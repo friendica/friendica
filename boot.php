@@ -254,6 +254,8 @@ class App {
 	public  $plugins;
 	public  $apps = array();
 	public  $identities;
+	
+	public $nav_sel;
 
 	private $scheme;
 	private $hostname;
