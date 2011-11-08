@@ -11,7 +11,7 @@ require_once('include/cache.php');
 define ( 'FRIENDIKA_PLATFORM',     'Friendica');
 define ( 'FRIENDIKA_VERSION',      '2.3.1158' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.22'    );
-define ( 'DB_UPDATE_VERSION',      1102      );
+define ( 'DB_UPDATE_VERSION',      1103      );
 
 define ( 'EOL',                    "<br />\r\n"     );
 define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
@@ -654,7 +654,7 @@ function get_guid($size=16) {
 // returns the complete html for inserting into the page
 
 if(! function_exists('login')) {
-function login($register = false) {
+function login($register = false, $hiddens=false) {
 	$o = "";
 	$reg = false;
 	if ($register) {
@@ -685,6 +685,7 @@ function login($register = false) {
 		'$openid'		=> !$noid,
 		'$lopenid'	=> array('openid_url', t('OpenID: '),'',''),
 		
+		'$hiddens'	=> $hiddens,
 		
 		'$register'		=> $reg,
 		

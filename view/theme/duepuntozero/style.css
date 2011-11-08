@@ -2779,6 +2779,28 @@ a.mail-list-link {
 .panel_text .progress { width: 50%; overflow: hidden; height: auto; border: 1px solid #cccccc; margin-bottom: 5px}
 .panel_text .progress span {float: right; display: block; width: 25%; background-color: #eeeeee; text-align: right;}
 
+/**
+ * OAuth
+ */
+.oauthapp {
+	height: auto; overflow: auto;
+	border-bottom: 2px solid #cccccc;
+	padding-bottom: 1em;
+	margin-bottom: 1em;	
+}
+.oauthapp img {
+	float: left;
+	width: 48px; height: 48px;
+	margin: 10px;
+}
+.oauthapp img.noicon {
+	background-image: url("../../../images/icons/48/plugin.png");
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+.oauthapp a {
+	float: left;
+}
 
 /**
  * ICONS

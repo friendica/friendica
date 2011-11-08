@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1102 );
+define( 'UPDATE_VERSION' , 1103 );
 
 /**
  *
@@ -874,7 +874,14 @@ function update_1101() {
 	q("ALTER TABLE `gcign` ADD INDEX (`uid`), ADD INDEX (`gcid`) ");
 }
 
+function update_1102() {
+	q("ALTER TABLE `clients` ADD `name` TEXT NULL DEFAULT NULL AFTER `redirect_uri` "); 
+	q("ALTER TABLE `clients` ADD `icon` TEXT NULL DEFAULT NULL AFTER `name` "); 
+	q("ALTER TABLE `clients` ADD `uid` INT NOT NULL DEFAULT 0 AFTER `icon` "); 
 
+	q("ALTER TABLE `tokens` ADD `secret` TEXT NOT NULL AFTER `id` "); 
+	q("ALTER TABLE `tokens` ADD `uid` INT NOT NULL AFTER `scope` "); 
+}
 
 
 

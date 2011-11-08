@@ -22,6 +22,11 @@
 		<input type="submit" name="submit" id="login-submit-button" value="$login" />
 	</div>
 	
+	{{ for $hiddens as $k=>$v }}
+		<input type="hidden" name="$k" value="$v" />
+	{{ endfor }}
+	
+	
 </form>
 
 

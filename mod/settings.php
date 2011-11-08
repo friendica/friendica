@@ -47,6 +47,58 @@ function settings_post(&$a) {
 		return;
 	}
 
+	if(($a->argc > 1) && ($a->argv[1] === 'oauth') && x($_POST,'remove')){
+		$key = $_POST['remove'];
+		q("DELETE FROM tokens WHERE id='%s' AND uid=%d",
+			dbesc($key),
+			local_user());
+		goaway($a->get_baseurl()."/settings/oauth/");
+		return;			
+	}
+
+	if(($a->argc > 2) && ($a->argv[1] === 'oauth')  && ($a->argv[2] === 'edit'||($a->argv[2] === 'add')) && x($_POST,'submit')) {
+		
+		$name   	= ((x($_POST,'name')) ? $_POST['name'] : '');
+		$key		= ((x($_POST,'key')) ? $_POST['key'] : '');
+		$secret		= ((x($_POST,'secret')) ? $_POST['secret'] : '');
+		$redirect	= ((x($_POST,'redirect')) ? $_POST['redirect'] : '');
+		$icon		= ((x($_POST,'icon')) ? $_POST['icon'] : '');
+		if ($name=="" || $key=="" || $secret==""){
+			notice(t("Missing some important data!"));
+			
+		} else {
+			if ($_POST['submit']==t("Update")){
+				$r = q("UPDATE clients SET
+							client_id='%s',
+							pw='%s',
+							name='%s',
+							redirect_uri='%s',
+							icon='%s',
+							uid=%d
+						WHERE client_id='%s'",
+						dbesc($key),
+						dbesc($secret),
+						dbesc($name),
+						dbesc($redirect),
+						dbesc($icon),
+						local_user(),
+						dbesc($key));
+			} else {
+				$r = q("INSERT INTO clients
+							(client_id, pw, name, redirect_uri, icon, uid)
+						VALUES ('%s','%s','%s','%s','%s',%d)",
+						dbesc($key),
+						dbesc($secret),
+						dbesc($name),
+						dbesc($redirect),
+						dbesc($icon),
+						local_user());
+			}
+		}
+		goaway($a->get_baseurl()."/settings/oauth/");
+		return;
+	}
+
 	if(($a->argc > 1) && ($a->argv[1] == 'addon')) {
 		call_hooks('plugin_settings_post', $_POST);
 		return;
@@ -342,6 +394,11 @@ function settings_content(&$a) {
 			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'addon')?'active':''),
 		),
 		array(
+			'label' => t('Connections'),
+			'url' => $a->get_baseurl() . '/settings/oauth',
+			'sel' => (($a->argc > 1) && ($a->argv[1] === 'oauth')?'active':''),
+		),
+		array(
 			'label' => t('Export personal data'),
 			'url' => $a->get_baseurl() . '/uexport',
 			'sel' => ''
@@ -353,8 +410,83 @@ function settings_content(&$a) {
 		'$tabs' => $tabs,
 	));
 		
-	
-
+	if(($a->argc > 1) && ($a->argv[1] === 'oauth')) {
+		
+		if(($a->argc > 2) && ($a->argv[2] === 'add')) {
+			$tpl = get_markup_template("settings_oauth_edit.tpl");
+			$o .= replace_macros($tpl, array(
+				'$tabs'		=> $tabs,
+				'$title'	=> t('Add application'),
+				'$submit'	=> t('Submit'),
+				'$cancel'	=> t('Cancel'),
+				'$name'		=> array('name', t('Name'), '', ''),
+				'$key'		=> array('key', t('Consumer Key'), '', ''),
+				'$secret'	=> array('secret', t('Consumer Secret'), '', ''),
+				'$redirect'	=> array('redirect', t('Redirect'), '', ''),
+				'$icon'		=> array('icon', t('Icon url'), '', ''),
+			));
+			return $o;
+		}
+		
+		if(($a->argc > 3) && ($a->argv[2] === 'edit')) {
+			$r = q("SELECT * FROM clients WHERE client_id='%s' AND uid=%d",
+					dbesc($a->argv[3]),
+					local_user());
+			
+			if (!count($r)){
+				notice(t("You can't edit this application."));
+				return;
+			}
+			$app = $r[0];
+			
+			$tpl = get_markup_template("settings_oauth_edit.tpl");
+			$o .= replace_macros($tpl, array(
+				'$tabs'		=> $tabs,
+				'$title'	=> t('Add application'),
+				'$submit'	=> t('Update'),
+				'$cancel'	=> t('Cancel'),
+				'$name'		=> array('name', t('Name'), $app['name'] , ''),
+				'$key'		=> array('key', t('Consumer Key'), $app['client_id'], ''),
+				'$secret'	=> array('secret', t('Consumer Secret'), $app['pw'], ''),
+				'$redirect'	=> array('redirect', t('Redirect'), $app['redirect_uri'], ''),
+				'$icon'		=> array('icon', t('Icon url'), $app['icon'], ''),
+			));
+			return $o;
+		}
+		
+		if(($a->argc > 3) && ($a->argv[2] === 'delete')) {
+			$r = q("DELETE FROM clients WHERE client_id='%s' AND uid=%d",
+					dbesc($a->argv[3]),
+					local_user());
+			goaway($a->get_baseurl()."/settings/oauth/");
+			return;			
+		}
+		
+		
+		$r = q("SELECT clients.*, tokens.id as oauth_token, (clients.uid=%d) AS my 
+				FROM clients
+				LEFT JOIN tokens ON clients.client_id=tokens.client_id
+				WHERE clients.uid IN (%d,0)",
+				local_user(),
+				local_user());
+		
+		
+		$tpl = get_markup_template("settings_oauth.tpl");
+		$o .= replace_macros($tpl, array(
+			'$baseurl'	=> $a->get_baseurl(),
+			'$title'	=> t('Connected Apps'),
+			'$add'		=> t('Add application'),
+			'$edit'		=> t('Edit'),
+			'$delete'		=> t('Delete'),
+			'$consumerkey' => t('Client key starts with'),
+			'$noname'	=> t('No name'),
+			'$remove'	=> t('Remove authorization'),
+			'$tabs'		=> $tabs,
+			'$apps'		=> $r,
+		));
+		return $o;
+		
+	}
 	if(($a->argc > 1) && ($a->argv[1] === 'addon')) {
 		$settings_addons = "";
 		

@@ -2,7 +2,7 @@
 	require_once("bbcode.php");
 	require_once("datetime.php");
 	require_once("conversation.php");
-	
+	require_once("oauth.php");
 	/* 
 	 * Twitter-Like API
 	 *  
@@ -27,6 +27,23 @@
 	 * Simple HTTP Login
 	 */
 	function api_login(&$a){
+		// login with oauth
+		try{
+			$oauth = new FKOAuth1();
+			list($consumer,$token) = $oauth->verify_request(OAuthRequest::from_request());
+			if (!is_null($token)){
+				$oauth->loginUser($token->uid);
+				call_hooks('logged_in', $a->user);
+				return;
+			}
+			echo __file__.__line__.__function__."<pre>"; var_dump($consumer, $token); die();
+		}catch(Exception $e){
+			logger(__file__.__line__.__function__."\n".$e);
+			//die(__file__.__line__.__function__."<pre>".$e); die();
+		}
+
+		
+		
 		// workaround for HTTP-auth in CGI mode
 		if(x($_SERVER,'REDIRECT_REMOTE_USER')) {
 		 	$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"],6)) ;
@@ -1127,3 +1144,31 @@
 	}
 	api_register_func('api/direct_messages/sent','api_direct_messages_sentbox',true);
 	api_register_func('api/direct_messages','api_direct_messages_inbox',true);
+
+
+
+	function api_oauth_request_token(&$a, $type){
+		try{
+			$oauth = new FKOAuth1();
+			$r = $oauth->fetch_request_token(OAuthRequest::from_request());
+		}catch(Exception $e){
+			echo "error=". OAuthUtil::urlencode_rfc3986($e->getMessage()); killme();
+		}
+		echo $r;
+		killme();	
+	}
+	function api_oauth_access_token(&$a, $type){
+		try{
+			$oauth = new FKOAuth1();
+			$r = $oauth->fetch_access_token(OAuthRequest::from_request());
+		}catch(Exception $e){
+			echo "error=". OAuthUtil::urlencode_rfc3986($e->getMessage()); killme();
+		}
+		echo $r;
+		killme();			
+	}
+
+	api_register_func('api/oauth/request_token', 'api_oauth_request_token', false);
+	api_register_func('api/oauth/access_token', 'api_oauth_access_token', false);
+
+
