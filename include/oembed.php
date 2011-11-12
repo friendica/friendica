@@ -56,7 +56,7 @@ function oembed_fetch_url($embedurl){
 	
 function oembed_format_object($j){
 	$embedurl = $j->embedurl;
-	$jhtml = oembed_iframe($j->html,$j->width,$j->height );
+	$jhtml = oembed_iframe($j->embedurl,$j->width,$j->height );
 	$ret="<span class='oembed ".$j->type."'>";
 	switch ($j->type) {
 		case "video": {
@@ -116,7 +116,9 @@ function oembed_iframe($src,$width,$height) {
 	$height = intval($height) + 80;
 	$width  = intval($width) + 40;
 
-	$s = 'data:text/html;base64,' . base64_encode('<html><body>' . $src . '</body></html>');
+	$a = get_app();
+
+	$s = $a->get_baseurl()."/oembed/".base64url_encode($src);
 	return '<iframe height="' . $height . '" width="' . $width . '" src="' . $s . '" frameborder="no" >' . t('Embedded content') . '</iframe>'; 
 
 }
