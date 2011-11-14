@@ -35,9 +35,6 @@ function ping_init(&$a) {
 				case ACTIVITY_DISLIKE:
 					$dislikes[] = $it;
 					break;
-				case ACTIVITY_POST;
-					$posts[] = $it;
-					break;
 				case ACTIVITY_FRIEND:
 					$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
 					$obj = parse_xml_string($xmlhead.$it['object']);
@@ -45,10 +42,13 @@ function ping_init(&$a) {
 					$friends[] = $it;
 					break;
 				default:
-					if ($it['parent']!=$it['id']) $comments[] = $it;
+					if ($it['parent']!=$it['id']) { 
+						$comments[] = $it;
+					} else {
+						$posts[] = $it;
+					}
 			}
 		}
-
 
 		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, 
 				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object`, 
@@ -129,7 +129,7 @@ function ping_init(&$a) {
 				<home>$home</home>";
 		if ($register!=0) echo "<register>$register</register>";
 		
-		$tot = $mail+$intro+$register+count($comments)+count($likes)+count($dislikes)+count($friends);
+		$tot = $mail+$intro+$register+count($comments)+count($likes)+count($dislikes)+count($friends)+count($posts);
 		
 		echo '	<notif count="'.$tot.'">';
 		if ($intro>0){
