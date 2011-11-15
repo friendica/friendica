@@ -4,7 +4,7 @@
  * Render actions localized
  */
 function localize_item(&$item){
-	
+	$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
 	if ($item['verb']=== ACTIVITY_LIKE || $item['verb']=== ACTIVITY_DISLIKE){
 
 		$r = q("SELECT * from `item`,`contact` WHERE 
@@ -79,7 +79,44 @@ function localize_item(&$item){
 		$item['body'] = sprintf( t('%1$s is now friends with %2$s'), $A, $B)."\n\n\n".$Bphoto;
 
 	}
-        
+    if ($item['verb']===ACTIVITY_TAG){
+		$r = q("SELECT * from `item`,`contact` WHERE 
+		`item`.`contact-id`=`contact`.`id` AND `item`.`uri`='%s';",
+		 dbesc($item['parent-uri']));
+		if(count($r)==0) return;
+		$obj=$r[0];
+		
+		$author	 = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
+		$objauthor =  '[url=' . $obj['author-link'] . ']' . $obj['author-name'] . '[/url]';
+		
+		switch($obj['verb']){
+			case ACTIVITY_POST:
+				switch ($obj['object-type']){
+					case ACTIVITY_OBJ_EVENT:
+						$post_type = t('event');
+						break;
+					default:
+						$post_type = t('status');
+				}
+				break;
+			default:
+				if($obj['resource-id']){
+					$post_type = t('photo');
+					$m=array();	preg_match("/\[url=([^]]*)\]/", $obj['body'], $m);
+					$rr['plink'] = $m[1];
+				} else {
+					$post_type = t('status');
+				}
+		}
+		$plink = '[url=' . $obj['plink'] . ']' . $post_type . '[/url]';
+		
+		$parsedobj = parse_xml_string($xmlhead.$item['object']);
+		
+		$tag = sprintf('#[url=%s]%s[/url]', $parsedobj->link, $parsedobj->content);
+		$item['body'] = sprintf( t('%1$s tagged %2$s\'s %3$s with %4$s'), $author, $objauthor, $plink, $tag );
+		
+		
+	}
 
 }
 
@@ -522,12 +559,22 @@ function conversation(&$a, $items, $mode, $update) {
 				// 
 				localize_item($item);
 
+
+				$tags=array();
+				foreach(explode(',',$item['tag']) as $tag){
+					$tag = trim($tag);
+					if ($tag!="") $tags[] = bbcode($tag);
+				}
+
+
 				// Build the HTML
 
 				$body = prepare_body($item,true);
-
+				
 
 				$tmp_item = replace_macros($template,array(
+					'$type' => implode("",array_slice(split("/",$item['verb']),-1)),
+					'$tags' => $tags,
 					'$body' => template_escape($body),
 					'$id' => $item['item_id'],
 					'$linktitle' => sprintf( t('View %s\'s profile @ %s'), $profile_name, ((strlen($item['author-link'])) ? $item['author-link'] : $item['url'])),

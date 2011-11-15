@@ -153,7 +153,7 @@
 /* global */
 body {
   font-family: Liberation Sans, helvetica, arial, clean, sans-serif;
-  font-size: 12px;
+  font-size: 10px;
   background-color: #ffffff;
   color: #2d2d2d;
   margin: 50px 0px 0px 0px;
@@ -535,6 +535,22 @@ section {
 .wall-item-container .wall-item-item, .wall-item-container .wall-item-bottom {
   display: table-row;
 }
+.wall-item-container .wall-item-bottom {
+  opacity: 0.5;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+.wall-item-container:hover .wall-item-bottom {
+  opacity: 1;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
 .wall-item-container .wall-item-info {
   display: table-cell;
   vertical-align: top;
@@ -563,7 +579,7 @@ section {
 }
 .wall-item-container .wall-item-content {
   display: table-cell;
-  font-size: 16px;
+  font-size: 12px;
   max-width: 720px;
   word-wrap: break-word;
 }
@@ -619,7 +635,8 @@ section {
   float: right;
 }
 .wall-item-container.comment {
-  margin-top: 50px;
+  /*margin-top: 50px;*/
+
 }
 .wall-item-container.comment .wall-item-photo {
   width: 32px;
@@ -652,6 +669,16 @@ section {
   height: 4em;
   color: #2d2d2d;
   border: 1px solid #2d2d2d;
+}
+.tag {
+  background: url("../../../images/tag_b.png") no-repeat center left;
+  color: #ffffff;
+  padding-left: 3px;
+}
+.tag a {
+  padding-right: 8px;
+  background: url("../../../images/tag.png") no-repeat center right;
+  color: #ffffff;
 }
 #profile-jot-wrapper {
   width: 100%;

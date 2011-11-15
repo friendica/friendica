@@ -1830,6 +1830,10 @@ a.mail-list-link {
 	margin-top: 10px;
 }
 
+aside input[type='text'] {
+ width: 180px;
+}
+
 .widget {
 	border: 1px solid #DDDDDD;
 	padding: 8px;

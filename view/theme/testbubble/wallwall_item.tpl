@@ -56,7 +56,13 @@
 		<div class="wall-item-content" id="wall-item-content-$id" >
 			<div class="wall-item-title" id="wall-item-title-$id">$title</div>
 			<div class="wall-item-title-end"></div>
-			<div class="wall-item-body" id="wall-item-body-$id" >$body</div>
+			<div class="wall-item-body" id="wall-item-body-$id" >$body
+					<div class="body-tag">
+						{{ for $tags as $tag }}
+							<span class='tag'>$tag</span>
+						{{ endfor }}
+					</div>
+			</div>
 		</div>
 		<div class="wall-item-author">
 			<a href="$profile_url" title="$linktitle" class="wall-item-name-link"><span class="wall-item-name$sparkle" id="wall-item-name-$id" >$name</span></a>

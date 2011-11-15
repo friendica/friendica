@@ -3,7 +3,7 @@
 /* global */
 body {
 	font-family: Liberation Sans,helvetica,arial,clean,sans-serif;
-	font-size: 12px;
+	font-size: 10px;
 	background-color: @BodyBackground;
 	color: @BodyColor;
 	margin: 50px 0px 0px 0px;
@@ -302,6 +302,9 @@ section {
 	
 	.wall-item-item,
 	.wall-item-bottom { display: table-row; }
+	
+	.wall-item-bottom { .opaque(0.5); }
+	&:hover .wall-item-bottom { .opaque(1); }
 	.wall-item-info {
 		display: table-cell;
 		vertical-align: top;
@@ -326,7 +329,7 @@ section {
 	}
 	.wall-item-content {
 		display: table-cell;
-		font-size: 16px;
+		font-size: 12px;
 		max-width: 720px;
 		word-wrap: break-word;
 	}
@@ -355,11 +358,12 @@ section {
 		a { float: right; }
 		input { float: right; }
 	}
+	
 }
 
 
 .wall-item-container.comment {
-	margin-top: 50px;
+	/*margin-top: 50px;*/
 	.wall-item-photo { width: 32px; height: 32px; margin-left: 16px;}	
 	.wall-item-photo-menu-button {
 		top: 13px !important;
@@ -384,6 +388,19 @@ section {
 		border: 1px solid @CommentBoxFullBorderColor;
 	}
 }
+
+.tag {
+	background: url("../../../images/tag_b.png") no-repeat center left;
+	color: @TagColor;
+	padding-left: 3px;
+	a {
+		padding-right: 8px;
+		background: url("../../../images/tag.png") no-repeat center right;
+		color: @TagColor;
+	}
+}
+
+
 
 #profile-jot-wrapper {
 	width: 100%;

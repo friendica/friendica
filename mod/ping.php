@@ -8,9 +8,10 @@ function ping_init(&$a) {
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
 		<result>";
 
+	$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
 	if(local_user()){
 
-		
+		$tags = array();
 		$comments = array();
 		$likes = array();
 		$dislikes = array();
@@ -29,6 +30,11 @@ function ping_init(&$a) {
 		$network = count($r);
 		foreach ($r as $it) {
 			switch($it['verb']){
+				case ACTIVITY_TAG:
+					$obj = parse_xml_string($xmlhead.$it['object']);
+					$it['tname'] = $obj->content;
+					$tags[] = $it;
+					break;
 				case ACTIVITY_LIKE:
 					$likes[] = $it;
 					break;
@@ -36,7 +42,6 @@ function ping_init(&$a) {
 					$dislikes[] = $it;
 					break;
 				case ACTIVITY_FRIEND:
-					$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
 					$obj = parse_xml_string($xmlhead.$it['object']);
 					$it['fname'] = $obj->title;			
 					$friends[] = $it;
@@ -61,6 +66,11 @@ function ping_init(&$a) {
 		$home = count($r);
 		foreach ($r as $it) {
 			switch($it['verb']){
+				case ACTIVITY_TAG:
+					$obj = parse_xml_string($xmlhead.$it['object']);
+					$it['tname'] = $obj->content;				
+					$tags[] = $it;
+					break;
 				case ACTIVITY_LIKE:
 					$likes[] = $it;
 					break;
@@ -68,7 +78,6 @@ function ping_init(&$a) {
 					$dislikes[] = $it;
 					break;
 				case ACTIVITY_FRIEND:
-					$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
 					$obj = parse_xml_string($xmlhead.$it['object']);
 					$it['fname'] = $obj->title;
 					$friends[] = $it;
@@ -129,7 +138,7 @@ function ping_init(&$a) {
 				<home>$home</home>";
 		if ($register!=0) echo "<register>$register</register>";
 		
-		$tot = $mail+$intro+$register+count($comments)+count($likes)+count($dislikes)+count($friends)+count($posts);
+		$tot = $mail+$intro+$register+count($comments)+count($likes)+count($dislikes)+count($friends)+count($posts)+count($tags);
 		
 		echo '	<notif count="'.$tot.'">';
 		if ($intro>0){
@@ -171,6 +180,11 @@ function ping_init(&$a) {
 		if (count($posts)){
 			foreach ($posts as $i) {
 				echo xmlize( $a->get_baseurl().'/display/'.$a->user['nickname']."/".$i['parent'], $i['author-name'], $i['author-link'], $i['author-avatar'], relative_date($i['created']), sprintf( t("{0} posted") ) );
+			};
+		}
+		if (count($tags)){
+			foreach ($tags as $i) {
+				echo xmlize( $a->get_baseurl().'/display/'.$a->user['nickname']."/".$i['parent'], $i['author-name'], $i['author-link'], $i['author-avatar'], relative_date($i['created']), sprintf( t("{0} tagged %s's post with #%s"), $i['pname'], $i['tname'] ) );
 			};
 		}
 
