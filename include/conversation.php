@@ -112,9 +112,8 @@ function localize_item(&$item){
 		
 		$parsedobj = parse_xml_string($xmlhead.$item['object']);
 		
-		$tag = sprintf('#[url=%s]%s[/url]', $parsedobj->link, $parsedobj->content);
+		$tag = sprintf('#[url=%s]%s[/url]', $parsedobj->id, $parsedobj->content);
 		$item['body'] = sprintf( t('%1$s tagged %2$s\'s %3$s with %4$s'), $author, $objauthor, $plink, $tag );
-		
 		
 	}
 
