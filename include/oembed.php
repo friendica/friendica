@@ -13,24 +13,30 @@ function oembed_replacecb($matches){
 function oembed_fetch_url($embedurl){
 	
 	$txt = Cache::get($embedurl);
+
+	$noexts = array("mp3","mp4","ogg","ogv","oga","ogm","webm");
+	$ext = pathinfo(strtolower($embedurl),PATHINFO_EXTENSION);
+	
 				
 	if(is_null($txt)){
 		$txt = "";
 		
-		// try oembed autodiscovery
-		$redirects = 0;
-		$html_text = fetch_url($embedurl, false, $redirects, 15);
-		if($html_text){
-			$dom = @DOMDocument::loadHTML($html_text);
-			if ($dom){
-				$xpath = new DOMXPath($dom);
-				$attr = "oembed";
-			
-				$xattr = oe_build_xpath("class","oembed");
-				$entries = $xpath->query("//link[@type='application/json+oembed']");
-				foreach($entries as $e){
-					$href = $e->getAttributeNode("href")->nodeValue;
-					$txt = fetch_url($href);
+		if (!in_array($ext, $noexts)){
+			// try oembed autodiscovery
+			$redirects = 0;
+			$html_text = fetch_url($embedurl, false, $redirects, 15, "text/*");
+			if($html_text){
+				$dom = @DOMDocument::loadHTML($html_text);
+				if ($dom){
+					$xpath = new DOMXPath($dom);
+					$attr = "oembed";
+				
+					$xattr = oe_build_xpath("class","oembed");
+					$entries = $xpath->query("//link[@type='application/json+oembed']");
+					foreach($entries as $e){
+						$href = $e->getAttributeNode("href")->nodeValue;
+						$txt = fetch_url($href);
+					}
 				}
 			}
 		}
