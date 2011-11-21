@@ -162,23 +162,20 @@ function group_side($every="contacts",$each="group",$edit = false, $group_id = 0
 	if(! local_user())
 		return '';
 
-	$createtext = t('Create a new group');
-	$linktext= t('Everybody');
-	$selected = (($group_id == 0) ? ' group-selected' : '');
-$o .= <<< EOT
+	$groups = array();
+	
+	$groups[] = array(
+		'text' 	=> t('Everybody'),
+		'selected' => (($group_id == 0) ? 'group-selected' : ''),
+		'href' 	=> $every,
+	);
 
-<div id="group-sidebar" class="widget">
-<h3>Groups</h3>
 
-<div id="sidebar-group-list">
-	<ul id="sidebar-group-ul">
-	<li class="sidebar-group-li" ><a href="$every" class="sidebar-group-element$selected" >$linktext</a></li>
-
-EOT;
 
 	$r = q("SELECT * FROM `group` WHERE `deleted` = 0 AND `uid` = %d ORDER BY `name` ASC",
 		intval($_SESSION['uid'])
 	);
+	$member_of = array();
 	if($cid) {
 		$member_of = groups_containing(local_user(),$cid);
 	} 
@@ -186,25 +183,38 @@ EOT;
 	if(count($r)) {
 		foreach($r as $rr) {
 			$selected = (($group_id == $rr['id']) ? ' group-selected' : '');
-			$o .= '	<li class="sidebar-group-li">' 
-			. (($edit) ? "<a href=\"group/{$rr['id']}\" title=\"" . t('Edit') 
-				. "\" class=\"groupsideedit\" ><span class=\"icon small-pencil\"></span></a> " : "") 
-			. (($cid) ? '<input type="checkbox" class="' . (($selected) ? 'ticked' : 'unticked') . '" onclick="contactgroupChangeMember(' . $rr['id'] . ',' . $cid . ');return true;" '
-				. ((in_array($rr['id'],$member_of)) ? ' checked="checked" ' : '') . '/>' : '')
-			. "<a href=\"$each/{$rr['id']}\" class=\"sidebar-group-element" . $selected ."\"  >{$rr['name']}</a></li>\r\n";
+			
+			if ($edit) {
+				$groupedit = array(
+					'href' => "group/".$rr['id'],
+					'title' => t('edit'),
+				);
+			} else {
+				$groupedit = null;
+			}
+			
+			$groups[] = array(
+				'id'		=> $rr['id'],
+				'cid'		=> $cid,
+				'text' 		=> $rr['name'],
+				'selected' 	=> $selected,
+				'href'		=> $each."/".$rr['id'],
+				'edit'		=> $groupedit,
+				'ismember'	=> in_array($rr['id'],$member_of),
+			);
 		}
 	}
-	$o .= "	</ul>\r\n	</div>";
-
-	$o .= <<< EOT
-
-  <div id="sidebar-new-group">
-  <a href="group/new">$createtext</a>
-  </div>
-</div>
 	
-EOT;
-
+	
+	$tpl = get_markup_template("group_side.tpl");
+	$o = replace_macros($tpl, array(
+		'$title'		=> t('Groups'),
+		'$createtext' 	=> t('Create a new group'),
+		'$groups'		=> $groups,
+		'$add'			=> t('add'),
+	));
+		
+	
 	return $o;
 }
 

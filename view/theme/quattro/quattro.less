@@ -42,11 +42,16 @@ a:hover {color: @LinkHover; text-decoration: underline; }
 .hidden { display: none; }
 
 
+/* tool */
+
 .tool {
 	height: auto; overflow: auto;
 	.label { float: left;}
 	.action { float: right; }
 }
+
+
+
 
 /* popup notifications */
 div.jGrowl div.notice {
@@ -74,7 +79,7 @@ header {
 	}
 	
 	#banner {
-		
+		overflow: hidden;
 	    text-align: center;
 		width: 100%;
 		a, a:active, a:visited, a:link, a:hover { color: @Grey1; text-decoration: none; outline: none; vertical-align: bottom; }
@@ -228,6 +233,7 @@ ul.menu-popup {
 /* aside */
 aside { 
 	display: table-cell;
+	vertical-align: top;
 	width: 200px;
 	padding:0px 10px 0px 20px;
 	border-right: 1px solid @AsideBorder;
@@ -260,6 +266,7 @@ aside {
 
 	#profiles-menu { width: 20em; }
 
+
 }
 
 #contact-block {
@@ -277,11 +284,40 @@ aside {
 }
 
 
+/* widget */
+.widget {
+	margin-bottom: 2em;
+	
+	h3 { padding: 0px; margin: 2px;}
+	.action { .opaque(0.1); }
+	input.action { .opaque(0.5); }
+	&:hover .title .action { .opaque(1); }
+	.tool:hover .action { .opaque(1); }
+	.tool:hover .action.ticked { .opaque(1); }
+
+	ul { padding: 0px;}
+	ul li {padding-left: 16px; min-height: 16px; list-style: none; }
+	
+	.tool.selected {
+		background: url('../../../images/selected.png') no-repeat left center;
+	}
+	
+	/*.action .s10 { width: 10px; overflow: hidden; padding: 0px;}
+	.action .s16 { width: 16px; overflow: hidden; padding: 0px;}*/
+	
+}
+
+/* widget: search */
+#add-search-popup {
+	width: 200px;
+	top: 18px;
+}
 
 
 /* section */
 section { 
 	display: table-cell;
+	vertical-align: top;
 	width: 800px;
 	padding:0px 20px 0px 10px;
 }
@@ -472,14 +508,14 @@ section {
 	margin-top: 15px;
 }
 /** buttons **/
-input[type="submit"] {
+/*input[type="submit"] {
 	border: 0px;
     background-color: @ButtonBackgroundColor;
     color: @ButtonColor;
     padding: 0px 10px;
 	.rounded(5px);
     height: 18px;
-}
+}*/
 
 
 /** acl **/
@@ -589,6 +625,77 @@ ul.tabs {
     li {
         float: left;
         margin-left: 20px;
+        
+        .active {
+			border-bottom: 1px solid @LinkVisited;
+        }
     }
+    
 }
 
+
+/**
+ * Form fields
+ */
+.field {
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	overflow: auto;
+	width: 100%;
+
+
+	label {
+		float: left;
+		width: 200px;
+	}
+
+	input,
+	textarea {
+		width: 400px;
+	}
+	textarea { height: 100px; }
+	.field_help {
+		display: block;
+		margin-left: 200px;
+		color: #666666;
+		
+	}
+
+
+	.onoff {
+		float: left;
+		width: 80px;
+	}
+	.onoff a {
+		display: block;
+		border:1px solid #666666;
+		background-image:url("../../../images/onoff.jpg");
+		background-repeat: no-repeat;
+		padding: 4px 2px 2px 2px;
+		height: 16px;
+		text-decoration: none;
+	}
+	.onoff .off {
+		border-color:#666666;
+		padding-left: 40px;
+		background-position: left center;
+		background-color: #cccccc;
+		color: #666666;
+		text-align: right;
+	}
+	.onoff .on {
+		border-color:#204A87;
+		padding-right: 40px;
+		background-position: right center;
+		background-color: #D7E3F1;
+		color: #204A87;
+		text-align: left;
+	}
+	.hidden { display: none!important; }
+
+	&.radio .field_help { margin-left: 0px; }
+}
+
+
+/* page footer */
+footer { height: 100px; display: table-row; }

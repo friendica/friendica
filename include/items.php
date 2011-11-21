@@ -2814,14 +2814,27 @@ function item_expire($uid,$days) {
 
 	if(! count($r))
 		return;
+
+	$expire_items = get_pconfig($uid, 'expire','items');
+	$expire_items = (($expire_items===false)?1:intval($expire_items)); // default if not set: 1
+	
+	$expire_notes = get_pconfig($uid, 'expire','notes');
+	$expire_notes = (($expire_notes===false)?1:intval($expire_notes)); // default if not set: 1
+	
+	$expire_photos = get_pconfig($uid, 'expire','photos');
+	$expire_photos = (($expire_photos===false)?0:intval($expire_photos)); // default if not set: 0
  
-	logger('expire: # items=' . count($r) );
+	logger('expire: # items=' . count($r). "; expire items: $expire_items, expire notes: $expire_notes, expire photos: $expire_photos");
 
 	foreach($r as $item) {
 
 		// Only expire posts, not photos and photo comments
 
-		if(strlen($item['resource-id']))
+		if($expire_photos==0 && strlen($item['resource-id']))
+			continue;
+		if($expire_notes==0 && $item['type']=='note')
+			continue;
+		if($expire_items==0 && $item['type']!='note')
 			continue;
 
 		$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `id` = %d LIMIT 1",
@@ -2842,7 +2855,7 @@ function item_expire($uid,$days) {
 	}
 
 	proc_run('php',"include/notifier.php","expire","$uid");
-
+	
 }
 
 

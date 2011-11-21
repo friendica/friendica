@@ -71,21 +71,30 @@ function saved_searches($search) {
 		intval(local_user())
 	);
 
-	$o .= '<div id="saved-search-list" class="widget">';
-	$o .= '<h3 id="search">' . t('Saved Searches') . '</h3>' . "\r\n";
-	$o .= search($search,'netsearch-box',$srchurl,true);
+	$saved = array();
+
+
 	
 	if(count($r)) {
-		$o .= '<ul id="saved-search-ul">' . "\r\n";
 		foreach($r as $rr) {
-			$o .= '<li class="saved-search-li clear"><a href="network/?f=&remove=1&search=' . $rr['term'] . '" class="icon drophide savedsearchdrop" title="' . t('Remove term') . '" onclick="return confirmDelete();" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a> <a href="network/?f=&search=' . urlencode($rr['term']) . '" class="savedsearchterm" >' . $rr['term'] . '</a></li>' . "\r\n";
+			$saved[] = array(
+				'term'			=> $rr['term'],
+				'encodedterm' 	=> urlencode($rr['term']),
+				'delete'		=> t('Remove term'),
+				'selected'		=> ($search==$rr['term']),
+			);
 		}
-		$o .= '</ul>';
 	}		
 
-	$o .= '<div class="clear"></div>';
-
-	$o .= '</div>' . "\r\n";
+	
+	$tpl = get_markup_template("saved_searches_aside.tpl");
+	$o = replace_macros($tpl, array(
+		'$title'	 => t('Saved Searches'),
+		'$add'		 => t('add'),
+		'$searchbox' => search($search,'netsearch-box',$srchurl,true),
+		'$saved' 	 => $saved,
+	));
+	
 	return $o;
 
 }
@@ -102,7 +111,7 @@ function network_content(&$a, $update = 0) {
 
 	// item filter tabs
 	// TODO: fix this logic, reduce duplication
-	$a->page['content'] .= '<div class="tabs-wrapper">';
+	//$a->page['content'] .= '<div class="tabs-wrapper">';
 	
 	$starred_active = '';
 	$new_active = '';

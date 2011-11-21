@@ -215,6 +215,12 @@ function settings_post(&$a) {
 	$openid           = ((x($_POST,'openid_url')) ? notags(trim($_POST['openid_url']))   : '');
 	$maxreq           = ((x($_POST,'maxreq'))     ? intval($_POST['maxreq'])             : 0);
 	$expire           = ((x($_POST,'expire'))     ? intval($_POST['expire'])             : 0);
+	
+	
+	$expire_items     = ((x($_POST,'expire_items')) ? intval($_POST['expire_items'])	 : 0);
+	$expire_notes     = ((x($_POST,'expire_notes')) ? intval($_POST['expire_notes'])	 : 0);
+	$expire_photos    = ((x($_POST,'expire_photos'))? intval($_POST['expire_photos'])	 : 0);
+	
 
 	$allow_location   = (((x($_POST,'allow_location')) && (intval($_POST['allow_location']) == 1)) ? 1: 0);
 	$publish          = (((x($_POST,'profile_in_directory')) && (intval($_POST['profile_in_directory']) == 1)) ? 1: 0);
@@ -296,6 +302,10 @@ function settings_post(&$a) {
 		else
 			$openidserver = '';
 	}
+
+	set_pconfig(local_user(),'expire','items', $expire_items);
+	set_pconfig(local_user(),'expire','notes', $expire_notes);
+	set_pconfig(local_user(),'expire','photos', $expire_photos);
 
 	$r = q("UPDATE `user` SET `username` = '%s', `email` = '%s', `openid` = '%s', `timezone` = '%s',  `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `notify-flags` = %d, `page-flags` = %d, `default-location` = '%s', `allow_location` = %d, `theme` = '%s', `maxreq` = %d, `expire` = %d, `openidserver` = '%s', `blockwall` = %d, `hidewall` = %d, `blocktags` = %d  WHERE `uid` = %d LIMIT 1",
 			dbesc($username),
@@ -586,6 +596,15 @@ function settings_content(&$a) {
 	$blockwall = $a->user['blockwall'];
 	$blocktags = $a->user['blocktags'];
 
+	$expire_items = get_pconfig(local_user(), 'expire','items');
+	$expire_items = (($expire_items===false)?1:$expire_items); // default if not set: 1
+	
+	$expire_notes = get_pconfig(local_user(), 'expire','notes');
+	$expire_notes = (($expire_notes===false)?1:$expire_notes); // default if not set: 1
+	
+	$expire_photos = get_pconfig(local_user(), 'expire','photos');
+	$expire_photos = (($expire_photos===false)?0:$expire_photos); // default if not set: 0
+	
 	if(! strlen($a->user['timezone']))
 		$timezone = date_default_timezone_get();
 
@@ -698,7 +717,13 @@ function settings_content(&$a) {
 
 	$celeb = ((($a->user['page-flags'] == PAGE_SOAPBOX) || ($a->user['page-flags'] == PAGE_COMMUNITY)) ? true : false);
 
-	
+	$expire_arr = array(
+		'days' => array('expire',  t("Automatically expire posts after days:"), $expire, t('If empty, posts will not expire. Expired posts will be deleted')),
+		'advanced' => t('Advanced expire settings'),
+		'items' => array('expire_items',  t("Expire posts:"), $expire_items, '', array(t('No'),t('Yes'))),
+		'notes' => array('expire_notes',  t("Expire personal notes:"), $expire_notes, '', array(t('No'),t('Yes'))),
+		'photos' => array('expire_photos',  t("Expire photos:"), $expire_photos, '', array(t('No'),t('Yes'))),		
+	);
 
 	$o .= replace_macros($stpl,array(
 		'$tabs' 	=> $tabs,
@@ -736,7 +761,7 @@ function settings_content(&$a) {
 
 		'$blockwall'=> $blockwall, // array('blockwall', t('Allow friends to post to your profile page:'), !$blockwall, ''),
 		'$blocktags'=> $blocktags, // array('blocktags', t('Allow friends to tag your posts:'), !$blocktags, ''),
-		'$expire'	=> array('expire', t("Automatically expire posts after days:"), $expire, t('If empty, posts will not expire. Expired posts will be deleted')),
+		'$expire'	=> $expire_arr,
 
 		'$profile_in_dir' => $profile_in_dir,
 		'$profile_in_net_dir' => $profile_in_net_dir,

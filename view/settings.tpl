@@ -55,18 +55,35 @@ $blockwall
 
 $blocktags
 
-{{inc field_input.tpl with $field=$expire }}{{endinc}}
+{{inc field_input.tpl with $field=$expire.days }}{{endinc}}
+<div class="field input">
+	<span class="field_help"><a href="#advaced-expire-popup" id="advenced-expire" class='popupbox' title="$expire.advanced">Advanced</a></span>
+	<div style="display: none;">
+		<div id="advaced-expire-popup" style="width:auto;height:auto;overflow:auto;">
+			<h3>$expire.advanced</h3>
+			{{ inc field_yesno.tpl with $field=$expire.items }}{{endinc}}
+			{{ inc field_yesno.tpl with $field=$expire.notes }}{{endinc}}
+		</div>
+	</div>
+
+</div>
+
 
 <div id="settings-default-perms" class="settings-default-perms" >
-	<div id="settings-default-perms-menu" class="fakelink" onClick="openClose('settings-default-perms-select');" >$permissions $permdesc</div>
+	<a href="#profile-jot-acl-wrapper" id="settings-default-perms-menu" class='popupbox'>$permissions $permdesc</a>
 	<div id="settings-default-perms-menu-end"></div>
 
 	<div id="settings-default-perms-select" style="display: none; margin-bottom: 20px" >
 	
-		$aclselect
+	<div style="display: none;">
+		<div id="profile-jot-acl-wrapper" style="width:auto;height:auto;overflow:auto;">
+			$aclselect
+		</div>
+	</div>
 
 	</div>
 </div>
+<br/>
 <div id="settings-default-perms-end"></div>
 
 

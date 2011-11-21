@@ -78,6 +78,13 @@
 			menu.toggle();
 			return false;
 		});
+		
+		// fancyboxes
+		$("a.popupbox").fancybox({
+			'transitionIn' : 'elastic',
+			'transitionOut' : 'elastic'
+		});
+		
 
 		/* notifications template */
 		var notifications_tpl= unescape($("#nav-notifications-template[rel=template]").html());

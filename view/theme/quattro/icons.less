@@ -20,7 +20,7 @@
 .icon {
 	background-color: transparent ;
 	background-repeat: no-repeat;
-	background-position: center center;
+	background-position: left center;
 	display: block;
 	overflow: hidden;
 	text-indent: -9999px;
@@ -31,16 +31,19 @@
 	}
 
 	&.s10 {
-		width:10px; height: 10px;
+		min-width:10px; height: 10px;
 		.icons(10);
+		&.text { padding: 2px 0px 0px 15px;  }
 	}
 	&.s16 {
-		width:22px; height: 22px;
+		min-width:16px; height: 16px;
 		.icons(16);
+		&.text { padding: 4px 0px 0px 20px;  }
 	}
 	&.s22 {
-		width:22px; height: 22px;
+		min-width:22px; height: 22px;
 		.icons(22);
+		&.text { padding: 10px 0px 0px 25px;  }
 	}
 	&.s48 {
 		width:48px; height: 48px;
