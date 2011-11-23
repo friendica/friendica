@@ -234,7 +234,6 @@ CREATE TABLE IF NOT EXISTS `item` (
   KEY `uid` (`uid`),
   KEY `contact-id` (`contact-id`),
   KEY `type` (`type`),
-  KEY `wall` (`wall`),
   KEY `parent` (`parent`),
   KEY `parent-uri` (`parent-uri`),
   KEY `extid` (`extid`),
