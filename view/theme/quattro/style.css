@@ -643,6 +643,10 @@ section {
 .wall-item-container .wall-item-info .wall-item-photo {
   width: 48px;
   height: 48px;
+  overflow: hidden;
+  text-indent: -9999px;
+  display: block;
+  background: url(../../../images/icons/48/user.png) no-repeat center center;
 }
 .wall-item-container .wall-item-info .wall-item-photo-menu-button {
   display: none;
@@ -722,6 +726,7 @@ section {
   width: 32px;
   height: 32px;
   margin-left: 16px;
+  background: url(../../../images/icons/22/user.png) no-repeat center center;
 }
 .wall-item-container.comment .wall-item-photo-menu-button {
   top: 13px !important;
@@ -749,6 +754,9 @@ section {
   height: 4em;
   color: #2d2d2d;
   border: 1px solid #2d2d2d;
+}
+.wall-item-tags {
+  padding-top: 5px;
 }
 .tag {
   background: url("../../../images/tag_b.png") no-repeat center left;

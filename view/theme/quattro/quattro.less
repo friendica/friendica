@@ -348,7 +348,13 @@ section {
 		width: 60px;
 		
 		.wall-item-photo-wrapper { position: relative; }
-		.wall-item-photo { width: 48px; height: 48px; }		
+		.wall-item-photo { 
+			width: 48px; height: 48px;
+			overflow: hidden;
+			text-indent: -9999px;
+			display: block;
+			background: url(../../../images/icons/48/user.png) no-repeat center center;
+		 }		
 		
 		.wall-item-photo-menu-button {
 			display: none;
@@ -400,7 +406,9 @@ section {
 
 .wall-item-container.comment {
 	/*margin-top: 50px;*/
-	.wall-item-photo { width: 32px; height: 32px; margin-left: 16px;}	
+	.wall-item-photo { width: 32px; height: 32px; margin-left: 16px;
+		background: url(../../../images/icons/22/user.png) no-repeat center center;
+	}	
 	.wall-item-photo-menu-button {
 		top: 13px !important;
 		left: 10px !important;
@@ -425,6 +433,9 @@ section {
 	}
 }
 
+
+
+.wall-item-tags { padding-top: 5px; }
 .tag {
 	background: url("../../../images/tag_b.png") no-repeat center left;
 	color: @TagColor;
