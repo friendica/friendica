@@ -979,6 +979,8 @@ profile-jot-banner-wrapper {
 	max-width: 85%;
 }
 
+.wall-item-body img { max-width: 100%; height: auto; }
+
 .wall-item-body p {
 	font-size: 0.8em;
 }
