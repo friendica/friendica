@@ -711,6 +711,12 @@ ul .sidebar-group-li .icon{
 	margin-left: 15px;
 }
 
+#pause {
+  position: fixed;
+  bottom: 5px;
+  right: 5px;
+}
+
 /* ================== */
 /* = Contacts Block = */
 /* ================== */
