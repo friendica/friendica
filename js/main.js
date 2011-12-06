@@ -16,12 +16,12 @@
       document.getElementById(theID).style.display = "none" 
   }
 
-	
 	var src = null;
 	var prev = null;
 	var livetime = null;
 	var msie = false;
 	var stopped = false;
+	var totStopped = false;
 	var timer = null;
 	var pr = 0;
 	var liking = 0;
@@ -148,26 +148,26 @@
 		
  		NavUpdate(); 
 		// Allow folks to stop the ajax page updates with the pause/break key
-		$(document).keypress(function(event) {
-			if(event.keyCode == '19') {
+		$(document).keydown(function(event) {
+			if(event.keyCode == '19' || (event.ctrlKey && event.which == '32')) {
 				event.preventDefault();
 				if(stopped == false) {
 					stopped = true;
+					if (event.ctrlKey) {
+						totStopped = true;
+					}
 					$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
+				} else {
+					stopped = false;
+					totStopped = false;
+					$('#pause').html('');
 				}
-				else {
+			} else {
+				if (!totStopped) {
 					stopped = false;
 					$('#pause').html('');
 				}
 			}
-			else {
-				// any key to resume
-				if(stopped == true) {
-					stopped = false;
-					$('#pause').html('');
-				}
-			}
-
 		});
 		
 		
