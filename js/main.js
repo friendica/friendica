@@ -158,14 +158,11 @@
 					}
 					$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
 				} else {
-					stopped = false;
-					totStopped = false;
-					$('#pause').html('');
+					unpause();
 				}
 			} else {
 				if (!totStopped) {
-					stopped = false;
-					$('#pause').html('');
+					unpause();
 				}
 			}
 		});
@@ -302,6 +299,7 @@
 	// is delayed and NavUpdate runs before it completes.
 
 	function dolike(ident,verb) {
+		unpause();
 		$('#like-rotator-' + ident.toString()).show();
 		$.get('like/' + ident.toString() + '?verb=' + verb );
 		if(timer) clearTimeout(timer);
@@ -374,6 +372,7 @@
 	}
 
 	function post_comment(id) {
+		unpause();
 		commentBusy = true;
 		$('body').css('cursor', 'wait');
 		$.post(  
@@ -398,6 +397,13 @@
          return false;  
 	}
 
+	function unpause() {
+		// unpause auto reloads if they are currently stopped
+		totStopped = false;
+		stopped = false;
+	    $('#pause').html('');
+	}
+		
 
     function bin2hex(s){  
         // Converts the binary representation of data to hex    
