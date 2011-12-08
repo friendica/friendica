@@ -65,6 +65,8 @@ li {
 .required { display: inline; color: #b20202; }
 .fakelink { color: #b20202; cursor: pointer; }
 .fakelink :hover { color: #db0503; }
+.heart { color: #FF0000; font-size: 100%; }
+
 
 input[type=text] {
 	border: 2px solid #b0b0b0;
@@ -2279,9 +2281,17 @@ margin-left: 0px;
     padding: 5px;
 }
 
-#register-form div,
-#profile-edit-form div { 
+#register-form div {
 	clear: both;
+}
+
+#profile-edit-form div { 
+	margin-bottom: 5px;
+}
+
+#profile-edit-form div[id$='desc'] {
+	font-size: 0.8em;
+	margin-left: 2%;
 }
 
 #register-form label,
@@ -2289,8 +2299,9 @@ margin-left: 0px;
 	width: 300px; float: left;
 }
 
-#register-form span,
-#profile-edit-form span  {
+/* #register-form span,
+#profile-edit-form span  { */
+#register-form span {
 	color: #555753;
 	display:block;
 	margin-bottom: 20px;
