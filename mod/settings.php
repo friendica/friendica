@@ -574,7 +574,7 @@ function settings_content(&$a) {
 		'$mail_disabled' => (($mail_disabled) ? t('Email access is disabled on this site.') : ''),
 		'$mail_server'	=> array('mail_server',  t('IMAP server name:'), $mail_server, ''),
 		'$mail_port'	=> array('mail_port', 	 t('IMAP port:'), $mail_port, ''),
-		'$mail_ssl'		=> array('mail_ssl', 	 t('Security:'), strtoupper($mail_ssl), '', array( ''=>t('None'), 'TSL'=>'TSL', 'SSL'=>'SSL')),
+		'$mail_ssl'		=> array('mail_ssl', 	 t('Security:'), strtoupper($mail_ssl), '', array( ''=>t('None'), 'TLS'=>'TLS', 'SSL'=>'SSL')),
 		'$mail_user'	=> array('mail_user',    t('Email login name:'), $mail_user, ''),
 		'$mail_pass'	=> array('mail_pass', 	 t('Email password:'), '', ''),
 		'$mail_replyto'	=> array('mail_replyto', t('Reply-to address:'), '', 'Optional'),
