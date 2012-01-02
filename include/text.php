@@ -426,6 +426,10 @@ function attribute_contains($attr,$s) {
 
 if(! function_exists('logger')) {
 function logger($msg,$level = 0) {
+	// turn off logger in install mode
+	global $a;
+	if ($a->module == 'install') return;
+	
 	$debugging = get_config('system','debugging');
 	$loglevel  = intval(get_config('system','loglevel'));
 	$logfile   = get_config('system','logfile');

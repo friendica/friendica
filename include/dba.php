@@ -18,7 +18,7 @@ class dba {
 	private $db;
 	public  $mysqli = true;
 	public  $connected = false;
-
+	public  $error = false;
 
 	function __construct($server,$user,$pass,$db,$install = false) {
 
@@ -27,10 +27,16 @@ class dba {
 		$pass = trim($pass);
 		$db = trim($db);
 
+		if (!(strlen($server) && strlen($user))){
+			$this->connected = false;
+			$this->db = null;
+			return;			
+		}
+		
 		if($install) {
 			if(strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
 				if(! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
-					notice( sprintf( t('Cannot locate DNS info for database server \'%s\''), $server));
+					$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
 					$this->connected = false;
 					$this->db = null;
 					return;
@@ -152,10 +158,11 @@ class dba {
 	}
 
 	function __destruct() {
-		if($this->mysqli)
-			@$this->db->close();
-		else
-			@mysql_close($this->db);
+		if ($this->db) 
+			if($this->mysqli)
+				$this->db->close();
+			else
+				mysql_close($this->db);
 	}
 }}
 
@@ -186,6 +193,7 @@ function dbesc($str) {
 }}
 
 
+
 // Function: q($sql,$args);
 // Description: execute SQL query with printf style args.
 // Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
@@ -209,7 +217,6 @@ function q($sql) {
 	 * session data after abnormal program termination 
 	 *
 	 */
-
 	logger('dba: no database: ' . print_r($args,true));
 	return false; 
 

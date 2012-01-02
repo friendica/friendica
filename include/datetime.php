@@ -15,7 +15,6 @@ function timezone_cmp($a, $b) {
 }}
 
 // emit a timezone selector grouped (primarily) by continent
-
 if(! function_exists('select_timezone')) {
 function select_timezone($current = 'America/Los_Angeles') {
 
@@ -53,6 +52,23 @@ function select_timezone($current = 'America/Los_Angeles') {
 	}    
 	$o .= '</optgroup></select>';
 	return $o;
+}}
+
+// return a select using 'field_select_raw' template, with timezones 
+// groupped (primarily) by continent
+// arguments follow convetion as other field_* template array:
+// 'name', 'label', $value, 'help'
+if (!function_exists('field_timezone')){
+function field_timezone($name='timezone', $label='', $current = 'America/Los_Angeles', $help){
+	$options = select_timezone($current);
+	$options = str_replace('<select id="timezone_select" name="timezone">','', $options);
+	$options = str_replace('</select>','', $options);
+	
+	$tpl = get_markup_template('field_select_raw.tpl');
+	return replace_macros($tpl, array(
+		'$field' => array($name, $label, $current, $help, $options),
+	));
+	
 }}
 
 // General purpose date parse/convert function.
