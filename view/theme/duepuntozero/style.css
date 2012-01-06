@@ -274,7 +274,7 @@ div.wall-item-content-wrapper.shiny {
 	border: 0px;
 	margin: 0px;
 	height: 20px;
-	width: 90%;
+	width: 465px;
 	font-weight: bold;
 	border: 1px solid #ffffff;
 }
@@ -1546,7 +1546,6 @@ input#dfrn-url {
 	padding: 3px 0px 0px 5px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;	
-	width: 100%;
 }
 
 

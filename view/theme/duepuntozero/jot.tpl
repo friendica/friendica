@@ -22,29 +22,29 @@
 
 <div id="profile-jot-submit-wrapper" class="jothidden">
 	<div id="profile-upload-wrapper" style="display: $visitor;" >
-		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="camera" title="$upload">$shortupload</a></div>
+		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="icon camera" title="$upload"></a></div>
 	</div> 
 	<div id="profile-attach-wrapper" style="display: $visitor;" >
-		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="attach" title="$attach">$shortattach</a></div>
+		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon attach" title="$attach"></a></div>
 	</div> 
 
 	<div id="profile-link-wrapper" style="display: $visitor;" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
-		<a id="profile-link" class="link" title="$weblink" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;">$shortweblink</a>
+		<a id="profile-link" class="icon link" title="$weblink" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
 	</div> 
 	<div id="profile-video-wrapper" style="display: $visitor;" >
-		<a id="profile-video" class="video" title="$video" onclick="jotVideoURL();return false;">$shortvideo</a>
+		<a id="profile-video" class="icon video" title="$video" onclick="jotVideoURL();return false;"></a>
 	</div> 
 	<div id="profile-audio-wrapper" style="display: $visitor;" >
-		<a id="profile-audio" class="audio" title="$audio" onclick="jotAudioURL();return false;">$shortaudio</a>
+		<a id="profile-audio" class="icon audio" title="$audio" onclick="jotAudioURL();return false;"></a>
 	</div> 
 	<div id="profile-location-wrapper" style="display: $visitor;" >
-		<a id="profile-location" class="globe" title="$setloc" onclick="jotGetLocation();return false;">$shortsetloc</a>
+		<a id="profile-location" class="icon globe" title="$setloc" onclick="jotGetLocation();return false;"></a>
 	</div> 
 	<div id="profile-nolocation-wrapper" style="display: none;" >
-		<a id="profile-nolocation" class="noglobe" title="$noloc" onclick="jotClearLocation();return false;">$shortnoloc</a>
+		<a id="profile-nolocation" class="icon noglobe" title="$noloc" onclick="jotClearLocation();return false;"></a>
 	</div> 
 	<div id="profile-jot-perms" class="profile-jot-perms" style="display: $pvisit;" >
-		<a href="#profile-jot-acl-wrapper" id="jot-perms-icon" class="$lockstate"  title="$permset" >$shortpermset</a>$bang
+		<a href="#profile-jot-acl-wrapper" id="jot-perms-icon" class="icon $lockstate"  title="$permset" ></a>$bang
 	</div>
 <input type="submit" id="profile-jot-submit" name="submit" value="$share" />
 	<div id="profile-jot-perms-end"></div>
