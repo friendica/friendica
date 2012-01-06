@@ -570,6 +570,10 @@ div[id$="wrapper"] br { clear: left; }
 /**
  * photos
  **/
+.photos {
+	height: auto;
+	overflow: auto;
+}
 #photo-top-links {
 	margin-bottom:30px;
 }

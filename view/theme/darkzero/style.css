@@ -70,3 +70,21 @@ input#dfrn-url {
     color: #000088;
 }
 
+#jot-perms-icon {
+	float: left;
+}
+
+
+#jot-title {
+	background-color: #333333;
+	border: 1px solid #333333;
+}
+
+#jot-title::-webkit-input-placeholder{ color: #555555!important;}
+#jot-title:-moz-placeholder{color: #555555!important;}
+		
+	
+#jot-title:hover,
+#jot-title:focus {
+	border: 1px solid #cccccc; 
+}

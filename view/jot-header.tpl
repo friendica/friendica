@@ -82,7 +82,7 @@ function initEditor(cb){
 				ed.onInit.add(function(ed) {
 					ed.pasteAsPlainText = true;
 					$("#profile-jot-text-loading").hide();
-					$("#profile-jot-submit-wrapper").show();
+					$(".jothidden").show();
 					if (typeof cb!="undefined") cb();
 				});
 
@@ -99,6 +99,12 @@ function initEditor(cb){
 	}
 }
 
+function enableOnUser(){
+	if (editor) return;
+	$(this).val("");
+	initEditor();
+}
+
 </script>
 <script type="text/javascript" src="js/ajaxupload.js" ></script>
 <script>
@@ -107,36 +113,10 @@ function initEditor(cb){
 
 	$(document).ready(function() {
 		
-		/* enable tinymce on focus */
-		$("#profile-jot-text").focus(function(){
-			if (editor) return;
-			$(this).val("");
-			initEditor();
-		});
+		/* enable tinymce on focus and click */
+		$("#profile-jot-text").focus(enableOnUser);
+		$("#profile-jot-text").click(enableOnUser);
 
-		$("#jot-title").mouseout(function() {
-			$("#jot-title").hide();
-			var ttl = $("#jot-title").val();
-			$('#jot-title-display').html(ttl);
-			if(ttl.length) {
-				$("#jot-title-display").show();
-			}
-			else {
-				$("#jot-title-desc").show();
-			}
-		});
-
-		$("#jot-title-display").hover(function() {
-			$("#jot-title-display").hide();
-			$("#jot-title").show();
-			$("#jot-title").focus();
-		});		
-
-		$("#jot-title-desc").click(function() {
-			$("#jot-title-desc").hide();
-			$("#jot-title").show();
-			$("#jot-title").focus();
-		});		
 	
 		var uploader = new window.AjaxUpload(
 			'wall-image-upload',

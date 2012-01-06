@@ -1944,6 +1944,11 @@ a.mail-list-link {
 	margin-top: 15px;
 }
 
+.photos {
+	height: auto;
+	overflow: auto;
+}
+
 .photo-album-image-wrapper {
 	float: left;
 	margin-top: 15px;

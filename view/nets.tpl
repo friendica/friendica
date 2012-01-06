@@ -1,10 +1,12 @@
 <div id="nets-sidebar" class="widget">
 	<h3>$title</h3>
 	<div id="nets-desc">$desc</div>
-	<a href="$base" class="nets-link{{ if $sel_all }} nets-selected{{ endif }} nets-all">$all</a>
+	
 	<ul class="nets-ul">
-	{{ for $nets as $net }}
-	<li><a href="$base?nets=$net.ref" class="nets-link{{ if $net.selected }} nets-selected{{ endif }}">$net.name</a></li>
-	{{ endfor }}
+		<li class="tool {{ if $sel_all }}selected{{ endif }}"><a href="$base" class="nets-link nets-all">$all</a>
+		{{ for $nets as $net }}
+			<li class="tool {{ if $net.selected }}selected{{ endif }}"><a href="$base?nets=$net.ref" class="nets-link">$net.name</a></li>
+		{{ endfor }}
 	</ul>
+	
 </div>

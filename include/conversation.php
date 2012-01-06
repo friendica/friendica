@@ -813,8 +813,7 @@ function status_editor($a,$x, $notes_cid = 0) {
 			'$audurl' => t("Please enter an audio link/URL:"),
 			'$term' => t('Tag term:'),
 			'$whereareu' => t('Where are you right now?'),
-			'$title' => t('Enter a title for this item'),
-			'$addtitle' => t('click here to add a title') 
+			'$title' => t('Enter a title for this item') 
 		));
 
 
@@ -858,15 +857,24 @@ function status_editor($a,$x, $notes_cid = 0) {
 			'$action' => 'item',
 			'$share' => (($x['button']) ? $x['button'] : t('Share')),
 			'$upload' => t('Upload photo'),
+			'$shortupload' => t('upload photo'),
 			'$attach' => t('Attach file'),
+			'$shortattach' => t('attach file'),
 			'$weblink' => t('Insert web link'),
+			'$shortweblink' => t('web link'),
 			'$video' => t('Insert video link'),
+			'$shortvideo' => t('video link'),
 			'$audio' => t('Insert audio link'),
+			'$shortaudio' => t('audio link'),
 			'$setloc' => t('Set your location'),
+			'$shortsetloc' => t('set location'),
 			'$noloc' => t('Clear browser location'),
-			'$title' => t('Set title'),
+			'$shortnoloc' => t('clear location'),
+			'$title' => "",
+			'$placeholdertitle' => t('Set title'),
 			'$wait' => t('Please wait'),
 			'$permset' => t('Permission settings'),
+			'$shortpermset' => t('permissions'),
 			'$ptyp' => (($notes_cid) ? 'note' : 'wall'),
 			'$content' => '',
 			'$post_id' => '',
@@ -882,8 +890,6 @@ function status_editor($a,$x, $notes_cid = 0) {
 			'$acl' => $x['acl'],
 			'$bang' => $x['bang'],
 			'$profile_uid' => $x['profile_uid'],
-			'$addtitle' => t('click here to add a title') 
-
 		));
 
 	return $o;

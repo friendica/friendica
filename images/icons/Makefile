@@ -2,7 +2,7 @@
 IMAGES=add.png edit.png	gear.png info.png menu.png \
 		notify_off.png star.png  delete.png feed.png group.png \
 		lock.png notice.png notify_on.png user.png link.png \
-		play.png plugin.png
+		play.png plugin.png unlock.png
 
 DESTS=10/ 16/ 22/ 48/ \
 		$(addprefix 10/, $(IMAGES)) \

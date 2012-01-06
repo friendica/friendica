@@ -8,19 +8,19 @@
 <div class="wall-item-container $indent">
 	<div class="wall-item-item">
 		<div class="wall-item-info">
-			<div class="wall-item-photo-wrapper mframe wwto" id="wall-item-ownerphoto-wrapper-$id" >
-				<a href="$owner_url" target="redir" title="$olinktitle" class="wall-item-photo-link" id="wall-item-ownerphoto-link-$id">
-					<img src="$owner_photo" class="wall-item-photo$osparkle" id="wall-item-ownerphoto-$id" alt="$owner_name" />
+			<div class="contact-photo-wrapper mframe wwto" id="wall-item-ownerphoto-wrapper-$id" >
+				<a href="$owner_url" target="redir" title="$olinktitle" class="contact-photo-link" id="wall-item-ownerphoto-link-$id">
+					<img src="$owner_photo" class="contact-photo $osparkle" id="wall-item-ownerphoto-$id" alt="$owner_name" />
 				</a>
 			</div>
-			<div class="wall-item-photo-wrapper mframe wwfrom"
+			<div class="contact-photo-wrapper mframe wwfrom"
 				onmouseover="if (typeof t$id != 'undefined') clearTimeout(t$id); openMenu('wall-item-photo-menu-button-$id')" 
 				onmouseout="t$id=setTimeout('closeMenu(\'wall-item-photo-menu-button-$id\'); closeMenu(\'wall-item-photo-menu-$id\');',200)">
-				<a href="$profile_url" target="redir" title="$linktitle" class="wall-item-photo-link" id="wall-item-photo-link-$id">
-					<img src="$thumb" class="wall-item-photo$sparkle" id="wall-item-photo-$id" alt="$name" />
+				<a href="$profile_url" target="redir" title="$linktitle" class="contact-photo-link" id="wall-item-photo-link-$id">
+					<img src="$thumb" class="contact-photo $sparkle" id="wall-item-photo-$id" alt="$name" />
 				</a>
-				<a href="#" rel="#wall-item-photo-menu-$id" class="fakelink wall-item-photo-menu-button icon s16 menu" id="wall-item-photo-menu-button-$id">menu</a>
-				<ul class="wall-item-menu menu-popup" id="wall-item-photo-menu-$id">
+				<a href="#" rel="#wall-item-photo-menu-$id" class="contact-photo-menu-button icon s16 menu" id="wall-item-photo-menu-button-$id">menu</a>
+				<ul class="contact-menu menu-popup" id="wall-item-photo-menu-$id">
 				$item_photo_menu
 				</ul>
 				

@@ -8,14 +8,14 @@
 <div class="wall-item-container $indent">
 	<div class="wall-item-item">
 		<div class="wall-item-info">
-			<div class="wall-item-photo-wrapper"
+			<div class="contact-photo-wrapper"
 				onmouseover="if (typeof t$id != 'undefined') clearTimeout(t$id); openMenu('wall-item-photo-menu-button-$id')" 
 				onmouseout="t$id=setTimeout('closeMenu(\'wall-item-photo-menu-button-$id\'); closeMenu(\'wall-item-photo-menu-$id\');',200)">
-				<a href="$profile_url" target="redir" title="$linktitle" class="wall-item-photo-link" id="wall-item-photo-link-$id">
-					<img src="$thumb" class="wall-item-photo$sparkle" id="wall-item-photo-$id" alt="$name" />
+				<a href="$profile_url" target="redir" title="$linktitle" class="contact-photo-link" id="wall-item-photo-link-$id">
+					<img src="$thumb" class="contact-photo$sparkle" id="wall-item-photo-$id" alt="$name" />
 				</a>
-				<a href="#" rel="#wall-item-photo-menu-$id" class="fakelink wall-item-photo-menu-button icon s16 menu" id="wall-item-photo-menu-button-$id">menu</a>
-				<ul class="wall-item-menu menu-popup" id="wall-item-photo-menu-$id">
+				<a href="#" rel="#wall-item-photo-menu-$id" class="contact-photo-menu-button icon s16 menu" id="wall-item-photo-menu-button-$id">menu</a>
+				<ul class="contact-menu menu-popup" id="wall-item-photo-menu-$id">
 				$item_photo_menu
 				</ul>
 				

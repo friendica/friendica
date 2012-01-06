@@ -145,8 +145,9 @@ function get_pconfig($uid,$family, $key, $instore = false) {
 	);
 
 	if(count($ret)) {
-		$a->config[$uid][$family][$key] = $ret[0]['v'];
-		return $ret[0]['v'];
+		$val = (preg_match("|^a:[0-9]+:{.*}$|", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
+		$a->config[$uid][$family][$key] = $val;
+		return $val;
 	}
 	else {
 		$a->config[$uid][$family][$key] = '!<unset>!';
@@ -177,20 +178,23 @@ function set_pconfig($uid,$family,$key,$value) {
 
 	global $a;
 
+	// manage array value
+	$dbvalue = (is_array($value)?serialize($value):$value);
+
 	if(get_pconfig($uid,$family,$key,true) === false) {
 		$a->config[$uid][$family][$key] = $value;
 		$ret = q("INSERT INTO `pconfig` ( `uid`, `cat`, `k`, `v` ) VALUES ( %d, '%s', '%s', '%s' ) ",
 			intval($uid),
 			dbesc($family),
 			dbesc($key),
-			dbesc($value)
+			dbesc($dbvalue)
 		);
 		if($ret) 
 			return $value;
 		return $ret;
 	}
 	$ret = q("UPDATE `pconfig` SET `v` = '%s' WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s' LIMIT 1",
-		dbesc($value),
+		dbesc($dbvalue),
 		intval($uid),
 		dbesc($family),
 		dbesc($key)

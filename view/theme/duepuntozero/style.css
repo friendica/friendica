@@ -269,21 +269,27 @@ div.wall-item-content-wrapper.shiny {
 	float: left;
 }
 
-#jot-title-desc {
-	color: #cccccc;
-}
-
-#jot-title-wrapper {
-	margin-bottom: 5px;
-}
-#jot-title-display {
-	font-weight: bold;
-}
 
 #jot-title {
-	border: 1px solid #cccccc;
-	width: 530px;
+	border: 0px;
+	margin: 0px;
+	height: 20px;
+	width: 90%;
+	font-weight: bold;
+	border: 1px solid #ffffff;
 }
+
+#jot-title::-webkit-input-placeholder{font-weight: normal;}
+#jot-title:-moz-placeholder{font-weight: normal;}
+		
+	
+#jot-title:hover,
+#jot-title:focus {
+	border: 1px solid #cccccc; 
+}
+
+.jothidden { display:none; }
+
 
 .fakelink, .fakelink:visited, .fakelink:link {
 	color: #3465a4;
@@ -1540,7 +1546,7 @@ input#dfrn-url {
 	padding: 3px 0px 0px 5px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;	
-
+	width: 100%;
 }
 
 
@@ -1897,6 +1903,11 @@ aside input[type='text'] {
 
 }
 
+
+.photos {
+	height: auto;
+	overflow: auto;
+}
 
 .photo-album-image-wrapper {
 	float: left;

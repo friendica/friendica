@@ -1368,30 +1368,36 @@ function photos_content(&$a) {
 		intval($a->pager['itemspage'])
 	);
 
-	$o .= '<h3>' . t('Recent Photos') . '</h3>';
 
-	if($can_post) {
-		$o .= '<div id="photo-top-links"><a id="photo-top-upload-link" href="'. $a->get_baseurl() . '/photos/' 
-			. $a->data['user']['nickname'] . '/upload' . '">' . t('Upload New Photos') . '</a></div>';
-	}
 
-	$tpl = get_markup_template('photo_top.tpl');
+	$photos = array();
 	if(count($r)) {
 		foreach($r as $rr) {
-			$o .= replace_macros($tpl,array(
-				'$id'         => $rr['id'],
-				'$photolink'  => $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id'],
-				'$phototitle' => t('View Photo'),
-				'$imgsrc'     => $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . ((($rr['scale']) == 6) ? 4 : $rr['scale']) . '.jpg',
-				'$albumlink'  => $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
-				'$albumname'  => template_escape($rr['album']),
-				'$albumalt'   => t('View Album'),
-				'$imgalt'     => template_escape($rr['filename'])
-			));
-
+			$photos[] = array(
+				'id'       => $rr['id'],
+				'link'  	=> $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id'],
+				'title' 	=> t('View Photo'),
+				'src'     	=> $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . ((($rr['scale']) == 6) ? 4 : $rr['scale']) . '.jpg',
+				'alt'     	=> template_escape($rr['filename']),
+				'album'	=> array(
+					'link'  => $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
+					'name'  => template_escape($rr['album']),
+					'alt'   => t('View Album'),
+				),
+				
+			);
 		}
-		$o .= '<div id="photo-top-end"></div>';
 	}
+	
+	$tpl = get_markup_template('photos_recent.tpl'); 
+	$o .= replace_macros($tpl,array(
+		'$title' => t('Recent Photos'),
+		'$can_post' => $can_post,
+		'$upload' => array(t('Upload New Photos'), $a->get_baseurl().'/photos/'.$a->data['user']['nickname'].'/upload'),
+		'$photos' => $photos,
+	));
+
+	
 	$o .= paginate($a);
 	return $o;
 }

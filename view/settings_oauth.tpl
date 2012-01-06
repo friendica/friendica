@@ -23,8 +23,8 @@ $tabs
 			{{ endif }}
 		{{ endif }}
 		{{ if $app.my }}
-		<a href="$baseurl/settings/oauth/edit/$app.client_id" class="icon edit" title="$edit">&nbsp;</a>
-		<a href="$baseurl/settings/oauth/delete/$app.client_id" class="icon drop" title="$delete">&nbsp;</a>
+		<a href="$baseurl/settings/oauth/edit/$app.client_id" class="icon s22 edit" title="$edit">&nbsp;</a>
+		<a href="$baseurl/settings/oauth/delete/$app.client_id" class="icon s22 delete" title="$delete">&nbsp;</a>
 		{{ endif }}		
 	</div>
 	{{ endfor }}
