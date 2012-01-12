@@ -1,10 +1,10 @@
-{{ if $indent }}{{ else }}
+
 <div class="wall-item-decor">
 	<span class="icon s22 star $isstarred" id="starred-$id" title="$star.starred">$star.starred</span>
 	{{ if $lock }}<span class="icon s22 lock fakelink" onclick="lockview(event,$id);" title="$lock">$lock</span>{{ endif }}	
 	<img id="like-rotator-$id" class="like-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
 </div>
-{{ endif }}
+
 <div class="wall-item-container $indent">
 	<div class="wall-item-item">
 		<div class="wall-item-info">

@@ -162,7 +162,7 @@
 /* global */
 body {
   font-family: Liberation Sans, helvetica, arial, clean, sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   background-color: #ffffff;
   color: #2d2d2d;
   margin: 50px 0px 0px 0px;
@@ -195,6 +195,15 @@ a:hover {
 .clear {
   clear: both;
 }
+.fakelink {
+  color: #005c94;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fakelink:hover {
+  color: #005c94;
+  text-decoration: underline;
+}
 code {
   font-family: Courier, monospace;
   white-space: pre;
@@ -205,6 +214,20 @@ code {
   color: #444;
   padding: 10px;
   margin-top: 20px;
+}
+#panel {
+  position: absolute;
+  width: 10em;
+  background: #ffffff;
+  color: #2d2d2d;
+  margin: 0px;
+  padding: 1em;
+  list-style: none;
+  border: 3px solid #364e59;
+  z-index: 100000;
+  -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
+  -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
 }
 /* tool */
 .tool {
@@ -442,6 +465,8 @@ ul.menu-popup .empty {
 }
 #nav-notifications-menu {
   width: 400px;
+  max-height: 550px;
+  overflow: auto;
 }
 #nav-notifications-menu img {
   float: left;
@@ -758,6 +783,33 @@ section {
   color: #2d2d2d;
   border: 1px solid #2d2d2d;
 }
+.comment-edit-preview {
+  width: 710px;
+  border: 1px solid #2d2d2d;
+  margin-top: 10px;
+}
+.comment-edit-preview .contact-photo {
+  width: 32px;
+  height: 32px;
+  margin-left: 16px;
+  /*background: url(../../../images/icons/22/user.png) no-repeat center center;*/
+
+}
+.comment-edit-preview .contact-photo-menu-button {
+  top: 15px !important;
+  left: 15px !important;
+}
+.comment-edit-preview .wall-item-links {
+  padding-left: 12px;
+}
+.comment-edit-preview .wall-item-container {
+  width: 700px;
+}
+.comment-edit-preview .tread-wrapper {
+  width: 700px;
+  padding: 0;
+  margin: 10px 0;
+}
 .wall-item-tags {
   padding-top: 5px;
 }
@@ -770,6 +822,27 @@ section {
   padding-right: 8px;
   background: url("../../../images/tag.png") no-repeat center right;
   color: #ffffff;
+}
+.wwto {
+  position: absolute !important;
+  width: 25px;
+  height: 25px;
+  background: #FFFFFF;
+  border: 2px solid #364e59;
+  height: 25px;
+  width: 25px;
+  overflow: hidden;
+  padding: 1px;
+  position: absolute !important;
+  top: 40px;
+  left: 30px;
+  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+  -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+}
+.wwto .contact-photo {
+  width: 25px;
+  height: 25px;
 }
 /* contacts menu */
 .contact-photo-wrapper {

@@ -1,18 +1,12 @@
-{{ if $indent }}{{ else }}
 <div class="wall-item-decor">
 	<span class="icon s22 star $isstarred" id="starred-$id" title="$star.starred">$star.starred</span>
 	{{ if $lock }}<span class="icon s22 lock fakelink" onclick="lockview(event,$id);" title="$lock">$lock</span>{{ endif }}	
 	<img id="like-rotator-$id" class="like-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
 </div>
-{{ endif }}
+
 <div class="wall-item-container $indent">
 	<div class="wall-item-item">
 		<div class="wall-item-info">
-			<div class="contact-photo-wrapper mframe wwto" id="wall-item-ownerphoto-wrapper-$id" >
-				<a href="$owner_url" target="redir" title="$olinktitle" class="contact-photo-link" id="wall-item-ownerphoto-link-$id">
-					<img src="$owner_photo" class="contact-photo $osparkle" id="wall-item-ownerphoto-$id" alt="$owner_name" />
-				</a>
-			</div>
 			<div class="contact-photo-wrapper mframe wwfrom"
 				onmouseover="if (typeof t$id != 'undefined') clearTimeout(t$id); openMenu('wall-item-photo-menu-button-$id')" 
 				onmouseout="t$id=setTimeout('closeMenu(\'wall-item-photo-menu-button-$id\'); closeMenu(\'wall-item-photo-menu-$id\');',200)">
@@ -25,6 +19,11 @@
 				</ul>
 				
 			</div>	
+			<div class="contact-photo-wrapper mframe wwto" id="wall-item-ownerphoto-wrapper-$id" >
+				<a href="$owner_url" target="redir" title="$olinktitle" class="contact-photo-link" id="wall-item-ownerphoto-link-$id">
+					<img src="$owner_photo" class="contact-photo $osparkle" id="wall-item-ownerphoto-$id" alt="$owner_name" />
+				</a>
+			</div>			
 			<div class="wall-item-location">$location</div>	
 		</div>
 		<div class="wall-item-content">

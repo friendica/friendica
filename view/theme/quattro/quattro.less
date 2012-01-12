@@ -3,7 +3,7 @@
 /* global */
 body {
 	font-family: Liberation Sans,helvetica,arial,clean,sans-serif;
-	font-size: 10px;
+	font-size: 11px;
 	background-color: @BodyBackground;
 	color: @BodyColor;
 	margin: 50px 0px 0px 0px;
@@ -44,6 +44,9 @@ a:hover {color: @LinkHover; text-decoration: underline; }
 .hidden { display: none; }
 .clear { clear: both; }
 
+.fakelink { color: @Link; text-decoration: none; cursor:pointer; }
+.fakelink:hover { color: @LinkHover; text-decoration: underline; }
+
 code {
 	font-family: Courier, monospace;
 	white-space: pre;
@@ -55,6 +58,23 @@ code {
 	padding: 10px;
 	margin-top: 20px; 
 }
+
+#panel {
+	position: absolute;
+	width: 10em;
+	background: @MenuBg;
+	color: @Menu;
+	margin: 0px;
+	padding: 1em;
+	list-style: none;
+	border: 3px solid @MenuBorder;
+	z-index: 100000;
+	
+	.shadow();	
+}
+
+
+
 /* tool */
 
 .tool {
@@ -234,7 +254,8 @@ ul.menu-popup {
 
 
 #nav-notifications-menu {
-	width: 400px;
+	width: 400px; max-height: 550px;
+	overflow: auto;
 	img { float: left; margin-right: 5px; }
 	.contactname { font-weight: bold; }
 	.notif-when { font-size: 10px; color: @MenuItemDetail; display: block; }
@@ -431,6 +452,26 @@ section {
 	}
 }
 
+.comment-edit-preview {
+	width: 710px;
+	border: 1px solid @Grey5;
+	margin-top: 10px;
+	
+	.contact-photo { width: 32px; height: 32px; margin-left: 16px;
+		/*background: url(../../../images/icons/22/user.png) no-repeat center center;*/
+	}	
+	.contact-photo-menu-button {
+		top: 15px !important;
+		left: 15px !important;
+	}
+	.wall-item-links { padding-left: 12px; }
+
+	.wall-item-container { width: 700px; }
+	.tread-wrapper { width: 700px; padding: 0; margin: 10px 0;}
+
+
+}
+
 
 
 .wall-item-tags { padding-top: 5px; }
@@ -444,6 +485,23 @@ section {
 		color: @TagColor;
 	}
 }
+
+.wwto { 
+	position: absolute !important; 
+	width: 25px; height: 25px; 
+    background: #FFFFFF;
+    border: 2px solid @Metalic3;
+    height: 25px;
+    width: 25px;
+    overflow: hidden;
+    padding: 1px;
+    position: absolute !important;
+    top: 40px;
+    left: 30px;
+    
+    .shadow(0px, 0px)
+}
+.wwto .contact-photo { width: 25px; height: 25px; }
 
 /* contacts menu */
 .contact-photo-wrapper { position: relative; }
