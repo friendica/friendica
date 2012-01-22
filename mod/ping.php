@@ -145,7 +145,7 @@ function ping_init(&$a) {
 		echo '	<notif count="'.$tot.'">';
 		if ($intro>0){
 			foreach ($intros as $i) { 
-				echo xmlize( $a->get_baseurl().'/notifications/'.$i['id'], $i['name'], $i['url'], $i['photo'], relative_date($i['datetime']), t("{0} wants to be your friend") );
+				echo xmlize( $a->get_baseurl().'/notifications/intros/'.$i['id'], $i['name'], $i['url'], $i['photo'], relative_date($i['datetime']), t("{0} wants to be your friend") );
 			};
 		}
 		if ($mail>0){
