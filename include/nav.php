@@ -116,7 +116,7 @@ function nav(&$a) {
 		if($_SESSION['page_flags'] == PAGE_NORMAL) {
 			$nav['introductions'] = array('notifications/intros',	t('Introductions'), "", t('Friend Requests'));
 			$nav['notifications'] = array('notifications',	t('Notifications'), "", t('Notifications'));
-			$nav['notifications_all']=array('notifications/network', t('See all notifications', "", ""));
+			$nav['notifications']['all']=array('notifications/network', t('See all notifications', "", ""));
 
 		}
 

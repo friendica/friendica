@@ -88,6 +88,7 @@
 
 		/* notifications template */
 		var notifications_tpl= unescape($("#nav-notifications-template[rel=template]").html());
+		var notifications_all = unescape($('<div>').append( $("#nav-notifications-see-all").clone() ).html()); //outerHtml hack
 		var notifications_empty = unescape($("#nav-notifications-menu").html());
 		
 		/* nav update event  */
@@ -116,7 +117,7 @@
 				$("#nav-notifications-linkmenu").addClass("on");
 				nnm = $("#nav-notifications-menu");
 				
-				nnm.html("<li><a href='"+baseurl+"/notifications/network'>Show All Notifications</a></li>");
+				nnm.html(notifications_all);
 				
 				//nnm.attr('popup','true');
 				eNotif.children("note").each(function(){
