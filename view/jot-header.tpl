@@ -118,7 +118,7 @@ function enableOnUser(){
 }
 
 </script>
-<script type="text/javascript" src="js/ajaxupload.js" ></script>
+<script type="text/javascript" src="$baseurl/js/ajaxupload.js" ></script>
 <script>
 	var ispublic = '$ispublic';
 	var addtitle = '$addtitle';
@@ -209,6 +209,8 @@ function enableOnUser(){
 	}
 
 	function jotShare(id) {
+		if ($('#jot-popup').length != 0) $('#jot-popup').show();
+
 		$('#like-rotator-' + id).show();
 		$.get('share/' + id, function(data) {
 			if (!editor) $("#profile-jot-text").val("");

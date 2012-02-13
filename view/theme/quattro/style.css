@@ -891,6 +891,11 @@ section {
   width: 25px;
   height: 25px;
 }
+#pause {
+  position: fixed;
+  bottom: 5px;
+  right: 5px;
+}
 /* contacts menu */
 .contact-photo-wrapper {
   position: relative;

@@ -489,7 +489,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				}
 
 				$likebuttons = '';
-				$shareable = ((($profile_owner == local_user()) && ($mode != 'display') && (! $item['private'])) ? true : false);
+				$shareable = ((($profile_owner == local_user()) &&  (! $item['private'])) ? true : false); //($mode != 'display') &&
 
 				if($page_writeable) {
 					if($toplevelpost) {
@@ -821,7 +821,7 @@ function format_like($cnt,$arr,$type,$id) {
 }}
 
 
-function status_editor($a,$x, $notes_cid = 0) {
+function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 
 	$o = '';
 		
@@ -885,7 +885,7 @@ function status_editor($a,$x, $notes_cid = 0) {
 
 	$o .= replace_macros($tpl,array(
 		'$return_path' => $a->cmd,
-		'$action' => 'item',
+		'$action' =>  $a->get_baseurl().'/item',
 		'$share' => (($x['button']) ? $x['button'] : t('Share')),
 		'$upload' => t('Upload photo'),
 		'$shortupload' => t('upload photo'),
@@ -923,6 +923,12 @@ function status_editor($a,$x, $notes_cid = 0) {
 		'$profile_uid' => $x['profile_uid'],
 		'$preview' => t('Preview'),
 	));
+
+
+	if ($popup==true){
+		$o = '<div id="jot-popup" style="display: none;">'.$o.'</div>';
+		
+	}
 
 	return $o;
 }

@@ -11,6 +11,7 @@ function display_content(&$a) {
 	require_once("include/bbcode.php");
 	require_once('include/security.php');
 	require_once('include/conversation.php');
+	require_once('include/acl_selectors.php');
 
 
 	$o = '<div id="live-display"></div>' . "\r\n";
@@ -66,6 +67,23 @@ function display_content(&$a) {
 		notice( t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
+	
+	if ($is_owner)
+		$celeb = ((($a->user['page-flags'] == PAGE_SOAPBOX) || ($a->user['page-flags'] == PAGE_COMMUNITY)) ? true : false);
+
+		$x = array(
+			'is_owner' => true,
+			'allow_location' => $a->user['allow_location'],
+			'default_location' => $a->user['default_location'],
+			'nickname' => $a->user['nickname'],
+			'lockstate' => ((($group) || (is_array($a->user) && ((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) || (strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
+			'acl' => populate_acl((($group || $cid) ? $def_acl : $a->user), $celeb),
+			'bang' => (($group || $cid) ? '!' : ''),
+			'visitor' => 'block',
+			'profile_uid' => local_user()
+		);	
+		$o .= status_editor($a,$x,0,true);
+
 
 	$sql_extra = permissions_sql($a->profile['uid'],$remote_contact,$groups);
 
