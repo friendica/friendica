@@ -24,12 +24,39 @@ function tryoembed($match){
 	
 }
 
+// [noparse][i]italic[/i][/noparse] turns into 
+// [noparse][ i ]italic[ /i ][/noparse], 
+// to hide them from parser.
 
+function bb_spacefy($st) {
+  $whole_match = $st[0];
+  $captured = $st[1];
+  $spacefied = preg_replace("/\[(.*?)\]/", "[ $1 ]", $captured);
+  $new_str = str_replace($captured, $spacefied, $whole_match);
+  return $new_str;
+}
+
+// The previously spacefied [noparse][ i ]italic[ /i ][/noparse], 
+// now turns back and the [noparse] tags are trimed
+// returning [i]italic[/i]
+
+function bb_unspacefy_and_trim($st) {
+  $whole_match = $st[0];
+  $captured = $st[1];
+  $unspacefied = preg_replace("/\[ (.*?)\ ]/", "[$1]", $captured);
+  return $unspacefied;
+}
 
 	// BBcode 2 HTML was written by WAY2WEB.net
 	// extended to work with Mistpark/Friendica - Mike Macgirvin
 
 function bbcode($Text,$preserve_nl = false) {
+
+	// Hide all [noparse] contained bbtags spacefying them
+
+	$Text = preg_replace_callback("/\[noparse\](.*?)\[\/noparse\]/ism", 'bb_spacefy',$Text);
+	$Text = preg_replace_callback("/\[nobb\](.*?)\[\/nobb\]/ism", 'bb_spacefy',$Text);
+	$Text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", 'bb_spacefy',$Text);
 
 
 	// Extract a single private image which uses data url's since preg has issues with 
@@ -111,25 +138,34 @@ function bbcode($Text,$preserve_nl = false) {
 	$Text = preg_replace("(\[color=(.*?)\](.*?)\[\/color\])ism","<span style=\"color: $1;\">$2</span>",$Text);
 
 	// Check for sized text
+        // [size=50] --> font-size: 50px (with the unit).
+	$Text = preg_replace("(\[size=(\d*?)\](.*?)\[\/size\])ism","<span style=\"font-size: $1px;\">$2</span>",$Text);
 	$Text = preg_replace("(\[size=(.*?)\](.*?)\[\/size\])ism","<span style=\"font-size: $1;\">$2</span>",$Text);
 
+	// Check for centered text
+	$Text = preg_replace("(\[center\](.*?)\[\/center\])ism","<div style=\"text-align:center;\">$1</div>",$Text);
+
 	// Check for list text
-
-	if(stristr($Text,'[/list]'))
-		$Text = str_replace("[*]", "<li>", $Text);
-
-	if(stristr($Text,'[/list]'))
-		$Text = str_replace("[*]", "<li>", $Text);
+	$Text = str_replace("[*]", "<li>", $Text);
+	$Text = preg_replace("/\[li\](.*?)\[\/li\]/ism", '<li>$1</li>' ,$Text);
 
 	$Text = preg_replace("/\[list\](.*?)\[\/list\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' ,$Text);
+	$Text = preg_replace("/\[ul\](.*?)\[\/ul\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' 
+,$Text);
 	$Text = preg_replace("/\[list=\](.*?)\[\/list\]/ism", '<ul class="listnone" style="list-style-type: none;">$1</ul>' ,$Text);
 	$Text = preg_replace("/\[list=1\](.*?)\[\/list\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[list=i\](.*?)\[\/list\]/sm",'<ul class="listlowerroman" style="list-style-type: lower-roman;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[list=I\](.*?)\[\/list\]/sm", '<ul class="listupperroman" style="list-style-type: upper-roman;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[list=a\](.*?)\[\/list\]/sm", '<ul class="listloweralpha" style="list-style-type: lower-alpha;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[list=A\](.*?)\[\/list\]/sm", '<ul class="listupperalpha" style="list-style-type: upper-alpha;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[li\](.*?)\[\/li\]/sm", '<li>$1</li>' ,$Text);
+	$Text = preg_replace("/\[ol\](.*?)\[\/ol\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>' 
+,$Text);
+	$Text = preg_replace("/\[list=((?-i)i)\](.*?)\[\/list\]/ism",'<ul class="listlowerroman" style="list-style-type: 
+lower-roman;">$2</ul>' ,$Text);
+	$Text = preg_replace("/\[list=((?-i)I)\](.*?)\[\/list\]/ism", '<ul class="listupperroman" style="list-style-type: 
+upper-roman;">$2</ul>' ,$Text);
+	$Text = preg_replace("/\[list=((?-i)a)\](.*?)\[\/list\]/ism", '<ul class="listloweralpha" style="list-style-type: 
+lower-alpha;">$2</ul>' ,$Text);
+	$Text = preg_replace("/\[list=((?-i)A)\](.*?)\[\/list\]/ism", '<ul class="listupperalpha" style="list-style-type: 
+upper-alpha;">$2</ul>' ,$Text);
 
+	$Text = preg_replace("/\[th\](.*?)\[\/th\]/sm", '<th>$1</th>' ,$Text);
 	$Text = preg_replace("/\[td\](.*?)\[\/td\]/sm", '<td>$1</td>' ,$Text);
 	$Text = preg_replace("/\[tr\](.*?)\[\/tr\]/sm", '<tr>$1</tr>' ,$Text);
 	$Text = preg_replace("/\[table\](.*?)\[\/table\]/sm", '<table>$1</table>' ,$Text);
@@ -157,7 +193,13 @@ function bbcode($Text,$preserve_nl = false) {
 	$QuoteLayout = '<blockquote>$1</blockquote>';                     
 	// Check for [quote] text
 	$Text = preg_replace("/\[quote\](.*?)\[\/quote\]/ism","$QuoteLayout", $Text);
-         
+
+	// Check for [quote=Author] text
+        $t_wrote = t("wrote");
+	$Text = preg_replace("/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism", 
+                             "<blockquote><strong>$1 wrote:</strong> $2</blockquote>", 
+                             $Text);         
+
 	// [img=widthxheight]image source[/img]
 	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="height: $2px; width: $1px;" >', $Text);
 
@@ -218,6 +260,13 @@ function bbcode($Text,$preserve_nl = false) {
 		$Text = preg_replace("/\[event\-location\](.*?)\[\/event\-location\]/ism",'',$Text);
 		$Text = preg_replace("/\[event\-adjust\](.*?)\[\/event\-adjust\]/ism",'',$Text);
 	}
+
+	// Unhide all [noparse] contained bbtags unspacefying them 
+	// and triming the [noparse] tag.
+
+	$Text = preg_replace_callback("/\[noparse\](.*?)\[\/noparse\]/ism", 'bb_unspacefy_and_trim',$Text);
+	$Text = preg_replace_callback("/\[nobb\](.*?)\[\/nobb\]/ism", 'bb_unspacefy_and_trim',$Text);
+	$Text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", 'bb_unspacefy_and_trim',$Text);
 
 	// fix any escaped ampersands that may have been converted into links
 	$Text = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$Text);
