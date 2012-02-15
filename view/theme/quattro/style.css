@@ -48,6 +48,21 @@
 .icon.s10.unlock {
   background-image: url("../../../images/icons/10/unlock.png");
 }
+.icon.s10.type-unkn {
+  background-image: url("../../../images/icons/10/zip.png");
+}
+.icon.s10.type-audio {
+  background-image: url("../../../images/icons/10/audio.png");
+}
+.icon.s10.type-video {
+  background-image: url("../../../images/icons/10/video.png");
+}
+.icon.s10.type-image {
+  background-image: url("../../../images/icons/10/image.png");
+}
+.icon.s10.type-text {
+  background-image: url("../../../images/icons/10/text.png");
+}
 .icon.s10.text {
   padding: 2px 0px 0px 15px;
 }
@@ -84,6 +99,21 @@
 }
 .icon.s16.unlock {
   background-image: url("../../../images/icons/16/unlock.png");
+}
+.icon.s16.type-unkn {
+  background-image: url("../../../images/icons/16/zip.png");
+}
+.icon.s16.type-audio {
+  background-image: url("../../../images/icons/16/audio.png");
+}
+.icon.s16.type-video {
+  background-image: url("../../../images/icons/16/video.png");
+}
+.icon.s16.type-image {
+  background-image: url("../../../images/icons/16/image.png");
+}
+.icon.s16.type-text {
+  background-image: url("../../../images/icons/16/text.png");
 }
 .icon.s16.text {
   padding: 4px 0px 0px 20px;
@@ -122,6 +152,21 @@
 .icon.s22.unlock {
   background-image: url("../../../images/icons/22/unlock.png");
 }
+.icon.s22.type-unkn {
+  background-image: url("../../../images/icons/22/zip.png");
+}
+.icon.s22.type-audio {
+  background-image: url("../../../images/icons/22/audio.png");
+}
+.icon.s22.type-video {
+  background-image: url("../../../images/icons/22/video.png");
+}
+.icon.s22.type-image {
+  background-image: url("../../../images/icons/22/image.png");
+}
+.icon.s22.type-text {
+  background-image: url("../../../images/icons/22/text.png");
+}
 .icon.s22.text {
   padding: 10px 0px 0px 25px;
 }
@@ -158,6 +203,21 @@
 }
 .icon.s48.unlock {
   background-image: url("../../../images/icons/48/unlock.png");
+}
+.icon.s48.type-unkn {
+  background-image: url("../../../images/icons/48/zip.png");
+}
+.icon.s48.type-audio {
+  background-image: url("../../../images/icons/48/audio.png");
+}
+.icon.s48.type-video {
+  background-image: url("../../../images/icons/48/video.png");
+}
+.icon.s48.type-image {
+  background-image: url("../../../images/icons/48/image.png");
+}
+.icon.s48.type-text {
+  background-image: url("../../../images/icons/48/text.png");
 }
 /* global */
 body {

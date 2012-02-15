@@ -1,5 +1,6 @@
 <?php
 
+require_once('include/bbcode.php');
 require_once('include/datetime.php');
 require_once('include/event.php');
 require_once('include/items.php');
@@ -110,11 +111,14 @@ function events_content(&$a) {
 		return;
 	}
 
+
+	$htpl = get_markup_template('event_head.tpl');
+	$a->page['htmlhead'] .= replace_macros($htpl,array('$baseurl' => $a->get_baseurl()));
+
 	$o ="";
 	// tabs
-	$o .= profile_tabs($a, True);	
+	$tabs = profile_tabs($a, True);	
 
-	$o .= '<h2>' . t('Events') . '</h2>';
 
 
 	$mode = 'view';
@@ -138,6 +142,8 @@ function events_content(&$a) {
 	}
 
 	if($mode == 'view') {
+		
+		
 	    $thisyear = datetime_convert('UTC',date_default_timezone_get(),'now','Y');
     	$thismonth = datetime_convert('UTC',date_default_timezone_get(),'now','m');
 		if(! $y)
@@ -167,11 +173,16 @@ function events_content(&$a) {
 			$prevmonth = 12;
 			$prevyear --;
 		}
-
 			
 		$dim    = get_dim($y,$m);
 		$start  = sprintf('%d-%d-%d %d:%d:%d',$y,$m,1,0,0,0);
 		$finish = sprintf('%d-%d-%d %d:%d:%d',$y,$m,$dim,23,59,59);
+
+
+		if ($a->argv[1] === 'json'){
+			if (x($_GET,'start'))	$start = date("Y-m-d h:i:s", $_GET['start']);
+			if (x($_GET,'end'))	$finish = date("Y-m-d h:i:s", $_GET['end']);
+		}
 	
 		$start  = datetime_convert('UTC','UTC',$start);
 		$finish = datetime_convert('UTC','UTC',$finish);
@@ -180,17 +191,26 @@ function events_content(&$a) {
 		$adjust_finish = datetime_convert('UTC', date_default_timezone_get(), $finish);
 
 
-		$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
-			`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event` LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` 
-			WHERE `event`.`uid` = %d
-			AND (( `adjust` = 0 AND `start` >= '%s' AND `start` <= '%s' ) 
-			OR  (  `adjust` = 1 AND `start` >= '%s' AND `start` <= '%s' )) ",
-			intval(local_user()),
-			dbesc($start),
-			dbesc($finish),
-			dbesc($adjust_start),
-			dbesc($adjust_finish)
-		);
+		if (x($_GET,'id')){
+			$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
+				`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event` LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` 
+				WHERE `event`.`uid` = %d AND `event`.`id` = %d",
+				intval(local_user()),
+				intval($_GET['id'])
+			);
+		} else {
+			$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
+				`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event` LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` 
+				WHERE `event`.`uid` = %d
+				AND (( `adjust` = 0 AND `start` >= '%s' AND `start` <= '%s' ) 
+				OR  (  `adjust` = 1 AND `start` >= '%s' AND `start` <= '%s' )) ",
+				intval(local_user()),
+				dbesc($start),
+				dbesc($finish),
+				dbesc($adjust_start),
+				dbesc($adjust_finish)
+			);
+		}
 
 		$links = array();
 
@@ -204,17 +224,7 @@ function events_content(&$a) {
 		}
 
 
-		$o .= '<div id="new-event-link"><a href="' . $a->get_baseurl() . '/events/new' . '" >' . t('Create New Event') . '</a></div>';
-		$o .= '<div id="event-calendar-wrapper">';
-
-		$o .= '<a href="' . $a->get_baseurl() . '/events/' . $prevyear . '/' . $prevmonth . '" class="prevcal"><div id="event-calendar-prev" class="icon prev" title="' . t('Previous') . '"></div></a>';
-		$o .= cal($y,$m,$links, ' eventcal');
-
-		$o .= '<a href="' . $a->get_baseurl() . '/events/' . $nextyear . '/' . $nextmonth . '" class="nextcal"><div id="event-calendar-next" class="icon next" title="' . t('Next') . '"></div></a>';
-		$o .= '</div>';
-		$o .= '<div class="event-calendar-end"></div>';
-
-
+		$events=array();
 
 		$last_date = '';
 		$fmt = t('l, F j');
@@ -222,25 +232,82 @@ function events_content(&$a) {
 		if(count($r)) {
 			$r = sort_by_date($r);
 			foreach($r as $rr) {
+				
+				
 				$j = (($rr['adjust']) ? datetime_convert('UTC',date_default_timezone_get(),$rr['start'], 'j') : datetime_convert('UTC','UTC',$rr['start'],'j'));
 				$d = (($rr['adjust']) ? datetime_convert('UTC',date_default_timezone_get(),$rr['start'], $fmt) : datetime_convert('UTC','UTC',$rr['start'],$fmt));
 				$d = day_translate($d);
-				if($d !== $last_date)
-					$o .= '<hr /><a name="link-' . $j . '" ><div class="event-list-date">' . $d . '</div></a>';
-				$last_date = $d;
-				if($rr['author-name']) {
-					$o .= '<a href="' . $rr['author-link'] . '" ><img src="' . $rr['author-avatar'] . '" height="32" width="32" />' . $rr['author-name'] . '</a>';
+				
+				$start = (($rr['adjust']) ? datetime_convert('UTC',date_default_timezone_get(),$rr['start'], 'c') : datetime_convert('UTC','UTC',$rr['start'],'c'));
+				if ($rr['nofinish']){
+					$end = null;
+				} else {
+					$end = (($rr['adjust']) ? datetime_convert('UTC',date_default_timezone_get(),$rr['finish'], 'c') : datetime_convert('UTC','UTC',$rr['finish'],'c'));
 				}
-				$o .= format_event_html($rr);
-				$o .= ((! $rr['cid']) ? '<a href="' . $a->get_baseurl() . '/events/event/' . $rr['id'] . '" title="' . t('Edit event') . '" class="edit-event-link icon pencil"></a>' : '');
-				if($rr['plink'])
-					$o .= '<a href="' . $rr['plink'] . '" title="' . t('link to source') . '" target="external-link" class="plink-event-link icon remote-link"></a></div>';
+				
+				
+				$is_first = ($d !== $last_date);
+					
+				$last_date = $d;
+				$edit = ((! $rr['cid']) ? array($a->get_baseurl().'/events/event/'.$rr['id'],t('Edit event'),'','') : null);
 
-				$o .= '<div class="clear"></div>';
+				list($title, $_trash) = explode("<br",bbcode($rr['desc']),2);
+				$title = strip_tags($title);
+				$html = format_event_html($rr);
+				$rr['desc'] = bbcode($rr['desc']);
+				$rr['location'] = bbcode($rr['location']);
+				$events[] = array(
+					'id'=>$rr['id'],
+					'start'=> $start,
+					'end' => $end,
+					'allDay' => false,
+					'title' => $title,
+					
+					'j' => $j,
+					'd' => $d,
+					'edit' => $edit,
+					'is_first'=>$is_first,
+					'item'=>$rr,
+					'html'=>$html,
+					'plink' => array($rr['plink'],t('link to source'),'',''),
+				);
+
 
 			}
 		}
+		 
+		if ($a->argv[1] === 'json'){
+			echo json_encode($events); killme();
+		}
+		
+		// links: array('href', 'text', 'extra css classes', 'title')
+		if (x($_GET,'id')){
+			$tpl =  get_markup_template("event.tpl");
+		} else {
+			if (get_config('experimentals','new_calendar')==1){
+				$tpl = get_markup_template("events-js.tpl");
+			} else {
+				$tpl = get_markup_template("events.tpl");
+			}
+		}
+		$o = replace_macros($tpl, array(
+			'$baseurl'	=> $a->get_baseurl(),
+			'$tabs'		=> $tabs,
+			'$title'	=> t('Events'),
+			'$new_event'=> array($a->get_baseurl().'/events/new',t('Create New Event'),'',''),
+			'$previus'	=> array($a->get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
+			'$next'		=> array($a->get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
+			'$calendar' => cal($y,$m,$links, ' eventcal'),
+			
+			'$events'	=> $events,
+			
+			
+		));
+		
+		if (x($_GET,'id')){ echo $o; killme(); }
+		
 		return $o;
+		
 	}
 
 	if($mode === 'edit' && $event_id) {
@@ -271,8 +338,7 @@ function events_content(&$a) {
 		if($cid)
 			$sh_checked .= ' disabled="disabled" ';
 
-		$htpl = get_markup_template('event_head.tpl');
-		$a->page['htmlhead'] .= replace_macros($htpl,array('$baseurl' => $a->get_baseurl()));
+
 
 		$tpl = get_markup_template('event_form.tpl');
 
@@ -311,8 +377,9 @@ function events_content(&$a) {
 			'$eid' => $eid, 
 			'$cid' => $cid,
 			'$uri' => $uri,
-			'$e_text' => t('Event details'),
-			'$e_desc' => sprintf( t('Format is %s %s. Starting date and Description are required.'),$dateformat,$timeformat),
+			'$title' => t('Event details'),
+			'$desc' => sprintf( t('Format is %s %s. Starting date and Description are required.'),$dateformat,$timeformat),
+			
 			'$s_text' => t('Event Starts:') . ' <span class="required">*</span> ',
 			'$s_dsel' => datesel($f,'start',$syear+5,$syear,false,$syear,$smonth,$sday),
 			'$s_tsel' => timesel('start',$shour,$sminute),

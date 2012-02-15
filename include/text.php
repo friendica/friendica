@@ -849,10 +849,10 @@ function prepare_body($item,$attach = false) {
 					case 'audio':
 					case 'image':
 					case 'text':
-						$icon = '<div class="attachtype type-' . $icontype . '"></div>';
+						$icon = '<div class="attachtype icon s22 type-' . $icontype . '"></div>';
 						break;
 					default:
-						$icon = '<div class="attachtype type-unkn"></div>';
+						$icon = '<div class="attachtype icon s22 type-unkn"></div>';
 						break;
 				}
 				$title = ((strlen(trim($matches[4]))) ? escape_tags(trim($matches[4])) : escape_tags($matches[1]));

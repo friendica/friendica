@@ -1,7 +1,7 @@
-<h3>$e_text</h3>
+<h3>$title</h3>
 
 <p>
-$e_desc
+$desc
 </p>
 
 <form action="$post" method="post" >

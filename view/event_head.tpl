@@ -1,3 +1,64 @@
+<link rel='stylesheet' type='text/css' href='$baseurl/library/fullcalendar/fullcalendar.css' />
+<script language="javascript" type="text/javascript"
+          src="$baseurl/library/fullcalendar/fullcalendar.min.js"></script>
+
+<script>
+	$(document).ready(function() {
+	    $('#events-calendar').fullCalendar({
+			events: '$baseurl/events/json/',
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},			
+			timeFormat: 'H(:mm)',
+			eventClick: function(calEvent, jsEvent, view) {
+				$.get(
+					'$baseurl/events/?id='+calEvent.id,
+					function(data){
+						$.fancybox(data);
+					}
+				);
+			},
+			
+			eventRender: function(event, element, view) {
+				//console.log(view.name);
+				if (event.item['author-name']==null) return;
+				switch(view.name){
+					case "month":
+					element.find(".fc-event-title").html(
+						"<img src='{0}' style='height:10px;width:10px'>{1} : {2}".format(
+							event.item['author-avatar'],
+							event.item['author-name'],
+							event.title
+					));
+					break;
+					case "agendaWeek":
+					element.find(".fc-event-title").html(
+						"<img src='{0}' style='height:12px; width:12px'>{1}<p>{2}</p><p>{3}</p>".format(
+							event.item['author-avatar'],
+							event.item['author-name'],
+							event.item.desc,
+							event.item.location
+					));
+					break;
+					case "agendaDay":
+					element.find(".fc-event-title").html(
+						"<img src='{0}' style='height:24px;width:24px'>{1}<p>{2}</p><p>{3}</p>".format(
+							event.item['author-avatar'],
+							event.item['author-name'],
+							event.item.desc,
+							event.item.location
+					));
+					break;
+				}
+			}
+			
+		})
+	});
+</script>
+
+
 <script language="javascript" type="text/javascript"
           src="$baseurl/library/tinymce/jscripts/tiny_mce/tiny_mce_src.js"></script>
           <script language="javascript" type="text/javascript">
@@ -24,9 +85,9 @@ tinyMCE.init({
 	theme_advanced_path : false,
 	setup : function(ed) {
 		ed.onInit.add(function(ed) {
-            ed.pasteAsPlainText = true;
-        });
-    }
+			ed.pasteAsPlainText = true;
+		});
+	}
 
 });
 

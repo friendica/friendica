@@ -734,8 +734,11 @@ function settings_content(&$a) {
 	if($files) {
 		foreach($files as $file) {
 			$f = basename($file);
-			$theme_name = ((file_exists($file . '/experimental')) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
-			$themes[$f]=$theme_name;
+			$is_experimental = file_exists($file . '/experimental');
+			if (!$is_experimental or ($is_experimental && (get_config('experimentals','exp_themes')==1 or get_config('experimentals','exp_themes')===false))){ 
+				$theme_name = (($is_experimental) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
+				$themes[$f]=$theme_name;
+			}
 		}
 	}
 	$theme_selected = (!x($_SESSION,'theme')? $default_theme : $_SESSION['theme']);
