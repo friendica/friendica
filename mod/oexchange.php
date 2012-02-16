@@ -49,7 +49,7 @@ function oexchange_content(&$a) {
 	$post['body'] = html2bbcode($s);
 	$post['type'] = 'wall';
 
-	$_POST = $post;
+	$_REQUEST = $post;
 	require_once('mod/item.php');
 	item_post($a);
 
