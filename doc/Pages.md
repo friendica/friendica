@@ -24,7 +24,7 @@ The "Automatic Friend Account" is typically used for personal profile pages wher
 
 We recommend that you create group pages with the same email address and password as your normal account. If you do this, you will find a new "Manage" tab on the menu bar which lets you toggle identities easily and manage your pages. You are not required to do this, but the alternative is to logout and log back into the other account to manage alternate pages - and this could get cumbersome if you manage several different pages/identities. 
 
-You may also appoint a delegate to manage your page. Do this by visiting the [Delegation Setup Page](/delegate). This will provide you with a list of contacts on this system under "Potential Delegates". Selecting one or more persons will give them access to manage your page. They will be able to edit contacts, profiles, and all content for this account/page. Please use this facility wisely. Delegated managers will not be able to alter basic account settings such as passwords or page types and/or remove the account.  
+You may also appoint a delegate to manage your page. Do this by visiting the [Delegation Setup Page](delegate). This will provide you with a list of contacts on this system under "Potential Delegates". Selecting one or more persons will give them access to manage your page. They will be able to edit contacts, profiles, and all content for this account/page. Please use this facility wisely. Delegated managers will not be able to alter basic account settings such as passwords or page types and/or remove the account.
 
 
 **Posting to Community Pages**
