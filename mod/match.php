@@ -31,7 +31,7 @@ function match_content(&$a) {
 			$params['p'] = $a->pager['page'];
 			
 		if(strlen(get_config('system','directory_submit_url')))
-			$x = post_url('http://dir.friendika.com/msearch', $params);
+			$x = post_url('http://dir.friendica.com/msearch', $params);
 		else
 			$x = post_url($a->get_baseurl() . '/msearch', $params);
 

@@ -23,7 +23,7 @@ $default_timezone = 'America/Los_Angeles';
 
 // What is your site name?
 
-$a->config['sitename'] = "Friendika Social Network";
+$a->config['sitename'] = "Friendica Social Network";
 
 // Your choices are REGISTER_OPEN, REGISTER_APPROVE, or REGISTER_CLOSED.
 // Be certain to create your own personal account before setting 

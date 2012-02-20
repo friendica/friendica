@@ -62,7 +62,7 @@
 	<div class="background"></div>
 	<div class="panel">
 		<div class="panel_in">
-			<h1>Friendika Update</h1>
+			<h1>Friendica Update</h1>
 			<div class="panel_text"></div>
 			<div class="panel_actions">
 				<input type="button" value="$close" class="panel_action_close">
@@ -81,7 +81,7 @@
 	{{ if $canwrite }}
 		<div class="submit"><input type="submit" name="remoteupdate" value="$submit" /></div>
 	{{ else }}
-		<h3>Your friendika installation is not writable by web server.</h3>
+		<h3>Your friendica installation is not writable by web server.</h3>
 		{{ if $canftp }}
 			<p>You can try to update via FTP</p>
 			{{ inc field_input.tpl with $field=$ftphost }}{{ endinc }}

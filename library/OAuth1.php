@@ -289,7 +289,7 @@ class OAuthRequest {
       }
 
     }
-    // fix for friendika redirect system
+    // fix for friendica redirect system
     
     $http_url =  substr($http_url, 0, strpos($http_url,$parameters['q'])+strlen($parameters['q']));
     unset( $parameters['q'] );

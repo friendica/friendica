@@ -4,7 +4,7 @@
 <p id="dfrn-request-intro">
 $page_desc<br />
 <ul id="dfrn-request-networks">
-<li><a href="http://friendika.com" title="$friendika">$friendika</a></li>
+<li><a href="http://friendica.com" title="$friendica">$friendica</a></li>
 <li><a href="http://joindiaspora.com" title="$diaspora">$diaspora</a> $diasnote</li>
 <li><a href="http://ostatus.org" title="$public_net" >$statusnet</a></li>
 </ul>

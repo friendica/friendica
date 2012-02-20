@@ -115,7 +115,7 @@ When strings are added or modified in source, you could run
 	to extract strings from source files and join them with the existing .po file:
 	new strings are added, the existing are not overwritten.
 	
-If you already translated Friendika using strings.php, you could import your old
+If you already translated Friendica using strings.php, you could import your old
 translation to messages.po. Run:
 $ php util/php2po.php view/<language>/strings.php
 

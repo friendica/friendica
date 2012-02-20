@@ -314,7 +314,7 @@ function scrape_feed($url) {
  *
  * PROBE_DIASPORA has a bias towards returning Diaspora information
  * while PROBE_NORMAL has a bias towards dfrn/zot - in the case where
- * an address (such as a Friendika address) supports more than one type
+ * an address (such as a Friendica address) supports more than one type
  * of network. 
  *
  */

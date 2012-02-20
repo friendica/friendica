@@ -179,7 +179,7 @@
 			'updated' => api_date(null),
 			'atom_updated' => datetime_convert('UTC','UTC','now',ATOM_TIME),
 			'language' => $user_info['language'],
-			'logo'	=> $a->get_baseurl()."/images/friendika-32.png",
+			'logo'	=> $a->get_baseurl()."/images/friendica-32.png",
 		);
 		
 		return $arr;
@@ -739,7 +739,7 @@
 		if (local_user()===false) return false;
 		
 		$user_info = api_get_user($a);
-		// in friendika starred item are private
+		// in friendica starred item are private
 		// return favorites only for self
 		logger('api_favorites: self:' . $user_info['self']);
 		
@@ -912,7 +912,7 @@
 	function api_statusnet_config(&$a,$type) {
 		$name = $a->config['sitename'];
 		$server = $a->get_hostname();
-		$logo = $a->get_baseurl() . '/images/friendika-64.png';
+		$logo = $a->get_baseurl() . '/images/friendica-64.png';
 		$email = $a->config['admin_email'];
 		$closed = (($a->config['register_policy'] == REGISTER_CLOSED) ? 'true' : 'false');
 		$private = (($a->config['system']['block_public']) ? 'true' : 'false');

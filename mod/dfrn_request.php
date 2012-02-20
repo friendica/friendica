@@ -677,7 +677,7 @@ function dfrn_request_content(&$a) {
 			'$no' => t('No'),
 			'$add_note' => t('Add a personal note:'),
 			'$page_desc' => $page_desc,
-			'$friendika' => t('Friendica'),
+			'$friendica' => t('Friendica'),
 			'$statusnet' => t('StatusNet/Federated Social Web'),
 			'$diaspora' => t('Diaspora'),
 			'$diasnote' => t('- please share from your own site as noted above'),

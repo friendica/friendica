@@ -759,7 +759,7 @@ function smilies($s, $sample = false) {
 		'<img src="' . $a->get_baseurl() . '/images/smiley-facepalm.gif" alt=":facepalm" />',
 		'<img src="' . $a->get_baseurl() . '/images/smiley-bangheaddesk.gif" alt=":headdesk" />',
 		'<a href="http://project.friendika.com">~friendika <img src="' . $a->get_baseurl() . '/images/friendika-16.png" alt="~friendika" /></a>',
-		'<a href="http://friendica.com">~friendica <img src="' . $a->get_baseurl() . '/images/friendika-16.png" alt="~friendica" /></a>',
+		'<a href="http://friendica.com">~friendica <img src="' . $a->get_baseurl() . '/images/friendica-16.png" alt="~friendica" /></a>',
 		'<a href="http://diasporafoundation.org">Diaspora<img src="' . $a->get_baseurl() . '/images/diaspora.png" alt="Diaspora*" /></a>',
 
 	);

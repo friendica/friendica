@@ -49,8 +49,8 @@ $a->config['php_path'] = '$phpath';
 
 // Location of global directory submission page.
 
-$a->config['system']['directory_submit_url'] = 'http://dir.friendika.com/submit';
-$a->config['system']['directory_search_url'] = 'http://dir.friendika.com/directory?search=';
+$a->config['system']['directory_submit_url'] = 'http://dir.friendica.com/submit';
+$a->config['system']['directory_search_url'] = 'http://dir.friendica.com/directory?search=';
 
 // PuSH - aka pubsubhubbub URL. This makes delivery of public posts as fast as private posts
 

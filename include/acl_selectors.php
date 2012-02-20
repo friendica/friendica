@@ -157,7 +157,7 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 
 	$o = '';
 
-	// When used for private messages, we limit correspondence to mutual DFRN/Friendika friends and the selector
+	// When used for private messages, we limit correspondence to mutual DFRN/Friendica friends and the selector
 	// to one recipient. By default our selector allows multiple selects amongst all contacts.
 
 	$sql_extra = '';

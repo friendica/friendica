@@ -1,5 +1,5 @@
 /**
- * Friendika people autocomplete
+ * Friendica people autocomplete
  *
  * require jQuery, jquery.textareas
  */
