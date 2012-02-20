@@ -252,7 +252,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 			$message = unxmlify($xml->message);   // human readable text of what may have gone wrong.
 			switch($status) {
 				case 0:
-					notice( t("Confirmation completed successfully.") . EOL);
+					info( t("Confirmation completed successfully.") . EOL);
 					if(strlen($message))
 						notice( t('Remote site reported: ') . $message . EOL);
 					break;

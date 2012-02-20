@@ -5,6 +5,7 @@ require_once("include/datetime.php");
 function ping_init(&$a) {
 
 	header("Content-type: text/xml");
+	
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
 		<result>";
 
@@ -90,22 +91,20 @@ function ping_init(&$a) {
 		}
 
 
-		$intros1 = q("SELECT COUNT(`intro`.`id`) AS `total`, `intro`.`id`, `intro`.`datetime`, 
+		$intros1 = q("SELECT  `intro`.`id`, `intro`.`datetime`, 
 			`fcontact`.`name`, `fcontact`.`url`, `fcontact`.`photo` 
 			FROM `intro` LEFT JOIN `fcontact` ON `intro`.`fid` = `fcontact`.`id`
 			WHERE `intro`.`uid` = %d  AND `intro`.`blocked` = 0 AND `intro`.`ignore` = 0 AND `intro`.`fid`!=0",
 			intval(local_user())
 		);
-		$intros2 = q("SELECT COUNT(`intro`.`id`) AS `total`, `intro`.`id`, `intro`.`datetime`, 
+		$intros2 = q("SELECT `intro`.`id`, `intro`.`datetime`, 
 			`contact`.`name`, `contact`.`url`, `contact`.`photo` 
 			FROM `intro` LEFT JOIN `contact` ON `intro`.`contact-id` = `contact`.`id`
 			WHERE `intro`.`uid` = %d  AND `intro`.`blocked` = 0 AND `intro`.`ignore` = 0 AND `intro`.`contact-id`!=0",
 			intval(local_user())
 		);
 		
-		$intro = $intros1[0]['total'] + $intros2[0]['total'];
-		if ($intros1[0]['total']==0) $intros1=Array();
-		if ($intros2[0]['total']==0) $intros2=Array();
+		$intro = count($intros1) + count($intros2);
 		$intros = $intros1+$intros2;
 
 
