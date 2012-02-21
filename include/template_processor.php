@@ -10,7 +10,7 @@
 		var $done = false;
 		var $d = false;
 		var $lang = null;
-		
+		var $debug=false;
 		
 		private function _preg_error(){
 			switch(preg_last_error()){
@@ -160,6 +160,30 @@
 			return $s;
 		}
 
+		private function _str_replace($str){
+			#$this->search,$this->replace,
+			$searchs = $this->search;
+			foreach($searchs as $search){
+				$search = "|".preg_quote($search)."(\|[a-zA-Z0-9_]*)*|";
+				$m = array();
+				if (preg_match_all($search, $str,$m)){
+					foreach ($m[0] as $match){
+						$toks = explode("|",$match);
+						$val = $this->_get_var($toks[0]);
+						for($k=1; $k<count($toks); $k++){
+							$func = $toks[$k];
+							if (function_exists($func)) $val = $func($val);
+						}
+						if (count($toks)>1){
+							$str = str_replace( $match, $val, $str);
+						} 
+					}
+				}
+				
+			}
+			return str_replace($this->search,$this->replace, $str);
+		}
+
 	
 		public function replace($s, $r) {
 			$this->r = $r;
@@ -180,7 +204,7 @@
 			$os = ""; $count=0;
 			while($os!=$s && $count<10){
 				$os=$s; $count++;
-				$s = str_replace($this->search,$this->replace, $s);
+				$s = $this->_str_replace($s);
 			}
 			return template_unescape($s);
 		}
