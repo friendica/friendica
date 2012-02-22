@@ -22,7 +22,7 @@ But wait, there's more...
 
 If you look carefully when visiting a group from your Network page, the lock icon under the status update box has an exclamation mark next to it. This is meant to draw attention to that lock. Click the lock. You will see that since you are only viewing a certain group of people, your status updates while on that screen default to only being seen by that same group of people. This is how you keep your future employers from seeing what you write to your drinking buddies.  You can over-ride this setting, but this makes it easy to separate your conversations into different friend circles.
 
-These private conversations work best when your friends are Freindika members. We know who else can see the conversations - nobody, *unless*  your friends cut and paste the messages and send them to others. 
+These private conversations work best when your friends are Friendica members. We know who else can see the conversations - nobody, *unless* your friends cut and paste the messages and send them to others. 
 
 This is a trust issue you need to be aware of. No software in the world can prevent your friends from leaking your confidential and trusted communications. Only a wise choice of friends.  
 
