@@ -1,5 +1,5 @@
 
-Lieber $username,
+Liebe/r $username,
 wir haben gerade eine Anfrage erhalten dein Passwort auf $sitename zu ändern.
 Um diese Anfrage zu bestätigen folge bitte dem Bestätigungslink oder kopiere
 ihn in die Adresszeile deines Browsers.

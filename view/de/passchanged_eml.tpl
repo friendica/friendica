@@ -1,5 +1,5 @@
 
-Lieber $username,
+Liebe/r $username,
 dein Passwort wurde wie gewünscht geändert. Bitte hebe diese Informationen
 für deine Unterlagen auf (oder ändere das Passwort augenblicklich in etwas
 das du dir merken kannst).

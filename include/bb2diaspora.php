@@ -8,35 +8,54 @@ require_once('include/html2bbcode.php');
 
 // we don't want to support a bbcode specific markdown interpreter
 // and the markdown library we have is pretty good, but provides HTML output.
-// So we'll use that to convert to HTML, then convert the HTML back to bbcode, 
+// So we'll use that to convert to HTML, then convert the HTML back to bbcode,
 // and then clean up a few Diaspora specific constructs.
 
 function diaspora2bb($s) {
 
+	// for testing purposes: Collect raw markdown articles
+	$file = tempnam("/tmp/friendica/", "markdown");
+	file_put_contents($file, $s);
+
 	$s = html_entity_decode($s,ENT_COMPAT,'UTF-8');
-    $s = str_replace("\r","\n",$s);
+
+	// Too many new lines. So deactivated the following line
+	// $s = str_replace("\r","\n",$s);
+	// Simply remove cr.
+	$s = str_replace("\r","",$s);
+
+	// <br/> is invalid. Replace it with the valid expression
+	$s = str_replace("<br/>","<br />",$s);
 
 	$s = preg_replace('/\@\{(.+?)\; (.+?)\@(.+?)\}/','@[url=https://$3/u/$2]$1[/url]',$s);
 
-    $s = preg_replace('/\#([^\s\#])/','\\#$1',$s);
+	// Escaping the hash tags - doesn't always seem to work
+	// $s = preg_replace('/\#([^\s\#])/','\\#$1',$s);
+	// This seems to work
+	$s = preg_replace('/\#([^\s\#])/','&#35;$1',$s);
 
 	$s = Markdown($s);
 
-    $s = str_replace('&#35;','#',$s);
-    $s = str_replace("\n",'<br />',$s);
+	$s = str_replace('&#35;','#',$s);
+
+	$s = str_replace("\n",'<br />',$s);
 
 	$s = html2bbcode($s);
 //	$s = str_replace('&#42;','*',$s);
 
+	// Convert everything that looks like a link to a link
+	$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3]$2$3[/url]',$s);
 
-    $s = preg_replace("/\[url\=?(.*?)\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/url\]/ism",'[youtube]$2[/youtube]',$s); 
-    $s = preg_replace("/\[url\=https?:\/\/www.youtube.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism",'[youtube]$1[/youtube]',$s); 
-	$s = preg_replace("/\[url\=?(.*?)\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism",'[vimeo]$2[/vimeo]',$s); 
-	$s = preg_replace("/\[url\=https?:\/\/vimeo.com\/([0-9]+)\](.*?)\[\/url\]/ism",'[vimeo]$1[/vimeo]',$s); 
-	$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)(vimeo|youtu|www\.youtube|soundcloud)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url]$2$3$4[/url]',$s);
+	//$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)(vimeo|youtu|www\.youtube|soundcloud)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3$4]$2$3$4[/url]',$s);
+	$s = preg_replace("/\[url\=?(.*?)\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/url\]/ism",'[youtube]$2[/youtube]',$s);
+	$s = preg_replace("/\[url\=https?:\/\/www.youtube.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism",'[youtube]$1[/youtube]',$s);
+	$s = preg_replace("/\[url\=?(.*?)\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism",'[vimeo]$2[/vimeo]',$s);
+	$s = preg_replace("/\[url\=https?:\/\/vimeo.com\/([0-9]+)\](.*?)\[\/url\]/ism",'[vimeo]$1[/vimeo]',$s);
 	// remove duplicate adjacent code tags
 	$s = preg_replace("/(\[code\])+(.*?)(\[\/code\])+/ism","[code]$2[/code]", $s);
-	$s = scale_diaspora_images($s);
+
+	// Don't show link to full picture (until it is fixed)
+	$s = scale_diaspora_images($s, false);
 
 	return $s;
 }

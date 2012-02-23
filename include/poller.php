@@ -194,8 +194,8 @@ function poller_run($argv, $argc){
 							$update = true;
 						break;
 				}
-				if((! $update) && (! $force))
-					continue;
+//				if((! $update) && (! $force))
+//					continue;
 			}
 
 			// Check to see if we are running out of memory - if so spawn a new process and kill this one
@@ -371,9 +371,13 @@ function poller_run($argv, $argc){
 			}
 			elseif($contact['network'] === NETWORK_MAIL || $contact['network'] === NETWORK_MAIL2) {
 
+				logger("Mail: Fetching");
+
 				$mail_disabled = ((function_exists('imap_open') && (! get_config('system','imap_disabled'))) ? 0 : 1);
 				if($mail_disabled)
 					continue;
+
+				logger("Mail: Enabled");
 
 				$mbox = null;
 				$x = q("SELECT `prvkey` FROM `user` WHERE `uid` = %d LIMIT 1",
@@ -388,6 +392,7 @@ function poller_run($argv, $argc){
 					openssl_private_decrypt(hex2bin($mailconf[0]['pass']),$password,$x[0]['prvkey']);
 					$mbox = email_connect($mailbox,$mailconf[0]['user'],$password);
 					unset($password);
+					logger("Mail: Connect");
 					if($mbox) {
 						q("UPDATE `mailacct` SET `last_check` = '%s' WHERE `id` = %d AND `uid` = %d LIMIT 1",
 							dbesc(datetime_convert()),
@@ -397,11 +402,16 @@ function poller_run($argv, $argc){
 					}
 				}
 				if($mbox) {
+					logger("Mail: mbox");
 
 					$msgs = email_poll($mbox,$contact['addr']);
 
 					if(count($msgs)) {
+						logger("Mail: Parsing ".count($msgs)." mails.");
+
 						foreach($msgs as $msg_uid) {
+							logger("Mail: Parsing mail ".$msg_uid);
+
 							$datarray = array();
 							$meta = email_msg_meta($mbox,$msg_uid);
 							$headers = email_msg_headers($mbox,$msg_uid);
@@ -436,23 +446,28 @@ function poller_run($argv, $argc){
 							);
 
 							if(count($r)) {
+								logger("Mail: Seen before ".$msg_uid);
 								if($meta->deleted && ! $r[0]['deleted']) {
 									q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
 										dbesc(datetime_convert()),
 										intval($r[0]['id'])
 									);
-								}		
+								}
 								continue;
 							}
 							$datarray['title'] = notags(trim($meta->subject));
 							$datarray['created'] = datetime_convert('UTC','UTC',$meta->date);
-	
+
 							$r = email_get_msg($mbox,$msg_uid);
-							if(! $r)
+							if(! $r) {
+								logger("Mail: can't fetch msg ".$msg_uid);
 								continue;
+							}
 							$datarray['body'] = escape_tags($r['body']);
 
-							// some mailing lists have the original author as 'from' - add this sender info to msg body. 
+							logger("Mail: Importing ".$msg_uid);
+
+							// some mailing lists have the original author as 'from' - add this sender info to msg body.
 							// todo: adding a gravatar for the original author would be cool
 
 							if(! stristr($meta->from,$contact['addr']))
@@ -469,7 +484,7 @@ function poller_run($argv, $argc){
 							$datarray['author-name'] = $contact['name'];
 							$datarray['author-link'] = 'mailbox';
 							$datarray['author-avatar'] = $contact['photo'];
-						
+
 							$stored_item = item_store($datarray);
 							q("UPDATE `item` SET `last-child` = 0 WHERE `parent-uri` = '%s' AND `uid` = %d",
 								dbesc($datarray['parent-uri']),

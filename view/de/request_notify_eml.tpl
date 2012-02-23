@@ -1,5 +1,5 @@
 
-Lieber $myname,
+Liebe/r $myname,
 
 du hast gerade eine Kontaktanfrage von '$requestor' auf $sitename erhalten.
 

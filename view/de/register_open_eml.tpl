@@ -1,5 +1,5 @@
 
-Lieber $username,
+Liebe/r $username,
 danke für die Registrierung bei $sitename. Dein neuer Account wurde angelegt.
 Die Anmeldedetails sind die Folgenden.
 

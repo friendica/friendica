@@ -309,8 +309,12 @@ class App {
 			. 'library/phpsec' . PATH_SEPARATOR 
 			. '.' );
 
-		if((x($_SERVER,'QUERY_STRING')) && substr($_SERVER['QUERY_STRING'],0,2) === "q=")
+		if((x($_SERVER,'QUERY_STRING')) && substr($_SERVER['QUERY_STRING'],0,2) === "q=") {
 			$this->query_string = substr($_SERVER['QUERY_STRING'],2);
+			// removing trailing / - maybe a nginx problem
+			if (substr($this->query_string, 0, 1) == "/")
+				$this->query_string = substr($this->query_string, 1);
+		}
 		if(x($_GET,'q'))
 			$this->cmd = trim($_GET['q'],'/\\');
 

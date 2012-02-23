@@ -1,5 +1,5 @@
 
-Lieber $username,
+Liebe/r $username,
 
 großartige Neuigkeiten... '$fn' von '$dfrn_url' hat deine Kontaktaufnahme auf
 '$sitename' bestätigt.

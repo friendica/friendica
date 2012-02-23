@@ -1,5 +1,5 @@
 
-Lieber $username,
+Liebe/r $username,
 
 '$fn' von '$dfrn_url' hat deine Kontaktanfrage auf '$sitename' bestätigt.
 

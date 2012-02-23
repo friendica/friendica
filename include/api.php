@@ -99,6 +99,10 @@
 	 **************************/
 	function api_call(&$a){
 		GLOBAL $API, $called_api;
+
+		// preset
+		$type="json";
+
 		foreach ($API as $p=>$info){
 			if (strpos($a->query_string, $p)===0){
 				$called_api= explode("/",$p);
@@ -109,14 +113,14 @@
 
 				load_contact_links(local_user());
 
-				logger('API call for ' . $a->user['username'] . ': ' . $a->query_string);		
+				logger('API call for ' . $a->user['username'] . ': ' . $a->query_string);
 				logger('API parameters: ' . print_r($_REQUEST,true));
-				$type="json";		
+				$type="json";
 				if (strpos($a->query_string, ".xml")>0) $type="xml";
 				if (strpos($a->query_string, ".json")>0) $type="json";
 				if (strpos($a->query_string, ".rss")>0) $type="rss";
-				if (strpos($a->query_string, ".atom")>0) $type="atom";				
-				
+				if (strpos($a->query_string, ".atom")>0) $type="atom";
+
 				$r = call_user_func($info['func'], $a, $type);
 				if ($r===false) return;
 
@@ -126,8 +130,8 @@
 						header ("Content-Type: text/xml");
 						return '<?xml version="1.0" encoding="UTF-8"?>'."\n".$r;
 						break;
-					case "json": 
-						//header ("Content-Type: application/json");  
+					case "json":
+						//header ("Content-Type: application/json");
 						foreach($r as $rr)
 						    return json_encode($rr);
 						break;
@@ -139,19 +143,20 @@
 						header ("Content-Type: application/atom+xml");
 						return '<?xml version="1.0" encoding="UTF-8"?>'."\n".$r;
 						break;
-						
+
 				}
 				//echo "<pre>"; var_dump($r); die();
 			}
 		}
+		logger('API call not implemented: '.$a->query_string." - ".print_r($_REQUEST,true));
 		$r = '<status><error>not implemented</error></status>';
 		switch($type){
 			case "xml":
 				header ("Content-Type: text/xml");
 				return '<?xml version="1.0" encoding="UTF-8"?>'."\n".$r;
 				break;
-			case "json": 
-				header ("Content-Type: application/json");  
+			case "json":
+				header ("Content-Type: application/json");
 			    return json_encode(array('error' => 'not implemented'));
 				break;
 			case "rss":
@@ -162,7 +167,6 @@
 				header ("Content-Type: application/atom+xml");
 				return '<?xml version="1.0" encoding="UTF-8"?>'."\n".$r;
 				break;
-				
 		}
 	}
 

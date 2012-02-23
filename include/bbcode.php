@@ -12,20 +12,20 @@ function stripcode_br_cb($s) {
 function tryoembed($match){
 	$url = ((count($match)==2)?$match[1]:$match[2]);
 //	logger("tryoembed: $url");
-	
+
 	$o = oembed_fetch_url($url);
 
 	//echo "<pre>"; var_dump($match, $url, $o); killme();
 
 	if ($o->type=="error") return $match[0];
-	
+
 	$html = oembed_format_object($o);
 	return $html; //oembed_iframe($html,$o->width,$o->height);
-	
+
 }
 
-// [noparse][i]italic[/i][/noparse] turns into 
-// [noparse][ i ]italic[ /i ][/noparse], 
+// [noparse][i]italic[/i][/noparse] turns into
+// [noparse][ i ]italic[ /i ][/noparse],
 // to hide them from parser.
 
 function bb_spacefy($st) {
@@ -36,7 +36,7 @@ function bb_spacefy($st) {
   return $new_str;
 }
 
-// The previously spacefied [noparse][ i ]italic[ /i ][/noparse], 
+// The previously spacefied [noparse][ i ]italic[ /i ][/noparse],
 // now turns back and the [noparse] tags are trimed
 // returning [i]italic[/i]
 
@@ -59,8 +59,8 @@ function bbcode($Text,$preserve_nl = false) {
 	$Text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", 'bb_spacefy',$Text);
 
 
-	// Extract a single private image which uses data url's since preg has issues with 
-	// large data sizes. Stash it away while we do bbcode conversion, and then put it back 
+	// Extract a single private image which uses data url's since preg has issues with
+	// large data sizes. Stash it away while we do bbcode conversion, and then put it back
 	// in after we've done all the regex matching. We cannot use any preg functions to do this.
 
 	$saved_image = '';
@@ -71,13 +71,13 @@ function bbcode($Text,$preserve_nl = false) {
 		$start_fragment = substr($Text,0,$img_start);
 		$img_start += strlen('[img]');
 		$saved_image = substr($Text,$img_start,$img_end - $img_start);
-		$end_fragment = substr($Text,$img_end + strlen('[/img]'));		
+		$end_fragment = substr($Text,$img_end + strlen('[/img]'));
 //		logger('saved_image: ' . $saved_image,LOGGER_DEBUG);
 		$Text = $start_fragment . '[$#saved_image#$]' . $end_fragment;
 	}
 
 	// If we find any event code, turn it into an event.
-	// After we're finished processing the bbcode we'll 
+	// After we're finished processing the bbcode we'll
 	// replace all of the event code with a reformatted version.
 
 	$ev = bbtoevent($Text);
@@ -105,7 +105,7 @@ function bbcode($Text,$preserve_nl = false) {
 	// Perform URL Search
 
 	$Text = preg_replace("/([^\]\=]|^)(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1<a href="$2" target="external-link">$2</a>', $Text);
-	
+
 	$Text = preg_replace_callback("/\[bookmark\=([^\]]*)\].*?\[\/bookmark\]/ism",'tryoembed',$Text);
 	$Text = preg_replace("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism",'[url=$1]$2[/url]',$Text);
 
@@ -118,7 +118,7 @@ function bbcode($Text,$preserve_nl = false) {
 	// Perform MAIL Search
 	$Text = preg_replace("/\[mail\]([$MAILSearchString]*)\[\/mail\]/", '<a href="mailto:$1">$1</a>', $Text);
 	$Text = preg_replace("/\[mail\=([$MAILSearchString]*)\](.*?)\[\/mail\]/", '<a href="mailto:$1">$2</a>', $Text);
-         
+
 	// Check for bold text
 	$Text = preg_replace("(\[b\](.*?)\[\/b\])ism",'<strong>$1</strong>',$Text);
 
@@ -149,21 +149,20 @@ function bbcode($Text,$preserve_nl = false) {
 	$Text = str_replace("[*]", "<li>", $Text);
 	$Text = preg_replace("/\[li\](.*?)\[\/li\]/ism", '<li>$1</li>' ,$Text);
 
-	$Text = preg_replace("/\[list\](.*?)\[\/list\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[ul\](.*?)\[\/ul\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' 
-,$Text);
-	$Text = preg_replace("/\[list=\](.*?)\[\/list\]/ism", '<ul class="listnone" style="list-style-type: none;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[list=1\](.*?)\[\/list\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>' ,$Text);
-	$Text = preg_replace("/\[ol\](.*?)\[\/ol\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>' 
-,$Text);
-	$Text = preg_replace("/\[list=((?-i)i)\](.*?)\[\/list\]/ism",'<ul class="listlowerroman" style="list-style-type: 
-lower-roman;">$2</ul>' ,$Text);
-	$Text = preg_replace("/\[list=((?-i)I)\](.*?)\[\/list\]/ism", '<ul class="listupperroman" style="list-style-type: 
-upper-roman;">$2</ul>' ,$Text);
-	$Text = preg_replace("/\[list=((?-i)a)\](.*?)\[\/list\]/ism", '<ul class="listloweralpha" style="list-style-type: 
-lower-alpha;">$2</ul>' ,$Text);
-	$Text = preg_replace("/\[list=((?-i)A)\](.*?)\[\/list\]/ism", '<ul class="listupperalpha" style="list-style-type: 
-upper-alpha;">$2</ul>' ,$Text);
+ 	// handle nested lists
+	$endlessloop = 0;
+	while (strpos($Text, "[/list]") and strpos($Text, "[list") and (++$endlessloop < 20)) {
+		$Text = preg_replace("/\[list\](.*?)\[\/list\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' ,$Text);
+		$Text = preg_replace("/\[list=\](.*?)\[\/list\]/ism", '<ul class="listnone" style="list-style-type: none;">$1</ul>' ,$Text);
+		$Text = preg_replace("/\[list=1\](.*?)\[\/list\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>' ,$Text);
+		$Text = preg_replace("/\[list=((?-i)i)\](.*?)\[\/list\]/ism",'<ul class="listlowerroman" style="list-style-type: lower-roman;">$2</ul>' ,$Text);
+		$Text = preg_replace("/\[list=((?-i)I)\](.*?)\[\/list\]/ism", '<ul class="listupperroman" style="list-style-type: upper-roman;">$2</ul>' ,$Text);
+		$Text = preg_replace("/\[list=((?-i)a)\](.*?)\[\/list\]/ism", '<ul class="listloweralpha" style="list-style-type: lower-alpha;">$2</ul>' ,$Text);
+		$Text = preg_replace("/\[list=((?-i)A)\](.*?)\[\/list\]/ism", '<ul class="listupperalpha" style="list-style-type: upper-alpha;">$2</ul>' ,$Text);
+	}
+
+	$Text = preg_replace("/\[ul\](.*?)\[\/ul\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' ,$Text);
+	$Text = preg_replace("/\[ol\](.*?)\[\/ol\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>' ,$Text);
 
 	$Text = preg_replace("/\[th\](.*?)\[\/th\]/sm", '<th>$1</th>' ,$Text);
 	$Text = preg_replace("/\[td\](.*?)\[\/td\]/sm", '<td>$1</td>' ,$Text);
@@ -190,21 +189,24 @@ upper-alpha;">$2</ul>' ,$Text);
 	// Check for [code] text
 	$Text = preg_replace("/\[code\](.*?)\[\/code\]/ism","$CodeLayout", $Text);
 
-
-
-
 	// Declare the format for [quote] layout
-	$QuoteLayout = '<blockquote>$1</blockquote>';                     
+	$QuoteLayout = '<blockquote>$1</blockquote>';
 	// Check for [quote] text
-	$Text = preg_replace("/\[quote\](.*?)\[\/quote\]/ism","$QuoteLayout", $Text);
+	// handle nested quotes
+	$endlessloop = 0;
+	while (strpos($Text, "[/quote]") and strpos($Text, "[quote]") and (++$endlessloop < 20))
+		$Text = preg_replace("/\[quote\](.*?)\[\/quote\]/ism","$QuoteLayout", $Text);
 
 	// Check for [quote=Author] text
 
 	$t_wrote = t('$1 wrote:');
 
-	$Text = preg_replace("/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism", 
-                             "<blockquote><strong>" . $t_wrote . "</strong> $2</blockquote>", 
-                             $Text);         
+	// handle nested quotes
+	$endlessloop = 0;
+	while (strpos($Text, "[/quote]") and strpos($Text, "[quote=") and (++$endlessloop < 20))
+		$Text = preg_replace("/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
+        	                     "<blockquote><strong>" . $t_wrote . "</strong> $2</blockquote>",
+                	             $Text);
 
 	// [img=widthxheight]image source[/img]
 	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="height: $2px; width: $1px;" >', $Text);
