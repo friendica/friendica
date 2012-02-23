@@ -309,12 +309,13 @@ aside {
 	.allcontact-link { float: right; margin: 5px 0px; }
 	.contact-block-content {
 		clear: both;
-		overflow: auto;	height: auto;
+		overflow: idden;	height: auto;
 	}
+	/*.contact-block-div { width:60px; height: 60px; }*/
 	.contact-block-link {
 		float: left;
 		margin: 0px 2px 2px 0px;
-		img { widht: 48px; height: 58px; }
+		img { widht: 48px; height: 48px; }
 	}
 }
 /* mail view */
@@ -373,6 +374,7 @@ aside {
             top: -50px;
         }
 }
+/*
 #group-members {
 	margin-top: 20px;
 	padding: 10px;
@@ -395,9 +397,10 @@ aside {
 }
 .contact-block-div {
 	float: left;
-	width: 52px;
-	height: 52px;
-}
+	width: 60px;
+	height: 60px;
+}*/
+ 
 /* widget */
 .widget {
 	margin-bottom: 2em;
@@ -551,6 +554,8 @@ section {
 
 }
 
+.shiny { border-right:10px solid @ShinyBorderColor; }
+#jot-preview-content .tread-wrapper { background-color: @JotPreviewBackgroundColor; }
 
 
 .wall-item-tags { padding-top: 5px; }
@@ -589,7 +594,7 @@ section {
  right: 5px;
 }
 
-/* contacts menu */
+
 .contact-photo-wrapper { position: relative; }
 .contact-photo { 
 	width: 48px; height: 48px;
@@ -606,9 +611,14 @@ section {
 
 .contact-wrapper {
 	float: left;
-	width: 90px;
+	width: 300px;
 	height: 90px;
-        margin-bottom: 15px;
+	padding-right: 10px;
+	margin: 0 10px 10px 0px;
+	.contact-photo-wrapper { 
+		float: left; 
+		margin-right: 10px;
+	}
 	.contact-photo { 
 		width: 80px; height: 80px;
 		img { width: 80px; height: 80px; }
@@ -627,8 +637,13 @@ section {
 		img { width: 175px; height: 175px; }
 	}
 }
-.contact-name { text-align: center; font-weight: bold; }
-.contact-details { color: @Grey3;}
+.contact-name { font-weight: bold; padding-top: 15px; }
+.contact-details { 
+	color: @Grey3; white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /* editor */
 .jothidden { display: none; }
 #jot {

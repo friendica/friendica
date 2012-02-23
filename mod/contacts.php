@@ -451,19 +451,7 @@ function contacts_content(&$a) {
 		$a->set_pager_total($r[0]['total']);
 
 
-	$tpl = get_markup_template("contacts-top.tpl");
-	$o .= replace_macros($tpl,array(
-		'$header' => t('Contacts') . (($nets) ? ' - ' . network_to_name($nets) : ''),
-		'$tabs' => $t,
-		'$total' => $r[0]['total'],
-		'$search' => $search_hdr,
-		'$desc' => t('Search your contacts'),
-		'$finding' => (strlen($search) ? '<h4>' . t('Finding: ') . "'" . $search . "'" . '</h4>' : ""),
-		'$submit' => t('Find'),
-		'$cmd' => $a->cmd
 
-
-	)); 
 
 	$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `pending` = 0 $sql_extra $sql_extra2 ORDER BY `name` ASC LIMIT %d , %d ",
 		intval($_SESSION['uid']),
@@ -471,9 +459,9 @@ function contacts_content(&$a) {
 		intval($a->pager['itemspage'])
 	);
 
-	if(count($r)) {
+	$contacts = array();
 
-		$tpl = get_markup_template("contact_template.tpl");
+	if(count($r)) {
 
 		foreach($r as $rr) {
 			if($rr['self'])
@@ -505,24 +493,40 @@ function contacts_content(&$a) {
 			}
 
 
-			$o .= replace_macros($tpl, array(
-				'$img_hover' => sprintf( t('Visit %s\'s profile [%s]'),$rr['name'],$rr['url']),
-				'$edit_hover' => t('Edit contact'),
-				'$contact_photo_menu' => contact_photo_menu($rr),
-				'$id' => $rr['id'],
-				'$alt_text' => $alt_text,
-				'$dir_icon' => $dir_icon,
-				'$thumb' => $rr['thumb'], 
-				'$name' => $rr['name'],
-				'$username' => $rr['name'],
-				'$sparkle' => $sparkle,
-				'$url' => $url
-			));
+			$contacts[] = array(
+				'img_hover' => sprintf( t('Visit %s\'s profile [%s]'),$rr['name'],$rr['url']),
+				'edit_hover' => t('Edit contact'),
+				'photo_menu' => contact_photo_menu($rr),
+				'id' => $rr['id'],
+				'alt_text' => $alt_text,
+				'dir_icon' => $dir_icon,
+				'thumb' => $rr['thumb'], 
+				'name' => $rr['name'],
+				'username' => $rr['name'],
+				'sparkle' => $sparkle,
+				'url' => $url,
+				'item' => $rr,
+			);
 		}
 
-		$o .= '<div id="contact-edit-end"></div>';
+		
 
 	}
-	$o .= paginate($a);
+	
+	$tpl = get_markup_template("contacts-template.tpl");
+	$o .= replace_macros($tpl,array(
+		'$header' => t('Contacts') . (($nets) ? ' - ' . network_to_name($nets) : ''),
+		'$tabs' => $t,
+		'$total' => $r[0]['total'],
+		'$search' => $search_hdr,
+		'$desc' => t('Search your contacts'),
+		'$finding' => (strlen($search) ? t('Finding: ') . "'" . $search . "'" : ""),
+		'$submit' => t('Find'),
+		'$cmd' => $a->cmd,
+		'$contacts' => $contacts,
+		'$paginate' => paginate($a),
+
+	)); 
+	
 	return $o;
 }

@@ -1,4 +1,4 @@
-<form action="$action" method="post">
+<form id="profile-jot-form" action="$action" method="post">
 	<div id="jot">
 		<div id="profile-jot-desc" class="jothidden" >&nbsp;</div>
 		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none">
@@ -22,6 +22,7 @@
 			<li><a id="profile-audio" onclick="jotAudioURL();return false;" title="$audio">$shortaudio</a></li>
 			<li><a id="profile-location" onclick="jotGetLocation();return false;" title="$setloc">$shortsetloc</a></li>
 			<li><a id="profile-nolocation" onclick="jotClearLocation();return false;" title="$noloc">$shortnoloc</a></li>
+			<li><a id="jot-preview-link" onclick="preview_post(); return false;" title="$preview">$preview</a></li>
 			$jotplugins
 
 			<li class="perms"><a id="jot-perms-icon" href="#profile-jot-acl-wrapper" class="icon s22 $lockstate $bang"  title="$permset" ></a></li>
@@ -29,6 +30,8 @@
 			<li id="profile-rotator" class="loading" style="display: none"><img src="images/rotator.gif" alt="$wait" title="$wait"  /></li>
 		</ul>
 	</div>
+	
+	<div id="jot-preview-content" style="display:none;"></div>
 
 	<div style="display: none;">
 		<div id="profile-jot-acl-wrapper" style="width:auto;height:auto;overflow:auto;">

@@ -1,9 +1,9 @@
+<h3>$title</h3>
 
-<div class="contact-wrapper" id="view-contact-wrapper-$id" >
-	<div class="contact-photo-wrapper" >
-		<div class="mframe contact-photo" id="view-contact-photo-$id" >
-			<a href="$url" title="$alt_text" /><img src="$thumb" alt="$name" /></a>
-		</div>
-	</div>
-	<div class="contact-name" id="view-contact-name-$id" >$name</div>
-</div>
+{{ for $contacts as $contact }}
+	{{ inc contact_template.tpl }}{{ endinc }}
+{{ endfor }}
+
+<div id="view-contact-end"></div>
+
+$paginate

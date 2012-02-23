@@ -602,6 +602,8 @@ aside #profiles-menu {
 #contact-block {
   overflow: auto;
   height: auto;
+  /*.contact-block-div { width:60px; height: 60px; }*/
+
 }
 #contact-block .contact-block-h4 {
   float: left;
@@ -613,7 +615,7 @@ aside #profiles-menu {
 }
 #contact-block .contact-block-content {
   clear: both;
-  overflow: auto;
+  overflow: idden;
   height: auto;
 }
 #contact-block .contact-block-link {
@@ -622,7 +624,7 @@ aside #profiles-menu {
 }
 #contact-block .contact-block-link img {
   widht: 48px;
-  height: 58px;
+  height: 48px;
 }
 /* mail view */
 .mail-conv-sender, .mail-conv-detail {
@@ -675,31 +677,32 @@ aside #profiles-menu {
   position: relative;
   top: -50px;
 }
+/*
 #group-members {
-  margin-top: 20px;
-  padding: 10px;
-  height: 250px;
-  overflow: auto;
-  border: 1px solid #ddd;
+	margin-top: 20px;
+	padding: 10px;
+	height: 250px;
+	overflow: auto;
+	border: 1px solid #ddd;
 }
 #group-members-end {
-  clear: both;
+	clear: both;
 }
 #group-all-contacts {
-  padding: 10px;
-  height: 450px;
-  overflow: auto;
-  border: 1px solid #ddd;
+	padding: 10px;
+	height: 450px;
+	overflow: auto;
+	border: 1px solid #ddd;
 }
 #group-all-contacts-end {
-  clear: both;
-  margin-bottom: 10px;
+	clear: both;
+	margin-bottom: 10px;
 }
 .contact-block-div {
-  float: left;
-  width: 52px;
-  height: 52px;
-}
+	float: left;
+	width: 60px;
+	height: 60px;
+}*/
 /* widget */
 .widget {
   margin-bottom: 2em;
@@ -946,6 +949,12 @@ section {
   padding: 0;
   margin: 10px 0;
 }
+.shiny {
+  border-right: 10px solid #fce94f;
+}
+#jot-preview-content .tread-wrapper {
+  background-color: #fce94f;
+}
 .wall-item-tags {
   padding-top: 5px;
 }
@@ -985,7 +994,6 @@ section {
   bottom: 5px;
   right: 5px;
 }
-/* contacts menu */
 .contact-photo-wrapper {
   position: relative;
 }
@@ -1007,9 +1015,14 @@ section {
 }
 .contact-wrapper {
   float: left;
-  width: 90px;
+  width: 300px;
   height: 90px;
-  margin-bottom: 15px;
+  padding-right: 10px;
+  margin: 0 10px 10px 0px;
+}
+.contact-wrapper .contact-photo-wrapper {
+  float: left;
+  margin-right: 10px;
 }
 .contact-wrapper .contact-photo {
   width: 80px;
@@ -1037,11 +1050,14 @@ section {
   height: 175px;
 }
 .contact-name {
-  text-align: center;
   font-weight: bold;
+  padding-top: 15px;
 }
 .contact-details {
   color: #999999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* editor */
 .jothidden {

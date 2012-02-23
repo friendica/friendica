@@ -1,4 +1,5 @@
 <?php
+require_once('include/contact_selectors.php');
 
 function viewcontacts_init(&$a) {
 
@@ -22,8 +23,6 @@ function viewcontacts_content(&$a) {
 		return;
 	} 
 
-	$o .= '<h3>' . t('View Contacts') . '</h3>';
-
 
 	$r = q("SELECT COUNT(*) as `total` FROM `contact` WHERE `uid` = %d AND `blocked` = 0 AND `pending` = 0 AND `hidden` = 0 ",
 		intval($a->profile['uid'])
@@ -41,7 +40,7 @@ function viewcontacts_content(&$a) {
 		return $o;
 	}
 
-	$tpl = get_markup_template("viewcontact_template.tpl");
+	$contacts = array();
 
 	foreach($r as $rr) {
 		if($rr['self'])
@@ -56,19 +55,26 @@ function viewcontacts_content(&$a) {
 		if($is_owner && ($rr['network'] === NETWORK_DFRN) && ($rr['rel']))
 			$url = 'redir/' . $rr['id'];
 
-		$o .= replace_macros($tpl, array(
-			'$id' => $rr['id'],
-			'$alt_text' => sprintf( t('Visit %s\'s profile [%s]'), $rr['name'], $rr['url']),
-			'$thumb' => $rr['thumb'], 
-			'$name' => substr($rr['name'],0,20),
-			'$username' => $rr['name'],
-			'$url' => $url
-		));
+		$contacts[] = array(
+			'id' => $rr['id'],
+			'img_hover' => sprintf( t('Visit %s\'s profile [%s]'), $rr['name'], $rr['url']),
+			'thumb' => $rr['thumb'], 
+			'name' => substr($rr['name'],0,20),
+			'username' => $rr['name'],
+			'url' => $url,
+			'sparkle' => '',
+			'item' => $rr,
+		);
 	}
 
-	$o .= '<div id="view-contact-end"></div>';
 
-	$o .= paginate($a);
+	$tpl = get_markup_template("viewcontact_template.tpl");
+	$o .= replace_macros($tpl, array(
+		'$title' => t('View Contacts'),
+		'$contacts' => $contacts,
+		'$paginate' => paginate($a),
+	));
+
 
 	return $o;
 }
