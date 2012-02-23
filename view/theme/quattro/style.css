@@ -615,7 +615,7 @@ aside #profiles-menu {
 }
 #contact-block .contact-block-content {
   clear: both;
-  overflow: idden;
+  overflow: hidden;
   height: auto;
 }
 #contact-block .contact-block-link {
@@ -623,7 +623,7 @@ aside #profiles-menu {
   margin: 0px 2px 2px 0px;
 }
 #contact-block .contact-block-link img {
-  widht: 48px;
+  width: 48px;
   height: 48px;
 }
 /* mail view */
