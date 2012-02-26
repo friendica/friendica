@@ -26,9 +26,10 @@ function ping_init(&$a) {
 		$dislikes = array();
 		$friends = array();
 		$posts = array();
-		
+		$home = 0;
+		$network = 0;
 
-		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, 
+		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`wall`, `item`.`author-name`, 
 				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object`, 
 				`pitem`.`author-name` as `pname`, `pitem`.`author-link` as `plink` 
 				FROM `item` INNER JOIN `item` as `pitem` ON  `pitem`.`id`=`item`.`parent`

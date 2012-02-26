@@ -119,7 +119,7 @@ function photo_init(&$a) {
 		// NOTREACHED
 	}
 
-	if(intval($customres) && $customres > 0 && $customres < 500) {
+	if(isset($customres) && $customres > 0 && $customres < 500) {
 		require_once('include/Photo.php');
 		$ph = new Photo($data);
 		if($ph->is_valid()) {

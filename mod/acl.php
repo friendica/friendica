@@ -16,6 +16,8 @@ function acl_init(&$a){
 	if ($search!=""){
 		$sql_extra = "AND `name` LIKE '%%".dbesc($search)."%%'";
 		$sql_extra2 = "AND (`attag` LIKE '%%".dbesc($search)."%%' OR `name` LIKE '%%".dbesc($search)."%%' OR `nick` LIKE '%%".dbesc($search)."%%')";
+	} else {
+		$sql_extra = $sql_extra2 = "";
 	}
 	
 	// count groups and contacts
@@ -75,7 +77,7 @@ function acl_init(&$a){
 	
 	if ($type=='' || $type=='c'){
 	
-		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url` FROM `contact` 
+		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag` FROM `contact` 
 			WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 AND `notify` != ''
 			$sql_extra2
 			ORDER BY `name` ASC ",

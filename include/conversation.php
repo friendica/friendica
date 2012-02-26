@@ -232,7 +232,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 
 	$alike = array();
 	$dlike = array();
-	
+	$o = "";
 	
 	// array with html for each thread (parent+comments)
 	$threads = array();
@@ -436,7 +436,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				}
 				else {
 					// prevent private email from leaking into public conversation
-					if((! $toplevelpost) && (! toplevelprivate) && ($item['private']) && ($profile_owner != local_user()))
+					if((! $toplevelpost) && (! $toplevelprivate) && ($item['private']) && ($profile_owner != local_user()))
 						continue;
 					$comments_seen ++;
 				}	
@@ -641,7 +641,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				$body = prepare_body($item,true);
 
 				$tmp_item = replace_macros($template,array(
-					'$type' => implode("",array_slice(split("/",$item['verb']),-1)),
+					'$type' => implode("",array_slice(explode("/",$item['verb']),-1)),
 					'$tags' => $tags,
 					'$body' => template_escape($body),
 					'$id' => $item['item_id'],

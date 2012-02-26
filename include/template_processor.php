@@ -32,11 +32,12 @@
 	
 			if(is_array($r) && count($r)) {
 				foreach ($r as $k => $v ) {
-					if (is_array($v))
+					if (is_array($v)) {
 						$this->_build_replace($v, "$prefix$k.");
-					
-					$this->search[] =  $prefix . $k;
-					$this->replace[] = $v;
+					} else {
+						$this->search[] =  $prefix . $k;
+						$this->replace[] = $v;
+					}
 				}
 			}
 		} 
@@ -53,7 +54,7 @@
 			$keys = array_map('trim',explode(".",$name));		
 			$val = $this->r;
 			foreach($keys as $k) {
-				$val = $val[$k];
+				$val = (isset($val[$k]) ? $val[$k] : null);
 			}
 			return $val;
 		}
@@ -79,8 +80,8 @@
 			} else {
 				$val = $this->_get_var($args[2]);
 			}
-			list($strue, $sfalse)= preg_split("|{{ *else *}}|", $args[3]);
-			return ($val?$strue:$sfalse);
+			$x = preg_split("|{{ *else *}}|", $args[3]);
+			return ( $val ? $x[0] : (isset($x[1]) ? $x[1] : ""));
 		}
 		
 		/**

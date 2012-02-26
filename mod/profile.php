@@ -107,7 +107,7 @@ function profile_content(&$a, $update = 0) {
 
 	$is_owner = ((local_user()) && (local_user() == $a->profile['profile_uid']) ? true : false);
 
-	if($a->profile['hidewall'] && (! $is_owner) && (! $remote_contact)) {
+	if($a->user['hidewall'] && (! $is_owner) && (! $remote_contact)) {
 		notice( t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
@@ -228,9 +228,11 @@ function profile_content(&$a, $update = 0) {
 			intval($a->profile['profile_uid']),
 			dbesc($parents_str)
 		);
+		
+		$items = conv_sort($items,'created');
+	} else {
+		$items = array();
 	}
-
-	$items = conv_sort($items,'created');
 
 	if($is_owner && ! $update) {
 		$o .= get_birthdays();

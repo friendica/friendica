@@ -162,7 +162,7 @@ function del_config($family,$key) {
 	if(x($a->config[$family],$key))
 		unset($a->config[$family][$key]);
 	$ret = q("DELETE FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
-		dbesc($cat),
+		dbesc($family),
 		dbesc($key)
 	);
 	return $ret;

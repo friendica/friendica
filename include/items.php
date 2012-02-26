@@ -308,7 +308,7 @@ function get_atom_elements($feed,$item) {
 	if($rawauthor && $rawauthor[0]['child'][SIMPLEPIE_NAMESPACE_ATOM_10]['link']) {
 		$base = $rawauthor[0]['child'][SIMPLEPIE_NAMESPACE_ATOM_10]['link'];
 		foreach($base as $link) {
-			if(! $res['author-avatar']) {
+			if(!x($res, 'author-avatar') || !$res['author-avatar']) {
 				if($link['attribs']['']['rel'] === 'photo' || $link['attribs']['']['rel'] === 'avatar')
 					$res['author-avatar'] = unxmlify($link['attribs']['']['href']);
 			}
@@ -323,7 +323,7 @@ function get_atom_elements($feed,$item) {
 			foreach($base as $link) {
 				if($link['attribs']['']['rel'] === 'alternate' && (! $res['author-link']))
 					$res['author-link'] = unxmlify($link['attribs']['']['href']);
-				if(! $res['author-avatar']) {
+				if(!x($res, 'author-avatar') || !$res['author-avatar']) {
 					if($link['attribs']['']['rel'] === 'avatar' || $link['attribs']['']['rel'] === 'photo')
 						$res['author-avatar'] = unxmlify($link['attribs']['']['href']);
 				}
@@ -503,7 +503,7 @@ function get_atom_elements($feed,$item) {
 		$base = $rawowner[0]['child'][SIMPLEPIE_NAMESPACE_ATOM_10]['link'];
 
 		foreach($base as $link) {
-			if(! $res['owner-avatar']) {
+			if(!x($res, 'owner-avatar') || !$res['owner-avatar']) {
 				if($link['attribs']['']['rel'] === 'photo' || $link['attribs']['']['rel'] === 'avatar')			
 					$res['owner-avatar'] = unxmlify($link['attribs']['']['href']);
 			}

@@ -163,7 +163,7 @@ function bbtoevent($s) {
 	if(preg_match("/\[event\-adjust\](.*?)\[\/event\-adjust\]/is",$s,$match))
 		$ev['adjust'] = $match[1];
 	$match = '';
-	$ev['nofinish'] = (($ev['start'] && (! $ev['finish'])) ? 1 : 0);
+	$ev['nofinish'] = (($ev['start'] && (!x($ev, 'finish') || !$ev['finish'])) ? 1 : 0);
 	return $ev;
 
 }
