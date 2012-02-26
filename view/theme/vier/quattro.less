@@ -3,7 +3,7 @@
 /* global */
 body {
 	font-family: Liberation Sans,helvetica,arial,clean,sans-serif;
-	font-size: 10px;
+	font-size: 11px;
 	background-color: @BodyBackground;
 	color: @BodyColor;
 	margin: 50px 0px 0px 0px;
@@ -44,6 +44,9 @@ a:hover {color: @LinkHover; text-decoration: underline; }
 .hidden { display: none; }
 .clear { clear: both; }
 
+.fakelink { color: @Link; text-decoration: none; cursor:pointer; }
+.fakelink:hover { color: @LinkHover; text-decoration: underline; }
+
 code {
 	font-family: Courier, monospace;
 	white-space: pre;
@@ -55,6 +58,23 @@ code {
 	padding: 10px;
 	margin-top: 20px; 
 }
+
+#panel {
+	position: absolute;
+	width: 10em;
+	background: @MenuBg;
+	color: @Menu;
+	margin: 0px;
+	padding: 1em;
+	list-style: none;
+	border: 3px solid @MenuBorder;
+	z-index: 100000;
+	
+	.shadow();	
+}
+
+
+
 /* tool */
 
 .tool {
@@ -234,7 +254,8 @@ ul.menu-popup {
 
 
 #nav-notifications-menu {
-	width: 400px;
+	width: 400px; max-height: 550px;
+	overflow: auto;
 	img { float: left; margin-right: 5px; }
 	.contactname { font-weight: bold; }
 	.notif-when { font-size: 10px; color: @MenuItemDetail; display: block; }
@@ -288,16 +309,99 @@ aside {
 	.allcontact-link { float: right; margin: 5px 0px; }
 	.contact-block-content {
 		clear: both;
-		overflow: auto;	height: auto;
+		overflow: hidden;
+		height: auto;
 	}
+	/*.contact-block-div { width:60px; height: 60px; }*/
 	.contact-block-link {
 		float: left;
 		margin: 0px 2px 2px 0px;
-		img { widht: 48px; height: 58px; }
+		img { width: 48px; height: 48px; }
 	}
 }
+/* mail view */
+.mail-conv-sender,
+.mail-conv-detail {
+	float: left;
+}
+.mail-conv-detail {
+	margin-left: 20px;
+	width: 500px;
+}
 
+.mail-conv-subject {
+    font-size: 1.4em;
+    margin: 10px 0;
+}
 
+.mail-conv-outside-wrapper-end {
+	clear: both;
+}
+
+.mail-conv-outside-wrapper {
+	margin-top: 30px;
+}
+
+.mail-conv-delete-wrapper {
+	float: right;
+	margin-right: 30px;
+	margin-top: 15px;
+}
+.mail-conv-break {
+	clear: both;
+}
+
+.mail-conv-delete-icon {
+	border: none;
+}
+
+/* group member */
+#contact-edit-drop-link,
+.mail-list-delete-wrapper,
+.group-delete-wrapper {
+	float: right;
+	margin-right: 50px;
+        .drophide {
+            background-image: url('../../../images/icons/22/delete.png');
+            display: block; width: 22px; height: 22px;
+            opacity: 0.3;
+            position: relative;
+            top: -50px;
+        }
+        .drop {
+            background-image: url('../../../images/icons/22/delete.png');
+            display: block; width: 22px; height: 22px;
+            position: relative;
+            top: -50px;
+        }
+}
+/*
+#group-members {
+	margin-top: 20px;
+	padding: 10px;
+	height: 250px;
+	overflow: auto;
+	border: 1px solid #ddd;
+}
+#group-members-end {
+	clear: both;
+}
+#group-all-contacts {
+	padding: 10px;
+	height: 450px;
+	overflow: auto;
+	border: 1px solid #ddd;
+}
+#group-all-contacts-end {
+	clear: both;
+	margin-bottom: 10px;
+}
+.contact-block-div {
+	float: left;
+	width: 60px;
+	height: 60px;
+}*/
+ 
 /* widget */
 .widget {
 	margin-bottom: 2em;
@@ -431,6 +535,28 @@ section {
 	}
 }
 
+.comment-edit-preview {
+	width: 710px;
+	border: 1px solid @Grey5;
+	margin-top: 10px;
+	
+	.contact-photo { width: 32px; height: 32px; margin-left: 16px;
+		/*background: url(../../../images/icons/22/user.png) no-repeat center center;*/
+	}	
+	.contact-photo-menu-button {
+		top: 15px !important;
+		left: 15px !important;
+	}
+	.wall-item-links { padding-left: 12px; }
+
+	.wall-item-container { width: 700px; }
+	.tread-wrapper { width: 700px; padding: 0; margin: 10px 0;}
+
+
+}
+
+.shiny { border-right:10px solid @ShinyBorderColor; }
+#jot-preview-content .tread-wrapper { background-color: @JotPreviewBackgroundColor; }
 
 
 .wall-item-tags { padding-top: 5px; }
@@ -445,7 +571,31 @@ section {
 	}
 }
 
-/* contacts menu */
+.wwto { 
+	position: absolute !important; 
+	width: 25px; height: 25px; 
+    background: #FFFFFF;
+    border: 2px solid @Metalic3;
+    height: 25px;
+    width: 25px;
+    overflow: hidden;
+    padding: 1px;
+    position: absolute !important;
+    top: 40px;
+    left: 30px;
+    
+    .shadow(0px, 0px)
+}
+.wwto .contact-photo { width: 25px; height: 25px; }
+
+
+#pause {
+ position: fixed;
+ bottom: 5px;
+ right: 5px;
+}
+
+
 .contact-photo-wrapper { position: relative; }
 .contact-photo { 
 	width: 48px; height: 48px;
@@ -462,8 +612,14 @@ section {
 
 .contact-wrapper {
 	float: left;
-	width: 90px;
+	width: 300px;
 	height: 90px;
+	padding-right: 10px;
+	margin: 0 10px 10px 0px;
+	.contact-photo-wrapper { 
+		float: left; 
+		margin-right: 10px;
+	}
 	.contact-photo { 
 		width: 80px; height: 80px;
 		img { width: 80px; height: 80px; }
@@ -482,8 +638,12 @@ section {
 		img { width: 175px; height: 175px; }
 	}
 }
-.contact-name { text-align: center; font-weight: bold; }
-.contact-details { color: @Grey3;}
+.contact-name { font-weight: bold; padding-top: 15px; }
+.contact-details { 
+	color: @Grey3; white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
 /* editor */
 .jothidden { display: none; }
@@ -794,6 +954,58 @@ ul.tabs {
 
 #profile-edit-links li {
 	list-style: none;
+        margin-top: 10px;
+}
+
+#profile-edit-default-desc {
+	color: #FF0000;
+	border: 1px solid #FF8888;
+	background-color: #FFEEEE;
+	padding: 7px;
+}
+#profile-edit-profile-name-label,
+#profile-edit-name-label,
+#profile-edit-pdesc-label,
+#profile-edit-gender-label,
+#profile-edit-dob-label,
+#profile-edit-address-label,
+#profile-edit-locality-label,
+#profile-edit-region-label,
+#profile-edit-postal-code-label,
+#profile-edit-country-name-label,
+#profile-edit-marital-label,
+#profile-edit-with-label,
+#profile-edit-sexual-label,
+#profile-edit-politic-label,
+#profile-edit-religion-label,
+#profile-edit-pubkeywords-label,
+#profile-edit-prvkeywords-label,
+#profile-edit-gender-select,
+#profile-edit-homepage-label {
+	float: left;
+	width: 175px;
+        padding-top: 7px;
+}
+#profile-edit-profile-name,
+#profile-edit-name,
+#gender-select, 
+#profile-edit-pdesc,
+#profile-edit-gender,
+#profile-edit-dob,
+#profile-edit-address,
+#profile-edit-locality,
+#profile-edit-region,
+#profile-edit-postal-code,
+#profile-edit-country-name,
+#profile-edit-marital,
+#profile-edit-with,
+#profile-edit-sexual,
+#profile-edit-politic,
+#profile-edit-religion,
+#profile-edit-pubkeywords,
+#profile-edit-prvkeywords,
+#profile-edit-homepage {
+    margin-top: 5px;
 }
 
 /* oauth */
@@ -828,6 +1040,28 @@ ul.tabs {
 	margin: 0px 10px 10px 0px;
 }
 
+/* profile match wrapper */
+.profile-match-wrapper {
+	float: left;
+	width: 90px;
+	height: 90px;
+        margin-bottom: 20px;
+	.contact-photo { 
+		width: 80px; height: 80px;
+		img { width: 80px; height: 80px; }
+	}
+	.contact-photo-menu-button {
+		left: 0px;
+		top: 63px;
+	}	
+}
+
 
 /* page footer */
 footer { height: 100px; display: table-row; }
+
+.pager {
+    margin-top: 25px;
+    clear: both;
+}
+

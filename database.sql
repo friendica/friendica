@@ -634,7 +634,8 @@ CREATE TABLE IF NOT EXISTS `mailacct` (
 `mailbox` CHAR( 255 ) NOT NULL,
 `user` CHAR( 255 ) NOT NULL ,
 `pass` TEXT NOT NULL ,
-`reply_to` CHAR( 255 ) NOT NULL ,
+`action` INT NOT NULL ,
+`movetofolder` CHAR(255) NOT NULL ,
 `pubmail` TINYINT(1) NOT NULL DEFAULT '0',
 `last_check` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE = MyISAM DEFAULT CHARSET=utf8;

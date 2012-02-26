@@ -110,13 +110,15 @@ function settings_post(&$a) {
 	if(($a->argc > 1) && ($a->argv[1] == 'connectors')) {
 
 		if(x($_POST['imap-submit'])) {
-			$mail_server      = ((x($_POST,'mail_server')) ? $_POST['mail_server'] : '');
-			$mail_port        = ((x($_POST,'mail_port')) ? $_POST['mail_port'] : '');
-			$mail_ssl         = ((x($_POST,'mail_ssl')) ? strtolower(trim($_POST['mail_ssl'])) : '');
-			$mail_user        = ((x($_POST,'mail_user')) ? $_POST['mail_user'] : '');
-			$mail_pass        = ((x($_POST,'mail_pass')) ? trim($_POST['mail_pass']) : '');
-			$mail_replyto     = ((x($_POST,'mail_replyto')) ? $_POST['mail_replyto'] : '');
-			$mail_pubmail     = ((x($_POST,'mail_pubmail')) ? $_POST['mail_pubmail'] : '');
+			$mail_server       = ((x($_POST,'mail_server')) ? $_POST['mail_server'] : '');
+			$mail_port         = ((x($_POST,'mail_port')) ? $_POST['mail_port'] : '');
+			$mail_ssl          = ((x($_POST,'mail_ssl')) ? strtolower(trim($_POST['mail_ssl'])) : '');
+			$mail_user         = ((x($_POST,'mail_user')) ? $_POST['mail_user'] : '');
+			$mail_pass         = ((x($_POST,'mail_pass')) ? trim($_POST['mail_pass']) : '');
+			$mail_action       = ((x($_POST,'mail_action')) ? trim($_POST['mail_action']) : '');
+			$mail_movetofolder = ((x($_POST,'mail_movetofolder')) ? trim($_POST['mail_movetofolder']) : '');
+			$mail_replyto      = ((x($_POST,'mail_replyto')) ? $_POST['mail_replyto'] : '');
+			$mail_pubmail      = ((x($_POST,'mail_pubmail')) ? $_POST['mail_pubmail'] : '');
 
 
 			$mail_disabled = ((function_exists('imap_open') && (! get_config('system','imap_disabled'))) ? 0 : 1);
@@ -142,11 +144,14 @@ function settings_post(&$a) {
 					);
 				}
 				$r = q("UPDATE `mailacct` SET `server` = '%s', `port` = %d, `ssltype` = '%s', `user` = '%s',
+					`action` = %d, `movetofolder` = '%s',
 					`mailbox` = 'INBOX', `reply_to` = '%s', `pubmail` = %d WHERE `uid` = %d LIMIT 1",
 					dbesc($mail_server),
 					intval($mail_port),
 					dbesc($mail_ssl),
 					dbesc($mail_user),
+					intval($mail_action),
+					dbesc($mail_movetofolder),
 					dbesc($mail_replyto),
 					intval($mail_pubmail),
 					intval(local_user())
@@ -218,8 +223,8 @@ function settings_post(&$a) {
 	$openid           = ((x($_POST,'openid_url')) ? notags(trim($_POST['openid_url']))   : '');
 	$maxreq           = ((x($_POST,'maxreq'))     ? intval($_POST['maxreq'])             : 0);
 	$expire           = ((x($_POST,'expire'))     ? intval($_POST['expire'])             : 0);
-	
-	
+
+
 	$expire_items     = ((x($_POST,'expire_items')) ? intval($_POST['expire_items'])	 : 0);
 	$expire_notes     = ((x($_POST,'expire_notes')) ? intval($_POST['expire_notes'])	 : 0);
 	$expire_starred   = ((x($_POST,'expire_starred')) ? intval($_POST['expire_starred']) : 0);
@@ -561,23 +566,25 @@ function settings_content(&$a) {
 		$r = null;
 	}
 
-	$mail_server  = ((count($r)) ? $r[0]['server'] : '');
-	$mail_port    = ((count($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
-	$mail_ssl     = ((count($r)) ? $r[0]['ssltype'] : '');
-	$mail_user    = ((count($r)) ? $r[0]['user'] : '');
-	$mail_replyto = ((count($r)) ? $r[0]['reply_to'] : '');
-	$mail_pubmail = ((count($r)) ? $r[0]['pubmail'] : 0);
-	$mail_chk     = ((count($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
+	$mail_server       = ((count($r)) ? $r[0]['server'] : '');
+	$mail_port         = ((count($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
+	$mail_ssl          = ((count($r)) ? $r[0]['ssltype'] : '');
+	$mail_user         = ((count($r)) ? $r[0]['user'] : '');
+	$mail_replyto      = ((count($r)) ? $r[0]['reply_to'] : '');
+	$mail_pubmail      = ((count($r)) ? $r[0]['pubmail'] : 0);
+	$mail_action       = ((count($r)) ? $r[0]['action'] : 0);
+	$mail_movetofolder = ((count($r)) ? $r[0]['movetofolder'] : '');
+	$mail_chk          = ((count($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
 
-		
+
 	$tpl = get_markup_template("settings_connectors.tpl");
 		$o .= replace_macros($tpl, array(
 			'$title'	=> t('Connector Settings'),
 			'$tabs'		=> $tabs,
-		
+
 		'$diasp_enabled' => $diasp_enabled,
 		'$ostat_enabled' => $ostat_enabled,
-		
+
 		'$h_imap' => t('Email/Mailbox Setup'),
 		'$imap_desc' => t("If you wish to communicate with email contacts using this service \x28optional\x29, please specify how to connect to your mailbox."),
 		'$imap_lastcheck' => array('imap_lastcheck', t('Last successful email check:'), $mail_chk,''),
@@ -589,8 +596,10 @@ function settings_content(&$a) {
 		'$mail_pass'	=> array('mail_pass', 	 t('Email password:'), '', ''),
 		'$mail_replyto'	=> array('mail_replyto', t('Reply-to address:'), '', 'Optional'),
 		'$mail_pubmail'	=> array('mail_pubmail', t('Send public posts to all email contacts:'), $mail_pubmail, ''),
-		'$submit' => t('Submit'),		
-		
+		'$mail_action'	=> array('mail_action',	 t('Action after import:'), $mail_action, '', array(0=>t('None'), 1=>t('Delete'), 2=>t('Mark as seen'), 3=>t('Move to folder'))),
+		'$mail_movetofolder'	=> array('mail_movetofolder',	 t('Move to folder:'), $mail_movetofolder, ''),
+		'$submit' => t('Submit'),
+
 
 
 			'$settings_connectors' => $settings_connectors
@@ -598,7 +607,7 @@ function settings_content(&$a) {
 		return $o;
 	}
 
-		
+
 	require_once('include/acl_selectors.php');
 
 	$p = q("SELECT * FROM `profile` WHERE `is-default` = 1 AND `uid` = %d LIMIT 1",

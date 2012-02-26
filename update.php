@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1126 );
+define( 'UPDATE_VERSION' , 1127 );
 
 /**
  *
@@ -1090,3 +1090,7 @@ function update_1125() {
   ) ENGINE = MyISAM DEFAULT CHARSET=utf8");
 }
 
+function update_1126() {
+	q("ALTER TABLE `mailacct` ADD `action` INT NOT NULL AFTER `pass`,
+		ADD `movetofolder` CHAR(255) NOT NULL AFTER `action`");
+}

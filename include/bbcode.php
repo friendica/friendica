@@ -151,7 +151,7 @@ function bbcode($Text,$preserve_nl = false) {
 
  	// handle nested lists
 	$endlessloop = 0;
-	while (strpos($Text, "[/list]") and strpos($Text, "[list") and (++$endlessloop < 20)) {
+	while ((strpos($Text, "[/list]") !== false) and (strpos($Text, "[list") !== false) and (++$endlessloop < 20)) {
 		$Text = preg_replace("/\[list\](.*?)\[\/list\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' ,$Text);
 		$Text = preg_replace("/\[list=\](.*?)\[\/list\]/ism", '<ul class="listnone" style="list-style-type: none;">$1</ul>' ,$Text);
 		$Text = preg_replace("/\[list=1\](.*?)\[\/list\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>' ,$Text);
@@ -194,7 +194,7 @@ function bbcode($Text,$preserve_nl = false) {
 	// Check for [quote] text
 	// handle nested quotes
 	$endlessloop = 0;
-	while (strpos($Text, "[/quote]") !== false and strpos($Text, "[quote]") !== false and (++$endlessloop < 20))
+	while ((strpos($Text, "[/quote]") !== false) and (strpos($Text, "[quote]") !== false) and (++$endlessloop < 20))
 		$Text = preg_replace("/\[quote\](.*?)\[\/quote\]/ism","$QuoteLayout", $Text);
 
 	// Check for [quote=Author] text
@@ -203,7 +203,7 @@ function bbcode($Text,$preserve_nl = false) {
 
 	// handle nested quotes
 	$endlessloop = 0;
-	while (strpos($Text, "[/quote]") !== false and strpos($Text, "[quote=") !== false and (++$endlessloop < 20))
+	while ((strpos($Text, "[/quote]")!== false)  and (strpos($Text, "[quote=") !== false) and (++$endlessloop < 20))
 		$Text = preg_replace("/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
         	                     "<blockquote><strong>" . $t_wrote . "</strong> $2</blockquote>",
                 	             $Text);
@@ -285,3 +285,4 @@ function bbcode($Text,$preserve_nl = false) {
 
 	return $Text;
 }
+

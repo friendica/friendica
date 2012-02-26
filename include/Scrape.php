@@ -452,10 +452,19 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 							$adr = imap_rfc822_parse_adrlist($x->to,'');
 						if(isset($adr)) {
 							foreach($adr as $feadr) {
-								if((strcasecmp($feadr->mailbox,$name) == 0) 
-									&&(strcasecmp($feadr->host,$phost) == 0) 
+								if((strcasecmp($feadr->mailbox,$name) == 0)
+									&&(strcasecmp($feadr->host,$phost) == 0)
 									&& (strlen($feadr->personal))) {
-									$vcard['fn'] = notags($feadr->personal);
+
+									$personal = imap_mime_header_decode($feadr->personal);
+									$vcard['fn'] = "";
+									foreach($personal as $perspart)
+										if ($perspart->charset != "default")
+											$vcard['fn'] .= iconv($perspart->charset, 'UTF-8//IGNORE', $perspart->text);
+										else
+											$vcard['fn'] .= $perspart->text;
+
+									$vcard['fn'] = notags($vcard['fn']);
 								}
 							}
 						}

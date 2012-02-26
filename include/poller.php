@@ -1,6 +1,7 @@
 <?php
 
 require_once("boot.php");
+require_once("include/quoteconvert.php");
 
 
 function poller_run($argv, $argc){
@@ -419,13 +420,13 @@ function poller_run($argv, $argc){
 							// look for a 'references' header and try and match with a parent item we have locally.
 
 							$raw_refs = ((x($headers,'references')) ? str_replace("\t",'',$headers['references']) : '');
-							$datarray['uri'] = trim($meta->message_id,'<>');
+							$datarray['uri'] = msgid2iri(trim($meta->message_id,'<>'));
 
 							if($raw_refs) {
 								$refs_arr = explode(' ', $raw_refs);
 								if(count($refs_arr)) {
 									for($x = 0; $x < count($refs_arr); $x ++)
-										$refs_arr[$x] = "'" . str_replace(array('<','>',' '),array('','',''),dbesc($refs_arr[$x])) . "'";
+										$refs_arr[$x] = "'" . msgid2iri(str_replace(array('<','>',' '),array('','',''),dbesc($refs_arr[$x]))) . "'";
 								}
 								$qstr = implode(',',$refs_arr);
 								$r = q("SELECT `uri` , `parent-uri` FROM `item` WHERE `uri` IN ( $qstr ) AND `uid` = %d LIMIT 1",
@@ -453,9 +454,39 @@ function poller_run($argv, $argc){
 										intval($r[0]['id'])
 									);
 								}
+								switch ($mailconf[0]['action']) {
+									case 0:
+										break;
+									case 1:
+										logger("Mail: Deleting ".$msg_uid);
+										imap_delete($mbox, $msg_uid, FT_UID);
+										break;
+									case 2:
+										logger("Mail: Mark as seen ".$msg_uid);
+										imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
+										break;
+									case 3:
+										logger("Mail: Moving ".$msg_uid." to ".$mailconf[0]['movetofolder']);
+										imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
+										if ($mailconf[0]['movetofolder'] != "")
+											imap_mail_move($mbox, $msg_uid, $mailconf[0]['movetofolder'], FT_UID);
+										break;
+								}
 								continue;
 							}
-							$datarray['title'] = notags(trim($meta->subject));
+
+							// Decoding the header
+							$subject = imap_mime_header_decode($meta->subject);
+							$datarray['title'] = "";
+							foreach($subject as $subpart)
+								if ($subpart->charset != "default")
+									$datarray['title'] .= iconv($subpart->charset, 'UTF-8//IGNORE', $subpart->text);
+								else
+									$datarray['title'] .= $subpart->text;
+
+							$datarray['title'] = notags(trim($datarray['title']));
+
+							//$datarray['title'] = notags(trim($meta->subject));
 							$datarray['created'] = datetime_convert('UTC','UTC',$meta->date);
 
 							$r = email_get_msg($mbox,$msg_uid);
@@ -463,15 +494,24 @@ function poller_run($argv, $argc){
 								logger("Mail: can't fetch msg ".$msg_uid);
 								continue;
 							}
-							$datarray['body'] = escape_tags($r['body']);
+							$datarray['body'] = escape_tags(convertquote($r['body'], false));
 
 							logger("Mail: Importing ".$msg_uid);
 
 							// some mailing lists have the original author as 'from' - add this sender info to msg body.
 							// todo: adding a gravatar for the original author would be cool
 
-							if(! stristr($meta->from,$contact['addr']))
-								$datarray['body'] = t('From: ') . escape_tags($meta->from) . "\n\n" . $datarray['body'];
+							if(! stristr($meta->from,$contact['addr'])) {
+								$from = imap_mime_header_decode($meta->from);
+								$fromdecoded = "";
+								foreach($from as $frompart)
+									if ($frompart->charset != "default")
+										$fromdecoded .= iconv($frompart->charset, 'UTF-8//IGNORE', $frompart->text);
+									else
+										$fromdecoded .= $frompart->text;
+
+								$datarray['body'] = "[b]".t('From: ') . escape_tags($fromdecoded) . "[/b]\n\n" . $datarray['body'];
+							}
 
 							$datarray['uid'] = $importer_uid;
 							$datarray['contact-id'] = $contact['id'];
@@ -493,6 +533,24 @@ function poller_run($argv, $argc){
 							q("UPDATE `item` SET `last-child` = 1 WHERE `id` = %d LIMIT 1",
 								intval($stored_item)
 							);
+							switch ($mailconf[0]['action']) {
+								case 0:
+									break;
+								case 1:
+									logger("Mail: Deleting ".$msg_uid);
+									imap_delete($mbox, $msg_uid, FT_UID);
+									break;
+								case 2:
+									logger("Mail: Mark as seen ".$msg_uid);
+									imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
+									break;
+								case 3:
+									logger("Mail: Moving ".$msg_uid." to ".$mailconf[0]['movetofolder']);
+									imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
+									if ($mailconf[0]['movetofolder'] != "")
+										imap_mail_move($mbox, $msg_uid, $mailconf[0]['movetofolder'], FT_UID);
+									break;
+							}
 						}
 					}
 
@@ -501,7 +559,7 @@ function poller_run($argv, $argc){
 			}
 			elseif($contact['network'] === NETWORK_FACEBOOK) {
 				// This is picked up by the Facebook plugin on a cron hook.
-				// Ignored here.			
+				// Ignored here.
 			}
 
 			if($xml) {

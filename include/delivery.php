@@ -1,6 +1,7 @@
 <?php
 require_once("boot.php");
 require_once('include/queue_fn.php');
+require_once('include/html2plain.php');
 
 function delivery_run($argv, $argc){
 	global $a, $db;
@@ -8,7 +9,7 @@ function delivery_run($argv, $argc){
 	if(is_null($a)){
 		$a = new App;
 	}
-  
+
 	if(is_null($db)) {
 		@include(".htconfig.php");
 		require_once("dba.php");
@@ -293,7 +294,7 @@ function delivery_run($argv, $argc){
 					$sql_extra = sprintf(" AND `dfrn-id` = '%s' ", dbesc($contact['issued-id']));
 				else
 					$sql_extra = sprintf(" AND `issued-id` = '%s' ", dbesc($contact['dfrn-id']));
-					
+
 				$x = q("SELECT	`contact`.*, `contact`.`uid` AS `importer_uid`, 
 					`contact`.`pubkey` AS `cpubkey`, 
 					`contact`.`prvkey` AS `cprvkey`, 
@@ -322,14 +323,14 @@ function delivery_run($argv, $argc){
 					require_once('library/simplepie/simplepie.inc');
 					logger('mod-delivery: local delivery');
 					local_delivery($x[0],$atom);
-					break;					
+					break;
 				}
 			}
 
 			$deliver_status = dfrn_deliver($owner,$contact,$atom);
 
 			logger('notifier: dfrn_delivery returns ' . $deliver_status);
-	
+
 			if($deliver_status == (-1)) {
 				logger('notifier: delivery failed: queuing message');
 				add_to_queue($contact['id'],NETWORK_DFRN,$atom);
@@ -382,7 +383,7 @@ function delivery_run($argv, $argc){
 
 		case NETWORK_MAIL :
 		case NETWORK_MAIL2:
-				
+
 			if(get_config('system','dfrn_only'))
 				break;
 			// WARNING: does not currently convert to RFC2047 header encodings, etc.
@@ -432,9 +433,19 @@ function delivery_run($argv, $argc){
 
 				if($reply_to)
 					$headers .= 'Reply-to: ' . $reply_to . "\n";
-				$headers .= 'Message-id: <' . $it['uri'] . '>' . "\n";
+
+				// for testing purposes: Collect exported mails
+				$file = tempnam("/tmp/friendica/", "mail-out-");
+				file_put_contents($file, json_encode($it));
+
+				$headers .= 'Message-Id: <' . iri2msgid($it['uri']). '>' . "\n";
+
+				//logger("Mail: uri: ".$it['uri']." parent-uri ".$it['parent-uri'], LOGGER_DEBUG);
+				//logger("Mail: Data: ".print_r($it, true), LOGGER_DEBUG);
+				//logger("Mail: Data: ".print_r($it, true), LOGGER_DATA);
+
 				if($it['uri'] !== $it['parent-uri']) {
-					$header .= 'References: <' . $it['parent-uri'] . '>' . "\n";
+					$headers .= 'References: <' . iri2msgid($it['parent-uri']) . '>' . "\n";
 					if(! strlen($it['title'])) {
 						$r = q("SELECT `title` FROM `item` WHERE `parent-uri` = '%s' LIMIT 1",
 							dbesc($it['parent-uri'])
@@ -450,13 +461,16 @@ function delivery_run($argv, $argc){
 						}
 					}
 				}
-				$headers .= 'MIME-Version: 1.0' . "\n";
-				$headers .= 'Content-Type: text/html; charset=UTF-8' . "\n";
+				/*$headers .= 'MIME-Version: 1.0' . "\n";
+				//$headers .= 'Content-Type: text/html; charset=UTF-8' . "\n";
+				$headers .= 'Content-Type: text/plain; charset=UTF-8' . "\n";
 				$headers .= 'Content-Transfer-Encoding: 8bit' . "\n\n";
 				$html    = prepare_body($it);
-				$message = '<html><body>' . $html . '</body></html>';
+				//$message = '<html><body>' . $html . '</body></html>';
+				$message = html2plain($html);
 				logger('notifier: email delivery to ' . $addr);
-				mail($addr, $subject, $message, $headers);
+				mail($addr, $subject, $message, $headers);*/
+				email_send($addr, $subject, $headers, $it);
 			}
 			break;
 
@@ -473,7 +487,7 @@ function delivery_run($argv, $argc){
 
 			if((! $contact['pubkey']) && (! $public_message))
 				break;
-					
+
 			if($target_item['verb'] === ACTIVITY_DISLIKE) {
 				// unsupported
 				break;

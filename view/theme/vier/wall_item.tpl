@@ -1,7 +1,7 @@
 {{ if $indent }}{{ else }}
 <div class="wall-item-decor">
-	<span class="icon s22 star $isstarred" id="starred-$id" title="$star.starred">$star.starred</span>
-	{{ if $lock }}<span class="icon s22 lock fakelink" onclick="lockview(event,$id);" title="$lock">$lock</span>{{ endif }}	
+	<span class="icon star $isstarred" id="starred-$id" title="$star.starred">$star.starred</span>
+	{{ if $lock }}<span class="icon lock fakelink" onclick="lockview(event,$id);" title="$lock">$lock</span>{{ endif }}	
 	<img id="like-rotator-$id" class="like-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
 </div>
 {{ endif }}
@@ -23,8 +23,9 @@
 		</div>
 			<div class="wall-item-actions-author">
 				<a href="$profile_url" target="redir" title="$linktitle" class="wall-item-name-link"><span class="wall-item-name$sparkle">$name</span></a> 
-			<span class="wall-item-ago">- &nbsp;
+			<span class="wall-item-ago">-
 			{{ if $plink }}<a class="link" title="$plink.title" href="$plink.href" style="color: #999">$ago</a>{{ else }} $ago {{ endif }}
+			{{ if $lock }} - <span class="fakelink" style="color: #999" onclick="lockview(event,$id);">$lock</span> {{ endif }}
 			</span>
 			</div>
 		<div class="wall-item-content">
