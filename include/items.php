@@ -2223,7 +2223,8 @@ function local_delivery($importer,$data) {
 								'source_photo' => ((link_compare($datarray['author-link'],$importer['url'])) 
 									? $importer['thumb'] : $datarray['author-avatar']),
 								'verb'         => ACTIVITY_POST,
-								'otype'        => 'item'
+								'otype'        => 'item',
+								'parent'       => $parent,
 
 							));
 
@@ -2317,7 +2318,7 @@ function local_delivery($importer,$data) {
 			
 				if($datarray['type'] != 'activity') {
 
-					$myconv = q("SELECT `author-link`, `author-avatar` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d AND `parent` != 0 ",
+					$myconv = q("SELECT `author-link`, `author-avatar`, `parent` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d AND `parent` != 0 ",
 						dbesc($parent_uri),
 						intval($importer['importer_uid'])
 					);
@@ -2330,6 +2331,8 @@ function local_delivery($importer,$data) {
 								continue;
 
 							require_once('include/enotify.php');
+							
+							$conv_parent = $conv['parent'];
 
 							notification(array(
 								'type'         => NOTIFY_COMMENT,
@@ -2345,7 +2348,8 @@ function local_delivery($importer,$data) {
 								'source_photo' => ((link_compare($datarray['author-link'],$importer['url'])) 
 									? $importer['thumb'] : $datarray['author-avatar']),
 								'verb'         => ACTIVITY_POST,
-								'otype'        => 'item'
+								'otype'        => 'item',
+								'parent'       => $conv_parent,
 
 							));
 

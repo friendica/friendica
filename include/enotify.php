@@ -13,7 +13,9 @@ function notification($params) {
 	$site_admin = sprintf( t('%s Administrator'), $sitename);
 
 	$sender_name = $product;
-	$sender_email = t('noreply') . '@' . $a->get_hostname();
+	$hostname = $a->get_hostname();
+	$sender_email = t('noreply') . '@' . $hostname;
+	$additional_mail_header = "";
 
 	if(array_key_exists('item',$params)) {
 		$title = $params['item']['title'];
@@ -36,8 +38,15 @@ function notification($params) {
 	}
 
 	if($params['type'] == NOTIFY_COMMENT) {
+		logger("notification: params = " . print_r($params, true), LOGGER_DEBUG);
 
-		$subject = sprintf( t('%s commented on an item at %s'), $params['source_name'], $sitename);
+		$parent_id = $params['parent'];
+		
+		// Some mail softwares relies on subject field for threading.
+		// So, we cannot have different subjects for notifications of the same thread.
+		// Before this we have the name of the replier on the subject rendering 
+		// differents subjects for messages on the same thread.
+		$subject = sprintf( t('Someone commented on item #%d at %s'), $parent_id, $sitename);
 		$preamble = sprintf( t('%s commented on an item/conversation you have been following.'), $params['source_name']); 
 		$epreamble = sprintf( t('%s commented in %s.'), '[url=' . $params['source_link'] . ']' . $params['source_name'] . '[/url]', '[url=$itemlink]' . t('a watched conversation') . '[/url]'); 
 
@@ -126,8 +135,6 @@ function notification($params) {
 	} while($dups == true);
 
 
-
-
 	// create notification entry in DB
 
 	$r = q("insert into notify (hash,name,url,photo,date,uid,link,type,verb,otype)
@@ -169,6 +176,40 @@ function notification($params) {
 	if(intval($params['notify_flags']) & intval($params['type'])) {
 
 		logger('notification: sending notification email');
+
+		$id_for_parent = "${params['parent']}@${hostname}";
+
+		// Is this the first email notification for this parent item and user?
+		
+		$r = q("select `id` from `notify-threads` where `master-parent-item` = %d and `receiver-uid` = %d limit 1", 
+			intval($params['parent']),
+			intval($params['uid']) );
+
+		// If so, create the record of it and use a message-id smtp header.
+
+		if(!$r) {
+			logger("norify_id:" . intval($notify_id). ", parent: " . intval($params['parent']) . "uid: " . 
+intval($params['uid']), LOGGER_DEBUG);
+			$r = q("insert into `notify-threads` (`notify-id`, `master-parent-item`, `receiver-uid`, `parent-item`)
+				values(%d,%d,%d,%d)",
+				intval($notify_id),
+				intval($params['parent']),
+				intval($params['uid']), 
+				0 );
+
+			$additional_mail_header .= "Message-ID: <${id_for_parent}>\n";
+			$log_msg = "include/enotify: No previous notification found for this parent:\n" . 
+					"  parent: ${params['parent']}\n" . "  uid   : ${params['uid']}\n";
+			logger($log_msg, LOGGER_DEBUG);
+		}
+
+		// If not, just "follow" the thread.
+
+		else {
+			$additional_mail_header = "References: <${id_for_parent}>\nIn-Reply-To: <${id_for_parent}>\n";
+			logger("include/enotify: There's already a notification for this parent:\n" . print_r($r, true), LOGGER_DEBUG);
+		}
+
 
 
 		$textversion = strip_tags(html_entity_decode(bbcode(stripslashes(str_replace(array("\\r\\n", "\\r", "\\n"), "\n",
@@ -227,7 +268,8 @@ function notification($params) {
 			'toEmail' => $params['to_email'],
 			'messageSubject' => $subject,
 			'htmlVersion' => $email_html_body,
-			'textVersion' => $email_text_body
+			'textVersion' => $email_text_body,
+			'additionalMailHeader' => $additional_mail_header,
 		));
 	}
 
@@ -248,6 +290,7 @@ class enotify {
 	 * @param messageSubject	subject of the message
 	 * @param htmlVersion		html version of the message
 	 * @param textVersion		text only version of the message
+	 * @param additionalMailHeader	additions to the smtp mail header
 	 */
 	static public function send($params) {
 
@@ -262,6 +305,7 @@ class enotify {
 
 		// generate a multipart/alternative message header
 		$messageHeader =
+			$params['additionalMailHeader'] .
 			"From: {$params['fromName']} <{$params['fromEmail']}>\n" . 
 			"Reply-To: {$params['fromName']} <{$params['replyTo']}>\n" .
 			"MIME-Version: 1.0\n" .
