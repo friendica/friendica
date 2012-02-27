@@ -160,7 +160,8 @@
 			krsort($this->nodes);
 			return $s;
 		}
-
+		
+        /*
 		private function _str_replace($str){
 			#$this->search,$this->replace,
 			$searchs = $this->search;
@@ -183,7 +184,7 @@
 				
 			}
 			return str_replace($this->search,$this->replace, $str);
-		}
+		}*/
 
 	
 		public function replace($s, $r) {
@@ -205,7 +206,8 @@
 			$os = ""; $count=0;
 			while($os!=$s && $count<10){
 				$os=$s; $count++;
-				$s = $this->_str_replace($s);
+				//$s = $this->_str_replace($s);
+				$s = str_replace($this->search, $this->replace, $s);
 			}
 			return template_unescape($s);
 		}

@@ -17,8 +17,8 @@
 			
 	</div>
 	<div class="contact-name" id="contact-entry-name-$contact.id" >$contact.name</div>
-	<div class="contact-details" id="contact-entry-url-$contact.id" >$contact.item.url</div>
-	<div class="contact-details" id="contact-entry-network-$contact.id" >$contact.item.network|network_to_name</div>
+	<div class="contact-details" id="contact-entry-url-$contact.id" >$contact.itemurl</div>
+	<div class="contact-details" id="contact-entry-network-$contact.id" >$contact.network</div>
 
 
 </div>

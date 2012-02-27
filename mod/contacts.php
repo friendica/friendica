@@ -504,8 +504,8 @@ function contacts_content(&$a) {
 				'name' => $rr['name'],
 				'username' => $rr['name'],
 				'sparkle' => $sparkle,
-				'url' => $url,
-				'item' => $rr,
+				'itemurl' => $rr['url'],
+				'network' => network_to_name($rr['network']),
 			);
 		}
 
