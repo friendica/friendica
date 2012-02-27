@@ -11,7 +11,7 @@
 <link rel="search"
          href="$baseurl/opensearch" 
          type="application/opensearchdescription+xml" 
-         title="Search in Friendika" />
+         title="Search in Friendica" />
 
 <!--[if IE]>
 <script type="text/javascript" src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>

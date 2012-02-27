@@ -15,7 +15,7 @@ function initEditor(cb){
 			$("a#jot-perms-icon").fancybox({
 				'transitionIn' : 'elastic',
 				'transitionOut' : 'elastic'
-			}); 
+			});
 			$(".jothidden").show();
 			if (typeof cb!="undefined") cb();
 			return;
@@ -129,7 +129,6 @@ function enableOnUser(){
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
 
-	
 		var uploader = new window.AjaxUpload(
 			'wall-image-upload',
 			{ action: 'wall_upload/$nickname',
