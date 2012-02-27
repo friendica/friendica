@@ -256,7 +256,7 @@ class b8_storage_frndc extends b8_storage_base
 		$token = dbesc($token);
 		$count = dbesc($count);
 		$uid = dbesc($uid);
-		array_push($this->_puts, '("' . $token . '", "' . $count . '", '"' . $uid .'")');
+		array_push($this->_puts, '("' . $token . '", "' . $count . '", "' . $uid .'")');
 	}
 
 	/**
@@ -273,7 +273,7 @@ class b8_storage_frndc extends b8_storage_base
 		$token = dbesc($token);
 		$count = dbesc($count);
 		$uid = dbesc($uid);
-		array_push($this->_puts, '("' . $token . '", "' . $count . '", '"' . $uid .'")');
+		array_push($this->_puts, '("' . $token . '", "' . $count . '", "' . $uid .'")');
 	}
 
 	/**
@@ -325,7 +325,7 @@ class b8_storage_frndc extends b8_storage_base
 		if(count($this->_updates) > 0) {
 
 			// this still needs work
-			$result = q("select * from " . $this->config['table_name'] . ' where token = ';
+			$result = q("select * from " . $this->config['table_name'] . ' where token = ');
 
 			
 			$result = q('
