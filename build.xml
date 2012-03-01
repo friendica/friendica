@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="friendica" default="test">
+
+	<!-- =================================== -->
+	<!-- Target: test -->
+	<!-- this target runs all test files -->
+	<!-- =================================== -->
+
+	<target name="test">
+		<!-- there are no tests by now, so, nothing to do -->
+	</target>
+
+	<!-- ===================================================== -->
+	<!-- Target: clean-doc -->
+	<!-- this target removes documentation from a previous run -->
+	<!-- ===================================================== -->
+	<target name="doc-clean">
+		<echo msg="Removing old documentation..." />
+		<delete dir="./doc/api/" />
+		<echo msg="Generate documentation directory..." />
+		<mkdir dir="./doc/api/" />
+	</target>
+
+	<!-- ====================================== -->
+	<!-- Target: doc -->
+	<!-- this target builds all documentation -->
+	<!-- ====================================== -->
+	<target name="doc" depends="doc-clean">
+		<echo msg="Building documentation..." />
+		<docblox title="Friendica API" destdir="./doc/api">
+			<fileset dir=".">
+				<include name="**/*.php" />
+			</fileset>
+		</docblox>
+	</target>
+
+</project>

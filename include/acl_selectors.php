@@ -1,6 +1,11 @@
 <?php
+/**
+ * 
+ */
 
-
+/**
+ * @package acl_selectors 
+ */
 function group_select($selname,$selclass,$preselected = false,$size = 4) {
 
 	$a = get_app();

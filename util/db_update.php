@@ -1,5 +1,11 @@
 <?php
+/**
+* @package util
+*/
 
+/* 
+* require boot.php
+*/
 require_once("boot.php");
 
 $a = new App;
