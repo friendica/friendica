@@ -366,7 +366,7 @@ function admin_page_users_post(&$a){
 				intval( $uid )
 			);
 		}
-		notice( sprintf( tt("%s user blocked", "%s users blocked/unblocked", count($users)), count($users)) );
+		notice( sprintf( tt("%s user blocked/unblocked", "%s users blocked/unblocked", count($users)), count($users)) );
 	}
 	if (x($_POST,'page_users_delete')){
 		require_once("include/Contact.php");
@@ -428,6 +428,7 @@ function admin_page_users(&$a){
 				 LEFT JOIN `contact` ON `register`.`uid` = `contact`.`uid`
 				 LEFT JOIN `user` ON `register`.`uid` = `user`.`uid`;");
 	
+	
 	/* get users */
 
 	$total = q("SELECT count(*) as total FROM `user` where 1");
@@ -435,7 +436,8 @@ function admin_page_users(&$a){
 		$a->set_pager_total($total[0]['total']);
 		$a->set_pager_itemspage(100);
 	}
-
+	
+	
 	$users = q("SELECT `user` . * , `contact`.`name` , `contact`.`url` , `contact`.`micro`, `lastitem`.`lastitem_date`
 				FROM
 					(SELECT MAX(`item`.`changed`) as `lastitem_date`, `item`.`uid`
@@ -468,6 +470,7 @@ function admin_page_users(&$a){
 		return $e;
 	}
 	$users = array_map("_setup_users", $users);
+	
 	
 	$t = get_markup_template("admin_users.tpl");
 	$o = replace_macros($t, array(

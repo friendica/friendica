@@ -17,6 +17,7 @@
 			
 	</div>
 	<div class="contact-name" id="contact-entry-name-$contact.id" >$contact.name</div>
+	{{ if $contact.alt_text }}<div class="contact-details" id="contact-entry-rel-$contact.id" >$contact.alt_text</div>{{ endif }}
 	<div class="contact-details" id="contact-entry-url-$contact.id" >$contact.itemurl</div>
 	<div class="contact-details" id="contact-entry-network-$contact.id" >$contact.network</div>
 

@@ -1,75 +1,75 @@
 
 <div class="wall-item-decor">
-	<span class="icon s22 star $isstarred" id="starred-$id" title="$star.starred">$star.starred</span>
-	{{ if $lock }}<span class="icon s22 lock fakelink" onclick="lockview(event,$id);" title="$lock">$lock</span>{{ endif }}	
-	<img id="like-rotator-$id" class="like-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
+	<span class="icon s22 star $item.isstarred" id="starred-$item.id" title="$item.star.starred">$item.star.starred</span>
+	{{ if $item.lock }}<span class="icon s22 lock fakelink" onclick="lockview(event,$item.id);" title="$item.lock">$item.lock</span>{{ endif }}	
+	<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 </div>
 
-<div class="wall-item-container $indent">
+<div class="wall-item-container $item.indent">
 	<div class="wall-item-item">
 		<div class="wall-item-info">
 			<div class="contact-photo-wrapper"
-				onmouseover="if (typeof t$id != 'undefined') clearTimeout(t$id); openMenu('wall-item-photo-menu-button-$id')" 
-				onmouseout="t$id=setTimeout('closeMenu(\'wall-item-photo-menu-button-$id\'); closeMenu(\'wall-item-photo-menu-$id\');',200)">
-				<a href="$profile_url" target="redir" title="$linktitle" class="wall-item-photo-link" id="wall-item-photo-link-$id">
-					<img src="$thumb" class="contact-photo$sparkle" id="wall-item-photo-$id" alt="$name" />
+				onmouseover="if (typeof t$item.id != 'undefined') clearTimeout(t$item.id); openMenu('wall-item-photo-menu-button-$item.id')" 
+				onmouseout="t$item.id=setTimeout('closeMenu(\'wall-item-photo-menu-button-$item.id\'); closeMenu(\'wall-item-photo-menu-$item.id\');',200)">
+				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-photo-link" id="wall-item-photo-link-$item.id">
+					<img src="$item.thumb" class="contact-photo$item.sparkle" id="wall-item-photo-$item.id" alt="$item.name" />
 				</a>
-				<a href="#" rel="#wall-item-photo-menu-$id" class="contact-photo-menu-button icon s16 menu" id="wall-item-photo-menu-button-$id">menu</a>
-				<ul class="wall-item-menu menu-popup" id="wall-item-photo-menu-$id">
-				$item_photo_menu
+				<a href="#" rel="#wall-item-photo-menu-$item.id" class="contact-photo-menu-button icon s16 menu" id="wall-item-photo-menu-button-$item.id">menu</a>
+				<ul class="wall-item-menu menu-popup" id="wall-item-photo-menu-$item.id">
+				$item.item_photo_menu
 				</ul>
 				
 			</div>
-			<div class="wall-item-location">$location</div>	
+			<div class="wall-item-location">$item.location</div>	
 		</div>
 		<div class="wall-item-content">
-			{{ if $title }}<h2><a href="$plink.href">$title</a></h2>{{ endif }}
-			$body
+			{{ if $item.title }}<h2><a href="$item.plink.href">$item.title</a></h2>{{ endif }}
+			$item.body
 		</div>
 	</div>
 	<div class="wall-item-bottom">
 		<div class="wall-item-links">
 		</div>
 		<div class="wall-item-tags">
-			{{ for $tags as $tag }}
-				<span class='tag'>$tag</span>
+			{{ for $item.tags as $item.tag }}
+				<span class='tag'>$item.tag</span>
 			{{ endfor }}
 		</div>
 	</div>
 	<div class="wall-item-bottom">
 		<div class="">
-			{{ if $plink }}<a class="icon s16 link" title="$plink.title" href="$plink.href">$plink.title</a>{{ endif }}
+			{{ if $item.plink }}<a class="icon s16 link" title="$item.plink.title" href="$item.plink.href">$item.plink.title</a>{{ endif }}
 		</div>
 		<div class="wall-item-actions">
 			<div class="wall-item-actions-author">
-				<a href="$profile_url" target="redir" title="$linktitle" class="wall-item-name-link"><span class="wall-item-name$sparkle">$name</span></a> <span class="wall-item-ago">$ago</span>
+				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-name-link"><span class="wall-item-name$item.sparkle">$item.name</span></a> <span class="wall-item-ago">$item.ago</span>
 			</div>
 			
 			<div class="wall-item-actions-social">
-			{{ if $star }}
-				<a href="#" id="star-$id" onclick="dostar($id); return false;"  class="$star.classdo"  title="$star.do">$star.do</a>
-				<a href="#" id="unstar-$id" onclick="dostar($id); return false;"  class="$star.classundo"  title="$star.undo">$star.undo</a>
-				<a href="#" id="tagger-$id" onclick="itemTag($id); return false;" class="$star.classtagger" title="$star.tagger">$star.tagger</a>
+			{{ if $item.star }}
+				<a href="#" id="star-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classdo"  title="$item.star.do">$item.star.do</a>
+				<a href="#" id="unstar-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo">$item.star.undo</a>
+				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="$item.star.classtagger" title="$item.star.tagger">$item.star.tagger</a>
 			{{ endif }}
 			
-			{{ if $vote }}
-				<a href="#" id="like-$id" title="$vote.like.0" onclick="dolike($id,'like'); return false">$vote.like.1</a>
-				<a href="#" id="dislike-$id" title="$vote.dislike.0" onclick="dolike($id,'dislike'); return false">$vote.dislike.1</a>
+			{{ if $item.vote }}
+				<a href="#" id="like-$item.id" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false">$item.vote.like.1</a>
+				<a href="#" id="dislike-$item.id" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false">$item.vote.dislike.1</a>
 			{{ endif }}
 						
-			{{ if $vote.share }}
-				<a href="#" id="share-$id" title="$vote.share.0" onclick="jotShare($id); return false">$vote.share.1</a>
+			{{ if $item.vote.share }}
+				<a href="#" id="share-$item.id" title="$item.vote.share.0" onclick="jotShare($item.id); return false">$item.vote.share.1</a>
 			{{ endif }}			
 			</div>
 			
 			<div class="wall-item-actions-tools">
 
-				{{ if $drop.dropping }}
-					<input type="checkbox" title="$drop.select" name="itemselected[]" class="item-select" value="$id" />
-					<a href="item/drop/$id" onclick="return confirmDelete();" class="icon delete s16" title="$drop.delete">$drop.delete</a>
+				{{ if $item.drop.dropping }}
+					<input type="checkbox" title="$item.drop.select" name="itemselected[]" class="item-select" value="$item.id" />
+					<a href="item/drop/$item.id" onclick="return confirmDelete();" class="icon delete s16" title="$item.drop.delete">$item.drop.delete</a>
 				{{ endif }}
-				{{ if $edpost }}
-					<a class="icon edit s16" href="$edpost.0" title="$edpost.1"></a>
+				{{ if $item.edpost }}
+					<a class="icon edit s16" href="$item.edpost.0" title="$item.edpost.1"></a>
 				{{ endif }}
 			</div>
 			
@@ -77,11 +77,11 @@
 	</div>
 	<div class="wall-item-bottom">
 		<div class="wall-item-links"></div>
-		<div class="wall-item-like" id="wall-item-like-$id">$like</div>
-		<div class="wall-item-dislike" id="wall-item-dislike-$id">$dislike</div>
-		{{ if $conv }}
-		<div class="wall-item-conv" id="wall-item-conv-$id" >
-			<a href='$conv.href' id='context-$id' title='$conv.title'>$conv.title</a>
+		<div class="wall-item-like" id="wall-item-like-$item.id">$item.like</div>
+		<div class="wall-item-dislike" id="wall-item-dislike-$item.id">$item.dislike</div>
+		{{ if $item.conv }}
+		<div class="wall-item-conv" id="wall-item-conv-$item.id" >
+			<a href='$item.conv.href' id='context-$item.id' title='$item.conv.title'>$item.conv.title</a>
 		{{ endif }}
 		</div>
 	</div>

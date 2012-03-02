@@ -1304,6 +1304,37 @@ ul.tabs li {
 ul.tabs li .active {
   border-bottom: 1px solid #005c94;
 }
+/** group editor **/
+#group-edit-desc {
+  margin-top: 1em;
+  color: #999999;
+}
+#group-update-wrapper {
+  height: auto;
+  overflow: auto;
+}
+#group-update-wrapper #group {
+  width: 300px;
+  float: left;
+  margin-right: 20px;
+}
+#group-update-wrapper #contacts {
+  width: 300px;
+  float: left;
+}
+#group-update-wrapper #group-separator {
+  display: none;
+}
+#group-update-wrapper .contact_list {
+  height: 300px;
+  border: 1px solid #364e59;
+  overflow: auto;
+}
+#group-update-wrapper .contact_list .contact-block-div {
+  width: 50px;
+  height: 50px;
+  float: left;
+}
 /**
  * Form fields
  */
@@ -1326,7 +1357,7 @@ ul.tabs li .active {
 .field .field_help {
   display: block;
   margin-left: 200px;
-  color: #666666;
+  color: #999999;
 }
 .field .onoff {
   float: left;

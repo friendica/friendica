@@ -890,6 +890,31 @@ ul.tabs {
 }
 
 
+/** group editor **/
+#group-edit-desc { margin-top: 1em; color: @FieldHelpColor; }
+#group-update-wrapper{
+	height: auto; overflow: auto;
+	#group {
+		width:300px; 
+		float:left;
+		margin-right:20px;
+	}
+	#contacts {
+		width:300px;
+		float:left;
+	}
+	#group-separator { display: none; }
+	.contact_list {
+		height: 300px;
+		border: 1px solid @MenuBorder;
+		overflow: auto;
+		.contact-block-div  {
+			width: 50px; height: 50px;
+			float: left;
+		}
+	}
+}
+
 /**
  * Form fields
  */
@@ -913,7 +938,7 @@ ul.tabs {
 	.field_help {
 		display: block;
 		margin-left: 200px;
-		color: #666666;
+		color: @FieldHelpColor;
 		
 	}
 

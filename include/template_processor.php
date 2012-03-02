@@ -116,7 +116,15 @@
 		 * {{ inc <templatefile> [with $var1=$var2] }}{{ endinc }}
 		 */
 		private function _replcb_inc($args){
-			list($tplfile, $newctx) = array_map('trim', explode("with",$args[2]));
+			if (strpos($args[2],"with")) {
+				list($tplfile, $newctx) = array_map('trim', explode("with",$args[2]));
+			} else {
+				$tplfile = trim($args[2]);
+				$newctx = null;
+			}
+			
+			if ($tplfile[0]=="$") $tplfile = $this->_get_var($tplfile);
+			
 			$this->_push_stack();
 			$r = $this->r;
 			if (!is_null($newctx)) {
