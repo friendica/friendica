@@ -160,7 +160,16 @@
 
 		private function var_replace($s){
 			$m = array();
-			if (preg_match_all('/\$\[{0,1}([a-zA-Z0-9-_]+\.*)+\]{0,1}/', $s,$m)){
+			/** regexp:
+			 * \$ 						literal $
+			 * (\[)?					optional open square bracket
+			 * ([a-zA-Z0-9-_]+\.?)+		var name, followed by optional
+			 * 							dot, repeated at least 1 time
+			 * (?(1)\])					if there was opened square bracket
+			 * 							(subgrup 1), match close bracket
+			 */
+			if (preg_match_all('/\$(\[)?([a-zA-Z0-9-_]+\.?)+(?(1)\])/', $s,$m)){
+				
 				foreach($m[0] as $var){
 					$varn = str_replace(array("[","]"), array("",""), $var);
 					$val = $this->_get_var($varn, true);

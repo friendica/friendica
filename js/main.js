@@ -292,7 +292,7 @@
 				$('body').css('cursor', 'auto');
 			}
 			/* autocomplete @nicknames */
-			$(".comment-edit-wrapper  textarea").contact_autocomplete(baseurl+"/acl");
+			$(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
 		});
 	}
 
