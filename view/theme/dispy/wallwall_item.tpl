@@ -58,8 +58,8 @@
 			<div class="wall-item-title-end"></div>
 			<div class="wall-item-body" id="wall-item-body-$item.id" >$item.body
 					<div class="body-tag">
-						{{ for $item.tags as $item.tag }}
-							<span class='tag'>$item.tag</span>
+						{{ for $item.tags as $tag }}
+							<span class='tag'>$tag</span>
 						{{ endfor }}
 					</div>			
 			</div>

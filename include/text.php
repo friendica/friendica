@@ -14,7 +14,13 @@ if(! function_exists('replace_macros')) {
 function replace_macros($s,$r) {
 	global $t;
 	
-	return $t->replace($s,$r);
+	//$ts = microtime();
+	$r =  $t->replace($s,$r);
+	//$tt = microtime() - $ts;
+	
+	//$a = get_app();
+	//$a->page['debug'] .= "$tt <br>\n";
+	return $r;
 
 }}
 

@@ -1,5 +1,5 @@
 <?php
-
+	define ("KEY_NOT_EXISTS", '^R_key_not_Exists^');
 
 	class Template {
 		var $r;
@@ -28,30 +28,18 @@
 			die();
 		}
 		
-		private function _build_replace($r, $prefix){
-	
-			if(is_array($r) && count($r)) {
-				foreach ($r as $k => $v ) {
-					if (is_array($v)) {
-						$this->_build_replace($v, "$prefix$k.");
-					} else {
-						$this->search[] =  $prefix . $k;
-						$this->replace[] = $v;
-					}
-				}
-			}
-		} 
 		
 		private function _push_stack(){
-			$this->stack[] = array($this->r, $this->search, $this->replace, $this->nodes);
+			$this->stack[] = array($this->r, $this->nodes);
 		}
 		private function _pop_stack(){
-			list($this->r, $this->search, $this->replace, $this->nodes) = array_pop($this->stack);
+			list($this->r, $this->nodes) = array_pop($this->stack);
 			
 		}
 		
-		private function _get_var($name){
-			$keys = array_map('trim',explode(".",$name));		
+		private function _get_var($name, $retNoKey=false){
+			$keys = array_map('trim',explode(".",$name));
+			if ($retNoKey && !array_key_exists($keys[0], $this->r)) return KEY_NOT_EXISTS;
 			$val = $this->r;
 			foreach($keys as $k) {
 				$val = (isset($val[$k]) ? $val[$k] : null);
@@ -169,40 +157,24 @@
 			return $s;
 		}
 		
-        /*
-		private function _str_replace($str){
-			#$this->search,$this->replace,
-			$searchs = $this->search;
-			foreach($searchs as $search){
-				$search = "|".preg_quote($search)."(\|[a-zA-Z0-9_]*)*|";
-				$m = array();
-				if (preg_match_all($search, $str,$m)){
-					foreach ($m[0] as $match){
-						$toks = explode("|",$match);
-						$val = $this->_get_var($toks[0]);
-						for($k=1; $k<count($toks); $k++){
-							$func = $toks[$k];
-							if (function_exists($func)) $val = $func($val);
-						}
-						if (count($toks)>1){
-							$str = str_replace( $match, $val, $str);
-						} 
-					}
-				}
-				
-			}
-			return str_replace($this->search,$this->replace, $str);
-		}*/
 
+		private function var_replace($s){
+			$m = array();
+			if (preg_match_all('/\$\[{0,1}([a-zA-Z0-9-_]+\.*)+\]{0,1}/', $s,$m)){
+				foreach($m[0] as $var){
+					$varn = str_replace(array("[","]"), array("",""), $var);
+					$val = $this->_get_var($varn, true);
+					if ($val!=KEY_NOT_EXISTS)
+						$s = str_replace($var, $val, $s);
+				}
+			}
+			
+			return $s;
+		}
 	
 		public function replace($s, $r) {
 			$this->r = $r;
-			$this->search = array();
-			$this->replace = array();
-
-			$this->_build_replace($r, "");
 			
-			#$s = str_replace(array("\n","\r"),array("§n§","§r§"),$s);
 			$s = $this->_build_nodes($s);
 
 			$s = preg_replace_callback('/\|\|([0-9]+)\|\|/', array($this, "_replcb_node"), $s);
@@ -210,12 +182,12 @@
 			
 			// remove comments block
 			$s = preg_replace('/{#[^#]*#}/', "" , $s);
+			
 			// replace strings recursively (limit to 10 loops)
 			$os = ""; $count=0;
 			while($os!=$s && $count<10){
 				$os=$s; $count++;
-				//$s = $this->_str_replace($s);
-				$s = str_replace($this->search, $this->replace, $s);
+				$s = $this->var_replace($s);
 			}
 			return template_unescape($s);
 		}

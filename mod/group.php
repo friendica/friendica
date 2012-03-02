@@ -84,6 +84,7 @@ function group_content(&$a) {
 		return replace_macros($tpl, $context + array(
 			'$title' => t('Create a group of contacts/friends.'),
 			'$gname' => array('groupname',t('Group Name: '),$group['name'], ''),
+			'$gid' => 'new',
 		));
 
 

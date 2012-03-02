@@ -45,8 +45,8 @@
 		<div class="wall-item-links">
 		</div>
 		<div class="wall-item-tags">
-			{{ for $item.tags as $item.tag }}
-				<span class='tag'>$item.tag</span>
+			{{ for $item.tags as $tag }}
+				<span class='tag'>$tag</span>
 			{{ endfor }}
 		</div>
 	</div>	
