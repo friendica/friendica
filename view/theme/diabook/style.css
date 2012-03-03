@@ -1290,7 +1290,7 @@ section {
   width: 785px;
   margin: 0px 2em 20px 0px;
 }
-#jot .profile-jot-text {
+#profile-jot-form #profile-jot-text {
   height: 1.2em;
   width: 99%;
   font-size: 10px;
@@ -1378,7 +1378,7 @@ section {
 #jot #jot-tools li.loading img {
   margin-top: 10px;
 }
-#jot #jot-title {
+#profile-jot-form #jot-title {
   border: 0px;
   margin: 0px;
   height: 20px;
@@ -1386,12 +1386,16 @@ section {
   font-weight: bold;
   border: 1px solid #ffffff;
 }
-#jot #jot-title:-webkit-input-placeholder {
+#profile-jot-form #jot-title:-webkit-input-placeholder {
   font-weight: normal;
 }
-#jot #jot-title:-moz-placeholder {
+#profile-jot-form #jot-title:-moz-placeholder {
   font-weight: normal;
 }
+#profile-jot-form #profile-jot-text_parent #profile-jot-text_tbl{
+	width: 785px;
+	height: 100px;
+	}
 #jot #jot-title:hover {
   border: 1px solid #999999;
 }
@@ -1424,59 +1428,75 @@ section {
 }
 #profile-jot-wrapper{
 	margin: 0 2em 20px 0;
-   width: 685px;
+   width: 785px;
 	}
 
 #profile-jot-submit-wrapper {
 	margin-bottom: 50px;
-	width: 675px;
+	width: 785px;
 }
 
 #profile-jot-submit {
-	float: left;
+	float: right;
+	margin-top: 2px;
+	
 }
 #profile-upload-wrapper {
 	float: left;
+	margin-top: 2px;
+	margin-left: 10px;
 	
 }
 #profile-attach-wrapper {
 	float: left;
 	margin-left: 15px;
+	margin-top: 2px;
 }
 #profile-rotator {
 	float: left;
 	margin-left: 30px;
+	margin-top: 2px;
 }
 #profile-link-wrapper {
 	float: left;
 	margin-left: 15px;
+	margin-top: 2px;
 }
 #profile-youtube-wrapper {
 	float: left;
 	margin-left: 15px;
+	margin-top: 2px;
 }
 #profile-video-wrapper {
 	float: left;
 	margin-left: 15px;
+	margin-top: 2px;
 }
 #profile-audio-wrapper {
 	float: left;
 	margin-left: 15px;
+	margin-top: 2px;
 }
 #profile-location-wrapper {
 	float: left;
 	margin-left: 15px;
+	margin-top: 2px;
 }
 #profile-jot-perms {
 	float: left;
 	margin-left: 45px;
+	margin-top: 2px;
 }
 #jot-preview-link {
-	float: left;
+	float: right;
 	margin-left: 10px;
-	margin-top: 0px !important;
+	margin-top: 2px;
 }
- 
+#profile-jot-perms{
+   float: right;
+	margin-left: 10px;
+	margin-top: 2px;	
+	}
 /** buttons **/
 .button.creation1 {
     background-color: #fff;

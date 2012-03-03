@@ -44,13 +44,13 @@
 		<a id="profile-nolocation" class="noglobe" title="$noloc" onclick="jotClearLocation();return false;"></a>
 	</div> 
 
+	<input type="submit" id="profile-jot-submit" class="button creation2" name="submit" value="$share" />
+
+	<button onclick="preview_post();" id="jot-preview-link" class="button creation1">$preview</button>
+
 	<div id="profile-jot-perms" class="profile-jot-perms" style="display: $pvisit;" >
 		<a href="#profile-jot-acl-wrapper" id="jot-perms-icon" class="icon $lockstate"  title="$permset" ></a>$bang
 	</div>
-
-	<button onclick="preview_post();" id="jot-preview-link" class="button creation1">$preview</button>
-	<input type="submit" id="profile-jot-submit" class="button creation2" name="submit" value="$share" />
-
 	<div id="profile-jot-perms-end"></div>
 
 
