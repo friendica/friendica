@@ -1,5 +1,5 @@
 <header>
-	{# $langselector #}
+	{# $langselector version 0.01#}
 
 	<div id="site-location">$sitelocation</div>
 	<div id="banner">$banner</div>
@@ -18,7 +18,7 @@
 			</li>
 		    {{ endif }}
 	
-
+			{{ if $nav.contacts }}
 			<li class="nav-menu-icon" id="nav-contacts-linkmenu">
 				<a href="$nav.contacts.0" rel="#nav-contacts-menu" title="$nav.contacts.1">
 				<span class="icon contacts">$nav.contacts.1</span></a>
@@ -28,9 +28,9 @@
 					<li id="nav-contacts-all"><a href="contacts">$nav.contacts.1</a></li> 
 				</ul>
 			</li>	
+			{{ endif }}
 			
-			
-			
+			{{ if $nav.messages }}
 			<li  id="nav-messages-linkmenu" class="nav-menu-icon">
 			  <a href="$nav.messages.0" rel="#nav-messages-menu" title="$nav.messages.1">
 			  <span class="icon messages">$nav.messages.1</span></a>
@@ -42,9 +42,8 @@
 					<li id="nav-messages-new"><a href="message/new">Neue Nachricht</a></li>
 				</ul>
 			</li>		
+			{{ endif }}
 		
-		
-      
       {{ if $nav.notifications }}
 			<li  id="nav-notifications-linkmenu" class="nav-menu-icon"><a href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1"><span class="icon notify">$nav.notifications.1</span></a>
 				<span id="notify-update" class="nav-notify"></span>
@@ -54,9 +53,7 @@
 					<li class="empty">$emptynotifications</li>
 				</ul>
 			</li>		
-		{{ endif }}			
-		
-				
+		{{ endif }}					
 		
 		<li id="nav-site-linkmenu" class="nav-menu-icon"><a href="#" rel="#nav-site-menu"><span class="icon s22 gear">Site</span></a>
 			<ul id="nav-site-menu" class="menu-popup">
@@ -70,16 +67,17 @@
 				{{ if $nav.admin }}<li><a class="$nav.admin.2" href="$nav.admin.0" title="$nav.admin.3" >$nav.admin.1</a></li>{{ endif }}
 
 				{{ if $nav.logout }}<li><a class="menu-sep $nav.logout.2" href="$nav.logout.0" title="$nav.logout.3" >$nav.logout.1</a></li>{{ endif }}
-				{{ if $nav.login }}<li><a class="$nav.login.2" href="$nav.login.0" title="$nav.login.3" >$nav.login.1</a><li>{{ endif }}
+
 				
 			</ul>		
 		</li>
 		
 		
-
+		{{ if $nav.directory }}
 		<li id="nav-directory-link" class="nav-menu $sel.directory">
 			<a class="$nav.directory.2" href="$nav.directory.0" title="$nav.directory.3" >$nav.directory.1</a>
 		</li>
+		{{ endif }}
 		
 		{{ if $nav.apps }}
 			<li id="nav-apps-link" class="nav-menu $sel.apps">
@@ -113,14 +111,22 @@
 			</li>
 		{{ endif }}
 		
+					{{ if $nav.login }}
+					<li id="nav-home-link" class="nav-menu $sel.home">
+						<a class="$nav.login.2" href="$nav.login.0" title="$nav.login.3" >$nav.login.1</a>
+					<li>
+					{{ endif }}
 		
 		
-	</ul>
-	</div>	
+		
+	</ul>	
 
 </nav>
+
+
+
 <ul id="nav-notifications-template" style="display:none;" rel="template">
-	<li><a href="{0}"><img src="{1}">{2} <span class="notif-when">{3}</span></a></li>
+	<li class="{4}"><a href="{0}"><img src="{1}" height="24" width="24" alt="" />{2} <span class="notif-when">{3}</span></a></li>
 </ul>
 
 {#

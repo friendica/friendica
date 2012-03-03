@@ -102,6 +102,8 @@
 .icon.tagged    { background-image: url("../../../view/theme/diabook/icons/tagged.png");}
 .icon.unstarred    { background-image: url("../../../view/theme/diabook/icons/unstarred.png");}
 .icon.star    { background-image: url("../../../view/theme/diabook/icons/star.png");}
+.icon.link		{ background-image: url("../../../view/theme/diabook/icons/link.png");}
+.icon.lock		{ background-image: url("../../../view/theme/diabook/icons/lock.png");}
 
 .article	{ background-position: -50px  0px;}
 .audio 		{ background-position: -70px  0px;}
@@ -112,7 +114,7 @@
 .camera 	{ background-position: -170px 0px;}
 /*.dislike 	{ background-position: -190px 0px;}*/
 /*.like 		{ background-position: -210px 0px;}*/
-.link 		{ background-position: -230px 0px;}
+/*.link 		{ background-position: -230px 0px;}*/
 
 .globe 		{ background-position: -50px  -20px;}
 .noglobe 	{ background-position: -70px  -20px;}
@@ -126,7 +128,7 @@
 .share 		{ background-position: -230px -20px;}
 
 .tools 		{ background-position: -50px  -40px;}
-.lock 		{ background-position: -70px  -40px;}
+/*.lock 		{ background-position: -70px  -40px;}*/
 
 .video          { background-position: -110px -40px;}
 .youtube        { background-position: -130px -40px;}
@@ -160,7 +162,7 @@
   display: block;
   width: 20px;
   height: 20px;
-  background-image: url('icons.png');
+  /*background-image: url('icons.png');*/
 }
 
 .icon {
@@ -613,7 +615,7 @@ nav .nav-notify {
   border-radius: 5px 5px 5px 5px;
   font-size: 10px;
   font-weight: 900;
-  padding: 1px 3px;
+  padding: 1px 4px;
   top: 0px;
   right: -6px;
   min-width: 10px;
@@ -672,6 +674,10 @@ nav #nav-apps-link.selected {
 	/* margin: 0px 0px 2px 0px;
 	padding: 5px 10px; */
 }
+
+.notify-seen {
+	background: none repeat scroll 0 0 #DDDDDD;
+	}
 
 ul.menu-popup {
   position: absolute;
@@ -1162,15 +1168,15 @@ section {
   padding-bottom: 2px;
 }
 .tag {
-  background: url("../../../images/tag_b.png") repeat-x center left;
-  color: #ffffff;
+  /*background: url("../../../images/tag_b.png") repeat-x center left;*/
+  color: #3465A4;
   padding-left: 3px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .tag a {
-  padding-right: 8px;
-  background: url("../../../images/tag.png") no-repeat center right;
-  color: #ffffff;
+  padding-right: 5px;
+  /*background: url("../../../images/tag.png") no-repeat center right;*/
+  color: #3465A4;
 }
 .wwto {
   position: absolute !important;
