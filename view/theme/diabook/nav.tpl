@@ -87,7 +87,7 @@
 					<li>$ap</li>
 					{{ endfor }}
 				</ul>
-			</li>
+			</li>	
 		{{ endif }}		
 		
       {{ if $nav.home }}

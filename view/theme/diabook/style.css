@@ -675,6 +675,13 @@ nav #nav-directory-link{
 	margin-left: 0px;
 	margin-right: 0px;
 	font-weight: bold;
+	margin: 3px 15px;
+	}
+nav #nav-apps-link{
+	margin-left: 0px;
+	margin-right: 0px;
+	font-weight: bold;
+	margin: 3px 15px;
 	}
 nav #nav-help-link .menu-popup,
 nav #nav-search-link .menu-popup,
