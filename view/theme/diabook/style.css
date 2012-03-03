@@ -163,8 +163,8 @@
 .language       { background-position: -210px -40px;}
 
 
-.on             { background-position: -50px  -60px;}
-.off            { background-position: -70px  -60px;}
+.icon.on             { background-image: url("../../../view/theme/diabook/icons/toogle_on.png"); background-repeat: no-repeat;}
+.icon.off            { background-image: url("../../../view/theme/diabook/icons/toogle_off.png"); background-repeat: no-repeat;}
 .prev           { background-position: -90px  -60px;}
 .next           { background-position: -110px -60px;}
 /*.tagged     { background-position: -130px -60px;}*/
