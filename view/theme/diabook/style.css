@@ -749,8 +749,8 @@ ul.menu-popup a {
   text-decoration: none;
 }
 ul.menu-popup a:hover {
-  background-color: #3465A4; /*bdcdd4;*/
-  color: #fff;
+  background-color: #fff797; /*bdcdd4;*/
+  color: #000;
 }
 ul.menu-popup .menu-sep {
   border-top: 1px solid #9eabb0;
