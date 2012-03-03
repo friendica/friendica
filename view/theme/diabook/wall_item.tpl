@@ -1,6 +1,6 @@
 {{ if $item.indent }}{{ else }}
 <div class="wall-item-decor">
-	<span class="icon star $item.isstarred" id="starred-$item.id" title="$item.star.starred">$item.star.starred</span>
+	<span class="icon isstar $item.isstarred" id="starred-$item.id" title="$item.star.starred">$item.star.starred</span>
 	{{ if $item.lock }}<span class="icon lock fakelink" onclick="lockview(event,$item.id);" title="$item.lock">$item.lock</span>{{ endif }}	
 	<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 </div>
@@ -38,9 +38,7 @@
 		</div>
 	</div>
 	<div class="wall-item-bottom">
-		<div class="wall-item-links">
-			{{ if $item.plink }}<a class="icon link" title="$item.plink.title" href="$item.plink.href">$item.plink.title</a>{{ endif }}
-		</div>
+		<div></div>
 		<div class="wall-item-tags">
 			{{ for $item.tags as $tag }}
 				<span class='tag'>$tag</span>
@@ -54,7 +52,8 @@
 		<div class="wall-item-actions">
 			<div class="wall-item-location">$item.location&nbsp;</div>
 			<div class="wall-item-actions-social">
-				
+			
+			
 			{{ if $item.vote }}
 				<a href="#" id="like-$item.id" class="icon like" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false">$item.vote.like.1</a>
 				<a href="#" id="dislike-$item.id" class="icon dislike" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"></a>
@@ -62,13 +61,19 @@
 						
 			{{ if $item.vote.share }}
 				<a href="#" id="share-$item.id" class="icon recycle" title="$item.vote.share.0" onclick="jotShare($item.id); return false"></a>
-			{{ endif }}		
+			{{ endif }}	
 			
 			{{ if $item.star }}
-				<a href="#" id="star-$item.id" class="icon star" onclick="dostar($item.id); return false;"  class="$item.star.classdo" title="$item.star.do">$item.star.do</a>
-				<a href="#" id="unstar-$item.id" class="icon unstarred" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo">$item.star.undo</a>
+				<a href="#" id="star-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classdo"  title="$item.star.do" >
+					<img src="images/star_dummy.png" class="icon star" alt="$item.star.do" /> </a>
+				<a href="#" id="unstar-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo">
+					<img src="images/star_dummy.png" class="icon star" alt="$item.star.undo" /> </a>
 				<a href="#" id="tagger-$item.id" class="icon tagged" onclick="itemTag($item.id); return false;" class="$item.star.classtagger" title="$item.star.tagger">$item.star.tagger</a>
-			{{ endif }}			
+			{{ endif }}	
+			
+			{{ if $item.plink }}<a class="icon link" title="$item.plink.title" href="$item.plink.href">$item.plink.title</a>{{ endif }}
+			
+					
 					
 			</div>
 			

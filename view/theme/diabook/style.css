@@ -100,11 +100,13 @@
 .icon.recycle 	{ background-image: url("../../../view/theme/diabook/icons/recycle.png");}
 .icon.remote-link { background-image: url("../../../view/theme/diabook/icons/remote.png");}
 .icon.tagged    { background-image: url("../../../view/theme/diabook/icons/tagged.png");}
-.icon.unstarred    { background-image: url("../../../view/theme/diabook/icons/unstarred.png");}
+.icon.unstarred    { background-image: url("../../../view/theme/diabook/icons/star.png");}
 .icon.star    { background-image: url("../../../view/theme/diabook/icons/star.png");}
 .icon.link		{ background-image: url("../../../view/theme/diabook/icons/link.png");}
 .icon.lock		{ background-image: url("../../../view/theme/diabook/icons/lock.png");}
 .icon.unlock		{ background-image: url("../../../view/theme/diabook/icons/unlock.png");}
+.icon.isstar    { background-image: url("../../../view/theme/diabook/icons/isstar.png");}
+
 
 .camera 	{ background-image: url("../../../view/theme/diabook/icons/camera.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
