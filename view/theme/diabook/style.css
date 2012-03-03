@@ -348,7 +348,9 @@ body {
   font-size: 13px;
   background-color: #ffffff;
   color: #2d2d2d;
-  margin: 50px 0px 0px 0px;
+  margin-left: : auto;
+  margin-right: auto;
+  margin-top: 50px;
   display: table;
 }
 h4 {
@@ -1269,6 +1271,8 @@ section {
   color: #999999;
   border: 1px solid #DDD;
   padding: 0.3em;
+  margin-top: 30px;
+  margin-bottom: 10px;
 }
 #jot #jot-tools {
   margin: 0px;
