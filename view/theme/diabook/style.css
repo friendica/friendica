@@ -615,7 +615,7 @@ nav .nav-menu-icon {
   border-radius: 5px 5px 0 0;
 }
 nav .nav-menu-icon.selected {
-  background-color: #364e59;
+  background-color: #fff;
 }
 nav .nav-menu-icon img {
   width: 22px;
@@ -691,9 +691,19 @@ nav #nav-site-linkmenu .menu-popup {
   right: 0px;
   left: auto;
 }
-nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-linkmenu.selected .icon.s22.notify {
-  background-image: url("../../../images/icons/22/notify_on.png");
-}
+
+nav #nav-messages-linkmenu.on .icon.messages, nav #nav-messages-linkmenu.selected .icon.messages{
+	background-image: url("../../../view/theme/diabook/icons/messages2.png");
+	}
+	
+/*nav #nav-notifications-linkmenu.on .icon.notify,*/ nav #nav-notifications-linkmenu.selected .icon.notify{
+	background-image: url("../../../view/theme/diabook/icons/notify2.png");
+	}
+	
+nav #nav-contacts-linkmenu.on .icon.contacts, nav #nav-contacts-linkmenu.selected .icon.contacts{
+	background-image: url("../../../view/theme/diabook/icons/contacts2.png");
+	}
+	
 nav #nav-apps-link.selected {
   background-color: #364e59;
 }
@@ -725,7 +735,8 @@ ul.menu-popup {
   margin: 0px;
   padding: 0px;
   list-style: none;
-  border: 3px solid #364e59;
+  border: 1px solid #364e59;
+  border-top-color: transparent;
   z-index: 100000;
   -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
   -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
@@ -738,7 +749,8 @@ ul.menu-popup a {
   text-decoration: none;
 }
 ul.menu-popup a:hover {
-  background-color: #bdcdd4;
+  background-color: #3465A4; /*bdcdd4;*/
+  color: #fff;
 }
 ul.menu-popup .menu-sep {
   border-top: 1px solid #9eabb0;
