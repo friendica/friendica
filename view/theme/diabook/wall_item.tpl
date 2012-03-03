@@ -38,7 +38,8 @@
 		</div>
 	</div>
 	<div class="wall-item-bottom">
-		<div></div>
+		<div class="wall-item-links">
+		</div>
 		<div class="wall-item-tags">
 			{{ for $item.tags as $tag }}
 				<span class='tag'>$tag</span>
