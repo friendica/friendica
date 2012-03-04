@@ -1,157 +1,137 @@
 
-<script language="javascript" type="text/javascript" src="$baseurl/library/tinymce/jscripts/tiny_mce/tiny_mce_src.js"></script>
 <script language="javascript" type="text/javascript">
 
 var editor=false;
 var textlen = 0;
+var plaintext = '$editselect';
+var skin = 'default';
 
-function initEditor(cb) {
-    if (editor==false) {
-        $("#profile-jot-text-loading").show();
-		$("#jot-title-desc").show();
- if(plaintext == 'none') {
-            $("#profile-jot-text-loading").hide();
-            $("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
-            $(".jothidden").show();
-            editor = true;
-            $("a#jot-perms-icon").fancybox({
-                'transitionIn' : 'elastic',
-                'transitionOut' : 'elastic'
-            });
-	                            $("#profile-jot-submit-wrapper").show();
-								{{ if $newpost }}
-    	                            $("#profile-upload-wrapper").show();
-        	                        $("#profile-attach-wrapper").show();
-            	                    $("#profile-link-wrapper").show();
-                	                $("#profile-video-wrapper").show();
-                    	            $("#profile-audio-wrapper").show();
-                        	        $("#profile-location-wrapper").show();
-                            	    $("#profile-nolocation-wrapper").show();
-                                	$("#profile-title-wrapper").show();
-	                                $("#profile-jot-plugin-wrapper").show();
-	                                $("#jot-preview-link").show();
-								{{ endif }}   
+function initEditor(cb){
+	if (editor==false){
+		$("#profile-jot-text-loading").show();
+		if(plaintext == 'none') {
+			$("#profile-jot-text-loading").hide();
+			$("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
+			editor = true;
+			$("a#jot-perms-icon").fancybox({
+				'transitionIn' : 'elastic',
+				'transitionOut' : 'elastic'
+			});
+			$(".jothidden").show();
+			if (typeof cb!="undefined") {
+                cb();
+            }
+			return;
+		}	
+		tinyMCE.init({
+			theme : "advanced",
+            skin : "default",
+			mode : "specific_textareas",
+			editor_selector: $editselect,
+			auto_focus: "profile-jot-text",
+			plugins : "bbcode,paste,fullscreen,autoresize",
+			theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code,fullscreen",
+			theme_advanced_buttons2 : "",
+			theme_advanced_buttons3 : "",
+			theme_advanced_toolbar_location : "top",
+			theme_advanced_toolbar_align : "center",
+			theme_advanced_blockformats : "blockquote,code",
+			paste_text_sticky : true,
+			entity_encoding : "raw",
+			add_unload_trigger : false,
+			remove_linebreaks : false,
+			force_p_newlines : false,
+			force_br_newlines : true,
+			forced_root_block : '',
+			convert_urls: false,
+			content_css: "$baseurl/view/custom_tinymce.css",
+			theme_advanced_path : false,
+			setup : function(ed) {
+				cPopup = null;
+				ed.onKeyDown.add(function(ed,e) {
+					if(cPopup !== null) {
+						cPopup.onkey(e);
+                    }
+				});
 
+				ed.onKeyUp.add(function(ed, e) {
+					var txt = tinyMCE.activeEditor.getContent();
+					match = txt.match(/@([^ \n]+)$/);
+					if(match!==null) {
+						if(cPopup === null) {
+							cPopup = new ACPopup(this,baseurl+"/acl");
+						}
+						if(cPopup.ready && match[1]!==cPopup.searchText) cPopup.search(match[1]);
+						if(! cPopup.ready) { cPopup = null; }
+					}
+					else {
+						if(cPopup !== null) { cPopup.close(); cPopup = null; }
+					}
 
-            if (typeof cb!="undefined") cb();
-            return;
-        }
-        tinyMCE.init({
-                theme : "advanced",
-                mode : "specific_textareas",
-                editor_selector: /(profile-jot-text|prvmail-text)/,
-                plugins : "bbcode,paste,fullscreen,autoresize",
-                theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code,fullscreen",
-                theme_advanced_buttons2 : "",
-                theme_advanced_buttons3 : "",
-                theme_advanced_toolbar_location : "top",
-                theme_advanced_toolbar_align : "center",
-                theme_advanced_blockformats : "blockquote,code",
-                //theme_advanced_resizing : true,
-                //theme_advanced_statusbar_location : "bottom",
-                paste_text_sticky : true,
-                entity_encoding : "raw",
-                add_unload_trigger : false,
-                remove_linebreaks : false,
-                force_p_newlines : false,
-                force_br_newlines : true,
-                forced_root_block : '',
-                convert_urls: false,
-                content_css: "$baseurl/view/custom_tinymce.css",
-                theme_advanced_path : false,
-                setup : function(ed) {
-                     //Character count
-                        ed.onKeyUp.add(function(ed, e) {
-                                var txt = tinyMCE.activeEditor.getContent();
-                                textlen = txt.length;
-                                if(textlen != 0 && $('#jot-perms-icon').is('.unlock')) {
-                                        $('#profile-jot-desc').html(ispublic);
-                                }
-                                else {
-                                        $('#profile-jot-desc').html('&nbsp;');
-                                }
+					textlen = txt.length;
+					if(textlen != 0 && $('#jot-perms-icon').is('.unlock')) {
+						$('#profile-jot-desc').html(ispublic);
+					}
+					else {
+						$('#profile-jot-desc').html('&#160;');
+					}	 
 
-                                if(textlen <= 140) {
-                                        $('#character-counter').removeClass('red');
-                                        $('#character-counter').removeClass('orange');
-                                        $('#character-counter').addClass('grey');
-                                }
-                                if((textlen > 140) && (textlen <= 420)) {
-                                        $('#character-counter').removeClass('grey');
-                                        $('#character-counter').removeClass('red');
-                                        $('#character-counter').addClass('orange');
-                                }
-                                if(textlen > 420) {
-                                        $('#character-counter').removeClass('grey');
-                                        $('#character-counter').removeClass('orange');
-                                        $('#character-counter').addClass('red');
-                                }
-                                $('#character-counter').text(textlen);
-                        });
-                        ed.onInit.add(function(ed) {
-                                ed.pasteAsPlainText = true;
-                                $("#profile-jot-text-loading").hide();
-                                $("#profile-jot-submit-wrapper").show();
-                                $("#profile-upload-wrapper").show();
-                                $("#profile-attach-wrapper").show();
-                                $("#profile-link-wrapper").show();
-                                $("#profile-youtube-wrapper").show();
-                                $("#profile-video-wrapper").show();
-                                $("#profile-audio-wrapper").show();
-                                $("#profile-location-wrapper").show();
-                                $("#profile-nolocation-wrapper").show();
-                                $("#profile-title-wrapper").show();
-                                $("#profile-jot-plugin-wrapper").show();
-                                $("#character-counter").show();
-                                if (typeof cb!="undefined") cb();
-                        });
-                }
-        });
-        editor = true;
-        // setup acl popup
-        $("a#jot-perms-icon").fancybox({
-            'transitionIn' : 'none',
-            'transitionOut' : 'none'
-        }); 
-    } else {
-        if (typeof cb!="undefined") cb();
-    }
-} // initEditor
-</script>
-<script type="text/javascript" src="js/ajaxupload.js" ></script>
-<script>
-    var ispublic = '$ispublic';
-	$(document).ready(function() {
-                /* enable tinymce on focus */
-                $("#profile-jot-text").focus(function(){
-                    if (editor) return;
-                    $(this).val("");
-                    initEditor();
-                }); 
+				 //Character count
 
-		$("#jot-title").mouseout(function() {
-			$("#jot-title").hide();
-			var ttl = $("#jot-title").val();
-			$('#jot-title-display').html(ttl);
-			if(ttl.length) {
-				$("#jot-title-display").show();
-			}
-			else {
-				$("#jot-title-desc").show();
+					if(textlen <= 140) {
+						$('#character-counter').removeClass('red');
+						$('#character-counter').removeClass('orange');
+						$('#character-counter').addClass('grey');
+					}
+					if((textlen > 140) && (textlen <= 420)) {
+						$('#character-counter').removeClass('grey');
+						$('#character-counter').removeClass('red');
+						$('#character-counter').addClass('orange');
+					}
+					if(textlen > 420) {
+						$('#character-counter').removeClass('grey');
+						$('#character-counter').removeClass('orange');
+						$('#character-counter').addClass('red');
+					}
+					$('#character-counter').text(textlen);
+				});
+
+				ed.onInit.add(function(ed) {
+					ed.pasteAsPlainText = true;
+					$("#profile-jot-text-loading").hide();
+					$(".jothidden").show();
+					if (typeof cb!="undefined") cb();
+				});
 			}
 		});
+		editor = true;
+		// setup acl popup
+		$("a#jot-perms-icon").fancybox({
+			'transitionIn' : 'elastic',
+			'transitionOut' : 'elastic'
+		}); 
+	} else {
+		if (typeof cb!="undefined") cb();
+	}
+}
 
-		$("#jot-title-display").hover(function() {
-			$("#jot-title-display").hide();
-			$("#jot-title").show();
-			$("#jot-title").focus();
-		});		
+function enableOnUser(){
+	if (editor) return;
+	$(this).val("");
+	initEditor();
+}
 
-		$("#jot-title-desc").click(function() {
-			$("#jot-title-desc").hide();
-			$("#jot-title").show();
-			$("#jot-title").focus();
-		});		
+</script>
+<script type="text/javascript" src="$baseurl/js/ajaxupload.js" ></script>
+<script>
+	var ispublic = '$ispublic';
+	var addtitle = '$addtitle';
+
+	$(document).ready(function() {
+		
+		/* enable tinymce on focus and click */
+		$("#profile-jot-text").focus(enableOnUser);
+		$("#profile-jot-text").click(enableOnUser);
 
 		var uploader = new window.AjaxUpload(
 			'wall-image-upload',
@@ -174,22 +154,8 @@ function initEditor(cb) {
 					$('#profile-rotator').hide();
 				}				 
 			}
-		);		
-		$('#contact_allow, #contact_deny, #group_allow, #group_deny').change(function() {
-			var selstr;
-			$('#contact_allow option:selected, #contact_deny option:selected, #group_allow option:selected, #group_deny option:selected').each( function() {
-				selstr = $(this).text();
-				$('#jot-perms-icon').removeClass('unlock').addClass('lock');
-				$('#jot-public').hide();
-				$('.profile-jot-net input').attr('disabled', 'disabled');
-			});
-			if(selstr == null) { 
-				$('#jot-perms-icon').removeClass('lock').addClass('unlock');
-				$('#jot-public').show();
-				$('.profile-jot-net input').attr('disabled', false);
-			}
+		);
 
-		}).trigger('change');
 
 	});
 
@@ -223,13 +189,6 @@ function initEditor(cb) {
 		}
 	}
 
-	function jotGetVideo() {
-		reply = prompt("$utubeurl");
-		if(reply && reply.length) {
-			addeditortext('[youtube]' + reply + '[/youtube]');
-		}
-	}
-
 	function jotVideoURL() {
 		reply = prompt("$vidurl");
 		if(reply && reply.length) {
@@ -252,22 +211,18 @@ function initEditor(cb) {
 		}
 	}
 
-	function jotTitle() {
-		reply = prompt("$title", $('#jot-title').val());
-		if(reply && reply.length) {
-			$('#jot-title').val(reply);
-		}
-	}
-
 	function jotShare(id) {
+		if ($('#jot-popup').length != 0) $('#jot-popup').show();
+
 		$('#like-rotator-' + id).show();
 		$.get('share/' + id, function(data) {
-				if (!editor) $("#profile-jot-text").val("");
-				initEditor(function(){
-					addeditortext(data);
-					$('#like-rotator-' + id).hide();
-					$(window).scrollTop(0);
-				});
+			if (!editor) $("#profile-jot-text").val("");
+			initEditor(function(){
+				addeditortext(data);
+				$('#like-rotator-' + id).hide();
+				$(window).scrollTop(0);
+			});
+
 		});
 	}
 
@@ -294,19 +249,36 @@ function initEditor(cb) {
 		}
 	}
 
+	function itemTag(id) {
+		reply = prompt("$term");
+		if(reply && reply.length) {
+			reply = reply.replace('#','');
+			if(reply.length) {
+
+				commentBusy = true;
+				$('body').css('cursor', 'wait');
+
+				$.get('tagger/' + id + '?term=' + reply);
+				if(timer) clearTimeout(timer);
+				timer = setTimeout(NavUpdate,3000);
+				liking = 1;
+			}
+		}
+	}
+
 	function jotClearLocation() {
 		$('#jot-coord').val('');
 		$('#profile-nolocation-wrapper').hide();
 	}
 
-  function addeditortext(data) {
-        if(plaintext == 'none') {
-            var currentText = $("#profile-jot-text").val();
-            $("#profile-jot-text").val(currentText + data);
-        }
-        else
-            tinyMCE.execCommand('mceInsertRawHTML',false,data);
-    }
+	function addeditortext(data) {
+		if(plaintext == 'none') {
+			var currentText = $("#profile-jot-text").val();
+			$("#profile-jot-text").val(currentText + data);
+		}
+		else
+			tinyMCE.execCommand('mceInsertRawHTML',false,data);
+	}	
 
 	$geotag
 

@@ -1,9 +1,9 @@
 <form id="profile-jot-form" action="$action" method="post">
 	<div id="jot">
-		<div id="profile-jot-desc" class="jothidden" >&nbsp;</div>
-		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none">
+		<div id="profile-jot-desc" class="jothidden">&nbsp;</div>
+		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none" />
 		<div id="character-counter" class="grey jothidden"></div>
-		
+
 		<input type="hidden" name="type" value="$ptyp" />
 		<input type="hidden" name="profile_uid" value="$profile_uid" />
 		<input type="hidden" name="return" value="$return_path" />
@@ -11,9 +11,9 @@
 		<input type="hidden" name="coord" id="jot-coord" value="" />
 		<input type="hidden" name="post_id" value="$post_id" />
 		<input type="hidden" name="preview" id="jot-preview" value="0" />
-		
-		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body" >{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>		
-				
+
+		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body" >{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>
+
 		<ul id="jot-tools" class="jothidden" style="display:none">
 			<li><a href="#" onclick="return false;" id="wall-image-upload" title="$upload">$shortupload</a></a></li>
 			<li><a href="#" onclick="return false;" id="wall-file-upload"  title="$attach">$shortattach</a></li>
@@ -41,13 +41,8 @@
 			<div id="profile-jot-email-end"></div>
 			$jotnets
 		</div>
-	</div>	
+	</div>
 
-	
 </form>
 
 {{ if $content }}<script>initEditor();</script>{{ endif }}
-
-
-
-

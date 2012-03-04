@@ -43,7 +43,7 @@
 				<div class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></div>
 			{{ endif }}
 			{{ if $item.edpost }}
-				<a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>'
+				<a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>
 			{{ endif }}
 		
 			<div class="wall-item-delete-wrapper" id="wall-item-delete-wrapper-$item.id" >
@@ -59,7 +59,7 @@
 			<div class="wall-item-body" id="wall-item-body-$item.id" >$item.body
 					<div class="body-tag">
 						{{ for $item.tags as $tag }}
-							<span class='tag'>$tag</span>
+							<span class="tag">$tag</span>
 						{{ endfor }}
 					</div>			
 			</div>
@@ -72,7 +72,7 @@
 	<div class="wall-item-wrapper-end"></div>
 	<div class="wall-item-like" id="wall-item-like-$item.id">$item.like</div>
 	<div class="wall-item-dislike" id="wall-item-dislike-$item.id">$item.dislike</div>
-	<div class="wall-item-comment-wrapper" >
+	<div class="wall-item-comment-wrapper">
 	$item.comment
 	</div>
 </div>
