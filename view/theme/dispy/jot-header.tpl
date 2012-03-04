@@ -4,10 +4,11 @@
 var editor=false;
 var textlen = 0;
 var plaintext = '$editselect';
+// this is here because of the silly tinymce error. didn't help.
 var skin = 'default';
 
-function initEditor(cb){
-	if (editor==false){
+function initEditor(cb) {
+	if (editor==false) {
 		$("#profile-jot-text-loading").show();
 		if(plaintext == 'none') {
 			$("#profile-jot-text-loading").hide();
@@ -22,7 +23,8 @@ function initEditor(cb){
                 cb();
             }
 			return;
-		}	
+		}
+
 		tinyMCE.init({
 			theme : "advanced",
             skin : "default",
@@ -100,7 +102,36 @@ function initEditor(cb){
 					ed.pasteAsPlainText = true;
 					$("#profile-jot-text-loading").hide();
 					$(".jothidden").show();
-					if (typeof cb!="undefined") cb();
+
+					if (typeof cb!="undefined") { cb(); }
+
+					// character count part deux
+					//
+					// get # of chars
+					var textlen = $('#profile-jot-text').val().length();
+					$('#character-counter').html(textlen);
+
+					$('#profile-jot-text').keyup(function() {
+						$('#character-counter').removeClass('jothidden');
+						if(textlen <= 140) {
+							$('#character-counter').removeClass('red');
+							$('#character-counter').removeClass('orange');
+							$('#character-counter').addClass('grey');
+						}
+						if((textlen > 140) && (textlen <= 420)) {
+							$('#character-counter').removeClass('grey');
+							$('#character-counter').removeClass('red');
+							$('#character-counter').addClass('orange');
+						}
+						if(textlen > 420) {
+							$('#character-counter').removeClass('grey');
+							$('#character-counter').removeClass('orange');
+							$('#character-counter').addClass('red');
+						}
+						// get new len
+						$('#character-counter').html($(this).val().length);
+					});
+
 				});
 			}
 		});

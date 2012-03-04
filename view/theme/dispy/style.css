@@ -988,7 +988,7 @@ section {
 }
 .wall-item-content-wrapper {
     position: relative;
-    border-top: 1px #aaa solid;
+    border-left: 1px #aaa solid;
     padding: 10px;
 }
 .wall-item-outside-wrapper .wall-item-comment-wrapper {
@@ -996,7 +996,6 @@ section {
 }
 .wall-item-content-wrapper.shiny {
     background: #efefcf;
-    border-right: 3px solid #ffd398;
 }
 .wall-item-content {
     overflow-x: auto;
@@ -1039,7 +1038,7 @@ section {
     border-radius: 5px;
 }
 [class^="wall-item-tools"] > *, [class^="wall-item-tools"] > * > * {
-	margin: 0 0 10px 0;
+	margin: 0 0 5px 0;
 }
 .wall-item-tools {
     float: right;
