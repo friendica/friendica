@@ -918,8 +918,11 @@ aside #viewcontacts {
 #acl-deny-text-end {
 	clear: both;
 }
-#jot-title-desc, #profile-jot-desc {
+#jot-title-desc {
 	color: #cccccc;
+}
+#profile-jot-desc {
+	color: #a00;
 }
 #jot-title-wrapper {
 	margin-bottom: 5px;

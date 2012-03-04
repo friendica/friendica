@@ -104,34 +104,6 @@ function initEditor(cb) {
 					$(".jothidden").show();
 
 					if (typeof cb!="undefined") { cb(); }
-
-					// character count part deux
-					//
-					// get # of chars
-					var textlen = $('#profile-jot-text').val().length();
-					$('#character-counter').html(textlen);
-
-					$('#profile-jot-text').keyup(function() {
-						$('#character-counter').removeClass('jothidden');
-						if(textlen <= 140) {
-							$('#character-counter').removeClass('red');
-							$('#character-counter').removeClass('orange');
-							$('#character-counter').addClass('grey');
-						}
-						if((textlen > 140) && (textlen <= 420)) {
-							$('#character-counter').removeClass('grey');
-							$('#character-counter').removeClass('red');
-							$('#character-counter').addClass('orange');
-						}
-						if(textlen > 420) {
-							$('#character-counter').removeClass('grey');
-							$('#character-counter').removeClass('orange');
-							$('#character-counter').addClass('red');
-						}
-						// get new len
-						$('#character-counter').html($(this).val().length);
-					});
-
 				});
 			}
 		});
@@ -146,10 +118,38 @@ function initEditor(cb) {
 	}
 }
 
+function charCounter() {
+	// character count part deux
+	$('#profile-jot-text').keyup(function(event) {
+		var textlen = $(this).val().length();
+		var maxLen1 = 140;
+		var maxLen2 = 420;
+
+		$('#character-counter').removeClass('jothidden');
+		if(textlen <= maxLen1) {
+			$('#character-counter').removeClass('red');
+			$('#character-counter').removeClass('orange');
+			$('#character-counter').addClass('grey');
+		}
+		if((textlen > maxLen1) && (textlen <= maxLen2)) {
+			$('#character-counter').removeClass('grey');
+			$('#character-counter').removeClass('red');
+			$('#character-counter').addClass('orange');
+		}
+		if(textlen > maxLen2) {
+			$('#character-counter').removeClass('grey');
+			$('#character-counter').removeClass('orange');
+			$('#character-counter').addClass('red');
+		}
+		$('#character-counter').html($(this).val().length);
+	});
+}
+
 function enableOnUser(){
 	if (editor) return;
 	$(this).val("");
 	initEditor();
+	charCounter();
 }
 
 </script>
