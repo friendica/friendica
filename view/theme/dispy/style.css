@@ -980,22 +980,25 @@ section {
 /**
  * 	items
  */
-.wall-item-outside-wrapper { 
-	margin-top: 15px;
+.wall-item-outside-wrapper {
+	border: 1px solid #aaa;
+	border-radius: 5px;
+}
+.wall-item-outside-wrapper.comment {
+	margin-top: 5px;
 }
 .wall-item-outside-wrapper-end {
     clear: both;
 }
 .wall-item-content-wrapper {
     position: relative;
-    border-left: 1px #aaa solid;
-    padding: 10px;
+	padding: 10px;
 }
 .wall-item-outside-wrapper .wall-item-comment-wrapper {
     /*margin-left: 90px;*/
 }
 .wall-item-content-wrapper.shiny {
-    background: #efefcf;
+    background: #efefdf;
 }
 .wall-item-content {
     overflow-x: auto;
