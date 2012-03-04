@@ -32,10 +32,10 @@
 		<a id="profile-link" class="weblink" title="$weblink" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
 	</div> 
 	<div id="profile-video-wrapper" style="display: $visitor;" >
-		<a id="profile-video" class="video" title="$video" onclick="jotVideoURL();return false;"></a>
+		<a id="profile-video" class="video2" title="$video" onclick="jotVideoURL();return false;"></a>
 	</div> 
 	<div id="profile-audio-wrapper" style="display: $visitor;" >
-		<a id="profile-audio" class="audio" title="$audio" onclick="jotAudioURL();return false;"></a>
+		<a id="profile-audio" class="audio2" title="$audio" onclick="jotAudioURL();return false;"></a>
 	</div> 
 	<div id="profile-location-wrapper" style="display: $visitor;" >
 		<a id="profile-location" class="globe" title="$setloc" onclick="jotGetLocation();return false;"></a>

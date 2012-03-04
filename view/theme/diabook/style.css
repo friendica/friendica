@@ -114,9 +114,15 @@
 .attach 	{ background-image: url("../../../view/theme/diabook/icons/attach.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
 			  }
-.video 	{ background-image: url("../../../view/theme/diabook/icons/video.png"); 
+.video2 	{ background-image: url("../../../view/theme/diabook/icons/video.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
 			  }	
+.video 	{ background-image: url("../../../view/theme/diabook/icons/video.png"); 
+			  display: block; width: 100%; height: 28px; background-repeat: no-repeat;
+			  }
+.audio2 	{ background-image: url("../../../view/theme/diabook/icons/audio.png"); 
+			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
+			  }
 .audio 	{ background-image: url("../../../view/theme/diabook/icons/audio.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
 			  }
@@ -129,6 +135,8 @@
 .unglobe 	{ background-image: url("../../../view/theme/diabook/icons/unglobe.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
 			  }
+.edit    {background-image: url("../../../view/theme/diabook/icons/pencil2.png"); 
+			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;}
 			  
 			  
 
@@ -138,7 +146,7 @@
 .block 		{ background-position: -90px  0px;}
 /*.drop 		{ background-position: -110px 0px;}*/
 /*.drophide 	{ background-position: -130px 0px;}*/
-.edit 		{ background-position: -150px 0px;}
+/*.edit 		{ background-position: -150px 0px;}*/
 /*.camera 	{ background-position: -170px 0px;}*/
 /*.dislike 	{ background-position: -190px 0px;}*/
 /*.like 		{ background-position: -210px 0px;}*/
@@ -1000,16 +1008,21 @@ section {
   padding: 0px 0px 0px 10px;
 }
 .tabs {
-    background-image: url("../../../view/theme/diabook/icons/head.jpg");
+    
     background-position: 0 -20px;
     background-repeat: repeat-x;
-    border-bottom: 1px solid #BABDB6;
+    
     height: 27px;
     padding: 0;
  }
 .tab.button {
     margin-right: 15px; 
     margin-left: 15px;	
+    background: none repeat scroll 0 0 #F8F8F8;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px 3px 3px 3px;
+    font-weight: bold;
+    padding: 3px;
 	}
 /* wall item */
 .tread-wrapper {
@@ -1162,7 +1175,7 @@ section {
   display: none;
 }
 .wall-item-comment-wrapper textarea {
-  height: 1.2em;
+  height: 2.0em;
   width: 100%;
   font-size: 10px;
   color: #999999;
@@ -1312,13 +1325,12 @@ section {
   margin: 0px 2em 20px 0px;
 }
 #profile-jot-form #profile-jot-text {
-  height: 1.2em;
+  height: 3.0em;
   width: 99%;
   font-size: 10px;
   color: #999999;
   border: 1px solid #DDD;
   padding: 0.3em;
-  margin-top: 30px;
   margin-bottom: 10px;
 }
 #jot #jot-tools {
@@ -1658,7 +1670,13 @@ ul.tabs li {
   margin-left: 7px;
 }
 ul.tabs li .active {
-  border-bottom: 1px solid #3465A4;
+  background-color: #33ACFF;
+    background-image: -moz-linear-gradient(center top , #66C1FF 0%, #0097FF 100%);
+    border: 1px solid #777777;
+    color: white;
+    border-radius: 3px 3px 3px 3px;
+    box-shadow: 0 1px 1px #CFCFCF;
+    margin-left: 5px;
 }
 /**
  * Form fields
