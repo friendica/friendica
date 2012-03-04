@@ -956,9 +956,10 @@ aside #viewcontacts {
  * section
  */
 section {
-    margin: 20px 9% 0 9%;
+    margin: 20px 8% 0 6%;
     font-size: 0.8em;
     padding-right: 250px;
+	min-width: 475px;
 }
 
 /** tabs **/
@@ -1014,10 +1015,10 @@ section {
     overflow-x: auto;
 }
 [id^="tread-wrapper"], [class^="tread-wrapper"] {
-    margin: 5px 0;
-    border: 1px #aaa solid;
-    border-radius: 5px;
-    padding: 10px;
+    margin: 15px 0 0 0;
+	/*border: 1px #aaa solid;*/
+	/*border-radius: 5px;*/
+    padding: 0px;
 }
 .wall-item-photo-menu {
     display: none;
