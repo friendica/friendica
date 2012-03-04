@@ -81,17 +81,18 @@ mark {
     font-weight: bold;
 }
 /* Redeclare monospace font family: h5bp.com/j */
-pre, code, kbd, samp {
+pre, code, kbd, samp, .wall-item-body code {
     font-family: monospace, monospace;
     _font-family: 'courier new', monospace;
     font-size: 1em; }
 
 /* Improve readability of pre-formatted text in all browsers */
-pre {
+pre, .wall-item-body code {
     white-space: pre;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
+
 q {
     quotes: none;
 }
@@ -287,6 +288,11 @@ ul#user-menu-popup li a.nav-sep {
 }
 #nav-buttons {
     clear: both;
+	list-style: none;
+	padding: 0px;
+}
+#nav-buttons li {
+	padding: 0;
 }
 nav .nav-link {
 	float: right;
@@ -469,17 +475,18 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	width: 30px;
 	height: 19px;
 	background: transparent url(notifications.png) 0 0 no-repeat;
-	color: #fff;
+	color: #222;
 	font-weight: bold;
 	font-size: 0.8em;
 	padding-top: 0.2em;
 	text-align: center;
 	float: left;
-	margin-right: -4px;
-    display: none;
+	margin: 0 -1px 0 3px;
+	display: block;
+	visibility: hidden;
 }
 .nav-ajax-update.show, .nav-ajax-left.show {
-    display: block;
+    visibility: visible;
 }
 #net-update {
 	background-position: 0px 0px;
@@ -1430,6 +1437,37 @@ div[id$="wrapper"] br {
 }
 #photos-upload-perms-menu {
     text-align: right;
+}
+#photo-edit-caption, #photo-edit-newtag, #photo-edit-albumname {
+    float: left;
+    margin-bottom: 25px;
+}
+#photo-edit-link-wrap {
+    margin-bottom: 15px;
+}
+#photo-edit-caption {
+	width: 100%;
+}
+#photo-edit-newtag {
+	width: 100%;
+}
+#photo-like-div {
+    margin-bottom: 25px;
+}
+#photo-edit-caption-end, #photo-edit-tags-end, #photo-edit-albumname-end {
+    clear: both;
+}
+#photo-edit-delete-button {
+    margin-left: 200px;
+}
+#photo-edit-end {
+    margin-bottom: 35px;
+}
+#photo-caption {
+    font-size: 110%;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 /**

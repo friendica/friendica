@@ -11,6 +11,10 @@ works -->
     {{ if $nav.help }}
     <a id="nav-help-link" class="nav-link $nav.help.2" href="$nav.help.0" title="$nav.help.1">$nav.help.1</a>
     {{ endif }}
+    {{ if $nav.community }}
+    <a id="nav-community-link" class="nav-link $nav.community.2"
+    href="$nav.community.0" title="$nav.community.1">$nav.community.1</a>
+    {{ endif }}
     {{ if $nav.apps }}
     <a id="nav-apps-link" class="nav-link $nav.apps.2" href="$nav.apps.0" title="$nav.apps.1">$nav.apps.1</a>
     {{ endif }}
@@ -27,10 +31,6 @@ works -->
         <li id="nav-notifications-mark-all"><a href="#" onclick="notifyMarkAll(); return false;">$nav.notifications.mark.1</a></li>
         <li class="empty">$emptynotifications</li>
     </ul>
-    {{ endif }}
-    {{ if $nav.community }}
-    <a id="nav-community-link" class="nav-link $nav.community.2"
-    href="$nav.community.0" title="$nav.community.1">$nav.community.1</a>
     {{ endif }}
     {{ if $nav.network }}
     <a id="nav-network-link" class="nav-link $nav.network.2"
@@ -106,6 +106,7 @@ works -->
         <a id="mail-update" class="nav-ajax-left" href="$nav.messages.0" title="$nav.messages.1"></a>
         {{ endif }}
     </div>
+
 </div>
     <a href="#" class="floaterflip"></a>
 </nav>
