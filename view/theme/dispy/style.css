@@ -2132,7 +2132,7 @@ div[id$="wrapper"] br {
 }
 .field_help {
     display: block;
-    margin-left: 222px;
+    margin-left: 297px;
     color: #666;
 }
 .field .onoff {
@@ -2161,7 +2161,7 @@ div[id$="wrapper"] br {
 }
 
 .field.radio .field_help {
-    margin-left:0;
+    margin-left: 0;
 }
 
 
