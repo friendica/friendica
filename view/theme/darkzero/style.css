@@ -92,3 +92,11 @@ blockquote {
 	background: #ddd;
 	color: #000;
 }
+
+.acl-list-item p, #profile-jot-email-label, div#jot-preview-content, div.profile-jot-net {
+        color: #000000;
+}
+
+input#acl-search {
+        background-color: #aaa;
+}
