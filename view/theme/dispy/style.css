@@ -153,7 +153,7 @@ a:hover {
     color: #729fcf;
 }
 input[type=submit] {
-    margin-top: 20px;
+    margin-top: 10px;
     height: 22px;
     background-color: #555753;
     color: #eeeeec;
@@ -1751,6 +1751,14 @@ div[id$="wrapper"] br {
 /**
  * 	contacts selector
  */
+.group-delete-wrapper {
+	margin: -28px 150px 0 0;
+    float: right;
+}
+#group-edit-submit-wrapper {
+    margin: 0 0 10px 0;
+    display: inline;
+}
 #group-edit-desc {
     margin: 10px 0px;
 }
@@ -2081,19 +2089,29 @@ div[id$="wrapper"] br {
  * Form fields
  */
 .field {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+	/*margin-bottom: 10px;*/
+	/*padding-bottom: 10px;*/
     overflow: auto;
     width: 100%;
 }
 .field label {
     float: left;
     width: 200px;
+	display: block;
+	font-size: 1.077em;
+	margin-bottom: 0.2em;
+	margin: 0 10px 0.2em 0;
+	border: 1px #999 solid;
+	padding: 5px;
+	vertical-align: middle;
 }
-
-.field input,
+.field input {
+	width: 250px;
+	height: 25px;
+	border: 1px #666 solid;
+}
 .field textarea {
-    width: 400px;
+    width: 80%;
 }
 .field textarea {
     height: 100px;
