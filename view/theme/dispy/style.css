@@ -414,8 +414,8 @@ div.jGrowl div.info {
     padding-left: 58px;
 }
 #nav-notifications-menu {
-    margin-top: 30px;
-    width: 255px;
+    margin: 30px 0 0 -45px;
+    width: 300px;
     max-height: 400px;
     overflow: auto;
     font-size: 9pt;
@@ -1021,6 +1021,7 @@ section {
 	/*border: 1px #aaa solid;*/
 	/*border-radius: 5px;*/
     padding: 0px;
+	overflow-x: auto;
 }
 .wall-item-photo-menu {
     display: none;
