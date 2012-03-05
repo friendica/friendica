@@ -104,4 +104,3 @@
 <div class="wall-item-comment-wrapper" >
 	$item.comment
 </div>
-tb

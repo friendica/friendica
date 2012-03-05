@@ -45,22 +45,24 @@
 	</div> 
 
 	<input type="submit" id="profile-jot-submit" class="button creation2" name="submit" value="$share" />
-
-	<button onclick="preview_post();" id="jot-preview-link" class="button creation1">$preview</button>
-
+  
+   <span onclick="preview_post();" id="jot-preview-link" class="tab button">$preview</span>
+   
 	<div id="profile-jot-perms" class="profile-jot-perms" style="display: $pvisit;" >
 		<a href="#profile-jot-acl-wrapper" id="jot-perms-icon" class="icon $lockstate"  title="$permset" ></a>$bang
 	</div>
-	<div id="profile-jot-perms-end"></div>
 
 
 	<div id="profile-jot-plugin-wrapper">
   	$jotplugins
 	</div>
-
+	
 	<div id="profile-rotator-wrapper" style="display: $visitor;" >
 		<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
 	</div> 
+	
+	</div>
+   <div id="profile-jot-perms-end"></div>
 	
 	<div id="jot-preview-content" style="display:none;"></div>
 
@@ -75,9 +77,8 @@
 	</div>
 
 
-</div>
 
-<div id="profile-jot-end"></div>
+
 </form>
 </div>
 		{{ if $content }}<script>initEditor();</script>{{ endif }}

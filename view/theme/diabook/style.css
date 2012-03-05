@@ -384,9 +384,7 @@ body {
   font-size: 13px;
   background-color: #ffffff;
   color: #2d2d2d;
-  margin-left: : auto;
-  margin-right: auto;
-  margin-top: 50px;
+  margin: 50px auto auto;
   display: table;
 }
 h4 {
@@ -1005,24 +1003,24 @@ section {
   display: table-cell;
   vertical-align: top;
   width: 800px;
-  padding: 0px 0px 0px 10px;
+  padding: 0px 0px 0px 12px;
 }
 .tabs {
     
     background-position: 0 -20px;
     background-repeat: repeat-x;
-    
     height: 27px;
     padding: 0;
  }
 .tab.button {
-    margin-right: 15px; 
-    margin-left: 15px;	
-    background: none repeat scroll 0 0 #F8F8F8;
+    margin-right: 5px; 
+    margin-left: 5px;	
+    /*background: none repeat scroll 0 0 #F8F8F8;*/
     border: 1px solid #CCCCCC;
     border-radius: 3px 3px 3px 3px;
-    font-weight: bold;
+    font-weight: normal;
     padding: 3px;
+    color:  #333333;
 	}
 /* wall item */
 .tread-wrapper {
@@ -1045,6 +1043,8 @@ section {
   display: table;
   width: 780px;
 }
+
+
 .wall-item-container .wall-item-item, .wall-item-container .wall-item-bottom {
   display: table-row;
 }
@@ -1221,8 +1221,12 @@ section {
 	border-right: 1px solid #A7C7F7;
 	padding-right: 12px;
 }
+
+#jot-preview-content{
+	margin-top: 30px;}
+	
 #jot-preview-content .tread-wrapper {
-  background-color: #fce94f;
+  background-color: #fff797;
 }
 
 .wall-item-tags {
@@ -1667,11 +1671,10 @@ ul.tabs {
 }
 ul.tabs li {
   float: left;
-  margin-left: 7px;
+  margin-left: 5px;
 }
 ul.tabs li .active {
-  background-color: #33ACFF;
-    background-image: -moz-linear-gradient(center top , #66C1FF 0%, #0097FF 100%);
+    background-color: #333333;
     border: 1px solid #777777;
     color: white;
     border-radius: 3px 3px 3px 3px;
