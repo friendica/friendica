@@ -611,8 +611,8 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 **/
 aside {
     position: absolute;
-    right: 8%;
-    width: 20.5%;
+    right: 15px;
+    width: 255px;
     font-size: smaller;
 }
 .vcard .fn {
@@ -672,7 +672,7 @@ aside #viewcontacts {
  **/
 #jot {
   /*width: 785px;*/
-  margin: 0px 0 20px 0px;
+  margin: 10px 0 20px 0px;
   width: 100%;
 }
 #jot #jot-tools {
@@ -956,7 +956,7 @@ aside #viewcontacts {
  * section
  */
 section {
-    margin: 20px 8% 0 6%;
+    margin: 20px 5% 0 6%;
     font-size: 0.8em;
     padding-right: 250px;
 	min-width: 475px;
@@ -965,7 +965,7 @@ section {
 /** tabs **/
 .tabs {
     list-style: none;
-    margin: 0;
+    margin: 10px 0 10px;
     padding: 0;
     border-bottom: 1px solid #729fcf;
     font-size: 14px;

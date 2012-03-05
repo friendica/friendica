@@ -19,15 +19,11 @@ function initEditor(cb) {
 				'transitionOut' : 'elastic'
 			});
 			$(".jothidden").show();
-			if (typeof cb!="undefined") {
-                cb();
-            }
+			if (typeof cb!="undefined") cb();
 			return;
 		}
-
 		tinyMCE.init({
 			theme : "advanced",
-            skin : "default",
 			mode : "specific_textareas",
 			editor_selector: $editselect,
 			auto_focus: "profile-jot-text",
@@ -51,9 +47,8 @@ function initEditor(cb) {
 			setup : function(ed) {
 				cPopup = null;
 				ed.onKeyDown.add(function(ed,e) {
-					if(cPopup !== null) {
+					if(cPopup !== null)
 						cPopup.onkey(e);
-                    }
 				});
 
 				ed.onKeyUp.add(function(ed, e) {
@@ -64,7 +59,7 @@ function initEditor(cb) {
 							cPopup = new ACPopup(this,baseurl+"/acl");
 						}
 						if(cPopup.ready && match[1]!==cPopup.searchText) cPopup.search(match[1]);
-						if(! cPopup.ready) { cPopup = null; }
+						if(! cPopup.ready) cPopup = null;
 					}
 					else {
 						if(cPopup !== null) { cPopup.close(); cPopup = null; }
@@ -102,9 +97,9 @@ function initEditor(cb) {
 					ed.pasteAsPlainText = true;
 					$("#profile-jot-text-loading").hide();
 					$(".jothidden").show();
-
-					if (typeof cb!="undefined") { cb(); }
+					if (typeof cb!="undefined") cb();
 				});
+
 			}
 		});
 		editor = true;
@@ -121,7 +116,7 @@ function initEditor(cb) {
 function charCounter() {
 	// character count part deux
 	$('#profile-jot-text').keyup(function(event) {
-		var textlen = $(this).val().length();
+		var textlen = $('#profile-jot-text').val().length();
 		var maxLen1 = 140;
 		var maxLen2 = 420;
 
@@ -141,7 +136,7 @@ function charCounter() {
 			$('#character-counter').removeClass('orange');
 			$('#character-counter').addClass('red');
 		}
-		$('#character-counter').html($(this).val().length);
+		$('#character-counter').html($('#profile-jot-text').val().length);
 	});
 }
 
@@ -149,7 +144,6 @@ function enableOnUser(){
 	if (editor) return;
 	$(this).val("");
 	initEditor();
-	charCounter();
 }
 
 </script>
@@ -163,6 +157,8 @@ function enableOnUser(){
 		/* enable tinymce on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
+		$("#profile-jot-text").focus(charCounter);
+		$("#profile-jot-text").click(charCounter);
 
 		var uploader = new window.AjaxUpload(
 			'wall-image-upload',
