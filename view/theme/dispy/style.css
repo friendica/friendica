@@ -232,7 +232,8 @@ nav a:hover {
 nav #banner {
 	display: block;
 	position: absolute;
-	margin-left: 20px;	
+	left: 51px;
+	top: 25px;
 }
 nav #banner #logo-text a {
 	font-size: 40px;
@@ -956,7 +957,7 @@ aside #viewcontacts {
  * section
  */
 section {
-    margin: 20px 5% 0 6%;
+    margin: 20px 6% 0 4%;
     font-size: 0.8em;
     padding-right: 250px;
 	min-width: 475px;
