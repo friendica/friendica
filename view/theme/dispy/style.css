@@ -1703,11 +1703,11 @@ div[id$="wrapper"] br {
 }
 
 #settings-nickname-desc {
-    background-color:#DDEFFF;
-    -webkit-border-radius:5px;
-    -moz-border-radius:5px;
-    border-radius:5px;
-    padding:5px;
+    background-color: #def;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 #register-form div,
@@ -2116,7 +2116,7 @@ div[id$="wrapper"] br {
 	margin: 0 10px 0.2em 0;
 	border: 1px #999 solid;
 	padding: 5px;
-	background: #f2eedf;
+	background: #def;
 	vertical-align: middle;
 }
 .field input {
@@ -2132,7 +2132,7 @@ div[id$="wrapper"] br {
 }
 .field_help {
     display: block;
-    margin-left: 0px;
+    margin-left: 222px;
     color: #666;
 }
 .field .onoff {
@@ -2142,25 +2142,19 @@ div[id$="wrapper"] br {
 .field .onoff a {
     display: block;
     border: 1px solid #666;
-    background: url("../../../images/onoff.jpg") no-repeat;
-    padding: 4px 2px 2px;
+    padding: 3px 6px 4px 10px;
     height: 16px;
     text-decoration: none;
 }
-.field .onoff .off {
-    border-color: #666;
-    padding-left: 40px;
-    background: #ccc left center;
-    color: #666;
-    text-align:right;
-}
 .field .onoff .on {
-    border-color:#204a87;
-    padding-right:40px;
-    background-position:right center;
-    background-color:#3465A4;
-    color:#fff;
-    text-align:left;
+	background: url("../../../images/onoff.jpg") no-repeat 42px 1px #def;
+    color: #333;
+    text-align: left;
+}
+.field .onoff .off {
+	background: url("../../../images/onoff.jpg") no-repeat 2px 1px #ccc;
+    color: #333;
+    text-align: right;
 }
 .hidden {
     display:none !important;
