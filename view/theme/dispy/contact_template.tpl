@@ -20,7 +20,8 @@
 	</div>
 	<div class="contact-entry-photo-end" ></div>
 		<div class="contact-entry-name" id="contact-entry-name-$contact.id" >$contact.name</div>
-	<div class="contact-entry-details" id="contact-entry-url-$contact.id" >$contact.itemurl</div>
+	<div class="contact-entry-details" id="contact-entry-url-$contact.id" >
+		<a href="$contact.itemurl" title="$contact.itemurl">Profile URL</a></div>
 	<div class="contact-entry-details" id="contact-entry-network-$contact.id" >$contact.network</div>
 
 	<div class="contact-entry-end" ></div>

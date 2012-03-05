@@ -1920,7 +1920,13 @@ div[id$="wrapper"] br {
 #item-delete-selected {
 	margin-top: 30px;
 }
-
+/* was tired of having no way of moving it around, so
+ * here's a little 'hook' to do so */
+.delete-checked {
+	position: absolute;
+	left: 35px;
+	margin-top: 20px;
+}
 #item-delete-selected-end {
 	clear: both;
 }
@@ -2102,13 +2108,15 @@ div[id$="wrapper"] br {
 }
 .field label {
     float: left;
-    width: 200px;
+    width: 275px;
 	display: block;
 	font-size: 1.077em;
+	/*font-weight: bold;*/
 	margin-bottom: 0.2em;
 	margin: 0 10px 0.2em 0;
 	border: 1px #999 solid;
 	padding: 5px;
+	background: #f2eedf;
 	vertical-align: middle;
 }
 .field input {

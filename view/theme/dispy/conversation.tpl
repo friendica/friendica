@@ -17,5 +17,7 @@
 {{ endfor }}
 
 {{ if $dropping }}
+<div class="delete-checked">
 <a href="#" onclick="deleteCheckedItems();return false;"><span class="icon delete"></span><span class="s22 text">$dropping</span></a>
+</div>
 {{ endif }}

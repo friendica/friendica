@@ -1,7 +1,8 @@
+<script type="text/javascript" src="$baseurl/library/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="$baseurl/js/ajaxupload.js"></script>
+<script type="text/javascript">
 
-<script language="javascript" type="text/javascript">
-
-var editor=false;
+var editor = false;
 var textlen = 0;
 var plaintext = '$editselect';
 // this is here because of the silly tinymce error. didn't help.
@@ -113,47 +114,16 @@ function initEditor(cb) {
 	}
 }
 
-function charCounter() {
-	// character count part deux
-	$('#profile-jot-text').keyup(function(event) {
-		var textlen = $('#profile-jot-text').val().length();
-		var maxLen1 = 140;
-		var maxLen2 = 420;
-
-		$('#character-counter').removeClass('jothidden');
-		if(textlen <= maxLen1) {
-			$('#character-counter').removeClass('red');
-			$('#character-counter').removeClass('orange');
-			$('#character-counter').addClass('grey');
-		}
-		if((textlen > maxLen1) && (textlen <= maxLen2)) {
-			$('#character-counter').removeClass('grey');
-			$('#character-counter').removeClass('red');
-			$('#character-counter').addClass('orange');
-		}
-		if(textlen > maxLen2) {
-			$('#character-counter').removeClass('grey');
-			$('#character-counter').removeClass('orange');
-			$('#character-counter').addClass('red');
-		}
-		$('#character-counter').html($('#profile-jot-text').val().length);
-	});
-}
-
 function enableOnUser(){
 	if (editor) return;
 	$(this).val("");
 	initEditor();
 }
 
-</script>
-<script type="text/javascript" src="$baseurl/js/ajaxupload.js" ></script>
-<script>
 	var ispublic = '$ispublic';
 	var addtitle = '$addtitle';
 
 	$(document).ready(function() {
-		
 		/* enable tinymce on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
@@ -308,6 +278,37 @@ function enableOnUser(){
 	}	
 
 	$geotag
+
+	function charCounter() {
+		// character count part deux
+		//$(this).val().length is not a function Line 282(3)
+		$('#profile-jot-text').keyup(function() {
+			var textlen = 0;
+			var maxLen1 = 140;
+			var maxLen2 = 420;
+
+			$('#character-counter').removeClass('jothidden');
+
+			textLen = $(this).val().length;
+			if(textLen <= maxLen1) {
+				$('#character-counter').removeClass('red');
+				$('#character-counter').removeClass('orange');
+				$('#character-counter').addClass('grey');
+			}
+			if((textLen > maxLen1) && (textlen <= maxLen2)) {
+				$('#character-counter').removeClass('grey');
+				$('#character-counter').removeClass('red');
+				$('#character-counter').addClass('orange');
+			}
+			if(textLen > maxLen2) {
+				$('#character-counter').removeClass('grey');
+				$('#character-counter').removeClass('orange');
+				$('#character-counter').addClass('red');
+			}
+			$('#character-counter').text( textLen );
+		});
+		$('#profile-jot-text').keyup();
+	}
 
 </script>
 
