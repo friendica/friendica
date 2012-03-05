@@ -1004,15 +1004,17 @@ section {
 .wall-item-content-wrapper {
     position: relative;
 	padding: 10px;
+	overflow-x: auto;
+	width: auto;
 }
 .wall-item-outside-wrapper .wall-item-comment-wrapper {
     /*margin-left: 90px;*/
 }
-.wall-item-content-wrapper.shiny {
+.shiny {
     background: #efefdf;
 }
 .wall-item-content {
-    overflow-x: auto;
+	overflow-x: auto;
 }
 [id^="tread-wrapper"], [class^="tread-wrapper"] {
     margin: 15px 0 0 0;
@@ -1090,13 +1092,13 @@ section {
 	clear: left;
 	font-size: 0.8em;
 	color: #878883;
-	margin: 20px 0 0 140px;
+	margin: 5px 0 5px 120px;
 }
 .wall-item-author, .wall-item-actions-author {
 	clear: left;
 	font-size: 0.8em;
 	color: #878883;
-	margin: 20px 0 0 140px;
+	margin: 20px 0 0 110px;
 }
 .wall-item-ago {
 	display: inline;
@@ -1215,8 +1217,8 @@ section {
 .wall-item-outside-wrapper.comment .wall-item-body {
     margin-left: 10px;
 }
-.wall-item-outside-wrapper.comment .wall-item-actions-author {
-    margin-left: 60px;
+.wall-item-outside-wrapper.comment .wall-item-author {
+    margin-left: 50px;
 }
 
 .wall-item-outside-wrapper.comment .wall-item-photo-menu {
@@ -1234,9 +1236,9 @@ section {
 	width: 20px;
 	height: 20px;
 }
-.comment-edit-photo-link {
+.comment-edit-photo-link, .comment-edit-photo {
 	float: left;
-	width: 40px;
+	margin-left: 10px;
 }
 .my-comment-photo {
     width: 40px;
@@ -1272,7 +1274,7 @@ section {
 }
 .comment-edit-submit-wrapper {
 	width: 90%;
-	margin-left: 0px;
+	margin: 5px 5px 10px 50px;
 	text-align: right;
 }
 .comment-edit-submit {
@@ -1290,11 +1292,13 @@ section {
  * item text style
  **/
 .wall-item-body code {
-	display:block;
-	padding-left:10px;
-	border-color:#ccc;
-	border-style:solid;
-	border-width:1px 1px 1px 10px;
+	display: block;
+	padding-left: 10px;
+	border-color: #ccc;
+	border-style: solid;
+	border-width: 1px 1px 1px 10px;
+	background: #eee;
+	width: 95%;
 }
 
 
@@ -2408,6 +2412,11 @@ div[id$="wrapper"] br {
 .icon.dim {
 	opacity: 0.3;
 	filter: alpha(opacity=30);
+}
+#pause {
+	position: fixed;
+	bottom: 5px;
+	right: 5px;
 }
 .border, .border:hover {
 	border: 1px solid #babdb6;
