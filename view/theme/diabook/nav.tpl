@@ -140,7 +140,7 @@
 
 <div style="position: fixed; bottom: 5px; right: 10px;"><a href="javascript:scroll(0,0); "><img src="images/scroll_top.png" title="scroll to top"></a></div>
 <div style="position: fixed; bottom: 5px; left: 25px;">$langselector</div>
-<div style="position: fixed; bottom: 25px; left: 5px;"><a href="http://pad.toktan.org/p/diabook" target="blank" ><img src="images/bug-x.gif" title="Fehlerreport für das Theme diaBook erstellen"/></a></div>
+<div style="position: fixed; bottom: 25px; left: 5px;"><a href="http://pad.toktan.org/p/diabook" target="blank" ><img src="images/ftdevs.gif" title="Fehlerreport für das Theme diaBook erstellen"/></a></div>
 
 
 {#
