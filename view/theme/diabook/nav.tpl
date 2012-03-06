@@ -1,6 +1,7 @@
 <header>
-	{# $langselector version 0.01#}
-
+	
+	
+	
 	<div id="site-location">$sitelocation</div>
 	<div id="banner">$banner</div>
 </header>
@@ -53,7 +54,15 @@
 					<li class="empty">$emptynotifications</li>
 				</ul>
 			</li>		
-		{{ endif }}					
+		{{ endif }}	
+			
+		{{ if $nav.search}}
+		<li id="search-box">
+			<form method="get" action="$nav.search.0">
+				<input id="search-text" class="nav-menu-search" type="text" value="" name="search">
+			</form>
+		</li>		
+		{{ endif }}	
 		
 		<li id="nav-site-linkmenu" class="nav-menu-icon"><a href="#" rel="#nav-site-menu"><span class="icon s22 gear">Site</span></a>
 			<ul id="nav-site-menu" class="menu-popup">
@@ -61,7 +70,13 @@
 
 				{{ if $nav.help }} <li><a class="$nav.help.2" target="friendika-help" href="$nav.help.0" title="$nav.help.3" >$nav.help.1</a></li>{{ endif }}
 
-										 <li><a class="$nav.search.2" href="$nav.search.0" title="$nav.search.3" >$nav.search.1</a></li>
+
+										<li ><a class="$nav.community.2" href="$nav.community.0" title="$nav.community.3" >$nav.community.1</a></li>
+
+
+										<li><a class="$nav.search.2" href="$nav.search.0" title="$nav.search.3" >$nav.search.1</a></li>
+										
+										<li><a class="$nav.search.2" href="friendica" title="About" >About</a></li>
 
 				{{ if $nav.settings }}<li><a class="menu-sep $nav.settings.2" href="$nav.settings.0" title="$nav.settings.3">$nav.settings.1</a></li>{{ endif }}
 				{{ if $nav.admin }}<li><a class="$nav.admin.2" href="$nav.admin.0" title="$nav.admin.3" >$nav.admin.1</a></li>{{ endif }}
@@ -122,6 +137,12 @@
 	</ul>	
 
 </nav>
+
+<div style="position: fixed; bottom: 5px; left: 25px;">$langselector</div>
+<div style="position: fixed; bottom: 7px; left: 5px;"><a href="http://pad.toktan.org/p/diabook" target="blank" ><img src="images/bug-x.gif" title="Fehlerreport für das Theme diaBook erstellen"></a></div>
+
+
+<a class="$nav.login.2" href="$nav.login.0" title="$nav.login.3" >$nav.login.1</a>
 
 
 
