@@ -122,6 +122,9 @@ function nav(&$a) {
 		}
 
 		$nav['messages'] = array('message', t('Messages'), "", t('Private mail'));
+		$nav['messages']['inbox'] = array('message', t('Inbox'), "", t('Inbox'));
+		$nav['messages']['outbox']= array('message/sent', t('Outbox'), "", t('Outbox'));
+		$nav['messages']['new'] = array('message/new', t('New Message'), "", t('New Message'));
 		
 		if(is_array($a->identities) && count($a->identities) > 1) {
 			$nav['manage'] = array('manage', t('Manage'), "", t('Manage other pages'));

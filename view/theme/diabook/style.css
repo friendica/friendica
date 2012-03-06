@@ -619,6 +619,7 @@ nav .nav-menu-search {
   margin: 3px 17px;
   margin-right: 0px;
   height: 17px;
+  width: 205px;
 }
 
 nav .nav-menu-icon {
@@ -856,7 +857,7 @@ aside {
   /* background: #F1F1F1; */
 }
 aside .vcard .fn {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   margin-bottom: 5px;
 }
@@ -1427,12 +1428,13 @@ section {
   margin-top: 10px;
 }
 #profile-jot-form #jot-title {
-  border: 0px;
-  margin: 0px;
-  height: 20px;
-  width: 700px;
-  font-weight: bold;
-  border: 1px solid #ffffff;
+    
+  	 border-radius: 5px 5px 5px 5px;
+    font-weight: bold;
+    height: 20px;
+    margin: 0 0 5px;
+    width: 60%;
+    border: 1px solid #ffffff;
 }
 #profile-jot-form #jot-title:-webkit-input-placeholder {
   font-weight: normal;
@@ -1883,7 +1885,12 @@ blockquote {
     padding-left: 9px;
     margin: 0 0 0 .8ex;
 }
-
+.aprofile dt{
+box-shadow: 1px 1px 5px 0;
+    color: #666666;
+    margin: 15px 0 5px;
+    padding-left: 5px;	
+	}
 /* ================== */
 /* = Contacts Block = */
 /* ================== */
