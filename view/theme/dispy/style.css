@@ -24,9 +24,9 @@ audio:not([controls]) {
     display: none;
 }
 
-/* =============================================================================
-   Base
-   ========================================================================== */
+/* 
+ *  Base
+ */
 
 /*
  * 1. Correct text resizing oddly in IE6/7 when body font-size is set using em units
@@ -613,14 +613,14 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 aside {
     position: absolute;
     right: 15px;
-    width: 255px;
+    width: 230px;
     font-size: smaller;
 }
 .vcard .fn {
 	font-size: 1.7em;
 	font-weight: bold;
 	border-bottom: 1px solid #729fcf;
-	padding-top: 3px;
+	padding-bottom: 3px;
 }
 .vcard #profile-photo-wrapper {
 	margin: 20px;
@@ -956,7 +956,7 @@ aside #viewcontacts {
 section {
     margin: 20px 6% 0 4%;
     font-size: 0.8em;
-    padding-right: 250px;
+    padding-right: 220px;
 	min-width: 475px;
 }
 
@@ -1002,7 +1002,6 @@ section {
 .wall-item-content-wrapper {
     position: relative;
 	padding: 10px;
-	overflow-x: auto;
 	width: auto;
 }
 .wall-item-outside-wrapper .wall-item-comment-wrapper {
@@ -1107,9 +1106,9 @@ section {
 	clear:both;
 }
 .wall-item-location {
-    margin-top: 5px;
+    margin-top: 10px;
     width: 100px;
-    overflow:hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
 }
@@ -1130,14 +1129,14 @@ section {
     display: none;
 }
 .wallwall .wwto {
-    left:-10px;
+    left: 5px;
     margin: 0;
-    position:absolute;
-    top:65px;
+    position: absolute;
+    top: 75px;
     width: 30px;
-    z-index:10001;
-    width:30px;
-    height:30px;
+    z-index: 10001;
+    width: 30px;
+    height: 30px;
 }
 .wallwall .wwto img {
     width: 30px !important;
@@ -1148,8 +1147,8 @@ section {
 }
 .wall-item-arrowphoto-wrapper {
     position: absolute;
-    left: 20px;
-    top: 70px;
+    left: 35px;
+    top: 80px;
     z-index: 10002;
 }
 .wall-item-photo-menu {
@@ -1732,11 +1731,11 @@ div[id$="wrapper"] br {
     margin: 30px 0px;
 }
 .profile-edit-side-div {
-    margin-top: 10px;
+    margin-top: 0px;
 }
 .profile-edit-side-link {
     float: right;
-    margin: 10px 20px -16px 0;
+    margin: 0px 20px -18px 0;
 }
 .profile-listing {
     float: left;
