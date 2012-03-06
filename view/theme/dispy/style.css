@@ -177,14 +177,14 @@ input[type=submit] {
 	padding: 1em;
 }
 .pager {
-	padding-top: 30px;
+	margin-top: 60px;
 	display: block;
 	clear: both;
 	text-align: center;
 }
 .pager span {
     padding: 4px;
-    margin:4px;
+    margin: 4px;
 }
 .pager_current {
     background-color: #729fcf;
@@ -618,19 +618,27 @@ aside {
 }
 .vcard .fn {
 	font-size: 1.7em;
-	font-weight: 700;
+	font-weight: bold;
 	border-bottom: 1px solid #729fcf;
-	padding-top: 1px;
+	padding-top: 3px;
 }
 .vcard #profile-photo-wrapper {
-	margin: 10px 0px;
+	margin: 20px;
+}
+.vcard #profile-photo-wrapper img {
+	box-shadow: 3px 3px 10px 0;
 }
 aside h4 {
 	font-size: 1.2em;
 }
-
 aside #viewcontacts {
 	text-align: right;
+}
+.aprofile dt {
+    box-shadow: 1px 1px 5px 0;
+    color: #666666;
+    margin: 15px 0 5px;
+    padding-left: 5px;
 }
 #profile-extra-links ul {
 	margin-left: 0px;
@@ -750,34 +758,27 @@ aside #viewcontacts {
 }
 #jot #jot-title {
     border: 0px;
-    margin: 0px;
+    margin: 0 0 5px;
     height: 20px;
-    width: 100%;
+    width: 90%;
     font-weight: bold;
-    border: 1px solid #ffffff;
     border-radius: 5px;
-}
-#jot #jot-title:-webkit-input-placeholder {
-  font-weight: normal;
-}
-#jot #jot-title:-moz-placeholder {
-  font-weight: normal;
-}
-#jot #jot-title:placeholder {
-  font-weight: normal;
+	vertical-align: middle;
+	padding: 5px 1px;
 }
 #jot #jot-title:hover,
 #jot #jot-title:focus {
-  border: 1px solid #999999;
+  border: 1px solid #999;
   border-radius: 5px;
 }
 #jot #character-counter {
-  width: 80px;
+  width: 40px;
   float: right;
   text-align: right;
   height: 20px;
   line-height: 20px;
-  padding-right: 20px;
+  padding: 5px;
+  margin: 0 0 5px;
 }
 #profile-jot-text_tbl {
 	margin-bottom: 10px;
@@ -795,10 +796,6 @@ aside #viewcontacts {
 #profile-video {
     float: left;
     margin-left: 10px;
-}
-#character-counter {
-    float:right;
-    padding:8px 10px;
 }
 #profile-rotator-wrapper {
 	float: right; 
@@ -1556,10 +1553,11 @@ div[id$="wrapper"] br {
 .view-contact-wrapper,
 .contact-entry-wrapper {
     float: left;
-    margin-right: 20px;
-    margin-bottom: 20px;
+    margin-right: 5px;
+    margin-bottom: 40px;
     width: 120px;
-    /*height: 120px;*/
+	height: 120px;
+	padding: 3px;
     position: relative;
 }
 .contact-direction-wrapper {
@@ -1703,13 +1701,15 @@ div[id$="wrapper"] br {
 }
 
 #settings-nickname-desc {
-    background-color: #def;
+    background-color: #eee;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
     padding: 5px;
 }
-
+#settings-default-perms {
+    margin-bottom: 20px;
+}
 #register-form div,
 #profile-edit-form div {
     clear: both;
@@ -2112,17 +2112,16 @@ div[id$="wrapper"] br {
 	display: block;
 	font-size: 1.077em;
 	/*font-weight: bold;*/
-	margin-bottom: 0.2em;
-	margin: 0 10px 0.2em 0;
+	margin: 0 10px 0.5em 0;
 	border: 1px #999 solid;
 	padding: 5px;
-	background: #def;
+	background: #eee;
 	vertical-align: middle;
 }
 .field input {
 	width: 250px;
 	height: 25px;
-	border: 1px #666 solid;
+	border: 1px #999 solid;
 }
 .field textarea {
     width: 80%;
@@ -2147,8 +2146,8 @@ div[id$="wrapper"] br {
     text-decoration: none;
 }
 .field .onoff .on {
-	background: url("../../../images/onoff.jpg") no-repeat 42px 1px #def;
-    color: #333;
+	background: url("../../../images/onoff.jpg") no-repeat 42px 1px #999;
+    color: #111;
     text-align: left;
 }
 .field .onoff .off {
