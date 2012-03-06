@@ -25,7 +25,7 @@
 				<span class="icon contacts">$nav.contacts.1</span></a>
 				<span id="intro-update" class="nav-notify"></span>
 				<ul id="nav-contacts-menu" class="menu-popup">
-					<li id="nav-contacts-see-intro"><a href="$nav.notifications.0">Kontaktanfragen</a><span id="intro-update" class="nav-notify"></span></li>
+					<li id="nav-contacts-see-intro"><a href="$nav.notifications.0">$nav.introductions.1</a><span id="intro-update" class="nav-notify"></span></li>
 					<li id="nav-contacts-all"><a href="contacts">$nav.contacts.1</a></li> 
 				</ul>
 			</li>	
@@ -38,9 +38,9 @@
 				<span id="mail-update" class="nav-notify"></span>
 				<ul id="nav-messages-menu" class="menu-popup">
 					<li id="nav-messages-see-all"><a href="$nav.messages.0">$nav.messages.1</a></li>
-					<li id="nav-messages-inbox"><a href="$nav.messages.0">Eingang</a></li>
-					<li id="nav-messages-outbox"><a href="message/sent">Ausgang</a></li>
-					<li id="nav-messages-new"><a href="message/new">Neue Nachricht</a></li>
+					<li id="nav-messages-see-all"><a href="$nav.messages.inbox.0">$nav.messages.inbox.1</a></li>
+					<li id="nav-messages-see-all"><a href="$nav.messages.outbox.0">$nav.messages.outbox.1</a></li>
+					<li id="nav-messages-see-all"><a href="$nav.messages.new.0">$nav.messages.new.1</a></li>
 				</ul>
 			</li>		
 			{{ endif }}
@@ -138,17 +138,10 @@
 
 </nav>
 
+<div style="position: fixed; bottom: 5px; right: 10px;"><a href="javascript:scroll(0,0); "><img src="view/theme/diabook/icons/scroll_top.png" title="scroll to top"></a></div>
 <div style="position: fixed; bottom: 5px; left: 25px;">$langselector</div>
-<div style="position: fixed; bottom: 7px; left: 5px;"><a href="http://pad.toktan.org/p/diabook" target="blank" ><img src="images/bug-x.gif" title="Fehlerreport für das Theme diaBook erstellen"></a></div>
+<div style="position: fixed; bottom: 25px; left: 5px;"><a href="http://pad.toktan.org/p/diabook" target="blank" ><img src="view/theme/diabook/icons/ftdevs.gif" title="Fehlerreport für das Theme diaBook erstellen"/></a></div>
 
-
-<a class="$nav.login.2" href="$nav.login.0" title="$nav.login.3" >$nav.login.1</a>
-
-
-
-<ul id="nav-notifications-template" style="display:none;" rel="template">
-	<li class="{4}"><a href="{0}"><img src="{1}" height="24" width="24" alt="" />{2} <span class="notif-when">{3}</span></a></li>
-</ul>
 
 {#
 
