@@ -142,6 +142,10 @@
 <div style="position: fixed; bottom: 5px; left: 25px;">$langselector</div>
 <div style="position: fixed; bottom: 25px; left: 5px;"><a href="http://pad.toktan.org/p/diabook" target="blank" ><img src="view/theme/diabook/icons/ftdevs.gif" title="Fehlerreport für das Theme diaBook erstellen"/></a></div>
 
+<ul id="nav-notifications-template" style="display:none;" rel="template">
+	<li><a href="{0}"><img src="{1}">{2} <span class="notif-when">{3}</span></a></li>
+</ul>
+
 
 {#
 
