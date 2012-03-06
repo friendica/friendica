@@ -782,8 +782,8 @@ function smilies($s, $sample = false) {
 		'<a href="http://project.friendika.com">~friendika <img src="' . $a->get_baseurl() . '/images/friendika-16.png" alt="~friendika" /></a>',
 		'<a href="http://friendica.com">~friendica <img src="' . $a->get_baseurl() . '/images/friendica-16.png" alt="~friendica" /></a>',
 //		'<a href="http://diasporafoundation.org">Diaspora<img src="' . $a->get_baseurl() . '/images/diaspora.png" alt="Diaspora*" /></a>',
-		'<img src="' . $a->get_baseurl() . '/images/beard.jpg" alt=":beard" />',
-		'<img src="' . $a->get_baseurl() . '/images/whitebeard.jpg" alt=":whitebeard" />'
+		'<img src="' . $a->get_baseurl() . '/images/smiley-beard.png" alt=":beard" />',
+		'<img src="' . $a->get_baseurl() . '/images/smiley-whitebeard.png" alt=":whitebeard" />'
 	);
 
 	$params = array('texts' => $texts, 'icons' => $icons, 'string' => $s);
