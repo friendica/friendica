@@ -5,7 +5,13 @@ Making Friends
 
 Friendship in Friendica can take on a great many different meanings. But let's keep it simple, you want to be friends with somebody. How do you do it?
 
-The first thing you can do is look at the Directory for somebody you would like to connect with. Visit their profile. Just beneath their profile picture will be the word 'Connect' (we're assuming this is an English language profile).
+The easiest thing to do is to join the <a href = "http://kakste.com/profile/newhere">New Here</a> group.  This group is especially for people new to the Friendica network.  Simply connect to the group, post to the wall, and make new friends.  You don't even have to like us - comment on a few of our posts, and other people will start to add you too.
+
+The next thing you can do is look at the Directory.  The directory is split up into two parts.  If you click the directory button, you will be presented with a list of all members (who chose to be listed) on your server.  You'll also see a link to the Global Directory.  If you click through to the global directory, you will be presented with a list of everybody who chose to be listed across all instances of Friendica.  You will also see a "Show Community Forums" link, which will direct you to Groups, Forums and Fanpages.  You connect to people, groups and forums in the same way, except groups and forums will automatically accept your introduction request, whereas a human will approve you manually.
+
+To connect with other Friendica user
+
+Visit their profile. Just beneath their profile picture will be the word 'Connect' (we're assuming this is an English language profile).
 
 Click that. It will take you to a "Connect" form.
 
@@ -22,6 +28,7 @@ You *could* also put in the URL of your "home" page, such as "http://demo.friend
 When you've submitted the connection page, it will take you back to your own site where you must then login (if necessary) and verify the connection request on *your* site. Once you've done this, the two websites can communicate with each other to complete the process (after your new friend has approved the request). 
 
 If you already know somebody's Identity Address, you can enter it in the "connect" box on your "Contacts" page. This will take you through a similar process.
+
 
 **Alternate Networks**
 

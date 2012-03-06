@@ -4,17 +4,18 @@ Bugs and Issues
 * [Home](help)
 
 
-Please report any bugs/issues you encounter using our bug tracker at [[http://bugs.friendica.com]]
+If your server has a support page, you should report any bugs/issues you encounter there first.  Reporting to your support page before reporting to the developers makes their job easier, as they don't have to deal with bug reports that might not have anything to do with them, and that helps us get new features faster.
 
-Try to provide as much information as you can about the bug (including the full text of any error messages or notices), and if possible your Friendica version.
+If you're a technical user, or your site doesn't have a support page, you'll need to use the <a href = "http://bugs.friendica.com/">Bug Tracker</a>.  Please perform a search to see if there's already an open bug that matches yours before submitting anything.
 
-Your Friendica version may be found in newer releases by visiting http://YOURFRIENDICASITE/friendica
+Try to provide as much information as you can about the bug, including the **full** text of any error messages or notices, and any steps required to replicate the problem in as much detail as possible.  It's generally better to provide too much information than not enough.
 
-For older versions, view the HTML source of your profile page. The Friendica version is in the HTML header, 5-10 lines from the top of the page.
+<a href = "http://www.chiark.greenend.org.uk/~sgtatham/bugs.html">See this article</a> to learn more about submitting **good** bug reports.
 
-For really old versions which don't have a version number in the HTML header - please upgrade. Your bug was probably fixed a long time ago. 
 
 **Bug Sponsorship**
+
+If you find a bug, and it is caused by a problem in main branch (ie, is not specific to our site), you may sponsor it.
 
 The bug/issue database allows you to sponsor issues. This provides an incentive for developers to work on your issue. This isn't necessary - we don't like bugs and will try to fix them. This has more importance for future development projects and feature requests.
 

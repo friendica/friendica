@@ -6,7 +6,9 @@ Account Basics
 
 **Registration**
 
-Not all Friendica sites allow open registration. If registration is allowed, you will see a "Register" link immediately below the login prompts on the site home page. Following this link will take you to the site Registration page.
+Not all Friendica sites allow open registration. If registration is allowed, you will see a "Register" link immediately below the login prompts on the site home page. Following this link will take you to the site registration page.  The strength of our network is that lots of different sites are all completely compatible with each other.  If the site you're visting doesn't allow registration, or you think you might prefer another one, you can find a <a href ="http://dir.friendica.com/siteinfo">list of public servers here</a>, and find one that meets your needs.  
+
+If you'd like to have your own server, you can do that too.  Visit <a href = "http://friendica.com/download">the Friendica website</a> to download the code with setup instructions.  It's a very simple install process that anybody experienced in hosting websites, or with basic Linux experience can handle easily.
 
 *OpenID*
 
@@ -14,11 +16,11 @@ The first field on the Registration page is for an OpenID address. If you do not
 
 *Your Full Name*
 
-Please provide your full name as you would like it to be displayed on this system.
+Please provide your full name **as you would like it to be displayed on this system**.  Most people use their real name for this, but you're under no obligation to do so yourself.
 
 *Email Address*
 
-Please provide a valid email address. Your email address is **never** published. We need this to send you account information and your login details. You may also occasionally receive notifications of incoming messages or items requiring your attention, but you have the ability to completely disable these from your Settings page once you have logged in.     
+Please provide a valid email address. Your email address is **never** published. We need this to send you account information and your login details. You may also occasionally receive notifications of incoming messages or items requiring your attention, but you have the ability to completely disable these from your Settings page once you have logged in.  This doesn't have to be your primary email address, but it does need to be a real email address.  You can't get your initial password, or reset a lost password later without it.  This is the only bit of personal information that has to be accurate.
 
 *Nickname*
 
@@ -28,12 +30,12 @@ A nickname is used to generate web addresses for many of your personal pages, an
 
 *Directory Publishing*
 
-The Registration form also allows you to choose whether or not to list your account in the online directory. This is like a "phone book" and you may choose to be unlisted. We recommend that you select 'Yes' so that other people (friends, family, etc.) will be able to find you. If you choose 'No', you will essentially be invisible and have few opportunities for interaction. Whichever you choose, this can be changed any time from your Settings page after you login.  
-
+The Registration form also allows you to choose whether or not to list your account in the online directory. This is like a "phone book" and you may choose to be unlisted. We recommend that you select 'Yes' so that other people (friends, family, etc.) will be able to find you. If you choose 'No', you will essentially be invisible and have few opportunities for interaction. Whichever you choose, this can be changed any time from your Settings page after you login. 
 
 *Register*
 
-Once you have provided the necessary details, click the 'Register' button. An email will be sent to you providing your account login details. Some sites may require administrator approval before the registration is processed, and you will be alerted if this is the case. Please watch your email (including spam folders) for your registration approval. 
+Once you have provided the necessary details, click the 'Register' button. An email will be sent to you providing your account login details. Please watch your email (including spam folders) for your registration details and initial password. 
+
 
 
 
@@ -58,6 +60,11 @@ After your first login, please visit the 'Settings' page from the top menu bar a
 A ['Tips for New Members'](newmember) link will show up on your home page for two weeks to provide some important Getting Started information.
 
 
+**Retrieving Personal Data**
+
+You can export a copy of your personal data in XML format from the "Export personal data" link at the top of your settings  page.
+
+
 **See Also**
 
 * [Profiles](help/Profiles)
@@ -66,4 +73,3 @@ A ['Tips for New Members'](newmember) link will show up on your home page for tw
 
 * [Remove Account](help/Remove-Account)
 
- 
