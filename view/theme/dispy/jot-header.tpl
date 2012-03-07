@@ -1,12 +1,7 @@
-<script type="text/javascript" src="$baseurl/library/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="$baseurl/js/ajaxupload.js"></script>
 <script type="text/javascript">
-
 var editor = false;
 var textlen = 0;
 var plaintext = '$editselect';
-// this is here because of the silly tinymce error. didn't help.
-var skin = 'default';
 
 function initEditor(cb) {
 	if (editor==false) {
@@ -119,7 +114,9 @@ function enableOnUser(){
 	$(this).val("");
 	initEditor();
 }
-
+</script>
+<script type="text/javascript" src="$baseurl/js/ajaxupload.js"></script>
+<script type="text/javascript">
 	var ispublic = '$ispublic';
 	var addtitle = '$addtitle';
 
@@ -127,6 +124,7 @@ function enableOnUser(){
 		/* enable tinymce on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
+		/* enable character counter */
 		$("#profile-jot-text").focus(charCounter);
 		$("#profile-jot-text").click(charCounter);
 

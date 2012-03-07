@@ -584,26 +584,26 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	border:2px solid #f8911b;
 	border-bottom:0;
 	padding-bottom: 50px;
-	z-index:1000;
+	z-index: 1000;
 }
 #sysmsg {
-	position:fixed;
-	bottom:0;
-	-moz-box-shadow:0 0 5px #888;
-	-webkit-box-shadow:0 0 5px #888;
-	box-shadow:0 0 5px #888;
+	position: fixed;
+	bottom: 0;
+	-moz-box-shadow: 0 0 5px #888;
+	-webkit-box-shadow: 0 0 5px #888;
+	box-shadow: 0 0 5px #888;
     padding: 10px;
-	background-color:#fcaf3e;
-	border:2px solid #f8911b;
-	border-bottom:0;
+	background-color: #fcaf3e;
+	border: 2px solid #f8911b;
+	border-bottom: 0;
 	padding-bottom: 50px;
-	z-index:1000;
+	z-index: 1000;
 }
 #sysmsg_info br,
 #sysmsg br {
-	display:block;
-	margin:2px 0px;
-	border-top:1px solid #ccccce;
+	display: block;
+	margin: 2px 0px;
+	border-top: 1px solid #ccccce;
 }
 
 
@@ -757,7 +757,7 @@ aside #viewcontacts {
     margin-top: 10px;
 }
 #jot #jot-title {
-    border: 0px;
+	border: 1px solid #aaa;
     margin: 0 0 5px;
     height: 20px;
     width: 90%;
@@ -765,11 +765,6 @@ aside #viewcontacts {
     border-radius: 5px;
 	vertical-align: middle;
 	padding: 5px 1px;
-}
-#jot #jot-title:hover,
-#jot #jot-title:focus {
-  border: 1px solid #999;
-  border-radius: 5px;
 }
 #jot #character-counter {
   width: 40px;
@@ -1013,12 +1008,12 @@ section {
 .wall-item-content {
 	overflow-x: auto;
 }
+/* removing it from here, vs. putting it in .wall-item-content
+ * might break things for people. we shall see ;) */
 [id^="tread-wrapper"], [class^="tread-wrapper"] {
     margin: 15px 0 0 0;
-	/*border: 1px #aaa solid;*/
-	/*border-radius: 5px;*/
     padding: 0px;
-	overflow-x: auto;
+	/*overflow-x: auto;*/
 }
 .wall-item-photo-menu {
     display: none;
@@ -1159,7 +1154,7 @@ section {
 	position: absolute;
 	left: -2px; top: 101px;
 	display: none;
-	z-index: 10000;
+	z-index: 10003;
 	-webkit-border-radius: 0px 5px 5px 5px;
 	-moz-border-radius: 0px 5px 5px 5px;
 	border-radius: 0px 5px 5px 5px;
@@ -2581,17 +2576,17 @@ footer {
 
 /* autocomplete popup */
 .acpopup {
-	max-height:150px;
-	background-color:#555753;
-	color: #FFFFFF;
-	overflow:auto;
-	z-index:100000;
-	border:1px solid #cccccc;
+	max-height: 150px;
+	background-color: #555753;
+	color: #fff;
+	overflow: auto;
+	z-index: 100000;
+	border: 1px solid #cccccc;
 }
 .acpopupitem {
-	background-color:#555753;
+	background-color: #555753;
     padding: 4px;
-	clear:left;
+	clear: left;
 }
 .acpopupitem img {
 	float: left;

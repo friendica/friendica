@@ -12,7 +12,8 @@
 		<input type="hidden" name="post_id" value="$post_id" />
 		<input type="hidden" name="preview" id="jot-preview" value="0" />
 
-		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body">{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>
+		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body">{{ if $content }}$content{{ else }}$share{{ endif }}
+		</textarea>
 
 		<div id="jot-tools" class="jothidden" style="display:none">
 			<span class="icon border camera"><a href="#" onclick="return false;" id="wall-image-upload" title="$upload"></a></span>
@@ -24,16 +25,13 @@
 			<span class="icon border noglobe"><a id="profile-nolocation" onclick="jotClearLocation();return false;" title="$noloc"></a></span>
 			$jotplugins
 			<ul id="profile-jot-submit-wrapper">
-				<li>
-					<a class="icon-text-preview pointer"></a><a id="jot-preview-link" class="pointer" onclick="preview_post(); return false;" title="$preview">$preview</a>
-				</li>
-
 				<li id="profile-jot-perms" class="profile-jot-perms">
 					<a id="jot-perms-icon" href="#profile-jot-acl-wrapper" class="icon $lockstate $bang" title="$permset"></a>
 				</li>
-
 				<li><input type="submit" id="profile-jot-submit" name="submit" value="$share" /></li>
-
+				<li>
+					<a class="icon-text-preview pointer"></a><a id="jot-preview-link" class="pointer" onclick="preview_post(); return false;" title="$preview">$preview</a>
+				</li>
 			</ul>
 			<span id="profile-rotator" class="loading" style="display: none">
 				<img src="images/rotator.gif" alt="$wait" title="$wait" /></span>
