@@ -15,41 +15,58 @@
 		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body">{{ if $content }}$content{{ else }}$share{{ endif }}
 		</textarea>
 
-		<div id="jot-tools" class="jothidden" style="display:none">
-			<span class="icon border camera"><a href="#" onclick="return false;" id="wall-image-upload" title="$upload"></a></span>
-			<span class="icon border attach"><a href="#" onclick="return false;" id="wall-file-upload" title="$attach"></a></span>
-			<span class="icon border link"><a id="profile-link" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;" title="$weblink"></a></span>
-			<span class="icon border video"><a id="profile-video" onclick="jotVideoURL();return false;" title="$gvideo"></a></span>
-			<span class="icon border audio"><a id="profile-audio" onclick="jotAudioURL();return false;" title="$audio"></a></span>
-			<span class="icon border globe"><a id="profile-location" onclick="jotGetLocation();return false;" title="$setloc"></a></span>
-			<span class="icon border noglobe"><a id="profile-nolocation" onclick="jotClearLocation();return false;" title="$noloc"></a></span>
-			$jotplugins
-			<ul id="profile-jot-submit-wrapper">
-				<li id="profile-jot-perms" class="profile-jot-perms">
-					<a id="jot-perms-icon" href="#profile-jot-acl-wrapper" class="icon $lockstate $bang" title="$permset"></a>
-				</li>
-				<li><input type="submit" id="profile-jot-submit" name="submit" value="$share" /></li>
-				<li>
-					<a class="icon-text-preview pointer"></a><a id="jot-preview-link" class="pointer" onclick="preview_post(); return false;" title="$preview">$preview</a>
-				</li>
-			</ul>
-			<span id="profile-rotator" class="loading" style="display: none">
-				<img src="images/rotator.gif" alt="$wait" title="$wait" /></span>
+
+<div id="jot-tools" class="jothidden" style="display:none">
+	<div id="profile-jot-submit-wrapper" class="jothidden">
+
+		<div id="profile-upload-wrapper" style="display: $visitor;">
+			<div id="wall-image-upload-div"><a class="icon border camera" href="#" onclick="return false;" id="wall-image-upload" title="$upload"></a></div>
 		</div>
+		<div id="profile-attach-wrapper" style="display: $visitor;">
+			<div id="wall-file-upload-div"><a class="icon border attach" href="#" onclick="return false;" id="wall-file-upload" title="$attach"></a></div>
+		</div>
+		<div id="profile-link-wrapper" style="display: $visitor;" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);">
+			<a class="icon border link" id="profile-link" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;" title="$weblink"></a>
+		</div>
+		<div id="profile-video-wrapper" style="display: $visitor;">
+			<a class="icon border video" id="profile-video" onclick="jotVideoURL();return false;" title="$video"></a>
+		</div>
+		<div id="profile-audio-wrapper" style="display: $visitor;">
+			<a class="icon border audio" id="profile-audio" onclick="jotAudioURL();return false;" title="$audio"></a>
+		</div>
+		<div id="profile-location-wrapper" style="display: $visitor;">
+			<a class="icon border globe" id="profile-location" onclick="jotGetLocation();return false;" title="$setloc"></a>
+		</div>
+		<div id="profile-nolocation-wrapper" style="display: none;">
+			<a class="icon border noglobe" id="profile-nolocation" onclick="jotClearLocation();return false;" title="$noloc"></a>
+		</div>
+
+		<div id="profile-jot-plugin-wrapper">
+		$jotplugins
+		</div>
+
+	<a class="icon-text-preview pointer"></a><a id="jot-preview-link" class="pointer" onclick="preview_post(); return false;" title="$preview">$preview</a>
+	<input type="submit" id="profile-jot-submit" name="submit" value="$share" />
+	<div id="profile-jot-perms" class="profile-jot-perms">
+		<a id="jot-perms-icon" href="#profile-jot-acl-wrapper" class="icon $lockstate $bang" title="$permset"></a>
 	</div>
+	<span id="profile-rotator" class="loading" style="display: none"><img src="images/rotator.gif" alt="$wait" title="$wait" /></span>
+	</div>
+
+	</div> <!-- /#profile-jot-submit-wrapper -->
+</div> <!-- /#jot-tools -->
 	
 	<div id="jot-preview-content" style="display:none;"></div>
-
 	<div style="display: none;">
 		<div id="profile-jot-acl-wrapper" style="width:auto;height:auto;overflow:auto;">
 			$acl
-			<hr style="clear:both"/>
-			<div id="profile-jot-email-label">$emailcc</div><input type="text" name="emailcc" id="profile-jot-email" title="$emtitle" />
+			<hr style="clear:both" />
+			<div id="profile-jot-email-label">$emailcc</div>
+			<input type="text" name="emailcc" id="profile-jot-email" title="$emtitle" />
 			<div id="profile-jot-email-end"></div>
 			$jotnets
 		</div>
 	</div>
 
 </form>
-
 {{ if $content }}<script>initEditor();</script>{{ endif }}

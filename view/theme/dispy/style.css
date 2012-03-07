@@ -143,7 +143,10 @@ a:hover {
 }
 .required {
     display: inline;
-    color: #ff0000;
+    color: #ff0;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 3px;
 }
 .fakelink, .lockview {
     color: #3465a4;
@@ -613,7 +616,8 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 aside {
     position: absolute;
     right: 15px;
-    width: 230px;
+    width: 245px;
+	padding-top: 15px;
     font-size: smaller;
 }
 .vcard .fn {
@@ -687,7 +691,7 @@ aside #viewcontacts {
 #jot #jot-tools {
   margin: 0px;
   padding: 0px;
-  height: 40px;
+  height: 35px;
   overflow: none;
   width: 100%;
   /*background-color: #0e232e;*/
@@ -757,23 +761,21 @@ aside #viewcontacts {
     margin-top: 10px;
 }
 #jot #jot-title {
-	border: 1px solid #aaa;
+	border: 1px solid #ccc;
     margin: 0 0 5px;
     height: 20px;
     width: 90%;
     font-weight: bold;
     border-radius: 5px;
 	vertical-align: middle;
-	padding: 5px 1px;
 }
 #jot #character-counter {
-  width: 40px;
-  float: right;
-  text-align: right;
-  height: 20px;
-  line-height: 20px;
-  padding: 5px;
-  margin: 0 0 5px;
+	width: 6%;
+	float: right;
+	text-align: right;
+	height: 15px;
+	line-height: 20px;
+	padding: 2px 20px 5px 0;
 }
 #profile-jot-text_tbl {
 	margin-bottom: 10px;
@@ -782,15 +784,15 @@ aside #viewcontacts {
 	width:99.900002% !important;
 }
 #profile-attach-wrapper,
-#profile-audio,
+#profile-audio-wrapper,
 #profile-link-wrapper,
-#profile-location,
-#profile-nolocation,
+#profile-location-wrapper,
+#profile-nolocation-wrapper,
 #profile-title-wrapper,
 #profile-upload-wrapper,
-#profile-video {
+#profile-video-wrapper {
     float: left;
-    margin-left: 10px;
+	margin: 0 20px 0 0;
 }
 #profile-rotator-wrapper {
 	float: right; 
@@ -821,9 +823,10 @@ aside #viewcontacts {
 	padding: 5px;
 }
 #jot-preview-link {
-    margin: 0 0 0 25px;
+    margin: 0 0 0 10px;
     border: 0;
     text-decoration: none;
+	float: right;
 }
 .icon-text-preview {
 	margin: 0 0 -18px 0;
@@ -833,9 +836,10 @@ aside #viewcontacts {
     background: url(icons.png) no-repeat -128px -40px;
     border: 0;
     text-decoration: none;
+	float: right;
 }
 #profile-jot-perms { 
-	/*float: right;*/
+	float: right;
     background-color: #555753;
     height: 22px;
     width: 20px;
@@ -846,16 +850,17 @@ aside #viewcontacts {
     border: 0px;
     margin: 0 -4px 0 10px;
 }
+#profile-jot-plugin-wrapper {
+	width: 1px;
+	margin: 10px 0 0 0;
+	float: right;
+}
 #profile-jot-submit-wrapper {
 	float: right;
-	width: 30%;
+	width: 100%;
 	list-style: none;
 	margin: 10px 0 0 0;
 	padding: 0;
-}
-#profile-jot-submit-wrapper li {
-	display: inline-block;
-	vertical-align: middle;
 }
 #profile-jot-submit {
 	height: 22px;
@@ -866,6 +871,7 @@ aside #viewcontacts {
 	border-radius: 0 5px 5px 0;
 	border: 0;
 	margin: 0;
+	float: right;
 }
 #jot-perms-icons {
 	background-color: #555753;
@@ -951,7 +957,7 @@ aside #viewcontacts {
 section {
     margin: 20px 6% 0 4%;
     font-size: 0.8em;
-    padding-right: 220px;
+    padding-right: 230px;
 	min-width: 475px;
 }
 
@@ -1726,11 +1732,10 @@ div[id$="wrapper"] br {
     margin: 30px 0px;
 }
 .profile-edit-side-div {
-    margin-top: 0px;
+    margin: 5px 2px 0 0;
 }
 .profile-edit-side-link {
     float: right;
-    margin: 0px 20px -18px 0;
 }
 .profile-listing {
     float: left;
@@ -2119,8 +2124,6 @@ div[id$="wrapper"] br {
 }
 .field textarea {
     width: 80%;
-}
-.field textarea {
     height: 100px;
 }
 .field_help {
@@ -2152,7 +2155,6 @@ div[id$="wrapper"] br {
 .hidden {
     display:none !important;
 }
-
 .field.radio .field_help {
     margin-left: 0;
 }
@@ -2280,12 +2282,12 @@ div[id$="wrapper"] br {
 .icon.drophide, .icon.delete {
     float: left;
 }
-.icon.s22 {
+/*.icon.s22 {
 	display: block;
 	background: url(icons.png) no-repeat;
 	width: 22px;
 	height: 22px;
-}
+}*/
 .icon.s22.delete {
 	display: block;
 	background-position: -110px 0;
