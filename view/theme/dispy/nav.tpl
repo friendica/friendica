@@ -69,6 +69,9 @@ works -->
         {{ if $nav.contacts }}
         <li><a id="nav-contacts-link" class="nav-commlink $nav.contacts.2" href="$nav.contacts.0" title="$nav.contacts.1">$nav.contacts.1</a></li>
         {{ endif }}
+		{{ if $nav.introductions }}
+	    <li><a id="nav-intro-link" class="nav-commlink $nav.introductions.2 $sel.introductions" href="$nav.introductions.0" title="$nav.introductions.3" >$nav.introductions.1</a></li>
+		{{ endif }}
         {{ if $nav.profiles }}
         <li><a id="nav-profiles-link" class="nav-commlink $nav.profiles.2" href="$nav.profiles.0" title="$nav.profiles.1">$nav.profiles.1</a></li>
         {{ endif }}
@@ -105,6 +108,9 @@ works -->
         {{ if $nav.messages }}
         <a id="mail-update" class="nav-ajax-left" href="$nav.messages.0" title="$nav.messages.1"></a>
         {{ endif }}
+		{{if $nav.introductions }}
+		<a id="intro-update" class="nav-ajax-left" href="$nav.introductions.0"></a>
+		{{ endif }}
     </div>
 
 </div>

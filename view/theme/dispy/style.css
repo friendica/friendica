@@ -344,6 +344,12 @@ nav .nav-link {
 #nav-home-link:hover {
     background-position: -66px -132px;
 }
+#nav-intro-link {
+	background-position: 0px -190px;
+}
+#nav-intro-link:hover {
+	background-position: -44px -190px;
+}
 #nav-login-link {
 	background-position: 0 -88px;
 }
@@ -504,6 +510,9 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 #home-update {
 	background-position: -90px 0px;
 }
+#intro-update {
+	background-position: -120px 0px;
+}
 #lang-select-icon {
 	cursor: pointer;
 	position: absolute;
@@ -514,7 +523,6 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
     position: absolute;
     top: 0;
     left: 16px;
-    padding-right: 50px;
 }
 .menu-popup {
     position: absolute;
@@ -933,10 +941,6 @@ aside #viewcontacts {
 #jot-title-wrapper {
 	margin-bottom: 5px;
 }
-#jot-title {
-	border: 1px solid #cccccc;
-	width: 90%;
-}
 #jot-title-display {
 	font-weight: bold;
 }
@@ -1107,7 +1111,7 @@ section {
 	clear:both;
 }
 .wall-item-location {
-    margin-top: 10px;
+    margin-top: 15px;
     width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1735,6 +1739,7 @@ div[id$="wrapper"] br {
     margin: 5px 2px 0 0;
 }
 .profile-edit-side-link {
+	margin: 0 20px -18px 0;
     float: right;
 }
 .profile-listing {
