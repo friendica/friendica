@@ -214,6 +214,17 @@
   padding: 1px;
 }
 
+.icon.border.camera{
+  background-image: url("../../../view/theme/diabook/icons/camera.png"); 
+  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
+	}
+	
+.icon.border.link{
+  background-image: url("../../../view/theme/diabook/icons/weblink.png"); 
+  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
+  margin-left: 10px;
+	}
+
 .icon.text {
   text-indent: 0px;
 }
@@ -615,12 +626,20 @@ nav #logo-text {
 }
 nav .nav-menu-search {
   position: relative;
-  
+
   margin: 3px 17px;
   margin-right: 0px;
   height: 17px;
-  width: 205px;
+  width: 180px;
+  
 }
+
+nav #search-box #search-text {
+  background-image:  url('icons/lupe.png');
+  background-repeat:no-repeat;
+  padding-left:20px;
+	}
+
 
 nav .nav-menu-icon {
   position: relative;
@@ -871,14 +890,14 @@ aside .vcard dl {
 aside .vcard dt {
   float: left;
   margin-left: 0px;
-  width: 35%;
+  /*width: 35%;*/
   text-align: right;
   color: #999999;
 }
 aside .vcard dd {
   float: left;
-  margin-left: 4px;
-  width: 60%;
+  margin-left: 5px;
+  /*width: 60%;*/
 }
 aside #profile-extra-links ul {
   padding: 0px;
@@ -1016,6 +1035,12 @@ section {
   width: 800px;
   padding: 0px 0px 0px 12px;
 }
+.pager {
+   padding: 10px;
+	text-align: center;
+	font-size: 1.0em;
+}	
+
 .tabs {
     
     background-position: 0 -20px;
