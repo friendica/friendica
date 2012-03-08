@@ -470,7 +470,7 @@ function network_content(&$a, $update = 0) {
 
 		if(count($r)) {
 			foreach($r as $rr)
-				if(! array_key_exists($rr['item_id'],$parents_arr))
+				if(! array_key_exists($rr['item_id'],array_keys($parents_arr,'item_id',true)))
 					$parents_arr[] = $rr['item_id'];
 			$parents_str = implode(', ', $parents_arr);
 
