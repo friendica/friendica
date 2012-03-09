@@ -45,12 +45,18 @@ body {
     font-size: 16px;
     line-height: 1.1em;
 }
-
 body, button, input, select, textarea {
     font-family: sans-serif;
     color: #222;
     background-color: rgb(254,254,254);
-    background-color: rgba(254,254,254,255);
+}
+select {
+	border: 1px #555 dotted;
+	padding: 3px;
+	margin: 2px;
+}
+option {
+	padding: 3px;
 }
 /* remember to define focus styles! */
 :focus {
@@ -1992,7 +1998,9 @@ div[id$="wrapper"] br {
     text-decoration: none;
     text-align: center;
 }
-
+#peoplefind-sidebar form {
+	margin-bottom: 10px;
+}
 #sidebar-new-group:hover {
     /*background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #b20202), color-stop(1, #d60808) );*/
     /*background: -moz-linear-gradient( center top, #b20202 5%, #d60808 100% );*/
@@ -2002,6 +2010,18 @@ div[id$="wrapper"] br {
 #sidebar-new-group:active {
     position: relative;
     top: 1px;
+}
+#side-peoplefind-url {
+    background-color: #e5e0cf;
+    color: #666;
+	border: 1px 666 solid;
+	margin-right: 3px;
+	width: 75%;
+}
+#side-peoplefind-url:hover, #side-peoplefind-url:focus {
+    background-color: #efefef;
+    color: #222;
+	border: 1px 333 solid;
 }
 .nets-ul {
     list-style-type: none;
@@ -2110,7 +2130,7 @@ div[id$="wrapper"] br {
     overflow: auto;
     width: 100%;
 }
-.field label {
+.field label, label {
     float: left;
     width: 275px;
 	display: block;
@@ -2122,7 +2142,7 @@ div[id$="wrapper"] br {
 	background: #eee;
 	vertical-align: middle;
 }
-.field input {
+.field input, input[type="text"] {
 	width: 250px;
 	height: 25px;
 	border: 1px #999 solid;
