@@ -515,7 +515,7 @@ header {
   top: 0px;
   margin: 0px;
   padding: 0px;
-  width: 20%;
+  width: 22%;
   height: 32px;
   background: #1872a2;
   background-color: #1872a2;
@@ -529,8 +529,9 @@ header #site-location {
 }
 header #banner {
   overflow: hidden;
-  text-align: center;
-  width: 100%;
+  text-align: banner;
+  width: 82%;
+  margin-left: 25%;
 }
 header #banner a,
 header #banner a:active,
@@ -556,12 +557,12 @@ nav {
   width: 80%;
   height: 32px;
   position: fixed;
-  left: 20%;
+  left: 22%;
   top: 0px;
   padding: 0px;
   background: #1872a2;
-  color: #1872a2;
-  z-index: 100;
+  color: #ffffff;
+  z-index: 99;
   border-bottom: 1px;
   border-bottom-color: black;
   border-bottom-style: inset;
@@ -1036,6 +1037,9 @@ section {
   width: 800px;
   padding: 0px 0px 0px 12px;
 }
+#contact-edit-end {
+  margin-top: 140%;
+	}
 .pager {
    padding: 10px;
 	text-align: center;
