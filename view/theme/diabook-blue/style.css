@@ -102,12 +102,11 @@
 .icon.recycle 	{ background-image: url("../../../view/theme/diabook-blue/icons/recycle.png");}
 .icon.remote-link { background-image: url("../../../view/theme/diabook-blue/icons/remote.png");}
 .icon.tagged    { background-image: url("../../../view/theme/diabook-blue/icons/tagged.png");}
-.icon.unstarred    { background-image: url("../../../view/theme/diabook-blue/icons/star.png");}
-.icon.star    { background-image: url("../../../view/theme/diabook-blue/icons/star.png");}
+.star-item.icon.unstarred { background-image: url("../../../view/theme/diabook-blue/icons/unstarred.png");}
+.star-item.icon.starred { background-image: url("../../../view/theme/diabook-blue/icons/starred.png");}
 .icon.link		{ background-image: url("../../../view/theme/diabook-blue/icons/link.png");}
 .icon.lock		{ background-image: url("../../../view/theme/diabook-blue/icons/lock.png");}
 .icon.unlock		{ background-image: url("../../../view/theme/diabook-blue/icons/unlock.png");}
-.icon.isstar    { background-image: url("../../../view/theme/diabook-blue/icons/isstar.png");}
 .icon.language    { background-image: url("../../../view/theme/diabook-blue/icons/language.png");}
 
 
@@ -1078,9 +1077,7 @@ section {
   top: -10px;
   width: 16px;
 }
-.unstarred {
-  display: none;
-}
+
 .wall-item-container {
   display: table;
   width: 780px;

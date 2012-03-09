@@ -1,6 +1,5 @@
 {{ if $item.indent }}{{ else }}
 <div class="wall-item-decor">
-	<span class="icon isstar $item.isstarred" id="starred-$item.id" title="$item.star.starred">$item.star.starred</span>
 	{{ if $item.lock }}<span class="icon lock fakelink" onclick="lockview(event,$item.id);" title="$item.lock">$item.lock</span>{{ endif }}	
 	<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 </div>
@@ -62,11 +61,9 @@
 
 
 			{{ if $item.star }}
-				<a href="#" id="star-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classdo"  title="$item.star.do" >
-					<img src="images/star_dummy.png" class="icon star" alt="$item.star.do" /> </a>
-				<a href="#" id="unstar-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo">
-					<img src="images/star_dummy.png" class="icon star" alt="$item.star.undo" /> </a>
-				<a href="#" id="tagger-$item.id" class="icon tagged" onclick="itemTag($item.id); return false;" class="$item.star.classtagger" title="$item.star.tagger">$item.star.tagger</a>
+				<a href="#" id="starred-$item.id" onclick="dostar($item.id); return false;" class="star-item icon $item.isstarred" title="$item.star.toggle">
+				<img src="images/star_dummy.png" class="icon star" alt="$item.star.do" /> </a>
+				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item icon tagged" title="$item.star.tagger"></a>					  
 			{{ endif }}	
 			
 			{{ if $item.plink }}<a class="icon link" title="$item.plink.title" href="$item.plink.href">$item.plink.title</a>{{ endif }}

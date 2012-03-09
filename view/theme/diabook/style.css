@@ -101,13 +101,12 @@
 .icon.pencil 	{ background-image: url("../../../view/theme/diabook/icons/pencil.png");}
 .icon.recycle 	{ background-image: url("../../../view/theme/diabook/icons/recycle.png");}
 .icon.remote-link { background-image: url("../../../view/theme/diabook/icons/remote.png");}
-.icon.tagged    { background-image: url("../../../view/theme/diabook/icons/tagged.png");}
-.icon.unstarred    { background-image: url("../../../view/theme/diabook/icons/star.png");}
-.icon.star    { background-image: url("../../../view/theme/diabook/icons/star.png");}
+.icon.tagged    { background-image: url("../../../view/theme/diabook/icons/tagged.png");}  
+.star-item.icon.unstarred { background-image: url("../../../view/theme/diabook/icons/unstarred.png");}
+.star-item.icon.starred { background-image: url("../../../view/theme/diabook/icons/starred.png");}
 .icon.link		{ background-image: url("../../../view/theme/diabook/icons/link.png");}
 .icon.lock		{ background-image: url("../../../view/theme/diabook/icons/lock.png");}
 .icon.unlock		{ background-image: url("../../../view/theme/diabook/icons/unlock.png");}
-.icon.isstar    { background-image: url("../../../view/theme/diabook/icons/isstar.png");}
 .icon.language    { background-image: url("../../../view/theme/diabook/icons/language.png");}
 
 
@@ -1077,9 +1076,7 @@ section {
   top: -10px;
   width: 16px;
 }
-.unstarred {
-  display: none;
-}
+
 .wall-item-container {
   display: table;
   width: 780px;
