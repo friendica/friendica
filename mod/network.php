@@ -403,7 +403,8 @@ function network_content(&$a, $update = 0) {
 
 		if(count($r)) {
 			$a->set_pager_total($r[0]['total']);
-			$a->set_pager_itemspage(40);
+	                $itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
+                        $a->set_pager_itemspage(((intval($itemspage_network)) ? $itemspage_network : 40));
 		}
 		$pager_sql = sprintf(" LIMIT %d, %d ",intval($a->pager['start']), intval($a->pager['itemspage']));
 	}

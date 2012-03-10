@@ -30,6 +30,7 @@ $nickname_block
 {{inc field_checkbox.tpl with $field=$allowloc }}{{endinc}}
 {{inc field_select.tpl with $field=$theme }}{{endinc}}
 {{inc field_input.tpl with $field=$ajaxint }}{{endinc}}
+{{inc field_input.tpl with $field=$itemspage_network }}{{endinc}}
 
 
 <div class="settings-submit-wrapper" >

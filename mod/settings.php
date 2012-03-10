@@ -237,6 +237,10 @@ function settings_post(&$a) {
 	if($browser_update < 10000)
 		$browser_update = 40000;
 
+	$itemspage_network   = ((x($_POST,'itemspage_network')) ? intval($_POST['itemspage_network']) : 40);
+	if($itemspage_network > 100)
+                $itemspage_network = 40;
+
 
 	$allow_location   = (((x($_POST,'allow_location')) && (intval($_POST['allow_location']) == 1)) ? 1: 0);
 	$publish          = (((x($_POST,'profile_in_directory')) && (intval($_POST['profile_in_directory']) == 1)) ? 1: 0);
@@ -331,6 +335,7 @@ function settings_post(&$a) {
 
 	set_pconfig(local_user(),'system','suggestme', $suggestme);
 	set_pconfig(local_user(),'system','update_interval', $browser_update);
+	set_pconfig(local_user(),'system','itemspage_network', $itemspage_network);
 
 	$r = q("UPDATE `user` SET `username` = '%s', `email` = '%s', `openid` = '%s', `timezone` = '%s',  `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `notify-flags` = %d, `page-flags` = %d, `default-location` = '%s', `allow_location` = %d, `theme` = '%s', `maxreq` = %d, `expire` = %d, `openidserver` = '%s', `blockwall` = %d, `hidewall` = %d, `blocktags` = %d  WHERE `uid` = %d LIMIT 1",
 			dbesc($username),
@@ -648,6 +653,9 @@ function settings_content(&$a) {
 
 	$browser_update = intval(get_pconfig(local_user(), 'system','update_interval'));
 	$browser_update = (($browser_update == 0) ? 40 : $browser_update / 1000); // default if not set: 40 seconds
+
+	$itemspage_network = intval(get_pconfig(local_user(), 'system','itemspage_network'));
+	$itemspage_network = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : 40); // default if not set: 40 items
 	
 	if(! strlen($a->user['timezone']))
 		$timezone = date_default_timezone_get();
@@ -814,6 +822,7 @@ function settings_content(&$a) {
 		'$allowloc' => array('allow_location', t('Use Browser Location:'), ($a->user['allow_location'] == 1), ''),
 		'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes),
 		'$ajaxint'   => array('browser_update',  t("Update browser every xx seconds"), $browser_update, t('Minimum of 10 seconds, no maximum')),
+		'$itemspage_network'   => array('itemspage_network',  t("Number of items to display on the network page:"), $itemspage_network, t('Maximum of 100 items')),
 
 		'$h_prv' 	=> t('Security and Privacy Settings'),
 
