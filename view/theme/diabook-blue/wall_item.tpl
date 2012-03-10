@@ -46,7 +46,7 @@
 
 		</div>
 		<div class="wall-item-actions">
-			<div class="wall-item-location">$item.location&nbsp;</div>
+
 			<div class="wall-item-actions-social">
 			
 			
@@ -82,7 +82,7 @@
 					<a class="icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>
 				{{ endif }}
 			</div>
-			
+			<div class="wall-item-location">$item.location&nbsp;</div>
 		</div>
 	</div>
 	<div class="wall-item-bottom">

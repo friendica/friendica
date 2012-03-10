@@ -13,6 +13,7 @@ $a->theme_info = array(
 
 $a->page['htmlhead'] .= <<< EOT
 <script>
+
 //contacts
 $('html').click(function() {
  $('#nav-contacts-linkmenu').removeClass('selected');
@@ -62,5 +63,5 @@ $('html').click(function() {
  $('#nav-site-linkmenu').click(function(event){
      event.stopPropagation();
  });
-</script>
+</script> 
 EOT;
