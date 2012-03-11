@@ -2643,3 +2643,10 @@ footer {
     display: inline-block;
 }
 
+
+@media handheld {
+    body {
+        font-size: 15pt;
+    }
+}
+

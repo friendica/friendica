@@ -42,7 +42,7 @@ html {
 }
 body {
     margin: 0;
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.1em;
 }
 body, button, input, select, textarea {
@@ -2638,3 +2638,9 @@ footer {
     display: inline-block;
 }
 
+
+@media handheld {
+	body {
+		font-size: 15pt;
+	}
+}
