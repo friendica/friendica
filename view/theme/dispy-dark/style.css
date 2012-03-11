@@ -80,7 +80,7 @@ mark {
 /* Redeclare monospace font family: h5bp.com/j */
 pre, code, kbd, samp, .wall-item-body code {
     font-family: monospace, monospace;
-    _font-family: 'courier new', monospace;
+    _font-family: monospace;
     font-size: 1em; }
 
 /* Improve readability of pre-formatted text in all browsers */
@@ -667,8 +667,10 @@ aside #viewcontacts {
 	text-align: right;
 }
 .aprofile dt {
-    box-shadow: 1px 1px 5px 0;
-    color: #666666;
+	background: #eec;
+	color: #2e2f2e;
+	font-weight: bold;
+    box-shadow: 1px 1px 5px 0 #000;
     margin: 15px 0 5px;
     padding-left: 5px;
 }
@@ -1289,6 +1291,7 @@ section {
 	border-style: solid;
 	border-width: 1px 1px 1px 10px;
 	background: #eee;
+	color: #2e2f2e;
 	width: 95%;
 }
 
@@ -1658,8 +1661,9 @@ div[id$="wrapper"] br {
 }
 .contact-photo-menu {
     width: auto;
-    border: 2px solid #444444;
-    background: #FFFFFF;
+    border: 2px solid #444;
+    background: #2e2f2e;
+	color: #eec;
     position: absolute;
     left: 0px; top: 90px;
     display: none;
