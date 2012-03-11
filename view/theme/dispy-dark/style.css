@@ -1,5 +1,5 @@
 /*
- * dispy
+ * dispy-dark
  *
  * modernised, sort of, by simon <http://simon.kisikew.org/>
  *
@@ -47,8 +47,9 @@ body {
 }
 body, button, input, select, textarea {
     font-family: sans-serif;
-    color: #222;
-    background-color: rgb(254,254,254);
+    color: #eec;
+	/*background-color: #2e3436;*/
+	background-color: #2e2f2e;
 }
 select {
 	border: 1px #555 dotted;
@@ -66,13 +67,13 @@ option {
 
 /* remember to highlight inserts somehow! */
 ins {
-    background-color: #ff9;
-    color: #000;
+    background-color: #2e302e;
+    color: #ff9;
     text-decoration: none;
 }
 mark {
-    background-color: #ff9;
-    color: #000;
+    background-color: #2e302e;
+    color: #ff9;
     font-style: italic;
     font-weight: bold;
 }
@@ -118,15 +119,20 @@ img {
     /*vertical-align: middle;*/
 }
 a {
-    color: #3465a4;
+    color: #88a9d2;
     text-decoration: none;
     margin-bottom: 1px;
+	text-decoration: none;
 }
+/*a:hover {                 */
+/*    text-decoration: none;*/
+/*}*/
 a:hover img {
     text-decoration: none;
 }
 blockquote {
-    background: #eee;
+    background: #444;
+	color: #eec;
     text-indent: 5px;
     padding: 5px;
     border: 1px #aaa solid;
@@ -145,17 +151,18 @@ a:hover {
     margin: 3px;
 }
 .fakelink, .lockview {
-    color: #3465a4;
+    color: #729fcf;
     cursor: pointer;
 }
 .fakelink:hover {
     color: #729fcf;
 }
 input[type=submit] {
+	font-weight: bold;
+    background-color: #eee;
+	color: #2e302e;
     margin-top: 10px;
     height: 22px;
-    background-color: #555753;
-    color: #eeeeec;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
@@ -171,7 +178,7 @@ input[type=submit] {
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 	border: 1px solid #fff;
-	background-color: #2e3436;
+	background-color: #2e302e;
 	color: #eeeeec;
 	padding: 1em;
 }
@@ -211,7 +218,7 @@ input[type=submit] {
 nav {
 	height: 60px;
 	display: block;
-	background-color: #2e3436;
+	background-color: #1d1f1d;
 	color: #eeeeec;
 	position: relative;
 	padding: 20px 20px 10px 95px;
@@ -280,7 +287,7 @@ ul#user-menu-popup li a {
 	padding: 5px;
 }
 ul#user-menu-popup li a:hover {
-	color: #2e3436;
+	color: #2e302e;
 	background-color: #eeeeec;
 }
 ul#user-menu-popup li a.nav-sep {
@@ -461,7 +468,8 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
     top: 20px;
     right: 1%;
     padding: 5px;
-    background: #2e3436;
+    background: #1d1f1d;
+	color: transparent;
     border-radius: 5px;
     z-index: 100;
 }
@@ -475,12 +483,12 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	height: 22px;
 	overflow: hidden;
 	margin: 0px;
-	background: transparent url(icons.png) -190px -60px no-repeat;
+	background: transparent url(icons.png) -190px -60px no-repeat; 
 }
 .nav-ajax-update, .nav-ajax-left {
 	width: 30px;
 	height: 19px;
-	background: transparent url(notifications.png) 0 0 no-repeat;
+	background: transparent url(notifications.svg) 0 0 no-repeat;
 	color: #222;
 	font-weight: bold;
 	font-size: 0.8em;
@@ -633,8 +641,24 @@ aside {
 .vcard #profile-photo-wrapper {
 	margin: 20px;
 }
+/* http://css-tricks.com/snippets/css/css-box-shadow/
+ * box-shadow:
+ * 1. The horizontal offset of the shadow, positive means
+ * the shadow will be on the right of the box, a negative
+ * offset will put the shadow on the left of the box.
+ * 2. The vertical offset of the shadow, a negative one
+ * means the box-shadow will be above the box, a
+ * positive one means the shadow will be below the box.
+ * 3. The blur radius (optional), if set to 0 the shadow
+ * will be sharp, the higher the number, the more blurred
+ * it will be.
+ * 4. The spread radius (optional), positive values increase
+ * the size of the shadow, negative values decrease the size.
+ * Default is 0 (the shadow is same size as blur).
+ * 5. Colo[u]r
+ */
 .vcard #profile-photo-wrapper img {
-	box-shadow: 3px 3px 10px 0;
+	box-shadow: 3px 3px 10px 0 #000;
 }
 aside h4 {
 	font-size: 1.2em;
@@ -707,51 +731,11 @@ aside #viewcontacts {
 }
 #jot #jot-tools span a {
     display: block;
-    /*color: #cccccc;    */
-    /*width: 100%;       */
-    /*height: 40px;      */
-    /*text-align: center;*/
-    /*line-height: 40px; */
-    /*overflow: hidden;*/
 }
-/*#jot #jot-tools li:hover {*/
-    /*background-color: #364e59;*/
-/*}*/
 #jot #jot-tools .perms {
     float: right;
     width: 40px;
 }
-/*#jot #jot-tools .perms a.unlock {*/
-/*    width: 30px;                    */
-/*    border-left: 10px solid #cccccc;*/
-/*    background-color: #cccccc;      */
-/*}*/
-/*#jot #jot-tools .perms a.lock {*/
-/*    width: 30px;                    */
-/*    border-left: 10px solid #666666;*/
-/*    background-color: #666666;      */
-/*}*/
-/*#jot #jot-tools li.submit {            */
-/*    float: right;                      */
-/*    background-color: #cccccc;         */
-/*    border-bottom: 2px solid #cccccc;  */
-/*    border-right: 1px solid #666666;   */
-/*    border-left: 1px solid #666666;    */
-/*}                                      */
-/*#jot #jot-tools li.submit input {      */
-/*    border: 0px;                       */
-/*    margin: 0px;                       */
-/*    padding: 0px;                      */
-/*    background-color: #cccccc;         */
-/*    color: #666666;                    */
-/*    width: 80px;                       */
-/*    height: 40px;                      */
-/*    line-height: 40px;                 */
-/*}                                      */
-/*#jot #jot-tools li.submit input:hover {*/
-/*    background-color: #bdcdd4;         */
-/*    color: #666666;                    */
-/*}                                      */
 #jot #jot-tools li.loading {
     float: right;
     background-color: #ffffff;
@@ -976,16 +960,19 @@ section {
     padding: 0 5px;
 }
 .tab:hover {
-    background-color: #729fcf;
-    color: #eeeeec;
+    background-color: #88a9d2;
+    color: #111;
     border: 0px;
 }
 .tab:active {
-    background-color: #729fcf;
-    color: #eeeeec;
+    background-color: #88a9d2;
+    color: #111;
     border: 0px;
 }
-
+.tab.active {
+	background-color: #88a9d2;
+    color: #111;
+}
 
 /**
  * 	items
@@ -1009,7 +996,7 @@ section {
     /*margin-left: 90px;*/
 }
 .shiny {
-    background: #efefdf;
+    background: #2e3436;
 }
 .wall-item-content {
 	overflow-x: auto;
@@ -1250,9 +1237,9 @@ section {
 }
 .comment-edit-text-empty {
 	height: 20px;
-	border: 2px #babdd6 solid;
+	border: 2px #c8bebe solid;
 	border-radius: 5px;
-	color: #babdb6;
+	color: #c8bebe;
 	-webkit-transition: all 0.5s ease-in-out;
 	-moz-transition: all 0.5s ease-in-out;
 	-o-transition: all 0.5s ease-in-out;
@@ -1701,11 +1688,12 @@ div[id$="wrapper"] br {
 }
 
 #settings-nickname-desc {
-    background-color: #eee;
+    background-color: #eec;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
     padding: 5px;
+	color: #111;
 }
 #settings-default-perms {
     margin-bottom: 20px;
@@ -1742,16 +1730,18 @@ div[id$="wrapper"] br {
     float: left;
     margin: 20px 20px 0px 0px;
 }
-
 #profile-edit-links ul {
     margin: 20px 0;
     padding: 0;
     list-style: none;
 }
-
 #register-sitename {
     display: inline;
     font-weight: bold;
+}
+#advanced-expire-popup {
+	background: #2e2f2e;
+	color: #eec;
 }
 
 /**
@@ -1957,8 +1947,8 @@ div[id$="wrapper"] br {
 }
 .group-selected, .nets-selected {
     padding: 3px;
-    border: 1px solid #CCCCCC;
-    background: #F8F8F8;
+    border: 1px solid #f8f8f8;
+    background: #2e302e;
     font-weight: bold;
 }
 .groupsideedit {
@@ -2003,9 +1993,9 @@ div[id$="wrapper"] br {
     top: 1px;
 }
 #side-peoplefind-url {
-    background-color: #e5e0cf;
-    color: #666;
-	border: 1px 666 solid;
+    background-color: #2e2f2e;
+    color: #eec;
+	border: 1px 999 solid;
 	margin-right: 3px;
 	width: 75%;
 }
@@ -2128,10 +2118,11 @@ div[id$="wrapper"] br {
 	font-size: 1.077em;
 	/*font-weight: bold;*/
 	margin: 0 10px 0.5em 0;
-	border: 1px #999 solid;
+	border: 1px #2e2f2e solid;
 	padding: 5px;
-	background: #eee;
+	background: #eec;
 	vertical-align: middle;
+	color: #111;
 }
 .field input, input[type="text"] {
 	width: 250px;
@@ -2145,7 +2136,7 @@ div[id$="wrapper"] br {
 .field_help {
     display: block;
     margin-left: 297px;
-    color: #666;
+    color: #aaa;
 }
 .field .onoff {
     float: left;
@@ -2172,7 +2163,7 @@ div[id$="wrapper"] br {
     display:none !important;
 }
 .field.radio .field_help {
-    margin-left: 0;
+    margin-left: 297px;
 }
 
 
@@ -2182,8 +2173,8 @@ div[id$="wrapper"] br {
 .popup { 	
 	width: 100%;
     height: 100%;
-	top:0px;
-    left:0px;
+	top: 0px;
+    left: 0px;
 	position: absolute;
 	display: none;
 }
@@ -2289,6 +2280,7 @@ div[id$="wrapper"] br {
     background: url(icons.png) no-repeat;
     border: 0;
     text-decoration: none;
+	border-radius: 5px;
 }
 .icon:hover {
     border: 0;
@@ -2298,12 +2290,6 @@ div[id$="wrapper"] br {
 .icon.drophide, .icon.delete {
     float: left;
 }
-/*.icon.s22 {
-	display: block;
-	background: url(icons.png) no-repeat;
-	width: 22px;
-	height: 22px;
-}*/
 .icon.s22.delete {
 	display: block;
 	background-position: -110px 0;
@@ -2611,7 +2597,7 @@ footer {
 	margin-right: 4px;
 }
 .acpopupitem.selected {
-	color: #2e3436;
+	color: #2e302e;
     background-color: #eeeeec;
 }
 .qcomment-wrapper {
