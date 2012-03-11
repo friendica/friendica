@@ -928,10 +928,15 @@ aside #viewcontacts {
     display: none;
 }
 #jot-preview-content {
-    background-color: #ffffe0;
-    border: 1px #aaaa00 solid;
+    background-color: #3e3f3e;
+	color: #eec;
+    border: 1px #eec solid;
     border-radius: 3px;
     padding: 3px 3px 6px 10px;
+}
+#jot-preview-content .wall-item-outside-wrapper {
+	border: 0;
+	border-radius: 0px;
 }
 
 
