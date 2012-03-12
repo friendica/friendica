@@ -962,6 +962,10 @@ aside #side-peoplefind-url {
   widht: 55px;
   height: 55px;
 }
+#lost-password-link {
+  float: left;
+  margin-right: 20px;	
+	}
 /* widget */
 .widget {
   margin-bottom: 2em;
@@ -1058,7 +1062,8 @@ body .pageheader{
    padding: 10px;
 	text-align: center;
 	font-size: 1.0em;
-	margin-top: 140%;
+	clear: both;
+	display: block;
 }	
 .tabs {
     
