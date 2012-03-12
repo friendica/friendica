@@ -177,8 +177,8 @@
 
 .icon.on             { background-image: url("../../../view/theme/diabook/icons/toogle_on.png"); background-repeat: no-repeat;}
 .icon.off            { background-image: url("../../../view/theme/diabook/icons/toogle_off.png"); background-repeat: no-repeat;}
-.prev           { background-position: -90px  -60px;}
-.next           { background-position: -110px -60px;}
+.icon.prev           { background-image: url("../../../view/theme/diabook/icons/prev.png"); background-repeat: no-repeat;}
+.icon.next           { background-image: url("../../../view/theme/diabook/icons/next.png"); background-repeat: no-repeat;}
 /*.tagged     { background-position: -130px -60px;}*/
 
 .attachtype {
@@ -247,7 +247,7 @@
   background-image: url("../../../images/icons/10/edit.png");
 }
 .icon.s10.star {
-  background-image: url("../../../images/icons/10/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s10.menu {
   background-image: url("../../../images/icons/10/menu.png");
@@ -285,7 +285,7 @@
   background-image: url("../../../images/icons/16/edit.png");
 }*/
 .icon.s16.star {
-  background-image: url("../../../images/icons/16/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s16.menu {
   background-image: url("../../../images/icons/16/menu.png");
@@ -323,7 +323,7 @@
   background-image: url("../../../images/icons/22/edit.png");
 }
 .icon.s22.star {
-  background-image: url("../../../images/icons/22/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s22.menu {
   background-image: url("../../../images/icons/22/menu.png");
@@ -361,7 +361,7 @@
   background-image: url("../../../images/icons/48/edit.png");
 }
 .icon.s48.star {
-  background-image: url("../../../images/icons/48/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s48.menu {
   background-image: url("../../../images/icons/48/menu.png");
@@ -400,6 +400,7 @@ body {
   margin: 50px auto auto;
   display: table;
 }
+
 h4 {
   font-size: 1.1em;
 }
@@ -704,21 +705,17 @@ nav #nav-user-linkmenu
 nav #nav-user-linkmenu{
 	margin-right: 0px;
 	}
-nav #nav-home-link{
+nav #nav-home-link, #nav-directory-link, #nav-apps-link{
 	margin-left: 0px;
+	margin-right: 0px;
 	font-weight: bold;
+	margin: 3px 5px;
 	}
 nav #nav-directory-link{
-	margin-left: 0px;
-	margin-right: 0px;
-	font-weight: bold;
-	margin: 3px 15px;
+  margin-right: 0px;	
 	}
-nav #nav-apps-link{
-	margin-left: 0px;
-	margin-right: 0px;
-	font-weight: bold;
-	margin: 3px 15px;
+nav #nav-home-link{
+  margin-left: 0px;	
 	}
 nav #nav-help-link .menu-popup,
 nav #nav-search-link .menu-popup,
@@ -866,6 +863,8 @@ ul.menu-popup .empty {
         padding: 7px 7px 0px 0px;
 }
 
+
+
 /* aside */
 aside {
   display: table-cell;
@@ -876,6 +875,7 @@ aside {
   float: left;
   /* background: #F1F1F1; */
 }
+
 aside .vcard .fn {
   font-size: 18px;
   font-weight: bold;
@@ -1036,6 +1036,13 @@ section {
   width: 800px;
   padding: 0px 0px 0px 12px;
 }
+
+body .pageheader{
+  text-align: center;
+  margin-top: 25px;
+  font-size: 0px;
+	}
+
 #id_username {
   width: 173px;	
 	}
@@ -1046,7 +1053,6 @@ section {
   width: 173px;	
 	}
 #contact-edit-end {
-   
 	}
 .pager {
    padding: 10px;
@@ -1972,10 +1978,22 @@ box-shadow: 1px 1px 5px 0;
 }
 
 #prvmail-submit {
-	float: left;
+	float: right;
 	margin-top: 10px;
-	margin-right: 30px;
 }
+#prvmail-subject
+{
+background: none repeat scroll 0 0 #FFFFFF;
+border: 1px solid #CCCCCC;
+border-radius: 5px 5px 5px 5px;
+font-weight: bold;
+height: 20px;
+margin: 0 0 5px;
+vertical-align: middle;
+}
+#prvmail-form{
+ width: 597px;	
+	}
 #prvmail-upload-wrapper,
 #prvmail-link-wrapper,
 #prvmail-rotator-wrapper {
@@ -2163,14 +2181,25 @@ a.mail-list-link {
         padding: 10px;
         float: left;
 }
+.lightbox{
+	float: left;
+	}
 
 #photo-photo {
         float: left;
 }
 #photo-like-div .wall-item-like-buttons {
-	float: left;
-   margin-right: 10px;
+	 float: left;
+    margin-right: 5px;
+    margin-top: 30px;
 	}
+.comment-edit-text-empty {
+    margin: 10px 0 0;
+    width: 85%;
+}
+.comment-edit-photo {
+    margin: 10px 0 0;
+}
 .wall-item-like-buttons .icon.like {
 float: left;
 }

@@ -12,7 +12,14 @@ $a->theme_info = array(
 );
 
 $a->page['htmlhead'] .= <<< EOT
+
+
+<script type="text/javascript" src="view/theme/diabook/lightbox/js/jquery.lightbox-0.5.js"></script>
+<link rel="stylesheet" type="text/css" href="view/theme/diabook/lightbox/css/jquery.lightbox-0.5.css" media="screen" />
+
+
 <script>
+
 //contacts
 $('html').click(function() {
  $('#nav-contacts-linkmenu').removeClass('selected');
@@ -62,5 +69,20 @@ $('html').click(function() {
  $('#nav-site-linkmenu').click(function(event){
      event.stopPropagation();
  });
-</script>
+ //appsmenu
+ $('html').click(function() {
+ $('#nav-apps-link').removeClass('selected');
+ document.getElementById( "nav-apps-menu" ).style.display = "none";
+ });
+
+ $('#nav-apps-link').click(function(event){
+     event.stopPropagation();
+ });
+ 
+ $(function() {
+	$('a.lightbox').lightBox(); // Select all links with lightbox class
+});
+
+ 
+ </script>
 EOT;

@@ -247,7 +247,7 @@
   background-image: url("../../../images/icons/10/edit.png");
 }
 .icon.s10.star {
-  background-image: url("../../../images/icons/10/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s10.menu {
   background-image: url("../../../images/icons/10/menu.png");
@@ -285,7 +285,7 @@
   background-image: url("../../../images/icons/16/edit.png");
 }*/
 .icon.s16.star {
-  background-image: url("../../../images/icons/16/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s16.menu {
   background-image: url("../../../images/icons/16/menu.png");
@@ -323,7 +323,7 @@
   background-image: url("../../../images/icons/22/edit.png");
 }
 .icon.s22.star {
-  background-image: url("../../../images/icons/22/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s22.menu {
   background-image: url("../../../images/icons/22/menu.png");
@@ -361,7 +361,7 @@
   background-image: url("../../../images/icons/48/edit.png");
 }
 .icon.s48.star {
-  background-image: url("../../../images/icons/48/star.png");
+  background-image: url("../../../images/star_dummy.png");
 }
 .icon.s48.menu {
   background-image: url("../../../images/icons/48/menu.png");
@@ -438,7 +438,7 @@ a:hover {
   clear: both;
 }
 .fakelink {
-  color: #3465A4;
+  color: #1872A2;
   /* color: #3e3e8c; */
   text-decoration: none;
   cursor: pointer;
@@ -647,7 +647,7 @@ nav .nav-menu-icon {
   position: relative;
   height: 22px;
   padding: 5px;
-  margin: 0px 7px;
+  margin: 0px 5px;
   -moz-border-radius: 5px 5px 0 0;
   -webkit-border-radius: 5px 5px 0 0;
   border-radius: 5px 5px 0 0;
@@ -657,7 +657,7 @@ nav .nav-menu-icon:hover {
   position: relative;
   height: 22px;
   padding: 5px;
-  margin: 0px 7px;
+  margin: 0px 5px;
   -moz-border-radius: 5px 5px 0 0;
   -webkit-border-radius: 5px 5px 0 0;
   border-radius: 5px 5px 0 0;
@@ -716,21 +716,17 @@ nav #nav-user-linkmenu
 nav #nav-user-linkmenu{
 	margin-right: 0px;
 	}
-nav #nav-home-link{
+nav #nav-home-link, #nav-directory-link, #nav-apps-link{
 	margin-left: 0px;
+	margin-right: 0px;
 	font-weight: bold;
+	margin: 3px 5px;
 	}
 nav #nav-directory-link{
-	margin-left: 0px;
-	margin-right: 0px;
-	font-weight: bold;
-	margin: 3px 15px;
+  margin-right: 0px;	
 	}
-nav #nav-apps-link{
-	margin-left: 0px;
-	margin-right: 0px;
-	font-weight: bold;
-	margin: 3px 15px;
+nav #nav-home-link{
+  margin-left: 0px;	
 	}
 nav #nav-help-link .menu-popup,
 nav #nav-search-link .menu-popup,
@@ -1048,6 +1044,12 @@ section {
   width: 800px;
   padding: 0px 0px 0px 12px;
 }
+body .pageheader{
+  text-align: center;
+  margin-top: 25px;
+  font-size: 0px;
+	}
+
 #id_username {
   width: 173px;	
 	}
@@ -1306,14 +1308,14 @@ section {
 }
 .tag {
   /*background: url("../../../images/tag_b.png") repeat-x center left;*/
-  color: #3465A4;
+  color: #999;
   padding-left: 3px;
   font-size: 12px;
 }
 .tag a {
   padding-right: 5px;
   /*background: url("../../../images/tag.png") no-repeat center right;*/
-  color: #3465A4;
+  color: #999;
 }
 .wwto {
   position: absolute !important;
@@ -1988,10 +1990,24 @@ box-shadow: 1px 1px 5px 0;
 }
 
 #prvmail-submit {
-	float: left;
+	float: right;
 	margin-top: 10px;
-	margin-right: 30px;
 }
+
+#prvmail-subject
+{
+background: none repeat scroll 0 0 #FFFFFF;
+border: 1px solid #CCCCCC;
+border-radius: 5px 5px 5px 5px;
+font-weight: bold;
+height: 20px;
+margin: 0 0 5px;
+vertical-align: middle;
+}
+#prvmail-form{
+ width: 597px;	
+	}
+	
 #prvmail-upload-wrapper,
 #prvmail-link-wrapper,
 #prvmail-rotator-wrapper {
@@ -2179,7 +2195,9 @@ a.mail-list-link {
         padding: 10px;
         float: left;
 }
-
+.lightbox{
+	float: left;
+	}
 #photo-photo {
         float: left;
 }
