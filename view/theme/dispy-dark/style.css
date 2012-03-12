@@ -122,7 +122,6 @@ a {
     color: #88a9d2;
     text-decoration: none;
     margin-bottom: 1px;
-	text-decoration: none;
 }
 /*a:hover {                 */
 /*    text-decoration: none;*/
@@ -140,7 +139,6 @@ blockquote {
 }
 a:hover {
     color: #729fcf;
-    padding-bottom: 0;
     border-bottom: 1px dotted #729fcf;
 }
 .required {
@@ -483,12 +481,12 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	height: 22px;
 	overflow: hidden;
 	margin: 0px;
-	background: transparent url(icons.png) -190px -60px no-repeat; 
+	background: transparent url(icons.png) -190px -60px no-repeat;
 }
 .nav-ajax-update, .nav-ajax-left {
 	width: 30px;
 	height: 19px;
-	background: transparent url(notifications.svg) 0 0 no-repeat;
+	background: transparent url(notifications.png) 0 0 no-repeat;
 	color: #222;
 	font-weight: bold;
 	font-size: 0.8em;
@@ -519,14 +517,14 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 }
 #lang-select-icon {
 	cursor: pointer;
-	position: absolute;
-	left: 0;
-	top: 0;
+	position: fixed;
+	left: 28px;
+	bottom: 6px;
 }
 #language-selector {
-    position: absolute;
-    top: 0;
-    left: 16px;
+    position: fixed;
+    bottom: 2px;
+    left: 52px;
 }
 .menu-popup {
     position: absolute;
@@ -946,7 +944,7 @@ aside #viewcontacts {
  * section
  */
 section {
-    margin: 20px 6% 0 4%;
+    margin: 20px 8% 0 4%;
     font-size: 0.8em;
     padding-right: 230px;
 	min-width: 475px;
@@ -955,30 +953,31 @@ section {
 /** tabs **/
 .tabs {
     list-style: none;
-    margin: 10px 0 10px;
+    margin: 10px 0;
     padding: 0;
-    border-bottom: 1px solid #729fcf;
-    font-size: 14px;
 }
 .tabs li {
     display: inline;
 }
 .tab {
-    padding: 0 5px;
+    border: 1px solid #729fcf;
+	padding: 4px;
 }
 .tab:hover {
-    background-color: #88a9d2;
-    color: #111;
-    border: 0px;
+    background: #88a9d2;
+    color: #2e2f2e;
 }
 .tab:active {
-    background-color: #88a9d2;
-    color: #111;
-    border: 0px;
+    background: #88a9d2;
+    color: #2e2f2e;
 }
 .tab.active {
-	background-color: #88a9d2;
-    color: #111;
+	background: #88a9d2;
+    color: #2e2f2e;
+}
+.tab a {
+	border: 0;
+	text-decoration: none;
 }
 
 /**
@@ -1004,6 +1003,9 @@ section {
 }
 .shiny {
     background: #2e3436;
+}
+.heart {
+	color: red;
 }
 .wall-item-content {
 	overflow-x: auto;
@@ -1548,8 +1550,7 @@ div[id$="wrapper"] br {
 .view-contact-wrapper,
 .contact-entry-wrapper {
     float: left;
-    margin-right: 5px;
-    margin-bottom: 40px;
+    margin: 0 5px 40px 0;
     width: 120px;
 	height: 120px;
 	padding: 3px;
@@ -1712,17 +1713,20 @@ div[id$="wrapper"] br {
     clear: both;
 }
 
-#register-form label,
-#profile-edit-form label {
-	width: 300px;
-    float: left;
-}
+/*#register-form label,     */
+/*#profile-edit-form label {*/
+/*    width: 300px;         */
+/*    float: left;          */
+/*}                         */
 
-#register-form span,
-#profile-edit-form span {
-    color:#555753;
-    display:block;
-    margin-bottom:20px;
+/*#register-form span,     */
+/*#profile-edit-form span {*/
+/*    color: #555753;      */
+/*    display: block;      */
+/*    margin-bottom: 20px; */
+/*}                        */
+#profile-edit-marital-label span {
+	margin: -4px;
 }
 .settings-submit-wrapper,
 .profile-edit-submit-wrapper {
@@ -1944,7 +1948,12 @@ div[id$="wrapper"] br {
  */
 .directory-item {
     float: left;
-    margin: 50px 50px 0px 0px;
+	/*margin: 50px 50px 0px 0px;*/
+	margin: 0 5px 4px 0;
+	padding: 3px;
+	width: 180px;
+	height: 250px;
+    position: relative;
 }
 
 
@@ -1956,8 +1965,8 @@ div[id$="wrapper"] br {
 }
 .group-selected, .nets-selected {
     padding: 3px;
-    border: 1px solid #f8f8f8;
-    background: #2e302e;
+	color: #2e2f2e;
+    background: #88a9d2;
     font-weight: bold;
 }
 .groupsideedit {

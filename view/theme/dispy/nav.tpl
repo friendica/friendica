@@ -1,5 +1,4 @@
 <nav>
-$langselector
 
 <span id="banner">$banner</span>
 
@@ -112,10 +111,13 @@ works -->
 		<a id="intro-update" class="nav-ajax-left" href="$nav.introductions.0"></a>
 		{{ endif }}
     </div>
-
 </div>
     <a href="#" class="floaterflip"></a>
 </nav>
+
+<div id="lang-sel-wrap">
+$langselector
+</div>
 
 <ul id="nav-notifications-template" style="display:none;" rel="template">
 	<li class="{4}"><a href="{0}"><img src="{1}" height="24" width="24" alt="" />{2} <span class="notif-when">{3}</span></a></li>

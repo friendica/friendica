@@ -79,7 +79,7 @@ mark {
 /* Redeclare monospace font family: h5bp.com/j */
 pre, code, kbd, samp, .wall-item-body code {
     font-family: monospace, monospace;
-    _font-family: 'courier new', monospace;
+    _font-family: monospace;
     font-size: 1em; }
 
 /* Improve readability of pre-formatted text in all browsers */
@@ -127,6 +127,7 @@ a:hover img {
 }
 blockquote {
     background: #eee;
+	color: #111;
     text-indent: 5px;
     padding: 5px;
     border: 1px #aaa solid;
@@ -134,7 +135,6 @@ blockquote {
 }
 a:hover {
     color: #729fcf;
-    padding-bottom: 0;
     border-bottom: 1px dotted #729fcf;
 }
 .required {
@@ -462,6 +462,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
     right: 1%;
     padding: 5px;
     background: #2e3436;
+	color: transparent;
     border-radius: 5px;
     z-index: 100;
 }
@@ -511,14 +512,14 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 }
 #lang-select-icon {
 	cursor: pointer;
-	position: absolute;
-	left: 0;
-	top: 0;
+	position: fixed;
+	left: 28px;
+	bottom: 6px;
 }
 #language-selector {
-    position: absolute;
-    top: 0;
-    left: 16px;
+    position: fixed;
+    bottom: 2px;
+    left: 52px;
 }
 .menu-popup {
     position: absolute;
@@ -633,8 +634,24 @@ aside {
 .vcard #profile-photo-wrapper {
 	margin: 20px;
 }
+/* http://css-tricks.com/snippets/css/css-box-shadow/
+ * box-shadow:
+ * 1. The horizontal offset of the shadow, positive means
+ * the shadow will be on the right of the box, a negative
+ * offset will put the shadow on the left of the box.
+ * 2. The vertical offset of the shadow, a negative one
+ * means the box-shadow will be above the box, a
+ * positive one means the shadow will be below the box.
+ * 3. The blur radius (optional), if set to 0 the shadow
+ * will be sharp, the higher the number, the more blurred
+ * it will be.
+ * 4. The spread radius (optional), positive values increase
+ * the size of the shadow, negative values decrease the size.
+ * Default is 0 (the shadow is same size as blur).
+ * 5. Colo[u]r
+ */
 .vcard #profile-photo-wrapper img {
-	box-shadow: 3px 3px 10px 0;
+	box-shadow: 3px 3px 10px 0 #000;
 }
 aside h4 {
 	font-size: 1.2em;
@@ -643,8 +660,10 @@ aside #viewcontacts {
 	text-align: right;
 }
 .aprofile dt {
-    box-shadow: 1px 1px 5px 0;
     color: #666666;
+	background: transparent;
+	font-weight: bold;
+    box-shadow: 1px 1px 5px 0 #000;
     margin: 15px 0 5px;
     padding-left: 5px;
 }
@@ -707,51 +726,11 @@ aside #viewcontacts {
 }
 #jot #jot-tools span a {
     display: block;
-    /*color: #cccccc;    */
-    /*width: 100%;       */
-    /*height: 40px;      */
-    /*text-align: center;*/
-    /*line-height: 40px; */
-    /*overflow: hidden;*/
 }
-/*#jot #jot-tools li:hover {*/
-    /*background-color: #364e59;*/
-/*}*/
 #jot #jot-tools .perms {
     float: right;
     width: 40px;
 }
-/*#jot #jot-tools .perms a.unlock {*/
-/*    width: 30px;                    */
-/*    border-left: 10px solid #cccccc;*/
-/*    background-color: #cccccc;      */
-/*}*/
-/*#jot #jot-tools .perms a.lock {*/
-/*    width: 30px;                    */
-/*    border-left: 10px solid #666666;*/
-/*    background-color: #666666;      */
-/*}*/
-/*#jot #jot-tools li.submit {            */
-/*    float: right;                      */
-/*    background-color: #cccccc;         */
-/*    border-bottom: 2px solid #cccccc;  */
-/*    border-right: 1px solid #666666;   */
-/*    border-left: 1px solid #666666;    */
-/*}                                      */
-/*#jot #jot-tools li.submit input {      */
-/*    border: 0px;                       */
-/*    margin: 0px;                       */
-/*    padding: 0px;                      */
-/*    background-color: #cccccc;         */
-/*    color: #666666;                    */
-/*    width: 80px;                       */
-/*    height: 40px;                      */
-/*    line-height: 40px;                 */
-/*}                                      */
-/*#jot #jot-tools li.submit input:hover {*/
-/*    background-color: #bdcdd4;         */
-/*    color: #666666;                    */
-/*}                                      */
 #jot #jot-tools li.loading {
     float: right;
     background-color: #ffffff;
@@ -945,9 +924,14 @@ aside #viewcontacts {
 }
 #jot-preview-content {
     background-color: #ffffe0;
-    border: 1px #aaaa00 solid;
+	color: #111;
+    border: 1px #aa0 solid;
     border-radius: 3px;
     padding: 3px 3px 6px 10px;
+}
+#jot-preview-content .wall-item-outside-wrapper {
+	border: 0;
+	border-radius: 0px;
 }
 
 
@@ -955,7 +939,7 @@ aside #viewcontacts {
  * section
  */
 section {
-    margin: 20px 6% 0 4%;
+    margin: 20px 8% 0 4%;
     font-size: 0.8em;
     padding-right: 230px;
 	min-width: 475px;
@@ -964,28 +948,32 @@ section {
 /** tabs **/
 .tabs {
     list-style: none;
-    margin: 10px 0 10px;
+    margin: 10px 0;
     padding: 0;
-    border-bottom: 1px solid #729fcf;
-    font-size: 14px;
 }
 .tabs li {
     display: inline;
 }
 .tab {
-    padding: 0 5px;
+    border: 1px solid #729fcf;
+	padding: 4px;
 }
 .tab:hover {
-    background-color: #729fcf;
+    background: #729fcf;
     color: #eeeeec;
-    border: 0px;
 }
 .tab:active {
-    background-color: #729fcf;
+    background: #729fcf;
     color: #eeeeec;
-    border: 0px;
 }
-
+.tab.active {
+	background: #729fcf;
+    color: #eeeeec;
+}
+.tab a {
+	border: 0;
+	text-decoration: none;
+}
 
 /**
  * 	items
@@ -1010,6 +998,9 @@ section {
 }
 .shiny {
     background: #efefdf;
+}
+.heart {
+	color: red;
 }
 .wall-item-content {
 	overflow-x: auto;
@@ -1297,6 +1288,7 @@ section {
 	border-style: solid;
 	border-width: 1px 1px 1px 10px;
 	background: #eee;
+	color: #444;
 	width: 95%;
 }
 
@@ -1553,8 +1545,7 @@ div[id$="wrapper"] br {
 .view-contact-wrapper,
 .contact-entry-wrapper {
     float: left;
-    margin-right: 5px;
-    margin-bottom: 40px;
+    margin: 0 5px 40px 0;
     width: 120px;
 	height: 120px;
 	padding: 3px;
@@ -1666,8 +1657,9 @@ div[id$="wrapper"] br {
 }
 .contact-photo-menu {
     width: auto;
-    border: 2px solid #444444;
-    background: #FFFFFF;
+    border: 2px solid #444;
+    background: #eee;
+	color: #111;
     position: absolute;
     left: 0px; top: 90px;
     display: none;
@@ -1706,6 +1698,7 @@ div[id$="wrapper"] br {
     -moz-border-radius: 5px;
     border-radius: 5px;
     padding: 5px;
+	color: #111;
 }
 #settings-default-perms {
     margin-bottom: 20px;
@@ -1715,17 +1708,20 @@ div[id$="wrapper"] br {
     clear: both;
 }
 
-#register-form label,
-#profile-edit-form label {
-	width: 300px;
-    float: left;
-}
+/*#register-form label,     */
+/*#profile-edit-form label {*/
+/*    width: 300px;         */
+/*    float: left;          */
+/*}                         */
 
-#register-form span,
-#profile-edit-form span {
-    color:#555753;
-    display:block;
-    margin-bottom:20px;
+/*#register-form span,     */
+/*#profile-edit-form span {*/
+/*    color: #555753;      */
+/*    display: block;      */
+/*    margin-bottom: 20px; */
+/*}                        */
+#profile-edit-marital-label span {
+	margin: -4px;
 }
 .settings-submit-wrapper,
 .profile-edit-submit-wrapper {
@@ -1742,16 +1738,18 @@ div[id$="wrapper"] br {
     float: left;
     margin: 20px 20px 0px 0px;
 }
-
 #profile-edit-links ul {
     margin: 20px 0;
     padding: 0;
     list-style: none;
 }
-
 #register-sitename {
     display: inline;
     font-weight: bold;
+}
+#advanced-expire-popup {
+/*	background: #2e2f2e;
+	color: #eec;*/
 }
 
 /**
@@ -1945,7 +1943,12 @@ div[id$="wrapper"] br {
  */
 .directory-item {
     float: left;
-    margin: 50px 50px 0px 0px;
+	/*margin: 50px 50px 0px 0px;*/
+	margin: 0 5px 4px 0;
+	padding: 3px;
+	width: 180px;
+	height: 250px;
+    position: relative;
 }
 
 
@@ -1957,6 +1960,7 @@ div[id$="wrapper"] br {
 }
 .group-selected, .nets-selected {
     padding: 3px;
+	color: #111;
     border: 1px solid #CCCCCC;
     background: #F8F8F8;
     font-weight: bold;
@@ -2132,6 +2136,7 @@ div[id$="wrapper"] br {
 	padding: 5px;
 	background: #eee;
 	vertical-align: middle;
+	color: #111;
 }
 .field input, input[type="text"] {
 	width: 250px;
@@ -2172,7 +2177,7 @@ div[id$="wrapper"] br {
     display:none !important;
 }
 .field.radio .field_help {
-    margin-left: 0;
+    margin-left: 297px;
 }
 
 
@@ -2182,8 +2187,8 @@ div[id$="wrapper"] br {
 .popup { 	
 	width: 100%;
     height: 100%;
-	top:0px;
-    left:0px;
+	top: 0px;
+    left: 0px;
 	position: absolute;
 	display: none;
 }
@@ -2298,12 +2303,6 @@ div[id$="wrapper"] br {
 .icon.drophide, .icon.delete {
     float: left;
 }
-/*.icon.s22 {
-	display: block;
-	background: url(icons.png) no-repeat;
-	width: 22px;
-	height: 22px;
-}*/
 .icon.s22.delete {
 	display: block;
 	background-position: -110px 0;
@@ -2649,4 +2648,3 @@ footer {
         font-size: 15pt;
     }
 }
-
