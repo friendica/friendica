@@ -79,6 +79,7 @@
 
 			/* oembed */
 			function _h2b_cb(match) {
+				/*
 				function s_h2b(data) {
 						match = data;
 				}
@@ -90,6 +91,23 @@
 					success: s_h2b,
 					dataType: 'html'
 				});
+				*/
+				
+				var f, g, tof = [], tor = [];
+				var find_spanc = /<span [^>]*class *= *[\"'](?:[^\"']* )*oembed(?: [^\"']*)*[\"'][^>]*>(.*?(?:<span[^>]*>(.*?)<\/span *>)*.*?)<\/span *>/ig;
+				while (f = find_spanc.exec(match)) {
+					var find_a = /<a([^>]* rel=[\"']oembed[\"'][^>]*)>.*?<\/a *>/ig;
+					if (g = find_a.exec(f[1])) {
+						var find_href = /href=[\"']([^\"']*)[\"']/ig;
+						var m2 = find_href.exec(g[1]);
+						if (m2[1]) {
+							tof.push(f[0]);
+							tor.push("[EMBED]" + m2[1] + "[/EMBED]");
+						}
+					}
+				}
+				for (var i = 0; i < tof.length; i++) match = match.replace(tof[i], tor[i]);
+				
 				return match;
 			}
 			if (s.indexOf('class="oembed')>=0){
