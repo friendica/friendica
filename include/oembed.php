@@ -62,7 +62,7 @@ function oembed_fetch_url($embedurl){
 	
 function oembed_format_object($j){
 	$embedurl = $j->embedurl;
-	$jhtml = oembed_iframe($j->embedurl,$j->width,$j->height );
+	$jhtml = oembed_iframe($j->embedurl,(isset($j->width) ? $j->width : null), (isset($j->height) ? $j->height : null) );
 	$ret="<span class='oembed ".$j->type."'>";
 	switch ($j->type) {
 		case "video": {

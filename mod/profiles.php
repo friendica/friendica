@@ -21,6 +21,9 @@ function profiles_post(&$a) {
 			notice( t('Profile not found.') . EOL);
 			return;
 		}
+		
+		check_form_security_token_redirectOnErr('/profiles', 'profile_edit');
+		
 		$is_default = (($orig[0]['is-default']) ? 1 : 0);
 
 		$profile_name = notags(trim($_POST['profile_name']));
@@ -240,6 +243,8 @@ function profiles_content(&$a) {
 			goaway($a->get_baseurl() . '/profiles');
 			return; // NOTREACHED
 		}
+		
+		check_form_security_token_redirectOnErr('/profiles', 'profile_drop', 't');
 
 		// move every contact using this profile as their default to the user default
 
@@ -264,6 +269,8 @@ function profiles_content(&$a) {
 
 
 	if(($a->argc > 1) && ($a->argv[1] === 'new')) {
+		
+		check_form_security_token_redirectOnErr('/profiles', 'profile_new', 't');
 
 		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
 			intval(local_user()));
@@ -291,10 +298,13 @@ function profiles_content(&$a) {
 		info( t('New profile created.') . EOL);
 		if(count($r3) == 1)
 			goaway($a->get_baseurl() . '/profiles/' . $r3[0]['id']);
+		
 		goaway($a->get_baseurl() . '/profiles');
-	}		 
+	} 
 
 	if(($a->argc > 2) && ($a->argv[1] === 'clone')) {
+		
+		check_form_security_token_redirectOnErr('/profiles', 'profile_clone', 't');
 
 		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
 			intval(local_user()));
@@ -330,9 +340,11 @@ function profiles_content(&$a) {
 		info( t('New profile created.') . EOL);
 		if(count($r3) == 1)
 			goaway($a->get_baseurl() . '/profiles/' . $r3[0]['id']);
-	goaway($a->get_baseurl() . '/profiles');
-	return; // NOTREACHED
-	}		 
+		
+		goaway($a->get_baseurl() . '/profiles');
+		
+		return; // NOTREACHED
+	}
 
 
 	if(($a->argc > 1) && (intval($a->argv[1]))) {
@@ -371,6 +383,9 @@ function profiles_content(&$a) {
 		$is_default = (($r[0]['is-default']) ? 1 : 0);
 		$tpl = get_markup_template("profile_edit.tpl");
 		$o .= replace_macros($tpl,array(
+			'$form_security_token' => get_form_security_token("profile_edit"),
+			'$profile_clone_link' => 'profiles/clone/' . $r[0]['id'] . '?t=' . get_form_security_token("profile_clone"),
+			'$profile_drop_link' => 'profiles/drop/' . $r[0]['id'] . '?t=' . get_form_security_token("profile_drop"),
 			'$banner' => t('Edit Profile Details'),
 			'$submit' => t('Submit'),
 			'$viewprof' => t('View this profile'),
@@ -460,7 +475,8 @@ function profiles_content(&$a) {
 			$o .= replace_macros($tpl_header,array(
 				'$header' => t('Edit/Manage Profiles'),
 				'$chg_photo' => t('Change profile photo'),
-				'$cr_new' => t('Create New Profile')
+				'$cr_new' => t('Create New Profile'),
+				'$cr_new_link' => 'profiles/new?t=' . get_form_security_token("profile_new")
 			));
 
 

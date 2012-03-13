@@ -1,6 +1,7 @@
 <h1>$title</h1>
 
 <form enctype="multipart/form-data" action="profile_photo" method="post">
+<input type='hidden' name='form_security_token' value='$form_security_token'>
 
 <div id="profile-photo-upload-wrapper">
 <label id="profile-photo-upload-label" for="profile-photo-upload">$lbl_upfile </label>

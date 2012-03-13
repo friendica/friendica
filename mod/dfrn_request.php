@@ -43,7 +43,7 @@ function dfrn_request_post(&$a) {
 		return;
 
 
-	if($_POST['cancel']) {
+	if(x($_POST, 'cancel')) {
 		goaway(z_root());
 	} 
 

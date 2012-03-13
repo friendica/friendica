@@ -682,7 +682,7 @@ function item_store($arr,$force_parent = false) {
 		unset($arr['dsprsig']);
 	}
 
-	if($arr['gravity'])
+	if(x($arr, 'gravity'))
 		$arr['gravity'] = intval($arr['gravity']);
 	elseif($arr['parent-uri'] === $arr['uri'])
 		$arr['gravity'] = 0;
@@ -742,6 +742,7 @@ function item_store($arr,$force_parent = false) {
 
 	if($arr['parent-uri'] === $arr['uri']) {
 		$parent_id = 0;
+		$parent_deleted = 0;
 		$allow_cid = $arr['allow_cid'];
 		$allow_gid = $arr['allow_gid'];
 		$deny_cid  = $arr['deny_cid'];
@@ -800,6 +801,8 @@ function item_store($arr,$force_parent = false) {
 				logger('item_store: item parent was not found - ignoring item');
 				return 0;
 			}
+			
+			$parent_deleted = 0;
 		}
 	}
 

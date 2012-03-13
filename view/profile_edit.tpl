@@ -5,9 +5,9 @@ $default
 <div id="profile-edit-links">
 <ul>
 <li><a href="profile/$profile_id/view?tab=profile" id="profile-edit-view-link" title="$viewprof">$viewprof</a></li>
-<li><a href="profiles/clone/$profile_id" id="profile-edit-clone-link" title="$cr_prof">$cl_prof</a></li>
+<li><a href="$profile_clone_link" id="profile-edit-clone-link" title="$cr_prof">$cl_prof</a></li>
 <li></li>
-<li><a href="profiles/drop/$profile_id" id="profile-edit-drop-link" title="$del_prof" $disabled >$del_prof</a></li>
+<li><a href="$profile_drop_link" id="profile-edit-drop-link" title="$del_prof" $disabled >$del_prof</a></li>
 
 </ul>
 </div>
@@ -17,6 +17,7 @@ $default
 
 <div id="profile-edit-wrapper" >
 <form id="profile-edit-form" name="form1" action="profiles/$profile_id" method="post" >
+<input type='hidden' name='form_security_token' value='$form_security_token'>
 
 <div id="profile-edit-profile-name-wrapper" >
 <label id="profile-edit-profile-name-label" for="profile-edit-profile-name" >$lbl_profname </label>

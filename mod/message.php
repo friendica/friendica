@@ -192,7 +192,7 @@ function message_content(&$a) {
 			$a->set_pager_total($r[0]['total']);
 	
 		$r = q("SELECT max(`mail`.`created`) AS `mailcreated`, min(`mail`.`seen`) AS `mailseen`, 
-			`mail`.* , `contact`.`name`, `contact`.`url`, `contact`.`thumb` 
+			`mail`.* , `contact`.`name`, `contact`.`url`, `contact`.`thumb` , `contact`.`network`  
 			FROM `mail` LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id` 
 			WHERE `mail`.`uid` = %d AND `from-url` $eq '%s' GROUP BY `parent-uri` ORDER BY `created` DESC  LIMIT %d , %d ",
 			intval(local_user()),
