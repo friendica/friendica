@@ -309,7 +309,7 @@ div.wall-item-content-wrapper.shiny {
 	margin-bottom: 10px;
 }
 
-.group-selected, .nets-selected {
+.group-selected, .nets-selected, .fileas-selected {
 	padding: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;	
@@ -1024,6 +1024,10 @@ input#dfrn-url {
 	float: left;	
 }
 
+.filer-item {
+	margin-left: 10px;
+	float: left;
+}
 
 .wall-item-links-wrapper {
 	float: left;
@@ -1864,11 +1868,11 @@ a.mail-list-link {
 	margin-top: 10px;
 }
 
-.nets-ul {
+.nets-ul, .fileas-ul {
 	list-style-type: none;
 }
 
-.nets-ul li {
+.nets-ul li, .fileas-ul li {
 	margin-top: 10px;
 }
 
@@ -1877,6 +1881,14 @@ a.mail-list-link {
 }
 .nets-all {
 	margin-left: 42px;
+}
+
+.fileas-link {
+	margin-left: 24px;
+}
+
+.fileas-all {
+	margin-left: 0px;
 }
 
 #search-save {
@@ -2901,6 +2913,11 @@ aside input[type='text'] {
 .unstarred { background-position: -32px -48px; }
 .tagged { background-position: -48px -48px; }
 
+
+.filer-icon {
+	display: block; width: 16px; height: 16px;
+	background-image: url('file.gif');
+}
 
 .icon.dim { opacity: 0.3;filter:alpha(opacity=30); }
 

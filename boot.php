@@ -9,7 +9,7 @@ require_once('include/nav.php');
 require_once('include/cache.php');
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
-define ( 'FRIENDICA_VERSION',      '2.3.1278' );
+define ( 'FRIENDICA_VERSION',      '2.3.1280' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.22'    );
 define ( 'DB_UPDATE_VERSION',      1131      );
 
@@ -1209,7 +1209,7 @@ function current_theme(){
 	$a = get_app();
 	
 	$system_theme = ((isset($a->config['system']['theme'])) ? $a->config['system']['theme'] : '');
-	$theme_name = ((is_array($_SESSION) && x($_SESSION,'theme')) ? $_SESSION['theme'] : $system_theme);
+	$theme_name = ((isset($_SESSION) && x($_SESSION,'theme')) ? $_SESSION['theme'] : $system_theme);
 	
 	if($theme_name && file_exists('view/theme/' . $theme_name . '/style.css'))
 		return($theme_name);
@@ -1335,7 +1335,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		array(
 			'label' => t('Profile'),
 			'url' 	=> $url.'/?tab=profile',
-			'sel'	=> (($tab=='profile')?'active':''),
+			'sel'	=> ((isset($tab) && $tab=='profile')?'active':''),
 		),
 		array(
 			'label' => t('Photos'),

@@ -43,7 +43,7 @@ function dfrn_request_post(&$a) {
 		return;
 
 
-	if($_POST['cancel']) {
+	if(x($_POST, 'cancel')) {
 		goaway(z_root());
 	} 
 
@@ -666,7 +666,11 @@ function dfrn_request_content(&$a) {
 		$page_desc = sprintf( t('Diaspora members: Please do not use this form. Instead, enter "%s" into your Diaspora search bar.'), 
 			$target_addr) . EOL . EOL;
 
-		$page_desc .= t("Please enter your 'Identity Address' from one of the following supported social networks:");
+		$page_desc .= t("Please enter your 'Identity Address' from one of the following supported communications networks:");
+
+		$emailnet = t("<strike>Connect as an email follower</strike> \x28Coming soon\x29");
+
+		$invite_desc = t('If you are not yet a member of the free social web, <a href="http://dir.friendica.com/siteinfo">follow this link to find a public Friendica site and join us today</a>.');
 
 		$o .= replace_macros($tpl,array(
 			'$header' => t('Friend/Connection Request'),
@@ -682,6 +686,8 @@ function dfrn_request_content(&$a) {
 			'$diaspora' => t('Diaspora'),
 			'$diasnote' => t('- please share from your own site as noted above'),
 			'$your_address' => t('Your Identity Address:'),
+			'$invite_desc' => $invite_desc,
+			'$emailnet' => $emailnet,
 			'$submit' => t('Submit Request'),
 			'$cancel' => t('Cancel'),
 			'$nickname' => $a->argv[1],

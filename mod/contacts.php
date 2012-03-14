@@ -445,7 +445,7 @@ function contacts_content(&$a) {
 
 	
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact` 
-		WHERE `uid` = %d AND `pending` = 0 $sql_extra $sql_extra2 ",
+		WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ",
 		intval($_SESSION['uid']));
 	if(count($r)) {
 		$a->set_pager_total($r[0]['total']);
@@ -454,7 +454,7 @@ function contacts_content(&$a) {
 
 
 
-	$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `pending` = 0 $sql_extra $sql_extra2 ORDER BY `name` ASC LIMIT %d , %d ",
+	$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ORDER BY `name` ASC LIMIT %d , %d ",
 		intval($_SESSION['uid']),
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
@@ -465,8 +465,6 @@ function contacts_content(&$a) {
 	if(count($r)) {
 
 		foreach($r as $rr) {
-			if($rr['self'])
-				continue;
 
 			switch($rr['rel']) {
 				case CONTACT_IS_FRIEND:

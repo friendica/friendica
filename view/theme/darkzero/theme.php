@@ -16,6 +16,8 @@ $a->page['htmlhead'] .= <<< EOT
 <script>
 $(document).ready(function() {
 
+$('html').click(function() { $("#nav-notifications-menu" ).hide(); });
+
 $('.group-edit-icon').hover(
 	function() {
 		$(this).addClass('icon'); $(this).removeClass('iconspacer');},

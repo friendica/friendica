@@ -913,6 +913,33 @@ function prepare_body($item,$attach = false) {
 		}
 		$s .= '<div class="clear"></div></div>';
 	}
+	$matches = false;
+	$cnt = preg_match_all('/<(.*?)>/',$item['file'],$matches,PREG_SET_ORDER);
+	if($cnt) {
+		logger('prepare_text: categories: ' . print_r($matches,true), LOGGER_DEBUG);
+		foreach($matches as $mtch) {
+			if(strlen($x))
+				$x .= ',';
+			$x .= file_tag_decode($mtch[1]);
+		}
+		if(strlen($x))
+			$s .= '<div class="categorytags"><span>' . t('Categories:') . ' </span>' . $x . '</div>'; 
+
+
+	}
+	$matches = false;
+	$x = '';
+	$cnt = preg_match_all('/\[(.*?)\]/',$item['file'],$matches,PREG_SET_ORDER);
+	if($cnt) {
+		logger('prepare_text: filed_under: ' . print_r($matches,true), LOGGER_DEBUG);
+		foreach($matches as $mtch) {
+			if(strlen($x))
+				$x .= ',';
+			$x .= file_tag_decode($mtch[1]);
+		}
+		if(strlen($x) && (local_user() == $item['uid']))
+			$s .= '<div class="filesavetags"><span>' . t('Filed under:') . ' </span>' . $x . '</div>'; 
+	}
 
 
 	$prep_arr = array('item' => $item, 'html' => $s);
@@ -1267,7 +1294,7 @@ function file_tag_save_file($uid,$item,$file) {
 	if(count($r)) {
 		if(! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']'))
 			q("update item set file = '%s' where id = %d and uid = %d limit 1",
-				dbesc($r[0]['file'] . '[' . $file_tag_encode($file) . ']'),
+				dbesc($r[0]['file'] . '[' . file_tag_encode($file) . ']'),
 				intval($item),
 				intval($uid)
 			);

@@ -5,7 +5,7 @@ $tabs
 $nickname_block
 
 <form action="settings" id="settings-form" method="post" autocomplete="off" >
-
+<input type='hidden' name='form_security_token' value='$form_security_token'>
 
 <h3 class="settings-heading">$h_pass</h3>
 

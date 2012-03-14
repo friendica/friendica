@@ -262,6 +262,18 @@ function enableOnUser(){
 		}
 	}
 
+	function itemFiler(id) {
+		reply = prompt("$fileas");
+		if(reply && reply.length) {
+			commentBusy = true;
+			$('body').css('cursor', 'wait');
+			$.get('filer/' + id + '?term=' + reply);
+			if(timer) clearTimeout(timer);
+			timer = setTimeout(NavUpdate,3000);
+			liking = 1;
+		}
+	}
+
 	function jotClearLocation() {
 		$('#jot-coord').val('');
 		$('#profile-nolocation-wrapper').hide();

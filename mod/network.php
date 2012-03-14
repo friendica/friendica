@@ -44,8 +44,9 @@ function network_init(&$a) {
 	}
 	
 	$a->page['aside'] .= group_side('network','network',true,$group_id);
-	$a->page['aside'] .= networks_widget($a->get_baseurl() . '/network',(($_GET['nets']) ? $_GET['nets'] : ''));
+	$a->page['aside'] .= networks_widget($a->get_baseurl() . '/network',(x($_GET, 'nets') ? $_GET['nets'] : ''));
 	$a->page['aside'] .= saved_searches($search);
+	$a->page['aside'] .= fileas_widget($a->get_baseurl() . '/network',(x($_GET, 'file') ? $_GET['file'] : ''));
 
 }
 
@@ -132,15 +133,15 @@ function network_content(&$a, $update = 0) {
 		$starred_active = 'active';
 	}
 	
-	if($_GET['bmark']) {
+	if(x($_GET,'bmark')) {
 		$bookmarked_active = 'active';
 	}
 
-	if($_GET['conv']) {
+	if(x($_GET,'conv')) {
 		$conv_active = 'active';
 	}
 
-	if($_GET['spam']) {
+	if(x($_GET,'spam')) {
 		$spam_active = 'active';
 	}
 
@@ -248,7 +249,7 @@ function network_content(&$a, $update = 0) {
 		$def_acl = array('allow_cid' => '<' . intval($cid) . '>');
 
 	if(! $update) {
-		if(group) {
+		if($group) {
 			if(($t = group_public_members($group)) && (! get_pconfig(local_user(),'system','nowarn_insecure'))) {
 				notice( sprintf( tt('Warning: This group contains %s member from an insecure network.',
 									'Warning: This group contains %s members from an insecure network.',
@@ -498,7 +499,9 @@ function network_content(&$a, $update = 0) {
 
 			$items = conv_sort($items,$ordering);
 
-		}	
+		} else {
+			$items = array();
+		}
 	}
 
 

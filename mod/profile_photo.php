@@ -15,11 +15,13 @@ function profile_photo_init(&$a) {
 
 function profile_photo_post(&$a) {
 
-        if(! local_user()) {
-                notice ( t('Permission denied.') . EOL );
-                return;
-        }
-
+	if(! local_user()) {
+		notice ( t('Permission denied.') . EOL );
+		return;
+	}
+	
+	check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
+        
 	if((x($_POST,'cropfinal')) && ($_POST['cropfinal'] == 1)) {
 
 		// phase 2 - we have finished cropping
@@ -148,7 +150,9 @@ function profile_photo_content(&$a) {
 			notice( t('Permission denied.') . EOL );
 			return;
 		};
-			
+		
+		check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
+        
 		$resource_id = $a->argv[2];
 		//die(":".local_user());
 		$r=q("SELECT * FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' ORDER BY `scale` ASC",
@@ -203,6 +207,7 @@ function profile_photo_content(&$a) {
 			'$lbl_upfile' => t('Upload File:'),
 			'$title' => t('Upload Profile Photo'),
 			'$submit' => t('Upload'),
+			'$form_security_token' => get_form_security_token("profile_photo"),
 			'$select' => sprintf('%s %s', t('or'), ($newuser) ? '<a href="' . $a->get_baseurl() . '">' . t('skip this step') . '</a>' : '<a href="'. $a->get_baseurl() . '/photos/' . $a->user['nickname'] . '">' . t('select a photo from your photo albums') . '</a>')
 		));
 
@@ -218,6 +223,7 @@ function profile_photo_content(&$a) {
 			'$image_url' => $a->get_baseurl() . '/photo/' . $filename,
 			'$title' => t('Crop Image'),
 			'$desc' => t('Please adjust the image cropping for optimum viewing.'),
+			'$form_security_token' => get_form_security_token("profile_photo"),
 			'$done' => t('Done Editing')
 		));
 		return $o;

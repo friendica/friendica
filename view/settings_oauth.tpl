@@ -4,7 +4,8 @@ $tabs
 
 
 <form action="settings/oauth" method="post" autocomplete="off">
-	
+<input type='hidden' name='form_security_token' value='$form_security_token'>
+
 	<div id="profile-edit-links">
 		<ul>
 			<li>
@@ -24,7 +25,7 @@ $tabs
 		{{ endif }}
 		{{ if $app.my }}
 		<a href="$baseurl/settings/oauth/edit/$app.client_id" class="icon s22 edit" title="$edit">&nbsp;</a>
-		<a href="$baseurl/settings/oauth/delete/$app.client_id" class="icon s22 delete" title="$delete">&nbsp;</a>
+		<a href="$baseurl/settings/oauth/delete/$app.client_id?t=$form_security_token" class="icon s22 delete" title="$delete">&nbsp;</a>
 		{{ endif }}		
 	</div>
 	{{ endfor }}

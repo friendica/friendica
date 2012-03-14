@@ -2593,7 +2593,8 @@ footer {
 
 /* autocomplete popup */
 .acpopup {
-	max-height: 150px;
+	max-height: 175px;
+    max-width: 42%;
 	background-color: #555753;
 	color: #fff;
 	overflow: auto;

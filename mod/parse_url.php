@@ -188,7 +188,7 @@ function parse_url_content(&$a) {
 
 	if(! $text) {
 		logger('parsing meta');
-		$items = $domhead->getElementsByTagName('meta');
+		$items = (isset($domhead) && is_object($domhead) ? $domhead->getElementsByTagName('meta') : null);
 		if($items) {
 			foreach($items as $item) {
 				$property = $item->getAttribute('property');

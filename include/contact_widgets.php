@@ -75,4 +75,33 @@ function networks_widget($baseurl,$selected = '') {
 	));
 }
 
+function fileas_widget($baseurl,$selected = '') {
+	$a = get_app();
+	if(! local_user())
+		return '';
+
+	$saved = get_pconfig(local_user(),'system','filetags');
+	if(! strlen($saved))
+		return;
+
+	$matches = false;
+	$terms = array();
+    $cnt = preg_match_all('/\[(.*?)\]/',$saved,$matches,PREG_SET_ORDER);
+    if($cnt) {
+		foreach($matches as $mtch) {
+			$unescaped = file_tag_decode($mtch[1]);
+			$terms[] = array('name' => $unescaped,'selected' => (($selected == $unescaped) ? 'selected' : ''));
+		}
+	}
+
+	return replace_macros(get_markup_template('fileas_widget.tpl'),array(
+		'$title' => t('File Selections'),
+		'$desc' => '',
+		'$sel_all' => (($selected == '') ? 'selected' : ''),
+		'$all' => t('Everything'),
+		'$terms' => $terms,
+		'$base' => $baseurl,
+
+	));
+}
 
