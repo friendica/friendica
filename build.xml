@@ -1,14 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="friendica" default="test">
-
+	<!-- ====================================================== -->
+	<!-- Target: clean-test -->
+	<!-- deletes directories with old test reports -->
+	<!-- ====================================================== -->
+	<target name="clean-test">
+		<delete dir="report" />
+	</target>
+	
+	<!-- ====================================================== -->
+	<!-- Target: prepare-test -->
+	<!-- creates directories for test reports -->
+	<!-- ====================================================== -->
+	<target name="prepare-test" depends="clean-test">
+		<mkdir dir="report" />
+	</target>
+	
 	<!-- =================================== -->
 	<!-- Target: test -->
 	<!-- this target runs all test files -->
 	<!-- =================================== -->
-
-	<target name="test">
-		<!-- there are no tests by now, so, nothing to do -->
+	<target name="test" depends="prepare-test">
+		<!-- coverage-setup database="./report/coverage-database">
+			<fileset dir=".">
+				<include name="**/*.php" />
+				<exclude name="*test.php"/>
+				<exclude name="index.php"/>
+				<exclude name="library/**"/>
+				<exclude name="doc/**"/>
+				<exclude name=".."/>
+			</fileset>
+		</coverage-setup -->
+		<phpunit printsummary="true">
+			<batchtest>
+				<fileset dir="tests">
+					<include name="*test.php" />
+				</fileset>
+			</batchtest>
+			<formatter type="xml" todir="report" outfile="testlog.xml" />
+		</phpunit>
+		<phpunitreport infile="report/testlog.xml" todir="report" />
+		<!-- coverage-report outfile="report/coverage-database">
+		      <report todir="report" styledir="/home/phing/etc" />
+		    </coverage-report -->
 	</target>
 
 	<!-- ===================================================== -->
@@ -31,6 +66,9 @@
 		<docblox title="Friendica API" destdir="./doc/api">
 			<fileset dir=".">
 				<include name="**/*.php" />
+				<include name="README"/>
+				<include name="INSTALL.txt"/>
+				<include name="LICENSE"/>
 			</fileset>
 		</docblox>
 	</target>

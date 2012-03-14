@@ -5,6 +5,9 @@ AddType audio/ogg .oga
 <FilesMatch "\.(out|log)$">
 Deny from all
 </FilesMatch>
+<Files "(include|library)">
+Deny from all
+</Files>
 
 <IfModule mod_rewrite.c>
   RewriteEngine on

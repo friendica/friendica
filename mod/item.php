@@ -425,110 +425,7 @@ function item_post(&$a) {
 
 	if(count($tags)) {
 		foreach($tags as $tag) {
-			
-			if(isset($profile))
-				unset($profile);
-			if(strpos($tag,'#') === 0) {
-				if(strpos($tag,'[url='))
-					continue;
-				$basetag = str_replace('_',' ',substr($tag,1));
-				$body = str_replace($tag,'#[url=' . $a->get_baseurl() . '/search?search=' . rawurlencode($basetag) . ']' . $basetag . '[/url]',$body);
-
-				$newtag = '#[url=' . $a->get_baseurl() . '/search?search=' . rawurlencode($basetag) . ']' . $basetag . '[/url]';
-				if(! stristr($str_tags,$newtag)) {
-					if(strlen($str_tags))
-						$str_tags .= ',';
-					$str_tags .= $newtag;
-				} 
-				continue;
-			}
-			if(strpos($tag,'@') === 0) {
-				if(strpos($tag,'[url='))
-					continue;
-				$stat = false;
-				$name = substr($tag,1);
-				if((strpos($name,'@')) || (strpos($name,'http://'))) {
-					$newname = $name;
-					$links = @lrdd($name);
-					if(count($links)) {
-						foreach($links as $link) {
-							if($link['@attributes']['rel'] === 'http://webfinger.net/rel/profile-page')
-                    			$profile = $link['@attributes']['href'];
-							if($link['@attributes']['rel'] === 'salmon') {
-								if(strlen($inform))
-									$inform .= ',';
-                    			$inform .= 'url:' . str_replace(',','%2c',$link['@attributes']['href']);
-							}
-						}
-					}
-				}
-				else {
-					$newname = $name;
-					$alias = '';
-					$tagcid = 0;
-					if(strrpos($newname,'+')) {
-						$tagcid = intval(substr($newname,strrpos($newname,'+') + 1));
-						if(strpos($name,' '))
-							$name = substr($name,0,strpos($name,' '));
-					}	
-					if($tagcid) {
-						$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-							intval($tagcid),
-							intval($profile_uid)
-						);
-					}
-					elseif(strstr($name,'_') || strstr($name,' ')) {
-						$newname = str_replace('_',' ',$name);
-						$r = q("SELECT * FROM `contact` WHERE `name` = '%s' AND `uid` = %d LIMIT 1",
-							dbesc($newname),
-							intval($profile_uid)
-						);
-					}
-					else {
-						$r = q("SELECT * FROM `contact` WHERE `attag` = '%s' OR `nick` = '%s' AND `uid` = %d ORDER BY `attag` DESC LIMIT 1",
-							dbesc($name),
-							dbesc($name),
-							intval($profile_uid)
-						);
-					}
-					if(count($r)) {
-						$profile = $r[0]['url'];
-						if($r[0]['network'] === 'stat') {
-							$newname = $r[0]['nick'];
-							$stat = true;
-							if($r[0]['alias'])
-								$alias = $r[0]['alias'];
-						}
-						else
-							$newname = $r[0]['name'];
-						if(strlen($inform))
-							$inform .= ',';
-						$inform .= 'cid:' . $r[0]['id'];
-					}
-				}
-				if($profile) {
-					$body = str_replace('@' . $name, '@' . '[url=' . $profile . ']' . $newname	. '[/url]', $body);
-					$profile = str_replace(',','%2c',$profile);
-					$newtag = '@[url=' . $profile . ']' . $newname	. '[/url]';
-					if(! stristr($str_tags,$newtag)) {
-						if(strlen($str_tags))
-							$str_tags .= ',';
-						$str_tags .= $newtag;
-					}
-
-					// Status.Net seems to require the numeric ID URL in a mention if the person isn't 
-					// subscribed to you. But the nickname URL is OK if they are. Grrr. We'll tag both. 
-
-					if(strlen($alias)) {
-						$newtag = '@[url=' . $alias . ']' . $newname	. '[/url]';
-						if(! stristr($str_tags,$newtag)) {
-							if(strlen($str_tags))
-								$str_tags .= ',';
-							$str_tags .= $newtag;
-						}
-					}
-				}
-			}
+			handle_tag($a, $body, $inform, $str_tags, $profile_uid, $tag); 
 		}
 	}
 
@@ -920,5 +817,144 @@ function item_content(&$a) {
 	if(($a->argc == 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
 		require_once('include/items.php');
 		drop_item($a->argv[2]);
+	}
+}
+
+/**
+ * This function removes the tag $tag from the text $body and replaces it with 
+ * the appropiate link. 
+ * 
+ * @param unknown_type $body the text to replace the tag in
+ * @param unknown_type $inform a comma-seperated string containing everybody to inform
+ * @param unknown_type $str_tags string to add the tag to
+ * @param unknown_type $profile_uid
+ * @param unknown_type $tag the tag to replace
+ */
+function handle_tag($a, &$body, &$inform, &$str_tags, $profile_uid, $tag) {
+	//is it a hash tag? 
+	if(strpos($tag,'#') === 0) {
+		//if the tag is replaced...
+		if(strpos($tag,'[url='))
+			//...do nothing
+			continue;
+		//base tag has the tags name only
+		$basetag = str_replace('_',' ',substr($tag,1));
+		//create text for link
+		$newtag = '#[url=' . $a->get_baseurl() . '/search?search=' . rawurlencode($basetag) . ']' . $basetag . '[/url]';
+		//replace tag by the link
+		$body = str_replace($tag, $newtag, $body);
+	
+		//is the link already in str_tags?
+		if(! stristr($str_tags,$newtag)) {
+			//append or set str_tags
+			if(strlen($str_tags))
+				$str_tags .= ',';
+			$str_tags .= $newtag;
+		}
+		return;
+	}
+	//is it a person tag? 
+	if(strpos($tag,'@') === 0) {
+		//is it already replaced? 
+		if(strpos($tag,'[url='))
+			continue;
+		$stat = false;
+		//get the person's name
+		$name = substr($tag,1);
+		//is it a link or a full dfrn address? 
+		if((strpos($name,'@')) || (strpos($name,'http://'))) {
+			$newname = $name;
+			//get the profile links
+			$links = @lrdd($name);
+			if(count($links)) {
+				//for all links, collect how is to inform and how's profile is to link
+				foreach($links as $link) {
+					if($link['@attributes']['rel'] === 'http://webfinger.net/rel/profile-page')
+						$profile = $link['@attributes']['href'];
+					if($link['@attributes']['rel'] === 'salmon') {
+						if(strlen($inform))
+							$inform .= ',';
+						$inform .= 'url:' . str_replace(',','%2c',$link['@attributes']['href']);
+					}
+				}
+			}
+		} else { //if it is a name rather than an address
+			$newname = $name;
+			$alias = '';
+			$tagcid = 0;
+			//is it some generated name?
+			if(strrpos($newname,'+')) {
+				//get the id
+				$tagcid = intval(substr($newname,strrpos($newname,'+') + 1));
+				//remove the next word from tag's name
+				if(strpos($name,' ')) {
+					$name = substr($name,0,strpos($name,' '));
+				}
+			}
+			if($tagcid) { //if there was an id
+				//select contact with that id from the logged in user's contact list
+				$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+						intval($tagcid),
+						intval($profile_uid)
+				);
+			} elseif(strstr($name,'_') || strstr($name,' ')) { //no id
+				//get the real name
+				$newname = str_replace('_',' ',$name);
+				//select someone from this user's contacts by name
+				$r = q("SELECT * FROM `contact` WHERE `name` = '%s' AND `uid` = %d LIMIT 1",
+						dbesc($newname),
+						intval($profile_uid)
+				);
+			} else {
+				//select someone by attag or nick and the name passed in
+				$r = q("SELECT * FROM `contact` WHERE `attag` = '%s' OR `nick` = '%s' AND `uid` = %d ORDER BY `attag` DESC LIMIT 1",
+						dbesc($name),
+						dbesc($name),
+						intval($profile_uid)
+				);
+			}
+			//$r is set, if someone could be selected
+			if(count($r)) {
+				$profile = $r[0]['url'];
+				//set newname to nick, find alias
+				if($r[0]['network'] === 'stat') {
+					$newname = $r[0]['nick'];
+					$stat = true;
+					if($r[0]['alias'])
+						$alias = $r[0]['alias'];
+				}
+				else
+					$newname = $r[0]['name'];
+				//add person's id to $inform
+				if(strlen($inform))
+					$inform .= ',';
+				$inform .= 'cid:' . $r[0]['id'];
+			}
+		}
+		//if there is an url for this persons profile
+		if(isset($profile)) {
+			//create profile link
+			$profile = str_replace(',','%2c',$profile);
+			$newtag = '@[url=' . $profile . ']' . $newname	. '[/url]';
+			$body = str_replace('@' . $name, $newtag, $body);
+			//append tag to str_tags
+			if(! stristr($str_tags,$newtag)) {
+				if(strlen($str_tags))
+					$str_tags .= ',';
+				$str_tags .= $newtag;
+			}
+	
+			// Status.Net seems to require the numeric ID URL in a mention if the person isn't
+			// subscribed to you. But the nickname URL is OK if they are. Grrr. We'll tag both.
+	
+			if(strlen($alias)) {
+				$newtag = '@[url=' . $alias . ']' . $newname	. '[/url]';
+				if(! stristr($str_tags,$newtag)) {
+					if(strlen($str_tags))
+						$str_tags .= ',';
+					$str_tags .= $newtag;
+				}
+			}
+		}
 	}
 }

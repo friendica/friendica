@@ -13,6 +13,9 @@ addon
 #ignore documentation, it should be newly built 
 doc/api
 
+#ignore reports, should be generted with every build
+report/
+
 #ignore config files from eclipse, we don't want IDE files in our repository
 .project
 .buildpath
