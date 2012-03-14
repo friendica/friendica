@@ -17,7 +17,7 @@
 </div>
 
 <div id="photo-photo-end"></div>
-<div id="photo-caption" >$desc</div>
+<div id="photo-caption">$desc</div>
 {{ if $tags }}
 <div id="in-this-photo-text">$tags.0</div>
 <div id="in-this-photo">$tags.1</div>

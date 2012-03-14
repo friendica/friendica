@@ -6,13 +6,17 @@
     <div class="title">$profile.pdesc</div>
     {{ endif }}
 	<div id="profile-photo-wrapper">
-    <img class="photo" width="175" height="175" src="$profile.photo" alt="$profile.name" />
+		<img class="photo" width="175" height="175" src="$profile.photo" alt="$profile.name" />
+		<div class="profile-edit-side-div">
+			<a class="profile-edit-side-link icon edit" title="$profile.$editprofile" href="profiles/$profile.id" ></a>
+		</div>
+		<div class="clear"></div>
     </div>
 
 	{{ if $location }}
 		<div class="location">
         <span class="location-label">$location</span>
-		<div class="adr">
+		<address class="adr">
 			{{ if $profile.address }}
             <div class="street-address">$profile.address</div>{{ endif }}
 			<span class="city-state-zip">$profile.zip</span>
@@ -20,7 +24,7 @@
             <span class="region">$profile.region</span>
             <span class="postal-code">$profile.postal-code</span>
 			{{ if $profile.country-name }}<span class="country-name">$profile.country-name</span>{{ endif }}
-		</div>
+		</address>
 		</div>
 	{{ endif }}
 

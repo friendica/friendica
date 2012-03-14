@@ -57,14 +57,6 @@ works -->
         </li>
         {{ endif }}
 
-{{ if $userinfo }}
-        <ul id="nav-user-menu" class="menu-popup">
-            {{ for $nav.usermenu as $usermenu }}
-                <li><a class="$usermenu.2" href="$usermenu.0" title="$usermenu.3">$usermenu.1</a></li>
-            {{ endfor }}
-        </ul>
-{{ endif }}
-
         {{ if $nav.contacts }}
         <li><a id="nav-contacts-link" class="nav-commlink $nav.contacts.2" href="$nav.contacts.0" title="$nav.contacts.1">$nav.contacts.1</a></li>
         {{ endif }}
@@ -93,6 +85,14 @@ works -->
         {{ endif }}
         </ul>
     </div>
+
+{{ if $userinfo }}
+        <ul id="nav-user-menu" class="menu-popup">
+            {{ for $nav.usermenu as $usermenu }}
+                <li><a class="$usermenu.2" href="$usermenu.0" title="$usermenu.3">$usermenu.1</a></li>
+            {{ endfor }}
+        </ul>
+{{ endif }}
 
     <div id="notifications">
         {{ if $nav.home }}
