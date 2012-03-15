@@ -114,6 +114,7 @@ function enableOnUser(){
 	$(this).val("");
 	initEditor();
 }
+
 </script>
 <script type="text/javascript" src="$baseurl/js/ajaxupload.js"></script>
 <script type="text/javascript">
@@ -121,6 +122,7 @@ function enableOnUser(){
 	var addtitle = '$addtitle';
 
 	$(document).ready(function() {
+		
 		/* enable tinymce on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
@@ -258,6 +260,18 @@ function enableOnUser(){
 				timer = setTimeout(NavUpdate,3000);
 				liking = 1;
 			}
+		}
+	}
+
+	function itemFiler(id) {
+		reply = prompt("$fileas");
+		if(reply && reply.length) {
+			commentBusy = true;
+			$('body').css('cursor', 'wait');
+			$.get('filer/' + id + '?term=' + reply);
+			if(timer) clearTimeout(timer);
+			timer = setTimeout(NavUpdate,3000);
+			liking = 1;
 		}
 	}
 

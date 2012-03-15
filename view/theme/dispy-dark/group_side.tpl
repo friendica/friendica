@@ -1,5 +1,5 @@
-<div class="widget" id="group-sidebar">
-<h3>$title</h3>
+<div id="group-sidebar" class="widget">
+<h3 class="label">$title</h3>
 
 <div id="sidebar-group-list">
 	<ul id="sidebar-group-ul">
@@ -9,7 +9,7 @@
 				{{ if $group.edit }}
 					<a 
                         class="groupsideedit"
-                        href="$group.edit.href" title="$edittext"><span class="icon small-pencil"></span></a>
+                        href="$group.edit.href" title="$group.edit.title"><span class="icon small-pencil"></span></a>
 				{{ endif }}
 				{{ if $group.cid }}
 					<input type="checkbox" 

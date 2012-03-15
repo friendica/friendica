@@ -195,13 +195,15 @@ input[type=submit] {
     color: #fff;
 }
 
+
 /**
  * global
  */
 /* .tool .action */
 .action {
-    float: right;
+	margin: 5px 0;
 }
+
 
 /**
  * 	login
@@ -210,9 +212,10 @@ input[type=submit] {
     margin-right: 20px;
 }
 
-/*********
-* nav
-*********/
+
+/**
+ * nav
+ */
 nav {
 	height: 60px;
 	display: block;
@@ -690,7 +693,9 @@ aside #viewcontacts {
 #netsearch-box {
 	margin: 30px 0px;
 }
-
+.ttright {
+	margin: 0px 0px 0px 5px;
+}
 
 /**
 * contacts block
@@ -916,7 +921,7 @@ aside #viewcontacts {
 	clear: both;
 }
 #jot-title-desc {
-	color: #cccccc;
+	color: #ccc;
 }
 #profile-jot-desc {
 	color: #ff2000;
@@ -1097,7 +1102,7 @@ section {
 	clear: left;
 	font-size: 0.8em;
 	color: #878883;
-	margin: 20px 0 0 110px;
+	margin: 20px 20px 0 110px;
 }
 .wall-item-ago {
 	display: inline;
@@ -1744,25 +1749,39 @@ div[id$="wrapper"] br {
     margin: 30px 0px;
 }
 .profile-edit-side-div {
-	background: #2e2f2e;
-	border-radius: 5px 5px 0 0;
-	width: 175px;
-	height: 20px;
-	position: relative;
-    margin: -25px -30px 0px 0px;
-	display: none;
-}
-.profile-edit-side-div:hover {
+	/*background: #111;*/
+	/*border-radius: 5px 5px 0px 0px;*/
 	/*margin: 0px 0px 0px 0px;*/
-	display: inline;
+	/*width: 100px;*/
+	/*height: 25px;*/
+	/*position: absolute;*/
+	display: none;
+	/*left: 35%;*/
+	/*top: 41%;*/
+	/*cursor: pointer;*/
 }
-.profile-edit-side-link {
-	margin: 0 0px 0px 155px;
-	/*float: right;*/
+/*.profile-edit-side-div:hover {*/
+	/*display: block;*/
+/*}*/
+/*.profile-edit-side-link {*/
+	/*margin: 3px 0px 0px 70px;*/
+/*}*/
+#profiles-menu-trigger {
+	width: 100px;
 }
 .profile-listing {
     float: left;
     margin: 20px 20px 0px 0px;
+}
+.icon-profile-edit {
+    background: url("icons.png") no-repeat scroll -150px 0px transparent;
+    border: 0 none;
+    display: block;
+    float: right;
+    height: 20px;
+    margin: 0 0 -18px;
+    text-decoration: none;
+	cursor: pointer;
 }
 #profile-edit-links ul {
     margin: 20px 0;

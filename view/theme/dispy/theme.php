@@ -111,6 +111,3 @@ $(document).ready(function() {
 });
 </script>
 EOT;
-
-$a->page['footer'] .= <<<EOFooter
-EOFooter;

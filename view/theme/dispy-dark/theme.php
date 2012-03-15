@@ -74,16 +74,6 @@ $(document).ready(function() {
 		event.stopPropagation();
 	});
 
-	// usermenu
-	//$('html').click(function() {
-//		$('#user-menu-popup').css('display: none');
-		//document.getElementById("usermenu-popup").style.display = "none";
-	//});
-
-	//$('#user-menu').click(function(event) {
-	//	event.stopPropagation();
-	//});
-
     function toggleToolbar() {
         if ( $('#nav-floater').is(':visible') ) {
             $('#nav-floater').slideUp('fast');
@@ -106,11 +96,20 @@ $(document).ready(function() {
 		$(this).css({color: '#eec'});
 	});
 
-	$('#profile-photo-wrapper').mouseover(function() {
-		$('#profile-edit-side-div').css({display: 'block'});
+/*	$('#profile-photo-wrapper').mouseover(function() {
+		$('.profile-edit-side-div').css({display: 'block'});
 	}).mouseout(function() {
-		$('#profile-edit-side-div').css({display: 'none'});
+		$('.profile-edit-side-div').css({display: 'none'});
+		return false;
 	});
+
+	$('img.photo').mouseover(function() {
+		$('.profile-edit-side-div').css({display: 'block'});
+	}).mouseout(function() {
+		$('.profile-edit-side-div').css({display: 'none'});
+		return false;
+	});*/
+
 });
 </script>
 EOT;

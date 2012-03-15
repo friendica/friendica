@@ -74,25 +74,6 @@
 		}
 	}
 
-    $(document).ready(function() {
-        function toggleToolbar() {
-            if ( $('#nav-floater').is(':visible') ) {
-                $('#nav-floater').slideUp('fast');
-                $('.floaterflip').css({
-                    backgroundPosition: '-210px -60px' 
-                });
-            } else {
-                $('#nav-floater').slideDown('fast');
-                $('.floaterflip').css({
-                    backgroundPosition: '-190px -60px'
-                });
-            }
-        };
-        $('.floaterflip').click(function() {
-            toggleToolbar();
-            return false;
-        });
-    });
 
 </script>
 

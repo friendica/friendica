@@ -1,30 +1,45 @@
 <div class="vcard">
 
 	<div class="fn label">$profile.name</div>
-	
+
+		{{ if $profile.edit }}
+			<div class="action">
+			<span class="icon-profile-edit"></span>
+			<a href="#" rel="#profiles-menu" class="ttright" id="profiles-menu-trigger" title="$profile.edit.3">$profile.edit.1</a>
+			<ul id="profiles-menu" class="menu-popup">
+				{{ for $profile.menu.entries as $e }}
+				<li>
+					<a href="profiles/$e.id"><img src='$e.photo'>$e.profile_name</a>
+				</li>
+				{{ endfor }}
+				<li><a href="profile_photo" >$profile.menu.chg_photo</a></li>
+				<li><a href="profiles/new" id="profile-listing-new-link">$profile.menu.cr_new</a></li>
+				
+			</ul>
+			</div>
+		{{ endif }}
+	</div>
+
 	{{ if $pdesc }}
     <div class="title">$profile.pdesc</div>
     {{ endif }}
 	<div id="profile-photo-wrapper">
-		<img class="photo" width="175" height="175" src="$profile.photo" alt="$profile.name" />
-		<div class="profile-edit-side-div">
-			<a class="profile-edit-side-link icon edit" title="$profile.$editprofile" href="profiles/$profile.id" ></a>
-		</div>
-		<div class="clear"></div>
+		<img class="photo" width="175" height="175" src="$profile.photo?rev=$profile.picdate" alt="$profile.name" />
     </div>
 
 	{{ if $location }}
 		<div class="location">
         <span class="location-label">$location</span>
-		<address class="adr">
+		<div class="adr">
 			{{ if $profile.address }}
             <div class="street-address">$profile.address</div>{{ endif }}
-			<span class="city-state-zip">$profile.zip</span>
-            <span class="locality">$profile.locality</span>{{ if $profile.locality }}, {{ endif }}
-            <span class="region">$profile.region</span>
-            <span class="postal-code">$profile.postal-code</span>
+			<span class="city-state-zip">
+				<span class="locality">$profile.locality</span>{{ if $profile.locality }}, {{ endif }}
+				<span class="region">$profile.region</span>
+				<span class="postal-code">$profile.postal-code</span>
+			</span>
 			{{ if $profile.country-name }}<span class="country-name">$profile.country-name</span>{{ endif }}
-		</address>
+		</div>
 		</div>
 	{{ endif }}
 
