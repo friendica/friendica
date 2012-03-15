@@ -1,7 +1,6 @@
 <?php
 
 require_once("boot.php");
-require_once("include/quoteconvert.php");
 
 
 function poller_run($argv, $argc){
@@ -69,6 +68,19 @@ function poller_run($argv, $argc){
 
 	// clear old cache
 	Cache::clear();
+
+	// clear item cache files if they are older than one day
+	$cache = get_config('system','itemcache');
+	if (($cache != '') and is_dir($cache)) {
+		if ($dh = opendir($cache)) {
+			while (($file = readdir($dh)) !== false) {
+				$fullpath = $cache."/".$file;
+				if ((filetype($fullpath) == "file") and filectime($fullpath) < (time() - 86400))
+					unlink($fullpath);
+			}
+			closedir($dh);
+		}
+	}
 
 	$manual_id  = 0;
 	$generation = 0;
@@ -141,7 +153,10 @@ function poller_run($argv, $argc){
 			if($manual_id)
 				$contact['last-update'] = '0000-00-00 00:00:00';
 
-			if($contact['network'] === NETWORK_DFRN || $contact['network'] === NETWORK_OSTATUS)
+			if($contact['network'] === NETWORK_DFRN)
+				$contact['priority'] = 2;
+
+			if(!get_config('system','ostatus_use_priority') and ($contact['network'] === NETWORK_OSTATUS))
 				$contact['priority'] = 2;
 
 			if($contact['priority'] || $contact['subhub']) {
@@ -494,7 +509,7 @@ function poller_run($argv, $argc){
 								logger("Mail: can't fetch msg ".$msg_uid);
 								continue;
 							}
-							$datarray['body'] = escape_tags(convertquote($r['body'], false));
+							$datarray['body'] = escape_tags($r['body']);
 
 							logger("Mail: Importing ".$msg_uid);
 

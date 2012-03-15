@@ -1,5 +1,7 @@
 <?php
 require_once('include/html2plain.php');
+require_once('include/msgclean.php');
+require_once('include/quoteconvert.php');
 
 function email_connect($mailbox,$username,$password) {
 	if(! function_exists('imap_open'))
@@ -86,6 +88,7 @@ function email_get_msg($mbox,$uid) {
 
 	if(! $struc->parts) {
 		$ret['body'] = email_get_part($mbox,$uid,$struc,0, 'html');
+		$html = $ret['body'];
 
 		if (trim($ret['body']) == '')
 			$ret['body'] = email_get_part($mbox,$uid,$struc,0, 'plain');
@@ -107,6 +110,17 @@ function email_get_msg($mbox,$uid) {
 		else
 			$ret['body'] = $text;
 	}
+
+	$ret['body'] = removegpg($ret['body']);
+	$msg = removesig($ret['body']);
+	$ret['body'] = $msg['body'];
+	$ret['body'] = convertquote($ret['body'], false);
+
+	if (trim($html) != '')
+		$ret['body'] = removelinebreak($ret['body']);
+
+	$ret['body'] = unifyattributionline($ret['body']);
+
 	return $ret;
 }
 

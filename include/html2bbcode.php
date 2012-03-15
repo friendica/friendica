@@ -142,18 +142,22 @@ function html2bbcode($message)
 	node2bbcode($doc, 'span', array('style'=>'font-style: italic;'), '[i]', '[/i]');
 	node2bbcode($doc, 'span', array('style'=>'font-weight: bold;'), '[b]', '[/b]');
 
-	node2bbcode($doc, 'font', array('face'=>'/([\w ]+)/', 'size'=>'/(\d+)/', 'color'=>'/(.+)/'), '[font=$1][size=$2][color=$3]', '[/color][/size][/font]');
+	/*node2bbcode($doc, 'font', array('face'=>'/([\w ]+)/', 'size'=>'/(\d+)/', 'color'=>'/(.+)/'), '[font=$1][size=$2][color=$3]', '[/color][/size][/font]');
 	node2bbcode($doc, 'font', array('size'=>'/(\d+)/', 'color'=>'/(.+)/'), '[size=$1][color=$2]', '[/color][/size]');
 	node2bbcode($doc, 'font', array('face'=>'/([\w ]+)/', 'size'=>'/(.+)/'), '[font=$1][size=$2]', '[/size][/font]');
 	node2bbcode($doc, 'font', array('face'=>'/([\w ]+)/', 'color'=>'/(.+)/'), '[font=$1][color=$3]', '[/color][/font]');
 	node2bbcode($doc, 'font', array('face'=>'/([\w ]+)/'), '[font=$1]', '[/font]');
 	node2bbcode($doc, 'font', array('size'=>'/(\d+)/'), '[size=$1]', '[/size]');
 	node2bbcode($doc, 'font', array('color'=>'/(.+)/'), '[color=$1]', '[/color]');
+*/
+	// Untested
+	//node2bbcode($doc, 'span', array('style'=>'/.*font-size:\s*(.+?)[,;].*font-family:\s*(.+?)[,;].*color:\s*(.+?)[,;].*/'), '[size=$1][font=$2][color=$3]', '[/color][/font][/size]');
+	//node2bbcode($doc, 'span', array('style'=>'/.*font-size:\s*(\d+)[,;].*/'), '[size=$1]', '[/size]');
+	//node2bbcode($doc, 'span', array('style'=>'/.*font-size:\s*(.+?)[,;].*/'), '[size=$1]', '[/size]');
 
 	node2bbcode($doc, 'span', array('style'=>'/.*color:\s*(.+?)[,;].*/'), '[color="$1"]', '[/color]');
-	node2bbcode($doc, 'span', array('style'=>'/.*font-size:\s*(\d+)/'), '[size=$1]', '[/size]');
-
 	//node2bbcode($doc, 'span', array('style'=>'/.*font-family:\s*(.+?)[,;].*/'), '[font=$1]', '[/font]');
+
 	//node2bbcode($doc, 'div', array('style'=>'/.*font-family:\s*(.+?)[,;].*font-size:\s*(\d+?)pt.*/'), '[font=$1][size=$2]', '[/size][/font]');
 	//node2bbcode($doc, 'div', array('style'=>'/.*font-family:\s*(.+?)[,;].*font-size:\s*(\d+?)px.*/'), '[font=$1][size=$2]', '[/size][/font]');
 	//node2bbcode($doc, 'div', array('style'=>'/.*font-family:\s*(.+?)[,;].*/'), '[font=$1]', '[/font]');
@@ -187,13 +191,13 @@ function html2bbcode($message)
 
 	node2bbcode($doc, 'hr', array(), "[hr]", "");
 
-	//node2bbcode($doc, 'table', array(), "", "");
-	//node2bbcode($doc, 'tr', array(), "\n", "");
-	//node2bbcode($doc, 'td', array(), "\t", "");
-	node2bbcode($doc, 'table', array(), "[table]", "[/table]");
-	node2bbcode($doc, 'th', array(), "[th]", "[/th]");
-	node2bbcode($doc, 'tr', array(), "[tr]", "[/tr]");
-	node2bbcode($doc, 'td', array(), "[td]", "[/td]");
+	node2bbcode($doc, 'table', array(), "", "");
+	node2bbcode($doc, 'tr', array(), "\n", "");
+	node2bbcode($doc, 'td', array(), "\t", "");
+	//node2bbcode($doc, 'table', array(), "[table]", "[/table]");
+	//node2bbcode($doc, 'th', array(), "[th]", "[/th]");
+	//node2bbcode($doc, 'tr', array(), "[tr]", "[/tr]");
+	//node2bbcode($doc, 'td', array(), "[td]", "[/td]");
 
 	node2bbcode($doc, 'h1', array(), "\n\n[size=xx-large][b]", "[/b][/size]\n");
 	node2bbcode($doc, 'h2', array(), "\n\n[size=x-large][b]", "[/b][/size]\n");

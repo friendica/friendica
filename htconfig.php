@@ -79,3 +79,9 @@ $a->config['system']['theme'] = 'duepuntozero';
 // By default allow pseudonyms
 
 $a->config['system']['no_regfullname'] = true;
+
+// If set to true the priority settings of ostatus contacts are used
+$a->config['system']['ostatus_use_priority'] = false;
+
+// If enabled all items are cached in the given directory
+$a->config['system']['itemcache'] = "";

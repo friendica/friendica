@@ -877,14 +877,27 @@ function prepare_body($item,$attach = false) {
 	$a = get_app();
 	call_hooks('prepare_body_init', $item); 
 
-	$s = prepare_text($item['body']);
+	$cache = get_config('system','itemcache');
+
+	if (($cache != '')) {
+		$cachefile = $cache."/".$item["guid"]."-".strtotime($item["edited"])."-".hash("crc32", $item['body']);
+
+		if (file_exists($cachefile))
+			$s = file_get_contents($cachefile);
+		else {
+			$s = prepare_text($item['body']);
+			file_put_contents($cachefile, $s);
+		}
+	} else
+		$s = prepare_text($item['body']);
 
 	$prep_arr = array('item' => $item, 'html' => $s);
 	call_hooks('prepare_body', $prep_arr);
 	$s = $prep_arr['html'];
 
-	if(! $attach)
+	if(! $attach) {
 		return $s;
+	}
 
 	$arr = explode(',',$item['attach']);
 	if(count($arr)) {
@@ -942,9 +955,9 @@ function prepare_body($item,$attach = false) {
 			$s .= '<div class="filesavetags"><span>' . t('Filed under:') . ' </span>' . $x . '</div>'; 
 	}
 
-
 	$prep_arr = array('item' => $item, 'html' => $s);
 	call_hooks('prepare_body_final', $prep_arr);
+
 	return $prep_arr['html'];
 }}
 
