@@ -123,9 +123,6 @@ a {
     text-decoration: none;
     margin-bottom: 1px;
 }
-/*a:hover {                 */
-/*    text-decoration: none;*/
-/*}*/
 a:hover img {
     text-decoration: none;
 }
@@ -777,6 +774,15 @@ aside #viewcontacts {
 }
 #profile-jot-text_ifr {
 	width:99.900002% !important;
+}
+[id$="jot-text_ifr"] {
+	width: 99.900002% !important;
+	color: #2e2f2e;
+	background: #eec;
+}
+[id$="jot-text_ifr"] .mceContentBody {
+	color: #2e2f2e;
+	background: #eec;
 }
 #profile-attach-wrapper,
 #profile-audio-wrapper,
@@ -1527,7 +1533,6 @@ div[id$="wrapper"] br {
 }
 .mail-list-subject {
     font-size: 1.2em;
-	font-weight: bold;
 }
 .mail-list-delete-wrapper {
     float: right;
@@ -1751,23 +1756,23 @@ div[id$="wrapper"] br {
     margin: 30px 0px;
 }
 .profile-edit-side-div {
-	/*background: #111;*/
-	/*border-radius: 5px 5px 0px 0px;*/
-	/*margin: 0px 0px 0px 0px;*/
-	/*width: 100px;*/
-	/*height: 25px;*/
-	/*position: absolute;*/
+	/*background: #111;
+	border-radius: 5px 5px 0px 0px;
+	margin: 0px 0px 0px 0px;
+	width: 100px;
+	height: 25px;
+	position: absolute;*/
 	display: none;
-	/*left: 35%;*/
-	/*top: 41%;*/
-	/*cursor: pointer;*/
+	/*left: 35%;
+	top: 41%;
+	cursor: pointer;*/
 }
-/*.profile-edit-side-div:hover {*/
-	/*display: block;*/
-/*}*/
-/*.profile-edit-side-link {*/
-	/*margin: 3px 0px 0px 70px;*/
-/*}*/
+/*.profile-edit-side-div:hover {
+	display: block;
+}
+.profile-edit-side-link {
+	margin: 3px 0px 0px 70px;
+}*/
 #profiles-menu-trigger {
 	margin: 0px 0px 0px 25px;
 }
@@ -2123,12 +2128,12 @@ div[id$="wrapper"] br {
     border-bottom: 1px solid #000;
 }
 #adminpage dt {
-    width: 200px;
+    width: 250px;
     float: left;
     font-weight: bold;
 }
 #adminpage dd {
-	margin-left: 200px;
+	margin-left: 250px;
 }
 #adminpage h3 {
     border-bottom:1px solid #ccc;
@@ -2590,8 +2595,8 @@ footer {
     margin-top: 30px;
     overflow: auto;
 }
-/*#acl-list-content {*/
-/*}*/
+/*#acl-list-content {
+}*/
 .acl-list-item {
 	border: 1px solid #eec;
     display: block;

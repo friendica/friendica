@@ -1,4 +1,4 @@
-<div class="widget" id="saved-search-list">
+<div id="saved-search-list" class="widget">
 	<h3 id="search">$title</h3>
 	$searchbox
 	
