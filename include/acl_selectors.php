@@ -113,11 +113,13 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 		$str_nets = implode(',',$x['networks']);
 		$sql_extra .= " AND `network` IN ( $str_nets ) ";
 	}
+	
+	$tabindex = (x($options, 'tabindex') ? "tabindex=\"" . $options["tabindex"] . "\"" : "");
 
 	if($x['single'])
-		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"" . $x['size'] . "\" >\r\n";
+		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"" . $x['size'] . "\" $tabindex >\r\n";
 	else 
-		$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"" . $x['size'] . "$\" >\r\n";
+		$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"" . $x['size'] . "$\" $tabindex >\r\n";
 
 	$r = q("SELECT `id`, `name`, `url`, `network` FROM `contact` 
 		WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 AND `notify` != ''
@@ -156,7 +158,7 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 
 
 
-function contact_select($selname, $selclass, $preselected = false, $size = 4, $privmail = false, $celeb = false, $privatenet = false) {
+function contact_select($selname, $selclass, $preselected = false, $size = 4, $privmail = false, $celeb = false, $privatenet = false, $tabindex = null) {
 
 	$a = get_app();
 
@@ -178,12 +180,12 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 		$sql_extra .= " AND `network` IN ( 'dfrn', 'mail', 'face', 'dspr' ) ";
 	}
 
-
+	$tabindex = ($tabindex > 0 ? "tabindex=\"$tabindex\"" : "");
 
 	if($privmail)
-		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"$size\" >\r\n";
+		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"$size\" $tabindex >\r\n";
 	else 
-		$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"$size\" >\r\n";
+		$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"$size\" $tabindex >\r\n";
 
 	$r = q("SELECT `id`, `name`, `url`, `network` FROM `contact` 
 		WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 AND `notify` != ''

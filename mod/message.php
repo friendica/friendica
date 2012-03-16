@@ -154,7 +154,7 @@ function message_content(&$a) {
 	
 		$preselect = (isset($a->argv[2])?array($a->argv[2]):false);
 	
-		$select = contact_select('messageto','message-to-select', $preselect, 4, true);
+		$select = contact_select('messageto','message-to-select', $preselect, 4, true, false, false, 10);
 		$tpl = get_markup_template('prv_message.tpl');
 		$o .= replace_macros($tpl,array(
 			'$header' => t('Send Private Message'),
