@@ -1,6 +1,6 @@
 <div class="mail-list-outside-wrapper">
 	<div class="mail-list-sender" >
-		<a href="$from_url" class="mail-list-sender-url" ><img class="mail-list-sender-photo$sparkle" src="$from_photo" height="80 width="80" alt="$from_name" /></a>
+		<a href="$from_url" class="mail-list-sender-url" ><img class="mail-list-sender-photo$sparkle" src="$from_photo" height="80" width="80" alt="$from_name" /></a>
 	</div>
 	<div class="mail-list-detail">
 		<div class="mail-list-sender-name" >$from_name</div>
