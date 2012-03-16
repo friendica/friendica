@@ -1490,6 +1490,8 @@ div[id$="wrapper"] br {
 }
 #prvmail-subject {
     width: 100%;
+	color: #2e2f2e;
+	background: #eec;
 }
 #prvmail-submit-wrapper {
     margin-top: 10px;
@@ -1803,6 +1805,10 @@ div[id$="wrapper"] br {
 	background: #2e2f2e;
 	color: #eec;
 }
+#id_ssl_policy {
+	width: 374px;
+}
+
 
 /**
  * 	contacts selector
