@@ -73,6 +73,15 @@ $(document).ready(function() {
 	$('#nav-notifications-linkmenu').click(function(event) {
 		event.stopPropagation();
 	});
+	// click outside profiles menu closes it
+	$('html').click(function() {
+		$('#profiles-menu-trigger').removeClass('selected');
+		document.getElementById("profiles-menu").style.display = "none";
+	});
+
+	$('#profiles-menu').click(function(event) {
+		event.stopPropagation();
+	});
 
 	// main function in toolbar functioning
     function toggleToolbar() {
