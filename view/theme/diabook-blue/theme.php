@@ -11,9 +11,9 @@ $a->theme_info = array(
   'extends' => 'diabook',
 );
 
+//fancybox: provide $photo.href to photo_top.tpl to img in org. scale
+
 //profile_side
-
-
 
 $nav['usermenu']=array();
 $userinfo = null;
@@ -110,9 +110,14 @@ $('html').click(function() {
      event.stopPropagation();
  });
  
- $(function() {
-	$('a.lightbox').fancybox(); // Select all links with lightbox class
+
+
+ $(document).ready(function() {
+	$("a.fancy-photo").fancybox(); // Select all links with lightbox class 
+	$("a.fancy-album").fancybox();
 });
+
+
 
  
  </script>

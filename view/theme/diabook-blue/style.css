@@ -891,22 +891,47 @@ ul.menu-popup .empty {
   text-decoration: none;	
 	}
 .menu-profile-side{
-	list-style: none;	
-  padding-left: 16px;
-  min-height: 16px;
+  list-style: none;	
+  padding-left: 0px;
+  min-height: 0px;
 	}
 .menu-profile-list{
   height: auto;
   overflow: auto;
   padding-top: 3px;
   padding-bottom: 3px;
+  padding-left: 16px;
+  min-height: 16px;
+  list-style: none;
 	}
 .menu-profile-list:hover{
 	background: #EEE;
 	}
+.menu-profile-list-item{
+	padding-left: 5px;
+	}	
 .menu-profile-list-item:hover{	
-	text-decoration: none;	
+	text-decoration: none;
    }
+/*http://prothemedesign.com/circular-icons/*/
+.menu-profile-list.home{
+	background: url("../../../view/theme/diabook-blue/icons/home.png") no-repeat;
+	}
+.menu-profile-list.photos{
+	background: url("../../../view/theme/diabook-blue/icons/mess_side.png") no-repeat;
+	}
+.menu-profile-list.events{
+	background: url("../../../view/theme/diabook-blue/icons/events.png") no-repeat;
+	}
+.menu-profile-list.notes{
+	background: url("../../../view/theme/diabook-blue/icons/notes.png") no-repeat;
+	}
+.menu-profile-list.foren{
+	background: url("../../../view/theme/diabook-blue/icons/pubgroups.png") no-repeat;
+	}
+.menu-profile-list.com_side{
+	background: url("../../../view/theme/diabook-blue/icons/com_side.png") no-repeat;
+	}
 /* aside */
 aside {
   display: table-cell;
@@ -1065,6 +1090,16 @@ aside #side-peoplefind-url {
   padding-left: 16px;
   min-height: 16px;
   list-style: none;
+}
+#side-bar-photos-albums li{
+list-style-type: disc;
+}
+#side-bar-photos-albums ul li{
+  margin-left: 30px;
+  padding-left: 0px;
+	}
+#side-bar-photos-albums ul li a{
+  color: #1872A2;
 }
 .widget .tool.selected {
   background: url("../../../view/theme/diabook-blue/icons/selected.png") no-repeat left center;
@@ -2207,6 +2242,9 @@ a.mail-list-link {
 .calendar {
         font-family: Courier, monospace;
 }
+.calendar.eventcal a {
+  color: #1872A2;	
+	}
 .today {
         font-weight: bold;
         color: #FF0000;
@@ -2380,6 +2418,9 @@ float: left;
   padding-bottom: 20px;
   position: relative;
   margin: 0 10px 10px 0;
+  overflow: hidden;
+  float: left;
+  position: relative;
 }
 .photo-top-album-name {
   position: absolute;
@@ -2388,6 +2429,9 @@ float: left;
 }
 .photo-top-album-link{
   color: #1872A2;
+	}
+.photo-top-album-img{
+	
 	}
 /*.photo-top-image-wrapper {
         position: relative;

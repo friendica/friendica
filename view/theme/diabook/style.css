@@ -485,9 +485,6 @@ code {
 #sidebar-group-list .tool:hover {
 	background: #EEE;
 }
-#sidebar-pages-list .tool:hover {
-	background: #EEE;
-}
 .tool .label {
   float: left;
 }
@@ -1337,14 +1334,14 @@ body .pageheader{
 }
 .tag {
   /*background: url("../../../images/tag_b.png") repeat-x center left;*/
-  color: #999;
+  color: #3465A4;
   padding-left: 3px;
   font-size: 12px;
 }
 .tag a {
   padding-right: 5px;
   /*background: url("../../../images/tag.png") no-repeat center right;*/
-  color: #999;
+  color: #3465A4;
 }
 .wwto {
   position: absolute !important;

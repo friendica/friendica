@@ -13,8 +13,7 @@
 				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="contact-photo-link" id="wall-item-photo-link-$item.id">
 					<img src="$item.thumb" class="contact-photo$item.sparkle" id="wall-item-photo-$item.id" alt="$item.name" />
 				</a>
-				<a href="#" rel="#wall-item-photo-menu-$item.id" class="contact-photo-menu-button icon s16 menu" 
-id="wall-item-photo-menu-button-$item.id">menu</a>
+				<a href="#" rel="#wall-item-photo-menu-$item.id" class="contact-photo-menu-button icon s16 menu" id="wall-item-photo-menu-button-$item.id">menu</a>
 				<ul class="contact-menu menu-popup" id="wall-item-photo-menu-$item.id">
 				$item.item_photo_menu
 				</ul>
@@ -22,8 +21,7 @@ id="wall-item-photo-menu-button-$item.id">menu</a>
 			</div>
 		</div>
 			<div class="wall-item-actions-author">
-				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-name-link"><span 
-class="wall-item-name$item.sparkle">$item.name</span></a> 
+				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-name-link"><span class="wall-item-name$item.sparkle">$item.name</span></a> 
 			<span class="wall-item-ago">-
 			{{ if $item.plink }}<a class="link" title="$item.plink.title" href="$item.plink.href" style="color: #999">$item.ago</a>{{ else }} $item.ago {{ endif }}
 			{{ if $item.lock }} - <span class="fakelink" style="color: #999" onclick="lockview(event,$item.id);">$item.lock</span> {{ endif }}
@@ -97,4 +95,3 @@ class="wall-item-name$item.sparkle">$item.name</span></a>
 <div class="wall-item-comment-wrapper" >
 	$item.comment
 </div>
-
