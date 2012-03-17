@@ -52,6 +52,9 @@ $('.savedsearchterm').hover(
 		$('#drop-' + id).removeClass('icon');$('#drop-' + id).removeClass('drophide'); $('#drop-' + id).addClass('iconspacer');}
 	);
 
+	// make auto-complete work in more places
+	$(".wall-item-comment-wrapper textarea").contact_autocomplete(baseurl+"/acl");
+
 });
 
 
