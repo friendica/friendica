@@ -16,7 +16,15 @@ function display_content(&$a) {
 
 	$o = '<div id="live-display"></div>' . "\r\n";
 
-	$a->page['htmlhead'] .= '<script>$(document).ready(function() {	$(".comment-edit-wrapper  textarea").contact_autocomplete(baseurl+"/acl"); });</script>';
+	$a->page['htmlhead'] .= <<<EOT
+<script>
+$(document).ready(function() {
+	$(".comment-edit-wrapper textarea").contact_autocomplete(baseurl+"/acl");
+	// make auto-complete work in more places
+	$(".wall-item-comment-wrapper textarea").contact_autocomplete(baseurl+"/acl");
+});
+</script>
+EOT;
 
 
 	$nick = (($a->argc > 1) ? $a->argv[1] : '');

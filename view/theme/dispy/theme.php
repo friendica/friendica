@@ -108,9 +108,6 @@ $(document).ready(function() {
 		$(this).css({color: '#eec'});
 	});
 
-	// make auto-complete work in more places
-	$(".wall-item-comment-wrapper textarea").contact_autocomplete(baseurl+"/acl");
-
 /*	$('#profile-photo-wrapper').mouseover(function() {
 		$('.profile-edit-side-div').css({display: 'block'});
 	}).mouseout(function() {
