@@ -649,7 +649,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 					// template to use to render item (wall, walltowall, search)
 					'template' => $template,
 					
-					'type' => implode("",array_slice(split("/",$item['verb']),-1)),
+					'type' => implode("",array_slice(explode("/",$item['verb']),-1)),
 					'tags' => $tags,
 					'body' => template_escape($body),
 					'text' => strip_tags(template_escape($body)),

@@ -56,7 +56,7 @@ function email_msg_headers($mbox,$uid) {
 	$raw_header = (($mbox && $uid) ? @imap_fetchheader($mbox,$uid,FT_UID) : '');
 	$raw_header = str_replace("\r",'',$raw_header);
 	$ret = array();
-	$h = split("\n",$raw_header);
+	$h = explode("\n",$raw_header);
 	if(count($h))
 	foreach($h as $line ) {
 	    if (preg_match("/^[a-zA-Z]/", $line)) {
