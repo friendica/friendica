@@ -3,6 +3,7 @@
 
 <div id="group-edit-wrapper" >
 	<form action="group/$gid" id="group-edit-form" method="post" >
+		<input type='hidden' name='form_security_token' value='$form_security_token'>
 		
 		{{ inc field_input.tpl with $field=$gname }}{{ endinc }}
 		{{ if $drop }}$drop{{ endif }}

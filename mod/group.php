@@ -21,6 +21,8 @@ function group_post(&$a) {
 	}
 
 	if(($a->argc == 2) && ($a->argv[1] === 'new')) {
+		check_form_security_token_redirectOnErr('/group/new', 'group_edit');
+		
 		$name = notags(trim($_POST['groupname']));
 		$r = group_add(local_user(),$name);
 		if($r) {
@@ -35,6 +37,8 @@ function group_post(&$a) {
 		return; // NOTREACHED
 	}
 	if(($a->argc == 2) && (intval($a->argv[1]))) {
+		check_form_security_token_redirectOnErr('/group', 'group_edit');
+		
 		$r = q("SELECT * FROM `group` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($a->argv[1]),
 			intval(local_user())
@@ -62,7 +66,8 @@ function group_post(&$a) {
 }
 
 function group_content(&$a) {
-
+	$change = false;
+	
 	if(! local_user()) {
 		notice( t('Permission denied') . EOL);
 		return;
@@ -83,14 +88,17 @@ function group_content(&$a) {
 		
 		return replace_macros($tpl, $context + array(
 			'$title' => t('Create a group of contacts/friends.'),
-			'$gname' => array('groupname',t('Group Name: '),$group['name'], ''),
+			'$gname' => array('groupname',t('Group Name: '), '', ''),
 			'$gid' => 'new',
+			'$form_security_token' => get_form_security_token("group_edit"),
 		));
 
 
 	}
 
 	if(($a->argc == 3) && ($a->argv[1] === 'drop')) {
+		check_form_security_token_redirectOnErr('/group', 'group_drop', 't');
+		
 		if(intval($a->argv[2])) {
 			$r = q("SELECT `name` FROM `group` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($a->argv[2]),
@@ -108,6 +116,8 @@ function group_content(&$a) {
 	}
 
 	if(($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
+		check_form_security_token_ForbiddenOnErr('group_member_change', 't');
+		
 		$r = q("SELECT `id` FROM `contact` WHERE `id` = %d AND `uid` = %d and `self` = 0 and `blocked` = 0 AND `pending` = 0 LIMIT 1",
 			intval($a->argv[2]),
 			intval(local_user())
@@ -155,7 +165,8 @@ function group_content(&$a) {
 		$drop_tpl = get_markup_template('group_drop.tpl');
 		$drop_txt = replace_macros($drop_tpl, array(
 			'$id' => $group['id'],
-			'$delete' => t('Delete')
+			'$delete' => t('Delete'),
+			'$form_security_token' => get_form_security_token("group_drop"),
 		));
 
 		$celeb = ((($a->user['page-flags'] == PAGE_SOAPBOX) || ($a->user['page-flags'] == PAGE_COMMUNITY)) ? true : false);
@@ -166,6 +177,7 @@ function group_content(&$a) {
 			'$gname' => array('groupname',t('Group Name: '),$group['name'], ''),
 			'$gid' => $group['id'],
 			'$drop' => $drop_txt,
+			'$form_security_token' => get_form_security_token('group_edit'),
 		);
 
 	}
@@ -177,14 +189,14 @@ function group_content(&$a) {
 		'label_members' => t('Members'),
 		'members' => array(),
 		'label_contacts' => t('All Contacts'),
-		'contacts' => arraY(),
+		'contacts' => array(),
 	);
 		
-
+	$sec_token = addslashes(get_form_security_token('group_member_change'));
 	$textmode = (($switchtotext && (count($members) > $switchtotext)) ? true : false);
 	foreach($members as $member) {
 		if($member['url']) {
-			$member['click'] = 'groupChangeMember(' . $group['id'] . ',' . $member['id'] . '); return true;';
+			$member['click'] = 'groupChangeMember(' . $group['id'] . ',' . $member['id'] . ',\'' . $sec_token . '\'); return true;';
 			$groupeditor['members'][] = micropro($member,true,'mpgroup', $textmode);
 		}
 		else
@@ -199,7 +211,7 @@ function group_content(&$a) {
 		$textmode = (($switchtotext && (count($r) > $switchtotext)) ? true : false);
 		foreach($r as $member) {
 			if(! in_array($member['id'],$preselected)) {
-				$member['click'] = 'groupChangeMember(' . $group['id'] . ',' . $member['id'] . '); return true;';
+				$member['click'] = 'groupChangeMember(' . $group['id'] . ',' . $member['id'] . ',\'' . $sec_token . '\'); return true;';
 				$groupeditor['contacts'][] = micropro($member,true,'mpall', $textmode);
 			}
 		}

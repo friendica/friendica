@@ -486,9 +486,9 @@
         return a.join('');  
     }  
 
-	function groupChangeMember(gid,cid) {
+	function groupChangeMember(gid, cid, sec_token) {
 		$('body .fakelink').css('cursor', 'wait');
-		$.get('group/' + gid + '/' + cid, function(data) {
+		$.get('group/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
 				$('#group-update-wrapper').html(data);
 				$('body .fakelink').css('cursor', 'auto');				
 		});

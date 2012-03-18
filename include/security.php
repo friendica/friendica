@@ -334,3 +334,9 @@ function check_form_security_token_redirectOnErr($err_redirect, $typename = "", 
 		goaway($a->get_baseurl() . $err_redirect );
 	}
 }
+function check_form_security_token_ForbiddenOnErr($typename = "", $formname = 'form_security_token') {
+	if (!check_form_security_token($typename, $formname)) {
+		header('HTTP/1.1 403 Forbidden');
+		killme();
+	}
+}
