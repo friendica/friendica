@@ -299,16 +299,16 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
  *    Actually, important actions should not be triggered by Links / GET-Requests at all, but somethimes they still are,
  *    so this mechanism brings in some damage control (the attacker would be able to forge a request to a form of this type, but not to forms of other types).
  */ 
-function get_form_security_token($typename = "") {
+function get_form_security_token($typename = '') {
 	$a = get_app();
 	
 	$timestamp = time();
-	$sec_hash = hash('whirlpool', $a->user["guid"] . $a->user["prvkey"] . session_id() . $timestamp . $typename);
+	$sec_hash = hash('whirlpool', $a->user['guid'] . $a->user['prvkey'] . session_id() . $timestamp . $typename);
 	
-	return $timestamp . "." . $sec_hash;
+	return $timestamp . '.' . $sec_hash;
 }
 
-function check_form_security_token($typename = "", $formname = 'form_security_token') {
+function check_form_security_token($typename = '', $formname = 'form_security_token') {
 	if (!x($_REQUEST, $formname)) return false;
 	$hash = $_REQUEST[$formname];
 	
@@ -316,10 +316,10 @@ function check_form_security_token($typename = "", $formname = 'form_security_to
 	
 	$a = get_app();
 	
-	$x = explode(".", $hash);
+	$x = explode('.', $hash);
 	if (time() > (IntVal($x[0]) + $max_livetime)) return false;
 	
-	$sec_hash = hash('whirlpool', $a->user["guid"] . $a->user["prvkey"] . session_id() . $x[0] . $typename);
+	$sec_hash = hash('whirlpool', $a->user['guid'] . $a->user['prvkey'] . session_id() . $x[0] . $typename);
 	
 	return ($sec_hash == $x[1]);
 }
@@ -327,15 +327,19 @@ function check_form_security_token($typename = "", $formname = 'form_security_to
 function check_form_security_std_err_msg() {
 	return t('The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before subitting it.') . EOL;
 }
-function check_form_security_token_redirectOnErr($err_redirect, $typename = "", $formname = 'form_security_token') {
+function check_form_security_token_redirectOnErr($err_redirect, $typename = '', $formname = 'form_security_token') {
 	if (!check_form_security_token($typename, $formname)) {
 		$a = get_app();
+		logger('check_form_security_token failed: user ' . $a->user['guid'] . ' - form element ' . $typename);
+		logger('check_form_security_token failed: _REQUEST data: ' . print_r($_REQUEST, true), LOGGER_DATA);
 		notice( check_form_security_std_err_msg() );
 		goaway($a->get_baseurl() . $err_redirect );
 	}
 }
-function check_form_security_token_ForbiddenOnErr($typename = "", $formname = 'form_security_token') {
+function check_form_security_token_ForbiddenOnErr($typename = '', $formname = 'form_security_token') {
 	if (!check_form_security_token($typename, $formname)) {
+		logger('check_form_security_token failed: user ' . $a->user['guid'] . ' - form element ' . $typename);
+		logger('check_form_security_token failed: _REQUEST data: ' . print_r($_REQUEST, true), LOGGER_DATA);
 		header('HTTP/1.1 403 Forbidden');
 		killme();
 	}
