@@ -153,9 +153,9 @@ a:hover {
     color: #729fcf;
 }
 input[type=submit] {
-	font-weight: bold;
     background-color: #eee;
 	color: #2e302e;
+	font-weight: bold;
     margin-top: 10px;
     height: 22px;
     -webkit-border-radius: 5px;
@@ -1871,6 +1871,71 @@ div[id$="wrapper"] br {
 #crop-image-form {
     clear:both;
 }
+
+
+/**
+ * intros
+ */
+.intro-wrapper {
+    margin-top: 20px;
+}
+
+.intro-fullname {
+    font-size: 1.1em;
+    font-weight: bold;
+
+}
+.intro-desc {
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.intro-note {
+    padding: 10px;
+}
+
+.intro-end {
+    padding: 30px;
+}
+
+.intro-form {
+    float: left;
+}
+.intro-approve-form {
+    clear: both;
+}
+.intro-approve-as-friend-end {
+    clear: both;
+}
+.intro-submit-approve, .intro-submit-ignore {
+    margin-right: 20px;
+}
+.intro-submit-approve {
+    margin-top: 15px;
+}
+
+.intro-approve-as-friend-label, .intro-approve-as-fan-label {
+    float: left;
+}
+.intro-approve-as-friend, .intro-approve-as-fan {
+    float: left;
+}
+.intro-form-end {
+    clear: both;
+    margin-bottom: 10px;
+}
+.intro-approve-as-friend-desc {
+    margin-top: 10px;
+}
+.intro-approve-as-end {
+    clear: both;
+    margin-bottom: 10px;
+}
+
+.intro-end {
+    clear: both;
+}
+
 
 /**
  * events

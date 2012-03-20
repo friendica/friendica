@@ -4,18 +4,15 @@
 <div id="photo-edit-link-wrap">
 {{ if $tools }}
 <a id="photo-edit-link" href="$tools.edit.0">$tools.edit.1</a>
--
+|
 <a id="photo-toprofile-link" href="$tools.profile.0">$tools.profile.1</a>
 {{ endif }}
-{{ if $lock }} - <img src="images/lock_icon.gif" class="lockview" alt="$lock" onclick="lockview(event,'photo$id');" /> {{ endif }}
+{{ if $lock }} | <img src="images/lock_icon.gif" class="lockview" alt="$lock" onclick="lockview(event,'photo/$id');" /> {{ endif }}
 </div>
 
-<div id="photo-photo">
-	{{ if $prevlink }}<div id="photo-prev-link"><a href="$prevlink.0">$prevlink.1</a></div>{{ endif }}
-	<a href="$photo.href" title="$photo.title"><img src="$photo.src" /></a>
-	{{ if $nextlink }}<div id="photo-next-link"><a href="$nextlink.0">$nextlink.1</a></div>{{ endif }}
-</div>
-
+{{ if $prevlink }}<div id="photo-prev-link"><a href="$prevlink.0">$prevlink.1</a></div>{{ endif }}
+<div id="photo-photo"><a href="$photo.href" title="$photo.title"><img src="$photo.src" /></a></div>
+{{ if $nextlink }}<div id="photo-next-link"><a href="$nextlink.0">$nextlink.1</a></div>{{ endif }}
 <div id="photo-photo-end"></div>
 <div id="photo-caption">$desc</div>
 {{ if $tags }}
