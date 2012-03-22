@@ -27,10 +27,31 @@ class AntiXSSTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testXmlify() {
 		$text="<tag>I want to break\n this!11!<?hard?></tag>";
-		$xml=xmlify($text); //test whether it actually may be part of a xml document
+		$xml=xmlify($text); 
 		$retext=unxmlify($text);
 
 		$this->assertEquals($text, $retext);
+	}
+	
+	/**
+	 * xmlify and put in a document
+	 */
+	public function testXmlifyDocument() {
+		$tag="<tag>I want to break</tag>";
+		$xml=xmlify($tag);
+		$text='<text>'.$xml.'</text>'; 
+		
+		$xml_parser=xml_parser_create(); 
+		//should be possible to parse it
+		$values=array(); $index=array(); 
+		$this->assertEquals(1, xml_parse_into_struct($xml_parser, $text, $values, $index)); 
+		
+		$this->assertEquals(array('TEXT'=>array(0)), 
+				$index); 
+		$this->assertEquals(array(array('tag'=>'TEXT', 'type'=>'complete', 'level'=>1, 'value'=>$tag)),
+				$values);
+		
+		xml_parser_free($xml_parser); 
 	}
 
 	/**
