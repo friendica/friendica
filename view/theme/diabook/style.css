@@ -385,7 +385,7 @@
 .hide-comments-outer {
   margin-left: 80px;
   margin-bottom: 5px;
-  width: 684px;
+  width: 484px;
   border-bottom: 1px solid #BDCDD4;
   border-top: 1px solid #BDCDD4;
 
@@ -1096,8 +1096,8 @@ aside #side-peoplefind-url {
 section {
   display: table-cell;
   vertical-align: top;
-  width: 800px;
-  padding: 0px 0px 0px 12px;
+  width: auto;
+  padding: 0px 12px 0px 12px;
 }
 
 body .pageheader{
@@ -1145,13 +1145,30 @@ body .pageheader{
 #birthday-notice, #event-notice, #birthday-wrapper, #event-wrapper{
 	margin-bottom: 10px;
 	}
+
+right_aside {
+  display: table-cell;
+  vertical-align: top;
+  width: 180px;
+  /*border-left: 1px solid #D2D2D2;*/
+  
+  /* background: #F1F1F1; */
+}
+right_aside h3 {border-bottom: 1px solid #D2D2D2; padding-top: 5px; padding-bottom: 0px; padding-left: 5px; margin-bottom: 0px; 
+margin-top:30px;}
+right_aside .directory-item {	width: 55px; height: 55px; vertical-align: center; text-align: center; }
+right_aside .directory-photo { margin: 0px; }
+right_aside .directory-photo-img { max-width: 48px; max-height: 48px; }
+right_aside #likes { margin: 0px; padding: 0px; list-style: none; }
+right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px solid #D2D2D2;}
+
 /* wall item */
 .tread-wrapper {
   border-bottom: 1px solid #D2D2D2;
   position: relative;
   padding: 5px;
   margin-bottom: 0px;
-  width: 775px;
+  width: 575px;
 }
 .wall-item-decor {
   position: absolute;
@@ -1162,7 +1179,7 @@ body .pageheader{
 
 .wall-item-container {
   display: table;
-  width: 780px;
+  width: 580px;
 }
 
 
@@ -1275,7 +1292,7 @@ body .pageheader{
   margin-top: 5px;
   margin-bottom: 5px;
   margin-left: 80px;
-  width: 700px;
+  width: 500px;
   border-bottom: 1px solid hsl(198, 21%, 79%);
 }
 .wall-item-container.comment .contact-photo {
@@ -1591,7 +1608,7 @@ body .pageheader{
 }
 #profile-jot-wrapper{
 	margin: 0 2em 20px 0;
-   width: 785px;
+   width: 585px;
 	}
 
 #profile-jot-submit-wrapper {
