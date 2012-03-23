@@ -263,7 +263,7 @@ function settings_post(&$a) {
 	$suggestme        = ((x($_POST,'suggestme')) ? intval($_POST['suggestme'])  : 0);  
 	$hide_friends     = (($_POST['hide-friends'] == 1) ? 1: 0);
 	$hidewall         = (($_POST['hidewall'] == 1) ? 1: 0);
-
+	$nosmile          = ((x($_POST,'nosmile')) ? intval($_POST['nosmile'])  : 0);  
 
 	$notify = 0;
 
@@ -347,6 +347,7 @@ function settings_post(&$a) {
 	set_pconfig(local_user(),'system','suggestme', $suggestme);
 	set_pconfig(local_user(),'system','update_interval', $browser_update);
 	set_pconfig(local_user(),'system','itemspage_network', $itemspage_network);
+	set_pconfig(local_user(),'system','no_smilies',$nosmile);
 
 	$r = q("UPDATE `user` SET `username` = '%s', `email` = '%s', `openid` = '%s', `timezone` = '%s',  `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `notify-flags` = %d, `page-flags` = %d, `default-location` = '%s', `allow_location` = %d, `theme` = '%s', `maxreq` = %d, `expire` = %d, `openidserver` = '%s', `blockwall` = %d, `hidewall` = %d, `blocktags` = %d  WHERE `uid` = %d LIMIT 1",
 			dbesc($username),
@@ -674,6 +675,9 @@ function settings_content(&$a) {
 	$itemspage_network = intval(get_pconfig(local_user(), 'system','itemspage_network'));
 	$itemspage_network = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : 40); // default if not set: 40 items
 	
+	$nosmile = get_pconfig(local_user(),'system','no_smilies');
+	$nosmile = (($nosmile===false)? '0': $nosmile); // default if not set: 0
+	
 	if(! strlen($a->user['timezone']))
 		$timezone = date_default_timezone_get();
 
@@ -841,6 +845,7 @@ function settings_content(&$a) {
 		'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes),
 		'$ajaxint'   => array('browser_update',  t("Update browser every xx seconds"), $browser_update, t('Minimum of 10 seconds, no maximum')),
 		'$itemspage_network'   => array('itemspage_network',  t("Number of items to display on the network page:"), $itemspage_network, t('Maximum of 100 items')),
+		'$nosmile'	=> array('nosmile', t("Don't show emoticons"), $nosmile, ''),
 
 		'$h_prv' 	=> t('Security and Privacy Settings'),
 

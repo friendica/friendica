@@ -28,13 +28,15 @@
 	var in_progress = false;
 	var langSelect = false;
 	var commentBusy = false;
+	var last_popup_menu = null;
+	var last_popup_button = null;
 
 	$(function() {
 		$.ajaxSetup({cache: false});
 
 		msie = $.browser.msie ;
 		
-		/* setup tooltips */
+		/* setup tooltips *//*
 		$("a,.tt").each(function(){
 			var e = $(this);
 			var pos="bottom";
@@ -43,7 +45,7 @@
 			if (e.hasClass("ttleft")) pos="left";
 			if (e.hasClass("ttright")) pos="right";
 			e.tipTip({defaultPosition: pos, edgeOffset: 8});
-		});
+		});*/
 		
 		
 		
@@ -76,7 +78,20 @@
 			if (menu.attr('popup')=="false") return false;
 			$(this).parent().toggleClass("selected");
 			menu.toggle();
+			if (menu.css("display") == "none") {
+				last_popup_menu = null;
+				last_popup_button = null;
+			} else {
+				last_popup_menu = menu;
+				last_popup_button = $(this).parent();
+			}
 			return false;
+		});
+		$('html').click(function() {
+			last_popup_menu.hide();
+			last_popup_button.removeClass("selected");
+			last_popup_menu = null;
+			last_popup_button = null;
 		});
 		
 		// fancyboxes
