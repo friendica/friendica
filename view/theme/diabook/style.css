@@ -928,8 +928,8 @@ ul.menu-popup .empty {
 aside {
   display: table-cell;
   vertical-align: top;
-  width: 180px;
-  padding: 0px 10px 0px 20px;
+  width: 160px;
+  padding: 0px 10px 0px 10px;
   border-right: 1px solid #D2D2D2;
   float: left;
   /* background: #F1F1F1; */
@@ -988,13 +988,13 @@ aside #profiles-menu {
   width: 20em;
 }
 aside #search-text {
-	width: 173px;
+	width: 150px;
 }
 aside #side-follow-url {
-	width: 173px;
+	width: 150px;
 	}
 aside #side-peoplefind-url {
-	width: 173px;
+	width: 150px;
 	}
 #contact-block {
   overflow: auto;
@@ -1097,7 +1097,7 @@ section {
   display: table-cell;
   vertical-align: top;
   width: auto;
-  padding: 0px 12px 0px 12px;
+  padding: 0px 0px 0px 12px;
 }
 
 body .pageheader{
@@ -1149,16 +1149,17 @@ body .pageheader{
 right_aside {
   display: table-cell;
   vertical-align: top;
-  width: 180px;
+  width: 160px;
+  padding-right: 10px;
   /*border-left: 1px solid #D2D2D2;*/
   
   /* background: #F1F1F1; */
 }
 right_aside h3 {border-bottom: 1px solid #D2D2D2; padding-top: 5px; padding-bottom: 0px; padding-left: 5px; margin-bottom: 0px; 
 margin-top:30px;}
-right_aside .directory-item {	width: 55px; height: 55px; vertical-align: center; text-align: center; }
+right_aside .directory-item {	width: 50px; height: 50px; vertical-align: center; text-align: center; }
 right_aside .directory-photo { margin: 0px; }
-right_aside .directory-photo-img { max-width: 48px; max-height: 48px; }
+right_aside .directory-photo-img { max-width: 45px; max-height: 45px; }
 right_aside #likes { margin: 0px; padding: 0px; list-style: none; }
 right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px solid #D2D2D2;}
 
@@ -1467,7 +1468,7 @@ right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px soli
   display: none;
 }
 #jot {
-  width: 785px;
+  width: 585px;
   margin: 0px 2em 20px 0px;
 }
 #profile-jot-form #profile-jot-text {
@@ -1484,7 +1485,7 @@ right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px soli
   padding: 0px;
   height: 40px;
   overflow: none;
-  width: 783px;
+  width: 583px;
   background-color: #fff;
   border-bottom: 2px solid #9eabb0;
 }
@@ -1573,7 +1574,7 @@ right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px soli
   font-weight: normal;
 }
 #profile-jot-form #profile-jot-text_parent #profile-jot-text_tbl{
-	width: 785px;
+	width: 585px;
 	height: 100px;
 	}
 #jot #jot-title:hover {
@@ -1613,7 +1614,7 @@ right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px soli
 
 #profile-jot-submit-wrapper {
 	margin-bottom: 50px;
-	width: 785px;
+	width: 585px;
 }
 
 #profile-jot-submit {
