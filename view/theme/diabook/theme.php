@@ -139,6 +139,8 @@ function diabook_community_info(){
   
    $aside['$fostitJS'] = $fostitJS;
    
+   $url = $a->get_baseurl($ssl_state);   
+   $aside['$url'] = $url;
 
 	$tpl = file_get_contents(dirname(__file__).'/communityhome.tpl');
 	$a->page['right_aside'] = replace_macros($tpl, $aside);

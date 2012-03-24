@@ -1,8 +1,22 @@
 {{ if $lastusers_title }}
 <h3 style="margin-top:0px;">Help or #NewHere ?</h3>
-<a href="https://helpers.pyxis.uberspace.de/profile/helpers" style="margin-left: 10px; color:#000;" title="Friendica Support" target="blank">Friendica Support</a><br>
-<a href="https://letstalk.pyxis.uberspace.de/profile/letstalk" style="margin-left: 10px; color:#000;" title="Let's talk" target="blank">Let's talk</a><br>
-<a href="http://kakste.com/profile/newhere" title="#NewHere" style="margin-left: 10px; color:#000;" target="blank">NewHere</a>
+<a href="https://helpers.pyxis.uberspace.de/profile/helpers" style="margin-left: 10px; " title="Friendica Support" target="blank">Friendica Support</a><br>
+<a href="https://letstalk.pyxis.uberspace.de/profile/letstalk" style="margin-left: 10px; " title="Let's talk" target="blank">Let's talk</a><br>
+<a href="http://kakste.com/profile/newhere" title="#NewHere" style="margin-left: 10px; " target="blank">NewHere</a>
+{{ endif }}
+
+{{ if $lastusers_title }}
+<h3>Connectable Services</h3>
+<div id="right_service_icons" style="margin-left: 10px; margin-top: 5px;">
+<a href="$url/facebook"><img alt="Facebook" src="view/theme/diabook/icons/facebook.png" title="Facebook"></a>
+<a href="$url/settings/connectors"><img alt="StatusNet" src="view/theme/diabook/icons/StatusNet.png?" title="StatusNet"></a>
+<a href="$url/settings/connectors"><img alt="LiveJournal" src="view/theme/diabook/icons/livejournal.png?" title="LiveJournal"></a>
+<a href="$url/settings/connectors"><img alt="Posterous" src="view/theme/diabook/icons/posterous.png?" title="Posterous"></a>
+<a href="$url/settings/connectors"><img alt="Tumblr" src="view/theme/diabook/icons/tumblr.png?" title="Tumblr"></a>
+<a href="$url/settings/connectors"><img alt="Twitter" src="view/theme/diabook/icons/twitter.png?" title="Twitter"></a>
+<a href="$url/settings/connectors"><img alt="WordPress" src="view/theme/diabook/icons/wordpress.png?" title="WordPress"></a>
+<a href="$url/settings/connectors"><img alt="E-Mail" src="view/theme/diabook/icons/email.png?" title="E-Mail"></a>
+</div>
 {{ endif }}
 
 {{ if $lastusers_title }}
