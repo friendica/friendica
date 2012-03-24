@@ -1018,8 +1018,8 @@ aside #side-peoplefind-url {
   margin: 0px 2px 2px 0px;
 }
 #contact-block .contact-block-link img {
-  widht: 55px;
-  height: 55px;
+  widht: 48px;
+  height: 48px;
 }
 #lost-password-link {
   float: left;
@@ -1161,8 +1161,9 @@ right_aside .directory-item {	width: 50px; height: 50px; vertical-align: center;
 right_aside .directory-photo { margin: 0px; }
 right_aside .directory-photo-img { max-width: 45px; max-height: 45px; }
 right_aside #likes { margin: 0px; padding: 0px; list-style: none; }
-right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px solid #D2D2D2;}
-
+right_aside .items-wrapper{ overflow: auto;	width: 100%; }
+right_aside #lastusers-wrapper { padding-left: 6px; padding-top: 3px; overflow: auto;	width: 100%; }
+right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: auto;	width: 100%; }
 /* wall item */
 .tread-wrapper {
   border-bottom: 1px solid #D2D2D2;
@@ -1232,13 +1233,13 @@ right_aside .items-wrapper{ overflow: auto;	width: 100%; border-bottom: 1px soli
 
 .wall-item-container .wall-item-content {
   font-size: 13px;
-  max-width: 720px;
+  max-width: 420px;
   word-wrap: break-word;
   line-height: 1.4;
 }
 
 .wall-item-container .wall-item-content img {
-  max-width: 700px;
+  max-width: 500px;
 }
 .wall-item-container .wall-item-links, .wall-item-container .wall-item-actions {
   display: table-cell;
@@ -2026,8 +2027,8 @@ box-shadow: 1px 1px 5px 0;
 /* ================== */
 
 .contact-block-img {
-        width: 55px;
-        height: 55px;
+        width: 48px;
+        height: 48px;
         padding-right: 3px;
 }
 .contact-block-div {
