@@ -947,7 +947,7 @@ aside #viewcontacts {
     background-color: #3e3f3e;
 	color: #eec;
     border: 1px #eec solid;
-    border-radius: 3px;
+    border-radius: 5px;
     padding: 3px 3px 6px 10px;
 }
 #jot-preview-content .wall-item-outside-wrapper {
@@ -2033,6 +2033,16 @@ div[id$="wrapper"] br {
 	opacity: 1.0 !important;
 	filter:alpha(opacity=100) !important;
 }
+.filesavetags {
+	margin: 20px 0;
+	opacity: 0.5;
+	filter:alpha(opacity=50);
+}
+.filesavetags:hover {
+	margin: 20px 0;
+	opacity: 1.0 !important;
+	filter:alpha(opacity=100) !important;
+}
 .item-select {
 	opacity: 0.1;
 	filter:alpha(opacity=10);
@@ -2484,6 +2494,9 @@ div[id$="wrapper"] br {
 .dislike {
 	background-position: -190px 0;
 }
+.file-as {
+	background-position: -230px -60px;
+}
 .like {
 	background-position: -211px 0;
 }
@@ -2570,9 +2583,9 @@ div[id$="wrapper"] br {
 }
 .border, .border:hover {
 	border: 1px solid #babdb6;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;	
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;	
 }
 .attachtype {
     display: block;
