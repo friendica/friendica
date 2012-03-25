@@ -395,7 +395,7 @@
 /* global */
 body {
   font-family: 'Lato', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 12.5px;
   background-color: #ffffff;
   color: #2d2d2d;
   margin: 50px auto auto;
@@ -888,6 +888,8 @@ ul.menu-popup .empty {
   position: absolute;
   padding-top: 4px;
   padding-left: 5px;	
+  word-wrap: break-word;
+  width: 130px;
 	}
 #ps-username:hover{
   text-decoration: none;	
@@ -1117,7 +1119,7 @@ list-style-type: disc;
 section {
   display: table-cell;
   vertical-align: top;
-  width: auto;
+  width: 611px;
   padding: 0px 0px 0px 12px;
 }
 
@@ -1177,6 +1179,7 @@ right_aside {
   
   /* background: #F1F1F1; */
 }
+right_aside a{color: #1872A2;}
 right_aside h3 {border-bottom: 1px solid #D2D2D2; padding-top: 5px; padding-bottom: 0px; padding-left: 5px; margin-bottom: 0px; 
 margin-top:30px;}
 right_aside .directory-item {	width: 50px; height: 50px; vertical-align: center; text-align: center; }
@@ -1186,7 +1189,8 @@ right_aside #likes { margin: 0px; padding: 0px; list-style: none; }
 right_aside .items-wrapper{ overflow: auto;	width: 100%; }
 right_aside #lastusers-wrapper { padding-left: 6px; padding-top: 3px; overflow: auto;	width: 100%; }
 right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: auto;	width: 100%; }
-
+#page-sidebar-right_aside{margin-top: 30px;}
+#page-sidebar-right_aside ul {margin-top: 0px;}
 /* wall item */
 .tread-wrapper {
   border-bottom: 1px solid #D2D2D2;
@@ -1215,6 +1219,7 @@ right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: 
 .wall-item-container .wall-item-item, .wall-item-container .wall-item-bottom {
   display: table-row;
 }
+
 .wall-item-bottom {
   font-size: 13px;
 }
@@ -1259,10 +1264,10 @@ right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: 
 }
 
 .wall-item-container .wall-item-content {
-  font-size: 13px;
+  font-size: 12.5px;
   max-width: 420px;
   word-wrap: break-word;
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .wall-item-container .wall-item-content img {

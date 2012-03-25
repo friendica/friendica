@@ -395,7 +395,7 @@
 /* global */
 body {
   font-family: 'Lato', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 12.5px;
   background-color: #ffffff;
   color: #2d2d2d;
   margin: 50px auto auto;
@@ -877,6 +877,8 @@ ul.menu-popup .empty {
   padding-top: 4px;
   padding-left: 5px;	
   color: #2D2D2D;
+  word-wrap: break-word;
+  width: 130px;
 	}
 #ps-username:hover{
   text-decoration: none;	
@@ -1096,7 +1098,7 @@ aside #side-peoplefind-url {
 section {
   display: table-cell;
   vertical-align: top;
-  width: auto;
+  width: 610px;
   padding: 0px 0px 0px 12px;
 }
 
@@ -1164,6 +1166,8 @@ right_aside #likes { margin: 0px; padding: 0px; list-style: none; }
 right_aside .items-wrapper{ overflow: auto;	width: 100%; }
 right_aside #lastusers-wrapper { padding-left: 6px; padding-top: 3px; overflow: auto;	width: 100%; }
 right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: auto;	width: 100%; }
+#page-sidebar-right_aside{margin-top: 30px;}
+#page-sidebar-right_aside ul {margin-top: 0px;}
 /* wall item */
 .tread-wrapper {
   border-bottom: 1px solid #D2D2D2;
@@ -1188,6 +1192,7 @@ right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: 
 .wall-item-container .wall-item-item, .wall-item-container .wall-item-bottom {
   display: table-row;
 }
+
 .wall-item-bottom {
   font-size: 13px;
 }
@@ -1232,10 +1237,10 @@ right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: 
 }
 
 .wall-item-container .wall-item-content {
-  font-size: 13px;
+  font-size: 12.5px;
   max-width: 420px;
   word-wrap: break-word;
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .wall-item-container .wall-item-content img {

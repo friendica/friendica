@@ -1,5 +1,5 @@
 {{ if $lastusers_title }}
-<h3 style="margin-top:0px;">Help or #NewHere ?</h3>
+<h3 style="margin-top:0px;">Help or @NewHere ?</h3>
 <a href="https://helpers.pyxis.uberspace.de/profile/helpers" style="margin-left: 10px; " title="Friendica Support" target="blank">Friendica Support</a><br>
 <a href="https://letstalk.pyxis.uberspace.de/profile/letstalk" style="margin-left: 10px; " title="Let's talk" target="blank">Let's talk</a><br>
 <a href="http://kakste.com/profile/newhere" title="#NewHere" style="margin-left: 10px; " target="blank">NewHere</a>
@@ -47,8 +47,12 @@
 {{ endif }}
 
 {{ if $lastusers_title }}
+<div>$page</div>
+{{ endif }}
+
+{{ if $lastusers_title }}
 <h3>PostIt to Friendica</h3>
-<div style="padding-left: 8px;"><span >Post to Friendica from anywhere by bookmarking this <a href="$fostitJS" title="PostIt">Link</a>.</span></div>
+<div style="padding-left: 8px;"><span ><a href="$fostitJS" title="PostIt">Post to Friendica</a> from anywhere by bookmarking the Link.</span></div>
 {{ endif }}
 
 {{ if $like_title }}

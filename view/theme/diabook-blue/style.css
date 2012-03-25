@@ -395,7 +395,7 @@
 /* global */
 body {
   font-family: 'Lato', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 12.5px;
   background-color: #ffffff;
   color: #2d2d2d;
   margin: 50px auto auto;
@@ -887,6 +887,8 @@ ul.menu-popup .empty {
   position: absolute;
   padding-top: 4px;
   padding-left: 5px;	
+  word-wrap: break-word;
+  width: 130px;
 	}
 #ps-username:hover{
   text-decoration: none;	
@@ -1235,10 +1237,10 @@ body .pageheader{
 }
 
 .wall-item-container .wall-item-content {
-  font-size: 13px;
+  font-size: 12.5px;
   max-width: 720px;
   word-wrap: break-word;
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .wall-item-container .wall-item-content img {

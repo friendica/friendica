@@ -138,6 +138,41 @@ function diabook_community_info(){
     							else {a_funct()}})()" ;
   
    $aside['$fostitJS'] = $fostitJS;
+	
+	//Community Page
+   $page = '<div id="page-sidebar-right_aside" class="widget">
+			<div class="title tool">
+			<h3>'.t("Community Pages").'</h3></div>
+			<div id="sidebar-page-list"><ul>';
+
+	$pagelist = array();
+
+	$contacts = q("SELECT `id`, `url`, `name`, `micro`FROM `contact`
+			WHERE `network`= 'dfrn' AND `forum` = 1 AND `uid` = %d",
+			intval($a->user['uid'])
+	);
+
+	$pageD = array();
+
+	// Look if the profile is a community page
+	foreach($contacts as $contact) {
+		$pageD[] = array("url"=>$contact["url"], "name"=>$contact["name"], "id"=>$contact["id"], "micro"=>$contact['micro']);
+	};
+	
+
+	$contacts = $pageD;
+
+	foreach($contacts as $contact) {
+		$page .= '<li style="list-style-type: none;" class="tool"><img height="20" width="20" style="float: left; margin-right: 3px;" src="' . $contact['micro'] .'" alt="' . $contact['url'] . '" /> <a href="'.$a->get_baseurl().'/redir/'.$contact["id"].'" style="margin-top: 2px;" title="' . $contact['url'] . '" class="label" target="external-link">'.
+				$contact["name"]."</a></li>";
+	}
+	$page .= '</ul></div></div>';
+	if (sizeof($contacts) > 0)
+		
+		$aside['$page'] = $page;
+  //END Community Page		   
+   
+   
    
    $url = $a->get_baseurl($ssl_state);   
    $aside['$url'] = $url;
