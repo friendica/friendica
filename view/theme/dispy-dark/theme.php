@@ -127,7 +127,7 @@ $(document).ready(function() {
 </script>
 EOT;
 
-function dispy_community_info() {
+function dispydark_community_info() {
 	$a = get_app();
 
 	$fostitJS = "javascript: (function() {
