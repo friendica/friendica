@@ -2086,13 +2086,13 @@ div[id$="wrapper"] br {
 #group-sidebar {
     margin-bottom: 10px;
 }
-.group-selected, .nets-selected {
+.group-selected, .nets-selected, .fileas-selected {
     padding: 3px;
 	color: #111;
     background: #f8f8f8;
     font-weight: bold;
 }
-.group-selected:hover, .nets-selected:hover {
+.group-selected:hover, .nets-selected:hover, .fileas-selected:hover {
 	color: #111;
 }
 .groupsideedit {
@@ -2783,6 +2783,29 @@ footer {
 }
 .network-star.icon.starred {
     display: inline-block;
+}
+#fileas-sidebar {
+	
+}
+.fileas-ul {
+	padding: 0;
+}
+
+
+
+/*
+ * ADDONS THEMING
+ */
+
+#sidebar-page-list {
+	
+}
+#sidebar-page-list ul {
+	padding: 0;
+	margin: 5px 0;
+}
+#sidebar-page-list li {
+	list-style: none;
 }
 
 

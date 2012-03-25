@@ -3,9 +3,10 @@
 /*
  * Name: Dispy Dark
  * Description: Dispy Dark, Friendica theme
- * Version: 0.9
+ * Version: 1.0
  * Author: Simon <http://simon.kisikew.org/>
  * Maintainer: Simon <http://simon.kisikew.org/>
+ * Screenshot: <a href="screenshot.png">screenshot</a>
  */
 
 
@@ -125,4 +126,31 @@ $(document).ready(function() {
 });
 </script>
 EOT;
+
+function dispy_community_info() {
+	$a = get_app();
+
+	$fostitJS = "javascript: (function() {
+		the_url = '".$a->get_baseurl($ssl_state)."/view/theme/dispy-dark/fpostit/fpostit.php?url=' +
+		encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title) + '&text=' +
+		encodeURIComponent(''+(window.getSelection ? window.getSelection() : document.getSelection ?
+		document.getSelection() : document.selection.createRange().text));
+		a_funct = function() {
+			if (!window.open(the_url, 'fpostit', 'location=yes,links=no,scrollbars=no,toolbar=no,width=600,height=300')) {
+				location.href = the_url;
+			}
+			if (/Firefox/.test(navigator.userAgent)) {
+				setTimeout(a_funct, 0)
+			} else {
+				a_funct();
+			}
+		})();" ;
+
+	$aside['$fostitJS'] = $fostitJS;
+	$url = $a->get_baseurl($ssl_state);
+	$aside['$url'] = $url;
+
+    $tpl = file_get_contents(dirname(__file__).'/communityhome.tpl');
+	$a->page['right_aside'] = replace_macros($tpl, $aside);
+}
 

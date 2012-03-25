@@ -38,10 +38,13 @@
 				<a href="#" class="icon dislike" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"></a>
 
 			{{ if $item.vote.share }}
-				<a href="#"  id="share-$item.id"
+				<a href="#" id="share-$item.id"
 class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick="jotShare($item.id); return false"></a>{{ endif }}
 				<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 			</div>
+			{{ endif }}
+			{{ if $item.filer }}
+				<div class="wall-item-filer-wrapper"><a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item icon file-as" title="$item.star.filer"></a></div>
 			{{ endif }}
 			{{ if $item.plink }}
 				<div class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></div>

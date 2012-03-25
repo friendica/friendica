@@ -60,6 +60,9 @@ option {
 	padding: 3px;
 	vertical-align: middle;
 }
+li {
+	padding: 0 0 0 2px;
+}
 /* remember to define focus styles! */
 :focus {
     outline: 0;
@@ -199,6 +202,10 @@ input[type=submit] {
 /* .tool .action */
 .action {
 	margin: 5px 0;
+}
+.tool {
+	margin: 5px 0;
+	list-style: none;
 }
 
 
@@ -688,11 +695,16 @@ aside #viewcontacts {
 	padding:.2em .5em;
 }
 #netsearch-box {
-	margin: 30px 0px;
+	margin: 20px 0px 30px;
+    width: 150px;   
+}
+#netsearch-box #search-submit {
+    margin: 5px 0px 0px 0px;
 }
 .ttright {
 	margin: 0px 0px 0px 0px;
 }
+
 
 /**
 * contacts block
@@ -1819,10 +1831,12 @@ div[id$="wrapper"] br {
  * 	contacts selector
  */
 .group-delete-wrapper {
-	margin: -31px 122px 0 0;
+	margin: -31px 50px 0 0;
     float: right;
 }
-
+/*.group-delete-icon {
+    margin: 0 0 0 10px;
+}*/
 #group-edit-submit-wrapper {
     margin: 0 0 10px 0;
     display: inline;
@@ -1861,6 +1875,7 @@ div[id$="wrapper"] br {
 #prof-separator {
     display: none;
 }
+
 
 /**
  * profile
@@ -2096,13 +2111,13 @@ div[id$="wrapper"] br {
 #group-sidebar {
     margin-bottom: 10px;
 }
-.group-selected, .nets-selected {
+.group-selected, .nets-selected, .fileas-selected {
     padding: 3px;
 	color: #2e2f2e;
     background: #88a9d2;
     font-weight: bold;
 }
-.group-selected:hover, .nets-selected:hover {
+.group-selected:hover, .nets-selected:hover, .fileas-selected:hover {
 	color: #2e2f2e;
 }
 .groupsideedit {
@@ -2172,13 +2187,7 @@ div[id$="wrapper"] br {
 .nets-all {
     margin-left: 0px;
 }
-#netsearch-box {
-    margin-top: 20px;
-    width: 150px;   
-}
-#netsearch-box #search-submit {
-    margin: 5px 0px 0px 0px;
-}
+
 
 /**
  * ADMIN
@@ -2793,6 +2802,29 @@ footer {
 }
 .network-star.icon.starred {
     display: inline-block;
+}
+#fileas-sidebar {
+	
+}
+.fileas-ul {
+	padding: 0;
+}
+
+
+
+/*
+ * ADDONS THEMING
+ */
+
+#sidebar-page-list {
+	
+}
+#sidebar-page-list ul {
+	padding: 0;
+	margin: 5px 0;
+}
+#sidebar-page-list li {
+	list-style: none;
 }
 
 
