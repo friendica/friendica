@@ -63,7 +63,7 @@
 
 <div id="contact-edit-info-wrapper">
 <h4>$lbl_info1</h4>
-	<textarea id="contact-edit-info" rows=8 cols=72 name="info" >$info</textarea>
+	<textarea id="contact-edit-info" rows="8" cols="60" name="info">$info</textarea>
 	<input class="contact-edit-submit" type="submit" name="submit" value="$submit" />
 </div>
 <div id="contact-edit-info-end"></div>
