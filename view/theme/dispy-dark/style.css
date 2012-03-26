@@ -500,7 +500,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	width: 0;
 }
 #search-text {
-	border: 1px #2e2f2e solid;
+	border: 1px #eec solid;
 	background: #2e2f2e;
 	color: #eec;
 }
@@ -713,7 +713,7 @@ aside #viewcontacts {
     width: 150px;   
 }
 #netsearch-box #search-submit {
-    margin: 5px 0px 0px 0px;
+    margin: 5px 5px 0px 0px;
 }
 .ttright {
 	margin: 0px 0px 0px 0px;
@@ -1045,6 +1045,9 @@ section {
 }
 .shiny {
     background: #2e3436;
+}
+.wall-outside-wrapper .shiny {
+	border-radius: 5px;
 }
 .heart {
 	color: red;

@@ -217,7 +217,7 @@ input[type=submit] {
  * nav
  */
 nav {
-	height: 60px;
+	height: 80px;
 	display: block;
 	background-color: #2e3436;
 	color: #eeeeec;
@@ -497,8 +497,8 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 }
 #search-text {
 	border: 1px #eec solid;
-	background: #eec;
-	color: #e2e33436;
+	background: #2e3436;
+	color: #eec;
 }
 .nav-ajax-update, .nav-ajax-left {
 	width: 30px;
