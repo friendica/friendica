@@ -11,13 +11,13 @@
 					<a class="comment-edit-photo-link" href="$mylink" title="$mytitle"><img class="my-comment-photo" src="$myphoto" alt="$mytitle" title="$mytitle" /></a>
 				</div>
 				<div class="comment-edit-photo-end"></div>
+				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);" onBlur="commentClose(this,$id);" >$comment</textarea>
 				{{ if $qcomment }}
 				{{ for $qcomment as $qc }}				
 					<span class="fakelink qcomment" onclick="commentInsert(this,$id); return false;" >$qc</span>
 					&nbsp;
 				{{ endfor }}
 				{{ endif }}
-				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);" onBlur="commentClose(this,$id);" >$comment</textarea>
 
 				<div class="comment-edit-text-end"></div>
 				<div class="comment-edit-submit-wrapper" id="comment-edit-submit-wrapper-$id" style="display: none;" >

@@ -1,29 +1,28 @@
-<div id="group-sidebar" class="widget">
-	<div class="title tool">
-		<h3 class="label">$title</h3>
-		<a href="group/new" title="$createtext" class="action"><span class="icon text s16 add"> $add</span></a>
-	</div>
+<div class="widget" id="group-sidebar">
+<h3>$title</h3>
 
-	<div id="sidebar-group-list">
-		<ul>
-			{{ for $groups as $group }}
-			<li class="tool  {{ if $group.selected }}selected{{ endif }}">
-				<a href="$group.href" class="label">
-					$group.text
-				</a>
-				{{ if $group.edit }}
-					<a href="$group.edit.href" class="action"><span class="icon text s10 edit">$group.edit.title</span></a>
-				{{ endif }}
+<div id="sidebar-group-list">
+	<ul id="sidebar-group-ul">
+		{{ for $groups as $group }}
+			<li class="sidebar-group-li">
 				{{ if $group.cid }}
 					<input type="checkbox" 
 						class="{{ if $group.selected }}ticked{{ else }}unticked {{ endif }} action" 
 						onclick="contactgroupChangeMember('$group.id','$group.cid');return true;"
 						{{ if $group.ismember }}checked="checked"{{ endif }}
 					/>
+				{{ endif }}			
+				{{ if $group.edit }}
+					<a class="groupsideedit" href="$group.edit.href" title="$edittext"><span id="edit-sidebar-group-element-$group.id" class="group-edit-icon iconspacer small-pencil"></span></a>
 				{{ endif }}
+				<a id="sidebar-group-element-$group.id" class="sidebar-group-element {{ if $group.selected }}group-selected{{ endif }}" href="$group.href">$group.text</a>
 			</li>
-			{{ endfor }}
-		</ul>
+		{{ endfor }}
+	</ul>
 	</div>
-</div>	
+  <div id="sidebar-new-group">
+  <a href="group/new">$createtext</a>
+  </div>
+</div>
+
 

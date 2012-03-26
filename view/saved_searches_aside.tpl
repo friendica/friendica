@@ -1,15 +1,14 @@
-<div id="saved-search-list" class="widget">
-	<h3 class="title">$title</h3>
-
-	<ul id="saved-search-ul">
-		{{ for $saved as $search }}
-			<li class="tool {{if $search.selected}}selected{{endif}}">
-					<a href="network/?f=&search=$search.encodedterm" class="label" >$search.term</a>
-					<a href="network/?f=&remove=1&search=$search.encodedterm" class="action icon s10 delete" title="$search.delete" onclick="return confirmDelete();"></a>
-			</li>
-		{{ endfor }}
-	</ul>
-	
+<div class="widget" id="saved-search-list">
+	<h3 id="search">$title</h3>
 	$searchbox
 	
+	<ul id="saved-search-ul">
+		{{ for $saved as $search }}
+		<li class="saved-search-li clear">
+			<a title="$search.delete" onclick="return confirmDelete();" id="drop-saved-search-term-$search.id" class="iconspacer savedsearchdrop " href="network/?f=&amp;remove=1&amp;search=$search.encodedterm"></a>
+			<a id="saved-search-term-$search.id" class="savedsearchterm" href="network/?f=&amp;search=$search.encodedterm">$search.term</a>
+		</li>
+		{{ endfor }}
+	</ul>
+	<div class="clear"></div>
 </div>

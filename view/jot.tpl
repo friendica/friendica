@@ -1,9 +1,12 @@
-<form id="profile-jot-form" action="$action" method="post">
-	<div id="jot">
-		<div id="profile-jot-desc" class="jothidden">&nbsp;</div>
-		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none" />
-		<div id="character-counter" class="grey jothidden"></div>
 
+<div id="profile-jot-wrapper" >
+	<div id="profile-jot-banner-wrapper">
+		<div id="profile-jot-desc" >&nbsp;</div>
+		<div id="character-counter" class="grey"></div>
+	</div>
+	<div id="profile-jot-banner-end"></div>
+
+	<form id="profile-jot-form" action="$action" method="post" >
 		<input type="hidden" name="type" value="$ptyp" />
 		<input type="hidden" name="profile_uid" value="$profile_uid" />
 		<input type="hidden" name="return" value="$return_path" />
@@ -11,25 +14,54 @@
 		<input type="hidden" name="coord" id="jot-coord" value="" />
 		<input type="hidden" name="post_id" value="$post_id" />
 		<input type="hidden" name="preview" id="jot-preview" value="0" />
-
+		<div id="jot-title-wrap"><input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none"></div>
+		<div id="jot-text-wrap">
+		<img id="profile-jot-text-loading" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
 		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body" >{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>
+		</div>
 
-		<ul id="jot-tools" class="jothidden" style="display:none">
-			<li><a href="#" onclick="return false;" id="wall-image-upload" title="$upload">$shortupload</a></a></li>
-			<li><a href="#" onclick="return false;" id="wall-file-upload"  title="$attach">$shortattach</a></li>
-			<li><a id="profile-link"  ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;" title="$weblink">$shortweblink</a></li>
-			<li><a id="profile-video" onclick="jotVideoURL();return false;" title="$gvideo">$shortvideo</a></li>
-			<li><a id="profile-audio" onclick="jotAudioURL();return false;" title="$audio">$shortaudio</a></li>
-			<li><a id="profile-location" onclick="jotGetLocation();return false;" title="$setloc">$shortsetloc</a></li>
-			<li><a id="profile-nolocation" onclick="jotClearLocation();return false;" title="$noloc">$shortnoloc</a></li>
-			<li><a id="jot-preview-link" onclick="preview_post(); return false;" title="$preview">$preview</a></li>
-			$jotplugins
+<div id="profile-jot-submit-wrapper" class="jothidden">
+	<input type="submit" id="profile-jot-submit" name="submit" value="$share" />
 
-			<li class="perms"><a id="jot-perms-icon" href="#profile-jot-acl-wrapper" class="icon s22 $lockstate $bang"  title="$permset" ></a></li>
-			<li class="submit"><input type="submit" id="profile-jot-submit" name="submit" value="$share" /></li>
-			<li id="profile-rotator" class="loading" style="display: none"><img src="images/rotator.gif" alt="$wait" title="$wait"  /></li>
-		</ul>
+	<div id="profile-upload-wrapper" style="display: $visitor;" >
+		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="icon camera" title="$upload"></a></div>
+	</div> 
+	<div id="profile-attach-wrapper" style="display: $visitor;" >
+		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon attach" title="$attach"></a></div>
+	</div> 
+
+	<div id="profile-link-wrapper" style="display: $visitor;" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
+		<a id="profile-link" class="icon link" title="$weblink" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
+	</div> 
+	<div id="profile-video-wrapper" style="display: $visitor;" >
+		<a id="profile-video" class="icon video" title="$video" onclick="jotVideoURL();return false;"></a>
+	</div> 
+	<div id="profile-audio-wrapper" style="display: $visitor;" >
+		<a id="profile-audio" class="icon audio" title="$audio" onclick="jotAudioURL();return false;"></a>
+	</div> 
+	<div id="profile-location-wrapper" style="display: $visitor;" >
+		<a id="profile-location" class="icon globe" title="$setloc" onclick="jotGetLocation();return false;"></a>
+	</div> 
+	<div id="profile-nolocation-wrapper" style="display: none;" >
+		<a id="profile-nolocation" class="icon noglobe" title="$noloc" onclick="jotClearLocation();return false;"></a>
+	</div> 
+
+	<div id="profile-jot-perms" class="profile-jot-perms" style="display: $pvisit;" >
+		<a href="#profile-jot-acl-wrapper" id="jot-perms-icon" class="icon $lockstate"  title="$permset" ></a>$bang
 	</div>
+
+	<span onclick="preview_post();" id="jot-preview-link" class="fakelink">$preview</span>
+
+	<div id="profile-jot-perms-end"></div>
+
+
+	<div id="profile-jot-plugin-wrapper">
+  	$jotplugins
+	</div>
+
+	<div id="profile-rotator-wrapper" style="display: $visitor;" >
+		<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
+	</div> 
 	
 	<div id="jot-preview-content" style="display:none;"></div>
 
@@ -43,6 +75,10 @@
 		</div>
 	</div>
 
-</form>
 
-{{ if $content }}<script>initEditor();</script>{{ endif }}
+</div>
+
+<div id="profile-jot-end"></div>
+</form>
+</div>
+		{{ if $content }}<script>initEditor();</script>{{ endif }}
