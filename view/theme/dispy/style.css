@@ -199,6 +199,10 @@ input[type=submit] {
 .action {
 	margin: 5px 0;
 }
+.tool {
+	margin: 5px 0;
+	list-style: none;
+}
 
 
 /**
@@ -483,13 +487,18 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	background: transparent url(icons.png) -190px -60px no-repeat;
 }
 .search-box {
-	margin: 5px;
-	width: 65%;
+	display: inline-block;
 	height: 40px;
-	z-index: 100;
+	margin: 12px 0 0 -3px;
+	position: relative;
+	right: -12px;
+	top: 17px;
+	width: 0;
 }
 #search-text {
 	border: 1px #eec solid;
+	background: #eec;
+	color: #e2e33436;
 }
 .nav-ajax-update, .nav-ajax-left {
 	width: 30px;
