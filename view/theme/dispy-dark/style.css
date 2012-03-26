@@ -221,7 +221,7 @@ input[type=submit] {
  * nav
  */
 nav {
-	height: 60px;
+	height: 80px;
 	display: block;
 	background-color: #1d1f1d;
 	color: #eeeeec;
@@ -489,6 +489,15 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	overflow: hidden;
 	margin: 0px;
 	background: transparent url(icons.png) -190px -60px no-repeat;
+}
+.search-box {
+	margin: 5px;
+	width: 65%;
+	height: 40px;
+	z-index: 100;
+}
+#search-text {
+	border: 1px #2e2f2e solid;
 }
 .nav-ajax-update, .nav-ajax-left {
 	width: 30px;

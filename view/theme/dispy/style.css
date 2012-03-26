@@ -482,6 +482,15 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	margin: 0px;
 	background: transparent url(icons.png) -190px -60px no-repeat;
 }
+.search-box {
+	margin: 5px;
+	width: 65%;
+	height: 40px;
+	z-index: 100;
+}
+#search-text {
+	border: 1px #eec solid;
+}
 .nav-ajax-update, .nav-ajax-left {
 	width: 30px;
 	height: 19px;
