@@ -6,7 +6,7 @@
  * Version: 1.0
  * Author: unknown
  * Maintainer: Simon <http://simon.kisikew.org/>
- * Screenshot: <a href="screenshot.png">Screenshot</a>
+ * Screenshot: <a href="screenshot.jpg">Screenshot</a>
  */
 
 
@@ -154,3 +154,8 @@ function dispy_community_info() {
 	$a->page['aside'] = replace_macros($tpl, $aside);
 }
 
+//right_aside at profile pages
+if ($a->argv[0] === "profile") {
+	// COMMUNITY
+	dispy_community_info();
+}

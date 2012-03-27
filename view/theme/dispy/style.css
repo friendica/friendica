@@ -59,6 +59,9 @@ option {
 	padding: 3px;
 	vertical-align: middle;
 }
+li {
+	padding: 0 0 0 2px;
+}
 /* remember to define focus styles! */
 :focus {
     outline: 0;
@@ -208,8 +211,39 @@ input[type=submit] {
 /**
  * 	login
  */
+#login-extra-links {
+    overflow: auto;
+    padding-top: 140px !important;
+    width: 100%;
+}
 #login-extra-links a {
     margin-right: 20px;
+}
+#login_standard {
+    display: block;
+    float: none;
+    height: 100px;
+    position: absolute;
+	width: 100%;
+}
+#login_standard .field label {
+	width: 200px;
+}
+#login_standard input, #login_standard input[type="text"] {
+	margin: 0 0 8px;
+    width: 210px;
+}
+#login-submit-wrapper {
+	margin: 0;
+}
+#login-submit-button {
+    margin-left: 0px !important;
+}
+#login_openid #id_openid_url {
+	width: 200px;
+}
+#login_openid label {
+	width: 208px;
 }
 
 
@@ -217,7 +251,7 @@ input[type=submit] {
  * nav
  */
 nav {
-	height: 80px;
+	height: 85px;
 	display: block;
 	background-color: #2e3436;
 	color: #eeeeec;
@@ -247,25 +281,6 @@ nav #banner #logo-text a {
 	font-weight: bold;
 	margin-left: 3px;
 }
-nav #user-menu {
-    display: block;	
-    width: auto;
-    float: right;
-    margin: 3px 68px 0 0;
-    position: relative;
-	background-color: #555753;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    background: #555753 url("menu-user-pin.jpg") 98% center no-repeat;
-    clear: both;
-}
-nav #user-menu-label {
-	float: left;
-   	font-size: 12px;
-    padding: 3px 20px 9px 5px;
-    height: 10px;
-}
 ul#user-menu-popup {
 	display: none;
 	position: absolute;
@@ -293,14 +308,6 @@ ul#user-menu-popup li a:hover {
 }
 ul#user-menu-popup li a.nav-sep {
 	border-top: 1px solid #eeeeec;
-}
-#nav-buttons {
-    clear: both;
-	list-style: none;
-	padding: 0px;
-}
-#nav-buttons li {
-	padding: 0;
 }
 nav .nav-link {
 	float: right;
@@ -409,13 +416,6 @@ nav .nav-link {
 .icon, .hover, .focus, .pointer {
     cursor: pointer;
 }
-#notifications {
-	height: 20px;
-	width: 100%;
-	position: absolute;
-	top: -19px;
-	left: 0;
-}
 /* popup notifications */
 div.jGrowl div.notice {
     background: #511919 url("../../../images/icons/48/notice.png") no-repeat 5px center;
@@ -464,6 +464,13 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 .show {
     display: block;
 }
+#notifications {
+	height: 20px;
+	width: 170px;
+	position: absolute;
+	top: -19px;
+	left: 15px;
+}
 #nav-floater {
     position: fixed;
     top: 20px;
@@ -473,12 +480,23 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	color: transparent;
     border-radius: 5px;
     z-index: 100;
+	width: 28%;
+	height: 80px;
+}
+#nav-buttons {
+    clear: both;
+	list-style: none;
+	padding: 0px;
+	height: 25px;
+}
+#nav-buttons li {
+	padding: 0;
 }
 .floaterflip {
 	display: block;
     position: fixed;
     z-index: 110;
-    top: 53px;
+    top: 56px;
     right: 19px;
 	width: 22px;
 	height: 22px;
@@ -488,17 +506,36 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 }
 .search-box {
 	display: inline-block;
-	height: 40px;
-	margin: 12px 0 0 -3px;
+	height: 20px;
+	margin: 0;
 	position: relative;
-	right: -12px;
-	top: 17px;
-	width: 0;
+	left: 7px;
+	top: 5px;
+	/*width: 210px;*/
 }
 #search-text {
 	border: 1px #eec solid;
 	background: #2e3436;
 	color: #eec;
+}
+nav #user-menu {
+    display: block;	
+    width: 75%;
+    margin: 3px 0 0 0;
+    position: relative;
+	background-color: #555753;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background: #555753 url("menu-user-pin.jpg") 98% center no-repeat;
+    clear: both;
+	top: 12px;
+	left: 7px;
+}
+nav #user-menu-label {
+   	font-size: 12px;
+    padding: 3px 20px 9px 5px;
+    height: 10px;
 }
 .nav-ajax-update, .nav-ajax-left {
 	width: 30px;
@@ -705,7 +742,11 @@ aside #viewcontacts {
 	padding:.2em .5em;
 }
 #netsearch-box {
-	margin: 30px 0px;
+	margin: 20px 0px 30px;
+    width: 150px;
+}
+#netsearch-box #search-submit {
+    margin: 5px 5px 0px 0px;
 }
 .ttright {
 	margin: 0px 0px 0px 0px;
@@ -964,7 +1005,7 @@ aside #viewcontacts {
     background-color: #ffffe0;
 	color: #111;
     border: 1px #aa0 solid;
-    border-radius: 3px;
+    border-radius: 5px;
     padding: 3px 3px 6px 10px;
 }
 #jot-preview-content .wall-item-outside-wrapper {
@@ -996,7 +1037,7 @@ section {
     border: 1px solid #729fcf;
 	padding: 4px;
 }
-.tab:hover {
+.tab:hover, .tab.active:hover {
     background: #729fcf;
     color: #eeeeec;
 }
@@ -1007,6 +1048,9 @@ section {
 .tab.active {
 	background: #729fcf;
     color: #eeeeec;
+}
+.tab.active a {
+	color: #729fcf;
 }
 .tab a {
 	border: 0;
@@ -1036,6 +1080,9 @@ section {
 }
 .shiny {
     background: #efefdf;
+}
+.wall-outside-wrapper .shiny {
+	border-radius: 5px;
 }
 .heart {
 	color: red;
@@ -1730,8 +1777,10 @@ div[id$="wrapper"] br {
 /**
  * 	register, settings & profile forms
  */
-#id_openid_url,
 .openid {
+
+}
+#id_openid_url {
     background:url(login-bg.gif) no-repeat;
     background-position:0 50%;
     padding-left:18px;
@@ -1827,10 +1876,12 @@ div[id$="wrapper"] br {
  * 	contacts selector
  */
 .group-delete-wrapper {
-	margin: -31px 122px 0 0;
+	margin: -31px 50px 0 0;
     float: right;
 }
-
+/*.group-delete-icon {
+    margin: 0 0 0 10px;
+}*/
 #group-edit-submit-wrapper {
     margin: 0 0 10px 0;
     display: inline;
@@ -1869,6 +1920,7 @@ div[id$="wrapper"] br {
 #prof-separator {
     display: none;
 }
+
 
 /**
  * profile
@@ -2188,6 +2240,7 @@ div[id$="wrapper"] br {
     margin: 5px 0px 0px 0px;
 }
 
+
 /**
  * ADMIN
  */
@@ -2275,7 +2328,7 @@ div[id$="wrapper"] br {
 .field {
 	/*margin-bottom: 10px;*/
 	/*padding-bottom: 10px;*/
-    overflow: auto;
+	/*overflow: auto;*/
     width: 100%;
 }
 .field label, label {
@@ -2283,11 +2336,10 @@ div[id$="wrapper"] br {
     width: 275px;
 	display: block;
 	font-size: 1.077em;
-	/*font-weight: bold;*/
 	margin: 0 10px 0.5em 0;
 	border: 1px #999 solid;
 	padding: 5px;
-	background: #eee;
+	background: #ccc;
 	vertical-align: middle;
 	color: #111;
 }
@@ -2591,9 +2643,9 @@ div[id$="wrapper"] br {
 }
 .border, .border:hover {
 	border: 1px solid #babdb6;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;	
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;	
 }
 .attachtype {
     display: block;
@@ -2720,7 +2772,7 @@ footer {
 	vertical-align: middle;
 }
 #acl-wrapper a:hover {
-    text-decoration:none;
+    text-decoration: none;
     color: #000;
 	border: 0;
 }
