@@ -924,6 +924,9 @@ ul.menu-popup .empty {
 .menu-profile-list.com_side{
 	background: url("../../../view/theme/diabook-blue/icons/com_side.png") no-repeat;
 	}
+.menu-profile-list.pscontacts{
+	background: url("../../../view/theme/diabook/icons/pscontacts.png") no-repeat;
+	}
 
 /* aside */
 aside {

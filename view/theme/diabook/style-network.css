@@ -909,25 +909,25 @@ ul.menu-popup .empty {
    }
 /*http://prothemedesign.com/circular-icons/*/
 .menu-profile-list.home{
-	background: url("../../../view/theme/diabook-blue/icons/home.png") no-repeat;
+	background: url("../../../view/theme/diabook/icons/home.png") no-repeat;
 	}
 .menu-profile-list.photos{
-	background: url("../../../view/theme/diabook-blue/icons/mess_side.png") no-repeat;
+	background: url("../../../view/theme/diabook/icons/mess_side.png") no-repeat;
 	}
 .menu-profile-list.events{
-	background: url("../../../view/theme/diabook-blue/icons/events.png") no-repeat;
+	background: url("../../../view/theme/diabook/icons/events.png") no-repeat;
 	}
 .menu-profile-list.notes{
-	background: url("../../../view/theme/diabook-blue/icons/notes.png") no-repeat;
+	background: url("../../../view/theme/diabook/icons/notes.png") no-repeat;
 	}
 .menu-profile-list.foren{
-	background: url("../../../view/theme/diabook-blue/icons/pubgroups.png") no-repeat;
+	background: url("../../../view/theme/diabook/icons/pubgroups.png") no-repeat;
 	}
 .menu-profile-list.com_side{
-	background: url("../../../view/theme/diabook-blue/icons/com_side.png") no-repeat;
+	background: url("../../../view/theme/diabook/icons/com_side.png") no-repeat;
 	}
 .menu-profile-list.pscontacts{
-	background: url("../../../view/theme/diabook-blue/icons/pscontacts.png") no-repeat;
+	background: url("../../../view/theme/diabook/icons/pscontacts.png") no-repeat;
 	}
 
 /* aside */
@@ -1156,8 +1156,7 @@ body .pageheader{
 right_aside {
   display: table-cell;
   vertical-align: top;
-  width: 160px;
-  padding-right: 10px;
+  width: 170px;
   /*border-left: 1px solid #D2D2D2;*/
   
   /* background: #F1F1F1; */
@@ -1173,8 +1172,9 @@ right_aside #lastusers-wrapper { padding-left: 6px; padding-top: 3px; overflow: 
 right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: auto;	width: 100%; }
 #page-sidebar-right_aside{margin-top: 0px; margin-bottom: 30px;}
 #page-sidebar-right_aside ul {margin-top: 0px;}
-.icon.expand		{ 
-		background-image: url("../../../view/theme/diabook/icons/expand.png");
+right_aside .icon {width: 10px; height: 10px;}
+.close_box		{ 
+		background-image: url("../../../view/theme/diabook-blue/icons/close_box.png");
 		float: right;
 		cursor: pointer;
 		}
