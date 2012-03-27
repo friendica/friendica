@@ -1174,8 +1174,8 @@ body .pageheader{
 right_aside {
   display: table-cell;
   vertical-align: top;
-  width: 160px;
-  padding-right: 10px;
+  width: 170px;
+  
   /*border-left: 1px solid #D2D2D2;*/
   
   /* background: #F1F1F1; */
@@ -1192,6 +1192,13 @@ right_aside #lastusers-wrapper { padding-left: 6px; padding-top: 3px; overflow: 
 right_aside #ra-photos-wrapper { padding-left: 5px; padding-top: 3px; overflow: auto;	width: 100%; }
 #page-sidebar-right_aside{margin-top: 0px; margin-bottom: 30px;}
 #page-sidebar-right_aside ul {margin-top: 0px;}
+right_aside .icon {width: 10px; height: 10px;}
+.close_box		{ 
+		background-image: url("../../../view/theme/diabook-blue/icons/close_box.png");
+		float: right;
+		cursor: pointer;
+		}
+		
 /* wall item */
 .tread-wrapper {
   border-bottom: 1px solid #D2D2D2;

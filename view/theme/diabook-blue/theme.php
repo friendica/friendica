@@ -147,9 +147,10 @@ function diabook_blue_community_info(){
 	$aside['$nv'] = $nv;
 	};
 	//Community Page
+	if(local_user()) {
    $page = '<div id="page-sidebar-right_aside" class="widget">
 			<div class="title tool">
-			<h3>'.t("Community Pages").'</h3></div>
+			<h3>'.t("Community Pages").'<a id="close_pages_icon"  onClick="close_pages()" class="icon close_box"></a></h3></div>
 			<div id="sidebar-page-list"><ul>';
 
 	$pagelist = array();
@@ -174,10 +175,10 @@ function diabook_blue_community_info(){
 				$contact["name"]."</a></li>";
 	}
 	$page .= '</ul></div></div>';
-	if (sizeof($contacts) > 0)
+	//if (sizeof($contacts) > 0)
 		
 		$aside['$page'] = $page;
-		
+	}		
   //END Community Page		   
    
    
@@ -222,30 +223,38 @@ if ($a->argv[0] === "network" && local_user()){
 
 	}
 	
+	$ccCookie = $_COOKIE['close_pages'] + $_COOKIE['close_helpers'] + $_COOKIE['close_services'] + $_COOKIE['close_friends'] + $_COOKIE['close_postit'] + $_COOKIE['close_lastusers'] + $_COOKIE['close_lastphotos'] + $_COOKIE['close_lastlikes'];
+	
+	if($ccCookie != "8") {
 	// COMMUNITY
 	diabook_blue_community_info();
 	
 	// CUSTOM CSS
 	$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook-blue/style-network.css";
-	
+	}
 }
 
 
 
 //right_aside at profile pages
 if ($a->argv[0] === "profile"){
-	
+	if($ccCookie != "8") {
 	// COMMUNITY
 	diabook_blue_community_info();
 	
 	// CUSTOM CSS
 	$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook-blue/style-profile.css";
-	
+	}
 }
 
 
 // custom css
 if (!is_null($cssFile)) $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
+
+//load jquery.cookie.js
+$cookieJS = $a->get_baseurl($ssl_state)."/view/theme/diabook-blue/js/jquery.cookie.js";
+$a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" />', $cookieJS);
+
 
 //js scripts
 
@@ -254,7 +263,98 @@ $a->page['htmlhead'] .= <<< EOT
 <script>
  $(function() {
 	$('a.lightbox').fancybox(); // Select all links with lightbox class
+	
  });
- </script>
+
+</script>
+
+<script>
+
+$("right_aside").ready(function(){
+	
+	if($.cookie('close_pages') == '1') 
+		{
+		document.getElementById( "close_pages" ).style.display = "none";
+			};
+	
+	if($.cookie('close_helpers') == '1') 
+		{
+		document.getElementById( "close_helpers" ).style.display = "none";
+			};
+			
+	if($.cookie('close_services') == '1') 
+		{
+		document.getElementById( "close_services" ).style.display = "none";
+			};
+			
+	if($.cookie('close_friends') == '1') 
+		{
+		document.getElementById( "close_friends" ).style.display = "none";
+			};
+	
+	if($.cookie('close_postit') == '1') 
+		{
+		document.getElementById( "close_postit" ).style.display = "none";
+			};
+			
+	if($.cookie('close_lastusers') == '1') 
+		{
+		document.getElementById( "close_lastusers" ).style.display = "none";
+			};
+			
+	if($.cookie('close_lastphotos') == '1') 
+		{
+		document.getElementById( "close_lastphotos" ).style.display = "none";
+			};
+			
+	if($.cookie('close_lastlikes') == '1') 
+		{
+		document.getElementById( "close_lastlikes" ).style.display = "none";
+			};}
+
+);
+
+function close_pages(){
+ document.getElementById( "close_pages" ).style.display = "none";
+ $.cookie('close_pages','1', { expires: 365, path: '/' });
+ };
+ 
+function close_helpers(){
+ document.getElementById( "close_helpers" ).style.display = "none";
+  $.cookie('close_helpers','1', { expires: 365, path: '/' });
+ };
+
+function close_services(){
+ document.getElementById( "close_services" ).style.display = "none";
+ $.cookie('close_services','1', { expires: 365, path: '/' });
+ };
+ 
+function close_friends(){
+ document.getElementById( "close_friends" ).style.display = "none";
+ $.cookie('close_friends','1', { expires: 365, path: '/' });
+ };
+
+function close_postit(){
+ document.getElementById( "close_postit" ).style.display = "none";
+ $.cookie('close_postit','1', { expires: 365, path: '/' });
+ };
+ 
+function close_lastusers(){
+ document.getElementById( "close_lastusers" ).style.display = "none";
+ $.cookie('close_lastusers','1', { expires: 365, path: '/' });
+ };
+
+function close_lastphotos(){
+ document.getElementById( "close_lastphotos" ).style.display = "none";
+ $.cookie('close_lastphotos','1', { expires: 365, path: '/' });
+ };
+ 
+function close_lastlikes(){
+ document.getElementById( "close_lastlikes" ).style.display = "none";
+ $.cookie('close_lastlikes','1', { expires: 365, path: '/' });
+ };
+ 
+</script>
+
 EOT;
 
