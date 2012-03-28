@@ -16,8 +16,20 @@ function filer_content(&$a) {
 
 	logger('filer: tag ' . $term . ' item ' . $item_id);
 
-	if($item_id && strlen($term))
+	if($item_id && strlen($term)){
+		// file item
 		file_tag_save_file(local_user(),$item_id,$term);
-
+	} else {
+		// return filer dialog
+		$filetags = get_pconfig(local_user(),'system','filetags');
+		$filetags = explode("][", trim($filetags,"[]"));
+		$tpl = get_markup_template("filer_dialog.tpl");
+		$o = replace_macros($tpl, array(
+			'$field' => array('term', t("File as:"), '', '', $filetags, t('- select -')),
+			'$submit' => t('Save'),
+		));
+		
+		echo $o;
+	}
 	killme();
 }

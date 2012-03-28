@@ -264,16 +264,38 @@ function enableOnUser(){
 	}
 
 	function itemFiler(id) {
-		reply = prompt("$fileas");
-		if(reply && reply.length) {
-			commentBusy = true;
-			$('body').css('cursor', 'wait');
-			$.get('filer/' + id + '?term=' + reply);
-			if(timer) clearTimeout(timer);
-			timer = setTimeout(NavUpdate,3000);
-			liking = 1;
-		}
+		
+		var bordercolor = $("input").css("border-color");
+		
+		$.get('filer/', function(data){
+			$.fancybox(data);
+			$("#id_term").keypress(function(){
+				$(this).css("border-color",bordercolor);
+			})
+			$("#select_term").change(function(){
+				$("#id_term").css("border-color",bordercolor);
+			})
+			
+			$("#filer_save").click(function(e){
+				e.preventDefault();
+				reply = $("#id_term").val();
+				if(reply && reply.length) {
+					commentBusy = true;
+					$('body').css('cursor', 'wait');
+					$.get('filer/' + id + '?term=' + reply);
+					if(timer) clearTimeout(timer);
+					timer = setTimeout(NavUpdate,3000);
+					liking = 1;
+					$.fancybox.close();
+				} else {
+					$("#id_term").css("border-color","#FF0000");
+				}
+				return false;
+			});
+		});
+		
 	}
+
 
 	function jotClearLocation() {
 		$('#jot-coord').val('');

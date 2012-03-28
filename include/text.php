@@ -1300,6 +1300,7 @@ function file_tag_save_file($uid,$item,$file) {
 		$saved = get_pconfig($uid,'system','filetags');
 		if((! strlen($saved)) || (! stristr($saved,'[' . file_tag_encode($file) . ']')))
 			set_pconfig($uid,'system','filetags',$saved . '[' . file_tag_encode($file) . ']');
+		info( t('Item filed') );
 	}
 	return true;
 }
