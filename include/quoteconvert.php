@@ -124,7 +124,7 @@ function removetofu($message)
 	}
 
 	if ($quotestart != 0) {
-		$message = trim(substr($message, 0, $quotestart))."\n[collapsed]\n".substr($message, $quotestart+7, -8).'[/collapsed]';
+		$message = trim(substr($message, 0, $quotestart))."\n[spoiler]".substr($message, $quotestart+7, -8).'[/spoiler]';
 	}
 
 	return($message);

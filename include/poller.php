@@ -504,7 +504,12 @@ function poller_run($argv, $argc){
 							//$datarray['title'] = notags(trim($meta->subject));
 							$datarray['created'] = datetime_convert('UTC','UTC',$meta->date);
 
-							$r = email_get_msg($mbox,$msg_uid);
+							// Is it  reply?
+							$reply = ((substr(strtolower($datarray['title']), 0, 3) == "re:") or
+								(substr(strtolower($datarray['title']), 0, 3) == "re-") or
+								(raw_refs != ""));
+
+							$r = email_get_msg($mbox,$msg_uid, $reply);
 							if(! $r) {
 								logger("Mail: can't fetch msg ".$msg_uid);
 								continue;

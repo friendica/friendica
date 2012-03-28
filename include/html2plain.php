@@ -1,9 +1,15 @@
 <?php
 require_once "html2bbcode.php";
 
-function breaklines($line, $level)
+function breaklines($line, $level, $wraplength = 75)
 {
-	$wraplen = 75-$level;
+
+	if ($wraplength == 0)
+		$wraplength = 2000000;
+
+	//	return($line);
+
+	$wraplen = $wraplength-$level;
 
 	$newlines = array();
 
@@ -37,7 +43,7 @@ function breaklines($line, $level)
 	return(implode($newlines, "\n"));
 }
 
-function quotelevel($message)
+function quotelevel($message, $wraplength = 75)
 {
 	$lines = explode("\n", $message);
 
@@ -65,12 +71,31 @@ function quotelevel($message)
 		}
 
 		if (!$startquote or ($line != ''))
-			$newlines[] = breaklines($line, $currlevel);
+			$newlines[] = breaklines($line, $currlevel, $wraplength);
 	}
 	return(implode($newlines, "\n"));
 }
 
-function html2plain($html)
+function collecturls($message) {
+	$pattern = '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is';
+	preg_match_all($pattern, $message, $result, PREG_SET_ORDER);
+
+	$urls = array();
+	foreach ($result as $treffer) {
+		// A list of some links that should be ignored
+		$list = array("/user/", "/tag/", "/profile/", "/search?search=", "mailto:", "/u/", "/node/",
+				"//facebook.com/profile.php?id=", "//plus.google.com/");
+		foreach ($list as $listitem)
+			if (strpos($treffer[1], $listitem) !== false)
+				$ignore = true;
+
+		if (!$ignore)
+			$urls[$treffer[1]] = $treffer[1];
+	}
+	return($urls);
+}
+
+function html2plain($html, $wraplength = 75, $compact = false)
 {
 	global $lang;
 
@@ -93,22 +118,16 @@ function html2plain($html)
 	$message = str_replace(array("\n<", ">\n", "\r", "\n", "\xC3\x82\xC2\xA0"), array("<", ">", "<br>", " ", ""), $message);
 	$message = preg_replace('= [\s]*=i', " ", $message);
 
-	// nach <a href="...">...</a> suchen, die ... miteinander vergleichen und bei Gleichheit durch ein einzelnes ... ersetzen.
-	$pattern = '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is';
-	preg_match_all($pattern, $message, $result, PREG_SET_ORDER);
+	// Collecting all links
+	$urls = collecturls($message);
 
-	foreach ($result as $treffer) {
-		if ($treffer[1] == $treffer[2]) {
-			$search = '<a href="'.$treffer[1].'" target="_blank">'.$treffer[1].'</a>';
-			$message = str_replace($search, $treffer[1], $message);
-		}
-	}
 	@$doc->loadHTML($message);
 
 	node2bbcode($doc, 'html', array(), '', '');
 	node2bbcode($doc, 'body', array(), '', '');
 
 	// MyBB-Auszeichnungen
+	/*
 	node2bbcode($doc, 'span', array('style'=>'text-decoration: underline;'), '_', '_');
 	node2bbcode($doc, 'span', array('style'=>'font-style: italic;'), '/', '/');
 	node2bbcode($doc, 'span', array('style'=>'font-weight: bold;'), '*', '*');
@@ -117,8 +136,12 @@ function html2plain($html)
 	node2bbcode($doc, 'b', array(), '*', '*');
 	node2bbcode($doc, 'i', array(), '/', '/');
 	node2bbcode($doc, 'u', array(), '_', '_');
+	*/
 
-	node2bbcode($doc, 'blockquote', array(), '[quote]', "[/quote]\n");
+	if ($compact)
+		node2bbcode($doc, 'blockquote', array(), "»", "«");
+	else
+		node2bbcode($doc, 'blockquote', array(), '[quote]', "[/quote]\n");
 
 	node2bbcode($doc, 'br', array(), "\n", '');
 
@@ -143,16 +166,25 @@ function html2plain($html)
 	node2bbcode($doc, 'h5', array(), "\n\n*", "*\n");
 	node2bbcode($doc, 'h6', array(), "\n\n*", "*\n");
 
-	node2bbcode($doc, 'a', array('href'=>'/(.+)/'), ' $1', '', true);
-	node2bbcode($doc, 'img', array('alt'=>'/(.+)/'), '$1', '');
-	node2bbcode($doc, 'img', array('title'=>'/(.+)/'), '$1', '');
-	node2bbcode($doc, 'img', array(), '', '');
-	node2bbcode($doc, 'img', array('src'=>'/(.+)/'), '[img]$1', '[/img]');
+	// Problem: there is no reliable way to detect if it is a link to a tag or profile
+	//node2bbcode($doc, 'a', array('href'=>'/(.+)/'), ' $1 ', '', true);
+	node2bbcode($doc, 'a', array('href'=>'/(.+)/', 'rel'=>'oembed'), ' $1 ', '', true);
+	//node2bbcode($doc, 'img', array('alt'=>'/(.+)/'), '$1', '');
+	//node2bbcode($doc, 'img', array('title'=>'/(.+)/'), '$1', '');
+	//node2bbcode($doc, 'img', array(), '', '');
+	if (!$compact)
+		node2bbcode($doc, 'img', array('src'=>'/(.+)/'), '[img]$1', '[/img]');
+	else
+		node2bbcode($doc, 'img', array('src'=>'/(.+)/'), '', '');
+
+	node2bbcode($doc, 'iframe', array('src'=>'/(.+)/'), ' $1 ', '', true);
 
 	$message = $doc->saveHTML();
 
-	$message = str_replace("[img]", "", $message);
-	$message = str_replace("[/img]", "", $message);
+	if (!$compact) {
+		$message = str_replace("[img]", "", $message);
+		$message = str_replace("[/img]", "", $message);
+	}
 
 	// was ersetze ich da?
 	// Irgendein stoerrisches UTF-Zeug
@@ -168,12 +200,20 @@ function html2plain($html)
 
 	$message = html_entity_decode($message, ENT_QUOTES, 'UTF-8');
 
+	if (!$compact) {
+		$counter = 1;
+		foreach ($urls as $id=>$url)
+			if (strpos($message, $url) == false)
+				$message .= "\n".$url." ";
+				//$message .= "\n[".($counter++)."] ".$url;
+	}
+
 	do {
 		$oldmessage = $message;
 		$message = str_replace("\n\n\n", "\n\n", $message);
 	} while ($oldmessage != $message);
 
-	$message = quotelevel(trim($message));
+	$message = quotelevel(trim($message), $wraplength);
 
 	return(trim($message));
 }

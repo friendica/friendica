@@ -13,7 +13,7 @@ function savereplace($pattern, $replace, $text)
 
 function unifyattributionline($message)
 {
-	$quotestr = array('quote', 'collapsed');
+	$quotestr = array('quote', 'spoiler');
 	foreach ($quotestr as $quote) {
 
 		$message = savereplace('/----- Original Message -----\s.*?From: "([^<"].*?)" <(.*?)>\s.*?To: (.*?)\s*?Cc: (.*?)\s*?Sent: (.*?)\s.*?Subject: ([^\n].*)\s*\['.$quote.'\]/i', "[".$quote."='$1']\n", $message);
