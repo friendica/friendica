@@ -25,7 +25,12 @@ function viewsrc_content(&$a) {
 	);
 
 	if(count($r))
-		$o .= str_replace("\n",'<br />',$r[0]['body']);
+		if(is_ajax()) {
+			echo str_replace("\n",'<br />',$r[0]['body']);
+			killme();
+		} else {
+			$o .= str_replace("\n",'<br />',$r[0]['body']);
+		}
 	return $o;
 }
 

@@ -563,6 +563,10 @@ function absurl($path) {
 	return $path;
 }
 
+function is_ajax() {
+	return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+}
+
 
 // Primarily involved with database upgrade, but also sets the 
 // base url for use in cmdline programs which don't have
