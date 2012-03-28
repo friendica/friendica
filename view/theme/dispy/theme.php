@@ -91,11 +91,13 @@ $(document).ready(function() {
             $('.floaterflip').css({
                 backgroundPosition: '-210px -60px' 
             });
+			$('.search-box').slideDown('fast');
         } else {
             $('#nav-floater').slideDown('fast');
             $('.floaterflip').css({
                 backgroundPosition: '-190px -60px'
             });
+			$('.search-box').slideUp('fast');
         }
     };
 	// our trigger for the toolbar button
@@ -131,14 +133,12 @@ function dispy_community_info() {
 	$a = get_app();
 
 	$fostitJS = "javascript: (function() {
-		the_url = '".$a->get_baseurl($ssl_state)."/view/theme/dispy/fpostit/fpostit.php?url=' +
-		encodeURIComponent(window.location.href) + '&title='
-			+ encodeURIComponent(document.title) + '&text='
-			+ encodeURIComponent('' + (window.getSelection
-			? window.getSelection() : document.getSelection
-			? document.getSelection() : document.selection.createRange().text));
+		the_url = '".$a->get_baseurl($ssl_state)."/view/theme/dispy-dark/fpostit/fpostit.php?url=' +
+		encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title) + '&text=' +
+		encodeURIComponent(''+(window.getSelection ? window.getSelection() : document.getSelection ?
+		document.getSelection() : document.selection.createRange().text));
 		a_funct = function() {
-			if ( !window.open(the_url, 'fpostit', 'location=yes, links=no, scrollbars=no, toolbar=no, width=600, height=300') ) {
+			if (!window.open(the_url, 'fpostit', 'location=yes,links=no,scrollbars=no,toolbar=no,width=600,height=300')) {
 				location.href = the_url;
 			}
 			if (/Firefox/.test(navigator.userAgent)) {
@@ -153,11 +153,13 @@ function dispy_community_info() {
 	$aside['$url'] = $url;
 
     $tpl = file_get_contents(dirname(__file__).'/communityhome.tpl');
-	$a->page['aside'] .= replace_macros($tpl, $aside);
+	$a->page['aside_bottom'] = replace_macros($tpl, $aside);
 }
 
-//aside at profile pages
+// use our 'default.php' instead of the system-wide one
+$a->page['template'] = "theme/dispy-dark/default";
+
+// aside on profile page
 if ($a->argv[0] === "profile") {
 	dispy_community_info();
 }
-

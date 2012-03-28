@@ -146,7 +146,7 @@ function dispydark_community_info() {
 			} else {
 				a_funct();
 			}
-		})();" ;
+		})();";
 
 	$aside['$fostitJS'] = $fostitJS;
 	$url = $a->get_baseurl($ssl_state);
