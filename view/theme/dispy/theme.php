@@ -157,7 +157,8 @@ function dispy_community_info() {
 }
 
 // use our 'default.php' instead of the system-wide one
-$a->page['template'] = "theme/dispy-dark/default";
+$theme_name = 'dispy';
+//$a->page['template'] = "theme/dispy/default";
 
 // aside on profile page
 if ($a->argv[0] === "profile") {
