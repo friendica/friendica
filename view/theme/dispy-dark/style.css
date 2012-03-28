@@ -251,7 +251,7 @@ input[type=submit] {
  * nav
  */
 nav {
-	height: 85px;
+	height: 60px;
 	display: block;
 	background-color: #1d1f1d;
 	color: #eeeeec;
@@ -469,7 +469,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	width: 170px;
 	position: absolute;
 	top: -19px;
-	left: 15px;
+	left: 7px;
 }
 #nav-floater {
     position: fixed;
@@ -480,13 +480,14 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	color: transparent;
     border-radius: 5px;
     z-index: 100;
-	width: 28%;
-	height: 80px;
+	width: 300px;
+	height: 60px;
 }
 #nav-buttons {
     clear: both;
 	list-style: none;
 	padding: 0px;
+	margin: 0 7px 0 0;
 	height: 25px;
 }
 #nav-buttons li {
@@ -506,16 +507,22 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 }
 .search-box {
 	display: inline-block;
-	height: 20px;
-	margin: 0;
-	position: relative;
-	left: 7px;
-	top: 5px;
-	/*width: 210px;*/
+	margin: 5px;
+	position: fixed;
+	right: 0px;
+	bottom: 0px;
+	z-index: 100;
+	background: #1d1f1d;
+	border-radius: 5px;
 }
 #search-text {
 	border: 1px #eec solid;
 	background: #2e2f2e;
+	color: #eec;
+}
+.search-box #search-text {
+	margin: 8px;
+	width: 10em;
 	color: #eec;
 }
 nav #user-menu {
@@ -529,8 +536,8 @@ nav #user-menu {
     border-radius: 5px;
     background: #555753 url("menu-user-pin.jpg") 98% center no-repeat;
     clear: both;
-	top: 12px;
-	left: 7px;
+	top: 4px;
+	left: 10px;
 }
 nav #user-menu-label {
    	font-size: 12px;
@@ -640,6 +647,7 @@ nav #user-menu-label {
 .notify-seen {
     background: #ddd;
 }
+
 
 /** sysmsg **/
 #sysmsg_info {
@@ -751,6 +759,7 @@ aside #viewcontacts {
 .ttright {
 	margin: 0px 0px 0px 0px;
 }
+
 
 /**
 * contacts block
@@ -1018,7 +1027,7 @@ aside #viewcontacts {
  * section
  */
 section {
-    margin: 20px 8% 0 4%;
+    margin: 20px 9% 0 4%;
     font-size: 0.8em;
     padding-right: 230px;
 	min-width: 475px;
@@ -1056,6 +1065,7 @@ section {
 	border: 0;
 	text-decoration: none;
 }
+
 
 /**
  * 	items
@@ -1129,7 +1139,7 @@ section {
     border-radius: 5px;
 }
 [class^="wall-item-tools"] > *, [class^="wall-item-tools"] > * > * {
-	margin: 0 0 5px 0;
+	/*margin: 0 0 5px 0;*/
 }
 .wall-item-tools {
     float: right;
@@ -1149,6 +1159,12 @@ section {
     -o-transition: all 1s ease-in-out;
     -ms-transition: all 1s ease-in-out;
     transition: all 1s ease-in-out;
+}
+.wall-item-subtools1 {
+	list-style: none;
+}
+.wall-item-subtools2 {
+	list-style: none;
 }
 .wall-item-title {
 	font-size: 1.2em;
@@ -1259,6 +1275,24 @@ section {
 #item-delete-selected {
     overflow: auto;
     width: 100%;
+}
+#connect-services-header {
+
+}
+#connect-services {
+	margin: 5px 0 0 0;
+}
+#extra-help-header {
+
+}
+#extra-help {
+	margin: 5px 0 0 0;
+}
+#postit-header {
+
+}
+#postit {
+	margin: 5px 0 0 0;
 }
 
 

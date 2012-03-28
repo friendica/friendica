@@ -45,13 +45,7 @@ works -->
     {{ endif }}
 	</div>
 
-	<div class="search-box">
-		<form method="get" action="$nav.search.0">
-			<input id="search-text" class="nav-menu-search" type="search" placeholder="Search" value="" id="search" name="search" />
-		</form>
-	</div>
-
-    <div id="user-menu">
+	<div id="user-menu">
         <a id="user-menu-label" onclick="openClose('user-menu-popup'); return false" href="$nav.home.0">$sitelocation</a>
         <ul id="user-menu-popup"
             onmouseover="if (typeof tmenu != 'undefined') clearTimeout(tmenu); openMenu('user-menu-popup')"
@@ -123,6 +117,12 @@ works -->
 
 <div id="lang-sel-wrap">
 $langselector
+</div>
+
+<div class="search-box">
+	<form method="get" action="$nav.search.0">
+		<input id="search-text" class="nav-menu-search" type="search" placeholder="Search" value="" id="search" name="search" />
+	</form>
 </div>
 
 <ul id="nav-notifications-template" style="display:none;" rel="template">

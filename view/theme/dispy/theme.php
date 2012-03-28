@@ -132,11 +132,13 @@ function dispy_community_info() {
 
 	$fostitJS = "javascript: (function() {
 		the_url = '".$a->get_baseurl($ssl_state)."/view/theme/dispy/fpostit/fpostit.php?url=' +
-		encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title) + '&text=' +
-		encodeURIComponent(''+(window.getSelection ? window.getSelection() : document.getSelection ?
-		document.getSelection() : document.selection.createRange().text));
+		encodeURIComponent(window.location.href) + '&title='
+			+ encodeURIComponent(document.title) + '&text='
+			+ encodeURIComponent('' + (window.getSelection
+			? window.getSelection() : document.getSelection
+			? document.getSelection() : document.selection.createRange().text));
 		a_funct = function() {
-			if (!window.open(the_url, 'fpostit', 'location=yes,links=no,scrollbars=no,toolbar=no,width=600,height=300')) {
+			if ( !window.open(the_url, 'fpostit', 'location=yes, links=no, scrollbars=no, toolbar=no, width=600, height=300') ) {
 				location.href = the_url;
 			}
 			if (/Firefox/.test(navigator.userAgent)) {
@@ -144,18 +146,18 @@ function dispy_community_info() {
 			} else {
 				a_funct();
 			}
-		})();" ;
+		})();";
 
 	$aside['$fostitJS'] = $fostitJS;
 	$url = $a->get_baseurl($ssl_state);
 	$aside['$url'] = $url;
 
     $tpl = file_get_contents(dirname(__file__).'/communityhome.tpl');
-	$a->page['aside'] = replace_macros($tpl, $aside);
+	$a->page['aside'] .= replace_macros($tpl, $aside);
 }
 
-//right_aside at profile pages
+//aside at profile pages
 if ($a->argv[0] === "profile") {
-	// COMMUNITY
 	dispy_community_info();
 }
+

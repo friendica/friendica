@@ -91,11 +91,13 @@ $(document).ready(function() {
             $('.floaterflip').css({
                 backgroundPosition: '-210px -60px' 
             });
+			$('.search-box').slideDown('fast');
         } else {
             $('#nav-floater').slideDown('fast');
             $('.floaterflip').css({
                 backgroundPosition: '-190px -60px'
             });
+			$('.search-box').slideUp('fast');
         }
     };
 	// our trigger for the toolbar button
@@ -151,6 +153,13 @@ function dispydark_community_info() {
 	$aside['$url'] = $url;
 
     $tpl = file_get_contents(dirname(__file__).'/communityhome.tpl');
-	$a->page['aside'] = replace_macros($tpl, $aside);
+	$a->page['aside_bottom'] = replace_macros($tpl, $aside);
 }
 
+// use our 'default.php' instead of the system-wide one
+$a->page['template'] = "theme/dispy-dark/default";
+
+// aside on profile page
+if ($a->argv[0] === "profile") {
+	dispydark_community_info();
+}
