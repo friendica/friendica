@@ -626,35 +626,6 @@ aside #profiles-menu {
   width: 48px;
   height: 48px;
 }
-/* mail view */
-.mail-conv-sender, .mail-conv-detail {
-  float: left;
-}
-.mail-conv-detail {
-  margin-left: 20px;
-  width: 500px;
-}
-.mail-conv-subject {
-  font-size: 1.4em;
-  margin: 10px 0;
-}
-.mail-conv-outside-wrapper-end {
-  clear: both;
-}
-.mail-conv-outside-wrapper {
-  margin-top: 30px;
-}
-.mail-conv-delete-wrapper {
-  float: right;
-  margin-right: 30px;
-  margin-top: 15px;
-}
-.mail-conv-break {
-  clear: both;
-}
-.mail-conv-delete-icon {
-  border: none;
-}
 /* group member */
 #contact-edit-drop-link, .mail-list-delete-wrapper, .group-delete-wrapper {
   float: right;
@@ -1355,6 +1326,9 @@ ul.tabs li .active {
 .field input, .field textarea {
   width: 400px;
 }
+.field input[type="checkbox"], .field input[type="radio"] {
+  width: auto;
+}
 .field textarea {
   height: 100px;
 }
@@ -1503,6 +1477,123 @@ ul.tabs li .active {
   left: 0px;
   top: 63px;
 }
+/* messages */
+#message-new {
+  background: #19aeff;
+  border: 1px solid #005c94;
+  width: 150px;
+}
+#message-new a {
+  color: #ffffff;
+  text-align: center;
+  display: block;
+  font-weight: bold;
+  padding: 1em 0px;
+}
+.mail-list-wrapper {
+  background-color: #f6f7f8;
+  margin-bottom: 5px;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+.mail-list-wrapper span {
+  display: block;
+  float: left;
+  width: 20%;
+  overflow: hidden;
+}
+.mail-list-wrapper .mail-subject {
+  width: 30%;
+  padding: 4px 0px 0px 4px;
+}
+.mail-list-wrapper .mail-subject a {
+  display: block;
+}
+.mail-list-wrapper .mail-subject.unseen a {
+  font-weight: bold;
+}
+.mail-list-wrapper .mail-date {
+  padding: 4px 4px 0px 4px;
+}
+.mail-list-wrapper .mail-from {
+  padding: 4px 4px 0px 4px;
+}
+.mail-list-wrapper .mail-count {
+  padding: 4px 4px 0px 4px;
+  text-align: right;
+}
+.mail-list-wrapper .mail-delete {
+  float: right;
+}
+#mail-display-subject {
+  background-color: #f6f7f8;
+  color: #2d2d2d;
+  margin-bottom: 10px;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+#mail-display-subject span {
+  float: left;
+  overflow: hidden;
+  padding: 4px 0px 0px 10px;
+}
+#mail-display-subject .mail-delete {
+  float: right;
+  opacity: 0.5;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+#mail-display-subject:hover .mail-delete {
+  opacity: 1;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+/* mail view */
+/*
+.mail-conv-sender,
+.mail-conv-detail {
+	float: left;
+}
+.mail-conv-detail {
+	margin-left: 20px;
+	width: 500px;
+}
+
+.mail-conv-subject {
+    font-size: 1.4em;
+    margin: 10px 0;
+}
+
+.mail-conv-outside-wrapper-end {
+	clear: both;
+}
+
+.mail-conv-outside-wrapper {
+	margin-top: 30px;
+}
+
+.mail-conv-delete-wrapper {
+	float: right;
+	margin-right: 30px;
+	margin-top: 15px;
+}
+.mail-conv-break {
+	clear: both;
+}
+
+.mail-conv-delete-icon {
+	border: none;
+}
+
+*/
 /* page footer */
 footer {
   height: 100px;

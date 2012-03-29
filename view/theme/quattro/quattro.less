@@ -319,41 +319,6 @@ aside {
 		img { width: 48px; height: 48px; }
 	}
 }
-/* mail view */
-.mail-conv-sender,
-.mail-conv-detail {
-	float: left;
-}
-.mail-conv-detail {
-	margin-left: 20px;
-	width: 500px;
-}
-
-.mail-conv-subject {
-    font-size: 1.4em;
-    margin: 10px 0;
-}
-
-.mail-conv-outside-wrapper-end {
-	clear: both;
-}
-
-.mail-conv-outside-wrapper {
-	margin-top: 30px;
-}
-
-.mail-conv-delete-wrapper {
-	float: right;
-	margin-right: 30px;
-	margin-top: 15px;
-}
-.mail-conv-break {
-	clear: both;
-}
-
-.mail-conv-delete-icon {
-	border: none;
-}
 
 /* group member */
 #contact-edit-drop-link,
@@ -938,6 +903,10 @@ ul.tabs {
 	textarea {
 		width: 400px;
 	}
+	input[type="checkbox"], input[type="radio"]{
+		width: auto;
+	}
+	
 	textarea { height: 100px; }
 	.field_help {
 		display: block;
@@ -980,6 +949,7 @@ ul.tabs {
 
 	&.radio .field_help { margin-left: 0px; }
 }
+
 
 #profile-edit-links li {
 	list-style: none;
@@ -1084,6 +1054,90 @@ ul.tabs {
 		top: 63px;
 	}	
 }
+
+/* messages */
+#message-new {
+	background: @MessageNewBackgroundColor;
+	border: 1px solid @MessageNewBorderColor;
+	width: 150px;
+	a {
+		color: @MessageNewColor;
+		text-align: center;
+		display: block;
+		font-weight: bold;
+		padding: 1em 0px;
+	}
+}
+
+.mail-list-wrapper {
+	background-color: @MailListBackgroundColor;
+	margin-bottom: 5px;
+	width: 100%; height: auto; overflow: hidden;
+	
+	span { display: block; float: left; width: 20%; overflow: hidden;}
+	
+	.mail-subject { 
+		width: 30%;
+		padding:4px 0px 0px 4px;
+		a { display: block; }
+		&.unseen a { font-weight: bold; }
+	}
+	.mail-date { padding: 4px 4px 0px 4px; }
+	.mail-from { padding: 4px 4px 0px 4px; }
+	.mail-count { padding: 4px 4px 0px 4px; text-align: right;}
+	
+	.mail-delete { float: right; }
+}
+
+#mail-display-subject {
+	background-color: @MailDisplaySubjectBackgroundColor;
+	color: @MailDisplaySubjectColor;
+	margin-bottom: 10px;
+	width: 100%; height: auto; overflow: hidden;
+	span { float: left; overflow: hidden; padding: 4px 0px 0px 10px;}
+	.mail-delete { float: right;  .opaque(0.5);}
+	&:hover .mail-delete { .opaque(1); }
+	
+}
+
+/* mail view */
+/*
+.mail-conv-sender,
+.mail-conv-detail {
+	float: left;
+}
+.mail-conv-detail {
+	margin-left: 20px;
+	width: 500px;
+}
+
+.mail-conv-subject {
+    font-size: 1.4em;
+    margin: 10px 0;
+}
+
+.mail-conv-outside-wrapper-end {
+	clear: both;
+}
+
+.mail-conv-outside-wrapper {
+	margin-top: 30px;
+}
+
+.mail-conv-delete-wrapper {
+	float: right;
+	margin-right: 30px;
+	margin-top: 15px;
+}
+.mail-conv-break {
+	clear: both;
+}
+
+.mail-conv-delete-icon {
+	border: none;
+}
+
+*/
 
 
 /* page footer */
