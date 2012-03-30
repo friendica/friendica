@@ -527,7 +527,8 @@ header {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
 }
 header #site-location {
-  display: none;
+position: absolute;
+top: 30px;
 }
 header #banner {
   overflow: hidden;
