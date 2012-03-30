@@ -1,6 +1,19 @@
 <?php
 
 
+function get_theme_config_file($theme){
+	$a = get_app();
+	$base_theme = $a->theme_info['extends'];
+	
+	if (file_exists("view/theme/$theme/config.php")){
+		return "view/theme/$theme/config.php";
+	} 
+	if (file_exists("view/theme/$base_theme/config.php")){
+		return "view/theme/$base_theme/config.php";
+	}
+	return null;
+}
+
 function settings_init(&$a) {
 	if(local_user()) {
 		profile_load($a,$a->user['nickname']);
@@ -193,6 +206,45 @@ function settings_post(&$a) {
 		call_hooks('connector_settings_post', $_POST);
 		return;
 	}
+	
+	if(($a->argc > 1) && ($a->argv[1] == 'display')) {
+		
+		check_form_security_token_redirectOnErr('/settings/display', 'settings_display');
+
+		$theme = ((x($_POST,'theme')) ? notags(trim($_POST['theme']))  : $a->user['theme']);
+		$nosmile = ((x($_POST,'nosmile')) ? intval($_POST['nosmile'])  : 0);  
+		$browser_update   = ((x($_POST,'browser_update')) ? intval($_POST['browser_update']) : 0);
+		$browser_update   = $browser_update * 1000;
+		if($browser_update < 10000)
+			$browser_update = 40000;
+
+		$itemspage_network   = ((x($_POST,'itemspage_network')) ? intval($_POST['itemspage_network']) : 40);
+		if($itemspage_network > 100)
+					$itemspage_network = 40;
+
+
+		set_pconfig(local_user(),'system','update_interval', $browser_update);
+		set_pconfig(local_user(),'system','itemspage_network', $itemspage_network);
+		set_pconfig(local_user(),'system','no_smilies',$nosmile);
+
+
+		if ($theme == $a->user['theme']){
+			// call theme_post only if theme has not benn changed
+			if( ($themeconfigfile = get_theme_config_file($theme)) != null){
+				require_once($themeconfigfile);
+				theme_post($a);
+			}
+		}
+
+
+		$r = q("UPDATE `user` SET `theme` = '%s' WHERE `uid` = %d LIMIT 1",
+				dbesc($theme),
+				intval(local_user())
+		);
+	
+		goaway($a->get_baseurl(true) . '/settings/display' );
+		return; // NOTREACHED
+	}
 
 	check_form_security_token_redirectOnErr('/settings', 'settings');
 	
@@ -227,7 +279,7 @@ function settings_post(&$a) {
 		}
 	}
 
-	$theme            = ((x($_POST,'theme'))      ? notags(trim($_POST['theme']))        : $a->user['theme']);
+	
 	$username         = ((x($_POST,'username'))   ? notags(trim($_POST['username']))     : '');
 	$email            = ((x($_POST,'email'))      ? notags(trim($_POST['email']))        : '');
 	$timezone         = ((x($_POST,'timezone'))   ? notags(trim($_POST['timezone']))     : '');
@@ -242,14 +294,6 @@ function settings_post(&$a) {
 	$expire_starred   = ((x($_POST,'expire_starred')) ? intval($_POST['expire_starred']) : 0);
 	$expire_photos    = ((x($_POST,'expire_photos'))? intval($_POST['expire_photos'])	 : 0);
 
-	$browser_update   = ((x($_POST,'browser_update')) ? intval($_POST['browser_update']) : 0);
-	$browser_update   = $browser_update * 1000;
-	if($browser_update < 10000)
-		$browser_update = 40000;
-
-	$itemspage_network   = ((x($_POST,'itemspage_network')) ? intval($_POST['itemspage_network']) : 40);
-	if($itemspage_network > 100)
-                $itemspage_network = 40;
 
 
 	$allow_location   = (((x($_POST,'allow_location')) && (intval($_POST['allow_location']) == 1)) ? 1: 0);
@@ -263,7 +307,7 @@ function settings_post(&$a) {
 	$suggestme        = ((x($_POST,'suggestme')) ? intval($_POST['suggestme'])  : 0);  
 	$hide_friends     = (($_POST['hide-friends'] == 1) ? 1: 0);
 	$hidewall         = (($_POST['hidewall'] == 1) ? 1: 0);
-	$nosmile          = ((x($_POST,'nosmile')) ? intval($_POST['nosmile'])  : 0);  
+
 
 	$notify = 0;
 
@@ -345,11 +389,9 @@ function settings_post(&$a) {
 	set_pconfig(local_user(),'expire','photos', $expire_photos);
 
 	set_pconfig(local_user(),'system','suggestme', $suggestme);
-	set_pconfig(local_user(),'system','update_interval', $browser_update);
-	set_pconfig(local_user(),'system','itemspage_network', $itemspage_network);
-	set_pconfig(local_user(),'system','no_smilies',$nosmile);
 
-	$r = q("UPDATE `user` SET `username` = '%s', `email` = '%s', `openid` = '%s', `timezone` = '%s',  `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `notify-flags` = %d, `page-flags` = %d, `default-location` = '%s', `allow_location` = %d, `theme` = '%s', `maxreq` = %d, `expire` = %d, `openidserver` = '%s', `blockwall` = %d, `hidewall` = %d, `blocktags` = %d  WHERE `uid` = %d LIMIT 1",
+
+	$r = q("UPDATE `user` SET `username` = '%s', `email` = '%s', `openid` = '%s', `timezone` = '%s',  `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `notify-flags` = %d, `page-flags` = %d, `default-location` = '%s', `allow_location` = %d, `maxreq` = %d, `expire` = %d, `openidserver` = '%s', `blockwall` = %d, `hidewall` = %d, `blocktags` = %d  WHERE `uid` = %d LIMIT 1",
 			dbesc($username),
 			dbesc($email),
 			dbesc($openid),
@@ -362,7 +404,6 @@ function settings_post(&$a) {
 			intval($page_flags),
 			dbesc($defloc),
 			intval($allow_location),
-			dbesc($theme),
 			intval($maxreq),
 			intval($expire),
 			dbesc($openidserver),
@@ -440,6 +481,12 @@ function settings_content(&$a) {
 			'url' 	=> $a->get_baseurl(true).'/settings',
 			'sel'	=> (($a->argc == 1)?'active':''),
 		),	
+		array(
+			'label'	=> t('Display settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings/display',
+			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'display')?'active':''),
+		),	
+		
 		array(
 			'label'	=> t('Connector settings'),
 			'url' 	=> $a->get_baseurl(true).'/settings/connectors',
@@ -578,31 +625,31 @@ function settings_content(&$a) {
 		$diasp_enabled = sprintf( t('Built-in support for %s connectivity is %s'), t('Diaspora'), ((get_config('system','diaspora_enabled')) ? t('enabled') : t('disabled')));
 		$ostat_enabled = sprintf( t('Built-in support for %s connectivity is %s'), t('StatusNet'), ((get_config('system','ostatus_disabled')) ? t('disabled') : t('enabled')));
 
-	$mail_disabled = ((function_exists('imap_open') && (! get_config('system','imap_disabled'))) ? 0 : 1);
-	if(get_config('system','dfrn_only'))
-		$mail_disabled = 1;
+		$mail_disabled = ((function_exists('imap_open') && (! get_config('system','imap_disabled'))) ? 0 : 1);
+		if(get_config('system','dfrn_only'))
+			$mail_disabled = 1;
 
-	if(! $mail_disabled) {
-		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
-			local_user()
-		);
-	}
-	else {
-		$r = null;
-	}
+		if(! $mail_disabled) {
+			$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
+				local_user()
+			);
+		}
+		else {
+			$r = null;
+		}
 
-	$mail_server       = ((count($r)) ? $r[0]['server'] : '');
-	$mail_port         = ((count($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
-	$mail_ssl          = ((count($r)) ? $r[0]['ssltype'] : '');
-	$mail_user         = ((count($r)) ? $r[0]['user'] : '');
-	$mail_replyto      = ((count($r)) ? $r[0]['reply_to'] : '');
-	$mail_pubmail      = ((count($r)) ? $r[0]['pubmail'] : 0);
-	$mail_action       = ((count($r)) ? $r[0]['action'] : 0);
-	$mail_movetofolder = ((count($r)) ? $r[0]['movetofolder'] : '');
-	$mail_chk          = ((count($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
+		$mail_server       = ((count($r)) ? $r[0]['server'] : '');
+		$mail_port         = ((count($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
+		$mail_ssl          = ((count($r)) ? $r[0]['ssltype'] : '');
+		$mail_user         = ((count($r)) ? $r[0]['user'] : '');
+		$mail_replyto      = ((count($r)) ? $r[0]['reply_to'] : '');
+		$mail_pubmail      = ((count($r)) ? $r[0]['pubmail'] : 0);
+		$mail_action       = ((count($r)) ? $r[0]['action'] : 0);
+		$mail_movetofolder = ((count($r)) ? $r[0]['movetofolder'] : '');
+		$mail_chk          = ((count($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
 
 
-	$tpl = get_markup_template("settings_connectors.tpl");
+		$tpl = get_markup_template("settings_connectors.tpl");
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("settings_connectors"),
 			
@@ -632,6 +679,78 @@ function settings_content(&$a) {
 		return $o;
 	}
 
+	/*
+	 * DISPLAY SETTINGS
+	 */
+	if(($a->argc > 1) && ($a->argv[1] === 'display')) {
+		$default_theme = get_config('system','theme');
+		if(! $default_theme)
+			$default_theme = 'default';
+
+		$allowed_themes_str = get_config('system','allowed_themes');
+		$allowed_themes_raw = explode(',',$allowed_themes_str);
+		$allowed_themes = array();
+		if(count($allowed_themes_raw))
+			foreach($allowed_themes_raw as $x)
+				if(strlen(trim($x)))
+					$allowed_themes[] = trim($x);
+
+		
+		$themes = array();
+		$files = glob('view/theme/*');
+		if($allowed_themes) {
+			foreach($allowed_themes as $th) {
+				$f = $th;
+				$is_experimental = file_exists('view/theme/' . $th . '/experimental');
+				$unsupported = file_exists('view/theme/' . $th . '/unsupported');
+				if (!$is_experimental or ($is_experimental && (get_config('experimentals','exp_themes')==1 or get_config('experimentals','exp_themes')===false))){ 
+					$theme_name = (($is_experimental) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
+					$themes[$f]=$theme_name;
+				}
+			}
+		}
+		$theme_selected = (!x($_SESSION,'theme')? $default_theme : $_SESSION['theme']);
+		
+		$browser_update = intval(get_pconfig(local_user(), 'system','update_interval'));
+		$browser_update = (($browser_update == 0) ? 40 : $browser_update / 1000); // default if not set: 40 seconds
+
+		$itemspage_network = intval(get_pconfig(local_user(), 'system','itemspage_network'));
+		$itemspage_network = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : 40); // default if not set: 40 items
+		
+		$nosmile = get_pconfig(local_user(),'system','no_smilies');
+		$nosmile = (($nosmile===false)? '0': $nosmile); // default if not set: 0
+
+
+		$theme_config = "";
+		if( ($themeconfigfile = get_theme_config_file($theme_selected)) != null){
+			require_once($themeconfigfile);
+			$theme_config = theme_content($a);
+		}
+		
+		$tpl = get_markup_template("settings_display.tpl");
+		$o = replace_macros($tpl, array(
+			'$tabs' 	=> $tabs,
+			'$ptitle' 	=> t('Display Settings'),
+			'$form_security_token' => get_form_security_token("settings_display"),
+			'$submit' 	=> t('Submit'),
+			'$baseurl' => $a->get_baseurl(true),
+			'$uid' => local_user(),
+		
+			'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes),
+			'$ajaxint'   => array('browser_update',  t("Update browser every xx seconds"), $browser_update, t('Minimum of 10 seconds, no maximum')),
+			'$itemspage_network'   => array('itemspage_network',  t("Number of items to display on the network page:"), $itemspage_network, t('Maximum of 100 items')),
+			'$nosmile'	=> array('nosmile', t("Don't show emoticons"), $nosmile, ''),
+			
+			'$theme_config' => $theme_config,
+		));
+		
+		return $o;
+	}
+	
+	
+	/*
+	 * ACCOUNT SETTINGS
+	 */
 
 	require_once('include/acl_selectors.php');
 
@@ -669,14 +788,7 @@ function settings_content(&$a) {
 	$suggestme = get_pconfig(local_user(), 'system','suggestme');
 	$suggestme = (($suggestme===false)? '0': $suggestme); // default if not set: 0
 
-	$browser_update = intval(get_pconfig(local_user(), 'system','update_interval'));
-	$browser_update = (($browser_update == 0) ? 40 : $browser_update / 1000); // default if not set: 40 seconds
 
-	$itemspage_network = intval(get_pconfig(local_user(), 'system','itemspage_network'));
-	$itemspage_network = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : 40); // default if not set: 40 items
-	
-	$nosmile = get_pconfig(local_user(),'system','no_smilies');
-	$nosmile = (($nosmile===false)? '0': $nosmile); // default if not set: 0
 	
 	if(! strlen($a->user['timezone']))
 		$timezone = date_default_timezone_get();
@@ -765,33 +877,7 @@ function settings_content(&$a) {
 		info( t('Profile is <strong>not published</strong>.') . EOL );
 
 	
-	$default_theme = get_config('system','theme');
-	if(! $default_theme)
-		$default_theme = 'default';
 
-	$allowed_themes_str = get_config('system','allowed_themes');
-	$allowed_themes_raw = explode(',',$allowed_themes_str);
-	$allowed_themes = array();
-	if(count($allowed_themes_raw))
-		foreach($allowed_themes_raw as $x)
-			if(strlen(trim($x)))
-				$allowed_themes[] = trim($x);
-
-	
-	$themes = array();
-	$files = glob('view/theme/*');
-	if($allowed_themes) {
-		foreach($allowed_themes as $th) {
-			$f = $th;
-			$is_experimental = file_exists('view/theme/' . $th . '/experimental');
-			$unsupported = file_exists('view/theme/' . $th . '/unsupported');
-			if (!$is_experimental or ($is_experimental && (get_config('experimentals','exp_themes')==1 or get_config('experimentals','exp_themes')===false))){ 
-				$theme_name = (($is_experimental) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
-				$themes[$f]=$theme_name;
-			}
-		}
-	}
-	$theme_selected = (!x($_SESSION,'theme')? $default_theme : $_SESSION['theme']);
 
 
 	$subdir = ((strlen($a->get_path())) ? '<br />' . t('or') . ' ' . $a->get_baseurl(true) . '/profile/' . $nickname : '');
@@ -842,10 +928,7 @@ function settings_content(&$a) {
 		'$timezone' => array('timezone_select' , t('Your Timezone:'), select_timezone($timezone), ''),
 		'$defloc'	=> array('defloc', t('Default Post Location:'), $defloc, ''),
 		'$allowloc' => array('allow_location', t('Use Browser Location:'), ($a->user['allow_location'] == 1), ''),
-		'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes),
-		'$ajaxint'   => array('browser_update',  t("Update browser every xx seconds"), $browser_update, t('Minimum of 10 seconds, no maximum')),
-		'$itemspage_network'   => array('itemspage_network',  t("Number of items to display on the network page:"), $itemspage_network, t('Maximum of 100 items')),
-		'$nosmile'	=> array('nosmile', t("Don't show emoticons"), $nosmile, ''),
+		
 
 		'$h_prv' 	=> t('Security and Privacy Settings'),
 

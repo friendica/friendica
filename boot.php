@@ -1261,17 +1261,20 @@ function current_theme(){
 	$system_theme = ((isset($a->config['system']['theme'])) ? $a->config['system']['theme'] : '');
 	$theme_name = ((isset($_SESSION) && x($_SESSION,'theme')) ? $_SESSION['theme'] : $system_theme);
 	
-	if($theme_name && file_exists('view/theme/' . $theme_name . '/style.css'))
+	if($theme_name && 
+		(file_exists('view/theme/' . $theme_name . '/style.css') ||
+		file_exists('view/theme/' . $theme_name . '/style.php')))
 		return($theme_name);
 	
 	foreach($app_base_themes as $t) {
-		if(file_exists('view/theme/' . $t . '/style.css'))
+		if(file_exists('view/theme/' . $t . '/style.css')||
+		   file_exists('view/theme/' . $t . '/style.php'))
 			return($t);
 	}
 	
-	$fallback = glob('view/theme/*/style.css');
+	$fallback = glob('view/theme/*/style.[css|php]');
 	if(count($fallback))
-		return (str_replace('view/theme/','', str_replace("/style.css","",$fallback[0])));
+		return (str_replace('view/theme/','', substr($fallback[0],0,-10)));
 
 }}
 
@@ -1283,6 +1286,8 @@ if(! function_exists('current_theme_url')) {
 function current_theme_url() {
 	global $a;
 	$t = current_theme();
+	if (file_exists('view/theme/' . $t . '/style.php'))
+		return($a->get_baseurl() . '/view/theme/' . $t . '/style.pcss');
 	return($a->get_baseurl() . '/view/theme/' . $t . '/style.css');
 }}
 

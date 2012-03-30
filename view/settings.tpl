@@ -28,10 +28,7 @@ $nickname_block
 {{inc field_custom.tpl with $field=$timezone }}{{endinc}}
 {{inc field_input.tpl with $field=$defloc }}{{endinc}}
 {{inc field_checkbox.tpl with $field=$allowloc }}{{endinc}}
-{{inc field_themeselect.tpl with $field=$theme }}{{endinc}}
-{{inc field_input.tpl with $field=$ajaxint }}{{endinc}}
-{{inc field_input.tpl with $field=$itemspage_network }}{{endinc}}
-{{inc field_checkbox.tpl with $field=$nosmile}}{{endinc}}
+
 
 <div class="settings-submit-wrapper" >
 <input type="submit" name="submit" class="settings-submit" value="$submit" />
