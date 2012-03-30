@@ -9,11 +9,6 @@
  * Screenshot: <a href="screenshot.jpg">Screenshot</a>
  */
 
-
-$a->theme_info = array(
-	'extends' => 'dispy'
-);
-
 $a->page['htmlhead'] .= <<< EOT
 <script>
 $(document).ready(function() {
@@ -111,20 +106,6 @@ $(document).ready(function() {
 		$(this).css({color: '#eec'});
 	});
 
-/*	$('#profile-photo-wrapper').mouseover(function() {
-		$('.profile-edit-side-div').css({display: 'block'});
-	}).mouseout(function() {
-		$('.profile-edit-side-div').css({display: 'none'});
-		return false;
-	});
-
-	$('img.photo').mouseover(function() {
-		$('.profile-edit-side-div').css({display: 'block'});
-	}).mouseout(function() {
-		$('.profile-edit-side-div').css({display: 'none'});
-		return false;
-	});*/
-
 });
 </script>
 EOT;
@@ -157,6 +138,6 @@ function dispy_community_info() {
 }
 
 // aside on profile page
-if ($a->argv[0] === "profile") {
+if (($a->argv[0] . $a->argv[1]) === ("profile" . $a->user['nickname'])) {
 	dispy_community_info();
 }

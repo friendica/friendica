@@ -1031,6 +1031,7 @@ section {
     font-size: 0.8em;
     padding-right: 230px;
 	min-width: 475px;
+	width: 65%;
 }
 
 /** tabs **/
@@ -1161,10 +1162,18 @@ section {
     transition: all 1s ease-in-out;
 }
 .wall-item-subtools1 {
-	list-style: none;
+    height: 30px;
+    list-style: none outside none;
+    margin: 20px 0 30px -20px;
+    padding: 0;
+    width: 30px;
 }
 .wall-item-subtools2 {
-	list-style: none;
+    height: 25px;
+    list-style: none outside none;
+    margin: -75px 0 0 5px;
+    padding: 0;
+    width: 25px;
 }
 .wall-item-title {
 	font-size: 1.2em;
@@ -1172,11 +1181,15 @@ section {
     margin-bottom: 1em;
 }
 .wall-item-body {
-	margin: 10px 10px 10px 0px;
+	margin: 20px 20px 10px 0px;
     text-align: left;
 }
 .wall-item-lock-wrapper {
 	float: right;
+    height: 22px;
+    margin: 0 -5px 0 0;
+    width: 22px;
+	opacity: 1;
 }
 .wall-item-dislike,
 .wall-item-like {
@@ -2141,8 +2154,7 @@ div[id$="wrapper"] br {
 	opacity: 0.1;
 	filter:alpha(opacity=10);
 	float: right;
-	margin-right: 10px;
-
+	margin-right: 5px;
 }
 .item-select:hover, .checkeditem {
 	opacity: 1;

@@ -16,11 +16,11 @@
 			<div class="wall-item-location" id="wall-item-location-$item.id">{{ if $item.location }}<span class="icon globe"></span>$item.location {{ endif }}</div>				
 		</div>
 		<div class="wall-item-tools" id="wall-item-tools-$item.id">
-			<ul class="wall-item-subtools1">
-				<li class="wall-item-lock-wrapper">
+				<div class="wall-item-lock-wrapper">
 					{{ if $item.lock }}<div class="wall-item-lock"><img src="images/lock_icon.gif" class="lockview" alt="$item.lock" onclick="lockview(event,$item.id);" /></div>
 					{{ else }}<div class="wall-item-lock"></div>{{ endif }}
-				</li>
+				</div>
+			<ul class="wall-item-subtools1">
 				{{ if $item.star }}
 				<li>
 					<a href="#" id="starred-$item.id" onclick="dostar($item.id); return false;" class="star-item icon $item.isstarred" title="$item.star.toggle"></a>
@@ -37,7 +37,7 @@
 					<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 				</li>
 				{{ endif }}
-			</ul>
+			</ul><br style="clear:left;" />
 			<ul class="wall-item-subtools2">
 				{{ if $item.filer }}
 				<li><a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item icon file-as" title="$item.star.filer"></a></li>
