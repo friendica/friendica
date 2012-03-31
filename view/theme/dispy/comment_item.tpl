@@ -12,14 +12,15 @@
 				</div>
 				<div class="comment-edit-photo-end"></div>
 				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);" onBlur="commentClose(this,$id);" >$comment</textarea>
-
 				{{ if $qcomment }}
-                <ul class="qcomment-wrapper">
-				{{ for $qcomment as $qc }}				
-					<li class="fakelink qcomment"
-                    onclick="commentInsert(this,$id); return false;">$qc</li>
+                <div class="qcomment-wrapper">
+					<select id="qcomment-select-$id" name="qcomment-$id" class="qcomment" onchange="qCommentInsert(this,$id);">
+					<option value=""></option>
+				{{ for $qcomment as $qc }}
+					<option value="$qc">$qc</option>
 				{{ endfor }}
-                </ul>
+					</select>
+				</div>
 				{{ endif }}
 
 				<div class="comment-edit-text-end"></div>

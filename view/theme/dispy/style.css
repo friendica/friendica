@@ -54,10 +54,14 @@ select {
 	border: 1px #555 dotted;
 	padding: 3px;
 	margin: 2px;
+	color: #222;
+	background: #efefef;
 }
 option {
 	padding: 3px;
 	vertical-align: middle;
+	color: #222;
+	background: #efefef;
 }
 li {
 	padding: 0 0 0 2px;
@@ -211,39 +215,51 @@ input[type=submit] {
 /**
  * 	login
  */
+aside .field {
+	overflow: hidden;
+	width: 200px;
+}
 #login-extra-links {
-    overflow: auto;
-    padding-top: 140px !important;
-    width: 100%;
+    overflow: auto !important;
+    padding-top: 60px !important;
+    width: 100% !important;
 }
 #login-extra-links a {
     margin-right: 20px;
 }
 #login_standard {
-    display: block;
-    float: none;
-    height: 100px;
-    position: absolute;
-	width: 100%;
+    display: block !important;
+    float: none !important;
+    height: 100% !important;
+    position: relative !important;
+	width: 100% !important;
 }
 #login_standard .field label {
-	width: 200px;
+	width: 200px !important;
 }
 #login_standard input, #login_standard input[type="text"] {
-	margin: 0 0 8px;
-    width: 210px;
+	margin: 0 0 8px !important;
+    width: 210px !important;
 }
 #login-submit-wrapper {
-	margin: 0;
+	margin: 0 !important;
 }
 #login-submit-button {
     margin-left: 0px !important;
 }
+aside #login_openid {
+	position: relative !important;
+	float: none !important;
+	margin-left: 0px !important;
+	height: auto !important;
+	width: 200px !important;
+}
 #login_openid #id_openid_url {
-	width: 200px;
+	width: 180px !important;
+	overflow: hidden !important;
 }
 #login_openid label {
-	width: 208px;
+	width: 180px !important;
 }
 
 
@@ -525,7 +541,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	width: 10em;
 	color: #eec;
 }
-nav #user-menu {
+#user-menu {
     display: block;	
     width: 75%;
     margin: 3px 0 0 0;
@@ -538,8 +554,12 @@ nav #user-menu {
     clear: both;
 	top: 4px;
 	left: 10px;
+	padding: 2px;
 }
-nav #user-menu-label {
+#user-menu > a {
+	vertical-align: top;
+}
+#user-menu-label {
    	font-size: 12px;
     padding: 3px 20px 9px 5px;
     height: 10px;
