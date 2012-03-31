@@ -21,23 +21,23 @@
 
 <div id="profile-jot-submit-wrapper" class="jothidden">
 	
-	<div id="profile-upload-wrapper" style="/*display: $visitor;*/" >
+	<div id="profile-upload-wrapper" style="display: $visitor;" >
 		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="camera" title="$upload"></a></div>
 	</div> 
-	<div id="profile-attach-wrapper" style="/*display: $visitor;*/" >
+	<div id="profile-attach-wrapper" style="display: $visitor;" >
 		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="attach" title="$attach"></a></div>
 	</div> 
 
-	<div id="profile-link-wrapper" style="/*display: $visitor;*/" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
+	<div id="profile-link-wrapper" style="display: $visitor;" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
 		<a id="profile-link" class="weblink" title="$weblink" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
 	</div> 
-	<div id="profile-video-wrapper" style="/*display: $visitor;*/" >
+	<div id="profile-video-wrapper" style="display: $visitor;" >
 		<a id="profile-video" class="video2" title="$video" onclick="jotVideoURL();return false;"></a>
 	</div> 
-	<div id="profile-audio-wrapper" style="/*display: $visitor;*/" >
+	<div id="profile-audio-wrapper" style="display: $visitor;" >
 		<a id="profile-audio" class="audio2" title="$audio" onclick="jotAudioURL();return false;"></a>
 	</div> 
-	<div id="profile-location-wrapper" style="/*display: $visitor;*/" >
+	<div id="profile-location-wrapper" style="display: $visitor;" >
 		<a id="profile-location" class="globe" title="$setloc" onclick="jotGetLocation();return false;"></a>
 	</div> 
 	<div id="profile-nolocation-wrapper" style="/*display: none;*/" >

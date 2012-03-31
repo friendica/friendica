@@ -439,7 +439,7 @@ a:hover {
   clear: both;
 }
 .fakelink {
-  color: #1872A2;
+  color: #333
   /* color: #3e3e8c; */
   text-decoration: none;
   cursor: pointer;
@@ -912,6 +912,10 @@ ul.menu-popup .empty {
 /*profile_side*/
 #profile_side {
   margin-bottom: 30px;
+ 
+}
+#profile_side a{
+  color: #333;
 }
 #ps-usericon{
 	height: 25px	
@@ -1289,7 +1293,7 @@ transition: all 0.2s ease-in-out;
   width: 575px;
 }
 .tread-wrapper a{
-  color: #1872A2;
+  color: red;
 }
 
 .wall-item-decor {

@@ -15,7 +15,7 @@ $cssFile = null;
 /**
  * prints last community activity
  */
-function diabook_blue_community_info(){
+function diabook_red_community_info(){
 	$a = get_app();
 	//right_aside at networkpages
 
@@ -234,7 +234,7 @@ if ($a->argv[0] === "network" && local_user()){
 	
 	if($ccCookie != "8") {
 	// COMMUNITY
-	diabook_blue_community_info();
+	diabook_red_community_info();
 	
 	// CUSTOM CSS
 	$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook-red/style-network.css";
@@ -247,7 +247,7 @@ if ($a->argv[0] === "network" && local_user()){
 if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname']){
 	if($ccCookie != "8") {
 	// COMMUNITY
-	diabook_blue_community_info();
+	diabook_red_community_info();
 	
 	// CUSTOM CSS
 	$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook-red/style-profile.css";
@@ -256,7 +256,7 @@ if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname']){
 
 
 // custom css
-if (!is_null($cssFile)) $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
+//if (!is_null($cssFile)) $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
 
 //load jquery.cookie.js
 $cookieJS = $a->get_baseurl($ssl_state)."/view/theme/diabook-red/js/jquery.cookie.js";

@@ -492,7 +492,7 @@ code {
   float: right;
 }
 .tool a {
-  color: ##3F8FBA;
+  color: #3465A4;
 }
 .tool a:hover {
   text-decoration: none;
@@ -912,6 +912,10 @@ ul.menu-popup .empty {
 /*profile_side*/
 #profile_side {
   margin-bottom: 30px;
+ 
+}
+#profile_side a{
+  color: #333;
 }
 #ps-usericon{
 	height: 25px	
@@ -1282,7 +1286,8 @@ right_aside .icon {width: 10px; height: 10px;}
 -ms-transition: all 0.2s ease-in-out;
 transition: all 0.2s ease-in-out;
 		}
-		
+
+
 /* wall item */
 .tread-wrapper {
   border-bottom: 1px solid #D2D2D2;
