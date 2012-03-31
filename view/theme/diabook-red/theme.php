@@ -292,7 +292,7 @@ if ($a->argv[0] === "settings"){
 		)
 	);
 	$tabtpl = file_get_contents(dirname(__file__).'/rs_common_tabs.tpl') ;
-	$a->page['right_aside'] = replace_macros($tabtpl, array(
+	$a->page['aside'] = replace_macros($tabtpl, array(
 		'$tabs' => $tabs,
 	));
 	

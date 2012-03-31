@@ -934,17 +934,15 @@ ul.menu-popup .empty {
 aside {
   display: table-cell;
   vertical-align: top;
-  width: 160px;
+  width: 200px;
   padding: 0px 10px 0px 10px;
   border-right: 1px solid #D2D2D2;
   float: left;
   /* background: #F1F1F1; */
 }
 
-aside .vcard .fn {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 5px;
+aside .vcard  {
+  display: none;
 }
 aside .vcard .title {
   margin-bottom: 5px;
@@ -1007,8 +1005,7 @@ aside #side-peoplefind-url {
 	width: 150px;
 	}
 #contact-block {
-  overflow: auto;
-  height: auto;
+  display: none;
 }
 #contact-block .contact-block-h4 {
   float: left;
@@ -1132,8 +1129,8 @@ span.sbox input {
 section {
   display: table-cell;
   vertical-align: top;
-  width: 640px;
-  padding: 0px 10px 0px 10px;
+  width: 650px;
+  padding: 0px 0px 0px 20px;
 }
 
 body .pageheader{
