@@ -262,6 +262,53 @@ if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname']){
 	}
 }
 
+//tabs at right_aside on settings page
+if ($a->argv[0] === "settings"){
+	
+	$tabs = array(
+		array(
+			'label'	=> t('Account settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings',
+			'sel'	=> (($a->argc == 1)?'active':''),
+		),	
+		array(
+			'label'	=> t('Display settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings/display',
+			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'display')?'active':''),
+		),	
+		
+		array(
+			'label'	=> t('Connector settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings/connectors',
+			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'connectors')?'active':''),
+		),
+		array(
+			'label'	=> t('Plugin settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings/addon',
+			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'addon')?'active':''),
+		),
+		array(
+			'label' => t('Connections'),
+			'url' => $a->get_baseurl(true) . '/settings/oauth',
+			'sel' => (($a->argc > 1) && ($a->argv[1] === 'oauth')?'active':''),
+		),
+		array(
+			'label' => t('Export personal data'),
+			'url' => $a->get_baseurl(true) . '/uexport',
+			'sel' => ''
+		)
+	);
+	$tabtpl = file_get_contents(dirname(__file__).'/rs_common_tabs.tpl') ;
+	$a->page['right_aside'] = replace_macros($tabtpl, array(
+		'$tabs' => $tabs,
+	));
+	
+	
+	// CUSTOM CSS
+	$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook/style-settings.css";
+	
+}
+
 // custom css
 if (!is_null($cssFile)) $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
 
