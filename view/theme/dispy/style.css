@@ -2894,13 +2894,7 @@ footer {
 }
 .qcomment-wrapper {
     padding: 0px;
-    margin: 2px;
-    list-style-type: none;
-}
-.qcomment, .qcomment:hover {
-    display: inline;
-    padding: 5px;
-    margin: 5px;
+    margin: 5px 5px 5px 81%;
 }
 .qcomment {
 	opacity: 0.5;
