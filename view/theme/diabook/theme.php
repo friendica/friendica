@@ -7,9 +7,7 @@
  * Author: 
  */
 
-$a->theme_info = array(
-  'extends' => 'duepuntozero',
-);
+
 
 //change css on network and profilepages
 $cssFile = null;
@@ -320,7 +318,7 @@ if (!is_null($cssFile)) $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" 
 
 //load jquery.cookie.js
 $cookieJS = $a->get_baseurl($ssl_state)."/view/theme/diabook-blue/js/jquery.cookie.js";
-$a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" />', $cookieJS);
+$a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" ></script>', $cookieJS);
 
 //js scripts
 

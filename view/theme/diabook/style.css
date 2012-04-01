@@ -552,6 +552,85 @@ header #banner #logo-text {
   position: absolute;
   top: 15%;
 }
+/* messages */
+#message-new {
+  background: #19aeff;
+  border: 1px solid #005c94;
+  width: 150px;
+}
+#message-new a {
+  color: #ffffff;
+  text-align: center;
+  display: block;
+  font-weight: bold;
+  padding: 1em 0px;
+}
+.mail-list-wrapper {
+  background-color: #f6f7f8;
+  margin-bottom: 5px;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+.mail-list-wrapper span {
+  display: block;
+  float: left;
+  width: 20%;
+  overflow: hidden;
+}
+.mail-list-wrapper .mail-subject {
+  width: 30%;
+  padding: 4px 0px 0px 4px;
+}
+.mail-list-wrapper .mail-subject a {
+  display: block;
+}
+.mail-list-wrapper .mail-subject.unseen a {
+  font-weight: bold;
+}
+.mail-list-wrapper .mail-date {
+  padding: 4px 4px 0px 4px;
+}
+.mail-list-wrapper .mail-from {
+  padding: 4px 4px 0px 4px;
+}
+.mail-list-wrapper .mail-count {
+  padding: 4px 4px 0px 4px;
+  text-align: right;
+}
+.mail-list-wrapper .mail-delete {
+  float: right;
+}
+#mail-display-subject {
+  background-color: #f6f7f8;
+  color: #2d2d2d;
+  margin-bottom: 10px;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+#mail-display-subject span {
+  float: left;
+  overflow: hidden;
+  padding: 4px 0px 0px 10px;
+}
+#mail-display-subject .mail-delete {
+  float: right;
+  opacity: 0.5;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+#mail-display-subject:hover .mail-delete {
+  opacity: 1;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
 /* nav */
 nav {
   width: 80%;

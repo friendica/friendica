@@ -25,3 +25,4 @@
 {{ if $tags.2 }}<div id="tag-remove"><a href="$tags.2">$tags.3</a></div>{{ endif }}
 
 {{ if $edit }}$edit{{ endif }}
+
