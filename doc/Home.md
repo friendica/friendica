@@ -5,6 +5,7 @@ Friendica Documentation and Resources
 **Contents**
 
 * [Account Basics](help/Account-Basics)
+* [New User Quick Start](help/guide)
 * [Profiles](help/Profiles)
 * [Connectors](help/Connectors)
 * [Making Friends](help/Making-Friends)

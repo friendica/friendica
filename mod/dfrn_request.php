@@ -664,8 +664,8 @@ function dfrn_request_content(&$a) {
 		else
 			$tpl = get_markup_template('auto_request.tpl');
 
-		$page_desc = sprintf( t('Diaspora members: Please do not use this form. Instead, enter "%s" into your Diaspora search bar.'), 
-			$target_addr) . EOL . EOL;
+	#	$page_desc = sprintf( t('Diaspora members: Please do not use this form. Instead, enter "%s" into your Diaspora search bar.'), 
+	#		$target_addr) . EOL . EOL;
 
 		$page_desc .= t("Please enter your 'Identity Address' from one of the following supported communications networks:");
 
@@ -699,7 +699,7 @@ function dfrn_request_content(&$a) {
 			'$friendica' => t('Friendica'),
 			'$statusnet' => t('StatusNet/Federated Social Web'),
 			'$diaspora' => t('Diaspora'),
-			'$diasnote' => t('- please share from your own site as noted above'),
+			'$diasnote' => sprintf (t(' - please do not use this form.  Instead, enter %s into your Diaspora search bar.'),$target_addr),
 			'$your_address' => t('Your Identity Address:'),
 			'$invite_desc' => $invite_desc,
 			'$emailnet' => $emailnet,

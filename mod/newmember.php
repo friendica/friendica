@@ -13,6 +13,8 @@ function newmember_content(&$a) {
 
 	$o .= '<ul>';
 
+	$o .= '<li>' . '<a target="newmember" href="/help/guide">' . t('On your <em>Quick Start</em> page - find a brief introduction to your profile and network tabs, connect to Facebook, make some new connections, and find some groups to join.') . '</a></li>' . EOL; 
+
 	$o .= '<li>' . '<a target="newmember" href="settings">' . t('On your <em>Settings</em> page -  change your initial password. Also make a note of your Identity Address. This looks just like an email address - and will be useful in making friends on the free social web.') . '</a></li>' . EOL; 
 
 	$o .= '<li>' . '<a target="newmember" href="settings">' . t('Review the other settings, particularly the privacy settings. An unpublished directory listing is like having an unlisted phone number. In general, you should probably publish your listing - unless all of your friends and potential friends know exactly how to find you.') . '</a></li>' . EOL;
