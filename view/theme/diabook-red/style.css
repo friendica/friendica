@@ -1216,108 +1216,7 @@ body .pageheader{
   width: 775px;
 }
 .tread-wrapper a{
-  color: #1872A2;
-}
-/*community-plugin*/
-aside #likes a, a:visited, a:link {
-		color: red;
-		text-decoration: none;
-		cursor: pointer;
-		
-}
-aside #likes a:hover{
-	text-decoration: underline;
-	}
-.wall-item-photo-menu-button {
-display: block;
-position: absolute;
-background-image: url("../../../view/theme/diabook-red/icons/photo-menu.jpg");
-background-position: top left;
-background-repeat: no-repeat;
-margin: 0px;
-padding: 0px;
-width: 16px;
-height: 16px;
-top: 90px;
-left: 17px;
-overflow: hidden;
-text-indent: 40px;
-display: none;
-}
-.wall-item-name {
- 	color: red;
-	}
-.wall-item-conv a{
-	color: black;	
-	}
-.wall-item-content-wrapper {
-margin-top: 10px;
-border: 1px solid #CCC;
--moz-border-radius: 3px;
-border-radius: 3px;
-display: table;
-width: 775px;
-}
-.wall-item-info {
-/*display: block;
-float: left;
-width: 110px;
-margin-right: 10px;*/
-  display: table-cell;
-  vertical-align: top;
-  text-align: left;
-  width: 80px;
-}
-.wall-item-content {
-  font-size: 12.5px;
-  max-width: 720px;
-  word-wrap: break-word;
-  line-height: 1.2;
-}
-.wrapper-end {
-	clear: both;
-}
-.wall-item-photo-wrapper {
-margin-top: 10px;
-margin-left: 10px;
-margin-bottom: 10px;
-width: 100px;
-}
-.wall-item-photo-menu ul { margin:0px; padding: 0px; list-style: none }
-.wall-item-photo-menu li a { display: block; padding: 2px; }
-.wall-item-photo-menu li a:hover { color: #FFFFFF; background: #3465A4; text-decoration: none; }
-.wall-item-wrapper {
-margin-left: 10px;
-}
-.wall-item-title-end {
-	clear: both;
-}
-
-.wall-item-body {
-	float: left;
-	/*width: 450px;*/
-	margin-top: 10px;
-}
-
-.wall-item-tools {
-	clear: both;
-	background-image: url("head.jpg");
-    background-position: 0 -20px;
-    background-repeat: repeat-x;
-   	padding: 5px 10px 0px;
-}
-.wall-item-author {
-	margin-top: 10px;
-}
-.wall-item-photo-menu {
-width: auto;
-border: 2px solid #444;
-background: white;
-position: absolute;
-left: 10px;
-top: 90px;
-display: none;
-z-index: 10000;
+  color: red;
 }
 
 .wall-item-decor {
@@ -2136,7 +2035,7 @@ max-width: 85%;
 	padding: 0px;
         width: 16px;
         height: 16px;
-        top: -20px; left:0px;
+        top: -16px; left:0px;
         overflow: hidden;
         text-indent: 40px;
         display: none;
@@ -2506,8 +2405,8 @@ float: left;
   display: none;
   /* position: absolute; */
   /* position: absolute; */
-  left: -2px;
-  top: -20px;
+  left: 0px;
+  top: -16px;
 }
 .contact-wrapper {
   float: left;
