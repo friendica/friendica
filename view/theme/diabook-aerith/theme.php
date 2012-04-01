@@ -267,8 +267,11 @@ if ($a->argv[0] === "settings"){
 			'label'	=> t('Display settings'),
 			'url' 	=> $a->get_baseurl(true).'/settings/display',
 			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'display')?'active':''),
+		),			
+		array(
+			'label'	=> t('Edit/Manage Profiles'),
+			'url' 	=> $a->get_baseurl(true).'/profiles',
 		),	
-		
 		array(
 			'label'	=> t('Connector settings'),
 			'url' 	=> $a->get_baseurl(true).'/settings/connectors',

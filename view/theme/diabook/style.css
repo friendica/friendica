@@ -1161,6 +1161,7 @@ body .pageheader{
   margin-bottom: 0px;
   width: 775px;
 }
+
 .wall-item-decor {
   position: absolute;
   left: 790px;
@@ -1172,7 +1173,6 @@ body .pageheader{
   display: table;
   width: 780px;
 }
-
 
 .wall-item-container .wall-item-item, .wall-item-container .wall-item-bottom {
   display: table-row;

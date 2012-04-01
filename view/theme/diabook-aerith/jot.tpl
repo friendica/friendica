@@ -34,7 +34,7 @@
 	<div id="profile-video-wrapper" style="display: $visitor;" >
 		<a id="profile-video" class="video2" title="$video" onclick="jotVideoURL();return false;"></a>
 	</div> 
-	<div id="profile-audio-wrapper" style="/*display: $visitor;*/" >
+	<div id="profile-audio-wrapper" style="display: $visitor;" >
 		<a id="profile-audio" class="audio2" title="$audio" onclick="jotAudioURL();return false;"></a>
 	</div> 
 	<div id="profile-location-wrapper" style="display: $visitor;" >
