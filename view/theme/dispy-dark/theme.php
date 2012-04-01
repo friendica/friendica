@@ -113,6 +113,10 @@ EOT;
 function dispydark_community_info() {
 	$a = get_app();
 
+	$aside['$lastusers_title'] = t('Last users');
+    $aside['$lastusers_items'] = array();
+	$publish = (get_config('system','publish_all') ? '' : " AND `publish` = 1 " );
+
 	$fostitJS = "javascript: (function() {
 		the_url = '".$a->get_baseurl($ssl_state)."/view/theme/dispy-dark/fpostit/fpostit.php?url=' +
 		encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title) + '&text=' +
@@ -138,6 +142,7 @@ function dispydark_community_info() {
 }
 
 // aside on profile page
-if (($a->argv[0] . $a->argv[1]) === ("profile" . $a->user['nickname'])) {
+//if (($a->argv[0] . $a->argv[1]) === ("profile" . $a->user['nickname'])) {
 	dispydark_community_info();
-}
+//}
+

@@ -146,7 +146,7 @@ a:hover {
 }
 .required {
     display: inline;
-    color: #ff0;
+    color: #f00;
     font-size: 16px;
     font-weight: bold;
     margin: 3px;
@@ -1062,6 +1062,8 @@ section {
 }
 .tabs li {
     display: inline;
+	font-size: smaller;
+	font-weight: bold;
 }
 .tab {
     border: 1px solid #729fcf;
@@ -1120,6 +1122,7 @@ section {
 }
 .wall-item-content {
 	overflow-x: auto;
+	margin: 0px 15px 0px 5px;
 }
 /* removing it from here, vs. putting it in .wall-item-content
  * might break things for people. we shall see ;) */
@@ -1203,6 +1206,7 @@ section {
 .wall-item-body {
 	margin: 20px 20px 10px 0px;
     text-align: left;
+	overflow-x: auto;
 }
 .wall-item-lock-wrapper {
 	float: right;

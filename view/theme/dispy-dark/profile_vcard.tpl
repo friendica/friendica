@@ -10,9 +10,8 @@
 			<a href="profiles/$e.id"><img src='$e.photo'>$e.profile_name</a>
 		</li>
 		{{ endfor }}
-		<li><a href="profile_photo" >$profile.menu.chg_photo</a></li>
+		<li><a href="profile_photo">$profile.menu.chg_photo</a></li>
 		<li><a href="profiles/new" id="profile-listing-new-link">$profile.menu.cr_new</a></li>
-		
 	</ul>
 	</div>
 	{{ endif }}
@@ -80,5 +79,4 @@
 </div>
 
 $contact_block
-
 
