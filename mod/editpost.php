@@ -115,6 +115,8 @@ function editpost_content(&$a) {
 		'$jotnets' => $jotnets,
 		'$title' => $itm[0]['title'],
 		'$placeholdertitle' => t('Set title'),
+                '$category' => file_tag_file_to_list($itm[0]['file'], 'category'),
+                '$placeholdercategory' => t('Categories (comma-separated list)'),
 		'$emtitle' => t('Example: bob@example.com, mary@example.com'),
 		'$lockstate' => $lockstate,
 		'$acl' => '', // populate_acl((($group) ? $group_acl : $a->user), $celeb),

@@ -974,6 +974,8 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		'$shortnoloc' => t('clear location'),
 		'$title' => "",
 		'$placeholdertitle' => t('Set title'),
+		'$category' => "",
+		'$placeholdercategory' => t('Categories (comma-separated list)'),
 		'$wait' => t('Please wait'),
 		'$permset' => t('Permission settings'),
 		'$shortpermset' => t('permissions'),

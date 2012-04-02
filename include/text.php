@@ -1314,6 +1314,118 @@ function file_tag_file_query($table,$s,$type = 'file') {
 	return " AND " . (($table) ? dbesc($table) . '.' : '') . "file regexp '" . dbesc($str) . "' ";
 }
 
+// ex. given music,video return <music><video> or [music][video]
+function file_tag_list_to_file($list,$type = 'file') {
+        $tag_list = '';
+        if(strlen($list)) {
+                $list_array = explode(",",$list);
+                if($type == 'file') {
+	                $lbracket = '[';
+	                $rbracket = ']';
+	        }
+                else {
+	                $lbracket = '<';
+        	        $rbracket = '>';
+	        }
+
+                foreach($list_array as $item) {
+		  if(strlen($item)) {
+		                $tag_list .= $lbracket . file_tag_encode(trim($item))  . $rbracket;
+			}
+                }
+	}
+        return $tag_list;
+}
+
+// ex. given <music><video>[friends], return music,video or friends
+function file_tag_file_to_list($file,$type = 'file') {
+        $matches = false;
+        $list = '';
+        if($type == 'file') {
+                $cnt = preg_match_all('/\[(.*?)\]/',$file,$matches,PREG_SET_ORDER);
+	}
+        else {
+                $cnt = preg_match_all('/<(.*?)>/',$file,$matches,PREG_SET_ORDER);
+	}
+	if($cnt) {
+		foreach($matches as $mtch) {
+			if(strlen($list))
+				$list .= ',';
+			$list .= file_tag_decode($mtch[1]);
+		}
+	}
+
+        return $list;
+}
+
+function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
+        // $file_old - categories previously associated with an item
+        // $file_new - new list of categories for an item
+
+	if(! intval($uid))
+		return false;
+
+        if($file_old == $file_new)
+	        return true;
+
+	$saved = get_pconfig($uid,'system','filetags');
+        if(strlen($saved)) {
+                if($type == 'file') {
+	                $lbracket = '[';
+	                $rbracket = ']';
+	        }
+                else {
+	                $lbracket = '<';
+        	        $rbracket = '>';
+	        }
+
+                $filetags_updated = $saved;
+
+		// check for new tags to be added as filetags in pconfig
+                $new_tags = array();
+                $check_new_tags = explode(",",file_tag_file_to_list($file_new,$type));
+
+	        foreach($check_new_tags as $tag) {
+		        if(! stristr($saved,$lbracket . file_tag_encode($tag) . $rbracket))
+			        $new_tags[] = $tag;
+	        }
+
+		$filetags_updated .= file_tag_list_to_file(implode(",",$new_tags),$type);
+
+		// check for deleted tags to be removed from filetags in pconfig
+                $deleted_tags = array();
+                $check_deleted_tags = explode(",",file_tag_file_to_list($file_old,$type));
+
+	        foreach($check_deleted_tags as $tag) {
+		        if(! stristr($file_new,$lbracket . file_tag_encode($tag) . $rbracket))
+		                $deleted_tags[] = $tag;
+	        }
+
+                foreach($deleted_tags as $key => $tag) {
+		        $r = q("select file from item where uid = %d " . file_tag_file_query('item',$tag,$type),
+		                intval($uid)
+	                );
+
+	                if(count($r)) {
+			        unset($deleted_tags[$key]);
+	                }
+			else {
+			        $filetags_updated = str_replace($lbracket . file_tag_encode($tag) . $rbracket,'',$filetags_updated);
+			}
+		}
+
+                if($saved != $filetags_updated) {
+		        set_pconfig($uid,'system','filetags', $filetags_updated);
+                }
+		return true;
+	}
+        else
+                if(strlen($file_new)) {
+		        set_pconfig($uid,'system','filetags', $file_new);
+                }
+		return true;
+}
+
 function file_tag_save_file($uid,$item,$file) {
 	$result = false;
 	if(! intval($uid))

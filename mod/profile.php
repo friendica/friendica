@@ -2,6 +2,11 @@
 
 function profile_init(&$a) {
 
+	require_once('include/contact_widgets.php');
+
+	if(! x($a->page,'aside'))
+		$a->page['aside'] = '';
+
 	$blocked = (((get_config('system','block_public')) && (! local_user()) && (! remote_user())) ? true : false);
 
 	if($a->argc > 1)
@@ -59,6 +64,13 @@ function profile_init(&$a) {
 
 function profile_content(&$a, $update = 0) {
 
+        if (x($a->category)) {
+	        $category = $a->category;
+	}
+        else {
+	        $category = ((x($_GET,'category')) ? $_GET['category'] : '');
+	}
+
 	if(get_config('system','block_public') && (! local_user()) && (! remote_user())) {
 		return login();
 	}
@@ -112,7 +124,8 @@ function profile_content(&$a, $update = 0) {
 		return;
 	}
 
-	
+	$a->page['aside'] .= categories_widget($a->get_baseurl(true) . '/profile/' . $a->profile['nickname'],(x($category) ? xmlify($category) : ''));
+
 	if(! $update) {
 		if(x($_GET,'tab'))
 			$tab = notags(trim($_GET['tab']));
@@ -134,6 +147,7 @@ function profile_content(&$a, $update = 0) {
 		$commvisitor = (($commpage && $remote_contact == true) ? true : false);
 
 		$celeb = ((($a->profile['page-flags'] == PAGE_SOAPBOX) || ($a->profile['page-flags'] == PAGE_COMMUNITY)) ? true : false);
+
 
 		if(can_write_wall($a,$a->profile['profile_uid'])) {
 
@@ -178,6 +192,10 @@ function profile_content(&$a, $update = 0) {
 	}
 	else {
 
+                if(x($category)) {
+		        $sql_extra .= file_tag_file_query('item',$category,'category');
+		}
+
 		$r = q("SELECT COUNT(*) AS `total`
 			FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
@@ -204,6 +222,7 @@ function profile_content(&$a, $update = 0) {
 			intval($a->profile['profile_uid'])
 
 		);
+
 	}
 
 	$parents_arr = array();

@@ -76,17 +76,21 @@ input#dfrn-url {
 }
 
 
-#jot-title {
+#jot-title, #jot-category {
 	background-color: #333333;
 	border: 1px solid #333333;
 }
 
 #jot-title::-webkit-input-placeholder{ color: #555555!important;}
 #jot-title:-moz-placeholder{color: #555555!important;}
+#jot-category::-webkit-input-placeholder{ color: #555555!important;}
+#jot-category:-moz-placeholder{color: #555555!important;}
 		
 	
 #jot-title:hover,
-#jot-title:focus {
+#jot-title:focus,
+#jot-category:hover,
+#jot-category:focus {
 	border: 1px solid #cccccc; 
 }
 blockquote {
