@@ -3,7 +3,7 @@
 /*
  * Name: Diabook-blue
  * Description: Diabook-blue: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
- * Version: (Version: 1.011)
+ * Version: (Version: 1.012)
  * Author: 
  */
 
@@ -139,7 +139,8 @@ function diabook_blue_community_info(){
    //nav FIND FRIENDS
 	if(local_user()) {
 	$nv = array();
-	$nv['directory'] = Array('directory', t('Local').' '.t('Directory'), "", "");
+	$nv['title'] = Array("", t('Find Friends'), "", "");
+	$nv['directory'] = Array('directory', t('Local Directory'), "", "");
 	$nv['global_directory'] = Array('http://dir.friendica.com/', t('Global Directory'), "", "");
 	$nv['match'] = Array('match', t('Similar Interests'), "", "");
 	$nv['suggest'] = Array('suggest', t('Friend Suggestions'), "", "");
@@ -188,10 +189,28 @@ function diabook_blue_community_info(){
 		
 		$aside['$page'] = $page;
 	}		
-  //END Community Page		   
-   
-   
-   
+  //END Community Page
+  //helpers
+   $helpers = array();
+	$helpers['title'] = Array("", t('Help or @NewHere ?'), "", "");
+	
+	$aside['$helpers'] = $helpers;
+   //end helpers
+   //connectable services
+   $con_services = array();
+	$con_services['title'] = Array("", t('Connect Services'), "", "");
+	
+	$aside['$con_services'] = $con_services;
+   //end connectable services
+   //postit
+   $postit = array();
+	$postit['title'] = Array("", t('PostIt to Friendica'), t('Post to Friendica'), "");
+	$postit['text'] = Array("", t(' from anywhere by bookmarking this Link.'), "", "");
+	
+	$aside['$postit'] = $postit;
+   //end postit
+  
+   //get_baseurl   
    $url = $a->get_baseurl($ssl_state);   
    $aside['$url'] = $url;
 

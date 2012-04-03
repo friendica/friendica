@@ -543,15 +543,17 @@ header #banner a:hover {
   text-decoration: none;
   outline: none;
   vertical-align: middle;
+ font-weight: bolder;
+  margin-left: 3px;
 }
 header #banner #logo-img {
   height: 25px;
-  margin-top: 5px;
+  margin-top: 3px;
 }
 header #banner #logo-text {
-  font-size: 22px;
+  font-size: 20px;
   position: absolute;
-  top: 15%;
+  top: 10%;
 }
 /* nav */
 nav {
@@ -630,7 +632,7 @@ nav #logo-text {
 nav .nav-menu-search {
   position: relative;
 
-  margin: 3px 17px;
+  margin: 4px 17px;
   margin-right: 0px;
   height: 17px;
   width: 180px;
@@ -995,6 +997,8 @@ aside #profiles-menu {
 }
 aside #search-text {
 	width: 150px;
+	height: 17px;
+	padding-left: 10px;
 	border-top-left-radius: 15px;
 border-top-right-radius: 15px;
 border-bottom-right-radius: 15px;
@@ -1195,7 +1199,7 @@ right_aside {
   
   /* background: #F1F1F1; */
 }
-right_aside h3 {border-bottom: 1px solid #D2D2D2; padding-top: 5px; padding-bottom: 0px; padding-left: 3px; margin-bottom: 0px; 
+right_aside h3 {border-bottom: 1px solid #D2D2D2; padding-top: 5px; padding-bottom: 0px; padding-left: 9px; margin-bottom: 0px; 
 margin-top:30px;}
 right_aside .directory-item {	width: 50px; height: 50px; vertical-align: center; text-align: center; }
 right_aside .directory-photo { margin: 0px; }
@@ -1688,7 +1692,7 @@ transition: all 0.2s ease-in-out;
 #profile-jot-submit {
 	float: right;
 	margin-top: 2px;
-	
+	font-size: 14px;
 }
 #profile-upload-wrapper {
 	float: left;
@@ -1740,7 +1744,9 @@ transition: all 0.2s ease-in-out;
 	float: right;
 	margin-left: 10px;
 	margin-top: 2px;
-	font-size: 10px;
+	font-size: 9px;
+	font-weight: bolder;
+	cursor: pointer;
 }
 #profile-jot-perms{
    float: right;
@@ -1751,9 +1757,10 @@ transition: all 0.2s ease-in-out;
 .button.creation1 {
     background-color: #fff;
     border: 1px solid #777777;
-    background-image: -moz-linear-gradient(center top , white 0%, #DDDDDD 100%);
     border-radius: 3px 3px 3px 3px;
     box-shadow: 0 1px 1px #CFCFCF;
+    cursor: pointer;
+    font-weight: bolder;
 }
 .button.creation2 {
     background-color: #33ACFF;
@@ -1763,6 +1770,8 @@ transition: all 0.2s ease-in-out;
     border-radius: 3px 3px 3px 3px;
     box-shadow: 0 1px 1px #CFCFCF;
     margin-left: 5px;
+    cursor: pointer;
+    font-weight: bolder;
 }
 /*input[type="submit"] {
 	border: 0px;

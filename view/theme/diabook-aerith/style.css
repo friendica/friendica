@@ -2042,6 +2042,14 @@ ul.tabs li .active {
 .field.radio .field_help {
   margin-left: 0px;
 }
+.suggest-select {
+width: 500px;
+height: 350px;	
+	}
+.message-to-select {
+	width: 400px;
+   height: 150px;
+	}
 #directory-search-form{
 	margin-bottom: 50px;
 	}

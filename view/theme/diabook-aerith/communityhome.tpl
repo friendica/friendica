@@ -6,7 +6,7 @@
 
 <div id="close_helpers">
 {{ if $lastusers_title }}
-<h3 style="margin-top:0px;">Help or @NewHere ?<a id="close_helpers_icon"  onClick="close_helpers()" class="icon close_box" title="close"></a></h3>
+<h3 style="margin-top:0px;">$helpers.title.1<a id="close_helpers_icon"  onClick="close_helpers()" class="icon close_box" title="close"></a></h3>
 <a href="http://kakste.com/profile/newhere" title="#NewHere" style="margin-left: 10px; " target="blank">NewHere</a><br>
 <a href="https://helpers.pyxis.uberspace.de/profile/helpers" style="margin-left: 10px; " title="Friendica Support" target="blank">Friendica Support</a><br>
 <a href="https://letstalk.pyxis.uberspace.de/profile/letstalk" style="margin-left: 10px; " title="Let's talk" target="blank">Let's talk</a><br>
@@ -16,7 +16,7 @@
 
 <div id="close_services">
 {{ if $lastusers_title }}
-<h3>Connectable Services<a id="close_services_icon" onClick="close_services()" class="icon close_box" title="close"></a></h3>
+<h3>$con_services.title.1<a id="close_services_icon" onClick="close_services()" class="icon close_box" title="close"></a></h3>
 <div id="right_service_icons" style="margin-left: 16px; margin-top: 5px;">
 <a href="$url/facebook"><img alt="Facebook" src="view/theme/diabook-aerith/icons/facebook.png" title="Facebook"></a>
 <a href="$url/settings/connectors"><img alt="StatusNet" src="view/theme/diabook-aerith/icons/StatusNet.png?" title="StatusNet"></a>
@@ -32,9 +32,9 @@
 
 <div id="close_friends" style="margin-bottom:53px;">
 {{ if $nv }}
-<h3>Find Friends<a id="close_friends_icon" onClick="close_friends()"  class="icon close_box" title="close"></a></h3>
+<h3>$nv.title.1<a id="close_friends_icon" onClick="close_friends()"  class="icon close_box" title="close"></a></h3>
 <a class="$nv.directory.2" href="$nv.directory.0" style="margin-left: 10px; " title="$nv.directory.3" >$nv.directory.1</a><br>
-<a class="$nv.global_directory.2" href="$nv.global_directory.0" style="margin-left: 10px; " title="$nv.global_directory.3" >$nv.global_directory.1</a><br>
+<a class="$nv.global_directory.2" href="$nv.global_directory.0" target="blank" style="margin-left: 10px; " title="$nv.global_directory.3" >$nv.global_directory.1</a><br>
 <a class="$nv.match.2" href="$nv.match.0" style="margin-left: 10px; " title="$nv.match.3" >$nv.match.1</a><br>
 <a class="$nv.suggest.2" href="$nv.suggest.0" style="margin-left: 10px; " title="$nv.suggest.3" >$nv.suggest.1</a><br>
 <a class="$nv.invite.2" href="$nv.invite.0" style="margin-left: 10px; " title="$nv.invite.3" >$nv.invite.1</a>			
@@ -44,8 +44,8 @@ $nv.search
 
 <div id="close_postit">
 {{ if $lastusers_title }}
-<h3>PostIt to Friendica<a id="close_postit_icon" onClick="close_postit()" class="icon close_box" title="close"></a></h3>
-<div style="padding-left: 8px;"><span ><a href="$fostitJS" title="PostIt">Post to Friendica</a> from anywhere by bookmarking the Link.</span></div>
+<h3>$postit.title.1<a id="close_postit_icon" onClick="close_postit()" class="icon close_box" title="close"></a></h3>
+<div style="padding-left: 10px;font-size: 12px;"><span ><a href="$fostitJS" title="PostIt">$postit.title.2</a>$postit.text.1</span></div>
 {{ endif }}
 </div>
 

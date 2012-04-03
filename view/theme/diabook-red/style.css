@@ -579,6 +579,7 @@ header #banner #logo-text {
   font-weight: bold;
   padding: 1em 0px;
   text-decoration: none;
+  background-color: red;
 }
 .mail-list-wrapper {
   background-color: #f6f7f8;
@@ -2027,6 +2028,14 @@ ul.tabs li .active {
 .field.radio .field_help {
   margin-left: 0px;
 }
+.suggest-select {
+width: 500px;
+height: 350px;	
+	}
+.message-to-select {
+	width: 400px;
+   height: 150px;
+	}
 #directory-search-form{
 	margin-bottom: 50px;
 	}
