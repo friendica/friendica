@@ -444,10 +444,10 @@ div.jGrowl div.info {
     padding-left: 58px;
 }
 #nav-notifications-menu {
-    margin: 30px 0 0 -45px;
-    width: 300px;
-    max-height: 400px;
-    overflow: auto;
+    margin: 30px 0 0 -20px;
+    width: 275px;
+    max-height: 300px;
+    overflow-y: auto;
     font-size: 9pt;
 }
 #nav-notifications-menu .contactname {
@@ -762,12 +762,20 @@ aside #viewcontacts {
     list-style: none;
 }
 #dfrn-request-link {
-	background:#3465A4 url(connect.png) no-repeat 95% center;
-	border-radius:5px 5px 5px 5px;
-	color:#fff;
-	display:block;
-	font-size:1.2em;
-	padding:.2em .5em;
+	background: #3465A4 url(connect.png) no-repeat 95% center;
+	border-radius: 5px 5px 5px 5px;
+	color: #fff;
+	display: block;
+	font-size: 1.2em;
+	padding: 0.2em 0.5em;
+}
+#wallmessage-link {
+	/*background: #3465A4 url(connect.png) no-repeat 95% center;*/
+	/*border-radius: 5px 5px 5px 5px;*/
+	color: #eee;
+	display: block;
+	font-size: 1.2em;
+	padding: 0.2em 0.5em;
 }
 #netsearch-box {
 	margin: 20px 0px 30px;
@@ -1113,6 +1121,7 @@ section {
 }
 .shiny {
     background: #efefdf;
+	border-radius: 5px;
 }
 .wall-outside-wrapper .shiny {
 	border-radius: 5px;
