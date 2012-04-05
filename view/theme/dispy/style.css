@@ -856,6 +856,16 @@ aside #viewcontacts {
     border-radius: 5px;
 	vertical-align: middle;
 }
+#jot-category {
+	margin: 5px 0;
+	border-radius: 5px;
+	border: 1px #ccc solid;
+	color: #666;
+	font-size: small;
+}
+#jot-category:focus {
+	color: #111;
+}
 #jot #character-counter {
 	width: 6%;
 	float: right;
@@ -2176,12 +2186,12 @@ div[id$="wrapper"] br {
 	opacity: 1.0 !important;
 	filter:alpha(opacity=100) !important;
 }
-.filesavetags {
+.filesavetags, .categorytags {
 	margin: 20px 0;
 	opacity: 0.5;
 	filter:alpha(opacity=50);
 }
-.filesavetags:hover {
+.filesavetags:hover, .categorytags:hover {
 	margin: 20px 0;
 	opacity: 1.0 !important;
 	filter:alpha(opacity=100) !important;
