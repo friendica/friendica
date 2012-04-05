@@ -22,7 +22,8 @@ function filer_content(&$a) {
 	} else {
 		// return filer dialog
 		$filetags = get_pconfig(local_user(),'system','filetags');
-		$filetags = explode("][", trim($filetags,"[]"));
+		$filetags = file_tag_file_to_list($filetags,'file');
+                $filetags = explode(",", $filetags);
 		$tpl = get_markup_template("filer_dialog.tpl");
 		$o = replace_macros($tpl, array(
 			'$field' => array('term', t("Save to Folder:"), '', '', $filetags, t('- select -')),
