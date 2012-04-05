@@ -22,43 +22,46 @@
 			<div class="wall-item-photo-end"></div>
 			<div class="wall-item-location" id="wall-item-location-$item.id">{{ if $item.location }}<span class="icon globe"></span>$item.location {{ endif }}</div>				
 		</div>
-		<div class="wall-item-lock-wrapper">
+		<div class="wall-item-tools" id="wall-item-tools-$item.id">
+			<div class="wall-item-lock-wrapper">
 				{{ if $item.lock }}<div class="wall-item-lock"><img src="images/lock_icon.gif" class="lockview" alt="$item.lock" onclick="lockview(event,$item.id);" /></div>
 				{{ else }}<div class="wall-item-lock"></div>{{ endif }}
-		</div>
-		<div class="wall-item-tools" id="wall-item-tools-$item.id">
-			{{ if $item.star }}
-				<a href="#" id="starred-$item.id" onclick="dostar($item.id); return false;" class="star-item icon $item.isstarred" title="$item.star.toggle"></a>
-				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item icon tagged" title="$item.star.tagger"></a>
-			{{ endif }}
-			
-			{{ if $item.vote }}
-			<div class="wall-item-like-buttons" id="wall-item-like-buttons-$item.id">
-				<a href="#" class="icon like" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false"></a>
-				<a href="#" class="icon dislike" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"></a>
-
-			{{ if $item.vote.share }}
-				<a href="#" id="share-$item.id"
-class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick="jotShare($item.id); return false"></a>{{ endif }}
-				<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 			</div>
-			{{ endif }}
+			<ul class="wall-item-subtools1">
+				{{ if $item.star }}
+				<li>
+					<a href="#" id="starred-$item.id" onclick="dostar($item.id); return false;" class="star-item icon $item.isstarred" title="$item.star.toggle"></a>
+					<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item icon tagged" title="$item.star.tagger"></a>
+				</li>
+				{{ endif }}
+				{{ if $item.vote }}
+				<li class="wall-item-like-buttons" id="wall-item-like-buttons-$item.id">
+					<a href="#" class="icon like" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false"></a>
+					<a href="#" class="icon dislike" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"></a>
+					{{ if $item.vote.share }}
+					<a href="#" id="share-$item.id"
+class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick="jotShare($item.id); return false"></a>{{ endif }}
+					<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
+				</li>
+				{{ endif }}
+			</ul><br style="clear:left;" />
+			<ul class="wall-item-subtools2">
 			{{ if $item.filer }}
-				<div class="wall-item-filer-wrapper"><a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item icon file-as" title="$item.star.filer"></a></div>
+				<li class="wall-item-filer-wrapper"><a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item icon file-as" title="$item.star.filer"></a></li>
 			{{ endif }}
 			{{ if $item.plink }}
-				<div class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></div>
+				<li class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></li>
 			{{ endif }}
 			{{ if $item.edpost }}
-				<a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>
+				<li><a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a></li>
 			{{ endif }}
 		
-			<div class="wall-item-delete-wrapper" id="wall-item-delete-wrapper-$item.id" >
+			<li class="wall-item-delete-wrapper" id="wall-item-delete-wrapper-$item.id" >
 				{{ if $item.drop.dropping }}<a href="item/drop/$item.id" onclick="return confirmDelete();" class="icon drophide" title="$item.drop.delete" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a>{{ endif }}
-			</div>
 				{{ if $item.drop.dropping }}<input type="checkbox" onclick="checkboxhighlight(this);" title="$item.drop.select" class="item-select" name="itemselected[]" value="$item.id" />{{ endif }}
+			</li>
+			</ul>
 			<div class="wall-item-delete-end"></div>
-
 		</div>
 		<div class="wall-item-content" id="wall-item-content-$item.id" >
 			<div class="wall-item-title" id="wall-item-title-$item.id">$item.title</div>
@@ -70,7 +73,6 @@ class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick
 						{{ endfor }}
 					</div>			
 			</div>
-			
 		</div>
 		<div class="wall-item-author">
 			<a href="$item.profile_url" title="$item.linktitle" class="wall-item-name-link"><span class="wall-item-name$item.sparkle" id="wall-item-name-$item.id" >$item.name</span></a>

@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" type="text/css" href="$stylesheet" media="all" />
 
-<link rel="shortcut icon" href="$baseurl/images/friendika-32.png" />
+<link rel="shortcut icon" href="$baseurl/images/friendica-32.png" />
 <link rel="search"
          href="$baseurl/opensearch" 
          type="application/opensearchdescription+xml" 
@@ -34,14 +34,16 @@
 	function commentOpen(obj,id) {
 		if(obj.value == '$comment') {
 			obj.value = '';
-			obj.className = "comment-edit-text-full";
+			$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
+			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 			openMenu("comment-edit-submit-wrapper-" + id);
 		}
 	}
 	function commentClose(obj,id) {
 		if(obj.value == '') {
 			obj.value = '$comment';
-			obj.className="comment-edit-text-empty";
+			$("#comment-edit-text-" + id).removeClass("comment-edit-text-full");
+			$("#comment-edit-text-" + id).addClass("comment-edit-text-empty");
 			closeMenu("comment-edit-submit-wrapper-" + id);
 		}
 	}
@@ -56,6 +58,22 @@
 			openMenu("comment-edit-submit-wrapper-" + id);
 		}
 		var ins = $(obj).html();
+		ins = ins.replace('&lt;','<');
+		ins = ins.replace('&gt;','>');
+		ins = ins.replace('&amp;','&');
+		ins = ins.replace('&quot;','"');
+		$("#comment-edit-text-" + id).val(tmpStr + ins);
+	}
+
+	function qCommentInsert(obj,id) {
+		var tmpStr = $("#comment-edit-text-" + id).val();
+		if(tmpStr == '$comment') {
+			tmpStr = '';
+			$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
+			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
+			openMenu("comment-edit-submit-wrapper-" + id);
+		}
+		var ins = $(obj).val();
 		ins = ins.replace('&lt;','<');
 		ins = ins.replace('&gt;','>');
 		ins = ins.replace('&amp;','&');

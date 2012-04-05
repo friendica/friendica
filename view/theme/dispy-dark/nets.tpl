@@ -4,7 +4,7 @@
 	<a href="$base" class="nets-link{{ if $sel_all }} nets-selected{{ endif }} nets-all">$all</a>
 	<ul class="nets-ul">
 	{{ for $nets as $net }}
-	<li><a href="$base?f=&nets=$net.ref" class="nets-link{{ if $net.selected }} nets-selected{{ endif }}">$net.name</a></li>
+	<li><a href="$base?nets=$net.ref" class="nets-link{{ if $net.selected }} nets-selected{{ endif }}">$net.name</a></li>
 	{{ endfor }}
 	</ul>
 </div>

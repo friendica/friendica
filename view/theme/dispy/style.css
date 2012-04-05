@@ -2085,6 +2085,9 @@ div[id$="wrapper"] br {
     float:left;
     font-size:20px;
 }
+.event {
+	background: #2e2f2e;
+}
 .vevent {
     border:1px solid #ccc;
 }
@@ -2096,15 +2099,14 @@ div[id$="wrapper"] br {
 	margin-left: 10px;
 	margin-right: 10px;
 }
-
 #new-event-link {
 	margin-bottom: 10px;
 }
 .edit-event-link, .plink-event-link {
-	float: left;
-	margin-top: 4px;
-	margin-right: 4px;
-	margin-bottom: 15px;
+	/*float: left;      */
+	/*margin-top: 4px;  */
+	/*margin-right: 4px;*/
+	/*margin-bottom: 15px;*/
 }
 .event-description:before {
 	content: url('../../../images/calendar.png');
@@ -2113,6 +2115,7 @@ div[id$="wrapper"] br {
 .event-start, .event-end {
 	margin-left: 10px;
 	width: 330px;
+	font-size: smaller;
 }
 .event-start .dtstart, .event-end .dtend {
 	float: right;
@@ -2187,7 +2190,7 @@ div[id$="wrapper"] br {
 	opacity: 0.1;
 	filter:alpha(opacity=10);
 	float: right;
-	margin-right: 10px;
+	margin-right: 5px;
 }
 .item-select:hover, .checkeditem {
 	opacity: 1;
@@ -2212,6 +2215,10 @@ div[id$="wrapper"] br {
 }
 #item-delete-selected-desc:hover {
 	text-decoration: underline;
+}
+.fc-state-highlight {
+    background: #eec;
+    color: #2e2f2e;
 }
 
 

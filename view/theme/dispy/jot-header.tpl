@@ -9,6 +9,7 @@ function initEditor(cb) {
 		if(plaintext == 'none') {
 			$("#profile-jot-text-loading").hide();
 			$("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
+			$("#profile-jot-text").contact_autocomplete(baseurl+"/acl");
 			editor = true;
 			$("a#jot-perms-icon").fancybox({
 				'transitionIn' : 'elastic',
@@ -30,6 +31,7 @@ function initEditor(cb) {
 			theme_advanced_toolbar_location : "top",
 			theme_advanced_toolbar_align : "center",
 			theme_advanced_blockformats : "blockquote,code",
+			gecko_spellcheck : true,
 			paste_text_sticky : true,
 			entity_encoding : "raw",
 			add_unload_trigger : false,
@@ -295,7 +297,6 @@ function enableOnUser(){
 		});
 		
 	}
-
 
 	function jotClearLocation() {
 		$('#jot-coord').val('');
