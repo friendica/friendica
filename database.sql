@@ -34,10 +34,11 @@ CREATE TABLE IF NOT EXISTS `challenge` (
 
 CREATE TABLE IF NOT EXISTS `config` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `cat` char(255) NOT NULL,
-  `k` char(255) NOT NULL,
+  `cat` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
+  `k` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
   `v` text NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`), 
+  UNIQUE KEY `access`(`cat`,`k`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
@@ -542,9 +543,10 @@ INDEX ( `batch` )
 CREATE TABLE IF NOT EXISTS `pconfig` (
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `uid` INT NOT NULL DEFAULT '0',
-`cat` CHAR( 255 ) NOT NULL ,
-`k` CHAR( 255 ) NOT NULL ,
-`v` MEDIUMTEXT NOT NULL
+`cat` CHAR( 255 ) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL ,
+`k` CHAR( 255 ) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL ,
+`v` MEDIUMTEXT NOT NULL, 
+UNIQUE KEY `access`(`cat`, `k`)
 ) ENGINE = MyISAM DEFAULT CHARSET=utf8;
 
 
