@@ -447,6 +447,24 @@ a:hover {
   /*color: #005c94; */
   text-decoration: underline;
 }
+.intro-end {
+	border-bottom: 1px solid black;
+   clear: both;
+   margin-bottom: 25px;
+   padding-bottom: 25px;
+   width: 75%;
+	}
+.intro-form-end {
+	clear: both;
+	}
+.intro-fullname {
+	padding-bottom: 5px;
+   padding-top: 5px;
+	}
+.intro-wrapper-end {
+	clear: both;
+   padding-bottom: 5px;
+	}
 code {
   font-family: Courier, monospace;
   white-space: pre;
@@ -2097,10 +2115,10 @@ height: 350px;
 /* photo */
 .photo {
 box-shadow: 2px 2px 5px 0px #000000;
-margin: 2px 5px 2px 5px;
-max-height: 85%;
-max-width: 85%;
+margin: 0px;
 border-radius: 10px;
+height: 145px !important;
+width: 145px !important;
 }
 .lframe {
   float: left;
