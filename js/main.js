@@ -119,9 +119,7 @@
 			var home = $(data).find('home').text();
 			if(home == 0) { home = '';  $('#home-update').removeClass('show') } else { $('#home-update').addClass('show') }
 			$('#home-update').html(home);
-
- 
-
+			
 			var intro = $(data).find('intro').text();
 			if(intro == 0) { intro = '';  $('#intro-update').removeClass('show') } else { $('#intro-update').addClass('show') }
 			$('#intro-update').html(intro);
@@ -129,6 +127,14 @@
 			var mail = $(data).find('mail').text();
 			if(mail == 0) { mail = '';  $('#mail-update').removeClass('show') } else { $('#mail-update').addClass('show') }
 			$('#mail-update').html(mail);
+			
+			var intro = $(data).find('intro').text();
+			if(intro == 0) { intro = '';  $('#intro-update-li').removeClass('show') } else { $('#intro-update-li').addClass('show') }
+			$('#intro-update-li').html(intro);
+
+			var mail = $(data).find('mail').text();
+			if(mail == 0) { mail = '';  $('#mail-update-li').removeClass('show') } else { $('#mail-update-li').addClass('show') }
+			$('#mail-update-li').html(mail);
 
 			var eNotif = $(data).find('notif')
 			notif = eNotif.attr('count');

@@ -2023,6 +2023,8 @@ ul.tabs li .active {
 /* photo */
 .photo {
 border-radius: 10px;	
+height: 145px !important;
+width: 145px !important;
 	}
 .lframe {
   float: left;

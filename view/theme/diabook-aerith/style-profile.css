@@ -2082,10 +2082,10 @@ ul.tabs li .active {
 /* photo */
 .photo {
 box-shadow: 2px 2px 5px 0px #000000;
-margin: 2px 5px 2px 5px;
-max-height: 85%;
-max-width: 85%;
+margin: 0px;
 border-radius: 10px;
+height: 145px !important;
+width: 145px !important;
 }
 .lframe {
   float: left;

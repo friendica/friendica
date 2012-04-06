@@ -3,7 +3,7 @@
 /*
  * Name: Diabook-red
  * Description: Diabook-red: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
- * Version: (Version: 1.012)
+ * Version: (Version: 1.013)
  * Author: 
  */
 

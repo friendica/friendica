@@ -3,7 +3,7 @@
 /*
  * Name: Diabook
  * Description: Diabook: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
- * Version: (Version: 1.012)
+ * Version: (Version: 1.013)
  * Author: 
  */
 
@@ -339,8 +339,9 @@ if ($a->argv[0] === "settings"){
 if (!is_null($cssFile)) $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
 
 //load jquery.cookie.js
-$cookieJS = $a->get_baseurl($ssl_state)."/view/theme/diabook-blue/js/jquery.cookie.js";
+$cookieJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/js/jquery.cookie.js";
 $a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" ></script>', $cookieJS);
+
 
 //js scripts
 
@@ -350,15 +351,9 @@ $a->page['htmlhead'] .= '
  $(function() {
 	$("a.lightbox").fancybox(); // Select all links with lightbox class
  });
- 
- $(document).ready(function (){
-	$("iframe").each(function(){
-		var url = $(this).attr("src");
-		$(this).attr("src",url+"?wmode=transparent"); });
-    });
-  
+   
  </script>';
-
+ 
 
 if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname'] or $a->argv[0] === "network" && local_user()){
 $a->page['htmlhead'] .= '
