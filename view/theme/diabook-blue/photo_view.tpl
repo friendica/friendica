@@ -26,3 +26,12 @@
 
 {{ if $edit }}$edit{{ endif }}
 
+<div style="margin-top:20px">
+</div>
+<div id="wall-photo-container">
+$comments
+</div>
+
+$paginate
+
+

@@ -3,11 +3,14 @@
 /*
  * Name: Diabook
  * Description: Diabook: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
- * Version: (Version: 1.013)
+ * Version: (Version: 1.014)
  * Author: 
  */
 
 
+//print diabook-version for debugging
+$diabook_version = "Diabook (Version: 1.014)";
+$a->page['htmlhead'] .= sprintf('<script "%s" ></script>', $diabook_version);
 
 //change css on network and profilepages
 $cssFile = null;
@@ -285,6 +288,8 @@ if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname']){
 	}
 }
 
+
+
 //tabs at aside on settings page
 if ($a->argv[0] === "settings"){
 	
@@ -340,10 +345,27 @@ if (!is_null($cssFile)) $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" 
 
 //load jquery.cookie.js
 $cookieJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/js/jquery.cookie.js";
-$a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" ></script>', $cookieJS);
+$a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s"></script>', $cookieJS);
+
+//load jquery.ae.image.resize.js
+$imageresizeJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/js/jquery.ae.image.resize.js";
+$a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" ></script>', $imageresizeJS);
 
 
 //js scripts
+//comment-edit-wrapper on photo_view
+if ($a->argv[0].$a->argv[2] === "photos"."image"){
+
+$a->page['htmlhead'] .= '
+<script>
+	$(function(){
+	
+		$(".comment-edit-form").css("display","table");
+			
+			});
+    </script>';
+	
+}
 
 $a->page['htmlhead'] .= '
 
@@ -354,10 +376,33 @@ $a->page['htmlhead'] .= '
    
  </script>';
  
+$a->page['htmlhead'] .= '
+ <script>
+ 
+$(document).ready(function() {
+    $(".embed_yt iframe").each(function(){
+        var ifr_source = $(this).attr("src");
+        var wmode = "wmode=transparent";
+        if(ifr_source.indexOf("?") != -1) {
+            var getQString = ifr_source.split("?");
+            var oldString = getQString[1];
+            var newString = getQString[0];
+            $(this).attr("src",newString+"?"+wmode+"&"+oldString);
+        }
+        else $(this).attr("src",ifr_source+"?"+wmode);
+    });
+});
+  
+ </script>';
+ 
 
 if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname'] or $a->argv[0] === "network" && local_user()){
 $a->page['htmlhead'] .= '
 <script>
+
+ $(function() {
+	$(".oembed.photo img").aeImageResize({height: 400, width: 400});
+  });
 
 $("right_aside").ready(function(){
 	

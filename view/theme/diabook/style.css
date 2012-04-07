@@ -1250,7 +1250,6 @@ body .pageheader{
     padding: 0;
  }
 .tab.button {
-    margin-right: 5px; 
     margin-left: 5px;	
     /*background: none repeat scroll 0 0 #F8F8F8;*/
     border: 1px solid #CCCCCC;
@@ -1287,6 +1286,9 @@ body .pageheader{
 .wall-item-container .wall-item-item, .wall-item-container .wall-item-bottom {
   display: table-row;
 }
+.wall-item-photo-container .wall-item-item, .wall-item-container .wall-item-bottom {
+  display: table-row;
+}
 .wall-item-bottom {
   font-size: 13px;
 }
@@ -1312,11 +1314,27 @@ body .pageheader{
   text-align: left;
   width: 80px;
 }
+.wall-item-photo-container .wall-item-info {
+  display: table-cell;
+  vertical-align: top;
+  text-align: left;
+  width: 80px;
+}
 .wall-item-container .wall-item-location {
   padding-right: 40px;
   display: table-cell;
 }
+.wall-item-photo-container .wall-item-location {
+  padding-right: 40px;
+  display: table-cell;
+}
 .wall-item-container .wall-item-ago {
+  word-wrap: break-word;
+  width: 50px;
+  margin-left: 10px;
+  color: #999;
+}
+.wall-item-photo-container .wall-item-ago {
   word-wrap: break-word;
   width: 50px;
   margin-left: 10px;
@@ -1335,16 +1353,38 @@ body .pageheader{
   max-width: 720px;
   word-wrap: break-word;
   line-height: 1.2;
+  margin-bottom: 14px;
 }
-
+.wall-item-photo-container .wall-item-content {
+  font-size: 12.5px;
+  max-width: 720px;
+  word-wrap: break-word;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
 .wall-item-container .wall-item-content img {
+  max-width: 700px;
+}
+.wall-item-photo-container .wall-item-content img {
   max-width: 700px;
 }
 .wall-item-container .wall-item-links, .wall-item-container .wall-item-actions {
   display: table-cell;
   vertical-align: middle;
 }
+.wall-item-photo-container .wall-item-links, .wall-item-photo-container .wall-item-actions {
+  display: table-cell;
+  vertical-align: middle;
+}
 .wall-item-container .wall-item-links .icon, .wall-item-container .wall-item-actions .icon {
+  opacity: 0.5;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+.wall-item-photo-container .wall-item-links .icon, .wall-item-photo-container .wall-item-actions .icon {
   opacity: 0.5;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
@@ -1360,14 +1400,22 @@ body .pageheader{
   -ms-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
 }
-.wall-item-container .wall-item-name {
+.wall-item-photo-container .wall-item-links .icon:hover, .wall-item-photo-container .wall-item-actions .icon:hover {
+  opacity: 1;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+.wall-item-container .wall-item-name, .wall-item-photo-container .wall-item-name {
   font-weight: bold;
 }
-.wall-item-container .wall-item-actions-author {
+.wall-item-container .wall-item-actions-author, .wall-item-photo-container .wall-item-actions-author {
   width: 100%;
   margin-bottom: 0.3em;
 }
-.wall-item-container .wall-item-actions-social {
+.wall-item-container .wall-item-actions-social, .wall-item-photo-container .wall-item-actions-social {
   float: left;
   margin-bottom: 1px;
   display: table-cell;
@@ -1375,10 +1423,19 @@ body .pageheader{
 .wall-item-container .wall-item-actions-social a {
   margin-right: 1em;
 }
+.wall-item-photo-container .wall-item-actions-social a {
+  margin-right: 1em;
+}
 .wall-item-actions-social a {
   float: left;
 }
+
 .wall-item-container .wall-item-actions-tools {
+  float: right;
+  width: 80px;
+  display: table-cell;
+}
+.wall-item-photo-container .wall-item-actions-tools {
   float: right;
   width: 80px;
   display: table-cell;
@@ -1386,7 +1443,13 @@ body .pageheader{
 .wall-item-container .wall-item-actions-tools a {
   float: right;
 }
+.wall-item-photo-container .wall-item-actions-tools a {
+  float: right;
+}
 .wall-item-container .wall-item-actions-tools input {
+  float: right;
+}
+.wall-item-photo-container .wall-item-actions-tools input {
   float: right;
 }
 .wall-item-container.comment {
@@ -1395,6 +1458,48 @@ body .pageheader{
   margin-left: 80px;
   width: 700px;
   border-bottom: 1px solid hsl(198, 21%, 79%);
+}
+.wall-item-photo-container.comment {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 40px;
+  width: 650px;
+  border-bottom: 1px solid #D2D2D2;
+}
+.wall-item-photo-container.comment {
+  top: 15px !important;
+  left: 15px !important;
+}
+.wall-item-photo-container {
+  display: table;
+  width: 780px;
+}
+
+.my-comment-photo {
+  width: 48px;
+  margin-left: 40px;
+  margin-right: 32px;
+	}
+.comment-edit-preview {
+  width: 500px;
+  margin-top: 10px;
+}
+.comment-edit-text-empty {
+    width: 500px;
+    border: 1px solid #D2D2D2;
+    height: 3.2em;
+    color: #2d2d2d;
+}
+.comment-edit-text-full {
+  font-size: 12.5px;
+  height: 3.3em;
+  
+  border: 1px solid #D2D2D2;
+  width: 500px;
+}
+.comment-edit-photo {
+    margin: 10px 0 0;
+    display: table-cell;
 }
 .wall-item-container.comment .contact-photo {
   width: 32px;
@@ -1431,11 +1536,7 @@ body .pageheader{
   color: #2d2d2d;
   border: 1px solid #2d2d2d;
 }
-.comment-edit-preview {
-  width: 710px;
-  border: 1px solid #2d2d2d;
-  margin-top: 10px;
-}
+
 .comment-edit-preview .contact-photo {
   width: 32px;
   height: 32px;
@@ -1446,6 +1547,11 @@ body .pageheader{
 .comment-edit-preview {
   top: 15px !important;
   left: 15px !important;
+}
+.comment-edit-preview {
+  width: 500px;
+  margin-top: 10px;
+  background-color:  #fff797;
 }
 .comment-edit-preview .wall-item-links {
   padding-left: 12px;
@@ -1670,7 +1776,7 @@ body .pageheader{
     height: 20px;
     margin: 0 0 5px;
     width: 60%;
-    border: 1px solid #ffffff;
+    border: 1px solid #d2d2d2;
 }
 #profile-jot-form #jot-title:-webkit-input-placeholder {
   font-weight: normal;
@@ -2137,6 +2243,11 @@ blockquote {
     border-left: 1px solid #D2D2D2;
     padding-left: 9px;
     margin: 0 0 0 .8ex;
+	 color: #777;
+}
+.oembed {
+	font-size: large;
+	font-weight: bold;
 }
 .aprofile dt{
 box-shadow: 1px 1px 5px 0;
@@ -2397,13 +2508,8 @@ a.mail-list-link {
     margin-right: 5px;
     margin-top: 30px;
 	}
-.comment-edit-text-empty {
-    margin: 10px 0 0;
-    width: 85%;
-}
-.comment-edit-photo {
-    margin: 10px 0 0;
-}
+
+
 .wall-item-like-buttons .icon.like {
 float: left;
 }

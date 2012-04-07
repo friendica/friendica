@@ -1176,7 +1176,6 @@ body .pageheader{
     padding: 0;
  }
 .tab.button {
-    margin-right: 5px; 
     margin-left: 5px;	
     /*background: none repeat scroll 0 0 #F8F8F8;*/
     border: 1px solid #CCCCCC;
@@ -1302,6 +1301,7 @@ transition: all 0.2s ease-in-out;
   max-width: 420px;
   word-wrap: break-word;
   line-height: 1.2;
+  margin-bottom: 14px;
 }
 
 .wall-item-container .wall-item-content img {
@@ -1399,9 +1399,9 @@ transition: all 0.2s ease-in-out;
   border: 1px solid #2d2d2d;
 }
 .comment-edit-preview {
-  width: 710px;
-  border: 1px solid #2d2d2d;
+  width: 500px;
   margin-top: 10px;
+  background-color:  #fff797;
 }
 .comment-edit-preview .contact-photo {
   width: 32px;
@@ -1637,7 +1637,7 @@ transition: all 0.2s ease-in-out;
     height: 20px;
     margin: 0 0 5px;
     width: 60%;
-    border: 1px solid #ffffff;
+    border: 1px solid #d2d2d2;
 }
 #profile-jot-form #jot-title:-webkit-input-placeholder {
   font-weight: normal;
@@ -2096,6 +2096,11 @@ blockquote {
     border-left: 1px solid #D2D2D2;
     padding-left: 9px;
     margin: 0 0 0 .8ex;
+    color: #777;
+}
+.oembed {
+	font-size: large;
+	font-weight: bold;
 }
 .aprofile dt{
 box-shadow: 1px 1px 5px 0;
