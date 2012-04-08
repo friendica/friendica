@@ -108,6 +108,7 @@
 
 .tools 		{ background-position: -50px  -40px;}
 .lock 		{ background-position: -70px  -40px;}
+.unlock 	{ background-position: -90px  -40px;}
 
 .video          { background-position: -110px -40px;}
 .youtube        { background-position: -130px -40px;}
@@ -139,8 +140,8 @@
 
 .icon {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background-image: url('icons.png');
 }
 
@@ -415,17 +416,21 @@ code {
 	background: #EEE;
 }
 .tool .label {
-  float: left;
+/*  float: left; */
 }
 .tool .action {
   float: right;
 }
 .tool a {
-  color: #000;
+/*  color: #000; */
 }
 .tool a:hover {
-  text-decoration: none;
+  text-decoration: underline;
 }
+.sidebar-group-element {
+/*  color: #000; */
+}
+
 /* popup notifications */
 div.jGrowl div.notice {
   background: #511919 url("../../../images/icons/48/notice.png") no-repeat 5px center;
@@ -603,6 +608,10 @@ nav #nav-apps-link.selected {
 	/* margin: 0px 0px 2px 0px;
 	padding: 5px 10px; */
 }
+
+.notify-seen {
+        background: none repeat scroll 0 0 #DDDDDD;
+        }
 
 ul.menu-popup {
   position: absolute;
@@ -970,6 +979,7 @@ section {
   margin-bottom: 1px;
 }
 .wall-item-container .wall-item-actions-social a {
+  float: left;
   margin-right: 1em;
 }
 .wall-item-container .wall-item-actions-tools {
@@ -1244,7 +1254,8 @@ section {
 #jot #jot-tools li.loading img {
   margin-top: 10px;
 }
-#jot #jot-title {
+/* #jot */
+#jot-title {
   border: 0px;
   margin: 0px;
   height: 20px;
@@ -1272,6 +1283,56 @@ section {
   line-height: 20px;
   padding-right: 20px;
 }
+
+#profile-jot-submit {
+  float: right;
+  margin-left: 15px;
+}
+#profile-upload-wrapper {
+  float: left;
+  margin-left: 15px;
+}
+#profile-attach-wrapper {
+  float: left;
+  margin-left: 15px;
+}
+#profile-link-wrapper {
+  float: left;
+  margin-left: 15px;
+}
+#profile-video-wrapper {
+  float: left;
+  margin-left: 15px;
+}
+#profile-audio-wrapper {
+  float: left;
+  margin-left: 15px;
+}
+#profile-location-wrapper {
+  float: left;
+  margin-left: 15px;
+}
+#profile-nolocation-wrapper {
+  float: left;
+  margin-left: 15px;
+}
+#jot-perms-icon {
+  float: right;
+  margin-left: 15px;
+}
+#jot-preview-link {
+  float: right;
+}
+#profile-jot-end {
+  clear: both;
+}
+#profile-jot-text_tbl {
+  width: 800px;
+}
+#profile-jot-wrapper {
+  margin-bottom: 20px;
+}
+
 /** buttons **/
 /*input[type="submit"] {
 	border: 0px;
@@ -1585,6 +1646,12 @@ blockquote {
     border-left: 1px solid #D2D2D2;
     padding-left: 9px;
     margin: 0 0 0 .8ex;
+    color: #777;
+}
+
+.oembed {
+    font-size: large;
+    font-weight: bold;
 }
 
 /* ================== */

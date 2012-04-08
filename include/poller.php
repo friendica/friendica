@@ -25,9 +25,19 @@ function poller_run($argv, $argc){
 	require_once('include/Contact.php');
 	require_once('include/email.php');
 	require_once('include/socgraph.php');
+	require_once('include/pidfile.php');
 
 	load_config('config');
 	load_config('system');
+
+	$lockpath = get_config('system','lockpath');
+	if ($lockpath != '') {
+		$pidfile = new pidfile($lockpath, 'poller.lck');
+		if($pidfile->is_already_running()) {
+			logger("poller: Already running");
+			exit;
+		}
+	}
 
 	$a->set_baseurl(get_config('system','url'));
 

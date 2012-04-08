@@ -83,5 +83,8 @@ $a->config['system']['no_regfullname'] = true;
 // If set to true the priority settings of ostatus contacts are used
 $a->config['system']['ostatus_use_priority'] = false;
 
-// If enabled all items are cached in the given directory
+// If enabled, all items are cached in the given directory
 $a->config['system']['itemcache'] = "";
+
+// If enabled, the lockpath is used for a lockfile to check if the poller is running
+$a->config['system']['lockpath'] = "";
