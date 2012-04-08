@@ -1266,7 +1266,7 @@ body .pageheader{
   font-size: 20px;
   margin-bottom: 20px;
   margin-top: 0px;
-  max-width: 575px;
+  max-width: 775px;
 	}
 .qcomment{
   max-width: 122px;	
@@ -2310,7 +2310,7 @@ blockquote {
 	 color: #777;
 }
 .oembed {
-	font-size: large;
+	
 	font-weight: bold;
 }
 .aprofile dt{
