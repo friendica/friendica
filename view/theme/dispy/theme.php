@@ -9,6 +9,10 @@
  * Screenshot: <a href="screenshot.jpg">Screenshot</a>
  */
 
+$a->theme_info = array(
+	'extends' => 'dispy',
+);
+
 $a->page['htmlhead'] .= <<< EOT
 <script>
 $(document).ready(function() {

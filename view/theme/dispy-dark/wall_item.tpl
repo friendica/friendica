@@ -4,9 +4,7 @@
 			<div class="wall-item-photo-wrapper" id="wall-item-photo-wrapper-$item.id" 
 				 onmouseover="if (typeof t$item.id != 'undefined') clearTimeout(t$item.id); openMenu('wall-item-photo-menu-button-$item.id')" 
 				 onmouseout="t$item.id=setTimeout('closeMenu(\'wall-item-photo-menu-button-$item.id\'); closeMenu(\'wall-item-photo-menu-$item.id\');',200)">
-				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-photo-link" id="wall-item-photo-link-$item.id">
-					<img src="$item.thumb" class="wall-item-photo$item.sparkle" id="wall-item-photo-$item.id" style="height: 80px; width: 80px;" alt="$item.name" />
-				</a>
+				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-photo-link" id="wall-item-photo-link-$item.id"><img src="$item.thumb" class="wall-item-photo$item.sparkle" id="wall-item-photo-$item.id" style="height: 80px; width: 80px;" alt="$item.name" /></a>
 				<span onclick="openClose('wall-item-photo-menu-$item.id');" class="fakelink wall-item-photo-menu-button" id="wall-item-photo-menu-button-$item.id">menu</span>
 				<div class="wall-item-photo-menu" id="wall-item-photo-menu-$item.id">
 					<ul>
@@ -57,15 +55,16 @@
 			</ul>
 			<div class="wall-item-delete-end"></div>
 		</div>
-		<div class="wall-item-content" id="wall-item-content-$item.id" >
+		<div class="wall-item-content" id="wall-item-content-$item.id">
 			<div class="wall-item-title" id="wall-item-title-$item.id">$item.title</div>
 			<div class="wall-item-title-end"></div>
-			<div class="wall-item-body" id="wall-item-body-$item.id" >$item.body
-					<div class="body-tag">
-						{{ for $item.tags as $tag }}
-							<span class='tag'>$tag</span>
-						{{ endfor }}
-					</div>
+			<div class="wall-item-body" id="wall-item-body-$item.id">
+				$item.body
+				<div class="body-tag">
+					{{ for $item.tags as $tag }}
+						<span class='tag'>$tag</span>
+					{{ endfor }}
+				</div>
 			</div>
 		</div>
 		<div class="wall-item-author">

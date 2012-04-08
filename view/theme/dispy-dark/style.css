@@ -63,8 +63,8 @@ option {
 	color: #eec;
 	background: #2e2f2e;
 }
-li {
-	padding: 0 0 0 2px;
+ul, ol {
+	padding: 0;
 }
 /* remember to define focus styles! */
 :focus {
@@ -2603,7 +2603,8 @@ div[id$="wrapper"] br {
 }
 .icon.drop,
 .icon.drophide, .icon.delete {
-    float: left;
+    float: right;
+	margin: 5px;
 }
 .icon.s22.delete {
 	display: block;
