@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: http://bugs.friendica.com/\n"
-"POT-Creation-Date: 2012-04-05 10:00-0700\n"
-"PO-Revision-Date: 2012-04-06 10:40+0000\n"
-"Last-Translator: bavatar <tobias.diekershoff@gmx.net>\n"
+"POT-Creation-Date: 2012-04-06 10:00-0700\n"
+"PO-Revision-Date: 2012-04-08 23:57+0000\n"
+"Last-Translator: zottel <transifex@zottel.net>\n"
 "Language-Team: German (http://www.transifex.net/projects/p/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -216,7 +216,7 @@ msgstr "l, F j"
 msgid "Edit event"
 msgstr "Veranstaltung bearbeiten"
 
-#: ../../mod/events.php:272 ../../include/text.php:1050
+#: ../../mod/events.php:272 ../../include/text.php:1053
 msgid "link to source"
 msgstr "Link zum Originalbeitrag"
 
@@ -410,7 +410,7 @@ msgstr "wurde getaggt in einem"
 #: ../../view/theme/diabook-red/theme.php:82
 #: ../../view/theme/diabook-blue/theme.php:82
 #: ../../view/theme/diabook/theme.php:86
-#: ../../view/theme/diabook-aerith/theme.php:82 ../../include/text.php:1294
+#: ../../view/theme/diabook-aerith/theme.php:82 ../../include/text.php:1297
 #: ../../include/diaspora.php:1654 ../../include/conversation.php:53
 #: ../../include/conversation.php:126
 msgid "photo"
@@ -2234,7 +2234,7 @@ msgstr "Markierte"
 msgid "Shared Links"
 msgstr "Geteilte Links"
 
-#: ../../mod/network.php:270
+#: ../../mod/network.php:274
 #, php-format
 msgid "Warning: This group contains %s member from an insecure network."
 msgid_plural ""
@@ -2242,31 +2242,31 @@ msgid_plural ""
 msgstr[0] "Warnung: Diese Gruppe beinhaltet %s Person aus einem unsicheren Netzwerk."
 msgstr[1] "Warnung: Diese Gruppe beinhaltet %s Personen aus unsicheren Netzwerken."
 
-#: ../../mod/network.php:273
+#: ../../mod/network.php:277
 msgid "Private messages to this group are at risk of public disclosure."
 msgstr "Private Nachrichten an diese Gruppe könnten an die Öffentlichkeit geraten."
 
-#: ../../mod/network.php:318
+#: ../../mod/network.php:322
 msgid "No such group"
 msgstr "Es gibt keine solche Gruppe"
 
-#: ../../mod/network.php:329
+#: ../../mod/network.php:333
 msgid "Group is empty"
 msgstr "Gruppe ist leer"
 
-#: ../../mod/network.php:333
+#: ../../mod/network.php:337
 msgid "Group: "
 msgstr "Gruppe: "
 
-#: ../../mod/network.php:343
+#: ../../mod/network.php:347
 msgid "Contact: "
 msgstr "Kontakt: "
 
-#: ../../mod/network.php:345
+#: ../../mod/network.php:349
 msgid "Private messages to this person are at risk of public disclosure."
 msgstr "Private Nachrichten an diese Person könnten an die Öffentlichkeit gelangen."
 
-#: ../../mod/network.php:350
+#: ../../mod/network.php:354
 msgid "Invalid contact."
 msgstr "Ungültiger Kontakt."
 
@@ -2275,7 +2275,7 @@ msgid "Personal Notes"
 msgstr "Persönliche Notizen"
 
 #: ../../mod/notes.php:63 ../../mod/filer.php:30
-#: ../../addon/facebook/facebook.php:673 ../../include/text.php:649
+#: ../../addon/facebook/facebook.php:673 ../../include/text.php:652
 msgid "Save"
 msgstr "Speichern"
 
@@ -2538,7 +2538,7 @@ msgstr "Alle Kontakte (mit gesichertem Profilzugriff)"
 msgid "No contacts."
 msgstr "Keine Kontakte."
 
-#: ../../mod/viewcontacts.php:76 ../../include/text.php:586
+#: ../../mod/viewcontacts.php:76 ../../include/text.php:589
 msgid "View Contacts"
 msgstr "Kontakte anzeigen"
 
@@ -4397,7 +4397,7 @@ msgstr "Neueste Favoriten"
 #: ../../view/theme/diabook-red/theme.php:74
 #: ../../view/theme/diabook-blue/theme.php:74
 #: ../../view/theme/diabook/theme.php:78
-#: ../../view/theme/diabook-aerith/theme.php:74 ../../include/text.php:1292
+#: ../../view/theme/diabook-aerith/theme.php:74 ../../include/text.php:1295
 #: ../../include/conversation.php:45 ../../include/conversation.php:118
 msgid "event"
 msgstr "Veranstaltung"
@@ -5223,21 +5223,21 @@ msgstr "Verbinde Dienste"
 #: ../../view/theme/diabook/theme.php:212
 #: ../../view/theme/diabook-aerith/theme.php:207
 msgid "PostIt to Friendica"
-msgstr "PostIt nach Friendica"
+msgstr "Bei Friendica posten"
 
 #: ../../view/theme/diabook-red/theme.php:207
 #: ../../view/theme/diabook-blue/theme.php:207
 #: ../../view/theme/diabook/theme.php:212
 #: ../../view/theme/diabook-aerith/theme.php:207
 msgid "Post to Friendica"
-msgstr "Bei Friendica veröffentlichen"
+msgstr "Wenn du diesen Link"
 
 #: ../../view/theme/diabook-red/theme.php:208
 #: ../../view/theme/diabook-blue/theme.php:208
 #: ../../view/theme/diabook/theme.php:213
 #: ../../view/theme/diabook-aerith/theme.php:208
 msgid " from anywhere by bookmarking this Link."
-msgstr " von überall her indem du diesen Link zu deinen Lesezeichen hinzufügst."
+msgstr "zu deinen Lesezeichen hinzufügst, kannst du von überallher Links bei Friendica veröffentlichen."
 
 #: ../../view/theme/diabook-red/theme.php:236
 #: ../../view/theme/diabook-blue/theme.php:236
@@ -5695,158 +5695,158 @@ msgstr "(kein Betreff)"
 msgid "noreply"
 msgstr "noreply"
 
-#: ../../include/text.php:240
+#: ../../include/text.php:243
 msgid "prev"
 msgstr "vorige"
 
-#: ../../include/text.php:242
+#: ../../include/text.php:245
 msgid "first"
 msgstr "erste"
 
-#: ../../include/text.php:271
+#: ../../include/text.php:274
 msgid "last"
 msgstr "letzte"
 
-#: ../../include/text.php:274
+#: ../../include/text.php:277
 msgid "next"
 msgstr "nächste"
 
-#: ../../include/text.php:565
+#: ../../include/text.php:568
 msgid "No contacts"
 msgstr "Keine Kontakte"
 
-#: ../../include/text.php:574
+#: ../../include/text.php:577
 #, php-format
 msgid "%d Contact"
 msgid_plural "%d Contacts"
 msgstr[0] "%d Kontakt"
 msgstr[1] "%d Kontakte"
 
-#: ../../include/text.php:647 ../../include/nav.php:91
+#: ../../include/text.php:650 ../../include/nav.php:91
 msgid "Search"
 msgstr "Suche"
 
-#: ../../include/text.php:828
+#: ../../include/text.php:831
 msgid "Monday"
 msgstr "Montag"
 
-#: ../../include/text.php:828
+#: ../../include/text.php:831
 msgid "Tuesday"
 msgstr "Dienstag"
 
-#: ../../include/text.php:828
+#: ../../include/text.php:831
 msgid "Wednesday"
 msgstr "Mittwoch"
 
-#: ../../include/text.php:828
+#: ../../include/text.php:831
 msgid "Thursday"
 msgstr "Donnerstag"
 
-#: ../../include/text.php:828
+#: ../../include/text.php:831
 msgid "Friday"
 msgstr "Freitag"
 
-#: ../../include/text.php:828
+#: ../../include/text.php:831
 msgid "Saturday"
 msgstr "Samstag"
 
-#: ../../include/text.php:828
+#: ../../include/text.php:831
 msgid "Sunday"
 msgstr "Sonntag"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "January"
 msgstr "Januar"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "February"
 msgstr "Februar"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "March"
 msgstr "März"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "April"
 msgstr "April"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "May"
 msgstr "Mai"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "June"
 msgstr "Juni"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "July"
 msgstr "Juli"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "August"
 msgstr "August"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "September"
 msgstr "September"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "October"
 msgstr "Oktober"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "November"
 msgstr "November"
 
-#: ../../include/text.php:832
+#: ../../include/text.php:835
 msgid "December"
 msgstr "Dezember"
 
-#: ../../include/text.php:916
+#: ../../include/text.php:919
 msgid "bytes"
 msgstr "Byte"
 
-#: ../../include/text.php:933
+#: ../../include/text.php:936
 msgid "Categories:"
 msgstr "Kategorien:"
 
-#: ../../include/text.php:945
+#: ../../include/text.php:948
 msgid "remove"
 msgstr "löschen"
 
-#: ../../include/text.php:945
+#: ../../include/text.php:948
 msgid "[remove]"
 msgstr "[löschen]"
 
-#: ../../include/text.php:948
+#: ../../include/text.php:951
 msgid "Filed under:"
 msgstr "Abgelegt unter:"
 
-#: ../../include/text.php:964 ../../include/text.php:976
+#: ../../include/text.php:967 ../../include/text.php:979
 msgid "Click to open/close"
 msgstr "Zum öffnen/schließen klicken"
 
-#: ../../include/text.php:1068
+#: ../../include/text.php:1071
 msgid "Select an alternate language"
 msgstr "Alternative Sprache auswählen"
 
-#: ../../include/text.php:1080
+#: ../../include/text.php:1083
 msgid "default"
 msgstr "standard"
 
-#: ../../include/text.php:1296
+#: ../../include/text.php:1299
 msgid "activity"
 msgstr "Aktivität"
 
-#: ../../include/text.php:1298
+#: ../../include/text.php:1301
 msgid "comment"
 msgstr "Kommentar"
 
-#: ../../include/text.php:1299
+#: ../../include/text.php:1302
 msgid "post"
 msgstr "Beitrag"
 
-#: ../../include/text.php:1454
+#: ../../include/text.php:1457
 msgid "Item filed"
 msgstr "Beitrag abgelegt"
 
@@ -6220,7 +6220,7 @@ msgstr "%s hat dir eine neue private Nachricht auf %s geschrieben."
 #: ../../include/enotify.php:42
 #, php-format
 msgid "%s sent you %s."
-msgstr "%s hat Dir geschickt %s"
+msgstr "%s hat Dir %s geschickt"
 
 #: ../../include/enotify.php:42
 msgid "a private message"
@@ -6316,7 +6316,7 @@ msgstr "%s markierte %s"
 
 #: ../../include/enotify.php:121
 msgid "your post"
-msgstr "Dein Beitrag"
+msgstr "Deinen Beitrag"
 
 #: ../../include/enotify.php:130
 msgid "[Friendica:Notify] Introduction received"
