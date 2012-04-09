@@ -83,6 +83,27 @@
 #adminpage .selectall { text-align: right; }
 /* icons */
 
+.icon.bold{
+  background-image: url("../../../view/theme/diabook/icons/bold.png");
+  float: right;
+  margin-top: 2px;}
+.icon.underline{
+  background-image: url("../../../view/theme/diabook/icons/underline.png");
+  float: right;
+  margin-top: 2px;}
+.icon.italic{
+  background-image: url("../../../view/theme/diabook/icons/italic.png");
+  float: right;
+  margin-top: 2px;}
+.icon.bb-image{
+  background-image: url("../../../view/theme/diabook/icons/bb-image.png");
+  float: right;
+  margin-top: 2px;}
+.icon.bb-video{
+  background-image: url("../../../view/theme/diabook/icons/bb-video.png");
+  float: right;
+  margin-top: 2px;}
+  
 .icon.contacts {
   background-image: url("../../../view/theme/diabook/icons/contacts.png");}
 .icon.notifications {
@@ -1269,6 +1290,7 @@ body .pageheader{
   padding: 5px;
   margin-bottom: 0px;
   width: 775px;
+  padding-top: 10px;
 }
 
 .wall-item-decor {
@@ -1516,7 +1538,7 @@ body .pageheader{
   padding-left: 12px;
 }
 .wall-item-comment-wrapper {
-  margin: 1px 5px 1px 80px;
+  margin: 1px 5px 17px 80px;
 }
 .wall-item-comment-wrapper .comment-edit-photo {
   display: none;

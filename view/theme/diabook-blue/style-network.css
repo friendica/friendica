@@ -1260,6 +1260,7 @@ transition: all 0.2s ease-in-out;
   padding: 5px;
   margin-bottom: 0px;
   width: 575px;
+  padding-top: 10px;
 }
 .tread-wrapper a{
   color: #1872A2;
@@ -1409,7 +1410,7 @@ transition: all 0.2s ease-in-out;
 }
 
 .wall-item-comment-wrapper {
-  margin: 1px 0px 0px 80px;
+  margin: 1px 5px 17px 80px;
   background-color: #fff;
   width: 500px;
 }

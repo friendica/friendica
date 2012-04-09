@@ -1258,6 +1258,7 @@ transition: all 0.2s ease-in-out;
   padding: 5px;
   margin-bottom: 0px;
   width: 575px;
+  padding-top: 10px;
 }
 .tread-wrapper a{
   color: #1872A2;
@@ -1406,7 +1407,7 @@ transition: all 0.2s ease-in-out;
   padding-left: 12px;
 }
 .wall-item-comment-wrapper {
-  margin: 1px 5px 1px 80px;
+  margin: 1px 5px 17px 80px;
 }
 .wall-item-comment-wrapper .comment-edit-photo {
   display: none;

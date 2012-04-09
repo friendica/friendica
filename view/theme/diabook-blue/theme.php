@@ -3,13 +3,13 @@
 /*
  * Name: Diabook-blue
  * Description: Diabook-blue: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
- * Version: (Version: 1.015)
+ * Version: (Version: 1.016)
  * Author: 
  */
 
 
 //print diabook-version for debugging
-$diabook_version = "Diabook-blue (Version: 1.015)";
+$diabook_version = "Diabook-blue (Version: 1.016)";
 $a->page['htmlhead'] .= sprintf('<script "%s" ></script>', $diabook_version);
 
 //change css on network and profilepages
@@ -509,3 +509,30 @@ function restore_boxes(){
 	alert("Right-hand column was restored. Please refresh your browser");
   }
 </script>';}
+
+$a->page['htmlhead'] .= ' 
+
+<script type="text/javascript">
+function insertFormatting(BBcode,id) {
+	
+		var tmpStr = $("#comment-edit-text-" + id).val();
+		if(tmpStr == "Kommentar") {
+			tmpStr = "";
+			$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
+			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
+			openMenu("comment-edit-submit-wrapper-" + id);
+											}
+
+	textarea = document.getElementById("comment-edit-text-" +id);
+	if (document.selection) {
+		textarea.focus();
+		selected = document.selection.createRange();
+		selected.text = "["+BBcode+"]" + selected.text + "[/"+BBcode+"]";
+	} else if (textarea.selectionStart || textarea.selectionStart == "0") {
+		var start = textarea.selectionStart;
+		var end = textarea.selectionEnd;
+		textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
+	}
+	return true;
+}
+</script> ';
