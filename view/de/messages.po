@@ -4161,7 +4161,7 @@ msgstr "Fehler: der angegebene API Schlüssel scheint nicht korrekt zu sein (Zug
 
 #: ../../addon/facebook/facebook.php:665
 msgid "The given API Key seems to work correctly."
-msgstr "Der angegebene API Schlüssel scheint nicht korrekt zu funktionieren."
+msgstr "Der angegebene API Schlüssel scheint korrekt zu funktionieren."
 
 #: ../../addon/facebook/facebook.php:667
 msgid ""
