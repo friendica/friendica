@@ -2603,8 +2603,8 @@ div[id$="wrapper"] br {
 }
 .icon.drop,
 .icon.drophide, .icon.delete {
-    float: right;
-	margin: 5px;
+    float: left;
+	/*margin: 5px;*/
 }
 .icon.s22.delete {
 	display: block;

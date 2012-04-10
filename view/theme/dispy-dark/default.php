@@ -7,13 +7,18 @@
 </head>
 <body>
 	<?php if(x($page,'nav')) echo $page['nav']; ?>
-	<aside>
+	<aside id="asideleft">
 		<?php if(x($page,'aside')) echo $page['aside']; ?>
 		<?php if(x($page,'aside_bottom')) echo $page['aside_bottom']; ?>
 	</aside>
-	<section><?php if(x($page,'content')) echo $page['content']; ?>
+	<section>
+		<?php if(x($page,'content')) echo $page['content']; ?>
 		<div id="page-footer"></div>
 	</section>
+	<aside id="asideright">
+		<?php if(x($page,'aside_right')) echo $page['aside_right']; ?>
+		<?php if(x($page,'aside_right_bottom')) echo $page['aside_right_bottom']; ?>
+	</aside>
 	<footer><?php if(x($page,'footer')) echo $page['footer']; ?></footer>
 </body>
 </html>
