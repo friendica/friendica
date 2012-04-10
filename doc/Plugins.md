@@ -164,9 +164,14 @@ Your module functions will often contain the function plugin_name_content(&$a), 
 **'init_1'** - called just after DB has been opened and before session start
     $b is not used or passed
 
-
 **'page_end'** - called after HTML content functions have completed
     $b is (string) HTML of content div
+
+**'avatar_lookup'** - called when looking up the avatar
+    $b is (array)
+        'size' => the size of the avatar that will be looked up
+        'email' => email to look up the avatar for
+        'url' => the (string) generated URL of the avatar
 
 
 A complete list of all hook callbacks with file locations (generated 14-Feb-2012): Please see the source for details of any hooks not documented above.

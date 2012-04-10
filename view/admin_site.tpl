@@ -17,7 +17,6 @@
 	
 	{{ inc field_checkbox.tpl with $field=$no_multi_reg }}{{ endinc }}
 	{{ inc field_checkbox.tpl with $field=$no_openid }}{{ endinc }}
-	{{ inc field_checkbox.tpl with $field=$no_gravatar }}{{ endinc }}
 	{{ inc field_checkbox.tpl with $field=$no_regfullname }}{{ endinc }}
 	
 	<div class="submit"><input type="submit" name="page_site" value="$submit" /></div>

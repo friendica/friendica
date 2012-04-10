@@ -172,16 +172,6 @@ $a->config['system']['no_regfullname'] = true;
 ```
 
 
-**Gravatars**
-
-During registration, we will try to automatically find a user photo for you on the web using the gravatar service. You may turn this off by setting 'no_gravatar' to true. Default is false.
-
-Config:
-```
-$a->config['system']['no_gravatar'] = true;
-```
-
-
 **OpenID**
 
 By default, OpenID may be used for both registration and logins. If you do not wish to make OpenID facilities available on your system (at all), set 'no_openid' to true. Default is false.

@@ -314,17 +314,13 @@ function register_post(&$a) {
 
 	}
 
-	$use_gravatar = ((get_config('system','no_gravatar')) ? false : true);
+	// if we have no OpenID photo try to look up an avatar
+	if(! strlen($photo))
+		$photo = avatar_img($email);
 
-	// if we have an openid photo use it. 
-	// otherwise unless it is disabled, use gravatar
-
-	if($use_gravatar || strlen($photo)) {
-
+	// unless there is no avatar-plugin loaded
+	if(strlen($photo)) {
 		require_once('include/Photo.php');
-
-		if(($use_gravatar) && (! strlen($photo))) 
-			$photo = gravatar_img($email);
 		$photo_failure = false;
 
 		$filename = basename($photo);
@@ -333,7 +329,7 @@ function register_post(&$a) {
 		if($img->is_valid()) {
 
 			$img->scaleImageSquare(175);
-					
+
 			$hash = photo_new_resource();
 
 			$r = $img->store($newuid, 0, $hash, $filename, t('Profile Photos'), 4 );
