@@ -1,7 +1,7 @@
 /*
  * dispy-dark
  *
- * modernised, sort of, by simon <http://simon.kisikew.org/>
+ * author, maintainer: simon <http://simon.kisikew.org/>
  *
  */
 
@@ -210,12 +210,17 @@ input[type=submit] {
 	margin: 5px 0;
 	list-style: none;
 }
+#articlemain {
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+}
 
 
 /**
  * 	login
  */
-aside .field {
+#asidemain .field {
 	overflow: hidden;
 	width: 200px;
 }
@@ -247,7 +252,7 @@ aside .field {
 #login-submit-button {
     margin-left: 0px !important;
 }
-aside #login_openid {
+#asidemain #login_openid {
 	position: relative !important;
 	float: none !important;
 	margin-left: 0px !important;
@@ -268,13 +273,10 @@ aside #login_openid {
  */
 nav {
 	height: 60px;
-	display: block;
 	background-color: #1d1f1d;
 	color: #eeeeec;
 	position: relative;
 	padding: 20px 20px 10px 95px;
-    margin-left: auto;
-    margin-right: auto;
 }
 nav a {
 	text-decoration: none;
@@ -707,12 +709,16 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 /**
 * aside
 **/
-aside {
-    position: absolute;
-    right: 15px;
-    width: 245px;
-	padding-top: 15px;
+#asidemain {
+	float: left;
     font-size: smaller;
+    margin: 20px 0 20px 35px;
+    width: 25%;
+	display: inline;
+}
+/* for now, disappear these */
+#asideright, #asideleft {
+	display: none;
 }
 .vcard .fn {
 	font-size: 1.7em;
@@ -742,10 +748,10 @@ aside {
 .vcard #profile-photo-wrapper img {
 	box-shadow: 3px 3px 10px 0 #000;
 }
-aside h4 {
+#asidemain h4 {
 	font-size: 1.2em;
 }
-aside #viewcontacts {
+#asidemain #viewcontacts {
 	text-align: right;
 }
 .aprofile dt {
@@ -1064,12 +1070,13 @@ aside #viewcontacts {
 /**
  * section
  */
-section {
-    margin: 20px 9% 0 4%;
+#sectionmain {
+    margin: 20px;
     font-size: 0.8em;
-    padding-right: 230px;
 	min-width: 475px;
-	width: 65%;
+	width: 67%;
+	float: left;
+	display: inline;
 }
 
 /** tabs **/
@@ -1333,19 +1340,19 @@ section {
     width: 100%;
 }
 #connect-services-header {
-
+	margin: 5px 0 0 0;
 }
 #connect-services {
 	margin: 5px 0 0 0;
 }
 #extra-help-header {
-
+	margin: 5px 0 0 0;
 }
 #extra-help {
 	margin: 5px 0 0 0;
 }
 #postit-header {
-
+	margin: 5px 0 0 0;
 }
 #postit {
 	margin: 5px 0 0 0;
@@ -2776,7 +2783,7 @@ div[id$="wrapper"] br {
 }
 footer {
     display: block;
-    margin: 50px 20%;
+	/*margin: 50px 20%;*/
     clear: both;
 }
 #profile-jot-text {
