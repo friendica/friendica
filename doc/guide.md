@@ -6,8 +6,8 @@ This is a bit like your Facebook wall.  It's where all your status messgages are
 
 Once you've finished writing your post, click on the padlock icon to select who can see it.  If you do not use the padlock icon, your post will be public.  This means it will appear to anybody who views your profile, and in the community tab if your site has it enabled, as well as in the network tab of any of your contacts.
 
-Play around with this a bit, then when you're ready to move on, we'll take a look at the <a href = "/help/network">Network Tab</a>
+Play around with this a bit, then when you're ready to move on, we'll take a look at the <a href="help/network">Network Tab</a>
 
-<iframe src="/login" width="950" height = "600"></iframe>
+<iframe src="login" width="950" height="600"></iframe>
 
 

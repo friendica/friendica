@@ -5,11 +5,11 @@ Making Friends
 
 Friendship in Friendica can take on a great many different meanings. But let's keep it simple, you want to be friends with somebody. How do you do it?
 
-The easiest thing to do is to join the <a href = "http://kakste.com/profile/newhere">New Here</a> group.  This group is especially for people new to the Friendica network.  Simply connect to the group, post to the wall, and make new friends.  You don't even have to like us - comment on a few of our posts, and other people will start to add you too.
+The easiest thing to do is to join the <a href="http://kakste.com/profile/newhere">New Here</a> group.  This group is especially for people new to the Friendica network.  Simply connect to the group, post to the wall, and make new friends.  You don't even have to like us - comment on a few of our posts, and other people will start to add you too.
 
 The next thing you can do is look at the Directory.  The directory is split up into two parts.  If you click the directory button, you will be presented with a list of all members (who chose to be listed) on your server.  You'll also see a link to the Global Directory.  If you click through to the global directory, you will be presented with a list of everybody who chose to be listed across all instances of Friendica.  You will also see a "Show Community Forums" link, which will direct you to Groups, Forums and Fanpages.  You connect to people, groups and forums in the same way, except groups and forums will automatically accept your introduction request, whereas a human will approve you manually.
 
-To connect with other Friendica user
+To connect with other Friendica users:
 
 Visit their profile. Just beneath their profile picture will be the word 'Connect' (we're assuming this is an English language profile).
 
