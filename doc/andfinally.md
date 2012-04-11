@@ -1,3 +1,5 @@
+[[!meta title="And Finally..."]]
+
 And that brings the Quick Start to an end.
 
 Here are some more things to help get you started:
@@ -18,7 +20,7 @@ Here are some more things to help get you started:
 
 **Documentation**
 
-- <a href = "/help/Connectors">Connecting to more networks</a>
-- <a href = "/help">Help Index</a>
+- <a href = "help/Connectors">Connecting to more networks</a>
+- <a href = "help">Help Index</a>
 
 

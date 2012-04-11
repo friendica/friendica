@@ -13,7 +13,7 @@ function newmember_content(&$a) {
 
 	$o .= '<ul>';
 
-	$o .= '<li>' . '<a target="newmember" href="/help/guide">' . t('On your <em>Quick Start</em> page - find a brief introduction to your profile and network tabs, connect to Facebook, make some new connections, and find some groups to join.') . '</a></li>' . EOL; 
+	$o .= '<li>' . '<a target="newmember" href="help/guide">' . t('On your <em>Quick Start</em> page - find a brief introduction to your profile and network tabs, connect to Facebook, make some new connections, and find some groups to join.') . '</a></li>' . EOL; 
 
 	$o .= '<li>' . '<a target="newmember" href="settings">' . t('On your <em>Settings</em> page -  change your initial password. Also make a note of your Identity Address. This looks just like an email address - and will be useful in making friends on the free social web.') . '</a></li>' . EOL; 
 
