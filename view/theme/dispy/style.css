@@ -1946,8 +1946,8 @@ div[id$="wrapper"] br {
     margin: 0 0 -18px;
 	position: absolute;
     text-decoration: none;
-	top: 18px;
-	right: 226px;
+	top: 113px;
+	right: 250px;
 }
 #profile-edit-links ul {
     margin: 20px 0;
@@ -2612,7 +2612,7 @@ div[id$="wrapper"] br {
 .icon.drop,
 .icon.drophide, .icon.delete {
     float: left;
-	/*margin: 5px;*/
+	margin: 0 2px;
 }
 .icon.s22.delete {
 	display: block;
