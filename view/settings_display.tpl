@@ -1,5 +1,3 @@
-$tabs
-
 <h1>$ptitle</h1>
 
 <form action="settings/display" id="settings-form" method="post" autocomplete="off" >

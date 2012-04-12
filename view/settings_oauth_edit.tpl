@@ -1,5 +1,3 @@
-$tabs
-
 <h1>$title</h1>
 
 <form method="POST">

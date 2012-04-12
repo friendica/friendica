@@ -1,5 +1,3 @@
-$tabs
-
 <h1>$title</h1>
 
 <div class="connector_statusmsg">$diasp_enabled</div>

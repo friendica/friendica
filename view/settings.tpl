@@ -1,5 +1,3 @@
-$tabs
-
 <h1>$ptitle</h1>
 
 $nickname_block

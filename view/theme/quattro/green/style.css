@@ -48,6 +48,9 @@
 .icon.s10.unlock {
   background-image: url("../../../images/icons/10/unlock.png");
 }
+.icon.s10.plugin {
+  background-image: url("../../../images/icons/10/plugin.png");
+}
 .icon.s10.type-unkn {
   background-image: url("../../../images/icons/10/zip.png");
 }
@@ -99,6 +102,9 @@
 }
 .icon.s16.unlock {
   background-image: url("../../../images/icons/16/unlock.png");
+}
+.icon.s16.plugin {
+  background-image: url("../../../images/icons/16/plugin.png");
 }
 .icon.s16.type-unkn {
   background-image: url("../../../images/icons/16/zip.png");
@@ -152,6 +158,9 @@
 .icon.s22.unlock {
   background-image: url("../../../images/icons/22/unlock.png");
 }
+.icon.s22.plugin {
+  background-image: url("../../../images/icons/22/plugin.png");
+}
 .icon.s22.type-unkn {
   background-image: url("../../../images/icons/22/zip.png");
 }
@@ -203,6 +212,9 @@
 }
 .icon.s48.unlock {
   background-image: url("../../../images/icons/48/unlock.png");
+}
+.icon.s48.plugin {
+  background-image: url("../../../images/icons/48/plugin.png");
 }
 .icon.s48.type-unkn {
   background-image: url("../../../images/icons/48/zip.png");
@@ -500,6 +512,17 @@ ul.menu-popup .empty {
   padding: 5px;
   text-align: center;
   color: #9eabb0;
+}
+ul.menu-popup .toolbar {
+  background-color: #9eabb0;
+  height: auto;
+  overflow: auto;
+}
+ul.menu-popup .toolbar a {
+  float: right;
+}
+ul.menu-popup .toolbar a:hover {
+  background-color: #ffffff;
 }
 /* autocomplete popup */
 .acpopup {

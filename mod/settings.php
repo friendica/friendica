@@ -15,10 +15,6 @@ function get_theme_config_file($theme){
 }
 
 function settings_init(&$a) {
-	if(local_user()) {
-		profile_load($a,$a->user['nickname']);
-	}
-
 	// These lines provide the javascript needed by the acl selector
 
 	$a->page['htmlhead'] .= "<script> var ispublic = '" . t('everybody') . "';" ;
@@ -46,6 +42,47 @@ function settings_init(&$a) {
 	</script>
 EOT;
 
+
+
+	$tabs = array(
+		array(
+			'label'	=> t('Account settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings',
+			'selected'	=> (($a->argc == 1)?'active':''),
+		),	
+		array(
+			'label'	=> t('Display settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings/display',
+			'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'display')?'active':''),
+		),	
+		
+		array(
+			'label'	=> t('Connector settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings/connectors',
+			'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'connectors')?'active':''),
+		),
+		array(
+			'label'	=> t('Plugin settings'),
+			'url' 	=> $a->get_baseurl(true).'/settings/addon',
+			'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'addon')?'active':''),
+		),
+		array(
+			'label' => t('Connected apps'),
+			'url' => $a->get_baseurl(true) . '/settings/oauth',
+			'selected' => (($a->argc > 1) && ($a->argv[1] === 'oauth')?'active':''),
+		),
+		array(
+			'label' => t('Export personal data'),
+			'url' => $a->get_baseurl(true) . '/uexport',
+			'selected' => ''
+		)
+	);
+	
+	$tabtpl = get_markup_template("generic_links_widget.tpl");
+	$a->page['aside'] = replace_macros($tabtpl, array(
+		'$title' => t('Settings'),
+		'$items' => $tabs,
+	));
 
 }
 
@@ -479,44 +516,7 @@ function settings_content(&$a) {
 		return;
 	}
 	
-	$tabs = array(
-		array(
-			'label'	=> t('Account settings'),
-			'url' 	=> $a->get_baseurl(true).'/settings',
-			'sel'	=> (($a->argc == 1)?'active':''),
-		),	
-		array(
-			'label'	=> t('Display settings'),
-			'url' 	=> $a->get_baseurl(true).'/settings/display',
-			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'display')?'active':''),
-		),	
-		
-		array(
-			'label'	=> t('Connector settings'),
-			'url' 	=> $a->get_baseurl(true).'/settings/connectors',
-			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'connectors')?'active':''),
-		),
-		array(
-			'label'	=> t('Plugin settings'),
-			'url' 	=> $a->get_baseurl(true).'/settings/addon',
-			'sel'	=> (($a->argc > 1) && ($a->argv[1] === 'addon')?'active':''),
-		),
-		array(
-			'label' => t('Connections'),
-			'url' => $a->get_baseurl(true) . '/settings/oauth',
-			'sel' => (($a->argc > 1) && ($a->argv[1] === 'oauth')?'active':''),
-		),
-		array(
-			'label' => t('Export personal data'),
-			'url' => $a->get_baseurl(true) . '/uexport',
-			'sel' => ''
-		)
-	);
-	
-	$tabtpl = get_markup_template("common_tabs.tpl");
-	$tabs = replace_macros($tabtpl, array(
-		'$tabs' => $tabs,
-	));
+
 		
 	if(($a->argc > 1) && ($a->argv[1] === 'oauth')) {
 		
@@ -524,7 +524,6 @@ function settings_content(&$a) {
 			$tpl = get_markup_template("settings_oauth_edit.tpl");
 			$o .= replace_macros($tpl, array(
 				'$form_security_token' => get_form_security_token("settings_oauth"),
-				'$tabs'		=> $tabs,
 				'$title'	=> t('Add application'),
 				'$submit'	=> t('Submit'),
 				'$cancel'	=> t('Cancel'),
@@ -551,7 +550,6 @@ function settings_content(&$a) {
 			$tpl = get_markup_template("settings_oauth_edit.tpl");
 			$o .= replace_macros($tpl, array(
 				'$form_security_token' => get_form_security_token("settings_oauth"),
-				'$tabs'		=> $tabs,
 				'$title'	=> t('Add application'),
 				'$submit'	=> t('Update'),
 				'$cancel'	=> t('Cancel'),
@@ -594,7 +592,6 @@ function settings_content(&$a) {
 			'$consumerkey' => t('Client key starts with'),
 			'$noname'	=> t('No name'),
 			'$remove'	=> t('Remove authorization'),
-			'$tabs'		=> $tabs,
 			'$apps'		=> $r,
 		));
 		return $o;
@@ -614,7 +611,6 @@ function settings_content(&$a) {
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("settings_addon"),
 			'$title'	=> t('Plugin Settings'),
-			'$tabs'		=> $tabs,
 			'$settings_addons' => $settings_addons
 		));
 		return $o;
@@ -658,7 +654,6 @@ function settings_content(&$a) {
 			'$form_security_token' => get_form_security_token("settings_connectors"),
 			
 			'$title'	=> t('Connector Settings'),
-			'$tabs'		=> $tabs,
 
 			'$diasp_enabled' => $diasp_enabled,
 			'$ostat_enabled' => $ostat_enabled,
@@ -735,7 +730,6 @@ function settings_content(&$a) {
 		
 		$tpl = get_markup_template("settings_display.tpl");
 		$o = replace_macros($tpl, array(
-			'$tabs' 	=> $tabs,
 			'$ptitle' 	=> t('Display Settings'),
 			'$form_security_token' => get_form_security_token("settings_display"),
 			'$submit' 	=> t('Submit'),
@@ -920,7 +914,6 @@ function settings_content(&$a) {
 	);
 
 	$o .= replace_macros($stpl,array(
-		'$tabs' 	=> $tabs,
 		'$ptitle' 	=> t('Account Settings'),
 
 		'$submit' 	=> t('Submit'),

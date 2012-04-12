@@ -137,13 +137,12 @@
 			$('#mail-update-li').html(mail);
 
 			var eNotif = $(data).find('notif')
-			notif = eNotif.attr('count');
-			if (notif>=0){
-				$("#nav-notifications-linkmenu").addClass("on");
+			
+			if (eNotif.children("note").length==0){
+				$("#nav-notifications-menu").html(notifications_empty);
+			} else {
 				nnm = $("#nav-notifications-menu");
-				
 				nnm.html(notifications_all + notifications_mark);
-				
 				//nnm.attr('popup','true');
 				eNotif.children("note").each(function(){
 					e = $(this);
@@ -151,10 +150,12 @@
 					html = notifications_tpl.format(e.attr('href'),e.attr('photo'), text, e.attr('date'), e.attr('seen'));
 					nnm.append(html);
 				});
-				
+			}
+			notif = eNotif.attr('count');
+			if (notif>0){
+				$("#nav-notifications-linkmenu").addClass("on");
 			} else {
-				//				$("#nav-notifications-linkmenu").removeClass("on");
-				//              $("#nav-notifications-menu").html(notifications_empty);
+				$("#nav-notifications-linkmenu").removeClass("on");
 			}
 			if(notif == 0) { notif = ''; $('#notify-update').removeClass('show') } else { $('#notify-update').addClass('show') }
 			$('#notify-update').html(notif);
