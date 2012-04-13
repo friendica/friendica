@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><?php if(x($page,'title')) echo $page['title'] ?></title>
+  <title><?php if(x($page,'title')) echo $page['title']; ?></title>
   <script>var baseurl="<?php echo $a->get_baseurl() ?>";</script>
-  <?php if(x($page,'htmlhead')) echo $page['htmlhead'] ?>
+  <?php if(x($page,'htmlhead')) echo $page['htmlhead']; ?>
 </head>
 <body>
 	<header>
-	<!-- header stuff will go here -->
+		<?php if(x($page, 'header')) echo $page['header']; ?>
 	</header>
 	<article id="articlemain">
 		<?php if(x($page,'nav')) echo $page['nav']; ?>

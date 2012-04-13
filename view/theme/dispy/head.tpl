@@ -91,8 +91,4 @@
 			$('#hide-comments-' + id).html('$showfewer');
 		}
 	}
-
-
 </script>
-
-

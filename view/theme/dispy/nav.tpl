@@ -4,7 +4,7 @@
 
 <!-- yes, they're going the other way. seems that's how the template renderer
 works -->
-
+<a name="top" id="top"></a>
 <div id="nav-floater">
     <div id="nav-buttons">
     {{ if $nav.help }}
@@ -114,6 +114,12 @@ works -->
 
 <div id="lang-sel-wrap">
 $langselector
+</div>
+
+<div id="scrollup">
+<a href="#top"><img
+	src="view/theme/dispy/icons/scroll_top.png"
+	alt="back to top" title="Back to top" /></a>
 </div>
 
 <div class="search-box">

@@ -114,11 +114,27 @@ function dispy_init(&$a) {
 			return false;
 		});
 
-		// (attempt) to change the text colour in a top post
+		// (attempt to) change the text colour in a top post
 		$('#profile-jot-text').focusin(function() {
 			$(this).css({color: '#eec'});
 		});
 
+		$('a[href=#top]').click(function() {
+			$('html, body').animate({scrollTop:0}, '500');
+			return false;
+		});
+
+	});
+	// shadowing effect for floating toolbars
+	$(document).scroll(function(e) {
+		var pageTop = $('html').scrollTop();
+		if (pageTop) {
+			$('#nav-floater').css({boxShadow: '3px 3px 10px rgba(0, 0, 0, 0.7)'});
+			$('.search-box').css({boxShadow: '3px 3px 10px rgba(0, 0, 0, 0.7)'});
+		} else {
+			$('#nav-floater').css({boxShadow: '0 0 0 0'});
+			$('.search-box').css({boxShadow: '0 0 0 0'});
+		}
 	});
 	</script>
 EOT;

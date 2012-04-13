@@ -311,6 +311,7 @@ ul#user-menu-popup {
 	-webkit-border-radius: 0 0 5px 5px;
 	-moz-border-radius: 0 0 5px 5px;
 	border-radius: 0 0 5px 5px;
+	box-shadow: 5px 10px 10px 0 #111;
 	z-index: 10000;
 }
 ul#user-menu-popup li {
@@ -543,7 +544,18 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	width: 10em;
 	color: #eec;
 }
+#scrollup {
+	position: fixed;
+	right: 5px;
+	bottom: 40px;
+	z-index: 100;
+}
+#scrollup a:hover {
+	text-decoration: none;
+	border: 0;
+}
 #user-menu {
+	box-shadow: 5px 0 10px 0 #111;
     display: block;	
     width: 75%;
     margin: 3px 0 0 0;
@@ -880,11 +892,23 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 	line-height: 20px;
 	padding: 2px 20px 5px 0;
 }
+#profile-jot-text_parent {
+	/*border-radius: 10px;*/
+	box-shadow: 5px 0 10px 0 #111;
+}
 #profile-jot-text_tbl {
 	margin-bottom: 10px;
+	/*border-radius: 10px;*/
+	background: #888;
 }
 #profile-jot-text_ifr {
 	width:99.900002% !important;
+}
+#profile-jot-text_toolbargroup {
+	background: #888;
+}
+.mceCenter table tr {
+	background: #888;
 }
 [id$="jot-text_ifr"] {
 	width: 99.900002% !important;
@@ -894,6 +918,15 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 [id$="jot-text_ifr"] .mceContentBody {
 	color: #2e2f2e;
 	background: #eec;
+}
+.mceFirst tr {
+	background: #888;
+}
+.mceFirst td {
+	/*border-radius: 10px 10px 0px 0px;*/
+}
+.mceLast td {
+	/*border-radius: 0 0 10px 10px;*/
 }
 #profile-attach-wrapper,
 #profile-audio-wrapper,
@@ -1121,6 +1154,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 .wall-item-outside-wrapper {
 	border: 1px solid #aaa;
 	border-radius: 5px;
+	box-shadow: 5px 0 10px 0 #111;
 }
 .wall-item-outside-wrapper.comment {
 	margin-top: 5px;
@@ -1946,7 +1980,7 @@ div[id$="wrapper"] br {
 	position: absolute;
     text-decoration: none;
 	top: 113px;
-	right: 250px;
+	right: 260px;
 }
 #profile-edit-links ul {
     margin: 20px 0;
@@ -2812,6 +2846,7 @@ footer {
     background: #fff url("../../../images/search_18.png") no-repeat right center;
     padding-right: 20px;
 	margin: 6px;
+	color: #111;
 }
 #acl-showall {
     float: left;
