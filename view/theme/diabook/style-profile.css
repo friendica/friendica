@@ -1298,10 +1298,10 @@ transition: all 0.2s ease-in-out;
 }
 
 .wall-item-container .wall-item-content {
-  font-size: 12.5px;
+
   max-width: 420px;
   word-wrap: break-word;
-  line-height: 1.2;
+
   margin-bottom: 14px;
 }
 

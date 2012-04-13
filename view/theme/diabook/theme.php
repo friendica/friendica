@@ -3,13 +3,13 @@
 /*
  * Name: Diabook
  * Description: Diabook: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
- * Version: (Version: 1.017)
+ * Version: (Version: 1.018)
  * Author: 
  */
 
 
 //print diabook-version for debugging
-$diabook_version = "Diabook (Version: 1.017)";
+$diabook_version = "Diabook (Version: 1.018)";
 $a->page['htmlhead'] .= sprintf('<script "%s" ></script>', $diabook_version);
 
 //change css on network and profilepages
