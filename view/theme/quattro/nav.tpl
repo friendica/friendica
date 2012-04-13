@@ -43,6 +43,7 @@
 			<li  id="nav-notifications-linkmenu" class="nav-menu-icon"><a href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1"><span class="icon s22 notify">$nav.notifications.1</span></a>
 				<span id="notify-update" class="nav-notify"></span>
 				<ul id="nav-notifications-menu" class="menu-popup">
+					<!-- TODO: better icons! -->
 					<li id="nav-notifications-mark-all" class="toolbar"><a href="#" onclick="notifyMarkAll(); return false;" title="$nav.notifications.mark.1"><span class="icon s10 edit"></span></a></a><a href="$nav.notifications.all.0" title="$nav.notifications.all.1"><span class="icon s10 plugin"></span></a></li>
 					<li class="empty">$emptynotifications</li>
 				</ul>
@@ -91,3 +92,4 @@
 	<li><a href="{0}"><img src="{1}">{2} <span class="notif-when">{3}</span></a></li>
 </ul>
 
+<div style="position: fixed; top: 3px; left: 5px; z-index:9999">$langselector</div>

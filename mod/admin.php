@@ -40,6 +40,20 @@ function admin_post(&$a){
 				goaway($a->get_baseurl(true) . '/admin/plugins/' . $a->argv[2] );
 				return; // NOTREACHED
 				break;
+			case 'themes':
+				$theme = $a->argv[2];
+				if (is_file("view/theme/$theme/config.php")){
+					require_once("view/theme/$theme/config.php");
+					if (function_exists("theme_admin_post")){
+						theme_admin_post($a);
+					}
+				}
+				info(t('Theme settings updated.'));
+				if(is_ajax()) return;
+				
+				goaway($a->get_baseurl(true) . '/admin/themes/' . $theme );
+				return;
+				break;
 			case 'logs':
 				admin_page_logs_post($a);
 				break;
@@ -129,7 +143,13 @@ function admin_content(&$a) {
 	} else {
 		$o = admin_page_summary($a);
 	}
-	return $o;
+	
+	if(is_ajax()) {
+		echo $o; 
+		killme();
+	} else {
+		return $o;
+	}
 } 
 
 
@@ -362,7 +382,7 @@ function admin_page_site(&$a) {
 		'$sitename' 		=> array('sitename', t("Site name"), htmlentities($a->config['sitename'], ENT_QUOTES), ""),
 		'$banner'			=> array('banner', t("Banner/Logo"), $banner, ""),
 		'$language' 		=> array('language', t("System language"), get_config('system','language'), "", $lang_choices),
-		'$theme' 			=> array('theme', t("System theme"), get_config('system','theme'), t("Default system theme - may be over-ridden by user profiles"), $theme_choices),
+		'$theme' 			=> array('theme', t("System theme"), get_config('system','theme'), t("Default system theme - may be over-ridden by user profiles - <a href='#' id='cnftheme'>change theme settings</a>"), $theme_choices),
 		'$ssl_policy'       => array('ssl_policy', t("SSL link policy"), (string) intval(get_config('system','ssl_policy')), t("Determines whether generated links should be forced to use SSL"), $ssl_choices),
 		'$maximagesize'		=> array('maximagesize', t("Maximum image size"), get_config('system','maximagesize'), t("Maximum size in bytes of uploaded images. Default is 0, which means no limits.")),
 
@@ -768,14 +788,22 @@ function admin_page_themes(&$a){
 		}
 		
 		$readme=Null;
-		if (is_file("view/$theme/README.md")){
-			$readme = file_get_contents("view/$theme/README.md");
+		if (is_file("view/theme/$theme/README.md")){
+			$readme = file_get_contents("view/theme/$theme/README.md");
 			$readme = Markdown($readme);
-		} else if (is_file("view/$theme/README")){
-			$readme = "<pre>". file_get_contents("view/$theme/README") ."</pre>";
+		} else if (is_file("view/theme/$theme/README")){
+			$readme = "<pre>". file_get_contents("view/theme/$theme/README") ."</pre>";
 		} 
 		
 		$admin_form="";
+		if (is_file("view/theme/$theme/config.php")){
+			require_once("view/theme/$theme/config.php");
+			if(function_exists("theme_admin")){
+				$admin_form = theme_admin($a);
+			}
+			
+		}
+		
 
 		$screenshot = array( get_theme_screenshot($theme), t('Screenshot'));
 		if(! stristr($screenshot[0],$theme))
@@ -793,10 +821,10 @@ function admin_page_themes(&$a){
 			'$status' => $status,
 			'$action' => $action,
 			'$info' => get_theme_info($theme),
-			'$function' => 'themes',		
+			'$function' => 'themes',
 			'$admin_form' => $admin_form,
 			'$str_author' => t('Author: '),
-			'$str_maintainer' => t('Maintainer: '),			
+			'$str_maintainer' => t('Maintainer: '),
 			'$screenshot' => $screenshot,
 			'$readme' => $readme
 		));
@@ -805,7 +833,7 @@ function admin_page_themes(&$a){
 	 
 	
 	/**
-	 * List plugins
+	 * List themes
 	 */
 	
 	$xthemes = array();

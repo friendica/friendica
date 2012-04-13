@@ -9,8 +9,11 @@
 		{{endif}}
 		{{if $item.comment_lastcollapsed}}</div>{{endif}}
 		
-		{{ inc $item.template }}{{ endinc }}
-		
+		{{ if $item.type == tag }}
+			{{ inc wall_item_tag.tpl }}{{ endinc }}
+		{{ else }}
+			{{ inc $item.template }}{{ endinc }}
+		{{ endif }}
 		
 	{{ endfor }}
 </div>

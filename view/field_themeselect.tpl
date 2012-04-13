@@ -1,4 +1,4 @@
-	
+	<script>$(function(){ previewTheme($("#id_$field.0")[0]); });</script>
 	<div class='field select'>
 		<label for='id_$field.0'>$field.1</label>
 		<select name='$field.0' id='id_$field.0' onchange="previewTheme(this);" >

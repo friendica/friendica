@@ -1,8 +1,10 @@
 <form id="profile-jot-form" action="$action" method="post">
 	<div id="jot">
 		<div id="profile-jot-desc" class="jothidden">&nbsp;</div>
-		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none" />
+		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" title="$placeholdertitle" value="$title" class="jothidden" style="display:none" /><input name="category" id="jot-category" type="text" placeholder="$placeholdercategory" title="$placeholdercategory" value="$category" class="jothidden" style="display:none" />
 		<div id="character-counter" class="grey jothidden"></div>
+		
+
 
 		<input type="hidden" name="type" value="$ptyp" />
 		<input type="hidden" name="profile_uid" value="$profile_uid" />
@@ -20,8 +22,10 @@
 			<li><a id="profile-link"  ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;" title="$weblink">$shortweblink</a></li>
 			<li><a id="profile-video" onclick="jotVideoURL();return false;" title="$gvideo">$shortvideo</a></li>
 			<li><a id="profile-audio" onclick="jotAudioURL();return false;" title="$audio">$shortaudio</a></li>
+			<!-- TODO: waiting for a better placement 
 			<li><a id="profile-location" onclick="jotGetLocation();return false;" title="$setloc">$shortsetloc</a></li>
 			<li><a id="profile-nolocation" onclick="jotClearLocation();return false;" title="$noloc">$shortnoloc</a></li>
+			-->
 			<li><a id="jot-preview-link" onclick="preview_post(); return false;" title="$preview">$preview</a></li>
 			$jotplugins
 

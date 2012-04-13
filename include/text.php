@@ -1068,10 +1068,12 @@ function unamp($s) {
 if(! function_exists('lang_selector')) {
 function lang_selector() {
 	global $lang;
-	$o = '<div id="lang-select-icon" class="icon language" title="' . t('Select an alternate language') . '" onclick="openClose(\'language-selector\');" ></div>';
-	$o .= '<div id="language-selector" style="display: none;" >';
-	$o .= '<form action="#" method="post" ><select name="system_language" onchange="this.form.submit();" >';
+	
 	$langs = glob('view/*/strings.php');
+	
+	$lang_options = array();
+	$selected = "";
+	
 	if(is_array($langs) && count($langs)) {
 		$langs[] = '';
 		if(! in_array('view/en/strings.php',$langs))
@@ -1079,17 +1081,22 @@ function lang_selector() {
 		asort($langs);
 		foreach($langs as $l) {
 			if($l == '') {
-				$default_selected = ((! x($_SESSION,'language')) ? ' selected="selected" ' : '');
-				$o .= '<option value="" ' . $default_selected . '>' . t('default') . '</option>';
+				$lang_options[""] = t('default');
 				continue;
 			}
 			$ll = substr($l,5);
 			$ll = substr($ll,0,strrpos($ll,'/'));
-			$selected = (($ll === $lang && (x($_SESSION, 'language'))) ? ' selected="selected" ' : '');
-			$o .= '<option value="' . $ll . '"' . $selected . '>' . $ll . '</option>';
+			$selected = (($ll === $lang && (x($_SESSION, 'language'))) ? $ll : $selected);
+			$lang_options[$ll]=$ll;
 		}
 	}
-	$o .= '</select></form></div>';
+
+	$tpl = get_markup_template("lang_selector.tpl");	
+	$o = replace_macros($tpl, array(
+		'$title' => t('Select an alternate language'),
+		'$langs' => array($lang_options, $selected),
+		
+	));
 	return $o;
 }}
 

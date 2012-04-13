@@ -587,13 +587,14 @@ function fetch_xrd_links($url) {
 
 if(! function_exists('validate_url')) {
 function validate_url(&$url) {
-	// no naked subdomains
-	if(strpos($url,'.') === false)
+	
+	// no naked subdomains (allow localhost for tests)
+	if(strpos($url,'.') === false && strpos($url,'/localhost/') === false)
 		return false;
 	if(substr($url,0,4) != 'http')
 		$url = 'http://' . $url;
 	$h = @parse_url($url);
-
+	
 	if(($h) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR))) {
 		return true;
 	}

@@ -17,7 +17,7 @@
 	</p>
 	
 	{{ if $screenshot }}
-	<a href="$screenshot.0" ><img src="$screenshot.0" width="320" height="240" alt="$screenshot.1" /></a>
+	<a href="$screenshot.0" class='screenshot'><img src="$screenshot.0" alt="$screenshot.1" /></a>
 	{{ endif }}
 
 	{{ if $admin_form }}
