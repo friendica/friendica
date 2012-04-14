@@ -1155,7 +1155,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-link
 .wall-item-outside-wrapper {
 	border: 1px solid #aaa;
 	border-radius: 5px;
-	box-shadow: 5px 0 10px 0 #111;
+	box-shadow: 5px 0 10px 0 #999;
 }
 .wall-item-outside-wrapper.comment {
 	margin-top: 5px;
