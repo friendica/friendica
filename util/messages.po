@@ -6596,7 +6596,7 @@ msgstr ""
 #: ../../include/security.php:329
 msgid ""
 "The form security token was not correct. This probably happened because the "
-"form has been opened for too long (>3 hours) before subitting it."
+"form has been opened for too long (>3 hours) before submitting it."
 msgstr ""
 
 #: ../../include/Contact.php:145 ../../include/conversation.php:813

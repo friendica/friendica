@@ -326,7 +326,7 @@ function check_form_security_token($typename = '', $formname = 'form_security_to
 }
 
 function check_form_security_std_err_msg() {
-	return t('The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before subitting it.') . EOL;
+	return t('The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it.') . EOL;
 }
 function check_form_security_token_redirectOnErr($err_redirect, $typename = '', $formname = 'form_security_token') {
 	if (!check_form_security_token($typename, $formname)) {
