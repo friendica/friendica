@@ -2395,6 +2395,12 @@ div[id$="wrapper"] br {
 .admin.link {
     list-style-position: inside;
 }
+#adminpage {
+	color: #111;
+	background: transparent;
+	margin: 5px;
+	padding: 10px;
+}
 #adminpage dl {
     clear:left;
     margin-bottom: 2px;
@@ -2416,7 +2422,6 @@ div[id$="wrapper"] br {
 #adminpage .submit {
 	clear:left;
 }
-
 #adminpage #pluginslist {
     margin: 0;
     padding: 0;
@@ -2433,7 +2438,6 @@ div[id$="wrapper"] br {
 	float:left;
 	margin-right: 1em;
 }
-
 #adminpage table {
     width: 100%;
     border-bottom: 1px solid #000;
@@ -2459,6 +2463,10 @@ div[id$="wrapper"] br {
 /*	color: #;*/
 	text-decoration: underline;
 }
+#users .name {
+	color: #eec;
+}
+
 
 /**
  * Form fields

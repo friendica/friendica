@@ -76,7 +76,7 @@ function dispy_init(&$a) {
 		// click outside notifications menu closes it
 		$('html').click(function() {
 			$('#nav-notifications-linkmenu').removeClass('selected');
-			document.getElementById("nav-notifications-menu").style.display = "none";
+			$('#nav-notifications-menu').css({display: 'none'});
 		});
 
 		$('#nav-notifications-linkmenu').click(function(event) {
@@ -85,7 +85,7 @@ function dispy_init(&$a) {
 		// click outside profiles menu closes it
 		$('html').click(function() {
 			$('#profiles-menu-trigger').removeClass('selected');
-			document.getElementById("profiles-menu").style.display = "none";
+			$('#profiles-menu').css({display: 'none'});
 		});
 
 		$('#profiles-menu').click(function(event) {
@@ -138,6 +138,8 @@ function dispy_init(&$a) {
 	});
 	</script>
 EOT;
+
+	js_in_foot();
 }
 
 function dispy_community_info() {
@@ -145,26 +147,25 @@ function dispy_community_info() {
 	$url = $a->get_baseurl($ssl_state);
 	$aside['$url'] = $url;
 
-	$fpostitJS = <<<FPI
-		javascript: (function() {
-		the_url = ' . $url . '/view/theme/' . $a->theme_info['name'] . '/fpostit/fpostit.php?url=' +
-		encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title) + '&text=' +
-		encodeURIComponent(''+(window.getSelection ? window.getSelection() : document.getSelection ?
-		document.getSelection() : document.selection.createRange().text));
-		a_funct = function() {
-			if (!window.open(the_url, 'fpostit', 'location=yes,links=no,scrollbars=no,toolbar=no,width=600,height=300')) {
-				location.href = the_url;
-			}
-			if (/Firefox/.test(navigator.userAgent)) {
-				setTimeout(a_funct, 0)
-			} else {
-				a_funct();
-			}
-		})();
-FPI;
+	$fpostitJS = "javascript:(function() {"
+		. "the_url = '" . $url . "/view/theme/".$a->theme_info['name']."/fpostit/fpostit.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title) + '&text=' + encodeURIComponent(''+(window.getSelection ? window.getSelection() : document.getSelection ? document.getSelection() : document.selection.createRange().text));
+						a_funct = function() {
+							if (!window.open(the_url, 'fpostit', 'location=yes,links=no,scrollbars=no,toolbar=no,width=600,height=300')) location.href = the_url;};
+							if (/Firefox/.test(navigator.userAgent)) {setTimeout(a_funct, 0);} 
+							else {a_funct();}})()";
 
 	$aside['$fpostitJS'] = $fpostitJS;
 	$tpl = file_get_contents(dirname(__file__) . '/communityhome.tpl');
 	return $a->page['aside_bottom'] = replace_macros($tpl, $aside);
 }
 
+function js_in_foot() {
+	/** @purpose insert stuff in bottom of page
+	 */
+	$a = get_app();
+	$baseurl = $a->get_baseurl($ssl_state);
+	$bottom['$baseurl'] = $baseurl;
+	$tpl = file_get_contents(dirname(__file__) . '/bottom.tpl');
+
+	return $a->page['bottom'] = replace_macros($tpl, $bottom);
+}

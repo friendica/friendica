@@ -28,9 +28,10 @@
 			<?php if(x($page,'aside_right_bottom')) echo $page['aside_right_bottom']; ?>
 		</aside>
 	</article>
-	<footer id="page-footer">
-		<?php if(x($page,'footer')) echo $page['footer']; ?>
+	<footer id="footer">
+		<?php if(x($page, 'footer')) echo $page['footer']; ?>
 	</footer>
+	<?php if (x($page, 'bottom')) echo $page['bottom']; ?>
 </body>
 </html>
 
