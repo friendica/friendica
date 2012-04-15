@@ -157,7 +157,7 @@ function html2plain($html, $wraplength = 75, $compact = false)
 	//node2bbcode($doc, 'ol', array(), "\n[list=1]", "[/list]\n");
 	node2bbcode($doc, 'li', array(), "\n* ", "\n");
 
-	node2bbcode($doc, 'hr', array(), str_repeat("-", 70), "");
+	node2bbcode($doc, 'hr', array(), "\n".str_repeat("-", 70)."\n", "");
 
 	node2bbcode($doc, 'tr', array(), "\n", "");
 	node2bbcode($doc, 'td', array(), "\t", "");

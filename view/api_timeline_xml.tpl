@@ -1,22 +1,20 @@
-<statuses type="array">
-  {{ for $statuses as $status }}
-  <status>
-    <created_at>$status.created_at</created_at>
-    <id>$status.id</id>
-    <text>$status.text</text>
-	<statusnet_html>$status.statusnet_html</statusnet_html>
-    <source>$status.source</source>
-    <truncated>$status.truncated</truncated>
-    <url>$status.url</url>
-    <in_reply_to_status_id>$status.in_reply_to_status_id</in_reply_to_status_id>
-    <in_reply_to_user_id>$status.in_reply_to_user_id</in_reply_to_user_id>
-    <favorited>$status.favorited</favorited>
-    <in_reply_to_screen_name>$status.in_reply_to_screen_name</in_reply_to_screen_name>
-    <geo>$status.geo</geo>
-    <coordinates>$status.coordinates</coordinates>
-    <place>$status.place</place>
-    <contributors>$status.contributors</contributors>
-  	{{ inc api_user_xml.tpl with $user=$status.user }}{{ endinc }}
-  </status>
-  {{ endfor }}
-</statuses>
+<statuses type="array" xmlns:statusnet="http://status.net/schema/api/1/">
+{{ for $statuses as $status }} <status>
+  <text>$status.text</text>
+  <truncated>$status.truncated</truncated>
+  <created_at>$status.created_at</created_at>
+  <in_reply_to_status_id>$status.in_reply_to_status_id</in_reply_to_status_id>
+  <source>$status.source</source>
+  <id>$status.id</id>
+  <in_reply_to_user_id>$status.in_reply_to_user_id</in_reply_to_user_id>
+  <in_reply_to_screen_name>$status.in_reply_to_screen_name</in_reply_to_screen_name>
+  <geo>$status.geo</geo>
+  <favorited>$status.favorited</favorited>
+{{ inc api_user_xml.tpl with $user=$status.user }}{{ endinc }}  <statusnet:html>$status.statusnet_html</statusnet:html>
+  <statusnet:conversation_id>$status.statusnet_conversation_id</statusnet:conversation_id>
+  <url>$status.url</url>
+  <coordinates>$status.coordinates</coordinates>
+  <place>$status.place</place>
+  <contributors>$status.contributors</contributors>
+ </status>
+{{ endfor }}</statuses>

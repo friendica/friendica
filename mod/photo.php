@@ -4,6 +4,30 @@ require_once('include/security.php');
 
 function photo_init(&$a) {
 
+	// To-Do:
+	// - checking with realpath
+	// - checking permissions
+	/*
+	$cache = get_config('system','itemcache');
+        if (($cache != '') and is_dir($cache)) {
+		$cachefile = $cache."/".$a->argc."-".$a->argv[1]."-".$a->argv[2]."-".$a->argv[3];
+		if (file_exists($cachefile)) {
+			$data = file_get_contents($cachefile);
+
+			if(function_exists('header_remove')) {
+				header_remove('Pragma');
+				header_remove('pragma');
+			}
+
+			header("Content-type: image/jpeg");
+ 			header("Expires: " . gmdate("D, d M Y H:i:s", time() + (3600*24)) . " GMT");
+			header("Cache-Control: max-age=" . (3600*24));
+			echo $data;
+			killme();
+			// NOTREACHED
+		}
+	}*/
+
 	switch($a->argc) {
 		case 4:
 			$person = $a->argv[3];
@@ -26,6 +50,7 @@ function photo_init(&$a) {
 	$default = 'images/person-175.jpg';
 
 	if(isset($type)) {
+
 
 		/**
 		 * Profile photos
@@ -143,6 +168,10 @@ function photo_init(&$a) {
 			$data = $ph->imageString();
 		}
 	}
+
+	// Writing in cachefile
+	if ($cachefile != '')
+		file_put_contents($cachefile, $data);
 
 	if(function_exists('header_remove')) {
 		header_remove('Pragma');

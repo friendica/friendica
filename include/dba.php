@@ -260,6 +260,4 @@ function dbesc_array(&$arr) {
 	if(is_array($arr) && count($arr)) {
 		array_walk($arr,'dbesc_array_cb');
 	}
-}}		
-
-
+}}

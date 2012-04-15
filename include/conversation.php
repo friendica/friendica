@@ -626,10 +626,6 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				else
 					$profile_avatar = (((strlen($item['author-avatar'])) && $diff_author) ? $item['author-avatar'] : $thumb);
 
-
-
-
-
 				$like    = ((x($alike,$item['id'])) ? format_like($alike[$item['id']],$alike[$item['id'] . '-l'],'like',$item['id']) : '');
 				$dislike = ((x($dlike,$item['id'])) ? format_like($dlike[$item['id']],$dlike[$item['id'] . '-l'],'dislike',$item['id']) : '');
 
@@ -1089,4 +1085,3 @@ function render_location_google($item) {
 	}
 	return $location;
 }
-
