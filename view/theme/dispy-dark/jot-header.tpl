@@ -36,7 +36,7 @@ function initEditor(cb) {
 			entity_encoding : "raw",
 			add_unload_trigger : false,
 			remove_linebreaks : false,
-			force_p_newlines : true,
+			force_p_newlines : false,
 			force_br_newlines : true,
 			forced_root_block : '',
 			convert_urls: false,

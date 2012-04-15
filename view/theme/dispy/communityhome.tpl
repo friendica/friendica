@@ -39,6 +39,6 @@
 
 <h3 id="postit-header">'PostIt' to Friendica</h3>
 <div id="postit">
-<a href="$fostitJS" title="PostIt">Post to Friendica</a> from anywhere by bookmarking this link.
+<a href="$fpostitJS" title="PostIt">Post to Friendica</a> from anywhere by bookmarking this link.
 </div>
 

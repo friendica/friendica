@@ -2776,8 +2776,8 @@ div[id$="wrapper"] br {
 }
 #pause {
 	position: fixed;
-	bottom: 5px;
-	right: 5px;
+	bottom: 40px;
+	right: 30px;
 }
 .border, .border:hover {
 	border: 1px solid #babdb6;
