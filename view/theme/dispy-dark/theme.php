@@ -147,14 +147,6 @@ function dispy_dark_community_info() {
 	$url = $a->get_baseurl($ssl_state);
 	$aside['$url'] = $url;
 
-	$fpostitJS = "javascript:(function() {"
-		. "the_url = '" . $url . "/view/theme/".$a->theme_info['name']."/fpostit/fpostit.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title) + '&text=' + encodeURIComponent(''+(window.getSelection ? window.getSelection() : document.getSelection ? document.getSelection() : document.selection.createRange().text));
-						a_funct = function() {
-							if (!window.open(the_url, 'fpostit', 'location=yes,links=no,scrollbars=no,toolbar=no,width=600,height=300')) location.href = the_url;};
-							if (/Firefox/.test(navigator.userAgent)) {setTimeout(a_funct, 0);} 
-							else {a_funct();}})()";
-
-	$aside['$fpostitJS'] = $fpostitJS;
 	$tpl = file_get_contents(dirname(__file__) . '/communityhome.tpl');
 	return $a->page['aside_bottom'] = replace_macros($tpl, $aside);
 }
