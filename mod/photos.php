@@ -330,7 +330,6 @@ function photos_post(&$a) {
 			// Create item container
 
 			$title = '';
-			$basename = basename($filename);
 			$uri = item_new_uri($a->get_hostname(),$page_owner_uid);
 
 			$arr = array();

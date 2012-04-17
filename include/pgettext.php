@@ -49,6 +49,7 @@ function get_language() {
 	if(isset($preferred))
 		return $preferred;
 
+    $a = get_app();
 	return ((isset($a->config['system']['language'])) ? $a->config['system']['language'] : 'en');
 }}
 

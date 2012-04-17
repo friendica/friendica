@@ -593,7 +593,7 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 			logger('probe_url: fetch feed: ' . $poll . ' returns: ' . $xml, LOGGER_DATA);
 			$a = get_app();
 
-			logger('probe_url: scrape_feed: headers: ' . $a->get_curl_headers(), $LOGGER_DATA);
+			logger('probe_url: scrape_feed: headers: ' . $a->get_curl_headers(), LOGGER_DATA);
 
    			$feed->set_raw_data($xml);
 

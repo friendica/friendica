@@ -172,7 +172,7 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
         $url_parsed = @parse_url($newurl);
         if (isset($url_parsed)) {
             $redirects++;
-            return fetch_url($newurl,$binary,$redirects,$timeout);
+            return fetch_url($newurl,false,$redirects,$timeout);
         }
     }
 	$a->set_curl_code($http_code);
@@ -206,6 +206,7 @@ function xml_status($st, $message = '') {
 if(! function_exists('http_status_exit')) {
 function http_status_exit($val) {
 
+    $err = '';
 	if($val >= 400)
 		$err = 'Error';
 	if($val >= 200 && $val < 300)
@@ -452,7 +453,7 @@ function lrdd($uri, $debug = false) {
 			logger('lrdd: parse error: ' . $e);
 		}
 
-		if($dom) {
+		if(isset($dom) && $dom) {
 			$items = $dom->getElementsByTagName('link');
 			foreach($items as $item) {
 				$x = $item->getAttribute('rel');

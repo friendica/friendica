@@ -342,7 +342,6 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 					'body' => template_escape($body),
 					'text' => strip_tags(template_escape($body)),
 					'ago' => (($item['app']) ? sprintf( t('%s from %s'),relative_date($item['created']),$item['app']) : relative_date($item['created'])),
-					'lock' => $lock,
 					'location' => template_escape($location),
 					'indent' => '',
 					'owner_name' => template_escape($owner_name),
@@ -400,6 +399,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 			}
 
 			$comments_collapsed = false;
+			$comments_seen = 0;
 			$comment_lastcollapsed = false;
 			$comment_firstcollapsed = false;
 			$blowhard = 0;
@@ -709,7 +709,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 	}
 
 	$page_template = get_markup_template("conversation.tpl");
-	$o .= replace_macros($page_template, array(
+	$o = replace_macros($page_template, array(
 		'$baseurl' => $a->get_baseurl($ssl_state),
 		'$mode' => $mode,
 		'$user' => $a->user,
@@ -1074,7 +1074,6 @@ function find_thread_parent_index($arr,$x) {
 }
 
 function render_location_google($item) {
-	$location = '';
 	$location = (($item['location']) ? '<a target="map" title="' . $item['location'] . '" href="http://maps.google.com/?q=' . urlencode($item['location']) . '">' . $item['location'] . '</a>' : '');
 	$coord = (($item['coord']) ? '<a target="map" title="' . $item['coord'] . '" href="http://maps.google.com/?q=' . urlencode($item['coord']) . '">' . $item['coord'] . '</a>' : '');
 	if($coord) {

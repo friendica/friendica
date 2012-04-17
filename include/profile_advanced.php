@@ -2,7 +2,7 @@
 
 function advanced_profile(&$a) {
 
-	$o .= '';
+	$o = '';
 
 	$o .= '<h2>' . t('Profile') . '</h2>';
 
@@ -69,13 +69,12 @@ function advanced_profile(&$a) {
 		if($txt = prepare_text($a->profile['work'])) $profile['work'] = array( t('Work/employment:'), $txt);
 
 		if($txt = prepare_text($a->profile['education'])) $profile['education'] = array( t('School/education:'), $txt );
-	}
 
-		
-	return replace_macros($tpl, array(
-		'$title' => t('Profile'),
-		'$profile' => $profile,
-	));
+        return replace_macros($tpl, array(
+            '$title' => t('Profile'),
+            '$profile' => $profile,
+        ));
+    }
 
-
+	return '';
 }

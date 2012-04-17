@@ -170,7 +170,7 @@ function photo_init(&$a) {
 	}
 
 	// Writing in cachefile
-	if ($cachefile != '')
+	if (isset($cachefile) && $cachefile != '')
 		file_put_contents($cachefile, $data);
 
 	if(function_exists('header_remove')) {
