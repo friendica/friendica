@@ -3126,7 +3126,7 @@ msgstr "Accounts gelten nach x Tagen als unbenutzt"
 
 #: ../../mod/admin.php:391
 msgid ""
-"Will not waste system resources polling external sites for abandonded "
+"Will not waste system resources polling external sites for abandoned "
 "accounts. Enter 0 for no time limit."
 msgstr "Verschwende keine System-Ressourcen auf das Pollen externer Seiten, wenn Accounts nicht mehr benutzt werden. 0 eingeben für kein Limit."
 

@@ -2910,7 +2910,7 @@ msgstr "Comptes abandonats després de x dies"
 
 #: ../../mod/admin.php:330
 msgid ""
-"Will not waste system resources polling external sites for abandonded "
+"Will not waste system resources polling external sites for abandoned "
 "accounts. Enter 0 for no time limit."
 msgstr "No gastará recursos del sistema creant enquestes des de llocs externos per a comptes abandonats. Introdueixi 0 per a cap límit temporal."
 

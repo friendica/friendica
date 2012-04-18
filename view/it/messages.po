@@ -3104,7 +3104,7 @@ msgstr "Account abbandonati dopo x giorni"
 
 #: ../../mod/admin.php:313
 msgid ""
-"Will not waste system resources polling external sites for abandonded "
+"Will not waste system resources polling external sites for abandoned "
 "accounts. Enter 0 for no time limit."
 msgstr ""
 "Non spreca risorse di sistema controllando siti esterni per gli account "

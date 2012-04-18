@@ -3117,7 +3117,7 @@ msgstr "Kontoj forlasitaj post x tagoj"
 
 #: ../../mod/admin.php:391
 msgid ""
-"Will not waste system resources polling external sites for abandonded "
+"Will not waste system resources polling external sites for abandoned "
 "accounts. Enter 0 for no time limit."
 msgstr "Mi ne malŝparu energion por enketi aliajn retejojn pri forlasitaj kontoj. Entajpu 0 por ne uzi templimo."
 

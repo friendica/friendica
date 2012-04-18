@@ -520,7 +520,7 @@ nav #nav-notifications-linkmenu.selected .icon.s22.notify {
     margin: 0px;
     height: 25px;
 }
-#nav-buttons li {
+#nav-buttons > li {
     padding: 0;
 	display: inline-block;
 	margin: 0px -4px 0px 0px;
