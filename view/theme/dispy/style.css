@@ -340,8 +340,7 @@ ul#user-menu-popup li a.nav-sep {
     border-top: 1px solid #eeeeec;
 }
 nav .nav-link {
-    float: right;
-    display: block;
+    display: inline-block;
     width: 22px;
     height: 22px;
     overflow: hidden;
@@ -500,7 +499,7 @@ nav #nav-notifications-linkmenu.selected .icon.s22.notify {
     width: 170px;
     position: absolute;
     top: -19px;
-    left: 7px;
+    left: 4px;
 }
 #nav-floater {
     position: fixed;
@@ -518,11 +517,13 @@ nav #nav-notifications-linkmenu.selected .icon.s22.notify {
     clear: both;
     list-style: none;
     padding: 0px;
-    margin: 0 7px 0 0;
+    margin: 0px;
     height: 25px;
 }
 #nav-buttons li {
     padding: 0;
+	display: inline-block;
+	margin: 0px -4px 0px 0px;
 }
 .floaterflip {
     display: block;

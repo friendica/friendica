@@ -8,11 +8,22 @@
 /* from html5boilerplate */
 
 /* these are to tell browsers they should be displayed a certain way */
-article, aside, details, figcaption, figure, footer,
-header, hgroup, nav, section {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section {
     display: block;
 }
-audio, canvas, video, time {
+audio,
+canvas,
+video,
+time {
     display: inline-block;
     *display: inline;
     *zoom: 1;
@@ -45,7 +56,11 @@ body {
     font-size: 16px;
     line-height: 1.1em;
 }
-body, button, input, select, textarea {
+body,
+button,
+input,
+select,
+textarea {
     font-family: sans-serif;
     color: #eec;
     background-color: #2e2f2e;
@@ -72,6 +87,10 @@ ul, ol {
 /* remember to define focus styles! */
 :focus {
     outline: 0;
+}
+[disabled="disabled"] {
+    background: #4e4f4f;
+    color: #ddb;
 }
 
 /* remember to highlight inserts somehow! */
@@ -321,8 +340,7 @@ ul#user-menu-popup li a.nav-sep {
     border-top: 1px solid #eeeeec;
 }
 nav .nav-link {
-    float: right;
-    display: block;
+    display: inline-block;
     width: 22px;
     height: 22px;
     overflow: hidden;
@@ -481,7 +499,7 @@ nav #nav-notifications-linkmenu.selected .icon.s22.notify {
     width: 170px;
     position: absolute;
     top: -19px;
-    left: 7px;
+    left: 4px;
 }
 #nav-floater {
     position: fixed;
@@ -499,11 +517,13 @@ nav #nav-notifications-linkmenu.selected .icon.s22.notify {
     clear: both;
     list-style: none;
     padding: 0px;
-    margin: 0 7px 0 0;
+    margin: 0px;
     height: 25px;
 }
 #nav-buttons li {
     padding: 0;
+	display: inline-block;
+	margin: 0px -4px 0px 0px;
 }
 .floaterflip {
     display: block;

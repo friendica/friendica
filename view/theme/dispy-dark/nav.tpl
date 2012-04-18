@@ -2,48 +2,52 @@
 
 <span id="banner">$banner</span>
 
-<!-- yes, they're going the other way. seems that's how the template renderer
-works -->
 <a name="top" id="top"></a>
 <div id="nav-floater">
-    <div id="nav-buttons">
-    {{ if $nav.help }}
-    <a id="nav-help-link" class="nav-link $nav.help.2" href="$nav.help.0" title="$nav.help.1">$nav.help.1</a>
-    {{ endif }}
-    {{ if $nav.community }}
-    <a id="nav-community-link" class="nav-link $nav.community.2"
-    href="$nav.community.0" title="$nav.community.1">$nav.community.1</a>
-    {{ endif }}
-    {{ if $nav.apps }}
-    <a id="nav-apps-link" class="nav-link $nav.apps.2" href="$nav.apps.0" title="$nav.apps.1">$nav.apps.1</a>
-    {{ endif }}
-    <a id="nav-directory-link" class="nav-link $nav.directory.2" href="$nav.directory.0" title="$nav.directory.1">$nav.directory.1</a>
-    <a id="nav-search-link" class="nav-link $nav.search.2" href="$nav.search.0" title="$nav.search.1">$nav.search.1</a>
-    {{ if $nav.messages }}
-    <a id="nav-messages-link" class="nav-link $nav.messages.2"
-    href="$nav.messages.0" title="$nav.messages.1">$nav.messages.1</a>
-    {{ endif }}
-    {{ if $nav.notifications }}
-    <a id="nav-notifications-linkmenu" class="nav-link $nav.notifications.2" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">$nav.notifications.1</a>
-    <ul id="nav-notifications-menu" class="menu-popup">
-        <li id="nav-notifications-see-all"><a href="$nav.notifications.all.0">$nav.notifications.all.1</a></li>
-        <li id="nav-notifications-mark-all"><a href="#" onclick="notifyMarkAll(); return false;">$nav.notifications.mark.1</a></li>
-        <li class="empty">$emptynotifications</li>
-    </ul>
-    {{ endif }}
-    {{ if $nav.network }}
-    <a id="nav-network-link" class="nav-link $nav.network.2"
-		href="$nav.network.0" title="$nav.network.1">$nav.network.1</a>
+    <ul id="nav-buttons">
+    {{ if $nav.login }}
+    <li><a id="nav-login-link" class="nav-login-link $nav.login.2"
+			href="$nav.login.0" title="$nav.login.3" >$nav.login.1</a></li>
     {{ endif }}
     {{ if $nav.home }}
-    <a id="nav-home-link" class="nav-link $nav.home.2"
-		href="$nav.home.0" title="$nav.home.1">$nav.home.1</a>
+    <li><a id="nav-home-link" class="nav-link $nav.home.2"
+			href="$nav.home.0" title="$nav.home.1">$nav.home.1</a></li>
     {{ endif }}
-    {{ if $nav.login }}
-    <a id="nav-login-link" class="nav-login-link $nav.login.2"
-		href="$nav.login.0" title="$nav.login.3" >$nav.login.1</a>
+    {{ if $nav.network }}
+    <li><a id="nav-network-link" class="nav-link $nav.network.2"
+			href="$nav.network.0" title="$nav.network.1">$nav.network.1</a></li>
     {{ endif }}
-	</div>
+    {{ if $nav.notifications }}
+    <li><a id="nav-notifications-linkmenu" class="nav-link $nav.notifications.2"
+			href="$nav.notifications.0"
+			rel="#nav-notifications-menu" title="$nav.notifications.1">$nav.notifications.1</a></li>
+		<ul id="nav-notifications-menu" class="menu-popup">
+			<li id="nav-notifications-see-all"><a href="$nav.notifications.all.0">$nav.notifications.all.1</a></li>
+			<li id="nav-notifications-mark-all"><a href="#" onclick="notifyMarkAll(); return false;">$nav.notifications.mark.1</a></li>
+			<li class="empty">$emptynotifications</li>
+		</ul>
+    {{ endif }}
+    {{ if $nav.messages }}
+    <li><a id="nav-messages-link" class="nav-link $nav.messages.2"
+			href="$nav.messages.0" title="$nav.messages.1">$nav.messages.1</a></li>
+    {{ endif }}
+    {{ if $nav.community }}
+    <li><a id="nav-community-link" class="nav-link $nav.community.2"
+			href="$nav.community.0" title="$nav.community.1">$nav.community.1</a></li>
+    {{ endif }}
+    <li><a id="nav-directory-link" class="nav-link $nav.directory.2"
+			href="$nav.directory.0" title="$nav.directory.1">$nav.directory.1</a></li>
+    <li><a id="nav-search-link" class="nav-link $nav.search.2"
+			href="$nav.search.0" title="$nav.search.1">$nav.search.1</a></li>
+    {{ if $nav.apps }}
+    <li><a id="nav-apps-link" class="nav-link $nav.apps.2"
+		href="$nav.apps.0" title="$nav.apps.1">$nav.apps.1</a></li>
+    {{ endif }}
+    {{ if $nav.help }}
+    <li><a id="nav-help-link" class="nav-link $nav.help.2"
+			href="$nav.help.0" title="$nav.help.1">$nav.help.1</a></li>
+    {{ endif }}
+	</ul>
 
 	<div id="user-menu">
         <a id="user-menu-label" onclick="openClose('user-menu-popup'); return false" href="$nav.home.0">$sitelocation</a>
