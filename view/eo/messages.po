@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: http://bugs.friendica.com/\n"
 "POT-Creation-Date: 2012-04-16 10:00-0700\n"
-"PO-Revision-Date: 2012-04-17 20:23+0000\n"
+"PO-Revision-Date: 2012-04-18 17:16+0000\n"
 "Last-Translator: Martin Schmitt <mas@scsy.de>\n"
 "Language-Team: Esperanto (http://www.transifex.net/projects/p/friendica/language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -1360,7 +1360,7 @@ msgstr "%s kreis novan afiŝon"
 #: ../../mod/notifications.php:497
 #, php-format
 msgid "%s commented on %s's post"
-msgstr "%s komentis pri la afiŝon de %s"
+msgstr "%s komentis pri la afiŝo de %s"
 
 #: ../../mod/notifications.php:298
 msgid "No more network notifications."
@@ -2657,7 +2657,7 @@ msgstr "La retejo transiras la maksimuman kvanton da ĉiutagaj kontaj registrado
 msgid ""
 "You may (optionally) fill in this form via OpenID by supplying your OpenID "
 "and clicking 'Register'."
-msgstr "Vi ankaŭ (nedeviga) povas plenigi la formularo tra OpenID se vi provizas vian OpenID adreson kaj klakas 'Registri'."
+msgstr "Vi ankaŭ (nedeviga) povas plenigi la formularon tra OpenID se vi provizas vian OpenID adreson kaj klakas 'Registri'."
 
 #: ../../mod/register.php:514
 msgid ""
@@ -3470,7 +3470,7 @@ msgstr "{0} petis registradon"
 #: ../../mod/ping.php:191
 #, php-format
 msgid "{0} commented %s's post"
-msgstr "{0} komentis pri la afiŝon de %s"
+msgstr "{0} komentis pri la afiŝo de %s"
 
 #: ../../mod/ping.php:196
 #, php-format
@@ -5576,7 +5576,7 @@ msgstr "Hejmpaĝo:"
 
 #: ../../include/profile_advanced.php:47
 msgid "Tags:"
-msgstr "Tags:"
+msgstr "Markoj:"
 
 #: ../../include/profile_advanced.php:51
 msgid "Religion:"
@@ -5860,7 +5860,7 @@ msgstr "Edziĝinta"
 
 #: ../../include/profile_selectors.php:33
 msgid "Imaginarily married"
-msgstr "Image edziiĝinta"
+msgstr "Image edziĝinta"
 
 #: ../../include/profile_selectors.php:33
 msgid "Partners"
@@ -5904,7 +5904,7 @@ msgstr "Eksedziĝinta"
 
 #: ../../include/profile_selectors.php:33
 msgid "Imaginarily divorced"
-msgstr "Image maledziiĝinta"
+msgstr "Image eksedziĝinta"
 
 #: ../../include/profile_selectors.php:33
 msgid "Widowed"
@@ -6490,7 +6490,7 @@ msgstr "Bonvolu viziti %s por vidi aŭ respondi viajn privatajn mesaĝojn."
 #: ../../include/enotify.php:73
 #, php-format
 msgid "%s's"
-msgstr "de %s"
+msgstr "de %s verkita"
 
 #: ../../include/enotify.php:77
 msgid "your"
@@ -6509,7 +6509,7 @@ msgstr "%s komentis pri elemento/konversacio kiun vi sekvas."
 #: ../../include/enotify.php:86
 #, php-format
 msgid "%s commented on %s."
-msgstr "%s komentis pri %s"
+msgstr "%s komentis pri %s."
 
 #: ../../include/enotify.php:88 ../../include/enotify.php:101
 #: ../../include/enotify.php:112 ../../include/enotify.php:123
@@ -6660,7 +6660,7 @@ msgstr "Bonvolu alŝuti profilbildon."
 
 #: ../../include/security.php:25
 msgid "Welcome back "
-msgstr "Bonvenon"
+msgstr "Bonvenon "
 
 #: ../../include/security.php:329
 msgid ""
@@ -6923,7 +6923,7 @@ msgstr "Mesaĝo"
 
 #: ../../boot.php:1151 ../../boot.php:1223
 msgid "g A l F d"
-msgstr "g A l F d"
+msgstr "\\j\\e \\l\\a G\\a \\h\\o\\r\\o, l F d"
 
 #: ../../boot.php:1152 ../../boot.php:1224
 msgid "F d"
@@ -6931,11 +6931,11 @@ msgstr "F d"
 
 #: ../../boot.php:1177
 msgid "Birthday Reminders"
-msgstr "Memorigiloj por naskiĝtagoj"
+msgstr "Memorigilo pri naskiĝtagoj"
 
 #: ../../boot.php:1178
 msgid "Birthdays this week:"
-msgstr "Naskiĝtagoj ĉi-semajne"
+msgstr "Naskiĝtagoj ĉi-semajne:"
 
 #: ../../boot.php:1201 ../../boot.php:1266
 msgid "[today]"
