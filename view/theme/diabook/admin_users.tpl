@@ -14,6 +14,7 @@
 	<h1>$title - $page</h1>
 	
 	<form action="$baseurl/admin/users" method="post">
+        <input type='hidden' name='form_security_token' value='$form_security_token'>
 		
 		<h3>$h_pending</h3>
 		{{ if $pending }}
@@ -72,8 +73,8 @@
 						<td class='login_date'>$u.page-flags</td>
 						<td class="checkbox"><input type="checkbox" class="users_ckbx" id="id_user_$u.uid" name="user[]" value="$u.uid"/></td>
 						<td class="tools" style="width:60px;">
-							<a href="$baseurl/admin/users/block/$u.uid" title='{{ if $u.blocked }}$unblock{{ else }}$block{{ endif }}'><span class='icon block {{ if $u.blocked==0 }}dim{{ endif }}'></span></a>
-							<a href="$baseurl/admin/users/delete/$u.uid" title='$delete' onclick="return confirm_delete('$u.name')"><span class='icon ad_drop'></span></a>
+							<a href="$baseurl/admin/users/block/$u.uid?t=$form_security_token" title='{{ if $u.blocked }}$unblock{{ else }}$block{{ endif }}'><span class='icon block {{ if $u.blocked==0 }}dim{{ endif }}'></span></a>
+							<a href="$baseurl/admin/users/delete/$u.uid?t=$form_security_token" title='$delete' onclick="return confirm_delete('$u.name')"><span class='icon ad_drop'></span></a>
 						</td>
 					</tr>
 				{{ endfor }}

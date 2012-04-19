@@ -38,7 +38,8 @@
 	<h1>$title - $page</h1>
 	
 	<form action="$baseurl/admin/site" method="post">
-	
+    <input type='hidden' name='form_security_token' value='$form_security_token'>
+
 	{{ inc field_input.tpl with $field=$sitename }}{{ endinc }}
 	{{ inc field_textarea.tpl with $field=$banner }}{{ endinc }}
 	{{ inc field_select.tpl with $field=$language }}{{ endinc }}

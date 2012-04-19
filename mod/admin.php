@@ -4,7 +4,11 @@
   * Friendica admin
   */
 require_once("include/remoteupdate.php");
- 
+
+
+/**
+ * @param App $a
+ */
 function admin_post(&$a){
 
 
@@ -67,6 +71,10 @@ function admin_post(&$a){
 	return; // NOTREACHED	
 }
 
+/**
+ * @param App $a
+ * @return string
+ */
 function admin_content(&$a) {
 
 	if(!is_site_admin()) {
@@ -74,7 +82,7 @@ function admin_content(&$a) {
 	}
 
 	if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
-		return;
+		return "";
 
 	/**
 	 * Side bar links
@@ -147,6 +155,7 @@ function admin_content(&$a) {
 	if(is_ajax()) {
 		echo $o; 
 		killme();
+		return '';
 	} else {
 		return $o;
 	}
@@ -155,6 +164,8 @@ function admin_content(&$a) {
 
 /**
  * Admin Summary Page
+ * @param App $a
+ * @return string
  */
 function admin_page_summary(&$a) {
 	$r = q("SELECT `page-flags`, COUNT(uid) as `count` FROM `user` GROUP BY `page-flags`");
@@ -188,11 +199,14 @@ function admin_page_summary(&$a) {
 
 /**
  * Admin Site Page
+ *  @param App $a
  */
 function admin_page_site_post(&$a){
 	if (!x($_POST,"page_site")){
 		return;
 	}
+
+    check_form_security_token_redirectOnErr('/admin/site', 'admin_site');
 
 	$sitename 			=	((x($_POST,'sitename'))			? notags(trim($_POST['sitename']))			: '');
 	$banner				=	((x($_POST,'banner'))      		? trim($_POST['banner'])					: false);
@@ -298,7 +312,7 @@ function admin_page_site_post(&$a){
 	} else {
 		set_config('system','directory_submit_url', $global_directory);
 	}
-	set_config('system','directory_search_url', $global_search_url);
+
 	set_config('system','block_extended_register', $no_multi_reg);
 	set_config('system','no_openid', $no_openid);
 	set_config('system','no_regfullname', $no_regfullname);
@@ -317,7 +331,11 @@ function admin_page_site_post(&$a){
 	return; // NOTREACHED	
 	
 }
- 
+
+/**
+ * @param  App $a
+ * @return string
+ */
 function admin_page_site(&$a) {
 	
 	/* Installed langs */
@@ -408,6 +426,7 @@ function admin_page_site(&$a) {
 		'$proxy'			=> array('proxy', t("Proxy URL"), get_config('system','proxy'), ""),
 		'$timeout'			=> array('timeout', t("Network timeout"), (x(get_config('system','curl_timeout'))?get_config('system','curl_timeout'):60), t("Value is in seconds. Set to 0 for unlimited (not recommended).")),
 
+        '$form_security_token' => get_form_security_token("admin_site"),
 			
 	));
 
@@ -416,11 +435,15 @@ function admin_page_site(&$a) {
 
 /**
  * Users admin page
+ *
+ * @param App $a
  */
 function admin_page_users_post(&$a){
 	$pending = ( x($_POST, 'pending') ? $_POST['pending'] : Array() );
 	$users = ( x($_POST, 'user') ? $_POST['user'] : Array() );
-	
+
+    check_form_security_token_redirectOnErr('/admin/users', 'admin_users');
+
 	if (x($_POST,'page_users_block')){
 		foreach($users as $uid){
 			q("UPDATE `user` SET `blocked`=1-`blocked` WHERE `uid`=%s",
@@ -452,7 +475,11 @@ function admin_page_users_post(&$a){
 	goaway($a->get_baseurl(true) . '/admin/users' );
 	return; // NOTREACHED	
 }
- 
+
+/**
+ * @param App $a
+ * @return string
+ */
 function admin_page_users(&$a){
 	if ($a->argc>2) {
 		$uid = $a->argv[3];
@@ -460,10 +487,11 @@ function admin_page_users(&$a){
 		if (count($user)==0){
 			notice( 'User not found' . EOL);
 			goaway($a->get_baseurl(true) . '/admin/users' );
-			return; // NOTREACHED						
+			return ''; // NOTREACHED
 		}		
 		switch($a->argv[2]){
 			case "delete":{
+                check_form_security_token_redirectOnErr('/admin/users', 'admin_users', 't');
 				// delete user
 				require_once("include/Contact.php");
 				user_remove($uid);
@@ -471,6 +499,7 @@ function admin_page_users(&$a){
 				notice( sprintf(t("User '%s' deleted"), $user[0]['username']) . EOL);
 			}; break;
 			case "block":{
+                check_form_security_token_redirectOnErr('/admin/users', 'admin_users', 't');
 				q("UPDATE `user` SET `blocked`=%d WHERE `uid`=%s",
 					intval( 1-$user[0]['blocked'] ),
 					intval( $uid )
@@ -479,7 +508,7 @@ function admin_page_users(&$a){
 			}; break;
 		}
 		goaway($a->get_baseurl(true) . '/admin/users' );
-		return; // NOTREACHED	
+		return ''; // NOTREACHED
 		
 	}
 	
@@ -555,6 +584,7 @@ function admin_page_users(&$a){
 		'$confirm_delete_multi' => t('Selected users will be deleted!\n\nEverything these users had posted on this site will be permanently deleted!\n\nAre you sure?'),
 		'$confirm_delete' => t('The user {0} will be deleted!\n\nEverything this user has posted on this site will be permanently deleted!\n\nAre you sure?'),
 
+        '$form_security_token' => get_form_security_token("admin_users"),
 
 		// values //
 		'$baseurl' => $a->get_baseurl(true),
@@ -567,10 +597,12 @@ function admin_page_users(&$a){
 }
 
 
-/*
+/**
  * Plugins admin page
+ *
+ * @param App $a
+ * @return string
  */
-
 function admin_page_plugins(&$a){
 	
 	/**
@@ -580,10 +612,12 @@ function admin_page_plugins(&$a){
 		$plugin = $a->argv[2];
 		if (!is_file("addon/$plugin/$plugin.php")){
 			notice( t("Item not found.") );
-			return;
+			return '';
 		}
 		
 		if (x($_GET,"a") && $_GET['a']=="t"){
+            check_form_security_token_redirectOnErr('/admin/plugins', 'admin_themes', 't');
+
 			// Toggle plugin status
 			$idx = array_search($plugin, $a->plugins);
 			if ($idx !== false){
@@ -597,7 +631,7 @@ function admin_page_plugins(&$a){
 			}
 			set_config("system","addon", implode(", ",$a->plugins));
 			goaway($a->get_baseurl(true) . '/admin/plugins' );
-			return; // NOTREACHED	
+			return ''; // NOTREACHED
 		}
 		// display plugin details
 		require_once('library/markdown.php');
@@ -641,7 +675,9 @@ function admin_page_plugins(&$a){
 			'$admin_form' => $admin_form,
 			'$function' => 'plugins',
 			'$screenshot' => '',
-			'$readme' => $readme
+			'$readme' => $readme,
+
+            '$form_security_token' => get_form_security_token("admin_themes"),
 		));
 	} 
 	 
@@ -670,10 +706,16 @@ function admin_page_plugins(&$a){
 		'$submit' => t('Submit'),
 		'$baseurl' => $a->get_baseurl(true),
 		'$function' => 'plugins',	
-		'$plugins' => $plugins
+		'$plugins' => $plugins,
+        '$form_security_token' => get_form_security_token("admin_themes"),
 	));
 }
 
+/**
+ * @param array $themes
+ * @param string $th
+ * @param int $result
+ */
 function toggle_theme(&$themes,$th,&$result) {
 	for($x = 0; $x < count($themes); $x ++) {
 		if($themes[$x]['name'] === $th) {
@@ -689,6 +731,11 @@ function toggle_theme(&$themes,$th,&$result) {
 	}
 }
 
+/**
+ * @param array $themes
+ * @param string $th
+ * @return int
+ */
 function theme_status($themes,$th) {
 	for($x = 0; $x < count($themes); $x ++) {
 		if($themes[$x]['name'] === $th) {
@@ -702,9 +749,12 @@ function theme_status($themes,$th) {
 	}
 	return 0;
 }
-	
 
 
+/**
+ * @param array $themes
+ * @return string
+ */
 function rebuild_theme_table($themes) {
 	$o = '';
 	if(count($themes)) {
@@ -720,10 +770,12 @@ function rebuild_theme_table($themes) {
 }
 
 	
-/*
+/**
  * Themes admin page
+ *
+ * @param App $a
+ * @return string
  */
-
 function admin_page_themes(&$a){
 	
 	$allowed_themes_str = get_config('system','allowed_themes');
@@ -740,7 +792,7 @@ function admin_page_themes(&$a){
         foreach($files as $file) {
             $f = basename($file);
             $is_experimental = intval(file_exists($file . '/experimental'));
-			$is_unsupported = 1-(intval(file_exists($file . '/unsupported')));
+			$is_supported = 1-(intval(file_exists($file . '/unsupported'))); // Is not used yet
 			$is_allowed = intval(in_array($f,$allowed_themes));
 			$themes[] = array('name' => $f, 'experimental' => $is_experimental, 'supported' => $is_supported, 'allowed' => $is_allowed);
         }
@@ -748,7 +800,7 @@ function admin_page_themes(&$a){
 
 	if(! count($themes)) {
 		notice( t('No themes found.'));
-		return;
+		return '';
 	}
 
 	/**
@@ -759,10 +811,11 @@ function admin_page_themes(&$a){
 		$theme = $a->argv[2];
 		if(! is_dir("view/theme/$theme")){
 			notice( t("Item not found.") );
-			return;
+			return '';
 		}
 		
 		if (x($_GET,"a") && $_GET['a']=="t"){
+            check_form_security_token_redirectOnErr('/admin/themes', 'admin_themes', 't');
 
 			// Toggle theme status
 
@@ -775,7 +828,7 @@ function admin_page_themes(&$a){
 
 			set_config('system','allowed_themes',$s);
 			goaway($a->get_baseurl(true) . '/admin/themes' );
-			return; // NOTREACHED	
+			return ''; // NOTREACHED
 		}
 
 		// display theme details
@@ -826,7 +879,9 @@ function admin_page_themes(&$a){
 			'$str_author' => t('Author: '),
 			'$str_maintainer' => t('Maintainer: '),
 			'$screenshot' => $screenshot,
-			'$readme' => $readme
+			'$readme' => $readme,
+
+			'$form_security_token' => get_form_security_token("admin_themes"),
 		));
 	} 
 	 
@@ -852,17 +907,21 @@ function admin_page_themes(&$a){
 		'$function' => 'themes',
 		'$plugins' => $xthemes,
 		'$experimental' => t('[Experimental]'),
-		'$unsupported' => t('[Unsupported]')
+		'$unsupported' => t('[Unsupported]'),
+        '$form_security_token' => get_form_security_token("admin_themes"),
 	));
 }
 
 
 /**
  * Logs admin page
+ *
+ * @param App $a
  */
  
 function admin_page_logs_post(&$a) {
 	if (x($_POST,"page_logs")) {
+        check_form_security_token_redirectOnErr('/admin/logs', 'admin_logs');
 
 		$logfile 		=	((x($_POST,'logfile'))		? notags(trim($_POST['logfile']))	: '');
 		$debugging		=	((x($_POST,'debugging'))	? true								: false);
@@ -879,7 +938,11 @@ function admin_page_logs_post(&$a) {
 	goaway($a->get_baseurl(true) . '/admin/logs' );
 	return; // NOTREACHED	
 }
- 
+
+/**
+ * @param App $a
+ * @return string
+ */
 function admin_page_logs(&$a){
 	
 	$log_choices = Array(
@@ -937,9 +1000,14 @@ readable.");
 		'$debugging' 		=> array('debugging', t("Debugging"),get_config('system','debugging'), ""),
 		'$logfile'			=> array('logfile', t("Log file"), get_config('system','logfile'), t("Must be writable by web server. Relative to your Friendica top-level directory.")),
 		'$loglevel' 		=> array('loglevel', t("Log level"), get_config('system','loglevel'), "", $log_choices),
+
+        '$form_security_token' => get_form_security_token("admin_logs"),
 	));
 }
 
+/**
+ * @param App $a
+ */
 function admin_page_remoteupdate_post(&$a) {
 	// this function should be called via ajax post
 	if(!is_site_admin()) {
@@ -958,6 +1026,10 @@ function admin_page_remoteupdate_post(&$a) {
 	killme();
 }
 
+/**
+ * @param App $a
+ * @return string
+ */
 function admin_page_remoteupdate(&$a) {
 	if(!is_site_admin()) {
 		return login(false);

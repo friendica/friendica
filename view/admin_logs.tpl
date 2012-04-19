@@ -2,6 +2,7 @@
 	<h1>$title - $page</h1>
 	
 	<form action="$baseurl/admin/logs" method="post">
+    <input type='hidden' name='form_security_token' value='$form_security_token'>
 
 	{{ inc field_checkbox.tpl with $field=$debugging }}{{ endinc }}
 	{{ inc field_input.tpl with $field=$logfile }}{{ endinc }}
