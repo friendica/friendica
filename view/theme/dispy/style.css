@@ -2277,8 +2277,7 @@ div[id$="wrapper"] br {
 .item-select {
     opacity: 0.1;
     filter:alpha(opacity=10);
-    float: right;
-    margin-right: 5px;
+    margin-right: 5px 0 0 6px !important;
 }
 .item-select:hover, .checkeditem {
     opacity: 1;
