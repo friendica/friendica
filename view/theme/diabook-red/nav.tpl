@@ -36,8 +36,6 @@
 				<span id="mail-update" class="nav-notify"></span></a>
 				<ul id="nav-messages-menu" class="menu-popup">
 					<li id="nav-messages-see-all"><a href="$nav.messages.0">$nav.messages.1</a></li>
-					<li id="nav-messages-see-all"><a href="$nav.messages.inbox.0">$nav.messages.inbox.1</a><span id="mail-update-li" class="nav-notify"></span></li>
-					<li id="nav-messages-see-all"><a href="$nav.messages.outbox.0">$nav.messages.outbox.1</a></li>
 					<li id="nav-messages-see-all"><a href="$nav.messages.new.0">$nav.messages.new.1</a></li>
 				</ul>
 			</li>		

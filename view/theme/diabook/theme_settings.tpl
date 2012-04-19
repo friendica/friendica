@@ -1,3 +1,5 @@
+{{inc field_select.tpl with $field=$color}}{{endinc}}
+
 {{inc field_select.tpl with $field=$font_size}}{{endinc}}
 
 {{inc field_select.tpl with $field=$line_height}}{{endinc}}

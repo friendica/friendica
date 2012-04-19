@@ -3,13 +3,13 @@
 /*
  * Name: Diabook
  * Description: Diabook: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
- * Version: (Version: 1.020)
+ * Version: (Version: 1.021)
  * Author: 
  */
 
 
 //print diabook-version for debugging
-$diabook_version = "Diabook (Version: 1.020)";
+$diabook_version = "Diabook (Version: 1.021)";
 $a->page['htmlhead'] .= sprintf('<script "%s" ></script>', $diabook_version);
 
 //change css on network and profilepages
@@ -17,6 +17,15 @@ $cssFile = null;
 $resolution=false;
 $resolution = get_pconfig(local_user(), "diabook", "resolution");
 if ($resolution===false) $resolution="normal";
+$color = false;
+$color = get_pconfig(local_user(), "diabook", "color");
+if ($color===false) $color="diabook";
+if ($color=="diabook") $color_path = "/";
+if ($color=="aerith") $color_path = "/diabook-aerith/";
+if ($color=="blue") $color_path = "/diabook-blue/";
+if ($color=="red") $color_path = "/diabook-red/";
+if ($color=="pink") $color_path = "/diabook-pink/";
+
 
 /**
  * prints last community activity
@@ -258,8 +267,8 @@ if ($a->argv[0] === "network" && local_user()){
 	diabook_community_info();
 
 	// CUSTOM CSS
-	if($resolution == "normal") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook/style-network.css";}
-	if($resolution == "wide") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook/style-network-wide.css";}
+	if($resolution == "normal") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook".$color_path."style-network.css";}
+	if($resolution == "wide") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook".$color_path."style-network-wide.css";}
 	}
 }
 
@@ -272,8 +281,8 @@ if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname']){
 	diabook_community_info();
 	
 	// CUSTOM CSS
-	if($resolution == "normal") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook/style-profile.css";}
-	if($resolution == "wide") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook/style-profile-wide.css";}
+	if($resolution == "normal") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook".$color_path."style-profile.css";}
+	if($resolution == "wide") {$cssFile = $a->get_baseurl($ssl_state)."/view/theme/diabook".$color_path."style-profile-wide.css";}
 	
 	}
 }
