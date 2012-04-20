@@ -1,12 +1,12 @@
 
-Dear $username,
-	Thank you for registering at $sitename. Your account has been created. 
+Dear $[username],
+	Thank you for registering at $[sitename]. Your account has been created. 
 The login details are as follows:
 
 
-Site Location:	$siteurl
-Login Name:	$email
-Password:	$password
+Site Location:	$[siteurl]
+Login Name:	$[email]
+Password:	$[password]
 
 You may change your password from your account "Settings" page after logging 
 in.
@@ -26,9 +26,9 @@ If you are new and do not know anybody here, they may help
 you to make some new and interesting friends.  
 
 
-Thank you and welcome to $sitename.
+Thank you and welcome to $[sitename].
 
 Sincerely,
-	$sitename Administrator
+	$[sitename] Administrator
 
  
