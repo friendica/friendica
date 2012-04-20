@@ -10,6 +10,9 @@
 		<?php if(x($page, 'header')) echo $page['header']; ?>
 	</header>
 	<article id="articlemain">
+		<header id="articleheader">
+			<?php if(x($page, 'articleheader')) echo $page['articleheader']; ?>
+		</header>
 		<?php if(x($page,'nav')) echo $page['nav']; ?>
 		<aside id="asideleft">
 			<?php if(x($page,'aside_left')) echo $page['aside_left']; ?>
@@ -17,7 +20,8 @@
 		</aside>
 		<section id="sectionmain">
 			<?php if(x($page,'content')) echo $page['content']; ?>
-			<footer id="section-footer"></footer>
+			<footer id="sectionfooter">
+			</footer>
 		</section>
 		<aside id="asidemain">
 			<?php if(x($page,'aside')) echo $page['aside']; ?>
@@ -27,6 +31,9 @@
 			<?php if(x($page,'aside_right')) echo $page['aside_right']; ?>
 			<?php if(x($page,'aside_right_bottom')) echo $page['aside_right_bottom']; ?>
 		</aside>
+		<footer id="articlefooter">
+			<?php if(x($page, 'articlefooter')) echo $page['articlefooter']; ?>
+		</footer>
 	</article>
 	<footer id="footer">
 		<?php if(x($page, 'footer')) echo $page['footer']; ?>

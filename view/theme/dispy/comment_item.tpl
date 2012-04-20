@@ -11,14 +11,49 @@
 					<a class="comment-edit-photo-link" href="$mylink" title="$mytitle"><img class="my-comment-photo" src="$myphoto" alt="$mytitle" title="$mytitle" /></a>
 				</div>
 				<div class="comment-edit-photo-end"></div>
-				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);" onBlur="commentClose(this,$id);" >$comment</textarea>
+				<ul class="comment-edit-bb-$id">
+					<li><a class="editicon boldbb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','b', $id);"></a></li>
+					<li><a class="editicon italicbb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','i', $id);"></a></li>
+					<li><a class="editicon underlinebb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','u', $id);"></a></li>
+					<li><a class="editicon quotebb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','quote', $id);"></a></li>
+					<li><a class="editicon codebb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','code', $id);"></a></li>
+					<li><a class="editicon imagebb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','img', $id);"></a></li>
+					<li><a class="editicon urlbb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','url', $id);"></a></li>
+					<li><a class="editicon videobb shadow"
+						style="cursor: pointer;"
+						onclick="insertFormatting('$comment','video', $id);"></a></li>
+				</ul>
+				<div class="comment-edit-bb-end"></div>
+				<textarea id="comment-edit-text-$id"
+					class="comment-edit-text-empty"
+					name="body"
+					onfocus="commentOpen(this,$id);tautogrow($id);cmtBbOpen($id);"
+					onblur="commentClose(this,$id);"
+					placeholder="Comment">$comment</textarea>
 				{{ if $qcomment }}
                 <div class="qcomment-wrapper">
-					<select id="qcomment-select-$id" name="qcomment-$id" class="qcomment" onchange="qCommentInsert(this,$id);">
+					<select id="qcomment-select-$id"
+						name="qcomment-$id"
+						class="qcomment"
+						onchange="qCommentInsert(this,$id);">
 					<option value=""></option>
-				{{ for $qcomment as $qc }}
+					{{ for $qcomment as $qc }}
 					<option value="$qc">$qc</option>
-				{{ endfor }}
+					{{ endfor }}
 					</select>
 				</div>
 				{{ endif }}

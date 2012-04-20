@@ -1,4 +1,4 @@
-<nav>
+<nav id="pagenav">
 
 <span id="banner">$banner</span>
 

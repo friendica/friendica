@@ -445,6 +445,8 @@ nav .nav-link {
 .icon, .hover, .focus, .pointer {
     cursor: pointer;
 }
+
+
 /* popup notifications */
 div.jGrowl div.notice {
     background: #511919 url("../../../images/icons/48/notice.png") no-repeat 5px center;
@@ -1132,6 +1134,7 @@ width: 100%;
     display: inline;
 }
 
+
 /**
  * tabs
  */
@@ -1459,13 +1462,23 @@ width: 100%;
 .comment-edit-wrapper {
     border-top: 1px #aaa solid;
 }
+[class^="comment-edit-bb"] {
+	list-style: none;
+	display: none;
+	margin: -40px 0 5px 60px;
+	width: 75%;
+}
+[class^="comment-edit-bb"] > li {
+	display: inline-block;
+	margin: 0 10px 0 0;
+	visibility: none;
+}
 .comment-wwedit-wrapper img,
 .comment-edit-wrapper img {
     width: 20px;
     height: 20px;
 }
 .comment-edit-photo-link, .comment-edit-photo {
-    float: left;
     margin-left: 10px;
 }
 .my-comment-photo {
@@ -1545,6 +1558,10 @@ div[id$="wrapper"] {
 div[id$="wrapper"] br {
     clear: left;
 }
+[id$="-end"], [class$="end"] {
+	clear: both;
+	margin: 0 0 10px 0;
+}
 #advanced-profile-with {
     margin-left: 200px;
 }
@@ -1605,9 +1622,6 @@ div[id$="wrapper"] br {
 #photo-photo {
     position: relative;
     float:left;
-}
-#photo-photo-end {
-    clear: both;
 }
 #photo-prev-link,
 #photo-next-link {
@@ -2705,6 +2719,71 @@ input[type="submit"]:active, input[type="button"]:active {
 .icon:hover {
     border: 0;
     text-decoration: none;
+}
+.editicon {
+    display: inline-block;
+    width: 21px;
+    height: 21px;
+    background: url(editicons.png) no-repeat;
+    border: 0;
+    text-decoration: none;
+}
+.shadow {
+	box-shadow: 2px 2px 5px 2px #111;
+}
+.shadow:active, .shadow:focus, .shadow:hover {
+	box-shadow: 0 0 0 0;
+}
+.editicon:hover {
+	border: 0;
+}
+.boldbb {
+	background-position: 0px 0px;
+}
+.boldbb:hover {
+	background-position: -22px 0px;
+}
+.italicbb {
+	background-position: 0px -22px;
+}
+.italicbb:hover {
+	background-position: -22px -22px;
+}
+.underlinebb {
+	background-position: 0px -44px;
+}
+.underlinebb:hover {
+	background-position: -22px -44px;
+}
+.quotebb {
+	background-position: 0px -66px;
+}
+.quotebb:hover {
+	background-position: -22px -66px;
+}
+.codebb {
+	background-position: 0px -88px;
+}
+.codebb:hover {
+	background-position: -22px -88px;
+}
+.imagebb {
+	background-position: -44px 0px;
+}
+.imagebb:hover {
+	background-position: -66px 0px;
+}
+.urlbb {
+	background-position: -44px -22px;
+}
+.urlbb:hover {
+	background-position: -66px -22px;
+}
+.videobb {
+	background-position: -44px -44px;
+}
+.videobb:hover {
+	background-position: -66px -44px;
 }
 .icon.drop,
 .icon.drophide, .icon.delete {
