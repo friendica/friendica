@@ -2547,6 +2547,8 @@ input[type="search"] {
 input[type="checkbox"], input[type="radio"] {
     border: 1px #999 solid;
     margin: 0 0 0 0;
+	height: 15px;
+	width: 15px;
 }
 input[type="submit"], input[type="button"] {
     background-color: #555753;
