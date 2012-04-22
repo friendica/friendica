@@ -134,6 +134,8 @@ function ping_init(&$a) {
 
 
 		function xmlize($href, $name, $url, $photo, $date, $seen, $message){
+			$data = array('href' => &$href, 'name' => &$name, 'url'=>&$url, 'photo'=>&$photo, 'date'=>&$date, 'seen'=>&$seen, 'messsage'=>&$message);
+			call_hooks('ping_xmlize', $data);
 			$notsxml = '<note href="%s" name="%s" url="%s" photo="%s" date="%s" seen="%s" >%s</note>';
 			return sprintf ( $notsxml,
 				xmlify($href), xmlify($name), xmlify($url), xmlify($photo), xmlify($date), xmlify($seen), xmlify($message)
