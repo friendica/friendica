@@ -5,17 +5,24 @@ require_once('Photo.php');
 function wall_upload_post(&$a) {
 
 	if($a->argc > 1) {
-		$nick = $a->argv[1];
-		$r = q("SELECT `user`.*, `contact`.`id` FROM `user` LEFT JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
-			dbesc($nick)
-		);
-		if(! count($r))
-			return;
+	        if(! x($_FILES,'media')) {
+		        $nick = $a->argv[1];
+		        $r = q("SELECT `user`.*, `contact`.`id` FROM `user` LEFT JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
+			        dbesc($nick)
+		        );
 
+		        if(! count($r))
+                                return;
+		}
+                else {
+			$user_info = api_get_user($a);
+		        $r = q("SELECT `user`.*, `contact`.`id` FROM `user` LEFT JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
+			        dbesc($user_info['screen_name'])
+		        );
+                }
 	}
 	else
 		return;
-
 
 
 	$can_post  = false;
@@ -47,12 +54,19 @@ function wall_upload_post(&$a) {
 		killme();
 	}
 
-	if(! x($_FILES,'userfile'))
+	if(! x($_FILES,'userfile') && ! x($_FILES,'media'))
 		killme();
 
-	$src      = $_FILES['userfile']['tmp_name'];
-	$filename = basename($_FILES['userfile']['name']);
-	$filesize = intval($_FILES['userfile']['size']);
+        if(x($_FILES,'userfile')) {
+	        $src      = $_FILES['userfile']['tmp_name'];
+	        $filename = basename($_FILES['userfile']['name']);
+	        $filesize = intval($_FILES['userfile']['size']);
+        }
+        elseif(x($_FILES,'media')) {
+	        $src = $_FILES['media']['tmp_name'];
+                $filename = basename($_FILES['media']['name']);
+	        $filesize = intval($_FILES['media']['size']);
+        }
 
 	$maximagesize = get_config('system','maximagesize');
 
