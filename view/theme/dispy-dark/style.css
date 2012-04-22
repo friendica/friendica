@@ -910,22 +910,20 @@ width: 100%;
     padding: 2px 20px 5px 0;
 }
 #profile-jot-text_parent {
-    /*border-radius: 10px;*/
     box-shadow: 5px 0 10px 0 #111;
 }
 #profile-jot-text_tbl {
     margin-bottom: 10px;
-    /*border-radius: 10px;*/
-    background: #888;
+    background: #777;
 }
 #profile-jot-text_ifr {
     width:99.900002% !important;
 }
 #profile-jot-text_toolbargroup {
-    background: #888;
+    background: #777;
 }
 .mceCenter table tr {
-    background: #888;
+    background: #777;
 }
 [id$="jot-text_ifr"] {
     width: 99.900002% !important;
@@ -936,14 +934,20 @@ width: 100%;
     color: #2e2f2e;
     background: #eec;
 }
-.mceFirst tr {
-    background: #888;
+.defaultSkin tr.mceFirst {
+    background: #777;
 }
-.mceFirst td {
-    /*border-radius: 10px 10px 0px 0px;*/
+.defaultSkin td.mceFirst {
+	background-color: #eec;
 }
-.mceLast td {
-    /*border-radius: 0 0 10px 10px;*/
+.defaultSkin td.mceLast {
+	background-color: #eec;
+}
+.defaultSkin span.mceIcon, .defaultSkin img.mceIcon {
+	background-color: #eec;
+}
+.defaultSkin .mceButtonDisabled .mceIcon {
+	background-color: #eec;
 }
 #profile-attach-wrapper,
 #profile-audio-wrapper,
