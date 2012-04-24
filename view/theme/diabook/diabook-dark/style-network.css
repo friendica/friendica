@@ -387,7 +387,7 @@
   margin-bottom: 1px;
   width: 484px;
   border-bottom: 1px solid #BDCDD4;
-  background-color: #fff;
+  background-color: #2e2e2f;
   padding: 8px;
 }
 
@@ -439,7 +439,7 @@ a:hover {
   clear: both;
 }
 .fakelink {
-  color: #1872A2;
+  color: #88a9d2;
   /* color: #3e3e8c; */
   text-decoration: none;
   cursor: pointer;
@@ -493,7 +493,7 @@ code {
   float: right;
 }
 .tool a {
-  color: ##3F8FBA;
+  color: #3465a4;
 }
 .tool a:hover {
   text-decoration: none;
@@ -1283,7 +1283,7 @@ transition: all 0.2s ease-in-out;
   padding-top: 10px;
 }
 .tread-wrapper a{
-  color: #1872A2;
+  color: #88a9d2;
 }
 
 .wall-item-decor {
