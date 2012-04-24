@@ -1174,11 +1174,7 @@ if(! function_exists('get_birthdays')) {
 			}
 			$classtoday = $istoday ? ' birthday-today ' : '';
 			if($total) {
-				$o .= '<div id="birthday-notice" class="birthday-notice fakelink' . $classtoday . '" onclick=openClose(\'birthday-wrapper\'); >' . t('Birthday Reminders') . ' ' . '(' . $total . ')' . '</div>';
-				$o .= '<div id="birthday-wrapper" style="display: none;" ><div id="birthday-title">' . t('Birthdays this week:') . '</div>';
-				$o .= '<div id="birthday-title-end"></div>';
-
-				foreach($r as $rr) {
+				foreach($r as &$rr) {
 					if(! strlen($rr['name']))
 						continue;
 
@@ -1196,15 +1192,24 @@ if(! function_exists('get_birthdays')) {
 						$url = $a->get_baseurl() . '/redir/'  . $rr['cid'];
 					}
 	
-					$o .= '<div class="birthday-list" id="birthday-' . $rr['eid'] . '"><a class="birthday-link$sparkle" target="redir" href="'
-					. $url . '">' . $rr['name'] . '</a> '
-					. day_translate(datetime_convert('UTC', $a->timezone, $rr['start'], $rr['adjust'] ? $bd_format : $bd_short)) . (($today) ?  ' ' . t('[today]') : '')
-					. '</div>' ;
+					$rr['link'] = $url;
+					$rr['title'] = $rr['name'];
+					$rr['date'] = day_translate(datetime_convert('UTC', $a->timezone, $rr['start'], $rr['adjust'] ? $bd_format : $bd_short)) . (($today) ?  ' ' . t('[today]') : '');
+					$rr['startime'] = Null;
+					$rr['today'] = $today;
+	
 				}
-				$o .= '</div></div>';
 			}
 		}
-		return $o;
+		$tpl = get_markup_template("birthdays_reminder.tpl");
+		return replace_macros($tpl, array(
+			'$baseurl' => $a->get_baseurl(),
+			'$classtoday' => $classtoday,
+			'$count' => $total,
+			'$event_reminders' => t('Birthday Reminders'),
+			'$event_title' => t('Birthdays this week:'),
+			'$events' => $r,
+		));
 	}
 }
 
@@ -1215,7 +1220,6 @@ if(! function_exists('get_events')) {
 		require_once('include/bbcode.php');
 
 		$a = get_app();
-		$o = '';
 
 		if(! local_user())
 			return $o;
@@ -1242,18 +1246,15 @@ if(! function_exists('get_events')) {
 				if($strt === datetime_convert('UTC',$a->timezone,'now','Y-m-d'))
 					$istoday = true;
 			}
-			$classtoday = (($istoday) ? ' event-today ' : '');
+			$classtoday = (($istoday) ? 'event-today' : '');
 
-			$o .= '<div id="event-notice" class="birthday-notice fakelink' . $classtoday . '" onclick=openClose(\'event-wrapper\'); >' . t('Event Reminders') . ' ' . '(' . count($r) . ')' . '</div>';
-			$o .= '<div id="event-wrapper" style="display: none;" ><div id="event-title">' . t('Events this week:') . '</div>';
-			$o .= '<div id="event-title-end"></div>';
 
-			foreach($r as $rr) {
-
+			foreach($r as &$rr) {
 				if($rr['adjust'])
-					$md = datetime_convert('UTC',$a->timezone,$rr['start'],'Y/m\#\l\i\n\k\-j');
+					$md = datetime_convert('UTC',$a->timezone,$rr['start'],'Y/m');
 				else
-					$md = datetime_convert('UTC','UTC',$rr['start'],'Y/m\#\l\i\n\k\-j');
+					$md = datetime_convert('UTC','UTC',$rr['start'],'Y/m');
+				$md .= "/#link-".$rr['id'];
 
 				$title = substr(strip_tags(bbcode($rr['desc'])),0,32) . '... ';
 				if(! $title)
@@ -1261,15 +1262,24 @@ if(! function_exists('get_events')) {
 
 				$strt = datetime_convert('UTC',$rr['convert'] ? $a->timezone : 'UTC',$rr['start']);
 				$today = ((substr($strt,0,10) === datetime_convert('UTC',$a->timezone,'now','Y-m-d')) ? true : false);
-
-				$o .= '<div class="event-list" id="event-' . $rr['eid'] . '"></a> <a href="events/' . $md . '">' . $title . '</a>'
-				. day_translate(datetime_convert('UTC', $rr['adjust'] ? $a->timezone : 'UTC', $rr['start'], $bd_format)) . (($today) ?  ' ' . t('[today]') : '')
-				. '</div>' ;
+				
+				$rr['link'] = $md;
+				$rr['title'] = $title;
+				$rr['date'] = day_translate(datetime_convert('UTC', $rr['adjust'] ? $a->timezone : 'UTC', $rr['start'], $bd_format)) . (($today) ?  ' ' . t('[today]') : '');
+				$rr['startime'] = $strt;
+				$rr['today'] = $today;
 			}
-			$o .= '</div></div>';
 		}
 
-		return $o;
+		$tpl = get_markup_template("events_reminder.tpl");
+		return replace_macros($tpl, array(
+			'$baseurl' => $a->get_baseurl(),
+			'$classtoday' => $classtoday,
+			'$count' => count($r),
+			'$event_reminders' => t('Event Reminders'),
+			'$event_title' => t('Events this week:'),
+			'$events' => $r,
+		));
 	}
 }
 
