@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: http://bugs.friendica.com/\n"
-"POT-Creation-Date: 2012-04-22 10:00-0700\n"
-"PO-Revision-Date: 2012-04-23 19:27+0000\n"
+"POT-Creation-Date: 2012-04-23 10:00-0700\n"
+"PO-Revision-Date: 2012-04-25 06:35+0000\n"
 "Last-Translator: Martin Schmitt <mas@scsy.de>\n"
 "Language-Team: Esperanto (http://www.transifex.net/projects/p/friendica/language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -52,7 +52,7 @@ msgstr "Ĝisdatigo de kontakto malsukcesis."
 #: ../../mod/profile_photo.php:139 ../../mod/profile_photo.php:150
 #: ../../mod/profile_photo.php:163 ../../mod/message.php:38
 #: ../../mod/message.php:90 ../../mod/allfriends.php:9
-#: ../../mod/nogroup.php:25 ../../mod/wall_upload.php:46
+#: ../../mod/nogroup.php:25 ../../mod/wall_upload.php:53
 #: ../../mod/follow.php:8 ../../mod/common.php:9 ../../mod/display.php:138
 #: ../../mod/profiles.php:7 ../../mod/profiles.php:329
 #: ../../mod/delegate.php:6 ../../mod/suggest.php:28 ../../mod/invite.php:13
@@ -292,7 +292,7 @@ msgid "Share this event"
 msgstr "Kunhavigi la okazon"
 
 #: ../../mod/tagrm.php:11 ../../mod/tagrm.php:94
-#: ../../mod/dfrn_request.php:752 ../../mod/settings.php:533
+#: ../../mod/dfrn_request.php:800 ../../mod/settings.php:533
 #: ../../mod/settings.php:559 ../../addon/js_upload/js_upload.php:45
 msgid "Cancel"
 msgstr "Nuligi"
@@ -336,7 +336,7 @@ msgid ""
 " and/or create new posts for you?"
 msgstr "Ĉu rajtigi ĉi tiun programon por atingi viajn afiŝojn kaj kontaktojn kaj/aŭ krei novajn afiŝojn?"
 
-#: ../../mod/api.php:105 ../../mod/dfrn_request.php:740
+#: ../../mod/api.php:105 ../../mod/dfrn_request.php:788
 #: ../../mod/settings.php:844 ../../mod/settings.php:850
 #: ../../mod/settings.php:858 ../../mod/settings.php:862
 #: ../../mod/settings.php:867 ../../mod/settings.php:873
@@ -347,7 +347,7 @@ msgstr "Ĉu rajtigi ĉi tiun programon por atingi viajn afiŝojn kaj kontaktojn 
 msgid "Yes"
 msgstr "Jes"
 
-#: ../../mod/api.php:106 ../../mod/dfrn_request.php:741
+#: ../../mod/api.php:106 ../../mod/dfrn_request.php:789
 #: ../../mod/settings.php:844 ../../mod/settings.php:850
 #: ../../mod/settings.php:858 ../../mod/settings.php:862
 #: ../../mod/settings.php:867 ../../mod/settings.php:873
@@ -447,17 +447,17 @@ msgid "Image file is empty."
 msgstr "Bilddosiero estas malplena."
 
 #: ../../mod/photos.php:653 ../../mod/profile_photo.php:124
-#: ../../mod/wall_upload.php:69
+#: ../../mod/wall_upload.php:83
 msgid "Unable to process image."
 msgstr "Ne eblas procedi la bildon."
 
 #: ../../mod/photos.php:673 ../../mod/profile_photo.php:257
-#: ../../mod/wall_upload.php:88
+#: ../../mod/wall_upload.php:102
 msgid "Image upload failed."
 msgstr "Alŝuto de bildo malsukcesis."
 
 #: ../../mod/photos.php:759 ../../mod/community.php:16
-#: ../../mod/dfrn_request.php:671 ../../mod/viewcontacts.php:17
+#: ../../mod/dfrn_request.php:719 ../../mod/viewcontacts.php:17
 #: ../../mod/display.php:7 ../../mod/search.php:71 ../../mod/directory.php:29
 msgid "Public access denied."
 msgstr "Publika atingo ne permesita."
@@ -733,19 +733,19 @@ msgstr "Ekzemple: bob@example.com, mary@example.com"
 msgid "This introduction has already been accepted."
 msgstr "Tia prezento jam estas akceptita"
 
-#: ../../mod/dfrn_request.php:117 ../../mod/dfrn_request.php:427
+#: ../../mod/dfrn_request.php:117 ../../mod/dfrn_request.php:475
 msgid "Profile location is not valid or does not contain profile information."
 msgstr "La adreso de la profilo ne validas aŭ ne enhavas profilinformojn."
 
-#: ../../mod/dfrn_request.php:122 ../../mod/dfrn_request.php:432
+#: ../../mod/dfrn_request.php:122 ../../mod/dfrn_request.php:480
 msgid "Warning: profile location has no identifiable owner name."
 msgstr "Averto: La adreso de la profilo ne enhavas identeblan personan nomon."
 
-#: ../../mod/dfrn_request.php:124 ../../mod/dfrn_request.php:434
+#: ../../mod/dfrn_request.php:124 ../../mod/dfrn_request.php:482
 msgid "Warning: profile location has no profile photo."
 msgstr "Averto: La adreso de la profilo ne enhavas bildon."
 
-#: ../../mod/dfrn_request.php:127 ../../mod/dfrn_request.php:437
+#: ../../mod/dfrn_request.php:127 ../../mod/dfrn_request.php:485
 #, php-format
 msgid "%d required parameter was not found at the given location"
 msgid_plural "%d required parameters were not found at the given location"
@@ -789,128 +789,128 @@ msgstr "Nevalida repoŝtadreso."
 msgid "This account has not been configured for email. Request failed."
 msgstr "La konto ne estas agordita por retpoŝto. La peto malsukcesis."
 
-#: ../../mod/dfrn_request.php:372
+#: ../../mod/dfrn_request.php:420
 msgid "Unable to resolve your name at the provided location."
 msgstr "Via nomo ne troveblas al la donita adreso."
 
-#: ../../mod/dfrn_request.php:385
+#: ../../mod/dfrn_request.php:433
 msgid "You have already introduced yourself here."
 msgstr "Vi vin jam prezentis tie."
 
-#: ../../mod/dfrn_request.php:389
+#: ../../mod/dfrn_request.php:437
 #, php-format
 msgid "Apparently you are already friends with %s."
 msgstr "Ŝajnas kvazaŭ vi jam amikiĝis kun %s."
 
-#: ../../mod/dfrn_request.php:410
+#: ../../mod/dfrn_request.php:458
 msgid "Invalid profile URL."
 msgstr "Nevalida adreso de profilo."
 
-#: ../../mod/dfrn_request.php:416 ../../mod/follow.php:20
+#: ../../mod/dfrn_request.php:464 ../../mod/follow.php:20
 msgid "Disallowed profile URL."
 msgstr "Malpermesita adreso de profilo."
 
-#: ../../mod/dfrn_request.php:485 ../../mod/contacts.php:102
+#: ../../mod/dfrn_request.php:533 ../../mod/contacts.php:102
 msgid "Failed to update contact record."
 msgstr "Ĝisdatigo de via kontaktrikordo malsukcesis."
 
-#: ../../mod/dfrn_request.php:506
+#: ../../mod/dfrn_request.php:554
 msgid "Your introduction has been sent."
 msgstr "Via prezento estas sendita."
 
-#: ../../mod/dfrn_request.php:559
+#: ../../mod/dfrn_request.php:607
 msgid "Please login to confirm introduction."
 msgstr "Bonvolu ensaluti por jesigi la prezenton."
 
-#: ../../mod/dfrn_request.php:573
+#: ../../mod/dfrn_request.php:621
 msgid ""
 "Incorrect identity currently logged in. Please login to "
 "<strong>this</strong> profile."
 msgstr "Malĝusta identaĵo ensalutata. Bonvolu ensaluti en <strong>tiun</strong> profilon."
 
-#: ../../mod/dfrn_request.php:585
+#: ../../mod/dfrn_request.php:633
 #, php-format
 msgid "Welcome home %s."
 msgstr "Bonvenon hejme, %s."
 
-#: ../../mod/dfrn_request.php:586
+#: ../../mod/dfrn_request.php:634
 #, php-format
 msgid "Please confirm your introduction/connection request to %s."
 msgstr "Bonvolu konfirmi vian prezenton / kontaktpeton al %s."
 
-#: ../../mod/dfrn_request.php:587
+#: ../../mod/dfrn_request.php:635
 msgid "Confirm"
 msgstr "Konfirmi."
 
-#: ../../mod/dfrn_request.php:628 ../../include/items.php:2691
+#: ../../mod/dfrn_request.php:676 ../../include/items.php:2691
 msgid "[Name Withheld]"
 msgstr "[Kaŝita nomo]"
 
-#: ../../mod/dfrn_request.php:715
+#: ../../mod/dfrn_request.php:763
 msgid ""
 "Please enter your 'Identity Address' from one of the following supported "
 "communications networks:"
 msgstr "Bonvolu entajpi vian 'Identecan Adreson' de iu de tiuj subtenataj komunikaj retejoj: "
 
-#: ../../mod/dfrn_request.php:731
+#: ../../mod/dfrn_request.php:779
 msgid "<strike>Connect as an email follower</strike> (Coming soon)"
 msgstr "<strike>Konektu kiel retpoŝta sekvanto</strike> (Baldaŭ venos)"
 
-#: ../../mod/dfrn_request.php:733
+#: ../../mod/dfrn_request.php:781
 msgid ""
 "If you are not yet a member of the free social web, <a "
 "href=\"http://dir.friendica.com/siteinfo\">follow this link to find a public"
 " Friendica site and join us today</a>."
 msgstr "Se vi ne estas membro de la libra interkona reto, <a href=\"http://dir.friendica.com/siteinfo\">sekvu ĉi-ligilon por trovi publikan Friendica retejon kaj aliĝi kun ni hodiaŭ</a>."
 
-#: ../../mod/dfrn_request.php:736
+#: ../../mod/dfrn_request.php:784
 msgid "Friend/Connection Request"
 msgstr "Prezento / Konektpeto"
 
-#: ../../mod/dfrn_request.php:737
+#: ../../mod/dfrn_request.php:785
 msgid ""
 "Examples: jojo@demo.friendica.com, http://demo.friendica.com/profile/jojo, "
 "testuser@identi.ca"
 msgstr "Ekzemploj: jojo@demo.friendica.com, http://demo.friendica.com/profile/jojo, testuser@identi.ca"
 
-#: ../../mod/dfrn_request.php:738
+#: ../../mod/dfrn_request.php:786
 msgid "Please answer the following:"
 msgstr "Bonvolu respondi:"
 
-#: ../../mod/dfrn_request.php:739
+#: ../../mod/dfrn_request.php:787
 #, php-format
 msgid "Does %s know you?"
 msgstr "Ĉu %s konas vin?"
 
-#: ../../mod/dfrn_request.php:742
+#: ../../mod/dfrn_request.php:790
 msgid "Add a personal note:"
 msgstr "Aldoni personan noton:"
 
-#: ../../mod/dfrn_request.php:744 ../../include/contact_selectors.php:76
+#: ../../mod/dfrn_request.php:792 ../../include/contact_selectors.php:76
 msgid "Friendica"
 msgstr "Friendica"
 
-#: ../../mod/dfrn_request.php:745
+#: ../../mod/dfrn_request.php:793
 msgid "StatusNet/Federated Social Web"
 msgstr "StatusNet/Federaciaj interkonaj retejoj"
 
-#: ../../mod/dfrn_request.php:746 ../../mod/settings.php:629
+#: ../../mod/dfrn_request.php:794 ../../mod/settings.php:629
 #: ../../include/contact_selectors.php:80
 msgid "Diaspora"
 msgstr "Diaspora"
 
-#: ../../mod/dfrn_request.php:747
+#: ../../mod/dfrn_request.php:795
 #, php-format
 msgid ""
 " - please do not use this form.  Instead, enter %s into your Diaspora search"
 " bar."
 msgstr " - bonvolu ne uzi ĉi formo.  Anstataŭe, entajpu %s en la Diaspora serĉilo."
 
-#: ../../mod/dfrn_request.php:748
+#: ../../mod/dfrn_request.php:796
 msgid "Your Identity Address:"
 msgstr "Via identeca adreso:"
 
-#: ../../mod/dfrn_request.php:751
+#: ../../mod/dfrn_request.php:799
 msgid "Submit Request"
 msgstr "Sendi peton"
 
@@ -1680,7 +1680,7 @@ msgstr "Pasvorta riparado petita je %s"
 #: ../../mod/register.php:388 ../../mod/register.php:442
 #: ../../mod/regmod.php:54 ../../mod/dfrn_confirm.php:732
 #: ../../addon/facebook/facebook.php:650
-#: ../../addon/facebook/facebook.php:1136
+#: ../../addon/facebook/facebook.php:1139
 #: ../../addon/testdrive/testdrive.php:58 ../../include/items.php:2700
 msgid "Administrator"
 msgstr "Administranto"
@@ -2315,7 +2315,9 @@ msgid "Personal Notes"
 msgstr "Personaj Notoj"
 
 #: ../../mod/notes.php:63 ../../mod/filer.php:30
-#: ../../addon/facebook/facebook.php:715 ../../include/text.php:652
+#: ../../addon/facebook/facebook.php:717
+#: ../../addon/privacy_image_cache/privacy_image_cache.php:147
+#: ../../include/text.php:652
 msgid "Save"
 msgstr "Konservi"
 
@@ -2747,7 +2749,7 @@ msgid "People Search"
 msgstr "Serĉi Membrojn"
 
 #: ../../mod/like.php:127 ../../mod/tagger.php:70
-#: ../../addon/facebook/facebook.php:1655
+#: ../../addon/facebook/facebook.php:1533
 #: ../../addon/communityhome/communityhome.php:158
 #: ../../addon/communityhome/communityhome.php:167
 #: ../../view/theme/diabook/diabook-green/theme.php:83
@@ -2770,7 +2772,7 @@ msgstr "Serĉi Membrojn"
 msgid "status"
 msgstr "staton"
 
-#: ../../mod/like.php:144 ../../addon/facebook/facebook.php:1659
+#: ../../mod/like.php:144 ../../addon/facebook/facebook.php:1537
 #: ../../addon/communityhome/communityhome.php:172
 #: ../../view/theme/diabook/diabook-green/theme.php:97
 #: ../../view/theme/diabook/diabook-red/theme.php:96
@@ -2836,8 +2838,8 @@ msgstr "Ne eblas trovi originalan afiŝon."
 msgid "Empty post discarded."
 msgstr "Forviŝis malplenan afiŝon."
 
-#: ../../mod/item.php:372 ../../mod/wall_upload.php:85
-#: ../../mod/wall_upload.php:94 ../../mod/wall_upload.php:101
+#: ../../mod/item.php:372 ../../mod/wall_upload.php:99
+#: ../../mod/wall_upload.php:108 ../../mod/wall_upload.php:115
 #: ../../include/message.php:144
 msgid "Wall Photos"
 msgstr "Muraj Bildoj"
@@ -2889,7 +2891,7 @@ msgstr "Reŝarĝu la paĝon au malplenigu la kaŝmemoro de la retesplorilo se la
 msgid "Unable to process image"
 msgstr "Ne eblas procezi bildon."
 
-#: ../../mod/profile_photo.php:115 ../../mod/wall_upload.php:60
+#: ../../mod/profile_photo.php:115 ../../mod/wall_upload.php:74
 #, php-format
 msgid "Image exceeds size limit of %d"
 msgstr "Bildo estas pli granda ol la limito %d"
@@ -3515,48 +3517,48 @@ msgstr "Atingo al ĉi tio profilo estas limitigita"
 msgid "Tips for New Members"
 msgstr "Konsilo por novaj membroj"
 
-#: ../../mod/ping.php:175
+#: ../../mod/ping.php:177
 msgid "{0} wants to be your friend"
 msgstr "{0} volas amikiĝi kun vi"
 
-#: ../../mod/ping.php:180
+#: ../../mod/ping.php:182
 msgid "{0} sent you a message"
 msgstr "{0} sendis mesaĝon al vi"
 
-#: ../../mod/ping.php:185
+#: ../../mod/ping.php:187
 msgid "{0} requested registration"
 msgstr "{0} petis registradon"
 
-#: ../../mod/ping.php:191
+#: ../../mod/ping.php:193
 #, php-format
 msgid "{0} commented %s's post"
 msgstr "{0} komentis pri la afiŝo de %s"
 
-#: ../../mod/ping.php:196
+#: ../../mod/ping.php:198
 #, php-format
 msgid "{0} liked %s's post"
 msgstr "{0} satis la afiŝon de %s"
 
-#: ../../mod/ping.php:201
+#: ../../mod/ping.php:203
 #, php-format
 msgid "{0} disliked %s's post"
 msgstr "{0} malŝatis la afiŝon de %s"
 
-#: ../../mod/ping.php:206
+#: ../../mod/ping.php:208
 #, php-format
 msgid "{0} is now friends with %s"
 msgstr "{0} amikiĝis kun %s"
 
-#: ../../mod/ping.php:211
+#: ../../mod/ping.php:213
 msgid "{0} posted"
 msgstr "{0} afiŝis"
 
-#: ../../mod/ping.php:216
+#: ../../mod/ping.php:218
 #, php-format
 msgid "{0} tagged %s's post with #%s"
 msgstr "{0} markis la afiŝon de %s kun #%s"
 
-#: ../../mod/ping.php:222
+#: ../../mod/ping.php:224
 msgid "{0} mentioned you in a post"
 msgstr "{0} menciis vin en afiŝo"
 
@@ -4268,99 +4270,125 @@ msgstr "Agordoj por la Facebook konektilo"
 msgid "Facebook API Key"
 msgstr "Facebook API ŝlosilo"
 
-#: ../../addon/facebook/facebook.php:700
+#: ../../addon/facebook/facebook.php:701
 msgid ""
 "Error: it appears that you have specified the App-ID and -Secret in your "
 ".htconfig.php file. As long as they are specified there, they cannot be set "
 "using this form.<br><br>"
 msgstr "Eraro: Ŝajnas kvazaŭ vi agordis la App-ID kaj la sekreton en via .htconfig.php dosiero. Kiam ili estas agordita tie, vi ne povas agordi ĝin tra tiu ĉi formo.<br><br>"
 
-#: ../../addon/facebook/facebook.php:705
+#: ../../addon/facebook/facebook.php:706
 msgid ""
 "Error: the given API Key seems to be incorrect (the application access token"
 " could not be retrieved)."
 msgstr "Eraro: La API ŝlosilo aspektas malĝusta (ne eblas ricevi la programa atingoĵetono)."
 
-#: ../../addon/facebook/facebook.php:707
+#: ../../addon/facebook/facebook.php:708
 msgid "The given API Key seems to work correctly."
 msgstr "La API ŝlosilo ŝajne ĝuste funkcias."
 
-#: ../../addon/facebook/facebook.php:709
+#: ../../addon/facebook/facebook.php:710
 msgid ""
 "The correctness of the API Key could not be detected. Somthing strange's "
 "going on."
 msgstr "Ne povis kontroli la ĝustecon de la API ŝlosilo. Ia stranga afero okazas. "
 
-#: ../../addon/facebook/facebook.php:712
+#: ../../addon/facebook/facebook.php:713
 msgid "App-ID / API-Key"
 msgstr "Programo ID / API Ŝlosilo"
 
-#: ../../addon/facebook/facebook.php:713
+#: ../../addon/facebook/facebook.php:714
 msgid "Application secret"
 msgstr "Programo sekreto"
 
-#: ../../addon/facebook/facebook.php:714
+#: ../../addon/facebook/facebook.php:715
 #, php-format
 msgid "Polling Interval (min. %1$s minutes)"
 msgstr "Intervalo por la enketilo (poller intervalo, minimume %1$s mintuoj) "
 
-#: ../../addon/facebook/facebook.php:718
+#: ../../addon/facebook/facebook.php:716
+msgid ""
+"Synchronize comments (no comments on Facebook are missed, at the cost of "
+"increased system load)"
+msgstr "Sinkronigi komentojn (vi ricevas ĉiujn komentojn de Facebook, sed la ŝargo de la sistemo iom kreskas)"
+
+#: ../../addon/facebook/facebook.php:720
 msgid "Real-Time Updates"
 msgstr "Realtempaj Ĝisdatigoj"
 
-#: ../../addon/facebook/facebook.php:722
+#: ../../addon/facebook/facebook.php:724
 msgid "Real-Time Updates are activated."
 msgstr "Realtempaj Ĝisdatigoj estas ŝaltita"
 
-#: ../../addon/facebook/facebook.php:723
+#: ../../addon/facebook/facebook.php:725
 msgid "Deactivate Real-Time Updates"
 msgstr "Malŝalti Realtempaj Ĝisdatigoj"
 
-#: ../../addon/facebook/facebook.php:725
+#: ../../addon/facebook/facebook.php:727
 msgid "Real-Time Updates not activated."
 msgstr "Realtempaj Ĝisdatigoj estas malŝaltita"
 
-#: ../../addon/facebook/facebook.php:725
+#: ../../addon/facebook/facebook.php:727
 msgid "Activate Real-Time Updates"
 msgstr "Ŝalti Realtempaj Ĝisdatigoj"
 
-#: ../../addon/facebook/facebook.php:743
+#: ../../addon/facebook/facebook.php:746
 msgid "The new values have been saved."
 msgstr "Konservis novajn valorojn."
 
-#: ../../addon/facebook/facebook.php:767
+#: ../../addon/facebook/facebook.php:770
 msgid "Post to Facebook"
 msgstr "Afiŝi al Facebook"
 
-#: ../../addon/facebook/facebook.php:865
+#: ../../addon/facebook/facebook.php:868
 msgid ""
 "Post to Facebook cancelled because of multi-network access permission "
 "conflict."
 msgstr "Afiŝado al Facebook nuligita ĉar okazis konflikto en la multretpermesoj."
 
-#: ../../addon/facebook/facebook.php:1085
+#: ../../addon/facebook/facebook.php:1088
 msgid "View on Friendica"
 msgstr "Vidi ĉe Friendica"
 
-#: ../../addon/facebook/facebook.php:1118
+#: ../../addon/facebook/facebook.php:1121
 msgid "Facebook post failed. Queued for retry."
 msgstr "Malsukcesis afiŝi ĉe Facebook. Enigita en vico."
 
-#: ../../addon/facebook/facebook.php:1158
+#: ../../addon/facebook/facebook.php:1161
 msgid "Your Facebook connection became invalid. Please Re-authenticate."
 msgstr "Via Facbook konekto iĝis nevalida. Bonvolu reaŭtentiĝi."
 
-#: ../../addon/facebook/facebook.php:1159
+#: ../../addon/facebook/facebook.php:1162
 msgid "Facebook connection became invalid"
 msgstr "Facebook konekto iĝis nevalida."
 
-#: ../../addon/facebook/facebook.php:1160
+#: ../../addon/facebook/facebook.php:1163
 #, php-format
 msgid ""
 "Hi %1$s,\n"
 "\n"
 "The connection between your accounts on %2$s and Facebook became invalid. This usually happens after you change your Facebook-password. To enable the connection again, you have to %3$sre-authenticate the Facebook-connector%4$s."
 msgstr "Saluton %1$s,\n\nla kontekto inter viaj kontoj ĉe %2$s kaj Facebook malvalidiĝis. Tio kutime okazas post kiam via ŝangas vian pasvorton ĉe Facebook. Por reaktivigi la konekto, vi bezonas %3$sreaŭtentiĝi la Facebook konektilon%4$s."
+
+#: ../../addon/privacy_image_cache/privacy_image_cache.php:144
+msgid "Lifetime of the cache (in hours)"
+msgstr "Vivodaŭro de kaŝmemoro (horoj)"
+
+#: ../../addon/privacy_image_cache/privacy_image_cache.php:149
+msgid "Cache Statistics"
+msgstr "Statistikoj pri kaŝmemoro"
+
+#: ../../addon/privacy_image_cache/privacy_image_cache.php:152
+msgid "Number of items"
+msgstr "Kvanto da eroj"
+
+#: ../../addon/privacy_image_cache/privacy_image_cache.php:154
+msgid "Size of the cache"
+msgstr "Grando de la kaŝmemoro"
+
+#: ../../addon/privacy_image_cache/privacy_image_cache.php:156
+msgid "Delete the whole cache"
+msgstr "Forviŝi la kaŝmemoron"
 
 #: ../../addon/widgets/widget_like.php:58
 #, php-format
@@ -6541,7 +6569,7 @@ msgstr "De: "
 msgid "$1 wrote:"
 msgstr "$1 skribis:"
 
-#: ../../include/bbcode.php:238 ../../include/bbcode.php:304
+#: ../../include/bbcode.php:238 ../../include/bbcode.php:307
 msgid "Image/photo"
 msgstr "Bildo"
 
