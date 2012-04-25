@@ -2937,6 +2937,79 @@ aside input[type='text'] {
 }
 
 .icon.dim { opacity: 0.3;filter:alpha(opacity=30); }
+[class^="comment-edit-bb"] {
+	list-style: none;
+	display: none;
+	margin: 0px 0 -5px 60px;
+	width: 75%;
+}
+[class^="comment-edit-bb"] > li {
+	display: inline-block;
+	margin: 10px 10px 0 0;
+	visibility: none;
+}
+[class^="comment-edit-bb-end"] {
+	clear: both;
+}
+.editicon {
+    display: inline-block;
+    width: 21px;
+    height: 21px;
+    background: url(editicons.png) no-repeat;
+    border: 0;
+    text-decoration: none;
+}
+.editicon:hover {
+	border: 0;
+}
+.boldbb {
+	background-position: 0px 0px;
+}
+.boldbb:hover {
+	background-position: -22px 0px;
+}
+.italicbb {
+	background-position: 0px -22px;
+}
+.italicbb:hover {
+	background-position: -22px -22px;
+}
+.underlinebb {
+	background-position: 0px -44px;
+}
+.underlinebb:hover {
+	background-position: -22px -44px;
+}
+.quotebb {
+	background-position: 0px -66px;
+}
+.quotebb:hover {
+	background-position: -22px -66px;
+}
+.codebb {
+	background-position: 0px -88px;
+}
+.codebb:hover {
+	background-position: -22px -88px;
+}
+.imagebb {
+	background-position: -44px 0px;
+}
+.imagebb:hover {
+	background-position: -66px 0px;
+}
+.urlbb {
+	background-position: -44px -22px;
+}
+.urlbb:hover {
+	background-position: -66px -22px;
+}
+.videobb {
+	background-position: -44px -44px;
+}
+.videobb:hover {
+	background-position: -66px -44px;
+}
 
 .attachtype {
 	display: block; width: 20px; height: 23px;
