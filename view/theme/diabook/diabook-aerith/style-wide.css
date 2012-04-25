@@ -1243,7 +1243,14 @@ aside #likes a:hover{
   margin-right: 20px;		
 	}
 #login-submit-wrapper{
-margin-bottom: 15px;
+  padding-top: 120px;
+  margin-bottom: 12px;
+	}
+aside #login-submit-button{
+  margin-left: 0px!important;	
+	}
+aside #login-extra-links{
+  padding-top: 0px!important;	
 	}
 .group_selected {
   background: url("../../../view/theme/diabook/icons/selected.png") no-repeat left center;
