@@ -134,7 +134,8 @@ nav #banner #logo-text a:hover { text-decoration: none; }
     height: 15px;
 	margin-top: 67px;
 	margin-right: 2px;
-	padding: 6px 10px;
+	//padding: 6px 10px;
+       padding: 6px 3px;
 	float: left;
 	bottom: 140px;
 	border: 1px solid #babdb6;
@@ -232,10 +233,12 @@ section {
 	display:block;
 	float:left;
 	padding: 0.4em;
-	margin-right: 1em;
+	//margin-right: 1em;
+	margin-right: 3px ;
 }
 .tab.active {
 	font-weight: bold;
+	
 }
 
 
