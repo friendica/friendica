@@ -14,12 +14,17 @@ $a->page['htmlhead'] .= sprintf('<script "%s" ></script>', $diabook_version);
 
 //change css on network and profilepages
 $cssFile = null;
+
 $resolution=false;
 $resolution = get_pconfig(local_user(), "diabook", "resolution");
 if ($resolution===false) $resolution="normal";
+
 $color = false;
-$color = get_pconfig(local_user(), "diabook", "color");
+$site_color = get_config("diabook", "color" );
+if (local_user()) {$color = get_pconfig(local_user(), "diabook", "color");}
+if ($color===false) $color=$site_color;
 if ($color===false) $color="diabook";
+
 if ($color=="diabook") $color_path = "/";
 if ($color=="aerith") $color_path = "/diabook-aerith/";
 if ($color=="blue") $color_path = "/diabook-blue/";

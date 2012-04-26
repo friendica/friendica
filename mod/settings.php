@@ -75,6 +75,11 @@ EOT;
 			'label' => t('Export personal data'),
 			'url' => $a->get_baseurl(true) . '/uexport',
 			'selected' => ''
+		),
+		array(
+			'label' => t('Remove account'),
+			'url' => $a->get_baseurl(true) . '/removeme',
+			'selected' => ''
 		)
 	);
 	
