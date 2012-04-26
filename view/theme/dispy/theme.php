@@ -2,22 +2,38 @@
 
 /*
  * Name: Dispy
- * Description: Dispy, Friendica theme
- * Version: 1.1
- * Author: unknown
+ * Description: <p style="white-space:pre;">            Dispy: Light, Spartan, Sleek, and Functional<br />            Dispy Dark: Dark, Spartan, Sleek, and Functional</p>
+ * Version: 1.2
+ * Author: Simon <http://simon.kisikew.org/>
  * Maintainer: Simon <http://simon.kisikew.org/>
  * Screenshot: <a href="screenshot.jpg">Screenshot</a>
  */
 
 $a = get_app();
 $a->theme_info = array(
-	'name' => 'dispy',
-	'version' => '1.1'
+    'family' => 'dispy',
+	'version' => '1.2'
 );
 
 function dispy_init(&$a) {
 
-	// aside on profile page
+    /** @purpose set some theme defaults
+    */
+    $cssFile = null;
+    $colour = false;
+    $colour = get_pconfig(local_user(), "dispy", "colour");
+    if ($colour === false) { $colour = "light"; }
+    if ($colour == "light") {
+		$colour_path = "/light/";
+		require_once ('light/theme.php');
+	}
+    if ($colour == "dark") {
+		$colour_path = "/dark/";
+		require_once ('dark/theme.php');
+	}
+
+    /** @purpose aside on profile page
+    */
 	if (($a->argv[0] . $a->argv[1]) === ("profile" . $a->user['nickname'])) {
 		dispy_community_info();
 	}
@@ -139,10 +155,17 @@ function dispy_init(&$a) {
 	</script>
 EOT;
 
+    // custom css
+    if (!is_null($cssFile)) {
+        $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
+    }
+
 	js_in_foot();
 }
 
 function dispy_community_info() {
+    /** @purpose some sidebar stuff for new users
+    */
 	$a = get_app();
 	$url = $a->get_baseurl($ssl_state);
 	$aside['$url'] = $url;
