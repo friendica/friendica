@@ -2,15 +2,15 @@
     $line_height = false;
     $dispy_font_size = false;
     $resolution = false;
-    $color = false;
+    $colour = false;
     $site_line_height = get_config("dispy","line_height");
     $site_dispy_font_size = get_config("dispy", "font_size" );
-    $site_color = get_config("dispy", "colour" );
+    $site_colour = get_config("dispy", "colour" );
 
     if (local_user()) {
         $line_height = get_pconfig(local_user(), "dispy","line_height");
         $dispy_font_size = get_pconfig(local_user(), "dispy", "font_size");
-        $color = get_pconfig(local_user(), "dispy", "colour");
+        $colour = get_pconfig(local_user(), "dispy", "colour");
     }
 
     if ($line_height === false) { $line_height = $site_line_height; }
@@ -20,7 +20,7 @@
     if ($colour === false) { $colour = $site_colour; }
     if ($colour === false) { $colour = "light"; }
     
-    if($color == "light") {
+    if($colour == "light") {
         if (file_exists("$THEMEPATH/light/style.css")) {
             echo file_get_contents("$THEMEPATH/light/style.css");
         }
@@ -134,7 +134,7 @@
         }
     }
 
-    if($color == "dark") {
+    if($colour == "dark") {
         if (file_exists("$THEMEPATH/dark/style.css")) { 
             echo file_get_contents("$THEMEPATH/dark/style.css");
         }
