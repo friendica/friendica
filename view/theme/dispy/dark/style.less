@@ -1485,14 +1485,21 @@ div {
   background-repeat: no-repeat; }
 
 #photo-prev-link {
-  left: 0;
-  top: 0;
-  background-image: url(dark/prev.png); }
+	background-image: url(dark/prev.png);
+    height: 350px;
+    left: 1%;
+    top: 215px;
+    width: 50px;
+    z-index: 10;
+}
 
 #photo-next-link {
-  right: 0;
-  top: 0;
-  background-image: url(dark/next.png); }
+	background-image: url(dark/next.png);
+    height: 350px;
+    right: 45%;
+    top: 215px;
+    width: 50px;
+}
 
 #photo-prev-link a, #photo-next-link a {
   display: block;
@@ -2181,7 +2188,7 @@ div {
 #side-peoplefind-url {
   background-color: #2e2f2e;
   color: #eec;
-  border: 1px 999 solid;
+  border: 1px #999 solid;
   margin-right: 3px;
   width: 75%;
   &:hover, &:focus {

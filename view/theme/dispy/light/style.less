@@ -1486,14 +1486,21 @@ div {
   background-repeat: no-repeat; }
 
 #photo-prev-link {
-  left: 0;
-  top: 0;
-  background-image: url(light/prev.png); }
+	background-image: url(light/prev.png);
+    height: 350px;
+    left: 1%;
+    top: 215px;
+    width: 50px;
+    z-index: 10;
+}
 
 #photo-next-link {
-  right: 0;
-  top: 0;
-  background-image: url(light/next.png); }
+	background-image: url(light/next.png);
+    height: 350px;
+    right: 45%;
+    top: 215px;
+    width: 50px;
+}
 
 #photo-prev-link a, #photo-next-link a {
   display: block;
@@ -2182,7 +2189,7 @@ div {
 #side-peoplefind-url {
   background-color: #e5e0cf;
   color: #666;
-  border: 1px 666 solid;
+  border: 1px #666 solid;
   margin-right: 3px;
   width: 75%;
   &:hover, &:focus {
