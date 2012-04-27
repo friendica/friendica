@@ -215,7 +215,12 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify,nav #nav-notifications-linkm
 .wall-item-body code{display:block;padding:0 0 10px 5px;border-color:#ccc;border-style:solid;border-width:1px 1px 1px 10px;background:#eee;color:#2e2f2e;width:95%;}
 div[id$="text"]{font-weight:bold;border-bottom:1px solid #ccc;}
 div[id$="wrapper"]{height:100%;margin-bottom:1em;}div[id$="wrapper"] br{clear:left;}
+.profile-match-wrapper{float:left;margin:0 5px 40px 0;width:120px;height:120px;padding:3px;position:relative;}
+.icon.drophide.profile-match-ignore{margin:0 6px 0 -3px;}
 [id$="-end"],[class$="end"]{clear:both;margin:0 0 10px 0;}
+.profile-match-end{margin:0 0 5px 0;}
+.profile-match-name{font-weight:bold;margin:auto auto auto 23px;}
+.profile-match-connect{font-style:italic;margin:auto auto auto 23px;}
 #advanced-profile-with{margin-left:200px;}
 .photos{height:auto;overflow:auto;}
 #photo-top-links{margin-bottom:30px;}

@@ -40,7 +40,7 @@
 			</ul><br style="clear:left;" />
 			<ul class="wall-item-subtools2">
 				{{ if $item.filer }}
-				<li><a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item icon file-as" title="$item.star.filer"></a></li>
+				<li><a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item icon file-as" title="$item.filer"></a></li>
 				{{ endif }}
 				{{ if $item.plink }}
 				<li class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></li>
