@@ -694,10 +694,26 @@ nav #nav-notifications-linkmenu {
 */
 
 #asidemain {
-  h4 {
-    font-size: 1.2em; }
-  #viewcontacts {
-    text-align: right; } }
+	h4 {
+		font-size: 1.2em; }
+	#viewcontacts {
+		text-align: right;
+	}
+	#contact-block {
+		width: 99%;
+		.contact-block-content {
+			width: 99%;
+			.contact-block-div {
+				float: left;
+				margin: 0 5px 5px 0;
+				width: 50px;
+				height: 50px;
+				padding: 3px;
+				position: relative;
+			}
+		}
+	}
+}
 
 .aprofile dt {
   background: transparent;
@@ -1401,7 +1417,7 @@ div {
 	
 }
 
-[id$="-end"], [class$="end"] {
+[id$="-end"], [class$="-end"] {
   clear: both;
   margin: 0 0 10px 0; }
 

@@ -103,6 +103,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify,nav #nav-notifications-linkm
 .vcard #profile-photo-wrapper{margin:20px;}.vcard #profile-photo-wrapper img{box-shadow:3px 3px 10px 0 #000;}
 #asidemain h4{font-size:1.2em;}
 #asidemain #viewcontacts{text-align:right;}
+#asidemain #contact-block{width:99%;}#asidemain #contact-block .contact-block-content{width:99%;}#asidemain #contact-block .contact-block-content .contact-block-div{float:left;margin:0 5px 5px 0;width:50px;height:50px;padding:3px;position:relative;}
 .aprofile dt{background:#eec;color:#2e2f2e;font-weight:bold;box-shadow:1px 1px 5px 0 #000;margin:15px 0 5px;padding-left:5px;}
 #profile-extra-links ul{margin-left:0px;padding-left:0px;list-style:none;}
 #dfrn-request-link{background:#3465a4 url(dark/connect.png) no-repeat 95% center;border-radius:5px 5px 5px 5px;color:#eec;display:block;font-size:1.2em;padding:0.2em 0.5em;}
@@ -217,7 +218,7 @@ div[id$="text"]{font-weight:bold;border-bottom:1px solid #ccc;}
 div[id$="wrapper"]{height:100%;margin-bottom:1em;}div[id$="wrapper"] br{clear:left;}
 .profile-match-wrapper{float:left;margin:0 5px 40px 0;width:120px;height:120px;padding:3px;position:relative;}
 .icon.drophide.profile-match-ignore{margin:0 6px 0 -3px;}
-[id$="-end"],[class$="end"]{clear:both;margin:0 0 10px 0;}
+[id$="-end"],[class$="-end"]{clear:both;margin:0 0 10px 0;}
 .profile-match-end{margin:0 0 5px 0;}
 .profile-match-name{font-weight:bold;margin:auto auto auto 23px;}
 .profile-match-connect{font-style:italic;margin:auto auto auto 23px;}
