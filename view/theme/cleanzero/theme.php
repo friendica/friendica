@@ -108,7 +108,7 @@ $a->page['htmlhead'] .= '
 <script>
 
  $(function() {
-	$(".wall-item-content-wrapper  img").aeImageResize({height: '.$resize.', width: '.$resize.'});
+	$(".wall-item-content  img").aeImageResize({height: '.$resize.', width: '.$resize.'});
   });
 </script>';}
 }
