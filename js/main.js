@@ -73,7 +73,16 @@
 		setupFieldRichtext();
 
 		/* popup menus */
+	function close_last_popup_menu() {
+ 		if(last_popup_menu) {
+ 		last_popup_menu.hide();
+ 		last_popup_button.removeClass("selected");
+ 		last_popup_menu = null;
+ 		last_popup_button = null;
+ 		}
+ 		}
 		$('a[rel^=#]').click(function(e){
+			close_last_popup_menu();
 			menu = $( $(this).attr('rel') );
 			e.preventDefault();
 			e.stopPropagation();
@@ -90,12 +99,7 @@
 			return false;
 		});
 		$('html').click(function() {
-			if(last_popup_menu) {
-				last_popup_menu.hide();
-				last_popup_button.removeClass("selected");
-				last_popup_menu = null;
-				last_popup_button = null;
-			}
+						close_last_popup_menu();
 		});
 		
 		// fancyboxes
