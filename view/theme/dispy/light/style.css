@@ -73,8 +73,7 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify,nav #nav-notifications-linkm
 #nav-buttons{clear:both;list-style:none;padding:0px;margin:0px;height:25px;}#nav-buttons>li{padding:0;display:inline-block;margin:0px -4px 0px 0px;}
 .floaterflip{display:block;position:fixed;z-index:110;top:56px;right:19px;width:22px;height:22px;overflow:hidden;margin:0px;background:transparent url(light/icons.png) -190px -60px no-repeat;}
 .search-box{display:inline-block;margin:5px;position:fixed;right:0px;bottom:0px;z-index:100;background:#1d1f1d;border-radius:5px;}
-#search-text{border:1px #eec solid;background:#2e3436;color:#eec;}
-.search-box #search-text{margin:8px;width:10em;height:14px;color:#eec;}
+#search-text{border:1px #eec solid;background:#2e3436;color:#eec;font-size:8pt;margin:8px;width:10em;height:14px;}
 #scrollup{position:fixed;right:5px;bottom:40px;z-index:100;}#scrollup a:hover{text-decoration:none;border:0;}
 #user-menu{box-shadow:5px 0 10px 0 #111;display:block;width:75%;margin:3px 0 0 0;position:relative;background-color:#555753;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;background:#555753 url("light/menu-user-pin.jpg") 98% center no-repeat;clear:both;top:4px;left:10px;padding:2px;}#user-menu>a{vertical-align:top;}
 #user-menu-label{font-size:12px;padding:3px 20px 9px 5px;height:10px;}
