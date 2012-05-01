@@ -2,10 +2,10 @@ article,aside,details,figcaption,figure,footer,header,hgroup,nav,section{display
 audio,canvas,video,time{display:inline-block;*display:inline;*zoom:1;}
 audio:not([controls]),[hidden]{display:none;}
 html{font-size:100%;overflow-y:scroll;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
-body{margin:0;font-size:16px;line-height:1.1em;font-family:sans-serif;color:#222;background-color:#e8e8e8;}
-button,input,select,textarea{font-family:sans-serif;color:#222;background-color:#e8e8e8;}
-select{border:1px #555 dotted;padding:3px;margin:3px;color:#222;background:#e8e8e8;}
-option{padding:3px;color:#222;background:#e8e8e8;}option[selected="selected"]{color:#111;background:#cca;}
+body{margin:0;font-size:16px;line-height:1.1em;font-family:sans-serif;color:#111;background-color:#eee;}
+button,input,select,textarea{font-family:sans-serif;color:#222;background-color:#eee;}
+select{border:1px #555 dotted;padding:3px;margin:3px;color:#222;background:#eee;}
+option{padding:3px;color:#222;background:#eee;}option[selected="selected"]{color:#111;background:#cca;}
 ul,ol{padding:0;}
 :focus{outline:0;}
 [disabled="disabled"]{background:#ddd;color:#333;}
