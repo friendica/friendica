@@ -380,7 +380,7 @@
 			$nick = $name;
 
 		// Generating a random ID
-		if (!array_key_exists($nick, $usercache))
+		if (is_null($usercache[$nick]) or !array_key_exists($nick, $usercache))
 			$usercache[$nick] = mt_rand(2000000, 2100000);
 
 		$ret = array(
