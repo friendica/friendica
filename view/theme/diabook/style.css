@@ -558,6 +558,7 @@ code {
   text-decoration: none;
 }
 /* popup notifications */
+div.jGrowl.top-right { top: 30px; /* put it below header/nav bar */ }
 div.jGrowl div.notice {
   background: #511919 url("../../../images/icons/48/notice.png") no-repeat 5px center;
   color: #ffffff;

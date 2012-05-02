@@ -26,6 +26,14 @@ $resolution=false;
 $resolution = get_pconfig(local_user(), "diabook", "resolution");
 if ($resolution===false) $resolution="normal";
 
+//Add META viewport tag respecting the resolution to header for tablets
+if ($resolution=="wide") {
+  $a->page['htmlhead'] .= '<meta name="viewport" content="width=1200" />';
+} else {
+  $a->page['htmlhead'] .= '<meta name="viewport" content="width=980" />';
+}
+
+
 $color = false;
 $site_color = get_config("diabook", "color" );
 if (local_user()) {$color = get_pconfig(local_user(), "diabook", "color");}

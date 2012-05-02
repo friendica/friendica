@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="$baseurl/library/jgrowl/jquery.jgrowl.css" type="text/css" media="screen" />
 
 <link rel="stylesheet" type="text/css" href="$stylesheet" media="all" />
-<meta name="viewport" content="width=800, initial-scale=1, maximum-scale=3" />
 
 <link rel="shortcut icon" href="$baseurl/images/friendica-32.png" />
 <link rel="search"
