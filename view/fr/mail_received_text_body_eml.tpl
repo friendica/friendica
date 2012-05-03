@@ -1,10 +1,10 @@
-$from t'a envoy un message ˆ $siteName.
+$from vous a envoyé un message à $siteName.
 	
 $title
 
 $textversion
 
-Ouvrez une session svp ˆ $siteurl pour lire et rpondre ˆ vos messages privs.
+Veuillez ouvrir une session sur $siteurl pour lire et répondre à vos messages privés.
 
 Merci,
 $siteName Administrateur

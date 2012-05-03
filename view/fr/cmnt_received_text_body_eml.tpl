@@ -1,12 +1,13 @@
-Cher $username,
 
-	'$from' a comment sur un lment ou une conversation que vous suivez.
+Cher(e) $username,
+
+	« $from » a commenté un élément ou une conversation que vous suivez.
 
 -----
 $body
 -----
 
-Connectez-vous ˆ $siteurl si vous souhaitez voir la conversation complte:
+Connectez-vous à $siteurl si vous souhaitez voir la conversation complète :
 
 $display
 

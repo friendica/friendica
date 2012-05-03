@@ -1,9 +1,9 @@
 
-Chèr(e) $myname,
+Cher(e) $myname,
 
 Vous venez de recevoir une demande de mise en relation sur $sitename
 
-venant de '$requestor'.
+venant de « $requestor ».
 
 Vous pouvez visiter son profil sur $url.
 
