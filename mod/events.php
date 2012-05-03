@@ -28,6 +28,9 @@ function events_post(&$a) {
 	$adjust   = intval($_POST['adjust']);
 	$nofinish = intval($_POST['nofinish']);
 
+	// The default setting for the `private` field in event_store() is false, so mirror that	
+	$private_event = false;
+
 
 	$start    = sprintf('%d-%d-%d %d:%d:0',$startyear,$startmonth,$startday,$starthour,$startminute);
 	if($nofinish)
@@ -70,8 +73,23 @@ function events_post(&$a) {
 		$str_contact_allow = perms2str($_POST['contact_allow']);
 		$str_group_deny    = perms2str($_POST['group_deny']);
 		$str_contact_deny  = perms2str($_POST['contact_deny']);
+
+		// Undo the pseudo-contact of self, since there are real contacts now
+		if( strpos($str_contact_allow, '<' . local_user() . '>') !== false )
+		{
+			$str_contact_allow = str_replace('<' . local_user() . '>', '', $str_contact_allow);
+		}
+		// Make sure to set the `private` field as true. This is necessary to
+		// have the posts show up correctly in Diaspora if an event is created
+		// as visible only to self at first, but then edited to display to others.
+		if( strlen($str_group_allow) or strlen($str_contact_allow) or strlen($str_group_deny) or strlen($str_contact_deny) )
+		{
+			$private_event = true;
+		}
 	}
 	else {
+		// Note: do not set `private` field for self-only events. It will
+		// keep even you from seeing them!
 		$str_contact_allow = '<' . local_user() . '>';
 		$str_group_allow = $str_contact_deny = $str_group_deny = '';
 	}
@@ -91,6 +109,7 @@ function events_post(&$a) {
 	$datarray['allow_gid'] = $str_group_allow;
 	$datarray['deny_cid'] = $str_contact_deny;
 	$datarray['deny_gid'] = $str_group_deny;
+	$datarray['private'] = $private_event;
 	$datarray['id'] = $event_id;
 	$datarray['created'] = $created;
 	$datarray['edited'] = $edited;
