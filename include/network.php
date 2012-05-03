@@ -583,7 +583,7 @@ function fetch_xrd_links($url) {
 
 
 // Take a URL from the wild, prepend http:// if necessary
-// and check DNS to see if it's real
+// and check DNS to see if it's real (or check if is a valid IP address)
 // return true if it's OK, false if something is wrong with it
 
 if(! function_exists('validate_url')) {
@@ -596,7 +596,7 @@ function validate_url(&$url) {
 		$url = 'http://' . $url;
 	$h = @parse_url($url);
 	
-	if(($h) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR))) {
+	if(($h) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
 		return true;
 	}
 	return false;
@@ -611,7 +611,7 @@ function validate_email($addr) {
 		return false;
 	$h = substr($addr,strpos($addr,'@') + 1);
 
-	if(($h) && (dns_get_record($h, DNS_A + DNS_CNAME + DNS_PTR + DNS_MX))) {
+	if(($h) && (dns_get_record($h, DNS_A + DNS_CNAME + DNS_PTR + DNS_MX) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
 		return true;
 	}
 	return false;
