@@ -1,0 +1,101 @@
+//*
+//* _base.less
+//*
+//*
+
+//* backgrounds */
+@dk_bg_colour: #1d1f1d;
+@bg_colour: #2e2f2e;
+@bg_alt_colour: #2e302e;
+@med_bg_colour: #4e4f4f;
+@menu_bg_colour: #555753;
+
+
+//* font colour, aka color: */
+@lt_main_colour: #ffff99;
+@main_colour: #eeeecc;
+@main_alt_colour: #eeeeee;
+@disabled_colour: #ddddbb;
+@shiny_colour: #2e3436;
+
+@lt_main_colour: lighten(@bg_colour, 10%);
+@dk_main_colour: darken(@bg_colour, 10%);
+
+//* links */
+@link_colour: #88a9d2;
+@dk_link_colour: darken(@link_colour, 10%);
+@lt_link_colour: lighten(@link_colour, 10%);
+//@hover_colour: #729fcf;
+@hover_colour: darken(@link_colour, 10%);
+
+//* box shadows */
+@menu_shadow: 5px 0 10px 0 #111;
+@main_shadow: 3px 3px 3px 10px 0 #111;
+
+// default here is @main_shadow
+.box_shadow(@h: 5px, @v: 5px, @blur: 5px, @spread: 0px, @colour: #111) {
+	-moz-box-shadow: @h @v @blur @spread @colour;
+	-o-box-shadow: @h @v @blur @spread @colour;
+	-webkit-box-shadow: @h @v @blur @spread @colour;
+	-ms-box-shadow: @h @v @blur @spread @colour;
+	box-shadow: @h @v @blur @spread @colour;
+}
+
+//* text-shadow */
+.text_shadow (@h: 1px, @v: 1px, @c: #111) {
+	-moz-text-shadow: @h @v @c;
+	-o-text-shadow: @h @v @c;
+	-webkit-text-shadow: @h @v @c;
+	-ms-text-shadow: @h @v @c;
+	text-shadow: @h @v @c;
+}
+//* transitions */
+.transition (@type: all, @dur: 0.5s, @effect: ease-in-out) {
+    -webkit-transition: @arguments;
+    -moz-transition: @arguments;
+    -o-transition: @arguments;
+    -ms-transition: @arguments;
+    transition: @arguments;
+}
+
+//* borders */
+.borders (@size: 1px, @style: solid, @colour: @main_colour) {
+	border: @size @style @colour;
+}
+
+//* rounded box corners */
+.rounded_corners (@r: 5px) {
+	-o-border-radius: @r;
+	-webkit-border-radius: @r;
+	-moz-border-radius: @r;
+	-ms-border-radius: @r;
+	border-radius: @r;
+}
+
+//* pre wrap */
+.wrap () {
+	white-space: pre-wrap;
+	white-space: pre;
+	word-wrap: break-word;
+}
+//* font size sizing */
+.default_font_size () {
+	font-size: 16px;
+	line-height: 1.1em;
+	font-family: sans-serif;
+}
+
+//* reset ul, ol */
+.list_reset () {
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+	list-style-position: inside;
+}
+
+//* box size: width, height */
+.box (@w: 20px, @h: 20px) {
+	width: @w;
+	height: @h;
+}
+

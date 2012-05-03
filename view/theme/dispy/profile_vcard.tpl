@@ -2,7 +2,7 @@
 
 	{{ if $profile.edit }}
 	<div class="action">
-	<span class="icon-profile-edit"></span>
+	<span class="icon-profile-edit" rel="#profiles-menu"></span>
 	<a href="#" rel="#profiles-menu" class="ttright" id="profiles-menu-trigger" title="$profile.edit.3">$profile.edit.1</a>
 	<ul id="profiles-menu" class="menu-popup">
 		{{ for $profile.menu.entries as $e }}
