@@ -64,8 +64,6 @@
 					<span onclick="preview_comment($id);" id="comment-edit-preview-link-$id" class="fakelink">$preview</span>
 					<div id="comment-edit-preview-$id" class="comment-edit-preview" style="display:none;"></div>
 				</div>
-
 				<div class="comment-edit-end"></div>
 			</form>
-
 		</div>

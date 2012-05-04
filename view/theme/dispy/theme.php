@@ -20,7 +20,6 @@ function dispy_init(&$a) {
     /** @purpose set some theme defaults
     */
     $cssFile = null;
-    $colour = false;
     $colour = get_pconfig(local_user(), "dispy", "colour");
 	$baseurl = $a->get_baseurl($ssl_state);
 
@@ -44,7 +43,10 @@ function dispy_init(&$a) {
 	<script type="text/javascript" src="$baseurl/view/theme/dispy/js/modernizr.custom.2.5.3.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
-		$('.group-edit-icon').hover(
+		// Select all links with lightbox class
+		$("a.lightbox").fancybox();
+
+    	$('.group-edit-icon').hover(
 			function() {
 				$(this).addClass('icon');
 				$(this).removeClass('iconspacer'); },

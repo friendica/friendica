@@ -20,19 +20,35 @@
 @med_bg_colour: #4e4f4e;
 @menu_bg_colour: #555753;
 
+
 //* font colour, aka color: */
 @lt_main_colour: #ffff99;
 @main_colour: #eeeecc;
 @main_alt_colour: #eeeeee;
 // darken(@main_alt_colour, 13%) > #cdcdcd
+// darken(@main_alt_colour, 13.5%) > #cccccc
+// darken(@main_alt_colour, 33%) > #9a9a9a
+// darken(@main_alt_colour, 24%) > #b1b1b1
+// darken(@main_alt_colour, 27%) > #a9a9a9
+// darken(@main_alt_colour, 33.5%) > #999999
+// darken(@main_alt_colour, 40%) > #888888
+// darken(@main_alt_colour, 46.8%) > #777777
+// darken(@main_alt_colour, 53.5%) > #666666
 // darken(@main_alt_colour, 60%) > #555555
+// darken(@main_alt_colour, 66.5%) > #444444
+// darken(@main_alt_colour, 73.5%) > #333333
+// darken(@main_alt_colour, 80%) > #222222
+// darken(@main_alt_colour, 86.5%) > #111111
 @disabled_colour: #ddddbb;
 @shiny_colour: #2e3436;
 @red_orange: #ff2000;
 @orange: #f8911b;
 @lt_orange: #fcaf3e;
-@shadow_colour: #111111;
+@shadow_colour: darken(@main_alt_colour, 86.5%);
 @friendica_blue: #3465a4;
+@border2: #babdb6;
+@group_show: #9ade00;
+@group_hide: #ff4141;
 @notice: #3320bc;
 @info: #1353b1;
 @alert: #ff0000;
@@ -105,6 +121,13 @@
 	-moz-border-radius: @r;
 	-ms-border-radius: @r;
 	border-radius: @r;
+}
+.text_overflow (@t: ellipsis) {
+	-moz-text-overflow: @t;
+	-ms-text-verflow: @t;
+	-o-text-overflow: @t;
+	-webkit-text-overflow: @t;
+	text-overflow: @t;
 }
 
 //* pre wrap */
