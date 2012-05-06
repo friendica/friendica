@@ -2,11 +2,19 @@
 
 /*
  * Name: Dispy
- * Description: <p style="white-space:pre;">            Dispy: Light, Spartan, Sleek, and Functional<br />            Dispy Dark: Dark, Spartan, Sleek, and Functional</p>
- * Version: 1.2
+ * Description: Dispy family (light, dark): Sleek and Functional Themes 
+ * Version: 1.2.1
  * Author: Simon <http://simon.kisikew.org/>
  * Maintainer: Simon <http://simon.kisikew.org/>
  * Screenshot: <a href="screenshot.jpg">Screenshot</a>
+ */
+
+/* If you borrow any of these functions, make sure to
+ * RENAME your functions, otherwise both themes get conflicts,
+ * and the friendica instance will get HTTP 500 errors.
+ * To paraphrase Mike: "Might wish to wrap
+ * function_name with "if(! function_exists('function_name')) ... "
+ * or rename to prefix1_function_name (prefix2_function_name), etc.
  */
 
 $a = get_app();
@@ -165,7 +173,7 @@ EOT;
         $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
     }
 
-	js_in_foot();
+	_js_in_foot();
 }
 
 function dispy_community_info() {
@@ -179,13 +187,15 @@ function dispy_community_info() {
 	return $a->page['aside_bottom'] = replace_macros($tpl, $aside);
 }
 
-function js_in_foot() {
-	/** @purpose insert stuff in bottom of page
-	 */
-	$a = get_app();
-	$baseurl = $a->get_baseurl($ssl_state);
-	$bottom['$baseurl'] = $baseurl;
-	$tpl = file_get_contents(dirname(__file__) . '/bottom.tpl');
+if(! function_exists('_js_in_foot')) {
+	function _js_in_foot() {
+		/** @purpose insert stuff in bottom of page
+		*/
+		$a = get_app();
+		$baseurl = $a->get_baseurl($ssl_state);
+		$bottom['$baseurl'] = $baseurl;
+		$tpl = file_get_contents(dirname(__file__) . '/bottom.tpl');
 
-	return $a->page['bottom'] = replace_macros($tpl, $bottom);
+		return $a->page['bottom'] = replace_macros($tpl, $bottom);
+	}
 }

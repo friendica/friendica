@@ -1,19 +1,19 @@
 /*
- * dispy-dark
- *
+ * dispy dark
+ * Description: Dispy Dark: dark, sleek, functional
  * author, maintainer: simon <http://simon.kisikew.org/>
  * 
  * Author's notes:
  * A few things of note here. The less file is our working copy,
  * and the CSS is *generated* from it. The CSS is the one that's
  * included in the HTML, and not the less one. This is to save
- * bandwidth and processing time.
+ * bandwidth and processing time, by not including less.js.
  */
-/* from html5boilerplate */
-/* these are to tell browsers they should be displayed a certain way */
 
 @import "_base";
 
+///* from html5boilerplate */
+///* these are to tell browsers they should be displayed a certain way */
 article,
 aside,
 details,
@@ -37,12 +37,12 @@ time {
 audio:not([controls]), [hidden] {
 	display: none;
 }
-/*
- * 1. Correct text resizing oddly in IE6/7 when body font-size is set using em units
- * 2. Force vertical scrollbar in non-IE
- * 3. Prevent iOS text size adjust on device orientation change,
- *		without disabling user zoom: h5bp.com/g
- */
+///*
+// * 1. Correct text resizing oddly in IE6/7 when body font-size is set using em units
+// * 2. Force vertical scrollbar in non-IE
+// * 3. Prevent iOS text size adjust on device orientation change,
+// *		without disabling user zoom: h5bp.com/g
+// */
 html {
 	font-size: 100%;
 	overflow-y: scroll;
@@ -61,11 +61,13 @@ button, input, select, textarea {
 	background-color: @bg_colour;
 }
 select {
-	border: 1px #555 dotted;
+	.borders(1px, dotted, darken(@main_alt_colour, 60%));
 	padding: 1px;
 	margin: 3px;
 	color: @main_colour;
 	background: @bg_colour;
+    max-width: 85%;
+    min-width: 85px;
 }
 option {
 	padding: 1px;
@@ -76,13 +78,10 @@ option {
 		background: @main_colour;
 	}
 }
-ul, ol {
-	.list_reset;
-}
 tr:nth-child(even) {
 	background-color: lighten(@bg_colour, 10%);
 }
-/* remember to define focus styles! */
+///* remember to define focus styles! */
 :focus {
 	outline: 0;
 }
@@ -90,7 +89,7 @@ tr:nth-child(even) {
 	background: @med_bg_colour;
 	color: @disabled_colour;
 }
-/* remember to highlight inserts somehow! */
+///* remember to highlight inserts somehow! */
 ins, mark {
 	background-color: @bg_alt_colour;
 	color: @lt_main_colour;
@@ -102,14 +101,19 @@ mark {
 	font-style: italic;
 	font-weight: bold;
 }
-/* Redeclare monospace font family: h5bp.com/j */
-pre, code, kbd, samp, .wall-item-body code {
+///* Redeclare monospace font family: h5bp.com/j */
+pre,
+code,
+kbd,
+samp,
+.wall-item-body code {
 	font-family: monospace, monospace;
 	_font-family: monospace;
 	font-size: 1em;
 }
-/* Improve readability of pre-formatted text in all browsers */
-pre, .wall-item-body code {
+///* Improve readability of pre-formatted text in all browsers */
+pre,
+.wall-item-body code {
 	.wrap;
 }
 q {
@@ -122,7 +126,8 @@ q {
 small {
 	font-size: 85%;
 }
-/* Position subscript and superscript content without affecting line-height: h5bp.com/k */
+///* Position subscript and superscript content without affecting
+// * line-height: h5bp.com/k */
 sub, sup {
 	font-size: 75%;
 	line-height: 0;
@@ -151,13 +156,55 @@ a {
 	}
 }
 blockquote {
-	background: #444;
+	background: darken(@main_alt_colour, 66.5%);
 	color: @main_colour;
 	text-indent: 5px;
 	padding: 5px;
-	border: 1px #aaa solid;
+	.borders(1px, solid, darken(@main_alt_colour, 33%));
 	.rounded_corners;
 }
+label {
+	width: 38%;
+	display: inline-block;
+	font-size: 0.95em;
+	margin: 0 10px 1em 0;
+	.borders(1px, solid, @bg_colour);
+	padding: 5px;
+	background: @main_colour;
+	color: darken(@main_alt_colour, 86.5%);
+	.box_shadow(3px, 3px, 5px);
+}
+input {
+	.box(250px, 25px);
+	.borders(1px, solid, darken(@main_alt_colour, 33.5%));
+	&[type="checkbox"],
+	&[type="radio"] {
+		margin: 0;
+		.box(15px, 15px);
+	}
+	&[type="submit"],
+	&[type="button"] {
+		background-color: @main_alt_colour;
+		.borders(2px, outset, darken(@main_alt_colour, 24%));
+		.rounded_corners;
+		.box_shadow(1px, 3px, 4px, 0);
+		color: @bg_alt_colour;
+		cursor: pointer;
+		font-weight: bold;
+		width: auto;
+		.text_shadow;
+	}
+	&[type="submit"]:active,
+	&[type="button"]:active {
+		.box_shadow(0, 0, 0, 0);
+	}
+}
+h1, h2, h3,
+h4, h5, h6 {
+	margin: 10px 0px;
+}
+
+//
 .required {
 	display: inline;
 	color: #ff0;
@@ -219,9 +266,10 @@ blockquote {
 	background: @main_colour;
 	.rounded_corners;
 	.box_shadow(3px, 3px, 5px);
-	padding: 3px;
-	margin: 5px 0;
+    margin: 3px 10px 7px 0;
+    padding: 6px 7px;
 	font-weight: bold;
+	font-size: smaller;
 }
 
 
@@ -276,7 +324,8 @@ blockquote {
 		overflow: hidden !important; }
 	label {
 		width: 180px !important;
-	} }
+	}
+}
 
 
 /**
@@ -315,6 +364,8 @@ ul#user-menu-popup {
 	margin: 0px;
 	top: 20px;
 	left: 0;
+	font-size: small;
+	line-height: 1;
 	.rounded_corners(0 0 5px 5px);
 	.box_shadow(5px, 5px, 10px, 0px);
 	z-index: 10000;
@@ -560,7 +611,7 @@ nav #nav-notifications-linkmenu {
 	}
 }
 #user-menu-label {
-	font-size: 12px;
+	font-size: small;
 	padding: 3px 20px 9px 5px;
 	height: 10px;
 }
@@ -700,7 +751,7 @@ nav #nav-notifications-linkmenu {
  */
 #asidemain {
 	float: left;
-	font-size: smaller;
+	font-size: 0.75em;
 	margin: 20px 0 20px 35px;
 	width: 25%;
 	display: inline;
@@ -712,9 +763,9 @@ nav #nav-notifications-linkmenu {
 }
 .vcard {
 	.fn {
-		font-size: 1.7em;
+		font-size: 1.5em;
 		font-weight: bold;
-		border-bottom: 1px solid #729fcf;
+		border-bottom: 1px solid @hover_colour;
 		padding-bottom: 3px;
 	}
 	#profile-photo-wrapper {
@@ -746,7 +797,8 @@ nav #nav-notifications-linkmenu {
 	background: @main_colour;
 	color: @bg_colour;
 	font-weight: bold;
-	.box_shadow(1px 1px 5px 0);
+	.box_shadow(3px, 3px, 5px);
+	.rounded_corners;
 	margin: 15px 0 5px;
 	padding-left: 5px;
 }
@@ -1133,7 +1185,7 @@ nav #nav-notifications-linkmenu {
 }
 .wall-item-content {
 	overflow-x: auto;
-	margin: 0px 15px 0px 5px;
+	margin: 0px 4em 0px 5px;
 }
 [id^="tread-wrapper"], [class^="tread-wrapper"] {
 	margin: 15px 0 0 0;
@@ -1182,13 +1234,13 @@ nav #nav-notifications-linkmenu {
 .wall-item-subtools1 {
 	.box(30px, 30px);
 	list-style: none outside none;
-	margin: 20px 0 30px -20px;
+	margin: 18px 0 30px -20px;
 	padding: 0;
 }
 .wall-item-subtools2 {
 	.box(25px, 25px);
 	list-style: none outside none;
-	margin: -75px 0 0 5px;
+	margin: -78px 0 0 5px;
 	padding: 0;
 }
 .wall-item-title {
@@ -1219,7 +1271,7 @@ nav #nav-notifications-linkmenu {
 	clear: left;
 	font-size: 0.8em;
 	color: lighten(@menu_bg_colour, 20%);
-	margin: 20px 20px 0 110px;
+	margin: 20px auto 0 0.2em;
 }
 .wall-item-ago {
 	display: inline;
@@ -1332,7 +1384,7 @@ nav #nav-notifications-linkmenu {
 		margin-left: 10px;
 	}
 	.wall-item-author {
-		margin-left: 50px;
+		margin-left: 0.2em;
 	}
 	.wall-item-photo-menu {
 		min-width: 50px;
@@ -1371,7 +1423,7 @@ nav #nav-notifications-linkmenu {
 
 [class^="comment-edit-text"] {
 	margin: 5px 0 10px 20px;
-	width: 84.5%;
+	width: 94%;
 }
 .comment-edit-text-empty {
 	height: 20px;
@@ -2346,7 +2398,6 @@ div {
 	label {
 		width: 38%;
 		display: inline-block;
-		font-size: 1.077em;
 		margin: 0 10px 1em 0;
 		border: 1px @bg_colour solid;
 		padding: 5px;
@@ -2395,42 +2446,6 @@ div {
 }
 .field.radio .field_help {
 	margin-left: 297px;
-}
-label {
-	width: 38%;
-	display: inline-block;
-	font-size: 1.077em;
-	margin: 0 10px 1em 0;
-	.borders(1px, solid, @bg_colour);
-	padding: 5px;
-	background: @main_colour;
-	color: darken(@main_alt_colour, 86.5%);
-	.box_shadow(3px, 3px, 5px);
-}
-input {
-	.box(250px, 25px);
-	.borders(1px, solid, darken(@main_alt_colour, 33.5%));
-	&[type="checkbox"],
-	&[type="radio"] {
-		margin: 0;
-		.box(15px, 15px);
-	}
-	&[type="submit"],
-	&[type="button"] {
-		background-color: @main_alt_colour;
-		.borders(2px, outset, darken(@main_alt_colour, 24%));
-		.rounded_corners;
-		.box_shadow(1px, 3px, 4px, 0);
-		color: @bg_alt_colour;
-		cursor: pointer;
-		font-weight: bold;
-		width: auto;
-		.text_shadow;
-	}
-	&[type="submit"]:active,
-	&[type="button"]:active {
-		.box_shadow(0, 0, 0, 0);
-	}
 }
 
 
@@ -2986,74 +3001,4 @@ footer {
 	z-index: 999;
 }
 
-
-//* media stuff */
-@media handheld {
-	body {
-		font-size: 15pt;
-	}
-}
-//* Smartphones (portrait and landscape) ----------- */
-@media only screen and (min-device-width: 320px)
-	and (max-device-width: 480px) {
-	body {
-		font-size: 10px;
-	}
-}
-//* Smartphones (landscape) ----------- */
-@media only screen and (min-width: 321px) {
-	body {
-		font-size: 10px;
-	}
-}
-//* Smartphones (portrait) ----------- */
-@media only screen and (max-width: 320px) {
-	body {
-		font-size: 10px;
-	}
-}
-//* iPads (portrait and landscape) ----------- */
-@media only screen and (min-device-width: 768px)
-	and (max-device-width: 1024px) {
-	body {
-		font-size: 16px;
-	}
-}
-//* iPads (landscape) ----------- */
-@media only screen and (min-device-width: 768px)
-	and (max-device-width: 1024px)
-	and (orientation: landscape) {
-	body {
-		font-size: 16px;
-	}
-}
-//* iPads (portrait) ----------- */
-@media only screen and (min-device-width: 768px)
-	and (max-device-width: 1024px)
-	and (orientation: portrait) {
-	body {
-		font-size: 16px;
-	}
-}
-//* Desktops and laptops ----------- */
-//adjusted to 1024 from 1224.
-//not everybody has a fucking big screen ffs
-@media only screen and (min-width: 1024px) {
-	body {
-		font-size: 16px;
-	}
-}
-//* Large screens - */
-@media only screen and (min-width: 1520px) {
-	body {
-		font-size: 18px;
-	}
-}
-//* iPhone 4 ----------- */
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
-	only screen and (min-device-pixel-ratio: 1.5) {
-	body {
-		font-size: 16px;
-	}
-}
-
+@import "../css/media";

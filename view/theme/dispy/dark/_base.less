@@ -13,6 +13,9 @@
 // you "compile" the css (with `lessc`), but css (/**/) comments
 // do. i use them to our advantage :).
 
+// import our reset styles first
+@import "../css/reset";
+
 //* backgrounds */
 @dk_bg_colour: #1d1f1d;
 @bg_colour: #2e2f2e;
@@ -138,7 +141,7 @@
 }
 //* font size sizing */
 .default_font () {
-	font-size: 16px;
+	font-size: 14pt;
 	line-height: 1.1em;
 	font-family: sans-serif;
 }
