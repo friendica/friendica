@@ -202,6 +202,8 @@ input {
 h1, h2, h3,
 h4, h5, h6 {
 	margin: 10px 0px;
+	font-weight: bold;
+	border-bottom: 1px solid @hover_colour;
 }
 
 //
@@ -235,6 +237,8 @@ h4, h5, h6 {
 	display: block;
 	clear: both;
 	text-align: center;
+	font-size: small;
+	font-weight: bold;
 	span {
 		padding: 4px;
 		margin: 4px;
@@ -242,7 +246,7 @@ h4, h5, h6 {
 }
 .pager_current {
 	background-color: @link_colour;
-	color: @main_alt_colour;
+	color: @bg_colour;
 }
 
 
@@ -429,7 +433,8 @@ nav .nav-link {
 	&:hover {
 		background-position: -66px -88px; }
 }
-#nav-notify-link, #nav-notifications-linkmenu {
+#nav-notify-link,
+#nav-notifications-linkmenu {
 	background-position: -44px -110px;
 }
 #nav-notify-link:hover {
@@ -468,9 +473,7 @@ nav .nav-link {
 .pointer {
 	cursor: pointer;
 }
-
-/* popup notifications */
-
+//* popup notifications */
 div.jGrowl div {
 	&.notice {
 		background: @notice url("../../../images/icons/48/notice.png") no-repeat 5px center;
@@ -485,7 +488,6 @@ div.jGrowl div {
 		margin-top: 50px;
 	}
 }
-
 #nav-notifications-menu {
 	margin: 30px 0 0 -20px;
 	width: 275px;
@@ -509,9 +511,9 @@ div.jGrowl div {
 	}
 	a:hover {
 		color: black;
-		text-decoration: underline; }
+		text-decoration: underline;
+	}
 }
-
 nav #nav-notifications-linkmenu {
 	&.on .icon.s22.notify,
 	&.selected .icon.s22.notify {
@@ -524,9 +526,10 @@ nav #nav-notifications-linkmenu {
 }
 #notifications {
 	.box(170px, 20px);
-	position: absolute;
+	font-size: small;
 	top: -19px;
 	left: 4px;
+	position: absolute;
 }
 #nav-floater {
 	position: fixed;
@@ -1033,14 +1036,6 @@ nav #nav-notifications-linkmenu {
 	.rounded_corners;
 	overflow: hidden;
 }
-#profile-jot-acl-wrapper {
-	margin: 0 10px;
-	.borders(1px, solid, darken(@main_alt_colour, 60%));
-	border-top: 0;
-	display: block !important;
-	.borders(1px solid @menu_bg_colour);
-	.box_shadow;
-}
 #group_allow_wrapper,
 #group_deny_wrapper,
 #acl-permit-outer-wrapper,
@@ -1098,10 +1093,12 @@ nav #nav-notifications-linkmenu {
 	color: @main_colour;
 	.borders(1px, solid, @main_colour);
 	.rounded_corners;
+	.box_shadow(5px, 0, 10px);
 	padding: 3px 3px 6px 10px;
 	.wall-item-outside-wrapper {
 	    border: 0;
 		.rounded_corners(0px 0px 0px 0px);
+		.box_shadow(0, 0, 0, 0);
 	}
 }
 
@@ -1167,7 +1164,7 @@ nav #nav-notifications-linkmenu {
 }
 .wall-item-content-wrapper {
 	position: relative;
-	padding: 10px;
+	padding: 0.75em;
 	width: auto;
 }
 .wall-item-outside-wrapper .wall-item-comment-wrapper {
@@ -1185,10 +1182,11 @@ nav #nav-notifications-linkmenu {
 }
 .wall-item-content {
 	overflow-x: auto;
-	margin: 0px 4em 0px 5px;
+	margin: 0px 4em 1em 5px;
 }
-[id^="tread-wrapper"], [class^="tread-wrapper"] {
-	margin: 15px 0 0 0;
+[id^="tread-wrapper"],
+[class^="tread-wrapper"] {
+	margin: 1.2em 0 0 0;
 	padding: 0px;
 }
 .wall-item-photo-menu {
@@ -1246,10 +1244,10 @@ nav #nav-notifications-linkmenu {
 .wall-item-title {
 	font-size: 1.2em;
 	font-weight: bold;
-	margin-bottom: 1em;
+	margin-bottom: 1.4em;
 }
 .wall-item-body {
-	margin: 20px 20px 10px 0px;
+	margin: 15px 10px 10px 0px;
 	text-align: left;
 	overflow-x: auto;
 }
@@ -1264,14 +1262,20 @@ nav #nav-notifications-linkmenu {
 	clear: left;
 	font-size: 0.8em;
 	color: lighten(@menu_bg_colour, 20%);
-	margin: 5px 0 5px 120px;
+	margin: 5px 0 5px 10.2em;
+	.transition;
+	opacity: 0.5;
+	&:hover {
+		opacity: 1;
+	}
 }
 .wall-item-author,
 .wall-item-actions-author {
 	clear: left;
+	float: left;
 	font-size: 0.8em;
 	color: lighten(@menu_bg_colour, 20%);
-	margin: 20px auto 0 0.2em;
+	margin: 1em auto 0 0.2em;
 }
 .wall-item-ago {
 	display: inline;
@@ -1361,10 +1365,10 @@ nav #nav-notifications-linkmenu {
  */
 .ccollapse-wrapper {
 	font-size: 0.9em;
-	margin-left: 80px;
+	margin-left: 5em;
 }
 .wall-item-outside-wrapper.comment {
-	margin-left: 80px;
+	margin-left: 5em;
 	.wall-item-photo {
 		width: 40px !important;
 		height: 40px !important;
@@ -2826,6 +2830,12 @@ footer {
 	display: block !important;
 	background: @bg_colour;
 	color: @main_colour;
+}
+#profile-jot-acl-wrapper {
+	margin: 0 10px;
+	.borders(1px, solid, @menu_bg_colour);
+	border-top: 0;
+	// .box_shadow;
 }
 #acl-wrapper {
 	width: 660px;

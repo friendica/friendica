@@ -24,8 +24,8 @@ function initEditor(cb) {
 			mode : "specific_textareas",
 			editor_selector: $editselect,
 			auto_focus: "profile-jot-text",
-			plugins : "bbcode,paste,fullscreen,autoresize,inlinepopups",
-			theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code,fullscreen",
+			plugins : "bbcode,paste,fullscreen,autoresize,inlinepopups,contextmenu,style",
+			theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code,fullscreen,charmap",
 			theme_advanced_buttons2 : "",
 			theme_advanced_buttons3 : "",
 			theme_advanced_toolbar_location : "top",
@@ -98,7 +98,6 @@ function initEditor(cb) {
 					$(".jothidden").show();
 					if (typeof cb!="undefined") cb();
 				});
-
 			}
 		});
 		editor = true;
@@ -155,8 +154,6 @@ function enableOnUser(){
 				}				 
 			}
 		);
-
-
 	});
 
 	function deleteCheckedItems() {
@@ -345,5 +342,4 @@ function enableOnUser(){
 		});
 		$('#profile-jot-text').keyup();
 	}
-
 </script>
