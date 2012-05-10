@@ -48,7 +48,7 @@ h1,h2,h3,h4,h5,h6{margin:10px 0px;font-weight:bold;border-bottom:1px solid #638e
 .action{margin:5px 0;}
 .tool{margin:5px 0;list-style:none;}
 #articlemain{width:100%;height:100%;margin:0 auto;}
-[class$="-desc"],[id$="-desc"]{color:#2e2f2e;background:#eeeecc;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;-moz-box-shadow:3px 3px 5px 0px #111111;-o-box-shadow:3px 3px 5px 0px #111111;-webkit-box-shadow:3px 3px 5px 0px #111111;-ms-box-shadow:3px 3px 5px 0px #111111;box-shadow:3px 3px 5px 0px #111111;margin:3px 10px 7px 0;padding:6px 7px;font-weight:bold;font-size:smaller;}
+[class$="-desc"],[id$="-desc"]{color:#2e2f2e;background:#eeeecc;margin:3px 10px 7px 0;padding:6px 7px;font-weight:bold;font-size:smaller;}
 #asidemain .field{overflow:hidden;width:200px;}
 #login-extra-links{overflow:auto !important;padding-top:60px !important;width:100% !important;}#login-extra-links a{margin-right:20px;}
 #login_standard{display:block !important;float:none !important;height:100% !important;position:relative !important;width:100% !important;}#login_standard .field label{width:200px !important;}
@@ -279,11 +279,12 @@ div[id$="wrapper"]{height:100%;margin-bottom:1em;}div[id$="wrapper"] br{clear:le
 .mail-conv-subject{clear:right;font-weight:bold;font-size:1.2em;}
 .mail-conv-body{clear:both;}
 .mail-conv-delete-wrapper{margin-top:5px;}
-.view-contact-wrapper,.contact-entry-wrapper{float:left;margin:0 5px 40px 0;width:120px;height:120px;padding:3px;position:relative;}
+.view-contact-wrapper,.contact-entry-wrapper{float:left;margin:0 5px 40px 0;width:120px;height:135px;padding:3px;position:relative;}
 .contact-direction-wrapper{position:absolute;top:20px;}
 .contact-edit-links{position:absolute;top:60px;}
 .contact-entry-photo{margin-left:20px;}
-.contact-entry-name{width:120px;font-weight:bold;}
+.contact-entry-name{width:120px;font-weight:bold;font-size:small;}
+.contact-entry-details{font-size:x-small;}
 .contact-entry-photo{position:relative;}
 .contact-entry-edit-links .icon{border:1px solid #babdb6;-o-border-radius:3px;-webkit-border-radius:3px;-moz-border-radius:3px;-ms-border-radius:3px;border-radius:3px;background-color:white;}
 #contact-entry-url,[id^="contact-entry-url"],#contact-entry-network,[id^="contact-entry-network"]{font-size:smaller;}

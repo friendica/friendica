@@ -268,8 +268,8 @@ h4, h5, h6 {
 [class$="-desc"], [id$="-desc"] {
 	color: @bg_colour;
 	background: @main_colour;
-	.rounded_corners;
-	.box_shadow(3px, 3px, 5px);
+	// .rounded_corners;
+	// .box_shadow(3px, 3px, 5px);
     margin: 3px 10px 7px 0;
     padding: 6px 7px;
 	font-weight: bold;
@@ -1736,10 +1736,11 @@ div {
 /**
  * contacts
  */
-.view-contact-wrapper, .contact-entry-wrapper {
+.view-contact-wrapper,
+.contact-entry-wrapper {
 	float: left;
 	margin: 0 5px 40px 0;
-	.box(120px, 120px);
+	.box(120px, 135px);
 	padding: 3px;
 	position: relative;
 }
@@ -1759,6 +1760,10 @@ div {
 .contact-entry-name {
 	width: 120px;
 	font-weight: bold;
+	font-size: small;
+}
+.contact-entry-details {
+	font-size: x-small;
 }
 .contact-entry-photo {
 	position: relative;
