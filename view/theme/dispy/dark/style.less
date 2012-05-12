@@ -448,9 +448,11 @@ ul#user-menu-popup {
 		a {
 			display: block;
 			padding: 5px;
+			color: @main_alt_colour;
+			background-color: @menu_bg_colour;
 			&:hover {
-				color: @main_colour;
-				background-color: @bg_alt_colour;
+				color: @bg_colour;
+				background-color: @main_alt_colour;
 			}
 			&.nav-sep {
 				border-top: 1px solid @bg_alt_colour; } } }
@@ -652,13 +654,20 @@ nav #nav-notifications-linkmenu {
 	background: @dk_bg_colour;
 	.rounded_corners;
 }
-#search-text {
-	.borders;
+#search-text,
+#mini-search-text {
 	background: @bg_colour;
 	color: @main_colour;
 	font-size: 8pt;
 	margin: 8px;
-	.box(10em, 14px);
+	height: 14px;
+}
+#search-text {
+	.borders;
+	width: 90%;
+}
+#mini-search-text {
+	width: 10em;
 }
 #scrollup {
 	position: fixed;
@@ -699,7 +708,7 @@ nav #nav-notifications-linkmenu {
 .nav-ajax-left {
 	.box(30px, 19px);
 	background: transparent url(dark/notifications.png) 0 0 no-repeat;
-	color: @main_colour;
+	color: @shadow_colour;
 	font-weight: bold;
 	font-size: 0.8em;
 	padding-top: 0.2em;
@@ -749,7 +758,8 @@ nav #nav-notifications-linkmenu {
 	color: @bg_colour;
 	margin: 0px;
 	padding: 0px;
-	.borders(3px, solid, @shiny_colour);
+	.borders(3px, solid, @link_colour);
+	.rounded_corners;
 	z-index: 100000;
 	.box_shadow;
 	a {
@@ -758,7 +768,8 @@ nav #nav-notifications-linkmenu {
 		padding: 5px 10px;
 		text-decoration: none;
 		&:hover {
-			background-color: lighten(@shiny_colour, 55%);
+			color: @main_colour;
+			background-color: @link_colour;
 		}
 	}
 	.menu-sep {
@@ -792,7 +803,11 @@ nav #nav-notifications-linkmenu {
 	padding: 7px 7px 0px 0px;
 }
 .notify-seen {
-	background: darken(@main_alt_colour, 20%);
+	background: @disabled_colour;
+	color: @main_colour;
+}
+.notify-unseen {
+	color: @main_colour;
 }
 
 
@@ -1078,7 +1093,6 @@ nav #nav-notifications-linkmenu {
 #profile-jot-perms {
 	float: right;
 	color: @menu_bg_colour;
-	background-color: @main_colour;
 	.box(20px, 20px);
 	.rounded_corners;
 	.box_shadow(3px, 3px, 5px, 0);
@@ -1112,9 +1126,10 @@ nav #nav-notifications-linkmenu {
 	}
 }
 #jot-perms-icon {
-	.box(20px, 22px);
+	.box(22px, 22px);
 	.rounded_corners;
 	overflow: hidden;
+	background: @menu_bg_colour url("dark/icons.png") -88px -40px;
 }
 #group_allow_wrapper,
 #group_deny_wrapper,
@@ -2324,7 +2339,6 @@ div {
 	&:hover {
 		color: @bg_colour;
 		background: @link_colour;
-		font-weight: bold;
 		padding: 3px;
 	}
 }
@@ -2637,7 +2651,7 @@ div {
 .icon {
 	display: block;
 	.box;
-	background: url(dark/icons.png) no-repeat;
+	background: transparent url("dark/icons.png") no-repeat;
 	border: 0;
 	text-decoration: none;
 	.rounded_corners;

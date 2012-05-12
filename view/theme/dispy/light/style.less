@@ -175,11 +175,11 @@ a {
 	}
 }
 blockquote {
-	background: darken(@main_alt_colour, 66.5%);
+	background: lighten(@main_alt_colour, 6.5%);
 	color: @main_colour;
 	text-indent: 5px;
 	padding: 5px;
-	.borders(1px, solid, darken(@main_alt_colour, 33%));//#aaa
+	.borders(1px, solid, @main_colour);
 	.rounded_corners;
 }
 label {
@@ -449,9 +449,11 @@ ul#user-menu-popup {
 		a {
 			display: block;
 			padding: 5px;
+			color: @bg_colour;
+			background-color: @menu_bg_colour;
 			&:hover {
-				color: @dk_bg_colour;
-				background-color: @bg_colour;
+				color: @bg_colour;
+				background-color: @main_colour;
 			}
 			&.nav-sep {
 				border-top: 1px solid @bg_alt_colour; } } }
@@ -653,13 +655,20 @@ nav #nav-notifications-linkmenu {
 	background: @dk_bg_colour;
 	.rounded_corners;
 }
-#search-text {
-	.borders(1px, solid, @bg_colour);
-	background: @bg_colour;
-	color: @dk_bg_colour;
+#search-text,
+#mini-search-text {
+	background: white;
+	color: @main_colour;
 	font-size: 8pt;
 	margin: 8px;
-	.box(10em, 14px);
+	height: 14px;
+}
+#search-text {
+	.borders(1px, solid, @main_alt_colour);
+	width: 90%;
+}
+#mini-search-text {
+	width: 10em;
 }
 #scrollup {
 	position: fixed;
@@ -747,19 +756,21 @@ nav #nav-notifications-linkmenu {
 	display: none;
 	width: 11em;
 	background: white;
-	color: @bg_colour;//#2d2d2d
+	color: @main_colour;
 	margin: 0px;
 	padding: 0px;
-	.borders(3px, solid, @shiny_colour);//#364e59
+	.borders(3px, solid, @link_colour);
+	.rounded_corners;
 	z-index: 100000;
 	.box_shadow;
 	a {
 		display: block;
-		color: @bg_colour;//#2d2d2d
+		color: @main_colour;
 		padding: 5px 10px;
 		text-decoration: none;
 		&:hover {
-			background-color: lighten(@shiny_colour, 55%);//#bdcdd4
+			color: @bg_colour;
+			background-color: @link_colour;
 		}
 	}
 	.menu-sep {
@@ -793,7 +804,11 @@ nav #nav-notifications-linkmenu {
 	padding: 7px 7px 0px 0px;
 }
 .notify-seen {
-	background: darken(@main_alt_colour, 20%);//#ddd
+	background: @disabled_colour;
+	color: @main_colour;
+}
+.notify-unseen {
+	color: @main_colour;
 }
 
 
@@ -1079,11 +1094,10 @@ nav #nav-notifications-linkmenu {
 #profile-jot-perms {
 	float: right;
 	color: @menu_bg_colour;
-	background-color: @main_colour;
 	.box(20px, 20px);
 	.rounded_corners;
 	.box_shadow(3px, 3px, 5px, 0);
-	.borders(2px, outset, @main_alt_colour);
+	.borders(2px, outset, @bg_colour);
 	overflow: hidden;
 	margin: 0 10px 0 10px;
 }
@@ -1101,9 +1115,9 @@ nav #nav-notifications-linkmenu {
 #profile-jot-submit {
 	height: auto;
 	background-color: @menu_bg_colour;
-	color: @main_alt_colour;//#eeeeec
+	color: @bg_colour;
 	.rounded_corners;
-	.borders(2px, outset, @shiny_colour);
+	.borders(2px, outset, @menu_bg_colour);
 	margin: 0;
 	float: right;
 	.text_shadow;
@@ -1113,9 +1127,10 @@ nav #nav-notifications-linkmenu {
 	}
 }
 #jot-perms-icon {
-	.box(20px, 22px);
+	.box(22px, 22px);
 	.rounded_corners;
 	overflow: hidden;
+	background: @menu_bg_colour url("dark/icons.png") -88px -40px;
 }
 #group_allow_wrapper,
 #group_deny_wrapper,
@@ -2327,7 +2342,6 @@ div {
 	&:hover {
 		color: @main_colour;
 		background: @shiny_colour;
-		font-weight: bold;
 		padding: 3px;
 	}
 }
@@ -2640,7 +2654,7 @@ div {
 .icon {
 	display: block;
 	.box;
-	background: url(light/icons.png) no-repeat;
+	background: transparent url("light/icons.png") no-repeat;
 	border: 0;
 	text-decoration: none;
 	.rounded_corners;

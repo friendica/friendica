@@ -128,7 +128,7 @@ $langselector
 
 <div class="search-box">
 	<form method="get" action="$nav.search.0">
-		<input id="search-text" class="nav-menu-search" type="search" placeholder="Search" value="" id="search" name="search" />
+		<input id="mini-search-text" class="nav-menu-search" type="search" placeholder="Search" value="" id="search" name="search" />
 	</form>
 </div>
 
