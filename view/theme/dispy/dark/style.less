@@ -90,6 +90,9 @@ tr:nth-child(even) {
 //outline-style		Sets the style of an outline	dotted,dashed,solid,double,groove,ridge,inset,outset,inherit
 //outline-width		Sets the width of an outline 	thin,medium,thick,length,inherit
 :focus {
+	outline: none;
+}
+a:focus {
 	outline: invert, dashed, thin;
 }
 [disabled="disabled"] {
@@ -259,30 +262,6 @@ h6 {
 }
 .smalltext {
 	font-size: 0.7em;
-}
-#panel {
-	position: absolute;
-	.rounded_corners;
-	.borders(1px, solid, @main_alt_colour);
-	background-color: @bg_alt_colour;
-	color: @main_colour;
-	padding: 1em;
-}
-.pager {
-	margin-top: 60px;
-	display: block;
-	clear: both;
-	text-align: center;
-	font-size: small;
-	font-weight: bold;
-	span {
-		padding: 4px;
-		margin: 4px;
-	}
-}
-.pager_current {
-	background-color: @link_colour;
-	color: @bg_colour;
 }
 
 
@@ -658,15 +637,14 @@ nav #nav-notifications-linkmenu {
 #mini-search-text {
 	background: @bg_colour;
 	color: @main_colour;
-	font-size: 8pt;
 	margin: 8px;
-	height: 14px;
 }
 #search-text {
 	.borders;
-	width: 90%;
 }
 #mini-search-text {
+	font-size: 8pt;
+	height: 14px;
 	width: 10em;
 }
 #scrollup {
@@ -1171,6 +1149,9 @@ nav #nav-notifications-linkmenu {
 	color: darken(@main_alt_colour, 13%);
 }
 #profile-jot-desc {
+	background: @bg_colour;
+	.borders;
+	.rounded_corners;
 	color: @red_orange;
 	margin: 5px 0;
 }
@@ -1184,9 +1165,9 @@ nav #nav-notifications-linkmenu {
 	display: none;
 }
 #jot-preview-content {
-	background-color: @bg_alt_colour;
+	background-color: @shiny_colour;
 	color: @main_colour;
-	.borders(1px, solid, @main_colour);
+	.borders(1px, solid, @bg_colour);
 	.rounded_corners;
 	.box_shadow(5px, 0, 10px);
 	padding: 3px 3px 6px 10px;
@@ -1226,7 +1207,6 @@ nav #nav-notifications-linkmenu {
 	.borders(1px, solid, @hover_colour);
 	padding: 4px;
 	&:hover,
-	&.active:hover,
 	&:active {
 		background: @shiny_colour;
 		color: @main_colour;
@@ -1236,6 +1216,11 @@ nav #nav-notifications-linkmenu {
 		background: @main_colour;
 		color: @bg_colour;
 		.borders(1px, solid, @hover_colour);
+		&:hover {
+			background: @shiny_colour;
+			color: @bg_colour;
+			.borders(1px, solid, @hover_colour);
+		}
 		a {
 			color: @bg_colour;
 			text-decoration: none;
@@ -2338,7 +2323,8 @@ div {
 	padding: 3px;
 	&:hover {
 		color: @bg_colour;
-		background: @link_colour;
+		background: @shiny_colour;
+		.borders(1px, solid, @hover_colour);
 		padding: 3px;
 	}
 }
@@ -2369,7 +2355,8 @@ div {
 	.borders(1px, solid, darken(@main_alt_colour, 33.5%));
 	margin-right: 3px;
 	width: 75%;
-	&:hover, &:focus {
+	&:hover,
+	&:focus {
 		background-color: @main_alt_colour;
 		color: darken(@main_alt_colour, 80%);
 		.borders(1px, solid, darken(@main_alt_colour, 73.5%));
@@ -2572,7 +2559,30 @@ div {
 	}
 }
 #panel {
+	position: absolute;
+	font-size: small;
+	.rounded_corners;
+	.borders(1px, solid, @main_alt_colour);
+	background-color: @bg_alt_colour;
+	color: @main_colour;
+	padding: 1em;
 	z-index: 100;
+}
+.pager {
+	margin-top: 60px;
+	display: block;
+	clear: both;
+	text-align: center;
+	font-size: small;
+	font-weight: bold;
+	span {
+		padding: 4px;
+		margin: 4px;
+	}
+}
+.pager_current {
+	background-color: @link_colour;
+	color: @bg_colour;
 }
 .grey, .gray {
 	color: gray;
@@ -2663,7 +2673,7 @@ div {
 .editicon {
 	display: inline-block;
 	.box(21px, 21px);
-	background: url(dark/editicons.png) no-repeat;
+	background: url("dark/editicons.png") no-repeat;
 	border: 0;
 	text-decoration: none;
 }

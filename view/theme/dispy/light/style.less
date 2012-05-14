@@ -91,17 +91,20 @@ tr:nth-child(even) {
 //outline-style		Sets the style of an outline	dotted,dashed,solid,double,groove,ridge,inset,outset,inherit
 //outline-width		Sets the width of an outline 	thin,medium,thick,length,inherit
 :focus {
+	outline: none;
+}
+a:focus {
 	outline: invert, dashed, thin;
 }
 [disabled="disabled"] {
-	background: @med_bg_colour;//#ddd
-	color: @disabled_colour;//#333
+	background: @dk_bg_colour;
+	color: @disabled_colour;
 }
 ///* remember to highlight inserts somehow! */
 ins,
 mark {
-	background-color: @bg_alt_colour;//#ff9
-	color: @lt_main_colour;//#000
+	background-color: @bg_colour;
+	color: @main_colour;
 }
 ins {
 	text-decoration: none;
@@ -260,30 +263,6 @@ h6 {
 }
 .smalltext {
 	font-size: 0.7em;
-}
-#panel {
-	position: absolute;
-	.rounded_corners;
-	.borders(1px, solid, @main_alt_colour);//#fff
-	background-color: @bg_alt_colour;//#2e3436
-	color: @main_colour;//#eec
-	padding: 1em;
-}
-.pager {
-	margin-top: 60px;
-	display: block;
-	clear: both;
-	text-align: center;
-	font-size: small;
-	font-weight: bold;
-	span {
-		padding: 4px;
-		margin: 4px;
-	}
-}
-.pager_current {
-	background-color: @link_colour;
-	color: @bg_colour;//#fff
 }
 
 
@@ -616,7 +595,7 @@ nav #nav-notifications-linkmenu {
 	top: 20px;
 	right: 1%;
 	padding: 5px;
-	background: @dk_bg_colour;//#2e3436
+	background: @dk_bg_colour;
 	color: transparent;
 	.rounded_corners;
 	z-index: 100;
@@ -659,15 +638,14 @@ nav #nav-notifications-linkmenu {
 #mini-search-text {
 	background: white;
 	color: @main_colour;
-	font-size: 8pt;
 	margin: 8px;
-	height: 14px;
 }
 #search-text {
 	.borders(1px, solid, @main_alt_colour);
-	width: 90%;
 }
 #mini-search-text {
+	font-size: 8pt;
+	height: 14px;
 	width: 10em;
 }
 #scrollup {
@@ -774,7 +752,7 @@ nav #nav-notifications-linkmenu {
 		}
 	}
 	.menu-sep {
-	    border-top: 1px solid @med_bg_colour;//#9eabb0
+	    border-top: 1px solid @med_bg_colour;
 	}
 	li {
 		float: none;
@@ -790,7 +768,7 @@ nav #nav-notifications-linkmenu {
 	.empty {
 		padding: 5px;
 		text-align: center;
-		color: lighten(@shiny_colour, 45%);//#9eabb0
+		color: lighten(@shiny_colour, 45%);
 	}
 }
 .notif-item {
@@ -820,8 +798,8 @@ nav #nav-notifications-linkmenu {
 	bottom: 0;
 	.box_shadow(@main_shadow);
 	padding: 10px;
-	background-color: @lt_orange;//#fcaf3e
-	.borders(2px, solid, @orange);//#f8911b
+	background-color: @lt_orange;
+	.borders(2px, solid, @orange);
 	border-bottom: 0;
 	padding-bottom: 50px;
 	z-index: 1000;
@@ -841,7 +819,7 @@ nav #nav-notifications-linkmenu {
 #sysmsg br {
 	display: block;
 	margin: 2px 0px;
-	border-top: 1px solid @main_colour;//#ccccce
+	border-top: 1px solid @bg_colour;
 }
 
 
@@ -891,8 +869,8 @@ nav #nav-notifications-linkmenu {
 				position: relative; } } }
 }
 .aprofile dt {
-	background: @main_colour;//transp.
-	color: @bg_colour;//#666666
+	background: transparent;
+	color: darken(@main_alt_colour, 20%);
 	font-weight: bold;
 	.box_shadow(3px, 3px, 5px);
 	.rounded_corners;
@@ -977,7 +955,7 @@ nav #nav-notifications-linkmenu {
 		}
 	}
 	#jot-title {
-	    .borders(1px, solid, darken(@main_alt_colour, 13%));//#ccc
+	    .borders(1px, solid, lighten(@main_alt_colour, 20%));
 		margin: 0 0 5px;
 		.box(90%, 20px);
 		font-weight: bold;
@@ -1007,21 +985,21 @@ nav #nav-notifications-linkmenu {
 }
 #profile-jot-text_tbl {
 	margin-bottom: 10px;
-	background: darken(@main_alt_colour, 46.8%);//#777
+	background: darken(@main_alt_colour, 10%);
 }
 #profile-jot-text_ifr {
 	width: 99.900002% !important;
 }
 #profile-jot-text_toolbargroup, .mceCenter tr {
-	background: darken(@main_alt_colour, 46.8%);//#777
+	background: darken(@main_alt_colour, 10%);
 }
 [id$="jot-text_ifr"] {
 	width: 99.900002% !important;
-	color: @bg_colour;//#2e2f2e
-	background: @main_colour;//#eec
+	color: @main_colour;
+	background: @bg_colour;
 	.mceContentBody {
-		color: @bg_colour;//#2e2f2e
-		background: @main_colour;//#eec
+		color: @main_colour;
+		background: @bg_colour;
 	}
 }
 .defaultSkin {
@@ -1058,7 +1036,7 @@ nav #nav-notifications-linkmenu {
 }
 #profile-jot-email-label {
 	background-color: @menu_bg_colour;
-	color: @main_colour;//#ccccce
+	color: @bg_colour;
 	padding: 5px;
 }
 #profile-jot-email {
@@ -1097,7 +1075,7 @@ nav #nav-notifications-linkmenu {
 	.box(20px, 20px);
 	.rounded_corners;
 	.box_shadow(3px, 3px, 5px, 0);
-	.borders(2px, outset, @bg_colour);
+	.borders(2px, outset, @menu_bg_colour);
 	overflow: hidden;
 	margin: 0 10px 0 10px;
 }
@@ -1151,28 +1129,31 @@ nav #nav-notifications-linkmenu {
 	float: right;
 }
 #acl-permit-text {
-	background-color: darken(@main_alt_colour, 60%);//@menu_bg_colour
+	background-color: @menu_bg_colour;
 	color: @main_colour;
 	padding: 5px;
 	float: left;
 }
 #jot-public {
-	background-color: darken(@main_alt_colour, 60%);//@menu_bg_colour
+	background-color: @menu_bg_colour;
 	color: @alert;
 	padding: 5px;
 	float: left;
 }
 #acl-deny-text {
-	background-color: darken(@main_alt_colour, 60%);//@menu_bg_colour
-	color: @main_colour;//#ccccce
+	background-color: @menu_bg_colour;
+	color: @bg_colour;
 	padding: 5px;
 	float: left;
 }
 #jot-title-desc {
-	color: darken(@main_alt_colour, 13%);//#ccc
+	color: lighten(@main_alt_colour, 20%);
 }
 #profile-jot-desc {
-	color: @red_orange;//#a00
+	background: @bg_colour;
+	.borders;
+	.rounded_corners;
+	color: @red_orange;
 	margin: 5px 0;
 }
 #jot-title-wrapper {
@@ -1185,9 +1166,9 @@ nav #nav-notifications-linkmenu {
 	display: none;
 }
 #jot-preview-content {
-	background-color: @bg_alt_colour;//@shiny_colour
+	background-color: @shiny_colour;
 	color: @main_colour;
-	.borders(1px, solid, @main_colour);//#aa0
+	.borders(1px, solid, @main_colour);
 	.rounded_corners;
 	.box_shadow(5px, 0, 10px);
 	padding: 3px 3px 6px 10px;
@@ -1227,16 +1208,20 @@ nav #nav-notifications-linkmenu {
 	.borders(1px, solid, @hover_colour);
 	padding: 4px;
 	&:hover,
-	&.active:hover,
 	&:active {
 		background: @shiny_colour;
 		color: @main_colour;
 		.borders(1px, solid, @hover_colour);
 	}
 	&.active {
-		background: @main_colour;
+		background: @dk_bg_colour;
 		color: @bg_colour;
 		.borders(1px, solid, @hover_colour);
+		&:hover {
+			background: @shiny_colour;
+			color: @main_colour;
+			.borders(1px, solid, @hover_colour);
+		}
 		a {
 			color: @bg_colour;
 			text-decoration: none;
@@ -1434,10 +1419,10 @@ nav #nav-notifications-linkmenu {
 		white-space: nowrap;
 		display: block;
 		padding: 5px 2px;
-		color: @main_alt_colour;//#eeeeec
+		color: @bg_colour;
 		&:hover {
 			color: @menu_bg_colour;
-			background: @main_alt_colour;//#eeeeec
+			background: @bg_colour;
 		}
 	}
 }
@@ -1546,7 +1531,7 @@ nav #nav-notifications-linkmenu {
 .comment-edit-submit {
 	height: 22px;
 	background-color: @menu_bg_colour;
-	color: @main_alt_colour;//#eeeeec
+	color: @bg_colour;
 	.rounded_corners;
 	border: 0;
 }
@@ -1556,11 +1541,11 @@ nav #nav-notifications-linkmenu {
  * item text style
  */
 .wall-item-body code {
-    background-color: lighten(@main_alt_colour, 66.5%);//@bg_colour
-    border-bottom: 1px dashed lighten(@main_alt_colour, 13.5%);//#ccc
-    border-left: 5px solid lighten(@main_alt_colour, 13.5%);//#ccc
-    border-top: 1px dashed lighten(@main_alt_colour, 13.5%);//#ccc
-	color: darken(@main_alt_colour, 5%);
+    background-color: lighten(@main_alt_colour, 26.5%);
+    border-bottom: 1px dashed darken(@main_alt_colour, 6.5%);
+    border-left: 5px solid darken(@main_alt_colour, 6.5%);
+    border-top: 1px dashed darken(@main_alt_colour, 6.5%);
+	color: darken(@main_alt_colour, 50%);
     display: block;
     overflow-x: auto;
     padding: 5px 0 15px 10px;
@@ -1577,7 +1562,7 @@ nav #nav-notifications-linkmenu {
 div {
 	&[id$="text"] {
 		font-weight: bold;
-		border-bottom: 1px solid darken(@main_alt_colour, 13.5%);//#ccc
+		border-bottom: 1px solid @bg_colour;
 	}
 	&[id$="wrapper"] {
 		height: 100%;
@@ -1634,8 +1619,8 @@ div {
 .photo-top-image-wrapper {
 	float: left;
 	.box_shadow(3px, 3px, 10px, 0);
-	background-color: darken(@main_alt_colour, 80%);//@bg_colour
-	color: @bg_colour;//@main_colour
+	background-color: @bg_colour;
+	color: @main_colour;
 	.rounded_corners;
 	padding-bottom: 30px;
 	position: relative;
@@ -1942,7 +1927,7 @@ div {
 }
 .contact-photo-menu {
 	width: auto;
-	.borders(2px, solid, darken(@main_alt_colour, 66.5%));//#444
+	.borders(2px, solid, darken(@main_alt_colour, 33.5%));
 	background: @bg_colour;
 	color: @main_colour;
 	position: absolute;
@@ -2042,8 +2027,8 @@ div {
 	font-weight: bold;
 }
 #advanced-expire-popup {
-	background: @bg_colour;//#2e2f2e
-	color: @main_colour;//#eec
+	background: @main_colour;
+	color: @bg_colour;
 }
 #id_ssl_policy {
 	width: 374px;
@@ -2083,7 +2068,7 @@ div {
 #group-all-contacts h3,
 #prof-members h3,
 #prof-all-contacts h3 {
-	color: @main_alt_colour;//#eeeeec
+	color: @bg_colour;
 	background-color: @menu_bg_colour;
 	margin: 0;
 	padding: 5px;
@@ -2163,7 +2148,7 @@ div {
 	background: @bg_colour;
 }
 .vevent {
-	border: 1px solid darken(@main_alt_colour, 13.5%);//#ccc
+	border: 1px solid @bg_colour;
 	.event-description,
 	.event-location,
 	.event-start {
@@ -2281,8 +2266,6 @@ div {
 .fc-state-highlight {
 	background: @bg_colour;
 	color: @main_colour;
-	//background: #eec;
-	//color: #2e2f2e;
 }
 
 
@@ -2310,15 +2293,15 @@ div {
 .fileas-selected {
 	padding: 3px;
 	color: @bg_colour;
-	background: @link_colour;
+	background: @dk_bg_colour;
 	.borders(1px, solid, @link_colour);
 }
 .group-selected:hover,
 .nets-selected:hover,
 .fileas-selected:hover {
 	padding: 3px;
-	color: @bg_colour;
-	background: @shiny_colour;
+	color: @link_colour;
+	background: @bg_colour;
 	.borders(1px, solid, @link_colour);
 }
 .groupsideedit {
@@ -2342,13 +2325,14 @@ div {
 	&:hover {
 		color: @main_colour;
 		background: @shiny_colour;
+		.borders(1px, solid, @hover_colour);
 		padding: 3px;
 	}
 }
 #sidebar-new-group {
 	margin: auto;
 	display: inline-block;
-	color: @main_alt_colour;//#efefef
+	color: @bg_colour;
 	text-decoration: none;
 	text-align: center;
 }
@@ -2367,15 +2351,16 @@ div {
 	}
 }
 #side-peoplefind-url {
-	background-color: @bg_colour;//#e5e0cf
-	color: @main_colour;//#666
-	.borders(1px, solid, darken(@main_alt_colour, 33.5%));//$666
+	background-color: @bg_colour;
+	color: darken(@main_alt_colour, 20%);
+	.borders(1px, solid, darken(@main_alt_colour, 20%));
 	margin-right: 3px;
 	width: 75%;
-	&:hover, &:focus {
+	&:hover,
+	&:focus {
 		background-color: @main_alt_colour;
-		color: darken(@main_alt_colour, 80%);//#efefef
-		.borders(1px, solid, darken(@main_alt_colour, 73.5%));//#333
+		color: @bg_colour;
+		.borders(1px, solid, @main_colour);
 	}
 }
 .nets-ul {
@@ -2437,7 +2422,7 @@ div {
 		margin-left: 250px;
 	}
 	h3 {
-		border-bottom: 1px solid darken(@main_alt_colour, 13.5%);//#ccc
+		border-bottom: 1px solid lighten(@main_alt_colour, 20%);
 	}
 	.submit {
 		clear: left;
@@ -2448,7 +2433,7 @@ div {
 	}
 	.plugin {
 		display: block;
-		.borders(1px, solid, darken(@main_alt_colour, 40%));//#888
+		.borders(1px, solid, darken(@main_alt_colour, 6.5%));
 		padding: 1em;
 		margin-bottom: 5px;
 		clear: left;
@@ -2508,7 +2493,7 @@ div {
 	width: 80px;
 	a {
 		display: block;
-		.borders(1px, solid, darken(@main_alt_colour, 53.5%));//#666
+		.borders(1px, solid, darken(@main_alt_colour, 20%));
 		padding: 3px 6px 4px 10px;
 		height: 16px;
 		text-decoration: none;
@@ -2557,7 +2542,7 @@ div {
 	position: absolute;
 	display: none;
 	.background {
-		background-color: darken(@main_alt_colour, 86.5%);//#000
+		background-color: @main_colour;
 		opacity: 0.5;
 		.box(100%, 100%);
 		position: absolute;
@@ -2575,7 +2560,30 @@ div {
 	}
 }
 #panel {
+	position: absolute;
+	font-size: small;
+	.rounded_corners;
+	.borders(1px, solid, @bg_colour);
+	background-color: @dk_bg_colour;
+	color: @bg_colour;
+	padding: 1em;
 	z-index: 100;
+}
+.pager {
+	margin-top: 60px;
+	display: block;
+	clear: both;
+	text-align: center;
+	font-size: small;
+	font-weight: bold;
+	span {
+		padding: 4px;
+		margin: 4px;
+	}
+}
+.pager_current {
+	background-color: @link_colour;
+	color: @bg_colour;
 }
 .grey, .gray {
 	color: gray;
@@ -2607,7 +2615,7 @@ div {
 	width: 50%;
 	overflow: hidden;
 	height: auto;
-	.borders(1px, solid, darken(@main_alt_colour, 13.5%));//#ccc
+	.borders(1px, solid, lighten(@main_alt_colour, 20%));
 	margin-bottom: 5px;
 	span {
 		float: right;
@@ -2625,7 +2633,7 @@ div {
 .oauthapp {
 	height: auto;
 	overflow: auto;
-	border-bottom: 2px solid darken(@main_alt_colour, 13.5%);//#ccc
+	border-bottom: 2px solid lighten(@main_alt_colour, 20%);
 	padding-bottom: 1em;
 	margin-bottom: 1em;
 	img {
@@ -2666,7 +2674,7 @@ div {
 .editicon {
 	display: inline-block;
 	.box(21px, 21px);
-	background: url(light/editicons.png) no-repeat;
+	background: url("light/editicons.png") no-repeat;
 	border: 0;
 	text-decoration: none;
 }
@@ -2926,8 +2934,6 @@ footer {
 	display: block !important;
 	background: @bg_colour;
 	color: @main_colour;
-//	background: #eec;
-//	color: #2e2f2e;
 }
 #profile-jot-acl-wrapper {
 	margin: 0 10px;
@@ -2944,7 +2950,7 @@ footer {
 	background: white url("../../../images/search_18.png") no-repeat right center;
 	padding-right: 20px;
 	margin: 6px;
-	color: @bg_colour;//@main_colour
+	color: @main_colour;
 }
 #acl-showall {
 	float: left;
