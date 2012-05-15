@@ -209,7 +209,7 @@ function contact_photo_menu($contact) {
 	);
 	
 	
-	$args = array('contact' => $contact, 'menu' => $menu);
+	$args = array('contact' => $contact, 'menu' => &$menu);
 	
 	call_hooks('contact_photo_menu', $args);
 	
