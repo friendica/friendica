@@ -281,10 +281,30 @@ h6 {
 	.box(100%, 100%);
 	margin: 0 auto;
 }
+.button,
+#profile-listing-desc {
+	.box(25%, auto);
+	background: @menu_bg_colour;
+	color: @bg_colour;
+	.borders(2px, outset, darken(@menu_bg_colour, 20%));
+	.rounded_corners;
+	padding: 5px;
+	font-size: smaller;
+	cursor: pointer;
+	&.active {
+		.box_shadow(4px, 4px, 7px);
+	}
+	a {
+		color: @bg_colour;
+		font-size: smaller;
+		font-weight: bold;
+	}
+}
 [class$="-desc"],
 [id$="-desc"] {
 	color: @bg_colour;
-	background: @dk_bg_colour;
+	// background: @main_colour;
+	.borders(1px, outset, @bg_colour);
 	.rounded_corners;
 	// .box_shadow(3px, 3px, 5px);
     margin: 3px 10px 7px 0;
@@ -1288,7 +1308,7 @@ nav #nav-notifications-linkmenu {
 }
 .wall-item-info {
 	float: left;
-	width: 110px;
+	width: 8em;
 }
 .wall-item-photo-wrapper {
 	.box(80px, 80px);
@@ -1353,16 +1373,21 @@ nav #nav-notifications-linkmenu {
 	}
 }
 .wall-item-author,
-.wall-item-actions-author {
+.wall-item-actions-author,
+.wall-item-ago {
 	clear: left;
 	float: left;
-	font-size: 0.8em;
-	color: lighten(@menu_bg_colour, 20%);
-	margin: 1em auto 0 0.2em;
+	color: @bg_colour;
+	line-height: 1;
+	display: inline-block;
+	font-size: 0.75em;
+	margin: 0.5em auto 0;
 }
-.wall-item-ago {
-	display: inline;
-	padding-left: 10px;
+.wall-item-author,
+.wall-item-actions-author {
+	margin: 0.5em auto 0;
+	font-size: 0.75em;
+	font-weight: bold;
 }
 .wall-item-location {
 	margin-top: 15px;
@@ -1372,7 +1397,8 @@ nav #nav-notifications-linkmenu {
 	.icon {
 		float: left;
 	}
-	> a, .smalltext {
+	> a,
+	.smalltext {
 		margin-left: 25px;
 		font-size: 0.7em;
 		display: block;
@@ -1406,7 +1432,8 @@ nav #nav-notifications-linkmenu {
 }
 .wall-item-photo-menu {
 	min-width: 92px;
-	.borders(2px, solid, white);
+	font-size: 0.75em;
+	.borders(2px, solid, @menu_bg_colour);
 	border-top: 0px;
 	background: @menu_bg_colour;
 	position: absolute;
@@ -1418,7 +1445,7 @@ nav #nav-notifications-linkmenu {
 	li a {
 		white-space: nowrap;
 		display: block;
-		padding: 5px 2px;
+		padding: 5px 6px;
 		color: @bg_colour;
 		&:hover {
 			color: @menu_bg_colour;
@@ -1447,6 +1474,9 @@ nav #nav-notifications-linkmenu {
 	font-size: 0.9em;
 	margin-left: 5em;
 }
+.hide-comments-outer {
+	font-size: small;
+}
 .wall-item-outside-wrapper.comment {
 	margin-left: 5em;
 	.wall-item-photo {
@@ -1460,9 +1490,6 @@ nav #nav-notifications-linkmenu {
 		width: 50px;
 		top: 45px;
 		background-position: 35px center;
-	}
-	.wall-item-info {
-		width: 60px;
 	}
 	.wall-item-body {
 		margin-left: 10px;
@@ -2456,13 +2483,13 @@ div {
 		}
 		&#users {
 			padding: 5px;
-		}
-		&#users img {
-			.box(16px, 16px);
-		}
-		&#users a {
-			color: @main_colour;
-			text-decoration: underline;
+		    img {
+			    .box(16px, 16px);
+    		}
+            a {
+			    color: @main_colour;
+			    text-decoration: underline;
+            }
 		}
 	}
 	td .icon {
@@ -2585,7 +2612,8 @@ div {
 	background-color: @link_colour;
 	color: @bg_colour;
 }
-.grey, .gray {
+.grey,
+.gray {
 	color: gray;
 }
 .orange {
@@ -2939,6 +2967,7 @@ footer {
 	margin: 0 10px;
 	.borders(1px, solid, @menu_bg_colour);
 	border-top: 0;
+	font-size: small;
 	// .box_shadow;
 }
 #acl-wrapper {
