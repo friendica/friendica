@@ -395,7 +395,7 @@ div[id$="wrapper"]{height:100%;margin-bottom:1em;}div[id$="wrapper"] br{clear:le
 #sidebar-group-ul{padding-left:0;}
 #sidebar-group-list{margin:0 0 5px 0;}#sidebar-group-list li{margin-top:10px;}
 #sidebar-group-list .icon{display:inline-block;width:12px;height:12px;}
-.sidebar-group-element{padding:3px;}.sidebar-group-element:hover{color:#2e2f2e;background:#2e3436;border:1px solid #638ec4;padding:3px;}
+.sidebar-group-element{padding:3px;}.sidebar-group-element:hover{color:#eeeecc;background:#2e3436;border:1px solid #638ec4;padding:3px;}
 #sidebar-new-group{margin:auto;display:inline-block;color:#eeeeee;text-decoration:none;text-align:center;}
 #peoplefind-sidebar form{margin-bottom:10px;}
 #sidebar-new-group:hover{}
