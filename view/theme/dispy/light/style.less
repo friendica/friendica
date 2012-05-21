@@ -62,7 +62,7 @@ input,
 select,
 textarea {
 	color: @main_colour;
-	background-color: @bg_colour;
+	background-color: white;
 }
 select {
 	.borders(1px, dotted, darken(@main_alt_colour, 26.8%));
@@ -303,7 +303,7 @@ h6 {
 [class$="-desc"],
 [id$="-desc"] {
 	color: @bg_colour;
-	background: @main_colour;
+	background: @dk_bg_colour;
 	.borders(1px, outset, @bg_colour);
 	.rounded_corners;
 	// .box_shadow(3px, 3px, 5px);
@@ -1377,7 +1377,7 @@ nav #nav-notifications-linkmenu {
 .wall-item-ago {
 	clear: left;
 	float: left;
-	color: @bg_colour;
+	color: @main_colour;
 	line-height: 1;
 	display: inline-block;
 	font-size: 0.75em;
