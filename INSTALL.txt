@@ -223,7 +223,7 @@ Retry the installation. As soon as the database has been created,
 % chmod 755 .htconfig.php
 
 #####################################################################
-- Some congiurations with "suhosin" security are configured without
+- Some configurations with "suhosin" security are configured without
 an ability to run external processes. Friendica requires this ability.
 Following are some notes provided by one of our members.
 #####################################################################
