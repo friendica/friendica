@@ -185,7 +185,7 @@ blockquote {
 	.borders(1px, solid, @main_colour);
 	.rounded_corners;
 }
-label {
+.label () {
 	width: 38%;
 	display: inline-block;
 	font-size: small;
@@ -195,6 +195,9 @@ label {
 	background: lighten(@main_alt_colour, 20%);
 	color: @main_colour;
 	.box_shadow(3px, 3px, 5px);
+}
+label {
+	.label;
 }
 input {
 	.box(250px, 25px);
@@ -1682,9 +1685,9 @@ div {
 	margin: 0 10px 10px 0;
 }
 #photo-photo {
-	max-width: 100%;
+	margin: auto auto 5em 20%;
 	img {
-		max-width: 100%;
+		max-width: 50%;
 	}
 }
 .photo-top-image-wrapper a:hover,
@@ -1692,7 +1695,8 @@ div {
 .photo-album-image-wrapper a:hover {
 	border-bottom: 0;
 }
-.photo-top-photo, .photo-album-photo {
+.photo-top-photo,
+.photo-album-photo {
 	.rounded_corners(5px 5px 0 0);
 }
 .photo-top-album-name,
@@ -1701,21 +1705,16 @@ div {
 	bottom: 0;
 	padding: 0 5px;
 }
-#photo-photo {
-	position: relative;
-	// float: left;
-	margin: 5px 45%;
-}
 #photo-prev-link,
 #photo-next-link {
 	position: absolute;
 	// .box(30%, 100%);
-	.box(50px, 150px);
+	.box(50px, 200px);
 	background: white center center no-repeat;
 	opacity: 0;
 	.transition(all, 0.5s);
 	z-index: 10;
-	top: 175px;
+	top: 15em;
 	.rounded_corners;
 	&:hover {
 		opacity: 0.6;
@@ -1728,12 +1727,12 @@ div {
 #photo-prev-link {
 	// background-image: url(light/prev.png);
 	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAnCAMAAADTjiM/AAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAALpQTFRF////AAAAQEBAZmZmVVVVSUlJTU1NXV1dVVVVTk5OW1tbWlpaWFhPWFhQU1pTVVVVVlZSVVlRVlZTVFdUVFdUVVdTVFZSVldUVldSVldSVldTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVZUVVdTVVdTVVhSVVdTVVdTVVhSVVdTVVdTVVhSVVdTVVdTVVdTVVdTVVdTVVdTVVhTVVdTVVdTVVdTVVdT3XYY/AAAAD10Uk5TAAEEBQYHCgsMDQ4RHSAlP0FFR1hee3+JnqSqq6ytrq+wsbKztLW2t7y9vr/AwcLDxMXGx8jU1dng7O/3+TmOwVsAAADASURBVCjPddPXEoIwEAXQINh7Q8WKYu+95v9/S0dxZxNy83hgMpvdu0Jox642r25GVxGfys+5540sZV3jyY/lWeVxyDLg7AR/lhXOI+KZZeRFgvGQeMnY9olXScYD4jXnPvHGzNsU4x7xjnGsa+YO8T7NnukRHzgXiY/KNKiUkzqkZ8ivnDoKD/xfBvdbbXM9sH70Xtgf2E/YfzgvOF+YB5gf5cPcAfmsgTy3QP5vYF8akf36XvXIRhZPlPyLWxBvNENWsZXDKukAAAAASUVORK5CYII=");
-    left: 22%;
+    left: 5%;
 }
 #photo-next-link {
 	// background-image: url(light/next.png);
 	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAnCAMAAADTjiM/AAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAKVQTFRF////gICAQEBAZmZmVVVVSUlJYGBgVVVVTU1NXV1dVVVVWVlZU1hTVlZSVlZTVlZTVVlRVVhSVFdUVlhTVVdTVFZTVVdTVldTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVdTVVZUVVdTVVdTVVhSVVdTVVdTVVdTVVdTVVdTVVdTVVdTVVdTVVdT8E3YQQAAADZ0Uk5TAAIEBQYHCAkKCwwUN0FER0hOW2uNjqWqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCxcjT3PP3B0dhfwAAANlJREFUKM910+cSgjAQRtEIomAXu4iIYge7ef9Hs+ZzN4b9eW4mk1kGIaqdU9wQf2Nf5XPSiu4d+Z6jp/n54/KghZ40h5ZymbFQGCCkLg3WKC+MEfYs2AHCrszCBGHLQ5gXpggbFooRwrrEwgxhxUOcE5w5wtJiYYHQZjt0EuUhX3r19vU7Y++ozgeMD7i/buYhYTcDj8gz3RQ8prwHB/aPyzvwhPLWzBtwSLi0Bk8pr8BR0cgzwiIycw0cUxZ9xXOH7VZ9vAVn4X840Vh4F9Pp1w/gZ92mpesDuLpM+1blc68AAAAASUVORK5CYII=");
-    left: 44%;
+    left: 55%;
 }
 #photo-prev-link a,
 #photo-next-link a {
@@ -1764,21 +1763,35 @@ div {
 #photo-edit-caption,
 #photo-edit-newtag,
 #photo-edit-albumname {
-	float: left;
-	margin-bottom: 25px;
+
 }
 #photo-edit-link-wrap {
 	margin-bottom: 15px;
 }
 #photo-edit-caption,
 #photo-edit-newtag {
-	width: 100%;
+
+}
+#photo-edit-perms {
+	width: auto;
+}
+#photo-edit-rotate-label {
+	.label;
 }
 #photo-like-div {
-	margin-bottom: 25px;
+	float: left;
+	margin: auto 0 0;
+	width: 2em;
+	.rounded_corners;
+	.borders;
+}
+.wall-item-like-buttons {
+	> * {
+		display: inline;
+	}
 }
 #photo-edit-delete-button {
-	margin-left: 200px;
+	margin: auto auto auto 1em;
 }
 #photo-edit-end {
 	margin-bottom: 35px;
@@ -1788,6 +1801,10 @@ div {
 	font-weight: bold;
 	margin-top: 15px;
 	margin-bottom: 15px;
+}
+#wall-photo-container {
+	margin: 0 auto 1em 4em;
+	width: 90%;
 }
 
 
@@ -2960,6 +2977,9 @@ div {
 footer {
 	display: block;
 	clear: both;
+}
+#sectionfooter {
+	margin: 1em 0 1em 0;
 }
 #profile-jot-text {
 	height: 20px;
