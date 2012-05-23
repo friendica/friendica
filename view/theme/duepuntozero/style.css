@@ -2950,6 +2950,7 @@ aside input[type='text'] {
 .starred { background-position: -16px -48px; }
 .unstarred { background-position: -32px -48px; }
 .tagged { background-position: -48px -48px; }
+.yellow { background-position: -64px -48px; }
 
 
 .filer-icon {

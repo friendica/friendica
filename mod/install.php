@@ -4,6 +4,12 @@ $install_wizard_pass=1;
 
 
 function install_init(&$a){
+	
+	// $baseurl/install/testrwrite to test if rewite in .htaccess is working
+	if ($a->argc==2 && $a->argv[1]=="testrewrite") {
+		echo "ok";
+		killme();
+	}
 	global $install_wizard_pass;
 	if (x($_POST,'pass'))
 		$install_wizard_pass = intval($_POST['pass']);
@@ -110,14 +116,7 @@ function install_content(&$a) {
 	$wizard_status = "";
 	$install_title = t('Friendica Social Communications Server - Setup');
 	
-	if(x($a->data,'txt') && strlen($a->data['txt'])) {
-		$tpl = get_markup_template('install.tpl');
-		return replace_macros($tpl, array(
-			'$title' => $install_title,
-			'$pass' => t('Database connection'),
-			'$text' => manual_config($a),
-		));
-	}
+
 	
 	if(x($a->data,'db_conn_failed')) {
 		$install_wizard_pass = 2;
@@ -128,39 +127,20 @@ function install_content(&$a) {
 		$wizard_status =  t('Could not create table.');
 	}
 	
+	$db_return_text="";
 	if(x($a->data,'db_installed')) {
 		$txt = '<p style="font-size: 130%;">';
 		$txt .= t('Your Friendica site database has been installed.') . EOL;
-		$txt .= t('IMPORTANT: You will need to [manually] setup a scheduled task for the poller.') . EOL ;
-		$txt .= t('Please see the file "INSTALL.txt".') . EOL ;
-		$txt .= '<br />';
-		$txt .= '<a href="' . $a->get_baseurl() . '/register' . '">' . t('Proceed to registration') . '</a>' ;
-		$txt .= '</p>';
-		
-		$tpl = get_markup_template('install.tpl');
-		return replace_macros($tpl, array(
-			'$title' => $install_title,
-			'$pass' => t('Proceed with Installation'),
-			'$text' => $txt,
-		));
-
+		$db_return_text .= $txt;
 	}
 
 	if(x($a->data,'db_failed')) {
 		$txt = t('You may need to import the file "database.sql" manually using phpmyadmin or mysql.') . EOL;
 		$txt .= t('Please see the file "INSTALL.txt".') . EOL ."<hr>" ;
 		$txt .= "<pre>".$a->data['db_failed'] . "</pre>". EOL ;
-
-		$tpl = get_markup_template('install.tpl');
-		return replace_macros($tpl, array(
-			'$title' => $install_title,
-			'$pass' => t('Database connection'),
-			'$status' => t('Database import failed.'),
-			'$text' => $txt,
-		));
-		
+		$db_return_text .= $txt;
 	}
-
+	
 	if($db && $db->connected) {
 		$r = q("SELECT COUNT(*) as `total` FROM `user`");
 		if($r && count($r) && $r[0]['total']) {
@@ -174,6 +154,19 @@ function install_content(&$a) {
 		}
 	}
 
+	if(x($a->data,'txt') && strlen($a->data['txt'])) {
+		$tpl = get_markup_template('install.tpl');
+		$db_return_text .= manual_config($a);
+	}
+	
+	if ($db_return_text!="") {
+		return replace_macros($tpl, array(
+			'$title' => $install_title,
+			'$pass' => "",
+			'$text' => $db_return_text . what_next(),
+		));
+	}
+	
 	switch ($install_wizard_pass){
 		case 1: { // System check
 
@@ -191,7 +184,8 @@ function install_content(&$a) {
 
 			check_php($phpath, $checks);
 
-
+			check_htaccess($checks);
+			
 			function check_passed($v, $c){
 				if ($c['required'])
 					$v = $v && $c['status'];
@@ -422,12 +416,24 @@ function check_htconfig(&$checks) {
 		$status=false;
 		$help = t('The web installer needs to be able to create a file called ".htconfig.php" in the top folder of your web server and it is unable to do so.') .EOL;
 		$help .= t('This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can.').EOL;
-		$help .= t('Please check with your site documentation or support people to see if this situation can be corrected.').EOL;
-		$help .= t('If not, you may be required to perform a manual installation. Please see the file "INSTALL.txt" for instructions.').EOL; 
+		$help .= t('At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder.').EOL;
+		$help .= t('You can alternatively skip this procedure and perform a manual installation. Please see the file "INSTALL.txt" for instructions.').EOL; 
 	}
 
-	check_add($checks, t('.htconfig.php is writable'), $status, true, $help);
+	check_add($checks, t('.htconfig.php is writable'), $status, false, $help);
 	
+}
+
+function check_htaccess(&$checks) {
+	$a = get_app();
+	$status = true;
+	$help = "";
+	$test = fetch_url($a->get_baseurl()."/install/testrewrite");
+	if ($test!="ok") {
+		$status = false;
+		$help = t('Url rewrite in .htconfig is not working. Check your server configuration.');
+	}
+	check_add($checks, t('Url rewrite is working'), $status, true, $help);
 }
 
 	
@@ -465,5 +471,16 @@ function load_database($db) {
 	return $errors;
 }
 
+function what_next() {
+	$a = get_app();
+	$baseurl = $a->get_baseurl();
+	return 
+		t('<h1>What next</h1>')
+		."<p>".t('IMPORTANT: You will need to [manually] setup a scheduled task for the poller.')
+		.t('Please see the file "INSTALL.txt".')			
+		."</p><p>"
+		.t("Go to your new Firendica node <a href='$baseurl/register'>registration page</a> and register as new user. Remember to use the same email you have entered as administrator email. This will allow you to enter the site admin panel.")
+		."</p>";
+}
 
 
