@@ -356,6 +356,11 @@ h6 {
 	font-style: italic;
 	font-size: smaller;
 }
+.like-rotator {
+	vertical-align: middle;
+	text-align: center;
+	margin: 1px;
+}
 
 
 /**
@@ -1303,6 +1308,10 @@ nav #nav-notifications-linkmenu {
 }
 .wall-item-outside-wrapper .wall-item-comment-wrapper {
 	/*margin-left: 90px;*/
+	.preview {
+		border: 0;
+		.rounded_corners(0px);
+	}
 }
 .shiny {
 	background: @shiny_colour;
@@ -1340,6 +1349,7 @@ nav #nav-notifications-linkmenu {
 .wall-item-info {
 	float: left;
 	width: 8em;
+	position: relative;
 }
 .wall-item-photo-wrapper {
 	.box(80px, 80px);
@@ -1406,13 +1416,19 @@ nav #nav-notifications-linkmenu {
 .wall-item-author,
 .wall-item-actions-author,
 .wall-item-ago {
-	clear: left;
-	float: left;
 	color: @main_colour;
 	line-height: 1;
 	display: inline-block;
-	font-size: 0.75em;
-	margin: 0.5em auto 0;
+	font-size: smaller;
+}
+.comment-edit-preview {
+	width: auto;
+	margin: auto auto auto -2em;
+	&.wall-item-author,
+	&.wall-item-actions-author,
+	&.wall-item-ago {
+		font-size: smaller;
+	}
 }
 .wall-item-author,
 .wall-item-actions-author {
@@ -1421,8 +1437,8 @@ nav #nav-notifications-linkmenu {
 	font-weight: bold;
 }
 .wall-item-location {
-	margin-top: 15px;
-	width: 100px;
+	margin-top: 2em;
+	width: 6em;
 	overflow: hidden;
 	.text_overflow;
 	.icon {
@@ -1522,9 +1538,6 @@ nav #nav-notifications-linkmenu {
 		top: 45px;
 		background-position: 35px center;
 	}
-	.wall-item-body {
-		margin-left: 10px;
-	}
 	.wall-item-author {
 		margin-left: 0.2em;
 	}
@@ -1536,7 +1549,7 @@ nav #nav-notifications-linkmenu {
 .comment-wwedit-wrapper {
     .borders(1px, solid, @main_colour);
     .rounded_corners;
-    margin: 5px 0;
+    margin: 5px;
 }
 .comment-edit-wrapper {
 	border-top: 1px #aaa solid;
