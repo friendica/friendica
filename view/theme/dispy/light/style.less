@@ -313,7 +313,7 @@ h6 {
 [id$="-desc"] {
 	color: @bg_colour;
 	background: @dk_bg_colour;
-	.borders(3px, outset, @main_colour);
+	.borders(3px, ridge, @main_colour);
 	.rounded_corners;
 	// .box_shadow(3px, 3px, 5px);
     margin: 3px 10px 7px 0;
@@ -511,7 +511,8 @@ nav .nav-link {
 		background-position: -44px -190px;
 	}
 }
-#nav-login-link, #nav-logout-link {
+#nav-login-link,
+#nav-logout-link {
 	background-position: 0 -88px;
 	&:hover {
 		background-position: -22px -88px;
@@ -670,11 +671,10 @@ nav #nav-notifications-linkmenu {
 #mini-search-text {
 	background: white;
 	color: @main_colour;
-	margin: 8px;
 }
 #search-text {
 	.borders(1px, solid, @main_alt_colour);
-	margin: 8px 0;
+	margin: 5px 0;
 }
 #mini-search-text {
 	font-size: 8pt;
@@ -772,7 +772,7 @@ nav #nav-notifications-linkmenu {
 	margin: 0px;
 	padding: 0px;
 	font-size: small;
-	line-height: 1.1;
+	line-height: 1.2;
 	.borders(3px, solid, @link_colour);
 	.rounded_corners;
 	z-index: 100000;
@@ -881,10 +881,12 @@ nav #nav-notifications-linkmenu {
 		padding-bottom: 3px;
 	}
 	#profile-photo-wrapper {
-		margin: 20px;
-		img {
-			.box_shadow(3px, 3px, 10px, 0);
-		}
+		margin: 20px 0;
+		background-color: @menu_bg_colour;
+		padding: 5px;
+		.box(175px, 175px);
+		.rounded_corners;
+		.box_shadow(3px, 3px, 10px, 0);
 	}
 }
 #asidemain {
@@ -2334,11 +2336,12 @@ div {
 #group-sidebar {
 	margin-bottom: 10px;
 }
+.categories-selected,
 .group-selected,
 .nets-selected,
 .fileas-selected {
 	// padding: 4px;
-	// color: @bg_colour;
+	color: @bg_colour;
 	// background: @dk_bg_colour;
 	// .borders(1px, solid, @hover_colour);
 	.multibutton_active;
@@ -2370,6 +2373,10 @@ div {
 .sidebar-group-element {
 	.multibutton;
 	.rounded_corners;
+	color: @main_colour;
+	&.group-selected {
+		color: @bg_colour;
+	}
 }
 #sidebar-new-group {
 	margin: auto;
@@ -2397,14 +2404,18 @@ div {
 	margin-right: 3px;
 	width: 75%;
 }
+.categories-ul,
 .nets-ul {
 	.list_reset;
 	li {
 		margin: 10px 0 0;
 	}
 }
+.categories-link,
 .nets-link,
 .nets-all {
+	.multibutton;
+	.rounded_corners;
 	margin-left: 0px;
 }
 #netsearch-box {

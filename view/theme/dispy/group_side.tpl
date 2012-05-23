@@ -5,10 +5,9 @@
 	<ul id="sidebar-group-ul">
 		{{ for $groups as $group }}
 			<li class="sidebar-group-li">
-				<a href="$group.href" class="sidebar-group-element {{ if $group.selected }}group-selected{{ endif }}">$group.text</a>
+				<a href="$group.href" class="sidebar-group-element {{ if $group.selected }}group-selected{{ else }}group-other{{ endif }}">$group.text</a>
 				{{ if $group.edit }}
-					<a 
-                        class="groupsideedit"
+					<a class="groupsideedit"
                         href="$group.edit.href" title="$group.edit.title"><span class="icon small-pencil"></span></a>
 				{{ endif }}
 				{{ if $group.cid }}
