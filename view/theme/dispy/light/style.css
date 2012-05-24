@@ -213,9 +213,8 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify,nav #nav-notifications-linkm
 .wall-item-body{margin:15px 10px 10px 0px;text-align:left;overflow-x:auto;}
 .wall-item-lock-wrapper{float:right;width:22px;height:22px;margin:0 -5px 0 0;opacity:1;}
 .wall-item-dislike,.wall-item-like{clear:left;font-size:0.8em;color:#111111;margin:5px 0 5px 10.2em;-webkit-transition:all 0.75s ease-in-out;-moz-transition:all 0.75s ease-in-out;-o-transition:all 0.75s ease-in-out;-ms-transition:all 0.75s ease-in-out;transition:all 0.75s ease-in-out;opacity:0.5;}.wall-item-dislike:hover,.wall-item-like:hover{opacity:1;}
-.wall-item-author,.wall-item-actions-author,.wall-item-ago{color:#111111;line-height:1;display:inline-block;font-size:smaller;}
+.wall-item-author,.wall-item-actions-author,.wall-item-ago{color:#111111;line-height:1;display:inline-block;font-size:x-small;margin:0.5em auto;font-weight:bold;}
 .comment-edit-preview{width:auto;margin:auto auto auto -2em;}.comment-edit-preview.wall-item-author,.comment-edit-preview.wall-item-actions-author,.comment-edit-preview.wall-item-ago{font-size:smaller;}
-.wall-item-author,.wall-item-actions-author{margin:0.5em auto 0;font-size:0.75em;font-weight:bold;}
 .wall-item-location{margin-top:2em;width:6em;overflow:hidden;-moz-text-overflow:ellipsis;-ms-text-verflow:ellipsis;-o-text-overflow:ellipsis;-webkit-text-overflow:ellipsis;text-overflow:ellipsis;}.wall-item-location .icon{float:left;}
 .wall-item-location>a,.wall-item-location .smalltext{margin-left:25px;font-size:0.7em;display:block;}
 .wall-item-location>br{display:none;}
@@ -391,15 +390,14 @@ div[id$="wrapper"]{height:100%;}div[id$="wrapper"] br{clear:left;}
 .fc-state-highlight{background:#eeeeec;color:#111111;}
 .directory-item{float:left;margin:0 5px 4px 0;padding:3px;width:180px;height:250px;position:relative;}
 #group-sidebar{margin-bottom:10px;}
-.categories-selected,.group-selected,.nets-selected,.fileas-selected{color:#eeeeec;background:#2e3436;color:#eeeeec;border:1px solid #284d7d;padding:4px;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;}.categories-selected:hover,.group-selected:hover,.nets-selected:hover,.fileas-selected:hover{background:#f2f2c3;color:#111111;border:1px solid #284d7d;}
+.categories-selected,.group-selected,.nets-selected,.fileas-selected{color:#111111;background:#2e3436;color:#eeeeec;border:1px solid #284d7d;padding:4px;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;}.categories-selected:hover,.group-selected:hover,.nets-selected:hover,.fileas-selected:hover{background:#f2f2c3;color:#111111;border:1px solid #284d7d;}
 .categories-selected a,.group-selected a,.nets-selected a,.fileas-selected a{color:#eeeeec;text-decoration:none;}
 .groupsideedit{margin-right:10px;}
 #sidebar-group-ul{padding-left:0;}
 #sidebar-group-list{margin:0 0 5px 0;}#sidebar-group-list li{margin-top:10px;}
 #sidebar-group-list .icon{display:inline-block;width:12px;height:12px;}
-.sidebar-group-element{border:1px solid #284d7d;padding:4px;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;color:#111111;}.sidebar-group-element:active,.sidebar-group-element:hover{background:#f2f2c3;color:#111111;border:1px solid #284d7d;}
+.sidebar-group-element{border:1px solid #284d7d;padding:4px;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;}.sidebar-group-element:active,.sidebar-group-element:hover{background:#f2f2c3;color:#111111;border:1px solid #284d7d;}
 .sidebar-group-element a{border:0;text-decoration:none;}
-.sidebar-group-element.group-selected{color:#eeeeec;}
 #sidebar-new-group{margin:auto;display:inline-block;color:#eeeeec;text-decoration:none;text-align:center;}
 #peoplefind-sidebar form{margin-bottom:10px;}
 #sidebar-new-group:hover{}

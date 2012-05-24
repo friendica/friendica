@@ -1419,7 +1419,9 @@ nav #nav-notifications-linkmenu {
 	color: @main_colour;
 	line-height: 1;
 	display: inline-block;
-	font-size: smaller;
+	font-size: x-small;
+	margin: 0.5em auto;
+	font-weight: bold;
 }
 .comment-edit-preview {
 	width: auto;
@@ -1429,12 +1431,6 @@ nav #nav-notifications-linkmenu {
 	&.wall-item-ago {
 		font-size: smaller;
 	}
-}
-.wall-item-author,
-.wall-item-actions-author {
-	margin: 0.5em auto 0;
-	font-size: 0.75em;
-	font-weight: bold;
 }
 .wall-item-location {
 	margin-top: 2em;
@@ -2377,14 +2373,15 @@ div {
 	// .borders(1px, solid, @link_colour);
 	.multibutton_active;
 }
-// .group-selected:hover,
-// .nets-selected:hover,
-// .fileas-selected:hover {
+.categories-selected:hover,
+.group-selected:hover,
+.nets-selected:hover,
+.fileas-selected:hover {
 //     padding: 4px;
-//     color: @link_colour;
+	// color: @bg_colour;
 //     background: @bg_colour;
 //     .borders(1px, solid, @link_colour);
-// }
+}
 .groupsideedit {
 	margin-right: 10px;
 }
@@ -2404,10 +2401,6 @@ div {
 .sidebar-group-element {
 	.multibutton;
 	.rounded_corners;
-	color: @main_colour;
-	&.group-selected {
-		color: @bg_colour;
-	}
 }
 #sidebar-new-group {
 	margin: auto;
