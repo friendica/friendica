@@ -29,7 +29,7 @@
 <script>
 
 	var updateInterval = $update_interval;
-	var localUser = $local_user;
+	var localUser = {{ if $local_user }}$local_user{{ else }}false{{ endif }};
 
 	function confirmDelete() { return confirm("$delitem"); }
 	function commentOpen(obj,id) {

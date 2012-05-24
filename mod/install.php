@@ -315,14 +315,16 @@ function check_php(&$phpath, &$checks) {
 	$help = "";
 	if(!$passed) {
 		$help .= t('Could not find a command line version of PHP in the web server PATH.'). EOL;
+		$help .= t("If you don't have a command line version of PHP installed on server, you will not be able to run background polling via cron. See <a href='http://friendica.com/node/27'>'Activating scheduled tasks'</a>") . EOL ;
+		$help .= EOL . EOL ;
 		$tpl = get_markup_template('field_input.tpl');
 		$help .= replace_macros($tpl, array(
-			'$field' => array('phpath', t('PHP executable path'), $phpath, t('Enter full path to php executable')),
+			'$field' => array('phpath', t('PHP executable path'), $phpath, t('Enter full path to php executable. You can leave this blank to continue the installation.')),
 		));
 		$phpath="";
 	}
 	
-	check_add($checks, t('Command line PHP'), $passed, true, $help);
+	check_add($checks, t('Command line PHP').($passed?" (<tt>$phpath</tt>)":""), $passed, false, $help);
 	
 	if($passed) {
 		$str = autoname(8);
