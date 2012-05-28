@@ -3,7 +3,6 @@
 /*
  * Name: Dispy Dark
  * Description: Dispy Dark: Dark, Spartan, Sleek, and Functional
- * Version: 1.2.1
  * Author: Simon <http://simon.kisikew.org/>
  * Maintainer: Simon <http://simon.kisikew.org/>
  * Screenshot: <a href="screenshot.jpg">Screenshot</a>
@@ -13,7 +12,6 @@ $a = get_app();
 $a->theme_info = array(
     'family' => 'dispy',
     'name' => 'dark',
-    'version' => '1.2.1'
 );
 
 function dispy_dark_init(&$a) {

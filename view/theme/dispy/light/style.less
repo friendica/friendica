@@ -316,7 +316,7 @@ h6 {
 [id$="-desc"] {
 	color: @bg_colour;
 	background: @dk_bg_colour;
-	.borders(3px, ridge, @main_colour);
+	.borders(2px, outset, @main_colour);
 	.rounded_corners;
 	// .box_shadow(3px, 3px, 5px);
     margin: 3px 10px 7px 0;
@@ -873,7 +873,7 @@ nav #nav-notifications-linkmenu {
 #asidemain {
 	float: left;
 	font-size: small;
-	margin: 20px 0 20px 35px;
+	margin: 1em;
 	width: 25%;
 	display: inline;
 }
@@ -1230,10 +1230,10 @@ nav #nav-notifications-linkmenu {
  * section
  */
 #sectionmain {
-	margin: 20px;
+	margin: 1em;
 	font-size: 0.8em;
 	min-width: 475px;
-	width: 67%;
+	width: 69%;
 	float: left;
 	display: inline;
 }
@@ -1349,7 +1349,7 @@ nav #nav-notifications-linkmenu {
 }
 .wall-item-info {
 	float: left;
-	width: 8em;
+	width: 7em;
 	position: relative;
 }
 .wall-item-photo-wrapper {
@@ -1502,12 +1502,16 @@ nav #nav-notifications-linkmenu {
 	width: 100%;
 }
 #connect-services-header,
+#extra-help-header {
+	margin: 1.5em 0 0 0;
+}
 #connect-services,
-#extra-help-header,
-#extra-help,
-#postit-header,
-#postit {
-	margin: 5px 0 0 0;
+#extra-help {
+	.list_reset;
+	margin: 1em 0 0 0;
+	li {
+		display: inline;
+	}
 }
 
 

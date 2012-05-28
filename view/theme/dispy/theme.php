@@ -20,7 +20,7 @@
 $a = get_app();
 $a->theme_info = array(
     'family' => 'dispy',
-	'version' => '1.2'
+	'version' => '1.2.2'
 );
 
 function dispy_init(&$a) {
