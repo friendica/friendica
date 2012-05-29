@@ -42,7 +42,7 @@ function format_event_html($ev) {
 	return $o;
 }
 
-
+/*
 function parse_event($h) {
 
 	require_once('include/Scrape.php');
@@ -108,7 +108,7 @@ function parse_event($h) {
 
 	return $ret;
 }
-
+*/
 
 function format_event_bbcode($ev) {
 
@@ -162,7 +162,6 @@ function bbtoevent($s) {
 	$match = '';
 	if(preg_match("/\[event\-adjust\](.*?)\[\/event\-adjust\]/is",$s,$match))
 		$ev['adjust'] = $match[1];
-	$match = '';
 	$ev['nofinish'] = (((x($ev, 'start') && $ev['start']) && (!x($ev, 'finish') || !$ev['finish'])) ? 1 : 0);
 	return $ev;
 
@@ -294,10 +293,14 @@ function event_store($arr) {
 				intval($arr['uid'])
 			);
 
-			return $r[0]['id'];
+			$item_id = $r[0]['id'];
 		}
 		else
-			return 0;
+			$item_id = 0;
+
+		call_hooks("event_updated", $arr['id']);
+
+		return $item_id;
 	}
 	else {
 
@@ -361,7 +364,7 @@ function event_store($arr) {
 		$item_arr['body']          = format_event_bbcode($event);
 
 
-		$item_arr['object'] = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($uri) . '</id>';
+		$item_arr['object'] = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($arr['uri']) . '</id>';
 		$item_arr['object'] .= '<content>' . xmlify(format_event_bbcode($event)) . '</content>';
 		$item_arr['object'] .= '</object>' . "\n";
 
@@ -382,6 +385,8 @@ function event_store($arr) {
 				intval($item_id)
 			);
 		}
+
+		call_hooks("event_created", $event['id']);
 
 		return $item_id;
 	}
