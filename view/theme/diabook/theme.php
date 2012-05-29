@@ -18,6 +18,11 @@ $a->page['htmlhead'] .= sprintf('<META NAME=generator CONTENT="%s"/>', $diabook_
 
 //init css on network and profilepages
 $cssFile = null;
+
+// Preload config
+load_config("diabook");
+load_pconfig(local_user(), "diabook");
+
 //get statuses of boxes at right-hand-column
 $close_pages = false;
 $site_close_pages = get_config("diabook", "close_pages" );

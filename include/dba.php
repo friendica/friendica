@@ -32,9 +32,9 @@ class dba {
 		if (!(strlen($server) && strlen($user))){
 			$this->connected = false;
 			$this->db = null;
-			return;			
+			return;
 		}
-		
+
 		if($install) {
 			if(strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
 				if(! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
@@ -71,23 +71,29 @@ class dba {
 	}
 
 	public function q($sql) {
-		
+
 		if((! $this->db) || (! $this->connected))
 			return false;
-		
+
 		$this->error = '';
+
+		//if (get_config("system", "db_log") != "")
+		//	@file_put_contents(get_config("system", "db_log"), datetime_convert().':'.session_id(). ' Start '.$sql."\n", FILE_APPEND);
 
 		if($this->mysqli)
 			$result = @$this->db->query($sql);
 		else
 			$result = @mysql_query($sql,$this->db);
 
+		//if (get_config("system", "db_log") != "")
+		//	@file_put_contents(get_config("system", "db_log"), datetime_convert().':'.session_id(). ' Stop '."\n", FILE_APPEND);
+
 		if($this->mysqli) {
 			if($this->db->errno)
 				$this->error = $this->db->error;
 		}
 		elseif(mysql_errno($this->db))
-				$this->error = mysql_error($this->db);	
+				$this->error = mysql_error($this->db);
 
 		if(strlen($this->error)) {
 			logger('dba: ' . $this->error);
@@ -107,8 +113,8 @@ class dba {
     			else
 					$mesg = mysql_num_rows($result) . ' results' . EOL;
 			}
-    
-			$str =  'SQL = ' . printable($sql) . EOL . 'SQL returned ' . $mesg 
+
+			$str =  'SQL = ' . printable($sql) . EOL . 'SQL returned ' . $mesg
 				. (($this->error) ? ' error: ' . $this->error : '')
 				. EOL;
 
@@ -146,7 +152,7 @@ class dba {
 			}
 		}
 
-    
+
 		if($this->debug)
 			logger('dba: ' . printable(print_r($r, true)));
 		return($r);

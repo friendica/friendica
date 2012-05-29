@@ -4,26 +4,26 @@
 	require_once("conversation.php");
 	require_once("oauth.php");
 	require_once("html2plain.php");
-	/* 
+	/*
 	 * Twitter-Like API
-	 *  
+	 *
 	 */
 
 	$API = Array();
-	$called_api = Null; 
+	$called_api = Null;
 
 	function api_date($str){
 		//Wed May 23 06:01:13 +0000 2007
 		return datetime_convert('UTC', 'UTC', $str, "D M d H:i:s +0000 Y" );
 	}
-	 
-	
+
+
 	function api_register_func($path, $func, $auth=false){
 		global $API;
 		$API[$path] = array('func'=>$func,
 							'auth'=>$auth);
 	}
-	
+
 	/**
 	 * Simple HTTP Login
 	 */
@@ -691,24 +691,24 @@
 				'geo' => '',
 				'coordinates' => $lastwall['coord'],
 				'place' => $lastwall['location'],
-				'contributors' => ''					
+				'contributors' => ''
 			);
 		}
 		return  api_apply_template("user", $type, array('$user' => $user_info));
-		
+
 	}
 	api_register_func('api/users/show','api_users_show');
-	
+
 	/**
-	 * 
+	 *
 	 * http://developer.twitter.com/doc/get/statuses/home_timeline
-	 * 
+	 *
 	 * TODO: Optional parameters
 	 * TODO: Add reply info
 	 */
 	function api_statuses_home_timeline(&$a, $type){
 		if (local_user()===false) return false;
-				
+
 		$user_info = api_get_user($a);
 		// get last newtork messages
 
@@ -720,7 +720,7 @@
 		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
 		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
 		//$since_id = 0;//$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		
+
 		$start = $page*$count;
 
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
@@ -728,7 +728,7 @@
 		if ($max_id > 0)
 			$sql_extra = 'AND `item`.`id` <= '.intval($max_id);
 
-		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
 			`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 			`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
@@ -747,7 +747,7 @@
 
 		$ret = api_format_items($r,$user_info);
 
-		
+
 		$data = array('$statuses' => $ret);
 		switch($type){
 			case "atom":
@@ -761,7 +761,7 @@
 				return($as);
 				break;
 		}
-				
+
 		return  api_apply_template("timeline", $type, $data);
 	}
 	api_register_func('api/statuses/home_timeline','api_statuses_home_timeline', true);
@@ -769,7 +769,7 @@
 
 	function api_statuses_public_timeline(&$a, $type){
 		if (local_user()===false) return false;
-				
+
 		$user_info = api_get_user($a);
 		// get last newtork messages
 
@@ -781,7 +781,7 @@
 		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
 		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
 		//$since_id = 0;//$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		
+
 		$start = $page*$count;
 
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
@@ -789,7 +789,7 @@
 		if ($max_id > 0)
 			$sql_extra = 'AND `item`.`id` <= '.intval($max_id);
 
-		/*$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+		/*$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
 			`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 			`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
@@ -806,17 +806,17 @@
 			intval($since_id),
 			intval($start),	intval($count)
 		);*/
-	        $r = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+	        $r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 	                `contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
-        	        `contact`.`network`, `contact`.`thumb`, `contact`.`self`, `contact`.`writable`, 
+        	        `contact`.`network`, `contact`.`thumb`, `contact`.`self`, `contact`.`writable`,
                 	`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`,
                 	`user`.`nickname`, `user`.`hidewall`
                 	FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
                 	LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
                 	WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
-                	AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
-                	AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' 
-                	AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
+                	AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''
+                	AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
+                	AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0
                 	AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			$sql_extra
 			AND `item`.`id`>%d
@@ -827,7 +827,7 @@
 
 		$ret = api_format_items($r,$user_info);
 
-		
+
 		$data = array('$statuses' => $ret);
 		switch($type){
 			case "atom":
@@ -841,7 +841,7 @@
 				return($as);
 				break;
 		}
-				
+
 		return  api_apply_template("timeline", $type, $data);
 	}
 	api_register_func('api/statuses/public_timeline','api_statuses_public_timeline', true);
@@ -857,11 +857,11 @@
 		// params
 		$id = intval($a->argv[3]);
 
-		logger('API: api_statuses_show: '.$id);		
+		logger('API: api_statuses_show: '.$id);
 
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
 
-		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
 			`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 			`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
@@ -875,7 +875,7 @@
 		);
 
 		$ret = api_format_items($r,$user_info);
-		
+
 		$data = array('$status' => $ret[0]);
 		/*switch($type){
 			case "atom":
@@ -976,7 +976,7 @@
 		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
 		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
 		//$since_id = 0;//$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		
+
 		$start = $page*$count;
 
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
@@ -985,11 +985,19 @@
 		$myurl = substr($myurl,strpos($myurl,'://')+3);
 		$myurl = str_replace(array('www.','.'),array('','\\.'),$myurl);
 		$diasp_url = str_replace('/profile/','/u/',$myurl);
-		$sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from item where ( `author-link` regexp '%s' or `tag` regexp '%s' or tag regexp '%s' )) ",
-			dbesc($myurl . '$'),
-			dbesc($myurl . '\\]'),
-			dbesc($diasp_url . '\\]')
-		);
+
+		if (get_config('system','use_fulltext_engine'))
+                        $sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from item where (MATCH(`author-link`) AGAINST ('".'"%s"'."' in boolean mode) or MATCH(`tag`) AGAINST ('".'"%s"'."' in boolean mode) or MATCH(tag) AGAINST ('".'"%s"'."' in boolean mode))) ",
+                                dbesc(protect_sprintf($myurl)),
+                                dbesc(protect_sprintf($myurl)),
+                                dbesc(protect_sprintf($diasp_url))
+                        );
+                else
+                        $sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from item where ( `author-link` like '%s' or `tag` like '%s' or tag like '%s' )) ",
+                                dbesc(protect_sprintf('%' . $myurl)),
+                                dbesc(protect_sprintf('%' . $myurl . '\\]%')),
+                                dbesc(protect_sprintf('%' . $diasp_url . '\\]%'))
+                        );
 
 		if ($max_id > 0)
 			$sql_extra .= ' AND `item`.`id` <= '.intval($max_id);
@@ -1013,7 +1021,7 @@
 
 		$ret = api_format_items($r,$user_info);
 
-		
+
 		$data = array('$statuses' => $ret);
 		switch($type){
 			case "atom":
@@ -1027,7 +1035,7 @@
 				return($as);
 				break;
 		}
-				
+
 		return  api_apply_template("timeline", $type, $data);
 	}
 	api_register_func('api/statuses/mentions','api_statuses_mentions', true);
@@ -1078,14 +1086,14 @@
 
 		$ret = api_format_items($r,$user_info);
 
-		
+
 		$data = array('$statuses' => $ret);
 		switch($type){
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
 		}
-				
+
 		return  api_apply_template("timeline", $type, $data);
 	}
 
@@ -1094,25 +1102,25 @@
 
 	function api_favorites(&$a, $type){
 		if (local_user()===false) return false;
-		
+
 		$user_info = api_get_user($a);
 		// in friendica starred item are private
 		// return favorites only for self
 		logger('api_favorites: self:' . $user_info['self']);
-		
+
 		if ($user_info['self']==0) {
 			$ret = array();
 		} else {
-			
-			
+
+
 			// params
 			$count = (x($_GET,'count')?$_GET['count']:20);
 			$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
 			if ($page<0) $page=0;
-			
+
 			$start = $page*$count;
 
-			$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+			$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 				`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
 				`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 				`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
@@ -1129,16 +1137,16 @@
 			);
 
 			$ret = api_format_items($r,$user_info);
-		
+
 		}
-		
+
 		$data = array('$statuses' => $ret);
 		switch($type){
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
 		}
-				
+
 		return  api_apply_template("timeline", $type, $data);
 	}
 
@@ -1208,7 +1216,7 @@
 		$as['link']['type'] = "text/html";
 		return($as);
 	}
-	
+
 	function api_format_items($r,$user_info) {
 
 		//logger('api_format_items: ' . print_r($r,true));
@@ -1223,14 +1231,14 @@
 			$status_user = (($item['cid']==$user_info['id'])?$user_info: api_item_get_user($a,$item));
 
 			if ($item['parent']!=$item['id']) {
-				$r = q("select id from item where parent=%s and id<%s order by id desc limit 1", 
+				$r = q("select id from item where parent=%s and id<%s order by id desc limit 1",
 					intval($item['parent']), intval($item['id']));
 				if ($r)
 					$in_reply_to_status_id = $r[0]['id'];
 				else
 					$in_reply_to_status_id = $item['parent'];
 
-				$r = q("select `item`.`contact-id`, `contact`.nick, `item`.`author-name` from item, contact 
+				$r = q("select `item`.`contact-id`, `contact`.nick, `item`.`author-name` from item, contact
 					where `contact`.`id` = `item`.`contact-id` and `item`.id=%d", intval($in_reply_to_status_id));
 
 				$in_reply_to_screen_name = $r[0]['author-name'];
@@ -1250,6 +1258,9 @@
 				$statustext = trim($statusbody);
 			else
 				$statustext = trim($statustitle."\n\n".$statusbody);
+
+			if (($item["network"] == NETWORK_FEED) and (strlen($statustext)> 1000))
+				$statustext = substr($statustext, 0, 1000)."... \n".$item["plink"];
 
 			$status = array(
 				'text'		=> $statustext,

@@ -88,3 +88,6 @@ $a->config['system']['itemcache'] = "";
 
 // If enabled, the lockpath is used for a lockfile to check if the poller is running
 $a->config['system']['lockpath'] = "";
+
+// If enabled, the MyBB fulltext engine is used
+// $a->config['system']['use_fulltext_engine'] = true;
