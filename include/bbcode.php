@@ -226,7 +226,7 @@ function bbcode($Text,$preserve_nl = false) {
 	$endlessloop = 0;
 	while ((strpos($Text, "[/quote]")!== false)  and (strpos($Text, "[quote=") !== false) and (++$endlessloop < 20))
 		$Text = preg_replace("/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
-        	                     "<br /><strong class=".'"author"'.">" . $t_wrote . "</strong><blockquote class=".'"author"'.">$2</blockquote>",
+        	                     "<br /><strong class=".'"author"'.">" . $t_wrote . "</strong><blockquote>$2</blockquote>",
                 	             $Text);
 
 	// [img=widthxheight]image source[/img]
