@@ -98,7 +98,7 @@ function admin_content(&$a) {
 		'plugins'=>	Array($a->get_baseurl(true)."/admin/plugins/", t("Plugins") , "plugins"),
 		'themes' =>	Array($a->get_baseurl(true)."/admin/themes/", t("Themes") , "themes"),
 		'dbsync' => Array($a->get_baseurl(true)."/admin/dbsync/", t('DB updates'), "dbsync"),
-		'update' =>	Array($a->get_baseurl(true)."/admin/update/", t("Software Update") , "update")
+		//'update' =>	Array($a->get_baseurl(true)."/admin/update/", t("Software Update") , "update")
 	);
 	
 	/* get plugins admin page */

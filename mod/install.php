@@ -184,15 +184,16 @@ function install_content(&$a) {
 
 			check_php($phpath, $checks);
 
-			check_htaccess($checks);
-			
+            check_htaccess($checks);
+            
 			function check_passed($v, $c){
 				if ($c['required'])
 					$v = $v && $c['status'];
 				return $v;
 			}
 			$checkspassed = array_reduce($checks, "check_passed", true);
-			
+	        
+
 
 			$tpl = get_markup_template('install_checks.tpl');
 			$o .= replace_macros($tpl, array(
@@ -381,6 +382,7 @@ function check_funcs(&$checks) {
 			check_add($ck_funcs, t('Apache mod_rewrite module'), true, true, "");
 		}
 	}
+
 	if(! function_exists('curl_init')){
 		$ck_funcs[0]['status']= false;
 		$ck_funcs[0]['help']= t('Error: libCURL PHP module required but not installed.');
@@ -421,21 +423,26 @@ function check_htconfig(&$checks) {
 		$help .= t('At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder.').EOL;
 		$help .= t('You can alternatively skip this procedure and perform a manual installation. Please see the file "INSTALL.txt" for instructions.').EOL; 
 	}
-
+    
 	check_add($checks, t('.htconfig.php is writable'), $status, false, $help);
-	
+
 }
 
 function check_htaccess(&$checks) {
 	$a = get_app();
 	$status = true;
 	$help = "";
-	$test = fetch_url($a->get_baseurl()."/install/testrewrite");
-	if ($test!="ok") {
-		$status = false;
-		$help = t('Url rewrite in .htconfig is not working. Check your server configuration.');
-	}
-	check_add($checks, t('Url rewrite is working'), $status, true, $help);
+	if (function_exists('curl_init')){
+        $test = fetch_url($a->get_baseurl()."/install/testrewrite");
+        if ($test!="ok") {
+            $status = false;
+            $help = t('Url rewrite in .htaccess is not working. Check your server configuration.');
+        }
+        check_add($checks, t('Url rewrite is working'), $status, true, $help); 
+    } else {
+        // cannot check modrewrite if libcurl is not installed
+    }
+	
 }
 
 	
