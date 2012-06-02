@@ -1423,8 +1423,8 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 			$bdtext = t('Birthday:') . ' [url=' . $contact['url'] . ']' . $contact['name'] . '[/url]' ;
 
 
-			$r = q("INSERT INTO `event` (`uid`,`cid`,`created`,`edited`,`start`,`finish`,`desc`,`type`)
-				VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s' ) ",
+			$r = q("INSERT INTO `event` (`uid`,`cid`,`created`,`edited`,`start`,`finish`,`desc`,`type`,`adjust`)
+				VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d ) ",
 				intval($contact['uid']),
 			 	intval($contact['id']),
 				dbesc(datetime_convert()),
@@ -1432,7 +1432,8 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 				dbesc(datetime_convert('UTC','UTC', $birthday)),
 				dbesc(datetime_convert('UTC','UTC', $birthday . ' + 1 day ')),
 				dbesc($bdtext),
-				dbesc('birthday')
+				dbesc('birthday'),
+				0
 			);
 			
 
