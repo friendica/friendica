@@ -125,6 +125,7 @@ function notifier_run($argv, $argc){
 		$uid = $r[0]['uid'];
 		$updated = $r[0]['edited'];
 
+		// The following seems superfluous. We've already checked for "if (! intval($r[0]['parent']))" a few lines up
 		if(! $parent_id)
 			return;
 
@@ -596,7 +597,7 @@ function notifier_run($argv, $argc){
 					break;
 				case NETWORK_OSTATUS:
 
-					// Do not send to otatus if we are not configured to send to public networks
+					// Do not send to ostatus if we are not configured to send to public networks
 					if($owner['prvnets'])
 						break;
 					if(get_config('system','ostatus_disabled') || get_config('system','dfrn_only'))
@@ -737,18 +738,19 @@ function notifier_run($argv, $argc){
 						// unsupported
 						break;
 					}
-					elseif(($target_item['deleted']) && ($target_item['verb'] !== ACTIVITY_LIKE)) {
-						// diaspora delete, 
+					elseif(($target_item['deleted']) && (($target_item['uri'] === $target_item['parent-uri']) || $followup)) {
+						// send both top-level retractions and relayable retractions for owner to relay
 						diaspora_send_retraction($target_item,$owner,$contact);
 						break;
 					}
 					elseif($followup) {
-						// send comments, likes and retractions of likes to owner to relay
+						// send comments and likes to owner to relay
 						diaspora_send_followup($target_item,$owner,$contact);
 						break;
 					}
-					elseif($target_item['parent'] != $target_item['id']) {
-						// we are the relay - send comments, likes and unlikes to our conversants
+					elseif($target_item['uri'] !== $target_item['parent-uri']) {
+						// we are the relay - send comments, likes and relayable_retractions
+						// (of comments and likes) to our conversants
 						diaspora_send_relay($target_item,$owner,$contact);
 						break;
 					}
@@ -856,6 +858,13 @@ function notifier_run($argv, $argc){
 			}
 		}
 
+	}
+
+	// If the item was deleted, clean up the `sign` table
+	if($target_item['deleted']) {
+		$r = q("DELETE FROM sign where `retract_iid` = %d",
+			intval($target_item['id'])
+		);
 	}
 
 	logger('notifier: calling hooks', LOGGER_DEBUG);

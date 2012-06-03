@@ -944,12 +944,14 @@ CREATE TABLE IF NOT EXISTS `session` (
 
 CREATE TABLE IF NOT EXISTS `sign` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `iid` int(10) unsigned NOT NULL,
+  `iid` int(10) unsigned NOT NULL DEFAULT '0',
+  `retract_iid` int(10) unsigned NOT NULL DEFAULT '0',
   `signed_text` mediumtext NOT NULL,
   `signature` text NOT NULL,
   `signer` char(255) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `iid` (`iid`)
+  KEY `iid` (`iid`),
+  KEY `retract_iid` (`retract_iid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

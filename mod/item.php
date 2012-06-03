@@ -737,16 +737,16 @@ function item_post(&$a) {
 				if($datarray['verb'] === ACTIVITY_LIKE) 
 					$signed_text = $datarray['guid'] . ';' . 'Post' . ';' . $parent_item['guid'] . ';' . 'true' . ';' . $myaddr;
 				else
-			    	$signed_text = $datarray['guid'] . ';' . $parent_item['guid'] . ';' . $signed_body . ';' . $myaddr;
+					$signed_text = $datarray['guid'] . ';' . $parent_item['guid'] . ';' . $signed_body . ';' . $myaddr;
 
 				$authorsig = base64_encode(rsa_sign($signed_text,$a->user['prvkey'],'sha256'));
 
 				q("insert into sign (`iid`,`signed_text`,`signature`,`signer`) values (%d,'%s','%s','%s') ",
 					intval($post_id),
-            		dbesc($signed_text),
-            		dbesc(base64_encode($authorsig)),
-            		dbesc($myaddr)
-        		);
+					dbesc($signed_text),
+					dbesc(base64_encode($authorsig)),
+					dbesc($myaddr)
+				);
 			}
 		}
 		else {

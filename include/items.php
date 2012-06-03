@@ -3278,7 +3278,42 @@ function drop_item($id,$interactive = true) {
 				q("UPDATE `item` SET `last-child` = 1 WHERE `id` = %d LIMIT 1",
 					intval($r[0]['id'])
 				);
-			}	
+			}
+
+			// Add a relayable_retraction signature for Diaspora. Note that we can't add a target_author_signature
+			// if the comment was deleted by a remote user. That should be ok, because if a remote user is deleting
+			// the comment, that means we're the home of the post, and Diaspora will only
+			// check the parent_author_signature of retractions that it doesn't have to relay further
+			//
+			// I don't think this function gets called for an "unlike," but I'll check anyway
+			$signed_text = $item['guid'] . ';' . ( ($item['verb'] === ACTIVITY_LIKE) ? 'Like' : 'Comment');
+
+			if(local_user() == $item['uid']) {
+
+				$handle = $a->user['nickname'] . '@' . substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
+				$authorsig = base64_encode(rsa_sign($signed_text,$a->user['prvkey'],'sha256'));
+			}
+			else {
+				$r = q("SELECT `nick`, `url` FROM `contact` WHERE `id` = '%d' LIMIT 1",
+					$item['contact-id']
+				);
+				if(count($r)) {
+					// The below handle only works for NETWORK_DFRN. I think that's ok, because this function
+					// only handles DFRN deletes
+					$handle_baseurl_start = strpos($r['url'],'://') + 3;
+					$handle_baseurl_length = strpos($r['url'],'/profile') - $handle_baseurl_start;
+					$handle = $r['nick'] . '@' . substr($r['url'], $handle_baseurl_start, $handle_baseurl_length);
+					$authorsig = '';
+				}
+			}
+
+			if(isset($handle))
+				q("insert into sign (`retract_iid`,`signed_text`,`signature`,`signer`) values (%d,'%s','%s','%s') ",
+					intval($item['id']),
+					dbesc($signed_text),
+					dbesc($authorsig),
+					dbesc($handle)
+				);
 		}
 		$drop_id = intval($item['id']);
 

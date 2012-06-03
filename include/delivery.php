@@ -113,6 +113,7 @@ function delivery_run($argv, $argc){
 			$uid = $r[0]['uid'];
 			$updated = $r[0]['edited'];
 
+			// The following seems superfluous. We've already checked for "if (! intval($r[0]['parent']))" a few lines up
 			if(! $parent_id)
 				continue;
 
@@ -508,17 +509,17 @@ function delivery_run($argv, $argc){
 					// unsupported
 					break;
 				}
-				elseif(($target_item['deleted']) && ($target_item['verb'] !== ACTIVITY_LIKE)) {
-				logger('delivery: diaspora retract: ' . $loc);
-					// diaspora delete, 
+				elseif(($target_item['deleted']) && ($target_item['uri'] === $target_item['parent-uri'])) {
+					// top-level retraction
+					logger('delivery: diaspora retract: ' . $loc);
+
 					diaspora_send_retraction($target_item,$owner,$contact,$public_message);
 					break;
 				}
-				elseif($target_item['parent'] != $target_item['id']) {
+				elseif($target_item['uri'] !== $target_item['parent-uri']) {
+					// we are the relay - send comments, likes and relayable_retractions to our conversants
+					logger('delivery: diaspora relay: ' . $loc);
 
-				logger('delivery: diaspora relay: ' . $loc);
-
-					// we are the relay - send comments, likes and unlikes to our conversants
 					diaspora_send_relay($target_item,$owner,$contact,$public_message);
 					break;
 				}		

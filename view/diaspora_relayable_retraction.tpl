@@ -1,0 +1,11 @@
+<XML>
+  <post>
+    <relayable_retraction>
+      <target_type>$target_type</target_type>
+      <target_guid>$guid</target_guid>
+      <parent_author_signature>$parentsig</parent_author_signature>
+      <target_author_signature>$authorsig</target_author_signature>
+      <sender_handle>$handle</sender_handle>
+    </relayable_retraction>
+  </post>
+</XML>
