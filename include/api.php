@@ -898,7 +898,7 @@
 		// params
 		$id = intval($a->argv[3]);
 
-		logger('API: api_statuses_repeat: '.$id);		
+		logger('API: api_statuses_repeat: '.$id);
 
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
 
@@ -915,13 +915,15 @@
 			intval($id)
 		);
 
-		$_REQUEST['body'] = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8')."[url=".$r[0]['reply_url']."]".$r[0]['reply_author']."[/url] \n".$r[0]['body'];
-		$_REQUEST['profile_uid'] = local_user();
-		$_REQUEST['type'] = 'wall';
-		$_REQUEST['api_source'] = true;
+		if ($r[0]['body'] != "") {
+			$_REQUEST['body'] = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8')."[url=".$r[0]['reply_url']."]".$r[0]['reply_author']."[/url] \n".$r[0]['body'];
+			$_REQUEST['profile_uid'] = local_user();
+			$_REQUEST['type'] = 'wall';
+			$_REQUEST['api_source'] = true;
 
-		require_once('mod/item.php');
-		item_post($a);
+			require_once('mod/item.php');
+			item_post($a);
+		}
 
 		if ($type == 'xml')
 			$ok = "true";
@@ -943,7 +945,7 @@
 		// params
 		$id = intval($a->argv[3]);
 
-		logger('API: api_statuses_destroy: '.$id);	
+		logger('API: api_statuses_destroy: '.$id);
 
 		require_once('include/items.php');
 		drop_item($id, false);
