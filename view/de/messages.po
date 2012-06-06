@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: http://bugs.friendica.com/\n"
-"POT-Creation-Date: 2012-06-03 10:00-0700\n"
-"PO-Revision-Date: 2012-06-05 08:08+0000\n"
+"POT-Creation-Date: 2012-06-05 10:00-0700\n"
+"PO-Revision-Date: 2012-06-06 23:32+0000\n"
 "Last-Translator: zottel <transifex@zottel.net>\n"
 "Language-Team: German (http://www.transifex.net/projects/p/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -67,7 +67,7 @@ msgstr "Konnte den Kontakt nicht aktualisieren."
 #: ../../mod/profiles.php:385 ../../mod/delegate.php:6
 #: ../../mod/suggest.php:28 ../../mod/invite.php:13 ../../mod/invite.php:81
 #: ../../mod/dfrn_confirm.php:53 ../../addon/facebook/facebook.php:503
-#: ../../include/items.php:3297 ../../index.php:306
+#: ../../include/items.php:3332 ../../index.php:306
 msgid "Permission denied."
 msgstr "Zugriff verweigert."
 
@@ -141,9 +141,9 @@ msgstr "Neues Foto von dieser URL"
 #: ../../mod/localtime.php:45 ../../mod/contacts.php:322
 #: ../../mod/settings.php:555 ../../mod/settings.php:701
 #: ../../mod/settings.php:762 ../../mod/settings.php:969
-#: ../../mod/manage.php:109 ../../mod/group.php:85 ../../mod/admin.php:417
-#: ../../mod/admin.php:653 ../../mod/admin.php:789 ../../mod/admin.php:988
-#: ../../mod/admin.php:1075 ../../mod/profiles.php:554
+#: ../../mod/manage.php:109 ../../mod/group.php:85 ../../mod/message.php:215
+#: ../../mod/admin.php:417 ../../mod/admin.php:653 ../../mod/admin.php:789
+#: ../../mod/admin.php:988 ../../mod/admin.php:1075 ../../mod/profiles.php:554
 #: ../../mod/invite.php:119 ../../addon/facebook/facebook.php:605
 #: ../../addon/yourls/yourls.php:76 ../../addon/ljpost/ljpost.php:93
 #: ../../addon/nsfw/nsfw.php:57 ../../addon/planets/planets.php:158
@@ -411,10 +411,10 @@ msgstr "Foto löschen"
 msgid "was tagged in a"
 msgstr "wurde getaggt in einem"
 
-#: ../../mod/photos.php:583 ../../mod/like.php:127 ../../mod/tagger.php:70
+#: ../../mod/photos.php:583 ../../mod/like.php:185 ../../mod/tagger.php:70
 #: ../../addon/communityhome/communityhome.php:163
 #: ../../view/theme/diabook/theme.php:570 ../../include/text.php:1316
-#: ../../include/diaspora.php:1662 ../../include/conversation.php:53
+#: ../../include/diaspora.php:1671 ../../include/conversation.php:53
 #: ../../include/conversation.php:126
 msgid "photo"
 msgstr "Foto"
@@ -554,7 +554,7 @@ msgstr "Teilen"
 
 #: ../../mod/photos.php:1277 ../../mod/editpost.php:104
 #: ../../mod/wallmessage.php:145 ../../mod/message.php:214
-#: ../../mod/message.php:408 ../../include/conversation.php:371
+#: ../../mod/message.php:409 ../../include/conversation.php:371
 #: ../../include/conversation.php:731 ../../include/conversation.php:1008
 msgid "Please wait"
 msgstr "Bitte warten"
@@ -652,7 +652,7 @@ msgid "Edit"
 msgstr "Bearbeiten"
 
 #: ../../mod/editpost.php:96 ../../mod/wallmessage.php:143
-#: ../../mod/message.php:212 ../../mod/message.php:406
+#: ../../mod/message.php:212 ../../mod/message.php:407
 #: ../../include/conversation.php:990
 msgid "Upload photo"
 msgstr "Foto hochladen"
@@ -662,7 +662,7 @@ msgid "Attach file"
 msgstr "Datei anhängen"
 
 #: ../../mod/editpost.php:98 ../../mod/wallmessage.php:144
-#: ../../mod/message.php:213 ../../mod/message.php:407
+#: ../../mod/message.php:213 ../../mod/message.php:408
 #: ../../include/conversation.php:994
 msgid "Insert web link"
 msgstr "einen Link einfügen"
@@ -2141,7 +2141,7 @@ msgstr "Die Adresse deines Profils lautet:"
 
 #: ../../mod/settings.php:953
 msgid "Automatically expire posts after this many days:"
-msgstr "Beiträge verfallen automatisch nach dieser Anzahl von Tagen"
+msgstr "Beiträge verfallen automatisch nach dieser Anzahl von Tagen:"
 
 #: ../../mod/settings.php:953
 msgid "If empty, posts will not expire. Expired posts will be deleted"
@@ -2173,7 +2173,7 @@ msgstr "Fotos verfallen lassen:"
 
 #: ../../mod/settings.php:960
 msgid "Only expire posts by others:"
-msgstr "Nur Beiträge anderer verfallen"
+msgstr "Nur Beiträge anderer verfallen:"
 
 #: ../../mod/settings.php:967
 msgid "Account Settings"
@@ -2217,7 +2217,7 @@ msgstr "Standardstandort:"
 
 #: ../../mod/settings.php:986
 msgid "Use Browser Location:"
-msgstr "Verwende den Standort des Browsers:"
+msgstr "Standort des Browsers verwenden:"
 
 #: ../../mod/settings.php:989
 msgid "Security and Privacy Settings"
@@ -2470,17 +2470,17 @@ msgid ""
 msgstr "Wenn du möchtest, dass %s dir antworten kann, überprüfe deine Privatsphären-Einstellungen und erlaube private Nachrichten von unbekannten Absendern."
 
 #: ../../mod/wallmessage.php:133 ../../mod/message.php:200
-#: ../../mod/message.php:397
+#: ../../mod/message.php:398
 msgid "To:"
 msgstr "An:"
 
 #: ../../mod/wallmessage.php:134 ../../mod/message.php:205
-#: ../../mod/message.php:399
+#: ../../mod/message.php:400
 msgid "Subject:"
 msgstr "Betreff:"
 
 #: ../../mod/wallmessage.php:140 ../../mod/message.php:209
-#: ../../mod/message.php:402 ../../mod/invite.php:113
+#: ../../mod/message.php:403 ../../mod/invite.php:113
 msgid "Your message:"
 msgstr "Deine Nachricht:"
 
@@ -2776,26 +2776,26 @@ msgstr "Registrieren"
 msgid "People Search"
 msgstr "Personen Suche"
 
-#: ../../mod/like.php:127 ../../mod/tagger.php:70
+#: ../../mod/like.php:185 ../../mod/like.php:259 ../../mod/tagger.php:70
 #: ../../addon/facebook/facebook.php:1572
 #: ../../addon/communityhome/communityhome.php:158
 #: ../../addon/communityhome/communityhome.php:167
 #: ../../view/theme/diabook/theme.php:565
-#: ../../view/theme/diabook/theme.php:574 ../../include/diaspora.php:1662
+#: ../../view/theme/diabook/theme.php:574 ../../include/diaspora.php:1671
 #: ../../include/conversation.php:48 ../../include/conversation.php:57
 #: ../../include/conversation.php:121 ../../include/conversation.php:130
 msgid "status"
 msgstr "Status"
 
-#: ../../mod/like.php:144 ../../addon/facebook/facebook.php:1576
+#: ../../mod/like.php:202 ../../addon/facebook/facebook.php:1576
 #: ../../addon/communityhome/communityhome.php:172
-#: ../../view/theme/diabook/theme.php:579 ../../include/diaspora.php:1678
+#: ../../view/theme/diabook/theme.php:579 ../../include/diaspora.php:1687
 #: ../../include/conversation.php:65
 #, php-format
 msgid "%1$s likes %2$s's %3$s"
 msgstr "%1$s mag %2$ss %3$s"
 
-#: ../../mod/like.php:146 ../../include/conversation.php:68
+#: ../../mod/like.php:204 ../../include/conversation.php:68
 #, php-format
 msgid "%1$s doesn't like %2$s's %3$s"
 msgstr "%1$s mag %2$ss %3$s nicht"
@@ -2968,55 +2968,55 @@ msgstr "Nachricht gelöscht."
 msgid "Conversation removed."
 msgstr "Unterhaltung gelöscht."
 
-#: ../../mod/message.php:245
+#: ../../mod/message.php:246
 msgid "No messages."
 msgstr "Keine Nachrichten."
 
-#: ../../mod/message.php:252
+#: ../../mod/message.php:253
 #, php-format
 msgid "Unknown sender - %s"
 msgstr "'Unbekannter Absender - %s"
 
-#: ../../mod/message.php:255
+#: ../../mod/message.php:256
 #, php-format
 msgid "You and %s"
 msgstr "Du und %s"
 
-#: ../../mod/message.php:258
+#: ../../mod/message.php:259
 #, php-format
 msgid "%s and You"
 msgstr "%s und Du"
 
-#: ../../mod/message.php:268 ../../mod/message.php:390
+#: ../../mod/message.php:269 ../../mod/message.php:391
 msgid "Delete conversation"
 msgstr "Unterhaltung löschen"
 
-#: ../../mod/message.php:271
+#: ../../mod/message.php:272
 msgid "D, d M Y - g:i A"
 msgstr "D, d. M Y - g:i A"
 
-#: ../../mod/message.php:273
+#: ../../mod/message.php:274
 #, php-format
 msgid "%d message"
 msgid_plural "%d messages"
 msgstr[0] "%d Nachricht"
 msgstr[1] "%d Nachrichten"
 
-#: ../../mod/message.php:308
+#: ../../mod/message.php:309
 msgid "Message not available."
 msgstr "Nachricht nicht verfügbar."
 
-#: ../../mod/message.php:373
+#: ../../mod/message.php:374
 msgid "Delete message"
 msgstr "Nachricht löschen"
 
-#: ../../mod/message.php:392
+#: ../../mod/message.php:393
 msgid ""
 "No secure communications available. You <strong>may</strong> be able to "
 "respond from the sender's profile page."
 msgstr "Sichere Kommunikation ist nicht verfügbar. <strong>Eventuell</strong> kannst du auf der Profilseite des Absenders antworten."
 
-#: ../../mod/message.php:396
+#: ../../mod/message.php:397
 msgid "Send Reply"
 msgstr "Antwort senden"
 
@@ -3858,7 +3858,7 @@ msgstr "Adresse:"
 
 #: ../../mod/profiles.php:565
 msgid "Locality/City:"
-msgstr "Wohnort/Stadt:"
+msgstr "Wohnort:"
 
 #: ../../mod/profiles.php:566
 msgid "Postal/Zip Code:"
@@ -3898,7 +3898,7 @@ msgstr "Adresse der Homepage:"
 
 #: ../../mod/profiles.php:575 ../../include/profile_advanced.php:50
 msgid "Hometown:"
-msgstr "Wohnort:"
+msgstr "Heimatort:"
 
 #: ../../mod/profiles.php:576 ../../include/profile_advanced.php:54
 msgid "Political Views:"
@@ -4204,7 +4204,7 @@ msgstr "Kontaktanfrage schlug fehl oder wurde zurück gezogen."
 msgid "Unable to set contact photo."
 msgstr "Konnte das Bild des Kontakts nicht speichern."
 
-#: ../../mod/dfrn_confirm.php:477 ../../include/diaspora.php:507
+#: ../../mod/dfrn_confirm.php:477 ../../include/diaspora.php:510
 #: ../../include/conversation.php:101
 #, php-format
 msgid "%1$s is now friends with %2$s"
@@ -6186,12 +6186,12 @@ msgstr "Beginnt:"
 msgid "Finishes:"
 msgstr "Endet:"
 
-#: ../../include/delivery.php:455 ../../include/notifier.php:677
+#: ../../include/delivery.php:456 ../../include/notifier.php:678
 msgid "(no subject)"
 msgstr "(kein Betreff)"
 
-#: ../../include/delivery.php:462 ../../include/enotify.php:26
-#: ../../include/notifier.php:684
+#: ../../include/delivery.php:463 ../../include/enotify.php:26
+#: ../../include/notifier.php:685
 msgid "noreply"
 msgstr "noreply"
 
@@ -6346,18 +6346,13 @@ msgstr "Beitrag"
 msgid "Item filed"
 msgstr "Beitrag abgelegt"
 
-#: ../../include/diaspora.php:590
+#: ../../include/diaspora.php:593
 msgid "Sharing notification from Diaspora network"
 msgstr "Freigabe-Benachrichtigung von Diaspora"
 
-#: ../../include/diaspora.php:1977
+#: ../../include/diaspora.php:2037
 msgid "Attachments:"
 msgstr "Anhänge:"
-
-#: ../../include/diaspora.php:2168
-#, php-format
-msgid "[Relayed] Comment authored by %s from network %s"
-msgstr "[Weitergeleitet] Kommentar von %s aus dem %s Netzwerk"
 
 #: ../../include/network.php:824
 msgid "view full size"
@@ -7111,7 +7106,7 @@ msgstr "mag ich nicht"
 
 #: ../../include/conversation.php:557
 msgid "Share this"
-msgstr "Teile dieses"
+msgstr "Weitersagen"
 
 #: ../../include/conversation.php:557
 msgid "share"
