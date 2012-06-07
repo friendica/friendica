@@ -230,8 +230,8 @@ function events_content(&$a) {
 			$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
 				`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event` LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` 
 				WHERE `event`.`uid` = %d
-				AND (( `adjust` = 0 AND `start` >= '%s' AND `start` <= '%s' ) 
-				OR  (  `adjust` = 1 AND `start` >= '%s' AND `start` <= '%s' )) ",
+				AND (( `adjust` = 0 AND `finish` >= '%s' AND `start` <= '%s' ) 
+				OR  (  `adjust` = 1 AND `finish` >= '%s' AND `start` <= '%s' )) ",
 				intval(local_user()),
 				dbesc($start),
 				dbesc($finish),
