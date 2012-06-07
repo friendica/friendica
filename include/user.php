@@ -284,7 +284,11 @@ function create_user($arr) {
 
 		$filename = basename($photo);
 		$img_str = fetch_url($photo,true);
-		$img = new Photo($img_str);
+		// guess mimetype from headers or filename
+		$type = guess_image_type($photo,true);
+
+		
+		$img = new Photo($img_str, $type);
 		if($img->is_valid()) {
 
 			$img->scaleImageSquare(175);

@@ -215,8 +215,11 @@ function parse_url_content(&$a) {
 					
 					$i = fetch_url($image);
 					if($i) {
+						// guess mimetype from headers or filename
+						$type = guess_image_type($image,true);
+						
 						require_once('include/Photo.php');
-						$ph = new Photo($i);
+						$ph = new Photo($i, $type);
 						if($ph->is_valid()) {
 							if($ph->getWidth() > 300 || $ph->getHeight() > 300) {
 								$ph->scaleImage(300);

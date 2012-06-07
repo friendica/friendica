@@ -11,7 +11,7 @@ require_once('include/cache.php');
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_VERSION',      '3.0.1366' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1148      );
+define ( 'DB_UPDATE_VERSION',      1149      );
 
 define ( 'EOL',                    "<br />\r\n"     );
 define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
@@ -28,6 +28,11 @@ define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
  */
 
 define ( 'JPEG_QUALITY',            100  );
+/**
+ * $a->config['system']['png_quality'] from 0 (uncompressed) to 9
+ */
+define ( 'PNG_QUALITY',             8  );
+
 
 /**
  * Not yet used

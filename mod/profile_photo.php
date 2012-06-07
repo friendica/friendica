@@ -53,7 +53,7 @@ function profile_photo_post(&$a) {
 
 			$base_image = $r[0];
 
-			$im = new Photo($base_image['data']);
+			$im = new Photo($base_image['data'], $base_image['type']);
 			if($im->is_valid()) {
 				$im->cropImage(175,$srcX,$srcY,$srcW,$srcH);
 
@@ -108,7 +108,9 @@ function profile_photo_post(&$a) {
 	$src      = $_FILES['userfile']['tmp_name'];
 	$filename = basename($_FILES['userfile']['name']);
 	$filesize = intval($_FILES['userfile']['size']);
-
+	$filetype = $_FILES['userfile']['type'];
+    if ($filetype=="") $filetype=guess_image_type($filename);
+    
 	$maximagesize = get_config('system','maximagesize');
 
 	if(($maximagesize) && ($filesize > $maximagesize)) {
@@ -118,7 +120,7 @@ function profile_photo_post(&$a) {
 	}
 
 	$imagedata = @file_get_contents($src);
-	$ph = new Photo($imagedata);
+	$ph = new Photo($imagedata, $filetype);
 
 	if(! $ph->is_valid()) {
 		notice( t('Unable to process image.') . EOL );
@@ -193,7 +195,7 @@ function profile_photo_content(&$a) {
 			goaway($a->get_baseurl() . '/profiles');
 			return; // NOTREACHED
 		}
-		$ph = new Photo($r[0]['data']);
+		$ph = new Photo($r[0]['data'], $r[0]['type']);
 		profile_photo_crop_ui_head($a, $ph);
 		// go ahead as we have jus uploaded a new photo to crop
 	}
@@ -214,7 +216,7 @@ function profile_photo_content(&$a) {
 		return $o;
 	}
 	else {
-		$filename = $a->config['imagecrop'] . '-' . $a->config['imagecrop_resolution'] . '.jpg';
+		$filename = $a->config['imagecrop'] . '-' . $a->config['imagecrop_resolution'] . '.'.$a->config['imagecrop_ext'];
 		$resolution = $a->config['imagecrop_resolution'];
 		$tpl = get_markup_template("cropbody.tpl");
 		$o .= replace_macros($tpl,array(
@@ -268,6 +270,7 @@ function profile_photo_crop_ui_head(&$a, $ph){
 
 	$a->config['imagecrop'] = $hash;
 	$a->config['imagecrop_resolution'] = $smallest;
+	$a->config['imagecrop_ext'] = $ph->getExt();
 	$a->page['htmlhead'] .= get_markup_template("crophead.tpl");
 	return;
 }}

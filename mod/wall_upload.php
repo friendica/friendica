@@ -57,17 +57,20 @@ function wall_upload_post(&$a) {
 	if(! x($_FILES,'userfile') && ! x($_FILES,'media'))
 		killme();
 
-        if(x($_FILES,'userfile')) {
-	        $src      = $_FILES['userfile']['tmp_name'];
-	        $filename = basename($_FILES['userfile']['name']);
-	        $filesize = intval($_FILES['userfile']['size']);
-        }
-        elseif(x($_FILES,'media')) {
-	        $src = $_FILES['media']['tmp_name'];
-                $filename = basename($_FILES['media']['name']);
-	        $filesize = intval($_FILES['media']['size']);
-        }
-
+	if(x($_FILES,'userfile')) {
+		$src      = $_FILES['userfile']['tmp_name'];
+		$filename = basename($_FILES['userfile']['name']);
+		$filesize = intval($_FILES['userfile']['size']);
+		$filetype = $_FILES['userfile']['type'];
+	}
+	elseif(x($_FILES,'media')) {
+		$src = $_FILES['media']['tmp_name'];
+		$filename = basename($_FILES['media']['name']);
+		$filesize = intval($_FILES['media']['size']);
+		$filetype = $_FILES['media']['type'];
+	}
+	
+    if ($filetype=="") $filetype=guess_image_type($filename);
 	$maximagesize = get_config('system','maximagesize');
 
 	if(($maximagesize) && ($filesize > $maximagesize)) {
@@ -77,7 +80,7 @@ function wall_upload_post(&$a) {
 	}
 
 	$imagedata = @file_get_contents($src);
-	$ph = new Photo($imagedata);
+	$ph = new Photo($imagedata, $filetype);
 
 	if(! $ph->is_valid()) {
 		echo ( t('Unable to process image.') . EOL);
@@ -123,19 +126,19 @@ function wall_upload_post(&$a) {
 /* mod Waitman Gobble NO WARRANTY */
 
 //if we get the signal then return the image url info in BBCODE, otherwise this outputs the info and bails (for the ajax image uploader on wall post)
-        if ($_REQUEST['hush']!='yeah') {
+	if ($_REQUEST['hush']!='yeah') {
 
 		/*existing code*/
 		if(local_user() && intval(get_pconfig(local_user(),'system','plaintext')))
-			echo  "\n\n" . '[url=' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.jpg[/img][/url]\n\n";
+			echo  "\n\n" . '[url=' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]\n\n";
 		else
-			echo  '<br /><br /><a href="' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '" ><img src="' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.jpg\" alt=\"$basename\" /></a><br /><br />";
+			echo  '<br /><br /><a href="' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '" ><img src="' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."\" alt=\"$basename\" /></a><br /><br />";
 		/*existing code*/
 		
 	} else {
-                $m = '[url=' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.jpg[/img][/url]";
+		$m = '[url=' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]";
 		return($m);
-        }
+	}
 /* mod Waitman Gobble NO WARRANTY */
 
 	killme();

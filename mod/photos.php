@@ -5,6 +5,7 @@ require_once('include/acl_selectors.php');
 require_once('include/bbcode.php');
 require_once('include/security.php');
 
+
 function photos_init(&$a) {
 
 
@@ -104,6 +105,8 @@ function photos_post(&$a) {
 
 	logger('mod_photos: REQUEST ' . print_r($_REQUEST,true), LOGGER_DATA);
 	logger('mod_photos: FILES '   . print_r($_FILES,true), LOGGER_DATA);
+
+	$phototypes = Photo::supportedTypes();
 
 	$can_post  = false;
 	$visitor   = 0;
@@ -311,7 +314,7 @@ function photos_post(&$a) {
 				intval($page_owner_uid)
 			);
 			if(count($r)) {
-				$ph = new Photo($r[0]['data']);
+				$ph = new Photo($r[0]['data'], $r[0]['type']);
 				if($ph->is_valid()) {
 					$ph->rotate(270);
 
@@ -362,6 +365,7 @@ function photos_post(&$a) {
 			intval($page_owner_uid)
 		);
 		if(count($p)) {
+			$ext = $phototypes[$p[0]['type']];
 			$r = q("UPDATE `photo` SET `desc` = '%s', `album` = '%s', `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s' WHERE `resource-id` = '%s' AND `uid` = %d",
 				dbesc($desc),
 				dbesc($albname),
@@ -386,7 +390,7 @@ function photos_post(&$a) {
 
 			$title = '';
 			$uri = item_new_uri($a->get_hostname(),$page_owner_uid);
-
+			
 			$arr = array();
 
 			$arr['uid']           = $page_owner_uid;
@@ -412,7 +416,7 @@ function photos_post(&$a) {
 			$arr['origin']        = 1;
 			
 			$arr['body']          = '[url=' . $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $p[0]['resource-id'] . ']' 
-						. '[img]' . $a->get_baseurl() . '/photo/' . $p[0]['resource-id'] . '-' . $p[0]['scale'] . '.jpg' . '[/img]' 
+						. '[img]' . $a->get_baseurl() . '/photo/' . $p[0]['resource-id'] . '-' . $p[0]['scale'] . '.'. $ext . '[/img]' 
 						. '[/url]';
 		
 			$item_id = item_store($arr);
@@ -581,17 +585,17 @@ function photos_post(&$a) {
 					$arr['inform']        = $tagged[2];
 					$arr['origin']        = 1;
 					$arr['body']          = '[url=' . $tagged[1] . ']' . $tagged[0] . '[/url]' . ' ' . t('was tagged in a') . ' ' . '[url=' . $a->get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . ']' . t('photo') . '[/url]' . ' ' . t('by') . ' ' . '[url=' . $owner_record['url'] . ']' . $owner_record['name'] . '[/url]' ;
-					$arr['body'] .= "\n\n" . '[url=' . $a->get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . ']' . '[img]' . $a->get_baseurl() . "/photo/" . $p[0]['resource-id'] . '-' . $best . '.jpg' . '[/img][/url]' . "\n" ;
+					$arr['body'] .= "\n\n" . '[url=' . $a->get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . ']' . '[img]' . $a->get_baseurl() . "/photo/" . $p[0]['resource-id'] . '-' . $best . '.' . $ext . '[/img][/url]' . "\n" ;
 
 					$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $tagged[0] . '</title><id>' . $tagged[1] . '/' . $tagged[0] . '</id>';
 					$arr['object'] .= '<link>' . xmlify('<link rel="alternate" type="text/html" href="' . $tagged[1] . '" />' . "\n");
 					if($tagged[3])
-						$arr['object'] .= xmlify('<link rel="photo" type="image/jpeg" href="' . $tagged[3]['photo'] . '" />' . "\n");
+						$arr['object'] .= xmlify('<link rel="photo" type="'.$p[0]['type'].'" href="' . $tagged[3]['photo'] . '" />' . "\n");
 					$arr['object'] .= '</link></object>' . "\n";
 
 					$arr['target'] = '<target><type>' . ACTIVITY_OBJ_PHOTO . '</type><title>' . $p[0]['desc'] . '</title><id>'
 						. $a->get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . '</id>';
-					$arr['target'] .= '<link>' . xmlify('<link rel="alternate" type="text/html" href="' . $a->get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . '" />' . "\n" . '<link rel="preview" type="image/jpeg" href="' . $a->get_baseurl() . "/photo/" . $p[0]['resource-id'] . '-' . $best . '.jpg' . '" />') . '</link></target>';
+					$arr['target'] .= '<link>' . xmlify('<link rel="alternate" type="text/html" href="' . $a->get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . '" />' . "\n" . '<link rel="preview" type="'.$p[0]['type'].'" href="' . $a->get_baseurl() . "/photo/" . $p[0]['resource-id'] . '-' . $best . '.' . $ext . '" />') . '</link></target>';
 
 					$item_id = item_store($arr);
 					if($item_id) {
@@ -662,7 +666,7 @@ function photos_post(&$a) {
 	$str_group_deny    = perms2str(((is_array($_REQUEST['group_deny']))    ? $_REQUEST['group_deny']    : explode(',',$_REQUEST['group_deny'])));
 	$str_contact_deny  = perms2str(((is_array($_REQUEST['contact_deny']))  ? $_REQUEST['contact_deny']  : explode(',',$_REQUEST['contact_deny'])));
 
-	$ret = array('src' => '', 'filename' => '', 'filesize' => 0);
+	$ret = array('src' => '', 'filename' => '', 'filesize' => 0, 'type' => '');
 
 	call_hooks('photo_post_file',$ret);
 
@@ -670,15 +674,17 @@ function photos_post(&$a) {
 		$src      = $ret['src'];
 		$filename = $ret['filename'];
 		$filesize = $ret['filesize'];
+		$type     = $ret['type'];
 	}
 	else {
 		$src        = $_FILES['userfile']['tmp_name'];
 		$filename   = basename($_FILES['userfile']['name']);
 		$filesize   = intval($_FILES['userfile']['size']);
+		$type       = $_FILES['userfile']['type'];
 	}
+	if ($type=="") $type=guess_image_type($filename);
 
-
-	logger('photos: upload: received file: ' . $filename . ' as ' . $src . ' ' . $filesize . ' bytes', LOGGER_DEBUG);
+	logger('photos: upload: received file: ' . $filename . ' as ' . $src . ' ('. $type . ') ' . $filesize . ' bytes', LOGGER_DEBUG);
 
 	$maximagesize = get_config('system','maximagesize');
 
@@ -701,7 +707,7 @@ function photos_post(&$a) {
 	logger('mod/photos.php: photos_post(): loading the contents of ' . $src , LOGGER_DEBUG);
 
 	$imagedata = @file_get_contents($src);
-	$ph = new Photo($imagedata);
+	$ph = new Photo($imagedata, $type);
 
 	if(! $ph->is_valid()) {
 		logger('mod/photos.php: photos_post(): unable to process image' , LOGGER_DEBUG);
@@ -771,7 +777,7 @@ function photos_post(&$a) {
 	$arr['origin']        = 1;
 
 	$arr['body']          = '[url=' . $a->get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo_hash . ']' 
-				. '[img]' . $a->get_baseurl() . "/photo/{$photo_hash}-{$smallest}.jpg" . '[/img]' 
+				. '[img]' . $a->get_baseurl() . "/photo/{$photo_hash}-{$smallest}.".$ph->getExt() . '[/img]' 
 				. '[/url]';
 
 	$item_id = item_store($arr);
@@ -814,8 +820,8 @@ function photos_content(&$a) {
 		notice( t('Public access denied.') . EOL);
 		return;
 	}
-
-
+	
+	
 	require_once('include/bbcode.php');
 	require_once('include/security.php');
 	require_once('include/conversation.php');
@@ -824,6 +830,8 @@ function photos_content(&$a) {
 		notice( t('No photos selected') . EOL );
 		return;
 	}
+
+	$phototypes = Photo::supportedTypes();
 
 	$_SESSION['photo_return'] = $a->cmd;
 
@@ -991,7 +999,7 @@ function photos_content(&$a) {
 			$a->set_pager_itemspage(20);
 		}
 
-		$r = q("SELECT `resource-id`, `id`, `filename`, max(`scale`) AS `scale`, `desc` FROM `photo` WHERE `uid` = %d AND `album` = '%s' 
+		$r = q("SELECT `resource-id`, `id`, `filename`, type, max(`scale`) AS `scale`, `desc` FROM `photo` WHERE `uid` = %d AND `album` = '%s' 
 			AND `scale` <= 4 $sql_extra GROUP BY `resource-id` ORDER BY `created` DESC LIMIT %d , %d",
 			intval($owner_uid),
 			dbesc($album),
@@ -1038,13 +1046,15 @@ function photos_content(&$a) {
 					$twist = 'rotleft';
 				else
 					$twist = 'rotright';
+				
+				$ext = $phototypes[$rr['type']];
 
 				$o .= replace_macros($tpl,array(
 					'$id' => $rr['id'],
 					'$twist' => ' ' . $twist . rand(2,4),
 					'$photolink' => $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id'],
 					'$phototitle' => t('View Photo'),
-					'$imgsrc' => $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . $rr['scale'] . '.jpg',
+					'$imgsrc' => $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . $rr['scale'] . '.' .$ext,
 					'$imgalt' => template_escape($rr['filename']),
 					'$desc'=> template_escape($rr['desc'])
 				));
@@ -1158,9 +1168,9 @@ function photos_content(&$a) {
 			$prevlink = array($prevlink, '<div class="icon prev"></div>') ;
 
 		$photo = array(
-			'href' => $a->get_baseurl() . '/photo/' . $hires['resource-id'] . '-' . $hires['scale'] . '.jpg',
+			'href' => $a->get_baseurl() . '/photo/' . $hires['resource-id'] . '-' . $hires['scale'] . '.' . $phototypes[$hires['type']],
 			'title'=> t('View Full Size'),
-			'src'  => $a->get_baseurl() . '/photo/' . $lores['resource-id'] . '-' . $lores['scale'] . '.jpg' . '?f=&_u=' . datetime_convert('','','','ymdhis')
+			'src'  => $a->get_baseurl() . '/photo/' . $lores['resource-id'] . '-' . $lores['scale'] . '.' . $phototypes[$lores['type']] . '?f=&_u=' . datetime_convert('','','','ymdhis')
 		);
 
 		if($nextlink)
@@ -1449,7 +1459,7 @@ function photos_content(&$a) {
 		$a->set_pager_itemspage(20);
 	}
 
-	$r = q("SELECT `resource-id`, `id`, `filename`, `album`, max(`scale`) AS `scale` FROM `photo`
+	$r = q("SELECT `resource-id`, `id`, `filename`, type, `album`, max(`scale`) AS `scale` FROM `photo`
 		WHERE `uid` = %d AND `album` != '%s' AND `album` != '%s'  
 		$sql_extra GROUP BY `resource-id` ORDER BY `created` DESC LIMIT %d , %d",
 		intval($a->data['user']['uid']),
@@ -1469,13 +1479,14 @@ function photos_content(&$a) {
 				$twist = 'rotleft';
 			else
 				$twist = 'rotright';
-
+			$ext = $phototypes[$rr['type']];
+			
 			$photos[] = array(
 				'id'       => $rr['id'],
 				'twist'    => ' ' . $twist . rand(2,4),
 				'link'  	=> $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id'],
 				'title' 	=> t('View Photo'),
-				'src'     	=> $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . ((($rr['scale']) == 6) ? 4 : $rr['scale']) . '.jpg',
+				'src'     	=> $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . ((($rr['scale']) == 6) ? 4 : $rr['scale']) . '.' . $ext,
 				'alt'     	=> template_escape($rr['filename']),
 				'album'	=> array(
 					'link'  => $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),

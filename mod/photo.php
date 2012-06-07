@@ -1,6 +1,7 @@
 <?php
 
 require_once('include/security.php');
+require_once('include/Photo.php');
 
 function photo_init(&$a) {
 
@@ -83,9 +84,11 @@ function photo_init(&$a) {
 		);
 		if(count($r)) {
 			$data = $r[0]['data'];
+			$mimetype = $r[0]['type'];
 		}
 		if(! isset($data)) {
 			$data = file_get_contents($default);
+			$mimetype = 'image/jpeg';
 		}
 	}
 	else {
@@ -95,7 +98,9 @@ function photo_init(&$a) {
 		 */
 
 		$resolution = 0;
-		$photo = str_replace('.jpg','',$photo);
+		foreach( Photo::supportedTypes() as $m=>$e){
+			$photo = str_replace(".$e",'',$photo);
+		}
 	
 		if(substr($photo,-2,1) == '-') {
 			$resolution = intval(substr($photo,-1,1));
@@ -119,6 +124,7 @@ function photo_init(&$a) {
 
 			if(count($r)) {
 				$data = $r[0]['data'];
+				$mimetype = $r[0]['type'];
 			}
 			else {
 
@@ -136,6 +142,7 @@ function photo_init(&$a) {
 				);
 				if(count($r)) {
 					$data = file_get_contents('images/nosign.jpg');
+					$mimetype = 'image/jpeg';
 					$prvcachecontrol = true;
 				}
 			}
@@ -148,12 +155,15 @@ function photo_init(&$a) {
 
 				case 4:
 					$data = file_get_contents('images/person-175.jpg');
+					$mimetype = 'image/jpeg';
 					break;
 				case 5:
 					$data = file_get_contents('images/person-80.jpg');
+					$mimetype = 'image/jpeg';
 					break;
 				case 6:
 					$data = file_get_contents('images/person-48.jpg');
+					$mimetype = 'image/jpeg';
 					break;
 				default:
 					killme();
@@ -164,11 +174,11 @@ function photo_init(&$a) {
 	}
 
 	if(isset($customres) && $customres > 0 && $customres < 500) {
-		require_once('include/Photo.php');
-		$ph = new Photo($data);
+		$ph = new Photo($data, $mimetype);
 		if($ph->is_valid()) {
 			$ph->scaleImageSquare($customres);
 			$data = $ph->imageString();
+			$mimetype = $ph->getType();
 		}
 	}
 
@@ -181,7 +191,7 @@ function photo_init(&$a) {
 		header_remove('pragma');
 	}
 
-	header("Content-type: image/jpeg");
+	header("Content-type: ".$mimetype);
 
 	if($prvcachecontrol) {
 

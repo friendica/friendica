@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1148 );
+define( 'UPDATE_VERSION' , 1149 );
 
 /**
  *
@@ -1283,3 +1283,9 @@ function update_1147() {
 	return UPDATE_SUCCESS ;
 }
 
+function update_1148() {
+	$r = q("ALTER TABLE photo ADD type CHAR(128) NOT NULL DEFAULT 'image/jpeg' AFTER filename");
+	if (!$r)
+		return UPDATE_FAILED;
+	return UPDATE_SUCCESS;
+}

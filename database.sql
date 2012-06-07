@@ -745,6 +745,7 @@ CREATE TABLE IF NOT EXISTS `photo` (
   `desc` text NOT NULL,
   `album` char(255) NOT NULL,
   `filename` char(255) NOT NULL,
+  `type` CHAR(128) NOT NULL DEFAULT 'image/jpeg',
   `height` smallint(6) NOT NULL,
   `width` smallint(6) NOT NULL,
   `data` mediumblob NOT NULL,

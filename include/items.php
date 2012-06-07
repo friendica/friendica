@@ -1346,7 +1346,11 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 		}
 			
 		$img_str = fetch_url($photo_url,true);
-		$img = new Photo($img_str);
+		// guess mimetype from headers or filename
+		$type = guess_image_type($photo_url,true);
+		
+		
+		$img = new Photo($img_str, $type);
 		if($img->is_valid()) {
 			if($have_photo) {
 				q("DELETE FROM `photo` WHERE `resource-id` = '%s' AND `contact-id` = %d AND `uid` = %d",
@@ -1372,9 +1376,9 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 			q("UPDATE `contact` SET `avatar-date` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s'  
 				WHERE `uid` = %d AND `id` = %d LIMIT 1",
 				dbesc(datetime_convert()),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-4.jpg'),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-5.jpg'),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-6.jpg'),
+				dbesc($a->get_baseurl() . '/photo/' . $hash . '-4.'.$img->getExt()),
+				dbesc($a->get_baseurl() . '/photo/' . $hash . '-5.'.$img->getExt()),
+				dbesc($a->get_baseurl() . '/photo/' . $hash . '-6.'.$img->getExt()),
 				intval($contact['uid']),
 				intval($contact['id'])
 			);
