@@ -6,7 +6,31 @@ function network_init(&$a) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
-  
+	
+	
+	// fetch last used tab and redirect if needed
+	$sel_tabs = network_query_get_sel_tab($a);
+	$last_sel_tabs = get_pconfig(local_user(), 'network.view','tab.selected');
+	if (is_array($last_sel_tabs)){
+		$tab_urls = array(
+			'/network?f=&order=comment',						//all
+			'/network?f=&order=post',		//postord
+			'/network?f=&conv=1',			//conv
+			'/network/new',					//new
+			'/network?f=&star=1',			//starred
+			'/network?f=&bmark=1',			//bookmarked
+			'/network?f=&spam=1',			//spam
+		);
+		
+		// redirect if current selected tab is 'no_active' and
+		// last selected tab is _not_ 'all_active'. 
+		if ($sel_tabs[0] == 'active' && $last_sel_tabs[0]!='active') {
+			$k = array_search('active', $last_sel_tabs);
+			//echo "<pre>"; var_dump($sel_tabs, $last_sel_tabs, $tab_urlsm, $k, $tab_urls[$k]); killme();
+			goaway($a->get_baseurl() . $tab_urls[$k]);
+		}
+	}
+	
 	$group_id = (($a->argc > 1 && intval($a->argv[1])) ? intval($a->argv[1]) : 0);
 		  
 	require_once('include/group.php');
@@ -98,26 +122,23 @@ function saved_searches($search) {
 
 }
 
-
-function network_content(&$a, $update = 0) {
-
-	require_once('include/conversation.php');
-
-	if(! local_user()) {
-		$_SESSION['return_url'] = $a->query_string;
-    	return login(false);
-	}
-
-	$arr = array('query' => $a->query_string);
-
-	call_hooks('network_content_init', $arr);
-
-	$o = '';
-
-	// item filter tabs
-	// TODO: fix this logic, reduce duplication
-	//$a->page['content'] .= '<div class="tabs-wrapper">';
-	
+/**
+ * Return selected tab from query
+ * 
+ * urls -> returns
+ * 		'/network'					=> $no_active = 'active'
+ * 		'/network?f=&order=comment'	=> $comment_active = 'active'
+ * 		'/network?f=&order=post'	=> $postord_active = 'active'
+ * 		'/network?f=&conv=1',		=> $conv_active = 'active'
+ * 		'/network/new',				=> $new_active = 'active'
+ * 		'/network?f=&star=1',		=> $starred_active = 'active'
+ * 		'/network?f=&bmark=1',		=> $bookmarked_active = 'active'
+ * 		'/network?f=&spam=1',		=> $spam_active = 'active'
+ * 
+ * @return Array ( $no_active, $comment_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active );
+ */
+function network_query_get_sel_tab($a) {
+	$no_active='';
 	$starred_active = '';
 	$new_active = '';
 	$bookmarked_active = '';
@@ -125,6 +146,7 @@ function network_content(&$a, $update = 0) {
 	$search_active = '';
 	$conv_active = '';
 	$spam_active = '';
+	$postord_active = '';
 
 	if(($a->argc > 1 && $a->argv[1] === 'new') 
 		|| ($a->argc > 2 && $a->argv[2] === 'new')) {
@@ -152,28 +174,56 @@ function network_content(&$a, $update = 0) {
 	}
 
 	
+	
 	if (($new_active == '') 
 		&& ($starred_active == '') 
 		&& ($bookmarked_active == '')
 		&& ($conv_active == '')
 		&& ($search_active == '')
 		&& ($spam_active == '')) {
-			$all_active = 'active';
+			$no_active = 'active';
 	}
 
+	if ($no_active=='active' && x($_GET,'order')) {
+		switch($_GET['order']){
+		 case 'post': $postord_active = 'active'; $no_active=''; break;
+		 case 'comment' : $all_active = 'active'; $no_active=''; break;
+		}
+	}
 	
-	$postord_active = '';
+	return array($no_active, $all_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active);
+}
 
-	if($all_active && x($_GET,'order') && $_GET['order'] !== 'comment') {
-		$all_active = '';
-		$postord_active = 'active';
+
+function network_content(&$a, $update = 0) {
+
+	require_once('include/conversation.php');
+
+	if(! local_user()) {
+		$_SESSION['return_url'] = $a->query_string;
+    	return login(false);
 	}
-			 	
+
+	$arr = array('query' => $a->query_string);
+
+	call_hooks('network_content_init', $arr);
+
+	$o = '';
+
+	// item filter tabs
+	// TODO: fix this logic, reduce duplication
+	//$a->page['content'] .= '<div class="tabs-wrapper">';
+	
+	list($no_active, $all_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active) = network_query_get_sel_tab($a);
+	// if no tabs are selected, defaults to comments
+	if ($no_active=='active') $all_active='active';
+	//echo "<pre>"; var_dump($no_active, $all_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active); killme();
+	
 	// tabs
 	$tabs = array(
 		array(
 			'label' => t('Commented Order'),
-			'url'=>$a->get_baseurl(true) . '/' . str_replace('/new', '', $a->cmd) . ((x($_GET,'cid')) ? '?f=&cid=' . $_GET['cid'] : ''), 
+			'url'=>$a->get_baseurl(true) . '/' . str_replace('/new', '', $a->cmd) . '?f=&order=comment' . ((x($_GET,'cid')) ? '&cid=' . $_GET['cid'] : ''), 
 			'sel'=>$all_active,
 			'title'=> t('Sort by Comment Date'),
 		),
@@ -215,8 +265,12 @@ function network_content(&$a, $update = 0) {
 //			'title' => t('Posts flagged as SPAM'),
 //		),	
 
-
 	);
+	
+	// save selected tab, but only if not in search or file mode
+	if(!x($_GET,'search') && !x($_GET,'file')) {
+		set_pconfig( local_user(), 'network.view','tab.selected',array($all_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active) );
+	}
 
 	$arr = array('tabs' => $tabs);
 	call_hooks('network_tabs', $arr);
