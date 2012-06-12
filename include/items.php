@@ -908,6 +908,16 @@ function item_store($arr,$force_parent = false) {
 		intval($current_post)
 	);
 
+        $arr['id'] = $current_post;
+        $arr['parent'] = $parent_id;
+        $arr['allow_cid'] = $allow_cid;
+        $arr['allow_gid'] = $allow_gid;
+        $arr['deny_cid'] = $deny_cid;
+        $arr['deny_gid'] = $deny_gid;
+        $arr['private'] = $private;
+        $arr['deleted'] = $parent_deleted;
+	call_hooks('post_remote_end',$arr);
+
 	// update the commented timestamp on the parent
 
 	q("UPDATE `item` set `commented` = '%s', `changed` = '%s' WHERE `id` = %d LIMIT 1",
