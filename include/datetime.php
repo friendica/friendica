@@ -87,7 +87,7 @@ function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d 
 		$from = 'UTC';
 	if($to === '')
 		$to = 'UTC';
-	if($s === '' || (! is_string($s)))
+	if( ($s === '') || (! is_string($s)) )
 		$s = 'now';
 
 	// Slight hackish adjustment so that 'zero' datetime actually returns what is intended
