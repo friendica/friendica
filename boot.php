@@ -1577,3 +1577,30 @@ function zrl($s,$force = false) {
 		return $s . $achar . 'zrl=' . urlencode($mine);
 	return $s;
 }
+
+/**
+* returns querystring as string from a mapped array
+*
+* @param params Array 
+* @return string
+*/
+function build_querystring($params, $name=null) { 
+    $ret = ""; 
+    foreach($params as $key=>$val) {
+        if(is_array($val)) { 
+            if($name==null) {
+                $ret .= build_querystring($val, $key); 
+            } else {
+                $ret .= build_querystring($val, $name."[$key]");    
+            }
+        } else {
+            $val = urlencode($val);
+            if($name!=null) {
+                $ret.=$name."[$key]"."=$val&"; 
+            } else {
+                $ret.= "$key=$val&"; 
+            }
+        } 
+    } 
+    return $ret;    
+}
