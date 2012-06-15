@@ -17,13 +17,18 @@ function network_init(&$a) {
 			}
 		}
 	}
-	
+    
+    // convert query string to array and remove first element (wich is friendica args)
+    $query_array = array();
+    parse_str($a->query_string, $query_array);
+    array_shift($query_array);
+    
 	// fetch last used tab and redirect if needed
 	$sel_tabs = network_query_get_sel_tab($a);
 	$last_sel_tabs = get_pconfig(local_user(), 'network.view','tab.selected');
 	if (is_array($last_sel_tabs)){
 		$tab_urls = array(
-			'/network?f=&order=comment',						//all
+			'/network?f=&order=comment',//all
 			'/network?f=&order=post',		//postord
 			'/network?f=&conv=1',			//conv
 			'/network/new',					//new
@@ -37,11 +42,21 @@ function network_init(&$a) {
 		// and this isn't a date query
 
 		if ($sel_tabs[0] == 'active' && $last_sel_tabs[0]!='active' && (! $is_a_date_query)) {
-
-
 			$k = array_search('active', $last_sel_tabs);
-			//echo "<pre>"; var_dump($sel_tabs, $last_sel_tabs, $tab_urlsm, $k, $tab_urls[$k]); killme();
-			goaway($a->get_baseurl() . $tab_urls[$k]);
+          
+            // merge tab querystring with request querystring
+            $dest_qa = array();
+            list($dest_url,$dest_qs) = explode("?", $tab_urls[$k]);
+            parse_str( $dest_qs, $dest_qa);
+            $dest_qa = array_merge($query_array, $dest_qa);
+            $dest_qs = build_querystring($dest_qa);
+            
+            // groups filter is in form of "network/nnn". Add it to $dest_url, if it's possible
+            if ($a->argc==2 && is_numeric($a->argv[1]) && strpos($dest_url, "/",1)===false){
+                $dest_url .= "/".$a->argv[1];
+            }
+
+			goaway($a->get_baseurl() . $dest_url."?".$dest_qs);
 		}
 	}
 	
