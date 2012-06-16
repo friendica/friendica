@@ -245,7 +245,7 @@
 			
 		}
 		
-		logger('api_user: ' . $extra_query . ' ' , $user);
+		logger('api_user: ' . $extra_query . ', user: ' . $user);
 		// user info		
 		$uinfo = q("SELECT *, `contact`.`id` as `cid` FROM `contact`
 				WHERE 1
