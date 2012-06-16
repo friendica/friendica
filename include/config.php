@@ -18,9 +18,7 @@
 if(! function_exists('load_config')) {
 function load_config($family) {
 	global $a;
-	$r = q("SELECT * FROM `config` WHERE `cat` = '%s'",
-		dbesc($family)
-	);
+	$r = q("SELECT * FROM `config` WHERE `cat` = '%s'", dbesc($family));
 	if(count($r)) {
 		foreach($r as $rr) {
 			$k = $rr['k'];
@@ -30,7 +28,7 @@ function load_config($family) {
 				$a->config[$family][$k] = $rr['v'];
 			}
 		}
-	} else if ($rr['cat'] != 'config') {
+	} else if (isset($rr) && ($rr['cat'] != 'config')) {
 		// Negative caching
 		$a->config[$family] = "!<unset>!";
 	}
