@@ -73,7 +73,7 @@ function directory_content(&$a) {
 	$order = " ORDER BY `name` ASC "; 
 
 
-	$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`, `user`.`timezone` FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $sql_extra $order LIMIT %d , %d ",
+	$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `contact`.`avatar-date` AS picdate, `user`.`nickname`, `user`.`timezone` FROM `profile` LEFT join `contact` on `contact`.`uid` = `profile`.`uid` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 AND `self` = 1 $publish AND `user`.`blocked` = 0 $sql_extra $order LIMIT %d , %d ",
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);
@@ -116,7 +116,7 @@ function directory_content(&$a) {
 			$entry = replace_macros($tpl,array(
 				'$id' => $rr['id'],
 				'$profile-link' => $profile_link,
-				'$photo' => $rr[$photo],
+				'$photo' => $rr[$photo] . '?rev=' . urlencode($rr['picdate']),
 				'$alt-text' => $rr['name'],
 				'$name' => $rr['name'],
 				'$details' => $pdesc . $details  

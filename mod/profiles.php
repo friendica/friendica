@@ -635,7 +635,7 @@ function profiles_content(&$a) {
 	}
 	else {
 
-		$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
+		$r = q("SELECT `profile`.*, `contact`.`avatar-date` AS picdate FROM `profile` LEFT JOIN `contact` on `contact`.`uid` = `profile`.`uid` WHERE `profile`.`uid` = %d",
 			local_user());
 		if(count($r)) {
 
@@ -652,7 +652,7 @@ function profiles_content(&$a) {
 
 			foreach($r as $rr) {
 				$o .= replace_macros($tpl, array(
-					'$photo' => $rr['thumb'],
+					'$photo' => $rr['thumb'] . '?rev=' . urlencode($rr['picdate']),
 					'$id' => $rr['id'],
 					'$alt' => t('Profile Image'),
 					'$profile_name' => $rr['profile-name'],

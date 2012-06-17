@@ -16,7 +16,7 @@ function photos_init(&$a) {
 
 	if($a->argc > 1) {
 		$nick = $a->argv[1];
-		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `blocked` = 0 LIMIT 1",
+		$r = q("SELECT `user`.*, `contact`.`avatar-date` AS picdate FROM `user` LEFT JOIN `contact` on `contact`.`uid` = `user`.`uid` WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 LIMIT 1",
 			dbesc($nick)
 		);
 
@@ -36,7 +36,7 @@ function photos_init(&$a) {
 
 			$o .= '<div class="vcard">';
 			$o .= '<div class="fn">' . $a->data['user']['username'] . '</div>';
-			$o .= '<div id="profile-photo-wrapper"><img class="photo" style="width: 175px; height: 175px;" src="' . $a->get_baseurl() . '/photo/profile/' . $a->data['user']['uid'] . '.jpg" alt="' . $a->data['user']['username'] . '" /></div>';
+			$o .= '<div id="profile-photo-wrapper"><img class="photo" style="width: 175px; height: 175px;" src="' . $a->get_baseurl() . '/photo/profile/' . $a->data['user']['uid'] . '.jpg?rev=' . urlencode($a->data['user']['picdate']) . '" alt="' . $a->data['user']['username'] . '" /></div>';
 			$o .= '</div>';
 			
 			if(! intval($a->data['user']['hidewall'])) {
