@@ -53,9 +53,9 @@ function nav(&$a) {
 		$nav['usermenu'][] = Array('notes/', t('Personal notes'), "", t('Your personal photos'));
 		
 		// user info
-		$r = q("SELECT micro FROM contact WHERE uid=%d AND self=1", intval($a->user['uid']));
+		$r = q("SELECT micro,avatar-date FROM contact WHERE uid=%d AND self=1", intval($a->user['uid']));
 		$userinfo = array(
-			'icon' => (count($r) ? $r[0]['micro']: $a->get_baseurl($ssl_state)."/images/person-48.jpg"),
+			'icon' => (count($r) ? $r[0]['micro']."?rev=".urlencode($r[0]['avatar-date']): $a->get_baseurl($ssl_state)."/images/person-48.jpg"),
 			'name' => $a->user['username'],
 		);
 		
