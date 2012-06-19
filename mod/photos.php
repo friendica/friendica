@@ -718,6 +718,7 @@ function photos_post(&$a) {
 		killme();
 	}
 
+	$ph->orient($src);
 	@unlink($src);
 
 	$width  = $ph->getWidth();

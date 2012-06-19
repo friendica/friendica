@@ -121,7 +121,67 @@ class Photo {
 		$this->image  = imagerotate($this->image,$degrees,0);
 		$this->width  = imagesx($this->image);
 		$this->height = imagesy($this->image);
-	}	
+	}
+
+	public function flip($horiz = true, $vert = false) {
+		$w = imagesx($this->image);
+		$h = imagesy($this->image);
+		$flipped = imagecreate($w, $h);
+		if($horiz) {
+			for ($x = 0; $x < $w; $x++) {
+				imagecopy($flipped, $this->image, $x, 0, $w - $x - 1, 0, 1, $h);
+			}
+		}
+		if($vert) {
+			for ($y = 0; $y < $h; $y++) {
+				imagecopy($flipped, $this->image, 0, $y, 0, $h - $y - 1, $w, 1);
+			}
+		}
+		$this->image = $flipped;
+	}
+
+	public function orient($filename) {
+		// based off comment on http://php.net/manual/en/function.imagerotate.php
+
+		$exif = exif_read_data($filename);
+		$ort = $exif['Orientation'];
+
+		switch($ort)
+		{
+			case 1: // nothing
+	        	break;
+
+	        case 2: // horizontal flip
+	            $this->flip();
+    		    break;
+                               
+	        case 3: // 180 rotate left
+            	$this->rotate(180);
+		        break;
+                   
+	        case 4: // vertical flip
+            	$this->flip(false, true);
+		        break;
+               
+	        case 5: // vertical flip + 90 rotate right
+            	$this->flip(false, true);
+                $this->rotate(-90);
+		        break;
+               
+	        case 6: // 90 rotate right
+	            $this->rotate(-90);
+		        break;
+               
+	        case 7: // horizontal flip + 90 rotate right
+	            $this->flip();   
+	            $this->rotate(-90);
+		        break;
+               
+	        case 8:    // 90 rotate left
+	            $this->rotate(90);
+		        break;
+	    }
+	}
 
 
 
