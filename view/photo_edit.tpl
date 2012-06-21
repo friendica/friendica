@@ -18,8 +18,12 @@
 
 	<div id="photo-edit-tags-end"></div>
 	<div id="photo-edit-rotate-wrapper">
-		<div id="photo-edit-rotate-label">$rotate</div>
-		<input type="checkbox" name="rotate" value="1" />
+		<div id="photo-edit-rotate-label">
+			$rotatecw<br>
+			$rotateccw
+		</div>
+		<input type="radio" name="rotate" value="1" /><br>
+		<input type="radio" name="rotate" value="2" />
 	</div>
 	<div id="photo-edit-rotate-end"></div>
 

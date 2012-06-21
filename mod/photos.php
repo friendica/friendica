@@ -306,7 +306,8 @@ function photos_post(&$a) {
 			$albname = datetime_convert('UTC',date_default_timezone_get(),'now', 'Y');
 
 
-		if((x($_POST,'rotate') !== false) && (intval($_POST['rotate']) == 1)) {
+		if((x($_POST,'rotate') !== false) && 
+		   ( (intval($_POST['rotate']) == 1) || (intval($_POST['rotate']) == 2) )) {
 			logger('rotate');
 
 			$r = q("select * from photo where `resource-id` = '%s' and uid = %d and scale = 0 limit 1",
@@ -316,7 +317,8 @@ function photos_post(&$a) {
 			if(count($r)) {
 				$ph = new Photo($r[0]['data'], $r[0]['type']);
 				if($ph->is_valid()) {
-					$ph->rotate(270);
+					$rotate_deg = ( (intval($_POST['rotate']) == 1) ? 270 : 90 );
+					$ph->rotate($rotate_deg);
 
 					$width  = $ph->getWidth();
 					$height = $ph->getHeight();
@@ -325,8 +327,8 @@ function photos_post(&$a) {
 						dbesc($ph->imageString()),
 						intval($height),
 						intval($width),
-				dbesc($resource_id),
-				intval($page_owner_uid)
+						dbesc($resource_id),
+						intval($page_owner_uid)
 					);
 
 					if($width > 640 || $height > 640) {
@@ -338,8 +340,8 @@ function photos_post(&$a) {
 							dbesc($ph->imageString()),
 							intval($height),
 							intval($width),
-				dbesc($resource_id),
-				intval($page_owner_uid)
+							dbesc($resource_id),
+							intval($page_owner_uid)
 						);
 					}
 
@@ -352,8 +354,8 @@ function photos_post(&$a) {
 							dbesc($ph->imageString()),
 							intval($height),
 							intval($width),
-				dbesc($resource_id),
-				intval($page_owner_uid)
+							dbesc($resource_id),
+							intval($page_owner_uid)
 						);
 					}	
 				}
@@ -1251,7 +1253,8 @@ function photos_content(&$a) {
 			$edit_tpl = get_markup_template('photo_edit.tpl');
 			$edit = replace_macros($edit_tpl, array(
 				'$id' => $ph[0]['id'],
-				'$rotate' => t('Rotate CW'),
+				'$rotatecw' => t('Rotate CW (right)'),
+				'$rotateccw' => t('Rotate CCW (left)'),
 				'$album' => template_escape($ph[0]['album']),
 				'$newalbum' => t('New album name'), 
 				'$nickname' => $a->data['user']['nickname'],
