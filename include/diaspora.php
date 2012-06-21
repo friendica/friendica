@@ -2150,7 +2150,7 @@ function diaspora_send_followup($item,$owner,$contact,$public_batch = false) {
 
 	$a = get_app();
 	$myaddr = $owner['nickname'] . '@' .  substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
-	$theiraddr = $contact['addr'];
+//	$theiraddr = $contact['addr'];
 
 	// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
 	// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
@@ -2213,7 +2213,10 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 
 	$a = get_app();
 	$myaddr = $owner['nickname'] . '@' . substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
-	$theiraddr = $contact['addr'];
+//	$theiraddr = $contact['addr'];
+
+	$body = $item['body'];
+	$text = html_entity_decode(bb2diaspora($body));
 
 
 	// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
@@ -2232,25 +2235,29 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	$relay_retract = false;
 	$sql_sign_id = 'iid';
 	if( $item['deleted']) {
-		$tpl = get_markup_template('diaspora_relayable_retraction.tpl');
 		$relay_retract = true;
-		$sql_sign_id = 'retract_iid';
+
 		$target_type = ( ($item['verb'] === ACTIVITY_LIKE) ? 'Like' : 'Comment');
+		$sender_signed_text = $item['guid'] . ';' . $target_type ;
+
+		$sql_sign_id = 'retract_iid';
+		$tpl = get_markup_template('diaspora_relayable_retraction.tpl');
 	}
 	elseif($item['verb'] === ACTIVITY_LIKE) {
-		$tpl = get_markup_template('diaspora_like_relay.tpl');
 		$like = true;
+
 		$target_type = 'Post';
 //		$positive = (($item['deleted']) ? 'false' : 'true');
 		$positive = 'true';
+		$sender_signed_text = $item['guid'] . ';' . $target_type . ';' . $parent_guid . ';' . $positive . ';' . $myaddr;
+
+		$tpl = get_markup_template('diaspora_like_relay.tpl');
 	}
-	else {
+	else { // item is a comment
+		$sender_signed_text = $item['guid'] . ';' . $parent_guid . ';' . $text . ';' . $myaddr;
+
 		$tpl = get_markup_template('diaspora_comment_relay.tpl');
 	}
-
-	$body = $item['body'];
-
-	$text = html_entity_decode(bb2diaspora($body));
 
 
 	// fetch the original signature	if the relayable was created by a Diaspora
@@ -2272,51 +2279,20 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 		// function is called
 		logger('diaspora_send_relay: original author signature not found, cannot send relayable');
 		return;
-/*
-		$itemcontact = q("select * from contact where `id` = %d limit 1",
-			intval($item['contact-id'])
-		);
-		if(count($itemcontact)) {
-			if(! $itemcontact[0]['self']) {
-				$prefix = sprintf( t('[Relayed] Comment authored by %s from network %s'),
-					'['. $item['author-name'] . ']' . '(' . $item['author-link'] . ')',  
-					network_to_name($itemcontact['network'])) . "\n";
-				// "$body" was assigned to "$text" above. It isn't used after that, so I don't think
-				// the following change will do anything
-				$body = $prefix . $body;
-
-				// I think this comment will fail upon reaching Diaspora, because "$signed_text" is not defined
-			}
-		}
-		else {
-		// I'm confused about this "else." Since it sets "$handle = $myaddr," it seems like it should be for the case
-		// where the top-level post owner commented on his own post, i.e. "$itemcontact[0]['self']" is true. But it's
-		// positioned to be for the case where "count($itemcontact)" is 0.
-
-			$handle = $myaddr;
-
-			if($like)
-				$signed_text = $item['guid'] . ';' . $target_type . ';' . $parent_guid . ';' . $positive . ';' . $handle;
-			elseif($relay_retract)
-				$signed_text = $item['guid'] . ';' . $target_type;
-			else
-				$signed_text = $item['guid'] . ';' . $parent_guid . ';' . $text . ';' . $handle;
-
-			$authorsig = base64_encode(rsa_sign($signed_text,$owner['uprvkey'],'sha256'));
-
-			q("insert into sign (`" . $sql_sign_id . "`,`signed_text`,`signature`,`signer`) values (%d,'%s','%s','%s') ",
-				intval($item['id']),
-				dbesc($signed_text),
-				dbesc($authorsig),
-				dbesc($handle)
-			);
-		}
-*/
 	}
 
-	// sign it with the top-level owner's signature
+	// Sign the relayable with the top-level owner's signature
+	//
+	// We'll use the $sender_signed_text that we just created, instead of the $signed_text
+	// stored in the database, because that provides the best chance that Diaspora will
+	// be able to reconstruct the signed text the same way we did. This is particularly a
+	// concern for the comment, whose signed text includes the text of the comment. The
+	// smallest change in the text of the comment, including removing whitespace, will
+	// make the signature verification fail. Since we translate from BB code to Diaspora's
+	// markup at the top of this function, which is AFTER we placed the original $signed_text
+	// in the database, it's hazardous to trust the original $signed_text.
 
-	$parentauthorsig = base64_encode(rsa_sign($signed_text,$owner['uprvkey'],'sha256'));
+	$parentauthorsig = base64_encode(rsa_sign($sender_signed_text,$owner['uprvkey'],'sha256'));
 
 	$msg = replace_macros($tpl,array(
 		'$guid' => xmlify($item['guid']),
