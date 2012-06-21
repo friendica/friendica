@@ -864,6 +864,8 @@
 		logger('API: api_statuses_show: '.$id);
 
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
+		//$sql_extra = "";
+		if ($_GET["conversation"] == "true") $sql_extra .= " AND `item`.`parent` = %d  ORDER BY `received` ASC "; else $sql_extra .= " AND `item`.`id` = %d";
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -874,19 +876,24 @@
 			AND `contact`.`id` = `item`.`contact-id`
 			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			$sql_extra
-			AND `item`.`id`=%d",
+			",
 			intval($id)
 		);
-
+//var_dump($r);
 		$ret = api_format_items($r,$user_info);
-
-		$data = array('$status' => $ret[0]);
-		/*switch($type){
-			case "atom":
-			case "rss":
-				$data = api_rss_extra($a, $data, $user_info);
-		}*/
-		return  api_apply_template("status", $type, $data);
+//var_dump($ret);
+		if ($_GET["conversation"] == "true") {
+			$data = array('$statuses' => $ret);
+			return  api_apply_template("timeline", $type, $data);
+		} else {
+			$data = array('$status' => $ret[0]);
+			/*switch($type){
+				case "atom":
+				case "rss":
+					$data = api_rss_extra($a, $data, $user_info);
+			}*/
+			return  api_apply_template("status", $type, $data);
+		}
 	}
 	api_register_func('api/statuses/show','api_statuses_show', true);
 
