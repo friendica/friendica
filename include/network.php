@@ -793,7 +793,7 @@ function add_fcontact($arr,$update = false) {
 }
 
 
-function scale_external_images($s,$include_link = true) {
+function scale_external_images($s, $include_link = true, $scale_replace = false) {
 
 	$a = get_app();
 
@@ -803,10 +803,22 @@ function scale_external_images($s,$include_link = true) {
 		require_once('include/Photo.php');
 		foreach($matches as $mtch) {
 			logger('scale_external_image: ' . $mtch[1]);
+
 			$hostname = str_replace('www.','',substr($a->get_baseurl(),strpos($a->get_baseurl(),'://')+3));
 			if(stristr($mtch[1],$hostname))
 				continue;
-			$i = fetch_url($mtch[1]);
+
+			// $scale_replace, if passed, is an array of two elements. The
+			// first is the name of the full-size image. The second is the
+			// name of a remote, scaled-down version of the full size image.
+			// This allows Friendica to display the smaller remote image if
+			// one exists, while still linking to the full-size image
+			if($scale_replace)
+				$scaled = str_replace($scale_replace[0], $scale_replace[1], $mtch[1]);
+			else
+				$scaled = $mtch[1];
+			$i = fetch_url($scaled);
+
 			// guess mimetype from headers or filename
 			$type = guess_image_type($mtch[1],true);
 			
@@ -822,7 +834,7 @@ function scale_external_images($s,$include_link = true) {
 						$new_width = $ph->getWidth();
 						$new_height = $ph->getHeight();
 						logger('scale_external_images: ' . $orig_width . '->' . $new_width . 'w ' . $orig_height . '->' . $new_height . 'h' . ' match: ' . $mtch[0], LOGGER_DEBUG);
-						$s = str_replace($mtch[0],'[img=' . $new_width . 'x' . $new_height. ']' . $mtch[1] . '[/img]'
+						$s = str_replace($mtch[0],'[img=' . $new_width . 'x' . $new_height. ']' . $scaled . '[/img]'
 							. "\n" . (($include_link) 
 								? '[url=' . $mtch[1] . ']' . t('view full size') . '[/url]' . "\n"
 								: ''),$s);
