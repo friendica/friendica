@@ -19,8 +19,9 @@
 <div id="conversation-end"></div>
 
 {{ if $dropping }}
-<div class="delete-checked">
-<a href="#" onclick="deleteCheckedItems();return false;"><span class="icon delete"></span><span class="s22 text" onmouseover="imgbright(this);" onmouseout="imgdull(this);">$dropping</span></a>
+<div id="item-delete-selected" class="fakelink" onclick="deleteCheckedItems(); return false;">
+  <div id="item-delete-selected-icon" class="icon drophide" title="$dropping" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></div>
+  <div id="item-delete-selected-desc" >$dropping</div>
 </div>
 <div id="item-delete-selected-end"></div>
 {{ endif }}

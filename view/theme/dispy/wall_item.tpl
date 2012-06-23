@@ -78,9 +78,9 @@
 		</div>
 	</div>
 	<div class="wall-item-wrapper-end"></div>
-	<div class="wall-item-like" id="wall-item-like-$item.id">$item.like</div>
-	<div class="wall-item-dislike" id="wall-item-dislike-$item.id">$item.dislike</div>
-	<div class="wall-item-comment-wrapper">
+	<div class="wall-item-like $item.indent" id="wall-item-like-$item.id">$item.like</div>
+	<div class="wall-item-dislike $item.indent" id="wall-item-dislike-$item.id">$item.dislike</div>
+	<div class="wall-item-comment-wrapper" >
 	$item.comment
 	</div>
 

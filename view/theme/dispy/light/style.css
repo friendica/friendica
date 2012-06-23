@@ -391,8 +391,9 @@ div[id$="wrapper"]{height:100%;}div[id$="wrapper"] br{clear:left;}
 .item-select{opacity:0.1;margin:5px 0 0 6px !important;}.item-select:hover{opacity:1;}
 .checkeditem{opacity:1;}
 #item-delete-selected{margin-top:30px;}
-.delete-checked{position:absolute;left:35px;margin-top:20px;}
+#item-delete-selected{position:absolute;left:35px;margin-top:20px;}
 #item-delete-selected-icon{float:left;margin-right:5px;}
+#item-delete-selected-desc{font-size:smaller;}
 .fc-state-highlight{background:#eeeeec;color:#111111;}
 .directory-item{float:left;margin:0 5px 4px 0;padding:3px;width:180px;height:250px;position:relative;}
 #group-sidebar{margin-bottom:10px;}

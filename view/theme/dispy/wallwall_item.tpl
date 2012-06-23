@@ -64,7 +64,7 @@ class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick
 			{{ if $item.edpost }}
 				<li><a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a></li>
 			{{ endif }}
-		
+
 			<li class="wall-item-delete-wrapper" id="wall-item-delete-wrapper-$item.id" >
 				{{ if $item.drop.dropping }}<a href="item/drop/$item.id" onclick="return confirmDelete();" class="icon drophide" title="$item.drop.delete" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a>{{ endif }}
 				{{ if $item.drop.dropping }}<input type="checkbox" onclick="checkboxhighlight(this);" title="$item.drop.select" class="item-select" name="itemselected[]" value="$item.id" />{{ endif }}
@@ -86,8 +86,8 @@ class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick
 		</div>
 	</div>	
 	<div class="wall-item-wrapper-end"></div>
-	<div class="wall-item-like" id="wall-item-like-$item.id">$item.like</div>
-	<div class="wall-item-dislike" id="wall-item-dislike-$item.id">$item.dislike</div>
+	<div class="wall-item-like $item.indent" id="wall-item-like-$item.id">$item.like</div>
+	<div class="wall-item-dislike $item.indent" id="wall-item-dislike-$item.id">$item.dislike</div>
 	<div class="wall-item-comment-separator"></div>
 	<div class="wall-item-comment-wrapper">
 	$item.comment
