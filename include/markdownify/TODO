@@ -1,0 +1,29 @@
+Markdownify
+===========
+* handle non-markdownifiable lists (i.e. `<ul><li id="foobar">asdf</li></ul>`)
+* organize methods better (i.e. flushlinebreaks & setlinebreaks close to each other)
+* take a look at function names etc.
+* is the new (in rev. 93) lastclosedtag property needed?
+* word wrapping (some work is done but it's still very buggy)
+
+
+Markdownify Extra
+=================
+
+* handle table alignment with KEEP_HTML=false
+* handle tables without headings when KEEP_HTML=false is set
+* handle Markdown inside non-markdownable tags
+
+
+Implementation Thoughts
+=======================
+* non-markdownifiable lists and markdown inside non-markdownable tags as well as the current
+  table implementation could be rewritten by using a rollback mechanism.
+  
+  example:
+  
+      <ul><li>asdf</li><li id="foobar">asdf</li></ul>
+  
+  we come to `<ul>`, know that this might fail and create a snapshot of our current parser
+  we keep on parsing and when we reach `<li id="foobar">` we gotta rollback and keep this
+  list in HTML format.

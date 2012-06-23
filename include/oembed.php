@@ -93,7 +93,8 @@ function oembed_format_object($j){
 			$ret.="<br>";
 		}; break;
 		case "photo": {
-			$ret.= "<img width='".$j->width."' height='".$j->height."' src='".$j->url."'>";
+			$ret.= "<img width='".$j->width."' src='".$j->url."'>";
+			//$ret.= "<img width='".$j->width."' height='".$j->height."' src='".$j->url."'>";
 			$ret.="<br>";
 		}; break;  
 		case "link": {

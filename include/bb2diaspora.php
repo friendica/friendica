@@ -1,10 +1,11 @@
 <?php
 
 require_once("include/oembed.php");
-require_once('include/event.php');
-
-require_once('library/markdown.php');
-require_once('include/html2bbcode.php');
+require_once("include/event.php");
+require_once("library/markdown.php");
+require_once("include/html2bbcode.php");
+require_once("include/bbcode.php");
+require_once("include/markdownify/markdownify.php");
 
 // we don't want to support a bbcode specific markdown interpreter
 // and the markdown library we have is pretty good, but provides HTML output.
@@ -85,6 +86,17 @@ function diaspora_ol($s) {
 
 function bb2diaspora($Text,$preserve_nl = false) {
 
+	// Convert it to HTML - don't try oembed
+	$Text = bbcode($Text, $preserve_nl, false);
+
+	// Now convert HTML to Markdown
+	$md = new Markdownify(false, false, false);
+	$Text = $md->parseString($Text);
+
+	// Remove all unconverted tags
+	$Text = strip_tags($Text);
+
+/*
 	$ev = bbtoevent($Text);
 
 	// Replace any html brackets with HTML Entities to prevent executing HTML or script
@@ -94,9 +106,8 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	$Text = str_replace(">", "&gt;", $Text);
 
 	// If we find any event code, turn it into an event.
-	// After we're finished processing the bbcode we'll 
+	// After we're finished processing the bbcode we'll
 	// replace all of the event code with a reformatted version.
-
 
 	if($preserve_nl)
 		$Text = str_replace(array("\n","\r"), array('',''),$Text);
@@ -105,6 +116,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 		// character, so having the "return" character can cause signature
 		// failures
 		$Text = str_replace("\r", "", $Text);
+
 
 	// Set up the parameters for a URL search string
 	$URLSearchString = "^\[\]";
@@ -119,7 +131,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	// new javascript markdown processor to handle links with images as the link "text"
 	// It is not optimal and may be removed if this ability is restored in the future
 
-	$Text = preg_replace("/\[url\=([$URLSearchString]*)\]\[img\](.*?)\[\/img\]\[\/url\]/ism", 
+	$Text = preg_replace("/\[url\=([$URLSearchString]*)\]\[img\](.*?)\[\/img\]\[\/url\]/ism",
 		'![' . t('image/photo') . '](' . '$2' . ')' . "\n" . '[' . t('link') . '](' . '$1' . ')', $Text);
 
 	$Text = preg_replace("/\[bookmark\]([$URLSearchString]*)\[\/bookmark\]/ism", '[$1]($1)', $Text);
@@ -136,7 +148,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	// Perform MAIL Search
 	$Text = preg_replace("(\[mail\]([$MAILSearchString]*)\[/mail\])", '[$1](mailto:$1)', $Text);
 	$Text = preg_replace("/\[mail\=([$MAILSearchString]*)\](.*?)\[\/mail\]/", '[$2](mailto:$1)', $Text);
-         
+
 	$Text = str_replace('*', '\\*', $Text);
 	$Text = str_replace('_', '\\_', $Text);
 
@@ -186,7 +198,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	$Text = preg_replace("/\[table border=(.*?)\](.*?)\[\/table\]/s", '$2' ,$Text);
 //	$Text = preg_replace("/\[table border=0\](.*?)\[\/table\]/s", '<table border="0" >$1</table>' ,$Text);
 
-	
+
 //	$Text = str_replace("[*]", "<li>", $Text);
 
 	// Check for font change text
@@ -202,11 +214,11 @@ function bb2diaspora($Text,$preserve_nl = false) {
 
 
 	// Declare the format for [quote] layout
-	//	$QuoteLayout = '<blockquote>$1</blockquote>';                     
+	//	$QuoteLayout = '<blockquote>$1</blockquote>';
 	// Check for [quote] text
 	$Text = preg_replace("/\[quote\](.*?)\[\/quote\]/is",">$1\n\n", $Text);
 	$Text = preg_replace("/\[quote=(.*?)\](.*?)\[\/quote\]/is",">$2\n\n", $Text);
-         
+
 	// Images
 
 	// html5 video and audio
@@ -216,7 +228,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	$Text = preg_replace("/\[audio\](.*?)\[\/audio\]/", '$1', $Text);
 
 //	$Text = preg_replace("/\[iframe\](.*?)\[\/iframe\]/", '<iframe src="$1" width="425" height="350"><a href="$1">$1</a></iframe>', $Text);
-         
+
 	// [img=widthxheight]image source[/img]
 //	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/", '<img src="$3" style="height:{$2}px; width:{$1}px;" >', $Text);
 
@@ -240,7 +252,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	if(x($ev,'desc') && x($ev,'start')) {
 
 		$sub = format_event_diaspora($ev);
-	
+
 		$Text = preg_replace("/\[event\-description\](.*?)\[\/event\-description\]/is",$sub,$Text);
 		$Text = preg_replace("/\[event\-start\](.*?)\[\/event\-start\]/is",'',$Text);
 		$Text = preg_replace("/\[event\-finish\](.*?)\[\/event\-finish\]/is",'',$Text);
@@ -251,11 +263,12 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	$Text = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$Text);
 
 	$Text = preg_replace_callback('/\[(.*?)\]\((.*?)\)/ism','unescape_underscores_in_links',$Text);
+*/
 
 	// Remove any leading or trailing whitespace, as this will mess up
 	// the Diaspora signature verification and cause the item to disappear
 	$Text = trim($Text);
-	
+
 	call_hooks('bb2diaspora',$Text);
 
 	return $Text;
