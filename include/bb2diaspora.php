@@ -66,6 +66,22 @@ function stripdcode_br_cb($s) {
 }
 
 
+function diaspora_ul($s) {
+	// Replace "[\\*]" followed by any number (including zero) of
+	// spaces by "* " to match Diaspora's list format
+	return preg_replace("/\[\\\\\*\]( *)/", "* ", $s[1]);
+}
+
+
+function diaspora_ol($s) {
+	// A hack: Diaspora will create a properly-numbered ordered list even
+	// if you use '1.' for each element of the list, like:
+	//		1. First element
+	//		1. Second element
+	//		1. Third element
+	return preg_replace("/\[\\\\\*\]( *)/", "1. ", $s[1]);
+}
+
 
 function bb2diaspora($Text,$preserve_nl = false) {
 
@@ -84,6 +100,11 @@ function bb2diaspora($Text,$preserve_nl = false) {
 
 	if($preserve_nl)
 		$Text = str_replace(array("\n","\r"), array('',''),$Text);
+	else
+		// Remove the "return" character, as Diaspora uses only the "newline"
+		// character, so having the "return" character can cause signature
+		// failures
+		$Text = str_replace("\r", "", $Text);
 
 	// Set up the parameters for a URL search string
 	$URLSearchString = "^\[\]";
@@ -124,38 +145,45 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	// Check for bold text
 	$Text = preg_replace("(\[b\](.*?)\[\/b\])is",'**$1**',$Text);
 
-	// Check for Italics text
+	// Check for italics text
 	$Text = preg_replace("(\[i\](.*?)\[\/i\])is",'_$1_',$Text);
 
-	// Check for Underline text
-//	$Text = preg_replace("(\[u\](.*?)\[\/u\])is",'<u>$1</u>',$Text);
+	// Check for underline text
+	// Replace with italics since Diaspora doesn't have underline
+	$Text = preg_replace("(\[u\](.*?)\[\/u\])is",'_$1_',$Text);
 
 	// Check for strike-through text
-//	$Text = preg_replace("(\[s\](.*?)\[\/s\])is",'<strike>$1</strike>',$Text);
+	$Text = preg_replace("(\[s\](.*?)\[\/s\])is",'**[strike]**$1**[/strike]**',$Text);
 
 	// Check for over-line text
 //	$Text = preg_replace("(\[o\](.*?)\[\/o\])is",'<span class="overline">$1</span>',$Text);
 
 	// Check for colored text
-//	$Text = preg_replace("(\[color=(.*?)\](.*?)\[\/color\])is","<span style=\"color: $1;\">$2</span>",$Text);
+	// Remove color since Diaspora doesn't support it
+	$Text = preg_replace("(\[color=(.*?)\](.*?)\[\/color\])is","$2",$Text);
 
 	// Check for sized text
-//	$Text = preg_replace("(\[size=(.*?)\](.*?)\[\/size\])is","<span style=\"font-size: $1;\">$2</span>",$Text);
+	// Remove it since Diaspora doesn't support sizes very well
+	$Text = preg_replace("(\[size=(.*?)\](.*?)\[\/size\])is","$2",$Text);
 
 	// Check for list text
-//	$Text = preg_replace("/\[list\](.*?)\[\/list\]/is", '<ul class="listbullet">$1</ul>' ,$Text);
-//	$Text = preg_replace("/\[list=1\](.*?)\[\/list\]/is", '<ul class="listdecimal">$1</ul>' ,$Text);
-//	$Text = preg_replace("/\[list=i\](.*?)\[\/list\]/s",'<ul class="listlowerroman">$1</ul>' ,$Text);
-//	$Text = preg_replace("/\[list=I\](.*?)\[\/list\]/s", '<ul class="listupperroman">$1</ul>' ,$Text);
-//	$Text = preg_replace("/\[list=a\](.*?)\[\/list\]/s", '<ul class="listloweralpha">$1</ul>' ,$Text);
-//	$Text = preg_replace("/\[list=A\](.*?)\[\/list\]/s", '<ul class="listupperalpha">$1</ul>' ,$Text);
+	$Text = preg_replace_callback("/\[list\](.*?)\[\/list\]/is", 'diaspora_ul', $Text);
+	$Text = preg_replace_callback("/\[ul\](.*?)\[\/ul\]/is", 'diaspora_ul', $Text);
+	$Text = preg_replace_callback("/\[list=1\](.*?)\[\/list\]/is", 'diaspora_ol', $Text);
+	$Text = preg_replace_callback("/\[list=i\](.*?)\[\/list\]/s",'diaspora_ol', $Text);
+	$Text = preg_replace_callback("/\[list=I\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+	$Text = preg_replace_callback("/\[list=a\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+	$Text = preg_replace_callback("/\[list=A\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+	$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
 //	$Text = preg_replace("/\[li\](.*?)\[\/li\]/s", '<li>$1</li>' ,$Text);
 
-//	$Text = preg_replace("/\[td\](.*?)\[\/td\]/s", '<td>$1</td>' ,$Text);
-//	$Text = preg_replace("/\[tr\](.*?)\[\/tr\]/s", '<tr>$1</tr>' ,$Text);
-//	$Text = preg_replace("/\[table\](.*?)\[\/table\]/s", '<table>$1</table>' ,$Text);
+	// Just get rid of table tags since Diaspora doesn't support tables
+	$Text = preg_replace("/\[th\](.*?)\[\/th\]/s", '$1' ,$Text);
+	$Text = preg_replace("/\[td\](.*?)\[\/td\]/s", '$1' ,$Text);
+	$Text = preg_replace("/\[tr\](.*?)\[\/tr\]/s", '$1' ,$Text);
+	$Text = preg_replace("/\[table\](.*?)\[\/table\]/s", '$1' ,$Text);
 
-//	$Text = preg_replace("/\[table border=1\](.*?)\[\/table\]/s", '<table border="1" >$1</table>' ,$Text);
+	$Text = preg_replace("/\[table border=(.*?)\](.*?)\[\/table\]/s", '$2' ,$Text);
 //	$Text = preg_replace("/\[table border=0\](.*?)\[\/table\]/s", '<table border="0" >$1</table>' ,$Text);
 
 	
@@ -165,7 +193,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 //	$Text = preg_replace("(\[font=(.*?)\](.*?)\[\/font\])","<span style=\"font-family: $1;\">$2</span>",$Text);
 
 
-    $Text = preg_replace_callback("/\[code\](.*?)\[\/code\]/is",'stripdcode_br_cb',$Text);
+	$Text = preg_replace_callback("/\[code\](.*?)\[\/code\]/is",'stripdcode_br_cb',$Text);
 
 	// Check for [code] text
 	$Text = preg_replace("/(\[code\])+(.*?)(\[\/code\])+/is","\t$2\n", $Text);
@@ -177,6 +205,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	//	$QuoteLayout = '<blockquote>$1</blockquote>';                     
 	// Check for [quote] text
 	$Text = preg_replace("/\[quote\](.*?)\[\/quote\]/is",">$1\n\n", $Text);
+	$Text = preg_replace("/\[quote=(.*?)\](.*?)\[\/quote\]/is",">$2\n\n", $Text);
          
 	// Images
 
@@ -191,9 +220,9 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	// [img=widthxheight]image source[/img]
 //	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/", '<img src="$3" style="height:{$2}px; width:{$1}px;" >', $Text);
 
-    $Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/youtube\]/ism",'http://www.youtube.com/watch?v=$1',$Text); 
-    $Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/embed\/(.*?)\[\/youtube\]/ism",'http://www.youtube.com/watch?v=$1',$Text); 
-    $Text = preg_replace("/\[youtube\]https?:\/\/youtu.be\/(.*?)\[\/youtube\]/ism",'http://www.youtube.com/watch?v=$1',$Text); 
+	$Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/youtube\]/ism",'http://www.youtube.com/watch?v=$1',$Text); 
+	$Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/embed\/(.*?)\[\/youtube\]/ism",'http://www.youtube.com/watch?v=$1',$Text); 
+	$Text = preg_replace("/\[youtube\]https?:\/\/youtu.be\/(.*?)\[\/youtube\]/ism",'http://www.youtube.com/watch?v=$1',$Text); 
 	$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", 'http://www.youtube.com/watch?v=$1', $Text);
 
 	$Text = preg_replace("/\[vimeo\]https?:\/\/player.vimeo.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism",'http://vimeo.com/$1',$Text); 
@@ -222,6 +251,10 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	$Text = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$Text);
 
 	$Text = preg_replace_callback('/\[(.*?)\]\((.*?)\)/ism','unescape_underscores_in_links',$Text);
+
+	// Remove any leading or trailing whitespace, as this will mess up
+	// the Diaspora signature verification and cause the item to disappear
+	$Text = trim($Text);
 	
 	call_hooks('bb2diaspora',$Text);
 
