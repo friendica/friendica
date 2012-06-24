@@ -68,9 +68,14 @@ function stripdcode_br_cb($s) {
 
 
 function diaspora_ul($s) {
-	// Replace "[\\*]" followed by any number (including zero) of
+	// Replace "[*]" followed by any number (including zero) of
 	// spaces by "* " to match Diaspora's list format
-	return preg_replace("/\[\\\\\*\]( *)/", "* ", $s[1]);
+	if( strpos($s[0], "[list]") === 0 )
+		return '<ul class="listbullet" style="list-style-type: circle;">' . preg_replace("/\[\*\]( *)/", "* ", $s[1]) . '</ul>';
+	elseif( strpos($s[0], "[ul]") === 0 )
+		return '<ul class="listbullet" style="list-style-type: circle;">' . preg_replace("/\[\*\]( *)/", "* ", $s[1]) . '</ul>';
+	else
+		return $s[0];
 }
 
 
@@ -80,11 +85,44 @@ function diaspora_ol($s) {
 	//		1. First element
 	//		1. Second element
 	//		1. Third element
-	return preg_replace("/\[\\\\\*\]( *)/", "1. ", $s[1]);
+	if( strpos($s[0], "[list=1]") === 0 )
+		return '<ul class="listdecimal" style="list-style-type: decimal;">' . preg_replace("/\[\*\]( *)/", "1. ", $s[1]) . '</ul>';
+	elseif( strpos($s[0], "[list=i]") === 0 )
+		return '<ul class="listlowerroman" style="list-style-type: lower-roman;">' . preg_replace("/\[\*\]( *)/", "1. ", $s[1]) . '</ul>';
+	elseif( strpos($s[0], "[list=I]") === 0 )
+		return '<ul class="listupperroman" style="list-style-type: upper-roman;">' . preg_replace("/\[\*\]( *)/", "1. ", $s[1]) . '</ul>';
+	elseif( strpos($s[0], "[list=a]") === 0 )
+		return '<ul class="listloweralpha" style="list-style-type: lower-alpha;">' . preg_replace("/\[\*\]( *)/", "1. ", $s[1]) . '</ul>';
+	elseif( strpos($s[0], "[list=A]") === 0 )
+		return '<ul class="listupperalpha" style="list-style-type: upper-alpha;">' . preg_replace("/\[\*\]( *)/", "1. ", $s[1]) . '</ul>';
+	elseif( strpos($s[0], "[ol]") === 0 )
+		return '<ul class="listdecimal" style="list-style-type: decimal;">' . preg_replace("/\[\*\]( *)/", "1. ", $s[1]) . '</ul>';
+	else
+		return $s[0];
 }
 
 
 function bb2diaspora($Text,$preserve_nl = false) {
+
+	// bbcode() will convert "[*]" into "<li>" with no closing "</li>"
+	// Markdownify() is unable to handle these, as it makes each new
+	// "<li>" into a deeper nested element until it crashes. So pre-format
+	// the lists as Diaspora lists before sending the $Text to bbcode()
+	//
+	// Note that regular expressions are really not suitable for parsing
+	// text with opening and closing tags, so nested lists may make things
+	// wonky
+	$endlessloop = 0;
+	while ((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false) && (++$endlessloop < 20)) {
+		$Text = preg_replace_callback("/\[list\](.*?)\[\/list\]/is", 'diaspora_ul', $Text);
+		$Text = preg_replace_callback("/\[list=1\](.*?)\[\/list\]/is", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=i\](.*?)\[\/list\]/s",'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=I\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=a\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=A\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+	}
+	$Text = preg_replace_callback("/\[ul\](.*?)\[\/ul\]/is", 'diaspora_ul', $Text);
+	$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
 
 	// Convert it to HTML - don't try oembed
 	$Text = bbcode($Text, $preserve_nl, false);
