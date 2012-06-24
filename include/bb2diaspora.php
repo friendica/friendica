@@ -131,6 +131,12 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	$md = new Markdownify(false, false, false);
 	$Text = $md->parseString($Text);
 
+	// If the text going into bbcode() has a plain URL in it, i.e.
+	// with no [url] tags around it, it will come out of parseString()
+	// looking like: <http://url.com>, which gets removed by strip_tags().
+	// So take off the angle brackets of any such URL
+	$Text = preg_replace("/<http(.*?)>/is", "http$1", $Text);
+
 	// Remove all unconverted tags
 	$Text = strip_tags($Text);
 
