@@ -109,20 +109,22 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	// "<li>" into a deeper nested element until it crashes. So pre-format
 	// the lists as Diaspora lists before sending the $Text to bbcode()
 	//
-	// Note that regular expressions are really not suitable for parsing
-	// text with opening and closing tags, so nested lists may make things
-	// wonky
+	// Note that to get nested lists to work for Diaspora, we would need
+	// to define the closing tag for the list elements. So nested lists
+	// are going to be flattened out in Diaspora for now
 	$endlessloop = 0;
-	while ((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false) && (++$endlessloop < 20)) {
+	while ((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false)
+	       (strpos($Text, "[/ol]") !== false) && (strpos($Text, "[ol]") !== false) && 
+	       (strpos($Text, "[/ul]") !== false) && (strpos($Text, "[ul]") !== false) && (++$endlessloop < 20)) {
 		$Text = preg_replace_callback("/\[list\](.*?)\[\/list\]/is", 'diaspora_ul', $Text);
 		$Text = preg_replace_callback("/\[list=1\](.*?)\[\/list\]/is", 'diaspora_ol', $Text);
 		$Text = preg_replace_callback("/\[list=i\](.*?)\[\/list\]/s",'diaspora_ol', $Text);
 		$Text = preg_replace_callback("/\[list=I\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
 		$Text = preg_replace_callback("/\[list=a\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
 		$Text = preg_replace_callback("/\[list=A\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[ul\](.*?)\[\/ul\]/is", 'diaspora_ul', $Text);
+		$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
 	}
-	$Text = preg_replace_callback("/\[ul\](.*?)\[\/ul\]/is", 'diaspora_ul', $Text);
-	$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
 
 	// Convert it to HTML - don't try oembed
 	$Text = bbcode($Text, $preserve_nl, false);
