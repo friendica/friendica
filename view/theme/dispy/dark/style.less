@@ -325,6 +325,7 @@ h6 {
 }
 #item-delete-selected-desc {
     float: left;
+    font-size: smaller;
     margin-right: 5px;
     &:hover {
         text-decoration: underline;
@@ -1533,10 +1534,6 @@ nav #nav-notifications-linkmenu {
         }
     }
 }
-#item-delete-selected {
-    overflow: auto;
-    width: 100%;
-}
 #connect-services-header,
 #extra-help-header {
     margin: 1.5em 0 0 0;
@@ -2370,20 +2367,14 @@ div {
 }
 #item-delete-selected {
     margin-top: 30px;
-}
-/* was tired of having no way of moving it around, so
-* here's a little 'hook' to do so */
-#item-delete-selected {
     position: absolute;
     left: 35px;
-    margin-top: 20px;
+	width: 15em;
+    overflow: auto;
 }
 #item-delete-selected-icon {
     float: left;
-    margin-right: 5px;
-}
-#item-delete-selected-desc {
-    font-size: smaller;
+    margin: 11px 5px;
 }
 .fc-state-highlight {
     background: @main_colour;
