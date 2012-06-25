@@ -108,7 +108,7 @@ function item_post(&$a) {
 		}
 	}
 
-	if($parent) logger('mod_post: parent=' . $parent);
+	if($parent) logger('mod_item: item_post parent=' . $parent);
 
 	$profile_uid = ((x($_REQUEST,'profile_uid')) ? intval($_REQUEST['profile_uid']) : 0);
 	$post_id     = ((x($_REQUEST,'post_id'))     ? intval($_REQUEST['post_id'])     : 0);

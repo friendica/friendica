@@ -565,18 +565,19 @@
 		if(requestdata('lat') && requestdata('long'))
 			$_REQUEST['coord'] = sprintf("%s %s",requestdata('lat'),requestdata('long'));
 		$_REQUEST['profile_uid'] = local_user();
-		if(requestdata('parent'))
+//		if(requestdata('parent'))
+		if($parent)
 			$_REQUEST['type'] = 'net-comment';
 		else {
 			$_REQUEST['type'] = 'wall';
-                        if(x($_FILES,'media')) {
-		                // upload the image if we have one
-		                $_REQUEST['hush']='yeah'; //tell wall_upload function to return img info instead of echo
-			        require_once('mod/wall_upload.php');
-			        $media = wall_upload_post($a);
-		                if(strlen($media)>0)
-				        $_REQUEST['body'] .= "\n\n".$media;
-			        }
+			if(x($_FILES,'media')) {
+				// upload the image if we have one
+				$_REQUEST['hush']='yeah'; //tell wall_upload function to return img info instead of echo
+				require_once('mod/wall_upload.php');
+				$media = wall_upload_post($a);
+				if(strlen($media)>0)
+					$_REQUEST['body'] .= "\n\n".$media;
+			}
 		}
 
 		// set this so that the item_post() function is quiet and doesn't redirect or emit json

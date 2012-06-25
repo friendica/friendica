@@ -449,7 +449,7 @@ function onepoll_run($argv, $argc){
 
 	if($xml) {
 		logger('poller: received xml : ' . $xml, LOGGER_DATA);
-			if((! strstr($xml,'<?xml')) && (! strstr($xml,'<rss'))) {
+		if((! strstr($xml,'<?xml')) && (! strstr($xml,'<rss'))) {
 			logger('poller: post_handshake: response from ' . $url . ' did not contain XML.');
 			$r = q("UPDATE `contact` SET `last-update` = '%s' WHERE `id` = %d LIMIT 1",
 				dbesc(datetime_convert()),
