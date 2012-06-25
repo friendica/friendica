@@ -528,7 +528,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 			$entry = replace_macros($tpl,array(
 				'$id' => $rr['id'],
 				'$profile-link' => $profile_link,
-				'$photo' => $rr[$photo],
+				'$photo' => $a->get_cached_avatar_image($rr[$photo]),
 				'$alt-text' => $rr['name'],
 			));
 			$aside['$lastusers_items'][] = $entry;
