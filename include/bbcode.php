@@ -162,7 +162,7 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
  	// handle nested lists
 	$endlessloop = 0;
-	while ((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false)
+	while ((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list]") !== false) &&
 	       (strpos($Text, "[/ol]") !== false) && (strpos($Text, "[ol]") !== false) && 
 	       (strpos($Text, "[/ul]") !== false) && (strpos($Text, "[ul]") !== false) && (++$endlessloop < 20)) {
 		$Text = preg_replace("/\[list\](.*?)\[\/list\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>' ,$Text);
