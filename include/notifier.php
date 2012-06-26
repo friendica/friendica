@@ -125,7 +125,7 @@ function notifier_run($argv, $argc){
 		$uid = $r[0]['uid'];
 		$updated = $r[0]['edited'];
 
-		// The following seems superfluous. We've already checked for "if (! intval($r[0]['parent']))" a few lines up
+		// POSSIBLE CLEANUP --> The following seems superfluous. We've already checked for "if (! intval($r[0]['parent']))" a few lines up
 		if(! $parent_id)
 			return;
 

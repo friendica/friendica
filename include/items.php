@@ -2268,6 +2268,7 @@ function local_delivery($importer,$data) {
 
 			$is_a_remote_comment = false;
 
+			// POSSIBLE CLEANUP --> Why select so many fields when only forum_mode and wall are used?
 			$r = q("select `item`.`id`, `item`.`uri`, `item`.`tag`, `item`.`forum_mode`,`item`.`origin`,`item`.`wall`, 
 				`contact`.`name`, `contact`.`url`, `contact`.`thumb` from `item` 
 				LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` 
@@ -3359,40 +3360,8 @@ function drop_item($id,$interactive = true) {
 				);
 			}
 
-			// Add a relayable_retraction signature for Diaspora. Note that we can't add a target_author_signature
-			// if the comment was deleted by a remote user. That should be ok, because if a remote user is deleting
-			// the comment, that means we're the home of the post, and Diaspora will only
-			// check the parent_author_signature of retractions that it doesn't have to relay further
-			//
-			// I don't think this function gets called for an "unlike," but I'll check anyway
-			$signed_text = $item['guid'] . ';' . ( ($item['verb'] === ACTIVITY_LIKE) ? 'Like' : 'Comment');
-
-			if(local_user() == $item['uid']) {
-
-				$handle = $a->user['nickname'] . '@' . substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
-				$authorsig = base64_encode(rsa_sign($signed_text,$a->user['prvkey'],'sha256'));
-			}
-			else {
-				$r = q("SELECT `nick`, `url` FROM `contact` WHERE `id` = '%d' LIMIT 1",
-					$item['contact-id']
-				);
-				if(count($r)) {
-					// The below handle only works for NETWORK_DFRN. I think that's ok, because this function
-					// only handles DFRN deletes
-					$handle_baseurl_start = strpos($r['url'],'://') + 3;
-					$handle_baseurl_length = strpos($r['url'],'/profile') - $handle_baseurl_start;
-					$handle = $r['nick'] . '@' . substr($r['url'], $handle_baseurl_start, $handle_baseurl_length);
-					$authorsig = '';
-				}
-			}
-
-			if(isset($handle))
-				q("insert into sign (`retract_iid`,`signed_text`,`signature`,`signer`) values (%d,'%s','%s','%s') ",
-					intval($item['id']),
-					dbesc($signed_text),
-					dbesc($authorsig),
-					dbesc($handle)
-				);
+			// Add a relayable_retraction signature for Diaspora.
+			store_diaspora_retract_sig($item, $a->user, $a->get_baseurl());
 		}
 		$drop_id = intval($item['id']);
 
@@ -3479,4 +3448,53 @@ function posted_date_widget($url,$uid,$wall) {
 		'$dates' => $ret
 	));
 	return $o;
+}
+
+
+function store_diaspora_retract_sig($item, $user, $baseurl) {
+	// Note that we can't add a target_author_signature
+	// if the comment was deleted by a remote user. That should be ok, because if a remote user is deleting
+	// the comment, that means we're the home of the post, and Diaspora will only
+	// check the parent_author_signature of retractions that it doesn't have to relay further
+	//
+	// I don't think this function gets called for an "unlike," but I'll check anyway
+
+	$enabled = intval(get_config('system','diaspora_enabled'));
+	if(! $enabled) {
+		logger('drop_item: diaspora support disabled, not storing retraction signature', LOGGER_DEBUG);
+		return;
+	}
+
+	logger('drop_item: storing diaspora retraction signature');
+
+	$signed_text = $item['guid'] . ';' . ( ($item['verb'] === ACTIVITY_LIKE) ? 'Like' : 'Comment');
+
+	if(local_user() == $item['uid']) {
+
+		$handle = $user['nickname'] . '@' . substr($baseurl, strpos($baseurl,'://') + 3);
+		$authorsig = base64_encode(rsa_sign($signed_text,$user['prvkey'],'sha256'));
+	}
+	else {
+		$r = q("SELECT `nick`, `url` FROM `contact` WHERE `id` = '%d' LIMIT 1",
+			$item['contact-id']
+		);
+		if(count($r)) {
+			// The below handle only works for NETWORK_DFRN. I think that's ok, because this function
+			// only handles DFRN deletes
+			$handle_baseurl_start = strpos($r['url'],'://') + 3;
+			$handle_baseurl_length = strpos($r['url'],'/profile') - $handle_baseurl_start;
+			$handle = $r['nick'] . '@' . substr($r['url'], $handle_baseurl_start, $handle_baseurl_length);
+			$authorsig = '';
+		}
+	}
+
+	if(isset($handle))
+		q("insert into sign (`retract_iid`,`signed_text`,`signature`,`signer`) values (%d,'%s','%s','%s') ",
+			intval($item['id']),
+			dbesc($signed_text),
+			dbesc($authorsig),
+			dbesc($handle)
+		);
+
+	return;
 }
