@@ -865,8 +865,13 @@
 		logger('API: api_statuses_show: '.$id);
 
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
-		//$sql_extra = "";
-		if ($_GET["conversation"] == "true") $sql_extra .= " AND `item`.`parent` = %d  ORDER BY `received` ASC "; else $sql_extra .= " AND `item`.`id` = %d";
+		$conversation = (x($_REQUEST,'conversation')?1:0);
+
+		$sql_extra = '';
+		if ($conversation)
+			$sql_extra .= " AND `item`.`parent` = %d  ORDER BY `received` ASC ";
+		else
+			$sql_extra .= " AND `item`.`id` = %d";
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -876,16 +881,15 @@
 			WHERE `item`.`visible` = 1 and `item`.`moderated` = 0 AND `item`.`deleted` = 0
 			AND `contact`.`id` = `item`.`contact-id`
 			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-			$sql_extra
-			",
+			$sql_extra",
 			intval($id)
 		);
-//var_dump($r);
+
 		$ret = api_format_items($r,$user_info);
-//var_dump($ret);
-		if ($_GET["conversation"] == "true") {
+
+		if ($conversation) {
 			$data = array('$statuses' => $ret);
-			return  api_apply_template("timeline", $type, $data);
+			return api_apply_template("timeline", $type, $data);
 		} else {
 			$data = array('$status' => $ret[0]);
 			/*switch($type){
@@ -1234,6 +1238,40 @@
 		return($as);
 	}
 
+	function api_format_messages($item, $recipient, $sender) {
+		// standard meta information
+		$ret=Array(
+				'id'                    => $item['id'],
+				'created_at'            => api_date($item['created']),
+				'sender_id'             => $sender['id'] ,
+				'sender_screen_name'    => $sender['screen_name'],
+				'sender'                => $sender,
+				'recipient_id'          => $recipient['id'],
+				'recipient_screen_name' => $recipient['screen_name'],
+				'recipient'             => $recipient,
+		);
+
+		//don't send title to regular StatusNET requests to avoid confusing these apps
+		if (x($_GET, 'getText')) {
+			$ret['title'] = $item['title'] ;
+			if ($_GET["getText"] == "html") {
+				$ret['text'] = bbcode($item['body']);
+			}
+			elseif ($_GET["getText"] == "plain") {
+				$ret['text'] = html2plain(bbcode($item['body']), 0);
+			}
+		}
+		else {
+			$ret['text'] = $item['title']."\n".html2plain(bbcode($item['body']), 0);
+		}
+		if (isset($_GET["getUserObjects"]) && $_GET["getUserObjects"] == "false") {
+			unset($ret['sender']);
+			unset($ret['recipient']);
+		}
+
+		return $ret;
+	}
+
 	function api_format_items($r,$user_info) {
 
 		//logger('api_format_items: ' . print_r($r,true));
@@ -1430,7 +1468,13 @@
 				'logo' => $logo, 'fancy' => 'true', 'language' => 'en', 'email' => $email, 'broughtby' => '',
 				'broughtbyurl' => '', 'timezone' => 'UTC', 'closed' => $closed, 'inviteonly' => 'false',
 				'private' => $private, 'textlimit' => $textlimit, 'sslserver' => $sslserver, 'ssl' => $ssl,
-				'shorturllength' => '30'
+				'shorturllength' => '30',
+        'friendica' => array(
+                             'FRIENDICA_PLATFORM' => FRIENDICA_PLATFORM,
+                             'FRIENDICA_VERSION' => FRIENDICA_VERSION,
+                             'DFRN_PROTOCOL_VERSION' => DFRN_PROTOCOL_VERSION,
+                             'DB_UPDATE_VERSION' => DB_UPDATE_VERSION
+                             )
 			),
 		);  
 
@@ -1504,37 +1548,39 @@
 		if (local_user()===false) return false;
 		
 		if (!x($_POST, "text") || !x($_POST,"screen_name")) return;
-		
+
 		$sender = api_get_user($a);
 		
+		require_once("include/message.php");
+
 		$r = q("SELECT `id` FROM `contact` WHERE `uid`=%d AND `nick`='%s'",
 				intval(local_user()),
 				dbesc($_POST['screen_name']));
-		
-		$recipient = api_get_user($a, $r[0]['id']);			
-		
 
-		require_once("include/message.php");
-		$sub = ( (strlen($_POST['text'])>10)?substr($_POST['text'],0,10)."...":$_POST['text']);
-		$id = send_message($recipient['id'], $_POST['text'], $sub);
-		
-		
+		$recipient = api_get_user($a, $r[0]['id']);			
+		$replyto = '';
+		$sub     = '';
+		if (x($_REQUEST,'replyto')) {
+			$r = q('SELECT `parent-uri`, `title` FROM `mail` WHERE `uid`=%d AND `id`=%d',
+					intval(local_user()),
+					intval($_REQUEST['replyto']));
+			$replyto = $r[0]['parent-uri'];
+			$sub     = $r[0]['title'];
+		}
+		else {
+			if (x($_REQUEST,'title')) {
+				$sub = $_REQUEST['title'];
+			}
+			else {
+				$sub = ((strlen($_POST['text'])>10)?substr($_POST['text'],0,10)."...":$_POST['text']);
+			}
+		}
+
+		$id = send_message($recipient['id'], $_POST['text'], $sub, $replyto);
+
 		if ($id>-1) {
 			$r = q("SELECT * FROM `mail` WHERE id=%d", intval($id));
-			$item = $r[0];
-			$ret=Array(
-					'id' => $item['id'],
-					'created_at'=> api_date($item['created']),
-					'sender_id'=> $sender['id'] ,
-					'sender_screen_name'=> $sender['screen_name'],
-					'sender'=> $sender,
-					'recipient_id'=> $recipient['id'],
-					'recipient_screen_name'=> $recipient['screen_name'],
-					'recipient'=> $recipient,
-					
-					'text'=> $item['title']."\n".html2plain(bbcode($item['body']), 0) ,
-					
-			);
+			$ret = api_format_messages($r[0], $recipient, $sender);
 		
 		} else {
 			$ret = array("error"=>$id);	
@@ -1553,7 +1599,7 @@
 	}
 	api_register_func('api/direct_messages/new','api_direct_messages_new',true);
 
-    function api_direct_messages_box(&$a, $type, $box) {
+	function api_direct_messages_box(&$a, $type, $box) {
 		if (local_user()===false) return false;
 		
 		$user_info = api_get_user($a);
@@ -1565,46 +1611,37 @@
 		
 		$start = $page*$count;
 		
-	
+		$profile_url = $a->get_baseurl() . '/profile/' . $a->user['nickname'];
 		if ($box=="sentbox") {
-			$sql_extra = "`from-url`='%s'";
-		} else {
-			$sql_extra = "`from-url`!='%s'";
+			$sql_extra = "`from-url`='".dbesc( $profile_url )."'";
+		}
+		elseif ($box=="conversation") {
+			$sql_extra = "`parent-uri`='".dbesc( $_GET["uri"] )  ."'";
+		}
+		elseif ($box=="all") {
+			$sql_extra = "true";
+		}
+		elseif ($box=="inbox") {
+			$sql_extra = "`from-url`!='".dbesc( $profile_url )."'";
 		}
 		
 		$r = q("SELECT * FROM `mail` WHERE uid=%d AND $sql_extra ORDER BY created DESC LIMIT %d,%d",
 				intval(local_user()),
-				dbesc( $a->get_baseurl() . '/profile/' . $a->user['nickname'] ),
 				intval($start),	intval($count)
-			   );
+		);
 		
 		$ret = Array();
-		foreach($r as $item){
-			switch ($box){
-				case "inbox":
-					$recipient = $user_info;
-					$sender = api_get_user($a,$item['contact-id']);
-					break;
-				case "sentbox":
-					$recipient = api_get_user($a,$item['contact-id']);
-					$sender = $user_info;
-					break;
+		foreach($r as $item) {
+			if ($box == "inbox" || $item['from-url'] != $profile_url){
+				$recipient = $user_info;
+				$sender = api_get_user($a,$item['contact-id']);
 			}
-				
-			$ret[]=Array(
-				'id' => $item['id'],
-				'created_at'=> api_date($item['created']),
-				'sender_id'=> $sender['id'] ,
-				'sender_screen_name'=> $sender['screen_name'],
-				'sender'=> $sender,
-				'recipient_id'=> $recipient['id'],
-				'recipient_screen_name'=> $recipient['screen_name'],
-				'recipient'=> $recipient,
-				
-				'text'=> $item['title']."\n".html2plain(bbcode($item['body']), 0) ,
-				
-			);
-			
+			elseif ($box == "sentbox" || $item['from-url'] != $profile_url){
+				$recipient = api_get_user($a,$item['contact-id']);
+				$sender = $user_info;
+			}
+
+			$ret[]=api_format_messages($item, $recipient, $sender);
 		}
 		
 
@@ -1625,6 +1662,14 @@
 	function api_direct_messages_inbox(&$a, $type){
 		return api_direct_messages_box($a, $type, "inbox");
 	}
+	function api_direct_messages_all(&$a, $type){
+		return api_direct_messages_box($a, $type, "all");
+	}
+	function api_direct_messages_conversation(&$a, $type){
+		return api_direct_messages_box($a, $type, "conversation");
+	}
+	api_register_func('api/direct_messages/conversation','api_direct_messages_conversation',true);
+	api_register_func('api/direct_messages/all','api_direct_messages_all',true);
 	api_register_func('api/direct_messages/sent','api_direct_messages_sentbox',true);
 	api_register_func('api/direct_messages','api_direct_messages_inbox',true);
 
