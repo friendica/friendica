@@ -59,7 +59,7 @@ h6{font-size:xx-small;}
 .button{color:#eeeecc;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;padding:5px;cursor:pointer;}.button a{color:#eeeecc;font-weight:bold;}
 #profile-listing-desc a{color:#eeeecc;font-weight:bold;}
 [class$="-desc"],[id$="-desc"]{color:#eeeecc;background:#2e2f2e;border:2px outset #d4d580;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;margin:3px 10px 7px 0;padding:5px;font-weight:bold;font-size:smaller;}
-#item-delete-selected-desc{float:left;font-size:smaller;margin-right:5px;}#item-delete-selected-desc:hover{text-decoration:underline;}
+#item-delete-selected-desc{float:left;font-size:x-small;margin-right:5px;}#item-delete-selected-desc:hover{text-decoration:underline;}
 .intro-approve-as-friend-desc{margin-top:10px;}
 .intro-desc{margin-bottom:20px;font-weight:bold;}
 #group-edit-desc{margin:10px 0px;}
@@ -389,7 +389,7 @@ div[id$="wrapper"]{height:100%;}div[id$="wrapper"] br{clear:left;}
 .filesavetags:hover,.categorytags:hover{margin:20px 0;opacity:1.0 !important;}
 .item-select{opacity:0.1;margin:5px 0 0 6px !important;}.item-select:hover{opacity:1;}
 .checkeditem{opacity:1;}
-#item-delete-selected{margin-top:30px;position:absolute;left:35px;width:15em;overflow:auto;}
+#item-delete-selected{margin:3em 5px;position:relative;left:4em;width:15em;overflow:auto;}
 #item-delete-selected-icon{float:left;margin:11px 5px;}
 .fc-state-highlight{background:#eeeecc;color:#2e2f2e;}
 .directory-item{float:left;margin:0 5px 4px 0;padding:3px;width:180px;height:250px;position:relative;}
