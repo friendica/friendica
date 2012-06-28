@@ -113,9 +113,9 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	// to define the closing tag for the list elements. So nested lists
 	// are going to be flattened out in Diaspora for now
 	$endlessloop = 0;
-	while ((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false) &&
-	       (strpos($Text, "[/ol]") !== false) && (strpos($Text, "[ol]") !== false) && 
-	       (strpos($Text, "[/ul]") !== false) && (strpos($Text, "[ul]") !== false) && (++$endlessloop < 20)) {
+	while ((((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false)) ||
+	       ((strpos($Text, "[/ol]") !== false) && (strpos($Text, "[ol]") !== false)) || 
+	       ((strpos($Text, "[/ul]") !== false) && (strpos($Text, "[ul]") !== false))) && (++$endlessloop < 20)) {
 		$Text = preg_replace_callback("/\[list\](.*?)\[\/list\]/is", 'diaspora_ul', $Text);
 		$Text = preg_replace_callback("/\[list=1\](.*?)\[\/list\]/is", 'diaspora_ol', $Text);
 		$Text = preg_replace_callback("/\[list=i\](.*?)\[\/list\]/s",'diaspora_ol', $Text);
