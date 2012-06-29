@@ -162,6 +162,7 @@ function nav(&$a) {
 	$tpl = get_markup_template('nav.tpl');
 
 	$a->page['nav'] .= replace_macros($tpl, array(
+        '$baseurl' => $a->get_baseurl(),
 		'$langselector' => lang_selector(),
 		'$sitelocation' => $sitelocation,
 		'$nav' => $nav,

@@ -27,12 +27,16 @@ h4 { font-size: 1.1em }
 
 .opaque(@v: 0.5){
 	opacity: @v;
-	-webkit-transition: all 0.2s ease-in-out;
-	-moz-transition: all 0.2s ease-in-out;
-	-o-transition: all 0.2s ease-in-out;
-	-ms-transition: all 0.2s ease-in-out;
-	transition: all 0.2s ease-in-out;
+	.transition();
 }
+
+.transition(@d: 0.2s){
+	-webkit-transition: all @d ease-in-out;
+	-moz-transition: all @d ease-in-out;
+	-o-transition: all @d ease-in-out;
+	-ms-transition: all @d ease-in-out;
+	transition: all @d ease-in-out;
+}	
 
 
 a, a:link { color: @Link; text-decoration: none; }
@@ -81,6 +85,7 @@ code {
 	height: auto; overflow: auto;
 	.label { float: left;}
 	.action { float: right; }
+	> img { float: left; }
 }
 
 
@@ -281,6 +286,8 @@ aside {
 	width: 200px;
 	padding:0px 10px 0px 20px;
 	border-right: 1px solid @AsideBorder;
+
+	.profile-edit-side-div { display: none; }
 
 	.vcard {
 		.fn { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
@@ -1068,12 +1075,102 @@ ul.tabs {
 	width: 50px; float: left;
 }
 
-/* photo */
-.lframe {
+/* photo albums */
+@photosize: 150px;
+
+#photo-edit-link-wrap { margin-bottom: 10px; }
+	
+#album-edit-link {
+	border-right: 1px solid @MenuBorder;
 	float: left;
-	margin: 0px 10px 10px 0px;
+	padding-right: 5px;
+	margin-right: 5px;
+}
+#photo-edit-link,
+#album-edit-link a {
+	background: url("../../../images/icons/16/edit.png") no-repeat left center;
+	padding-left: 18px;
+}
+#photo-toprofile-link {
+	background: url("../../../images/icons/16/user.png") no-repeat left center;
+	padding-left: 18px;
 }
 
+.photos-upload-link a,
+#photo-top-upload-link {
+	background: url("../../../images/icons/16/add.png") no-repeat left center;
+	padding-left: 18px;
+}
+
+
+.photo-top-image-wrapper,
+.photo-album-image-wrapper {
+	float: left;
+	margin: 0px 10px 10px 0px;
+	width:@photosize; height: @photosize;
+	position: relative;
+	overflow: hidden;
+	
+	img { width: @photosize; }
+		
+	.photo-top-album-name,
+	.caption{
+		position: absolute;
+		color: @Menu;
+		background-color: @MenuBg;
+		
+		width: 100%;
+		.shadow(0px, 5px);
+		.transition(0.5s);
+		bottom: -@photosize;
+	}
+	
+	&:hover .photo-top-album-name,
+	&:hover .caption {
+		bottom: 0px;
+		.shadow(0px, 0px);
+		.transition(0.5s);
+	}
+}
+
+#photo-photo {
+	display: block; width: 660px;
+	padding: 50px; margin-bottom: 0px;
+	text-align: center;
+	background-color: @Grey3;
+	img { max-width: 560px; }
+}
+#photo-album-title {
+	background: url("../../../images/icons/22/image.png") no-repeat top left;
+	padding-left: 23px;
+	min-height: 22px;
+	a { display: block; padding-top: 5px; }
+}
+
+#photo-caption {
+	display: block; width: 660px;
+	min-height: 55px;
+	background-color:  @Grey2;
+	padding:0 50px 0 50px;
+}
+#photo-next-link > a > div {
+	background: url("icons/next.png") no-repeat center center;
+	float: right;
+	width: 50px; height: 50px;
+}
+#photo-prev-link > a > div {
+	background: url("icons/prev.png") no-repeat center center;
+	float: left;
+	width: 50px; height: 50px;
+}
+#photo-like-div {
+	display: block; width: 660px;
+	height: 30px;
+	background-color:  @Grey2;
+	padding:0 50px 0 50px;
+	.icon {float: left;}
+	.like-rotator {float: right;}
+}
 /* profile match wrapper */
 .profile-match-wrapper {
 	float: left;

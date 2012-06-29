@@ -5,6 +5,9 @@
 	&.notify { background-image: url("../../../images/icons/@{size}/notify_off.png"); }
 	&.gear 	 { background-image: url("../../../images/icons/@{size}/gear.png"); }
 	
+    &.like 	 { background-image: url("icons/like.png"); }
+	&.dislike 	 { background-image: url("icons/dislike.png"); }
+	
 	&.add 	 	{ background-image: url("../../../images/icons/@{size}/add.png"); }
 	&.delete 	{ background-image: url("../../../images/icons/@{size}/delete.png"); }
 	&.edit 	 	{ background-image: url("../../../images/icons/@{size}/edit.png"); }
@@ -39,6 +42,10 @@
 	&.text {
 		text-indent: 0px;
 	}
+
+    min-width:22px; height: 22px;
+    .icons(22);
+    &.text { padding: 10px 0px 0px 25px;  }
 
 	&.s10 {
 		min-width:10px; height: 10px;
