@@ -2732,6 +2732,30 @@ float: left;
 /* ============= */
 /* = Directory = */
 /* ============= */
+section .directory-item dl {
+  height: auto;
+  overflow: auto;	
+}
+section .directory-item dt {
+  float: left;
+  margin-left: 0px;
+  text-align: right;
+  color: #999;
+}
+section .directory-item dd {
+  float: left;
+  margin-left: 5px;
+}
+.directory-profile-wrapper {
+  float: left;
+  max-height: 178px;
+  overflow: hidden;
+  width: 635px;
+}
+.directory-copy-wrapper {
+  float: left;
+  overflow: hidden;	
+}
 /* contacts menu */
 .contact-photo-wrapper {
   position: relative;
@@ -2773,7 +2797,7 @@ float: left;
 }
 .directory-item {
   float: left;
-  width: 200px;
+  width: 800px;
   height: 200px;
 }
 .directory-item .contact-photo {
@@ -2784,13 +2808,37 @@ float: left;
   width: 175px;
   height: 175px;
 }
+.directory-photo-wrapper {
+  float: left;
+  height: 200px;
+  width: 165px;	
+}
 .contact-name {
-  text-align: left;
+  font-size: 18px;
   font-weight: bold;
-  font-size: 12px;
+  margin-bottom: -3px;
+  text-align: left;
 }
 .contact-details {
   color: #999999;
+}
+.page-type {
+  font-size: 10px;
+  font-style: italic;
+}
+.directory-detailscolumn-wrapper {
+  float: left;	
+  width: 305px;
+  margin-right: 10px;  
+}
+.directory-profile-wrapper dl {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+.directory-profile-title {
+  font-weight: bold;
+  margin-bottom: 3px;
+  font-size: 14px;
 }
 #side-bar-photos-albums li{
 list-style-type: disc;

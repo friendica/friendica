@@ -73,13 +73,11 @@ function directory_content(&$a) {
 	$order = " ORDER BY `name` ASC "; 
 
 
-	$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`, `user`.`timezone` FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $sql_extra $order LIMIT %d , %d ",
+	$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`, `user`.`timezone` , `user`.`page-flags` FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $sql_extra $order LIMIT %d , %d ",
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);
 	if(count($r)) {
-
-		$tpl = get_markup_template('directory_item.tpl');
 
 		if(in_array('small', $a->argv))
 			$photo = 'thumb';
@@ -113,20 +111,60 @@ function directory_content(&$a) {
 			if(strlen($rr['gender']))
 				$details .= '<br />' . t('Gender: ') . $rr['gender'];
 
+			if($rr['page-flags'] == PAGE_NORMAL)
+				$page_type = "Personal Profile";
+			if($rr['page-flags'] == PAGE_SOAPBOX)
+				$page_type = "Fan Page";
+			if($rr['page-flags'] == PAGE_COMMUNITY)
+				$page_type = "Community Forum";
+			if($rr['page-flags'] == PAGE_FREELOVE)
+				$page_type = "Open Forum";
+			if($rr['page-flags'] == PAGE_PRVGROUP)
+				$page_type = "Private Group";
+
+			$profile = $rr;
+
+			if((x($profile,'address') == 1)
+				|| (x($profile,'locality') == 1)
+				|| (x($profile,'region') == 1)
+				|| (x($profile,'postal-code') == 1)
+				|| (x($profile,'country-name') == 1))
+			$location = t('Location:');
+
+			$gender = ((x($profile,'gender') == 1) ? t('Gender:') : False);
+
+			$marital = ((x($profile,'marital') == 1) ?  t('Status:') : False);
+
+			$homepage = ((x($profile,'homepage') == 1) ?  t('Homepage:') : False);
+
+			$about = ((x($profile,'about') == 1) ?  t('About:') : False);
+			
+			$tpl = get_markup_template('directory_item.tpl');
+
 			$entry = replace_macros($tpl,array(
 				'$id' => $rr['id'],
 				'$profile-link' => $profile_link,
 				'$photo' => $a->get_cached_avatar_image($rr[$photo]),
 				'$alt-text' => $rr['name'],
 				'$name' => $rr['name'],
-				'$details' => $pdesc . $details  
-
+				'$details' => $pdesc . $details,
+				'$page-type' => $page_type,
+				'$profile' => $profile,
+				'$location' => template_escape($location),
+				'$gender'   => $gender,
+				'$pdesc'	=> $pdesc,
+				'$marital'  => $marital,
+				'$homepage' => $homepage,
+				'$about' => $about,
 
 			));
 
 			$arr = array('contact' => $rr, 'entry' => $entry);
 
 			call_hooks('directory_item', $arr);
+			
+			unset($profile);
+			unset($location);
 
 			$o .= $entry;
 
