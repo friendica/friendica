@@ -8,7 +8,7 @@ Se vi NE petis tiun ŝanĝon, bonvolu NE KLAKU la
 sekvantan ligilon kaj ignoru aŭ forvisu ĉi-mesaĝon. 
 
 Ni ne ŝanĝu vian pasvorton se ni ne povas kontroli ĉu estas vi
-kiu petis lala ŝanĝon. 
+kiu petis la ŝanĝon. 
 
 Sekvu ĉi tion ligilon por konfirmi vian identecon:
 
