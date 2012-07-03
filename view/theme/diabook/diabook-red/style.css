@@ -2870,7 +2870,7 @@ section .directory-item dd {
   height: 175px;
 }
 
-.directory-photo-wrapper {
+section .directory-photo-wrapper {
   float: left;
   height: 200px;
   width: 165px;  
