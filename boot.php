@@ -34,6 +34,24 @@ define ( 'JPEG_QUALITY',            100  );
  */
 define ( 'PNG_QUALITY',             8  );
 
+/**
+ *
+ * An alternate way of limiting picture upload sizes. Specify the maximum pixel
+ * length that pictures are allowed to be (for non-square pictures, it will apply
+ * to the longest side). Pictures longer than this length will be resized to be
+ * this length (on the longest side, the other side will be scaled appropriately).
+ * Modify this value using
+ *
+ *    $a->config['system']['max_image_length'] = n;
+ *
+ * in .htconfig.php
+ *
+ * If you don't want to set a maximum length, set to -1. The default value is
+ * defined by 'MAX_IMAGE_LENGTH' below.
+ *
+ */
+define ( 'MAX_IMAGE_LENGTH',        -1  );
+
 
 /**
  * Not yet used
