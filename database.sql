@@ -599,6 +599,19 @@ CREATE TABLE IF NOT EXISTS `item_id` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `locks`
+--
+
+CREATE TABLE `locks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` char(128) NOT NULL,
+  `locked` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `mail`
 --
 

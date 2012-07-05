@@ -432,7 +432,7 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 					intval(local_user())
 				);
 				if(count($x) && count($r)) {
-				    $mailbox = construct_mailbox_name($r[0]);
+					$mailbox = construct_mailbox_name($r[0]);
 					$password = '';
 					openssl_private_decrypt(hex2bin($r[0]['pass']),$password,$x[0]['prvkey']);
 					$mbox = email_connect($mailbox,$r[0]['user'],$password);

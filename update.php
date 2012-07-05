@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1151 );
+define( 'UPDATE_VERSION' , 1152 );
 
 /**
  *
@@ -1303,6 +1303,18 @@ function update_1149() {
 function update_1150() {
 	$r = q("ALTER TABLE event ADD summary text NOT NULL after finish, add index ( uid ), add index ( cid ), add index ( uri ), add index ( `start` ), add index ( finish ), add index ( `type` ), add index ( adjust ) ");
 	if(! $r)
+		return UPDATE_FAILED;
+	return UPDATE_SUCCESS;
+}
+
+
+function update_1151() {
+	$r = q("CREATE TABLE IF NOT EXISTS locks (
+			id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			name CHAR( 128 ) NOT NULL ,
+			locked TINYINT( 1 ) NOT NULL DEFAULT '0'
+		  ) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
+	if (!$r)
 		return UPDATE_FAILED;
 	return UPDATE_SUCCESS;
 }
