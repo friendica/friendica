@@ -70,6 +70,12 @@ function stripdcode_br_cb($s) {
 }
 
 
+//////////////////////
+// The following "diaspora_ul" and "diaspora_ol" are only appropriate for the
+// pre-Markdownify conversion. If Markdownify isn't used, use the non-Markdownify
+// versions below
+//////////////////////
+/*
 function diaspora_ul($s) {
 	// Replace "[*]" followed by any number (including zero) of
 	// spaces by "* " to match Diaspora's list format
@@ -103,10 +109,38 @@ function diaspora_ol($s) {
 	else
 		return $s[0];
 }
+*/
+
+//////////////////////
+// Non-Markdownify versions of "diaspora_ol" and "diaspora_ul"
+//////////////////////
+function diaspora_ul($s) {
+	// Replace "[\\*]" followed by any number (including zero) of
+	// spaces by "* " to match Diaspora's list format
+	return preg_replace("/\[\\\\\*\]( *)/", "* ", $s[1]);
+}
+
+function diaspora_ol($s) {
+	// A hack: Diaspora will create a properly-numbered ordered list even
+	// if you use '1.' for each element of the list, like:
+	// 1. First element
+	// 1. Second element
+	// 1. Third element
+	return preg_replace("/\[\\\\\*\]( *)/", "1. ", $s[1]);
+}
 
 
 function bb2diaspora($Text,$preserve_nl = false) {
 
+//////////////////////
+// An attempt was made to convert bbcode to html and then to markdown
+// consisting of the following lines.
+// I'm undoing this as we have a lot of bbcode constructs which
+// were simply getting lost, for instance bookmark, vimeo, video, youtube, events, etc.
+// We can try this again, but need a very good test sequence to verify
+// all the major bbcode constructs that we use are getting through.
+//////////////////////
+/*
 	// bbcode() will convert "[*]" into "<li>" with no closing "</li>"
 	// Markdownify() is unable to handle these, as it makes each new
 	// "<li>" into a deeper nested element until it crashes. So pre-format
@@ -115,6 +149,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	// Note that to get nested lists to work for Diaspora, we would need
 	// to define the closing tag for the list elements. So nested lists
 	// are going to be flattened out in Diaspora for now
+
 	$endlessloop = 0;
 	while ((((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false)) ||
 	       ((strpos($Text, "[/ol]") !== false) && (strpos($Text, "[ol]") !== false)) || 
@@ -129,16 +164,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 		$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
 	}
 
-
-
-//////////////////////
-// An attempt was made to convert bbcode to html and then to markdown
-// consisting of the following lines.
-// I'm undoing this as we have a lot of bbcode constructs which
-// were simply getting lost, for instance bookmark, vimeo, video, youtube, events, etc.
-// We can try this again, but need a very good test sequence to verify
-// all the major bbcode constructs that we use are getting through.
-//////////////////////
+*/
 
 	// Convert it to HTML - don't try oembed
 //	$Text = bbcode($Text, $preserve_nl, false);
@@ -244,15 +270,21 @@ function bb2diaspora($Text,$preserve_nl = false) {
 	$Text = preg_replace("(\[size=(.*?)\](.*?)\[\/size\])is","$2",$Text);
 
 	// Check for list text
-	$Text = preg_replace_callback("/\[list\](.*?)\[\/list\]/is", 'diaspora_ul', $Text);
-	$Text = preg_replace_callback("/\[ul\](.*?)\[\/ul\]/is", 'diaspora_ul', $Text);
-	$Text = preg_replace_callback("/\[list=1\](.*?)\[\/list\]/is", 'diaspora_ol', $Text);
-	$Text = preg_replace_callback("/\[list=i\](.*?)\[\/list\]/s",'diaspora_ol', $Text);
-	$Text = preg_replace_callback("/\[list=I\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
-	$Text = preg_replace_callback("/\[list=a\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
-	$Text = preg_replace_callback("/\[list=A\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
-	$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
-//	$Text = preg_replace("/\[li\](.*?)\[\/li\]/s", '<li>$1</li>' ,$Text);
+	$endlessloop = 0;
+	while ((((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false)) ||
+	       ((strpos($Text, "[/ol]") !== false) && (strpos($Text, "[ol]") !== false)) || 
+	       ((strpos($Text, "[/ul]") !== false) && (strpos($Text, "[ul]") !== false)) || 
+	       ((strpos($Text, "[/li]") !== false) && (strpos($Text, "[li]") !== false))) && (++$endlessloop < 20)) {
+		$Text = preg_replace_callback("/\[list\](.*?)\[\/list\]/is", 'diaspora_ul', $Text);
+		$Text = preg_replace_callback("/\[list=1\](.*?)\[\/list\]/is", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=i\](.*?)\[\/list\]/s",'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=I\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=a\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[list=A\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
+		$Text = preg_replace_callback("/\[ul\](.*?)\[\/ul\]/is", 'diaspora_ul', $Text);
+		$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
+		$Text = preg_replace("/\[li\]( *)(.*?)\[\/li\]/s", '* $2' ,$Text);
+	}
 
 	// Just get rid of table tags since Diaspora doesn't support tables
 	$Text = preg_replace("/\[th\](.*?)\[\/th\]/s", '$1' ,$Text);
