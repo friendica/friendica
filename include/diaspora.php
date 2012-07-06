@@ -119,6 +119,9 @@ function find_diaspora_person_by_handle($handle) {
 	$update = false;
 	$got_lock = false;
 
+	$endlessloop = 0;
+	$maxloops = 10;
+
 	do {
 		$r = q("select * from fcontact where network = '%s' and addr = '%s' limit 1",
 			dbesc(NETWORK_DIASPORA),
@@ -153,7 +156,12 @@ function find_diaspora_person_by_handle($handle) {
 			// Lock the function to prevent race conditions if multiple items
 			// come in at the same time from a person who doesn't exist in
 			// fcontact
-			$got_lock = lock_function('find_diaspora_person_by_handle', false);
+			//
+			// Don't loop forever. On the last loop, try to create the contact
+			// whether the function is locked or not. Maybe the locking thread
+			// has died or something. At any rate, a duplicate in 'fcontact'
+			// is a much smaller problem than a deadlocked thread
+			$got_lock = (($endlessloop + 1) < $maxloops ? lock_function('find_diaspora_person_by_handle', false) : true );
 
 			if($got_lock) {
 				logger('find_diaspora_person_by_handle: create or refresh', LOGGER_DEBUG);
@@ -175,7 +183,7 @@ function find_diaspora_person_by_handle($handle) {
 					block_on_function_lock('find_diaspora_person_by_handle');
 			}
 		}
-	} while((! $person) && (! $got_lock));
+	} while((! $person) && (! $got_lock) && (++$endlessloop < $maxloops));
 	// We need to try again if the person wasn't in 'fcontact' but the function was locked.
 	// The fact that the function was locked may mean that another process was creating the
 	// person's record. It could also mean another process was creating or updating an unrelated
