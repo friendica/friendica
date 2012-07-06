@@ -2271,7 +2271,8 @@ function local_delivery($importer,$data) {
 					}
 
 					if($item['uri'] == $item['parent-uri']) {
-						$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s'
+						$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s',
+							`body` = '', `title` = ''
 							WHERE `parent-uri` = '%s' AND `uid` = %d",
 							dbesc($when),
 							dbesc(datetime_convert()),
@@ -2280,7 +2281,8 @@ function local_delivery($importer,$data) {
 						);
 					}
 					else {
-						$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' 
+						$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s',
+							`body` = '', `title` = ''
 							WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
 							dbesc($when),
 							dbesc(datetime_convert()),
