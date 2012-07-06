@@ -45,7 +45,7 @@ function diaspora2bb($s) {
 //	$s = str_replace('&#42;','*',$s);
 
 	// protect the recycle symbol from turning into a tag, but without unescaping angles and naked ampersands
-	$s = str_replace('&#x2672;',html_entities_decode('&#x2672;',ENT_QUOTES,'UTF-8'),$s);
+	$s = str_replace('&#x2672;',html_entity_decode('&#x2672;',ENT_QUOTES,'UTF-8'),$s);
 
 	// Convert everything that looks like a link to a link
 	$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3]$2$3[/url]',$s);
