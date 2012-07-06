@@ -161,7 +161,9 @@ function find_diaspora_person_by_handle($handle) {
 			// whether the function is locked or not. Maybe the locking thread
 			// has died or something. At any rate, a duplicate in 'fcontact'
 			// is a much smaller problem than a deadlocked thread
-			$got_lock = (($endlessloop + 1) < $maxloops ? lock_function('find_diaspora_person_by_handle', false) : true );
+			$got_lock = lock_function('find_diaspora_person_by_handle', false);
+			if(($endlessloop + 1) >= $maxloops)
+				$got_lock = true;
 
 			if($got_lock) {
 				logger('find_diaspora_person_by_handle: create or refresh', LOGGER_DEBUG);
