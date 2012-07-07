@@ -346,7 +346,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 
 	// If we found an event earlier, strip out all the event code and replace with a reformatted version.
 
-	if(x($ev,'desc') && x($ev,'start')) {
+	if(x($ev,'start')) {
 
 		$sub = format_event_diaspora($ev);
 
