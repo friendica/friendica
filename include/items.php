@@ -3621,7 +3621,9 @@ function posted_dates($uid,$wall) {
 		$dnow = substr($dthen,0,8) . '28';
 
 	$ret = array();
-	while($dnow >= $dthen) {
+	// Starting with the current month, get the first and last days of every
+	// month down to and including the month of the first post
+	while(substr($dnow, 0, 7) >= substr($dthen, 0, 7)) {
 		$dstart = substr($dnow,0,8) . '01';
 		$dend = substr($dnow,0,8) . get_dim(intval($dnow),intval(substr($dnow,5)));
 		$start_month = datetime_convert('','',$dstart,'Y-m-d');
