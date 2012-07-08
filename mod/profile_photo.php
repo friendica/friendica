@@ -128,6 +128,7 @@ function profile_photo_post(&$a) {
 		return;
 	}
 
+	$ph->orient($src);
 	@unlink($src);
 	return profile_photo_crop_ui_head($a, $ph);
 	
@@ -237,6 +238,12 @@ function profile_photo_content(&$a) {
 
 if(! function_exists('_crop_ui_head')) {
 function profile_photo_crop_ui_head(&$a, $ph){
+	$max_length = get_config('system','max_image_length');
+	if(! $max_length)
+		$max_length = MAX_IMAGE_LENGTH;
+	if($max_length > 0)
+		$ph->scaleImage($max_length);
+
 	$width = $ph->getWidth();
 	$height = $ph->getHeight();
 

@@ -101,7 +101,14 @@ function wall_upload_post(&$a) {
 		killme();
 	}
 
+	$ph->orient($src);
 	@unlink($src);
+
+	$max_length = get_config('system','max_image_length');
+	if(! $max_length)
+		$max_length = MAX_IMAGE_LENGTH;
+	if($max_length > 0)
+		$ph->scaleImage($max_length);
 
 	$width = $ph->getWidth();
 	$height = $ph->getHeight();

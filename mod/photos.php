@@ -740,8 +740,7 @@ function photos_post(&$a) {
 		killme();
 	}
 
-        if($ph->getType() != 'image/png')
-            $ph->orient($src);
+	$ph->orient($src);
 	@unlink($src);
 
 	$max_length = get_config('system','max_image_length');

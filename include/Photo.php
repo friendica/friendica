@@ -143,7 +143,7 @@ class Photo {
 	public function orient($filename) {
 		// based off comment on http://php.net/manual/en/function.imagerotate.php
 
-		if(! function_exists('exif_read_data'))
+		if( (! function_exists('exif_read_data')) || ($this->getType() !== 'image/jpeg') )
 			return;
 
 		$exif = exif_read_data($filename);
