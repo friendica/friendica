@@ -47,6 +47,67 @@ function bb_unspacefy_and_trim($st) {
   return $unspacefied;
 }
 
+if(! function_exists('bb_extract_images')) {
+function bb_extract_images($body) {
+
+	$saved_image = array();
+	$orig_body = $body;
+	$new_body = '';
+
+	$cnt = 0;
+	$img_start = strpos($orig_body, '[img');
+	$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
+	$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
+	while(($img_st_close !== false) && ($img_end !== false)) {
+
+		$img_st_close++; // make it point to AFTER the closing bracket
+		$img_end += $img_start;
+
+		if(! strcmp(substr($orig_body, $img_start + $img_st_close, 5), 'data:')) {
+			// This is an embedded image
+
+			$saved_image[$cnt] = substr($orig_body, $img_start + $img_st_close, $img_end - ($img_start + $img_st_close));
+			$new_body = $new_body . substr($orig_body, 0, $img_start) . '[$#saved_image' . $cnt . '#$]';
+
+			$cnt++;
+		}
+		else
+			$new_body = $new_body . substr($orig_body, 0, $img_end + strlen('[/img]'));
+
+		$orig_body = substr($orig_body, $img_end + strlen('[/img]'));
+
+		if($orig_body === false) // in case the body ends on a closing image tag
+			$orig_body = '';
+
+		$img_start = strpos($orig_body, '[img');
+		$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
+		$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
+	}
+
+	$new_body = $new_body . $orig_body;
+
+	return array('body' => $new_body, 'images' => $saved_image);
+}}
+
+if(! function_exists('bb_replace_images')) {
+function bb_replace_images($body, $images) {
+
+	$newbody = $body;
+
+	$cnt = 0;
+	foreach($images as $image) {
+		// We're depending on the property of 'foreach' (specified on the PHP website) that
+		// it loops over the array starting from the first element and going sequentially
+		// to the last element
+		$newbody = str_replace('[$#saved_image' . $cnt . '#$]', '<img src="' . $image .'" alt="' . t('Image/photo') . '" />', $newbody);
+		$cnt++;
+	}
+
+	return $newbody;
+}}
+
+
+
 	// BBcode 2 HTML was written by WAY2WEB.net
 	// extended to work with Mistpark/Friendica - Mike Macgirvin
 
@@ -54,29 +115,21 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	$a = get_app();
 
-	// Hide all [noparse] contained bbtags spacefying them
+	// Hide all [noparse] contained bbtags by spacefying them
+	// POSSIBLE BUG --> Will the 'preg' functions crash if there's an embedded image?
 
 	$Text = preg_replace_callback("/\[noparse\](.*?)\[\/noparse\]/ism", 'bb_spacefy',$Text);
 	$Text = preg_replace_callback("/\[nobb\](.*?)\[\/nobb\]/ism", 'bb_spacefy',$Text);
 	$Text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", 'bb_spacefy',$Text);
 
 
-	// Extract a single private image which uses data url's since preg has issues with
-	// large data sizes. Stash it away while we do bbcode conversion, and then put it back
+	// Extract the private images which use data url's since preg has issues with
+	// large data sizes. Stash them away while we do bbcode conversion, and then put them back
 	// in after we've done all the regex matching. We cannot use any preg functions to do this.
 
-	$saved_image = '';
-	$img_start = strpos($Text,'[img]data:');
-	$img_end = strpos($Text,'[/img]');
-
-	if($img_start !== false && $img_end !== false && $img_end > $img_start) {
-		$start_fragment = substr($Text,0,$img_start);
-		$img_start += strlen('[img]');
-		$saved_image = substr($Text,$img_start,$img_end - $img_start);
-		$end_fragment = substr($Text,$img_end + strlen('[/img]'));
-//		logger('saved_image: ' . $saved_image,LOGGER_DEBUG);
-		$Text = $start_fragment . '[$#saved_image#$]' . $end_fragment;
-	}
+	$extracted = bb_extract_images($Text);
+	$Text = $extracted['body'];
+	$saved_image = $extracted['images'];
 
 	// If we find any event code, turn it into an event.
 	// After we're finished processing the bbcode we'll
@@ -333,8 +386,9 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	// fix any escaped ampersands that may have been converted into links
 	$Text = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$Text);
-	if(strlen($saved_image))
-		$Text = str_replace('[$#saved_image#$]','<img src="' . $saved_image .'" alt="' . t('Image/photo') . '" />',$Text);
+
+	if($saved_image)
+		$Text = bb_replace_images($Text, $saved_image);
 
 	call_hooks('bbcode',$Text);
 
