@@ -73,5 +73,3 @@ function unlock_function($fn_name) {
 
 	return;
 }}
-
-?>

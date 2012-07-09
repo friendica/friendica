@@ -2517,7 +2517,7 @@ function diaspora_send_mail($item,$owner,$contact) {
 
 }
 
-function diaspora_transmit($owner,$contact,$slap,$public_batch) {
+function diaspora_transmit($owner,$contact,$slap,$public_batch,$queue_run=false) {
 
 	$enabled = intval(get_config('system','diaspora_enabled'));
 	if(! $enabled) {
@@ -2534,7 +2534,7 @@ function diaspora_transmit($owner,$contact,$slap,$public_batch) {
 
 	logger('diaspora_transmit: ' . $logid . ' ' . $dest_url);
 
-	if(was_recently_delayed($contact['id'])) {
+	if( (! $queue_run) && (was_recently_delayed($contact['id'])) ) {
 		$return_code = 0;
 	}
 	else {
