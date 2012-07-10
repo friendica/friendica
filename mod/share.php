@@ -22,11 +22,12 @@ function share_init(&$a) {
 
 	$o .= "\xE2\x99\xb2" . ' [url=' . $r[0]['author-link'] . ']' . $r[0]['author-name'] . '[/url]' . "\n";
 	if($r[0]['title'])
-		$o .= '[b]' . $r[0]['title'] . '[/b]' . "\n";
-	$o .= $r[0]['body'] . "\n" ;
+		$o .= '[b]' . ' [url=' . $r[0]['plink'] . ']' . $r[0]['title'] . '[/url]' . '[/b]' . "\n";
+        else
+                $o .= '[b]' . ' [url=' . $r[0]['plink'] . ']' . 'View Source' . '[/url]' . '[/b]' . "\n";
+	$o .= $r[0]['body'] . "\n";
+        
+        echo $o;
 
-	$o .= (($r[0]['plink']) ? '[url=' . $r[0]['plink'] . ']' . t('link') . '[/url]' . "\n" : '');
-
-	echo $o;
 	killme();  
 }
