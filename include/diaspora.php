@@ -1272,7 +1272,7 @@ function diaspora_comment($importer,$xml,$msg) {
 	if(($parent_item['origin']) && (! $parent_author_signature)) {
 		q("insert into sign (`iid`,`signed_text`,`signature`,`signer`) values (%d,'%s','%s','%s') ",
 			intval($message_id),
-			dbesc($author_signed_data),
+			dbesc($signed_data),
 			dbesc(base64_encode($author_signature)),
 			dbesc($diaspora_handle)
 		);
@@ -1855,7 +1855,7 @@ EOT;
 	if(! $parent_author_signature) {
 		q("insert into sign (`iid`,`signed_text`,`signature`,`signer`) values (%d,'%s','%s','%s') ",
 			intval($message_id),
-			dbesc($author_signed_data),
+			dbesc($signed_data),
 			dbesc(base64_encode($author_signature)),
 			dbesc($diaspora_handle)
 		);
