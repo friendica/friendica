@@ -1039,16 +1039,11 @@ function store_diaspora_comment_sig($datarray, $author, $uprvkey, $parent_item, 
 	require_once('include/bb2diaspora.php');
 	$signed_body = html_entity_decode(bb2diaspora($datarray['body']));
 
-//	$myaddr = $user['nickname'] . '@' . substr($baseurl, strpos($baseurl,'://') + 3);
-//	if( $author['network'] === NETWORK_DIASPORA)
-//		$diaspora_handle = $author['addr'];
-//	else {
 	// Only works for NETWORK_DFRN
 	$contact_baseurl_start = strpos($author['url'],'://') + 3;
 	$contact_baseurl_length = strpos($author['url'],'/profile') - $contact_baseurl_start;
 	$contact_baseurl = substr($author['url'], $contact_baseurl_start, $contact_baseurl_length);
 	$diaspora_handle = $author['nick'] . '@' . $contact_baseurl;
-//	}
 
 	$signed_text = $datarray['guid'] . ';' . $parent_item['guid'] . ';' . $signed_body . ';' . $diaspora_handle;
 

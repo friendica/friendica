@@ -3683,7 +3683,7 @@ function store_diaspora_retract_sig($item, $user, $baseurl) {
 	}
 	else {
 		$r = q("SELECT `nick`, `url` FROM `contact` WHERE `id` = '%d' LIMIT 1",
-			$item['contact-id']
+			$item['contact-id'] // If this function gets called, drop_item() has already checked remote_user() == $item['contact-id']
 		);
 		if(count($r)) {
 			// The below handle only works for NETWORK_DFRN. I think that's ok, because this function
