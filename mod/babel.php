@@ -19,6 +19,12 @@ function babel_content(&$a) {
 
 	$o .= '<br /><br />';
 
+	$o .= '<form action="babel" method="post">';
+	$o .= t('Source (Diaspora) text to convert to BBcode:') . EOL . '<textarea name="d2bbtext" >' . htmlspecialchars($_REQUEST['d2bbtext']) .'</textarea>' . EOL;
+	$o .= '<input type="submit" name="submit" value="Submit" /></form>'; 
+
+	$o .= '<br /><br />';
+
 	if(x($_REQUEST,'text')) {
 
 		$text = trim($_REQUEST['text']);
@@ -52,5 +58,18 @@ function babel_content(&$a) {
 
 
 	}
+
+	if(x($_REQUEST,'d2bbtext')) {
+
+		$d2bbtext = trim($_REQUEST['d2bbtext']);
+		$o .= t("Source input (Diaspora format): ") . EOL. EOL; 
+		$o .= visible_lf($d2bbtext) . EOL. EOL; 
+
+
+		$bb = diaspora2bb($d2bbtext);
+		$o .= t("diaspora2bb: ") . EOL. EOL; 
+		$o .= visible_lf($bb) . EOL. EOL; 
+	}
+
 	return $o;
 }
