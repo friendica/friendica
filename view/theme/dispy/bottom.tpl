@@ -43,4 +43,17 @@ function insertFormatting(comment, BBcode, id) {
 function cmtBbOpen(id) {
 	$(".comment-edit-bb-" + id).show();
 }
+function cmtBbClose(id) {
+    $(".comment-edit-bb-" + id).hide();
+}
+
+var doctitle = document.title;
+function checkNotify() {
+	if(document.getElementById("notify-update").innerHTML != "") {
+		document.title = "("+document.getElementById("notify-update").innerHTML+") " + doctitle;
+	} else {
+		document.title = doctitle;
+    };
+    setInterval(function () {checkNotify();}, 10 * 1000);
+}
 </script>
