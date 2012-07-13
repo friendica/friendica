@@ -616,7 +616,8 @@ function network_content(&$a, $update = 0) {
 		if($update) {
 			$r = q("SELECT `parent` AS `item_id`, `contact`.`uid` AS `contact_uid`
 				FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-				WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
+				WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND
+				(`item`.`deleted` = 0 OR item.verb = '" . ACTIVITY_LIKE ."' OR item.verb = '" . ACTIVITY_DISLIKE . "')
 				and `item`.`moderated` = 0 and `item`.`unseen` = 1
 				AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 				$sql_extra3 $sql_extra $sql_nets ",

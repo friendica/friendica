@@ -117,7 +117,7 @@ function like_content(&$a) {
 		$like_item = $r[0];
 
 		// Already voted, undo it
-		$r = q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
+		$r = q("UPDATE `item` SET `deleted` = 1, `unseen` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
 			dbesc(datetime_convert()),
 			intval($like_item['id'])
 		);

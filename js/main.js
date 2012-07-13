@@ -357,9 +357,9 @@
 	function dolike(ident,verb) {
 		unpause();
 		$('#like-rotator-' + ident.toString()).show();
-		$.get('like/' + ident.toString() + '?verb=' + verb );
-		if(timer) clearTimeout(timer);
-		timer = setTimeout(NavUpdate,3000);
+		$.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
+//		if(timer) clearTimeout(timer);
+//		timer = setTimeout(NavUpdate,3000);
 		liking = 1;
 	}
 
