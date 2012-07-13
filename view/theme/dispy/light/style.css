@@ -97,6 +97,7 @@ nav .nav-link{display:inline-block;width:22px;height:22px;overflow:hidden;margin
 #nav-network-link{background-position:0px -177px;}#nav-network-link:hover{background-position:-22px -177px;}
 #nav-search-link{background-position:0 -44px;}#nav-search-link:hover{background-position:-22px -44px;}
 #jot-title,#profile-link,#profile-title,#profile-attach-wrapper,#profile-audio,#profile-link,#profile-location,#profile-nolocation,#profile-title,#profile-upload-wrapper,#profile-video,#profile-jot-submit,#wall-image-upload,#wall-file-upload,#wall-image-upload-div,#wall-file-upload-div,.icon,.hover,.focus,.pointer{cursor:pointer;}
+.sparkle{cursor:url("icons/sparkle.cur"),pointer;}
 div.jGrowl div.notice{background:#511919 url("../../../images/icons/48/notice.png") no-repeat 5px center;color:white;padding-left:58px;margin-top:50px;}
 div.jGrowl div.info{background:#364e59 url("../../../images/icons/48/info.png") no-repeat 5px center;color:white;padding-left:58px;margin-top:50px;}
 #nav-notifications-menu{margin:30px 0 0 -20px;width:275px;max-height:300px;overflow-y:auto;font-size:9pt;}#nav-notifications-menu img{float:left;margin-right:5px;}
