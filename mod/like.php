@@ -106,11 +106,12 @@ function like_content(&$a) {
 
 
 	$r = q("SELECT * FROM `item` WHERE `verb` = '%s' AND `deleted` = 0 
-		AND `contact-id` = %d AND ( `parent` = '%s' OR `parent-uri` = '%s') LIMIT 1",
+		AND `contact-id` = %d AND ( `parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s') LIMIT 1",
 		dbesc($activity),
 		intval($contact['id']),
 		dbesc($item_id),
-		dbesc($item_id)
+		dbesc($item_id),
+		dbesc($item['uri'])
 	);
 	if(count($r)) {
 		$like_item = $r[0];

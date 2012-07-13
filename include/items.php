@@ -890,7 +890,7 @@ function item_store($arr,$force_parent = false) {
 			if($r[0]['uri'] != $r[0]['parent-uri']) {
 				$arr['thr-parent'] = $arr['parent-uri'];
 				$arr['parent-uri'] = $r[0]['parent-uri'];
-				$z = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `parent-uri` = '%s' AND `uid` = %d 
+				$z = q("SELECT * FROM `item` WHERE `uri` = '%s' AND `parent-uri` = '%s' AND `uid` = %d 
 					ORDER BY `id` ASC LIMIT 1",
 					dbesc($r[0]['parent-uri']),
 					dbesc($r[0]['parent-uri']),

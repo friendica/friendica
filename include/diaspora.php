@@ -1236,6 +1236,7 @@ function diaspora_comment($importer,$xml,$msg) {
 
 	$datarray['uid'] = $importer['uid'];
 	$datarray['contact-id'] = $contact['id'];
+	$datarray['type'] = 'remote-comment';
 	$datarray['wall'] = $parent_item['wall'];
 	$datarray['gravity'] = GRAVITY_COMMENT;
 	$datarray['guid'] = $guid;
@@ -1673,8 +1674,8 @@ function diaspora_like($importer,$xml,$msg) {
 
 	// likes on comments not supported here and likes on photos not supported by Diaspora
 
-	if($target_type !== 'Post')
-		return;
+//	if($target_type !== 'Post')
+//		return;
 
 	$contact = diaspora_get_contact_by_handle($importer['uid'],$msg['author']);
 	if(! $contact) {
@@ -2253,22 +2254,30 @@ function diaspora_send_followup($item,$owner,$contact,$public_batch = false) {
 	$myaddr = $owner['nickname'] . '@' .  substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
 //	$theiraddr = $contact['addr'];
 
-	// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
-	// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
-	// The only item with `parent` and `id` as the parent id is the parent item.
-	$p = q("select guid from item where parent = %d and id = %d limit 1",
-		intval($item['parent']),
-		intval($item['parent'])
-	);
+	if($item['thr-parent']) {
+		$p = q("select guid, type, uri, `parent-uri` from item where uri = '%s' limit 1",
+		        dbesc($item['thr-parent'])
+		      );
+	}
+	else {
+		// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
+		// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
+		// The only item with `parent` and `id` as the parent id is the parent item.
+		$p = q("select guid, type, uri, `parent-uri` from item where parent = %d and id = %d limit 1",
+			intval($item['parent']),
+			intval($item['parent'])
+		);
+	}
 	if(count($p))
-		$parent_guid = $p[0]['guid'];
+		$parent = $p[0];
 	else
 		return;
 
 	if($item['verb'] === ACTIVITY_LIKE) {
 		$tpl = get_markup_template('diaspora_like.tpl');
 		$like = true;
-		$target_type = 'Post';
+		$target_type = ( $parent['uri'] === $parent['parent-uri']  ? 'Post' : 'Comment');
+//		$target_type = (strpos($parent['type'], 'comment') ? 'Comment' : 'Post');
 //		$positive = (($item['deleted']) ? 'false' : 'true');
 		$positive = 'true';
 
@@ -2285,15 +2294,15 @@ function diaspora_send_followup($item,$owner,$contact,$public_batch = false) {
 	// sign it
 
 	if($like)
-		$signed_text = $item['guid'] . ';' . $target_type . ';' . $parent_guid . ';' . $positive . ';' . $myaddr;
+		$signed_text = $item['guid'] . ';' . $target_type . ';' . $parent['guid'] . ';' . $positive . ';' . $myaddr;
 	else
-		$signed_text = $item['guid'] . ';' . $parent_guid . ';' . $text . ';' . $myaddr;
+		$signed_text = $item['guid'] . ';' . $parent['guid'] . ';' . $text . ';' . $myaddr;
 
 	$authorsig = base64_encode(rsa_sign($signed_text,$owner['uprvkey'],'sha256'));
 
 	$msg = replace_macros($tpl,array(
 		'$guid' => xmlify($item['guid']),
-		'$parent_guid' => xmlify($parent_guid),
+		'$parent_guid' => xmlify($parent['guid']),
 		'$target_type' =>xmlify($target_type),
 		'$authorsig' => xmlify($authorsig),
 		'$body' => xmlify($text),
@@ -2321,15 +2330,22 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	$text = html_entity_decode(bb2diaspora($body));
 
 
-	// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
-	// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
-	// The only item with `parent` and `id` as the parent id is the parent item.
-	$p = q("select guid from item where parent = %d and id = %d limit 1",
-		intval($item['parent']),
-		intval($item['parent'])
-	);
+	if($item['thr-parent']) {
+		$p = q("select guid, type, uri, `parent-uri` from item where uri = '%s' limit 1",
+		        dbesc($item['thr-parent'])
+		      );
+	}
+	else {
+		// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
+		// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
+		// The only item with `parent` and `id` as the parent id is the parent item.
+		$p = q("select guid, type, uri, `parent-uri` from item where parent = %d and id = %d limit 1",
+			intval($item['parent']),
+			intval($item['parent'])
+		      );
+	}
 	if(count($p))
-		$parent_guid = $p[0]['guid'];
+		$parent = $p[0];
 	else
 		return;
 
@@ -2347,7 +2363,8 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	elseif($item['verb'] === ACTIVITY_LIKE) {
 		$like = true;
 
-		$target_type = 'Post';
+		$target_type = ( $parent['uri'] === $parent['parent-uri']  ? 'Post' : 'Comment');
+//		$target_type = (strpos($parent['type'], 'comment') ? 'Comment' : 'Post');
 //		$positive = (($item['deleted']) ? 'false' : 'true');
 		$positive = 'true';
 
@@ -2382,9 +2399,9 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	if($relay_retract)
 		$sender_signed_text = $item['guid'] . ';' . $target_type;
 	elseif($like)
-		$sender_signed_text = $item['guid'] . ';' . $target_type . ';' . $parent_guid . ';' . $positive . ';' . $handle;
+		$sender_signed_text = $item['guid'] . ';' . $target_type . ';' . $parent['guid'] . ';' . $positive . ';' . $handle;
 	else
-		$sender_signed_text = $item['guid'] . ';' . $parent_guid . ';' . $text . ';' . $handle;
+		$sender_signed_text = $item['guid'] . ';' . $parent['guid'] . ';' . $text . ';' . $handle;
 
 	// Sign the relayable with the top-level owner's signature
 	//
@@ -2401,7 +2418,7 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 
 	$msg = replace_macros($tpl,array(
 		'$guid' => xmlify($item['guid']),
-		'$parent_guid' => xmlify($parent_guid),
+		'$parent_guid' => xmlify($parent['guid']),
 		'$target_type' =>xmlify($target_type),
 		'$authorsig' => xmlify($authorsig),
 		'$parentsig' => xmlify($parentauthorsig),
