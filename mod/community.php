@@ -45,13 +45,13 @@ function community_content(&$a, $update = 0) {
 	// OR your own posts if you are a logged in member
 
 
-	$r = q("SELECT distinct(`item`.`uri`) AS `total`
+	$r = q("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
 		FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
 		WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
 		AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
 		AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' 
 		AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
-		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 group by `item`.`uri` "
+		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0"
 	);
 
 	if(count($r))
