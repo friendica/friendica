@@ -280,6 +280,31 @@ function paginate(&$a) {
 	return $o;
 }}
 
+if(! function_exists('alt_pager')) {
+function alt_pager(&$a, $i) {
+        $o = '';
+	$stripped = preg_replace('/(&page=[0-9]*)/','',$a->query_string);
+	$stripped = str_replace('q=','',$stripped);
+	$stripped = trim($stripped,'/');
+	$pagenum = $a->pager['page'];
+        $url = $a->get_baseurl() . '/' . $stripped;
+
+        $o .= '<div class="pager">';
+
+	if($a->pager['page']>1)
+	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] - 1).'">' . t('newer') . '</a>';
+        if($i>0) {
+          if($a->pager['page']>1)
+	          $o .= "&nbsp;-&nbsp;";
+	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] + 1).'">' . t('older') . '</a>';
+	}
+
+
+        $o .= '</div>'."\r\n";
+
+	return $o;
+}}
+
 // Turn user/group ACLs stored as angle bracketed text into arrays
 
 if(! function_exists('expand_acl')) {

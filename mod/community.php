@@ -44,22 +44,24 @@ function community_content(&$a, $update = 0) {
 	// Only public posts can be shown
 	// OR your own posts if you are a logged in member
 
+        if(! get_pconfig(local_user(),'system','alt_pager')) {
+	        $r = q("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
+		        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
+		        WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
+		        AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
+		        AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
+		        AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
+		        AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0"
+	        );
 
-	$r = q("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
-		FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
-		WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
-		AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
-		AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' 
-		AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
-		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0"
-	);
+	        if(count($r))
+		        $a->set_pager_total($r[0]['total']);
 
-	if(count($r))
-		$a->set_pager_total($r[0]['total']);
+	        if(! $r[0]['total']) {
+		        info( t('No results.') . EOL);
+		        return $o;
+	        }
 
-	if(! $r[0]['total']) {
-		info( t('No results.') . EOL);
-		return $o;
 	}
 
 	$r = q("SELECT distinct(`item`.`uri`), `item`.*, `item`.`id` AS `item_id`, 
@@ -70,9 +72,9 @@ function community_content(&$a, $update = 0) {
 		FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 		LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
 		WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
-		AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
+		AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''
 		AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' 
-		AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
+		AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0
 		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 group by `item`.`uri`
 		ORDER BY `received` DESC LIMIT %d, %d ",
 		intval($a->pager['start']),
@@ -80,11 +82,21 @@ function community_content(&$a, $update = 0) {
 
 	);
 
+	if(! count($r)) {
+		info( t('No results.') . EOL);
+		return $o;
+	}
+
 	// we behave the same in message lists as the search module
 
 	$o .= conversation($a,$r,'community',$update);
 
-	$o .= paginate($a);
+        if(! get_pconfig(local_user(),'system','alt_pager')) {
+	        $o .= paginate($a);
+	}
+	else {
+	        $o .= alt_pager($a,count($r));
+	}
 
 	return $o;
 }

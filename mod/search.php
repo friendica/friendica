@@ -128,21 +128,24 @@ function search_content(&$a) {
 	// OR your own posts if you are a logged in member
 	// No items will be shown if the member has a blocked profile wall. 
 
-	$r = q("SELECT distinct(`item`.`uri`) as `total`
-		FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
-		WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
-		AND (( `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' AND `item`.`private` = 0 AND `user`.`hidewall` = 0) 
-			OR `item`.`uid` = %d )
-		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-		$sql_extra group by `item`.`uri` ", 
-		intval(local_user())
-	);
+	if(! get_pconfig(local_user(),'system','alt_pager')) {
+	        $r = q("SELECT distinct(`item`.`uri`) as `total`
+		        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
+		        WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
+		        AND (( `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' AND `item`.`private` = 0 AND `user`.`hidewall` = 0) 
+			        OR `item`.`uid` = %d )
+		        AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
+		        $sql_extra group by `item`.`uri` ", 
+		        intval(local_user())
+	        );
 
-	if(count($r))
-		$a->set_pager_total(count($r));
-	if(! count($r)) {
-		info( t('No results.') . EOL);
-		return $o;
+	        if(count($r))
+		        $a->set_pager_total(count($r));
+
+	        if(! count($r)) {
+		        info( t('No results.') . EOL);
+		        return $o;
+	        }
 	}
 
 	$r = q("SELECT distinct(`item`.`uri`), `item`.*, `item`.`id` AS `item_id`, 
@@ -165,6 +168,12 @@ function search_content(&$a) {
 
 	);
 
+	if(! count($r)) {
+		info( t('No results.') . EOL);
+		return $o;
+	}
+
+
 	if($tag) 
 		$o .= '<h2>Items tagged with: ' . $search . '</h2>';
 	else
@@ -172,7 +181,12 @@ function search_content(&$a) {
 
 	$o .= conversation($a,$r,'search',false);
 
-	$o .= paginate($a);
+        if(! get_pconfig(local_user(),'system','alt_pager')) {
+	        $o .= paginate($a);
+	}
+	else {
+	        $o .= alt_pager($a,count($r));
+	}
 
 	return $o;
 }
