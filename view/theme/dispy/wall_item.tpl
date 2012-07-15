@@ -52,7 +52,7 @@
 				<li><a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item icon file-as" title="$item.filer"></a></li>
 				{{ endif }}
 				{{ if $item.plink }}
-				<li class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link$item.sparkle"></a></li>
+				<li class="wall-item-links-wrapper$item.sparkle"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></li>
 				{{ endif }}
 				{{ if $item.edpost }}
 				<li><a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a></li>
