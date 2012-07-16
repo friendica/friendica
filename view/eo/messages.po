@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: http://bugs.friendica.com/\n"
-"POT-Creation-Date: 2012-06-30 10:00-0700\n"
-"PO-Revision-Date: 2012-07-01 16:55+0000\n"
+"POT-Creation-Date: 2012-07-15 10:00-0700\n"
+"PO-Revision-Date: 2012-07-16 19:31+0000\n"
 "Last-Translator: Martin Schmitt <mas@scsy.de>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/friendica/language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr "Ĝisdatigo de kontakto malsukcesis."
 
 #: ../../mod/crepair.php:115 ../../mod/wall_attach.php:44
 #: ../../mod/fsuggest.php:78 ../../mod/events.php:140 ../../mod/api.php:26
-#: ../../mod/api.php:31 ../../mod/photos.php:135 ../../mod/photos.php:951
+#: ../../mod/api.php:31 ../../mod/photos.php:135 ../../mod/photos.php:957
 #: ../../mod/editpost.php:10 ../../mod/install.php:151
 #: ../../mod/notifications.php:66 ../../mod/contacts.php:145
 #: ../../mod/settings.php:106 ../../mod/settings.php:537
@@ -47,18 +47,18 @@ msgstr "Ĝisdatigo de kontakto malsukcesis."
 #: ../../mod/wallmessage.php:33 ../../mod/wallmessage.php:79
 #: ../../mod/wallmessage.php:103 ../../mod/attach.php:33
 #: ../../mod/group.php:19 ../../mod/viewcontacts.php:22
-#: ../../mod/register.php:38 ../../mod/regmod.php:116 ../../mod/item.php:124
-#: ../../mod/item.php:140 ../../mod/profile_photo.php:19
-#: ../../mod/profile_photo.php:141 ../../mod/profile_photo.php:152
-#: ../../mod/profile_photo.php:165 ../../mod/message.php:45
-#: ../../mod/message.php:97 ../../mod/allfriends.php:9
+#: ../../mod/register.php:38 ../../mod/regmod.php:116 ../../mod/item.php:125
+#: ../../mod/item.php:141 ../../mod/profile_photo.php:19
+#: ../../mod/profile_photo.php:142 ../../mod/profile_photo.php:153
+#: ../../mod/profile_photo.php:166 ../../mod/message.php:45
+#: ../../mod/message.php:175 ../../mod/allfriends.php:9
 #: ../../mod/nogroup.php:25 ../../mod/wall_upload.php:53
 #: ../../mod/follow.php:9 ../../mod/display.php:138 ../../mod/profiles.php:7
-#: ../../mod/profiles.php:400 ../../mod/delegate.php:6
+#: ../../mod/profiles.php:408 ../../mod/delegate.php:6
 #: ../../mod/suggest.php:28 ../../mod/invite.php:13 ../../mod/invite.php:81
-#: ../../mod/dfrn_confirm.php:53 ../../addon/facebook/facebook.php:508
-#: ../../addon/facebook/facebook.php:514 ../../addon/dav/layout.fnk.php:353
-#: ../../include/items.php:3455 ../../index.php:309
+#: ../../mod/dfrn_confirm.php:53 ../../addon/facebook/facebook.php:510
+#: ../../addon/facebook/facebook.php:516 ../../addon/dav/layout.fnk.php:353
+#: ../../include/items.php:3593 ../../index.php:309
 msgid "Permission denied."
 msgstr "Malpermesita."
 
@@ -88,7 +88,7 @@ msgid "Return to contact editor"
 msgstr "Reen al kontakta redaktilo"
 
 #: ../../mod/crepair.php:148 ../../mod/settings.php:557
-#: ../../mod/settings.php:583 ../../mod/admin.php:659 ../../mod/admin.php:668
+#: ../../mod/settings.php:583 ../../mod/admin.php:661 ../../mod/admin.php:670
 msgid "Name"
 msgstr "Nomo"
 
@@ -125,21 +125,22 @@ msgid "New photo from this URL"
 msgstr "Nova bildo el tiu adreso"
 
 #: ../../mod/crepair.php:166 ../../mod/fsuggest.php:107
-#: ../../mod/events.php:436 ../../mod/photos.php:986 ../../mod/photos.php:1057
-#: ../../mod/photos.php:1303 ../../mod/photos.php:1343
-#: ../../mod/photos.php:1383 ../../mod/photos.php:1414
+#: ../../mod/events.php:436 ../../mod/photos.php:992 ../../mod/photos.php:1063
+#: ../../mod/photos.php:1309 ../../mod/photos.php:1349
+#: ../../mod/photos.php:1389 ../../mod/photos.php:1420
 #: ../../mod/install.php:246 ../../mod/install.php:284
-#: ../../mod/localtime.php:45 ../../mod/contacts.php:343
-#: ../../mod/settings.php:555 ../../mod/settings.php:709
-#: ../../mod/settings.php:770 ../../mod/settings.php:971
-#: ../../mod/group.php:85 ../../mod/message.php:216 ../../mod/message.php:410
-#: ../../mod/admin.php:420 ../../mod/admin.php:656 ../../mod/admin.php:792
-#: ../../mod/admin.php:991 ../../mod/admin.php:1078 ../../mod/profiles.php:569
-#: ../../mod/invite.php:119 ../../addon/fromgplus/fromgplus.php:40
-#: ../../addon/facebook/facebook.php:617
+#: ../../mod/localtime.php:45 ../../mod/content.php:691
+#: ../../mod/contacts.php:343 ../../mod/settings.php:555
+#: ../../mod/settings.php:709 ../../mod/settings.php:770
+#: ../../mod/settings.php:971 ../../mod/group.php:85 ../../mod/message.php:294
+#: ../../mod/message.php:473 ../../mod/admin.php:422 ../../mod/admin.php:658
+#: ../../mod/admin.php:794 ../../mod/admin.php:993 ../../mod/admin.php:1080
+#: ../../mod/profiles.php:577 ../../mod/invite.php:119
+#: ../../addon/fromgplus/fromgplus.php:40
+#: ../../addon/facebook/facebook.php:619
 #: ../../addon/snautofollow/snautofollow.php:64
 #: ../../addon/yourls/yourls.php:76 ../../addon/ljpost/ljpost.php:93
-#: ../../addon/nsfw/nsfw.php:57 ../../addon/page/page.php:208
+#: ../../addon/nsfw/nsfw.php:57 ../../addon/page/page.php:210
 #: ../../addon/planets/planets.php:158
 #: ../../addon/uhremotestorage/uhremotestorage.php:89
 #: ../../addon/randplace/randplace.php:177 ../../addon/dwpost/dwpost.php:93
@@ -149,9 +150,10 @@ msgstr "Nova bildo el tiu adreso"
 #: ../../addon/notimeline/notimeline.php:64 ../../addon/blockem/blockem.php:57
 #: ../../addon/qcomment/qcomment.php:61
 #: ../../addon/openstreetmap/openstreetmap.php:70
-#: ../../addon/libertree/libertree.php:90 ../../addon/mathjax/mathjax.php:42
-#: ../../addon/editplain/editplain.php:84 ../../addon/blackout/blackout.php:98
-#: ../../addon/gravatar/gravatar.php:86
+#: ../../addon/libravatar/libravatar.php:99
+#: ../../addon/libertree/libertree.php:90 ../../addon/altpager/altpager.php:87
+#: ../../addon/mathjax/mathjax.php:42 ../../addon/editplain/editplain.php:84
+#: ../../addon/blackout/blackout.php:98 ../../addon/gravatar/gravatar.php:95
 #: ../../addon/pageheader/pageheader.php:55 ../../addon/ijpost/ijpost.php:93
 #: ../../addon/jappixmini/jappixmini.php:302
 #: ../../addon/statusnet/statusnet.php:278
@@ -170,7 +172,7 @@ msgstr "Nova bildo el tiu adreso"
 #: ../../view/theme/diabook/theme.php:757
 #: ../../view/theme/diabook/config.php:190
 #: ../../view/theme/quattro/config.php:52 ../../view/theme/dispy/config.php:70
-#: ../../include/conversation.php:580
+#: ../../include/conversation.php:653
 msgid "Submit"
 msgstr "Sendi"
 
@@ -225,12 +227,12 @@ msgstr "l, F j"
 msgid "Edit event"
 msgstr "Redakti okazon"
 
-#: ../../mod/events.php:304 ../../include/text.php:1065
+#: ../../mod/events.php:304 ../../include/text.php:1094
 msgid "link to source"
 msgstr "ligilo al fonto"
 
 #: ../../mod/events.php:328 ../../view/theme/diabook/theme.php:131
-#: ../../include/nav.php:52 ../../boot.php:1559
+#: ../../include/nav.php:52 ../../boot.php:1596
 msgid "Events"
 msgstr "Okazoj"
 
@@ -284,8 +286,9 @@ msgstr "Agordi al horzono de la leganto"
 msgid "Description:"
 msgstr "Priskribo"
 
-#: ../../mod/events.php:429 ../../include/event.php:40
-#: ../../include/bb2diaspora.php:357 ../../boot.php:1136
+#: ../../mod/events.php:429 ../../mod/directory.php:132
+#: ../../include/event.php:40 ../../include/bb2diaspora.php:469
+#: ../../boot.php:1173
 msgid "Location:"
 msgstr "Loko:"
 
@@ -350,7 +353,7 @@ msgstr "Ĉu rajtigi ĉi tiun programon por atingi viajn afiŝojn kaj kontaktojn 
 #: ../../mod/settings.php:958 ../../mod/settings.php:959
 #: ../../mod/settings.php:960 ../../mod/settings.php:961
 #: ../../mod/settings.php:962 ../../mod/register.php:234
-#: ../../mod/profiles.php:546
+#: ../../mod/profiles.php:554
 msgid "Yes"
 msgstr "Jes"
 
@@ -362,23 +365,23 @@ msgstr "Jes"
 #: ../../mod/settings.php:958 ../../mod/settings.php:959
 #: ../../mod/settings.php:960 ../../mod/settings.php:961
 #: ../../mod/settings.php:962 ../../mod/register.php:235
-#: ../../mod/profiles.php:547
+#: ../../mod/profiles.php:555
 msgid "No"
 msgstr "Ne"
 
-#: ../../mod/photos.php:46 ../../boot.php:1553
+#: ../../mod/photos.php:46 ../../boot.php:1590
 msgid "Photo Albums"
 msgstr "Bildalbumoj"
 
-#: ../../mod/photos.php:54 ../../mod/photos.php:156 ../../mod/photos.php:965
-#: ../../mod/photos.php:1049 ../../mod/photos.php:1064
-#: ../../mod/photos.php:1492 ../../mod/photos.php:1504
+#: ../../mod/photos.php:54 ../../mod/photos.php:156 ../../mod/photos.php:971
+#: ../../mod/photos.php:1055 ../../mod/photos.php:1070
+#: ../../mod/photos.php:1498 ../../mod/photos.php:1510
 #: ../../addon/communityhome/communityhome.php:110
 #: ../../view/theme/diabook/theme.php:598
 msgid "Contact Photos"
 msgstr "Kontaktbildoj"
 
-#: ../../mod/photos.php:61 ../../mod/photos.php:1074 ../../mod/photos.php:1542
+#: ../../mod/photos.php:61 ../../mod/photos.php:1080 ../../mod/photos.php:1548
 msgid "Upload New Photos"
 msgstr "Alŝuti novajn bildojn"
 
@@ -390,11 +393,11 @@ msgstr "ĉiuj"
 msgid "Contact information unavailable"
 msgstr "Kontaktoj informoj ne disponeblas"
 
-#: ../../mod/photos.php:156 ../../mod/photos.php:660 ../../mod/photos.php:1049
-#: ../../mod/photos.php:1064 ../../mod/profile_photo.php:60
+#: ../../mod/photos.php:156 ../../mod/photos.php:660 ../../mod/photos.php:1055
+#: ../../mod/photos.php:1070 ../../mod/profile_photo.php:60
 #: ../../mod/profile_photo.php:67 ../../mod/profile_photo.php:74
-#: ../../mod/profile_photo.php:176 ../../mod/profile_photo.php:254
-#: ../../mod/profile_photo.php:263
+#: ../../mod/profile_photo.php:177 ../../mod/profile_photo.php:261
+#: ../../mod/profile_photo.php:270
 #: ../../addon/communityhome/communityhome.php:111
 #: ../../view/theme/diabook/theme.php:599 ../../include/user.php:304
 #: ../../include/user.php:311 ../../include/user.php:318
@@ -405,11 +408,11 @@ msgstr "Profilbildoj"
 msgid "Album not found."
 msgstr "Albumo ne trovita."
 
-#: ../../mod/photos.php:184 ../../mod/photos.php:1058
+#: ../../mod/photos.php:184 ../../mod/photos.php:1064
 msgid "Delete Album"
 msgstr "Forviŝi albumon"
 
-#: ../../mod/photos.php:247 ../../mod/photos.php:1304
+#: ../../mod/photos.php:247 ../../mod/photos.php:1310
 msgid "Delete Photo"
 msgstr "Forviŝi bildon"
 
@@ -417,11 +420,11 @@ msgstr "Forviŝi bildon"
 msgid "was tagged in a"
 msgstr "estas markita en"
 
-#: ../../mod/photos.php:591 ../../mod/like.php:144 ../../mod/tagger.php:70
+#: ../../mod/photos.php:591 ../../mod/like.php:145 ../../mod/tagger.php:70
 #: ../../addon/communityhome/communityhome.php:163
-#: ../../view/theme/diabook/theme.php:570 ../../include/text.php:1317
-#: ../../include/diaspora.php:1710 ../../include/conversation.php:53
-#: ../../include/conversation.php:126
+#: ../../view/theme/diabook/theme.php:570 ../../include/text.php:1346
+#: ../../include/diaspora.php:1793 ../../include/conversation.php:114
+#: ../../include/conversation.php:187
 msgid "photo"
 msgstr "bildo"
 
@@ -442,170 +445,177 @@ msgstr "Bilddosiero estas malplena."
 msgid "Unable to process image."
 msgstr "Ne eblas procedi la bildon."
 
-#: ../../mod/photos.php:757 ../../mod/profile_photo.php:259
-#: ../../mod/wall_upload.php:118
+#: ../../mod/photos.php:763 ../../mod/profile_photo.php:266
+#: ../../mod/wall_upload.php:125
 msgid "Image upload failed."
 msgstr "Alŝuto de bildo malsukcesis."
 
-#: ../../mod/photos.php:843 ../../mod/community.php:16
+#: ../../mod/photos.php:849 ../../mod/community.php:16
 #: ../../mod/dfrn_request.php:759 ../../mod/viewcontacts.php:17
 #: ../../mod/display.php:7 ../../mod/search.php:71 ../../mod/directory.php:29
 msgid "Public access denied."
 msgstr "Publika atingo ne permesita."
 
-#: ../../mod/photos.php:853
+#: ../../mod/photos.php:859
 msgid "No photos selected"
 msgstr "Neniu bildoj elektita"
 
-#: ../../mod/photos.php:932
+#: ../../mod/photos.php:938
 msgid "Access to this item is restricted."
 msgstr "Atingo al tio elemento estas limigita."
 
-#: ../../mod/photos.php:996
+#: ../../mod/photos.php:1002
 #, php-format
 msgid "You have used %1$.2f Mbytes of %2$.2f Mbytes photo storage."
 msgstr "Vi uzas %1$.2f MB de %2$.2f MB bildkonservejo."
 
-#: ../../mod/photos.php:999
+#: ../../mod/photos.php:1005
 #, php-format
 msgid "You have used %1$.2f Mbytes of photo storage."
 msgstr "Vi uzas %1$.2f MB de bildkonservejo."
 
-#: ../../mod/photos.php:1005
+#: ../../mod/photos.php:1011
 msgid "Upload Photos"
 msgstr "Alŝuti bildojn"
 
-#: ../../mod/photos.php:1009 ../../mod/photos.php:1053
+#: ../../mod/photos.php:1015 ../../mod/photos.php:1059
 msgid "New album name: "
 msgstr "Nomo por nova albumo:"
 
-#: ../../mod/photos.php:1010
+#: ../../mod/photos.php:1016
 msgid "or existing album name: "
 msgstr "aŭ nomo de estanta albumo:"
 
-#: ../../mod/photos.php:1011
+#: ../../mod/photos.php:1017
 msgid "Do not show a status post for this upload"
 msgstr "Ne kreu statan afiŝon por tio alŝuto."
 
-#: ../../mod/photos.php:1013 ../../mod/photos.php:1299
+#: ../../mod/photos.php:1019 ../../mod/photos.php:1305
 msgid "Permissions"
 msgstr "Permesoj"
 
-#: ../../mod/photos.php:1068
+#: ../../mod/photos.php:1074
 msgid "Edit Album"
 msgstr "Redakti albumon"
 
-#: ../../mod/photos.php:1092 ../../mod/photos.php:1525
+#: ../../mod/photos.php:1098 ../../mod/photos.php:1531
 msgid "View Photo"
 msgstr "Vidi bildon"
 
-#: ../../mod/photos.php:1127
+#: ../../mod/photos.php:1133
 msgid "Permission denied. Access to this item may be restricted."
 msgstr "Malpermesita. Atingo al tio elemento eble estas limigita."
 
-#: ../../mod/photos.php:1129
+#: ../../mod/photos.php:1135
 msgid "Photo not available"
 msgstr "La bildo ne disponeblas"
 
-#: ../../mod/photos.php:1179
+#: ../../mod/photos.php:1185
 msgid "View photo"
 msgstr "Vidi bildon"
 
-#: ../../mod/photos.php:1179
+#: ../../mod/photos.php:1185
 msgid "Edit photo"
 msgstr "Redakti bildon"
 
-#: ../../mod/photos.php:1180
+#: ../../mod/photos.php:1186
 msgid "Use as profile photo"
 msgstr "Uzi kiel profilbildo"
 
-#: ../../mod/photos.php:1186 ../../include/conversation.php:490
+#: ../../mod/photos.php:1192 ../../mod/content.php:601
+#: ../../include/conversation.php:563
 msgid "Private Message"
 msgstr "Privata mesaĝo"
 
-#: ../../mod/photos.php:1208
+#: ../../mod/photos.php:1214
 msgid "View Full Size"
 msgstr "Vidi plengrande "
 
-#: ../../mod/photos.php:1276
+#: ../../mod/photos.php:1282
 msgid "Tags: "
 msgstr "Markoj:"
 
-#: ../../mod/photos.php:1279
+#: ../../mod/photos.php:1285
 msgid "[Remove any tag]"
 msgstr "[Forviŝi iun markon]"
 
-#: ../../mod/photos.php:1289
+#: ../../mod/photos.php:1295
 msgid "Rotate CW (right)"
 msgstr "Turni horloĝdirekte (dekstren)"
 
-#: ../../mod/photos.php:1290
+#: ../../mod/photos.php:1296
 msgid "Rotate CCW (left)"
 msgstr "Turni kontraŭhorloĝdirekte (maldekstren)"
 
-#: ../../mod/photos.php:1292
+#: ../../mod/photos.php:1298
 msgid "New album name"
 msgstr "Nova nomo de albumo"
 
-#: ../../mod/photos.php:1295
+#: ../../mod/photos.php:1301
 msgid "Caption"
 msgstr "Apudskribo"
 
-#: ../../mod/photos.php:1297
+#: ../../mod/photos.php:1303
 msgid "Add a Tag"
 msgstr "Aldoni markon"
 
-#: ../../mod/photos.php:1301
+#: ../../mod/photos.php:1307
 msgid ""
 "Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
 msgstr "Ekzemple: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
 
-#: ../../mod/photos.php:1321 ../../include/conversation.php:554
+#: ../../mod/photos.php:1327 ../../mod/content.php:665
+#: ../../include/conversation.php:627
 msgid "I like this (toggle)"
 msgstr "Mi ŝatas tion (ŝalti)"
 
-#: ../../mod/photos.php:1322 ../../include/conversation.php:555
+#: ../../mod/photos.php:1328 ../../mod/content.php:666
+#: ../../include/conversation.php:628
 msgid "I don't like this (toggle)"
 msgstr "Mi malŝatas tion(ŝalti)"
 
-#: ../../mod/photos.php:1323 ../../include/conversation.php:993
+#: ../../mod/photos.php:1329 ../../include/conversation.php:1066
 msgid "Share"
 msgstr "Kunhavigi"
 
-#: ../../mod/photos.php:1324 ../../mod/editpost.php:104
-#: ../../mod/wallmessage.php:145 ../../mod/message.php:215
-#: ../../mod/message.php:411 ../../include/conversation.php:371
-#: ../../include/conversation.php:731 ../../include/conversation.php:1012
+#: ../../mod/photos.php:1330 ../../mod/editpost.php:104
+#: ../../mod/content.php:482 ../../mod/content.php:842
+#: ../../mod/wallmessage.php:145 ../../mod/message.php:293
+#: ../../mod/message.php:474 ../../include/conversation.php:444
+#: ../../include/conversation.php:804 ../../include/conversation.php:1085
 msgid "Please wait"
 msgstr "Bonvolu atendi"
 
-#: ../../mod/photos.php:1340 ../../mod/photos.php:1380
-#: ../../mod/photos.php:1411 ../../include/conversation.php:577
+#: ../../mod/photos.php:1346 ../../mod/photos.php:1386
+#: ../../mod/photos.php:1417 ../../mod/content.php:688
+#: ../../include/conversation.php:650
 msgid "This is you"
 msgstr "Tiu estas vi"
 
-#: ../../mod/photos.php:1342 ../../mod/photos.php:1382
-#: ../../mod/photos.php:1413 ../../include/conversation.php:579
-#: ../../boot.php:528
+#: ../../mod/photos.php:1348 ../../mod/photos.php:1388
+#: ../../mod/photos.php:1419 ../../mod/content.php:690
+#: ../../include/conversation.php:652 ../../boot.php:565
 msgid "Comment"
 msgstr "Komenti"
 
-#: ../../mod/photos.php:1344 ../../mod/editpost.php:125
-#: ../../include/conversation.php:589 ../../include/conversation.php:1030
+#: ../../mod/photos.php:1350 ../../mod/editpost.php:125
+#: ../../mod/content.php:700 ../../include/conversation.php:662
+#: ../../include/conversation.php:1103
 msgid "Preview"
 msgstr "Antaŭrigardi"
 
-#: ../../mod/photos.php:1441 ../../mod/settings.php:618
-#: ../../mod/settings.php:707 ../../mod/group.php:168 ../../mod/admin.php:663
-#: ../../include/conversation.php:328 ../../include/conversation.php:609
+#: ../../mod/photos.php:1447 ../../mod/content.php:439
+#: ../../mod/content.php:720 ../../mod/settings.php:618
+#: ../../mod/settings.php:707 ../../mod/group.php:168 ../../mod/admin.php:665
+#: ../../include/conversation.php:401 ../../include/conversation.php:682
 msgid "Delete"
 msgstr "Forviŝi"
 
-#: ../../mod/photos.php:1531
+#: ../../mod/photos.php:1537
 msgid "View Album"
 msgstr "Vidi albumon"
 
-#: ../../mod/photos.php:1540
+#: ../../mod/photos.php:1546
 msgid "Recent Photos"
 msgstr "̂Ĵusaj bildoj"
 
@@ -618,7 +628,8 @@ msgstr "Ne disponebla."
 msgid "Community"
 msgstr "Komunumo"
 
-#: ../../mod/community.php:61 ../../mod/search.php:144
+#: ../../mod/community.php:61 ../../mod/community.php:86
+#: ../../mod/search.php:146 ../../mod/search.php:172
 msgid "No results."
 msgstr "Nenion trovita."
 
@@ -662,28 +673,28 @@ msgstr "Elemento ne trovita"
 msgid "Edit post"
 msgstr "Redakti afiŝon"
 
-#: ../../mod/editpost.php:80 ../../include/conversation.php:979
+#: ../../mod/editpost.php:80 ../../include/conversation.php:1052
 msgid "Post to Email"
 msgstr "Sendi per retpoŝto"
 
-#: ../../mod/editpost.php:95 ../../mod/settings.php:617
-#: ../../include/conversation.php:596
+#: ../../mod/editpost.php:95 ../../mod/content.php:707
+#: ../../mod/settings.php:617 ../../include/conversation.php:669
 msgid "Edit"
 msgstr "Redakti"
 
 #: ../../mod/editpost.php:96 ../../mod/wallmessage.php:143
-#: ../../mod/message.php:213 ../../mod/message.php:408
-#: ../../include/conversation.php:994
+#: ../../mod/message.php:291 ../../mod/message.php:471
+#: ../../include/conversation.php:1067
 msgid "Upload photo"
 msgstr "Alŝuti bildon"
 
-#: ../../mod/editpost.php:97 ../../include/conversation.php:996
+#: ../../mod/editpost.php:97 ../../include/conversation.php:1069
 msgid "Attach file"
 msgstr "Kunligi dosieron"
 
 #: ../../mod/editpost.php:98 ../../mod/wallmessage.php:144
-#: ../../mod/message.php:214 ../../mod/message.php:409
-#: ../../include/conversation.php:998
+#: ../../mod/message.php:292 ../../mod/message.php:472
+#: ../../include/conversation.php:1071
 msgid "Insert web link"
 msgstr "Enmeti retan adreson"
 
@@ -699,35 +710,35 @@ msgstr "Enmeti videton en formato Vorbis [.ogg]"
 msgid "Insert Vorbis [.ogg] audio"
 msgstr "Enmeti sonon en formato Vorbis [.ogg]"
 
-#: ../../mod/editpost.php:102 ../../include/conversation.php:1004
+#: ../../mod/editpost.php:102 ../../include/conversation.php:1077
 msgid "Set your location"
 msgstr "Agordi vian lokon"
 
-#: ../../mod/editpost.php:103 ../../include/conversation.php:1006
+#: ../../mod/editpost.php:103 ../../include/conversation.php:1079
 msgid "Clear browser location"
 msgstr "Forviŝu retesplorilan lokon"
 
-#: ../../mod/editpost.php:105 ../../include/conversation.php:1013
+#: ../../mod/editpost.php:105 ../../include/conversation.php:1086
 msgid "Permission settings"
 msgstr "Permesagordoj"
 
-#: ../../mod/editpost.php:113 ../../include/conversation.php:1022
+#: ../../mod/editpost.php:113 ../../include/conversation.php:1095
 msgid "CC: email addresses"
 msgstr "CC: retpoŝtadresojn"
 
-#: ../../mod/editpost.php:114 ../../include/conversation.php:1023
+#: ../../mod/editpost.php:114 ../../include/conversation.php:1096
 msgid "Public post"
 msgstr "Publika afiŝo"
 
-#: ../../mod/editpost.php:117 ../../include/conversation.php:1009
+#: ../../mod/editpost.php:117 ../../include/conversation.php:1082
 msgid "Set title"
 msgstr "Redakti titolon"
 
-#: ../../mod/editpost.php:119 ../../include/conversation.php:1011
+#: ../../mod/editpost.php:119 ../../include/conversation.php:1084
 msgid "Categories (comma-separated list)"
 msgstr "Kategorioj (disigita per komo)"
 
-#: ../../mod/editpost.php:120 ../../include/conversation.php:1025
+#: ../../mod/editpost.php:120 ../../include/conversation.php:1098
 msgid "Example: bob@example.com, mary@example.com"
 msgstr "Ekzemple: bob@example.com, mary@example.com"
 
@@ -848,7 +859,7 @@ msgstr "Bonvolu konfirmi vian prezenton / kontaktpeton al %s."
 msgid "Confirm"
 msgstr "Konfirmi."
 
-#: ../../mod/dfrn_request.php:715 ../../include/items.php:2881
+#: ../../mod/dfrn_request.php:715 ../../include/items.php:2984
 msgid "[Name Withheld]"
 msgstr "[Kaŝita nomo]"
 
@@ -1175,7 +1186,7 @@ msgid ""
 msgstr "GRAVA: Vi bezonas [mane] agordi planitan taskon por la Friendica poller."
 
 #: ../../mod/localtime.php:12 ../../include/event.php:11
-#: ../../include/bb2diaspora.php:335
+#: ../../include/bb2diaspora.php:447
 msgid "l F d, Y \\@ g:i A"
 msgstr "l F d, Y \\@ g:i A"
 
@@ -1221,7 +1232,7 @@ msgid "is interested in:"
 msgstr "interesiĝas pri:"
 
 #: ../../mod/match.php:58 ../../mod/suggest.php:59
-#: ../../include/contact_widgets.php:9 ../../boot.php:1080
+#: ../../include/contact_widgets.php:9 ../../boot.php:1117
 msgid "Connect"
 msgstr "Konekti"
 
@@ -1236,6 +1247,138 @@ msgstr "Informoj pri fora privateca ne estas disponebla."
 #: ../../mod/lockview.php:43
 msgid "Visible to:"
 msgstr "Videbla al:"
+
+#: ../../mod/content.php:119 ../../mod/network.php:436
+msgid "No such group"
+msgstr "Grupo ne estas trovita"
+
+#: ../../mod/content.php:130 ../../mod/network.php:447
+msgid "Group is empty"
+msgstr "Grupo estas malplena"
+
+#: ../../mod/content.php:134 ../../mod/network.php:451
+msgid "Group: "
+msgstr "Grupo:"
+
+#: ../../mod/content.php:438 ../../mod/content.php:719
+#: ../../include/conversation.php:400 ../../include/conversation.php:681
+msgid "Select"
+msgstr "Elekti"
+
+#: ../../mod/content.php:455 ../../mod/content.php:812
+#: ../../mod/content.php:813 ../../include/conversation.php:417
+#: ../../include/conversation.php:774 ../../include/conversation.php:775
+#, php-format
+msgid "View %s's profile @ %s"
+msgstr "Vidi la profilon de %s ĉe %s"
+
+#: ../../mod/content.php:465 ../../mod/content.php:824
+#: ../../include/conversation.php:427 ../../include/conversation.php:786
+#, php-format
+msgid "%s from %s"
+msgstr "%s de %s"
+
+#: ../../mod/content.php:480 ../../include/conversation.php:442
+msgid "View in context"
+msgstr "Vidi kun kunteksto"
+
+#: ../../mod/content.php:586 ../../include/conversation.php:548
+#, php-format
+msgid "%d comment"
+msgid_plural "%d comments"
+msgstr[0] "%d komento"
+msgstr[1] "%d komentoj"
+
+#: ../../mod/content.php:587 ../../addon/page/page.php:76
+#: ../../addon/page/page.php:110 ../../addon/showmore/showmore.php:87
+#: ../../include/contact_widgets.php:188 ../../include/conversation.php:549
+#: ../../boot.php:566
+msgid "show more"
+msgstr "montri pli"
+
+#: ../../mod/content.php:665 ../../include/conversation.php:627
+msgid "like"
+msgstr "ŝati"
+
+#: ../../mod/content.php:666 ../../include/conversation.php:628
+msgid "dislike"
+msgstr "malŝati"
+
+#: ../../mod/content.php:668 ../../include/conversation.php:630
+msgid "Share this"
+msgstr "Kunhavigi ĉi tiun"
+
+#: ../../mod/content.php:668 ../../include/conversation.php:630
+msgid "share"
+msgstr "kunhavigi"
+
+#: ../../mod/content.php:692 ../../include/conversation.php:654
+msgid "Bold"
+msgstr "Grasa"
+
+#: ../../mod/content.php:693 ../../include/conversation.php:655
+msgid "Italic"
+msgstr "Kursiva"
+
+#: ../../mod/content.php:694 ../../include/conversation.php:656
+msgid "Underline"
+msgstr "Substreki"
+
+#: ../../mod/content.php:695 ../../include/conversation.php:657
+msgid "Quote"
+msgstr "Citaĵo"
+
+#: ../../mod/content.php:696 ../../include/conversation.php:658
+msgid "Code"
+msgstr "Kodo"
+
+#: ../../mod/content.php:697 ../../include/conversation.php:659
+msgid "Image"
+msgstr "Bildo"
+
+#: ../../mod/content.php:698 ../../include/conversation.php:660
+msgid "Link"
+msgstr "Ligilo"
+
+#: ../../mod/content.php:699 ../../include/conversation.php:661
+msgid "Video"
+msgstr "Video"
+
+#: ../../mod/content.php:732 ../../include/conversation.php:694
+msgid "add star"
+msgstr "aldoni stelon"
+
+#: ../../mod/content.php:733 ../../include/conversation.php:695
+msgid "remove star"
+msgstr "forpreni stelon"
+
+#: ../../mod/content.php:734 ../../include/conversation.php:696
+msgid "toggle star status"
+msgstr "ŝalti/malŝalti steloŝtato"
+
+#: ../../mod/content.php:737 ../../include/conversation.php:699
+msgid "starred"
+msgstr "steligita"
+
+#: ../../mod/content.php:738 ../../include/conversation.php:700
+msgid "add tag"
+msgstr "aldoni markon"
+
+#: ../../mod/content.php:742 ../../include/conversation.php:704
+msgid "save to folder"
+msgstr "konservi en dosierujo"
+
+#: ../../mod/content.php:814 ../../include/conversation.php:776
+msgid "to"
+msgstr "al"
+
+#: ../../mod/content.php:815 ../../include/conversation.php:777
+msgid "Wall-to-Wall"
+msgstr "Muro-al-Muro"
+
+#: ../../mod/content.php:816 ../../include/conversation.php:778
+msgid "via Wall-To-Wall:"
+msgstr "per Muro-al-Muro:"
 
 #: ../../mod/home.php:26 ../../addon/communityhome/communityhome.php:179
 #, php-format
@@ -1278,7 +1421,7 @@ msgstr "Hejmo"
 msgid "Introductions"
 msgstr "Prezentoj"
 
-#: ../../mod/notifications.php:100 ../../mod/message.php:105
+#: ../../mod/notifications.php:100 ../../mod/message.php:183
 #: ../../include/nav.php:128
 msgid "Messages"
 msgstr "Mesaĝoj"
@@ -1318,7 +1461,7 @@ msgid "if applicable"
 msgstr "se aplikebla"
 
 #: ../../mod/notifications.php:157 ../../mod/notifications.php:204
-#: ../../mod/admin.php:661
+#: ../../mod/admin.php:663
 msgid "Approve"
 msgstr "Aprobi"
 
@@ -1519,12 +1662,12 @@ msgid "View all contacts"
 msgstr "Vidi ĉiujn kontaktojn"
 
 #: ../../mod/contacts.php:310 ../../mod/contacts.php:369
-#: ../../mod/admin.php:665
+#: ../../mod/admin.php:667
 msgid "Unblock"
 msgstr "Malbloki"
 
 #: ../../mod/contacts.php:310 ../../mod/contacts.php:369
-#: ../../mod/admin.php:664
+#: ../../mod/admin.php:666
 msgid "Block"
 msgstr "Bloki"
 
@@ -1621,7 +1764,7 @@ msgstr "Plej ĵusa ĝisdatigo:"
 msgid "Update public posts"
 msgstr "Ĝisdatigi publikajn afiŝojn"
 
-#: ../../mod/contacts.php:366 ../../mod/admin.php:1136
+#: ../../mod/contacts.php:366 ../../mod/admin.php:1138
 msgid "Update now"
 msgstr "Ĝisdatigi nun"
 
@@ -1748,11 +1891,11 @@ msgstr "Pasvorta riparado petita je %s"
 #: ../../mod/lostpass.php:45 ../../mod/lostpass.php:107
 #: ../../mod/register.php:90 ../../mod/register.php:144
 #: ../../mod/regmod.php:54 ../../mod/dfrn_confirm.php:752
-#: ../../addon/facebook/facebook.php:700
-#: ../../addon/facebook/facebook.php:1190
+#: ../../addon/facebook/facebook.php:702
+#: ../../addon/facebook/facebook.php:1192
 #: ../../addon/public_server/public_server.php:62
-#: ../../addon/testdrive/testdrive.php:67 ../../include/items.php:2890
-#: ../../boot.php:730
+#: ../../addon/testdrive/testdrive.php:67 ../../include/items.php:2993
+#: ../../boot.php:767
 msgid "Administrator"
 msgstr "Administranto"
 
@@ -1762,7 +1905,7 @@ msgid ""
 "Password reset failed."
 msgstr "Ne povis konfirmi la peton. (Eble vi sendis ĝin antaŭ.) Pasvorta riparado malsukcesis."
 
-#: ../../mod/lostpass.php:83 ../../boot.php:862
+#: ../../mod/lostpass.php:83 ../../boot.php:899
 msgid "Password Reset"
 msgstr "Pasvorta riparado"
 
@@ -1834,7 +1977,7 @@ msgstr "Eksporto"
 msgid "Remove account"
 msgstr "Forigi konton"
 
-#: ../../mod/settings.php:89 ../../mod/admin.php:751 ../../mod/admin.php:956
+#: ../../mod/settings.php:89 ../../mod/admin.php:753 ../../mod/admin.php:958
 #: ../../addon/dav/layout.fnk.php:116 ../../addon/mathjax/mathjax.php:36
 #: ../../view/theme/diabook/theme.php:643
 #: ../../view/theme/diabook/theme.php:773 ../../include/nav.php:137
@@ -1897,7 +2040,7 @@ msgstr "Privata forumo ne havas privatecajn agordojn. Defaŭlta privateca grupo 
 msgid "Private forum has no privacy permissions and no default privacy group."
 msgstr "Privata forumo havas nek privatecajn agordojn nek defaŭltan privatecan grupon."
 
-#: ../../mod/settings.php:484 ../../addon/facebook/facebook.php:493
+#: ../../mod/settings.php:484 ../../addon/facebook/facebook.php:495
 #: ../../addon/impressum/impressum.php:77
 #: ../../addon/openstreetmap/openstreetmap.php:80
 #: ../../addon/mathjax/mathjax.php:66 ../../addon/piwik/piwik.php:105
@@ -2156,7 +2299,7 @@ msgstr "Permesigi nekonatulojn sendi retpoŝton al vi?"
 msgid "Profile is <strong>not published</strong>."
 msgstr "Profilo <strong>ne estas publika</strong>."
 
-#: ../../mod/settings.php:939 ../../mod/profile_photo.php:213
+#: ../../mod/settings.php:939 ../../mod/profile_photo.php:214
 msgid "or"
 msgstr "aŭ"
 
@@ -2414,18 +2557,6 @@ msgstr[1] "Averto: La grupo enhavas %s membrojn el nesekuraj retejoj."
 msgid "Private messages to this group are at risk of public disclosure."
 msgstr "La privateco de privataj mesaĝoj al ĉi tiu grupo ne ĉiam estas garantita."
 
-#: ../../mod/network.php:436
-msgid "No such group"
-msgstr "Grupo ne estas trovita"
-
-#: ../../mod/network.php:447
-msgid "Group is empty"
-msgstr "Grupo estas malplena"
-
-#: ../../mod/network.php:451
-msgid "Group: "
-msgstr "Grupo:"
-
 #: ../../mod/network.php:461
 msgid "Contact: "
 msgstr "Kontakto:"
@@ -2438,14 +2569,14 @@ msgstr "La privateco de privataj mesaĝoj al ĉi tiu persono ne ĉiam estas gara
 msgid "Invalid contact."
 msgstr "Nevalida kontakto."
 
-#: ../../mod/notes.php:44 ../../boot.php:1565
+#: ../../mod/notes.php:44 ../../boot.php:1602
 msgid "Personal Notes"
 msgstr "Personaj Notoj"
 
 #: ../../mod/notes.php:63 ../../mod/filer.php:30
-#: ../../addon/facebook/facebook.php:768
+#: ../../addon/facebook/facebook.php:770
 #: ../../addon/privacy_image_cache/privacy_image_cache.php:187
-#: ../../addon/dav/layout.fnk.php:384 ../../include/text.php:652
+#: ../../addon/dav/layout.fnk.php:384 ../../include/text.php:677
 msgid "Save"
 msgstr "Konservi"
 
@@ -2478,12 +2609,12 @@ msgstr "Mesaĝo estas sendita."
 msgid "No recipient."
 msgstr "Neniom da ricevontoj."
 
-#: ../../mod/wallmessage.php:124 ../../mod/message.php:172
-#: ../../include/conversation.php:947
+#: ../../mod/wallmessage.php:124 ../../mod/message.php:250
+#: ../../include/conversation.php:1020
 msgid "Please enter a link URL:"
 msgstr "Bonvolu entajpu adreson de ligilo:"
 
-#: ../../mod/wallmessage.php:131 ../../mod/message.php:200
+#: ../../mod/wallmessage.php:131 ../../mod/message.php:278
 msgid "Send Private Message"
 msgstr "Sendi Privatan Mesaĝon"
 
@@ -2494,18 +2625,18 @@ msgid ""
 "your site allow private mail from unknown senders."
 msgstr "Se vi deziras ke %s respondu, bonvolu kontroli ke la privatecaj agordoj je via retejo permesas privatajn mesaĝojn de nekonataj sendantoj."
 
-#: ../../mod/wallmessage.php:133 ../../mod/message.php:201
-#: ../../mod/message.php:399
+#: ../../mod/wallmessage.php:133 ../../mod/message.php:279
+#: ../../mod/message.php:462
 msgid "To:"
 msgstr "Al:"
 
-#: ../../mod/wallmessage.php:134 ../../mod/message.php:206
-#: ../../mod/message.php:401
+#: ../../mod/wallmessage.php:134 ../../mod/message.php:284
+#: ../../mod/message.php:464
 msgid "Subject:"
 msgstr "Temo:"
 
-#: ../../mod/wallmessage.php:140 ../../mod/message.php:210
-#: ../../mod/message.php:404 ../../mod/invite.php:113
+#: ../../mod/wallmessage.php:140 ../../mod/message.php:288
+#: ../../mod/message.php:467 ../../mod/invite.php:113
 msgid "Your message:"
 msgstr "Via mesaĝo:"
 
@@ -2689,7 +2820,7 @@ msgstr "Redaktilo por profila videbleco."
 
 #: ../../mod/profperm.php:103 ../../view/theme/diabook/theme.php:128
 #: ../../include/profile_advanced.php:7 ../../include/profile_advanced.php:84
-#: ../../include/nav.php:50 ../../boot.php:1544
+#: ../../include/nav.php:50 ../../boot.php:1581
 msgid "Profile"
 msgstr "Profilo"
 
@@ -2705,7 +2836,7 @@ msgstr "Ĉiuj Kontaktoj (kun sekura atingo al la profilo)"
 msgid "No contacts."
 msgstr "Neniu kontaktojn."
 
-#: ../../mod/viewcontacts.php:76 ../../include/text.php:589
+#: ../../mod/viewcontacts.php:76 ../../include/text.php:614
 msgid "View Contacts"
 msgstr "Vidi Kontaktojn"
 
@@ -2770,7 +2901,7 @@ msgstr "Membriĝi ĉi tie nur eblas laŭ invito."
 msgid "Your invitation ID: "
 msgstr "Via invita idento: "
 
-#: ../../mod/register.php:255 ../../mod/admin.php:421
+#: ../../mod/register.php:255 ../../mod/admin.php:423
 msgid "Registration"
 msgstr "Registrado"
 
@@ -2793,7 +2924,7 @@ msgstr "Elektu kaŝnomon por la profilo. Tiu bezonas komenci kun teksta litero. 
 msgid "Choose a nickname: "
 msgstr "Elektu kaŝnomon: "
 
-#: ../../mod/register.php:269 ../../include/nav.php:81 ../../boot.php:828
+#: ../../mod/register.php:269 ../../include/nav.php:81 ../../boot.php:865
 msgid "Register"
 msgstr "Registri"
 
@@ -2801,33 +2932,33 @@ msgstr "Registri"
 msgid "People Search"
 msgstr "Serĉi Membrojn"
 
-#: ../../mod/like.php:144 ../../mod/like.php:301 ../../mod/tagger.php:70
-#: ../../addon/facebook/facebook.php:1584
+#: ../../mod/like.php:145 ../../mod/like.php:298 ../../mod/tagger.php:70
+#: ../../addon/facebook/facebook.php:1586
 #: ../../addon/communityhome/communityhome.php:158
 #: ../../addon/communityhome/communityhome.php:167
 #: ../../view/theme/diabook/theme.php:565
-#: ../../view/theme/diabook/theme.php:574 ../../include/diaspora.php:1710
-#: ../../include/conversation.php:48 ../../include/conversation.php:57
-#: ../../include/conversation.php:121 ../../include/conversation.php:130
+#: ../../view/theme/diabook/theme.php:574 ../../include/diaspora.php:1793
+#: ../../include/conversation.php:109 ../../include/conversation.php:118
+#: ../../include/conversation.php:182 ../../include/conversation.php:191
 msgid "status"
 msgstr "staton"
 
-#: ../../mod/like.php:161 ../../addon/facebook/facebook.php:1588
+#: ../../mod/like.php:162 ../../addon/facebook/facebook.php:1590
 #: ../../addon/communityhome/communityhome.php:172
-#: ../../view/theme/diabook/theme.php:579 ../../include/diaspora.php:1726
-#: ../../include/conversation.php:65
+#: ../../view/theme/diabook/theme.php:579 ../../include/diaspora.php:1809
+#: ../../include/conversation.php:126
 #, php-format
 msgid "%1$s likes %2$s's %3$s"
 msgstr "%1$s ŝatas la %3$s de %2$s"
 
-#: ../../mod/like.php:163 ../../include/conversation.php:68
+#: ../../mod/like.php:164 ../../include/conversation.php:129
 #, php-format
 msgid "%1$s doesn't like %2$s's %3$s"
 msgstr "%1$s malŝatas la %3$s de %2$s"
 
 #: ../../mod/notice.php:15 ../../mod/viewsrc.php:15 ../../mod/admin.php:159
-#: ../../mod/admin.php:700 ../../mod/admin.php:899 ../../mod/display.php:37
-#: ../../mod/display.php:142 ../../include/items.php:3334
+#: ../../mod/admin.php:702 ../../mod/admin.php:901 ../../mod/display.php:37
+#: ../../mod/display.php:142 ../../include/items.php:3472
 msgid "Item not found."
 msgstr "Elemento ne estas trovita."
 
@@ -2836,7 +2967,7 @@ msgid "Access denied."
 msgstr "Atingo nepermesita."
 
 #: ../../mod/fbrowser.php:25 ../../view/theme/diabook/theme.php:130
-#: ../../include/nav.php:51 ../../boot.php:1550
+#: ../../include/nav.php:51 ../../boot.php:1587
 msgid "Photos"
 msgstr "Bildoj"
 
@@ -2857,43 +2988,43 @@ msgstr "Registraĵo por %s senvalidigita."
 msgid "Please login."
 msgstr "Bonvolu ensaluti."
 
-#: ../../mod/item.php:89
+#: ../../mod/item.php:90
 msgid "Unable to locate original post."
 msgstr "Ne eblas trovi originalan afiŝon."
 
-#: ../../mod/item.php:258
+#: ../../mod/item.php:274
 msgid "Empty post discarded."
 msgstr "Forviŝis malplenan afiŝon."
 
-#: ../../mod/item.php:379 ../../mod/wall_upload.php:115
-#: ../../mod/wall_upload.php:124 ../../mod/wall_upload.php:131
+#: ../../mod/item.php:395 ../../mod/wall_upload.php:122
+#: ../../mod/wall_upload.php:131 ../../mod/wall_upload.php:138
 #: ../../include/message.php:144
 msgid "Wall Photos"
 msgstr "Muraj Bildoj"
 
-#: ../../mod/item.php:784
+#: ../../mod/item.php:800
 msgid "System error. Post not saved."
 msgstr "Sistema eraro. Afiŝo ne registrita."
 
-#: ../../mod/item.php:809
+#: ../../mod/item.php:825
 #, php-format
 msgid ""
 "This message was sent to you by %s, a member of the Friendica social "
 "network."
 msgstr "Ĉi mesaĝo estas sendita al vi de %s, membro de la Friendica interkona reto."
 
-#: ../../mod/item.php:811
+#: ../../mod/item.php:827
 #, php-format
 msgid "You may visit them online at %s"
 msgstr "Vi povas viziti ilin rete ĉe %s"
 
-#: ../../mod/item.php:812
+#: ../../mod/item.php:828
 msgid ""
 "Please contact the sender by replying to this post if you do not wish to "
 "receive these messages."
 msgstr "Bonvolu rispondi al ĉi mesaĝo kaj kontaktu la sendinto se vi ne volas ricevi tiujn mesaĝojn."
 
-#: ../../mod/item.php:814
+#: ../../mod/item.php:830
 #, php-format
 msgid "%s posted an update."
 msgstr "%s publikigis afiŝon."
@@ -2903,7 +3034,7 @@ msgid "Image uploaded but image cropping failed."
 msgstr "Bildo estas alŝutita, sed malsukcesis tranĉi la bildon."
 
 #: ../../mod/profile_photo.php:63 ../../mod/profile_photo.php:70
-#: ../../mod/profile_photo.php:77 ../../mod/profile_photo.php:266
+#: ../../mod/profile_photo.php:77 ../../mod/profile_photo.php:273
 #, php-format
 msgid "Image size reduction [%s] failed."
 msgstr "Malsukcesis malpligrandigi [%s] la bildon."
@@ -2923,39 +3054,39 @@ msgstr "Ne eblas procezi bildon."
 msgid "Image exceeds size limit of %d"
 msgstr "Bildo estas pli granda ol la limito %d"
 
-#: ../../mod/profile_photo.php:209
+#: ../../mod/profile_photo.php:210
 msgid "Upload File:"
 msgstr "Alŝuti dosieron:"
 
-#: ../../mod/profile_photo.php:210
+#: ../../mod/profile_photo.php:211
 msgid "Upload Profile Photo"
 msgstr "Alŝuti profilbildon"
 
-#: ../../mod/profile_photo.php:211
+#: ../../mod/profile_photo.php:212
 msgid "Upload"
 msgstr "Alŝuti"
 
-#: ../../mod/profile_photo.php:213
+#: ../../mod/profile_photo.php:214
 msgid "skip this step"
 msgstr "Preterpasi tian paŝon"
 
-#: ../../mod/profile_photo.php:213
+#: ../../mod/profile_photo.php:214
 msgid "select a photo from your photo albums"
 msgstr "elekti bildon el viaj albumoj"
 
-#: ../../mod/profile_photo.php:226
+#: ../../mod/profile_photo.php:227
 msgid "Crop Image"
 msgstr "Stuci Bildon"
 
-#: ../../mod/profile_photo.php:227
+#: ../../mod/profile_photo.php:228
 msgid "Please adjust the image cropping for optimum viewing."
 msgstr "Bonvolu agordi la stuco de la bildo por optimuma aspekto."
 
-#: ../../mod/profile_photo.php:229
+#: ../../mod/profile_photo.php:230
 msgid "Done Editing"
 msgstr "Finigi Redaktado"
 
-#: ../../mod/profile_photo.php:257
+#: ../../mod/profile_photo.php:264
 msgid "Image uploaded successfully."
 msgstr "Bildo estas sukcese enŝutita."
 
@@ -2985,63 +3116,63 @@ msgstr "Nova Mesaĝo"
 msgid "Unable to locate contact information."
 msgstr "Ne eblas trovi kontaktajn informojn."
 
-#: ../../mod/message.php:120
+#: ../../mod/message.php:198
 msgid "Message deleted."
 msgstr "Mesaĝo estas forviŝita."
 
-#: ../../mod/message.php:150
+#: ../../mod/message.php:228
 msgid "Conversation removed."
 msgstr "Dialogo estas forviŝita."
 
-#: ../../mod/message.php:247
+#: ../../mod/message.php:327
 msgid "No messages."
 msgstr "Neniom da mesaĝoj."
 
-#: ../../mod/message.php:254
+#: ../../mod/message.php:334
 #, php-format
 msgid "Unknown sender - %s"
 msgstr "Nekonata sendanto - %s"
 
-#: ../../mod/message.php:257
+#: ../../mod/message.php:337
 #, php-format
 msgid "You and %s"
 msgstr "Vi kaj %s"
 
-#: ../../mod/message.php:260
+#: ../../mod/message.php:340
 #, php-format
 msgid "%s and You"
 msgstr "%s kaj vi"
 
-#: ../../mod/message.php:270 ../../mod/message.php:392
+#: ../../mod/message.php:350 ../../mod/message.php:455
 msgid "Delete conversation"
 msgstr "Forviŝi dialogon"
 
-#: ../../mod/message.php:273
+#: ../../mod/message.php:353
 msgid "D, d M Y - g:i A"
 msgstr "D, d M Y - g:i A"
 
-#: ../../mod/message.php:275
+#: ../../mod/message.php:355
 #, php-format
 msgid "%d message"
 msgid_plural "%d messages"
 msgstr[0] "%d mesaĝo"
 msgstr[1] "%d mesaĝoj"
 
-#: ../../mod/message.php:310
+#: ../../mod/message.php:390
 msgid "Message not available."
 msgstr "Mesaĝo nedisponebla."
 
-#: ../../mod/message.php:375
+#: ../../mod/message.php:438
 msgid "Delete message"
 msgstr "Forviŝu mesaĝon"
 
-#: ../../mod/message.php:394
+#: ../../mod/message.php:457
 msgid ""
 "No secure communications available. You <strong>may</strong> be able to "
 "respond from the sender's profile page."
 msgstr "Sekura komunikado ne disponeblas. Vi <strong>eble</strong> povus respondi sur la profilpaĝo de la sendanto."
 
-#: ../../mod/message.php:398
+#: ../../mod/message.php:461
 msgid "Send Reply"
 msgstr "Respondi"
 
@@ -3058,19 +3189,19 @@ msgstr "Neniom da amiko al montri."
 msgid "Theme settings updated."
 msgstr "Gisdatigis agordojn pri etosoj."
 
-#: ../../mod/admin.php:96 ../../mod/admin.php:419
+#: ../../mod/admin.php:96 ../../mod/admin.php:421
 msgid "Site"
 msgstr "Retejo"
 
-#: ../../mod/admin.php:97 ../../mod/admin.php:655 ../../mod/admin.php:667
+#: ../../mod/admin.php:97 ../../mod/admin.php:657 ../../mod/admin.php:669
 msgid "Users"
 msgstr "Uzantoj"
 
-#: ../../mod/admin.php:98 ../../mod/admin.php:749 ../../mod/admin.php:791
+#: ../../mod/admin.php:98 ../../mod/admin.php:751 ../../mod/admin.php:793
 msgid "Plugins"
 msgstr "Kromprogramoj"
 
-#: ../../mod/admin.php:99 ../../mod/admin.php:954 ../../mod/admin.php:990
+#: ../../mod/admin.php:99 ../../mod/admin.php:956 ../../mod/admin.php:992
 msgid "Themes"
 msgstr "Etosoj"
 
@@ -3078,7 +3209,7 @@ msgstr "Etosoj"
 msgid "DB updates"
 msgstr "DB ĝisdatigoj"
 
-#: ../../mod/admin.php:115 ../../mod/admin.php:122 ../../mod/admin.php:1077
+#: ../../mod/admin.php:115 ../../mod/admin.php:122 ../../mod/admin.php:1079
 msgid "Logs"
 msgstr "Protokoloj"
 
@@ -3094,553 +3225,561 @@ msgstr "Kromprogramaj Trajtoj"
 msgid "User registrations waiting for confirmation"
 msgstr "Uzantaj registradoj atendante konfirmon"
 
-#: ../../mod/admin.php:183 ../../mod/admin.php:637
+#: ../../mod/admin.php:183 ../../mod/admin.php:639
 msgid "Normal Account"
 msgstr "Normala konto"
 
-#: ../../mod/admin.php:184 ../../mod/admin.php:638
+#: ../../mod/admin.php:184 ../../mod/admin.php:640
 msgid "Soapbox Account"
 msgstr "Soapbox Konto"
 
-#: ../../mod/admin.php:185 ../../mod/admin.php:639
+#: ../../mod/admin.php:185 ../../mod/admin.php:641
 msgid "Community/Celebrity Account"
 msgstr "Komunuma/eminentula Konto"
 
-#: ../../mod/admin.php:186 ../../mod/admin.php:640
+#: ../../mod/admin.php:186 ../../mod/admin.php:642
 msgid "Automatic Friend Account"
 msgstr "Aŭtomata Amika Konto"
 
-#: ../../mod/admin.php:205
+#: ../../mod/admin.php:187
+msgid "Blog Account"
+msgstr "Blogkonto"
+
+#: ../../mod/admin.php:188
+msgid "Private Forum"
+msgstr "Privata Forumo"
+
+#: ../../mod/admin.php:207
 msgid "Message queues"
 msgstr "Mesaĝvicoj"
 
-#: ../../mod/admin.php:210 ../../mod/admin.php:418 ../../mod/admin.php:654
-#: ../../mod/admin.php:748 ../../mod/admin.php:790 ../../mod/admin.php:953
-#: ../../mod/admin.php:989 ../../mod/admin.php:1076
+#: ../../mod/admin.php:212 ../../mod/admin.php:420 ../../mod/admin.php:656
+#: ../../mod/admin.php:750 ../../mod/admin.php:792 ../../mod/admin.php:955
+#: ../../mod/admin.php:991 ../../mod/admin.php:1078
 msgid "Administration"
 msgstr "Administrado"
 
-#: ../../mod/admin.php:211
+#: ../../mod/admin.php:213
 msgid "Summary"
 msgstr "Resumo"
 
-#: ../../mod/admin.php:213
+#: ../../mod/admin.php:215
 msgid "Registered users"
 msgstr "Registrataj uzantoj"
 
-#: ../../mod/admin.php:215
+#: ../../mod/admin.php:217
 msgid "Pending registrations"
 msgstr "Okazontaj registradoj"
 
-#: ../../mod/admin.php:216
+#: ../../mod/admin.php:218
 msgid "Version"
 msgstr "Versio"
 
-#: ../../mod/admin.php:218
+#: ../../mod/admin.php:220
 msgid "Active plugins"
 msgstr "Ŝaltitaj kromprogramoj"
 
-#: ../../mod/admin.php:357
+#: ../../mod/admin.php:359
 msgid "Site settings updated."
 msgstr "Ĝisdatigis retejaj agordoj."
 
-#: ../../mod/admin.php:405
+#: ../../mod/admin.php:407
 msgid "Closed"
 msgstr "Ferma"
 
-#: ../../mod/admin.php:406
+#: ../../mod/admin.php:408
 msgid "Requires approval"
 msgstr "Bezonas aprobon"
 
-#: ../../mod/admin.php:407
+#: ../../mod/admin.php:409
 msgid "Open"
 msgstr "Malferma"
 
-#: ../../mod/admin.php:411
+#: ../../mod/admin.php:413
 msgid "No SSL policy, links will track page SSL state"
 msgstr "Sen SSL strategio. Ligiloj sekvos la SSL staton de la paĝo."
 
-#: ../../mod/admin.php:412
+#: ../../mod/admin.php:414
 msgid "Force all links to use SSL"
 msgstr "Devigi ke ĉiuj ligiloj uzu SSL."
 
-#: ../../mod/admin.php:413
+#: ../../mod/admin.php:415
 msgid "Self-signed certificate, use SSL for local links only (discouraged)"
 msgstr "Memsubskribita atestilo, nur uzu SSL por lokaj ligiloj (malkuraĝigata)"
 
-#: ../../mod/admin.php:422
+#: ../../mod/admin.php:424
 msgid "File upload"
 msgstr "Alŝuto"
 
-#: ../../mod/admin.php:423
+#: ../../mod/admin.php:425
 msgid "Policies"
 msgstr "Politiko"
 
-#: ../../mod/admin.php:424
+#: ../../mod/admin.php:426
 msgid "Advanced"
 msgstr "Altnivela"
 
-#: ../../mod/admin.php:428 ../../addon/statusnet/statusnet.php:558
+#: ../../mod/admin.php:430 ../../addon/statusnet/statusnet.php:558
 msgid "Site name"
 msgstr "Nomo de retejo"
 
-#: ../../mod/admin.php:429
+#: ../../mod/admin.php:431
 msgid "Banner/Logo"
 msgstr "Emblemo"
 
-#: ../../mod/admin.php:430
+#: ../../mod/admin.php:432
 msgid "System language"
 msgstr "Sistema lingvo"
 
-#: ../../mod/admin.php:431
+#: ../../mod/admin.php:433
 msgid "System theme"
 msgstr "Sistema etoso"
 
-#: ../../mod/admin.php:431
+#: ../../mod/admin.php:433
 msgid ""
 "Default system theme - may be over-ridden by user profiles - <a href='#' "
 "id='cnftheme'>change theme settings</a>"
 msgstr "Defaŭlta sistema etoso - transpasebla de uzantprofiloj -  <a href='#' id='cnftheme'>redakti agordoj pri etosoj</a>"
 
-#: ../../mod/admin.php:432
+#: ../../mod/admin.php:434
 msgid "SSL link policy"
 msgstr "Strategio por SSL ligiloj"
 
-#: ../../mod/admin.php:432
+#: ../../mod/admin.php:434
 msgid "Determines whether generated links should be forced to use SSL"
 msgstr "Difinas ĉu generotaj ligiloj devige uzu SSL."
 
-#: ../../mod/admin.php:433
+#: ../../mod/admin.php:435
 msgid "Maximum image size"
 msgstr "Maksimuma bildgrando"
 
-#: ../../mod/admin.php:433
+#: ../../mod/admin.php:435
 msgid ""
 "Maximum size in bytes of uploaded images. Default is 0, which means no "
 "limits."
 msgstr "Maksimuma grando en bajtoj por alŝutotaj bildoj. Defaŭlte 0, kio signifas neniu limito."
 
-#: ../../mod/admin.php:435
+#: ../../mod/admin.php:437
 msgid "Register policy"
 msgstr "Interkonsento pri registrado"
 
-#: ../../mod/admin.php:436
+#: ../../mod/admin.php:438
 msgid "Register text"
 msgstr "Interkonsento teksto"
 
-#: ../../mod/admin.php:436
+#: ../../mod/admin.php:438
 msgid "Will be displayed prominently on the registration page."
 msgstr "Tio estos eminente montrata en la registro paĝo."
 
-#: ../../mod/admin.php:437
+#: ../../mod/admin.php:439
 msgid "Accounts abandoned after x days"
 msgstr "Kontoj forlasitaj post x tagoj"
 
-#: ../../mod/admin.php:437
+#: ../../mod/admin.php:439
 msgid ""
 "Will not waste system resources polling external sites for abandonded "
 "accounts. Enter 0 for no time limit."
 msgstr "Mi ne malŝparu energion por enketi aliajn retejojn pri forlasitaj kontoj. Entajpu 0 por ne uzi templimo."
 
-#: ../../mod/admin.php:438
+#: ../../mod/admin.php:440
 msgid "Allowed friend domains"
 msgstr "Permesitaj amikaj domainoj"
 
-#: ../../mod/admin.php:438
+#: ../../mod/admin.php:440
 msgid ""
 "Comma separated list of domains which are allowed to establish friendships "
 "with this site. Wildcards are accepted. Empty to allow any domains"
 msgstr "Perkome disigita listo da domajnoj kiuj rajtas konstrui amikecojn kun ĉi tiu retejo. Ĵokeroj eblas. Malplena por rajtigi ĉiujn ajn domajnojn."
 
-#: ../../mod/admin.php:439
+#: ../../mod/admin.php:441
 msgid "Allowed email domains"
 msgstr "Permesitaj retpoŝtaj domajnoj"
 
-#: ../../mod/admin.php:439
+#: ../../mod/admin.php:441
 msgid ""
 "Comma separated list of domains which are allowed in email addresses for "
 "registrations to this site. Wildcards are accepted. Empty to allow any "
 "domains"
 msgstr "Perkome disigita listo da domajnoj kiuj uzeblas kiel retpoŝtaj adresoj en novaj registradoj. Ĵokeroj eblas. Malplena por rajtigi ĉiujn ajn domajnojn."
 
-#: ../../mod/admin.php:440
+#: ../../mod/admin.php:442
 msgid "Block public"
 msgstr "Bloki publike"
 
-#: ../../mod/admin.php:440
+#: ../../mod/admin.php:442
 msgid ""
 "Check to block public access to all otherwise public personal pages on this "
 "site unless you are currently logged in."
 msgstr "Elektu por bloki publikan atingon al ĉiuj alie publikajn paĝojn en ĉi tiu retejo kiam vi ne estas ensalutita."
 
-#: ../../mod/admin.php:441
+#: ../../mod/admin.php:443
 msgid "Force publish"
 msgstr "Devigi publikigon"
 
-#: ../../mod/admin.php:441
+#: ../../mod/admin.php:443
 msgid ""
 "Check to force all profiles on this site to be listed in the site directory."
 msgstr "Elektu por devigi la registradon en la loka katalogo al ĉiuj profiloj en ĉi tiu retejo."
 
-#: ../../mod/admin.php:442
+#: ../../mod/admin.php:444
 msgid "Global directory update URL"
 msgstr "Ĝenerala adreso por ĝisdatigi la katalogon"
 
-#: ../../mod/admin.php:442
+#: ../../mod/admin.php:444
 msgid ""
 "URL to update the global directory. If this is not set, the global directory"
 " is completely unavailable to the application."
 msgstr "URL adreso por ĝisdatigi la tutmondan katalogon. Se ne agordita, la tutmonda katatolge tute ne disponeblas al la programo."
 
-#: ../../mod/admin.php:444
+#: ../../mod/admin.php:446
 msgid "Block multiple registrations"
 msgstr "Bloki pluroblajn registradojn."
 
-#: ../../mod/admin.php:444
+#: ../../mod/admin.php:446
 msgid "Disallow users to register additional accounts for use as pages."
 msgstr "Malpermesi al uzantoj la permeson por registri pluajn kontojn kiel paĝoj."
 
-#: ../../mod/admin.php:445
+#: ../../mod/admin.php:447
 msgid "OpenID support"
 msgstr "Subteno por OpenID"
 
-#: ../../mod/admin.php:445
+#: ../../mod/admin.php:447
 msgid "OpenID support for registration and logins."
 msgstr "Subteni OpenID por registrado kaj ensaluto."
 
-#: ../../mod/admin.php:446
+#: ../../mod/admin.php:448
 msgid "Fullname check"
 msgstr "Kontroli plenan nomon"
 
-#: ../../mod/admin.php:446
+#: ../../mod/admin.php:448
 msgid ""
 "Force users to register with a space between firstname and lastname in Full "
 "name, as an antispam measure"
 msgstr "Kiel kontraŭspamilo, devigi uzantoj al registrado kun spaceto inter la persona nomo kaj la familia nomo."
 
-#: ../../mod/admin.php:447
+#: ../../mod/admin.php:449
 msgid "UTF-8 Regular expressions"
 msgstr "UTF-8 regulaj exprimoj"
 
-#: ../../mod/admin.php:447
+#: ../../mod/admin.php:449
 msgid "Use PHP UTF8 regular expressions"
 msgstr "Uzi PHP UTF8 regulajn esprimojn."
 
-#: ../../mod/admin.php:448
+#: ../../mod/admin.php:450
 msgid "Show Community Page"
 msgstr "Montri Komunuma Paĝo"
 
-#: ../../mod/admin.php:448
+#: ../../mod/admin.php:450
 msgid ""
 "Display a Community page showing all recent public postings on this site."
 msgstr "Montri komunuma paĝo kun ĉiuj ĵusaj afiŝoj en ĉi tiu retejo."
 
-#: ../../mod/admin.php:449
+#: ../../mod/admin.php:451
 msgid "Enable OStatus support"
 msgstr "Ŝalti subtenon por OStatus"
 
-#: ../../mod/admin.php:449
+#: ../../mod/admin.php:451
 msgid ""
 "Provide built-in OStatus (identi.ca, status.net, etc.) compatibility. All "
 "communications in OStatus are public, so privacy warnings will be "
 "occasionally displayed."
 msgstr "Provizi integritan OStatus (identi.ca, status.net ktp) subtenon. Ĉiuj komunikadoj en OStatus estas publikaj, do privatecaj avertoj aperos de tempo al tempo."
 
-#: ../../mod/admin.php:450
+#: ../../mod/admin.php:452
 msgid "Enable Diaspora support"
 msgstr "Ŝalti subtenon por Diaspora"
 
-#: ../../mod/admin.php:450
+#: ../../mod/admin.php:452
 msgid "Provide built-in Diaspora network compatibility."
 msgstr "Provizi integritan Diaspora subtenon."
 
-#: ../../mod/admin.php:451
+#: ../../mod/admin.php:453
 msgid "Only allow Friendica contacts"
 msgstr "Nur permesigi Friendica kontaktojn"
 
-#: ../../mod/admin.php:451
+#: ../../mod/admin.php:453
 msgid ""
 "All contacts must use Friendica protocols. All other built-in communication "
 "protocols disabled."
 msgstr "Ĉiuj kontaktoj devas uzi Friendica protokolojn. Ĉiuj aliaj komunikaj protokoloj malaktivita."
 
-#: ../../mod/admin.php:452
+#: ../../mod/admin.php:454
 msgid "Verify SSL"
 msgstr "Kontroli SSL"
 
-#: ../../mod/admin.php:452
+#: ../../mod/admin.php:454
 msgid ""
 "If you wish, you can turn on strict certificate checking. This will mean you"
 " cannot connect (at all) to self-signed SSL sites."
 msgstr "Se vi deziras, vi povas aktivigi severan kontroladon de SSL atestiloj. Pro tio, vie (tute) ne eblos konekti al SSL retejoj kun memsubskribitaj atestiloj."
 
-#: ../../mod/admin.php:453
+#: ../../mod/admin.php:455
 msgid "Proxy user"
 msgstr "Uzantnomo por retperanto"
 
-#: ../../mod/admin.php:454
+#: ../../mod/admin.php:456
 msgid "Proxy URL"
 msgstr "URL adreso de retperanto"
 
-#: ../../mod/admin.php:455
+#: ../../mod/admin.php:457
 msgid "Network timeout"
 msgstr "Reta tempolimo"
 
-#: ../../mod/admin.php:455
+#: ../../mod/admin.php:457
 msgid "Value is in seconds. Set to 0 for unlimited (not recommended)."
 msgstr "Valoro en sekundoj. Uzu 0 por mallimitigi (ne rekomendata)."
 
-#: ../../mod/admin.php:456
+#: ../../mod/admin.php:458
 msgid "Delivery interval"
 msgstr "Intervalo de liverado"
 
-#: ../../mod/admin.php:456
+#: ../../mod/admin.php:458
 msgid ""
 "Delay background delivery processes by this many seconds to reduce system "
 "load. Recommend: 4-5 for shared hosts, 2-3 for virtual private servers. 0-1 "
 "for large dedicated servers."
 msgstr "Malfruigi fonan liveradon dum tiom da sekundoj por malpliigi la ŝargon de la sistemo. Rekomendoj: 4-5 por komunaj serviloj, 2-3 por virtualaj privataj serviloj, 0-1 por grandaj dediĉitaj serviloj."
 
-#: ../../mod/admin.php:457
+#: ../../mod/admin.php:459
 msgid "Poll interval"
 msgstr "Enketintervalo"
 
-#: ../../mod/admin.php:457
+#: ../../mod/admin.php:459
 msgid ""
 "Delay background polling processes by this many seconds to reduce system "
 "load. If 0, use delivery interval."
 msgstr "Malfruigi fonajn enketprocesojn je tiom da sekundoj por malpliigi la ŝargon de la sistemo. Se 0, uzas la liverintervalon."
 
-#: ../../mod/admin.php:458
+#: ../../mod/admin.php:460
 msgid "Maximum Load Average"
 msgstr "Maksimuma Meza Sistemŝargo"
 
-#: ../../mod/admin.php:458
+#: ../../mod/admin.php:460
 msgid ""
 "Maximum system load before delivery and poll processes are deferred - "
 "default 50."
 msgstr "Maksimuma sistemŝargo post kiu livero- kaj enketprocesoj estos prokrastinataj. - Defaŭlte 50."
 
-#: ../../mod/admin.php:472
+#: ../../mod/admin.php:474
 msgid "Update has been marked successful"
 msgstr "Ĝisdatigo estas markita sukcesa"
 
-#: ../../mod/admin.php:482
+#: ../../mod/admin.php:484
 #, php-format
 msgid "Executing %s failed. Check system logs."
 msgstr "Ne sukcesis plenumi %s. Kontrolu la sistemprotokolojn."
 
-#: ../../mod/admin.php:485
+#: ../../mod/admin.php:487
 #, php-format
 msgid "Update %s was successfully applied."
 msgstr "Sukcese aplikis la ĝisdatigo %s."
 
-#: ../../mod/admin.php:489
+#: ../../mod/admin.php:491
 #, php-format
 msgid "Update %s did not return a status. Unknown if it succeeded."
 msgstr "Ĝisdatigo %s ne liveris elirstaton. "
 
-#: ../../mod/admin.php:492
+#: ../../mod/admin.php:494
 #, php-format
 msgid "Update function %s could not be found."
 msgstr "Ne troveblas ĝisdatigo funkcio %s."
 
-#: ../../mod/admin.php:507
+#: ../../mod/admin.php:509
 msgid "No failed updates."
 msgstr "Neniom da malsukcesaj ĝisdatigoj."
 
-#: ../../mod/admin.php:511
+#: ../../mod/admin.php:513
 msgid "Failed Updates"
 msgstr "Malsukcesaj Ĝisdatigoj"
 
-#: ../../mod/admin.php:512
+#: ../../mod/admin.php:514
 msgid ""
 "This does not include updates prior to 1139, which did not return a status."
 msgstr "Ne inkluzivas ĝisdatigojn antaŭ 1139, kiuj ne liveris elirstaton."
 
-#: ../../mod/admin.php:513
+#: ../../mod/admin.php:515
 msgid "Mark success (if update was manually applied)"
 msgstr "Marki sukcesa (se la ĝisdatigo estas instalita mane)"
 
-#: ../../mod/admin.php:514
+#: ../../mod/admin.php:516
 msgid "Attempt to execute this update step automatically"
 msgstr "Provi automate plenumi ĉi tian paŝon de la ĝisdatigo."
 
-#: ../../mod/admin.php:539
+#: ../../mod/admin.php:541
 #, php-format
 msgid "%s user blocked/unblocked"
 msgid_plural "%s users blocked/unblocked"
 msgstr[0] "Blokis/malblokis %s uzanton"
 msgstr[1] "Blokis/malblokis %s uzantojn"
 
-#: ../../mod/admin.php:546
+#: ../../mod/admin.php:548
 #, php-format
 msgid "%s user deleted"
 msgid_plural "%s users deleted"
 msgstr[0] "%s uzanto forviŝita"
 msgstr[1] "%s uzanto forviŝitaj"
 
-#: ../../mod/admin.php:585
+#: ../../mod/admin.php:587
 #, php-format
 msgid "User '%s' deleted"
 msgstr "Uzanto '%s' forviŝita"
 
-#: ../../mod/admin.php:593
+#: ../../mod/admin.php:595
 #, php-format
 msgid "User '%s' unblocked"
 msgstr "Uzanto '%s' malblokita"
 
-#: ../../mod/admin.php:593
+#: ../../mod/admin.php:595
 #, php-format
 msgid "User '%s' blocked"
 msgstr "Uzanto '%s' blokita"
 
-#: ../../mod/admin.php:657
+#: ../../mod/admin.php:659
 msgid "select all"
 msgstr "elekti ĉiujn"
 
-#: ../../mod/admin.php:658
+#: ../../mod/admin.php:660
 msgid "User registrations waiting for confirm"
 msgstr "Registriĝoj atendante aprobon"
 
-#: ../../mod/admin.php:659
+#: ../../mod/admin.php:661
 msgid "Request date"
 msgstr "Dato de peto"
 
-#: ../../mod/admin.php:659 ../../mod/admin.php:668
+#: ../../mod/admin.php:661 ../../mod/admin.php:670
 #: ../../include/contact_selectors.php:79
 msgid "Email"
 msgstr "Retpoŝto"
 
-#: ../../mod/admin.php:660
+#: ../../mod/admin.php:662
 msgid "No registrations."
 msgstr "Neniom da registriĝoj."
 
-#: ../../mod/admin.php:662
+#: ../../mod/admin.php:664
 msgid "Deny"
 msgstr "Negi"
 
-#: ../../mod/admin.php:668
+#: ../../mod/admin.php:670
 msgid "Register date"
 msgstr "Dato de registrado"
 
-#: ../../mod/admin.php:668
+#: ../../mod/admin.php:670
 msgid "Last login"
 msgstr "Plej ĵusa ensaluto"
 
-#: ../../mod/admin.php:668
+#: ../../mod/admin.php:670
 msgid "Last item"
 msgstr "Plej ĵusa elemento"
 
-#: ../../mod/admin.php:668
+#: ../../mod/admin.php:670
 msgid "Account"
 msgstr "Konto"
 
-#: ../../mod/admin.php:670
+#: ../../mod/admin.php:672
 msgid ""
 "Selected users will be deleted!\\n\\nEverything these users had posted on "
 "this site will be permanently deleted!\\n\\nAre you sure?"
 msgstr "La elektitaj uzantkontoj estas forviŝotaj!\\n\\nĈiuj elementoj kiujn ili afiŝis je la retpaĝo estos permanente forviŝitaj.\\n\\nĈu vi certas?"
 
-#: ../../mod/admin.php:671
+#: ../../mod/admin.php:673
 msgid ""
 "The user {0} will be deleted!\\n\\nEverything this user has posted on this "
 "site will be permanently deleted!\\n\\nAre you sure?"
 msgstr "La uzanto {0} estas forviŝota!\\n\\nĈiuj elementoj kiujn li afiŝis je la retpaĝo estos permanente forviŝitaj.\\n\\nĈu vi certas?"
 
-#: ../../mod/admin.php:712
+#: ../../mod/admin.php:714
 #, php-format
 msgid "Plugin %s disabled."
 msgstr "Kromprogramo %s estas malŝaltita."
 
-#: ../../mod/admin.php:716
+#: ../../mod/admin.php:718
 #, php-format
 msgid "Plugin %s enabled."
 msgstr "Kromprogramo %s estas ŝaltita."
 
-#: ../../mod/admin.php:726 ../../mod/admin.php:924
+#: ../../mod/admin.php:728 ../../mod/admin.php:926
 msgid "Disable"
 msgstr "Malŝalti"
 
-#: ../../mod/admin.php:728 ../../mod/admin.php:926
+#: ../../mod/admin.php:730 ../../mod/admin.php:928
 msgid "Enable"
 msgstr "Ŝalti"
 
-#: ../../mod/admin.php:750 ../../mod/admin.php:955
+#: ../../mod/admin.php:752 ../../mod/admin.php:957
 msgid "Toggle"
 msgstr "Ŝalti/Malŝalti"
 
-#: ../../mod/admin.php:758 ../../mod/admin.php:965
+#: ../../mod/admin.php:760 ../../mod/admin.php:967
 msgid "Author: "
 msgstr "Aŭtoro: "
 
-#: ../../mod/admin.php:759 ../../mod/admin.php:966
+#: ../../mod/admin.php:761 ../../mod/admin.php:968
 msgid "Maintainer: "
 msgstr "Prizorganto: "
 
-#: ../../mod/admin.php:888
+#: ../../mod/admin.php:890
 msgid "No themes found."
 msgstr "Ne trovis etosojn."
 
-#: ../../mod/admin.php:947
+#: ../../mod/admin.php:949
 msgid "Screenshot"
 msgstr "Ekrankopio"
 
-#: ../../mod/admin.php:995
+#: ../../mod/admin.php:997
 msgid "[Experimental]"
 msgstr "[Eksperimenta]"
 
-#: ../../mod/admin.php:996
+#: ../../mod/admin.php:998
 msgid "[Unsupported]"
 msgstr "[Nesubtenata]"
 
-#: ../../mod/admin.php:1023
+#: ../../mod/admin.php:1025
 msgid "Log settings updated."
 msgstr "Protokolagordoj ĝisdatigitaj."
 
-#: ../../mod/admin.php:1079
+#: ../../mod/admin.php:1081
 msgid "Clear"
 msgstr "Forviŝi"
 
-#: ../../mod/admin.php:1085
+#: ../../mod/admin.php:1087
 msgid "Debugging"
 msgstr "Sencimigado"
 
-#: ../../mod/admin.php:1086
+#: ../../mod/admin.php:1088
 msgid "Log file"
 msgstr "Protokolo"
 
-#: ../../mod/admin.php:1086
+#: ../../mod/admin.php:1088
 msgid ""
 "Must be writable by web server. Relative to your Friendica top-level "
 "directory."
 msgstr "Devas esti skribebla de la retservilo. Relativa al via plej supra Friendica dosierujo."
 
-#: ../../mod/admin.php:1087
+#: ../../mod/admin.php:1089
 msgid "Log level"
 msgstr "Protokolnivelo"
 
-#: ../../mod/admin.php:1137
+#: ../../mod/admin.php:1139
 msgid "Close"
 msgstr "Fermi"
 
-#: ../../mod/admin.php:1143
+#: ../../mod/admin.php:1145
 msgid "FTP Host"
 msgstr "FTP Servilo"
 
-#: ../../mod/admin.php:1144
+#: ../../mod/admin.php:1146
 msgid "FTP Path"
 msgstr "FTP Vojo"
 
-#: ../../mod/admin.php:1145
+#: ../../mod/admin.php:1147
 msgid "FTP User"
 msgstr "FTP Uzanto"
 
-#: ../../mod/admin.php:1146
+#: ../../mod/admin.php:1148
 msgid "FTP Password"
 msgstr "FTP Pasvorto"
 
-#: ../../mod/profile.php:21 ../../boot.php:993
+#: ../../mod/profile.php:21 ../../boot.php:1030
 msgid "Requested profile is not available."
 msgstr "La petita profilo ne disponeblas."
 
@@ -3727,6 +3866,10 @@ msgstr "Komunaj Amikoj"
 msgid "No contacts in common."
 msgstr "Neniom da komunaj kontaktoj."
 
+#: ../../mod/share.php:28 ../../include/bb2diaspora.php:286
+msgid "link"
+msgstr "ligilo"
+
 #: ../../mod/display.php:135
 msgid "Item has been removed."
 msgstr "Elemento estas forviŝita."
@@ -3739,13 +3882,13 @@ msgstr "Programoj"
 msgid "No installed applications."
 msgstr "Neniom da instalitaj programoj."
 
-#: ../../mod/search.php:83 ../../include/text.php:649
-#: ../../include/text.php:650 ../../include/nav.php:91
+#: ../../mod/search.php:83 ../../include/text.php:674
+#: ../../include/text.php:675 ../../include/nav.php:91
 msgid "Search"
 msgstr "Serĉi"
 
-#: ../../mod/profiles.php:21 ../../mod/profiles.php:410
-#: ../../mod/profiles.php:524 ../../mod/dfrn_confirm.php:62
+#: ../../mod/profiles.php:21 ../../mod/profiles.php:418
+#: ../../mod/profiles.php:532 ../../mod/dfrn_confirm.php:62
 msgid "Profile not found."
 msgstr "Profilo ne trovita."
 
@@ -3832,226 +3975,226 @@ msgstr " - Vizitu la %2$s de %1$s"
 msgid "%1$s has an updated %2$s, changing %3$s."
 msgstr "%1$s havas ĝisdatigigan %2$s, ŝanĝas %3$s."
 
-#: ../../mod/profiles.php:429
+#: ../../mod/profiles.php:437
 msgid "Profile deleted."
 msgstr "Profilo forviŝita."
 
-#: ../../mod/profiles.php:447 ../../mod/profiles.php:481
+#: ../../mod/profiles.php:455 ../../mod/profiles.php:489
 msgid "Profile-"
 msgstr "Profilo-"
 
-#: ../../mod/profiles.php:466 ../../mod/profiles.php:508
+#: ../../mod/profiles.php:474 ../../mod/profiles.php:516
 msgid "New profile created."
 msgstr "Nova profilo kreita."
 
-#: ../../mod/profiles.php:487
+#: ../../mod/profiles.php:495
 msgid "Profile unavailable to clone."
 msgstr "Ne eblas kopii profilon."
 
-#: ../../mod/profiles.php:545
+#: ../../mod/profiles.php:553
 msgid "Hide your contact/friend list from viewers of this profile?"
 msgstr "Kaŝi vian liston de kontaktoj/amikoj al vidantoj de ĉi-tio profilo?"
 
-#: ../../mod/profiles.php:568
+#: ../../mod/profiles.php:576
 msgid "Edit Profile Details"
 msgstr "Redakti Detalojn de Profilo"
 
-#: ../../mod/profiles.php:570
+#: ../../mod/profiles.php:578
 msgid "View this profile"
 msgstr "Vidi la profilon."
 
-#: ../../mod/profiles.php:571
+#: ../../mod/profiles.php:579
 msgid "Create a new profile using these settings"
 msgstr "Krei novan profilon kun tiaj agordoj"
 
-#: ../../mod/profiles.php:572
+#: ../../mod/profiles.php:580
 msgid "Clone this profile"
 msgstr "Kopii ĉi tiun profilon"
 
-#: ../../mod/profiles.php:573
+#: ../../mod/profiles.php:581
 msgid "Delete this profile"
 msgstr "Forviŝi ĉi tiun profilon"
 
-#: ../../mod/profiles.php:574
+#: ../../mod/profiles.php:582
 msgid "Profile Name:"
 msgstr "Nomo de Profilo:"
 
-#: ../../mod/profiles.php:575
+#: ../../mod/profiles.php:583
 msgid "Your Full Name:"
 msgstr "Via Plena Nomo:"
 
-#: ../../mod/profiles.php:576
+#: ../../mod/profiles.php:584
 msgid "Title/Description:"
 msgstr "Titolo/Priskribo:"
 
-#: ../../mod/profiles.php:577
+#: ../../mod/profiles.php:585
 msgid "Your Gender:"
 msgstr "Via Sekso:"
 
-#: ../../mod/profiles.php:578
+#: ../../mod/profiles.php:586
 #, php-format
 msgid "Birthday (%s):"
 msgstr "Naskiĝtago (%s):"
 
-#: ../../mod/profiles.php:579
+#: ../../mod/profiles.php:587
 msgid "Street Address:"
 msgstr "Adreso:"
 
-#: ../../mod/profiles.php:580
+#: ../../mod/profiles.php:588
 msgid "Locality/City:"
 msgstr "Urbo:"
 
-#: ../../mod/profiles.php:581
+#: ../../mod/profiles.php:589
 msgid "Postal/Zip Code:"
 msgstr "Poŝtkodo:"
 
-#: ../../mod/profiles.php:582
+#: ../../mod/profiles.php:590
 msgid "Country:"
 msgstr "Lando:"
 
-#: ../../mod/profiles.php:583
+#: ../../mod/profiles.php:591
 msgid "Region/State:"
 msgstr "Ŝtato:"
 
-#: ../../mod/profiles.php:584
+#: ../../mod/profiles.php:592
 msgid "<span class=\"heart\">&hearts;</span> Marital Status:"
 msgstr "<span class=\"heart\">&hearts;</span> Civita Stato:"
 
-#: ../../mod/profiles.php:585
+#: ../../mod/profiles.php:593
 msgid "Who: (if applicable)"
 msgstr "Kiu (se aplikeble):"
 
-#: ../../mod/profiles.php:586
+#: ../../mod/profiles.php:594
 msgid "Examples: cathy123, Cathy Williams, cathy@example.com"
 msgstr "Ekzemploj: cathy123, Cathy Williams, cathy@example.com"
 
-#: ../../mod/profiles.php:587
+#: ../../mod/profiles.php:595
 msgid "Since [date]:"
 msgstr "Ekde [dato]:"
 
-#: ../../mod/profiles.php:588 ../../include/profile_advanced.php:46
+#: ../../mod/profiles.php:596 ../../include/profile_advanced.php:46
 msgid "Sexual Preference:"
 msgstr "Seksa Prefero:"
 
-#: ../../mod/profiles.php:589
+#: ../../mod/profiles.php:597
 msgid "Homepage URL:"
 msgstr "Adreso de Hejmpaĝo:"
 
-#: ../../mod/profiles.php:590 ../../include/profile_advanced.php:50
+#: ../../mod/profiles.php:598 ../../include/profile_advanced.php:50
 msgid "Hometown:"
 msgstr "Hejmurbo:"
 
-#: ../../mod/profiles.php:591 ../../include/profile_advanced.php:54
+#: ../../mod/profiles.php:599 ../../include/profile_advanced.php:54
 msgid "Political Views:"
 msgstr "Politikaj Opinioj:"
 
-#: ../../mod/profiles.php:592
+#: ../../mod/profiles.php:600
 msgid "Religious Views:"
 msgstr "Religiaj Opinioj:"
 
-#: ../../mod/profiles.php:593
+#: ../../mod/profiles.php:601
 msgid "Public Keywords:"
 msgstr "Publikaj ŝlosilvortoj:"
 
-#: ../../mod/profiles.php:594
+#: ../../mod/profiles.php:602
 msgid "Private Keywords:"
 msgstr "Privataj ŝlosilvortoj:"
 
-#: ../../mod/profiles.php:595 ../../include/profile_advanced.php:62
+#: ../../mod/profiles.php:603 ../../include/profile_advanced.php:62
 msgid "Likes:"
 msgstr "Ŝatoj:"
 
-#: ../../mod/profiles.php:596 ../../include/profile_advanced.php:64
+#: ../../mod/profiles.php:604 ../../include/profile_advanced.php:64
 msgid "Dislikes:"
 msgstr "Malŝatoj:"
 
-#: ../../mod/profiles.php:597
+#: ../../mod/profiles.php:605
 msgid "Example: fishing photography software"
 msgstr "Ekzemple: fiŝkapti fotografio programaro"
 
-#: ../../mod/profiles.php:598
+#: ../../mod/profiles.php:606
 msgid "(Used for suggesting potential friends, can be seen by others)"
 msgstr "(Por sugesti amikoj. Videbla al aliaj.)"
 
-#: ../../mod/profiles.php:599
+#: ../../mod/profiles.php:607
 msgid "(Used for searching profiles, never shown to others)"
 msgstr "(Por serĉi profilojn. Neniam videbla al aliaj.)"
 
-#: ../../mod/profiles.php:600
+#: ../../mod/profiles.php:608
 msgid "Tell us about yourself..."
 msgstr "Diru al ni pri vi..."
 
-#: ../../mod/profiles.php:601
+#: ../../mod/profiles.php:609
 msgid "Hobbies/Interests"
 msgstr "Ŝatokupoj/Interesoj"
 
-#: ../../mod/profiles.php:602
+#: ../../mod/profiles.php:610
 msgid "Contact information and Social Networks"
 msgstr "Kontaktaj informoj kaj Interkonaj Retejoj"
 
-#: ../../mod/profiles.php:603
+#: ../../mod/profiles.php:611
 msgid "Musical interests"
 msgstr "Muzikaj interesoj"
 
-#: ../../mod/profiles.php:604
+#: ../../mod/profiles.php:612
 msgid "Books, literature"
 msgstr "Libroj, literaturo"
 
-#: ../../mod/profiles.php:605
+#: ../../mod/profiles.php:613
 msgid "Television"
 msgstr "Televido"
 
-#: ../../mod/profiles.php:606
+#: ../../mod/profiles.php:614
 msgid "Film/dance/culture/entertainment"
 msgstr "Filmoj/dancoj/arto/amuzaĵoj"
 
-#: ../../mod/profiles.php:607
+#: ../../mod/profiles.php:615
 msgid "Love/romance"
 msgstr "Amo/romanco"
 
-#: ../../mod/profiles.php:608
+#: ../../mod/profiles.php:616
 msgid "Work/employment"
 msgstr "Laboro"
 
-#: ../../mod/profiles.php:609
+#: ../../mod/profiles.php:617
 msgid "School/education"
 msgstr "Lernejo/eduko"
 
-#: ../../mod/profiles.php:614
+#: ../../mod/profiles.php:622
 msgid ""
 "This is your <strong>public</strong> profile.<br />It <strong>may</strong> "
 "be visible to anybody using the internet."
 msgstr "Ĉi tio estas via <strong>publika</strong> profilo. Ĝi <strong>eble</strong> estas videbla al ĉiuj en interreto. "
 
-#: ../../mod/profiles.php:624 ../../mod/directory.php:111
+#: ../../mod/profiles.php:632 ../../mod/directory.php:109
 msgid "Age: "
 msgstr "Aĝo:"
 
-#: ../../mod/profiles.php:663
+#: ../../mod/profiles.php:671
 msgid "Edit/Manage Profiles"
 msgstr "Redakti/administri Profilojn"
 
-#: ../../mod/profiles.php:664 ../../boot.php:1102
+#: ../../mod/profiles.php:672 ../../boot.php:1139
 msgid "Change profile photo"
 msgstr "Ŝanĝi profilbildon"
 
-#: ../../mod/profiles.php:665 ../../boot.php:1103
+#: ../../mod/profiles.php:673 ../../boot.php:1140
 msgid "Create New Profile"
 msgstr "Krei novan profilon"
 
-#: ../../mod/profiles.php:676 ../../boot.php:1113
+#: ../../mod/profiles.php:684 ../../boot.php:1150
 msgid "Profile Image"
 msgstr "Profilbildo"
 
-#: ../../mod/profiles.php:678 ../../boot.php:1116
+#: ../../mod/profiles.php:686 ../../boot.php:1153
 msgid "visible to everybody"
 msgstr "videbla al ĉiuj"
 
-#: ../../mod/profiles.php:679 ../../boot.php:1117
+#: ../../mod/profiles.php:687 ../../boot.php:1154
 msgid "Edit visibility"
 msgstr "Redakti videblecon"
 
-#: ../../mod/filer.php:29 ../../include/conversation.php:951
+#: ../../mod/filer.php:29 ../../include/conversation.php:1024
 msgid "Save to Folder:"
 msgstr "Konservi en Dosierujo:"
 
@@ -4059,7 +4202,7 @@ msgstr "Konservi en Dosierujo:"
 msgid "- select -"
 msgstr "- elekti -"
 
-#: ../../mod/tagger.php:103 ../../include/conversation.php:138
+#: ../../mod/tagger.php:103 ../../include/conversation.php:199
 #, php-format
 msgid "%1$s tagged %2$s's %3$s with %4$s"
 msgstr "%1$s markis la %3$s de %2$s kun %4$s"
@@ -4099,6 +4242,50 @@ msgstr "Aldoni"
 msgid "No entries."
 msgstr "Neniom da afiŝoj."
 
+#: ../../mod/babel.php:17
+msgid "Source (bbcode) text:"
+msgstr "Fontkodo (bbcode):"
+
+#: ../../mod/babel.php:23
+msgid "Source (Diaspora) text to convert to BBcode:"
+msgstr "Fontokodo (Diaspora) konvertota al BBcode:"
+
+#: ../../mod/babel.php:31
+msgid "Source input: "
+msgstr "Fontoenigo:"
+
+#: ../../mod/babel.php:35
+msgid "bb2html: "
+msgstr "bb2html: "
+
+#: ../../mod/babel.php:39
+msgid "bb2html2bb: "
+msgstr "bb2html2bb: "
+
+#: ../../mod/babel.php:43
+msgid "bb2md: "
+msgstr "bb2md: "
+
+#: ../../mod/babel.php:47
+msgid "bb2md2html: "
+msgstr "bb2md2html: "
+
+#: ../../mod/babel.php:51
+msgid "bb2dia2bb: "
+msgstr "bb2dia2bb: "
+
+#: ../../mod/babel.php:55
+msgid "bb2md2html2bb: "
+msgstr "bb2md2html2bb: "
+
+#: ../../mod/babel.php:65
+msgid "Source input (Diaspora format): "
+msgstr "Fontoenigo (Diaspora formato):"
+
+#: ../../mod/babel.php:70
+msgid "diaspora2bb: "
+msgstr "diaspora2bb: "
+
 #: ../../mod/suggest.php:38 ../../view/theme/diabook/theme.php:626
 #: ../../include/contact_widgets.php:34
 msgid "Friend Suggestions"
@@ -4126,11 +4313,30 @@ msgstr "Trovi en ĉi retejo"
 msgid "Site Directory"
 msgstr "Reteja Katalogo"
 
-#: ../../mod/directory.php:114
+#: ../../mod/directory.php:112
 msgid "Gender: "
 msgstr "Sekso:"
 
-#: ../../mod/directory.php:140
+#: ../../mod/directory.php:134 ../../include/profile_advanced.php:17
+#: ../../boot.php:1175
+msgid "Gender:"
+msgstr "Sekso:"
+
+#: ../../mod/directory.php:136 ../../include/profile_advanced.php:37
+#: ../../boot.php:1178
+msgid "Status:"
+msgstr "Stato:"
+
+#: ../../mod/directory.php:138 ../../include/profile_advanced.php:48
+#: ../../boot.php:1180
+msgid "Homepage:"
+msgstr "Hejmpaĝo:"
+
+#: ../../mod/directory.php:140 ../../include/profile_advanced.php:58
+msgid "About:"
+msgstr "Pri:"
+
+#: ../../mod/directory.php:178
 msgid "No entries (some entries may be hidden)."
 msgstr "Neniom da afiŝoj (kelkaj afiŝoj eble ne estas videbla)."
 
@@ -4253,8 +4459,8 @@ msgstr "La prezento malsukcesis au estas revokita."
 msgid "Unable to set contact photo."
 msgstr "Neeblas agordi la kontaktbildo."
 
-#: ../../mod/dfrn_confirm.php:477 ../../include/diaspora.php:510
-#: ../../include/conversation.php:101
+#: ../../mod/dfrn_confirm.php:477 ../../include/diaspora.php:577
+#: ../../include/conversation.php:162
 #, php-format
 msgid "%1$s is now friends with %2$s"
 msgstr "%1$s amikiĝis kun %2$s"
@@ -4321,83 +4527,83 @@ msgstr "Google Konto ID"
 msgid "Google+ Import Settings saved."
 msgstr "Konservis Agordojn por Google+ Importo."
 
-#: ../../addon/facebook/facebook.php:521
+#: ../../addon/facebook/facebook.php:523
 msgid "Facebook disabled"
 msgstr "Facebook malŝaltita"
 
-#: ../../addon/facebook/facebook.php:526
+#: ../../addon/facebook/facebook.php:528
 msgid "Updating contacts"
 msgstr "Mi ĝisdatigas la kontaktojn."
 
-#: ../../addon/facebook/facebook.php:549
+#: ../../addon/facebook/facebook.php:551
 msgid "Facebook API key is missing."
 msgstr "La API ŝlosilo de Facebook ne estas konata ĉi tie."
 
-#: ../../addon/facebook/facebook.php:556
+#: ../../addon/facebook/facebook.php:558
 msgid "Facebook Connect"
 msgstr "Kontekto al Facebook"
 
-#: ../../addon/facebook/facebook.php:562
+#: ../../addon/facebook/facebook.php:564
 msgid "Install Facebook connector for this account."
 msgstr "Instali la Facebook konektilo por ĉi tiu konto."
 
-#: ../../addon/facebook/facebook.php:569
+#: ../../addon/facebook/facebook.php:571
 msgid "Remove Facebook connector"
 msgstr "Forigi la Facebook konektilon."
 
-#: ../../addon/facebook/facebook.php:574
+#: ../../addon/facebook/facebook.php:576
 msgid ""
 "Re-authenticate [This is necessary whenever your Facebook password is "
 "changed.]"
 msgstr "Reaŭtentiĝi [Tio estas bezonata ĉiam kiam vi ŝanĝis vian pasvorton ĉe Facebook.]"
 
-#: ../../addon/facebook/facebook.php:581
+#: ../../addon/facebook/facebook.php:583
 msgid "Post to Facebook by default"
 msgstr "Ĉiam afiŝi al Facebook."
 
-#: ../../addon/facebook/facebook.php:587
+#: ../../addon/facebook/facebook.php:589
 msgid ""
 "Facebook friend linking has been disabled on this site. The following "
 "settings will have no effect."
 msgstr "Ligado kun Facebook amikoj estas malaktivita ĉe tiu retejo. La sekvantaj agordoj do ne havas validecon."
 
-#: ../../addon/facebook/facebook.php:591
+#: ../../addon/facebook/facebook.php:593
 msgid ""
 "Facebook friend linking has been disabled on this site. If you disable it, "
 "you will be unable to re-enable it."
 msgstr "Ligado kun Facebook amikoj estas malaktivita ĉe tiu retejo. Se vi malŝaltas ĝin, vi ne eblos ree ŝalti ĝin."
 
-#: ../../addon/facebook/facebook.php:594
+#: ../../addon/facebook/facebook.php:596
 msgid "Link all your Facebook friends and conversations on this website"
 msgstr "Alligu ĉiujn viajn Facebook amikojn kaj konversaciojn je ĉi-tiu retejo."
 
-#: ../../addon/facebook/facebook.php:596
+#: ../../addon/facebook/facebook.php:598
 msgid ""
 "Facebook conversations consist of your <em>profile wall</em> and your friend"
 " <em>stream</em>."
 msgstr "Facebok konversacioj konsistas el via <em>profilmuro</em> kaj la <em>fluo</em> de viaj amikoj."
 
-#: ../../addon/facebook/facebook.php:597
+#: ../../addon/facebook/facebook.php:599
 msgid "On this website, your Facebook friend stream is only visible to you."
 msgstr "Je ĉi-tiu retejo, la fluo de viaj amikoj ĉe Facebook nur videblas al vi."
 
-#: ../../addon/facebook/facebook.php:598
+#: ../../addon/facebook/facebook.php:600
 msgid ""
 "The following settings determine the privacy of your Facebook profile wall "
 "on this website."
 msgstr "La sekvontaj agordoj difinas la privatecon de via Facebook profilmuro je ĉi-tiu retejo."
 
-#: ../../addon/facebook/facebook.php:602
+#: ../../addon/facebook/facebook.php:604
 msgid ""
 "On this website your Facebook profile wall conversations will only be "
 "visible to you"
 msgstr "Je ĉi-tiu retejo, la conversacioj sur via Facebook profilmuro nur videblas al vi."
 
-#: ../../addon/facebook/facebook.php:607
+#: ../../addon/facebook/facebook.php:609
 msgid "Do not import your Facebook profile wall conversations"
 msgstr "Ne importi konversaciojn de via Facebook profilmuro"
 
-#: ../../addon/facebook/facebook.php:609
+#: ../../addon/facebook/facebook.php:611
 msgid ""
 "If you choose to link conversations and leave both of these boxes unchecked,"
 " your Facebook profile wall will be merged with your profile wall on this "
@@ -4405,120 +4611,120 @@ msgid ""
 "who may see the conversations."
 msgstr "Se vi elektas alligi conversaciojn kaj ne elektas tiujn butonojn, via Facebook profilmuro estas kunigota kun via profilmuro ĉi tie. Viaj privatecaj agordoj ĉi tie difinos kiu povas vidi la coversaciojn."
 
-#: ../../addon/facebook/facebook.php:614
+#: ../../addon/facebook/facebook.php:616
 msgid "Comma separated applications to ignore"
 msgstr "Ignorotaj programoj, disigita per komo"
 
-#: ../../addon/facebook/facebook.php:698
+#: ../../addon/facebook/facebook.php:700
 msgid "Problems with Facebook Real-Time Updates"
 msgstr "Problemoj kun Facebook Realtempaj Ĝisdatigoj"
 
-#: ../../addon/facebook/facebook.php:726
+#: ../../addon/facebook/facebook.php:728
 #: ../../include/contact_selectors.php:81
 msgid "Facebook"
 msgstr "Facebook"
 
-#: ../../addon/facebook/facebook.php:727
+#: ../../addon/facebook/facebook.php:729
 msgid "Facebook Connector Settings"
 msgstr "Agordoj por la Facebook konektilo"
 
-#: ../../addon/facebook/facebook.php:742
+#: ../../addon/facebook/facebook.php:744
 msgid "Facebook API Key"
 msgstr "Facebook API ŝlosilo"
 
-#: ../../addon/facebook/facebook.php:752
+#: ../../addon/facebook/facebook.php:754
 msgid ""
 "Error: it appears that you have specified the App-ID and -Secret in your "
 ".htconfig.php file. As long as they are specified there, they cannot be set "
 "using this form.<br><br>"
 msgstr "Eraro: Ŝajnas kvazaŭ vi agordis la App-ID kaj la sekreton en via .htconfig.php dosiero. Kiam ili estas agordita tie, vi ne povas agordi ĝin en tiu ĉi formo.<br><br>"
 
-#: ../../addon/facebook/facebook.php:757
+#: ../../addon/facebook/facebook.php:759
 msgid ""
 "Error: the given API Key seems to be incorrect (the application access token"
 " could not be retrieved)."
 msgstr "Eraro: La API ŝlosilo aspektas malĝusta (ne eblas ricevi la programa atingoĵetono)."
 
-#: ../../addon/facebook/facebook.php:759
+#: ../../addon/facebook/facebook.php:761
 msgid "The given API Key seems to work correctly."
 msgstr "La API ŝlosilo ŝajne ĝuste funkcias."
 
-#: ../../addon/facebook/facebook.php:761
+#: ../../addon/facebook/facebook.php:763
 msgid ""
-"The correctness of the API Key could not be detected. Somthing strange's "
+"The correctness of the API Key could not be detected. Something strange's "
 "going on."
-msgstr "Ne povis kontroli la ĝustecon de la API ŝlosilo. Ia stranga afero okazas. "
+msgstr "Ne povis kontroli la ĝusteco de la API ŝlosilo. Stranga afero okazas."
 
-#: ../../addon/facebook/facebook.php:764
+#: ../../addon/facebook/facebook.php:766
 msgid "App-ID / API-Key"
 msgstr "Programo ID / API Ŝlosilo"
 
-#: ../../addon/facebook/facebook.php:765
+#: ../../addon/facebook/facebook.php:767
 msgid "Application secret"
 msgstr "Programo sekreto"
 
-#: ../../addon/facebook/facebook.php:766
+#: ../../addon/facebook/facebook.php:768
 #, php-format
 msgid "Polling Interval in minutes (minimum %1$s minutes)"
 msgstr "Intervalo de enketo en minutoj (minimume %1$s minutoj)"
 
-#: ../../addon/facebook/facebook.php:767
+#: ../../addon/facebook/facebook.php:769
 msgid ""
 "Synchronize comments (no comments on Facebook are missed, at the cost of "
 "increased system load)"
 msgstr "Sinkronigi komentojn (vi ricevas ĉiujn komentojn de Facebook, sed la ŝargo de la sistemo iom kreskas)"
 
-#: ../../addon/facebook/facebook.php:771
+#: ../../addon/facebook/facebook.php:773
 msgid "Real-Time Updates"
 msgstr "Realtempaj Ĝisdatigoj"
 
-#: ../../addon/facebook/facebook.php:775
+#: ../../addon/facebook/facebook.php:777
 msgid "Real-Time Updates are activated."
 msgstr "Realtempaj Ĝisdatigoj estas ŝaltita"
 
-#: ../../addon/facebook/facebook.php:776
+#: ../../addon/facebook/facebook.php:778
 msgid "Deactivate Real-Time Updates"
 msgstr "Malŝalti Realtempaj Ĝisdatigoj"
 
-#: ../../addon/facebook/facebook.php:778
+#: ../../addon/facebook/facebook.php:780
 msgid "Real-Time Updates not activated."
 msgstr "Realtempaj Ĝisdatigoj estas malŝaltita"
 
-#: ../../addon/facebook/facebook.php:778
+#: ../../addon/facebook/facebook.php:780
 msgid "Activate Real-Time Updates"
 msgstr "Ŝalti Realtempaj Ĝisdatigoj"
 
-#: ../../addon/facebook/facebook.php:797 ../../addon/dav/layout.fnk.php:360
+#: ../../addon/facebook/facebook.php:799 ../../addon/dav/layout.fnk.php:360
 msgid "The new values have been saved."
 msgstr "Konservis novajn valorojn."
 
-#: ../../addon/facebook/facebook.php:821
+#: ../../addon/facebook/facebook.php:823
 msgid "Post to Facebook"
 msgstr "Afiŝi al Facebook"
 
-#: ../../addon/facebook/facebook.php:919
+#: ../../addon/facebook/facebook.php:921
 msgid ""
 "Post to Facebook cancelled because of multi-network access permission "
 "conflict."
 msgstr "Afiŝado al Facebook nuligita ĉar okazis konflikto en la multretpermesoj."
 
-#: ../../addon/facebook/facebook.php:1139
+#: ../../addon/facebook/facebook.php:1141
 msgid "View on Friendica"
 msgstr "Vidi ĉe Friendica"
 
-#: ../../addon/facebook/facebook.php:1172
+#: ../../addon/facebook/facebook.php:1174
 msgid "Facebook post failed. Queued for retry."
 msgstr "Malsukcesis afiŝi ĉe Facebook. Enigita en vico."
 
-#: ../../addon/facebook/facebook.php:1212
+#: ../../addon/facebook/facebook.php:1214
 msgid "Your Facebook connection became invalid. Please Re-authenticate."
 msgstr "Via Facbook konekto iĝis nevalida. Bonvolu reaŭtentiĝi."
 
-#: ../../addon/facebook/facebook.php:1213
+#: ../../addon/facebook/facebook.php:1215
 msgid "Facebook connection became invalid"
 msgstr "Facebook konekto iĝis nevalida."
 
-#: ../../addon/facebook/facebook.php:1214
+#: ../../addon/facebook/facebook.php:1216
 #, php-format
 msgid ""
 "Hi %1$s,\n"
@@ -4679,33 +4885,27 @@ msgstr "%s - Klaku por malfermi/fermi"
 msgid "Forums"
 msgstr "Forumoj"
 
-#: ../../addon/page/page.php:76 ../../addon/page/page.php:110
-#: ../../addon/showmore/showmore.php:87 ../../include/contact_widgets.php:188
-#: ../../include/conversation.php:476 ../../boot.php:529
-msgid "show more"
-msgstr "montri pli"
-
 #: ../../addon/page/page.php:129
 msgid "Forums:"
 msgstr "Forumoj:"
 
-#: ../../addon/page/page.php:163
+#: ../../addon/page/page.php:165
 msgid "Page settings updated."
 msgstr "Paĝajn agordojn ĝisdatigita."
 
-#: ../../addon/page/page.php:192
+#: ../../addon/page/page.php:194
 msgid "Page Settings"
 msgstr "Paĝaj Agordoj"
 
-#: ../../addon/page/page.php:194
+#: ../../addon/page/page.php:196
 msgid "How many forums to display on sidebar without paging"
 msgstr "Montri tiom da forumoj en la flanka strio sen paĝigo"
 
-#: ../../addon/page/page.php:197
+#: ../../addon/page/page.php:199
 msgid "Randomise Page/Forum list"
 msgstr "Hazardigi la liston de Paĝoj/Forumoj"
 
-#: ../../addon/page/page.php:200
+#: ../../addon/page/page.php:202
 msgid "Show pages/forums on profile page"
 msgstr "Montri paĝojn/forumojn sur la profilpaĝo"
 
@@ -4721,7 +4921,7 @@ msgstr "Ŝalti la Planets kromprogamon"
 #: ../../addon/communityhome/communityhome.php:34
 #: ../../addon/communityhome/twillingham/communityhome.php:28
 #: ../../addon/communityhome/twillingham/communityhome.php:34
-#: ../../include/nav.php:64 ../../boot.php:849
+#: ../../include/nav.php:64 ../../boot.php:886
 msgid "Login"
 msgstr "Ensaluti"
 
@@ -4749,8 +4949,8 @@ msgid "Latest likes"
 msgstr "Ĵusaj ŝatitaĵoj"
 
 #: ../../addon/communityhome/communityhome.php:155
-#: ../../view/theme/diabook/theme.php:562 ../../include/text.php:1315
-#: ../../include/conversation.php:45 ../../include/conversation.php:118
+#: ../../view/theme/diabook/theme.php:562 ../../include/text.php:1344
+#: ../../include/conversation.php:106 ../../include/conversation.php:179
 msgid "event"
 msgstr "okazo"
 
@@ -4859,7 +5059,7 @@ msgstr "Horzono"
 msgid "Limitations"
 msgstr "Limigoj"
 
-#: ../../addon/dav/layout.fnk.php:391
+#: ../../addon/dav/layout.fnk.php:391 ../../addon/libravatar/libravatar.php:82
 msgid "Warning"
 msgstr "Averto"
 
@@ -5343,6 +5543,69 @@ msgstr "Defaŭlta zoma faktoro"
 msgid "The default zoom level. (1:world, 18:highest)"
 msgstr "La defaŭlta zoma faktoro. (1:tutmonda, 18:plej proksima)"
 
+#: ../../addon/libravatar/libravatar.php:14
+msgid "Could NOT install Libravatar successfully.<br>It requires PHP >= 5.3"
+msgstr "NE SUKCESIS instali la bibliotekon Libravatar.<br>Ĝi bezonas PHP >= 5.3"
+
+#: ../../addon/libravatar/libravatar.php:73
+#: ../../addon/gravatar/gravatar.php:71
+msgid "generic profile image"
+msgstr "komuna profilbildo"
+
+#: ../../addon/libravatar/libravatar.php:74
+#: ../../addon/gravatar/gravatar.php:72
+msgid "random geometric pattern"
+msgstr "loteca geometria skemo"
+
+#: ../../addon/libravatar/libravatar.php:75
+#: ../../addon/gravatar/gravatar.php:73
+msgid "monster face"
+msgstr "monstrobildo"
+
+#: ../../addon/libravatar/libravatar.php:76
+#: ../../addon/gravatar/gravatar.php:74
+msgid "computer generated face"
+msgstr "komputita vizaĝo"
+
+#: ../../addon/libravatar/libravatar.php:77
+#: ../../addon/gravatar/gravatar.php:75
+msgid "retro arcade style face"
+msgstr "retrostila videoludstila vizaĝo"
+
+#: ../../addon/libravatar/libravatar.php:83
+#, php-format
+msgid "Your PHP version %s is lower than the required PHP >= 5.3."
+msgstr "Via PHP versio %s estas malpli alta ol la bezonata PHP >= 5.3."
+
+#: ../../addon/libravatar/libravatar.php:84
+msgid "This addon is not functional on your server."
+msgstr "Tiu ĉi kromprogramo ne funkcieblas je via servilo."
+
+#: ../../addon/libravatar/libravatar.php:93
+#: ../../addon/gravatar/gravatar.php:89
+msgid "Information"
+msgstr "Informo"
+
+#: ../../addon/libravatar/libravatar.php:93
+msgid ""
+"Gravatar addon is installed. Please disable the Gravatar addon.<br>The "
+"Libravatar addon will fall back to Gravatar if nothing was found at "
+"Libravatar."
+msgstr "La Gravatar kromprogramo estas instalita. Bonvolu malŝalti la Gravatar kromprogramon.<tr>La Libravatar kromprogramo retropaŝos al Gravatar se neniu troveblis ĉe Libravatar."
+
+#: ../../addon/libravatar/libravatar.php:100
+#: ../../addon/gravatar/gravatar.php:96
+msgid "Default avatar image"
+msgstr "Defaŭlta avatarbildo"
+
+#: ../../addon/libravatar/libravatar.php:100
+msgid "Select default avatar image if none was found. See README"
+msgstr "Elektu la defaŭltan avatar bildon sen neniu troveblis. Legu README."
+
+#: ../../addon/libravatar/libravatar.php:112
+msgid "Libravatar settings updated."
+msgstr "Ĝisdatigis Libravatar agordojn."
+
 #: ../../addon/libertree/libertree.php:36
 msgid "Post to libertree"
 msgstr "Afiŝi al libertree"
@@ -5366,6 +5629,18 @@ msgstr "URL adreso de libertree retejo:"
 #: ../../addon/libertree/libertree.php:84
 msgid "Post to Libertree by default"
 msgstr "Defaŭlte afiŝi ĉe Libertree"
+
+#: ../../addon/altpager/altpager.php:46
+msgid "Altpager settings updated."
+msgstr "Ĝisdatigis Altpager agordojn."
+
+#: ../../addon/altpager/altpager.php:79
+msgid "Alternate Pagination Setting"
+msgstr "Alternativa paĝonumerado agordoj"
+
+#: ../../addon/altpager/altpager.php:81
+msgid "Use links to \"newer\" and \"older\" pages in place of page numbers?"
+msgstr "Uzi ligilojn al \"pli nova\" kaj \"pli malnova\" paĝoj anstataŭ paĝnombrojn?"
 
 #: ../../addon/mathjax/mathjax.php:37
 msgid ""
@@ -5400,43 +5675,26 @@ msgstr "Agordoj por Editplain"
 msgid "Disable richtext status editor"
 msgstr "Malŝalti la riĉteksto-redaktilon"
 
-#: ../../addon/gravatar/gravatar.php:71
-msgid "generic profile image"
-msgstr "komuna profilbildo"
+#: ../../addon/gravatar/gravatar.php:89
+msgid ""
+"Libravatar addon is installed, too. Please disable Libravatar addon or this "
+"Gravatar addon.<br>The Libravatar addon will fall back to Gravatar if "
+"nothing was found at Libravatar."
+msgstr "La Libravatar kromprogramo estas ankaŭ instaltga. Bonvolu malŝalti la Libravatar kromprogramon.<br>La Libravatar kromprogramo retropaŝos al Gravatar se neniu troveblis ĉe Libravatar."
 
-#: ../../addon/gravatar/gravatar.php:72
-msgid "random geometric pattern"
-msgstr "loteca geometria skemo"
-
-#: ../../addon/gravatar/gravatar.php:73
-msgid "monster face"
-msgstr "monstrobildo"
-
-#: ../../addon/gravatar/gravatar.php:74
-msgid "computer generated face"
-msgstr "komputita vizaĝo"
-
-#: ../../addon/gravatar/gravatar.php:75
-msgid "retro arcade style face"
-msgstr "retrostila videoludstila vizaĝo"
-
-#: ../../addon/gravatar/gravatar.php:87
-msgid "Default avatar image"
-msgstr "Defaŭlta avatarbildo"
-
-#: ../../addon/gravatar/gravatar.php:87
+#: ../../addon/gravatar/gravatar.php:96
 msgid "Select default avatar image if none was found at Gravatar. See README"
 msgstr "Elektu defaŭltan avatarbildon se neniu troviĝis ĉe Gravatar. Vidu README."
 
-#: ../../addon/gravatar/gravatar.php:88
+#: ../../addon/gravatar/gravatar.php:97
 msgid "Rating of images"
 msgstr "Pritakso de bildoj"
 
-#: ../../addon/gravatar/gravatar.php:88
+#: ../../addon/gravatar/gravatar.php:97
 msgid "Select the appropriate avatar rating for your site. See README"
 msgstr "Elektu la ĝustan pritakson de via avataro por via retejo. Vidu README."
 
-#: ../../addon/gravatar/gravatar.php:102
+#: ../../addon/gravatar/gravatar.php:111
 msgid "Gravatar settings updated."
 msgstr "Gravatar agordoj ĝisdatigitaj."
 
@@ -6130,10 +6388,6 @@ msgstr "Centren"
 msgid "Set colour scheme"
 msgstr "Agordi Kolorskemon"
 
-#: ../../include/profile_advanced.php:17 ../../boot.php:1138
-msgid "Gender:"
-msgstr "Sekso:"
-
 #: ../../include/profile_advanced.php:22
 msgid "j F, Y"
 msgstr "j F, Y"
@@ -6150,18 +6404,10 @@ msgstr "Naskiĝtago:"
 msgid "Age:"
 msgstr "Aĝo:"
 
-#: ../../include/profile_advanced.php:37 ../../boot.php:1141
-msgid "Status:"
-msgstr "Stato:"
-
 #: ../../include/profile_advanced.php:43
 #, php-format
 msgid "for %1$d %2$s"
 msgstr "por %1$d %2$s"
-
-#: ../../include/profile_advanced.php:48 ../../boot.php:1143
-msgid "Homepage:"
-msgstr "Hejmpaĝo:"
 
 #: ../../include/profile_advanced.php:52
 msgid "Tags:"
@@ -6170,10 +6416,6 @@ msgstr "Markoj:"
 #: ../../include/profile_advanced.php:56
 msgid "Religion:"
 msgstr "Religio:"
-
-#: ../../include/profile_advanced.php:58
-msgid "About:"
-msgstr "Pri:"
 
 #: ../../include/profile_advanced.php:60
 msgid "Hobbies/Interests:"
@@ -6515,11 +6757,11 @@ msgstr "Egala"
 msgid "Ask me"
 msgstr "Demandu min"
 
-#: ../../include/event.php:20 ../../include/bb2diaspora.php:341
+#: ../../include/event.php:20 ../../include/bb2diaspora.php:453
 msgid "Starts:"
 msgstr "Ekas:"
 
-#: ../../include/event.php:30 ../../include/bb2diaspora.php:349
+#: ../../include/event.php:30 ../../include/bb2diaspora.php:461
 msgid "Finishes:"
 msgstr "Finas:"
 
@@ -6552,150 +6794,158 @@ msgstr "lasta"
 msgid "next"
 msgstr "sekvanta"
 
-#: ../../include/text.php:568
+#: ../../include/text.php:295
+msgid "newer"
+msgstr "pli nova"
+
+#: ../../include/text.php:299
+msgid "older"
+msgstr "pli malnova"
+
+#: ../../include/text.php:593
 msgid "No contacts"
 msgstr "Neniu kontaktoj"
 
-#: ../../include/text.php:577
+#: ../../include/text.php:602
 #, php-format
 msgid "%d Contact"
 msgid_plural "%d Contacts"
 msgstr[0] "%d Kontakto"
 msgstr[1] "%d Kontaktoj"
 
-#: ../../include/text.php:835
+#: ../../include/text.php:864
 msgid "Monday"
 msgstr "Lundo"
 
-#: ../../include/text.php:835
+#: ../../include/text.php:864
 msgid "Tuesday"
 msgstr "Mardo"
 
-#: ../../include/text.php:835
+#: ../../include/text.php:864
 msgid "Wednesday"
 msgstr "Merkredo"
 
-#: ../../include/text.php:835
+#: ../../include/text.php:864
 msgid "Thursday"
 msgstr "Ĵaŭdo"
 
-#: ../../include/text.php:835
+#: ../../include/text.php:864
 msgid "Friday"
 msgstr "Vendredo"
 
-#: ../../include/text.php:835
+#: ../../include/text.php:864
 msgid "Saturday"
 msgstr "Sabato"
 
-#: ../../include/text.php:835
+#: ../../include/text.php:864
 msgid "Sunday"
 msgstr "Dimanĉo"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "January"
 msgstr "Januaro"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "February"
 msgstr "Februaro"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "March"
 msgstr "Marto"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "April"
 msgstr "Aprilo"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "May"
 msgstr "Majo"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "June"
 msgstr "Junio"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "July"
 msgstr "Julio"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "August"
 msgstr "Aŭgusto"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "September"
 msgstr "Septembro"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "October"
 msgstr "Oktobro"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "November"
 msgstr "Novembro"
 
-#: ../../include/text.php:839
+#: ../../include/text.php:868
 msgid "December"
 msgstr "Decembro"
 
-#: ../../include/text.php:925
+#: ../../include/text.php:954
 msgid "bytes"
 msgstr "bajtoj"
 
-#: ../../include/text.php:945 ../../include/text.php:960
+#: ../../include/text.php:974 ../../include/text.php:989
 msgid "remove"
 msgstr "forviŝi"
 
-#: ../../include/text.php:945 ../../include/text.php:960
+#: ../../include/text.php:974 ../../include/text.php:989
 msgid "[remove]"
 msgstr "[forviŝi]"
 
-#: ../../include/text.php:948
+#: ../../include/text.php:977
 msgid "Categories:"
 msgstr "Kategorioj:"
 
-#: ../../include/text.php:963
+#: ../../include/text.php:992
 msgid "Filed under:"
 msgstr "Enarkivigita kiel:"
 
-#: ../../include/text.php:979 ../../include/text.php:991
+#: ../../include/text.php:1008 ../../include/text.php:1020
 msgid "Click to open/close"
 msgstr "Klaku por malfermi/fermi"
 
-#: ../../include/text.php:1097 ../../include/user.php:236
+#: ../../include/text.php:1126 ../../include/user.php:236
 msgid "default"
 msgstr "defaŭlta"
 
-#: ../../include/text.php:1109
+#: ../../include/text.php:1138
 msgid "Select an alternate language"
 msgstr "Elekti alian lingvon"
 
-#: ../../include/text.php:1319
+#: ../../include/text.php:1348
 msgid "activity"
 msgstr "aktiveco"
 
-#: ../../include/text.php:1321
+#: ../../include/text.php:1350
 msgid "comment"
 msgstr "komento"
 
-#: ../../include/text.php:1322
+#: ../../include/text.php:1351
 msgid "post"
 msgstr "afiŝo"
 
-#: ../../include/text.php:1477
+#: ../../include/text.php:1506
 msgid "Item filed"
 msgstr "Enarkivigis elementon "
 
-#: ../../include/diaspora.php:593
+#: ../../include/diaspora.php:660
 msgid "Sharing notification from Diaspora network"
 msgstr "Antentigo pri kunhavigado de la Diaspora reto"
 
-#: ../../include/diaspora.php:2085
+#: ../../include/diaspora.php:2174
 msgid "Attachments:"
 msgstr "Kunsendaĵoj:"
 
-#: ../../include/network.php:839
+#: ../../include/network.php:842
 msgid "view full size"
 msgstr "vidi plengrande"
 
@@ -6742,7 +6992,7 @@ msgstr "Krei novan grupon"
 msgid "Contacts not in any group"
 msgstr "Kontaktoj en neniu grupo"
 
-#: ../../include/nav.php:46 ../../boot.php:848
+#: ../../include/nav.php:46 ../../boot.php:885
 msgid "Logout"
 msgstr "Elsaluti"
 
@@ -6750,7 +7000,7 @@ msgstr "Elsaluti"
 msgid "End this session"
 msgstr "Fini ĉi-tiun seancon"
 
-#: ../../include/nav.php:49 ../../boot.php:1538
+#: ../../include/nav.php:49 ../../boot.php:1575
 msgid "Status"
 msgstr "Stato"
 
@@ -6830,11 +7080,11 @@ msgstr "Administri"
 msgid "Manage other pages"
 msgstr "Administri aliajn paĝojn"
 
-#: ../../include/nav.php:138 ../../boot.php:1096
+#: ../../include/nav.php:138 ../../boot.php:1133
 msgid "Profiles"
 msgstr "Profiloj"
 
-#: ../../include/nav.php:138 ../../boot.php:1096
+#: ../../include/nav.php:138 ../../boot.php:1133
 msgid "Manage/edit profiles"
 msgstr "Administri/redakti profilojn"
 
@@ -6996,12 +7246,12 @@ msgstr "sekundoj"
 msgid "%1$d %2$s ago"
 msgstr "antaŭ %1$d %2$s"
 
-#: ../../include/datetime.php:450 ../../include/items.php:1460
+#: ../../include/datetime.php:450 ../../include/items.php:1561
 #, php-format
 msgid "%s's birthday"
 msgstr "Naskiĝtago de %s"
 
-#: ../../include/datetime.php:451 ../../include/items.php:1461
+#: ../../include/datetime.php:451 ../../include/items.php:1562
 #, php-format
 msgid "Happy Birthday %s"
 msgstr "Feliĉan Naskiĝtagon al %s"
@@ -7010,13 +7260,13 @@ msgstr "Feliĉan Naskiĝtagon al %s"
 msgid "From: "
 msgstr "De: "
 
-#: ../../include/bbcode.php:216 ../../include/bbcode.php:236
-msgid "$1 wrote:"
-msgstr "$1 skribis:"
-
-#: ../../include/bbcode.php:251 ../../include/bbcode.php:328
+#: ../../include/bbcode.php:102 ../../include/bbcode.php:313
 msgid "Image/photo"
 msgstr "Bildo"
+
+#: ../../include/bbcode.php:278 ../../include/bbcode.php:298
+msgid "$1 wrote:"
+msgstr "$1 skribis:"
 
 #: ../../include/dba.php:41
 #, php-format
@@ -7073,130 +7323,130 @@ msgstr "privatan mesaĝon"
 msgid "Please visit %s to view and/or reply to your private messages."
 msgstr "Bonvolu viziti %s por vidi aŭ respondi viajn privatajn mesaĝojn."
 
-#: ../../include/enotify.php:73
+#: ../../include/enotify.php:87
 #, php-format
 msgid "%1$s commented on [url=%2$s]a %3$s[/url]"
 msgstr "%1$s komentis pri [url=%2$s]%3$s[/url]"
 
-#: ../../include/enotify.php:80
+#: ../../include/enotify.php:94
 #, php-format
 msgid "%1$s commented on [url=%2$s]%3$s's %4$s[/url]"
 msgstr "%1$s komentis pri [url=%2$s]%4$s de %3$s[/url]"
 
-#: ../../include/enotify.php:88
+#: ../../include/enotify.php:102
 #, php-format
 msgid "%1$s commented on [url=%2$s]your %3$s[/url]"
 msgstr "%1$s komentis pri [url=%2$s]via %3$s[/url]"
 
-#: ../../include/enotify.php:98
+#: ../../include/enotify.php:112
 #, php-format
 msgid "[Friendica:Notify] Comment to conversation #%1$d by %2$s"
 msgstr "[Friendica:Atentigo] Komento pri konversacio #%1$d de %2$s"
 
-#: ../../include/enotify.php:99
+#: ../../include/enotify.php:113
 #, php-format
 msgid "%s commented on an item/conversation you have been following."
 msgstr "%s komentis pri elemento/konversacio kiun vi sekvas."
 
-#: ../../include/enotify.php:102 ../../include/enotify.php:117
-#: ../../include/enotify.php:130 ../../include/enotify.php:143
+#: ../../include/enotify.php:116 ../../include/enotify.php:131
+#: ../../include/enotify.php:144 ../../include/enotify.php:157
 #, php-format
 msgid "Please visit %s to view and/or reply to the conversation."
 msgstr "Bonvolu viziti %s por vidi aŭ respondi la konversacion."
 
-#: ../../include/enotify.php:109
+#: ../../include/enotify.php:123
 #, php-format
 msgid "[Friendica:Notify] %s posted to your profile wall"
 msgstr "[Friendica:Atentigo] %s afiŝis al via profilmuro"
 
-#: ../../include/enotify.php:111
+#: ../../include/enotify.php:125
 #, php-format
 msgid "%1$s posted to your profile wall at %2$s"
 msgstr "%1$s skribis al via profilmuro ĉe %2$s"
 
-#: ../../include/enotify.php:113
+#: ../../include/enotify.php:127
 #, php-format
-msgid "%1$s posted to [url=%2s]your wall[/url]"
-msgstr "%1$s afiŝis al [url=%2s]via muro[/url]"
+msgid "%1$s posted to [url=%2$s]your wall[/url]"
+msgstr "%1$s afiŝis al [url=%2$s]via muro[/url]"
 
-#: ../../include/enotify.php:124
+#: ../../include/enotify.php:138
 #, php-format
 msgid "[Friendica:Notify] %s tagged you"
 msgstr "[Friendica:Atentigo] %s markis vin"
 
-#: ../../include/enotify.php:125
+#: ../../include/enotify.php:139
 #, php-format
 msgid "%1$s tagged you at %2$s"
 msgstr "%1$s markis vin ĉe %2$s"
 
-#: ../../include/enotify.php:126
+#: ../../include/enotify.php:140
 #, php-format
 msgid "%1$s [url=%2$s]tagged you[/url]."
 msgstr "%1$s [url=%2$s]markis vin[/url]."
 
-#: ../../include/enotify.php:137
+#: ../../include/enotify.php:151
 #, php-format
 msgid "[Friendica:Notify] %s tagged your post"
 msgstr "[Friendica:Atentigo] %s markis vian afiŝon"
 
-#: ../../include/enotify.php:138
+#: ../../include/enotify.php:152
 #, php-format
 msgid "%1$s tagged your post at %2$s"
 msgstr "%1$s markis vian afiŝon ĉe %2$s"
 
-#: ../../include/enotify.php:139
+#: ../../include/enotify.php:153
 #, php-format
 msgid "%1$s tagged [url=%2$s]your post[/url]"
 msgstr "%1$s markis [url=%2$s]vian afiŝon[/url]"
 
-#: ../../include/enotify.php:150
+#: ../../include/enotify.php:164
 msgid "[Friendica:Notify] Introduction received"
 msgstr "[Friendica:Atentigo] Ricevis prezenton"
 
-#: ../../include/enotify.php:151
+#: ../../include/enotify.php:165
 #, php-format
 msgid "You've received an introduction from '%1$s' at %2$s"
 msgstr "Vi ricevis prezenton de '%1$s' ĉe %2$s"
 
-#: ../../include/enotify.php:152
+#: ../../include/enotify.php:166
 #, php-format
 msgid "You've received [url=%1$s]an introduction[/url] from %2$s."
 msgstr "Vi ricevis [url=%1$s]prezenton[/url] de %2$s."
 
-#: ../../include/enotify.php:155 ../../include/enotify.php:173
+#: ../../include/enotify.php:169 ../../include/enotify.php:187
 #, php-format
 msgid "You may visit their profile at %s"
 msgstr "Vi povas vidi la profilon de li aŭ ŝi ĉe %s"
 
-#: ../../include/enotify.php:157
+#: ../../include/enotify.php:171
 #, php-format
 msgid "Please visit %s to approve or reject the introduction."
 msgstr "Bonvolu viziti %s por aprobi aŭ malaprobi la prezenton."
 
-#: ../../include/enotify.php:164
+#: ../../include/enotify.php:178
 msgid "[Friendica:Notify] Friend suggestion received"
 msgstr "[Friendica:Atentigo] Ricevis amikosugeston"
 
-#: ../../include/enotify.php:165
+#: ../../include/enotify.php:179
 #, php-format
 msgid "You've received a friend suggestion from '%1$s' at %2$s"
 msgstr "Vi ricevis amikosugeston de '%1$s' ĉe %2$s"
 
-#: ../../include/enotify.php:166
+#: ../../include/enotify.php:180
 #, php-format
 msgid ""
 "You've received [url=%1$s]a friend suggestion[/url] for %2$s from %3$s."
 msgstr "Vi ricevis [url=%1$s]amikosugeston[/url] pri %2$s de %3$s."
 
-#: ../../include/enotify.php:171
+#: ../../include/enotify.php:185
 msgid "Name:"
 msgstr "Nomo:"
 
-#: ../../include/enotify.php:172
+#: ../../include/enotify.php:186
 msgid "Photo:"
 msgstr "Bildo:"
 
-#: ../../include/enotify.php:175
+#: ../../include/enotify.php:189
 #, php-format
 msgid "Please visit %s to approve or reject the suggestion."
 msgstr "Bonvolu viziti %s por aprobi aŭ malaprobi la sugeston."
@@ -7256,17 +7506,22 @@ msgstr "Ne eblas ricevi kontaktinformojn."
 msgid "following"
 msgstr "sekvanta"
 
-#: ../../include/items.php:2888
+#: ../../include/items.php:2991
 msgid "A new person is sharing with you at "
 msgstr "Nova persono kunhavigas kun vi ĉe "
 
-#: ../../include/items.php:2888
+#: ../../include/items.php:2991
 msgid "You have a new follower at "
 msgstr "Vi havas novan sekvanton ĉe "
 
-#: ../../include/items.php:3520
+#: ../../include/items.php:3660
 msgid "Archives"
 msgstr "Arkivoj"
+
+#: ../../include/bb2diaspora.php:286 ../../include/bb2diaspora.php:296
+#: ../../include/bb2diaspora.php:297
+msgid "image/photo"
+msgstr "bildo/foto"
 
 #: ../../include/user.php:38
 msgid "An invitation is required."
@@ -7358,252 +7613,142 @@ msgstr "La sekuriga ĵetono de la formo estis malĝusta. Tio verŝajne okazis ĉ
 msgid "stopped following"
 msgstr "ne plu sekvas"
 
-#: ../../include/Contact.php:218 ../../include/conversation.php:842
+#: ../../include/Contact.php:218 ../../include/conversation.php:915
 msgid "View Status"
 msgstr "Vidi Staton"
 
-#: ../../include/Contact.php:219 ../../include/conversation.php:843
+#: ../../include/Contact.php:219 ../../include/conversation.php:916
 msgid "View Profile"
 msgstr "Vidi Profilon"
 
-#: ../../include/Contact.php:220 ../../include/conversation.php:844
+#: ../../include/Contact.php:220 ../../include/conversation.php:917
 msgid "View Photos"
 msgstr "Vidi Bildojn"
 
 #: ../../include/Contact.php:221 ../../include/Contact.php:234
-#: ../../include/conversation.php:845
+#: ../../include/conversation.php:918
 msgid "Network Posts"
 msgstr "Enretaj Afiŝoj"
 
 #: ../../include/Contact.php:222 ../../include/Contact.php:234
-#: ../../include/conversation.php:846
+#: ../../include/conversation.php:919
 msgid "Edit Contact"
 msgstr "Redakti Kontakton"
 
 #: ../../include/Contact.php:223 ../../include/Contact.php:234
-#: ../../include/conversation.php:847
+#: ../../include/conversation.php:920
 msgid "Send PM"
 msgstr "Sendi PM"
 
-#: ../../include/conversation.php:163
+#: ../../include/conversation.php:224
 msgid "post/item"
 msgstr "afiŝo/elemento"
 
-#: ../../include/conversation.php:164
+#: ../../include/conversation.php:225
 #, php-format
 msgid "%1$s marked %2$s's %3$s as favorite"
 msgstr "%1$s markis la %3$s de %2$s kiel preferita."
 
-#: ../../include/conversation.php:327 ../../include/conversation.php:608
-msgid "Select"
-msgstr "Elekti"
-
-#: ../../include/conversation.php:344 ../../include/conversation.php:701
-#: ../../include/conversation.php:702
-#, php-format
-msgid "View %s's profile @ %s"
-msgstr "Vidi la profilon de %s ĉe %s"
-
-#: ../../include/conversation.php:354 ../../include/conversation.php:713
-#, php-format
-msgid "%s from %s"
-msgstr "%s de %s"
-
-#: ../../include/conversation.php:369
-msgid "View in context"
-msgstr "Vidi kun kunteksto"
-
-#: ../../include/conversation.php:475
-#, php-format
-msgid "%d comment"
-msgid_plural "%d comments"
-msgstr[0] "%d komento"
-msgstr[1] "%d komentoj"
-
-#: ../../include/conversation.php:554
-msgid "like"
-msgstr "ŝati"
-
-#: ../../include/conversation.php:555
-msgid "dislike"
-msgstr "malŝati"
-
-#: ../../include/conversation.php:557
-msgid "Share this"
-msgstr "Kunhavigi ĉi tiun"
-
-#: ../../include/conversation.php:557
-msgid "share"
-msgstr "kunhavigi"
-
-#: ../../include/conversation.php:581
-msgid "Bold"
-msgstr "Grasa"
-
-#: ../../include/conversation.php:582
-msgid "Italic"
-msgstr "Kursiva"
-
-#: ../../include/conversation.php:583
-msgid "Underline"
-msgstr "Substreki"
-
-#: ../../include/conversation.php:584
-msgid "Quote"
-msgstr "Citaĵo"
-
-#: ../../include/conversation.php:585
-msgid "Code"
-msgstr "Kodo"
-
-#: ../../include/conversation.php:586
-msgid "Image"
-msgstr "Bildo"
-
-#: ../../include/conversation.php:587
-msgid "Link"
-msgstr "Ligilo"
-
-#: ../../include/conversation.php:588
-msgid "Video"
-msgstr "Video"
-
-#: ../../include/conversation.php:621
-msgid "add star"
-msgstr "aldoni stelon"
-
-#: ../../include/conversation.php:622
-msgid "remove star"
-msgstr "forpreni stelon"
-
-#: ../../include/conversation.php:623
-msgid "toggle star status"
-msgstr "ŝalti/malŝalti steloŝtato"
-
-#: ../../include/conversation.php:626
-msgid "starred"
-msgstr "steligita"
-
-#: ../../include/conversation.php:627
-msgid "add tag"
-msgstr "aldoni markon"
-
-#: ../../include/conversation.php:631
-msgid "save to folder"
-msgstr "konservi en dosierujo"
-
-#: ../../include/conversation.php:703
-msgid "to"
-msgstr "al"
-
-#: ../../include/conversation.php:704
-msgid "Wall-to-Wall"
-msgstr "Muro-al-Muro"
-
-#: ../../include/conversation.php:705
-msgid "via Wall-To-Wall:"
-msgstr "per Muro-al-Muro:"
-
-#: ../../include/conversation.php:750
+#: ../../include/conversation.php:823
 msgid "Delete Selected Items"
 msgstr "Forviŝi Elektitajn Elementojn"
 
-#: ../../include/conversation.php:905
+#: ../../include/conversation.php:978
 #, php-format
 msgid "%s likes this."
 msgstr "%s ŝatas tiun."
 
-#: ../../include/conversation.php:905
+#: ../../include/conversation.php:978
 #, php-format
 msgid "%s doesn't like this."
 msgstr "%s malŝatas tiun."
 
-#: ../../include/conversation.php:909
+#: ../../include/conversation.php:982
 #, php-format
 msgid "<span  %1$s>%2$d people</span> like this."
 msgstr "<span %1$s>%2$d homoj</span> ŝatas tiun."
 
-#: ../../include/conversation.php:911
+#: ../../include/conversation.php:984
 #, php-format
 msgid "<span  %1$s>%2$d people</span> don't like this."
 msgstr "<span %1$s>%2$d homoj</span>malŝatas tiun."
 
-#: ../../include/conversation.php:917
+#: ../../include/conversation.php:990
 msgid "and"
 msgstr "kaj"
 
-#: ../../include/conversation.php:920
+#: ../../include/conversation.php:993
 #, php-format
 msgid ", and %d other people"
 msgstr ", kaj %d aliaj homoj."
 
-#: ../../include/conversation.php:921
+#: ../../include/conversation.php:994
 #, php-format
 msgid "%s like this."
 msgstr "%s ŝatas tiun."
 
-#: ../../include/conversation.php:921
+#: ../../include/conversation.php:994
 #, php-format
 msgid "%s don't like this."
 msgstr "%s malŝatas tiun."
 
-#: ../../include/conversation.php:946
+#: ../../include/conversation.php:1019
 msgid "Visible to <strong>everybody</strong>"
 msgstr "Videbla al <strong>ĉiuj</strong>"
 
-#: ../../include/conversation.php:948
+#: ../../include/conversation.php:1021
 msgid "Please enter a video link/URL:"
 msgstr "Bonvolu entajpi ligilon/adreson de video:"
 
-#: ../../include/conversation.php:949
+#: ../../include/conversation.php:1022
 msgid "Please enter an audio link/URL:"
 msgstr "Bonvolu entajpi ligilon/adreson de sono:"
 
-#: ../../include/conversation.php:950
+#: ../../include/conversation.php:1023
 msgid "Tag term:"
 msgstr "Markfrazo:"
 
-#: ../../include/conversation.php:952
+#: ../../include/conversation.php:1025
 msgid "Where are you right now?"
 msgstr "Kie vi estas nun?"
 
-#: ../../include/conversation.php:995
+#: ../../include/conversation.php:1068
 msgid "upload photo"
 msgstr "alŝuti bildon"
 
-#: ../../include/conversation.php:997
+#: ../../include/conversation.php:1070
 msgid "attach file"
 msgstr "kunsendi dosieron"
 
-#: ../../include/conversation.php:999
+#: ../../include/conversation.php:1072
 msgid "web link"
 msgstr "TTT ligilo"
 
-#: ../../include/conversation.php:1000
+#: ../../include/conversation.php:1073
 msgid "Insert video link"
 msgstr "Alglui ligilon de video"
 
-#: ../../include/conversation.php:1001
+#: ../../include/conversation.php:1074
 msgid "video link"
 msgstr "video ligilo"
 
-#: ../../include/conversation.php:1002
+#: ../../include/conversation.php:1075
 msgid "Insert audio link"
 msgstr "Alglui ligilon de sono"
 
-#: ../../include/conversation.php:1003
+#: ../../include/conversation.php:1076
 msgid "audio link"
 msgstr "sono ligilo"
 
-#: ../../include/conversation.php:1005
+#: ../../include/conversation.php:1078
 msgid "set location"
 msgstr "agordi lokon"
 
-#: ../../include/conversation.php:1007
+#: ../../include/conversation.php:1080
 msgid "clear location"
 msgstr "forviŝi lokon"
 
-#: ../../include/conversation.php:1014
+#: ../../include/conversation.php:1087
 msgid "permissions"
 msgstr "permesoj"
 
@@ -7619,96 +7764,96 @@ msgstr "Tia ago preterpasas la limojn de via abono."
 msgid "This action is not available under your subscription plan."
 msgstr "Tia ago ne estas permesita laŭ via abono."
 
-#: ../../boot.php:527
+#: ../../boot.php:564
 msgid "Delete this item?"
 msgstr "Forviŝi ĉi tiun elementon?"
 
-#: ../../boot.php:530
+#: ../../boot.php:567
 msgid "show fewer"
 msgstr "montri malpli"
 
-#: ../../boot.php:725
+#: ../../boot.php:762
 #, php-format
 msgid "Update %s failed. See error logs."
 msgstr "Malsukcesis ĝisdatigi %s. Vidu la protokolojn."
 
-#: ../../boot.php:727
+#: ../../boot.php:764
 #, php-format
 msgid "Update Error at %s"
 msgstr "Eraro dum ĝisdatigo ĉe %s"
 
-#: ../../boot.php:827
+#: ../../boot.php:864
 msgid "Create a New Account"
 msgstr "Krei Novan Konton"
 
-#: ../../boot.php:851
+#: ../../boot.php:888
 msgid "Nickname or Email address: "
 msgstr "Kaŝnomo aŭ retpoŝtadreso:"
 
-#: ../../boot.php:852
+#: ../../boot.php:889
 msgid "Password: "
 msgstr "Pasvorto:"
 
-#: ../../boot.php:855
+#: ../../boot.php:892
 msgid "Or login using OpenID: "
 msgstr "Aŭ ensaluti per OpenID:"
 
-#: ../../boot.php:861
+#: ../../boot.php:898
 msgid "Forgot your password?"
 msgstr "Ĉu vi vorgesis vian pasvorton?"
 
-#: ../../boot.php:1028
+#: ../../boot.php:1065
 msgid "Edit profile"
 msgstr "Redakti profilon"
 
-#: ../../boot.php:1088
+#: ../../boot.php:1125
 msgid "Message"
 msgstr "Mesaĝo"
 
-#: ../../boot.php:1204 ../../boot.php:1283
+#: ../../boot.php:1241 ../../boot.php:1320
 msgid "g A l F d"
 msgstr "\\j\\e \\l\\a G\\a \\h\\o\\r\\o, l F d"
 
-#: ../../boot.php:1205 ../../boot.php:1284
+#: ../../boot.php:1242 ../../boot.php:1321
 msgid "F d"
 msgstr "F d"
 
-#: ../../boot.php:1250 ../../boot.php:1324
+#: ../../boot.php:1287 ../../boot.php:1361
 msgid "[today]"
 msgstr "[hodiaŭ]"
 
-#: ../../boot.php:1262
+#: ../../boot.php:1299
 msgid "Birthday Reminders"
 msgstr "Memorigilo pri naskiĝtagoj"
 
-#: ../../boot.php:1263
+#: ../../boot.php:1300
 msgid "Birthdays this week:"
 msgstr "Naskiĝtagoj ĉi-semajne:"
 
-#: ../../boot.php:1317
+#: ../../boot.php:1354
 msgid "[No description]"
 msgstr "[Neniu priskribo]"
 
-#: ../../boot.php:1335
+#: ../../boot.php:1372
 msgid "Event Reminders"
 msgstr "Memorigilo pri Okazoj"
 
-#: ../../boot.php:1336
+#: ../../boot.php:1373
 msgid "Events this week:"
 msgstr "Okazoj ĉi-semajne:"
 
-#: ../../boot.php:1541
+#: ../../boot.php:1578
 msgid "Status Messages and Posts"
 msgstr "Ŝtatmesaĝoj kaj Afiŝoj"
 
-#: ../../boot.php:1547
+#: ../../boot.php:1584
 msgid "Profile Details"
 msgstr "Profildetaloj"
 
-#: ../../boot.php:1562
+#: ../../boot.php:1599
 msgid "Events and Calendar"
 msgstr "Okazoj kaj Kalendaro"
 
-#: ../../boot.php:1568
+#: ../../boot.php:1605
 msgid "Only You Can See This"
 msgstr "Nur Vi Povas Vidi Tiun"
