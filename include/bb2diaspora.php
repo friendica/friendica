@@ -190,63 +190,40 @@ function diaspora_ol($s) {
 }
 
 
-function bb2diaspora($Text,$preserve_nl = false) {
+function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 
-//////////////////////
-// An attempt was made to convert bbcode to html and then to markdown
-// consisting of the following lines.
-// I'm undoing this as we have a lot of bbcode constructs which
-// were simply getting lost, for instance bookmark, vimeo, video, youtube, events, etc.
-// We can try this again, but need a very good test sequence to verify
-// all the major bbcode constructs that we use are getting through.
-//////////////////////
-/*
-	// bbcode() will convert "[*]" into "<li>" with no closing "</li>"
-	// Markdownify() is unable to handle these, as it makes each new
-	// "<li>" into a deeper nested element until it crashes. So pre-format
-	// the lists as Diaspora lists before sending the $Text to bbcode()
-	//
-	// Note that to get nested lists to work for Diaspora, we would need
-	// to define the closing tag for the list elements. So nested lists
-	// are going to be flattened out in Diaspora for now
+	// Re-enabling the converter again.
+	// The bbcode parser now handles youtube-links (and the other stuff) correctly.
+	// Additionally the html code is now fixed so that lists are now working.
 
-	$endlessloop = 0;
-	while ((((strpos($Text, "[/list]") !== false) && (strpos($Text, "[list") !== false)) ||
-	       ((strpos($Text, "[/ol]") !== false) && (strpos($Text, "[ol]") !== false)) || 
-	       ((strpos($Text, "[/ul]") !== false) && (strpos($Text, "[ul]") !== false))) && (++$endlessloop < 20)) {
-		$Text = preg_replace_callback("/\[list\](.*?)\[\/list\]/is", 'diaspora_ul', $Text);
-		$Text = preg_replace_callback("/\[list=1\](.*?)\[\/list\]/is", 'diaspora_ol', $Text);
-		$Text = preg_replace_callback("/\[list=i\](.*?)\[\/list\]/s",'diaspora_ol', $Text);
-		$Text = preg_replace_callback("/\[list=I\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
-		$Text = preg_replace_callback("/\[list=a\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
-		$Text = preg_replace_callback("/\[list=A\](.*?)\[\/list\]/s", 'diaspora_ol', $Text);
-		$Text = preg_replace_callback("/\[ul\](.*?)\[\/ul\]/is", 'diaspora_ul', $Text);
-		$Text = preg_replace_callback("/\[ol\](.*?)\[\/ol\]/is", 'diaspora_ol', $Text);
-	}
+	// Converting images with size parameters to simple images. Markdown doesn't know it.
+	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $Text);
 
-*/
+	// the following was added on 10-January-2012 due to an inability of Diaspora's
+	// new javascript markdown processor to handle links with images as the link "text"
+	// It is not optimal and may be removed if this ability is restored in the future
+	if ($fordiaspora)
+		$Text = preg_replace("/\[url\=([^\[\]]*)\]\s*\[img\](.*?)\[\/img\]\s*\[\/url\]/ism",
+					"[url]$1[/url]\n[img]$2[/img]", $Text);
 
 	// Convert it to HTML - don't try oembed
-//	$Text = bbcode($Text, $preserve_nl, false);
+	$Text = bbcode($Text, $preserve_nl, false);
 
 	// Now convert HTML to Markdown
-//	$md = new Markdownify(false, false, false);
-//	$Text = $md->parseString($Text);
+	$md = new Markdownify(false, false, false);
+	$Text = $md->parseString($Text);
 
 	// If the text going into bbcode() has a plain URL in it, i.e.
 	// with no [url] tags around it, it will come out of parseString()
 	// looking like: <http://url.com>, which gets removed by strip_tags().
 	// So take off the angle brackets of any such URL
-//	$Text = preg_replace("/<http(.*?)>/is", "http$1", $Text);
+	$Text = preg_replace("/<http(.*?)>/is", "http$1", $Text);
 
 	// Remove all unconverted tags
-//	$Text = strip_tags($Text);
-
-////// 
-// end of bb->html->md conversion attempt
-//////
+	$Text = strip_tags($Text);
 
 
+/* Old routine
 
 	$ev = bbtoevent($Text);
 
@@ -422,6 +399,7 @@ function bb2diaspora($Text,$preserve_nl = false) {
 
 	$Text = preg_replace_callback('/\[(.*?)\]\((.*?)\)/ism','unescape_underscores_in_links',$Text);
 
+*/
 
 	// Remove any leading or trailing whitespace, as this will mess up
 	// the Diaspora signature verification and cause the item to disappear

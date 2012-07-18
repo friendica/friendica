@@ -115,6 +115,10 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	$a = get_app();
 
+	// Move all spaces out of the tags
+	$Text = preg_replace("/\[(\w*)\](\s*)/ism", '$2[$1]', $Text);
+	$Text = preg_replace("/(\s*)\[\/(\w*)\]/ism", '[/$2]$1', $Text);
+
 	// Hide all [noparse] contained bbtags by spacefying them
 	// POSSIBLE BUG --> Will the 'preg' functions crash if there's an embedded image?
 
@@ -313,21 +317,25 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	$Text = preg_replace("/\[img\](.*?)\[\/img\]/ism", '<img src="$1" alt="' . t('Image/photo') . '" />', $Text);
 
 
-	$Text = preg_replace("/\[video\](.*?\.(ogg|ogv|oga|ogm|webm|mp4))\[\/video\]/ism", '<video src="$1" controls="controls" width="425" height="350"><a href="$1">$1</a></video>', $Text);
-
-	$Text = preg_replace("/\[audio\](.*?\.(ogg|ogv|oga|ogm|webm|mp4|mp3))\[\/audio\]/ism", '<audio src="$1" controls="controls"><a href="$1">$1</a></audio>', $Text);
-
 	// Try to Oembed
 	if ($tryoembed) {
+		$Text = preg_replace("/\[video\](.*?\.(ogg|ogv|oga|ogm|webm|mp4))\[\/video\]/ism", '<video src="$1" controls="controls" width="425" height="350"><a href="$1">$1</a></video>', $Text);
+		$Text = preg_replace("/\[audio\](.*?\.(ogg|ogv|oga|ogm|webm|mp4|mp3))\[\/audio\]/ism", '<audio src="$1" controls="controls"><a href="$1">$1</a></audio>', $Text);
+
 		$Text = preg_replace_callback("/\[video\](.*?)\[\/video\]/ism", 'tryoembed', $Text);
 		$Text = preg_replace_callback("/\[audio\](.*?)\[\/audio\]/ism", 'tryoembed', $Text);
+	} else {
+		$Text = preg_replace("/\[video\](.*?)\[\/video\]/", '$1', $Text);
+		$Text = preg_replace("/\[audio\](.*?)\[\/audio\]/", '$1', $Text);
 	}
 
 	// html5 video and audio
 
 
-	$Text = preg_replace("/\[iframe\](.*?)\[\/iframe\]/ism", '<iframe src="$1" width="425" height="350"><a href="$1">$1</a></iframe>', $Text);
-
+	if ($tryoembed)
+		$Text = preg_replace("/\[iframe\](.*?)\[\/iframe\]/ism", '<iframe src="$1" width="425" height="350"><a href="$1">$1</a></iframe>', $Text);
+	else
+		$Text = preg_replace("/\[iframe\](.*?)\[\/iframe\]/ism", '<a href="$1">$1</a>', $Text);
 
 	// Youtube extensions
 	if ($tryoembed) {
@@ -340,7 +348,10 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	$Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/embed\/(.*?)\[\/youtube\]/ism",'[youtube]$1[/youtube]',$Text); 
 	$Text = preg_replace("/\[youtube\]https?:\/\/youtu.be\/(.*?)\[\/youtube\]/ism",'[youtube]$1[/youtube]',$Text);
 
-	$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '<iframe width="425" height="350" src="http://www.youtube.com/embed/$1" frameborder="0" ></iframe>', $Text);
+	if ($tryoembed)
+		$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '<iframe width="425" height="350" src="http://www.youtube.com/embed/$1" frameborder="0" ></iframe>', $Text);
+	else
+		$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", "http://www.youtube.com/watch?v=$1", $Text);
 
 
 	if ($tryoembed) {
@@ -349,14 +360,21 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	}
 
 	$Text = preg_replace("/\[vimeo\]https?:\/\/player.vimeo.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism",'[vimeo]$1[/vimeo]',$Text); 
-	$Text = preg_replace("/\[vimeo\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/vimeo\]/ism",'[vimeo]$1[/vimeo]',$Text); 
-	$Text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '<iframe width="425" height="350" src="http://player.vimeo.com/video/$1" frameborder="0" ></iframe>', $Text);
+	$Text = preg_replace("/\[vimeo\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/vimeo\]/ism",'[vimeo]$1[/vimeo]',$Text);
+
+	if ($tryoembed)
+		$Text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '<iframe width="425" height="350" src="http://player.vimeo.com/video/$1" frameborder="0" ></iframe>', $Text);
+	else
+		$Text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", "http://vimeo.com/$1", $Text);
 
 //	$Text = preg_replace("/\[youtube\](.*?)\[\/youtube\]/", '<object width="425" height="350" type="application/x-shockwave-flash" data="http://www.youtube.com/v/$1" ><param name="movie" value="http://www.youtube.com/v/$1"></param><!--[if IE]><embed src="http://www.youtube.com/v/$1" type="application/x-shockwave-flash" width="425" height="350" /><![endif]--></object>', $Text);
 
 
 	// oembed tag
 	$Text = oembed_bbcode2html($Text);
+
+	// Avoid triple linefeeds through oembed
+	$Text = str_replace("<br style='clear:left'></span><br /><br />", "<br style='clear:left'></span><br />", $Text);
 
 	// If we found an event earlier, strip out all the event code and replace with a reformatted version.
 	// Replace the event-start section with the entire formatted event. The other bbcode is stripped.
@@ -390,6 +408,25 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	if($saved_image)
 		$Text = bb_replace_images($Text, $saved_image);
+
+	// Clean up the HTML by loading and saving the HTML with the DOM
+	// Only do it when it has to be done - for performance reasons
+	if (!$tryoembed) {
+		$doc = new DOMDocument();
+		$doc->preserveWhiteSpace = false;
+
+		$Text = mb_convert_encoding($Text, 'HTML-ENTITIES', "UTF-8");
+
+		$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">';
+		@$doc->loadHTML($doctype."<html><body>".$Text."</body></html>");
+
+		$Text = $doc->saveHTML();
+		$Text = str_replace(array("<html><body>", "</body></html>", $doctype), array("", "", ""), $Text);
+
+		$Text = str_replace('<br></li>','</li>', $Text);
+
+		$Text = mb_convert_encoding($Text, "UTF-8", 'HTML-ENTITIES');
+	}
 
 	call_hooks('bbcode',$Text);
 

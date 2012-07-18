@@ -1562,6 +1562,7 @@ function undo_post_tagging($s) {
 
 function fix_mce_lf($s) {
 	$s = str_replace("\r\n","\n",$s);
+	$s = str_replace("\n\n","\n",$s);
 	return $s;
 }
 

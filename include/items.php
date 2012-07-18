@@ -374,6 +374,29 @@ function limit_body_size($body) {
 		return $body;
 }}
 
+function title_is_body($title, $body) {
+
+	$title = strip_tags($title);
+	$title = trim($title);
+	$title = str_replace(array("\n", "\r", "\t", " "), array("","","",""), $title);
+
+	$body = strip_tags($body);
+	$body = trim($body);
+	$body = str_replace(array("\n", "\r", "\t", " "), array("","","",""), $body);
+
+	if (strlen($title) < strlen($body))
+		$body = substr($body, 0, strlen($title));
+
+	if (($title != $body) and (substr($title, -3) == "...")) {
+		$pos = strrpos($title, "...");
+		if ($pos > 0) {
+			$title = substr($title, 0, $pos);
+			$body = substr($body, 0, $pos);
+		}
+	}
+
+	return($title == $body);
+}
 
 
 
@@ -400,6 +423,11 @@ function get_atom_elements($feed,$item) {
 	$res['body'] = unxmlify($item->get_content());
 	$res['plink'] = unxmlify($item->get_link(0));
 
+	// removing the content of the title if its identically to the body
+	// This helps with auto generated titles e.g. from tumblr
+	if (title_is_body($res["title"], $res["body"]))
+		$res['title'] = "";
+
 	if($res['plink'])
 		$base_url = implode('/', array_slice(explode('/',$res['plink']),0,3));
 	else
@@ -418,7 +446,7 @@ function get_atom_elements($feed,$item) {
 					$res['author-avatar'] = unxmlify($link['attribs']['']['href']);
 			}
 		}
-	}			
+	}
 
 	$rawactor = $item->get_item_tags(NAMESPACE_ACTIVITY, 'actor');
 
@@ -450,7 +478,7 @@ function get_atom_elements($feed,$item) {
 						$res['author-avatar'] = unxmlify($link['attribs']['']['href']);
 				}
 			}
-		}			
+		}
 
 		$rawactor = $feed->get_feed_tags(NAMESPACE_ACTIVITY, 'subject');
 
@@ -475,7 +503,7 @@ function get_atom_elements($feed,$item) {
 		$res['app'] = strip_tags(unxmlify($apps[0]['attribs']['']['source']));
 		if($res['app'] === 'web')
 			$res['app'] = 'OStatus';
-	}		   
+	}
 
 	// base64 encoded json structure representing Diaspora signature
 
@@ -618,7 +646,7 @@ function get_atom_elements($feed,$item) {
 
 		foreach($base as $link) {
 			if(!x($res, 'owner-avatar') || !$res['owner-avatar']) {
-				if($link['attribs']['']['rel'] === 'photo' || $link['attribs']['']['rel'] === 'avatar')			
+				if($link['attribs']['']['rel'] === 'photo' || $link['attribs']['']['rel'] === 'avatar')
 					$res['owner-avatar'] = unxmlify($link['attribs']['']['href']);
 			}
 		}
@@ -758,9 +786,40 @@ function get_atom_elements($feed,$item) {
 		$res['target'] .= '</target>' . "\n";
 	}
 
+	// This is some experimental stuff. By now retweets are shown with "RT:"
+	// But: There is data so that the message could be shown similar to native retweets
+	// There is some better way to parse this array - but it didn't worked for me.
+	$child = $item->feed->data["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["feed"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["entry"][0]["child"]["http://activitystrea.ms/spec/1.0/"][object][0]["child"];
+	if (is_array($child)) {
+		$message = $child["http://activitystrea.ms/spec/1.0/"]["object"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["content"][0]["data"];
+		$author = $child[SIMPLEPIE_NAMESPACE_ATOM_10]["author"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10];
+		$uri = $author["uri"][0]["data"];
+		$name = $author["name"][0]["data"];
+		$avatar = @array_shift($author["link"][2]["attribs"]);
+		$avatar = $avatar["href"];
+
+		if (($name != "") and ($uri != "") and ($avatar != "") and ($message != "")) {
+			$res["owner-name"] = $res["author-name"];
+			$res["owner-link"] = $res["author-link"];
+			$res["owner-avatar"] = $res["author-avatar"];
+
+			$res["author-name"] = $name;
+			$res["author-link"] = $uri;
+			$res["author-avatar"] = $avatar;
+
+			$res["body"] = html2bbcode($message);
+		}
+	}
+
 	$arr = array('feed' => $feed, 'item' => $item, 'result' => $res);
 
 	call_hooks('parse_atom', $arr);
+
+	//if (($res["title"] != "") or (strpos($res["body"], "RT @") > 0)) {
+	//if (strpos($res["body"], "RT @") !== false) {
+	//	$debugfile = tempnam("/home/ike/log", "item-res2-");
+	//	file_put_contents($debugfile, serialize($arr));
+	//}
 
 	return $res;
 }
@@ -1717,7 +1776,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 	// Now process the feed
 
-	if($feed->get_item_quantity()) {		
+	if($feed->get_item_quantity()) {
 
 		logger('consume_feed: feed item count = ' . $feed->get_item_quantity());
 
@@ -1730,7 +1789,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 		foreach($items as $item) {
 
-			$is_reply = false;		
+			$is_reply = false;
 			$item_id = $item->get_id();
 			$rawthread = $item->get_item_tags( NAMESPACE_THREAD,'in-reply-to');
 			if(isset($rawthread[0]['attribs']['']['ref'])) {
@@ -1744,10 +1803,9 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 					continue;
 
 				// Have we seen it? If not, import it.
-	
+
 				$item_id  = $item->get_id();
 				$datarray = get_atom_elements($feed,$item);
-
 
 				if((! x($datarray,'author-name')) && ($contact['network'] != NETWORK_DFRN))
 					$datarray['author-name'] = $contact['name'];
@@ -3664,7 +3722,6 @@ function posted_date_widget($url,$uid,$wall) {
 	));
 	return $o;
 }
-
 
 function store_diaspora_retract_sig($item, $user, $baseurl) {
 	// Note that we can't add a target_author_signature

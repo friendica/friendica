@@ -735,6 +735,13 @@ class Markdownify {
       $this->parser->tagAttributes['src'] = $this->decode($this->parser->tagAttributes['src']);
     }
 
+// ![Alt text](/path/to/img.jpg "Optional title")
+    if ($this->parser->tagAttributes['title'] != "")
+      $this->out('!['.$this->parser->tagAttributes['alt'].']('.$this->parser->tagAttributes['src'].'"'.$this->parser->tagAttributes['title'].'")', true);
+    else
+      $this->out('!['.$this->parser->tagAttributes['alt'].']('.$this->parser->tagAttributes['src'].')', true);
+
+/*
     # [This link][id]
     $link_id = false;
     if (!empty($this->stack['a'])) {
@@ -759,6 +766,7 @@ class Markdownify {
     }
 
     $this->out('!['.$this->parser->tagAttributes['alt'].']['.$link_id.']', true);
+*/
   }
   /**
    * handle <code> tags
