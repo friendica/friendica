@@ -4,7 +4,6 @@ if(! class_exists("Photo")) {
 class Photo {
 
     private $image;
-    private $ext;
 
     /**
      * Put back gd stuff, not everybody have Imagick
@@ -41,22 +40,53 @@ class Photo {
 
     public function __construct($data, $type=null) {
         $this->imagick = class_exists('Imagick');
+        $this->types = $this->supportedTypes();
+        if (!array_key_exists($type,$this->types)){
+            $type='image/jpeg';
+        }
+        $this->type = $type;
 
         if($this->is_imagick()) {
             $this->image = new Imagick();
             $this->image->readImageBlob($data);
 
-            // If it is a gif, it may be animated, get it ready for any future operations
-            if($this->image->getFormat() !== "GIF") $this->image = $this->image->coalesceImages();
+            /**
+             * Setup the image to the format it will be saved to
+             */
+            $map = $this->get_FormatsMap();
+            $format = $map[$type];
+            $this->image->setFormat($format);
 
-            $this->ext = strtolower($this->image->getImageFormat());
-        } else {
-            $this->types = $this->supportedTypes();
-            if (!array_key_exists($type,$this->types)){
-                $type='image/jpeg';
+            // Always coalesce, if it is not a multi-frame image it won't hurt anyway
+            $this->image = $this->image->coalesceImages();
+
+            /**
+             * setup the compression here, so we'll do it only once
+             */
+            switch($this->getType()){
+                case "image/png":
+                    $quality = get_config('system','png_quality');
+                    if((! $quality) || ($quality > 9))
+                        $quality = PNG_QUALITY;
+                    /**
+                     * From http://www.imagemagick.org/script/command-line-options.php#quality:
+                     *
+                     * 'For the MNG and PNG image formats, the quality value sets
+                     * the zlib compression level (quality / 10) and filter-type (quality % 10).
+                     * The default PNG "quality" is 75, which means compression level 7 with adaptive PNG filtering,
+                     * unless the image has a color map, in which case it means compression level 7 with no PNG filtering'
+                     */
+                    $quality = $quality * 10;
+                    $this->image->setCompressionQuality($quality);
+                    break;
+                case "image/jpeg":
+                    $quality = get_config('system','jpeg_quality');
+                    if((! $quality) || ($quality > 100))
+                        $quality = JPEG_QUALITY;
+                    $this->image->setCompressionQuality($quality);
             }
+        } else {
             $this->valid = false;
-            $this->type = $type;
             $this->image = @imagecreatefromstring($data);
             if($this->image !== FALSE) {
                 $this->width  = imagesx($this->image);
@@ -81,6 +111,18 @@ class Photo {
 
     public function is_imagick() {
         return $this->imagick;
+    }
+
+    /**
+     * Maps Mime types to Imagick formats
+     */
+    public function get_FormatsMap() {
+        $m = array(
+            'image/jpeg' => 'JPG',
+            'image/png' => 'PNG',
+            'image/gif' => 'GIF'
+        );
+        return $m;
     }
 
     public function is_valid() {
@@ -111,8 +153,8 @@ class Photo {
         if(!$this->is_valid())
             return FALSE;
 
-        /* Clean it */
         if($this->is_imagick()) {
+            /* Clean it */
             $this->image = $this->image->deconstructImages();
             return $this->image;
         }
@@ -123,10 +165,6 @@ class Photo {
         if(!$this->is_valid())
             return FALSE;
 
-        if($this->is_imagick()) {
-            // This should do the trick (see supportedTypes above)
-            return 'image/'. $this->getExt();
-        }
         return $this->type;
     }
 
@@ -134,9 +172,7 @@ class Photo {
         if(!$this->is_valid())
             return FALSE;
 
-        if($this->is_imagick())
-            return $this->ext;
-        return $this->types[$this->type];
+        return $this->types[$this->getType()];
     }
 
     public function scaleImage($max) {
@@ -148,7 +184,7 @@ class Photo {
              * If it is not animated, there will be only one iteration here,
              * so don't bother checking
              */
-            // Don't forget to go back to the first frame for any further operation
+            // Don't forget to go back to the first frame
             $this->image->setFirstIterator();
             do {
                 $this->image->resizeImage($max, $max, imagick::FILTER_LANCZOS, 1, true);
@@ -365,7 +401,7 @@ class Photo {
         if($this->is_imagick()) {
             $this->image->setFirstIterator();
             do {
-                $this->image->resizeImage($max, $max, imagick::FILTER_LANCZOS, 1, false);
+                $this->image->resizeImage($dim, $dim, imagick::FILTER_LANCZOS, 1, false);
             } while ($this->image->nextImage());
             return;
         }
@@ -425,59 +461,32 @@ class Photo {
         if(!$this->is_valid())
             return FALSE;
 
+        if($this->is_imagick()) {
+            /* Clean it */
+            $this->image = $this->image->deconstructImages();
+            $string = $this->image->getImagesBlob();
+            return $string;
+        }
+
         $quality = FALSE;
 
-        /**
-         * Hmmm, for Imagick
-         * we should do the conversion/compression at the initialisation i think
-         * This method may be called several times,
-         * and there is no need to do that more than once
-         */
-
-        if(!$this->is_imagick()) ob_start();
+        ob_start();
 
         switch($this->getType()){
             case "image/png":
                 $quality = get_config('system','png_quality');
                 if((! $quality) || ($quality > 9))
                     $quality = PNG_QUALITY;
-                if($this->is_imagick()) {
-                    /**
-                     * From http://www.imagemagick.org/script/command-line-options.php#quality:
-                     *
-                     * 'For the MNG and PNG image formats, the quality value sets
-                     * the zlib compression level (quality / 10) and filter-type (quality % 10).
-                     * The default PNG "quality" is 75, which means compression level 7 with adaptive PNG filtering,
-                     * unless the image has a color map, in which case it means compression level 7 with no PNG filtering'
-                     */
-                    $quality = $quality * 10;
-                } else imagepng($this->image,NULL, $quality);
+                imagepng($this->image,NULL, $quality);
                 break;
-            case "image/gif":
-                // We change nothing here, do we?
-                break;
-            default:
-                // Convert to jpeg by default
+            case "image/jpeg":
                 $quality = get_config('system','jpeg_quality');
                 if((! $quality) || ($quality > 100))
                     $quality = JPEG_QUALITY;
-                if($this->is_imagick())
-                    $this->image->setImageFormat('jpeg');
-                else imagejpeg($this->image,NULL,$quality);
+                imagejpeg($this->image,NULL,$quality);
         }
-
-        if($this->is_imagick()) {
-            if($quality !== FALSE) {
-            // Do we need to iterate for animations?
-            $this->image->setImageCompressionQuality($quality);
-            $this->image->stripImage();
-            }
-
-            $string = $this->image->getImagesBlob();
-        } else {
-            $string = ob_get_contents();
-            ob_end_clean();
-        }
+        $string = ob_get_contents();
+        ob_end_clean();
 
         return $string;
     }
@@ -594,14 +603,14 @@ function guess_image_type($filename, $fromcurl=false) {
     }
     if (is_null($type)){
         // Guessing from extension? Isn't that... dangerous?
-        if($this->is_imagick()) {
+        if(class_exists('Imagick')) {
             /**
              * Well, this not much better,
              * but at least it comes from the data inside the image,
              * we won't be tricked by a manipulated extension
              */
             $image = new Imagick($filename);
-            $type = 'image/'. strtolower($image->getImageFormat());
+            $type = $image->getImageMimeType();
         } else {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
             $types = Photo::supportedTypes();
@@ -636,11 +645,7 @@ function import_profile_photo($photo,$uid,$cid) {
     $filename = basename($photo);
     $img_str = fetch_url($photo,true);
 
-    if($this->is_imagick()) $type = null;
-    else {
-        // guess mimetype from headers or filename
-        $type = guess_image_type($photo,true);
-    }
+    $type = guess_image_type($photo,true);
     $img = new Photo($img_str, $type);
     if($img->is_valid()) {
 
