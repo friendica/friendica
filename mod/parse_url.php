@@ -302,11 +302,16 @@ function parse_url_content(&$a) {
 
 	$image = "";
 
-	foreach ($siteinfo["images"] as $imagedata)
+        if($siteinfo["image"] != ""){
+            /*
+              Execute below code only if image is present in siteinfo
+             */
+            foreach ($siteinfo["images"] as $imagedata)
 		if($textmode)
-			$image .= '[img='.$imagedata["width"].'x'.$imagedata["height"].']'.$imagedata["src"].'[/img]';
+                    $image .= '[img='.$imagedata["width"].'x'.$imagedata["height"].']'.$imagedata["src"].'[/img]';
 		else
-			$image .= '<img height="'.$imagedata["height"].'" width="'.$imagedata["width"].'" src="'.$imagedata["src"].'" alt="photo" />';
+                    $image .= '<img height="'.$imagedata["height"].'" width="'.$imagedata["width"].'" src="'.$imagedata["src"].'" alt="photo" />';
+        }
 
 	if(strlen($text)) {
 		if($textmode)
