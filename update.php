@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1153 );
+define( 'UPDATE_VERSION' , 1154 );
 
 /**
  *
@@ -1334,6 +1334,13 @@ function update_1152() {
 		) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
 	if (!$r)
 		return UPDATE_FAILED;
+	return UPDATE_SUCCESS;
+}
+
+function update_1153() {
+	$r = q("ALTER TABLE `hook` ADD `priority` INT(11) UNSIGNED NOT NULL DEFAULT '0'");
+	
+	if(!$r) return UPDATE_FAILED;
 	return UPDATE_SUCCESS;
 }
 

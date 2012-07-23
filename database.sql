@@ -456,6 +456,7 @@ CREATE TABLE IF NOT EXISTS `hook` (
   `hook` char(255) NOT NULL,
   `file` char(255) NOT NULL,
   `function` char(255) NOT NULL,
+  `priority` int(11) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
