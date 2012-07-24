@@ -1,0 +1,108 @@
+body {
+	font-family: helvetica,arial,freesans,clean,sans-serif;
+	font-size: 14px;
+	background-color: #ffffff;
+	color: #505050;/* ZP Change*/
+	margin: 0px;
+}
+
+a, a:visited, a:link { color: #3465a4; text-decoration: none; }
+a:hover {text-decoration: underline; }
+
+img { border :0px; }
+
+.login-button {
+	margin-top: 110px;
+}
+
+img.login-button-image {
+	max-width: 350px;
+}
+
+.section-wrapper {
+	position: relative;
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.login-form {
+	margin-top: 200px;
+}
+
+.register-form {
+	margin-top: 15px;
+}
+
+.lostpass-form {
+	margin-top: 170px;
+}
+
+.field label {
+	position: absolute;
+	margin-left: 0px;
+	font-weight: 700;
+}
+
+.field input {
+/*	margin-left: 225px;*/
+	width: 200px;
+}
+
+.openid input {
+	background: url(login-bg.gif) no-repeat;
+	background-position: 0 50%;
+	width: 182px;
+	padding-left: 18px;
+}
+
+#wrapper_username input, #wrapper_password input, #wrapper_openid_url input {
+	margin-left: 225px;
+}
+
+#register-openid-wrapper input, #register-name-wrapper input, #register-email-wrapper input, #register-nickname-wrapper input {
+	margin-left: 275px;
+}
+
+#login-name-wrapper input {
+	margin-left: 200px;
+}
+
+.login-extra-links, .agreement {
+	font-size: 12px;
+}
+
+#login-submit-button, #register-submit-button, #lostpass-submit-button {
+	font-size: 16px;
+}
+
+#register-link {
+	margin-right: 200px;
+}
+
+.error-message {
+	width: 475px;
+	color: #FF0000;
+	font-size: 1.1em;
+	text-align: left;
+	border: 1px solid #FF8888;
+	background-color: #FFEEEE;
+	padding: 10px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.register-explain-wrapper {
+	width: 400px;
+	font-size: 12px;
+	text-align: left;
+	margin-left: 200px;
+}
+
+#lostpass-desc {
+	width: 380px;
+	margin-left: 220px;
+	text-align: left;
+	font-size: 12px;
+}
