@@ -403,7 +403,7 @@ function load_view_file($s) {
 		return file_get_contents("$d/$lang/$b");
 	
 	$theme = current_theme();
-	
+
 	if(file_exists("$d/theme/$theme/$b"))
 		return file_get_contents("$d/theme/$theme/$b");
 			

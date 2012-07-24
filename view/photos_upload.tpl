@@ -23,7 +23,7 @@
 
 
 	<div id="photos-upload-perms" class="photos-upload-perms" >
-		<a href="#photos-upload-permissions-wrapper" id="photos-upload-perms-menu" class="button" />
+		<a href="#photos-upload-permissions-wrapper" id="photos-upload-perms-menu" class="button popupbox" />
 		<span id="jot-perms-icon" class="icon $lockstate" ></span>$permissions
 		</a>
 	<div id="photos-upload-perms-end"></div>
@@ -43,9 +43,3 @@
 	<div class="photos-upload-end" ></div>
 </form>
 
-<script>
-	$("a#photos-upload-perms-menu").fancybox({
-		'transitionIn' : 'none',
-		'transitionOut' : 'none'
-	}); 
-</script>

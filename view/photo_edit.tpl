@@ -28,7 +28,7 @@
 	<div id="photo-edit-rotate-end"></div>
 
 	<div id="photo-edit-perms" class="photo-edit-perms" >
-		<a href="#photo-edit-perms-select" id="photo-edit-perms-menu" class="button" title="$permissions"/>
+		<a href="#photo-edit-perms-select" id="photo-edit-perms-menu" class="button popupbox" title="$permissions"/>
 			<span id="jot-perms-icon" class="icon $lockstate" ></span>$permissions
 		</a>
 		<div id="photo-edit-perms-menu-end"></div>
@@ -47,9 +47,4 @@
 	<div id="photo-edit-end"></div>
 </form>
 
-<script>
-	$("a#photo-edit-perms-menu").fancybox({
-		'transitionIn' : 'none',
-		'transitionOut' : 'none'
-	}); 
-</script>
+

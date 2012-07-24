@@ -256,6 +256,7 @@ function get_theme_info($theme){
 		'author' => array(),
 		'maintainer' => array(),
 		'version' => "",
+		'credits' => "",
 		'experimental' => false,
 		'unsupported' => false
 	);
