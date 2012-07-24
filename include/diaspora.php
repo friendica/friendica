@@ -2120,7 +2120,6 @@ function diaspora_unshare($me,$contact) {
 }
 
 
-
 function diaspora_send_status($item,$owner,$contact,$public_batch = false) {
 
 	$a = get_app();
@@ -2154,8 +2153,12 @@ function diaspora_send_status($item,$owner,$contact,$public_batch = false) {
 		}
 	}
 */
-	// Removal of tags
-	$body = preg_replace('/#\[url\=(\w+.*?)\](\w+.*?)\[\/url\]/i', '#$2', $body);
+	/**
+	 * Transform #tags, strip off the [url] and replace spaces with underscore
+	 */
+	$body = preg_replace_callback('/#\[url\=(\w+.*?)\](\w+.*?)\[\/url\]/i', function($match) {
+		return '#'. str_replace(' ', '_', $match[2]);
+	}, $body);
 
 	//if(strlen($title))
 	//	$body = "[b]".html_entity_decode($title)."[/b]\n\n".$body;
