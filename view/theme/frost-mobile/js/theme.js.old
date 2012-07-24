@@ -1,0 +1,121 @@
+$(document).ready(function() {
+
+    $.ajaxSetup({ 
+        cache: false 
+    });
+
+
+	$('.system-menu-link').click(function() {
+		handleNavMenu('#system-menu-list');
+		return false;
+	});
+
+	$('.contacts-menu-link').click(function() {
+		handleNavMenu('#contacts-menu-list');
+		return false;
+	});
+
+	$('.network-menu-link').click(function() {
+		handleNavMenu('#network-menu-list');
+		return false;
+	});
+
+/*	$('.nav-load-page-link').click(function() {
+		getPageContent( $(this).attr('href') );
+		hideNavMenu( '#' + $(this).closest('ul').attr('id') );
+		return false;
+	});*/
+
+/*	$('#nav-network-link').click(function() {
+		getPageContent('/network', '#network-menu-list');
+		return false;
+	});
+
+	$('#nav-home-link').click(function() {
+
+		var username = $('#site-location').text();
+		username = username.substring(0, username.indexOf('@'));
+
+		getPageContent('/profile/' + username, '#network-menu-list');
+
+		return false;
+	});
+
+	$('#nav-community-link').click(function() {
+		getPageContent('/community', '#network-menu-list');
+		return false;
+	});
+
+	$('#nav-messages-link').click(function() {
+		getPageContent('/message');
+		return false;
+	});
+
+	$('#nav-contacts-link').click(function() {
+		getPageContent('/contacts', '#contacts-menu-list');
+		return false;
+	});*/
+
+});
+
+$(document).mouseup(function (clickPos) {
+
+	var sysMenu = $("#system-menu-list");
+	var sysMenuLink = $(".system-menu-link");
+	var contactsMenu = $("#contacts-menu-list");
+	var contactsMenuLink = $(".contacts-menu-link");
+	var networkMenu = $("#network-menu-list");
+	var networkMenuLink = $(".network-menu-link");
+
+	if( !sysMenu.is(clickPos.target) && !sysMenuLink.is(clickPos.target) && sysMenu.has(clickPos.target).length === 0) {
+		hideNavMenu("#system-menu-list");
+	}
+	if( !contactsMenu.is(clickPos.target) && !contactsMenuLink.is(clickPos.target) && contactsMenu.has(clickPos.target).length === 0) {
+		hideNavMenu("#contacts-menu-list");
+	}
+	if( !networkMenu.is(clickPos.target) && !networkMenuLink.is(clickPos.target) && networkMenu.has(clickPos.target).length === 0) {
+		hideNavMenu("#network-menu-list");
+	}
+});
+
+
+function getPageContent(url) {
+
+	var pos = $('.main-container').position();
+
+	$('.main-container').css('margin-left', pos.left);	
+	$('.main-content-container').hide(0, function () {
+		$('.main-content-loading').show(0);
+	});
+
+	$.get(url, function(html) {
+		console.log($('.main-content-container').html());
+		$('.main-content-container').html( $('.main-content-container', html).html() );
+		console.log($('.main-content-container').html());
+		$('.main-content-loading').hide(function() {
+			$('.main-content-container').fadeIn(800,function() {
+				$('.main-container').css('margin-left', 'auto'); // This sucks -- if the CSS specification changes, this will be wrong
+			});
+		});
+	});
+}
+
+function handleNavMenu(menuID) {
+	if( $(menuID).hasClass('menu-visible') ) {
+		hideNavMenu(menuID);
+	}
+	else {
+		showNavMenu(menuID);
+	}
+}
+
+function showNavMenu(menuID) {
+	$(menuID).show();
+	$(menuID).addClass('menu-visible');
+}
+
+function hideNavMenu(menuID) {
+	$(menuID).hide();
+	$(menuID).removeClass('menu-visible');
+}
+
