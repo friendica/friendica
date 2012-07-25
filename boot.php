@@ -1451,11 +1451,11 @@ if(! function_exists('current_theme')) {
 			$system_theme = ((isset($a->config['system']['mobile-theme'])) ? $a->config['system']['mobile-theme'] : '');
 			$theme_name = ((isset($_SESSION) && x($_SESSION,'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
 		}
-		else {
+		if(!$is_mobile || ($system_theme === '' && $theme_name === '')) {
 			$system_theme = ((isset($a->config['system']['theme'])) ? $a->config['system']['theme'] : '');
 			$theme_name = ((isset($_SESSION) && x($_SESSION,'theme')) ? $_SESSION['theme'] : $system_theme);
 		}
-	
+
 		if($theme_name &&
 				(file_exists('view/theme/' . $theme_name . '/style.css') ||
 						file_exists('view/theme/' . $theme_name . '/style.php')))
