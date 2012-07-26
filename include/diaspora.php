@@ -2156,9 +2156,9 @@ function diaspora_send_status($item,$owner,$contact,$public_batch = false) {
 	/**
 	 * Transform #tags, strip off the [url] and replace spaces with underscore
 	 */
-	$body = preg_replace_callback('/#\[url\=(\w+.*?)\](\w+.*?)\[\/url\]/i', function($match) {
-		return '#'. str_replace(' ', '_', $match[2]);
-	}, $body);
+	$body = preg_replace_callback('/#\[url\=(\w+.*?)\](\w+.*?)\[\/url\]/i', create_function('$match',
+		'return \'#\'. str_replace(\' \', \'_\', $match[2]);'
+	), $body);
 
 	//if(strlen($title))
 	//	$body = "[b]".html_entity_decode($title)."[/b]\n\n".$body;
