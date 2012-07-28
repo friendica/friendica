@@ -279,6 +279,7 @@ function profile_photo_crop_ui_head(&$a, $ph){
 	$a->config['imagecrop_resolution'] = $smallest;
 	$a->config['imagecrop_ext'] = $ph->getExt();
 	$a->page['htmlhead'] .= get_markup_template("crophead.tpl");
+	$a->page['end'] .= get_markup_template("cropend.tpl");
 	return;
 }}
 

@@ -82,4 +82,4 @@
 <div id="profile-jot-end"></div>
 </form>
 </div>
-		{{ if $content }}<script>initEditor();</script>{{ endif }}
+		{{ if $content }}<script>window.jotInit = true;</script>{{ endif }}

@@ -1055,8 +1055,24 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		$plaintext = true;
 
 	$tpl = get_markup_template('jot-header.tpl');
-	
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
+		'$newpost' => 'true',
+		'$baseurl' => $a->get_baseurl(true),
+		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
+		'$geotag' => $geotag,
+		'$nickname' => $x['nickname'],
+		'$ispublic' => t('Visible to <strong>everybody</strong>'),
+		'$linkurl' => t('Please enter a link URL:'),
+		'$vidurl' => t("Please enter a video link/URL:"),
+		'$audurl' => t("Please enter an audio link/URL:"),
+		'$term' => t('Tag term:'),
+		'$fileas' => t('Save to Folder:'),
+		'$whereareu' => t('Where are you right now?')
+	));
+
+
+	$tpl = get_markup_template('jot-end.tpl');
+	$a->page['end'] .= replace_macros($tpl, array(
 		'$newpost' => 'true',
 		'$baseurl' => $a->get_baseurl(true),
 		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),

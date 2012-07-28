@@ -45,22 +45,16 @@ function contacts_init(&$a) {
 	$a->page['aside'] .= networks_widget('contacts',$_GET['nets']);
 	$base = $a->get_baseurl();
 
-	$a->page['htmlhead'] .= '<script src="' . $a->get_baseurl(true) . '/library/jquery_ac/friendica.complete.js" ></script>';
-	$a->page['htmlhead'] .= <<< EOT
-
-<script>$(document).ready(function() { 
-	var a; 
-	a = $("#contacts-search").autocomplete({ 
-		serviceUrl: '$base/acl',
-		minChars: 2,
-		width: 350,
-	});
-	a.setOptions({ params: { type: 'a' }});
-
-}); 
-
-</script>
-EOT;
+	$tpl = get_markup_template("contacts-head.tpl");
+	$a->page['htmlhead'] .= replace_macros($tpl,array(
+		'$baseurl' => $a->get_baseurl(true),
+		'$base' => $base
+	));
+	$tpl = get_markup_template("contacts-end.tpl");
+	$a->page['end'] .= replace_macros($tpl,array(
+		'$baseurl' => $a->get_baseurl(true),
+		'$base' => $base
+	));
 
 
 }
@@ -244,6 +238,10 @@ function contacts_content(&$a) {
 			$editselect = 'none';
 
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('contact_head.tpl'), array(
+			'$baseurl' => $a->get_baseurl(true),
+			'$editselect' => $editselect,
+		));
+		$a->page['end'] .= replace_macros(get_markup_template('contact_end.tpl'), array(
 			'$baseurl' => $a->get_baseurl(true),
 			'$editselect' => $editselect,
 		));

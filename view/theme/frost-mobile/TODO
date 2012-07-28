@@ -14,3 +14,9 @@ Photo album display?
 
 - Admin: access to more pages than summary?
 
+- Needs to be faster!
+	- Reduce DOM elements (4100 for 10 items)
+	- Automatically set limit of 10 items for Network and Profile?
+
+
+

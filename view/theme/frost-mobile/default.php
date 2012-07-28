@@ -36,6 +36,7 @@
 		</div>
 	</div>
 	<?php } ?>
+	<?php if(x($page,'end')) echo $page['end']; ?>
 </body>
 </html>
 

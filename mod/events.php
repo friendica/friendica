@@ -145,6 +145,9 @@ function events_content(&$a) {
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl,array('$baseurl' => $a->get_baseurl()));
 
+	$etpl = get_markup_template('event_end.tpl');
+	$a->page['end'] .= replace_macros($etpl,array('$baseurl' => $a->get_baseurl()));
+
 	$o ="";
 	// tabs
 	$tabs = profile_tabs($a, True);	

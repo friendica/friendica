@@ -12,21 +12,21 @@
 	<div id="photos-upload-new-end"></div>
 	<div id="photos-upload-exist-wrapper">
 		<div id="photos-upload-existing-album-text">$existalbumtext</div>
+		<select id="photos-upload-album-select" name="album">
 		$albumselect
+		</select>
 	</div>
 	<div id="photos-upload-exist-end"></div>
 
-
 	<div id="photos-upload-noshare-div" class="photos-upload-noshare-div" >
 		<input id="photos-upload-noshare" type="checkbox" name="not_visible" value="1" checked />
-		<div id="photos-upload-noshare-label">
 		<label id="photos-upload-noshare-text" for="photos-upload-noshare" >$nosharetext</label>
-		</div>
 	</div>
 
+
 	<div id="photos-upload-perms" class="photos-upload-perms" >
-		<a href="#photos-upload-permissions-wrapper" id="photos-upload-perms-menu" class="popupbox button" />
-		<span id="jot-perms-icon" class="icon $lockstate  photo-perms-icon" ></span><div class="photo-jot-perms-text">$permissions</div>
+		<a href="#photos-upload-permissions-wrapper" id="photos-upload-perms-menu" class="button popupbox" />
+		<span id="jot-perms-icon" class="icon $lockstate" ></span>$permissions
 		</a>
 	<div id="photos-upload-perms-end"></div>
 
@@ -45,6 +45,3 @@
 	<div class="photos-upload-end" ></div>
 </form>
 
-<script>
-	$("#photos-upload-album-select").removeAttr('size');
-</script>

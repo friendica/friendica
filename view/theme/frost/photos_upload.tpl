@@ -12,7 +12,9 @@
 	<div id="photos-upload-new-end"></div>
 	<div id="photos-upload-exist-wrapper">
 		<div id="photos-upload-existing-album-text">$existalbumtext</div>
+		<select id="photos-upload-album-select" name="album" size="4">
 		$albumselect
+		</select>
 	</div>
 	<div id="photos-upload-exist-end"></div>
 
@@ -46,10 +48,3 @@
 	</div>
 </form>
 
-<!--
-<script>
-	$("a#photos-upload-perms-menu").fancybox({
-		'transitionIn' : 'none',
-		'transitionOut' : 'none'
-	}); 
-</script>-->

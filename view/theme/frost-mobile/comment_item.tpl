@@ -1,4 +1,4 @@
-		<script>
+<!--		<script>
 		$(document).ready( function () {
 			$(document).mouseup(function(e) {
 				var container = $("#comment-edit-wrapper-$id");
@@ -8,7 +8,7 @@
 				}
 			});
 		});
-		</script>
+		</script>-->
 
 		<div class="comment-wwedit-wrapper" id="comment-edit-wrapper-$id" style="display: block;" >
 			<form class="comment-edit-form" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;" >

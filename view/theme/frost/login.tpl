@@ -39,4 +39,4 @@
 </form>
 </div>
 
-<script type="text/javascript"> $(document).ready(function() { $("#id_$lname.0").focus();} );</script>
+<script type="text/javascript">window.loginName = "$lname.0";</script>

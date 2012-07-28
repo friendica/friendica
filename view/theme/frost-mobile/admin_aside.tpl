@@ -1,15 +1,4 @@
-<script>
-	// update pending count //
-	$(function(){
 
-		$("nav").bind('nav-update',  function(e,data){
-			var elm = $('#pending-update');
-			var register = $(data).find('register').text();
-			if (register=="0") { reigster=""; elm.hide();} else { elm.show(); }
-			elm.html(register);
-		});
-	});
-</script>
 <h4><a href="$admurl">$admtxt</a></h4>
 <ul class='admin linklist'>
 	<li class='admin button $admin.site.2'><a href='$admin.site.0'>$admin.site.1</a></li>

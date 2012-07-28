@@ -629,9 +629,11 @@ input#dfrn-url {
 
 #cropimage-wrapper, #cropimage-preview-wrapper {
 	float: left;
-	padding: 30px;
+	padding: 10px;
 }
-
+.imgCrop {
+	max-width: 280px;
+}
 #crop-image-form {
 	margin-top: 30px;
 	clear: both;
@@ -1860,9 +1862,17 @@ input#dfrn-url {
 	margin-top: 15px;
 }
 
+#contact-edit-last-update-text {
+	float: left;
+	clear: left;
+	margin-top: 30px;
+}
+
 #contact-edit-poll-text {
+	float: left;
+	clear: left;
 	margin-top: 15px;
-	margin-bottom: 5px;
+	margin-bottom: 0px;
 }
 
 #contact-edit-update-now {
@@ -1886,7 +1896,7 @@ input#dfrn-url {
 
 #contact-edit-drop-link {
 	float: right;
-	margin-right: 20px;
+	margin-right: 10px;
 }
 
 #contact-edit-nav-end {
@@ -1897,6 +1907,19 @@ input#dfrn-url {
 	width: 100%;
 }
 
+#update_now_link {
+	float: left;
+	clear: left;
+	margin-bottom: 20px;
+}
+
+#label_id_hidden, #id_hidden {
+	margin-top: 30px;
+}
+#help_id_hidden {
+	margin-top: 30px;
+}
+
 #contact-edit-end {
 	clear: both;
 	margin-top: 15px;
@@ -1904,11 +1927,13 @@ input#dfrn-url {
 
 #contact-profile-selector {
 	width: 175px;
-	margin-left: 175px;
+	margin-left: 0px;
 }
 
 .contact-edit-submit {
 	margin-top: 20px;
+	padding: 0.2em 0.5em;
+	font-size: 18px;
 }
 
 
@@ -2487,6 +2512,10 @@ aside input[type='text'] {
 	color: #8888FF;
 	text-decoration: none;
 	cursor: pointer;
+}
+
+#photos-upload-perms-menu {
+	margin-left: 15px;
 }
 
 #photos-upload-perms-menu:hover {

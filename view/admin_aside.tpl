@@ -5,7 +5,7 @@
 		$("nav").bind('nav-update',  function(e,data){
 			var elm = $('#pending-update');
 			var register = $(data).find('register').text();
-			if (register=="0") { reigster=""; elm.hide();} else { elm.show(); }
+			if (register=="0") { register=""; elm.hide();} else { elm.show(); }
 			elm.html(register);
 		});
 	});

@@ -18,24 +18,17 @@ function message_init(&$a) {
 	));
 	$base = $a->get_baseurl();
 
-	$a->page['htmlhead'] .= '<script src="' . $a->get_baseurl(true) . '/library/jquery_ac/friendica.complete.js" ></script>';
-	$a->page['htmlhead'] .= <<< EOT
+	$head_tpl = get_markup_template('message-head.tpl');
+	$a->page['htmlhead'] .= replace_macros($head_tpl,array(
+		'$baseurl' => $a->get_baseurl(true),
+		'$base' => $base
+	));
 
-<script>$(document).ready(function() { 
-	var a; 
-	a = $("#recip").autocomplete({ 
-		serviceUrl: '$base/acl',
-		minChars: 2,
-		width: 350,
-		onSelect: function(value,data) {
-			$("#recip-complete").val(data);
-		}			
-	});
-
-}); 
-
-</script>
-EOT;
+	$end_tpl = get_markup_template('message-end.tpl');
+	$a->page['end'] .= replace_macros($end_tpl,array(
+		'$baseurl' => $a->get_baseurl(true),
+		'$base' => $base
+	));
 	
 }
 
@@ -242,8 +235,15 @@ function message_content(&$a) {
 
 
 		$tpl = get_markup_template('msg-header.tpl');
-
 		$a->page['htmlhead'] .= replace_macros($tpl, array(
+			'$baseurl' => $a->get_baseurl(true),
+			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
+			'$nickname' => $a->user['nickname'],
+			'$linkurl' => t('Please enter a link URL:')
+		));
+	
+		$tpl = get_markup_template('msg-end.tpl');
+		$a->page['end'] .= replace_macros($tpl, array(
 			'$baseurl' => $a->get_baseurl(true),
 			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 			'$nickname' => $a->user['nickname'],
@@ -399,8 +399,13 @@ function message_content(&$a) {
 		require_once("include/bbcode.php");
 
 		$tpl = get_markup_template('msg-header.tpl');
-	
 		$a->page['htmlhead'] .= replace_macros($tpl, array(
+			'$nickname' => $a->user['nickname'],
+			'$baseurl' => $a->get_baseurl(true)
+		));
+
+		$tpl = get_markup_template('msg-end.tpl');
+		$a->page['end'] .= replace_macros($tpl, array(
 			'$nickname' => $a->user['nickname'],
 			'$baseurl' => $a->get_baseurl(true)
 		));

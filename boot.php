@@ -573,6 +573,13 @@ if(! class_exists('App')) {
 			));
 		}
 
+		function init_page_end() {
+			$tpl = get_markup_template('end.tpl');
+			$this->page['end'] = replace_macros($tpl,array(
+				'$baseurl' => $this->get_baseurl() // FIXME for z_path!!!!
+			));
+		}
+
 		function set_curl_code($code) {
 			$this->curl_code = $code;
 		}
