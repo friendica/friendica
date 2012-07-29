@@ -13,6 +13,12 @@
 	<img class="system-menu-link" src="/view/theme/frost/images/menu.png">
 	</a>
 	<ul id="system-menu-list" class="nav-menu-list">
+			{{ if $nav.manage }}
+			<li>
+			<a id="nav-manage-link" class="nav-link $nav.manage.2 $sel.manage" href="$nav.manage.0" title="$nav.manage.3">$nav.manage.1</a>
+			</li>
+			{{ endif }}
+
 		{{ if $nav.settings }}
 		<li><a id="nav-settings-link" class="$nav.settings.2 nav-load-page-link" href="$nav.settings.0" title="$nav.settings.3">$nav.settings.1</a></li>
 		{{ endif }}
@@ -120,7 +126,6 @@
 
 	{{ if $nav.register }}<a id="nav-register-link" class="nav-commlink $nav.register.2 $sel.register" href="$nav.register.0" title="$nav.register.3" >$nav.register.1</a>{{ endif }}
 		
-	{{ if $nav.manage }}<a id="nav-manage-link" class="nav-link $nav.manage.2 $sel.manage" href="$nav.manage.0" title="$nav.manage.3">$nav.manage.1</a>{{ endif }}
 	</span>
 	<span id="nav-end"></span>
 	<span id="banner">$banner</span>
