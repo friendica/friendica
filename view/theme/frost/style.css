@@ -2222,7 +2222,7 @@ aside input[type='text'] {
 
 .widget {
 	border: 1px solid #DDDDDD;
-	padding: 8px;
+	padding: 1em 2em;
 	margin-top: 5px;
 	-moz-border-radius:5px;
 	-webkit-border-radius:5px;

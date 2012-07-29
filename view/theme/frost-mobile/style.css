@@ -360,7 +360,7 @@ section {
 }
 .tabs li { margin: 0px 0px 20px 0px; padding-left: 1em; list-style: none; }
 .tabs a {
-	padding: 0.2em 2em;
+	padding: 0.4em 2em;
 	border: 1px solid #aaa;
 	border-radius: 8px;
 	-moz-border-radius: 8px;
