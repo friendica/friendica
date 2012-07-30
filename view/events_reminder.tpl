@@ -5,6 +5,6 @@
 {{ for $events as $event }}
 <div class="event-list" id="event-$event.id"></a> <a href="events/$event.link">$event.title</a> $event.date </div>
 {{ endfor }}
-</div></div>
+</div>
 {{ endif }}
 
