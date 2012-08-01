@@ -19,10 +19,10 @@
 				<input type="hidden" name="jsreload" value="$jsreload" />
 				<input type="hidden" name="preview" id="comment-preview-inp-$id" value="0" />
 
-				<div class="comment-edit-photo" id="comment-edit-photo-$id" >
-					<a class="comment-edit-photo-link" href="$mylink" title="$mytitle"><img class="my-comment-photo" src="$myphoto" alt="$mytitle" title="$mytitle" /></a>
-				</div>
-				<div class="comment-edit-photo-end"></div>
+<!--				<div class="comment-edit-photo" id="comment-edit-photo-$id" >-->
+					<a class="comment-edit-photo comment-edit-photo-link" id="comment-edit-photo-$id" href="$mylink" title="$mytitle"><img class="my-comment-photo" src="$myphoto" alt="$mytitle" title="$mytitle" /></a>
+<!--				</div>-->
+				<!--<div class="comment-edit-photo-end"></div>-->
 				<ul class="comment-edit-bb-$id">
 					<li><a class="editicon boldbb shadow"
 						style="cursor: pointer;" title="$edbold"
@@ -49,7 +49,7 @@
 						style="cursor: pointer;" title="$edvideo"
 						onclick="insertFormatting('$comment','video', $id);"></a></li>
 				</ul>	
-				<div class="comment-edit-bb-end"></div>
+<!--				<div class="comment-edit-bb-end"></div>-->
 <!--				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);cmtBbOpen($id);" onBlur="commentClose(this,$id);cmtBbClose($id);" >$comment</textarea>-->
 				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);cmtBbOpen($id);" >$comment</textarea>
 				{{ if $qcomment }}
@@ -68,7 +68,7 @@
 					<div id="comment-edit-preview-$id" class="comment-edit-preview" style="display:none;"></div>
 				</div>
 
-				<div class="comment-edit-end"></div>
+				<!--<div class="comment-edit-end"></div>-->
 			</form>
 
 		</div>

@@ -93,6 +93,13 @@ $j(document).ready(function() {
 			$j('#drop-' + id).removeClass('icon');$j('#drop-' + id).removeClass('drophide'); $j('#drop-' + id).addClass('iconspacer');}
 	);*/
 
+	if(window.autoCompleteType == "display-head") {
+		//$j(".comment-edit-wrapper textarea").contact_autocomplete(baseurl+"/acl");
+		// make auto-complete work in more places
+		//$j(".wall-item-comment-wrapper textarea").contact_autocomplete(baseurl+"/acl");
+		$j(".comment-wwedit-wrapper textarea").contact_autocomplete(baseurl+"/acl");
+	}
+
 	if(window.aclType == "event_head") {
 		$j('#events-calendar').fullCalendar({
 			events: baseurl + '/events/json/',

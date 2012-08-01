@@ -14,8 +14,10 @@ Photo album display?
 
 - Admin: access to more pages than summary?
 
+- Embedded video playback is way too big
+
 - Needs to be faster!
-	- Reduce DOM elements (4100 for 10 items)
+	- Reduce DOM elements (~2400 for 10 items, ~8400 for 40 items)
 	- Automatically set limit of 10 items for Network and Profile?
 
 
