@@ -23,4 +23,5 @@ $msg_text
 <input type="submit" name="submit" value="$submit" />
 </div>
 
+</div>
 </form>

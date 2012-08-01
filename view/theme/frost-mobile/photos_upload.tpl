@@ -28,6 +28,7 @@
 		<a href="#photos-upload-permissions-wrapper" id="photos-upload-perms-menu" class="button popupbox" />
 		<span id="jot-perms-icon" class="icon $lockstate" ></span>$permissions
 		</a>
+	</div>
 	<div id="photos-upload-perms-end"></div>
 
 	<div style="display: none;">
