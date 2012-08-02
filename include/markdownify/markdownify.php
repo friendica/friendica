@@ -686,6 +686,10 @@ class Markdownify {
         #  [1]: mailto:mail@example.com Title
         $tag['href'] = 'mailto:'.$bufferDecoded;
       }
+
+      $this->out('['.$buffer.']('.$tag['href'].' "'.$tag['title'].'")', true);
+
+/*
       # [This link][id]
       foreach ($this->stack['a'] as $tag2) {
         if ($tag2['href'] == $tag['href'] && $tag2['title'] === $tag['title']) {
@@ -699,6 +703,7 @@ class Markdownify {
       }
 
       $this->out('['.$buffer.']['.$tag['linkID'].']', true);
+*/
     }
   }
   /**
@@ -737,7 +742,7 @@ class Markdownify {
 
 // ![Alt text](/path/to/img.jpg "Optional title")
     if ($this->parser->tagAttributes['title'] != "")
-      $this->out('!['.$this->parser->tagAttributes['alt'].']('.$this->parser->tagAttributes['src'].'"'.$this->parser->tagAttributes['title'].'")', true);
+      $this->out('!['.$this->parser->tagAttributes['alt'].']('.$this->parser->tagAttributes['src'].' "'.$this->parser->tagAttributes['title'].'")', true);
     else
       $this->out('!['.$this->parser->tagAttributes['alt'].']('.$this->parser->tagAttributes['src'].')', true);
 

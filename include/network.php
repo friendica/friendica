@@ -802,7 +802,7 @@ function scale_external_images($s, $include_link = true, $scale_replace = false)
 	$s = htmlspecialchars_decode($s);
 
 	$matches = null;
-	$c = preg_match_all('/\[img\](.*?)\[\/img\]/ism',$s,$matches,PREG_SET_ORDER);
+	$c = preg_match_all('/\[img.*?\](.*?)\[\/img\]/ism',$s,$matches,PREG_SET_ORDER);
 	if($c) {
 		require_once('include/Photo.php');
 		foreach($matches as $mtch) {
@@ -822,6 +822,12 @@ function scale_external_images($s, $include_link = true, $scale_replace = false)
 			else
 				$scaled = $mtch[1];
 			$i = fetch_url($scaled);
+
+			$cache = get_config('system','itemcache');
+			if (($cache != '') and is_dir($cache)) {
+				$cachefile = $cache."/".hash("md5", $scaled);
+				file_put_contents($cachefile, $i);
+			}
 
 			// guess mimetype from headers or filename
 			$type = guess_image_type($mtch[1],true);

@@ -176,6 +176,9 @@ function parseurl_getsiteinfo($url) {
                 }
         } else {
 		$src = completeurl($siteinfo["image"], $url);
+
+		unset($siteinfo["image"]);
+
 		$photodata = getimagesize($src);
 
 		if (($photodata[0] > 10) and ($photodata[1] > 10))
@@ -292,8 +295,7 @@ function parse_url_content(&$a) {
 	$siteinfo = parseurl_getsiteinfo($url);
 
 	if($siteinfo["title"] == "") {
-		echo print_r($siteinfo, true);
-		//echo sprintf($template,$url,$url,'') . $str_tags;
+		echo sprintf($template,$url,$url,'') . $str_tags;
 		killme();
 	} else {
 		$text = $siteinfo["text"];
@@ -302,7 +304,7 @@ function parse_url_content(&$a) {
 
 	$image = "";
 
-        if($siteinfo["image"] != ""){
+        if(sizeof($siteinfo["images"]) > 0){
             /*
               Execute below code only if image is present in siteinfo
              */

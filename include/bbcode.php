@@ -224,6 +224,12 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	// Check for list text
 	$Text = str_replace("[*]", "<li>", $Text);
 
+	// Check for style sheet commands
+	$Text = preg_replace("(\[style=(.*?)\](.*?)\[\/style\])ism","<span style=\"$1;\">$2</span>",$Text);
+
+	// Check for CSS classes
+	$Text = preg_replace("(\[class=(.*?)\](.*?)\[\/class\])ism","<span class=\"$1\">$2</span>",$Text);
+
  	// handle nested lists
 	$endlessloop = 0;
 

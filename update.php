@@ -1343,4 +1343,3 @@ function update_1153() {
 	if(!$r) return UPDATE_FAILED;
 	return UPDATE_SUCCESS;
 }
-

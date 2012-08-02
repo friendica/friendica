@@ -2550,3 +2550,8 @@ list-style-type: disc;
         float: left;
         width: 175px;
 }
+
+.item-image-preview {
+  float: left;
+  margin-right: 10px;
+}
