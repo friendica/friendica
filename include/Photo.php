@@ -247,7 +247,7 @@ class Photo {
         if($this->is_imagick()) {
             $this->image->setFirstIterator();
             do {
-                $this->image->rotateImage(new ImagickPixel(), $degrees);
+                $this->image->rotateImage(new ImagickPixel(), -$degrees); // ImageMagick rotates in the opposite direction of imagerotate()
             } while ($this->image->nextImage());
             return;
         }
