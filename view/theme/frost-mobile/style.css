@@ -156,7 +156,7 @@ nav #banner #logo-text a {
 	font-size: 40px;
 	font-weight: bold;
 	margin-left: 3px;
- 	color: #000000;
+	color: #000000;
 
 }
 nav #banner #logo-text a:hover { text-decoration: none; }
@@ -2399,13 +2399,13 @@ aside input[type='text'] {
 }
 .photo-album-image-wrapper .caption {
 	display: none; 
- 	width: 100%;
+	width: 100%;
 /* 	position: absolute; */
- 	bottom: 0px; 
- 	padding: 0.5em 0.5em 0px 0.5em;
- 	background-color: rgba(245, 245, 255, 0.8);
- 	border-bottom: 2px solid #CCC;
- 	margin: 0px;
+	bottom: 0px; 
+	padding: 0.5em 0.5em 0px 0.5em;
+	background-color: rgba(245, 245, 255, 0.8);
+	border-bottom: 2px solid #CCC;
+	margin: 0px;
 }
 .photo-album-image-wrapper a:hover .caption {
 	display:block;
@@ -2433,13 +2433,13 @@ aside input[type='text'] {
 	-webkit-border-radius: 10px;
 }
 .photo-top-album-name {
- 	width: 100%;
- 	min-height: 2em;
+	width: 100%;
+	min-height: 2em;
 /* 	position: absolute;  */
- 	bottom: 0px; 
- 	padding: 0px 3px;
- 	padding-top: 0.5em;
- 	background-color: rgb(255, 255, 255);
+	bottom: 0px; 
+	padding: 0px 3px;
+	padding-top: 0.5em;
+	background-color: rgb(255, 255, 255);
 }
 #photo-top-end {
 	clear: both;
@@ -3884,4 +3884,22 @@ ul.notifications-menu-popup {
 #datebrowse-sidebar select {
 	margin-left: 40px;
 	width: 130px;
+}
+
+@media only screen and (min-device-width: 768px)
+and (max-device-width: 1024px)
+{
+html {
+width:700px
+}
+div.section-wrapper {
+width:700px;
+margin-left:0px;
+}
+.wall-item-body {
+width:700px;
+}
+.comment .wall-item-body {
+width:650px;
+}
 }
