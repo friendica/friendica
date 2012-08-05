@@ -349,6 +349,7 @@ if(! class_exists('App')) {
 		public  $plugins;
 		public  $apps = array();
 		public  $identities;
+		public	$sourcename = '';
 	
 		public $nav_sel;
 

@@ -1894,7 +1894,7 @@ input#dfrn-url {
 
 
 #acl-wrapper {
-	width: 690px;
+	width: 580px;
 	float:left;
 }
 #acl-search {
@@ -1935,7 +1935,7 @@ input#dfrn-url {
 }
 .acl-list-item {
 	display: block;
-	width: 150px;
+	width: 170px;
 	height: 30px;
 	border: 1px solid #cccccc;
 	margin: 5px;
@@ -1949,10 +1949,10 @@ input#dfrn-url {
 }
 .acl-list-item p { height: 12px; font-size: 10px; margin: 0px; padding: 2px 0px 1px; overflow: hidden;}
 .acl-list-item a { 
-	font-size: 8px;
+	font-size: 10px; /* 8px; */
 	display: block;
-	width: 40px;
-	height: 10px;
+	width: 50px;
+	height: 12px;
 	float: left;
 	color: #999999;
 	background-color: #cccccc;

@@ -1324,6 +1324,7 @@ function photos_content(&$a) {
 							'$comment' => t('Comment'),
 							'$submit' => t('Submit'),
 							'$preview' => t('Preview'),
+							'$sourceapp' => t($a->sourcename),
 							'$ww' => ''
 						));
 					}
@@ -1363,6 +1364,7 @@ function photos_content(&$a) {
 							'$myphoto' => $contact['thumb'],
 							'$comment' => t('Comment'),
 							'$submit' => t('Submit'),
+							'$sourceapp' => t($a->sourcename),
 							'$ww' => ''
 						));
 					}
@@ -1394,6 +1396,7 @@ function photos_content(&$a) {
 								'$myphoto' => $contact['thumb'],
 								'$comment' => t('Comment'),
 								'$submit' => t('Submit'),
+								'$sourceapp' => t($a->sourcename),
 								'$ww' => ''
 							));
 						}

@@ -698,6 +698,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 							'$edurl' => t('Link'),
 							'$edvideo' => t('Video'),
 							'$preview' => t('Preview'),
+							'$sourceapp' => t($a->sourcename),
 							'$ww' => (($mode === 'network') ? $commentww : '')
 						));
 					}

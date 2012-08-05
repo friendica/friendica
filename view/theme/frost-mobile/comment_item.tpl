@@ -13,6 +13,7 @@
 		<div class="comment-wwedit-wrapper" id="comment-edit-wrapper-$id" style="display: block;" >
 			<form class="comment-edit-form" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;" >
 				<input type="hidden" name="type" value="$type" />
+				<input type="hidden" name="source" value="$sourceapp" />
 				<input type="hidden" name="profile_uid" value="$profile_uid" />
 				<input type="hidden" name="parent" value="$parent" />
 				<input type="hidden" name="return" value="$return_path" />
