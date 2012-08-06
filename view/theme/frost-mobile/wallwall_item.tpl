@@ -18,12 +18,12 @@
                     <ul class="wall-item-photo-menu" id="wall-item-photo-menu-$item.id">
                         $item.item_photo_menu
                     </ul>
-<!--                </div>-->
+                </div>-->
 
 			</div>
 			<!--<div class="wall-item-photo-end"></div>-->
 			<div class="wall-item-wrapper" id="wall-item-wrapper-$item.id" >
-				{{ if $item.lock }}<div class="wall-item-lock"><img src="images/lock_icon.gif" class="lockview" alt="$item.lock" onclick="lockview(event,$item.id);" /></div>
+				{{ if $item.lock }}<!--<div class="wall-item-lock">--><img src="images/lock_icon.gif" class="wall-item-lock lockview" alt="$item.lock" onclick="lockview(event,$item.id);" /><!--</div>-->
 				{{ else }}<div class="wall-item-lock"></div>{{ endif }}	
 				<div class="wall-item-location" id="wall-item-location-$item.id">$item.location</div>
 			</div>

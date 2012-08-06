@@ -349,11 +349,21 @@ if(! class_exists('App')) {
 		public  $plugins;
 		public  $apps = array();
 		public  $identities;
-		public	$sourcename = '';
 	
 		public $nav_sel;
 
 		public $category;
+
+		// Allow themes to control internal parameters
+		// by changing App values in theme.php
+		//
+		// Possibly should make these part of the plugin
+		// system, but it seems like overkill to invoke
+		// all the plugin machinery just to change a couple
+		// of values
+		public	$sourcename = '';
+		public	$videowidth = 425;
+		public	$videoheight = 350;
 
 		private $scheme;
 		private $hostname;
