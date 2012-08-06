@@ -90,7 +90,7 @@ nav .nav-link{display:inline-block;width:22px;height:22px;overflow:hidden;margin
 #nav-home-link{background-position:-44px -132px;}#nav-home-link:hover{background-position:-66px -132px;}
 #nav-intro-link{background-position:0px -88px;}#nav-intro-link:hover{background-position:-22px -88px;}
 #nav-login-link,#nav-logout-link{background-position:0 -88px;}#nav-login-link:hover,#nav-logout-link:hover{background-position:-22px -88px;}
-#nav-manage-link{background-position:0px -22px;}#nav-manage-link:hover{background-position:-22px -22px;}
+#nav-manage-link{background-position:-88px -88px;}#nav-manage-link:hover{background-position:-110px -88px;}
 #nav-messages-link{background-position:-44px -88px;}#nav-messages-link:hover{background-position:-66px -88px;}
 #nav-notify-link,#nav-notifications-linkmenu{background-position:-44px -110px;}
 #nav-notify-link:hover{background-position:-66px -110px;}

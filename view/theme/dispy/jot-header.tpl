@@ -1,5 +1,5 @@
 <script type="text/javascript">
-var editor = false;
+var editor=false;
 var textlen = 0;
 var plaintext = '$editselect';
 
