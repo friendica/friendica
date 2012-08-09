@@ -13,11 +13,13 @@
 			<div class="wall-item-location">$item.location</div>	
 		</div>
 		<div class="wall-item-content">
-			$item.body
+			$item.ago $item.body 
 		</div>
 	</div>
 </div>
 
+{{ if $item.flatten }}
 <div class="wall-item-comment-wrapper" >
 	$item.comment
 </div>
+{{ endif }}

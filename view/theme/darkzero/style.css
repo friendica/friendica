@@ -28,7 +28,8 @@ background: #444;
 
 }
 .wall-item-tools {	background-color: #444444;   background-image: none;}
-.comment-wwedit-wrapper{ background-color: #333333; }
+.comment-wwedit-wrapper{ background-color: #444444; }
+.toplevel_item > .wall-item-comment-wrapper > .comment-wwedit-wrapper{ background-color: #333333; }
 .comment-edit-preview{ color: #000000; }
 .wall-item-content-wrapper.comment { background-color: #444444; border: 0px;}
 .photo-top-album-name{ background-color: #333333; }

@@ -935,8 +935,12 @@ input#dfrn-url {
 
 }
 
-.wall-item-content-wrapper.comment {
+.tread-wrapper .tread-wrapper {
 	margin-left: 50px;
+}
+
+.wall-item-content-wrapper.comment {
+#	margin-left: 50px;
 	background: #EEEEEE;
 }
 
@@ -1175,9 +1179,7 @@ input#dfrn-url {
 }
 
 .comment-wwedit-wrapper {
-	margin-top: 15px;
 	background: #f3f3f3;
-	margin-left: 50px;
 }
 
 .comment-edit-photo {

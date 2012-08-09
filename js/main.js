@@ -280,8 +280,7 @@
 			//});
 
 			// add a new thread
-
-			$('.tread-wrapper',data).each(function() {
+			$('.toplevel_item',data).each(function() {
 				var ident = $(this).attr('id');
 
 				if($('#' + ident).length == 0 && profile_page == 1) {

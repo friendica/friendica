@@ -113,8 +113,9 @@ function display_content(&$a) {
 			);
 		}
 
-
-		$o .= conversation($a,$r,'display', false);
+		$items = conv_sort($r,"`commented`");
+		
+		$o .= conversation($a,$items,'display', false);
 
 	}
 	else {

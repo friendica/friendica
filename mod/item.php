@@ -79,6 +79,7 @@ function item_post(&$a) {
 		// if this isn't the real parent of the conversation, find it
 		if($r !== false && count($r)) {
 			$parid = $r[0]['parent'];
+			$parent_uri = $r[0]['uri'];
 			if($r[0]['id'] != $r[0]['parent']) {
 				$r = q("SELECT * FROM `item` WHERE `id` = `parent` AND `parent` = %d LIMIT 1",
 					intval($parid)
@@ -96,7 +97,7 @@ function item_post(&$a) {
 		$parent = $r[0]['id'];
 
 		// multi-level threading - preserve the info but re-parent to our single level threading
-		if(($parid) && ($parid != $parent))
+		//if(($parid) && ($parid != $parent))
 			$thr_parent = $parent_uri;
 
 		if($parent_item['contact-id'] && $uid) {
@@ -544,6 +545,10 @@ function item_post(&$a) {
 
 	$uri = item_new_uri($a->get_hostname(),$profile_uid);
 
+	// Fallback so that we alway have a thr-parent
+	if(!$thr_parent)
+		$thr_parent = $uri;
+
 	$datarray = array();
 	$datarray['uid']           = $profile_uid;
 	$datarray['type']          = $post_type;
@@ -603,7 +608,7 @@ function item_post(&$a) {
 
 	if($preview) {
 		require_once('include/conversation.php');
-		$o = conversation($a,array(array_merge($contact_record,$datarray)),'search',false,true);
+		$o = conversation($a,array(array_merge($contact_record,$datarray)),'search', false);
 		logger('preview: ' . $o);
 		echo json_encode(array('preview' => $o));
 		killme();

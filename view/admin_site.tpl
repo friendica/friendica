@@ -71,6 +71,7 @@
 	{{ inc field_checkbox.tpl with $field=$diaspora_enabled }}{{ endinc }}
 	{{ inc field_checkbox.tpl with $field=$dfrn_only }}{{ endinc }}
 	{{ inc field_input.tpl with $field=$global_directory }}{{ endinc }}
+	{{ inc field_checkbox.tpl with $field=$thread_allow }}{{ endinc }}
 	
 	<div class="submit"><input type="submit" name="page_site" value="$submit" /></div>
 	

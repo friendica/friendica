@@ -250,6 +250,7 @@ function admin_page_site_post(&$a){
 	$block_public		=	((x($_POST,'block_public'))		? True	:	False);
 	$force_publish		=	((x($_POST,'publish_all'))		? True	:	False);
 	$global_directory	=	((x($_POST,'directory_submit_url'))	? notags(trim($_POST['directory_submit_url']))	: '');
+	$thread_allow		=	((x($_POST,'thread_allow'))		? True	:	False);
 	$no_multi_reg		=	((x($_POST,'no_multi_reg'))		? True	:	False);
 	$no_openid			=	!((x($_POST,'no_openid'))		? True	:	False);
 	$no_regfullname		=	!((x($_POST,'no_regfullname'))	? True	:	False);
@@ -342,6 +343,7 @@ function admin_page_site_post(&$a){
 	} else {
 		set_config('system','directory_submit_url', $global_directory);
 	}
+	set_config('system','thread_allow', $thread_allow);
 
 	set_config('system','block_extended_register', $no_multi_reg);
 	set_config('system','no_openid', $no_openid);
@@ -442,6 +444,7 @@ function admin_page_site(&$a) {
 		'$block_public'		=> array('block_public', t("Block public"), get_config('system','block_public'), t("Check to block public access to all otherwise public personal pages on this site unless you are currently logged in.")),
 		'$force_publish'	=> array('publish_all', t("Force publish"), get_config('system','publish_all'), t("Check to force all profiles on this site to be listed in the site directory.")),
 		'$global_directory'	=> array('directory_submit_url', t("Global directory update URL"), get_config('system','directory_submit_url'), t("URL to update the global directory. If this is not set, the global directory is completely unavailable to the application.")),
+		'$thread_allow'		=> array('thread_allow', t("Allow threaded items"), get_config('system','thread_allow'), t("Allow infinite level threading for items on this site.")),
 			
 		'$no_multi_reg'		=> array('no_multi_reg', t("Block multiple registrations"),  get_config('system','block_extended_register'), t("Disallow users to register additional accounts for use as pages.")),
 		'$no_openid'		=> array('no_openid', t("OpenID support"), !get_config('system','no_openid'), t("OpenID support for registration and logins.")),

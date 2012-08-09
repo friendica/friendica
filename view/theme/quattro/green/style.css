@@ -1068,6 +1068,9 @@ section {
   color: #2d2d2d;
   border: 1px solid #2d2d2d;
 }
+.threaded .wall-item-comment-wrapper {
+  margin-left: 0px;
+}
 .comment-edit-preview {
   width: 710px;
   border: 1px solid #2d2d2d;
@@ -1138,6 +1141,37 @@ section {
 .wwto .contact-photo {
   width: 25px;
   height: 25px;
+}
+/* threaded comments */
+.children .children {
+  margin-left: 40px;
+}
+.children .children .wall-item-container {
+  width: 710px;
+}
+.children .children .children {
+  margin-left: 40px;
+}
+.children .children .children .wall-item-container {
+  width: 670px;
+}
+.children .children .children .children {
+  margin-left: 40px;
+}
+.children .children .children .children .wall-item-container {
+  width: 630px;
+}
+.children .children .children .children .children {
+  margin-left: 40px;
+}
+.children .children .children .children .children .wall-item-container {
+  width: 590px;
+}
+.children .children .children .children .children .children {
+  margin-left: 0px;
+}
+.threaded .hide-comments-outer {
+  margin-left: 20px;
 }
 span[id^="showmore-teaser"] {
   background: url("showmore-bg.jpg") no-repeat center bottom;
