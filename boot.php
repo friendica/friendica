@@ -364,6 +364,7 @@ if(! class_exists('App')) {
 		public	$sourcename = '';
 		public	$videowidth = 425;
 		public	$videoheight = 350;
+		public	$force_max_items = 0;
 
 		private $scheme;
 		private $hostname;

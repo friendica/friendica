@@ -1,7 +1,10 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<meta content='width=device-width, minimum-scale=1 maximum-scale=1' name='viewport'>
+<!--<meta content='width=device-width, minimum-scale=1 maximum-scale=1' name='viewport'>
 <meta content='True' name='HandheldFriendly'>
-<meta content='320' name='MobileOptimized'>
+<meta content='320' name='MobileOptimized'>-->
+<meta name="viewport" content="width=device-width; initial-scale = 1.0; maximum-scale=1.0; user-scalable=no" />
+<!--<meta name="viewport" content="width=100%;  initial-scale=1; maximum-scale=1; minimum-scale=1; user-scalable=no;" />-->
+
 <base href="$baseurl/" />
 <meta name="generator" content="$generator" />
 <!--<link rel="stylesheet" href="$baseurl/library/fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />

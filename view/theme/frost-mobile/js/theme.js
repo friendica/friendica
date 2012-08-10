@@ -1,8 +1,8 @@
 $j(document).ready(function() {
 
-		/* enable tinymce on focus and click */
-		$j("#profile-jot-text").focus(enableOnUser);
-		$j("#profile-jot-text").click(enableOnUser);
+	/* enable tinymce on focus and click */
+	$j("#profile-jot-text").focus(enableOnUser);
+	$j("#profile-jot-text").click(enableOnUser);
 
 	if(typeof window.AjaxUpload != "undefined") {
 		switch(window.ajaxType) {

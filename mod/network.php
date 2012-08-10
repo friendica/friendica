@@ -563,7 +563,7 @@ function network_content(&$a, $update = 0) {
 
 	}
 	else {
- 	        if(! get_pconfig(local_user(),'system','alt_pager')) {
+		if(! get_pconfig(local_user(),'system','alt_pager')) {
 		        $r = q("SELECT COUNT(*) AS `total`
 			        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			        WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
@@ -576,10 +576,15 @@ function network_content(&$a, $update = 0) {
 		        if(count($r)) {
 			        $a->set_pager_total($r[0]['total']);
 		        }
-	         }
-                $itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
-                $a->set_pager_itemspage(((intval($itemspage_network)) ? $itemspage_network : 40));
-                $pager_sql = sprintf(" LIMIT %d, %d ",intval($a->pager['start']), intval($a->pager['itemspage']));
+		}
+
+		$itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
+		$itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 40);
+		if(($a->force_max_items > 0) && ($a->force_max_items < $itemspage_network))
+			$itemspage_network = $a->force_max_items;
+
+		$a->set_pager_itemspage($itemspage_network);
+		$pager_sql = sprintf(" LIMIT %d, %d ",intval($a->pager['start']), intval($a->pager['itemspage']));
 	}
 
 	$simple_update = (($update) ? " and `item`.`unseen` = 1 " : '');

@@ -401,19 +401,19 @@
 
 	function getPosition(e) {
 		var cursor = {x:0, y:0};
-		if ( e.pageX || e.pageY  ) {
-			cursor.x = e.pageX;
-			cursor.y = e.pageY;
+		if ( e.touches[0].pageX || e.touches[0].pageY  ) {
+			cursor.x = e.touches[0].pageX;
+			cursor.y = e.touches[0].pageY;
 		}
 		else {
-			if( e.clientX || e.clientY ) {
-				cursor.x = e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft;
-				cursor.y = e.clientY + (document.documentElement.scrollTop  || document.body.scrollTop)  - document.documentElement.clientTop;
+			if( e.touches[0].clientX || e.touches[0].clientY ) {
+				cursor.x = e.touches[0].clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft;
+				cursor.y = e.touches[0].clientY + (document.documentElement.scrollTop  || document.body.scrollTop)  - document.documentElement.clientTop;
 			}
 			else {
-				if( e.x || e.y ) {
-					cursor.x = e.x;
-					cursor.y = e.y;
+				if( e.touches[0].x || e.touches[0].y ) {
+					cursor.touches[0].x = e.touches[0].x;
+					cursor.touches[0].y = e.touches[0].y;
 				}
 			}
 		}
