@@ -2459,6 +2459,7 @@ function local_delivery($importer,$data) {
 
 					$is_a_remote_delete = false;
 
+					// POSSIBLE CLEANUP --> Why select so many fields when only forum_mode and wall are used?
 					$r = q("select `item`.`id`, `item`.`uri`, `item`.`tag`, `item`.`forum_mode`,`item`.`origin`,`item`.`wall`, 
 						`contact`.`name`, `contact`.`url`, `contact`.`thumb` from `item` 
 						LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` 
@@ -2472,7 +2473,7 @@ function local_delivery($importer,$data) {
 						intval($importer['importer_uid'])
 					);
 					if($r && count($r))
-						$is_a_remote_delete = true;			
+						$is_a_remote_delete = true;
 
 					// Does this have the characteristics of a community or private group comment?
 					// If it's a reply to a wall post on a community/prvgroup page it's a 
@@ -2799,7 +2800,7 @@ function local_delivery($importer,$data) {
 					}
 
 					if($posted_id && $parent) {
-				
+
 						proc_run('php',"include/notifier.php","comment-import","$posted_id");
 					
 						if((! $is_like) && (! $importer['self'])) {

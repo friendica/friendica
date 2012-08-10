@@ -18,6 +18,31 @@ require_once('include/html2plain.php');
  * us by hosting providers. 
  */
 
+/*
+ * The notifier is typically called with:
+ *
+ *		proc_run('php', "include/notifier.php", COMMAND, ITEM_ID);
+ *
+ * where COMMAND is one of the following:
+ *
+ *		activity				(in diaspora.php, dfrn_confirm.php, profiles.php)
+ *		comment-import			(in diaspora.php, items.php)
+ *		comment-new				(in item.php)
+ *		drop					(in diaspora.php, items.php, photos.php)
+ *		edit_post				(in item.php)
+ *		event					(in events.php)
+ *		expire					(in items.php)
+ *		like					(in like.php, poke.php)
+ *		mail					(in message.php)
+ *		suggest					(in fsuggest.php)
+ *		tag						(in photos.php, poke.php, tagger.php)
+ *		tgroup					(in items.php)
+ *		wall-new				(in photos.php, item.php)
+ *
+ * and ITEM_ID is the id of the item in the database that needs to be sent to others.
+ */
+
+
 function notifier_run($argv, $argc){
 	global $a, $db;
 

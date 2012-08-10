@@ -196,6 +196,14 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	// The bbcode parser now handles youtube-links (and the other stuff) correctly.
 	// Additionally the html code is now fixed so that lists are now working.
 
+	/**
+	 * Transform #tags, strip off the [url] and replace spaces with underscore
+	 */
+	$Text = preg_replace_callback('/#\[url\=(\w+.*?)\](\w+.*?)\[\/url\]/i', create_function('$match',
+		'return \'#\'. str_replace(\' \', \'_\', $match[2]);'
+	), $Text);
+
+
 	// Converting images with size parameters to simple images. Markdown doesn't know it.
 	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $Text);
 

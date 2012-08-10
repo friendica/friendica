@@ -102,6 +102,37 @@ function diaspora_dispatch($importer,$msg) {
 	return $ret;
 }
 
+function diaspora_handle_from_contact($contact_id) {
+	$handle = False;
+
+	logger("diaspora_handle_from_contact: contact id is " . $contact_id, LOGGER_DEBUG);
+
+	$r = q("SELECT network, addr, self, url, nick FROM contact WHERE id = %d",
+	       intval($contact_id)
+	);
+	if($r) {
+		$contact = $r[0];
+
+		logger("diaspora_handle_from_contact: contact 'self' = " . $contact['self'] . " 'url' = " . $contact['url'], LOGGER_DEBUG);
+
+		if($contact['network'] === NETWORK_DIASPORA) {
+			$handle = $contact['addr'];
+
+//			logger("diaspora_handle_from_contact: contact id is a Diaspora person, handle = " . $handle, LOGGER_DEBUG);
+		}
+		elseif(($contact['network'] === NETWORK_DFRN) || ($contact['self'] == 1)) {
+			$baseurl_start = strpos($contact['url'],'://') + 3;
+			$baseurl_length = strpos($contact['url'],'/profile') - $baseurl_start; // allows installations in a subdirectory--not sure how Diaspora will handle
+			$baseurl = substr($contact['url'], $baseurl_start, $baseurl_length);
+			$handle = $contact['nick'] . '@' . $baseurl;
+
+//			logger("diaspora_handle_from_contact: contact id is a DFRN person, handle = " . $handle, LOGGER_DEBUG);
+		}
+	}
+
+	return $handle;
+}
+
 function diaspora_get_contact_by_handle($uid,$handle) {
 	$r = q("SELECT * FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `addr` = '%s' LIMIT 1",
 		dbesc(NETWORK_DIASPORA),
@@ -1282,7 +1313,7 @@ function diaspora_comment($importer,$xml,$msg) {
 		// the existence of parent_author_signature means the parent_author or owner
 		// is already relaying.
 
-		proc_run('php','include/notifier.php','comment',$message_id);
+		proc_run('php','include/notifier.php','comment-import',$message_id);
 	}
 
 	$myconv = q("SELECT `author-link`, `author-avatar`, `parent` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d AND `parent` != 0 AND `deleted` = 0 ",
@@ -1867,7 +1898,7 @@ EOT;
 	// is already relaying. The parent_item['origin'] indicates the message was created on our system
 
 	if(($parent_item['origin']) && (! $parent_author_signature))
-		proc_run('php','include/notifier.php','comment',$message_id);
+		proc_run('php','include/notifier.php','comment-import',$message_id);
 
 	return;
 }
@@ -1993,7 +2024,7 @@ function diaspora_signed_retraction($importer,$xml,$msg) {
 						// is already relaying.
 						logger('diaspora_signed_retraction: relaying relayable_retraction');
 
-						proc_run('php','include/notifier.php','relayable_retraction',$r[0]['id']);
+						proc_run('php','include/notifier.php','drop',$r[0]['id']);
 					}
 				}
 			}
@@ -2153,12 +2184,6 @@ function diaspora_send_status($item,$owner,$contact,$public_batch = false) {
 		}
 	}
 */
-	/**
-	 * Transform #tags, strip off the [url] and replace spaces with underscore
-	 */
-	$body = preg_replace_callback('/#\[url\=(\w+.*?)\](\w+.*?)\[\/url\]/i', create_function('$match',
-		'return \'#\'. str_replace(\' \', \'_\', $match[2]);'
-	), $body);
 
 	//if(strlen($title))
 	//	$body = "[b]".html_entity_decode($title)."[/b]\n\n".$body;
@@ -2344,8 +2369,8 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 		// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
 		// The only item with `parent` and `id` as the parent id is the parent item.
 		$p = q("select guid, type, uri, `parent-uri` from item where parent = %d and id = %d limit 1",
-			intval($item['parent']),
-			intval($item['parent'])
+		       intval($item['parent']),
+		       intval($item['parent'])
 		      );
 	//}
 	if(count($p))
@@ -2368,7 +2393,6 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 		$like = true;
 
 		$target_type = ( $parent['uri'] === $parent['parent-uri']  ? 'Post' : 'Comment');
-//		$target_type = (strpos($parent['type'], 'comment') ? 'Comment' : 'Post');
 //		$positive = (($item['deleted']) ? 'false' : 'true');
 		$positive = 'true';
 
@@ -2382,7 +2406,7 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	// fetch the original signature	if the relayable was created by a Diaspora
 	// or DFRN user. Relayables for other networks are not supported.
 
-	$r = q("select * from sign where " . $sql_sign_id . " = %d limit 1",
+/*	$r = q("select * from sign where " . $sql_sign_id . " = %d limit 1",
 		intval($item['id'])
 	);
 	if(count($r)) { 
@@ -2398,7 +2422,25 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 		// function is called
 		logger('diaspora_send_relay: original author signature not found, cannot send relayable');
 		return;
-	}
+	}*/
+
+	/* Since the author signature is only checked by the parent, not by the relay recipients,
+	 * I think it may not be necessary for us to do so much work to preserve all the original
+	 * signatures. The important thing that Diaspora DOES need is the original creator's handle.
+	 * Let's just generate that and forget about all the original author signature stuff.
+	 *
+	 * Note: this might be more of an problem if we want to support likes on comments for older
+	 * versions of Diaspora (diaspora-pistos), but since there are a number of problems with
+	 * doing that, let's ignore it for now.
+	 *
+	 * Currently, only DFRN contacts are supported. StatusNet shouldn't be hard, but it hasn't
+	 * been done yet
+	 */
+
+	$handle = diaspora_handle_from_contact($item['contact-id']);
+	if(! $handle)
+		return;
+
 
 	if($relay_retract)
 		$sender_signed_text = $item['guid'] . ';' . $target_type;
