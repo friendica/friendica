@@ -42,11 +42,21 @@ function insertFormatting(comment,BBcode,id) {
 	return true;
 }
 
-function cmtBbOpen(id) {
-	$(".comment-edit-bb-" + id).show();
+function showThread(id) {
+	$("#collapsed-comments-" + id).show()
+	$("#collapsed-comments-" + id + " .collapsed-comments").show()
 }
-function cmtBbClose(comment, id) {
-	$(".comment-edit-bb-" + id).hide();
+function hideThread(id) {
+	$("#collapsed-comments-" + id).hide()
+	$("#collapsed-comments-" + id + " .collapsed-comments").hide()
+}
+
+
+function cmtBbOpen(id) {
+	$("#comment-edit-bb-" + id).show();
+}
+function cmtBbClose(id) {
+	$("#comment-edit-bb-" + id).hide();
 }
 $(document).ready(function() {
 

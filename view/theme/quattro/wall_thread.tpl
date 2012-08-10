@@ -2,12 +2,24 @@
 {{ else }}
 {{if $item.comment_firstcollapsed}}
 	<div class="hide-comments-outer">
-	<span id="hide-comments-total-$item.id" class="hide-comments-total">$item.num_comments</span> <span id="hide-comments-$item.id" class="hide-comments fakelink" onclick="showHideComments($item.id);">$item.hide_text</span>
+		<span id="hide-comments-total-$item.id" 
+			class="hide-comments-total">$item.num_comments</span>
+			<span id="hide-comments-$item.id" 
+				class="hide-comments fakelink" 
+				onclick="showHideComments($item.id);">$item.hide_text</span>
+			{{ if $item.thread_level==3 }} - 
+			<span id="hide-thread-$item-id"
+				class="fakelink"
+				onclick="showThread($item.id);">expand</span> /
+			<span id="hide-thread-$item-id"
+				class="fakelink"
+				onclick="hideThread($item.id);">collapse</span> thread{{ endif }}
 	</div>
 	<div id="collapsed-comments-$item.id" class="collapsed-comments" style="display: none;">
 {{endif}}
 {{ endif }}
 
+{{ if $item.thread_level!=1 }}<div class="children">{{ endif }}
 
 <div class="wall-item-decor">
 	<span class="icon s22 star $item.isstarred" id="starred-$item.id" title="$item.star.starred">$item.star.starred</span>
@@ -93,35 +105,40 @@
 		<div class="wall-item-like" id="wall-item-like-$item.id">$item.like</div>
 		<div class="wall-item-dislike" id="wall-item-dislike-$item.id">$item.dislike</div>	
 	</div>
-	{{ if $item.threaded }}{{ if $item.comment }}
+	{{ if $item.threaded }}{{ if $item.comment }}{{ if $item.thread_level!=1 }}
 	<div class="wall-item-bottom">
 		<div class="wall-item-links"></div>
 		<div class="wall-item-comment-wrapper">
-					$item.comment
+			$item.comment
 		</div>
 	</div>
-	{{ endif }}{{ endif }}
+	{{ endif }}{{ endif }}{{ endif }}
 
 </div>
 
 
-{{ for $item.children as $item }}
-	<div class="children">
-		{{ if $item.type == tag }}
-			{{ inc wall_item_tag.tpl }}{{ endinc }}
-		{{ else }}
-			{{ inc $item.template }}{{ endinc }}
-		{{ endif }}
-	</div>
+
+{{ for $item.children as $child }}
+	{{ if $item.type == tag }}
+		{{ inc wall_item_tag.tpl with $item=$child }}{{ endinc }}
+	{{ else }}
+		{{ inc $item.template with $item=$child }}{{ endinc }}
+	{{ endif }}
 {{ endfor }}
+
+{{ if $item.thread_level!=1 }}</div>{{ endif }}
+
 
 {{if $mode == display}}
 {{ else }}
 {{if $item.comment_lastcollapsed}}</div>{{endif}}
 {{ endif }}
 
+{{if $item.threaded}}{{if $item.comment}}{{if $item.thread_level==1}}
+<div class="wall-item-comment-wrapper" >$item.comment</div>
+{{ endif }}{{ endif }}{{ endif }}
+
+
 {{ if $item.flatten }}
-<div class="wall-item-comment-wrapper" >
-	$item.comment
-</div>
+<div class="wall-item-comment-wrapper" >$item.comment</div>
 {{ endif }}

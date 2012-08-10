@@ -63,7 +63,7 @@
 				if ($b[0]=="$") $b =  $this->_get_var($b);
 				$val = ($a == $b);
 			} else if (strpos($args[2],"!=")>0){
-				list($a,$b) = explode("!=",$args[2]);
+				list($a,$b) = array_map("trim", explode("!=",$args[2]));
 				$a = $this->_get_var($a);
 				if ($b[0]=="$") $b =  $this->_get_var($b);
 				$val = ($a != $b);
@@ -132,6 +132,26 @@
 			$this->_pop_stack();
 			return $ret;
 			
+		}
+		
+		/**
+		 * DEBUG node
+		 * 
+		 * {{ debug $var [$var [$var [...]]] }}{{ enddebug }}
+		 * 
+		 * replace node with <pre>var_dump($var, $var, ...);</pre>
+		 */
+		private function _replcb_debug($args){
+			$vars = array_map('trim', explode(" ",$args[2]));
+			$vars[] = $args[1];
+
+			$ret = "<pre>";
+			foreach ($vars as $var){
+				$ret .= htmlspecialchars(var_export( $this->_get_var($var), true ));
+				$ret .= "\n";
+			}
+			$ret .= "</pre>";
+			return $ret;
 		}
 
 		private function _replcb_node($m) {

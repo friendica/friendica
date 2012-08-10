@@ -1,5 +1,7 @@
 {{ for $threads as $item }}
+
 <div id="tread-wrapper-$item.id" class="tread-wrapper {{ if $item.threaded }}threaded{{ endif }}">
+       
        
 		{{ if $item.type == tag }}
 			{{ inc wall_item_tag.tpl }}{{ endinc }}

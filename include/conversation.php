@@ -588,6 +588,7 @@ function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $pr
 			'comment' => $comment,
 			'previewing' => $previewing,
 			'wait' => t('Please wait'),
+			'thread_level' => $thread_level,
 		);
 
 		$arr = array('item' => $item, 'output' => $tmp_item);
@@ -818,6 +819,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 					'conv' => (($preview) ? '' : array('href'=> $a->get_baseurl($ssl_state) . '/display/' . $nickname . '/' . $item['id'], 'title'=> t('View in context'))),
 					'previewing' => $previewing,
 					'wait' => t('Please wait'),
+					'thread_level' => 1,
 				);
 
 				$arr = array('item' => $item, 'output' => $tmp_item);

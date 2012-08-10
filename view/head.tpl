@@ -39,7 +39,9 @@
 			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 			$("#mod-cmnt-wrap-" + id).show();
 			openMenu("comment-edit-submit-wrapper-" + id);
+			return true;
 		}
+		return false;
 	}
 	function commentClose(obj,id) {
 		if(obj.value == '') {
@@ -48,7 +50,9 @@
 			$("#comment-edit-text-" + id).addClass("comment-edit-text-empty");
 			$("#mod-cmnt-wrap-" + id).hide();
 			closeMenu("comment-edit-submit-wrapper-" + id);
+			return true;
 		}
+		return false;
 	}
 
 
