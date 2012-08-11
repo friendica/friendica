@@ -1,5 +1,5 @@
-<div class="wall-item-outside-wrapper$item.indent$item.previewing wallwall" id="wall-item-outside-wrapper-$item.id" >
-	<div class="wall-item-content-wrapper$item.indent" id="wall-item-content-wrapper-$item.id" >
+<div class="wall-item-outside-wrapper $item.indent$item.previewing wallwall" id="wall-item-outside-wrapper-$item.id" >
+	<div class="wall-item-content-wrapper $item.indent" id="wall-item-content-wrapper-$item.id" >
 		<div class="wall-item-info wallwall" id="wall-item-info-$item.id">
 			<div class="wall-item-photo-wrapper wwto" id="wall-item-ownerphoto-wrapper-$item.id" >
 				<a href="$item.owner_url" target="redir" title="$item.olinktitle" class="wall-item-photo-link" id="wall-item-ownerphoto-link-$item.id">
@@ -10,7 +10,7 @@
 				onmouseover="if (typeof t$item.id != 'undefined') clearTimeout(t$item.id); openMenu('wall-item-photo-menu-button-$item.id')"
                 onmouseout="t$item.id=setTimeout('closeMenu(\'wall-item-photo-menu-button-$item.id\'); closeMenu(\'wall-item-photo-menu-$item.id\');',200)">
 				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-photo-link" id="wall-item-photo-link-$item.id">
-				<img src="$item.thumb" class="wall-item-photo$item.sparkle$item.indent" id="wall-item-photo-$item.id" style="height: 80px; width: 80px;" alt="$item.name" /></a>
+				<img src="$item.thumb" class="wall-item-photo$item.sparkle $item.indent" id="wall-item-photo-$item.id" style="height: 80px; width: 80px;" alt="$item.name" /></a>
 				<span onclick="openClose('wall-item-photo-menu-$item.id');" class="fakelink wall-item-photo-menu-button" id="wall-item-photo-menu-button-$item.id">menu</span>
                 <div class="wall-item-photo-menu" id="wall-item-photo-menu-$item.id">
                     <ul>
@@ -80,6 +80,6 @@
 	$item.comment
 	</div>
 
-<div class="wall-item-outside-wrapper-end$item.indent" ></div>
+<div class="wall-item-outside-wrapper-end $item.indent" ></div>
 </div>
 

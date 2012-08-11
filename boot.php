@@ -365,6 +365,7 @@ if(! class_exists('App')) {
 		public	$videowidth = 425;
 		public	$videoheight = 350;
 		public	$force_max_items = 0;
+		public	$theme_thread_allow = true;
 
 		private $scheme;
 		private $hostname;

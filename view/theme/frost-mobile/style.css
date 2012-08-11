@@ -1422,6 +1422,13 @@ input#dfrn-url {
 	margin-right: 10px;
 }
 
+.comment-wwedit-wrapper.comment {
+	margin-left: 40px;
+	margin-right: 40px;
+	border-radius: 10px;
+}
+
+
 .comment-edit-photo {
 	margin-top: 15px;
 	margin-left: 10px;
@@ -1460,6 +1467,15 @@ input#dfrn-url {
 	margin-top: 15px;
 	margin-left: 20px;
 }
+
+.comment .comment-edit-text-empty {
+	width: 120px;
+}
+.comment .comment-edit-text-full {
+	margin-left: 10px;
+	width: 210px;
+}
+
 
 .comment-edit-text-end {
 	clear: both;

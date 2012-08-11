@@ -10,8 +10,10 @@
 		});
 		</script>-->
 
-		<div class="comment-wwedit-wrapper" id="comment-edit-wrapper-$id" style="display: block;">
+		<div class="comment-wwedit-wrapper $indent" id="comment-edit-wrapper-$id" style="display: block;">
 			<form class="comment-edit-form" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;">
+<!--			<span id="hide-commentbox-$id" class="hide-commentbox fakelink" onclick="showHideCommentBox($id);">$comment</span>
+			<form class="comment-edit-form" style="display: none;" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;">-->
 				<input type="hidden" name="type" value="$type" />
 				<input type="hidden" name="profile_uid" value="$profile_uid" />
 				<input type="hidden" name="parent" value="$parent" />
@@ -23,7 +25,7 @@
 					<a class="comment-edit-photo comment-edit-photo-link" id="comment-edit-photo-$id" href="$mylink" title="$mytitle"><img class="my-comment-photo" src="$myphoto" alt="$mytitle" title="$mytitle" /></a>
 <!--				</div>-->
 				<!--<div class="comment-edit-photo-end"></div>-->
-				<ul class="comment-edit-bb-$id">
+				<ul class="comment-edit-bb" id="comment-edit-bb-$id">
 					<li><a class="editicon boldbb shadow"
 						style="cursor: pointer;" title="$edbold"
 						onclick="insertFormatting('$comment','b', $id);"></a></li>

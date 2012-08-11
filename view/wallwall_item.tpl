@@ -1,6 +1,6 @@
 <a name="$item.id" ></a>
-<div class="wall-item-outside-wrapper$item.indent$item.previewing wallwall" id="wall-item-outside-wrapper-$item.id" >
-	<div class="wall-item-content-wrapper$item.indent" id="wall-item-content-wrapper-$item.id" >
+<div class="wall-item-outside-wrapper $item.indent$item.previewing wallwall" id="wall-item-outside-wrapper-$item.id" >
+	<div class="wall-item-content-wrapper $item.indent" id="wall-item-content-wrapper-$item.id" >
 		<div class="wall-item-info wallwall" id="wall-item-info-$item.id">
 			<div class="wall-item-photo-wrapper wwto" id="wall-item-ownerphoto-wrapper-$item.id" >
 				<a href="$item.owner_url" target="redir" title="$item.olinktitle" class="wall-item-photo-link" id="wall-item-ownerphoto-link-$item.id">
@@ -81,6 +81,6 @@
 	$item.comment
 	</div>
 
-<div class="wall-item-outside-wrapper-end$item.indent" ></div>
+<div class="wall-item-outside-wrapper-end $item.indent" ></div>
 </div>
 

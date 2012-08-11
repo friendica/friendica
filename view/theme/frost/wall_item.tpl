@@ -1,6 +1,6 @@
 <a name="$item.id" ></a>
-<!--<div class="wall-item-outside-wrapper$item.indent$item.previewing" id="wall-item-outside-wrapper-$item.id" >-->
-	<div class="wall-item-content-wrapper$item.indent" id="wall-item-content-wrapper-$item.id" >
+<!--<div class="wall-item-outside-wrapper $item.indent$item.previewing" id="wall-item-outside-wrapper-$item.id" >-->
+	<div class="wall-item-content-wrapper $item.indent" id="wall-item-content-wrapper-$item.id" >
 		<div class="wall-item-info" id="wall-item-info-$item.id">
 			<div class="wall-item-photo-wrapper" id="wall-item-photo-wrapper-$item.id" 
 				 onmouseover="if (typeof t$item.id != 'undefined') clearTimeout(t$item.id); openMenu('wall-item-photo-menu-button-$item.id')" 
@@ -24,7 +24,7 @@
 		</div>
 		<!--<div class="wall-item-author">-->
 				<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-name-link"><span class="wall-item-name$item.sparkle" id="wall-item-name-$item.id" >$item.name</span></a>
-				<div class="wall-item-ago"  id="wall-item-ago-$item.id">$item.ago</div>
+				<div class="wall-item-ago" id="wall-item-ago-$item.id" >$item.ago</div>
 				
 		<!--</div>-->
 		<div class="wall-item-content" id="wall-item-content-$item.id" >
@@ -75,5 +75,5 @@
 	$item.comment
 	<!--</div>-->
 
-<!--<div class="wall-item-outside-wrapper-end$item.indent" ></div>-->
+<!--<div class="wall-item-outside-wrapper-end $item.indent" ></div>-->
 <!--</div>-->

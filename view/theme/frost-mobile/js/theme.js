@@ -544,6 +544,15 @@ function showHideComments(id) {
 	}
 }
 
+/*function showHideCommentBox(id) {
+	if( $j('#comment-edit-form-' + id).is(':visible')) {
+		$j('#comment-edit-form-' + id).hide();
+	}
+	else {
+		$j('#comment-edit-form-' + id).show();
+	}
+}*/
+
 
 /*function deleteCheckedItems() {
 	var checkedstr = '';

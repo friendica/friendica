@@ -1,6 +1,6 @@
 <a name="$item.id" ></a>
-<div class="wall-item-outside-wrapper$item.indent$item.previewing" id="wall-item-outside-wrapper-$item.id" >
-	<div class="wall-item-content-wrapper$item.indent" id="wall-item-content-wrapper-$item.id" >
+<div class="wall-item-outside-wrapper $item.indent$item.previewing" id="wall-item-outside-wrapper-$item.id" >
+	<div class="wall-item-content-wrapper $item.indent" id="wall-item-content-wrapper-$item.id" >
 		<div class="wall-item-info" id="wall-item-info-$item.id">
 			<div class="wall-item-photo-wrapper" id="wall-item-photo-wrapper-$item.id" 
 				 onmouseover="if (typeof t$item.id != 'undefined') clearTimeout(t$item.id); openMenu('wall-item-photo-menu-button-$item.id')" 
@@ -84,5 +84,5 @@
 	$item.comment
 	</div>
 
-<div class="wall-item-outside-wrapper-end$item.indent" ></div>
+<div class="wall-item-outside-wrapper-end $item.indent" ></div>
 </div>

@@ -81,13 +81,13 @@
 
 			{{ if $item.threaded }}
 			{{ if $item.comment }}
-			<div class="wall-item-comment-wrapper$item.indent" >
+			<div class="wall-item-comment-wrapper $item.indent" >
 				$item.comment
 			</div>
 			{{ endif }}
 			{{ endif }}
 
-<div class="wall-item-outside-wrapper-end$item.indent" ></div>
+<div class="wall-item-outside-wrapper-end $item.indent" ></div>
 </div>
 {{ for $item.children as $item }}
 	{{ inc $item.template }}{{ endinc }}

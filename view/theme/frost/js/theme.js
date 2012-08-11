@@ -522,10 +522,10 @@ function insertFormatting(comment,BBcode,id) {
 }
 
 function cmtBbOpen(id) {
-	$j(".comment-edit-bb-" + id).show();
+	$j("#comment-edit-bb-" + id).show();
 }
 function cmtBbClose(id) {
-	$j(".comment-edit-bb-" + id).hide();
+	$j("#comment-edit-bb-" + id).hide();
 }
 
 function confirmDelete() { return confirm(window.delItem); }
@@ -593,6 +593,15 @@ function showHideComments(id) {
 		$j("#hide-comments-" + id).html(window.showFewer);
 	}
 }
+
+/*function showHideCommentBox(id) {
+	if( $j('#comment-edit-form-' + id).is(':visible')) {
+		$j('#comment-edit-form-' + id).hide();
+	}
+	else {
+		$j('#comment-edit-form-' + id).show();
+	}
+}*/
 
 
 

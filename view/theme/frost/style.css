@@ -1363,6 +1363,12 @@ input#dfrn-url {
 	margin-left: 50px;
 }
 
+.comment-wwedit-wrapper.comment {
+	width: 300px;
+	margin-left: 150px;
+	border-radius: 10px;
+}
+
 .comment-edit-photo {
 	margin-top: 10px;
 	margin-left: 10px;
@@ -1372,6 +1378,9 @@ input#dfrn-url {
 }
 .comment-edit-photo img {
 	width: 25px;
+}
+.comment .comment-edit-photo {
+	width: 50px;
 }
 .comment-edit-text-empty, .comment-edit-text-full {
 	float: left;
@@ -1398,12 +1407,25 @@ input#dfrn-url {
 	overflow: auto;
 }
 
+.comment .comment-edit-text-empty {
+	height: 1.5em;
+	width: 150px;
+}
+
+.comment .comment-edit-text-full {
+	margin-left: 10px;
+	width: 275px;
+}
+
 .comment-edit-text-end {
 	clear: both;
 }
 
 .comment-edit-submit {
 	margin: 10px 0px 10px 110px;
+}
+.comment .comment-edit-submit {
+	margin-left: 30px;
 }
 
 #profile-jot-plugin-wrapper,
@@ -3514,13 +3536,19 @@ aside input[type='text'] {
 }
 
 .icon.dim { opacity: 0.3;filter:alpha(opacity=30); }
-[class^="comment-edit-bb"] {
+/*[class^="comment-edit-bb"] {*/
+.comment-edit-bb {
 	list-style: none;
 	display: none;
 	margin: 0px 0 -5px 60px;
 	width: 75%;
 }
-[class^="comment-edit-bb"] > li {
+.comment .comment-edit-bb {
+	width: 300px;
+	margin: 0px;
+}
+/*[class^="comment-edit-bb"] > li {*/
+.comment-edit-bb > li {
 	display: inline-block;
 	margin: 10px 10px 0 0;
 	visibility: none;

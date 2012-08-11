@@ -545,6 +545,7 @@ function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $pr
 					'$edurl' => t('Link'),
 					'$edvideo' => t('Video'),
 					'$preview' => t('Preview'),
+					'$indent' => $indent,
 					'$sourceapp' => t($a->sourcename),
 					'$ww' => (($mode === 'network') ? $commentww : '')
 				));
@@ -623,7 +624,7 @@ function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $pr
 		/*
 		 * I don't like this very much...
 		 */
-		if(get_config('system','thread_allow')) {
+		if(get_config('system','thread_allow') && $a->theme_thread_allow) {
 			$item_result['flatten'] = false;
 			$item_result['threaded'] = true;
 		}
