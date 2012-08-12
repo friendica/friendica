@@ -290,7 +290,7 @@
 
 			// add a new thread
 
-			$j('.tread-wrapper',data).each(function() {
+			$j('.toplevel_item',data).each(function() {
 				var ident = $j(this).attr('id');
 
 				if($j('#' + ident).length == 0 && profile_page == 1) {
