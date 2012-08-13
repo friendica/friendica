@@ -755,6 +755,15 @@
 
 		$ret = api_format_items($r,$user_info);
 
+		// We aren't going to try to figure out at the item, group, and page
+		// level which items you've seen and which you haven't. If you're looking
+		// at the network timeline just mark everything seen. 
+	
+		$r = q("UPDATE `item` SET `unseen` = 0 
+			WHERE `unseen` = 1 AND `uid` = %d",
+			intval($user_info['uid'])
+		);
+
 
 		$data = array('$statuses' => $ret);
 		switch($type){
