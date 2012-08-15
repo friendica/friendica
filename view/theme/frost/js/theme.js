@@ -275,6 +275,7 @@ $j(function(){
 		autoDimensions: false,
 		onStart: function(){
 			var theme = $j("#id_theme :selected").val();
+			var theme_mobile = $j("#id_theme_mobile :selected").val();
 			$j("#cnftheme").attr('href', baseurl + "/admin/themes/"+theme);
 		}, 
 		onComplete: function(){
