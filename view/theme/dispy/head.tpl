@@ -94,4 +94,15 @@
 			$('#hide-comments-' + id).html('$showfewer');
 		}
 	}
+
+	function showHideCommentBox(id) {
+		if( $('#comment-edit-form-' + id).is(':visible')) {
+			$('#comment-edit-form-' + id).hide();
+		}
+		else {
+			$('#comment-edit-form-' + id).show();
+		}
+	}
+
+
 </script>

@@ -4,7 +4,6 @@
 	</div>
 	<div id="collapsed-comments-$item.id" class="collapsed-comments" style="display: none;">
 {{endif}}
-{{if $item.comment_lastcollapsed}}</div>{{endif}}
 <div id="tread-wrapper-$item.id" class="tread-wrapper $item.toplevel">
 <a name="$item.id" ></a>
 <!--<div class="wall-item-outside-wrapper $item.indent$item.previewing" id="wall-item-outside-wrapper-$item.id" >-->
@@ -103,4 +102,5 @@
 <!--</div>-->
 {{ endif }}
 </div>
+{{if $item.comment_lastcollapsed}}</div>{{endif}}
 

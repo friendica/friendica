@@ -4,7 +4,6 @@
 	</div>
 	<div id="collapsed-comments-$item.id" class="collapsed-comments" style="display: none;">
 {{endif}}
-{{if $item.comment_lastcollapsed}}</div>{{endif}}
 <div id="tread-wrapper-$item.id" class="tread-wrapper $item.toplevel">
 <a name="$item.id" ></a>
 <!--<div class="wall-item-outside-wrapper $item.indent$item.previewing" id="wall-item-outside-wrapper-$item.id" >-->
@@ -46,6 +45,7 @@
 <!--					</div>-->
 			</div>
 		</div>
+
 		<div class="wall-item-tools" id="wall-item-tools-$item.id">
 			{{ if $item.vote }}
 			<div class="wall-item-like-buttons" id="wall-item-like-buttons-$item.id">
@@ -73,6 +73,7 @@
 				{{ if $item.drop.dropping }}<a href="item/drop/$item.id" onclick="return confirmDelete();" class="wall-item-delete-wrapper icon drophide" title="$item.drop.delete" id="wall-item-delete-wrapper-$item.id" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a>{{ endif }}
 <!--			</div>-->
 				{{ if $item.drop.dropping }}<input type="checkbox" onclick="checkboxhighlight(this);" title="$item.drop.select" class="item-select" name="itemselected[]" value="$item.id" />{{ endif }}
+
 			<!--<div class="wall-item-delete-end"></div>-->
 		</div>
 	</div>
@@ -100,4 +101,4 @@
 <!--</div>-->
 {{ endif }}
 </div>
-
+{{if $item.comment_lastcollapsed}}</div>{{endif}}
