@@ -850,22 +850,42 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 			// Normal View
 			$page_template = get_markup_template("threaded_conversation.tpl");
 
+			require_once('object/Conversation.php');
+			require_once('object/Item.php');
+
+			$conv = new Conversation($mode);
+
 			// get all the topmost parents
-			// this shouldn't be needed, as we should have only them in ou array
+			// this shouldn't be needed, as we should have only them in our array
 			// But for now, this array respects the old style, just in case
 
 			$threads = array();
 			foreach($items as $item) {
 
+				// Can we put this after the visibility check?
 				like_puller($a,$item,$alike,'like');
 				like_puller($a,$item,$dlike,'dislike');
 
+				// Only add what is visible
+				if($item['network'] === NETWORK_MAIL && local_user() != $item['uid']) {
+					continue;
+				}
+				if($item['verb'] === ACTIVITY_LIKE || $item['verb'] === ACTIVITY_DISLIKE) {
+					continue;
+				}
+
 				if($item['id'] == $item['parent']) {
-					$threads[] = $item;
+					$item_object = new Item($item);
+					$conv->add_thread($item_object);
 				}
 			}
 
-			$threads = prepare_threads_body($a, $threads, $cmnt_tpl, $page_writeable, $mode,  $profile_owner, $alike, $dlike);
+			$threads = $conv->get_template_data($alike, $dlike);
+			if(!$threads) {
+				logger('[ERROR] conversation : Failed to get template data.', LOGGER_DEBUG);
+				$threads = array();
+			}
+			logger('[DEBUG] conversation : $threads = '. print_r($threads, true), LOGGER_DEBUG);
 		}
 	}
 		
