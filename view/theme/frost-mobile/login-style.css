@@ -26,7 +26,7 @@ img.login-button-image {
 	max-width: 300px;
 }
 
-.section-wrapper {
+div.section-wrapper {
 	position: relative;
 	width: 300px;
 	margin-left: auto;
@@ -45,6 +45,8 @@ img.login-button-image {
 .field label {
 	margin-left: 25px;
 	font-weight: 700;
+	float: none;
+	width: auto;
 }
 
 .field input {
@@ -62,6 +64,7 @@ img.login-button-image {
 	background-position: 0 50%;
 	width: 182px;
 	padding-left: 18px;
+	margin-left: 50px;
 }
 
 #login-footer {

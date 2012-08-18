@@ -547,7 +547,7 @@ footer {
 	margin-top: 10px;
 }
 
-
+/*
 #login_standard {
 	width: 210px;
 	float: left;
@@ -577,9 +577,9 @@ footer {
 }
 
 #login-submit-button {
-/*	margin-top: 10px; */
+	margin-top: 10px; 
 	margin-left: 200px;
-}
+}*/
 
 
 input#dfrn-url {

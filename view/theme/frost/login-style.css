@@ -1,6 +1,7 @@
 body {
 	font-family: helvetica,arial,freesans,clean,sans-serif;
 	font-size: 14px;
+	/*background-image: none;*/
 	background-color: #ffffff;
 	color: #505050;/* ZP Change*/
 	margin: 0px;
@@ -19,7 +20,7 @@ img.login-button-image {
 	max-width: 350px;
 }
 
-.section-wrapper {
+div.section-wrapper {
 	position: relative;
 	width: 800px;
 	margin-left: auto;
@@ -28,7 +29,8 @@ img.login-button-image {
 }
 
 .login-form {
-	margin-top: 200px;
+	padding-top: 200px;
+	margin-bottom: 50px;
 }
 
 .register-form {
@@ -39,7 +41,13 @@ img.login-button-image {
 	margin-top: 170px;
 }
 
+.field {
+	margin-bottom: 2px;
+	padding-bottom: 0px;
+}
+
 .field label {
+	width: auto;
 	position: absolute;
 	margin-left: 0px;
 	font-weight: 700;
@@ -50,7 +58,8 @@ img.login-button-image {
 	width: 200px;
 }
 
-.openid input {
+/*.openid input {*/
+#id_openid_url, .openid input {
 	background: url(login-bg.gif) no-repeat;
 	background-position: 0 50%;
 	width: 182px;

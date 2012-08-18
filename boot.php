@@ -904,6 +904,10 @@ if(! function_exists('login')) {
 			$tpl = get_markup_template("logout.tpl");
 		}
 		else {
+			$a->page['htmlhead'] .= replace_macros(get_markup_template("login_head.tpl"),array(
+				'$baseurl'		=> $a->get_baseurl(true)
+			));
+
 			$tpl = get_markup_template("login.tpl");
 			$_SESSION['return_url'] = $a->query_string;
 		}

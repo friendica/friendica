@@ -511,8 +511,10 @@ div.wall-item-content-wrapper.shiny {
 	margin-top: 10px;
 }
 
-
-#login_standard {
+.login-form {
+	margin-top: -150px;
+}
+/*#login_standard {
 	width: 210px;
 	float: left;
 }
@@ -541,9 +543,9 @@ div.wall-item-content-wrapper.shiny {
 }
 
 #login-submit-button {
-/*	margin-top: 10px; */
+	margin-top: 10px; 
 	margin-left: 200px;
-}
+}*/
 
 
 input#dfrn-url {
