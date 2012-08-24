@@ -541,59 +541,59 @@ class Item extends BaseObject {
 		$a = $this->get_app();
 		$conv = $this->get_conversation();
 		$this->wall_to_wall = false;
+		$this->set_template('wall');
+		$this->owner_url = '';
+		$this->owner_photo = '';
+		$this->owner_name = '';
 		
-		if($this->is_toplevel()) {
-			if( (! $this->get_data_value('self')) && ($conv->get_mode() !== 'profile')) {
-				if($this->get_data_value('wall')) {
+		if(!$this->is_toplevel())
+			return;
+			
+		if( (! $this->get_data_value('self')) && ($conv->get_mode() !== 'profile')) {
+			if($this->get_data_value('wall')) {
 
-					// On the network page, I am the owner. On the display page it will be the profile owner.
-					// This will have been stored in $a->page_contact by our calling page.
-					// Put this person as the wall owner of the wall-to-wall notice.
+				// On the network page, I am the owner. On the display page it will be the profile owner.
+				// This will have been stored in $a->page_contact by our calling page.
+				// Put this person as the wall owner of the wall-to-wall notice.
 
-					$this->owner_url = zrl($a->page_contact['url']);
-					$this->owner_photo = $a->page_contact['thumb'];
-					$this->owner_name = $a->page_contact['name'];
+				$this->owner_url = zrl($a->page_contact['url']);
+				$this->owner_photo = $a->page_contact['thumb'];
+				$this->owner_name = $a->page_contact['name'];
+				$this->set_template('wall2wall');
+				$this->wall_to_wall = true;
+				return;
+			}
+			if($this->get_data_value('owner-link')) {
+
+				$owner_linkmatch = (($this->get_data_value('owner-link')) && link_compare($this->get_data_value('owner-link'),$this->get_data_value('author-link')));
+				$alias_linkmatch = (($this->get_data_value('alias')) && link_compare($this->get_data_value('alias'),$this->get_data_value('author-link')));
+				$owner_namematch = (($this->get_data_value('owner-name')) && $this->get_data_value('owner-name') == $this->get_data_value('author-name'));
+				if((! $owner_linkmatch) && (! $alias_linkmatch) && (! $owner_namematch)) {
+
+					// The author url doesn't match the owner (typically the contact)
+					// and also doesn't match the contact alias. 
+					// The name match is a hack to catch several weird cases where URLs are 
+					// all over the park. It can be tricked, but this prevents you from
+					// seeing "Bob Smith to Bob Smith via Wall-to-wall" and you know darn
+					// well that it's the same Bob Smith. 
+
+					// But it could be somebody else with the same name. It just isn't highly likely. 
+					
+
+					$this->owner_photo = $this->get_data_value('owner-avatar');
+					$this->owner_name = $this->get_data_value('owner-name');
 					$this->set_template('wall2wall');
 					$this->wall_to_wall = true;
-				}
-				else if($this->get_data_value('owner-link')) {
-
-					$owner_linkmatch = (($this->get_data_value('owner-link')) && link_compare($this->get_data_value('owner-link'),$this->get_data_value('author-link')));
-					$alias_linkmatch = (($this->get_data_value('alias')) && link_compare($this->get_data_value('alias'),$this->get_data_value('author-link')));
-					$owner_namematch = (($this->get_data_value('owner-name')) && $this->get_data_value('owner-name') == $this->get_data_value('author-name'));
-					if((! $owner_linkmatch) && (! $alias_linkmatch) && (! $owner_namematch)) {
-
-						// The author url doesn't match the owner (typically the contact)
-						// and also doesn't match the contact alias. 
-						// The name match is a hack to catch several weird cases where URLs are 
-						// all over the park. It can be tricked, but this prevents you from
-						// seeing "Bob Smith to Bob Smith via Wall-to-wall" and you know darn
-						// well that it's the same Bob Smith. 
-
-						// But it could be somebody else with the same name. It just isn't highly likely. 
-						
-
-						$this->owner_photo = $this->get_data_value('owner-avatar');
-						$this->owner_name = $this->get_data_value('owner-name');
-						$this->set_template('wall2wall');
-						$this->wall_to_wall = true;
-						// If it is our contact, use a friendly redirect link
-						if((link_compare($this->get_data_value('owner-link'),$this->get_data_value('url'))) 
-							&& ($this->get_data_value('network') === NETWORK_DFRN)) {
-							$this->owner_url = $this->get_redirect_url();
-						}
-						else
-							$this->owner_url = zrl($this->get_data_value('owner-link'));
+					// If it is our contact, use a friendly redirect link
+					if((link_compare($this->get_data_value('owner-link'),$this->get_data_value('url'))) 
+						&& ($this->get_data_value('network') === NETWORK_DFRN)) {
+						$this->owner_url = $this->get_redirect_url();
 					}
+					else
+						$this->owner_url = zrl($this->get_data_value('owner-link'));
 				}
+				return;
 			}
-		}
-
-		if(!$this->wall_to_wall) {
-			$this->set_template('wall');
-			$this->owner_url = '';
-			$this->owner_photo = '';
-			$this->owner_name = '';
 		}
 	}
 
