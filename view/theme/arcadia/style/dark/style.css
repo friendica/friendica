@@ -1,0 +1,13 @@
+/*
+ * Widely inspired by darkzero
+ */
+
+body {
+	margin: 0px;
+	background-color: #222222;
+	background-image: url("style/dark/images/head.jpg");
+	background-repeat: repeat-x;
+	color: #CCCCCC;
+	font-family: helvetica,arial,freesans,clean,sans-serif;
+	font-size: 12px;
+}
