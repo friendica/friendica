@@ -15,6 +15,26 @@ a:hover {text-decoration: underline; }
 
 img { border :0px; }
 
+nav {
+	display: none;
+}
+
+/* popup notifications */
+div.jGrowl div.notice {
+  background: #511919 url("../../../images/icons/48/notice.png") no-repeat 5px center;
+  color: #ffffff;
+  padding-left: 58px;
+}
+div.jGrowl div.info {
+  background: #364e59 url("../../../images/icons/48/info.png") no-repeat 5px center;
+  color: #ffffff;
+  padding-left: 58px;
+}
+#jGrowl.top-right {
+	top: 15px;
+	right: 15px;
+}
+
 .login-button {
 	margin-top: 90px;
 	margin-left: auto;

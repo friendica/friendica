@@ -6,23 +6,23 @@
   <?php if(x($page,'htmlhead')) echo $page['htmlhead'] ?>
 </head>
 <body>
+	<?php if(x($page,'nav')) echo $page['nav']; ?>
+
 	<?php if( $a->module === 'home' ) { ?>
 	<center>
 	<div class="login-button">
 	<a href="login" class="login-button-link"><img class="login-button-image" src="/images/friendika-1600.png" title="Click to log in"></a>
 	</div>
 	</center>
+
 	<?php } elseif ( $a->module === 'login' || $a->module === 'register' || $a->module === 'lostpass' ) {
 	?>
-
 	<div class='section-wrapper'>
 	<section><?php if(x($page,'content')) echo $page['content']; ?>
 	</section>
 	</div>
 
-	<?php } else {
-
-	if(x($page,'nav')) echo $page['nav']; ?>
+	<?php } else { ?>
 	<div class='main-container'>
 		<!--<div class='main-content-loading'><img src="/view/theme/frost/images/ajax-loader.gif" alt="Please wait..."></div>-->
 		<div class='main-content-container'>
