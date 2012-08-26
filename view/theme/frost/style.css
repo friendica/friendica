@@ -1296,7 +1296,7 @@ input#dfrn-url {
 .wall-item-content {
 	margin-left: 10px;
 	padding-right: 1em;
-	max-height: 500px;
+/*	max-height: 500px;*/
 	overflow: auto;
 }
 

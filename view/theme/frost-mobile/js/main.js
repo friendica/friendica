@@ -349,6 +349,33 @@
 			}
 			/* autocomplete @nicknames */
 			$j(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
+
+			var bimgs = $j(".wall-item-body > img").not(function() { return this.complete; });
+			var bimgcount = bimgs.length;
+
+			if (bimgcount) {
+				bimgs.load(function() {
+					bimgcount--;
+					if (! bimgcount) {
+						collapseHeight();
+
+					}
+				});
+			} else {
+				collapseHeight();
+			}
+
+		});
+	}
+
+	function collapseHeight() {
+		$j(".wall-item-body").each(function() {
+				if($j(this).height() > 310) {
+				if(! $j(this).hasClass('divmore')) {
+					$j(this).divgrow({ initialHeight: 300, showBrackets: false, speed: 300 });
+					$j(this).addClass('divmore');
+				}
+			}					
 		});
 	}
 
