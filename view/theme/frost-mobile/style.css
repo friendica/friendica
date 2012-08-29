@@ -1347,6 +1347,11 @@ input#dfrn-url {
 	max-width: 280px;
 }
 
+.divgrow-showmore {
+	display: block;
+	clear: both;
+}
+
 
 .wall-item-title {
 	float: left;

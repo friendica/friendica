@@ -1304,6 +1304,11 @@ input#dfrn-url {
 	max-width: 100%;
 }
 
+.divgrow-showmore {
+	display: block;
+	clear: both;
+}
+
 
 
 .wall-item-title {

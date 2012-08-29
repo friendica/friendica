@@ -4,7 +4,7 @@
  * Name: Frost
  * Description: Like frosted glass
  * Credits: Navigation icons taken from http://iconza.com. Other icons taken from http://thenounproject.com, including: Like, Dislike, Black Lock, Unlock, Pencil, Tag, Camera, Paperclip (Marie Coons), Folder (Sergio Calcara), Chain-link (Andrew Fortnum), Speaker (Harold Kim), Quotes (Henry Ryder), Video Camera (Anas Ramadan), and Left Arrow, Right Arrow, and Delete X (all three P.J. Onori). All under Attribution (CC BY 3.0). Others from The Noun Project are public domain or No Rights Reserved (CC0).
- * Version: Version 0.2.7
+ * Version: Version 0.2.8
  * Author: Zach P <techcity@f.shmuz.in>
  * Maintainer: Zach P <techcity@f.shmuz.in>
  */
@@ -23,5 +23,6 @@ function frost_init(&$a) {
 
 	$a->videowidth = 400;
 	$a->videoheight = 330;
+	$a->theme_thread_allow = false;
 
 }

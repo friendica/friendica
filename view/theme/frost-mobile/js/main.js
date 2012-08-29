@@ -350,7 +350,7 @@
 			/* autocomplete @nicknames */
 			$j(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
 
-			/*var bimgs = $j(".wall-item-body > img").not(function() { return this.complete; });
+			var bimgs = $j(".wall-item-body > img").not(function() { return this.complete; });
 			var bimgcount = bimgs.length;
 
 			if (bimgcount) {
@@ -363,12 +363,12 @@
 				});
 			} else {
 				collapseHeight();
-			}*/
+			}
 
 		});
 	}
 
-/*	function collapseHeight() {
+	function collapseHeight() {
 		$j(".wall-item-body").each(function() {
 				if($j(this).height() > 310) {
 				if(! $j(this).hasClass('divmore')) {
@@ -377,7 +377,7 @@
 				}
 			}					
 		});
-	}*/
+	}
 
 	function imgbright(node) {
 		$j(node).removeClass("drophide").addClass("drop");
