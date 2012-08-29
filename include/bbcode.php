@@ -47,6 +47,30 @@ function bb_unspacefy_and_trim($st) {
   return $unspacefied;
 }
 
+function bb_find_open_close($s, $open, $close, $occurance = 1) {
+
+	if($occurance < 1)
+		$occurance = 1;
+
+	$start_pos = -1;
+	for($i = 1; $i <= $occurance; $i++) {
+		if( $start_pos !== false)
+			$start_pos = strpos($s, $open, $start_pos + 1);
+	}
+
+	if( $start_pos === false)
+		return false;
+
+	$end_pos = strpos($s, $close, $start_pos);
+
+	if( $end_pos === false)
+		return false;
+
+	$res = array( 'start' => $start_pos, 'end' => $end_pos );
+
+	return $res;
+}
+
 function get_bb_tag_pos($s, $name, $occurance = 1) {
 
 	if($occurance < 1)

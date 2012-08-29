@@ -162,6 +162,22 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	$md = new Markdownify(false, false, false);
 	$Text = $md->parseString($Text);
 
+	// The Markdownify converter converts underscores '_' in URLs to '\_', which
+	// messes up the URL. Manually fix these
+	$count = 1;
+	$pos = bb_find_open_close($Text, '[', ']', $count);
+	while($pos !== false) {
+		$start = substr($Text, 0, $pos['start']);
+		$subject = substr($Text, $pos['start'], $pos['end'] - $pos['start'] + 1);
+		$end = substr($Text, $pos['end'] + 1);
+
+		$subject = str_replace('\_', '_', $subject);
+		$Text = $start . $subject . $end;
+
+		$count++;
+		$pos = bb_find_open_close($Text, '[', ']', $count);
+	}	
+
 	// If the text going into bbcode() has a plain URL in it, i.e.
 	// with no [url] tags around it, it will come out of parseString()
 	// looking like: <http://url.com>, which gets removed by strip_tags().
