@@ -1,5 +1,8 @@
 <?php
 
+require_once("include/bbcode.php");
+
+
 // Note: the code in 'item_extract_images' and 'item_redir_and_replace_images'
 // is identical to the code in mod/message.php for 'item_extract_images' and
 // 'item_redir_and_replace_images'
@@ -51,19 +54,27 @@ function item_redir_and_replace_images($body, $images, $cid) {
 	$origbody = $body;
 	$newbody = '';
 
-	for($i = 0; $i < count($images); $i++) {
-		$search = '/\[url\=(.*?)\]\[!#saved_image' . $i . '#!\]\[\/url\]' . '/is';
+	$cnt = 1;
+	$pos = get_bb_tag_pos($origbody, 'url', 1);
+	while($pos !== false && $cnt < 1000) {
+
+		$search = '/\[url\=(.*?)\]\[!#saved_image([0-9]*)#!\]\[\/url\]' . '/is';
 		$replace = '[url=' . z_path() . '/redir/' . $cid 
-		           . '?f=1&url=' . '$1' . '][!#saved_image' . $i . '#!][/url]' ;
+		           . '?f=1&url=' . '$1' . '][!#saved_image' . '$2' .'#!][/url]';
 
-		$img_end = strpos($origbody, '[!#saved_image' . $i . '#!][/url]') + strlen('[!#saved_image' . $i . '#!][/url]');
-		$process_part = substr($origbody, 0, $img_end);
-		$origbody = substr($origbody, $img_end);
+		$newbody .= substr($origbody, 0, $pos['start']['open']);
+		$subject = substr($origbody, $pos['start']['open'], $pos['end']['close'] - $pos['start']['open']);
+		$origbody = substr($origbody, $pos['end']['close']);
+		if($origbody === false)
+			$origbody = '';
 
-		$process_part = preg_replace($search, $replace, $process_part);
-		$newbody = $newbody . $process_part;
+		$subject = preg_replace($search, $replace, $subject);
+		$newbody .= $subject;
+
+		$cnt++;
+		$pos = get_bb_tag_pos($origbody, 'url', 1);
 	}
-	$newbody = $newbody . $origbody;
+	$newbody .= $origbody;
 
 	$cnt = 0;
 	foreach($images as $image) {
@@ -293,10 +304,10 @@ function localize_item(&$item){
 	}
 
 	// add zrl's to public images
-	if(preg_match_all('/\[url=(.*?)\/photos\/(.*?)\/image\/(.*?)\]\[img(.*?)\]h(.*?)\[\/img\]\[\/url\]/is',$item['body'],$matches,PREG_SET_ORDER)) {
-		foreach($matches as $mtch) {
-				$item['body'] = str_replace($mtch[0],'[url=' . zrl($mtch[1] . '/photos/' . $mtch[2] . '/image/' . $mtch[3] ,true) . '][img' . $mtch[4] . ']h' . $mtch[5]  . '[/img][/url]',$item['body']);
-		}
+	$photo_pattern = "/\[url=(.*?)\/photos\/(.*?)\/image\/(.*?)\]\[img(.*?)\]h(.*?)\[\/img\]\[\/url\]/is";
+	if(preg_match($photo_pattern,$item['body'])) {
+		$photo_replace = '[url=' . zrl('$1' . '/photos/' . '$2' . '/image/' . '$3' ,true) . '][img' . '$4' . ']h' . '$5'  . '[/img][/url]';
+		$item['body'] = bb_tag_preg_replace($photo_pattern, $photo_replace, 'url', $item['body']);
 	}
 
 	// add sparkle links to appropriate permalinks

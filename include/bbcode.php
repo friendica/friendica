@@ -47,6 +47,65 @@ function bb_unspacefy_and_trim($st) {
   return $unspacefied;
 }
 
+function get_bb_tag_pos($s, $name, $occurance = 1) {
+
+	if($occurance < 1)
+		$occurance = 1;
+
+	$start_open = -1;
+	for($i = 1; $i <= $occurance; $i++) {
+		if( $start_open !== false)
+			$start_open = strpos($s, '[' . $name, $start_open + 1); // allow [name= type tags
+	}
+
+	if( $start_open === false)
+		return false;
+
+	$start_equal = strpos($s, '=', $start_open);
+	$start_close = strpos($s, ']', $start_open);
+
+	if( $start_close === false)
+		return false;
+
+	$start_close++;
+
+	$end_open = strpos($s, '[/' . $name . ']', $start_close);
+
+	if( $end_open === false)
+		return false;
+
+	$res = array( 'start' => array('open' => $start_open, 'close' => $start_close),
+	              'end' => array('open' => $end_open, 'close' => $end_open + strlen('[/' . $name . ']')) );
+	if( $start_equal !== false)
+		$res['start']['equal'] = $start_equal + 1;
+
+	return $res;
+}
+
+function bb_tag_preg_replace($pattern, $replace, $name, $s) {
+
+	$string = $s;
+
+	$occurance = 1;
+	$pos = get_bb_tag_pos($string, $name, $occurance);
+	while($pos !== false && $occurance < 1000) {
+
+		$start = substr($string, 0, $pos['start']['open']);
+		$subject = substr($string, $pos['start']['open'], $pos['end']['close'] - $pos['start']['open']);
+		$end = substr($string, $pos['end']['close']);
+		if($end === false)
+			$end = '';
+
+		$subject = preg_replace($pattern, $replace, $subject);
+		$string = $start . $subject . $end;
+
+		$occurance++;
+		$pos = get_bb_tag_pos($string, $name, $occurance);
+	}
+
+	return $string;
+}
+
 if(! function_exists('bb_extract_images')) {
 function bb_extract_images($body) {
 
