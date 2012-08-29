@@ -231,44 +231,47 @@ function admin_page_site_post(&$a){
 		return;
 	}
 
-    check_form_security_token_redirectOnErr('/admin/site', 'admin_site');
+	check_form_security_token_redirectOnErr('/admin/site', 'admin_site');
 
-	$sitename 			=	((x($_POST,'sitename'))			? notags(trim($_POST['sitename']))			: '');
-	$banner				=	((x($_POST,'banner'))      		? trim($_POST['banner'])					: false);
-	$language			=	((x($_POST,'language'))			? notags(trim($_POST['language']))			: '');
-	$theme				=	((x($_POST,'theme'))			? notags(trim($_POST['theme']))				: '');
-	$theme_mobile			=	((x($_POST,'theme_mobile'))		? notags(trim($_POST['theme_mobile']))			: '');
+	$sitename 		=	((x($_POST,'sitename'))			? notags(trim($_POST['sitename']))		: '');
+	$banner			=	((x($_POST,'banner'))      		? trim($_POST['banner'])			: false);
+	$language		=	((x($_POST,'language'))			? notags(trim($_POST['language']))		: '');
+	$theme			=	((x($_POST,'theme'))			? notags(trim($_POST['theme']))			: '');
+	$theme_mobile		=	((x($_POST,'theme_mobile'))		? notags(trim($_POST['theme_mobile']))		: '');
 	$maximagesize		=	((x($_POST,'maximagesize'))		? intval(trim($_POST['maximagesize']))		:  0);
+	$maximagelength		=	((x($_POST,'maximagelength'))		? intval(trim($_POST['maximagelength']))	:  MAX_IMAGE_LENGTH);
+	$jpegimagequality	=	((x($_POST,'jpegimagequality'))		? intval(trim($_POST['jpegimagequality']))	:  JPEG_QUALITY);
 	
 	
-	$register_policy	=	((x($_POST,'register_policy'))	? intval(trim($_POST['register_policy']))	:  0);
-	$abandon_days	    =	((x($_POST,'abandon_days'))	    ? intval(trim($_POST['abandon_days']))	    :  0);
+	$register_policy	=	((x($_POST,'register_policy'))		? intval(trim($_POST['register_policy']))	:  0);
+	$abandon_days	    	=	((x($_POST,'abandon_days'))		? intval(trim($_POST['abandon_days']))		:  0);
 
-	$register_text		=	((x($_POST,'register_text'))	? notags(trim($_POST['register_text']))		: '');	
+	$register_text		=	((x($_POST,'register_text'))		? notags(trim($_POST['register_text']))		: '');	
 	
-	$allowed_sites		=	((x($_POST,'allowed_sites'))	? notags(trim($_POST['allowed_sites']))		: '');
-	$allowed_email		=	((x($_POST,'allowed_email'))	? notags(trim($_POST['allowed_email']))		: '');
-	$block_public		=	((x($_POST,'block_public'))		? True	:	False);
-	$force_publish		=	((x($_POST,'publish_all'))		? True	:	False);
+	$allowed_sites		=	((x($_POST,'allowed_sites'))		? notags(trim($_POST['allowed_sites']))		: '');
+	$allowed_email		=	((x($_POST,'allowed_email'))		? notags(trim($_POST['allowed_email']))		: '');
+	$block_public		=	((x($_POST,'block_public'))		? True						: False);
+	$force_publish		=	((x($_POST,'publish_all'))		? True						: False);
 	$global_directory	=	((x($_POST,'directory_submit_url'))	? notags(trim($_POST['directory_submit_url']))	: '');
-	$thread_allow		=	((x($_POST,'thread_allow'))		? True	:	False);
-	$no_multi_reg		=	((x($_POST,'no_multi_reg'))		? True	:	False);
-	$no_openid			=	!((x($_POST,'no_openid'))		? True	:	False);
-	$no_regfullname		=	!((x($_POST,'no_regfullname'))	? True	:	False);
-	$no_utf				=	!((x($_POST,'no_utf'))			? True	:	False);
-	$no_community_page	=	!((x($_POST,'no_community_page'))	? True	:	False);
+	$thread_allow		=	((x($_POST,'thread_allow'))		? True						: False);
+	$newuser_public		=	((x($_POST,'newuser_public'))		? True						: False);
+	$no_multi_reg		=	((x($_POST,'no_multi_reg'))		? True						: False);
+	$no_openid		=	!((x($_POST,'no_openid'))		? True						: False);
+	$no_regfullname		=	!((x($_POST,'no_regfullname'))		? True						: False);
+	$no_utf			=	!((x($_POST,'no_utf'))			? True						: False);
+	$no_community_page	=	!((x($_POST,'no_community_page'))	? True						: False);
 
-	$verifyssl			=	((x($_POST,'verifyssl'))		? True	:	False);
-	$proxyuser			=	((x($_POST,'proxyuser'))		? notags(trim($_POST['proxyuser']))	: '');
-	$proxy				=	((x($_POST,'proxy'))			? notags(trim($_POST['proxy']))	: '');
-	$timeout			=	((x($_POST,'timeout'))			? intval(trim($_POST['timeout']))		: 60);
-	$delivery_interval	=	((x($_POST,'delivery_interval'))? intval(trim($_POST['delivery_interval']))		: 0);
-	$poll_interval	=	((x($_POST,'poll_interval'))? intval(trim($_POST['poll_interval']))		: 0);
-	$maxloadavg	        =	((x($_POST,'maxloadavg'))       ? intval(trim($_POST['maxloadavg']))		: 50);
-	$dfrn_only          =	((x($_POST,'dfrn_only'))	    ? True	:	False);
-	$ostatus_disabled   =   !((x($_POST,'ostatus_disabled')) ? True  :   False);
-	$diaspora_enabled   =   ((x($_POST,'diaspora_enabled')) ? True   :  False);
-	$ssl_policy         =   ((x($_POST,'ssl_policy')) ? intval($_POST['ssl_policy']) : 0);
+	$verifyssl		=	((x($_POST,'verifyssl'))		? True						: False);
+	$proxyuser		=	((x($_POST,'proxyuser'))		? notags(trim($_POST['proxyuser']))		: '');
+	$proxy			=	((x($_POST,'proxy'))			? notags(trim($_POST['proxy']))			: '');
+	$timeout		=	((x($_POST,'timeout'))			? intval(trim($_POST['timeout']))		: 60);
+	$delivery_interval	=	((x($_POST,'delivery_interval'))	? intval(trim($_POST['delivery_interval']))	: 0);
+	$poll_interval		=	((x($_POST,'poll_interval'))		? intval(trim($_POST['poll_interval']))		: 0);
+	$maxloadavg		=	((x($_POST,'maxloadavg'))		? intval(trim($_POST['maxloadavg']))		: 50);
+	$dfrn_only		=	((x($_POST,'dfrn_only'))		? True						: False);
+	$ostatus_disabled	=	!((x($_POST,'ostatus_disabled'))	? True  					: False);
+	$diaspora_enabled	=	((x($_POST,'diaspora_enabled'))		? True   					: False);
+	$ssl_policy		=	((x($_POST,'ssl_policy'))		? intval($_POST['ssl_policy']) 			: 0);
 
 	if($ssl_policy != intval(get_config('system','ssl_policy'))) {
 		if($ssl_policy == SSL_POLICY_FULL) {
@@ -332,6 +335,8 @@ function admin_page_site_post(&$a){
     	    set_config('system','mobile-theme', $theme_mobile);
         }
 	set_config('system','maximagesize', $maximagesize);
+	set_config('system','max_image_length', $maximagelength);
+	set_config('system','jpeg_quality', $jpegimagequality);
 	
 	set_config('config','register_policy', $register_policy);
 	set_config('system','account_abandon_days', $abandon_days);
@@ -350,6 +355,7 @@ function admin_page_site_post(&$a){
 		set_config('system','directory_submit_url', $global_directory);
 	}
 	set_config('system','thread_allow', $thread_allow);
+	set_config('system','newuser_public', $newuser_public);
 
 	set_config('system','block_extended_register', $no_multi_reg);
 	set_config('system','no_openid', $no_openid);
@@ -439,40 +445,43 @@ function admin_page_site(&$a) {
 		'$advanced' => t('Advanced'),
 		
 		'$baseurl' => $a->get_baseurl(true),
-									// name, label, value, help string, extra data...
+		// name, label, value, help string, extra data...
 		'$sitename' 		=> array('sitename', t("Site name"), htmlentities($a->config['sitename'], ENT_QUOTES), ""),
-		'$banner'			=> array('banner', t("Banner/Logo"), $banner, ""),
+		'$banner'		=> array('banner', t("Banner/Logo"), $banner, ""),
 		'$language' 		=> array('language', t("System language"), get_config('system','language'), "", $lang_choices),
-		'$theme' 			=> array('theme', t("System theme"), get_config('system','theme'), t("Default system theme - may be over-ridden by user profiles - <a href='#' id='cnftheme'>change theme settings</a>"), $theme_choices),
-		'$theme_mobile' 			=> array('theme_mobile', t("Mobile system theme"), get_config('system','mobile-theme'), t("Theme for mobile devices"), $theme_choices_mobile),
-		'$ssl_policy'       => array('ssl_policy', t("SSL link policy"), (string) intval(get_config('system','ssl_policy')), t("Determines whether generated links should be forced to use SSL"), $ssl_choices),
+		'$theme' 		=> array('theme', t("System theme"), get_config('system','theme'), t("Default system theme - may be over-ridden by user profiles - <a href='#' id='cnftheme'>change theme settings</a>"), $theme_choices),
+		'$theme_mobile' 	=> array('theme_mobile', t("Mobile system theme"), get_config('system','mobile-theme'), t("Theme for mobile devices"), $theme_choices_mobile),
+		'$ssl_policy'		=> array('ssl_policy', t("SSL link policy"), (string) intval(get_config('system','ssl_policy')), t("Determines whether generated links should be forced to use SSL"), $ssl_choices),
 		'$maximagesize'		=> array('maximagesize', t("Maximum image size"), get_config('system','maximagesize'), t("Maximum size in bytes of uploaded images. Default is 0, which means no limits.")),
+		'$maximagelength'		=> array('maximagelength', t("Maximum image length"), get_config('system','max_image_length'), t("Maximum length in pixels of the longest side of uploaded images. Default is -1, which means no limits.")),
+		'$jpegimagequality'		=> array('jpegimagequality', t("JPEG image quality"), get_config('system','jpeg_quality'), t("Uploaded JPEGS will be saved at this quality setting [0-100]. Default is 100, which is full quality.")),
 
 		'$register_policy'	=> array('register_policy', t("Register policy"), $a->config['register_policy'], "", $register_choices),
 		'$register_text'	=> array('register_text', t("Register text"), htmlentities($a->config['register_text'], ENT_QUOTES, 'UTF-8'), t("Will be displayed prominently on the registration page.")),
-		'$abandon_days'     => array('abandon_days', t('Accounts abandoned after x days'), get_config('system','account_abandon_days'), t('Will not waste system resources polling external sites for abandonded accounts. Enter 0 for no time limit.')),
+		'$abandon_days'		=> array('abandon_days', t('Accounts abandoned after x days'), get_config('system','account_abandon_days'), t('Will not waste system resources polling external sites for abandonded accounts. Enter 0 for no time limit.')),
 		'$allowed_sites'	=> array('allowed_sites', t("Allowed friend domains"), get_config('system','allowed_sites'), t("Comma separated list of domains which are allowed to establish friendships with this site. Wildcards are accepted. Empty to allow any domains")),
 		'$allowed_email'	=> array('allowed_email', t("Allowed email domains"), get_config('system','allowed_email'), t("Comma separated list of domains which are allowed in email addresses for registrations to this site. Wildcards are accepted. Empty to allow any domains")),
 		'$block_public'		=> array('block_public', t("Block public"), get_config('system','block_public'), t("Check to block public access to all otherwise public personal pages on this site unless you are currently logged in.")),
 		'$force_publish'	=> array('publish_all', t("Force publish"), get_config('system','publish_all'), t("Check to force all profiles on this site to be listed in the site directory.")),
 		'$global_directory'	=> array('directory_submit_url', t("Global directory update URL"), get_config('system','directory_submit_url'), t("URL to update the global directory. If this is not set, the global directory is completely unavailable to the application.")),
 		'$thread_allow'		=> array('thread_allow', t("Allow threaded items"), get_config('system','thread_allow'), t("Allow infinite level threading for items on this site.")),
+		'$newuser_public'	=> array('newuser_public', t("No default permissions for new users"), get_config('system','newuser_public'), t("New users will have no private permissions set for their posts by default, making their posts public until they change it.")),
 			
 		'$no_multi_reg'		=> array('no_multi_reg', t("Block multiple registrations"),  get_config('system','block_extended_register'), t("Disallow users to register additional accounts for use as pages.")),
 		'$no_openid'		=> array('no_openid', t("OpenID support"), !get_config('system','no_openid'), t("OpenID support for registration and logins.")),
 		'$no_regfullname'	=> array('no_regfullname', t("Fullname check"), !get_config('system','no_regfullname'), t("Force users to register with a space between firstname and lastname in Full name, as an antispam measure")),
-		'$no_utf'			=> array('no_utf', t("UTF-8 Regular expressions"), !get_config('system','no_utf'), t("Use PHP UTF8 regular expressions")),
-		'$no_community_page' => array('no_community_page', t("Show Community Page"), !get_config('system','no_community_page'), t("Display a Community page showing all recent public postings on this site.")),
-		'$ostatus_disabled' => array('ostatus_disabled', t("Enable OStatus support"), !get_config('system','ostatus_disable'), t("Provide built-in OStatus \x28identi.ca, status.net, etc.\x29 compatibility. All communications in OStatus are public, so privacy warnings will be occasionally displayed.")),	
-		'$diaspora_enabled' => array('diaspora_enabled', t("Enable Diaspora support"), get_config('system','diaspora_enabled'), t("Provide built-in Diaspora network compatibility.")),	
-		'$dfrn_only'        => array('dfrn_only', t('Only allow Friendica contacts'), get_config('system','dfrn_only'), t("All contacts must use Friendica protocols. All other built-in communication protocols disabled.")),
+		'$no_utf'		=> array('no_utf', t("UTF-8 Regular expressions"), !get_config('system','no_utf'), t("Use PHP UTF8 regular expressions")),
+		'$no_community_page' 	=> array('no_community_page', t("Show Community Page"), !get_config('system','no_community_page'), t("Display a Community page showing all recent public postings on this site.")),
+		'$ostatus_disabled' 	=> array('ostatus_disabled', t("Enable OStatus support"), !get_config('system','ostatus_disable'), t("Provide built-in OStatus \x28identi.ca, status.net, etc.\x29 compatibility. All communications in OStatus are public, so privacy warnings will be occasionally displayed.")),	
+		'$diaspora_enabled' 	=> array('diaspora_enabled', t("Enable Diaspora support"), get_config('system','diaspora_enabled'), t("Provide built-in Diaspora network compatibility.")),	
+		'$dfrn_only'        	=> array('dfrn_only', t('Only allow Friendica contacts'), get_config('system','dfrn_only'), t("All contacts must use Friendica protocols. All other built-in communication protocols disabled.")),
 		'$verifyssl' 		=> array('verifyssl', t("Verify SSL"), get_config('system','verifyssl'), t("If you wish, you can turn on strict certificate checking. This will mean you cannot connect (at all) to self-signed SSL sites.")),
 		'$proxyuser'		=> array('proxyuser', t("Proxy user"), get_config('system','proxyuser'), ""),
-		'$proxy'			=> array('proxy', t("Proxy URL"), get_config('system','proxy'), ""),
-		'$timeout'			=> array('timeout', t("Network timeout"), (x(get_config('system','curl_timeout'))?get_config('system','curl_timeout'):60), t("Value is in seconds. Set to 0 for unlimited (not recommended).")),
-		'$delivery_interval'			=> array('delivery_interval', t("Delivery interval"), (x(get_config('system','delivery_interval'))?get_config('system','delivery_interval'):2), t("Delay background delivery processes by this many seconds to reduce system load. Recommend: 4-5 for shared hosts, 2-3 for virtual private servers. 0-1 for large dedicated servers.")),
-		'$poll_interval'			=> array('poll_interval', t("Poll interval"), (x(get_config('system','poll_interval'))?get_config('system','poll_interval'):2), t("Delay background polling processes by this many seconds to reduce system load. If 0, use delivery interval.")),
-		'$maxloadavg'			=> array('maxloadavg', t("Maximum Load Average"), ((intval(get_config('system','maxloadavg')) > 0)?get_config('system','maxloadavg'):50), t("Maximum system load before delivery and poll processes are deferred - default 50.")),
+		'$proxy'		=> array('proxy', t("Proxy URL"), get_config('system','proxy'), ""),
+		'$timeout'		=> array('timeout', t("Network timeout"), (x(get_config('system','curl_timeout'))?get_config('system','curl_timeout'):60), t("Value is in seconds. Set to 0 for unlimited (not recommended).")),
+		'$delivery_interval'	=> array('delivery_interval', t("Delivery interval"), (x(get_config('system','delivery_interval'))?get_config('system','delivery_interval'):2), t("Delay background delivery processes by this many seconds to reduce system load. Recommend: 4-5 for shared hosts, 2-3 for virtual private servers. 0-1 for large dedicated servers.")),
+		'$poll_interval'	=> array('poll_interval', t("Poll interval"), (x(get_config('system','poll_interval'))?get_config('system','poll_interval'):2), t("Delay background polling processes by this many seconds to reduce system load. If 0, use delivery interval.")),
+		'$maxloadavg'		=> array('maxloadavg', t("Maximum Load Average"), ((intval(get_config('system','maxloadavg')) > 0)?get_config('system','maxloadavg'):50), t("Maximum system load before delivery and poll processes are deferred - default 50.")),
         '$form_security_token' => get_form_security_token("admin_site"),
 			
 	));
