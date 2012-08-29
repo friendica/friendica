@@ -1307,6 +1307,9 @@ input#dfrn-url {
 .divgrow-showmore {
 	display: block;
 	clear: both;
+	text-align: center;
+	outline: 0;
+	border-top: 1px dotted #888;
 }
 
 
