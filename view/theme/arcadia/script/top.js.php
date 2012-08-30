@@ -7,4 +7,3 @@ header('Content-type: application/javascript; charset=utf-8');
 $topdir = '../../../../';
 chdir($topdir);
 ?>
-

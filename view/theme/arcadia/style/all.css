@@ -1,0 +1,205 @@
+body {
+	margin: 0px;
+	z-index: 0;
+	background-color: #15222b;
+	color: #CCCCCC;
+	font-family: helvetica,arial,freesans,clean,sans-serif;
+	font-size: 12px;
+}
+
+/* Links */
+*[onclick], a {
+	cursor: pointer;
+	text-decoration: none;
+	color: #498036;
+}
+
+*[onclick]:hover, a:hover {
+	text-decoration: underline;
+	color: #ab9a1a;
+}
+
+.button {
+	position: relative;
+	background-color: #15222b;
+	border: 2px ridge #15222b;
+	padding: 0px 10px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.button:hover {
+	background-color: #4a4724;
+	text-decoration: none;
+}
+
+.button a, a.button, *[onclick].button {
+	color: #CCCCCC;
+	text-decoration: none;
+}
+
+.icon {
+	padding: 0px;
+    background-image: url("../../../images/icons.png");
+    display: block;
+    height: 16px;
+    width: 16px;
+}
+
+.language.icon {
+    background-position: -96px -32px;
+}
+
+.menu {
+	z-index: 999;
+	position: relative;
+	display: none;
+	background: #78917c;
+	border: 2px outset #78917c;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 3px 3px black;
+	-webkit-box-shadow: 3px 3px black;
+	box-shadow: 3px 3px black;
+}
+
+.menu:focus {
+	outline: 0px;
+}
+
+/*
+ * Used to drop inset shadow on top of menu content
+ * See: http://stackoverflow.com/questions/6658350/get-css-inset-box-shadow-to-appear-on-top-of-inner-backgrounds
+ * See: http://stackoverflow.com/questions/3680429/click-through-a-div-to-underlying-elements
+ *
+ * This will obviously need to be dealt differently for browsers compatibility
+ */
+.menu:before {
+	display: block;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+	pointer-events:none;
+	border: 2px inset #78917c;
+	margin: 6px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 3px 3px black inset;
+	-webkit-box-shadow: 3px 3px black inset;
+	box-shadow: 3px 3px black inset;
+	content: '';
+}
+
+.menu > ul {
+	background: #15222b;
+	margin: 8px;
+	padding: 0px;
+	list-style-type: none;
+}
+
+.menu > ul > li {
+	padding: 0px 5px;
+	text-align: center;
+}
+
+.menu > ul > li.selected {
+	background: #4a4724;
+}
+
+.menu > ul > li:hover {
+	background: #ab9a1a;
+}
+
+.menu *[onclick], .menu a {
+	color: #CCCCCC;
+	text-decoration: none;
+}
+
+#header {
+	padding: 5px;
+	height: 114px;
+	text-align: center;
+	background-image: url("images/head.png");
+	background-repeat: repeat-x;
+	background-position: bottom;
+	background-color: #2a3a40;
+}
+
+#lang-select-icon {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+}
+
+#language-selector {
+	position: absolute;
+	top: 26px;
+	left: 5px;
+}
+
+#language-selector > form {
+	display: none;
+}
+
+#banner {
+	border: 3px inset #15222b;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 5px 50px;
+	background: #15222b;
+	display: inline-block;
+	-moz-box-shadow: 3px 3px black inset;
+	-webkit-box-shadow: 3px 3px black inset;
+	box-shadow: 3px 3px black inset;
+}
+
+#logo-img {
+	vertical-align: middle;
+}
+
+#user_nav {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+#site-location {
+	font-size: 1em;
+	margin: 0px;
+}
+
+#user_nav-menu {
+	position: absolute;
+	top: 30px;
+	right: 5px;
+}
+
+#user_nav-menu > ul > li > a {
+	color: #CCCCCC;
+}
+
+#user_nav-menu > ul > li > a:hover {
+	text-decoration: none;
+	color: #CCCCCC;
+}
+
+#site_nav, #comm_nav {
+	margin-top: 5px;
+}
+
+#site_nav > ul, #comm_nav > ul {
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;
+}
+
+#site_nav > ul > li, #comm_nav > ul > li {
+	display: inline-block;
+}
+
+#notifications_menu {
+	position: absolute;
+	white-space: nowrap;
+}

@@ -1,4 +1,4 @@
 <?php
 
-echo file_get_contents('view/theme/arcadia/style/dark/style.css');
+echo file_get_contents('view/theme/arcadia/style/all.css');
 ?>

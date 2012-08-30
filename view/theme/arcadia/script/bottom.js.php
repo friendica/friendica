@@ -8,17 +8,27 @@ $topdir = '../../../../';
 chdir($topdir);
 
 echo file_get_contents('./js/jquery.js');
-echo file_get_contents('./js/jquery.textinputs.js');
-echo file_get_contents('./js/fk.autocomplete.js');
-echo file_get_contents('./library/fancybox/jquery.fancybox-1.3.4.pack.js');
-echo file_get_contents('./library/tiptip/jquery.tipTip.minified.js');
-echo file_get_contents('./library/jgrowl/jquery.jgrowl_minimized.js');
-echo file_get_contents('./library/tinymce/jscripts/tiny_mce/tiny_mce_src.js');
-echo file_get_contents('./js/acl.js');
-echo file_get_contents('./js/webtoolkit.base64.js');
-echo file_get_contents('./js/main.js');
-?>
-function confirmDelete() { return confirm(window.delItem); }
+//echo file_get_contents('./js/jquery.textinputs.js');
+//echo file_get_contents('./js/fk.autocomplete.js');
+//echo file_get_contents('./library/fancybox/jquery.fancybox-1.3.4.pack.js');
+//echo file_get_contents('./library/tiptip/jquery.tipTip.minified.js');
+//echo file_get_contents('./library/jgrowl/jquery.jgrowl_minimized.js');
+//echo file_get_contents('./library/tinymce/jscripts/tiny_mce/tiny_mce_src.js');
+//echo file_get_contents('./js/acl.js');
+
+/*$(document).ready(function() {
+	if(typeof acl=="undefined"){
+		acl = new ACL(
+			baseurl+"/acl",
+			window.acl_setup
+		);
+	}
+});*/
+
+//echo file_get_contents('./js/webtoolkit.base64.js');
+//echo file_get_contents('./js/main.js');
+echo file_get_contents('./view/theme/arcadia/script/main.js');
+/*function confirmDelete() { return confirm(window.delItem); }
 function commentOpen(obj,id) {
 	if(obj.value == window.commentEmptyText) {
 		obj.value = '';
@@ -94,4 +104,11 @@ function showHideCommentBox(id) {
 	else {
 		$('#comment-edit-form-' + id).show();
 	}
-}
+}*/
+
+/*echo file_get_contents('./view/theme/arcadia/script/jot.js');
+echo file_get_contents('./js/ajaxupload.js');
+echo file_get_contents('./view/theme/arcadia/script/jot_b.js');
+echo file_get_contents('./view/theme/arcadia/script/settings.js');
+echo file_get_contents('./view/theme/arcadia/script/photo.js');*/
+?>
