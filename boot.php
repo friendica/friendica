@@ -472,21 +472,12 @@ if(! class_exists('App')) {
 			$this->argc = count($this->argv);
 			if((array_key_exists('0',$this->argv)) && strlen($this->argv[0])) {
 				$this->module = str_replace(".", "_", $this->argv[0]);
+				$this->module = str_replace("-", "_", $this->module);
 			}
 			else {
 				$this->argc = 1;
 				$this->argv = array('home');
 				$this->module = 'home';
-			}
-
-			/**
-			 * Special handling for the webfinger/lrdd host XRD file
-			 */
-
-			if($this->cmd === '.well-known/host-meta') {
-				$this->argc = 1;
-				$this->argv = array('hostxrd');
-				$this->module = 'hostxrd';
 			}
 
 			/**

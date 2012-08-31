@@ -68,7 +68,7 @@ function get_config($family, $key, $instore = false) {
 	);
 	if(count($ret)) {
 		// manage array value
-		$val = (preg_match("|^a:[0-9]+:{.*}$|", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
+		$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
 		$a->config[$family][$key] = $val;
 		return $val;
 	}
@@ -162,7 +162,7 @@ function get_pconfig($uid,$family, $key, $instore = false) {
 	);
 
 	if(count($ret)) {
-		$val = (preg_match("|^a:[0-9]+:{.*}$|", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
+		$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
 		$a->config[$uid][$family][$key] = $val;
 		return $val;
 	}
