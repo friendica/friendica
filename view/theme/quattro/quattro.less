@@ -51,6 +51,14 @@ a:hover {color: @LinkHover; text-decoration: underline; }
 .fakelink { color: @Link; text-decoration: none; cursor:pointer; }
 .fakelink:hover { color: @LinkHover; text-decoration: underline; }
 
+blockquote {
+    background:@BlockquoteBackgroundColor;
+    padding: 1em;
+    margin-left: 1em;
+    border-left: 1em solid @BlockquoteBorderColor;
+    
+}
+
 code {
 	font-family: Courier, monospace;
 	white-space: pre;
@@ -62,6 +70,9 @@ code {
 	padding: 10px;
 	margin-top: 20px; 
 }
+
+textarea { font-size: 20px; }
+
 
 #panel {
 	position: absolute;
@@ -531,7 +542,7 @@ section {
 		padding:0.3em;
 	}
 	.comment-edit-text-full {
-		font-size: 14px;
+		font-size: 20px;
 		height: 4em;
 		color: @CommentBoxFullColor;
 		border: 1px solid @CommentBoxFullBorderColor;
@@ -603,10 +614,13 @@ section {
 }
 .wwto .contact-photo { width: 25px; height: 25px; }
 
+
 /* threaded comments */
 .children {
 	margin-top: 1em;
 	.hide-comments-outer { margin-left:60px; }
+	
+	.wwto { display: none; }
 	
 	.comment-edit-preview { width: 660px;
 		.wall-item-container { width: 610px; }
@@ -730,6 +744,8 @@ span[id^="showmore-wrap"] {
 		color: @CommentBoxEmptyColor;
 		border: 1px solid @CommentBoxEmptyBorderColor;
 		padding:0.3em;
+		
+		&:focus { font-size: 20px; }
 	}
 
 	#jot-tools {
@@ -1434,18 +1450,4 @@ footer { height: 100px; display: table-row; }
 .videobb { background-position: -112px 0px; }
 .videobb:hover { background-position: -112px -16px; }
 
-.attachtype {
-	display: block; width: 20px; height: 23px;
-	float: left;
-	background-image: url('../../../images/content-types.png');
-}
 
-.body-attach {
-	margin-top: 10px;
-}
-
-.type-video { background-position: 0px 0px; }
-.type-image { background-position: -20px 0px; }
-.type-audio { background-position: -40px 0px; }
-.type-text  { background-position: -60px 0px; }
-.type-unkn  { background-position: -80px 0px; }
