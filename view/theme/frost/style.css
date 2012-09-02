@@ -1296,12 +1296,20 @@ input#dfrn-url {
 .wall-item-content {
 	margin-left: 10px;
 	padding-right: 1em;
-	max-height: 500px;
+/*	max-height: 500px;*/
 	overflow: auto;
 }
 
 .wall-item-content img {
 	max-width: 100%;
+}
+
+.divgrow-showmore {
+	display: block;
+	clear: both;
+	text-align: center;
+	outline: 0;
+	border-top: 1px dotted #888;
 }
 
 

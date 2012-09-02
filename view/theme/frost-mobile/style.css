@@ -1347,6 +1347,14 @@ input#dfrn-url {
 	max-width: 280px;
 }
 
+.divgrow-showmore {
+	display: block;
+	clear: both;
+	text-align: center;
+	outline: 0;
+	border-top: 1px dotted #888;
+}
+
 
 .wall-item-title {
 	float: left;
@@ -1407,6 +1415,7 @@ input#dfrn-url {
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 } 
+
 
 .comment-edit-wrapper {
 	margin-top: 15px;

@@ -8,65 +8,6 @@ require_once("include/bbcode.php");
 require_once("include/markdownify/markdownify.php");
 
 
-function get_bb_tag_pos($s, $name, $occurance = 1) {
-
-	if($occurance < 1)
-		$occurance = 1;
-
-	$start_open = -1;
-	for($i = 1; $i <= $occurance; $i++) {
-		if( $start_open !== false)
-			$start_open = strpos($s, '[' . $name, $start_open + 1); // allow [name= type tags
-	}
-
-	if( $start_open === false)
-		return false;
-
-	$start_equal = strpos($s, '=', $start_open);
-	$start_close = strpos($s, ']', $start_open);
-
-	if( $start_close === false)
-		return false;
-
-	$start_close++;
-
-	$end_open = strpos($s, '[/' . $name . ']', $start_close);
-
-	if( $end_open === false)
-		return false;
-
-	$res = array( 'start' => array('open' => $start_open, 'close' => $start_close),
-	              'end' => array('open' => $end_open, 'close' => $end_open + strlen('[/' . $name . ']')) );
-	if( $start_equal !== false)
-		$res['start']['equal'] = $start_equal + 1;
-
-	return $res;
-}
-
-function bb_tag_preg_replace($pattern, $replace, $name, $s) {
-
-	$string = $s;
-
-	$occurance = 1;
-	$pos = get_bb_tag_pos($string, $name, $occurance);
-	while($pos !== false && $occurance < 1000) {
-
-		$start = substr($string, 0, $pos['start']['open']);
-		$subject = substr($string, $pos['start']['open'], $pos['end']['close'] - $pos['start']['open']);
-		$end = substr($string, $pos['end']['close']);
-		if($end === false)
-			$end = '';
-
-		$subject = preg_replace($pattern, $replace, $subject);
-		$string = $start . $subject . $end;
-
-		$occurance++;
-		$pos = get_bb_tag_pos($string, $name, $occurance);
-	}
-
-	return $string;
-}
-
 // we don't want to support a bbcode specific markdown interpreter
 // and the markdown library we have is pretty good, but provides HTML output.
 // So we'll use that to convert to HTML, then convert the HTML back to bbcode,
@@ -113,7 +54,7 @@ function diaspora2bb($s) {
 	//$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)(vimeo|youtu|www\.youtube|soundcloud)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3$4]$2$3$4[/url]',$s);
 	$s = bb_tag_preg_replace("/\[url\=?(.*?)\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/url\]/ism",'[youtube]$2[/youtube]','url',$s);
 	$s = bb_tag_preg_replace("/\[url\=https?:\/\/www.youtube.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism",'[youtube]$1[/youtube]','url',$s);
-	$s = bb_tag_preg_replace("/\[url\=?(.*?)\]https?:\/	\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism",'[vimeo]$2[/vimeo]','url',$s);
+	$s = bb_tag_preg_replace("/\[url\=?(.*?)\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism",'[vimeo]$2[/vimeo]','url',$s);
 	$s = bb_tag_preg_replace("/\[url\=https?:\/\/vimeo.com\/([0-9]+)\](.*?)\[\/url\]/ism",'[vimeo]$1[/vimeo]','url',$s);
 	// remove duplicate adjacent code tags
 	$s = preg_replace("/(\[code\])+(.*?)(\[\/code\])+/ism","[code]$2[/code]", $s);
@@ -220,6 +161,22 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	// Now convert HTML to Markdown
 	$md = new Markdownify(false, false, false);
 	$Text = $md->parseString($Text);
+
+	// The Markdownify converter converts underscores '_' in URLs to '\_', which
+	// messes up the URL. Manually fix these
+	$count = 1;
+	$pos = bb_find_open_close($Text, '[', ']', $count);
+	while($pos !== false) {
+		$start = substr($Text, 0, $pos['start']);
+		$subject = substr($Text, $pos['start'], $pos['end'] - $pos['start'] + 1);
+		$end = substr($Text, $pos['end'] + 1);
+
+		$subject = str_replace('\_', '_', $subject);
+		$Text = $start . $subject . $end;
+
+		$count++;
+		$pos = bb_find_open_close($Text, '[', ']', $count);
+	}	
 
 	// If the text going into bbcode() has a plain URL in it, i.e.
 	// with no [url] tags around it, it will come out of parseString()

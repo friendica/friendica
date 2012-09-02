@@ -11,7 +11,7 @@ require_once('include/cache.php');
 require_once('library/Mobile_Detect/Mobile_Detect.php');
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
-define ( 'FRIENDICA_VERSION',      '3.0.1444' );
+define ( 'FRIENDICA_VERSION',      '3.0.1449' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
 define ( 'DB_UPDATE_VERSION',      1154      );
 
@@ -472,21 +472,12 @@ if(! class_exists('App')) {
 			$this->argc = count($this->argv);
 			if((array_key_exists('0',$this->argv)) && strlen($this->argv[0])) {
 				$this->module = str_replace(".", "_", $this->argv[0]);
+				$this->module = str_replace("-", "_", $this->module);
 			}
 			else {
 				$this->argc = 1;
 				$this->argv = array('home');
 				$this->module = 'home';
-			}
-
-			/**
-			 * Special handling for the webfinger/lrdd host XRD file
-			 */
-
-			if($this->cmd === '.well-known/host-meta') {
-				$this->argc = 1;
-				$this->argv = array('hostxrd');
-				$this->module = 'hostxrd';
 			}
 
 			/**

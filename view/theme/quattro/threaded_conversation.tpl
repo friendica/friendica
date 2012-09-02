@@ -1,6 +1,6 @@
 {{ for $threads as $item }}
 
-<div id="tread-wrapper-$item.id" class="tread-wrapper {{ if $item.threaded }}threaded{{ endif }}">
+<div id="tread-wrapper-$item.id" class="tread-wrapper {{ if $item.threaded }}threaded{{ endif }}  $item.toplevel">
        
        
 		{{ if $item.type == tag }}

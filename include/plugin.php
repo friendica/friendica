@@ -8,7 +8,10 @@ function uninstall_plugin($plugin){
 	q("DELETE FROM `addon` WHERE `name` = '%s' ",
 		dbesc($plugin)
 	);
-
+    
+	// define THISPLUGIN, make life easy to plugin devs :-)
+	define("THISPLUGIN", 'addon/' . $plugin . '/' . $plugin . '.php');
+	
 	@include_once('addon/' . $plugin . '/' . $plugin . '.php');
 	if(function_exists($plugin . '_uninstall')) {
 		$func = $plugin . '_uninstall';
@@ -18,8 +21,10 @@ function uninstall_plugin($plugin){
 
 if (! function_exists('install_plugin')){
 function install_plugin($plugin) {
-
 	// silently fail if plugin was removed
+
+	// define THISPLUGIN, make life easy to plugin devs :-)
+	define("THISPLUGIN", 'addon/' . $plugin . '/' . $plugin . '.php');
 
 	if(! file_exists('addon/' . $plugin . '/' . $plugin . '.php'))
 		return false;
@@ -77,7 +82,10 @@ function reload_plugins() {
 				$pl = trim($pl);
 
 				$fname = 'addon/' . $pl . '/' . $pl . '.php';
-				
+
+				// define THISPLUGIN, make life easy to plugin devs :-)
+				define("THISPLUGIN", $fname);
+
 				if(file_exists($fname)) {
 					$t = @filemtime($fname);
 					foreach($installed as $i) {
@@ -163,6 +171,8 @@ function call_hooks($name, &$data = null) {
 
 	if((is_array($a->hooks)) && (array_key_exists($name,$a->hooks))) {
 		foreach($a->hooks[$name] as $hook) {
+			// define THISPLUGIN, make life easy to plugin devs :-)
+			define("THISPLUGIN", $hook[0]);
 			@include_once($hook[0]);
 			if(function_exists($hook[1])) {
 				$func = $hook[1];

@@ -351,6 +351,7 @@ function message_content(&$a) {
 				'$body' => template_escape($rr['body']),
 				'$to_name' => template_escape($rr['name']),
 				'$date' => datetime_convert('UTC',date_default_timezone_get(),$rr['mailcreated'], t('D, d M Y - g:i A')),
+                                '$ago' => relative_date($rr['mailcreated']),
 				'$seen' => $rr['mailseen'],
 				'$count' => sprintf( tt('%d message', '%d messages', $rr['count']), $rr['count']),
 			));
@@ -443,6 +444,7 @@ function message_content(&$a) {
 				'delete' => t('Delete message'),
 				'to_name' => template_escape($message['name']),
 				'date' => datetime_convert('UTC',date_default_timezone_get(),$message['created'],'D, d M Y - g:i A'),
+                                'ago' => relative_date($message['created']),
 			);
 				
 			$seen = $message['seen'];

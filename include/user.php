@@ -277,6 +277,20 @@ function create_user($arr) {
 		require_once('include/group.php');
 		group_add($newuid, t('Friends'));
 
+		if(! get_config('system', 'newuser_public')) {
+			$r = q("SELECT id FROM `group` WHERE uid = %d AND name = '%s'",
+				intval($newuid),
+				dbesc(t('Friends'))
+			);
+			if($r) {
+				q("UPDATE user SET def_gid = %d, allow_gid = '%s' WHERE uid = %d",
+				   intval($r[0]['id']),
+				   dbesc("<" . $r[0]['id'] . ">"),
+				   intval($newuid)
+				);
+			}
+		}
+
 	}
 
 	// if we have no OpenID photo try to look up an avatar

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 3.0.1444\n"
+"Project-Id-Version: 3.0.1449\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-23 10:00-0700\n"
+"POT-Creation-Date: 2012-08-28 10:00-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,7 +234,7 @@ msgid "link to source"
 msgstr ""
 
 #: ../../mod/events.php:331 ../../view/theme/diabook/theme.php:131
-#: ../../include/nav.php:52 ../../boot.php:1656
+#: ../../include/nav.php:52 ../../boot.php:1659
 msgid "Events"
 msgstr ""
 
@@ -372,7 +372,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: ../../mod/photos.php:46 ../../boot.php:1649
+#: ../../mod/photos.php:46 ../../boot.php:1652
 msgid "Photo Albums"
 msgstr ""
 
@@ -2594,7 +2594,7 @@ msgstr ""
 msgid "Invalid contact."
 msgstr ""
 
-#: ../../mod/notes.php:44 ../../boot.php:1663
+#: ../../mod/notes.php:44 ../../boot.php:1666
 msgid "Personal Notes"
 msgstr ""
 
@@ -2847,7 +2847,7 @@ msgstr ""
 
 #: ../../mod/profperm.php:103 ../../view/theme/diabook/theme.php:128
 #: ../../include/profile_advanced.php:7 ../../include/profile_advanced.php:84
-#: ../../include/nav.php:50 ../../boot.php:1639
+#: ../../include/nav.php:50 ../../boot.php:1642
 msgid "Profile"
 msgstr ""
 
@@ -2994,7 +2994,7 @@ msgid "Access denied."
 msgstr ""
 
 #: ../../mod/fbrowser.php:25 ../../view/theme/diabook/theme.php:130
-#: ../../include/nav.php:51 ../../boot.php:1646
+#: ../../include/nav.php:51 ../../boot.php:1649
 msgid "Photos"
 msgstr ""
 
@@ -7689,7 +7689,7 @@ msgstr ""
 msgid "End this session"
 msgstr ""
 
-#: ../../include/nav.php:49 ../../boot.php:1632
+#: ../../include/nav.php:49 ../../boot.php:1635
 msgid "Status"
 msgstr ""
 
@@ -8538,18 +8538,18 @@ msgstr ""
 msgid "Events this week:"
 msgstr ""
 
-#: ../../boot.php:1635
+#: ../../boot.php:1638
 msgid "Status Messages and Posts"
 msgstr ""
 
-#: ../../boot.php:1642
+#: ../../boot.php:1645
 msgid "Profile Details"
 msgstr ""
 
-#: ../../boot.php:1659
+#: ../../boot.php:1662
 msgid "Events and Calendar"
 msgstr ""
 
-#: ../../boot.php:1666
+#: ../../boot.php:1669
 msgid "Only You Can See This"
 msgstr ""

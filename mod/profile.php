@@ -229,21 +229,27 @@ function profile_content(&$a, $update = 0) {
 			$sql_extra2 .= protect_sprintf(sprintf(" AND item.created >= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery2))));
 		}
 
-                if(! get_pconfig($a->profile['profile_uid'],'system','alt_pager')) {
-		        $r = q("SELECT COUNT(*) AS `total`
-			        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-			        WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
-			        and `item`.`moderated` = 0 AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 
-			        AND `item`.`id` = `item`.`parent` AND `item`.`wall` = 1
-			        $sql_extra $sql_extra2 ",
-			        intval($a->profile['profile_uid'])
-		        );
+		if(! get_pconfig($a->profile['profile_uid'],'system','alt_pager')) {
+		    $r = q("SELECT COUNT(*) AS `total`
+			    FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			    WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
+			    and `item`.`moderated` = 0 AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 
+			    AND `item`.`id` = `item`.`parent` AND `item`.`wall` = 1
+			    $sql_extra $sql_extra2 ",
+			    intval($a->profile['profile_uid'])
+		    );
 
-		        if(count($r)) {
-			        $a->set_pager_total($r[0]['total']);
+	        if(count($r)) {
+		        $a->set_pager_total($r[0]['total']);
+			}
 		}
-		}
-		$a->set_pager_itemspage(40);
+
+		$itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
+		$itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 40);
+		if(($a->force_max_items > 0) && ($a->force_max_items < $itemspage_network))
+			$itemspage_network = $a->force_max_items;
+
+		$a->set_pager_itemspage($itemspage_network);
 
 		$pager_sql = sprintf(" LIMIT %d, %d ",intval($a->pager['start']), intval($a->pager['itemspage']));
 

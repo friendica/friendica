@@ -387,6 +387,12 @@ a:hover {
   color: #005c94;
   text-decoration: underline;
 }
+blockquote {
+  background: #ffffff;
+  padding: 1em;
+  margin-left: 1em;
+  border-left: 1em solid #e6e6e6;
+}
 code {
   font-family: Courier, monospace;
   white-space: pre;
@@ -397,6 +403,9 @@ code {
   color: #444;
   padding: 10px;
   margin-top: 20px;
+}
+textarea {
+  font-size: 20px;
 }
 #panel {
   position: absolute;
@@ -1063,7 +1072,7 @@ section {
   padding: 0.3em;
 }
 .wall-item-comment-wrapper .comment-edit-text-full {
-  font-size: 14px;
+  font-size: 20px;
   height: 4em;
   color: #2d2d2d;
   border: 1px solid #2d2d2d;
@@ -1154,6 +1163,9 @@ section {
 }
 .children .hide-comments-outer {
   margin-left: 60px;
+}
+.children .wwto {
+  display: none;
 }
 .children .comment-edit-preview {
   width: 660px;
@@ -1302,6 +1314,9 @@ span[id^="showmore-wrap"] {
   color: #999999;
   border: 1px solid #999999;
   padding: 0.3em;
+}
+#jot .profile-jot-text:focus {
+  font-size: 20px;
 }
 #jot #jot-tools {
   margin: 0px;
@@ -2112,29 +2127,4 @@ footer {
 }
 .videobb:hover {
   background-position: -112px -16px;
-}
-.attachtype {
-  display: block;
-  width: 20px;
-  height: 23px;
-  float: left;
-  background-image: url('../../../images/content-types.png');
-}
-.body-attach {
-  margin-top: 10px;
-}
-.type-video {
-  background-position: 0px 0px;
-}
-.type-image {
-  background-position: -20px 0px;
-}
-.type-audio {
-  background-position: -40px 0px;
-}
-.type-text {
-  background-position: -60px 0px;
-}
-.type-unkn {
-  background-position: -80px 0px;
 }
