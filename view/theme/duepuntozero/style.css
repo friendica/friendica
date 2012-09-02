@@ -932,7 +932,6 @@ input#dfrn-url {
 	position: relative;
 	-moz-border-radius: 3px;
 	border-radius: 3px;	
-
 }
 
 .tread-wrapper .tread-wrapper {
@@ -1196,6 +1195,10 @@ input#dfrn-url {
 	width: 100px;
 	float: left;
 }
+.comment-wwedit-wrapper.threaded > .comment-edit-form > .comment-edit-photo {
+	width: 40px;
+}
+
 .comment-edit-photo img {
 	width: 25px;
 }
@@ -1213,6 +1216,10 @@ input#dfrn-url {
 
 .comment-edit-submit {
 	margin: 10px 0px 10px 110px;
+}
+
+.comment-wwedit-wrapper.threaded > .comment-edit-form > .comment-edit-submit-wrapper > .comment-edit-submit {
+	margin-left: 50px;
 }
 
 #profile-jot-plugin-wrapper,
@@ -1758,10 +1765,14 @@ input#dfrn-url {
 
 .comment-edit-text-empty {
 	color: gray;
-	height: 30px;
+	height: 5em;
 	width: 175px;
 	overflow: auto;
 	margin-bottom: 10px;
+}
+
+.comment-wwedit-wrapper.threaded > .comment-edit-form > .comment-edit-text-empty {
+	height: 1.5em;
 }
 
 .comment-edit-text-full {
@@ -3046,7 +3057,8 @@ aside input[type='text'] {
 [class^="comment-edit-bb"] {
 	list-style: none;
 	display: none;
-	margin: 0px 0 -5px 60px;
+	margin: 0px 0 -5px 0px;
+	padding: 0px;
 	width: 75%;
 }
 [class^="comment-edit-bb"] > li {

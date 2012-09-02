@@ -15,6 +15,15 @@ Deny from all
   # Also place auth information into REMOTE_USER for sites running
   # in CGI mode.
 
+  # If you are having problems or are using VirtualDocumentRoot,
+  # uncomment this line and set it to your friendica path.
+  # e.g.:
+  # Friendica url: http://some.example.com
+  # Use: RewriteBase /
+  # Friendica url: http://some.example.com/friendica
+  # Use: RewriteBase /friendica/
+  #RewriteBase /
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^(.*)$ index.php?q=$1 [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]

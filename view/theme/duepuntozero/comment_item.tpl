@@ -1,10 +1,9 @@
+		{{ if $threaded }}
+		<div class="comment-wwedit-wrapper threaded" id="comment-edit-wrapper-$id" style="display: block;">
+		{{ else }}
 		<div class="comment-wwedit-wrapper" id="comment-edit-wrapper-$id" style="display: block;">
-			{{ if $threaded }}
-			<span id="hide-commentbox-$id" class="hide-commentbox fakelink" onclick="showHideCommentBox($id);">$comment</span>
-			<form class="comment-edit-form" style="display: none;" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;">
-			{{ else }}
+		{{ endif }}
 			<form class="comment-edit-form" style="display: block;" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;">
-			{{ endif }}
 				<input type="hidden" name="type" value="$type" />
 				<input type="hidden" name="profile_uid" value="$profile_uid" />
 				<input type="hidden" name="parent" value="$parent" />
@@ -43,7 +42,7 @@
 						onclick="insertFormatting('$comment','video', $id);"></a></li>
 				</ul>	
 				<div class="comment-edit-bb-end"></div>
-				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);cmtBbOpen($id);" onBlur="commentClose(this,$id);" >$comment</textarea>			
+				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);cmtBbOpen(this, $id);" onBlur="commentClose(this,$id);cmtBbClose(this,$id);" >$comment</textarea>			
 				{{ if $qcomment }}
 					<select id="qcomment-select-$id" name="qcomment-$id" class="qcomment" onchange="qCommentInsert(this,$id);" >
 					<option value=""></option>

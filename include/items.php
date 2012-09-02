@@ -2617,22 +2617,32 @@ function local_delivery($importer,$data) {
 			// Specifically, the recipient? 
 
 			$is_a_remote_comment = false;
-
-			// POSSIBLE CLEANUP --> Why select so many fields when only forum_mode and wall are used?
-			$r = q("select `item`.`id`, `item`.`uri`, `item`.`tag`, `item`.`forum_mode`,`item`.`origin`,`item`.`wall`, 
-				`contact`.`name`, `contact`.`url`, `contact`.`thumb` from `item` 
-				LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` 
-				WHERE `item`.`uri` = '%s' AND (`item`.`parent-uri` = '%s' or `item`.`thr-parent` = '%s')
-				AND `item`.`uid` = %d 
-				$sql_extra
+			$top_uri = $parent_uri;
+			
+			$r = q("select `item`.`parent-uri` from `item`
+				WHERE `item`.`uri` = '%s'
 				LIMIT 1",
-				dbesc($parent_uri),
-				dbesc($parent_uri),
-				dbesc($parent_uri),
-				intval($importer['importer_uid'])
+				dbesc($parent_uri)
 			);
-			if($r && count($r))
-				$is_a_remote_comment = true;			
+			if($r && count($r)) {
+				$top_uri = $r[0]['parent-uri'];
+
+				// POSSIBLE CLEANUP --> Why select so many fields when only forum_mode and wall are used?
+				$r = q("select `item`.`id`, `item`.`uri`, `item`.`tag`, `item`.`forum_mode`,`item`.`origin`,`item`.`wall`, 
+					`contact`.`name`, `contact`.`url`, `contact`.`thumb` from `item` 
+					LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` 
+					WHERE `item`.`uri` = '%s' AND (`item`.`parent-uri` = '%s' or `item`.`thr-parent` = '%s')
+					AND `item`.`uid` = %d 
+					$sql_extra
+					LIMIT 1",
+					dbesc($top_uri),
+					dbesc($top_uri),
+					dbesc($top_uri),
+					intval($importer['importer_uid'])
+				);
+				if($r && count($r))
+					$is_a_remote_comment = true;
+			}
 
 			// Does this have the characteristics of a community or private group comment?
 			// If it's a reply to a wall post on a community/prvgroup page it's a 
@@ -2936,7 +2946,7 @@ function local_delivery($importer,$data) {
 				if(!x($datarray['type']) || $datarray['type'] != 'activity') {
 
 					$myconv = q("SELECT `author-link`, `author-avatar`, `parent` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d AND `parent` != 0 AND `deleted` = 0",
-						dbesc($parent_uri),
+						dbesc($top_uri),
 						intval($importer['importer_uid'])
 					);
 
