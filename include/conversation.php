@@ -346,7 +346,7 @@ function count_descendants($item) {
  * Recursively prepare a thread for HTML
  */
 
-function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $profile_owner, $alike, $dlike, $thread_level=1) {
+function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $profile_owner, $alike, $dlike, $previewing, $thread_level=1) {
 	$result = array();
 
 	$wall_template = 'wall_thread.tpl';
@@ -651,7 +651,7 @@ function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $pr
 
 		$item_result['children'] = array();
 		if(count($item['children'])) {
-			$item_result['children'] = prepare_threads_body($a, $item['children'], $cmnt_tpl, $page_writeable, $mode, $profile_owner, $alike, $dlike, ($thread_level + 1));
+			$item_result['children'] = prepare_threads_body($a, $item['children'], $cmnt_tpl, $page_writeable, $mode, $profile_owner, $alike, $dlike, $previewing, ($thread_level + 1));
 		}
 		$item_result['private'] = $item['private'];
 		$item_result['toplevel'] = ($toplevelpost ? 'toplevel_item' : '');
@@ -901,7 +901,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				}
 			}
 
-			$threads = prepare_threads_body($a, $threads, $cmnt_tpl, $page_writeable, $mode,  $profile_owner, $alike, $dlike);
+			$threads = prepare_threads_body($a, $threads, $cmnt_tpl, $page_writeable, $mode,  $profile_owner, $alike, $dlike, $previewing);
 		}
 	}
 		
