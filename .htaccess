@@ -21,7 +21,7 @@ Deny from all
   # Friendica url: http://some.example.com
   # RewriteBase /
   # Friendica url: http://some.example.com/friendica
-  # RewriteBase /firendica/
+  # RewriteBase /friendica/
   #
   #RewriteBase /
 
