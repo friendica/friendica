@@ -22,6 +22,8 @@ function home_content(&$a) {
 
 	if(x($_SESSION,'theme'))
 		unset($_SESSION['theme']);
+	if(x($_SESSION,'mobile-theme'))
+		unset($_SESSION['mobile-theme']);
 
 	$o .= '<h1>' . ((x($a->config,'sitename')) ? sprintf( t("Welcome to %s") ,$a->config['sitename']) : "" ) . '</h1>';
 	if(file_exists('home.html'))

@@ -1088,9 +1088,12 @@ if(! function_exists('profile_load')) {
 
 		$a->profile = $r[0];
 
+		$a->profile['mobile-theme'] = get_pconfig($profile_uid, 'system', 'mobile_theme');
+
 
 		$a->page['title'] = $a->profile['name'] . " @ " . $a->config['sitename'];
 		$_SESSION['theme'] = $a->profile['theme'];
+		$_SESSION['mobile-theme'] = $a->profile['mobile-theme'];
 
 		/**
 		 * load/reload current theme info
@@ -1510,6 +1513,12 @@ if(! function_exists('current_theme')) {
 		if($is_mobile) {
 			$system_theme = ((isset($a->config['system']['mobile-theme'])) ? $a->config['system']['mobile-theme'] : '');
 			$theme_name = ((isset($_SESSION) && x($_SESSION,'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
+
+			if($theme_name === '---') {
+				// user has selected to have the mobile theme be the same as the normal one
+				$system_theme = '';
+				$theme_name = '';
+			}
 		}
 		if(!$is_mobile || ($system_theme === '' && $theme_name === '')) {
 			$system_theme = ((isset($a->config['system']['theme'])) ? $a->config['system']['theme'] : '');

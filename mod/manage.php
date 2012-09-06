@@ -63,6 +63,7 @@ function manage_post(&$a) {
 	unset($_SESSION['administrator']);
 	unset($_SESSION['cid']);
 	unset($_SESSION['theme']);
+	unset($_SESSION['mobile-theme']);
 	unset($_SESSION['page_flags']);
 	unset($_SESSION['return_url']);
 	if(x($_SESSION,'submanage'))

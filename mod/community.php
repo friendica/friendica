@@ -1,8 +1,10 @@
 <?php
 
 function community_init(&$a) {
-	if(! local_user())
+	if(! local_user()) {
 		unset($_SESSION['theme']);
+		unset($_SESSION['mobile-theme']);
+	}
 
 
 }

@@ -6,6 +6,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 	$_SESSION['uid'] = $user_record['uid'];
 	$_SESSION['theme'] = $user_record['theme'];
+	$_SESSION['mobile-theme'] = get_pconfig($user_record['uid'], 'system', 'mobile_theme');
 	$_SESSION['authenticated'] = 1;
 	$_SESSION['page_flags'] = $user_record['page-flags'];
 	$_SESSION['my_url'] = $a->get_baseurl() . '/profile/' . $user_record['nickname'];

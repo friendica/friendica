@@ -145,6 +145,7 @@ class FKOAuth1 extends OAuthServer {
 		}
 		$_SESSION['uid'] = $record['uid'];
 		$_SESSION['theme'] = $record['theme'];
+		$_SESSION['mobile-theme'] = get_pconfig($record['uid'], 'system', 'mobile_theme');
 		$_SESSION['authenticated'] = 1;
 		$_SESSION['page_flags'] = $record['page-flags'];
 		$_SESSION['my_url'] = $a->get_baseurl() . '/profile/' . $record['nickname'];

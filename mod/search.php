@@ -50,8 +50,10 @@ function search_init(&$a) {
 		$a->page['aside'] .= search_saved_searches();
 
 	}
-	else
+	else {
 		unset($_SESSION['theme']);
+		unset($_SESSION['mobile-theme']);
+	}
 
 
 

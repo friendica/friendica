@@ -9,8 +9,10 @@ function directory_init(&$a) {
 		$a->page['aside'] .= findpeople_widget();
 
 	}
-	else
+	else {
 		unset($_SESSION['theme']);
+		unset($_SESSION['mobile-theme']);
+	}
 
 
 }

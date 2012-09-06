@@ -4,6 +4,7 @@
 <input type='hidden' name='form_security_token' value='$form_security_token'>
 
 {{inc field_themeselect.tpl with $field=$theme }}{{endinc}}
+{{inc field_themeselect.tpl with $field=$mobile_theme }}{{endinc}}
 {{inc field_input.tpl with $field=$ajaxint }}{{endinc}}
 {{inc field_input.tpl with $field=$itemspage_network }}{{endinc}}
 {{inc field_checkbox.tpl with $field=$nosmile}}{{endinc}}

@@ -10,14 +10,13 @@ function nuke_session() {
 	unset($_SESSION['administrator']);
 	unset($_SESSION['cid']);
 	unset($_SESSION['theme']);
+	unset($_SESSION['mobile-theme']);
 	unset($_SESSION['page_flags']);
 	unset($_SESSION['submanage']);
 	unset($_SESSION['my_url']);
 	unset($_SESSION['my_address']);
 	unset($_SESSION['addr']);
 	unset($_SESSION['return_url']);
-	unset($_SESSION['theme']);
-	unset($_SESSION['page_flags']);
 }
 
 

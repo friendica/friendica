@@ -236,16 +236,21 @@ function settings_post(&$a) {
 		check_form_security_token_redirectOnErr('/settings/display', 'settings_display');
 
 		$theme = ((x($_POST,'theme')) ? notags(trim($_POST['theme']))  : $a->user['theme']);
+		$mobile_theme = ((x($_POST,'mobile_theme')) ? notags(trim($_POST['mobile_theme']))  : '');
 		$nosmile = ((x($_POST,'nosmile')) ? intval($_POST['nosmile'])  : 0);  
 		$browser_update   = ((x($_POST,'browser_update')) ? intval($_POST['browser_update']) : 0);
 		$browser_update   = $browser_update * 1000;
 		if($browser_update < 10000)
-			$browser_update = 40000;
+			$browser_update = 10000;
 
 		$itemspage_network   = ((x($_POST,'itemspage_network')) ? intval($_POST['itemspage_network']) : 40);
 		if($itemspage_network > 100)
-					$itemspage_network = 40;
+			$itemspage_network = 100;
 
+
+		if($mobile_theme !== '') {
+			set_pconfig(local_user(),'system','mobile_theme',$mobile_theme);
+		}
 
 		set_pconfig(local_user(),'system','update_interval', $browser_update);
 		set_pconfig(local_user(),'system','itemspage_network', $itemspage_network);
@@ -497,10 +502,11 @@ function settings_post(&$a) {
 	require_once('include/profile_update.php');
 	profile_change();
 
-	$_SESSION['theme'] = $theme;
+	//$_SESSION['theme'] = $theme;
 	if($email_changed && $a->config['register_policy'] == REGISTER_VERIFY) {
 
 		// FIXME - set to un-verified, blocked and redirect to logout
+		// Why? Are we verifying people or email addresses?
 
 	}
 
@@ -704,6 +710,9 @@ function settings_content(&$a) {
 		$default_theme = get_config('system','theme');
 		if(! $default_theme)
 			$default_theme = 'default';
+		$default_mobile_theme = get_config('system','mobile-theme');
+		if(! $mobile_default_theme)
+			$mobile_default_theme = 'none';
 
 		$allowed_themes_str = get_config('system','allowed_themes');
 		$allowed_themes_raw = explode(',',$allowed_themes_str);
@@ -715,19 +724,27 @@ function settings_content(&$a) {
 
 		
 		$themes = array();
+		$mobile_themes = array("---" => t('No special theme for mobile devices'));
 		$files = glob('view/theme/*');
 		if($allowed_themes) {
 			foreach($allowed_themes as $th) {
 				$f = $th;
 				$is_experimental = file_exists('view/theme/' . $th . '/experimental');
 				$unsupported = file_exists('view/theme/' . $th . '/unsupported');
+				$is_mobile = file_exists('view/theme/' . $th . '/mobile');
 				if (!$is_experimental or ($is_experimental && (get_config('experimentals','exp_themes')==1 or get_config('experimentals','exp_themes')===false))){ 
 					$theme_name = (($is_experimental) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
-					$themes[$f]=$theme_name;
+					if($is_mobile) {
+						$mobile_themes[$f]=$theme_name;
+					}
+					else {
+						$themes[$f]=$theme_name;
+					}
 				}
 			}
 		}
 		$theme_selected = (!x($_SESSION,'theme')? $default_theme : $_SESSION['theme']);
+		$mobile_theme_selected = (!x($_SESSION,'mobile-theme')? $default_mobile_theme : $_SESSION['mobile-theme']);
 		
 		$browser_update = intval(get_pconfig(local_user(), 'system','update_interval'));
 		$browser_update = (($browser_update == 0) ? 40 : $browser_update / 1000); // default if not set: 40 seconds
@@ -753,7 +770,8 @@ function settings_content(&$a) {
 			'$baseurl' => $a->get_baseurl(true),
 			'$uid' => local_user(),
 		
-			'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes),
+			'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes, 'preview'),
+			'$mobile_theme'	=> array('mobile_theme', t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, ''),
 			'$ajaxint'   => array('browser_update',  t("Update browser every xx seconds"), $browser_update, t('Minimum of 10 seconds, no maximum')),
 			'$itemspage_network'   => array('itemspage_network',  t("Number of items to display per page:"), $itemspage_network, t('Maximum of 100 items')),
 			'$nosmile'	=> array('nosmile', t("Don't show emoticons"), $nosmile, ''),

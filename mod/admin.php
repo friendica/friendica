@@ -329,11 +329,11 @@ function admin_page_site_post(&$a){
 	}
 	set_config('system','language', $language);
 	set_config('system','theme', $theme);
-        if ( $theme_mobile === '---' ) {
-            del_config('system','mobile-theme');
-        } else {
-    	    set_config('system','mobile-theme', $theme_mobile);
-        }
+	if ( $theme_mobile === '---' ) {
+		del_config('system','mobile-theme');
+	} else {
+		set_config('system','mobile-theme', $theme_mobile);
+	}
 	set_config('system','maximagesize', $maximagesize);
 	set_config('system','max_image_length', $maximagelength);
 	set_config('system','jpeg_quality', $jpegimagequality);
@@ -399,16 +399,18 @@ function admin_page_site(&$a) {
 	/* Installed themes */
 	$theme_choices = array();
 	$theme_choices_mobile = array();
-        $theme_choices_mobile["---"] = t("Don't apply a special theme for mobile devices.");
+	$theme_choices_mobile["---"] = t("No special theme for mobile devices");
 	$files = glob('view/theme/*');
 	if($files) {
 		foreach($files as $file) {
 			$f = basename($file);
 			$theme_name = ((file_exists($file . '/experimental')) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
-                        $theme_choices[$f] = $theme_name;
-                        if (file_exists($file . '/mobile')) {
-                            $theme_choices_mobile[$f] = $theme_name;
-                        }
+            if (file_exists($file . '/mobile')) {
+                $theme_choices_mobile[$f] = $theme_name;
+            }
+			else {
+                $theme_choices[$f] = $theme_name;
+			}
 		}
 	}
 	

@@ -193,6 +193,8 @@ function register_content(&$a) {
 
 	if(x($_SESSION,'theme'))
 		unset($_SESSION['theme']);
+	if(x($_SESSION,'mobile-theme'))
+		unset($_SESSION['mobile-theme']);
 
 
 	$username     = ((x($_POST,'username'))     ? $_POST['username']     : ((x($_GET,'username'))     ? $_GET['username']              : ''));
