@@ -375,6 +375,14 @@ div.wall-item-content-wrapper.shiny {
 #theme-preview {
 	margin: 15px 0 15px 150px;
 }
+#theme-version {
+	display: block;
+	font-weight: bold;
+}
+#theme-credits {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
 
 /* from default */
 #jot-perms-icon, 
@@ -3167,6 +3175,10 @@ aside input[type='text'] {
 .field textarea {
 	width: 400px;
 }
+.field input[type=checkbox],
+.field input[type=radio] {
+	width: auto;
+}
 .field textarea { height: 100px; }
 .field_help {
 	display: block;
@@ -3823,11 +3835,4 @@ ul.notifications-menu-popup {
 	width: 130px;
 }
 
-#theme-version {
-	display: block;
-	font-weight: bold;
-}
-#theme-credits {
-	margin-top: 15px;
-	margin-bottom: 15px;
-}
+

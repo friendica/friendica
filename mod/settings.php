@@ -770,8 +770,8 @@ function settings_content(&$a) {
 			'$baseurl' => $a->get_baseurl(true),
 			'$uid' => local_user(),
 		
-			'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes, 'preview'),
-			'$mobile_theme'	=> array('mobile_theme', t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, ''),
+			'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes, true),
+			'$mobile_theme'	=> array('mobile_theme', t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false),
 			'$ajaxint'   => array('browser_update',  t("Update browser every xx seconds"), $browser_update, t('Minimum of 10 seconds, no maximum')),
 			'$itemspage_network'   => array('itemspage_network',  t("Number of items to display per page:"), $itemspage_network, t('Maximum of 100 items')),
 			'$nosmile'	=> array('nosmile', t("Don't show emoticons"), $nosmile, ''),

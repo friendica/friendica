@@ -54,7 +54,7 @@ img { border :0px; }
    background: url(login-bg.gif) no-repeat;
    background-position: 0 50%;
    padding-left: 18px;
-   width: 252px;
+   width: 212px;
    margin-left: 20px;
 }
 .openid:hover {
@@ -288,9 +288,8 @@ div.main-container {
 
 
 /* aside */
-aside {
-/*	display: block;*/
-	display: none;
+/*aside {
+	display: block;
 	min-height: 112px;
 
 	width: 250px;
@@ -299,9 +298,7 @@ aside {
 	margin: 1em 0px 0px 0px;
 
 	position: absolute;
-
-/*	float:left;*/
-}
+}*/
 
 #dfrn-request-link {
 	display: block;
@@ -409,7 +406,15 @@ footer {
 }
 
 #theme-preview {
-	margin: 15px 0 15px 150px;
+	margin: 15px 0 15px 15px;
+}
+#theme-version {
+	display: block;
+	font-weight: bold;
+}
+#theme-credits {
+	margin-top: 15px;
+	margin-bottom: 15px;
 }
 
 /* from default */
@@ -486,11 +491,11 @@ footer {
 }
 
 .settings-widget .selected {
-	padding: 3px;
-/*	-moz-border-radius: 3px;*/
+/*	padding: 3px;
+	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;	
-	border: 1px solid #CCCCCC;
+	border: 1px solid #CCCCCC;*/
 	background: #F8F8F8;
 	font-weight: bold;
 }
@@ -1017,7 +1022,11 @@ input#dfrn-url {
 	margin-bottom: 20px;
 }
 
-.settings-widget ul {
+#id_theme,
+#id_mobile_theme {
+	width: 280px;
+}
+/*.settings-widget ul {
 	list-style-type: none;
 	padding: 0px;
 }
@@ -1025,7 +1034,7 @@ input#dfrn-url {
 .settings-widget li {
 	margin-left: 24px;
 	margin-bottom: 8px;
-}
+}*/
 
 
 #gender-select, #marital-select, #sexual-select {
@@ -1035,6 +1044,11 @@ input#dfrn-url {
 #profile-edit-profile-name-wrapper .required {
 	color: #FF0000;
 	float: left;
+}
+
+#contacts-search-submit {
+	font-size: 18px;
+	padding: 5px 10px;
 }
 
 #contacts-display-wrapper {
@@ -1053,7 +1067,7 @@ input#dfrn-url {
 	padding-left: 15px;
 	padding-right: 15px; 
 	width: 95px;
-	height: 170px;
+	height: 200px;
 }
 #contacts-search-end {
 	margin-bottom: 10px;
@@ -2408,7 +2422,9 @@ a.mail-list-link {
 	margin-top: 5px;
 }
 #side-follow-submit, #side-peoplefind-submit {
-	margin-top: 15px;
+	font-size: 18px;
+	padding: 5px 10px;
+	margin: 10px 0px 10px 10px;
 }
 
 #side-match-link {
@@ -2421,7 +2437,7 @@ aside input[type='text'] {
 
 .widget {
 	border: 1px solid #DDDDDD;
-	padding: 8px;
+	padding: 18px;
 	margin-top: 5px;
 /*	-moz-border-radius:5px;*/
 	-webkit-border-radius:5px;
@@ -3336,7 +3352,7 @@ aside input[type='text'] {
 	margin-bottom: 10px;
 	padding-bottom: 10px;
 	overflow: auto;
-	width: 100%
+/*	width: 100%*/
 }
 
 .field label {
@@ -3347,8 +3363,12 @@ aside input[type='text'] {
 
 .field input,
 .field textarea {
-	width: 270px;
+	width: 230px;
 	margin-left: 20px;
+}
+.field input[type=checkbox],
+.field input[type=radio] {
+	width: auto;
 }
 .field textarea { height: 100px; }
 .field_help {

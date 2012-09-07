@@ -684,7 +684,7 @@ Array.prototype.remove = function(item) {
 function previewTheme(elm) {
 	theme = $j(elm).val();
 	$j.getJSON('pretheme?f=&theme=' + theme,function(data) {
-			$j('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div><a href="' + data.img + '"><img src="' + data.img + '" width="320" height="240" alt="' + theme + '" /></a>');
+			$j('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div>');
 	});
 
 }
