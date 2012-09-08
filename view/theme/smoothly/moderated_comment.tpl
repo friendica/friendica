@@ -1,10 +1,5 @@
 		<div class="comment-wwedit-wrapper" id="comment-edit-wrapper-$id" style="display: block;">
-			{{ if $threaded }}
-			<span id="hide-commentbox-$id" class="hide-commentbox fakelink" onclick="showHideCommentBox($id);">$comment</span>
-			<form class="comment-edit-form" style="display: none;" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;">
-			{{ else }}
-			<form class="comment-edit-form" style="display: block;" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;">
-			{{ endif }}
+			<form class="comment-edit-form" id="comment-edit-form-$id" action="item" method="post" onsubmit="post_comment($id); return false;">
 				<input type="hidden" name="type" value="$type" />
 				<input type="hidden" name="profile_uid" value="$profile_uid" />
 				<input type="hidden" name="parent" value="$parent" />
@@ -16,6 +11,14 @@
 					<a class="comment-edit-photo-link" href="$mylink" title="$mytitle"><img class="my-comment-photo" src="$myphoto" alt="$mytitle" title="$mytitle" /></a>
 				</div>
 				<div class="comment-edit-photo-end"></div>
+				<div id="mod-cmnt-wrap-$id" class="mod-cmnt-wrap" style="display:none">
+					<div id="mod-cmnt-name-lbl-$id" class="mod-cmnt-name-lbl">$lbl_modname</div>
+					<input type="text" id="mod-cmnt-name-$id" class="mod-cmnt-name" name="mod-cmnt-name" value="$modname" />
+					<div id="mod-cmnt-email-lbl-$id" class="mod-cmnt-email-lbl">$lbl_modemail</div>
+					<input type="text" id="mod-cmnt-email-$id" class="mod-cmnt-email" name="mod-cmnt-email" value="$modemail" />
+					<div id="mod-cmnt-url-lbl-$id" class="mod-cmnt-url-lbl">$lbl_modurl</div>
+					<input type="text" id="mod-cmnt-url-$id" class="mod-cmnt-url" name="mod-cmnt-url" value="$modurl" />
+				</div>
 				<ul class="comment-edit-bb-$id">
 					<li><a class="editicon boldbb shadow"
 						style="cursor: pointer;" title="$edbold"
@@ -44,14 +47,6 @@
 				</ul>	
 				<div class="comment-edit-bb-end"></div>
 				<textarea id="comment-edit-text-$id" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,$id);cmtBbOpen($id);" onBlur="commentClose(this,$id);" >$comment</textarea>			
-				{{ if $qcomment }}
-					<select id="qcomment-select-$id" name="qcomment-$id" class="qcomment" onchange="qCommentInsert(this,$id);" >
-					<option value=""></option>
-				{{ for $qcomment as $qc }}
-					<option value="$qc">$qc</option>				
-				{{ endfor }}
-					</select>
-				{{ endif }}
 
 				<div class="comment-edit-text-end"></div>
 				<div class="comment-edit-submit-wrapper" id="comment-edit-submit-wrapper-$id" style="display: none;" >

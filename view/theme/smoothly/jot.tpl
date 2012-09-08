@@ -1,11 +1,10 @@
+
 <div id="profile-jot-wrapper" > 
 	<div id="profile-jot-banner-wrapper">
 		<div id="profile-jot-desc" >&nbsp;</div>
 		<div id="character-counter" class="grey" style="display: none;">0</div>
-		<div id="profile-rotator-wrapper" style="display: $visitor;" >
-			<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display:none;"  />
-		</div> 		
 	</div>
+	<div id="profile-jot-banner-end"></div>
 
 	<form id="profile-jot-form" action="$action" method="post" >
 		<input type="hidden" name="type" value="$ptyp" />
@@ -16,12 +15,14 @@
 		<input type="hidden" name="post_id" value="$post_id" />
 		<input type="hidden" name="preview" id="jot-preview" value="0" />
 		<div id="jot-title-wrap"><input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none"></div>
+		<div id="jot-category-wrap"><input name="category" id="jot-category" type="text" placeholder="$placeholdercategory" value="$category" class="jothidden" style="display:none" /></div>
 		<div id="jot-text-wrap">
                 <img id="profile-jot-text-loading" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
-                <textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body" >{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>
+                <textarea rows="5" cols="88" class="profile-jot-text" id="profile-jot-text" name="body" >{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>
 		</div>
+
 	<div id="profile-upload-wrapper" class="jot-tool" style="display: none;" >
-		<div id="wall-image-upload-div" ><a href="#"  onclick="return false;" id="wall-image-upload" class="icon border camera" title="$upload"></a></div>
+		<div id="wall-image-upload-div" ><a onclick="return false;" id="wall-image-upload" class="icon border camera" title="$upload"></a></div>
 	</div>
 	<div id="profile-attach-wrapper" class="jot-tool" style="display: none;" >
 		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon border attach" title="$attach"></a></div>

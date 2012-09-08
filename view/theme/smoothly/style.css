@@ -79,10 +79,10 @@ li {
 
 
 input[type=text] {
-	border: 2px solid #b0b0b0;
+	border: 1px solid #b0b0b0;
 	padding: 2px;
-	/*width: 300px;*/
-	margin-left: 3px;
+	width: 466px;
+	margin-left: 0px;
 	-webkit-border-radius: 3px 3px 3px 3px;
 	-moz-border-radius: 3px 3px 3px 3px;
 	border-radius: 3px 3px 3px 3px;	
@@ -145,7 +145,7 @@ section {
 .mframe {
 	padding: 2px;
 	background-color: #efefef;
-	border: 2px solid #dddddd;
+	border: 1px solid #dddddd;
 	-moz-box-shadow: 3px 3px 4px #959494;
 	-webkit-box-shadow: 3px 3px 4px #959494;
 	box-shadow: 3px 3px 4px #959494;
@@ -451,7 +451,7 @@ aside {
 	/*width: 21%;*/
 	width: 200px; /*250*/
 	margin-top: 40px; /*50*/
-	font-size: 0.8em;
+	font-size: 1.0em;
 	font-style: bold;
 }
 
@@ -547,13 +547,14 @@ aside h4 { font-size: 1.3em; }
 
 #netsearch-box {
 	background-color: #f6f6f6;
-	padding: 10px 8px 10px 8px;
+	padding: 5px 5px 5px 5px;
 }
 #netsearch-box input[type="text"] {
-	width: 97%;
+	width: 175px;
 }
 #netsearch-box input[type="submit"] {
 	width: 48%;
+	margin-top: 5px;
 }
 
 h3#search:before {
@@ -666,7 +667,7 @@ h3#search:before {
 
 ul .sidebar-group-li{
 	list-style: none;
-	font-size: 1.2em;
+	font-size: 1.0em;
 	padding-bottom: 5px;
 }
 
@@ -1047,13 +1048,17 @@ profile-jot-banner-wrapper {
 }
 .wall-item-lock-wrapper { float: right; }
 .wall-item-dislike,
-.wall-item-like,
-.wall-item-author {
-	/*clear: left;*/
+.wall-item-like {
+	clear: left;
 	font-size: 0.9em;
-	margin: 0px 0px 10px 450px; /*140*/
-	padding-left: 0px; /*10*/
-/*	font-variant:small-caps; */
+	margin: 0px 0px 10px 450px;
+	padding-left: 0px;
+
+}
+.wall-item-author {
+	font-size: 0.9em;
+	margin: 0px 0px 0px 100px;
+	padding-left: 0px;
 }
 
 .wall-item-author a {
@@ -1571,7 +1576,7 @@ div[id$="wrapper"] br { clear: left; }
 
 select, input {
 	margin-top: 0px;
-	border: 2px solid #b0b0b0;
+	border: 1px solid #b0b0b0;
 	padding: 2px;
 	-webkit-border-radius: 3px 3px 3px 3px;
 	-moz-border-radius: 3px 3px 3px 3px;
@@ -1766,7 +1771,7 @@ margin-left: 0px;
 	float: left;
 	padding: 5px;
 	background-color: #efefef;
-	border: 2px dotted #eeeeee;
+	border: 1px dotted #eeeeee;
 	-moz-box-shadow: 3px 3px 4px #959494;
 	-webkit-box-shadow: 3px 3px 4px #959494;
 	box-shadow: 3px 3px 4px #959494;
@@ -3309,7 +3314,7 @@ ul.menu-popup {
 }
 
 hr.line-dots {
-    background: url("icons/dot.png") repeat-x scroll left center transparent;
+    background: url("dot.png") repeat-x scroll left center transparent;
     border: medium none;
     /*padding: 0.5em 0;*/
 }
