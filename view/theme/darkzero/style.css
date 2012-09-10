@@ -23,13 +23,23 @@ div.wall-item-content-wrapper.shiny {  background-image: url('shiny.png'); }
 nav #banner #logo-text a { color: #ffffff; }
 
 .wall-item-content-wrapper { 
-border: 1px solid #444444; 
-background: #444;  
-
+	border: 1px solid #444444; 
+	background: #444444;  
+}
+.wall-item-outside-wrapper.threaded > .wall-item-content-wrapper {
+	-moz-border-radius: 3px 3px 0px;
+	border-radius: 3px 3px 0px;	
 }
 .wall-item-tools {	background-color: #444444;   background-image: none;}
-.comment-wwedit-wrapper{ background-color: #444444; }
-.toplevel_item > .wall-item-comment-wrapper > .comment-wwedit-wrapper{ background-color: #333333; }
+.comment-wwedit-wrapper{
+	background-color: #333333;
+}
+.comment-wwedit-wrapper.threaded {
+	border: solid #444444;
+	border-width: 0px 3px 3px;
+	-moz-border-radius: 0px 0px 3px 3px;
+	border-radius: 0px 0px 3px 3px;	
+}
 .comment-edit-preview{ color: #000000; }
 .wall-item-content-wrapper.comment { background-color: #444444; border: 0px;}
 .photo-top-album-name{ background-color: #333333; }

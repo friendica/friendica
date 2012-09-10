@@ -6,7 +6,11 @@
 {{endif}}
 <div id="tread-wrapper-$item.id" class="tread-wrapper $item.toplevel">
 <a name="$item.id" ></a>
+{{ if $item.threaded }}
+<div class="wall-item-outside-wrapper $item.indent$item.previewing threaded" id="wall-item-outside-wrapper-$item.id" >
+{{ else }}
 <div class="wall-item-outside-wrapper $item.indent$item.previewing" id="wall-item-outside-wrapper-$item.id" >
+{{ endif }}
 	<div class="wall-item-content-wrapper $item.indent" id="wall-item-content-wrapper-$item.id" >
 		<div class="wall-item-info" id="wall-item-info-$item.id">
 			<div class="wall-item-photo-wrapper" id="wall-item-photo-wrapper-$item.id" 
@@ -93,10 +97,12 @@
 	{{ inc $item.template }}{{ endinc }}
 {{ endfor }}
 
+{{ if $item.comment }}
 {{ if $item.flatten }}
 <div class="wall-item-comment-wrapper" >
 	$item.comment
 </div>
+{{ endif }}
 {{ endif }}
 </div>
 {{if $item.comment_lastcollapsed}}</div>{{endif}}
