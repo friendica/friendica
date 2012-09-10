@@ -88,8 +88,19 @@ input[type=text] {
 	border-radius: 3px 3px 3px 3px;	
 }
 
+input[type=text-sidebar] {
+	border: 1px solid #b0b0b0;
+	padding: 2px;
+	width: 172px;
+	margin-left: 10px;
+	margin-top: 10px;
+	-webkit-border-radius: 3px 3px 3px 3px;
+	-moz-border-radius: 3px 3px 3px 3px;
+	border-radius: 3px 3px 3px 3px;	
+}
+
 input[type=submit] {
-	margin: 0px 0px 5px 2px;
+	margin: 10px;
 	border: none;
 	font-size: 0.9em;
 	padding: 5px;
@@ -127,7 +138,7 @@ input[type=submit]:active {
 
 section {
 	float: left;
-	padding-top: 60px;
+	padding-top: 40px; /*60*/
 	width: 730px;
 	font-size: 0.9em;
 	line-height: 1.2em;
@@ -277,10 +288,10 @@ nav {
 	padding: 0;
 	width: 960px;
 	z-index: 10000;
-	height: 50px;
+	height: 40px;
 	position: fixed;
 	color: #efefef;
-	background: url("nav-bg.png") no-repeat scroll 0px 7px transparent;
+	background: url("nav-bg.png") no-repeat scroll 0px 0px transparent;
 	/*background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #7c7d7b), color-stop(1, #555753) );*/
 	/*background:-moz-linear-gradient( center top, #7c7d7b 5%, #555753 100% );*/
 	/*filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#7c7d7b', endColorstr='#555753');*/
@@ -295,7 +306,7 @@ nav #banner {
 	display: block;
 	position: absolute;
 	margin-left: 3px; /*10*/
-	margin-top: 10px; /*5*/
+	margin-top: 3px; /*5*/
 	padding-bottom:5px;	
 }
 nav #banner #logo-text a {
@@ -309,7 +320,7 @@ nav #user-menu {
 	width: 190px; /*240*/
 	float: right;
 	margin-right: 5px; /*20%*/
-	margin-top: 11px;
+	margin-top: 3px;
 	padding: 5px;
 	position: relative;
 	vertical-align: middle;
@@ -376,7 +387,7 @@ ul#user-menu-popup li a.nav-sep { border-top: 1px solid #989898; border-style:in
 #notifications {
 	height: 32px;
 	position: absolute;
-	top:10px; left: 35%;
+	top:3px; left: 35%;
 }
 .nav-ajax-update {
 	width: 44px;
@@ -390,7 +401,7 @@ ul#user-menu-popup li a.nav-sep { border-top: 1px solid #989898; border-style:in
 	padding-left: 11px;
 }
 #notify-update { background-position: 0px -168px; }
-#net-update { background-position: 0px -126px }
+#net-update { background-position: 0px -126px; }
 #mail-update { background-position: 0px -40px; }
 #intro-update { background-position: 0px -84px; }
 #home-update { background-position: 0px 0px; }
@@ -550,11 +561,11 @@ aside h4 { font-size: 1.3em; }
 	padding: 5px 5px 5px 5px;
 }
 #netsearch-box input[type="text"] {
-	width: 175px;
+	width: 97%;
 }
 #netsearch-box input[type="submit"] {
-	width: 48%;
-	margin-top: 5px;
+	width: auto;
+	/*margin-top: 5px;*/
 }
 
 h3#search:before {
@@ -909,10 +920,9 @@ profile-jot-banner-wrapper {
 .tabs {
 	min-width: 400px;
 	list-style: none;
-	padding: 0px; /*10*/
+	padding: 20px 0px 0px;
 	/*border-bottom: 1px solid #efefef;*/
 	font-size: 0.9em;
-	margin-top: 0px;
 }
 .tabs li { display: inline;}
 
@@ -1162,7 +1172,7 @@ profile-jot-banner-wrapper {
 }
 
 .icon.drop,
-.icon.drophide { float: left;}
+.icon.drophide { float: right;}
 #item-delete-selected {	overflow: auto;	width: 100%;}
 
 
@@ -1254,6 +1264,7 @@ profile-jot-banner-wrapper {
 
 #item-delete-selected-desc {
 	color: #898989;
+	float: right;
 }
 
 .wall-item-body code {
@@ -1305,7 +1316,7 @@ div[id$="wrapper"] br { clear: left; }
 #profile-listing-new-link-wrapper {
 	float: left;
 	display: inline;
-	width: 130px;
+	width: auto;
 	margin-left:5px;
 	margin-top: 20px;
 	padding: 5px 10px 5px 10px;
@@ -1779,7 +1790,7 @@ margin-left: 0px;
 
 .mail-list-detail {
 	margin-left: 100px;
-	width: 300px;
+	width: 600px;
 	min-height: 70px;
 	padding: 20px;
 	padding-top:10px;
@@ -1820,6 +1831,7 @@ margin-left: 0px;
 
 .mail-conv-outside-wrapper {
 	margin-bottom: 10px;
+	margin-top: 30px;
 }
 
 .mail-conv-sender {float: left; margin: 0px 5px 5px 0px; }
@@ -1837,8 +1849,8 @@ margin-left: 0px;
 
 .mail-conv-detail {
 	width: 500px;
-	padding: 30px;
-	padding-bottom: 10px;
+	padding: 20px;
+	padding-bottom: 20px;
 	margin-left: 20px;
 	margin-bottom: 0px;
 	vertical-align: middle;
@@ -2048,14 +2060,16 @@ margin-left: 0px;
 }
 
 #side-follow-submit {
-	width: 70px;
+	width: 178px;
+	margin: 10px;
+	text-align: center;
 }
 
 #side-match-link {
-	width: 180px;
+	width: 158px;
 	padding: 10px;
-	margin: auto;
-	margin-bottom: 20px;
+	margin: auto 10px 20px;
+	/*margin-bottom: 20px;*/
 	-moz-box-shadow:inset 0px 1px 0px 0px #cfcfcf;
 	-webkit-box-shadow:inset 0px 1px 0px 0px #cfcfcf;
 	box-shadow:inset 0px 1px 0px 0px #cfcfcf;
@@ -2068,7 +2082,7 @@ margin-left: 0px;
 	border-radius:5px;
 	padding: 5px 10px 5px 10px;
 	color: #efefef;
-	font-size: 1.2em;
+	font-size: 1.1em;
 	text-align: center;
 }
 
@@ -2091,7 +2105,7 @@ margin-left: 0px;
 }
 
 #side-invite-link {
-	width: 180px;
+	width: 80%;
 	padding: 10px;
 	margin: auto;
 	margin-bottom: 20px;
@@ -2107,7 +2121,7 @@ margin-left: 0px;
 	border-radius:5px;
 	padding: 5px 10px 5px 10px;
 	color: #efefef;
-	font-size: 1.2em;
+	font-size: 1.1em;
 	text-align: center;	
 }
 
@@ -2131,7 +2145,7 @@ margin-left: 0px;
 }
 
 #side-suggest-link {
-	width: 180px;
+	width: 80%;
 	padding: 10px;
 	margin: auto;
 	margin-bottom: 20px;
@@ -2147,7 +2161,7 @@ margin-left: 0px;
 	border-radius:5px;
 	padding: 5px 10px 5px 10px;
 	color: #efefef;
-	font-size: 1.2em;
+	font-size: 1.1em;
 	text-align: center;	
 }
 
@@ -2309,14 +2323,16 @@ margin-left: 0px;
 }
 
 #settings-default-perms {
-	width: 160px;
+	width: 260px;
 	text-align: center;
 	-moz-box-shadow:inset 0px 1px 0px 0px #cfcfcf;
 	-webkit-box-shadow:inset 0px 1px 0px 0px #cfcfcf;
 	box-shadow:inset 0px 1px 0px 0px #cfcfcf;
 	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #7c7d7b), color-stop(1, #555753) );
-	background:-moz-linear-gradient( center top, #7c7d7b 5%, #555753 100% );
+	/*background:-moz-linear-gradient( center top, #7c7d7b 5%, #555753 100% );*/
+	background: -moz-linear-gradient(center top , #BDBDBD 5%, #A2A2A2 100%) repeat scroll 0 0 #BDBDBD;
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#7c7d7b', endColorstr='#555753');
+	color: #EFEFEF;
 	background-color:#7c7d7b;
 	-moz-border-radius:5px;
 	-webkit-border-radius:5px;
@@ -2774,7 +2790,7 @@ tr {
 	list-style-position: inside;
 	font-size: 1em;
 	padding: 5px;
-	width: 100px;
+	width: auto;
 	margin: 5px;
 }
 
@@ -2834,7 +2850,8 @@ tr {
 /* =============== */
 
 .field {
-	margin-bottom: 5px;
+	margin-bottom: 10px;
+	margin-top: 10px;
 	padding-bottom: 0px;
 	/*overflow: auto;*/
 	width: 90%;
