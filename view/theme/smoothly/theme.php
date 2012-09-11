@@ -2,8 +2,8 @@
 
 /*
  * Name: Smoothly
- * Description: Theme opzimized for Tablets
- * Version: 0.4
+ * Description: Theme optimized for iPad/iPad2
+ * Version: 0.5
  * Author: Alex <https://friendica.pixelbits.de/profile/alex>
  * Maintainer: Alex <https://friendica.pixelbits.de/profile/alex>
  * Screenshot: <a href="screenshot.png">Screenshot</a>
@@ -13,6 +13,7 @@ $a->theme_info = array();
 
 function smoothly_init(&$a) {
 $a->page['htmlhead'] .= <<< EOT
+
 <script>
 function insertFormatting(comment,BBcode,id) {
 	
@@ -90,7 +91,6 @@ $('.savedsearchterm').hover(
 	);
 
 });
-
 
 </script>
 EOT;

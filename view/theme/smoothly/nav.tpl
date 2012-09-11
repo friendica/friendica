@@ -58,9 +58,11 @@
 	</div>
 </nav>
 
+<div id="scrollup">
+<a href="#top"><img src="view/theme/smoothly/totop.png"
+    alt="back to top" title="Back to top" /></a>
+</div>
 
 <ul id="nav-notifications-template" style="display:none;" rel="template">
 	<li class="{4}"><a href="{0}"><img src="{1}" height="24" width="24" alt="" />{2} <span class="notif-when">{3}</span></a></li>
 </ul>
-
-
