@@ -3,7 +3,7 @@
 /*
  * Name: Smoothly
  * Description: Theme optimized for iPad/iPad2
- * Version: 0.5
+ * Version: 0.6
  * Author: Alex <https://friendica.pixelbits.de/profile/alex>
  * Maintainer: Alex <https://friendica.pixelbits.de/profile/alex>
  * Screenshot: <a href="screenshot.png">Screenshot</a>

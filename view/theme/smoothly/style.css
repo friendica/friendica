@@ -3,7 +3,7 @@
   	Smoothly
    
   	Created by Anne Walk and Devlon Duthie on 2011-09-24
-	Modified by alex@friendica.pixelbits.de on 2012-09-11
+	Modified by alex@friendica.pixelbits.de on 2012-09-12
 
 
 ** Colors ** 
@@ -22,7 +22,7 @@ You can switch out the colors of the header, buttons and links by using a find a
 body {
     margin: 0 auto;
     padding-bottom: 3em;
-    position: relative;
+    /*position: relative;*/
     width: 960px;
     font-family: "Lucida Grande","Lucida Sans Unicode",Arial,Verdana,sans-serif;
     font-size: 15px;
@@ -176,34 +176,39 @@ section {
 }
 
 .button {
-	border: none;
+	border: 1px solid #7C7D7B;
+	box-shadow: 0 0 8px #BDBDBD;
+		-moz-box-shadow: 3px 3px 4px #959494;
+		-webkit-box-shadow: 3px 3px 4px #959494;
+	border-radius: 5px 5px 5px 5px;
 	font-size: 1em;
-	-moz-box-shadow:inset 0px 1px 0px 0px #cfcfcf;
-	-webkit-box-shadow:inset 0px 1px 0px 0px #cfcfcf;
-	box-shadow:inset 0px 1px 0px 0px #cfcfcf;
-	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bdbdbd), color-stop(1, #a2a2a2) );
-	background:-moz-linear-gradient( center top, #bdbdbd 5%, #a2a2a2 100% );
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#bdbdbd', endColorstr='#a2a2a2');
-	background-color:#bdbdbd;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-	border-radius:5px;
-	color:#efefef;
-	text-align: center;	
+	box-shadow: inset 0px 0px 0px 0px #cfcfcf;
+		-moz-box-shadow:inset 0px 0px 0px 0px #cfcfcf;
+		-webkit-box-shadow:inset 0px 0px 0px 0px #cfcfcf;
+	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bdbdbd), color-stop(1, #a2a2a2) );
+	background: -moz-linear-gradient( center top, #bdbdbd 5%, #a2a2a2 100% );
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bdbdbd', endColorstr='#a2a2a2');
+	background-color: #bdbdbd;
+	color: #efefef;
+	text-align: center;
 }
 
 .button:hover {
-	border: none;
-	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1873a2), color-stop(1, #6da6c4) );
-	background:-moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
-	background-color:#1873a2;
-	color: #efefef;	
+	border: 1px solid #7C7D7B;
+	box-shadow: 0 0 8px #BDBDBD;
+		-moz-box-shadow: 3px 3px 4px #959494;
+		-webkit-box-shadow: 3px 3px 4px #959494;
+	border-radius: 5px 5px 5px 5px;
+	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1873a2), color-stop(1, #6da6c4) );
+	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
+	background-color: #1873a2;
+	color: #efefef;
 }
 
 .button:active {
-	position:relative;
-	top:1px;
+	position: relative;
+	top: 1px;
 }
 
 .button a {
@@ -300,14 +305,14 @@ nav {
 	height: 40px;
 	position: fixed;
 	color: #efefef;
-	background: url("nav-bg.png") no-repeat scroll 0px 0px transparent;
-	/*background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #7c7d7b), color-stop(1, #555753) );*/
-	/*background:-moz-linear-gradient( center top, #7c7d7b 5%, #555753 100% );*/
-	/*filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#7c7d7b', endColorstr='#555753');*/
-	/*background-color:#7c7d7b;*/
 	margin-bottom: 16px;
 	font-size: 15px;
-	/*border-bottom: 1px solid #494948;*/
+	background: -moz-linear-gradient(center top , #BDBDBD 5%, #A2A2A2 100%) repeat scroll 0 0 #BDBDBD;
+	border: 1px solid #7C7D7B;
+	box-shadow: 0 0 8px #BDBDBD;
+		-moz-box-shadow: 3px 3px 4px #959494;
+		-webkit-box-shadow: 3px 3px 4px #959494;
+	border-radius: 5px 5px 5px 5px;
 }
 nav a { text-decoration: none;	color: #eeeeec; border:0px;}
 nav a:hover { text-decoration: none;	color: #eeeeec; border:0px;}
@@ -326,9 +331,9 @@ nav #banner #logo-text a {
 }
 nav #user-menu {
 	display: block;
-	width: 190px; /*240*/
+	width: 190px;
 	float: right;
-	margin-right: 5px; /*20%*/
+	margin-right: 5px;
 	margin-top: 3px;
 	padding: 5px;
 	position: relative;
@@ -340,7 +345,7 @@ nav #user-menu {
 	-moz-border-radius:5px;
 	-webkit-border-radius:5px;
 	border-radius:5px;
-	border: 1px solid #9A9A9A;
+	border: 1px solid #7C7D8B;
 	color:#efefef;
 	text-decoration:none;
 	text-align: center;   
@@ -467,11 +472,11 @@ ul#user-menu-popup li a.nav-sep { border-top: 1px solid #989898; border-style:in
 
 aside {
 	float: right;
-	margin-right: 5px; /*10%*/
+	/*margin-right: 5px;/
 	/*width: 21%;*/
-	width: 200px; /*250*/
+	width: 205px; /*250*/
 	margin-top: 40px; /*50*/
-	font-size: 1.0em;
+	font-size: 0.9em;
 	font-style: bold;
 }
 
@@ -516,7 +521,7 @@ aside h4 { font-size: 1.3em; }
 	color: #626262;
 	text-align: center;
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 1em;
 }
 .allcontact-link a {
 	padding-bottom: 10px;
@@ -769,9 +774,12 @@ ul .sidebar-group-li .icon{
 /* ================== */
 
 .contact-block-img {
-	width: 48px; /*42*/
-	height: 48px;
-	padding-right: 2px;
+	width: 47px;
+	height: 47px;
+	margin-right: 2px;
+	border: 1px solid #C5C5C5;
+    border-radius: 3px 3px 3px 3px;
+    box-shadow: 0 0 8px #BDBDBD;
 }
 .contact-block-div {
 	float: left;
@@ -1092,9 +1100,10 @@ profile-jot-banner-wrapper {
 .wall-item-location .icon { float: left; }
 .wall-item-location > a {
 	margin-left: 0px; /*25*/
+	margin-right: 2px;
 	font-size: 0.9em;
 	display: block;
-/*	font-variant:small-caps; */
+	font-variant:small-caps;
 	color: #898989;
 }
 
@@ -1776,12 +1785,13 @@ margin-left: 0px;
 
 .mail-list-sender {
 	float: left;
-	padding: 5px;
+	padding: 2px;
 	background-color: #efefef;
-	border: 1px dotted #eeeeee;
-	-moz-box-shadow: 3px 3px 4px #959494;
-	-webkit-box-shadow: 3px 3px 4px #959494;
-	box-shadow: 3px 3px 4px #959494;
+	border: 1px solid #C5C5C5;
+    border-radius: 3px 3px 3px 3px;
+    box-shadow: 0 0 8px #BDBDBD;
+		-moz-box-shadow: 3px 3px 4px #959494;
+		-webkit-box-shadow: 3px 3px 4px #959494;
 }
 
 .mail-list-detail {
@@ -3170,7 +3180,7 @@ a.active {
 	background:-moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
 	background-color:#1873a2;
-	color:#efefef;
+	color:#fec01d;
 	padding: 5px 10px 5px 10px;
 	margin-right: 5px;
 }
