@@ -46,9 +46,52 @@ class Photo {
         }
         $this->type = $type;
 
-        if($this->is_imagick()) {
-            $this->image = new Imagick();
-            $this->image->readImageBlob($data);
+        if($this->is_imagick() && $this->load_data($data)) {
+			return true;
+		} else {
+			// Failed to load with Imagick, fallback
+			$this->imagick = false;
+		}
+		return $this->load_data($data);
+    }
+
+    public function __destruct() {
+        if($this->image) {
+            if($this->is_imagick()) {
+                $this->image->clear();
+                $this->image->destroy();
+                return;
+            }
+            imagedestroy($this->image);
+        }
+    }
+
+    public function is_imagick() {
+        return $this->imagick;
+    }
+
+    /**
+     * Maps Mime types to Imagick formats
+     */
+    public function get_FormatsMap() {
+        $m = array(
+            'image/jpeg' => 'JPG',
+            'image/png' => 'PNG',
+            'image/gif' => 'GIF'
+        );
+        return $m;
+    }
+
+    private function load_data($data) {
+		if($this->is_imagick()) {
+			$this->image = new Imagick();
+            try {
+				$this->image->readImageBlob($data);
+			}
+			catch (Exception $e) {
+				// Imagick couldn't use the data
+				return false;
+			}
 
             /**
              * Setup the image to the format it will be saved to
@@ -85,45 +128,28 @@ class Photo {
                         $quality = JPEG_QUALITY;
                     $this->image->setCompressionQuality($quality);
             }
-        } else {
-            $this->valid = false;
-            $this->image = @imagecreatefromstring($data);
-            if($this->image !== FALSE) {
-                $this->width  = imagesx($this->image);
-                $this->height = imagesy($this->image);
-                $this->valid  = true;
-                imagealphablending($this->image, false);
-                imagesavealpha($this->image, true);
-            }
-        }
-    }
 
-    public function __destruct() {
-        if($this->image) {
-            if($this->is_imagick()) {
-                $this->image->clear();
-                $this->image->destroy();
-                return;
-            }
-            imagedestroy($this->image);
-        }
-    }
+            $this->width  = $this->image->getImageWidth();
+			$this->height = $this->image->getImageHeight();
+			$this->valid  = true;
 
-    public function is_imagick() {
-        return $this->imagick;
-    }
+            return true;
+		}
 
-    /**
-     * Maps Mime types to Imagick formats
-     */
-    public function get_FormatsMap() {
-        $m = array(
-            'image/jpeg' => 'JPG',
-            'image/png' => 'PNG',
-            'image/gif' => 'GIF'
-        );
-        return $m;
-    }
+		$this->valid = false;
+		$this->image = @imagecreatefromstring($data);
+		if($this->image !== FALSE) {
+			$this->width  = imagesx($this->image);
+			$this->height = imagesy($this->image);
+			$this->valid  = true;
+			imagealphablending($this->image, false);
+			imagesavealpha($this->image, true);
+
+			return true;
+		}
+		
+		return false;
+	}
 
     public function is_valid() {
         if($this->is_imagick())
