@@ -21,6 +21,9 @@
 	<section><?php if(x($page,'content')) echo $page['content']; ?>
 	</section>
 	</div>
+	<footer>
+	<a href="<?php echo $a->get_baseurl() ?>/toggle_mobile?off=1&address=<?php echo curPageURL() ?>">toggle mobile</a>
+	</footer>
 
 	<?php } else { ?>
 	<div class='main-container'>
@@ -33,7 +36,10 @@
 		</div>
 		<right_aside><?php if(x($page,'right_aside')) echo $page['right_aside']; ?></right_aside>
 		<?php if( ($a->module === 'contacts') && x($page,'aside')) echo $page['aside']; ?>
-		<footer><?php if(x($page,'footer')) echo $page['footer']; ?></footer>
+		<footer>
+		<a href="<?php echo $a->get_baseurl() ?>/toggle_mobile?off=1&address=<?php echo curPageURL() ?>">toggle mobile</a>
+		<?php if(x($page,'footer')) echo $page['footer']; ?>
+		</footer>
 <!--		</div>-->
 	</div>
 	<?php } ?>

@@ -152,3 +152,9 @@ div.section-wrapper {
 #login-submit-wrapper {
 	text-align: center;
 }
+
+footer {
+	text-align: center;
+	padding-top: 3em;
+	padding-bottom: 1em;
+}

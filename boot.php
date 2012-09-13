@@ -1511,13 +1511,19 @@ if(! function_exists('current_theme')) {
 		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
 	
 		if($is_mobile) {
-			$system_theme = ((isset($a->config['system']['mobile-theme'])) ? $a->config['system']['mobile-theme'] : '');
-			$theme_name = ((isset($_SESSION) && x($_SESSION,'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
-
-			if($theme_name === '---') {
-				// user has selected to have the mobile theme be the same as the normal one
+			if(isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
 				$system_theme = '';
 				$theme_name = '';
+			}
+			else {
+				$system_theme = ((isset($a->config['system']['mobile-theme'])) ? $a->config['system']['mobile-theme'] : '');
+				$theme_name = ((isset($_SESSION) && x($_SESSION,'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
+
+				if($theme_name === '---') {
+					// user has selected to have the mobile theme be the same as the normal one
+					$system_theme = '';
+					$theme_name = '';
+				}
 			}
 		}
 		if(!$is_mobile || ($system_theme === '' && $theme_name === '')) {
@@ -1759,4 +1765,21 @@ function build_querystring($params, $name=null) {
         } 
     } 
     return $ret;    
+}
+
+/**
+* Returns the complete URL of the current page, e.g.: http(s)://something.com/network
+*
+* Taken from http://webcheatsheet.com/php/get_current_page_url.php
+*/
+function curPageURL() {
+	$pageURL = 'http';
+	if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+	$pageURL .= "://";
+	if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
+		$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+	} else {
+		$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+	}
+	return $pageURL;
 }

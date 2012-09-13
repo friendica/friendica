@@ -393,8 +393,8 @@ section {
 
 /* footer */
 footer {
-    display: none;
-
+	text-align: center;
+	padding-bottom: 1em;
 }
 
 .birthday-today, .event-today {
