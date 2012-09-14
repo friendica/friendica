@@ -213,8 +213,6 @@ section {
 .button:hover {
 	border: 1px solid #7C7D7B;
 	box-shadow: 0 0 8px #BDBDBD;
-	/*	-moz-box-shadow: 3px 3px 4px #959494;
-		-webkit-box-shadow: 3px 3px 4px #959494;*/
 	border-radius: 5px 5px 5px 5px;
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1873a2), color-stop(1, #6da6c4) );
 	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
@@ -905,30 +903,51 @@ ul .sidebar-group-li .icon {
 	background: #FFFFC8;
 }
 
-#profile-jot-perms, #profile-jot-submit, #jot-preview-link {
+#profile-jot-perms, #profile-jot-submit {
 	width: 60px;
 	font-size: 12px;
-	box-shadow: inset 0px 1px 0px 0px #cfcfcf;
-		-moz-box-shadow: inset 0px 1px 0px 0px #cfcfcf;
-		-webkit-box-shadow: inset 0px 1px 0px 0px #cfcfcf;
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bdbdbd), color-stop(1, #a2a2a2) );
 	background: -moz-linear-gradient( center top, #bdbdbd 5%, #a2a2a2 100% );
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bdbdbd', endColorstr='#a2a2a2');
 	background-color: #bdbdbd;
-	border-radius: 5px;
-		-moz-border-radius: 5px;
-		-webkit-border-radius: 5px;
 	display: inline-block;
 	color: #efefef;
 	text-decoration: none;
 	text-align: center;
+	border: 1px solid #7C7D7B;
+	border-radius: 5px 5px 5px 5px;
+}
+
+#jot-preview-link {
+	float: right;
+	width: 60px;
+	/*height: 10px;*/
+	margin-right: 180px;
+	/*margin-top: 0px;
+	margin-left: 10px;*/
+	font-size: 12px;
+	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bdbdbd), color-stop(1, #a2a2a2) );
+	background: -moz-linear-gradient( center top, #bdbdbd 5%, #a2a2a2 100% );
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bdbdbd', endColorstr='#a2a2a2');
+	background-color: #bdbdbd;
+	display: inline-block;
+	color: #efefef;
+	text-decoration: none;
+	text-align: center;
+	padding: 5px 5px;
+	border: 1px solid #7C7D7B;
+	border-radius: 5px 5px 5px 5px;
 }
 
 #profile-jot-perms {
-	width: 30px;
+	width: 25px;
+	float: right;
 	overflow: hidden;
-	border: 0px;
-	margin-left:5px;
+	margin-left: 10px;
+	margin-right: 80px;
+	margin-top: -28px;
+	border: 1px solid #7C7D7B;
+	border-radius: 5px 5px 5px 5px;
 }
 
 #jot-perms-perms .icon {
@@ -936,11 +955,13 @@ ul .sidebar-group-li .icon {
 }
 
 #profile-jot-submit {
-	float: left;
-	margin-right: 5px;
-	border: 0px;
-	margin-top: 0px;
-	margin-left: -30px;
+	width: 80px;
+	float: right;
+	margin-right: 90px;
+	margin-top: -28px;
+	margin-left: 10px;
+	border: 1px solid #7C7D7B;
+	border-radius: 5px 5px 5px 5px;
 }
 
 #profile-jot-perms:hover, 
@@ -950,6 +971,9 @@ ul .sidebar-group-li .icon {
 	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
 	background-color: #1873a2;
+	border: 1px solid #7C7D7B;
+	box-shadow: 0 0 8px #BDBDBD;
+	border-radius: 5px 5px 5px 5px;
 }
 
 #profile-jot-perms:active, 
@@ -960,9 +984,9 @@ ul .sidebar-group-li .icon {
 }
 
 #character-counter {
-	position: absolute: 
-		right: 100px; 
-		top:100px;
+	position: absolute;
+	right: 100px; 
+	top: 100px;
 }
 #profile-rotator-wrapper {
 	float: right; 
@@ -1396,7 +1420,8 @@ profile-jot-banner-wrapper {
 }
 
 #item-delete-selected {	
-	overflow: auto;	
+	overflow: auto;
+	margin-top: 20px;
 	width: 100%;
 }
 
@@ -1494,21 +1519,23 @@ profile-jot-banner-wrapper {
 .comment-edit-submit-wrapper { 
 	width: 80%; 
 	margin-left: 40px; 
-	text-align: right; 
+	text-align: left; 
 }
 
 .comment-edit-submit {
 	height: 22px;
+	padding: 5px 5px;
 	background-color: #a2a2a2;
 	color: #eeeeec;
-	border-radius: 5px;
-		-webkit-border-radius: 5px;
-		-moz-border-radius: 5px;
-	border: 0px;
+	border: 1px solid #CDCDCD;
+	border-radius: 5px 5px 5px 5px;
 }
 
 .comment-edit-submit:hover {
 	background-color: #1873a2;
+	border: 1px solid #CDCDCD;
+	border-radius: 5px 5px 5px 5px;
+	box-shadow: 0 0 8px #BDBDBD;
 }
 
 .comment-edit-submit:active {
@@ -1517,7 +1544,7 @@ profile-jot-banner-wrapper {
 
 #item-delete-selected-desc {
 	color: #898989;
-	float: left;
+	float: right;
 }
 
 .wall-item-body code {
