@@ -94,7 +94,7 @@ li.widget-list {
 	color: #1873a2;
 	cursor: pointer;
 	padding-left: 20px;
-	margin-left: 40px;
+	margin-left: 20px;
 	margin-bottom: 10px;
 	background: url("down.png") no-repeat scroll left center transparent;
 }
@@ -1426,7 +1426,8 @@ profile-jot-banner-wrapper {
 #item-delete-selected {	
 	overflow: auto;
 	margin-top: 20px;
-	width: 100%;
+	float: right;
+    	width: 230px;
 }
 
 /* ============ */
