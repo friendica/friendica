@@ -93,6 +93,10 @@ li.widget-list {
 .fakelink {
 	color: #1873a2;
 	cursor: pointer;
+	padding-left: 20px;
+	margin-left: 40px;
+	margin-bottom: 10px;
+	background: url("down.png") no-repeat scroll left center transparent;
 }
 
 .fakelink :hover {
@@ -334,8 +338,6 @@ nav {
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bdbdbd), color-stop(1, #a2a2a2) );
 	border: 1px solid #7C7D7B;
 	box-shadow: 0 0 8px #BDBDBD;
-	/*	-moz-box-shadow: 3px 3px 4px #959494;
-		-webkit-box-shadow: 3px 3px 4px #959494;*/
 	border-radius: 5px 5px 5px 5px;
 }
 
@@ -876,6 +878,7 @@ ul .sidebar-group-li .icon {
 }
 
 #profile-jot-submit-wrapper { 
+	margin-top: 30px;
 }
 
 #jot-title {
