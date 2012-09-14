@@ -984,9 +984,10 @@ ul .sidebar-group-li .icon {
 }
 
 #character-counter {
-	position: absolute;
-	right: 100px; 
-	top: 100px;
+	position: relative;
+	float: left;
+	right: 0px; 
+	top: 0px;
 }
 #profile-rotator-wrapper {
 	float: right; 
