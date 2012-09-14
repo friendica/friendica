@@ -3,7 +3,7 @@
   	Smoothly
    
   	Created by Anne Walk and Devlon Duthie on 2011-09-24
-	Modified by alex@friendica.pixelbits.de on 2012-09-13
+	Modified by alex@friendica.pixelbits.de on 2012-09-14
 
 
 ** Colors ** 
@@ -371,7 +371,8 @@ nav #banner #logo-text a {
 
 nav #user-menu {
 	display: block;
-	width: 190px;
+	width: auto;
+	min-width: 190px;
 	float: right;
 	margin-right: 5px;
 	margin-top: 4px;
@@ -3756,8 +3757,8 @@ hr.line-dots {
 ----------------------------------------------------------- */
 #scrollup {
 	position: fixed;
-	right: 5px;
-	bottom: 5px;
+	right: 1px;
+	bottom: 30px;
 	z-index: 100;
 }
 

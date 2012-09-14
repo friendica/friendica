@@ -58,9 +58,8 @@
 	</div>
 </nav>
 
-<div id="scrollup">
-<a href="#top"><img src="view/theme/smoothly/totop.png"
-    alt="back to top" title="Back to top" /></a>
+<div id="scrollup" >
+<a href="#top"><img src="view/theme/smoothly/totop.png" alt="back to top" title="Back to top" /></a>
 </div>
 
 <ul id="nav-notifications-template" style="display:none;" rel="template">

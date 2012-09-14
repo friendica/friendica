@@ -2,7 +2,7 @@
 
 /*
  * Name: Smoothly
- * Description: Theme optimized for iPad[2]
+ * Description: Like coffee with milk. Theme works fine with iPad[2].
  * Version: 0.7
  * Author: Alex <https://friendica.pixelbits.de/profile/alex>
  * Maintainer: Alex <https://friendica.pixelbits.de/profile/alex>
