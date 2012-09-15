@@ -373,8 +373,8 @@ function item_post(&$a) {
 
 	$match = null;
 
-	if((! $preview) && preg_match_all("/\[img\](.*?)\[\/img\]/",$body,$match)) {
-		$images = $match[1];
+	if((! $preview) && preg_match_all("/\[img([\=0-9x]*?)\](.*?)\[\/img\]/",$body,$match)) {
+		$images = $match[2];
 		if(count($images)) {
 			foreach($images as $image) {
 				if(! stristr($image,$a->get_baseurl() . '/photo/'))
