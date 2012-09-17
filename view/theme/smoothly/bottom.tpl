@@ -47,8 +47,7 @@ function cmtBbClose(id) {
     $(".comment-edit-bb-" + id).hide();
 }
 
-
-	$(document).ready(function(){
+$(document).ready(function(){
 	var doctitle = document.title;
 	function checkNotify() {
 	if(document.getElementById("notify-update").innerHTML != "")
@@ -58,4 +57,5 @@ function cmtBbClose(id) {
 	};
 	setInterval(function () {checkNotify();}, 10 * 1000);
 	})
+
 </script>
