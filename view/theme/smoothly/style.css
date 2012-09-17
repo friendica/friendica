@@ -96,7 +96,7 @@ li.widget-list {
 	padding-left: 20px;
 	margin-left: 20px;
 	margin-bottom: 10px;
-	background: url("down.png") no-repeat scroll left center transparent;
+	/*background: url("down.png") no-repeat scroll left center transparent;*/
 }
 
 .fakelink :hover {
@@ -922,12 +922,9 @@ ul .sidebar-group-li .icon {
 }
 
 #jot-preview-link {
-	float: right;
+	float: left;
 	width: 60px;
 	/*height: 10px;*/
-	margin-right: 180px;
-	/*margin-top: 0px;
-	margin-left: 10px;*/
 	font-size: 12px;
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bdbdbd), color-stop(1, #a2a2a2) );
 	background: -moz-linear-gradient( center top, #bdbdbd 5%, #a2a2a2 100% );
@@ -943,12 +940,12 @@ ul .sidebar-group-li .icon {
 }
 
 #profile-jot-perms {
-	width: 25px;
+	width: 27px;
+	height: 27px;
 	float: right;
 	overflow: hidden;
 	margin-left: 10px;
-	margin-right: 80px;
-	margin-top: -28px;
+	margin-top: -20px;
 	border: 1px solid #7C7D7B;
 	border-radius: 5px 5px 5px 5px;
 }
@@ -961,8 +958,9 @@ ul .sidebar-group-li .icon {
 	width: 80px;
 	float: right;
 	margin-right: 90px;
-	margin-top: -28px;
+	margin-top: -20px;
 	margin-left: 10px;
+	padding: 5px 5px;
 	border: 1px solid #7C7D7B;
 	border-radius: 5px 5px 5px 5px;
 }
@@ -2643,7 +2641,7 @@ margin-left: 0px;
 	background: url(login-bg.gif) no-repeat;
 	background-position: 0 50%;
 	padding-left: 18px;
-	width: 384px!important;
+	width: 220px!important;
 }
 
 #profile-tabs-wrapper {
@@ -3273,8 +3271,8 @@ tr {
 /* =============== */
 
 .field {
-	margin-bottom: 10px;
-	margin-top: 10px;
+	/*margin-bottom: 10px;
+	margin-top: 10px;*/
 	padding-bottom: 0px;
 	width: 90%;
 }
@@ -3807,6 +3805,6 @@ hr.line-dots {
 }
 
 /*div.wall-item-content-wrapper.shiny {
-	background-image: url("star.png");
+	background-image: url("shiny.png");
 	background-repeat: no-repeat;
 }*/
