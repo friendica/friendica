@@ -3805,6 +3805,6 @@ hr.line-dots {
 
 div.wall-item-content-wrapper.shiny {
 	background-image: url("shiny.png");
-	background-repeat: repeat-y;
+	background-repeat: repeat-x;
 }
 
