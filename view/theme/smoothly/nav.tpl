@@ -1,13 +1,4 @@
-<header>
-	<!-- 
-	<div id="site-location">$sitelocation</div>
-	<div id="banner">$banner</div>
-	-->
-</header>
-
 <nav>
-	<!-- $langselector -->
-
 	<span id="banner">$banner</span>
 
 	<div id="notifications">	

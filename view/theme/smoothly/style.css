@@ -175,7 +175,7 @@ input[type=submit]:active {
 
 section {
 	float: left;
-	padding-top: 45px; /*60*/
+	margin-top: 45px;
 	width: 730px;
 	font-size: 0.9em;
 	line-height: 1.2em;
@@ -546,7 +546,7 @@ ul#user-menu-popup li a.nav-sep {
 aside {
 	float: right;
 	width: 205px;
-	margin-top: 40px;
+	margin-top: 45px;
 	font-size: 0.9em;
 	font-style: bold;
 }
@@ -569,7 +569,6 @@ aside a{
 	font-size: 1.4em;
 	font-weight: bold;
 	border-bottom: none;
-	padding-top: 15px;
 }
 
 .vcard #profile-photo-wrapper {
