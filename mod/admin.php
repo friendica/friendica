@@ -664,6 +664,7 @@ function admin_page_users(&$a){
 				);
 					
 	function _setup_users($e){
+        $a = get_app();
 		$accounts = Array(
 			t('Normal Account'), 
 			t('Soapbox Account'),
@@ -674,6 +675,7 @@ function admin_page_users(&$a){
 		$e['register_date'] = relative_date($e['register_date']);
 		$e['login_date'] = relative_date($e['login_date']);
 		$e['lastitem_date'] = relative_date($e['lastitem_date']);
+        $e['is_admin'] = ($e['email'] === $a->config['admin_email']);
 		return $e;
 	}
 	$users = array_map("_setup_users", $users);
@@ -694,6 +696,7 @@ function admin_page_users(&$a){
 		'$delete' => t('Delete'),
 		'$block' => t('Block'),
 		'$unblock' => t('Unblock'),
+        '$siteadmin' => t('Site admin'),
 		
 		'$h_users' => t('Users'),
 		'$th_users' => array( t('Name'), t('Email'), t('Register date'), t('Last login'), t('Last item'),  t('Account') ),

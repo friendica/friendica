@@ -70,11 +70,20 @@
 						<td class='register_date'>$u.register_date</td>
 						<td class='login_date'>$u.login_date</td>
 						<td class='lastitem_date'>$u.lastitem_date</td>
-						<td class='login_date'>$u.page-flags</td>
-						<td class="checkbox"><input type="checkbox" class="users_ckbx" id="id_user_$u.uid" name="user[]" value="$u.uid"/></td>
+						<td class='login_date'>$u.page-flags {{ if $u.is_admin }}($siteadmin){{ endif }}</td>
+						<td class="checkbox"> 
+                                    {{ if $u.is_admin }}
+                                        &nbsp;
+                                    {{ else }}
+                                        <input type="checkbox" class="users_ckbx" id="id_user_$u.uid" name="user[]" value="$u.uid"/></td>
+                                    {{ endif }}
 						<td class="tools">
-							<a href="$baseurl/admin/users/block/$u.uid?t=$form_security_token" title='{{ if $u.blocked }}$unblock{{ else }}$block{{ endif }}'><span class='icon block {{ if $u.blocked==0 }}dim{{ endif }}'></span></a>
-							<a href="$baseurl/admin/users/delete/$u.uid?t=$form_security_token" title='$delete' onclick="return confirm_delete('$u.name')"><span class='icon drop'></span></a>
+                                    {{ if $u.is_admin }}
+                                        &nbsp;
+                                    {{ else }}
+                                        <a href="$baseurl/admin/users/block/$u.uid?t=$form_security_token" title='{{ if $u.blocked }}$unblock{{ else }}$block{{ endif }}'><span class='icon block {{ if $u.blocked==0 }}dim{{ endif }}'></span></a>
+                                        <a href="$baseurl/admin/users/delete/$u.uid?t=$form_security_token" title='$delete' onclick="return confirm_delete('$u.name')"><span class='icon drop'></span></a>
+                                    {{ endif }}
 						</td>
 					</tr>
 				{{ endfor }}
