@@ -130,7 +130,7 @@ $(document).ready(function() {
 	$(".comment-edit-bb-" + id).hide();
 	}
 	
-	$(document).ready(function(){
+	/*$(document).ready(function(){
 	var doctitle = document.title;
 	function checkNotify() {
 	if(document.getElementById("notify-update").innerHTML != "")
@@ -139,7 +139,17 @@ $(document).ready(function() {
 	document.title = doctitle;
 	};
 	setInterval(function () {checkNotify();}, 10 * 1000);
-	})
-
-	
+	})*/
+</script>
+<script>
+var pagetitle = null;
+$("nav").bind('nav-update',  function(e,data){
+  if (pagetitle==null) pagetitle = document.title;
+  var count = $(data).find('notif').attr('count');
+  if (count>0) {
+    document.title = "("+count+") "+pagetitle;
+  } else {
+    document.title = pagetitle;
+  }
+});
 </script>
