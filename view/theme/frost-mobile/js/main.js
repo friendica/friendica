@@ -78,7 +78,7 @@
  			if( last_popup_menu ) {
 				if( '#' + last_popup_menu.attr('id') !== $j(e.target).attr('rel')) {
 		 			last_popup_menu.hide();
-					if (last_popup_menu.attr('id') == "nav-notifications-menu" ) $j('section').show();
+					if (last_popup_menu.attr('id') == "nav-notifications-menu" ) $j('.main-container').show();
 		 			last_popup_button.removeClass("selected");
 		 			last_popup_menu = null;
 		 			last_popup_button = null;
@@ -100,13 +100,13 @@
 			if (menu.css("display") == "none") {
 				$j(this).parent().addClass("selected");
 				menu.show();
-				if (menu.attr('id') == "nav-notifications-menu" ) $j('section').hide();
+				if (menu.attr('id') == "nav-notifications-menu" ) $j('.main-container').hide();
 				last_popup_menu = menu;
 				last_popup_button = $j(this).parent();
 			} else {
 				$j(this).parent().removeClass("selected");
 				menu.hide();
-				if (menu.attr('id') == "nav-notifications-menu" ) $j('section').show();
+				if (menu.attr('id') == "nav-notifications-menu" ) $j('.main-container').show();
 				last_popup_menu = null;
 				last_popup_button = null;
 			}

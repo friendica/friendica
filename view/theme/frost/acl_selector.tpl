@@ -19,4 +19,5 @@
 	window.allowGID = $allowgid;
 	window.denyCID = $denycid;
 	window.denyGID = $denygid;
+	window.aclInit = "true";
 </script>

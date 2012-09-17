@@ -60,6 +60,8 @@
   	$jotplugins
 	</div>
 
+<!--	<span id="jot-display-location" style="display: none;"></span>-->
+
 	<div id="profile-rotator-wrapper" style="display: $visitor;" >
 		<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
 	</div> 

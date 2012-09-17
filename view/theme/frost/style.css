@@ -1309,6 +1309,10 @@ input#dfrn-url {
 }
 
 .wall-item-content img {
+	display: block;
+	margin-top: 10px;
+	margin-right: auto;
+	margin-left: auto;
 	max-width: 100%;
 }
 
@@ -3418,7 +3422,13 @@ aside input[type='text'] {
 	background-image: url('images/globe.png');
 	background-repeat: no-repeat;
 }
-.noglobe { background-position: -16px -16px;}
+/*.noglobe { background-position: -16px -16px;}*/
+.icon.noglobe {
+	display: block; width: 24px; height: 24px;
+	background-size: 100% 100%;
+	background-image: url('images/noglobe.png');
+	background-repeat: no-repeat;
+}
 .no { background-position: -32px -16px;}
 .pause { background-position: -48px -16px;}
 .play { background-position: -64px -16px;}

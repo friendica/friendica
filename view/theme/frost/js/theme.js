@@ -17,7 +17,7 @@ $j(document).ready(function() {
     });*/
 
 
-	if(typeof acl=="undefined"){
+	if(typeof window.aclInit !="undefined" && typeof acl=="undefined"){
 		acl = new ACL(
 			baseurl+"/acl",
 			[ window.allowCID,window.allowGID,window.denyCID,window.denyGID ]
@@ -935,6 +935,37 @@ function jotAudioURL() {
 
 
 function jotGetLocation() {
+
+/*	if(navigator.geolocation) {
+
+		navigator.geolocation.getCurrentPosition(function(position) {
+			var lat = position.coords.latitude;
+			var lng = position.coords.longitude;
+
+			$j.ajax({
+				type: 'GET',
+				url: 'http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng,
+				jsonp: 'json_callback',
+				contentType: 'application/json',
+				dataType: 'jsonp',
+				success: function(json) {
+					console.log(json);
+					var locationDisplay = json.address.building+', '+json.address.city+', '+json.address.state;
+					$j('#jot-location').val(locationDisplay);
+					$j('#jot-display-location').html('Location: '+locationDisplay);
+					$j('#jot-display-location').show();
+				}
+			});
+		});
+
+	}
+	else {
+		reply = prompt(window.whereAreU, $j('#jot-location').val());
+		if(reply && reply.length) {
+			$j('#jot-location').val(reply);
+		}
+	}*/
+
 	reply = prompt(window.whereAreU, $j('#jot-location').val());
 	if(reply && reply.length) {
 		$j('#jot-location').val(reply);

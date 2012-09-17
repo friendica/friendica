@@ -49,7 +49,7 @@ $j(document).ready(function() {
 		}
 	}
 
-	if(typeof acl=="undefined"){
+	if(typeof window.aclInit !="undefined" && typeof acl=="undefined"){
 		acl = new ACL(
 			baseurl+"/acl",
 			[ window.allowCID,window.allowGID,window.denyCID,window.denyGID ]
