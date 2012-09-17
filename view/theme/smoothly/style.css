@@ -164,12 +164,12 @@ input[type=submit]:active {
 }
 
 ::selection	{
-	background: #fdf795;
+	background: #fec01d;
 	color: #000; /* Safari and Opera */
 }
 
 ::-moz-selection {
-	background: #fdf795;
+	background: #fec01d;
 	color: #000; /* Firefox */
 }
 
@@ -3801,10 +3801,10 @@ hr.line-dots {
 ----------------------------------------------------------- */
 .shiny {
 	background: #fbfde9;
-	border-radius: 5px;
 }
 
-/*div.wall-item-content-wrapper.shiny {
+div.wall-item-content-wrapper.shiny {
 	background-image: url("shiny.png");
-	background-repeat: no-repeat;
-}*/
+	background-repeat: repeat-y;
+}
+
