@@ -46,7 +46,7 @@ function fbrowser_content($a){
 			}
 				
 			$r = q("SELECT `resource-id`, `id`, `filename`, type, min(`scale`) AS `hiq`,max(`scale`) AS `loq`, `desc`  
-					FROM `photo` WHERE `uid` = %d $sql_extra
+					FROM `photo` WHERE `uid` = %d AND (height <= 320 AND width <= 320) $sql_extra
 					GROUP BY `resource-id` $sql_extra2",
 				intval(local_user())					
 			);
