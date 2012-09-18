@@ -65,3 +65,16 @@
 </ul>
 
 <div style="position: fixed; top: 3px; left: 5px; z-index:9999">$langselector</div>
+
+<script>
+var pagetitle = null;
+$("nav").bind('nav-update', function(e,data){
+if (pagetitle==null) pagetitle = document.title;
+var count = $(data).find('notif').attr('count');
+if (count>0) {
+document.title = "("+count+") "+pagetitle;
+} else {
+document.title = pagetitle;
+}
+});
+</script>

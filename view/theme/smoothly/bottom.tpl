@@ -48,14 +48,5 @@ function cmtBbClose(id) {
 }
 
 
-$(document).ready(function(){
-var doctitle = document.title;
-function checkNotify() {
-if(document.getElementById("notify-update").innerHTML != "")
-document.title = "("+document.getElementById("notify-update").innerHTML+") " + doctitle;
-else
-document.title = doctitle;
-};
-setInterval(function () {checkNotify();}, 10 * 1000);
-})
+
 </script>

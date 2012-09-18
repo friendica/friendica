@@ -93,9 +93,8 @@ li.widget-list {
 .fakelink {
 	color: #1873a2;
 	cursor: pointer;
-	padding-left: 20px;
-	margin-left: 20px;
 	margin-bottom: 10px;
+	margin-left: 10px;
 	/*background: url("down.png") no-repeat scroll left center transparent;*/
 }
 
@@ -1177,9 +1176,11 @@ profile-jot-banner-wrapper {
 	transition: all 0.25s ease-in-out;
 		-webkit-transition: all 0.25s ease-in-out;
 		-moz-transition: all 0.25s ease-in-out;
-	margin-top: 10px;
+	margin-top: 20px;
+	margin-left: 100px;
 	padding-bottom: 5px;
 	float: right;
+	width: 100%;
 }
 
 .wall-item-tools:hover {
@@ -1192,18 +1193,17 @@ profile-jot-banner-wrapper {
 }
 
 .wall-item-outside-wrapper.comment .wall-item-tools {
-	margin: 5px 5px 0px 70px;
+	/*margin: 5px 5px 0px 70px;*/
 	float: right;
 }
 
 .wall-item-like-buttons {
 	float: left;
-	padding-left: 10px;
 }
 
 .wall-item-like-buttons a.icon {
 	float: left;
-	margin-right: 5px;
+	margin-right: 10px;
 	display: inline;
 }
 
@@ -1213,13 +1213,12 @@ profile-jot-banner-wrapper {
 }
 
 .wall-item-delete-wrapper {
-	float: left;
-	margin-right: 5px;
+	float: right;
 }
 
 .wall-item-links-wrapper a.icon {
 	float: left;
-	margin-right: 5px;
+	margin-right: 10px;
 	display: inline;
 }
 
@@ -1266,8 +1265,8 @@ profile-jot-banner-wrapper {
 .wall-item-like {
 	clear: left;
 	font-size: 0.9em;
-	margin: 0px 0px 10px 450px;
-	padding-left: 0px;
+	margin: 0px 0px 10px 0px;
+	padding-left: 10px;
 }
 
 .wall-item-author {
@@ -1483,13 +1482,14 @@ profile-jot-banner-wrapper {
 
 .comment-wwedit-wrapper,
 .comment-edit-wrapper { 
-	margin: 30px 0px 0px 80px;
+	margin: 0px 0px 0px 80px;
 }
 
 .comment-wwedit-wrapper img,
 .comment-edit-wrapper img { 
 	width: 20px; 
-	height: 20px; 
+	height: 20px;
+	margin-top: 5px;
 }
 
 .comment-edit-photo-link { 
@@ -1926,6 +1926,7 @@ keygen, select {
 }
 
 input, textarea, keygen {
+	margin-top: 3px;
 	font-size: 0.9em;
 	letter-spacing: normal;
 	word-spacing: normal;
@@ -3379,19 +3380,19 @@ tr {
 .drop 		{ background-position: -110px 0px;}
 .drophide 	{ background-position: -130px 0px;}
 .edit 		{ background-position: -150px 0px;}
-.camera 		{ background-position: -170px 0px;}
+.camera 	{ background-position: -170px 0px;}
 .dislike 	{ background-position: -190px 0px;}
 .like 		{ background-position: -210px 0px;}
 .link 		{ background-position: -230px 0px;}
 .globe 		{ background-position: -50px  -20px;}
 .noglobe 	{ background-position: -70px  -20px;}
-.no 			{ background-position: -90px  -20px;}
+.no 		{ background-position: -90px  -20px;}
 .pause 		{ background-position: -110px -20px;}
 .play 		{ background-position: -130px -20px;}
-.pencil 		{ background-position: -150px -20px;}
+.pencil 	{ background-position: -150px -20px; margin-right: 10px;}
 .small-pencil	{ background-position: -170px -20px;}
 .recycle 	{ background-position: -190px -20px;}
-.remote-link	{ background-position: -210px -20px;}
+.remote-link	{ background-position: -210px -20px; margin-right: 10px;}
 .share 		{ background-position: -230px -20px;}
 .tools 		{ background-position: -50px  -40px;}
 .lock 		{ background-position: -70px  -40px;}
@@ -3412,13 +3413,13 @@ tr {
 
 .video 		{ background-position: -110px -40px;}
 .youtube 	{ background-position: -130px -40px;}
-.attach 		{ background-position: -190px -40px;}
+.attach 	{ background-position: -190px -40px;}
 .language 	{ background-position: -210px -40px;}
-.on 			{ background-position: -50px  -60px;}
+.on 		{ background-position: -50px  -60px;}
 .off 		{ background-position: -70px  -60px;}
 .prev 		{ background-position: -90px  -60px;}
 .next 		{ background-position: -110px -60px;}
-.tagged     	{ background-position: -130px -60px;}
+.tagged     	{ background-position: -130px -60px; margin-right: 10px;}
 .icon.dim 	{ opacity: 0.3;filter:alpha(opacity=30);}
 
 .attachtype {
