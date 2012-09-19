@@ -1,9 +1,9 @@
 /*
-	style.css
-	Smoothly
-
-	Created by Anne Walk and Devlon Duthie on 2011-09-24
-	Modified by alex@friendica.pixelbits.de on 2012-09-19
+  	style.css
+  	Smoothly
+   
+  	Created by Anne Walk and Devlon Duthie on 2011-09-24
+	Modified by alex@friendica.pixelbits.de on 2012-09-17
 
 
 ** Colors ** 
@@ -109,10 +109,11 @@ li.widget-list {
 
 
 input[type=text] {
+	float: left;
 	border: 1px solid #b0b0b0;
 	padding: 2px;
 	width: 466px;
-	margin-left: 0px;
+	margin-top: 10px;
 	border-radius: 3px 3px 3px 3px;
 		-webkit-border-radius: 3px 3px 3px 3px;
 		-moz-border-radius: 3px 3px 3px 3px;
@@ -647,7 +648,7 @@ aside h4 {
 	padding: 5px 5px 5px 5px;
 }
 #netsearch-box input[type="text"] {
-	width: 97%;
+	width: 90%;
 }
 #netsearch-box input[type="submit"] {
 	width: auto;
@@ -1179,7 +1180,7 @@ profile-jot-banner-wrapper {
 	margin-top: 20px;
 	padding-bottom: 5px;
 	float: right;
-	width: 15%;
+	width: auto;
 }
 
 .wall-item-tools:hover {
@@ -1231,7 +1232,8 @@ profile-jot-banner-wrapper {
 }
 
 .wall-item-delete-wrapper {
-	float: right;
+	float: left;
+	margin-right: 10px;
 }
 
 .wall-item-links-wrapper a.icon {
@@ -1944,7 +1946,7 @@ keygen, select {
 	/*-webkit-border-radius: ;*/
 }
 
-input, textarea, keygen {
+textarea, keygen {
 	margin-top: 3px;
 	font-size: 0.9em;
 	letter-spacing: normal;
@@ -1955,6 +1957,20 @@ input, textarea, keygen {
 	text-shadow: none;
 	display: inline-block;
 	text-align: -webkit-auto;	
+}
+
+input {
+	margin-top: 3px;
+	margin-right: 10px;
+	/*font-size: 0.9em;
+	letter-spacing: normal;
+	word-spacing: normal;
+	line-height: 1.2em;
+	text-transform: none;
+	text-indent: 0px;
+	text-shadow: none;
+	display: inline-block;
+	text-align: -webkit-auto;*/
 }
 
 .qq-upload-button {
@@ -2442,7 +2458,7 @@ margin-left: 0px;
 }
 
 #follow-sidebar {
-	margin-bottom: 20px;
+	margin-bottom: 80px;
 }
 
 #follow-sidebar h3:before {
@@ -3408,7 +3424,7 @@ tr {
 .no 		{ background-position: -90px  -20px;}
 .pause 		{ background-position: -110px -20px;}
 .play 		{ background-position: -130px -20px;}
-.pencil 	{ background-position: -150px -20px; margin-right: 20px;}
+.pencil 	{ background-position: -150px -20px; margin-right: 12px;}
 .small-pencil	{ background-position: -170px -20px;}
 .recycle 	{ background-position: -190px -20px;}
 .remote-link	{ background-position: -210px -20px; margin-right: 10px;}
