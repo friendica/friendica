@@ -16,7 +16,7 @@
 		<input type="hidden" name="preview" id="jot-preview" value="0" />
 		<div id="jot-title-wrap"><input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" value="$title" class="jothidden" style="display:none"></div>
 		<div id="jot-category-wrap"><input name="category" id="jot-category" type="text" placeholder="$placeholdercategory" value="$category" class="jothidden" style="display:none" /></div>
-		<div id="jot-text-wrap">
+		<div id="jot-text-wrap"><br /><br />
                 <img id="profile-jot-text-loading" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
                 <textarea rows="5" cols="88" class="profile-jot-text" id="profile-jot-text" name="body" >{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>
 		</div>
