@@ -1201,7 +1201,7 @@ profile-jot-banner-wrapper {
 	margin-left: 0px;
 	padding-bottom: 5px;
 	float: left;
-	width: 85%;
+	width: auto;
 }
 
 .wall-item-social:hover {
