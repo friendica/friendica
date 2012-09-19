@@ -1,9 +1,11 @@
 {{if $item.comment_firstcollapsed}}
 	<div class="hide-comments-outer">
-	<span id="hide-comments-total-$item.id" class="hide-comments-total">$item.num_comments</span> <span id="hide-comments-$item.id" class="hide-comments fakelink" onclick="showHideComments($item.id);">$item.hide_text</span>
+		<span id="hide-comments-total-$item.id" class="hide-comments-total">$item.num_comments</span> 
+		<span id="hide-comments-$item.id" class="hide-comments fakelink" onclick="showHideComments($item.id);">$item.hide_text</span>
 	</div>
 	<div id="collapsed-comments-$item.id" class="collapsed-comments" style="display: none;">
 {{endif}}
+
 <div id="tread-wrapper-$item.id" class="tread-wrapper $item.toplevel">
 <div class="wall-item-outside-wrapper $item.indent wallwall" id="wall-item-outside-wrapper-$item.id" >
 	<div class="wall-item-content-wrapper $item.indent" id="wall-item-content-wrapper-$item.id" >
@@ -30,8 +32,13 @@
 			<div class="wall-item-location" id="wall-item-location-$item.id">{{ if $item.location }}<span class="icon globe"></span>$item.location {{ endif }}</div>
 		</div>
 		<div class="wall-item-lock-wrapper">
-				{{ if $item.lock }}<div class="wall-item-lock"><img src="images/lock_icon.gif" class="lockview" alt="$item.lock" onclick="lockview(event,$item.id);" /></div>
-				{{ else }}<div class="wall-item-lock"></div>{{ endif }}
+			{{ if $item.lock }}
+			<div class="wall-item-lock">
+			<img src="images/lock_icon.gif" class="lockview" alt="$item.lock" onclick="lockview(event,$item.id);" />
+			</div>
+			{{ else }}
+			<div class="wall-item-lock"></div>
+			{{ endif }}
 		</div>
 		<div class="wall-item-content" id="wall-item-content-$item.id" >
 		<div class="wall-item-author">
@@ -59,12 +66,16 @@
 			<div class="wall-item-like-buttons" id="wall-item-like-buttons-$item.id">
 				<a href="#" class="icon like" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false"></a>
 				<a href="#" class="icon dislike" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"></a>
-				{{ if $item.vote.share }}<a href="#" class="icon recycle wall-item-share-buttons" title="$item.vote.share.0" onclick="jotShare($item.id); return false"></a>{{ endif }}
+				{{ if $item.vote.share }}
+				<a href="#" class="icon recycle wall-item-share-buttons" title="$item.vote.share.0" onclick="jotShare($item.id); return false"></a>				{{ endif }}
 				<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 			</div>
 			{{ endif }}
+
 			{{ if $item.plink }}
-				<div class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></div>
+			<div class="wall-item-links-wrapper">
+				<a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a>
+			</div>
 			{{ endif }}
 		 
 			{{ if $item.star }}
@@ -76,12 +87,17 @@
 
 		<div class="wall-item-tools" id="wall-item-tools-$item.id">
 			{{ if $item.edpost }}
-				<a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>
+			<a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>
 			{{ endif }}
+
 			<div class="wall-item-delete-wrapper" id="wall-item-delete-wrapper-$item.id" >
-				{{ if $item.drop.dropping }}<a href="item/drop/$item.id" onclick="return confirmDelete();" class="icon drophide" title="$item.drop.delete" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a>{{ endif }}
+				{{ if $item.drop.dropping }}
+				<a href="item/drop/$item.id" onclick="return confirmDelete();" class="icon drophide" title="$item.drop.delete" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a>
+				{{ endif }}
 			</div>
-				{{ if $item.drop.dropping }}<input type="checkbox" onclick="checkboxhighlight(this);" title="$item.drop.select" class="item-select" name="itemselected[]" value="$item.id" />{{ endif }}
+
+			{{ if $item.drop.dropping }}
+			<input type="checkbox" onclick="checkboxhighlight(this);" title="$item.drop.select" class="item-select" name="itemselected[]" value="$item.id" />			{{ endif }}
 			<div class="wall-item-delete-end"></div>
 		</div>
 
