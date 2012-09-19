@@ -1933,6 +1933,7 @@ select[size],
 select[multiple], 
 select[size][multiple] {
 	-webkit-appearance: listbox;
+	margin: 5px 0px 10px 30px;
 }
 
 select {
