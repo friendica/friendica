@@ -112,7 +112,7 @@ input[type=text] {
 	float: left;
 	border: 1px solid #b0b0b0;
 	padding: 2px;
-	width: 466px;
+	width: 575px;
 	margin-top: 10px;
 	border-radius: 3px 3px 3px 3px;
 		-webkit-border-radius: 3px 3px 3px 3px;
@@ -884,7 +884,7 @@ ul .sidebar-group-li .icon {
 #jot-title {
 	margin: 0px;
 	height: 20px;
-	width: 466px;
+	width: 575px;
 	font-weight: bold;
 	border: 1px solid #cccccc;
 }
@@ -957,7 +957,7 @@ ul .sidebar-group-li .icon {
 #profile-jot-submit {
 	width: 80px;
 	float: right;
-	margin-right: 90px;
+	margin-right: 145px;
 	margin-top: -20px;
 	margin-left: 10px;
 	padding: 5px 5px;
