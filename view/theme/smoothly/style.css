@@ -1,9 +1,9 @@
 /*
-	style.css
-	Smoothly
+  	style.css
+  	Smoothly
    
-	Created by Anne Walk and Devlon Duthie on 2011-09-24
-	Modified by alex@friendica.pixelbits.de on 2012-09-18
+  	Created by Anne Walk and Devlon Duthie on 2011-09-24
+	Modified by alex@friendica.pixelbits.de on 2012-09-17
 
 
 ** Colors ** 
@@ -1177,10 +1177,9 @@ profile-jot-banner-wrapper {
 		-webkit-transition: all 0.25s ease-in-out;
 		-moz-transition: all 0.25s ease-in-out;
 	margin-top: 20px;
-	margin-left: 100px;
 	padding-bottom: 5px;
 	float: right;
-	width: 100%;
+	width: 15%;
 }
 
 .wall-item-tools:hover {
@@ -1189,11 +1188,30 @@ profile-jot-banner-wrapper {
 	transition: all 0.25s ease-in-out;	
 		-webkit-transition: all 0.25s ease-in-out;
 		-moz-transition: all 0.25s ease-in-out;
-	margin-left: 140px;
+}
+
+.wall-item-social { 
+	filter: alpha(opacity=60);
+	opacity: 0.7;
+	transition: all 0.25s ease-in-out;
+		-webkit-transition: all 0.25s ease-in-out;
+		-moz-transition: all 0.25s ease-in-out;
+	margin-top: 20px;
+	margin-left: 0px;
+	padding-bottom: 5px;
+	float: left;
+	width: 85%;
+}
+
+.wall-item-social:hover {
+	filter: alpha(opacity=100);
+	opacity: 1;
+	transition: all 0.25s ease-in-out;	
+		-webkit-transition: all 0.25s ease-in-out;
+		-moz-transition: all 0.25s ease-in-out;
 }
 
 .wall-item-outside-wrapper.comment .wall-item-tools {
-	/*margin: 5px 5px 0px 70px;*/
 	float: right;
 }
 
@@ -1224,6 +1242,7 @@ profile-jot-banner-wrapper {
 
 .pencil {
 	float: left;
+	margin-right: 20px;
 }
 
 .star-item {
@@ -3389,7 +3408,7 @@ tr {
 .no 		{ background-position: -90px  -20px;}
 .pause 		{ background-position: -110px -20px;}
 .play 		{ background-position: -130px -20px;}
-.pencil 	{ background-position: -150px -20px; margin-right: 10px;}
+.pencil 	{ background-position: -150px -20px; margin-right: 20px;}
 .small-pencil	{ background-position: -170px -20px;}
 .recycle 	{ background-position: -190px -20px;}
 .remote-link	{ background-position: -210px -20px; margin-right: 10px;}

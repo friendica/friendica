@@ -58,7 +58,7 @@
 		<hr class="line-dots">
 		</div>
 -->
-		<div class="wall-item-tools" id="wall-item-tools-$item.id">
+		<div class="wall-item-social" id="wall-item-social-$item.id">
 			{{ if $item.vote }}
 			<div class="wall-item-like-buttons" id="wall-item-like-buttons-$item.id">
 				<a href="#" class="icon like" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false"></a>
@@ -69,23 +69,24 @@
 			{{ endif }}
 			{{ if $item.plink }}
 				<div class="wall-item-links-wrapper"><a href="$item.plink.href" title="$item.plink.title" target="external-link" class="icon remote-link"></a></div>
-			{{ endif }}
-			{{ if $item.edpost }}
-				<a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>
-			{{ endif }}
-			 
-			{{ if $item.star }}
+	 		{{ if $item.star }}
 			<a href="#" id="starred-$item.id" onclick="dostar($item.id); return false;" class="star-item icon $item.isstarred" title="$item.star.toggle"></a>
 			<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item icon tagged" title="$item.star.tagger"></a>
 			{{ endif }}
 			
+		</div>
+
+		<div class="wall-item-tools" id="wall-item-tools-$item.id">
+			{{ endif }}
+			{{ if $item.edpost }}
+				<a class="editpost icon pencil" href="$item.edpost.0" title="$item.edpost.1"></a>
+			{{ endif }}
 			<div class="wall-item-delete-wrapper" id="wall-item-delete-wrapper-$item.id" >
 				{{ if $item.drop.dropping }}<a href="item/drop/$item.id" onclick="return confirmDelete();" class="icon drophide" title="$item.drop.delete" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a>{{ endif }}
 			</div>
 				{{ if $item.drop.dropping }}<input type="checkbox" onclick="checkboxhighlight(this);" title="$item.drop.select" class="item-select" name="itemselected[]" value="$item.id" />{{ endif }}
 			<div class="wall-item-delete-end"></div>
 		</div>
-		
 	</div>
 	<div class="wall-item-wrapper-end"></div>
 	<div class="wall-item-like" id="wall-item-like-$item.id">$item.like</div>
