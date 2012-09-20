@@ -1361,6 +1361,13 @@ input#dfrn-url {
 	-webkit-border-radius: 7px;
 }
 
+.wall-item-content img.smiley {
+	display: inline;
+	margin: auto;
+	border-radius: 0;
+	-webkit-border-radius: 0;
+}
+
 .comment .wall-item-content img {
 	max-width: 280px;
 }
@@ -3398,6 +3405,7 @@ aside input[type='text'] {
 	text-decoration: none;
 }
 .field .onoff .off {
+
 	border-color:#666666;
 	padding-left: 40px;
 	background-position: left center;

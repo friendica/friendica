@@ -275,7 +275,7 @@ function onepoll_run($argv, $argc){
 			openssl_private_decrypt(hex2bin($mailconf[0]['pass']),$password,$x[0]['prvkey']);
 			$mbox = email_connect($mailbox,$mailconf[0]['user'],$password);
 			unset($password);
-			logger("Mail: Connect");
+			logger("Mail: Connect to " . $mailconf[0]['user']);
 			if($mbox) {
 				q("UPDATE `mailacct` SET `last_check` = '%s' WHERE `id` = %d AND `uid` = %d LIMIT 1",
 					dbesc(datetime_convert()),
@@ -289,7 +289,7 @@ function onepoll_run($argv, $argc){
 			$msgs = email_poll($mbox,$contact['addr']);
 
 			if(count($msgs)) {
-				logger("Mail: Parsing ".count($msgs)." mails.", LOGGER_DEBUG);
+				logger("Mail: Parsing ".count($msgs)." mails for ".$mailconf[0]['user'], LOGGER_DEBUG);
 
 				foreach($msgs as $msg_uid) {
 					logger("Mail: Parsing mail ".$msg_uid, LOGGER_DATA);
@@ -339,15 +339,15 @@ function onepoll_run($argv, $argc){
 							case 0:
 								break;
 							case 1:
-								logger("Mail: Deleting ".$msg_uid);
+								logger("Mail: Deleting ".$msg_uid." for ".$mailconf[0]['user']);
 								imap_delete($mbox, $msg_uid, FT_UID);
 								break;
 							case 2:
-								logger("Mail: Mark as seen ".$msg_uid);
+								logger("Mail: Mark as seen ".$msg_uid." for ".$mailconf[0]['user']);
 								imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 								break;
 							case 3:
-								logger("Mail: Moving ".$msg_uid." to ".$mailconf[0]['movetofolder']);
+								logger("Mail: Moving ".$msg_uid." to ".$mailconf[0]['movetofolder']." for ".$mailconf[0]['user']);
 								imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 								if ($mailconf[0]['movetofolder'] != "")
 									imap_mail_move($mbox, $msg_uid, $mailconf[0]['movetofolder'], FT_UID);
@@ -377,12 +377,12 @@ function onepoll_run($argv, $argc){
 
 					$r = email_get_msg($mbox,$msg_uid, $reply);
 					if(! $r) {
-						logger("Mail: can't fetch msg ".$msg_uid);
+						logger("Mail: can't fetch msg ".$msg_uid." for ".$mailconf[0]['user']);
 						continue;
 					}
 					$datarray['body'] = escape_tags($r['body']);
 
-					logger("Mail: Importing ".$msg_uid);
+					logger("Mail: Importing ".$msg_uid." for ".$mailconf[0]['user']);
 
 					// some mailing lists have the original author as 'from' - add this sender info to msg body.
 					// todo: adding a gravatar for the original author would be cool
@@ -423,15 +423,15 @@ function onepoll_run($argv, $argc){
 						case 0:
 							break;
 						case 1:
-							logger("Mail: Deleting ".$msg_uid);
+							logger("Mail: Deleting ".$msg_uid." for ".$mailconf[0]['user']);
 							imap_delete($mbox, $msg_uid, FT_UID);
 							break;
 						case 2:
-							logger("Mail: Mark as seen ".$msg_uid);
+							logger("Mail: Mark as seen ".$msg_uid." for ".$mailconf[0]['user']);
 							imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 							break;
 						case 3:
-							logger("Mail: Moving ".$msg_uid." to ".$mailconf[0]['movetofolder']);
+							logger("Mail: Moving ".$msg_uid." to ".$mailconf[0]['movetofolder']." for ".$mailconf[0]['user']);
 							imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 							if ($mailconf[0]['movetofolder'] != "")
 								imap_mail_move($mbox, $msg_uid, $mailconf[0]['movetofolder'], FT_UID);

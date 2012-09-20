@@ -2061,11 +2061,20 @@ function diaspora_profile($importer,$xml,$msg) {
 	$image_url = unxmlify($xml->image_url);
 	$birthday = unxmlify($xml->birthday);
 
-	$r = q("SELECT DISTINCT ( `resource-id` ) FROM `photo` WHERE  `uid` = %d AND `contact-id` = %d AND `album` = 'Contact Photos' ",
+
+	$handle_parts = explode("@", $diaspora_handle);
+	if($name === '') {
+		$name = $handle_parts[0];
+	}
+	if(strpos($image_url, $handle_parts[1]) === false) {
+		$image_url = "http://" . $handle_parts[1] . $image_url;
+	}
+
+/*	$r = q("SELECT DISTINCT ( `resource-id` ) FROM `photo` WHERE  `uid` = %d AND `contact-id` = %d AND `album` = 'Contact Photos' ",
 		intval($importer['uid']),
 		intval($contact['id'])
 	);
-	$oldphotos = ((count($r)) ? $r : null);
+	$oldphotos = ((count($r)) ? $r : null);*/
 
 	require_once('include/Photo.php');
 
@@ -2098,7 +2107,7 @@ function diaspora_profile($importer,$xml,$msg) {
 		intval($importer['uid'])
 	); 
 
-	if($r) {
+/*	if($r) {
 		if($oldphotos) {
 			foreach($oldphotos as $ph) {
 				q("DELETE FROM `photo` WHERE `uid` = %d AND `contact-id` = %d AND `album` = 'Contact Photos' AND `resource-id` = '%s' ",
@@ -2108,7 +2117,7 @@ function diaspora_profile($importer,$xml,$msg) {
 				);
 			}
 		}
-	}	
+	}	*/
 
 	return;
 

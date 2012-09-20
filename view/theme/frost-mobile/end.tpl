@@ -5,8 +5,6 @@
 <script type="text/javascript">
   tinyMCE.init({ mode : "none"});
 </script>-->
-<script type="text/javascript" src="$baseurl/js/jquery.js" ></script>
-<script type="text/javascript">var $j = jQuery.noConflict();</script>
 <script type="text/javascript" src="$baseurl/view/theme/frost/js/jquery.divgrow-1.3.1.min.js" ></script>
 <script type="text/javascript" src="$baseurl/js/jquery.textinputs.js" ></script>
 <script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/fk.autocomplete.min.js" ></script>
@@ -16,5 +14,4 @@
 <script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/acl.min.js" ></script>
 <script type="text/javascript" src="$baseurl/js/webtoolkit.base64.min.js" ></script>
 <script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/theme.min.js"></script>
-<script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/main.min.js" ></script>
 

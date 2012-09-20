@@ -198,10 +198,6 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	$a = get_app();
 
-	// Move all spaces out of the tags
-	$Text = preg_replace("/\[(\w*)\](\s*)/ism", '$2[$1]', $Text);
-	$Text = preg_replace("/(\s*)\[\/(\w*)\]/ism", '[/$2]$1', $Text);
-
 	// Hide all [noparse] contained bbtags by spacefying them
 	// POSSIBLE BUG --> Will the 'preg' functions crash if there's an embedded image?
 
@@ -209,6 +205,10 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	$Text = preg_replace_callback("/\[nobb\](.*?)\[\/nobb\]/ism", 'bb_spacefy',$Text);
 	$Text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", 'bb_spacefy',$Text);
 
+
+	// Move all spaces out of the tags
+	$Text = preg_replace("/\[(\w*)\](\s*)/ism", '$2[$1]', $Text);
+	$Text = preg_replace("/(\s*)\[\/(\w*)\]/ism", '[/$2]$1', $Text);
 
 	// Extract the private images which use data url's since preg has issues with
 	// large data sizes. Stash them away while we do bbcode conversion, and then put them back

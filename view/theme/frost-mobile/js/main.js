@@ -315,6 +315,22 @@
 				prev = ident;
 			});
 
+
+			var bimgs = $j(".wall-item-body > img").not(function() { return this.complete; });
+			var bimgcount = bimgs.length;
+
+			if (bimgcount) {
+				bimgs.load(function() {
+					bimgcount--;
+					if (! bimgcount) {
+						collapseHeight();
+
+					}
+				});
+			} else {
+				collapseHeight();
+			}
+
 			// reset vars for inserting individual items
 
 			/*prev = 'live-' + src;
@@ -349,22 +365,6 @@
 			}
 			/* autocomplete @nicknames */
 			$j(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
-
-			var bimgs = $j(".wall-item-body > img").not(function() { return this.complete; });
-			var bimgcount = bimgs.length;
-
-			if (bimgcount) {
-				bimgs.load(function() {
-					bimgcount--;
-					if (! bimgcount) {
-						collapseHeight();
-
-					}
-				});
-			} else {
-				collapseHeight();
-			}
-
 		});
 	}
 

@@ -1316,6 +1316,11 @@ input#dfrn-url {
 	max-width: 100%;
 }
 
+.wall-item-content img.smiley {
+	display: inline;
+	margin: auto;
+}
+
 .divgrow-showmore {
 	display: block;
 	clear: both;

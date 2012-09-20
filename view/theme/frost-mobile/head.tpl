@@ -27,4 +27,7 @@
 	var updateInterval = $update_interval;
 	var localUser = {{ if $local_user }}$local_user{{ else }}false{{ endif }};
 </script>
+<script type="text/javascript" src="$baseurl/js/jquery.js" ></script>
+<script type="text/javascript">var $j = jQuery.noConflict();</script>
+<script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/main.min.js" ></script>
 
