@@ -1016,34 +1016,7 @@ function prepare_body($item,$attach = false) {
 		}
 		$s .= '<div class="clear"></div></div>';
 	}
-	$matches = false;
-	$cnt = preg_match_all('/<(.*?)>/',$item['file'],$matches,PREG_SET_ORDER);
-	if($cnt) {
-//		logger('prepare_text: categories: ' . print_r($matches,true), LOGGER_DEBUG);
-		foreach($matches as $mtch) {
-			if(strlen($x))
-				$x .= ',';
-			$x .= xmlify(file_tag_decode($mtch[1])) 
-				. ((local_user() == $item['uid']) ? ' <a href="' . $a->get_baseurl() . '/filerm/' . $item['id'] . '?f=&cat=' . xmlify(file_tag_decode($mtch[1])) . '" title="' . t('remove') . '" >' . t('[remove]') . '</a>' : '');
-		}
-		if(strlen($x))
-			$s .= '<div class="categorytags"><span>' . t('Categories:') . ' </span>' . $x . '</div>'; 
 
-
-	}
-	$matches = false;
-	$x = '';
-	$cnt = preg_match_all('/\[(.*?)\]/',$item['file'],$matches,PREG_SET_ORDER);
-	if($cnt) {
-//		logger('prepare_text: filed_under: ' . print_r($matches,true), LOGGER_DEBUG);
-		foreach($matches as $mtch) {
-			if(strlen($x))
-				$x .= '&nbsp;&nbsp;&nbsp;';
-			$x .= xmlify(file_tag_decode($mtch[1])) . ' <a href="' . $a->get_baseurl() . '/filerm/' . $item['id'] . '?f=&term=' . xmlify(file_tag_decode($mtch[1])) . '" title="' . t('remove') . '" >' . t('[remove]') . '</a>';
-		}
-		if(strlen($x) && (local_user() == $item['uid']))
-			$s .= '<div class="filesavetags"><span>' . t('Filed under:') . ' </span>' . $x . '</div>'; 
-	}
 
 	// Look for spoiler
 	$spoilersearch = '<blockquote class="spoiler">';
@@ -1096,6 +1069,72 @@ function prepare_text($text) {
 
 	return $s;
 }}
+
+
+/**
+ * returns 
+ * [
+ *    //categories [
+ *          {
+ *               'name': 'category name',
+ *              'removeurl': 'url to remove this category',
+ *             'first': 'is the first in this array? true/false',
+ *               'last': 'is the last in this array? true/false',
+ *           } ,
+ *           ....
+ *       ],
+ *       // folders [
+ *               'name': 'folder name',
+ *               'removeurl': 'url to remove this folder',
+ *               'first': 'is the first in this array? true/false',
+ *               'last': 'is the last in this array? true/false',
+ *           } ,
+ *           ....       
+ *       ]
+ *   ]
+ */
+function get_cats_and_terms($item) {
+    $a = get_app();
+    $categories = array();
+    $folders = array();
+
+    $matches = false; $first = true;
+    $cnt = preg_match_all('/<(.*?)>/',$item['file'],$matches,PREG_SET_ORDER);
+    if($cnt) {
+        foreach($matches as $mtch) {
+            $categories[] = array(
+                'name' => xmlify(file_tag_decode($mtch[1])),
+                'url' =>  "#",
+                'removeurl' => ((local_user() == $item['uid'])?$a->get_baseurl() . '/filerm/' . $item['id'] . '?f=&cat=' . xmlify(file_tag_decode($mtch[1])):""),
+                'first' => $first,
+                'last' => false
+            );
+            $first = false;
+        }
+    }
+    if (count($categories)) $categories[count($categories)-1]['last'] = true;
+    
+
+
+    $matches = false; $first = true;
+    $cnt = preg_match_all('/\[(.*?)\]/',$item['file'],$matches,PREG_SET_ORDER);
+    if($cnt) {
+        foreach($matches as $mtch) {
+            $folders[] = array(
+                'name' => xmlify(file_tag_decode($mtch[1])),
+                 'url' =>  "#",
+                'removeurl' => ((local_user() == $item['uid'])?$a->get_baseurl() . '/filerm/' . $item['id'] . '?f=&term=' . xmlify(file_tag_decode($mtch[1])):""),
+                'first' => $first,
+                'last' => false
+            );
+            $first = false;
+        }
+    }
+
+    if (count($folders)) $folders[count($folders)-1]['last'] = true;
+    
+    return array($categories, $folders);
+}
 
 
 /**

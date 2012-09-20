@@ -143,10 +143,20 @@ class Item extends BaseObject {
 		$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_google($locate));
 
 		$tags=array();
+		$hashtags = array();
+		$mentions = array();
 		foreach(explode(',',$item['tag']) as $tag){
 			$tag = trim($tag);
-			if ($tag!="") $tags[] = bbcode($tag);
-		}
+			if ($tag!="") {
+				$t = bbcode($tag);
+				$tags[] = $t;
+				if($t[0] == '#')
+					$hashtags[] = $t;
+				elseif($t[0] == '@')
+					$mentions[] = $t;
+			}
+
+		}        
 
 		$like    = ((x($alike,$item['uri'])) ? format_like($alike[$item['uri']],$alike[$item['uri'] . '-l'],'like',$item['uri']) : '');
 		$dislike = ((x($dlike,$item['uri'])) ? format_like($dlike[$item['uri']],$dlike[$item['uri'] . '-l'],'dislike',$item['uri']) : '');
@@ -195,11 +205,17 @@ class Item extends BaseObject {
 
 		$body = prepare_body($item,true);
 
+        list($categories, $folders) = get_cats_and_terms($item);
+
 		$tmp_item = array(
 			'template' => $this->get_template(),
 			
 			'type' => implode("",array_slice(explode("/",$item['verb']),-1)),
 			'tags' => $tags,
+            'hashtags' => $hashtags,
+            'mentions' => $mentions,
+            'categories' => $categories,
+            'folders' => $folders,            
 			'body' => template_escape($body),
 			'text' => strip_tags(template_escape($body)),
 			'id' => $this->get_id(),
@@ -266,6 +282,11 @@ class Item extends BaseObject {
 			}
 		}
 		
+        if ($this->is_toplevel()) {
+            $result['total_comments_num'] = $total_children;
+            $result['total_comments_text'] = tt('comment', 'comments', $total_children);
+        }
+        
 		$result['private'] = $item['private'];
 		$result['toplevel'] = ($this->is_toplevel() ? 'toplevel_item' : '');
 

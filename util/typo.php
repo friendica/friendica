@@ -25,6 +25,13 @@
 		echo $file . "\n";
 		include_once($file);
 	}
+    
+    echo "Directory: object\n";
+	$files = glob('object/*.php');
+	foreach($files as $file) {
+		echo $file . "\n";
+		include_once($file);
+	}
 
 	echo "Directory: addon\n";
 	$dirs = glob('addon/*');

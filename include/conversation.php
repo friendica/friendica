@@ -350,6 +350,7 @@ function visible_activity($item) {
 	return true;
 }
 
+
 /**
  * Recursively prepare a thread for HTML
  */
@@ -629,6 +630,10 @@ function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $pr
 
 		$body = prepare_body($item,true);
 
+		list($categories, $folders) = get_cats_and_terms($item);
+
+
+
 		$tmp_item = array(
 			// collapse comments in template. I don't like this much...
 			'comment_firstcollapsed' => $firstcollapsed,
@@ -640,6 +645,8 @@ function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $pr
 			'tags' => template_escape($tags),
 			'hashtags' => template_escape($hashtags),
 			'mentions' => template_escape($mentions),
+			'categories' => $categories,
+			'folders' => $folders,
 			'body' => template_escape($body),
 			'text' => strip_tags(template_escape($body)),
 			'id' => $item['item_id'],
@@ -892,6 +899,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 
 				$body = prepare_body($item,true);
 
+				list($categories, $folders) = get_cats_and_terms($item);
 				//$tmp_item = replace_macros($tpl,array(
 				$tmp_item = array(
 					'template' => $tpl,
@@ -908,6 +916,8 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 					'tags' => template_escape($tags),
 					'hashtags' => template_escape($hashtags),
 					'mentions' => template_escape($mentions),
+					'categories' => $categories,
+					'folders' => $folders,
 					'text' => strip_tags(template_escape($body)),
 					'localtime' => datetime_convert('UTC', date_default_timezone_get(), $item['created'], 'r'),
 					'ago' => (($item['app']) ? sprintf( t('%s from %s'),relative_date($item['created']),$item['app']) : relative_date($item['created'])),
@@ -985,6 +995,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 
 	$o = replace_macros($page_template, array(
 		'$baseurl' => $a->get_baseurl($ssl_state),
+        '$remove' => t('remove'),
 		'$mode' => $mode,
 		'$user' => $a->user,
 		'$threads' => $threads,
