@@ -685,6 +685,8 @@ function prepare_threads_body($a, $items, $cmnt_tpl, $page_writeable, $mode, $pr
 		$item_result = $arr['output'];
 		if($firstcollapsed) {
 			$item_result['num_comments'] = sprintf( tt('%d comment','%d comments',$total_children),$total_children );
+			$item_result['hidden_comments_num'] = $total_children;
+			$item_result['hidden_comments_text'] = tt('comment', 'comments', $total_children);
 			$item_result['hide_text'] = t('show more');
 		}
 

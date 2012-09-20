@@ -584,6 +584,8 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 					if (!$comments_collapsed){
 						$threads[$threadsid]['num_comments'] = sprintf( tt('%d comment','%d comments',$comments[$item['parent']]),$comments[$item['parent']] );
+						$threads[$threadsid]['hidden_comments_num'] = $comments[$item['parent']];
+						$threads[$threadsid]['hidden_comments_text'] = tt('comment', 'comments', $comments[$item['parent']]);
 						$threads[$threadsid]['hide_text'] = t('show more');
 						$comments_collapsed = true;
 						$comment_firstcollapsed = true;
