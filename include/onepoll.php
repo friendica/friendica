@@ -291,35 +291,16 @@ function onepoll_run($argv, $argc){
 			if(count($msgs)) {
 				logger("Mail: Parsing ".count($msgs)." mails for ".$mailconf[0]['user'], LOGGER_DEBUG);
 
-				foreach($msgs as $msg_uid) {
+				$metas = email_msg_meta($mbox,implode(',',$msgs));
+				$msgs = array_combine($msgs, $metas);
+				foreach($msgs as $msg_uid => $meta) {
 					logger("Mail: Parsing mail ".$msg_uid, LOGGER_DATA);
 
 					$datarray = array();
-					$meta = email_msg_meta($mbox,$msg_uid);
-					$headers = email_msg_headers($mbox,$msg_uid);
+//					$meta = email_msg_meta($mbox,$msg_uid);
+//					$headers = email_msg_headers($mbox,$msg_uid);
 
-					// look for a 'references' header and try and match with a parent item we have locally.
-
-					$raw_refs = ((x($headers,'references')) ? str_replace("\t",'',$headers['references']) : '');
 					$datarray['uri'] = msgid2iri(trim($meta->message_id,'<>'));
-
-					if($raw_refs) {
-						$refs_arr = explode(' ', $raw_refs);
-						if(count($refs_arr)) {
-							for($x = 0; $x < count($refs_arr); $x ++)
-								$refs_arr[$x] = "'" . msgid2iri(str_replace(array('<','>',' '),array('','',''),dbesc($refs_arr[$x]))) . "'";
-						}
-						$qstr = implode(',',$refs_arr);
-						$r = q("SELECT `uri` , `parent-uri` FROM `item` WHERE `uri` IN ( $qstr ) AND `uid` = %d LIMIT 1",
-							intval($importer_uid)
-						);
-						if(count($r))
-							$datarray['parent-uri'] = $r[0]['uri'];
-					}
-
-
-					if(! x($datarray,'parent-uri'))
-						$datarray['parent-uri'] = $datarray['uri'];
 
 					// Have we seen it before?
 					$r = q("SELECT * FROM `item` WHERE `uid` = %d AND `uri` = '%s' LIMIT 1",
@@ -328,15 +309,16 @@ function onepoll_run($argv, $argc){
 					);
 
 					if(count($r)) {
-//						logger("Mail: Seen before ".$msg_uid);
+						logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user']);
 						if($meta->deleted && ! $r[0]['deleted']) {
 							q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
 								dbesc(datetime_convert()),
 								intval($r[0]['id'])
 							);
 						}
-						switch ($mailconf[0]['action']) {
+						/*switch ($mailconf[0]['action']) {
 							case 0:
+								logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user'].". Doing nothing.", LOGGER_DEBUG);
 								break;
 							case 1:
 								logger("Mail: Deleting ".$msg_uid." for ".$mailconf[0]['user']);
@@ -352,9 +334,37 @@ function onepoll_run($argv, $argc){
 								if ($mailconf[0]['movetofolder'] != "")
 									imap_mail_move($mbox, $msg_uid, $mailconf[0]['movetofolder'], FT_UID);
 								break;
-						}
+						}*/
 						continue;
 					}
+
+
+					// look for a 'references' or an 'in-reply-to' header and try to match with a parent item we have locally.
+
+//					$raw_refs = ((x($headers,'references')) ? str_replace("\t",'',$headers['references']) : '');
+					$raw_refs = ((property_exists($meta,'references')) ? str_replace("\t",'',$meta->references) : '');
+					if(! trim($raw_refs))
+						$raw_refs = ((property_exists($meta,'in_reply_to')) ? str_replace("\t",'',$meta->in_reply_to) : '');
+					$raw_refs = trim($raw_refs);  // Don't allow a blank reference in $refs_arr
+
+					if($raw_refs) {
+						$refs_arr = explode(' ', $raw_refs);
+						if(count($refs_arr)) {
+							for($x = 0; $x < count($refs_arr); $x ++)
+								$refs_arr[$x] = "'" . msgid2iri(str_replace(array('<','>',' '),array('','',''),dbesc($refs_arr[$x]))) . "'";
+						}
+						$qstr = implode(',',$refs_arr);
+						$r = q("SELECT `uri` , `parent-uri` FROM `item` WHERE `uri` IN ( $qstr ) AND `uid` = %d LIMIT 1",
+							intval($importer_uid)
+						);
+						if(count($r))
+							$datarray['parent-uri'] = $r[0]['parent-uri'];  // Set the parent as the top-level item
+//							$datarray['parent-uri'] = $r[0]['uri'];
+					}
+
+
+					if(! x($datarray,'parent-uri'))
+						$datarray['parent-uri'] = $datarray['uri'];
 
 					// Decoding the header
 					$subject = imap_mime_header_decode($meta->subject);
@@ -421,6 +431,7 @@ function onepoll_run($argv, $argc){
 					);
 					switch ($mailconf[0]['action']) {
 						case 0:
+							logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user'].". Doing nothing.", LOGGER_DEBUG);
 							break;
 						case 1:
 							logger("Mail: Deleting ".$msg_uid." for ".$mailconf[0]['user']);

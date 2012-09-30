@@ -458,10 +458,10 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 						$poll = 'email ' . random_string();
 						$priority = 0;
 						$x = email_msg_meta($mbox,$msgs[0]);
-						if(stristr($x->from,$orig_url))
-							$adr = imap_rfc822_parse_adrlist($x->from,'');
-						elseif(stristr($x->to,$orig_url))
-							$adr = imap_rfc822_parse_adrlist($x->to,'');
+						if(stristr($x[0]->from,$orig_url))
+							$adr = imap_rfc822_parse_adrlist($x[0]->from,'');
+						elseif(stristr($x[0]->to,$orig_url))
+							$adr = imap_rfc822_parse_adrlist($x[0]->to,'');
 						if(isset($adr)) {
 							foreach($adr as $feadr) {
 								if((strcasecmp($feadr->mailbox,$name) == 0)
@@ -552,6 +552,13 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 			}
 		
 			logger('probe_url: scrape_vcard: ' . print_r($vcard,true), LOGGER_DATA);
+		}
+
+		if($diaspora && $addr) {
+			// Diaspora returns the name as the nick. As the nick will never be updated,
+			// let's use the Diaspora nickname (the first part of the handle) as the nick instead
+			$addr_parts = explode('@', $addr);
+			$vcard['nick'] = $addr_parts[0];
 		}
 
 		if($twitter) {		

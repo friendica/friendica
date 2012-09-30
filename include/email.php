@@ -48,8 +48,8 @@ function construct_mailbox_name($mailacct) {
 
 
 function email_msg_meta($mbox,$uid) {
-	$ret = (($mbox && $uid) ? @imap_fetch_overview($mbox,$uid,FT_UID) : array(array()));
-	return ((count($ret)) ? $ret[0] : array());
+	$ret = (($mbox && $uid) ? @imap_fetch_overview($mbox,$uid,FT_UID) : array(array())); // POSSIBLE CLEANUP --> array(array()) is probably redundant now
+	return ((count($ret)) ? $ret : array());
 }
 
 function email_msg_headers($mbox,$uid) {
