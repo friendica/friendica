@@ -18,13 +18,92 @@ function network_init(&$a) {
 		}
 	}
     
-    // convert query string to array and remove first element (wich is friendica args)
+    // convert query string to array and remove first element (which is friendica args)
     $query_array = array();
     parse_str($a->query_string, $query_array);
     array_shift($query_array);
     
-	// fetch last used tab and redirect if needed
-	$sel_tabs = network_query_get_sel_tab($a);
+	// fetch last used network view and redirect if needed
+	if(! $is_a_date_query) {
+		$sel_tabs = network_query_get_sel_tab($a);
+		$sel_nets = network_query_get_sel_net();
+		$sel_groups = network_query_get_sel_group($a);
+		$last_sel_tabs = get_pconfig(local_user(), 'network.view','tab.selected');
+		$last_sel_nets = get_pconfig(local_user(), 'network.view', 'net.selected');
+		$last_sel_groups = get_pconfig(local_user(), 'network.view', 'group.selected');
+
+		$remember_tab = ($sel_tabs[0] === 'active' && is_array($last_sel_tabs) && $last_sel_tabs[0] !== 'active');
+		$remember_net = ($sel_nets === false && $last_sel_nets && $last_sel_nets !== 'all');
+		$remember_group = ($sel_groups === false && $last_sel_groups && $last_sel_groups != 0);
+
+		$net_baseurl = '/network';
+		$net_args = array();
+
+		if($remember_group) {
+			$net_baseurl .= '/' . $last_sel_groups; // Note that the group number must come before the "/new" tab selection
+		}
+		else if($sel_groups !== false) {
+			$net_baseurl .= '/' . $sel_groups;
+		}
+
+		if($remember_tab) {
+			// redirect if current selected tab is '/network' and
+			// last selected tab is _not_ '/network?f=&order=comment'. 
+			// and this isn't a date query
+
+			$tab_baseurls = array(
+				'',		//all
+				'',		//postord
+				'',		//conv
+				'/new',	//new
+				'',		//starred
+				'',		//bookmarked
+				'',		//spam
+			);
+			$tab_args = array(
+				'f=&order=comment',	//all
+				'f=&order=post',		//postord
+				'f=&conv=1',			//conv
+				'',					//new
+				'f=&star=1',			//starred
+				'f=&bmark=1',			//bookmarked
+				'f=&spam=1',			//spam
+			);
+
+			$k = array_search('active', $last_sel_tabs);
+
+			$net_baseurl .= $tab_baseurls[$k];
+
+            // parse out tab queries
+            $dest_qa = array();
+            $dest_qs = $tab_args[$k];
+            parse_str( $dest_qs, $dest_qa);
+            $net_args = array_merge($net_args, $dest_qa);
+		}
+		else if($sel_tabs[4] === 'active') {
+			// The '/new' tab is selected
+			$net_baseurl .= '/new';
+		}
+
+		if($remember_net) {
+			$net_args['nets'] = $last_sel_nets;
+		}
+
+		if($remember_tab || $remember_net || $remember_group) {
+            $net_args = array_merge($query_array, $net_args);
+            $net_queries = build_querystring($net_args);
+
+            // groups filter is in form of "network/nnn". Add it to $dest_url, if it's possible
+            //if ($a->argc==2 && is_numeric($a->argv[1]) && strpos($net_baseurl, "/",1)===false){
+            //    $net_baseurl .= "/".$a->argv[1];
+            //}
+
+			$redir_url = ($net_queries ? $net_baseurl."?".$net_queries : $net_baseurl);
+			goaway($a->get_baseurl() . $redir_url);
+		}
+	}
+
+/*	$sel_tabs = network_query_get_sel_tab($a);
 	$last_sel_tabs = get_pconfig(local_user(), 'network.view','tab.selected');
 	if (is_array($last_sel_tabs)){
 		$tab_urls = array(
@@ -58,9 +137,14 @@ function network_init(&$a) {
 
 			goaway($a->get_baseurl() . $dest_url."?".$dest_qs);
 		}
-	}
+	}*/
+
+	if(x($_GET['nets']) && $_GET['nets'] === 'all')
+		unset($_GET['nets']);
 	
 	$group_id = (($a->argc > 1 && intval($a->argv[1])) ? intval($a->argv[1]) : 0);
+
+	set_pconfig(local_user(), 'network.view', 'group.selected', $group_id);
 		  
 	require_once('include/group.php');
 	require_once('include/contact_widgets.php');
@@ -97,7 +181,7 @@ function network_init(&$a) {
 		$a->page['content'] .= '<h2>' . t('Search Results For:') . ' '  . $search . '</h2>';
 	}
 
-	$a->page['aside'] .= group_side('network','network',true,$group_id);
+	$a->page['aside'] .= group_side('network/0','network',true,$group_id);
 	$a->page['aside'] .= posted_date_widget($a->get_baseurl() . '/network',local_user(),false);	
 	$a->page['aside'] .= networks_widget($a->get_baseurl(true) . '/network',(x($_GET, 'nets') ? $_GET['nets'] : ''));
 	$a->page['aside'] .= saved_searches($search);
@@ -223,6 +307,29 @@ function network_query_get_sel_tab($a) {
 	}
 	
 	return array($no_active, $all_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active);
+}
+
+/**
+ * Return selected network from query
+ */
+function network_query_get_sel_net() {
+	$network = false;
+
+	if(x($_GET,'nets')) {
+		$network = $_GET['nets'];
+	}
+	
+	return $network;
+}
+
+function network_query_get_sel_group($a) {
+	$group = false;
+
+	if($a->argc >= 2 && is_numeric($a->argv[1])) {
+		$group = $a->argv[1];
+	}
+
+	return $group;
 }
 
 
@@ -381,6 +488,7 @@ function network_content(&$a, $update = 0) {
 		if(strlen($str))
 			$def_acl = array('allow_cid' => $str);
 	}
+	set_pconfig(local_user(), 'network.view', 'net.selected', ($nets ? $nets : 'all'));
 
 	if(! $update) {
 		if($group) {
@@ -607,6 +715,7 @@ function network_content(&$a, $update = 0) {
 			intval($_SESSION['uid'])
 		);
 
+		$update_unseen = ' WHERE uid = ' . intval($_SESSION['uid']) . " AND unseen = 1 $sql_extra $sql_nets";
 	}
 	else {
 
@@ -673,6 +782,9 @@ function network_content(&$a, $update = 0) {
 		} else {
 			$items = array();
 		}
+
+		if($parents_str)
+			$update_unseen = ' WHERE uid = ' . intval(local_user()) . ' AND unseen = 1 AND parent IN ( ' . dbesc($parents_str) . ' )';
 	}
 
 
@@ -680,12 +792,15 @@ function network_content(&$a, $update = 0) {
 	// level which items you've seen and which you haven't. If you're looking
 	// at the top level network page just mark everything seen. 
 	
-	if((! $group) && (! $cid) && (! $star)) {
+/*	if((! $group) && (! $cid) && (! $star)) {
 		$r = q("UPDATE `item` SET `unseen` = 0 
 			WHERE `unseen` = 1 AND `uid` = %d",
 			intval(local_user())
 		);
-	}
+	}*/
+
+	if($update_unseen)
+		$r = q("UPDATE `item` SET `unseen` = 0 $update_unseen");
 
 	// Set this so that the conversation function can find out contact info for our wall-wall items
 	$a->page_contact = $a->contact;
@@ -695,7 +810,7 @@ function network_content(&$a, $update = 0) {
 	$o .= conversation($a,$items,$mode,$update);
 
 	if(! $update) {
-	        if(! get_pconfig(local_user(),'system','alt_pager')) {
+		if(! get_pconfig(local_user(),'system','alt_pager')) {
 		        $o .= paginate($a);
 		}
 		else {
