@@ -21,6 +21,7 @@
 	<section><?php if(x($page,'content')) echo $page['content']; ?>
 	</section>
 	</div>
+	<footer><?php if(x($page,'footer')) echo $page['footer']; ?></footer>
 
 	<?php } else { ?>
 	<div class='main-container'>

@@ -350,6 +350,8 @@ if(! class_exists('App')) {
 		public  $plugins;
 		public  $apps = array();
 		public  $identities;
+		public	$is_mobile;
+		public	$is_tablet;
 	
 		public $nav_sel;
 
@@ -491,6 +493,14 @@ if(! class_exists('App')) {
 			if($this->pager['start'] < 0)
 				$this->pager['start'] = 0;
 			$this->pager['total'] = 0;
+
+			/**
+			 * Detect mobile devices
+			 */
+
+			$mobile_detect = new Mobile_Detect();
+			$this->is_mobile = $mobile_detect->isMobile();
+			$this->is_tablet = $mobile_detect->isTablet();
 		}
 
 		function get_baseurl($ssl = false) {
@@ -1288,14 +1298,14 @@ if(! function_exists('get_birthdays')) {
 		$a = get_app();
 		$o = '';
 
-		if(! local_user())
+		if(! local_user() || $a->is_mobile || $a->is_tablet)
 			return $o;
 
-		$mobile_detect = new Mobile_Detect();
-		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
+//		$mobile_detect = new Mobile_Detect();
+//		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
 
-		if($is_mobile)
-			return $o;
+//		if($is_mobile)
+//			return $o;
 
 		$bd_format = t('g A l F d') ; // 8 AM Friday January 18
 		$bd_short = t('F d');
@@ -1373,15 +1383,15 @@ if(! function_exists('get_events')) {
 
 		$a = get_app();
 
-		if(! local_user())
+		if(! local_user() || $a->is_mobile || $a->is_tablet)
 			return $o;
 
 
-		$mobile_detect = new Mobile_Detect();
-		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
+//		$mobile_detect = new Mobile_Detect();
+//		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
 
-		if($is_mobile)
-			return $o;
+//		if($is_mobile)
+//			return $o;
 
 		$bd_format = t('g A l F d') ; // 8 AM Friday January 18
 		$bd_short = t('F d');
@@ -1507,8 +1517,9 @@ if(! function_exists('current_theme')) {
 	
 		$a = get_app();
 	
-		$mobile_detect = new Mobile_Detect();
-		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
+//		$mobile_detect = new Mobile_Detect();
+//		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
+		$is_mobile = $a->is_mobile || $a->is_tablet;
 	
 		if($is_mobile) {
 			if(isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {

@@ -354,8 +354,8 @@ section {
 
 /* footer */
 footer {
-    display: none;
-
+	text-align: center;
+	padding-bottom: 1em;
 }
 
 .birthday-today, .event-today {
@@ -618,6 +618,10 @@ input#dfrn-url {
 #crop-image-form {
 	margin-top: 30px;
 	clear: both;
+}
+
+#croppa {
+	max-width: 510px;
 }
 
 .intro-wrapper {
@@ -1349,6 +1353,13 @@ input#dfrn-url {
 	width: 100%;
 	margin-top: 10px;
 	line-height: 18px;
+}
+
+.wall-item-body iframe {
+	display: block;
+	clear: both;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 }
 
 .wall-item-tools {
@@ -3193,7 +3204,7 @@ aside input[type='text'] {
 	display: block;
 	margin-left: 50px;
 	color: #666666;
-	
+	clear: left;
 }
 
 .field .onoff {
@@ -3290,6 +3301,10 @@ aside input[type='text'] {
 #adminpage table#users img { width: 16px; height: 16px; }
 #adminpage table tr:hover { background-color: #bbc7d7; }
 #adminpage .selectall { text-align: right; }
+
+#adminpage .screenshot img {
+	max-width: 550px;
+}
 
 /*
  * UPDATE

@@ -1402,6 +1402,13 @@ input#dfrn-url {
 	line-height: 23px;
 }
 
+.wall-item-body iframe {
+	display: block;
+	clear: both;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
+}
+
 .wall-item-body code {
 	width: 260px;
 	overflow: hidden;

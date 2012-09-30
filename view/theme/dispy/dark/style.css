@@ -519,7 +519,7 @@ div[id$="wrapper"]{height:100%;}div[id$="wrapper"] br{clear:left;}
 .type-text{background-position:-60px 0px;}
 .type-unkn{background-position:-80px 0;}
 .cc-license{margin-top:100px;font-size:0.7em;}
-footer{display:block;clear:both;}
+footer{display:block;clear:both;text-align:center;}
 #sectionfooter{margin:1em 0 1em 0;}
 #profile-jot-text{height:20px;color:#eeeecc;background:#2e2f2e;border:1px solid #eeeecc;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;width:99.5%;}
 #photo-edit-perms-select,#photos-upload-permissions-wrapper,#profile-jot-acl-wrapper{display:block !important;background:#2e2f2e;color:#eeeecc;}

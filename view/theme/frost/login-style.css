@@ -135,3 +135,9 @@ div.section-wrapper {
 	text-align: left;
 	font-size: 12px;
 }
+
+footer {
+	text-align: center;
+	padding-top: 3em;
+	padding-bottom: 1em;
+}

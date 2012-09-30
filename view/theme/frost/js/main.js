@@ -178,11 +178,11 @@
 			var eSysmsg = $j(data).find('sysmsgs');
 			eSysmsg.children("notice").each(function(){
 				text = $j(this).text();
-				$j.jGrowl(text, { sticky: false, theme: 'notice', life: 2000 }); // originally: sticky: true,
+				$j.jGrowl(text, { sticky: false, theme: 'notice', life: 3000 }); // originally: sticky: true,
 			});
 			eSysmsg.children("info").each(function(){
 				text = $j(this).text();
-				$j.jGrowl(text, { sticky: false, theme: 'info', life: 1500 });
+				$j.jGrowl(text, { sticky: false, theme: 'info', life: 1000 });
 			});
 			
 		});

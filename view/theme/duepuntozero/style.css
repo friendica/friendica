@@ -245,8 +245,9 @@ section {
 
 /* footer */
 footer {
-    display: none;
-
+	text-align: right;
+	padding-bottom: 1em;
+	padding-right: 3em;
 }
 
 .birthday-today, .event-today {

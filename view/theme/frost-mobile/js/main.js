@@ -185,7 +185,7 @@
 			var eSysmsg = $j(data).find('sysmsgs');
 			eSysmsg.children("notice").each(function(){
 				text = $j(this).text();
-				$j.jGrowl(text, { sticky: false, theme: 'notice', life: 1500 });
+				$j.jGrowl(text, { sticky: false, theme: 'notice', life: 1000 });
 			});
 			eSysmsg.children("info").each(function(){
 				text = $j(this).text();
