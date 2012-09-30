@@ -994,7 +994,25 @@ function handle_tag($a, &$body, &$inform, &$str_tags, $profile_uid, $tag) {
 						intval($tagcid),
 						intval($profile_uid)
 				);
-			} elseif(strstr($name,'_') || strstr($name,' ')) { //no id
+			else {
+				$newname = str_replace('_',' ',$name);
+
+				//select someone from this user's contacts by name
+				$r = q("SELECT * FROM `contact` WHERE `name` = '%s' AND `uid` = %d LIMIT 1",
+						dbesc($newname),
+						intval($profile_uid)
+				);
+
+				if(! $r) {
+					//select someone by attag or nick and the name passed in
+					$r = q("SELECT * FROM `contact` WHERE `attag` = '%s' OR `nick` = '%s' AND `uid` = %d ORDER BY `attag` DESC LIMIT 1",
+							dbesc($name),
+							dbesc($name),
+							intval($profile_uid)
+					);
+				}
+			}
+/*			} elseif(strstr($name,'_') || strstr($name,' ')) { //no id
 				//get the real name
 				$newname = str_replace('_',' ',$name);
 				//select someone from this user's contacts by name
@@ -1009,7 +1027,7 @@ function handle_tag($a, &$body, &$inform, &$str_tags, $profile_uid, $tag) {
 						dbesc($name),
 						intval($profile_uid)
 				);
-			}
+			}*/
 			//$r is set, if someone could be selected
 			if(count($r)) {
 				$profile = $r[0]['url'];
