@@ -141,6 +141,17 @@ function diaspora_get_contact_by_handle($uid,$handle) {
 	);
 	if($r && count($r))
 		return $r[0];
+
+	$handle_parts = explode("@", $handle);
+	$nurl_sql = '%%://' . $handle_parts[1] . '%%/profile/' . $handle_parts[0];
+	$r = q("SELECT * FROM contact WHERE network = '%s' AND uid = %d AND nurl LIKE '%s' LIMIT 1",
+	       dbesc(NETWORK_DFRN),
+	       intval($uid),
+	       dbesc($nurl_sql)
+	);
+	if($r && count($r))
+		return $r[0];
+
 	return false;
 }
 
@@ -1949,7 +1960,7 @@ function diaspora_signed_retraction($importer,$xml,$msg) {
 
 	$contact = diaspora_get_contact_by_handle($importer['uid'],$diaspora_handle);
 	if(! $contact) {
-		logger('diaspora_signed_retraction: no contact');
+		logger('diaspora_signed_retraction: no contact ' . $diaspora_handle . ' for ' . $importer['uid']);
 		return;
 	}
 
