@@ -71,9 +71,6 @@ code {
 	margin-top: 20px; 
 }
 
-textarea { font-size: 20px; }
-
-
 #panel {
 	position: absolute;
 	width: 10em;
@@ -554,7 +551,6 @@ section {
 		padding:0.3em;
 	}
 	.comment-edit-text-full {
-		font-size: 20px;
 		height: 4em;
 		color: @CommentBoxFullColor;
 		border: 1px solid @CommentBoxFullBorderColor;
@@ -595,19 +591,37 @@ section {
 
 .wall-item-tags { padding-top: 5px; }
 .tag {
-	background: url("../../../images/tag_b.png") no-repeat center left;
+	background: url("icons/tag.png") no-repeat center right;
 	color: @TagColor;
+	padding-right: 8px;
 	padding-left: 3px;
-	a {
-		padding-right: 8px;
-		background: url("../../../images/tag.png") no-repeat center right;
-		color: @TagColor;
-	}
+	a { color: @TagColor;	}
 }
-.filesavetags {
+.mention {
+	background: url("icons/men.png") no-repeat 1px center;
+	color: @MentionColor;
+	padding-right: 3px;
+	padding-left: 18px;
+	a { color: @MentionColor;	}
+}
+.folder {
+	background: url("icons/folder.png") no-repeat 1px center;
+	color: @MentionColor;
+	padding-right: 3px;
+	padding-left: 15px;
+	a { color: @MentionColor;	}
+}
+.category {
+	background: url("icons/category.png") no-repeat 1px center;
+	color: @MentionColor;
+	padding-right: 3px;
+	padding-left: 15px;
+	a { color: @MentionColor;	}
+}
+/*.filesavetags {
     padding: 3px 0px 3px 0px;
     opacity: 0.5;
-}
+}*/
 
 .wwto { 
 	position: absolute !important; 
@@ -756,8 +770,6 @@ span[id^="showmore-wrap"] {
 		color: @CommentBoxEmptyColor;
 		border: 1px solid @CommentBoxEmptyBorderColor;
 		padding:0.3em;
-		
-		&:focus { font-size: 20px; }
 	}
 
 	#jot-tools {
@@ -1462,4 +1474,49 @@ footer { height: 100px; display: table-row; }
 .videobb { background-position: -112px 0px; }
 .videobb:hover { background-position: -112px -16px; }
 
+
+/** range input css **/
+/* slider root element */
+.slider {
+    height:2px;
+    position:relative;
+    cursor:pointer;
+    border:1px solid #333;
+    width:200px;
+    margin:10px 0px 10px 0px;
+	float: left;
+}
+
+/* progress bar (enabled with progress: true) */
+.progress {
+    height:9px;
+    background-color:#C5FF00;
+    display:none;
+    opacity:0.6;
+}
+
+/* drag handle */
+.handle {
+	background-color:#ccc;
+    height:16px;
+    width:8px;
+    top:-8px;
+    position:absolute;
+    display:block;
+    margin-top:1px;
+    border:1px solid #000;
+    cursor:move;
+	.roundbottom();
+	.shadow();
+
+}
+
+/* the input field */
+.range {
+	width: 20px!important;
+	font-size: 8pt;
+	margin-left: 10px;
+	border: 0px;
+	color: @FieldHelpColor;
+}
 

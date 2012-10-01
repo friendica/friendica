@@ -288,7 +288,7 @@ class Item extends BaseObject {
 		}
 		
         if ($this->is_toplevel()) {
-            $result['total_comments_num'] = $total_children;
+            $result['total_comments_num'] = "$total_children";
             $result['total_comments_text'] = tt('comment', 'comments', $total_children);
         }
         

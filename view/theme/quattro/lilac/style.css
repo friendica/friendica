@@ -404,9 +404,6 @@ code {
   padding: 10px;
   margin-top: 20px;
 }
-textarea {
-  font-size: 20px;
-}
 #panel {
   position: absolute;
   width: 10em;
@@ -1088,7 +1085,6 @@ section {
   padding: 0.3em;
 }
 .wall-item-comment-wrapper .comment-edit-text-full {
-  font-size: 20px;
   height: 4em;
   color: #2d2d2d;
   border: 1px solid #2d2d2d;
@@ -1142,23 +1138,46 @@ section {
   padding-top: 5px;
 }
 .tag {
-  background: url("../../../images/tag_b.png") no-repeat center left;
+  background: url("icons/tag.png") no-repeat center right;
   color: #ffffff;
+  padding-right: 8px;
   padding-left: 3px;
 }
 .tag a {
-  padding-right: 8px;
-  background: url("../../../images/tag.png") no-repeat center right;
   color: #ffffff;
 }
-.filesavetags {
-  padding: 3px 0px 3px 0px;
-  opacity: 0.5;
+.mention {
+  background: url("icons/men.png") no-repeat 1px center;
+  color: #666666;
+  padding-right: 3px;
+  padding-left: 18px;
 }
+.mention a {
+  color: #666666;
+}
+.folder {
+  background: url("icons/folder.png") no-repeat 1px center;
+  color: #666666;
+  padding-right: 3px;
+  padding-left: 15px;
+}
+.folder a {
+  color: #666666;
+}
+.category {
+  background: url("icons/category.png") no-repeat 1px center;
+  color: #666666;
+  padding-right: 3px;
+  padding-left: 15px;
+}
+.category a {
+  color: #666666;
+}
+/*.filesavetags {
+    padding: 3px 0px 3px 0px;
+    opacity: 0.5;
+}*/
 .wwto {
-  position: absolute !important;
-  width: 25px;
-  height: 25px;
   background: #FFFFFF;
   border: 2px solid #364e59;
   height: 25px;
@@ -1333,9 +1352,6 @@ span[id^="showmore-wrap"] {
   color: #999999;
   border: 1px solid #999999;
   padding: 0.3em;
-}
-#jot .profile-jot-text:focus {
-  font-size: 20px;
 }
 #jot #jot-tools {
   margin: 0px;
@@ -2146,4 +2162,48 @@ footer {
 }
 .videobb:hover {
   background-position: -112px -16px;
+}
+/** range input css **/
+/* slider root element */
+.slider {
+  height: 2px;
+  position: relative;
+  cursor: pointer;
+  border: 1px solid #333;
+  width: 200px;
+  margin: 10px 0px 10px 0px;
+  float: left;
+}
+/* progress bar (enabled with progress: true) */
+.progress {
+  height: 9px;
+  background-color: #C5FF00;
+  display: none;
+  opacity: 0.6;
+}
+/* drag handle */
+.handle {
+  background-color: #ccc;
+  height: 16px;
+  width: 8px;
+  top: -8px;
+  position: absolute;
+  display: block;
+  margin-top: 1px;
+  border: 1px solid #000;
+  cursor: move;
+  -moz-border-radius: 0 0 5px 5px;
+  -webkit-border-radius: 0 0 5px 5px;
+  border-radius: 0 0 5px 5px;
+  -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
+  -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
+}
+/* the input field */
+.range {
+  width: 20px!important;
+  font-size: 8pt;
+  margin-left: 10px;
+  border: 0px;
+  color: #999999;
 }

@@ -60,9 +60,18 @@
 		<div class="wall-item-links">
 		</div>
 		<div class="wall-item-tags">
-			{{ for $item.tags as $tag }}
+			{{ for $item.hashtags as $tag }}
 				<span class='tag'>$tag</span>
 			{{ endfor }}
+  			{{ for $item.mentions as $tag }}
+				<span class='mention'>$tag</span>
+			{{ endfor }}
+               {{ for $item.folders as $cat }}
+                    <span class='folder'>$cat.name</a>{{if $cat.removeurl}} (<a href="$cat.removeurl" title="$remove">x</a>) {{endif}} </span>
+               {{ endfor }}
+                {{ for $item.categories as $cat }}
+                    <span class='category'>$cat.name</a>{{if $cat.removeurl}} (<a href="$cat.removeurl" title="$remove">x</a>) {{endif}} </span>
+                {{ endfor }}
 		</div>
 	</div>	
 	<div class="wall-item-bottom">
