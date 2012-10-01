@@ -142,7 +142,7 @@ function network_init(&$a) {
 	if(x($_GET['nets']) && $_GET['nets'] === 'all')
 		unset($_GET['nets']);
 	
-	$group_id = (($a->argc > 1 && intval($a->argv[1])) ? intval($a->argv[1]) : 0);
+	$group_id = (($a->argc > 1 && is_numeric($a->argv[1])) ? intval($a->argv[1]) : 0);
 
 	set_pconfig(local_user(), 'network.view', 'group.selected', $group_id);
 		  
