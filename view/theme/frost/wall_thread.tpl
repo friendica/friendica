@@ -49,6 +49,15 @@
 							<span class='body-tag tag'>$tag</span>
 						{{ endfor }}
 					<!--</div>-->
+			{{ if $item.has_cats }}
+			<div class="categorytags">$item.txt_cats {{ for $item.categories as $cat }}$cat.name <a href="$cat.removeurl" title="$remove">[$remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
+			</div>
+			{{ endif }}
+
+			{{ if $item.has_folders }}
+			<div class="filesavetags">$item.txt_folders {{ for $item.folders as $cat }}$cat.name <a href="$cat.removeurl" title="$remove">[$remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
+			</div>
+			{{ endif }}
 			</div>
 		</div>
 		<div class="wall-item-tools" id="wall-item-tools-$item.id">
