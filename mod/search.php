@@ -9,13 +9,26 @@ function search_saved_searches() {
 	);
 
 	if(count($r)) {
-		$o .= '<div id="saved-search-list" class="widget">';
-		$o .= '<h3>' . t('Saved Searches') . '</h3>' . "\r\n";
-		$o .= '<ul id="saved-search-ul">' . "\r\n";
+		$saved = array();
 		foreach($r as $rr) {
-			$o .= '<li class="saved-search-li clear"><a href="search/?f=&remove=1&search=' . $rr['term'] . '" class="icon drophide savedsearchdrop" title="' . t('Remove term') . '" onclick="return confirmDelete();" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a> <a href="search/?f=&search=' . $rr['term'] . '" class="savedsearchterm" >' . $rr['term'] . '</a></li>' . "\r\n";
+			$saved[] = array(
+				'id'            => $rr['id'],
+				'term'			=> $rr['term'],
+				'encodedterm' 	=> urlencode($rr['term']),
+				'delete'		=> t('Remove term'),
+				'selected'		=> ($search==$rr['term']),
+			);
 		}
-		$o .= '</ul><div class="clear"></div></div>' . "\r\n";
+
+		
+		$tpl = get_markup_template("saved_searches_aside.tpl");
+
+		$o .= replace_macros($tpl, array(
+			'$title'	 => t('Saved Searches'),
+			'$add'		 => '',
+			'$searchbox' => '',
+			'$saved' 	 => $saved,
+		));
 	}		
 
 	return $o;
