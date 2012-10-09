@@ -1140,8 +1140,11 @@ input#dfrn-url {
 	margin-top: 10px;
 }
 
+.toplevel_item {
+	margin-bottom: 60px;
+}
+
 .wall-item-content-wrapper {
-	margin-top: 60px;
 	padding-top: 30px;
 	border-top: 2px solid #AAAAAA;
 	position: relative;
@@ -1237,9 +1240,6 @@ input#dfrn-url {
     left: 75px;
     top: 80px;
 /*    z-index: 100;*/
-}
-.wall-item-wrapper {
-	margin-left:10px;
 }
 .wall-item-lock {
 	margin-top: 30px;
@@ -1395,6 +1395,7 @@ input#dfrn-url {
 .wall-item-body {
 	text-align: justify;
 	float: left;
+	clear: left;
 /*	width: 300px;*/
 	overflow: hidden;
 	margin-top: 10px;
@@ -3287,6 +3288,11 @@ aside input[type='text'] {
 }
 #event-submit {
 	margin-top: 10px;
+}
+
+.filesavetags, .categorytags {
+	display: block;
+	clear: left;
 }
 
 .body-tag, .filesavetags, .categorytags {
