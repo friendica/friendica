@@ -584,31 +584,6 @@ function network_content(&$a, $update = 0) {
 		$o .= get_events();
 	}
 
-	if(! $update) {
-		// The special div is needed for liveUpdate to kick in for this page.
-		// We only launch liveUpdate if you aren't filtering in some incompatible 
-		// way and also you aren't writing a comment (discovered in javascript).
-
-		$o .= '<div id="live-network"></div>' . "\r\n";
-		$o .= "<script> var profile_uid = " . $_SESSION['uid'] 
-			. "; var netargs = '" . substr($a->cmd,8)
-			. '?f='
-			. ((x($_GET,'cid'))    ? '&cid='    . $_GET['cid']    : '')
-			. ((x($_GET,'search')) ? '&search=' . $_GET['search'] : '') 
-			. ((x($_GET,'star'))   ? '&star='   . $_GET['star']   : '') 
-			. ((x($_GET,'order'))  ? '&order='  . $_GET['order']  : '') 
-			. ((x($_GET,'bmark'))  ? '&bmark='  . $_GET['bmark']  : '') 
-			. ((x($_GET,'liked'))  ? '&liked='  . $_GET['liked']  : '') 
-			. ((x($_GET,'conv'))   ? '&conv='   . $_GET['conv']   : '') 
-			. ((x($_GET,'spam'))   ? '&spam='   . $_GET['spam']   : '') 
-			. ((x($_GET,'nets'))   ? '&nets='   . $_GET['nets']   : '') 
-			. ((x($_GET,'cmin'))   ? '&cmin='   . $_GET['cmin']   : '') 
-			. ((x($_GET,'cmax'))   ? '&cmax='   . $_GET['cmax']   : '') 
-			. ((x($_GET,'file'))   ? '&file='   . $_GET['file']   : '') 
-
-			. "'; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
-	}
-
 	$sql_extra3 = '';
 
 	if($datequery) {

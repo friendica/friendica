@@ -14,7 +14,7 @@ function display_content(&$a) {
 	require_once('include/acl_selectors.php');
 
 
-	$o = '<div id="live-display"></div>' . "\r\n";
+	$o = '';
 
 	$a->page['htmlhead'] .= get_markup_template('display-head.tpl');
 
@@ -78,7 +78,7 @@ function display_content(&$a) {
 		return;
 	}
 	
-	if ($is_owner)
+	if ($is_owner) {
 		$celeb = ((($a->user['page-flags'] == PAGE_SOAPBOX) || ($a->user['page-flags'] == PAGE_COMMUNITY)) ? true : false);
 
 		$x = array(
@@ -93,7 +93,7 @@ function display_content(&$a) {
 			'profile_uid' => local_user()
 		);	
 		$o .= status_editor($a,$x,0,true);
-
+	}
 
 	$sql_extra = item_permissions_sql($a->profile['uid'],$remote_contact,$groups);
 

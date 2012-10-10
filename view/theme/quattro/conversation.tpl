@@ -1,3 +1,5 @@
+$live_update
+
 {{ for $threads as $thread }}
 <div id="tread-wrapper-$thread.id" class="tread-wrapper">
 	{{ for $thread.items as $item }}

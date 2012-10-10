@@ -8,8 +8,6 @@ function profile_init(&$a) {
 	if(! x($a->page,'aside'))
 		$a->page['aside'] = '';
 
-	$blocked = (((get_config('system','block_public')) && (! local_user()) && (! remote_user())) ? true : false);
-
 	if($a->argc > 1)
 		$which = $a->argv[1];
 	else {
@@ -33,6 +31,7 @@ function profile_init(&$a) {
 
 	profile_load($a,$which,$profile);
 
+	$blocked = (((get_config('system','block_public')) && (! local_user()) && (! remote_user())) ? true : false);
 	$userblock = (($a->profile['hidewall'] && (! local_user()) && (! remote_user())) ? true : false);
 
 	if((x($a->profile,'page-flags')) && ($a->profile['page-flags'] == PAGE_COMMUNITY)) {
@@ -307,16 +306,6 @@ function profile_content(&$a, $update = 0) {
 	if($is_owner && (! $update) && (! get_config('theme','hide_eventlist'))) {
 		$o .= get_birthdays();
 		$o .= get_events();
-	}
-
-	if((! $update) && ($tab === 'posts')) {
-
-		// This is ugly, but we can't pass the profile_uid through the session to the ajax updater,
-		// because browser prefetching might change it on us. We have to deliver it with the page.
-
-		$o .= '<div id="live-profile"></div>' . "\r\n";
-		$o .= "<script> var profile_uid = " . $a->profile['profile_uid'] 
-			. "; var netargs = '?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
 	}
 
 

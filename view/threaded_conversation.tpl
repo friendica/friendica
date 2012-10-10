@@ -1,3 +1,5 @@
+$live_update
+
 {{ for $threads as $item }}
 {{ inc $item.template }}{{ endinc }}
 {{ endfor }}

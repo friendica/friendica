@@ -1,3 +1,5 @@
+$live_update
+
 {{ for $threads as $item }}
 
 <div id="tread-wrapper-$item.id" class="tread-wrapper {{ if $item.threaded }}threaded{{ endif }}">

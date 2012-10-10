@@ -374,33 +374,79 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 	$ssl_state = ((local_user()) ? true : false);
 
 	$profile_owner = 0;
-	$page_writeable      = false;
+	$page_writeable = false;
+	$live_update_div = '';
 
 	$previewing = (($preview) ? ' preview ' : '');
 
 	if($mode === 'network') {
 		$profile_owner = local_user();
 		$page_writeable = true;
-	}
+		if(!$update) {
+			// The special div is needed for liveUpdate to kick in for this page.
+			// We only launch liveUpdate if you aren't filtering in some incompatible 
+			// way and also you aren't writing a comment (discovered in javascript).
 
-	if($mode === 'profile') {
+			$live_update_div = '<div id="live-network"></div>' . "\r\n"
+				. "<script> var profile_uid = " . $_SESSION['uid'] 
+				. "; var netargs = '" . substr($a->cmd,8)
+				. '?f='
+				. ((x($_GET,'cid'))    ? '&cid='    . $_GET['cid']    : '')
+				. ((x($_GET,'search')) ? '&search=' . $_GET['search'] : '') 
+				. ((x($_GET,'star'))   ? '&star='   . $_GET['star']   : '') 
+				. ((x($_GET,'order'))  ? '&order='  . $_GET['order']  : '') 
+				. ((x($_GET,'bmark'))  ? '&bmark='  . $_GET['bmark']  : '') 
+				. ((x($_GET,'liked'))  ? '&liked='  . $_GET['liked']  : '') 
+				. ((x($_GET,'conv'))   ? '&conv='   . $_GET['conv']   : '') 
+				. ((x($_GET,'spam'))   ? '&spam='   . $_GET['spam']   : '') 
+				. ((x($_GET,'nets'))   ? '&nets='   . $_GET['nets']   : '') 
+				. ((x($_GET,'cmin'))   ? '&cmin='   . $_GET['cmin']   : '') 
+				. ((x($_GET,'cmax'))   ? '&cmax='   . $_GET['cmax']   : '') 
+				. ((x($_GET,'file'))   ? '&file='   . $_GET['file']   : '') 
+
+				. "'; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
+		}
+	}
+	else if($mode === 'profile') {
 		$profile_owner = $a->profile['profile_uid'];
 		$page_writeable = can_write_wall($a,$profile_owner);
-	}
 
-	if($mode === 'notes') {
+		if(!$update) {
+			$tab = notags(trim($_GET['tab']));
+			if($tab === 'posts') {
+				// This is ugly, but we can't pass the profile_uid through the session to the ajax updater,
+				// because browser prefetching might change it on us. We have to deliver it with the page.
+
+				$live_update_div = '<div id="live-profile"></div>' . "\r\n"
+					. "<script> var profile_uid = " . $a->profile['profile_uid'] 
+					. "; var netargs = '?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
+			}
+		}
+	}
+	else if($mode === 'notes') {
 		$profile_owner = local_user();
 		$page_writeable = true;
+		if(!$update) {
+			$live_update_div = '<div id="live-notes"></div>' . "\r\n"
+				. "<script> var profile_uid = " . local_user() 
+				. "; var netargs = '/?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
+		}
 	}
-
-	if($mode === 'display') {
+	else if($mode === 'display') {
 		$profile_owner = $a->profile['uid'];
 		$page_writeable = can_write_wall($a,$profile_owner);
+		$live_update_div = '<div id="live-display"></div>' . "\r\n";
 	}
-
-	if($mode === 'community') {
+	else if($mode === 'community') {
 		$profile_owner = 0;
 		$page_writeable = false;
+		if(!$update) {
+			$live_update_div = '<div id="live-community"></div>' . "\r\n"
+				. "<script> var profile_uid = -1; var netargs = '/?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
+		}
+	}
+	else if($mode === 'search') {
+		$live_update_div = '<div id="live-search"></div>' . "\r\n";
 	}
 
 	$page_dropping = ((local_user() && local_user() == $profile_owner) ? true : false);
@@ -630,7 +676,8 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 
 	$o = replace_macros($page_template, array(
 		'$baseurl' => $a->get_baseurl($ssl_state),
-        '$remove' => t('remove'),
+		'$live_update' => $live_update_div,
+		'$remove' => t('remove'),
 		'$mode' => $mode,
 		'$user' => $a->user,
 		'$threads' => $threads,

@@ -93,9 +93,7 @@ function search_content(&$a) {
 	require_once('include/security.php');
 	require_once('include/conversation.php');
 
-	$o = '<div id="live-search"></div>' . "\r\n";
-
-	$o .= '<h3>' . t('Search') . '</h3>';
+	$o = '<h3>' . t('Search') . '</h3>';
 
 	if(x($a->data,'search'))
 		$search = notags(trim($a->data['search']));
