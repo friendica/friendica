@@ -75,7 +75,10 @@ function manage_post(&$a) {
 	if($limited_id)
 		$_SESSION['submanage'] = $original_id;
 
-	goaway($a->get_baseurl(true) . '/profile/' . $a->user['nickname']);
+	$ret = array();
+	call_hooks('home_init',$ret);
+
+	goaway( $a->get_baseurl() . "/profile/" . $a->user['nickname'] );
 	// NOTREACHED
 }
 
