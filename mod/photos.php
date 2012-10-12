@@ -4,14 +4,18 @@ require_once('include/items.php');
 require_once('include/acl_selectors.php');
 require_once('include/bbcode.php');
 require_once('include/security.php');
+require_once('include/redir.php');
 
 
 function photos_init(&$a) {
 
+	if($a->argc > 1)
+		auto_redir($a, $a->argv[1]);
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		return;
 	}
+
 	$o = '';
 
 	if($a->argc > 1) {

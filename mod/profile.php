@@ -1,6 +1,7 @@
 <?php
 
 require_once('include/contact_widgets.php');
+require_once('include/redir.php');
 
 
 function profile_init(&$a) {
@@ -27,6 +28,9 @@ function profile_init(&$a) {
 	if((local_user()) && ($a->argc > 2) && ($a->argv[2] === 'view')) {
 		$which = $a->user['nickname'];
 		$profile = $a->argv[1];		
+	}
+	else {
+		auto_redir($a, $which);
 	}
 
 	profile_load($a,$which,$profile);
