@@ -413,6 +413,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 
 		if(!$update) {
 			$tab = notags(trim($_GET['tab']));
+			$tab = ( $tab ? $tab : 'posts' );
 			if($tab === 'posts') {
 				// This is ugly, but we can't pass the profile_uid through the session to the ajax updater,
 				// because browser prefetching might change it on us. We have to deliver it with the page.
