@@ -292,7 +292,12 @@ function onepoll_run($argv, $argc){
 				logger("Mail: Parsing ".count($msgs)." mails for ".$mailconf[0]['user'], LOGGER_DEBUG);
 
 				$metas = email_msg_meta($mbox,implode(',',$msgs));
+				if(count($metas) != count($msgs)) {
+					logger("onepoll: for " . $mailconf[0]['user'] . " there are ". count($msgs) . " messages but received " . count($metas) . " metas", LOGGER_DEBUG);
+					break;
+				}
 				$msgs = array_combine($msgs, $metas);
+
 				foreach($msgs as $msg_uid => $meta) {
 					logger("Mail: Parsing mail ".$msg_uid, LOGGER_DATA);
 
@@ -309,7 +314,7 @@ function onepoll_run($argv, $argc){
 					);
 
 					if(count($r)) {
-						logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user']);
+						logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user'],LOGGER_DEBUG);
 						if($meta->deleted && ! $r[0]['deleted']) {
 							q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
 								dbesc(datetime_convert()),
