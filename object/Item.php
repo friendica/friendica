@@ -519,7 +519,8 @@ class Item extends BaseObject {
 	 *      _ false on failure
 	 */
 	private function get_comment_box($indent) {
-		if(!$this->is_toplevel() && !get_config('system','thread_allow')) {
+		$a = $this->get_app();
+		if(!$this->is_toplevel() && !(get_config('system','thread_allow') && $a->theme_thread_allow)) {
 			return '';
 		}
 		
@@ -531,7 +532,6 @@ class Item extends BaseObject {
 			$ww = 'ww';
 
 		if($conv->is_writable() && $this->is_writable()) {
-			$a = $this->get_app();
 			$qc = $qcomment =  null;
 
 			/*

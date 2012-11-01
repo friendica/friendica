@@ -12,6 +12,8 @@ function auto_redir(&$a, $contact_nick) {
 		// same nickname as me on other hubs or other networks. Exclude these by requiring
 		// that the contact have a local URL. I will be the only person with my nickname at
 		// this URL, so if a result is found, then I am a contact of the $contact_nick user.
+		//
+		// We also have to make sure that I'm a legitimate contact--I'm not blocked or pending.
 
 		$baseurl = $a->get_baseurl();
 		$domain_st = strpos($baseurl, "://");
@@ -20,7 +22,7 @@ function auto_redir(&$a, $contact_nick) {
 		$baseurl = substr($baseurl, $domain_st + 3);
 
 		$r = q("SELECT id FROM contact WHERE uid = ( SELECT uid FROM user WHERE nickname = '%s' LIMIT 1 )
-		        AND nick = '%s' AND self = 0 AND url LIKE '%%%s%%' LIMIT 1",
+		        AND nick = '%s' AND self = 0 AND url LIKE '%%%s%%' AND blocked = 0 AND pending = 0 LIMIT 1",
 			   dbesc($contact_nick),
 			   dbesc($a->user['nickname']),
 		       dbesc($baseurl)
@@ -30,10 +32,12 @@ function auto_redir(&$a, $contact_nick) {
 			return;
 
 
-		$r = q("SELECT * FROM contact WHERE nick = '%s' AND network = '%s' AND uid = %d LIMIT 1",
+		$r = q("SELECT * FROM contact WHERE nick = '%s'
+		        AND network = '%s' AND uid = %d  AND url LIKE '%%%s%%' LIMIT 1",
 		       dbesc($contact_nick),
 		       dbesc(NETWORK_DFRN),
-		       intval(local_user())
+		       intval(local_user()),
+		       dbesc($baseurl)
 		);
 
 		if(! ($r && count($r)))

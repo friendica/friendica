@@ -1008,9 +1008,10 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 
 function get_item_children($arr, $parent) {
 	$children = array();
+	$a = get_app();
 	foreach($arr as $item) {
 		if($item['id'] != $item['parent']) {
-			if(get_config('system','thread_allow')) {
+			if(get_config('system','thread_allow') && $a->theme_thread_allow) {
 				// Fallback to parent-uri if thr-parent is not set
 				$thr_parent = $item['thr-parent'];
 				if($thr_parent == '')
