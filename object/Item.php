@@ -545,7 +545,8 @@ class Item extends BaseObject {
 			$comment_box = replace_macros($template,array(
 				'$return_path' => '',
 				'$threaded' => $this->is_threaded(),
-				'$jsreload' => (($conv->get_mode() === 'display') ? $_SESSION['return_url'] : ''),
+//				'$jsreload' => (($conv->get_mode() === 'display') ? $_SESSION['return_url'] : ''),
+				'$jsreload' => '',
 				'$type' => (($conv->get_mode() === 'profile') ? 'wall-comment' : 'net-comment'),
 				'$id' => $this->get_id(),
 				'$parent' => $this->get_id(),
@@ -567,7 +568,8 @@ class Item extends BaseObject {
 				'$preview' => t('Preview'),
 				'$indent' => $indent,
 				'$sourceapp' => t($a->sourcename),
-				'$ww' => (($conv->get_mode() === 'network') ? $ww : '')
+				'$ww' => (($conv->get_mode() === 'network') ? $ww : ''),
+				'$rand_num' => random_digits(12)
 			));
 		}
 

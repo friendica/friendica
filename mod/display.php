@@ -1,7 +1,7 @@
 <?php
 
 
-function display_content(&$a) {
+function display_content(&$a, $update = 0) {
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		notice( t('Public access denied.') . EOL);
@@ -19,10 +19,20 @@ function display_content(&$a) {
 	$a->page['htmlhead'] .= get_markup_template('display-head.tpl');
 
 
-	$nick = (($a->argc > 1) ? $a->argv[1] : '');
+	if($update) {
+		$nick = $_REQUEST['nick'];
+	}
+	else {
+		$nick = (($a->argc > 1) ? $a->argv[1] : '');
+	}
 	profile_load($a,$nick);
 
-	$item_id = (($a->argc > 2) ? intval($a->argv[2]) : 0);
+	if($update) {
+		$item_id = $_REQUEST['item_id'];
+	}
+	else {
+		$item_id = (($a->argc > 2) ? intval($a->argv[2]) : 0);
+	}
 
 	if(! $item_id) {
 		$a->error = 404;
@@ -97,6 +107,18 @@ function display_content(&$a) {
 
 	$sql_extra = item_permissions_sql($a->profile['uid'],$remote_contact,$groups);
 
+	if($update) {
+		$r = q("SELECT id FROM item WHERE item.uid = %d
+		        AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE ( `id` = '%s' OR `uri` = '%s' ))
+		        $sql_extra AND unseen = 1",
+		        intval($a->profile['uid']),
+		        dbesc($item_id),
+		        dbesc($item_id) 
+		);
+		if(!$r)
+			return '';
+	}
+
 	$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
 		`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
 		`contact`.`network`, `contact`.`thumb`, `contact`.`self`, `contact`.`writable`, 
@@ -124,8 +146,10 @@ function display_content(&$a) {
 		}
 
 		$items = conv_sort($r,"`commented`");
-		
-		$o .= conversation($a,$items,'display', false);
+
+		if(!$update)
+			$o .= "<script> var netargs = '?f=&nick=" . $nick . "&item_id=" . $item_id . "'; </script>";
+		$o .= conversation($a,$items,'display', $update);
 
 	}
 	else {

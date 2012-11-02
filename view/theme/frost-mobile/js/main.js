@@ -243,12 +243,13 @@
 					if($j('#live-profile').length)   { src = 'profile'; liveUpdate(); }
 					if($j('#live-community').length) { src = 'community'; liveUpdate(); }
 					if($j('#live-notes').length)     { src = 'notes'; liveUpdate(); }
-					if($j('#live-display').length) {
+					if($j('#live-display').length) { src = 'display'; liveUpdate(); }
+					/*if($j('#live-display').length) {
 						if(liking) {
 							liking = 0;
 							window.location.href=window.location.href 
 						}
-					}
+					}*/
 					if($j('#live-photos').length) {
 						if(liking) {
 							liking = 0;
@@ -307,10 +308,26 @@
 					$j('#' + prev).after($j(this));
 				}
 				else {
+					// Find out if the hidden comments are open, so we can keep it that way
+					// if a new comment has been posted
+					var id = $j('.hide-comments-total', this).attr('id');
+					if(typeof id != 'undefined') {
+						id = id.split('-')[3];
+						var commentsOpen = $j("#collapsed-comments-" + id).is(":visible");
+					}
+
 					$j('img',this).each(function() {
 						$j(this).attr('src',$j(this).attr('dst'));
 					});
+					//vScroll = $j(document).scrollTop();
+					$j('html').height($j('html').height());
 					$j('#' + ident).replaceWith($j(this));
+
+					if(typeof id != 'undefined') {
+						if(commentsOpen) showHideComments(id);
+					}
+					$j('html').height('auto');
+					//$j(document).scrollTop(vScroll);
 				}
 				prev = ident;
 			});
@@ -516,6 +533,17 @@
          return true;  
 	}
 
+
+	function showHideComments(id) {
+		if( $j("#collapsed-comments-" + id).is(":visible")) {
+			$j("#collapsed-comments-" + id).hide();
+			$j("#hide-comments-" + id).html(window.showMore);
+		}
+		else {
+			$j("#collapsed-comments-" + id).show();
+			$j("#hide-comments-" + id).html(window.showFewer);
+		}
+	}
 
 
 	function preview_post() {

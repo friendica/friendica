@@ -194,21 +194,26 @@ function initEditor(cb) {
 	});
 
 	function deleteCheckedItems() {
-		var checkedstr = '';
+		if(confirm('$delitems')) {
+			var checkedstr = '';
 
-		$('.item-select').each( function() {
-			if($(this).is(':checked')) {
-				if(checkedstr.length != 0) {
-					checkedstr = checkedstr + ',' + $(this).val();
-				}
-				else {
-					checkedstr = $(this).val();
-				}
-			}	
-		});
-		$.post('item', { dropitems: checkedstr }, function(data) {
-			window.location.reload();
-		});
+			$("#item-delete-selected").hide();
+			$('#item-delete-selected-rotator').show();
+
+			$('.item-select').each( function() {
+				if($(this).is(':checked')) {
+					if(checkedstr.length != 0) {
+						checkedstr = checkedstr + ',' + $(this).val();
+					}
+					else {
+						checkedstr = $(this).val();
+					}
+				}	
+			});
+			$.post('item', { dropitems: checkedstr }, function(data) {
+				window.location.reload();
+			});
+		}
 	}
 
 	function jotGetLink() {

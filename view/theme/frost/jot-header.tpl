@@ -12,5 +12,6 @@
 	window.baseURL = "$baseurl";
 	window.geoTag = function () { $geotag }
 	window.ajaxType = 'jot-header';
+	window.delItems = '$delitems';
 </script>
 

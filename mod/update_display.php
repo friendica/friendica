@@ -2,10 +2,10 @@
 
 // See update_profile.php for documentation
 
-require_once('mod/network.php');
+require_once('mod/display.php');
 require_once('include/group.php');
 
-function update_network_content(&$a) {
+function update_display_content(&$a) {
 
 	$profile_uid = intval($_GET['p']);
 
@@ -14,7 +14,7 @@ function update_network_content(&$a) {
 	echo (($_GET['msie'] == 1) ? '<div>' : '<section>');
 
 
-	$text = network_content($a,$profile_uid);
+	$text = display_content($a,$profile_uid);
 	$pattern = "/<img([^>]*) src=\"([^\"]*)\"/";
 	$replace = "<img\${1} dst=\"\${2}\"";
 	$text = preg_replace($pattern, $replace, $text);

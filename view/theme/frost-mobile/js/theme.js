@@ -533,17 +533,6 @@ function qCommentInsert(obj,id) {
 	$j(obj).val("");
 }
 
-function showHideComments(id) {
-	if( $j("#collapsed-comments-" + id).is(":visible")) {
-		$j("#collapsed-comments-" + id).hide();
-		$j("#hide-comments-" + id).html(window.showMore);
-	}
-	else {
-		$j("#collapsed-comments-" + id).show();
-		$j("#hide-comments-" + id).html(window.showFewer);
-	}
-}
-
 /*function showHideCommentBox(id) {
 	if( $j('#comment-edit-form-' + id).is(':visible')) {
 		$j('#comment-edit-form-' + id).hide();

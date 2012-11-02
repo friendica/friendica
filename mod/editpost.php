@@ -139,7 +139,8 @@ function editpost_content(&$a) {
 		'$preview' => t('Preview'),
 		'$jotplugins' => $jotplugins,
 		'$sourceapp' => t($a->sourcename),
-		'$cancel' => t('Cancel')
+		'$cancel' => t('Cancel'),
+		'$rand_num' => random_digits(12)
 	));
 
 	return $o;

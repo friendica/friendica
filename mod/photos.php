@@ -1406,7 +1406,8 @@ function photos_content(&$a) {
 							'$submit' => t('Submit'),
 							'$preview' => t('Preview'),
 							'$sourceapp' => t($a->sourcename),
-							'$ww' => ''
+							'$ww' => '',
+							'$rand_num' => random_digits(12)
 						));
 					}
 				}
@@ -1449,7 +1450,8 @@ function photos_content(&$a) {
 							'$submit' => t('Submit'),
 							'$preview' => t('Preview'),
 							'$sourceapp' => t($a->sourcename),
-							'$ww' => ''
+							'$ww' => '',
+							'$rand_num' => random_digits(12)
 						));
 					}
 				}
@@ -1520,7 +1522,8 @@ function photos_content(&$a) {
 								'$submit' => t('Submit'),
 								'$preview' => t('Preview'),
 								'$sourceapp' => t($a->sourcename),
-								'$ww' => ''
+								'$ww' => '',
+								'$rand_num' => random_digits(12)
 							));
 						}
 					}

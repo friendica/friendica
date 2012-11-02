@@ -46,6 +46,19 @@ function item_post(&$a) {
 	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
 	$preview = ((x($_REQUEST,'preview')) ? intval($_REQUEST['preview']) : 0);
 
+
+	// Check for doubly-submitted posts, and reject duplicates
+	// Note that we have to ignore previews, otherwise nothing will post
+	// after it's been previewed
+	if(!$preview && x($_REQUEST['post_id_random'])) {
+		if(x($_SESSION['post-random']) && $_SESSION['post-random'] == $_REQUEST['post_id_random']) {
+			logger("item post: duplicate post", LOGGER_DEBUG);
+			item_post_return($a->get_baseurl(), $api_source, $return_path);
+		}
+		else
+			$_SESSION['post-random'] = $_REQUEST['post_id_random'];
+	}
+
 	/**
 	 * Is this a reply to something?
 	 */
@@ -98,7 +111,7 @@ function item_post(&$a) {
 
 		// multi-level threading - preserve the info but re-parent to our single level threading
 		//if(($parid) && ($parid != $parent))
-			$thr_parent = $parent_uri;
+		$thr_parent = $parent_uri;
 
 		if($parent_item['contact-id'] && $uid) {
 			$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -873,27 +886,29 @@ function item_post(&$a) {
 
 	logger('post_complete');
 
+	item_post_return($a->get_baseurl(), $api_source, $return_path);
+	// NOTREACHED
+}
+
+function item_post_return($baseurl, $api_source, $return_path) {
 	// figure out how to return, depending on from whence we came
 
 	if($api_source)
 		return;
 
 	if($return_path) {
-		goaway($a->get_baseurl() . "/" . $return_path);
+		goaway($baseurl . "/" . $return_path);
 	}
 
 	$json = array('success' => 1);
 	if(x($_REQUEST,'jsreload') && strlen($_REQUEST['jsreload']))
-		$json['reload'] = $a->get_baseurl() . '/' . $_REQUEST['jsreload'];
+		$json['reload'] = $baseurl . '/' . $_REQUEST['jsreload'];
 
 	logger('post_json: ' . print_r($json,true), LOGGER_DEBUG);
 
 	echo json_encode($json);
 	killme();
-	// NOTREACHED
 }
-
-
 
 
 

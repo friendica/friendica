@@ -3901,10 +3901,10 @@ function drop_item($id,$interactive = true) {
 
 		// send the notification upstream/downstream as the case may be
 
+		proc_run('php',"include/notifier.php","drop","$drop_id");
+
 		if(! $interactive)
 			return $owner;
-
-		proc_run('php',"include/notifier.php","drop","$drop_id");
 		goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
 		//NOTREACHED
 	}

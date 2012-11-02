@@ -1796,3 +1796,10 @@ function curPageURL() {
 	return $pageURL;
 }
 
+function random_digits($digits) {
+	$rn = '';
+	for($i = 0; $i < $digits; $i++) {
+		$rn .= rand(0,9);
+	}
+	return $rn;
+}
