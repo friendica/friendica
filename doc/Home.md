@@ -6,6 +6,8 @@ Friendica Documentation and Resources
 
 * [Account Basics](help/Account-Basics)
 * [New User Quick Start](help/guide)
+* [Creating posts](help/Text_editor)
+* [Comment, sort and delete posts](help/Text_comment)
 * [Profiles](help/Profiles)
 * [Connectors](help/Connectors)
 * [Making Friends](help/Making-Friends)
