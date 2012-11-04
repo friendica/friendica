@@ -25,9 +25,10 @@ function home_content(&$a) {
 	if(x($_SESSION,'mobile-theme'))
 		unset($_SESSION['mobile-theme']);
 
-	$o .= '<h1>' . ((x($a->config,'sitename')) ? sprintf( t("Welcome to %s") ,$a->config['sitename']) : "" ) . '</h1>';
 	if(file_exists('home.html'))
  		$o .= file_get_contents('home.html');
+	else 	$o .= '<h1>' . ((x($a->config,'sitename')) ? sprintf( t("Welcome to %s") ,$a->config['sitename']) : "" ) . '</h1>';
+
 
 	$o .= login(($a->config['register_policy'] == REGISTER_CLOSED) ? 0 : 1);
 	
