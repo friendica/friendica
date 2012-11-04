@@ -323,7 +323,7 @@ function delivery_run($argv, $argc){
 						WHERE `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 						AND `contact`.`network` = '%s' AND `user`.`nickname` = '%s'
 						$sql_extra
-						AND `user`.`account_expired` = 0 LIMIT 1",
+						AND `user`.`account_expired` = 0 AND `user`.`account_removed` = 0 LIMIT 1",
 						dbesc(NETWORK_DFRN),
 						dbesc($nickname)
 					);

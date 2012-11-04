@@ -12,7 +12,7 @@ function profile_init(&$a) {
 	if($a->argc > 1)
 		$which = $a->argv[1];
 	else {
-		$r = q("select nickname from user where blocked = 0 and account_expired = 0 and verified = 1 order by rand() limit 1");
+		$r = q("select nickname from user where blocked = 0 and account_expired = 0 and account_removed = 0 and verified = 1 order by rand() limit 1");
 		if(count($r)) {
 			goaway($a->get_baseurl() . '/profile/' . $r[0]['nickname']);
 		}

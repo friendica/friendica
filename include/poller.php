@@ -67,6 +67,16 @@ function poller_run($argv, $argc){
 	q("UPDATE user SET `account_expired` = 1 where `account_expired` = 0 
 		AND `account_expires_on` != '0000-00-00 00:00:00' 
 		AND `account_expires_on` < UTC_TIMESTAMP() ");
+	
+	// delete user and contact records for recently removed accounts
+
+	$r = q("SELECT * FROM `user` WHERE `account_removed` = 1 AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
+	if ($r) {
+		foreach($r as $user) {
+			q("DELETE FROM `contact` WHERE `uid` = %d", intval($user['uid']));
+			q("DELETE FROM `user` WHERE `uid` = %d", intval($user['uid']));
+		}
+	}
   
 	$abandon_days = intval(get_config('system','account_abandon_days'));
 	if($abandon_days < 1)
@@ -154,7 +164,7 @@ function poller_run($argv, $argc){
 		$sql_extra 
 		AND `self` = 0 AND `contact`.`blocked` = 0 AND `contact`.`readonly` = 0 
 		AND `contact`.`archive` = 0 
-		AND `user`.`account_expired` = 0 $abandon_sql ORDER BY RAND()",
+		AND `user`.`account_expired` = 0 AND `user`.`account_removed` = 0 $abandon_sql ORDER BY RAND()",
 		intval(CONTACT_IS_SHARING),
 		intval(CONTACT_IS_FRIEND),
 		dbesc(NETWORK_DIASPORA),

@@ -77,7 +77,7 @@ function dfrn_notify_post(&$a) {
 			FROM `contact` 
 			LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid` 
 			WHERE `contact`.`blocked` = 0 AND `contact`.`pending` = 0 
-				AND `user`.`nickname` = '%s' AND `user`.`account_expired` = 0 $sql_extra LIMIT 1",
+				AND `user`.`nickname` = '%s' AND `user`.`account_expired` = 0 AND `user`.`account_removed` = 0 $sql_extra LIMIT 1",
 		dbesc($a->argv[1])
 	);
 
@@ -220,7 +220,7 @@ function dfrn_notify_content(&$a) {
 
 		$r = q("SELECT `contact`.*, `user`.`nickname`, `user`.`page-flags` FROM `contact` LEFT JOIN `user` ON `user`.`uid` = `contact`.`uid` 
 				WHERE `contact`.`blocked` = 0 AND `contact`.`pending` = 0 AND `user`.`nickname` = '%s' 
-				AND `user`.`account_expired` = 0 $sql_extra LIMIT 1",
+				AND `user`.`account_expired` = 0 AND `user`.`account_removed` = 0 $sql_extra LIMIT 1",
 				dbesc($a->argv[1])
 		);
 

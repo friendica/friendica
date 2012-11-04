@@ -20,7 +20,7 @@ function post_post(&$a) {
 	else {
 		$nickname = $a->argv[2];
 		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' 
-				AND `account_expired` = 0 LIMIT 1",
+				AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 			dbesc($nickname)
 		);
 		if(! count($r))

@@ -31,7 +31,7 @@ function receive_post(&$a) {
 
 		$guid = $a->argv[2];
 
-		$r = q("SELECT * FROM `user` WHERE `guid` = '%s' AND `account_expired` = 0 LIMIT 1",
+		$r = q("SELECT * FROM `user` WHERE `guid` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 			dbesc($guid)
 		);
 		if(! count($r))

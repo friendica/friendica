@@ -44,7 +44,7 @@ function pubsub_init(&$a) {
 
 		$subscribe = (($hub_mode === 'subscribe') ? 1 : 0);
 
-		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 LIMIT 1",
+		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 			dbesc($nick)
 		);
 		if(! count($r)) {
@@ -112,7 +112,7 @@ function pubsub_post(&$a) {
 	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
 	$contact_id = (($a->argc > 2) ? intval($a->argv[2])       : 0 );
 
-	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 LIMIT 1",
+	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 		dbesc($nick)
 	);
 	if(! count($r))

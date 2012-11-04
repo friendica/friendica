@@ -133,7 +133,7 @@ class FKOAuth1 extends OAuthServer {
 	function loginUser($uid){
 		logger("FKOAuth1::loginUser $uid");
 		$a = get_app();
-		$r = q("SELECT * FROM `user` WHERE uid=%d AND `blocked` = 0 AND `account_expired` = 0 AND `verified` = 1 LIMIT 1",
+		$r = q("SELECT * FROM `user` WHERE uid=%d AND `blocked` = 0 AND `account_expired` = 0 AND `account_removed` = 0 AND `verified` = 1 LIMIT 1",
 			intval($uid)
 		);
 		if(count($r)){
