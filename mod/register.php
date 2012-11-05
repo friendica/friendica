@@ -42,6 +42,7 @@ function register_post(&$a) {
 		$verified = 0;
 		break;
 	}
+    
 
 	require_once('include/user.php');
 
@@ -234,7 +235,7 @@ function register_content(&$a) {
 			'$yes_selected' => ' checked="checked" ',
 			'$no_selected'  => '',
 			'$str_yes'      => t('Yes'),
-			'$str_no'       => t('No')
+			'$str_no'       => t('No'),
 		));
 	}
 
@@ -275,7 +276,8 @@ function register_content(&$a) {
 		'$email'     => $email,
 		'$nickname'  => $nickname,
 		'$license'   => $license,
-		'$sitename'  => $a->get_hostname()
+		'$sitename'  => $a->get_hostname(),
+      
 	));
 	return $o;
 

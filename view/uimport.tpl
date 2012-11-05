@@ -1,0 +1,11 @@
+<form action="uimport" method="post" id="uimport-form" enctype="multipart/form-data">
+<h1>$import.title</h1>
+    <p>$import.text</p>
+     {{inc field_custom.tpl with $field=$import.field }}{{ endinc }}
+     
+     
+	<div id="register-submit-wrapper">
+		<input type="submit" name="submit" id="register-submit-button" value="$regbutt" />
+	</div>
+	<div id="register-submit-end" ></div>    
+</form>

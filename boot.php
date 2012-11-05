@@ -385,7 +385,7 @@ if(! class_exists('App')) {
 							
 		function __construct() {
 
-			global $default_timezone;
+			global $default_timezone, $argv, $argc;
 
 			$this->timezone = ((x($default_timezone)) ? $default_timezone : 'UTC');
 
@@ -428,6 +428,9 @@ if(! class_exists('App')) {
 				if(isset($path) && strlen($path) && ($path != $this->path))
 					$this->path = $path;
 			}
+			if (is_array($argv) && $argc>1 && !x($_SERVER,'SERVER_NAME') && substr(end($argv), 0, 4)=="http" ) {
+				$this->set_baseurl(array_pop($argv) );
+			}
 
 			set_include_path(
 					"include/$this->hostname" . PATH_SEPARATOR
@@ -436,6 +439,7 @@ if(! class_exists('App')) {
 					. 'library/phpsec' . PATH_SEPARATOR
 					. 'library/langdet' . PATH_SEPARATOR
 					. '.' );
+            
 
 			if((x($_SERVER,'QUERY_STRING')) && substr($_SERVER['QUERY_STRING'],0,2) === "q=") {
 				$this->query_string = substr($_SERVER['QUERY_STRING'],2);
@@ -1501,8 +1505,14 @@ if(! function_exists('proc_run')) {
 
 		if(count($args) && $args[0] === 'php')
 			$args[0] = ((x($a->config,'php_path')) && (strlen($a->config['php_path'])) ? $a->config['php_path'] : 'php');
-		for($x = 0; $x < count($args); $x ++)
+        
+        // add baseurl to args. cli scripts can't construct it
+        $args[] = $a->get_baseurl();
+        
+        for($x = 0; $x < count($args); $x ++)
 			$args[$x] = escapeshellarg($args[$x]);
+
+        
 
 		$cmdline = implode($args," ");
 		if(get_config('system','proc_windows'))

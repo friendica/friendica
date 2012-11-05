@@ -3,7 +3,7 @@ require_once("boot.php");
 require_once('include/queue_fn.php');
 require_once('include/html2plain.php');
 
-function delivery_run($argv, $argc){
+function delivery_run(&$argv, &$argc){
 	global $a, $db;
 
 	if(is_null($a)){

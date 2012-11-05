@@ -1,5 +1,4 @@
 <?php
-
 require_once("boot.php");
 require_once('include/queue_fn.php');
 require_once('include/html2plain.php');
@@ -43,7 +42,7 @@ require_once('include/html2plain.php');
  */
 
 
-function notifier_run($argv, $argc){
+function notifier_run(&$argv, &$argc){
 	global $a, $db;
 
 	if(is_null($a)){
@@ -89,6 +88,7 @@ function notifier_run($argv, $argc){
 	$expire = false;
 	$mail = false;
 	$fsuggest = false;
+    $relocate = false;
 	$top_level = false;
 	$recipients = array();
 	$url_recipients = array();
@@ -148,8 +148,12 @@ function notifier_run($argv, $argc){
 		}
 		return;
 	}
+    elseif($cmd === 'relocate') {
+        $normal_mode = false;
+		$relocate = true;
+        $uid = $item_id;
+    }
 	else {
-
 		// find ancestors
 		$r = q("SELECT * FROM `item` WHERE `id` = %d and visible = 1 and moderated = 0 LIMIT 1",
 			intval($item_id)
@@ -214,7 +218,7 @@ function notifier_run($argv, $argc){
 	// fill this in with a single salmon slap if applicable
 	$slap = '';
 
-	if(! ($mail || $fsuggest)) {
+	if(! ($mail || $fsuggest || $relocate)) {
 
 		require_once('include/group.php');
 
@@ -418,6 +422,45 @@ function notifier_run($argv, $argc){
 		);
 
 	}
+    elseif($relocate) {
+        $public_message = false;  // suggestions are not public
+
+		$sugg_template = get_markup_template('atom_relocate.tpl');
+
+		/* get site pubkey. this could be a new installation with no site keys*/
+		$pubkey = get_config('system','site_pubkey');
+		if(! $pubkey) {
+			$res = new_keypair(1024);
+			set_config('system','site_prvkey', $res['prvkey']);
+			set_config('system','site_pubkey', $res['pubkey']);
+		}
+		
+		$rp = q("SELECT `resource-id` , `scale`, type FROM `photo` 
+						WHERE `profile` = 1 AND `uid` = %d ORDER BY scale;", $uid);
+		$photos = array();
+		$ext = Photo::supportedTypes();
+		foreach($rp as $p){
+			$photos[$p['scale']] = $a->get_baseurl().'/photo/'.$p['resource-id'].'-'.$p['scale'].'.'.$ext[$p['type']];
+		}
+		unset($rp, $ext);
+		
+        $atom .= replace_macros($sugg_template, array(
+            '$name' => xmlify($owner['name']),
+            '$photo' => xmlify($photos[4]),
+            '$thumb' => xmlify($photos[5]),
+            '$micro' => xmlify($photos[6]),
+            '$url' => xmlify($owner['url']),
+            '$request' => xmlify($owner['request']),
+            '$confirm' => xmlify($owner['confirm']),
+            '$notify' => xmlify($owner['notify']),
+            '$poll' => xmlify($owner['poll']),
+            '$sitepubkey' => xmlify(get_config('system','site_pubkey')),
+            //'$pubkey' => xmlify($owner['pubkey']),
+            //'$prvkey' => xmlify($owner['prvkey']),
+		)); 
+        $recipients_relocate = q("SELECT * FROM contact WHERE uid = %d  AND self = 0 AND network = '%s'" , intval($uid), NETWORK_DFRN);
+		unset($photos);
+    }
 	else {
 		if($followup) {
 			foreach($items as $item) {  // there is only one item
@@ -493,9 +536,12 @@ function notifier_run($argv, $argc){
 	else
 		$recip_str = implode(', ', $recipients);
 
-	$r = q("SELECT * FROM `contact` WHERE `id` IN ( %s ) AND `blocked` = 0 AND `pending` = 0 ",
-		dbesc($recip_str)
-	);
+    if ($relocate)
+        $r = $recipients_relocate;
+    else
+        $r = q("SELECT * FROM `contact` WHERE `id` IN ( %s ) AND `blocked` = 0 AND `pending` = 0 ",
+            dbesc($recip_str)
+        );
 
 
 	require_once('include/salmon.php');
@@ -507,7 +553,7 @@ function notifier_run($argv, $argc){
 	if(count($r)) {
 
 		foreach($r as $contact) {
-			if((! $mail) && (! $fsuggest) && (! $followup) && (! $contact['self'])) {
+			if((! $mail) && (! $fsuggest) && (! $followup) && (!$relocate) && (! $contact['self'])) {
 				if(($contact['network'] === NETWORK_DIASPORA) && ($public_message))
 					continue;
 				q("insert into deliverq ( `cmd`,`item`,`contact` ) values ('%s', %d, %d )",
@@ -544,7 +590,7 @@ function notifier_run($argv, $argc){
 			// potentially more than one recipient. Start a new process and space them out a bit.
 			// we will deliver single recipient types of message and email recipients here. 
 		
-			if((! $mail) && (! $fsuggest) && (! $followup)) {
+			if((! $mail) && (! $fsuggest) && (!$relocate) && (! $followup)) {
 
 				$this_batch[] = $contact['id'];
 
@@ -559,7 +605,7 @@ function notifier_run($argv, $argc){
 
 			$deliver_status = 0;
 
-			logger("main delivery by notifier: followup=$followup mail=$mail fsuggest=$fsuggest");
+			logger("main delivery by notifier: followup=$followup mail=$mail fsuggest=$fsuggest relocate=$relocate");
 
 			switch($contact['network']) {
 				case NETWORK_DFRN:
@@ -915,6 +961,7 @@ function notifier_run($argv, $argc){
 
 	return;
 }
+
 
 if (array_search(__file__,get_included_files())===0){
   notifier_run($argv,$argc);

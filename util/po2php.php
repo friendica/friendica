@@ -1,7 +1,7 @@
 <?php
 
 
-function po2php_run($argv, $argc) {
+function po2php_run(&$argv, &$argc) {
 
 	if ($argc!=2) {
 		print "Usage: ".$argv[0]." <file.po>\n\n";

@@ -1,7 +1,7 @@
 <?php
 require_once("boot.php");
 
-function directory_run($argv, $argc){
+function directory_run(&$argv, &$argc){
 	global $a, $db;
 
 	if(is_null($a)) {

@@ -3,7 +3,7 @@
 require_once("boot.php");
 
 
-function cronhooks_run($argv, $argc){
+function cronhooks_run(&$argv, &$argc){
 	global $a, $db;
 
 	if(is_null($a)) {

@@ -2,7 +2,7 @@
 require_once("boot.php");
 require_once('include/queue_fn.php');
 
-function queue_run($argv, $argc){
+function queue_run(&$argv, &$argc){
 	global $a, $db;
 
 	if(is_null($a)){

@@ -2,7 +2,7 @@
 
 require_once("boot.php");
 
-function expire_run($argv, $argc){
+function expire_run(&$argv, &$argc){
 	global $a, $db;
 
 	if(is_null($a)) {

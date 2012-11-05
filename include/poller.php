@@ -3,7 +3,7 @@
 require_once("boot.php");
 
 
-function poller_run($argv, $argc){
+function poller_run(&$argv, &$argc){
 	global $a, $db;
 
 	if(is_null($a)) {
