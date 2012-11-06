@@ -136,11 +136,15 @@ function notifier_run(&$argv, &$argc){
 	}
 	elseif($cmd === 'removeme') {
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval($item_id));
+		if (! $r)
+			return;
 		$user = $r[0];
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 1 LIMIT 1", intval($item_id));
+		if (! $r)
+			return;
 		$self = $r[0];
 		$r = q("SELECT * FROM `contact` WHERE `self` = 0 AND `uid` = %d", intval($item_id));
-		if(! count($r))
+		if(! $r)
 			return;
 		require_once('include/Contact.php');
 		foreach($r as $contact) {
