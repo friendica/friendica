@@ -1,6 +1,5 @@
 <?php
 
-
 function uexport_init(&$a){
 	if(! local_user())
 		killme();
@@ -88,7 +87,8 @@ function uexport_content(&$a){
 function _uexport_multirow($query) {
 	$result = array();
 	$r = q($query);
-	if(count($r)) {
+//	if(count($r)) {
+	if ($r){
 		foreach($r as $rr){
             $p = array();
 			foreach($rr as $k => $v)
@@ -102,7 +102,7 @@ function _uexport_multirow($query) {
 function _uexport_row($query) {
 	$result = array();
 	$r = q($query);
-	if(count($r)) {
+	if ($r) {
 		foreach($r as $rr)
 			foreach($rr as $k => $v)
 				$result[$k] = $v;
@@ -128,20 +128,20 @@ function uexport_account($a){
 	);
 
     $photo = _uexport_multirow(
-        sprintf( "SELECT * FROM photo WHERE uid = %d AND profile = 1", intval(local_user()) )
+        sprintf( "SELECT * FROM `photo` WHERE uid = %d AND profile = 1", intval(local_user()) )
     );
     foreach ($photo as &$p) $p['data'] = bin2hex($p['data']);
 
     $pconfig = _uexport_multirow(
-        sprintf( "SELECT * FROM pconfig WHERE uid = %d",intval(local_user()) )
+        sprintf( "SELECT * FROM `pconfig` WHERE uid = %d",intval(local_user()) )
     );
 
     $group = _uexport_multirow(
-        sprintf( "SELECT * FROM group WHERE uid = %d",intval(local_user()) )
+        sprintf( "SELECT * FROM `group` WHERE uid = %d",intval(local_user()) )
     );
     
     $group_member = _uexport_multirow(
-        sprintf( "SELECT * FROM group_member WHERE uid = %d",intval(local_user()) )
+        sprintf( "SELECT * FROM `group_member` WHERE uid = %d",intval(local_user()) )
     );
 
 	$output = array(
