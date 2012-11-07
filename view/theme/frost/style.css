@@ -85,6 +85,7 @@ blockquote {
 }
 .hide-comments-outer:hover {
 	opacity: 1.0;
+	border-bottom: 1px solid #DDD; /* manually prevent the border from changing color */
 }
 .hide-comments {
 	margin-left: 5px;
@@ -3418,18 +3419,18 @@ aside input[type='text'] {
 	background-repeat: no-repeat;
 }
 /*.dislike { background-position: -112px 0px;}*/
-.icon.dislike {
+.tool.dislike {
 	display: block; width: 15px; height: 16px;/* 23 24*/
 	background-size: 100% 100%;
 	background-image: url('images/disapprove-16.png');
 	background-repeat: no-repeat;
 	opacity: 0.4;
 }
-.icon.dislike:hover {
+.tool.dislike:hover {
 	opacity: 1.0;
 }
 /*.like { background-position: -128px 0px;}*/
-.icon.like {
+.tool.like {
 	display: block; width: 15px; height: 16px;/* 23 24*/
 	margin-right: 6px;
 	background-size: 100% 100%;
@@ -3437,7 +3438,7 @@ aside input[type='text'] {
 	background-repeat: no-repeat;
 	opacity: 0.4;
 }
-.icon.like:hover {
+.tool.like:hover {
 	opacity: 1.0;
 }
 /*.link { background-position: -144px 0px;}*/
@@ -3466,14 +3467,14 @@ aside input[type='text'] {
 .pause { background-position: -48px -16px;}
 .play { background-position: -64px -16px;}
 /*.pencil { background-position: -80px -16px;}*/
-.icon.pencil {
+.tool.pencil {
 	display: block; width: 16px; height: 16px;
 	background-size: 100% 100%;
 	background-image: url('images/pencil-16.png');
 	background-repeat: no-repeat;
 	opacity: 0.4;
 }
-.icon.pencil:hover {
+.tool.pencil:hover {
 	opacity: 1.0;
 }
 /*.small-pencil { background-position: -96px -16px;}*/
@@ -3488,14 +3489,14 @@ aside input[type='text'] {
 	opacity: 1.0;
 }
 /*.recycle { background-position: -112px -16px;}*/
-.icon.recycle {
+.tool.recycle {
 	display: block; width: 16px; height: 16px;/*24 23*/
 	background-size: 100% 100%;
 	background-image: url('images/recycle-16.png');
 	background-repeat: no-repeat;
 	opacity: 0.4;
 }
-.icon.recycle:hover {
+.tool.recycle:hover {
 	opacity: 1.0;
 }
 /*.remote-link { background-position: -128px -16px;}*/
@@ -3556,32 +3557,32 @@ aside input[type='text'] {
 
 .off { background-position: 0px -48px; }
 /*.starred { background-position: -16px -48px; }*/
-.icon.starred {
+.tool.starred {
 	display: block; width: 16px; height: 16px;
 	background-size: 100% 100%;
 	background-image: url('images/star-yellow-16.png');
 	background-repeat: no-repeat;
 }
 /*.unstarred { background-position: -32px -48px; }*/
-.icon.unstarred {
+.tool.unstarred {
 	display: block; width: 16px; height: 16px;
 	background-size: 100% 100%;
 	background-image: url('images/star-16.png');
 	background-repeat: no-repeat;
 	opacity: 0.4;
 }
-.icon.unstarred:hover {
+.tool.unstarred:hover {
 	opacity: 1.0;
 }
 /*.tagged { background-position: -48px -48px; }*/
-.icon.tagged {
+.tool.tagged {
 	display: block; width: 16px; height: 16px;
 	background-size: 100% 100%;
 	background-image: url('images/tag-16.png');
 	background-repeat: no-repeat;
 	opacity: 0.4;
 }
-.icon.tagged:hover {
+.tool.tagged:hover {
 	opacity: 1.0;
 }
 .yellow { background-position: -64px -48px; }

@@ -9,7 +9,7 @@ $j(document).ready(function() {
 			case 'jot-header':
 				var uploader = new window.AjaxUpload(
 					'wall-image-upload',
-					{ action: 'wall_upload/'+window.nickname,
+					{ action: 'wall_upload/'+window.nickname+'?nomce=1',
 						name: 'userfile',
 						onSubmit: function(file,ext) { $j('#profile-rotator').show(); },
 						onComplete: function(file,response) {
@@ -21,7 +21,7 @@ $j(document).ready(function() {
 
 				var file_uploader = new window.AjaxUpload(
 					'wall-file-upload',
-					{ action: 'wall_attach/'+window.nickname,
+					{ action: 'wall_attach/'+window.nickname+'?nomce=1',
 						name: 'userfile',
 						onSubmit: function(file,ext) { $j('#profile-rotator').show(); },
 						onComplete: function(file,response) {
@@ -34,7 +34,7 @@ $j(document).ready(function() {
 			case 'msg-header':
 				var uploader = new window.AjaxUpload(
 					'prvmail-upload',
-					{ action: 'wall_upload/' + window.nickname,
+					{ action: 'wall_upload/'+window.nickname+'?nomce=1',
 						name: 'userfile',
 						onSubmit: function(file,ext) { $j('#profile-rotator').show(); },
 						onComplete: function(file,response) {
@@ -251,14 +251,14 @@ function insertFormatting(comment,BBcode,id) {
 		textarea.focus();
 		selected = document.selection.createRange();
 		if (BBcode == "url"){
-			selected.text = "["+BBcode+"]" + "http://" +  selected.text + "[/"+BBcode+"]";
+			selected.text = "["+BBcode+"=http://]" +  selected.text + "[/"+BBcode+"]";
 			} else			
 		selected.text = "["+BBcode+"]" + selected.text + "[/"+BBcode+"]";
 	} else if (textarea.selectionStart || textarea.selectionStart == "0") {
 		var start = textarea.selectionStart;
 		var end = textarea.selectionEnd;
 		if (BBcode == "url"){
-			textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + "http://" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
+			textarea.value = textarea.value.substring(0, start) + "["+BBcode+"=http://]" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
 			} else
 		textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
 	}

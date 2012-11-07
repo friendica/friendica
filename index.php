@@ -115,19 +115,9 @@ if(! x($_SESSION,'authenticated'))
 	header('X-Account-Management-Status: none');
 
 
-/*
- * Create the page head after setting the language
- * and getting any auth credentials
- */
-
-$a->init_pagehead();
-
-/**
- * Build the page ending -- this is stuff that goes right before
- * the closing </body> tag
- */
-
-$a->init_page_end();
+/* set up page['htmlhead'] and page['end'] for the modules to use */
+$a->page['htmlhead'] = '';
+$a->page['end'] = '';
 
 
 if(! x($_SESSION,'sysmsg'))
@@ -300,7 +290,31 @@ if($a->module_loaded) {
 		$a->page['content'] .= $arr['content'];
 	}
 
+	if(function_exists(str_replace('-','_',current_theme()) . '_content_loaded')) {
+		$func = str_replace('-','_',current_theme()) . '_content_loaded';
+		$func($a);
+	}
+
 }
+
+
+/*
+ * Create the page head after setting the language
+ * and getting any auth credentials
+ *
+ * Moved init_pagehead() and init_page_end() to after
+ * all the module functions have executed so that all
+ * theme choices made by the modules can take effect
+ */
+
+$a->init_pagehead();
+
+/**
+ * Build the page ending -- this is stuff that goes right before
+ * the closing </body> tag
+ */
+
+$a->init_page_end();
 
 // If you're just visiting, let javascript take you home
 
@@ -366,7 +380,11 @@ if($a->module != 'install') {
  * Build the page - now that we have all the components
  */
 
-$a->page['htmlhead'] = replace_macros($a->page['htmlhead'], array('$stylesheet' => current_theme_url()));
+if(!$a->theme['stylesheet'])
+	$stylesheet = current_theme_url();
+else
+	$stylesheet = $a->theme['stylesheet'];
+$a->page['htmlhead'] = replace_macros($a->page['htmlhead'], array('$stylesheet' => $stylesheet));
 
 if($a->is_mobile || $a->is_tablet) {
 	if(isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {

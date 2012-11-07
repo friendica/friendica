@@ -29,5 +29,5 @@
 </script>
 <script type="text/javascript" src="$baseurl/js/jquery.js" ></script>
 <script type="text/javascript">var $j = jQuery.noConflict();</script>
-<script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/main.min.js" ></script>
+<script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/jquery.divgrow-1.3.1.f1.min.js" ></script>
 

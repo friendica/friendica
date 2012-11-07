@@ -5,7 +5,7 @@
 <script type="text/javascript">
   tinyMCE.init({ mode : "none"});
 </script>-->
-<script type="text/javascript" src="$baseurl/view/theme/frost/js/jquery.divgrow-1.3.1.min.js" ></script>
+<script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/main.min.js" ></script>
 <script type="text/javascript" src="$baseurl/js/jquery.textinputs.js" ></script>
 <script type="text/javascript" src="$baseurl/view/theme/frost-mobile/js/fk.autocomplete.min.js" ></script>
 <!--<script type="text/javascript" src="$baseurl/library/fancybox/jquery.fancybox-1.3.4.pack.js"></script>-->

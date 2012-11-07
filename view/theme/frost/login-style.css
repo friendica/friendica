@@ -78,6 +78,15 @@ div.section-wrapper {
 	width: 200px;
 }
 
+.field.checkbox label {
+	position: auto;
+	/*margin-left: 100px;*/
+}
+.field.checkbox input {
+	width: auto;
+	margin-left: 140px;
+}
+
 /*.openid input {*/
 #id_openid_url, .openid input {
 	background: url(login-bg.gif) no-repeat;

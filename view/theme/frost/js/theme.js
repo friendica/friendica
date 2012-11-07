@@ -508,14 +508,14 @@ function insertFormatting(comment,BBcode,id) {
 		textarea.focus();
 		selected = document.selection.createRange();
 		if (BBcode == "url"){
-			selected.text = "["+BBcode+"]" + "http://" +  selected.text + "[/"+BBcode+"]";
+			selected.text = "["+BBcode+"=http://]" +  selected.text + "[/"+BBcode+"]";
 			} else			
 		selected.text = "["+BBcode+"]" + selected.text + "[/"+BBcode+"]";
 	} else if (textarea.selectionStart || textarea.selectionStart == "0") {
 		var start = textarea.selectionStart;
 		var end = textarea.selectionEnd;
 		if (BBcode == "url"){
-			textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + "http://" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
+			textarea.value = textarea.value.substring(0, start) + "["+BBcode+"=http://]" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
 			} else
 		textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
 	}

@@ -865,11 +865,15 @@ function format_like($cnt,$arr,$type,$id) {
 		$total = count($arr);
 		if($total >= MAX_LIKERS)
 			$arr = array_slice($arr, 0, MAX_LIKERS - 1);
-		if($total < MAX_LIKERS)
-			$arr[count($arr)-1] = t('and') . ' ' . $arr[count($arr)-1];
-		$str = implode(', ', $arr);
-		if($total >= MAX_LIKERS)
+		if($total < MAX_LIKERS) {
+			$last = t('and') . ' ' . $arr[count($arr)-1];
+			$arr2 = array_slice($arr, 0, -1);
+			$str = implode(', ', $arr2) . ' ' . $last;
+		}
+		if($total >= MAX_LIKERS) {
+			$str = implode(', ', $arr);
 			$str .= sprintf( t(', and %d other people'), $total - MAX_LIKERS );
+		}
 		$str = (($type === 'like') ? sprintf( t('%s like this.'), $str) : sprintf( t('%s don\'t like this.'), $str));
 		$o .= "\t" . '<div id="' . $type . 'list-' . $id . '" style="display: none;" >' . $str . '</div>';
 	}

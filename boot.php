@@ -361,16 +361,25 @@ if(! class_exists('App')) {
 
 		// Allow themes to control internal parameters
 		// by changing App values in theme.php
-		//
-		// Possibly should make these part of the plugin
-		// system, but it seems like overkill to invoke
-		// all the plugin machinery just to change a couple
-		// of values
+
 		public	$sourcename = '';
 		public	$videowidth = 425;
 		public	$videoheight = 350;
 		public	$force_max_items = 0;
 		public	$theme_thread_allow = true;
+
+		// An array for all theme-controllable parameters
+		// Mostly unimplemented yet. Only options 'stylesheet' and
+		// beyond are used.
+
+		public	$theme = array(
+			'sourcename' => '',
+			'videowidth' => 425,
+			'videoheight' => 350,
+			'force_max_items' => 0,
+			'thread_allow' => true,
+			'stylesheet' => ''
+		);
 
 		private $scheme;
 		private $hostname;
@@ -580,6 +589,13 @@ if(! class_exists('App')) {
 				$interval = 40000;
 
 			$this->page['title'] = $this->config['sitename'];
+
+			/* put the head template at the beginning of page['htmlhead']
+			 * since the code added by the modules frequently depends on it
+			 * being first
+			 */
+			if(!isset($this->page['htmlhead']))
+				$this->page['htmlhead'] = '';
 			$tpl = get_markup_template('head.tpl');
 			$this->page['htmlhead'] = replace_macros($tpl,array(
 				'$baseurl' => $this->get_baseurl(), // FIXME for z_path!!!!
@@ -590,14 +606,16 @@ if(! class_exists('App')) {
 				'$showmore' => t('show more'),
 				'$showfewer' => t('show fewer'),
 				'$update_interval' => $interval
-			));
+			)) . $this->page['htmlhead'];
 		}
 
 		function init_page_end() {
+			if(!isset($this->page['end']))
+				$this->page['end'] = '';
 			$tpl = get_markup_template('end.tpl');
 			$this->page['end'] = replace_macros($tpl,array(
 				'$baseurl' => $this->get_baseurl() // FIXME for z_path!!!!
-			));
+			)) . $this->page['end'];
 		}
 
 		function set_curl_code($code) {
@@ -917,6 +935,7 @@ if(! function_exists('login')) {
 
 			$tpl = get_markup_template("login.tpl");
 			$_SESSION['return_url'] = $a->query_string;
+			$a->module = 'login';
 		}
 
 

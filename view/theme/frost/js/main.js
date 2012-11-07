@@ -38,6 +38,8 @@
 
 		msie = $j.browser.msie ;
 		
+		collapseHeight();
+		
 		/* setup tooltips *//*
 		$j("a,.tt").each(function(){
 			var e = $j(this);
@@ -359,32 +361,23 @@
 			}
 			/* autocomplete @nicknames */
 			$j(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
-
-			var bimgs = $j(".wall-item-body > img").not(function() { return this.complete; });
-			var bimgcount = bimgs.length;
-
-			if (bimgcount) {
-				bimgs.load(function() {
-					bimgcount--;
-					if (! bimgcount) {
-						collapseHeight();
-
-					}
-				});
-			} else {
-				collapseHeight();
-			}
+		
+			collapseHeight();
 
 		});
 	}
 
-	function collapseHeight() {
-		$j(".wall-item-body").each(function() {
-				if($j(this).height() > 410) {
-				if(! $j(this).hasClass('divmore')) {
-					$j(this).divgrow({ initialHeight: 400, showBrackets: false, speed: 300 });
-					$j(this).addClass('divmore');
-				}
+	function collapseHeight(elems) {
+		var elemName = '.wall-item-body:not(.divmore)';
+		if(typeof elems != 'undefined') {
+			elemName = elems + ' ' + elemName;
+		}
+		$j(elemName).each(function() {
+			if($j(this).height() > 450) {
+				$j('html').height($j('html').height());
+				$j(this).divgrow({ initialHeight: 400, showBrackets: false, speed: 0 });
+				$j(this).addClass('divmore');
+				$j('html').height('auto');
 			}					
 		});
 	}
@@ -535,6 +528,7 @@
 		else {
 			$j("#collapsed-comments-" + id).show();
 			$j("#hide-comments-" + id).html(window.showFewer);
+			collapseHeight("#collapsed-comments-" + id);
 		}
 	}
 
