@@ -44,10 +44,6 @@
     <li><a id="nav-apps-link" class="nav-link $nav.apps.2"
         href="$nav.apps.0" title="$nav.apps.1">$nav.apps.1</a></li>
     {{ endif }}
-    {{ if $nav.help }}
-    <li><a id="nav-help-link" class="nav-link $nav.help.2"
-            href="$nav.help.0" title="$nav.help.1">$nav.help.1</a></li>
-    {{ endif }}
     </ul>
 
     <div id="user-menu">
@@ -88,6 +84,10 @@
     {{ endif }}
     {{ if $nav.manage }}
     <li><a id="nav-manage-link" class="nav-link $nav.manage.2" href="$nav.manage.0" title="$nav.manage.1">$nav.manage.1</a></li>
+    {{ endif }}
+    {{ if $nav.help }}
+    <li><a id="nav-help-link" class="nav-link $nav.help.2"
+            href="$nav.help.0" title="$nav.help.1">$nav.help.1</a></li>
     {{ endif }}
     </ul>
 
