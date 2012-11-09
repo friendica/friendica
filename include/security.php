@@ -1,6 +1,6 @@
 <?php
 
-function authenticate_success($user_record, $login_initial = false, $interactive = false) {
+function authenticate_success($user_record, $login_initial = false, $interactive = false, $login_refresh = false) {
 
 	$a = get_app();
 
@@ -65,6 +65,8 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 	if($login_initial)
 		logger('auth_identities: ' . print_r($a->identities,true), LOGGER_DEBUG);
+	if($login_refresh)
+		logger('auth_identities refresh: ' . print_r($a->identities,true), LOGGER_DEBUG);
 
 	$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 1 LIMIT 1",
 		intval($_SESSION['uid']));
@@ -76,7 +78,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 	header('X-Account-Management-Status: active; name="' . $a->user['username'] . '"; id="' . $a->user['nickname'] .'"');
 
-	if($login_initial) {
+	if($login_initial || $login_refresh) {
 		$l = get_browser_language();
 
 		q("UPDATE `user` SET `login_date` = '%s', `language` = '%s' WHERE `uid` = %d LIMIT 1",
@@ -84,7 +86,8 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 			dbesc($l),
 			intval($_SESSION['uid'])
 		);
-
+	}
+	if($login_initial) {
 		call_hooks('logged_in', $a->user);
 
 		if(($a->module !== 'home') && isset($_SESSION['return_url']))

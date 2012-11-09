@@ -947,6 +947,7 @@ if(! function_exists('login')) {
 	
 			'$lname'	 	=> array('username', t('Nickname or Email address: ') , '', ''),
 			'$lpassword' 	=> array('password', t('Password: '), '', ''),
+			'$lremember'	=> array('remember', t('Remember me'), 0, ''),
 	
 			'$openid'		=> !$noid,
 			'$lopenid'      => array('openid_url', t('Or login using OpenID: '),'',''),

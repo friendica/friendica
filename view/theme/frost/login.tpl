@@ -25,7 +25,9 @@
 		<input type="submit" name="submit" id="login-submit-button" value="$login" />
 	</div>
 
-	<br /><br /><br /><br />
+	{{ inc field_checkbox.tpl with $field=$lremember }}{{ endinc }}
+
+	<br /><br /><br />
 	<div class="login-extra-links">
 		{{ if $register }}<a href="register" title="$register.title" id="register-link">$register.desc</a>{{ endif }}
         <a href="lostpass" title="$lostpass" id="lost-password-link" >$lostlink</a>

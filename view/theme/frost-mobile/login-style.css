@@ -87,6 +87,10 @@ div.section-wrapper {
 	margin-left: 30px;
 }
 
+#div_id_remember {
+	margin-top: 10px;
+}
+
 #login_openid {
 	margin-top: 50px;
 }

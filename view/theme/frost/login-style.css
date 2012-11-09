@@ -87,6 +87,10 @@ div.section-wrapper {
 	margin-left: 140px;
 }
 
+#div_id_remember {
+	margin-top: 10px;
+}
+
 /*.openid input {*/
 #id_openid_url, .openid input {
 	background: url(login-bg.gif) no-repeat;
