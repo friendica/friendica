@@ -14,6 +14,7 @@ Friendica Documentation and Resources
 * [Groups and Privacy](help/Groups-and-Privacy)
 * [Tags and Mentions](help/Tags-and-Mentions)
 * [Pages](help/Pages)
+* [Move Account](help/Move-Account)
 * [Remove Account](help/Remove-Account)
 * [Bugs and Issues](help/Bugs-and-Issues)
 

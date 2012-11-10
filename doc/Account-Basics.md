@@ -73,5 +73,7 @@ You can export a copy of your personal data in XML format from the "Export perso
 
 * [Groups and Privacy](help/Groups-and-Privacy)
 
+* [Move Account](help/Move-Account)
+
 * [Remove Account](help/Remove-Account)
 

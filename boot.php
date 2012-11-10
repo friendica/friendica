@@ -1009,6 +1009,13 @@ if(! function_exists('remote_user')) {
 // a page is loaded. Usually used for errors or alerts.
 
 if(! function_exists('notice')) {
+	/**
+	 * Show an error message to user.
+	 * 
+	 * This function save text in session, to be shown to the user at next page load
+	 * 
+	 * @param string $s - Text of notice
+	 */
 	function notice($s) {
 		$a = get_app();
 		if(! x($_SESSION,'sysmsg'))	$_SESSION['sysmsg'] = array();
@@ -1017,6 +1024,13 @@ if(! function_exists('notice')) {
 	}
 }
 if(! function_exists('info')) {
+	/**
+	 * Show an info message to user.
+	 * 
+	 * This function save text in session, to be shown to the user at next page load
+	 * 
+	 * @param string $s - Text of notice
+	 */
 	function info($s) {
 		$a = get_app();
 		if(! x($_SESSION,'sysmsg_info')) $_SESSION['sysmsg_info'] = array();
