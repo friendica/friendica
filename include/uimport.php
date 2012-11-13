@@ -73,6 +73,18 @@ function import_account(&$a, $file) {
         return;
     }
    
+	
+	// check for username
+	$r = q("SELECT uid FROM user WHERE nickname='%s'", $account['user']['nickname']);
+	if ($r===false) {
+		logger("uimport:check nickname : ERROR : ".last_error(), LOGGER_NORMAL);
+		notice(t('Error! Cannot check nickname'));
+		return;
+	}
+	if (count($r)>0) {
+		notice(sprintf(t("User '%s' already exists on this server!"),$account['user']['nickname']));
+		return;
+	}
 
     $oldbaseurl  = $account['baseurl'];
     $newbaseurl = $a->get_baseurl();

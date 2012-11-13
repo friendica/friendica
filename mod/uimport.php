@@ -36,6 +36,29 @@ function uimport_post(&$a) {
 }
 
 function uimport_content(&$a) {
+	
+	if((! local_user()) && ($a->config['register_policy'] == REGISTER_CLOSED)) {
+		notice("Permission denied." . EOL);
+		return;
+	}
+
+	$max_dailies = intval(get_config('system','max_daily_registrations'));
+	if($max_dailies) {
+		$r = q("select count(*) as total from user where register_date > UTC_TIMESTAMP - INTERVAL 1 day");
+		if($r && $r[0]['total'] >= $max_dailies) {
+			logger('max daily registrations exceeded.');
+			notice( t('This site has exceeded the number of allowed daily account registrations. Please try again tomorrow.') . EOL);
+			return;
+		}
+	}
+	
+	
+	if(x($_SESSION,'theme'))
+		unset($_SESSION['theme']);
+	if(x($_SESSION,'mobile-theme'))
+		unset($_SESSION['mobile-theme']);
+	
+	
     $tpl = get_markup_template("uimport.tpl");
     return replace_macros($tpl, array(
         '$regbutt' => t('Import'),
