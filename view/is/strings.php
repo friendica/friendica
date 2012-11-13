@@ -236,7 +236,7 @@ $a->strings["Error: GD graphics PHP module with JPEG support required but not in
 $a->strings["Error: openssl PHP module required but not installed."] = "Villa: openssl PHP eining skilyrði og er ekki uppsett.";
 $a->strings["Error: mysqli PHP module required but not installed."] = "Villa: mysqli PHP eining er skilyrði og er ekki uppsett";
 $a->strings["Error: mb_string PHP module required but not installed."] = "Villa: mb_string PHP eining skilyrði en ekki uppsett.";
-$a->strings["The web installer needs to be able to create a file called \".htconfig.php\ in the top folder of your web server and it is unable to do so."] = "Vef uppsetningar forrit þarf að geta stofnað skránna \".htconfig.php\" in efsta skráarsafninu á vefþjóninum og það getur ekki gert það.";
+$a->strings["The web installer needs to be able to create a file called \".htconfig.php\" in the top folder of your web server and it is unable to do so."] = "Vef uppsetningar forrit þarf að geta stofnað skránna \".htconfig.php\" in efsta skráarsafninu á vefþjóninum og það getur ekki gert það.";
 $a->strings["This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can."] = "Þetta er oftast aðgangsstýringa stilling, þar sem vefþjónninn getur ekki skrifað út skrár í skráarsafnið - þó þú getir það.";
 $a->strings["At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder."] = "";
 $a->strings["You can alternatively skip this procedure and perform a manual installation. Please see the file \"INSTALL.txt\" for instructions."] = "";

@@ -1,4 +1,5 @@
 <?php
+define("DQ_ESCAPE", "__DQ__");
 
 
 function po2php_run(&$argv, &$argc) {
@@ -38,6 +39,7 @@ function po2php_run(&$argv, &$argc) {
 		return str_replace('$','\$',$match[0]);
 	}
 	foreach ($infile as $l) {
+		$l = str_replace('\"', DQ_ESCAPE, $l);
 		$len = strlen($l);
 		if ($l[0]=="#") $l="";
 		if (substr($l,0,15)=='"Plural-Forms: '){
@@ -54,7 +56,7 @@ function po2php_run(&$argv, &$argc) {
 
 		if ($k!="" && substr($l,0,7)=="msgstr "){
 			if ($ink) { $ink = False; $out .= '$a->strings["'.$k.'"] = '; }
-			if ($inv) {	$inv = False; $out .= '"'.$v.'"'; }
+			if ($inv) { $inv = False; $out .= '"'.$v.'"'; }
 			
 			$v = substr($l,8,$len-10);
 			$v = preg_replace_callback($escape_s_exp,'escape_s',$v);
@@ -113,6 +115,7 @@ function po2php_run(&$argv, &$argc) {
 	if ($inv) {	$inv = False; $out .= '"'.$v.'"'; }
 	if ($k!="") $out .= $arr?");\n":";\n";
 	
+	$out = str_replace(DQ_ESCAPE, '\"', $out);
 	file_put_contents($outfile, $out);
 	
 }

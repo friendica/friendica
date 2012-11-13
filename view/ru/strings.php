@@ -237,7 +237,7 @@ $a->strings["Error: GD graphics PHP module with JPEG support required but not in
 $a->strings["Error: openssl PHP module required but not installed."] = "Ошибка: необходим PHP модуль OpenSSL, но он не установлен.";
 $a->strings["Error: mysqli PHP module required but not installed."] = "Ошибка: необходим PHP модуль MySQLi, но он не установлен.";
 $a->strings["Error: mb_string PHP module required but not installed."] = "Ошибка: необходим PHP модуль mb_string, но он не установлен.";
-$a->strings["The web installer needs to be able to create a file called \".htconfig.php\ in the top folder of your web server and it is unable to do so."] = "Веб-инсталлятору требуется создать файл с именем \". htconfig.php\" в верхней папке веб-сервера, но он не в состоянии это сделать.";
+$a->strings["The web installer needs to be able to create a file called \".htconfig.php\" in the top folder of your web server and it is unable to do so."] = "Веб-инсталлятору требуется создать файл с именем \". htconfig.php\" в верхней папке веб-сервера, но он не в состоянии это сделать.";
 $a->strings["This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can."] = "Это наиболее частые параметры разрешений, когда веб-сервер не может записать файлы в папке - даже если вы можете.";
 $a->strings["At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder."] = "";
 $a->strings["You can alternatively skip this procedure and perform a manual installation. Please see the file \"INSTALL.txt\" for instructions."] = "";

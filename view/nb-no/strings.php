@@ -1,6 +1,6 @@
 <?php
 
-function string_plural_select_nb_NO($n){
+function string_plural_select_nb_no($n){
 	return ($n != 1);;
 }
 ;
@@ -236,7 +236,7 @@ $a->strings["Error: GD graphics PHP module with JPEG support required but not in
 $a->strings["Error: openssl PHP module required but not installed."] = "Feil: openssl PHP-modulen er påkrevet, men er ikke installert.";
 $a->strings["Error: mysqli PHP module required but not installed."] = "Feil: mysqli PHP-modulen er påkrevet, men er ikke installert.";
 $a->strings["Error: mb_string PHP module required but not installed."] = "Feil: mb_string PHP-modulen er påkrevet men ikke installert.";
-$a->strings["The web installer needs to be able to create a file called \".htconfig.php\ in the top folder of your web server and it is unable to do so."] = "Web-installatøren trenger å kunne lage filen \".htconfig.php\" i topp-folderen på web-tjeneren din, men den får ikke til dette.";
+$a->strings["The web installer needs to be able to create a file called \".htconfig.php\" in the top folder of your web server and it is unable to do so."] = "Web-installatøren trenger å kunne lage filen \".htconfig.php\" i topp-folderen på web-tjeneren din, men den får ikke til dette.";
 $a->strings["This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can."] = "Dette skyldes oftest manglende tillatelse, ettersom web-tjeneren kanskje ikke kan skrive filer i din mappe - selv om du kan.";
 $a->strings["At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder."] = "";
 $a->strings["You can alternatively skip this procedure and perform a manual installation. Please see the file \"INSTALL.txt\" for instructions."] = "";
