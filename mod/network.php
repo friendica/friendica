@@ -782,9 +782,10 @@ function network_content(&$a, $update = 0) {
 			intval(local_user())
 		);
 	}
-
-//	if($update_unseen)
-//		$r = q("UPDATE `item` SET `unseen` = 0 $update_unseen");
+	else {
+		if($update_unseen)
+			$r = q("UPDATE `item` SET `unseen` = 0 $update_unseen");
+	}
 
 	// Set this so that the conversation function can find out contact info for our wall-wall items
 	$a->page_contact = $a->contact;
