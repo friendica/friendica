@@ -7,7 +7,7 @@
 <div id="tread-wrapper-$item.id" class="tread-wrapper $item.toplevel">
 <a name="$item.id" ></a>
 <div class="wall-item-outside-wrapper $item.indent$item.previewing{{ if $item.owner_url }} wallwall{{ endif }}" id="wall-item-outside-wrapper-$item.id" >
-	<div class="wall-item-content-wrapper $item.indent" id="wall-item-content-wrapper-$item.id" >
+	<div class="wall-item-content-wrapper $item.indent $item.shiny" id="wall-item-content-wrapper-$item.id" >
 		<div class="wall-item-info{{ if $item.owner_url }} wallwall{{ endif }}" id="wall-item-info-$item.id">
 			{{ if $item.owner_url }}
 			<div class="wall-item-photo-wrapper wwto" id="wall-item-ownerphoto-wrapper-$item.id" >

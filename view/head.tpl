@@ -8,6 +8,11 @@
 <link rel="stylesheet" type="text/css" href="$stylesheet" media="all" />
 
 <link rel="shortcut icon" href="$baseurl/images/friendica-32.png" />
+
+<link rel="apple-touch-icon" href="$baseurl/images/friendica-128.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes" /> 
+
+
 <link rel="search"
          href="$baseurl/opensearch" 
          type="application/opensearchdescription+xml" 

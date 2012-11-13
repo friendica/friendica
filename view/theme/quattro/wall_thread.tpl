@@ -27,7 +27,7 @@
 	<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 </div>
 
-<div class="wall-item-container $item.indent" id="item-$item.id">
+<div class="wall-item-container $item.indent $item.shiny" id="item-$item.id">
 	<div class="wall-item-item">
 		<div class="wall-item-info">
 			<div class="contact-photo-wrapper mframe{{ if $item.owner_url }} wwfrom{{ endif }}"
@@ -132,7 +132,7 @@
 	</div>
 	
 	{{ if $item.threaded }}{{ if $item.comment }}{{ if $item.indent==comment }}
-	<div class="wall-item-bottom">
+	<div class="wall-item-bottom commentbox">
 		<div class="wall-item-links"></div>
 		<div class="wall-item-comment-wrapper">
 					$item.comment
@@ -143,7 +143,7 @@
 
 
 {{ for $item.children as $child }}
-	{{ if $item.type == tag }}
+	{{ if $child.type == tag }}
 		{{ inc wall_item_tag.tpl with $item=$child }}{{ endinc }}
 	{{ else }}
 		{{ inc $item.template with $item=$child }}{{ endinc }}
@@ -158,6 +158,7 @@
 {{if $item.comment_lastcollapsed}}</div>{{endif}}
 {{ endif }}
 
+{# top thread comment box #}
 {{if $item.threaded}}{{if $item.comment}}{{if $item.thread_level==1}}
 <div class="wall-item-comment-wrapper" >$item.comment</div>
 {{ endif }}{{ endif }}{{ endif }}

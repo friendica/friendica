@@ -93,6 +93,7 @@ class Item extends BaseObject {
 		$star = false;
 		$isstarred = "unstarred";
 		$indent = '';
+		$shiny = '';
 		$osparkle = '';
 		$total_children = $this->count_descendants();
 
@@ -199,8 +200,9 @@ class Item extends BaseObject {
 			if ($shareable) $buttons['share'] = array( t('Share this'), t('share'));
 		}
 
-		if(strcmp(datetime_convert('UTC','UTC',$item['created']),datetime_convert('UTC','UTC','now - 12 hours')) > 0)
-			$indent .= ' shiny';
+		if(strcmp(datetime_convert('UTC','UTC',$item['created']),datetime_convert('UTC','UTC','now - 12 hours')) > 0){
+			$shiny = 'shiny';
+		}
 
 		localize_item($item);
 
@@ -241,6 +243,7 @@ class Item extends BaseObject {
 			'lock' => $lock,
 			'location' => template_escape($location),
 			'indent' => $indent,
+			'shiny' => $shiny,
 			'owner_url' => $this->get_owner_url(),
 			'owner_photo' => $this->get_owner_photo(),
 			'owner_name' => template_escape($this->get_owner_name()),

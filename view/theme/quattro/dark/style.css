@@ -1050,6 +1050,34 @@ section {
 .wall-item-container.comment .wall-item-links {
   padding-left: 12px;
 }
+.wall-item-container.comment .commentbox {
+  height: 0px;
+  overflow: hidden;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+.wall-item-container.comment .commentbox .wall-item-comment-wrapper {
+  border-top: 1px solid #999999;
+  height: 0px;
+  overflow: hidden;
+}
+.wall-item-container.comment:hover .commentbox {
+  height: auto;
+  overflow: visible;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+.wall-item-container.comment:hover .commentbox .wall-item-comment-wrapper {
+  border-top: 0px;
+  height: auto;
+  overflow: visible;
+}
 /* 'tag' item type */
 .wall-item-container.item-tag .wall-item-content {
   opacity: 0.5;

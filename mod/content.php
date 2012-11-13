@@ -784,8 +784,9 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 				$indent = (($toplevelpost) ? '' : ' comment');
 
+				$shiny = "";
 				if(strcmp(datetime_convert('UTC','UTC',$item['created']),datetime_convert('UTC','UTC','now - 12 hours')) > 0)
-					$indent .= ' shiny'; 
+					$shiny = 'shiny'; 
 
 				// 
 				localize_item($item);
@@ -829,6 +830,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 					'lock' => $lock,
 					'location' => template_escape($location),
 					'indent' => $indent,
+					'shiny' => $shiny,
 					'owner_url' => $owner_url,
 					'owner_photo' => $owner_photo,
 					'owner_name' => template_escape($owner_name),
