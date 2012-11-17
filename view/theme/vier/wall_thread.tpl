@@ -49,8 +49,16 @@
 				</a>
 			</div>
 			{{ endif }}			
-			<div class="wall-item-location">$item.location</div>	
 		</div>
+		<div class="wall-item-actions-author">
+			<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-name-link"><span class="wall-item-name$item.sparkle">$item.name</span></a>
+			 {{ if $item.owner_url }}$item.via <a href="$item.owner_url" target="redir" title="$item.olinktitle" class="wall-item-name-link"><span class="wall-item-name$item.osparkle" id="wall-item-ownername-$item.id">$item.owner_name</span></a> <!-- $item.vwall -->{{ endif }}
+			<span class="wall-item-ago">-
+				{{ if $item.plink }}<a class="link" title="$item.plink.title" href="$item.plink.href" style="color: #999">$item.ago</a>{{ else }} $item.ago {{ endif }}
+				{{ if $item.lock }} - <span class="fakelink" style="color: #999" onclick="lockview(event,$item.id);">$item.lock</span> {{ endif }}
+			</span>
+		</div>
+
 		<div class="wall-item-content">
 			{{ if $item.title }}<h2><a href="$item.plink.href" class="$item.sparkle">$item.title</a></h2>{{ endif }}
 			$item.body
@@ -76,50 +84,40 @@
 	</div>	
 	<div class="wall-item-bottom">
 		<div class="wall-item-links">
-			{{ if $item.plink }}<a class="icon s16 link$item.sparkle" title="$item.plink.title" href="$item.plink.href">$item.plink.title</a>{{ endif }}
+			{{ if $item.plink }}<a title="$item.plink.title" href="$item.plink.href"><i class="icon-link icon-large"></i></a>{{ endif }}
 		</div>
 		<div class="wall-item-actions">
-			<div class="wall-item-actions-author">
-				<a href="$item.profile_url" target="redir"
-                                title="$item.linktitle"
-                                class="wall-item-name-link"><span
-                                class="wall-item-name$item.sparkle">$item.name</span></a>
-                                <span class="wall-item-ago" title="$item.localtime">$item.ago</span>
-				 {{ if $item.owner_url }}<br/>$item.to <a href="$item.owner_url" target="redir" title="$item.olinktitle" class="wall-item-name-link"><span class="wall-item-name$item.osparkle" id="wall-item-ownername-$item.id">$item.owner_name</span></a> $item.vwall
-				 {{ endif }}
-			</div>
-			
 			<div class="wall-item-actions-social">
+			{{ if $item.threaded }}{{ if $item.comment }}
+				<span id="comment-$item.id" class="fakelink togglecomment" onclick="openClose('item-comments-$item.id');"><i class="icon-comment"></i></span>
+			{{ endif }}{{ endif }}
+			{{ if $item.vote }}
+				<a href="#" id="like-$item.id" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false"><i class="icon-thumbs-up icon-large"></i></a>
+				<a href="#" id="dislike-$item.id" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"><i class="icon-thumbs-down icon-large"></i></a>
+			{{ endif }}
+			{{ if $item.vote.share }}
+				<a href="#" id="share-$item.id" title="$item.vote.share.0" onclick="jotShare($item.id); return false"><i class="icon-share icon-large"></i></a>
+			{{ endif }}
 			{{ if $item.star }}
-				<a href="#" id="star-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classdo"  title="$item.star.do">$item.star.do</a>
-				<a href="#" id="unstar-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo">$item.star.undo</a>
-				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="$item.star.classtagger" title="$item.star.tagger">$item.star.tagger</a>
-
+				<a href="#" id="star-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classdo"  title="$item.star.do"><i class="icon-star icon-large"></i></a>
+				<a href="#" id="unstar-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo"><i class="icon-star-empty icon-large"></i></a>
+				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="$item.star.classtagger" title="$item.star.tagger"><i class="icon-tags icon-large"></i></a>
 			{{ endif }}
 			{{ if $item.filer }}
-                                <a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item filer-icon" title="$item.filer">$item.filer</a>
-			{{ endif }}			
-			
-			{{ if $item.vote }}
-				<a href="#" id="like-$item.id" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false">$item.vote.like.1</a>
-				<a href="#" id="dislike-$item.id" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false">$item.vote.dislike.1</a>
+                                <a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item filer-icon" title="$item.filer"><i class="icon-folder-close icon-large"></i></a>
 			{{ endif }}
-						
-			{{ if $item.vote.share }}
-				<a href="#" id="share-$item.id" title="$item.vote.share.0" onclick="jotShare($item.id); return false">$item.vote.share.1</a>
-			{{ endif }}			
 			</div>
-			
+			<div class="wall-item-location">$item.location</div>				
 			<div class="wall-item-actions-tools">
 
 				{{ if $item.drop.pagedrop }}
 					<input type="checkbox" title="$item.drop.select" name="itemselected[]" class="item-select" value="$item.id" />
 				{{ endif }}
 				{{ if $item.drop.dropping }}
-					<a href="item/drop/$item.id" onclick="return confirmDelete();" class="icon delete s16" title="$item.drop.delete">$item.drop.delete</a>
+					<a href="item/drop/$item.id" onclick="return confirmDelete();" title="$item.drop.delete"><i class="icon-trash icon-large"></i></a>
 				{{ endif }}
 				{{ if $item.edpost }}
-					<a class="icon edit s16" href="$item.edpost.0" title="$item.edpost.1"></a>
+					<a href="$item.edpost.0" title="$item.edpost.1"><i class="icon-edit icon-large"></i></a>
 				{{ endif }}
 			</div>
 			
@@ -134,7 +132,7 @@
 	{{ if $item.threaded }}{{ if $item.comment }}
 	<div class="wall-item-bottom">
 		<div class="wall-item-links"></div>
-		<div class="wall-item-comment-wrapper">
+		<div class="wall-item-comment-wrapper" id="item-comments-$item.id" style="display: none;">
 					$item.comment
 		</div>
 	</div>
@@ -159,10 +157,10 @@
 {{ endif }}
 
 {{if $item.threaded}}{{if $item.comment}}{{if $item.thread_level==1}}
-<div class="wall-item-comment-wrapper" >$item.comment</div>
+<div class="wall-item-comment-wrapper" id="item-comments-$item.id">$item.comment</div>
 {{ endif }}{{ endif }}{{ endif }}
 
 
 {{ if $item.flatten }}
-<div class="wall-item-comment-wrapper" >$item.comment</div>
+<div class="wall-item-comment-wrapper" id="item-comments-$item.id">$item.comment</div>
 {{ endif }}

@@ -379,10 +379,12 @@ function title_is_body($title, $body) {
 
 	$title = strip_tags($title);
 	$title = trim($title);
+	$title = html_entity_decode($title, ENT_QUOTES, 'UTF-8');
 	$title = str_replace(array("\n", "\r", "\t", " "), array("","","",""), $title);
 
 	$body = strip_tags($body);
 	$body = trim($body);
+	$body = html_entity_decode($body, ENT_QUOTES, 'UTF-8');
 	$body = str_replace(array("\n", "\r", "\t", " "), array("","","",""), $body);
 
 	if (strlen($title) < strlen($body))
@@ -793,6 +795,8 @@ function get_atom_elements($feed,$item) {
 	// There is some better way to parse this array - but it didn't worked for me.
 	$child = $item->feed->data["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["feed"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["entry"][0]["child"]["http://activitystrea.ms/spec/1.0/"][object][0]["child"];
 	if (is_array($child)) {
+		logger('get_atom_elements: Looking for status.net repeated message');
+
 		$message = $child["http://activitystrea.ms/spec/1.0/"]["object"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["content"][0]["data"];
 		$author = $child[SIMPLEPIE_NAMESPACE_ATOM_10]["author"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10];
 		$uri = $author["uri"][0]["data"];
@@ -801,6 +805,8 @@ function get_atom_elements($feed,$item) {
 		$avatar = $avatar["href"];
 
 		if (($name != "") and ($uri != "") and ($avatar != "") and ($message != "")) {
+			logger('get_atom_elements: fixing sender of repeated message');
+
 			$res["owner-name"] = $res["author-name"];
 			$res["owner-link"] = $res["author-link"];
 			$res["owner-avatar"] = $res["author-avatar"];

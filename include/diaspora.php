@@ -859,7 +859,8 @@ function diaspora_post($importer,$xml,$msg) {
 	$datarray['parent'] = 0;
 	$datarray['owner-name'] = $contact['name'];
 	$datarray['owner-link'] = $contact['url'];
-	$datarray['owner-avatar'] = $contact['thumb'];
+	//$datarray['owner-avatar'] = $contact['thumb'];
+	$datarray['owner-avatar'] = ((x($contact,'thumb')) ? $contact['thumb'] : $contact['photo']);
 	$datarray['author-name'] = $contact['name'];
 	$datarray['author-link'] = $contact['url'];
 	$datarray['author-avatar'] = $contact['thumb'];
@@ -962,8 +963,8 @@ function diaspora_reshare($importer,$xml,$msg) {
 		$details = '[url=' . $person['url'] . ']' . $person['name'] . '[/url]';
 	else
 		$details = $orig_author;
-	
-	$prefix = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8') . $details . "\n"; 
+
+	$prefix = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8') . $details . "\n";
 
 
 	// allocate a guid on our system - we aren't fixing any collisions.
@@ -1021,11 +1022,22 @@ function diaspora_reshare($importer,$xml,$msg) {
 	$datarray['parent'] = 0;
 	$datarray['owner-name'] = $contact['name'];
 	$datarray['owner-link'] = $contact['url'];
-	$datarray['owner-avatar'] = $contact['thumb'];
-	$datarray['author-name'] = $contact['name'];
-	$datarray['author-link'] = $contact['url'];
-	$datarray['author-avatar'] = $contact['thumb'];
-	$datarray['body'] = $prefix . $body;
+	$datarray['owner-avatar'] = ((x($contact,'thumb')) ? $contact['thumb'] : $contact['photo']);
+	if (intval(get_config('system','diaspora_newreshare'))) {
+		// Let reshared messages look like wall-to-wall posts
+		// we have to set an additional value in the item in the future
+		// to distinct the wall-to-wall-posts from reshared/repeated messages
+		$datarray['author-name'] = $person['name'];
+		$datarray['author-link'] = $person['url'];
+		$datarray['author-avatar'] = ((x($person,'thumb')) ? $person['thumb'] : $person['photo']);
+		$datarray['body'] = $body;
+	} else {
+		$datarray['author-name'] = $contact['name'];
+		$datarray['author-link'] = $contact['url'];
+		$datarray['author-avatar'] = $contact['thumb'];
+		$datarray['body'] = $prefix . $body;
+	}
+
 	$datarray['tag'] = $str_tags;
 	$datarray['app']  = 'Diaspora';
 
@@ -1116,7 +1128,8 @@ function diaspora_asphoto($importer,$xml,$msg) {
 	$datarray['parent'] = 0;
 	$datarray['owner-name'] = $contact['name'];
 	$datarray['owner-link'] = $contact['url'];
-	$datarray['owner-avatar'] = $contact['thumb'];
+	//$datarray['owner-avatar'] = $contact['thumb'];
+	$datarray['owner-avatar'] = ((x($contact,'thumb')) ? $contact['thumb'] : $contact['photo']);
 	$datarray['author-name'] = $contact['name'];
 	$datarray['author-link'] = $contact['url'];
 	$datarray['author-avatar'] = $contact['thumb'];
@@ -1864,7 +1877,8 @@ EOT;
 
 	$arr['owner-name'] = $parent_item['name'];
 	$arr['owner-link'] = $parent_item['url'];
-	$arr['owner-avatar'] = $parent_item['thumb'];
+	//$arr['owner-avatar'] = $parent_item['thumb'];
+	$arr['owner-avatar'] = ((x($parent_item,'thumb')) ? $parent_item['thumb'] : $parent_item['photo']);
 
 	$arr['author-name'] = $person['name'];
 	$arr['author-link'] = $person['url'];

@@ -962,13 +962,11 @@ if(! function_exists('prepare_body')) {
 function prepare_body($item,$attach = false) {
 
 	$a = get_app();
-	call_hooks('prepare_body_init', $item); 
+	call_hooks('prepare_body_init', $item);
 
-	$cache = get_config('system','itemcache');
+	$cachefile = get_cachefile($item["guid"]."-".strtotime($item["edited"])."-".hash("crc32", $item['body']));
 
-	if (($cache != '')) {
-		$cachefile = $cache."/".$item["guid"]."-".strtotime($item["edited"])."-".hash("crc32", $item['body']);
-
+	if (($cachefile != '')) {
 		if (file_exists($cachefile))
 			$s = file_get_contents($cachefile);
 		else {

@@ -45,7 +45,7 @@
 	</div>
 	<div class="wall-item-bottom">
 		<div class="">
-			{{ if $item.plink }}<a class="icon s16 link" title="$item.plink.title" href="$item.plink.href">$item.plink.title</a>{{ endif }}
+			{{ if $item.plink }}<a title="$item.plink.title" href="$item.plink.href"><i class="icon-link icon-large"></i></a>{{ endif }}
 		</div>
 		<div class="wall-item-actions">
 

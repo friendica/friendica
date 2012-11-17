@@ -92,6 +92,9 @@ function collecturls($message) {
 		if ((strpos($treffer[1], "//plus.google.com/") !== false) and (strpos($treffer[1], "/posts") !== false))
 				$ignore = false;
 
+		if ((strpos($treffer[1], "//plus.google.com/") !== false) and (strpos($treffer[1], "/photos") !== false))
+				$ignore = false;
+
 		if (!$ignore)
 			$urls[$treffer[1]] = $treffer[1];
 	}

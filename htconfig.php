@@ -91,3 +91,6 @@ $a->config['system']['lockpath'] = "";
 
 // If enabled, the MyBB fulltext engine is used
 // $a->config['system']['use_fulltext_engine'] = true;
+
+// Let reshared messages look like wall-to-wall posts
+// $a->config['system']['diaspora_newreshare'] = true;

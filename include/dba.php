@@ -231,7 +231,7 @@ function q($sql) {
 	unset($args[0]);
 
 	if($db && $db->connected) {
-		$stmt = vsprintf($sql,$args);
+		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		//logger("dba: q: $stmt", LOGGER_ALL);
 		if($stmt === false)
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);

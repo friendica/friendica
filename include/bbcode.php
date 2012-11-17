@@ -3,7 +3,24 @@
 require_once("include/oembed.php");
 require_once('include/event.php');
 
+function cleancss($input) {
 
+	$cleaned = "";
+
+	$input = strtolower($input);
+
+	for ($i = 0; $i < strlen($input); $i++) {
+		$char = substr($input, $i, 1);
+
+		if (($char >= "a") and ($char <= "z"))
+			$cleaned .= $char;
+
+		if (!(strpos(" #;:0123456789", $char) === false))
+			$cleaned .= $char;
+	}
+
+	return($cleaned);
+}
 
 function stripcode_br_cb($s) {
 	return '[code]' . str_replace('<br />', '', $s[1]) . '[/code]';

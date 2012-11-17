@@ -4,30 +4,7 @@ require_once('include/security.php');
 require_once('include/Photo.php');
 
 function photo_init(&$a) {
-
-	// To-Do:
-	// - checking with realpath
-	// - checking permissions
-	/*
-	$cache = get_config('system','itemcache');
-        if (($cache != '') and is_dir($cache)) {
-		$cachefile = $cache."/".$a->argc."-".$a->argv[1]."-".$a->argv[2]."-".$a->argv[3];
-		if (file_exists($cachefile)) {
-			$data = file_get_contents($cachefile);
-
-			if(function_exists('header_remove')) {
-				header_remove('Pragma');
-				header_remove('pragma');
-			}
-
-			header("Content-type: image/jpeg");
- 			header("Expires: " . gmdate("D, d M Y H:i:s", time() + (3600*24)) . " GMT");
-			header("Cache-Control: max-age=" . (3600*24));
-			echo $data;
-			killme();
-			// NOTREACHED
-		}
-	}*/
+	global $_SERVER;
 
 	$prvcachecontrol = false;
 
@@ -49,6 +26,22 @@ function photo_init(&$a) {
 			killme();
 			// NOTREACHED
 	}
+
+	//	strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= filemtime($localFileName)) {
+	if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+		header('HTTP/1.1 304 Not Modified');
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
+		header('Etag: '.$_SERVER['HTTP_IF_NONE_MATCH']);
+	 	header("Expires: " . gmdate("D, d M Y H:i:s", time() + (31536000)) . " GMT");
+		header("Cache-Control: max-age=31536000");
+		if(function_exists('header_remove')) {
+			header_remove('Last-Modified');
+			header_remove('Expires');
+			header_remove('Cache-Control');
+		}
+		exit;
+	}
+
 
 	$default = 'images/person-175.jpg';
 
@@ -182,10 +175,6 @@ function photo_init(&$a) {
 		}
 	}
 
-	// Writing in cachefile
-	if (isset($cachefile) && $cachefile != '')
-		file_put_contents($cachefile, $data);
-
 	if(function_exists('header_remove')) {
 		header_remove('Pragma');
 		header_remove('pragma');
@@ -203,10 +192,10 @@ function photo_init(&$a) {
 
 	}
 	else {
-
-	 	header("Expires: " . gmdate("D, d M Y H:i:s", time() + (3600*24)) . " GMT");
-		header("Cache-Control: max-age=" . (3600*24));
-
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
+		header('Etag: "'.md5($data).'"');
+	 	header("Expires: " . gmdate("D, d M Y H:i:s", time() + (31536000)) . " GMT");
+		header("Cache-Control: max-age=31536000");
 	}
 	echo $data;
 	killme();

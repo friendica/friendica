@@ -559,6 +559,8 @@
 			$_REQUEST['body'] = requestdata('status');
 			//$_REQUEST['body'] = urldecode(requestdata('status'));
 
+		$_REQUEST['title'] = requestdata('title');
+
 		$parent = requestdata('in_reply_to_status_id');
 		if(ctype_digit($parent))
 			$_REQUEST['parent'] = $parent;

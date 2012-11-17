@@ -1847,3 +1847,54 @@ function random_digits($digits) {
 	}
 	return $rn;
 }
+
+function get_cachefile($file, $writemode = true) {
+	$cache = get_config("system","itemcache");
+
+	if ($cache == "")
+		return("");
+
+	if (!is_dir($cache))
+		return("");
+
+	$subfolder = $cache."/".substr($file, 0, 2);
+
+	$cachepath = $subfolder."/".$file;
+
+	if ($writemode) {
+		if (!is_dir($subfolder)) {
+			mkdir($subfolder);
+			chmod($subfolder, 0777);
+		}
+	}
+
+	return($cachepath);
+}
+
+function clear_cache($basepath = "", $path = "") {
+	if ($path == "") {
+		$basepath = get_config('system','itemcache');
+		$path = $basepath;
+	}
+
+	if (($path == "") OR (!is_dir($path)))
+		return;
+
+	if (substr(realpath($path), 0, strlen($basepath)) != $basepath)
+		return;
+
+	$cachetime = (int)get_config('system','itemcache_duration');
+	if ($cachetime == 0)
+		$cachetime = 86400;
+
+	if ($dh = opendir($path)) {
+		while (($file = readdir($dh)) !== false) {
+			$fullpath = $path."/".$file;
+			if ((filetype($fullpath) == "dir") and ($file != ".") and ($file != ".."))
+				clear_cache($basepath, $fullpath);
+			if ((filetype($fullpath) == "file") and filectime($fullpath) < (time() - $cachetime))
+				unlink($fullpath);
+		}
+		closedir($dh);
+	}
+}
