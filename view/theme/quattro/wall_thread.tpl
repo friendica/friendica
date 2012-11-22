@@ -93,8 +93,9 @@
 			{{ if $item.star }}
 				<a href="#" id="star-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classdo"  title="$item.star.do">$item.star.do</a>
 				<a href="#" id="unstar-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo">$item.star.undo</a>
-				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="$item.star.classtagger" title="$item.star.tagger">$item.star.tagger</a>
-
+			{{ endif }}
+			{{ if $item.tagger }}
+				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="$item.tagger.class" title="$item.tagger.add">$item.tagger.add</a>
 			{{ endif }}
 			{{ if $item.filer }}
                                 <a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item filer-icon" title="$item.filer">$item.filer</a>
@@ -102,7 +103,9 @@
 			
 			{{ if $item.vote }}
 				<a href="#" id="like-$item.id" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false">$item.vote.like.1</a>
+				{{ if $item.vote.dislike }}
 				<a href="#" id="dislike-$item.id" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false">$item.vote.dislike.1</a>
+				{{ endif }}
 			{{ endif }}
 						
 			{{ if $item.vote.share }}

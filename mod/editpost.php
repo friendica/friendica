@@ -28,9 +28,12 @@ function editpost_content(&$a) {
 		return;
 	}
 
-	$plaintext = false;
-	if(local_user() && intval(get_pconfig(local_user(),'system','plaintext')))
-		$plaintext = true;
+/*	$plaintext = false;
+	if( local_user() && intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext') )
+		$plaintext = true;*/
+	$plaintext = true;
+	if( local_user() && feature_enabled(local_user(),'richtext') )
+		$plaintext = false;
 
 
 	$o .= '<h2>' . t('Edit post') . '</h2>';
@@ -130,7 +133,7 @@ function editpost_content(&$a) {
 		'$title' => $itm[0]['title'],
 		'$placeholdertitle' => t('Set title'),
 		'$category' => file_tag_file_to_list($itm[0]['file'], 'category'),
-		'$placeholdercategory' => t('Categories (comma-separated list)'),
+		'$placeholdercategory' => (feature_enabled(local_user(),'categories') ? t('Categories (comma-separated list)') : ''),
 		'$emtitle' => t('Example: bob@example.com, mary@example.com'),
 		'$lockstate' => $lockstate,
 		'$acl' => '', // populate_acl((($group) ? $group_acl : $a->user), $celeb),

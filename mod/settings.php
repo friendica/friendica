@@ -32,6 +32,11 @@ function settings_init(&$a) {
 			'selected'	=> (($a->argc == 1)?'active':''),
 		),	
 		array(
+			'label'	=> t('Additional features'),
+			'url' 	=> $a->get_baseurl(true).'/settings/features',
+			'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'features') ? 'active' : ''),
+		),
+		array(
 			'label'	=> t('Display settings'),
 			'url' 	=> $a->get_baseurl(true).'/settings/display',
 			'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'display')?'active':''),
@@ -231,7 +236,18 @@ function settings_post(&$a) {
 		return;
 	}
 	
-	if(($a->argc > 1) && ($a->argv[1] == 'display')) {
+	if(($a->argc > 1) && ($a->argv[1] === 'features')) {
+		check_form_security_token_redirectOnErr('/settings/features', 'settings_features');
+		foreach($_POST as $k => $v) {
+			if(strpos($k,'feature_') === 0) {
+				set_pconfig(local_user(),'feature',substr($k,8),((intval($v)) ? 1 : 0));
+			}
+		}
+		info( t('Features updated') . EOL);
+		return;
+	}
+
+	if(($a->argc > 1) && ($a->argv[1] === 'display')) {
 		
 		check_form_security_token_redirectOnErr('/settings/display', 'settings_display');
 
@@ -612,6 +628,7 @@ function settings_content(&$a) {
 		return $o;
 		
 	}
+
 	if(($a->argc > 1) && ($a->argv[1] === 'addon')) {
 		$settings_addons = "";
 		
@@ -627,6 +644,30 @@ function settings_content(&$a) {
 			'$form_security_token' => get_form_security_token("settings_addon"),
 			'$title'	=> t('Plugin Settings'),
 			'$settings_addons' => $settings_addons
+		));
+		return $o;
+	}
+
+	if(($a->argc > 1) && ($a->argv[1] === 'features')) {
+		
+		$arr = array();
+		$features = get_features();
+		foreach($features as $fname => $fdata) {
+			$arr[$fname] = array();
+			$arr[$fname][0] = $fdata[0];
+			foreach(array_slice($fdata,1) as $f) {
+				$arr[$fname][1][] = array('feature_' .$f[0],$f[1],((intval(get_pconfig(local_user(),'feature',$f[0]))) ? "1" : ''),$f[2],array(t('Off'),t('On')));
+			}
+		}
+
+
+		$tpl = get_markup_template("settings_features.tpl");
+		$o .= replace_macros($tpl, array(
+			'$form_security_token' => get_form_security_token("settings_features"),
+			'$title'	=> t('Additional Features'),
+			'$features' => $arr,
+			'$submit'   => t('Submit'),
+			'$field_yesno'	=> 'field_yesno.tpl',
 		));
 		return $o;
 	}

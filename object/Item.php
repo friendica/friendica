@@ -113,7 +113,7 @@ class Item extends BaseObject {
 
 		$drop = array(
 			'dropping' => $dropping,
-			'pagedrop' => $item['pagedrop'],
+			'pagedrop' => ((feature_enabled($conv->get_profile_owner(),'multi_delete')) ? $item['pagedrop'] : ''),
 			'select' => t('Select'), 
 			'delete' => t('Delete'),
 		);
@@ -184,9 +184,14 @@ class Item extends BaseObject {
 					'classdo' => (($item['starred']) ? "hidden" : ""),
 					'classundo' => (($item['starred']) ? "" : "hidden"),
 					'starred' =>  t('starred'),
-					'tagger' => t("add tag"),
-					'classtagger' => "",
 				);
+				$tagger = '';
+				if(feature_enabled($conv->get_profile_owner(),'commtag')) {
+					$tagger = array(
+						'add' => t("add tag"),
+						'class' => "",
+					);
+				}
 			}
 		} else {
 			$indent = 'comment';
@@ -195,7 +200,7 @@ class Item extends BaseObject {
 		if($conv->is_writable()) {
 			$buttons = array(
 				'like' => array( t("I like this \x28toggle\x29"), t("like")),
-				'dislike' => array( t("I don't like this \x28toggle\x29"), t("dislike")),
+				'dislike' => ((feature_enabled($conv->get_profile_owner(),'dislike')) ? array( t("I don't like this \x28toggle\x29"), t("dislike")) : ''),
 			);
 			if ($shareable) $buttons['share'] = array( t('Share this'), t('share'));
 		}
@@ -249,14 +254,15 @@ class Item extends BaseObject {
 			'owner_photo' => $this->get_owner_photo(),
 			'owner_name' => template_escape($this->get_owner_name()),
 			'plink' => get_plink($item),
-			'edpost' => $edpost,
+			'edpost'    => ((feature_enabled($conv->get_profile_owner(),'edit_posts')) ? $edpost : ''),
 			'isstarred' => $isstarred,
-			'star' => $star,
-			'filer' => $filer,
+			'star'      => ((feature_enabled($conv->get_profile_owner(),'star_posts')) ? $star : ''),
+			'tagger'	=> $tagger,
+			'filer'     => ((feature_enabled($conv->get_profile_owner(),'filing')) ? $filer : ''),
 			'drop' => $drop,
 			'vote' => $buttons,
 			'like' => $like,
-			'dislike' => $dislike,
+			'dislike'   => $dislike,
 			'switchcomment' => t('Comment'),
 			'comment' => $this->get_comment_box($indent),
 			'previewing' => ($conv->is_preview() ? ' preview ' : ''),
@@ -570,7 +576,7 @@ class Item extends BaseObject {
 				'$edimg' => t('Image'),
 				'$edurl' => t('Link'),
 				'$edvideo' => t('Video'),
-				'$preview' => t('Preview'),
+				'$preview' => ((feature_enabled($conv->get_profile_owner(),'preview')) ? t('Preview') : ''),
 				'$indent' => $indent,
 				'$sourceapp' => t($a->sourcename),
 				'$ww' => (($conv->get_mode() === 'network') ? $ww : ''),

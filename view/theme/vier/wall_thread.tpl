@@ -93,7 +93,9 @@
 			{{ endif }}{{ endif }}
 			{{ if $item.vote }}
 				<a href="#" id="like-$item.id" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false"><i class="icon-thumbs-up icon-large"></i></a>
+				{{ if $item.vote.dislike }}
 				<a href="#" id="dislike-$item.id" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"><i class="icon-thumbs-down icon-large"></i></a>
+				{{ endif }}
 			{{ endif }}
 			{{ if $item.vote.share }}
 				<a href="#" id="share-$item.id" title="$item.vote.share.0" onclick="jotShare($item.id); return false"><i class="icon-share icon-large"></i></a>
@@ -101,7 +103,9 @@
 			{{ if $item.star }}
 				<a href="#" id="star-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classdo"  title="$item.star.do"><i class="icon-star icon-large"></i></a>
 				<a href="#" id="unstar-$item.id" onclick="dostar($item.id); return false;"  class="$item.star.classundo"  title="$item.star.undo"><i class="icon-star-empty icon-large"></i></a>
-				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="$item.star.classtagger" title="$item.star.tagger"><i class="icon-tags icon-large"></i></a>
+			{{ endif }}
+			{{ if $item.tagger }}
+				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="$item.tagger.class" title="$item.tagger.add"><i class="icon-tags icon-large"></i></a>
 			{{ endif }}
 			{{ if $item.filer }}
                                 <a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item filer-icon" title="$item.filer"><i class="icon-folder-close icon-large"></i></a>

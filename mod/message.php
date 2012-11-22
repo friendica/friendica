@@ -46,7 +46,11 @@ function message_post(&$a) {
 
 	// Work around doubled linefeeds in Tinymce 3.5b2
 
-	$plaintext = intval(get_pconfig(local_user(),'system','plaintext'));
+/*	$plaintext = intval(get_pconfig(local_user(),'system','plaintext') && !feature_enabled(local_user(),'richtext'));
+	if(! $plaintext) {
+		$body = fix_mce_lf($body);
+	}*/
+	$plaintext = intval(!feature_enabled(local_user(),'richtext'));
 	if(! $plaintext) {
 		$body = fix_mce_lf($body);
 	}
@@ -229,9 +233,12 @@ function message_content(&$a) {
 		
 		$o .= $header;
 		
-		$plaintext = false;
+/*		$plaintext = false;
 		if(intval(get_pconfig(local_user(),'system','plaintext')))
-			$plaintext = true;
+			$plaintext = true;*/
+		$plaintext = true;
+		if( local_user() && feature_enabled(local_user(),'richtext') )
+			$plaintext = false;
 
 
 		$tpl = get_markup_template('msg-header.tpl');

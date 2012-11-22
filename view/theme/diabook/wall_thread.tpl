@@ -100,7 +100,9 @@
 			
 			{{ if $item.vote }}
 				<a href="#" id="like-$item.id" class="icon like" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false">$item.vote.like.1</a>
+				{{ if $item.vote.dislike }}
 				<a href="#" id="dislike-$item.id" class="icon dislike" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"></a>
+				{{ endif }}
 			{{ endif }}
 						
 			{{ if $item.vote.share }}
@@ -111,7 +113,10 @@
 			{{ if $item.star }}
 				<a href="#" id="starred-$item.id" onclick="dostar($item.id); return false;" class="star-item icon $item.isstarred" title="$item.star.toggle">
 				<img src="images/star_dummy.png" class="icon star" alt="$item.star.do" /> </a>
-				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item icon tagged" title="$item.star.tagger"></a>					  
+			{{ endif }}
+
+			{{ if $item.tagger }}
+				<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item icon tagged" title="$item.tagger.add"></a>					  
 			{{ endif }}	
 			
 			{{ if $item.filer }}

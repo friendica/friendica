@@ -130,6 +130,14 @@
 	</ul>
 	</div>
 		
+	{{ if $nav.network }}
+	<div class="nav-button-container nav-menu-link" rel="#network-reset-button">
+	<a class="nav-menu-icon network-reset-link nav-link" href="$nav.net_reset.0" title="$nav.net_reset.3">
+	<img class="network-reset-link" src="$baseurl/view/theme/frost/images/net-reset.png">
+	</a>
+	</div>
+	{{ endif }}
+		
 	</span>
 	<!--<span id="nav-end"></span>-->
 	<span id="banner">$banner</span>

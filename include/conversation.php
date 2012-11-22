@@ -686,7 +686,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 		'$mode' => $mode,
 		'$user' => $a->user,
 		'$threads' => $threads,
-		'$dropping' => ($page_dropping?t('Delete Selected Items'):False),
+		'$dropping' => ($page_dropping && feature_enabled(local_user(),'multi_delete') ? t('Delete Selected Items') : False),
 	));
 
 	return $o;
@@ -887,9 +887,12 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 
 	$geotag = (($x['allow_location']) ? get_markup_template('jot_geotag.tpl') : '');
 
-	$plaintext = false;
-	if(local_user() && intval(get_pconfig(local_user(),'system','plaintext')))
-		$plaintext = true;
+/*	$plaintext = false;
+	if( local_user() && (intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext')) )
+		$plaintext = true;*/
+	$plaintext = true;
+	if( local_user() && feature_enabled(local_user(),'richtext') )
+		$plaintext = false;
 
 	$tpl = get_markup_template('jot-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
@@ -958,7 +961,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 	if($notes_cid)
 		$jotnets .= '<input type="hidden" name="contact_allow[]" value="' . $notes_cid .'" />';
 
-	$tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));
+//	$tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));
 
 	$o .= replace_macros($tpl,array(
 		'$return_path' => $a->query_string,
@@ -981,7 +984,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		'$title' => "",
 		'$placeholdertitle' => t('Set title'),
 		'$category' => "",
-		'$placeholdercategory' => t('Categories (comma-separated list)'),
+		'$placeholdercategory' => (feature_enabled(local_user(),'categories') ? t('Categories (comma-separated list)') : ''),
 		'$wait' => t('Please wait'),
 		'$permset' => t('Permission settings'),
 		'$shortpermset' => t('permissions'),
@@ -1000,7 +1003,8 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		'$acl' => $x['acl'],
 		'$bang' => $x['bang'],
 		'$profile_uid' => $x['profile_uid'],
-		'$preview' => t('Preview'),
+		'$preview' => ((feature_enabled($x['profile_uid'],'preview')) ? t('Preview') : ''),
+		'$jotplugins' => $jotplugins,
 		'$sourceapp' => t($a->sourcename),
 		'$cancel' => t('Cancel'),
 		'$rand_num' => random_digits(12)

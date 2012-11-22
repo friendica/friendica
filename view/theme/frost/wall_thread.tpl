@@ -66,7 +66,9 @@
 			{{ if $item.vote }}
 			<div class="wall-item-like-buttons" id="wall-item-like-buttons-$item.id">
 				<a href="#" class="tool like" title="$item.vote.like.0" onclick="dolike($item.id,'like'); return false"></a>
+				{{ if $item.vote.dislike }}
 				<a href="#" class="tool dislike" title="$item.vote.dislike.0" onclick="dolike($item.id,'dislike'); return false"></a>
+				{{ endif }}
 				{{ if $item.vote.share }}<a href="#" class="tool recycle wall-item-share-buttons" title="$item.vote.share.0" onclick="jotShare($item.id); return false"></a>{{ endif }}
 				<img id="like-rotator-$item.id" class="like-rotator" src="images/rotator.gif" alt="$item.wait" title="$item.wait" style="display: none;" />
 			</div>
@@ -80,7 +82,9 @@
 			 
 			{{ if $item.star }}
 			<a href="#" id="starred-$item.id" onclick="dostar($item.id); return false;" class="star-item tool $item.isstarred" title="$item.star.toggle"></a>
-			<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item tool tagged" title="$item.star.tagger"></a>
+			{{ endif }}
+			{{ if $item.tagger }}
+			<a href="#" id="tagger-$item.id" onclick="itemTag($item.id); return false;" class="tag-item tool tagged" title="$item.tagger.add"></a>
 			{{ endif }}
 			{{ if $item.filer }}
 			<a href="#" id="filer-$item.id" onclick="itemFiler($item.id); return false;" class="filer-item filer-icon" title="$item.filer"></a>

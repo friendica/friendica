@@ -554,9 +554,12 @@ function profiles_content(&$a) {
 		require_once('include/profile_selectors.php');
 
 
-		$editselect = 'textareas';
-		if(intval(get_pconfig(local_user(),'system','plaintext')))
-			$editselect = 'none';
+/*		$editselect = 'textareas';
+		if( intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext') )
+			$editselect = 'none';*/
+		$editselect = 'none';
+		if( feature_enabled(local_user(),'richtext') )
+			$editselect = 'textareas';
 
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('profed_head.tpl'), array(
 			'$baseurl' => $a->get_baseurl(true),

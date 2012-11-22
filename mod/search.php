@@ -4,6 +4,9 @@ function search_saved_searches() {
 
 	$o = '';
 
+	if(! feature_enabled(local_user(),'savedsearch'))
+		return $o;
+
 	$r = q("select `id`,`term` from `search` WHERE `uid` = %d",
 		intval(local_user())
 	);

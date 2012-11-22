@@ -1,7 +1,10 @@
 <form id="profile-jot-form" action="$action" method="post">
 	<div id="jot">
 		<div id="profile-jot-desc" class="jothidden">&nbsp;</div>
-		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" title="$placeholdertitle" value="$title" class="jothidden" style="display:none" /><input name="category" id="jot-category" type="text" placeholder="$placeholdercategory" title="$placeholdercategory" value="$category" class="jothidden" style="display:none" />
+		<input name="title" id="jot-title" type="text" placeholder="$placeholdertitle" title="$placeholdertitle" value="$title" class="jothidden" style="display:none" />
+		{{ if $placeholdercategory }}
+		<input name="category" id="jot-category" type="text" placeholder="$placeholdercategory" title="$placeholdercategory" value="$category" class="jothidden" style="display:none" />
+		{{ endif }}
 		<div id="character-counter" class="grey jothidden"></div>
 		
 

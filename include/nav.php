@@ -111,6 +111,7 @@ function nav(&$a) {
 	if(local_user()) {
 
 		$nav['network'] = array('network', t('Network'), "", t('Conversations from your friends'));
+		$nav['net_reset'] = array('network/0?f=&order=comment&nets=all', t('Network Reset'), "", t('Load Network page with no filters'));
 
 		$nav['home'] = array('profile/' . $a->user['nickname'], t('Home'), "", t('Your posts and conversations'));
 
@@ -135,7 +136,9 @@ function nav(&$a) {
 		}
 
 		$nav['settings'] = array('settings', t('Settings'),"", t('Account settings'));
-		$nav['profiles'] = array('profiles', t('Profiles'),"", t('Manage/edit profiles'));
+		if(feature_enabled(local_user(),'multi_profiles'))
+			$nav['profiles'] = array('profiles', t('Profiles'),"", t('Manage/Edit Profiles'));
+
 		$nav['contacts'] = array('contacts', t('Contacts'),"", t('Manage/edit friends and contacts'));
 	}
 

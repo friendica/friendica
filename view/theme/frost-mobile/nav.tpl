@@ -117,6 +117,12 @@
 		<!--<span id="net-update" class="nav-ajax-left"></span>-->
 		{{ endif }}
 
+		{{ if $nav.network }}
+		<li>
+		<a class="nav-menu-icon network-reset-link nav-link" href="$nav.net_reset.0" title="$nav.net_reset.3">$nav.net_reset.1</a>
+		</li>
+		{{ endif }}
+
 		{{ if $nav.home }}
 		<li><a id="nav-home-link" class="$nav.home.2 $sel.home nav-load-page-link" href="$nav.home.0" title="$nav.home.3" >$nav.home.1</a></li>
 		<!--<span id="home-update" class="nav-ajax-left"></span>-->

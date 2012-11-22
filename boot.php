@@ -9,6 +9,7 @@ require_once('include/pgettext.php');
 require_once('include/nav.php');
 require_once('include/cache.php');
 require_once('library/Mobile_Detect/Mobile_Detect.php');
+require_once('include/features.php');
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_VERSION',      '3.0.1534' );
@@ -358,6 +359,7 @@ if(! class_exists('App')) {
 		public $nav_sel;
 
 		public $category;
+
 
 		// Allow themes to control internal parameters
 		// by changing App values in theme.php
@@ -1232,7 +1234,7 @@ if(! function_exists('profile_sidebar')) {
 
 
 		// show edit profile to yourself
-		if ($profile['uid'] == local_user()) {
+		if ($profile['uid'] == local_user() && feature_enabled(local_user(),'multi_profiles')) {
 			$profile['edit'] = array($a->get_baseurl(). '/profiles', t('Profiles'),"", t('Manage/edit profiles'));
 		
 			$r = q("SELECT * FROM `profile` WHERE `uid` = %d",

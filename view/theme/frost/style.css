@@ -3204,6 +3204,9 @@ aside input[type='text'] {
 	float: left;
 	width: 200px;
 }
+.field.yesno label {
+	font-weight: 700;
+}
 
 .field input,
 .field textarea {

@@ -278,6 +278,7 @@ nav .nav-link {
 }
 
 #network-menu-list {
+	width: 9em;
 	left: 3px;
 }
 
@@ -2750,7 +2751,7 @@ aside input[type='text'] {
 	margin-left: 100px;
 	margin-bottom: 20px;
 }
-.settings-submit, .profile-edit-submit-button {
+.settings-submit, .profile-edit-submit-button, .settings-features-submit {
 	padding: 0.25em 0.5em;
 	margin-bottom: 10px;
 	font-size: 18px;
@@ -3420,7 +3421,7 @@ aside input[type='text'] {
 	display: block;
 	margin-left: 20px;
 	color: #666666;
-	
+	clear: left;
 }
 
 
@@ -3457,7 +3458,7 @@ aside input[type='text'] {
 }
 .hidden { display: none!important; }
 
-.field.radio .field_help { clear: left; margin-left: 20px; }
+.field.radio .field_help { margin-left: 20px; }
 
 /**
  * ADMIN
