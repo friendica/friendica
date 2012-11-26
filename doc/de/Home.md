@@ -12,7 +12,7 @@ Friendica - Dokumentation und Ressourcen
 * [Freunde finden](help/Making-Friends)
 * [Gruppen und Privatsphäre](help/Groups-and-Privacy)
 * [Tags und Erwähnungen](help/Tags-and-Mentions)
-* [Seiten](help/Pages)
+* [Community-Foren](help/Forums)
 * [Account umziehen](help/Move-Account)
 * [Account löschen](help/Remove-Account)
 * [Bugs und Probleme](help/Bugs-and-Issues)

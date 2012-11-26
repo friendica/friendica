@@ -7,7 +7,7 @@ Here you can find an overview of the different ways to create and edit your post
 
 <img src="doc/img/friendica_editor.png" width="538" height="218" alt="editor">
 
-<i>The different iconss</i>
+<i>The different icons</i>
 
 <img src="doc/img/camera.png" width="44" height="33" alt="editor" align="left" style="padding-bottom: 20px;"> This symbol is used to upload a picture from your computer. If you only want to add an adress (url), you can also use the "tree" icon at the upper part of the editor. After selecting an image, you'll see a thumbnail in the editor.
 <p style="clear:both;"></p>
