@@ -44,23 +44,23 @@ function community_content(&$a, $update = 0) {
 	// Only public posts can be shown
 	// OR your own posts if you are a logged in member
 
-        if(! get_pconfig(local_user(),'system','alt_pager')) {
-	        $r = q("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
-		        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
-		        WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
-		        AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
-		        AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
-		        AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
-		        AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0"
-	        );
+	if( (! get_config('alt_pager', 'global')) && (! get_pconfig(local_user(),'system','alt_pager')) ) {
+		$r = q("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
+			FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
+			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
+			AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
+			AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
+			AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
+			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0"
+		);
 
-	        if(count($r))
-		        $a->set_pager_total($r[0]['total']);
+		if(count($r))
+			$a->set_pager_total($r[0]['total']);
 
-	        if(! $r[0]['total']) {
-		        info( t('No results.') . EOL);
-		        return $o;
-	        }
+		if(! $r[0]['total']) {
+			info( t('No results.') . EOL);
+			return $o;
+		}
 
 	}
 
@@ -91,11 +91,11 @@ function community_content(&$a, $update = 0) {
 
 	$o .= conversation($a,$r,'community',$update);
 
-        if(! get_pconfig(local_user(),'system','alt_pager')) {
-	        $o .= paginate($a);
+	if( get_config('alt_pager', 'global') || get_pconfig(local_user(),'system','alt_pager') ) {
+	        $o .= alt_pager($a,count($r));
 	}
 	else {
-	        $o .= alt_pager($a,count($r));
+	        $o .= paginate($a);
 	}
 
 	return $o;

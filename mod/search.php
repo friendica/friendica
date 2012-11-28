@@ -144,7 +144,7 @@ function search_content(&$a) {
 	// OR your own posts if you are a logged in member
 	// No items will be shown if the member has a blocked profile wall. 
 
-	if(! get_pconfig(local_user(),'system','alt_pager')) {
+	if( (! get_config('alt_pager', 'global')) && (! get_pconfig(local_user(),'system','alt_pager')) ) {
 	        $r = q("SELECT distinct(`item`.`uri`) as `total`
 		        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
 		        WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
@@ -197,11 +197,11 @@ function search_content(&$a) {
 
 	$o .= conversation($a,$r,'search',false);
 
-        if(! get_pconfig(local_user(),'system','alt_pager')) {
-	        $o .= paginate($a);
+	if( get_config('alt_pager', 'global') || get_pconfig(local_user(),'system','alt_pager') ) {
+	        $o .= alt_pager($a,count($r));
 	}
 	else {
-	        $o .= alt_pager($a,count($r));
+	        $o .= paginate($a);
 	}
 
 	return $o;

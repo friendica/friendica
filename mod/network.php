@@ -696,7 +696,7 @@ function network_content(&$a, $update = 0) {
 
 	}
 	else {
-		if(! get_pconfig(local_user(),'system','alt_pager')) {
+		if( (! get_config('alt_pager', 'global')) && (! get_pconfig(local_user(),'system','alt_pager')) ) {
 		        $r = q("SELECT COUNT(*) AS `total`
 			        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			        WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
@@ -845,11 +845,11 @@ function network_content(&$a, $update = 0) {
 	$o .= conversation($a,$items,$mode,$update);
 
 	if(! $update) {
-		if(! get_pconfig(local_user(),'system','alt_pager')) {
-		        $o .= paginate($a);
+		if( get_config('alt_pager', 'global') || get_pconfig(local_user(),'system','alt_pager') ) {
+		        $o .= alt_pager($a,count($items));
 		}
 		else {
-		        $o .= alt_pager($a,count($items));
+		        $o .= paginate($a);
 		}
 	}
 

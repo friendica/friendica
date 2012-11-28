@@ -242,7 +242,7 @@ function profile_content(&$a, $update = 0) {
 			$sql_extra2 .= protect_sprintf(sprintf(" AND item.created >= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery2))));
 		}
 
-		if(! get_pconfig($a->profile['profile_uid'],'system','alt_pager')) {
+		if( (! get_config('alt_pager', 'global')) && (! get_pconfig($a->profile['profile_uid'],'system','alt_pager')) ) {
 		    $r = q("SELECT COUNT(*) AS `total`
 			    FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			    WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
@@ -323,12 +323,12 @@ function profile_content(&$a, $update = 0) {
 	$o .= conversation($a,$items,'profile',$update);
 
 	if(! $update) {
-	  if(! get_pconfig($a->profile['profile_uid'],'system','alt_pager')) {
-		        $o .= paginate($a);
-	        }
-	        else {
-	                $o .= alt_pager($a,count($items));
-	        }
+		if( get_config('alt_pager', 'global') || get_pconfig($a->profile['profile_uid'],'system','alt_pager') ) {
+			$o .= alt_pager($a,count($items));
+		}
+		else {
+			$o .= paginate($a);
+		}
 	}
 
 	return $o;
