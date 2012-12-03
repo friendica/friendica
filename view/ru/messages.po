@@ -1717,11 +1717,11 @@ msgstr "Разблокировать"
 #: ../../mod/contacts.php:315 ../../mod/contacts.php:374
 #: ../../mod/admin.php:697
 msgid "Block"
-msgstr "Блокировать"
+msgstr "Заблокировать"
 
 #: ../../mod/contacts.php:318
 msgid "Toggle Blocked status"
-msgstr ""
+msgstr "Изменить статус блокированности (заблокировать/разблокировать)"
 
 #: ../../mod/contacts.php:321 ../../mod/contacts.php:375
 msgid "Unignore"
@@ -1729,19 +1729,19 @@ msgstr "Не игнорировать"
 
 #: ../../mod/contacts.php:324
 msgid "Toggle Ignored status"
-msgstr ""
+msgstr "Изменить статус игнорирования"
 
 #: ../../mod/contacts.php:328
 msgid "Unarchive"
-msgstr ""
+msgstr "Разархивировать"
 
 #: ../../mod/contacts.php:328
 msgid "Archive"
-msgstr ""
+msgstr "Архивировать"
 
 #: ../../mod/contacts.php:331
 msgid "Toggle Archive status"
-msgstr ""
+msgstr "Сменить статус архивации (архивирова/не архивировать)"
 
 #: ../../mod/contacts.php:334
 msgid "Repair"
@@ -1749,11 +1749,11 @@ msgstr "Восстановить"
 
 #: ../../mod/contacts.php:337
 msgid "Advanced Contact Settings"
-msgstr ""
+msgstr "Дополнительные Настройки Контакта"
 
 #: ../../mod/contacts.php:343
 msgid "Communications lost with this contact!"
-msgstr ""
+msgstr "Связь с контактом утеряна!"
 
 #: ../../mod/contacts.php:346
 msgid "Contact Editor"
@@ -1826,7 +1826,7 @@ msgstr "В настоящее время игнорируется"
 
 #: ../../mod/contacts.php:380
 msgid "Currently archived"
-msgstr ""
+msgstr "В данный момент архивирован"
 
 #: ../../mod/contacts.php:381
 msgid ""
@@ -1839,7 +1839,7 @@ msgstr ""
 
 #: ../../mod/contacts.php:437
 msgid "Suggest potential friends"
-msgstr ""
+msgstr "Предложить потенциального знакомого"
 
 #: ../../mod/contacts.php:440 ../../mod/group.php:191
 msgid "All Contacts"
@@ -1847,35 +1847,35 @@ msgstr "Все контакты"
 
 #: ../../mod/contacts.php:443
 msgid "Show all contacts"
-msgstr ""
+msgstr "Показать все контакты"
 
 #: ../../mod/contacts.php:446
 msgid "Unblocked"
-msgstr ""
+msgstr "Не блокирован"
 
 #: ../../mod/contacts.php:449
 msgid "Only show unblocked contacts"
-msgstr ""
+msgstr "Показать только не блокированные контакты"
 
 #: ../../mod/contacts.php:453
 msgid "Blocked"
-msgstr ""
+msgstr "Заблокирован"
 
 #: ../../mod/contacts.php:456
 msgid "Only show blocked contacts"
-msgstr ""
+msgstr "Показать только блокированные контакты"
 
 #: ../../mod/contacts.php:460
 msgid "Ignored"
-msgstr ""
+msgstr "Игнорирован"
 
 #: ../../mod/contacts.php:463
 msgid "Only show ignored contacts"
-msgstr ""
+msgstr "Показать только игнорируемые контакты"
 
 #: ../../mod/contacts.php:467
 msgid "Archived"
-msgstr ""
+msgstr "Архивированные"
 
 #: ../../mod/contacts.php:470
 msgid "Only show archived contacts"
@@ -1883,7 +1883,7 @@ msgstr ""
 
 #: ../../mod/contacts.php:474
 msgid "Hidden"
-msgstr ""
+msgstr "Скрытые"
 
 #: ../../mod/contacts.php:477
 msgid "Only show hidden contacts"
