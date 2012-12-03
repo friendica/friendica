@@ -99,7 +99,7 @@ if(! function_exists('post_url')) {
 function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) {
 	$a = get_app();
 	$ch = curl_init($url);
-	if(($redirects > 8) || (! $ch)) 
+	if(($redirects > 8) || (! $ch))
 		return false;
 
 	curl_setopt($ch, CURLOPT_HEADER, true);

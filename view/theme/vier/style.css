@@ -398,6 +398,7 @@ code {
   color: #444;
   padding: 10px;
   margin-top: 20px;
+  max-width: 640px;
 }
 #panel {
   position: absolute;
@@ -1045,7 +1046,7 @@ section {
 
 .wall-item-container .wall-item-content {
   font-size: 13px;
-  max-width: 720px;
+  max-width: 660px;
   word-wrap: break-word;
   line-height: 1.4;
 }
@@ -1128,6 +1129,10 @@ section {
   width: 665px;
   border-bottom: 1px solid hsl(198, 21%, 79%);
 }
+.wall-item-container.comment .wall-item-content {
+  max-width: 585px;
+}
+
 .wall-item-container.comment .contact-photo {
   width: 32px;
   height: 32px;
