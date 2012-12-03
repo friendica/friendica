@@ -12,6 +12,17 @@
 	$API = Array();
 	$called_api = Null;
 
+        function api_user() {
+          // It is not sufficient to use local_user() to check whether someone is allowed to use the API,
+          // because this will open CSRF holes (just embed an image with src=friendicasite.com/api/statuses/update?status=CSRF
+          // into a page, and visitors will post something without noticing it).
+          // Instead, use this function.
+          if ($_SESSION["allow_api"])
+            return local_user();
+
+          return false;
+        }
+
 	function api_date($str){
 		//Wed May 23 06:01:13 +0000 2007
 		return datetime_convert('UTC', 'UTC', $str, "D M d H:i:s +0000 Y" );
@@ -89,7 +100,7 @@
 		}
 
 		require_once('include/security.php');
-		authenticate_success($record);
+		authenticate_success($record); $_SESSION["allow_api"] = true;
 
 		call_hooks('logged_in', $a->user);
 
@@ -108,11 +119,11 @@
 			if (strpos($a->query_string, $p)===0){
 				$called_api= explode("/",$p);
 				//unset($_SERVER['PHP_AUTH_USER']);
-				if ($info['auth']===true && local_user()===false) {
+				if ($info['auth']===true && api_user()===false) {
 						api_login($a);
 				}
 
-				load_contact_links(local_user());
+				load_contact_links(api_user());
 
 				logger('API call for ' . $a->user['username'] . ': ' . $a->query_string);
 				logger('API parameters: ' . print_r($_REQUEST,true));
@@ -219,7 +230,7 @@
 		if(is_null($user) && x($_GET, 'screen_name')) {
 			$user = dbesc($_GET['screen_name']);	
 			$extra_query = "AND `contact`.`nick` = '%s' ";
-			if (local_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(local_user());
+			if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
 			
 		}
 		
@@ -232,12 +243,12 @@
 			} else {
 				$user = dbesc($user);
 				$extra_query = "AND `contact`.`nick` = '%s' ";
-				if (local_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(local_user());
+				if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
 			}
 		}
 		
 		if (! $user) {
-			if (local_user()===false) {
+			if (api_user()===false) {
 				api_login($a); return False;
 			} else {
 				$user = $_SESSION['uid'];
@@ -259,10 +270,10 @@
 		
 		if($uinfo[0]['self']) {
 			$usr = q("select * from user where uid = %d limit 1",
-				intval(local_user())
+				intval(api_user())
 			);
 			$profile = q("select * from profile where uid = %d and `is-default` = 1 limit 1",
-				intval(local_user())
+				intval(api_user())
 			);
 
 			// count public wall messages
@@ -458,7 +469,7 @@
 	 * http://developer.twitter.com/doc/get/account/verify_credentials
 	 */
 	function api_account_verify_credentials(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 		$user_info = api_get_user($a);
 		
 		return api_apply_template("user", $type, array('$user' => $user_info));
@@ -482,14 +493,14 @@
 
 /*Waitman Gobble Mod*/
         function api_statuses_mediap(&$a, $type) {
-                if (local_user()===false) {
+                if (api_user()===false) {
                         logger('api_statuses_update: no user');
                         return false;
                 }
                 $user_info = api_get_user($a);
 
                 $_REQUEST['type'] = 'wall';
-                $_REQUEST['profile_uid'] = local_user();
+                $_REQUEST['profile_uid'] = api_user();
                 $_REQUEST['api_source'] = true;
                 $txt = requestdata('status');
                 //$txt = urldecode(requestdata('status'));
@@ -525,7 +536,7 @@
 
 
 	function api_statuses_update(&$a, $type) {
-		if (local_user()===false) {
+		if (api_user()===false) {
 			logger('api_statuses_update: no user');
 			return false;
 		}
@@ -569,7 +580,7 @@
 
 		if(requestdata('lat') && requestdata('long'))
 			$_REQUEST['coord'] = sprintf("%s %s",requestdata('lat'),requestdata('long'));
-		$_REQUEST['profile_uid'] = local_user();
+		$_REQUEST['profile_uid'] = api_user();
 
 		if($parent)
 			$_REQUEST['type'] = 'net-comment';
@@ -713,7 +724,7 @@
 	 * TODO: Add reply info
 	 */
 	function api_statuses_home_timeline(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 
 		$user_info = api_get_user($a);
 		// get last newtork messages
@@ -787,7 +798,7 @@
 	api_register_func('api/statuses/friends_timeline','api_statuses_home_timeline', true);
 
 	function api_statuses_public_timeline(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 
 		$user_info = api_get_user($a);
 		// get last newtork messages
@@ -869,7 +880,7 @@
 	 * 
 	 */
 	function api_statuses_show(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 
 		$user_info = api_get_user($a);
 
@@ -921,7 +932,7 @@
 	 * 
 	 */
 	function api_statuses_repeat(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 
 		$user_info = api_get_user($a);
 
@@ -947,7 +958,7 @@
 
 		if ($r[0]['body'] != "") {
 			$_REQUEST['body'] = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8')."[url=".$r[0]['reply_url']."]".$r[0]['reply_author']."[/url] \n".$r[0]['body'];
-			$_REQUEST['profile_uid'] = local_user();
+			$_REQUEST['profile_uid'] = api_user();
 			$_REQUEST['type'] = 'wall';
 			$_REQUEST['api_source'] = true;
 
@@ -968,7 +979,7 @@
 	 * 
 	 */
 	function api_statuses_destroy(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 
 		$user_info = api_get_user($a);
 
@@ -995,7 +1006,7 @@
 	 * 
 	 */
 	function api_statuses_mentions(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 				
 		$user_info = api_get_user($a);
 		// get last newtork messages
@@ -1075,13 +1086,13 @@
 
 
 	function api_statuses_user_timeline(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 		
 		$user_info = api_get_user($a);
 		// get last newtork messages
 
 
-		logger("api_statuses_user_timeline: local_user: ". local_user() .
+		logger("api_statuses_user_timeline: api_user: ". api_user() .
 			   "\nuser_info: ".print_r($user_info, true) .
 			   "\n_REQUEST:  ".print_r($_REQUEST, true),
 			   LOGGER_DEBUG);
@@ -1113,7 +1124,7 @@
 			$sql_extra
 			AND `item`.`id`>%d
 			ORDER BY `item`.`received` DESC LIMIT %d ,%d ",
-			intval(local_user()),
+			intval(api_user()),
 			intval($user_info['id']),
 			intval($since_id),
 			intval($start),	intval($count)
@@ -1136,7 +1147,7 @@
 
 
 	function api_favorites(&$a, $type){
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 
 		$user_info = api_get_user($a);
 		// in friendica starred item are private
@@ -1408,7 +1419,7 @@
 	 *  returns: json, xml 
 	 **/
 	function api_statuses_f(&$a, $type, $qtype) {
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 		$user_info = api_get_user($a);
 		
 		
@@ -1434,7 +1445,7 @@
 			$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(CONTACT_IS_FOLLOWER), intval(CONTACT_IS_FRIEND));
  
 		$r = q("SELECT id FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 $sql_extra",
-			intval(local_user())
+			intval(api_user())
 		);
 
 		$ret = array();
@@ -1516,7 +1527,7 @@
 
 
 	function api_ff_ids(&$a,$type,$qtype) {
-		if(! local_user())
+		if(! api_user())
 			return false;
 
 		if($qtype == 'friends')
@@ -1526,7 +1537,7 @@
  
 
 		$r = q("SELECT id FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 $sql_extra",
-			intval(local_user())
+			intval(api_user())
 		);
 
 		if(is_array($r)) {
@@ -1559,7 +1570,7 @@
 
 
 	function api_direct_messages_new(&$a, $type) {
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 		
 		if (!x($_POST, "text") || !x($_POST,"screen_name")) return;
 
@@ -1568,7 +1579,7 @@
 		require_once("include/message.php");
 
 		$r = q("SELECT `id` FROM `contact` WHERE `uid`=%d AND `nick`='%s'",
-				intval(local_user()),
+				intval(api_user()),
 				dbesc($_POST['screen_name']));
 
 		$recipient = api_get_user($a, $r[0]['id']);			
@@ -1576,7 +1587,7 @@
 		$sub     = '';
 		if (x($_REQUEST,'replyto')) {
 			$r = q('SELECT `parent-uri`, `title` FROM `mail` WHERE `uid`=%d AND `id`=%d',
-					intval(local_user()),
+					intval(api_user()),
 					intval($_REQUEST['replyto']));
 			$replyto = $r[0]['parent-uri'];
 			$sub     = $r[0]['title'];
@@ -1614,7 +1625,7 @@
 	api_register_func('api/direct_messages/new','api_direct_messages_new',true);
 
 	function api_direct_messages_box(&$a, $type, $box) {
-		if (local_user()===false) return false;
+		if (api_user()===false) return false;
 		
 		$user_info = api_get_user($a);
 		
@@ -1640,7 +1651,7 @@
 		}
 		
 		$r = q("SELECT * FROM `mail` WHERE uid=%d AND $sql_extra ORDER BY created DESC LIMIT %d,%d",
-				intval(local_user()),
+				intval(api_user()),
 				intval($start),	intval($count)
 		);
 		
