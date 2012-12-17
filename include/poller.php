@@ -105,6 +105,9 @@ function poller_run(&$argv, &$argc){
 	// clear old item cache files
 	clear_cache();
 
+	// clear cache for photos
+	clear_cache($a->get_basepath(), $a->get_basepath()."/photo");
+
 	$manual_id  = 0;
 	$generation = 0;
 	$hub_update = false;

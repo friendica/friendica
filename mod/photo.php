@@ -7,6 +7,7 @@ function photo_init(&$a) {
 	global $_SERVER;
 
 	$prvcachecontrol = false;
+	$file = "";
 
 	switch($a->argc) {
 		case 4:
@@ -20,6 +21,7 @@ function photo_init(&$a) {
 			break;
 		case 2:
 			$photo = $a->argv[1];
+			$file = $photo;
 			break;
 		case 1:
 		default:
@@ -41,7 +43,6 @@ function photo_init(&$a) {
 		}
 		exit;
 	}
-
 
 	$default = 'images/person-175.jpg';
 
@@ -94,7 +95,7 @@ function photo_init(&$a) {
 		foreach( Photo::supportedTypes() as $m=>$e){
 			$photo = str_replace(".$e",'',$photo);
 		}
-	
+
 		if(substr($photo,-2,1) == '-') {
 			$resolution = intval(substr($photo,-1,1));
 			$photo = substr($photo,0,-2);
@@ -114,6 +115,8 @@ function photo_init(&$a) {
 				dbesc($photo),
 				intval($resolution)
 			);
+
+			$public = ($r[0]['allow_cid'] == '') AND ($r[0]['allow_gid'] == '') AND ($r[0]['deny_cid']  == '') AND ($r[0]['deny_gid']  == '');
 
 			if(count($r)) {
 				$data = $r[0]['data'];
@@ -198,6 +201,12 @@ function photo_init(&$a) {
 		header("Cache-Control: max-age=31536000");
 	}
 	echo $data;
+
+	// If the photo is public and there is an existing photo directory store the photo there
+	if ($public and ($file != ""))
+		if (is_dir($_SERVER["DOCUMENT_ROOT"]."/photo"))
+			file_put_contents($_SERVER["DOCUMENT_ROOT"]."/photo/".$file, $data);
+
 	killme();
 	// NOTREACHED
 }

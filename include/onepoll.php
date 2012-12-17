@@ -2,6 +2,13 @@
 
 require_once("boot.php");
 
+function RemoveReply($subject) {
+	while (in_array(strtolower(substr($subject, 0, 3)), array("re:", "aw:")))
+		$subject = trim(substr($subject, 4));
+
+	return($subject);
+}
+
 function onepoll_run(&$argv, &$argc){
 	global $a, $db;
 
@@ -374,10 +381,6 @@ function onepoll_run(&$argv, &$argc){
 	//							$datarray['parent-uri'] = $r[0]['uri'];
 						}
 
-
-						if(! x($datarray,'parent-uri'))
-							$datarray['parent-uri'] = $datarray['uri'];
-
 						// Decoding the header
 						$subject = imap_mime_header_decode($meta->subject);
 						$datarray['title'] = "";
@@ -392,10 +395,25 @@ function onepoll_run(&$argv, &$argc){
 						//$datarray['title'] = notags(trim($meta->subject));
 						$datarray['created'] = datetime_convert('UTC','UTC',$meta->date);
 
-						// Is it  reply?
+						// Is it a reply?
 						$reply = ((substr(strtolower($datarray['title']), 0, 3) == "re:") or
 							(substr(strtolower($datarray['title']), 0, 3) == "re-") or
 							(raw_refs != ""));
+
+						// Remove Reply-signs in the subject
+						$datarray['title'] = RemoveReply($datarray['title']);
+
+						// If it seems to be a reply but a header couldn't be found take the last message with matching subject
+						if(!x($datarray,'parent-uri') and $reply) {
+							$r = q("SELECT `uri` , `parent-uri` FROM `item` WHERE MATCH (`title`) AGAINST ('".'"%s"'."' IN BOOLEAN MODE) ORDER BY `created` DESC LIMIT 1",
+								dbesc(protect_sprintf($datarray['title'])));
+							if(count($r))
+								$datarray['parent-uri'] = $r[0]['parent-uri'];
+						}
+
+						if(! x($datarray,'parent-uri'))
+							$datarray['parent-uri'] = $datarray['uri'];
+
 
 						$r = email_get_msg($mbox,$msg_uid, $reply);
 						if(! $r) {

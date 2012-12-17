@@ -520,6 +520,19 @@ if(! class_exists('App')) {
 			$this->is_tablet = $mobile_detect->isTablet();
 		}
 
+		function get_basepath() {
+
+			$basepath = get_config("system", "basepath");
+
+			if ($basepath == "")
+				$basepath = $_SERVER["DOCUMENT_ROOT"];
+
+			if ($basepath == "")
+				$basepath = $_SERVER["PWD"];
+
+			return($basepath);
+		}
+
 		function get_baseurl($ssl = false) {
 
 			$scheme = $this->scheme;
@@ -1895,7 +1908,7 @@ function clear_cache($basepath = "", $path = "") {
 			$fullpath = $path."/".$file;
 			if ((filetype($fullpath) == "dir") and ($file != ".") and ($file != ".."))
 				clear_cache($basepath, $fullpath);
-			if ((filetype($fullpath) == "file") and filectime($fullpath) < (time() - $cachetime))
+			if ((filetype($fullpath) == "file") and (filectime($fullpath) < (time() - $cachetime)))
 				unlink($fullpath);
 		}
 		closedir($dh);

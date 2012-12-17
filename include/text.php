@@ -292,11 +292,11 @@ function alt_pager(&$a, $i) {
         $o .= '<div class="pager">';
 
 	if($a->pager['page']>1)
-	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] - 1).'">' . t('newer') . '</a>';
+	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] - 1).'" class="pager_newer">' . t('newer') . '</a>';
         if($i>0) {
           if($a->pager['page']>1)
 	          $o .= "&nbsp;-&nbsp;";
-	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] + 1).'">' . t('older') . '</a>';
+	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] + 1).'" class="pager_older">' . t('older') . '</a>';
 	}
 
 

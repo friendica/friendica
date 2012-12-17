@@ -41,6 +41,7 @@
 				{{ if $nav.help }} <li><a class="$nav.help.2" target="friendica-help" href="$nav.help.0" title="$nav.help.3" >$nav.help.1</a></li>{{ endif }}
 				<li><a class="$nav.search.2" href="friendica" title="Site Info / Impressum" >Info/Impressum</a></li>
 				<li><a class="$nav.directory.2" href="$nav.directory.0" title="$nav.directory.3" >$nav.directory.1</a></li>
+				{{ if $nav.delegations }}<li><a class="$nav.delegations.2" href="$nav.delegations.0" title="$nav.delegations.3">$nav.delegations.1</a></li>{{ endif }}
 				{{ if $nav.settings }}<li><a class="$nav.settings.2" href="$nav.settings.0" title="$nav.settings.3">$nav.settings.1</a></li>{{ endif }}
 				{{ if $nav.admin }}<li><a class="$nav.admin.2" href="$nav.admin.0" title="$nav.admin.3" >$nav.admin.1</a></li>{{ endif }}
 
@@ -74,7 +75,6 @@
 					{{ for $nav.usermenu as $usermenu }}
 						<li><a class="$usermenu.2" href="$usermenu.0" title="$usermenu.3">$usermenu.1</a></li>
 					{{ endfor }}
-					
 					{{ if $nav.notifications }}<li><a class="$nav.notifications.2" href="$nav.notifications.0" title="$nav.notifications.3" >$nav.notifications.1</a></li>{{ endif }}
 					{{ if $nav.messages }}<li><a class="$nav.messages.2" href="$nav.messages.0" title="$nav.messages.3" >$nav.messages.1</a></li>{{ endif }}
 					{{ if $nav.contacts }}<li><a class="$nav.contacts.2" href="$nav.contacts.0" title="$nav.contacts.3" >$nav.contacts.1</a></li>{{ endif }}	

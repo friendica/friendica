@@ -771,14 +771,17 @@ function notifier_run(&$argv, &$argc){
 						$subject  = (($it['title']) ? email_header_encode($it['title'],'UTF-8') : t("\x28no subject\x29")) ;
 
 						// only expose our real email address to true friends
-
 						if(($contact['rel'] == CONTACT_IS_FRIEND) && (! $contact['blocked']))
-							$headers  = 'From: ' . email_header_encode($local_user[0]['username'],'UTF-8') . ' <' . $local_user[0]['email'] . '>' . "\n";
+							if($reply_to) {
+								$headers  = 'From: ' . email_header_encode($local_user[0]['username'],'UTF-8') . ' <' . $reply_to . '>' . "\n";
+								$headers .= 'Sender: '.$local_user[0]['email']."\n";
+							} else
+								$headers  = 'From: ' . email_header_encode($local_user[0]['username'],'UTF-8') . ' <' . $local_user[0]['email'] . '>' . "\n";
 						else
 							$headers  = 'From: ' . email_header_encode($local_user[0]['username'],'UTF-8') . ' <' . t('noreply') . '@' . $a->get_hostname() . '>' . "\n";
 
-						if($reply_to)
-							$headers .= 'Reply-to: ' . $reply_to . "\n";
+						//if($reply_to)
+						//	$headers .= 'Reply-to: ' . $reply_to . "\n";
 
 						// for testing purposes: Collect exported mails
 						//$file = tempnam("/tmp/friendica/", "mail-out2-");

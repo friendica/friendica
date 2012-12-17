@@ -155,6 +155,9 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	//	$Text = preg_replace("/\[url\=([^\[\]]*)\]\s*\[img\](.*?)\[\/img\]\s*\[\/url\]/ism",
 	//				"[url]$1[/url]\n[img]$2[/img]", $Text);
 
+	// Remove the avatar picture since that isn't looking good on the other side
+	//$Text = preg_replace("/\[share(.*?)avatar\s?=\s?'.*?'\s?(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","\n[share$1$2]$3[/share]",$Text);
+
 	// Convert it to HTML - don't try oembed
 	$Text = bbcode($Text, $preserve_nl, false);
 
