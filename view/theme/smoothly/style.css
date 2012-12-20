@@ -1378,9 +1378,15 @@ ul .sidebar-group-li .icon {
 	position: absolute;
 	overflow: hidden;
 	height: 20px;
-	width: 90px;
+	width: 100%;
 	top: 85px;
 	left: -1px;
+	border-right: 1px solid #dddddd;
+	border-left: 1px solid #dddddd;
+	border-bottom: 1px solid #dddddd;
+	box-shadow: 3px 3px 4px #959494;
+		-moz-box-shadow: 3px 3px 4px #959494;
+		-webkit-box-shadow: 3px 3px 4px #959494;
 	border-radius: 0px 0px 5px  5px;	
 		-webkit-border-radius: 0px 0px 5px  5px;
 		-moz-border-radius: 0px 0px 5px  5px;
@@ -1543,7 +1549,6 @@ ul .sidebar-group-li .icon {
 
 .wall-item-location {
 	margin-top: 5px;
-	width: 100px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 		-o-text-overflow: ellipsis;
@@ -1606,7 +1611,7 @@ ul .sidebar-group-li .icon {
 
 .wall-item-photo-menu {
 	display: none;
-	min-width: 92px;
+	min-width: 88px;
 	color: #2e3436;
 	border-top: 1px;
 	background: #eeeeee;
@@ -1625,15 +1630,6 @@ ul .sidebar-group-li .icon {
 		-moz-box-shadow: 3px 3px 4px #959494;
 		-webkit-box-shadow: 3px 3px 4px #959494;
 
-}
-
-.wall-item-photo-menu-button {
-	border-right: 1px solid #dddddd;
-	border-left: 1px solid #dddddd;
-	border-bottom: 1px solid #dddddd;
-	box-shadow: 3px 3px 4px #959494;
-		-moz-box-shadow: 3px 3px 4px #959494;
-		-webkit-box-shadow: 3px 3px 4px #959494;
 }
 
 .fakelink wall-item-photo-menu-button {
@@ -1733,7 +1729,6 @@ code {
 }
 
 .wall-item-outside-wrapper.comment .wall-item-photo-menu-button {
-	width: 50px;
 	top: 45px;
 	background-position: 35px center;
 }
@@ -1780,7 +1775,8 @@ code {
 }
 
 .comment-edit-text-empty { 
-	width: 672px; /*80%*/
+	width: 98%;
+	max-width: 672px;
 	height: 20px;
 	color: #babdb6;
 	transition: all 0.5s ease-in-out;	
@@ -1793,7 +1789,8 @@ code {
 }
 
 .comment-edit-text-full { 
-	width: 670px; 
+	width: 98%;
+	max-width: 672px;
 	height: 6em;
 	transition: all 0.5s ease-in-out;	
 		-webkit-transition: all 0.5s ease-in-out;
@@ -1801,7 +1798,8 @@ code {
 }
 
 .comment-edit-submit-wrapper { 
-	width: 670px; 
+	width: 98%;
+	max-width: 672px;
 	margin-left: 20px; 
 	text-align: left; 
 }
