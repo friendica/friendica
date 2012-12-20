@@ -923,6 +923,7 @@ function diaspora_reshare($importer,$xml,$msg) {
 	$orig_guid = notags(unxmlify($xml->root_guid));
 
 	$source_url = 'https://' . substr($orig_author,strpos($orig_author,'@')+1) . '/p/' . $orig_guid . '.xml';
+	$orig_url = 'https://'.substr($orig_author,strpos($orig_author,'@')+1).'/posts/'.$orig_guid;
 	$x = fetch_url($source_url);
 	if(! $x)
 		$x = fetch_url(str_replace('https://','http://',$source_url));
@@ -1032,10 +1033,14 @@ function diaspora_reshare($importer,$xml,$msg) {
 		$datarray['author-avatar'] = ((x($person,'thumb')) ? $person['thumb'] : $person['photo']);
 		$datarray['body'] = $body;
 	} else {
+		$prefix = "[share author='".$person['name'].
+				"' profile='".$person['url'].
+				"' avatar='".((x($person,'thumb')) ? $person['thumb'] : $person['photo']).
+				"' link='".$orig_url."']";
 		$datarray['author-name'] = $contact['name'];
 		$datarray['author-link'] = $contact['url'];
 		$datarray['author-avatar'] = $contact['thumb'];
-		$datarray['body'] = $prefix . $body;
+		$datarray['body'] = $prefix.$body."[/share]";
 	}
 
 	$datarray['tag'] = $str_tags;

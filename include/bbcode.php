@@ -251,11 +251,11 @@ function bb_ShareAttributes($match) {
 	if ($avatar != "")
 		$headline .= '<img src="'.$avatar.'" height="32" width="32" >';
 
-	$headline .= sprintf(t('<span><a href="%s">%s</a> wrote the following <a href="%s">post</a>:</span>'), $profile, $author, $link);
+	$headline .= sprintf(t('<span><a href="%s" target="external-link">%s</a> wrote the following <a href="%s" target="external-link">post</a>:</span>'), $profile, $author, $link);
 
         $headline .= "</div>";
 
-        $text = "<br />".$headline.'<blockquote class="shared_content">'.trim($match[2])."</blockquote>";
+        $text = $headline.'<blockquote class="shared_content">'.trim($match[2])."</blockquote>";
 
         return($text);
 }
@@ -314,6 +314,7 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	// We'll emulate it.
 
+	$Text = trim($Text);
 	$Text = str_replace("\r\n","\n", $Text);
 	$Text = str_replace(array("\r","\n"), array('<br />','<br />'), $Text);
 

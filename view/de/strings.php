@@ -1024,6 +1024,7 @@ $a->strings["Delegate Page Management"] = "Delegiere das Management für die Sei
 $a->strings["Delegates are able to manage all aspects of this account/page except for basic account settings. Please do not delegate your personal account to anybody that you do not trust completely."] = "Bevollmächtigte sind in der Lage, alle Aspekte dieses Kontos/dieser Seite zu verwalten, abgesehen von den Grundeinstellungen des Kontos. Bitte gib niemandem eine Bevollmächtigung für deinen privaten Account, dem du nicht absolut vertraust!";
 $a->strings["Existing Page Managers"] = "Vorhandene Seiten Manager";
 $a->strings["Existing Page Delegates"] = "Vorhandene Bevollmächtigte für die Seite";
+$a->strings["Delegations"] = "Bevollmächtigungen";
 $a->strings["Potential Delegates"] = "Potentielle Bevollmächtigte";
 $a->strings["Add"] = "Hinzufügen";
 $a->strings["No entries."] = "Keine Einträge";
@@ -2076,7 +2077,7 @@ $a->strings["Birthday Reminders"] = "Geburtstagserinnerungen";
 $a->strings["Birthdays this week:"] = "Geburtstage diese Woche:";
 $a->strings["[No description]"] = "[keine Beschreibung]";
 $a->strings["Event Reminders"] = "Veranstaltungserinnerungen";
-$a->strings["Events this week:"] = "Veranstaltungen diese Woche";
+$a->strings["Events this week:"] = "Veranstaltungen diese Woche:";
 $a->strings["Status Messages and Posts"] = "Statusnachrichten und Beiträge";
 $a->strings["Profile Details"] = "Profildetails";
 $a->strings["Events and Calendar"] = "Ereignisse und Kalender";
@@ -2097,5 +2098,7 @@ $a->strings["Post to Drupal by default"] = "Veröffentliche öffentliche Beiträ
 $a->strings["OEmbed settings updated"] = "OEmbed Einstellungen aktualisiert.";
 $a->strings["Use OEmbed for YouTube videos"] = "OEmbed für Youtube Videos verwenden";
 $a->strings["URL to embed:"] = "URL zum Einbetten:";
+$a->strings['<span><a href="%s" target="external-link">%s</a> wrote the following <a href="%s" target="external-link">post</a>:</span>'] = 
+            '<span><a href="%s" target="external-link">%s</a> hat diesen <a href="%s" target="external-link">Beitrag</a> ursprünglich gepostet:</span>';
 $a->strings["Tumblr login"] = "Tumblr Login";
 $a->strings["Tumblr password"] = "Tumblr Passwort";

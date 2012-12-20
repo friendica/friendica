@@ -798,6 +798,7 @@ function get_atom_elements($feed,$item) {
 		logger('get_atom_elements: Looking for status.net repeated message');
 
 		$message = $child["http://activitystrea.ms/spec/1.0/"]["object"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["content"][0]["data"];
+		$orig_uri = $child["http://activitystrea.ms/spec/1.0/"]["object"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10]["id"][0]["data"];
 		$author = $child[SIMPLEPIE_NAMESPACE_ATOM_10]["author"][0]["child"][SIMPLEPIE_NAMESPACE_ATOM_10];
 		$uri = $author["uri"][0]["data"];
 		$name = $author["name"][0]["data"];
@@ -805,17 +806,22 @@ function get_atom_elements($feed,$item) {
 		$avatar = $avatar["href"];
 
 		if (($name != "") and ($uri != "") and ($avatar != "") and ($message != "")) {
-			logger('get_atom_elements: fixing sender of repeated message');
+			logger('get_atom_elements: fixing sender of repeated message.');
 
-			$res["owner-name"] = $res["author-name"];
+			/*$res["owner-name"] = $res["author-name"];
 			$res["owner-link"] = $res["author-link"];
 			$res["owner-avatar"] = $res["author-avatar"];
 
 			$res["author-name"] = $name;
 			$res["author-link"] = $uri;
-			$res["author-avatar"] = $avatar;
+			$res["author-avatar"] = $avatar;*/
 
-			$res["body"] = html2bbcode($message);
+			$prefix = "[share author='".$name.
+					"' profile='".$uri.
+					"' avatar='".$avatar.
+					"' link='".$orig_uri."']";
+
+			$res["body"] = $prefix.html2bbcode($message)."[/share]";
 		}
 	}
 

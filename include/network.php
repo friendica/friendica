@@ -15,6 +15,9 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 
 	@curl_setopt($ch, CURLOPT_HEADER, true);
 
+	@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	@curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+
 	if (!is_null($accept_content)){
 		curl_setopt($ch,CURLOPT_HTTPHEADER, array (
 			"Accept: " . $accept_content

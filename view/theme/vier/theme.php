@@ -12,7 +12,7 @@ $a->theme_info = array();
 function vier_init(&$a) {
 $a->page['htmlhead'] .= <<< EOT
 <script>
-/*function insertFormatting(comment,BBcode,id) {
+function insertFormatting(comment,BBcode,id) {
 
 		var tmpStr = $("#comment-edit-text-" + id).val();
 		if(tmpStr == comment) {
@@ -41,7 +41,7 @@ $a->page['htmlhead'] .= <<< EOT
 	}
 	return true;
 }
-*/
+
 
 function showThread(id) {
 	$("#collapsed-comments-" + id).show()
@@ -52,13 +52,15 @@ function hideThread(id) {
 	$("#collapsed-comments-" + id + " .collapsed-comments").hide()
 }
 
-/*
+
 function cmtBbOpen(id) {
 	$("#comment-edit-bb-" + id).show();
 }
 function cmtBbClose(id) {
 	$("#comment-edit-bb-" + id).hide();
 }
+
+/*
 $(document).ready(function() {
 
 $('html').click(function() { $("#nav-notifications-menu" ).hide(); });

@@ -982,6 +982,9 @@ function prepare_body($item,$attach = false) {
 	$s = $prep_arr['html'];
 
 	if(! $attach) {
+		// Replace the blockquotes with quotes that are used in mails
+		$mailquote = '<blockquote type="cite" class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex;">';
+		$s = str_replace(array('<blockquote>', '<blockquote class="spoiler">', '<blockquote class="author">'), array($mailquote, $mailquote, $mailquote), $s);
 		return $s;
 	}
 
