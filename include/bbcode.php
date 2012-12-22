@@ -3,6 +3,14 @@
 require_once("include/oembed.php");
 require_once('include/event.php');
 
+function bb_cleanstyle($st) {
+  return "<span style=\"".cleancss($st[1]).";\">".$st[2]."</span>";
+}
+
+function bb_cleanclass($st) {
+  return "<span class=\"".cleancss($st[1])."\">".$st[2]."</span>";
+}
+
 function cleancss($input) {
 
 	$cleaned = "";
@@ -213,7 +221,7 @@ function bb_ShareAttributes($match) {
         $author = "";
         preg_match("/author='(.*?)'/ism", $attributes, $matches);
         if ($matches[1] != "")
-                $author = $matches[1];
+                $author = html_entity_decode($matches[1],ENT_QUOTES,'UTF-8');
 
         preg_match('/author="(.*?)"/ism', $attributes, $matches);
         if ($matches[1] != "")
@@ -385,10 +393,10 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	$Text = str_replace("[*]", "<li>", $Text);
 
 	// Check for style sheet commands
-	$Text = preg_replace("(\[style=(.*?)\](.*?)\[\/style\])ism","<span style=\"$1;\">$2</span>",$Text);
+	$Text = preg_replace_callback("(\[style=(.*?)\](.*?)\[\/style\])ism","bb_cleanstyle",$Text);
 
 	// Check for CSS classes
-	$Text = preg_replace("(\[class=(.*?)\](.*?)\[\/class\])ism","<span class=\"$1\">$2</span>",$Text);
+	$Text = preg_replace_callback("(\[class=(.*?)\](.*?)\[\/class\])ism","bb_cleanclass",$Text);
 
  	// handle nested lists
 	$endlessloop = 0;

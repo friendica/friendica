@@ -808,20 +808,24 @@ function get_atom_elements($feed,$item) {
 		if (($name != "") and ($uri != "") and ($avatar != "") and ($message != "")) {
 			logger('get_atom_elements: fixing sender of repeated message.');
 
-			/*$res["owner-name"] = $res["author-name"];
-			$res["owner-link"] = $res["author-link"];
-			$res["owner-avatar"] = $res["author-avatar"];
+			if (intval(get_config('system','new_share'))) {
+				$prefix = "[share author='".str_replace("'", "&#039;",$name).
+						"' profile='".$uri.
+						"' avatar='".$avatar.
+						"' link='".$orig_uri."']";
 
-			$res["author-name"] = $name;
-			$res["author-link"] = $uri;
-			$res["author-avatar"] = $avatar;*/
+				$res["body"] = $prefix.html2bbcode($message)."[/share]";
+			} else {
+				$res["owner-name"] = $res["author-name"];
+				$res["owner-link"] = $res["author-link"];
+				$res["owner-avatar"] = $res["author-avatar"];
 
-			$prefix = "[share author='".$name.
-					"' profile='".$uri.
-					"' avatar='".$avatar.
-					"' link='".$orig_uri."']";
+				$res["author-name"] = $name;
+				$res["author-link"] = $uri;
+				$res["author-avatar"] = $avatar;
 
-			$res["body"] = $prefix.html2bbcode($message)."[/share]";
+				$res["body"] = html2bbcode($message);
+			}
 		}
 	}
 

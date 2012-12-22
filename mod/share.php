@@ -18,15 +18,30 @@ function share_init(&$a) {
 	if(! count($r) || ($r[0]['private'] == 1))
 		killme();
 
-	$o = '';
+	if (intval(get_config('system','new_share'))) {
+		if (strpos($r[0]['body'], "[/share]") !== false) {
+			$pos = strpos($r[0]['body'], "[share");
+			$o = substr($r[0]['body'], $pos);
+		} else {
+			$o = "[share author='".str_replace("'", "&#039;",$r[0]['author-name']).
+				"' profile='".$r[0]['author-link'].
+				"' avatar='".$r[0]['author-avatar'].
+				"' link='".$r[0]['plink']."']\n";
+			if($r[0]['title'])
+				$o .= '[b]'.$r[0]['title'].'[/b]'."\n";
+			$o .= $r[0]['body'];
+			$o.= "[/share]";
+		}
+	} else {
+		$o = '';
 
-	$o .= "\xE2\x99\xb2" . ' [url=' . $r[0]['author-link'] . ']' . $r[0]['author-name'] . '[/url]' . "\n";
-	if($r[0]['title'])
-		$o .= '[b]' . $r[0]['title'] . '[/b]' . "\n";
-	$o .= $r[0]['body'] . "\n" ;
+		$o .= "\xE2\x99\xb2" . ' [url=' . $r[0]['author-link'] . ']' . $r[0]['author-name'] . '[/url]' . "\n";
+		if($r[0]['title'])
+			$o .= '[b]' . $r[0]['title'] . '[/b]' . "\n";
+		$o .= $r[0]['body'] . "\n" ;
 
-	$o .= (($r[0]['plink']) ? '[url=' . $r[0]['plink'] . ']' . t('link') . '[/url]' . "\n" : '');
-
+		$o .= (($r[0]['plink']) ? '[url=' . $r[0]['plink'] . ']' . t('link') . '[/url]' . "\n" : '');
+	}
 	echo $o;
-	killme();  
+	killme();
 }

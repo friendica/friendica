@@ -960,12 +960,12 @@ function diaspora_reshare($importer,$xml,$msg) {
 
 	$person = find_diaspora_person_by_handle($orig_author);
 
-	if(is_array($person) && x($person,'name') && x($person,'url'))
+	/*if(is_array($person) && x($person,'name') && x($person,'url'))
 		$details = '[url=' . $person['url'] . ']' . $person['name'] . '[/url]';
 	else
 		$details = $orig_author;
 
-	$prefix = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8') . $details . "\n";
+	$prefix = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8') . $details . "\n";*/
 
 
 	// allocate a guid on our system - we aren't fixing any collisions.
@@ -1012,7 +1012,7 @@ function diaspora_reshare($importer,$xml,$msg) {
 			}
 		}
 	}
-	
+
 	$datarray['uid'] = $importer['uid'];
 	$datarray['contact-id'] = $contact['id'];
 	$datarray['wall'] = 0;
@@ -1024,16 +1024,8 @@ function diaspora_reshare($importer,$xml,$msg) {
 	$datarray['owner-name'] = $contact['name'];
 	$datarray['owner-link'] = $contact['url'];
 	$datarray['owner-avatar'] = ((x($contact,'thumb')) ? $contact['thumb'] : $contact['photo']);
-	if (intval(get_config('system','diaspora_newreshare'))) {
-		// Let reshared messages look like wall-to-wall posts
-		// we have to set an additional value in the item in the future
-		// to distinct the wall-to-wall-posts from reshared/repeated messages
-		$datarray['author-name'] = $person['name'];
-		$datarray['author-link'] = $person['url'];
-		$datarray['author-avatar'] = ((x($person,'thumb')) ? $person['thumb'] : $person['photo']);
-		$datarray['body'] = $body;
-	} else {
-		$prefix = "[share author='".$person['name'].
+	if (intval(get_config('system','new_share'))) {
+		$prefix = "[share author='".str_replace("'", "&#039;",$person['name']).
 				"' profile='".$person['url'].
 				"' avatar='".((x($person,'thumb')) ? $person['thumb'] : $person['photo']).
 				"' link='".$orig_url."']";
@@ -1041,6 +1033,12 @@ function diaspora_reshare($importer,$xml,$msg) {
 		$datarray['author-link'] = $contact['url'];
 		$datarray['author-avatar'] = $contact['thumb'];
 		$datarray['body'] = $prefix.$body."[/share]";
+	} else {
+		// Let reshared messages look like wall-to-wall posts
+		$datarray['author-name'] = $person['name'];
+		$datarray['author-link'] = $person['url'];
+		$datarray['author-avatar'] = ((x($person,'thumb')) ? $person['thumb'] : $person['photo']);
+		$datarray['body'] = $body;
 	}
 
 	$datarray['tag'] = $str_tags;

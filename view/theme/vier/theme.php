@@ -1,10 +1,11 @@
 <?php
 /**
  * Name: Vier
- * Version: 0.1
+ * Version: 0.9
  * Author: Fabio <http://kirgroup.com/profile/fabrixxm>
  * Author: Ike <http://pirati.ca/profile/heluecht>
  * Maintainer: Ike <http://pirati.ca/profile/heluecht>
+ * Description: "Vier" uses the font awesome font library: http://fortawesome.github.com/Font-Awesome/
  */
 
 $a->theme_info = array();
