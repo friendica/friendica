@@ -1,14 +1,14 @@
 $live_update
 
-{{ for $threads as $item }}
+{{ for $threads as $thread }}
 
-<div id="tread-wrapper-$item.id" class="tread-wrapper {{ if $item.threaded }}threaded{{ endif }}  $item.toplevel">
+<div id="tread-wrapper-$thread.id" class="tread-wrapper {{ if $thread.threaded }}threaded{{ endif }}  $thread.toplevel">
        
        
-		{{ if $item.type == tag }}
-			{{ inc wall_item_tag.tpl }}{{ endinc }}
+		{{ if $thread.type == tag }}
+			{{ inc wall_item_tag.tpl with $item=$thread }}{{ endinc }}
 		{{ else }}
-			{{ inc $item.template }}{{ endinc }}
+			{{ inc $thread.template with $item=$thread }}{{ endinc }}
 		{{ endif }}
 		
 </div>

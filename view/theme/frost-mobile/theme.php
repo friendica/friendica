@@ -15,6 +15,7 @@ $a->videowidth = 250;
 $a->videoheight = 200;
 $a->theme_thread_allow = false;
 $a->force_max_items = 10;
+$a->theme['template_engine'] = 'smarty3';
 
 function frost_mobile_content_loaded(&$a) {
 

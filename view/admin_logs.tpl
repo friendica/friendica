@@ -4,9 +4,9 @@
 	<form action="$baseurl/admin/logs" method="post">
     <input type='hidden' name='form_security_token' value='$form_security_token'>
 
-	{{ inc field_checkbox.tpl with $field=$debugging }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$logfile }}{{ endinc }}
-	{{ inc field_select.tpl with $field=$loglevel }}{{ endinc }}
+	{{ inc $field_checkbox with $field=$debugging }}{{ endinc }}
+	{{ inc $field_input with $field=$logfile }}{{ endinc }}
+	{{ inc $field_select with $field=$loglevel }}{{ endinc }}
 	
 	<div class="submit"><input type="submit" name="page_logs" value="$submit" /></div>
 	

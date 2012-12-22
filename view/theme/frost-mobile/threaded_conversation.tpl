@@ -1,7 +1,7 @@
 $live_update
 
-{{ for $threads as $item }}
-{{ inc $item.template }}{{ endinc }}
+{{ for $threads as $thread }}
+{{ inc $thread.template with $item=$thread }}{{ endinc }}
 {{ endfor }}
 
 <div id="conversation-end"></div>

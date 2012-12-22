@@ -147,7 +147,13 @@ function poco_init(&$a) {
 
 	if($format === 'xml') {
 		header('Content-type: text/xml');
-		echo replace_macros(get_markup_template('poco_xml.tpl'),array_xmlify(array('$response' => $ret)));
+
+		$includes = array(
+			'$poco_entry_xml' => 'poco_entry_xml.tpl'
+		);
+		$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+		echo replace_macros(get_markup_template('poco_xml.tpl'),array_xmlify($includes + array('$response' => $ret)));
 		http_status_exit(500);
 	}
 	if($format === 'json') {

@@ -554,7 +554,13 @@ function settings_content(&$a) {
 		
 		if(($a->argc > 2) && ($a->argv[2] === 'add')) {
 			$tpl = get_markup_template("settings_oauth_edit.tpl");
-			$o .= replace_macros($tpl, array(
+
+			$includes = array(
+				'$field_input' => 'field_input.tpl',
+			);
+			$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+			$o .= replace_macros($tpl, $includes + array(
 				'$form_security_token' => get_form_security_token("settings_oauth"),
 				'$title'	=> t('Add application'),
 				'$submit'	=> t('Submit'),
@@ -580,7 +586,13 @@ function settings_content(&$a) {
 			$app = $r[0];
 			
 			$tpl = get_markup_template("settings_oauth_edit.tpl");
-			$o .= replace_macros($tpl, array(
+
+			$includes = array(
+				'$field_input' => 'field_input.tpl',
+			);
+			$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+			$o .= replace_macros($tpl, $includes + array(
 				'$form_security_token' => get_form_security_token("settings_oauth"),
 				'$title'	=> t('Add application'),
 				'$submit'	=> t('Update'),
@@ -663,12 +675,17 @@ function settings_content(&$a) {
 
 
 		$tpl = get_markup_template("settings_features.tpl");
-		$o .= replace_macros($tpl, array(
+
+		$includes = array(
+			'$field_yesno'	=> 'field_yesno.tpl',
+		);
+		$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+		$o .= replace_macros($tpl, $includes + array(
 			'$form_security_token' => get_form_security_token("settings_features"),
 			'$title'	=> t('Additional Features'),
 			'$features' => $arr,
 			'$submit'   => t('Submit'),
-			'$field_yesno'	=> 'field_yesno.tpl',
 		));
 		return $o;
 	}
@@ -715,7 +732,17 @@ function settings_content(&$a) {
 			$mail_disabled_message = (($mail_disabled) ? t('Email access is disabled on this site.') : '');
 		}
 	
-		$o .= replace_macros($tpl, array(
+
+		$includes = array(
+			'$field_checkbox' => 'field_checkbox.tpl',
+			'$field_input' => 'field_input.tpl',
+			'$field_select'	=> 'field_select.tpl',
+			'$field_custom' => 'field_custom.tpl',
+			'$field_password' => 'field_password.tpl',
+		);
+		$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+		$o .= replace_macros($tpl, $includes + array(
 			'$form_security_token' => get_form_security_token("settings_connectors"),
 			
 			'$title'	=> t('Connector Settings'),
@@ -805,7 +832,15 @@ function settings_content(&$a) {
 		}
 		
 		$tpl = get_markup_template("settings_display.tpl");
-		$o = replace_macros($tpl, array(
+
+		$includes = array(
+			'$field_themeselect' => 'field_themeselect.tpl',
+			'$field_checkbox' => 'field_checkbox.tpl',
+			'$field_input' => 'field_input.tpl',
+		);
+		$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+		$o = replace_macros($tpl, $includes + array(
 			'$ptitle' 	=> t('Display Settings'),
 			'$form_security_token' => get_form_security_token("settings_display"),
 			'$submit' 	=> t('Submit'),
@@ -891,7 +926,13 @@ function settings_content(&$a) {
 
 
 	$pageset_tpl = get_markup_template('pagetypes.tpl');
-	$pagetype = replace_macros($pageset_tpl,array(
+
+	$includes = array(
+		'$field_radio' => 'field_radio.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+	$pagetype = replace_macros($pageset_tpl,$includes + array(
 		'$page_normal' 	=> array('page-flags', t('Normal Account Page'), PAGE_NORMAL, 
 									t('This account is a normal personal profile'), 
 									($a->user['page-flags'] == PAGE_NORMAL)),
@@ -1012,7 +1053,17 @@ function settings_content(&$a) {
 	require_once('include/group.php');
 	$group_select = mini_group_select(local_user(),$a->user['def_gid']);
 
-	$o .= replace_macros($stpl,array(
+	$includes = array(
+		'$field_password' => 'field_password.tpl',
+		'$field_input' => 'field_input.tpl',
+		'$field_custom' => 'field_custom.tpl',
+		'$field_checkbox' => 'field_checkbox.tpl',
+		'$field_yesno' => 'field_yesno.tpl',
+		'$field_intcheckbox' => 'field_intcheckbox.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+	$o .= replace_macros($stpl,$includes + array(
 		'$ptitle' 	=> t('Account Settings'),
 
 		'$submit' 	=> t('Submit'),

@@ -447,6 +447,23 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 				$shareable = false;
 
 				$body = prepare_body($item,true);
+
+				if($a->theme['template_engine'] === 'internal') {
+					$name_e = template_escape($profile_name);
+					$title_e = template_escape($item['title']);
+					$body_e = template_escape($body);
+					$text_e = strip_tags(template_escape($body));
+					$location_e = template_escape($location);
+					$owner_name_e = template_escape($owner_name);
+				}
+				else {
+					$name_e = $profile_name;
+					$title_e = $item['title'];
+					$body_e = $body;
+					$text_e = strip_tags($body);
+					$location_e = $location;
+					$owner_name_e = $owner_name;
+				}
 				
 				//$tmp_item = replace_macros($tpl,array(
 				$tmp_item = array(
@@ -455,17 +472,17 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 					'linktitle' => sprintf( t('View %s\'s profile @ %s'), $profile_name, ((strlen($item['author-link'])) ? $item['author-link'] : $item['url'])),
 					'profile_url' => $profile_link,
 					'item_photo_menu' => item_photo_menu($item),
-					'name' => template_escape($profile_name),
+					'name' => $name_e,
 					'sparkle' => $sparkle,
 					'lock' => $lock,
 					'thumb' => $profile_avatar,
-					'title' => template_escape($item['title']),
-					'body' => template_escape($body),
-					'text' => strip_tags(template_escape($body)),
+					'title' => $title_e,
+					'body' => $body_e,
+					'text' => $text_e,
 					'ago' => (($item['app']) ? sprintf( t('%s from %s'),relative_date($item['created']),$item['app']) : relative_date($item['created'])),
-					'location' => template_escape($location),
+					'location' => $location_e,
 					'indent' => '',
-					'owner_name' => template_escape($owner_name),
+					'owner_name' => $owner_name_e,
 					'owner_url' => $owner_url,
 					'owner_photo' => $owner_photo,
 					'plink' => get_plink($item),
@@ -802,6 +819,24 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 				$body = prepare_body($item,true);
 				//$tmp_item = replace_macros($template,
+
+				if($a->theme['template_engine'] === 'internal') {
+					$body_e = template_escape($body);
+					$text_e = strip_tags(template_escape($body));
+					$name_e = template_escape($profile_name);
+					$title_e = template_escape($item['title']);
+					$location_e = template_escape($location);
+					$owner_name_e = template_escape($owner_name);
+				}
+				else {
+					$body_e = $body;
+					$text_e = strip_tags($body);
+					$name_e = $profile_name;
+					$title_e = $item['title'];
+					$location_e = $location;
+					$owner_name_e = $owner_name;
+				}
+
 				$tmp_item = array(
 					// collapse comments in template. I don't like this much...
 					'comment_firstcollapsed' => $comment_firstcollapsed,
@@ -811,8 +846,8 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 					
 					'type' => implode("",array_slice(explode("/",$item['verb']),-1)),
 					'tags' => $tags,
-					'body' => template_escape($body),
-					'text' => strip_tags(template_escape($body)),
+					'body' => $body_e,
+					'text' => $text_e,
 					'id' => $item['item_id'],
 					'linktitle' => sprintf( t('View %s\'s profile @ %s'), $profile_name, ((strlen($item['author-link'])) ? $item['author-link'] : $item['url'])),
 					'olinktitle' => sprintf( t('View %s\'s profile @ %s'), $profile_name, ((strlen($item['owner-link'])) ? $item['owner-link'] : $item['url'])),
@@ -821,19 +856,19 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 					'vwall' => t('via Wall-To-Wall:'),
 					'profile_url' => $profile_link,
 					'item_photo_menu' => item_photo_menu($item),
-					'name' => template_escape($profile_name),
+					'name' => $name_e,
 					'thumb' => $profile_avatar,
 					'osparkle' => $osparkle,
 					'sparkle' => $sparkle,
-					'title' => template_escape($item['title']),
+					'title' => $title_e,
 					'ago' => (($item['app']) ? sprintf( t('%s from %s'),relative_date($item['created']),$item['app']) : relative_date($item['created'])),
 					'lock' => $lock,
-					'location' => template_escape($location),
+					'location' => $location_e,
 					'indent' => $indent,
 					'shiny' => $shiny,
 					'owner_url' => $owner_url,
 					'owner_photo' => $owner_photo,
-					'owner_name' => template_escape($owner_name),
+					'owner_name' => $owner_name_e,
 					'plink' => get_plink($item),
 					'edpost' => $edpost,
 					'isstarred' => $isstarred,

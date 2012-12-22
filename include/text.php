@@ -9,19 +9,38 @@
 // depending on the order in which they were declared in the array.   
 
 require_once("include/template_processor.php");
+require_once("include/friendica_smarty.php");
 
 if(! function_exists('replace_macros')) {  
 function replace_macros($s,$r) {
 	global $t;
-	
-	//$ts = microtime();
-	$r =  $t->replace($s,$r);
-	//$tt = microtime() - $ts;
-	
-	//$a = get_app();
-	//$a->page['debug'] .= "$tt <br>\n";
-	return template_unescape($r);
 
+//	$ts = microtime();
+	$a = get_app();
+
+	if($a->theme['template_engine'] === 'smarty3') {
+		$template = '';
+		if(gettype($s) === 'string') {
+			$template = $s;
+			$s = new FriendicaSmarty();
+		}
+		foreach($r as $key=>$value) {
+			if($key[0] === '$') {
+				$key = substr($key, 1);
+			}
+			$s->assign($key, $value);
+		}
+		$output = $s->parsed($template);
+	}
+	else {
+		$r =  $t->replace($s,$r);
+	
+		$output = template_unescape($r);
+	}
+//	$tt = microtime() - $ts;
+//	$a = get_app();
+//	$a->page['debug'] .= "$tt <br>\n";
+	return $output;
 }}
 
 
@@ -421,29 +440,78 @@ if(! function_exists('get_intltext_template')) {
 function get_intltext_template($s) {
 	global $lang;
 
+	$a = get_app();
+	$engine = '';
+	if($a->theme['template_engine'] === 'smarty3')
+		$engine = "/smarty3";
+
 	if(! isset($lang))
 		$lang = 'en';
 
-	if(file_exists("view/$lang/$s"))
-		return file_get_contents("view/$lang/$s");
-	elseif(file_exists("view/en/$s"))
-		return file_get_contents("view/en/$s");
+	if(file_exists("view/$lang$engine/$s"))
+		return file_get_contents("view/$lang$engine/$s");
+	elseif(file_exists("view/en$engine/$s"))
+		return file_get_contents("view/en$engine/$s");
 	else
-		return file_get_contents("view/$s");
+		return file_get_contents("view$engine/$s");
 }}
 
 if(! function_exists('get_markup_template')) {
-function get_markup_template($s) {
-	$a=get_app();
-	$theme = current_theme();
-	
-	if(file_exists("view/theme/$theme/$s"))
-		return file_get_contents("view/theme/$theme/$s");
-	elseif (x($a->theme_info,"extends") && file_exists("view/theme/".$a->theme_info["extends"]."/$s"))
-		return file_get_contents("view/theme/".$a->theme_info["extends"]."/$s");
-	else
-		return file_get_contents("view/$s");
+function get_markup_template($s, $root = '') {
+//	$ts = microtime();
+	$a = get_app();
 
+	if($a->theme['template_engine'] === 'smarty3') {
+		$template_file = get_template_file($a, 'smarty3/' . $s, $root);
+
+		$template = new FriendicaSmarty();
+		$template->filename = $template_file;
+
+//		$tt = microtime() - $ts;
+//		$a->page['debug'] .= "$tt <br>\n";
+		return $template;
+	}
+	else {
+		$template_file = get_template_file($a, $s, $root);
+//		$file_contents = file_get_contents($template_file);
+//		$tt = microtime() - $ts;
+//		$a->page['debug'] .= "$tt <br>\n";
+//		return $file_contents;
+		return file_get_contents($template_file);
+	}	
+}}
+
+if(! function_exists("get_template_file")) {
+function get_template_file($a, $filename, $root = '') {
+	$theme = current_theme();
+
+	// Make sure $root ends with a slash /
+	if($root !== '' && $root[strlen($root)-1] !== '/')
+		$root = $root . '/';
+
+	if(file_exists($root . "view/theme/$theme/$filename"))
+		$template_file = $root . "view/theme/$theme/$filename";
+	elseif (x($a->theme_info,"extends") && file_exists($root . "view/theme/".$a->theme_info["extends"]."/$filename"))
+		$template_file = $root . "view/theme/".$a->theme_info["extends"]."/$filename";
+	else
+		$template_file = $root . "view/$filename";
+
+	return $template_file;
+}}
+
+if(! function_exists("set_template_includes")) {
+function set_template_includes($engine, $includes) {
+	if($engine === 'smarty3') {
+		$a = get_app();
+		foreach($includes as $name=>$path) {
+//			$sm_includes[$name] = $_SERVER['DOCUMENT_ROOT'] . '/' . get_template_file($a, 'smarty3/' . $path);
+			$sm_includes[$name] = get_template_file($a, 'smarty3/' . $path);
+		}
+		return $sm_includes;
+	}
+	else {
+		return $includes;
+	}
 }}
 
 

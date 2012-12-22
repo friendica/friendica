@@ -9,8 +9,8 @@
 
 
 {{ if $response.totalResults }}
-{{ for $response.entry as $entry }}
-{{ inc poco_entry_xml.tpl }}{{ endinc }}
+{{ for $response.entry as $ent }}
+{{ inc $poco_entry_xml with $entry=$ent }}{{ endinc }}
 {{ endfor }}
 {{ else }}
 <entry></entry>

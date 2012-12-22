@@ -16,7 +16,7 @@
 <input type="hidden" name="dbdata" value="$dbdata" />
 <input type="hidden" name="pass" value="4" />
 
-{{ inc field_input.tpl with $field=$adminmail }}{{endinc}}
+{{ inc $field_input with $field=$adminmail }}{{endinc}}
 $timezone
 
 <input id="install-submit" type="submit" name="submit" value="$submit" /> 

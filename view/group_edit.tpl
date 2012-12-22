@@ -5,7 +5,7 @@
 	<form action="group/$gid" id="group-edit-form" method="post" >
 		<input type='hidden' name='form_security_token' value='$form_security_token'>
 		
-		{{ inc field_input.tpl with $field=$gname }}{{ endinc }}
+		{{ inc $field_input with $field=$gname }}{{ endinc }}
 		{{ if $drop }}$drop{{ endif }}
 		<div id="group-edit-submit-wrapper" >
 			<input type="submit" name="submit" value="$submit" >
@@ -15,9 +15,9 @@
 </div>
 
 
-{{ if $groupeditor }}
+{{ if $groupedit_info }}
 	<div id="group-update-wrapper">
-		{{ inc groupeditor.tpl }}{{ endinc }}
+		{{ inc $groupeditortpl with $groupeditor=$groupedit_info }}{{ endinc }}
 	</div>
 {{ endif }}
 {{ if $desc }}<div id="group-edit-desc">$desc</div>{{ endif }}

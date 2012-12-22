@@ -60,13 +60,19 @@ function uimport_content(&$a) {
 	
 	
     $tpl = get_markup_template("uimport.tpl");
-    return replace_macros($tpl, array(
+
+	$includes = array(
+		'$field_custom' => 'field_custom.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+    return replace_macros($tpl, $includes + array(
         '$regbutt' => t('Import'),
         '$import' => array(
             'title' => t("Move account"),
-            'text' => t("You can import an account from another Friendica server. <br>
-                            You need to export your account from the old server and upload it here. We will recreate your old account here with all your contacts. We will try also to inform your friends that you moved here.<br>
-                            <b>This feature is experimental. We can't import contacts from the OStatus network (statusnet/identi.ca) or from diaspora"),
+			'intro' => t("You can import an account from another Friendica server."),
+			'instruct' => t("You need to export your account from the old server and upload it here. We will recreate your old account here with all your contacts. We will try also to inform your friends that you moved here."),
+			'warn' => t("This feature is experimental. We can't import contacts from the OStatus network (statusnet/identi.ca) or from Diaspora"),
             'field' => array('accountfile', t('Account file'),'<input id="id_accountfile" name="accountfile" type="file">', t('To export your accont, go to "Settings->Export your porsonal data" and select "Export account"')),
         ),  
     ));

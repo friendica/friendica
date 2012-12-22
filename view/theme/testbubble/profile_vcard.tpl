@@ -29,7 +29,7 @@
 
 	{{ if $homepage }}<dl class="homepage"><dt class="homepage-label">$homepage</dt><dd class="homepage-url"><a href="$profile.homepage" target="external-link">$profile.homepage</a></dd></dl>{{ endif }}
 
-	{{ inc diaspora_vcard.tpl }}{{ endinc }}
+	{{ inc $diaspora_vcard with $diaspora=$diaspora_info }}{{ endinc }}
 	
 	<div id="profile-extra-links">
 		<ul>

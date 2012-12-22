@@ -8,6 +8,7 @@
  */
 
 $a = get_app();
+$a->theme['template_engine'] = 'smarty3';
 
 function get_diabook_config($key, $default = false) {
 	if (local_user()) {
@@ -385,7 +386,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$aside['$comunity_profiles_items'] = array();
 	$r = q("select gcontact.* from gcontact left join glink on glink.gcid = gcontact.id
 			  where glink.cid = 0 and glink.uid = 0 order by rand() limit 9");
-	$tpl = file_get_contents( dirname(__file__).'/ch_directory_item.tpl');
+	$tpl = get_markup_template('ch_directory_item.tpl');
 	if(count($r)) {
 		$photo = 'photo';
 		foreach($r as $rr) {
@@ -414,7 +415,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 		0,
 		9
 	);
-	$tpl = file_get_contents( dirname(__file__).'/ch_directory_item.tpl');
+	$tpl = get_markup_template('ch_directory_item.tpl');
 	if(count($r)) {
 		$photo = 'thumb';
 		foreach($r as $rr) {
@@ -493,7 +494,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 				dbesc(t('Profile Photos'))
 				);
 		if(count($r)) {
-		$tpl = file_get_contents( dirname(__file__).'/ch_directory_item.tpl');
+		$tpl = get_markup_template('ch_directory_item.tpl');
 		foreach($r as $rr) {
 			$photo_page = $a->get_baseurl() . '/photos/' . $rr['nickname'] . '/image/' . $rr['resource-id'];
 			$photo_url = $a->get_baseurl() . '/photo/' .  $rr['resource-id'] . '-' . $rr['scale'] .'.jpg';
@@ -661,8 +662,15 @@ if ($color=="dark") $color_path = "/diabook-dark/";
    $url = $a->get_baseurl($ssl_state);
    $aside['$url'] = $url;
 	//print right_aside
-	$tpl = file_get_contents(dirname(__file__).'/communityhome.tpl');
-	$a->page['right_aside'] = replace_macros($tpl, $aside);
+	$tpl = get_markup_template('communityhome.tpl');
+
+	$includes = array(
+		'$field_select' => 'field_select.tpl',
+		'$field_input' => 'field_input.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+	$a->page['right_aside'] = replace_macros($tpl, $includes + $aside);
 
  }
 
@@ -672,7 +680,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$a = get_app();
 	$baseurl = $a->get_baseurl($ssl_state);
 	$bottom['$baseurl'] = $baseurl;
-	$tpl = file_get_contents(dirname(__file__) . '/bottom.tpl');
+	$tpl = get_markup_template('bottom.tpl');
 	$a->page['footer'] = $a->page['footer'].replace_macros($tpl, $bottom);
  }
 

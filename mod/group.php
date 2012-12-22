@@ -82,7 +82,16 @@ function group_content(&$a) {
 		$switchtotext = 400;
 
 	$tpl = get_markup_template('group_edit.tpl');
-	$context = array('$submit' => t('Submit'));
+
+	$includes = array(
+			'$field_input' => 'field_input.tpl',
+			'$groupeditortpl' => 'groupeditor.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+	$context = $includes + array(
+			'$submit' => t('Submit'),
+	);
 
 	if(($a->argc == 2) && ($a->argv[1] === 'new')) {
 		
@@ -217,15 +226,16 @@ function group_content(&$a) {
 		}
 	}
 
-	$context['$groupeditor'] = $groupeditor;
 	$context['$desc'] = t('Click on a contact to add or remove.');
 
 	if($change) {
+		$context['$groupeditor'] = $groupeditor;
 		$tpl = get_markup_template('groupeditor.tpl');
 		echo replace_macros($tpl, $context);
 		killme();
 	}
 	
+	$context['$groupedit_info'] = $groupeditor;
 	return replace_macros($tpl, $context);
 
 }

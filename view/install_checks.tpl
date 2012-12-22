@@ -3,7 +3,7 @@
 <form  action="$baseurl/index.php?q=install" method="post">
 <table>
 {{ for $checks as $check }}
-	<tr><td>$check.title </td><td><span class="icon s22 {{if $check.status}}on{{else}}{{if$check.required}}off{{else}}yellow{{endif}}{{endif}}"></td><td>{{if $check.required}}(required){{endif}}</td></tr>
+	<tr><td>$check.title </td><td><span class="icon s22 {{if $check.status}}on{{else}}{{if $check.required}}off{{else}}yellow{{endif}}{{endif}}"></td><td>{{if $check.required}}(required){{endif}}</td></tr>
 	{{if $check.help }}
 	<tr><td colspan="3"><blockquote>$check.help</blockquote></td></tr>
 	{{endif}}

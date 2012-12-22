@@ -439,7 +439,16 @@ function admin_page_site(&$a) {
 	);
 
 	$t = get_markup_template("admin_site.tpl");
-	return replace_macros($t, array(
+
+	$includes = array(
+		'$field_checkbox'	=> 'field_checkbox.tpl',
+		'$field_input'		=> 'field_input.tpl',
+		'$field_select'		=> 'field_select.tpl',
+		'$field_textarea'	=> 'field_textarea.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+	return replace_macros($t, $includes + array(
 		'$title' => t('Administration'),
 		'$page' => t('Site'),
 		'$submit' => t('Submit'),
@@ -488,7 +497,7 @@ function admin_page_site(&$a) {
 		'$poll_interval'	=> array('poll_interval', t("Poll interval"), (x(get_config('system','poll_interval'))?get_config('system','poll_interval'):2), t("Delay background polling processes by this many seconds to reduce system load. If 0, use delivery interval.")),
 		'$maxloadavg'		=> array('maxloadavg', t("Maximum Load Average"), ((intval(get_config('system','maxloadavg')) > 0)?get_config('system','maxloadavg'):50), t("Maximum system load before delivery and poll processes are deferred - default 50.")),
         '$form_security_token' => get_form_security_token("admin_site"),
-			
+
 	));
 
 }
@@ -1109,7 +1118,14 @@ readable.");
 		}
 	}			
 
-	return replace_macros($t, array(
+	$includes = array(
+		'$field_checkbox'	=> 'field_checkbox.tpl',
+		'$field_input'		=> 'field_input.tpl',
+		'$field_select'		=> 'field_select.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+	return replace_macros($t, $includes + array(
 		'$title' => t('Administration'),
 		'$page' => t('Logs'),
 		'$submit' => t('Submit'),
@@ -1168,7 +1184,14 @@ function admin_page_remoteupdate(&$a) {
 	}
 	
 	$tpl = get_markup_template("admin_remoteupdate.tpl");
-	return replace_macros($tpl, array(
+
+	$includes = array(
+		'$field_input'		=> 'field_input.tpl',
+		'$field_password'	=> 'field_password.tpl',
+	);
+	$includes = set_template_includes($a->theme['template_engine'], $includes);
+
+	return replace_macros($tpl, $includes + array(
 		'$baseurl' => $a->get_baseurl(true),
 		'$submit' => t("Update now"),
 		'$close' => t("Close"),
@@ -1181,7 +1204,7 @@ function admin_page_remoteupdate(&$a) {
 		'$ftppath'	=> array('ftppath', t("FTP Path"), '/',''),
 		'$ftpuser'	=> array('ftpuser', t("FTP User"), '',''),
 		'$ftppwd'	=> array('ftppwd', t("FTP Password"), '',''),
-		'$remotefile'=>array('remotefile','', $u['2'],'')
+		'$remotefile'=>array('remotefile','', $u['2'],''),
 	));
 	
 }

@@ -7,6 +7,8 @@
  * Maintainer: Ike <http://pirati.ca/profile/heluecht>
  */
 
+$a->theme['template_engine'] = 'smarty3';
+
 $a->theme_info = array();
 
 function vier_init(&$a) {
@@ -106,3 +108,4 @@ $('.savedsearchterm').hover(
 </script>
 EOT;
 }
+

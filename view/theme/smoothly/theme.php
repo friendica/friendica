@@ -11,6 +11,7 @@
 
 $a = get_app();
 $a->theme_info = array();
+$a->theme['template_engine'] = 'smarty3';
 
 function smoothly_init(&$a) {
 	$cssFile = null;

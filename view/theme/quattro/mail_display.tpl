@@ -3,10 +3,10 @@
 	<a href="message/dropconv/$thread_id" onclick="return confirmDelete();"  title="$delete" class="mail-delete icon s22 delete"></a>
 </div>
 
-{{ for $mails as $mail }}
-	<div id="tread-wrapper-$mail.id" class="tread-wrapper">
-		{{ inc mail_conv.tpl }}{{endinc}}
+{{ for $mails as $mail_item }}
+	<div id="tread-wrapper-$mail_item.id" class="tread-wrapper">
+		{{ inc $mail_conv with $mail=$mail_item }}{{endinc}}
 	</div>
 {{ endfor }}
 
-{{ inc prv_message.tpl }}{{ endinc }}
+{{ inc $prv_message with $reply=$reply_info }}{{ endinc }}

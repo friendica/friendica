@@ -7,11 +7,11 @@ $nickname_block
 
 <h3 class="settings-heading">$h_pass</h3>
 
-{{inc field_password.tpl with $field=$password1 }}{{endinc}}
-{{inc field_password.tpl with $field=$password2 }}{{endinc}}
+{{inc $field_password with $field=$password1 }}{{endinc}}
+{{inc $field_password with $field=$password2 }}{{endinc}}
 
 {{ if $oid_enable }}
-{{inc field_input.tpl with $field=$openid }}{{endinc}}
+{{inc $field_input with $field=$openid }}{{endinc}}
 {{ endif }}
 
 <div class="settings-submit-wrapper" >
@@ -21,11 +21,11 @@ $nickname_block
 
 <h3 class="settings-heading">$h_basic</h3>
 
-{{inc field_input.tpl with $field=$username }}{{endinc}}
-{{inc field_input.tpl with $field=$email }}{{endinc}}
-{{inc field_custom.tpl with $field=$timezone }}{{endinc}}
-{{inc field_input.tpl with $field=$defloc }}{{endinc}}
-{{inc field_checkbox.tpl with $field=$allowloc }}{{endinc}}
+{{inc $field_input with $field=$username }}{{endinc}}
+{{inc $field_input with $field=$email }}{{endinc}}
+{{inc $field_custom with $field=$timezone }}{{endinc}}
+{{inc $field_input with $field=$defloc }}{{endinc}}
+{{inc $field_checkbox with $field=$allowloc }}{{endinc}}
 
 
 <div class="settings-submit-wrapper" >
@@ -38,7 +38,7 @@ $nickname_block
 
 <input type="hidden" name="visibility" value="$visibility" />
 
-{{inc field_input.tpl with $field=$maxreq }}{{endinc}}
+{{inc $field_input with $field=$maxreq }}{{endinc}}
 
 $profile_in_dir
 
@@ -57,9 +57,9 @@ $suggestme
 $unkmail
 
 
-{{inc field_input.tpl with $field=$cntunkmail }}{{endinc}}
+{{inc $field_input with $field=$cntunkmail }}{{endinc}}
 
-{{inc field_input.tpl with $field=$expire.days }}{{endinc}}
+{{inc $field_input with $field=$expire.days }}{{endinc}}
 
 
 <div class="field input">
@@ -67,10 +67,10 @@ $unkmail
 	<div style="display: none;">
 		<div id="advanced-expire-popup" style="width:auto;height:auto;overflow:auto;">
 			<h3>$expire.advanced</h3>
-			{{ inc field_yesno.tpl with $field=$expire.items }}{{endinc}}
-			{{ inc field_yesno.tpl with $field=$expire.notes }}{{endinc}}
-			{{ inc field_yesno.tpl with $field=$expire.starred }}{{endinc}}
-			{{ inc field_yesno.tpl with $field=$expire.network_only }}{{endinc}}
+			{{ inc $field_yesno with $field=$expire.items }}{{endinc}}
+			{{ inc $field_yesno with $field=$expire.notes }}{{endinc}}
+			{{ inc $field_yesno with $field=$expire.starred }}{{endinc}}
+			{{ inc $field_yesno with $field=$expire.network_only }}{{endinc}}
 		</div>
 	</div>
 
@@ -108,21 +108,21 @@ $group_select
 
 <div id="settings-activity-desc">$activity_options</div>
 
-{{inc field_checkbox.tpl with $field=$post_newfriend }}{{endinc}}
-{{inc field_checkbox.tpl with $field=$post_joingroup }}{{endinc}}
-{{inc field_checkbox.tpl with $field=$post_profilechange }}{{endinc}}
+{{inc $field_checkbox with $field=$post_newfriend }}{{endinc}}
+{{inc $field_checkbox with $field=$post_joingroup }}{{endinc}}
+{{inc $field_checkbox with $field=$post_profilechange }}{{endinc}}
 
 
 <div id="settings-notify-desc">$lbl_not</div>
 
 <div class="group">
-{{inc field_intcheckbox.tpl with $field=$notify1 }}{{endinc}}
-{{inc field_intcheckbox.tpl with $field=$notify2 }}{{endinc}}
-{{inc field_intcheckbox.tpl with $field=$notify3 }}{{endinc}}
-{{inc field_intcheckbox.tpl with $field=$notify4 }}{{endinc}}
-{{inc field_intcheckbox.tpl with $field=$notify5 }}{{endinc}}
-{{inc field_intcheckbox.tpl with $field=$notify6 }}{{endinc}}
-{{inc field_intcheckbox.tpl with $field=$notify7 }}{{endinc}}
+{{inc $field_intcheckbox with $field=$notify1 }}{{endinc}}
+{{inc $field_intcheckbox with $field=$notify2 }}{{endinc}}
+{{inc $field_intcheckbox with $field=$notify3 }}{{endinc}}
+{{inc $field_intcheckbox with $field=$notify4 }}{{endinc}}
+{{inc $field_intcheckbox with $field=$notify5 }}{{endinc}}
+{{inc $field_intcheckbox with $field=$notify6 }}{{endinc}}
+{{inc $field_intcheckbox with $field=$notify7 }}{{endinc}}
 </div>
 
 </div>

@@ -3,11 +3,11 @@
 <form action="settings/display" id="settings-form" method="post" autocomplete="off" >
 <input type='hidden' name='form_security_token' value='$form_security_token'>
 
-{{inc field_themeselect.tpl with $field=$theme }}{{endinc}}
-{{inc field_themeselect.tpl with $field=$mobile_theme }}{{endinc}}
-{{inc field_input.tpl with $field=$ajaxint }}{{endinc}}
-{{inc field_input.tpl with $field=$itemspage_network }}{{endinc}}
-{{inc field_checkbox.tpl with $field=$nosmile}}{{endinc}}
+{{inc $field_themeselect with $field=$theme }}{{endinc}}
+{{inc $field_themeselect with $field=$mobile_theme }}{{endinc}}
+{{inc $field_input with $field=$ajaxint }}{{endinc}}
+{{inc $field_input with $field=$itemspage_network }}{{endinc}}
+{{inc $field_checkbox with $field=$nosmile}}{{endinc}}
 
 
 <div class="settings-submit-wrapper" >

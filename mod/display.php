@@ -16,7 +16,7 @@ function display_content(&$a, $update = 0) {
 
 	$o = '';
 
-	$a->page['htmlhead'] .= get_markup_template('display-head.tpl');
+	$a->page['htmlhead'] .= replace_macros(get_markup_template('display-head.tpl'), array());
 
 
 	if($update) {

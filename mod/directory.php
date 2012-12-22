@@ -143,16 +143,23 @@ function directory_content(&$a) {
 			
 			$tpl = get_markup_template('directory_item.tpl');
 
+			if($a->theme['template_engine'] === 'internal') {
+				$location_e = template_escape($location);
+			}
+			else {
+				$location_e = $location;
+			}
+
 			$entry = replace_macros($tpl,array(
 				'$id' => $rr['id'],
-				'$profile-link' => $profile_link,
+				'$profile_link' => $profile_link,
 				'$photo' => $a->get_cached_avatar_image($rr[$photo]),
-				'$alt-text' => $rr['name'],
+				'$alt_text' => $rr['name'],
 				'$name' => $rr['name'],
 				'$details' => $pdesc . $details,
-				'$page-type' => $page_type,
+				'$page_type' => $page_type,
 				'$profile' => $profile,
-				'$location' => template_escape($location),
+				'$location' => $location_e,
 				'$gender'   => $gender,
 				'$pdesc'	=> $pdesc,
 				'$marital'  => $marital,

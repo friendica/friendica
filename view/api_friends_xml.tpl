@@ -1,5 +1,7 @@
+<!-- TEMPLATE APPEARS UNUSED -->
+
 <users type="array">
-	{{for $users as $user }}
-	{{inc api_user_xml.tpl }}{{endinc}}
+	{{for $users as $u }}
+	{{inc $api_user_xml with $user=$u }}{{endinc}}
 	{{endfor}}
 </users>

@@ -98,12 +98,12 @@ class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick
 					{{ endfor }}
 				</div>			
 			{{ if $item.has_cats }}
-			<div class="categorytags"><span>$item.txt_cats {{ for $item.categories as $cat }}$cat.name <a href="$cat.removeurl" title="$remove">[$remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
+			<div class="categorytags"><span>$item.txt_cats {{ for $item.categories as $cat }}$cat.name <a href="$cat.removeurl" title="$item.remove">[$item.remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
 			</div>
 			{{ endif }}
 
 			{{ if $item.has_folders }}
-			<div class="filesavetags"><span>$item.txt_folders {{ for $item.folders as $cat }}$cat.name <a href="$cat.removeurl" title="$remove">[$remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
+			<div class="filesavetags"><span>$item.txt_folders {{ for $item.folders as $cat }}$cat.name <a href="$cat.removeurl" title="$item.remove">[$item.remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
 			</div>
 			{{ endif }}
 
@@ -131,8 +131,8 @@ class="icon recycle wall-item-share-buttons"  title="$item.vote.share.0" onclick
 
 <div class="wall-item-outside-wrapper-end $item.indent $item.shiny" ></div>
 </div>
-{{ for $item.children as $item }}
-	{{ inc $item.template }}{{ endinc }}
+{{ for $item.children as $child }}
+	{{ inc $child.template with $item=$child }}{{ endinc }}
 {{ endfor }}
 
 </div>

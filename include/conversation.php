@@ -581,33 +581,54 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 
 				list($categories, $folders) = get_cats_and_terms($item);
 
+				if($a->theme['template_engine'] === 'internal') {
+					$profile_name_e = template_escape($profile_name);
+					$item['title_e'] = template_escape($item['title']);
+					$body_e = template_escape($body);
+					$tags_e = template_escape($tags);
+					$hashtags_e = template_escape($hashtags);
+					$mentions_e = template_escape($mentions);
+					$location_e = template_escape($location);
+					$owner_name_e = template_escape($owner_name);
+				}
+				else {
+					$profile_name_e = $profile_name;
+					$item['title_e'] = $item['title'];
+					$body_e = $body;
+					$tags_e = $tags;
+					$hashtags_e = $hashtags;
+					$mentions_e = $mentions;
+					$location_e = $location;
+					$owner_name_e = $owner_name;
+				}
+
 				$tmp_item = array(
 					'template' => $tpl,
 					'id' => (($preview) ? 'P0' : $item['item_id']),
 					'linktitle' => sprintf( t('View %s\'s profile @ %s'), $profile_name, ((strlen($item['author-link'])) ? $item['author-link'] : $item['url'])),
 					'profile_url' => $profile_link,
 					'item_photo_menu' => item_photo_menu($item),
-					'name' => template_escape($profile_name),
+					'name' => $profile_name_e,
 					'sparkle' => $sparkle,
 					'lock' => $lock,
 					'thumb' => $profile_avatar,
-					'title' => template_escape($item['title']),
-					'body' => template_escape($body),
-					'tags' => template_escape($tags),
-					'hashtags' => template_escape($hashtags),
-					'mentions' => template_escape($mentions),
+					'title' => $item['title_e'],
+					'body' => $body_e,
+					'tags' => $tags_e,
+					'hashtags' => $hashtags_e,
+					'mentions' => $mentions_e,
 					'txt_cats' => t('Categories:'),
 					'txt_folders' => t('Filed under:'),
 					'has_cats' => ((count($categories)) ? 'true' : ''),
 					'has_folders' => ((count($folders)) ? 'true' : ''),
 					'categories' => $categories,
 					'folders' => $folders,
-					'text' => strip_tags(template_escape($body)),
+					'text' => strip_tags($body_e),
 					'localtime' => datetime_convert('UTC', date_default_timezone_get(), $item['created'], 'r'),
 					'ago' => (($item['app']) ? sprintf( t('%s from %s'),relative_date($item['created']),$item['app']) : relative_date($item['created'])),
-					'location' => template_escape($location),
+					'location' => $location_e,
 					'indent' => '',
-					'owner_name' => template_escape($owner_name),
+					'owner_name' => $owner_name_e,
 					'owner_url' => $owner_url,
 					'owner_photo' => $owner_photo,
 					'plink' => get_plink($item),
@@ -682,7 +703,6 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 	$o = replace_macros($page_template, array(
 		'$baseurl' => $a->get_baseurl($ssl_state),
 		'$live_update' => $live_update_div,
-		'$remove' => t('remove'),
 		'$mode' => $mode,
 		'$user' => $a->user,
 		'$threads' => $threads,
@@ -856,12 +876,27 @@ function format_like($cnt,$arr,$type,$id) {
 	if($cnt == 1)
 		$o .= (($type === 'like') ? sprintf( t('%s likes this.'), $arr[0]) : sprintf( t('%s doesn\'t like this.'), $arr[0])) . EOL ;
 	else {
-		$spanatts = 'class="fakelink" onclick="openClose(\'' . $type . 'list-' . $id . '\');"';
-		$o .= (($type === 'like') ?
-					sprintf( t('<span  %1$s>%2$d people</span> like this.'), $spanatts, $cnt)
-					 :
-					sprintf( t('<span  %1$s>%2$d people</span> don\'t like this.'), $spanatts, $cnt) );
-		$o .= EOL ;
+		//$spanatts = 'class="fakelink" onclick="openClose(\'' . $type . 'list-' . $id . '\');"';
+		switch($type) {
+			case 'like':
+//				$phrase = sprintf( t('<span  %1$s>%2$d people</span> like this.'), $spanatts, $cnt);
+				$mood = t('like this');
+				break;
+			case 'dislike':
+//				$phrase = sprintf( t('<span  %1$s>%2$d people</span> don\'t like this.'), $spanatts, $cnt);
+				$mood = t('don\'t like this');
+				break;
+		}
+		$tpl = get_markup_template("voting_fakelink.tpl");
+		$phrase = replace_macros($tpl, array(
+			'$vote_id' => $type . 'list-' . $id,
+			'$count' => $cnt,
+			'$people' => t('people'),
+			'$vote_mood' => $mood
+		));
+		$o .= $phrase;
+//		$o .= EOL ;
+
 		$total = count($arr);
 		if($total >= MAX_LIKERS)
 			$arr = array_slice($arr, 0, MAX_LIKERS - 1);

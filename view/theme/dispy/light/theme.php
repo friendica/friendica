@@ -13,6 +13,7 @@ $a->theme_info = array(
     'family' => 'dispy',
 	'name' => 'light',
 );
+$a->theme['template_engine'] = 'smarty3';
 
 function dispy_light_init(&$a) {
 

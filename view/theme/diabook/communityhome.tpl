@@ -1,7 +1,7 @@
 
 <div id="twittersettings" style="display:none">
 <form id="twittersettingsform" action="network" method="post" >
-{{inc field_input.tpl with $field=$TSearchTerm}}{{endinc}}
+{{inc $field_input with $field=$TSearchTerm}}{{endinc}}
 <div class="settings-submit-wrapper">
 <input id="twittersub" type="submit" value="$sub" class="settings-submit" name="diabook-settings-sub"></input>
 </div>
@@ -13,9 +13,9 @@
 <div id="layermanager" style="width: 350px;position: relative;float: right;right:20px;height: 300px;"></div>
 <div id="map2" style="height:350px;width:350px;"></div>
 <div id="mouseposition" style="width: 350px;"></div>
-{{inc field_input.tpl with $field=$ELZoom}}{{endinc}}
-{{inc field_input.tpl with $field=$ELPosX}}{{endinc}}
-{{inc field_input.tpl with $field=$ELPosY}}{{endinc}}
+{{inc $field_input with $field=$ELZoom}}{{endinc}}
+{{inc $field_input with $field=$ELPosX}}{{endinc}}
+{{inc $field_input with $field=$ELPosY}}{{endinc}}
 <div class="settings-submit-wrapper">
 <input id="mapsub" type="submit" value="$sub" class="settings-submit" name="diabook-settings-map-sub"></input>
 </div>
@@ -35,16 +35,16 @@ just contact me, if you are intesrested in joining</p>
 <div id="boxsettings" style="display:none">
 <form id="boxsettingsform" action="network" method="post" >
 <fieldset><legend>$boxsettings.title.1</legend>
-{{inc field_select.tpl with $field=$close_pages}}{{endinc}}
-{{inc field_select.tpl with $field=$close_profiles}}{{endinc}}
-{{inc field_select.tpl with $field=$close_helpers}}{{endinc}}
-{{inc field_select.tpl with $field=$close_services}}{{endinc}}
-{{inc field_select.tpl with $field=$close_friends}}{{endinc}}
-{{inc field_select.tpl with $field=$close_lastusers}}{{endinc}}
-{{inc field_select.tpl with $field=$close_lastphotos}}{{endinc}}
-{{inc field_select.tpl with $field=$close_lastlikes}}{{endinc}}
-{{inc field_select.tpl with $field=$close_twitter}}{{endinc}}
-{{inc field_select.tpl with $field=$close_mapquery}}{{endinc}}
+{{inc $field_select with $field=$close_pages}}{{endinc}}
+{{inc $field_select with $field=$close_profiles}}{{endinc}}
+{{inc $field_select with $field=$close_helpers}}{{endinc}}
+{{inc $field_select with $field=$close_services}}{{endinc}}
+{{inc $field_select with $field=$close_friends}}{{endinc}}
+{{inc $field_select with $field=$close_lastusers}}{{endinc}}
+{{inc $field_select with $field=$close_lastphotos}}{{endinc}}
+{{inc $field_select with $field=$close_lastlikes}}{{endinc}}
+{{inc $field_select with $field=$close_twitter}}{{endinc}}
+{{inc $field_select with $field=$close_mapquery}}{{endinc}}
 <div class="settings-submit-wrapper">
 <input id="boxsub" type="submit" value="$sub" class="settings-submit" name="diabook-settings-box-sub"></input>
 </div>

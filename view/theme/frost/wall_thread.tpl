@@ -52,12 +52,12 @@
 						{{ endfor }}
 					<!--</div>-->
 			{{ if $item.has_cats }}
-			<div class="categorytags">$item.txt_cats {{ for $item.categories as $cat }}$cat.name <a href="$cat.removeurl" title="$remove">[$remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
+			<div class="categorytags">$item.txt_cats {{ for $item.categories as $cat }}$cat.name <a href="$cat.removeurl" title="$item.remove">[$item.remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
 			</div>
 			{{ endif }}
 
 			{{ if $item.has_folders }}
-			<div class="filesavetags">$item.txt_folders {{ for $item.folders as $cat }}$cat.name <a href="$cat.removeurl" title="$remove">[$remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
+			<div class="filesavetags">$item.txt_folders {{ for $item.folders as $cat }}$cat.name <a href="$cat.removeurl" title="$item.remove">[$item.remove]</a> {{ if $cat.last }}{{ else }}, {{ endif }}{{ endfor }}
 			</div>
 			{{ endif }}
 			</div>
@@ -111,8 +111,8 @@
 
 <!--<div class="wall-item-outside-wrapper-end $item.indent" ></div>-->
 <!--</div>-->
-{{ for $item.children as $item }}
-	{{ inc $item.template }}{{ endinc }}
+{{ for $item.children as $child }}
+	{{ inc $child.template with $item=$child }}{{ endinc }}
 {{ endfor }}
 
 {{ if $item.flatten }}
