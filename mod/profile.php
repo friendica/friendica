@@ -33,7 +33,7 @@ function profile_init(&$a) {
 		auto_redir($a, $which);
 	}
 
-	$a->theme["template_engine"] = 'internal'; // reset the template engine to the default in case the user's theme doesn't specify one
+	set_template_engine($a); // reset the template engine to the default in case the user's theme doesn't specify one
 	profile_load($a,$which,$profile);
 
 	$blocked = (((get_config('system','block_public')) && (! local_user()) && (! remote_user())) ? true : false);
