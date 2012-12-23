@@ -31,7 +31,7 @@ function filer_content(&$a) {
 		);
 		$includes = set_template_includes($a->theme['template_engine'], $includes);
 
-		$o = replace_macros($tpl, array(
+		$o = replace_macros($tpl,$includes + array(
 			'$field' => array('term', t("Save to Folder:"), '', '', $filetags, t('- select -')),
 			'$submit' => t('Save'),
 		));
