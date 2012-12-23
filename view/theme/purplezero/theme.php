@@ -2,7 +2,7 @@
 $a->theme_info = array(
   'extends' => 'duepuntozero',
 );
-$a->theme['template_engine'] = 'smarty3';
+set_template_engine($a, 'smarty3');
 
 function purplezero_init(&$a) {
 $a->page['htmlhead'] .= <<< EOT

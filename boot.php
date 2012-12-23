@@ -1946,3 +1946,18 @@ function clear_cache($basepath = "", $path = "") {
 		closedir($dh);
 	}
 }
+
+function set_template_engine(&$a, $engine = 'internal') {
+
+	$a->theme['template_engine'] = 'internal';
+
+	if(is_writable('view/smarty3/')) {
+		switch($engine) {
+			case 'smarty3':
+				$a->theme['template_engine'] = 'smarty3';
+				break;
+			default:
+				break;
+		}
+	}
+}

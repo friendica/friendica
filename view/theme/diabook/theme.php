@@ -8,7 +8,7 @@
  */
 
 $a = get_app();
-$a->theme['template_engine'] = 'smarty3';
+set_template_engine($a, 'smarty3');
 
 function get_diabook_config($key, $default = false) {
 	if (local_user()) {

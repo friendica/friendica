@@ -22,7 +22,7 @@ $a->theme_info = array(
     'family' => 'dispy',
 	'version' => '1.2.2'
 );
-$a->theme['template_engine'] = 'smarty3';
+set_template_engine($a, 'smarty3');
 
 function dispy_init(&$a) {
 

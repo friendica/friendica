@@ -8,7 +8,7 @@
  * Maintainer: Mike Macgirvin <mike@macgirvin.com>
  */
 
-$a->theme['template_engine'] = 'smarty3';
+set_template_engine($a, 'smarty3');
 
 $a->page['htmlhead'] .= <<< EOT
 <script>

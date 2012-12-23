@@ -920,7 +920,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 
 	$o = '';
 
-	$geotag = (($x['allow_location']) ? get_markup_template('jot_geotag.tpl') : '');
+	$geotag = (($x['allow_location']) ? replace_macros(get_markup_template('jot_geotag.tpl'), array()) : '');
 
 /*	$plaintext = false;
 	if( local_user() && (intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext')) )
