@@ -77,7 +77,7 @@
 		</div>
 	</div>
 	<div class="mceActionPanel">
-		<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+		<input type="button" id="cancel" name="cancel" value="$cancel" onclick="tinyMCEPopup.close();" />
 	</div>	
 	</body>
 	

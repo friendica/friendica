@@ -78,6 +78,7 @@ function fbrowser_content($a){
 				'$path' => $path,
 				'$folders' => $albums,
 				'$files' =>$files,
+				'$cancel' => t('Cancel'),
 			));
 				
 				
@@ -112,6 +113,7 @@ function fbrowser_content($a){
 					'$path' => array( array($a->get_baseurl()."/fbrowser/image/", t("Files")) ),
 					'$folders' => false,
 					'$files' =>$files,
+					'$cancel' => t('Cancel'),
 				));
 				
 			}
