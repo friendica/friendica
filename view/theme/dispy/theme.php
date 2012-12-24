@@ -184,7 +184,7 @@ function dispy_community_info() {
 	$url = $a->get_baseurl($ssl_state);
 	$aside['$url'] = $url;
 
-	$tpl = file_get_contents(dirname(__file__) . '/communityhome.tpl');
+	$tpl = get_markup_template('communityhome.tpl');
 	return $a->page['aside_bottom'] = replace_macros($tpl, $aside);
 }
 
@@ -195,7 +195,7 @@ if(! function_exists('_js_in_foot')) {
 		$a = get_app();
 		$baseurl = $a->get_baseurl($ssl_state);
 		$bottom['$baseurl'] = $baseurl;
-		$tpl = file_get_contents(dirname(__file__) . '/bottom.tpl');
+		$tpl = get_markup_template('bottom.tpl');
 
 		return $a->page['bottom'] = replace_macros($tpl, $bottom);
 	}
