@@ -5,6 +5,8 @@ require_once('include/security.php');
 require_once('include/datetime.php');
 
 function nuke_session() {
+	new_cookie(0); // make sure cookie is deleted on browser close, as a security measure
+
 	unset($_SESSION['authenticated']);
 	unset($_SESSION['uid']);
 	unset($_SESSION['visitor_id']);
@@ -187,18 +189,10 @@ else {
 		// (i.e. expire when the browser is closed), even when there's a time expiration
 		// on the cookie
 		if($_POST['remember']) {
-			$old_sid = session_id();
-			session_set_cookie_params('31449600'); // one year
-			session_regenerate_id(false);
-
-			q("UPDATE session SET sid = '%s' WHERE sid = '%s'", dbesc(session_id()), dbesc($old_sid));
+			new_cookie(31449600); // one year
 		}
 		else {
-			$old_sid = session_id();
-			session_set_cookie_params('0');
-			session_regenerate_id(false);
-
-			q("UPDATE session SET sid = '%s' WHERE sid = '%s'", dbesc(session_id()), dbesc($old_sid));
+			new_cookie(0); // 0 means delete on browser exit
 		}
 
 		// if we haven't failed up this point, log them in.
@@ -208,4 +202,10 @@ else {
 	}
 }
 
+function new_cookie($time) {
+	$old_sid = session_id();
+	session_set_cookie_params("$time");
+	session_regenerate_id(false);
 
+	q("UPDATE session SET sid = '%s' WHERE sid = '%s'", dbesc(session_id()), dbesc($old_sid));
+}
