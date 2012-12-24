@@ -47,6 +47,8 @@
 	{{include file="file:{{$field_select}}" field=$theme}}
 	{{include file="file:{{$field_select}}" field=$theme_mobile}}
 	{{include file="file:{{$field_select}}" field=$ssl_policy}}
+	{{include file="file:{{$field_checkbox}}" field=$new_share}}
+
 	
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit}}" /></div>
 	
@@ -90,6 +92,15 @@
 	{{include file="file:{{$field_input}}" field=$poll_interval}}
 	{{include file="file:{{$field_input}}" field=$maxloadavg}}
 	{{include file="file:{{$field_input}}" field=$abandon_days}}
+	{{include file="file:{{$field_input}}" field=$lockpath}}
+	{{include file="file:{{$field_input}}" field=$temppath}}
+	{{include file="file:{{$field_input}}" field=$basepath}}
+
+	<h3>{{$performance}}</h3>
+	{{include file="file:{{$field_checkbox}}" field=$use_fulltext_engine}}
+	{{include file="file:{{$field_input}}" field=$itemcache}}
+	{{include file="file:{{$field_input}}" field=$itemcache_duration}}
+
 	
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit}}" /></div>
 	

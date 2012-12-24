@@ -41,13 +41,13 @@
 	<form action="$baseurl/admin/site" method="post">
     <input type='hidden' name='form_security_token' value='$form_security_token'>
 
-	{{ inc field_input.tpl with $field=$sitename }}{{ endinc }}
-	{{ inc field_textarea.tpl with $field=$banner }}{{ endinc }}
-	{{ inc field_select.tpl with $field=$language }}{{ endinc }}
-	{{ inc field_select.tpl with $field=$theme }}{{ endinc }}
-	{{ inc field_select.tpl with $field=$theme_mobile }}{{ endinc }}
-	{{ inc field_select.tpl with $field=$ssl_policy }}{{ endinc }}
-	{{ inc field_checkbox.tpl with $field=$new_share }}{{ endinc }}
+	{{ inc $field_input with $field=$sitename }}{{ endinc }}
+	{{ inc $field_textarea with $field=$banner }}{{ endinc }}
+	{{ inc $field_select with $field=$language }}{{ endinc }}
+	{{ inc $field_select with $field=$theme }}{{ endinc }}
+	{{ inc $field_select with $field=$theme_mobile }}{{ endinc }}
+	{{ inc $field_select with $field=$ssl_policy }}{{ endinc }}
+	{{ inc $field_checkbox with $field=$new_share }}{{ endinc }}
 
 	
 	<div class="submit"><input type="submit" name="page_site" value="$submit" /></div>
@@ -83,23 +83,23 @@
 	<div class="submit"><input type="submit" name="page_site" value="$submit" /></div>
 	
 	<h3>$advanced</h3>
-	{{ inc field_checkbox.tpl with $field=$no_utf }}{{ endinc }}
-	{{ inc field_checkbox.tpl with $field=$verifyssl }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$proxy }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$proxyuser }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$timeout }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$delivery_interval }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$poll_interval }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$maxloadavg }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$abandon_days }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$lockpath }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$temppath }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$basepath }}{{ endinc }}
+	{{ inc $field_checkbox with $field=$no_utf }}{{ endinc }}
+	{{ inc $field_checkbox with $field=$verifyssl }}{{ endinc }}
+	{{ inc $field_input with $field=$proxy }}{{ endinc }}
+	{{ inc $field_input with $field=$proxyuser }}{{ endinc }}
+	{{ inc $field_input with $field=$timeout }}{{ endinc }}
+	{{ inc $field_input with $field=$delivery_interval }}{{ endinc }}
+	{{ inc $field_input with $field=$poll_interval }}{{ endinc }}
+	{{ inc $field_input with $field=$maxloadavg }}{{ endinc }}
+	{{ inc $field_input with $field=$abandon_days }}{{ endinc }}
+	{{ inc $field_input with $field=$lockpath }}{{ endinc }}
+	{{ inc $field_input with $field=$temppath }}{{ endinc }}
+	{{ inc $field_input with $field=$basepath }}{{ endinc }}
 
 	<h3>$performance</h3>
-	{{ inc field_checkbox.tpl with $field=$use_fulltext_engine }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$itemcache }}{{ endinc }}
-	{{ inc field_input.tpl with $field=$itemcache_duration }}{{ endinc }}
+	{{ inc $field_checkbox with $field=$use_fulltext_engine }}{{ endinc }}
+	{{ inc $field_input with $field=$itemcache }}{{ endinc }}
+	{{ inc $field_input with $field=$itemcache_duration }}{{ endinc }}
 
 	
 	<div class="submit"><input type="submit" name="page_site" value="$submit" /></div>

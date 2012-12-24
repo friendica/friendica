@@ -1,8 +1,8 @@
  <script src="$baseurl/view/theme/quattro/jquery.tools.min.js"></script>
  
-{{inc field_select.tpl with $field=$color}}{{endinc}}
+{{inc $field_select with $field=$color}}{{endinc}}
 
-{{inc field_select.tpl with $field=$align}}{{endinc}}
+{{inc $field_select with $field=$align}}{{endinc}}
 
 
 <div class="field">

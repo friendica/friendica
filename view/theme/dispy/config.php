@@ -65,7 +65,6 @@ function dispy_form(&$a, $font_size, $line_height, $colour) {
 		'dark' => 'dark',						
 	);
 
-	//$t = file_get_contents( dirname(__file__). "/theme_settings.tpl" );
 	$t = get_markup_template("theme_settings.tpl" );
 
 	$includes = array(
