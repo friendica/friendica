@@ -1,7 +1,7 @@
-{{include file="file:{{$field_select}}" field=$color}}
-{{include file="file:{{$field_select}}" field=$font_size}}
-{{include file="file:{{$field_select}}" field=$resize}}
-{{include file="file:{{$field_select}}" field=$theme_width}}
+{{include file="field_select.tpl" field=$color}}
+{{include file="field_select.tpl" field=$font_size}}
+{{include file="field_select.tpl" field=$resize}}
+{{include file="field_select.tpl" field=$theme_width}}
 
 
 <div class="settings-submit-wrapper">

@@ -2,6 +2,6 @@
 
 <users type="array">
 	{{foreach $users as $u}}
-	{{include file="file:{{$api_user_xml}}" user=$u}}
+	{{include file="api_user_xml.tpl" user=$u}}
 	{{/foreach}}
 </users>

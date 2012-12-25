@@ -16,7 +16,7 @@
 
 <div id="contacts-display-wrapper">
 {{foreach $contacts as $c}}
-	{{include file="file:{{$contact_template}}" contact=$c}}
+	{{include file="contact_template.tpl" contact=$c}}
 {{/foreach}}
 </div>
 <div id="contact-edit-end"></div>

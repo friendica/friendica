@@ -4,13 +4,13 @@
 	<input type="hidden" name="auth-params" value="login" />
 
 	<div id="login_standard">
-	{{include file="file:{{$field_input}}" field=$lname}}
-	{{include file="file:{{$field_password}}" field=$lpassword}}
+	{{include file="field_input.tpl" field=$lname}}
+	{{include file="field_password.tpl" field=$lpassword}}
 	</div>
 	
 	{{if $openid}}
 			<div id="login_openid">
-			{{include file="file:{{$field_openid}}" field=$lopenid}}
+			{{include file="field_openid.tpl" field=$lopenid}}
 			</div>
 	{{/if}}
 
@@ -21,7 +21,7 @@
 	</div>-->
 
 	<br />
-	{{include file="file:{{$field_checkbox}}" field=$lremember}}
+	{{include file="field_checkbox.tpl" field=$lremember}}
 
 	<div id="login-submit-wrapper" >
 		<input type="submit" name="submit" id="login-submit-button" value="{{$login}}" />

@@ -84,10 +84,10 @@
 		<h3>Your friendica installation is not writable by web server.</h3>
 		{{if $canftp}}
 			<p>You can try to update via FTP</p>
-			{{include file="file:{{$field_input}}" field=$ftphost}}
-			{{include file="file:{{$field_input}}" field=$ftppath}}
-			{{include file="file:{{$field_input}}" field=$ftpuser}}
-			{{include file="file:{{$field_password}}" field=$ftppwd}}
+			{{include file="field_input.tpl" field=$ftphost}}
+			{{include file="field_input.tpl" field=$ftppath}}
+			{{include file="field_input.tpl" field=$ftpuser}}
+			{{include file="field_password.tpl" field=$ftppwd}}
 			<div class="submit"><input type="submit" name="remoteupdate" value="{{$submit}}" /></div>
 		{{/if}}
 	{{/if}}

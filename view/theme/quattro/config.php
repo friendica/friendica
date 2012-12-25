@@ -60,13 +60,7 @@ function quattro_form(&$a, $align, $color, $tfs, $pfs){
     if ($pfs===false) $pfs="12";
     
 	$t = get_markup_template("theme_settings.tpl" );
-
-	$includes = array(
-		'$field_select' => 'field_select.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	$o .= replace_macros($t, $includes + array(
+	$o .= replace_macros($t, array(
 		'$submit' => t('Submit'),
 		'$baseurl' => $a->get_baseurl(),
 		'$title' => t("Theme settings"),

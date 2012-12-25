@@ -969,16 +969,7 @@ if(! function_exists('login')) {
 			$a->module = 'login';
 		}
 
-
-		$includes = array(
-			'$field_input' => 'field_input.tpl',
-			'$field_password' => 'field_password.tpl',
-			'$field_openid' => 'field_openid.tpl',
-			'$field_checkbox' => 'field_checkbox.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-		$o .= replace_macros($tpl,$includes + array(
+		$o .= replace_macros($tpl, array(
 
 			'$dest_url'     => $dest_url,
 			'$logout'       => t('Logout'),
@@ -997,6 +988,7 @@ if(! function_exists('login')) {
 	
 			'$lostpass'     => t('Forgot your password?'),
 			'$lostlink'     => t('Password Reset'),
+
 		));
 
 		call_hooks('login_hook',$o);
@@ -1348,15 +1340,10 @@ if(! function_exists('profile_sidebar')) {
 		$tpl = get_markup_template('profile_vcard.tpl');
 
 
-		$includes = array(
-			'$diaspora_vcard' => 'diaspora_vcard.tpl'
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
 		if($a->theme['template_engine'] === 'internal')
 			$location = template_escape($location);
 
-		$o .= replace_macros($tpl, $includes + array(
+		$o .= replace_macros($tpl, array(
 			'$profile' => $profile,
 			'$connect'  => $connect,
 			'$wallmessage' => $wallmessage,

@@ -5,7 +5,7 @@
 
 <div class="photos">
 {{foreach $photos as $ph}}
-	{{include file="file:{{$photo_top}}" photo=$ph}}
+	{{include file="photo_top.tpl" photo=$ph}}
 {{/foreach}}
 </div>
 <div class="photos-end"></div>

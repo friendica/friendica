@@ -3,11 +3,11 @@
 <form action="settings/display" id="settings-form" method="post" autocomplete="off" >
 <input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
 
-{{include file="file:{{$field_themeselect}}" field=$theme}}
-{{include file="file:{{$field_themeselect}}" field=$mobile_theme}}
-{{include file="file:{{$field_input}}" field=$ajaxint}}
-{{include file="file:{{$field_input}}" field=$itemspage_network}}
-{{include file="file:{{$field_checkbox}}" field=$nosmile}}
+{{include file="field_themeselect.tpl" field=$theme}}
+{{include file="field_themeselect.tpl" field=$mobile_theme}}
+{{include file="field_input.tpl" field=$ajaxint}}
+{{include file="field_input.tpl" field=$itemspage_network}}
+{{include file="field_checkbox.tpl" field=$nosmile}}
 
 
 <div class="settings-submit-wrapper" >

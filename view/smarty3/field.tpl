@@ -1,4 +1,4 @@
 
  {{if $field.0==select}}
- {{include file="file:{{$field_select}}"}}
+ {{include file="field_select.tpl"}}
  {{/if}}

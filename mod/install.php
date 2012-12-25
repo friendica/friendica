@@ -220,14 +220,7 @@ function install_content(&$a) {
 			
 
 			$tpl = get_markup_template('install_db.tpl');
-
-			$includes = array(
-				'$field_input' 	=> 'field_input.tpl',
-				'$field_password' => 'field_password.tpl',
-			);
-			$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-			$o .= replace_macros($tpl,$includes + array(
+			$o .= replace_macros($tpl, array(
 				'$title' => $install_title,
 				'$pass' => t('Database connection'),
 				'$info_01' => t('In order to install Friendica we need to know how to connect to your database.'),
@@ -267,13 +260,7 @@ function install_content(&$a) {
 			$timezone = ((x($_POST,'timezone')) ? ($_POST['timezone']) : 'America/Los_Angeles');
 			
 			$tpl = get_markup_template('install_settings.tpl');
-
-			$includes = array(
-				'$field_input' => 'field_input.tpl',
-			);
-			$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-			$o .= replace_macros($tpl, $includes + array(
+			$o .= replace_macros($tpl, array(
 				'$title' => $install_title,
 				'$pass' => t('Site settings'),
 

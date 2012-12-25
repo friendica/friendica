@@ -1,7 +1,7 @@
 
 <div id="twittersettings" style="display:none">
 <form id="twittersettingsform" action="network" method="post" >
-{{include file="file:{{$field_input}}" field=$TSearchTerm}}
+{{include file="field_input.tpl" field=$TSearchTerm}}
 <div class="settings-submit-wrapper">
 <input id="twittersub" type="submit" value="{{$sub}}" class="settings-submit" name="diabook-settings-sub"></input>
 </div>
@@ -13,9 +13,9 @@
 <div id="layermanager" style="width: 350px;position: relative;float: right;right:20px;height: 300px;"></div>
 <div id="map2" style="height:350px;width:350px;"></div>
 <div id="mouseposition" style="width: 350px;"></div>
-{{include file="file:{{$field_input}}" field=$ELZoom}}
-{{include file="file:{{$field_input}}" field=$ELPosX}}
-{{include file="file:{{$field_input}}" field=$ELPosY}}
+{{include file="field_input.tpl" field=$ELZoom}}
+{{include file="field_input.tpl" field=$ELPosX}}
+{{include file="field_input.tpl" field=$ELPosY}}
 <div class="settings-submit-wrapper">
 <input id="mapsub" type="submit" value="{{$sub}}" class="settings-submit" name="diabook-settings-map-sub"></input>
 </div>
@@ -35,16 +35,16 @@ just contact me, if you are intesrested in joining</p>
 <div id="boxsettings" style="display:none">
 <form id="boxsettingsform" action="network" method="post" >
 <fieldset><legend>{{$boxsettings.title.1}}</legend>
-{{include file="file:{{$field_select}}" field=$close_pages}}
-{{include file="file:{{$field_select}}" field=$close_profiles}}
-{{include file="file:{{$field_select}}" field=$close_helpers}}
-{{include file="file:{{$field_select}}" field=$close_services}}
-{{include file="file:{{$field_select}}" field=$close_friends}}
-{{include file="file:{{$field_select}}" field=$close_lastusers}}
-{{include file="file:{{$field_select}}" field=$close_lastphotos}}
-{{include file="file:{{$field_select}}" field=$close_lastlikes}}
-{{include file="file:{{$field_select}}" field=$close_twitter}}
-{{include file="file:{{$field_select}}" field=$close_mapquery}}
+{{include file="field_select.tpl" field=$close_pages}}
+{{include file="field_select.tpl" field=$close_profiles}}
+{{include file="field_select.tpl" field=$close_helpers}}
+{{include file="field_select.tpl" field=$close_services}}
+{{include file="field_select.tpl" field=$close_friends}}
+{{include file="field_select.tpl" field=$close_lastusers}}
+{{include file="field_select.tpl" field=$close_lastphotos}}
+{{include file="field_select.tpl" field=$close_lastlikes}}
+{{include file="field_select.tpl" field=$close_twitter}}
+{{include file="field_select.tpl" field=$close_mapquery}}
 <div class="settings-submit-wrapper">
 <input id="boxsub" type="submit" value="{{$sub}}" class="settings-submit" name="diabook-settings-box-sub"></input>
 </div>

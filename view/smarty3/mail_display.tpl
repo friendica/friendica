@@ -1,10 +1,10 @@
 
 {{foreach $mails as $mail_item}}
-	{{include file="file:{{$mail_conv}}" mail=$mail_item}}
+	{{include file="mail_conv.tpl" mail=$mail_item}}
 {{/foreach}}
 
 {{if $canreply}}
-{{include file="file:{{$prv_message}}" reply=$reply_info}}
+{{include file="prv_message.tpl" reply=$reply_info}}
 {{else}}
 {{$unknown_text}}
 {{/if}}

@@ -145,12 +145,7 @@ function notifications_content(&$a) {
 
 					$return_addr = bin2hex($a->user['nickname'] . '@' . $a->get_hostname() . (($a->path) ? '/' . $a->path : ''));
 
-					$includes = array(
-						'$field_checkbox' => 'field_checkbox.tpl',
-					);
-					$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-					$notif_content .= replace_macros($sugg,$includes + array(
+					$notif_content .= replace_macros($sugg, array(
 						'$str_notifytype' => t('Notification type: '),
 						'$notify_type' => t('Friend Suggestion'),
 						'$intro_id' => $rr['intro_id'],
@@ -196,12 +191,7 @@ function notifications_content(&$a) {
 					));
 				}			
 
-				$includes = array(
-					'$field_checkbox' => 'field_checkbox.tpl',
-				);
-				$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-				$notif_content .= replace_macros($tpl,$includes + array(
+				$notif_content .= replace_macros($tpl, array(
 					'$str_notifytype' => t('Notification type: '),
 					'$notify_type' => (($rr['network'] !== NETWORK_OSTATUS) ? t('Friend/Connect Request') : t('New Follower')),
 					'$dfrn_text' => $dfrn_text,	
@@ -226,12 +216,7 @@ function notifications_content(&$a) {
 		else
 			info( t('No introductions.') . EOL);
 
-		$includes = array(
-			'$common_tabs' => 'common_tabs.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-		$o .= replace_macros($notif_tpl,$includes + array(
+		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Notifications'),
 			'$tabs_data' => $tabs,
 			'$notif_content' => $notif_content,
@@ -317,12 +302,7 @@ function notifications_content(&$a) {
 			$notif_content = t('No more network notifications.');
 		}
 		
-		$includes = array(
-			'$common_tabs' => 'common_tabs.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-		$o .= replace_macros($notif_tpl,$includes + array(
+		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Network Notifications'),
 			'$tabs_data' => $tabs,
 			'$notif_content' => $notif_content,
@@ -352,12 +332,7 @@ function notifications_content(&$a) {
 			$notif_content .= t('No more system notifications.');
 		}
 		
-		$includes = array(
-			'$common_tabs' => 'common_tabs.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-		$o .= replace_macros($notif_tpl,$includes + array(
+		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('System Notifications'),
 			'$tabs_data' => $tabs,
 			'$notif_content' => $notif_content,
@@ -452,12 +427,7 @@ function notifications_content(&$a) {
 			$notif_content = t('No more personal notifications.');
 		}
 		
-		$includes = array(
-			'$common_tabs' => 'common_tabs.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-		$o .= replace_macros($notif_tpl,$includes + array(
+		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Personal Notifications'),
 			'$tabs_data' => $tabs,
 			'$notif_content' => $notif_content,
@@ -538,12 +508,7 @@ function notifications_content(&$a) {
 			$notif_content = t('No more home notifications.');
 		}
 		
-		$includes = array(
-			'$common_tabs' => 'common_tabs.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-		$o .= replace_macros($notif_tpl,$includes + array(
+		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Home Notifications'),
 			'$tabs_data' => $tabs,
 			'$notif_content' => $notif_content,

@@ -10,7 +10,7 @@
 
 {{if $response.totalResults}}
 {{foreach $response.entry as $ent}}
-{{include file="file:{{$poco_entry_xml}}" entry=$ent}}
+{{include file="poco_entry_xml.tpl" entry=$ent}}
 {{/foreach}}
 {{else}}
 <entry></entry>

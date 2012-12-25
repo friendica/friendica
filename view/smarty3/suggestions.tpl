@@ -14,7 +14,7 @@
 <div class="intro-form-end"></div>
 
 <form class="intro-approve-form" action="{{$request}}" method="get">
-{{include file="file:{{$field_checkbox}}" field=$hidden}}
+{{include file="field_checkbox.tpl" field=$hidden}}
 <input class="intro-submit-approve" type="submit" name="submit" value="{{$approve}}" />
 </form>
 </div>

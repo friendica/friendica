@@ -67,7 +67,7 @@
     target="external-link">{{$profile.homepage}}</a></span>
     </div>{{/if}}
 
-	{{include file="file:{{$diaspora_vcard}}" diaspora=$diaspora_info}}
+	{{include file="diaspora_vcard.tpl" diaspora=$diaspora_info}}
 	
 	<div id="profile-extra-links">
 		<ul>

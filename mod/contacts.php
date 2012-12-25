@@ -346,12 +346,7 @@ function contacts_content(&$a) {
 
 		$lost_contact = (($contact['archive'] && $contact['term-date'] != '0000-00-00 00:00:00' && $contact['term-date'] < datetime_convert('','','now')) ? t('Communications lost with this contact!') : '');
 
-		$includes = array(
-			'$field_checkbox' => 'field_checkbox.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-		$o .= replace_macros($tpl,$includes + array(
+		$o .= replace_macros($tpl, array(
 			'$header' => t('Contact Editor'),
 			'$tab_str' => $tab_str,
 			'$submit' => t('Submit'),
@@ -576,13 +571,7 @@ function contacts_content(&$a) {
 	}
 	
 	$tpl = get_markup_template("contacts-template.tpl");
-
-	$includes = array(
-		'$contact_template' => 'contact_template.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	$o .= replace_macros($tpl,$includes + array(
+	$o .= replace_macros($tpl, array(
 		'$header' => t('Contacts') . (($nets) ? ' - ' . network_to_name($nets) : ''),
 		'$tabs' => $t,
 		'$total' => $total,

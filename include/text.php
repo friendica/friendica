@@ -499,21 +499,6 @@ function get_template_file($a, $filename, $root = '') {
 	return $template_file;
 }}
 
-if(! function_exists("set_template_includes")) {
-function set_template_includes($engine, $includes) {
-	if($engine === 'smarty3') {
-		$a = get_app();
-		foreach($includes as $name=>$path) {
-//			$sm_includes[$name] = $_SERVER['DOCUMENT_ROOT'] . '/' . get_template_file($a, 'smarty3/' . $path);
-			$sm_includes[$name] = get_template_file($a, 'smarty3/' . $path);
-		}
-		return $sm_includes;
-	}
-	else {
-		return $includes;
-	}
-}}
-
 
 
 

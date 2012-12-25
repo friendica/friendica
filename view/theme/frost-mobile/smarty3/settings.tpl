@@ -7,11 +7,11 @@
 
 <h3 class="settings-heading">{{$h_pass}}</h3>
 
-{{include file="file:{{$field_password}}" field=$password1}}
-{{include file="file:{{$field_password}}" field=$password2}}
+{{include file="field_password.tpl" field=$password1}}
+{{include file="field_password.tpl" field=$password2}}
 
 {{if $oid_enable}}
-{{include file="file:{{$field_input}}" field=$openid}}
+{{include file="field_input.tpl" field=$openid}}
 {{/if}}
 
 <div class="settings-submit-wrapper" >
@@ -21,11 +21,11 @@
 
 <h3 class="settings-heading">{{$h_basic}}</h3>
 
-{{include file="file:{{$field_input}}" field=$username}}
-{{include file="file:{{$field_input}}" field=$email}}
-{{include file="file:{{$field_custom}}" field=$timezone}}
-{{include file="file:{{$field_input}}" field=$defloc}}
-{{include file="file:{{$field_checkbox}}" field=$allowloc}}
+{{include file="field_input.tpl" field=$username}}
+{{include file="field_input.tpl" field=$email}}
+{{include file="field_custom.tpl" field=$timezone}}
+{{include file="field_input.tpl" field=$defloc}}
+{{include file="field_checkbox.tpl" field=$allowloc}}
 
 
 <div class="settings-submit-wrapper" >
@@ -38,7 +38,7 @@
 
 <input type="hidden" name="visibility" value="{{$visibility}}" />
 
-{{include file="file:{{$field_input}}" field=$maxreq}}
+{{include file="field_input.tpl" field=$maxreq}}
 
 {{$profile_in_dir}}
 
@@ -57,9 +57,9 @@
 {{$unkmail}}
 
 
-{{include file="file:{{$field_input}}" field=$cntunkmail}}
+{{include file="field_input.tpl" field=$cntunkmail}}
 
-{{include file="file:{{$field_input}}" field=$expire.days}}
+{{include file="field_input.tpl" field=$expire.days}}
 
 
 <div class="field input">
@@ -67,10 +67,10 @@
 	<div style="display: none;">
 		<div id="advanced-expire-popup" style="width:auto;height:auto;overflow:auto;">
 			<h3>{{$expire.advanced}}</h3>
-			{{include file="file:{{$field_yesno}}" field=$expire.items}}
-			{{include file="file:{{$field_yesno}}" field=$expire.notes}}
-			{{include file="file:{{$field_yesno}}" field=$expire.starred}}
-			{{include file="file:{{$field_yesno}}" field=$expire.network_only}}
+			{{include file="field_yesno.tpl" field=$expire.items}}
+			{{include file="field_yesno.tpl" field=$expire.notes}}
+			{{include file="field_yesno.tpl" field=$expire.starred}}
+			{{include file="field_yesno.tpl" field=$expire.network_only}}
 		</div>
 	</div>
 
@@ -108,21 +108,21 @@
 
 <div id="settings-activity-desc">{{$activity_options}}</div>
 
-{{include file="file:{{$field_checkbox}}" field=$post_newfriend}}
-{{include file="file:{{$field_checkbox}}" field=$post_joingroup}}
-{{include file="file:{{$field_checkbox}}" field=$post_profilechange}}
+{{include file="field_checkbox.tpl" field=$post_newfriend}}
+{{include file="field_checkbox.tpl" field=$post_joingroup}}
+{{include file="field_checkbox.tpl" field=$post_profilechange}}
 
 
 <div id="settings-notify-desc">{{$lbl_not}}</div>
 
 <div class="group">
-{{include file="file:{{$field_intcheckbox}}" field=$notify1}}
-{{include file="file:{{$field_intcheckbox}}" field=$notify2}}
-{{include file="file:{{$field_intcheckbox}}" field=$notify3}}
-{{include file="file:{{$field_intcheckbox}}" field=$notify4}}
-{{include file="file:{{$field_intcheckbox}}" field=$notify5}}
-{{include file="file:{{$field_intcheckbox}}" field=$notify6}}
-{{include file="file:{{$field_intcheckbox}}" field=$notify7}}
+{{include file="field_intcheckbox.tpl" field=$notify1}}
+{{include file="field_intcheckbox.tpl" field=$notify2}}
+{{include file="field_intcheckbox.tpl" field=$notify3}}
+{{include file="field_intcheckbox.tpl" field=$notify4}}
+{{include file="field_intcheckbox.tpl" field=$notify5}}
+{{include file="field_intcheckbox.tpl" field=$notify6}}
+{{include file="field_intcheckbox.tpl" field=$notify7}}
 </div>
 
 </div>

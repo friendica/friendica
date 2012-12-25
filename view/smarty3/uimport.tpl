@@ -3,7 +3,7 @@
     <p>{{$import.intro}}</p>
     <p>{{$import.instruct}}</p>
     <p><b>{{$import.warn}}</b></p>
-     {{include file="file:{{$field_custom}}" field=$import.field}}
+     {{include file="field_custom.tpl" field=$import.field}}
      
      
 	<div id="register-submit-wrapper">

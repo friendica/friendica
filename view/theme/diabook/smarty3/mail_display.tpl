@@ -5,8 +5,8 @@
 
 {{foreach $mails as $mail_item}}
 	<div id="tread-wrapper-{{$mail_item.id}}" class="tread-wrapper">
-		{{include file="file:{{$mail_conv}}" mail=$mail_item}}
+		{{include file="mail_conv.tpl" mail=$mail_item}}
 	</div>
 {{/foreach}}
 
-{{include file="file:{{$prv_message}}" reply=$reply_info}}
+{{include file="prv_message.tpl" reply=$reply_info}}

@@ -455,16 +455,7 @@ function admin_page_site(&$a) {
 	);
 
 	$t = get_markup_template("admin_site.tpl");
-
-	$includes = array(
-		'$field_checkbox'	=> 'field_checkbox.tpl',
-		'$field_input'		=> 'field_input.tpl',
-		'$field_select'		=> 'field_select.tpl',
-		'$field_textarea'	=> 'field_textarea.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	return replace_macros($t, $includes + array(
+	return replace_macros($t, array(
 		'$title' => t('Administration'),
 		'$page' => t('Site'),
 		'$submit' => t('Submit'),
@@ -1144,14 +1135,7 @@ readable.");
 		}
 	}			
 
-	$includes = array(
-		'$field_checkbox'	=> 'field_checkbox.tpl',
-		'$field_input'		=> 'field_input.tpl',
-		'$field_select'		=> 'field_select.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	return replace_macros($t, $includes + array(
+	return replace_macros($t, array(
 		'$title' => t('Administration'),
 		'$page' => t('Logs'),
 		'$submit' => t('Submit'),
@@ -1210,14 +1194,7 @@ function admin_page_remoteupdate(&$a) {
 	}
 	
 	$tpl = get_markup_template("admin_remoteupdate.tpl");
-
-	$includes = array(
-		'$field_input'		=> 'field_input.tpl',
-		'$field_password'	=> 'field_password.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	return replace_macros($tpl, $includes + array(
+	return replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
 		'$submit' => t("Update now"),
 		'$close' => t("Close"),
