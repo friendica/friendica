@@ -1679,13 +1679,7 @@ function photos_content(&$a) {
 	}
 	
 	$tpl = get_markup_template('photos_recent.tpl'); 
-
-	$includes = array(
-		'$photo_top' => 'photo_top.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	$o .= replace_macros($tpl,$includes + array(
+	$o .= replace_macros($tpl, array(
 		'$title' => t('Recent Photos'),
 		'$can_post' => $can_post,
 		'$upload' => array(t('Upload New Photos'), $a->get_baseurl().'/photos/'.$a->data['user']['nickname'].'/upload'),

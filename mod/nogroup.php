@@ -55,13 +55,7 @@ function nogroup_content(&$a) {
 	}
 
 	$tpl = get_markup_template("nogroup-template.tpl");
-
-	$includes = array(
-		'$contact_template' => 'contact_template.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	$o .= replace_macros($tpl,$includes + array(
+	$o .= replace_macros($tpl, array(
 		'$header' => t('Contacts who are not members of a group'),
 		'$contacts' => $contacts,
 		'$paginate' => paginate($a),

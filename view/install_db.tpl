@@ -18,10 +18,10 @@ $info_03
 <input type="hidden" name="phpath" value="$phpath" />
 <input type="hidden" name="pass" value="3" />
 
-{{ inc $field_input with $field=$dbhost }}{{endinc}}
-{{ inc $field_input with $field=$dbuser }}{{endinc}}
-{{ inc $field_password with $field=$dbpass }}{{endinc}}
-{{ inc $field_input with $field=$dbdata }}{{endinc}}
+{{ inc field_input.tpl with $field=$dbhost }}{{endinc}}
+{{ inc field_input.tpl with $field=$dbuser }}{{endinc}}
+{{ inc field_password.tpl with $field=$dbpass }}{{endinc}}
+{{ inc field_input.tpl with $field=$dbdata }}{{endinc}}
 
 
 <input id="install-submit" type="submit" name="submit" value="$submit" /> 

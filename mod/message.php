@@ -497,12 +497,6 @@ function message_content(&$a) {
 
 		$tpl = get_markup_template('mail_display.tpl');
 
-		$includes = array(
-			'$mail_conv' => 'mail_conv.tpl',
-			'$prv_message' => 'prv_message.tpl',
-		);
-		$includes = set_template_includes($a->theme['template_engine'], $includes);
-
 		if($a->theme['template_engine'] === 'internal') {
 			$subjtxt_e = template_escape($message['title']);
 		}
@@ -510,7 +504,7 @@ function message_content(&$a) {
 			$subjtxt_e = $message['title'];
 		}
 
-		$o = replace_macros($tpl, $includes + array(
+		$o = replace_macros($tpl, array(
 			'$thread_id' => $a->argv[1],
 			'$thread_subject' => $message['title'],
 			'$thread_seen' => $seen,

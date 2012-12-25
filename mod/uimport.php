@@ -60,13 +60,7 @@ function uimport_content(&$a) {
 	
 	
     $tpl = get_markup_template("uimport.tpl");
-
-	$includes = array(
-		'$field_custom' => 'field_custom.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-    return replace_macros($tpl, $includes + array(
+    return replace_macros($tpl, array(
         '$regbutt' => t('Import'),
         '$import' => array(
             'title' => t("Move account"),

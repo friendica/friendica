@@ -83,13 +83,7 @@ function group_content(&$a) {
 
 	$tpl = get_markup_template('group_edit.tpl');
 
-	$includes = array(
-			'$field_input' => 'field_input.tpl',
-			'$groupeditortpl' => 'groupeditor.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	$context = $includes + array(
+	$context = array(
 			'$submit' => t('Submit'),
 	);
 

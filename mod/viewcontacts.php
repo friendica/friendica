@@ -72,13 +72,7 @@ function viewcontacts_content(&$a) {
 
 
 	$tpl = get_markup_template("viewcontact_template.tpl");
-
-	$includes = array(
-		'$contact_template' => 'contact_template.tpl',
-	);
-	$includes = set_template_includes($a->theme['template_engine'], $includes);
-
-	$o .= replace_macros($tpl, $includes + array(
+	$o .= replace_macros($tpl, array(
 		'$title' => t('View Contacts'),
 		'$contacts' => $contacts,
 		'$paginate' => paginate($a),

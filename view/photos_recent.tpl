@@ -5,7 +5,7 @@
 
 <div class="photos">
 {{ for $photos as $ph }}
-	{{ inc $photo_top with $photo=$ph }}{{ endinc }}
+	{{ inc photo_top.tpl with $photo=$ph }}{{ endinc }}
 {{ endfor }}
 </div>
 <div class="photos-end"></div>

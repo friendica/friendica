@@ -14,16 +14,16 @@ $settings_connectors
 	<div class="settings-block">
 	<h3 class="settings-heading">$h_imap</h3>
 	<p>$imap_desc</p>
-	{{inc $field_custom with $field=$imap_lastcheck }}{{endinc}}
-	{{inc $field_input with $field=$mail_server }}{{endinc}}
-	{{inc $field_input with $field=$mail_port }}{{endinc}}
-	{{inc $field_select with $field=$mail_ssl }}{{endinc}}
-	{{inc $field_input with $field=$mail_user }}{{endinc}}
-	{{inc $field_password with $field=$mail_pass }}{{endinc}}
-	{{inc $field_input with $field=$mail_replyto }}{{endinc}}
-	{{inc $field_checkbox with $field=$mail_pubmail }}{{endinc}}
-	{{inc $field_select with $field=$mail_action }}{{endinc}}
-	{{inc $field_input with $field=$mail_movetofolder }}{{endinc}}
+	{{inc field_custom.tpl with $field=$imap_lastcheck }}{{endinc}}
+	{{inc field_input.tpl with $field=$mail_server }}{{endinc}}
+	{{inc field_input.tpl with $field=$mail_port }}{{endinc}}
+	{{inc field_select.tpl with $field=$mail_ssl }}{{endinc}}
+	{{inc field_input.tpl with $field=$mail_user }}{{endinc}}
+	{{inc field_password.tpl with $field=$mail_pass }}{{endinc}}
+	{{inc field_input.tpl with $field=$mail_replyto }}{{endinc}}
+	{{inc field_checkbox.tpl with $field=$mail_pubmail }}{{endinc}}
+	{{inc field_select.tpl with $field=$mail_action }}{{endinc}}
+	{{inc field_input.tpl with $field=$mail_movetofolder }}{{endinc}}
 
 	<div class="settings-submit-wrapper" >
 		<input type="submit" id="imap-submit" name="imap-submit" class="settings-submit" value="$submit" />

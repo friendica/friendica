@@ -5,8 +5,8 @@
 
 {{ for $mails as $mail_item }}
 	<div id="tread-wrapper-$mail_item.id" class="tread-wrapper">
-		{{ inc $mail_conv with $mail=$mail_item }}{{endinc}}
+		{{ inc mail_conv.tpl with $mail=$mail_item }}{{endinc}}
 	</div>
 {{ endfor }}
 
-{{ inc $prv_message with $reply=$reply_info }}{{ endinc }}
+{{ inc prv_message.tpl with $reply=$reply_info }}{{ endinc }}

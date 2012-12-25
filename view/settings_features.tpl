@@ -8,7 +8,7 @@
 <h3 class="settings-heading">$f.0</h3>
 
 {{ for $f.1 as $fcat }}
-	{{ inc $field_yesno with $field=$fcat }}{{endinc}}
+	{{ inc field_yesno.tpl with $field=$fcat }}{{endinc}}
 {{ endfor }}
 {{ endfor }}
 
