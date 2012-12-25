@@ -1,8 +1,8 @@
  <script src="{{$baseurl}}/view/theme/quattro/jquery.tools.min.js"></script>
  
-{{include file="file:{{$field_select}}" field=$color}}
+{{include file="field_select.tpl" field=$color}}
 
-{{include file="file:{{$field_select}}" field=$align}}
+{{include file="field_select.tpl" field=$align}}
 
 
 <div class="field">

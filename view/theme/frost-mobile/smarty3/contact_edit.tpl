@@ -70,7 +70,7 @@
 	{{/if}}
 	<div id="contact-edit-end" ></div>
 
-	{{include file="file:{{$field_checkbox}}" field=$hidden}}
+	{{include file="field_checkbox.tpl" field=$hidden}}
 
 <div id="contact-edit-info-wrapper">
 <h4>{{$lbl_info1}}</h4>

@@ -45,7 +45,8 @@
 	</div>
 	<div class="wall-item-bottom">
 		<div class="">
-			{{if $item.plink}}<a title="{{$item.plink.title}}" href="{{$item.plink.href}}"><i class="icon-link icon-large"></i></a>{{/if}}
+			<!-- {{if $item.plink}}<a title="{{$item.plink.title}}" href="{{$item.plink.href}}"><i class="icon-link icon-large"></i></a>{{/if}} -->
+			{{if $item.conv}}<a href='{{$item.conv.href}}' id='context-{{$item.id}}' title='{{$item.conv.title}}'><i class="icon-link icon-large"></i></a>{{/if}}
 		</div>
 		<div class="wall-item-actions">
 

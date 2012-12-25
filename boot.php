@@ -989,6 +989,12 @@ if(! function_exists('login')) {
 			'$lostpass'     => t('Forgot your password?'),
 			'$lostlink'     => t('Password Reset'),
 
+			'$tostitle'	=> t('Website Terms of Service'),
+			'$toslink'	=> t('terms of service'),
+
+			'$privacytitle'	=> t('Website Privacy Policy'),
+			'$privacylink'	=> t('privacy policy'),
+
 		));
 
 		call_hooks('login_hook',$o);

@@ -70,7 +70,7 @@
 	{{ endif }}
 	<div id="contact-edit-end" ></div>
 
-	{{inc $field_checkbox with $field=$hidden }}{{endinc}}
+	{{inc field_checkbox.tpl with $field=$hidden }}{{endinc}}
 
 <div id="contact-edit-info-wrapper">
 <h4>$lbl_info1</h4>
