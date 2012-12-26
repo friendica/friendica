@@ -218,7 +218,7 @@ function notifications_content(&$a) {
 
 		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Notifications'),
-			'$tabs_data' => $tabs,
+			'$tabs' => $tabs,
 			'$notif_content' => $notif_content,
 		));
 		
@@ -304,7 +304,7 @@ function notifications_content(&$a) {
 		
 		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Network Notifications'),
-			'$tabs_data' => $tabs,
+			'$tabs' => $tabs,
 			'$notif_content' => $notif_content,
 		));
 		
@@ -334,7 +334,7 @@ function notifications_content(&$a) {
 		
 		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('System Notifications'),
-			'$tabs_data' => $tabs,
+			'$tabs' => $tabs,
 			'$notif_content' => $notif_content,
 		));
 
@@ -429,7 +429,7 @@ function notifications_content(&$a) {
 		
 		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Personal Notifications'),
-			'$tabs_data' => $tabs,
+			'$tabs' => $tabs,
 			'$notif_content' => $notif_content,
 		));
 		
@@ -510,7 +510,7 @@ function notifications_content(&$a) {
 		
 		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('Home Notifications'),
-			'$tabs_data' => $tabs,
+			'$tabs' => $tabs,
 			'$notif_content' => $notif_content,
 		));
 	}

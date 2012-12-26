@@ -1358,7 +1358,7 @@ if(! function_exists('profile_sidebar')) {
 			'$pdesc'	=> $pdesc,
 			'$marital'  => $marital,
 			'$homepage' => $homepage,
-			'$diaspora_info' => $diaspora,
+			'$diaspora' => $diaspora,
 			'$contact_block' => $contact_block,
 		));
 

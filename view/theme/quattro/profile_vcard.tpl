@@ -49,7 +49,7 @@
         class="homepage-label">$homepage</dt><dd class="homepage-url"><a
         href="$profile.homepage" target="external-link">$profile.homepage</a></dd></dl>{{ endif }}
 
-	{{ inc diaspora_vcard.tpl with $diaspora=$diaspora_info }}{{ endinc }}
+	{{ inc diaspora_vcard.tpl }}{{ endinc }}
 	
 	<div id="profile-extra-links">
 		<ul>

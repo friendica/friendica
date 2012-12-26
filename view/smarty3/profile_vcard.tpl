@@ -31,7 +31,7 @@
 
 	{{if $homepage}}<dl class="homepage"><dt class="homepage-label">{{$homepage}}</dt><dd class="homepage-url"><a href="{{$profile.homepage}}" target="external-link">{{$profile.homepage}}</a></dd></dl>{{/if}}
 
-	{{include file="diaspora_vcard.tpl" diaspora=$diaspora_info}}
+	{{include file="diaspora_vcard.tpl"}}
 	
 	<div id="profile-extra-links">
 		<ul>

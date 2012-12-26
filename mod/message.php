@@ -282,25 +282,23 @@ function message_content(&$a) {
 
 		$tpl = get_markup_template('prv_message.tpl');
 		$o .= replace_macros($tpl,array(
-			'$reply' => array(
-				'header' => t('Send Private Message'),
-				'to' => t('To:'),
-				'showinputs' => 'true', 
-				'prefill' => $prefill,
-				'autocomp' => $autocomp,
-				'preid' => $preid,
-				'subject' => t('Subject:'),
-				'subjtxt' => ((x($_REQUEST,'subject')) ? strip_tags($_REQUEST['subject']) : ''),
-				'text' => ((x($_REQUEST,'body')) ? escape_tags(htmlspecialchars($_REQUEST['body'])) : ''),
-				'readonly' => '',
-				'yourmessage' => t('Your message:'),
-				'select' => $select,
-				'parent' => '',
-				'upload' => t('Upload photo'),
-				'insert' => t('Insert web link'),
-				'wait' => t('Please wait'),
-				'submit' => t('Submit')
-			)
+			'$header' => t('Send Private Message'),
+			'$to' => t('To:'),
+			'$showinputs' => 'true', 
+			'$prefill' => $prefill,
+			'$autocomp' => $autocomp,
+			'$preid' => $preid,
+			'$subject' => t('Subject:'),
+			'$subjtxt' => ((x($_REQUEST,'subject')) ? strip_tags($_REQUEST['subject']) : ''),
+			'$text' => ((x($_REQUEST,'body')) ? escape_tags(htmlspecialchars($_REQUEST['body'])) : ''),
+			'$readonly' => '',
+			'$yourmessage' => t('Your message:'),
+			'$select' => $select,
+			'$parent' => '',
+			'$upload' => t('Upload photo'),
+			'$insert' => t('Insert web link'),
+			'$wait' => t('Please wait'),
+			'$submit' => t('Submit')
 		));
 
 		return $o;
@@ -514,22 +512,20 @@ function message_content(&$a) {
 			'$mails' => $mails,
 			
 			// reply
-			'$reply_info' => array(
-				'header' => t('Send Reply'),
-				'to' => t('To:'),
-				'showinputs' => '',
-				'subject' => t('Subject:'),
-				'subjtxt' => $subjtxt_e,
-				'readonly' => ' readonly="readonly" style="background: #BBBBBB;" ',
-				'yourmessage' => t('Your message:'),
-				'text' => '',
-				'select' => $select,
-				'parent' => $parent,
-				'upload' => t('Upload photo'),
-				'insert' => t('Insert web link'),
-				'submit' => t('Submit'),
-				'wait' => t('Please wait'),
-			),
+			'$header' => t('Send Reply'),
+			'$to' => t('To:'),
+			'$showinputs' => '',
+			'$subject' => t('Subject:'),
+			'$subjtxt' => template_escape($message['title']),
+			'$readonly' => ' readonly="readonly" style="background: #BBBBBB;" ',
+			'$yourmessage' => t('Your message:'),
+			'$text' => '',
+			'$select' => $select,
+			'$parent' => $parent,
+			'$upload' => t('Upload photo'),
+			'$insert' => t('Insert web link'),
+			'$submit' => t('Submit'),
+			'$wait' => t('Please wait')
 
 		));
 

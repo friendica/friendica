@@ -63,7 +63,7 @@ function notify_content(&$a) {
 		
 		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('System Notifications'),
-			'$tabs_data' => '', // $tabs,
+			'$tabs' => '', // $tabs,
 			'$notif_content' => $notif_content,
 		));
 

@@ -9,4 +9,4 @@
 	</div>
 {{/foreach}}
 
-{{include file="prv_message.tpl" reply=$reply_info}}
+{{include file="prv_message.tpl"}}

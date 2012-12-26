@@ -4,7 +4,7 @@
 {{/foreach}}
 
 {{if $canreply}}
-{{include file="prv_message.tpl" reply=$reply_info}}
+{{include file="prv_message.tpl"}}
 {{else}}
 {{$unknown_text}}
 {{/if}}

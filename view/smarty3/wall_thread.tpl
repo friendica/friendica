@@ -50,12 +50,12 @@
 						{{/foreach}}
 					</div>
 			{{if $item.has_cats}}
-			<div class="categorytags"><span>{{$item.txt_cats}} {{foreach $item.categories as $cat}}{{$cat.name}}{{if $cat.removeurl}} <a href="{{$cat.removeurl}}" title="{{$item.remove}}">[{{$item.remove}}]</a>{{/if}} {{if $cat.last}}{{else}}, {{/if}}{{/foreach}}
+			<div class="categorytags"><span>{{$item.txt_cats}} {{foreach $item.categories as $cat}}{{$cat.name}}{{if $cat.removeurl}} <a href="{{$cat.removeurl}}" title="{{$remove}}">[{{$remove}}]</a>{{/if}} {{if $cat.last}}{{else}}, {{/if}}{{/foreach}}
 			</div>
 			{{/if}}
 
 			{{if $item.has_folders}}
-			<div class="filesavetags"><span>{{$item.txt_folders}} {{foreach $item.folders as $cat}}{{$cat.name}}{{if $cat.removeurl}} <a href="{{$cat.removeurl}}" title="{{$item.remove}}">[{{$item.remove}}]</a>{{/if}}{{if $cat.last}}{{else}}, {{/if}}{{/foreach}}
+			<div class="filesavetags"><span>{{$item.txt_folders}} {{foreach $item.folders as $cat}}{{$cat.name}}{{if $cat.removeurl}} <a href="{{$cat.removeurl}}" title="{{$remove}}">[{{$remove}}]</a>{{/if}}{{if $cat.last}}{{else}}, {{/if}}{{/foreach}}
 			</div>
 			{{/if}}
 			</div>

@@ -9,4 +9,4 @@
 	</div>
 {{ endfor }}
 
-{{ inc prv_message.tpl with $reply=$reply_info }}{{ endinc }}
+{{ inc prv_message.tpl }}{{ endinc }}

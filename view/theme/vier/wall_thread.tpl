@@ -75,10 +75,10 @@
 				<span class='mention'>$tag</span>
 			{{ endfor }}
                {{ for $item.folders as $cat }}
-                    <span class='folder'>$cat.name</a>{{if $cat.removeurl}} (<a href="$cat.removeurl" title="$item.remove">x</a>) {{endif}} </span>
+                    <span class='folder'>$cat.name</a>{{if $cat.removeurl}} (<a href="$cat.removeurl" title="$remove">x</a>) {{endif}} </span>
                {{ endfor }}
                 {{ for $item.categories as $cat }}
-                    <span class='category'>$cat.name</a>{{if $cat.removeurl}} (<a href="$cat.removeurl" title="$item.remove">x</a>) {{endif}} </span>
+                    <span class='category'>$cat.name</a>{{if $cat.removeurl}} (<a href="$cat.removeurl" title="$remove">x</a>) {{endif}} </span>
                 {{ endfor }}
 		</div>
 	</div>	

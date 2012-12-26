@@ -285,7 +285,6 @@ class Item extends BaseObject {
 			'comment' => $this->get_comment_box($indent),
 			'previewing' => ($conv->is_preview() ? ' preview ' : ''),
 			'wait' => t('Please wait'),
-			'remove' => t('remove'),
 			'thread_level' => $thread_level
 		);
 

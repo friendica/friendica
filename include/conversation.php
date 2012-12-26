@@ -703,6 +703,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 	$o = replace_macros($page_template, array(
 		'$baseurl' => $a->get_baseurl($ssl_state),
 		'$live_update' => $live_update_div,
+		'$remove' => t('remove'),
 		'$mode' => $mode,
 		'$user' => $a->user,
 		'$threads' => $threads,

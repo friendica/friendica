@@ -4,7 +4,7 @@
 {{ endfor }}
 
 {{ if $canreply }}
-{{ inc prv_message.tpl with $reply=$reply_info }}{{ endinc }}
+{{ inc prv_message.tpl }}{{ endinc }}
 {{ else }}
 $unknown_text
 {{endif }}
