@@ -177,6 +177,8 @@ function install_content(&$a) {
 
 			check_htconfig($checks);
 
+			check_smarty3($checks);
+
 			check_keys($checks);
 			
 			if(x($_POST,'phpath'))
@@ -425,6 +427,22 @@ function check_htconfig(&$checks) {
 	}
     
 	check_add($checks, t('.htconfig.php is writable'), $status, false, $help);
+
+}
+
+function check_smarty3(&$checks) {
+	$status = true;
+	$help = "";
+	if(	!is_writable('view/smarty3') ) {
+	
+		$status=false;
+		$help = t('Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering.') .EOL;
+		$help .= t('In order to store these compiled templates, the web server needs to have write access to the directory view/smarty3/ under the Friendica top level folder.').EOL;
+		$help .= t('Please ensure that the user that your web server runs as (e.g. www-data) has write access to this folder.').EOL;
+		$help .= t('Note: as a security measure, you should give the web server write access to view/smarty3/ only--not the template files (.tpl) that it contains.').EOL; 
+	}
+    
+	check_add($checks, t('view/smarty3 is writable'), $status, true, $help);
 
 }
 
