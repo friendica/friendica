@@ -710,6 +710,16 @@ function admin_page_users(&$a){
 	$users = array_map("_setup_users", $users);
 	
 	
+	// Get rid of dashes in key names, Smarty3 can't handle them
+	foreach($users as $key => $user) {
+		$new_user = array();
+		foreach($user as $k => $v) {
+			$k = str_replace('-','_',$k);
+			$new_user[$k] = $v;
+		}
+		$users[$key] = $new_user;
+	}
+
 	$t = get_markup_template("admin_users.tpl");
 	$o = replace_macros($t, array(
 		// strings //

@@ -341,6 +341,17 @@ function events_content(&$a) {
 //				$tpl = get_markup_template("events.tpl");
 //			}
 		}
+
+		// Get rid of dashes in key names, Smarty3 can't handle them
+		foreach($events as $key => $event) {
+			$event_item = array();
+			foreach($event['item'] as $k => $v) {
+				$k = str_replace('-','_',$k);
+				$event_item[$k] = $v;
+			}
+			$events[$key]['item'] = $event_item;
+		}
+
 		$o = replace_macros($tpl, array(
 			'$baseurl'	=> $a->get_baseurl(),
 			'$tabs'		=> $tabs,
