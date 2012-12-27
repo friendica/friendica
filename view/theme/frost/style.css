@@ -311,7 +311,7 @@ section {
 
 	padding-left: 1em;
 	padding-right: 1em;
-	padding-top: 1em;
+	padding-top: 0.5em;
 
 	background-color: #ffffff;
 /*	background-image: url(border.jpg);
@@ -319,20 +319,36 @@ section {
 	background-repeat: no-repeat;*/
 
 	min-height: 112px;
-	border-top: 1px solid #babdb6;
-	border-left: 1px dotted #AAA;
-	border-right: 1px dotted #AAA;
+/*	border-top: 1px solid #babdb6;*/
+	border-top: 1px solid #CCC;
+	border-left: 1px solid #CCC;
+	border-right: 1px solid #CCC;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
 }
 
 .tabs {
 	height: 27px;
-	background-image: url(head.jpg);
+	/*background-image: url(head.jpg);
 	background-repeat: repeat-x;	
 	background-position: 0px -20px;
-	border-bottom: 1px solid #babdb6;
+	border-bottom: 1px solid #babdb6;*/
 	padding:0px;
 }
 .tabs li { margin: 0px; list-style: none; }
+.tabs a {
+	padding: 0.4em 0.5em;
+	margin-right: 0.5em;
+	margin-bottom: 0.5em;
+	border: 1px solid #aaa;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+
+	box-shadow: -2px -2px 3px #aaa inset;
+	-moz-box-shadow: -2px -2px 3px #aaa inset;
+	-webkit-box-shadow: -2px -2px 3px #aaa inset;
+}
 .tab {
 	display:block;
 	float:left;
@@ -342,7 +358,14 @@ section {
 }
 .tab.active {
 	font-weight: bold;
-	
+
+	box-shadow: 2px 2px 3px #aaa inset;
+	-moz-box-shadow: 2px 2px 3px #aaa inset;
+	-webkit-box-shadow: 2px 2px 3px #aaa inset;
+}
+
+#display-top-padding {
+	padding-top: 3em;
 }
 
 
@@ -401,13 +424,17 @@ div.wall-item-content-wrapper.shiny {
 }
 
 #jot-title, #jot-category {
-	border: 0px;
 	margin: 0px;
-	height: 20px;
-	width: 530px;
 	margin-bottom: 5px;
+
+	height: 20px;
+	width: 465px;
 	font-weight: bold;
+
 	border: 1px solid #ffffff;
+
+	display: block;
+	clear: left;
 }
 
 #jot-title::-webkit-input-placeholder{font-weight: normal;}
@@ -1013,6 +1040,12 @@ input#dfrn-url {
 	padding-left: 0px;
 }
 
+#contacts-search-wrapper {
+	padding-top: 1em;
+	padding-bottom: 2em;
+	clear: left;
+}
+
 #contacts-main {
 	margin-top: 20px;
 	margin-bottom: 20px;
@@ -1103,7 +1136,7 @@ input#dfrn-url {
 }
 
 .wall-item-content-wrapper {
-	padding-top: 30px;
+	padding-top: 1em; /* wall-item-lock margin-top needs to match this */
 	border-top: 2px solid #AAA;
 	position: relative;
 
@@ -1205,7 +1238,7 @@ input#dfrn-url {
     z-index: 100;
 }
 .wall-item-lock {
-	margin-top: 30px;
+	margin-top: 1em; /* needs to match .wall-item-content-wrapper padding-top */
 	left: 105px;
 	position: absolute;
 	top: 1px;	
@@ -1215,7 +1248,7 @@ input#dfrn-url {
 	margin-top: 0px;
 }
 
-.wall-item-ago {
+.wall-item-ago, .wall-item-ago a {
 	color: #888888;
 	font-size: 0.8em;
 }
@@ -1301,10 +1334,16 @@ input#dfrn-url {
 }
 .wall-item-photo {
 	border: none;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
 }
 .comment .wall-item-photo {
 	width: 50px !important; 
 	height: 50px !important;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
 .wall-item-content {
 	margin-left: 10px;
@@ -1466,6 +1505,11 @@ input#dfrn-url {
 #profile-jot-plugin-wrapper,
 #profile-jot-submit-wrapper {
 	margin-top: 15px;
+}
+#profile-jot-banner-wrapper {
+	height: 1.5em;
+	display: block;
+	clear: left
 }
 
 #profile-jot-submit {
@@ -3314,7 +3358,7 @@ aside input[type='text'] {
 
 #adminpage table {width:100%; border-bottom: 1px solid #000000; margin: 5px 0px;}
 #adminpage table th { text-align: left;}
-#adminpage td .icon { float: left;}
+#adminpage td .icon, #adminpage td .tool { float: left;}
 #adminpage table#users img { width: 16px; height: 16px; }
 #adminpage table tr:hover { background-color: #bbc7d7; }
 #adminpage .selectall { text-align: right; }
@@ -3763,8 +3807,11 @@ div.jGrowl div.info {
   padding-left: 58px;
 }
 #jGrowl.top-right {
-	top: 15px;
+	top: 75px;
 	right: 15px;
+}
+div.jGrowl-notification {
+  border-radius: 7px;
 }
 .qcomment {
 	border: 1px solid #EEE;

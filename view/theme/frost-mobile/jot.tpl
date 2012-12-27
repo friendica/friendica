@@ -28,6 +28,10 @@
 <div id="profile-jot-submit-wrapper" class="jothidden">
 	<input type="submit" id="profile-jot-submit" name="submit" value="$share" />
 
+	<div id="profile-rotator-wrapper" style="display: $visitor;" >
+		<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
+	</div> 
+	
 	<div id="profile-upload-wrapper" style="display: $visitor;" >
 		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="icon camera" title="$upload"></a></div>
 	</div> 
@@ -64,10 +68,6 @@
   	$jotplugins
 	</div>
 
-	<div id="profile-rotator-wrapper" style="display: $visitor;" >
-		<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
-	</div> 
-	
 	<div id="jot-preview-content" style="display:none;"></div>
 
 	<div style="display: none;">
@@ -75,8 +75,8 @@
 			$acl
 			<hr style="clear:both"/>
 			<div id="profile-jot-email-label">$emailcc</div><input type="text" name="emailcc" id="profile-jot-email" title="$emtitle" />
-			<div id="profile-jot-email-end"></div>
 			$jotnets
+			<div id="profile-jot-networks-end"></div>
 		</div>
 	</div>
 

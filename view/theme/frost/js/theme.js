@@ -29,10 +29,10 @@ $j(document).ready(function() {
 	$j("#profile-jot-text").click(enableOnUser);
 
 
-	$j('.nav-menu-link').hover(function() {
-		showNavMenu($j(this).attr('rel'));
+	$j('.nav-menu-list, .nav-menu-icon').hover(function() {
+		showNavMenu($j(this).attr('point'));
 	}, function() {
-		hideNavMenu($j(this).attr('rel'));
+		hideNavMenu($j(this).attr('point'));
 	});
 
 /*	$j('html').click(function() { $j("#nav-notifications-menu" ).hide(); });*/
@@ -303,6 +303,13 @@ $j(function(){
 		}
 	});
 });
+
+
+function homeRedirect() {
+	$j('html').fadeOut('slow', function(){
+		window.location = baseurl + "/login";
+	});
+}
 
 
 if(typeof window.photoEdit != 'undefined') {
@@ -616,8 +623,8 @@ function initEditor(cb){
 			$j("#profile-jot-text").contact_autocomplete(baseurl+"/acl");
 			editor = true;
 			$j("a#jot-perms-icon").fancybox({
-				'transitionIn' : 'elastic',
-				'transitionOut' : 'elastic'
+				'transitionIn' : 'none', //'elastic',
+				'transitionOut' : 'none' //'elastic'
 			});
 			$j(".jothidden").show();
 			if (typeof cb!="undefined") cb();

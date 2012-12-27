@@ -1164,14 +1164,14 @@ input#dfrn-url {
 }
 
 .wall-item-content-wrapper {
-	padding-top: 30px;
+	padding-top: 1em;
 	border-top: 2px solid #AAAAAA;
 	position: relative;
 
 }
 
 .wall-item-content-wrapper.comment {
-	margin-top: 30px;
+	margin-top: 15px;
 	padding-top: 0px;
 	margin-left: 5px;
 	margin-right: 5px;
@@ -1261,7 +1261,7 @@ input#dfrn-url {
 /*    z-index: 100;*/
 }
 .wall-item-lock {
-	margin-top: 30px;
+	margin-top: 1em;
 	left: 105px;
 	position: absolute;
 	top: 1px;	
@@ -1355,11 +1355,11 @@ input#dfrn-url {
 }
 .wall-item-photo {
 	border: none;
+	border-radius: 7px;
 }
 .comment .wall-item-photo {
 	width: 50px !important; 
 	height: 50px !important;
-	border-top-left-radius: 10px;
 }
 .wall-item-content {
 	float: left;
@@ -1629,6 +1629,9 @@ input#dfrn-url {
 
 #profile-jot-plugin-end{
   clear: both;
+}
+input#profile-jot-email {
+	display: block;
 }
 .profile-jot-net {
 	float: left;
@@ -2123,14 +2126,14 @@ input#dfrn-url {
 }
 
 #profile-jot-acl-wrapper{
-	width:270px;
+	/*width:270px;*/
 	padding-left:10px;
 	height:auto;
 	overflow:visible;
 }
 
 #acl-wrapper {
-	width: 270px;
+	/*width: 270px;*/
 	float:left;
 }
 #acl-search {
@@ -3897,6 +3900,9 @@ div.jGrowl div.info {
 #jGrowl.top-right {
 	top: 15px;
 	right: 10px;
+}
+div.jGrowl-notification {
+  border-radius: 7px;
 }
 .qcomment {
 	border: 1px solid #EEE;

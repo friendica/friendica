@@ -1,20 +1,32 @@
 
-  function openClose(theID) {
-    if(document.getElementById(theID).style.display == "block") { 
-      document.getElementById(theID).style.display = "none" 
-    }
-    else { 
-      document.getElementById(theID).style.display = "block" 
-    } 
-  }
+	function openClose(listID) {
+/*		if(document.getElementById(theID).style.display == "block") { 
+			document.getElementById(theID).style.display = "none" 
+		}
+		else { 
+			document.getElementById(theID).style.display = "block" 
+		}*/
+		listID = "#" + listID.replace(/:/g, "\\:");
+		listID = listID.replace(/\./g, "\\.");
+		listID = listID.replace(/@/g, "\\@");
 
-  function openMenu(theID) {
-      document.getElementById(theID).style.display = "block" 
-  }
+		if($j(listID).is(":visible")) {
+			$j(listID).hide();
+			$j(listID+"-wrapper").show();
+		}
+		else {
+			$j(listID).show();
+			$j(listID+"-wrapper").hide();
+		}
+	}
 
-  function closeMenu(theID) {
-      document.getElementById(theID).style.display = "none" 
-  }
+	function openMenu(theID) {
+		document.getElementById(theID).style.display = "block" 
+	}
+
+	function closeMenu(theID) {
+		document.getElementById(theID).style.display = "none" 
+	}
 
 
 

@@ -7,10 +7,10 @@
 
 <!--	<a id="system-menu-link" class="nav-link" href="#system-menu" title="Menu">Menu</a>-->
 	<div class="nav-button-container nav-menu-link" rel="#system-menu-list">
-	<a class="system-menu-link nav-link" href="{{$nav.settings.0}}" title="Main Menu">
+	<a class="system-menu-link nav-link nav-menu-icon" href="{{$nav.settings.0}}" title="Main Menu" point="#system-menu-list">
 	<img class="system-menu-link" src="{{$baseurl}}/view/theme/frost/images/menu.png">
 	</a>
-	<ul id="system-menu-list" class="nav-menu-list">
+	<ul id="system-menu-list" class="nav-menu-list" point="#system-menu-list">
 		{{if $nav.login}}
 		<a id="nav-login-link" class="nav-load-page-link {{$nav.login.2}}" href="{{$nav.login.0}}" title="{{$nav.login.3}}" >{{$nav.login.1}}</a>
 		{{/if}}
@@ -70,13 +70,15 @@
 
 <!--	<a id="contacts-menu-link" class="nav-link" href="#contacts-menu" title="Contacts">Contacts</a>-->
 	<div class="nav-button-container nav-menu-link" rel="#contacts-menu-list">
-	<a class="contacts-menu-link nav-link" href="{{$nav.contacts.0}}" title="Contacts">
+	<a class="contacts-menu-link nav-link nav-menu-icon" href="{{$nav.contacts.0}}" title="Contacts" point="#contacts-menu-list">
 	<img class="contacts-menu-link" src="{{$baseurl}}/view/theme/frost/images/contacts.png">
 	</a>
 	{{if $nav.introductions}}
+	<a id="nav-notify-link" class="{{$nav.introductions.2}} {{$sel.introductions}} nav-load-page-link" href="{{$nav.introductions.0}}" title="{{$nav.introductions.3}}" >
 	<span id="intro-update" class="nav-ajax-left"></span>
+	</a>
 	{{/if}}
-	<ul id="contacts-menu-list" class="nav-menu-list">
+	<ul id="contacts-menu-list" class="nav-menu-list" point="#contacts-menu-list">
 		{{if $nav.contacts}}
 		<li><a id="nav-contacts-link" class="{{$nav.contacts.2}} nav-load-page-link" href="{{$nav.contacts.0}}" title="{{$nav.contacts.3}}" >{{$nav.contacts.1}}</a><li>
 		{{/if}}
@@ -103,13 +105,13 @@
 
 <!--	<a id="network-menu-link" class="nav-link" href="#network-menu" title="Network">Network</a>-->
 	<div class="nav-button-container nav-menu-link" rel="#network-menu-list">
-	<a class="network-menu-link nav-link" href="{{$nav.network.0}}" title="Network">
+	<a class="nav-menu-icon network-menu-link nav-link" href="{{$nav.network.0}}" title="Network" point="#network-menu-list">
 	<img class="network-menu-link" src="{{$baseurl}}/view/theme/frost/images/network.png">
 	</a>
 	{{if $nav.network}}
 	<span id="net-update" class="nav-ajax-left"></span>
 	{{/if}}
-	<ul id="network-menu-list" class="nav-menu-list">
+	<ul id="network-menu-list" class="nav-menu-list" point="#network-menu-list">
 		{{if $nav.network}}
 		<li>
 		<a id="nav-network-link" class="{{$nav.network.2}} {{$sel.network}} nav-load-page-link" href="{{$nav.network.0}}" title="{{$nav.network.3}}" >{{$nav.network.1}}</a>
@@ -129,7 +131,7 @@
 		{{/if}}
 	</ul>
 	</div>
-		
+
 	{{if $nav.network}}
 	<div class="nav-button-container nav-menu-link" rel="#network-reset-button">
 	<a class="nav-menu-icon network-reset-link nav-link" href="{{$nav.net_reset.0}}" title="{{$nav.net_reset.3}}">

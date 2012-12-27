@@ -4,6 +4,10 @@
   <div id="item-delete-selected-top-desc" >$dropping</div>
 </div>
 <img id="item-delete-selected-top-rotator" class="like-rotator" src="images/rotator.gif" style="display: none;" />
+{{ else }}
+{{ if $mode==display }}
+<div id="display-top-padding"></div>
+{{ endif }}
 {{ endif }}
 
 $live_update

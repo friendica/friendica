@@ -31,6 +31,9 @@ div.jGrowl div.info {
 	top: 15px;
 	right: 15px;
 }
+div.jGrowl-notification {
+  border-radius: 7px;
+}
 
 .login-button {
 	margin-top: 110px;
@@ -89,6 +92,7 @@ div.section-wrapper {
 
 #div_id_remember {
 	margin-top: 10px;
+	margin-bottom: 10px;
 }
 
 /*.openid input {*/

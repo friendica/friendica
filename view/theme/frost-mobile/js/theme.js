@@ -235,6 +235,13 @@ $j(function(){
 
 
 
+function homeRedirect() {
+	$j('html').fadeOut('slow', function(){
+		window.location = baseurl + "/login";
+	});
+}
+
+
 function insertFormatting(comment,BBcode,id) {
 	
 	var tmpStr = $j("#comment-edit-text-" + id).val();

@@ -27,6 +27,10 @@
 <div id="profile-jot-submit-wrapper" class="jothidden">
 	<input type="submit" id="profile-jot-submit" name="submit" value="$share" />
 
+	<div id="profile-rotator-wrapper" style="display: $visitor;" >
+		<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
+	</div> 
+	
 	<div id="profile-upload-wrapper" style="display: $visitor;" >
 		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="icon camera" title="$upload"></a></div>
 	</div> 
@@ -65,10 +69,6 @@
 
 <!--	<span id="jot-display-location" style="display: none;"></span>-->
 
-	<div id="profile-rotator-wrapper" style="display: $visitor;" >
-		<img id="profile-rotator" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />
-	</div> 
-	
 	<div id="jot-preview-content" style="display:none;"></div>
 
 	<div style="display: none;">
