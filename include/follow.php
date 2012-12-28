@@ -218,7 +218,7 @@ function new_contact($uid,$url,$interactive = false) {
 		group_add_member($uid,'',$contact_id,$g[0]['def_gid']);
 	}
 
-	require_once("Photo.php");
+	require_once("include/Photo.php");
 
 	$photos = import_profile_photo($ret['photo'],$uid,$contact_id);
 

@@ -310,7 +310,7 @@ function notification($params) {
 
 	// send email notification if notification preferences permit
 
-	require_once('bbcode.php');
+	require_once('include/bbcode.php');
 	if((intval($params['notify_flags']) & intval($params['type'])) || $params['type'] == NOTIFY_SYSTEM) {
 
 		logger('notification: sending notification email');

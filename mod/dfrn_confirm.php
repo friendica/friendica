@@ -671,7 +671,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		else
 			$photo = $a->get_baseurl() . '/images/person-175.jpg';
 				
-		require_once("Photo.php");
+		require_once("include/Photo.php");
 
 		$photos = import_profile_photo($photo,$local_uid,$dfrn_record);
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once('acl_selectors.php');
+require_once('include/acl_selectors.php');
 
 function editpost_content(&$a) {
 

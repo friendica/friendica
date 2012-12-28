@@ -1,6 +1,6 @@
 <?php
 
-require_once('Scrape.php');
+require_once('include/Scrape.php');
 require_once('include/follow.php');
 
 function follow_init(&$a) {

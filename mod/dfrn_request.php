@@ -110,7 +110,7 @@ function dfrn_request_post(&$a) {
 					 * Scrape the other site's profile page to pick up the dfrn links, key, fn, and photo
 					 */
 
-					require_once('Scrape.php');
+					require_once('include/Scrape.php');
 	
 					$parms = scrape_dfrn($dfrn_url);
 	
@@ -505,7 +505,7 @@ function dfrn_request_post(&$a) {
 				}
 			
 
-				require_once('Scrape.php');
+				require_once('include/Scrape.php');
 
 				$parms = scrape_dfrn(($hcard) ? $hcard : $url);
 

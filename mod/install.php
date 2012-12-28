@@ -32,7 +32,7 @@ function install_post(&$a) {
 			$dbdata = notags(trim($_POST['dbdata']));
 			$phpath = notags(trim($_POST['phpath']));
 
-			require_once("dba.php");
+			require_once("include/dba.php");
 			unset($db);
 			$db = new dba($dbhost, $dbuser, $dbpass, $dbdata, true);
 			/*if(get_db_errno()) {
@@ -251,7 +251,7 @@ function install_content(&$a) {
 			return $o;
 		}; break;
 		case 3: { // Site settings
-			require_once('datetime.php');
+			require_once('include/datetime.php');
 			$dbhost = ((x($_POST,'dbhost')) ? notags(trim($_POST['dbhost'])) : 'localhost');
 			$dbuser = notags(trim($_POST['dbuser']));
 			$dbpass = notags(trim($_POST['dbpass']));

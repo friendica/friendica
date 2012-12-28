@@ -76,7 +76,7 @@ function crepair_post(&$a) {
 
 	if($photo) {
 		logger('mod-crepair: updating photo from ' . $photo);
-		require_once("Photo.php");
+		require_once("include/Photo.php");
 
 		$photos = import_profile_photo($photo,local_user(),$contact['id']);
 

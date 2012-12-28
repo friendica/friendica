@@ -1,5 +1,5 @@
 <?php
-require_once("hostxrd.php");
+require_once("mod/hostxrd.php");
 
 function _well_known_init(&$a){
     if ($a->argc > 1) {

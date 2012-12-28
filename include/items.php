@@ -1607,7 +1607,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 	if((is_array($contact)) && ($photo_timestamp) && (strlen($photo_url)) && ($photo_timestamp > $contact['avatar-date'])) {
 		logger('consume_feed: Updating photo for ' . $contact['name']);
-		require_once("Photo.php");
+		require_once("include/Photo.php");
 		$photo_failure = false;
 		$have_photo = false;
 
@@ -2240,7 +2240,7 @@ function local_delivery($importer,$data) {
 
 	if(($photo_timestamp) && (strlen($photo_url)) && ($photo_timestamp > $importer['avatar-date'])) {
 		logger('local_delivery: Updating photo for ' . $importer['name']);
-		require_once("Photo.php");
+		require_once("include/Photo.php");
 		$photo_failure = false;
 		$have_photo = false;
 

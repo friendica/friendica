@@ -41,7 +41,7 @@ load_translation_table($lang);
  *
  */
 
-require_once("dba.php");
+require_once("include/dba.php");
 
 if(! $install) {
 	$db = new dba($db_host, $db_user, $db_pass, $db_data, $install);
@@ -54,7 +54,7 @@ if(! $install) {
 	load_config('config');
 	load_config('system');
 
-	require_once("session.php");
+	require_once("include/session.php");
 	load_hooks();
 	call_hooks('init_1');
 }

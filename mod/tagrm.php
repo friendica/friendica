@@ -1,6 +1,6 @@
 <?php
 
-require_once('bbcode.php');
+require_once('include/bbcode.php');
 
 function tagrm_post(&$a) {
 

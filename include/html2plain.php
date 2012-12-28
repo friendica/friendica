@@ -1,5 +1,5 @@
 <?php
-require_once "html2bbcode.php";
+require_once("include/html2bbcode.php");
 
 function breaklines($line, $level, $wraplength = 75)
 {

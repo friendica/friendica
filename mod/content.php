@@ -309,7 +309,7 @@ function content_content(&$a, $update = 0) {
 function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 
-	require_once('bbcode.php');
+	require_once('include/bbcode.php');
 
 	$ssl_state = ((local_user()) ? true : false);
 

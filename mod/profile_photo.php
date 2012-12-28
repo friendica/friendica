@@ -1,6 +1,6 @@
 <?php
 
-require_once("Photo.php");
+require_once("include/Photo.php");
 
 function profile_photo_init(&$a) {
 
