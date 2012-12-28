@@ -109,7 +109,7 @@ if((x($_GET,'zrl')) && (! $install)) {
 // header('Link: <' . $a->get_baseurl() . '/amcd>; rel="acct-mgmt";');
 
 if((x($_SESSION,'authenticated')) || (x($_POST,'auth-params')) || ($a->module === 'login'))
-	require("auth.php");
+	require("include/auth.php");
 
 if(! x($_SESSION,'authenticated'))
 	header('X-Account-Management-Status: none');
