@@ -187,6 +187,12 @@
 					html = notifications_tpl.format(e.attr('href'),e.attr('photo'), text, e.attr('date'), e.attr('seen'));
 					nnm.append(html);
 				});
+
+				$("img[data-src]", nnm).each(function(i, el){
+					// Replace data-src attribute with src attribute for every image
+					$(el).attr('src', $(el).data("src"));
+					$(el).removeAttr("data-src");
+				});
 			}
 			notif = eNotif.attr('count');
 			if (notif>0){

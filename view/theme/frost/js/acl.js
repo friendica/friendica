@@ -253,6 +253,11 @@ ACL.prototype.populate = function(data){
 		//console.log(html);
 		that.list_content.append(html);
 	});
+	$(".acl-list-item img[data-src]").each(function(i, el){
+		// Replace data-src attribute with src attribute for every image
+		$(el).attr('src', $(el).data("src"));
+		$(el).removeAttr("data-src");
+	});
 	that.update_view();
 }
 

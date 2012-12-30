@@ -104,7 +104,7 @@
 
 </nav>
 <ul id="nav-notifications-template" style="display:none;" rel="template">
-	<li><a href="{0}"><img src="{1}">{2} <span class="notif-when">{3}</span></a></li>
+	<li><a href="{0}"><img data-src="{1}">{2} <span class="notif-when">{3}</span></a></li>
 </ul>
 
 {{*
