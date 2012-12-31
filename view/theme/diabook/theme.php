@@ -393,9 +393,9 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 			$profile_link = $a->get_baseurl() . '/profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['profile_uid']);
 			$entry = replace_macros($tpl,array(
 				'$id' => $rr['id'],
-				'$profile-link' => zrl($rr['url']),
+				'$profile_link' => zrl($rr['url']),
 				'$photo' => $rr[$photo],
-				'$alt-text' => $rr['name'],
+				'$alt_text' => $rr['name'],
 			));
 			$aside['$comunity_profiles_items'][] = $entry;
 		}
@@ -422,9 +422,9 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 			$profile_link = $a->get_baseurl() . '/profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['profile_uid']);
 			$entry = replace_macros($tpl,array(
 				'$id' => $rr['id'],
-				'$profile-link' => $profile_link,
+				'$profile_link' => $profile_link,
 				'$photo' => $a->get_cached_avatar_image($rr[$photo]),
-				'$alt-text' => $rr['name'],
+				'$alt_text' => $rr['name'],
 			));
 			$aside['$lastusers_items'][] = $entry;
 		}
@@ -501,9 +501,9 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 
 			$entry = replace_macros($tpl,array(
 				'$id' => $rr['id'],
-				'$profile-link' => $photo_page,
+				'$profile_link' => $photo_page,
 				'$photo' => $photo_url,
-				'$alt-text' => $rr['username']." : ".$rr['desc'],
+				'$alt_text' => $rr['username']." : ".$rr['desc'],
 			));
 
 			$aside['$photos_items'][] = $entry;
