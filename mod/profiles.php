@@ -1,6 +1,147 @@
 <?php
 
 
+function profiles_init(&$a) {
+
+	nav_set_selected('profiles');
+
+	if(! local_user()) {
+		notice( t('Permission denied.') . EOL);
+		killme();
+		return;
+	}
+
+	if(($a->argc > 2) && ($a->argv[1] === "drop") && intval($a->argv[2])) {
+		$r = q("SELECT * FROM `profile` WHERE `id` = %d AND `uid` = %d AND `is-default` = 0 LIMIT 1",
+			intval($a->argv[2]),
+			intval(local_user())
+		);
+		if(! count($r)) {
+			notice( t('Profile not found.') . EOL);
+			goaway($a->get_baseurl(true) . '/profiles');
+			return; // NOTREACHED
+		}
+		
+		check_form_security_token_redirectOnErr('/profiles', 'profile_drop', 't');
+
+		// move every contact using this profile as their default to the user default
+
+		$r = q("UPDATE `contact` SET `profile-id` = (SELECT `profile`.`id` AS `profile-id` FROM `profile` WHERE `profile`.`is-default` = 1 AND `profile`.`uid` = %d LIMIT 1) WHERE `profile-id` = %d AND `uid` = %d ",
+			intval(local_user()),
+			intval($a->argv[2]),
+			intval(local_user())
+		);
+		$r = q("DELETE FROM `profile` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			intval($a->argv[2]),
+			intval(local_user())
+		);
+		if($r)
+			info( t('Profile deleted.') . EOL);
+
+		goaway($a->get_baseurl(true) . '/profiles');
+		return; // NOTREACHED
+	}
+
+
+
+
+
+	if(($a->argc > 1) && ($a->argv[1] === 'new')) {
+		
+		check_form_security_token_redirectOnErr('/profiles', 'profile_new', 't');
+
+		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
+			intval(local_user()));
+		$num_profiles = count($r0);
+
+		$name = t('Profile-') . ($num_profiles + 1);
+
+		$r1 = q("SELECT `name`, `photo`, `thumb` FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
+			intval(local_user()));
+		
+		$r2 = q("INSERT INTO `profile` (`uid` , `profile-name` , `name`, `photo`, `thumb`)
+			VALUES ( %d, '%s', '%s', '%s', '%s' )",
+			intval(local_user()),
+			dbesc($name),
+			dbesc($r1[0]['name']),
+			dbesc($r1[0]['photo']),
+			dbesc($r1[0]['thumb'])
+		);
+
+		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
+			intval(local_user()),
+			dbesc($name)
+		);
+
+		info( t('New profile created.') . EOL);
+		if(count($r3) == 1)
+			goaway($a->get_baseurl(true) . '/profiles/' . $r3[0]['id']);
+		
+		goaway($a->get_baseurl(true) . '/profiles');
+	} 
+
+	if(($a->argc > 2) && ($a->argv[1] === 'clone')) {
+		
+		check_form_security_token_redirectOnErr('/profiles', 'profile_clone', 't');
+
+		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
+			intval(local_user()));
+		$num_profiles = count($r0);
+
+		$name = t('Profile-') . ($num_profiles + 1);
+		$r1 = q("SELECT * FROM `profile` WHERE `uid` = %d AND `id` = %d LIMIT 1",
+			intval(local_user()),
+			intval($a->argv[2])
+		);
+		if(! count($r1)) {
+			notice( t('Profile unavailable to clone.') . EOL);
+			killme();
+			return;
+		}
+		unset($r1[0]['id']);
+		$r1[0]['is-default'] = 0;
+		$r1[0]['publish'] = 0;	
+		$r1[0]['net-publish'] = 0;	
+		$r1[0]['profile-name'] = dbesc($name);
+
+		dbesc_array($r1[0]);
+
+		$r2 = dbq("INSERT INTO `profile` (`" 
+			. implode("`, `", array_keys($r1[0])) 
+			. "`) VALUES ('" 
+			. implode("', '", array_values($r1[0])) 
+			. "')" );
+
+		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
+			intval(local_user()),
+			dbesc($name)
+		);
+		info( t('New profile created.') . EOL);
+		if(count($r3) == 1)
+			goaway($a->get_baseurl(true) . '/profiles/' . $r3[0]['id']);
+		
+		goaway($a->get_baseurl(true) . '/profiles');
+		
+		return; // NOTREACHED
+	}
+
+
+	if(($a->argc > 1) && (intval($a->argv[1]))) {
+		$r = q("SELECT id FROM `profile` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			intval($a->argv[1]),
+			intval(local_user())
+		);
+		if(! count($r)) {
+			notice( t('Profile not found.') . EOL);
+			killme();
+			return;
+		}
+
+		profile_load($a,$a->user['nickname'],$r[0]['id']);
+	}
+
+}
+
 function profiles_post(&$a) {
 
 	if(! local_user()) {
@@ -425,126 +566,6 @@ function profile_activity($changed, $value) {
 function profiles_content(&$a) {
 
 	$o = '';
-	nav_set_selected('profiles');
-
-	if(! local_user()) {
-		notice( t('Permission denied.') . EOL);
-		return;
-	}
-
-	if(($a->argc > 2) && ($a->argv[1] === "drop") && intval($a->argv[2])) {
-		$r = q("SELECT * FROM `profile` WHERE `id` = %d AND `uid` = %d AND `is-default` = 0 LIMIT 1",
-			intval($a->argv[2]),
-			intval(local_user())
-		);
-		if(! count($r)) {
-			notice( t('Profile not found.') . EOL);
-			goaway($a->get_baseurl(true) . '/profiles');
-			return; // NOTREACHED
-		}
-		
-		check_form_security_token_redirectOnErr('/profiles', 'profile_drop', 't');
-
-		// move every contact using this profile as their default to the user default
-
-		$r = q("UPDATE `contact` SET `profile-id` = (SELECT `profile`.`id` AS `profile-id` FROM `profile` WHERE `profile`.`is-default` = 1 AND `profile`.`uid` = %d LIMIT 1) WHERE `profile-id` = %d AND `uid` = %d ",
-			intval(local_user()),
-			intval($a->argv[2]),
-			intval(local_user())
-		);
-		$r = q("DELETE FROM `profile` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($a->argv[2]),
-			intval(local_user())
-		);
-		if($r)
-			info( t('Profile deleted.') . EOL);
-
-		goaway($a->get_baseurl(true) . '/profiles');
-		return; // NOTREACHED
-	}
-
-
-
-
-
-	if(($a->argc > 1) && ($a->argv[1] === 'new')) {
-		
-		check_form_security_token_redirectOnErr('/profiles', 'profile_new', 't');
-
-		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
-			intval(local_user()));
-		$num_profiles = count($r0);
-
-		$name = t('Profile-') . ($num_profiles + 1);
-
-		$r1 = q("SELECT `name`, `photo`, `thumb` FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
-			intval(local_user()));
-		
-		$r2 = q("INSERT INTO `profile` (`uid` , `profile-name` , `name`, `photo`, `thumb`)
-			VALUES ( %d, '%s', '%s', '%s', '%s' )",
-			intval(local_user()),
-			dbesc($name),
-			dbesc($r1[0]['name']),
-			dbesc($r1[0]['photo']),
-			dbesc($r1[0]['thumb'])
-		);
-
-		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
-			intval(local_user()),
-			dbesc($name)
-		);
-
-		info( t('New profile created.') . EOL);
-		if(count($r3) == 1)
-			goaway($a->get_baseurl(true) . '/profiles/' . $r3[0]['id']);
-		
-		goaway($a->get_baseurl(true) . '/profiles');
-	} 
-
-	if(($a->argc > 2) && ($a->argv[1] === 'clone')) {
-		
-		check_form_security_token_redirectOnErr('/profiles', 'profile_clone', 't');
-
-		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
-			intval(local_user()));
-		$num_profiles = count($r0);
-
-		$name = t('Profile-') . ($num_profiles + 1);
-		$r1 = q("SELECT * FROM `profile` WHERE `uid` = %d AND `id` = %d LIMIT 1",
-			intval(local_user()),
-			intval($a->argv[2])
-		);
-		if(! count($r1)) {
-			notice( t('Profile unavailable to clone.') . EOL);
-			return;
-		}
-		unset($r1[0]['id']);
-		$r1[0]['is-default'] = 0;
-		$r1[0]['publish'] = 0;	
-		$r1[0]['net-publish'] = 0;	
-		$r1[0]['profile-name'] = dbesc($name);
-
-		dbesc_array($r1[0]);
-
-		$r2 = dbq("INSERT INTO `profile` (`" 
-			. implode("`, `", array_keys($r1[0])) 
-			. "`) VALUES ('" 
-			. implode("', '", array_values($r1[0])) 
-			. "')" );
-
-		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
-			intval(local_user()),
-			dbesc($name)
-		);
-		info( t('New profile created.') . EOL);
-		if(count($r3) == 1)
-			goaway($a->get_baseurl(true) . '/profiles/' . $r3[0]['id']);
-		
-		goaway($a->get_baseurl(true) . '/profiles');
-		
-		return; // NOTREACHED
-	}
-
 
 	if(($a->argc > 1) && (intval($a->argv[1]))) {
 		$r = q("SELECT * FROM `profile` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -555,8 +576,6 @@ function profiles_content(&$a) {
 			notice( t('Profile not found.') . EOL);
 			return;
 		}
-
-		profile_load($a,$a->user['nickname'],$r[0]['id']);
 
 		require_once('include/profile_selectors.php');
 

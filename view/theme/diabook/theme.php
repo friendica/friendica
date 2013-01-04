@@ -7,9 +7,6 @@
  * Author:
  */
 
-$a = get_app();
-set_template_engine($a, 'smarty3');
-
 function get_diabook_config($key, $default = false) {
 	if (local_user()) {
 		$result = get_pconfig(local_user(), "diabook", $key);
@@ -25,6 +22,8 @@ function get_diabook_config($key, $default = false) {
 }
 
 function diabook_init(&$a) {
+
+set_template_engine($a, 'smarty3');
 
 //print diabook-version for debugging
 $diabook_version = "Diabook (Version: 1.027)";

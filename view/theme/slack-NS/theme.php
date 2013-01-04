@@ -1,9 +1,10 @@
 <?php
+
+function slack_NS_init(&$a) {
 $a->theme_info = array(
   'extends' => 'duepuntozero',
 );
 
-function slack_NS_init(&$a) {
 $a->page['htmlhead'] .= <<< EOT
 <script>
 function insertFormatting(comment,BBcode,id) {

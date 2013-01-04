@@ -17,14 +17,13 @@
  * or rename to prefix1_function_name (prefix2_function_name), etc.
  */
 
-$a = get_app();
-$a->theme_info = array(
-    'family' => 'dispy',
-	'version' => '1.2.2'
-);
-set_template_engine($a, 'smarty3');
-
 function dispy_init(&$a) {
+
+	$a->theme_info = array(
+		'family' => 'dispy',
+		'version' => '1.2.2'
+	);
+	set_template_engine($a, 'smarty3');
 
     /** @purpose set some theme defaults
     */

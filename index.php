@@ -377,14 +377,8 @@ if($a->module != 'install') {
 }
 
 /**
- * Build the page - now that we have all the components
+ * Add a "toggle mobile" link if we're using a mobile device
  */
-
-if(!$a->theme['stylesheet'])
-	$stylesheet = current_theme_url();
-else
-	$stylesheet = $a->theme['stylesheet'];
-$a->page['htmlhead'] = replace_macros($a->page['htmlhead'], array('$stylesheet' => $stylesheet));
 
 if($a->is_mobile || $a->is_tablet) {
 	if(isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
@@ -398,6 +392,16 @@ if($a->is_mobile || $a->is_tablet) {
 	                     	'$toggle_text' => t('toggle mobile')
     	                 ));
 }
+
+/**
+ * Build the page - now that we have all the components
+ */
+
+if(!$a->theme['stylesheet'])
+	$stylesheet = current_theme_url();
+else
+	$stylesheet = $a->theme['stylesheet'];
+$a->page['htmlhead'] = replace_macros($a->page['htmlhead'], array('$stylesheet' => $stylesheet));
 
 $page    = $a->page;
 $profile = $a->profile;

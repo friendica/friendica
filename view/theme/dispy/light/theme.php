@@ -8,14 +8,13 @@
  * Screenshot: <a href="screenshot.jpg">Screenshot</a>
  */
 
-$a = get_app();
-$a->theme_info = array(
-    'family' => 'dispy',
-	'name' => 'light',
-);
-set_template_engine($a, 'smarty3');
-
 function dispy_light_init(&$a) {
+
+	$a->theme_info = array(
+		'family' => 'dispy',
+		'name' => 'light',
+	);
+	set_template_engine($a, 'smarty3');
 
     /** @purpose set some theme defaults
     */

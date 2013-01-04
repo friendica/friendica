@@ -1,10 +1,11 @@
 <?php
+
+function greenzero_init(&$a) {
 $a->theme_info = array(
   'extends' => 'duepuntozero',
 );
 set_template_engine($a, 'smarty3');
 
-function greenzero_init(&$a) {
 $a->page['htmlhead'] .= <<< EOT
 <script>
 function insertFormatting(comment,BBcode,id) {

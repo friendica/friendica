@@ -1,4 +1,6 @@
 <?php
+
+function facepark_init(&$a) {
 $a->theme_info = array();
 set_template_engine($a, 'smarty3');
 
@@ -48,3 +50,5 @@ $('.savedsearchterm').hover(
 
 </script>
 EOT;
+}
+

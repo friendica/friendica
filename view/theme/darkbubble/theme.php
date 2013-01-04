@@ -7,6 +7,7 @@
  */
 
 
+function darkbubble_init(&$a) {
 $a->theme_info = array(
   'extends' => 'testbubble',
 );
@@ -21,3 +22,4 @@ $('html').click(function() { $("#nav-notifications-menu" ).hide(); });
 });
 </script>
 EOT;
+}

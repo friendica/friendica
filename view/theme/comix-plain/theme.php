@@ -8,6 +8,7 @@
  */
 
 
+function comix_plain_init(&$a) {
 $a->theme_info = array(
   'extends' => 'duepuntozero',
 );
@@ -59,3 +60,5 @@ $('.savedsearchterm').hover(
 
 </script>
 EOT;
+}
+

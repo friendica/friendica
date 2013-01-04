@@ -9,11 +9,10 @@
  * Screenshot: <a href="screenshot.png">Screenshot</a>
  */
 
-$a = get_app();
-$a->theme_info = array();
-set_template_engine($a, 'smarty3');
-
 function smoothly_init(&$a) {
+	$a->theme_info = array();
+	set_template_engine($a, 'smarty3');
+
 	$cssFile = null;
 	$ssl_state = null;
 	$baseurl = $a->get_baseurl($ssl_state);
