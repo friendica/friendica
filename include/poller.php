@@ -99,14 +99,26 @@ function poller_run(&$argv, &$argc){
 		proc_run('php','include/expire.php');
 	}
 
-	// clear old cache
-	Cache::clear();
+	$last = get_config('system','cache_last_cleared');
 
-	// clear old item cache files
-	clear_cache();
+ 	if($last) {
+		$next = $last + (3600); // Once per hour
+		$clear_cache = ($next <= time());
+        } else
+		$clear_cache = true;
 
-	// clear cache for photos
-	clear_cache($a->get_basepath(), $a->get_basepath()."/photo");
+	if ($clear_cache) {
+		// clear old cache
+		Cache::clear();
+
+		// clear old item cache files
+		clear_cache();
+
+		// clear cache for photos
+		clear_cache($a->get_basepath(), $a->get_basepath()."/photo");
+
+		set_config('system','cache_last_cleared', time());
+	}
 
 	$manual_id  = 0;
 	$generation = 0;

@@ -7,6 +7,10 @@
 @import url("css/font-awesome.css") all;
 @import url("css/font2.css") all;
 
+img { 
+  border: 0px;
+}
+
 /* ========= */
 /* = Admin = */
 /* ========= */
@@ -1067,8 +1071,9 @@ border-bottom: 1px solid #D2D2D2;
   text-align: left;
   width: 80px;
 }
-.wall-item-container .wall-item-location {
-  padding-right: 40px;
+.wall-item-container {
+  /* padding-right: 30px; */
+  padding-right: 0px;
 }
 .wall-item-container .wall-item-ago {
   word-wrap: break-word;
@@ -1077,7 +1082,7 @@ border-bottom: 1px solid #D2D2D2;
   color: #999;
 }
 .wall-item-location {
-  width: 180px;
+  width: 350px;
   float: left;
 }
 
@@ -1253,7 +1258,8 @@ border-bottom: 1px solid #D2D2D2;
 
 #profile-jot-form #profile-jot-text {
   height: 2.0em;
-  width: 99%;
+  /* width: 99%; */
+  width: 752px;
   font-size: 15px;
   color: #999999;
   border: 1px solid #DDD;
@@ -1267,7 +1273,8 @@ border-bottom: 1px solid #D2D2D2;
     font-weight: bold;
     height: 20px;
     margin: 0 0 5px;
-    width: 60%;
+    /* width: 60%; */
+    width: 762px;
     border: 1px solid #d2d2d2;
 }
 
@@ -1280,6 +1287,10 @@ border-bottom: 1px solid #D2D2D2;
 #profile-jot-form #profile-jot-text_parent #profile-jot-text_tbl{
   width: 785px;
   height: 100px;
+}
+
+#profile-jot-perms {
+  float: right;
 }
 
 #jot-preview-content {
@@ -1689,7 +1700,7 @@ div.pager, .birthday-notice, ul.tabs a, #jot-preview-link, .comment-edit-submit-
     border: 1px solid lightgray;
     color: black;
     background: #F2F2F2;
-    padding: 3px 7px 2px 7px;
+    padding: 2px 7px 2px 7px;
     margin-top: 2px;
     margin-bottom: 2px;
 
@@ -1816,9 +1827,14 @@ div.pager, .birthday-notice, ul.tabs a, #jot-preview-link, .comment-edit-submit-
 }
 
 .profile-edit-side-div {
-  display: none;
-/*  float: right; */
+/*  display: none; */
+  float: right; 
 }
+
+/* aside div.clear {
+  clear: none;
+  float: left;
+} */
 
 #register-form label,
 #profile-edit-form label {

@@ -115,10 +115,10 @@ class Item extends BaseObject {
 		$drop = array(
 			'dropping' => $dropping,
 			'pagedrop' => ((feature_enabled($conv->get_profile_owner(),'multi_delete')) ? $item['pagedrop'] : ''),
-			'select' => t('Select'), 
+			'select' => t('Select'),
 			'delete' => t('Delete'),
 		);
-		
+
 		$filer = (($conv->get_profile_owner() == local_user()) ? t("save to folder") : false);
 
 		$diff_author    = ((link_compare($item['url'],$item['author-link'])) ? false : true);
@@ -133,7 +133,7 @@ class Item extends BaseObject {
 		if($sp)
 			$sparkle = ' sparkle';
 		else
-			$profile_link = zrl($profile_link);                 
+			$profile_link = zrl($profile_link);
 
 		$normalised = normalise_link((strlen($item['author-link'])) ? $item['author-link'] : $item['url']);
 		if(($normalised != 'mailbox') && (x($a->contacts,$normalised)))
@@ -212,9 +212,14 @@ class Item extends BaseObject {
 
 		localize_item($item);
 
+		if ($item["postopts"]) {
+			$langdata = explode(";", $item["postopts"]);
+			$langstr = substr($langdata[0], 5)." (".round($langdata[1]*100, 1)."%)";
+		}
+
 		$body = prepare_body($item,true);
 
-        list($categories, $folders) = get_cats_and_terms($item);
+		list($categories, $folders) = get_cats_and_terms($item);
 
 		if($a->theme['template_engine'] === 'internal') {
 			$body_e = template_escape($body);
@@ -235,7 +240,7 @@ class Item extends BaseObject {
 
 		$tmp_item = array(
 			'template' => $this->get_template(),
-			
+
 			'type' => implode("",array_slice(explode("/",$item['verb']),-1)),
 			'tags' => $tags,
             'hashtags' => $hashtags,
@@ -285,7 +290,8 @@ class Item extends BaseObject {
 			'comment' => $this->get_comment_box($indent),
 			'previewing' => ($conv->is_preview() ? ' preview ' : ''),
 			'wait' => t('Please wait'),
-			'thread_level' => $thread_level
+			'thread_level' => $thread_level,
+			'postopts' => $langstr
 		);
 
 		$arr = array('item' => $item, 'output' => $tmp_item);

@@ -25,3 +25,10 @@ report/
 .DS_Store
 
 /nbproject/private/
+
+#ignore smarty cache
+/view/smarty3/compiled/
+
+#ignore cache folders
+/privacy_image_cache/
+/photo/

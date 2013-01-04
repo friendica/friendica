@@ -944,7 +944,7 @@
 		//$include_entities = (x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:false);
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, `contact`.`nick` as `reply_author`,
-			`contact`.`name`, `contact`.`photo`, `contact`.`url` as `reply_url`, `contact`.`rel`,
+			`contact`.`name`, `contact`.`photo` as `reply_photo`, `contact`.`url` as `reply_url`, `contact`.`rel`,
 			`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 			`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
 			FROM `item`, `contact`
@@ -957,7 +957,18 @@
 		);
 
 		if ($r[0]['body'] != "") {
-			$_REQUEST['body'] = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8')."[url=".$r[0]['reply_url']."]".$r[0]['reply_author']."[/url] \n".$r[0]['body'];
+			if (intval(get_config('system','new_share'))) {
+				$post = "[share author='".str_replace("'", "&#039;", $r[0]['reply_author']).
+						"' profile='".$r[0]['reply_url'].
+						"' avatar='".$r[0]['reply_photo'].
+						"' link='".$r[0]['plink']."']";
+
+				$post .= $r[0]['body'];
+				$post .= "[/share]";
+				$_REQUEST['body'] = $post;
+			} else
+				$_REQUEST['body'] = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8')."[url=".$r[0]['reply_url']."]".$r[0]['reply_author']."[/url] \n".$r[0]['body'];
+
 			$_REQUEST['profile_uid'] = api_user();
 			$_REQUEST['type'] = 'wall';
 			$_REQUEST['api_source'] = true;

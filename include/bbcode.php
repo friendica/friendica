@@ -310,6 +310,7 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	// remove some newlines before the general conversion
 	$Text = preg_replace("/\s?\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","[share$1]$2[/share]",$Text);
+	$Text = preg_replace("/\s?\[quote(.*?)\]\s?(.*?)\s?\[\/quote\]\s?/ism","[quote$1]$2[/quote]",$Text);
 
 	// when the content is meant exporting to other systems then remove the avatar picture since this doesn't really look good on these systems
 	if (!$tryoembed)
@@ -324,6 +325,15 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	$Text = trim($Text);
 	$Text = str_replace("\r\n","\n", $Text);
+
+	// removing multiplicated newlines
+	$search = array("\n\n\n", "\n ", " \n", "[/quote]\n\n", "\n[/quote]");
+	$replace = array("\n\n", "\n", "\n", "[/quote]\n", "[/quote]");
+	do {
+		$oldtext = $Text;
+		$Text = str_replace($search, $replace, $Text);
+	} while ($oldtext != $Text);
+
 	$Text = str_replace(array("\r","\n"), array('<br />','<br />'), $Text);
 
 	if($preserve_nl)
