@@ -324,7 +324,7 @@ li.icon.icon-large:before {
 .icon.type.unkn:before            { content: "\f059"; }
 
 .icon.drop:before                 { content: "\f014"; }
-.icon.drophilde:before            { content: "\f014"; }
+.icon.drophide:before             { content: "\f014"; }
 
 .small-pencil:before, .savedsearchdrop:before { 
   font-family: FontAwesome;
