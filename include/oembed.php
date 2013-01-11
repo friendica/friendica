@@ -117,7 +117,7 @@ function oembed_format_object($j){
 		if (isset($j->provider_name)) $ret.=" on ".$j->provider_name;
 	} else {
 		// add <a> for html2bbcode conversion
-		$ret .= "<a href='$embedurl' rel='oembed'></a>";
+		$ret .= "<a href='$embedurl' wmode='opaque' rel='oembed'></a>";
 	}
 	$ret.="<br style='clear:left'></span>";
 	return  mb_convert_encoding($ret, 'HTML-ENTITIES', mb_detect_encoding($ret));
