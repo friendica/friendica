@@ -3361,10 +3361,6 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 			}
 
 			if(($r[0]['notify-flags'] & NOTIFY_INTRO) && ($r[0]['page-flags'] == PAGE_NORMAL)) {
-
-				$engine = get_app()->get_template_engine();
-				get_app()->set_template_engine();
-
 				$email_tpl = get_intltext_template('follow_notify_eml.tpl');
 				$email = replace_macros($email_tpl, array(
 					'$requestor' => ((strlen($name)) ? $name : t('[Name Withheld]')),
@@ -3373,9 +3369,6 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 					'$siteurl' => $a->get_baseurl(),
 					'$sitename' => $a->config['sitename']
 				));
-
-				get_app()->set_template_engine($engine);
-
 				$res = mail($r[0]['email'], 
 					email_header_encode((($sharing) ? t('A new person is sharing with you at ') : t("You have a new follower at ")) . $a->config['sitename'],'UTF-8'),
 					$email,

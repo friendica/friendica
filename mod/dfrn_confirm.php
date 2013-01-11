@@ -737,11 +737,6 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 				? get_intltext_template('friend_complete_eml.tpl')
 				: get_intltext_template('intro_complete_eml.tpl'));
 		
-
-			$engine = get_app()->get_template_engine();
-			get_app()->set_template_engine();
-
-
 			$email_tpl = replace_macros($tpl, array(
 				'$sitename' => $a->config['sitename'],
 				'$siteurl' =>  $a->get_baseurl(),
@@ -751,10 +746,6 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 				'$dfrn_url' => $r[0]['url'],
 				'$uid' => $newuid )
 			);
-
-
-			get_app()->set_template_engine($engine);
-
 			require_once('include/email.php');
 
 			$res = mail($r[0]['email'], email_header_encode( sprintf( t("Connection accepted at %s") , $a->config['sitename']),'UTF-8'),

@@ -79,10 +79,6 @@ function register_post(&$a) {
 			set_pconfig($user['uid'],'system','invites_remaining',$num_invites);
 		}
 
-		$engine = get_app()->get_template_engine();
-		get_app()->set_template_engine();
-
-
 		$email_tpl = get_intltext_template("register_open_eml.tpl");
 		$email_tpl = replace_macros($email_tpl, array(
 				'$sitename' => $a->config['sitename'],
@@ -91,10 +87,6 @@ function register_post(&$a) {
 				'$email' => $user['email'],
 				'$password' => $result['password'],
 				'$uid' => $user['uid'] ));
-
-
-		get_app()->set_template_engine($engine);
-
 
 		$res = mail($user['email'], email_header_encode( sprintf( t('Registration details for %s'), $a->config['sitename']),'UTF-8'),
 			$email_tpl, 
@@ -139,10 +131,6 @@ function register_post(&$a) {
 			set_pconfig($user['uid'],'system','invites_remaining',$num_invites);
 		}
 
-
-		$engine = get_app()->get_template_engine();
-		get_app()->set_template_engine();
-
 		$email_tpl = get_intltext_template("register_verify_eml.tpl");
 		$email_tpl = replace_macros($email_tpl, array(
 				'$sitename' => $a->config['sitename'],
@@ -153,9 +141,6 @@ function register_post(&$a) {
 				'$uid' => $user['uid'],
 				'$hash' => $hash
 		 ));
-
-		get_app()->set_template_engine($engine);
-
 
 		$res = mail($a->config['admin_email'], email_header_encode( sprintf(t('Registration request at %s'), $a->config['sitename']),'UTF-8'),
 			$email_tpl,

@@ -23,7 +23,6 @@ function replace_macros($s,$r) {
 		if(gettype($s) === 'string') {
 			$template = $s;
 			$s = new FriendicaSmarty();
-			$s->error_reporting = E_ALL & ~E_NOTICE;
 		}
 		foreach($r as $key=>$value) {
 			if($key[0] === '$') {
