@@ -112,7 +112,7 @@
 <!--<div class="wall-item-outside-wrapper-end {{$item.indent}}" ></div>-->
 <!--</div>-->
 {{foreach $item.children as $child}}
-	{{include file="file:{{$child.template}}" item=$child}}
+	{{include file="{{$child.template}}" item=$child}}
 {{/foreach}}
 
 {{if $item.flatten}}

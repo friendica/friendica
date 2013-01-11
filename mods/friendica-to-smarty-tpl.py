@@ -77,7 +77,7 @@ def fix_element(element):
 
 		if parts[first+1][0] == '$':
 			# This takes care of elements where the filename is a variable, e.g. {{ inc $file }}
-			element += 'file:' + ldelim + parts[first+1].rstrip('}') + rdelim
+			element += ldelim + parts[first+1].rstrip('}') + rdelim
 		else:
 			# This takes care of elements where the filename is a path, e.g. {{ inc file.tpl }}
 			element += parts[first+1].rstrip('}') 
@@ -189,10 +189,14 @@ for a_file in files:
 	filename = os.path.join(path,a_file)
 	ext = a_file.split('.')[-1]
 	if os.path.isfile(filename) and ext == 'tpl':
-		with open(filename, 'r') as f:
-			newfilename = os.path.join(outpath,a_file)
-			with open(newfilename, 'w') as outf:
-				print "Converting " + filename + " to " + newfilename
-				convert(f, outf, php_tpl)
+		f = open(filename, 'r')
 
+		newfilename = os.path.join(outpath,a_file)
+		outf = open(newfilename, 'w')
+
+		print "Converting " + filename + " to " + newfilename
+		convert(f, outf, php_tpl)
+
+		outf.close()
+		f.close()
 

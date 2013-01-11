@@ -149,7 +149,7 @@
 	{{if $child.type == tag}}
 		{{include file="wall_item_tag.tpl" item=$child}}
 	{{else}}
-		{{include file="file:{{$item.template}}" item=$child}}
+		{{include file="{{$item.template}}" item=$child}}
 	{{/if}}
 {{/foreach}}
 

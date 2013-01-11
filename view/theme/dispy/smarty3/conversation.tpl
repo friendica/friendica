@@ -11,7 +11,7 @@
 		{{/if}}
 		{{if $item.comment_lastcollapsed}}</div>{{/if}}
 		
-		{{include file="file:{{$item.template}}"}}
+		{{include file="{{$item.template}}"}}
 		
 		
 	{{/foreach}}

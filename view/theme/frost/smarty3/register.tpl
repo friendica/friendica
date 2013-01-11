@@ -11,9 +11,9 @@
 	<p id="register-realpeople">{{$realpeople}}</p>
 
 	<br />
-{{if $oidlabel }}
+{{if $oidlabel}}
 	<div id="register-openid-wrapper" >
-    	<label for="register-openid" id="label-register-openid" >{{$oidlabel}}</label><input type="text" maxlength="60" size="32" name="openid_url" class="openid" 	id="register-openid" value="{{$openid}}" >
+    	<label for="register-openid" id="label-register-openid" >{{$oidlabel}}</label><input 	type="text" maxlength="60" size="32" name="openid_url" class="openid" id="register-openid" value="{{$openid}}" >
 	</div>
 	<div id="register-openid-end" ></div>
 {{/if}}

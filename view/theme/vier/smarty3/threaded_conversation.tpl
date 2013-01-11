@@ -8,7 +8,7 @@
 		{{if $thread.type == tag}}
 			{{include file="wall_item_tag.tpl" item=$thread}}
 		{{else}}
-			{{include file="file:{{$thread.template}}" item=$thread}}
+			{{include file="{{$thread.template}}" item=$thread}}
 		{{/if}}
 		
 </div>

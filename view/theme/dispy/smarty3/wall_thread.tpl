@@ -132,7 +132,7 @@ class="icon recycle wall-item-share-buttons"  title="{{$item.vote.share.0}}" onc
 <div class="wall-item-outside-wrapper-end {{$item.indent}} {{$item.shiny}}" ></div>
 </div>
 {{foreach $item.children as $child}}
-	{{include file="file:{{$child.template}}" item=$child}}
+	{{include file="{{$child.template}}" item=$child}}
 {{/foreach}}
 
 </div>

@@ -13,7 +13,7 @@
 {{$live_update}}
 
 {{foreach $threads as $thread}}
-{{include file="file:{{$thread.template}}" item=$thread}}
+{{include file="{{$thread.template}}" item=$thread}}
 {{/foreach}}
 
 <div id="conversation-end"></div>
