@@ -16,7 +16,9 @@ function diaspora_dispatch_public($msg) {
 		return;
 	}
 
-	$r = q("SELECT `user`.* FROM `user` WHERE `user`.`uid` IN ( SELECT `contact`.`uid` FROM `contact` WHERE `contact`.`network` = '%s' AND `contact`.`addr` = '%s' ) AND `account_expired` = 0 AND `account_removed` = 0 ",
+	$r = q("SELECT `user`.* FROM `user` WHERE `user`.`uid` IN
+	        ( SELECT `contact`.`uid` FROM `contact` WHERE `contact`.`network` = '%s' AND `contact`.`addr` = '%s' )
+	        AND `account_expired` = 0 AND `account_removed` = 0 ",
 		dbesc(NETWORK_DIASPORA),
 		dbesc($msg['author'])
 	);
@@ -32,7 +34,7 @@ function diaspora_dispatch_public($msg) {
 
 
 
-function diaspora_dispatch($importer,$msg) {
+function diaspora_dispatch($importer,$msg,$attempt=1) {
 
 	$ret = 0;
 
@@ -88,7 +90,7 @@ function diaspora_dispatch($importer,$msg) {
 		$ret = diaspora_signed_retraction($importer,$xmlbase->relayable_retraction,$msg);
 	}
 	elseif($xmlbase->photo) {
-		$ret = diaspora_photo($importer,$xmlbase->photo,$msg);
+		$ret = diaspora_photo($importer,$xmlbase->photo,$msg,$attempt);
 	}
 	elseif($xmlbase->conversation) {
 		$ret = diaspora_conversation($importer,$xmlbase->conversation,$msg);
@@ -1655,7 +1657,7 @@ function diaspora_message($importer,$xml,$msg) {
 }
 
 
-function diaspora_photo($importer,$xml,$msg) {
+function diaspora_photo($importer,$xml,$msg,$attempt=1) {
 
 	$a = get_app();
 
@@ -1693,7 +1695,14 @@ function diaspora_photo($importer,$xml,$msg) {
 		dbesc($status_message_guid)
 	);
 	if(! count($r)) {
-		logger('diaspora_photo: parent item not found: parent: ' . $parent_guid . ' item: ' . $guid);
+		if($attempt <= 3) {
+			q("INSERT INTO dsprphotoq (uid, msg, attempt) VALUES (%d, '%s', %d)",
+			   intval($importer['uid']),
+			   dbesc(serialize($msg)),
+			   intval($attempt + 1)
+			);
+		}
+		logger('diaspora_photo: attempt = ' . $attempt . '; status message not found: ' . $status_message_guid . ' for photo: ' . $guid);
 		return;
 	}
 
@@ -2319,13 +2328,15 @@ function diaspora_send_followup($item,$owner,$contact,$public_batch = false) {
 	$myaddr = $owner['nickname'] . '@' .  substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
 //	$theiraddr = $contact['addr'];
 
-	// Diaspora doesn't support threaded comments
-	/*if($item['thr-parent']) {
+	// Diaspora doesn't support threaded comments, but some
+	// versions of Diaspora (i.e. Diaspora-pistos) support
+	// likes on comments
+	if($item['verb'] === ACTIVITY_LIKE && $item['thr-parent']) {
 		$p = q("select guid, type, uri, `parent-uri` from item where uri = '%s' limit 1",
 		        dbesc($item['thr-parent'])
 		      );
 	}
-	else {*/
+	else {
 		// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
 		// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
 		// The only item with `parent` and `id` as the parent id is the parent item.
@@ -2333,7 +2344,7 @@ function diaspora_send_followup($item,$owner,$contact,$public_batch = false) {
 			intval($item['parent']),
 			intval($item['parent'])
 		);
-	//}
+	}
 	if(count($p))
 		$parent = $p[0];
 	else
@@ -2395,13 +2406,15 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	$body = $item['body'];
 	$text = html_entity_decode(bb2diaspora($body));
 
-	// Diaspora doesn't support threaded comments
-	/*if($item['thr-parent']) {
+	// Diaspora doesn't support threaded comments, but some
+	// versions of Diaspora (i.e. Diaspora-pistos) support
+	// likes on comments
+	if($item['verb'] === ACTIVITY_LIKE && $item['thr-parent']) {
 		$p = q("select guid, type, uri, `parent-uri` from item where uri = '%s' limit 1",
 		        dbesc($item['thr-parent'])
 		      );
 	}
-	else {*/
+	else {
 		// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
 		// return the items ordered by `item`.`id`, in which case the wrong item is chosen as the parent.
 		// The only item with `parent` and `id` as the parent id is the parent item.
@@ -2409,7 +2422,7 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 		       intval($item['parent']),
 		       intval($item['parent'])
 		      );
-	//}
+	}
 	if(count($p))
 		$parent = $p[0];
 	else

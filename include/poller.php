@@ -62,6 +62,10 @@ function poller_run(&$argv, &$argc){
 
 	proc_run('php',"include/queue.php");
 	
+	// run diaspora photo queue process in the background
+
+	proc_run('php',"include/dsprphotoq.php");
+	
 	// expire any expired accounts
 
 	q("UPDATE user SET `account_expired` = 1 where `account_expired` = 0 

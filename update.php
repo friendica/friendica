@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1157 );
+define( 'UPDATE_VERSION' , 1158 );
 
 /**
  *
@@ -1369,3 +1369,20 @@ ADD INDEX ( `datasize` ) ");
 	if(!$r) return UPDATE_FAILED;
 	return UPDATE_SUCCESS;
 }
+
+function update_1157() {
+	$r = q("CREATE TABLE  IF NOT EXISTS `dsprphotoq` (
+	  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	  `uid` int(11) NOT NULL,
+	  `msg` mediumtext NOT NULL,
+	  `attempt` tinyint(4) NOT NULL,
+	  PRIMARY KEY (`id`)
+	  ) ENGINE=MyISAM DEFAULT CHARSET=utf8"
+	);
+
+	if($r)
+		return UPDATE_SUCCESS;
+
+	return UPDATE_FAILED;
+}
+
