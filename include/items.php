@@ -3732,11 +3732,11 @@ function item_getfeedtags($item) {
 
 function item_getfeedattach($item) {
 	$ret = '';
-	$arr = explode(',',$item['attach']);
+	$arr = explode('[/attach],',$item['attach']);
 	if(count($arr)) {
 		foreach($arr as $r) {
 			$matches = false;
-			$cnt = preg_match('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"\[\/attach\]|',$r,$matches);
+			$cnt = preg_match('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|',$r,$matches);
 			if($cnt) {
 				$ret .= '<link rel="enclosure" href="' . xmlify($matches[1]) . '" type="' . xmlify($matches[3]) . '" ';
 				if(intval($matches[2]))

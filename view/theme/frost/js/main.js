@@ -180,9 +180,9 @@
 					nnm.append(html);
 				});
 
-				$("img[data-src]", nnm).each(function(i, el){
+				$j("img[data-src]", nnm).each(function(i, el){
 					// Add src attribute for images with a data-src attribute
-					$(el).attr('src', $(el).data("src"));
+					$j(el).attr('src', $j(el).data("src"));
 				});
 			}
 			notif = eNotif.attr('count');

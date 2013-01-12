@@ -37,6 +37,7 @@ require_once('include/html2plain.php');
  *		tag						(in photos.php, poke.php, tagger.php)
  *		tgroup					(in items.php)
  *		wall-new				(in photos.php, item.php)
+ *		removeme				(in Contact.php)
  *
  * and ITEM_ID is the id of the item in the database that needs to be sent to others.
  */
@@ -138,14 +139,17 @@ function notifier_run(&$argv, &$argc){
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval($item_id));
 		if (! $r)
 			return;
+
 		$user = $r[0];
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 1 LIMIT 1", intval($item_id));
 		if (! $r)
 			return;
+
 		$self = $r[0];
 		$r = q("SELECT * FROM `contact` WHERE `self` = 0 AND `uid` = %d", intval($item_id));
 		if(! $r)
 			return;
+
 		require_once('include/Contact.php');
 		foreach($r as $contact) {
 			terminate_friendship($user, $self, $contact);

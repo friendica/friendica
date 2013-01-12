@@ -42,6 +42,10 @@ function z_mime_content_type($filename) {
 		'qt' => 'video/quicktime',
 		'mov' => 'video/quicktime',
 		'ogg' => 'application/ogg',
+		'mp4' => 'video/mp4',
+		'avi' => 'video/x-msvideo',
+		'wmv' => 'video/x-ms-wmv',
+		'wma' => 'audio/x-ms-wma',
 
 		// adobe
 		'pdf' => 'application/pdf',

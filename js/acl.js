@@ -253,7 +253,7 @@ ACL.prototype.populate = function(data){
 		//console.log(html);
 		that.list_content.append(html);
 	});
-	$(".acl-list-item[rel!=acl-template] img[data-src]").each(function(i, el){
+	$(".acl-list-item img[data-src]", that.list_content).each(function(i, el){
 		// Add src attribute for images with a data-src attribute
 		$(el).attr('src', $(el).data("src"));
 	});
