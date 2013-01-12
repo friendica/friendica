@@ -220,16 +220,15 @@ function group_content(&$a) {
 		}
 	}
 
+	$context['$groupeditor'] = $groupeditor;
 	$context['$desc'] = t('Click on a contact to add or remove.');
 
 	if($change) {
-		$context['$groupeditor'] = $groupeditor;
 		$tpl = get_markup_template('groupeditor.tpl');
 		echo replace_macros($tpl, $context);
 		killme();
 	}
 	
-	$context['$groupedit_info'] = $groupeditor;
 	return replace_macros($tpl, $context);
 
 }

@@ -516,7 +516,7 @@ function message_content(&$a) {
 			'$to' => t('To:'),
 			'$showinputs' => '',
 			'$subject' => t('Subject:'),
-			'$subjtxt' => template_escape($message['title']),
+			'$subjtxt' => $subjtxt_e,
 			'$readonly' => ' readonly="readonly" style="background: #BBBBBB;" ',
 			'$yourmessage' => t('Your message:'),
 			'$text' => '',

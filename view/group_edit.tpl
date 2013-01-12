@@ -15,9 +15,9 @@
 </div>
 
 
-{{ if $groupedit_info }}
+{{ if $groupeditor }}
 	<div id="group-update-wrapper">
-		{{ inc groupeditor.tpl with $groupeditor=$groupedit_info }}{{ endinc }}
+		{{ inc groupeditor.tpl }}{{ endinc }}
 	</div>
 {{ endif }}
 {{ if $desc }}<div id="group-edit-desc">$desc</div>{{ endif }}

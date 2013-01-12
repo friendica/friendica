@@ -19,8 +19,8 @@
 {{$tabs}}
 
 
-{{foreach $contacts as $c}}
-	{{include file="contact_template.tpl" contact=$c}}
+{{foreach $contacts as $contact}}
+	{{include file="contact_template.tpl"}}
 {{/foreach}}
 <div id="contact-edit-end"></div>
 

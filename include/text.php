@@ -489,12 +489,12 @@ function get_template_file($a, $filename, $root = '') {
 	if($root !== '' && $root[strlen($root)-1] !== '/')
 		$root = $root . '/';
 
-	if(file_exists($root . "view/theme/$theme/$filename"))
-		$template_file = $root . "view/theme/$theme/$filename";
-	elseif (x($a->theme_info,"extends") && file_exists($root . "view/theme/".$a->theme_info["extends"]."/$filename"))
-		$template_file = $root . "view/theme/".$a->theme_info["extends"]."/$filename";
+	if(file_exists("{$root}view/theme/$theme/$filename"))
+		$template_file = "{$root}view/theme/$theme/$filename";
+	elseif (x($a->theme_info,"extends") && file_exists("{$root}view/theme/{$a->theme_info["extends"]}/$filename"))
+		$template_file = "{$root}view/theme/{$a->theme_info["extends"]}/$filename";
 	else
-		$template_file = $root . "view/$filename";
+		$template_file = "{$root}view/$filename";
 
 	return $template_file;
 }}

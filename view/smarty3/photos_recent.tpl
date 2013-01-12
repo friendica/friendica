@@ -9,8 +9,8 @@
 {{/if}}
 
 <div class="photos">
-{{foreach $photos as $ph}}
-	{{include file="photo_top.tpl" photo=$ph}}
+{{foreach $photos as $photo}}
+	{{include file="photo_top.tpl"}}
 {{/foreach}}
 </div>
 <div class="photos-end"></div>

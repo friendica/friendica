@@ -20,8 +20,8 @@
 
 
 <div id="contacts-display-wrapper">
-{{foreach $contacts as $c}}
-	{{include file="contact_template.tpl" contact=$c}}
+{{foreach $contacts as $contact}}
+	{{include file="contact_template.tpl"}}
 {{/foreach}}
 </div>
 <div id="contact-edit-end"></div>

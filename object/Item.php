@@ -497,13 +497,7 @@ class Item extends BaseObject {
 			return false;
 		}
 
-		if($a->theme['template_engine'] === 'smarty3') {
-			$template_file = get_template_file($a, 'smarty3/' . $this->available_templates[$name]);
-		}
-		else {
-			$template_file = $this->available_templates[$name];
-		}
-		$this->template = $template_file;
+		$this->template = $this->available_templates[$name];
 	}
 
 	/**

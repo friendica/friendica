@@ -6,8 +6,6 @@ function profiles_init(&$a) {
 	nav_set_selected('profiles');
 
 	if(! local_user()) {
-		notice( t('Permission denied.') . EOL);
-		killme();
 		return;
 	}
 
@@ -564,6 +562,11 @@ function profile_activity($changed, $value) {
 
 
 function profiles_content(&$a) {
+
+	if(! local_user()) {
+		notice( t('Permission denied.') . EOL);
+		return;
+	}
 
 	$o = '';
 

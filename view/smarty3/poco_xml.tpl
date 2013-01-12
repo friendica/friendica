@@ -14,8 +14,8 @@
 
 
 {{if $response.totalResults}}
-{{foreach $response.entry as $ent}}
-{{include file="poco_entry_xml.tpl" entry=$ent}}
+{{foreach $response.entry as $entry}}
+{{include file="poco_entry_xml.tpl"}}
 {{/foreach}}
 {{else}}
 <entry></entry>

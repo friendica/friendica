@@ -4,8 +4,8 @@
 {{ endif }}
 
 <div class="photos">
-{{ for $photos as $ph }}
-	{{ inc photo_top.tpl with $photo=$ph }}{{ endinc }}
+{{ for $photos as $photo }}
+	{{ inc photo_top.tpl }}{{ endinc }}
 {{ endfor }}
 </div>
 <div class="photos-end"></div>

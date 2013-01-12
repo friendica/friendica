@@ -622,7 +622,6 @@ if(! class_exists('App')) {
 			 */
 			if(!isset($this->page['htmlhead']))
 				$this->page['htmlhead'] = '';
-			$tpl = get_markup_template('head.tpl');
 
 			// If we're using Smarty, then doing replace_macros() will replace
 			// any unrecognized variables with a blank string. Since we delay
@@ -633,6 +632,7 @@ if(! class_exists('App')) {
 			else
 				$stylesheet = '$stylesheet';
 
+			$tpl = get_markup_template('head.tpl');
 			$this->page['htmlhead'] = replace_macros($tpl,array(
 				'$baseurl' => $this->get_baseurl(), // FIXME for z_path!!!!
 				'$local_user' => local_user(),
@@ -1381,8 +1381,6 @@ if(! function_exists('profile_sidebar')) {
 		}
 
 
-		$tpl = get_markup_template('profile_vcard.tpl');
-
 		$p = array();
 		foreach($profile as $k => $v) {
 			$k = str_replace('-','_',$k);
@@ -1392,6 +1390,7 @@ if(! function_exists('profile_sidebar')) {
 		if($a->theme['template_engine'] === 'internal')
 			$location = template_escape($location);
 
+		$tpl = get_markup_template('profile_vcard.tpl');
 		$o .= replace_macros($tpl, array(
 			'$profile' => $p,
 			'$connect'  => $connect,

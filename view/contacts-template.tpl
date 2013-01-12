@@ -14,8 +14,8 @@
 $tabs
 
 
-{{ for $contacts as $c }}
-	{{ inc contact_template.tpl with $contact=$c }}{{ endinc }}
+{{ for $contacts as $contact }}
+	{{ inc contact_template.tpl }}{{ endinc }}
 {{ endfor }}
 <div id="contact-edit-end"></div>
 

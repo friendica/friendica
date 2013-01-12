@@ -8,9 +8,9 @@
 	<a href="message/dropconv/{{$thread_id}}" onclick="return confirmDelete();"  title="{{$delete}}" class="mail-delete icon s22 delete"></a>
 </div>
 
-{{foreach $mails as $mail_item}}
+{{foreach $mails as $mail}}
 	<div id="tread-wrapper-{{$mail_item.id}}" class="tread-wrapper">
-		{{include file="mail_conv.tpl" mail=$mail_item}}
+		{{include file="mail_conv.tpl"}}
 	</div>
 {{/foreach}}
 

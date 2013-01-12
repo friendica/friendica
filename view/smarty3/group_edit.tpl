@@ -20,9 +20,9 @@
 </div>
 
 
-{{if $groupedit_info}}
+{{if $groupeditor}}
 	<div id="group-update-wrapper">
-		{{include file="groupeditor.tpl" groupeditor=$groupedit_info}}
+		{{include file="groupeditor.tpl"}}
 	</div>
 {{/if}}
 {{if $desc}}<div id="group-edit-desc">{{$desc}}</div>{{/if}}

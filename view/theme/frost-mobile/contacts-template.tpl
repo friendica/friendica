@@ -15,8 +15,8 @@ $tabs
 
 
 <div id="contacts-display-wrapper">
-{{ for $contacts as $c }}
-	{{ inc contact_template.tpl with $contact=$c }}{{ endinc }}
+{{ for $contacts as $contact }}
+	{{ inc contact_template.tpl }}{{ endinc }}
 {{ endfor }}
 </div>
 <div id="contact-edit-end"></div>
