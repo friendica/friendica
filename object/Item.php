@@ -66,6 +66,7 @@ class Item extends BaseObject {
 				if(! visible_activity($item)) {
 					continue;
 				}
+				$item['pagedrop'] = $data['pagedrop'];
 				$child = new Item($item);
 				$this->add_child($child);
 			}
