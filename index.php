@@ -140,8 +140,10 @@ if($install)
 	$a->module = 'install';
 elseif($maintenance)
 	$a->module = 'maintenance';
-else
+else {
 	proc_run('php', 'include/dbupdate.php');
+	check_plugins($a);
+}
 
 nav_set_selected('nothing');
 

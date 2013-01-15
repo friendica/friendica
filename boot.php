@@ -806,15 +806,11 @@ function is_ajax() {
 
 // Primarily involved with database upgrade, but also sets the
 // base url for use in cmdline programs which don't have
-// $_SERVER variables, and synchronising the state of installed plugins.
+// $_SERVER variables
 
 
 if(! function_exists('check_config')) {
 	function check_config(&$a) {
-
-		$build = get_config('system','build');
-		if(! x($build))
-			$build = set_config('system','build',DB_UPDATE_VERSION);
 
 		$url = get_config('system','url');
 
@@ -829,6 +825,10 @@ if(! function_exists('check_config')) {
 		if((! link_compare($url,$a->get_baseurl())) && (! preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/",$a->get_hostname)))
 			$url = set_config('system','url',$a->get_baseurl());
 
+
+		$build = get_config('system','build');
+		if(! x($build))
+			$build = set_config('system','build',DB_UPDATE_VERSION);
 
 		if($build != DB_UPDATE_VERSION) {
 			$stored = intval($build);
@@ -897,6 +897,14 @@ if(! function_exists('check_config')) {
 				}
 			}
 		}
+
+		return;
+	}
+}
+
+
+if(! function_exists('check_plugins')) {
+	function check_plugins(&$a) {
 
 		/**
 		 *
