@@ -19,7 +19,7 @@ function dbupdate_run(&$argv, &$argc) {
 	load_config('config');
 	load_config('system');
 
-	check_config($a);
+	update_db($a);
 }
 
 if (array_search(__file__,get_included_files())===0){

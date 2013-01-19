@@ -58,9 +58,9 @@ if(!$install) {
 	require_once("include/session.php");
 	load_hooks();
 	call_hooks('init_1');
-}
 
-$maintenance = get_config('system', 'maintenance');
+	$maintenance = get_config('system', 'maintenance');
+}
 
 
 /**
@@ -141,6 +141,7 @@ if($install)
 elseif($maintenance)
 	$a->module = 'maintenance';
 else {
+	check_url($a);
 	check_db();
 	check_plugins($a);
 }

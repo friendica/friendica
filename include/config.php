@@ -85,6 +85,15 @@ function get_config($family, $key, $instore = false) {
 if(! function_exists('set_config')) {
 function set_config($family,$key,$value) {
 	global $a;
+
+	// If $a->config[$family] has been previously set to '!<unset>!', then
+	// $a->config[$family][$key] will evaluate to $a->config[$family][0], and
+	// $a->config[$family][$key] = $value will be equivalent to
+	// $a->config[$family][0] = $value[0] (this causes infuriating bugs),
+	// so unset the family before assigning a value to a family's key
+	if($a->config[$family] === '!<unset>!')
+		unset($a->config[$family]);
+
 	// manage array value
 	$dbvalue = (is_array($value)?serialize($value):$value);
 	$dbvalue = (is_bool($dbvalue) ? intval($dbvalue) : $dbvalue);

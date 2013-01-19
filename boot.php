@@ -808,7 +808,7 @@ function check_db() {
 	$build = get_config('system','build');
 	if(! x($build)) {
 		set_config('system','build',DB_UPDATE_VERSION);
-		$buid = DB_UPDATE_VERSION;
+		$build = DB_UPDATE_VERSION;
 	}
 	if($build != DB_UPDATE_VERSION)
 		proc_run('php', 'include/dbupdate.php');
@@ -818,13 +818,11 @@ function check_db() {
 
 
 
-// Primarily involved with database upgrade, but also sets the
-// base url for use in cmdline programs which don't have
+// Sets the base url for use in cmdline programs which don't have
 // $_SERVER variables
 
-
-if(! function_exists('check_config')) {
-	function check_config(&$a) {
+if(! function_exists('check_url')) {
+	function check_url(&$a) {
 
 		$url = get_config('system','url');
 
@@ -839,6 +837,15 @@ if(! function_exists('check_config')) {
 		if((! link_compare($url,$a->get_baseurl())) && (! preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/",$a->get_hostname)))
 			$url = set_config('system','url',$a->get_baseurl());
 
+		return;
+	}
+}
+
+
+// Automatic database updates
+
+if(! function_exists('update_db')) {
+	function update_db(&$a) {
 
 		$build = get_config('system','build');
 		if(! x($build))
