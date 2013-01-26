@@ -11,7 +11,7 @@ Hier sieht es ein wenig wie auf deiner Facebook-Seite aus. Hier findest du alle 
 
 Wenn du deinen Beitrag ("Post") geschrieben hast, kannst du auf das "Schloss"-Symbol klicken und festlegen, wer deinen Beitrag sehen kann. Wenn du dieses Symbol nicht anklickst, ist dein Beitrag öffentlich. Das bedeutet, dass jeder, der dein Profil ansieht, der auf dem "Community"-Tab deines Servers oder auf dem "Netzwerk"-Tab ("Beiträge deiner Kontakte") eines befreundeten Kontakts ist, den Beitrag sehen kann.
 
-Probiere es doch einfach mal aus. Wenn du fertig bist, schauen wir uns den <a href="help/Quick-Start-network">"Netzwerk"-Tab</a> an. 
+Probiere es doch einfach mal aus. Wenn du fertg bist, schauen wir uns den <a href="help/network">"Netzwerk"-Tab</a> an. 
 
 <iframe src="login" width="950" height="600"></iframe>
 
