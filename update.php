@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1158 );
+define( 'UPDATE_VERSION' , 1159 );
 
 /**
  *
@@ -1379,6 +1379,22 @@ function update_1157() {
 	  PRIMARY KEY (`id`)
 	  ) ENGINE=MyISAM DEFAULT CHARSET=utf8"
 	);
+
+	if($r)
+		return UPDATE_SUCCESS;
+
+	return UPDATE_FAILED;
+}
+
+function update_1158() {
+	set_config('system', 'maintenance', 1);
+
+	// Wait for 15 seconds for current requests to
+	// clear before locking up the database
+	sleep(15);
+
+	$r = q("CREATE INDEX event_id ON item(`event-id`)");
+	set_config('system', 'maintenance', 0);
 
 	if($r)
 		return UPDATE_SUCCESS;
