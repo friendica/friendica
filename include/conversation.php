@@ -1,6 +1,7 @@
 <?php
 
 require_once("include/bbcode.php");
+require_once("include/acl_selectors.php");
 
 
 // Note: the code in 'item_extract_images' and 'item_redir_and_replace_images'
@@ -704,6 +705,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 
 	$o = replace_macros($page_template, array(
 		'$baseurl' => $a->get_baseurl($ssl_state),
+		'$return_path' => $a->query_string,
 		'$live_update' => $live_update_div,
 		'$remove' => t('remove'),
 		'$mode' => $mode,
@@ -908,7 +910,7 @@ function format_like($cnt,$arr,$type,$id) {
 			$str .= sprintf( t(', and %d other people'), $total - MAX_LIKERS );
 		}
 		$str = (($type === 'like') ? sprintf( t('%s like this.'), $str) : sprintf( t('%s don\'t like this.'), $str));
-		$o .= "\t" . '<div id="' . $type . 'list-' . $id . '" style="display: none;" >' . $str . '</div>';
+		$o .= "\t" . '<div class="wall-item-' . $type . '-expanded" id="' . $type . 'list-' . $id . '" style="display: none;" >' . $str . '</div>';
 	}
 	return $o;
 }}
@@ -962,8 +964,6 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 	));
 
 
-	$tpl = get_markup_template("jot.tpl");
-
 	$jotplugins = '';
 	$jotnets = '';
 
@@ -994,10 +994,31 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 	if($notes_cid)
 		$jotnets .= '<input type="hidden" name="contact_allow[]" value="' . $notes_cid .'" />';
 
+
+	// Private/public post links for the non-JS ACL form
+	$private_post = 1;
+	if($_REQUEST['public'])
+		$private_post = 0;
+
+	$query_str = $a->query_string;
+	if(strpos($query_str, 'public=1') !== false)
+		$query_str = str_replace(array('?public=1', '&public=1'), array('', ''), $query_str);
+
+	// I think $a->query_string may never have ? in it, but I could be wrong
+	// It looks like it's from the index.php?q=[etc] rewrite that the web
+	// server does, which converts any ? to &, e.g. suggest&ignore=61 for suggest?ignore=61
+	if(strpos($query_str, '?') === false)
+		$public_post_link = '?public=1';
+	else
+		$public_post_link = '&public=1';
+
+
+
 //	$tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));
+	$tpl = get_markup_template("jot.tpl");
 
 	$o .= replace_macros($tpl,array(
-		'$return_path' => $a->query_string,
+		'$return_path' => $query_str,
 		'$action' =>  $a->get_baseurl(true) . '/item',
 		'$share' => (x($x,'button') ? $x['button'] : t('Share')),
 		'$upload' => t('Upload photo'),
@@ -1033,14 +1054,22 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		'$jotnets' => $jotnets,
 		'$emtitle' => t('Example: bob@example.com, mary@example.com'),
 		'$lockstate' => $x['lockstate'],
-		'$acl' => $x['acl'],
 		'$bang' => $x['bang'],
 		'$profile_uid' => $x['profile_uid'],
 		'$preview' => ((feature_enabled($x['profile_uid'],'preview')) ? t('Preview') : ''),
 		'$jotplugins' => $jotplugins,
 		'$sourceapp' => t($a->sourcename),
 		'$cancel' => t('Cancel'),
-		'$rand_num' => random_digits(12)
+		'$rand_num' => random_digits(12),
+
+		// ACL permissions box
+		'$acl' => $x['acl'],
+		'$acl_data' => $x['acl_data'],
+		'$group_perms' => t('Post to Groups'),
+		'$contact_perms' => t('Post to Contacts'),
+		'$private' => t('Private post'),
+		'$is_private' => $private_post,
+		'$public_link' => $public_post_link,
 	));
 
 

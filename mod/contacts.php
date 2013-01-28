@@ -225,6 +225,36 @@ function contacts_content(&$a) {
 
 		if($cmd === 'drop') {
 
+			// Check if we should do HTML-based delete confirmation
+			if($_REQUEST['confirm']) {
+				// <form> can't take arguments in its "action" parameter
+				// so add any arguments as hidden inputs
+				$query = explode_querystring($a->query_string);
+				$inputs = array();
+				foreach($query['args'] as $arg) {
+					if(strpos($arg, 'confirm=') === false) {
+						$arg_parts = explode('=', $arg);
+						$inputs[] = array('name' => $arg_parts[0], 'value' => $arg_parts[1]);
+					}
+				}
+
+				$a->page['aside'] = '';
+				return replace_macros(get_markup_template('confirm.tpl'), array(
+					'$method' => 'get',
+					'$message' => t('Do you really want to delete this contact?'),
+					'$extra_inputs' => $inputs,
+					'$confirm' => t('Yes'),
+					'$confirm_url' => $query['base'],
+					'$confirm_name' => 'confirmed',
+					'$cancel' => t('Cancel'),
+				));
+			}
+			// Now check how the user responded to the confirmation query
+			if($_REQUEST['canceled']) {
+				goaway($a->get_baseurl(true) . '/' . $_SESSION['return_url']);
+
+			}
+
 			require_once('include/Contact.php');
 
 			terminate_friendship($a->user,$a->contact,$orig_record[0]);
@@ -238,6 +268,10 @@ function contacts_content(&$a) {
 			return; // NOTREACHED
 		}
 	}
+
+
+
+	$_SESSION['return_url'] = $a->query_string;
 
 	if((x($a->data,'contact')) && (is_array($a->data['contact']))) {
 
@@ -404,8 +438,6 @@ function contacts_content(&$a) {
 	$hidden = false;
 	$ignored = false;
 	$all = false;
-
-	$_SESSION['return_url'] = $a->query_string;
 
 	if(($a->argc == 2) && ($a->argv[1] === 'all')) {
 		$sql_extra = '';

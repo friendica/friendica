@@ -166,6 +166,11 @@ function photos_post(&$a) {
 			return; // NOTREACHED
 		}
 
+		// Check if the user has responded to a delete confirmation query
+		if($_REQUEST['canceled']) {
+			goaway($a->get_baseurl() . '/' . $_SESSION['photo_return']);
+		}
+
 		$newalbum = notags(trim($_POST['albumname']));
 		if($newalbum != $album) {
 			q("UPDATE `photo` SET `album` = '%s' WHERE `album` = '%s' AND `uid` = %d",
@@ -180,6 +185,25 @@ function photos_post(&$a) {
 
 
 		if($_POST['dropalbum'] == t('Delete Album')) {
+
+			// Check if we should do HTML-based delete confirmation
+			if($_REQUEST['confirm']) {
+				$drop_url = $a->query_string;
+				$extra_inputs = array(
+					array('name' => 'albumname', 'value' => $_POST['albumname']),
+				);
+				$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), array(
+					'$method' => 'post',
+					'$message' => t('Do you really want to delete this photo album and all its photos?'),
+					'$extra_inputs' => $extra_inputs,
+					'$confirm' => t('Delete Album'),
+					'$confirm_url' => $drop_url,
+					'$confirm_name' => 'dropalbum', // Needed so that confirmation will bring us back into this if statement
+					'$cancel' => t('Cancel'),
+				));
+				$a->error = 1; // Set $a->error so the other module functions don't execute
+				return;
+			}
 
 			$res = array();
 
@@ -242,9 +266,31 @@ function photos_post(&$a) {
 		return; // NOTREACHED
 	}
 
+
+	// Check if the user has responded to a delete confirmation query for a single photo
+	if(($a->argc > 2) && $_REQUEST['canceled']) {
+		goaway($a->get_baseurl() . '/' . $_SESSION['photo_return']);
+	}
+
 	if(($a->argc > 2) && (x($_POST,'delete')) && ($_POST['delete'] == t('Delete Photo'))) {
 
 		// same as above but remove single photo
+
+		// Check if we should do HTML-based delete confirmation
+		if($_REQUEST['confirm']) {
+			$drop_url = $a->query_string;
+			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), array(
+				'$method' => 'post',
+				'$message' => t('Do you really want to delete this photo?'),
+				'$extra_inputs' => array(),
+				'$confirm' => t('Delete Photo'),
+				'$confirm_url' => $drop_url,
+				'$confirm_name' => 'delete', // Needed so that confirmation will bring us back into this if statement
+				'$cancel' => t('Cancel'),
+			));
+			$a->error = 1; // Set $a->error so the other module functions don't execute
+			return;
+		}
 
 		if($visitor) {
 			$r = q("SELECT `id`, `resource-id` FROM `photo` WHERE `contact-id` = %d AND `uid` = %d AND `resource-id` = '%s' LIMIT 1",
@@ -284,7 +330,7 @@ function photos_post(&$a) {
 			}
 		}
 
-		goaway($a->get_baseurl() . '/' . $_SESSION['photo_return']);
+		goaway($a->get_baseurl() . '/photos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
@@ -1024,8 +1070,10 @@ function photos_content(&$a) {
 
 		call_hooks('photo_upload_form',$ret);
 
-		$default_upload = '<input id="photos-upload-choose" type="file" name="userfile" /> 	<div class="photos-upload-submit-wrapper" >
-		<input type="submit" name="submit" value="' . t('Submit') . '" id="photos-upload-submit" /> </div>';
+		$default_upload_box = replace_macros(get_markup_template('photos_default_uploader_box.tpl'), array());
+		$default_upload_submit = replace_macros(get_markup_template('photos_default_uploader_submit.tpl'), array(
+			'$submit' => t('Submit'),
+		));
 
 		$usage_message = '';
 		$limit = service_class_fetch($a->data['user']['uid'],'photo_upload_limit');
@@ -1036,6 +1084,25 @@ function photos_content(&$a) {
 			);
 			$usage_message = sprintf( t("You have used %1$.2f Mbytes of %2$.2f Mbytes photo storage."), $r[0]['total'] / 1024000, $limit / 1024000 );
 		}
+
+
+		// Private/public post links for the non-JS ACL form
+		$private_post = 1;
+		if($_REQUEST['public'])
+			$private_post = 0;
+
+		$query_str = $a->query_string;
+		if(strpos($query_str, 'public=1') !== false)
+			$query_str = str_replace(array('?public=1', '&public=1'), array('', ''), $query_str);
+
+		// I think $a->query_string may never have ? in it, but I could be wrong
+		// It looks like it's from the index.php?q=[etc] rewrite that the web
+		// server does, which converts any ? to &, e.g. suggest&ignore=61 for suggest?ignore=61
+		if(strpos($query_str, '?') === false)
+			$public_post_link = '?public=1';
+		else
+			$public_post_link = '&public=1';
+
 
 
 		$tpl = get_markup_template('photos_upload.tpl');
@@ -1060,9 +1127,20 @@ function photos_content(&$a) {
 			'$albumselect' => $albumselect_e,
 			'$permissions' => t('Permissions'),
 			'$aclselect' => $aclselect_e,
-			'$uploader' => $ret['addon_text'],
-			'$default' => (($ret['default_upload']) ? $default_upload : ''),
-			'$uploadurl' => $ret['post_url']
+			'$alt_uploader' => $ret['addon_text'],
+			'$default_upload_box' => (($ret['default_upload']) ? $default_upload_box : ''),
+			'$default_upload_submit' => (($ret['default_upload']) ? $default_upload_submit : ''),
+			'$uploadurl' => $ret['post_url'],
+
+			// ACL permissions box
+			'$acl_data' => construct_acl_data($a, $a->user), // For non-Javascript ACL selector
+			'$group_perms' => t('Show to Groups'),
+			'$contact_perms' => t('Show to Contacts'),
+			'$private' => t('Private Photo'),
+			'$public' => t('Public Photo'),
+			'$is_private' => $private_post,
+			'$return_path' => $query_str,
+			'$public_link' => $public_post_link,
 
 		));
 
@@ -1372,6 +1450,24 @@ function photos_content(&$a) {
 		if(($cmd === 'edit') && ($can_post)) {
 			$edit_tpl = get_markup_template('photo_edit.tpl');
 
+			// Private/public post links for the non-JS ACL form
+			$private_post = 1;
+			if($_REQUEST['public'])
+				$private_post = 0;
+
+			$query_str = $a->query_string;
+			if(strpos($query_str, 'public=1') !== false)
+				$query_str = str_replace(array('?public=1', '&public=1'), array('', ''), $query_str);
+
+			// I think $a->query_string may never have ? in it, but I could be wrong
+			// It looks like it's from the index.php?q=[etc] rewrite that the web
+			// server does, which converts any ? to &, e.g. suggest&ignore=61 for suggest?ignore=61
+			if(strpos($query_str, '?') === false)
+				$public_post_link = '?public=1';
+			else
+				$public_post_link = '&public=1';
+
+
 			if($a->theme['template_engine'] === 'internal') {
 				$album_e = template_escape($ph[0]['album']);
 				$caption_e = template_escape($ph[0]['desc']);
@@ -1400,7 +1496,17 @@ function photos_content(&$a) {
 				'$help_tags' => t('Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping'),
 				'$item_id' => ((count($linked_items)) ? $link_item['id'] : 0),
 				'$submit' => t('Submit'),
-				'$delete' => t('Delete Photo')
+				'$delete' => t('Delete Photo'),
+
+				// ACL permissions box
+				'$acl_data' => construct_acl_data($a, $ph[0]), // For non-Javascript ACL selector
+				'$group_perms' => t('Show to Groups'),
+				'$contact_perms' => t('Show to Contacts'),
+				'$private' => t('Private photo'),
+				'$public' => t('Public photo'),
+				'$is_private' => $private_post,
+				'$return_path' => $query_str,
+				'$public_link' => $public_post_link,
 			));
 		}
 
@@ -1418,9 +1524,10 @@ function photos_content(&$a) {
 				$likebuttons = replace_macros($like_tpl,array(
 					'$id' => $link_item['id'],
 					'$likethis' => t("I like this \x28toggle\x29"),
-					'$nolike' => t("I don't like this \x28toggle\x29"),
+					'$nolike' => (feature_enabled(local_user(), 'dislike') ? t("I don't like this \x28toggle\x29") : ''),
 					'$share' => t('Share'),
-					'$wait' => t('Please wait')
+					'$wait' => t('Please wait'),
+					'$return_path' => $a->query_string,
 				));
 			}
 

@@ -1,5 +1,7 @@
 <?php
 
+require_once("include/text.php");
+
 
 function manage_post(&$a) {
 
@@ -68,6 +70,10 @@ function manage_post(&$a) {
 	unset($_SESSION['return_url']);
 	if(x($_SESSION,'submanage'))
 		unset($_SESSION['submanage']);
+	if(x($_SESSION,'sysmsg'))
+		unset($_SESSION['sysmsg']);
+	if(x($_SESSION,'sysmsg_info'))
+		unset($_SESSION['sysmsg_info']);
 
 	require_once('include/security.php');
 	authenticate_success($r[0],true,true);
@@ -91,27 +97,18 @@ function manage_content(&$a) {
 		return;
 	}
 
-	$o = '<h3>' . t('Manage Identities and/or Pages') . '</h3>';
-
-	
-	$o .= '<div id="identity-manage-desc">' . t('Toggle between different identities or community/group pages which share your account details or which you have been granted "manage" permissions') . '</div>';
-
-	$o .= '<div id="identity-manage-choose">' . t('Select an identity to manage: ') . '</div>';
-
-	$o .= '<div id="identity-selector-wrapper">' . "\r\n";
-	$o .= '<form action="manage" method="post" >' . "\r\n";
-	$o .= '<select name="identity" size="4" onchange="this.form.submit();" >' . "\r\n";
-
-	foreach($a->identities as $rr) {
-		$selected = (($rr['nickname'] === $a->user['nickname']) ? ' selected="selected" ' : '');
-		$o .= '<option ' . $selected . 'value="' . $rr['uid'] . '">' . $rr['username'] . ' (' . $rr['nickname'] . ')</option>' . "\r\n";
+	$identities = $a->identities;
+	foreach($identities as $key=>$id) {
+		$identities[$key]['selected'] = (($id['nickname'] === $a->user['nickname']) ? ' selected="selected" ' : '');
 	}
 
-	$o .= '</select>' . "\r\n";
-	$o .= '<div id="identity-select-break"></div>' . "\r\n";
-
-//	$o .= '<input id="identity-submit" type="submit" name="submit" value="' . t('Submit') . '" />';
-	$o .= '</div></form>' . "\r\n";
+	$o = replace_macros(get_markup_template('manage.tpl'), array(
+		'$title' => t('Manage Identities and/or Pages'),
+		'$desc' => t('Toggle between different identities or community/group pages which share your account details or which you have been granted "manage" permissions'),
+		'$choose' => t('Select an identity to manage: '),
+		'$identities' => $identities,
+		'$submit' => t('Submit'),
+	));
 
 	return $o;
 

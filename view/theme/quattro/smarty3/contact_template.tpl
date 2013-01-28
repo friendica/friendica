@@ -15,7 +15,13 @@
 			{{if $contact.photo_menu}}
 			<a href="#" rel="#contact-photo-menu-{{$contact.id}}" class="contact-photo-menu-button icon s16 menu" id="contact-photo-menu-button-{{$contact.id}}">menu</a>
 			<ul class="contact-photo-menu menu-popup" id="contact-photo-menu-{{$contact.id}}">
-				{{$contact.photo_menu}}
+				{{foreach $contact.photo_menu as $c}}
+				{{if $c.2}}
+				<li><a target="redir" href="{{$c.1}}">{{$c.0}}</a></li>
+				{{else}}
+				<li><a href="{{$c.1}}">{{$c.0}}</a></li>
+				{{/if}}
+				{{/foreach}}
 			</ul>
 			{{/if}}
 		</div>

@@ -927,10 +927,12 @@ function item_content(&$a) {
 
 	require_once('include/security.php');
 
+	$o = '';
 	if(($a->argc == 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
 		require_once('include/items.php');
-		drop_item($a->argv[2]);
+		$o = drop_item($a->argv[2]);
 	}
+	return $o;
 }
 
 /**

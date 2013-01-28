@@ -82,6 +82,8 @@ function message_post(&$a) {
 		$a->argc = 2;
 		$a->argv[1] = 'new';
 	}
+	else
+		goaway($a->get_baseurl(true) . '/' . $_SESSION['return_url']);
 
 }
 
@@ -185,6 +187,36 @@ function message_content(&$a) {
 	if(($a->argc == 3) && ($a->argv[1] === 'drop' || $a->argv[1] === 'dropconv')) {
 		if(! intval($a->argv[2]))
 			return;
+
+		// Check if we should do HTML-based delete confirmation
+		if($_REQUEST['confirm']) {
+			// <form> can't take arguments in its "action" parameter
+			// so add any arguments as hidden inputs
+			$query = explode_querystring($a->query_string);
+			$inputs = array();
+			foreach($query['args'] as $arg) {
+				if(strpos($arg, 'confirm=') === false) {
+					$arg_parts = explode('=', $arg);
+					$inputs[] = array('name' => $arg_parts[0], 'value' => $arg_parts[1]);
+				}
+			}
+
+			//$a->page['aside'] = '';
+			return replace_macros(get_markup_template('confirm.tpl'), array(
+				'$method' => 'get',
+				'$message' => t('Do you really want to delete this message?'),
+				'$extra_inputs' => $inputs,
+				'$confirm' => t('Yes'),
+				'$confirm_url' => $query['base'],
+				'$confirm_name' => 'confirmed',
+				'$cancel' => t('Cancel'),
+			));
+		}
+		// Now check how the user responded to the confirmation query
+		if($_REQUEST['canceled']) {
+			goaway($a->get_baseurl(true) . '/' . $_SESSION['return_url']);
+		}
+
 		$cmd = $a->argv[1];
 		if($cmd === 'drop') {
 			$r = q("DELETE FROM `mail` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -194,7 +226,8 @@ function message_content(&$a) {
 			if($r) {
 				info( t('Message deleted.') . EOL );
 			}
-			goaway($a->get_baseurl(true) . '/message' );
+			//goaway($a->get_baseurl(true) . '/message' );
+			goaway($a->get_baseurl(true) . '/' . $_SESSION['return_url']);
 		}
 		else {
 			$r = q("SELECT `parent-uri`,`convid` FROM `mail` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -224,7 +257,8 @@ function message_content(&$a) {
 				if($r)
 					info( t('Conversation removed.') . EOL );
 			} 
-			goaway($a->get_baseurl(true) . '/message' );
+			//goaway($a->get_baseurl(true) . '/message' );
+			goaway($a->get_baseurl(true) . '/' . $_SESSION['return_url']);
 		}	
 	
 	}
@@ -303,6 +337,9 @@ function message_content(&$a) {
 
 		return $o;
 	}
+
+
+	$_SESSION['return_url'] = $a->query_string;
 
 	if($a->argc == 1) {
 

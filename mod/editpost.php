@@ -85,16 +85,19 @@ function editpost_content(&$a) {
 		}
 	}
 
-	if($mail_enabled) {
+	// I don't think there's any need for the $jotnets when editing the post,
+	// and including them makes it difficult for the JS-free theme, so let's
+	// disable them
+/*	if($mail_enabled) {
        $selected = (($pubmail_enabled) ? ' checked="checked" ' : '');
 		$jotnets .= '<div class="profile-jot-net"><input type="checkbox" name="pubmail_enable"' . $selected . ' value="1" /> '
           	. t("Post to Email") . '</div>';
-	}
+	}*/
 					
 
 
 	call_hooks('jot_tool', $jotplugins);
-	call_hooks('jot_networks', $jotnets);
+	//call_hooks('jot_networks', $jotnets);
 
 	
 	//$tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));	

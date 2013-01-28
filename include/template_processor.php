@@ -259,14 +259,14 @@ class Template {
 	public function replace($s, $r) {
 		$this->r = $r;
 
+		// remove comments block
+		$s = preg_replace('/{#(.*?\s*?)*?#}/', "", $s);
+
 		$s = $this->_build_nodes($s);
 
 		$s = preg_replace_callback('/\|\|([0-9]+)\|\|/', array($this, "_replcb_node"), $s);
 		if ($s == Null)
 			$this->_preg_error();
-
-		// remove comments block
-		$s = preg_replace('/{#[^#]*#}/', "", $s);
 
 		// replace strings recursively (limit to 10 loops)
 		$os = "";

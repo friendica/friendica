@@ -222,13 +222,13 @@ function contact_photo_menu($contact) {
 	$posts_link = $a->get_baseurl() . '/network/?cid=' . $contact['id'];
 
 	$menu = Array(
-		t("Poke") => $poke_link,
-		t("View Status") => $status_link,
-		t("View Profile") => $profile_link,
-		t("View Photos") => $photos_link,		
-		t("Network Posts") => $posts_link, 
-		t("Edit Contact") => $contact_url,
-		t("Send PM") => $pm_url,
+		'poke' => array(t("Poke"), $poke_link),
+		'status' => array(t("View Status"), $status_link),
+		'profile' => array(t("View Profile"), $profile_link),
+		'photos' => array(t("View Photos"), $photos_link),		
+		'network' => array(t("Network Posts"), $posts_link), 
+		'edit' => array(t("Edit Contact"), $contact_url),
+		'pm' => array(t("Send PM"), $pm_url),
 	);
 	
 	
@@ -236,7 +236,7 @@ function contact_photo_menu($contact) {
 	
 	call_hooks('contact_photo_menu', $args);
 	
-	$o = "";
+/*	$o = "";
 	foreach($menu as $k=>$v){
 		if ($v!="") {
 			if(($k !== t("Network Posts")) && ($k !== t("Send PM")) && ($k !== t('Edit Contact')))
@@ -245,7 +245,16 @@ function contact_photo_menu($contact) {
 				$o .= "<li><a href=\"$v\">$k</a></li>\n";
 		}
 	}
-	return $o;
+	return $o;*/
+	foreach($menu as $k=>$v){
+		if ($v[1]!="") {
+			if(($v[0] !== t("Network Posts")) && ($v[0] !== t("Send PM")) && ($v[0] !== t('Edit Contact')))
+				$menu[$k][2] = 1;
+			else
+				$menu[$k][2] = 0;
+		}
+	}
+	return $menu;
 }}
 
 

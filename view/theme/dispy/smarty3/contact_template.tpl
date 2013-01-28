@@ -16,7 +16,13 @@
 			<span onclick="openClose('contact-photo-menu-{{$contact.id}}');" class="fakelink contact-photo-menu-button" id="contact-photo-menu-button-{{$contact.id}}">menu</span>
                 <div class="contact-photo-menu" id="contact-photo-menu-{{$contact.id}}">
                     <ul>
-                        {{$contact.photo_menu}}
+						{{foreach $contact.photo_menu as $c}}
+						{{if $c.2}}
+						<li><a target="redir" href="{{$c.1}}">{{$c.0}}</a></li>
+						{{else}}
+						<li><a href="{{$c.1}}">{{$c.0}}</a></li>
+						{{/if}}
+						{{/foreach}}
                     </ul>
                 </div>
 			{{/if}}

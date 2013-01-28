@@ -560,10 +560,12 @@ function network_content(&$a, $update = 0) {
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
 			'lockstate' => ((($group) || ($cid) || ($nets) || (is_array($a->user) && ((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) || (strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
+			'default_perms' => get_acl_permissions($a->user),
 			'acl' => populate_acl((($group || $cid || $nets) ? $def_acl : $a->user), $celeb),
 			'bang' => (($group || $cid || $nets) ? '!' : ''),
 			'visitor' => 'block',
-			'profile_uid' => local_user()
+			'profile_uid' => local_user(),
+			'acl_data' => construct_acl_data($a, $a->user), // For non-Javascript ACL selector
 		);
 
 		$o .= status_editor($a,$x);

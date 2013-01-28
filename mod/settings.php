@@ -1012,6 +1012,25 @@ function settings_content(&$a) {
 	require_once('include/group.php');
 	$group_select = mini_group_select(local_user(),$a->user['def_gid']);
 
+
+	// Private/public post links for the non-JS ACL form
+	$private_post = 1;
+	if($_REQUEST['public'])
+		$private_post = 0;
+
+	$query_str = $a->query_string;
+	if(strpos($query_str, 'public=1') !== false)
+		$query_str = str_replace(array('?public=1', '&public=1'), array('', ''), $query_str);
+
+	// I think $a->query_string may never have ? in it, but I could be wrong
+	// It looks like it's from the index.php?q=[etc] rewrite that the web
+	// server does, which converts any ? to &, e.g. suggest&ignore=61 for suggest?ignore=61
+	if(strpos($query_str, '?') === false)
+		$public_post_link = '?public=1';
+	else
+		$public_post_link = '&public=1';
+
+
 	$o .= replace_macros($stpl, array(
 		'$ptitle' 	=> t('Account Settings'),
 
@@ -1045,6 +1064,17 @@ function settings_content(&$a) {
 		'$suggestme' => $suggestme,
 		'$blockwall'=> $blockwall, // array('blockwall', t('Allow friends to post to your profile page:'), !$blockwall, ''),
 		'$blocktags'=> $blocktags, // array('blocktags', t('Allow friends to tag your posts:'), !$blocktags, ''),
+
+		// ACL permissions box
+		'$acl_data' => construct_acl_data($a, $a->user), // For non-Javascript ACL selector
+		'$group_perms' => t('Show to Groups'),
+		'$contact_perms' => t('Show to Contacts'),
+		'$private' => t('Default Private Post'),
+		'$public' => t('Default Public Post'),
+		'$is_private' => $private_post,
+		'$return_path' => $query_str,
+		'$public_link' => $public_post_link,
+		'$settings_perms' => t('Default Permissions for New Posts'),
 
 		'$group_select' => $group_select,
 

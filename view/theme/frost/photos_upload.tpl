@@ -19,6 +19,7 @@
 	<div id="photos-upload-exist-end"></div>
 
 	<div id="photos-upload-choosefile-outer-wrapper">
+	$default_upload_box
 	<div id="photos-upload-noshare-div" class="photos-upload-noshare-div" >
 		<input id="photos-upload-noshare" type="checkbox" name="not_visible" value="1" checked />
 		<div id="photos-upload-noshare-label">
@@ -41,9 +42,9 @@
 
 	<div id="photos-upload-spacer"></div>
 
-	$uploader
+	$alt_uploader
 
-	$default
+	$default_upload_submit
 
 	<div class="photos-upload-end" ></div>
 	</div>

@@ -3874,6 +3874,34 @@ function drop_item($id,$interactive = true) {
 
 	if((local_user() == $item['uid']) || ($cid) || (! $interactive)) {
 
+		// Check if we should do HTML-based delete confirmation
+		if($_REQUEST['confirm']) {
+			// <form> can't take arguments in its "action" parameter
+			// so add any arguments as hidden inputs
+			$query = explode_querystring($a->query_string);
+			$inputs = array();
+			foreach($query['args'] as $arg) {
+				if(strpos($arg, 'confirm=') === false) {
+					$arg_parts = explode('=', $arg);
+					$inputs[] = array('name' => $arg_parts[0], 'value' => $arg_parts[1]);
+				}
+			}
+
+			return replace_macros(get_markup_template('confirm.tpl'), array(
+				'$method' => 'get',
+				'$message' => t('Do you really want to delete this item?'),
+				'$extra_inputs' => $inputs,
+				'$confirm' => t('Yes'),
+				'$confirm_url' => $query['base'],
+				'$confirm_name' => 'confirmed',
+				'$cancel' => t('Cancel'),
+			));
+		}
+		// Now check how the user responded to the confirmation query
+		if($_REQUEST['canceled']) {
+			goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
+		}
+
 		logger('delete item: ' . $item['id'], LOGGER_DEBUG);
 		// delete the item
 

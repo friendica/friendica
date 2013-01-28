@@ -112,8 +112,9 @@ function display_content(&$a, $update = 0) {
 			'acl' => populate_acl($a->user, $celeb),
 			'bang' => '',
 			'visitor' => 'block',
-			'profile_uid' => local_user()
-		);	
+			'profile_uid' => local_user(),
+			'acl_data' => construct_acl_data($a, $a->user), // For non-Javascript ACL selector
+		);
 		$o .= status_editor($a,$x,0,true);
 	}
 

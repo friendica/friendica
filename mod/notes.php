@@ -60,8 +60,8 @@ function notes_content(&$a,$update = false) {
     	    'bang' => '',
         	'visitor' => 'block',
 	   	    'profile_uid' => local_user(),
-			'button' => t('Save')
-
+			'button' => t('Save'),
+			'acl_data' => '',
     	);
 
     	$o .= status_editor($a,$x,$a->contact['id']);

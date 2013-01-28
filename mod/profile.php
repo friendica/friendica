@@ -198,7 +198,8 @@ function profile_content(&$a, $update = 0) {
             	'acl' => (($is_owner) ? populate_acl($a->user, $celeb) : ''),
 	            'bang' => '',
     	        'visitor' => (($is_owner || $commvisitor) ? 'block' : 'none'),
-        	    'profile_uid' => $a->profile['profile_uid']
+        	    'profile_uid' => $a->profile['profile_uid'],
+				'acl_data' => ( $is_owner ? construct_acl_data($a, $a->user) : '' ), // For non-Javascript ACL selector
         	);
 
         	$o .= status_editor($a,$x);

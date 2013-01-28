@@ -28,6 +28,16 @@ function starred_init(&$a) {
 		intval($message_id)
 	);
  
+	// See if we've been passed a return path to redirect to
+	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
+	if($return_path) {
+		$rand = '_=' . time();
+		if(strpos($return_path, '?')) $rand = "&$rand";
+		else $rand = "?$rand";
+
+		goaway($a->get_baseurl() . "/" . $return_path . $rand);
+	}
+
 	// the json doesn't really matter, it will either be 0 or 1
 
 	echo json_encode($starred);

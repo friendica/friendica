@@ -105,6 +105,10 @@ function like_content(&$a) {
 	}
 
 
+	// See if we've been passed a return path to redirect to
+	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
+
+
 	$r = q("SELECT * FROM `item` WHERE `verb` = '%s' AND `deleted` = 0 
 		AND `contact-id` = %d AND ( `parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s') LIMIT 1",
 		dbesc($activity),
@@ -137,7 +141,9 @@ function like_content(&$a) {
 //		proc_run('php',"include/notifier.php","like","$post_id"); // $post_id isn't defined here!
 		$like_item_id = $like_item['id'];
 		proc_run('php',"include/notifier.php","like","$like_item_id");
-		return;
+
+		like_content_return($a->get_baseurl(), $return_path);
+		return; // NOTREACHED
 	}
 
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
@@ -221,8 +227,26 @@ EOT;
 
 	proc_run('php',"include/notifier.php","like","$post_id");
 
-	killme();
+	like_content_return($a->get_baseurl(), $return_path);
+	killme(); // NOTREACHED
 //	return; // NOTREACHED
+}
+
+
+// Decide how to return. If we were called with a 'return' argument,
+// then redirect back to the calling page. If not, just quietly end
+
+function like_content_return($baseurl, $return_path) {
+
+	if($return_path) {
+		$rand = '_=' . time();
+		if(strpos($return_path, '?')) $rand = "&$rand";
+		else $rand = "?$rand";
+
+		goaway($baseurl . "/" . $return_path . $rand);
+	}
+
+	killme();
 }
 
 

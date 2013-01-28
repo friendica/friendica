@@ -588,7 +588,7 @@ class Item extends BaseObject {
 				$qcomment = (($qc) ? explode("\n",$qc) : null);
 			}
 			$comment_box = replace_macros($template,array(
-				'$return_path' => '',
+				'$return_path' => $a->query_string,
 				'$threaded' => $this->is_threaded(),
 //				'$jsreload' => (($conv->get_mode() === 'display') ? $_SESSION['return_url'] : ''),
 				'$jsreload' => '',
