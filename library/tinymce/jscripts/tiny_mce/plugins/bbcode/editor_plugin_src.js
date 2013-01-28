@@ -47,16 +47,16 @@
 			function rep(re, str) {
 
 
-s = s.replace(re,str);
+				s = s.replace(re,str);
 
 				//modify code to keep stuff intact within [code][/code] blocks
 				//Waitman Gobble NO WARRANTY
 
-/* This doesn't seem to work well with
-[code]line1
-line2[/code]
-commenting out for now
-*/
+				/* This doesn't seem to work well with
+				[code]line1
+				line2[/code]
+				commenting out for now
+				*/
 
 /*
 				var o = new Array();
@@ -84,6 +84,9 @@ commenting out for now
 			};
 
 
+			function get(re) {
+				return s.match(re);
+			}
 
 
 			/* oembed */
@@ -119,6 +122,7 @@ commenting out for now
 				
 				return match;
 			}
+
 			if (s.indexOf('class="oembed')>=0){
 				//alert("request oembed html2bbcode");
 				s = _h2b_cb(s);
@@ -127,17 +131,23 @@ commenting out for now
 			/* /oembed */
 
 
+			// Preserve HTML tags inside code blocks
+			var codes = get(/<code>(.*?)<\/code>/gi);
+			rep(/<code>(.*?)<\/code>/gi,"[$!$!CODEBLOCK!$!$]");
+
 			// example: <strong> to [b]
 			rep(/<a class=\"bookmark\" href=\"(.*?)\".*?>(.*?)<\/a>/gi,"[bookmark=$1]$2[/bookmark]");
 			rep(/<a.*?href=\"(.*?)\".*?>(.*?)<\/a>/gi,"[url=$1]$2[/url]");
 			rep(/<span style=\"font-size:(.*?);\">(.*?)<\/span>/gi,"[size=$1]$2[/size]");
 			rep(/<span style=\"color:(.*?);\">(.*?)<\/span>/gi,"[color=$1]$2[/color]");
 			rep(/<font>(.*?)<\/font>/gi,"$1");
-			rep(/<img.*?width=\"(.*?)\".*?height=\"(.*?)\".*?src=\"(.*?)\".*?\/>/gi,"[img=$1x$2]$3[/img]");
-			rep(/<img.*?height=\"(.*?)\".*?width=\"(.*?)\".*?src=\"(.*?)\".*?\/>/gi,"[img=$2x$1]$3[/img]");
-			rep(/<img.*?src=\"(.*?)\".*?height=\"(.*?)\".*?width=\"(.*?)\".*?\/>/gi,"[img=$3x$2]$1[/img]");
-			rep(/<img.*?src=\"(.*?)\".*?width=\"(.*?)\".*?height=\"(.*?)\".*?\/>/gi,"[img=$2x$3]$1[/img]");
-			rep(/<img.*?src=\"(.*?)\".*?\/>/gi,"[img]$1[/img]");
+
+			// Use [^>]* instead of .* to prevent a match against two separate <img> tags
+			rep(/<img[^>]*?width=\"([^>]*?)\"[^>]*?height=\"([^>]*?)\"[^>]*?src=\"([^>]*?)\"[^>]*?\/>/gi,"[img=$1x$2]$3[/img]");
+			rep(/<img[^>]*?height=\"([^>]*?)\"[^>]*?width=\"([^>]*?)\"[^>]*?src=\"([^>]*?)\"[^>]*?\/>/gi,"[img=$2x$1]$3[/img]");
+			rep(/<img[^>]*?src=\"([^>]*?)\"[^>]*?height=\"([^>]*?)\"[^>]*?width=\"([^>]*?)\"[^>]*?\/>/gi,"[img=$3x$2]$1[/img]");
+			rep(/<img[^>]*?src=\"([^>]*?)\"[^>]*?width=\"([^>]*?)\"[^>]*?height=\"([^>]*?)\"[^>]*?\/>/gi,"[img=$2x$3]$1[/img]");
+			rep(/<img[^>]*?src=\"([^>]*?)\"[^>]*?\/>/gi,"[img]$1[/img]");
 
 			rep(/<ul class=\"listbullet\" style=\"list-style-type\: circle\;\">(.*?)<\/ul>/gi,"[list]$1[/list]");
 			rep(/<ul class=\"listnone\" style=\"list-style-type\: none\;\">(.*?)<\/ul>/gi,"[list=]$1[/list]");
@@ -148,7 +158,7 @@ commenting out for now
 			rep(/<ul class=\"listupperalpha\" style=\"list-style-type\: upper-alpha\;\">(.*?)<\/ul>/gi,"[list=A]$1[/list]");
 			rep(/<li>(.*?)<\/li>/gi,'[li]$1[/li]');
 
-			rep(/<code>(.*?)<\/code>/gi,"[code]$1[/code]");
+			//rep(/<code>(.*?)<\/code>/gi,"[code]$1[/code]");
 			rep(/<\/(strong|b)>/gi,"[/b]");
 			rep(/<(strong|b)>/gi,"[b]");
 			rep(/<\/(em|i)>/gi,"[/i]");
@@ -164,11 +174,25 @@ commenting out for now
 			rep(/<br>/gi,"\n");
 			rep(/<p>/gi,"");
 			rep(/<\/p>/gi,"\n");
-			rep(/&nbsp;/gi," ");
+			rep(/&nbsp;|\u00a0/gi," ");
 			rep(/&quot;/gi,"\"");
 			rep(/&lt;/gi,"<");
 			rep(/&gt;/gi,">");
 			rep(/&amp;/gi,"&");
+
+			// Hack to fix an annoying bug of TinyMCE where block formats don't
+			// work when forced_root_block = ''. So set forced_root_block = 'div'
+			// and then strip out the divs manually
+			rep(/<div>/gi,"");
+			rep(/<\/div>/gi,"");
+
+			if(codes != null) {			
+				for(var i=0; i<codes.length; i++) {
+					codes[i] = codes[i].replace("<code>","");
+					codes[i] = codes[i].replace("</code>","");
+					rep(/\[\$!\$!CODEBLOCK!\$!\$\]/i,"[code]"+codes[i]+"[/code]");
+				}
+			}
 
 			return s; 
 		},
@@ -178,40 +202,50 @@ commenting out for now
 			s = tinymce.trim(s);
 
 
-                        function rep(re, str) {
+            function rep(re, str) {
 
 
-                                //modify code to keep stuff intact within [code][/code] blocks
-                                //Waitman Gobble NO WARRANTY
+                /*//modify code to keep stuff intact within [code][/code] blocks
+                //Waitman Gobble NO WARRANTY
 
 
-                                var o = new Array();
-                                var x = s.split("[code]");
-                                var i = 0;
+                var o = new Array();
+                var x = s.split("[code]");
+                var i = 0;
 
-                                var si = "";
-                                si = x.shift();
-                                si = si.replace(re,str);
-                                o.push(si);
+                var si = "";
+                si = x.shift();
+                si = si.replace(re,str);
+                o.push(si);
 
-                                for (i = 0; i < x.length; i++) {
-                                        var no = new Array();
-                                        var j = x.shift();
-                                        var g = j.split("[/code]");
-                                        no.push(g.shift());
-                                        si = g.shift();
-                                        si = si.replace(re,str);
-                                        no.push(si);
-                                        o.push(no.join("[/code]"));
-                                }
+                for (i = 0; i < x.length; i++) {
+                        var no = new Array();
+                        var j = x.shift();
+                        var g = j.split("[/code]");
+                        no.push(g.shift());
+                        si = g.shift();
+                        si = si.replace(re,str);
+                        no.push(si);
+                        o.push(no.join("[/code]"));
+                }
 
-                                s = o.join("[code]");
+                s = o.join("[code]");*/
 
-                        };
+				s = s.replace(re, str);
+
+            };
 
 
 
+			function get(re) {
+				return s.match(re);
+			}
 
+
+
+			// Preserve HTML tags inside code blocks
+			var codes = get(/\[code\](.*?)\[\/code\]/gi);
+			rep(/\[code\](.*?)\[\/code\]/gi,"[$!$!CODEBLOCK!$!$]");
 
 			// example: [b] to <strong>
 			rep(/\n/gi,"<br />");
@@ -238,7 +272,7 @@ commenting out for now
 			rep(/\[li\](.*?)\[\/li\]/gi, '<li>$1</li>');
 			rep(/\[color=(.*?)\](.*?)\[\/color\]/gi,"<span style=\"color: $1;\">$2</span>");
 			rep(/\[size=(.*?)\](.*?)\[\/size\]/gi,"<span style=\"font-size: $1;\">$2</span>");
-			rep(/\[code\](.*?)\[\/code\]/gi,"<code>$1</code>");
+			//rep(/\[code\](.*?)\[\/code\]/gi,"<code>$1</code>");
 			rep(/\[quote.*?\](.*?)\[\/quote\]/gi,"<blockquote>$1</blockquote>");
 
 			/* oembed */
@@ -255,9 +289,18 @@ commenting out for now
 				});
 				return match;
 			}
+
 			s = s.replace(/\[embed\](.*?)\[\/embed\]/gi, _b2h_cb);
 			
 			/* /oembed */
+
+			if(codes != null) {			
+				for(var i=0; i<codes.length; i++) {
+					codes[i] = codes[i].replace("[code]","");
+					codes[i] = codes[i].replace("[/code]","");
+					rep(/\[\$!\$!CODEBLOCK!\$!\$\]/i,"<code>"+codes[i]+"</code>");
+				}
+			}
 
 			return s; 
 		}

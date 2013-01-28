@@ -89,8 +89,11 @@
 					while (endContainer.nodeType != 3 && endContainer.firstChild)
 						endContainer = endContainer.firstChild;
 
-					r.setStart(endContainer, 0);
-					r.setEnd(endContainer, endContainer.nodeValue.length);
+					// Move range to text node
+					if (endContainer.nodeType == 3) {
+						r.setStart(endContainer, 0);
+						r.setEnd(endContainer, endContainer.nodeValue.length);
+					}
 				}
 
 				if (r.endOffset == 1)
@@ -104,8 +107,8 @@
 			do
 			{
 				// Move the selection one character backwards.
-				r.setStart(endContainer, end - 2);
-				r.setEnd(endContainer, end - 1);
+				r.setStart(endContainer, end >= 2 ? end - 2 : 0);
+				r.setEnd(endContainer, end >= 1 ? end - 1 : 0);
 				end -= 1;
 
 				// Loop until one of the following is found: a blank space, &nbsp;, delimeter, (end-2) >= 0
@@ -131,12 +134,12 @@
 			}
 
 			text = r.toString();
-			matches = text.match(/^(https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.|[A-Z0-9._%+-]+@)(.+)$/i);
+			matches = text.match(/^(https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.|(?:mailto:)?[A-Z0-9._%+-]+@)(.+)$/i);
 
 			if (matches) {
 				if (matches[1] == 'www.') {
 					matches[1] = 'http://www.';
-				} else if (/@$/.test(matches[1])) {
+				} else if (/@$/.test(matches[1]) && !/^mailto:/.test(matches[1])) {
 					matches[1] = 'mailto:' + matches[1];
 				}
 
@@ -145,6 +148,7 @@
 				ed.selection.setRng(r);
 				tinyMCE.execCommand('createlink',false, matches[1] + matches[2]);
 				ed.selection.moveToBookmark(bookmark);
+				ed.nodeChanged();
 
 				// TODO: Determine if this is still needed.
 				if (tinyMCE.isWebKit) {
