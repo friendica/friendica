@@ -115,10 +115,14 @@ function wallmessage_content(&$a) {
 
 
 
+	$editselect = 'none';
+	if( feature_enabled(local_user(), 'richtext') )
+		$editselect = '/(profile-jot-text|prvmail-text)/';
+
 	$tpl = get_markup_template('wallmsg-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
-		'$editselect' => '/(profile-jot-text|prvmail-text)/',
+		'$editselect' => $editselect,
 		'$nickname' => $user['nickname'],
 		'$linkurl' => t('Please enter a link URL:')
 	));
@@ -126,7 +130,7 @@ function wallmessage_content(&$a) {
 	$tpl = get_markup_template('wallmsg-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
-		'$editselect' => '/(profile-jot-text|prvmail-text)/',
+		'$editselect' => $editselect,
 		'$nickname' => $user['nickname'],
 		'$linkurl' => t('Please enter a link URL:')
 	));

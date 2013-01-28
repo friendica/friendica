@@ -156,11 +156,21 @@ function events_content(&$a) {
 	}
 
 
+	$editselect = 'none';
+	if( feature_enabled(local_user(), 'richtext') )
+		$editselect = 'textareas';
+
 	$htpl = get_markup_template('event_head.tpl');
-	$a->page['htmlhead'] .= replace_macros($htpl,array('$baseurl' => $a->get_baseurl()));
+	$a->page['htmlhead'] .= replace_macros($htpl,array(
+		'$baseurl' => $a->get_baseurl(),
+		'$editselect' => $editselect
+	));
 
 	$etpl = get_markup_template('event_end.tpl');
-	$a->page['end'] .= replace_macros($etpl,array('$baseurl' => $a->get_baseurl()));
+	$a->page['end'] .= replace_macros($etpl,array(
+		'$baseurl' => $a->get_baseurl(),
+		'$editselect' => $editselect
+	));
 
 	$o ="";
 	// tabs

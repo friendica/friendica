@@ -244,9 +244,9 @@ function contacts_content(&$a) {
 		$contact_id = $a->data['contact']['id'];
 		$contact = $a->data['contact'];
 
-		$editselect = 'exact';
-		if(intval(get_pconfig(local_user(),'system','plaintext')))
-			$editselect = 'none';
+		$editselect = 'none';
+		if( feature_enabled(local_user(),'richtext') )
+			$editselect = 'exact';
 
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('contact_head.tpl'), array(
 			'$baseurl' => $a->get_baseurl(true),
