@@ -266,14 +266,8 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 	 * Profile owner - everything is visible
 	 */
 
-	if($local_user) {
-		if($local_user == $owner_id) {
-			$sql = '';
-		}
-		else {
-			/* logged in user can see hidden walls and feeds that are blocked to unknown users (private == 2) */
-			$sql = " AND private != 1 "; 
-		}
+	if($local_user && ($local_user == $owner_id)) {
+		$sql = '';
 	}
 
 	/**
