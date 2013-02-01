@@ -795,7 +795,7 @@ function item_photo_menu($item){
 	if(($cid) && (! $item['self'])) {
 		$poke_link = $a->get_baseurl($ssl_state) . '/poke/?f=&c=' . $cid;
 		$contact_url = $a->get_baseurl($ssl_state) . '/contacts/' . $cid;
-		$posts_link = $a->get_baseurl($ssl_state) . '/network/?cid=' . $cid;
+		$posts_link = $a->get_baseurl($ssl_state) . '/network/0?nets=all&cid=' . $cid;
 
 		$clean_url = normalise_link($item['author-link']);
 

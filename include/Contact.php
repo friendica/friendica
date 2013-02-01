@@ -219,7 +219,7 @@ function contact_photo_menu($contact) {
 
 	$poke_link = $a->get_baseurl() . '/poke/?f=&c=' . $contact['id'];
 	$contact_url = $a->get_baseurl() . '/contacts/' . $contact['id'];
-	$posts_link = $a->get_baseurl() . '/network/?cid=' . $contact['id'];
+	$posts_link = $a->get_baseurl() . '/network/0?nets=all&cid=' . $contact['id'];
 
 	$menu = Array(
 		'poke' => array(t("Poke"), $poke_link),

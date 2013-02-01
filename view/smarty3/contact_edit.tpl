@@ -48,7 +48,7 @@
 				{{/if}}
 
 
-				<li><a href="network/?cid={{$contact_id}}" id="contact-edit-view-recent">{{$lblrecent}}</a></li>
+				<li><a href="network/0?nets=all&cid={{$contact_id}}" id="contact-edit-view-recent">{{$lblrecent}}</a></li>
 				{{if $lblsuggest}}
 					<li><a href="fsuggest/{{$contact_id}}" id="contact-edit-suggest">{{$lblsuggest}}</a></li>
 				{{/if}}
