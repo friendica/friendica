@@ -15,7 +15,7 @@
 		$.get(
 			'{{$baseurl}}/events/?id='+eventid,
 			function(data){
-				$.fancybox(data);
+				$.colorbox({html:data});
 			}
 		);			
 	}

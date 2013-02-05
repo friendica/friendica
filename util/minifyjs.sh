@@ -22,11 +22,33 @@ JSFILES=(
 	"view/theme/frost-mobile/js/theme.js"
 	"view/theme/decaf-mobile/js/theme.js"
 )
+JSFILES2=(
+	"library/colorbox/jquery.colorbox.js"
+)
+JSFILES3=(
+	"library/tinymce/jscripts/tiny_mce/plugins/bbcode/editor_plugin_src.js"
+)
 
 for i in ${JSFILES[@]}
 do
-	echo "Processing $i"
 	MINFILE=${i%%.js}.min.js
+	echo "Minifying $i into $MINFILE"
+	rm $MINFILE
+	$MINIFY_CMD -o $MINFILE $i
+done
+
+for i in ${JSFILES2[@]}
+do
+	MINFILE=${i%%.js}-min.js
+	echo "Minifying $i into $MINFILE"
+	rm $MINFILE
+	$MINIFY_CMD -o $MINFILE $i
+done
+
+for i in ${JSFILES3[@]}
+do
+	MINFILE=${i%%_src.js}.js
+	echo "Minifying $i into $MINFILE"
 	rm $MINFILE
 	$MINIFY_CMD -o $MINFILE $i
 done

@@ -1,7 +1,8 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <base href="$baseurl/" />
 <meta name="generator" content="$generator" />
-<link rel="stylesheet" href="$baseurl/library/fancybox/jquery.fancybox.css" type="text/css" media="screen" />
+{#<!--<link rel="stylesheet" href="$baseurl/library/fancybox/jquery.fancybox.css" type="text/css" media="screen" />-->#}
+<link rel="stylesheet" href="$baseurl/library/colorbox/colorbox.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="$baseurl/library/jgrowl/jquery.jgrowl.css" type="text/css" media="screen" />
 
 <link rel="stylesheet" type="text/css" href="$stylesheet" media="all" />
@@ -23,7 +24,8 @@
 <script type="text/javascript" src="$baseurl/js/jquery.js" ></script>
 <script type="text/javascript" src="$baseurl/js/jquery.textinputs.js" ></script>
 <script type="text/javascript" src="$baseurl/js/fk.autocomplete.js" ></script>
-<script type="text/javascript" src="$baseurl/library/fancybox/jquery.fancybox.pack.js"></script>
+{#<!--<script type="text/javascript" src="$baseurl/library/fancybox/jquery.fancybox.pack.js"></script>-->#}
+<script type="text/javascript" src="$baseurl/library/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="$baseurl/library/jgrowl/jquery.jgrowl_minimized.js"></script>
 <script type="text/javascript" src="$baseurl/library/tinymce/jscripts/tiny_mce/tiny_mce_src.js" ></script>
 <script type="text/javascript" src="$baseurl/js/acl.js" ></script>

@@ -15,7 +15,8 @@
 <script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/jquery.divgrow-1.3.1.f1.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/js/jquery.textinputs.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/fk.autocomplete.js" ></script>-->*}}
-{{*<!--<script type="text/javascript" src="{{$baseurl}}/library/fancybox/jquery.fancybox-1.3.4.pack.js"></script>-->*}}
+{{*<!--<script type="text/javascript" src="{{$baseurl}}/library/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+<script type="text/javascript" src="{{$baseurl}}/library/colorbox/jquery.colorbox-min.js"></script>-->*}}
 {{*<!--<script type="text/javascript" src="{{$baseurl}}/library/tiptip/jquery.tipTip.minified.js"></script>-->*}}
 {{*<!--<script type="text/javascript" src="{{$baseurl}}/library/jgrowl/jquery.jgrowl_minimized.js"></script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/acl.js" ></script>

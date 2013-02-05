@@ -1,37 +1,40 @@
 <script>
 	$(function(){
 		
-		$("#cnftheme").fancybox({
-			width: 800,
-			autoDimensions: false,
-			onStart: function(){
-				var theme = $("#id_theme :selected").val();
-				var theme_mobile = $("#id_theme_mobile :selected").val();
-				$("#cnftheme").attr('href',"$baseurl/admin/themes/"+theme);
-			}, 
-			onComplete: function(){
-				$("div#fancybox-content form").submit(function(e){
-					var url = $(this).attr('action');
-					// can't get .serialize() to work...
-					var data={};
-					$(this).find("input").each(function(){
-						data[$(this).attr('name')] = $(this).val();
-					});
-					$(this).find("select").each(function(){
-						data[$(this).attr('name')] = $(this).children(":selected").val();
-					});
-					console.log(":)", url, data);
+		$("#cnftheme").click(function(){
+			$.colorbox({
+				width: 800,
+				height: '90%',
+				/*onOpen: function(){
+					var theme = $("#id_theme :selected").val();
+					$("#cnftheme").attr('href',"$baseurl/admin/themes/"+theme);
+				},*/
+				href: "$baseurl/admin/themes/" + $("#id_theme :selected").val(),
+				onComplete: function(){
+					$("div#fancybox-content form").submit(function(e){
+						var url = $(this).attr('action');
+						// can't get .serialize() to work...
+						var data={};
+						$(this).find("input").each(function(){
+							data[$(this).attr('name')] = $(this).val();
+						});
+						$(this).find("select").each(function(){
+							data[$(this).attr('name')] = $(this).children(":selected").val();
+						});
+						console.log(":)", url, data);
 					
-					$.post(url, data, function(data) {
-						if(timer) clearTimeout(timer);
-						NavUpdate();
-						$.fancybox.close();
-					})
+						$.post(url, data, function(data) {
+							if(timer) clearTimeout(timer);
+							NavUpdate();
+							$.colorbox.close();
+						})
 					
-					return false;
-				});
+						return false;
+					});
 				
-			}
+				}
+			});
+			return false;
 		});
 	});
 </script>

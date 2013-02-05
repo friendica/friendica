@@ -132,9 +132,9 @@
 		});
 		
 		// fancyboxes
-		/*$j("a.popupbox").fancybox({
-			'transitionIn' : 'elastic',
-			'transitionOut' : 'elastic'
+		/*$j("a.popupbox").colorbox({
+			'inline' : true,
+			'transition' : 'none'
 		});*/
 		
 

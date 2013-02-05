@@ -19,9 +19,9 @@ function initEditor(cb) {
             $("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
             $(".jothidden").show();
             editor = true;
-            $("a#jot-perms-icon").fancybox({
-                'transitionIn' : 'elastic',
-                'transitionOut' : 'elastic'
+            $("a#jot-perms-icon").colorbox({
+				'inline' : true,
+				'transition' : 'elastic'
             });
 	                            $("#profile-jot-submit-wrapper").show();
 								{{if $newpost}}
@@ -138,9 +138,9 @@ function initEditor(cb) {
         });
         editor = true;
         // setup acl popup
-        $("a#jot-perms-icon").fancybox({
-            'transitionIn' : 'none',
-            'transitionOut' : 'none'
+        $("a#jot-perms-icon").colorbox({
+			'inline' : true,
+			'transition' : 'elastic'
         }); 
     } else {
         if (typeof cb!="undefined") cb();
@@ -320,7 +320,7 @@ function initEditor(cb) {
 		var bordercolor = $("input").css("border-color");
 		
 		$.get('filer/', function(data){
-			$.fancybox(data);
+			$.colorbox({html:data});
 			$("#id_term").keypress(function(){
 				$(this).css("border-color",bordercolor);
 			})
@@ -338,7 +338,7 @@ function initEditor(cb) {
 					if(timer) clearTimeout(timer);
 					timer = setTimeout(NavUpdate,3000);
 					liking = 1;
-					$.fancybox.close();
+					$.colorbox.close();
 				} else {
 					$("#id_term").css("border-color","#FF0000");
 				}

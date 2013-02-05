@@ -51,8 +51,8 @@
 </form>
 
 <script type="text/javascript">
-	$("a#photo-edit-perms-menu").fancybox({
-		'transitionIn' : 'none',
-		'transitionOut' : 'none'
+	$("a#photo-edit-perms-menu").colorbox({
+		'inline' : true,
+		'transition' : 'none'
 	}); 
 </script>

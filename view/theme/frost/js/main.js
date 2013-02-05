@@ -124,9 +124,9 @@
 		});
 		
 		// fancyboxes
-		$j("a.popupbox").fancybox({
-			'transitionIn' : 'none',
-			'transitionOut' : 'none'
+		$j("a.popupbox").colorbox({
+			'inline' : true,
+			'transition' : 'elastic'
 		});
 		
 

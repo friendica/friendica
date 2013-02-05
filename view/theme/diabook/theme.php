@@ -169,10 +169,10 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$a->page['htmlhead'] .= '
 	<script>
 	 $(function() {
-		$("a.lightbox").fancybox(); // Select all links with lightbox class
-	 	$("a#twittersettings-link").fancybox({onClosed: function() { $("#twittersettings").attr("style","display: none;");}} );
-	   $("a#mapcontrol-link").fancybox({onClosed: function() { $("#mapcontrol").attr("style","display: none;");}} );
-	   $("a#closeicon").fancybox({onClosed: function() { $("#boxsettings").attr("style","display: none;");}} );
+		$("a.lightbox").colorbox({maxHeight:"90%"}); // Select all links with lightbox class
+	 	$("a#twittersettings-link").colorbox({inline:true,onClosed: function() { $("#twittersettings").attr("style","display: none;");}} );
+		$("a#mapcontrol-link").colorbox({inline:true,onClosed: function() { $("#mapcontrol").attr("style","display: none;");}} );
+		$("a#closeicon").colorbox({inline:true,onClosed: function() { $("#boxsettings").attr("style","display: none;");}} );
 	 	});
 
 	 $(window).load(function() {

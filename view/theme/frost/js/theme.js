@@ -270,37 +270,36 @@ $j(function(){
 
 $j(function(){
 	
-	$j("#cnftheme").fancybox({
-		width: 800,
-		autoDimensions: false,
-		onStart: function(){
-			var theme = $j("#id_theme :selected").val();
-			var theme_mobile = $j("#id_theme_mobile :selected").val();
-			$j("#cnftheme").attr('href', baseurl + "/admin/themes/"+theme);
-		}, 
-		onComplete: function(){
-			$j("div#fancybox-content form").submit(function(e){
-				var url = $j(this).attr('action');
-				// can't get .serialize() to work...
-				var data={};
-				$j(this).find("input").each(function(){
-					data[$j(this).attr('name')] = $j(this).val();
-				});
-				$j(this).find("select").each(function(){
-					data[$j(this).attr('name')] = $j(this).children(":selected").val();
-				});
-				console.log(":)", url, data);
+	$j("#cnftheme").click(function(){
+		$.colorbox({
+			width: 800,
+			height: '90%',
+			href: "$baseurl/admin/themes/" + $j("#id_theme :selected").val(),
+			onComplete: function(){
+				$j("div#fancybox-content form").submit(function(e){
+					var url = $j(this).attr('action');
+					// can't get .serialize() to work...
+					var data={};
+					$j(this).find("input").each(function(){
+						data[$j(this).attr('name')] = $j(this).val();
+					});
+					$j(this).find("select").each(function(){
+						data[$j(this).attr('name')] = $j(this).children(":selected").val();
+					});
+					console.log(":)", url, data);
 				
-				$j.post(url, data, function(data) {
-					if(timer) clearTimeout(timer);
-					NavUpdate();
-					$j.fancybox.close();
-				})
+					$j.post(url, data, function(data) {
+						if(timer) clearTimeout(timer);
+						NavUpdate();
+						$j.colorbox.close();
+					})
 				
-				return false;
-			});
+					return false;
+				});
 			
-		}
+			}
+		});
+		return false;
 	});
 });
 
@@ -389,7 +388,7 @@ function showEvent(eventid) {
 	$j.get(
 		baseurl + '/events/?id='+eventid,
 		function(data){
-			$j.fancybox(data);
+			$j.colorbox({html:data});
 		}
 	);			
 }
@@ -622,9 +621,9 @@ function initEditor(cb){
 			$j("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
 			$j("#profile-jot-text").contact_autocomplete(baseurl+"/acl");
 			editor = true;
-			$j("a#jot-perms-icon").fancybox({
-				'transitionIn' : 'none', //'elastic',
-				'transitionOut' : 'none' //'elastic'
+			$j("a#jot-perms-icon").colorbox({
+				'inline' : true,
+				'transition' : 'elastic'
 			});
 			$j(".jothidden").show();
 			if (typeof cb!="undefined") cb();
@@ -714,9 +713,9 @@ function initEditor(cb){
 		});
 		editor = true;
 		// setup acl popup
-		$j("a#jot-perms-icon").fancybox({
-			'transitionIn' : 'none',
-			'transitionOut' : 'none'
+		$j("a#jot-perms-icon").colorbox({
+			'inline' : true,
+			'transition' : 'elastic'
 		}); 
 	} else {
 		if (typeof cb!="undefined") cb();
@@ -1015,7 +1014,7 @@ function itemFiler(id) {
 	var bordercolor = $j("input").css("border-color");
 	
 	$j.get('filer/', function(data){
-		$j.fancybox(data);
+		$j.colorbox({html:data});
 		$j("#id_term").keypress(function(){
 			$j(this).css("border-color",bordercolor);
 		})
@@ -1033,7 +1032,7 @@ function itemFiler(id) {
 /*					if(timer) clearTimeout(timer);
 				timer = setTimeout(NavUpdate,3000);*/
 				liking = 1;
-				$j.fancybox.close();
+				$j.colorbox.close();
 			} else {
 				$j("#id_term").css("border-color","#FF0000");
 			}

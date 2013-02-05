@@ -295,9 +295,9 @@ function initEditor(cb){
 			$j("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
 			$j("#profile-jot-text").contact_autocomplete(baseurl+"/acl");
 			editor = true;
-/*			$j("a#jot-perms-icon").fancybox({
-				'transitionIn' : 'none',
-				'transitionOut' : 'none'
+/*			$j("a#jot-perms-icon").colorbox({
+				'inline' : true,
+				'transition' : 'elastic'
 			});*/
 			$j("a#jot-perms-icon, a#settings-default-perms-menu").click(function () {
 				var parent = $j("#profile-jot-acl-wrapper").parent();
@@ -397,9 +397,9 @@ function initEditor(cb){
 		});
 		editor = true;
 		// setup acl popup
-		$j("a#jot-perms-icon").fancybox({
-			'transitionIn' : 'elastic',
-			'transitionOut' : 'elastic'
+		$j("a#jot-perms-icon").colorbox({
+			'inline' : true,
+			'transition' : 'elastic'
 		}); */
 	} else {
 		if (typeof cb!="undefined") cb();
@@ -678,7 +678,7 @@ function showEvent(eventid) {
 /*	$j.get(
 		baseurl + '/events/?id='+eventid,
 		function(data){
-			$j.fancybox(data);
+			$j.colorbox({html:data});
 		}
 	);*/			
 }
@@ -715,14 +715,14 @@ function itemFiler(id) {
 /*				if(timer) clearTimeout(timer);
 			timer = setTimeout(NavUpdate,3000);*/
 			liking = 1;
-/*				$j.fancybox.close();*/
+/*				$j.colorbox.close();*/
 		}
 	});
 
 /*		var bordercolor = $j("input").css("border-color");
 	
 	$j.get('filer/', function(data){
-		$j.fancybox(data);
+		$j.colorbox({html:data});
 		$j("#id_term").keypress(function(){
 			$j(this).css("border-color",bordercolor);
 		})
@@ -740,7 +740,7 @@ function itemFiler(id) {
 				if(timer) clearTimeout(timer);
 				timer = setTimeout(NavUpdate,3000);
 				liking = 1;
-				$j.fancybox.close();
+				$j.colorbox.close();
 			} else {
 				$j("#id_term").css("border-color","#FF0000");
 			}
