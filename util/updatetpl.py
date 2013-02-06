@@ -58,7 +58,7 @@ fnull = open(os.devnull, "w")
 
 for tplpath in tplpaths:
 	print "Converting " + path + tplpath
-	subprocess.call(['python', path + 'mods/friendica-to-smarty-tpl.py', '-p', path + tplpath], stdout = fnull)
+	subprocess.call(['python', path + 'util/friendica-to-smarty-tpl.py', '-p', path + tplpath], stdout = fnull)
 
 fnull.close()
 
