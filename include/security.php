@@ -300,7 +300,7 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 			} 
 
 			$sql = sprintf(
-				" AND ( private = 0 OR ( private in (1,2) AND wall = 1 AND ( allow_cid = '' OR allow_cid REGEXP '<%d>' ) 
+				/*" AND ( private = 0 OR ( private in (1,2) AND wall = 1 AND ( allow_cid = '' OR allow_cid REGEXP '<%d>' ) 
 				  AND ( deny_cid  = '' OR  NOT deny_cid REGEXP '<%d>' ) 
 				  AND ( allow_gid = '' OR allow_gid REGEXP '%s' )
 				  AND ( deny_gid  = '' OR NOT deny_gid REGEXP '%s'))) 
@@ -308,6 +308,15 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 				intval($remote_user),
 				intval($remote_user),
 				dbesc($gs),
+				dbesc($gs)
+*/
+				" AND ( private = 0 OR ( private in (1,2) AND wall = 1
+				  AND ( NOT (deny_cid REGEXP '<%d>' OR deny_gid REGEXP '%s')
+				  AND ( allow_cid REGEXP '<%d>' OR allow_gid REGEXP '%s' OR ( allow_cid = '' AND allow_gid = '')))))
+				",
+				intval($remote_user),
+				dbesc($gs),
+				intval($remote_user),
 				dbesc($gs)
 			);
 		}
