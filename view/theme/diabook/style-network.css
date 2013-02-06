@@ -186,6 +186,7 @@
 .attachtype {
         display: block; width: 20px; height: 23px;
         background-image: url('../../../images/content-types.png');
+		background-position: -80px 0px;
 }
 
 .type-video { background-position: 0px 0px; }

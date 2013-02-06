@@ -3761,6 +3761,7 @@ aside input[type='text'] {
 	display: block; width: 20px; height: 23px;
 	float: left;
 	background-image: url('../../../images/content-types.png');
+	background-position: -80px 0px;
 }
 
 .body-attach {

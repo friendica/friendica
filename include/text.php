@@ -1050,7 +1050,18 @@ function prepare_body($item,$attach = false) {
 			$cnt = preg_match_all('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|',$r,$matches, PREG_SET_ORDER);
 			if($cnt) {
 				foreach($matches as $mtch) {
-					$icontype = strtolower(substr($mtch[3],0,strpos($mtch[3],'/')));
+					$filetype = strtolower(substr( $mtch[3], 0, strpos($mtch[3],'/') ));
+					if($filetype) {
+						$filesubtype = strtolower(substr( $mtch[3], strpos($mtch[3],'/') + 1 ));
+						$filesubtype = str_replace('.', '-', $filesubtype);
+					}
+					else {
+						$filetype = 'unkn';
+						$filesubtype = 'unkn';
+					}
+
+					$icon = '<div class="attachtype icon s22 type-' . $filetype . ' subtype-' . $filesubtype . '"></div>';
+					/*$icontype = strtolower(substr($mtch[3],0,strpos($mtch[3],'/')));
 					switch($icontype) {
 						case 'video':
 						case 'audio':
@@ -1061,7 +1072,8 @@ function prepare_body($item,$attach = false) {
 						default:
 							$icon = '<div class="attachtype icon s22 type-unkn"></div>';
 							break;
-					}
+					}*/
+
 					$title = ((strlen(trim($mtch[4]))) ? escape_tags(trim($mtch[4])) : escape_tags($mtch[1]));
 					$title .= ' ' . $mtch[2] . ' ' . t('bytes');
 					if((local_user() == $item['uid']) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN))
