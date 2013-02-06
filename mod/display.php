@@ -122,7 +122,6 @@ function display_content(&$a, $update = 0) {
 
 	if($update) {
 
-dbg(1);
 		$r = q("SELECT id FROM item WHERE item.uid = %d
 		        AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE ( `id` = '%s' OR `uri` = '%s' ))
 		        $sql_extra AND unseen = 1",
@@ -130,7 +129,7 @@ dbg(1);
 		        dbesc($item_id),
 		        dbesc($item_id) 
 		);
-dbg(0);
+
 		if(!$r)
 			return '';
 	}
