@@ -17,6 +17,7 @@ function dfrn_poll_init(&$a) {
 	$sec             = ((x($_GET,'sec'))             ? $_GET['sec']                  : '');
 	$dfrn_version    = ((x($_GET,'dfrn_version'))    ? (float) $_GET['dfrn_version'] : 2.0);
 	$perm            = ((x($_GET,'perm'))            ? $_GET['perm']                 : 'r');
+	$quiet			 = ((x($_GET,'quiet'))			 ? true							 : false);
 
 	$direction = (-1);
 
@@ -96,7 +97,8 @@ function dfrn_poll_init(&$a) {
 					$_SESSION['visitor_home'] = $r[0]['url'];
 					$_SESSION['visitor_handle'] = $r[0]['addr'];
 					$_SESSION['visitor_visiting'] = $r[0]['uid'];
-					info( sprintf(t('%1$s welcomes %2$s'), $r[0]['username'] , $r[0]['name']) . EOL);
+					if(!$quiet)
+						info( sprintf(t('%1$s welcomes %2$s'), $r[0]['username'] , $r[0]['name']) . EOL);
 					// Visitors get 1 day session.
 					$session_id = session_id();
 					$expire = time() + 86400;
@@ -385,6 +387,7 @@ function dfrn_poll_content(&$a) {
 	$sec             = ((x($_GET,'sec'))             ? $_GET['sec']                  : '');
 	$dfrn_version    = ((x($_GET,'dfrn_version'))    ? (float) $_GET['dfrn_version'] : 2.0);
 	$perm            = ((x($_GET,'perm'))            ? $_GET['perm']                 : 'r');
+	$quiet			 = ((x($_GET,'quiet'))			 ? true							 : false);
 
 	$direction = (-1);
 	if(strpos($dfrn_id,':') == 1) {
@@ -527,7 +530,8 @@ function dfrn_poll_content(&$a) {
 					$_SESSION['visitor_id'] = $r[0]['id'];
 					$_SESSION['visitor_home'] = $r[0]['url'];
 					$_SESSION['visitor_visiting'] = $r[0]['uid'];
-					info( sprintf(t('%1$s welcomes %2$s'), $r[0]['username'] , $r[0]['name']) . EOL);
+					if(!$quiet)
+						info( sprintf(t('%1$s welcomes %2$s'), $r[0]['username'] , $r[0]['name']) . EOL);
 					// Visitors get 1 day session.
 					$session_id = session_id();
 					$expire = time() + 86400;

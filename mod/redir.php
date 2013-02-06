@@ -3,6 +3,7 @@
 function redir_init(&$a) {
 
 	$url = ((x($_GET,'url')) ? $_GET['url'] : '');
+	$quiet = ((x($_GET,'quiet')) ? '&quiet=1' : '');
 
 	// traditional DFRN
 
@@ -43,7 +44,7 @@ function redir_init(&$a) {
 		logger('mod_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG); 
 		$dest = (($url) ? '&destination_url=' . $url : '');
 		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id 
-			. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest );
+			. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest . $quiet );
 	}
 
 	if(local_user())
