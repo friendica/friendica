@@ -162,6 +162,10 @@ function call_hooks($name, &$data = null) {
 
 	if((is_array($a->hooks)) && (array_key_exists($name,$a->hooks))) {
 		foreach($a->hooks[$name] as $hook) {
+			// Don't run a theme's hook if the user isn't using the theme
+			if(strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/'.current_theme()) === false)
+				continue;
+
 			@include_once($hook[0]);
 			if(function_exists($hook[1])) {
 				$func = $hook[1];
@@ -317,6 +321,42 @@ function get_theme_screenshot($theme) {
 	}
 	return($a->get_baseurl() . '/images/blank.png');
 }
+
+// install and uninstall theme
+if (! function_exists('uninstall_theme')){
+function uninstall_theme($theme){
+	logger("Addons: uninstalling theme " . $theme);
+    
+	@include_once("view/theme/$theme/theme.php");
+	if(function_exists("{$theme}_uninstall")) {
+		$func = "{$theme}_uninstall";
+		$func();
+	}
+}}
+
+if (! function_exists('install_theme')){
+function install_theme($theme) {
+	// silently fail if theme was removed
+
+	if(! file_exists("view/theme/$theme/theme.php"))
+		return false;
+
+	logger("Addons: installing theme $theme");
+
+	@include_once("view/theme/$theme/theme.php");
+
+	if(function_exists("{$theme}_install")) {
+		$func = "{$theme}_install";
+		$func();
+		return true;
+	}
+	else {
+		logger("Addons: FAILED installing theme $theme");
+		return false;
+	}
+
+}}
+
 
 
 // check service_class restrictions. If there are no service_classes defined, everything is allowed.

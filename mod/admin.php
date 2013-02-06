@@ -980,10 +980,14 @@ function admin_page_themes(&$a){
 
 			toggle_theme($themes,$theme,$result);
 			$s = rebuild_theme_table($themes);
-			if($result)
+			if($result) {
+				install_theme($theme);
 				info( sprintf('Theme %s enabled.',$theme));
-			else
+			}
+			else {
+				uninstall_theme($theme);
 				info( sprintf('Theme %s disabled.',$theme));
+			}
 
 			set_config('system','allowed_themes',$s);
 			goaway($a->get_baseurl(true) . '/admin/themes' );
