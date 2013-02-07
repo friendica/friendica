@@ -173,10 +173,11 @@ function autoname($len) {
 
 if(! function_exists('xmlify')) {
 function xmlify($str) {
-	$buffer = '';
+/*	$buffer = '';
 	
-	for($x = 0; $x < mb_strlen($str); $x ++) {
-		$char = $str[$x];
+	$len = mb_strlen($str);
+	for($x = 0; $x < $len; $x ++) {
+		$char = mb_substr($str,$x,1);
         
 		switch( $char ) {
 
@@ -204,7 +205,14 @@ function xmlify($str) {
 				$buffer .= $char;
 				break;
 		}	
-	}
+	}*/
+
+	$buffer = mb_ereg_replace("&", "&amp;", $str);
+	$buffer = mb_ereg_replace("'", "&apos;", $buffer);
+	$buffer = mb_ereg_replace("\"", "&quot;", $buffer);
+	$buffer = mb_ereg_replace("<", "&lt;", $buffer);
+	$buffer = mb_ereg_replace(">", "&gt;", $buffer);
+
 	$buffer = trim($buffer);
 	return($buffer);
 }}
@@ -214,8 +222,13 @@ function xmlify($str) {
 
 if(! function_exists('unxmlify')) {
 function unxmlify($s) {
-	$ret = str_replace('&amp;','&', $s);
-	$ret = str_replace(array('&lt;','&gt;','&quot;','&apos;'),array('<','>','"',"'"),$ret);
+//	$ret = str_replace('&amp;','&', $s);
+//	$ret = str_replace(array('&lt;','&gt;','&quot;','&apos;'),array('<','>','"',"'"),$ret);
+	$ret = mb_ereg_replace('&amp;', '&', $s);
+	$ret = mb_ereg_replace('&apos;', "'", $ret);
+	$ret = mb_ereg_replace('&quot;', '"', $ret);
+	$ret = mb_ereg_replace('&lt;', "<", $ret);
+	$ret = mb_ereg_replace('&gt;', ">", $ret);
 	return $ret;	
 }}
 
