@@ -2,5 +2,6 @@
 
 <script language="javascript" type="text/javascript">
 window.aclType = 'event_head';
+window.editSelect = "$editselect";
 </script>
 

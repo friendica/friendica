@@ -67,11 +67,14 @@ div.section-wrapper {
 .field {
 	margin-bottom: 2px;
 	padding-bottom: 0px;
+	display: inline-block;
+	text-align: left;
 }
 
 .field label {
-	width: auto;
-	position: absolute;
+	width: 275px;
+	/*position: absolute;*/
+	display: inline-block;
 	margin-left: 0px;
 	font-weight: 700;
 }
@@ -85,30 +88,43 @@ div.section-wrapper {
 	position: auto;
 	/*margin-left: 100px;*/
 }
-.field.checkbox input {
+/*.field.checkbox input {
 	width: auto;
 	margin-left: 140px;
-}
+}*/
 
 #div_id_remember {
 	margin-top: 10px;
 	margin-bottom: 10px;
 }
+#div_id_remember label {
+	width: auto;
+	margin-right: 1em;
+}
 
 /*.openid input {*/
-#id_openid_url, .openid input {
+#id_openid_url, input.openid  {
 	background: url(login-bg.gif) no-repeat;
 	background-position: 0 50%;
 	width: 182px;
 	padding-left: 18px;
 }
 
-#wrapper_username input, #wrapper_password input, #wrapper_openid_url input {
+/*#wrapper_username input, #wrapper_password input, #wrapper_openid_url input {
 	margin-left: 225px;
-}
+}*/
 
-#register-openid-wrapper input, #register-name-wrapper input, #register-email-wrapper input, #register-nickname-wrapper input {
+/*#register-openid-wrapper input, #register-name-wrapper input, #register-email-wrapper input, #register-nickname-wrapper input {
 	margin-left: 275px;
+}*/
+
+#register-openid-wrapper {
+	display: inline-block;
+	text-align: left;
+}
+#label-register-openid {
+	display: inline-block;
+	width: 275px;
 }
 
 #login-name-wrapper input {

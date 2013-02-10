@@ -5,7 +5,7 @@
 
 	<span id="nav-link-wrapper" >
 
-<!--	<a id="system-menu-link" class="nav-link" href="#system-menu" title="Menu">Menu</a>-->
+{#<!--	<a id="system-menu-link" class="nav-link" href="#system-menu" title="Menu">Menu</a>-->#}
 	<div class="nav-button-container nav-menu-link" rel="#system-menu-list">
 	<a class="system-menu-link nav-link nav-menu-icon" href="$nav.settings.0" title="Main Menu" point="#system-menu-list">
 	<img class="system-menu-link" src="$baseurl/view/theme/frost/images/menu.png">
@@ -54,12 +54,12 @@
 	</div>
 
 	{{ if $nav.notifications }}
-<!--	<a id="nav-notifications-linkmenu" class="nav-link" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">$nav.notifications.1</a>-->
+{#<!--	<a id="nav-notifications-linkmenu" class="nav-link" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">$nav.notifications.1</a>-->#}
 	<div class="nav-button-container">
 	<a id="nav-notifications-linkmenu" class="nav-link" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">
 	<img rel="#nav-notifications-menu" src="$baseurl/view/theme/frost/images/notifications.png">
 	</a>
-	<span id="notify-update" class="nav-ajax-left"></span>
+	<span id="notify-update" class="nav-ajax-left" rel="#nav-network-notifications-popup"></span>
 	<ul id="nav-notifications-menu" class="notifications-menu-popup">
 		<li id="nav-notifications-see-all"><a href="$nav.notifications.all.0">$nav.notifications.all.1</a></li>
 		<li id="nav-notifications-mark-all"><a href="#" onclick="notifyMarkAll(); return false;">$nav.notifications.mark.1</a></li>
@@ -68,7 +68,7 @@
 	</div>
 	{{ endif }}		
 
-<!--	<a id="contacts-menu-link" class="nav-link" href="#contacts-menu" title="Contacts">Contacts</a>-->
+{#<!--	<a id="contacts-menu-link" class="nav-link" href="#contacts-menu" title="Contacts">Contacts</a>-->#}
 	<div class="nav-button-container nav-menu-link" rel="#contacts-menu-list">
 	<a class="contacts-menu-link nav-link nav-menu-icon" href="$nav.contacts.0" title="Contacts" point="#contacts-menu-list">
 	<img class="contacts-menu-link" src="$baseurl/view/theme/frost/images/contacts.png">
@@ -94,7 +94,7 @@
 	</div>
 
 	{{ if $nav.messages }}
-<!--	<a id="nav-messages-link" class="nav-link $nav.messages.2 $sel.messages nav-load-page-link" href="$nav.messages.0" title="$nav.messages.3" >$nav.messages.1</a>-->
+{#<!--	<a id="nav-messages-link" class="nav-link $nav.messages.2 $sel.messages nav-load-page-link" href="$nav.messages.0" title="$nav.messages.3" >$nav.messages.1</a>-->#}
 	<div class="nav-button-container">
 	<a id="nav-messages-link" class="nav-link $nav.messages.2 $sel.messages nav-load-page-link" href="$nav.messages.0" title="$nav.messages.3" >
 	<img src="$baseurl/view/theme/frost/images/message.png">
@@ -103,7 +103,7 @@
 	</div>
 	{{ endif }}
 
-<!--	<a id="network-menu-link" class="nav-link" href="#network-menu" title="Network">Network</a>-->
+{#<!--	<a id="network-menu-link" class="nav-link" href="#network-menu" title="Network">Network</a>-->#}
 	<div class="nav-button-container nav-menu-link" rel="#network-menu-list">
 	<a class="nav-menu-icon network-menu-link nav-link" href="$nav.network.0" title="Network" point="#network-menu-list">
 	<img class="network-menu-link" src="$baseurl/view/theme/frost/images/network.png">
@@ -116,12 +116,12 @@
 		<li>
 		<a id="nav-network-link" class="$nav.network.2 $sel.network nav-load-page-link" href="$nav.network.0" title="$nav.network.3" >$nav.network.1</a>
 		</li>
-		<!--<span id="net-update" class="nav-ajax-left"></span>-->
+		{#<!--<span id="net-update" class="nav-ajax-left"></span>-->#}
 		{{ endif }}
 
 		{{ if $nav.home }}
 		<li><a id="nav-home-link" class="$nav.home.2 $sel.home nav-load-page-link" href="$nav.home.0" title="$nav.home.3" >$nav.home.1</a></li>
-		<!--<span id="home-update" class="nav-ajax-left"></span>-->
+		{#<!--<span id="home-update" class="nav-ajax-left"></span>-->#}
 		{{ endif }}
 
 		{{ if $nav.community }}
@@ -141,7 +141,7 @@
 	{{ endif }}
 		
 	</span>
-	<!--<span id="nav-end"></span>-->
+	{#<!--<span id="nav-end"></span>-->#}
 	<span id="banner">$banner</span>
 </nav>
 

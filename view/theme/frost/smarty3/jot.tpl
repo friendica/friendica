@@ -43,7 +43,8 @@
 		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon attach" title="{{$attach}}"></a></div>
 	</div> 
 
-	<div id="profile-link-wrapper" style="display: {{$visitor}};" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
+	{{*<!--<div id="profile-link-wrapper" style="display: {{$visitor}};" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >-->*}}
+	<div id="profile-link-wrapper" style="display: {{$visitor}};" >
 		<a id="profile-link" class="icon link" title="{{$weblink}}" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
 	</div> 
 	<div id="profile-video-wrapper" style="display: {{$visitor}};" >
@@ -72,7 +73,7 @@
   	{{$jotplugins}}
 	</div>
 
-<!--	<span id="jot-display-location" style="display: none;"></span>-->
+{{*<!--	<span id="jot-display-location" style="display: none;"></span>-->*}}
 
 	<div id="jot-preview-content" style="display:none;"></div>
 

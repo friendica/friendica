@@ -84,7 +84,7 @@
 		});
 		
 		/* setup field_richtext */
-		setupFieldRichtext();
+		//setupFieldRichtext();
 
 		/* popup menus */
 		function close_last_popup_menu(e) {
@@ -279,7 +279,7 @@
 	}
 
 	function liveUpdate() {
-		if((src == null) || (stopped) || (! profile_uid)) { $j('.like-rotator').hide(); return; }
+		if((src == null) || (stopped) || (typeof profile_uid == 'undefined') || (! profile_uid)) { $j('.like-rotator').hide(); return; }
 		if(($j('.comment-edit-text-full').length) || (in_progress)) {
 			if(livetime) {
 				clearTimeout(livetime);
@@ -341,6 +341,30 @@
 					$j('html').height('auto');
 					//$j(document).scrollTop(vScroll);
 				}
+
+				// Add Colorbox for viewing Network page images
+				$j("#" + ident + " .wall-item-body a img").each(function(){
+					var aElem = $j(this).parent();
+					var imgHref = aElem.attr("href");
+
+					// We need to make sure we only put a Colorbox on links to Friendica images
+					// We'll try to do this by looking for links of the form
+					// .../photo/ab803d8eg08daf85023adfec08(-0.jpg) (with nothing more following), in hopes
+					// that that will be unique enough
+					if(imgHref.match(/\/photo\/[a-fA-F0-9]+(-[0-9]\.[\w]+?)?$/)) {
+
+						// Add a unique class to all the images of a certain post, to allow scrolling through
+						var cBoxClass = $j(this).closest(".wall-item-body").attr("id") + "-lightbox";
+						$j(this).addClass(cBoxClass);
+
+						aElem.colorbox({
+							maxHeight: '90%',
+							photo: true,
+							rel: cBoxClass
+						});
+					}
+				});
+
 				prev = ident;
 			});
 
@@ -399,13 +423,13 @@
 		});
 	}
 
-	function imgbright(node) {
+	/*function imgbright(node) {
 		$j(node).removeClass("drophide").addClass("drop");
 	}
 
 	function imgdull(node) {
 		$j(node).removeClass("drop").addClass("drophide");
-	}
+	}*/
 
 	// Since our ajax calls are asynchronous, we will give a few 
 	// seconds for the first ajax call (setting like/dislike), then 
@@ -421,8 +445,6 @@
 		unpause();
 		$j('#like-rotator-' + ident.toString()).show();
 		$j.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
-//		if(timer) clearTimeout(timer);
-//		timer = setTimeout(NavUpdate,3000);
 		liking = 1;
 	}
 
@@ -666,7 +688,7 @@ function fcFileBrowser (field_name, url, type, win) {
     return false;
   }
 
-function setupFieldRichtext(){
+/*function setupFieldRichtext(){
 	tinyMCE.init({
 		theme : "advanced",
 		mode : "specific_textareas",
@@ -690,7 +712,7 @@ function setupFieldRichtext(){
 		theme_advanced_path : false,
 		file_browser_callback : "fcFileBrowser",
 	});
-}
+}*/
 
 
 /** 

@@ -50,9 +50,9 @@
 	<div id="photo-edit-end"></div>
 </form>
 
-<!--<script>
+{#<!--<script>
 	$("a#photo-edit-perms-menu").colorbox({
 		'inline' : true,
 		'transition' : 'none'
 	}); 
-</script>-->
+</script>-->#}

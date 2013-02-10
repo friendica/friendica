@@ -173,7 +173,7 @@
 {{$lbl_about}}
 </p>
 
-<textarea rows="10" cols="30" id="profile-about-text" class="profile-edit-textarea" name="about" >{{$about}}</textarea>
+<textarea rows="10" cols="70" id="profile-about-text" class="profile-edit-textarea" name="about" >{{$about}}</textarea>
 
 </div>
 <div id="about-jot-end"></div>
@@ -184,7 +184,7 @@
 {{$lbl_hobbies}}
 </p>
 
-<textarea rows="10" cols="30" id="interest-jot-text" class="profile-edit-textarea" name="interest" >{{$interest}}</textarea>
+<textarea rows="10" cols="70" id="interest-jot-text" class="profile-edit-textarea" name="interest" >{{$interest}}</textarea>
 
 </div>
 <div id="interest-jot-end"></div>
@@ -195,7 +195,7 @@
 {{$lbl_likes}}
 </p>
 
-<textarea rows="10" cols="30" id="likes-jot-text" class="profile-edit-textarea" name="likes" >{{$likes}}</textarea>
+<textarea rows="10" cols="70" id="likes-jot-text" class="profile-edit-textarea" name="likes" >{{$likes}}</textarea>
 
 </div>
 <div id="likes-jot-end"></div>
@@ -206,7 +206,7 @@
 {{$lbl_dislikes}}
 </p>
 
-<textarea rows="10" cols="30" id="dislikes-jot-text" class="profile-edit-textarea" name="dislikes" >{{$dislikes}}</textarea>
+<textarea rows="10" cols="70" id="dislikes-jot-text" class="profile-edit-textarea" name="dislikes" >{{$dislikes}}</textarea>
 
 </div>
 <div id="dislikes-jot-end"></div>
@@ -217,7 +217,7 @@
 {{$lbl_social}}
 </p>
 
-<textarea rows="10" cols="30" id="contact-jot-text" class="profile-edit-textarea" name="contact" >{{$contact}}</textarea>
+<textarea rows="10" cols="70" id="contact-jot-text" class="profile-edit-textarea" name="contact" >{{$contact}}</textarea>
 
 </div>
 <div id="contact-jot-end"></div>
@@ -234,7 +234,7 @@
 {{$lbl_music}}
 </p>
 
-<textarea rows="10" cols="30" id="music-jot-text" class="profile-edit-textarea" name="music" >{{$music}}</textarea>
+<textarea rows="10" cols="70" id="music-jot-text" class="profile-edit-textarea" name="music" >{{$music}}</textarea>
 
 </div>
 <div id="music-jot-end"></div>
@@ -244,7 +244,7 @@
 {{$lbl_book}}
 </p>
 
-<textarea rows="10" cols="30" id="book-jot-text" class="profile-edit-textarea" name="book" >{{$book}}</textarea>
+<textarea rows="10" cols="70" id="book-jot-text" class="profile-edit-textarea" name="book" >{{$book}}</textarea>
 
 </div>
 <div id="book-jot-end"></div>
@@ -256,7 +256,7 @@
 {{$lbl_tv}} 
 </p>
 
-<textarea rows="10" cols="30" id="tv-jot-text" class="profile-edit-textarea" name="tv" >{{$tv}}</textarea>
+<textarea rows="10" cols="70" id="tv-jot-text" class="profile-edit-textarea" name="tv" >{{$tv}}</textarea>
 
 </div>
 <div id="tv-jot-end"></div>
@@ -268,7 +268,7 @@
 {{$lbl_film}}
 </p>
 
-<textarea rows="10" cols="30" id="film-jot-text" class="profile-edit-textarea" name="film" >{{$film}}</textarea>
+<textarea rows="10" cols="70" id="film-jot-text" class="profile-edit-textarea" name="film" >{{$film}}</textarea>
 
 </div>
 <div id="film-jot-end"></div>
@@ -285,7 +285,7 @@
 {{$lbl_love}}
 </p>
 
-<textarea rows="10" cols="30" id="romance-jot-text" class="profile-edit-textarea" name="romance" >{{$romance}}</textarea>
+<textarea rows="10" cols="70" id="romance-jot-text" class="profile-edit-textarea" name="romance" >{{$romance}}</textarea>
 
 </div>
 <div id="romance-jot-end"></div>
@@ -297,7 +297,7 @@
 {{$lbl_work}}
 </p>
 
-<textarea rows="10" cols="30" id="work-jot-text" class="profile-edit-textarea" name="work" >{{$work}}</textarea>
+<textarea rows="10" cols="70" id="work-jot-text" class="profile-edit-textarea" name="work" >{{$work}}</textarea>
 
 </div>
 <div id="work-jot-end"></div>
@@ -309,7 +309,7 @@
 {{$lbl_school}} 
 </p>
 
-<textarea rows="10" cols="30" id="education-jot-text" class="profile-edit-textarea" name="education" >{{$education}}</textarea>
+<textarea rows="10" cols="70" id="education-jot-text" class="profile-edit-textarea" name="education" >{{$education}}</textarea>
 
 </div>
 <div id="education-jot-end"></div>

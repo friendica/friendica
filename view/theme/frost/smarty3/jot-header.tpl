@@ -5,8 +5,7 @@
  *}}
 
 <script>
-	var none = "none"; // ugly hack: {{$editselect}} shouldn't be a string if TinyMCE is enabled, but should if it isn't
-	window.editSelect = {{$editselect}};
+	window.editSelect = "{{$editselect}}";
 	window.isPublic = "{{$ispublic}}";
 	window.nickname = "{{$nickname}}";
 	window.linkURL = "{{$linkurl}}";
@@ -16,7 +15,8 @@
 	window.term = "{{$term}}";
 	window.baseURL = "{{$baseurl}}";
 	window.geoTag = function () { {{$geotag}} }
-	window.ajaxType = 'jot-header';
+	window.jotId = "#profile-jot-text";
+	window.imageUploadButton = 'wall-image-upload';
 	window.delItems = '{{$delitems}}';
 </script>
 
