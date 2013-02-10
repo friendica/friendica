@@ -86,7 +86,7 @@
 	<a href="#settings-jot-acl-wrapper" id="settings-default-perms-menu" class='popupbox'>{{$permissions}} {{$permdesc}}</a>
 	<div id="settings-default-perms-menu-end"></div>
 
-<!--	<div id="settings-default-perms-select" style="display: none; margin-bottom: 20px" >-->
+{{*<!--	<div id="settings-default-perms-select" style="display: none; margin-bottom: 20px" >-->*}}
 	
 	<div style="display: none;">
 		<div id="settings-jot-acl-wrapper" style="width:auto;height:auto;overflow:auto;margin-bottom: 20px">
@@ -94,7 +94,7 @@
 		</div>
 	</div>
 
-<!--	</div>-->
+{{*<!--	</div>-->*}}
 </div>
 <br/>
 <div id="settings-default-perms-end"></div>

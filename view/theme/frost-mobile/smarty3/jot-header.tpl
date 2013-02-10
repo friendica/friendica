@@ -16,7 +16,8 @@
 	window.term = "{{$term}}";
 	window.baseURL = "{{$baseurl}}";
 	window.geoTag = function () { {{$geotag}} }
-	window.ajaxType = 'jot-header';
+	window.jotId = "#profile-jot-text";
+	window.imageUploadButton = 'wall-image-upload';
 </script>
 
 

@@ -99,7 +99,7 @@ div.section-wrapper {
 	margin-top: 50px;
 }
 
-#login_openid input {
+#login_openid input, input.openid {
 	background: url(login-bg.gif) no-repeat;
 	background-position: 0 50%;
 	width: 182px;

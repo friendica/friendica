@@ -3,30 +3,35 @@
 
 	<input type="hidden" name="item_id" value="$item_id" />
 
+	<div class="photo-edit-input-text">
 	<label id="photo-edit-albumname-label" for="photo-edit-albumname">$newalbum</label>
 	<input id="photo-edit-albumname" type="text" size="32" name="albname" value="$album" />
+	</div>
 
 	<div id="photo-edit-albumname-end"></div>
 
+	<div class="photo-edit-input-text">
 	<label id="photo-edit-caption-label" for="photo-edit-caption">$capt_label</label>
 	<input id="photo-edit-caption" type="text" size="32" name="desc" value="$caption" />
+	</div>
 
 	<div id="photo-edit-caption-end"></div>
 
+	<div class="photo-edit-input-text">
 	<label id="photo-edit-tags-label" for="photo-edit-newtag" >$tag_label</label>
 	<input name="newtag" id="photo-edit-newtag" size="32" title="$help_tags" type="text" />
+	</div>
 
 	<div id="photo-edit-tags-end"></div>
-	<div id="photo-edit-rotate-wrapper">
-		<div class="photo-edit-rotate-label">
-			$rotatecw
-		</div>
-		<input class="photo-edit-rotate" type="radio" name="rotate" value="1" /><br />
 
-		<div class="photo-edit-rotate-label">
-			$rotateccw
-		</div>
-		<input class="photo-edit-rotate" type="radio" name="rotate" value="2" />
+	<div class="photo-edit-rotate-choice">
+	<label id="photo-edit-rotate-cw-label" for="photo-edit-rotate-cw">$rotatecw</label>
+	<input id="photo-edit-rotate-cw" class="photo-edit-rotate" type="radio" name="rotate" value="1" /><br />
+	</div>
+
+	<div class="photo-edit-rotate-choice">
+	<label id="photo-edit-rotate-ccw-label" for="photo-edit-rotate-ccw">$rotateccw</label>
+	<input id="photo-edit-rotate-ccw" class="photo-edit-rotate" type="radio" name="rotate" value="2" />
 	</div>
 	<div id="photo-edit-rotate-end"></div>
 

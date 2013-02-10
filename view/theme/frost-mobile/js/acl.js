@@ -160,7 +160,7 @@ ACL.prototype.update_view = function(){
 				$j('#jot-public').show();
 				$j('.profile-jot-net input').attr('disabled', false);			
 				if(typeof editor != 'undefined' && editor != false) {
-					$j('#profile-jot-desc').html(ispublic);
+					$j('#profile-jot-desc').html(window.isPublic);
 				}
 			
 	} else {

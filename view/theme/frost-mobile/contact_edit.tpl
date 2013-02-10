@@ -6,7 +6,7 @@
 	$tab_str
 
 	<div id="contact-edit-drop-link" >
-		<a href="contacts/$contact_id/drop" class="icon drophide" id="contact-edit-drop-link" onclick="return confirmDelete();"  title="$delete" onmouseover="imgbright(this);" onmouseout="imgdull(this);"></a>
+		<a href="contacts/$contact_id/drop" class="icon drophide" id="contact-edit-drop-link" onclick="return confirmDelete();"  title="$delete" {#onmouseover="imgbright(this);" onmouseout="imgdull(this);"#}></a>
 	</div>
 
 	<div id="contact-edit-drop-link-end"></div>
@@ -74,7 +74,7 @@
 
 <div id="contact-edit-info-wrapper">
 <h4>$lbl_info1</h4>
-	<textarea id="contact-edit-info" rows="8" cols="35" name="info">$info</textarea>
+	<textarea id="contact-edit-info" rows="8"{# cols="35"#} name="info">$info</textarea>
 	<input class="contact-edit-submit" type="submit" name="submit" value="$submit" />
 </div>
 <div id="contact-edit-info-end"></div>

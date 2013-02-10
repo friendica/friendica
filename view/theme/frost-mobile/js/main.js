@@ -287,7 +287,7 @@
 	}
 
 	function liveUpdate() {
-		if((src == null) || (stopped) || (! profile_uid)) { $j('.like-rotator').hide(); return; }
+		if((src == null) || (stopped) || (typeof profile_uid == 'undefined') || (! profile_uid)) { $j('.like-rotator').hide(); return; }
 		if(($j('.comment-edit-text-full').length) || (in_progress)) {
 			if(livetime) {
 				clearTimeout(livetime);
@@ -407,13 +407,13 @@
 		});
 	}
 
-	function imgbright(node) {
+/*	function imgbright(node) {
 		$j(node).removeClass("drophide").addClass("drop");
 	}
 
 	function imgdull(node) {
 		$j(node).removeClass("drop").addClass("drophide");
-	}
+	}*/
 
 	// Since our ajax calls are asynchronous, we will give a few 
 	// seconds for the first ajax call (setting like/dislike), then 
@@ -456,19 +456,19 @@
 
 	function getPosition(e) {
 		var cursor = {x:0, y:0};
-		if ( e.touches[0].pageX || e.touches[0].pageY  ) {
-			cursor.x = e.touches[0].pageX;
-			cursor.y = e.touches[0].pageY;
+		if ( e.pageX || e.pageY  ) {
+			cursor.x = e.pageX;
+			cursor.y = e.pageY;
 		}
 		else {
-			if( e.touches[0].clientX || e.touches[0].clientY ) {
-				cursor.x = e.touches[0].clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft;
-				cursor.y = e.touches[0].clientY + (document.documentElement.scrollTop  || document.body.scrollTop)  - document.documentElement.clientTop;
+			if( e.clientX || e.clientY ) {
+				cursor.x = e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft;
+				cursor.y = e.clientY + (document.documentElement.scrollTop  || document.body.scrollTop)  - document.documentElement.clientTop;
 			}
 			else {
-				if( e.touches[0].x || e.touches[0].y ) {
-					cursor.touches[0].x = e.touches[0].x;
-					cursor.touches[0].y = e.touches[0].y;
+				if( e.x || e.y ) {
+					cursor.x = e.x;
+					cursor.y = e.y;
 				}
 			}
 		}
@@ -487,7 +487,7 @@
 			lockvisible = true;
 			$j.get('lockview/' + id, function(data) {
 				$j('#panel').html(data);
-				$j('#panel').css({ 'left': cursor.x + 5 , 'top': cursor.y + 5});
+				$j('#panel').css({ 'left': 10 , 'top': cursor.y + 20});
 				$j('#panel').show();
 			});
 		}

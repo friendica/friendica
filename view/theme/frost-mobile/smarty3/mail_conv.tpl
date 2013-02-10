@@ -17,7 +17,7 @@
 <div class="mail-conv-outside-wrapper-end"></div>
 
 
-<div class="mail-conv-delete-wrapper" id="mail-conv-delete-wrapper-{{$mail.id}}" ><a href="message/drop/{{$mail.id}}" class="icon drophide delete-icon mail-list-delete-icon" onclick="return confirmDelete();" title="{{$mail.delete}}" id="mail-conv-delete-icon-{{$mail.id}}" class="mail-conv-delete-icon" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a></div>
+<div class="mail-conv-delete-wrapper" id="mail-conv-delete-wrapper-{{$mail.id}}" ><a href="message/drop/{{$mail.id}}" class="icon drophide delete-icon mail-list-delete-icon" onclick="return confirmDelete();" title="{{$mail.delete}}" id="mail-conv-delete-icon-{{$mail.id}}" class="mail-conv-delete-icon" {{*onmouseover="imgbright(this);" onmouseout="imgdull(this);"*}} ></a></div>
 <div class="mail-conv-delete-end"></div>
 
 <hr class="mail-conv-break" />

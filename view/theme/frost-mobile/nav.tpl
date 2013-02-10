@@ -1,15 +1,15 @@
 <nav>
-<!--	$langselector -->
+{#<!--	$langselector -->#}
 
-<!--	<div id="site-location">$sitelocation</div> -->
+{#<!--	<div id="site-location">$sitelocation</div> -->#}
 
 	<span id="nav-link-wrapper" >
 
-<!--	<a id="system-menu-link" class="nav-link" href="#system-menu" title="Menu">Menu</a>-->
+{#<!--	<a id="system-menu-link" class="nav-link" href="#system-menu" title="Menu">Menu</a>-->#}
 	<div class="nav-button-container">
-<!--	<a class="system-menu-link nav-link" href="#system-menu" title="Menu">-->
+{#<!--	<a class="system-menu-link nav-link" href="#system-menu" title="Menu">-->#}
 	<img rel="#system-menu-list" class="nav-link" src="$baseurl/view/theme/frost-mobile/images/menu.png">
-<!--	</a>-->
+{#<!--	</a>-->#}
 	<ul id="system-menu-list" class="nav-menu-list">
 		{{ if $nav.login }}
 		<a id="nav-login-link" class="nav-load-page-link $nav.login.2" href="$nav.login.0" title="$nav.login.3" >$nav.login.1</a>
@@ -54,11 +54,11 @@
 	</div>
 
 	{{ if $nav.notifications }}
-<!--	<a id="nav-notifications-linkmenu" class="nav-link" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">$nav.notifications.1</a>-->
+{#<!--	<a id="nav-notifications-linkmenu" class="nav-link" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">$nav.notifications.1</a>-->#}
 	<div class="nav-button-container">
-<!--	<a id="nav-notifications-linkmenu" class="nav-link" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">-->
+{#<!--	<a id="nav-notifications-linkmenu" class="nav-link" href="$nav.notifications.0" rel="#nav-notifications-menu" title="$nav.notifications.1">-->#}
 	<img rel="#nav-notifications-menu" class="nav-link" src="$baseurl/view/theme/frost-mobile/images/notifications.png">
-<!--	</a>-->
+{#<!--	</a>-->#}
 	<span id="notify-update" class="nav-ajax-left"></span>
 	<ul id="nav-notifications-menu" class="notifications-menu-popup">
 		<li id="nav-notifications-see-all"><a href="$nav.notifications.all.0">$nav.notifications.all.1</a></li>
@@ -68,11 +68,11 @@
 	</div>
 	{{ endif }}		
 
-<!--	<a id="contacts-menu-link" class="nav-link" href="#contacts-menu" title="Contacts">Contacts</a>-->
+{#<!--	<a id="contacts-menu-link" class="nav-link" href="#contacts-menu" title="Contacts">Contacts</a>-->#}
 	<div class="nav-button-container">
-<!--	<a class="contacts-menu-link nav-link" href="#contacts-menu" title="Contacts">-->
+{#<!--	<a class="contacts-menu-link nav-link" href="#contacts-menu" title="Contacts">-->#}
 	<img rel="#contacts-menu-list"  class="nav-link" src="$baseurl/view/theme/frost-mobile/images/contacts.png">
-	<!--</a>-->
+	{#<!--</a>-->#}
 	{{ if $nav.introductions }}
 	<span id="intro-update" class="nav-ajax-left"></span>
 	{{ endif }}
@@ -92,7 +92,7 @@
 	</div>
 
 	{{ if $nav.messages }}
-<!--	<a id="nav-messages-link" class="nav-link $nav.messages.2 $sel.messages nav-load-page-link" href="$nav.messages.0" title="$nav.messages.3" >$nav.messages.1</a>-->
+{#<!--	<a id="nav-messages-link" class="nav-link $nav.messages.2 $sel.messages nav-load-page-link" href="$nav.messages.0" title="$nav.messages.3" >$nav.messages.1</a>-->#}
 	<div class="nav-button-container">
 	<a id="nav-messages-link" class="$nav.messages.2 $sel.messages nav-load-page-link" href="$nav.messages.0" title="$nav.messages.3" >
 	<img src="$baseurl/view/theme/frost-mobile/images/message.png" class="nav-link">
@@ -101,11 +101,11 @@
 	</div>
 	{{ endif }}
 
-<!--	<a id="network-menu-link" class="nav-link" href="#network-menu" title="Network">Network</a>-->
+{#<!--	<a id="network-menu-link" class="nav-link" href="#network-menu" title="Network">Network</a>-->#}
 	<div class="nav-button-container">
-<!--	<a class="network-menu-link nav-link" href="#network-menu" title="Network">-->
+{#<!--	<a class="network-menu-link nav-link" href="#network-menu" title="Network">-->#}
 	<img rel="#network-menu-list" class="nav-link" src="$baseurl/view/theme/frost-mobile/images/network.png">
-<!--	</a>-->
+{#<!--	</a>-->#}
 	{{ if $nav.network }}
 	<span id="net-update" class="nav-ajax-left"></span>
 	{{ endif }}
@@ -114,7 +114,7 @@
 		<li>
 		<a id="nav-network-link" class="$nav.network.2 $sel.network nav-load-page-link" href="$nav.network.0" title="$nav.network.3" >$nav.network.1</a>
 		</li>
-		<!--<span id="net-update" class="nav-ajax-left"></span>-->
+		{#<!--<span id="net-update" class="nav-ajax-left"></span>-->#}
 		{{ endif }}
 
 		{{ if $nav.network }}
@@ -125,7 +125,7 @@
 
 		{{ if $nav.home }}
 		<li><a id="nav-home-link" class="$nav.home.2 $sel.home nav-load-page-link" href="$nav.home.0" title="$nav.home.3" >$nav.home.1</a></li>
-		<!--<span id="home-update" class="nav-ajax-left"></span>-->
+		{#<!--<span id="home-update" class="nav-ajax-left"></span>-->#}
 		{{ endif }}
 
 		{{ if $nav.community }}
@@ -137,7 +137,7 @@
 	</div>
 
 	</span>
-	<!--<span id="nav-end"></span>-->
+	{#<!--<span id="nav-end"></span>-->#}
 	<span id="banner">$banner</span>
 </nav>
 

@@ -8,7 +8,8 @@
 	window.nickname = "{{$nickname}}";
 	window.linkURL = "{{$linkurl}}";
 	var plaintext = "none";
-	window.ajaxType = 'msg-header';
+	window.jotId = "#prvmail-text";
+	window.imageUploadButton = 'prvmail-upload';
 	window.autocompleteType = 'msg-header';
 </script>
 

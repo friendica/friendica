@@ -27,7 +27,7 @@
 	<div class='main-container'>
 <!--		<div class='main-content-container'>-->
 		<div class='section-wrapper'>
-		<?php if( ($a->module === 'settings') && x($page,'aside')) echo $page['aside']; ?>
+		<?php if( ($a->module === 'settings' || $a->module === 'message' || $a->module === 'profile') && x($page,'aside')) echo $page['aside']; ?>
 		<section><?php if(x($page,'content')) echo $page['content']; ?>
 			<div id="page-footer"></div>
 		</section>

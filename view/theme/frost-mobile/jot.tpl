@@ -21,7 +21,7 @@
 		<div id="jot-category-wrap"><input name="category" id="jot-category" type="text" placeholder="$placeholdercategory" value="$category" class="jothidden" style="display:none" /></div>
 		{{ endif }}
 		<div id="jot-text-wrap">
-		<!--<img id="profile-jot-text-loading" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />-->
+		{#<!--<img id="profile-jot-text-loading" src="images/rotator.gif" alt="$wait" title="$wait" style="display: none;" />-->#}
 		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body" >{{ if $content }}$content{{ else }}$share{{ endif }}</textarea>
 		</div>
 
@@ -39,8 +39,10 @@
 		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon attach" title="$attach"></a></div>
 	</div> 
 
-	<div id="profile-link-wrapper" style="display: $visitor;" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
-		<a id="profile-link" class="icon link" title="$weblink" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
+	{#<!--<div id="profile-link-wrapper" style="display: $visitor;" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
+		<a id="profile-link" class="icon link" title="$weblink" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>-->#}
+	<div id="profile-link-wrapper" style="display: $visitor;" >
+		<a id="profile-link" class="icon link" title="$weblink" onclick="jotGetLink(); return false;"></a>
 	</div> 
 	<div id="profile-video-wrapper" style="display: $visitor;" >
 		<a id="profile-video" class="icon video" title="$video" onclick="jotVideoURL();return false;"></a>
@@ -73,7 +75,7 @@
 	<div style="display: none;">
 		<div id="profile-jot-acl-wrapper">
 			$acl
-			<hr style="clear:both"/>
+			<hr/>
 			<div id="profile-jot-email-label">$emailcc</div><input type="text" name="emailcc" id="profile-jot-email" title="$emtitle" />
 			$jotnets
 			<div id="profile-jot-networks-end"></div>
