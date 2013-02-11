@@ -239,7 +239,7 @@ function prune_deadguys($arr) {
 	if($r) {
 		$ret = array();
 		foreach($r as $rr) 
-			$ret[] = $rr['id'];
+			$ret[] = intval($rr['id']);
 		return $ret;
 	}
 	return array();
