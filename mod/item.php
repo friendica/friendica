@@ -929,8 +929,13 @@ function item_content(&$a) {
 
 	$o = '';
 	if(($a->argc == 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
-		require_once('include/items.php');
-		$o = drop_item($a->argv[2]);
+		require_once('include/items.php'); 
+		$o = drop_item($a->argv[2], !is_ajax());
+		if (is_ajax()){
+			// ajax return: [<item id>, 0 (no perm) | <owner id>] 
+			echo json_encode(array(intval($a->argv[2]), intval($o)));
+			kllme();
+		}
 	}
 	return $o;
 }

@@ -1364,9 +1364,15 @@ if(! function_exists('profile_sidebar')) {
 
 
 			}
-
-
 		}
+        if ($profile['uid'] == local_user() && !feature_enabled(local_user(),'multi_profiles')) {
+            $profile['edit'] = array($a->get_baseurl(). '/profiles/'.$profile['id'], t('Edit profile'),"", t('Edit profile'));
+        	$profile['menu'] = array(
+				'chg_photo' => t('Change profile photo'),
+				'cr_new' => null,
+				'entries' => array(),
+			);
+        }
 
 
 
@@ -1418,6 +1424,7 @@ if(! function_exists('profile_sidebar')) {
 
 		if($a->theme['template_engine'] === 'internal')
 			$location = template_escape($location);
+
 
 		$tpl = get_markup_template('profile_vcard.tpl');
 		$o .= replace_macros($tpl, array(
