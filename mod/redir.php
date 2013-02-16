@@ -4,20 +4,36 @@ function redir_init(&$a) {
 
 	$url = ((x($_GET,'url')) ? $_GET['url'] : '');
 	$quiet = ((x($_GET,'quiet')) ? '&quiet=1' : '');
+	$con_url = ((x($_GET,'conurl')) ? $_GET['conurl'] : '');
 
 	// traditional DFRN
 
-	if(local_user() && $a->argc > 1 && intval($a->argv[1])) {
+	if( $con_url || (local_user() && $a->argc > 1 && intval($a->argv[1])) ) {
 
-		$cid = $a->argv[1];
+		if($con_url) {
+			$con_url = str_replace('https', 'http', $con_url);
 
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($cid),
-			intval(local_user())
-		);
+			$r = q("SELECT * FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d LIMIT 1",
+				dbesc($con_url),
+				intval(local_user())
+			);
 
-		if((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
-			goaway(z_root());
+			if((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+				goaway(z_root());
+
+			$cid = $r[0]['id'];
+		}
+		else {
+			$cid = $a->argv[1];
+
+			$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+				intval($cid),
+				intval(local_user())
+			);
+
+			if((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+				goaway(z_root());
+		}
 
 		$dfrn_id = $orig_id = (($r[0]['issued-id']) ? $r[0]['issued-id'] : $r[0]['dfrn-id']);
 
