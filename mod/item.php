@@ -867,8 +867,11 @@ function item_post(&$a) {
 					. '<br />';
 				$disclaimer .= sprintf( t('You may visit them online at %s'), $a->get_baseurl() . '/profile/' . $a->user['nickname']) . EOL;
 				$disclaimer .= t('Please contact the sender by replying to this post if you do not wish to receive these messages.') . EOL; 
-
-				$subject  = email_header_encode('[Friendica]' . ' ' . sprintf( t('%s posted an update.'),$a->user['username']),'UTF-8');
+                                if (!$datarray['title']=='') {
+                                    $subject = email_header_encode($datarray['title'],'UTF-8');
+                                } else {
+				    $subject = email_header_encode('[Friendica]' . ' ' . sprintf( t('%s posted an update.'),$a->user['username']),'UTF-8');
+                                }
 				$headers  = 'From: ' . email_header_encode($a->user['username'],'UTF-8') . ' <' . $a->user['email'] . '>' . "\n";
 				$headers .= 'MIME-Version: 1.0' . "\n";
 				$headers .= 'Content-Type: text/html; charset=UTF-8' . "\n";
@@ -876,7 +879,7 @@ function item_post(&$a) {
 				$link = '<a href="' . $a->get_baseurl() . '/profile/' . $a->user['nickname'] . '"><img src="' . $author['thumb'] . '" alt="' . $a->user['username'] . '" /></a><br /><br />';
 				$html    = prepare_body($datarray);
 				$message = '<html><body>' . $link . $html . $disclaimer . '</body></html>';
-				@mail($addr, $subject, $message, $headers);
+                                @mail($addr, $subject, $message, $headers);
 			}
 		}
 	}
