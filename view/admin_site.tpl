@@ -51,6 +51,8 @@
 	{{ inc field_select.tpl with $field=$theme_mobile }}{{ endinc }}
 	{{ inc field_select.tpl with $field=$ssl_policy }}{{ endinc }}
 	{{ inc field_checkbox.tpl with $field=$new_share }}{{ endinc }}
+	{{ inc field_checkbox.tpl with $field=$hide_help }}{{ endinc }}
+	{{ inc field_select.tpl with $field=$singleuser }}{{ endinc }}
 
 	
 	<div class="submit"><input type="submit" name="page_site" value="$submit" /></div>

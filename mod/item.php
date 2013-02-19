@@ -872,14 +872,20 @@ function item_post(&$a) {
                                 } else {
 				    $subject = email_header_encode('[Friendica]' . ' ' . sprintf( t('%s posted an update.'),$a->user['username']),'UTF-8');
                                 }
-				$headers  = 'From: ' . email_header_encode($a->user['username'],'UTF-8') . ' <' . $a->user['email'] . '>' . "\n";
-				$headers .= 'MIME-Version: 1.0' . "\n";
-				$headers .= 'Content-Type: text/html; charset=UTF-8' . "\n";
-				$headers .= 'Content-Transfer-Encoding: 8bit' . "\n\n";
 				$link = '<a href="' . $a->get_baseurl() . '/profile/' . $a->user['nickname'] . '"><img src="' . $author['thumb'] . '" alt="' . $a->user['username'] . '" /></a><br /><br />';
 				$html    = prepare_body($datarray);
 				$message = '<html><body>' . $link . $html . $disclaimer . '</body></html>';
-                                @mail($addr, $subject, $message, $headers);
+                                include_once('include/html2plain.php');
+                                $params = array (
+                                    'fromName' => $a->user['username'],
+                                    'fromEmail' => $a->user['email'],
+                                    'toEmail' => $addr,
+                                    'replyTo' => $a->user['email'],
+                                    'messageSubject' => $subject,
+                                    'htmlVersion' => $message,
+                                    'textVersion' => html2plain($html.$disclaimer),
+                                );
+                                enotify::send($params);
 			}
 		}
 	}

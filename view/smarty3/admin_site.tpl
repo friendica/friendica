@@ -52,10 +52,12 @@
 	{{include file="field_input.tpl" field=$sitename}}
 	{{include file="field_textarea.tpl" field=$banner}}
 	{{include file="field_select.tpl" field=$language}}
-	{{include file="field_select.tpl" field=$theme}}
+        {{include file="field_select.tpl" field=$theme}}
 	{{include file="field_select.tpl" field=$theme_mobile}}
 	{{include file="field_select.tpl" field=$ssl_policy}}
 	{{include file="field_checkbox.tpl" field=$new_share}}
+	{{include file="field_checkbox.tpl" field=$hide_help}}
+        {{include file="field_select.tpl" field=$singleuser}}
 
 	
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit}}" /></div>
