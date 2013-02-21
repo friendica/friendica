@@ -6,16 +6,17 @@
 // returns substituted string.
 // WARNING: this is pretty basic, and doesn't properly handle search strings that are substrings of each other.
 // For instance if 'test' => "foo" and 'testing' => "bar", testing could become either bar or fooing, 
-// depending on the order in which they were declared in the array.   
+// depending on the order in which they were declared in the array.
 
 require_once("include/template_processor.php");
 require_once("include/friendica_smarty.php");
 
-if(! function_exists('replace_macros')) {  
+if(! function_exists('replace_macros')) {
 function replace_macros($s,$r) {
 	global $t;
 
-//	$ts = microtime();
+	$stamp1 = microtime(true);
+
 	$a = get_app();
 
 	if($a->theme['template_engine'] === 'smarty3') {
@@ -34,12 +35,12 @@ function replace_macros($s,$r) {
 	}
 	else {
 		$r =  $t->replace($s,$r);
-	
+
 		$output = template_unescape($r);
 	}
-//	$tt = microtime() - $ts;
-//	$a = get_app();
-//	$a->page['debug'] .= "$tt <br>\n";
+	$a = get_app();
+	$a->save_timestamp($stamp1, "rendering");
+
 	return $output;
 }}
 
@@ -438,15 +439,26 @@ function load_view_file($s) {
 		$lang = 'en';
 	$b = basename($s);
 	$d = dirname($s);
-	if(file_exists("$d/$lang/$b"))
-		return file_get_contents("$d/$lang/$b");
-	
+	if(file_exists("$d/$lang/$b")) {
+		$stamp1 = microtime(true);
+		$content = file_get_contents("$d/$lang/$b");
+		$a->save_timestamp($stamp1, "file");
+		return $content;
+	}
+
 	$theme = current_theme();
 
-	if(file_exists("$d/theme/$theme/$b"))
-		return file_get_contents("$d/theme/$theme/$b");
-			
-	return file_get_contents($s);
+	if(file_exists("$d/theme/$theme/$b")) {
+		$stamp1 = microtime(true);
+		$content = file_get_contents("$d/theme/$theme/$b");
+		$a->save_timestamp($stamp1, "file");
+		return $content;
+	}
+
+	$stamp1 = microtime(true);
+	$content = file_get_contents($s);
+	$a->save_timestamp($stamp1, "file");
+	return $content;
 }}
 
 if(! function_exists('get_intltext_template')) {
@@ -461,17 +473,28 @@ function get_intltext_template($s) {
 	if(! isset($lang))
 		$lang = 'en';
 
-	if(file_exists("view/$lang$engine/$s"))
-		return file_get_contents("view/$lang$engine/$s");
-	elseif(file_exists("view/en$engine/$s"))
-		return file_get_contents("view/en$engine/$s");
-	else
-		return file_get_contents("view$engine/$s");
+	if(file_exists("view/$lang$engine/$s")) {
+		$stamp1 = microtime(true);
+		$content = file_get_contents("view/$lang$engine/$s");
+		$a->save_timestamp($stamp1, "file");
+		return $content;
+	} elseif(file_exists("view/en$engine/$s")) {
+		$stamp1 = microtime(true);
+		$content = file_get_contents("view/en$engine/$s");
+		$a->save_timestamp($stamp1, "file");
+		return $content;
+	} else {
+		$stamp1 = microtime(true);
+		$content = file_get_contents("view$engine/$s");
+		$a->save_timestamp($stamp1, "file");
+		return $content;
+	}
 }}
 
 if(! function_exists('get_markup_template')) {
 function get_markup_template($s, $root = '') {
-//	$ts = microtime();
+	$stamp1 = microtime(true);
+
 	$a = get_app();
 
 	if($a->theme['template_engine'] === 'smarty3') {
@@ -479,19 +502,20 @@ function get_markup_template($s, $root = '') {
 
 		$template = new FriendicaSmarty();
 		$template->filename = $template_file;
+		$a->save_timestamp($stamp1, "rendering");
 
-//		$tt = microtime() - $ts;
-//		$a->page['debug'] .= "$tt <br>\n";
 		return $template;
 	}
 	else {
 		$template_file = get_template_file($a, $s, $root);
-//		$file_contents = file_get_contents($template_file);
-//		$tt = microtime() - $ts;
-//		$a->page['debug'] .= "$tt <br>\n";
-//		return $file_contents;
-		return file_get_contents($template_file);
-	}	
+		$a->save_timestamp($stamp1, "rendering");
+
+		$stamp1 = microtime(true);
+		$content = file_get_contents($template_file);
+		$a->save_timestamp($stamp1, "file");
+		return $content;
+
+	}
 }}
 
 if(! function_exists("get_template_file")) {
@@ -547,8 +571,10 @@ function logger($msg,$level = 0) {
 
 	if((! $debugging) || (! $logfile) || ($level > $loglevel))
 		return;
-	
+
+	$stamp1 = microtime(true);
 	@file_put_contents($logfile, datetime_convert() . ':' . session_id() . ' ' . $msg . "\n", FILE_APPEND);
+	$a->save_timestamp($stamp1, "file");
 	return;
 }}
 
@@ -574,11 +600,12 @@ function get_tags($s) {
 	$ret = array();
 
 	// ignore anything in a code block
-
 	$s = preg_replace('/\[code\](.*?)\[\/code\]/sm','',$s);
 
-	// ignore anything in a bbtag
+	// Force line feeds at bbtags
+	$s = str_replace(array("[", "]"), array("\n[", "]\n"), $s);
 
+	// ignore anything in a bbtag
 	$s = preg_replace('/\[(.*?)\]/sm','',$s);
 
 	// Match full names against @tags including the space between first and last
@@ -1030,14 +1057,20 @@ function prepare_body($item,$attach = false) {
 	$a = get_app();
 	call_hooks('prepare_body_init', $item);
 
-	$cachefile = get_cachefile($item["guid"]."-".strtotime($item["edited"])."-".hash("crc32", $item['body']));
+	//$cachefile = get_cachefile($item["guid"]."-".strtotime($item["edited"])."-".hash("crc32", $item['body']));
+	$cachefile = get_cachefile($item["guid"]."-".hash("md5", $item['body']));
 
 	if (($cachefile != '')) {
-		if (file_exists($cachefile))
+		if (file_exists($cachefile)) {
+			$stamp1 = microtime(true);
 			$s = file_get_contents($cachefile);
-		else {
+			$a->save_timestamp($stamp1, "file");
+		} else {
 			$s = prepare_text($item['body']);
+			$stamp1 = microtime(true);
 			file_put_contents($cachefile, $s);
+			$a->save_timestamp($stamp1, "file");
+			logger('prepare_body: put item '.$item["id"].' into cachefile '.$cachefile);
 		}
 	} else
 		$s = prepare_text($item['body']);

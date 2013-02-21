@@ -48,9 +48,9 @@ function new_contact($uid,$url,$interactive = false) {
 				$myaddr = bin2hex($a->get_baseurl() . '/profile/' . $a->user['nickname']);
 			else
 				$myaddr = bin2hex($a->user['nickname'] . '@' . $a->get_hostname());
- 
+
 			goaway($ret['request'] . "&addr=$myaddr");
-		
+
 			// NOTREACHED
 		}
 	}
@@ -61,7 +61,7 @@ function new_contact($uid,$url,$interactive = false) {
 			return $result;
 		}
 	}
-	
+
 
 
 

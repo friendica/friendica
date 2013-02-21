@@ -160,16 +160,26 @@ function content_content(&$a, $update = 0) {
 
 	$sql_extra2 = (($nouveau) ? '' : " AND `item`.`parent` = `item`.`id` ");
 	$sql_extra3 = (($nouveau) ? '' : $sql_extra3);
+	$sql_table = "`item`";
 
 	if(x($_GET,'search')) {
 		$search = escape_tags($_GET['search']);
-		if (get_config('system','use_fulltext_engine')) {
+
+		if(strpos($search,'#') === 0) {
+			$tag = true;
+			$search = substr($search,1);
+		}
+
+		if (get_config('system','only_tag_search'))
+			$tag = true;
+
+		/*if (get_config('system','use_fulltext_engine')) {
 			if(strpos($search,'#') === 0)
-				$sql_extra .= sprintf(" AND (MATCH(tag) AGAINST ('".'"%s"'."' in boolean mode)) ",
+				$sql_extra .= sprintf(" AND (MATCH(tag) AGAINST ('%s' in boolean mode)) ",
 					dbesc(protect_sprintf($search))
 				);
 			else
-				$sql_extra .= sprintf(" AND (MATCH(`item`.`body`) AGAINST ('".'"%s"'."' in boolean mode) or MATCH(tag) AGAINST ('".'"%s"'."' in boolean mode)) ",
+				$sql_extra .= sprintf(" AND (MATCH(`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode)) ",
 					dbesc(protect_sprintf($search)),
 					dbesc(protect_sprintf($search))
 				);
@@ -178,7 +188,19 @@ function content_content(&$a, $update = 0) {
 					dbesc(protect_sprintf('%' . $search . '%')),
 					dbesc(protect_sprintf('%]' . $search . '[%'))
 			);
+		}*/
+
+		if($tag) {
+			$sql_extra = sprintf(" AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d ",
+				dbesc(protect_sprintf($search)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG));
+			$sql_table = "`term` LEFT JOIN `item` ON `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` ";
+		} else {
+			if (get_config('system','use_fulltext_engine'))
+				$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
+			else
+				$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
 		}
+
 	}
 	if(strlen($file)) {
 		$sql_extra .= file_tag_file_query('item',unxmlify($file));
@@ -189,38 +211,39 @@ function content_content(&$a, $update = 0) {
 		$myurl = substr($myurl,strpos($myurl,'://')+3);
 		$myurl = str_replace('www.','',$myurl);
 		$diasp_url = str_replace('/profile/','/u/',$myurl);
-		if (get_config('system','use_fulltext_engine'))
-			$sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from item where (MATCH(`author-link`) AGAINST ('".'"%s"'."' in boolean mode) or MATCH(`tag`) AGAINST ('".'"%s"'."' in boolean mode) or MATCH(tag) AGAINST ('".'"%s"'."' in boolean mode))) ",
+		/*if (get_config('system','use_fulltext_engine'))
+			$sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from $sql_table where (MATCH(`author-link`, `tag`) AGAINST ('%s' in boolean mode) or MATCH(tag) AGAINST ('%s' in boolean mode))) ",
 				dbesc(protect_sprintf($myurl)),
 				dbesc(protect_sprintf($myurl)),
 				dbesc(protect_sprintf($diasp_url))
 			);
 		else
-			$sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from item where ( `author-link` like '%s' or `tag` like '%s' or tag like '%s' )) ",
+			$sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from $sql_table where ( `author-link` like '%s' or `tag` like '%s' or tag like '%s' )) ",
 				dbesc(protect_sprintf('%' . $myurl)),
 				dbesc(protect_sprintf('%' . $myurl . ']%')),
 				dbesc(protect_sprintf('%' . $diasp_url . ']%'))
-			);
+			);*/
 
+		$sql_extra .= sprintf(" AND `item`.`parent` IN (SELECT distinct(`parent`) from item where `author-link` IN ('https://%s', 'http://%s') OR `mention`)",
+			dbesc(protect_sprintf($myurl)),
+			dbesc(protect_sprintf($myurl))
+		);
 	}
 
 	$pager_sql = sprintf(" LIMIT %d, %d ",intval($a->pager['start']), intval($a->pager['itemspage']));
 
 
-
-
 	if($nouveau) {
 		// "New Item View" - show all items unthreaded in reverse created date order
 
-		$items = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+		$items = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`, `contact`.`writable`,
 			`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 			`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
-			FROM `item`, `contact`
-			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 
+			FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			WHERE `item`.`uid` = %d AND `item`.`visible` = 1
 			AND `item`.`deleted` = 0 and `item`.`moderated` = 0
 			$simple_update
-			AND `contact`.`id` = `item`.`contact-id`
 			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			$sql_extra $sql_nets
 			ORDER BY `item`.`received` DESC $pager_sql ",
@@ -241,7 +264,7 @@ function content_content(&$a, $update = 0) {
 		$start = dba_timer();
 
 		$r = q("SELECT `item`.`id` AS `item_id`, `contact`.`uid` AS `contact_uid`
-			FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 			AND `item`.`moderated` = 0 AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			AND `item`.`parent` = `item`.`id`
@@ -268,9 +291,9 @@ function content_content(&$a, $update = 0) {
 				`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`alias`, `contact`.`rel`, `contact`.`writable`,
 				`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 				`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
-				FROM `item`, `contact`
+				FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 				WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
-				AND `item`.`moderated` = 0 AND `contact`.`id` = `item`.`contact-id`
+				AND `item`.`moderated` = 0
 				AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 				AND `item`.`parent` IN ( %s )
 				$sql_extra ",
@@ -287,7 +310,7 @@ function content_content(&$a, $update = 0) {
 		}
 	}
 
-	
+
 	logger('parent dba_timer: ' . sprintf('%01.4f',$first - $start));
 	logger('child  dba_timer: ' . sprintf('%01.4f',$second - $first));
 
@@ -298,7 +321,7 @@ function content_content(&$a, $update = 0) {
 
 	$o = render_content($a,$items,$mode,false);
 
-	
+
 	header('Content-type: application/json');
 	echo json_encode($o);
 	killme();

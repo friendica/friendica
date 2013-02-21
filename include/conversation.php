@@ -369,7 +369,6 @@ function visible_activity($item) {
 if(!function_exists('conversation')) {
 function conversation(&$a, $items, $mode, $update, $preview = false) {
 
-
 	require_once('include/bbcode.php');
 
 	$ssl_state = ((local_user()) ? true : false);
@@ -524,7 +523,26 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				$tags=array();
 				$hashtags = array();
 				$mentions = array();
-				foreach(explode(',',$item['tag']) as $tag){
+
+				$taglist = q("SELECT `type`, `term`, `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` IN (%d, %d) ORDER BY `tid`",
+						intval(TERM_OBJ_POST), intval($item['id']), intval(TERM_HASHTAG), intval(TERM_MENTION));
+
+				foreach($taglist as $tag) {
+
+					if ($tag["url"] == "")
+						$tag["url"] = $searchpath.strtolower($tag["term"]);
+
+					if ($tag["type"] == TERM_HASHTAG) {
+						$hashtags[] = "#<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+						$prefix = "#";
+					} elseif ($tag["type"] == TERM_MENTION) {
+						$mentions[] = "@<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+						$prefix = "@";
+					}
+					$tags[] = $prefix."<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+				}
+
+				/*foreach(explode(',',$item['tag']) as $tag){
 					$tag = trim($tag);
 					if ($tag!="") {
 						$t = bbcode($tag);
@@ -534,7 +552,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 						elseif($t[0] == '@')
 							$mentions[] = $t;
 					}
-				}
+				}*/
 
 				$sp = false;
 				$profile_link = best_link_url($item,$sp);

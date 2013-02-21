@@ -9,7 +9,7 @@ function poller_run(&$argv, &$argc){
 	if(is_null($a)) {
 		$a = new App;
 	}
-  
+
 	if(is_null($db)) {
 	    @include(".htconfig.php");
     	require_once("include/dba.php");
@@ -57,21 +57,21 @@ function poller_run(&$argv, &$argc){
 	load_hooks();
 
 	logger('poller: start');
-	
+
 	// run queue delivery process in the background
 
 	proc_run('php',"include/queue.php");
-	
+
 	// run diaspora photo queue process in the background
 
 	proc_run('php',"include/dsprphotoq.php");
-	
+
 	// expire any expired accounts
 
 	q("UPDATE user SET `account_expired` = 1 where `account_expired` = 0 
 		AND `account_expires_on` != '0000-00-00 00:00:00' 
 		AND `account_expires_on` < UTC_TIMESTAMP() ");
-	
+
 	// delete user and contact records for recently removed accounts
 
 	$r = q("SELECT * FROM `user` WHERE `account_removed` = 1 AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
@@ -81,12 +81,13 @@ function poller_run(&$argv, &$argc){
 			q("DELETE FROM `user` WHERE `uid` = %d", intval($user['uid']));
 		}
 	}
-  
+
 	$abandon_days = intval(get_config('system','account_abandon_days'));
 	if($abandon_days < 1)
 		$abandon_days = 0;
 
-	
+	// Check OStatus conversations
+	check_conversations();
 
 	// once daily run birthday_updates and then expire in background
 

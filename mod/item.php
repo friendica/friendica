@@ -19,6 +19,7 @@ require_once('include/crypto.php');
 require_once('include/enotify.php');
 require_once('include/email.php');
 require_once('library/langdet/Text/LanguageDetect.php');
+require_once('include/tags.php');
 
 function item_post(&$a) {
 
@@ -236,9 +237,23 @@ function item_post(&$a) {
 
 		if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
 			$l = new Text_LanguageDetect;
-			$lng = $l->detectConfidence($naked_body);
+			//$lng = $l->detectConfidence($naked_body);
+			//$postopts = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
 
-			$postopts = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
+			$lng = $l->detect($naked_body, 3);
+
+			if (sizeof($lng) > 0) {
+				$postopts = "";
+
+				foreach ($lng as $language => $score) {
+					if ($postopts == "")
+						$postopts = "lang=";
+					else
+						$postopts .= ":";
+
+					$postopts .= $language.";".$score;
+				}
+			}
 
 			logger('mod_item: detect language' . print_r($lng,true) . $naked_body, LOGGER_DATA);
 		}
@@ -675,6 +690,7 @@ function item_post(&$a) {
 			intval($post_id),
 			intval($profile_uid)
 		);
+		create_tags_from_itemuri($post_id, $profile_uid);
 
 		// update filetags in pconfig
                 file_tag_update_pconfig($uid,$categories_old,$categories_new,'category');
@@ -740,9 +756,21 @@ function item_post(&$a) {
 	if(count($r)) {
 		$post_id = $r[0]['id'];
 		logger('mod_item: saved item ' . $post_id);
+		create_tags_from_item($post_id);
 
 		// update filetags in pconfig
                 file_tag_update_pconfig($uid,$categories_old,$categories_new,'category');
+
+		// Store the fresh generated item into the cache
+		$cachefile = get_cachefile($datarray["guid"]."-".hash("md5", $datarray['body']));
+
+		if (($cachefile != '') AND !file_exists($cachefile)) {
+			$s = prepare_text($datarray['body']);
+			$stamp1 = microtime(true);
+			file_put_contents($cachefile, $s);
+			$a->save_timestamp($stamp1, "file");
+			logger('mod_item: put item '.$r[0]['id'].' into cachefile '.$cachefile);
+		}
 
 		if($parent) {
 

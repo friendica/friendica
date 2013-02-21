@@ -9,6 +9,7 @@ favicon.*
 home.html
 addon
 *~
+robots.txt
 
 #ignore documentation, it should be newly built 
 doc/api

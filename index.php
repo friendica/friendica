@@ -33,7 +33,7 @@ $install = ((file_exists('.htconfig.php') && filesize('.htconfig.php')) ? false 
 
 
 $lang = get_browser_language();
-	
+
 load_translation_table($lang);
 
 /**

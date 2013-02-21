@@ -278,10 +278,39 @@ function bb_ShareAttributes($match) {
         return($text);
 }
 
+function bb_ShareAttributesSimple($match) {
+
+        $attributes = $match[1];
+
+        $author = "";
+        preg_match("/author='(.*?)'/ism", $attributes, $matches);
+        if ($matches[1] != "")
+                $author = html_entity_decode($matches[1],ENT_QUOTES,'UTF-8');
+
+        preg_match('/author="(.*?)"/ism', $attributes, $matches);
+        if ($matches[1] != "")
+                $author = $matches[1];
+
+        $profile = "";
+        preg_match("/profile='(.*?)'/ism", $attributes, $matches);
+        if ($matches[1] != "")
+                $profile = $matches[1];
+
+        preg_match('/profile="(.*?)"/ism', $attributes, $matches);
+        if ($matches[1] != "")
+                $profile = $matches[1];
+
+        $text = "<br />".html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').' <a href="'.$profile.'">'.$author."</a>: <br />»".$match[2]."«";
+
+        return($text);
+}
+
 	// BBcode 2 HTML was written by WAY2WEB.net
 	// extended to work with Mistpark/Friendica - Mike Macgirvin
 
-function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
+function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = false) {
+
+	$stamp1 = microtime(true);
 
 	$a = get_app();
 
@@ -340,13 +369,14 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	$Text = str_replace("\r\n","\n", $Text);
 
 	// removing multiplicated newlines
-//	$search = array("\n\n\n", "\n ", " \n", "[/quote]\n\n", "\n[/quote]");
-//	$replace = array("\n\n", "\n", "\n", "[/quote]\n", "[/quote]");
-//	do {
-//		$oldtext = $Text;
-//		$Text = str_replace($search, $replace, $Text);
-//	} while ($oldtext != $Text);
-
+	if (get_config("system", "remove_multiplicated_lines")) {
+		$search = array("\n\n\n", "\n ", " \n", "[/quote]\n\n", "\n[/quote]");
+		$replace = array("\n\n", "\n", "\n", "[/quote]\n", "[/quote]");
+		do {
+			$oldtext = $Text;
+			$Text = str_replace($search, $replace, $Text);
+		} while ($oldtext != $Text);
+	}
 
 	$Text = str_replace(array("\r","\n"), array('<br />','<br />'), $Text);
 
@@ -515,7 +545,10 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 	$Text = preg_replace("/\[img\](.*?)\[\/img\]/ism", '<img src="$1" alt="' . t('Image/photo') . '" />', $Text);
 
 	// Shared content
-	$Text = preg_replace_callback("/\[share(.*?)\](.*?)\[\/share\]/ism","bb_ShareAttributes",$Text);
+	if (!$simplehtml)
+		$Text = preg_replace_callback("/\[share(.*?)\](.*?)\[\/share\]/ism","bb_ShareAttributes",$Text);
+	else
+		$Text = preg_replace_callback("/\[share(.*?)\](.*?)\[\/share\]/ism","bb_ShareAttributesSimple",$Text);
 
 	$Text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism",'<br/><img src="' .$a->get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . t('Encrypted content') . '" /><br />', $Text);
 	$Text = preg_replace("/\[crypt=(.*?)\](.*?)\[\/crypt\]/ism",'<br/><img src="' .$a->get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);
@@ -617,7 +650,8 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 
 	// Clean up the HTML by loading and saving the HTML with the DOM
 	// Only do it when it has to be done - for performance reasons
-	if (!$tryoembed) {
+	// Update: Now it is done every time - since bad structured html can break a whole page
+	//if (!$tryoembed) {
 		$doc = new DOMDocument();
 		$doc->preserveWhiteSpace = false;
 
@@ -632,9 +666,11 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true) {
 		$Text = str_replace('<br></li>','</li>', $Text);
 
 		$Text = mb_convert_encoding($Text, "UTF-8", 'HTML-ENTITIES');
-	}
+	//}
 
 	call_hooks('bbcode',$Text);
+
+	$a->save_timestamp($stamp1, "parser");
 
 	return $Text;
 }

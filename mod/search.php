@@ -23,7 +23,7 @@ function search_saved_searches() {
 			);
 		}
 
-		
+
 		$tpl = get_markup_template("saved_searches_aside.tpl");
 
 		$o .= replace_macros($tpl, array(
@@ -32,7 +32,7 @@ function search_saved_searches() {
 			'$searchbox' => '',
 			'$saved' 	 => $saved,
 		));
-	}		
+	}
 
 	return $o;
 
@@ -124,7 +124,10 @@ function search_content(&$a) {
 	if(! $search)
 		return $o;
 
-	if (get_config('system','use_fulltext_engine')) {
+	if (get_config('system','only_tag_search'))
+		$tag = true;
+
+	/*if (get_config('system','use_fulltext_engine')) {
 		if($tag)
 			$sql_extra = sprintf(" AND MATCH (`item`.`tag`) AGAINST ('".'"%s"'."' in boolean mode) ", '#'.dbesc(protect_sprintf($search)));
 		else
@@ -134,10 +137,24 @@ function search_content(&$a) {
 			$sql_extra = sprintf(" AND `item`.`tag` REGEXP '%s' ", 	dbesc('\\]' . protect_sprintf(preg_quote($search)) . '\\['));
 		else
 			$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
+	}*/
+
+	if($tag) {
+		//$sql_extra = sprintf(" AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d",
+		//			dbesc(protect_sprintf($search)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG));
+		//$sql_table = "`term` LEFT JOIN `item` ON `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` ";
+
+		$sql_extra = sprintf(" AND EXISTS (SELECT * FROM `term` WHERE `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d) GROUP BY `item`.`uri` ",
+					dbesc(protect_sprintf($search)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG));
+		$sql_table = "`item` FORCE INDEX (`uri`) ";
+	} else {
+		if (get_config('system','use_fulltext_engine')) {
+			$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
+		} else {
+			$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
+		}
+		$sql_table = "`item`";
 	}
-
-
-
 
 	// Here is the way permissions work in the search module...
 	// Only public posts can be shown
@@ -146,14 +163,15 @@ function search_content(&$a) {
 
 	if( (! get_config('alt_pager', 'global')) && (! get_pconfig(local_user(),'system','alt_pager')) ) {
 	        $r = q("SELECT distinct(`item`.`uri`) as `total`
-		        FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
+		        FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
 		        WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
 		        AND (( `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' AND `item`.`private` = 0 AND `user`.`hidewall` = 0) 
 			        OR ( `item`.`uid` = %d ))
 		        AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-		        $sql_extra group by `item`.`uri` ", 
+		        $sql_extra ",
 		        intval(local_user())
 	        );
+//		        $sql_extra group by `item`.`uri` ",
 
 	        if(count($r))
 		        $a->set_pager_total(count($r));
@@ -164,25 +182,25 @@ function search_content(&$a) {
 	        }
 	}
 
-	$r = q("SELECT distinct(`item`.`uri`), `item`.*, `item`.`id` AS `item_id`, 
+	$r = q("SELECT `item`.`uri`, `item`.*, `item`.`id` AS `item_id`, 
 		`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`alias`, `contact`.`rel`,
 		`contact`.`network`, `contact`.`thumb`, `contact`.`self`, `contact`.`writable`, 
 		`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`,
 		`user`.`nickname`, `user`.`uid`, `user`.`hidewall`
-		FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+		FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 		LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
 		WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
 		AND (( `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' AND `item`.`private` = 0 AND `user`.`hidewall` = 0 ) 
 			OR ( `item`.`uid` = %d ))
 		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 		$sql_extra
-		group by `item`.`uri`	
 		ORDER BY `received` DESC LIMIT %d , %d ",
 		intval(local_user()),
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 
 	);
+//		group by `item`.`uri`
 
 	if(! count($r)) {
 		info( t('No results.') . EOL);

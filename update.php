@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1159 );
+define( 'UPDATE_VERSION' , 1162 );
 
 /**
  *
@@ -1382,8 +1382,6 @@ function update_1157() {
 
 	if($r)
 		return UPDATE_SUCCESS;
-
-	return UPDATE_FAILED;
 }
 
 function update_1158() {
@@ -1402,3 +1400,42 @@ function update_1158() {
 	return UPDATE_FAILED;
 }
 
+function update_1159() {
+	$r = q("ALTER TABLE `term` ADD `aid` int(10) unsigned NOT NULL DEFAULT '0',
+		ADD `uid` int(10) unsigned NOT NULL DEFAULT '0',
+		ADD INDEX (`uid`),
+		ADD INDEX (`aid`)");
+
+	if(!$r)
+		return UPDATE_FAILED;
+
+	require_once('include/tags.php');
+	update_items();
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1160() {
+	set_config('system', 'maintenance', 1);
+
+	// Wait for 15 seconds for current requests to
+	// clear before locking up the database
+	sleep(15);
+
+	$r = q("ALTER TABLE `item` ADD `mention` TINYINT(1) NOT NULL DEFAULT '0', ADD INDEX (`mention`)");
+	set_config('system', 'maintenance', 0);
+
+	if(!$r)
+		return UPDATE_FAILED;
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1161() {
+	$r = q("ALTER TABLE `pconfig` ADD INDEX (`cat`)");
+
+	if(!$r)
+		return UPDATE_FAILED;
+
+	return UPDATE_SUCCESS;
+}

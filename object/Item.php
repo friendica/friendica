@@ -146,10 +146,30 @@ class Item extends BaseObject {
 		call_hooks('render_location',$locate);
 		$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_google($locate));
 
+		$searchpath = $a->get_baseurl()."/search?tag=";
 		$tags=array();
 		$hashtags = array();
 		$mentions = array();
-		foreach(explode(',',$item['tag']) as $tag){
+
+		$taglist = q("SELECT `type`, `term`, `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` IN (%d, %d) ORDER BY `tid`",
+				intval(TERM_OBJ_POST), intval($item['id']), intval(TERM_HASHTAG), intval(TERM_MENTION));
+
+		foreach($taglist as $tag) {
+
+			if ($tag["url"] == "")
+				$tag["url"] = $searchpath.strtolower($tag["term"]);
+
+			if ($tag["type"] == TERM_HASHTAG) {
+				$hashtags[] = "#<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+				$prefix = "#";
+			} elseif ($tag["type"] == TERM_MENTION) {
+				$mentions[] = "@<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+				$prefix = "@";
+			}
+			$tags[] = $prefix."<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+		}
+
+		/*foreach(explode(',',$item['tag']) as $tag){
 			$tag = trim($tag);
 			if ($tag!="") {
 				$t = bbcode($tag);
@@ -159,8 +179,7 @@ class Item extends BaseObject {
 				elseif($t[0] == '@')
 					$mentions[] = $t;
 			}
-
-		}        
+		}*/
 
 		$like    = ((x($alike,$item['uri'])) ? format_like($alike[$item['uri']],$alike[$item['uri'] . '-l'],'like',$item['uri']) : '');
 		$dislike = ((x($dlike,$item['uri'])) ? format_like($dlike[$item['uri']],$dlike[$item['uri'] . '-l'],'dislike',$item['uri']) : '');
@@ -171,10 +190,10 @@ class Item extends BaseObject {
 		 * Maybe we should establish a way to be notified about conversation changes
 		 */
 		$this->check_wall_to_wall();
-		
+
 		if($this->is_wall_to_wall() && ($this->get_owner_url() == $this->get_redirect_url()))
 			$osparkle = ' sparkle';
-		
+
 		if($this->is_toplevel()) {
 			if($conv->get_profile_owner() == local_user()) {
 				$isstarred = (($item['starred']) ? "starred" : "unstarred");
@@ -214,8 +233,28 @@ class Item extends BaseObject {
 		localize_item($item);
 
 		if ($item["postopts"]) {
-			$langdata = explode(";", $item["postopts"]);
-			$langstr = substr($langdata[0], 5)." (".round($langdata[1]*100, 1)."%)";
+			//$langdata = explode(";", $item["postopts"]);
+			//$langstr = substr($langdata[0], 5)." (".round($langdata[1]*100, 1)."%)";
+			$langstr = "";
+			if (substr($item["postopts"], 0, 5) == "lang=") {
+				$postopts = substr($item["postopts"], 5);
+
+				$languages = explode(":", $postopts);
+
+				if (sizeof($languages) == 1) {
+					$languages = array();
+					$languages[] = $postopts;
+				}
+
+				foreach ($languages as $language) {
+					$langdata = explode(";", $language);
+					if ($langstr != "")
+						$langstr .= ", ";
+
+					//$langstr .= $langdata[0]." (".round($langdata[1]*100, 1)."%)";
+					$langstr .= round($langdata[1]*100, 1)."% ".$langdata[0];
+				}
+			}
 		}
 
 		$body = prepare_body($item,true);
@@ -244,14 +283,14 @@ class Item extends BaseObject {
 
 			'type' => implode("",array_slice(explode("/",$item['verb']),-1)),
 			'tags' => $tags,
-            'hashtags' => $hashtags,
-            'mentions' => $mentions,
+			'hashtags' => $hashtags,
+			'mentions' => $mentions,
 			'txt_cats' => t('Categories:'),
 			'txt_folders' => t('Filed under:'),
 			'has_cats' => ((count($categories)) ? 'true' : ''),
 			'has_folders' => ((count($folders)) ? 'true' : ''),
-            'categories' => $categories,
-            'folders' => $folders,            
+			'categories' => $categories,
+			'folders' => $folders,
 			'body' => $body_e,
 			'text' => $text_e,
 			'id' => $this->get_id(),
@@ -322,12 +361,12 @@ class Item extends BaseObject {
 				}
 			}
 		}
-		
+
         if ($this->is_toplevel()) {
             $result['total_comments_num'] = "$total_children";
             $result['total_comments_text'] = tt('comment', 'comments', $total_children);
         }
-        
+
 		$result['private'] = $item['private'];
 		$result['toplevel'] = ($this->is_toplevel() ? 'toplevel_item' : '');
 

@@ -14,8 +14,7 @@ require_once('include/features.php');
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_VERSION',      '3.1.1614' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1159      );
-
+define ( 'DB_UPDATE_VERSION',      1162      );
 define ( 'EOL',                    "<br />\r\n"     );
 define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
 
@@ -204,10 +203,12 @@ define ( 'NOTIFY_SYSTEM',   0x8000 );
 
 define ( 'TERM_UNKNOWN',   0 );
 define ( 'TERM_HASHTAG',   1 );
-define ( 'TERM_MENTION',   2 );   
+define ( 'TERM_MENTION',   2 );
 define ( 'TERM_CATEGORY',  3 );
 define ( 'TERM_PCATEGORY', 4 );
 define ( 'TERM_FILE',      5 );
+define ( 'TERM_SAVEDSEARCH', 6 );
+define ( 'TERM_CONVERSATION', 7 );
 
 define ( 'TERM_OBJ_POST',  1 );
 define ( 'TERM_OBJ_PHOTO', 2 );
@@ -355,7 +356,8 @@ if(! class_exists('App')) {
 		public  $identities;
 		public	$is_mobile;
 		public	$is_tablet;
-	
+		public	$performance = array();
+
 		public $nav_sel;
 
 		public $category;
@@ -403,7 +405,7 @@ if(! class_exists('App')) {
 
 		private $cached_profile_image;
 		private $cached_profile_picdate;
-							
+
 		function __construct() {
 
 			global $default_timezone, $argv, $argc;
@@ -411,6 +413,14 @@ if(! class_exists('App')) {
 			$this->timezone = ((x($default_timezone)) ? $default_timezone : 'UTC');
 
 			date_default_timezone_set($this->timezone);
+
+			$this->performance["start"] = microtime(true);
+			$this->performance["database"] = 0;
+			$this->performance["network"] = 0;
+			$this->performance["rendering"] = 0;
+			$this->performance["parser"] = 0;
+			$this->performance["marktime"] = 0;
+			$this->performance["markstart"] = microtime(true);
 
 			$this->config = array();
 			$this->page = array();
@@ -719,6 +729,17 @@ if(! class_exists('App')) {
 			return $this->rdelim[$engine];
 		}
 
+		function save_timestamp($stamp, $value) {
+			$duration = (float)(microtime(true)-$stamp);
+
+			$this->performance[$value] += (float)$duration;
+			$this->performance["marktime"] += (float)$duration;
+		}
+
+		function mark_timestamp($mark) {
+			//$this->performance["markstart"] -= microtime(true) - $this->performance["marktime"];
+			$this->performance["markstart"] = microtime(true) - $this->performance["markstart"] - $this->performance["marktime"];
+		}
 	}
 }
 
