@@ -7,7 +7,12 @@
 $parent
 
 <div id="prvmail-to-label">$to</div>
+{{ if $showinputs }}
+<input type="text" id="recip" name="messagerecip" value="$prefill" maxlength="255" size="64" tabindex="10" />
+<input type="hidden" id="recip-complete" name="messageto" value="$preid">
+{{ else }}
 $select
+{{ endif }}
 
 <div id="prvmail-subject-label">$subject</div>
 <input type="text" size="64" maxlength="255" id="prvmail-subject" name="subject" value="$subjtxt" $readonly tabindex="11" />

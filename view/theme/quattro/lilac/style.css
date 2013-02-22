@@ -648,26 +648,34 @@ ul.menu-popup .toolbar a:hover {
   background-color: #ffffff;
 }
 /* autocomplete popup */
+.autocomplete,
 .acpopup {
   max-height: 150px;
   background-color: #ffffff;
   color: #2d2d2d;
-  border: 1px solid #MenuBorder;
+  border: 1px solid #364e59;
   overflow: auto;
   z-index: 100000;
   -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
   -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
 }
+.autocomplete > div,
 .acpopupitem {
   color: #2d2d2d;
   padding: 4px;
   clear: left;
+  overflow: auto;
+  height: auto;
 }
+.autocomplete > div img,
 .acpopupitem img {
   float: left;
   margin-right: 4px;
+  width: 16px !important;
+  height: 16px !important;
 }
+.autocomplete > div.selected,
 .acpopupitem.selected {
   background-color: #c0a3c7;
 }
@@ -983,7 +991,7 @@ section {
   word-wrap: break-word;
 }
 .wall-item-container .wall-item-content img {
-  max-width: 710px;
+  max-width: 700px;
 }
 .wall-item-container .wall-item-links,
 .wall-item-container .wall-item-actions {

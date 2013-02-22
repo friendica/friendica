@@ -254,21 +254,27 @@ ul.menu-popup {
 }
 
 /* autocomplete popup */
+.autocomplete,
 .acpopup {
 	max-height:150px;
 	background-color:@MenuBg;
 	color: @Menu;
-	border:1px solid #MenuBorder;
+	border:1px solid @MenuBorder;
 	overflow:auto;
 	z-index:100000;
 	.shadow();
 }
+.autocomplete > div, 
 .acpopupitem {
 	color: @MenuItem; padding: 4px;
 	clear:left;
+	overflow: auto;
+	height: auto;
 	img {
 		float: left;
 		margin-right: 4px;
+		width: 16px !important;
+		height: 16px !important;
 	}
 	&.selected{
 		background-color: @MenuItemHoverBg;
@@ -484,7 +490,7 @@ section {
 		max-width: 720px;
 		word-wrap: break-word;
 	}
-	.wall-item-content img { max-width: 710px; }
+	.wall-item-content img { max-width: 700px; }
 	.wall-item-links,
 	.wall-item-actions { 
 		display: table-cell; 
