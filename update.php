@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1162 );
+define( 'UPDATE_VERSION' , 1163 );
 
 /**
  *
@@ -1409,9 +1409,6 @@ function update_1159() {
 	if(!$r)
 		return UPDATE_FAILED;
 
-	require_once('include/tags.php');
-	update_items();
-
 	return UPDATE_SUCCESS;
 }
 
@@ -1438,4 +1435,9 @@ function update_1161() {
 		return UPDATE_FAILED;
 
 	return UPDATE_SUCCESS;
+}
+
+function update_1162() {
+	require_once('include/tags.php');
+	update_items();
 }
