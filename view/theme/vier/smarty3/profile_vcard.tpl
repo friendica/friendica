@@ -23,7 +23,7 @@
 			</ul>
 			</div>
 		{{else}}
-			<div class="profile-edit-side-div"><a class="profile-edit-side-link icon edit" title="{{$editprofile}}" href="profiles/{{$profid}}" ></a></div>
+			<div class="profile-edit-side-div"><a class="profile-edit-side-link icon edit" title="{{$editprofile}}" href="profiles" ></a></div>
 		{{/if}}
 	</div>
 
