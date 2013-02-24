@@ -426,6 +426,7 @@ function onepoll_run(&$argv, &$argc){
 							continue;
 						}
 						$datarray['body'] = escape_tags($r['body']);
+						$datarray['body'] = limit_body_size($datarray['body']);
 
 						logger("Mail: Importing ".$msg_uid." for ".$mailconf[0]['user']);
 
