@@ -75,6 +75,9 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 		$conv_as = json_decode($conv_as);
 
 		$first_id = "";
+
+                if (!is_array($conv_as->items))
+                    return;
 		$items = array_reverse($conv_as->items);
 
 		foreach ($items as $single_conv) {
