@@ -13,10 +13,12 @@
 	<tr><td style="padding-top:22px;" colspan="2">$preamble</td></tr>
 
 
+	{{ if $content_allowed }}
 	<tr><td style="padding-left:22px;padding-top:22px;width:60px;" valign="top" rowspan=3><a href="$source_link"><img style="border:0px;width:48px;height:48px;" src="$source_photo"></a></td>
 		<td style="padding-top:22px;"><a href="$source_link">$source_name</a></td></tr>
 	<tr><td style="font-weight:bold;padding-bottom:5px;">$title</td></tr>
 	<tr><td style="padding-right:22px;">$htmlversion</td></tr>
+	{{ endif }}
 	<tr><td style="padding-top:11px;" colspan="2">$hsitelink</td></tr>
 	<tr><td style="padding-bottom:11px;" colspan="2">$hitemlink</td></tr>
 	<tr><td></td><td>$thanks</td></tr>
@@ -25,3 +27,4 @@
 </table>
 </body>
 </html>
+

@@ -46,6 +46,7 @@
 	{{include file="field_input.tpl" field=$global_directory}}
 	{{include file="field_checkbox.tpl" field=$thread_allow}}
 	{{include file="field_checkbox.tpl" field=$newuser_private}}
+	{{include file="field_checkbox.tpl" field=$enotify_no_content}}
 	
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit}}" /></div>
 	

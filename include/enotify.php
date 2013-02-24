@@ -415,6 +415,9 @@ intval($params['uid']), LOGGER_DEBUG);
 
 		call_hooks('enotify_mail', $datarray);
 
+		// check whether sending post content in email notifications is allowed
+		$content_allowed = !get_config('system','enotify_no_content');
+
 		// load the template for private message notifications
 		$tpl = get_markup_template('email_notify_html.tpl');
 		$email_html_body = replace_macros($tpl,array(
@@ -432,7 +435,8 @@ intval($params['uid']), LOGGER_DEBUG);
 			'$thanks'       => $datarray['thanks'],
 			'$site_admin'   => $datarray['site_admin'],
 			'$title'		=> $datarray['title'],
-			'$htmlversion'	=> $datarray['htmlversion'],	
+			'$htmlversion'	=> $datarray['htmlversion'],
+			'$content_allowed'	=> $content_allowed,
 		));
 		
 		// load the template for private message notifications
@@ -453,6 +457,7 @@ intval($params['uid']), LOGGER_DEBUG);
 			'$site_admin'   => $datarray['site_admin'],
 			'$title'		=> $datarray['title'],
 			'$textversion'	=> $datarray['textversion'],	
+			'$content_allowed'	=> $content_allowed,
 		));
 
 //		logger('text: ' . $email_text_body);
