@@ -86,7 +86,7 @@ class Item extends BaseObject {
 		$a = $this->get_app();
 
 		$item = $this->get_data();
-                $item['was_edited'] = strcmp($item['created'], $item['edited']);
+                $item['was_edited'] = strcmp($item['created'], $item['edited'])<>0;
 
 		$commentww = '';
 		$sparkle = '';
