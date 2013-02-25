@@ -1166,7 +1166,7 @@ function prepare_body($item,$attach = false) {
 	}
 
         if ($item['was_edited'])
-            $s .= '<div class="item-edited"><em>'.t('This item was edited.').'</em></div>';
+            $s .= '<div class="item-edited"><em>'.t('This entry was edited.').'</em></div>';
 
 	$prep_arr = array('item' => $item, 'html' => $s);
 	call_hooks('prepare_body_final', $prep_arr);
