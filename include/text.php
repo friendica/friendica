@@ -1165,6 +1165,9 @@ function prepare_body($item,$attach = false) {
 		$s = substr($s, 0, $pos).$authorreplace.substr($s, $pos+strlen($authorsearch));
 	}
 
+        if ($item['was_edited'])
+            $s .= '<div class="item-edited"><em>'.t('Item was edited').'</em></div>';
+
 	$prep_arr = array('item' => $item, 'html' => $s);
 	call_hooks('prepare_body_final', $prep_arr);
 
