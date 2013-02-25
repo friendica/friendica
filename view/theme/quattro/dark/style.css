@@ -1214,6 +1214,9 @@ section {
     opacity: 0.5;
 }*/
 .wwto {
+  position: absolute !important;
+  width: 25px;
+  height: 25px;
   background: #FFFFFF;
   border: 2px solid #364e59;
   height: 25px;
@@ -2241,5 +2244,11 @@ footer {
   font-size: 8pt;
   margin-left: 10px;
   border: 0px;
+  color: #999999;
+}
+/* item edited? */
+.item-edited {
+  padding-top: 30px;
+  font-style: italic;
   color: #999999;
 }
