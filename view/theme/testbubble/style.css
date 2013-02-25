@@ -3291,3 +3291,9 @@ ul.menu-popup {
 #page-profile div#profile-page-list{
 margin-left: 45px;
 }
+/* item edited? */
+.item-edited {
+  padding-top: 30px;
+  font-style: italic;
+  color: #999999;
+}

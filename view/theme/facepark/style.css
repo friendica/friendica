@@ -3065,3 +3065,9 @@ ul.menu-popup {
 .notify-seen {
 	background: #DDDDDD;
 }
+/* item edited? */
+.item-edited {
+  padding-top: 30px;
+  font-style: italic;
+  color: #999999;
+}
