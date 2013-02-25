@@ -694,7 +694,7 @@ function admin_page_users(&$a){
 	}
 	
 	
-	$users = q("SELECT `user` . * , `contact`.`name` , `contact`.`url` , `contact`.`micro`, `lastitem`.`lastitem_date`
+	$users = q("SELECT `user` . * , `contact`.`name` , `contact`.`url` , `contact`.`micro`, `lastitem`.`lastitem_date`, `user`.`account_expired`
 				FROM
 					(SELECT MAX(`item`.`changed`) as `lastitem_date`, `item`.`uid`
 					FROM `item`
@@ -718,7 +718,7 @@ function admin_page_users(&$a){
 			t('Normal Account'), 
 			t('Soapbox Account'),
 			t('Community/Celebrity Account'),
-			t('Automatic Friend Account')
+                        t('Automatic Friend Account')
 		);
 		$e['page-flags'] = $accounts[$e['page-flags']];
 		$e['register_date'] = relative_date($e['register_date']);
@@ -756,6 +756,7 @@ function admin_page_users(&$a){
 		'$block' => t('Block'),
 		'$unblock' => t('Unblock'),
         '$siteadmin' => t('Site admin'),
+        '$accountexpired' => t('Account expired'),
 		
 		'$h_users' => t('Users'),
 		'$th_users' => array( t('Name'), t('Email'), t('Register date'), t('Last login'), t('Last item'),  t('Account') ),
