@@ -2468,3 +2468,9 @@ a.mail-list-link {
         border: none;
 }
 
+/* item edited? */
+.item-edited {
+  padding-top: 30px;
+  font-style: italic;
+  color: #999999;
+}
