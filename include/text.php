@@ -1166,7 +1166,7 @@ function prepare_body($item,$attach = false) {
 	}
 
         if ($item['was_edited'])
-            $s .= '<div class="item-edited">'.t('This entry was edited.').'</div>';
+            $s .= '<div class="item-edited">'. t('This entry was edited') . sprintf(' <span title="%s">%s</span>.', $item['edited'], relative_date($item['edited'])).'</div>';
 
 	$prep_arr = array('item' => $item, 'html' => $s);
 	call_hooks('prepare_body_final', $prep_arr);
