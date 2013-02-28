@@ -46,9 +46,12 @@ function po2php_run(&$argv, &$argc) {
 			$match=Array();
 			preg_match("|nplurals=([0-9]*); *plural=(.*)[;\\\\]|", $l, $match);
 			$cond = str_replace('n','$n',$match[2]);
-			$out .= 'function string_plural_select_' . $lang . '($n){'."\n";
+			// define plural select function if not already defined
+			$fnname = 'string_plural_select_' . $lang;
+			$out .= 'if(! function_exists("'.$fnname.'")) {'."\n";
+			$out .= 'function '. $fnname . '($n){'."\n";
 			$out .= '	return '.$cond.';'."\n";
-			$out .= '}'."\n";
+			$out .= '}}'."\n";
 		}
 		
 

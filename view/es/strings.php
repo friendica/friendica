@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_es")) {
 function string_plural_select_es($n){
 	return ($n != 1);;
-}
+}}
 ;
 $a->strings["Post successful."] = "¡Publicado!";
 $a->strings["[Embedded content - reload page to view]"] = "[Contenido incrustado - recarga la página para verlo]";

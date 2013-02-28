@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_is")) {
 function string_plural_select_is($n){
 	return ($n != 1);;
-}
+}}
 ;
 $a->strings["Post successful."] = "Melding tókst.";
 $a->strings["[Embedded content - reload page to view]"] = "[Innfelt efni - endurhlaða síðu til að sjá]";

@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_pl")) {
 function string_plural_select_pl($n){
 	return ($n==1 ? 0 : $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2);;
-}
+}}
 ;
 $a->strings["Post successful."] = "Post dodany pomyślnie";
 $a->strings["[Embedded content - reload page to view]"] = "";

@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_eo")) {
 function string_plural_select_eo($n){
 	return ($n != 1);;
-}
+}}
 ;
 $a->strings["Post successful."] = "Sukcese afiŝita.";
 $a->strings["[Embedded content - reload page to view]"] = "[Enigita enhavo - reŝargu paĝon por spekti ĝin]";

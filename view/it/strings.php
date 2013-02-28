@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_it")) {
 function string_plural_select_it($n){
 	return ($n != 1);;
-}
+}}
 ;
 $a->strings["Altpager settings updated."] = "Impostazioni Altpager aggiornate.";
 $a->strings["Alternate Pagination Setting"] = "Impostazioni Paginatore Alternativo";

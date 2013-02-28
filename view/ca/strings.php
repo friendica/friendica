@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_ca")) {
 function string_plural_select_ca($n){
 	return ($n != 1);;
-}
+}}
 ;
 $a->strings["Post successful."] = "Publicat amb éxit.";
 $a->strings["[Embedded content - reload page to view]"] = "[Contingut embegut - recarrega la pàgina per a veure-ho]";

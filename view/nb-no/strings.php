@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_nb_no")) {
 function string_plural_select_nb_no($n){
 	return ($n != 1);;
-}
+}}
 ;
 $a->strings["Post successful."] = "Innlegg vellykket.";
 $a->strings["[Embedded content - reload page to view]"] = "[Innebygget innhold - hent siden på nytt for å se det]";

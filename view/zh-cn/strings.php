@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_zh_cn")) {
 function string_plural_select_zh_cn($n){
 	return 0;;
-}
+}}
 ;
 $a->strings["Post successful."] = "评论发表了。";
 $a->strings["[Embedded content - reload page to view]"] = "[嵌入内容－重新加载页为看]";
@@ -1505,7 +1506,7 @@ $a->strings["Alternate Pagination Setting"] = "供替换的分页设置";
 $a->strings["Use links to \"newer\" and \"older\" pages in place of page numbers?"] = "用到「更新」和「更旧」页代替页数？";
 $a->strings["Force global use of the alternate pager"] = "让大家用供替换的分页";
 $a->strings["Each user chooses whether to use the alternate pager"] = "每用户选择是否用供替换的分页";
-$a->strings["The MathJax addon renders mathematical formulae written using the LaTeX syntax surrounded by the usual $$ or an eqnarray block in the postings of your wall,network tab and private mail."] = "MathJax插件表示用LaTeX句法的数学公式，围绕\$\$或者eqnarray快，在您墙，网络分页和私人收件箱的文章。";
+$a->strings["The MathJax addon renders mathematical formulae written using the LaTeX syntax surrounded by the usual $$ or an eqnarray block in the postings of your wall,network tab and private mail."] = "MathJax插件表示用LaTeX句法的数学公式，围绕$$或者eqnarray快，在您墙，网络分页和私人收件箱的文章。";
 $a->strings["Use the MathJax renderer"] = "用MathJax表示器";
 $a->strings["MathJax Base URL"] = "MathJax基础URL";
 $a->strings["The URL for the javascript file that should be included to use MathJax. Can be either the MathJax CDN or another installation of MathJax."] = "URL JavaScript文件应该包括为用MathJax。可以MathJax CDN或者别的MathJax安装。";

@@ -1,8 +1,9 @@
 <?php
 
+if(! function_exists("string_plural_select_ru")) {
 function string_plural_select_ru($n){
 	return ($n%10==1 && $n%100!=11 ? 0 : $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2);;
-}
+}}
 ;
 $a->strings["Post successful."] = "Успешно добавлено.";
 $a->strings["[Embedded content - reload page to view]"] = "[Встроенное содержание - перезагрузите страницу для просмотра]";
