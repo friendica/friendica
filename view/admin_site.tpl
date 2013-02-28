@@ -85,7 +85,7 @@
 	{{ inc field_checkbox.tpl with $field=$thread_allow }}{{ endinc }}
 	{{ inc field_checkbox.tpl with $field=$newuser_private }}{{ endinc }}
 	{{ inc field_checkbox.tpl with $field=$enotify_no_content }}{{ endinc }}
-	
+	{{ inc field_checkbox.tpl with $field=$private_addons }}{{ endinc }}	
 	<div class="submit"><input type="submit" name="page_site" value="$submit" /></div>
 	
 	<h3>$advanced</h3>

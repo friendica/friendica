@@ -1,7 +1,14 @@
 <?php
 
 function apps_content(&$a) {
-	$title = t('Applications');
+    $privateaddons = get_config('config','private_addons');
+      if ($privateaddons === "1") {
+	if((! (local_user())))  {
+	info( t("You must be logged in to use addons. "));
+      return;};
+}
+
+      $title = t('Applications');
 
 	if(count($a->apps)==0)
 		notice( t('No installed applications.') . EOL);

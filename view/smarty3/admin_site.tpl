@@ -90,7 +90,7 @@
 	{{include file="field_checkbox.tpl" field=$thread_allow}}
 	{{include file="field_checkbox.tpl" field=$newuser_private}}
 	{{include file="field_checkbox.tpl" field=$enotify_no_content}}
-	
+	{{include file="field_checkbox.tpl" field=$private_addons}}	
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit}}" /></div>
 	
 	<h3>{{$advanced}}</h3>

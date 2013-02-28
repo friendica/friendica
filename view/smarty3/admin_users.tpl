@@ -75,7 +75,7 @@
 						<td class='register_date'>{{$u.register_date}}</td>
 						<td class='login_date'>{{$u.login_date}}</td>
 						<td class='lastitem_date'>{{$u.lastitem_date}}</td>
-						<td class='login_date'>{{$u.page_flags}} {{if $u.is_admin}}({{$siteadmin}}){{/if}} {{if $u.accountexpired}}{{$account_expired}}{{/if}}</td>
+						<td class='login_date'>{{$u.page_flags}} {{if $u.is_admin}}({{$siteadmin}}){{/if}} {{if $u.account_expired}}({{$accountexpired}}){{/if}}</td>
 						<td class="checkbox"> 
                                     {{if $u.is_admin}}
                                         &nbsp;
