@@ -45,11 +45,12 @@ OPTS=
 KEYWORDS="-k -kt -ktt:1,2"
 
 echo "extract strings to $OUTFILE.."
+rm "$OUTFILE"; touch "$OUTFILE"
 for f in $(find "$FINDSTARTDIR" $FINDOPTS -name "*.php" -type f)
 do
 	if [ ! -d "$f" ]
 	then
-		xgettext $KEYWORDS $OPTS -o "$OUTFILE" --from-code=UTF-8 "$f"
+		xgettext $KEYWORDS $OPTS -j -o "$OUTFILE" --from-code=UTF-8 "$f"
 	fi
 done
 
