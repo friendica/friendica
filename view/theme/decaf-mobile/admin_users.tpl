@@ -70,7 +70,7 @@
 						<td class='register_date'>$u.register_date</td>
 						<td class='login_date'>$u.login_date</td>
 						<td class='lastitem_date'>$u.lastitem_date</td>
-						<td class='login_date'>$u.page_flags {{ if $u.is_admin }}($siteadmin){{ endif }}</td>
+						<td class='login_date'>$u.page_flags {{ if $u.is_admin }}($siteadmin){{ endif }} {{ if $u.account_expired }}($accountexpired){{ endif }}</td>
 						<td class="checkbox"> 
                                     {{ if $u.is_admin }}
                                         &nbsp;

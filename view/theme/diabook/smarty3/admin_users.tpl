@@ -74,7 +74,7 @@
 						<td class='register_date'>{{$u.register_date}}</td>
 						<td class='login_date'>{{$u.login_date}}</td>
 						<td class='lastitem_date'>{{$u.lastitem_date}}</td>
-						<td class='login_date'>{{$u.page_flags}}</td>
+						<td class='login_date'>{{$u.page_flags}} {{if $u.is_admin}}({{$siteadmin}}){{/if}} {{if $u.account_expired}}({{$accountexpired}}){{/if}}</td>
 						<td class="checkbox"><input type="checkbox" class="users_ckbx" id="id_user_{{$u.uid}}" name="user[]" value="{{$u.uid}}"/></td>
 						<td class="tools" style="width:60px;">
 							<a href="{{$baseurl}}/admin/users/block/{{$u.uid}}?t={{$form_security_token}}" title='{{if $u.blocked}}{{$unblock}}{{else}}{{$block}}{{/if}}'><span class='icon block {{if $u.blocked==0}}dim{{/if}}'></span></a>
