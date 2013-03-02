@@ -4493,3 +4493,9 @@ div #datebrowse-sidebar.widget {
 	width: 75px;
 }
 
+/* item edited? */
+.item-edited {
+  padding-top: 30px;
+  font-style: italic;
+  color: #999999;
+}

@@ -3310,3 +3310,9 @@ ul.menu-popup {
 .shared_header span {
 	margin-left: 10px;
 }
+/* item edited? */
+.item-edited {
+    padding-top: 30px;
+    font-style: italic;
+    color: @ItemColorDimmed;
+}

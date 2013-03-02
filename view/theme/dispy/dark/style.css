@@ -552,3 +552,9 @@ footer{display:block;clear:both;}
 #jappix_mini{margin-left:130px;position:fixed;bottom:0;right:175px !important;z-index:999;}
 #fancybox-content{color:#111;}
 @media handheld and screen{body{font-size:15pt;}}@media only screen and (min-device-width:320px) and (max-device-width:480px){body{font-size:12pt;}}@media only screen and (min-width:321px){body{font-size:12pt;}}@media only screen and (max-width:320px){body{font-size:12pt;}}@media only screen and (min-device-width:768px) and (max-device-width:1024px){body{font-size:14pt;}}@media only screen and (min-device-width:768px) and (max-device-width:1024px) and (orientation:landscape){body{font-size:14pt;}}@media only screen and (min-device-width:768px) and (max-device-width:1024px) and (orientation:portrait){body{font-size:14pt;}}@media only screen and (min-width:1024px){body{font-size:14pt;}}@media only screen and (min-width:1520px){body{font-size:16pt;}}@media only screen and (-webkit-min-device-pixel-ratio:1.5),only screen and (min-device-pixel-ratio:1.5){body{font-size:14pt;}}
+/* item edited? */
+.item-edited {
+  padding-top: 30px;
+  font-style: italic;
+  color: #999999;
+}
