@@ -3039,7 +3039,11 @@ class HTML5_TreeBuilder {
         }
 
     private function insertElement($token, $append = true) {
-        $el = $this->dom->createElementNS(self::NS_HTML, $token['name']);
+	$el = $this->dom->createElementNS(self::NS_HTML, $token['name']);
+	if ($el == false) {
+		logger('insertElement(): ignoring invalid token='.$token['name']);
+		return false;
+	}
 		
         if (!empty($token['attr'])) {
             foreach($token['attr'] as $attr) {
