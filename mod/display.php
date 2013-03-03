@@ -166,6 +166,32 @@ function display_content(&$a, $update = 0) {
 			$o .= "<script> var netargs = '?f=&nick=" . $nick . "&item_id=" . $item_id . "'; </script>";
 		$o .= conversation($a,$items,'display', $update);
 
+		// Preparing the meta header
+		require_once('include/bbcode.php');
+		require_once("include/html2plain.php");
+		$description = trim(html2plain(bbcode($r[0]["body"], false, false), 0, true));
+		$title = trim(html2plain(bbcode($r[0]["title"], false, false), 0, true));
+
+		if ($title == "")
+			$title = $r[0]["author-name"];
+
+		//<meta name="keywords" content="">
+		$a->page['htmlhead'] .= '<meta name="author" content="'.$r[0]["author-name"].'" />'."\n";
+		$a->page['htmlhead'] .= '<meta name="title" content="'.$title.'" />'."\n";
+		$a->page['htmlhead'] .= '<meta name="fulltitle" content="'.$title.'" />'."\n";
+		$a->page['htmlhead'] .= '<meta name="description" content="'.$description.'" />'."\n";
+
+		$a->page['htmlhead'] .= '<meta name="DC.title" content="'.$title.'" />'."\n";
+		$a->page['htmlhead'] .= '<meta name="DC.description" content="'.$description.'" />'."\n";
+
+		$a->page['htmlhead'] .= '<meta property="og:type" content="website" />'."\n";
+		$a->page['htmlhead'] .= '<meta property="og:title" content="'.$title.'" />'."\n";
+		//<meta property="og:image" content="" />
+		$a->page['htmlhead'] .= '<meta property="og:url" content="'.$r[0]["plink"].'" />'."\n";
+		$a->page['htmlhead'] .= '<meta property="og:description" content="'.$description.'" />'."\n";
+		$a->page['htmlhead'] .= '<meta name="og:article:author" content="'.$r[0]["author-name"].'" />'."\n";
+		// article:tag
+
 	}
 	else {
 		$r = q("SELECT `id`,`deleted` FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",

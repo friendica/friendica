@@ -33,7 +33,7 @@ function completeurl($url, $scheme) {
 
         $complete = $schemearr["scheme"]."://".$schemearr["host"];
 
-        if ($schemearr["port"] != "")
+        if (@$schemearr["port"] != "")
                 $complete .= ":".$schemearr["port"];
 
 		if(strpos($urlarr['path'],'/') !== 0)
@@ -41,10 +41,10 @@ function completeurl($url, $scheme) {
 
         $complete .= $urlarr["path"];
 
-        if ($urlarr["query"] != "")
+        if (@$urlarr["query"] != "")
                 $complete .= "?".$urlarr["query"];
 
-        if ($urlarr["fragment"] != "")
+        if (@$urlarr["fragment"] != "")
                 $complete .= "#".$urlarr["fragment"];
 
         return($complete);
@@ -52,17 +52,28 @@ function completeurl($url, $scheme) {
 
 function parseurl_getsiteinfo($url) {
 	$siteinfo = array();
-
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_HEADER, 1);
 	curl_setopt($ch, CURLOPT_NOBODY, 0);
 	curl_setopt($ch, CURLOPT_TIMEOUT, 3);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	//curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 	curl_setopt($ch,CURLOPT_USERAGENT,'Opera/9.64(Windows NT 5.1; U; de) Presto/2.1.1');
 
 	$header = curl_exec($ch);
+	$curl_info = @curl_getinfo($ch);
+        $http_code = $curl_info['http_code'];
 	curl_close($ch);
+
+	if ((($curl_info['http_code'] == "301") OR ($curl_info['http_code'] == "302"))
+		AND (($curl_info['redirect_url'] != "") OR ($curl_info['location'] != ""))) {
+		if ($curl_info['redirect_url'] != "")
+			$siteinfo = parseurl_getsiteinfo($curl_info['redirect_url']);
+		else
+			$siteinfo = parseurl_getsiteinfo($curl_info['location']);
+		return($siteinfo);
+	}
 
 	// Fetch the first mentioned charset. Can be in body or header
 	if (preg_match('/charset=(.*?)['."'".'"\s\n]/', $header, $matches))
@@ -96,6 +107,28 @@ function parseurl_getsiteinfo($url) {
 	deletenode($doc, 'ul');
 
 	$xpath = new DomXPath($doc);
+
+	$list = $xpath->query("//meta[@content]");
+        foreach ($list as $node) {
+                $attr = array();
+                if ($node->attributes->length)
+                        foreach ($node->attributes as $attribute)
+                                $attr[$attribute->name] = $attribute->value;
+
+                if (@$attr["http-equiv"] == 'refresh') {
+                        $path = $attr["content"];
+                        $pathinfo = explode(";", $path);
+                        $content = "";
+                        foreach ($pathinfo AS $value) {
+                                if (substr(strtolower($value), 0, 4) == "url=")
+                                        $content = substr($value, 4);
+                        }
+                        if ($content != "") {
+                                $siteinfo = parseurl_getsiteinfo($content);
+                                return($siteinfo);
+                        }
+                }
+	}
 
 	//$list = $xpath->query("head/title");
 	$list = $xpath->query("//title");
@@ -151,7 +184,7 @@ function parseurl_getsiteinfo($url) {
 		}
 	}
 
-	if ($siteinfo["image"] == "") {
+	if (@$siteinfo["image"] == "") {
             $list = $xpath->query("//img[@src]");
             foreach ($list as $node) {
                 $attr = array();
@@ -190,7 +223,7 @@ function parseurl_getsiteinfo($url) {
 							"height"=>$photodata[1]);
 	}
 
-	if ($siteinfo["text"] == "") {
+	if (@$siteinfo["text"] == "") {
 		$text = "";
 
 		$list = $xpath->query("//div[@class='article']");

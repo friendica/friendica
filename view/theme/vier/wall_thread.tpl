@@ -59,7 +59,7 @@
 			</span>
 		</div>
 
-		<div class="wall-item-content">
+		<div itemprop="description" class="wall-item-content">
 			{{ if $item.title }}<h2><a href="$item.plink.href" class="$item.sparkle">$item.title</a></h2>{{ endif }}
 			$item.body
 		</div>
