@@ -86,7 +86,14 @@ class Item extends BaseObject {
 		$a = $this->get_app();
 
 		$item = $this->get_data();
-
+                $edited = false;
+                if (strcmp($item['created'], $item['edited'])<>0) {
+                      $edited = array(
+                          'label' => t('This entry was edited'),
+                          'date' => datetime_convert('UTC', date_default_timezone_get(), $item['edited'], 'r'),
+                          'relative' => relative_date($item['edited'])
+                      );
+                }
 		$commentww = '';
 		$sparkle = '';
 		$buttons = '';
@@ -325,13 +332,14 @@ class Item extends BaseObject {
 			'drop' => $drop,
 			'vote' => $buttons,
 			'like' => $like,
-			'dislike'   => $dislike,
+                        'dislike'   => $dislike,
 			'switchcomment' => t('Comment'),
 			'comment' => $this->get_comment_box($indent),
 			'previewing' => ($conv->is_preview() ? ' preview ' : ''),
 			'wait' => t('Please wait'),
 			'thread_level' => $thread_level,
-			'postopts' => $langstr
+                        'postopts' => $langstr,
+                        'edited' => $edited
 		);
 
 		$arr = array('item' => $item, 'output' => $tmp_item);
