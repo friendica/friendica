@@ -309,6 +309,7 @@ function check_add(&$checks, $title, $status, $required, $help){
 }
 
 function check_php(&$phpath, &$checks) {
+	$passed = $passed2 = $passed3 = false;
 	if (strlen($phpath)){
 		$passed = file_exists($phpath);
 	} else {
@@ -330,16 +331,30 @@ function check_php(&$phpath, &$checks) {
 	check_add($checks, t('Command line PHP').($passed?" (<tt>$phpath</tt>)":""), $passed, false, $help);
 	
 	if($passed) {
+		$cmd = "$phpath -v";
+		$result = trim(shell_exec($cmd));
+		$passed2 = ( strpos($result, "(cli)") !== false );
+		list($result) = explode("\n", $result);
+		$help = "";
+		if(!$passed2) {
+			$help .= t('PHP executable is not the php cli binary (could be cgi-fgci version)'). EOL;
+			$help .= t('Found PHP version: ')."<tt>$result</tt>";
+		}
+		check_add($checks, t('PHP cli binary'), $passed2, true, $help);
+	}
+	
+	
+	if($passed2) {
 		$str = autoname(8);
 		$cmd = "$phpath testargs.php $str";
 		$result = trim(shell_exec($cmd));
-		$passed2 = $result == $str;
+		$passed3 = $result == $str;
 		$help = "";
-		if(!$passed2) {
+		if(!$passed3) {
 			$help .= t('The command line version of PHP on your system does not have "register_argc_argv" enabled.'). EOL;
 			$help .= t('This is required for message delivery to work.');
 		}
-		check_add($checks, t('PHP register_argc_argv'), $passed, true, $help);
+		check_add($checks, t('PHP register_argc_argv'), $passed3, true, $help);
 	}
 	
 
