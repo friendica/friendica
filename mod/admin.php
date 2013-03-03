@@ -256,7 +256,8 @@ function admin_page_site_post(&$a){
 	$thread_allow		=	((x($_POST,'thread_allow'))		? True						: False);
 	$newuser_private		=	((x($_POST,'newuser_private'))		? True						: False);
 	$enotify_no_content		=	((x($_POST,'enotify_no_content'))	? True						: False);
-	$private_addons		=	((x($_POST,'private_addons'))		? True						: False);
+	$private_addons			=	((x($_POST,'private_addons'))		? True						: False);
+	$disable_embedded		=	((x($_POST,'disable_embedded'))		? True						: False);
 	
 	$no_multi_reg		=	((x($_POST,'no_multi_reg'))		? True						: False);
 	$no_openid		=	!((x($_POST,'no_openid'))		? True						: False);
@@ -374,6 +375,7 @@ function admin_page_site_post(&$a){
 	set_config('system','thread_allow', $thread_allow);
 	set_config('system','newuser_private', $newuser_private);
 	set_config('system','enotify_no_content', $enotify_no_content);
+	set_config('system','disable_embedded', $disable_embedded);
 
 	set_config('system','block_extended_register', $no_multi_reg);
 	set_config('system','no_openid', $no_openid);
@@ -510,6 +512,7 @@ function admin_page_site(&$a) {
 		'$newuser_private'	=> array('newuser_private', t("Private posts by default for new users"), get_config('system','newuser_private'), t("Set default post permissions for all new members to the default privacy group rather than public.")),
 		'$enotify_no_content'	=> array('enotify_no_content', t("Don't include post content in email notifications"), get_config('system','enotify_no_content'), t("Don't include the content of a post/comment/private message/etc. in the email notifications that are sent out from this site, as a privacy measure.")),
 		'$private_addons'	=> array('private_addons', t("Disallow public access to addons listed in the apps menu."), get_config('config','private_addons'), t("Checking this box will restrict addons listed in the apps menu to members only.")),
+		'$disable_embedded'	=> array('disable_embedded', t("Don't embed private images in posts"), get_config('system','disable_embedded'), t("Don't replace locally-hosted private photos in posts with an embedded copy of the image. This means that contacts who receive posts containing private photos won't be able to see them unless they first visit the owner's profile page, or unless they have the redir_private_img plugin enabled.")),
 		
 		'$no_multi_reg'		=> array('no_multi_reg', t("Block multiple registrations"),  get_config('system','block_extended_register'), t("Disallow users to register additional accounts for use as pages.")),
 		'$no_openid'		=> array('no_openid', t("OpenID support"), !get_config('system','no_openid'), t("OpenID support for registration and logins.")),

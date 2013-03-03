@@ -3644,9 +3644,13 @@ function atom_entry($item,$type,$author,$owner,$comment = false,$cid = 0) {
 }
 
 function fix_private_photos($s, $uid, $item = null, $cid = 0) {
+
+	if(get_config('system','disable_embedded'))
+		return $s;
+
 	$a = get_app();
 
-	logger('fix_private_photos', LOGGER_DEBUG);
+	logger('fix_private_photos: check for photos', LOGGER_DEBUG);
 	$site = substr($a->get_baseurl(),strpos($a->get_baseurl(),'://'));
 
 	$orig_body = $s;

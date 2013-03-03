@@ -1047,9 +1047,33 @@ function link_compare($a,$b) {
 	return false;
 }}
 
+
+// Find any non-embedded images in private items and add redir links to them
+
+if(! function_exists('redir_private_images')) {
+function redir_private_images($a, &$item) {
+
+	$matches = false;
+	$cnt = preg_match_all('|\[img\](http[^\[]*?/photo/[a-fA-F0-9]+?(-[0-9]\.[\w]+?)?)\[\/img\]|', $item['body'], $matches, PREG_SET_ORDER);
+	if($cnt) {
+		//logger("redir_private_images: matches = " . print_r($matches, true));
+		foreach($matches as $mtch) {
+			if(strpos($mtch[1], '/redir') !== false)
+				continue;
+
+			if((local_user() == $item['uid']) && ($item['private'] != 0) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN)) {
+				//logger("redir_private_images: redir");
+				$img_url = $a->get_baseurl() . '/redir?f=1&quiet=1&url=' . $mtch[1] . '&conurl=' . $item['author-link'];
+				$item['body'] = str_replace($mtch[0], "[img]".$img_url."[/img]", $item['body']);
+			}
+		}
+	}
+
+}}
+
+
 // Given an item array, convert the body element from bbcode to html and add smilie icons.
 // If attach is true, also add icons for item attachments
-
 
 if(! function_exists('prepare_body')) {
 function prepare_body($item,$attach = false) {
@@ -1066,14 +1090,19 @@ function prepare_body($item,$attach = false) {
 			$s = file_get_contents($cachefile);
 			$a->save_timestamp($stamp1, "file");
 		} else {
+			redir_private_images($a, $item);
 			$s = prepare_text($item['body']);
+
 			$stamp1 = microtime(true);
 			file_put_contents($cachefile, $s);
 			$a->save_timestamp($stamp1, "file");
+
 			logger('prepare_body: put item '.$item["id"].' into cachefile '.$cachefile);
 		}
-	} else
+	} else {
+		redir_private_images($a, $item);
 		$s = prepare_text($item['body']);
+	}
 
 
 	$prep_arr = array('item' => $item, 'html' => $s);
