@@ -23,9 +23,9 @@
 		</div>
 		<div class="wall-item-actions-author">
 			<a href="$item.profile_url" target="redir" title="$item.linktitle" class="wall-item-name-link"><span class="wall-item-name$item.sparkle">$item.name</span></a> 
-			<span class="wall-item-ago">- &nbsp;
+			<span class="wall-item-ago">
 				{{ if $item.plink }}<a class="link" title="$item.plink.title" href="$item.plink.href" style="color: #999">$item.ago</a>{{ else }} $item.ago {{ endif }}
-				{{ if $item.lock }} - <span class="fakelink" style="color: #999" onclick="lockview(event,$item.id);">$item.lock</span> {{ endif }}
+				{{ if $item.lock }}<span class="fakelink" style="color: #999" onclick="lockview(event,$item.id);">$item.lock</span> {{ endif }}
 			</span>
 		</div>
 		<div class="wall-item-content">

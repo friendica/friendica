@@ -158,22 +158,24 @@ class Item extends BaseObject {
 		$hashtags = array();
 		$mentions = array();
 
-		$taglist = q("SELECT `type`, `term`, `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` IN (%d, %d) ORDER BY `tid`",
-				intval(TERM_OBJ_POST), intval($item['id']), intval(TERM_HASHTAG), intval(TERM_MENTION));
+		if (!get_config('system','suppress_tags')) {
+			$taglist = q("SELECT `type`, `term`, `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` IN (%d, %d) ORDER BY `tid`",
+					intval(TERM_OBJ_POST), intval($item['id']), intval(TERM_HASHTAG), intval(TERM_MENTION));
 
-		foreach($taglist as $tag) {
+			foreach($taglist as $tag) {
 
-			if ($tag["url"] == "")
-				$tag["url"] = $searchpath.strtolower($tag["term"]);
+				if ($tag["url"] == "")
+					$tag["url"] = $searchpath.strtolower($tag["term"]);
 
-			if ($tag["type"] == TERM_HASHTAG) {
-				$hashtags[] = "#<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
-				$prefix = "#";
-			} elseif ($tag["type"] == TERM_MENTION) {
-				$mentions[] = "@<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
-				$prefix = "@";
+				if ($tag["type"] == TERM_HASHTAG) {
+					$hashtags[] = "#<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+					$prefix = "#";
+				} elseif ($tag["type"] == TERM_MENTION) {
+					$mentions[] = "@<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+					$prefix = "@";
+				}
+				$tags[] = $prefix."<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
 			}
-			$tags[] = $prefix."<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
 		}
 
 		/*foreach(explode(',',$item['tag']) as $tag){
@@ -239,7 +241,7 @@ class Item extends BaseObject {
 
 		localize_item($item);
 
-		if ($item["postopts"]) {
+		if ($item["postopts"] and !get_config("system", "suppress_language")) {
 			//$langdata = explode(";", $item["postopts"]);
 			//$langstr = substr($langdata[0], 5)." (".round($langdata[1]*100, 1)."%)";
 			$langstr = "";

@@ -46,7 +46,7 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 
 	//logger('complete_conversation: completing conversation url '.$conversation_url.' for id '.$itemid);
 
-	$messages = q("SELECT `uid`, `parent` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
+	$messages = q("SELECT `uid`, `parent`, `created` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
 	if (!$messages)
 		return;
 	$message = $messages[0];
@@ -57,7 +57,7 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 
 	if (!$conversation) {
 		$r = q("INSERT INTO `term` (`uid`, `oid`, `otype`, `type`, `term`, `url`) VALUES (%d, %d, %d, %d, '%s', '%s')",
-			intval($message["uid"]), intval($itemid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc(datetime_convert()), dbesc($conversation_url));
+			intval($message["uid"]), intval($itemid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($message["created"]), dbesc($conversation_url));
 		logger('complete_conversation: Storing conversation url '.$conversation_url.' for id '.$itemid);
 	}
 

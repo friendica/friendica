@@ -30,7 +30,7 @@ function settings_init(&$a) {
 			'label'	=> t('Account settings'),
 			'url' 	=> $a->get_baseurl(true).'/settings',
 			'selected'	=> (($a->argc == 1)?'active':''),
-		),	
+		),
 		array(
 			'label'	=> t('Additional features'),
 			'url' 	=> $a->get_baseurl(true).'/settings/features',
@@ -40,8 +40,8 @@ function settings_init(&$a) {
 			'label'	=> t('Display settings'),
 			'url' 	=> $a->get_baseurl(true).'/settings/display',
 			'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'display')?'active':''),
-		),	
-		
+		),
+
 		array(
 			'label'	=> t('Connector settings'),
 			'url' 	=> $a->get_baseurl(true).'/settings/connectors',
@@ -68,7 +68,7 @@ function settings_init(&$a) {
 			'selected' => ''
 		)
 	);
-	
+
 	$tabtpl = get_markup_template("generic_links_widget.tpl");
 	$a->page['aside'] = replace_macros($tabtpl, array(
 		'$title' => t('Settings'),
@@ -96,19 +96,19 @@ function settings_post(&$a) {
 
 	if(($a->argc > 1) && ($a->argv[1] === 'oauth') && x($_POST,'remove')){
 		check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth');
-		
+
 		$key = $_POST['remove'];
 		q("DELETE FROM tokens WHERE id='%s' AND uid=%d",
 			dbesc($key),
 			local_user());
 		goaway($a->get_baseurl(true)."/settings/oauth/");
-		return;			
+		return;
 	}
 
 	if(($a->argc > 2) && ($a->argv[1] === 'oauth')  && ($a->argv[2] === 'edit'||($a->argv[2] === 'add')) && x($_POST,'submit')) {
-		
+
 		check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth');
-		
+
 		$name   	= ((x($_POST,'name')) ? $_POST['name'] : '');
 		$key		= ((x($_POST,'key')) ? $_POST['key'] : '');
 		$secret		= ((x($_POST,'secret')) ? $_POST['secret'] : '');
@@ -116,7 +116,7 @@ function settings_post(&$a) {
 		$icon		= ((x($_POST,'icon')) ? $_POST['icon'] : '');
 		if ($name=="" || $key=="" || $secret==""){
 			notice(t("Missing some important data!"));
-			
+
 		} else {
 			if ($_POST['submit']==t("Update")){
 				$r = q("UPDATE clients SET
@@ -236,7 +236,7 @@ function settings_post(&$a) {
 		call_hooks('connector_settings_post', $_POST);
 		return;
 	}
-	
+
 	if(($a->argc > 1) && ($a->argv[1] === 'features')) {
 		check_form_security_token_redirectOnErr('/settings/features', 'settings_features');
 		foreach($_POST as $k => $v) {
@@ -249,7 +249,7 @@ function settings_post(&$a) {
 	}
 
 	if(($a->argc > 1) && ($a->argv[1] === 'display')) {
-		
+
 		check_form_security_token_redirectOnErr('/settings/display', 'settings_display');
 
 		$theme = ((x($_POST,'theme')) ? notags(trim($_POST['theme']))  : $a->user['theme']);
@@ -611,8 +611,8 @@ function settings_content(&$a) {
 				WHERE clients.uid IN (%d,0)",
 				local_user(),
 				local_user());
-		
-		
+
+
 		$tpl = get_markup_template("settings_oauth.tpl");
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("settings_oauth"),
@@ -627,19 +627,19 @@ function settings_content(&$a) {
 			'$apps'		=> $r,
 		));
 		return $o;
-		
+
 	}
 
 	if(($a->argc > 1) && ($a->argv[1] === 'addon')) {
 		$settings_addons = "";
-		
+
 		$r = q("SELECT * FROM `hook` WHERE `hook` = 'plugin_settings' ");
 		if(! count($r))
 			$settings_addons = t('No Plugin settings configured');
 
 		call_hooks('plugin_settings', $settings_addons);
-		
-		
+
+
 		$tpl = get_markup_template("settings_addons.tpl");
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("settings_addon"),
@@ -650,7 +650,7 @@ function settings_content(&$a) {
 	}
 
 	if(($a->argc > 1) && ($a->argv[1] === 'features')) {
-		
+
 		$arr = array();
 		$features = get_features();
 		foreach($features as $fname => $fdata) {
@@ -675,7 +675,7 @@ function settings_content(&$a) {
 	if(($a->argc > 1) && ($a->argv[1] === 'connectors')) {
 
 		$settings_connectors = "";
-		
+
 		call_hooks('connector_settings', $settings_connectors);
 
 		$diasp_enabled = sprintf( t('Built-in support for %s connectivity is %s'), t('Diaspora'), ((get_config('system','diaspora_enabled')) ? t('enabled') : t('disabled')));
