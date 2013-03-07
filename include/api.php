@@ -1433,7 +1433,7 @@
 		return api_apply_template('test', $type, array('$ok' => $ok));
 
 	}
-	api_register_func('api/help/test','api_help_test',true);
+	api_register_func('api/help/test','api_help_test',false);
 
 	/**
 	 *  https://dev.twitter.com/docs/api/1/get/statuses/friends 
