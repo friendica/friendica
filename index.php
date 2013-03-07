@@ -183,6 +183,10 @@ if(strlen($a->module)) {
 	 *
 	 */
 
+	// Compatibility with the Android Diaspora client
+	if ($a->module == "stream")
+		$a->module = "network";
+
 	if(is_array($a->plugins) && in_array($a->module,$a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
 		include_once("addon/{$a->module}/{$a->module}.php");
 		if(function_exists($a->module . '_module'))

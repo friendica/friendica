@@ -90,6 +90,12 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 		$items = array_reverse($conv_as->items);
 
 		foreach ($items as $single_conv) {
+			if (@!$single_conv->id AND $single_conv->provider->url AND $single_conv->statusnet_notice_info->local_id)
+				$single_conv->id = $single_conv->provider->url."notice/".$single_conv->statusnet_notice_info->local_id;
+
+			if (@!$single_conv->id)
+				continue;
+
 			if ($first_id == "") {
 				$first_id = $single_conv->id;
 

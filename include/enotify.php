@@ -214,11 +214,10 @@ function notification($params) {
 	}
 
 	if($params['type'] == NOTIFY_CONFIRM) {
-
 	}
 
 	if($params['type'] == NOTIFY_SYSTEM) {
-		
+
 	}
 
 	$h = array(
