@@ -1149,7 +1149,6 @@ function item_store($arr,$force_parent = false) {
         $arr['deny_gid'] = $deny_gid;
         $arr['private'] = $private;
         $arr['deleted'] = $parent_deleted;
-	call_hooks('post_remote_end',$arr);
 
 	// update the commented timestamp on the parent
 
@@ -1194,6 +1193,14 @@ function item_store($arr,$force_parent = false) {
 		$a->save_timestamp($stamp1, "file");
 		logger('item_store: put item '.$current_post.' into cachefile '.$cachefile);
 	}
+
+        $r = q('SELECT * FROM `item` WHERE id = %d', intval($current_post));
+        if (count($r) == 1) {
+            call_hooks('post_remote_end', $r[0]);
+        }
+        else {
+            logger('item_store: new item not found in DB, id ' . $current_post);
+        }
 
 	return $current_post;
 }
