@@ -594,7 +594,7 @@ function network_content(&$a, $update = 0) {
 			if($update)
 				killme();
 			notice( t('No such group') . EOL );
-			goaway($a->get_baseurl(true) . '/network');
+			goaway($a->get_baseurl(true) . '/network/0');
 			// NOTREACHED
 		}
 
