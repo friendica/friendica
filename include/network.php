@@ -88,9 +88,10 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 		if (($new_location_info["path"] == "") AND ($new_location_info["host"] != ""))
 			$newurl = $new_location_info["scheme"]."://".$new_location_info["host"].$old_location_info["path"];
 
-		//$matches = array();
-		//preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
-		//$newurl = trim(array_pop($matches));
+		$matches = array();
+		if (preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches)) {
+			$newurl = trim(array_pop($matches));
+		}
 		if(strpos($newurl,'/') === 0)
 			$newurl = $url . $newurl;
 		$url_parsed = @parse_url($newurl);
