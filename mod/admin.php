@@ -1181,7 +1181,7 @@ readable.");
 		'$logname' =>  get_config('system','logfile'),
 		
 									// name, label, value, help string, extra data...
-		'$debugging' 		=> array('debugging', t("Debugging"),get_config('system','debugging'), ""),
+		'$debugging' 		=> array('debugging', t("Enable Debugging"),get_config('system','debugging'), ""),
 		'$logfile'			=> array('logfile', t("Log file"), get_config('system','logfile'), t("Must be writable by web server. Relative to your Friendica top-level directory.")),
 		'$loglevel' 		=> array('loglevel', t("Log level"), get_config('system','loglevel'), "", $log_choices),
 
