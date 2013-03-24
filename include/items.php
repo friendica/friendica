@@ -1589,6 +1589,26 @@ function dfrn_deliver($owner,$contact,$atom, $dissolve = false) {
 }
 
 
+/*
+  This function returns true if $update has an edited timestamp newer
+  than $existing, i.e. $update contains new data which should override
+  what's already there.  If there is no timestamp yet, the update is
+  assumed to be newer.  If the update has no timestamp, the existing
+  item is assumed to be up-to-date.  If the timestamps are equal it
+  assumes the update has been seen before and should be ignored.
+  */
+function edited_timestamp_is_newer($existing, $update) {
+    if (!x($existing,'edited') || !$existing['edited']) {
+        return true;
+    }
+    if (!x($update,'edited') || !$update['edited']) {
+        return false;
+    }
+    $existing_edited = datetime_convert('UTC', 'UTC', $existing['edited']);
+    $update_edited = datetime_convert('UTC', 'UTC', $update['edited']);
+    return (strcmp($existing_edited, $update_edited) < 0);
+}
+
 /**
  *
  * consume_feed - process atom feed and update anything/everything we might need to update
@@ -2002,7 +2022,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 				// Update content if 'updated' changes
 
 				if(count($r)) {
-					if((x($datarray,'edited') !== false) && (datetime_convert('UTC','UTC',$datarray['edited']) !== $r[0]['edited'])) {  
+					if (edited_timestamp_is_newer($r[0], $datarray)) {  
 
 						// do not accept (ignore) an earlier edit than one we currently have.
 						if(datetime_convert('UTC','UTC',$datarray['edited']) < $r[0]['edited'])
@@ -2151,7 +2171,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 				// Update content if 'updated' changes
 
 				if(count($r)) {
-					if((x($datarray,'edited') !== false) && (datetime_convert('UTC','UTC',$datarray['edited']) !== $r[0]['edited'])) {  
+					if (edited_timestamp_is_newer($r[0], $datarray)) {  
 
 						// do not accept (ignore) an earlier edit than one we currently have.
 						if(datetime_convert('UTC','UTC',$datarray['edited']) < $r[0]['edited'])
@@ -2905,7 +2925,7 @@ function local_delivery($importer,$data) {
 
 				if(count($r)) {
 					$iid = $r[0]['id'];
-					if((x($datarray,'edited') !== false) && (datetime_convert('UTC','UTC',$datarray['edited']) !== $r[0]['edited'])) {
+					if (edited_timestamp_is_newer($r[0], $datarray)) {
 
 						// do not accept (ignore) an earlier edit than one we currently have.
 						if(datetime_convert('UTC','UTC',$datarray['edited']) < $r[0]['edited'])
@@ -3080,7 +3100,7 @@ function local_delivery($importer,$data) {
 				// Update content if 'updated' changes
 
 				if(count($r)) {
-					if((x($datarray,'edited') !== false) && (datetime_convert('UTC','UTC',$datarray['edited']) !== $r[0]['edited'])) {  
+					if (edited_timestamp_is_newer($r[0], $datarray)) {  
 
 						// do not accept (ignore) an earlier edit than one we currently have.
 						if(datetime_convert('UTC','UTC',$datarray['edited']) < $r[0]['edited'])
@@ -3256,7 +3276,7 @@ function local_delivery($importer,$data) {
 			// Update content if 'updated' changes
 
 			if(count($r)) {
-				if((x($datarray,'edited') !== false) && (datetime_convert('UTC','UTC',$datarray['edited']) !== $r[0]['edited'])) {  
+				if (edited_timestamp_is_newer($r[0], $datarray)) {  
 
 					// do not accept (ignore) an earlier edit than one we currently have.
 					if(datetime_convert('UTC','UTC',$datarray['edited']) < $r[0]['edited'])
