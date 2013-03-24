@@ -971,7 +971,7 @@ function item_content(&$a) {
 		if (is_ajax()){
 			// ajax return: [<item id>, 0 (no perm) | <owner id>] 
 			echo json_encode(array(intval($a->argv[2]), intval($o)));
-			kllme();
+			killme();
 		}
 	}
 	return $o;
