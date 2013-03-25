@@ -84,6 +84,7 @@
 	{{include file="field_checkbox.tpl" field=$force_publish}}
 	{{include file="field_checkbox.tpl" field=$no_community_page}}
 	{{include file="field_checkbox.tpl" field=$ostatus_disabled}}
+	{{include file="field_select.tpl" field=$ostatus_poll_interval}}
 	{{include file="field_checkbox.tpl" field=$diaspora_enabled}}
 	{{include file="field_checkbox.tpl" field=$dfrn_only}}
 	{{include file="field_input.tpl" field=$global_directory}}

@@ -274,6 +274,7 @@ function admin_page_site_post(&$a){
 	$maxloadavg		=	((x($_POST,'maxloadavg'))		? intval(trim($_POST['maxloadavg']))		: 50);
 	$dfrn_only		=	((x($_POST,'dfrn_only'))		? True						: False);
 	$ostatus_disabled	=	!((x($_POST,'ostatus_disabled'))	? True  					: False);
+	$ostatus_poll_interval	=	((x($_POST,'ostatus_poll_interval'))	? intval(trim($_POST['ostatus_poll_interval']))		:  0);
 	$diaspora_enabled	=	((x($_POST,'diaspora_enabled'))		? True   					: False);
 	$ssl_policy		=	((x($_POST,'ssl_policy'))		? intval($_POST['ssl_policy']) 			: 0);
 	$new_share		=	((x($_POST,'new_share'))		? True   					: False);
@@ -388,6 +389,7 @@ function admin_page_site_post(&$a){
 	set_config('system','curl_timeout', $timeout);
 	set_config('system','dfrn_only', $dfrn_only);
 	set_config('system','ostatus_disabled', $ostatus_disabled);
+        set_config('system','ostatus_poll_interval', $ostatus_poll_interval);
 	set_config('system','diaspora_enabled', $diaspora_enabled);
 	set_config('config','private_addons', $private_addons);
 	
@@ -442,7 +444,16 @@ function admin_page_site(&$a) {
                 $theme_choices[$f] = $theme_name;
 			}
 		}
-	}
+        }
+
+        /* OStatus conversation poll choices */
+        $ostatus_poll_choices = array(
+                "-1" => t("Never"),
+                "0" => t("Frequently"),
+                "60" => t("Hourly"),
+                "720" => t("Twice daily"),
+                "1440" => t("Daily")
+            );
 
         /* get user names to make the install a personal install of X */
         $user_names = array();
@@ -520,6 +531,7 @@ function admin_page_site(&$a) {
 		'$no_utf'		=> array('no_utf', t("UTF-8 Regular expressions"), !get_config('system','no_utf'), t("Use PHP UTF8 regular expressions")),
 		'$no_community_page' 	=> array('no_community_page', t("Show Community Page"), !get_config('system','no_community_page'), t("Display a Community page showing all recent public postings on this site.")),
 		'$ostatus_disabled' 	=> array('ostatus_disabled', t("Enable OStatus support"), !get_config('system','ostatus_disabled'), t("Provide built-in OStatus \x28identi.ca, status.net, etc.\x29 compatibility. All communications in OStatus are public, so privacy warnings will be occasionally displayed.")),	
+		'$ostatus_poll_interval'	=> array('ostatus_poll_interval', t("OStatus conversation completion interval"), (string) intval(get_config('system','ostatus_poll_interval')), t("How often shall the poller check for new entries in OStatus conversations? This can be a very ressource task."), $ostatus_poll_choices),
 		'$diaspora_enabled' 	=> array('diaspora_enabled', t("Enable Diaspora support"), get_config('system','diaspora_enabled'), t("Provide built-in Diaspora network compatibility.")),	
 		'$dfrn_only'        	=> array('dfrn_only', t('Only allow Friendica contacts'), get_config('system','dfrn_only'), t("All contacts must use Friendica protocols. All other built-in communication protocols disabled.")),
 		'$verifyssl' 		=> array('verifyssl', t("Verify SSL"), get_config('system','verifyssl'), t("If you wish, you can turn on strict certificate checking. This will mean you cannot connect (at all) to self-signed SSL sites.")),
