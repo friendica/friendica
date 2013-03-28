@@ -19,9 +19,19 @@ function cronhooks_run(&$argv, &$argc){
 
 	require_once('include/session.php');
 	require_once('include/datetime.php');
+	require_once('include/pidfile.php');
 
 	load_config('config');
 	load_config('system');
+
+	$lockpath = get_config('system','lockpath');
+	if ($lockpath != '') {
+		$pidfile = new pidfile($lockpath, 'cron.lck');
+		if($pidfile->is_already_running()) {
+			logger("cronhooks: Already running");
+			exit;
+		}
+	}
 
 	$a->set_baseurl(get_config('system','url'));
 
