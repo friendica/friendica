@@ -12,9 +12,18 @@ require_once("include/template_processor.php");
 require_once("include/friendica_smarty.php");
 
 if(! function_exists('replace_macros')) {
+/**
+ * This is our template processor
+ * 
+ * @global Template $t
+ * @param string|FriendicaSmarty $s the string requiring macro substitution, 
+ *									or an instance of FriendicaSmarty
+ * @param array $r key value pairs (search => replace)
+ * @return string substituted string
+ */
 function replace_macros($s,$r) {
 	global $t;
-
+	
 	$stamp1 = microtime(true);
 
 	$a = get_app();
@@ -59,6 +68,7 @@ function random_string($size = 64,$type = RANDOM_STRING_HEX) {
 	return(substr($s,0,$size));
 }}
 
+if(! function_exists('notags')) {
 /**
  * This is our primary input filter. 
  *
@@ -73,9 +83,9 @@ function random_string($size = 64,$type = RANDOM_STRING_HEX) {
  * They will be replaced with safer brackets. This may be filtered further
  * if these are not allowed either.   
  *
+ * @param string $string Input string
+ * @return string Filtered string
  */
-
-if(! function_exists('notags')) {
 function notags($string) {
 
 	return(str_replace(array("<",">"), array('[',']'), $string));
@@ -84,10 +94,15 @@ function notags($string) {
 //	return(str_replace(array("<",">","\xBA","\xBC","\xBE"), array('[',']','','',''), $string));
 }}
 
-// use this on "body" or "content" input where angle chars shouldn't be removed,
-// and allow them to be safely displayed.
+
 
 if(! function_exists('escape_tags')) {
+/**
+ * use this on "body" or "content" input where angle chars shouldn't be removed,
+ * and allow them to be safely displayed.
+ * @param string $string
+ * @return string
+ */
 function escape_tags($string) {
 
 	return(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false));
@@ -98,6 +113,12 @@ function escape_tags($string) {
 // used to generate initial passwords
 
 if(! function_exists('autoname')) {
+/**
+ * generate a string that's random, but usually pronounceable. 
+ * used to generate initial passwords
+ * @param int $len
+ * @return string
+ */
 function autoname($len) {
 
 	if($len <= 0)
@@ -173,6 +194,11 @@ function autoname($len) {
 // returns escaped text.
 
 if(! function_exists('xmlify')) {
+/**
+ * escape text ($str) for XML transport
+ * @param string $str
+ * @return string Escaped text.
+ */
 function xmlify($str) {
 /*	$buffer = '';
 	
@@ -218,10 +244,12 @@ function xmlify($str) {
 	return($buffer);
 }}
 
-// undo an xmlify
-// pass xml escaped text ($s), returns unescaped text
-
 if(! function_exists('unxmlify')) {
+/**
+ * undo an xmlify
+ * @param string $s xml escaped text
+ * @return string unescaped text
+ */
 function unxmlify($s) {
 //	$ret = str_replace('&amp;','&', $s);
 //	$ret = str_replace(array('&lt;','&gt;','&quot;','&apos;'),array('<','>','"',"'"),$ret);
@@ -233,9 +261,12 @@ function unxmlify($s) {
 	return $ret;	
 }}
 
-// convenience wrapper, reverse the operation "bin2hex"
-
 if(! function_exists('hex2bin')) {
+/**
+ * convenience wrapper, reverse the operation "bin2hex"
+ * @param string $s
+ * @return number
+ */
 function hex2bin($s) {
 	if(! (is_string($s) && strlen($s)))
 		return '';
@@ -247,17 +278,23 @@ function hex2bin($s) {
 	return(pack("H*",$s));
 }}
 
-// Automatic pagination.
-// To use, get the count of total items.
-// Then call $a->set_pager_total($number_items);
-// Optionally call $a->set_pager_itemspage($n) to the number of items to display on each page
-// Then call paginate($a) after the end of the display loop to insert the pager block on the page
-// (assuming there are enough items to paginate).
-// When using with SQL, the setting LIMIT %d, %d => $a->pager['start'],$a->pager['itemspage']
-// will limit the results to the correct items for the current page. 
-// The actual page handling is then accomplished at the application layer. 
 
 if(! function_exists('paginate')) {
+/**
+ * Automatic pagination.
+ *
+ *  To use, get the count of total items.
+ * Then call $a->set_pager_total($number_items);
+ * Optionally call $a->set_pager_itemspage($n) to the number of items to display on each page
+ * Then call paginate($a) after the end of the display loop to insert the pager block on the page
+ * (assuming there are enough items to paginate).
+ * When using with SQL, the setting LIMIT %d, %d => $a->pager['start'],$a->pager['itemspage']
+ * will limit the results to the correct items for the current page. 
+ * The actual page handling is then accomplished at the application layer. 
+ * 
+ * @param App $a App instance
+ * @return string html for pagination #FIXME remove html
+ */
 function paginate(&$a) {
 	$o = '';
 	$stripped = preg_replace('/(&page=[0-9]*)/','',$a->query_string);
@@ -314,6 +351,12 @@ function paginate(&$a) {
 }}
 
 if(! function_exists('alt_pager')) {
+/**
+ * Alternative pager
+ * @param App $a App instance
+ * @param int $i
+ * @return string html for pagination #FIXME remove html
+ */
 function alt_pager(&$a, $i) {
         $o = '';
 	$stripped = preg_replace('/(&page=[0-9]*)/','',$a->query_string);
@@ -338,9 +381,14 @@ function alt_pager(&$a, $i) {
 	return $o;
 }}
 
-// Turn user/group ACLs stored as angle bracketed text into arrays
 
 if(! function_exists('expand_acl')) {
+/**
+ * Turn user/group ACLs stored as angle bracketed text into arrays
+ * 
+ * @param string $s
+ * @return array
+ */
 function expand_acl($s) {
 	// turn string array of angle-bracketed elements into numeric array
 	// e.g. "<1><2><3>" => array(1,2,3);
@@ -357,9 +405,11 @@ function expand_acl($s) {
 	return $ret;
 }}		
 
-// Used to wrap ACL elements in angle brackets for storage 
-
 if(! function_exists('sanitise_acl')) {
+/**
+ * Wrap ACL elements in angle brackets for storage 
+ * @param string $item
+ */
 function sanitise_acl(&$item) {
 	if(intval($item))
 		$item = '<' . intval(notags(trim($item))) . '>';
@@ -368,14 +418,18 @@ function sanitise_acl(&$item) {
 }}
 
 
-// Convert an ACL array to a storable string
-// Normally ACL permissions will be an array.
-// We'll also allow a comma-separated string.
-
 if(! function_exists('perms2str')) {
+/**
+ * Convert an ACL array to a storable string
+ * 
+ * Normally ACL permissions will be an array.
+ * We'll also allow a comma-separated string.
+ * 
+ * @param string|array $p
+ * @return string
+ */
 function perms2str($p) {
 	$ret = '';
-
 	if(is_array($p))
 		$tmp = $p;
 	else
@@ -388,10 +442,16 @@ function perms2str($p) {
 	return $ret;
 }}
 
-// generate a guaranteed unique (for this domain) item ID for ATOM
-// safe from birthday paradox
 
 if(! function_exists('item_new_uri')) {
+/**
+ * generate a guaranteed unique (for this domain) item ID for ATOM
+ * safe from birthday paradox
+ * 
+ * @param string $hostname
+ * @param int $uid
+ * @return string
+ */
 function item_new_uri($hostname,$uid) {
 
 	do {
@@ -412,6 +472,12 @@ function item_new_uri($hostname,$uid) {
 // safe from birthday paradox
 
 if(! function_exists('photo_new_resource')) {
+/**
+ * Generate a guaranteed unique photo ID.
+ * safe from birthday paradox
+ * 
+ * @return string
+ */	
 function photo_new_resource() {
 
 	do {
@@ -427,12 +493,17 @@ function photo_new_resource() {
 }}
 
 
-// wrapper to load a view template, checking for alternate
-// languages before falling back to the default
-
-// obsolete, deprecated.
-
 if(! function_exists('load_view_file')) {
+/**
+ * @deprecated
+ * wrapper to load a view template, checking for alternate
+ * languages before falling back to the default
+ * 
+ * @global string $lang
+ * @global App $a
+ * @param string $s view name
+ * @return string
+ */	
 function load_view_file($s) {
 	global $lang, $a;
 	if(! isset($lang))
@@ -462,6 +533,14 @@ function load_view_file($s) {
 }}
 
 if(! function_exists('get_intltext_template')) {
+/**
+ * load a view template, checking for alternate
+ * languages before falling back to the default
+ * 
+ * @global string $lang
+ * @param string $s view path
+ * @return string
+ */
 function get_intltext_template($s) {
 	global $lang;
 
@@ -492,6 +571,13 @@ function get_intltext_template($s) {
 }}
 
 if(! function_exists('get_markup_template')) {
+/**
+ * load template $s
+ * 
+ * @param string $s
+ * @param string $root
+ * @return string
+ */
 function get_markup_template($s, $root = '') {
 	$stamp1 = microtime(true);
 
@@ -519,6 +605,13 @@ function get_markup_template($s, $root = '') {
 }}
 
 if(! function_exists("get_template_file")) {
+/**
+ * 
+ * @param App $a
+ * @param string $filename
+ * @param string $root
+ * @return string
+ */
 function get_template_file($a, $filename, $root = '') {
 	$theme = current_theme();
 
@@ -540,16 +633,23 @@ function get_template_file($a, $filename, $root = '') {
 
 
 
-// for html,xml parsing - let's say you've got
-// an attribute foobar="class1 class2 class3"
-// and you want to find out if it contains 'class3'.
-// you can't use a normal sub string search because you
-// might match 'notclass3' and a regex to do the job is 
-// possible but a bit complicated. 
-// pass the attribute string as $attr and the attribute you 
-// are looking for as $s - returns true if found, otherwise false
+
 
 if(! function_exists('attribute_contains')) {
+/**
+ *  for html,xml parsing - let's say you've got
+ *  an attribute foobar="class1 class2 class3"
+ *  and you want to find out if it contains 'class3'.
+ *  you can't use a normal sub string search because you
+ *  might match 'notclass3' and a regex to do the job is 
+ *  possible but a bit complicated. 
+ *  pass the attribute string as $attr and the attribute you 
+ *  are looking for as $s - returns true if found, otherwise false
+ * 
+ * @param string $attr attribute value
+ * @param string $s string to search
+ * @return boolean True if found, False otherwise
+ */
 function attribute_contains($attr,$s) {
 	$a = explode(' ', $attr);
 	if(count($a) && in_array($s,$a))
@@ -558,6 +658,19 @@ function attribute_contains($attr,$s) {
 }}
 
 if(! function_exists('logger')) {
+/**
+ * log levels:
+ * LOGGER_NORMAL (default)
+ * LOGGER_TRACE
+ * LOGGER_DEBUG
+ * LOGGER_DATA
+ * LOGGER_ALL
+ * 
+ * @global App $a
+ * @global dba $db
+ * @param string $msg
+ * @param int $level
+ */
 function logger($msg,$level = 0) {
 	// turn off logger in install mode
 	global $a;
@@ -580,6 +693,13 @@ function logger($msg,$level = 0) {
 
 
 if(! function_exists('activity_match')) {
+/**
+ * Compare activity uri. Knows about activity namespace.
+ * 
+ * @param string $haystack
+ * @param string $needle
+ * @return boolean
+ */
 function activity_match($haystack,$needle) {
 	if(($haystack === $needle) || ((basename($needle) === $haystack) && strstr($needle,NAMESPACE_ACTIVITY_SCHEMA)))
 		return true;
@@ -587,15 +707,18 @@ function activity_match($haystack,$needle) {
 }}
 
 
-// Pull out all #hashtags and @person tags from $s;
-// We also get @person@domain.com - which would make 
-// the regex quite complicated as tags can also
-// end a sentence. So we'll run through our results
-// and strip the period from any tags which end with one.
-// Returns array of tags found, or empty array.
-
-
 if(! function_exists('get_tags')) {
+/**
+ * Pull out all #hashtags and @person tags from $s;
+ * We also get @person@domain.com - which would make 
+ * the regex quite complicated as tags can also
+ * end a sentence. So we'll run through our results
+ * and strip the period from any tags which end with one.
+ * Returns array of tags found, or empty array.
+ * 
+ * @param string $s
+ * @return array
+ */
 function get_tags($s) {
 	$ret = array();
 
@@ -648,9 +771,15 @@ function get_tags($s) {
 }}
 
 
-// quick and dirty quoted_printable encoding
+// 
 
 if(! function_exists('qp')) {
+/**
+ * quick and dirty quoted_printable encoding
+ * 
+ * @param string $s
+ * @return string
+ */	
 function qp($s) {
 return str_replace ("%","=",rawurlencode($s));
 }} 
@@ -658,6 +787,10 @@ return str_replace ("%","=",rawurlencode($s));
 
 
 if(! function_exists('get_mentions')) {
+/**
+ * @param array $item
+ * @return string html for mentions #FIXME: remove html
+ */
 function get_mentions($item) {
 	$o = '';
 	if(! strlen($item['tag']))
@@ -675,6 +808,13 @@ function get_mentions($item) {
 }}
 
 if(! function_exists('contact_block')) {
+/**
+ * Get html for contact block.
+ * 
+ * @template contact_block.tpl
+ * @hook contact_block_end (contacts=>array, output=>string)
+ * @return string
+ */
 function contact_block() {
 	$o = '';
 	$a = get_app();
@@ -727,6 +867,14 @@ function contact_block() {
 }}
 
 if(! function_exists('micropro')) {
+/**
+ * 
+ * @param array $contact
+ * @param boolean $redirect
+ * @param string $class
+ * @param boolean $textmode
+ * @return string #FIXME: remove html
+ */
 function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 
 	if($class)
@@ -771,6 +919,15 @@ function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 
 
 if(! function_exists('search')) {
+/**
+ * search box
+ * 
+ * @param string $s search query
+ * @param string $id html id
+ * @param string $url search url
+ * @param boolean $save show save search button
+ * @return string html for search box #FIXME: remove html
+ */
 function search($s,$id='search-box',$url='/search',$save = false) {
 	$a = get_app();
 	$o  = '<div id="' . $id . '">';
@@ -784,6 +941,12 @@ function search($s,$id='search-box',$url='/search',$save = false) {
 }}
 
 if(! function_exists('valid_email')) {
+/**
+ * Check if $x is a valid email string
+ * 
+ * @param string $x
+ * @return boolean
+ */
 function valid_email($x){
 
 	if(get_config('system','disable_email_validation'))
@@ -795,21 +958,26 @@ function valid_email($x){
 }}
 
 
+if(! function_exists('linkify')) {
 /**
- *
- * Function: linkify
- *
  * Replace naked text hyperlink with HTML formatted hyperlink
  *
+ * @param string $s
  */
-
-if(! function_exists('linkify')) {
 function linkify($s) {
 	$s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="external-link">$1</a>', $s);
 	$s = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$s);
 	return($s);
 }}
 
+
+/**
+ * Load poke verbs
+ *
+ * @return array index is present tense verb
+				 value is array containing past tense verb, translation of present, translation of past
+ * @hook poke_verbs pokes array
+ */
 function get_poke_verbs() {
 	
 	// index is present tense verb
@@ -827,11 +995,13 @@ function get_poke_verbs() {
 	return $arr;
 }
 
+/**
+ * Load moods
+ * @return array index is mood, value is translated mood
+ * @hook mood_verbs moods array
+ */
 function get_mood_verbs() {
 	
-	// index is present tense verb
-	// value is array containing past tense verb, translation of present, translation of past
-
 	$arr = array(
 		'happy'      => t('happy'),
 		'sad'        => t('sad'),
@@ -860,16 +1030,10 @@ function get_mood_verbs() {
 }
 
 
+
+if(! function_exists('smilies')) {
 /**
- * 
- * Function: smilies
- *
- * Description:
  * Replaces text emoticons with graphical images
- *
- * @Parameter: string $s
- *
- * Returns string
  *
  * It is expected that this function will be called using HTML text.
  * We will escape text between HTML pre and code blocks from being 
@@ -879,11 +1043,12 @@ function get_mood_verbs() {
  * function from being executed by the prepare_text() routine when preparing
  * bbcode source for HTML display
  *
+ * @param string $s
+ * @param boolean $sample
+ * @return string
+ * @hook smilie ('texts' => smilies texts array, 'icons' => smilies html array, 'string' => $s)
  */
-
-if(! function_exists('smilies')) {
 function smilies($s, $sample = false) {
-
 	$a = get_app();
 
 	if(intval(get_config('system','no_smilies')) 
@@ -995,8 +1160,13 @@ function smile_decode($m) {
 	return(str_replace($m[1],base64url_decode($m[1]),$m[0]));
 }
 
-// expand <3333 to the correct number of hearts
 
+/**
+ * expand <3333 to the correct number of hearts
+ * 
+ * @param string $x
+ * @return string
+ */
 function preg_heart($x) {
 	$a = get_app();
 	if(strlen($x[1]) == 1)
@@ -1010,6 +1180,12 @@ function preg_heart($x) {
 
 
 if(! function_exists('day_translate')) {
+/**
+ * Translate days and months names
+ * 
+ * @param string $s
+ * @return string
+ */
 function day_translate($s) {
 	$ret = str_replace(array('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'),
 		array( t('Monday'), t('Tuesday'), t('Wednesday'), t('Thursday'), t('Friday'), t('Saturday'), t('Sunday')),
@@ -1024,23 +1200,31 @@ function day_translate($s) {
 
 
 if(! function_exists('normalise_link')) {
+/**
+ * Normalize url
+ * 
+ * @param string $url
+ * @return string
+ */
 function normalise_link($url) {
 	$ret = str_replace(array('https:','//www.'), array('http:','//'), $url);
 	return(rtrim($ret,'/'));
 }}
 
+
+
+if(! function_exists('link_compare')) {
 /**
- *
  * Compare two URLs to see if they are the same, but ignore
  * slight but hopefully insignificant differences such as if one 
  * is https and the other isn't, or if one is www.something and 
  * the other isn't - and also ignore case differences.
  *
- * Return true if the URLs match, otherwise false.
+ * @param string $a first url
+ * @param string $b second url
+ * @return boolean True if the URLs match, otherwise False
  *
- */
-
-if(! function_exists('link_compare')) {
+ */	
 function link_compare($a,$b) {
 	if(strcasecmp(normalise_link($a),normalise_link($b)) === 0)
 		return true;
@@ -1048,9 +1232,13 @@ function link_compare($a,$b) {
 }}
 
 
-// Find any non-embedded images in private items and add redir links to them
-
 if(! function_exists('redir_private_images')) {
+/**
+ * Find any non-embedded images in private items and add redir links to them
+ * 
+ * @param App $a
+ * @param array $item
+ */
 function redir_private_images($a, &$item) {
 
 	$matches = false;
@@ -1076,6 +1264,17 @@ function redir_private_images($a, &$item) {
 // If attach is true, also add icons for item attachments
 
 if(! function_exists('prepare_body')) {
+/**
+ * Given an item array, convert the body element from bbcode to html and add smilie icons.
+ * If attach is true, also add icons for item attachments
+ * 
+ * @param array $item
+ * @param boolean $attach
+ * @return string item body html
+ * @hook prepare_body_init item array before any work
+ * @hook prepare_body ('item'=>item array, 'html'=>body string) after first bbcode to html
+ * @hook prepare_body_final ('item'=>item array, 'html'=>body string) after attach icons and blockquote special case handling (spoiler, author)
+ */
 function prepare_body($item,$attach = false) {
 
 	$a = get_app();
@@ -1201,9 +1400,13 @@ function prepare_body($item,$attach = false) {
 }}
 
 
-// Given a text string, convert from bbcode to html and add smilie icons.
-
 if(! function_exists('prepare_text')) {
+/**
+ * Given a text string, convert from bbcode to html and add smilie icons.
+ * 
+ * @param string $text
+ * @return string
+ */
 function prepare_text($text) {
 
 	require_once('include/bbcode.php');
@@ -1217,19 +1420,25 @@ function prepare_text($text) {
 }}
 
 
+
 /**
- * returns 
- * [
- *    //categories [
+ * return array with details for categories and folders for an item
+ * 
+ * @param array $item
+ * @return array
+ * 
+  * [
+ *      [ // categories array
  *          {
  *               'name': 'category name',
- *              'removeurl': 'url to remove this category',
- *             'first': 'is the first in this array? true/false',
+ *               'removeurl': 'url to remove this category',
+ *               'first': 'is the first in this array? true/false',
  *               'last': 'is the last in this array? true/false',
  *           } ,
  *           ....
  *       ],
- *       // folders [
+ *       [ //folders array
+ *			{
  *               'name': 'folder name',
  *               'removeurl': 'url to remove this folder',
  *               'first': 'is the first in this array? true/false',
@@ -1237,9 +1446,10 @@ function prepare_text($text) {
  *           } ,
  *           ....       
  *       ]
- *   ]
+ *  ]
  */
 function get_cats_and_terms($item) {
+
     $a = get_app();
     $categories = array();
     $folders = array();
@@ -1284,11 +1494,12 @@ function get_cats_and_terms($item) {
 }
 
 
-/**
- * return atom link elements for all of our hubs
- */
 
 if(! function_exists('feed_hublinks')) {
+/**
+ * return atom link elements for all of our hubs
+ * @return string hub link xml elements
+ */
 function feed_hublinks() {
 
 	$hub = get_config('system','huburl');
@@ -1308,9 +1519,13 @@ function feed_hublinks() {
 	return $hubxml;
 }}
 
-/* return atom link elements for salmon endpoints */
 
 if(! function_exists('feed_salmonlinks')) {
+/**
+ * return atom link elements for salmon endpoints
+ * @param string $nick user nickname
+ * @return string salmon link xml elements
+ */
 function feed_salmonlinks($nick) {
 
 	$a = get_app();
@@ -1325,6 +1540,11 @@ function feed_salmonlinks($nick) {
 }}
 
 if(! function_exists('get_plink')) {
+/**
+ * get private link for item
+ * @param array $item
+ * @return boolean|array False if item has not plink, otherwise array('href'=>plink url, 'title'=>translated title)
+ */
 function get_plink($item) {
 	$a = get_app();	
 	if (x($item,'plink') && ($item['private'] != 1)) {
@@ -1339,6 +1559,11 @@ function get_plink($item) {
 }}
 
 if(! function_exists('unamp')) {
+/**
+ * replace html amp entity with amp char
+ * @param string $s
+ * @return string
+ */
 function unamp($s) {
 	return str_replace('&amp;', '&', $s);
 }}
@@ -1347,6 +1572,12 @@ function unamp($s) {
 
 
 if(! function_exists('lang_selector')) {
+/**
+ * get html for language selector
+ * @global string $lang
+ * @return string 
+ * @template lang_selector.tpl
+ */
 function lang_selector() {
 	global $lang;
 	
@@ -1383,6 +1614,11 @@ function lang_selector() {
 
 
 if(! function_exists('return_bytes')) {
+/**
+ * return number of bytes in size (K, M, G)
+ * @param string $size_str
+ * @return number
+ */
 function return_bytes ($size_str) {
     switch (substr ($size_str, -1))
     {
@@ -1393,6 +1629,9 @@ function return_bytes ($size_str) {
     }
 }}
 
+/**
+ * @return string
+ */
 function generate_user_guid() {
 	$found = true;
 	do {
@@ -1407,7 +1646,11 @@ function generate_user_guid() {
 }
 
 
-
+/**
+ * @param string $s
+ * @param boolean $strip_padding
+ * @return string
+ */
 function base64url_encode($s, $strip_padding = false) {
 
 	$s = strtr(base64_encode($s),'+/','-_');
@@ -1418,6 +1661,10 @@ function base64url_encode($s, $strip_padding = false) {
 	return $s;
 }
 
+/**
+ * @param string $s
+ * @return string
+ */
 function base64url_decode($s) {
 
 	if(is_array($s)) {
@@ -1446,6 +1693,16 @@ function base64url_decode($s) {
 
 
 if (!function_exists('str_getcsv')) {
+	/**
+	 * Parse csv string
+	 * 
+	 * @param string $input
+	 * @param string $delimiter
+	 * @param string $enclosure
+	 * @param string $escape
+	 * @param string $eol
+	 * @return boolean|array False on error, otherwise array[row][column]
+	 */
     function str_getcsv($input, $delimiter = ',', $enclosure = '"', $escape = '\\', $eol = '\n') {
         if (is_string($input) && !empty($input)) {
             $output = array();
@@ -1502,6 +1759,11 @@ if (!function_exists('str_getcsv')) {
     }
 } 
 
+/**
+ * return div element with class 'clear'
+ * @return string
+ * @deprecated
+ */
 function cleardiv() {
 	return '<div class="clear"></div>';
 }
@@ -1538,6 +1800,8 @@ function html2bb_video($s) {
 
 /**
  * apply xmlify() to all values of array $val, recursively
+ * @param array $val
+ * @return array
  */
 function array_xmlify($val){
 	if (is_bool($val)) return $val?"true":"false";
@@ -1546,6 +1810,13 @@ function array_xmlify($val){
 }
 
 
+/**
+ * transorm link href and img src from relative to absolute
+ * 
+ * @param string $text
+ * @param string $base base url
+ * @return string
+ */
 function reltoabs($text, $base)
 {
   if (empty($base))
@@ -1578,6 +1849,12 @@ function reltoabs($text, $base)
   return $text;
 }
 
+/**
+ * get translated item type
+ * 
+ * @param array $itme
+ * @return string
+ */
 function item_post_type($item) {
 	if(intval($item['event-id']))
 		return t('event');
