@@ -331,13 +331,17 @@ function onepoll_run(&$argv, &$argc){
 						);
 
 						if(count($r)) {
-							logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user'],LOGGER_DEBUG);
-							if($meta->deleted && ! $r[0]['deleted']) {
-								q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
-									dbesc(datetime_convert()),
-									intval($r[0]['id'])
-								);
-							}
+							logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user']." UID: ".$importer_uid." URI: ".$datarray['uri'],LOGGER_DEBUG);
+
+							// Only delete when mails aren't automatically moved or deleted
+							if (($mailconf[0]['action'] != 1) AND ($mailconf[0]['action'] != 3))
+								if($meta->deleted && ! $r[0]['deleted']) {
+									q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
+										dbesc(datetime_convert()),
+										intval($r[0]['id'])
+									);
+								}
+
 							switch ($mailconf[0]['action']) {
 								case 0:
 									logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user'].". Doing nothing.", LOGGER_DEBUG);
