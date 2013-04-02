@@ -101,6 +101,7 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 	}
 
 	$a->set_curl_code($http_code);
+	$a->set_curl_content_type($curl_info['content_type']);
 
 	$body = substr($s,strlen($header));
 	$a->set_curl_headers($header);

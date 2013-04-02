@@ -401,6 +401,7 @@ if(! class_exists('App')) {
 		private $db;
 
 		private $curl_code;
+		private $curl_content_type;
 		private $curl_headers;
 
 		private $cached_profile_image;
@@ -671,6 +672,14 @@ if(! class_exists('App')) {
 
 		function get_curl_code() {
 			return $this->curl_code;
+		}
+
+		function set_curl_content_type($content_type) {
+			$this->curl_content_type = $content_type;
+		}
+
+		function get_curl_content_type() {
+			return $this->curl_content_type;
 		}
 
 		function set_curl_headers($headers) {
