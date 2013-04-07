@@ -43,7 +43,7 @@ function display_content(&$a, $update = 0) {
 		$a->profile = array('uid' => intval($update), 'profile_uid' => intval($update));
 	}
 	else {
-		$item_id = (($a->argc > 2) ? intval($a->argv[2]) : 0);
+		$item_id = (($a->argc > 2) ? $a->argv[2] : 0);
 	}
 
 	if(! $item_id) {
@@ -142,16 +142,46 @@ function display_content(&$a, $update = 0) {
 		WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 		and `item`.`moderated` = 0
 		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-		AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE ( `id` = '%s' OR `uri` = '%s' ))
+		AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE ( `id` = '%s' OR `uri` = '%s' )
+		AND uid = %d )
 		$sql_extra
 		ORDER BY `parent` DESC, `gravity` ASC, `id` ASC ",
 		intval($a->profile['uid']),
 		dbesc($item_id),
-		dbesc($item_id)
+		dbesc($item_id),
+		intval($a->profile['uid'])
 	);
 
+	if(!$r && local_user()) {
+		// Check if this is another person's link to a post that we have
+		$r = q("SELECT `item`.uri FROM `item`
+			WHERE (`item`.`id` = '%s' OR `item`.`uri` = '%s' )
+			LIMIT 1",
+			dbesc($item_id),
+			dbesc($item_id)
+		);
+		if($r) {
+			$item_uri = $r[0]['uri'];
 
-	if(count($r)) {
+			$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+				`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
+				`contact`.`network`, `contact`.`thumb`, `contact`.`self`, `contact`.`writable`, 
+				`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
+				FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+				WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
+				and `item`.`moderated` = 0
+				AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
+				AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE `uri` = '%s' AND uid = %d )
+				ORDER BY `parent` DESC, `gravity` ASC, `id` ASC ",
+				intval(local_user()),
+				dbesc($item_uri),
+				intval(local_user())
+			);
+		}
+	}
+
+
+	if($r) {
 
 		if((local_user()) && (local_user() == $a->profile['uid'])) {
 			q("UPDATE `item` SET `unseen` = 0 
@@ -171,15 +201,17 @@ function display_content(&$a, $update = 0) {
 		require_once("include/html2plain.php");
 		$description = trim(html2plain(bbcode($r[0]["body"], false, false), 0, true));
 		$title = trim(html2plain(bbcode($r[0]["title"], false, false), 0, true));
+		$author_name = $r[0]["author-name"];
+
+		if ($title == "")
+			$title = $author_name;
 
 		$description = htmlspecialchars($description, ENT_COMPAT, 'UTF-8', true); // allow double encoding here
 		$title = htmlspecialchars($title, ENT_COMPAT, 'UTF-8', true); // allow double encoding here
-
-		if ($title == "")
-			$title = $r[0]["author-name"];
+		$author_name = htmlspecialchars($author_name, ENT_COMPAT, 'UTF-8', true); // allow double encoding here
 
 		//<meta name="keywords" content="">
-		$a->page['htmlhead'] .= '<meta name="author" content="'.$r[0]["author-name"].'" />'."\n";
+		$a->page['htmlhead'] .= '<meta name="author" content="'.$author_name.'" />'."\n";
 		$a->page['htmlhead'] .= '<meta name="title" content="'.$title.'" />'."\n";
 		$a->page['htmlhead'] .= '<meta name="fulltitle" content="'.$title.'" />'."\n";
 		$a->page['htmlhead'] .= '<meta name="description" content="'.$description.'" />'."\n";
@@ -192,27 +224,26 @@ function display_content(&$a, $update = 0) {
 		//<meta property="og:image" content="" />
 		$a->page['htmlhead'] .= '<meta property="og:url" content="'.$r[0]["plink"].'" />'."\n";
 		$a->page['htmlhead'] .= '<meta property="og:description" content="'.$description.'" />'."\n";
-		$a->page['htmlhead'] .= '<meta name="og:article:author" content="'.$r[0]["author-name"].'" />'."\n";
+		$a->page['htmlhead'] .= '<meta name="og:article:author" content="'.$author_name.'" />'."\n";
 		// article:tag
 
+		return $o;
+	}
+
+	$r = q("SELECT `id`,`deleted` FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",
+		dbesc($item_id),
+		dbesc($item_id)
+	);
+	if($r) {
+		if($r[0]['deleted']) {
+			notice( t('Item has been removed.') . EOL );
+		}
+		else {	
+			notice( t('Permission denied.') . EOL ); 
+		}
 	}
 	else {
-		$r = q("SELECT `id`,`deleted` FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",
-			dbesc($item_id),
-			dbesc($item_id)
-		);
-		if(count($r)) {
-			if($r[0]['deleted']) {
-				notice( t('Item has been removed.') . EOL );
-			}
-			else {	
-				notice( t('Permission denied.') . EOL ); 
-			}
-		}
-		else {
-			notice( t('Item not found.') . EOL );
-		}
-
+		notice( t('Item not found.') . EOL );
 	}
 
 	return $o;
