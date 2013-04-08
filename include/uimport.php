@@ -101,11 +101,13 @@ function import_account(&$a, $file) {
 		return;
 	}
 
+	/*
+	// this is not required as we remove columns in json not in current db schema
 	if ($account['schema'] != DB_UPDATE_VERSION) {
 		notice(t("Error! I can't import this file: DB schema version is not compatible."));
 		return;
 	}
-
+	*/
 
 	// check for username
 	$r = q("SELECT uid FROM user WHERE nickname='%s'", $account['user']['nickname']);
