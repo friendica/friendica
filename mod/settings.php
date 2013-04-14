@@ -300,7 +300,8 @@ function settings_post(&$a) {
 	if((x($_POST,'npassword')) || (x($_POST,'confirm'))) {
 
 		$newpass = $_POST['npassword'];
-		$confirm = $_POST['confirm'];
+        $confirm = $_POST['confirm'];
+        $oldpass = hash('whirlpool', $_POST['opassword']);
 
 		$err = false;
 		if($newpass != $confirm ) {
@@ -311,7 +312,15 @@ function settings_post(&$a) {
 		if((! x($newpass)) || (! x($confirm))) {
 			notice( t('Empty passwords are not allowed. Password unchanged.') . EOL);
 			$err = true;
-		}
+        }
+
+        //  check if the old password was supplied correctly before 
+        //  changing it to the new value
+        $r = q("SELECT `password` FROM `user`WHERE `uid` = %d LIMIT 1", intval(local_user()));
+        if( $oldpass != $r[0]['password'] ) {
+            notice( t('Wrong password.') . EOL);
+            $err = true;
+        }
 
 		if(! $err) {
 			$password = hash('whirlpool',$newpass);
@@ -394,8 +403,17 @@ function settings_post(&$a) {
 
 	if($email != $a->user['email']) {
 		$email_changed = true;
+        //  check for the correct password
+        $r = q("SELECT `password` FROM `user`WHERE `uid` = %d LIMIT 1", intval(local_user()));
+        $password = hash('whirlpool', $_POST['password']);
+        if ($password != $r[0]['password']) {
+            $err .= t('Wrong Password') . EOL;
+            $email = $a->user['email'];
+        }
+        //  check the email is valid
         if(! valid_email($email))
-			$err .= t(' Not valid email.');
+            $err .= t(' Not valid email.');
+        //  ensure new email is not the admin mail
 		if((x($a->config,'admin_email')) && (strcasecmp($email,$a->config['admin_email']) == 0)) {
 			$err .= t(' Cannot change to that email.');
 			$email = $a->user['email'];
@@ -1045,6 +1063,8 @@ function settings_content(&$a) {
 		'$h_pass' 	=> t('Password Settings'),
 		'$password1'=> array('npassword', t('New Password:'), '', ''),
 		'$password2'=> array('confirm', t('Confirm:'), '', t('Leave password fields blank unless changing')),
+		'$password3'=> array('opassword', t('Current Password:'), '', t('Your current password to confirm the changes')),
+		'$password4'=> array('password', t('Password:'), '', t('Your current password to confirm the changes')),
 		'$oid_enable' => (! get_config('system','no_openid')),
 		'$openid'	=> $openid_field,
 		
