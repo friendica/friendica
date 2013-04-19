@@ -9,6 +9,7 @@ $nickname_block
 
 {{inc field_password.tpl with $field=$password1 }}{{endinc}}
 {{inc field_password.tpl with $field=$password2 }}{{endinc}}
+{{inc field_password.tpl with $field=$password3 }}{{endinc}}
 
 {{ if $oid_enable }}
 {{inc field_input.tpl with $field=$openid }}{{endinc}}
@@ -23,6 +24,7 @@ $nickname_block
 
 {{inc field_input.tpl with $field=$username }}{{endinc}}
 {{inc field_input.tpl with $field=$email }}{{endinc}}
+{{inc field_password.tpl with $field=$password4 }}{{endinc}}
 {{inc field_custom.tpl with $field=$timezone }}{{endinc}}
 {{inc field_input.tpl with $field=$defloc }}{{endinc}}
 {{inc field_checkbox.tpl with $field=$allowloc }}{{endinc}}
@@ -123,6 +125,7 @@ $group_select
 {{inc field_intcheckbox.tpl with $field=$notify5 }}{{endinc}}
 {{inc field_intcheckbox.tpl with $field=$notify6 }}{{endinc}}
 {{inc field_intcheckbox.tpl with $field=$notify7 }}{{endinc}}
+{{inc field_intcheckbox.tpl with $field=$notify8 }}{{endinc}}
 </div>
 
 </div>

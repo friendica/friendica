@@ -14,6 +14,7 @@
 
 {{include file="field_password.tpl" field=$password1}}
 {{include file="field_password.tpl" field=$password2}}
+{{include file="field_password.tpl" field=$password3}}
 
 {{if $oid_enable}}
 {{include file="field_input.tpl" field=$openid}}
@@ -28,6 +29,7 @@
 
 {{include file="field_input.tpl" field=$username}}
 {{include file="field_input.tpl" field=$email}}
+{{include file="field_password.tpl" field=$password4}}
 {{include file="field_custom.tpl" field=$timezone}}
 {{include file="field_input.tpl" field=$defloc}}
 {{include file="field_checkbox.tpl" field=$allowloc}}
@@ -128,6 +130,7 @@
 {{include file="field_intcheckbox.tpl" field=$notify5}}
 {{include file="field_intcheckbox.tpl" field=$notify6}}
 {{include file="field_intcheckbox.tpl" field=$notify7}}
+{{include file="field_intcheckbox.tpl" field=$notify8}}
 </div>
 
 </div>
