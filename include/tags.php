@@ -106,8 +106,10 @@ function create_tags_from_item($itemid) {
 function create_tags_from_itemuri($itemuri, $uid) {
 	$messages = q("SELECT `id` FROM `item` WHERE uri ='%s' AND uid=%d", dbesc($itemuri), intval($uid));
 
-	foreach ($messages as $message)
-		create_tags_from_item($message["id"]);
+	if(count($messages)) {
+		foreach ($messages as $message)
+			create_tags_from_item($message["id"]);
+	}
 }
 
 function update_items() {
