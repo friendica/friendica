@@ -1180,19 +1180,23 @@ function item_store($arr,$force_parent = false) {
 		);
 	}
 
-	tag_deliver($arr['uid'],$current_post);
+	$deleted = tag_deliver($arr['uid'],$current_post);
 
-	// Store the fresh generated item into the cache
-	$cachefile = get_cachefile($arr["guid"]."-".hash("md5", $arr['body']));
+	// current post can be deleted if is for a communuty page and no mention are
+	// in it.
+	if (!$deleted) {
+		
+		// Store the fresh generated item into the cache
+		$cachefile = get_cachefile($arr["guid"]."-".hash("md5", $arr['body']));
 
-	if (($cachefile != '') AND !file_exists($cachefile)) {
-		$s = prepare_text($arr['body']);
-		$a = get_app();
-		$stamp1 = microtime(true);
-		file_put_contents($cachefile, $s);
-		$a->save_timestamp($stamp1, "file");
-		logger('item_store: put item '.$current_post.' into cachefile '.$cachefile);
-	}
+		if (($cachefile != '') AND !file_exists($cachefile)) {
+			$s = prepare_text($arr['body']);
+			$a = get_app();
+			$stamp1 = microtime(true);
+			file_put_contents($cachefile, $s);
+			$a->save_timestamp($stamp1, "file");
+			logger('item_store: put item '.$current_post.' into cachefile '.$cachefile);
+		}
 
         $r = q('SELECT * FROM `item` WHERE id = %d', intval($current_post));
         if (count($r) == 1) {
@@ -1201,7 +1205,7 @@ function item_store($arr,$force_parent = false) {
         else {
             logger('item_store: new item not found in DB, id ' . $current_post);
         }
-
+	}
 	return $current_post;
 }
 
@@ -1217,10 +1221,15 @@ function get_item_contact($item,$contacts) {
 	return false;
 }
 
-
+/**
+ * look for mention tags and setup a second delivery chain for forum/community posts if appropriate
+ * @param int $uid
+ * @param int $item_id
+ * @return bool true if item was deleted, else false
+ */
 function tag_deliver($uid,$item_id) {
 
-	// look for mention tags and setup a second delivery chain for forum/community posts if appropriate
+	// 
 
 	$a = get_app();
 
@@ -1262,8 +1271,21 @@ function tag_deliver($uid,$item_id) {
 		}
 	}
 
-	if(! $mention)
+	if(! $mention){
+		if ( ($community_page || $prvgroup) &&
+			  (!$item['wall']) && (!$item['origin']) && ($item['id'] == $item['parent'])){
+			// mmh.. no mention.. community page or private group... no wall.. no origin.. top-post (not a comment)
+			// delete it!
+			logger("tag_deliver: no-mention top-level post to communuty or private group. delete.");
+			q("DELETE FROM item WHERE id = %d and uid = %d limit 1",
+				intval($item_id),
+				intval($uid)
+			);
+			return true;
+		}
 		return;
+	}
+		
 
 	// send a notification
 
