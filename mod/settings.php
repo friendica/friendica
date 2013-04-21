@@ -263,6 +263,9 @@ function settings_post(&$a) {
 		$itemspage_network   = ((x($_POST,'itemspage_network')) ? intval($_POST['itemspage_network']) : 40);
 		if($itemspage_network > 100)
 			$itemspage_network = 100;
+		$itemspage_mobile_network   = ((x($_POST,'itemspage_mobile_network')) ? intval($_POST['itemspage_mobile_network']) : 20);
+		if($itemspage_mobile_network > 100)
+			$itemspage_mobile_network = 100;
 
 
 		if($mobile_theme !== '') {
@@ -271,6 +274,7 @@ function settings_post(&$a) {
 
 		set_pconfig(local_user(),'system','update_interval', $browser_update);
 		set_pconfig(local_user(),'system','itemspage_network', $itemspage_network);
+		set_pconfig(local_user(),'system','itemspage_mobile_network', $itemspage_mobile_network);
 		set_pconfig(local_user(),'system','no_smilies',$nosmile);
 
 
@@ -813,6 +817,8 @@ function settings_content(&$a) {
 
 		$itemspage_network = intval(get_pconfig(local_user(), 'system','itemspage_network'));
 		$itemspage_network = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : 40); // default if not set: 40 items
+		$itemspage_mobile_network = intval(get_pconfig(local_user(), 'system','itemspage_mobile_network'));
+		$itemspage_mobile_network = (($itemspage_mobile_network > 0 && $itemspage_mobile_network < 101) ? $itemspage_mobile_network : 20); // default if not set: 20 items
 		
 		$nosmile = get_pconfig(local_user(),'system','no_smilies');
 		$nosmile = (($nosmile===false)? '0': $nosmile); // default if not set: 0
@@ -836,6 +842,7 @@ function settings_content(&$a) {
 			'$mobile_theme'	=> array('mobile_theme', t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false),
 			'$ajaxint'   => array('browser_update',  t("Update browser every xx seconds"), $browser_update, t('Minimum of 10 seconds, no maximum')),
 			'$itemspage_network'   => array('itemspage_network',  t("Number of items to display per page:"), $itemspage_network, t('Maximum of 100 items')),
+			'$itemspage_mobile_network'   => array('itemspage_mobile_network',  t("Number of items to display per page when viewed from mobile device:"), $itemspage_mobile_network, t('Maximum of 100 items')),
 			'$nosmile'	=> array('nosmile', t("Don't show emoticons"), $nosmile, ''),
 			
 			'$theme_config' => $theme_config,
