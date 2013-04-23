@@ -1,9 +1,11 @@
 <?php
+require_once 'object/TemplateEngine.php';
 
 define("KEY_NOT_EXISTS", '^R_key_not_Exists^');
 
-class Template {
-
+class Template implements ITemplateEngine {
+	static $name ="internal";
+	
 	var $r;
 	var $search;
 	var $replace;
@@ -256,7 +258,8 @@ class Template {
 		return $s;
 	}
 
-	public function replace($s, $r) {
+	// TemplateEngine interface
+	public function replace_macros($s, $r) {
 		$this->r = $r;
 
 		// remove comments block
@@ -276,12 +279,18 @@ class Template {
 			$count++;
 			$s = $this->var_replace($s);
 		}
-		return $s;
+		return template_unescape($s);
 	}
-
+	
+	public function get_template_file($file, $root='') {
+		$a = get_app();
+		$template_file = get_template_file($a, $file, $root);
+		$content = file_get_contents($template_file);
+		return $content;		
+	}
+	
 }
 
-$t = new Template;
 
 function template_escape($s) {
 

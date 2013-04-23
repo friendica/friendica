@@ -1,2 +1,0 @@
-$follow_widget
-
