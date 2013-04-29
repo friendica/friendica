@@ -1,5 +1,7 @@
 <?php
 
+require_once("dba.php");
+
 /**
  * translation support
  */
