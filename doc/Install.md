@@ -1,4 +1,5 @@
 Friendica Installation
+===============
 
 We've tried very hard to ensure that Friendica will run on commodity hosting platforms - such as those used to host Wordpress blogs and Drupal websites. But be aware that Friendica is more than a simple web application. It is a complex communications system which more closely resembles an email server than a web server. For reliability and performance, messages are delivered in the background and are queued for later delivery when sites are down. This kind of functionality requires a bit more of the host system than the typical blog. Not every PHP/MySQL hosting provider will be able to support Friendica. Many will. But **please** review the requirements and confirm these with your hosting provider prior to installation.
 
@@ -41,6 +42,12 @@ you might have trouble getting everything to work.]
     - and then you can pick up the latest changes at any time with
 
         `git pull`
+        
+    - make sure folder *view/smarty3* exists and is writable by webserver
+        
+        `mkdir view/smarty3`
+        
+        `chown 777 view/smarty3`
     
     - For installing addons
     

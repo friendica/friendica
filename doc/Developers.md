@@ -1,6 +1,7 @@
 Friendica Developer Guide
+===================
 
-Here is how you can join us.
+**Here is how you can join us.**
 
 First, get yourself a working git package on the system where you will be
 doing development.

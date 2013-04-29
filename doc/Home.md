@@ -7,6 +7,7 @@ Friendica Documentation and Resources
 	* [Account Basics](help/Account-Basics)
 	* [New User Quick Start](help/Quick-Start-guide)
 	* [Creating posts](help/Text_editor)
+        * [BBCode tag reference](help/BBCode)
 	* [Comment, sort and delete posts](help/Text_comment)
 	* [Profiles](help/Profiles)
 * You and other user

@@ -1,4 +1,5 @@
-**Friendica Addon/Plugin development**
+Friendica Addon/Plugin development
+==========================
 
 Please see the sample addon 'randplace' for a working example of using some of these features. The facebook addon provides an example of integrating both "addon" and "module" functionality. Addons work by intercepting event hooks - which must be registered. Modules work by intercepting specific page requests (by URL path). 
 
@@ -51,7 +52,8 @@ currently being processed, and generally contains information that is being imme
 processed or acted on that you can use, display, or alter. Remember to declare it with
 '&' if you wish to alter it.
 
-**Modules**
+Modules
+--------
 
 Plugins/addons may also act as "modules" and intercept all page requests for a given URL path. In order for a plugin to act as a module it needs to define a function "plugin_name_module()" which takes no arguments and need not do anything.
 
@@ -62,8 +64,29 @@ If this function exists, you will now receive all page requests for "http://my.w
 Your module functions will often contain the function plugin_name_content(&$a), which defines and returns the page body content. They may also contain plugin_name_post(&$a) which is called before the _content function and typically handles the results of POST forms. You may also have plugin_name_init(&$a) which is called very early on and often does module initialisation. 
 
 
+Templates
+----------
 
-**Current hooks:**
+If your plugin need some template, you can use Friendica template system. Friendica use [smarty3](http://www.smarty.net/) as template engine.
+
+Put your tpl files in *templates/* subfolder of your plugin.
+
+In your code, like in function plugin_name_content(), load template file and execute it passing needed values:
+
+    # load template file. first argument is the template name, 
+    # second is the plugin path relative to friendica top folder
+    $tpl = get_markup_template('mytemplate.tpl', 'addon/plugin_name/');
+
+    # apply template. first argument is the loaded template, 
+    # second an array of 'name'=>'values' to pass to template
+    $output = replace_macros($tpl,array(
+        'title' => 'My beautifull plugin',
+    ));
+
+See also wiki page [Quick Template Guide](https://github.com/friendica/friendica/wiki/Quick-Template-Guide)
+
+Current hooks:
+--------------
 
 **'authenticate'** - called when a user attempts to login.
     $b is an array
