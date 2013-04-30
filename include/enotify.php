@@ -17,7 +17,7 @@ function notification($params) {
 	$product = FRIENDICA_PLATFORM;
 	$siteurl = $a->get_baseurl(true);
 	$thanks = t('Thank You,');
-	$sitename = get_config('config','sitename');
+	$sitename = $a->config['sitename'];
 	$site_admin = sprintf( t('%s Administrator'), $sitename);
 
 	$sender_name = $product;
