@@ -45,6 +45,13 @@ class FriendicaSmarty extends Smarty {
 
 class FriendicaSmartyEngine implements ITemplateEngine {
 	static $name ="smarty3";
+   	
+    public function __construct(){
+		if(!is_writable('view/smarty3/')){
+			echo "<b>ERROR:</b> folder <tt>view/tpl/smarty3/</tt> must be writable by webserver."; killme();
+		}
+	} 
+    
 	// ITemplateEngine interface
 	public function replace_macros($s, $r) {
 		$template = '';
