@@ -1956,6 +1956,13 @@ if(! function_exists('profile_tabs')){
 				'title' => t('Photo Albums'),
 				'id' => 'photo-tab',
 			),
+			array(
+				'label' => t('Videos'),
+				'url'	=> $a->get_baseurl() . '/videos/' . $nickname,
+				'sel'	=> ((!isset($tab)&&$a->argv[0]=='videos')?'active':''),
+				'title' => t('Videos'),
+				'id' => 'video-tab',
+			),
 		);
 	
 		if ($is_owner){

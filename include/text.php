@@ -1285,18 +1285,45 @@ function prepare_body($item,$attach = false) {
 		return $s;
 	}
 
+	$as = '';
+	$vhead = false;
 	$arr = explode('[/attach],',$item['attach']);
 	if(count($arr)) {
-		$s .= '<div class="body-attach">';
+		$as .= '<div class="body-attach">';
 		foreach($arr as $r) {
 			$matches = false;
 			$icon = '';
 			$cnt = preg_match_all('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|',$r,$matches, PREG_SET_ORDER);
 			if($cnt) {
 				foreach($matches as $mtch) {
-					$filetype = strtolower(substr( $mtch[3], 0, strpos($mtch[3],'/') ));
+					$mime = $mtch[3];
+
+					if((local_user() == $item['uid']) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN))
+						$the_url = $a->get_baseurl() . '/redir/' . $item['contact-id'] . '?f=1&url=' . $mtch[1];
+					else
+						$the_url = $mtch[1];
+
+					if(strpos($mime, 'video') !== false) {
+						if(!$vhead) {
+							$vhead = true;
+							$a->page['htmlhead'] .= replace_macros(get_markup_template('videos_head.tpl'), array());
+							$a->page['end'] .= replace_macros(get_markup_template('videos_end.tpl'), array());
+						}
+
+						$id = end(explode('/', $the_url));
+						$as .= replace_macros(get_markup_template('video_top.tpl'), array(
+							'$video'	=> array(
+								'id'       => $id,
+								'title' 	=> t('View Video'),
+								'src'     	=> $the_url,
+								'mime'		=> $mime,
+							),
+						));
+					}
+
+					$filetype = strtolower(substr( $mime, 0, strpos($mime,'/') ));
 					if($filetype) {
-						$filesubtype = strtolower(substr( $mtch[3], strpos($mtch[3],'/') + 1 ));
+						$filesubtype = strtolower(substr( $mime, strpos($mime,'/') + 1 ));
 						$filesubtype = str_replace('.', '-', $filesubtype);
 					}
 					else {
@@ -1320,17 +1347,14 @@ function prepare_body($item,$attach = false) {
 
 					$title = ((strlen(trim($mtch[4]))) ? escape_tags(trim($mtch[4])) : escape_tags($mtch[1]));
 					$title .= ' ' . $mtch[2] . ' ' . t('bytes');
-					if((local_user() == $item['uid']) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN))
-						$the_url = $a->get_baseurl() . '/redir/' . $item['contact-id'] . '?f=1&url=' . $mtch[1];
-					else
-						$the_url = $mtch[1];
 
-					$s .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="external-link" >' . $icon . '</a>';
+					$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="external-link" >' . $icon . '</a>';
 				}
 			}
 		}
-		$s .= '<div class="clear"></div></div>';
+		$as .= '<div class="clear"></div></div>';
 	}
+	$s = $s . $as;
 
 
 	// Look for spoiler

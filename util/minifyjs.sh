@@ -1,5 +1,7 @@
 #!/bin/bash
 
+command -v uglifyjs >/dev/null 2>&1 || { echo >&2 "I require UglifyJS but it's not installed.  Aborting."; exit 1; }
+
 MINIFY_CMD=uglifyjs
 
 JSFILES=(

@@ -2519,6 +2519,15 @@ aside input[type='text'] {
 	margin-bottom: 15px;
 }
 
+.video-top-wrapper {
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 15px;
+	margin-right: 15px;
+	margin-left: 15px;
+	margin-bottom: 15px;
+}
+
 #profile-jot-desc {
 	/*float: left;*/
 	/*width: 480px;*/

@@ -389,6 +389,9 @@
 			}
 			/* autocomplete @nicknames */
 			$j(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
+
+			// setup videos, since VideoJS won't take care of any loaded via AJAX
+			if(typeof _V_ != 'undefined') _V_.autoSetup();
 		});
 	}
 
