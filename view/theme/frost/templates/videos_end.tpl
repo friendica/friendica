@@ -1,5 +1,5 @@
-<script src="library/video-js/video.min.js"></script>
+<script src="library/video-js/video.js"></script>
 <script>
-   _V_.options.flash.swf = "https://f.shmuz.in/library/video-js/video-js.swf"
+   videojs.options.flash.swf = "{{$baseurl}}/library/video-js/video-js.swf"
 </script>
 

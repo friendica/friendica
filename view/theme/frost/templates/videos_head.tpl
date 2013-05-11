@@ -1,2 +1,2 @@
-<link href="library/video-js/video-js.min.css" rel="stylesheet">
+<link href="library/video-js/video-js.css" rel="stylesheet">
 

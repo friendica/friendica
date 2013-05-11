@@ -1306,8 +1306,12 @@ function prepare_body($item,$attach = false) {
 					if(strpos($mime, 'video') !== false) {
 						if(!$vhead) {
 							$vhead = true;
-							$a->page['htmlhead'] .= replace_macros(get_markup_template('videos_head.tpl'), array());
-							$a->page['end'] .= replace_macros(get_markup_template('videos_end.tpl'), array());
+							$a->page['htmlhead'] .= replace_macros(get_markup_template('videos_head.tpl'), array(
+								'$baseurl' => $a->get_baseurl(),
+							));
+							$a->page['end'] .= replace_macros(get_markup_template('videos_end.tpl'), array(
+								'$baseurl' => $a->get_baseurl(),
+							));
 						}
 
 						$id = end(explode('/', $the_url));
