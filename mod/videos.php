@@ -74,10 +74,14 @@ function videos_init(&$a) {
 
 
 		$tpl = get_markup_template("videos_head.tpl");
-		$a->page['htmlhead'] .= replace_macros($tpl,array());
+		$a->page['htmlhead'] .= replace_macros($tpl,array(
+			'$baseurl' => $a->get_baseurl(),
+		));
 
 		$tpl = get_markup_template("videos_end.tpl");
-		$a->page['end'] .= replace_macros($tpl,array());
+		$a->page['end'] .= replace_macros($tpl,array(
+			'$baseurl' => $a->get_baseurl(),
+		));
 
 	}
 

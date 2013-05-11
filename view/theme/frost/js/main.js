@@ -406,7 +406,7 @@
 			collapseHeight();
 
 			// setup videos, since VideoJS won't take care of any loaded via AJAX
-			if(typeof _V_ != 'undefined') _V_.autoSetup();
+			if(typeof videojs != 'undefined') videojs.autoSetup();
 		});
 	}
 
