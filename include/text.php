@@ -1061,7 +1061,8 @@ function smilies($s, $sample = false) {
 		':facepalm',
 		':like',
 		':dislike',
-		'~friendica'
+                '~friendica',
+                'red#'
 
 	);
 
@@ -1098,7 +1099,8 @@ function smilies($s, $sample = false) {
 		'<img class="smiley" src="' . $a->get_baseurl() . '/images/smiley-facepalm.gif" alt=":facepalm" />',
 		'<img class="smiley" src="' . $a->get_baseurl() . '/images/like.gif" alt=":like" />',
 		'<img class="smiley" src="' . $a->get_baseurl() . '/images/dislike.gif" alt=":dislike" />',
-		'<a href="http://friendica.com">~friendica <img class="smiley" src="' . $a->get_baseurl() . '/images/friendica-16.png" alt="~friendica" /></a>'
+		'<a href="http://friendica.com">~friendica <img class="smiley" src="' . $a->get_baseurl() . '/images/friendica-16.png" alt="~friendica" /></a>',
+		'<a href="http://friendica.com">red <img class="smiley" src="' . $a->get_baseurl() . '/images/rhash-16.png" alt="red" /></a>'
 	);
 
 	$params = array('texts' => $texts, 'icons' => $icons, 'string' => $s);
