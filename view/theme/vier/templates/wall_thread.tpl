@@ -101,9 +101,9 @@
 				{{if $item.vote.dislike}}
 				<a href="#" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="dolike({{$item.id}},'dislike'); return false"><i class="icon-thumbs-down icon-large"></i></a>
 				{{/if}}
-			{{/if}}
-			{{if $item.vote.share}}
-				<a href="#" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}}); return false"><i class="icon-retweet icon-large"></i></a>
+			    {{if $item.vote.share}}
+				    <a href="#" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}}); return false"><i class="icon-retweet icon-large"></i></a>
+			    {{/if}}
 			{{/if}}
 			{{if $item.star}}
 				<a href="#" id="star-{{$item.id}}" onclick="dostar({{$item.id}}); return false;"  class="{{$item.star.classdo}}"  title="{{$item.star.do}}"><i class="icon-star icon-large"></i></a>
