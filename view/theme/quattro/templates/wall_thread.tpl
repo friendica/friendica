@@ -111,11 +111,11 @@
 				{{if $item.vote.dislike}}
 				<a href="#" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="dolike({{$item.id}},'dislike'); return false">{{$item.vote.dislike.1}}</a>
 				{{/if}}
+			    {{if $item.vote.share}}
+				    <a href="#" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}}); return false">{{$item.vote.share.1}}</a>
+			    {{/if}}			
 			{{/if}}
 						
-			{{if $item.vote.share}}
-				<a href="#" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}}); return false">{{$item.vote.share.1}}</a>
-			{{/if}}			
 			</div>
 			
 			<div class="wall-item-actions-tools">
