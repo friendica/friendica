@@ -33,3 +33,4 @@ report/
 #ignore cache folders
 /privacy_image_cache/
 /photo/
+nbproject

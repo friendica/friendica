@@ -11,8 +11,21 @@ function quattro_init(&$a) {
 $a->theme_info = array();
 set_template_engine($a, 'smarty3');
 
+
+$a->page['htmlhead'] .= '<script src="'.$a->get_baseurl().'/view/theme/quattro/tinycon.min.js"></script>';
 $a->page['htmlhead'] .= <<< EOT
 <script>
+$(document).ready(function(){
+    $('nav').bind('nav-update', function(e,data){
+        var notifCount = $(data).find('notif').attr('count');
+        if (notifCount > 0 ) {
+            Tinycon.setBubble(notifCount);
+        } else {
+            Tinycon.setBubble('');
+        }
+    });
+});        
+
 function insertFormatting(comment,BBcode,id) {
 	
 		var tmpStr = $("#comment-edit-text-" + id).val();
