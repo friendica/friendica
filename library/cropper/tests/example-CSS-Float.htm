@@ -13,12 +13,12 @@
 		
 		// setup the callback function
 		function onEndCrop( coords, dimensions ) {
-			$( 'x1' ).value = coords.x1;
-			$( 'y1' ).value = coords.y1;
-			$( 'x2' ).value = coords.x2;
-			$( 'y2' ).value = coords.y2;
-			$( 'width' ).value = dimensions.width;
-			$( 'height' ).value = dimensions.height;
+			$PR( 'x1' ).value = coords.x1;
+			$PR( 'y1' ).value = coords.y1;
+			$PR( 'x2' ).value = coords.x2;
+			$PR( 'y2' ).value = coords.y2;
+			$PR( 'width' ).value = dimensions.width;
+			$PR( 'height' ).value = dimensions.height;
 		}
 		
 		// float example
@@ -30,12 +30,12 @@
 					'testFloatImage',
 					{ 
 						onEndCrop: function( coords, dimensions ) {
-							$( 'floatX1' ).value = coords.x1;
-							$( 'floatY1' ).value = coords.y1;
-							$( 'floatX2' ).value = coords.x2;
-							$( 'floatY2' ).value = coords.y2;
-							$( 'floatWidth' ).value = dimensions.width;
-							$( 'floatHeight' ).value = dimensions.height;
+							$PR( 'floatX1' ).value = coords.x1;
+							$PR( 'floatY1' ).value = coords.y1;
+							$PR( 'floatX2' ).value = coords.x2;
+							$PR( 'floatY2' ).value = coords.y2;
+							$PR( 'floatWidth' ).value = dimensions.width;
+							$PR( 'floatHeight' ).value = dimensions.height;
 						}
 					}
 				);

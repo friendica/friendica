@@ -113,6 +113,8 @@
  * http://www.opensource.org/licenses/bsd-license.php
  * 
  * See scriptaculous.js for full scriptaculous licence
+ *
+ * Modified 2013/06/01 Zach P to change $() to $PR() for eliminating conflicts with jQuery
  */
  
 /**
@@ -134,7 +136,7 @@ Object.extend( Object.extend( CropDraggable.prototype, Draggable.prototype), {
 			arguments[1] || {}
 		);
 
-		this.element = $(element);
+		this.element = $PR(element);
 
 		this.handle = this.element;
 
@@ -212,12 +214,12 @@ Object.extend( Object.extend( CropDraggable.prototype, Draggable.prototype), {
  *
  * 		Example:
  * 			function onEndCrop( coords, dimensions ) {
- *				$( 'x1' ).value 	= coords.x1;
- *				$( 'y1' ).value 	= coords.y1;
- *				$( 'x2' ).value 	= coords.x2;
- *				$( 'y2' ).value 	= coords.y2;
- *				$( 'width' ).value 	= dimensions.width;
- *				$( 'height' ).value	= dimensions.height;
+ *				$PR( 'x1' ).value 	= coords.x1;
+ *				$PR( 'y1' ).value 	= coords.y1;
+ *				$PR( 'x2' ).value 	= coords.x2;
+ *				$PR( 'y2' ).value 	= coords.y2;
+ *				$PR( 'width' ).value 	= dimensions.width;
+ *				$PR( 'height' ).value	= dimensions.height;
  *			}
  * 
  */
@@ -288,7 +290,7 @@ Cropper.Img.prototype = {
 		 * @var obj
 		 * The img node to attach to
 		 */
-		this.img			= $( element );
+		this.img			= $PR( element );
 		/**
 		 * @var obj
 		 * The x & y coordinates of the click point
@@ -524,7 +526,7 @@ Cropper.Img.prototype = {
 	 */
 	registerHandles: function( registration ) {	
 		for( var i = 0; i < this.handles.length; i++ ) {
-			var handle = $( this.handles[i] );
+			var handle = $PR( this.handles[i] );
 			
 			if( registration ) {
 				var hideHandle	= false;	// whether to hide the handle
@@ -569,16 +571,16 @@ Cropper.Img.prototype = {
 		 */
 		this.imgH = this.img.height;			
 
-		$( this.north ).setStyle( { height: 0 } );
-		$( this.east ).setStyle( { width: 0, height: 0 } );
-		$( this.south ).setStyle( { height: 0 } );
-		$( this.west ).setStyle( { width: 0, height: 0 } );
+		$PR( this.north ).setStyle( { height: 0 } );
+		$PR( this.east ).setStyle( { width: 0, height: 0 } );
+		$PR( this.south ).setStyle( { height: 0 } );
+		$PR( this.west ).setStyle( { width: 0, height: 0 } );
 		
 		// resize the container to fit the image
-		$( this.imgWrap ).setStyle( { 'width': this.imgW + 'px', 'height': this.imgH + 'px' } );
+		$PR( this.imgWrap ).setStyle( { 'width': this.imgW + 'px', 'height': this.imgH + 'px' } );
 		
 		// hide the select area
-		$( this.selArea ).hide();
+		$PR( this.selArea ).hide();
 						
 		// setup the starting position of the select area
 		var startCoords = { x1: 0, y1: 0, x2: 0, y2: 0 };
@@ -1263,7 +1265,7 @@ Object.extend( Object.extend( Cropper.ImgWithPreview.prototype, Cropper.Img.prot
 			 * The preview image wrapper element
 			 * @var obj HTML element
 			 */
-			this.previewWrap 	= $( this.options.previewWrap );
+			this.previewWrap 	= $PR( this.options.previewWrap );
 			/**
 			 * The preview image element
 			 * @var obj HTML IMG element

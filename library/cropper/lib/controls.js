@@ -37,8 +37,8 @@ var Autocompleter = {}
 Autocompleter.Base = function() {};
 Autocompleter.Base.prototype = {
   baseInitialize: function(element, update, options) {
-    this.element     = $(element); 
-    this.update      = $(update);  
+    this.element     = $PR(element); 
+    this.update      = $PR(update);  
     this.hasFocus    = false; 
     this.changed     = false; 
     this.active      = false; 
@@ -88,7 +88,7 @@ Autocompleter.Base.prototype = {
        '<iframe id="' + this.update.id + '_iefix" '+
        'style="display:none;position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);" ' +
        'src="javascript:false;" frameborder="0" scrolling="no"></iframe>');
-      this.iefix = $(this.update.id+'_iefix');
+      this.iefix = $PR(this.update.id+'_iefix');
     }
     if(this.iefix) setTimeout(this.fixIEOverlapping.bind(this), 50);
   },
@@ -456,7 +456,7 @@ Ajax.InPlaceEditor.defaultHighlightColor = "#FFFF99";
 Ajax.InPlaceEditor.prototype = {
   initialize: function(element, url, options) {
     this.url = url;
-    this.element = $(element);
+    this.element = $PR(element);
 
     this.options = Object.extend({
       okButton: true,
@@ -491,14 +491,14 @@ Ajax.InPlaceEditor.prototype = {
 
     if(!this.options.formId && this.element.id) {
       this.options.formId = this.element.id + "-inplaceeditor";
-      if ($(this.options.formId)) {
+      if ($PR(this.options.formId)) {
         // there's already a form with that name, don't specify an id
         this.options.formId = null;
       }
     }
     
     if (this.options.externalControl) {
-      this.options.externalControl = $(this.options.externalControl);
+      this.options.externalControl = $PR(this.options.externalControl);
     }
     
     this.originalBackground = Element.getStyle(this.element, 'background-color');
@@ -796,7 +796,7 @@ Form.Element.DelayedObserver = Class.create();
 Form.Element.DelayedObserver.prototype = {
   initialize: function(element, delay, callback) {
     this.delay     = delay || 0.5;
-    this.element   = $(element);
+    this.element   = $PR(element);
     this.callback  = callback;
     this.timer     = null;
     this.lastValue = $F(this.element); 

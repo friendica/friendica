@@ -11,7 +11,6 @@
   tinyMCE.init({ mode : "none"});
 </script>-->*}}
 {{*<!--<script type="text/javascript" src="{{$baseurl}}/js/jquery.js" ></script>
-<script type="text/javascript">var $j = jQuery.noConflict();</script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/jquery.divgrow-1.3.1.f1.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/js/jquery.textinputs.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/fk.autocomplete.js" ></script>-->*}}
@@ -25,6 +24,5 @@
 <script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/theme.js"></script>
 
 <!--<script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/jquery.package.js" ></script>
-<script type="text/javascript">var $j = jQuery.noConflict();</script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/decaf-mobile/js/decaf-mobile.package.js" ></script>-->
 

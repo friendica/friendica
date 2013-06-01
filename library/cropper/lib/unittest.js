@@ -32,7 +32,7 @@ Event.simulateMouse = function(element, eventName) {
   var oEvent = document.createEvent("MouseEvents");
   oEvent.initMouseEvent(eventName, true, true, document.defaultView, 
     options.buttons, options.pointerX, options.pointerY, options.pointerX, options.pointerY, 
-    false, false, false, false, 0, $(element));
+    false, false, false, false, 0, $PR(element));
   
   if(this.mark) Element.remove(this.mark);
   this.mark = document.createElement('div');
@@ -49,7 +49,7 @@ Event.simulateMouse = function(element, eventName) {
   if(this.step)
     alert('['+new Date().getTime().toString()+'] '+eventName+'/'+Test.Unit.inspect(options));
   
-  $(element).dispatchEvent(oEvent);
+  $PR(element).dispatchEvent(oEvent);
 };
 
 // Note: Due to a fix in Firefox 1.0.5/6 that probably fixed "too much", this doesn't work in 1.0.6 or DP2.
@@ -69,7 +69,7 @@ Event.simulateKey = function(element, eventName) {
   oEvent.initKeyEvent(eventName, true, true, window, 
     options.ctrlKey, options.altKey, options.shiftKey, options.metaKey,
     options.keyCode, options.charCode );
-  $(element).dispatchEvent(oEvent);
+  $PR(element).dispatchEvent(oEvent);
 };
 
 Event.simulateKeys = function(element, command) {
@@ -87,7 +87,7 @@ Test.Unit.inspect = Object.inspect;
 Test.Unit.Logger = Class.create();
 Test.Unit.Logger.prototype = {
   initialize: function(log) {
-    this.log = $(log);
+    this.log = $PR(log);
     if (this.log) {
       this._createLogTable();
     }
@@ -126,8 +126,8 @@ Test.Unit.Logger.prototype = {
     '<thead><tr><th>Status</th><th>Test</th><th>Message</th></tr></thead>' +
     '<tbody id="loglines"></tbody>' +
     '</table>';
-    this.logsummary = $('logsummary')
-    this.loglines = $('loglines');
+    this.logsummary = $PR('logsummary')
+    this.loglines = $PR('loglines');
   },
   _toHTML: function(txt) {
     return txt.escapeHTML().replace(/\n/g,"<br/>");
@@ -142,7 +142,7 @@ Test.Unit.Runner.prototype = {
     }, arguments[1] || {});
     this.options.resultsURL = this.parseResultsURLQueryParameter();
     if (this.options.testLog) {
-      this.options.testLog = $(this.options.testLog) || null;
+      this.options.testLog = $PR(this.options.testLog) || null;
     }
     if(this.options.tests) {
       this.tests = [];
@@ -326,7 +326,7 @@ Test.Unit.Assertions.prototype = {
     catch(e) { this.error(e); } 
   },
   _isVisible: function(element) {
-    element = $(element);
+    element = $PR(element);
     if(!element.parentNode) return true;
     this.assertNotNull(element);
     if(element.style && Element.getStyle(element, 'display') == 'none')

@@ -10,14 +10,14 @@
 		listID = listID.replace(/\./g, "\\.");
 		listID = listID.replace(/@/g, "\\@");
 
-		if($j(listID).is(":visible")) {
-			$j(listID).hide();
-			$j(listID+"-wrapper").show();
-			alert($j(listID+"-wrapper").attr("id"));
+		if($(listID).is(":visible")) {
+			$(listID).hide();
+			$(listID+"-wrapper").show();
+			alert($(listID+"-wrapper").attr("id"));
 		}
 		else {
-			$j(listID).show();
-			$j(listID+"-wrapper").hide();
+			$(listID).show();
+			$(listID+"-wrapper").hide();
 		}
 	}
 
@@ -46,16 +46,16 @@
 	var last_popup_menu = null;
 	var last_popup_button = null;
 
-	$j(function() {
-		$j.ajaxSetup({cache: false});
+	$(function() {
+		$.ajaxSetup({cache: false});
 
-		msie = $j.browser.msie ;
+		msie = $.browser.msie ;
 		
 		collapseHeight();
 
 		/* setup tooltips *//*
-		$j("a,.tt").each(function(){
-			var e = $j(this);
+		$("a,.tt").each(function(){
+			var e = $(this);
 			var pos="bottom";
 			if (e.hasClass("tttop")) pos="top";
 			if (e.hasClass("ttbottom")) pos="bottom";
@@ -67,19 +67,19 @@
 		
 		
 		/* setup onoff widgets */
-		$j(".onoff input").each(function(){
-			val = $j(this).val();
-			id = $j(this).attr("id");
-			$j("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
+		$(".onoff input").each(function(){
+			val = $(this).val();
+			id = $(this).attr("id");
+			$("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
 			
 		});
-		$j(".onoff > a").click(function(event){
+		$(".onoff > a").click(function(event){
 			event.preventDefault();	
-			var input = $j(this).siblings("input");
+			var input = $(this).siblings("input");
 			var val = 1-input.val();
 			var id = input.attr("id");
-			$j("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
-			$j("#"+id+"_onoff ."+ (val==1?"on":"off")).removeClass("hidden");
+			$("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
+			$("#"+id+"_onoff ."+ (val==1?"on":"off")).removeClass("hidden");
 			input.val(val);
 			//console.log(id);
 		});
@@ -91,129 +91,129 @@
 		function close_last_popup_menu(e) {
 
  			if( last_popup_menu ) {
-				if( '#' + last_popup_menu.attr('id') !== $j(e.target).attr('rel')) {
+				if( '#' + last_popup_menu.attr('id') !== $(e.target).attr('rel')) {
 		 			last_popup_menu.hide();
-					if (last_popup_menu.attr('id') == "nav-notifications-menu" ) $j('.main-container').show();
+					if (last_popup_menu.attr('id') == "nav-notifications-menu" ) $('.main-container').show();
 		 			last_popup_button.removeClass("selected");
 		 			last_popup_menu = null;
 		 			last_popup_button = null;
 				}
 			}
 		}
-		$j('img[rel^=#]').click(function(e){
+		$('img[rel^=#]').click(function(e){
 
 			close_last_popup_menu(e);
-			menu = $j( $j(this).attr('rel') );
+			menu = $( $(this).attr('rel') );
 			e.preventDefault();
 			e.stopPropagation();
 
 			if (menu.attr('popup')=="false") return false;
 
-//			$j(this).parent().toggleClass("selected");
+//			$(this).parent().toggleClass("selected");
 //			menu.toggle();
 
 			if (menu.css("display") == "none") {
-				$j(this).parent().addClass("selected");
+				$(this).parent().addClass("selected");
 				menu.show();
-				if (menu.attr('id') == "nav-notifications-menu" ) $j('.main-container').hide();
+				if (menu.attr('id') == "nav-notifications-menu" ) $('.main-container').hide();
 				last_popup_menu = menu;
-				last_popup_button = $j(this).parent();
+				last_popup_button = $(this).parent();
 			} else {
-				$j(this).parent().removeClass("selected");
+				$(this).parent().removeClass("selected");
 				menu.hide();
-				if (menu.attr('id') == "nav-notifications-menu" ) $j('.main-container').show();
+				if (menu.attr('id') == "nav-notifications-menu" ) $('.main-container').show();
 				last_popup_menu = null;
 				last_popup_button = null;
 			}
 			return false;
 		});
-		$j('html').click(function(e) {
+		$('html').click(function(e) {
 			close_last_popup_menu(e);
 		});
 		
 		// fancyboxes
-		/*$j("a.popupbox").colorbox({
+		/*$("a.popupbox").colorbox({
 			'inline' : true,
 			'transition' : 'none'
 		});*/
 		
 
 		/* notifications template */
-		var notifications_tpl= unescape($j("#nav-notifications-template[rel=template]").html());
-		var notifications_all = unescape($j('<div>').append( $j("#nav-notifications-see-all").clone() ).html()); //outerHtml hack
-		var notifications_mark = unescape($j('<div>').append( $j("#nav-notifications-mark-all").clone() ).html()); //outerHtml hack
-		var notifications_empty = unescape($j("#nav-notifications-menu").html());
+		var notifications_tpl= unescape($("#nav-notifications-template[rel=template]").html());
+		var notifications_all = unescape($('<div>').append( $("#nav-notifications-see-all").clone() ).html()); //outerHtml hack
+		var notifications_mark = unescape($('<div>').append( $("#nav-notifications-mark-all").clone() ).html()); //outerHtml hack
+		var notifications_empty = unescape($("#nav-notifications-menu").html());
 		
 		/* nav update event  */
-		$j('nav').bind('nav-update', function(e,data){;
-			var invalid = $j(data).find('invalid').text();
+		$('nav').bind('nav-update', function(e,data){;
+			var invalid = $(data).find('invalid').text();
 			if(invalid == 1) { window.location.href=window.location.href }
 
-			var net = $j(data).find('net').text();
-			if(net == 0) { net = ''; $j('#net-update').removeClass('show') } else { $j('#net-update').addClass('show') }
-			$j('#net-update').html(net);
+			var net = $(data).find('net').text();
+			if(net == 0) { net = ''; $('#net-update').removeClass('show') } else { $('#net-update').addClass('show') }
+			$('#net-update').html(net);
 
-			var home = $j(data).find('home').text();
-			if(home == 0) { home = '';  $j('#home-update').removeClass('show') } else { $j('#home-update').addClass('show') }
-			$j('#home-update').html(home);
+			var home = $(data).find('home').text();
+			if(home == 0) { home = '';  $('#home-update').removeClass('show') } else { $('#home-update').addClass('show') }
+			$('#home-update').html(home);
 			
-			var intro = $j(data).find('intro').text();
-			if(intro == 0) { intro = '';  $j('#intro-update').removeClass('show') } else { $j('#intro-update').addClass('show') }
-			$j('#intro-update').html(intro);
+			var intro = $(data).find('intro').text();
+			if(intro == 0) { intro = '';  $('#intro-update').removeClass('show') } else { $('#intro-update').addClass('show') }
+			$('#intro-update').html(intro);
 
-			var mail = $j(data).find('mail').text();
-			if(mail == 0) { mail = '';  $j('#mail-update').removeClass('show') } else { $j('#mail-update').addClass('show') }
-			$j('#mail-update').html(mail);
+			var mail = $(data).find('mail').text();
+			if(mail == 0) { mail = '';  $('#mail-update').removeClass('show') } else { $('#mail-update').addClass('show') }
+			$('#mail-update').html(mail);
 			
-			var intro = $j(data).find('intro').text();
-			if(intro == 0) { intro = '';  $j('#intro-update-li').removeClass('show') } else { $j('#intro-update-li').addClass('show') }
-			$j('#intro-update-li').html(intro);
+			var intro = $(data).find('intro').text();
+			if(intro == 0) { intro = '';  $('#intro-update-li').removeClass('show') } else { $('#intro-update-li').addClass('show') }
+			$('#intro-update-li').html(intro);
 
-			var mail = $j(data).find('mail').text();
-			if(mail == 0) { mail = '';  $j('#mail-update-li').removeClass('show') } else { $j('#mail-update-li').addClass('show') }
-			$j('#mail-update-li').html(mail);
+			var mail = $(data).find('mail').text();
+			if(mail == 0) { mail = '';  $('#mail-update-li').removeClass('show') } else { $('#mail-update-li').addClass('show') }
+			$('#mail-update-li').html(mail);
 
-			var eNotif = $j(data).find('notif')
+			var eNotif = $(data).find('notif')
 			
 			if (eNotif.children("note").length==0){
-				$j("#nav-notifications-menu").html(notifications_empty);
+				$("#nav-notifications-menu").html(notifications_empty);
 			} else {
-				nnm = $j("#nav-notifications-menu");
+				nnm = $("#nav-notifications-menu");
 				nnm.html(notifications_all + notifications_mark);
 				//nnm.attr('popup','true');
 				eNotif.children("note").each(function(){
-					e = $j(this);
+					e = $(this);
 					text = e.text().format("<span class='contactname'>"+e.attr('name')+"</span>");
 					html = notifications_tpl.format(e.attr('href'),e.attr('photo'), text, e.attr('date'), e.attr('seen'));
 					nnm.append(html);
 				});
 
-				$j("img[data-src]", nnm).each(function(i, el){
+				$("img[data-src]", nnm).each(function(i, el){
 					// Add src attribute for images with a data-src attribute
 					// However, don't bother if the data-src attribute is empty, because
 					// an empty "src" tag for an image will cause some browsers
 					// to prefetch the root page of the Friendica hub, which will
 					// unnecessarily load an entire profile/ or network/ page
-					if($j(el).data("src") != '') $j(el).attr('src', $j(el).data("src"));
+					if($(el).data("src") != '') $(el).attr('src', $(el).data("src"));
 				});
 			}
 			notif = eNotif.attr('count');
 			if (notif>0){
-				$j("#nav-notifications-linkmenu").addClass("on");
+				$("#nav-notifications-linkmenu").addClass("on");
 			} else {
-				$j("#nav-notifications-linkmenu").removeClass("on");
+				$("#nav-notifications-linkmenu").removeClass("on");
 			}
-			if(notif == 0) { notif = ''; $j('#notify-update').removeClass('show') } else { $j('#notify-update').addClass('show') }
-			$j('#notify-update').html(notif);
+			if(notif == 0) { notif = ''; $('#notify-update').removeClass('show') } else { $('#notify-update').addClass('show') }
+			$('#notify-update').html(notif);
 			
-			var eSysmsg = $j(data).find('sysmsgs');
+			var eSysmsg = $(data).find('sysmsgs');
 			eSysmsg.children("notice").each(function(){
-				text = $j(this).text();
-				$j.jGrowl(text, { sticky: false, theme: 'notice', life: 1000 });
+				text = $(this).text();
+				$.jGrowl(text, { sticky: false, theme: 'notice', life: 1000 });
 			});
 			eSysmsg.children("info").each(function(){
-				text = $j(this).text();
-				$j.jGrowl(text, { sticky: false, theme: 'info', life: 1000 });
+				text = $(this).text();
+				$.jGrowl(text, { sticky: false, theme: 'info', life: 1000 });
 			});
 			
 		});
@@ -221,7 +221,7 @@
 		
  		NavUpdate(); 
 		// Allow folks to stop the ajax page updates with the pause/break key
-/*		$j(document).keydown(function(event) {
+/*		$(document).keydown(function(event) {
 			if(event.keyCode == '8') {
 				var target = event.target || event.srcElement;
 				if (!/input|textarea/i.test(target.nodeName)) {
@@ -235,7 +235,7 @@
 					if (event.ctrlKey) {
 						totStopped = true;
 					}
-					$j('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
+					$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
 				} else {
 					unpause();
 				}
@@ -253,28 +253,28 @@
 
 		if(! stopped) {
 			var pingCmd = 'ping' + ((localUser != 0) ? '?f=&uid=' + localUser : '');
-			$j.get(pingCmd,function(data) {
-				$j(data).find('result').each(function() {
+			$.get(pingCmd,function(data) {
+				$(data).find('result').each(function() {
 					// send nav-update event
-					$j('nav').trigger('nav-update', this);
+					$('nav').trigger('nav-update', this);
 					
 					
 					// start live update
 
 					
 
-					if($j('#live-network').length)   { src = 'network'; liveUpdate(); }
-					if($j('#live-profile').length)   { src = 'profile'; liveUpdate(); }
-					if($j('#live-community').length) { src = 'community'; liveUpdate(); }
-					if($j('#live-notes').length)     { src = 'notes'; liveUpdate(); }
-					if($j('#live-display').length) { src = 'display'; liveUpdate(); }
-					/*if($j('#live-display').length) {
+					if($('#live-network').length)   { src = 'network'; liveUpdate(); }
+					if($('#live-profile').length)   { src = 'profile'; liveUpdate(); }
+					if($('#live-community').length) { src = 'community'; liveUpdate(); }
+					if($('#live-notes').length)     { src = 'notes'; liveUpdate(); }
+					if($('#live-display').length) { src = 'display'; liveUpdate(); }
+					/*if($('#live-display').length) {
 						if(liking) {
 							liking = 0;
 							window.location.href=window.location.href 
 						}
 					}*/
-					if($j('#live-photos').length) {
+					if($('#live-photos').length) {
 						if(liking) {
 							liking = 0;
 							window.location.href=window.location.href 
@@ -291,8 +291,8 @@
 	}
 
 	function liveUpdate() {
-		if((src == null) || (stopped) || (typeof profile_uid == 'undefined') || (! profile_uid)) { $j('.like-rotator').hide(); return; }
-		if(($j('.comment-edit-text-full').length) || (in_progress)) {
+		if((src == null) || (stopped) || (typeof profile_uid == 'undefined') || (! profile_uid)) { $('.like-rotator').hide(); return; }
+		if(($('.comment-edit-text-full').length) || (in_progress)) {
 			if(livetime) {
 				clearTimeout(livetime);
 			}
@@ -308,50 +308,50 @@
 		var udargs = ((netargs.length) ? '/' + netargs : '');
 		var update_url = 'update_' + src + udargs + '&p=' + profile_uid + '&page=' + profile_page + '&msie=' + ((msie) ? 1 : 0);
 
-		$j.get(update_url,function(data) {
+		$.get(update_url,function(data) {
 			in_progress = false;
-			//			$j('.collapsed-comments',data).each(function() {
-			//	var ident = $j(this).attr('id');
-			//	var is_hidden = $j('#' + ident).is(':hidden');
-			//	if($j('#' + ident).length) {
-			//		$j('#' + ident).replaceWith($j(this));
+			//			$('.collapsed-comments',data).each(function() {
+			//	var ident = $(this).attr('id');
+			//	var is_hidden = $('#' + ident).is(':hidden');
+			//	if($('#' + ident).length) {
+			//		$('#' + ident).replaceWith($(this));
 			//		if(is_hidden)
-			//			$j('#' + ident).hide();
+			//			$('#' + ident).hide();
 			//	}
 			//});
 
 			// add a new thread
 
-			$j('.toplevel_item',data).each(function() {
-				var ident = $j(this).attr('id');
+			$('.toplevel_item',data).each(function() {
+				var ident = $(this).attr('id');
 
-				if($j('#' + ident).length == 0 && profile_page == 1) {
-					$j('img',this).each(function() {
-						$j(this).attr('src',$j(this).attr('dst'));
+				if($('#' + ident).length == 0 && profile_page == 1) {
+					$('img',this).each(function() {
+						$(this).attr('src',$(this).attr('dst'));
 					});
-					$j('#' + prev).after($j(this));
+					$('#' + prev).after($(this));
 				}
 				else {
 					// Find out if the hidden comments are open, so we can keep it that way
 					// if a new comment has been posted
-					var id = $j('.hide-comments-total', this).attr('id');
+					var id = $('.hide-comments-total', this).attr('id');
 					if(typeof id != 'undefined') {
 						id = id.split('-')[3];
-						var commentsOpen = $j("#collapsed-comments-" + id).is(":visible");
+						var commentsOpen = $("#collapsed-comments-" + id).is(":visible");
 					}
 
-					$j('img',this).each(function() {
-						$j(this).attr('src',$j(this).attr('dst'));
+					$('img',this).each(function() {
+						$(this).attr('src',$(this).attr('dst'));
 					});
-					//vScroll = $j(document).scrollTop();
-					$j('html').height($j('html').height());
-					$j('#' + ident).replaceWith($j(this));
+					//vScroll = $(document).scrollTop();
+					$('html').height($('html').height());
+					$('#' + ident).replaceWith($(this));
 
 					if(typeof id != 'undefined') {
 						if(commentsOpen) showHideComments(id);
 					}
-					$j('html').height('auto');
-					//$j(document).scrollTop(vScroll);
+					$('html').height('auto');
+					//$(document).scrollTop(vScroll);
 				}
 				prev = ident;
 			});
@@ -363,36 +363,36 @@
 
 			/*prev = 'live-' + src;
 
-			$j('.wall-item-outside-wrapper',data).each(function() {
-				var ident = $j(this).attr('id');
+			$('.wall-item-outside-wrapper',data).each(function() {
+				var ident = $(this).attr('id');
 
-				if($j('#' + ident).length == 0 && prev != 'live-' + src) {
-						$j('img',this).each(function() {
-							$j(this).attr('src',$j(this).attr('dst'));
+				if($('#' + ident).length == 0 && prev != 'live-' + src) {
+						$('img',this).each(function() {
+							$(this).attr('src',$(this).attr('dst'));
 						});
-						$j('#' + prev).after($j(this));
+						$('#' + prev).after($(this));
 				}
 				else { 
-					$j('#' + ident + ' ' + '.wall-item-ago').replaceWith($j(this).find('.wall-item-ago')); 
-					if($j('#' + ident + ' ' + '.comment-edit-text-empty').length)
-						$j('#' + ident + ' ' + '.wall-item-comment-wrapper').replaceWith($j(this).find('.wall-item-comment-wrapper'));
-					$j('#' + ident + ' ' + '.hide-comments-total').replaceWith($j(this).find('.hide-comments-total'));
-					$j('#' + ident + ' ' + '.wall-item-like').replaceWith($j(this).find('.wall-item-like'));
-					$j('#' + ident + ' ' + '.wall-item-dislike').replaceWith($j(this).find('.wall-item-dislike'));
-					$j('#' + ident + ' ' + '.my-comment-photo').each(function() {
-						$j(this).attr('src',$j(this).attr('dst'));
+					$('#' + ident + ' ' + '.wall-item-ago').replaceWith($(this).find('.wall-item-ago')); 
+					if($('#' + ident + ' ' + '.comment-edit-text-empty').length)
+						$('#' + ident + ' ' + '.wall-item-comment-wrapper').replaceWith($(this).find('.wall-item-comment-wrapper'));
+					$('#' + ident + ' ' + '.hide-comments-total').replaceWith($(this).find('.hide-comments-total'));
+					$('#' + ident + ' ' + '.wall-item-like').replaceWith($(this).find('.wall-item-like'));
+					$('#' + ident + ' ' + '.wall-item-dislike').replaceWith($(this).find('.wall-item-dislike'));
+					$('#' + ident + ' ' + '.my-comment-photo').each(function() {
+						$(this).attr('src',$(this).attr('dst'));
 					});
 				}
 				prev = ident; 
 			});*/
 			
-			$j('.like-rotator').hide();
+			$('.like-rotator').hide();
 			if(commentBusy) {
 				commentBusy = false;
-				$j('body').css('cursor', 'auto');
+				$('body').css('cursor', 'auto');
 			}
 			/* autocomplete @nicknames */
-			$j(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
+			$(".comment-edit-form  textarea").contact_autocomplete(baseurl+"/acl");
 
 			// setup videos, since VideoJS won't take care of any loaded via AJAX
 			if(typeof videojs != 'undefined') videojs.autoSetup();
@@ -404,22 +404,22 @@
 		if(typeof elems != 'undefined') {
 			elemName = elems + ' ' + elemName;
 		}
-		$j(elemName).each(function() {
-			if($j(this).height() > 350) {
-				$j('html').height($j('html').height());
-				$j(this).divgrow({ initialHeight: 300, showBrackets: false, speed: 0 });
-				$j(this).addClass('divmore');
-				$j('html').height('auto');
+		$(elemName).each(function() {
+			if($(this).height() > 350) {
+				$('html').height($('html').height());
+				$(this).divgrow({ initialHeight: 300, showBrackets: false, speed: 0 });
+				$(this).addClass('divmore');
+				$('html').height('auto');
 			}
 		});
 	}
 
 /*	function imgbright(node) {
-		$j(node).removeClass("drophide").addClass("drop");
+		$(node).removeClass("drophide").addClass("drop");
 	}
 
 	function imgdull(node) {
-		$j(node).removeClass("drop").addClass("drophide");
+		$(node).removeClass("drop").addClass("drophide");
 	}*/
 
 	// Since our ajax calls are asynchronous, we will give a few 
@@ -434,8 +434,8 @@
 
 	function dolike(ident,verb) {
 		unpause();
-		$j('#like-rotator-' + ident.toString()).show();
-		$j.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
+		$('#like-rotator-' + ident.toString()).show();
+		$.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
 //		if(timer) clearTimeout(timer);
 //		timer = setTimeout(NavUpdate,3000);
 		liking = 1;
@@ -443,21 +443,21 @@
 
 	function dostar(ident) {
 		ident = ident.toString();
-		//$j('#like-rotator-' + ident).show();
-		$j.get('starred/' + ident, function(data) {
+		//$('#like-rotator-' + ident).show();
+		$.get('starred/' + ident, function(data) {
 			if(data.match(/1/)) {
-				$j('#starred-' + ident).addClass('starred');
-				$j('#starred-' + ident).removeClass('unstarred');
-				$j('#star-' + ident).addClass('hidden');
-				$j('#unstar-' + ident).removeClass('hidden');
+				$('#starred-' + ident).addClass('starred');
+				$('#starred-' + ident).removeClass('unstarred');
+				$('#star-' + ident).addClass('hidden');
+				$('#unstar-' + ident).removeClass('hidden');
 			}
 			else {			
-				$j('#starred-' + ident).addClass('unstarred');
-				$j('#starred-' + ident).removeClass('starred');
-				$j('#star-' + ident).removeClass('hidden');
-				$j('#unstar-' + ident).addClass('hidden');
+				$('#starred-' + ident).addClass('unstarred');
+				$('#starred-' + ident).removeClass('starred');
+				$('#star-' + ident).removeClass('hidden');
+				$('#unstar-' + ident).addClass('hidden');
 			}
-			//$j('#like-rotator-' + ident).hide();	
+			//$('#like-rotator-' + ident).hide();	
 		});
 	}
 
@@ -492,31 +492,31 @@
 		}
 		else {
 			lockvisible = true;
-			$j.get('lockview/' + id, function(data) {
-				$j('#panel').html(data);
-				$j('#panel').css({ 'left': 10 , 'top': cursor.y + 20});
-				$j('#panel').show();
+			$.get('lockview/' + id, function(data) {
+				$('#panel').html(data);
+				$('#panel').css({ 'left': 10 , 'top': cursor.y + 20});
+				$('#panel').show();
 			});
 		}
 	}
 
 	function lockviewhide() {
 		lockvisible = false;
-		$j('#panel').hide();
+		$('#panel').hide();
 	}
 
 	function post_comment(id) {
 		unpause();
 		commentBusy = true;
-		$j('body').css('cursor', 'wait');
-		$j("#comment-preview-inp-" + id).val("0");
-		$j.post(  
+		$('body').css('cursor', 'wait');
+		$("#comment-preview-inp-" + id).val("0");
+		$.post(  
              "item",  
-             $j("#comment-edit-form-" + id).serialize(),
+             $("#comment-edit-form-" + id).serialize(),
 			function(data) {
 				if(data.success) {
-					$j("#comment-edit-wrapper-" + id).hide();
-					$j("#comment-edit-text-" + id).val('');
+					$("#comment-edit-wrapper-" + id).hide();
+					$("#comment-edit-text-" + id).val('');
     	  			var tarea = document.getElementById("comment-edit-text-" + id);
 					if(tarea)
 						commentClose(tarea,id);
@@ -534,16 +534,16 @@
 
 
 	function preview_comment(id) {
-		$j("#comment-preview-inp-" + id).val("1");
-		$j("#comment-edit-preview-" + id).show();
-		$j.post(  
+		$("#comment-preview-inp-" + id).val("1");
+		$("#comment-edit-preview-" + id).show();
+		$.post(  
              "item",  
-             $j("#comment-edit-form-" + id).serialize(),
+             $("#comment-edit-form-" + id).serialize(),
 			function(data) {
 				if(data.preview) {
 						
-					$j("#comment-edit-preview-" + id).html(data.preview);
-					$j("#comment-edit-preview-" + id + " a").click(function() { return false; });
+					$("#comment-edit-preview-" + id).html(data.preview);
+					$("#comment-edit-preview-" + id + " a").click(function() { return false; });
 				}
 			},
 			"json"  
@@ -553,34 +553,34 @@
 
 
 	function showHideComments(id) {
-		if( $j("#collapsed-comments-" + id).is(":visible")) {
-			$j("#collapsed-comments-" + id).hide();
-			$j("#hide-comments-" + id).html(window.showMore);
+		if( $("#collapsed-comments-" + id).is(":visible")) {
+			$("#collapsed-comments-" + id).hide();
+			$("#hide-comments-" + id).html(window.showMore);
 		}
 		else {
-			$j("#collapsed-comments-" + id).show();
-			$j("#hide-comments-" + id).html(window.showFewer);
+			$("#collapsed-comments-" + id).show();
+			$("#hide-comments-" + id).html(window.showFewer);
 			collapseHeight("#collapsed-comments-" + id);
 		}
 	}
 
 
 	function preview_post() {
-		$j("#jot-preview").val("1");
-		$j("#jot-preview-content").show();
+		$("#jot-preview").val("1");
+		$("#jot-preview-content").show();
 		tinyMCE.triggerSave();
-		$j.post(  
+		$.post(  
 			"item",  
-			$j("#profile-jot-form").serialize(),
+			$("#profile-jot-form").serialize(),
 			function(data) {
 				if(data.preview) {			
-					$j("#jot-preview-content").html(data.preview);
-					$j("#jot-preview-content" + " a").click(function() { return false; });
+					$("#jot-preview-content").html(data.preview);
+					$("#jot-preview-content" + " a").click(function() { return false; });
 				}
 			},
 			"json"  
 		);  
-		$j("#jot-preview").val("0");
+		$("#jot-preview").val("0");
 		return true;  
 	}
 
@@ -589,7 +589,7 @@
 		// unpause auto reloads if they are currently stopped
 		totStopped = false;
 		stopped = false;
-	    $j('#pause').html('');
+	    $('#pause').html('');
 	}
 		
 
@@ -617,40 +617,40 @@
     }  
 
 	function groupChangeMember(gid, cid, sec_token) {
-		$j('body .fakelink').css('cursor', 'wait');
-		$j.get('group/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
-				$j('#group-update-wrapper').html(data);
-				$j('body .fakelink').css('cursor', 'auto');				
+		$('body .fakelink').css('cursor', 'wait');
+		$.get('group/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
+				$('#group-update-wrapper').html(data);
+				$('body .fakelink').css('cursor', 'auto');				
 		});
 	}
 
 	function profChangeMember(gid,cid) {
-		$j('body .fakelink').css('cursor', 'wait');
-		$j.get('profperm/' + gid + '/' + cid, function(data) {
-				$j('#prof-update-wrapper').html(data);
-				$j('body .fakelink').css('cursor', 'auto');				
+		$('body .fakelink').css('cursor', 'wait');
+		$.get('profperm/' + gid + '/' + cid, function(data) {
+				$('#prof-update-wrapper').html(data);
+				$('body .fakelink').css('cursor', 'auto');				
 		});
 	}
 
 	function contactgroupChangeMember(gid,cid) {
-		$j('body').css('cursor', 'wait');
-		$j.get('contactgroup/' + gid + '/' + cid, function(data) {
-				$j('body').css('cursor', 'auto');
+		$('body').css('cursor', 'wait');
+		$.get('contactgroup/' + gid + '/' + cid, function(data) {
+				$('body').css('cursor', 'auto');
 		});
 	}
 
 
 function checkboxhighlight(box) {
-  if($j(box).is(':checked')) {
-	$j(box).addClass('checkeditem');
+  if($(box).is(':checked')) {
+	$(box).addClass('checkeditem');
   }
   else {
-	$j(box).removeClass('checkeditem');
+	$(box).removeClass('checkeditem');
   }
 }
 
 function notifyMarkAll() {
-	$j.get('notify/mark/all', function(data) {
+	$.get('notify/mark/all', function(data) {
 		if(timer) clearTimeout(timer);
 		timer = setTimeout(NavUpdate,1000);
 	});
@@ -729,9 +729,9 @@ Array.prototype.remove = function(item) {
 };
 
 function previewTheme(elm) {
-	theme = $j(elm).val();
-	$j.getJSON('pretheme?f=&theme=' + theme,function(data) {
-			$j('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div>');
+	theme = $(elm).val();
+	$.getJSON('pretheme?f=&theme=' + theme,function(data) {
+			$('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div>');
 	});
 
 }

@@ -13,13 +13,15 @@
  * http://www.opensource.org/licenses/bsd-license.php
  * 
  * See scriptaculous.js for full scriptaculous licence
+ *
+ * Modified 2013/06/01 Zach P to change $() to $PR() for eliminating conflicts with jQuery
  */
 
 var CropDraggable=Class.create();
 Object.extend(Object.extend(CropDraggable.prototype,Draggable.prototype),{initialize:function(_1){
 this.options=Object.extend({drawMethod:function(){
 }},arguments[1]||{});
-this.element=$(_1);
+this.element=$PR(_1);
 this.handle=this.element;
 this.delta=this.currentDelta();
 this.dragging=false;
@@ -40,7 +42,7 @@ var Cropper={};
 Cropper.Img=Class.create();
 Cropper.Img.prototype={initialize:function(_7,_8){
 this.options=Object.extend({ratioDim:{x:0,y:0},minWidth:0,minHeight:0,displayOnInit:false,onEndCrop:Prototype.emptyFunction,captureKeys:true,onloadCoords:null,maxWidth:0,maxHeight:0},_8||{});
-this.img=$(_7);
+this.img=$PR(_7);
 this.clickCoords={x:0,y:0};
 this.dragging=false;
 this.resizing=false;
@@ -127,7 +129,7 @@ new CropDraggable(this.selArea,{drawMethod:this.moveArea.bindAsEventListener(thi
 this.setParams();
 },registerHandles:function(_13){
 for(var i=0;i<this.handles.length;i++){
-var _15=$(this.handles[i]);
+var _15=$PR(this.handles[i]);
 if(_13){
 var _16=false;
 if(this.fixedWidth&&this.fixedHeight){
@@ -163,12 +165,12 @@ Event.stopObserving(_15,"mousedown",this.resizeBind);
 },setParams:function(){
 this.imgW=this.img.width;
 this.imgH=this.img.height;
-$(this.north).setStyle({height:0});
-$(this.east).setStyle({width:0,height:0});
-$(this.south).setStyle({height:0});
-$(this.west).setStyle({width:0,height:0});
-$(this.imgWrap).setStyle({"width":this.imgW+"px","height":this.imgH+"px"});
-$(this.selArea).hide();
+$PR(this.north).setStyle({height:0});
+$PR(this.east).setStyle({width:0,height:0});
+$PR(this.south).setStyle({height:0});
+$PR(this.west).setStyle({width:0,height:0});
+$PR(this.imgWrap).setStyle({"width":this.imgW+"px","height":this.imgH+"px"});
+$PR(this.selArea).hide();
 var _1a={x1:0,y1:0,x2:0,y2:0};
 var _1b=false;
 if(this.options.onloadCoords!=null){
@@ -540,7 +542,7 @@ Cropper.ImgWithPreview=Class.create();
 Object.extend(Object.extend(Cropper.ImgWithPreview.prototype,Cropper.Img.prototype),{subInitialize:function(){
 this.hasPreviewImg=false;
 if(typeof (this.options.previewWrap)!="undefined"&&this.options.minWidth>0&&this.options.minHeight>0){
-this.previewWrap=$(this.options.previewWrap);
+this.previewWrap=$PR(this.options.previewWrap);
 this.previewImg=this.img.cloneNode(false);
 this.previewImg.id="imgCrop_"+this.previewImg.id;
 this.options.displayOnInit=true;

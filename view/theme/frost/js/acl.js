@@ -13,41 +13,41 @@ function ACL(backend_url, preset){
 	that.group_uids = [];
 	that.nw = 3; //items per row. should be calulated from #acl-list.width
 	
-	that.list_content = $j("#acl-list-content");
-	that.item_tpl = unescape($j(".acl-list-item[rel=acl-template]").html());
-	that.showall = $j("#acl-showall");
+	that.list_content = $("#acl-list-content");
+	that.item_tpl = unescape($(".acl-list-item[rel=acl-template]").html());
+	that.showall = $("#acl-showall");
 
 	if (preset.length==0) that.showall.addClass("selected");
 	
 	/*events*/
 	that.showall.click(that.on_showall);
-	$j(".acl-button-show").live('click', that.on_button_show);
-	$j(".acl-button-hide").live('click', that.on_button_hide);
-	$j("#acl-search").keypress(that.on_search);
-	$j("#acl-wrapper").parents("form").submit(that.on_submit);
+	$(".acl-button-show").live('click', that.on_button_show);
+	$(".acl-button-hide").live('click', that.on_button_hide);
+	$("#acl-search").keypress(that.on_search);
+	$("#acl-wrapper").parents("form").submit(that.on_submit);
 	
 	/* startup! */
 	that.get(0,100);
 }
 
 ACL.prototype.on_submit = function(){
-	aclfileds = $j("#acl-fields").html("");
-	$j(that.allow_gid).each(function(i,v){
+	aclfileds = $("#acl-fields").html("");
+	$(that.allow_gid).each(function(i,v){
 		aclfileds.append("<input type='hidden' name='group_allow[]' value='"+v+"'>");
 	});
-	$j(that.allow_cid).each(function(i,v){
+	$(that.allow_cid).each(function(i,v){
 		aclfileds.append("<input type='hidden' name='contact_allow[]' value='"+v+"'>");
 	});
-	$j(that.deny_gid).each(function(i,v){
+	$(that.deny_gid).each(function(i,v){
 		aclfileds.append("<input type='hidden' name='group_deny[]' value='"+v+"'>");
 	});
-	$j(that.deny_cid).each(function(i,v){
+	$(that.deny_cid).each(function(i,v){
 		aclfileds.append("<input type='hidden' name='contact_deny[]' value='"+v+"'>");
 	});	
 }
 
 ACL.prototype.search = function(){
-	var srcstr = $j("#acl-search").val();
+	var srcstr = $("#acl-search").val();
 	that.list_content.html("");
 	that.get(0,100, srcstr);
 }
@@ -82,10 +82,10 @@ ACL.prototype.on_button_show = function(event){
 	event.stopPropagation();
 
 	/*that.showall.removeClass("selected");
-	$j(this).siblings(".acl-button-hide").removeClass("selected");
-	$j(this).toggleClass("selected");*/
+	$(this).siblings(".acl-button-hide").removeClass("selected");
+	$(this).toggleClass("selected");*/
 
-	that.set_allow($j(this).parent().attr('id'));
+	that.set_allow($(this).parent().attr('id'));
 
 	return false;
 }
@@ -95,10 +95,10 @@ ACL.prototype.on_button_hide = function(event){
 	event.stopPropagation();
 
 	/*that.showall.removeClass("selected");
-	$j(this).siblings(".acl-button-show").removeClass("selected");
-	$j(this).toggleClass("selected");*/
+	$(this).siblings(".acl-button-show").removeClass("selected");
+	$(this).toggleClass("selected");*/
 
-	that.set_deny($j(this).parent().attr('id'));
+	that.set_deny($(this).parent().attr('id'));
 
 	return false;
 }
@@ -156,32 +156,32 @@ ACL.prototype.update_view = function(){
 		that.deny_gid.length==0 && that.deny_cid.length==0){
 			that.showall.addClass("selected");
 			/* jot acl */
-				$j('#jot-perms-icon').removeClass('lock').addClass('unlock');
-				$j('#jot-public').show();
-				$j('.profile-jot-net input').attr('disabled', false);			
+				$('#jot-perms-icon').removeClass('lock').addClass('unlock');
+				$('#jot-public').show();
+				$('.profile-jot-net input').attr('disabled', false);			
 				if(typeof editor != 'undefined' && editor != false) {
-					$j('#profile-jot-desc').html(window.isPublic);
+					$('#profile-jot-desc').html(window.isPublic);
 				}
 			
 	} else {
 			that.showall.removeClass("selected");
 			/* jot acl */
-				$j('#jot-perms-icon').removeClass('unlock').addClass('lock');
-				$j('#jot-public').hide();
-				$j('.profile-jot-net input').attr('disabled', 'disabled');			
-				$j('#profile-jot-desc').html('&nbsp;');
+				$('#jot-perms-icon').removeClass('unlock').addClass('lock');
+				$('#jot-public').hide();
+				$('.profile-jot-net input').attr('disabled', 'disabled');			
+				$('#profile-jot-desc').html('&nbsp;');
 	}
-	$j("#acl-list-content .acl-list-item").each(function(){
-		$j(this).removeClass("groupshow grouphide");
+	$("#acl-list-content .acl-list-item").each(function(){
+		$(this).removeClass("groupshow grouphide");
 	});
 	
-	$j("#acl-list-content .acl-list-item").each(function(){
-		itemid = $j(this).attr('id');
+	$("#acl-list-content .acl-list-item").each(function(){
+		itemid = $(this).attr('id');
 		type = itemid[0];
 		id 	 = parseInt(itemid.substr(1));
 		
-		btshow = $j(this).children(".acl-button-show").removeClass("selected");
-		bthide = $j(this).children(".acl-button-hide").removeClass("selected");	
+		btshow = $(this).children(".acl-button-show").removeClass("selected");
+		bthide = $(this).children(".acl-button-hide").removeClass("selected");	
 		
 		switch(type){
 			case "g":
@@ -197,16 +197,16 @@ ACL.prototype.update_view = function(){
 					uclass="grouphide";
 				}
 				
-				$j(that.group_uids[id]).each(function(i,v) {
+				$(that.group_uids[id]).each(function(i,v) {
 					if(uclass == "grouphide")
-						$j("#c"+v).removeClass("groupshow");
+						$("#c"+v).removeClass("groupshow");
 					if(uclass != "") {
-						var cls = $j("#c"+v).attr('class');
+						var cls = $("#c"+v).attr('class');
 						if( cls == undefined)
 							return true;
 						var hiding = cls.indexOf('grouphide');
 						if(hiding == -1)
-							$j("#c"+v).addClass(uclass);
+							$("#c"+v).addClass(uclass);
 					}
 				});
 				
@@ -234,7 +234,7 @@ ACL.prototype.get = function(start,count, search){
 		search:search,
 	}
 	
-	$j.ajax({
+	$.ajax({
 		type:'POST',
 		url: that.url,
 		data: postdata,
@@ -246,16 +246,16 @@ ACL.prototype.get = function(start,count, search){
 ACL.prototype.populate = function(data){
 	var height = Math.ceil(data.tot / that.nw) * 42;
 	that.list_content.height(height);
-	$j(data.items).each(function(){
+	$(data.items).each(function(){
 		html = "<div class='acl-list-item {4} {5}' title='{6}' id='{2}{3}'>"+that.item_tpl+"</div>";
 		html = html.format( this.photo, this.name, this.type, this.id, '', this.network, this.link );
 		if (this.uids!=undefined) that.group_uids[this.id] = this.uids;
 		//console.log(html);
 		that.list_content.append(html);
 	});
-	$j(".acl-list-item img[data-src]", that.list_content).each(function(i, el){
+	$(".acl-list-item img[data-src]", that.list_content).each(function(i, el){
 		// Add src attribute for images with a data-src attribute
-		$j(el).attr('src', $j(el).data("src"));
+		$(el).attr('src', $(el).data("src"));
 	});
 	that.update_view();
 }

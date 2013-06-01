@@ -20,8 +20,6 @@
 {{*<!--<script type="text/javascript" src="{{$baseurl}}/library/tiptip/jquery.tipTip.minified.js"></script>-->*}}
 <script type="text/javascript" src="{{$baseurl}}/library/jgrowl/jquery.jgrowl_minimized.js"></script>
 
-<script type="text/javascript">var $j = jQuery.noConflict();</script>
-
 <script type="text/javascript" src="{{$baseurl}}/view/theme/frost/js/acl.min.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/js/webtoolkit.base64.min.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/frost/js/fk.autocomplete.min.js" ></script>

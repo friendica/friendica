@@ -35,12 +35,12 @@ Control.Slider.prototype = {
     var slider = this;
     
     if(handle instanceof Array) {
-      this.handles = handle.collect( function(e) { return $(e) });
+      this.handles = handle.collect( function(e) { return $PR(e) });
     } else {
-      this.handles = [$(handle)];
+      this.handles = [$PR(handle)];
     }
     
-    this.track   = $(track);
+    this.track   = $PR(track);
     this.options = options || {};
 
     this.axis      = this.options.axis || 'horizontal';
@@ -50,9 +50,9 @@ Control.Slider.prototype = {
     
     this.value     = 0; // assure backwards compat
     this.values    = this.handles.map( function() { return 0 });
-    this.spans     = this.options.spans ? this.options.spans.map(function(s){ return $(s) }) : false;
-    this.options.startSpan = $(this.options.startSpan || null);
-    this.options.endSpan   = $(this.options.endSpan || null);
+    this.spans     = this.options.spans ? this.options.spans.map(function(s){ return $PR(s) }) : false;
+    this.options.startSpan = $PR(this.options.startSpan || null);
+    this.options.endSpan   = $PR(this.options.endSpan || null);
 
     this.restricted = this.options.restricted || false;
 

@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', function(){
 			window.imageUploadButton,
 			{ action: 'wall_upload/'+window.nickname,
 				name: 'userfile',
-				onSubmit: function(file,ext) { $j('#profile-rotator').show(); },
+				onSubmit: function(file,ext) { $('#profile-rotator').show(); },
 				onComplete: function(file,response) {
-					var currentText = $j(window.jotId).val();
-					$j(window.jotId).val(currentText + response);
-					$j('#profile-rotator').hide();
+					var currentText = $(window.jotId).val();
+					$(window.jotId).val(currentText + response);
+					$('#profile-rotator').hide();
 				}				 
 			}
 		);
@@ -37,11 +37,11 @@ document.addEventListener('DOMContentLoaded', function(){
 				'wall-file-upload',
 				{ action: 'wall_attach/'+window.nickname,
 					name: 'userfile',
-					onSubmit: function(file,ext) { $j('#profile-rotator').show(); },
+					onSubmit: function(file,ext) { $('#profile-rotator').show(); },
 					onComplete: function(file,response) {
-						var currentText = $j(window.jotId).val();
-						$j(window.jotId).val(currentText + response);
-						$j('#profile-rotator').hide();
+						var currentText = $(window.jotId).val();
+						$(window.jotId).val(currentText + response);
+						$('#profile-rotator').hide();
 					}				 
 				}
 			);

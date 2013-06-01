@@ -9,11 +9,11 @@ var Droppables = {
   drops: [],
 
   remove: function(element) {
-    this.drops = this.drops.reject(function(d) { return d.element==$(element) });
+    this.drops = this.drops.reject(function(d) { return d.element==$PR(element) });
   },
 
   add: function(element) {
-    element = $(element);
+    element = $PR(element);
     var options = Object.extend({
       greedy:     true,
       hoverclass: null,
@@ -26,9 +26,9 @@ var Droppables = {
       var containment = options.containment;
       if((typeof containment == 'object') && 
         (containment.constructor == Array)) {
-        containment.each( function(c) { options._containers.push($(c)) });
+        containment.each( function(c) { options._containers.push($PR(c)) });
       } else {
-        options._containers.push($(containment));
+        options._containers.push($PR(containment));
       }
     }
     
@@ -228,17 +228,17 @@ Draggable.prototype = {
       snap: false   // false, or xy or [x,y] or function(x,y){ return [x,y] }
     }, arguments[1] || {});
 
-    this.element = $(element);
+    this.element = $PR(element);
     
     if(options.handle && (typeof options.handle == 'string')) {
       var h = Element.childrenWithClassName(this.element, options.handle, true);
       if(h.length>0) this.handle = h[0];
     }
-    if(!this.handle) this.handle = $(options.handle);
+    if(!this.handle) this.handle = $PR(options.handle);
     if(!this.handle) this.handle = this.element;
     
     if(options.scroll && !options.scroll.scrollTo && !options.scroll.outerHTML)
-      options.scroll = $(options.scroll);
+      options.scroll = $PR(options.scroll);
 
     Element.makePositioned(this.element); // fix IE    
 
@@ -508,7 +508,7 @@ Draggable.prototype = {
 var SortableObserver = Class.create();
 SortableObserver.prototype = {
   initialize: function(element, observer) {
-    this.element   = $(element);
+    this.element   = $PR(element);
     this.observer  = observer;
     this.lastValue = Sortable.serialize(this.element);
   },
@@ -535,7 +535,7 @@ var Sortable = {
   },
 
   options: function(element) {
-    element = Sortable._findRootElement($(element));
+    element = Sortable._findRootElement($PR(element));
     if(!element) return;
     return Sortable.sortables[element.id];
   },
@@ -553,7 +553,7 @@ var Sortable = {
   },
 
   create: function(element) {
-    element = $(element);
+    element = $PR(element);
     var options = Object.extend({ 
       element:     element,
       tag:         'li',       // assumes li children, override with tag: 'tagname'
@@ -744,7 +744,7 @@ var Sortable = {
     if(sortable && !sortable.ghosting) return; 
 
     if(!Sortable._marker) {
-      Sortable._marker = $('dropmarker') || document.createElement('DIV');
+      Sortable._marker = $PR('dropmarker') || document.createElement('DIV');
       Element.hide(Sortable._marker);
       Element.addClassName(Sortable._marker, 'dropmarker');
       Sortable._marker.style.position = 'absolute';
@@ -802,7 +802,7 @@ var Sortable = {
   },
 
   tree: function(element) {
-    element = $(element);
+    element = $PR(element);
     var sortableOptions = this.options(element);
     var options = Object.extend({
       tag: sortableOptions.tag,
@@ -833,16 +833,16 @@ var Sortable = {
   },
 
   sequence: function(element) {
-    element = $(element);
+    element = $PR(element);
     var options = Object.extend(this.options(element), arguments[1] || {});
     
-    return $(this.findElements(element, options) || []).map( function(item) {
+    return $PR(this.findElements(element, options) || []).map( function(item) {
       return item.id.match(options.format) ? item.id.match(options.format)[1] : '';
     });
   },
 
   setSequence: function(element, new_sequence) {
-    element = $(element);
+    element = $PR(element);
     var options = Object.extend(this.options(element), arguments[2] || {});
     
     var nodeMap = {};
@@ -862,7 +862,7 @@ var Sortable = {
   },
   
   serialize: function(element) {
-    element = $(element);
+    element = $PR(element);
     var options = Object.extend(Sortable.options(element), arguments[1] || {});
     var name = encodeURIComponent(
       (arguments[1] && arguments[1].name) ? arguments[1].name : element.id);

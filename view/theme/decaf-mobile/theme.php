@@ -28,6 +28,6 @@ function decaf_mobile_content_loaded(&$a) {
 		$a->theme['stylesheet'] = $a->get_baseurl() . '/view/theme/decaf-mobile/login-style.css';
 	}
 	if( $a->module === 'login' )
-		$a->page['end'] .= '<script type="text/javascript"> $j(document).ready(function() { $j("#id_" + window.loginName).focus();} );</script>';
+		$a->page['end'] .= '<script type="text/javascript"> $(document).ready(function() { $("#id_" + window.loginName).focus();} );</script>';
 
 }
