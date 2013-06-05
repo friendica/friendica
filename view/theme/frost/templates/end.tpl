@@ -22,7 +22,7 @@
 
 <script type="text/javascript" src="{{$baseurl}}/view/theme/frost/js/acl.min.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/js/webtoolkit.base64.min.js" ></script>
-<script type="text/javascript" src="{{$baseurl}}/view/theme/frost/js/fk.autocomplete.min.js" ></script>
+<script type="text/javascript" src="{{$baseurl}}/js/fk.autocomplete.min.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/frost/js/main.min.js" ></script>
 <script type="text/javascript" src="{{$baseurl}}/view/theme/frost/js/theme.min.js"></script>
 
