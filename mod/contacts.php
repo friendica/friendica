@@ -34,7 +34,7 @@ function contacts_init(&$a) {
 				'$photo' => $a->data['contact']['photo']
 			));
 			$follow_widget = '';
-	}	
+	}
 	else {
 		$vcard_widget = '';
 		$follow_widget = follow_widget();
