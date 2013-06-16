@@ -635,7 +635,11 @@ if(! class_exists('App')) {
 		function set_pager_itemspage($n) {
 			$this->pager['itemspage'] = ((intval($n) > 0) ? intval($n) : 0);
 			$this->pager['start'] = ($this->pager['page'] * $this->pager['itemspage']) - $this->pager['itemspage'];
-
+		}
+		
+		function set_pager_page($n) {
+			$this->pager['page'] = $n;
+			$this->pager['start'] = ($this->pager['page'] * $this->pager['itemspage']) - $this->pager['itemspage'];
 		}
 
 		function init_pagehead() {

@@ -27,7 +27,11 @@ function replace_macros($s,$r) {
 	$a = get_app();
 
 	$t = $a->template_engine();
-	$output = $t->replace_macros($s,$r);
+	try {
+		$output = $t->replace_macros($s,$r);
+	} catch (Exception $e) {
+		echo "<pre><b>".__function__."</b>: ".$e->getMessage()."</pre>"; killme();
+	}
 
 	$a->save_timestamp($stamp1, "rendering");
 
@@ -260,6 +264,84 @@ function hex2bin($s) {
 }}
 
 
+if(! function_exists('paginate_data')) {
+/**
+ * Automatica pagination data.
+ *
+ * @param App $a App instance
+ * @param int $count [optional] item count (used with alt pager)
+ * @return Array data for pagination template
+ */
+function paginate_data(&$a, $count=null) {
+	$stripped = preg_replace('/(&page=[0-9]*)/','',$a->query_string);
+
+	$stripped = str_replace('q=','',$stripped);
+	$stripped = trim($stripped,'/');
+	$pagenum = $a->pager['page'];
+	$url = $a->get_baseurl() . '/' . $stripped;
+
+
+	$data = array();
+	function _l(&$d, $name, $url, $text, $class="") { 
+		
+		$d[$name] = array('url'=>$url, 'text'=>$text, 'class'=>$class); 
+	}
+
+	if (!is_null($count)){
+		// alt pager
+		if($a->pager['page']>1)
+			_l($data,  "prev", $url.'&page='.($a->pager['page'] - 1), t('newer'));
+		if($count>0)
+			_l($data,  "next", $url.'&page='.($a->pager['page'] - 1), t('older'));
+	} else {
+		// full pager
+		if($a->pager['total'] > $a->pager['itemspage']) {
+			if($a->pager['page'] != 1)
+				_l($data,  "prev", $url.'&page='.($a->pager['page'] - 1), t('prev'));
+
+			_l($data, "first", $url."&page=1",  t('first'));
+
+			
+			$numpages = $a->pager['total'] / $a->pager['itemspage'];
+
+			$numstart = 1;
+			$numstop = $numpages;
+
+			if($numpages > 14) {
+				$numstart = (($pagenum > 7) ? ($pagenum - 7) : 1);
+				$numstop = (($pagenum > ($numpages - 7)) ? $numpages : ($numstart + 14));
+			}
+
+			$pages = array();
+
+			for($i = $numstart; $i <= $numstop; $i++){
+				if($i == $a->pager['page'])
+					_l($pages, $i, "#",  $i, "current");
+				else
+					_l($pages, $i, $url."&page=$i", $i, "n");
+			}
+
+			if(($a->pager['total'] % $a->pager['itemspage']) != 0) {
+				if($i == $a->pager['page'])
+					_l($pages, $i, "#",  $i, "current");
+				else
+					_l($pages, $i, $url."&page=$i", $i, "n");
+			}
+
+			$data['pages'] = $pages;
+
+			$lastpage = (($numpages > intval($numpages)) ? intval($numpages)+1 : $numpages);
+			_l($data, "last", $url."&page=$lastpage", t('last'));
+			
+			if(($a->pager['total'] - ($a->pager['itemspage'] * $a->pager['page'])) > 0)
+				_l($data, "next", $url."&page=".($a->pager['page'] + 1), t('next'));
+
+		}	
+	}
+	return $data;
+
+}}
+
 if(! function_exists('paginate')) {
 /**
  * Automatic pagination.
@@ -277,58 +359,11 @@ if(! function_exists('paginate')) {
  * @return string html for pagination #FIXME remove html
  */
 function paginate(&$a) {
-	$o = '';
-	$stripped = preg_replace('/(&page=[0-9]*)/','',$a->query_string);
+	
+	$data = paginate_data($a);
+	$tpl = get_markup_template("paginate.tpl");
+	return replace_macros($tpl, array("pager" => $data));
 
-//	$stripped = preg_replace('/&zrl=(.*?)([\?&]|$)/ism','',$stripped);
-
-	$stripped = str_replace('q=','',$stripped);
-	$stripped = trim($stripped,'/');
-	$pagenum = $a->pager['page'];
-	$url = $a->get_baseurl() . '/' . $stripped;
-
-
-	  if($a->pager['total'] > $a->pager['itemspage']) {
-		$o .= '<div class="pager">';
-    		if($a->pager['page'] != 1)
-			$o .= '<span class="pager_prev">'."<a href=\"$url".'&page='.($a->pager['page'] - 1).'">' . t('prev') . '</a></span> ';
-
-		$o .=  "<span class=\"pager_first\"><a href=\"$url"."&page=1\">" . t('first') . "</a></span> ";
-
-    		$numpages = $a->pager['total'] / $a->pager['itemspage'];
-
-			$numstart = 1;
-    		$numstop = $numpages;
-
-    		if($numpages > 14) {
-      			$numstart = (($pagenum > 7) ? ($pagenum - 7) : 1);
-      			$numstop = (($pagenum > ($numpages - 7)) ? $numpages : ($numstart + 14));
-    		}
-   
-		for($i = $numstart; $i <= $numstop; $i++){
-      			if($i == $a->pager['page'])
-				$o .= '<span class="pager_current">'.(($i < 10) ? '&nbsp;'.$i : $i);
-			else
-				$o .= "<span class=\"pager_n\"><a href=\"$url"."&page=$i\">".(($i < 10) ? '&nbsp;'.$i : $i)."</a>";
-			$o .= '</span> ';
-		}
-
-		if(($a->pager['total'] % $a->pager['itemspage']) != 0) {
-			if($i == $a->pager['page'])
-				$o .= '<span class="pager_current">'.(($i < 10) ? '&nbsp;'.$i : $i);
-			else
-				$o .= "<span class=\"pager_n\"><a href=\"$url"."&page=$i\">".(($i < 10) ? '&nbsp;'.$i : $i)."</a>";
-			$o .= '</span> ';
-		}
-
-		$lastpage = (($numpages > intval($numpages)) ? intval($numpages)+1 : $numpages);
-		$o .= "<span class=\"pager_last\"><a href=\"$url"."&page=$lastpage\">" . t('last') . "</a></span> ";
-
-    		if(($a->pager['total'] - ($a->pager['itemspage'] * $a->pager['page'])) > 0)
-			$o .= '<span class="pager_next">'."<a href=\"$url"."&page=".($a->pager['page'] + 1).'">' . t('next') . '</a></span>';
-		$o .= '</div>'."\r\n";
-	}
-	return $o;
 }}
 
 if(! function_exists('alt_pager')) {
@@ -339,27 +374,11 @@ if(! function_exists('alt_pager')) {
  * @return string html for pagination #FIXME remove html
  */
 function alt_pager(&$a, $i) {
-        $o = '';
-	$stripped = preg_replace('/(&page=[0-9]*)/','',$a->query_string);
-	$stripped = str_replace('q=','',$stripped);
-	$stripped = trim($stripped,'/');
-	$pagenum = $a->pager['page'];
-        $url = $a->get_baseurl() . '/' . $stripped;
 
-        $o .= '<div class="pager">';
-
-	if($a->pager['page']>1)
-	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] - 1).'" class="pager_newer">' . t('newer') . '</a>';
-        if($i>0) {
-          if($a->pager['page']>1)
-	          $o .= "&nbsp;-&nbsp;";
-	  $o .= "<a href=\"$url"."&page=".($a->pager['page'] + 1).'" class="pager_older">' . t('older') . '</a>';
-	}
-
-
-        $o .= '</div>'."\r\n";
-
-	return $o;
+	$data = paginate_data($a, $i);
+	$tpl = get_markup_template("paginate.tpl");
+	return replace_macros($tpl, array('pager' => $data));
+	
 }}
 
 
@@ -564,8 +583,11 @@ function get_markup_template($s, $root = '') {
 
 	$a = get_app();
 	$t = $a->template_engine();
-	
-	$template = $t->get_template_file($s, $root);
+	try {
+		$template = $t->get_template_file($s, $root);
+	} catch (Exception $e) {
+		echo "<pre><b>".__function__."</b>: ".$e->getMessage()."</pre>"; killme();
+	}
 	
 	$a->save_timestamp($stamp1, "file");
 	
