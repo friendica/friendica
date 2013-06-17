@@ -100,6 +100,10 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 	$items = array_reverse($items);
 
 	foreach ($items as $single_conv) {
+		// identi.ca just changed the format of the activity streams. This is a quick fix.
+		if (@is_string($single_conv->object->id))
+			$single_conv->id = $single_conv->object->id;
+
 		if (@!$single_conv->id AND $single_conv->provider->url AND $single_conv->statusnet_notice_info->local_id)
 			$single_conv->id = $single_conv->provider->url."notice/".$single_conv->statusnet_notice_info->local_id;
 
