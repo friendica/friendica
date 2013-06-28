@@ -168,6 +168,7 @@ function uexport_account($a){
 function uexport_all(&$a) {
     
     uexport_account($a);
+	echo "\n";
 
 	$r = q("SELECT count(*) as `total` FROM `item` WHERE `uid` = %d ",
 		intval(local_user())
@@ -184,14 +185,14 @@ function uexport_all(&$a) {
 			intval($x),
 			intval(500)
 		);
-		if(count($r)) {
+		/*if(count($r)) {
 			foreach($r as $rr)
 				foreach($rr as $k => $v)
 					$item[][$k] = $v;
-		}
+		}*/
 
-		$output = array('item' => $item);
-		echo json_encode($output);
+		$output = array('item' => $r);
+		echo json_encode($output)."\n";
 	}
 
 }
