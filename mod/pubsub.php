@@ -121,11 +121,12 @@ function pubsub_post(&$a) {
 	$importer = $r[0];
 
 	$r = q("SELECT * FROM `contact` WHERE `subhub` = 1 AND `id` = %d AND `uid` = %d 
-		AND ( `rel` = %d OR `rel` = %d ) AND `blocked` = 0 AND `readonly` = 0 LIMIT 1",
+		AND ( `rel` = %d OR `rel` = %d OR network = '%s' ) AND `blocked` = 0 AND `readonly` = 0 LIMIT 1",
 		intval($contact_id),
 		intval($importer['uid']),
 		intval(CONTACT_IS_SHARING),
-		intval(CONTACT_IS_FRIEND)	
+		intval(CONTACT_IS_FRIEND),
+		dbesc(NETWORK_FEED)
 	);
 
 	if(! count($r)) {
