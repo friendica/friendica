@@ -936,7 +936,8 @@ aside #dfrn-request-link:hover {
   /* background-color: #19aeff; */
 }
 aside #profiles-menu {
-  width: 20em;
+  width: 14em;
+  left: 10px;
 }
 
 aside #search-text, aside #side-follow-url, aside #side-peoplefind-url {

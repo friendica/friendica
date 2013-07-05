@@ -81,7 +81,9 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 	logger('complete_conversation: fetching conversation url '.$conv.' for '.$itemid);
 
 	do {
-		$conv_as = file_get_contents($conv."?page=".$pageno);
+		$conv_as = fetch_url($conv."?page=".$pageno);
+		//$conv_as = fetch_url($conv."?page=".$pageno, false, 0, 10);
+		//$conv_as = file_get_contents($conv."?page=".$pageno);
 		$conv_as = str_replace(',"statusnet:notice_info":', ',"statusnet_notice_info":', $conv_as);
 		$conv_as = json_decode($conv_as);
 
