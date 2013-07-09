@@ -2117,7 +2117,9 @@ function diaspora_profile($importer,$xml,$msg) {
 	if($name === '') {
 		$name = $handle_parts[0];
 	}
-	if(strpos($image_url, $handle_parts[1]) === false) {
+	
+	 
+	if( preg_match("|^https?://|", $image_url) === 0) {
 		$image_url = "http://" . $handle_parts[1] . $image_url;
 	}
 
