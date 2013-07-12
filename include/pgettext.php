@@ -87,16 +87,19 @@ function pop_lang() {
 }
 
 
-// load string translation table for alternate language
+// l
 
 if(! function_exists('load_translation_table')) {
+/**
+ * load string translation table for alternate language
+ *
+ * first plugin strings are loaded, then globals
+ * 
+ * @param string $lang language code to load
+ */
 function load_translation_table($lang) {
 	global $a;
-	 
-	$a->strings = array();
-	if(file_exists("view/$lang/strings.php")) {
-		include("view/$lang/strings.php");
-	}
+
 	// load enabled plugins strings
 	$plugins = q("SELECT name FROM addon WHERE installed=1;");
 	if ($plugins!==false) {
@@ -107,6 +110,12 @@ function load_translation_table($lang) {
 			}
 		}
 	}
+	
+	$a->strings = array();
+	if(file_exists("view/$lang/strings.php")) {
+		include("view/$lang/strings.php");
+	}
+
 }}
 
 // translate string if translation exists
