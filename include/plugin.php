@@ -185,6 +185,21 @@ function call_hooks($name, &$data = null) {
 	}
 }}
 
+//check if an app_menu hook exist for plugin $name.
+//Return true if the plugin is an app
+if(! function_exists('plugin_is_app')) {
+function plugin_is_app($name) {
+	$a = get_app();
+
+	if(is_array($a->hooks) && (array_key_exists('app_menu',$a->hooks))) {
+		foreach($a->hooks['app_menu'] as $hook) {
+			if($hook[0] == 'addon/'.$name.'/'.$name.'.php')
+				return true;
+		}
+	}
+	
+	return false;
+}}
 
 /*
  * parse plugin comment in search of plugin infos.

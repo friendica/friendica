@@ -149,11 +149,16 @@ else {
 
 nav_set_selected('nothing');
 
-$arr = array('app_menu' => $a->apps);
+//Don't populate apps_menu if apps are private
+$privateapps = get_config('config','private_addons');
+if((local_user()) || (! $privateapps === "1"))
+{
+	$arr = array('app_menu' => $a->apps);
 
-call_hooks('app_menu', $arr);
+	call_hooks('app_menu', $arr);
 
-$a->apps = $arr['app_menu'];
+	$a->apps = $arr['app_menu'];
+}
 
 /**
  *
@@ -186,11 +191,19 @@ if(strlen($a->module)) {
 	// Compatibility with the Android Diaspora client
 	if ($a->module == "stream")
 		$a->module = "network";
+	
+	$privateapps = get_config('config','private_addons');
 
 	if(is_array($a->plugins) && in_array($a->module,$a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
-		include_once("addon/{$a->module}/{$a->module}.php");
-		if(function_exists($a->module . '_module'))
-			$a->module_loaded = true;
+		//Check if module is an app and if public access to apps is allowed or not
+		if((!local_user()) && plugin_is_app($a->module) && $privateapps === "1") {
+			info( t("You must be logged in to use addons. "));
+		}
+		else {
+			include_once("addon/{$a->module}/{$a->module}.php");
+			if(function_exists($a->module . '_module'))
+				$a->module_loaded = true;
+		}
 	}
 
 	/**
