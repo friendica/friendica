@@ -151,13 +151,27 @@ EOT;
 		);
 	}			
 
-	if((! $blocktags) && (! stristr($item['tag'], ']' . $term . '[' ))) {
-		q("update item set tag = '%s' where id = %d limit 1",
+	$term_objtype = (($item['resource-id']) ? TERM_OBJ_PHOTO : TERM_OBJ_POST );
+        $t = q("SELECT count(tid) as tcount FROM term WHERE oid=%d AND term='%s'",
+                intval($item['id']),
+                dbesc($term)
+        );
+	if((! $blocktags) && $t[0]['tcount']==0 ) {
+		/*q("update item set tag = '%s' where id = %d limit 1",
 			dbesc($item['tag'] . (strlen($item['tag']) ? ',' : '') . '#[url=' . $a->get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
 			intval($item['id'])
+		);*/
+
+		q("INSERT INTO term (oid, otype, type, term, url, uid) VALUE (%d, %d, %d, '%s', '%s', %d)",
+		   intval($item['id']),
+		   $term_objtype,
+		   TERM_HASHTAG,
+		   dbesc($term),
+		   dbesc($a->get_baseurl() . '/search?tag=' . $term),
+		   intval($owner_uid)
 		);
 	}
-
+	
 	// if the original post is on this site, update it.
 
 	$r = q("select `tag`,`id`,`uid` from item where `origin` = 1 AND `uri` = '%s' LIMIT 1",
@@ -167,12 +181,27 @@ EOT;
 		$x = q("SELECT `blocktags` FROM `user` WHERE `uid` = %d limit 1",
 			intval($r[0]['uid'])
 		);
-		if(count($x) && !$x[0]['blocktags'] && (! stristr($r[0]['tag'], ']' . $term . '['))) {
+		$t = q("SELECT count(tid) as tcount FROM term WHERE oid=%d AND term='%s'",
+			intval($r[0]['id']),
+			dbesc($term)
+		);
+		if(count($x) && !$x[0]['blocktags'] && $t[0]['tcount']==0){
+			q("INSERT INTO term (oid, otype, type, term, url, uid) VALUE (%d, %d, %d, '%s', '%s', %d)",
+	                   intval($r[0]['id']),
+	                   $term_objtype,
+	                   TERM_HASHTAG,
+	                   dbesc($term),
+	                   dbesc($a->get_baseurl() . '/search?tag=' . $term),
+	                   intval($owner_uid)
+	                );
+		}
+
+		/*if(count($x) && !$x[0]['blocktags'] && (! stristr($r[0]['tag'], ']' . $term . '['))) {
 			q("update item set tag = '%s' where id = %d limit 1",
 				dbesc($r[0]['tag'] . (strlen($r[0]['tag']) ? ',' : '') . '#[url=' . $a->get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
 				intval($r[0]['id'])
 			);
-		}
+		}*/
 
 	}
 		
