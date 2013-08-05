@@ -655,7 +655,7 @@ function admin_page_users_post(&$a){
 		    info( t('Registration successful. Email send to user').EOL ); 
       } 
   }
-
+	
 	if (x($_POST,'page_users_block')){
 		foreach($users as $uid){
 			q("UPDATE `user` SET `blocked`=1-`blocked` WHERE `uid`=%s",
@@ -771,19 +771,35 @@ function admin_page_users(&$a){
 		$e['login_date'] = relative_date($e['login_date']);
 		$e['lastitem_date'] = relative_date($e['lastitem_date']);
         $e['is_admin'] = ($e['email'] === $a->config['admin_email']);
+        $e['deleted'] = ($e['account_removed']?relative_date($e['account_expires_on']):False);
 		return $e;
 	}
 	$users = array_map("_setup_users", $users);
 	
 	
 	// Get rid of dashes in key names, Smarty3 can't handle them
-	foreach($users as $key => $user) {
-		$new_user = array();
-		foreach($user as $k => $v) {
+	// and extracting deleted users
+	
+	$tmp_users = Array();
+	$deleted = Array();
+	
+	while(count($users)) {
+		$new_user = Array();
+		foreach( array_pop($users) as $k => $v) {
 			$k = str_replace('-','_',$k);
 			$new_user[$k] = $v;
 		}
-		$users[$key] = $new_user;
+		if($new_user['deleted']) {
+			array_push($deleted, $new_user);
+		}
+		else {
+			array_push($tmp_users, $new_user);
+		}
+	}
+	//Reversing the two array, and moving $tmp_users to $users
+	array_reverse($deleted);
+	while(count($tmp_users)) {
+		array_push($users, array_pop($tmp_users));
 	}
 
 	$t = get_markup_template("admin_users.tpl");
@@ -794,6 +810,7 @@ function admin_page_users(&$a){
 		'$submit' => t('Submit'),
 		'$select_all' => t('select all'),
 		'$h_pending' => t('User registrations waiting for confirm'),
+		'$h_deleted' => t('User waiting for permanent deletion'),
 		'$th_pending' => array( t('Request date'), t('Name'), t('Email') ),
 		'$no_pending' =>  t('No registrations.'),
 		'$approve' => t('Approve'),
@@ -806,6 +823,7 @@ function admin_page_users(&$a){
 		
 		'$h_users' => t('Users'),
 		'$h_newuser' => t('New User'),
+		'$th_deleted' => array( t('Name'), t('Email'), t('Register date'), t('Last login'), t('Last item'), t('Deleted since') ),
 		'$th_users' => array( t('Name'), t('Email'), t('Register date'), t('Last login'), t('Last item'),  t('Account') ),
 
 		'$confirm_delete_multi' => t('Selected users will be deleted!\n\nEverything these users had posted on this site will be permanently deleted!\n\nAre you sure?'),
@@ -817,6 +835,7 @@ function admin_page_users(&$a){
 		'$baseurl' => $a->get_baseurl(true),
 
 		'$pending' => $pending,
+		'deleted' => $deleted,
 		'$users' => $users,
 		'$newusername'  => array('new_user_name', t("Name"), '', t("Name of the new user.")), 
     '$newusernickname'  => array('new_user_nickname', t("Nickname"), '', t("Nickname of the new user.")), 

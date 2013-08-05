@@ -52,9 +52,6 @@
 			<p>{{$no_pending}}</p>
 		{{/if}}
 	
-	
-		
-	
 		<h3>{{$h_users}}</h3>
 		{{if $users}}
 			<table id='users'>
@@ -69,7 +66,7 @@
 				<tbody>
 				{{foreach $users as $u}}
 					<tr>
-						<td><img src="{{$u.micro}}" alt="{{$u.nickname}}" title="{{$u.nickname}}"></td>
+						<td><img class='icon' src="{{$u.micro}}" alt="{{$u.nickname}}" title="{{$u.nickname}}"></td>
 						<td class='name'><a href="{{$u.url}}" title="{{$u.nickname}}" >{{$u.name}}</a></td>
 						<td class='email'>{{$u.email}}</td>
 						<td class='register_date'>{{$u.register_date}}</td>
@@ -100,6 +97,30 @@
 			NO USERS?!?
 		{{/if}}
 	</form>
+	{{if $deleted}}
+		<h3>{{$h_deleted}}</h3>
+			<table id='deleted'>
+				<thead>
+				<tr>
+					<th></th>
+					{{foreach $th_deleted as $th}}<th>{{$th}}</th>{{/foreach}}
+				</tr>
+				</thead>
+				<tbody>
+				{{foreach $deleted as $u}}
+					<tr>
+						<td><img class='icon' src="{{$u.micro}}" alt="{{$u.nickname}}" title="{{$u.nickname}}"></td>
+						<td class='name'><a href="{{$u.url}}" title="{{$u.nickname}}" >{{$u.name}}</a></td>
+						<td class='email'>{{$u.email}}</td>
+						<td class='register_date'>{{$u.register_date}}</td>
+						<td class='login_date'>{{$u.login_date}}</td>
+						<td class='lastitem_date'>{{$u.lastitem_date}}</td>
+						<td class='login_date'>{{$u.deleted}}</td>
+					</tr>
+				{{/foreach}}
+				</tbody>
+			</table>
+		{{/if}}
   <h3>{{$h_newuser}}</h3> 
   <form action="{{$baseurl}}/admin/users" method="post"> 
   <input type='hidden' name='form_security_token' value='{{$form_security_token}}'> 
