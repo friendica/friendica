@@ -84,6 +84,8 @@ function community_content(&$a, $update = 0) {
 
 	);
 //		group by `item`.`uri`
+//		AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `item`.`id` = `item`.`parent`
+//		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 AND `contact`.`self`
 
 	if(! count($r)) {
 		info( t('No results.') . EOL);

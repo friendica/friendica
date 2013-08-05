@@ -42,7 +42,7 @@ function onepoll_run(&$argv, &$argc){
 	load_hooks();
 
 	logger('onepoll: start');
-	
+
 	$manual_id  = 0;
 	$generation = 0;
 	$hub_update = false;
@@ -56,7 +56,17 @@ function onepoll_run(&$argv, &$argc){
 		logger('onepoll: no contact');
 		return;
 	}
-	
+
+	// Test
+	$lockpath = get_config('system','lockpath');
+	if ($lockpath != '') {
+		$pidfile = new pidfile($lockpath, 'onepoll'.$contact_id.'.lck');
+		if($pidfile->is_already_running()) {
+			logger("onepoll: Already running for contact ".$contact_id);
+			exit;
+		}
+	}
+
 
 	$d = datetime_convert();
 

@@ -184,6 +184,8 @@ class TwitterOAuth {
     switch ($method) {
     case 'GET':
       return $this->http($request->to_url(), 'GET');
+    case 'UPLOAD':
+      return $this->http($request->get_normalized_http_url(), 'POST', $request->to_postdata(true));
     default:
       return $this->http($request->get_normalized_http_url(), $method, $request->to_postdata());
     }

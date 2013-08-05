@@ -220,6 +220,9 @@ function html2plain($html, $wraplength = 75, $compact = false)
 				//$message .= "\n[".($counter++)."] ".$url;
 	}
 
+	$message = str_replace("\n«", "«\n", $message);
+	$message = str_replace("»\n", "\n»", $message);
+
 	do {
 		$oldmessage = $message;
 		$message = str_replace("\n\n\n", "\n\n", $message);

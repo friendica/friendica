@@ -122,6 +122,9 @@ function poller_run(&$argv, &$argc){
 		// clear cache for photos
 		clear_cache($a->get_basepath(), $a->get_basepath()."/photo");
 
+		// clear smarty cache
+		clear_cache($a->get_basepath()."/view/smarty3/compiled", $a->get_basepath()."/view/smarty3/compiled");
+
 		set_config('system','cache_last_cleared', time());
 	}
 

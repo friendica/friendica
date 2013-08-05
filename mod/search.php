@@ -141,12 +141,13 @@ function search_content(&$a) {
 
 	if($tag) {
 		//$sql_extra = sprintf(" AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d",
-		//			dbesc(protect_sprintf($search)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG));
-		//$sql_table = "`term` LEFT JOIN `item` ON `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` ";
-
-		$sql_extra = sprintf(" AND EXISTS (SELECT * FROM `term` WHERE `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d) GROUP BY `item`.`uri` ",
+		$sql_extra = sprintf(" AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d group by `item`.`uri` ",
 					dbesc(protect_sprintf($search)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG));
-		$sql_table = "`item` FORCE INDEX (`uri`) ";
+		$sql_table = "`term` LEFT JOIN `item` ON `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` ";
+
+		//$sql_extra = sprintf(" AND EXISTS (SELECT * FROM `term` WHERE `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d) GROUP BY `item`.`uri` ",
+		//			dbesc(protect_sprintf($search)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG));
+		//$sql_table = "`item` FORCE INDEX (`uri`) ";
 	} else {
 		if (get_config('system','use_fulltext_engine')) {
 			$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));

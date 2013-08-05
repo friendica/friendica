@@ -62,6 +62,15 @@ function get_config($family, $key, $instore = false) {
 			return $a->config[$family][$key];
 		}
 	}
+
+	// If APC is enabled then fetch the data from there
+	if (function_exists("apc_fetch") AND function_exists("apc_exists"))
+		if (apc_exists($family."|".$key)) {
+			$val = apc_fetch($family."|".$key);
+			$a->config[$family][$key] = $val;
+			return $val;
+		}
+
 	$ret = q("SELECT `v` FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
 		dbesc($family),
 		dbesc($key)
@@ -117,6 +126,10 @@ function set_config($family,$key,$value) {
 
 	$a->config[$family][$key] = $value;
 
+	// If APC is enabled then store the data there
+	if (function_exists("apc_store"))
+		apc_store($family."|".$key, $value, 600);
+
 	if($ret)
 		return $value;
 	return $ret;
@@ -164,6 +177,14 @@ function get_pconfig($uid,$family, $key, $instore = false) {
 		}
 	}
 
+	// If APC is enabled then fetch the data from there
+	if (function_exists("apc_fetch") AND function_exists("apc_exists"))
+		if (apc_exists($uid."|".$family."|".$key)) {
+			$val = apc_fetch($uid."|".$family."|".$key);
+			$a->config[$uid][$family][$key] = $val;
+			return $val;
+		}
+
 	$ret = q("SELECT `v` FROM `pconfig` WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s' LIMIT 1",
 		intval($uid),
 		dbesc($family),
@@ -191,6 +212,10 @@ function del_config($family,$key) {
 		dbesc($family),
 		dbesc($key)
 	);
+	// If APC is enabled then store the data there
+	if (function_exists("apc_delete"))
+		apc_delete($family."|".$key);
+
 	return $ret;
 }}
 
@@ -227,6 +252,11 @@ function set_pconfig($uid,$family,$key,$value) {
 	);
 
 	$a->config[$uid][$family][$key] = $value;
+
+	// If APC is enabled then store the data there
+	if (function_exists("apc_store"))
+		apc_store($uid."|".$family."|".$key, $value, 600);
+
 
 	if($ret)
 		return $value;

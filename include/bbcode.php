@@ -262,9 +262,9 @@ function bb_ShareAttributes($match) {
         preg_match('/posted="(.*?)"/ism', $attributes, $matches);
         if ($matches[1] != "")
                 $posted = $matches[1];
-		$reldate = (($posted) ? " " . relative_date($posted) : ''); 
+		$reldate = (($posted) ? " " . relative_date($posted) : '');
 
-        $headline = '<div class="shared_header">';
+        $headline = '<br /><div class="shared_header">';
 
 	if ($avatar != "")
 		$headline .= '<img src="'.$avatar.'" height="32" width="32" >';
@@ -300,9 +300,62 @@ function bb_ShareAttributesSimple($match) {
         if ($matches[1] != "")
                 $profile = $matches[1];
 
-        $text = "<br />".html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').' <a href="'.$profile.'">'.$author."</a>: <br />»".$match[2]."«";
+	$userid = GetProfileUsername($profile,$author);
+
+        $text = "<br />".html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').' <a href="'.$profile.'">'.$userid."</a>: <br />»".$match[2]."«";
 
         return($text);
+}
+function bb_ShareAttributesSimple2($match) {
+
+        $attributes = $match[1];
+
+        $author = "";
+        preg_match("/author='(.*?)'/ism", $attributes, $matches);
+        if ($matches[1] != "")
+                $author = html_entity_decode($matches[1],ENT_QUOTES,'UTF-8');
+
+        preg_match('/author="(.*?)"/ism', $attributes, $matches);
+        if ($matches[1] != "")
+                $author = $matches[1];
+
+        $profile = "";
+        preg_match("/profile='(.*?)'/ism", $attributes, $matches);
+        if ($matches[1] != "")
+                $profile = $matches[1];
+
+        preg_match('/profile="(.*?)"/ism', $attributes, $matches);
+        if ($matches[1] != "")
+                $profile = $matches[1];
+
+	$userid = GetProfileUsername($profile,$author);
+
+        $text = "<br />".html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').' <a href="'.$profile.'">'.$userid."</a>: <br />".$match[2];
+
+        return($text);
+}
+
+function GetProfileUsername($profile, $username) {
+	$friendica = preg_replace("=https?://(.*)/profile/(.*)=ism", "$2@$1", $profile);
+	if ($friendica != $profile)
+		return($friendica);
+
+	$diaspora = preg_replace("=https?://(.*)/u/(.*)=ism", "$2@$1", $profile);
+	if ($diaspora != $profile)
+		return($diaspora);
+
+	$StatusnetHost = preg_replace("=https?://(.*)/user/(.*)=ism", "$1", $profile);
+	if ($StatusnetHost != $profile) {
+		$StatusnetUser = preg_replace("=https?://(.*)/user/(.*)=ism", "$2", $profile);
+		if ($StatusnetUser != $profile) {
+			$UserData = fetch_url("http://".$StatusnetHost."/api/users/show.json?user_id=".$StatusnetUser);
+			$user = json_decode($UserData);
+			if ($user)
+				return($user->screen_name."@".$StatusnetHost);
+		}
+	}
+
+	return($username);
 }
 
 	// BBcode 2 HTML was written by WAY2WEB.net
@@ -553,8 +606,10 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	// Shared content
 	if (!$simplehtml)
 		$Text = preg_replace_callback("/\[share(.*?)\](.*?)\[\/share\]/ism","bb_ShareAttributes",$Text);
-	else
+	elseif ($simplehtml == 1)
 		$Text = preg_replace_callback("/\[share(.*?)\](.*?)\[\/share\]/ism","bb_ShareAttributesSimple",$Text);
+	elseif ($simplehtml == 2)
+		$Text = preg_replace_callback("/\[share(.*?)\](.*?)\[\/share\]/ism","bb_ShareAttributesSimple2",$Text);
 
 	$Text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism",'<br/><img src="' .$a->get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . t('Encrypted content') . '" /><br />', $Text);
 	$Text = preg_replace("/\[crypt=(.*?)\](.*?)\[\/crypt\]/ism",'<br/><img src="' .$a->get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);

@@ -42,6 +42,8 @@ function receive_post(&$a) {
 
 	// It is an application/x-www-form-urlencoded
 
+	logger('mod-diaspora: receiving post', LOGGER_DEBUG);
+
 	$xml = urldecode($_POST['xml']);
 
 	logger('mod-diaspora: new salmon ' . $xml, LOGGER_DATA);
@@ -49,12 +51,18 @@ function receive_post(&$a) {
 	if(! $xml)
 		http_status_exit(500);
 
+	logger('mod-diaspora: message is okay', LOGGER_DEBUG);
+
 	$msg = diaspora_decode($importer,$xml);
+
+	logger('mod-diaspora: decoded', LOGGER_DEBUG);
 
 	logger('mod-diaspora: decoded msg: ' . print_r($msg,true), LOGGER_DATA);
 
 	if(! is_array($msg))
 		http_status_exit(500);
+
+	logger('mod-diaspora: dispatching', LOGGER_DEBUG);
 
 	$ret = 0;
 	if($public)

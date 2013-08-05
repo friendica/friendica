@@ -423,8 +423,11 @@ class OAuthRequest {
   /**
    * builds the data one would send in a POST request
    */
-  public function to_postdata() {
-    return OAuthUtil::build_http_query($this->parameters);
+  public function to_postdata($raw = false) {
+    if ($raw)
+      return($this->parameters);
+    else
+      return OAuthUtil::build_http_query($this->parameters);
   }
 
   /**
