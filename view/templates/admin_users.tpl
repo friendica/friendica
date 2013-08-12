@@ -74,13 +74,13 @@
 						<td class='lastitem_date'>{{$u.lastitem_date}}</td>
 						<td class='login_date'>{{$u.page_flags}} {{if $u.is_admin}}({{$siteadmin}}){{/if}} {{if $u.account_expired}}({{$accountexpired}}){{/if}}</td>
 						<td class="checkbox"> 
-                                    {{if $u.is_admin}}
+                                    {{if !$u.is_admin}}
                                         &nbsp;
                                     {{else}}
                                         <input type="checkbox" class="users_ckbx" id="id_user_{{$u.uid}}" name="user[]" value="{{$u.uid}}"/></td>
                                     {{/if}}
 						<td class="tools">
-                                    {{if $u.is_admin}}
+                                    {{if !$u.is_admin}}
                                         &nbsp;
                                     {{else}}
                                         <a href="{{$baseurl}}/admin/users/block/{{$u.uid}}?t={{$form_security_token}}" title='{{if $u.blocked}}{{$unblock}}{{else}}{{$block}}{{/if}}'><span class='icon block {{if $u.blocked==0}}dim{{/if}}'></span></a>
