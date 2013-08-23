@@ -4,8 +4,10 @@
 // curl wrapper. If binary flag is true, return binary
 // results. 
 
+// Set the cookiejar argument to a string (e.g. "/tmp/friendica-cookies.txt")
+// to preserve cookies from one request to the next.
 if(! function_exists('fetch_url')) {
-function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_content=Null) {
+function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_content=Null, $cookiejar = 0) {
 
 	$stamp1 = microtime(true);
 
@@ -17,6 +19,10 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 
 	@curl_setopt($ch, CURLOPT_HEADER, true);
 
+	if($cookiejar) {
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiejar);
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiejar);
+	}
 
 //  These settings aren't needed. We're following the location already. 
 //	@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -96,7 +102,7 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 			$newurl = $old_location_info["scheme"]."://".$old_location_info["host"].$newurl;
 		if (filter_var($newurl, FILTER_VALIDATE_URL)) {
 			$redirects++;
-			return fetch_url($newurl,$binary,$redirects,$timeout);
+			return fetch_url($newurl,$binary,$redirects,$timeout,$accept_content,$cookiejar);
 		}
 	}
 
