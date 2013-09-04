@@ -278,7 +278,9 @@ function register_content(&$a) {
 		'$nickname'  => $nickname,
 		'$license'   => $license,
 		'$sitename'  => $a->get_hostname(),
-      
+		'$importh'   => t('Import'),
+		'$importt'   => t('Import your profile to this friendica instance'),
+
 	));
 	return $o;
 

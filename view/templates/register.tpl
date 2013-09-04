@@ -62,7 +62,11 @@
 		<input type="submit" name="submit" id="register-submit-button" value="{{$regbutt}}" />
 	</div>
 	<div id="register-submit-end" ></div>
-    
+
+<h3>{{$importh}}</h3>
+	<div id ="import-profile">
+		<a href="/uimport">{{$importt}}</a>
+	</div>
 </form>
 
 {{$license}}
