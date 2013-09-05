@@ -881,12 +881,15 @@ function notifier_run(&$argv, &$argc){
 				case NETWORK_FACEBOOK:
 					if(get_config('system','dfrn_only'))
 						break;
+				case NETWORK_PUMPIO:
+					if(get_config('system','dfrn_only'))
+						break;
 				default:
 					break;
 			}
 		}
 	}
-		
+
 	// send additional slaps to mentioned remote tags (@foo@example.com)
 
 	if($slap && count($url_recipients) && ($followup || $top_level) && $public_message && (! $expire)) {

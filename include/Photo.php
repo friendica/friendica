@@ -534,6 +534,9 @@ class Photo {
 
         ob_start();
 
+	// Enable interlacing
+	imageinterlace($this->image, true);
+
         switch($this->getType()){
             case "image/png":
                 $quality = get_config('system','png_quality');
@@ -676,6 +679,7 @@ function guess_image_type($filename, $fromcurl=false) {
              */
             $image = new Imagick($filename);
             $type = $image->getImageMimeType();
+            $image->setInterlaceScheme(Imagick::INTERLACE_PLANE);
         } else {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
             $types = Photo::supportedTypes();

@@ -25,7 +25,6 @@ function expire_run(&$argv, &$argc){
 	load_config('config');
 	load_config('system');
 
-
 	$a->set_baseurl(get_config('system','url'));
 
 

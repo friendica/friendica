@@ -76,7 +76,7 @@ function onepoll_run(&$argv, &$argc){
 
 	$contacts = q("SELECT `contact`.* FROM `contact` 
 		WHERE ( `rel` = %d OR `rel` = %d ) AND `poll` != ''
-		AND NOT `network` IN ( '%s', '%s' )
+		AND NOT `network` IN ( '%s', '%s', '%s' )
 		AND `contact`.`id` = %d
 		AND `self` = 0 AND `contact`.`blocked` = 0 AND `contact`.`readonly` = 0 
 		AND `contact`.`archive` = 0 LIMIT 1",
@@ -84,6 +84,7 @@ function onepoll_run(&$argv, &$argc){
 		intval(CONTACT_IS_FRIEND),
 		dbesc(NETWORK_DIASPORA),
 		dbesc(NETWORK_FACEBOOK),
+		dbesc(NETWORK_PUMPIO),
 		intval($contact_id)
 	);
 
@@ -526,6 +527,9 @@ function onepoll_run(&$argv, &$argc){
 	elseif($contact['network'] === NETWORK_FACEBOOK) {
 		// This is picked up by the Facebook plugin on a cron hook.
 		// Ignored here.
+	} elseif($contact['network'] === NETWORK_PUMPIO) {
+		// This is picked up by the pump.io plugin on a cron hook.
+		// Ignored here.
 	}
 
 	if($xml) {
@@ -544,7 +548,7 @@ function onepoll_run(&$argv, &$argc){
 
 
 		// do it twice. Ensures that children of parents which may be later in the stream aren't tossed
-	
+
 		consume_feed($xml,$importer,$contact,$hub,1,2);
 
 		$hubmode = 'subscribe';

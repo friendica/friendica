@@ -18,6 +18,9 @@
 if(! function_exists('load_config')) {
 function load_config($family) {
 	global $a;
+
+	// To-Do: How to integrate APC here?
+
 	$r = q("SELECT * FROM `config` WHERE `cat` = '%s'", dbesc($family));
 	if(count($r)) {
 		foreach($r as $rr) {
@@ -68,7 +71,11 @@ function get_config($family, $key, $instore = false) {
 		if (apc_exists($family."|".$key)) {
 			$val = apc_fetch($family."|".$key);
 			$a->config[$family][$key] = $val;
-			return $val;
+
+			if ($val === '!<unset>!')
+				return false;
+			else
+				return $val;
 		}
 
 	$ret = q("SELECT `v` FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
@@ -79,10 +86,19 @@ function get_config($family, $key, $instore = false) {
 		// manage array value
 		$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
 		$a->config[$family][$key] = $val;
+
+		// If APC is enabled then store the data there
+		if (function_exists("apc_store"))
+			apc_store($family."|".$key, $val, 600);
+
 		return $val;
 	}
 	else {
 		$a->config[$family][$key] = '!<unset>!';
+
+		// If APC is enabled then store the data there
+		if (function_exists("apc_store"))
+			apc_store($family."|".$key, '!<unset>!', 600);
 	}
 	return false;
 }}
@@ -182,8 +198,13 @@ function get_pconfig($uid,$family, $key, $instore = false) {
 		if (apc_exists($uid."|".$family."|".$key)) {
 			$val = apc_fetch($uid."|".$family."|".$key);
 			$a->config[$uid][$family][$key] = $val;
-			return $val;
+
+			if ($val === '!<unset>!')
+				return false;
+			else
+				return $val;
 		}
+
 
 	$ret = q("SELECT `v` FROM `pconfig` WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s' LIMIT 1",
 		intval($uid),
@@ -194,10 +215,19 @@ function get_pconfig($uid,$family, $key, $instore = false) {
 	if(count($ret)) {
 		$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
 		$a->config[$uid][$family][$key] = $val;
+
+		// If APC is enabled then store the data there
+		if (function_exists("apc_store"))
+			apc_store($uid."|".$family."|".$key, $val, 600);
+
 		return $val;
 	}
 	else {
 		$a->config[$uid][$family][$key] = '!<unset>!';
+
+		// If APC is enabled then store the data there
+		if (function_exists("apc_store"))
+			apc_store($uid."|".$family."|".$key, '!<unset>!', 600);
 	}
 	return false;
 }}

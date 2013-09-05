@@ -542,7 +542,7 @@ function delivery_run(&$argv, &$argc){
 
 					diaspora_send_relay($target_item,$owner,$contact,$public_message);
 					break;
-				}		
+				}
 				elseif(($top_level) && (! $walltowall)) {
 					// currently no workable solution for sending walltowall
 					logger('delivery: diaspora status: ' . $loc);
@@ -556,6 +556,9 @@ function delivery_run(&$argv, &$argc){
 
 			case NETWORK_FEED :
 			case NETWORK_FACEBOOK :
+				if(get_config('system','dfrn_only'))
+					break;
+			case NETWORK_PUMPIO :
 				if(get_config('system','dfrn_only'))
 					break;
 			default:

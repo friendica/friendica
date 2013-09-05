@@ -36,7 +36,11 @@ function stripcode_br_cb($s) {
 
 function tryoembed($match){
 	$url = ((count($match)==2)?$match[1]:$match[2]);
-//	logger("tryoembed: $url");
+
+	// Always embed the SSL version
+	$url = str_replace("http://www.youtube.com/", "https://www.youtube.com/", $url);
+
+	//logger("tryoembed: $url");
 
 	$o = oembed_fetch_url($url);
 
@@ -423,8 +427,8 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 
 	// removing multiplicated newlines
 	if (get_config("system", "remove_multiplicated_lines")) {
-		$search = array("\n\n\n", "\n ", " \n", "[/quote]\n\n", "\n[/quote]");
-		$replace = array("\n\n", "\n", "\n", "[/quote]\n", "[/quote]");
+		$search = array("\n\n\n", "\n ", " \n", "[/quote]\n\n", "\n[/quote]", "[/li]\n", "\n[li]", "\n[ul]", "[/ul]\n");
+		$replace = array("\n\n", "\n", "\n", "[/quote]\n", "[/quote]", "[/li]", "[li]", "[ul]", "[/ul]");
 		do {
 			$oldtext = $Text;
 			$Text = str_replace($search, $replace, $Text);
@@ -638,19 +642,19 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 
 	// Youtube extensions
 	if ($tryoembed) {
-		$Text = preg_replace_callback("/\[youtube\](https?:\/\/www.youtube.com\/watch\?v\=.*?)\[\/youtube\]/ism", 'tryoembed', $Text);        
-		$Text = preg_replace_callback("/\[youtube\](www.youtube.com\/watch\?v\=.*?)\[\/youtube\]/ism", 'tryoembed', $Text);        
-		$Text = preg_replace_callback("/\[youtube\](https?:\/\/youtu.be\/.*?)\[\/youtube\]/ism",'tryoembed',$Text); 
+		$Text = preg_replace_callback("/\[youtube\](https?:\/\/www.youtube.com\/watch\?v\=.*?)\[\/youtube\]/ism", 'tryoembed', $Text);
+		$Text = preg_replace_callback("/\[youtube\](www.youtube.com\/watch\?v\=.*?)\[\/youtube\]/ism", 'tryoembed', $Text);
+		$Text = preg_replace_callback("/\[youtube\](https?:\/\/youtu.be\/.*?)\[\/youtube\]/ism",'tryoembed',$Text);
 	}
 
-	$Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/youtube\]/ism",'[youtube]$1[/youtube]',$Text); 
-	$Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/embed\/(.*?)\[\/youtube\]/ism",'[youtube]$1[/youtube]',$Text); 
+	$Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/youtube\]/ism",'[youtube]$1[/youtube]',$Text);
+	$Text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/embed\/(.*?)\[\/youtube\]/ism",'[youtube]$1[/youtube]',$Text);
 	$Text = preg_replace("/\[youtube\]https?:\/\/youtu.be\/(.*?)\[\/youtube\]/ism",'[youtube]$1[/youtube]',$Text);
 
 	if ($tryoembed)
-		$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '<iframe width="' . $a->videowidth . '" height="' . $a->videoheight . '" src="http://www.youtube.com/embed/$1" frameborder="0" ></iframe>', $Text);
+		$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '<iframe width="' . $a->videowidth . '" height="' . $a->videoheight . '" src="https://www.youtube.com/embed/$1" frameborder="0" ></iframe>', $Text);
 	else
-		$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", "http://www.youtube.com/watch?v=$1", $Text);
+		$Text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", "https://www.youtube.com/watch?v=$1", $Text);
 
 
 	if ($tryoembed) {
@@ -714,21 +718,28 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	// Only do it when it has to be done - for performance reasons
 	// Update: Now it is done every time - since bad structured html can break a whole page
 	//if (!$tryoembed) {
-//		$doc = new DOMDocument();
-//		$doc->preserveWhiteSpace = false;
+	//	$doc = new DOMDocument();
+	//	$doc->preserveWhiteSpace = false;
 
-//		$Text = mb_convert_encoding($Text, 'HTML-ENTITIES', "UTF-8");
+	//	$Text = mb_convert_encoding($Text, 'HTML-ENTITIES', "UTF-8");
 
-//		$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">';
-//		@$doc->loadHTML($doctype."<html><body>".$Text."</body></html>");
+	//	$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">';
+	//	@$doc->loadHTML($doctype."<html><body>".$Text."</body></html>");
 
-//		$Text = $doc->saveHTML();
-//		$Text = str_replace(array("<html><body>", "</body></html>", $doctype), array("", "", ""), $Text);
+	//	$Text = $doc->saveHTML();
+	//	$Text = str_replace(array("<html><body>", "</body></html>", $doctype), array("", "", ""), $Text);
 
-//		$Text = str_replace('<br></li>','</li>', $Text);
+	//	$Text = str_replace('<br></li>','</li>', $Text);
 
-//		$Text = mb_convert_encoding($Text, "UTF-8", 'HTML-ENTITIES');
+	//	$Text = mb_convert_encoding($Text, "UTF-8", 'HTML-ENTITIES');
 	//}
+
+	// Clean up some useless linebreaks in lists
+	//$Text = str_replace('<br /><ul','<ul ', $Text);
+	//$Text = str_replace('</ul><br />','</ul>', $Text);
+	//$Text = str_replace('</li><br />','</li>', $Text);
+	//$Text = str_replace('<br /><li>','<li>', $Text);
+	//	$Text = str_replace('<br /><ul','<ul ', $Text);
 
 	// Remove all hashtag addresses
 	if (!$tryoembed AND get_config("system", "remove_hashtags_on_export")) {

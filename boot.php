@@ -139,6 +139,8 @@ define ( 'NETWORK_LINKEDIN',         'lnkd');    // LinkedIn
 define ( 'NETWORK_XMPP',             'xmpp');    // XMPP
 define ( 'NETWORK_MYSPACE',          'mysp');    // MySpace
 define ( 'NETWORK_GPLUS',            'goog');    // Google+
+define ( 'NETWORK_PUMPIO',           'pump');    // pump.io
+define ( 'NETWORK_TWITTER',          'twit');    // Twitter
 
 define ( 'NETWORK_PHANTOM',          'unkn');    // Place holder
 
@@ -161,6 +163,8 @@ $netgroup_ids = array(
 	NETWORK_XMPP     => (-10),
 	NETWORK_MYSPACE  => (-11),
 	NETWORK_GPLUS    => (-12),
+	NETWORK_PUMPIO   => (-13),
+	NETWORK_TWITTER  => (-14),
 
 	NETWORK_PHANTOM  => (-127),
 );

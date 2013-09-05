@@ -173,7 +173,7 @@ function poller_run(&$argv, &$argc){
 
 	$contacts = q("SELECT `contact`.`id` FROM `contact` LEFT JOIN `user` ON `user`.`uid` = `contact`.`uid` 
 		WHERE ( `rel` = %d OR `rel` = %d ) AND `poll` != ''
-		AND NOT `network` IN ( '%s', '%s' )
+		AND NOT `network` IN ( '%s', '%s', '%s' )
 		$sql_extra 
 		AND `self` = 0 AND `contact`.`blocked` = 0 AND `contact`.`readonly` = 0 
 		AND `contact`.`archive` = 0 
@@ -181,7 +181,8 @@ function poller_run(&$argv, &$argc){
 		intval(CONTACT_IS_SHARING),
 		intval(CONTACT_IS_FRIEND),
 		dbesc(NETWORK_DIASPORA),
-		dbesc(NETWORK_FACEBOOK)
+		dbesc(NETWORK_FACEBOOK),
+		dbesc(NETWORK_PUMPIO)
 	);
 
 	if(! count($contacts)) {
