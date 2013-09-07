@@ -45,7 +45,6 @@ $close_friends    = get_diabook_config( "close_friends", 0 );
 $close_lastusers  = get_diabook_config( "close_lastusers", 0 );
 $close_lastphotos = get_diabook_config( "close_lastphotos", 0 );
 $close_lastlikes  = get_diabook_config( "close_lastlikes", 0 );
-$close_twitter    = get_diabook_config( "close_twitter", 1 );
 $close_mapquery   = get_diabook_config( "close_mapquery", 1 );
 
 //get resolution (wide/normal)
@@ -102,9 +101,9 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 
 	}
 
-	$ccCookie = $close_pages + $close_mapquery + $close_profiles + $close_helpers + $close_services + $close_friends + $close_twitter + $close_lastusers + $close_lastphotos + $close_lastlikes;
+	$ccCookie = $close_pages + $close_mapquery + $close_profiles + $close_helpers + $close_services + $close_friends + $close_lastusers + $close_lastphotos + $close_lastlikes;
 	//if all boxes closed, dont build right-hand-col and dont use special css
-	if($ccCookie != "10") {
+	if($ccCookie != "9") {
 	// COMMUNITY
 	diabook_community_info();
 
@@ -118,7 +117,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 
 	//build boxes at right_aside at profile pages
 	if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname']){
-	if($ccCookie != "10") {
+	if($ccCookie != "9") {
 	// COMMUNITY
 	diabook_community_info();
 
@@ -137,17 +136,13 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$imageresizeJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/js/jquery.ae.image.resize.min.js";
 	$a->page['htmlhead'] .= sprintf('<script type="text/javascript" src="%s" ></script>', $imageresizeJS);
 	//load jquery.ui.js
-	if($ccCookie != "10") {
+	if($ccCookie != "9") {
 	$jqueryuiJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/js/jquery-ui-1.8.20.custom.min.js";
 	$a->page['htmlhead'] .= sprintf('<script type="text/javascript" src="%s" ></script>', $jqueryuiJS);
 	$jqueryuicssJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/jquery-ui-1.8.20.custom.css";
 	$a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $jqueryuicssJS);
 	}
-	//load jquery.twitter.search.js
-	if($close_twitter != "1") {
-	$twitterJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/js/jquery.twitter.search.js";
-	$a->page['htmlhead'] .= sprintf('<script type="text/javascript" src="%s" ></script>', $twitterJS);
-	}
+	
 	//load jquery.mapquery.js
 	if($close_mapquery != "1") {
 	$mqtmplJS = $a->get_baseurl($ssl_state)."/view/theme/diabook/js/jquery.tmpl.js";
@@ -170,7 +165,6 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	<script>
 	 $(function() {
 		$("a.lightbox").colorbox({maxHeight:"90%"}); // Select all links with lightbox class
-	 	$("a#twittersettings-link").colorbox({inline:true,onClosed: function() { $("#twittersettings").attr("style","display: none;");}} );
 		$("a#mapcontrol-link").colorbox({inline:true,onClosed: function() { $("#mapcontrol").attr("style","display: none;");}} );
 		$("a#closeicon").colorbox({inline:true,onClosed: function() { $("#boxsettings").attr("style","display: none;");}} );
 	 	});
@@ -234,25 +228,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 		};
 		</script>';
 	}
-	//check if twitterbox is active and print
-	if($close_twitter != "1") {
-		$TSearchTerm = get_diabook_config( "TSearchTerm", "friendica" );
-		$a->page['htmlhead'] .= '
-		<script>
-		$(function() {
-		$("#twitter").twitterSearch({
-		term: "'.$TSearchTerm.'",
-		animInSpeed: 250,
-		bird:    false,
-		avatar:  false,
-		colorExterior: "#fff",
-		timeout: 10000    	});
-		});
-		function open_twittersettings() {
-		$("div#twittersettings").attr("style","display: block;");
-		};
-		</script>';}
-
+	
 	//check if community_home-plugin is activated and change css.. we need this, that the submit-wrapper doesn't overlay the login-panel if communityhome-plugin is active
 	$nametocheck = "communityhome";
 	$r = q("select id from addon where name = '%s' and installed = 1", dbesc($nametocheck));
@@ -292,7 +268,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
   	});
 	</script>';
 
-	if($ccCookie != "10") {
+	if($ccCookie != "9") {
 	$a->page['htmlhead'] .= '
 	<script>
 	$("right_aside").ready(function(){
@@ -325,11 +301,6 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	if('.$close_friends.')
 		{
 		document.getElementById( "close_friends" ).style.display = "none";
-			};
-
-	if('.$close_twitter.')
-		{
-		document.getElementById( "close_twitter" ).style.display = "none";
 			};
 
 	if('.$close_lastusers.')
@@ -376,7 +347,6 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$close_lastusers  = get_diabook_config( "close_lastusers", 0 );
 	$close_lastphotos = get_diabook_config( "close_lastphotos", 0 );
 	$close_lastlikes  = get_diabook_config( "close_lastlikes", 0 );
-	$close_twitter    = get_diabook_config( "close_twitter", 1 );
 	$close_mapquery   = get_diabook_config( "close_mapquery", 1 );
 
 	// comunity_profiles
@@ -600,22 +570,8 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$aside['$con_services'] = $con_services;
 	}
    //end connectable services
-   //twitter
-   if($close_twitter != "1") {
-   $twitter = array();
-	$twitter['title'] = Array("", "<a id='twittersettings-link' href='#twittersettings' style='text-decoration:none;' onclick='open_twittersettings(); return false;'>".t('Last Tweets')."</a>", "", "");
-	$aside['$twitter'] = $twitter;
-	$TSearchTerm = get_pconfig(local_user(), 'diabook', 'TSearchTerm' );
-	$aside['$TSearchTerm'] = array('diabook_TSearchTerm', t('Set twitter search term'), $TSearchTerm, '', $TSearchTerm);
-	$baseurl = $a->get_baseurl($ssl_state);
-	$aside['$baseurl'] = $baseurl;
-	if (isset($_POST['diabook-settings-sub']) && $_POST['diabook-settings-sub']!=''){
-		set_pconfig(local_user(), 'diabook', 'TSearchTerm', $_POST['diabook_TSearchTerm']);
-		header("Location: network");
-		}
-	}
-   //end twitter
-   if($ccCookie != "10") {
+   
+   if($ccCookie != "9") {
 	$close_pages      = get_diabook_config( "close_pages", 1 );
 	$close_profiles   = get_diabook_config( "close_profiles", 0 );
 	$close_helpers    = get_diabook_config( "close_helpers", 0 );
@@ -624,7 +580,6 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$close_lastusers  = get_diabook_config( "close_lastusers", 0 );
 	$close_lastphotos = get_diabook_config( "close_lastphotos", 0 );
 	$close_lastlikes  = get_diabook_config( "close_lastlikes", 0 );
-	$close_twitter    = get_diabook_config( "close_twitter", 1 );
 	$close_mapquery   = get_diabook_config( "close_mapquery", 1 );
 	$close_or_not = array('1'=>t("don't show"),	'0'=>t("show"),);
 	$boxsettings['title'] = Array("", t('Show/hide boxes at right-hand column:'), "", "");
@@ -635,7 +590,6 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	$aside['$close_helpers'] = array('diabook_close_helpers', t('Help or @NewHere ?'), $close_helpers, '', $close_or_not);
 	$aside['$close_services'] = array('diabook_close_services', t('Connect Services'), $close_services, '', $close_or_not);
 	$aside['$close_friends'] = array('diabook_close_friends', t('Find Friends'), $close_friends, '', $close_or_not);
-	$aside['$close_twitter'] = array('diabook_close_twitter', t('Last Tweets'), $close_twitter, '', $close_or_not);
 	$aside['$close_lastusers'] = array('diabook_close_lastusers', t('Last users'), $close_lastusers, '', $close_or_not);
 	$aside['$close_lastphotos'] = array('diabook_close_lastphotos', t('Last photos'), $close_lastphotos, '', $close_or_not);
 	$aside['$close_lastlikes'] = array('diabook_close_lastlikes', t('Last likes'), $close_lastlikes, '', $close_or_not);
@@ -649,7 +603,6 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 		set_pconfig(local_user(), 'diabook', 'close_helpers', $_POST['diabook_close_helpers']);
 		set_pconfig(local_user(), 'diabook', 'close_services', $_POST['diabook_close_services']);
 		set_pconfig(local_user(), 'diabook', 'close_friends', $_POST['diabook_close_friends']);
-		set_pconfig(local_user(), 'diabook', 'close_twitter', $_POST['diabook_close_twitter']);
 		set_pconfig(local_user(), 'diabook', 'close_lastusers', $_POST['diabook_close_lastusers']);
 		set_pconfig(local_user(), 'diabook', 'close_lastphotos', $_POST['diabook_close_lastphotos']);
 		set_pconfig(local_user(), 'diabook', 'close_lastlikes', $_POST['diabook_close_lastlikes']);

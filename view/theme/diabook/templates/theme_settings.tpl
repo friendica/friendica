@@ -24,8 +24,6 @@
 {{include file="field_select.tpl" field=$close_lastusers}}
 {{include file="field_select.tpl" field=$close_lastphotos}}
 {{include file="field_select.tpl" field=$close_lastlikes}}
-{{include file="field_select.tpl" field=$close_twitter}}
-{{include file="field_input.tpl" field=$TSearchTerm}}
 {{include file="field_select.tpl" field=$close_mapquery}}
 
 {{include file="field_input.tpl" field=$ELPosX}}

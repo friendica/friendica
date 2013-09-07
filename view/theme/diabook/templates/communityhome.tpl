@@ -4,14 +4,6 @@
  *
  *}}
 
-<div id="twittersettings" style="display:none">
-<form id="twittersettingsform" action="network" method="post" >
-{{include file="field_input.tpl" field=$TSearchTerm}}
-<div class="settings-submit-wrapper">
-<input id="twittersub" type="submit" value="{{$sub}}" class="settings-submit" name="diabook-settings-sub"></input>
-</div>
-</form>
-</div>
 
 <div id="mapcontrol" style="display:none;">
 <form id="mapform" action="network" method="post" >
@@ -48,7 +40,6 @@ just contact me, if you are intesrested in joining</p>
 {{include file="field_select.tpl" field=$close_lastusers}}
 {{include file="field_select.tpl" field=$close_lastphotos}}
 {{include file="field_select.tpl" field=$close_lastlikes}}
-{{include file="field_select.tpl" field=$close_twitter}}
 {{include file="field_select.tpl" field=$close_mapquery}}
 <div class="settings-submit-wrapper">
 <input id="boxsub" type="submit" value="{{$sub}}" class="settings-submit" name="diabook-settings-box-sub"></input>
@@ -85,8 +76,6 @@ just contact me, if you are intesrested in joining</p>
 <a href="http://friendica.com/resources" title="How-to's" style="margin-left: 10px; " target="blank">How-To Guides</a><br>
 <a href="http://kakste.com/profile/newhere" title="@NewHere" style="margin-left: 10px; " target="blank">NewHere</a><br>
 <a href="https://helpers.pyxis.uberspace.de/profile/helpers" style="margin-left: 10px; " title="Friendica Support" target="blank">Friendica Support</a><br>
-<a href="https://letstalk.pyxis.uberspace.de/profile/letstalk" style="margin-left: 10px; " title="Let's talk" target="blank">Let's talk</a><br>
-<a href="http://newzot.hydra.uberspace.de/profile/newzot" title="Local Friendica" style="margin-left: 10px; " target="blank">Local Friendica</a>
 {{/if}}
 </div>
 
@@ -158,12 +147,6 @@ just contact me, if you are intesrested in joining</p>
 {{/foreach}}
 </ul>
 {{/if}}
-</div>
-
-<div id="close_twitter">
-<h3 style="height:1.17em">{{$twitter.title.1}}<a id="closeicon" href="#boxsettings" onClick="open_boxsettings(); return false;" style="text-decoration:none;" class="icon close_box" title="{{$close}}"></a></h3>
-<div id="twitter">
-</div>
 </div>
 
 <div id="close_mapquery">

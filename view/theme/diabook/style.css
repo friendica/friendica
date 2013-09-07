@@ -141,6 +141,7 @@
 .icon.language    { background-image: url("../../../view/theme/diabook/icons/language.png");}
 
 
+
 .camera 	{ background-image: url("../../../view/theme/diabook/icons/camera.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
 			  }
@@ -168,6 +169,10 @@
 .unglobe 	{ background-image: url("../../../view/theme/diabook/icons/unglobe.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
 			  }
+#jot-preview-link .tab 	{ background-image: url("../../../view/theme/diabook/icons/preview.png"); 
+			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
+			  }
+		
 .edit    {background-image: url("../../../view/theme/diabook/icons/pencil2.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;}
 .icon.block   {background-image: url("../../../view/theme/diabook/icons/block.png"); 
@@ -231,7 +236,7 @@
 .type-unkn  { background-position: -80px 0px; }
 
 .icon.drop, .icon.drophide {
- float: left;
+ float: right;
 }
 
 .icon {
@@ -1044,6 +1049,8 @@ ul.menu-popup .empty {
 	}
 .menu-profile-list-item{
 	padding-left: 5px;
+	padding-top: 0.6em;
+	display: inline;
 	vertical-align: middle;
 	}	
 .menu-profile-list-item:hover{	
@@ -1352,6 +1359,15 @@ body .pageheader{
 	clear: both;
 	display: block;
 }	
+.pager_current a {
+   margin: 3px;
+   color: #000;
+   font-weight: bolder;
+}	
+.pager_n a {
+   margin: 2px;
+   font-weight: bold;
+}
 .tabs {
     
     background-position: 0 -20px;
@@ -1993,11 +2009,8 @@ body .pageheader{
 }
 #jot-preview-link {
 	float: right;
-	margin-left: 10px;
-	margin-top: 2px;
-	font-size: 9px;
-	font-weight: bolder;
-	cursor: pointer;
+	background-image: url("../../../view/theme/diabook/icons/preview.png"); 
+	display: block; width: 12px; height: 12px; background-repeat: no-repeat;
 }
 #profile-jot-perms{
    float: right;
@@ -2154,6 +2167,10 @@ ul.tabs li .active {
     box-shadow: 0 1px 1px #CFCFCF;
     margin-left: 5px;
 }
+ul.tabs li a {
+text-decoration: none;
+}
+
 //settings tabs
 ul.rs_tabs {
   list-style-type: none;

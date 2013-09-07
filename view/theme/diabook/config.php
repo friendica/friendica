@@ -23,13 +23,12 @@ function theme_content(&$a){
 	$close_helpers = get_pconfig(local_user(), 'diabook', 'close_helpers' );
 	$close_services = get_pconfig(local_user(), 'diabook', 'close_services' );
 	$close_friends = get_pconfig(local_user(), 'diabook', 'close_friends' );
-	$close_twitter = get_pconfig(local_user(), 'diabook', 'close_twitter' );
 	$close_lastusers = get_pconfig(local_user(), 'diabook', 'close_lastusers' );
 	$close_lastphotos = get_pconfig(local_user(), 'diabook', 'close_lastphotos' );
 	$close_lastlikes = get_pconfig(local_user(), 'diabook', 'close_lastlikes' );
 
 
-	return diabook_form($a,$font_size, $line_height, $resolution, $color, $TSearchTerm, $ELZoom, $ELPosX, $ELPosY, $close_pages, $close_mapquery, $close_profiles, $close_helpers, $close_services, $close_friends, $close_twitter, $close_lastusers, $close_lastphotos, $close_lastlikes);
+	return diabook_form($a,$font_size, $line_height, $resolution, $color, $TSearchTerm, $ELZoom, $ELPosX, $ELPosY, $close_pages, $close_mapquery, $close_profiles, $close_helpers, $close_services, $close_friends, $close_lastusers, $close_lastphotos, $close_lastlikes);
 }
 
 function theme_post(&$a){
@@ -52,7 +51,6 @@ function theme_post(&$a){
 		set_pconfig(local_user(), 'diabook', 'close_helpers', $_POST['diabook_close_helpers']);
 		set_pconfig(local_user(), 'diabook', 'close_services', $_POST['diabook_close_services']);
 		set_pconfig(local_user(), 'diabook', 'close_friends', $_POST['diabook_close_friends']);
-		set_pconfig(local_user(), 'diabook', 'close_twitter', $_POST['diabook_close_twitter']);
 		set_pconfig(local_user(), 'diabook', 'close_lastusers', $_POST['diabook_close_lastusers']);
 		set_pconfig(local_user(), 'diabook', 'close_lastphotos', $_POST['diabook_close_lastphotos']);
 		set_pconfig(local_user(), 'diabook', 'close_lastlikes', $_POST['diabook_close_lastlikes']);
@@ -76,12 +74,11 @@ function theme_admin(&$a){
 	$close_helpers = get_config('diabook', 'close_helpers' );
 	$close_services = get_config('diabook', 'close_services' );
 	$close_friends = get_config('diabook', 'close_friends' );
-	$close_twitter = get_config('diabook', 'close_twitter' );
 	$close_lastusers = get_config('diabook', 'close_lastusers' );
 	$close_lastphotos = get_config('diabook', 'close_lastphotos' );
 	$close_lastlikes = get_config('diabook', 'close_lastlikes' );
 
-	return diabook_form($a,$font_size, $line_height, $resolution, $color, $TSearchTerm, $ELZoom, $ELPosX, $ELPosY, $close_pages, $close_mapquery, $close_profiles, $close_helpers, $close_services, $close_friends, $close_twitter, $close_lastusers, $close_lastphotos, $close_lastlikes);
+	return diabook_form($a,$font_size, $line_height, $resolution, $color, $TSearchTerm, $ELZoom, $ELPosX, $ELPosY, $close_pages, $close_mapquery, $close_profiles, $close_helpers, $close_services, $close_friends, $close_lastusers, $close_lastphotos, $close_lastlikes);
 }
 
 function theme_admin_post(&$a){
@@ -99,7 +96,6 @@ function theme_admin_post(&$a){
 		set_config('diabook', 'close_helpers', $_POST['diabook_close_helpers']);
 		set_config('diabook', 'close_services', $_POST['diabook_close_services']);
 		set_config('diabook', 'close_friends', $_POST['diabook_close_friends']);
-		set_config('diabook', 'close_twitter', $_POST['diabook_close_twitter']);
 		set_config('diabook', 'close_lastusers', $_POST['diabook_close_lastusers']);
 		set_config('diabook', 'close_lastphotos', $_POST['diabook_close_lastphotos']);
 		set_config('diabook', 'close_lastlikes', $_POST['diabook_close_lastlikes']);
@@ -108,7 +104,7 @@ function theme_admin_post(&$a){
 }
 
 
-function diabook_form(&$a, $font_size, $line_height, $resolution, $color, $TSearchTerm, $ELZoom, $ELPosX, $ELPosY, $close_pages, $close_mapquery, $close_profiles, $close_helpers, $close_services, $close_friends, $close_twitter, $close_lastusers, $close_lastphotos, $close_lastlikes){
+function diabook_form(&$a, $font_size, $line_height, $resolution, $color, $TSearchTerm, $ELZoom, $ELPosX, $ELPosY, $close_pages, $close_mapquery, $close_profiles, $close_helpers, $close_services, $close_friends, $close_lastusers, $close_lastphotos, $close_lastlikes){
 	$line_heights = array(
 		"1.3"=>"1.3",
 		"---"=>"---",
@@ -156,7 +152,6 @@ function diabook_form(&$a, $font_size, $line_height, $resolution, $color, $TSear
 		'$line_height' => array('diabook_line_height', t('Set line-height for posts and comments'), $line_height, '', $line_heights),
 		'$resolution' => array('diabook_resolution', t('Set resolution for middle column'), $resolution, '', $resolutions),
 		'$color' => array('diabook_color', t('Set color scheme'), $color, '', $colors),
-		'$TSearchTerm' => array('diabook_TSearchTerm', t('Set twitter search term'), $TSearchTerm, '', $TSearchTerm),
 		'$ELZoom' => array('diabook_ELZoom', t('Set zoomfactor for Earth Layer'), $ELZoom, '', $ELZoom),
 		'$ELPosX' => array('diabook_ELPosX', t('Set longitude (X) for Earth Layers'), $ELPosX, '', $ELPosX),
 		'$ELPosY' => array('diabook_ELPosY', t('Set latitude (Y) for Earth Layers'), $ELPosY, '', $ELPosY),
@@ -166,7 +161,6 @@ function diabook_form(&$a, $font_size, $line_height, $resolution, $color, $TSear
 		'$close_helpers' => array('diabook_close_helpers', t('Help or @NewHere ?'), $close_helpers, '', $close_or_not),
 		'$close_services' => array('diabook_close_services', t('Connect Services'), $close_services, '', $close_or_not),
 		'$close_friends' => array('diabook_close_friends', t('Find Friends'), $close_friends, '', $close_or_not),
-		'$close_twitter' => array('diabook_close_twitter', t('Last tweets'), $close_twitter, '', $close_or_not),
 		'$close_lastusers' => array('diabook_close_lastusers', t('Last users'), $close_lastusers, '', $close_or_not),
 		'$close_lastphotos' => array('diabook_close_lastphotos', t('Last photos'), $close_lastphotos, '', $close_or_not),
 		'$close_lastlikes' => array('diabook_close_lastlikes', t('Last likes'), $close_lastlikes, '', $close_or_not),
