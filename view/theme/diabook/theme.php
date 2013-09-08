@@ -2,7 +2,7 @@
 
 /*
  * Name: Diabook
- * Description: Diabook: report bugs and request here: http://pad.toktan.org/p/diabook or contact me : thomas_bierey@friendica.eu
+ * Description: Diabook: report bugs and request here: http://pad.toktan.org/p/diabook or http://bugs.friendica.com/view_all_bug_page.php
  * Version: (Version: 1.027)
  * Author:
  */
@@ -69,6 +69,18 @@ if ($color=="pink") $color_path = "/diabook-pink/";
 if ($color=="green") $color_path = "/diabook-green/";
 if ($color=="dark") $color_path = "/diabook-dark/";
 
+	// remove doubled checkboxes at contacts-edit-page
+	if ($a->argv[0] === "contacts" && $a->argv[1] != NULL && local_user()){
+	$a->page['htmlhead'] .= '
+	<script>
+	 $(document).ready(function() {
+		$("span.group_unselected").attr("style","display: none;");
+		$("span.group_selected").attr("style","display: none;");
+		$("input.unticked.action").attr("style","float: left; margin-top: 5px;");
+		$("li.menu-profile-list").attr("style","min-height: 22px;");
+	});
+	</script>';
+	}
 
 	//build personal menue at lefthand-col (id="profile_side") and boxes at right-hand-col at networkpages
 	if ($a->argv[0] === "network" && local_user()){

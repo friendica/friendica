@@ -228,7 +228,7 @@
 .type-unkn  { background-position: -80px 0px; }
 
 .icon.drop, .icon.drophide {
- float: left;
+ float: right;
 }
 
 .icon {
@@ -1223,6 +1223,9 @@ aside #login-extra-links{
   height: 22px;
   width: 22px;
 }
+#group-all-contacts{
+  overflow: auto;
+}
 .icon.text_add		{ 
 		background-image: url("../../../images/icons/16/add.png");
 		float: right;
@@ -1357,6 +1360,9 @@ body .pageheader{
 	}
 #id_openid_url {
   width: 173px;	
+	}
+.contact-edit-submit{
+	display: block;
 	}
 #contact-edit-end {
 	}
@@ -1718,6 +1724,17 @@ body .pageheader{
 	
 #jot-preview-content .tread-wrapper {
   background-color: #fff797;
+}
+
+span#jot-preview-link.tab.button{
+	float: right;
+	margin-left: 10px;
+	margin-right: 14px;
+	margin-top: 2px;
+	font-size: 11px;
+	font-weight: bolder;
+	cursor: pointer;
+	border: 0px;
 }
 
 .wall-item-tags {

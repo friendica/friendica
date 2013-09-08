@@ -1769,14 +1769,7 @@ transition: all 0.2s ease-in-out;
 	margin-left: 45px;
 	margin-top: 2px;
 }
-#jot-preview-link {
-	float: right;
-	margin-left: 10px;
-	margin-top: 2px;
-	font-size: 9px;
-	font-weight: bolder;
-	cursor: pointer;
-}
+
 #profile-jot-perms{
    float: right;
 	margin-left: 10px;

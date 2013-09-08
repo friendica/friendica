@@ -168,11 +168,7 @@
 			  }
 .unglobe 	{ background-image: url("../../../view/theme/diabook/icons/unglobe.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
-			  }
-#jot-preview-link .tab 	{ background-image: url("../../../view/theme/diabook/icons/preview.png"); 
-			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;
-			  }
-		
+			  }		
 .edit    {background-image: url("../../../view/theme/diabook/icons/pencil2.png"); 
 			  display: block; width: 28px; height: 28px; background-repeat: no-repeat;}
 .icon.block   {background-image: url("../../../view/theme/diabook/icons/block.png"); 
@@ -1049,6 +1045,12 @@ ul.menu-popup .empty {
 	}
 .menu-profile-list-item{
 	padding-left: 5px;
+	padding-top: 0.5em;
+	display: inline;
+	vertical-align: middle;
+	}	
+#profile-side-status .menu-profile-list-item{
+	padding-left: 5px;
 	padding-top: 0.6em;
 	display: inline;
 	vertical-align: middle;
@@ -1286,6 +1288,9 @@ aside #login-extra-links{
   height: 22px;
   width: 22px;
 }
+#group-all-contacts{
+  overflow: auto;
+}
 .icon.text_add		{ 
 		background-image: url("../../../images/icons/16/add.png");
 		float: right;
@@ -1349,6 +1354,9 @@ body .pageheader{
 	}
 #id_openid_url {
   width: 173px;	
+	}
+.contact-edit-submit{
+	display: block;
 	}
 #contact-edit-end {
 	}
@@ -1706,6 +1714,17 @@ body .pageheader{
   background-color: #fff797;
 }
 
+span#jot-preview-link.tab.button{
+	float: right;
+	margin-left: 10px;
+	margin-right: 14px;
+	margin-top: 2px;
+	font-size: 11px;
+	font-weight: bolder;
+	cursor: pointer;
+	border: 0px;
+}
+
 .wall-item-tags {
   padding-top: 1px;
   padding-bottom: 2px;
@@ -2006,11 +2025,6 @@ body .pageheader{
 	float: left;
 	margin-left: 45px;
 	margin-top: 2px;
-}
-#jot-preview-link {
-	float: right;
-	background-image: url("../../../view/theme/diabook/icons/preview.png"); 
-	display: block; width: 12px; height: 12px; background-repeat: no-repeat;
 }
 #profile-jot-perms{
    float: right;
