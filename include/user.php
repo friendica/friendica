@@ -60,7 +60,13 @@ function create_user($arr) {
 			$openid->returnUrl = $a->get_baseurl() . '/openid'; 
 			$openid->required = array('namePerson/friendly', 'contact/email', 'namePerson');
 			$openid->optional = array('namePerson/first','media/image/aspect11','media/image/default');
-			goaway($openid->authUrl());
+			try {			
+				$authurl = $openid->authUrl();
+			} catch (Exception $e){
+				$result['message'] .= t("We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID."). EOL . EOL . t("The error message was:") . $e->getMessage() . EOL; 
+				return $result;
+			}
+			goaway($authurl);
 			// NOTREACHED	
 		}
 
