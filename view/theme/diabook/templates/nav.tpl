@@ -106,7 +106,7 @@
 		
       {{if $nav.home}}
 			<li id="nav-home-link" class="nav-menu {{$sel.home}}">
-				<a class="{{$nav.home.2}}" href="{{$nav.home.0}}" title="{{$nav.home.3}}" >{{$nav.home.1}}
+				<a class="{{$nav.home.2}}" href="{{$nav.home.0}}" title="{{$nav.home.3}}" >{{$userinfo.name}}
 				<span id="home-update" class="nav-notify"></span></a>
 			</li>
 		{{/if}}		
@@ -127,7 +127,7 @@
 		{{/if}}
 		
 					{{if $nav.login}}
-					<li id="nav-home-link" class="nav-menu {{$sel.home}}">
+					<li id="nav-login-link" class="nav-menu {{$sel.home}}">
 						<a class="{{$nav.login.2}}" href="{{$nav.login.0}}" title="{{$nav.login.3}}" >{{$nav.login.1}}</a>
 					<li>
 					{{/if}}

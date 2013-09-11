@@ -3,7 +3,7 @@
 /*
  * Name: Diabook
  * Description: Diabook: report bugs and request here: http://pad.toktan.org/p/diabook or http://bugs.friendica.com/view_all_bug_page.php
- * Version: (Version: 1.027)
+ * Version: (Version: 1.028)
  * Author:
  */
 
@@ -26,7 +26,7 @@ function diabook_init(&$a) {
 set_template_engine($a, 'smarty3');
 
 //print diabook-version for debugging
-$diabook_version = "Diabook (Version: 1.027)";
+$diabook_version = "Diabook (Version: 1.028)";
 $a->page['htmlhead'] .= sprintf('<META NAME=generator CONTENT="%s"/>', $diabook_version);
 
 //init css on network and profilepages
@@ -35,6 +35,31 @@ $cssFile = null;
 // Preload config
 load_config("diabook");
 load_pconfig(local_user(), "diabook");
+
+
+// adjust nav-bar, depending state of user
+if (local_user() ) {
+	$a->page['htmlhead'] .= '
+	<script>
+	 $(document).ready(function() {
+		$("li#nav-site-linkmenu.nav-menu-icon").attr("style","display: block;");
+		$("li#nav-directory-link.nav-menu").attr("style","margin-right: 0px;");
+		$("li#nav-home-link.nav-menu").attr("style","display: block;margin-right: 8px;");
+	});
+	</script>';
+	}
+
+if ($a->argv[0] == "profile" && $a->argv[1] != $a->user['nickname'] ) {
+	$a->page['htmlhead'] .= '
+	<script>
+	 $(document).ready(function() {
+		$("li#nav-site-linkmenu.nav-menu-icon").attr("style","display: block;");
+		$("li#nav-directory-link.nav-menu").attr("style","margin-right: 0px;");
+		$("li#nav-home-link.nav-menu").attr("style","display: block;margin-right: 8px;");
+	});
+	</script>';
+	}
+
 
 //get statuses of boxes at right-hand-column
 $close_pages      = get_diabook_config( "close_pages", 1 );
@@ -76,7 +101,7 @@ if ($color=="dark") $color_path = "/diabook-dark/";
 	 $(document).ready(function() {
 		$("span.group_unselected").attr("style","display: none;");
 		$("span.group_selected").attr("style","display: none;");
-		$("input.unticked.action").attr("style","float: left; margin-top: 5px;");
+		$("input.unticked.action").attr("style","float: left; margin-top: 5px;-moz-appearance: none;");
 		$("li.menu-profile-list").attr("style","min-height: 22px;");
 	});
 	</script>';

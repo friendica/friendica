@@ -852,6 +852,7 @@ nav #nav-directory-link,
 nav #nav-apps-link,
 nav #nav-site-linkmenu, 
 nav #nav-home-link,
+nav #nav-login-link,
 nav #nav-user-linkmenu
 {
   float: right;
@@ -859,17 +860,23 @@ nav #nav-user-linkmenu
 nav #nav-user-linkmenu{
 	margin-right: 0px;
 	}
-nav #nav-home-link, #nav-directory-link, #nav-apps-link{
+nav #nav-home-link, #nav-directory-link, #nav-login-link, #nav-apps-link{
 	margin-left: 0px;
 	margin-right: 0px;
 	font-weight: bold;
 	margin: 3px 5px;
 	}
 nav #nav-directory-link{
-  margin-right: 0px;	
+  margin-right: 10px;	
 	}
+
+li#nav-site-linkmenu.nav-menu-icon{
+	display: none;
+}
+
 nav #nav-home-link{
-  margin-left: 0px;	
+   margin-left: 0px;	
+   display: none;
 	}
 nav #nav-help-link .menu-popup,
 nav #nav-search-link .menu-popup,
