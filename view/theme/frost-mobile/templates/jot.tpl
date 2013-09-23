@@ -40,15 +40,13 @@
 	<div id="profile-upload-wrapper" style="display: {{$visitor}};" >
 		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="icon camera" title="{{$upload}}"></a></div>
 	</div> 
-	<div id="profile-attach-wrapper" style="display: {{$visitor}};" >
+    {{*<!--<div id="profile-attach-wrapper" style="display: {{$visitor}};" >
 		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon attach" title="{{$attach}}"></a></div>
-	</div> 
-
-	{{*<!--<div id="profile-link-wrapper" style="display: {{$visitor}};" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
-		<a id="profile-link" class="icon link" title="{{$weblink}}" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>-->*}}
+	</div> -->*}}
+    {{*<!--<div id="profile-link-wrapper" style="display: {{$visitor}};" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >-->*}}
 	<div id="profile-link-wrapper" style="display: {{$visitor}};" >
-		<a id="profile-link" class="icon link" title="{{$weblink}}" onclick="jotGetLink(); return false;"></a>
-	</div> 
+    <a id="profile-link" class="icon link" title="{{$weblink}}" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
+	</div>
 	<div id="profile-video-wrapper" style="display: {{$visitor}};" >
 		<a id="profile-video" class="icon video" title="{{$video}}" onclick="jotVideoURL();return false;"></a>
 	</div> 
