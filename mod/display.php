@@ -123,7 +123,7 @@ function display_content(&$a, $update = 0) {
 	if($update) {
 
 		$r = q("SELECT id FROM item WHERE item.uid = %d
-		        AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE ( `id` = '%s' OR `uri` = '%s' ))
+		        AND `item`.`parent` = ( SELECT `parent` FROM `item` FORCE INDEX (PRIMARY, `uri`) WHERE ( `id` = '%s' OR `uri` = '%s' ))
 		        $sql_extra AND unseen = 1",
 		        intval($a->profile['uid']),
 		        dbesc($item_id),
@@ -142,7 +142,7 @@ function display_content(&$a, $update = 0) {
 		WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 		and `item`.`moderated` = 0
 		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-		AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE ( `id` = '%s' OR `uri` = '%s' )
+		AND `item`.`parent` = ( SELECT `parent` FROM `item` FORCE INDEX (PRIMARY, `uri`) WHERE ( `id` = '%s' OR `uri` = '%s' )
 		AND uid = %d )
 		$sql_extra
 		ORDER BY `parent` DESC, `gravity` ASC, `id` ASC ",
@@ -171,7 +171,7 @@ function display_content(&$a, $update = 0) {
 				WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 				and `item`.`moderated` = 0
 				AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-				AND `item`.`parent` = ( SELECT `parent` FROM `item` WHERE `uri` = '%s' AND uid = %d )
+				AND `item`.`parent` = ( SELECT `parent` FROM `item` FORCE INDEX (PRIMARY, `uri`) WHERE `uri` = '%s' AND uid = %d )
 				ORDER BY `parent` DESC, `gravity` ASC, `id` ASC ",
 				intval(local_user()),
 				dbesc($item_uri),

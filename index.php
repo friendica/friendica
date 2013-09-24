@@ -104,12 +104,12 @@ if((x($_GET,'zrl')) && (!$install && !$maintenance)) {
  * For Mozilla auth manager - still needs sorting, and this might conflict with LRDD header.
  * Apache/PHP lumps the Link: headers into one - and other services might not be able to parse it
  * this way. There's a PHP flag to link the headers because by default this will over-write any other 
- * link header. 
+ * link header.
  *
  * What we really need to do is output the raw headers ourselves so we can keep them separate.
  *
  */
- 
+
 // header('Link: <' . $a->get_baseurl() . '/amcd>; rel="acct-mgmt";');
 
 if((x($_SESSION,'authenticated')) || (x($_POST,'auth-params')) || ($a->module === 'login'))
@@ -135,7 +135,6 @@ if(! x($_SESSION,'sysmsg_info'))
  * update the DB schema whenever we push a new one out. It also checks to see if
  * any plugins have been added or removed and reacts accordingly. 
  */
-
 
 if($install)
 	$a->module = 'install';
@@ -191,7 +190,7 @@ if(strlen($a->module)) {
 	// Compatibility with the Android Diaspora client
 	if ($a->module == "stream")
 		$a->module = "network";
-	
+
 	$privateapps = get_config('config','private_addons');
 
 	if(is_array($a->plugins) && in_array($a->module,$a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
@@ -320,9 +319,7 @@ if($a->module_loaded) {
 		$func = str_replace('-','_',current_theme()) . '_content_loaded';
 		$func($a);
 	}
-
 }
-
 
 /*
  * Create the page head after setting the language

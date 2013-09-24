@@ -487,7 +487,6 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 	$alike = array();
 	$dlike = array();
 
-
 	// array with html for each thread (parent+comments)
 	$threads = array();
 	$threadsid = -1;
@@ -516,7 +515,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 					if($blocked)
 						continue;
 				}
-							
+
 
 				$threadsid++;
 
@@ -697,7 +696,6 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				$threads[$threadsid]['items'] = array($arr['output']);
 
 			}
-
 		}
 		else
 		{
@@ -719,7 +717,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				if($arr_blocked) {
 					$blocked = false;
 					foreach($arr_blocked as $b) {
-						
+
 						if($b && link_compare($item['author-link'],$b)) {
 							$blocked = true;
 							break;
@@ -728,7 +726,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 					if($blocked)
 						continue;
 				}
-							
+
 
 
 				// Can we put this after the visibility check?
@@ -754,6 +752,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 			}
 
 			$threads = $conv->get_template_data($alike, $dlike);
+
 			if(!$threads) {
 				logger('[ERROR] conversation : Failed to get template data.', LOGGER_DEBUG);
 				$threads = array();

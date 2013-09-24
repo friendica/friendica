@@ -376,7 +376,6 @@ function network_content(&$a, $update = 0) {
 		}
 	}
 
-
 	$o = '';
 
 	// item filter tabs
@@ -498,10 +497,6 @@ function network_content(&$a, $update = 0) {
 
 	// --- end item filter tabs
 
-
-
-
-
 	$contact_id = $a->cid;
 
 	require_once('include/acl_selectors.php');
@@ -571,7 +566,6 @@ function network_content(&$a, $update = 0) {
 		$o .= status_editor($a,$x);
 
 	}
-
 
 	// We don't have to deal with ACLs on this page. You're looking at everything
 	// that belongs to you, hence you can see all of it. We will filter by group if
@@ -849,7 +843,6 @@ function network_content(&$a, $update = 0) {
 			$update_unseen = ' WHERE uid = ' . intval(local_user()) . ' AND unseen = 1 AND parent IN ( ' . dbesc($parents_str) . ' )';
 	}
 
-
 	// We aren't going to try and figure out at the item, group, and page
 	// level which items you've seen and which you haven't. If you're looking
 	// at the top level network page just mark everything seen. 
@@ -864,7 +857,7 @@ function network_content(&$a, $update = 0) {
 // on they just get buried deeper. It has happened to me a couple of times also.
 
 	if((! $group) && (! $cid) && (! $star)) {
-		$r = q("UPDATE `item` SET `unseen` = 0 
+		$r = q("UPDATE `item` SET `unseen` = 0
 			WHERE `unseen` = 1 AND `uid` = %d",
 			intval(local_user())
 		);

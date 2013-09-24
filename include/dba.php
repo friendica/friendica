@@ -93,6 +93,8 @@ class dba {
 		$stamp2 = microtime(true);
 		$duration = (float)($stamp2-$stamp1);
 
+		$a->save_timestamp($stamp1, "database");
+
 		if(x($a->config,'system') && x($a->config['system'],'db_log')) {
 			if (($duration > $a->config["system"]["db_loglimit"])) {
 				$duration = round($duration, 3);
@@ -168,7 +170,7 @@ class dba {
 			}
 		}
 
-		$a->save_timestamp($stamp1, "database");
+		//$a->save_timestamp($stamp1, "database");
 
 		if($this->debug)
 			logger('dba: ' . printable(print_r($r, true)));
