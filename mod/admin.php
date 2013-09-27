@@ -87,6 +87,11 @@ function admin_content(&$a) {
 	if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
 		return "";
 
+	if (function_exists("apc_delete")) {
+		$toDelete = new APCIterator('user', APC_ITER_VALUE);
+		apc_delete($toDelete);
+	}
+
 	/**
 	 * Side bar links
 	 */

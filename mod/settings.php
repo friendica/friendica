@@ -16,6 +16,11 @@ function get_theme_config_file($theme){
 
 function settings_init(&$a) {
 
+	if (function_exists("apc_delete")) {
+		$toDelete = new APCIterator('user', APC_ITER_VALUE);
+		apc_delete($toDelete);
+	}
+
 	// These lines provide the javascript needed by the acl selector
 
 	$tpl = get_markup_template("settings-head.tpl");
