@@ -663,7 +663,7 @@ function notifier_run(&$argv, &$argc){
 
 							// if contact's ssl policy changed, which we just determined
 							// is on our own server, update our contact links
-							
+
 							$ssl_policy = get_config('system','ssl_policy');
 							fix_contact_ssl_policy($x[0],$ssl_policy);
 
@@ -675,17 +675,15 @@ function notifier_run(&$argv, &$argc){
 							require_once('library/simplepie/simplepie.inc');
 							logger('mod-delivery: local delivery');
 							local_delivery($x[0],$atom);
-							break;					
+							break;
 						}
 					}
-
-
 
 					logger('notifier: dfrndelivery: ' . $contact['name']);
 					$deliver_status = dfrn_deliver($owner,$contact,$atom);
 
 					logger('notifier: dfrn_delivery returns ' . $deliver_status);
-	
+
 					if($deliver_status == (-1)) {
 						logger('notifier: delivery failed: queuing message');
 						// queue message for redelivery

@@ -2667,16 +2667,15 @@ function diaspora_transmit($owner,$contact,$slap,$public_batch,$queue_run=false)
 		$return_code = 0;
 	}
 	else {
-		if(! intval(get_config('system','diaspora_test'))) {
+		if (!intval(get_config('system','diaspora_test'))) {
 			post_url($dest_url . '/', $slap);
 			$return_code = $a->get_curl_code();
-		}
-		else {
+		} else {
 			logger('diaspora_transmit: test_mode');
 			return 200;
 		}
 	}
-	
+
 	logger('diaspora_transmit: ' . $logid . ' returns: ' . $return_code);
 
 	if((! $return_code) || (($return_code == 503) && (stristr($a->get_curl_headers(),'retry-after')))) {
