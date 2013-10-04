@@ -863,19 +863,21 @@ aside {
   /* display: table-cell; */
   vertical-align: top;
   width: 185px;
-  padding: 32px 10px 10px 20px;
+  /* padding: 32px 10px 10px 20px; */
+  padding: 10px 10px 0px 20px;
   /* border-right: 1px solid #D2D2D2; */
   /* background-color: #ECECF2; */
   background-color: #F2F2F2;
   font-size: 13px;
   /* background: #F1F1F1; */
-  top: 0px;
+  /* top: 0px; */
+  top: 32px;
   overflow-y: auto;
   z-index: 2;
 
   position: fixed;
   /* overflow: auto; */
-  height: 100%;
+  height: calc(100% - 42px);
   /* overflow: scroll; */
 }
 aside .vcard .fn {
