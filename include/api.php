@@ -619,18 +619,31 @@
 	function api_status_show(&$a, $type){
 		$user_info = api_get_user($a);
 		// get last public wall message
-		$lastwall = q("SELECT `item`.*, `i`.`contact-id` as `reply_uid`, `i`.`nick` as `reply_author`
-				FROM `item`, `contact`,
-					(SELECT `item`.`id`, `item`.`contact-id`, `contact`.`nick` FROM `item`,`contact` WHERE `contact`.`id`=`item`.`contact-id`) as `i` 
+
+		$lastwall = q("SELECT `item`.*, `i`.`contact-id` as `reply_uid`, `c`.`nick` as `reply_author`
+				FROM `item`, `contact`, `item` as `i`, `contact` as `c`
 				WHERE `item`.`contact-id` = %d
 					AND `i`.`id` = `item`.`parent`
-					AND `contact`.`id`=`item`.`contact-id` AND `contact`.`self`=1
-					AND `type`!='activity'
+					AND `contact`.`id`=`item`.`contact-id` AND `c`.`id`=`i`.`contact-id` AND `contact`.`self`=1
+					AND `item`.`type`!='activity'
 					AND `item`.`allow_cid`='' AND `item`.`allow_gid`='' AND `item`.`deny_cid`='' AND `item`.`deny_gid`=''
-				ORDER BY `created` DESC 
+				ORDER BY `item`.`created` DESC
 				LIMIT 1",
 				intval($user_info['id'])
 		);
+
+//		$lastwall = q("SELECT `item`.*, `i`.`contact-id` as `reply_uid`, `i`.`nick` as `reply_author`
+//				FROM `item`, `contact`,
+//					(SELECT `item`.`id`, `item`.`contact-id`, `contact`.`nick` FROM `item`,`contact` WHERE `contact`.`id`=`item`.`contact-id`) as `i` 
+//				WHERE `item`.`contact-id` = %d
+//					AND `i`.`id` = `item`.`parent`
+//					AND `contact`.`id`=`item`.`contact-id` AND `contact`.`self`=1
+//					AND `type`!='activity'
+//					AND `item`.`allow_cid`='' AND `item`.`allow_gid`='' AND `item`.`deny_cid`='' AND `item`.`deny_gid`=''
+//				ORDER BY `created` DESC
+//				LIMIT 1",
+//				intval($user_info['id'])
+//		);
 
 		if (count($lastwall)>0){
 			$lastwall = $lastwall[0];
