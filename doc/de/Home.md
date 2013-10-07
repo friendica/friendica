@@ -17,6 +17,7 @@ Friendica - Dokumentation und Ressourcen
 	* [Community-Foren](help/Forums)
 	* [Chats](help/Chats)
 * Weiterführende Informationen
+	* [Performance verbessern](help/Improve-Performance)
 	* [Account umziehen](help/Move-Account)
 	* [Account löschen](help/Remove-Account)
 	* [Bugs und Probleme](help/Bugs-and-Issues)
