@@ -85,7 +85,8 @@ function network_to_name($s) {
 		NETWORK_MYSPACE  => t('MySpace'),
 		NETWORK_MAIL2    => t('Email'),
 		NETWORK_GPLUS    => t('Google+'),
-		NETWORK_PUMPIO   => t('pump.io')
+		NETWORK_PUMPIO   => t('pump.io'),
+		NETWORK_TWITTER  => t('Twitter')
 	);
 
 	call_hooks('network_to_name', $nets);

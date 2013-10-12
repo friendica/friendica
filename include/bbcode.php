@@ -349,6 +349,10 @@ function GetProfileUsername($profile, $username) {
 	if ($diaspora != $profile)
 		return($diaspora);
 
+	$twitter = preg_replace("=https?://twitter.com/(.*)=ism", "$1@twitter.com", $profile);
+	if ($twitter != $profile)
+		return($twitter);
+
 	$StatusnetHost = preg_replace("=https?://(.*)/user/(.*)=ism", "$1", $profile);
 	if ($StatusnetHost != $profile) {
 		$StatusnetUser = preg_replace("=https?://(.*)/user/(.*)=ism", "$2", $profile);
