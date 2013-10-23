@@ -469,7 +469,7 @@ function check_htaccess(&$checks) {
         $test = fetch_url($a->get_baseurl()."/install/testrewrite");
         if ($test!="ok") {
             $status = false;
-            $help = t('Url rewrite in .htaccess is not working. Check your server configuration.');
+            $help = t('Url rewrite in .htaccess is not working. Check your server configuration. Error: ' . $test);
         }
         check_add($checks, t('Url rewrite is working'), $status, true, $help); 
     } else {
