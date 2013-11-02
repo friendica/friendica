@@ -2857,7 +2857,6 @@ aside input[type='text'] {
 .field textarea { height: 100px; }
 .field_help {
 	display: block;
-	margin-left: 200px;
 	color: #666666;
 	
 }
