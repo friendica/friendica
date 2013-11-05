@@ -1360,3 +1360,4 @@ $a->strings["[today]"] = "";
 $a->strings["Event Reminders"] = "";
 $a->strings["Events this week:"] = "";
 $a->strings["[No description]"] = "";
+$a->strings["Drop Contact"] = "";
