@@ -7161,3 +7161,7 @@ msgstr ""
 #: ../../include/network.php:883
 msgid "view full size"
 msgstr ""
+
+#: ../../include/Contact.php:233
+msgid "Drop Contact"
+msgstr ""
