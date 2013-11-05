@@ -1649,3 +1649,4 @@ $a->strings["Profile Details"] = "Profildetails";
 $a->strings["Videos"] = "Videos";
 $a->strings["Events and Calendar"] = "Ereignisse und Kalender";
 $a->strings["Only You Can See This"] = "Nur du kannst das sehen";
+$a->strings["Drop Contact"] = "Kontakt entfernen";
