@@ -7215,3 +7215,7 @@ msgstr ""
 #, php-format
 msgid "Cannot locate DNS info for database server '%s'"
 msgstr ""
+
+#: ../../include/Contact.php:233
+msgid "Drop Contact"
+msgstr ""
