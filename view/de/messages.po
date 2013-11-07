@@ -7131,3 +7131,7 @@ msgstr "Ereignisse und Kalender"
 #: ../../boot.php:1985
 msgid "Only You Can See This"
 msgstr "Nur du kannst das sehen"
+
+#: ../../include/Contact.php:233
+msgid "Drop Contact"
+msgstr "Kontakt entfernen"
