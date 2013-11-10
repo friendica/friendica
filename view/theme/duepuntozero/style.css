@@ -2851,10 +2851,17 @@ aside input[type='text'] {
 	width: 200px;
 }
 
-.field input,
 .field textarea {
 	width: 400px;
 }
+
+@media all and (max-width: 1089px) {
+	.field input { width: 50%; }
+}
+@media all and (min-width: 1090px) {
+     .field input { width: 400px; }
+}
+
 .field textarea { height: 100px; }
 .field_help {
 	display: block;
