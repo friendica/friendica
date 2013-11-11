@@ -780,7 +780,7 @@ input#dfrn-url {
 #profile-edit-pubkeywords-desc,
 #profile-edit-prvkeywords-desc {
 	float: left;
-	margin-left: 20px;
+	/*margin-left: 20px;*/
 }
 
 
