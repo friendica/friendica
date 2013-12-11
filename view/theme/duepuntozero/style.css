@@ -37,8 +37,10 @@ img { border :0px; }
 
 }
 
-#id_openid_url {
-	width: 384px;
+@media all and (min-width: 1090px) {
+	#id_openid_url {
+		width: 384px;
+	}
 }
 
 code {
