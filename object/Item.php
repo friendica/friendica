@@ -268,26 +268,6 @@ class Item extends BaseObject {
 			$owner_name_e = $this->get_owner_name();
 		}
 
-		// Disable features that aren't available in several networks
-		if ($item["item_network"] != "dfrn") {
-			unset($buttons["dislike"]);
-			$tagger = '';
-		}
-
-		if ($item["item_network"] == "feed")
-			unset($buttons["like"]);
-
-		if ($item["item_network"] == "mail")
-			unset($buttons["like"]);
-
-		if (($item["item_network"] == "dspr") AND ($indent == 'comment'))
-			unset($buttons["like"]);
-
-		// Facebook can like comments - but it isn't programmed in the connector yet.
-		if (($item["item_network"] == "face") AND ($indent == 'comment'))
-			unset($buttons["like"]);
-
-
 		$tmp_item = array(
 			'template' => $this->get_template(),
 
