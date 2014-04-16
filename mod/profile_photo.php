@@ -19,9 +19,9 @@ function profile_photo_post(&$a) {
 		notice ( t('Permission denied.') . EOL );
 		return;
 	}
-	
+
 	check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
-        
+
 	if((x($_POST,'cropfinal')) && ($_POST['cropfinal'] == 1)) {
 
 		// unless proven otherwise
@@ -34,9 +34,9 @@ function profile_photo_post(&$a) {
 			);
 			if(count($r) && (! intval($r[0]['is-default'])))
 				$is_default_profile = 0;
-		} 
+		}
 
-		
+
 
 		// phase 2 - we have finished cropping
 
@@ -51,7 +51,7 @@ function profile_photo_post(&$a) {
 			$scale = substr($image_id,-1,1);
 			$image_id = substr($image_id,0,-2);
 		}
-			
+
 
 		$srcX = $_POST['xstart'];
 		$srcY = $_POST['ystart'];
@@ -86,7 +86,7 @@ function profile_photo_post(&$a) {
 				$im->scaleImage(48);
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 6, $is_default_profile);
-			
+
 				if($r === false)
 					notice( sprintf(t('Image size reduction [%s] failed.'),"48") . EOL );
 
@@ -99,7 +99,7 @@ function profile_photo_post(&$a) {
 					);
 				}
 				else {
-					$r = q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d limit 1",
+					$r = q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
 						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4'),
 						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5'),
 						intval($_REQUEST['profile']),
@@ -110,7 +110,7 @@ function profile_photo_post(&$a) {
 				// we'll set the updated profile-photo timestamp even if it isn't the default profile,
 				// so that browsers will do a cache update unconditionally
 
-				$r = q("UPDATE `contact` SET `avatar-date` = '%s' WHERE `self` = 1 AND `uid` = %d LIMIT 1",
+				$r = q("UPDATE `contact` SET `avatar-date` = '%s' WHERE `self` = 1 AND `uid` = %d",
 					dbesc(datetime_convert()),
 					intval(local_user())
 				);
@@ -204,22 +204,22 @@ function profile_photo_content(&$a) {
 		if (($r[0]['album']== t('Profile Photos')) && ($havescale)){
 			$r=q("UPDATE `photo` SET `profile`=0 WHERE `profile`=1 AND `uid`=%d",
 				intval(local_user()));
-			
+
 			$r=q("UPDATE `photo` SET `profile`=1 WHERE `uid` = %d AND `resource-id` = '%s'",
 				intval(local_user()),
 				dbesc($resource_id)
 				);
-			
-			$r = q("UPDATE `contact` SET `avatar-date` = '%s' WHERE `self` = 1 AND `uid` = %d LIMIT 1",
+
+			$r = q("UPDATE `contact` SET `avatar-date` = '%s' WHERE `self` = 1 AND `uid` = %d",
 				dbesc(datetime_convert()),
 				intval(local_user())
 			);
-			
+
 			// Update global directory in background
 			$url = $_SESSION['my_url'];
 			if($url && strlen(get_config('system','directory_submit_url')))
 				proc_run('php',"include/directory.php","$url");
-			
+
 			goaway($a->get_baseurl() . '/profiles');
 			return; // NOTREACHED
 		}

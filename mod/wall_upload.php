@@ -9,7 +9,7 @@ function wall_upload_post(&$a) {
 	if($a->argc > 1) {
 	        if(! x($_FILES,'media')) {
 		        $nick = $a->argv[1];
-		        $r = q("SELECT `user`.*, `contact`.`id` FROM `user` LEFT JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
+		        $r = q("SELECT `user`.*, `contact`.`id` FROM `user` INNER JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
 			        dbesc($nick)
 		        );
 
@@ -18,7 +18,7 @@ function wall_upload_post(&$a) {
 		}
                 else {
 			$user_info = api_get_user($a);
-		        $r = q("SELECT `user`.*, `contact`.`id` FROM `user` LEFT JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
+		        $r = q("SELECT `user`.*, `contact`.`id` FROM `user` INNER JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
 			        dbesc($user_info['screen_name'])
 		        );
                 }

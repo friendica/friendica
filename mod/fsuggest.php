@@ -52,7 +52,7 @@ function fsuggest_post(&$a) {
 			);
 			if(count($r)) {
 				$fsuggest_id = $r[0]['id'];
-				q("UPDATE `fsuggest` SET `note` = '%s' WHERE `id` = %d AND `uid` = %d LIMIT 1",
+				q("UPDATE `fsuggest` SET `note` = '%s' WHERE `id` = %d AND `uid` = %d",
 					dbesc($note),
 					intval($fsuggest_id),
 					intval(local_user())

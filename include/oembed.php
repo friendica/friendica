@@ -12,6 +12,9 @@ function oembed_replacecb($matches){
 
 function oembed_fetch_url($embedurl){
 
+	$embedurl = trim($embedurl, "'");
+	$embedurl = trim($embedurl, '"');
+
 	$a = get_app();
 
 	$txt = Cache::get($a->videowidth . $embedurl);
@@ -48,9 +51,18 @@ function oembed_fetch_url($embedurl){
 		}
 
 		if ($txt==false || $txt==""){
-			// try oohembed service
-			$ourl = "http://oohembed.com/oohembed/?url=".urlencode($embedurl).'&maxwidth=' . $a->videowidth;  
-			$txt = fetch_url($ourl);
+			$embedly = get_config("system", "embedly");
+			if ($embedly == "") {
+				// try oohembed service
+				$ourl = "http://oohembed.com/oohembed/?url=".urlencode($embedurl).'&maxwidth=' . $a->videowidth;
+				$txt = fetch_url($ourl);
+			} else {
+				// try embedly service
+				$ourl = "https://api.embed.ly/1/oembed?key=".$embedly."&url=".urlencode($embedurl);
+				$txt = fetch_url($ourl);
+			}
+
+			logger("oembed_fetch_url: ".$txt, LOGGER_DEBUG);
 		}
 
 		$txt=trim($txt);
@@ -62,6 +74,10 @@ function oembed_fetch_url($embedurl){
 	}
 
 	$j = json_decode($txt);
+
+	if (!is_object($j))
+		return false;
+
 	$j->embedurl = $embedurl;
 	return $j;
 }
@@ -82,7 +98,7 @@ function oembed_format_object($j){
 				$th=120; $tw = $th*$tr;
 				$tpl=get_markup_template('oembed_video.tpl');
 				$ret.=replace_macros($tpl, array(
-                    '$baseurl' => $a->get_baseurl(),
+				'$baseurl' => $a->get_baseurl(),
 					'$embedurl'=>$embedurl,
 					'$escapedhtml'=>base64_encode($jhtml),
 					'$tw'=>$tw,
@@ -105,16 +121,34 @@ function oembed_format_object($j){
 		}; break;
 		case "rich": {
 			// not so safe..
-			$ret.= $jhtml;
+			if (!get_config("system","no_oembed_rich_content"))
+				$ret.= $jhtml;
 		}; break;
 	}
 
 	// add link to source if not present in "rich" type
 	if ($j->type!='rich' || !strpos($j->html,$embedurl) ){
-		if (isset($j->provider_name)) $ret .= $j->provider_name.": ";
-		$embedlink = (isset($j->title))?$j->title:$embedurl;
-		$ret .= "<a href='$embedurl' rel='oembed'>$embedlink</a>";
-		if (isset($j->author_name)) $ret.=" (".$j->author_name.")";
+		if (isset($j->title)) {
+			if (isset($j->provider_name))
+				$ret .= $j->provider_name.": ";
+
+			$embedlink = (isset($j->title))?$j->title:$embedurl;
+			$ret .= "<a href='$embedurl' rel='oembed'>$embedlink</a>";
+			if (isset($j->author_name))
+				$ret.=" (".$j->author_name.")";
+		} elseif (isset($j->provider_name) OR isset($j->author_name)) {
+			$embedlink = "";
+			if (isset($j->provider_name))
+				$embedlink .= $j->provider_name;
+
+			if (isset($j->author_name)) {
+				if ($embedlink != "")
+					$embedlink .= ": ";
+
+				$embedlink .= $j->author_name;
+			}
+			$ret .= "<a href='$embedurl' rel='oembed'>$embedlink</a>";
+		}
 		//if (isset($j->author_name)) $ret.=" by ".$j->author_name;
 		//if (isset($j->provider_name)) $ret.=" on ".$j->provider_name;
 	} else {

@@ -1,5 +1,5 @@
 <!DOCTYPE html >
-<html>
+<html itemscope itemtype="http://schema.org/Blog" />
 <head>
   <title><?php if(x($page,'title')) echo $page['title'] ?></title>
   <script>var baseurl="<?php echo $a->get_baseurl() ?>";</script>

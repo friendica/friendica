@@ -191,6 +191,10 @@ if(strlen($a->module)) {
 	if ($a->module == "stream")
 		$a->module = "network";
 
+	// Compatibility with the Firefox App
+	if (($a->module == "users") AND ($a->cmd == "users/sign_in"))
+		$a->module = "login";
+
 	$privateapps = get_config('config','private_addons');
 
 	if(is_array($a->plugins) && in_array($a->module,$a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
@@ -461,7 +465,7 @@ if ($_GET["mode"] == "raw") {
 	exit;
 
 } elseif (get_pconfig(local_user(),'system','infinite_scroll')
-          AND ($_GET["q"] == "network") AND ($_GET["mode"] != "minimal")) {
+          AND ($a->module == "network") AND ($_GET["mode"] != "minimal")) {
 	if (is_string($_GET["page"]))
 		$pageno = $_GET["page"];
 	else

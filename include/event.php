@@ -207,7 +207,7 @@ function event_store($arr) {
 
 	$arr['created'] = (($arr['created']) ? $arr['created'] : datetime_convert());
 	$arr['edited']  = (($arr['edited']) ? $arr['edited'] : datetime_convert());
-	$arr['type']    = (($arr['type']) ? $arr['type'] : 'event' );	
+	$arr['type']    = (($arr['type']) ? $arr['type'] : 'event' );
 	$arr['cid']     = ((intval($arr['cid'])) ? intval($arr['cid']) : 0);
 	$arr['uri']     = (x($arr,'uri') ? $arr['uri'] : item_new_uri($a->get_hostname(),$arr['uid']));
 	$arr['private'] = ((x($arr,'private')) ? intval($arr['private']) : 0);
@@ -263,7 +263,7 @@ function event_store($arr) {
 			`allow_gid` = '%s',
 			`deny_cid` = '%s',
 			`deny_gid` = '%s'
-			WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			WHERE `id` = %d AND `uid` = %d",
 
 			dbesc($arr['edited']),
 			dbesc($arr['start']),
@@ -291,7 +291,7 @@ function event_store($arr) {
 			$object .= '</object>' . "\n";
 
 
-			q("UPDATE `item` SET `body` = '%s', `object` = '%s', `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `edited` = '%s', `private` = %d WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			q("UPDATE `item` SET `body` = '%s', `object` = '%s', `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `edited` = '%s', `private` = %d WHERE `id` = %d AND `uid` = %d",
 				dbesc(format_event_bbcode($arr)),
 				dbesc($object),
 				dbesc($arr['allow_cid']),
@@ -390,7 +390,7 @@ function event_store($arr) {
 
 
 		if($item_id) {
-			q("UPDATE `item` SET `plink` = '%s', `event-id` = %d  WHERE `uid` = %d AND `id` = %d LIMIT 1",
+			q("UPDATE `item` SET `plink` = '%s', `event-id` = %d  WHERE `uid` = %d AND `id` = %d",
 				dbesc($plink),
 				intval($event['id']),
 				intval($arr['uid']),

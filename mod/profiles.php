@@ -19,7 +19,7 @@ function profiles_init(&$a) {
 			goaway($a->get_baseurl(true) . '/profiles');
 			return; // NOTREACHED
 		}
-		
+
 		check_form_security_token_redirectOnErr('/profiles', 'profile_drop', 't');
 
 		// move every contact using this profile as their default to the user default
@@ -29,7 +29,7 @@ function profiles_init(&$a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		$r = q("DELETE FROM `profile` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+		$r = q("DELETE FROM `profile` WHERE `id` = %d AND `uid` = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
@@ -45,7 +45,7 @@ function profiles_init(&$a) {
 
 
 	if(($a->argc > 1) && ($a->argv[1] === 'new')) {
-		
+
 		check_form_security_token_redirectOnErr('/profiles', 'profile_new', 't');
 
 		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
@@ -56,7 +56,7 @@ function profiles_init(&$a) {
 
 		$r1 = q("SELECT `name`, `photo`, `thumb` FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
 			intval(local_user()));
-		
+
 		$r2 = q("INSERT INTO `profile` (`uid` , `profile-name` , `name`, `photo`, `thumb`)
 			VALUES ( %d, '%s', '%s', '%s', '%s' )",
 			intval(local_user()),
@@ -74,12 +74,12 @@ function profiles_init(&$a) {
 		info( t('New profile created.') . EOL);
 		if(count($r3) == 1)
 			goaway($a->get_baseurl(true) . '/profiles/' . $r3[0]['id']);
-		
+
 		goaway($a->get_baseurl(true) . '/profiles');
-	} 
+	}
 
 	if(($a->argc > 2) && ($a->argv[1] === 'clone')) {
-		
+
 		check_form_security_token_redirectOnErr('/profiles', 'profile_clone', 't');
 
 		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
@@ -98,16 +98,16 @@ function profiles_init(&$a) {
 		}
 		unset($r1[0]['id']);
 		$r1[0]['is-default'] = 0;
-		$r1[0]['publish'] = 0;	
-		$r1[0]['net-publish'] = 0;	
+		$r1[0]['publish'] = 0;
+		$r1[0]['net-publish'] = 0;
 		$r1[0]['profile-name'] = dbesc($name);
 
 		dbesc_array($r1[0]);
 
-		$r2 = dbq("INSERT INTO `profile` (`" 
-			. implode("`, `", array_keys($r1[0])) 
-			. "`) VALUES ('" 
-			. implode("', '", array_values($r1[0])) 
+		$r2 = dbq("INSERT INTO `profile` (`"
+			. implode("`, `", array_keys($r1[0]))
+			. "`) VALUES ('"
+			. implode("', '", array_values($r1[0]))
 			. "')" );
 
 		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
@@ -117,9 +117,9 @@ function profiles_init(&$a) {
 		info( t('New profile created.') . EOL);
 		if(count($r3) == 1)
 			goaway($a->get_baseurl(true) . '/profiles/' . $r3[0]['id']);
-		
+
 		goaway($a->get_baseurl(true) . '/profiles');
-		
+
 		return; // NOTREACHED
 	}
 
@@ -160,9 +160,9 @@ function profiles_post(&$a) {
 			notice( t('Profile not found.') . EOL);
 			return;
 		}
-		
+
 		check_form_security_token_redirectOnErr('/profiles', 'profile_edit');
-		
+
 		$is_default = (($orig[0]['is-default']) ? 1 : 0);
 
 		$profile_name = notags(trim($_POST['profile_name']));
@@ -170,7 +170,7 @@ function profiles_post(&$a) {
 			notify( t('Profile Name is required.') . EOL);
 			return;
 		}
-	
+
 		$year = intval($_POST['year']);
 		if($year < 1900 || $year > 2100 || $year < 0)
 			$year = 0;
@@ -259,7 +259,7 @@ function profiles_post(&$a) {
 							intval(local_user())
 						);
 					}*/
-					
+
 					$r = q("SELECT * FROM `contact` WHERE `name` = '%s' AND `uid` = %d LIMIT 1",
 						dbesc($newname),
 						intval(local_user())
@@ -288,6 +288,10 @@ function profiles_post(&$a) {
 
 		$sexual = notags(trim($_POST['sexual']));
 		$homepage = notags(trim($_POST['homepage']));
+		if (strpos($homepage, 'http') !== 0) {
+		    // neither http nor https in URL, add them
+		    $homepage = 'http://'.$homepage;
+		}
 		$hometown = notags(trim($_POST['hometown']));
 		$politic = notags(trim($_POST['politic']));
 		$religion = notags(trim($_POST['religion']));
@@ -372,9 +376,9 @@ function profiles_post(&$a) {
 
 			profile_activity($changes,$value);
 
-		}			
-			
-		$r = q("UPDATE `profile` 
+		}
+
+		$r = q("UPDATE `profile`
 			SET `profile-name` = '%s',
 			`name` = '%s',
 			`pdesc` = '%s',
@@ -408,7 +412,7 @@ function profiles_post(&$a) {
 			`work` = '%s',
 			`education` = '%s',
 			`hide-friends` = %d
-			WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			WHERE `id` = %d AND `uid` = %d",
 			dbesc($profile_name),
 			dbesc($name),
 			dbesc($pdesc),
@@ -451,11 +455,11 @@ function profiles_post(&$a) {
 
 
 		if($namechanged && $is_default) {
-			$r = q("UPDATE `contact` SET `name-date` = '%s' WHERE `self` = 1 AND `uid` = %d LIMIT 1",
+			$r = q("UPDATE `contact` SET `name-date` = '%s' WHERE `self` = 1 AND `uid` = %d",
 				dbesc(datetime_convert()),
 				intval(local_user())
 			);
-			$r = q("UPDATE `user` set `username` = '%s' where `uid` = %d limit 1",
+			$r = q("UPDATE `user` set `username` = '%s' where `uid` = %d",
 				dbesc($name),
 				intval(local_user())
 			);
@@ -554,7 +558,7 @@ function profile_activity($changed, $value) {
 	if($i) {
 
 		// give it a permanent link
-		q("update item set plink = '%s' where id = %d limit 1",
+		q("update item set plink = '%s' where id = %d",
 			dbesc($a->get_baseurl() . '/display/' . $a->user['nickname'] . '/' . $i),
 			intval($i)
 		);

@@ -12,8 +12,8 @@ function mood_init(&$a) {
 
 	$uid = local_user();
 	$verb = notags(trim($_GET['verb']));
-	
-	if(! $verb) 
+
+	if(! $verb)
 		return;
 
 	$verbs = get_mood_verbs();
@@ -30,7 +30,7 @@ function mood_init(&$a) {
 
 
 	if($parent) {
-		$r = q("select uri, private, allow_cid, allow_gid, deny_cid, deny_gid 
+		$r = q("select uri, private, allow_cid, allow_gid, deny_cid, deny_gid
 			from item where id = %d and parent = %d and uid = %d limit 1",
 			intval($parent),
 			intval($parent),
@@ -90,7 +90,7 @@ function mood_init(&$a) {
 
 	$item_id = item_store($arr);
 	if($item_id) {
-		q("UPDATE `item` SET `plink` = '%s' WHERE `uid` = %d AND `id` = %d LIMIT 1",
+		q("UPDATE `item` SET `plink` = '%s' WHERE `uid` = %d AND `id` = %d",
 			dbesc($a->get_baseurl() . '/display/' . $poster['nickname'] . '/' . $item_id),
 			intval($uid),
 			intval($item_id)

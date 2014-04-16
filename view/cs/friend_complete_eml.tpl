@@ -1,17 +1,22 @@
 
-Milý/Milá $username,
+Drahý/Drahá $[username],
 
-        Skvělé zprávy... '$fn' na '$dfrn_url' odsouhlasil Váš požadavek na spojení na '$sitename'.
+	Skvělé zprávy... '$[fn]' na '$[dfrn_url]' akceptoval 
+Vaši žádost o spojení na '$[sitename]'.
 
-Jste nyní přátelé a můžete si vyměňovat aktualizace statusu, fotek a e-mailů bez omezení.
+Jste nyní vzájemnými přáteli a můžete si vyměňovat aktualizace statusu, fotografií a emailů
+bez omezení.
 
-Pokud budete chtít tento vztah jakkoliv upravit, navštivte Vaši stránku "Kontakty" na $sitename.
+Navštivte prosím stránku "Kontakty" na $[sitename] pokud si přejete provést 
+jakékoliv změny v tomto vztahu. 
 
-$siteurl
+$[siteurl]
 
-(Nyní můžete například vytvořit separátní profil s informacemi, které nebudou viditelné veřejně, a nastavit právo pro zobrazení tohoto profilu pro '$fn').
+[Například můžete vytvořit separátní profil s informacemi, které nebudou
+dostupné pro veřejnost - a přidělit práva k němu pro čtení pro '$[fn]'].
 
 S pozdravem,
 
-        $sitename administrátor
+	$[sitename] administrátor
 
+ 

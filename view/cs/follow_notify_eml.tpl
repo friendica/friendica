@@ -1,14 +1,14 @@
 
-Milý/Milá $username,
+Drahý/Drahá $[myname],
 
-Máte nového následovatele na $sitename -  '$requestor'.
+Máte nového následovatele na $[sitename] -  '$[requestor]'.
 
-Můžete si prohlédnout jeho/její profil na $url.
+Můžete si zobrazit jeho profil na $[url].
 
-Přihlaste se na váš server k odsouhlasení nebo ignorování/zrušení žádosti.
+Prosím, přihlaste se na Vašem webu pro odsouhlasení nebo ignorování/zrušení této žádosti
 
-$siteurl
+$[siteurl]
 
-S pozdravem,
+S pozdravem
 
-        $sitename administrátor
+	$[sitename] administrátor

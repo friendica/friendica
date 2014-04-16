@@ -40,14 +40,14 @@ function notify_content(&$a) {
 		return login();
 
 		$notif_tpl = get_markup_template('notifications.tpl');
-		
+
 		$not_tpl = get_markup_template('notify.tpl');
 		require_once('include/bbcode.php');
 
 		$r = q("SELECT * from notify where uid = %d and seen = 0 order by date desc",
 			intval(local_user())
 		);
-		
+
 		if (count($r) > 0) {
 			foreach ($r as $it) {
 				$notif_content .= replace_macros($not_tpl,array(
@@ -60,7 +60,7 @@ function notify_content(&$a) {
 		} else {
 			$notif_content .= t('No more system notifications.');
 		}
-		
+
 		$o .= replace_macros($notif_tpl, array(
 			'$notif_header' => t('System Notifications'),
 			'$tabs' => '', // $tabs,

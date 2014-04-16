@@ -28,7 +28,7 @@ function crepair_init(&$a) {
 			$o .= '</div>';
 			$a->page['aside'] .= $o;
 
-	}	
+	}
 }
 
 
@@ -59,9 +59,10 @@ function crepair_post(&$a) {
 	$poll    = ((x($_POST,'poll')) ? $_POST['poll'] : '');
 	$attag   = ((x($_POST,'attag')) ? $_POST['attag'] : '');
 	$photo   = ((x($_POST,'photo')) ? $_POST['photo'] : '');
+	$remote_self = ((x($_POST,'remote_self')) ? $_POST['remote_self'] : false);
 
-	$r = q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `url` = '%s', `request` = '%s', `confirm` = '%s', `notify` = '%s', `poll` = '%s', `attag` = '%s' 
-		WHERE `id` = %d AND `uid` = %d LIMIT 1",
+	$r = q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `url` = '%s', `request` = '%s', `confirm` = '%s', `notify` = '%s', `poll` = '%s', `attag` = '%s' , `remote_self` = %d
+		WHERE `id` = %d AND `uid` = %d",
 		dbesc($name),
 		dbesc($nick),
 		dbesc($url),
@@ -70,6 +71,7 @@ function crepair_post(&$a) {
 		dbesc($notify),
 		dbesc($poll),
 		dbesc($attag),
+		intval($remote_self),
 		intval($contact['id']),
 		local_user()
 	);
@@ -86,7 +88,7 @@ function crepair_post(&$a) {
 			`name-date` = '%s',
 			`uri-date` = '%s',
 			`avatar-date` = '%s'
-			WHERE `id` = %d LIMIT 1
+			WHERE `id` = %d
 			",
 			dbesc($photos[0]),
 			dbesc($photos[1]),
@@ -154,6 +156,9 @@ function crepair_content(&$a) {
 		'$label_notify' => t('Notification Endpoint URL'),
 		'$label_poll' => t('Poll/Feed URL'),
 		'$label_photo' => t('New photo from this URL'),
+		'$label_remote_self' => t('Remote Self'),
+		'$allow_remote_self' => get_config('system','allow_users_remote_self'),
+		'$remote_self' => array('remote_self', t('Mirror postings from this contact'), $contact['remote_self'], t('Mark this contact as remote_self, this will cause friendica to repost new entries from this contact.')),  
 		'$contact_name' => $contact['name'],
 		'$contact_nick' => $contact['nick'],
 		'$contact_id'   => $contact['id'],
@@ -164,7 +169,7 @@ function crepair_content(&$a) {
 		'$poll'         => $contact['poll'],
 		'$contact_attag'  => $contact['attag'],
 		'$lbl_submit'   => t('Submit')
-	));
+	    ));
 
 	return $o;
 

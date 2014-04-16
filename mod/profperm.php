@@ -6,7 +6,7 @@ function profperm_init(&$a) {
 		return;
 
 	$which = $a->user['nickname'];
-	$profile = $a->argv[1];		
+	$profile = $a->argv[1];
 
 	profile_load($a,$which,$profile);
 
@@ -36,7 +36,7 @@ function profperm_content(&$a) {
 
 
 	if(($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
-		$r = q("SELECT `id` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `self` = 0 
+		$r = q("SELECT `id` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `self` = 0
 			AND `network` = 'dfrn' AND `id` = %d AND `uid` = %d LIMIT 1",
 			intval($a->argv[2]),
 			intval(local_user())
@@ -71,13 +71,13 @@ function profperm_content(&$a) {
 
 		if($change) {
 			if(in_array($change,$ingroup)) {
-				q("UPDATE `contact` SET `profile-id` = 0 WHERE `id` = %d AND `uid` = %d LIMIT 1",
+				q("UPDATE `contact` SET `profile-id` = 0 WHERE `id` = %d AND `uid` = %d",
 					intval($change),
 					intval(local_user())
 				);
 			}
 			else {
-				q("UPDATE `contact` SET `profile-id` = %d WHERE `id` = %d AND `uid` = %d LIMIT 1",
+				q("UPDATE `contact` SET `profile-id` = %d WHERE `id` = %d AND `uid` = %d",
 					intval($a->argv[1]),
 					intval($change),
 					intval(local_user())

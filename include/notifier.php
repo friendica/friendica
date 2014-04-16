@@ -207,7 +207,7 @@ function notifier_run(&$argv, &$argc){
 	$r = q("SELECT `contact`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey`, 
 		`user`.`timezone`, `user`.`nickname`, `user`.`sprvkey`, `user`.`spubkey`, 
 		`user`.`page-flags`, `user`.`prvnets`
-		FROM `contact` LEFT JOIN `user` ON `user`.`uid` = `contact`.`uid` 
+		FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid` 
 		WHERE `contact`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
 		intval($uid)
 	);
@@ -241,31 +241,31 @@ function notifier_run(&$argv, &$argc){
 
 		// if $parent['wall'] == 1 we will already have the parent message in our array
 		// and we will relay the whole lot.
- 
+
 		// expire sends an entire group of expire messages and cannot be forwarded.
-		// However the conversation owner will be a part of the conversation and will 
+		// However the conversation owner will be a part of the conversation and will
 		// be notified during this run.
 		// Other DFRN conversation members will be alerted during polled updates.
 
 
 
 		// Diaspora members currently are not notified of expirations, and other networks have
-		// either limited or no ability to process deletions. We should at least fix Diaspora 
+		// either limited or no ability to process deletions. We should at least fix Diaspora
 		// by stringing togther an array of retractions and sending them onward.
-		 
-  	
+
+
 		$localhost = str_replace('www.','',$a->get_hostname());
 		if(strpos($localhost,':'))
 			$localhost = substr($localhost,0,strpos($localhost,':'));
 
 		/**
 		 *
-		 * Be VERY CAREFUL if you make any changes to the following several lines. Seemingly innocuous changes 
-		 * have been known to cause runaway conditions which affected several servers, along with 
-		 * permissions issues. 
+		 * Be VERY CAREFUL if you make any changes to the following several lines. Seemingly innocuous changes
+		 * have been known to cause runaway conditions which affected several servers, along with
+		 * permissions issues.
 		 *
 		 */
- 
+
 		$relay_to_owner = false;
 
 		if((! $top_level) && ($parent['wall'] == 0) && (! $expire) && (stristr($target_item['uri'],$localhost))) {
@@ -274,8 +274,8 @@ function notifier_run(&$argv, &$argc){
 
 
 		if(($cmd === 'uplink') && (intval($parent['forum_mode']) == 1) && (! $top_level)) {
-			$relay_to_owner = true;			
-		} 
+			$relay_to_owner = true;
+		}
 
 		// until the 'origin' flag has been in use for several months
 		// we will just use it as a fallback test
@@ -443,7 +443,7 @@ function notifier_run(&$argv, &$argc){
 			set_config('system','site_prvkey', $res['prvkey']);
 			set_config('system','site_pubkey', $res['pubkey']);
 		}
-		
+
 		$rp = q("SELECT `resource-id` , `scale`, type FROM `photo` 
 						WHERE `profile` = 1 AND `uid` = %d ORDER BY scale;", $uid);
 		$photos = array();
@@ -452,7 +452,7 @@ function notifier_run(&$argv, &$argc){
 			$photos[$p['scale']] = $a->get_baseurl().'/photo/'.$p['resource-id'].'-'.$p['scale'].'.'.$ext[$p['type']];
 		}
 		unset($rp, $ext);
-		
+
         $atom .= replace_macros($sugg_template, array(
             '$name' => xmlify($owner['name']),
             '$photo' => xmlify($photos[4]),
@@ -577,12 +577,12 @@ function notifier_run(&$argv, &$argc){
 		// This controls the number of deliveries to execute with each separate delivery process.
 		// By default we'll perform one delivery per process. Assuming a hostile shared hosting
 		// provider, this provides the greatest chance of deliveries if processes start getting 
-		// killed. We can also space them out with the delivery_interval to also help avoid them 
+		// killed. We can also space them out with the delivery_interval to also help avoid them
 		// getting whacked.
 
-		// If $deliveries_per_process > 1, we will chain this number of multiple deliveries 
-		// together into a single process. This will reduce the overall number of processes 
-		// spawned for each delivery, but they will run longer. 
+		// If $deliveries_per_process > 1, we will chain this number of multiple deliveries
+		// together into a single process. This will reduce the overall number of processes
+		// spawned for each delivery, but they will run longer.
 
 		$deliveries_per_process = intval(get_config('system','delivery_batch_count'));
 		if($deliveries_per_process <= 0)
@@ -597,8 +597,8 @@ function notifier_run(&$argv, &$argc){
 				continue;
 
 			// potentially more than one recipient. Start a new process and space them out a bit.
-			// we will deliver single recipient types of message and email recipients here. 
-		
+			// we will deliver single recipient types of message and email recipients here.
+
 			if((! $mail) && (! $fsuggest) && (!$relocate) && (! $followup)) {
 
 				$this_batch[] = $contact['id'];
@@ -635,15 +635,15 @@ function notifier_run(&$argv, &$argc){
 						else
 							$sql_extra = sprintf(" AND `issued-id` = '%s' ", dbesc($contact['dfrn-id']));
 
-						$x = q("SELECT	`contact`.*, `contact`.`uid` AS `importer_uid`, 
-							`contact`.`pubkey` AS `cpubkey`, 
-							`contact`.`prvkey` AS `cprvkey`, 
-							`contact`.`thumb` AS `thumb`, 
+						$x = q("SELECT	`contact`.*, `contact`.`uid` AS `importer_uid`,
+							`contact`.`pubkey` AS `cpubkey`,
+							`contact`.`prvkey` AS `cprvkey`,
+							`contact`.`thumb` AS `thumb`,
 							`contact`.`url` as `url`,
 							`contact`.`name` as `senderName`,
-							`user`.* 
-							FROM `contact` 
-							LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid` 
+							`user`.*
+							FROM `contact`
+							INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
 							WHERE `contact`.`blocked` = 0 AND `contact`.`archive` = 0
 							AND `contact`.`pending` = 0
 							AND `contact`.`network` = '%s' AND `user`.`nickname` = '%s'
@@ -656,7 +656,7 @@ function notifier_run(&$argv, &$argc){
 						if($x && count($x)) {
 							$write_flag = ((($x[0]['rel']) && ($x[0]['rel'] != CONTACT_IS_SHARING)) ? true : false);
 							if((($owner['page-flags'] == PAGE_COMMUNITY) || ($write_flag)) && (! $x[0]['writable'])) {
-								q("update contact set writable = 1 where id = %d limit 1",
+								q("update contact set writable = 1 where id = %d",
 									intval($x[0]['id'])
 								);
 								$x[0]['writable'] = 1;
@@ -696,6 +696,7 @@ function notifier_run(&$argv, &$argc){
 					// Do not send to ostatus if we are not configured to send to public networks
 					if($owner['prvnets'])
 						break;
+
 					if(get_config('system','ostatus_disabled') || get_config('system','dfrn_only'))
 						break;
 
@@ -707,8 +708,7 @@ function notifier_run(&$argv, &$argc){
 							// queue message for redelivery
 							add_to_queue($contact['id'],NETWORK_OSTATUS,$slap);
 						}
-					}
-					else {
+					} else {
 
 						// only send salmon if public - e.g. if it's ok to notify
 						// a public hub, it's ok to send a salmon
@@ -730,7 +730,7 @@ function notifier_run(&$argv, &$argc){
 
 				case NETWORK_MAIL:
 				case NETWORK_MAIL2:
-						
+
 					if(get_config('system','dfrn_only'))
 						break;
 
@@ -755,7 +755,7 @@ function notifier_run(&$argv, &$argc){
 						}
 						if(! $it)
 							break;
-						
+
 
 
 						$local_user = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
@@ -763,7 +763,7 @@ function notifier_run(&$argv, &$argc){
 						);
 						if(! count($local_user))
 							break;
-						
+
 						$reply_to = '';
 						$r1 = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 							intval($uid)
@@ -847,7 +847,7 @@ function notifier_run(&$argv, &$argc){
 
 					if(! $contact['pubkey'])
 						break;
-					
+
 					if($target_item['verb'] === ACTIVITY_DISLIKE) {
 						// unsupported
 						break;
@@ -906,14 +906,14 @@ function notifier_run(&$argv, &$argc){
 
 	if($public_message) {
 
-		$r1 = q("SELECT DISTINCT(`batch`), `id`, `name`,`network` FROM `contact` WHERE `network` = '%s' 
+		$r1 = q("SELECT DISTINCT(`batch`), `id`, `name`,`network` FROM `contact` WHERE `network` = '%s'
 			AND `uid` = %d AND `rel` != %d group by `batch` ORDER BY rand() ",
 			dbesc(NETWORK_DIASPORA),
 			intval($owner['uid']),
 			intval(CONTACT_IS_SHARING)
 		);
-			
-		$r2 = q("SELECT `id`, `name`,`network` FROM `contact` 
+
+		$r2 = q("SELECT `id`, `name`,`network` FROM `contact`
 			WHERE `network` in ( '%s', '%s')  AND `uid` = %d AND `blocked` = 0 AND `pending` = 0 AND `archive` = 0
 			AND `rel` != %d order by rand() ",
 			dbesc(NETWORK_DFRN),

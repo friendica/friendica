@@ -595,7 +595,7 @@ class Photo {
                 `allow_gid` = '%s',
                 `deny_cid` = '%s',
                 `deny_gid` = '%s'
-                where id = %d limit 1",
+                where id = %d",
 
                 intval($uid),
                 intval($cid),

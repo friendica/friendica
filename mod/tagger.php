@@ -60,9 +60,9 @@ function tagger_content(&$a) {
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
 	$xterm = xmlify($term);
 	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
-	$targettype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE ); 
+	$targettype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE );
 
-	$link = xmlify('<link rel="alternate" type="text/html" href="' 
+	$link = xmlify('<link rel="alternate" type="text/html" href="'
 		. $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 
 	$body = xmlify($item['body']);
@@ -136,20 +136,20 @@ EOT;
 	$arr['last-child'] = 1;
 	$arr['origin'] = 1;
 
-	$post_id = item_store($arr);	
+	$post_id = item_store($arr);
 
-	q("UPDATE `item` set plink = '%s' where id = %d limit 1",
+	q("UPDATE `item` set plink = '%s' where id = %d",
 		dbesc($a->get_baseurl() . '/display/' . $owner_nick . '/' . $post_id),
 		intval($post_id)
 	);
-		
+
 
 	if(! $item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d LIMIT 1",
+		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval($item['id']),
 			intval($owner_uid)
 		);
-	}			
+	}
 
 	$term_objtype = (($item['resource-id']) ? TERM_OBJ_PHOTO : TERM_OBJ_POST );
         $t = q("SELECT count(tid) as tcount FROM term WHERE oid=%d AND term='%s'",
@@ -157,7 +157,7 @@ EOT;
                 dbesc($term)
         );
 	if((! $blocktags) && $t[0]['tcount']==0 ) {
-		/*q("update item set tag = '%s' where id = %d limit 1",
+		/*q("update item set tag = '%s' where id = %d",
 			dbesc($item['tag'] . (strlen($item['tag']) ? ',' : '') . '#[url=' . $a->get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
 			intval($item['id'])
 		);*/
@@ -171,7 +171,7 @@ EOT;
 		   intval($owner_uid)
 		);
 	}
-	
+
 	// if the original post is on this site, update it.
 
 	$r = q("select `tag`,`id`,`uid` from item where `origin` = 1 AND `uri` = '%s' LIMIT 1",
@@ -197,14 +197,14 @@ EOT;
 		}
 
 		/*if(count($x) && !$x[0]['blocktags'] && (! stristr($r[0]['tag'], ']' . $term . '['))) {
-			q("update item set tag = '%s' where id = %d limit 1",
+			q("update item set tag = '%s' where id = %d",
 				dbesc($r[0]['tag'] . (strlen($r[0]['tag']) ? ',' : '') . '#[url=' . $a->get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
 				intval($r[0]['id'])
 			);
 		}*/
 
 	}
-		
+
 
 	$arr['id'] = $post_id;
 

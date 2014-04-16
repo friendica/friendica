@@ -27,7 +27,7 @@ function profile_init(&$a) {
 	$profile = 0;
 	if((local_user()) && ($a->argc > 2) && ($a->argv[2] === 'view')) {
 		$which = $a->user['nickname'];
-		$profile = $a->argv[1];		
+		$profile = $a->argv[1];
 	}
 	else {
 		auto_redir($a, $which);
@@ -41,7 +41,7 @@ function profile_init(&$a) {
 	if((x($a->profile,'page-flags')) && ($a->profile['page-flags'] == PAGE_COMMUNITY)) {
 		$a->page['htmlhead'] .= '<meta name="friendica.community" content="true" />';
 	}
-	if(x($a->profile,'openidserver'))				
+	if(x($a->profile,'openidserver'))
 		$a->page['htmlhead'] .= '<link rel="openid.server" href="' . $a->profile['openidserver'] . '" />' . "\r\n";
 	if(x($a->profile,'openid')) {
 		$delegate = ((strstr($a->profile['openid'],'://')) ? $a->profile['openid'] : 'http://' . $a->profile['openid']);
@@ -60,7 +60,7 @@ function profile_init(&$a) {
 	$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $a->get_hostname() . (($a->path) ? '/' . $a->path : ''));
 	$a->page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . $a->get_baseurl() . '/xrd/?uri=' . $uri . '" />' . "\r\n";
 	header('Link: <' . $a->get_baseurl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
-  	
+
 	$dfrn_pages = array('request', 'confirm', 'notify', 'poll');
 	foreach($dfrn_pages as $dfrn)
 		$a->page['htmlhead'] .= "<link rel=\"dfrn-{$dfrn}\" href=\"".$a->get_baseurl()."/dfrn_{$dfrn}/{$which}\" />\r\n";
@@ -217,38 +217,43 @@ function profile_content(&$a, $update = 0) {
 
 	if($update) {
 
-		$r = q("SELECT distinct(parent) AS `item_id`, `contact`.`uid` AS `contact-uid`
-			FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`,
+			`contact`.`uid` AS `contact-uid`
+			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND
 			(`item`.`deleted` = 0 OR item.verb = '" . ACTIVITY_LIKE ."' OR item.verb = '" . ACTIVITY_DISLIKE . "')
 			and `item`.`moderated` = 0 and `item`.`unseen` = 1
-			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			AND `item`.`wall` = 1
 			$sql_extra
 			ORDER BY `item`.`created` DESC",
 			intval($a->profile['profile_uid'])
 		);
 
-	}
-	else {
+	} else {
+		$sql_post_table = "";
 
 		if(x($category)) {
-			$sql_extra .= protect_sprintf(file_tag_file_query('item',$category,'category'));
+			$sql_post_table = sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
+				dbesc(protect_sprintf($category)), intval(TERM_OBJ_POST), intval(TERM_CATEGORY), intval($a->profile['profile_uid']));
+			//$sql_extra .= protect_sprintf(file_tag_file_query('item',$category,'category'));
 		}
 
 		if($datequery) {
-			$sql_extra2 .= protect_sprintf(sprintf(" AND item.created <= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery))));
+			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` <= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery))));
 		}
 		if($datequery2) {
-			$sql_extra2 .= protect_sprintf(sprintf(" AND item.created >= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery2))));
+			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` >= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery2))));
 		}
 
 		if( (! get_config('alt_pager', 'global')) && (! get_pconfig($a->profile['profile_uid'],'system','alt_pager')) ) {
 		    $r = q("SELECT COUNT(*) AS `total`
-			    FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-			    WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
-			    and `item`.`moderated` = 0 AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 
-			    AND `item`.`id` = `item`.`parent` AND `item`.`wall` = 1
+			    FROM `thread` INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
+			    $sql_post_table INNER JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
+			    AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
+			    WHERE `thread`.`uid` = %d AND `thread`.`visible` = 1 AND `thread`.`deleted` = 0
+			    and `thread`.`moderated` = 0
+			    AND `thread`.`wall` = 1
 			    $sql_extra $sql_extra2 ",
 			    intval($a->profile['profile_uid'])
 		    );
@@ -258,16 +263,16 @@ function profile_content(&$a, $update = 0) {
 			}
 		}
 
-		//  check if we serve a mobile device and get the user settings 
+		//  check if we serve a mobile device and get the user settings
 		//  accordingly
-		if ($a->is_mobile) { 
+		if ($a->is_mobile) {
 		    $itemspage_network = get_pconfig(local_user(),'system','itemspage_mobile_network');
 		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 20);
-		} else { 
+		} else {
 		    $itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
 		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 40);
 		}
-		//  now that we have the user settings, see if the theme forces 
+		//  now that we have the user settings, see if the theme forces
 		//  a maximum item number which is lower then the user choice
 		if(($a->force_max_items > 0) && ($a->force_max_items < $itemspage_network))
 			$itemspage_network = $a->force_max_items;
@@ -276,19 +281,19 @@ function profile_content(&$a, $update = 0) {
 
 		$pager_sql = sprintf(" LIMIT %d, %d ",intval($a->pager['start']), intval($a->pager['itemspage']));
 
-		// FROM `item` FORCE INDEX (created, uid) LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-
-		$r = q("SELECT `item`.`id` AS `item_id`, `contact`.`uid` AS `contact-uid`
-			FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
-			and `item`.`moderated` = 0 AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-			AND `item`.`id` = `item`.`parent` AND `item`.`wall` = 1
+		$r = q("SELECT `thread`.`iid` AS `item_id`, `thread`.`network` AS `item_network`,
+			`thread`.`uid` AS `contact-uid`
+			FROM `thread` INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
+			$sql_post_table INNER JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
+			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
+			WHERE `thread`.`uid` = %d AND `thread`.`visible` = 1 AND `thread`.`deleted` = 0
+			and `thread`.`moderated` = 0
+			AND `thread`.`wall` = 1
 			$sql_extra $sql_extra2
-			ORDER BY `item`.`created` DESC $pager_sql ",
+			ORDER BY `thread`.`created` DESC $pager_sql ",
 			intval($a->profile['profile_uid'])
 
 		);
-
 	}
 
 	$parents_arr = array();
@@ -299,9 +304,9 @@ function profile_content(&$a, $update = 0) {
 			$parents_arr[] = $rr['item_id'];
 		$parents_str = implode(', ', $parents_arr);
  
-		$items = q("SELECT `item`.*, `item`.`id` AS `item_id`, 
+		$items = q("SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`alias`, `contact`.`network`, `contact`.`rel`, 
-			`contact`.`thumb`, `contact`.`self`, `contact`.`writable`, 
+			`contact`.`thumb`, `contact`.`self`, `contact`.`writable`,
 			`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
 			FROM `item`, `contact`
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
@@ -313,7 +318,7 @@ function profile_content(&$a, $update = 0) {
 			intval($a->profile['profile_uid']),
 			dbesc($parents_str)
 		);
-		
+
 		$items = conv_sort($items,'created');
 	} else {
 		$items = array();

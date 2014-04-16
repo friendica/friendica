@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1166 );
+define( 'UPDATE_VERSION' , 1170 );
 
 /**
  *
@@ -92,7 +92,7 @@ function update_1006() {
 			$spkey = openssl_pkey_get_details($sres);
 			$spubkey = $spkey["key"];
 			$r = q("UPDATE `user` SET `spubkey` = '%s', `sprvkey` = '%s'
-				WHERE `uid` = %d LIMIT 1",
+				WHERE `uid` = %d",
 				dbesc($spubkey),
 				dbesc($sprvkey),
 				intval($rr['uid'])
@@ -123,7 +123,7 @@ function update_1011() {
 	$r = q("SELECT * FROM `contact` WHERE 1");
 	if(count($r)) {
 		foreach($r as $rr) {
-				q("UPDATE `contact` SET `nick` = '%s' WHERE `id` = %d LIMIT 1",
+				q("UPDATE `contact` SET `nick` = '%s' WHERE `id` = %d",
 					dbesc(basename($rr['url'])),
 					intval($rr['id'])
 				);
@@ -157,11 +157,11 @@ function update_1014() {
 	if(count($r)) {
 		foreach($r as $rr) {		
 			if(stristr($rr['thumb'],'avatar'))
-				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d LIMIT 1",
+				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('avatar','micro',$rr['thumb'])),
 					intval($rr['id']));
 			else
-				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d LIMIT 1",
+				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('5.jpg','6.jpg',$rr['thumb'])),
 					intval($rr['id']));
 		}
@@ -310,7 +310,7 @@ function update_1031() {
 	if($r && count($r)) {
 		foreach($r as $rr) {
 			if(strstr($rr['object'],'type=&quot;http')) {
-				q("UPDATE `item` SET `object` = '%s' WHERE `id` = %d LIMIT 1",
+				q("UPDATE `item` SET `object` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('type=&quot;http','href=&quot;http',$rr['object'])),
 					intval($rr['id'])
 				);
@@ -357,7 +357,7 @@ function update_1036() {
 	$r = dbq("SELECT * FROM `contact` WHERE `network` = 'dfrn' && `photo` LIKE '%include/photo%' ");
 	if(count($r)) {
 		foreach($r as $rr) {
-			q("UPDATE `contact` SET `photo` = '%s', `thumb` = '%s', `micro` = '%s' WHERE `id` = %d LIMIT 1",
+			q("UPDATE `contact` SET `photo` = '%s', `thumb` = '%s', `micro` = '%s' WHERE `id` = %d",
 				dbesc(str_replace('include/photo','photo',$rr['photo'])),
 				dbesc(str_replace('include/photo','photo',$rr['thumb'])),
 				dbesc(str_replace('include/photo','photo',$rr['micro'])),
@@ -595,7 +595,7 @@ function update_1074() {
 	$r = q("SELECT `uid` FROM `profile` WHERE `is-default` = 1 AND `hidewall` = 1");
 	if(count($r)) {
 		foreach($r as $rr)
-			q("UPDATE `user` SET `hidewall` = 1 WHERE `uid` = %d LIMIT 1",
+			q("UPDATE `user` SET `hidewall` = 1 WHERE `uid` = %d",
 				intval($rr['uid'])
 			);
 	}
@@ -617,7 +617,7 @@ function update_1075() {
 					$found = false;
 			} while ($found == true );
 
-			q("UPDATE `user` SET `guid` = '%s' WHERE `uid` = %d LIMIT 1",
+			q("UPDATE `user` SET `guid` = '%s' WHERE `uid` = %d",
 				dbesc($guid),
 				intval($rr['uid'])
 			);
@@ -736,7 +736,7 @@ function update_1087() {
 				intval($rr['id'])
 			);
 			if(count($x))
-				q("UPDATE `item` SET `commented` = '%s' WHERE `id` = %d LIMIT 1",
+				q("UPDATE `item` SET `commented` = '%s' WHERE `id` = %d",
 					dbesc($x[0]['cdate']),
 					intval($rr['id'])
 				);
@@ -855,7 +855,7 @@ function update_1100() {
 	$r = q("select id, url from contact where url != '' and nurl = '' ");
 	if(count($r)) {
 		foreach($r as $rr) {
-			q("update contact set nurl = '%s' where id = %d limit 1",
+			q("update contact set nurl = '%s' where id = %d",
 				dbesc(normalise_link($rr['url'])),
 				intval($rr['id'])
 			); 
@@ -1173,7 +1173,7 @@ function update_1136() {
 			foreach($arr as $x) {
 				if($x['cat'] == $rr['cat'] && $x['k'] == $rr['k']) {
 					$found = true;
-					q("delete from config where id = %d limit 1",
+					q("delete from config where id = %d",
 						intval($rr['id'])
 					);
 				}
@@ -1192,7 +1192,7 @@ function update_1136() {
 			foreach($arr as $x) {
 				if($x['uid'] == $rr['uid'] && $x['cat'] == $rr['cat'] && $x['k'] == $rr['k']) {
 					$found = true;
-					q("delete from pconfig where id = %d limit 1",
+					q("delete from pconfig where id = %d",
 						intval($rr['id'])
 					);
 				}
@@ -1523,6 +1523,80 @@ function update_1165() {
 		  ) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
 	if (!$r)
 		return UPDATE_FAILED;
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1166() {
+	$r = q("CREATE TABLE IF NOT EXISTS `unique_contacts` (
+			`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			`url` CHAR(255) NOT NULL,
+			`nick` CHAR(255) NOT NULL,
+			`name` CHAR(255) NOT NULL,
+			`avatar` CHAR(255) NOT NULL,
+			INDEX (`url`)
+		  ) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
+	if (!$r)
+		return UPDATE_FAILED;
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1167() {
+	$r = q("ALTER TABLE `contact` ADD `notify_new_posts` TINYINT(1) NOT NULL DEFAULT '0'");
+	if (!$r)
+		return UPDATE_FAILED;
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1168() {
+	$r = q("ALTER TABLE `contact` ADD `fetch_further_information` TINYINT(1) NOT NULL DEFAULT '0'");
+	if (!$r)
+		return UPDATE_FAILED;
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1169() {
+	$r = q("CREATE TABLE IF NOT EXISTS `thread` (
+		  `iid` int(10) unsigned NOT NULL DEFAULT '0',
+		  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+		  `contact-id` int(11) unsigned NOT NULL DEFAULT '0',
+		  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		  `edited` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		  `commented` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		  `received` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		  `changed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		  `wall` tinyint(1) NOT NULL DEFAULT '0',
+		  `private` tinyint(1) NOT NULL DEFAULT '0',
+		  `pubmail` tinyint(1) NOT NULL DEFAULT '0',
+		  `moderated` tinyint(1) NOT NULL DEFAULT '0',
+		  `visible` tinyint(1) NOT NULL DEFAULT '0',
+		  `spam` tinyint(1) NOT NULL DEFAULT '0',
+		  `starred` tinyint(1) NOT NULL DEFAULT '0',
+		  `bookmark` tinyint(1) NOT NULL DEFAULT '0',
+		  `unseen` tinyint(1) NOT NULL DEFAULT '1',
+		  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+		  `origin` tinyint(1) NOT NULL DEFAULT '0',
+		  `forum_mode` tinyint(1) NOT NULL DEFAULT '0',
+		  `mention` tinyint(1) NOT NULL DEFAULT '0',
+		  `network` char(32) NOT NULL,
+		  PRIMARY KEY (`iid`),
+		  KEY `created` (`created`),
+		  KEY `commented` (`commented`),
+		  KEY `uid_network_commented` (`uid`,`network`,`commented`),
+		  KEY `uid_network_created` (`uid`,`network`,`created`),
+		  KEY `uid_contactid_commented` (`uid`,`contact-id`,`commented`),
+		  KEY `uid_contactid_created` (`uid`,`contact-id`,`created`),
+		  KEY `wall_private_received` (`wall`,`private`,`received`),
+		  KEY `uid_created` (`uid`,`created`),
+		  KEY `uid_commented` (`uid`,`commented`)
+		) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
+	if (!$r)
+		return UPDATE_FAILED;
+
+	proc_run('php',"include/threadupdate.php");
 
 	return UPDATE_SUCCESS;
 }

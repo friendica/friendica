@@ -1,6 +1,7 @@
 Options -Indexes
 AddType application/x-java-archive .jar
 AddType audio/ogg .oga
+#AddHandler php53-cgi .php
 
 <FilesMatch "\.(out|log)$">
 Deny from all

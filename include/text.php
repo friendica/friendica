@@ -218,14 +218,16 @@ function xmlify($str) {
 				break;
 		}	
 	}*/
-
+	/*
 	$buffer = mb_ereg_replace("&", "&amp;", $str);
 	$buffer = mb_ereg_replace("'", "&apos;", $buffer);
-	$buffer = mb_ereg_replace("\"", "&quot;", $buffer);
+	$buffer = mb_ereg_replace('"', "&quot;", $buffer);
 	$buffer = mb_ereg_replace("<", "&lt;", $buffer);
 	$buffer = mb_ereg_replace(">", "&gt;", $buffer);
-
+	*/
+	$buffer = htmlspecialchars($str, ENT_QUOTES);
 	$buffer = trim($buffer);
+	
 	return($buffer);
 }}
 
@@ -238,11 +240,13 @@ if(! function_exists('unxmlify')) {
 function unxmlify($s) {
 //	$ret = str_replace('&amp;','&', $s);
 //	$ret = str_replace(array('&lt;','&gt;','&quot;','&apos;'),array('<','>','"',"'"),$ret);
-	$ret = mb_ereg_replace('&amp;', '&', $s);
+	/*$ret = mb_ereg_replace('&amp;', '&', $s);
 	$ret = mb_ereg_replace('&apos;', "'", $ret);
 	$ret = mb_ereg_replace('&quot;', '"', $ret);
 	$ret = mb_ereg_replace('&lt;', "<", $ret);
 	$ret = mb_ereg_replace('&gt;', ">", $ret);
+	*/
+	$ret = htmlspecialchars_decode($s, ENT_QUOTES);
 	return $ret;	
 }}
 
@@ -482,9 +486,9 @@ if(! function_exists('photo_new_resource')) {
 /**
  * Generate a guaranteed unique photo ID.
  * safe from birthday paradox
- * 
+ *
  * @return string
- */	
+ */
 function photo_new_resource() {
 
 	do {
@@ -505,7 +509,7 @@ if(! function_exists('load_view_file')) {
  * @deprecated
  * wrapper to load a view template, checking for alternate
  * languages before falling back to the default
- * 
+ *
  * @global string $lang
  * @global App $a
  * @param string $s view name
@@ -964,7 +968,7 @@ if(! function_exists('linkify')) {
  * @param string $s
  */
 function linkify($s) {
-	$s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="external-link">$1</a>', $s);
+	$s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="_blank">$1</a>', $s);
 	$s = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$s);
 	return($s);
 }}
@@ -1129,7 +1133,7 @@ function smilies($s, $sample = false) {
 		'<img class="smiley" src="' . $a->get_baseurl() . '/images/like.gif" alt=":like" />',
 		'<img class="smiley" src="' . $a->get_baseurl() . '/images/dislike.gif" alt=":dislike" />',
 		'<a href="http://friendica.com">~friendica <img class="smiley" src="' . $a->get_baseurl() . '/images/friendica-16.png" alt="~friendica" /></a>',
-		'<a href="http://friendica.com">red <img class="smiley" src="' . $a->get_baseurl() . '/images/rhash-16.png" alt="red" /></a>'
+		'<a href="http://redmatrix.me/">red <img class="smiley" src="' . $a->get_baseurl() . '/images/rhash-16.png" alt="red" /></a>'
 	);
 
 	$params = array('texts' => $texts, 'icons' => $icons, 'string' => $s);
@@ -1297,13 +1301,13 @@ function prepare_body(&$item,$attach = false) {
 				$tag["url"] = $searchpath.strtolower($tag["term"]);
 
 			if ($tag["type"] == TERM_HASHTAG) {
-				$hashtags[] = "#<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+				$hashtags[] = "#<a href=\"".$tag["url"]."\" target=\"_blank\">".$tag["term"]."</a>";
 				$prefix = "#";
 			} elseif ($tag["type"] == TERM_MENTION) {
-				$mentions[] = "@<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+				$mentions[] = "@<a href=\"".$tag["url"]."\" target=\"_blank\">".$tag["term"]."</a>";
 				$prefix = "@";
 			}
-			$tags[] = $prefix."<a href=\"".$tag["url"]."\" target=\"external-link\">".$tag["term"]."</a>";
+			$tags[] = $prefix."<a href=\"".$tag["url"]."\" target=\"_blank\">".$tag["term"]."</a>";
 		}
 	}
 
@@ -1414,7 +1418,7 @@ function prepare_body(&$item,$attach = false) {
 					$title = ((strlen(trim($mtch[4]))) ? escape_tags(trim($mtch[4])) : escape_tags($mtch[1]));
 					$title .= ' ' . $mtch[2] . ' ' . t('bytes');
 
-					$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="external-link" >' . $icon . '</a>';
+					$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" >' . $icon . '</a>';
 				}
 			}
 		}
@@ -1608,16 +1612,30 @@ if(! function_exists('get_plink')) {
  * @return boolean|array False if item has not plink, otherwise array('href'=>plink url, 'title'=>translated title)
  */
 function get_plink($item) {
-	$a = get_app();	
-	if (x($item,'plink') && ($item['private'] != 1)) {
-		return array(
-			'href' => $item['plink'],
-			'title' => t('link to source'),
-		);
-	} 
-	else {
-		return false;
-	}
+	$a = get_app();
+
+	if ($a->user['nickname'] != "") {
+		$ret = array(
+				'href' => $a->get_baseurl()."/display/".$a->user['nickname']."/".$item['id'],
+				'title' => t('link to source'),
+			);
+		$ret["orig"] = $ret["href"];
+
+		if (x($item,'plink'))
+			$ret["href"] = $item['plink'];
+
+	} elseif (x($item,'plink') && ($item['private'] != 1))
+		$ret = array(
+				'href' => $item['plink'],
+				'orig' => $item['plink'],
+				'title' => t('link to source'),
+			);
+	else
+		$ret = array();
+
+	//if (x($item,'plink') && ($item['private'] != 1))
+
+	return($ret);
 }}
 
 if(! function_exists('unamp')) {
@@ -2010,10 +2028,12 @@ function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
                 if($type == 'file') {
 	                $lbracket = '[';
 	                $rbracket = ']';
+			$termtype = TERM_FILE;
 	        }
                 else {
 	                $lbracket = '<';
         	        $rbracket = '>';
+			$termtype = TERM_CATEGORY;
 	        }
 
                 $filetags_updated = $saved;
@@ -2039,9 +2059,15 @@ function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
 	        }
 
                 foreach($deleted_tags as $key => $tag) {
-		        $r = q("select file from item where uid = %d " . file_tag_file_query('item',$tag,$type),
-		                intval($uid)
-	                );
+			$r = q("SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d",
+				dbesc($tag),
+				intval(TERM_OBJ_POST),
+				intval($termtype),
+				intval($uid));
+
+			//$r = q("select file from item where uid = %d " . file_tag_file_query('item',$tag,$type),
+			//	intval($uid)
+			//);
 
 	                if(count($r)) {
 			        unset($deleted_tags[$key]);
@@ -2064,6 +2090,8 @@ function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
 }
 
 function file_tag_save_file($uid,$item,$file) {
+	require_once("include/files.php");
+
 	$result = false;
 	if(! intval($uid))
 		return false;
@@ -2073,11 +2101,14 @@ function file_tag_save_file($uid,$item,$file) {
 	);
 	if(count($r)) {
 		if(! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']'))
-			q("update item set file = '%s' where id = %d and uid = %d limit 1",
+			q("update item set file = '%s' where id = %d and uid = %d",
 				dbesc($r[0]['file'] . '[' . file_tag_encode($file) . ']'),
 				intval($item),
 				intval($uid)
 			);
+
+		create_files_from_item($item);
+
 		$saved = get_pconfig($uid,'system','filetags');
 		if((! strlen($saved)) || (! stristr($saved,'[' . file_tag_encode($file) . ']')))
 			set_pconfig($uid,'system','filetags',$saved . '[' . file_tag_encode($file) . ']');
@@ -2087,14 +2118,19 @@ function file_tag_save_file($uid,$item,$file) {
 }
 
 function file_tag_unsave_file($uid,$item,$file,$cat = false) {
+	require_once("include/files.php");
+
 	$result = false;
 	if(! intval($uid))
 		return false;
 
-	if($cat == true)
+	if($cat == true) {
 		$pattern = '<' . file_tag_encode($file) . '>' ;
-	else
+		$termtype = TERM_CATEGORY;
+	} else {
 		$pattern = '[' . file_tag_encode($file) . ']' ;
+		$termtype = TERM_FILE;
+	}
 
 
 	$r = q("select file from item where id = %d and uid = %d limit 1",
@@ -2104,15 +2140,22 @@ function file_tag_unsave_file($uid,$item,$file,$cat = false) {
 	if(! count($r))
 		return false;
 
-	q("update item set file = '%s' where id = %d and uid = %d limit 1",
+	q("update item set file = '%s' where id = %d and uid = %d",
 		dbesc(str_replace($pattern,'',$r[0]['file'])),
 		intval($item),
 		intval($uid)
 	);
 
-	$r = q("select file from item where uid = %d and deleted = 0 " . file_tag_file_query('item',$file,(($cat) ? 'category' : 'file')),
-		intval($uid)
-	);
+	create_files_from_item($item);
+
+	$r = q("SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d",
+		dbesc($file),
+		intval(TERM_OBJ_POST),
+		intval($termtype),
+		intval($uid));
+
+	//$r = q("select file from item where uid = %d and deleted = 0 " . file_tag_file_query('item',$file,(($cat) ? 'category' : 'file')),
+	//);
 
 	if(! count($r)) {
 		$saved = get_pconfig($uid,'system','filetags');

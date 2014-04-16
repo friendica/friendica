@@ -28,7 +28,7 @@ function check_conversations() {
         logger('complete_conversation: cron_start');
 
         $start = date("Y-m-d H:i:s", time() - ($poll_timeframe * 60));
-        $conversations = q("SELECT * FROM `term` WHERE `type` = 7 AND `term` > '%s'", 
+        $conversations = q("SELECT * FROM `term` WHERE `type` = 7 AND `term` > '%s'",
                                 dbesc($start));
         foreach ($conversations AS $conversation) {
                 $id = $conversation['oid'];
@@ -43,6 +43,14 @@ function check_conversations() {
 
 function complete_conversation($itemid, $conversation_url, $only_add_conversation = false) {
 	global $a;
+
+	if (intval(get_config('system','ostatus_poll_interval')) == -2)
+		return;
+
+	if ($a->last_ostatus_conversation_url == $conversation_url)
+		return;
+
+	$a->last_ostatus_conversation_url = $conversation_url;
 
 	//logger('complete_conversation: completing conversation url '.$conversation_url.' for id '.$itemid);
 
@@ -136,7 +144,7 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 		if ($message_exists) {
 			if ($parent["id"] != 0) {
 				$existing_message = $message_exists[0];
-				$r = q("UPDATE `item` SET `parent` = %d, `parent-uri` = '%s', `thr-parent` = '%s' WHERE `id` = %d LIMIT 1",
+				$r = q("UPDATE `item` SET `parent` = %d, `parent-uri` = '%s', `thr-parent` = '%s' WHERE `id` = %d",
 					intval($parent["id"]),
 					dbesc($parent["uri"]),
 					dbesc($parent_uri),
@@ -146,6 +154,7 @@ function complete_conversation($itemid, $conversation_url, $only_add_conversatio
 		}
 
 		$arr = array();
+		$arr["network"] = NETWORK_OSTATUS;
 		$arr["uri"] = $single_conv->id;
 		$arr["plink"] = $single_conv->id;
 		$arr["uid"] = $message["uid"];

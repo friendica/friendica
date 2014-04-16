@@ -189,7 +189,7 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 		$base = substr($base,strlen($chunk));
 	}
 
-	if($http_code == 301 || $http_code == 302 || $http_code == 303) {
+	if($http_code == 301 || $http_code == 302 || $http_code == 303 || $http_code == 307) {
         $matches = array();
         preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
         $newurl = trim(array_pop($matches));
@@ -617,7 +617,6 @@ function fetch_xrd_links($url) {
 
 if(! function_exists('validate_url')) {
 function validate_url(&$url) {
-
 	// no naked subdomains (allow localhost for tests)
 	if(strpos($url,'.') === false && strpos($url,'/localhost/') === false)
 		return false;
@@ -826,6 +825,10 @@ function add_fcontact($arr,$update = false) {
 
 
 function scale_external_images($srctext, $include_link = true, $scale_replace = false) {
+
+	// Suppress "view full size"
+	if (intval(get_config('system','no_view_full_size')))
+		$include_link = false;
 
 	$a = get_app();
 
@@ -1101,4 +1104,72 @@ function xml2array($contents, $namespaces = true, $get_attributes=1, $priority =
     }
 
     return($xml_array);
+}
+
+function original_url($url, $depth=1, $fetchbody = false) {
+        if ($depth > 10)
+                return($url);
+
+        $url = trim($url, "'");
+
+        $siteinfo = array();
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+
+        if ($fetchbody)
+                curl_setopt($ch, CURLOPT_NOBODY, 0);
+        else
+                curl_setopt($ch, CURLOPT_NOBODY, 1);
+
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0');
+
+        $header = curl_exec($ch);
+        $curl_info = @curl_getinfo($ch);
+        $http_code = $curl_info['http_code'];
+        curl_close($ch);
+
+        if ((($curl_info['http_code'] == "301") OR ($curl_info['http_code'] == "302"))
+                AND (($curl_info['redirect_url'] != "") OR ($curl_info['location'] != ""))) {
+                if ($curl_info['redirect_url'] != "")
+                        return(original_url($curl_info['redirect_url'], ++$depth, $fetchbody));
+                else
+                        return(original_url($curl_info['location'], ++$depth, $fetchbody));
+        }
+
+        $pos = strpos($header, "\r\n\r\n");
+
+        if ($pos)
+                $body = trim(substr($header, $pos));
+        else
+                $body = $header;
+
+        if (trim($body) == "")
+                return(original_url($url, ++$depth, true));
+
+        $doc = new DOMDocument();
+        @$doc->loadHTML($body);
+
+        $xpath = new DomXPath($doc);
+
+        $list = $xpath->query("//meta[@content]");
+        foreach ($list as $node) {
+                $attr = array();
+                if ($node->attributes->length)
+                        foreach ($node->attributes as $attribute)
+                                $attr[$attribute->name] = $attribute->value;
+
+                if (@$attr["http-equiv"] == 'refresh') {
+                        $path = $attr["content"];
+                        $pathinfo = explode(";", $path);
+                        $content = "";
+                        foreach ($pathinfo AS $value)
+                                if (substr(strtolower($value), 0, 4) == "url=")
+                                        return(original_url(substr($value, 4), ++$depth));
+                }
+        }
+
+        return($url);
 }

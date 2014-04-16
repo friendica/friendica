@@ -46,7 +46,7 @@ function handle_pubsubhubbub() {
 			// we use the push variable also as a counter, if we failed we
 			// increment this until some upper limit where we give up
 			$new_push = intval($rr['push']) + 1;
-			
+
 			if ($new_push > 30) // OK, let's give up
 				$new_push = 0;
 
@@ -66,7 +66,7 @@ function queue_run(&$argv, &$argc){
 	if(is_null($a)){
 		$a = new App;
 	}
-  
+
 	if(is_null($db)){
 		@include(".htconfig.php");
 		require_once("include/dba.php");
@@ -79,9 +79,19 @@ function queue_run(&$argv, &$argc){
 	require_once("include/datetime.php");
 	require_once('include/items.php');
 	require_once('include/bbcode.php');
+	require_once('include/pidfile.php');
 
 	load_config('config');
 	load_config('system');
+
+	$lockpath = get_config('system','lockpath');
+	if ($lockpath != '') {
+		$pidfile = new pidfile($lockpath, 'queue.lck');
+		if($pidfile->is_already_running()) {
+			logger("queue: Already running");
+			return;
+		}
+	}
 
 	$a->set_baseurl(get_config('system','url'));
 
@@ -111,7 +121,7 @@ function queue_run(&$argv, &$argc){
 	}
 
 	$r = q("SELECT `queue`.*, `contact`.`name`, `contact`.`uid` FROM `queue` 
-		LEFT JOIN `contact` ON `queue`.`cid` = `contact`.`id` 
+		INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id` 
 		WHERE `queue`.`created` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
 	if($r) {
 		foreach($r as $rr) {
@@ -120,7 +130,7 @@ function queue_run(&$argv, &$argc){
 		}
 		q("DELETE FROM `queue` WHERE `created` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
 	}
-		
+
 	if($queue_id) {
 		$r = q("SELECT `id` FROM `queue` WHERE `id` = %d LIMIT 1",
 			intval($queue_id)
@@ -233,17 +243,17 @@ function queue_run(&$argv, &$argc){
 			default:
 				$params = array('owner' => $owner, 'contact' => $contact, 'queue' => $q_item, 'result' => false);
 				call_hooks('queue_deliver', $a, $params);
-		
+
 				if($params['result'])
 						remove_queue_item($q_item['id']);
 				else
 						update_queue_time($q_item['id']);
-	
+
 				break;
 
 		}
 	}
-		
+
 	return;
 
 }

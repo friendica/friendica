@@ -156,11 +156,17 @@ function html2bbcode($message)
 	//node2bbcode($doc, 'span', array('style'=>'/.*font-size:\s*(.+?)[,;].*/'), '[size=$1]', '[/size]');
 
 	node2bbcode($doc, 'span', array('style'=>'/.*color:\s*(.+?)[,;].*/'), '[color="$1"]', '[/color]');
+
 	//node2bbcode($doc, 'span', array('style'=>'/.*font-family:\s*(.+?)[,;].*/'), '[font=$1]', '[/font]');
 
 	//node2bbcode($doc, 'div', array('style'=>'/.*font-family:\s*(.+?)[,;].*font-size:\s*(\d+?)pt.*/'), '[font=$1][size=$2]', '[/size][/font]');
 	//node2bbcode($doc, 'div', array('style'=>'/.*font-family:\s*(.+?)[,;].*font-size:\s*(\d+?)px.*/'), '[font=$1][size=$2]', '[/size][/font]');
 	//node2bbcode($doc, 'div', array('style'=>'/.*font-family:\s*(.+?)[,;].*/'), '[font=$1]', '[/font]');
+
+	// Importing the classes - interesting for importing of posts from third party networks that were exported from friendica
+	// Test
+	//node2bbcode($doc, 'span', array('class'=>'/([\w ]+)/'), '[class=$1]', '[/class]');
+	node2bbcode($doc, 'span', array('class'=>'type-link'), '[class=type-link]', '[/class]');
 
 	node2bbcode($doc, 'strong', array(), '[b]', '[/b]');
 	node2bbcode($doc, 'em', array(), '[i]', '[/i]');
@@ -206,6 +212,7 @@ function html2bbcode($message)
 	node2bbcode($doc, 'h5', array(), "\n\n[size=small][b]", "[/b][/size]\n");
 	node2bbcode($doc, 'h6', array(), "\n\n[size=x-small][b]", "[/b][/size]\n");
 
+	node2bbcode($doc, 'a', array('href'=>'/mailto:(.+)/'), '[mail=$1]', '[/mail]');
 	node2bbcode($doc, 'a', array('href'=>'/(.+)/'), '[url=$1]', '[/url]');
 
 	node2bbcode($doc, 'img', array('src'=>'/(.+)/', 'width'=>'/(\d+)/', 'height'=>'/(\d+)/'), '[img=$2x$3]$1', '[/img]');

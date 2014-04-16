@@ -12,9 +12,9 @@ require_once('library/Mobile_Detect/Mobile_Detect.php');
 require_once('include/features.php');
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
-define ( 'FRIENDICA_VERSION',      '3.2.1745' );
+define ( 'FRIENDICA_VERSION',      '3.2.1748' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1166      );
+define ( 'DB_UPDATE_VERSION',      1170      );
 define ( 'EOL',                    "<br />\r\n"     );
 define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
 
@@ -141,6 +141,8 @@ define ( 'NETWORK_MYSPACE',          'mysp');    // MySpace
 define ( 'NETWORK_GPLUS',            'goog');    // Google+
 define ( 'NETWORK_PUMPIO',           'pump');    // pump.io
 define ( 'NETWORK_TWITTER',          'twit');    // Twitter
+define ( 'NETWORK_DIASPORA2',        'dspc');    // Diaspora connector
+define ( 'NETWORK_STATUSNET',        'stac');    // Statusnet connector
 
 define ( 'NETWORK_PHANTOM',          'unkn');    // Place holder
 
@@ -165,6 +167,8 @@ $netgroup_ids = array(
 	NETWORK_GPLUS    => (-12),
 	NETWORK_PUMPIO   => (-13),
 	NETWORK_TWITTER  => (-14),
+	NETWORK_DIASPORA2 => (-15),
+	NETWORK_STATUSNET => (-16),
 
 	NETWORK_PHANTOM  => (-127),
 );
@@ -197,6 +201,7 @@ define ( 'NOTIFY_PROFILE',  0x0040 );
 define ( 'NOTIFY_TAGSELF',  0x0080 );
 define ( 'NOTIFY_TAGSHARE', 0x0100 );
 define ( 'NOTIFY_POKE',     0x0200 );
+define ( 'NOTIFY_SHARE',    0x0400 );
 
 define ( 'NOTIFY_SYSTEM',   0x8000 );
 
@@ -394,6 +399,9 @@ if(! class_exists('App')) {
 		public $template_engines = array();
 		// array of instanced template engines ('name'=>'instance')
 		public $template_engine_instance = array();
+
+		// Used for reducing load to the ostatus completion
+		public $last_ostatus_conversation_url;
 
 		private $ldelim = array(
 			'internal' => '',
@@ -733,7 +741,7 @@ if(! class_exists('App')) {
 			if($this->cached_profile_picdate[$common_filename]){
 				$this->cached_profile_image[$avatar_image] = $avatar_image . $this->cached_profile_picdate[$common_filename];
 			} else {
-				$r = q("SELECT `contact`.`avatar-date` AS picdate FROM `contact` WHERE `contact`.`thumb` like \"%%/%s\"",
+				$r = q("SELECT `contact`.`avatar-date` AS picdate FROM `contact` WHERE `contact`.`thumb` like '%%/%s'",
 					$common_filename);
 				if(! count($r)){
 					$this->cached_profile_image[$avatar_image] = $avatar_image;
@@ -1322,7 +1330,7 @@ if(! function_exists('profile_load')) {
 		if($profile) {
 			$profile_int = intval($profile);
 			$r = q("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
-					left join `contact` on `contact`.`uid` = `profile`.`uid` LEFT JOIN `user` ON `profile`.`uid` = `user`.`uid`
+					INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
 					WHERE `user`.`nickname` = '%s' AND `profile`.`id` = %d and `contact`.`self` = 1 LIMIT 1",
 					dbesc($nickname),
 					intval($profile_int)
@@ -1330,7 +1338,7 @@ if(! function_exists('profile_load')) {
 		}
 		if((! $r) && (!  count($r))) {
 			$r = q("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
-					left join `contact` on `contact`.`uid` = `profile`.`uid` LEFT JOIN `user` ON `profile`.`uid` = `user`.`uid`
+					INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
 					WHERE `user`.`nickname` = '%s' AND `profile`.`is-default` = 1 and `contact`.`self` = 1 LIMIT 1",
 					dbesc($nickname)
 			);
@@ -1585,7 +1593,7 @@ if(! function_exists('get_birthdays')) {
 		$bd_short = t('F d');
 
 		$r = q("SELECT `event`.*, `event`.`id` AS `eid`, `contact`.* FROM `event`
-				LEFT JOIN `contact` ON `contact`.`id` = `event`.`cid`
+				INNER JOIN `contact` ON `contact`.`id` = `event`.`cid`
 				WHERE `event`.`uid` = %d AND `type` = 'birthday' AND `start` < '%s' AND `finish` > '%s'
 				ORDER BY `start` ASC ",
 				intval(local_user()),
@@ -1624,7 +1632,7 @@ if(! function_exists('get_birthdays')) {
 						$sparkle = " sparkle";
 						$url = $a->get_baseurl() . '/redir/'  . $rr['cid'];
 					}
-	
+
 					$rr['link'] = $url;
 					$rr['title'] = $rr['name'];
 					$rr['date'] = day_translate(datetime_convert('UTC', $a->timezone, $rr['start'], $rr['adjust'] ? $bd_format : $bd_short)) . (($today) ?  ' ' . t('[today]') : '');

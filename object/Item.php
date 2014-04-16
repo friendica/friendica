@@ -32,7 +32,7 @@ class Item extends BaseObject {
 
 	public function __construct($data) {
 		$a = $this->get_app();
-		
+
 		$this->data = $data;
 		$this->set_template('wall');
 		$this->toplevel = ($this->get_id() == $this->get_data_value('parent'));
@@ -268,6 +268,26 @@ class Item extends BaseObject {
 			$owner_name_e = $this->get_owner_name();
 		}
 
+		// Disable features that aren't available in several networks
+		if (($item["item_network"] != "dfrn") AND isset($buttons["dislike"])) {
+			unset($buttons["dislike"]);
+			$tagger = '';
+		}
+
+		if (($item["item_network"] == "feed") AND isset($buttons["like"]))
+			unset($buttons["like"]);
+
+		if (($item["item_network"] == "mail") AND isset($buttons["like"]))
+			unset($buttons["like"]);
+
+		if (($item["item_network"] == "dspr") AND ($indent == 'comment') AND isset($buttons["like"]))
+			unset($buttons["like"]);
+
+		// Facebook can like comments - but it isn't programmed in the connector yet.
+		if (($item["item_network"] == "face") AND ($indent == 'comment') AND isset($buttons["like"]))
+			unset($buttons["like"]);
+
+
 		$tmp_item = array(
 			'template' => $this->get_template(),
 
@@ -299,6 +319,8 @@ class Item extends BaseObject {
 			'title' => $title_e,
 			'localtime' => datetime_convert('UTC', date_default_timezone_get(), $item['created'], 'r'),
 			'ago' => (($item['app']) ? sprintf( t('%s from %s'),relative_date($item['created']),$item['app']) : relative_date($item['created'])),
+			'app' => $item['app'],
+			'created' => relative_date($item['created']),
 			'lock' => $lock,
 			'location' => $location_e,
 			'indent' => $indent,
@@ -322,7 +344,9 @@ class Item extends BaseObject {
 			'wait' => t('Please wait'),
 			'thread_level' => $thread_level,
                         'postopts' => $langstr,
-                        'edited' => $edited
+                        'edited' => $edited,
+			'network' => $item["item_network"],
+			'network_name' => network_to_name($item['item_network']),
 		);
 
 		$arr = array('item' => $item, 'output' => $tmp_item);

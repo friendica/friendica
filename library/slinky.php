@@ -341,7 +341,7 @@ abstract class Slinky_Service {
 		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );			// Don't stress about SSL validity
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );			// Return the response, don't output it
 		curl_setopt( $ch, CURLOPT_TIMEOUT, SLINKY_TIMEOUT );	// Limit how long we'll wait for a response
-		curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );			// Allow following of redirections
+		//curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );			// Allow following of redirections
 		$r  = curl_exec( $ch );
 		if ( curl_errno( $ch ) ) {
 			return false;
@@ -372,7 +372,7 @@ abstract class Slinky_Service {
 		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );			// Don't stress about SSL validity
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );			// Return the response, don't output it
 		curl_setopt( $ch, CURLOPT_TIMEOUT, SLINKY_TIMEOUT );	// Limit how long we'll wait for a response
-		curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );			// Allow following of redirections
+		//curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );			// Allow following of redirections
 		$r  = curl_exec( $ch );
 		if ( curl_errno( $ch ) ) {
 			return false;

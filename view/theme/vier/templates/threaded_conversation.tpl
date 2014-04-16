@@ -7,7 +7,7 @@
 
 {{foreach $threads as $thread}}
 
-<div id="tread-wrapper-{{$thread.id}}" class="tread-wrapper {{if $thread.threaded}}threaded{{/if}}  {{$thread.toplevel}}">
+<div id="tread-wrapper-{{$thread.id}}" class="tread-wrapper {{if $thread.threaded}}threaded{{/if}}  {{$thread.toplevel}} {{$thread.network}}">
        
        
 		{{if $thread.type == tag}}

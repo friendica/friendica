@@ -69,7 +69,8 @@
 		</div>
 	{{/if}}
 	<div id="contact-edit-end" ></div>
-
+	{{include file="field_checkbox.tpl" field=$notify}}
+	{{include file="field_checkbox.tpl" field=$fetch_further_information}}
 	{{include file="field_checkbox.tpl" field=$hidden}}
 
 <div id="contact-edit-info-wrapper">

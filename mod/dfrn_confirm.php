@@ -52,7 +52,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		if(! $uid) {
 			notice( t('Permission denied.') . EOL );
 			return;
-		}	
+		}
 
 		$user = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($uid)
@@ -61,7 +61,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		if(! $user) {
 			notice( t('Profile not found.') . EOL );
 			return;
-		}	
+		}
 
 
 		// These data elements may come from either the friend request notification form or $handsfree array.
@@ -153,7 +153,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 
 			// Save the private key. Send them the public key.
 
-			$r = q("UPDATE `contact` SET `prvkey` = '%s' WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			$r = q("UPDATE `contact` SET `prvkey` = '%s' WHERE `id` = %d AND `uid` = %d",
 				dbesc($private_key),
 				intval($contact_id),
 				intval($uid) 
@@ -258,7 +258,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 				case 1:
 					// birthday paradox - generate new dfrn-id and fall through.
 					$new_dfrn_id = random_string();
-					$r = q("UPDATE contact SET `issued-id` = '%s' WHERE `id` = %d AND `uid` = %d LIMIT 1",
+					$r = q("UPDATE contact SET `issued-id` = '%s' WHERE `id` = %d AND `uid` = %d",
 						dbesc($new_dfrn_id),
 						intval($contact_id),
 						intval($uid) 
@@ -279,17 +279,17 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 				}
 
 			if(($status == 0) && ($intro_id)) {
-	
+
 				// Success. Delete the notification.
-	
-				$r = q("DELETE FROM `intro` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+
+				$r = q("DELETE FROM `intro` WHERE `id` = %d AND `uid` = %d",
 					intval($intro_id),
 					intval($uid)
 				);
-				
+
 			}
 
-			if($status != 0) 
+			if($status != 0)
 				return;
 		}
 
@@ -319,19 +319,19 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 			if(($relation == CONTACT_IS_SHARING) && ($duplex))
 				$duplex = 0;
 
-			$r = q("UPDATE `contact` SET 
-				`photo` = '%s', 
+			$r = q("UPDATE `contact` SET
+				`photo` = '%s',
 				`thumb` = '%s',
-				`micro` = '%s', 
-				`rel` = %d, 
-				`name-date` = '%s', 
-				`uri-date` = '%s', 
-				`avatar-date` = '%s', 
-				`blocked` = 0, 
+				`micro` = '%s',
+				`rel` = %d,
+				`name-date` = '%s',
+				`uri-date` = '%s',
+				`avatar-date` = '%s',
+				`blocked` = 0,
 				`pending` = 0,
 				`duplex` = %d,
 				`hidden` = %d,
-				`network` = 'dfrn' WHERE `id` = %d LIMIT 1
+				`network` = 'dfrn' WHERE `id` = %d
 			",
 				dbesc($photos[0]),
 				dbesc($photos[1]),
@@ -345,7 +345,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 				intval($contact_id)
 			);
 		}
-		else {  
+		else {
 
 			// $network !== NETWORK_DFRN
 
@@ -378,27 +378,27 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 					$writable = 1;
 			}
 
-			$r = q("DELETE FROM `intro` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			$r = q("DELETE FROM `intro` WHERE `id` = %d AND `uid` = %d",
 				intval($intro_id),
 				intval($uid)
 			);
 
 
-			$r = q("UPDATE `contact` SET `photo` = '%s', 
+			$r = q("UPDATE `contact` SET `photo` = '%s',
 				`thumb` = '%s',
-				`micro` = '%s', 
-				`name-date` = '%s', 
-				`uri-date` = '%s', 
-				`avatar-date` = '%s', 
+				`micro` = '%s',
+				`name-date` = '%s',
+				`uri-date` = '%s',
+				`avatar-date` = '%s',
 				`notify` = '%s',
 				`poll` = '%s',
-				`blocked` = 0, 
+				`blocked` = 0,
 				`pending` = 0,
 				`network` = '%s',
 				`writable` = %d,
 				`hidden` = %d,
 				`rel` = %d
-				WHERE `id` = %d LIMIT 1
+				WHERE `id` = %d
 			",
 				dbesc($photos[0]),
 				dbesc($photos[1]),
@@ -413,7 +413,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 				intval($hidden),
 				intval($new_relation),
 				intval($contact_id)
-			);			
+			);
 		}
 
 		if($r === false)
@@ -511,7 +511,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		if($handsfree === null)
 			goaway($a->get_baseurl() . '/contacts/' . intval($contact_id));
 		else
-			return;  
+			return;
 		//NOTREACHED
 	}
 
@@ -538,7 +538,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		$duplex     = ((x($_POST,'duplex'))       ? intval($_POST['duplex'])       : 0 );
 		$page       = ((x($_POST,'page'))         ? intval($_POST['page'])         : 0 );
 		$version_id = ((x($_POST,'dfrn_version')) ? (float) $_POST['dfrn_version'] : 2.0);
-	
+
 		$forum = (($page == 1) ? 1 : 0);
 		$prv   = (($page == 2) ? 1 : 0);
 
@@ -640,7 +640,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 			// NOTREACHED
 		}
 
-		$r = q("UPDATE `contact` SET `dfrn-id` = '%s', `pubkey` = '%s' WHERE `id` = %d LIMIT 1",
+		$r = q("UPDATE `contact` SET `dfrn-id` = '%s', `pubkey` = '%s' WHERE `id` = %d",
 			dbesc($decrypted_dfrn_id),
 			dbesc($dfrn_pubkey),
 			intval($dfrn_record)
@@ -651,10 +651,10 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		}
 
 		// It's possible that the other person also requested friendship.
-		// If it is a duplex relationship, ditch the issued-id if one exists. 
+		// If it is a duplex relationship, ditch the issued-id if one exists.
 
 		if($duplex) {
-			$r = q("UPDATE `contact` SET `issued-id` = '' WHERE `id` = %d LIMIT 1",
+			$r = q("UPDATE `contact` SET `issued-id` = '' WHERE `id` = %d",
 				intval($dfrn_record)
 			);
 		}
@@ -670,7 +670,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 			$photo = $r[0]['photo'];
 		else
 			$photo = $a->get_baseurl() . '/images/person-175.jpg';
-				
+
 		require_once("include/Photo.php");
 
 		$photos = import_profile_photo($photo,$local_uid,$dfrn_record);
@@ -684,20 +684,20 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		if(($relation == CONTACT_IS_FOLLOWER) && ($duplex))
 			$duplex = 0;
 
-		$r = q("UPDATE `contact` SET 
-			`photo` = '%s', 
-			`thumb` = '%s', 
+		$r = q("UPDATE `contact` SET
+			`photo` = '%s',
+			`thumb` = '%s',
 			`micro` = '%s',
-			`rel` = %d, 
-			`name-date` = '%s', 
-			`uri-date` = '%s', 
-			`avatar-date` = '%s', 
-			`blocked` = 0, 
+			`rel` = %d,
+			`name-date` = '%s',
+			`uri-date` = '%s',
+			`avatar-date` = '%s',
+			`blocked` = 0,
 			`pending` = 0,
-			`duplex` = %d, 
+			`duplex` = %d,
 			`forum` = %d,
 			`prv` = %d,
-			`network` = '%s' WHERE `id` = %d LIMIT 1
+			`network` = '%s' WHERE `id` = %d
 		",
 			dbesc($photos[0]),
 			dbesc($photos[1]),
@@ -733,10 +733,10 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 		if((count($r)) && ($r[0]['notify-flags'] & NOTIFY_CONFIRM)) {
 
 			push_lang($r[0]['language']);
-			$tpl = (($new_relation == CONTACT_IS_FRIEND) 
+			$tpl = (($new_relation == CONTACT_IS_FRIEND)
 				? get_intltext_template('friend_complete_eml.tpl')
 				: get_intltext_template('intro_complete_eml.tpl'));
-		
+
 			$email_tpl = replace_macros($tpl, array(
 				'$sitename' => $a->config['sitename'],
 				'$siteurl' =>  $a->get_baseurl(),

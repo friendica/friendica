@@ -89,6 +89,9 @@ function poller_run(&$argv, &$argc){
 	// Check OStatus conversations
 	check_conversations();
 
+	// To-Do: Regenerate usage statistics
+	// q("ANALYZE TABLE `item`");
+
 	// once daily run birthday_updates and then expire in background
 
 	$d1 = get_config('system','last_expire_day');
@@ -171,7 +174,7 @@ function poller_run(&$argv, &$argc){
 		: '' 
 	);
 
-	$contacts = q("SELECT `contact`.`id` FROM `contact` LEFT JOIN `user` ON `user`.`uid` = `contact`.`uid` 
+	$contacts = q("SELECT `contact`.`id` FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid` 
 		WHERE ( `rel` = %d OR `rel` = %d ) AND `poll` != ''
 		AND NOT `network` IN ( '%s', '%s', '%s' )
 		$sql_extra 

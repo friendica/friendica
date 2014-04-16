@@ -1,17 +1,22 @@
 
-Milý/Milá $username,
+Drahý/Drahá $[username],
 
+	'$[fn]' na '$[dfrn_url]' akceptoval 
+Vaši žádost o připojení na '$[sitename]'.
 
-	'$fn' na '$dfrn_url' odsouhlasil Váš požadavek na spojení na '$sitename'.
+	'$[fn]' se rozhodl Vás akceptovat jako "fanouška", což omezuje 
+určité druhy komunikace, jako jsou soukromé zprávy a určité profilové
+interakce. Pokud se jedná o účet celebrity nebo o kumunitní stránky, tato nastavení byla 
+použita automaticky.
 
-	'$fn' Vás označil za svého "fanouška", což jistým způsobem omezuje komunikaci (například v oblasti soukromých zpráv a některých profilových interakcí. Pokud je toto celebritní nebo komunitní stránka, bylo toto nastavení byla přijato automaticky. 
+	'$[fn]' se může rozhodnout rozšířit tento vztah na oboustraný nebo méně restriktivní 
+vztah v budoucnosti. 
 
-	'$fn' může v budoucnu rozšířit toto spojení na oboustranné nebo jinak méně restriktivní.
+	Nyní začnete získávat veřejné aktualizace statusu od '$[fn]', 
+které se objeví na Vaší stránce "Síť" na   
 
-	Nyní začnete dostávat veřejné aktualizace statusu od '$fn', které se objeví ve Vaší stránce "Síť" na webu
-
-$siteurl
+$[siteurl]
 
 S pozdravem,
 
-        $sitename administrátor
+	$[sitename] administrátor

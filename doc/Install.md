@@ -15,7 +15,7 @@ local .htaccess file
     - PHP  5.2+. The later the better. You'll need 5.3 for encryption of key exchange conversations. On a Windows environment, 5.2+ might not work as the function dns_get_record() is only available with version 5.3.
         - PHP *command line* access with register_argc_argv set to true in the
 php.ini file
-        - curl, gd, mysql, and openssl extensions
+        - curl, gd, mysql, hash and openssl extensions
         - some form of email server or email gateway such that PHP mail() works
         - mcrypt (optional; used for server-to-server message encryption)
 

@@ -85,7 +85,7 @@ function subthread_content(&$a) {
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
 
 	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
-	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE ); 
+	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE );
 	$link = xmlify('<link rel="alternate" type="text/html" href="' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 	$body = $item['body'];
 
@@ -140,14 +140,14 @@ EOT;
 	$arr['unseen'] = 1;
 	$arr['last-child'] = 0;
 
-	$post_id = item_store($arr);	
+	$post_id = item_store($arr);
 
 	if(! $item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d LIMIT 1",
+		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval($item['id']),
 			intval($owner_uid)
 		);
-	}			
+	}
 
 	$arr['id'] = $post_id;
 

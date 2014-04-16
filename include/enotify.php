@@ -58,11 +58,12 @@ function notification($params) {
 
 		// Check to see if there was already a tag notify or comment notify for this post.
 		// If so don't create a second notification
-		
+
 		$p = null;
-		$p = q("select id from notify where ( type = %d or type = %d ) and link = '%s' and uid = %d limit 1",
+		$p = q("select id from notify where (type = %d or type = %d or type = %d) and link = '%s' and uid = %d limit 1",
 			intval(NOTIFY_TAGSELF),
 			intval(NOTIFY_COMMENT),
+			intval(NOTIFY_SHARE),
 			dbesc($params['link']),
 			intval($params['uid'])
 		);
@@ -70,7 +71,7 @@ function notification($params) {
 			pop_lang();
 			return;
 		}
-	
+
 
 		// if it's a post figure out who's post it is.
 
@@ -99,7 +100,7 @@ function notification($params) {
 						$itemlink,
 						$p[0]['author-name'],
 						$item_post_type);
-		
+
 		// "your post"
 		if($p[0]['owner-name'] == $p[0]['author-name'] && $p[0]['wall'])
 			$dest_str = sprintf(t('%1$s commented on [url=%2$s]your %3$s[/url]'),
@@ -114,7 +115,7 @@ function notification($params) {
 
 		$subject = sprintf( t('[Friendica:Notify] Comment to conversation #%1$d by %2$s'), $parent_id, $params['source_name']);
 		$preamble = sprintf( t('%s commented on an item/conversation you have been following.'), $params['source_name']); 
-		$epreamble = $dest_str; 
+		$epreamble = $dest_str;
 
 		$sitelink = t('Please visit %s to view and/or reply to the conversation.');
 		$tsitelink = sprintf( $sitelink, $siteurl );
@@ -126,11 +127,11 @@ function notification($params) {
 		$subject = sprintf( t('[Friendica:Notify] %s posted to your profile wall') , $params['source_name']);
 
 		$preamble = sprintf( t('%1$s posted to your profile wall at %2$s') , $params['source_name'], $sitename);
-		
-		$epreamble = sprintf( t('%1$s posted to [url=%2$s]your wall[/url]') , 
+
+		$epreamble = sprintf( t('%1$s posted to [url=%2$s]your wall[/url]') ,
 								'[url=' . $params['source_link'] . ']' . $params['source_name'] . '[/url]',
-								$params['link']); 
-		
+								$params['link']);
+
 		$sitelink = t('Please visit %s to view and/or reply to the conversation.');
 		$tsitelink = sprintf( $sitelink, $siteurl );
 		$hsitelink = sprintf( $sitelink, '<a href="' . $siteurl . '">' . $sitename . '</a>');
@@ -140,9 +141,22 @@ function notification($params) {
 	if($params['type'] == NOTIFY_TAGSELF) {
 		$subject =	sprintf( t('[Friendica:Notify] %s tagged you') , $params['source_name']);
 		$preamble = sprintf( t('%1$s tagged you at %2$s') , $params['source_name'], $sitename);
-		$epreamble = sprintf( t('%1$s [url=%2$s]tagged you[/url].') , 
+		$epreamble = sprintf( t('%1$s [url=%2$s]tagged you[/url].') ,
 								'[url=' . $params['source_link'] . ']' . $params['source_name'] . '[/url]',
-								$params['link']); 
+								$params['link']);
+
+		$sitelink = t('Please visit %s to view and/or reply to the conversation.');
+		$tsitelink = sprintf( $sitelink, $siteurl );
+		$hsitelink = sprintf( $sitelink, '<a href="' . $siteurl . '">' . $sitename . '</a>');
+		$itemlink =  $params['link'];
+	}
+
+	if($params['type'] == NOTIFY_SHARE) {
+		$subject =	sprintf( t('[Friendica:Notify] %s shared a new post') , $params['source_name']);
+		$preamble = sprintf( t('%1$s shared a new post at %2$s') , $params['source_name'], $sitename);
+		$epreamble = sprintf( t('%1$s [url=%2$s]shared a post[/url].') ,
+								'[url=' . $params['source_link'] . ']' . $params['source_name'] . '[/url]',
+								$params['link']);
 
 		$sitelink = t('Please visit %s to view and/or reply to the conversation.');
 		$tsitelink = sprintf( $sitelink, $siteurl );
@@ -241,10 +255,10 @@ function notification($params) {
 	$sitelink  = $h['sitelink'];
 	$tsitelink = $h['tsitelink'];
 	$hsitelink = $h['hsitelink'];
-	$itemlink  = $h['itemlink']; 
+	$itemlink  = $h['itemlink'];
 
 
-	require_once('include/html2bbcode.php');	
+	require_once('include/html2bbcode.php');
 
 	do {
 		$dups = false;
@@ -317,7 +331,7 @@ function notification($params) {
 	);
 	if($p && (count($p) > 1)) {
 		for ($d = 1; $d < count($p); $d ++) {
-			q("delete from notify where id = %d limit 1",
+			q("delete from notify where id = %d",
 				intval($p[$d]['id'])
 			);
 		}
@@ -339,12 +353,12 @@ function notification($params) {
 
 	$itemlink = $a->get_baseurl() . '/notify/view/' . $notify_id;
 	$msg = replace_macros($epreamble,array('$itemlink' => $itemlink));
-	$r = q("update notify set msg = '%s' where id = %d and uid = %d limit 1",
+	$r = q("update notify set msg = '%s' where id = %d and uid = %d",
 		dbesc($msg),
 		intval($notify_id),
 		intval($params['uid'])
 	);
-		
+
 
 	// send email notification if notification preferences permit
 
@@ -356,15 +370,15 @@ function notification($params) {
 		$id_for_parent = "${params['parent']}@${hostname}";
 
 		// Is this the first email notification for this parent item and user?
-		
-		$r = q("select `id` from `notify-threads` where `master-parent-item` = %d and `receiver-uid` = %d limit 1", 
+
+		$r = q("select `id` from `notify-threads` where `master-parent-item` = %d and `receiver-uid` = %d limit 1",
 			intval($params['parent']),
 			intval($params['uid']) );
 
 		// If so, create the record of it and use a message-id smtp header.
 
 		if(!$r) {
-			logger("notify_id:" . intval($notify_id). ", parent: " . intval($params['parent']) . "uid: " . 
+			logger("notify_id:" . intval($notify_id). ", parent: " . intval($params['parent']) . "uid: " .
 intval($params['uid']), LOGGER_DEBUG);
 			$r = q("insert into `notify-threads` (`notify-id`, `master-parent-item`, `receiver-uid`, `parent-item`)
 				values(%d,%d,%d,%d)",

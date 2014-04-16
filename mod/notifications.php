@@ -33,7 +33,7 @@ function notifications_post(&$a) {
 		$fid = $r[0]['fid'];
 
 		if($_POST['submit'] == t('Discard')) {
-			$r = q("DELETE FROM `intro` WHERE `id` = %d LIMIT 1", 
+			$r = q("DELETE FROM `intro` WHERE `id` = %d",
 				intval($intro_id)
 			);
 			if(! $fid) {
@@ -41,7 +41,7 @@ function notifications_post(&$a) {
 				// The check for blocked and pending is in case the friendship was already approved
 				// and we just want to get rid of the now pointless notification
 
-				$r = q("DELETE FROM `contact` WHERE `id` = %d AND `uid` = %d AND `self` = 0 AND `blocked` = 1 AND `pending` = 1 LIMIT 1", 
+				$r = q("DELETE FROM `contact` WHERE `id` = %d AND `uid` = %d AND `self` = 0 AND `blocked` = 1 AND `pending` = 1",
 					intval($contact_id),
 					intval(local_user())
 				);

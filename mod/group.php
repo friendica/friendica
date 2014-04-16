@@ -22,7 +22,7 @@ function group_post(&$a) {
 
 	if(($a->argc == 2) && ($a->argv[1] === 'new')) {
 		check_form_security_token_redirectOnErr('/group/new', 'group_edit');
-		
+
 		$name = notags(trim($_POST['groupname']));
 		$r = group_add(local_user(),$name);
 		if($r) {
@@ -32,13 +32,13 @@ function group_post(&$a) {
 				goaway($a->get_baseurl() . '/group/' . $r);
 		}
 		else
-			notice( t('Could not create group.') . EOL );	
+			notice( t('Could not create group.') . EOL );
 		goaway($a->get_baseurl() . '/group');
 		return; // NOTREACHED
 	}
 	if(($a->argc == 2) && (intval($a->argv[1]))) {
 		check_form_security_token_redirectOnErr('/group', 'group_edit');
-		
+
 		$r = q("SELECT * FROM `group` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($a->argv[1]),
 			intval(local_user())
@@ -51,7 +51,7 @@ function group_post(&$a) {
 		$group = $r[0];
 		$groupname = notags(trim($_POST['groupname']));
 		if((strlen($groupname))  && ($groupname != $group['name'])) {
-			$r = q("UPDATE `group` SET `name` = '%s' WHERE `uid` = %d AND `id` = %d LIMIT 1",
+			$r = q("UPDATE `group` SET `name` = '%s' WHERE `uid` = %d AND `id` = %d",
 				dbesc($groupname),
 				intval(local_user()),
 				intval($group['id'])
@@ -88,7 +88,7 @@ function group_content(&$a) {
 	);
 
 	if(($a->argc == 2) && ($a->argv[1] === 'new')) {
-		
+
 		return replace_macros($tpl, $context + array(
 			'$title' => t('Create a group of contacts/friends.'),
 			'$gname' => array('groupname',t('Group Name: '), '', ''),
@@ -101,13 +101,13 @@ function group_content(&$a) {
 
 	if(($a->argc == 3) && ($a->argv[1] === 'drop')) {
 		check_form_security_token_redirectOnErr('/group', 'group_drop', 't');
-		
+
 		if(intval($a->argv[2])) {
 			$r = q("SELECT `name` FROM `group` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($a->argv[2]),
 				intval(local_user())
 			);
-			if(count($r)) 
+			if(count($r))
 				$result = group_rmv(local_user(),$r[0]['name']);
 			if($result)
 				info( t('Group removed.') . EOL);
@@ -120,7 +120,7 @@ function group_content(&$a) {
 
 	if(($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
 		check_form_security_token_ForbiddenOnErr('group_member_change', 't');
-		
+
 		$r = q("SELECT `id` FROM `contact` WHERE `id` = %d AND `uid` = %d and `self` = 0 and `blocked` = 0 AND `pending` = 0 LIMIT 1",
 			intval($a->argv[2]),
 			intval(local_user())

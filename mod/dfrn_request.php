@@ -70,19 +70,19 @@ function dfrn_request_post(&$a) {
 			$confirm_key = ((x($_POST,'confirm_key')) ? $_POST['confirm_key'] : "");
 			$hidden = ((x($_POST,'hidden-contact')) ? intval($_POST['hidden-contact']) : 0);
 			$contact_record = null;
-	
+
 			if(x($dfrn_url)) {
 
 				/**
 				 * Lookup the contact based on their URL (which is the only unique thing we have at the moment)
 				 */
-	
+
 				$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND (`url` = '%s' OR `nurl` = '%s') AND `self` = 0 LIMIT 1",
 					intval(local_user()),
 					dbesc($dfrn_url),
 					dbesc(normalise_link($dfrn_url))
 				);
-	
+
 				if(count($r)) {
 					if(strlen($r[0]['dfrn-id'])) {
 
@@ -283,11 +283,11 @@ function dfrn_request_post(&$a) {
 		if(count($r)) {
 			foreach($r as $rr) {
 				if(! $rr['rel']) {
-					q("DELETE FROM `contact` WHERE `id` = %d LIMIT 1",
+					q("DELETE FROM `contact` WHERE `id` = %d",
 						intval($rr['cid'])
 					);
 				}
-				q("DELETE FROM `intro` WHERE `id` = %d LIMIT 1",
+				q("DELETE FROM `intro` WHERE `id` = %d",
 					intval($rr['iid'])
 				);
 			}
@@ -298,9 +298,9 @@ function dfrn_request_post(&$a) {
 		 * Cleanup any old email intros - which will have a greater lifetime
 		 */
 
-		$r = q("SELECT `intro`.*, `intro`.`id` AS `iid`, `contact`.`id` AS `cid`, `contact`.`rel` 
+		$r = q("SELECT `intro`.*, `intro`.`id` AS `iid`, `contact`.`id` AS `cid`, `contact`.`rel`
 			FROM `intro` LEFT JOIN `contact` on `intro`.`contact-id` = `contact`.`id`
-			WHERE `intro`.`blocked` = 1 AND `contact`.`self` = 0 
+			WHERE `intro`.`blocked` = 1 AND `contact`.`self` = 0
 			AND `contact`.`network` = '%s'
 			AND `intro`.`datetime` < UTC_TIMESTAMP() - INTERVAL 3 DAY ",
 			dbesc(NETWORK_MAIL2)
@@ -308,11 +308,11 @@ function dfrn_request_post(&$a) {
 		if(count($r)) {
 			foreach($r as $rr) {
 				if(! $rr['rel']) {
-					q("DELETE FROM `contact` WHERE `id` = %d LIMIT 1",
+					q("DELETE FROM `contact` WHERE `id` = %d",
 						intval($rr['cid'])
 					);
 				}
-				q("DELETE FROM `intro` WHERE `id` = %d LIMIT 1",
+				q("DELETE FROM `intro` WHERE `id` = %d",
 					intval($rr['iid'])
 				);
 			}
@@ -455,7 +455,7 @@ function dfrn_request_post(&$a) {
 		logger('dfrn_request: url: ' . $url);
 
 		if(! strlen($url)) {
-			notice( t("Unable to resolve your name at the provided location.") . EOL);			
+			notice( t("Unable to resolve your name at the provided location.") . EOL);
 			return;
 		}
 
@@ -555,14 +555,14 @@ function dfrn_request_post(&$a) {
 				);
 
 				// find the contact record we just created
-				if($r) {	
-					$r = q("SELECT `id` FROM `contact` 
+				if($r) {
+					$r = q("SELECT `id` FROM `contact`
 						WHERE `uid` = %d AND `url` = '%s' AND `issued-id` = '%s' LIMIT 1",
 						intval($uid),
 						$parms['url'],
 						$parms['issued-id']
 					);
-					if(count($r)) 
+					if(count($r))
 						$contact_record = $r[0];
 				}
 
@@ -701,7 +701,7 @@ function dfrn_request_content(&$a) {
 
 			if(count($r)) {
 				if(($r[0]['page-flags'] != PAGE_NORMAL) && ($r[0]['page-flags'] != PAGE_PRVGROUP))
-					$auto_confirm = true;				
+					$auto_confirm = true;
 
 				if(! $auto_confirm) {
 					require_once('include/enotify.php');

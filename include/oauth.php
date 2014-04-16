@@ -1,8 +1,8 @@
 <?php
-/** 
+/**
  * OAuth server
  * Based on oauth2-php <http://code.google.com/p/oauth2-php/>
- * 
+ *
  */
 
 define('REQUEST_TOKEN_DURATION', 300);
@@ -15,11 +15,11 @@ class FKOAuthDataStore extends OAuthDataStore {
   function gen_token(){
 		return md5(base64_encode(pack('N6', mt_rand(), mt_rand(), mt_rand(), mt_rand(), mt_rand(), uniqid())));
   }
-	
+
   function lookup_consumer($consumer_key) {
 		logger(__function__.":".$consumer_key);
       //echo "<pre>"; var_dump($consumer_key); killme();
-	  
+
 		$r = q("SELECT client_id, pw, redirect_uri FROM clients WHERE client_id='%s'",
 			dbesc($consumer_key)
 		);
@@ -129,7 +129,7 @@ class FKOAuth1 extends OAuthServer {
 		$this->add_signature_method(new OAuthSignatureMethod_PLAINTEXT());
 		$this->add_signature_method(new OAuthSignatureMethod_HMAC_SHA1());
 	}
-	
+
 	function loginUser($uid){
 		logger("FKOAuth1::loginUser $uid");
 		$a = get_app();
@@ -167,7 +167,7 @@ class FKOAuth1 extends OAuthServer {
 			$a->cid = $r[0]['id'];
 			$_SESSION['cid'] = $a->cid;
 		}
-		q("UPDATE `user` SET `login_date` = '%s' WHERE `uid` = %d LIMIT 1",
+		q("UPDATE `user` SET `login_date` = '%s' WHERE `uid` = %d",
 			dbesc(datetime_convert()),
 			intval($_SESSION['uid'])
 		);

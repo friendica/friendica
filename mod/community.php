@@ -46,12 +46,13 @@ function community_content(&$a, $update = 0) {
 
 	if( (! get_config('alt_pager', 'global')) && (! get_pconfig(local_user(),'system','alt_pager')) ) {
 		$r = q("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
-			FROM `item` LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id` LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
+			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
+			INNER JOIN `user` ON `user`.`uid` = `item`.`uid` AND `user`.`hidewall` = 0
 			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
-			AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = '' 
+			AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''
 			AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
-			AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `user`.`hidewall` = 0 
-			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0"
+			AND `item`.`private` = 0 AND `item`.`wall` = 1"
 		);
 
 		if(count($r))
@@ -64,28 +65,25 @@ function community_content(&$a, $update = 0) {
 
 	}
 
-	//$r = q("SELECT distinct(`item`.`uri`)
-	$r = q("SELECT `item`.`uri`, `item`.*, `item`.`id` AS `item_id`, 
+	$r = q("SELECT `item`.`uri`, `item`.*, `item`.`id` AS `item_id`,
 		`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`alias`, `contact`.`rel`,
-		`contact`.`network`, `contact`.`thumb`, `contact`.`self`, `contact`.`writable`, 
+		`contact`.`network`, `contact`.`thumb`, `contact`.`self`, `contact`.`writable`,
 		`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`,
 		`user`.`nickname`, `user`.`hidewall`
-		FROM `item` FORCE INDEX (`received`, `wall`) LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-		LEFT JOIN `user` ON `user`.`uid` = `item`.`uid`
-		WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
+		FROM `thread` FORCE INDEX (`wall_private_received`)
+		INNER JOIN `user` ON `user`.`uid` = `thread`.`uid` AND `user`.`hidewall` = 0
+		INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
 		AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''
-		AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' 
-		AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `item`.`id` = `item`.`parent`
-		AND `user`.`hidewall` = 0
+		AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
+		INNER JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
 		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 AND `contact`.`self`
-		ORDER BY `received` DESC LIMIT %d, %d ",
+		WHERE `thread`.`visible` = 1 AND `thread`.`deleted` = 0 and `thread`.`moderated` = 0
+		AND `thread`.`private` = 0 AND `thread`.`wall` = 1
+		ORDER BY `thread`.`received` DESC LIMIT %d, %d ",
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 
 	);
-//		group by `item`.`uri`
-//		AND `item`.`private` = 0 AND `item`.`wall` = 1 AND `item`.`id` = `item`.`parent`
-//		AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 AND `contact`.`self`
 
 	if(! count($r)) {
 		info( t('No results.') . EOL);

@@ -233,7 +233,7 @@ function create_user($arr) {
 	);
 	if((count($r) > 1) && $newuid) {
 		$result['message'] .= t('Nickname is already registered. Please choose another.') . EOL;
-		q("DELETE FROM `user` WHERE `uid` = %d LIMIT 1",
+		q("DELETE FROM `user` WHERE `uid` = %d",
 			intval($newuid)
 		);
 		return $result;

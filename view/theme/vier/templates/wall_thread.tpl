@@ -27,12 +27,12 @@
 {{if $item.thread_level!=1}}<div class="children">{{/if}}
 
 <div class="wall-item-decor">
-	<span class="icon s22 star {{$item.isstarred}}" id="starred-{{$item.id}}" title="{{$item.star.starred}}">{{$item.star.starred}}</span>
-	{{if $item.lock}}<span class="icon s22 lock fakelink" onclick="lockview(event,{{$item.id}});" title="{{$item.lock}}">{{$item.lock}}</span>{{/if}}	
+	<!-- <span class="icon s22 star {{$item.isstarred}}" id="starred-{{$item.id}}" title="{{$item.star.starred}}">{{$item.star.starred}}</span> -->
+	<!-- {{if $item.lock}}<span class="icon s22 lock fakelink" onclick="lockview(event,{{$item.id}});" title="{{$item.lock}}">{{$item.lock}}</span>{{/if}} -->
 	<img id="like-rotator-{{$item.id}}" class="like-rotator" src="images/rotator.gif" alt="{{$item.wait}}" title="{{$item.wait}}" style="display: none;" />
 </div>
 
-<div class="wall-item-container {{$item.indent}} {{$item.shiny}} " id="item-{{$item.id}}">
+<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}}" id="item-{{$item.id}}">
 	<div class="wall-item-item">
 		<div class="wall-item-info">
 			<div class="contact-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}}"
@@ -57,10 +57,13 @@
 		</div>
 		<div class="wall-item-actions-author">
 			<a href="{{$item.profile_url}}" target="redir" title="{{$item.linktitle}}" class="wall-item-name-link"><span class="wall-item-name{{$item.sparkle}}">{{$item.name}}</span></a>
-			 {{if $item.owner_url}}{{$item.via}} <a href="{{$item.owner_url}}" target="redir" title="{{$item.olinktitle}}" class="wall-item-name-link"><span class="wall-item-name{{$item.osparkle}}" id="wall-item-ownername-{{$item.id}}">{{$item.owner_name}}</span></a> <!-- {{$item.vwall}} -->{{/if}}
+			{{if $item.owner_url}}{{$item.via}} <a href="{{$item.owner_url}}" target="redir" title="{{$item.olinktitle}}" class="wall-item-name-link"><span class="wall-item-name{{$item.osparkle}}" id="wall-item-ownername-{{$item.id}}">{{$item.owner_name}}</span></a> <!-- {{$item.vwall}} -->{{/if}}
 			<span class="wall-item-ago">
-				{{if $item.plink}}<a title="{{$item.plink.title}}" href="{{$item.plink.href}}" style="color: #999">{{$item.ago}}</a>{{else}} {{$item.ago}} {{/if}}
-				{{if $item.lock}}<span class="fakelink" style="color: #999" onclick="lockview(event,{{$item.id}});">{{$item.lock}}</span> {{/if}}
+				{{if $item.plink}}<a title="{{$item.plink.title}}" href="{{$item.plink.href}}" style="color: #999">{{$item.created}}</a>{{else}} {{$item.created}} {{/if}}
+			</span>
+			{{if $item.lock}}<span class="icon s10 lock fakelink" onclick="lockview(event,{{$item.id}});" title="{{$item.lock}}">{{$item.lock}}</span>{{/if}}
+			<span class="wall-item-network" title="{{$item.app}}">
+				{{$item.network_name}}
 			</span>
 		</div>
 
@@ -89,7 +92,7 @@
 	</div>	
 	<div class="wall-item-bottom">
 		<div class="wall-item-links">
-			{{if $item.plink}}<a title="{{$item.plink.title}}" href="{{$item.plink.href}}"><i class="icon-link icon-large"></i></a>{{/if}}
+			{{if $item.plink}}<a title="{{$item.plink.title}}" href="{{$item.plink.orig}}"><i class="icon-link icon-large"></i></a>{{/if}}
 		</div>
 		<div class="wall-item-actions">
 			<div class="wall-item-actions-social">
@@ -97,8 +100,9 @@
 				<span id="comment-{{$item.id}}" class="fakelink togglecomment" onclick="openClose('item-comments-{{$item.id}}');"><i class="icon-comment"></i></span>
 			{{/if}}{{/if}}
 			{{if $item.vote}}
+				{{if $item.vote.like}}
 				<a href="#" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="dolike({{$item.id}},'like'); return false"><i class="icon-thumbs-up icon-large"></i></a>
-				{{if $item.vote.dislike}}
+				{{/if}}{{if $item.vote.dislike}}
 				<a href="#" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="dolike({{$item.id}},'dislike'); return false"><i class="icon-thumbs-down icon-large"></i></a>
 				{{/if}}
 			    {{if $item.vote.share}}

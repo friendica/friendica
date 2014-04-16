@@ -8,17 +8,17 @@ function group_add($uid,$name) {
 		$r = group_byname($uid,$name); // check for dups
 		if($r !== false) {
 
-			// This could be a problem. 
+			// This could be a problem.
 			// Let's assume we've just created a group which we once deleted
 			// all the old members are gone, but the group remains so we don't break any security
 			// access lists. What we're doing here is reviving the dead group, but old content which
-			// was restricted to this group may now be seen by the new group members. 
+			// was restricted to this group may now be seen by the new group members.
 
 			$z = q("SELECT * FROM `group` WHERE `id` = %d LIMIT 1",
 				intval($r)
 			);
 			if(count($z) && $z[0]['deleted']) {
-				$r = q("UPDATE `group` SET `deleted` = 0 WHERE `uid` = %d AND `name` = '%s' LIMIT 1",
+				$r = q("UPDATE `group` SET `deleted` = 0 WHERE `uid` = %d AND `name` = '%s'",
 					intval($uid),
 					dbesc($name)
 				);
@@ -32,7 +32,7 @@ function group_add($uid,$name) {
 			dbesc($name)
 		);
 		$ret = $r;
-	}	
+	}
 	return $ret;
 }
 
@@ -87,7 +87,7 @@ function group_rmv($uid,$name) {
 		);
 
 		// remove group
-		$r = q("UPDATE `group` SET `deleted` = 1 WHERE `uid` = %d AND `name` = '%s' LIMIT 1",
+		$r = q("UPDATE `group` SET `deleted` = 1 WHERE `uid` = %d AND `name` = '%s'",
 			intval($uid),
 			dbesc($name)
 		);
@@ -117,13 +117,13 @@ function group_rmv_member($uid,$name,$member) {
 		return false;
 	if(! ( $uid && $gid && $member))
 		return false;
-	$r = q("DELETE FROM `group_member` WHERE `uid` = %d AND `gid` = %d AND `contact-id` = %d LIMIT 1 ",
+	$r = q("DELETE FROM `group_member` WHERE `uid` = %d AND `gid` = %d AND `contact-id` = %d",
 		intval($uid),
 		intval($gid),
 		intval($member)
 	);
 	return $r;
-	
+
 
 }
 
@@ -134,13 +134,13 @@ function group_add_member($uid,$name,$member,$gid = 0) {
 	if((! $gid) || (! $uid) || (! $member))
 		return false;
 
-	$r = q("SELECT * FROM `group_member` WHERE `uid` = %d AND `gid` = %d AND `contact-id` = %d LIMIT 1",	
+	$r = q("SELECT * FROM `group_member` WHERE `uid` = %d AND `gid` = %d AND `contact-id` = %d LIMIT 1",
 		intval($uid),
 		intval($gid),
 		intval($member)
 	);
 	if(count($r))
-		return true;	// You might question this, but 
+		return true;	// You might question this, but
 				// we indicate success because the group member was in fact created
 				// -- It was just created at another time
  	if(! count($r))
@@ -157,7 +157,7 @@ function group_get_members($gid) {
 	$ret = array();
 	if(intval($gid)) {
 		$r = q("SELECT `group_member`.`contact-id`, `contact`.* FROM `group_member` 
-			LEFT JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id` 
+			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id` 
 			WHERE `gid` = %d AND `group_member`.`uid` = %d ORDER BY `contact`.`name` ASC ",
 			intval($gid),
 			intval(local_user())
@@ -172,7 +172,7 @@ function group_public_members($gid) {
 	$ret = 0;
 	if(intval($gid)) {
 		$r = q("SELECT `contact`.`id` AS `contact-id` FROM `group_member` 
-			LEFT JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id` 
+			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id` 
 			WHERE `gid` = %d AND `group_member`.`uid` = %d 
 			AND  `contact`.`network` = '%s' AND `contact`.`notify` != '' ",
 			intval($gid),
@@ -299,7 +299,7 @@ function expand_groups($a,$check_dead = false) {
 
 function member_of($c) {
 
-	$r = q("SELECT `group`.`name`, `group`.`id` FROM `group` LEFT JOIN `group_member` ON `group_member`.`gid` = `group`.`id` WHERE `group_member`.`contact-id` = %d AND `group`.`deleted` = 0 ORDER BY `group`.`name`  ASC ",
+	$r = q("SELECT `group`.`name`, `group`.`id` FROM `group` INNER JOIN `group_member` ON `group_member`.`gid` = `group`.`id` WHERE `group_member`.`contact-id` = %d AND `group`.`deleted` = 0 ORDER BY `group`.`name`  ASC ",
 		intval($c)
 	);
 

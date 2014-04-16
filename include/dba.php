@@ -18,6 +18,7 @@ class dba {
 
 	private $debug = 0;
 	private $db;
+	private $result;
 	public  $mysqli = true;
 	public  $connected = false;
 	public  $error = false;
@@ -75,7 +76,7 @@ class dba {
 		return $this->db;
 	}
 
-	public function q($sql) {
+	public function q($sql, $onlyquery = false) {
 		global $a;
 
 		if((! $this->db) || (! $this->connected))
@@ -99,7 +100,7 @@ class dba {
 			if (($duration > $a->config["system"]["db_loglimit"])) {
 				$duration = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-				@file_put_contents($a->config["system"]["db_log"], $duration."\t".
+				@file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
 						basename($backtrace[1]["file"])."\t".
 						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
 						substr($sql, 0, 2000)."\n", FILE_APPEND);
@@ -154,6 +155,11 @@ class dba {
 		if(($result === true) || ($result === false))
 			return $result;
 
+		if ($onlyquery) {
+			$this->result = $result;
+			return true;
+		}
+
 		$r = array();
 		if($this->mysqli) {
 			if($result->num_rows) {
@@ -175,6 +181,30 @@ class dba {
 		if($this->debug)
 			logger('dba: ' . printable(print_r($r, true)));
 		return($r);
+	}
+
+	public function qfetch() {
+		$x = false;
+
+		if ($this->result)
+			if($this->mysqli) {
+				if($this->result->num_rows)
+					$x = $this->result->fetch_array(MYSQLI_ASSOC);
+			} else {
+				if(mysql_num_rows($this->result))
+					$x = mysql_fetch_array($this->result, MYSQL_ASSOC);
+			}
+
+		return($x);
+	}
+
+	public function qclose() {
+		if ($this->result)
+			if($this->mysqli) {
+				$this->result->free_result();
+			} else {
+				mysql_free_result($this->result);
+			}
 	}
 
 	public function dbg($dbg) {

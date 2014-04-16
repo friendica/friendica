@@ -191,9 +191,9 @@ function html2plain($html, $wraplength = 75, $compact = false)
 	//node2bbcode($doc, 'img', array('title'=>'/(.+)/'), '$1', '');
 	//node2bbcode($doc, 'img', array(), '', '');
 	if (!$compact)
-		node2bbcode($doc, 'img', array('src'=>'/(.+)/'), '[img]$1', '[/img]');
+		node2bbcode($doc, 'img', array('src'=>'/(.+)/'), ' [img]$1', '[/img] ');
 	else
-		node2bbcode($doc, 'img', array('src'=>'/(.+)/'), '', '');
+		node2bbcode($doc, 'img', array('src'=>'/(.+)/'), ' ', ' ');
 
 	node2bbcode($doc, 'iframe', array('src'=>'/(.+)/'), ' $1 ', '', true);
 
@@ -218,12 +218,13 @@ function html2plain($html, $wraplength = 75, $compact = false)
 
 	$message = html_entity_decode($message, ENT_QUOTES, 'UTF-8');
 
-	if (!$compact) {
+	if (!$compact AND ($message != "")) {
 		$counter = 1;
 		foreach ($urls as $id=>$url)
-			if (strpos($message, $url) === false)
-				$message .= "\n".$url." ";
-				//$message .= "\n[".($counter++)."] ".$url;
+			if ($url != "")
+				if (strpos($message, $url) === false)
+					$message .= "\n".$url." ";
+					//$message .= "\n[".($counter++)."] ".$url;
 	}
 
 	$message = str_replace("\n«", "«\n", $message);

@@ -7,7 +7,6 @@ require_once('include/contact_selectors.php');
 require_once('include/queue_fn.php');
 require_once('include/lock.php');
 
-
 function diaspora_dispatch_public($msg) {
 
 	$enabled = intval(get_config('system','diaspora_enabled'));
@@ -486,7 +485,7 @@ function diaspora_decode($importer,$xml) {
 		$base = $dom->env;
 	elseif($dom->data)
 		$base = $dom;
-	
+
 	if(! $base) {
 		logger('mod-diaspora: unable to locate salmon data in xml ');
 		http_status_exit(400);
@@ -578,7 +577,7 @@ function diaspora_request($importer,$xml) {
 		// That makes us friends.
 
 		if($contact['rel'] == CONTACT_IS_FOLLOWER && $importer['page-flags'] != PAGE_COMMUNITY) {
-			q("UPDATE `contact` SET `rel` = %d, `writable` = 1 WHERE `id` = %d AND `uid` = %d LIMIT 1",
+			q("UPDATE `contact` SET `rel` = %d, `writable` = 1 WHERE `id` = %d AND `uid` = %d",
 				intval(CONTACT_IS_FRIEND),
 				intval($contact['id']),
 				intval($importer['uid'])
@@ -614,7 +613,7 @@ function diaspora_request($importer,$xml) {
 				$arr['author-avatar'] = $arr['owner-avatar'] = $self[0]['thumb'];
 				$arr['verb'] = ACTIVITY_FRIEND;
 				$arr['object-type'] = ACTIVITY_OBJ_PERSON;
-				
+
 				$A = '[url=' . $self[0]['url'] . ']' . $self[0]['name'] . '[/url]';
 				$B = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
 				$BPhoto = '[url=' . $contact['url'] . ']' . '[img]' . $contact['thumb'] . '[/img][/url]';
@@ -642,7 +641,7 @@ function diaspora_request($importer,$xml) {
 
 		return;
 	}
-	
+
 	$ret = find_diaspora_person_by_handle($sender_handle);
 
 
@@ -673,7 +672,7 @@ function diaspora_request($importer,$xml) {
 		1,
 		2
 	);
-		 
+
 	// find the contact record we just created
 
 	$contact_record = diaspora_get_contact_by_handle($importer['uid'],$sender_handle);
@@ -694,7 +693,7 @@ function diaspora_request($importer,$xml) {
 	if($importer['page-flags'] == PAGE_NORMAL) {
 
 		$hash = random_string() . (string) time();   // Generate a confirm_key
-	
+
 		$ret = q("INSERT INTO `intro` ( `uid`, `contact-id`, `blocked`, `knowyou`, `note`, `hash`, `datetime` )
 			VALUES ( %d, %d, %d, %d, '%s', '%s', '%s' )",
 			intval($importer['uid']),
@@ -713,7 +712,7 @@ function diaspora_request($importer,$xml) {
 		require_once('include/Photo.php');
 
 		$photos = import_profile_photo($contact_record['photo'],$importer['uid'],$contact_record['id']);
-		
+
 		// technically they are sharing with us (CONTACT_IS_SHARING), 
 		// but if our page-type is PAGE_COMMUNITY or PAGE_SOAPBOX
 		// we are going to change the relationship and make them a follower.
@@ -733,7 +732,7 @@ function diaspora_request($importer,$xml) {
 			`avatar-date` = '%s', 
 			`blocked` = 0, 
 			`pending` = 0
-			WHERE `id` = %d LIMIT 1
+			WHERE `id` = %d
 			",
 			dbesc($photos[0]),
 			dbesc($photos[1]),
@@ -759,7 +758,7 @@ function diaspora_post_allow($importer,$contact) {
 	// That makes us friends.
 	// Normally this should have handled by getting a request - but this could get lost
 	if($contact['rel'] == CONTACT_IS_FOLLOWER && $importer['page-flags'] != PAGE_COMMUNITY) {
-		q("UPDATE `contact` SET `rel` = %d, `writable` = 1 WHERE `id` = %d AND `uid` = %d LIMIT 1",
+		q("UPDATE `contact` SET `rel` = %d, `writable` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval(CONTACT_IS_FRIEND),
 			intval($contact['id']),
 			intval($importer['uid'])
@@ -827,6 +826,9 @@ function diaspora_post($importer,$xml,$msg) {
 
 	$body = diaspora2bb($xml->raw_message);
 
+	// Add OEmbed and other information to the body
+	$body = add_page_info_to_body($body, false, true);
+
 	$datarray = array();
 
 	$str_tags = '';
@@ -861,18 +863,22 @@ function diaspora_post($importer,$xml,$msg) {
 		foreach($matches as $mtch) {
 			if(strlen($str_tags))
 				$str_tags .= ',';
-			$str_tags .= '@[url=' . $mtch[1] . '[/url]';	
+			$str_tags .= '@[url=' . $mtch[1] . '[/url]';
 		}
 	}
+
+	$plink = 'https://'.substr($diaspora_handle,strpos($diaspora_handle,'@')+1).'/posts/'.$guid;
 
 	$datarray['uid'] = $importer['uid'];
 	$datarray['contact-id'] = $contact['id'];
 	$datarray['wall'] = 0;
+	$datarray['network']  = NETWORK_DIASPORA;
 	$datarray['guid'] = $guid;
 	$datarray['uri'] = $datarray['parent-uri'] = $message_id;
-	$datarray['created'] = $datarray['edited'] = datetime_convert('UTC','UTC',$created);
+	$datarray['changed'] = $datarray['created'] = $datarray['edited'] = datetime_convert('UTC','UTC',$created);
 	$datarray['private'] = $private;
 	$datarray['parent'] = 0;
+	$datarray['plink'] = $plink;
 	$datarray['owner-name'] = $contact['name'];
 	$datarray['owner-link'] = $contact['url'];
 	//$datarray['owner-avatar'] = $contact['thumb'];
@@ -890,12 +896,12 @@ function diaspora_post($importer,$xml,$msg) {
 
 	$message_id = item_store($datarray);
 
-	if($message_id) {
-		q("update item set plink = '%s' where id = %d limit 1",
-			dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
-			intval($message_id)
-		);
-	}
+	//if($message_id) {
+	//	q("update item set plink = '%s' where id = %d",
+	//		dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
+	//		intval($message_id)
+	//	);
+	//}
 
 	return;
 
@@ -962,17 +968,35 @@ function diaspora_reshare($importer,$xml,$msg) {
 	}
 	elseif($source_xml->post->status_message) {
 		$body = diaspora2bb($source_xml->post->status_message->raw_message);
+
+		// Checking for embedded pictures
+		if($source_xml->post->status_message->photo->remote_photo_path AND
+			$source_xml->post->status_message->photo->remote_photo_name) {
+
+			$remote_photo_path = notags(unxmlify($source_xml->post->status_message->photo->remote_photo_path));
+			$remote_photo_name = notags(unxmlify($source_xml->post->status_message->photo->remote_photo_name));
+
+			$body = '[img]'.$remote_photo_path.$remote_photo_name.'[/img]'."\n".$body;
+
+			logger('diaspora_reshare: embedded picture link found: '.$body, LOGGER_DEBUG);
+		}
+
 		$body = scale_external_images($body);
 
+		// Add OEmbed and other information to the body
+		$body = add_page_info_to_body($body, false, true);
 	}
 	else {
+		// Maybe it is a reshare of a photo that will be delivered at a later time (testing)
 		logger('diaspora_reshare: no reshare content found: ' . print_r($source_xml,true));
-		return;
+		$body = "";
+		//return;
 	}
-	if(! $body) {
-		logger('diaspora_reshare: empty body: source= ' . $x);
-		return;
-	}
+
+	//if(! $body) {
+	//	logger('diaspora_reshare: empty body: source= ' . $x);
+	//	return;
+	//}
 
 	$person = find_diaspora_person_by_handle($orig_author);
 
@@ -1029,14 +1053,18 @@ function diaspora_reshare($importer,$xml,$msg) {
 		}
 	}
 
+	$plink = 'https://'.substr($diaspora_handle,strpos($diaspora_handle,'@')+1).'/posts/'.$guid;
+
 	$datarray['uid'] = $importer['uid'];
 	$datarray['contact-id'] = $contact['id'];
 	$datarray['wall'] = 0;
+	$datarray['network']  = NETWORK_DIASPORA;
 	$datarray['guid'] = $guid;
 	$datarray['uri'] = $datarray['parent-uri'] = $message_id;
-	$datarray['created'] = $datarray['edited'] = datetime_convert('UTC','UTC',$created);
+	$datarray['changed'] = $datarray['created'] = $datarray['edited'] = datetime_convert('UTC','UTC',$created);
 	$datarray['private'] = $private;
 	$datarray['parent'] = 0;
+	$datarray['plink'] = $plink;
 	$datarray['owner-name'] = $contact['name'];
 	$datarray['owner-link'] = $contact['url'];
 	$datarray['owner-avatar'] = ((x($contact,'thumb')) ? $contact['thumb'] : $contact['photo']);
@@ -1060,14 +1088,17 @@ function diaspora_reshare($importer,$xml,$msg) {
 	$datarray['tag'] = $str_tags;
 	$datarray['app']  = 'Diaspora';
 
+	// if empty content it might be a photo that hasn't arrived yet. If a photo arrives, we'll make it visible. (testing)
+	$datarray['visible'] = ((strlen($body)) ? 1 : 0);
+
 	$message_id = item_store($datarray);
 
-	if($message_id) {
-		q("update item set plink = '%s' where id = %d limit 1",
-			dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
-			intval($message_id)
-		);
-	}
+	//if($message_id) {
+	//	q("update item set plink = '%s' where id = %d",
+	//		dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
+	//		intval($message_id)
+	//	);
+	//}
 
 	return;
 
@@ -1134,17 +1165,20 @@ function diaspora_asphoto($importer,$xml,$msg) {
 		return;
 	}
 
+	$plink = 'https://'.substr($diaspora_handle,strpos($diaspora_handle,'@')+1).'/posts/'.$guid;
+
 	$datarray = array();
 
-	
 	$datarray['uid'] = $importer['uid'];
 	$datarray['contact-id'] = $contact['id'];
 	$datarray['wall'] = 0;
+	$datarray['network']  = NETWORK_DIASPORA;
 	$datarray['guid'] = $guid;
 	$datarray['uri'] = $datarray['parent-uri'] = $message_id;
-	$datarray['created'] = $datarray['edited'] = datetime_convert('UTC','UTC',$created);
+	$datarray['changed'] = $datarray['created'] = $datarray['edited'] = datetime_convert('UTC','UTC',$created);
 	$datarray['private'] = $private;
 	$datarray['parent'] = 0;
+	$datarray['plink'] = $plink;
 	$datarray['owner-name'] = $contact['name'];
 	$datarray['owner-link'] = $contact['url'];
 	//$datarray['owner-avatar'] = $contact['thumb'];
@@ -1153,17 +1187,17 @@ function diaspora_asphoto($importer,$xml,$msg) {
 	$datarray['author-link'] = $contact['url'];
 	$datarray['author-avatar'] = $contact['thumb'];
 	$datarray['body'] = $body;
-	
+
 	$datarray['app']  = 'Diaspora/Cubbi.es';
 
 	$message_id = item_store($datarray);
 
-	if($message_id) {
-		q("update item set plink = '%s' where id = %d limit 1",
-			dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
-			intval($message_id)
-		);
-	}
+	//if($message_id) {
+	//	q("update item set plink = '%s' where id = %d",
+	//		dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
+	//		intval($message_id)
+	//	);
+	//}
 
 	return;
 
@@ -1266,7 +1300,7 @@ function diaspora_comment($importer,$xml,$msg) {
 	if(strcasecmp($diaspora_handle,$msg['author']) == 0)
 		$person = $contact;
 	else {
-		$person = find_diaspora_person_by_handle($diaspora_handle);	
+		$person = find_diaspora_person_by_handle($diaspora_handle);
 
 		if(! is_array($person)) {
 			logger('diaspora_comment: unable to find author details');
@@ -1275,7 +1309,6 @@ function diaspora_comment($importer,$xml,$msg) {
 	}
 
 	$body = diaspora2bb($text);
-
 	$message_id = $diaspora_handle . ':' . $guid;
 
 	$datarray = array();
@@ -1312,13 +1345,14 @@ function diaspora_comment($importer,$xml,$msg) {
 	$datarray['contact-id'] = $contact['id'];
 	$datarray['type'] = 'remote-comment';
 	$datarray['wall'] = $parent_item['wall'];
+	$datarray['network']  = NETWORK_DIASPORA;
 	$datarray['gravity'] = GRAVITY_COMMENT;
 	$datarray['guid'] = $guid;
 	$datarray['uri'] = $message_id;
 	$datarray['parent-uri'] = $parent_item['uri'];
 
 	// No timestamps for comments? OK, we'll the use current time.
-	$datarray['created'] = $datarray['edited'] = datetime_convert();
+	$datarray['changed'] = $datarray['created'] = $datarray['edited'] = datetime_convert();
 	$datarray['private'] = $parent_item['private'];
 
 	$datarray['owner-name'] = $parent_item['owner-name'];
@@ -1332,13 +1366,13 @@ function diaspora_comment($importer,$xml,$msg) {
 	$datarray['tag'] = $str_tags;
 
 	// We can't be certain what the original app is if the message is relayed.
-	if(($parent_item['origin']) && (! $parent_author_signature)) 
+	if(($parent_item['origin']) && (! $parent_author_signature))
 		$datarray['app']  = 'Diaspora';
 
 	$message_id = item_store($datarray);
 
 	if($message_id) {
-		q("update item set plink = '%s' where id = %d limit 1",
+		q("update item set plink = '%s' where id = %d",
 			dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
 			intval($message_id)
 		);
@@ -1370,12 +1404,12 @@ function diaspora_comment($importer,$xml,$msg) {
 		foreach($myconv as $conv) {
 
 			// now if we find a match, it means we're in this conversation
-	
+
 			if(! link_compare($conv['author-link'],$importer_url))
 				continue;
 
 			require_once('include/enotify.php');
-								
+
 			$conv_parent = $conv['parent'];
 
 			notification(array(
@@ -1547,15 +1581,15 @@ function diaspora_conversation($importer,$xml,$msg) {
 			dbesc($message_id),
 			dbesc($parent_uri),
 			dbesc($msg_created_at)
-		);			
+		);
 
-		q("update conv set updated = '%s' where id = %d limit 1",
+		q("update conv set updated = '%s' where id = %d",
 			dbesc(datetime_convert()),
 			intval($conversation['id'])
-		);		
+		);
 
 		require_once('include/enotify.php');
-		notification(array(			
+		notification(array(
 			'type' => NOTIFY_MAIL,
 			'notify_flags' => $importer['notify-flags'],
 			'language' => $importer['language'],
@@ -1614,7 +1648,7 @@ function diaspora_message($importer,$xml,$msg) {
 	}
 
 	$reply = 0;
-			
+
 	$body = diaspora2bb($msg_text);
 	$message_id = $msg_diaspora_handle . ':' . $msg_guid;
 
@@ -1660,13 +1694,13 @@ function diaspora_message($importer,$xml,$msg) {
 		dbesc($message_id),
 		dbesc($parent_uri),
 		dbesc($msg_created_at)
-	);			
+	);
 
-	q("update conv set updated = '%s' where id = %d limit 1",
+	q("update conv set updated = '%s' where id = %d",
 		dbesc(datetime_convert()),
 		intval($conversation['id'])
-	);		
-	
+	);
+
 	return;
 }
 
@@ -1728,7 +1762,7 @@ function diaspora_photo($importer,$xml,$msg,$attempt=1) {
 	                                   array($remote_photo_name, 'scaled_full_' . $remote_photo_name));
 
 	if(strpos($parent_item['body'],$link_text) === false) {
-		$r = q("update item set `body` = '%s', `visible` = 1 where `id` = %d and `uid` = %d limit 1",
+		$r = q("update item set `body` = '%s', `visible` = 1 where `id` = %d and `uid` = %d",
 			dbesc($link_text . $parent_item['body']),
 			intval($parent_item['id']),
 			intval($parent_item['uid'])
@@ -1788,12 +1822,12 @@ function diaspora_like($importer,$xml,$msg) {
 		if($positive === 'true') {
 			logger('diaspora_like: duplicate like: ' . $guid);
 			return;
-		} 
+		}
 		// Note: I don't think "Like" objects with positive = "false" are ever actually used
 		// It looks like "RelayableRetractions" are used for "unlike" instead
 		if($positive === 'false') {
 			logger('diaspora_like: received a like with positive set to "false"...ignoring');
-/*			q("UPDATE `item` SET `deleted` = 1 WHERE `id` = %d AND `uid` = %d LIMIT 1",
+/*			q("UPDATE `item` SET `deleted` = 1 WHERE `id` = %d AND `uid` = %d",
 				intval($r[0]['id']),
 				intval($importer['uid'])
 			);*/
@@ -1894,6 +1928,7 @@ EOT;
 	$arr['uri'] = $uri;
 	$arr['uid'] = $importer['uid'];
 	$arr['guid'] = $guid;
+	$arr['network']  = NETWORK_DIASPORA;
 	$arr['contact-id'] = $contact['id'];
 	$arr['type'] = 'activity';
 	$arr['wall'] = $parent_item['wall'];
@@ -1909,7 +1944,7 @@ EOT;
 	$arr['author-name'] = $person['name'];
 	$arr['author-link'] = $person['url'];
 	$arr['author-avatar'] = ((x($person,'thumb')) ? $person['thumb'] : $person['photo']);
-	
+
 	$ulink = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
 	$alink = '[url=' . $parent_item['author-link'] . ']' . $parent_item['author-name'] . '[/url]';
 	$plink = '[url=' . $a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $parent_item['id'] . ']' . $post_type . '[/url]';
@@ -1929,7 +1964,7 @@ EOT;
 
 
 	if($message_id) {
-		q("update item set plink = '%s' where id = %d limit 1",
+		q("update item set plink = '%s' where id = %d",
 			dbesc($a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $message_id),
 			intval($message_id)
 		);
@@ -1976,8 +2011,8 @@ function diaspora_retraction($importer,$xml) {
 		);
 		if(count($r)) {
 			if(link_compare($r[0]['author-link'],$contact['url'])) {
-				q("update item set `deleted` = 1, `changed` = '%s' where `id` = %d limit 1",
-					dbesc(datetime_convert()),			
+				q("update item set `deleted` = 1, `changed` = '%s' where `id` = %d",
+					dbesc(datetime_convert()),
 					intval($r[0]['id'])
 				);
 			}
@@ -2047,12 +2082,12 @@ function diaspora_signed_retraction($importer,$xml,$msg) {
 		);
 		if(count($r)) {
 			if(link_compare($r[0]['author-link'],$contact['url'])) {
-				q("update item set `deleted` = 1, `edited` = '%s', `changed` = '%s', `body` = '' , `title` = '' where `id` = %d limit 1",
-					dbesc(datetime_convert()),			
-					dbesc(datetime_convert()),			
+				q("update item set `deleted` = 1, `edited` = '%s', `changed` = '%s', `body` = '' , `title` = '' where `id` = %d",
+					dbesc(datetime_convert()),
+					dbesc(datetime_convert()),
 					intval($r[0]['id'])
 				);
-	
+
 				// Now check if the retraction needs to be relayed by us
 				//
 				// The first item in the `item` table with the parent id is the parent. However, MySQL doesn't always
@@ -2148,7 +2183,7 @@ function diaspora_profile($importer,$xml,$msg) {
 	// TODO: update name on item['author-name'] if the name changed. See consume_feed()
 	// Not doing this currently because D* protocol is scheduled for revision soon. 
 
-	$r = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s', `avatar-date` = '%s' , `bd` = '%s' WHERE `id` = %d AND `uid` = %d LIMIT 1",
+	$r = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s', `avatar-date` = '%s' , `bd` = '%s' WHERE `id` = %d AND `uid` = %d",
 		dbesc($name),
 		dbesc(datetime_convert()),
 		dbesc($images[0]),
@@ -2318,7 +2353,7 @@ function diaspora_send_images($item,$owner,$contact,$images,$public_batch = fals
 		if(! count($r))
 			continue;
 		$public = (($r[0]['allow_cid'] || $r[0]['allow_gid'] || $r[0]['deny_cid'] || $r[0]['deny_gid']) ? 'false' : 'true' );
-		$msg = replace_macros($tpl,array(		
+		$msg = replace_macros($tpl,array(
 			'$path' => xmlify($image['path']),
 			'$filename' => xmlify($image['file']),
 			'$msg_guid' => xmlify($image['guid']),

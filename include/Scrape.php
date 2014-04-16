@@ -14,7 +14,7 @@ function scrape_dfrn($url) {
 
 	$s = fetch_url($url);
 
-	if(! $s) 
+	if(! $s)
 		return $ret;
 
 	$headers = $a->get_curl_headers();
@@ -23,7 +23,7 @@ function scrape_dfrn($url) {
 
 	$lines = explode("\n",$headers);
 	if(count($lines)) {
-		foreach($lines as $line) {				
+		foreach($lines as $line) {
 			// don't try and run feeds through the html5 parser
 			if(stristr($line,'content-type:') && ((stristr($line,'application/atom+xml')) || (stristr($line,'application/rss+xml'))))
 				return ret;
@@ -351,7 +351,8 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 	$has_lrdd = false;
 	$email_conversant = false;
 
-	$twitter = ((strpos($url,'twitter.com') !== false) ? true : false);
+	// Twitter is deactivated since twitter closed its old API
+	//$twitter = ((strpos($url,'twitter.com') !== false) ? true : false);
 	$lastfm  = ((strpos($url,'last.fm/user') !== false) ? true : false);
 
 	$at_addr = ((strpos($url,'@') !== false) ? true : false);
@@ -561,7 +562,7 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 			$vcard['nick'] = $addr_parts[0];
 		}
 
-		if($twitter) {
+		/* if($twitter) {
 			logger('twitter: setup');
 			$tid = basename($url);
 			$tapi = 'https://api.twitter.com/1/statuses/user_timeline.rss';
@@ -574,7 +575,7 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 			$vcard['photo'] = 'https://api.twitter.com/1/users/profile_image?screen_name=' . $tid . '&size=bigger';
 			$vcard['nick'] = $tid;
 			$vcard['fn'] = $tid;
-		}
+		} */
 
 		if($lastfm) {
 			$profile = $url;
@@ -609,7 +610,7 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 			logger('probe_url: scrape_feed ' . (($poll)? $poll : $url) . ' returns: ' . print_r($feedret,true), LOGGER_DATA);
 			if(count($feedret) && ($feedret['feed_atom'] || $feedret['feed_rss'])) {
 				$poll = ((x($feedret,'feed_atom')) ? unamp($feedret['feed_atom']) : unamp($feedret['feed_rss']));
-				if(! x($vcard)) 
+				if(! x($vcard))
 					$vcard = array();
 			}
 

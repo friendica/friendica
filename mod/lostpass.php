@@ -25,7 +25,7 @@ function lostpass_post(&$a) {
 	$new_password = autoname(12) . mt_rand(100,9999);
 	$new_password_encoded = hash('whirlpool',$new_password);
 
-	$r = q("UPDATE `user` SET `pwdreset` = '%s' WHERE `uid` = %d LIMIT 1",
+	$r = q("UPDATE `user` SET `pwdreset` = '%s' WHERE `uid` = %d",
 		dbesc($new_password_encoded),
 		intval($uid)
 	);
@@ -74,7 +74,7 @@ function lostpass_content(&$a) {
 		$new_password = autoname(6) . mt_rand(100,9999);
 		$new_password_encoded = hash('whirlpool',$new_password);
 
-		$r = q("UPDATE `user` SET `password` = '%s', `pwdreset` = ''  WHERE `uid` = %d LIMIT 1",
+		$r = q("UPDATE `user` SET `password` = '%s', `pwdreset` = ''  WHERE `uid` = %d",
 			dbesc($new_password_encoded),
 			intval($uid)
 		);

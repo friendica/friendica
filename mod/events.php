@@ -28,7 +28,7 @@ function events_post(&$a) {
 	$adjust   = intval($_POST['adjust']);
 	$nofinish = intval($_POST['nofinish']);
 
-	// The default setting for the `private` field in event_store() is false, so mirror that	
+	// The default setting for the `private` field in event_store() is false, so mirror that
 	$private_event = false;
 
 
@@ -142,14 +142,14 @@ function events_content(&$a) {
 	}
 
 	if(($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
-		$r = q("update event set ignore = 1 where id = %d and uid = %d limit 1",
+		$r = q("update event set ignore = 1 where id = %d and uid = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
 	}
 
 	if(($a->argc > 2) && ($a->argv[1] === 'unignore') && intval($a->argv[2])) {
-		$r = q("update event set ignore = 0 where id = %d and uid = %d limit 1",
+		$r = q("update event set ignore = 0 where id = %d and uid = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
@@ -372,16 +372,16 @@ function events_content(&$a) {
 			'$previus'	=> array($a->get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
 			'$next'		=> array($a->get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
 			'$calendar' => cal($y,$m,$links, ' eventcal'),
-			
+
 			'$events'	=> $events,
-			
-			
+
+
 		));
-		
+
 		if (x($_GET,'id')){ echo $o; killme(); }
-		
+
 		return $o;
-		
+
 	}
 
 	if($mode === 'edit' && $event_id) {

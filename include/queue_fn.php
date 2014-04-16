@@ -2,7 +2,7 @@
 
 function update_queue_time($id) {
 	logger('queue: requeue item ' . $id);
-	q("UPDATE `queue` SET `last` = '%s' WHERE `id` = %d LIMIT 1",
+	q("UPDATE `queue` SET `last` = '%s' WHERE `id` = %d",
 		dbesc(datetime_convert()),
 		intval($id)
 	);
@@ -10,7 +10,7 @@ function update_queue_time($id) {
 
 function remove_queue_item($id) {
 	logger('queue: remove queue item ' . $id);
-	q("DELETE FROM `queue` WHERE `id` = %d LIMIT 1",
+	q("DELETE FROM `queue` WHERE `id` = %d",
 		intval($id)
 	);
 }
@@ -44,7 +44,7 @@ function add_to_queue($cid,$network,$msg,$batch = false) {
 	if($batch_queue < 1)
 		$batch_queue = 1000;
 
-	$r = q("SELECT COUNT(*) AS `total` FROM `queue` left join `contact` ON `queue`.`cid` = `contact`.`id` 
+	$r = q("SELECT COUNT(*) AS `total` FROM `queue` INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id` 
 		WHERE `queue`.`cid` = %d AND `contact`.`self` = 0 ",
 		intval($cid)
 	);

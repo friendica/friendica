@@ -8,7 +8,7 @@ function dsprphotoq_run($argv, $argc){
 	if(is_null($a)){
 		$a = new App;
 	}
-  
+
 	if(is_null($db)){
 		@include(".htconfig.php");
 		require_once("include/dba.php");

@@ -110,7 +110,7 @@ function api_content(&$a) {
 		
 		return $o;
 	}
-	
+
 	echo api_call($a);
 	killme();
 }

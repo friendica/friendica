@@ -328,10 +328,10 @@ function get_theme_info($theme){
 						$info[$k]=$v;
 					}
 				}
-				
+
 			}
 		}
-		
+
 	}
 	return $info;
 }}
@@ -351,7 +351,7 @@ function get_theme_screenshot($theme) {
 if (! function_exists('uninstall_theme')){
 function uninstall_theme($theme){
 	logger("Addons: uninstalling theme " . $theme);
-    
+
 	@include_once("view/theme/$theme/theme.php");
 	if(function_exists("{$theme}_uninstall")) {
 		$func = "{$theme}_uninstall";

@@ -206,9 +206,15 @@ function photo_init(&$a) {
 	echo $data;
 
 	// If the photo is public and there is an existing photo directory store the photo there
-	if ($public and ($file != ""))
+	if ($public and ($file != "")) {
+		// If the photo path isn't there, try to create it
+		if (!is_dir($_SERVER["DOCUMENT_ROOT"]."/photo"))
+			if (is_writable($_SERVER["DOCUMENT_ROOT"]))
+				mkdir($_SERVER["DOCUMENT_ROOT"]."/photo");
+
 		if (is_dir($_SERVER["DOCUMENT_ROOT"]."/photo"))
 			file_put_contents($_SERVER["DOCUMENT_ROOT"]."/photo/".$file, $data);
+	}
 
 	killme();
 	// NOTREACHED

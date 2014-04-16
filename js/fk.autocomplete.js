@@ -89,7 +89,7 @@ ACPopup.prototype._search = function(){
 	});
 	
 }
-	ACPopup.prototype.add = function(label, value){
+ACPopup.prototype.add = function(label, value){
 	var that=this;
 	var elm = $("<div class='acpopupitem' title='"+value+"'>"+label+"</div>");
 	elm.click(function(e){

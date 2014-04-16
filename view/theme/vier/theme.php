@@ -11,10 +11,35 @@
 function vier_init(&$a) {
 set_template_engine($a, 'smarty3');
 
+$baseurl = $a->get_baseurl();
+
 $a->theme_info = array();
 
+$style = get_pconfig(local_user(), 'vier', 'style');
+if ($style == "flat")
+	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier/flat.css" type="text/css" media="screen"/>'."\n";
+else if ($style == "netcolour")
+	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier/netcolour.css" type="text/css" media="screen"/>'."\n";
+
 $a->page['htmlhead'] .= <<< EOT
+<script type="text/javascript" src="$baseurl/view/theme/vier/js/jquery.divgrow-1.3.1.f1.min.js"></script>
 <script>
+
+function collapseHeight(elems) {
+	var elemName = '.wall-item-body:not(.divmore)';
+	if(typeof elems != 'undefined') {
+		elemName = elems + ' ' + elemName;
+	}
+	$(elemName).each(function() {
+		if($(this).height() > 450) {
+			$('html').height($('html').height());
+			$(this).divgrow({ initialHeight: 400, showBrackets: false, speed: 0 });
+			$(this).addClass('divmore');
+			$('html').height('auto');
+		}
+	});
+}
+
 function insertFormatting(comment,BBcode,id) {
 
 		var tmpStr = $("#comment-edit-text-" + id).val();
@@ -32,7 +57,7 @@ function insertFormatting(comment,BBcode,id) {
 		selected = document.selection.createRange();
 		if (BBcode == "url"){
 			selected.text = "["+BBcode+"]" + "http://" +  selected.text + "[/"+BBcode+"]";
-			} else			
+			} else
 		selected.text = "["+BBcode+"]" + selected.text + "[/"+BBcode+"]";
 	} else if (textarea.selectionStart || textarea.selectionStart == "0") {
 		var start = textarea.selectionStart;
@@ -62,50 +87,6 @@ function cmtBbOpen(id) {
 function cmtBbClose(id) {
 	$("#comment-edit-bb-" + id).hide();
 }
-
-/*
-$(document).ready(function() {
-
-$('html').click(function() { $("#nav-notifications-menu" ).hide(); });
-
-$('.group-edit-icon').hover(
-	function() {
-		$(this).addClass('icon'); $(this).removeClass('iconspacer');},
-	function() {
-		$(this).removeClass('icon'); $(this).addClass('iconspacer');}
-	);
-
-$('.sidebar-group-element').hover(
-	function() {
-		id = $(this).attr('id');
-		$('#edit-' + id).addClass('icon'); $('#edit-' + id).removeClass('iconspacer');},
-
-	function() {
-		id = $(this).attr('id');
-		$('#edit-' + id).removeClass('icon');$('#edit-' + id).addClass('iconspacer');}
-	);
-
-
-$('.savedsearchdrop').hover(
-	function() {
-		$(this).addClass('drop'); $(this).addClass('icon'); $(this).removeClass('iconspacer');},
-	function() {
-		$(this).removeClass('drop'); $(this).removeClass('icon'); $(this).addClass('iconspacer');}
-	);
-
-$('.savedsearchterm').hover(
-	function() {
-		id = $(this).attr('id');
-		$('#drop-' + id).addClass('icon'); 	$('#drop-' + id).addClass('drophide'); $('#drop-' + id).removeClass('iconspacer');},
-
-	function() {
-		id = $(this).attr('id');
-		$('#drop-' + id).removeClass('icon');$('#drop-' + id).removeClass('drophide'); $('#drop-' + id).addClass('iconspacer');}
-	);
-
-});
-
-*/
 </script>
 EOT;
 }

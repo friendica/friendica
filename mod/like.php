@@ -109,19 +109,18 @@ function like_content(&$a) {
 	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
 
 
-	$r = q("SELECT * FROM `item` WHERE `verb` = '%s' AND `deleted` = 0 
-		AND `contact-id` = %d AND ( `parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s') LIMIT 1",
-		dbesc($activity),
-		intval($contact['id']),
-		dbesc($item_id),
-		dbesc($item_id),
-		dbesc($item['uri'])
+	$r = q("SELECT `id`, `guid` FROM `item` WHERE `verb` = '%s' AND `deleted` = 0
+		AND `contact-id` = %d AND `uid` = %d
+		AND (`parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s') LIMIT 1",
+		dbesc($activity), intval($contact['id']), intval($owner_uid),
+		dbesc($item_id), dbesc($item_id), dbesc($item['uri'])
 	);
+
 	if(count($r)) {
 		$like_item = $r[0];
 
 		// Already voted, undo it
-		$r = q("UPDATE `item` SET `deleted` = 1, `unseen` = 1, `changed` = '%s' WHERE `id` = %d LIMIT 1",
+		$r = q("UPDATE `item` SET `deleted` = 1, `unseen` = 1, `changed` = '%s' WHERE `id` = %d",
 			dbesc(datetime_convert()),
 			intval($like_item['id'])
 		);
@@ -207,14 +206,14 @@ EOT;
 	$arr['unseen'] = 1;
 	$arr['last-child'] = 0;
 
-	$post_id = item_store($arr);	
+	$post_id = item_store($arr);
 
 	if(! $item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d LIMIT 1",
+		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval($item['id']),
 			intval($owner_uid)
 		);
-	}			
+	}
 
 
 	// Save the author information for the like in case we need to relay to Diaspora

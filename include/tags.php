@@ -1,20 +1,4 @@
 <?php
-/*
-require_once("boot.php");
-if(@is_null($a)) {
-        $a = new App;
-}
-
-if(is_null($db)) {
-        @include(".htconfig.php");
-        require_once("dba.php");
-        $db = new dba($db_host, $db_user, $db_pass, $db_data);
-        unset($db_host, $db_user, $db_pass, $db_data);
-};
-
-$a->set_baseurl("https://pirati.ca");
-*/
-
 function create_tags_from_item($itemid) {
 	global $a;
 
@@ -25,7 +9,7 @@ function create_tags_from_item($itemid) {
 
 	$searchpath = $a->get_baseurl()."/search?tag=";
 
-	$messages = q("SELECT `guid`, `uid`, `id`, `edited`, `deleted`, `title`, `body`, `tag` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
+	$messages = q("SELECT `guid`, `uid`, `id`, `edited`, `deleted`, `title`, `body`, `tag`, `parent` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
 
 	if (!$messages)
 		return;
@@ -102,8 +86,11 @@ function create_tags_from_item($itemid) {
 		if ((substr($tag, 0, 1) == '@') AND (strpos($link, $profile_base_friendica) OR strpos($link, $profile_base_diaspora))) {
 			$users = q("SELECT `uid` FROM `contact` WHERE self AND (`url` = '%s' OR `nurl` = '%s')", $link, $link);
 			foreach ($users AS $user) {
-				if ($user["uid"] == $message["uid"])
+				if ($user["uid"] == $message["uid"]) {
 					q("UPDATE `item` SET `mention` = 1 WHERE `id` = %d", intval($itemid));
+
+					q("UPDATE `thread` SET `mention` = 1 WHERE `iid` = %d", intval($message["parent"]));
+				}
 			}
 		}
 	}
@@ -125,11 +112,4 @@ function update_items() {
 	foreach ($messages as $message)
 		create_tags_from_item($message["id"]);
 }
-
-//print_r($tags);
-//print_r($hashtags);
-//print_r($mentions);
-//update_items();
-//create_tags_from_item(265194);
-//create_tags_from_itemuri("infoagent@diasp.org:cce94abd104c06e8", 2);
 ?>

@@ -176,7 +176,7 @@ function content_content(&$a, $update = 0) {
 		if($tag) {
 			//$sql_extra = sprintf(" AND `term`.`term` = '%s' AND `term`.`otype` = %d AND `term`.`type` = %d ",
 			//	dbesc(protect_sprintf($search)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG));
-			//$sql_table = "`term` LEFT JOIN `item` ON `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` ";
+			//$sql_table = "`term` INNER JOIN `item` ON `item`.`id` = `term`.`oid` AND `item`.`uid` = `term`.`uid` ";
 
 			$sql_extra = "";
 			$sql_table = sprintf("`item` INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
@@ -216,7 +216,7 @@ function content_content(&$a, $update = 0) {
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`, `contact`.`writable`,
 			`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 			`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
-			FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			FROM $sql_table INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1
 			AND `item`.`deleted` = 0 and `item`.`moderated` = 0
 			$simple_update
@@ -240,7 +240,7 @@ function content_content(&$a, $update = 0) {
 		$start = dba_timer();
 
 		$r = q("SELECT `item`.`id` AS `item_id`, `contact`.`uid` AS `contact_uid`
-			FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			FROM $sql_table INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 			AND `item`.`moderated` = 0 AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			AND `item`.`parent` = `item`.`id`
@@ -267,7 +267,7 @@ function content_content(&$a, $update = 0) {
 				`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`alias`, `contact`.`rel`, `contact`.`writable`,
 				`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 				`contact`.`id` AS `cid`, `contact`.`uid` AS `contact-uid`
-				FROM $sql_table LEFT JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+				FROM $sql_table INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 				WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 				AND `item`.`moderated` = 0
 				AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0

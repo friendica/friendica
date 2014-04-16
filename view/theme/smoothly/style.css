@@ -1,7 +1,7 @@
 /*
   	style.css
   	Theme: Smoothly
-	Maintainer: alex@friendica.pixelbits.de
+	Maintainer: Nomen Nominandum
 	last change: 2013-05-08
 
 ** Colors ** 
@@ -1724,6 +1724,59 @@ ul .sidebar-group-li .icon {
 	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
 	background-color: #1873a2; 
+}
+
+.wall-item-container .wall-item-content .type-link img,
+.type-link img {
+  max-width: 160px;
+  max-height: 160px;
+  float: left;
+  margin-right: 10px;
+}
+.type-link blockquote {
+  margin-left: 160px;
+  max-height: 160px;
+  overflow: hidden;
+}
+.type-link .oembed {
+}
+
+.shared_header {
+  height: 32px;
+  color: #999;
+  border-top: 1px solid #D2D2D2;
+  padding-top: 5px;
+  margin-top: 5px;
+}
+
+.shared_header a {
+  color: black;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.shared_header a:hover {
+  color: #36c;
+}
+
+.shared_header img {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  float: left;
+}
+
+.shared_header span {
+  margin-left: 9px;
+}
+
+blockquote.shared_content {
+  margin-left: 32px;
+  color: #000;
+  border: none;
 }
 
 .icon.drop,

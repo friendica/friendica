@@ -32,7 +32,7 @@ function tagrm_post(&$a) {
 
 	$tag_str = implode(',',$arr);
 
-	q("UPDATE `item` SET `tag` = '%s' WHERE `id` = %d AND `uid` = %d LIMIT 1",
+	q("UPDATE `item` SET `tag` = '%s' WHERE `id` = %d AND `uid` = %d",
 		dbesc($tag_str),
 		intval($item),
 		intval(local_user())

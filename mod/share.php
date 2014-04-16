@@ -9,7 +9,7 @@ function share_init(&$a) {
 		killme();
 
 	$r = q("SELECT item.*, contact.network FROM `item` 
-		left join contact on `item`.`contact-id` = `contact`.`id` 
+		inner join contact on `item`.`contact-id` = `contact`.`id` 
 		WHERE `item`.`id` = %d AND `item`.`uid` = %d LIMIT 1",
 
 		intval($post_id),

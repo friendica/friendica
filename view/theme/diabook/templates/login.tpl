@@ -17,6 +17,9 @@
 			{{include file="field_openid.tpl" field=$lopenid}}
 			</div>
 	{{/if}}
+
+	{{include file="field_checkbox.tpl" field=$lremember}}
+
 	
 	<div id="login-submit-wrapper" >
 		<input type="submit" name="submit" id="login-submit-button" value="{{$login}}" />

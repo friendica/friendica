@@ -1,6 +1,7 @@
 <?php
 
 require_once('include/email.php');
+require_once('include/bbcode.php');
 
 if(! function_exists('register_post')) {
 function register_post(&$a) {
@@ -263,7 +264,7 @@ function register_content(&$a) {
 		'$realpeople' => $realpeople,
 		'$regtitle'  => t('Registration'),
 		'$registertext' =>((x($a->config,'register_text'))
-			? '<div class="error-message">' . $a->config['register_text'] . '</div>'
+			? bbcode($a->config['register_text'])
 			: "" ),
 		'$fillwith'  => $fillwith,
 		'$fillext'   => $fillext,
