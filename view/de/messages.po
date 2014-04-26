@@ -7323,3 +7323,11 @@ msgstr "Kontakt löschen"
 #, php-format
 msgid "Cannot locate DNS info for database server '%s'"
 msgstr "Kann die DNS Informationen für den Datenbankserver '%s' nicht ermitteln."
+
+#: ../../mod/wall_attach.php:75
+msgid "Sorry, maybe your upload is bigger than the PHP configuration allows"
+msgstr "Leider könnte Dein Upload größer sein als die PHP-Konfiguration erlaubt."
+
+#: ../../mod/wall_attach.php:75
+msgid "Or - did you try to upload an empty file?"
+msgstr "Oder - hast Du versucht, eine leere Datei hochzuladen?"
