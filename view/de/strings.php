@@ -1690,3 +1690,5 @@ $a->strings["Ask me"] = "Frag mich";
 $a->strings["stopped following"] = "wird nicht mehr gefolgt";
 $a->strings["Drop Contact"] = "Kontakt löschen";
 $a->strings["Cannot locate DNS info for database server '%s'"] = "Kann die DNS Informationen für den Datenbankserver '%s' nicht ermitteln.";
+$a->strings["Sorry, maybe your upload is bigger than the PHP configuration allows"] = "Leider könnte Dein Upload größer sein als die PHP-Konfiguration erlaubt.";
+$a->strings["Or - did you try to upload an empty file?"] = "Oder - hast Du versucht, eine leere Datei hochzuladen?";
