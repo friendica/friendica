@@ -112,7 +112,9 @@
 <ul id="nav-notifications-template" style="display:none;" rel="template">
 	<li><a href="{0}"><img data-src="{1}">{2} <span class="notif-when">{3}</span></a></li>
 </ul>
-
+<!--
+<div style="position: fixed; bottom: 61px; left: 220px;">{{$langselector}}</div>
+-->
 {{*
 
 {{if $nav.logout}}<a id="nav-logout-link" class="nav-link {{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}" >{{$nav.logout.1}}</a> {{/if}}

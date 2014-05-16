@@ -738,7 +738,7 @@ die("ss");
 			// This problem can occur expecially with imported facebook posts
 			$max_comments = get_config("system", "max_comments");
 			if ($max_comments == 0)
-				$max_comments = 1000;
+				$max_comments = 100;
 
 			$items = array();
 

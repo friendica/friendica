@@ -1,20 +1,20 @@
 
-Cher(e) $username,
+Cher/Chère $[username],
+	Votre mot de passe a été changé comme demandé. Merci de 
+mémoriser cette information (ou de changer immédiatement pour un 
+mot de passe que vous retiendrez).
 
-	Votre mot de passe a été modifié comme demandé. Merci de conserver
-cette information pour un usage ultérieur (ou bien de changer votre mot de 
-passe immédiatement en quelque chose dont vous vous souviendrez).
 
-Vos informations de connexion sont désormais :
+Vos identifiants sont comme suit :
 
-Site :			$siteurl
-Pseudo/Courriel :	$email
-Mot de passe :		$new_password
+Adresse du site:	$[siteurl]
+Utilisateur:	$[email]
+Mot de passe:	$[new_password]
 
-Vous pouvez changer ce mot de passe depuis la page des « réglages » de votre compte, 
-après connexion
+Vous pouvez changer ce mot de passe depuis vos 'Réglages' une fois connecté.
 
-Sincèrement votre,
-	l'administrateur de $sitename
+
+Sincèrement,
+	l'administrateur de $[sitename]
 
  

@@ -197,14 +197,14 @@ function plugin_is_app($name) {
 				return true;
 		}
 	}
-	
+
 	return false;
 }}
 
 /*
  * parse plugin comment in search of plugin infos.
  * like
- * 	
+ *
  * 	 * Name: Plugin
  *   * Description: A plugin which plugs in
  * 	 * Version: 1.2.3
@@ -222,7 +222,8 @@ function get_plugin_info($plugin){
 		'name' => $plugin,
 		'description' => "",
 		'author' => array(),
-		'version' => ""
+		'version' => "",
+		'status' => ""
 	);
 
 	if (!is_file("addon/$plugin/$plugin.php")) return $info;

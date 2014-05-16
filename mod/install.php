@@ -504,7 +504,7 @@ function load_database($db) {
 	foreach($arr as $a) {
 		if(strlen(trim($a))) {	
 			$r = @$db->q(trim($a));
-			if(! $r) {
+			if(false === $r) {
 				$errors .=  t('Errors encountered creating database tables.') . $a . EOL;
 			}
 		}

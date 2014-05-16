@@ -1,4 +1,9 @@
 <?php
+/*
+ * This is the old template engine, now deprecated.
+ * Friendica's default template engine is Smarty3 (see include/friendica_smarty.php)
+ * 
+ */
 require_once 'object/TemplateEngine.php';
 
 define("KEY_NOT_EXISTS", '^R_key_not_Exists^');

@@ -1043,13 +1043,18 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		}
 	}
 
-	if($mail_enabled) {
-		$selected = (($pubmail_enabled) ? ' checked="checked" ' : '');
-		$jotnets .= '<div class="profile-jot-net"><input type="checkbox" name="pubmail_enable"' . $selected . ' value="1" /> ' . t("Post to Email") . '</div>';
-	}
+	if (!$a->user['hidewall']) {
+		if($mail_enabled) {
+			$selected = (($pubmail_enabled) ? ' checked="checked" ' : '');
+			$jotnets .= '<div class="profile-jot-net"><input type="checkbox" name="pubmail_enable"' . $selected . ' value="1" /> ' . t("Post to Email") . '</div>';
+		}
+
+		call_hooks('jot_networks', $jotnets);
+	} else
+		$jotnets .= sprintf(t('Connectors disabled, since "%s" is enabled.'),
+				    t('Hide your profile details from unknown viewers?'));
 
 	call_hooks('jot_tool', $jotplugins);
-	call_hooks('jot_networks', $jotnets);
 
 	if($notes_cid)
 		$jotnets .= '<input type="hidden" name="contact_allow[]" value="' . $notes_cid .'" />';

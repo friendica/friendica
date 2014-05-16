@@ -17,7 +17,14 @@
 		<div class="wall-item-title" id="wall-item-title-{{$id}}">{{$title}}</div>
 		<div class="wall-item-body" id="wall-item-body-{{$id}}" >{{$body}}</div>
 	</div>
-	{{$drop}}
+	
+	{{if $drop.dropping }}
+		<div class="wall-item-delete-wrapper" id="wall-item-delete-wrapper-{{$id}}" >
+			<a href="item/drop/{{$id}}" onclick="return confirmDelete();" class="icon drophide" title="{{$drop.delete}}" onmouseover="imgbright(this);" onmouseout="imgdull(this);" ></a>
+		</div>
+		<div class="wall-item-delete-end"></div>
+	{{/if}}
+
 	<div class="wall-item-wrapper-end"></div>
 	<div class="wall-item-comment-separator"></div>
 	{{$comment}}

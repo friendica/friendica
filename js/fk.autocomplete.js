@@ -14,6 +14,11 @@ function ACPopup(elm,backend_url){
 	this.kp_timer = false;
 	this.url = backend_url;
 
+	this.conversation_id = null;
+	var conv_id = this.element.id.match(/\d+$/);
+	if (conv_id) this.conversation_id = conv_id[0];
+	console.log("ACPopup elm id",this.element.id,"conversation",this.conversation_id);
+
 	var w = 530;
 	var h = 130;
 
@@ -67,6 +72,7 @@ ACPopup.prototype._search = function(){
 		count:100,
 		search:this.searchText,
 		type:'c',
+		conversation: this.conversation_id,
 	}
 	
 	$.ajax({
@@ -79,8 +85,10 @@ ACPopup.prototype._search = function(){
 			if (data.tot>0){
 				that.cont.show();
 				$(data.items).each(function(){
-					html = "<img src='{0}' height='16px' width='16px'>{1} ({2})".format(this.photo, this.name, this.nick)
-						that.add(html, this.nick.replace(' ','') + '+' + this.id + ' - ' + this.link);
+					var html = "<img src='{0}' height='16px' width='16px'>{1} ({2})".format(this.photo, this.name, this.nick);
+					var nick = this.nick.replace(' ','');
+					if (this.id!=='')  nick += '+' + this.id; 
+					that.add(html, nick + ' - ' + this.link);
 				});			
 			} else {
 				that.cont.hide();

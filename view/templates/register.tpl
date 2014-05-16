@@ -61,7 +61,7 @@
 
 <h3>{{$importh}}</h3>
 	<div id ="import-profile">
-		<a href="/uimport">{{$importt}}</a>
+		<a href="uimport">{{$importt}}</a>
 	</div>
 </form>
 

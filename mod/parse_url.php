@@ -51,6 +51,7 @@ function completeurl($url, $scheme) {
 }
 
 function parseurl_getsiteinfo($url, $no_guessing = false) {
+
 	$siteinfo = array();
 
 	$url = trim($url, "'");
@@ -172,7 +173,7 @@ function parseurl_getsiteinfo($url, $no_guessing = false) {
 					$siteinfo["image"] = $attr["content"];
 					break;
 				case "twitter:card":
-					if ($siteinfo["type"] == "")
+					if (($siteinfo["type"] == "") OR ($attr["content"] == "photo"))
 						$siteinfo["type"] = $attr["content"];
 					break;
 				case "twitter:description":
@@ -440,3 +441,4 @@ function parse_url_content(&$a) {
 
 	killme();
 }
+?>

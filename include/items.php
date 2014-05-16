@@ -176,7 +176,7 @@ function get_feed_for(&$a, $dfrn_id, $owner_nick, $last_update, $direction = 0) 
 		'$thumb'        => xmlify($owner['thumb']),
 		'$picdate'      => xmlify(datetime_convert('UTC','UTC',$owner['avatar-date'] . '+00:00' , ATOM_TIME)) ,
 		'$uridate'      => xmlify(datetime_convert('UTC','UTC',$owner['uri-date']    . '+00:00' , ATOM_TIME)) ,
-		'$namdate'      => xmlify(datetime_convert('UTC','UTC',$owner['name-date']   . '+00:00' , ATOM_TIME)) , 
+		'$namdate'      => xmlify(datetime_convert('UTC','UTC',$owner['name-date']   . '+00:00' , ATOM_TIME)) ,
 		'$birthday'     => ((strlen($birthday)) ? '<dfrn:birthday>' . xmlify($birthday) . '</dfrn:birthday>' : ''),
 		'$community'    => (($owner['page-flags'] == PAGE_COMMUNITY) ? '<dfrn:community>1</dfrn:community>' : '')
 	));
@@ -261,7 +261,7 @@ function construct_activity_object($item) {
 	}
 
 	return '';
-} 
+}
 
 function construct_activity_target($item) {
 
@@ -425,7 +425,7 @@ function get_atom_elements($feed, $item, $contact = array()) {
 	$res = array();
 
 	$author = $item->get_author();
-	if($author) { 
+	if($author) {
 		$res['author-name'] = unxmlify($author->get_name());
 		$res['author-link'] = unxmlify($author->get_link());
 	}
@@ -554,14 +554,14 @@ function get_atom_elements($feed, $item, $contact = array()) {
 
 	$res['body'] = limit_body_size($res['body']);
 
-	// It isn't certain at this point whether our content is plaintext or html and we'd be foolish to trust 
-	// the content type. Our own network only emits text normally, though it might have been converted to 
+	// It isn't certain at this point whether our content is plaintext or html and we'd be foolish to trust
+	// the content type. Our own network only emits text normally, though it might have been converted to
 	// html if we used a pubsubhubbub transport. But if we see even one html tag in our text, we will
 	// have to assume it is all html and needs to be purified.
 
-	// It doesn't matter all that much security wise - because before this content is used anywhere, we are 
-	// going to escape any tags we find regardless, but this lets us import a limited subset of html from 
-	// the wild, by sanitising it and converting supported tags to bbcode before we rip out any remaining 
+	// It doesn't matter all that much security wise - because before this content is used anywhere, we are
+	// going to escape any tags we find regardless, but this lets us import a limited subset of html from
+	// the wild, by sanitising it and converting supported tags to bbcode before we rip out any remaining
 	// html.
 
 	if((strpos($res['body'],'<') !== false) && (strpos($res['body'],'>') !== false)) {
@@ -720,7 +720,7 @@ function get_atom_elements($feed, $item, $contact = array()) {
 			if(! $type)
 				$type = 'application/octet-stream';
 
-			$att_arr[] = '[attach]href="' . $link . '" length="' . $len . '" type="' . $type . '" title="' . $title . '"[/attach]'; 
+			$att_arr[] = '[attach]href="' . $link . '" length="' . $len . '" type="' . $type . '" title="' . $title . '"[/attach]';
 		}
 		$res['attach'] = implode(',', $att_arr);
 	}
@@ -988,6 +988,23 @@ function item_store($arr,$force_parent = false) {
 
 	if(! x($arr,'type'))
 		$arr['type']      = 'remote';
+
+
+
+	/* check for create  date and expire time */
+	$uid = intval($arr['uid']);
+	$r = q("SELECT expire FROM user WHERE uid = %d", $uid);
+	if(count($r)) {
+		$expire_interval = $r[0]['expire'];
+		if ($expire_interval>0) {
+			$expire_date =  new DateTime( '- '.$expire_interval.' days', new DateTimeZone('UTC'));
+			$created_date = new DateTime($arr['created'], new DateTimeZone('UTC'));
+			if ($created_date < $expire_date) {
+				logger('item-store: item created ('.$arr['created'].') before expiration time ('.$expire_date->format(DateTime::W3C).'). ignored. ' . print_r($arr,true), LOGGER_DEBUG);
+				return 0;
+			}
+		}
+	}
 
 	// Shouldn't happen but we want to make absolutely sure it doesn't leak from a plugin.
 
@@ -1647,7 +1664,7 @@ function dfrn_deliver($owner,$contact,$atom, $dissolve = false) {
 	$final_dfrn_id = '';
 
 	if($perm) {
-		if((($perm == 'rw') && (! intval($contact['writable']))) 
+		if((($perm == 'rw') && (! intval($contact['writable'])))
 		|| (($perm == 'r') && (intval($contact['writable'])))) {
 			q("update contact set writable = %d where id = %d",
 				intval(($perm == 'rw') ? 1 : 0),
@@ -1657,7 +1674,7 @@ function dfrn_deliver($owner,$contact,$atom, $dissolve = false) {
 		}
 	}
 
-	if(($contact['duplex'] && strlen($contact['pubkey'])) 
+	if(($contact['duplex'] && strlen($contact['pubkey']))
 		|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
 		|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))) {
 		openssl_public_decrypt($sent_dfrn_id,$final_dfrn_id,$contact['pubkey']);
@@ -1675,7 +1692,7 @@ function dfrn_deliver($owner,$contact,$atom, $dissolve = false) {
 
 	if($final_dfrn_id != $orig_id) {
 		logger('dfrn_deliver: wrong dfrn_id.');
-		// did not decode properly - cannot trust this site 
+		// did not decode properly - cannot trust this site
 		return 3;
 	}
 
@@ -1698,16 +1715,16 @@ function dfrn_deliver($owner,$contact,$atom, $dissolve = false) {
 
 	if($page)
 		$postvars['page'] = $page;
-	
+
 	if($rino && $rino_allowed && (! $dissolve)) {
 		$key = substr(random_string(),0,16);
 		$data = bin2hex(aes_encrypt($postvars['data'],$key));
 		$postvars['data'] = $data;
-		logger('rino: sent key = ' . $key, LOGGER_DEBUG);	
+		logger('rino: sent key = ' . $key, LOGGER_DEBUG);
 
 
-		if($dfrn_version >= 2.1) {	
-			if(($contact['duplex'] && strlen($contact['pubkey'])) 
+		if($dfrn_version >= 2.1) {
+			if(($contact['duplex'] && strlen($contact['pubkey']))
 				|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
 				|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))) {
 
@@ -1758,7 +1775,7 @@ function dfrn_deliver($owner,$contact,$atom, $dissolve = false) {
 
 	$res = parse_xml_string($xml);
 
-	return $res->status; 
+	return $res->status;
 }
 
 
@@ -1791,12 +1808,12 @@ function edited_timestamp_is_newer($existing, $update) {
  * $importer = the contact_record (joined to user_record) of the local user who owns this relationship.
  *             It is this person's stuff that is going to be updated.
  * $contact =  the person who is sending us stuff. If not set, we MAY be processing a "follow" activity
- *             from an external network and MAY create an appropriate contact record. Otherwise, we MUST 
+ *             from an external network and MAY create an appropriate contact record. Otherwise, we MUST
  *             have a contact record.
- * $hub = should we find a hub declation in the feed, pass it back to our calling process, who might (or 
+ * $hub = should we find a hub declation in the feed, pass it back to our calling process, who might (or
  *        might not) try and subscribe to it.
  * $datedir sorts in reverse order
- * $pass - by default ($pass = 0) we cannot guarantee that a parent item has been 
+ * $pass - by default ($pass = 0) we cannot guarantee that a parent item has been
  *      imported prior to its children being seen in the stream unless we are certain
  *      of how the feed is arranged/ordered.
  * With $pass = 1, we only pull parent items out of the stream.
@@ -1957,7 +1974,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 			 *
 			 * $bdtext is just a readable placeholder in case the event is shared
 			 * with others. We will replace it during presentation to our $importer
-			 * to contain a sparkle link and perhaps a photo. 
+			 * to contain a sparkle link and perhaps a photo.
 			 *
 			 */
 
@@ -1988,7 +2005,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 			);
 
 			// This function is called twice without reloading the contact
-			// Make sure we only create one event. This is why &$contact 
+			// Make sure we only create one event. This is why &$contact
 			// is a reference var in this function
 
 			$contact['bdyear'] = substr($birthday,0,4);
@@ -2027,7 +2044,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 					$when = datetime_convert('UTC','UTC','now','Y-m-d H:i:s');
 			}
 			if($deleted && is_array($contact)) {
-				$r = q("SELECT `item`.*, `contact`.`self` FROM `item` INNER JOIN `contact` on `item`.`contact-id` = `contact`.`id` 
+				$r = q("SELECT `item`.*, `contact`.`self` FROM `item` INNER JOIN `contact` on `item`.`contact-id` = `contact`.`id`
 					WHERE `uri` = '%s' AND `item`.`uid` = %d AND `contact-id` = %d AND NOT `item`.`file` LIKE '%%[%%' LIMIT 1",
 					dbesc($uri),
 					intval($importer['uid']),
@@ -2441,19 +2458,19 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 				$datarray['contact-id'] = $contact['id'];
 
 				if(! link_compare($datarray['owner-link'],$contact['url'])) {
-					// The item owner info is not our contact. It's OK and is to be expected if this is a tgroup delivery, 
+					// The item owner info is not our contact. It's OK and is to be expected if this is a tgroup delivery,
 					// but otherwise there's a possible data mixup on the sender's system.
 					// the tgroup delivery code called from item_store will correct it if it's a forum,
-					// but we're going to unconditionally correct it here so that the post will always be owned by our contact. 
+					// but we're going to unconditionally correct it here so that the post will always be owned by our contact.
 					logger('consume_feed: Correcting item owner.', LOGGER_DEBUG);
 					$datarray['owner-name']   = $contact['name'];
 					$datarray['owner-link']   = $contact['url'];
 					$datarray['owner-avatar'] = $contact['thumb'];
 				}
 
-				// We've allowed "followers" to reach this point so we can decide if they are 
+				// We've allowed "followers" to reach this point so we can decide if they are
 				// posting an @-tag delivery, which followers are allowed to do for certain
-				// page types. Now that we've parsed the post, let's check if it is legit. Otherwise ignore it. 
+				// page types. Now that we've parsed the post, let's check if it is legit. Otherwise ignore it.
 
 				if(($contact['rel'] == CONTACT_IS_FOLLOWER) && (! tgroup_check($importer['uid'],$datarray)))
 					continue;
@@ -2811,7 +2828,7 @@ function local_delivery($importer,$data) {
 
 		dbesc_array($msg);
 
-		$r = dbq("INSERT INTO `mail` (`" . implode("`, `", array_keys($msg)) 
+		$r = dbq("INSERT INTO `mail` (`" . implode("`, `", array_keys($msg))
 			. "`) VALUES ('" . implode("', '", array_values($msg)) . "')" );
 
 		// send notifications.
@@ -2895,18 +2912,18 @@ function local_delivery($importer,$data) {
 					}
 					else
 						$sql_extra = " and contact.self = 1 and item.wall = 1 ";
- 
-					// was the top-level post for this reply written by somebody on this site? 
-					// Specifically, the recipient? 
+
+					// was the top-level post for this reply written by somebody on this site?
+					// Specifically, the recipient?
 
 					$is_a_remote_delete = false;
 
 					// POSSIBLE CLEANUP --> Why select so many fields when only forum_mode and wall are used?
-					$r = q("select `item`.`id`, `item`.`uri`, `item`.`tag`, `item`.`forum_mode`,`item`.`origin`,`item`.`wall`, 
-						`contact`.`name`, `contact`.`url`, `contact`.`thumb` from `item` 
-						INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id` 
+					$r = q("select `item`.`id`, `item`.`uri`, `item`.`tag`, `item`.`forum_mode`,`item`.`origin`,`item`.`wall`,
+						`contact`.`name`, `contact`.`url`, `contact`.`thumb` from `item`
+						INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 						WHERE `item`.`uri` = '%s' AND (`item`.`parent-uri` = '%s' or `item`.`thr-parent` = '%s')
-						AND `item`.`uid` = %d 
+						AND `item`.`uid` = %d
 						$sql_extra
 						LIMIT 1",
 						dbesc($parent_uri),
@@ -2918,8 +2935,8 @@ function local_delivery($importer,$data) {
 						$is_a_remote_delete = true;
 
 					// Does this have the characteristics of a community or private group comment?
-					// If it's a reply to a wall post on a community/prvgroup page it's a 
-					// valid community comment. Also forum_mode makes it valid for sure. 
+					// If it's a reply to a wall post on a community/prvgroup page it's a
+					// valid community comment. Also forum_mode makes it valid for sure.
 					// If neither, it's not.
 
 					if($is_a_remote_delete && $community) {
@@ -3094,8 +3111,8 @@ function local_delivery($importer,$data) {
 			}
 
 			// Does this have the characteristics of a community or private group comment?
-			// If it's a reply to a wall post on a community/prvgroup page it's a 
-			// valid community comment. Also forum_mode makes it valid for sure. 
+			// If it's a reply to a wall post on a community/prvgroup page it's a
+			// valid community comment. Also forum_mode makes it valid for sure.
 			// If neither, it's not.
 
 			if($is_a_remote_comment && $community) {
@@ -3275,7 +3292,7 @@ function local_delivery($importer,$data) {
 								'link'		   => $a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $posted_id,
 								'source_name'  => stripslashes($datarray['author-name']),
 								'source_link'  => $datarray['author-link'],
-								'source_photo' => ((link_compare($datarray['author-link'],$importer['url'])) 
+								'source_photo' => ((link_compare($datarray['author-link'],$importer['url']))
 									? $importer['thumb'] : $datarray['author-avatar']),
 								'verb'         => ACTIVITY_POST,
 								'otype'        => 'item',
@@ -3439,7 +3456,7 @@ function local_delivery($importer,$data) {
 									'link'		   => $a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $posted_id,
 									'source_name'  => stripslashes($datarray['author-name']),
 									'source_link'  => $datarray['author-link'],
-									'source_photo' => ((link_compare($datarray['author-link'],$importer['url'])) 
+									'source_photo' => ((link_compare($datarray['author-link'],$importer['url']))
 										? $importer['thumb'] : $datarray['author-avatar']),
 									'verb'         => ACTIVITY_POST,
 									'otype'        => 'item',
@@ -3539,10 +3556,10 @@ function local_delivery($importer,$data) {
 
 
 			if(! link_compare($datarray['owner-link'],$importer['url'])) {
-				// The item owner info is not our contact. It's OK and is to be expected if this is a tgroup delivery, 
+				// The item owner info is not our contact. It's OK and is to be expected if this is a tgroup delivery,
 				// but otherwise there's a possible data mixup on the sender's system.
 				// the tgroup delivery code called from item_store will correct it if it's a forum,
-				// but we're going to unconditionally correct it here so that the post will always be owned by our contact. 
+				// but we're going to unconditionally correct it here so that the post will always be owned by our contact.
 				logger('local_delivery: Correcting item owner.', LOGGER_DEBUG);
 				$datarray['owner-name']   = $importer['senderName'];
 				$datarray['owner-link']   = $importer['url'];
@@ -3569,7 +3586,7 @@ function local_delivery($importer,$data) {
 			        foreach($links->link as $l) {
             			$atts = $l->attributes();
             			switch($atts['rel']) {
-                			case "alternate": 
+                			case "alternate":
 								$Blink = $atts['href'];
 								break;
 							default:
@@ -3592,7 +3609,7 @@ function local_delivery($importer,$data) {
 							'link'		   => $a->get_baseurl() . '/display/' . $importer['nickname'] . '/' . $posted_id,
 							'source_name'  => stripslashes($datarray['author-name']),
 							'source_link'  => $datarray['author-link'],
-							'source_photo' => ((link_compare($datarray['author-link'],$importer['url'])) 
+							'source_photo' => ((link_compare($datarray['author-link'],$importer['url']))
 								? $importer['thumb'] : $datarray['author-avatar']),
 							'verb'         => $datarray['verb'],
 							'otype'        => 'person',
@@ -3601,7 +3618,7 @@ function local_delivery($importer,$data) {
 						));
 					}
 				}
-			}			
+			}
 
 			continue;
 		}
@@ -3637,7 +3654,7 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 
 		// create contact record
 
-		$r = q("INSERT INTO `contact` ( `uid`, `created`, `url`, `nurl`, `name`, `nick`, `photo`, `network`, `rel`, 
+		$r = q("INSERT INTO `contact` ( `uid`, `created`, `url`, `nurl`, `name`, `nick`, `photo`, `network`, `rel`,
 			`blocked`, `readonly`, `pending`, `writable` )
 			VALUES ( %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, 0, 0, 1, 1 ) ",
 			intval($importer['uid']),
@@ -3689,7 +3706,7 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 					'$siteurl' => $a->get_baseurl(),
 					'$sitename' => $a->config['sitename']
 				));
-				$res = mail($r[0]['email'], 
+				$res = mail($r[0]['email'],
 					email_header_encode((($sharing) ? t('A new person is sharing with you at ') : t("You have a new follower at ")) . $a->config['sitename'],'UTF-8'),
 					$email,
 					'From: ' . 'Administrator' . '@' . $_SERVER['SERVER_NAME'] . "\n"
@@ -3738,7 +3755,7 @@ function subscribe_to_hub($url,$importer,$contact,$hubmode = 'subscribe') {
 		);
 	}
 
-	// Diaspora has different message-ids in feeds than they do 
+	// Diaspora has different message-ids in feeds than they do
 	// through the direct Diaspora protocol. If we try and use
 	// the feed, we'll get duplicates. So don't.
 
@@ -3934,7 +3951,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 					// Check to see if we should replace this photo link with an embedded image
 					// 1. No need to do so if the photo is public
 					// 2. If there's a contact-id provided, see if they're in the access list
-					//    for the photo. If so, embed it. 
+					//    for the photo. If so, embed it.
 					// 3. Otherwise, if we have an item, see if the item permissions match the photo
 					//    permissions, regardless of order but first check to see if they're an exact
 					//    match to save some processing overhead.
@@ -3943,7 +3960,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 						if($cid) {
 							$recips = enumerate_permissions($r[0]);
 							if(in_array($cid, $recips)) {
-								$replace = true;	
+								$replace = true;
 							}
 						}
 						elseif($item) {
@@ -3976,7 +3993,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 					}
 				}
 			}
-		}	
+		}
 
 		$new_body = $new_body . substr($orig_body, 0, $img_start + $img_st_close) . $image . '[/img]';
 		$orig_body = substr($orig_body, $img_start + $img_st_close + $img_len + strlen('[/img]'));
@@ -4001,7 +4018,7 @@ function has_permissions($obj) {
 }
 
 function compare_permissions($obj1,$obj2) {
-	// first part is easy. Check that these are exactly the same. 
+	// first part is easy. Check that these are exactly the same.
 	if(($obj1['allow_cid'] == $obj2['allow_cid'])
 		&& ($obj1['allow_gid'] == $obj2['allow_gid'])
 		&& ($obj1['deny_cid'] == $obj2['deny_cid'])
@@ -4043,14 +4060,14 @@ function item_getfeedtags($item) {
 				$ret[] = array('#',$matches[1][$x], $matches[2][$x]);
 		}
 	}
-	$matches = false; 
+	$matches = false;
 	$cnt = preg_match_all('|\@\[url\=(.*?)\](.*?)\[\/url\]|',$item['tag'],$matches);
 	if($cnt) {
 		for($x = 0; $x < $cnt; $x ++) {
 			if($matches[1][$x])
 				$ret[] = array('@',$matches[1][$x], $matches[2][$x]);
 		}
-	} 
+	}
 	return $ret;
 }
 
@@ -4087,10 +4104,10 @@ function item_expire($uid,$days) {
 	$expire_network_only = get_pconfig($uid,'expire','network_only');
 	$sql_extra = ((intval($expire_network_only)) ? " AND wall = 0 " : "");
 
-	$r = q("SELECT * FROM `item` 
-		WHERE `uid` = %d 
-		AND `created` < UTC_TIMESTAMP() - INTERVAL %d DAY 
-		AND `id` = `parent` 
+	$r = q("SELECT * FROM `item`
+		WHERE `uid` = %d
+		AND `created` < UTC_TIMESTAMP() - INTERVAL %d DAY
+		AND `id` = `parent`
 		$sql_extra
 		AND `deleted` = 0",
 		intval($uid),
@@ -4136,7 +4153,7 @@ function item_expire($uid,$days) {
 	}
 
 	proc_run('php',"include/notifier.php","expire","$uid");
-	
+
 }
 
 
@@ -4257,10 +4274,10 @@ function drop_item($id,$interactive = true) {
 			}
 		}
 
-		// If item is a link to a photo resource, nuke all the associated photos 
+		// If item is a link to a photo resource, nuke all the associated photos
 		// (visitors will not have photo resources)
 		// This only applies to photos uploaded from the photos page. Photos inserted into a post do not
-		// generate a resource-id and therefore aren't intimately linked to the item. 
+		// generate a resource-id and therefore aren't intimately linked to the item.
 
 		if(strlen($item['resource-id'])) {
 			q("DELETE FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d ",
@@ -4400,7 +4417,7 @@ function posted_dates($uid,$wall) {
 	if(! $dthen)
 		return array();
 
-	// If it's near the end of a long month, backup to the 28th so that in 
+	// If it's near the end of a long month, backup to the 28th so that in
 	// consecutive loops we'll always get a whole month difference.
 
 	if(intval(substr($dnow,8)) > 28)

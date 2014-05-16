@@ -1,27 +1,25 @@
 
-Une nouvelle demande d'inscription a été reçue sur $sitename, et elle
-nécessite votre approbation.
+Une nouvelle demande d'inscription a été reçue par $[sitename], elle  
+nécessite votre approbation. 
 
 
-Les informations de connexion sont les suivantes :
+Les détails du compte sont:
 
-Nom complet :		$username
-Site :			$siteurl
-Pseudo/Courriel :	$email
-
-
-Pour approuver cette demande, merci de suivre le lien :
+Nom complet:	$[username]
+Adresse du site:	$[siteurl]
+Utilisateur:	$[email]
 
 
-$siteurl/regmod/allow/$hash
+Pour approuver, merci de visiter le lien suivant:
 
 
-Pour rejeter cette demande et supprimer le compte associé, 
-merci de suivre le lien :
+$[siteurl]/regmod/allow/$[hash] 
 
 
-$siteurl/regmod/deny/$hash
+Pour refuser et supprimer le compte:
 
 
-En vous remerçiant.
+$[siteurl]/regmod/deny/$[hash]
 
+
+Merci d'avance.

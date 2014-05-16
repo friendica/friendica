@@ -1,5 +1,11 @@
 <?php
 
+# if PDO is avaible for mysql, use the new database abstraction
+if(class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
+  require_once("library/dddbl2/dddbl.php");
+  require_once("include/dba_pdo.php");
+}
+
 require_once('include/datetime.php');
 
 /**

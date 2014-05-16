@@ -27,14 +27,15 @@ function removeme_post(&$a) {
 
 }
 
-
-
 function removeme_content(&$a) {
 
 	if(! local_user())
 		goaway(z_root());
 
 	$hash = random_string();
+
+        require_once("mod/settings.php");
+        settings_init($a);
 
 	$_SESSION['remove_account_verify'] = $hash;
 
@@ -48,6 +49,6 @@ function removeme_content(&$a) {
 		'$submit' => t('Remove My Account')
 	));
 
-	return $o;		
+	return $o;
 
 }

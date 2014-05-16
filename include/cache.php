@@ -5,17 +5,17 @@
 
 	class Cache {
 		public static function get($key) {
-			if (function_exists("apc_fetch") AND function_exists("apc_exists"))
+			/*if (function_exists("apc_fetch") AND function_exists("apc_exists"))
 				if (apc_exists($key))
-					return(apc_fetch($key));
+					return(apc_fetch($key));*/
 
 			$r = q("SELECT `v` FROM `cache` WHERE `k`='%s' limit 1",
 				dbesc($key)
 			);
 
 			if (count($r)) {
-				if (function_exists("apc_store"))
-					apc_store($key, $r[0]['v'], 600);
+				/*if (function_exists("apc_store"))
+					apc_store($key, $r[0]['v'], 600);*/
 
 				return $r[0]['v'];
 			}
@@ -29,8 +29,8 @@
 					dbesc($value),
 					dbesc(datetime_convert()));
 
-			if (function_exists("apc_store"))
-				apc_store($key, $value, 600);
+			/*if (function_exists("apc_store"))
+				apc_store($key, $value, 600);*/
 
 		}
 

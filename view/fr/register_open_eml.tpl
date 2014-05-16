@@ -1,22 +1,34 @@
 
-Cher(e) $username,
+Cher $[username],
+	Merci de vous être inscrit sur $[sitename]. Votre compte est bien créé. 
+Vos informations de connexion sont comme suit : 
 
-	Merci de votre inscription à $sitename. Votre compte a été créé.
-Les informations de connexion sont les suivantes :
 
-Site :			$siteurl
-Pseudo/Courriel :	$email
-Mot de passe :		$password
+Adresse du site:	$[siteurl]
+Utilisateur:	$[email]
+Mot de passe:	$[password]
 
-Vous pouvez changer de mot de passe dans la page des « Réglages » de votre compte,
-après connexion.
+Vous pouvez changer votre mot de passe depuis la page "Réglages" une fois 
+connecté.
 
-Merci de prendre quelques minutes pour découvrir les autres réglages disponibles
-sur cette page.
+Merci de prender quelques instants pour vérifier les autres réglages de cette page.
 
-Merci, et bienvenue sur $sitename.
+Vous pouvez aussi ajouter quelques informatiques de base à votre profil par défaut 
+(sur la page "Profils") pour que les autres membres vous trouvent facilement.
+
+Nous vous recommandons d'indiquer un nom complet, d'ajouter une photo 
+de profil, quelques "mots-clés" (très efficace pour rencontrer des gens) - et 
+peut-être aussi votre pays de résidence ; sauf si vous souhaitez être plus
+précis, bien sûr.
+
+Nous avons le plus grand respect pour votre vie privée, et aucun de ces éléments n'est nécessaire. 
+Si vous êtes nouveau et ne connaissez personne, ils peuvent cependant vous
+aider à vous faire quelques nouveaux et intéressants contacts.  
+
+
+Merci, et bienvenue sur $[sitename].
 
 Sincèrement votre,
-	l'administrateur de $sitename
+	l'administrateur de $[sitename]
 
  

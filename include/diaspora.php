@@ -329,7 +329,7 @@ function diaspora_msg_build($msg,$user,$contact,$prvkey,$pubkey,$public = false)
 	$b_outer_aes_key = base64_encode($outer_aes_key);
 	$outer_iv = random_string(16);
 	$b_outer_iv = base64_encode($outer_iv);
-	
+
 	$handle = $user['nickname'] . '@' . substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
 
 	$padded_data = pkcs5_pad($msg,16);
@@ -425,7 +425,7 @@ function diaspora_decode($importer,$xml) {
 	else {
 
 		$encrypted_header = json_decode(base64_decode($children->encrypted_header));
-	
+
 		$encrypted_aes_key_bundle = base64_decode($encrypted_header->aes_key);
 		$ciphertext = base64_decode($encrypted_header->ciphertext);
 

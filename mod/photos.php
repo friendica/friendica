@@ -1640,10 +1640,15 @@ function photos_content(&$a) {
 
 					$profile_link = $profile_url;
 
-					$drop = '';
-
-					if(($item['contact-id'] == $contact_id) || ($item['uid'] == local_user()))
-						$drop = replace_macros(get_markup_template('photo_drop.tpl'), array('$id' => $item['id'], '$delete' => t('Delete')));
+					
+					
+					$dropping = (($item['contact-id'] == $contact_id) || ($item['uid'] == local_user()));
+					$drop = array(
+						'dropping' => $dropping,
+						'pagedrop' => false,
+						'select' => t('Select'),
+						'delete' => t('Delete'),
+					);
 
 
 					if($a->theme['template_engine'] === 'internal') {

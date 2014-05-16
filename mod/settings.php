@@ -16,10 +16,11 @@ function get_theme_config_file($theme){
 
 function settings_init(&$a) {
 
-	if (function_exists("apc_delete")) {
-		$toDelete = new APCIterator('user', APC_ITER_VALUE);
-		apc_delete($toDelete);
-	}
+	// APC deactivated, since there are problems with PHP 5.5
+	//if (function_exists("apc_delete")) {
+	//	$toDelete = new APCIterator('user', APC_ITER_VALUE);
+	//	apc_delete($toDelete);
+	//}
 
 	// These lines provide the javascript needed by the acl selector
 
@@ -956,6 +957,8 @@ function settings_content(&$a) {
 
 	$pageset_tpl = get_markup_template('pagetypes.tpl');
 	$pagetype = replace_macros($pageset_tpl, array(
+		'$user' 	=> t("User Types"),
+		'$community' 	=> t("Community Types"),
 		'$page_normal' 	=> array('page-flags', t('Normal Account Page'), PAGE_NORMAL,
 									t('This account is a normal personal profile'),
 									($a->user['page-flags'] == PAGE_NORMAL)),

@@ -382,7 +382,7 @@ function acl_lookup(&$a, $out_type = 'json') {
 	$count = (x($_REQUEST,'count')?$_REQUEST['count']:100);
 	$search = (x($_REQUEST,'search')?$_REQUEST['search']:"");
 	$type = (x($_REQUEST,'type')?$_REQUEST['type']:"");
-	
+	$conv_id = (x($_REQUEST,'conversation')?$_REQUEST['conversation']:null);
 
 	// For use with jquery.autocomplete for private mail completion
 
@@ -449,6 +449,7 @@ function acl_lookup(&$a, $out_type = 'json') {
 	} else {
 		$contact_count = 0;
 	}
+	
 	
 	$tot = $group_count+$contact_count;
 	
@@ -553,6 +554,52 @@ function acl_lookup(&$a, $out_type = 'json') {
 		
 	$items = array_merge($groups, $contacts);
 
+	if ($conv_id) {
+		/* if $conv_id is set, get unknow contacts in thread */ 
+		/* but first get know contacts url to filter them out */
+		function _contact_link($i){ return dbesc($i['link']); }
+		$known_contacts = array_map(_contact_link, $contacts);
+		$unknow_contacts=array();
+		$r = q("select 
+					`author-avatar`,`author-name`,`author-link`
+				from item where parent=%d
+				and (
+					`author-name` LIKE '%%%s%%' OR
+					`author-link` LIKE '%%%s%%'
+				) and 
+				`author-link` NOT IN ('%s')
+				GROUP BY `author-link`
+				ORDER BY `author-name` ASC
+				", 
+				intval($conv_id),
+				dbesc($search),
+				dbesc($search),
+				implode("','", $known_contacts)
+		);
+		if (is_array($r) && count($r)){
+			foreach($r as $row) {
+				// nickname..
+				$up = parse_url($row['author-link']);
+				$nick = explode("/",$up['path']);
+				$nick = $nick[count($nick)-1];
+				$nick .= "@".$up['host'];
+				// /nickname
+				$unknow_contacts[] = array(
+					"type"  => "c",
+					"photo" => $row['author-avatar'],
+					"name"  => $row['author-name'],
+					"id"	=> '',
+					"network" => "unknown",
+					"link" => $row['author-link'],
+					"nick" => $nick,
+					"forum" => false
+				);
+			}
+		}
+
+		$items = array_merge($items, $unknow_contacts);
+		$tot += count($unknow_contacts);
+	}
 
 	if($out_type === 'html') {
 		$o = array(

@@ -19,6 +19,8 @@ function ref_session_read ($id) {
   if(count($r)) {
     $session_exists = true;
     return $r[0]['data'];
+  } else {
+    logger("no data for session $id", LOGGER_TRACE);
   }
   return '';
 }}

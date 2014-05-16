@@ -1,13 +1,5 @@
 <?php
 
-// This is our template processor.
-// $s is the string requiring macro substitution.
-// $r is an array of key value pairs (search => replace)
-// returns substituted string.
-// WARNING: this is pretty basic, and doesn't properly handle search strings that are substrings of each other.
-// For instance if 'test' => "foo" and 'testing' => "bar", testing could become either bar or fooing, 
-// depending on the order in which they were declared in the array.
-
 require_once("include/template_processor.php");
 require_once("include/friendica_smarty.php");
 
@@ -661,6 +653,9 @@ function attribute_contains($attr,$s) {
 }}
 
 if(! function_exists('logger')) {
+/* setup int->string log level map */
+$LOGGER_LEVELS = array();
+	
 /**
  * log levels:
  * LOGGER_NORMAL (default)
@@ -678,9 +673,16 @@ function logger($msg,$level = 0) {
 	// turn off logger in install mode
 	global $a;
 	global $db;
-
+	global $LOGGER_LEVELS;
+	
 	if(($a->module == 'install') || (! ($db && $db->connected))) return;
 
+    if (count($LOGGER_LEVEL)==0){
+        foreach (get_defined_constants() as $k=>$v){
+            if (substr($k,0,7)=="LOGGER_") $LOGGER_LEVELS[$v] = substr($k,7,7);
+        }        
+    }
+    
 	$debugging = get_config('system','debugging');
 	$loglevel  = intval(get_config('system','loglevel'));
 	$logfile   = get_config('system','logfile');
@@ -688,8 +690,19 @@ function logger($msg,$level = 0) {
 	if((! $debugging) || (! $logfile) || ($level > $loglevel))
 		return;
 
+	$callers = debug_backtrace(); 
+	$logline =  sprintf("%s@%s\t[%s]:%s:%s:%s\t%s\n", 
+				 datetime_convert(), 
+				 session_id(),
+				 $LOGGER_LEVELS[$level],
+				 basename($callers[0]['file']),
+				 $callers[0]['line'],
+				 $callers[1]['function'],
+				 $msg
+				);
+	
 	$stamp1 = microtime(true);
-	@file_put_contents($logfile, datetime_convert() . ':' . session_id() . ' ' . $msg . "\n", FILE_APPEND);
+	@file_put_contents($logfile, $logline, FILE_APPEND);
 	$a->save_timestamp($stamp1, "file");
 	return;
 }}

@@ -1,5 +1,6 @@
 favicon.*
 .htconfig.php
+.htpreconfig.php
 \#*
 include/jquery-1.4.2.min.js
 *.log

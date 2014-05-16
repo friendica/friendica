@@ -87,10 +87,11 @@ function admin_content(&$a) {
 	if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
 		return "";
 
-	if (function_exists("apc_delete")) {
-		$toDelete = new APCIterator('user', APC_ITER_VALUE);
-		apc_delete($toDelete);
-	}
+	// APC deactivated, since there are problems with PHP 5.5
+	//if (function_exists("apc_delete")) {
+	//	$toDelete = new APCIterator('user', APC_ITER_VALUE);
+	//	apc_delete($toDelete);
+	//}
 
 	/**
 	 * Side bar links
@@ -329,7 +330,7 @@ function admin_page_site_post(&$a){
 	$private_addons			=	((x($_POST,'private_addons'))		? True						: False);
 	$disable_embedded		=	((x($_POST,'disable_embedded'))		? True						: False);
 	$allow_users_remote_self	=	((x($_POST,'allow_users_remote_self'))		? True						: False);
-	
+
 	$no_multi_reg		=	((x($_POST,'no_multi_reg'))		? True						: False);
 	$no_openid		=	!((x($_POST,'no_openid'))		? True						: False);
 	$no_regfullname		=	!((x($_POST,'no_regfullname'))		? True						: False);
@@ -403,6 +404,7 @@ function admin_page_site_post(&$a){
 	set_config('system','poll_interval',$poll_interval);
 	set_config('system','maxloadavg',$maxloadavg);
 	set_config('config','sitename',$sitename);
+	set_config('system','suppress_language',$suppress_language);
 	if ($banner==""){
 		// don't know why, but del_config doesn't work...
 		q("DELETE FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
@@ -1028,13 +1030,24 @@ function admin_page_plugins(&$a){
 	 */
 
 	$plugins = array();
-	$files = glob("addon/*/");
+	$files = glob("addon/*/"); /* */
 	if($files) {
-		foreach($files as $file) {	
+		foreach($files as $file) {
 			if (is_dir($file)){
 				list($tmp, $id)=array_map("trim", explode("/",$file));
 				$info = get_plugin_info($id);
-				$plugins[] = array( $id, (in_array($id,  $a->plugins)?"on":"off") , $info);
+				$show_plugin = true;
+
+				// If the addon is unsupported, then only show it, when it is enabled
+				if ((strtolower($info["status"]) == "unsupported") AND !in_array($id,  $a->plugins))
+					$show_plugin = false;
+
+				// Override the above szenario, when the admin really wants to see outdated stuff
+				if (get_config("system", "show_unsupported_addons"))
+					$show_plugin = true;
+
+				if ($show_plugin)
+					$plugins[] = array($id, (in_array($id,  $a->plugins)?"on":"off") , $info);
 			}
 		}
 	}
@@ -1045,7 +1058,7 @@ function admin_page_plugins(&$a){
 		'$page' => t('Plugins'),
 		'$submit' => t('Save Settings'),
 		'$baseurl' => $a->get_baseurl(true),
-		'$function' => 'plugins',	
+		'$function' => 'plugins',
 		'$plugins' => $plugins,
         '$form_security_token' => get_form_security_token("admin_themes"),
 	));
@@ -1127,16 +1140,16 @@ function admin_page_themes(&$a){
 				$allowed_themes[] = trim($x);
 
 	$themes = array();
-    $files = glob('view/theme/*');
-    if($files) {
-        foreach($files as $file) {
-            $f = basename($file);
-            $is_experimental = intval(file_exists($file . '/experimental'));
+	$files = glob('view/theme/*'); /* */
+	if($files) {
+		foreach($files as $file) {
+			$f = basename($file);
+			$is_experimental = intval(file_exists($file . '/experimental'));
 			$is_supported = 1-(intval(file_exists($file . '/unsupported'))); // Is not used yet
 			$is_allowed = intval(in_array($f,$allowed_themes));
 			$themes[] = array('name' => $f, 'experimental' => $is_experimental, 'supported' => $is_supported, 'allowed' => $is_allowed);
-        }
-    }
+		}
+	}
 
 	if(! count($themes)) {
 		notice( t('No themes found.'));
@@ -1272,12 +1285,12 @@ function admin_page_logs_post(&$a) {
 		set_config('system','debugging',  $debugging);
 		set_config('system','loglevel', $loglevel);
 
-		
+
 	}
 
 	info( t("Log settings updated.") );
 	goaway($a->get_baseurl(true) . '/admin/logs' );
-	return; // NOTREACHED	
+	return; // NOTREACHED
 }
 
 /**
@@ -1285,7 +1298,7 @@ function admin_page_logs_post(&$a) {
  * @return string
  */
 function admin_page_logs(&$a){
-	
+
 	$log_choices = Array(
 		LOGGER_NORMAL => 'Normal',
 		LOGGER_TRACE => 'Trace',
@@ -1293,7 +1306,7 @@ function admin_page_logs(&$a){
 		LOGGER_DATA => 'Data',
 		LOGGER_ALL => 'All'
 	);
-	
+
 	$t = get_markup_template("admin_logs.tpl");
 
 	$f = get_config('system','logfile');
@@ -1325,7 +1338,7 @@ readable.");
 			}
 			fclose($fp);
 		}
-	}			
+	}
 
 	return replace_macros($t, array(
 		'$title' => t('Administration'),
@@ -1335,7 +1348,7 @@ readable.");
 		'$data' => $data,
 		'$baseurl' => $a->get_baseurl(true),
 		'$logname' =>  get_config('system','logfile'),
-		
+
 									// name, label, value, help string, extra data...
 		'$debugging' 		=> array('debugging', t("Enable Debugging"),get_config('system','debugging'), ""),
 		'$logfile'			=> array('logfile', t("Log file"), get_config('system','logfile'), t("Must be writable by web server. Relative to your Friendica top-level directory.")),
@@ -1354,7 +1367,7 @@ function admin_page_remoteupdate_post(&$a) {
 		return;
 	}
 
-	
+
 	if (x($_POST,'remotefile') && $_POST['remotefile']!=""){
 		$remotefile = $_POST['remotefile'];
 		$ftpdata = (x($_POST['ftphost'])?$_POST:false);
@@ -1377,14 +1390,14 @@ function admin_page_remoteupdate(&$a) {
 
 	$canwrite = canWeWrite();
 	$canftp = function_exists('ftp_connect');
-	
+
 	$needupdate = true;
 	$u = checkUpdate();
 	if (!is_array($u)){
 		$needupdate = false;
 		$u = array('','','');
 	}
-	
+
 	$tpl = get_markup_template("admin_remoteupdate.tpl");
 	return replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
@@ -1401,5 +1414,5 @@ function admin_page_remoteupdate(&$a) {
 		'$ftppwd'	=> array('ftppwd', t("FTP Password"), '',''),
 		'$remotefile'=>array('remotefile','', $u['2'],''),
 	));
-	
+
 }

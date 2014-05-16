@@ -31,7 +31,10 @@ function bb_rearrange_link($shared) {
 	return($newshare);
 }
 
-function bb_remove_share_information($Text) {
+function bb_remove_share_information($Text, $plaintext = false) {
+	if ($plaintext)
+		$Text = preg_replace("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism","[bookmark=$1]$1[/bookmark]", $Text);
+
         $Text = preg_replace_callback("((.*?)\[class=(.*?)\](.*?)\[\/class\])ism","bb_cleanup_share",$Text);
         return($Text);
 }
@@ -383,22 +386,19 @@ function bb_ShareAttributesDiaspora($match) {
         if ($matches[1] != "")
                 $profile = $matches[1];
 
-	$posted = "";
-//	preg_match("/posted='(.*?)'/ism", $attributes, $matches);
-//	if ($matches[1] != "")
-//		$posted = " ".date("Y-m-d H:i", strtotime($matches[1]));
-//
-//	preg_match('/posted="(.*?)"/ism', $attributes, $matches);
-//	if ($matches[1] != "")
-//		$posted = " ".date("Y-m-d H:i", strtotime($matches[1]));
+        $link = "";
+        preg_match("/link='(.*?)'/ism", $attributes, $matches);
+        if ($matches[1] != "")
+                $link = $matches[1];
+
+        preg_match('/link="(.*?)"/ism', $attributes, $matches);
+        if ($matches[1] != "")
+                $link = $matches[1];
 
 	$userid = GetProfileUsername($profile,$author);
 
 	$headline = '<div class="shared_header">';
 	$headline .= '<span><b>'.html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').$userid.':</b></span>';
-	//$headline .= sprintf(t('<span><b>'.
-	//		html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').
-	//		'<a href="%s" target="_blank">%s</a>%s:</b></span>'), $profile, $userid, $posted);
         $headline .= "</div>";
 
 	$text = trim($match[1]);
@@ -407,7 +407,11 @@ function bb_ShareAttributesDiaspora($match) {
 		$text .= "<hr />";
 
 	$text .= $headline.'<blockquote class="shared_content">'.trim($match[3])."</blockquote><br />";
-	//$text .= $headline."<br />".trim($match[3])."<br />";
+
+	if ($link != "")
+		$text .= '<br /><a href="'.$link.'">[l]</a>';
+
+	//	$text .= '<br /><a href="'.$link.'">'.t("Link").' [l]</a>';
 
         return($text);
 }
@@ -450,10 +454,9 @@ function bb_ShareAttributesForExport($match) {
 	$userid = GetProfileUsername($profile,$author);
 
 	$headline = '<div class="shared_header">';
-	$headline .= sprintf(t('<span><b>'.
-			html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').
-			'<a href="%s" target="_blank">%s</a>%s:</b></span>'), $link, $userid, $posted);
-        $headline .= "</div>";
+	$headline .= '<span><b>'.html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8');
+	$headline .= sprintf(t('<a href="%1$s" target="_blank">%2$s</a> %3$s'), $link, $userid, $posted);
+        $headline .= ":</b></span></div>";
 
 	$text = trim($match[1]);
 
@@ -1070,3 +1073,4 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 
 	return $Text;
 }
+?>
