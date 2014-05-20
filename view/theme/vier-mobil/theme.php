@@ -1,6 +1,6 @@
 <?php
 /**
- * Name: Vier
+ * Name: Vier-mobil
  * Version: 0.9
  * Author: Fabio <http://kirgroup.com/profile/fabrixxm>
  * Author: Ike <http://pirati.ca/profile/heluecht>
@@ -8,18 +8,20 @@
  * Description: "Vier" uses the font awesome font library: http://fortawesome.github.com/Font-Awesome/
  */
 
-function vier_init(&$a) {
+function vier_mobil_init(&$a) {
 set_template_engine($a, 'smarty3');
 
 $baseurl = $a->get_baseurl();
 
-$a->theme_info = array();
+$a->theme_info = array(
+    'extends'=>'vier',
+);
 
-$style = get_pconfig(local_user(), 'vier', 'style');
+$style = get_pconfig(local_user(), 'vier-mobil', 'style');
 if ($style == "flat")
-	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier/flat.css" type="text/css" media="screen"/>'."\n";
+	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier-mobil/flat.css" type="text/css" media="screen"/>'."\n";
 else if ($style == "netcolour")
-	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier/netcolour.css" type="text/css" media="screen"/>'."\n";
+	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier-mobil/netcolour.css" type="text/css" media="screen"/>'."\n";
 
 $a->page['htmlhead'] .= <<< EOT
 <script type="text/javascript" src="$baseurl/view/theme/vier/js/jquery.divgrow-1.3.1.f1.min.js"></script>

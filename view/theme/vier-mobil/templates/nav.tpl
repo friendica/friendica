@@ -11,6 +11,12 @@
 </header>
 <nav>
 	<ul>
+		{{if $nav.hideaside}}
+			<li id="nav-hideaside-link" class="nav-menu {{$sel.hideaside}}">
+				<a class="{{$nav.hideaside.2}}" href="{{$nav.hideaside.0}}" title="{{$nav.hideaside.3}}" ><img src="images/icons/22/aside.png"</a>
+			</li>
+		{{/if}}
+		
 		{{if $nav.community}}
 			<li id="nav-community-link" class="nav-menu {{$sel.community}}">
 				<a class="{{$nav.community.2}}" href="{{$nav.community.0}}" title="{{$nav.community.3}}" >{{$nav.community.1}}</a>

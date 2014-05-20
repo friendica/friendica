@@ -498,7 +498,7 @@ header #banner #logo-text {
 nav {
   min-width: 1000px;
   width: 100%;
-  height: 32px;
+  height: 48px;
   position: absolute;
   left: 0px;
   top: 0px;
@@ -653,6 +653,7 @@ nav .nav-notify.show {
   display: block;
 }
 nav #nav-help-link,
+nav #nav-search-link,
 nav #nav-directory-link,
 nav #nav-apps-link,
 nav #nav-notifications-linkmenu,
