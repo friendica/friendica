@@ -501,7 +501,7 @@ nav {
   height: 48px;
   position: absolute;
   left: 0px;
-  top: 0px;
+  top: 20px;
   padding: 0px;
   padding-left: 0px;
   /* background: #2d2d2d; */
@@ -598,6 +598,7 @@ nav .nav-menu-icon img {
 }
 nav .nav-menu-icon .nav-notify {
   top: 3px;
+  float:right
 }
 nav .nav-menu-label {
   margin: 3px 5px 0px;
