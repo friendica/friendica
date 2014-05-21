@@ -11,9 +11,9 @@
 </header>
 <nav>
 	<ul>
-		{{if $nav.hideaside}}
-			<li id="nav-hideaside-link" class="nav-menu {{$sel.hideaside}}">
-				<a class="{{$nav.hideaside.2}}" href="{{$nav.hideaside.0}}" title="{{$nav.hideaside.3}}" ><img src="images/icons/22/aside.png"</a>
+		{{if $nav.showaside}}
+			<li id="nav-showaside-link" class="nav-menu {{$sel.showaside}}">
+				<a class="{{$nav.showaside.2}}" href="{{$nav.showaside.0}}" title="{{$nav.showaside.3}}" ><img src="images/icons/22/aside.png"</a>
 			</li>
 		{{/if}}
 		
