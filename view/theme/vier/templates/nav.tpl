@@ -6,8 +6,8 @@
 <header>
 	{{* {{$langselector}} *}}
 
-	<div id="site-location">{{$sitelocation}}</div>
-	<div id="banner">{{$banner}}</div>
+	<span id="banner">{{$banner}}</span>
+	<span id="site-location">{{$sitelocation}}</span>
 </header>
 <nav>
 	<ul>
@@ -45,6 +45,7 @@
                         	</ul>
                         </li>           
                 {{/if}}
+		<li id="toggle_mobile_link" href="{{$toggle_link}}"><img src="/images/icons/22/toggle_mobile.png" /></li>
 
 		<li id="nav-site-linkmenu" class="nav-menu-icon"><a href="#" rel="#nav-site-menu"><span class="icon s22 gear"></span></a>
 			<ul id="nav-site-menu" class="menu-popup">

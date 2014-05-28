@@ -130,7 +130,7 @@ function nav_info(&$a) {
 	$nav['directory'] = array($gdirpath, t('Directory'), "", t('People directory'));
 
 	$nav['about'] = Array('friendica', t('Information'), "", t('Information about this friendica instance'));
-	$nav['showaside'] = Array('friendica', t('show sidebar'), "", 'X');
+	$nav['showaside'] = Array('toggle_leftaside', t('toggle sidebar'), "", t('toggle sidebar'));
 
 	/**
 	 *

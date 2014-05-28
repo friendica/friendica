@@ -464,16 +464,21 @@ header {
   top: 0px;
   margin: 0px;
   padding: 0px;
-  /*width: 100%; height: 12px; */
+  width: 100%;
+  height: 20px; 
 
   z-index: 110;
   color: #ffffff;
 }
 header #site-location {
-  display: none;
+  position: absolute;
+  font-size: 20px;
+  float: right;
+  background: rgb(36, 76, 94);
 }
 header #banner {
   overflow: hidden;
+  background: rgb(36, 76, 94);
   text-align: center;
   width: 100%;
 }
@@ -2663,4 +2668,3 @@ a.mail-list-link {
 .mail-conv-delete-icon {
         border: none;
 }
-

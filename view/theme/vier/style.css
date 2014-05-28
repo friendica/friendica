@@ -2663,3 +2663,7 @@ a.mail-list-link {
         border: none;
 }
 
+footer #toggle_mobile_link {
+  font-size: 20px;
+  background: rgb(36, 76, 94);
+}
