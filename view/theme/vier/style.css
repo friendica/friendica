@@ -1068,8 +1068,8 @@ section {
   border-right: 1px solid lightgray;
   border-left: 1px solid lightgray; */
   position: absolute;
+  z-index: 3;
   left: 215px;
-  left: calc(215px + (100% - (215px + 766px)) / 6);
   /* left: calc(215px + (100% - 215px) / 10); */
 }
 
