@@ -844,7 +844,7 @@ aside {
   overflow-y: auto;
   z-index: 2;
   line-height: 17px;
-  position: fixed;
+  position: absolute;
   /* overflow: auto; */
   height: 100%;
   height: calc(100% - 42px);
@@ -1058,6 +1058,7 @@ section {
   vertical-align: top;
   top: 32px;
   width: 766px;
+  height: 100%;
   max-width: 766px;
   padding: 10px 10px 10px 10px;
   /* background-color: white; */
@@ -1069,7 +1070,6 @@ section {
   border-left: 1px solid lightgray; */
   position: absolute;
   z-index: 3;
-  left: 215px;
   /* left: calc(215px + (100% - 215px) / 10); */
 }
 

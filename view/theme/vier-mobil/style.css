@@ -1065,6 +1065,7 @@ section {
   top: 32px;
   width: 766px;
   max-width: 766px;
+  height: 100%;
   padding: 10px 10px 10px 10px;
   /* background-color: white; */
   /* background-color: rgb(252, 252, 252); */
@@ -1074,8 +1075,7 @@ section {
   border-right: 1px solid lightgray;
   border-left: 1px solid lightgray; */
   position: absolute;
-  left: 215px;
-  left: calc(215px + (100% - (215px + 766px)) / 6);
+  z-index: 3;
   /* left: calc(215px + (100% - 215px) / 10); */
 }
 

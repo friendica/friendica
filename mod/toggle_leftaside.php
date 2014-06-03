@@ -13,9 +13,6 @@ function toggle_leftaside_init(&$a) {
 
         logger( "get_pconfig: " . get_pconfig( local_user(), 'system', 'leftsidebar'), LOGGER_DEBUG) ;
 
-	if(isset($_GET['address']))
-		$address = $_GET['address'];
-	else
 		$address = $a->get_baseurl();
 
 	goaway($address);}
