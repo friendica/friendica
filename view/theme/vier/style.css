@@ -854,7 +854,7 @@ aside {
   overflow-y: auto;
   z-index: 2;
   line-height: 17px;
-  position: fixed;
+  position: absolute;
   /* overflow: auto; */
   height: 100%;
   height: calc(100% - 42px);
@@ -1068,6 +1068,7 @@ section {
   vertical-align: top;
   top: 32px;
   width: 766px;
+  height: 100%;
   max-width: 766px;
   padding: 10px 10px 10px 10px;
   /* background-color: white; */
@@ -1078,8 +1079,7 @@ section {
   border-right: 1px solid lightgray;
   border-left: 1px solid lightgray; */
   position: absolute;
-  left: 215px;
-  left: calc(215px + (100% - (215px + 766px)) / 6);
+  z-index: 3;
   /* left: calc(215px + (100% - 215px) / 10); */
 }
 
@@ -2715,3 +2715,7 @@ a.mail-list-link {
         border: none;
 }
 
+footer #toggle_mobile_link {
+  font-size: 20px;
+  background: rgb(36, 76, 94);
+}

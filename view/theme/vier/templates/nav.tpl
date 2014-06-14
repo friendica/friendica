@@ -6,11 +6,17 @@
 <header>
 	{{* {{$langselector}} *}}
 
-	<div id="site-location">{{$sitelocation}}</div>
-	<div id="banner">{{$banner}}</div>
+	<span id="banner">{{$banner}}</span>
+	<span id="site-location">{{$sitelocation}}</span>
 </header>
 <nav>
 	<ul>
+		{{if $nav.showaside}}
+			<li id="nav-showaside-link" class="nav-menu {{$sel.showaside}}">
+				<a class="{{$nav.showaside.2}}" href="{{$nav.showaside.0}}" title="{{$nav.showaside.3}}" ><img src="images/icons/22/aside.png"</a>
+			</li>
+		{{/if}}
+		
 		{{if $nav.community}}
 			<li id="nav-community-link" class="nav-menu {{$sel.community}}">
 				<a class="{{$nav.community.2}}" href="{{$nav.community.0}}" title="{{$nav.community.3}}" >{{$nav.community.1}}</a>
@@ -39,6 +45,7 @@
                         	</ul>
                         </li>           
                 {{/if}}
+		<li id="toggle_mobile_link" href="{{$toggle_link}}"><img src="/images/icons/22/toggle_mobile.png" /></li>
 
 		<li id="nav-site-linkmenu" class="nav-menu-icon"><a href="#" rel="#nav-site-menu"><span class="icon s22 gear"></span></a>
 			<ul id="nav-site-menu" class="menu-popup">
