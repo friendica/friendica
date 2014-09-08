@@ -589,7 +589,8 @@ function get_markup_template($s, $root = '') {
 	try {
 		$template = $t->get_template_file($s, $root);
 	} catch (Exception $e) {
-		echo "<pre><b>".__function__."</b>: ".$e->getMessage()."</pre>"; killme();
+		echo "<pre><b>".__function__."</b>: ".$e->getMessage()."</pre>"; 
+        killme();
 	}
 
 	$a->save_timestamp($stamp1, "file");
