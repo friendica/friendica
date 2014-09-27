@@ -186,6 +186,9 @@ function parseurl_getsiteinfo($url, $no_guessing = false, $do_oembed = true, $co
 				case "twitter:image":
 					$siteinfo["image"] = $attr["content"];
 					break;
+				case "twitter:image:src":
+					$siteinfo["image"] = $attr["content"];
+					break;
 				case "twitter:card":
 					if (($siteinfo["type"] == "") OR ($attr["content"] == "photo"))
 						$siteinfo["type"] = $attr["content"];

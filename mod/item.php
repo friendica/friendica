@@ -807,7 +807,7 @@ function item_post(&$a) {
 		file_tag_update_pconfig($uid,$categories_old,$categories_new,'category');
 
 		// Store the fresh generated item into the cache
-		$cachefile = get_cachefile($datarray["guid"]."-".hash("md5", $datarray['body']));
+		$cachefile = get_cachefile(urlencode($datarray["guid"])."-".hash("md5", $datarray['body']));
 
 		if (($cachefile != '') AND !file_exists($cachefile)) {
 			$s = prepare_text($datarray['body']);

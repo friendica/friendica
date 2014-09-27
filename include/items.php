@@ -1412,7 +1412,7 @@ function item_store($arr,$force_parent = false, $notify = false) {
 	if (!$deleted) {
 
 		// Store the fresh generated item into the cache
-		$cachefile = get_cachefile($arr["guid"]."-".hash("md5", $arr['body']));
+		$cachefile = get_cachefile(urlencode($arr["guid"])."-".hash("md5", $arr['body']));
 
 		if (($cachefile != '') AND !file_exists($cachefile)) {
 			$s = prepare_text($arr['body']);

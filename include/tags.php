@@ -26,7 +26,7 @@ function create_tags_from_item($itemid) {
 	if ($message["deleted"])
 		return;
 
-	$cachefile = get_cachefile($message["guid"]."-".hash("md5", $message['body']));
+	$cachefile = get_cachefile(urlencode($message["guid"])."-".hash("md5", $message['body']));
 
 	if (($cachefile != '') AND !file_exists($cachefile)) {
 		$s = prepare_text($message['body']);

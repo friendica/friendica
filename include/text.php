@@ -1330,8 +1330,7 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 	$item['mentions'] = $mentions;
 
 
-	//$cachefile = get_cachefile($item["guid"]."-".strtotime($item["edited"])."-".hash("crc32", $item['body']));
-	$cachefile = get_cachefile($item["guid"]."-".hash("md5", $item['body']));
+	$cachefile = get_cachefile(urlencode($item["guid"])."-".hash("md5", $item['body']));
 
 	if (($cachefile != '')) {
 		if (file_exists($cachefile)) {
