@@ -648,12 +648,8 @@ function dfrn_request_content(&$a) {
 
 		if(! local_user()) {
 			info( t("Please login to confirm introduction.") . EOL );
-
 			/* setup the return URL to come back to this page if they use openid */
-
-			$stripped = str_replace('q=','',$a->query_string);
-			$_SESSION['return_url'] = trim($stripped,'/');
-
+			$_SESSION['return_url'] = $a->query_string;
 			return login();
 		}
 
