@@ -240,14 +240,14 @@ function poller_run(&$argv, &$argc){
 				// We should be getting everything via a hub. But just to be sure, let's check once a day.
 				// (You can make this more or less frequent if desired by setting 'pushpoll_frequency' appropriately)
 				// This also lets us update our subscription to the hub, and add or replace hubs in case it
-				// changed. We will only update hubs once a day, regardless of 'pushpoll_frequency'. 
+				// changed. We will only update hubs once a day, regardless of 'pushpoll_frequency'.
 
 
 				if($contact['subhub']) {
 					$poll_interval = get_config('system','pushpoll_frequency');
 					$contact['priority'] = (($poll_interval !== false) ? intval($poll_interval) : 3);
 					$hub_update = false;
-	
+
 					if((datetime_convert('UTC','UTC', 'now') > datetime_convert('UTC','UTC', $t . " + 1 day")) || $force)
 							$hub_update = true;
 				}
@@ -256,13 +256,13 @@ function poller_run(&$argv, &$argc){
 
 				/**
 				 * Based on $contact['priority'], should we poll this site now? Or later?
-				 */			
+				 */
 
 				switch ($contact['priority']) {
 					case 5:
 						if(datetime_convert('UTC','UTC', 'now') > datetime_convert('UTC','UTC', $t . " + 1 month"))
 							$update = true;
-						break;					
+						break;
 					case 4:
 						if(datetime_convert('UTC','UTC', 'now') > datetime_convert('UTC','UTC', $t . " + 1 week"))
 							$update = true;
@@ -285,7 +285,13 @@ function poller_run(&$argv, &$argc){
 					continue;
 			}
 
-			proc_run('php','include/onepoll.php',$contact['id']);
+			// Don't run onepoll.php if the contact isn't pollable
+			// This check also is inside the onepoll.php - but this will reduce the load
+			if (in_array($contact["rel"], array(CONTACT_IS_SHARING, CONTACT_IS_FRIEND)) AND ($contact["poll"] != "")
+				AND !in_array($contact['network'], array(NETWORK_DIASPORA, NETWORK_FACEBOOK, NETWORK_PUMPIO, NETWORK_TWITTER, NETWORK_APPNET))
+				AND !$contact["self"] AND !$contact["blocked"] AND !$contact["readonly"] AND !$contact["archive"])
+				proc_run('php','include/onepoll.php',$contact['id']);
+
 			if($interval)
 				@time_sleep_until(microtime(true) + (float) $interval);
 		}

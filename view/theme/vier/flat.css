@@ -1,4 +1,11 @@
-*{ box-shadow: 0 0 0 0 !important;} 
+*{ 
+	box-shadow: 0 0 0 0 !important;
+	border-color: #EAEAEA !important;
+}
+
+nav { background-color: #27333F !important; }
+aside { background-color: #EAEEF4 !important }
+
 body, section { background-color: #ffffff !important;}
 #profile-jot-form { background-color: #ffffff !important;}
 .dspr, .twit, .pump, .dfrn { background-color: #ffffff !important;}

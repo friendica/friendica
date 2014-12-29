@@ -78,6 +78,11 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 	if (!is_object($j))
 		return false;
 
+	// Always embed the SSL version
+	if (isset($j->html))
+		$j->html = str_replace(array("http://www.youtube.com/", "http://player.vimeo.com/"),
+			array("https://www.youtube.com/", "https://player.vimeo.com/"), $j->html);
+
 	$j->embedurl = $embedurl;
 
 	// If fetching information doesn't work, then improve via internal functions

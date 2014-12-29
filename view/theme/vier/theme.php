@@ -22,6 +22,8 @@ if ($style == "")
 
 if ($style == "flat")
 	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier/flat.css" type="text/css" media="screen"/>'."\n";
+if ($style == "dark")
+	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier/dark.css" type="text/css" media="screen"/>'."\n";
 else if ($style == "netcolour")
 	$a->page['htmlhead'] .= '<link rel="stylesheet" href="view/theme/vier/netcolour.css" type="text/css" media="screen"/>'."\n";
 else if ($style == "breathe")

@@ -196,6 +196,24 @@ Current hooks:
         'email' => email to look up the avatar for
         'url' => the (string) generated URL of the avatar
 
+**'emailer_send_prepare'** - called from Emailer::send() before building the mime message
+    $b is (array) , params to Emailer::send()
+     'fromName' => name of the sender
+     'fromEmail' => email fo the sender
+     'replyTo' => replyTo address to direct responses
+     'toEmail' => destination email address
+     'messageSubject' => subject of the message
+     'htmlVersion' => html version of the message
+     'textVersion' => text only version of the message
+     'additionalMailHeader' => additions to the smtp mail header
+
+**'emailer_send'** - called before calling PHP's mail()
+    $b is (array) , params to mail()
+     'to'
+     'subject'
+     'body'
+     'headers'
+
 
 A complete list of all hook callbacks with file locations (generated 14-Feb-2012): Please see the source for details of any hooks not documented above.
 

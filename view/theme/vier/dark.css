@@ -1,0 +1,61 @@
+*{ 
+	box-shadow: 0 0 0 0 !important;
+	border-color: #343434 !important;
+}
+
+hr { background-color: #343434 !important; }
+
+a, .wall-item-name, .fakelink { 
+	color: #989898 !important; 
+}
+
+nav { 
+	color: #989898 !important;
+	background-color: #1C2126 !important; 
+}
+
+nav .nav-notify {
+	background-color: #2C77AE !important
+}
+
+a.on {
+	color: #FFFFFF !important;
+	background-color: #2C77AE !important
+}
+
+aside, .menu-popup, .fc-state-highlight, a.off, .autocomplete { 
+	color: #989898 !important;
+	background-color: #252C33 !important;
+	border-right: 1px solid #D2D2D2;
+}
+
+body, section, blockquote, blockquote.shared_content, #profile-jot-form, 
+.dspr, .twit, .pump, .dfrn, .tread-wrapper, code, .mail-list-wrapper, div.pager, ul.tabs {
+	color: #989898 !important;
+	background-color: #171B1F !important;
+}
+
+div.rte, .mceContentBody {
+background:none repeat scroll 0 0 #333333!important;
+color:#FFF!important;
+text-align:left;
+}
+
+div.pager, ul.tabs {
+  box-shadow: unset;
+  border-bottom: unset;
+}
+
+input, option, textarea, select {
+	color: #989898 !important;
+	border: 2px solid #0C1116 !important;
+	background-color: #0C1116 !important;
+}
+
+input#side-peoplefind-submit, input#side-follow-submit {
+	margin-top: 2px !important;
+}
+
+li :hover {
+	color: #767676 !important;	
+}

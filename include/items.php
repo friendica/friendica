@@ -872,9 +872,18 @@ function get_atom_elements($feed, $item, $contact = array()) {
 	}
 
 	if (isset($contact["network"]) AND ($contact["network"] == NETWORK_FEED) AND $contact['fetch_further_information']) {
-		$res["body"] = $res["title"].add_page_info($res['plink'], false, "", ($contact['fetch_further_information'] == 2), $contact['ffi_keyword_blacklist']);
+		$preview = "";
+
+		// Handle enclosures and treat them as preview picture
+		if (isset($attach))
+			foreach ($attach AS $attachment)
+				if ($attachment->type == "image/jpeg")
+					$preview = $attachment->link;
+
+		$res["body"] = $res["title"].add_page_info($res['plink'], false, $preview, ($contact['fetch_further_information'] == 2), $contact['ffi_keyword_blacklist']);
 		$res["title"] = "";
 		$res["object-type"] = ACTIVITY_OBJ_BOOKMARK;
+		unset($res["attach"]);
 	} elseif (isset($contact["network"]) AND ($contact["network"] == NETWORK_OSTATUS))
 		$res["body"] = add_page_info_to_body($res["body"]);
 	elseif (isset($contact["network"]) AND ($contact["network"] == NETWORK_FEED) AND strstr($res['plink'], ".app.net/")) {
@@ -939,7 +948,15 @@ function add_page_info_data($data) {
 function add_page_info($url, $no_photos = false, $photo = "", $keywords = false, $keyword_blacklist = "") {
 	require_once("mod/parse_url.php");
 
-	$data = parseurl_getsiteinfo($url, true);
+	$data = Cache::get("parse_url:".$url);
+	if (is_null($data)){
+		$data = parseurl_getsiteinfo($url, true);
+		Cache::set("parse_url:".$url,serialize($data));
+	} else
+		$data = unserialize($data);
+
+	if ($photo != "")
+		$data["images"][0]["src"] = $photo;
 
 	logger('add_page_info: fetch page info for '.$url.' '.print_r($data, true), LOGGER_DEBUG);
 

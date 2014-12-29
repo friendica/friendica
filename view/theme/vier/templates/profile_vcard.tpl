@@ -1,15 +1,15 @@
 
-<div class="vcard">
+<div class="vcard h-card">
 
 	<div class="tool">
-		<div class="fn label">{{$profile.name}}</div>
+		<div class="fn label p-name">{{$profile.name}}</div>
 		{{if $profile.edit}}
 			<div class="action">
 			<a class="icon s16 edit ttright" href="#" rel="#profiles-menu" title="{{$profile.edit.3}}"><span>{{$profile.edit.1}}</span></a>
 			<ul id="profiles-menu" class="menu-popup">
 				{{foreach $profile.menu.entries as $e}}
 				<li>
-					<a href="profiles/{{$e.id}}"><img src='{{$e.photo}}'>{{$e.profile_name}}</a>
+					<a href="profiles/{{$e.id}}"><img class="u-photo" src='{{$e.photo}}'>{{$e.profile_name}}</a>
 				</li>
 				{{/foreach}}
 				<li><a href="profile_photo" >{{$profile.menu.chg_photo}}</a></li>
@@ -36,11 +36,11 @@
 	{{if $location}}
 		<dl class="location"><dt class="location-label">{{$location}}</dt><br> 
 		<dd class="adr">
-			{{if $profile.address}}<div class="street-address">{{$profile.address}}</div>{{/if}}
+			{{if $profile.address}}<div class="street-address p-street-address">{{$profile.address}}</div>{{/if}}
 			<span class="city-state-zip">
-				<span class="locality">{{$profile.locality}}</span>{{if $profile.locality}}, {{/if}}
-				<span class="region">{{$profile.region}}</span>
-				<span class="postal-code">{{$profile.postal_code}}</span>
+				<span class="locality p-locality">{{$profile.locality}}</span>{{if $profile.locality}}, {{/if}}
+				<span class="region p-region">{{$profile.region}}</span>
+				<span class="postal-code p-postal-code">{{$profile.postal_code}}</span>
 			</span>
 			{{if $profile.country_name}}<span class="country-name">{{$profile.country_name}}</span>{{/if}}
 		</dd>
@@ -53,7 +53,7 @@
 
 	{{if $marital}}<dl class="marital"><dt class="marital-label"><span class="heart">&hearts;</span>{{$marital}}</dt><dd class="marital-text">{{$profile.marital}}</dd></dl>{{/if}}
 
-	{{if $homepage}}<dl class="homepage"><dt class="homepage-label">{{$homepage}}</dt><dd class="homepage-url"><a href="{{$profile.homepage}}" target="_blank">{{$profile.homepage}}</a></dd></dl>{{/if}}
+	{{if $homepage}}<dl class="homepage"><dt class="homepage-label">{{$homepage}}</dt><dd class="homepage-url"><a href="{{$profile.homepage}}" class="u-url" rel="me" target="_blank">{{$profile.homepage}}</a></dd></dl>{{/if}}
 
 	{{include file="diaspora_vcard.tpl"}}
 	

@@ -2028,6 +2028,7 @@ function diaspora_retraction($importer,$xml) {
 					dbesc(datetime_convert()),
 					intval($r[0]['id'])
 				);
+				delete_thread($r[0]['id']);
 			}
 		}
 	}
@@ -2100,6 +2101,7 @@ function diaspora_signed_retraction($importer,$xml,$msg) {
 					dbesc(datetime_convert()),
 					intval($r[0]['id'])
 				);
+				delete_thread($r[0]['id']);
 
 				// Now check if the retraction needs to be relayed by us
 				//

@@ -90,8 +90,9 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 
 	} else {
 		$Text = bbcode($Text, $preserve_nl, false, 4);
+
 		// Libertree doesn't convert a harizontal rule if there isn't a linefeed
-		$Text = str_replace("<hr />", "<br /><hr />", $Text);
+		$Text = str_replace(array("<hr />", "<hr>"), array("<br /><hr />", "<br><hr>"), $Text);
 	}
 
 	// Now convert HTML to Markdown

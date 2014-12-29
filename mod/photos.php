@@ -1183,8 +1183,6 @@ function photos_content(&$a) {
 			intval($a->pager['itemspage'])
 		);
 
-		$o .= '<h3 id="photo-album-title">' . $album . '</h3>';
-
 		if($cmd === 'edit') {
 			if(($album !== t('Profile Photos')) && ($album !== 'Contact Photos') && ($album !== t('Contact Photos'))) {
 				if($can_post) {
@@ -1211,25 +1209,18 @@ function photos_content(&$a) {
 		else {
 			if(($album !== t('Profile Photos')) && ($album !== 'Contact Photos') && ($album !== t('Contact Photos'))) {
 				if($can_post) {
-					$o .= '<div id="album-edit-link"><a href="'. $a->get_baseurl() . '/photos/' 
-						. $a->data['user']['nickname'] . '/album/' . bin2hex($album) . '/edit' . '">' 
-						. t('Edit Album') . '</a></div>';
+					$edit = array(t('Edit Album'), $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album) . '/edit');
  				}
 			}
 		}
 
 		if($_GET['order'] === 'posted')
-			$o .=  '<div class="photos-upload-link" ><a href="' . $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album) . '" >' . t('Show Newest First') . '</a></div>';
+			$order =  array(t('Show Newest First'), $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album));
 		else
-			$o .= '<div class="photos-upload-link" ><a href="' . $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album) . '?f=&order=posted" >' . t('Show Oldest First') . '</a></div>';
+			$order = array(t('Show Oldest First'), $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album) . '?f=&order=posted');
 
+		$photos = array();
 
-		if($can_post) {
-			$o .= '<div class="photos-upload-link" ><a href="' . $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/upload/' . bin2hex($album) . '" >' . t('Upload New Photos') . '</a></div>';
-		}
-
-
-		$tpl = get_markup_template('photo_album.tpl');
 		if(count($r))
 			$twist = 'rotright';
 			foreach($r as $rr) {
@@ -1248,20 +1239,31 @@ function photos_content(&$a) {
 					$imgalt_e = $rr['filename'];
 					$desc_e = $rr['desc'];
 				}
-
-				$o .= replace_macros($tpl,array(
-					'$id' => $rr['id'],
-					'$twist' => ' ' . $twist . rand(2,4),
-					'$photolink' => $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id']
+				
+				$photos[] = array(
+					'id' => $rr['id'],
+					'twist' => ' ' . $twist . rand(2,4),
+					'link' => $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id']
 						. (($_GET['order'] === 'posted') ? '?f=&order=posted' : ''),
-					'$phototitle' => t('View Photo'),
-					'$imgsrc' => $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . $rr['scale'] . '.' .$ext,
-					'$imgalt' => $imgalt_e,
-					'$desc'=> $desc_e
-				));
-
+					'title' => t('View Photo'),
+					'src' => $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . $rr['scale'] . '.' .$ext,
+					'alt' => $imgalt_e,
+					'desc'=> $desc_e,
+					'ext' => $ext,
+					'hash'=> $rr['resource_id'],
+				);
 		}
-		$o .= '<div id="photo-album-end"></div>';
+
+		$tpl = get_markup_template('photo_album.tpl');
+		$o .= replace_macros($tpl, array(
+				'$photos' => $photos,
+				'$album' => $album,
+				'$can_post' => $can_post,
+				'$upload' => array(t('Upload New Photos'), $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/upload/' . bin2hex($album)),
+				'$order' => $order,
+				'$edit' => $edit
+			));
+
 		$o .= paginate($a);
 
 		return $o;

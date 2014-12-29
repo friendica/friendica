@@ -21,6 +21,7 @@ function notification($params) {
 	$thanks = t('Thank You,');
 	$sitename = $a->config['sitename'];
 	$site_admin = sprintf( t('%s Administrator'), $sitename);
+	$nickname = "";
 
 	$sender_name = $product;
 	$hostname = $a->get_hostname();
@@ -28,6 +29,10 @@ function notification($params) {
 		$hostname = substr($hostname,0,strpos($hostname,':'));
 
 	$sender_email = t('noreply') . '@' . $hostname;
+
+	$user = q("SELECT `nickname` FROM `user` WHERE `uid` = %d", intval($params['uid']));
+	if ($user)
+		$nickname = $user[0]["nickname"];
 
 	// with $params['show_in_notification_page'] == false, the notification isn't inserted into
 	// the database, and an email is sent if applicable.
@@ -37,6 +42,7 @@ function notification($params) {
 	$additional_mail_header = "";
 	$additional_mail_header .= "Precedence: list\n";
 	$additional_mail_header .= "X-Friendica-Host: ".$hostname."\n";
+	$additional_mail_header .= "X-Friendica-Account: <".$nickname."@".$hostname.">\n";
 	$additional_mail_header .= "X-Friendica-Platform: ".FRIENDICA_PLATFORM."\n";
 	$additional_mail_header .= "X-Friendica-Version: ".FRIENDICA_VERSION."\n";
 	$additional_mail_header .= "List-ID: <notification.".$hostname.">\n";
@@ -344,7 +350,7 @@ function notification($params) {
 			$show_in_notification_page = false;
 	}
 
-
+	$subject .= " (".$nickname."@".$hostname.")";
 
 	$h = array(
 		'params'    => $params,
