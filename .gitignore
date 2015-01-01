@@ -18,6 +18,9 @@ doc/api
 #ignore reports, should be generted with every build
 report/
 
+#ignore composer vendor .git
+vendor/.git
+
 #ignore config files from eclipse, we don't want IDE files in our repository
 .project
 .buildpath

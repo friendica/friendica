@@ -1,4 +1,5 @@
 <?php
+require 'vendor/autoload.php';
 
 require_once('include/config.php');
 require_once('include/network.php');
