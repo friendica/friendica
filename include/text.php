@@ -1,6 +1,5 @@
 <?php
 
-require_once("include/template_processor.php");
 require_once("include/friendica_smarty.php");
 
 if(! function_exists('replace_macros')) {

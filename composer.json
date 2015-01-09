@@ -6,5 +6,7 @@
         "psr-4": {"Friendica\\": "app/"}
     },
     "preferred-install": "dist",
-    "require": {}
+    "require": {
+        "smarty/smarty": "~3.1"
+    }
 }
