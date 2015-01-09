@@ -3,7 +3,7 @@
     "description": "The internet is our social network",
     "license": "AGPL3",
     "autoload": {
-        "psr-4": {"Friendica\\": "friendica/"}
+        "psr-4": {"Friendica\\": "app/"}
     },
     "preferred-install": "dist",
     "require": {}
