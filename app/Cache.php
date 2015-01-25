@@ -1,8 +1,8 @@
 <?php
+namespace Friendica {
 	/**
-	 *  cache api
+	 * Cache api
 	 */
-
 	class Cache {
 		public static function get($key) {
 			/*if (function_exists("apc_fetch") AND function_exists("apc_exists"))
@@ -68,4 +68,4 @@
 		}
 
 	}
-
+}

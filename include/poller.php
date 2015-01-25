@@ -1,7 +1,7 @@
 <?php
-
 require_once("boot.php");
 
+use Friendica\Cache;
 
 function poller_run(&$argv, &$argc){
 	global $a, $db;
@@ -74,8 +74,8 @@ function poller_run(&$argv, &$argc){
 
 	// expire any expired accounts
 
-	q("UPDATE user SET `account_expired` = 1 where `account_expired` = 0 
-		AND `account_expires_on` != '0000-00-00 00:00:00' 
+	q("UPDATE user SET `account_expired` = 1 where `account_expired` = 0
+		AND `account_expires_on` != '0000-00-00 00:00:00'
 		AND `account_expires_on` < UTC_TIMESTAMP() ");
 
 	// delete user and contact records for recently removed accounts
@@ -169,7 +169,7 @@ function poller_run(&$argv, &$argc){
 	}
 
 	$interval = intval(get_config('system','poll_interval'));
-	if(! $interval) 
+	if(! $interval)
 		$interval = ((get_config('system','delivery_interval') === false) ? 3 : intval(get_config('system','delivery_interval')));
 
 	$sql_extra = (($manual_id) ? " AND `id` = $manual_id " : "");
@@ -182,20 +182,20 @@ function poller_run(&$argv, &$argc){
 		proc_run('php','include/cronhooks.php');
 
 	// Only poll from those with suitable relationships,
-	// and which have a polling address and ignore Diaspora since 
+	// and which have a polling address and ignore Diaspora since
 	// we are unable to match those posts with a Diaspora GUID and prevent duplicates.
 
-	$abandon_sql = (($abandon_days) 
-		? sprintf(" AND `user`.`login_date` > UTC_TIMESTAMP() - INTERVAL %d DAY ", intval($abandon_days)) 
-		: '' 
+	$abandon_sql = (($abandon_days)
+		? sprintf(" AND `user`.`login_date` > UTC_TIMESTAMP() - INTERVAL %d DAY ", intval($abandon_days))
+		: ''
 	);
 
-	$contacts = q("SELECT `contact`.`id` FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid` 
+	$contacts = q("SELECT `contact`.`id` FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
 		WHERE ( `rel` = %d OR `rel` = %d ) AND `poll` != ''
 		AND NOT `network` IN ( '%s', '%s', '%s' )
-		$sql_extra 
-		AND `self` = 0 AND `contact`.`blocked` = 0 AND `contact`.`readonly` = 0 
-		AND `contact`.`archive` = 0 
+		$sql_extra
+		AND `self` = 0 AND `contact`.`blocked` = 0 AND `contact`.`readonly` = 0
+		AND `contact`.`archive` = 0
 		AND `user`.`account_expired` = 0 AND `user`.`account_removed` = 0 $abandon_sql ORDER BY RAND()",
 		intval(CONTACT_IS_SHARING),
 		intval(CONTACT_IS_FRIEND),

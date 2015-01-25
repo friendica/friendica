@@ -1,4 +1,5 @@
 <?php
+use Friendica\Cache;
 
 if(! class_exists("Photo")) {
 class Photo {
@@ -148,7 +149,7 @@ class Photo {
 
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -273,7 +274,7 @@ class Photo {
 			do {
 
 				// FIXME - implement horizantal bias for scaling as in followin GD functions
-				// to allow very tall images to be constrained only horizontally. 
+				// to allow very tall images to be constrained only horizontally.
 
 				$this->image->scaleImage($dest_width, $dest_height);
 			} while ($this->image->nextImage());

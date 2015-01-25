@@ -1,4 +1,5 @@
 <?php
+use Friendica\Cache;
 
 require_once('library/HTML5/Parser.php');
 require_once('include/crypto.php');
@@ -327,7 +328,7 @@ function scrape_feed($url) {
  * PROBE_DIASPORA has a bias towards returning Diaspora information
  * while PROBE_NORMAL has a bias towards dfrn/zot - in the case where
  * an address (such as a Friendica address) supports more than one type
- * of network. 
+ * of network.
  *
  */
 
@@ -416,7 +417,7 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 			// to a contact on incoming messages to prevent spam, and we won't know which one
 			// to match. So in case of two, one of them is stored as an alias. Only store URL's
 			// and not webfinger user@host aliases. If they've got more than two non-email style
-			// aliases, let's hope we're lucky and get one that matches the feed author-uri because 
+			// aliases, let's hope we're lucky and get one that matches the feed author-uri because
 			// otherwise we're screwed.
 
 			foreach($links as $link) {
@@ -505,8 +506,8 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 				if($j) {
 					$network = NETWORK_ZOT;
 					$vcard   = array(
-						'fn'    => $j->fullname, 
-						'nick'  => $j->nickname, 
+						'fn'    => $j->fullname,
+						'nick'  => $j->nickname,
 						'photo' => $j->photo
 					);
 					$profile  = $j->url;
