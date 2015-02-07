@@ -1,5 +1,6 @@
 <?php
-require_once('include/Emailer.php');
+use Friendica\Emailer;
+
 require_once('include/email.php');
 require_once('include/bbcode.php');
 require_once('include/html2bbcode.php');

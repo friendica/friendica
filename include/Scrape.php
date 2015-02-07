@@ -1,4 +1,5 @@
 <?php
+use Friendica\Cache;
 
 require_once('library/HTML5/Parser.php');
 require_once('include/crypto.php');
@@ -327,7 +328,7 @@ function scrape_feed($url) {
  * PROBE_DIASPORA has a bias towards returning Diaspora information
  * while PROBE_NORMAL has a bias towards dfrn/zot - in the case where
  * an address (such as a Friendica address) supports more than one type
- * of network. 
+ * of network.
  *
  */
 
@@ -526,8 +527,8 @@ function probe_url($url, $mode = PROBE_NORMAL) {
 				if($j) {
 					$network = NETWORK_ZOT;
 					$vcard   = array(
-						'fn'    => $j->fullname, 
-						'nick'  => $j->nickname, 
+						'fn'    => $j->fullname,
+						'nick'  => $j->nickname,
 						'photo' => $j->photo
 					);
 					$profile  = $j->url;

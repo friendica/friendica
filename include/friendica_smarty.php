@@ -1,7 +1,6 @@
 <?php
-
 require_once "object/TemplateEngine.php";
-require_once("library/Smarty/libs/Smarty.class.php");
+
 
 define('SMARTY3_TEMPLATE_FOLDER','templates');
 
@@ -39,19 +38,19 @@ class FriendicaSmarty extends Smarty {
 		}
 		return $this->fetch('file:' . $this->filename);
 	}
-	
+
 
 }
 
 class FriendicaSmartyEngine implements ITemplateEngine {
 	static $name ="smarty3";
-   	
+
     public function __construct(){
 		if(!is_writable('view/smarty3/')){
 			echo "<b>ERROR:</b> folder <tt>view/smarty3/</tt> must be writable by webserver."; killme();
 		}
-	} 
-    
+	}
+
 	// ITemplateEngine interface
 	public function replace_macros($s, $r) {
 		$template = '';
@@ -65,9 +64,9 @@ class FriendicaSmartyEngine implements ITemplateEngine {
 			}
 			$s->assign($key, $value);
 		}
-		return $s->parsed($template);		
+		return $s->parsed($template);
 	}
-	
+
 	public function get_template_file($file, $root=''){
 		$a = get_app();
 		$template_file = get_template_file($a, SMARTY3_TEMPLATE_FOLDER.'/'.$file, $root);
