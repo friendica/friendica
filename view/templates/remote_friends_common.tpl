@@ -11,7 +11,7 @@
 		</div>
 		<div class="profile-match-break"></div>
 		<div class="profile-match-name">
-			<a href="{{$itemurl}}" title="{{$item.name}}">{{$item.name}}</a>
+			<a href="{{$item.url}}" title="{{$item.name}}">{{$item.name}}</a>
 		</div>
 		<div class="profile-match-end"></div>
 	</div>
