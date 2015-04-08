@@ -182,6 +182,18 @@
 					text = e.text().format("<span class='contactname'>"+e.attr('name')+"</span>");
 					html = notifications_tpl.format(e.attr('href'),e.attr('photo'), text, e.attr('date'), e.attr('seen'));
 					nnm.append(html);
+					
+					if(e.text().search('&rarr;') == 0) {
+                                         var notification = new Notification(document.title, {
+                                          body: e.text().replace('&rarr; ',''),
+                                          icon: e.attr('photo')
+                                         });
+   
+                                         // TODO (yet unsupported by most browsers): 
+                                         // Implement notification.onclick()
+                                         
+                                        notifyMarkAll();
+                                       }
 				});
 
 				$("img[data-src]", nnm).each(function(i, el){

@@ -7,6 +7,9 @@
 	require_once("include/conversation.php");
 	require_once("include/oauth.php");
 	require_once("include/html2plain.php");
+	require_once("mod/share.php");
+	require_once("include/Photo.php");
+
 	/*
 	 * Twitter-Like API
 	 *
@@ -821,6 +824,18 @@
 				$_REQUEST['body'] .= "\n\n".$media;
 		}
 
+		// To-Do: Multiple IDs
+		if (requestdata('media_ids')) {
+			$r = q("SELECT `resource-id`, `scale`, `nickname`, `type` FROM `photo` INNER JOIN `user` ON `user`.`uid` = `photo`.`uid` WHERE `resource-id` IN (SELECT `resource-id` FROM `photo` WHERE `id` = %d) AND `scale` > 0 AND `photo`.`uid` = %d ORDER BY `photo`.`width` DESC LIMIT 1",
+				intval(requestdata('media_ids')), api_user());
+			if ($r) {
+				$phototypes = Photo::supportedTypes();
+				$ext = $phototypes[$r[0]['type']];
+				$_REQUEST['body'] .= "\n\n".'[url='.$a->get_baseurl().'/photos/'.$r[0]['nickname'].'/image/'.$r[0]['resource-id'].']';
+				$_REQUEST['body'] .= '[img]'.$a->get_baseurl()."/photo/".$r[0]['resource-id']."-".$r[0]['scale'].".".$ext."[/img][/url]";
+			}
+		}
+
 		// set this so that the item_post() function is quiet and doesn't redirect or emit json
 
 		$_REQUEST['api_source'] = true;
@@ -839,6 +854,41 @@
 	api_register_func('api/statuses/update','api_statuses_update', true);
 	api_register_func('api/statuses/update_with_media','api_statuses_update', true);
 
+
+	function api_media_upload(&$a, $type) {
+		if (api_user()===false) {
+			logger('no user');
+			return false;
+		}
+
+		$user_info = api_get_user($a);
+
+		if(!x($_FILES,'media')) {
+			// Output error
+			return false;
+		}
+
+		require_once('mod/wall_upload.php');
+		$media = wall_upload_post($a, false);
+		if(!$media) {
+			// Output error
+			return false;
+		}
+
+		$returndata = array();
+		$returndata["media_id"] = $media["id"];
+		$returndata["media_id_string"] = (string)$media["id"];
+		$returndata["size"] = $media["size"];
+		$returndata["image"] = array("w" => $media["width"],
+						"h" => $media["height"],
+						"image_type" => $media["type"]);
+
+		logger("Media uploaded: ".print_r($returndata, true), LOGGER_DEBUG);
+
+		return array("media" => $returndata);
+	}
+
+	api_register_func('api/media/upload','api_media_upload', true);
 
 	function api_status_show(&$a, $type){
 		$user_info = api_get_user($a);
@@ -1136,7 +1186,8 @@
 
 		$idlist = implode(",", $idarray);
 
-		$r = q("UPDATE `item` SET `unseen` = 0 WHERE `unseen` AND `id` IN (%s)", $idlist);
+		if ($idlist != "")
+			$r = q("UPDATE `item` SET `unseen` = 0 WHERE `unseen` AND `id` IN (%s)", $idlist);
 
 
 		$data = array('$statuses' => $ret);
@@ -1389,10 +1440,8 @@
 					$pos = strpos($r[0]['body'], "[share");
 					$post = substr($r[0]['body'], $pos);
 				} else {
-					$post = "[share author='".str_replace("'", "&#039;", $r[0]['author-name']).
-							"' profile='".$r[0]['author-link'].
-							"' avatar='".$r[0]['author-avatar'].
-							"' link='".$r[0]['plink']."']";
+					$post = share_header($r[0]['author-name'], $r[0]['author-link'], $r[0]['author-avatar'], $r[0]['guid'], $r[0]['created'], $r[0]['plink']);
+
 					$post .= $r[0]['body'];
 					$post .= "[/share]";
 				}
@@ -1876,8 +1925,6 @@
 		if (!$ret)
 			return false;
 
-		require_once("include/Photo.php");
-
 		$attachments = array();
 
 		foreach ($images[1] AS $image) {
@@ -2003,7 +2050,6 @@
 
 			$start = iconv_strpos($text, $url, $offset, "UTF-8");
 			if (!($start === false)) {
-				require_once("include/Photo.php");
 				$image = get_photo_info($url);
 				if ($image) {
 					// If image cache is activated, then use the following sizes:

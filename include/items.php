@@ -12,6 +12,7 @@ require_once('include/email.php');
 require_once('include/ostatus_conversation.php');
 require_once('include/threads.php');
 require_once('include/socgraph.php');
+require_once('mod/share.php');
 
 function get_feed_for(&$a, $dfrn_id, $owner_nick, $last_update, $direction = 0) {
 
@@ -838,10 +839,7 @@ function get_atom_elements($feed, $item, $contact = array()) {
 			logger('get_atom_elements: fixing sender of repeated message.');
 
 			if (!intval(get_config('system','wall-to-wall_share'))) {
-				$prefix = "[share author='".str_replace("'", "&#039;",$name).
-						"' profile='".$uri.
-						"' avatar='".$avatar.
-						"' link='".$orig_uri."']";
+				$prefix = share_header($name, $uri, $avatar, "", "", $orig_uri);
 
 				$res["body"] = $prefix.html2bbcode($message)."[/share]";
 			} else {
@@ -1183,9 +1181,9 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	$arr['owner-avatar']  = ((x($arr,'owner-avatar'))  ? notags(trim($arr['owner-avatar']))  : '');
 	$arr['created']       = ((x($arr,'created') !== false) ? datetime_convert('UTC','UTC',$arr['created']) : datetime_convert());
 	$arr['edited']        = ((x($arr,'edited')  !== false) ? datetime_convert('UTC','UTC',$arr['edited'])  : datetime_convert());
-	$arr['commented']     = datetime_convert();
-	$arr['received']      = datetime_convert();
-	$arr['changed']       = datetime_convert();
+	$arr['commented']     = ((x($arr,'commented')  !== false) ? datetime_convert('UTC','UTC',$arr['commented'])  : datetime_convert());
+	$arr['received']      = ((x($arr,'received')  !== false) ? datetime_convert('UTC','UTC',$arr['received'])  : datetime_convert());
+	$arr['changed']       = ((x($arr,'changed')  !== false) ? datetime_convert('UTC','UTC',$arr['changed'])  : datetime_convert());
 	$arr['title']         = ((x($arr,'title'))         ? notags(trim($arr['title']))         : '');
 	$arr['location']      = ((x($arr,'location'))      ? notags(trim($arr['location']))      : '');
 	$arr['coord']         = ((x($arr,'coord'))         ? notags(trim($arr['coord']))         : '');

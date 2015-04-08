@@ -1,7 +1,4 @@
 <?php
-
-require_once('include/bbcode.php');
-
 function share_init(&$a) {
 
 	$post_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
@@ -23,11 +20,8 @@ function share_init(&$a) {
 			$pos = strpos($r[0]['body'], "[share");
 			$o = substr($r[0]['body'], $pos);
 		} else {
-			$o = "[share author='".str_replace("'", "&#039;",$r[0]['author-name']).
-				"' profile='".$r[0]['author-link'].
-				"' avatar='".$r[0]['author-avatar'].
-				"' link='".$r[0]['plink'].
-				"' posted='".$r[0]['created']."']\n";
+			$o = share_header($r[0]['author-name'], $r[0]['author-link'], $r[0]['author-avatar'], $r[0]['guid'], $r[0]['created'], $r[0]['plink']);
+
 			if($r[0]['title'])
 				$o .= '[b]'.$r[0]['title'].'[/b]'."\n";
 			$o .= $r[0]['body'];
@@ -45,4 +39,20 @@ function share_init(&$a) {
 	}
 	echo $o;
 	killme();
+}
+
+function share_header($author, $profile, $avatar, $guid, $posted, $link) {
+	$header = "[share author='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$author).
+		"' profile='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$profile).
+		"' avatar='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$avatar);
+
+	if ($guid)
+		$header .= "' guid='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$guid);
+
+	if ($posted)
+		$header .= "' posted='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$posted);
+
+	$header .= "' link='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$link)."']";
+
+	return $header;
 }
