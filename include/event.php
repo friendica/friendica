@@ -1,9 +1,11 @@
 <?php
 
+require_once('include/bbcode.php');
+require_once('include/map.php');
 
 function format_event_html($ev) {
 
-	require_once('include/bbcode.php');
+
 
 	if(! ((is_array($ev)) && count($ev)))
 		return '';
@@ -36,10 +38,17 @@ function format_event_html($ev) {
 				$ev['finish'] , $bd_format )))
 			. '</abbr></p>'  . "\r\n";
 
-	if(strlen($ev['location']))
+	if(strlen($ev['location'])){
 		$o .= '<p class="event-location"> ' . t('Location:') . ' <span class="location">' 
 			. bbcode($ev['location']) 
 			. '</span></p>' . "\r\n";
+		
+		if (str_pos("[map", $ev['location'])==0) {
+			$map = generate_named_map($ev['location']);
+			if ($map!==$ev['location']) $o.=$map;
+		}
+		
+	}
 
 	$o .= '</div>' . "\r\n";
 	return $o;

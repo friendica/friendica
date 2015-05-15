@@ -20,15 +20,26 @@
 </p>
 {{/if}}
 
+{{if $request}}
+<form action="{{$request}}" method="post" />
+{{else}}
 <form action="dfrn_request/{{$nickname}}" method="post" />
+{{/if}}
+
+{{if $photo}}
+<img src="{{$photo}}" alt="" id="dfrn-request-photo">
+{{/if}}
 
 <div id="dfrn-request-url-wrapper" >
 	<label id="dfrn-url-label" for="dfrn-url" >{{$your_address}}</label>
         {{if $myaddr}}
                 {{$myaddr}}
-                <input type="hidden" name="dfrn_url" id="dfrn-url" size="32" value="{{$myaddr|escape:'html'}}" />
+                <input type="hidden" name="dfrn_url" id="dfrn-url" value="{{$myaddr|escape:'html'}}" />
         {{else}}
         <input type="text" name="dfrn_url" id="dfrn-url" size="32" value="{{$myaddr|escape:'html'}}" />
+        {{/if}}
+        {{if $url}}
+                <input type="hidden" name="url" id="url" value="{{$url|escape:'html'}}" />
         {{/if}}
 	<div id="dfrn-request-url-end"></div>
 </div>

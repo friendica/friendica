@@ -18,7 +18,7 @@ others can use them.
 We do not include every translation from transifex in the source tree to avoid
 a scattered and disturbed overall experience. As an uneducated guess we have a
 lower limit of 50% translated strings before we include the language (for the
-core message.po file, addont translation will be included once all strings of
+core message.po file, addon translation will be included once all strings of
 an addon are translated. This limit is judging only by the amount of translated
 strings under the assumption that the most prominent strings for the UI will be
 translated first by a translation team. If you feel your translation useable
@@ -47,10 +47,10 @@ view/de/message.po you would do the following.
     2. Execute the po2php script, which will place the translation
        in the strings.php file that is used by friendica.
 
-       $> php util/po2php.php view/de/message.po
+       $> php util/po2php.php view/de/messages.po
 
        The output of the script will be placed at view/de/strings.php where
-       froemdoca os expecting it, so you can test your translation mmediately.
+       friendica is expecting it, so you can test your translation immediately.
                                   
     3. Visit your friendica page to check if it still works in the language you
        just translated. If not try to find the error, most likely PHP will give
@@ -71,7 +71,7 @@ Utilities
 
 Additional to the po2php script there are some more utilities for translation
 in the "util" directory of the friendica source tree.  If you only want to
-translate friendica into another language you wont need any of these tools most
+translate friendica into another language you won't need any of these tools most
 likely but it gives you an idea how the translation process of friendica
 works.
 

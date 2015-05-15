@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 3.4.0 (Ginger)
--- DB_UPDATE_VERSION 1182
+-- Friendica 3.4.0 (Lily of the valley)
+-- DB_UPDATE_VERSION 1183
 -- ------------------------------------------
 
 
@@ -140,6 +140,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`uri-date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	`avatar-date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	`term-date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`last-item` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	`priority` tinyint(3) NOT NULL DEFAULT 0,
 	`blocked` tinyint(1) NOT NULL DEFAULT 1,
 	`readonly` tinyint(1) NOT NULL DEFAULT 0,

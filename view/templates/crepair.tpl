@@ -2,6 +2,12 @@
 
 <h4>{{$contact_name}}</h4>
 
+<div id="contact-update-profile-wrapper">
+{{if $update_profile}}
+	<span id="contact-update-profile-now" class="button"><a href="contacts/{{$contact_id}}/updateprofile" >{{$udprofilenow}}</a></span>
+{{/if}}
+</div>
+
 <label id="crepair-name-label" class="crepair-label" for="crepair-name">{{$label_name}}</label>
 <input type="text" id="crepair-name" class="crepair-input" name="name" value="{{$contact_name|escape:'html'}}" />
 <div class="clear"></div>

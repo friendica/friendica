@@ -120,7 +120,7 @@ function print_structure($database) {
 	}
 }
 
-function update_structure($verbose, $action) {
+function update_structure($verbose, $action, $tables=null, $definition=null) {
 	global $a, $db;
 
 	$errors = false;
@@ -130,7 +130,8 @@ function update_structure($verbose, $action) {
 	// Get the current structure
 	$database = array();
 
-	$tables = q("show tables");
+	if (is_null($tables))
+		$tables = q("show tables");
 
 	foreach ($tables AS $table) {
 		$table = current($table);
@@ -139,7 +140,8 @@ function update_structure($verbose, $action) {
 	}
 
 	// Get the definition
-	$definition = db_definition();
+	if (is_null($definition))
+		$definition = db_definition();
 
 	// Compare it
 	foreach ($definition AS $name => $structure) {
@@ -149,9 +151,9 @@ function update_structure($verbose, $action) {
                         if(false === $r)
 				$errors .=  t('Errors encountered creating database tables.').$name.EOL;
 		} else {
-			// Drop the index if it isn't present in the definition
+			// Drop the index if it isn't present in the definition and index name doesn't start with "local_"
 			foreach ($database[$name]["indexes"] AS $indexname => $fieldnames)
-				if (!isset($structure["indexes"][$indexname])) {
+				if (!isset($structure["indexes"][$indexname]) && substr($indexname, 0, 6) != 'local_') {
 					$sql2=db_drop_index($indexname);
 					if ($sql3 == "")
 						$sql3 = "ALTER TABLE `".$name."` ".$sql2;
@@ -453,6 +455,7 @@ function db_definition() {
 					"uri-date" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					"avatar-date" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					"term-date" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
+					"last-item" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					"priority" => array("type" => "tinyint(3)", "not null" => "1", "default" => "0"),
 					"blocked" => array("type" => "tinyint(1)", "not null" => "1", "default" => "1"),
 					"readonly" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
@@ -922,6 +925,7 @@ function db_definition() {
 					"msg" => array("type" => "mediumtext", "not null" => "1"),
 					"uid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"link" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"iid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"parent" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"seen" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"verb" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),

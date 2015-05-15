@@ -82,6 +82,7 @@ class Item extends BaseObject {
 	 */
 	public function get_template_data($alike, $dlike, $thread_level=1) {
 		require_once("mod/proxy.php");
+		require_once("include/diaspora.php");
 
 		$result = array();
 
@@ -287,22 +288,24 @@ class Item extends BaseObject {
 		}
 
 		// Disable features that aren't available in several networks
-		if (($item["item_network"] != "dfrn") AND isset($buttons["dislike"])) {
+		if (($item["item_network"] != NETWORK_DFRN) AND isset($buttons["dislike"])) {
 			unset($buttons["dislike"]);
 			$tagger = '';
 		}
 
-		if (($item["item_network"] == "feed") AND isset($buttons["like"]))
+		if (($item["item_network"] == NETWORK_FEED) AND isset($buttons["like"]))
 			unset($buttons["like"]);
 
-		if (($item["item_network"] == "mail") AND isset($buttons["like"]))
+		if (($item["item_network"] == NETWORK_MAIL) AND isset($buttons["like"]))
 			unset($buttons["like"]);
 
-		if (($item["item_network"] == "dspr") AND ($indent == 'comment') AND isset($buttons["like"]))
+		// Diaspora isn't able to do likes on comments - but red does
+		if (($item["item_network"] == NETWORK_DIASPORA) AND ($indent == 'comment') AND
+			!diaspora_is_redmatrix($item["owner-link"]) AND isset($buttons["like"]))
 			unset($buttons["like"]);
 
 		// Facebook can like comments - but it isn't programmed in the connector yet.
-		if (($item["item_network"] == "face") AND ($indent == 'comment') AND isset($buttons["like"]))
+		if (($item["item_network"] == NETWORK_FACEBOOK) AND ($indent == 'comment') AND isset($buttons["like"]))
 			unset($buttons["like"]);
 
 

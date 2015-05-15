@@ -27,7 +27,7 @@ function notification($params) {
 	$hostname = $a->get_hostname();
 	if(strpos($hostname,':'))
 		$hostname = substr($hostname,0,strpos($hostname,':'));
-	
+
 	$sender_email = $a->config['sender_email'];
 	if (empty($sender_email)) {
 		$sender_email = t('noreply') . '@' . $hostname;
@@ -63,6 +63,16 @@ function notification($params) {
 	// e.g. "your post", "David's photo", etc.
 	$possess_desc = t('%s <!item_type!>');
 
+	if (isset($params['item']['id']))
+		$item_id = $params['item']['id'];
+	else
+		$item_id = 0;
+
+	if (isset($params['parent']))
+		$parent_id = $params['parent'];
+	else
+		$parent_id = 0;
+
 	if($params['type'] == NOTIFY_MAIL) {
 
 		$subject = 	sprintf( t('[Friendica:Notify] New mail received at %s'),$sitename);
@@ -78,7 +88,7 @@ function notification($params) {
 	if($params['type'] == NOTIFY_COMMENT) {
 //		logger("notification: params = " . print_r($params, true), LOGGER_DEBUG);
 
-		$parent_id = $params['parent'];
+		//$parent_id = $params['parent'];
 
 		$p = q("SELECT `ignored` FROM `thread` WHERE `iid` = %d AND `uid` = %d LIMIT 1",
 			intval($parent_id),
@@ -400,6 +410,7 @@ function notification($params) {
 		$datarray['date']  = datetime_convert();
 		$datarray['uid']   = $params['uid'];
 		$datarray['link']  = $itemlink;
+		$datarray['iid']   = $item_id;
 		$datarray['parent'] = $parent_id;
 		$datarray['type']  = $params['type'];
 		$datarray['verb']  = $params['verb'];
@@ -415,8 +426,8 @@ function notification($params) {
 
 		// create notification entry in DB
 
-		$r = q("insert into notify (hash,name,url,photo,date,uid,link,parent,type,verb,otype)
-			values('%s','%s','%s','%s','%s',%d,'%s',%d,%d,'%s','%s')",
+		$r = q("insert into notify (hash,name,url,photo,date,uid,link,iid,parent,type,verb,otype)
+			values('%s','%s','%s','%s','%s',%d,'%s',%d,%d,%d,'%s','%s')",
 			dbesc($datarray['hash']),
 			dbesc($datarray['name']),
 			dbesc($datarray['url']),
@@ -424,6 +435,7 @@ function notification($params) {
 			dbesc($datarray['date']),
 			intval($datarray['uid']),
 			dbesc($datarray['link']),
+			intval($datarray['iid']),
 			intval($datarray['parent']),
 			intval($datarray['type']),
 			dbesc($datarray['verb']),

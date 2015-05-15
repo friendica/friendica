@@ -3,11 +3,21 @@ Friendica Installation
 
 * [Zur Startseite der Hilfe](help)
 
-Wir haben hart daran gearbeitet, um Friendica auf vorgefertigten Hosting-Plattformen zum Laufen zu bringen - solche, auf denen auch Wordpress Blogs und Drupal-Installationen laufen. Aber bedenke, dass Friendica mehr als eine einfache Webanwendung ist. Es handelt sich um ein komplexes Kommunikationssystem, das eher an einen Email-Server erinnert als an einen Webserver. Um die Verfügbarkeit und Performance zu gewährleisten, werden Nachrichten im Hintergrund verschickt und gespeichert, um sie später zu verschicken, wenn eine Webseite gerade nicht erreichbar ist. Diese Funktionalität benötigt ein wenig mehr als die normalen Blogs. Nicht jeder PHP/MySQL-Hosting-Anbieter kann Friendica unterstützen. Viele hingegen können es. Aber **bitte** prüfe die Voraussetzungen deines Servers vor der Installation. 
+Wir haben hart daran gearbeitet, um Friendica auf vorgefertigten Hosting-Plattformen zum Laufen zu bringen - solche, auf denen auch Wordpress Blogs und Drupal-Installationen laufen. 
+Aber bedenke, dass Friendica mehr als eine einfache Webanwendung ist. 
+Es handelt sich um ein komplexes Kommunikationssystem, das eher an einen Email-Server erinnert als an einen Webserver. 
+Um die Verfügbarkeit und Performance zu gewährleisten, werden Nachrichten im Hintergrund verschickt und gespeichert, um sie später zu verschicken, wenn eine Webseite gerade nicht erreichbar ist. 
+Diese Funktionalität benötigt ein wenig mehr als die normalen Blogs. 
+Nicht jeder PHP/MySQL-Hosting-Anbieter kann Friendica unterstützen. 
+Viele hingegen können es. Aber **bitte** prüfe die Voraussetzungen deines Servers vor der Installation. 
 
-Wenn dir Fehler während der Installation auffallen, sag uns bitte über das Forum auf http://groups.google.com/group/friendica oder über http://bugs.friendica.com Bescheid. Gib uns bitte so viele Infos zu deinem System, wie du kannst, und beschreibe den Fehler mit allen Details und Fehlermeldungen, so dass wir den Fehler zukünftig verhindern können. Aufgrund der großen Anzahl an verschiedenen Betriebssystemen und PHP-Plattformen haben wir nur geringe Kapazitäten, um deine PHP-Installation zu debuggen oder fehlende Module zu ersetzen, aber wir tun unser Bestes, um allgemeine Code-Fehler zu beheben.
+Wenn dir Fehler während der Installation auffallen, sag uns bitte über http://bugs.friendica.com Bescheid. 
+Gib uns bitte so viele Infos zu deinem System, wie du kannst, und beschreibe den Fehler mit allen Details und Fehlermeldungen, so dass wir den Fehler zukünftig verhindern können. 
+Aufgrund der großen Anzahl an verschiedenen Betriebssystemen und PHP-Plattformen haben wir nur geringe Kapazitäten, um deine PHP-Installation zu debuggen oder fehlende Module zu ersetzen, aber wir tun unser Bestes, um allgemeine Code-Fehler zu beheben.
 
-Bevor du anfängst: suche dir einen Domain- oder Subdomainnamen für deinen Server. Denke ausreichend darüber nach, da ein Wechsel nach der Friendica-Installation derzeit nicht unterstützt wird. Dinge verändern sich und einige deiner Freunde haben möglicherweise Probleme, mit dir zu kommunizieren. Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben. 
+Bevor du anfängst: suche dir einen Domain- oder Subdomainnamen für deinen Server. 
+Dinge verändern sich und einige deiner Freunde haben möglicherweise Probleme, mit dir zu kommunizieren. 
+Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben. 
 
 
 1. Voraussetzungen
@@ -81,13 +91,18 @@ Wenn du einen Linux-Server nutzt, benutze den Befehl "crontab -e" und ergänze e
 
 `*/10 * * * * cd /home/myname/mywebsite; /usr/bin/php include/poller.php`
 
-Du kannst den PHP-Pfad finden, indem du den Befehl „which php“ ausführst. Wenn du Schwierigkeiten mit diesem Schritt hast, kannst du deinen Hosting-Anbieter kontaktieren. Friendica wird nicht korrekt laufen, wenn dieser Schritt nicht erfolgreich abgeschlossen werden kann.
+Du kannst den PHP-Pfad finden, indem du den Befehl „which php“ ausführst. 
+Wenn du Schwierigkeiten mit diesem Schritt hast, kannst du deinen Hosting-Anbieter kontaktieren. 
+Friendica wird nicht korrekt laufen, wenn dieser Schritt nicht erfolgreich abgeschlossen werden kann.
 
-Alternativ kannst du das Plugin 'poormancron' nutzen, um diesen Schritt durchzuführen, wenn du eine aktuelle Friendica-Version nutzt. Um dies zu machen, musst du die ".htconfig.php" an der Stelle anpassen, die dein Plugin beschreibt. In einer frischen Installation sieht es aus wie: 
+Alternativ kannst du das Plugin 'poormancron' nutzen, um diesen Schritt durchzuführen, wenn du eine aktuelle Friendica-Version nutzt. 
+Um dies zu machen, musst du die ".htconfig.php" an der Stelle anpassen, die dein Plugin beschreibt. 
+In einer frischen Installation sieht es aus wie: 
 
 `$a->config['system']['addon'] = 'js_upload';`
 
-Dies setzt voraus, dass das Addon-Modul "js_upload" aktiviert ist. Du kannst auch weitere Addons/Plugins ergänzen. Ändere den Eintrag folgendermaßen ab:
+Dies setzt voraus, dass das Addon-Modul "js_upload" aktiviert ist. 
+Du kannst auch weitere Addons/Plugins ergänzen. Ändere den Eintrag folgendermaßen ab:
 
 `$a->config['system']['addon'] = 'js_upload,poormancron';`
 

@@ -15,7 +15,7 @@
 
 function new_contact($uid,$url,$interactive = false) {
 
-	$result = array('success' => false,'message' => '');
+	$result = array('cid' => -1, 'success' => false,'message' => '');
 
 	$a = get_app();
 
@@ -208,7 +208,7 @@ function new_contact($uid,$url,$interactive = false) {
 
 	$contact = $r[0];
 	$contact_id  = $r[0]['id'];
-
+	$result['cid'] = $contact_id;
 
 	$g = q("select def_gid from user where uid = %d limit 1",
 		intval($uid)

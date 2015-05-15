@@ -107,6 +107,7 @@
 	{{include file="field_input.tpl" field=$delivery_interval}}
 	{{include file="field_input.tpl" field=$poll_interval}}
 	{{include file="field_input.tpl" field=$maxloadavg}}
+	{{include file="field_input.tpl" field=$maxloadavg_frontend}}
 	{{include file="field_input.tpl" field=$abandon_days}}
 	{{include file="field_input.tpl" field=$lockpath}}
 	{{include file="field_input.tpl" field=$temppath}}

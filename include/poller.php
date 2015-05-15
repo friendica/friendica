@@ -46,7 +46,7 @@ function poller_run(&$argv, &$argc){
 	if(function_exists('sys_getloadavg')) {
 		$load = sys_getloadavg();
 		if(intval($load[0]) > $maxsysload) {
-			logger('system: load ' . $load . ' too high. Poller deferred to next scheduled run.');
+			logger('system: load ' . $load[0] . ' too high. Poller deferred to next scheduled run.');
 			return;
 		}
 	}

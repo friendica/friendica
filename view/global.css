@@ -84,6 +84,10 @@ span.connector {
   position: relative;
 }
 
+.embed_rich {
+  display: block;
+}
+
 /* Shared Messages */
 .shared_header {
   height: 32px;

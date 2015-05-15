@@ -452,11 +452,6 @@ function network_content(&$a, $update = 0) {
 	}
 	set_pconfig(local_user(), 'network.view', 'net.selected', ($nets ? $nets : 'all'));
 
-/*if ($update) {
-print_r($_GET);
-die("ss");
-}*/
-
 	if(! $update) {
 		if($group) {
 			if(($t = group_public_members($group)) && (! get_pconfig(local_user(),'system','nowarn_insecure'))) {
@@ -471,6 +466,14 @@ die("ss");
 
 		$celeb = ((($a->user['page-flags'] == PAGE_SOAPBOX) || ($a->user['page-flags'] == PAGE_COMMUNITY)) ? true : false);
 
+		$content = "";
+
+		if ($cid) {
+			$contact = q("SELECT `nick` FROM `contact` WHERE `id` = %d AND `uid` = %d AND `forum`", intval($cid), intval(local_user()));
+			if ($contact)
+				$content = "@".$contact[0]["nick"]."+".$cid;
+		}
+
 		$x = array(
 			'is_owner' => true,
 			'allow_location' => $a->user['allow_location'],
@@ -483,6 +486,7 @@ die("ss");
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
 			'acl_data' => construct_acl_data($a, $a->user), // For non-Javascript ACL selector
+			'content' => $content,
 		);
 
 		$o .= status_editor($a,$x);

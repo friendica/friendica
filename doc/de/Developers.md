@@ -17,6 +17,9 @@ Gehe nun zu deiner Github-Seite und erstelle eine "Pull request", wenn du soweit
 
 **Wichtig**
 
-Bitte hole dir alle Änderungen aus dem Projektverzeichnis und führe sie mit deiner Arbeit zusammen, **bevor** du deine "pull request" stellt. Wir behalten es uns vor, Patches abzulehnen, die eine große Anzahl an Fehlern hervorrufen. Dies gilt vor allem für Übersetzungen, da wir hier möglicherweise nicht alle feinen Unterschiede in konfliktären Versionen erkennen können.
+Bitte hole dir alle Änderungen aus dem Projektverzeichnis und führe sie mit deiner Arbeit zusammen, **bevor** du deine "pull request" stellt. 
+Wir behalten es uns vor, Patches abzulehnen, die eine große Anzahl an Fehlern hervorrufen. 
+Dies gilt vor allem für Übersetzungen, da wir hier möglicherweise nicht alle feinen Unterschiede in konfliktären Versionen erkennen können.
 
-Außerdem: **teste deine Änderungen!** Vergiss nicht, dass eine simple Fehlerlösung einen anderen Fehler auslösen kann. Lass deine Änderungen von einem erfahrenen Friendica-Entwickler gegenprüfen.
+Außerdem: **teste deine Änderungen!** Vergiss nicht, dass eine simple Fehlerlösung einen anderen Fehler auslösen kann. 
+Lass deine Änderungen von einem erfahrenen Friendica-Entwickler gegenprüfen.

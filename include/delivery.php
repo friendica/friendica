@@ -60,7 +60,7 @@ function delivery_run(&$argv, &$argc){
 		if(function_exists('sys_getloadavg')) {
 			$load = sys_getloadavg();
 			if(intval($load[0]) > $maxsysload) {
-				logger('system: load ' . $load . ' too high. Delivery deferred to next queue run.');
+				logger('system: load ' . $load[0] . ' too high. Delivery deferred to next queue run.');
 				return;
 			}
 		}

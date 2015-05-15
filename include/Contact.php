@@ -330,7 +330,8 @@ function get_contact($url, $uid = 0) {
 
 		if (!$update_photo)
 			return($contactid);
-	}
+	} elseif ($uid != 0)
+		return 0;
 
 	if (!count($data))
 		$data = probe_url($url);

@@ -1,10 +1,21 @@
 <?php
 require_once("include/oembed.php");
 require_once('include/event.php');
+require_once('include/map.php');
+
+
+function bb_map_coords($match) {
+	// the extra space in the following line is intentional
+	return str_replace($match[0],'<div class="map"  >' . generate_map(str_replace('/',' ',$match[1])) . '</div>', $match[0]);
+}
+function bb_map_location($match) {
+	// the extra space in the following line is intentional
+	return str_replace($match[0],'<div class="map"  >' . generate_named_map($match[1]) . '</div>', $match[0]);
+}
 
 function bb_attachment($Text, $plaintext = false, $tryoembed = true) {
 	$Text = preg_replace_callback("/(.*?)\[attachment(.*?)\](.*?)\[\/attachment\]/ism",
-		function ($match) use ($plaintext){
+		function ($match) use ($plaintext, $tryoembed){
 
 			$attributes = $match[2];
 
@@ -83,14 +94,18 @@ function bb_attachment($Text, $plaintext = false, $tryoembed = true) {
 				else
 					$oembed = $bookmark[0];
 
-				if (($image != "") AND !strstr(strtolower($oembed), "<img "))
-					$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $url, $image, $title);
-				elseif (($preview != "") AND !strstr(strtolower($oembed), "<img "))
-					$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $url, $preview, $title);
+				if (strstr(strtolower($oembed), "<iframe "))
+					$text = $oembed;
+				else {
+					if (($image != "") AND !strstr(strtolower($oembed), "<img "))
+						$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $url, $image, $title);
+					elseif (($preview != "") AND !strstr(strtolower($oembed), "<img "))
+						$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $url, $preview, $title);
 
-				$text .= $oembed;
+					$text .= $oembed;
 
-				$text .= sprintf('<blockquote>%s</blockquote></span>', trim($match[3]));
+					$text .= sprintf('<blockquote>%s</blockquote></span>', trim($match[3]));
+				}
 			}
 
 			return($match[1].$text);
@@ -928,7 +943,20 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	// Perform MAIL Search
 	$Text = preg_replace("/\[mail\]([$MAILSearchString]*)\[\/mail\]/", '<a href="mailto:$1">$1</a>', $Text);
 	$Text = preg_replace("/\[mail\=([$MAILSearchString]*)\](.*?)\[\/mail\]/", '<a href="mailto:$1">$2</a>', $Text);
+	
+	// leave open the posibility of [map=something]
+	// this is replaced in prepare_body() which has knowledge of the item location
 
+	if (strpos($Text,'[/map]') !== false) {
+		$Text = preg_replace_callback("/\[map\](.*?)\[\/map\]/ism", 'bb_map_location', $Text);
+	}
+	if (strpos($Text,'[map=') !== false) {
+		$Text = preg_replace_callback("/\[map=(.*?)\]/ism", 'bb_map_coords', $Text);
+	}
+	if (strpos($Text,'[map]') !== false) {
+		$Text = preg_replace("/\[map\]/", '<div class="map"></div>', $Text);
+	}	
+	
 	// Check for headers
 	$Text = preg_replace("(\[h1\](.*?)\[\/h1\])ism",'<h1>$1</h1>',$Text);
 	$Text = preg_replace("(\[h2\](.*?)\[\/h2\])ism",'<h2>$1</h2>',$Text);

@@ -5,16 +5,22 @@ Konnektoren installieren (Facebook/Twitter/StatusNet)
 
 Friendica nutzt Plugins, um die Verbindung zu anderen Netzwerken wie Facebook und Twitter zu gewährleisten.
 
-Es gibt außerdem ein Plugin, um über einen bestehenden Status.Net-Account diesen Service zu nutzen. Du brauchst dieses Plugin aber nicht, um mit Status.Net-Mitgliedern von Friendica aus zu kommunizieren - es sei denn, du wünschst es, über einen existierenden Account einen Beitrag zu schreiben. 
+Es gibt außerdem ein Plugin, um über einen bestehenden Status.Net-Account diesen Service zu nutzen. 
+Du brauchst dieses Plugin aber nicht, um mit Status.Net-Mitgliedern von Friendica aus zu kommunizieren - es sei denn, du wünschst es, über einen existierenden Account einen Beitrag zu schreiben. 
 
-Alle drei Plugins benötigen einen Account im gewünschten Netzwerk. Zusätzlich musst du (bzw. der Administrator der Seite) einen API-Schlüssel holen, um einen authentifizierten Zugriff zu deinem Friendica-Server herstellen zu lassen.
+Alle drei Plugins benötigen einen Account im gewünschten Netzwerk. 
+Zusätzlich musst du (bzw. der Administrator der Seite) einen API-Schlüssel holen, um einen authentifizierten Zugriff zu deinem Friendica-Server herstellen zu lassen.
 
 
 **Seitenkonfiguration**
 
-Plugins müssen vom Administrator installiert werden, bevor sie genutzt werden können. Dieses kann über das Administrationsmenü erstellt werden.
+Plugins müssen vom Administrator installiert werden, bevor sie genutzt werden können. 
+Dieses kann über das Administrationsmenü erstellt werden.
 
-Jeder der Konnektoren benötigt zudem einen API-Schlüssel vom Service, der verbunden werden soll. Einige Plugins erlaube es, diese Informationen auf den Administrationsseiten einzustellen, wohingegen andere eine direkte Bearbeitung der Konfigurationsdatei ".htconfig.php" erfordern. Der Weg, um diese Schlüssel zu erhalten, variiert stark, jedoch brauchen fast alle einen bestehenden Account im gewünschten Service. Einmal installiert, können diese Schlüssel von allen Seitennutzern genutzt werden.
+Jeder der Konnektoren benötigt zudem einen API-Schlüssel vom Service, der verbunden werden soll. 
+Einige Plugins erlaube es, diese Informationen auf den Administrationsseiten einzustellen, wohingegen andere eine direkte Bearbeitung der Konfigurationsdatei ".htconfig.php" erfordern. 
+Der Weg, um diese Schlüssel zu erhalten, variiert stark, jedoch brauchen fast alle einen bestehenden Account im gewünschten Service. 
+Einmal installiert, können diese Schlüssel von allen Seitennutzern genutzt werden.
 
 Im Folgenden findest du die Einstellungen für die verschiedenen Services (viele dieser Informationen kommen direkt aus den Quelldateien der Plugins):
 
@@ -39,8 +45,6 @@ $a->config['twitter']['consumersecret'] = 'your consumer_secret here';
 ```
 
 Anschließend kann der Nutzer deiner Seite die Twitter-Einstellungen selbst eintragen: "Einstellungen -> Connector Einstellungen".
-
-Dokumentation: http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/Twitter_Plugin
 
 
 **StatusNet Plugin für Friendica**
@@ -72,11 +76,12 @@ Während der Registrierung des OAuth-Clients ist Folgendes zu beachten:
 * stelle Lese- und Schreibrechte ein
 * die Quell-URL sollte die URL deines Friendica-Servers sein
 
-Sobald die benötigten Daten gespeichert sind, musst du deinen Friendica-Account mit StatusNet verbinden. Das kannst du über Einstellungen --> Connector-Einstellungen durchführen. Folge dem "Einloggen mit StatusNet"-Button, erlaube den Zugriff und kopiere den Sicherheitscode in die entsprechende Box. Friendica wird dann versuchen, die abschließende OAuth-Einstellungen über die API zu beziehen.
+Sobald die benötigten Daten gespeichert sind, musst du deinen Friendica-Account mit StatusNet verbinden. 
+Das kannst du über Einstellungen --> Connector-Einstellungen durchführen. 
+Folge dem "Einloggen mit StatusNet"-Button, erlaube den Zugriff und kopiere den Sicherheitscode in die entsprechende Box. 
+Friendica wird dann versuchen, die abschließende OAuth-Einstellungen über die API zu beziehen.
 
 Wenn es geklappt hat, kannst du in den Einstellungen festlegen, ob deine öffentlichen Nachrichten automatisch in deinem StatusNet-Account erscheinen soll (achte hierbei auf das kleine Schloss-Symbol im Status-Editor)
-
-Dokumentation: http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/StatusNet_Plugin
 
 
 **Installiere den Friendica/Facebook-Konnektor**
@@ -101,10 +106,14 @@ Auf Friendica kann nun jeder Nutzer, der eine Verbindung zu Facebook wünscht, d
 
 Wähle die gewünschten Einstellungen für deine Nutzungs- und Privatsphäreansprüche.
 
-Hier meldest du dich bei Facebook an und gibst dem Plugin die nötigen Zugriffsrechte, um richtig zu funktionieren. Erlaube dieses.
+Hier meldest du dich bei Facebook an und gibst dem Plugin die nötigen Zugriffsrechte, um richtig zu funktionieren. 
+Erlaube dieses.
 
 Und fertig. Um es abzustellen, gehe wieder auf die Einstellungsseite und auf "Remove Facebook posting".
 
-Videos und eingebetteter Code werden nicht gepostet, wenn sonst kein anderer Inhalt enthalten ist. Links und Bilder werden in ein Format übertragen, das von der Facebook-API verstanden wird. Lange Texte werden verkürzt und mit einem Link zum Originalbeitrag versehen. 
+Videos und eingebetteter Code werden nicht gepostet, wenn sonst kein anderer Inhalt enthalten ist. 
+Links und Bilder werden in ein Format übertragen, das von der Facebook-API verstanden wird. 
+Lange Texte werden verkürzt und mit einem Link zum Originalbeitrag versehen. 
 
-Facebook-Kontakte können außerdem keine privaten Fotos sehen, da diese nicht richtig authentifiziert werden können, wenn sie deine Seite besuchen. Dieser Fehler wird zukünftig bearbeitet.
+Facebook-Kontakte können außerdem keine privaten Fotos sehen, da diese nicht richtig authentifiziert werden können, wenn sie deine Seite besuchen. 
+Dieser Fehler wird zukünftig bearbeitet.

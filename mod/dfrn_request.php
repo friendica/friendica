@@ -664,6 +664,21 @@ function dfrn_request_content(&$a) {
 		$dfrn_url = notags(trim(hex2bin($_GET['dfrn_url'])));
 		$aes_allow = (((x($_GET,'aes_allow')) && ($_GET['aes_allow'] == 1)) ? 1 : 0);
 		$confirm_key = (x($_GET,'confirm_key') ? $_GET['confirm_key'] : "");
+
+		// Checking fastlane for validity
+		if (x($_SESSION, "fastlane") AND (normalise_link($_SESSION["fastlane"]) == normalise_link($dfrn_url))) {
+			$_POST["dfrn_url"] = $dfrn_url;
+			$_POST["confirm_key"] = $confirm_key;
+			$_POST["localconfirm"] = 1;
+			$_POST["hidden-contact"] = 0;
+			$_POST["submit"] = t('Confirm');
+
+			dfrn_request_post($a);
+
+			killme();
+			return; // NOTREACHED
+		}
+
 		$tpl = get_markup_template("dfrn_req_confirm.tpl");
 		$o  = replace_macros($tpl,array(
 			'$dfrn_url' => $dfrn_url,

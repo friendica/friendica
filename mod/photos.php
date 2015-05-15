@@ -1628,7 +1628,7 @@ function photos_content(&$a) {
 
 
 					if(local_user() && ($item['contact-uid'] == local_user())
-						&& ($item['network'] == 'dfrn') && (! $item['self'] )) {
+						&& ($item['network'] == NETWORK_DFRN) && (! $item['self'] )) {
 						$profile_url = $redirect_url;
 						$sparkle = ' sparkle';
 					}

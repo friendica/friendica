@@ -118,7 +118,8 @@ Man kann viele Dinge, z.B. Video und Audio Dateine, in Nachrichten einbetten.
 <pre>[video]url[/video]</pre>
 <pre>[audio]url[/audio]</pre>
 
-Wobei die *url* von youtube, vimeo, soundcloud oder einer anderen Seite stammen kann die die oembed oder opengraph Spezifikationen unterst&uuml;tzt.  Au&szlig;erdem kann *url* die genaue url zu einer ogg Datei sein, die dann per HTML5 eingebunden wird.
+Wobei die *url* von youtube, vimeo, soundcloud oder einer anderen Seite stammen kann die die oembed oder opengraph Spezifikationen unterst&uuml;tzt.  
+Au&szlig;erdem kann *url* die genaue url zu einer ogg Datei sein, die dann per HTML5 eingebunden wird.
 
 <pre>[url]*url*[/url]</pre>
 

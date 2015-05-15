@@ -126,6 +126,14 @@ Where *url* can be an url to youtube, vimeo, soundcloud, or other sites wich sup
 If *url* supports oembed or opengraph specifications the embedded object will be shown (eg, documents from scribd).
 Page title with a link to *url* will be shown.
 
+Map
+---
+
+<pre>[map]address[/map]</pre>
+<pre>[map=lat,long]</pre>
+
+You can embed maps from coordinates or addresses. 
+This require "openstreetmap" addon version 1.3 or newer.
 
 
 Special

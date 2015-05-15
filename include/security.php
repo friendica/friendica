@@ -55,7 +55,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	else
 		$a->identities = array();
 
-	$r = q("select `user`.`uid`, `user`.`username`, `user`.`nickname` 
+	$r = q("select `user`.`uid`, `user`.`username`, `user`.`nickname`
 		from manage INNER JOIN user on manage.mid = user.uid where `user`.`account_removed` = 0
 		and `manage`.`uid` = %d",
 		intval($master_record['uid'])
@@ -86,6 +86,15 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 			dbesc($l),
 			intval($_SESSION['uid'])
 		);
+
+		// Set the login date for all identities of the user
+		q("UPDATE `user` SET `login_date` = '%s' WHERE `password` = '%s' AND `email` = '%s' AND `account_removed` = 0",
+			dbesc(datetime_convert()),
+			dbesc($master_record['password']),
+			dbesc($master_record['email'])
+		);
+
+
 	}
 	if($login_initial) {
 		call_hooks('logged_in', $a->user);

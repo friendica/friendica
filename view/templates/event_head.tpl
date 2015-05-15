@@ -12,6 +12,15 @@
 			}
 		);			
 	}
+        
+        function doEventPreview() {
+        $('#event-edit-preview').val(1);
+        $.post('events',$('#event-edit-form').serialize(), function(data) {
+                $.colorbox({ html: data });
+        });
+        $('#event-edit-preview').val(0);
+	}
+
 	
 	$(document).ready(function() {
 		$('#events-calendar').fullCalendar({
@@ -75,6 +84,7 @@
 </script>
 
 
+{{if $editselect != 'none'}}
 <script language="javascript" type="text/javascript"
           src="{{$baseurl}}/library/tinymce/jscripts/tiny_mce/tiny_mce_src.js"></script>
 <script language="javascript" type="text/javascript">
@@ -108,6 +118,9 @@
 		}
 
 	});
+        {{else}}
+	<script language="javascript" type="text/javascript">
+	{{/if}}
 
 
 	$(document).ready(function() { 

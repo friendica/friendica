@@ -270,6 +270,8 @@ function group_side($every="contacts",$each="group",$edit = false, $group_id = 0
 		'$title'		=> t('Groups'),
 		'$edittext'     => t('Edit group'),
 		'$createtext' 	=> t('Create a new group'),
+    '$creategroup' => t('Group Name: '),
+    '$form_security_token' => get_form_security_token("group_edit"),
 		'$ungrouped'    => (($every === 'contacts') ? t('Contacts not in any group') : ''),
 		'$groups'		=> $groups,
 		'$add'			=> t('add'),

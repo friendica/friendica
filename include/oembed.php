@@ -199,10 +199,15 @@ function oembed_format_object($j){
 }
 
 function oembed_iframe($src,$width,$height) {
+
 	if(! $width || strstr($width,'%'))
 		$width = '640';
-	if(! $height || strstr($height,'%'))
+	if(! $height || strstr($height,'%')) {
 		$height = '300';
+		$resize = 'onload="resizeIframe(this);"';
+	} else
+		$resize = '';
+
 	// try and leave some room for the description line.
 	$height = intval($height) + 80;
 	$width  = intval($width) + 40;
@@ -210,7 +215,7 @@ function oembed_iframe($src,$width,$height) {
 	$a = get_app();
 
 	$s = $a->get_baseurl()."/oembed/".base64url_encode($src);
-	return '<iframe height="' . $height . '" width="' . $width . '" src="' . $s . '" frameborder="no" >' . t('Embedded content') . '</iframe>';
+	return '<iframe '.$resize.' class="embed_rich" height="'.$height.'" width="'.$width.'" src="'.$s.'" frameborder="no">'.t('Embedded content').'</iframe>';
 
 }
 

@@ -27,7 +27,6 @@ Friendica Documentation and Resources
 
 * [Install](help/Install)
 * [Settings](help/Settings)
-* [Plugins](help/Plugins)
 * [Installing Connectors (Facebook/Twitter/StatusNet)](help/Installing-Connectors)
 * [Message Flow](help/Message-Flow)
 * [Using SSL with Friendica](help/SSL)
@@ -40,6 +39,7 @@ Friendica Documentation and Resources
 * [Help on Vagrant](help/Vagrant)
 * [How to translate Friendica](help/translations)
 * [Bugs and Issues](help/Bugs-and-Issues)
+* [Plugin Development](help/Plugins)
 * [Smarty 3 Templates](help/smarty3-templates)
 
 **External Resources**

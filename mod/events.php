@@ -7,6 +7,8 @@ require_once('include/items.php');
 
 function events_post(&$a) {
 
+        logger('post: ' . print_r($_REQUEST,true));
+        
 	if(! local_user())
 		return;
 
@@ -64,6 +66,10 @@ function events_post(&$a) {
 
 	if((! $summary) || (! $start)) {
 		notice( t('Event title and start time are required.') . EOL);
+                if(intval($_REQUEST['preview'])) {
+			echo( t('Event title and start time are required.'));
+			killme();
+		}
 		goaway($a->get_baseurl() . '/events/new');
 	}
 
@@ -124,6 +130,12 @@ function events_post(&$a) {
 	$datarray['id'] = $event_id;
 	$datarray['created'] = $created;
 	$datarray['edited'] = $edited;
+        
+      	if(intval($_REQUEST['preview'])) {
+		$html = format_event_html($datarray);
+		echo $html;
+               		killme();
+	}
 
 	$item_id = event_store($datarray);
 
@@ -474,6 +486,7 @@ function events_content(&$a) {
 			'$t_orig' => $t_orig,
 			'$sh_text' => t('Share this event'),
 			'$sh_checked' => $sh_checked,
+                        '$preview' => t('Preview'),
 			'$acl' => (($cid) ? '' : populate_acl(((x($orig_event)) ? $orig_event : $a->user),false)),
 			'$submit' => t('Submit')
 

@@ -112,7 +112,7 @@ function update_thread_uri($itemuri, $uid) {
 }
 
 function update_thread($itemid, $setmention = false) {
-	$items = q("SELECT `uid`, `uri`, `created`, `edited`, `commented`, `received`, `changed`, `wall`, `private`, `pubmail`, `moderated`, `visible`, `spam`, `starred`, `bookmark`, `contact-id`,
+	$items = q("SELECT `uid`, `guid`, `title`, `body`, `created`, `edited`, `commented`, `received`, `changed`, `wall`, `private`, `pubmail`, `moderated`, `visible`, `spam`, `starred`, `bookmark`, `contact-id`,
 			`deleted`, `origin`, `forum_mode`, `network`  FROM `item` WHERE `id` = %d AND (`parent` = %d OR `parent` = 0) LIMIT 1", intval($itemid), intval($itemid));
 
 	if (!$items)
@@ -126,7 +126,7 @@ function update_thread($itemid, $setmention = false) {
 	$sql = "";
 
 	foreach ($item AS $field => $data)
-		if ($field != "uri") {
+		if (!in_array($field, array("guid", "title", "body"))) {
 			if ($sql != "")
 				$sql .= ", ";
 
@@ -135,40 +135,20 @@ function update_thread($itemid, $setmention = false) {
 
 	$result = q("UPDATE `thread` SET ".$sql." WHERE `iid` = %d", intval($itemid));
 
-	logger("update_thread: Update thread for item ".$itemid." - ".print_r($result, true)." ".print_r($item, true), LOGGER_DEBUG);
+	logger("Update thread for item ".$itemid." - guid ".$item["guid"]." - ".print_r($result, true)." ".print_r($item, true), LOGGER_DEBUG);
 
 	// Updating a shadow item entry
-	$items = q("SELECT `id`, `title`, `body`, `created`, `edited`, `commented`, `received`, `changed`, `wall`, `private`, `pubmail`,
-			`moderated`, `visible`, `spam`, `starred`, `bookmark`, `deleted`, `origin`, `forum_mode`, `network`
-			FROM `item` WHERE `uri` = '%s' AND `uid` = 0 LIMIT 1", dbesc($item["uri"]));
+	$items = q("SELECT `id` FROM `item` WHERE `guid` = '%s' AND `uid` = 0 LIMIT 1", dbesc($item["guid"]));
 
 	if (!$items)
 		return;
 
-	$item = $items[0];
-
-	$result = q("UPDATE `item` SET `title` = '%s', `body` = '%s', `network` = '%s' WHERE `id` = %d",
+	$result = q("UPDATE `item` SET `title` = '%s', `body` = '%s' WHERE `id` = %d",
 			dbesc($item["title"]),
 			dbesc($item["body"]),
-			dbesc($item["network"]),
-			intval($item["id"])
+			intval($items[0]["id"])
 		);
-	logger("update_thread: Updating public shadow for post ".$item["id"]." Result: ".print_r($result, true), LOGGER_DEBUG);
-
-	/*
-	$sql = "";
-
-	foreach ($item AS $field => $data)
-		if ($field != "id") {
-			if ($sql != "")
-				$sql .= ", ";
-
-			$sql .= "`".$field."` = '".dbesc($data)."'";
-		}
-	//logger("update_thread: Updating public shadow for post ".$item["id"]." SQL: ".$sql, LOGGER_DEBUG);
-	$result = q("UPDATE `item` SET ".$sql." WHERE `id` = %d", intval($item["id"]));
-	logger("update_thread: Updating public shadow for post ".$item["id"]." Result: ".print_r($result, true), LOGGER_DEBUG);
-	*/
+	logger("Updating public shadow for post ".$items[0]["id"]." - guid ".$item["guid"]." Result: ".print_r($result, true), LOGGER_DEBUG);
 }
 
 function delete_thread_uri($itemuri, $uid) {

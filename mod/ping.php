@@ -1,5 +1,6 @@
 <?php
 require_once("include/datetime.php");
+require_once('include/bbcode.php');
 
 
 function ping_init(&$a) {
@@ -13,7 +14,7 @@ function ping_init(&$a) {
 
 	if(local_user()){
 
-		// Different login session than the page that is calling us. 
+		// Different login session than the page that is calling us.
 
 		if(intval($_GET['uid']) && intval($_GET['uid']) != local_user()) {
 			echo '<invalid>1</invalid></result>';
@@ -22,32 +23,11 @@ function ping_init(&$a) {
 
 		$firehose = intval(get_pconfig(local_user(),'system','notify_full'));
 
-		$t = q("select count(*) as total from notify where uid = %d and seen = 0",
-			intval(local_user())
-		);
-		if($t && intval($t[0]['total']) > 49) {
-			$z = q("select * from notify where uid = %d
-				and seen = 0 order by date desc limit 0, 50",
-				intval(local_user())
-			);
-			$sysnotify = $t[0]['total'];
-		}
-		else {
-			$z1 = q("select * from notify where uid = %d
-				and seen = 0 order by date desc limit 0, 50",
-				intval(local_user())
-			);
+		// Are the nofications calles from the regular process or via the friendica app?
+		$regularnotifications = (intval($_GET['uid']) AND intval($_GET['_']));
 
-			$z2 = q("select * from notify where uid = %d
-				and seen = 1 order by date desc limit 0, %d",
-				intval(local_user()),
-				intval(50 - intval($t[0]['total']))
-			);
-			$z = array_merge($z1,$z2);
-			$sysnotify = 0; // we will update this in a moment
-		}
-
-
+		$z = ping_get_notifications(local_user(), $regularnotifications);
+		$sysnotify = 0; // we will update this in a moment
 
 		$tags = array();
 		$comments = array();
@@ -128,13 +108,12 @@ function ping_init(&$a) {
 
 
 		$myurl = $a->get_baseurl() . '/profile/' . $a->user['nickname'] ;
-		$mails = q("SELECT *,  COUNT(*) AS `total` FROM `mail`
+		$mails = q("SELECT * FROM `mail`
 			WHERE `uid` = %d AND `seen` = 0 AND `from-url` != '%s' ",
 			intval(local_user()),
 			dbesc($myurl)
 		);
-		if($mails)
-			$mail = $mails[0]['total'];
+		$mail = count($mails);
 
 		if ($a->config['register_policy'] == REGISTER_APPROVE && is_site_admin()){
 			$regs = q("SELECT `contact`.`name`, `contact`.`url`, `contact`.`micro`, `register`.`created`, COUNT(*) as `total` FROM `contact` RIGHT JOIN `register` ON `register`.`uid`=`contact`.`uid` WHERE `contact`.`self`=1");
@@ -213,8 +192,6 @@ function ping_init(&$a) {
 
 		$tot = $mail+$intro+$register+count($comments)+count($likes)+count($dislikes)+count($friends)+count($posts)+count($tags);
 
-		require_once('include/bbcode.php');
-
 		if($firehose) {
 			echo '	<notif count="'.$tot.'">';
 		}
@@ -226,7 +203,24 @@ function ping_init(&$a) {
 				}
 			}
 
-			echo '	<notif count="'. $sysnotify .'">';
+			echo '	<notif count="'. ($sysnotify + $intro + $mail + $register) .'">';
+
+			if ($intro>0){
+				foreach ($intros as $i) {
+					echo xmlize($a->get_baseurl().'/notifications/intros/'.$i['id'], $i['name'], $i['url'], $i['photo'], relative_date($i['datetime']), 'notify-unseen', "&rarr; ".t("{0} wants to be your friend"));
+				};
+			}
+			if ($mail>0){
+				foreach ($mails as $i) {
+					echo xmlize($a->get_baseurl().'/message/'.$i['id'], $i['from-name'], $i['from-url'], $i['from-photo'], relative_date($i['created']), 'notify-unseen',"&rarr; ".t("{0} sent you a message"));
+				};
+			}
+			if ($register>0){
+				foreach ($regs as $i) {
+					echo xmlize($a->get_baseurl().'/admin/users/', $i['name'], $i['url'], $i['micro'], relative_date($i['created']), 'notify-unseen', "&rarr; ".t("{0} requested registration"));
+				};
+			}
+
 			if(count($z)) {
 				foreach($z as $zz) {
 					echo xmlize($a->get_baseurl() . '/notify/view/' . $zz['id'], $zz['name'],$zz['url'],$zz['photo'],relative_date($zz['date']), ($zz['seen'] ? 'notify-seen' : 'notify-unseen'), ($zz['seen'] ? '' : '&rarr; ') .strip_tags(bbcode($zz['msg'])));
@@ -241,12 +235,12 @@ function ping_init(&$a) {
 				};
 			}
 			if ($mail>0){
-				foreach ($mails as $i) { 
+				foreach ($mails as $i) {
 					echo xmlize( $a->get_baseurl().'/message/'.$i['id'], $i['from-name'], $i['from-url'], $i['from-photo'], relative_date($i['created']), 'notify-unseen',t("{0} sent you a message") );
 				};
 			}
 			if ($register>0){
-				foreach ($regs as $i) { 
+				foreach ($regs as $i) {
 					echo xmlize( $a->get_baseurl().'/admin/users/', $i['name'], $i['url'], $i['micro'], relative_date($i['created']), 'notify-unseen',t("{0} requested registration") );
 				};
 			}
@@ -305,7 +299,7 @@ function ping_init(&$a) {
 		}
 		unset($_SESSION['sysmsg_info']);
 	}
-	
+
 	echo " </sysmsgs>";
 	echo"</result>
 	";
@@ -313,3 +307,65 @@ function ping_init(&$a) {
 	killme();
 }
 
+function ping_get_notifications($uid, $regularnotifications) {
+
+	$result = array();
+	$offset = 0;
+	$seen = false;
+	$seensql = "NOT";
+	$order = "";
+	$quit = false;
+
+	do {
+		$r = q("SELECT `notify`.*, `item`.`visible`, `item`.`spam`, `item`.`deleted`
+			FROM `notify` LEFT JOIN `item` ON `item`.`id` = `notify`.`iid`
+			WHERE `notify`.`uid` = %d AND `notify`.`msg` != ''
+			AND NOT (`notify`.`type` IN (%d, %d))
+			AND $seensql `notify`.`seen` ORDER BY `notify`.`date` $order LIMIT %d, 50",
+			intval($uid),
+			intval(NOTIFY_INTRO),
+			intval(NOTIFY_MAIL),
+			intval($offset)
+		);
+
+		if (!$r AND !$seen) {
+			$seen = true;
+			$seensql = "";
+			$order = "DESC";
+			$offset = 0;
+		} elseif (!$r)
+			$quit = true;
+		else
+			$offset += 50;
+
+		foreach ($r AS $notification) {
+			if (is_null($notification["visible"]))
+				$notification["visible"] = true;
+
+			if (is_null($notification["spam"]))
+				$notification["spam"] = 0;
+
+			if (is_null($notification["deleted"]))
+				$notification["deleted"] = 0;
+
+			$notification["msg"] = strip_tags(bbcode($notification["msg"]));
+			$notification["name"] = strip_tags(bbcode($notification["name"]));
+
+			// Replace the name with {0} but ensure to make that only once
+			// The {0} is used later and prints the name in bold.
+			// But don't do it for the android app.
+			$pos = strpos($notification["msg"],$notification['name']);
+			if (($pos !== false) AND $regularnotifications)
+				$notification["msg"] = substr_replace($notification["msg"],"{0}",$pos,strlen($notification["name"]));
+			else
+				$notification["msg"] = str_replace("{0}", $notification["name"], $notification["msg"]);
+
+			if ($notification["visible"] AND !$notification["spam"] AND
+				!$notification["deleted"] AND !is_array($result[$notification["parent"]]))
+				$result[$notification["parent"]] = $notification;
+		}
+
+	} while ((count($result) < 50) AND !$quit);
+
+	return($result);
+}

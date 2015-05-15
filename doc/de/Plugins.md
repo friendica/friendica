@@ -3,9 +3,16 @@
 
 * [Zur Startseite der Hilfe](help)
 
-Bitte schau dir das Beispiel-Addon "randplace" für ein funktionierendes Beispiel für manche der hier aufgeführten Funktionen an. Das Facebook-Addon bietet ein Beispiel dafür, die "addon"- und "module"-Funktion gemeinsam zu integrieren. Addons arbeiten, indem sie Event Hooks abfangen. Module arbeiten, indem bestimmte Seitenanfragen (durch den URL-Pfad) abgefangen werden 
+Bitte schau dir das Beispiel-Addon "randplace" für ein funktionierendes Beispiel für manche der hier aufgeführten Funktionen an. 
+Das Facebook-Addon bietet ein Beispiel dafür, die "addon"- und "module"-Funktion gemeinsam zu integrieren. 
+Addons arbeiten, indem sie Event Hooks abfangen. Module arbeiten, indem bestimmte Seitenanfragen (durch den URL-Pfad) abgefangen werden 
 
-Plugin-Namen können keine Leerstellen oder andere Interpunktionen enthalten und werden als Datei- und Funktionsnamen genutzt. Du kannst einen lesbaren Namen im Kommentarblock eintragen. Jedes Addon muss beides beinhalten - eine Installations- und eine Deinstallationsfunktion, die auf dem Addon-/Plugin-Namen basieren; z.B. "plugin1name_install()". Diese beiden Funktionen haben keine Argumente und sind dafür verantwortlich, Event Hooks zu registrieren und abzumelden (unregistering), die dein Plugin benötigt. Die Installations- und Deinstallationsfunktionfunktionen werden auch ausgeführt (z.B. neu installiert), wenn sich das Plugin nach der Installation ändert - somit sollte deine Deinstallationsfunktion keine Daten zerstört und deine Installationsfunktion sollte bestehende Daten berücksichtigen. Zukünftige Extensions werden möglicherweise "Setup" und "Entfernen" anbieten.
+Plugin-Namen können keine Leerstellen oder andere Interpunktionen enthalten und werden als Datei- und Funktionsnamen genutzt. 
+Du kannst einen lesbaren Namen im Kommentarblock eintragen. 
+Jedes Addon muss beides beinhalten - eine Installations- und eine Deinstallationsfunktion, die auf dem Addon-/Plugin-Namen basieren; z.B. "plugin1name_install()". 
+Diese beiden Funktionen haben keine Argumente und sind dafür verantwortlich, Event Hooks zu registrieren und abzumelden (unregistering), die dein Plugin benötigt. 
+Die Installations- und Deinstallationsfunktionfunktionen werden auch ausgeführt (z.B. neu installiert), wenn sich das Plugin nach der Installation ändert - somit sollte deine Deinstallationsfunktion keine Daten zerstört und deine Installationsfunktion sollte bestehende Daten berücksichtigen. 
+Zukünftige Extensions werden möglicherweise "Setup" und "Entfernen" anbieten.
 
 Plugins sollten einen Kommentarblock mit den folgenden vier Parametern enthalten:
 
@@ -22,7 +29,8 @@ Registriere deine Plugin-Hooks während der Installation.
 
 $hookname ist ein String und entspricht einem bekannten Friendica-Hook.
 
-$file steht für den Pfadnamen, der relativ zum Top-Level-Friendicaverzeichnis liegt. Das *sollte* "addon/plugin_name/plugin_name.php' sein.
+$file steht für den Pfadnamen, der relativ zum Top-Level-Friendicaverzeichnis liegt. 
+Das *sollte* "addon/plugin_name/plugin_name.php' sein.
 
 $function ist ein String und der Name der Funktion, die ausgeführt wird, wenn der Hook aufgerufen wird.
 
@@ -34,21 +42,29 @@ Deine Hook-Callback-Funktion wird mit mindestens einem und bis zu zwei Argumente
 
 Wenn du Änderungen an den aufgerufenen Daten vornehmen willst, musst du diese als Referenzvariable (mit "&") während der Funktionsdeklaration deklarieren. 
 
-$a ist die Friendica "App"-Klasse, die eine Menge an Informationen über den aktuellen Friendica-Status beinhaltet, u.a. welche Module genutzt werden, Konfigurationsinformationen, Inhalte der Seite zum Zeitpunkt des Hook-Aufrufs. Es ist empfohlen, diese Funktion "$a" zu nennen, um seine Nutzung an den Gebrauch an anderer Stelle anzugleichen. 
+$a ist die Friendica "App"-Klasse, die eine Menge an Informationen über den aktuellen Friendica-Status beinhaltet, u.a. welche Module genutzt werden, Konfigurationsinformationen, Inhalte der Seite zum Zeitpunkt des Hook-Aufrufs. 
+Es ist empfohlen, diese Funktion "$a" zu nennen, um seine Nutzung an den Gebrauch an anderer Stelle anzugleichen. 
 
-$b kann frei benannt werden. Diese Information ist speziell auf den Hook bezogen, der aktuell bearbeitet wird, und beinhaltet normalerweise Daten, die du sofort nutzen, anzeigen oder bearbeiten kannst. Achte darauf, diese mit "&" zu deklarieren, wenn du sie bearbeiten willst. 
+$b kann frei benannt werden. 
+Diese Information ist speziell auf den Hook bezogen, der aktuell bearbeitet wird, und beinhaltet normalerweise Daten, die du sofort nutzen, anzeigen oder bearbeiten kannst. 
+Achte darauf, diese mit "&" zu deklarieren, wenn du sie bearbeiten willst. 
 
 
 **Module**
 
-Plugins/Addons können auch als "Module" agieren und alle Seitenanfragen für eine bestimte URL abfangen. Um ein Plugin als Modul zu nutzen, ist es nötig, die Funktion "plugin_name_module()" zu definieren, die keine Argumente benötigt und nichts weiter machen muss. 
+Plugins/Addons können auch als "Module" agieren und alle Seitenanfragen für eine bestimte URL abfangen. 
+Um ein Plugin als Modul zu nutzen, ist es nötig, die Funktion "plugin_name_module()" zu definieren, die keine Argumente benötigt und nichts weiter machen muss. 
 
-Wenn diese Funktion existiert, wirst du nun alle Seitenanfragen für "http://my.web.site/plugin_name" erhalten - mit allen URL-Komponenten als zusätzliche Argumente. Diese werden in ein Array $a->argv geparst und stimmen mit $a->argc überein, wobei sie die Anzahl der URL-Komponenten abbilden. So würde http://my.web.site/plugin/arg1/arg2 nach einem Modul "plugin" suchen und seiner Modulfunktion die $a-App-Strukur übergeben (dies ist für viele Komponenten verfügbar). Das umfasst:
+Wenn diese Funktion existiert, wirst du nun alle Seitenanfragen für "http://my.web.site/plugin_name" erhalten - mit allen URL-Komponenten als zusätzliche Argumente. 
+Diese werden in ein Array $a->argv geparst und stimmen mit $a->argc überein, wobei sie die Anzahl der URL-Komponenten abbilden. 
+So würde http://my.web.site/plugin/arg1/arg2 nach einem Modul "plugin" suchen und seiner Modulfunktion die $a-App-Strukur übergeben (dies ist für viele Komponenten verfügbar). Das umfasst:
 
      $a->argc = 3
      $a->argv = array(0 => 'plugin', 1 => 'arg1', 2 => 'arg2');
 
-Deine Modulfunktionen umfassen oft die Funktion plugin_name_content(&$a), welche den Seiteninhalt definiert und zurückgibt. Sie können auch plugin_name_post(&$a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt. Du kannst ebenso plugin_name_init(&$a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
+Deine Modulfunktionen umfassen oft die Funktion plugin_name_content(&$a), welche den Seiteninhalt definiert und zurückgibt. 
+Sie können auch plugin_name_post(&$a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt. 
+Du kannst ebenso plugin_name_init(&$a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
 
 
 **Derzeitige Hooks:**

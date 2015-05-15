@@ -53,6 +53,20 @@ if(!$install) {
 	load_config('config');
 	load_config('system');
 
+	$maxsysload_frontend = intval(get_config('system','maxloadavg_frontend'));
+	if($maxsysload_frontend < 1)
+		$maxsysload_frontend = 50;
+	if(function_exists('sys_getloadavg')) {
+		$load = sys_getloadavg();
+		if(intval($load[0]) > $maxsysload_frontend) {
+			logger('system: load ' . $load[0] . ' too high. Service Temporarily Unavailable.');
+			header($_SERVER["SERVER_PROTOCOL"].' 503 Service Temporarily Unavailable');
+			header('Retry-After: 300');
+			die("System is currently unavailable. Please try again later");
+		}
+	}
+
+
 	if (get_config('system','force_ssl') AND ($a->get_scheme() == "http") AND
 		(intval(get_config('system','ssl_policy')) == SSL_POLICY_FULL) AND
 		(substr($a->get_baseurl(), 0, 8) == "https://")) {

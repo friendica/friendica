@@ -2,7 +2,7 @@
 
 require_once('include/Photo.php');
 
-function wall_upload_post(&$a) {
+function wall_upload_post(&$a, $desktopmode = true) {
 
 	logger("wall upload: starting new upload", LOGGER_DEBUG);
 
@@ -189,6 +189,25 @@ function wall_upload_post(&$a) {
 
 	$basename = basename($filename);
 
+	if (!$desktopmode) {
+
+		$r = q("SELECT `id`, `datasize`, `width`, `height`, `type` FROM `photo` WHERE `resource-id` = '%s' ORDER BY `width` DESC LIMIT 1", $hash);
+		if (!$r)
+			return false;
+
+		$picture = array();
+
+		$picture["id"] = $r[0]["id"];
+		$picture["size"] = $r[0]["datasize"];
+		$picture["width"] = $r[0]["width"];
+		$picture["height"] = $r[0]["height"];
+		$picture["type"] = $r[0]["type"];
+		$picture["albumpage"] = $a->get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash;
+		$picture["picture"] = $a->get_baseurl()."/photo/{$hash}-0.".$ph->getExt();
+		$picture["preview"] = $a->get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt();
+
+		return $picture;
+	}
 
 /* mod Waitman Gobble NO WARRANTY */
 

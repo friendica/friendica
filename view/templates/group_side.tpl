@@ -1,4 +1,3 @@
-
 <div class="widget" id="group-sidebar">
 <h3>{{$title}}</h3>
 
@@ -22,7 +21,11 @@
 	</ul>
 	</div>
   <div id="sidebar-new-group">
-  <a href="group/new">{{$createtext}}</a>
+  <a onclick="javascript:$('#group-new-form').fadeIn('fast');return false;">{{$createtext}}</a>
+  <form id="group-new-form" action="group/new" method="post" style="display:none;">
+   <input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+   <input name="groupname" id="id_groupname" placeholder="{{$creategroup}}">
+  </form>
   </div>
   {{if $ungrouped}}
   <div id="sidebar-ungrouped">

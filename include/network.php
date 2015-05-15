@@ -9,6 +9,49 @@
 if(! function_exists('fetch_url')) {
 function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_content=Null, $cookiejar = 0) {
 
+	$ret = z_fetch_url(
+		$url, 
+		$binary, 
+		$redirects, 
+		array('timeout'=>$timeout, 
+		'accept_content'=>$accept_content,
+		'cookiejar'=>$cookiejar
+		));
+
+
+
+	return($ret['body']);
+}}
+
+if(!function_exists('z_fetch_url')){
+/**
+ * @brief fetches an URL.
+ *
+ * @param string $url
+ *    URL to fetch
+ * @param boolean $binary default false
+ *    TRUE if asked to return binary results (file download)
+ * @param int $redirects default 0
+ *    internal use, recursion counter
+ * @param array $opts (optional parameters) assoziative array with:
+ *  * \b accept_content => supply Accept: header with 'accept_content' as the value
+ *  * \b timeout => int seconds, default system config value or 60 seconds
+ *  * \b http_auth => username:password
+ *  * \b novalidate => do not validate SSL certs, default is to validate using our CA list
+ *  * \b nobody => only return the header
+ *	* \b cookiejar => path to cookie jar file
+ * 
+ * @return array an assoziative array with:
+ *  * \e int \b return_code => HTTP return code or 0 if timeout or failure
+ *  * \e boolean \b success => boolean true (if HTTP 2xx result) or false
+ *  * \e string \b header => HTTP headers
+ *  * \e string \b body => fetched content
+ */
+function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
+
+	$ret = array('return_code' => 0, 'success' => false, 'header' => "", 'body' => "");
+	
+
 	$stamp1 = microtime(true);
 
 	$a = get_app();
@@ -19,18 +62,18 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 
 	@curl_setopt($ch, CURLOPT_HEADER, true);
 
-	if($cookiejar) {
-		curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiejar);
-		curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiejar);
+	if(x($opts,"cookiejar")) {
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $opts["cookiejar"]);
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $opts["cookiejar"]);
 	}
 
 //  These settings aren't needed. We're following the location already.
 //	@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 //	@curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
 
-	if (!is_null($accept_content)){
+	if (x($opts,'accept_content')){
 		curl_setopt($ch,CURLOPT_HTTPHEADER, array (
-			"Accept: " . $accept_content
+			"Accept: " . $opts['accept_content']
 		));
 	}
 
@@ -38,6 +81,13 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 	@curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
 
 
+
+	if(x($opts,'headers')){
+		@curl_setopt($ch, CURLOPT_HTTPHEADER, $opts['headers']);
+	}
+	if(x($opts,'nobody')){
+		@curl_setopt($ch, CURLOPT_NOBODY, $opts['nobody']);
+	}
 	if(intval($timeout)) {
 		@curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 	}
@@ -72,7 +122,7 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 
 	$base = $s;
 	$curl_info = @curl_getinfo($ch);
-	@curl_close($ch);
+
 	$http_code = $curl_info['http_code'];
 	logger('fetch_url '.$url.': '.$http_code." ".$s, LOGGER_DATA);
 	$header = '';
@@ -103,9 +153,11 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 			$newurl = $old_location_info["scheme"]."://".$old_location_info["host"].$newurl;
 		if (filter_var($newurl, FILTER_VALIDATE_URL)) {
 			$redirects++;
+			@curl_close($ch);
 			return fetch_url($newurl,$binary,$redirects,$timeout,$accept_content,$cookiejar);
 		}
 	}
+
 
 	$a->set_curl_code($http_code);
 	$a->set_curl_content_type($curl_info['content_type']);
@@ -113,9 +165,28 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
 	$body = substr($s,strlen($header));
 	$a->set_curl_headers($header);
 
-	$a->save_timestamp($stamp1, "network");
 
-	return($body);
+
+	$rc = intval($http_code);
+	$ret['return_code'] = $rc;
+	$ret['success'] = (($rc >= 200 && $rc <= 299) ? true : false);
+	if(! $ret['success']) {
+		$ret['error'] = curl_error($ch);
+		$ret['debug'] = $curl_info;
+		logger('z_fetch_url: error: ' . $url . ': ' . $ret['error'], LOGGER_DEBUG);
+		logger('z_fetch_url: debug: ' . print_r($curl_info,true), LOGGER_DATA);
+	}
+	$ret['body'] = substr($s,strlen($header));
+	$ret['header'] = $header;
+	if(x($opts,'debug')) {
+		$ret['debug'] = $curl_info;
+	}
+	@curl_close($ch);
+	
+	$a->save_timestamp($stamp1, "network");
+	
+	return($ret);
+
 }}
 
 // post request to $url. $params is an array of post variables.

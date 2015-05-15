@@ -78,19 +78,19 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 		if(x($options,'networks')) {
 			switch($options['networks']) {
 				case 'DFRN_ONLY':
-					$networks = array('dfrn');
+					$networks = array(NETWORK_DFRN);
 					break;
 				case 'PRIVATE':
 					if(is_array($a->user) && $a->user['prvnets'])
-						$networks = array('dfrn','mail','dspr');
+						$networks = array(NETWORK_DFRN,NETWORK_MAIL,NETWORK_DIASPORA);
 					else
-						$networks = array('dfrn','face','mail', 'dspr');
+						$networks = array(NETWORK_DFRN,NETWORK_FACEBOOK,NETWORK_MAIL, NETWORK_DIASPORA);
 					break;
 				case 'TWO_WAY':
 					if(is_array($a->user) && $a->user['prvnets'])
-						$networks = array('dfrn','mail','dspr');
+						$networks = array(NETWORK_DFRN,NETWORK_MAIL,NETWORK_DIASPORA);
 					else
-						$networks = array('dfrn','face','mail','dspr','stat');
+						$networks = array(NETWORK_DFRN,NETWORK_FACEBOOK,NETWORK_MAIL,NETWORK_DIASPORA,NETWORK_OSTATUS);
 					break;
 				default:
 					break;
@@ -181,12 +181,12 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 		$sql_extra .= sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
 	}
 
-	if($privmail) {
-		$sql_extra .= " AND `network` IN ( 'dfrn', 'dspr' ) ";
-	}
-	elseif($privatenet) {
-		$sql_extra .= " AND `network` IN ( 'dfrn', 'mail', 'face', 'dspr' ) ";
-	}
+	if($privmail)
+		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ",
+					NETWORK_DFRN, NETWORK_DIASPORA);
+	elseif($privatenet)
+		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s', '%s', '%s') ",
+					NETWORK_DFRN, NETWORK_MAIL, NETWORK_FACEBOOK, NETWORK_DIASPORA);
 
 	$tabindex = ($tabindex > 0 ? "tabindex=\"$tabindex\"" : "");
 

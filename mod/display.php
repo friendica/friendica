@@ -193,11 +193,13 @@ function display_fetchauthor($a, $item) {
 	}
 
 	if (local_user()) {
-		if ($profiledata["network"] == NETWORK_DFRN) {
-			$connect = str_replace("/profile/", "/dfrn_request/", $profiledata["url"])."&addr=".bin2hex($a->get_baseurl()."/profile/".$a->user["nickname"]);
-			$profiledata["remoteconnect"] = $connect;
-		} elseif ($profiledata["network"] == NETWORK_DIASPORA)
-			$profiledata["remoteconnect"] = $a->get_baseurl()."/contacts?add=".GetProfileUsername($profiledata["url"], "", true);
+		if (in_array($profiledata["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS)))
+			$profiledata["remoteconnect"] = $a->get_baseurl()."/follow?url=".urlencode($profiledata["url"]);
+		//if ($profiledata["network"] == NETWORK_DFRN) {
+		//	$connect = str_replace("/profile/", "/dfrn_request/", $profiledata["url"])."&addr=".bin2hex($a->get_baseurl()."/profile/".$a->user["nickname"]);
+		//	$profiledata["remoteconnect"] = $connect;
+		//} elseif ($profiledata["network"] == NETWORK_DIASPORA)
+		//	$profiledata["remoteconnect"] = $a->get_baseurl()."/contacts?add=".GetProfileUsername($profiledata["url"], "", true);
 	} elseif ($profiledata["network"] == NETWORK_DFRN) {
 		$connect = str_replace("/profile/", "/dfrn_request/", $profiledata["url"]);
 		$profiledata["remoteconnect"] = $connect;

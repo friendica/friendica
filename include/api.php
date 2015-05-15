@@ -7,6 +7,9 @@
 	require_once("include/conversation.php");
 	require_once("include/oauth.php");
 	require_once("include/html2plain.php");
+	require_once("mod/share.php");
+	require_once("include/Photo.php");
+
 	/*
 	 * Twitter-Like API
 	 *
@@ -99,6 +102,9 @@
 		$password = $_SERVER['PHP_AUTH_PW'];
 		$encrypted = hash('whirlpool',trim($password));
 
+		// allow "user@server" login (but ignore 'server' part)
+		$at=strstr($user, "@", true);
+		if ( $at ) $user=$at;
 
 		/**
 		 *  next code from mod/auth.php. needs better solution
@@ -106,7 +112,7 @@
 		$record = null;
 
 		$addon_auth = array(
-			'username' => trim($user), 
+			'username' => trim($user),
 			'password' => trim($password),
 			'authenticated' => 0,
 			'user_record' => null
@@ -821,6 +827,18 @@
 				$_REQUEST['body'] .= "\n\n".$media;
 		}
 
+		// To-Do: Multiple IDs
+		if (requestdata('media_ids')) {
+			$r = q("SELECT `resource-id`, `scale`, `nickname`, `type` FROM `photo` INNER JOIN `user` ON `user`.`uid` = `photo`.`uid` WHERE `resource-id` IN (SELECT `resource-id` FROM `photo` WHERE `id` = %d) AND `scale` > 0 AND `photo`.`uid` = %d ORDER BY `photo`.`width` DESC LIMIT 1",
+				intval(requestdata('media_ids')), api_user());
+			if ($r) {
+				$phototypes = Photo::supportedTypes();
+				$ext = $phototypes[$r[0]['type']];
+				$_REQUEST['body'] .= "\n\n".'[url='.$a->get_baseurl().'/photos/'.$r[0]['nickname'].'/image/'.$r[0]['resource-id'].']';
+				$_REQUEST['body'] .= '[img]'.$a->get_baseurl()."/photo/".$r[0]['resource-id']."-".$r[0]['scale'].".".$ext."[/img][/url]";
+			}
+		}
+
 		// set this so that the item_post() function is quiet and doesn't redirect or emit json
 
 		$_REQUEST['api_source'] = true;
@@ -839,6 +857,41 @@
 	api_register_func('api/statuses/update','api_statuses_update', true);
 	api_register_func('api/statuses/update_with_media','api_statuses_update', true);
 
+
+	function api_media_upload(&$a, $type) {
+		if (api_user()===false) {
+			logger('no user');
+			return false;
+		}
+
+		$user_info = api_get_user($a);
+
+		if(!x($_FILES,'media')) {
+			// Output error
+			return false;
+		}
+
+		require_once('mod/wall_upload.php');
+		$media = wall_upload_post($a, false);
+		if(!$media) {
+			// Output error
+			return false;
+		}
+
+		$returndata = array();
+		$returndata["media_id"] = $media["id"];
+		$returndata["media_id_string"] = (string)$media["id"];
+		$returndata["size"] = $media["size"];
+		$returndata["image"] = array("w" => $media["width"],
+						"h" => $media["height"],
+						"image_type" => $media["type"]);
+
+		logger("Media uploaded: ".print_r($returndata, true), LOGGER_DEBUG);
+
+		return array("media" => $returndata);
+	}
+
+	api_register_func('api/media/upload','api_media_upload', true);
 
 	function api_status_show(&$a, $type){
 		$user_info = api_get_user($a);
@@ -1136,7 +1189,8 @@
 
 		$idlist = implode(",", $idarray);
 
-		$r = q("UPDATE `item` SET `unseen` = 0 WHERE `unseen` AND `id` IN (%s)", $idlist);
+		if ($idlist != "")
+			$r = q("UPDATE `item` SET `unseen` = 0 WHERE `unseen` AND `id` IN (%s)", $idlist);
 
 
 		$data = array('$statuses' => $ret);
@@ -1315,6 +1369,10 @@
 
 		logger('API: api_conversation_show: '.$id);
 
+		$r = q("SELECT `parent` FROM `item` WHERE `id` = %d", intval($id));
+		if ($r)
+			$id = $r[0]["parent"];
+
 		$sql_extra = '';
 
 		if ($max_id > 0)
@@ -1389,10 +1447,8 @@
 					$pos = strpos($r[0]['body'], "[share");
 					$post = substr($r[0]['body'], $pos);
 				} else {
-					$post = "[share author='".str_replace("'", "&#039;", $r[0]['author-name']).
-							"' profile='".$r[0]['author-link'].
-							"' avatar='".$r[0]['author-avatar'].
-							"' link='".$r[0]['plink']."']";
+					$post = share_header($r[0]['author-name'], $r[0]['author-link'], $r[0]['author-avatar'], $r[0]['guid'], $r[0]['created'], $r[0]['plink']);
+
 					$post .= $r[0]['body'];
 					$post .= "[/share]";
 				}
@@ -1876,8 +1932,6 @@
 		if (!$ret)
 			return false;
 
-		require_once("include/Photo.php");
-
 		$attachments = array();
 
 		foreach ($images[1] AS $image) {
@@ -2003,7 +2057,6 @@
 
 			$start = iconv_strpos($text, $url, $offset, "UTF-8");
 			if (!($start === false)) {
-				require_once("include/Photo.php");
 				$image = get_photo_info($url);
 				if ($image) {
 					// If image cache is activated, then use the following sizes:
@@ -2620,6 +2673,70 @@
 
 
 
+	/**
+	 * similar as /mod/redir.php
+	 * redirect to 'url' after dfrn auth
+	 *
+	 * why this when there is mod/redir.php already?
+	 * This use api_user() and api_login()
+	 *
+	 * params
+	 * 		c_url: url of remote contact to auth to
+	 * 		url: string, url to redirect after auth
+	 */
+	function api_friendica_remoteauth(&$a) {
+		$url = ((x($_GET,'url')) ? $_GET['url'] : '');
+		$c_url = ((x($_GET,'c_url')) ? $_GET['c_url'] : '');
+
+		if ($url === '' || $c_url === '')
+			die((api_error($a, 'json', "Wrong parameters")));
+
+		$c_url = normalise_link($c_url);
+
+		// traditional DFRN
+
+		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `nurl` = '%s' LIMIT 1",
+			dbesc($c_url),
+			intval(api_user())
+		);
+
+		if ((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+			die((api_error($a, 'json', "Unknown contact")));
+
+		$cid = $r[0]['id'];
+
+		$dfrn_id = $orig_id = (($r[0]['issued-id']) ? $r[0]['issued-id'] : $r[0]['dfrn-id']);
+
+		if($r[0]['duplex'] && $r[0]['issued-id']) {
+			$orig_id = $r[0]['issued-id'];
+			$dfrn_id = '1:' . $orig_id;
+		}
+		if($r[0]['duplex'] && $r[0]['dfrn-id']) {
+			$orig_id = $r[0]['dfrn-id'];
+			$dfrn_id = '0:' . $orig_id;
+		}
+
+		$sec = random_string();
+
+		q("INSERT INTO `profile_check` ( `uid`, `cid`, `dfrn_id`, `sec`, `expire`)
+			VALUES( %d, %s, '%s', '%s', %d )",
+			intval(api_user()),
+			intval($cid),
+			dbesc($dfrn_id),
+			dbesc($sec),
+			intval(time() + 45)
+		);
+
+		logger($r[0]['name'] . ' ' . $sec, LOGGER_DEBUG);
+		$dest = (($url) ? '&destination_url=' . $url : '');
+		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id
+				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
+				. '&type=profile&sec=' . $sec . $dest . $quiet );
+	}
+	api_register_func('api/friendica/remoteauth', 'api_friendica_remoteauth', true);
+
+
+
 function api_share_as_retweet(&$item) {
 	$body = trim($item["body"]);
 
@@ -2837,6 +2954,7 @@ function api_best_nickname(&$contacts) {
 	else
 		$contacts = array($contacts[0]);
 }
+
 
 /*
 Not implemented by now:

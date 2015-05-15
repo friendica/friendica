@@ -345,6 +345,24 @@ class Photo {
     }
 
     public function orient($filename) {
+        if ($this->is_imagick()) {
+            // based off comment on http://php.net/manual/en/imagick.getimageorientation.php
+            $orientation = $this->image->getImageOrientation();
+            switch ($orientation) {
+            case imagick::ORIENTATION_BOTTOMRIGHT:
+                $this->image->rotateimage("#000", 180);
+                break;
+            case imagick::ORIENTATION_RIGHTTOP:
+                $this->image->rotateimage("#000", 90);
+                break;
+            case imagick::ORIENTATION_LEFTBOTTOM:
+                $this->image->rotateimage("#000", -90);
+                break;
+            }
+
+            $this->image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
+            return TRUE;
+        }
 	// based off comment on http://php.net/manual/en/function.imagerotate.php
 
 	if(!$this->is_valid())
