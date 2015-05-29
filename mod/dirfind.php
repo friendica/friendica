@@ -1,4 +1,5 @@
 <?php
+require_once("mod/proxy.php");
 
 function dirfind_init(&$a) {
 
@@ -20,15 +21,15 @@ function dirfind_content(&$a) {
 
 	if(strpos($search,'@') === 0)
 		$search = substr($search,1);
-	
+
 	$o = '';
 
 	$o .= '<h2>' . t('People Search') . ' - ' . $search . '</h2>';
-	
+
 	if($search) {
 
 		$p = (($a->pager['page'] != 1) ? '&p=' . $a->pager['page'] : '');
-			
+
 		if(strlen(get_config('system','directory_submit_url')))
 			$x = fetch_url('http://dir.friendica.com/lsearch?f=' . $p .  '&search=' . urlencode($search));
 
@@ -44,10 +45,14 @@ function dirfind_content(&$a) {
 		}
 
 		if(count($j->results)) {
-			
+
 			$tpl = get_markup_template('match.tpl');
 			foreach($j->results as $jj) {
-				
+
+				$jj->photo = proxy_url(str_replace(array("http:///photo/", "http://dir.friendika.com/photo/"),
+							array("http://dir.friendica.com/photo/", "http://dir.friendica.com/photo/"),
+							$jj->photo));
+
 				$o .= replace_macros($tpl,array(
 					'$url' => zrl($jj->url),
 					'$name' => $jj->name,
@@ -58,7 +63,7 @@ function dirfind_content(&$a) {
 		}
 		else {
 			info( t('No matches') . EOL);
-		}		
+		}
 
 	}
 
