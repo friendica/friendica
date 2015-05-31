@@ -45,7 +45,7 @@ Abgesehen davon kann es ohne SSL auch Probleme mit der Verbindung zu Diaspora ge
 
 Wenn Du Friendica nur für eine bestimmte Gruppe von Leuten auf einem einzelnen Server nutzt, bei dem keine Verbindung zum restlichen Netzwerk besteht, dann benötigst Du kein SSL. Ebenso benötigst Du SSL nicht, wenn Du ausschließlich öffentliche Beiträge auf Deiner Seite veröffentlichst bzw. empfängst. 
 
-Wenn Du zum jetzigen Zeitpunkt noch keinen Server aufgesetzt hast, ist es sinnvoll, die verschiedenen Anbieter in Bezug auf SSL zu vergleichen. Einige erlauben die Nutzung von freien Zertifikaten oder lassen dich ihre eigenen Zertifikate mitnutzen. Andere erlauben nur kostenpflichtige Zertifikate als eigenes Angebot bzw. von anderen Anbietern. 
+Wenn Du zum jetzigen Zeitpunkt noch keinen Server aufgesetzt hast, ist es sinnvoll, die verschiedenen Anbieter in Bezug auf SSL zu vergleichen. Einige erlauben die Nutzung von freien Zertifikaten oder lassen Dich ihre eigenen Zertifikate mitnutzen. Andere erlauben nur kostenpflichtige Zertifikate als eigenes Angebot bzw. von anderen Anbietern. 
 
 <a name="upload"></a>
 
