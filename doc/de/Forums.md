@@ -34,4 +34,4 @@ Wenn Du Mitglied eines Community-Forums bist, kannst Du das Forum in einem Beitr
 
 Du kannst außerdem via "Wall zu Wall" einen Beitrag auf der Community-Seite bzw. in dem Community-Forum erstellen.
 
-Kommentare, die Du an ein Community-Forum schickst, werden dem Originalbeitrag hinzugefügt. Das Forum mit dem @-Tag zu erwähnen, leitet den Beitrag nicht weiter, da die Verteilung des Beitrages komplett vom Original-Beitragsschreiber kontrolliert wird.
+Kommentare, die Du an ein Community-Forum schickst, werden dem Originalbeitrag hinzugefügt. Ein weiteres Forum mit dem @-Tag zu erwähnen, leitet den Beitrag nicht an dieses weiter, da die Verteilung der Kommentare komplett vom Originalbeitrag bestimmt wird.
