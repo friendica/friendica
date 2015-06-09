@@ -189,7 +189,7 @@
 					
 					if(e.text().search('&rarr;') == 0) {
                                          var notification = new Notification(document.title, {
-                                          body: e.text().replace('&rarr; ',''),
+                                          body: e.text().replace('&rarr; ','').replace('{0}',e.attr('name')),
                                           icon: e.attr('photo')
                                          });
    
