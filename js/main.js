@@ -75,14 +75,14 @@
 		setupFieldRichtext();
 
 		/* popup menus */
-	function close_last_popup_menu() {
- 		if(last_popup_menu) {
- 		last_popup_menu.hide();
- 		last_popup_button.removeClass("selected");
- 		last_popup_menu = null;
- 		last_popup_button = null;
- 		}
- 		}
+		function close_last_popup_menu() {
+			if(last_popup_menu) {
+				last_popup_menu.hide();
+				last_popup_button.removeClass("selected");
+				last_popup_menu = null;
+				last_popup_button = null;
+			}
+		}
 		$('a[rel^=#]').click(function(e){
 			e.preventDefault();
 			var parent = $(this).parent();
@@ -105,7 +105,7 @@
 			return false;
 		});
 		$('html').click(function() {
-						close_last_popup_menu();
+			close_last_popup_menu();
 		});
 		
 		// fancyboxes
@@ -181,24 +181,44 @@
 				nnm = $("#nav-notifications-menu");
 				nnm.html(notifications_all + notifications_mark);
 				//nnm.attr('popup','true');
+
+				var notification_lastitem = localStorage.getItem("notification-lastitem");
+				var notification_first_id = 0;
+				var notification_id;
 				eNotif.children("note").each(function(){
 					e = $(this);
 					text = e.text().format("<span class='contactname'>"+e.attr('name')+"</span>");
 					html = notifications_tpl.format(e.attr('href'),e.attr('photo'), text, e.attr('date'), e.attr('seen'));
 					nnm.append(html);
 					
-					if(e.text().search('&rarr;') == 0) {
-                                         var notification = new Notification(document.title, {
-                                          body: e.text().replace('&rarr; ',''),
-                                          icon: e.attr('photo')
-                                         });
-   
-                                         // TODO (yet unsupported by most browsers): 
-                                         // Implement notification.onclick()
-                                         
-                                         // notifyMarkAll();
-                                       }
+					notification_id = e.attr('href').match(/\d+$/)[0];
+					if (notification_lastitem!== null && notification_id!=notification_lastitem) {
+						if (notification_first_id===0) notification_first_id = notification_id;
+						if (getNotificationPermission()==="granted") {
+							console.log("notification", e.text().replace('&rarr; ','').format(e.attr('name')));
+							var notification = new Notification(document.title, {
+											  body: e.text().replace('&rarr; ','').format(e.attr('name')),
+											  icon: e.attr('photo'),
+											  data: e.attr('href')
+											 });
+							// close notification after 5 secs.
+							// see https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API#Closing_notifications
+							//setTimeout(notification.close.bind(notification), 5000);
+							
+							notification.addEventListener("click", function(ev){
+								window.location = ev.target.data;
+							});
+						}
+					}
+					if (notification_id == notification_lastitem) {
+						if (notification_first_id===0) notification_first_id = notification_id;
+						notification_lastitem = null;
+					}
+				
+					
 				});
+				if (notification_first_id!==0) notification_lastitem = notification_first_id;
+				localStorage.setItem("notification-lastitem", notification_lastitem)
 
 				$("img[data-src]", nnm).each(function(i, el){
 					// Add src attribute for images with a data-src attribute
@@ -761,4 +781,19 @@ function previewTheme(elm) {
 			$('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div><a href="' + data.img + '"><img src="' + data.img + '" width="320" height="240" alt="' + theme + '" /></a>');
 	});
 
+}
+
+// notification permission settings in localstorage
+// set by settings page
+function getNotificationPermission() {
+	if (window["Notification"] === undefined) {
+		return null;
+	}
+    if (Notification.permission === 'granted') {
+        var val = localStorage.getItem('notification-permissions');
+		if (val === null) return 'denied';
+		return val;
+    } else {
+        return Notification.permission;
+    }
 }

@@ -169,3 +169,8 @@ h6 {
 span.oembed, h4 {
   margin: 0px 0px 0px 0px;
 }
+
+/* fields help text */
+.field .field_help {
+    clear: left;
+}
