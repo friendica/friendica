@@ -155,7 +155,7 @@ class Item extends BaseObject {
 
 		$locate = array('location' => $item['location'], 'coord' => $item['coord'], 'html' => '');
 		call_hooks('render_location',$locate);
-		$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_google($locate));
+		$location = ((strlen($locate['html'])) ? $locate['html'] : render_location($locate));
 
 		$searchpath = $a->get_baseurl()."/search?tag=";
 		$tags=array();

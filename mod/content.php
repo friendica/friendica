@@ -425,7 +425,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 				$locate = array('location' => $item['location'], 'coord' => $item['coord'], 'html' => '');
 				call_hooks('render_location',$locate);
 
-				$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_google($locate));
+				$location = ((strlen($locate['html'])) ? $locate['html'] : render_location($locate));
 
 				localize_item($item);
 				if($mode === 'network-new')
@@ -799,7 +799,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 				$locate = array('location' => $item['location'], 'coord' => $item['coord'], 'html' => '');
 				call_hooks('render_location',$locate);
 
-				$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_google($locate));
+				$location = ((strlen($locate['html'])) ? $locate['html'] : render_location($locate));
 
 				$indent = (($toplevelpost) ? '' : ' comment');
 
