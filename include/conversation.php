@@ -597,7 +597,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 				$locate = array('location' => $item['location'], 'coord' => $item['coord'], 'html' => '');
 				call_hooks('render_location',$locate);
 
-				$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_google($locate));
+				$location = ((strlen($locate['html'])) ? $locate['html'] : render_location($locate));
 
 				localize_item($item);
 				if($mode === 'network-new')
@@ -1239,4 +1239,34 @@ function render_location_google($item) {
 			$location = '<span class="smalltext">' . $coord . '</span>';
 	}
 	return $location;
+}
+
+function render_location_osm($item) {
+  $latlon = explode(' ', $item['coord']);
+
+	$location = (($item['location']) ? '<a target="map" title="'
+            . $item['location']
+            . '" href="http://www.openstreetmap.org/search?query='
+            . $item['location'] . '">'
+            . $item['location'] . '</a>' : '');
+
+	$coord = (($item['coord']) ? '<a target="map" title="'
+            . $item['coord']
+            . '" href="http://www.openstreetmap.org/#map=12/'
+            . $latlon[0] . '/' . $latlon[1] . '">'
+            . $item['coord'] . '</a>' : '');
+
+	if($coord) {
+		if($location)
+			$location .= '<br /><span class="smalltext">(' . $coord . ')</span>';
+		else
+			$location = '<span class="smalltext">' . $coord . '</span>';
+	}
+	return $location;
+}
+
+function render_location($item) {
+  # TODO: allow node/user configuration ?
+  # See https://github.com/friendica/friendica/issues/1705
+  return render_location_osm($item);
 }
