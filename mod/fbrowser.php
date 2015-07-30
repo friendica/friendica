@@ -18,11 +18,18 @@ function fbrowser_content($a){
 	if ($a->argc==1)
 		killme();
 	
+	$template_file = "filebrowser.tpl";
+	$mode = "";
+	if (x($_GET,'mode')) {
+		$template_file = "filebrowser_plain.tpl";
+		$mode  = "?mode=".$_GET['mode'];
+	}
+	
 	//echo "<pre>"; var_dump($a->argv); killme();	
 	
 	switch($a->argv[1]){
 		case "image":
-			$path = array( array($a->get_baseurl()."/fbrowser/image/", t("Photos")));
+			$path = array( array("", t("Photos")));
 			$albums = false;
 			$sql_extra = "";
 			$sql_extra2 = " ORDER BY created DESC LIMIT 0, 10";
@@ -32,8 +39,8 @@ function fbrowser_content($a){
 					intval(local_user())
 				);
 				// anon functions only from 5.3.0... meglio tardi che mai..
-				function folder1($el){return array(bin2hex($el['album']),$el['album']);}	
-				$albums = array_map( "folder1" , $albums);
+				$folder1 = function($el) use ($mode) {return array(bin2hex($el['album']),$el['album']);};
+				$albums = array_map( $folder1 , $albums);
 				
 			}
 			
@@ -42,7 +49,7 @@ function fbrowser_content($a){
 				$album = hex2bin($a->argv[2]);
 				$sql_extra = sprintf("AND `album` = '%s' ",dbesc($album));
 				$sql_extra2 = "";
-				$path[]=array($a->get_baseurl()."/fbrowser/image/".$a->argv[2]."/", $album);
+				$path[]=array($a->argv[2], $album);
 			}
 				
 			$r = q("SELECT `resource-id`, `id`, `filename`, type, min(`scale`) AS `hiq`,max(`scale`) AS `loq`, `desc`  
@@ -71,14 +78,16 @@ function fbrowser_content($a){
 			}
 			$files = array_map("files1", $r);
 			
-			$tpl = get_markup_template("filebrowser.tpl");
-			echo replace_macros($tpl, array(
+			$tpl = get_markup_template($template_file);
+			
+			$o =  replace_macros($tpl, array(
 				'$type' => 'image',
 				'$baseurl' => $a->get_baseurl(),
 				'$path' => $path,
 				'$folders' => $albums,
 				'$files' =>$files,
 				'$cancel' => t('Cancel'),
+				'$nickname' => $a->user['nickname'],
 			));
 				
 				
@@ -106,14 +115,15 @@ function fbrowser_content($a){
 				//echo "<pre>"; var_dump($files); killme();
 			
 							
-				$tpl = get_markup_template("filebrowser.tpl");
-				echo replace_macros($tpl, array(
+				$tpl = get_markup_template($template_file);
+				$o = replace_macros($tpl, array(
 					'$type' => 'file',
 					'$baseurl' => $a->get_baseurl(),
-					'$path' => array( array($a->get_baseurl()."/fbrowser/image/", t("Files")) ),
+					'$path' => array( array( "", t("Files")) ),
 					'$folders' => false,
 					'$files' =>$files,
 					'$cancel' => t('Cancel'),
+					'$nickname' => $a->user['nickname'],
 				));
 				
 			}
@@ -121,7 +131,12 @@ function fbrowser_content($a){
 			break;
 	}
 	
-
-	killme();
+	if (x($_GET,'mode')) {
+		return $o;
+	} else {
+		echo $o;
+		killme();
+	}
+	
 	
 }

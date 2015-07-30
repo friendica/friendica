@@ -12,7 +12,7 @@ define('OSTATUS_DEFAULT_POLL_INTERVAL', 30); // given in minutes
 define('OSTATUS_DEFAULT_POLL_TIMEFRAME', 1440); // given in minutes
 define('OSTATUS_DEFAULT_POLL_TIMEFRAME_MENTIONS', 14400); // given in minutes
 
-function ostatus_fetchauthor($xpath, $context, $importer, &$contact) {
+function ostatus_fetchauthor($xpath, $context, $importer, &$contact, $onlyfetch) {
 
 	$author = array();
 	$author["author-link"] = $xpath->evaluate('atom:author/atom:uri/text()', $context)->item(0)->nodeValue;
@@ -63,7 +63,7 @@ function ostatus_fetchauthor($xpath, $context, $importer, &$contact) {
 	$author["owner-link"] = $author["author-link"];
 	$author["owner-avatar"] = $author["author-avatar"];
 
-	if ($r) {
+	if ($r AND !$onlyfetch) {
 		// Update contact data
 		$update_contact = ($r[0]['name-date'] < datetime_convert('','','now -12 hours'));
 		if ($update_contact) {
@@ -107,6 +107,34 @@ function ostatus_fetchauthor($xpath, $context, $importer, &$contact) {
 	}
 
 	return($author);
+}
+
+function ostatus_salmon_author($xml, $importer) {
+	$a = get_app();
+
+	if ($xml == "")
+		return;
+
+	$doc = new DOMDocument();
+	@$doc->loadXML($xml);
+
+	$xpath = new DomXPath($doc);
+	$xpath->registerNamespace('atom', "http://www.w3.org/2005/Atom");
+	$xpath->registerNamespace('thr', "http://purl.org/syndication/thread/1.0");
+	$xpath->registerNamespace('georss', "http://www.georss.org/georss");
+	$xpath->registerNamespace('activity', "http://activitystrea.ms/spec/1.0/");
+	$xpath->registerNamespace('media', "http://purl.org/syndication/atommedia");
+	$xpath->registerNamespace('poco', "http://portablecontacts.net/spec/1.0");
+	$xpath->registerNamespace('ostatus', "http://ostatus.org/schema/1.0");
+	$xpath->registerNamespace('statusnet', "http://status.net/schema/api/1/");
+
+	$entries = $xpath->query('/atom:entry');
+
+	foreach ($entries AS $entry) {
+		// fetch the author
+		$author = ostatus_fetchauthor($xpath, $entry, $importer, $contact, true);
+		return $author;
+	}
 }
 
 function ostatus_import($xml,$importer,&$contact, &$hub) {
@@ -173,9 +201,15 @@ function ostatus_import($xml,$importer,&$contact, &$hub) {
 
 		// fetch the author
 		if ($first_child == "feed")
-			$author = ostatus_fetchauthor($xpath, $doc->firstChild, $importer, $contact);
+			$author = ostatus_fetchauthor($xpath, $doc->firstChild, $importer, $contact, false);
 		else
-			$author = ostatus_fetchauthor($xpath, $entry, $importer, $contact);
+			$author = ostatus_fetchauthor($xpath, $entry, $importer, $contact, false);
+
+		$value = $xpath->evaluate('atom:author/poco:preferredUsername/text()', $context)->item(0)->nodeValue;
+		if ($value != "")
+			$nickname = $value;
+		else
+			$nickname = $author["author-name"];
 
 		$item = array_merge($header, $author);
 
@@ -205,23 +239,44 @@ function ostatus_import($xml,$importer,&$contact, &$hub) {
 		// Delete a message
 		if ($item["verb"] == "qvitter-delete-notice") {
 			// ignore "Delete" messages (by now)
+			logger("Ignore delete message ".print_r($item, true));
 			continue;
 		}
 
 		if ($item["verb"] == ACTIVITY_JOIN) {
 			// ignore "Join" messages
+			logger("Ignore join message ".print_r($item, true));
 			continue;
 		}
 
 		if ($item["verb"] == ACTIVITY_FOLLOW) {
-			// ignore "Follow" messages
+			new_follower($importer, $contact, $item, $nickname);
+			continue;
+		}
+
+		if ($item["verb"] == NAMESPACE_OSTATUS."/unfollow") {
+			lose_follower($importer, $contact, $item, $dummy);
 			continue;
 		}
 
 		if ($item["verb"] == ACTIVITY_FAVORITE) {
-			// ignore "Favorite" messages
+			$orig_uri = $xpath->query("activity:object/atom:id", $entry)->item(0)->nodeValue;
+			logger("Favorite ".$orig_uri." ".print_r($item, true));
+
+		        $item["verb"] = ACTIVITY_LIKE;
+			$item["parent-uri"] = $orig_uri;
+			$item["gravity"] = GRAVITY_LIKE;
+		}
+
+		if ($item["verb"] == NAMESPACE_OSTATUS."/unfavorite") {
+			// Ignore "Unfavorite" message
+			logger("Ignore unfavorite message ".print_r($item, true));
 			continue;
 		}
+
+		// http://activitystrea.ms/schema/1.0/rsvp-yes
+		if (!in_array($item["verb"], array(ACTIVITY_POST, ACTIVITY_LIKE, ACTIVITY_SHARE)))
+			logger("Unhandled verb ".$item["verb"]." ".print_r($item, true));
 
 		$item["created"] = $xpath->query('atom:published/text()', $entry)->item(0)->nodeValue;
 		$item["edited"] = $xpath->query('atom:updated/text()', $entry)->item(0)->nodeValue;
@@ -366,7 +421,7 @@ function ostatus_import($xml,$importer,&$contact, &$hub) {
 				$orig_created = $xpath->query('atom:published/text()', $activityobjects)->item(0)->nodeValue;
 
 				$orig_contact = $contact;
-				$orig_author = ostatus_fetchauthor($xpath, $activityobjects, $importer, $orig_contact);
+				$orig_author = ostatus_fetchauthor($xpath, $activityobjects, $importer, $orig_contact, false);
 
 				//if (!intval(get_config('system','wall-to-wall_share'))) {
 				//	$prefix = share_header($orig_author['author-name'], $orig_author['author-link'], $orig_author['author-avatar'], "", $orig_created, $orig_link);

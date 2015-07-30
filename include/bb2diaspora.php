@@ -34,6 +34,15 @@ function diaspora2bb($s) {
 
 	$s = str_replace('&#35;','#',$s);
 
+	$search = array(" \n", "\n ");
+	$replace = array("\n", "\n");
+	do {
+		$oldtext = $s;
+		$s = str_replace($search, $replace, $s);
+	} while ($oldtext != $s);
+
+	$s = str_replace("\n\n", "<br>", $s);
+
 	$s = html2bbcode($s);
 
 	// protect the recycle symbol from turning into a tag, but without unescaping angles and naked ampersands

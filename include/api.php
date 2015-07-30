@@ -505,7 +505,7 @@
 		}
 
 		require_once('include/contact_selectors.php');
-		$network_name = network_to_name($uinfo[0]['network']);
+		$network_name = network_to_name($uinfo[0]['network'], $uinfo[0]['url']);
 
 		$ret = Array(
 			'id' => intval($r[0]['id']),
@@ -996,9 +996,9 @@
 				$status_info["entities"] = $converted["entities"];
 
 			if (($lastwall['item_network'] != "") AND ($status["source"] == 'web'))
-				$status_info["source"] = network_to_name($lastwall['item_network']);
-			elseif (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network']) != $status_info["source"]))
-				$status_info["source"] = trim($status_info["source"].' ('.network_to_name($lastwall['item_network']).')');
+				$status_info["source"] = network_to_name($lastwall['item_network'], $user_info['url']);
+			elseif (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $status_info["source"]))
+				$status_info["source"] = trim($status_info["source"].' ('.network_to_name($lastwall['item_network'], $user_info['url']).')');
 
 			// "uid" and "self" are only needed for some internal stuff, so remove it from here
 			unset($status_info["user"]["uid"]);
@@ -1095,9 +1095,9 @@
 				$user_info["status"]["entities"] = $converted["entities"];
 
 			if (($lastwall['item_network'] != "") AND ($user_info["status"]["source"] == 'web'))
-				$user_info["status"]["source"] = network_to_name($lastwall['item_network']);
-			if (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network']) != $user_info["status"]["source"]))
-				$user_info["status"]["source"] = trim($user_info["status"]["source"].' ('.network_to_name($lastwall['item_network']).')');
+				$user_info["status"]["source"] = network_to_name($lastwall['item_network'], $user_info['url']);
+			if (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $user_info["status"]["source"]))
+				$user_info["status"]["source"] = trim($user_info["status"]["source"].' ('.network_to_name($lastwall['item_network'], $user_info['url']).')');
 
 		}
 
@@ -2214,9 +2214,9 @@
 				$status["entities"] = $converted["entities"];
 
 			if (($item['item_network'] != "") AND ($status["source"] == 'web'))
-				$status["source"] = network_to_name($item['item_network']);
-			else if (($item['item_network'] != "") AND (network_to_name($item['item_network']) != $status["source"]))
-				$status["source"] = trim($status["source"].' ('.network_to_name($item['item_network']).')');
+				$status["source"] = network_to_name($item['item_network'], $user_info['url']);
+			else if (($item['item_network'] != "") AND (network_to_name($item['item_network'], $user_info['url']) != $status["source"]))
+				$status["source"] = trim($status["source"].' ('.network_to_name($item['item_network'], $user_info['url']).')');
 
 
 			// Retweets are only valid for top postings

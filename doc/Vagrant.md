@@ -17,7 +17,7 @@ Inside, you'll find a "Vagrantfile" and some scripts in the utils folder.
 3. Run "vagrant up" from inside the friendica clone.
 Be patient: When it runs for the first time, it downloads an Ubuntu Server image.
 4. Run "vagrant ssh" to log into the virtual machine to log in to the VM.
-5. Open 192.168.22.10 in a browser to finish the Friendica installation.
+5. Open 192.168.22.10 in a browser.
 The mysql database is called "friendica", the mysql user and password both are "root".
 6. Work on Friendica's code in your git clone on your machine (not in the VM).
 7. Check the changes in your browser in the VM.
@@ -30,13 +30,7 @@ If you want to stop vagrant after finishing your work, run the following command
 
 in the development directory.
 
-Import test data
-----------------
-
-If you want some test data in your vagrant Friendica instance import the database dump friendica_test_data.sql like so (inside the VM):
-
-		$> mysql -u root -p friendica < /vagrant/friendica_test_data.sql
-
+The vagrant Friendica instance contains a test database.
 You will then have the following accounts to login:
 
   * admin, password admin

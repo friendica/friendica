@@ -43,6 +43,9 @@
 .icon.edit {
   background-image: url("../../../images/icons/22/edit.png");
 }
+.icon.pencil {
+  background-image: url("../../../images/icons/22/edit.png");
+}
 .icon.star {
   background-image: url("../../../images/icons/22/star.png");
 }
@@ -50,6 +53,9 @@
   background-image: url("../../../images/icons/22/menu.png");
 }
 .icon.link {
+  background-image: url("../../../images/icons/22/link.png");
+}
+.icon.remote-link {
   background-image: url("../../../images/icons/22/link.png");
 }
 .icon.lock {
@@ -116,6 +122,9 @@
 .icon.s10.edit {
   background-image: url("../../../images/icons/10/edit.png");
 }
+.icon.s10.pencil {
+  background-image: url("../../../images/icons/10/edit.png");
+}
 .icon.s10.star {
   background-image: url("../../../images/icons/10/star.png");
 }
@@ -123,6 +132,9 @@
   background-image: url("../../../images/icons/10/menu.png");
 }
 .icon.s10.link {
+  background-image: url("../../../images/icons/10/link.png");
+}
+.icon.s10.remote-link {
   background-image: url("../../../images/icons/10/link.png");
 }
 .icon.s10.lock {
@@ -189,6 +201,9 @@
 .icon.s16.edit {
   background-image: url("../../../images/icons/16/edit.png");
 }
+.icon.s16.pencil {
+  background-image: url("../../../images/icons/16/edit.png");
+}
 .icon.s16.star {
   background-image: url("../../../images/icons/16/star.png");
 }
@@ -196,6 +211,9 @@
   background-image: url("../../../images/icons/16/menu.png");
 }
 .icon.s16.link {
+  background-image: url("../../../images/icons/16/link.png");
+}
+.icon.s16.remote-link {
   background-image: url("../../../images/icons/16/link.png");
 }
 .icon.s16.lock {
@@ -262,6 +280,9 @@
 .icon.s22.edit {
   background-image: url("../../../images/icons/22/edit.png");
 }
+.icon.s22.pencil {
+  background-image: url("../../../images/icons/22/edit.png");
+}
 .icon.s22.star {
   background-image: url("../../../images/icons/22/star.png");
 }
@@ -269,6 +290,9 @@
   background-image: url("../../../images/icons/22/menu.png");
 }
 .icon.s22.link {
+  background-image: url("../../../images/icons/22/link.png");
+}
+.icon.s22.remote-link {
   background-image: url("../../../images/icons/22/link.png");
 }
 .icon.s22.lock {
@@ -335,6 +359,9 @@
 .icon.s48.edit {
   background-image: url("../../../images/icons/48/edit.png");
 }
+.icon.s48.pencil {
+  background-image: url("../../../images/icons/48/edit.png");
+}
 .icon.s48.star {
   background-image: url("../../../images/icons/48/star.png");
 }
@@ -342,6 +369,9 @@
   background-image: url("../../../images/icons/48/menu.png");
 }
 .icon.s48.link {
+  background-image: url("../../../images/icons/48/link.png");
+}
+.icon.s48.remote-link {
   background-image: url("../../../images/icons/48/link.png");
 }
 .icon.s48.lock {
@@ -2449,4 +2479,71 @@ footer {
   margin-left: 10px;
   border: 0px;
   color: #999999;
+}
+/* buttons for the event view */
+.plink-event-link {
+  float: left;
+  margin-left: 2px;
+}
+/* upload/select popup */
+.fbrowser {
+  overflow: auto;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+}
+.fbrowser .path {
+  background-color: #0e232e;
+}
+.fbrowser .path a {
+  padding: 5px;
+  margin: 0px 2px;
+  display: inline-block;
+}
+.fbrowser .path a,
+.fbrowser .path a:active,
+.fbrowser .path a:visited,
+.fbrowser .path a:link,
+.fbrowser .path a:hover {
+  color: #ffffff;
+  text-decoration: none;
+  outline: none;
+}
+.fbrowser .folders ul {
+  list-style: url("icons/folder.png");
+  padding-left: 22px;
+}
+.fbrowser .list {
+  padding: 10px;
+}
+.fbrowser.image .photo-album-image-wrapper {
+  width: 48px;
+  height: 48px;
+}
+.fbrowser.image a img {
+  width: auto;
+  height: 48px;
+}
+.fbrowser.image a p {
+  display: none;
+}
+.fbrowser.file .photo-album-image-wrapper {
+  float: none;
+  white-space: nowrap;
+  width: 100%;
+  height: auto;
+}
+.fbrowser.file img {
+  display: inline;
+  width: 16px;
+  height: 16px;
+}
+.fbrowser.file p {
+  display: inline;
+  white-space: nowrap;
+}
+.fbrowser .upload {
+  clear: both;
+  padding-top: 1em;
 }

@@ -4,7 +4,7 @@
                 <input type="text" name="search" id="search-text" placeholder="{{$search_label}}" value="{{$s}}" />
                 <input type="submit" name="submit" id="search-submit" value="{{$search_label}}" />
                 {{if $savedsearch}}
-                <input type="submit" name="searchsave" id="search-save" value="{{$save_label}}" />
+                <input type="submit" name="save" id="search-save" value="{{$save_label}}" />
                 {{/if}}
                 {{/strip}}
         </form>

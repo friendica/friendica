@@ -31,14 +31,14 @@
 				<div class="comment-edit-submit-wrapper" id="comment-edit-submit-wrapper-{{$id}}" style="display: none;" >
 
 				<div class="comment-edit-bb">
-	                                <a title="{{$edimg}}" onclick="insertFormatting('{{$comment}}','img',{{$id}});"><i class="icon-picture"></i></a>      
-	                                <a title="{{$edurl}}" onclick="insertFormatting('{{$comment}}','url',{{$id}});"><i class="icon-link"></i></a>
-	                                <a title="{{$edvideo}}" onclick="insertFormatting('{{$comment}}','video',{{$id}});"><i class="icon-film"></i></a>
+	                                <a title="{{$edimg}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="img" data-id="{{$id}}"><i class="icon-picture"></i></a>      
+	                                <a title="{{$edurl}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="url" data-id="{{$id}}"><i class="icon-link"></i></a>
+	                                <a title="{{$edvideo}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="video" data-id="{{$id}}"><i class="icon-film"></i></a>
                                                                                 
-	                                <a title="{{$eduline}}" onclick="insertFormatting('{{$comment}}','u',{{$id}});"><i class="icon-underline"></i></a>
-	                                <a title="{{$editalic}}" onclick="insertFormatting('{{$comment}}','i',{{$id}});"><i class="icon-italic"></i></a>
-	                                <a title="{{$edbold}}" onclick="insertFormatting('{{$comment}}','b',{{$id}});"><i class="icon-bold"></i></a>
-	                                <a title="{{$edquote}}" onclick="insertFormatting('{{$comment}}','quote',{{$id}});"><i class="icon-quote-left"></i></a>
+	                                <a title="{{$eduline}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="u" data-id="{{$id}}"><i class="icon-underline"></i></a>
+	                                <a title="{{$editalic}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="i" data-id="{{$id}}"><i class="icon-italic"></i></a>
+	                                <a title="{{$edbold}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="b" data-id="{{$id}}"><i class="icon-bold"></i></a>
+	                                <a title="{{$edquote}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="quote" data-id="{{$id}}"><i class="icon-quote-left"></i></a>
 
                                 </div>
 					<input type="submit" onclick="post_comment({{$id}}); return false;" id="comment-edit-submit-{{$id}}" class="comment-edit-submit" name="submit" value="{{$submit}}" />

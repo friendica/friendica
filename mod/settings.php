@@ -178,7 +178,8 @@ function settings_post(&$a) {
 		check_form_security_token_redirectOnErr('/settings/connectors', 'settings_connectors');
 
 		if(x($_POST, 'general-submit')) {
-			set_pconfig(local_user(), 'system', 'no_intelligent_shortening', $_POST['no_intelligent_shortening']);
+			set_pconfig(local_user(), 'system', 'no_intelligent_shortening', intval($_POST['no_intelligent_shortening']));
+			set_pconfig(local_user(), 'system', 'ostatus_autofriend', intval($_POST['snautofollow']));
 		} elseif(x($_POST, 'imap-submit')) {
 
 			$mail_server       = ((x($_POST,'mail_server')) ? $_POST['mail_server'] : '');
@@ -751,6 +752,14 @@ function settings_content(&$a) {
 		$settings_connectors .= '<span class="field_help">'.t('Normally the system tries to find the best link to add to shortened posts. If this option is enabled then every shortened post will always point to the original friendica post.').'</span>';
 		$settings_connectors .= '</div>';
 
+		$checked = ((get_pconfig(local_user(), 'system', 'ostatus_autofriend')) ? ' checked="checked" ' : '');
+
+		$settings_connectors .= '<div id="snautofollow-wrapper" class="field checkbox">';
+		$settings_connectors .= '<label id="snautofollow-label" for="snautofollow-checkbox">'. t('Automatically follow any GNU Social (OStatus) followers/mentioners'). '</label>';
+		$settings_connectors .= '<input id="snautofollow-checkbox" type="checkbox" name="snautofollow" value="1" ' . $checked . '/>';
+		$settings_connectors .= '<span class="field_help">'.t('If you receive a message from an unknown OStatus user, this option decides what to do. If it is checked, a new contact will be created for every unknown user.').'</span>';
+		$settings_connectors .= '</div>';
+
 		$settings_connectors .= '<div class="settings-submit-wrapper" ><input type="submit" name="general-submit" class="settings-submit" value="' . t('Save Settings') . '" /></div>';
 
 		$settings_connectors .= '</div><div class="clear"></div>';
@@ -759,7 +768,7 @@ function settings_content(&$a) {
 
 		if (is_site_admin()) {
 			$diasp_enabled = sprintf( t('Built-in support for %s connectivity is %s'), t('Diaspora'), ((get_config('system','diaspora_enabled')) ? t('enabled') : t('disabled')));
-			$ostat_enabled = sprintf( t('Built-in support for %s connectivity is %s'), t('StatusNet'), ((get_config('system','ostatus_disabled')) ? t('disabled') : t('enabled')));
+			$ostat_enabled = sprintf( t('Built-in support for %s connectivity is %s'), t('GNU Social (OStatus)'), ((get_config('system','ostatus_disabled')) ? t('disabled') : t('enabled')));
 		} else {
 			$diasp_enabled = "";
 			$ostat_enabled = "";
@@ -916,6 +925,7 @@ function settings_content(&$a) {
 			'$infinite_scroll'	=> array('infinite_scroll', t("Infinite scroll"), $infinite_scroll, ''),
 			'$no_auto_update'	=> array('no_auto_update', t("Automatic updates only at the top of the network page"), $no_auto_update, 'When disabled, the network page is updated all the time, which could be confusing while reading.'),
 
+			'stitle' => t('Theme settings'),
 			'$theme_config' => $theme_config,
 		));
 

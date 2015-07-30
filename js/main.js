@@ -51,6 +51,38 @@
 			e.tipTip({defaultPosition: pos, edgeOffset: 8});
 		});*/
 		
+		/* setup comment textarea buttons */
+		/* comment textarea buttons needs some "data-*" attributes to work:
+		 * 		data-role="insert-formatting" : to mark the element as a formatting button
+		 * 		data-comment="<string>" : string for "Comment", used by insertFormatting() function
+		 * 		data-bbcode="<string>" : name of the bbcode element to insert. insertFormatting() will insert it as "[name][/name]"
+		 * 		data-id="<string>" : id of the comment, used to find other comment-related element, like the textarea
+		 * */		
+		$('[data-role="insert-formatting"]').on('click', function(e) {
+			e.preventDefault();
+			var o = $(this);
+			var comment = o.data('comment');
+			var bbcode  = o.data('bbcode');
+			var id = o.data('id');
+			if (bbcode=="img") {
+				$.colorbox({href: baseurl + "/fbrowser/image/?mode=minimal#comment-"+id, iframe:true,innerWidth:'500px',innerHeight:'400px'})
+				return;	
+			}
+			
+			insertFormatting(comment, bbcode, id);
+		});
+
+		/* event from comment textarea button popups */
+		/* insert returned bbcode at cursor position or replace selected text */
+		$("body").on("fbrowser.image.comment", function(e, filename, bbcode, id) {
+			console.log("on", id);
+			$.colorbox.close();
+			var textarea = document.getElementById("comment-edit-text-" +id);
+			var start = textarea.selectionStart;
+			var end = textarea.selectionEnd;
+			textarea.value = textarea.value.substring(0, start) + bbcode + textarea.value.substring(end, textarea.value.length);
+		});
+	
 		
 		
 		/* setup onoff widgets */

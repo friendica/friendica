@@ -79,25 +79,27 @@ function register_post(&$a) {
 			set_pconfig($user['uid'],'system','invites_remaining',$num_invites);
 		}
 
-		$res = send_register_open_eml(
-			$user['email'],
-			$a->config['sitename'],
-			$a->get_baseurl(),
-			$user['username'],
-			$result['password']);
+		// Only send a password mail when the password wasn't manually provided
+		if (!x($_POST,'password1') OR !x($_POST,'confirm')) {
+			$res = send_register_open_eml(
+				$user['email'],
+				$a->config['sitename'],
+				$a->get_baseurl(),
+				$user['username'],
+				$result['password']);
 
-		if($res) {
-			info( t('Registration successful. Please check your email for further instructions.') . EOL ) ;
-			goaway(z_root());
-		}
-		else {
-			notice(
-				sprintf(
-					t('Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.'),
-					 $user['email'],
-					 $result['password']
-					 ). EOL
-			);
+			if($res) {
+				info( t('Registration successful. Please check your email for further instructions.') . EOL ) ;
+				goaway(z_root());
+			} else {
+				notice(
+					sprintf(
+						t('Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.'),
+						 $user['email'],
+						 $result['password']
+						 ). EOL
+				);
+			}
 		}
 	}
 	elseif($a->config['register_policy'] == REGISTER_APPROVE) {
@@ -235,6 +237,9 @@ function register_content(&$a) {
 		));
 	}
 
+	$r = q("SELECT count(*) AS `contacts` FROM `contact`");
+	$passwords = !$r[0]["contacts"];
+
 	$license = '';
 
 	$o = get_markup_template("register.tpl");
@@ -262,6 +267,9 @@ function register_content(&$a) {
 		'$openid'    => $openid_url,
 		'$namelabel' => t('Your Full Name ' . "\x28" . 'e.g. Joe Smith' . "\x29" . ': '),
 		'$addrlabel' => t('Your Email Address: '),
+		'$passwords' => $passwords,
+		'$password1' => array('password1', t('New Password:'), '', t('Leave empty for an auto generated password.')),
+		'$password2' => array('confirm', t('Confirm:'), '', ''),
 		'$nickdesc'  => str_replace('$sitename',$a->get_hostname(),t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be \'<strong>nickname@$sitename</strong>\'.')),
 		'$nicklabel' => t('Choose a nickname: '),
 		'$photo'     => $photo,

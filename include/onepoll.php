@@ -1,6 +1,7 @@
 <?php
 
 require_once("boot.php");
+require_once("include/follow.php");
 
 function RemoveReply($subject) {
 	while (in_array(strtolower(substr($subject, 0, 3)), array("re:", "aw:")))
@@ -91,6 +92,10 @@ function onepoll_run(&$argv, &$argc){
 	);
 
 	if(! count($contacts)) {
+		// Maybe it is a Redmatrix account. Then we can fetch their contacts via poco
+		$contacts = q("SELECT `id`, `poco` FROM `contact` WHERE `id` = %d AND `poco` != ''", intval($contact_id));
+		if ($contacts)
+			poco_load($contacts[0]['id'],$importer_uid,0,$contacts[0]['poco']);
 		return;
 	}
 
@@ -128,6 +133,10 @@ function onepoll_run(&$argv, &$argc){
 		? datetime_convert('UTC','UTC','now - 7 days', ATOM_TIME)
 		: datetime_convert('UTC','UTC',$contact['last-update'], ATOM_TIME)
 	);
+
+	// Update the contact entry
+	if(($contact['network'] === NETWORK_OSTATUS) || ($contact['network'] === NETWORK_DIASPORA) || ($contact['network'] === NETWORK_DFRN))
+		update_contact($contact["id"]);
 
 	if($contact['network'] === NETWORK_DFRN) {
 
@@ -243,8 +252,8 @@ function onepoll_run(&$argv, &$argc){
 			$final_dfrn_id = substr($final_dfrn_id,2);
 
 		if($final_dfrn_id != $orig_id) {
-			logger('poller: ID did not decode: ' . $contact['id'] . ' orig: ' . $orig_id . ' final: ' . $final_dfrn_id);	
-			// did not decode properly - cannot trust this site 
+			logger('poller: ID did not decode: ' . $contact['id'] . ' orig: ' . $orig_id . ' final: ' . $final_dfrn_id);
+			// did not decode properly - cannot trust this site
 			return;
 		}
 
@@ -255,7 +264,7 @@ function onepoll_run(&$argv, &$argc){
 		$xml = post_url($contact['poll'],$postvars);
 
 	}
-	elseif(($contact['network'] === NETWORK_OSTATUS) 
+	elseif(($contact['network'] === NETWORK_OSTATUS)
 		|| ($contact['network'] === NETWORK_DIASPORA)
 		|| ($contact['network'] === NETWORK_FEED) ) {
 
@@ -265,7 +274,8 @@ function onepoll_run(&$argv, &$argc){
 
 		$stat_writeable = ((($contact['notify']) && ($contact['rel'] == CONTACT_IS_FOLLOWER || $contact['rel'] == CONTACT_IS_FRIEND)) ? 1 : 0);
 
-		if($contact['network'] === NETWORK_OSTATUS && get_pconfig($importer_uid,'system','ostatus_autofriend'))
+		// Contacts from OStatus are always writable
+		if($contact['network'] === NETWORK_OSTATUS)
 			$stat_writeable = 1;
 
 		if($stat_writeable != $contact['writable']) {

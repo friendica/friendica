@@ -43,13 +43,13 @@ function nogroup_content(&$a) {
 				'id' => $rr['id'],
 				'alt_text' => $alt_text,
 				'dir_icon' => $dir_icon,
-				'thumb' => $rr['thumb'], 
+				'thumb' => $rr['thumb'],
 				'name' => $rr['name'],
 				'username' => $rr['name'],
 				'sparkle' => $sparkle,
 				'itemurl' => $rr['url'],
 				'url' => $url,
-				'network' => network_to_name($rr['network']),
+				'network' => network_to_name($rr['network'], $url),
 			);
 		}
 	}
@@ -59,8 +59,8 @@ function nogroup_content(&$a) {
 		'$header' => t('Contacts who are not members of a group'),
 		'$contacts' => $contacts,
 		'$paginate' => paginate($a),
-	)); 
-	
+	));
+
 	return $o;
 
 }

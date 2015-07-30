@@ -406,9 +406,13 @@ function notifier_run(&$argv, &$argc){
 					}
 				}
 			}
-		}
 
-		$r = q("SELECT * FROM `contact` WHERE `id` IN ( $conversant_str ) AND `blocked` = 0 AND `pending` = 0 AND `archive` = 0");
+			// It only makes sense to distribute answers to OStatus messages to Friendica and OStatus - but not Diaspora
+			$sql_extra = " AND `network` IN ('".NETWORK_OSTATUS."', '".NETWORK_DFRN."')";
+		} else
+			$sql_extra = "";
+
+		$r = q("SELECT * FROM `contact` WHERE `id` IN ($conversant_str) AND `blocked` = 0 AND `pending` = 0 AND `archive` = 0".$sql_extra);
 
 		if(count($r))
 			$contacts = $r;

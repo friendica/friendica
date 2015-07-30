@@ -63,6 +63,7 @@ SQL="${Q1}${Q2}"
 $MYSQL -uroot -proot -e "$SQL"
 service mysql restart
 
+
 #configure rudimentary mail server (local delivery only)
 #add Friendica accounts for local user accounts, use email address like vagrant@friendica.dev, read the email with 'mail'.
 debconf-set-selections <<< "postfix postfix/mailname string friendica.dev"
@@ -74,15 +75,13 @@ sudo echo -e "friendica1:	vagrant\nfriendica2:	vagrant\nfriendica3:	vagrant\nfri
 sudo rm -rf /var/www/
 sudo ln -fs /vagrant /var/www
 
-#delete .htconfig.php file if it exists to have a fresh friendica 
-#installation
-if [ -f /vagrant/.htconfig.php ]
-  then
-    sudo rm /vagrant/.htconfig.php
-fi
+# initial config file for friendica in vagrant
+cp /vagrant/util/htconfig.vagrant.php /vagrant/.htconfig.php
 
-#create the friendica database
+# create the friendica database
 echo "create database friendica" | mysql -u root -proot
+# import test database
+$MYSQL -uroot -proot friendica < /vagrant/friendica_test_data.sql
 
 #create cronjob
 echo "*/10 * * * * cd /vagrant; /usr/bin/php include/poller.php" >> friendicacron

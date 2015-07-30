@@ -4,6 +4,7 @@ if(class_exists('Item'))
 
 require_once('object/BaseObject.php');
 require_once('include/text.php');
+require_once('include/diaspora.php');
 require_once('boot.php');
 
 /**
@@ -82,7 +83,6 @@ class Item extends BaseObject {
 	 */
 	public function get_template_data($alike, $dlike, $thread_level=1) {
 		require_once("mod/proxy.php");
-		require_once("include/diaspora.php");
 
 		$result = array();
 
@@ -308,7 +308,6 @@ class Item extends BaseObject {
 		if (($item["item_network"] == NETWORK_FACEBOOK) AND ($indent == 'comment') AND isset($buttons["like"]))
 			unset($buttons["like"]);
 
-
 		$tmp_item = array(
 			'template' => $this->get_template(),
 
@@ -325,7 +324,7 @@ class Item extends BaseObject {
 			'body' => $body_e,
 			'text' => $text_e,
 			'id' => $this->get_id(),
-			'guid' => $item['guid'],
+			'guid' => urlencode($item['guid']),
 			'linktitle' => sprintf( t('View %s\'s profile @ %s'), $profile_name, ((strlen($item['author-link'])) ? $item['author-link'] : $item['url'])),
 			'olinktitle' => sprintf( t('View %s\'s profile @ %s'), $this->get_owner_name(), ((strlen($item['owner-link'])) ? $item['owner-link'] : $item['url'])),
 			'to' => t('to'),
@@ -369,7 +368,7 @@ class Item extends BaseObject {
                         'postopts' => $langstr,
                         'edited' => $edited,
 			'network' => $item["item_network"],
-			'network_name' => network_to_name($item['item_network']),
+			'network_name' => network_to_name($item['item_network'], $profile_link),
 		);
 
 		$arr = array('item' => $item, 'output' => $tmp_item);

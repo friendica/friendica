@@ -1,5 +1,5 @@
 <?php
-
+require_once('include/diaspora.php');
 
 function contact_profile_assign($current,$foreign_net) {
 
@@ -70,7 +70,7 @@ function contact_poll_interval($current, $disabled = false) {
 }
 
 
-function network_to_name($s) {
+function network_to_name($s, $profile = "") {
 
 	$nets = array(
 		NETWORK_DFRN     => t('Friendica'),
@@ -97,6 +97,10 @@ function network_to_name($s) {
 	$search  = array_keys($nets);
 	$replace = array_values($nets);
 
-	return str_replace($search,$replace,$s);
+	$networkname = str_replace($search,$replace,$s);
 
+	if (($s == NETWORK_DIASPORA) AND ($profile != "") AND diaspora_is_redmatrix($profile))
+		$networkname = t("Redmatrix");
+
+	return $networkname;
 }

@@ -127,37 +127,66 @@ function enableOnUser(){
 <script>
 	var ispublic = '{{$ispublic}}';
 
+	
 	$(document).ready(function() {
 		
 		/* enable tinymce on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
 
-		var uploader = new window.AjaxUpload(
-			'wall-image-upload',
-			{ action: 'wall_upload/{{$nickname}}',
-				name: 'userfile',
-				onSubmit: function(file,ext) { $('#profile-rotator').show(); },
-				onComplete: function(file,response) {
-					addeditortext(response);
-					$('#profile-rotator').hide();
-				}				 
-			}
-		);
-		var file_uploader = new window.AjaxUpload(
-			'wall-file-upload',
-			{ action: 'wall_attach/{{$nickname}}',
-				name: 'userfile',
-				onSubmit: function(file,ext) { $('#profile-rotator').show(); },
-				onComplete: function(file,response) {
-					addeditortext(response);
-					$('#profile-rotator').hide();
-				}				 
-			}
-		);
-
-
+		
+		
+		
+		/* show images / file browser window
+		 * 
+		 **/
+	
+		/* callback */
+		$('body').on('fbrowser.image.main', function(e, filename, embedcode, id) {
+			$.colorbox.close();
+			addeditortext(embedcode);
+		});
+		$('body').on('fbrowser.file.main', function(e, filename, embedcode, id) {
+			$.colorbox.close();
+			addeditortext(embedcode);
+		});
+	
+		$('#wall-image-upload').on('click', function(){
+			$.colorbox({href: baseurl + "/fbrowser/image/?mode=minimal#main", iframe:true,innerWidth:'500px',innerHeight:'400px'})
+		});
+		
+		$('#wall-file-upload').on('click', function(){
+			$.colorbox({href: baseurl + "/fbrowser/file/?mode=minimal#main", iframe:true,innerWidth:'500px',innerHeight:'400px'})
+		});
+		
+		/**	
+			var uploader = new window.AjaxUpload(
+				'wall-image-upload',
+				{ action: 'wall_upload/{{$nickname}}',
+					name: 'userfile',
+					onSubmit: function(file,ext) { $('#profile-rotator').show(); },
+					onComplete: function(file,response) {
+						addeditortext(response);
+						$('#profile-rotator').hide();
+					}				 
+				}
+			);
+			var file_uploader = new window.AjaxUpload(
+				'wall-file-upload',
+				{ action: 'wall_attach/{{$nickname}}',
+					name: 'userfile',
+					onSubmit: function(file,ext) { $('#profile-rotator').show(); },
+					onComplete: function(file,response) {
+						addeditortext(response);
+						$('#profile-rotator').hide();
+					}				 
+				}
+			);
+		
+		}
+		**/
 	});
+
 
 	function deleteCheckedItems() {
 		if(confirm('{{$delitems}}')) {

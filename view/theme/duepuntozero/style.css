@@ -1469,6 +1469,7 @@ blockquote.shared_content {
   padding: 10px;
   text-align: center;
   font-size: 1.0em;
+  clear:left;
 }
 
 
@@ -3468,3 +3469,5 @@ ul.menu-popup {
 .videos .video-top-wrapper:hover .video-delete {
   opacity: 1;
 }
+
+

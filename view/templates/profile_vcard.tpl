@@ -9,9 +9,9 @@
 
 	{{if $profile.picdate}}
 		<div id="profile-photo-wrapper"><a href="{{$profile.url}}"><img class="photo u-photo" width="175" height="175" src="{{$profile.photo}}?rev={{$profile.picdate}}" alt="{{$profile.name}}"></a></div>
-        {{else}}
+	{{else}}
 		<div id="profile-photo-wrapper"><a href="{{$profile.url}}"><img class="photo u-photo" width="175" height="175" src="{{$profile.photo}}" alt="{{$profile.name}}"></a></div>
-        {{/if}}
+	{{/if}}
 	{{if $profile.network_name}}<dl class="network"><dt class="network-label">{{$network}}</dt><dd class="x-network">{{$profile.network_name}}</dd></dl>{{/if}}
 	{{if $location}}
 		<dl class="location"><dt class="location-label">{{$location}}</dt> 
@@ -46,12 +46,12 @@
 	<div id="profile-extra-links">
 		<ul>
 			{{if $connect}}
-                                {{if $remoteconnect}}
-                                        <li><a id="dfrn-request-link" href="{{$remoteconnect}}">{{$connect}}</a></li>
-                                {{else}}
-                                        <li><a id="dfrn-request-link" href="dfrn_request/{{$profile.nickname}}">{{$connect}}</a></li>
-                                {{/if}}
-                        {{/if}}
+				{{if $remoteconnect}}
+					<li><a id="dfrn-request-link" href="{{$remoteconnect}}">{{$connect}}</a></li>
+				{{else}}
+					<li><a id="dfrn-request-link" href="dfrn_request/{{$profile.nickname}}">{{$connect}}</a></li>
+				{{/if}}
+			{{/if}}
 			{{if $wallmessage}}
 				<li><a id="wallmessage-link" href="wallmessage/{{$profile.nickname}}">{{$wallmessage}}</a></li>
 			{{/if}}

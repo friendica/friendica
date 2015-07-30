@@ -2977,9 +2977,6 @@ function item_is_remote_self($contact, &$datarray) {
 			$datarray['private'] = 0;
 	}
 
-	//if (!isset($datarray["app"]) OR ($datarray["app"] == ""))
-	//	$datarray["app"] = network_to_name($contact['network']);
-
 	if ($contact['network'] != NETWORK_FEED) {
 		// Store the original post
 		$r = item_store($datarray2, false, false);
@@ -4159,9 +4156,12 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 	$name = notags(trim($datarray['author-name']));
 	$photo = notags(trim($datarray['author-avatar']));
 
-	$rawtag = $item->get_item_tags(NAMESPACE_ACTIVITY,'actor');
-	if($rawtag && $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'])
-		$nick = $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'];
+	if (is_object($item)) {
+		$rawtag = $item->get_item_tags(NAMESPACE_ACTIVITY,'actor');
+		if($rawtag && $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'])
+			$nick = $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'];
+	} else
+		$nick = $item;
 
 	if(is_array($contact)) {
 		if(($contact['network'] == NETWORK_OSTATUS && $contact['rel'] == CONTACT_IS_SHARING)

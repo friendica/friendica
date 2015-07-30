@@ -1700,3 +1700,33 @@ footer { height: 100px; display: table-row; }
 	color: @FieldHelpColor;
 }
 
+/* buttons for the event view */
+.plink-event-link {
+	float: left;
+	margin-left: 2px;
+}
+
+/* upload/select popup */
+.fbrowser {
+	overflow: auto;
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+}
+.fbrowser .path {
+	background-color: @NavbarBackground;
+	a {	padding: 5px; margin: 0px 2px; display: inline-block; }
+	a, a:active, a:visited, a:link, a:hover { color: @Banner; text-decoration: none; outline: none;  }
+}
+.fbrowser .folders ul { list-style: url("icons/folder.png"); padding-left: 22px;}
+.fbrowser .list { padding: 10px; }
+.fbrowser.image .photo-album-image-wrapper { width: 48px; height: 48px; }
+.fbrowser.image a img { width: auto; height: 48px; }
+.fbrowser.image a p { display: none;}
+.fbrowser.file .photo-album-image-wrapper { float:none;  white-space: nowrap; width: 100%; height: auto; }
+.fbrowser.file img { display: inline; width: 16px; height: 16px}
+.fbrowser.file p  { display: inline; white-space: nowrap; }
+
+.fbrowser .upload { clear: both; padding-top: 1em;}
+

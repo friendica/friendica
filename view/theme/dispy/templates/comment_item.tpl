@@ -16,28 +16,28 @@
 				<ul class="comment-edit-bb-{{$id}}">
 					<li><a class="editicon boldbb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','b', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="b" data-id="{{$id}}"></a></li>
 					<li><a class="editicon italicbb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','i', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="i" data-id="{{$id}}"></a></li>
 					<li><a class="editicon underlinebb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','u', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="u" data-id="{{$id}}"></a></li>
 					<li><a class="editicon quotebb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','quote', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="quote" data-id="{{$id}}"></a></li>
 					<li><a class="editicon codebb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','code', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="code" data-id="{{$id}}"></a></li>
 					<li><a class="editicon imagebb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','img', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="img" data-id="{{$id}}"></a></li>
 					<li><a class="editicon urlbb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','url', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="url" data-id="{{$id}}"></a></li>
 					<li><a class="editicon videobb shadow"
 						style="cursor: pointer;"
-						onclick="insertFormatting('{{$comment}}','video', {{$id}});"></a></li>
+						data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="video" data-id="{{$id}}"></a></li>
 				</ul>
 				<div class="comment-edit-bb-end"></div>
 				<textarea id="comment-edit-text-{{$id}}"

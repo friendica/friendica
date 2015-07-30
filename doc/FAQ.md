@@ -19,6 +19,8 @@ Admins
 
 * **[Can I configure multiple domains with the same code instance?](help/FAQ#multiple)**
 * **[Where can I find the source code of friendica, addons and themes?](help/FAQ#sources)**
+* **[I've changed the my email address now the admin panel is gone?](help/FAQ#adminaccount1)**
+* **[Can there be more then just one admin for a node?](help/FAQ#adminaccount2)**
 
 User
 --------
@@ -198,3 +200,14 @@ There you will always find the current stable version of friendica.
 Addons are listed at [this page](https://github.com/friendica/friendica-addons).
 
 If you are searching for new themes, you can find them at [Friendica-Themes.com](http://friendica-themes.com/) 
+
+<a name="adminaccount1"></a>
+###I've changed the my email address now the admin panel is gone?
+
+Have a look into your <tt>.htconfig.php</tt> and fix your email address there.
+
+<a name="adminaccount2"></a>
+###Can there be more then just one admin for a node?
+
+Yes. You just have to list more then one email address in the
+<tt>.htconfig.php</tt> file. The listed emails need to be separated by a comma.

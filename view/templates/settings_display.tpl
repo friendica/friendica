@@ -20,7 +20,7 @@
 </div>
 
 {{if $theme_config}}
-<h2>Theme settings</h2>
+<h2>{{$stitle}}</h2>
 {{$theme_config}}
 {{/if}}
 

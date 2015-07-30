@@ -124,8 +124,9 @@ function poco_load($cid,$uid = 0,$zcid = 0,$url = null) {
 				$keywords = implode(", ", $tag);
 
 		// If you query a Friendica server for its profiles, the network has to be Friendica
-		if ($uid == 0)
-			$network = NETWORK_DFRN;
+		// To-Do: It could also be a Redmatrix server
+		//if ($uid == 0)
+		//	$network = NETWORK_DFRN;
 
 		poco_check($profile_url, $name, $network, $profile_photo, $about, $location, $gender, $keywords, $connect_url, $updated, $generation, $cid, $uid, $zcid);
 

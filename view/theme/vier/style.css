@@ -1109,6 +1109,9 @@ section {
 section.minimal {
   top: 0px;
   left: 0px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 /* wall item */
@@ -1216,6 +1219,7 @@ section.minimal {
 
 .wall-item-container .wall-item-content img {
   max-width: 100%;
+  vertical-align: middle;
   /* max-width: 650px; */
   /* max-width: 580px; */
 }
@@ -2928,3 +2932,6 @@ a.mail-list-link {
 .videos .video-top-wrapper:hover .video-delete {
   opacity: 1;
 }
+
+/* upload/select popup */
+.fbrowser.image .photo-album-image-wrapper { margin-left: 10px; }

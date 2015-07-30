@@ -61,7 +61,7 @@ function friendica_content(&$a) {
 
 	$o .= t('Please visit <a href="http://friendica.com">Friendica.com</a> to learn more about the Friendica project.') . '</p><p>';	
 
-	$o .= t('Bug reports and issues: please visit') . ' ' . '<a href="https://github.com/friendica/friendica/issues?state=open">the bucktracker at github</a></p><p>';
+	$o .= t('Bug reports and issues: please visit') . ' ' . '<a href="https://github.com/friendica/friendica/issues?state=open">'.t('the bugtracker at github').'</a></p><p>';
 	$o .= t('Suggestions, praise, donations, etc. - please email "Info" at Friendica - dot com') . '</p>';
 
 	$o .= '<p></p>';

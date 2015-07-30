@@ -470,7 +470,8 @@ function profiles_post(&$a) {
 
 
 		if($namechanged && $is_default) {
-			$r = q("UPDATE `contact` SET `name-date` = '%s' WHERE `self` = 1 AND `uid` = %d",
+			$r = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s' WHERE `self` = 1 AND `uid` = %d",
+				dbesc($name),
 				dbesc(datetime_convert()),
 				intval(local_user())
 			);

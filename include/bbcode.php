@@ -887,8 +887,12 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	$MAILSearchString = $URLSearchString;
 
 	// Remove all hashtag addresses
-	if ((!$tryoembed OR $simplehtml) AND ($simplehtml != 7))
+	if ((!$tryoembed OR $simplehtml) AND !in_array($simplehtml, array(3, 7)))
 		$Text = preg_replace("/([#@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $Text);
+	elseif ($simplehtml == 3)
+		$Text = preg_replace("/([@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
+			'$1<a href="$2">$3</a>',
+			$Text);
 	elseif ($simplehtml == 7)
 		$Text = preg_replace("/([@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
 			'$1<span class="vcard"><a href="$2" class="url" title="$3"><span class="fn nickname mention">$3</span></a></span>',
