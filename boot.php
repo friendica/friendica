@@ -1811,7 +1811,7 @@ function get_lockpath() {
 
 	if ($temppath != "") {
 		$lockpath = $temppath."/lock";
-		mkdir($lockpath);
+		if ( ! file_exists($lockpath) ) mkdir($lockpath);
 
 		if (is_dir($lockpath) AND is_writable($lockpath)) {
 			set_config("system", "lockpath", $lockpath);
