@@ -1096,6 +1096,48 @@ function add_guid($item) {
 		dbesc($item["uri"]), dbesc($item["network"]));
 }
 
+// Adds a "lang" specification in a "postopts" element of given $arr,
+// if possible and not already present.
+// Expects "body" element to exist in $arr.
+// TODO: add a parameter to request forcing override
+function item_add_language_opt(&$arr) {
+
+	if (version_compare(PHP_VERSION, '5.3.0', '<')) return; // LanguageDetect.php not available ?
+
+	if ( x($arr, 'postopts') )
+	{
+		if ( strstr($arr['postopts'], 'lang=') )
+		{
+			// do not override
+			// TODO: add parameter to request overriding
+			return;
+		}
+		$postopts = $arr['postopts'];
+	}
+	else
+	{
+		$postopts = "";
+	}
+
+	require_once('library/langdet/Text/LanguageDetect.php');
+	$naked_body = preg_replace('/\[(.+?)\]/','',$arr['body']);
+	$l = new Text_LanguageDetect;
+	//$lng = $l->detectConfidence($naked_body);
+	//$arr['postopts'] = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
+	$lng = $l->detect($naked_body, 3);
+
+	if (sizeof($lng) > 0) {
+		if ($postopts != "") $postopts .= '&'; // arbitrary separator, to be reviewed
+		$postopts .= 'lang=';
+		$sep = "";
+		foreach ($lng as $language => $score) {
+			$postopts .= $sep . $language.";".$score;
+			$sep = ':';
+		}
+		$arr['postopts'] = $postopts;
+	}
+}
+
 function item_store($arr,$force_parent = false, $notify = false, $dontcache = false) {
 
 	// If it is a posting where users should get notifications, then define it as wall posting
@@ -1185,29 +1227,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	//if((strpos($arr['body'],'<') !== false) || (strpos($arr['body'],'>') !== false))
 	//	$arr['body'] = strip_tags($arr['body']);
 
-
-	if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-		require_once('library/langdet/Text/LanguageDetect.php');
-		$naked_body = preg_replace('/\[(.+?)\]/','',$arr['body']);
-		$l = new Text_LanguageDetect;
-		//$lng = $l->detectConfidence($naked_body);
-		//$arr['postopts'] = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
-		$lng = $l->detect($naked_body, 3);
-
-		if (sizeof($lng) > 0) {
-			$postopts = "";
-
-			foreach ($lng as $language => $score) {
-				if ($postopts == "")
-					$postopts = "lang=";
-				else
-					$postopts .= ":";
-
-				$postopts .= $language.";".$score;
-			}
-			$arr['postopts'] = $postopts;
-		}
-	}
+	item_add_language_opt($arr);
 
 	if ($notify)
 		$guid_prefix = "";

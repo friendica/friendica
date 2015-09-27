@@ -10,7 +10,7 @@ Friendica Documentation and Resources
         * [BBCode tag reference](help/BBCode)
 	* [Comment, sort and delete posts](help/Text_comment)
 	* [Profiles](help/Profiles)
-	* [Accesskey reference](help/Accesskeys
+	* [Accesskey reference](help/Accesskeys)
     * [Events](help/events)
 * You and other users
 	* [Connectors](help/Connectors)
