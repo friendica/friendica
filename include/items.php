@@ -2664,7 +2664,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 		foreach($items as $item) {
 
 			$is_reply = false;
-			$item_id = $item->get_id();
+			$item_id = unxmlify($item->get_id());
 			$rawthread = $item->get_item_tags( NAMESPACE_THREAD,'in-reply-to');
 			if(isset($rawthread[0]['attribs']['']['ref'])) {
 				$is_reply = true;
@@ -2684,7 +2684,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 				// Have we seen it? If not, import it.
 
-				$item_id  = $item->get_id();
+				$item_id  = unxmlify($item->get_id());
 				$datarray = get_atom_elements($feed, $item, $contact);
 
 				if((! x($datarray,'author-name')) && ($contact['network'] != NETWORK_DFRN))
@@ -2832,7 +2832,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 				// Head post of a conversation. Have we seen it? If not, import it.
 
-				$item_id  = $item->get_id();
+				$item_id  = unxmlify($item->get_id());
 
 				$datarray = get_atom_elements($feed, $item, $contact);
 
@@ -3649,7 +3649,7 @@ function local_delivery($importer,$data) {
 	foreach($feed->get_items() as $item) {
 
 		$is_reply = false;
-		$item_id = $item->get_id();
+		$item_id = unxmlify($item->get_id());
 		$rawthread = $item->get_item_tags( NAMESPACE_THREAD, 'in-reply-to');
 		if(isset($rawthread[0]['attribs']['']['ref'])) {
 			$is_reply = true;
@@ -3906,7 +3906,7 @@ function local_delivery($importer,$data) {
 
 				// regular comment that is part of this total conversation. Have we seen it? If not, import it.
 
-				$item_id  = $item->get_id();
+				$item_id  = unxmlify($item->get_id());
 				$datarray = get_atom_elements($feed,$item);
 
 				if($importer['rel'] == CONTACT_IS_FOLLOWER)
@@ -4079,7 +4079,7 @@ function local_delivery($importer,$data) {
 			// Head post of a conversation. Have we seen it? If not, import it.
 
 
-			$item_id  = $item->get_id();
+			$item_id  = unxmlify($item->get_id());
 			$datarray = get_atom_elements($feed,$item);
 
 			if((x($datarray,'object-type')) && ($datarray['object-type'] === ACTIVITY_OBJ_EVENT)) {
