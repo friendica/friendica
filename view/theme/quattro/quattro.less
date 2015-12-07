@@ -442,6 +442,20 @@ aside {
 	/*.action .s10 { width: 10px; overflow: hidden; padding: 0px;}
 	.action .s16 { width: 16px; overflow: hidden; padding: 0px;}*/
 
+	.notify {
+		display: none;
+		background-color: #19AEFF;
+		border-radius: 5px;
+		font-size: 10px;
+		padding: 1px 3px;
+		min-width: 15px;
+		text-align: right;
+		float: right;
+		color: rgb(255, 255, 255);
+		margin-right: 10px;
+
+		&.on { display: block; }
+	}
 }
 
 /* widget: search */
@@ -519,6 +533,9 @@ section {
 	.wall-item-name { font-weight: bold; }
 
 	.wall-item-actions-author { float: left; width: 20em; margin-top: 0.5em; }
+	.wall-item-actions-events { float: left; margin-top: 0.5em;
+		a { margin-right: 3em; }
+	 }
 	.wall-item-actions-social { float: left; margin-top: 0.5em;
 		a { margin-right: 3em; }
 	 }
@@ -874,6 +891,27 @@ span[id^="showmore-wrap"] {
 		left: 0px;
 		top: 63px;
 	}
+	.drop {
+		background-image: url('../../../images/icons/22/delete.png');
+		display: block; width: 22px; height: 22px;
+		position: relative;
+		top: 10px;
+		left: -10px;
+		z-index: 99;
+	}
+	.drophide {
+		background-image: url('../../../images/icons/22/delete.png');
+		display: block; width: 22px; height: 22px;
+		opacity: 0.3;
+		position: relative;
+		top: 10px;
+		left: -10px;
+		z-index: 99;
+	}
+	.contact-entry-connect {
+		padding-top: 5px;
+		font-weight: bold;
+	}
 }
 .directory-item {
 	float: left;
@@ -884,7 +922,7 @@ span[id^="showmore-wrap"] {
 		img { width: 175px; height: 175px; }
 	}
 }
-.contact-name { font-weight: bold; padding-top: 15px; }
+.contact-name { font-weight: bold; /* padding-top: 15px; */}
 .contact-details {
 	color: @Grey3; white-space: nowrap;
 	overflow: hidden;

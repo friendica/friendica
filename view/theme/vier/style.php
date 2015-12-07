@@ -26,5 +26,3 @@ else if ($style == "dark")
 	$stylecss = file_get_contents('view/theme/vier/dark.css');
 
 echo $stylecss;
-
-

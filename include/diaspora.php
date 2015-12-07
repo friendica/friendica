@@ -110,6 +110,9 @@ function diaspora_dispatch($importer,$msg,$attempt=1) {
 	elseif($xmlbase->message) {
 		$ret = diaspora_message($importer,$xmlbase->message,$msg);
 	}
+	elseif($xmlbase->participation) {
+		$ret = diaspora_participation($importer,$xmlbase->participation);
+	}
 	else {
 		logger('diaspora_dispatch: unknown message type: ' . print_r($xmlbase,true));
 	}
@@ -589,7 +592,7 @@ function diaspora_request($importer,$xml) {
 		// perhaps we were already sharing with this person. Now they're sharing with us.
 		// That makes us friends.
 
-		if($contact['rel'] == CONTACT_IS_FOLLOWER && !in_array($importer['page-flags'], array(PAGE_COMMUNITY, PAGE_SOAPBOX))) {
+		if($contact['rel'] == CONTACT_IS_FOLLOWER && in_array($importer['page-flags'], array(PAGE_FREELOVE))) {
 			q("UPDATE `contact` SET `rel` = %d, `writable` = 1 WHERE `id` = %d AND `uid` = %d",
 				intval(CONTACT_IS_FRIEND),
 				intval($contact['id']),
@@ -771,7 +774,7 @@ function diaspora_post_allow($importer,$contact, $is_comment = false) {
 	// perhaps we were already sharing with this person. Now they're sharing with us.
 	// That makes us friends.
 	// Normally this should have handled by getting a request - but this could get lost
-	if($contact['rel'] == CONTACT_IS_FOLLOWER && !in_array($importer['page-flags'], array(PAGE_COMMUNITY, PAGE_SOAPBOX))) {
+	if($contact['rel'] == CONTACT_IS_FOLLOWER && in_array($importer['page-flags'], array(PAGE_FREELOVE))) {
 		q("UPDATE `contact` SET `rel` = %d, `writable` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval(CONTACT_IS_FRIEND),
 			intval($contact['id']),
@@ -1834,7 +1837,7 @@ function diaspora_message($importer,$xml,$msg) {
 
 	$author_signature = base64_decode($msg_author_signature);
 
-	$person = find_diaspora_person_by_handle($msg_diaspora_handle);	
+	$person = find_diaspora_person_by_handle($msg_diaspora_handle);
 	if(is_array($person) && x($person,'pubkey'))
 		$key = $person['pubkey'];
 	else {
@@ -1881,6 +1884,9 @@ function diaspora_message($importer,$xml,$msg) {
 	return;
 }
 
+function diaspora_participation($importer,$xml) {
+	logger("Unsupported message type 'participation' ".print_r($xml, true));
+}
 
 function diaspora_photo($importer,$xml,$msg,$attempt=1) {
 
@@ -2415,7 +2421,8 @@ function diaspora_profile($importer,$xml,$msg) {
 
 	$birthday = str_replace('1000','1901',$birthday);
 
-	$birthday = datetime_convert('UTC','UTC',$birthday,'Y-m-d');
+	if ($birthday != "")
+		$birthday = datetime_convert('UTC','UTC',$birthday,'Y-m-d');
 
 	// this is to prevent multiple birthday notifications in a single year
 	// if we already have a stored birthday and the 'm-d' part hasn't changed, preserve the entry, which will preserve the notify year

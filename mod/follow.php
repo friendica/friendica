@@ -15,6 +15,8 @@ function follow_content(&$a) {
 	$uid = local_user();
 	$url = notags(trim($_REQUEST['url']));
 
+	$submit = t('Submit Request');
+
 	// There is a current issue. It seems as if you can't start following a Friendica that is following you
 	// With Diaspora this works - but Friendica is special, it seems ...
 	$r = q("SELECT `url` FROM `contact` WHERE `uid` = %d AND ((`rel` != %d) OR (`network` = '%s')) AND
@@ -25,11 +27,33 @@ function follow_content(&$a) {
 
 	if ($r) {
 		notice(t('You already added this contact.').EOL);
-		goaway($_SESSION['return_url']);
+		$submit = "";
+		//goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
 	$ret = probe_url($url);
+
+	if (($ret["network"] == NETWORK_DIASPORA) AND !get_config('system','diaspora_enabled')) {
+		notice( t("Diaspora support isn't enabled. Contact can't be added.") . EOL);
+		$submit = "";
+		//goaway($_SESSION['return_url']);
+		// NOTREACHED
+	}
+
+	if (($ret["network"] == NETWORK_OSTATUS) AND get_config('system','ostatus_disabled')) {
+		notice( t("OStatus support is disabled. Contact can't be added.") . EOL);
+		$submit = "";
+		//goaway($_SESSION['return_url']);
+		// NOTREACHED
+	}
+
+	if ($ret["network"] == NETWORK_PHANTOM) {
+		notice( t("The network type couldn't be detected. Contact can't be added.") . EOL);
+		$submit = "";
+		//goaway($_SESSION['return_url']);
+		// NOTREACHED
+	}
 
 	if ($ret["network"] == NETWORK_MAIL)
 		$ret["url"] = $ret["addr"];
@@ -55,35 +79,54 @@ function follow_content(&$a) {
 	// Makes the connection request for friendica contacts easier
 	$_SESSION["fastlane"] = $ret["url"];
 
+	$r = q("SELECT `location`, `about`, `keywords` FROM `gcontact` WHERE `nurl` = '%s'",
+		normalise_link($ret["url"]));
+
+	if (!$r)
+		$r = array(array("location" => "", "about" => "", "keywords" => ""));
+
+	if($ret['network'] === NETWORK_DIASPORA) {
+		$r[0]["location"] = "";
+		$r[0]["about"] = "";
+	}
+
 	$header = $ret["name"];
 
 	if ($ret["addr"] != "")
 		$header .= " <".$ret["addr"].">";
 
-	$header .= " (".network_to_name($ret['network']).")";
+	$header .= " (".network_to_name($ret['network'], $ret['url']).")";
 
 	$o  = replace_macros($tpl,array(
 			'$header' => htmlentities($header),
-			'$photo' => $ret["photo"],
-                        '$desc' => "",
-                        '$pls_answer' => t('Please answer the following:'),
-                        '$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$ret["name"]), false, '', array(t('No'),t('Yes'))),
-                        '$add_note' => t('Add a personal note:'),
-                        '$page_desc' => "",
-                        '$friendica' => "",
-                        '$statusnet' => "",
-                        '$diaspora' => "",
-                        '$diasnote' => "",
-                        '$your_address' => t('Your Identity Address:'),
-                        '$invite_desc' => "",
-                        '$emailnet' => "",
-                        '$submit' => t('Submit Request'),
-                        '$cancel' => t('Cancel'),
-                        '$nickname' => "",
-                        '$name' => $ret["name"],
-                        '$url' => $ret["url"],
-                        '$myaddr' => $myaddr,
-			'$request' => $request
+			'$photo' => proxy_url($ret["photo"], false, PROXY_SIZE_SMALL),
+			'$desc' => "",
+			'$pls_answer' => t('Please answer the following:'),
+			'$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$ret["name"]), false, '', array(t('No'),t('Yes'))),
+			'$add_note' => t('Add a personal note:'),
+			'$page_desc' => "",
+			'$friendica' => "",
+			'$statusnet' => "",
+			'$diaspora' => "",
+			'$diasnote' => "",
+			'$your_address' => t('Your Identity Address:'),
+			'$invite_desc' => "",
+			'$emailnet' => "",
+			'$submit' => $submit,
+			'$cancel' => t('Cancel'),
+			'$nickname' => "",
+			'$name' => $ret["name"],
+			'$url' => $ret["url"],
+			'$zrl' => zrl($ret["url"]),
+			'$url_label' => t("Profile URL"),
+			'$myaddr' => $myaddr,
+			'$request' => $request,
+			'$location' => bbcode($r[0]["location"]),
+			'$location_label' => t("Location:"),
+			'$about' => bbcode($r[0]["about"], false, false),
+			'$about_label' => t("About:"),
+			'$keywords' => $r[0]["keywords"],
+			'$keywords_label' => t("Tags:")
 	));
 	return $o;
 }

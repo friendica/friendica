@@ -7,7 +7,7 @@
 	<div id="sidebar-group-list">
 		<ul>
 			{{foreach $groups as $group}}
-			<li class="tool  {{if $group.selected}}selected{{/if}}">
+			<li class="tool  {{if $group.selected}}selected{{/if}} group-{{$group.id}}">
 				<a href="{{$group.href}}" class="label">
 					{{$group.text}}
 				</a>
@@ -15,15 +15,16 @@
 					<a href="{{$group.edit.href}}" class="action"><span class="icon text s10 edit">{{$group.edit.title}}</span></a>
 				{{/if}}
 				{{if $group.cid}}
-					<input type="checkbox" 
-						class="{{if $group.selected}}ticked{{else}}unticked {{/if}} action" 
+					<input type="checkbox"
+						class="{{if $group.selected}}ticked{{else}}unticked {{/if}} action"
 						onclick="contactgroupChangeMember('{{$group.id}}','{{$group.cid}}');return true;"
 						{{if $group.ismember}}checked="checked"{{/if}}
 					/>
 				{{/if}}
+				<span class="notify"></span>
 			</li>
 			{{/foreach}}
 		</ul>
 	</div>
-</div>	
+</div>
 

@@ -1,5 +1,5 @@
 
-<h1>{{$header}}{{if $total}} ({{$total}}){{/if}}</h1>
+<h2>{{$header}}{{if $total}} ({{$total}}){{/if}}</h2>
 
 {{if $finding}}<h4>{{$finding}}</h4>{{/if}}
 

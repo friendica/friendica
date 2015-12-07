@@ -8,6 +8,8 @@ function directory_init(&$a) {
 
 		$a->page['aside'] .= findpeople_widget();
 
+		$a->page['aside'] .= follow_widget();
+
 	}
 	else {
 		unset($_SESSION['theme']);
@@ -31,7 +33,7 @@ function directory_content(&$a) {
 	require_once("mod/proxy.php");
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user()) || 
-                (get_config('system','block_local_dir')) && (! local_user()) && (! remote_user())) {
+		(get_config('system','block_local_dir')) && (! local_user()) && (! remote_user())) {
 		notice( t('Public access denied.') . EOL);
 		return;
 	}
@@ -44,26 +46,11 @@ function directory_content(&$a) {
 	else
 		$search = ((x($_GET,'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
 
-	$tpl = get_markup_template('directory_header.tpl');
-
-	$globaldir = '';
-	$gdirpath = get_config('system','directory');
-	if(strlen($gdirpath)) {
-		$globaldir = '<ul><li><div id="global-directory-link"><a href="'
-		. zrl($gdirpath,true) . '">' . t('Global Directory') . '</a></div></li></ul>';
+	$gdirpath = '';
+	$dirurl = get_config('system','directory');
+	if(strlen($dirurl)) {
+		$gdirpath = zrl($dirurl,true);
 	}
-
-	$admin = '';
-
-	$o .= replace_macros($tpl, array(
-		'$search' => $search,
-		'$globaldir' => $globaldir,
-		'$desc' => t('Find on this site'),
-		'$admin' => $admin,
-		'$finding' => (strlen($search) ? '<h4>' . t('Finding: ') . "'" . $search . "'" . '</h4>' : ""),
-		'$sitedir' => t('Site Directory'),
-		'$submit' => t('Find')
-	));
 
 	if($search) {
 		$search = dbesc($search);
@@ -159,32 +146,33 @@ function directory_content(&$a) {
 
 			$about = ((x($profile,'about') == 1) ?  t('About:') : False);
 
-			$tpl = get_markup_template('directory_item.tpl');
-
 			if($a->theme['template_engine'] === 'internal') {
 				$location_e = template_escape($location);
 			}
 			else {
 				$location_e = $location;
 			}
+			
+			$photo_menu = array(array(t("View Profile"), zrl($profile_link)));
 
-			$entry = replace_macros($tpl,array(
-				'$id' => $rr['id'],
-				'$profile_link' => $profile_link,
-				'$photo' => proxy_url($a->get_cached_avatar_image($rr[$photo])),
-				'$alt_text' => $rr['name'],
-				'$name' => $rr['name'],
-				'$details' => $pdesc . $details,
-				'$page_type' => $page_type,
-				'$profile' => $profile,
-				'$location' => $location_e,
-				'$gender'   => $gender,
-				'$pdesc'	=> $pdesc,
-				'$marital'  => $marital,
-				'$homepage' => $homepage,
-				'$about' => $about,
+			$entry = array(
+				'id' => $rr['id'],
+				'url' => $profile_link,
+				'thumb' => proxy_url($a->get_cached_avatar_image($rr[$photo]), false, PROXY_SIZE_THUMB),
+				'img_hover' => $rr['name'],
+				'name' => $rr['name'],
+				'details' => $pdesc . $details,
+				'page_type' => $page_type,
+				'profile' => $profile,
+				'location' => $location_e,
+				'gender'   => $gender,
+				'pdesc'	=> $pdesc,
+				'marital'  => $marital,
+				'homepage' => $homepage,
+				'about' => $about,
+				'photo_menu' => $photo_menu,
 
-			));
+			);
 
 			$arr = array('contact' => $rr, 'entry' => $entry);
 
@@ -193,12 +181,27 @@ function directory_content(&$a) {
 			unset($profile);
 			unset($location);
 
-			$o .= $entry;
+			if(! $arr['entry'])
+				continue;
+
+			$entries[] = $arr['entry'];
 
 		}
 
-		$o .= "<div class=\"directory-end\" ></div>\r\n";
-		$o .= paginate($a);
+		$tpl = get_markup_template('directory_header.tpl');
+
+		$o .= replace_macros($tpl, array(
+			'$search' => $search,
+			'$globaldir' => t('Global Directory'),
+			'$gdirpath' => $gdirpath,
+			'$desc' => t('Find on this site'),
+			'$contacts' => $entries,
+			'$finding' => t('Finding:'),
+			'$findterm' => (strlen($search) ? $search : ""),
+			'$title' => t('Site Directory'),
+			'$submit' => t('Find'),
+			'$paginate' => paginate($a),
+		));
 
 	}
 	else

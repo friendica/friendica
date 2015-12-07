@@ -1,6 +1,6 @@
 <?php
 
-define( 'UPDATE_VERSION' , 1188 );
+define( 'UPDATE_VERSION' , 1191 );
 
 /**
  *
@@ -1647,4 +1647,79 @@ function update_1180() {
 	proc_run('php',"include/tagupdate.php");
 
 	return UPDATE_SUCCESS;
+}
+
+function update_1188() {
+
+	if (strlen(get_config('system','directory_submit_url')) AND
+		!strlen(get_config('system','directory'))) {
+		set_config('system','directory', dirname(get_config('system','directory_submit_url')));
+		del_config('system','directory_submit_url');
+	}
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1190() {
+
+	require_once('include/plugin.php');
+
+	set_config('system', 'maintenance', 1);
+
+	if (plugin_enabled('forumlist')) {
+		$plugin = 'forumlist';
+		$plugins = get_config('system','addon');
+		$plugins_arr = array();
+
+		if($plugins) {
+			$plugins_arr = explode(",",str_replace(" ", "",$plugins));
+
+			$idx = array_search($plugin, $plugins_arr);
+			if ($idx !== false){
+				unset($plugins_arr[$idx]);
+				//delete forumlist manually from addon and hook table 
+				// since uninstall_plugin() don't work here
+				q("DELETE FROM `addon` WHERE `name` = 'forumlist' ");
+				q("DELETE FROM `hook` WHERE `file` = 'addon/forumlist/forumlist.php' ");
+				set_config('system','addon', implode(", ",$plugins_arr));
+			}
+		}
+	}
+
+	// select old formlist addon entries
+	$r = q("SELECT `uid`, `cat`, `k`, `v` FROM `pconfig` WHERE `cat` = '%s' ",
+		dbesc('forumlist')
+	);
+
+	// convert old forumlist addon entries in new config entries
+	if (count($r)) {
+		foreach ($r as $rr) {
+			$uid = $rr['uid'];
+			$family = $rr['cat'];
+			$key = $rr['k'];
+			$value = $rr['v'];
+
+			if ($key === 'randomise')
+				del_pconfig($uid,$family,$key);
+
+			if ($key === 'show_on_profile') {
+				if ($value)
+					set_pconfig($uid,feature,forumlist_profile,$value);
+
+				del_pconfig($uid,$family,$key);
+			}
+
+			if ($key === 'show_on_network') {
+				if ($value)
+					set_pconfig($uid,feature,forumlist_widget,$value);
+
+				del_pconfig($uid,$family,$key);
+			}
+		}
+	}
+
+	set_config('system', 'maintenance', 0);
+
+	return UPDATE_SUCCESS;
+
 }

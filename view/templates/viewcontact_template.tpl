@@ -1,5 +1,5 @@
 
-<h3>{{$title}}</h3>
+{{include file="section_title.tpl"}}
 
 {{foreach $contacts as $contact}}
 	{{include file="contact_template.tpl"}}

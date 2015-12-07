@@ -30,6 +30,7 @@ Friendica Documentation and Resources
 * [Settings](help/Settings)
 * [Plugins](help/Plugins)
 * [Installing Connectors (Twitter/GNU Social)](help/Installing-Connectors)
+* [Install an ejabberd server (XMPP chat) with synchronized credentials](help/install-ejabberd)
 * [Message Flow](help/Message-Flow)
 * [Using SSL with Friendica](help/SSL)
 * [Developers](help/Developers)

@@ -1,0 +1,218 @@
+/*
+ * Friendica ShaShape font by Andi Stadler, 2015
+ */
+
+@font-face {
+    font-family: 'ShaShape';
+    src: url('friendica_shashape.ttf') format('truetype');
+}
+.shashape {
+    font-family: ShaShape;
+    font-weight: normal;
+    font-style: normal;
+}
+.shashape.friendica:before {
+    content: "3";
+}
+.shashape.archive:before{
+    content: "a";
+}
+.shashape.base:before{
+    content: "b";
+}
+.shashape.cloud:before{
+    content: "c";
+}
+.shashape.download:before{
+    content: "d";
+}
+.shashape.event:before{
+    content: "e";
+}
+.shashape.friends:before{
+    content: "f";
+}
+.shashape.group:before{
+    content: "g";
+}
+.shashape.home:before{
+    content: "h";
+}
+.shashape.iglu:before{
+    content: "i";
+}
+.shashape.flag:before{
+    content: "j";
+}
+.shashape.star:before{
+    content: "k";
+}
+.shashape.star-full:before{
+    content: "l";
+}
+.shashape.message:before{
+    content: "m";
+}
+.shashape.network:before{
+    content: "n";
+}
+.shashape.settings:before{
+    content: "o";
+}
+.shashape.profile:before{
+    content: "p";
+}
+.shashape.skip:before{
+    content: "q";
+}
+.shashape.reload:before{
+    content: "r";
+}
+.shashape.search:before{
+    content: "s";
+}
+.shashape.time:before{
+    content: "t";
+}
+.shashape.undo:before{
+    content: "u";
+}
+.shashape.logout:before,
+.shashape.logged-in:before{
+    content: "v";
+}
+.shashape.login:before,
+.shashape.logged-out:before{
+    content: "w";
+}
+.shashape.delete:before{
+    content: "x";
+}
+.shashape.source:before{
+    content: "y";
+}
+.shashape.signature:before{
+    content: "z";
+}
+.shashape.like:before{
+    content: "A";
+}
+.shashape.hesitate:before{
+    content: "B";
+}
+.shashape.unlike:before,
+.shashape.nolike:before{
+    content: "C";
+}
+/* uppercase D is not defined at the moment
+ .shashape.hash:before{
+    content: "D";
+} */
+.shashape.arrow7:before{
+    content: "E";
+}
+.shashape.follow:before{
+    content: "F";
+}
+.shashape.follower:before{
+    content: "G";
+}
+.shashape.hand:before{
+    content: "H";
+}
+.shashape.help:before{
+    content: "I";
+}
+.shashape.arrow-leftright:before{
+    content: "J";
+}
+.shashape.arrow-updown:before{
+    content: "K";
+}
+/* uppercase L is not defined at the moment
+.shashape.lock:before{
+    content: "L";
+} */
+.shashape.arrow-left:before{
+    content: "M";
+}
+.shashape.arrow-right:before{
+    content: "N";
+}
+.shashape.setting2:before,
+.shashape.admin:before{
+    content: "O";
+}
+.shashape.arrow-down:before{
+    content: "P";
+}
+.shashape.arrow-up:before{
+    content: "Q";
+}
+.shashape.request:before{
+    content: "R";
+}
+.shashape.arrow-up2:before{
+    content: "S";
+}
+.shashape.arrow-down2:before{
+    content: "T";
+}
+.shashape.arrow-left2:before{
+    content: "U";
+}
+.shashape.arrow-right2:before{
+    content: "V";
+}
+.shashape.arrow-updown2:before{
+    content: "W";
+}
+.shashape.arrow-leftright2:before{
+    content: "X";
+}
+.shashape.arrow-leftright3:before{
+    content: "Y";
+}
+.shashape.arrow-updown3:before{
+    content: "Z";
+}
+.shashape.hash:before{
+    content: "/";
+}
+.shashape.tag:before{
+    content: "=";
+}
+.shashape.lock-open:before{
+    content: "?";
+}
+.shashape.lock-closed:before{
+    content: ")";
+}
+.shashape.yes:before{
+    content: "+";
+}
+.shashape.hmm:before{
+    content: ",";
+}
+.shashape.no:before{
+    content: "-";
+}
+.shashape.blank:before{
+    content: ".";
+}
+.shashape.see:before{
+    content: ":";
+}
+.shashape.blind:before{
+    content: ";";
+}
+.shashape.edit:before{
+    content: "<";
+}
+.shashape.stamp:before{
+    content: ">";
+}
+.shashape.heart:before{
+    content: "_";
+}
+

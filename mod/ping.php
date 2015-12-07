@@ -33,6 +33,7 @@ function ping_init(&$a) {
 
 		$home = 0;
 		$network = 0;
+		$network_group = array();
 
 		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`wall`, `item`.`author-name`,
 				`item`.`contact-id`, `item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object`,
@@ -40,8 +41,9 @@ function ping_init(&$a) {
 				FROM `item` INNER JOIN `item` as `pitem` ON  `pitem`.`id`=`item`.`parent`
 				WHERE `item`.`unseen` = 1 AND `item`.`visible` = 1 AND
 				 `item`.`deleted` = 0 AND `item`.`uid` = %d AND `pitem`.`parent` != 0
+				AND `item`.`contact-id` != %d
 				ORDER BY `item`.`created` DESC",
-			intval(local_user())
+			intval(local_user()), intval(local_user())
 		);
 
 		if(count($r)) {
@@ -82,6 +84,22 @@ function ping_init(&$a) {
 						}
 				}
 			}
+		}
+
+		if ( $network )
+		{
+			# Find out how unseen network posts are spread across groups
+			$sql = "SELECT g.id, g.name, count(i.id) count " .
+				"FROM `group` g, group_member gm, item i " .
+				"WHERE g.uid = %d " .
+				"AND i.uid = %d " .
+				"AND i.unseen AND i.visible " .
+				"AND NOT i.deleted " .
+				"AND i.`contact-id` = gm.`contact-id` " .
+				"AND gm.gid = g.id GROUP BY g.id";
+			#echo '<SQL id="' . intval(local_user()) . '">' . $sql . '</SQL>';
+			$network_group = q($sql, intval(local_user()), intval(local_user()));
+			#echo '<COUNT R="' . count($network_group) . '"/>';
 		}
 
 		$intros1 = q("SELECT  `intro`.`id`, `intro`.`datetime`,
@@ -173,7 +191,7 @@ function ping_init(&$a) {
 		 *		'message' => notification message. "{0}" will be replaced by subject name
 		 **/
 		function xmlize($n){
-			$n['photo'] = proxy_url($n['photo']);
+			$n['photo'] = proxy_url($n['photo'], false, PROXY_SIZE_MICRO);
 
 			$n['message'] = html_entity_decode($n['message'], ENT_COMPAT | ENT_HTML401, "UTF-8");
 			$n['name'] = html_entity_decode($n['name'], ENT_COMPAT | ENT_HTML401, "UTF-8");
@@ -186,8 +204,8 @@ function ping_init(&$a) {
 			if ($a->is_friendica_app() OR !$regularnotifications)
 				$n['message'] = str_replace("{0}", $n['name'], $n['message']);
 
-			$local_time = datetime_convert('UTC',date_default_timezone_get(),$n['date']); 
-				
+			$local_time = datetime_convert('UTC',date_default_timezone_get(),$n['date']);
+
 			call_hooks('ping_xmlize', $n);
 			$notsxml = '<note href="%s" name="%s" url="%s" photo="%s" date="%s" seen="%s" timestamp="%s" >%s</note>'."\n";
 			return sprintf ( $notsxml,
@@ -202,6 +220,13 @@ function ping_init(&$a) {
 				<net>$network</net>
 				<home>$home</home>\r\n";
 		if ($register!=0) echo "<register>$register</register>";
+		if ( count($network_group) ) {
+			echo '<groups>';
+			foreach ($network_group as $it) {
+				echo '<group id="' . $it['id'] . '">' . $it['count'] . "</group>";
+			}
+			echo "</groups>";
+		}
 
 		echo "<all-events>$all_events</all-events>
 			<all-events-today>$all_events_today</all-events-today>
@@ -226,41 +251,41 @@ function ping_init(&$a) {
 				$n = array(
 					'href' => $a->get_baseurl().'/notifications/intros/'.$i['id'],
 					'name' => $i['name'],
-					'url' => $i['url'], 
+					'url' => $i['url'],
 					'photo' => $i['photo'],
 					'date' => $i['datetime'],
 					'seen' => false,
-					'message' => t("{0} wants to be your friend"),				
+					'message' => t("{0} wants to be your friend"),
 				);
 				$notifs[] = $n;
 			}
 		}
-		
+
 		if ($mail>0){
 			foreach ($mails as $i) {
 				$n = array(
 					'href' => $a->get_baseurl().'/message/'.$i['id'],
 					'name' => $i['from-name'],
-					'url' => $i['from-url'], 
+					'url' => $i['from-url'],
 					'photo' => $i['from-photo'],
 					'date' => $i['created'],
 					'seen' => false,
-					'message' => t("{0} sent you a message"),				
+					'message' => t("{0} sent you a message"),
 				);
 				$notifs[] = $n;
 			}
 		}
-		
+
 		if ($register>0){
 			foreach ($regs as $i) {
 				$n = array(
 					'href' => $a->get_baseurl().'/admin/users/',
 					'name' => $i['name'],
-					'url' => $i['url'], 
+					'url' => $i['url'],
 					'photo' => $i['micro'],
 					'date' => $i['created'],
 					'seen' => false,
-					'message' => t("{0} requested registration"),				
+					'message' => t("{0} requested registration"),
 				);
 				$notifs[] = $n;
 			}
@@ -339,7 +364,7 @@ function ping_get_notifications($uid) {
 			$quit = true;
 		else
 			$offset += 50;
-			
+
 
 		foreach ($r AS $notification) {
 			if (is_null($notification["visible"]))
@@ -362,7 +387,7 @@ function ping_get_notifications($uid) {
 				$notification["message"] = substr_replace($notification["message"],"{0}",$pos,strlen($notification["name"]));
 
 			$notification['href'] = $a->get_baseurl() . '/notify/view/' . $notification['id'];
-				
+
 			if ($notification["visible"] AND !$notification["spam"] AND
 				!$notification["deleted"] AND !is_array($result[$notification["parent"]])) {
 				$result[$notification["parent"]] = $notification;
@@ -371,6 +396,6 @@ function ping_get_notifications($uid) {
 
 	} while ((count($result) < 50) AND !$quit);
 
-	
+
 	return($result);
 }

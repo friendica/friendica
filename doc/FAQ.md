@@ -87,8 +87,8 @@ However their conversations with your friends will still be visible in your stre
 If you remove a contact completely, they can send you another friend request.
 Blocked contacts cannot do this. They cannot communicate with you directly, only through friends.
 
-**Ignored contacts** are included in delivery - they will receive your posts.
-However we do not import their posts to you.
+**Ignored contacts** are included in delivery - they will receive your posts and private messages.
+However we do not import their posts or private messages to you.
 Like blocking, you will still see this person's comments to posts made by your friends.
 
 A plugin called "blockem" can be installed to collapse/hide all posts from a particular person in your stream if you desire complete blocking of an individual, including his/her conversations with your other friends.

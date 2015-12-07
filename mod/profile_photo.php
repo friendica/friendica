@@ -79,7 +79,7 @@ function profile_photo_post(&$a) {
 				$im->scaleImage(80);
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 5, $is_default_profile);
-			
+
 				if($r === false)
 					notice( sprintf(t('Image size reduction [%s] failed.'),"80") . EOL );
 
@@ -97,11 +97,17 @@ function profile_photo_post(&$a) {
 						dbesc($base_image['resource-id']),
 						intval(local_user())
 					);
-				}
-				else {
+
+					$r = q("UPDATE `contact` SET `photo` = '%s', `thumb` = '%s', `micro` = '%s'  WHERE `self` AND `uid` = %d",
+						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
+						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
+						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-6.' . $im->getExt()),
+						intval(local_user())
+					);
+				} else {
 					$r = q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4'),
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5'),
+						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
+						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
 						intval($_REQUEST['profile']),
 						intval(local_user())
 					);

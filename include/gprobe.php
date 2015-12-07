@@ -47,7 +47,7 @@ function gprobe_run(&$argv, &$argc){
 		$result = Cache::get("gprobe:".$urlparts["host"]);
 		if (!is_null($result)) {
 			$result = unserialize($result);
-			if ($result["network"] == NETWORK_FEED) {
+			if (in_array($result["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
 				logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
 				return;
 			}

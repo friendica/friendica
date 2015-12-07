@@ -1,0 +1,58 @@
+/***
+ * Friendica Communcation Server
+ *
+ * This is the static css for the install procedure
+ */
+
+body {
+	background-color: #FFF;
+	max-width: 750px;
+	margin: 0 auto;
+}
+
+section {
+    background-color: rgb(252, 252, 252);
+    padding: 0.5em 2em;
+}
+
+h1 img {
+	vertical-align: sub;
+}
+
+td {
+	padding: 0.2em;
+	border-bottom: 1px solid rgb(238, 238, 238);
+}
+td.help {
+	border-width: 0px 0px 2px 2px;
+	border-style: solid;
+	border-color: #000;
+	background: transparent url("/friendica/view/install/info.png") no-repeat scroll 5px 5px;
+}
+td.help blockquote {
+	margin-left: 60px;
+}
+input[type="submit"] {
+	margin: 2em 0;
+}
+
+tt {
+	background-color: rgb(238, 238, 238);
+	padding: 0.1em 0.2em;
+}
+
+.field {
+	margin-bottom: 0.5em;
+}
+.field label,
+.field input, .field select, .field textarea {
+    width: 100%;
+    display: block;
+}
+.field .field_help {
+	color: #999;
+	text-align: right;
+	width: 100%;
+	display: block;
+	font-size: 0.8em;
+}

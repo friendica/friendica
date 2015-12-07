@@ -1,5 +1,6 @@
 <?php
 require_once('include/Photo.php');
+require_once('include/photos.php');
 require_once('include/items.php');
 require_once('include/acl_selectors.php');
 require_once('include/bbcode.php');
@@ -17,6 +18,8 @@ function photos_init(&$a) {
 		return;
 	}
 
+	nav_set_selected('home');
+
 	$o = '';
 
 	if($a->argc > 1) {
@@ -30,6 +33,7 @@ function photos_init(&$a) {
 
 		$a->data['user'] = $r[0];
 		$a->profile_uid = $r[0]['uid'];
+		$is_owner = (local_user() && (local_user() == $a->profile_uid));
 
 		$profilephoto = $a->get_cached_avatar_image($a->get_baseurl() . '/photo/profile/' . $a->data['user']['uid'] . '.jpg');
 
@@ -62,6 +66,9 @@ function photos_init(&$a) {
 
 			$ret['albums'] = array();
 			foreach($albums as $k => $album) {
+				//hide profile photos to others
+				if((! $is_owner) && (! remote_user()) && ($album['album'] == t('Profile Photos')))
+					continue;
 				$entry = array(
 					'text'      => $album['album'],
 					'total'     => $album['total'],
@@ -194,6 +201,10 @@ function photos_post(&$a) {
 			goaway($a->get_baseurl() . '/' . $_SESSION['photo_return']);
 		}
 
+		/*
+		 * RENAME photo album
+		 */
+
 		$newalbum = notags(trim($_POST['albumname']));
 		if($newalbum != $album) {
 			q("UPDATE `photo` SET `album` = '%s' WHERE `album` = '%s' AND `uid` = %d",
@@ -206,6 +217,9 @@ function photos_post(&$a) {
 			return; // NOTREACHED
 		}
 
+		/*
+		 * DELETE photo album and all its photos
+		 */
 
 		if($_POST['dropalbum'] == t('Delete Album')) {
 
@@ -534,12 +548,12 @@ function photos_post(&$a) {
 							if(count($links)) {
 								foreach($links as $link) {
 									if($link['@attributes']['rel'] === 'http://webfinger.net/rel/profile-page')
-        		            			$profile = $link['@attributes']['href'];
+										$profile = $link['@attributes']['href'];
 									if($link['@attributes']['rel'] === 'salmon') {
 										$salmon = '$url:' . str_replace(',','%sc',$link['@attributes']['href']);
 										if(strlen($inform))
 											$inform .= ',';
-                    					$inform .= $salmon;
+							$inform .= $salmon;
 									}
 								}
 							}
@@ -833,7 +847,7 @@ function photos_post(&$a) {
 		killme();
 	}
 
-	$ph->orient($src);
+	$exif = $ph->orient($src);
 	@unlink($src);
 
 	$max_length = get_config('system','max_image_length');
@@ -874,7 +888,19 @@ function photos_post(&$a) {
 
 	// Create item container
 
+	$lat = $lon = null;
+
+	if($exif && $exif['GPS']) {
+		if(feature_enabled($channel_id,'photo_location')) {
+			$lat = getGps($exif['GPS']['GPSLatitude'], $exif['GPS']['GPSLatitudeRef']);
+			$lon = getGps($exif['GPS']['GPSLongitude'], $exif['GPS']['GPSLongitudeRef']);
+		}
+	}
+
 	$arr = array();
+
+	if($lat && $lon)
+		$arr['coord'] = $lat . ' ' . $lon;
 
 	$arr['uid']           = $page_owner_uid;
 	$arr['uri']           = $uri;
@@ -1059,13 +1085,12 @@ function photos_content(&$a) {
 	$o = "";
 
 	// tabs
-	$_is_owner = (local_user() && (local_user() == $owner_uid));
-	$o .= profile_tabs($a,$_is_owner, $a->data['user']['nickname']);
+	$is_owner = (local_user() && (local_user() == $owner_uid));
+	$o .= profile_tabs($a,$is_owner, $a->data['user']['nickname']);
 
-	//
-	// dispatch request
-	//
-
+	/**
+	 * Display upload form
+	 */
 
 	if($datatype === 'upload') {
 		if(! ($can_post)) {
@@ -1176,6 +1201,10 @@ function photos_content(&$a) {
 		return $o;
 	}
 
+	/*
+	 * Display a single photo album
+	 */
+
 	if($datatype === 'album') {
 
 		$album = hex2bin($datum);
@@ -1203,6 +1232,7 @@ function photos_content(&$a) {
 			intval($a->pager['itemspage'])
 		);
 
+		//edit album name
 		if($cmd === 'edit') {
 			if(($album !== t('Profile Photos')) && ($album !== 'Contact Photos') && ($album !== t('Contact Photos'))) {
 				if($can_post) {
@@ -1290,10 +1320,11 @@ function photos_content(&$a) {
 
 	}
 
+	/** 
+	 * Display one photo
+	 */
 
 	if($datatype === 'image') {
-
-
 
 		//$o = '';
 		// fetch image, item containing image, then comments
@@ -1418,6 +1449,9 @@ function photos_content(&$a) {
 		$linked_items = q("SELECT * FROM `item` WHERE `resource-id` = '%s' $sql_extra LIMIT 1",
 			dbesc($datum)
 		);
+
+		$map = null;
+
 		if(count($linked_items)) {
 			$link_item = $linked_items[0];
 			$r = q("SELECT COUNT(*) AS `total`
@@ -1460,6 +1494,10 @@ function photos_content(&$a) {
 					intval(local_user())
 				);
 				update_thread($link_item['parent']);
+			}
+
+			if($link_item['coord']) {
+				$map = generate_map($link_item['coord']);
 			}
 		}
 
@@ -1597,18 +1635,22 @@ function photos_content(&$a) {
 			$like = '';
 			$dislike = '';
 
+			$conv_responses = array(
+				'like' => array('title' => t('Likes','title')),'dislike' => array('title' => t('Dislikes','title')),
+				'attendyes' => array('title' => t('Attending','title')), 'attendno' => array('title' => t('Not attending','title')), 'attendmaybe' => array('title' => t('Might attend','title'))
+			);
+
 
 
 			// display comments
 			if(count($r)) {
 
 				foreach($r as $item) {
-					like_puller($a,$item,$alike,'like');
-					like_puller($a,$item,$dlike,'dislike');
+					builtin_activity_puller($item, $conv_responses);
 				}
 
-				$like    = ((isset($alike[$link_item['id']])) ? format_like($alike[$link_item['id']],$alike[$link_item['id'] . '-l'],'like',$link_item['id']) : '');
-				$dislike = ((isset($dlike[$link_item['id']])) ? format_like($dlike[$link_item['id']],$dlike[$link_item['id'] . '-l'],'dislike',$link_item['id']) : '');
+				$like    = ((x($conv_responses['like'],$link_item['uri'])) ? format_like($conv_responses['like'][$link_item['uri']],$conv_responses['like'][$link_item['uri'] . '-l'],'like',$link_item['id']) : '');
+				$dislike = ((x($conv_responses['dislike'],$link_item['uri'])) ? format_like($conv_responses['dislike'][$link_item['uri']],$conv_responses['dislike'][$link_item['uri'] . '-l'],'dislike',$link_item['id']) : '');
 
 
 
@@ -1727,6 +1769,12 @@ function photos_content(&$a) {
 			$paginate = paginate($a);
 		}
 
+
+		$response_verbs = array('like');
+		if(feature_enabled($owner_uid,'dislike'))
+			$response_verbs[] = 'dislike';
+		$responses = get_responses($conv_responses,$response_verbs,'',$link_item);
+
 		$photo_tpl = get_markup_template('photo_view.tpl');
 
 		if($a->theme['template_engine'] === 'internal') {
@@ -1753,9 +1801,12 @@ function photos_content(&$a) {
 			'$desc' => $ph[0]['desc'],
 			'$tags' => $tags_e,
 			'$edit' => $edit,
+			'$map' => $map,
+			'$map_text' => t('Map'),
 			'$likebuttons' => $likebuttons,
 			'$like' => $like_e,
 			'$dislike' => $dikslike_e,
+			'responses' => $responses,
 			'$comments' => $comments,
 			'$paginate' => $paginate,
 		));
@@ -1799,6 +1850,10 @@ function photos_content(&$a) {
 	if(count($r)) {
 		$twist = 'rotright';
 		foreach($r as $rr) {
+			//hide profile photos to others
+			if((! $is_owner) && (! remote_user()) && ($rr['album'] == t('Profile Photos')))
+					continue;
+			
 			if($twist == 'rotright')
 				$twist = 'rotleft';
 			else
@@ -1815,8 +1870,8 @@ function photos_content(&$a) {
 			}
 
 			$photos[] = array(
-				'id'       => $rr['id'],
-				'twist'    => ' ' . $twist . rand(2,4),
+				'id'		=> $rr['id'],
+				'twist'		=> ' ' . $twist . rand(2,4),
 				'link'  	=> $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id'],
 				'title' 	=> t('View Photo'),
 				'src'     	=> $a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . ((($rr['scale']) == 6) ? 4 : $rr['scale']) . '.' . $ext,

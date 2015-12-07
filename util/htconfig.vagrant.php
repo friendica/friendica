@@ -70,3 +70,9 @@ $a->config['system']['no_regfullname'] = true;
 
 // Location of the global directory
 $a->config['system']['directory'] = 'http://dir.friendi.ca';
+
+// turn on friendica's log
+$a->config['system']['debugging'] = true;
+$a->config['system']['logfile'] = 'logfile.out';
+$a->config['system']['loglevel'] = LOGGER_DEBUG;
+

@@ -145,6 +145,10 @@ aside {
   height: calc(100% - 54px);
 }
 
+right_aside {
+  top: 44px;
+}
+
 section {
   top: 44px;
 }

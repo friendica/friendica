@@ -32,11 +32,13 @@ Friendica - Dokumentation und Ressourcen
 * [Konfigurationen](help/Settings)
 * [Plugins](help/Plugins)
 * [Konnektoren (Connectors) installieren (Twitter/GNU Social)](help/Installing-Connectors)
+* [Installation eines ejabberd Servers (XMPP-Chat) mit synchronisierten Anmeldedaten](help/install-ejabberd) (EN)
 * [Nachrichtenfluss](help/Message-Flow)
 * [Betreibe deine Seite mit einem SSL-Zertifikat](help/SSL)
 * [Entwickler](help/Developers)
 * [Twitter/GNU Social API Functions](help/api) (EN)
 * [Translation of Friendica](help/translations) (EN)
+* [Konfigurationswerte, die nur in der .htconfig.php gesetzt werden können](help/htconfig) (EN)
 
 **Entwickler Dokumentation**
 
@@ -58,4 +60,5 @@ Friendica - Dokumentation und Ressourcen
 **Über diese Seite**
 
 * [Seite/Friendica-Version](friendica)
+* [Mitwirkenden bei Friendica](credits)
 

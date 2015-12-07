@@ -157,7 +157,7 @@ function oembed_format_object($j){
 		case "rich": {
 			// not so safe..
 			if (!get_config("system","no_oembed_rich_content"))
-				$ret.= $jhtml;
+				$ret.= proxy_parse_html($jhtml);
 		}; break;
 	}
 

@@ -642,6 +642,7 @@ function db_definition() {
 					"gender" => array("type" => "varchar(32)", "not null" => "1", "default" => ""),
 					"community" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"network" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"addr" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"generation" => array("type" => "tinyint(3)", "not null" => "1", "default" => "0"),
 					"server_url" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					),
@@ -1380,6 +1381,20 @@ function db_definition() {
 			"indexes" => array(
 					"PRIMARY" => array("id"),
 					"username" => array("username"),
+					)
+			);
+	$database["workerqueue"] = array(
+			"fields" => array(
+					"id" => array("type" => "int(11)", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
+					"parameter" => array("type" => "text", "not null" => "1"),
+					"priority" => array("type" => "tinyint(3) unsigned", "not null" => "1", "default" => "0"),
+					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
+					"pid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
+					"executed" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
+					),
+			"indexes" => array(
+					"PRIMARY" => array("id"),
+					"created" => array("created"),
 					)
 			);
 

@@ -95,10 +95,29 @@ function search_content(&$a) {
 	}
 
 	if(get_config('system','local_search') AND !local_user()) {
-		notice(t('Public access denied.').EOL);
-		return;
-		//http_status_exit(403);
-		//killme();
+		http_status_exit(403,
+				array("title" => t("Public access denied."),
+					"description" => t("Only logged in users are permitted to perform a search.")));
+		killme();
+		//notice(t('Public access denied.').EOL);
+		//return;
+	}
+
+	if (get_config('system','permit_crawling') AND !local_user()) {
+		// To-Do:
+		// - 10 requests are "free", after the 11th only a call per minute is allowed
+
+		$remote = $_SERVER["REMOTE_ADDR"];
+		$result = Cache::get("remote_search:".$remote);
+		if (!is_null($result)) {
+			if ($result > (time() - 60)) {
+				http_status_exit(429,
+						array("title" => t("Too Many Requests"),
+							"description" => t("Only one search per minute is permitted for not logged in users.")));
+				killme();
+			}
+		}
+		Cache::set("remote_search:".$remote, time(), CACHE_HOUR);
 	}
 
 	nav_set_selected('search');

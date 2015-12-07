@@ -13,12 +13,18 @@ function wall_attach_post(&$a) {
 			dbesc($nick)
 		);
 		if(! count($r)){
-			if ($r_json) { echo json_encode(['error'=>t('Invalid request.')]); killme(); }
+			if ($r_json) {
+                            echo json_encode(array('error'=>t('Invalid request.')));
+                            killme();
+                        }
 			return;
         }
 
 	} else {
-		if ($r_json) { echo json_encode(['error'=>t('Invalid request.')]); killme(); }
+		if ($r_json) {
+                    echo json_encode(array('error'=>t('Invalid request.')));
+                    killme();
+                }
 		return;
     }
 
@@ -57,13 +63,18 @@ function wall_attach_post(&$a) {
 		}
 	}
 	if(! $can_post) {
-		if ($r_json) { echo json_encode(['error'=>t('Permission denied.')]); killme(); }
+		if ($r_json) {
+                    echo json_encode(array('error'=>t('Permission denied.')));
+                    killme();
+                }
 		notice( t('Permission denied.') . EOL );
 		killme();
 	}
 
 	if(! x($_FILES,'userfile')) {
-		if ($r_json) { echo json_encode(['error'=>t('Invalid request.')]); killme(); }
+		if ($r_json) {
+                    echo json_encode(array('error'=>t('Invalid request.')));
+                }
 		killme();
 	}
 
@@ -82,7 +93,7 @@ function wall_attach_post(&$a) {
 	if($filesize <=0) {
 		$msg = t('Sorry, maybe your upload is bigger than the PHP configuration allows') . EOL .(t('Or - did you try to upload an empty file?'));
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(array('error'=>$msg));
 		} else {
 			notice( $msg. EOL );
 		}
@@ -93,7 +104,7 @@ function wall_attach_post(&$a) {
 	if(($maxfilesize) && ($filesize > $maxfilesize)) {
 		$msg = sprintf(t('File exceeds size limit of %s'), formatBytes($maxfilesize));
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(array('error'=>$msg));
 		} else {
 			echo  $msg. EOL ;
 		}
@@ -110,7 +121,7 @@ function wall_attach_post(&$a) {
 	if(($limit !== false) && (($r[0]['total'] + strlen($imagedata)) > $limit)) {
 		$msg = upgrade_message(true);
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(array('error'=>$msg));
 		} else {
 			echo  $msg. EOL ;
 		}
@@ -144,7 +155,7 @@ function wall_attach_post(&$a) {
 	if(! $r) {
 		$msg =  t('File upload failed.');
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(array('error'=>$msg));
 		} else {
 			echo  $msg. EOL ;
 		}
@@ -160,14 +171,17 @@ function wall_attach_post(&$a) {
 	if(! count($r)) {
 		$msg = t('File upload failed.');
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(array('error'=>$msg));
 		} else {
 			echo  $msg. EOL ;
 		}
 		killme();
 	}
 
-	if ($r_json) { echo json_encode(['ok'=>true]); killme(); }
+	if ($r_json) {
+            echo json_encode(array('ok'=>true));
+            killme();
+        }
 
 	$lf = "\n";
 

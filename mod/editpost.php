@@ -93,15 +93,14 @@ function editpost_content(&$a) {
 		$jotnets .= '<div class="profile-jot-net"><input type="checkbox" name="pubmail_enable"' . $selected . ' value="1" /> '
           	. t("Post to Email") . '</div>';
 	}*/
-					
+
 
 
 	call_hooks('jot_tool', $jotplugins);
 	//call_hooks('jot_networks', $jotnets);
 
 	
-	//$tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));	
-	
+	//$tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));
 
 	$o .= replace_macros($tpl,array(
 		'$return_path' => $_SESSION['return_url'],

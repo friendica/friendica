@@ -1,0 +1,12 @@
+#nav-user-linklabel {
+  display: none;
+}
+
+nav ul li .menu-popup {
+  left: auto;
+  right: 0px;
+}
+
+nav #search-box #search-text {
+  width: 100px;
+}

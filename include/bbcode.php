@@ -2,7 +2,23 @@
 require_once("include/oembed.php");
 require_once('include/event.php');
 require_once('include/map.php');
+require_once('mod/proxy.php');
 
+function bb_PictureCacheExt($matches) {
+	if (strpos($matches[3], "data:image/") === 0)
+		return ($matches[0]);
+
+	$matches[3] = proxy_url($matches[3]);
+	return "[img=".$matches[1]."x".$matches[2]."]".$matches[3]."[/img]";
+}
+
+function bb_PictureCache($matches) {
+	if (strpos($matches[1], "data:image/") === 0)
+		return ($matches[0]);
+
+	$matches[1] = proxy_url($matches[1]);
+	return "[img]".$matches[1]."[/img]";
+}
 
 function bb_map_coords($match) {
 	// the extra space in the following line is intentional
@@ -101,9 +117,9 @@ function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 					$text = $oembed;
 				else {
 					if (($image != "") AND !strstr(strtolower($oembed), "<img "))
-						$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $url, $image, $title);
+						$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $url, proxy_url($image), $title);
 					elseif (($preview != "") AND !strstr(strtolower($oembed), "<img "))
-						$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $url, $preview, $title);
+						$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $url, proxy_url($preview), $title);
 
 					$text .= $oembed;
 
@@ -455,7 +471,7 @@ function bb_replace_images($body, $images) {
 		// We're depending on the property of 'foreach' (specified on the PHP website) that
 		// it loops over the array starting from the first element and going sequentially
 		// to the last element
-		$newbody = str_replace('[$#saved_image' . $cnt . '#$]', '<img src="' . $image .'" alt="' . t('Image/photo') . '" />', $newbody);
+		$newbody = str_replace('[$#saved_image' . $cnt . '#$]', '<img src="' . proxy_url($image) .'" alt="' . t('Image/photo') . '" />', $newbody);
 		$cnt++;
 	}
 
@@ -585,7 +601,7 @@ function bb_ShareAttributes($share, $simplehtml) {
 		default:
 			$headline = trim($share[1]).'<div class="shared_header">';
 			if ($avatar != "")
-				$headline .= '<img src="'.$avatar.'" height="32" width="32" >';
+				$headline .= '<img src="'.proxy_url($avatar, false, PROXY_SIZE_MICRO).'" height="32" width="32" >';
 
 			$headline .= sprintf(t('<span><a href="%s" target="_blank">%s</a> wrote the following <a href="%s" target="_blank">post</a>'.$reldate.':</span>'), $profile, $author, $link);
 			$headline .= "</div>";
@@ -1102,13 +1118,17 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 				     "<br /><strong class=".'"author"'.">" . $t_wrote . "</strong><blockquote>$2</blockquote>",
 				     $Text);
 
+
 	// [img=widthxheight]image source[/img]
-	//$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="height: $2px; width: $1px;" >', $Text);
+	$Text = preg_replace_callback("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", 'bb_PictureCacheExt', $Text);
+
 	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="width: $1px;" >', $Text);
 	$Text = preg_replace("/\[zmg\=([0-9]*)x([0-9]*)\](.*?)\[\/zmg\]/ism", '<img class="zrl" src="$3" style="width: $1px;" >', $Text);
 
 	// Images
 	// [img]pathtoimage[/img]
+	$Text = preg_replace_callback("/\[img\](.*?)\[\/img\]/ism", 'bb_PictureCache', $Text);
+
 	$Text = preg_replace("/\[img\](.*?)\[\/img\]/ism", '<img src="$1" alt="' . t('Image/photo') . '" />', $Text);
 	$Text = preg_replace("/\[zmg\](.*?)\[\/zmg\]/ism", '<img src="$1" alt="' . t('Image/photo') . '" />', $Text);
 
@@ -1190,7 +1210,7 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	// start which is always required). Allow desc with a missing summary for compatibility.
 
 	if((x($ev,'desc') || x($ev,'summary')) && x($ev,'start')) {
-		$sub = format_event_html($ev);
+		$sub = format_event_html($ev, $simplehtml);
 
 		$Text = preg_replace("/\[event\-summary\](.*?)\[\/event\-summary\]/ism",'',$Text);
 		$Text = preg_replace("/\[event\-description\](.*?)\[\/event\-description\]/ism",'',$Text);

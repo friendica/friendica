@@ -108,7 +108,7 @@ class exAuth
 								// ovdje provjeri je li korisnik OK
 								$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
 								$this->writeDebugLog("[debug] checking isuser for ". $sUser);
-								$sQuery = "select * from user where nickname='". $db->escape($sUser) ."'";
+								$sQuery = "SELECT `uid` FROM `user` WHERE `nickname`='". $db->escape($sUser) ."'";
 								$this->writeDebugLog("[debug] using query ". $sQuery);
 								if ($oResult = q($sQuery)){
 									if ($oResult) {
@@ -120,7 +120,7 @@ class exAuth
 										$this->writeLog("[exAuth] invalid user: ". $sUser);
 										fwrite(STDOUT, pack("nn", 2, 0));
 									}
-									$oResult->close();
+									//$oResult->close();
 								} else {
 									$this->writeLog("[MySQL] invalid query: ". $sQuery);
 									fwrite(STDOUT, pack("nn", 2, 0));
@@ -136,10 +136,14 @@ class exAuth
 								// ovdje provjeri prijavu
 								$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
 								$this->writeDebugLog("[debug] doing auth for ". $sUser);
-								$sQuery = "select * from user where password='".hash('whirlpool',$aCommand[3])."' and nickname='". $db->escape($sUser) ."'";
+								//$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `password`='".hash('whirlpool',$aCommand[3])."' AND `nickname`='". $db->escape($sUser) ."'";
+								$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `nickname`='". $db->escape($sUser) ."'";
 								$this->writeDebugLog("[debug] using query ". $sQuery);
 								if ($oResult = q($sQuery)){
-									if ($oResult) {
+									$uid = $oResult[0]["uid"];
+									$Error = ($oResult[0]["password"] != hash('whirlpool',$aCommand[3]));
+/*
+									if ($oResult[0]["password"] == hash('whirlpool',$aCommand[3])) {
 										// korisnik OK
 										$this->writeLog("[exAuth] authentificated user ". $sUser ."@". $aCommand[2]);
 										fwrite(STDOUT, pack("nn", 2, 1));
@@ -149,9 +153,24 @@ class exAuth
 										fwrite(STDOUT, pack("nn", 2, 0));
 									}
 									$oResult->close();
+*/
 								} else {
 									$this->writeLog("[MySQL] invalid query: ". $sQuery);
+									$Error = true;
+									$uid = -1;
+								}
+								if ($Error) {
+									$oConfig = q("SELECT `v` FROM `pconfig` WHERE `uid`=%d AND `cat` = 'xmpp' AND `k`='password' LIMIT 1;", intval($uid));
+									$this->writeLog("[exAuth] got password ".$oConfig[0]["v"]);
+									$Error = ($aCommand[3] != $oConfig[0]["v"]);
+								}
+
+								if ($Error) {
+									$this->writeLog("[exAuth] authentification failed for user ". $sUser ."@". $aCommand[2]);
 									fwrite(STDOUT, pack("nn", 2, 0));
+								} else {
+									$this->writeLog("[exAuth] authentificated user ". $sUser ."@". $aCommand[2]);
+									fwrite(STDOUT, pack("nn", 2, 1));
 								}
 							}
 						break;

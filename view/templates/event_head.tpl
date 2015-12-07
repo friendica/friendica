@@ -1,7 +1,7 @@
 
 <link rel='stylesheet' type='text/css' href='{{$baseurl}}/library/fullcalendar/fullcalendar.css' />
 <script language="javascript" type="text/javascript"
-          src="{{$baseurl}}/library/fullcalendar/fullcalendar.min.js"></script>
+	  src="{{$baseurl}}/library/fullcalendar/fullcalendar.min.js"></script>
 
 <script>
 	function showEvent(eventid) {
@@ -12,18 +12,33 @@
 			}
 		);			
 	}
-        
-        function doEventPreview() {
-                $('#event-edit-preview').val(1);
-                $.post('events',$('#event-edit-form').serialize(), function(data) {
-                        $.colorbox({ html: data });
-                });
-                $('#event-edit-preview').val(0);
+
+	function doEventPreview() {
+		$('#event-edit-preview').val(1);
+		$.post('events',$('#event-edit-form').serialize(), function(data) {
+			$.colorbox({ html: data });
+		});
+		$('#event-edit-preview').val(0);
 	}
 
-	
+
 	$(document).ready(function() {
 		$('#events-calendar').fullCalendar({
+			firstDay: {{$i18n.firstDay}},
+			monthNames: ['{{$i18n.January}}','{{$i18n.February}}','{{$i18n.March}}','{{$i18n.April}}','{{$i18n.May}}','{{$i18n.June}}','{{$i18n.July}}','{{$i18n.August}}','{{$i18n.September}}','{{$i18n.October}}','{{$i18n.November}}','{{$i18n.December}}'],
+			monthNamesShort: ['{{$i18n.Jan}}','{{$i18n.Feb}}','{{$i18n.Mar}}','{{$i18n.Apr}}','{{$i18n.May}}','{{$i18n.Jun}}','{{$i18n.Jul}}','{{$i18n.Aug}}','{{$i18n.Sep}}','{{$i18n.Oct}}','{{$i18n.Nov}}','{{$i18n.Dec}}'],
+			dayNames: ['{{$i18n.Sunday}}','{{$i18n.Monday}}','{{$i18n.Tuesday}}','{{$i18n.Wednesday}}','{{$i18n.Thursday}}','{{$i18n.Friday}}','{{$i18n.Saturday}}'],
+			dayNamesShort: ['{{$i18n.Sun}}','{{$i18n.Mon}}','{{$i18n.Tue}}','{{$i18n.Wed}}','{{$i18n.Thu}}','{{$i18n.Fri}}','{{$i18n.Sat}}'],
+			buttonText: {
+				prev: "<span class='fc-text-arrow'>&lsaquo;</span>",
+				next: "<span class='fc-text-arrow'>&rsaquo;</span>",
+				prevYear: "<span class='fc-text-arrow'>&laquo;</span>",
+				nextYear: "<span class='fc-text-arrow'>&raquo;</span>",
+				today: '{{$i18n.today}}',
+				month: '{{$i18n.month}}',
+				week: '{{$i18n.week}}',
+				day: '{{$i18n.day}}'
+			},
 			events: '{{$baseurl}}/events/json/',
 			header: {
 				left: 'prev,next today',
@@ -34,7 +49,7 @@
 			eventClick: function(calEvent, jsEvent, view) {
 				showEvent(calEvent.id);
 			},
-                        loading: function(isLoading, view) {
+			loading: function(isLoading, view) {
 				if(!isLoading) {
 					$('td.fc-day').dblclick(function() { window.location.href='/events/new?start='+$(this).data('date'); });
 				}
@@ -91,7 +106,7 @@
 
 {{if $editselect != 'none'}}
 <script language="javascript" type="text/javascript"
-          src="{{$baseurl}}/library/tinymce/jscripts/tiny_mce/tiny_mce_src.js"></script>
+	  src="{{$baseurl}}/library/tinymce/jscripts/tiny_mce/tiny_mce_src.js"></script>
 <script language="javascript" type="text/javascript">
 
 
@@ -123,7 +138,7 @@
 		}
 
 	});
-        {{else}}
+	{{else}}
 	<script language="javascript" type="text/javascript">
 	{{/if}}
 

@@ -1,5 +1,9 @@
 <?php
-require_once("mod/nodeinfo.php");
+/**
+ * @file mod/statistics_json.php
+ */
+
+require_once("include/plugin.php");
 
 function statistics_json_init(&$a) {
 
@@ -20,19 +24,19 @@ function statistics_json_init(&$a) {
 			);
 
 	$statistics["services"] = array();
-	$statistics["services"]["appnet"] = nodeinfo_plugin_enabled("appnet");
-	$statistics["services"]["blogger"] = nodeinfo_plugin_enabled("blogger");
-	$statistics["services"]["buffer"] = nodeinfo_plugin_enabled("buffer");
-	$statistics["services"]["dreamwidth"] = nodeinfo_plugin_enabled("dwpost");
-	$statistics["services"]["facebook"] = nodeinfo_plugin_enabled("fbpost");
-	$statistics["services"]["gnusocial"] = nodeinfo_plugin_enabled("statusnet");
-	$statistics["services"]["googleplus"] = nodeinfo_plugin_enabled("gpluspost");
-	$statistics["services"]["libertree"] = nodeinfo_plugin_enabled("libertree");
-	$statistics["services"]["livejournal"] = nodeinfo_plugin_enabled("ljpost");
-	$statistics["services"]["pumpio"] = nodeinfo_plugin_enabled("pumpio");
-	$statistics["services"]["twitter"] = nodeinfo_plugin_enabled("twitter");
-	$statistics["services"]["tumblr"] = nodeinfo_plugin_enabled("tumblr");
-	$statistics["services"]["wordpress"] = nodeinfo_plugin_enabled("wppost");
+	$statistics["services"]["appnet"] = plugin_enabled("appnet");
+	$statistics["services"]["blogger"] = plugin_enabled("blogger");
+	$statistics["services"]["buffer"] = plugin_enabled("buffer");
+	$statistics["services"]["dreamwidth"] = plugin_enabled("dwpost");
+	$statistics["services"]["facebook"] = plugin_enabled("fbpost");
+	$statistics["services"]["gnusocial"] = plugin_enabled("statusnet");
+	$statistics["services"]["googleplus"] = plugin_enabled("gpluspost");
+	$statistics["services"]["libertree"] = plugin_enabled("libertree");
+	$statistics["services"]["livejournal"] = plugin_enabled("ljpost");
+	$statistics["services"]["pumpio"] = plugin_enabled("pumpio");
+	$statistics["services"]["twitter"] = plugin_enabled("twitter");
+	$statistics["services"]["tumblr"] = plugin_enabled("tumblr");
+	$statistics["services"]["wordpress"] = plugin_enabled("wppost");
 
 	$statistics["appnet"] = $statistics["services"]["appnet"];
 	$statistics["blogger"] = $statistics["services"]["blogger"];

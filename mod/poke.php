@@ -1,4 +1,18 @@
-<?php
+<?php /** @file */
+
+/**
+ *
+ * Poke, prod, finger, or otherwise do unspeakable things to somebody - who must be a connection in your address book
+ * This function can be invoked with the required arguments (verb and cid and private and possibly parent) silently via ajax or
+ * other web request. You must be logged in and connected to a profile. 
+ * If the required arguments aren't present, we'll display a simple form to choose a recipient and a verb.
+ * parent is a special argument which let's you attach this activity as a comment to an existing conversation, which
+ * may have started with somebody else poking (etc.) somebody, but this isn't necessary. This can be used in the more pokes
+ * plugin version to have entire conversations where Alice poked Bob, Bob fingered Alice, Alice hugged Bob, etc.  
+ *
+ * private creates a private conversation with the recipient. Otherwise your profile's default post privacy is used.
+ *
+ */
 
 require_once('include/security.php');
 require_once('include/bbcode.php');
@@ -33,7 +47,7 @@ function poke_init(&$a) {
 	logger('poke: verb ' . $verb . ' contact ' . $contact_id, LOGGER_DEBUG);
 
 
-	$r = q("SELECT * FROM `contact` WHERE `id` = %d and  `uid` = %d LIMIT 1",
+	$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 		intval($contact_id),
 		intval($uid)
 	);
@@ -46,8 +60,8 @@ function poke_init(&$a) {
 	$target = $r[0];
 
 	if($parent) {
-		$r = q("select uri, private, allow_cid, allow_gid, deny_cid, deny_gid
-			from item where id = %d and parent = %d and uid = %d limit 1",
+		$r = q("SELECT `uri`, `private`, `allow_cid`, `allow_gid`, `deny_cid`, `deny_gid`
+			FROM `item` WHERE `id` = %d AND `parent` = %d AND `uid` = %d LIMIT 1",
 			intval($parent),
 			intval($parent),
 			intval($uid)
@@ -140,7 +154,7 @@ function poke_content(&$a) {
 	$id = '';
 
 	if(intval($_GET['c'])) {
-		$r = q("select id,name from contact where id = %d and uid = %d limit 1",
+		$r = q("SELECT `id`,`name` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($_GET['c']),
 			intval(local_user())
 		);
@@ -153,29 +167,14 @@ function poke_content(&$a) {
 
 	$base = $a->get_baseurl();
 
-	$a->page['htmlhead'] .= '<script src="' . $a->get_baseurl(true) . '/library/jquery_ac/friendica.complete.js" ></script>';
-	$a->page['htmlhead'] .= <<< EOT
+	$head_tpl = get_markup_template('poke_head.tpl');
+	$a->page['htmlhead'] .= replace_macros($head_tpl,array(
+		'$baseurl' => $a->get_baseurl(true),
+		'$base' => $base
+	));
 
-<script>$(document).ready(function() {
-	var a;
-	a = $("#poke-recip").autocomplete({
-		serviceUrl: '$base/acl',
-		minChars: 2,
-		width: 350,
-		onSelect: function(value,data) {
-			$("#poke-recip-complete").val(data);
-		}
-	});
-	a.setOptions({ params: { type: 'a' }});
-
-
-});
-
-</script>
-EOT;
 
 	$parent = ((x($_GET,'parent')) ? intval($_GET['parent']) : '0');
-
 
 
 	$verbs = get_poke_verbs();

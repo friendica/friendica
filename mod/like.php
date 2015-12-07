@@ -26,6 +26,18 @@ function like_content(&$a) {
 		case 'undislike':
 			$activity = ACTIVITY_DISLIKE;
 			break;
+		case 'attendyes':
+		case 'unattendyes':
+			$activity = ACTIVITY_ATTEND;
+			break;
+		case 'attendno':
+		case 'unattendno':
+			$activity = ACTIVITY_ATTENDNO;
+			break;
+		case 'attendmaybe':
+		case 'unattendmaybe':
+			$activity = ACTIVITY_ATTENDMAYBE;
+			break;
 		default:
 			return;
 			break;
@@ -108,11 +120,18 @@ function like_content(&$a) {
 	// See if we've been passed a return path to redirect to
 	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
 
+	$verbs = " '".dbesc($activity)."' ";
 
-	$r = q("SELECT `id`, `guid` FROM `item` WHERE `verb` = '%s' AND `deleted` = 0
+	// event participation are essentially radio toggles. If you make a subsequent choice,
+	// we need to eradicate your first choice. 
+	if($activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE) {
+		$verbs = " '" . dbesc(ACTIVITY_ATTEND) . "','" . dbesc(ACTIVITY_ATTENDNO) . "','" . dbesc(ACTIVITY_ATTENDMAYBE) . "' ";
+	}
+
+	$r = q("SELECT `id`, `guid` FROM `item` WHERE `verb` IN ( $verbs ) AND `deleted` = 0
 		AND `contact-id` = %d AND `uid` = %d
 		AND (`parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s') LIMIT 1",
-		dbesc($activity), intval($contact['id']), intval($owner_uid),
+		intval($contact['id']), intval($owner_uid),
 		dbesc($item_id), dbesc($item_id), dbesc($item['uri'])
 	);
 
@@ -147,6 +166,8 @@ function like_content(&$a) {
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
 
 	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
+	if($item['obj_type'] === ACTIVITY_OBJ_EVENT)
+		$post_type = t('event');
 	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE );
 	$link = xmlify('<link rel="alternate" type="text/html" href="' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 	$body = $item['body'];
@@ -166,6 +187,12 @@ EOT;
 		$bodyverb = t('%1$s likes %2$s\'s %3$s');
 	if($verb === 'dislike')
 		$bodyverb = t('%1$s doesn\'t like %2$s\'s %3$s');
+	if($verb === 'attendyes')
+		$bodyverb = t('%1$s is attending %2$s\'s %3$s');
+	if($verb === 'attendno')
+		$bodyverb = t('%1$s is not attending %2$s\'s %3$s');
+	if($verb === 'attendmaybe')
+		$bodyverb = t('%1$s may attend %2$s\'s %3$s');
 
 	if(! isset($bodyverb))
 			return; 

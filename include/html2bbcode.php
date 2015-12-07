@@ -85,14 +85,16 @@ function deletenode(&$doc, $node)
 		$child->parentNode->removeChild($child);
 }}
 
+function _replace_code_cb($m){
+	return "<code>".str_replace("\n","<br>\n",$m[1]). "</code>";
+}
+
 function html2bbcode($message)
 {
 
 	$message = str_replace("\r", "", $message);
 
-	$message = preg_replace_callback("|<pre><code>([^<]*)</code></pre>|ism", function($m) {
-		return "<code>".str_replace("\n","<br>\n",$m[1]). "</code>";
-	}, $message);
+	$message = preg_replace_callback("|<pre><code>([^<]*)</code></pre>|ism", "_replace_code_cb", $message);
 
 	$message = str_replace(array(
 					"<li><p>",

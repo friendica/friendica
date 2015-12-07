@@ -9,6 +9,8 @@ function notes_init(&$a) {
 
 	$which = $a->user['nickname'];
 
+	nav_set_selected('home');
+
 //	profile_load($a,$which,$profile);
 
 }

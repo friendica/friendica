@@ -144,7 +144,7 @@ function terminate_friendship($user,$self,$contact) {
 // and we won't waste any more time trying to communicate with them.
 // This provides for the possibility that their database is temporarily messed
 // up or some other transient event and that there's a possibility we could recover from it.
- 
+
 if(! function_exists('mark_for_death')) {
 function mark_for_death($contact) {
 
@@ -166,7 +166,7 @@ function mark_for_death($contact) {
 		$expiry = $contact['term-date'] . ' + 32 days ';
 		if(datetime_convert() > datetime_convert('UTC','UTC',$expiry)) {
 
-			// relationship is really truly dead. 
+			// relationship is really truly dead.
 			// archive them rather than delete
 			// though if the owner tries to unarchive them we'll start the whole process over again
 
@@ -190,6 +190,100 @@ function unmark_for_death($contact) {
 		intval($contact['id'])
 	);
 }}
+
+function get_contact_details_by_url($url, $uid = -1) {
+	require_once("mod/proxy.php");
+	require_once("include/bbcode.php");
+
+	if ($uid == -1)
+		$uid = local_user();
+
+	$r = q("SELECT `id` AS `gid`, `url`, `name`, `nick`, `addr`, `photo`, `location`, `about`, `keywords`, `gender`, `community`, `network` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
+		dbesc(normalise_link($url)));
+
+	if ($r) {
+		$profile = $r[0];
+
+		if ((($profile["addr"] == "") OR ($profile["name"] == "")) AND
+			in_array($profile["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS)))
+			proc_run('php',"include/update_gcontact.php", $profile["gid"]);
+
+	} else {
+		$r = q("SELECT `url`, `name`, `nick`, `avatar` AS `photo`, `location`, `about` FROM `unique_contacts` WHERE `url` = '%s'",
+			dbesc(normalise_link($url)));
+
+		if (count($r)) {
+			$profile = $r[0];
+			$profile["keywords"] = "";
+			$profile["gender"] = "";
+			$profile["community"] = false;
+			$profile["network"] = "";
+			$profile["addr"] = "";
+		}
+	}
+
+	// Fetching further contact data from the contact table
+	$r = q("SELECT `id`, `uid`, `url`, `network`, `name`, `nick`, `addr`, `location`, `about`, `keywords`, `gender`, `photo`, `addr`, `forum`, `prv`, `bd` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d AND `network` = '%s'",
+		dbesc(normalise_link($url)), intval($uid), dbesc($profile["network"]));
+
+	if (!count($r))
+		$r = q("SELECT `id`, `uid`, `url`, `network`, `name`, `nick`, `addr`, `location`, `about`, `keywords`, `gender`, `photo`, `addr`, `forum`, `prv`, `bd` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d",
+			dbesc(normalise_link($url)), intval($uid));
+
+	if (!count($r))
+		$r = q("SELECT `id`, `uid`, `url`, `network`, `name`, `nick`, `addr`, `location`, `about`, `keywords`, `gender`, `photo`, `addr`, `forum`, `prv`, `bd` FROM `contact` WHERE `nurl` = '%s' AND `uid` = 0",
+			dbesc(normalise_link($url)));
+
+	if ($r) {
+		if (isset($r[0]["url"]) AND $r[0]["url"])
+			$profile["url"] = $r[0]["url"];
+		if (isset($r[0]["name"]) AND $r[0]["name"])
+			$profile["name"] = $r[0]["name"];
+		if (isset($r[0]["nick"]) AND $r[0]["nick"] AND ($profile["nick"] == ""))
+			$profile["nick"] = $r[0]["nick"];
+		if (isset($r[0]["addr"]) AND $r[0]["addr"] AND ($profile["addr"] == ""))
+			$profile["addr"] = $r[0]["addr"];
+		if (isset($r[0]["photo"]) AND $r[0]["photo"])
+			$profile["photo"] = $r[0]["photo"];
+		if (isset($r[0]["location"]) AND $r[0]["location"])
+			$profile["location"] = $r[0]["location"];
+		if (isset($r[0]["about"]) AND $r[0]["about"])
+			$profile["about"] = $r[0]["about"];
+		if (isset($r[0]["keywords"]) AND $r[0]["keywords"])
+			$profile["keywords"] = $r[0]["keywords"];
+		if (isset($r[0]["gender"]) AND $r[0]["gender"])
+			$profile["gender"] = $r[0]["gender"];
+		if (isset($r[0]["forum"]) OR isset($r[0]["prv"]))
+			$profile["community"] = ($r[0]["forum"] OR $r[0]["prv"]);
+		if (isset($r[0]["network"]) AND $r[0]["network"])
+			$profile["network"] = $r[0]["network"];
+		if (isset($r[0]["addr"]) AND $r[0]["addr"])
+			$profile["addr"] = $r[0]["addr"];
+		if (isset($r[0]["bd"]) AND $r[0]["bd"])
+			$profile["bd"] = $r[0]["bd"];
+		if ($r[0]["uid"] == 0)
+			$profile["cid"] = 0;
+		else
+			$profile["cid"] = $r[0]["id"];
+	} else
+		$profile["cid"] = 0;
+
+	if (isset($profile["photo"]))
+		$profile["photo"] = proxy_url($profile["photo"], false, PROXY_SIZE_SMALL);
+
+	if (isset($profile["location"]))
+		$profile["location"] = bbcode($profile["location"]);
+
+	if (isset($profile["about"]))
+		$profile["about"] = bbcode($profile["about"]);
+
+	if (($profile["cid"] == 0) AND ($profile["network"] == NETWORK_DIASPORA)) {
+		$profile["location"] = "";
+		$profile["about"] = "";
+	}
+
+	return($profile);
+}
 
 if(! function_exists('contact_photo_menu')){
 function contact_photo_menu($contact) {
@@ -219,24 +313,32 @@ function contact_photo_menu($contact) {
 		$status_link = $profile_link . "?url=status";
 		$photos_link = $profile_link . "?url=photos";
 		$profile_link = $profile_link . "?url=profile";
-		$pm_url = $a->get_baseurl() . '/message/new/' . $contact['id'];
 	}
 
-	$poke_link = $a->get_baseurl() . '/poke/?f=&c=' . $contact['id'];
+	if (in_array($contact["network"], array(NETWORK_DFRN, NETWORK_DIASPORA)))
+		$pm_url = $a->get_baseurl() . '/message/new/' . $contact['id'];
+
+	if ($contact["network"] == NETWORK_DFRN)
+		$poke_link = $a->get_baseurl() . '/poke/?f=&c=' . $contact['id'];
+
 	$contact_url = $a->get_baseurl() . '/contacts/' . $contact['id'];
 	$posts_link = $a->get_baseurl() . '/network/0?nets=all&cid=' . $contact['id'];
 	$contact_drop_link = $a->get_baseurl() . "/contacts/" . $contact['id'] . '/drop?confirm=1';
 
 
+	/**
+	 * menu array:
+	 * "name" => [ "Label", "link", (bool)Should the link opened in a new tab? ]
+	 */
 	$menu = Array(
-		'poke' => array(t("Poke"), $poke_link),
-		'status' => array(t("View Status"), $status_link),
-		'profile' => array(t("View Profile"), $profile_link),
-		'photos' => array(t("View Photos"), $photos_link),
-		'network' => array(t("Network Posts"), $posts_link),
-		'edit' => array(t("Edit Contact"), $contact_url),
-		'drop' => array(t("Drop Contact"), $contact_drop_link),
-		'pm' => array(t("Send PM"), $pm_url),
+		'status' => array(t("View Status"), $status_link, true),
+		'profile' => array(t("View Profile"), $profile_link, true),
+		'photos' => array(t("View Photos"), $photos_link,true),
+		'network' => array(t("Network Posts"), $posts_link,false),
+		'edit' => array(t("Edit Contact"), $contact_url, false),
+		'drop' => array(t("Drop Contact"), $contact_drop_link, false),
+		'pm' => array(t("Send PM"), $pm_url, false),
+		'poke' => array(t("Poke"), $poke_link, false),
 	);
 
 
@@ -244,25 +346,13 @@ function contact_photo_menu($contact) {
 
 	call_hooks('contact_photo_menu', $args);
 
-/*	$o = "";
-	foreach($menu as $k=>$v){
-		if ($v!="") {
-			if(($k !== t("Network Posts")) && ($k !== t("Send PM")) && ($k !== t('Edit Contact')))
-				$o .= "<li><a target=\"redir\" href=\"$v\">$k</a></li>\n";
-			else
-				$o .= "<li><a href=\"$v\">$k</a></li>\n";
-		}
-	}
-	return $o;*/
-	foreach($menu as $k=>$v){
-		if ($v[1]!="") {
-			if(($v[0] !== t("Network Posts")) && ($v[0] !== t("Send PM")) && ($v[0] !== t('Edit Contact')))
-				$menu[$k][2] = 1;
-			else
-				$menu[$k][2] = 0;
-		}
-	}
-	return $menu;
+	$menucondensed = array();
+
+	foreach ($menu AS $menuname=>$menuitem)
+		if ($menuitem[1] != "")
+			$menucondensed[$menuname] = $menuitem;
+
+	return $menucondensed;
 }}
 
 

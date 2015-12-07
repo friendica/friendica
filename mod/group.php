@@ -62,12 +62,12 @@ function group_post(&$a) {
 
 		$a->page['aside'] = group_side();
 	}
-	return;	
+	return;
 }
 
 function group_content(&$a) {
 	$change = false;
-	
+
 	if(! local_user()) {
 		notice( t('Permission denied') . EOL);
 		return;
@@ -172,7 +172,7 @@ function group_content(&$a) {
 			'$form_security_token' => get_form_security_token("group_drop"),
 		));
 
-		
+
 		$context = $context + array(
 			'$title' => t('Group Editor'),
 			'$gname' => array('groupname',t('Group Name: '),$group['name'], ''),
@@ -192,7 +192,7 @@ function group_content(&$a) {
 		'label_contacts' => t('All Contacts'),
 		'contacts' => array(),
 	);
-		
+
 	$sec_token = addslashes(get_form_security_token('group_member_change'));
 	$textmode = (($switchtotext && (count($members) > $switchtotext)) ? true : false);
 	foreach($members as $member) {
@@ -226,8 +226,7 @@ function group_content(&$a) {
 		echo replace_macros($tpl, $context);
 		killme();
 	}
-	
+
 	return replace_macros($tpl, $context);
 
 }
-

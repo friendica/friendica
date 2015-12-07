@@ -3,216 +3,124 @@ Friendica mit SSL nutzen
 
 * [Zur Startseite der Hilfe](help)
 
-Wenn du deine eigene Friendica-Seite betreibst, willst du vielleicht SSL (https) nutzen, um die Kommunikation zwischen dir und deinem Server zu verschlüsseln (die Kommunikation zwischen den Servern ist bereits verschlüsselt).
+Disclaimer
+---
+**Dieses Dokument wurde im November 2015 aktualisiert.
+SSL-Verschlüsselung ist sicherheitskritisch.
+Das bedeutet, dass sich die empfohlenen Einstellungen schnell verändern.
+Halte deine Installation auf dem aktuellen Stand und verlasse dich nicht darauf, dass dieses Dokument genau so schnell aktualisiert wird, wie sich Technologien verändern!**
 
-Wenn du das auf deiner eigenen Domain machen willst, musst du ein Zertifikat von einer anerkannten Organisation beschaffen (sogenannte selbst-signierte Zertifikate, die unter Computerfreaks beliebt sind, arbeiten nicht sehr gut mit Friendica, weil sie Warnungen im Browser hervorrufen können).
+Einleitung
+---
 
-Wenn du dieses Dokument liest, bevor du Friendica installierst, kannst du eine sehr einfache Option in Betracht ziehen: suche dir ein geteiltes Hosting-Angebot (shared hosting) ohne eigene Domain. 
-Dadurch wirst du eine Adresse in der Form deinName.deinAnbietername.de erhalten, was nicht so schön wie deinName.de ist. 
-Aber es wird trotzdem deine ganz persönliche Seite sein und du wirst unter Umständen die Möglichkeit haben, das SSL-Zertifikat deines Anbieters mitzubenutzen. 
-Das bedeutet, dass du SSL überhaupt nicht konfigurieren musst - es wird einfach sofort funktionieren, wenn die Besucher deiner Seite https statt http eingeben. 
+Wenn du deine eigene Friendica-Seite betreibst, willst du vielleicht SSL (https) nutzen, um die Kommunikation zwischen den Servern und zwischen dir und deinem Server zu verschlüsseln.
 
-Wenn dir diese Lösung nicht gefällt, lies weiter...
+Dafür gibt es grundsätzlich zwei Arten von SSL-Zertifikaten: Selbst-signierte Zertifikate und Zertifikate, die von einer Zertifizierungsstelle (CA) unterschrieben sind.
+Technisch gesehen sorgen beide für valide Verschlüsselung.
+Mit selbst-signierten Zertifikaten gibt es jedoch ein Problem:
+Sie sind weder in Browsern noch auf anderen Servern installiert.
+Deshalb führen sie zu Warnungen über "nicht vertrauenswürdige Zertifikate".
+Das ist verwirrend und stört sehr.
 
-**Geteilte Hosting-Angebote/Shared hosts**
+Aus diesem Grund empfehlen wir, dass du dir ein von einer CA unterschriebenes Zertifikat besorgst.
+Normalerweise kosten sie Geld - und sind nur für eine begrenzte Zeit gültig (z.B. ein Jahr oder zwei).
 
-Wenn du ein geteiltes Hosting-Angebot mit einer eigenen Domain nutzt, dann wird dir dein Anbieter ggf. anbieten, dir das Zertifikat zu besorgen und zu installieren. 
-Du musst es nur beantragen und bezahlen und alles wird eingerichtet. 
-Wenn das die Lösung für dich ist, musst du das weitere Dokument nicht lesen. 
-Gehe nur sicher, dass das Zertifikat auch für die Domain gilt, die du für Friendica nutzt: z.B. meinfriendica.de oder friendica.meinserver.de.
+Es gibt aber Möglichkeiten, ein vertrauenswürdiges Zertifikat umsonst zu bekommen.
 
-Das Vorangehende wird die häufigste Art sein, eine Friendica-Seite zu betreiben, so dass der Rest des Artikels für die meisten Leute nicht von Bedeutung ist.
+Wähle deinen Domainnamen
+---
 
-**Beschaffe dir das Zertifikat selbst**
+Dein SSL-Zertifikat wird für eine bestimmte Domain gültig sein oder sogar nur für eine Subdomain.
+Entscheide dich endgültig für einen Domainnamen, *bevor* du ein Zertifikat bestellst.
+Wenn du das Zertifikat hast, brauchst du ein neues, wenn du den Domainnamen ändern möchtest.
 
-Alternativ kannst du dir auch selbst ein Zertifikat besorgen und hochladen, falls dein Anbieter das unterstützt.
+Gehosteter Webspace
+---
 
-Der nächste Abschnitt beschreibt den Ablauf, um ein Zertifikat von StartSSL zu erhalten. 
-Das Gute an StartSSL ist, dass du kostenlos ein einfaches, aber perfekt ausreichendes Zertifikat erhältst. 
-Das ist bei vielen anderen Anbietern nicht so, weshalb wir uns in diesem Dokument auf StartSSL konzentrieren werden. 
-Wenn du ein Zertifikat eines anderen Anbieters nutzen willst, musst du die Vorgaben dieser Organisation befolgen. 
-Wir können hier nicht jede Möglichkeit abdecken. 
+Wenn deine Friendica-Instanz auf einem gehosteten Webspace läuft, solltest du dich bei deinem Hosting-Provider informieren.
+Dort bekommst du Instruktionen, wie es dort läuft.
+Du kannst bei deinem Provider immer ein kostenpflichtiges Zertifikat bestellen.
+Sie installieren es für dich oder haben in der Weboberfläche eine einfache Upload-Möglichkeit für Zertifikat und Schlüssel.
 
-Die Installation deines erhaltenen Zertifikats hängt von den Vorgaben deines Anbieters ab. 
-Aber generell nutzen solche Anbieter ein einfaches Web-Tool, um die Einrichtung zu unterstützen.
+Um Geld zu sparen, kann es sich lohnen, dort auch nachzufragen, ob sie ein anderes Zertifikat, das du selbst beschaffst, für dich installieren würden.
+Wenn ja, dann lies weiter.
 
-Beachte: dein Zertifikat gilt gewöhnlich nur für eine Subdomain. 
-Wenn du dein Zertifikat beantragst, sorge dafür, dass es für die Domain und die Subdomain gilt, die du für Friendica nutzt: z.B. meinfriendica.de oder friendica.meinserver.de.
+Ein kostenloses StartSSL-Zertifikat besorgen
+---
 
-**Erhalte ein kostenloses StartSSL-Zertifikat**
+StartSSL ist eine Zertifizierungsstelle, die kostenlose Zertifikate ausstellt.
+Sie sind für ein Jahr gültig und genügen für unsere Zwecke.
 
-Die Webseite von StartSSL führt dich durch den Erstellungsprozess, aber manche Leute haben hier trotzdem Probleme. 
-Wir empfehlen dir ausdrücklich, die Installationsanleitung Schritt für Schritt langsam und sorgfältig zu befolgen. 
-Lese dir jedes Wort durch und schließe deinen Browser erst, wenn alles läuft. 
-Es heißt, dass es drei Schritte gibt, die den Nutzer verwirren können:
+### Schritt 1: Client-Zertifikat erstellen
 
-Wenn du dich erstmals bei StartSSL anmeldest, erhältst du ein erstes Zertifikat, dass sich einfach in deinem Browser installiert. 
-Dieses Zertifikat solltest du zur Sicherheit irgendwo speichern, so dass du es für einen neuen Browser neu installieren kannst, wenn du z.B. etwas erneuern musst. 
-Dieses Authentifizierungszertifikat wird nur für das Login benötigt und hat nichts mit dem Zertifikat zu tun, dass du später für deinen Server benötigst. 
-Als Anfänger mit StartSSL kannst du [hier starten](https://www.startssl.com/?lang=de) und die "Express Lane" nutzen, um dein Browser-Zertifikiat zu erhalten. 
-Im nächsten Schritt kannst du die Einrichtung deines Zertifikats fortsetzen.
+Wenn du dich erstmalig bei StartSSL anmeldest, erhältst du ein Zertifikat, das in deinem Browser installiert wird.
+Du brauchst es, um dich bei StartSSL einzuloggen, auch wenn du später wiederkommst.
+Dieses Client-Zertifikat hat nichts mit dem SSL-Zertifikat für deinen Server zu tun.
 
-Wenn du zuerst nach einer Domain für dein Zertifikat gefragt wirst, musst du die Top-Level-Domain angeben, nicht die Subdomain, die Friendica nutzt. 
-Im nächsten Schritt kannst du dann die Subdomain spezifizieren. 
-Wenn du also friendica.deinName.de auf deinem Server hast, musst du zuerst deinName.de angeben. 
+### Schritt 2: Email-Adresse und Domain validieren
 
-Höre nicht zu früh auf, wenn du am Ende der Einrichtung dein persönliches Server-Zertifikat erhalten hast. 
-Abhängig von deiner Server-Software benötigst du ein oder zwei generische Dateien, die du mit deinem kostenlosen StartSSL-Zertifikat nutzen musst. 
-Diese Dateien sind sub.class1.server.ca.pem und ca.pem. 
-Wenn du diesen Schritt bereits übersprungen hast, kannst du die Dateien hier finden: [http://www.startssl.com/?app=21](http://www.startssl.com/?app=21). 
-Aber am besten funktioniert es, wenn du StartSSL nicht beendest, bevor du den Vorgang komplett abgeschlossen hast und dein https-Zertifikat hochgeladen ist und funktioniert. 
+Um fortzufahren musst du beweisen, dass du die Email-Adresse, die du angegeben hast, und die Domain, für die du das Zertifikat möchtest, besitzt.
+Gehe in den "Validation wizard" und fordere einen Bestätigungslink per Mail an.
+Dasselbe machst du auch für die Validierung der Domain.
 
-**Virtuelle private und dedizierte Server (mit StartSSL free)**
+### Schritt 3: Das Zertifikat bestellen
 
-Der Rest dieses Dokuments ist etwas komplizierter, aber es ist auch nur für Personen, die Friendica auf einem virtuellen oder dedizierten Server nutzen. 
-Jeder andere kann an dieser Stelle mit dem Lesen aufhören.
+Gehe in den "Certificate wizard".
+Wähle das Target Webserver.
+Bei der ersten Abfrage der Domain gibst du deine Hauptdomain an.
+Im nächsten Schritt kannst du eine Subdomain hinzufügen.
+Ein Beispiel: Wenn die Adresse der Friendica-Instanz friendica.beispiel.net lautet, gibst du zuerst beispiel.net an und danach friendica.
 
-Folge den weiteren Anleitungen [hier](http://www.startssl.com/?app=20), um den Webserver, den du benutzt (z.B. Apache), für dein Zertifikat einzurichten.
+Wenn du weißt, wie man einen openssl-Schlüssel und einen Certificate Signing Request (CSR) erstellt, tu das.
+Kopiere den CSR in den Browser, um ihn von StartSSL signiert zu bekommen.
 
-Um die nötigen Schritte zu verdeutlichen, setzen wir nun voraus, dass Apache aktiv ist. 
-Im Wesentlichen kannst du einfach einen zweiten httpd.conf-Eintrag für Friendica erstellen. 
+Wenn du nicht weißt, wie man Schlüssel und CSR erzeugt, nimm das Angebot von StartSSL an, beides für dich zu generieren.
+Das bedeutet: StartSSL hat den Schlüssel zu deiner SSL-Verschlüsselung, aber das ist immer noch besser als gar kein Zertifikat.
+Lade dein Zertifikat von der Website herunter.
+(Oder im zweiten Fall: Lade Zertifikat und Schlüssel herunter.)
 
-Um das zu machen, kopiere den existierenden Eintrag und ändere das Ende der ersten Zeile auf "lesen" :443> anstelle von :80> und trage dann die folgenden Zeilen ein, wie du es auch in der Anleitung von StartSSL finden kannst:
+Um dein Zertifikat auf einem Webserver zu installieren, brauchst du noch ein oder zwei andere Dateien: sub.class1.server.ca.pem und ca.pem, auch von StartSSL.
+Gehe in die Rubrik "Tool box" und lade "Class 1 Intermediate Server CA" und "StartCom Root CA (PEM encoded)" herunter.
 
-	SSLEngine on
-	SSLProtocol all -SSLv2
-	SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM
+Wenn du dein Zertifikat zu deinem Hosting-Provider schicken möchtest, brauchen Sie mindestens Zertifikat und Schlüssel.
+Schick zur Sicherheit alle vier Dateien hin.
+**Du solltest sie auf einem verschlüsselten Weg hinschicken!**
 
-	SSLCertificateFile /usr/local/apache/conf/ssl.crt
-	SSLCertificateKeyFile /usr/local/apache/conf/ssl.key
-	SSLCertificateChainFile /usr/local/apache/conf/sub.class1.server.ca.pem
-	SSLCACertificateFile /usr/local/apache/conf/ca.pem
-	SetEnvIf User-Agent ".*MSIE.*" nokeepalive ssl-unclean-shutdown
-	CustomLog /usr/local/apache/logs/ssl_request_log \ 
-	"%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+Wenn du deinen eigenen Server betreibst, lade die Dateien hoch und besuche das Mozilla-Wiki (Link unten).
 
-(Beachte, dass das Verzeichnis /usr/local/apache/conf/ möglicherweise nicht in deinem System existiert. 
-In Debian ist der Pfad bspw. /etc/apache2/, in dem du ein SSL-Unterverzeichnis erstellen kannst, wenn dieses noch nicht vorhanden ist. 
-Dann hast du /etc/apache2/ssl/… statt /usr/local/apache/conf/…)
+Let's encrypt
+---
 
-Du solltest nun zwei Einträgen für deine Friendica-Seite haben - einen für einfaches http und eines für https.
+Wenn du einen eigenen Server betreibst und den Nameserver kontrollierst, könnte auch die Initiative "Let's encrypt" interessant für dich werden.
+Momentan ist deren Angebot noch nicht fertig.
+Auf der [Website](https://letsencrypt.org/) kannst du dich über den Stand informieren.
 
-Ein Hinweis für diejenigen, die SSL steuern wollen: setze keine Weiterleitung deines SSL in deine Apache-Einstellung. Friendicas Admin-Panel hat eine spezielle Einstellung für die SSL-Methode. 
-Bitte nutze diese Einstellungen. 
+Webserver-Einstellungen
+---
 
-**Vermische Zertifikate in Apache – StartSSL und andere (selbst-signierte)**
+Im [Wiki von Mozilla](https://wiki.mozilla.org/Security/Server_Side_TLS) gibt es Anleitungen für die Konfiguration sicherer Webserver.
+Dort findest du Empfehlungen, die auf [verschiedene Webserver](https://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_Server_Configurations) zugeschnitten sind.
 
-Viele Leute nutzen einen virtuellen privaten oder einen dedizierten Server, um mehr als Friendica darauf laufen zu lassen. 
-Sie wollen möglicherweise SSL auch für andere Seiten nutzen, die auf dem Server liegen. 
-Um das zu erreichen, wollen sie mehrere Zertifikate für eine IP nutzen, z.B. ein Zertifikat eines anerkannten Anbieters für Friendica und ein selbst-signiertes für eine persönliche Inhalte (möglw. ein Wildcard-Zertifikat für mehrere Subdomains).
+Teste deine SSL-Einstellungen
+---
 
-Um das zum Laufen zu bringen, bietet Apache eine NameVirtualHost-Direktive. 
-Du findest Informationen zur Nutzung in httpd.conf in den folgenden Ausschnitten. 
-Beachte, dass Wildcards (*) in httpd.conf dazu führen, dass die NameVirtualHost-Methode nicht funktioniert; du kannst diese in dieser neuen Konfiguration nicht nutzen. 
-Das bedeutet, dass *80> oder *443> nicht funktionieren. 
-Und du musst unbedingt die IP definieren, selbst wenn du nur eine hast. 
-Beachte außerdem, dass du bald zwei Zeilen zu Beginn der Datei hinzufügen musst, um NameVirtualHost für IPv6 vorzubereiten.
+Wenn du fertig bist, kannst du auf der Testseite [SSL-Labs](https://www.ssllabs.com/ssltest/) prüfen lassen, ob Du alles richtig gemacht hast.
 
-	NameVirtualHost 12.123.456.1:443
-	NameVirtualHost 12.123.456.1:80
 
-	<VirtualHost www.anywhere.net:80>
-	DocumentRoot /var/www/anywhere
-	Servername www.anywhere.net
-	</VirtualHost>
 
-	<VirtualHost www.anywhere.net:443>
-	DocumentRoot /var/www/anywhere
-	Servername www.anywhere.net 
-	SSLEngine On
-	<pointers to a an eligible cert>
-	<more ssl stuff >
-	<other stuff>
-	</VirtualHost>
 
-	<VirtualHost www.somewhere-else.net:80>
-	DocumentRoot /var/www/somewhere-else
-	Servername www.somewhere-else.net
-	</VirtualHost>
 
-	<VirtualHost www.somewhere-else:443>
-	DocumentRoot /var/www/somewhere-else
-	Servername www.somewhere-else.net
-	SSLEngine On
-	<pointers to another eligible cert>
-	<more ssl stuff >
-	<other stuff>
-	</VirtualHost>
 
-Natürlich kannst du auch andere Verzeichnisse auf deinem Server nutzen, um Apache zu konfigurieren. 
-In diesem Fall müssen nur einige Zeilen in httpd.conf oder ports.conf angepasst werden - vor allem die NameVirtualHost-Zeilen. 
-Aber wenn du sicher im Umgang mit solchen Alternativen bist, wirst du sicherlich die nötigen Anpassungen herausfinden.
 
-Starte dein Apache abschließend neu. 
 
-**StartSSL auf Nginx**
 
-Führe zunächst ein Update auf den neuesten Friendica-Code durch. 
-Folge dann der Anleitung oben, um dein kostenloses Zertifikat zu erhalten. 
-Aber statt der Apache-Installationsanleitung zu folgen, mache das Folgende:
 
-Lade dein Zertifikat hoch. 
-Es ist nicht wichtig, wohin du es lädst, solange Nginx es finden kann. 
-Einige Leute nutzen /home/verschiedeneNummernundBuchstaben, du kannst aber auch z.B. etwas wie /foo/bar nutzen.
 
-Du kannst das Passwort entfernen, wenn du willst. 
-Es ist zwar möglicherweise nicht die beste Wahl, aber wenn du es nicht machst, wirst du das Passwort immer wieder eingeben müssen, wenn du Ngingx neustartest. 
-Um es zu entfernen, gebe Folgendes ein: 
 
-	openssl rsa -in ssl.key-pass -out ssl.key
 
-Nun hole dir das Hifs-Zertifikat:
 
-	wget http://www.startssl.com/certs/sub.class1.server.ca.pem
 
-Nun vereinige die Dateien:
 
-	cat ssl.crt sub.class1.server.ca.pem > ssl.crt
 
-In manchen Konfigurationen ist ein Bug enthalten, weshalb diese Schritte nicht ordentlich arbeiten. 
-Du musst daher ggf. ssl.crt bearbeiten:
 
-	nano /foo/bar/ssl.crt
 
-Du wirst zwei Zertifikate in der gleichen Date sehen. In der Mitte findest du:
-
-	-----END CERTIFICATE----------BEGIN CERTIFICATE-----
-
-Das ist schlecht. Du brauchst die folgenden Einträge:
-
-	-----END CERTIFICATE-----
-	-----BEGIN CERTIFICATE-----
-
-
-Du kannst den Zeilenumbruch manuell eingeben, falls dein System vom Bug betroffen ist. 
-Beachte, dass nach -----BEGIN CERTIFICATE----- nur ein Zeilenumbruch ist. 
-Es gibt keine leere Zeile zwischen beiden Einträgen.
-
-Nun musst du Nginx über die Zertifikate informieren.
-
-In /etc/nginx/sites-available/foo.com.conf benötigst du etwas wie:
-
-	server {
-	
-	listen 80;
-	
-	listen 443 ssl;
-
-	listen [::]:80;
-
-	listen [::]:443 ipv6only=on ssl;
-
-	ssl_certificate /foo/bar/ssl.crt;
-
-	ssl_certificate_key /foo/bar/ssl.key;
-
-	...
-
-Nun starte Nginx neu:
-
-	/etc/init.d/nginx restart
-
-Und das war es schon. 
-
-Für multiple Domains ist es mit Nginx einfacher als mit Apache. 
-Du musst du oben genannten Schritte nur für jedes Zertifikat wiederholen und die spezifischen Informationen im eigenen {server...}-Bereich spezifizieren.

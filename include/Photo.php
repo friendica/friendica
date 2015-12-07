@@ -345,38 +345,37 @@ class Photo {
     }
 
     public function orient($filename) {
-        if ($this->is_imagick()) {
-            // based off comment on http://php.net/manual/en/imagick.getimageorientation.php
-            $orientation = $this->image->getImageOrientation();
-            switch ($orientation) {
-            case imagick::ORIENTATION_BOTTOMRIGHT:
-                $this->image->rotateimage("#000", 180);
-                break;
-            case imagick::ORIENTATION_RIGHTTOP:
-                $this->image->rotateimage("#000", 90);
-                break;
-            case imagick::ORIENTATION_LEFTBOTTOM:
-                $this->image->rotateimage("#000", -90);
-                break;
-            }
+	if ($this->is_imagick()) {
+		// based off comment on http://php.net/manual/en/imagick.getimageorientation.php
+		$orientation = $this->image->getImageOrientation();
+		switch ($orientation) {
+		case imagick::ORIENTATION_BOTTOMRIGHT:
+		    $this->image->rotateimage("#000", 180);
+		    break;
+		case imagick::ORIENTATION_RIGHTTOP:
+		    $this->image->rotateimage("#000", 90);
+		    break;
+		case imagick::ORIENTATION_LEFTBOTTOM:
+		    $this->image->rotateimage("#000", -90);
+		    break;
+		}
 
-            $this->image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
-            return TRUE;
-        }
+		$this->image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
+		return TRUE;
+	}
 	// based off comment on http://php.net/manual/en/function.imagerotate.php
 
 	if(!$this->is_valid())
-	    return FALSE;
+		return FALSE;
 
 	if( (! function_exists('exif_read_data')) || ($this->getType() !== 'image/jpeg') )
-	    return;
+		return;
 
-	$exif = @exif_read_data($filename);
+	$exif = @exif_read_data($filename,null,true);
+	if(! $exif)
+		return;
 
-		if(! $exif)
-			return;
-
-	$ort = $exif['Orientation'];
+	$ort = $exif['IFD0']['Orientation'];
 
 	switch($ort)
 	{
@@ -413,6 +412,10 @@ class Photo {
 		$this->rotate(90);
 		break;
 	}
+
+	//	logger('exif: ' . print_r($exif,true));
+	return $exif;
+
     }
 
 

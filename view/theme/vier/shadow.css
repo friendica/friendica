@@ -1,0 +1,154 @@
+nav {
+  background: rgb(36, 76, 94);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+  padding: 0px;
+  padding-left: 0px;
+}
+
+nav a:active,
+nav a:link,
+nav a:visited,
+nav a {
+  color: #ccc;
+}
+
+nav a:hover,
+#nav-messages-see-all a:hover {
+  color: #fff;
+}
+
+nav .nav-notify {
+  background-color: #F80;
+  top: 0px;
+  right: -5px;
+  padding: 1px 3px;
+  border-radius: 5px 5px 5px 5px;
+}
+// -----
+nav .nav-menu-icon .nav-notify {
+  top: 0px;
+}
+
+nav .nav-menu.selected a {
+  color: #000;
+/*  font-weight: bold; */
+}
+
+nav .nav-menu:hover,
+nav .nav-menu.selected {
+  border-bottom: 2px solid #427FED;
+}
+
+nav .nav-menu {
+  height: 23px;
+  font-size: 14px;
+  font-weight: initial;
+}
+
+#nav-site-menu,
+#nav-notifications-menu,
+#nav-user-menu {
+  top: 35px;
+}
+
+#nav-messages-menu {
+  top: 32px;
+}
+
+#nav-messages-see-all a {
+  color: #737373;
+}
+
+ul.tabs li .active, span.pager_current a {
+  border-bottom: 2px solid #427FED;
+}
+
+span.pager_current, span.pager_n a:hover, 
+span.pager_first a:hover, span.pager_last a:hover, 
+span.pager_prev a:hover, span.pager_next a:hover,
+ul.tabs a:hover {
+  border-bottom: 2px solid #427FED;
+}
+
+nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-linkmenu.selected .icon.s22.notify {
+  color: #737373;
+}
+
+nav #nav-messages-linkmenu.selected,
+nav #nav-user-linklabel.selected,
+nav #nav-apps-link.selected {
+  background-color: #fff;
+  border-bottom-style: none;
+}
+
+div.jGrowl div.info {
+  background: #fff url("../../../images/icons/48/info.png") no-repeat 5px center;
+}
+
+div.jGrowl div.notice {
+  color: #737373;
+}
+div.jGrowl div.info {
+  color: #737373;
+}
+
+.birthday-notice, .event-notice {
+  font-weight: initial;
+}
+
+div.pager, ul.tabs {
+  font-weight: initial;
+}
+
+nav .nav-menu-icon.selected {
+  background-color: #fff;
+}
+
+#jot #jot-tools li:hover {
+  background-color: #fff;
+}
+
+nav .icon {
+  color: #737373;
+}
+
+nav a:hover .icon {
+  color: #000;
+}
+
+ul.menu-popup {
+  border: 0px solid #FFF;
+  margin-top: 0px;
+}
+
+header #banner a, header #banner a:active, header #banner a:visited, header #banner a:link, header #banner a:hover {
+  color: #737373;
+}
+
+header {
+  left: 10px;
+}
+
+header #banner {
+  margin-top: 6px;
+}
+
+#banner #logo-text {
+  margin-left: 5px;
+}
+
+aside {
+  top: 44px;
+  height: calc(100% - 54px);
+}
+
+section {
+  top: 44px;
+}
+
+nav #search-box #search-text {
+  background-color: initial;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgba(0, 0, 0, 0.15);
+}

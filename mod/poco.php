@@ -69,14 +69,8 @@ function poco_init(&$a) {
 			dbesc(NETWORK_OSTATUS)
 		);
 	} elseif($system_mode) {
-		$r = q("SELECT count(*) AS `total` FROM `contact` WHERE `self` = 1 AND `network` IN ('%s', '%s', '%s', '%s')
-			AND (`success_update` >= `failure_update` OR `last-item` >= `failure_update`)
-			AND `uid` IN (SELECT `uid` FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1) ",
-			dbesc(NETWORK_DFRN),
-			dbesc(NETWORK_DIASPORA),
-			dbesc(NETWORK_OSTATUS),
-			dbesc(NETWORK_STATUSNET)
-			);
+		$r = q("SELECT count(*) AS `total` FROM `contact` WHERE `self` = 1
+			AND `uid` IN (SELECT `uid` FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1) ");
 	} else {
 		$r = q("SELECT count(*) AS `total` FROM `contact` WHERE `uid` = %d AND `blocked` = 0 AND `pending` = 0 AND `hidden` = 0 AND `archive` = 0
 			AND (`success_update` >= `failure_update` OR `last-item` >= `failure_update`)
@@ -115,13 +109,8 @@ function poco_init(&$a) {
 		$r = q("SELECT `contact`.*, `profile`.`about` AS `pabout`, `profile`.`locality` AS `plocation`, `profile`.`pub_keywords`, `profile`.`gender` AS `pgender`,
 			`profile`.`address` AS `paddress`, `profile`.`region` AS `pregion`, `profile`.`postal-code` AS `ppostalcode`, `profile`.`country-name` AS `pcountry`
 			FROM `contact` INNER JOIN `profile` ON `profile`.`uid` = `contact`.`uid`
-			WHERE `self` = 1 AND `network` IN ('%s', '%s', '%s', '%s') AND `profile`.`is-default`
-			AND ((`contact`.`success_update` >= `contact`.`failure_update`) OR (`contact`.`last-item` >= `contact`.`failure_update`))
+			WHERE `self` = 1 AND `profile`.`is-default`
 			AND `contact`.`uid` IN (SELECT `uid` FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1) LIMIT %d, %d",
-			dbesc(NETWORK_DFRN),
-			dbesc(NETWORK_DIASPORA),
-			dbesc(NETWORK_OSTATUS),
-			dbesc(NETWORK_STATUSNET),
 			intval($startIndex),
 			intval($itemsPerPage)
 		);
@@ -224,6 +213,13 @@ function poco_init(&$a) {
 				if (is_null($about)) {
 					$about = bbcode($rr['about'], false, false);
 					Cache::set("about:".$rr['updated'].":".$rr['nurl'],$about);
+				}
+
+				// Non connected persons can only see the keywords of a Diaspora account
+				if ($rr['network'] == NETWORK_DIASPORA) {
+					$rr['location'] = "";
+					$about = "";
+					$rr['gender'] = "";
 				}
 
 				$entry = array();

@@ -23,7 +23,7 @@ a.on {
 	background-color: #2C77AE !important
 }
 
-aside, .menu-popup, .fc-state-highlight, a.off, .autocomplete { 
+aside, right_aside, .menu-popup, .fc-state-highlight, a.off, .autocomplete {
 	color: #989898 !important;
 	background-color: #252C33 !important;
 	border-right: 1px solid #D2D2D2;

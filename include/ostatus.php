@@ -48,7 +48,7 @@ function ostatus_follow_friends($uid, $url) {
 		$r = q("SELECT `url` FROM `contact` WHERE `uid` = %d AND
 			(`nurl` = '%s' OR `alias` = '%s' OR `alias` = '%s') AND
 			`network` != '%s' LIMIT 1",
- 			intval($uid), dbesc(normalise_link($url)),
+			intval($uid), dbesc(normalise_link($url)),
 			dbesc(normalise_link($url)), dbesc($url), dbesc(NETWORK_STATUSNET));
 		if (!$r) {
 			$data = probe_url($friend->statusnet_profile_url);
@@ -315,7 +315,7 @@ function ostatus_import($xml,$importer,&$contact, &$hub) {
 			$orig_uri = $xpath->query("activity:object/atom:id", $entry)->item(0)->nodeValue;
 			logger("Favorite ".$orig_uri." ".print_r($item, true));
 
-		        $item["verb"] = ACTIVITY_LIKE;
+			$item["verb"] = ACTIVITY_LIKE;
 			$item["parent-uri"] = $orig_uri;
 			$item["gravity"] = GRAVITY_LIKE;
 		}
@@ -702,9 +702,13 @@ function ostatus_completion($conversation_url, $uid, $item = array()) {
 		$conv_as = str_replace(',"statusnet:notice_info":', ',"statusnet_notice_info":', $conv_as);
 		$conv_as = json_decode($conv_as);
 
+		$no_of_items = sizeof($items);
+
 		if (@is_array($conv_as->items))
-			$items = array_merge($items, $conv_as->items);
-		else
+			foreach ($conv_as->items AS $single_item)
+				$items[$single_item->id] = $single_item;
+
+		if ($no_of_items == sizeof($items))
 			break;
 
 		$pageno++;

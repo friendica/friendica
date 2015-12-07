@@ -23,7 +23,7 @@ The following window shows some text while connecting.
 This text isn't importend for you, just wait for the next window.
 The first line shows your name and your current IP address.
 The right part of the window shows all users.
-The lower part of the window contains an input field. 
+The lower part of the window contains an input field.
 
 Jappix Mini
 ---
@@ -41,7 +41,7 @@ You can use several servers to create an account:
 
 At first you have to get the current version. You can either pull it from [Github](https://github.com) like so:
 
-	$> cd /var/www/virtual/YOURSPACE/html/addon; git pull
+    $> cd /var/www/virtual/YOURSPACE/html/addon; git pull
 
 Or you can download a tar archive here: [jappixmini.tgz](https://github.com/friendica/friendica-addons/blob/master/jappixmini.tgz) (click at „view raw“).
 
@@ -63,9 +63,10 @@ At first you have to activate the addon.
 
 Now add your Jabber/XMPP name, the domain/server (without "http"; just "jappix.com").
 For „Jabber BOSH Host“ you could use "https://bind.jappix.com/".
+Note that you need another BOSH server if you do not use jappix.com for your XMPP account.
 You can find further information in the „Configuration Help“-section below this fields.
 At last you have enter your password (there are some more optional options, you can choose).
-Finish these steps with "send" to save the entries. 
+Finish these steps with "send" to save the entries.
 Now, you should find the chatbox at the lower right corner of your browser window.
 
-If you want to add contacts manually, you can click "add contact". 
+If you want to add contacts manually, you can click "add contact".

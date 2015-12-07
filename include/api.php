@@ -2,6 +2,27 @@
 /* To-Do:
  - Automatically detect if incoming data is HTML or BBCode
 */
+
+/* Contact details:
+	Gerhard Seeber		Mail: gerhard@seeber.at		Friendica: http://mozartweg.dyndns.org/friendica/gerhard
+
+ */
+
+
+/*
+ * Change history:
+	Gerhard Seeber		2015-NOV-25	Add API call /users/group_show to return all or a single group
+ 						with the containing contacts (necessary for Windows 10 Universal app)
+	Gerhard Seeber 		2015-NOV-27	Add API call /users/group_delete to delete the specified group id
+						(necessary for Windows 10 Universal app)
+	Gerhard Seeber		2015-DEC-01	Add API call /users/group_create to create a group with the specified 
+						name and the given list of contacts (necessary for Windows 10 Universal
+						app)
+	Gerhard Seeber		2015-DEC-07	Add API call /users/group_update to update a group with the given list of
+						contacts (necessary for Windows 10 Universal app)
+ *
+ */
+
 	require_once("include/bbcode.php");
 	require_once("include/datetime.php");
 	require_once("include/conversation.php");
@@ -16,6 +37,7 @@
 	require_once('mod/wall_upload.php');
 	require_once("mod/proxy.php");
 	require_once("include/message.php");
+	require_once("include/group.php");
 
 
 	/*
@@ -285,7 +307,7 @@
 	 * Unique contact to contact url.
 	 */
 	function api_unique_id_to_url($id){
-		$r = q("SELECT url FROM unique_contacts WHERE id=%d LIMIT 1",
+		$r = q("SELECT `url` FROM `unique_contacts` WHERE `id`=%d LIMIT 1",
 			intval($id));
 		if ($r)
 			return ($r[0]["url"]);
@@ -390,9 +412,9 @@
 			$r = array();
 
 			if ($url != "")
-				$r = q("SELECT * FROM unique_contacts WHERE url='%s' LIMIT 1", $url);
+				$r = q("SELECT * FROM `unique_contacts` WHERE `url`='%s' LIMIT 1", $url);
 			elseif ($nick != "")
-				$r = q("SELECT * FROM unique_contacts WHERE nick='%s' LIMIT 1", $nick);
+				$r = q("SELECT * FROM `unique_contacts` WHERE `nick`='%s' LIMIT 1", $nick);
 
 			if ($r) {
 				// If no nick where given, extract it from the address
@@ -505,14 +527,14 @@
 		}
 
 		// Fetching unique id
-		$r = q("SELECT id FROM unique_contacts WHERE url='%s' LIMIT 1", dbesc(normalise_link($uinfo[0]['url'])));
+		$r = q("SELECT id FROM `unique_contacts` WHERE `url`='%s' LIMIT 1", dbesc(normalise_link($uinfo[0]['url'])));
 
 		// If not there, then add it
 		if (count($r) == 0) {
-			q("INSERT INTO unique_contacts (url, name, nick, avatar) VALUES ('%s', '%s', '%s', '%s')",
+			q("INSERT INTO `unique_contacts` (`url`, `name`, `nick`, `avatar`) VALUES ('%s', '%s', '%s', '%s')",
 				dbesc(normalise_link($uinfo[0]['url'])), dbesc($uinfo[0]['name']),dbesc($uinfo[0]['nick']), dbesc($uinfo[0]['micro']));
 
-			$r = q("SELECT id FROM unique_contacts WHERE url='%s' LIMIT 1", dbesc(normalise_link($uinfo[0]['url'])));
+			$r = q("SELECT `id` FROM `unique_contacts` WHERE `url`='%s' LIMIT 1", dbesc(normalise_link($uinfo[0]['url'])));
 		}
 
 		$network_name = network_to_name($uinfo[0]['network'], $uinfo[0]['url']);
@@ -539,7 +561,8 @@
 			'verified' => true,
 			'statusnet_blocking' => false,
 			'notifications' => false,
-			'statusnet_profile_url' => $a->get_baseurl()."/contacts/".$uinfo[0]['cid'],
+			//'statusnet_profile_url' => $a->get_baseurl()."/contacts/".$uinfo[0]['cid'],
+			'statusnet_profile_url' => $uinfo[0]['url'],
 			'uid' => intval($uinfo[0]['uid']),
 			'cid' => intval($uinfo[0]['cid']),
 			'self' => $uinfo[0]['self'],
@@ -552,32 +575,44 @@
 
 	function api_item_get_user(&$a, $item) {
 
-		$author = q("SELECT * FROM unique_contacts WHERE url='%s' LIMIT 1",
+		$author = q("SELECT * FROM `unique_contacts` WHERE `url`='%s' LIMIT 1",
 			dbesc(normalise_link($item['author-link'])));
 
 		if (count($author) == 0) {
-			q("INSERT INTO unique_contacts (url, name, avatar) VALUES ('%s', '%s', '%s')",
-			dbesc(normalise_link($item["author-link"])), dbesc($item["author-name"]), dbesc($item["author-avatar"]));
+			q("INSERT INTO `unique_contacts` (`url`, `name`, `avatar`) VALUES ('%s', '%s', '%s')",
+				dbesc(normalise_link($item["author-link"])), dbesc($item["author-name"]), dbesc($item["author-avatar"]));
 
-			$author = q("SELECT id FROM unique_contacts WHERE url='%s' LIMIT 1",
+			$author = q("SELECT `id` FROM `unique_contacts` WHERE `url`='%s' LIMIT 1",
 				dbesc(normalise_link($item['author-link'])));
 		} else if ($item["author-link"].$item["author-name"] != $author[0]["url"].$author[0]["name"]) {
-			q("UPDATE unique_contacts SET name = '%s', avatar = '%s' WHERE url = '%s'",
-			dbesc($item["author-name"]), dbesc($item["author-avatar"]), dbesc(normalise_link($item["author-link"])));
+			$r = q("SELECT `id` FROM `unique_contacts` WHERE `name` = '%s' AND `avatar` = '%s' AND url = '%s'",
+				dbesc($item["author-name"]), dbesc($item["author-avatar"]),
+				dbesc(normalise_link($item["author-link"])));
+
+			if (!$r)
+				q("UPDATE `unique_contacts` SET `name` = '%s', `avatar` = '%s' WHERE `url` = '%s'",
+					dbesc($item["author-name"]), dbesc($item["author-avatar"]),
+					dbesc(normalise_link($item["author-link"])));
 		}
 
-		$owner = q("SELECT id FROM unique_contacts WHERE url='%s' LIMIT 1",
+		$owner = q("SELECT `id` FROM `unique_contacts` WHERE `url`='%s' LIMIT 1",
 			dbesc(normalise_link($item['owner-link'])));
 
 		if (count($owner) == 0) {
-			q("INSERT INTO unique_contacts (url, name, avatar) VALUES ('%s', '%s', '%s')",
-			dbesc(normalise_link($item["owner-link"])), dbesc($item["owner-name"]), dbesc($item["owner-avatar"]));
+			q("INSERT INTO `unique_contacts` (`url`, `name`, `avatar`) VALUES ('%s', '%s', '%s')",
+				dbesc(normalise_link($item["owner-link"])), dbesc($item["owner-name"]), dbesc($item["owner-avatar"]));
 
-			$owner = q("SELECT id FROM unique_contacts WHERE url='%s' LIMIT 1",
+			$owner = q("SELECT `id` FROM `unique_contacts` WHERE `url`='%s' LIMIT 1",
 				dbesc(normalise_link($item['owner-link'])));
 		} else if ($item["owner-link"].$item["owner-name"] != $owner[0]["url"].$owner[0]["name"]) {
-			q("UPDATE unique_contacts SET name = '%s', avatar = '%s' WHERE url = '%s'",
-			dbesc($item["owner-name"]), dbesc($item["owner-avatar"]), dbesc(normalise_link($item["owner-link"])));
+			$r = q("SELECT `id` FROM `unique_contacts` WHERE `name` = '%s' AND `avatar` = '%s' AND url = '%s'",
+				dbesc($item["owner-name"]), dbesc($item["owner-avatar"]),
+				dbesc(normalise_link($item["owner-link"])));
+
+			if (!$r)
+				q("UPDATE `unique_contacts` SET `name` = '%s', `avatar` = '%s' WHERE `url` = '%s'",
+					dbesc($item["owner-name"]), dbesc($item["owner-avatar"]),
+					dbesc(normalise_link($item["owner-link"])));
 		}
 
 		// Comments in threads may appear as wall-to-wall postings.
@@ -914,14 +949,18 @@
 
 		logger('api_status_show: user_info: '.print_r($user_info, true), LOGGER_DEBUG);
 
+		if ($type == "raw")
+			$privacy_sql = "AND `item`.`allow_cid`='' AND `item`.`allow_gid`='' AND `item`.`deny_cid`='' AND `item`.`deny_gid`=''";
+		else
+			$privacy_sql = "";
+
 		// get last public wall message
 		$lastwall = q("SELECT `item`.*, `i`.`contact-id` as `reply_uid`, `i`.`author-link` AS `item-author`
 				FROM `item`, `item` as `i`
 				WHERE `item`.`contact-id` = %d AND `item`.`uid` = %d
 					AND ((`item`.`author-link` IN ('%s', '%s')) OR (`item`.`owner-link` IN ('%s', '%s')))
 					AND `i`.`id` = `item`.`parent`
-					AND `item`.`type`!='activity'
-					AND `item`.`allow_cid`='' AND `item`.`allow_gid`='' AND `item`.`deny_cid`='' AND `item`.`deny_gid`=''
+					AND `item`.`type`!='activity' $privacy_sql
 				ORDER BY `item`.`created` DESC
 				LIMIT 1",
 				intval($user_info['cid']),
@@ -944,7 +983,7 @@
 				$in_reply_to_status_id= intval($lastwall['parent']);
 				$in_reply_to_status_id_str = (string) intval($lastwall['parent']);
 
-				$r = q("SELECT * FROM unique_contacts WHERE `url` = '%s'", dbesc(normalise_link($lastwall['item-author'])));
+				$r = q("SELECT * FROM `unique_contacts` WHERE `url` = '%s'", dbesc(normalise_link($lastwall['item-author'])));
 				if ($r) {
 					if ($r[0]['nick'] == "")
 						$r[0]['nick'] = api_get_nick($r[0]["url"]);
@@ -967,7 +1006,7 @@
 				$in_reply_to_screen_name = NULL;
 			}
 
-			$converted = api_convert_item($item);
+			$converted = api_convert_item($lastwall);
 
 			$status_info = array(
 				'created_at' => api_date($lastwall['created']),
@@ -1012,6 +1051,8 @@
 			unset($status_info["user"]["uid"]);
 			unset($status_info["user"]["self"]);
 		}
+
+		logger('status_info: '.print_r($status_info, true), LOGGER_DEBUG);
 
 		if ($type == "raw")
 			return($status_info);
@@ -1064,7 +1105,7 @@
 					$in_reply_to_status_id = intval($lastwall['parent']);
 					$in_reply_to_status_id_str = (string) intval($lastwall['parent']);
 
-					$r = q("SELECT * FROM unique_contacts WHERE `url` = '%s'", dbesc(normalise_link($reply[0]['item-author'])));
+					$r = q("SELECT * FROM `unique_contacts` WHERE `url` = '%s'", dbesc(normalise_link($reply[0]['item-author'])));
 					if ($r) {
 						if ($r[0]['nick'] == "")
 							$r[0]['nick'] = api_get_nick($r[0]["url"]);
@@ -1076,7 +1117,7 @@
 				}
 			}
 
-			$converted = api_convert_item($item);
+			$converted = api_convert_item($lastwall);
 
 			$user_info['status'] = array(
 				'text' => $converted["text"],
@@ -1125,9 +1166,9 @@
 		$userlist = array();
 
 		if (isset($_GET["q"])) {
-			$r = q("SELECT id FROM unique_contacts WHERE name='%s'", dbesc($_GET["q"]));
+			$r = q("SELECT id FROM `unique_contacts` WHERE `name`='%s'", dbesc($_GET["q"]));
 			if (!count($r))
-				$r = q("SELECT id FROM unique_contacts WHERE nick='%s'", dbesc($_GET["q"]));
+				$r = q("SELECT `id` FROM `unique_contacts` WHERE `nick`='%s'", dbesc($_GET["q"]));
 
 			if (count($r)) {
 				foreach ($r AS $user) {
@@ -2170,7 +2211,7 @@
 					intval(api_user()),
 					intval($in_reply_to_status_id));
 				if ($r) {
-					$r = q("SELECT * FROM unique_contacts WHERE `url` = '%s'", dbesc(normalise_link($r[0]['author-link'])));
+					$r = q("SELECT * FROM `unique_contacts` WHERE `url` = '%s'", dbesc(normalise_link($r[0]['author-link'])));
 
 					if ($r) {
 						if ($r[0]['nick'] == "")
@@ -2429,7 +2470,7 @@
 
 		$stringify_ids = (x($_REQUEST,'stringify_ids')?$_REQUEST['stringify_ids']:false);
 
-		$r = q("SELECT unique_contacts.id FROM contact, unique_contacts WHERE contact.nurl = unique_contacts.url AND `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 $sql_extra",
+		$r = q("SELECT `unique_contact`.`id` FROM contact, `unique_contacts` WHERE contact.nurl = unique_contacts.url AND `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 $sql_extra",
 			intval(api_user())
 		);
 
@@ -2831,15 +2872,29 @@ function api_share_as_retweet(&$item) {
 
 function api_get_nick($profile) {
 /* To-Do:
- - remove trailing jung from profile url
+ - remove trailing junk from profile url
  - pump.io check has to check the website
 */
 
 	$nick = "";
 
-	$friendica = preg_replace("=https?://(.*)/profile/(.*)=ism", "$2", $profile);
-	if ($friendica != $profile)
-		$nick = $friendica;
+	$r = q("SELECT `nick` FROM `gcontact` WHERE `nurl` = '%s'",
+		dbesc(normalise_link($profile)));
+	if ($r)
+		$nick = $r[0]["nick"];
+
+	if (!$nick == "") {
+		$r = q("SELECT `nick` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s'",
+			dbesc(normalise_link($profile)));
+		if ($r)
+			$nick = $r[0]["nick"];
+	}
+
+	if (!$nick == "") {
+		$friendica = preg_replace("=https?://(.*)/profile/(.*)=ism", "$2", $profile);
+		if ($friendica != $profile)
+			$nick = $friendica;
+	}
 
 	if (!$nick == "") {
 		$diaspora = preg_replace("=https?://(.*)/u/(.*)=ism", "$2", $profile);
@@ -2877,8 +2932,8 @@ function api_get_nick($profile) {
 	//}
 
 	if ($nick != "") {
-		q("UPDATE unique_contacts SET nick = '%s' WHERE url = '%s'",
-			dbesc($nick), dbesc(normalise_link($profile)));
+		q("UPDATE `unique_contacts` SET `nick` = '%s' WHERE `nick` != '%s' AND url = '%s'",
+			dbesc($nick), dbesc($nick), dbesc(normalise_link($profile)));
 		return($nick);
 	}
 
@@ -2979,6 +3034,205 @@ function api_best_nickname(&$contacts) {
 		$contacts = array($contacts[0]);
 }
 
+	// return all or a specified group of the user with the containing contacts
+	function api_users_group_show(&$a, $type) {
+		if (api_user()===false) return false;		
+
+		// params
+		$user_info = api_get_user($a);
+		$gid = (x($_REQUEST,'gid') ? $_REQUEST['gid'] : 0);
+		$uid = $user_info['uid'];
+	
+		// get data of the specified group id or all groups if not specified
+		if ($gid != 0) {
+			$r = q("SELECT * FROM `group` WHERE `deleted` = 0 AND `uid` = %d AND `id` = %d",
+				intval($uid), 
+				intval($gid));
+			// error message if specified gid is not in database
+			if (count($r) == 0) 
+				die(api_error($a, $type, 'gid not available'));
+		}
+		else 
+			$r = q("SELECT * FROM `group` WHERE `deleted` = 0 AND `uid` = %d",
+				intval($uid));
+		
+		// loop through all groups and retrieve all members for adding data in the user array
+		foreach ($r as $rr) {
+			$members = group_get_members($rr['id']);
+			$users = array();
+			foreach ($members as $member) {
+				$user = api_get_user($a, $member['nurl']);
+				$users[] = $user;
+			}
+			$grps[] = array('name' => $rr['name'], 'gid' => $rr['id'], 'user' => $users);
+		}
+		return api_apply_template("group_show", $type, array('$groups' => $grps));
+	}
+	api_register_func('api/users/group_show', 'api_users_group_show', true);
+
+
+	// delete the specified group of the user
+	function api_users_group_delete(&$a, $type) {
+		if (api_user()===false) return false;		
+
+		// params
+		$user_info = api_get_user($a);
+		$gid = (x($_REQUEST,'gid') ? $_REQUEST['gid'] : 0);
+		$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
+		$uid = $user_info['uid'];
+	
+		// error if no gid specified
+		if ($gid == 0 || $name == "")
+			die(api_error($a, $type, 'gid or name not specified'));
+
+		// get data of the specified group id
+		$r = q("SELECT * FROM `group` WHERE `uid` = %d AND `id` = %d",
+			intval($uid), 
+			intval($gid));
+		// error message if specified gid is not in database
+		if (count($r) == 0) 
+			die(api_error($a, $type, 'gid not available'));
+
+		// get data of the specified group id and group name
+		$rname = q("SELECT * FROM `group` WHERE `uid` = %d AND `id` = %d AND `name` = '%s'",
+			intval($uid), 
+			intval($gid),
+			dbesc($name));
+		// error message if specified gid is not in database
+		if (count($rname) == 0) 
+			die(api_error($a, $type, 'wrong group name'));
+
+		// delete group
+		$ret = group_rmv($uid, $name);
+		if ($ret) {
+			// return success
+			$success = array('success' => $ret, 'gid' => $gid, 'name' => $name, 'status' => 'deleted', 'wrong users' => array());
+			return api_apply_template("group_delete", $type, array('$result' => $success));
+		}
+		else
+			die(api_error($a, $type, 'other API error'));
+	}
+	api_register_func('api/users/group_delete', 'api_users_group_delete', true);
+
+
+	// create the specified group with the posted array of contacts 
+	function api_users_group_create(&$a, $type) {
+		if (api_user()===false) return false;		
+
+		// params
+		$user_info = api_get_user($a);
+		$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
+		$uid = $user_info['uid'];
+		$json = json_decode($_POST['json'], true);
+		$users = $json['user'];
+
+		// error if no name specified
+		if ($name == "")
+			die(api_error($a, $type, 'group name not specified'));
+
+		// get data of the specified group name
+		$rname = q("SELECT * FROM `group` WHERE `uid` = %d AND `name` = '%s' AND `deleted` = 0",
+			intval($uid), 
+			dbesc($name));
+		// error message if specified group name already exists
+		if (count($rname) != 0) 
+			die(api_error($a, $type, 'group name already exists'));
+
+		// check if specified group name is a deleted group
+		$rname = q("SELECT * FROM `group` WHERE `uid` = %d AND `name` = '%s' AND `deleted` = 1",
+			intval($uid), 
+			dbesc($name));
+		// error message if specified group name already exists
+		if (count($rname) != 0) 
+			$reactivate_group = true;
+
+		// create group
+		$ret = group_add($uid, $name);
+		if ($ret) 
+			$gid = group_byname($uid, $name);
+		else
+			die(api_error($a, $type, 'other API error'));
+		
+		// add members
+		$erroraddinguser = false;
+		$errorusers = array();
+		foreach ($users as $user) {
+			$cid = $user['cid'];
+			// check if user really exists as contact
+			$contact = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d", 
+				intval($cid),
+				intval($uid));
+			if (count($contact))
+				$result = group_add_member($uid, $name, $cid, $gid);
+			else {
+				$erroraddinguser = true;
+				$errorusers[] = $cid;
+			}
+		}
+
+		// return success message incl. missing users in array
+		$status = ($erroraddinguser ? "missing user" : ($reactivate_group ? "reactivated" : "ok"));
+		$success = array('success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers);
+		return api_apply_template("group_create", $type, array('result' => $success));		
+	}
+	api_register_func('api/users/group_create', 'api_users_group_create', true);
+
+
+	// update the specified group with the posted array of contacts 
+	function api_users_group_update(&$a, $type) {
+		if (api_user()===false) return false;		
+
+		// params
+		$user_info = api_get_user($a);
+		$uid = $user_info['uid'];
+		$gid = (x($_REQUEST, 'gid') ? $_REQUEST['gid'] : 0);
+		$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
+		$json = json_decode($_POST['json'], true);
+		$users = $json['user'];
+
+		// error if no name specified
+		if ($name == "")
+			die(api_error($a, $type, 'group name not specified'));
+
+		// error if no gid specified
+		if ($gid == "")
+			die(api_error($a, $type, 'gid not specified'));
+
+		// remove members
+		$members = group_get_members($gid);
+		foreach ($members as $member) {
+			$cid = $member['id'];
+			foreach ($users as $user) {
+				$found = ($user['cid'] == $cid ? true : false);
+			}
+			if (!$found) {
+				$ret = group_rmv_member($uid, $name, $cid);
+			}
+		}
+
+		// add members
+		$erroraddinguser = false;
+		$errorusers = array();
+		foreach ($users as $user) {
+			$cid = $user['cid'];
+			// check if user really exists as contact
+			$contact = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d", 
+				intval($cid),
+				intval($uid));
+			if (count($contact))
+				$result = group_add_member($uid, $name, $cid, $gid);
+			else {
+				$erroraddinguser = true;
+				$errorusers[] = $cid;
+			}
+		}
+		
+		// return success message incl. missing users in array
+		$status = ($erroraddinguser ? "missing user" : "ok");
+		$success = array('success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers);
+		return api_apply_template("group_update", $type, array('result' => $success));		
+	}
+	api_register_func('api/users/group_update', 'api_users_group_update', true);
 
 /*
 To.Do:

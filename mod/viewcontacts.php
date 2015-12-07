@@ -1,4 +1,5 @@
 <?php
+require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 
 function viewcontacts_init(&$a) {
@@ -12,7 +13,6 @@ function viewcontacts_init(&$a) {
 
 
 function viewcontacts_content(&$a) {
-
 	require_once("mod/proxy.php");
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
@@ -48,7 +48,7 @@ function viewcontacts_content(&$a) {
 		if($rr['self'])
 			continue;
 
-	    $url = $rr['url'];
+		$url = $rr['url'];
 
 		// route DFRN profiles through the redirect
 
@@ -59,15 +59,20 @@ function viewcontacts_content(&$a) {
 		else
 			$url = zrl($url);
 
+		$contact_details = get_contact_details_by_url($rr['url'], $a->profile['uid']);
+
 		$contacts[] = array(
 			'id' => $rr['id'],
 			'img_hover' => sprintf( t('Visit %s\'s profile [%s]'), $rr['name'], $rr['url']),
-			'thumb' => proxy_url($rr['thumb']),
-			'name' => substr($rr['name'],0,20),
-			'username' => $rr['name'],
+			'thumb' => proxy_url($rr['thumb'], false, PROXY_SIZE_THUMB),
+			'name' => htmlentities(substr($rr['name'],0,20)),
+			'username' => htmlentities($rr['name']),
+			'details'       => $contact_details['location'],
+                        'tags'          => $contact_details['keywords'],
+                        'about'         => $contact_details['about'],
 			'url' => $url,
 			'sparkle' => '',
-			'itemurl' => $rr['url'],
+			'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
 			'network' => network_to_name($rr['network'], $rr['url']),
 		);
 	}

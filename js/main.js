@@ -4,20 +4,20 @@
   }
 
   function openClose(theID) {
-    if(document.getElementById(theID).style.display == "block") { 
-      document.getElementById(theID).style.display = "none" 
+    if(document.getElementById(theID).style.display == "block") {
+      document.getElementById(theID).style.display = "none"
     }
-    else { 
-      document.getElementById(theID).style.display = "block" 
-    } 
+    else {
+      document.getElementById(theID).style.display = "block"
+    }
   }
 
   function openMenu(theID) {
-      document.getElementById(theID).style.display = "block" 
+      document.getElementById(theID).style.display = "block"
   }
 
   function closeMenu(theID) {
-      document.getElementById(theID).style.display = "none" 
+      document.getElementById(theID).style.display = "none"
   }
 
 
@@ -50,14 +50,14 @@
 			if (e.hasClass("ttright")) pos="right";
 			e.tipTip({defaultPosition: pos, edgeOffset: 8});
 		});*/
-		
+
 		/* setup comment textarea buttons */
 		/* comment textarea buttons needs some "data-*" attributes to work:
 		 * 		data-role="insert-formatting" : to mark the element as a formatting button
 		 * 		data-comment="<string>" : string for "Comment", used by insertFormatting() function
 		 * 		data-bbcode="<string>" : name of the bbcode element to insert. insertFormatting() will insert it as "[name][/name]"
 		 * 		data-id="<string>" : id of the comment, used to find other comment-related element, like the textarea
-		 * */		
+		 * */
 		$('body').on('click','[data-role="insert-formatting"]', function(e) {
 			e.preventDefault();
 			var o = $(this);
@@ -65,10 +65,9 @@
 			var bbcode  = o.data('bbcode');
 			var id = o.data('id');
 			if (bbcode=="img") {
-				$.colorbox({href: baseurl + "/fbrowser/image/?mode=minimal#comment-"+id, iframe:true,innerWidth:'500px',innerHeight:'400px'})
-				return;	
+				Dialog.doImageBrowser("comment", id);
+				return;
 			}
-			
 			insertFormatting(comment, bbcode, id);
 		});
 
@@ -82,18 +81,18 @@
 			var end = textarea.selectionEnd;
 			textarea.value = textarea.value.substring(0, start) + bbcode + textarea.value.substring(end, textarea.value.length);
 		});
-	
-		
-		
+
+
+
 		/* setup onoff widgets */
 		$(".onoff input").each(function(){
 			val = $(this).val();
 			id = $(this).attr("id");
 			$("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
-			
+
 		});
 		$(".onoff > a").click(function(event){
-			event.preventDefault();	
+			event.preventDefault();
 			var input = $(this).siblings("input");
 			var val = 1-input.val();
 			var id = input.attr("id");
@@ -102,7 +101,7 @@
 			input.val(val);
 			//console.log(id);
 		});
-		
+
 		/* setup field_richtext */
 		setupFieldRichtext();
 
@@ -139,22 +138,22 @@
 		$('html').click(function() {
 			close_last_popup_menu();
 		});
-		
+
 		// fancyboxes
 		$("a.popupbox").colorbox({
 			'inline' : true,
 			'transition' : 'elastic'
 		});
-		
+
 
 		/* notifications template */
 		var notifications_tpl= unescape($("#nav-notifications-template[rel=template]").html());
 		var notifications_all = unescape($('<div>').append( $("#nav-notifications-see-all").clone() ).html()); //outerHtml hack
 		var notifications_mark = unescape($('<div>').append( $("#nav-notifications-mark-all").clone() ).html()); //outerHtml hack
 		var notifications_empty = unescape($("#nav-notifications-menu").html());
-		
+
 		/* nav update event  */
-		$('nav').bind('nav-update', function(e,data){;
+		$('nav').bind('nav-update', function(e,data){
 			var invalid = $(data).find('invalid').text();
 			if(invalid == 1) { window.location.href=window.location.href }
 
@@ -165,7 +164,7 @@
 			var home = $(data).find('home').text();
 			if(home == 0) { home = '';  $('#home-update').removeClass('show') } else { $('#home-update').addClass('show') }
 			$('#home-update').html(home);
-			
+
 			var intro = $(data).find('intro').text();
 			if(intro == 0) { intro = '';  $('#intro-update').removeClass('show') } else { $('#intro-update').addClass('show') }
 			$('#intro-update').html(intro);
@@ -173,7 +172,7 @@
 			var mail = $(data).find('mail').text();
 			if(mail == 0) { mail = '';  $('#mail-update').removeClass('show') } else { $('#mail-update').addClass('show') }
 			$('#mail-update').html(mail);
-			
+
 			var intro = $(data).find('intro').text();
 			if(intro == 0) { intro = '';  $('#intro-update-li').removeClass('show') } else { $('#intro-update-li').addClass('show') }
 			$('#intro-update-li').html(intro);
@@ -204,9 +203,16 @@
 			var birthdaystoday = $(data).find('birthdays-today').text();
 			if(birthdaystoday == 0) { $('#birthdays-update').removeClass('notif-birthdays-today') } else { $('#birthdays-update').addClass('notif-birthdays-today') }
 
+			$(".sidebar-group-li .notify").removeClass("show");
+			$(data).find("group").each(function() {
+				var gid = this.id;
+				var gcount = this.innerHTML;
+				$(".group-"+gid+" .notify").addClass("show").text(gcount);
+			});
+
 
 			var eNotif = $(data).find('notif')
-			
+
 			if (eNotif.children("note").length==0){
 				$("#nav-notifications-menu").html(notifications_empty);
 			} else {
@@ -244,7 +250,7 @@
 							});
 						}
 					}
-					
+
 				});
 				notification_lastitem = notification_id;
 				localStorage.setItem("notification-lastitem", notification_lastitem)
@@ -267,7 +273,7 @@
 			}
 			if(notif == 0) { notif = ''; $('#notify-update').removeClass('show') } else { $('#notify-update').addClass('show') }
 			$('#notify-update').html(notif);
-			
+
 			var eSysmsg = $(data).find('sysmsgs');
 			eSysmsg.children("notice").each(function(){
 				text = $(this).text();
@@ -277,10 +283,10 @@
 				text = $(this).text();
 				$.jGrowl(text, { sticky: false, theme: 'info', life: 5000 });
 			});
-			
+
 		});
 
- 		NavUpdate(); 
+ 		NavUpdate();
 		// Allow folks to stop the ajax page updates with the pause/break key
 		$(document).keydown(function(event) {
 			if(event.keyCode == '8') {
@@ -306,8 +312,8 @@
 				}
 			}
 		});
-		
-		
+
+
 	});
 
 	function NavUpdate() {
@@ -318,8 +324,8 @@
 				$(data).find('result').each(function() {
 					// send nav-update event
 					$('nav').trigger('nav-update', this);
-					
-					
+
+
 					// start live update
 
 					if($('#live-network').length)   { src = 'network'; liveUpdate(); }
@@ -330,19 +336,19 @@
 /*					if($('#live-display').length) {
 						if(liking) {
 							liking = 0;
-							window.location.href=window.location.href 
+							window.location.href=window.location.href
 						}
 					}*/
-					if($('#live-photos').length) { 
+					if($('#live-photos').length) {
 						if(liking) {
 							liking = 0;
-							window.location.href=window.location.href 
+							window.location.href=window.location.href
 						}
 					}
 
-					
-					
-					
+
+
+
 				});
 			}) ;
 		}
@@ -432,8 +438,8 @@
 						});
 						$('#' + prev).after($(this));
 				}
-				else { 
-					$('#' + ident + ' ' + '.wall-item-ago').replaceWith($(this).find('.wall-item-ago')); 
+				else {
+					$('#' + ident + ' ' + '.wall-item-ago').replaceWith($(this).find('.wall-item-ago'));
 					if($('#' + ident + ' ' + '.comment-edit-text-empty').length)
 						$('#' + ident + ' ' + '.wall-item-comment-wrapper').replaceWith($(this).find('.wall-item-comment-wrapper'));
 					$('#' + ident + ' ' + '.hide-comments-total').replaceWith($(this).find('.hide-comments-total'));
@@ -443,7 +449,7 @@
 						$(this).attr('src',$(this).attr('dst'));
 					});
 				}
-				prev = ident; 
+				prev = ident;
 			});
 			*/
 			$('.like-rotator').hide();
@@ -467,10 +473,10 @@
 		$(node).removeClass("drop").addClass("drophide");
 	}
 
-	// Since our ajax calls are asynchronous, we will give a few 
-	// seconds for the first ajax call (setting like/dislike), then 
+	// Since our ajax calls are asynchronous, we will give a few
+	// seconds for the first ajax call (setting like/dislike), then
 	// run the updater to pick up any changes and display on the page.
-	// The updater will turn any rotators off when it's done. 
+	// The updater will turn any rotators off when it's done.
 	// This function will have returned long before any of these
 	// events have completed and therefore there won't be any
 	// visible feedback that anything changed without all this
@@ -582,14 +588,14 @@
 		commentBusy = true;
 		$('body').css('cursor', 'wait');
 		$("#comment-preview-inp-" + id).val("0");
-		$.post(  
-             "item",  
-             $("#comment-edit-form-" + id).serialize(),
+		$.post(
+			"item",
+			$("#comment-edit-form-" + id).serialize(),
 			function(data) {
 				if(data.success) {
 					$("#comment-edit-wrapper-" + id).hide();
 					$("#comment-edit-text-" + id).val('');
-    	  			var tarea = document.getElementById("comment-edit-text-" + id);
+					var tarea = document.getElementById("comment-edit-text-" + id);
 					if(tarea)
 						commentClose(tarea,id);
 					if(timer) clearTimeout(timer);
@@ -600,28 +606,27 @@
 					window.location.href=data.reload;
 				}
 			},
-			"json"  
-         );  
-         return false;  
+			"json"
+		);
+		return false;
 	}
 
 
 	function preview_comment(id) {
 		$("#comment-preview-inp-" + id).val("1");
 		$("#comment-edit-preview-" + id).show();
-		$.post(  
-             "item",  
-             $("#comment-edit-form-" + id).serialize(),
+		$.post(
+			"item",
+			$("#comment-edit-form-" + id).serialize(),
 			function(data) {
 				if(data.preview) {
-						
 					$("#comment-edit-preview-" + id).html(data.preview);
 					$("#comment-edit-preview-" + id + " a").click(function() { return false; });
 				}
 			},
-			"json"  
-         );  
-         return true;  
+			"json"
+		);
+		return true;
 	}
 
 
@@ -643,19 +648,19 @@
 		$("#jot-preview").val("1");
 		$("#jot-preview-content").show();
 		tinyMCE.triggerSave();
-		$.post(  
-			"item",  
+		$.post(
+			"item",
 			$("#profile-jot-form").serialize(),
 			function(data) {
-				if(data.preview) {			
+				if(data.preview) {
 					$("#jot-preview-content").html(data.preview);
 					$("#jot-preview-content" + " a").click(function() { return false; });
 				}
 			},
-			"json"  
-		);  
+			"json"
+		);
 		$("#jot-preview").val("0");
-		return true;  
+		return true;
 	}
 
 
@@ -663,38 +668,38 @@
 		// unpause auto reloads if they are currently stopped
 		totStopped = false;
 		stopped = false;
-	    $('#pause').html('');
+		$('#pause').html('');
 	}
-		
 
-    function bin2hex(s){  
-        // Converts the binary representation of data to hex    
-        //   
-        // version: 812.316  
-        // discuss at: http://phpjs.org/functions/bin2hex  
-        // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
-        // +   bugfixed by: Onno Marsman  
-        // +   bugfixed by: Linuxworld  
-        // *     example 1: bin2hex('Kev');  
-        // *     returns 1: '4b6576'  
-        // *     example 2: bin2hex(String.fromCharCode(0x00));  
-        // *     returns 2: '00'  
-        var v,i, f = 0, a = [];  
-        s += '';  
-        f = s.length;  
-          
-        for (i = 0; i<f; i++) {  
-            a[i] = s.charCodeAt(i).toString(16).replace(/^([\da-f])$/,"0$1");  
-        }  
-          
-        return a.join('');  
-    }  
+
+    function bin2hex(s){
+        // Converts the binary representation of data to hex
+        //
+        // version: 812.316
+        // discuss at: http://phpjs.org/functions/bin2hex
+        // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // +   bugfixed by: Onno Marsman
+        // +   bugfixed by: Linuxworld
+        // *     example 1: bin2hex('Kev');
+        // *     returns 1: '4b6576'
+        // *     example 2: bin2hex(String.fromCharCode(0x00));
+        // *     returns 2: '00'
+        var v,i, f = 0, a = [];
+        s += '';
+        f = s.length;
+
+        for (i = 0; i<f; i++) {
+            a[i] = s.charCodeAt(i).toString(16).replace(/^([\da-f])$/,"0$1");
+        }
+
+        return a.join('');
+    }
 
 	function groupChangeMember(gid, cid, sec_token) {
 		$('body .fakelink').css('cursor', 'wait');
 		$.get('group/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
 				$('#group-update-wrapper').html(data);
-				$('body .fakelink').css('cursor', 'auto');				
+				$('body .fakelink').css('cursor', 'auto');
 		});
 	}
 
@@ -702,7 +707,7 @@
 		$('body .fakelink').css('cursor', 'wait');
 		$.get('profperm/' + gid + '/' + cid, function(data) {
 				$('#prof-update-wrapper').html(data);
-				$('body .fakelink').css('cursor', 'auto');				
+				$('body .fakelink').css('cursor', 'auto');
 		});
 	}
 
@@ -784,9 +789,9 @@ function setupFieldRichtext(){
 }
 
 
-/** 
- * sprintf in javascript 
- *	"{0} and {1}".format('zero','uno'); 
+/**
+ * sprintf in javascript
+ *	"{0} and {1}".format('zero','uno');
  **/
 String.prototype.format = function() {
     var formatted = this;
@@ -825,4 +830,69 @@ function getNotificationPermission() {
     } else {
         return Notification.permission;
     }
+}
+
+/**
+ * Show a dialog loaded from an url
+ * By defaults this load the url in an iframe in colorbox
+ * Themes can overwrite `show()` function to personalize it
+ */
+var Dialog = {
+	/**
+	 * Show the dialog
+	 *
+	 * @param string url
+	 * @return object colorbox
+	 */
+	show : function (url) {
+		var size = Dialog._get_size();
+		return $.colorbox({href: url, iframe:true,innerWidth: size.width+'px',innerHeight: size.height+'px'})
+	},
+
+	/**
+	 * Show the Image browser dialog
+	 *
+	 * @param string name
+	 * @param string id (optional)
+	 * @return object
+	 *
+	 * The name will be used to build the event name
+	 * fired by image browser dialog when the user select
+	 * an image. The optional id will be passed as argument
+	 * to the event handler
+	 */
+	doImageBrowser : function (name, id) {
+		var url = Dialog._get_url("image",name,id);
+		return Dialog.show(url);
+	},
+
+	/**
+	 * Show the File browser dialog
+	 *
+	 * @param string name
+	 * @param string id (optional)
+	 * @return object
+	 *
+	 * The name will be used to build the event name
+	 * fired by file browser dialog when the user select
+	 * a file. The optional id will be passed as argument
+	 * to the event handler
+	 */
+	doFileBrowser : function (name, id) {
+		var url = Dialog._get_url("file",name,id);
+		return Dialog.show(url);
+	},
+
+	_get_url : function(type, name, id) {
+		var hash = name;
+		if (id !== undefined) hash = hash + "-" + id;
+		return baseurl + "/fbrowser/"+type+"/?mode=minimal#"+hash;
+	},
+
+	_get_size: function() {
+		return {
+			width: window.innerWidth-50,
+			height: window.innerHeight-100
+		};
+	}
 }

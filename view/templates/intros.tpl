@@ -1,10 +1,10 @@
-
+<h2>{{$header}}</h2>
 
 <div class="intro-wrapper" id="intro-{{$contact_id}}" >
 
 <p class="intro-desc">{{$str_notifytype}} {{$notify_type}}</p>
-<a class="intro-url-link" id="intro-url-link-{{$contact_id}}" href="{{$url}}" ><div class="intro-fullname" id="intro-fullname-{{$contact_id}}" >{{$fullname}}</div></a>
 <img id="photo-{{$contact_id}}" class="intro-photo" src="{{$photo}}" width="175" height=175" title="{{$fullname|escape:'html'}}" alt="{{$fullname|escape:'html'}}" />
+<dl><dt>{{$url_label}}</dt><dd><a target="blank" href="{{$zrl}}">{{$url}}</a></dd></dl>
 {{if $location}}<dl><dt>{{$location_label}}</dt><dd>{{$location}}</dd></dl>{{/if}}
 {{if $gender}}<dl><dt>{{$gender_label}}</dt><dd>{{$gender}}</dd></dl>{{/if}}
 {{if $keywords}}<dl><dt>{{$keywords_label}}</dt><dd>{{$keywords}}</dd></dl>{{/if}}

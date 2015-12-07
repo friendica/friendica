@@ -382,7 +382,7 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 				if($duplex)
 					$new_relation = CONTACT_IS_FRIEND;
 				else
-					$new_relation = CONTACT_IS_SHARING;
+					$new_relation = CONTACT_IS_FOLLOWER;
 
 				if($new_relation != CONTACT_IS_FOLLOWER)
 					$writable = 1;

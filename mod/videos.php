@@ -15,6 +15,8 @@ function videos_init(&$a) {
 		return;
 	}
 
+	nav_set_selected('home');
+
 	$o = '';
 
 	if($a->argc > 1) {
@@ -111,10 +113,10 @@ function videos_post(&$a) {
 			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), array(
 				'$method' => 'post',
 				'$message' => t('Do you really want to delete this video?'),
-				'$extra_inputs' => [
-					['name'=>'id', 'value'=> $_POST['id']],
-					['name'=>'delete', 'value'=>'x']
-				],
+				'$extra_inputs' => array(
+					array('name'=>'id', 'value'=> $_POST['id']),
+					array('name'=>'delete', 'value'=>'x')
+				),
 				'$confirm' => t('Delete Video'),
 				'$confirm_url' => $drop_url,
 				'$confirm_name' => 'confirm', // Needed so that confirmation will bring us back into this if statement

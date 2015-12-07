@@ -100,9 +100,9 @@ Wenn Du einen Kontakt komplett löschst, können sie Dir eine neue Freundschafts
 Blockierte Kontakte können das nicht machen. 
 Sie können nicht mit Dir direkt kommunizieren, nur über Freunde. 
 
-Ignorierte Kontakte können weiterhin Beiträge von Dir erhalten. 
-Deren Beiträge werden allerdings nicht importiert. W
-ie bei blockierten Beiträgen siehst Du auch hier weiterhin die Kommentare dieser Person zu anderen Beiträgen Deiner Freunde. 
+Ignorierte Kontakte können weiterhin Beiträge und private Nachrichten von Dir erhalten. 
+Deren Beiträge und private Nachrichten werden allerdings nicht importiert. 
+Wie bei blockierten Beiträgen siehst Du auch hier weiterhin die Kommentare dieser Person zu anderen Beiträgen Deiner Freunde. 
 
 [Ein Plugin namens "blockem" kann installiert werden, um alle Beiträge einer bestimmten Person in Deinem Stream zu verstecken bzw. zu verkürzen. 
 Dabei werden auch Kommentare dieser Person in Beiträgen Deiner Freunde blockiert.]

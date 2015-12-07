@@ -1,7 +1,7 @@
 /**
  * Filebrowser - Friendica Communications Server
  *
- * Copyright (c) 2010-2013 the Friendica Project
+ * Copyright (c) 2010-2015 the Friendica Project
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -13,33 +13,34 @@
  *
  * To load filebrowser in colorbox, call
  *
- *     $.colorbox({href: ulr, iframe:true,innerWidth:'500px',innerHeight:'400px'})
+ *      Dialog.doImageBrowser(eventname, id);
  *
- * where url is:
+ * or
  *
- * 		<baseurl>/fbrowser/<type>/?mode=minimal[#<eventname>-<id>]
+ *      Dialog.doFileBrowser(eventname, id);
  *
- * 		baseurl: baseurl from friendica
- * 		type: one of "image", "file"
+ * where:
+ *
  * 		eventname: event name to catch return value
  * 		id: id returned to event handler
  *
- * 	When user select an item, an event in fired in parent page, on body element
- * 	The event is named
+ * When user select an item, an event in fired in parent page, on body element
+ * The event is named
  *
  * 		fbrowser.<type>.[<eventname>]
  *
- * 	with params:
+ * <type> will be one of "image" or "file", and the event handler will
+ * get the following params:
  *
  * 		filemane: filename of item choosed by user
  * 		embed: bbcode to embed element into posts
- * 		id: id from url
+ * 		id: id from caller code
  *
- *  example:
+ * example:
  *
- *  	// open dialog for select an image for a textarea with id "myeditor"
- *		var id="myeditor";
- *		$.colorbox({href: baseurl + "/fbrowser/image/?mode=minimal#example-"+id, iframe:true,innerWidth:'500px',innerHeight:'400px'})
+ * 		// open dialog for select an image for a textarea with id "myeditor"
+ * 		var id="myeditor";
+ * 		Dialog.doImageBrowser("example", id);
  *
  *		// setup event handler to get user selection
  *		$("body").on("fbrowser.image.example", function(event, filename, bbcode, id) {

@@ -340,9 +340,9 @@ function delivery_run(&$argv, &$argc){
 						$ssl_policy = get_config('system','ssl_policy');
 						fix_contact_ssl_policy($x[0],$ssl_policy);
 
-						// If we are setup as a soapbox we aren't accepting input from this person
+						// If we are setup as a soapbox we aren't accepting top level posts from this person
 
-						if($x[0]['page-flags'] == PAGE_SOAPBOX)
+						if (($x[0]['page-flags'] == PAGE_SOAPBOX) AND $top_level)
 							break;
 
 						require_once('library/simplepie/simplepie.inc');
@@ -520,11 +520,16 @@ function delivery_run(&$argv, &$argc){
 				if((! $contact['pubkey']) && (! $public_message))
 					break;
 
-				if($target_item['verb'] === ACTIVITY_DISLIKE) {
-					// unsupported
-					break;
+				$unsupported_activities = array(ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE);
+
+				//don't transmit activities which are not supported by diaspora
+				foreach($unsupported_activities as $act) {
+					if(activity_match($target_item['verb'],$act)) {
+						break 2;
+					}
 				}
-				elseif(($target_item['deleted']) && ($target_item['uri'] === $target_item['parent-uri'])) {
+
+				if(($target_item['deleted']) && ($target_item['uri'] === $target_item['parent-uri'])) {
 					// top-level retraction
 					logger('delivery: diaspora retract: ' . $loc);
 

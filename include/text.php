@@ -20,6 +20,10 @@ function replace_macros($s,$r) {
 	$stamp1 = microtime(true);
 
 	$a = get_app();
+	
+	// pass $baseurl to all templates
+	$r['$baseurl'] = $a->get_baseurl();
+	
 
 	$t = $a->template_engine();
 	try {
@@ -970,7 +974,7 @@ function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 			. (($click) ? ' fakelink' : '') . '" '
 			. (($redir) ? ' target="redir" ' : '')
 			. (($url) ? ' href="' . $url . '"' : '') . $click . ' ><img class="contact-block-img' . $class . $sparkle . '" src="'
-			. proxy_url($contact['micro']) . '" title="' . $contact['name'] . ' [' . $contact['url'] . ']" alt="' . $contact['name']
+			. proxy_url($contact['micro'], false, PROXY_SIZE_THUMB) . '" title="' . $contact['name'] . ' [' . $contact['url'] . ']" alt="' . $contact['name']
 			. '" /></a></div>' . "\r\n";
 	}
 }}
@@ -1020,8 +1024,9 @@ if(! function_exists('valid_email')) {
  */
 function valid_email($x){
 
-	if(get_config('system','disable_email_validation'))
-		return true;
+	// Removed because Fabio told me so.
+	//if(get_config('system','disable_email_validation'))
+	//	return true;
 
 	if(preg_match('/^[_a-zA-Z0-9\-\+]+(\.[_a-zA-Z0-9\-\+]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/',$x))
 		return true;
@@ -1410,9 +1415,6 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 	put_item_in_cache($item, true);
 	$s = $item["rendered-html"];
 
-	require_once("mod/proxy.php");
-	$s = proxy_parse_html($s);
-
 	$prep_arr = array('item' => $item, 'html' => $s, 'preview' => $preview);
 	call_hooks('prepare_body', $prep_arr);
 	$s = $prep_arr['html'];
@@ -1505,7 +1507,7 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 		if($x) {
 			$s = preg_replace('/\<div class\=\"map\"\>/','$0' . $x,$s);
 		}
-	}		
+	}
 
 
 	// Look for spoiler
@@ -1738,50 +1740,6 @@ if(! function_exists('unamp')) {
  */
 function unamp($s) {
 	return str_replace('&amp;', '&', $s);
-}}
-
-
-
-
-if(! function_exists('lang_selector')) {
-/**
- * get html for language selector
- * @global string $lang
- * @return string
- * @template lang_selector.tpl
- */
-function lang_selector() {
-	global $lang;
-
-	$langs = glob('view/*/strings.php');
-
-	$lang_options = array();
-	$selected = "";
-
-	if(is_array($langs) && count($langs)) {
-		$langs[] = '';
-		if(! in_array('view/en/strings.php',$langs))
-			$langs[] = 'view/en/';
-		asort($langs);
-		foreach($langs as $l) {
-			if($l == '') {
-				$lang_options[""] = t('default');
-				continue;
-			}
-			$ll = substr($l,5);
-			$ll = substr($ll,0,strrpos($ll,'/'));
-			$selected = (($ll === $lang && (x($_SESSION, 'language'))) ? $ll : $selected);
-			$lang_options[$ll]=$ll;
-		}
-	}
-
-	$tpl = get_markup_template("lang_selector.tpl");
-	$o = replace_macros($tpl, array(
-		'$title' => t('Select an alternate language'),
-		'$langs' => array($lang_options, $selected),
-
-	));
-	return $o;
 }}
 
 
@@ -2317,14 +2275,14 @@ function deindent($text, $chr="[\t ]", $count=NULL) {
 	return implode("\n", $lines);
 }
 
-function formatBytes($bytes, $precision = 2) { 
-	 $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+function formatBytes($bytes, $precision = 2) {
+	 $units = array('B', 'KB', 'MB', 'GB', 'TB');
 
-	$bytes = max($bytes, 0); 
-	$pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
-	$pow = min($pow, count($units) - 1); 
+	$bytes = max($bytes, 0);
+	$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+	$pow = min($pow, count($units) - 1);
 
 	$bytes /= pow(1024, $pow);
 
-	return round($bytes, $precision) . ' ' . $units[$pow]; 
-} 
+	return round($bytes, $precision) . ' ' . $units[$pow];
+}

@@ -17,9 +17,9 @@ require_once('include/dbstructure.php');
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Lily of the valley');
-define ( 'FRIENDICA_VERSION',      '3.4.2' );
+define ( 'FRIENDICA_VERSION',      '3.4.3-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1188      );
+define ( 'DB_UPDATE_VERSION',      1191      );
 define ( 'EOL',                    "<br />\r\n"     );
 define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
 
@@ -163,7 +163,8 @@ define ( 'NETWORK_TWITTER',          'twit');    // Twitter
 define ( 'NETWORK_DIASPORA2',        'dspc');    // Diaspora connector
 define ( 'NETWORK_STATUSNET',        'stac');    // Statusnet connector
 define ( 'NETWORK_APPNET',           'apdn');    // app.net
-
+define ( 'NETWORK_NEWS',             'nntp');    // Network News Transfer Protocol
+define ( 'NETWORK_ICALENDAR',        'ical');    // iCalendar
 define ( 'NETWORK_PHANTOM',          'unkn');    // Place holder
 
 /**
@@ -189,7 +190,9 @@ $netgroup_ids = array(
 	NETWORK_TWITTER  => (-14),
 	NETWORK_DIASPORA2 => (-15),
 	NETWORK_STATUSNET => (-16),
-	NETWORK_APPNET => (-17),
+	NETWORK_APPNET    => (-17),
+	NETWORK_NEWS      => (-18),
+	NETWORK_ICALENDAR => (-19),
 
 	NETWORK_PHANTOM  => (-127),
 );
@@ -270,6 +273,10 @@ define ( 'NAMESPACE_ATOM1',           'http://www.w3.org/2005/Atom' );
 
 define ( 'ACTIVITY_LIKE',        NAMESPACE_ACTIVITY_SCHEMA . 'like' );
 define ( 'ACTIVITY_DISLIKE',     NAMESPACE_DFRN            . '/dislike' );
+define ( 'ACTIVITY_ATTEND',      NAMESPACE_ZOT             . '/activity/attendyes' );
+define ( 'ACTIVITY_ATTENDNO',    NAMESPACE_ZOT             . '/activity/attendno' );
+define ( 'ACTIVITY_ATTENDMAYBE', NAMESPACE_ZOT             . '/activity/attendmaybe' );
+
 define ( 'ACTIVITY_OBJ_HEART',   NAMESPACE_DFRN            . '/heart' );
 
 define ( 'ACTIVITY_FRIEND',      NAMESPACE_ACTIVITY_SCHEMA . 'make-friend' );
@@ -408,6 +415,7 @@ if(! class_exists('App')) {
 		public	$videoheight = 350;
 		public	$force_max_items = 0;
 		public	$theme_thread_allow = true;
+		public	$theme_events_in_profile = true;
 
 		// An array for all theme-controllable parameters
 		// Mostly unimplemented yet. Only options 'stylesheet' and
@@ -1432,8 +1440,46 @@ if(! function_exists('proc_run')) {
 		if(! $arr['run_cmd'])
 			return;
 
-		if(count($args) && $args[0] === 'php')
+		if(count($args) && $args[0] === 'php') {
+
+			if (get_config("system", "worker")) {
+				$argv = $args;
+				array_shift($argv);
+
+				$parameters = json_encode($argv);
+				$found = q("SELECT `id` FROM `workerqueue` WHERE `parameter` = '%s'",
+						dbesc($parameters));
+
+				if (!$found)
+					q("INSERT INTO `workerqueue` (`parameter`, `created`, `priority`)
+								VALUES ('%s', '%s', %d)",
+						dbesc($parameters),
+						dbesc(datetime_convert()),
+						intval(0));
+
+				// Should we quit and wait for the poller to be called as a cronjob?
+				if (get_config("system", "worker_dont_fork"))
+					return;
+
+				// Checking number of workers
+				$workers = q("SELECT COUNT(*) AS `workers` FROM `workerqueue` WHERE `executed` != '0000-00-00 00:00:00'");
+
+				// Get number of allowed number of worker threads
+				$queues = intval(get_config("system", "worker_queues"));
+
+				if ($queues == 0)
+					$queues = 4;
+
+				// If there are already enough workers running, don't fork another one
+				if ($workers[0]["workers"] >= $queues)
+					return;
+
+				// Now call the poller to execute the jobs that we just added to the queue
+				$args = array("php", "include/poller.php", "no_cron");
+			}
+
 			$args[0] = ((x($a->config,'php_path')) && (strlen($a->config['php_path'])) ? $a->config['php_path'] : 'php');
+		}
 
 		// add baseurl to args. cli scripts can't construct it
 		$args[] = $a->get_baseurl();
@@ -1441,9 +1487,8 @@ if(! function_exists('proc_run')) {
 		for($x = 0; $x < count($args); $x ++)
 			$args[$x] = escapeshellarg($args[$x]);
 
-
-
 		$cmdline = implode($args," ");
+
 		if(get_config('system','proc_windows'))
 			proc_close(proc_open('cmd /c start /b ' . $cmdline,array(),$foo,dirname(__FILE__)));
 		else
@@ -1620,7 +1665,7 @@ if(! function_exists('load_contact_links')) {
 		if(! $uid || x($a->contacts,'empty'))
 			return;
 
-		$r = q("SELECT `id`,`network`,`url`,`thumb` FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `thumb` != ''",
+		$r = q("SELECT `id`,`network`,`url`,`thumb`, `rel` FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `thumb` != ''",
 				intval($uid)
 		);
 		if(count($r)) {
@@ -1859,4 +1904,32 @@ if(!function_exists('exif_imagetype')) {
 		$size = getimagesize($file);
 		return($size[2]);
 	}
+}
+
+function validate_include(&$file) {
+	$orig_file = $file;
+
+	$file = realpath($file);
+
+	if (strpos($file, getcwd()) !== 0)
+		return false;
+
+	$file = str_replace(getcwd()."/", "", $file, $count);
+	if ($count != 1)
+		return false;
+
+	if ($orig_file !== $file)
+		return false;
+
+	$valid = false;
+	if (strpos($file, "include/") === 0)
+		$valid = true;
+
+	if (strpos($file, "addon/") === 0)
+		$valid = true;
+
+	if (!$valid)
+		return false;
+
+	return true;
 }

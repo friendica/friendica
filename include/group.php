@@ -156,9 +156,11 @@ function group_add_member($uid,$name,$member,$gid = 0) {
 function group_get_members($gid) {
 	$ret = array();
 	if(intval($gid)) {
-		$r = q("SELECT `group_member`.`contact-id`, `contact`.* FROM `group_member` 
-			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id` 
-			WHERE `gid` = %d AND `group_member`.`uid` = %d ORDER BY `contact`.`name` ASC ",
+		$r = q("SELECT `group_member`.`contact-id`, `contact`.* FROM `group_member`
+			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id`
+			WHERE `gid` = %d AND `group_member`.`uid` = %d AND
+				NOT `contact`.`self` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				ORDER BY `contact`.`name` ASC ",
 			intval($gid),
 			intval(local_user())
 		);
@@ -171,14 +173,14 @@ function group_get_members($gid) {
 function group_public_members($gid) {
 	$ret = 0;
 	if(intval($gid)) {
-		$r = q("SELECT `contact`.`id` AS `contact-id` FROM `group_member` 
-			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id` 
-			WHERE `gid` = %d AND `group_member`.`uid` = %d 
+		$r = q("SELECT `contact`.`id` AS `contact-id` FROM `group_member`
+			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id`
+			WHERE `gid` = %d AND `group_member`.`uid` = %d
 			AND  `contact`.`network` = '%s' AND `contact`.`notify` != '' ",
 			intval($gid),
 			intval(local_user()),
 			dbesc(NETWORK_OSTATUS)
-		);		
+		);
 		if(count($r))
 			$ret = count($r);
 	}
@@ -187,7 +189,7 @@ function group_public_members($gid) {
 
 
 function mini_group_select($uid,$gid = 0) {
-	
+
 	$grps = array();
 	$o = '';
 
@@ -205,7 +207,7 @@ function mini_group_select($uid,$gid = 0) {
 
 	$o = replace_macros(get_markup_template('group_selection.tpl'), array(
 		'$label' => t('Default privacy group for new contacts'),
-		'$groups' => $grps 
+		'$groups' => $grps
 	));
 	return $o;
 }

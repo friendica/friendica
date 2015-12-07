@@ -3,7 +3,7 @@ Friendica Addon/Plugin development
 
 Please see the sample addon 'randplace' for a working example of using some of these features.
 Addons work by intercepting event hooks - which must be registered.
-Modules work by intercepting specific page requests (by URL path). 
+Modules work by intercepting specific page requests (by URL path).
 
 Plugin names cannot contain spaces or other punctuation and are used as filenames and function names.
 You may supply a "friendly" name within the comment block.
@@ -12,12 +12,12 @@ For instance "plugin1name_install()".
 These two functions take no arguments and are usually responsible for registering (and unregistering) event hooks that your plugin will require.
 The install and uninstall functions will also be called (i.e. re-installed) if the plugin changes after installation.
 Therefore your uninstall should not destroy data and install should consider that data may already exist.
-Future extensions may provide for "setup" amd "remove". 
+Future extensions may provide for "setup" amd "remove".
 
-Plugins should contain a comment block with the four following parameters: 
+Plugins should contain a comment block with the four following parameters:
 
 	/*
-	* Name: My Great Plugin 
+	* Name: My Great Plugin
  	* Description: This is what my plugin does. It's really cool
  	* Version: 1.0
  	* Author: John Q. Public <john@myfriendicasite.com>
@@ -52,7 +52,7 @@ It contains a wealth of information about the current state of Friendica:
 * which module has been called,
 * configuration information,
 * the page contents at the point the hook was invoked,
-* profile and user information, etc. 
+* profile and user information, etc.
 
 It is recommeded you call this '$a' to match its usage elsewhere.
 
@@ -77,7 +77,7 @@ This will include:
 
 Your module functions will often contain the function plugin_name_content(&$a), which defines and returns the page body content.
 They may also contain plugin_name_post(&$a) which is called before the _content function and typically handles the results of POST forms.
-You may also have plugin_name_init(&$a) which is called very early on and often does module initialisation. 
+You may also have plugin_name_init(&$a) which is called very early on and often does module initialisation.
 
 Templates
 ----------
@@ -89,11 +89,11 @@ Put your tpl files in the *templates/* subfolder of your plugin.
 
 In your code, like in the function plugin_name_content(), load the template file and execute it passing needed values:
 
-    # load template file. first argument is the template name, 
+    # load template file. first argument is the template name,
     # second is the plugin path relative to friendica top folder
     $tpl = get_markup_template('mytemplate.tpl', 'addon/plugin_name/');
 
-    # apply template. first argument is the loaded template, 
+    # apply template. first argument is the loaded template,
     # second an array of 'name'=>'values' to pass to template
     $output = replace_macros($tpl,array(
         'title' => 'My beautiful plugin',
@@ -271,6 +271,16 @@ $b is an array, params to mail()
 is called after the navigational menu is build in include/nav.php.
 $b is an array containing $nav from nav.php.
 
+###'template_vars'
+is called before vars are passed to the template engine to render the page.
+The registered function can add,change or remove variables passed to template.
+$b is an array with:
+
+    'template' => filename of template
+    'vars' => array of vars passed to template
+
+
+
 Complete list of hook callbacks
 ---
 
@@ -298,7 +308,7 @@ include/text.php:	call_hooks('contact_block_end', $arr);
 
 include/text.php:	call_hooks('smilie', $s);
 
-include/text.php:	call_hooks('prepare_body_init', $item); 
+include/text.php:	call_hooks('prepare_body_init', $item);
 
 include/text.php:	call_hooks('prepare_body', $prep_arr);
 
@@ -310,7 +320,7 @@ include/auth.php:		call_hooks('authenticate', $addon_auth);
 
 include/bbcode.php:	call_hooks('bbcode',$Text);
 
-include/oauth.php:		call_hooks('logged_in', $a->user);		
+include/oauth.php:		call_hooks('logged_in', $a->user);
 
 include/acl_selectors.php:	call_hooks($a->module . '_pre_' . $selname, $arr);
 
@@ -396,7 +406,7 @@ mod/photos.php:	call_hooks('photo_post_end',intval($item_id));
 
 mod/photos.php:		call_hooks('photo_upload_form',$ret);
 
-mod/friendica.php:	call_hooks('about_hook', $o); 	
+mod/friendica.php:	call_hooks('about_hook', $o);
 
 mod/editpost.php:	call_hooks('jot_tool', $jotplugins);
 

@@ -27,6 +27,7 @@
 {{include file="field_input.tpl" field=$email}}
 {{include file="field_password.tpl" field=$password4}}
 {{include file="field_custom.tpl" field=$timezone}}
+{{include file="field_select.tpl" field=$language}}
 {{include file="field_input.tpl" field=$defloc}}
 {{include file="field_checkbox.tpl" field=$allowloc}}
 

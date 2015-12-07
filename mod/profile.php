@@ -221,8 +221,10 @@ function profile_content(&$a, $update = 0) {
 			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND
-			(`item`.`deleted` = 0 OR item.verb = '" . ACTIVITY_LIKE ."' OR item.verb = '" . ACTIVITY_DISLIKE . "')
-			and `item`.`moderated` = 0 and `item`.`unseen` = 1
+			(`item`.`deleted` = 0 OR item.verb = '" . ACTIVITY_LIKE ."'
+			OR item.verb = '" . ACTIVITY_DISLIKE . "' OR item.verb = '" . ACTIVITY_ATTEND . "'
+			OR item.verb = '" . ACTIVITY_ATTENDNO . "' OR item.verb = '" . ACTIVITY_ATTENDMAYBE . "')
+			AND `item`.`moderated` = 0 and `item`.`unseen` = 1
 			AND `item`.`wall` = 1
 			$sql_extra
 			ORDER BY `item`.`created` DESC",
@@ -266,10 +268,10 @@ function profile_content(&$a, $update = 0) {
 		//  accordingly
 		if ($a->is_mobile) {
 		    $itemspage_network = get_pconfig(local_user(),'system','itemspage_mobile_network');
-		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 20);
+		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 10);
 		} else {
 		    $itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
-		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 40);
+		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 20);
 		}
 		//  now that we have the user settings, see if the theme forces
 		//  a maximum item number which is lower then the user choice

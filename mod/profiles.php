@@ -206,7 +206,7 @@ function profiles_post(&$a) {
 			if($ignore_year)
 				$dob = '0000-' . $dob;
 		}
-                
+
 		$name = notags(trim($_POST['name']));
 
 		if(! strlen($name)) {
@@ -327,7 +327,7 @@ function profiles_post(&$a) {
 
 		$hide_friends = (($_POST['hide-friends'] == 1) ? 1: 0);
 
-
+		set_pconfig(local_user(),'system','detailled_profile', (($_POST['detailled_profile'] == 1) ? 1: 0));
 
 		$changes = array();
 		$value = '';
@@ -540,7 +540,7 @@ function profile_activity($changed, $value) {
 		return;
 
 	$arr = array();
-	$arr['uri'] = $arr['parent-uri'] = item_new_uri($a->get_hostname(), local_user()); 
+	$arr['uri'] = $arr['parent-uri'] = item_new_uri($a->get_hostname(), local_user());
 	$arr['uid'] = local_user();
 	$arr['contact-id'] = $self[0]['id'];
 	$arr['wall'] = 1;
@@ -552,7 +552,7 @@ function profile_activity($changed, $value) {
 	$arr['author-avatar'] = $arr['owner-avatar'] = $self[0]['thumb'];
 	$arr['verb'] = ACTIVITY_UPDATE;
 	$arr['object-type'] = ACTIVITY_OBJ_PROFILE;
-				
+
 	$A = '[url=' . $self[0]['url'] . ']' . $self[0]['name'] . '[/url]';
 
 
@@ -570,7 +570,7 @@ function profile_activity($changed, $value) {
 		$changes .= $ch;
 	}
 
-	$prof = '[url=' . $self[0]['url'] . '?tab=profile' . ']' . t('public profile') . '[/url]';	
+	$prof = '[url=' . $self[0]['url'] . '?tab=profile' . ']' . t('public profile') . '[/url]';
 
 	if($t == 1 && strlen($value)) {
 		$message = sprintf( t('%1$s changed %2$s to &ldquo;%3$s&rdquo;'), $A, $changes, $value);
@@ -578,9 +578,9 @@ function profile_activity($changed, $value) {
 	}
 	else
 		$message = 	sprintf( t('%1$s has an updated %2$s, changing %3$s.'), $A, $prof, $changes);
- 
 
-	$arr['body'] = $message;  
+
+	$arr['body'] = $message;
 
 	$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PROFILE . '</type><title>' . $self[0]['name'] . '</title>'
 	. '<id>' . $self[0]['url'] . '/' . $self[0]['name'] . '</id>';
@@ -664,8 +664,10 @@ function profiles_content(&$a) {
 			'$no_selected' => (($r[0]['hide-friends'] == 0) ? " checked=\"checked\" " : "")
 		));
 
+		$personal_account = !(in_array($a->user["page-flags"],
+					array(PAGE_COMMUNITY, PAGE_PRVGROUP)));
 
-
+		$detailled_profile = (get_pconfig(local_user(),'system','detailled_profile') AND $personal_account);
 
 		$f = get_config('system','birthday_input_format');
 		if(! $f)
@@ -674,6 +676,17 @@ function profiles_content(&$a) {
 		$is_default = (($r[0]['is-default']) ? 1 : 0);
 		$tpl = get_markup_template("profile_edit.tpl");
 		$o .= replace_macros($tpl,array(
+			'$personal_account' => $personal_account,
+			'$detailled_profile' => $detailled_profile,
+
+			'$details' => array(
+                                'detailled_profile', //Name
+                                t('Show more profile fields:'), //Label
+                                $detailled_profile, //Value
+                                '', //Help string
+                                array(t('No'),t('Yes')) //Off - On strings
+                        ),
+
 			'$multi_profiles' => feature_enabled(local_user(),'multi_profiles'),
 			'$form_security_token' => get_form_security_token("profile_edit"),
 			'$form_security_token_photo' => get_form_security_token("profile_photo"),
@@ -775,10 +788,10 @@ function profiles_content(&$a) {
 
 		return $o;
 	}
-	
+
 	//Profiles list.
 	else {
-		
+
 		//If we don't support multi profiles, don't display this list.
 		if(!feature_enabled(local_user(),'multi_profiles')){
 			$r = q(
@@ -790,11 +803,11 @@ function profiles_content(&$a) {
 				goaway($a->get_baseurl(true) . '/profiles/'.$r[0]['id']);
 			}
 		}
-		
+
 		$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
 			local_user());
 		if(count($r)) {
-			
+
 			$tpl_header = get_markup_template('profile_listing_header.tpl');
 			$o .= replace_macros($tpl_header,array(
 				'$header' => t('Edit/Manage Profiles'),
@@ -802,17 +815,17 @@ function profiles_content(&$a) {
 				'$cr_new' => t('Create New Profile'),
 				'$cr_new_link' => 'profiles/new?t=' . get_form_security_token("profile_new")
 			));
-			
-			
+
+
 			$tpl = get_markup_template('profile_entry.tpl');
-			
+
 			foreach($r as $rr) {
 				$o .= replace_macros($tpl, array(
 					'$photo' => $a->get_cached_avatar_image($rr['thumb']),
 					'$id' => $rr['id'],
 					'$alt' => t('Profile Image'),
 					'$profile_name' => $rr['profile-name'],
-					'$visible' => (($rr['is-default']) ? '<strong>' . t('visible to everybody') . '</strong>' 
+					'$visible' => (($rr['is-default']) ? '<strong>' . t('visible to everybody') . '</strong>'
 						: '<a href="' . $a->get_baseurl(true) . '/profperm/' . $rr['id'] . '" />' . t('Edit visibility') . '</a>')
 				));
 			}

@@ -47,12 +47,35 @@ function admin_post(&$a){
 				return; // NOTREACHED
 				break;
 			case 'themes':
+				if ($a->argc < 2) {
+					if(is_ajax()) return;
+					goaway($a->get_baseurl(true) . '/admin/' );
+					return;
+				}
+
 				$theme = $a->argv[2];
 				if (is_file("view/theme/$theme/config.php")){
-					require_once("view/theme/$theme/config.php");
-					if (function_exists("theme_admin_post")){
-						theme_admin_post($a);
+					function __call_theme_admin_post(&$a, $theme) {
+						$orig_theme = $a->theme;
+						$orig_page = $a->page;
+						$orig_session_theme = $_SESSION['theme'];
+						require_once("view/theme/$theme/theme.php");
+						require_once("view/theme/$theme/config.php");
+						$_SESSION['theme'] = $theme;
+
+
+						$init = $theme."_init";
+						if(function_exists($init)) $init($a);
+						if(function_exists("theme_admin_post")){
+							$admin_form = theme_admin_post($a);
+						}
+
+						$_SESSION['theme'] = $orig_session_theme;
+						$a->theme = $orig_theme;
+						$a->page = $orig_page;
+						return $admin_form;
 					}
+					__call_theme_admin_post($a, $theme);
 				}
 				info(t('Theme settings updated.'));
 				if(is_ajax()) return;
@@ -112,7 +135,7 @@ function admin_content(&$a) {
 
 	/* get plugins admin page */
 
-	$r = q("SELECT name FROM `addon` WHERE `plugin_admin`=1");
+	$r = q("SELECT `name` FROM `addon` WHERE `plugin_admin`=1 ORDER BY `name`");
 	$aside['plugins_admin']=Array();
 	foreach ($r as $h){
 		$plugin =$h['name'];
@@ -416,6 +439,11 @@ function admin_page_site_post(&$a){
 	$rino			=	((x($_POST,'rino'))				? intval($_POST['rino'])				: 0);
 	$embedly		=	((x($_POST,'embedly'))			? notags(trim($_POST['embedly']))		: '');
 
+	if ($a->get_path() != "")
+		$diaspora_enabled = false;
+
+	if (!$thread_allow)
+		$ostatus_disabled = true;
 
 	if($ssl_policy != intval(get_config('system','ssl_policy'))) {
 		if($ssl_policy == SSL_POLICY_FULL) {
@@ -535,6 +563,7 @@ function admin_page_site_post(&$a){
 	set_config('system','ostatus_disabled', $ostatus_disabled);
 	set_config('system','ostatus_poll_interval', $ostatus_poll_interval);
 	set_config('system','diaspora_enabled', $diaspora_enabled);
+
 	set_config('config','private_addons', $private_addons);
 
 	set_config('system','force_ssl', $force_ssl);
@@ -551,10 +580,10 @@ function admin_page_site_post(&$a){
 	set_config('system','old_pager', $old_pager);
 	set_config('system','only_tag_search', $only_tag_search);
 
-	
+
 	if ($rino==2 and !function_exists('mcrypt_create_iv')){
-		notice(t("RINO2 needs mcrypt php extension to work."));		
-	} else {	
+		notice(t("RINO2 needs mcrypt php extension to work."));
+	} else {
 		set_config('system','rino_encrypt', $rino);
 	}
 
@@ -574,18 +603,7 @@ function admin_page_site_post(&$a){
 function admin_page_site(&$a) {
 
 	/* Installed langs */
-	$lang_choices = array();
-	$langs = glob('view/*/strings.php'); /**/
-
-	if(is_array($langs) && count($langs)) {
-		if(! in_array('view/en/strings.php',$langs))
-			$langs[] = 'view/en/';
-		asort($langs);
-		foreach($langs as $l) {
-			$t = explode("/",$l);
-			$lang_choices[$t[1]] = $t[1];
-		}
-	}
+	$lang_choices = get_avaiable_languages();
 
 	if (strlen(get_config('system','directory_submit_url')) AND
 		!strlen(get_config('system','directory'))) {
@@ -597,58 +615,60 @@ function admin_page_site(&$a) {
 	$theme_choices = array();
 	$theme_choices_mobile = array();
 	$theme_choices_mobile["---"] = t("No special theme for mobile devices");
-	$files = glob('view/theme/*');
+	$files = glob('view/theme/*'); /**/
 	if($files) {
 		foreach($files as $file) {
+			if (intval(file_exists($file . '/unsupported')))
+				continue;
+
 			$f = basename($file);
 			$theme_name = ((file_exists($file . '/experimental')) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
 			if (file_exists($file . '/mobile')) {
 				$theme_choices_mobile[$f] = $theme_name;
-			}
-		else {
+			} else {
 				$theme_choices[$f] = $theme_name;
 			}
 		}
-		}
+	}
 
-		/* Community page style */
-		$community_page_style_choices = array(
-			CP_NO_COMMUNITY_PAGE => t("No community page"),
-			CP_USERS_ON_SERVER => t("Public postings from users of this site"),
-			CP_GLOBAL_COMMUNITY => t("Global community page")
-			);
+	/* Community page style */
+	$community_page_style_choices = array(
+		CP_NO_COMMUNITY_PAGE => t("No community page"),
+		CP_USERS_ON_SERVER => t("Public postings from users of this site"),
+		CP_GLOBAL_COMMUNITY => t("Global community page")
+		);
 
-		/* OStatus conversation poll choices */
-		$ostatus_poll_choices = array(
-			"-2" => t("Never"),
-			"-1" => t("At post arrival"),
-			"0" => t("Frequently"),
-			"60" => t("Hourly"),
-			"720" => t("Twice daily"),
-			"1440" => t("Daily")
-			);
+	/* OStatus conversation poll choices */
+	$ostatus_poll_choices = array(
+		"-2" => t("Never"),
+		"-1" => t("At post arrival"),
+		"0" => t("Frequently"),
+		"60" => t("Hourly"),
+		"720" => t("Twice daily"),
+		"1440" => t("Daily")
+		);
 
-		$poco_discovery_choices = array(
-			"0" => t("Disabled"),
-			"1" => t("Users"),
-			"2" => t("Users, Global Contacts"),
-			"3" => t("Users, Global Contacts/fallback"),
-			);
+	$poco_discovery_choices = array(
+		"0" => t("Disabled"),
+		"1" => t("Users"),
+		"2" => t("Users, Global Contacts"),
+		"3" => t("Users, Global Contacts/fallback"),
+		);
 
-		$poco_discovery_since_choices = array(
-			"30" => t("One month"),
-			"91" => t("Three months"),
-			"182" => t("Half a year"),
-			"365" => t("One year"),
-			);
+	$poco_discovery_since_choices = array(
+		"30" => t("One month"),
+		"91" => t("Three months"),
+		"182" => t("Half a year"),
+		"365" => t("One year"),
+		);
 
-		/* get user names to make the install a personal install of X */
-		$user_names = array();
-		$user_names['---'] = t('Multi user instance');
-		$users = q("SELECT username, nickname FROM `user`");
-		foreach ($users as $user) {
-			$user_names[$user['nickname']] = $user['username'];
-		}
+	/* get user names to make the install a personal install of X */
+	$user_names = array();
+	$user_names['---'] = t('Multi user instance');
+	$users = q("SELECT username, nickname FROM `user`");
+	foreach ($users as $user) {
+		$user_names[$user['nickname']] = $user['username'];
+	}
 
 	/* Banner */
 	$banner = get_config('system','banner');
@@ -680,6 +700,8 @@ function admin_page_site(&$a) {
 
 	if ($a->config['hostname'] == "")
 		$a->config['hostname'] = $a->get_hostname();
+
+	$diaspora_able = ($a->get_path() == "");
 
 	$t = get_markup_template("admin_site.tpl");
 	return replace_macros($t, array(
@@ -737,6 +759,9 @@ function admin_page_site(&$a) {
 		'$max_author_posts_community_page' => array('max_author_posts_community_page', t("Posts per user on community page"), get_config('system','max_author_posts_community_page'), t("The maximum number of posts per user on the community page. (Not valid for 'Global Community')")),
 		'$ostatus_disabled' 	=> array('ostatus_disabled', t("Enable OStatus support"), !get_config('system','ostatus_disabled'), t("Provide built-in OStatus \x28StatusNet, GNU Social etc.\x29 compatibility. All communications in OStatus are public, so privacy warnings will be occasionally displayed.")),
 		'$ostatus_poll_interval'	=> array('ostatus_poll_interval', t("OStatus conversation completion interval"), (string) intval(get_config('system','ostatus_poll_interval')), t("How often shall the poller check for new entries in OStatus conversations? This can be a very ressource task."), $ostatus_poll_choices),
+		'$ostatus_not_able'	=> t("OStatus support can only be enabled if threading is enabled."),
+		'$diaspora_able'	=> $diaspora_able,
+		'$diaspora_not_able'	=> t("Diaspora support can't be enabled because Friendica was installed into a sub directory."),
 		'$diaspora_enabled' 	=> array('diaspora_enabled', t("Enable Diaspora support"), get_config('system','diaspora_enabled'), t("Provide built-in Diaspora network compatibility.")),
 		'$dfrn_only'        	=> array('dfrn_only', t('Only allow Friendica contacts'), get_config('system','dfrn_only'), t("All contacts must use Friendica protocols. All other built-in communication protocols disabled.")),
 		'$verifyssl' 		=> array('verifyssl', t("Verify SSL"), get_config('system','verifyssl'), t("If you wish, you can turn on strict certificate checking. This will mean you cannot connect (at all) to self-signed SSL sites.")),
@@ -1206,7 +1231,7 @@ function admin_page_plugins(&$a){
 	 * List plugins
 	 */
 
-    if (x($_GET,"a") && $_GET['a']=="r"){
+	if (x($_GET,"a") && $_GET['a']=="r"){
 		check_form_security_token_redirectOnErr($a->get_baseurl().'/admin/plugins', 'admin_themes', 't');
 		reload_plugins();
 		info("Plugins reloaded");
@@ -1241,6 +1266,7 @@ function admin_page_plugins(&$a){
 		'$title' => t('Administration'),
 		'$page' => t('Plugins'),
 		'$submit' => t('Save Settings'),
+		'$reload' => t('Reload active plugins'),
 		'$baseurl' => $a->get_baseurl(true),
 		'$function' => 'plugins',
 		'$plugins' => $plugins,
@@ -1393,11 +1419,27 @@ function admin_page_themes(&$a){
 
 		$admin_form="";
 		if (is_file("view/theme/$theme/config.php")){
-			require_once("view/theme/$theme/config.php");
-			if(function_exists("theme_admin")){
-				$admin_form = theme_admin($a);
-			}
+			function __get_theme_admin_form(&$a, $theme) {
+				$orig_theme = $a->theme;
+				$orig_page = $a->page;
+				$orig_session_theme = $_SESSION['theme'];
+				require_once("view/theme/$theme/theme.php");
+				require_once("view/theme/$theme/config.php");
+				$_SESSION['theme'] = $theme;
 
+
+				$init = $theme."_init";
+				if(function_exists($init)) $init($a);
+				if(function_exists("theme_admin")){
+					$admin_form = theme_admin($a);
+				}
+
+				$_SESSION['theme'] = $orig_session_theme;
+				$a->theme = $orig_theme;
+				$a->page = $orig_page;
+				return $admin_form;
+			}
+			$admin_form = __get_theme_admin_form($a, $theme);
 		}
 
 		$screenshot = array( get_theme_screenshot($theme), t('Screenshot'));
@@ -1427,6 +1469,22 @@ function admin_page_themes(&$a){
 		));
 	}
 
+
+	// reload active themes
+	if (x($_GET,"a") && $_GET['a']=="r"){
+		check_form_security_token_redirectOnErr($a->get_baseurl().'/admin/themes', 'admin_themes', 't');
+		if ($themes) {
+			foreach($themes as $th) {
+				if ($th['allowed']) {
+					uninstall_theme($th['name']);
+					install_theme($th['name']);
+				}
+			}
+		}
+		info("Themes reloaded");
+		goaway($a->get_baseurl().'/admin/themes');
+	}
+
 	/**
 	 * List themes
 	 */
@@ -1438,11 +1496,13 @@ function admin_page_themes(&$a){
 		}
 	}
 
+
 	$t = get_markup_template("admin_plugins.tpl");
 	return replace_macros($t, array(
 		'$title' => t('Administration'),
 		'$page' => t('Themes'),
 		'$submit' => t('Save Settings'),
+		'$reload' => t('Reload active themes'),
 		'$baseurl' => $a->get_baseurl(true),
 		'$function' => 'themes',
 		'$plugins' => $xthemes,

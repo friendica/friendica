@@ -7,9 +7,10 @@
 
 			<a href="{{$contact.url}}" title="{{$contact.img_hover}}" /><img src="{{$contact.thumb}}" {{$contact.sparkle}} alt="{{$contact.name}}" /></a>
 
-			{{if !$no_contacts_checkbox}}
+			{{if $multiselect}}
 			<input type="checkbox" class="contact-select" name="contact_batch[]" value="{{$contact.id}}">
 			{{/if}}
+
 			{{if $contact.photo_menu}}
 			<span onclick="openClose('contact-photo-menu-{{$contact.id}}');" class="fakelink contact-photo-menu-button" id="contact-photo-menu-button-{{$contact.id}}">menu</span>
 			<div class="contact-photo-menu" id="contact-photo-menu-{{$contact.id}}">
@@ -27,8 +28,19 @@
 		</div>
 			
 	</div>
-	<div class="contact-entry-photo-end" ></div>
-	<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}" >{{$contact.name}}</div>
+
+	<div class="contact-entry-desc">
+		<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}" >
+			{{$contact.name}}
+			{{if $contact.account_type}} <span class="contact-entry-details" id="contact-entry-accounttype-{{$contact.id}}">({{$contact.account_type}})</span>{{/if}}
+		</div>
+		{{if $contact.alt_text}}<div class="contact-entry-details" id="contact-entry-rel-{{$contact.id}}" >{{$contact.alt_text}}</div>{{/if}}
+		{{if $contact.itemurl}}<div class="contact-entry-details" id="contact-entry-url-{{$contact.id}}" >{{$contact.itemurl}}</div>{{/if}}
+		{{if $contact.tags}}<div class="contact-entry-details" id="contact-entry-tags-{{$contact.id}}" >{{$contact.tags}}</div>{{/if}}
+		{{if $contact.details}}<div class="contact-entry-details" id="contact-entry-details-{{$contact.id}}" >{{$contact.details}}</div>{{/if}}
+		{{if $contact.network}}<div class="contact-entry-details" id="contact-entry-network-{{$contact.id}}" >{{$contact.network}}</div>{{/if}}
+		
+	</div>
 
 	<div class="contact-entry-end" ></div>
 </div>

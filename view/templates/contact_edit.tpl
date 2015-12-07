@@ -51,6 +51,9 @@
 				{{if $lblsuggest}}
 					<li><a href="fsuggest/{{$contact_id}}" id="contact-edit-suggest">{{$lblsuggest}}</a></li>
 				{{/if}}
+				{{if $follow}}
+					<li><div id="contact-edit-follow"><a href="{{$follow}}">{{$follow_text}}</a></div></li>
+				{{/if}}
 
 			</ul>
 		</div>

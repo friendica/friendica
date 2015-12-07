@@ -100,6 +100,9 @@ function register_post(&$a) {
 						 ). EOL
 				);
 			}
+		} else {
+			info( t('Registration successful.') . EOL ) ;
+			goaway(z_root());
 		}
 	}
 	elseif($a->config['register_policy'] == REGISTER_APPROVE) {
@@ -265,7 +268,7 @@ function register_content(&$a) {
 		'$fillext'   => $fillext,
 		'$oidlabel'  => $oidlabel,
 		'$openid'    => $openid_url,
-		'$namelabel' => t('Your Full Name ' . "\x28" . 'e.g. Joe Smith' . "\x29" . ': '),
+		'$namelabel' => t('Your Full Name ' . "\x28" . 'e.g. Joe Smith, real or real-looking' . "\x29" . ': '),
 		'$addrlabel' => t('Your Email Address: '),
 		'$passwords' => $passwords,
 		'$password1' => array('password1', t('New Password:'), '', t('Leave empty for an auto generated password.')),

@@ -1,6 +1,8 @@
 <?php
-/*
-Documentation: http://nodeinfo.diaspora.software/schema.html
+/**
+ * @file mod/nodeinfo.php
+ * 
+ * Documentation: http://nodeinfo.diaspora.software/schema.html
 */
 
 require_once("include/plugin.php");
@@ -67,48 +69,48 @@ function nodeinfo_init(&$a){
 
 	$nodeinfo["metadata"] = array("nodeName" => $a->config["sitename"]);
 
-	if (nodeinfo_plugin_enabled("appnet"))
+	if (plugin_enabled("appnet"))
 		$nodeinfo["services"]["inbound"][] = "appnet";
 
-	if (nodeinfo_plugin_enabled("appnet") OR nodeinfo_plugin_enabled("buffer"))
+	if (plugin_enabled("appnet") OR plugin_enabled("buffer"))
 		$nodeinfo["services"]["outbound"][] = "appnet";
 
-	if (nodeinfo_plugin_enabled("blogger"))
+	if (plugin_enabled("blogger"))
 		$nodeinfo["services"]["outbound"][] = "blogger";
 
-	if (nodeinfo_plugin_enabled("dwpost"))
+	if (plugin_enabled("dwpost"))
 		$nodeinfo["services"]["outbound"][] = "dreamwidth";
 
-	if (nodeinfo_plugin_enabled("fbpost") OR nodeinfo_plugin_enabled("buffer"))
+	if (plugin_enabled("fbpost") OR plugin_enabled("buffer"))
 		$nodeinfo["services"]["outbound"][] = "facebook";
 
-	if (nodeinfo_plugin_enabled("statusnet")) {
+	if (plugin_enabled("statusnet")) {
 		$nodeinfo["services"]["inbound"][] = "gnusocial";
 		$nodeinfo["services"]["outbound"][] = "gnusocial";
 	}
 
-	if (nodeinfo_plugin_enabled("gpluspost") OR nodeinfo_plugin_enabled("buffer"))
+	if (plugin_enabled("gpluspost") OR plugin_enabled("buffer"))
 		$nodeinfo["services"]["outbound"][] = "google";
 
-	if (nodeinfo_plugin_enabled("ijpost"))
+	if (plugin_enabled("ijpost"))
 		$nodeinfo["services"]["outbound"][] = "insanejournal";
 
-	if (nodeinfo_plugin_enabled("libertree"))
+	if (plugin_enabled("libertree"))
 		$nodeinfo["services"]["outbound"][] = "libertree";
 
-	if (nodeinfo_plugin_enabled("buffer"))
+	if (plugin_enabled("buffer"))
 		$nodeinfo["services"]["outbound"][] = "linkedin";
 
-	if (nodeinfo_plugin_enabled("ljpost"))
+	if (plugin_enabled("ljpost"))
 		$nodeinfo["services"]["outbound"][] = "livejournal";
 
-	if (nodeinfo_plugin_enabled("buffer"))
+	if (plugin_enabled("buffer"))
 		$nodeinfo["services"]["outbound"][] = "pinterest";
 
-	if (nodeinfo_plugin_enabled("posterous"))
+	if (plugin_enabled("posterous"))
 		$nodeinfo["services"]["outbound"][] = "posterous";
 
-	if (nodeinfo_plugin_enabled("pumpio")) {
+	if (plugin_enabled("pumpio")) {
 		$nodeinfo["services"]["inbound"][] = "pumpio";
 		$nodeinfo["services"]["outbound"][] = "pumpio";
 	}
@@ -118,13 +120,13 @@ function nodeinfo_init(&$a){
 	if ($smtp)
 		$nodeinfo["services"]["outbound"][] = "smtp";
 
-	if (nodeinfo_plugin_enabled("tumblr"))
+	if (plugin_enabled("tumblr"))
 		$nodeinfo["services"]["outbound"][] = "tumblr";
 
-	if (nodeinfo_plugin_enabled("twitter") OR nodeinfo_plugin_enabled("buffer"))
+	if (plugin_enabled("twitter") OR plugin_enabled("buffer"))
 		$nodeinfo["services"]["outbound"][] = "twitter";
 
-	if (nodeinfo_plugin_enabled("wppost"))
+	if (plugin_enabled("wppost"))
 		$nodeinfo["services"]["outbound"][] = "wordpress";
 
 	$nodeinfo["metadata"]["protocols"] = $nodeinfo["protocols"];
@@ -134,7 +136,7 @@ function nodeinfo_init(&$a){
 
 	$nodeinfo["metadata"]["services"] = $nodeinfo["services"];
 
-	if (nodeinfo_plugin_enabled("twitter"))
+	if (plugin_enabled("twitter"))
 		$nodeinfo["metadata"]["services"]["inbound"][] = "twitter";
 
 	header('Content-type: application/json; charset=utf-8');
@@ -142,17 +144,14 @@ function nodeinfo_init(&$a){
 	exit;
 }
 
-function nodeinfo_plugin_enabled($plugin) {
-	$r = q("SELECT * FROM `addon` WHERE `installed` = 1 AND `name` = '%s'", $plugin);
-	return((bool)(count($r) > 0));
-}
+
 
 function nodeinfo_cron() {
 
 	$a = get_app();
 
 	// If the plugin "statistics_json" is enabled then disable it and actrivate nodeinfo.
-	if (nodeinfo_plugin_enabled("statistics_json")) {
+	if (plugin_enabled("statistics_json")) {
 		set_config("system", "nodeinfo", true);
 
 		$plugin = "statistics_json";

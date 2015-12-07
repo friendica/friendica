@@ -1,7 +1,7 @@
 
 <div id='adminpage'>
 	<h1>{{$title}} - {{$page}}</h1>
-		<a class="btn" href="{{$baseurl}}/admin/{{$function}}?a=r&amp;t={{$form_security_token}}">{{"Reload active plugins"|t}}</a>
+		<a class="btn" href="{{$baseurl}}/admin/{{$function}}?a=r&amp;t={{$form_security_token}}">{{$reload}}</a>
 		<ul id='pluginslist'>
 		{{foreach $plugins as $p}}
 			<li class='plugin {{$p.1}}'>

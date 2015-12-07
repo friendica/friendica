@@ -13,6 +13,7 @@ require_once('include/threads.php');
 require_once('include/socgraph.php');
 require_once('include/plaintext.php');
 require_once('include/ostatus.php');
+require_once('include/feed.php');
 require_once('mod/share.php');
 
 require_once('library/defuse/php-encryption-1.2.1/Crypto.php');
@@ -1096,6 +1097,48 @@ function add_guid($item) {
 		dbesc($item["uri"]), dbesc($item["network"]));
 }
 
+// Adds a "lang" specification in a "postopts" element of given $arr,
+// if possible and not already present.
+// Expects "body" element to exist in $arr.
+// TODO: add a parameter to request forcing override
+function item_add_language_opt(&$arr) {
+
+	if (version_compare(PHP_VERSION, '5.3.0', '<')) return; // LanguageDetect.php not available ?
+
+	if ( x($arr, 'postopts') )
+	{
+		if ( strstr($arr['postopts'], 'lang=') )
+		{
+			// do not override
+			// TODO: add parameter to request overriding
+			return;
+		}
+		$postopts = $arr['postopts'];
+	}
+	else
+	{
+		$postopts = "";
+	}
+
+	require_once('library/langdet/Text/LanguageDetect.php');
+	$naked_body = preg_replace('/\[(.+?)\]/','',$arr['body']);
+	$l = new Text_LanguageDetect;
+	//$lng = $l->detectConfidence($naked_body);
+	//$arr['postopts'] = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
+	$lng = $l->detect($naked_body, 3);
+
+	if (sizeof($lng) > 0) {
+		if ($postopts != "") $postopts .= '&'; // arbitrary separator, to be reviewed
+		$postopts .= 'lang=';
+		$sep = "";
+		foreach ($lng as $language => $score) {
+			$postopts .= $sep . $language.";".$score;
+			$sep = ':';
+		}
+		$arr['postopts'] = $postopts;
+	}
+}
+
 function item_store($arr,$force_parent = false, $notify = false, $dontcache = false) {
 
 	// If it is a posting where users should get notifications, then define it as wall posting
@@ -1185,29 +1228,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	//if((strpos($arr['body'],'<') !== false) || (strpos($arr['body'],'>') !== false))
 	//	$arr['body'] = strip_tags($arr['body']);
 
-
-	if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-		require_once('library/langdet/Text/LanguageDetect.php');
-		$naked_body = preg_replace('/\[(.+?)\]/','',$arr['body']);
-		$l = new Text_LanguageDetect;
-		//$lng = $l->detectConfidence($naked_body);
-		//$arr['postopts'] = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
-		$lng = $l->detect($naked_body, 3);
-
-		if (sizeof($lng) > 0) {
-			$postopts = "";
-
-			foreach ($lng as $language => $score) {
-				if ($postopts == "")
-					$postopts = "lang=";
-				else
-					$postopts .= ":";
-
-				$postopts .= $language.";".$score;
-			}
-			$arr['postopts'] = $postopts;
-		}
-	}
+	item_add_language_opt($arr);
 
 	if ($notify)
 		$guid_prefix = "";
@@ -1218,10 +1239,10 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	$arr['guid']          = ((x($arr,'guid'))          ? notags(trim($arr['guid']))          : get_guid(32, $guid_prefix));
 	$arr['uri']           = ((x($arr,'uri'))           ? notags(trim($arr['uri']))           : $arr['guid']);
 	$arr['extid']         = ((x($arr,'extid'))         ? notags(trim($arr['extid']))         : '');
-	$arr['author-name']   = ((x($arr,'author-name'))   ? notags(trim($arr['author-name']))   : '');
+	$arr['author-name']   = ((x($arr,'author-name'))   ? trim($arr['author-name'])   : '');
 	$arr['author-link']   = ((x($arr,'author-link'))   ? notags(trim($arr['author-link']))   : '');
 	$arr['author-avatar'] = ((x($arr,'author-avatar')) ? notags(trim($arr['author-avatar'])) : '');
-	$arr['owner-name']    = ((x($arr,'owner-name'))    ? notags(trim($arr['owner-name']))    : '');
+	$arr['owner-name']    = ((x($arr,'owner-name'))    ? trim($arr['owner-name'])    : '');
 	$arr['owner-link']    = ((x($arr,'owner-link'))    ? notags(trim($arr['owner-link']))    : '');
 	$arr['owner-avatar']  = ((x($arr,'owner-avatar'))  ? notags(trim($arr['owner-avatar']))  : '');
 	$arr['created']       = ((x($arr,'created') !== false) ? datetime_convert('UTC','UTC',$arr['created']) : datetime_convert());
@@ -1229,8 +1250,8 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	$arr['commented']     = ((x($arr,'commented')  !== false) ? datetime_convert('UTC','UTC',$arr['commented'])  : datetime_convert());
 	$arr['received']      = ((x($arr,'received')  !== false) ? datetime_convert('UTC','UTC',$arr['received'])  : datetime_convert());
 	$arr['changed']       = ((x($arr,'changed')  !== false) ? datetime_convert('UTC','UTC',$arr['changed'])  : datetime_convert());
-	$arr['title']         = ((x($arr,'title'))         ? notags(trim($arr['title']))         : '');
-	$arr['location']      = ((x($arr,'location'))      ? notags(trim($arr['location']))      : '');
+	$arr['title']         = ((x($arr,'title'))         ? trim($arr['title'])         : '');
+	$arr['location']      = ((x($arr,'location'))      ? trim($arr['location'])      : '');
 	$arr['coord']         = ((x($arr,'coord'))         ? notags(trim($arr['coord']))         : '');
 	$arr['last-child']    = ((x($arr,'last-child'))    ? intval($arr['last-child'])          : 0 );
 	$arr['visible']       = ((x($arr,'visible') !== false) ? intval($arr['visible'])         : 1 );
@@ -1266,10 +1287,23 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	}
 
 	if ($arr['network'] == "") {
-		$r = q("SELECT `network` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($arr['contact-id']),
+		$r = q("SELECT `network` FROM `contact` WHERE `network` IN ('%s', '%s', '%s') AND `nurl` = '%s' AND `uid` = %d LIMIT 1",
+			dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS),
+			dbesc(normalise_link($arr['author-link'])),
 			intval($arr['uid'])
 		);
+
+		if(!count($r))
+			$r = q("SELECT `network` FROM `gcontact` WHERE `network` IN ('%s', '%s', '%s') AND `nurl` = '%s' LIMIT 1",
+				dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS),
+				dbesc(normalise_link($arr['author-link']))
+			);
+
+		if(!count($r))
+			$r = q("SELECT `network` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+				intval($arr['contact-id']),
+				intval($arr['uid'])
+			);
 
 		if(count($r))
 			$arr['network'] = $r[0]["network"];
@@ -1455,9 +1489,10 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	$arr = $unescaped;
 
 	// find the item we just created
-	$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = %d ORDER BY `id` ASC ",
+	$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = %d AND `network` = '%s' ORDER BY `id` ASC ",
 		dbesc($arr['uri']),
-		intval($arr['uid'])
+		intval($arr['uid']),
+		dbesc($arr['network'])
 	);
 
 	if(count($r)) {
@@ -2264,12 +2299,16 @@ function edited_timestamp_is_newer($existing, $update) {
 function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) {
 	if ($contact['network'] === NETWORK_OSTATUS) {
 		if ($pass < 2) {
-			// Test - remove before flight
-			//$tempfile = tempnam(get_temppath(), "ostatus");
-			//file_put_contents($tempfile, $xml);
-
 			logger("Consume OStatus messages ", LOGGER_DEBUG);
 			ostatus_import($xml,$importer,$contact, $hub);
+		}
+		return;
+	}
+
+	if ($contact['network'] === NETWORK_FEED) {
+		if ($pass < 2) {
+			logger("Consume feeds", LOGGER_DEBUG);
+			feed_import($xml,$importer,$contact, $hub);
 		}
 		return;
 	}
@@ -2342,85 +2381,45 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 		$contact_updated = $photo_timestamp;
 
 		require_once("include/Photo.php");
-		$photo_failure = false;
-		$have_photo = false;
+		$photos = import_profile_photo($photo_url,$contact['uid'],$contact['id']);
 
-		$r = q("SELECT `resource-id` FROM `photo` WHERE `contact-id` = %d AND `uid` = %d LIMIT 1",
-			intval($contact['id']),
-			intval($contact['uid'])
+		q("UPDATE `contact` SET `avatar-date` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s'
+			WHERE `uid` = %d AND `id` = %d AND NOT `self`",
+			dbesc(datetime_convert()),
+			dbesc($photos[0]),
+			dbesc($photos[1]),
+			dbesc($photos[2]),
+			intval($contact['uid']),
+			intval($contact['id'])
 		);
-		if(count($r)) {
-			$resource_id = $r[0]['resource-id'];
-			$have_photo = true;
-		}
-		else {
-			$resource_id = photo_new_resource();
-		}
-
-		$img_str = fetch_url($photo_url,true);
-		// guess mimetype from headers or filename
-		$type = guess_image_type($photo_url,true);
-
-
-		$img = new Photo($img_str, $type);
-		if($img->is_valid()) {
-			if($have_photo) {
-				q("DELETE FROM `photo` WHERE `resource-id` = '%s' AND `contact-id` = %d AND `uid` = %d",
-					dbesc($resource_id),
-					intval($contact['id']),
-					intval($contact['uid'])
-				);
-			}
-
-			$img->scaleImageSquare(175);
-
-			$hash = $resource_id;
-			$r = $img->store($contact['uid'], $contact['id'], $hash, basename($photo_url), 'Contact Photos', 4);
-
-			$img->scaleImage(80);
-			$r = $img->store($contact['uid'], $contact['id'], $hash, basename($photo_url), 'Contact Photos', 5);
-
-			$img->scaleImage(48);
-			$r = $img->store($contact['uid'], $contact['id'], $hash, basename($photo_url), 'Contact Photos', 6);
-
-			$a = get_app();
-
-			q("UPDATE `contact` SET `avatar-date` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s'
-				WHERE `uid` = %d AND `id` = %d",
-				dbesc(datetime_convert()),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-4.'.$img->getExt()),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-5.'.$img->getExt()),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-6.'.$img->getExt()),
-				intval($contact['uid']),
-				intval($contact['id'])
-			);
-		}
 	}
 
 	if((is_array($contact)) && ($name_updated) && (strlen($new_name)) && ($name_updated > $contact['name-date'])) {
 		if ($name_updated > $contact_updated)
 			$contact_updated = $name_updated;
 
-		$r = q("select * from contact where uid = %d and id = %d limit 1",
+		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `id` = %d LIMIT 1",
 			intval($contact['uid']),
 			intval($contact['id'])
 		);
 
-		$x = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s' WHERE `uid` = %d AND `id` = %d",
+		$x = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s' WHERE `uid` = %d AND `id` = %d AND `name` != '%s' AND NOT `self`",
 			dbesc(notags(trim($new_name))),
 			dbesc(datetime_convert()),
 			intval($contact['uid']),
-			intval($contact['id'])
+			intval($contact['id']),
+			dbesc(notags(trim($new_name)))
 		);
 
 		// do our best to update the name on content items
 
-		if(count($r)) {
-			q("update item set `author-name` = '%s' where `author-name` = '%s' and `author-link` = '%s' and uid = %d",
+		if(count($r) AND (notags(trim($new_name)) != $r[0]['name'])) {
+			q("UPDATE `item` SET `author-name` = '%s' WHERE `author-name` = '%s' AND `author-link` = '%s' AND `uid` = %d AND `author-name` != '%s'",
 				dbesc(notags(trim($new_name))),
 				dbesc($r[0]['name']),
 				dbesc($r[0]['url']),
-				intval($contact['uid'])
+				intval($contact['uid']),
+				dbesc(notags(trim($new_name)))
 			);
 		}
 	}
@@ -2518,6 +2517,11 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 					if(! $item['deleted'])
 						logger('consume_feed: deleting item ' . $item['id'] . ' uri=' . $item['uri'], LOGGER_DEBUG);
+
+					if($item['object-type'] === ACTIVITY_OBJ_EVENT) {
+						logger("Deleting event ".$item['event-id'], LOGGER_DEBUG);
+						event_delete($item['event-id']);
+					}
 
 					if(($item['verb'] === ACTIVITY_TAG) && ($item['object-type'] === ACTIVITY_OBJ_TAGTERM)) {
 						$xo = parse_xml_string($item['object'],false);
@@ -2726,7 +2730,11 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 				$datarray['parent-uri'] = $parent_uri;
 				$datarray['uid'] = $importer['uid'];
 				$datarray['contact-id'] = $contact['id'];
-				if((activity_match($datarray['verb'],ACTIVITY_LIKE)) || (activity_match($datarray['verb'],ACTIVITY_DISLIKE))) {
+				if(($datarray['verb'] === ACTIVITY_LIKE)
+					|| ($datarray['verb'] === ACTIVITY_DISLIKE)
+					|| ($datarray['verb'] === ACTIVITY_ATTEND)
+					|| ($datarray['verb'] === ACTIVITY_ATTENDNO)
+					|| ($datarray['verb'] === ACTIVITY_ATTENDMAYBE)) {
 					$datarray['type'] = 'activity';
 					$datarray['gravity'] = GRAVITY_LIKE;
 					// only one like or dislike per person
@@ -2806,11 +2814,12 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 				if((x($datarray,'object-type')) && ($datarray['object-type'] === ACTIVITY_OBJ_EVENT)) {
 					$ev = bbtoevent($datarray['body']);
-					if(x($ev,'desc') && x($ev,'start')) {
+					if((x($ev,'desc') || x($ev,'summary')) && x($ev,'start')) {
 						$ev['uid'] = $importer['uid'];
 						$ev['uri'] = $item_id;
 						$ev['edited'] = $datarray['edited'];
 						$ev['private'] = $datarray['private'];
+						$ev['guid'] = $datarray['guid'];
 
 						if(is_array($contact))
 							$ev['cid'] = $contact['id'];
@@ -3070,85 +3079,46 @@ function local_delivery($importer,$data) {
 
 		logger('local_delivery: Updating photo for ' . $importer['name']);
 		require_once("include/Photo.php");
-		$photo_failure = false;
-		$have_photo = false;
 
-		$r = q("SELECT `resource-id` FROM `photo` WHERE `contact-id` = %d AND `uid` = %d LIMIT 1",
-			intval($importer['id']),
-			intval($importer['importer_uid'])
+		$photos = import_profile_photo($photo_url,$importer['importer_uid'],$importer['id']);
+
+		q("UPDATE `contact` SET `avatar-date` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s'
+			WHERE `uid` = %d AND `id` = %d AND NOT `self`",
+			dbesc(datetime_convert()),
+			dbesc($photos[0]),
+			dbesc($photos[1]),
+			dbesc($photos[2]),
+			intval($importer['importer_uid']),
+			intval($importer['id'])
 		);
-		if(count($r)) {
-			$resource_id = $r[0]['resource-id'];
-			$have_photo = true;
-		}
-		else {
-			$resource_id = photo_new_resource();
-		}
-
-		$img_str = fetch_url($photo_url,true);
-		// guess mimetype from headers or filename
-		$type = guess_image_type($photo_url,true);
-
-
-		$img = new Photo($img_str, $type);
-		if($img->is_valid()) {
-			if($have_photo) {
-				q("DELETE FROM `photo` WHERE `resource-id` = '%s' AND `contact-id` = %d AND `uid` = %d",
-					dbesc($resource_id),
-					intval($importer['id']),
-					intval($importer['importer_uid'])
-				);
-			}
-
-			$img->scaleImageSquare(175);
-
-			$hash = $resource_id;
-			$r = $img->store($importer['importer_uid'], $importer['id'], $hash, basename($photo_url), 'Contact Photos', 4);
-
-			$img->scaleImage(80);
-			$r = $img->store($importer['importer_uid'], $importer['id'], $hash, basename($photo_url), 'Contact Photos', 5);
-
-			$img->scaleImage(48);
-			$r = $img->store($importer['importer_uid'], $importer['id'], $hash, basename($photo_url), 'Contact Photos', 6);
-
-			$a = get_app();
-
-			q("UPDATE `contact` SET `avatar-date` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s'
-				WHERE `uid` = %d AND `id` = %d",
-				dbesc(datetime_convert()),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-4.'.$img->getExt()),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-5.'.$img->getExt()),
-				dbesc($a->get_baseurl() . '/photo/' . $hash . '-6.'.$img->getExt()),
-				intval($importer['importer_uid']),
-				intval($importer['id'])
-			);
-		}
 	}
 
 	if(($name_updated) && (strlen($new_name)) && ($name_updated > $importer['name-date'])) {
 		if ($name_updated > $contact_updated)
 			$contact_updated = $name_updated;
 
-		$r = q("select * from contact where uid = %d and id = %d limit 1",
+		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `id` = %d LIMIT 1",
 			intval($importer['importer_uid']),
 			intval($importer['id'])
 		);
 
-		$x = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s' WHERE `uid` = %d AND `id` = %d",
+		$x = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s' WHERE `uid` = %d AND `id` = %d AND `name` != '%s' AND NOT `self`",
 			dbesc(notags(trim($new_name))),
 			dbesc(datetime_convert()),
 			intval($importer['importer_uid']),
-			intval($importer['id'])
+			intval($importer['id']),
+			dbesc(notags(trim($new_name)))
 		);
 
 		// do our best to update the name on content items
 
-		if(count($r)) {
-			q("update item set `author-name` = '%s' where `author-name` = '%s' and `author-link` = '%s' and uid = %d",
+		if(count($r) AND (notags(trim($new_name)) != $r[0]['name'])) {
+			q("UPDATE `item` SET `author-name` = '%s' WHERE `author-name` = '%s' AND `author-link` = '%s' AND `uid` = %d AND `author-name` != '%s'",
 				dbesc(notags(trim($new_name))),
 				dbesc($r[0]['name']),
 				dbesc($r[0]['url']),
-				intval($importer['importer_uid'])
+				intval($importer['importer_uid']),
+				dbesc(notags(trim($new_name)))
 			);
 		}
 	}
@@ -3500,6 +3470,11 @@ function local_delivery($importer,$data) {
 
 					logger('local_delivery: deleting item ' . $item['id'] . ' uri=' . $item['uri'], LOGGER_DEBUG);
 
+					if($item['object-type'] === ACTIVITY_OBJ_EVENT) {
+						logger("Deleting event ".$item['event-id'], LOGGER_DEBUG);
+						event_delete($item['event-id']);
+					}
+
 					if(($item['verb'] === ACTIVITY_TAG) && ($item['object-type'] === ACTIVITY_OBJ_TAGTERM)) {
 						$xo = parse_xml_string($item['object'],false);
 						$xt = parse_xml_string($item['target'],false);
@@ -3713,7 +3688,11 @@ function local_delivery($importer,$data) {
 				$datarray['owner-avatar'] = $own[0]['thumb'];
 				$datarray['contact-id'] = $importer['id'];
 
-				if(($datarray['verb'] === ACTIVITY_LIKE) || ($datarray['verb'] === ACTIVITY_DISLIKE)) {
+				if(($datarray['verb'] === ACTIVITY_LIKE) 
+					|| ($datarray['verb'] === ACTIVITY_DISLIKE)
+					|| ($datarray['verb'] === ACTIVITY_ATTEND)
+					|| ($datarray['verb'] === ACTIVITY_ATTENDNO)
+					|| ($datarray['verb'] === ACTIVITY_ATTENDMAYBE)) {
 					$is_like = true;
 					$datarray['type'] = 'activity';
 					$datarray['gravity'] = GRAVITY_LIKE;
@@ -3902,7 +3881,11 @@ function local_delivery($importer,$data) {
 				$datarray['parent-uri'] = $parent_uri;
 				$datarray['uid'] = $importer['importer_uid'];
 				$datarray['contact-id'] = $importer['id'];
-				if(($datarray['verb'] == ACTIVITY_LIKE) || ($datarray['verb'] == ACTIVITY_DISLIKE)) {
+				if(($datarray['verb'] === ACTIVITY_LIKE) 
+					|| ($datarray['verb'] === ACTIVITY_DISLIKE)
+					|| ($datarray['verb'] === ACTIVITY_ATTEND)
+					|| ($datarray['verb'] === ACTIVITY_ATTENDNO)
+					|| ($datarray['verb'] === ACTIVITY_ATTENDMAYBE)) {
 					$datarray['type'] = 'activity';
 					$datarray['gravity'] = GRAVITY_LIKE;
 					// only one like or dislike per person
@@ -4022,12 +4005,13 @@ function local_delivery($importer,$data) {
 
 			if((x($datarray,'object-type')) && ($datarray['object-type'] === ACTIVITY_OBJ_EVENT)) {
 				$ev = bbtoevent($datarray['body']);
-				if(x($ev,'desc') && x($ev,'start')) {
+				if((x($ev,'desc') || x($ev,'summary')) && x($ev,'start')) {
 					$ev['cid'] = $importer['id'];
 					$ev['uid'] = $importer['uid'];
 					$ev['uri'] = $item_id;
 					$ev['edited'] = $datarray['edited'];
 					$ev['private'] = $datarray['private'];
+					$ev['guid'] = $datarray['guid'];
 
 					$r = q("SELECT * FROM `event` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
 						dbesc($item_id),
@@ -4329,7 +4313,7 @@ function subscribe_to_hub($url,$importer,$contact,$hubmode = 'subscribe') {
 }
 
 
-function atom_author($tag,$name,$uri,$h,$w,$photo) {
+function atom_author($tag,$name,$uri,$h,$w,$photo,$geo) {
 	$o = '';
 	if(! $tag)
 		return $o;
@@ -4347,6 +4331,10 @@ function atom_author($tag,$name,$uri,$h,$w,$photo) {
 	$o .= "\t".'<link rel="avatar" type="image/jpeg" media:width="' . $w . '" media:height="' . $h . '" href="' . $photo . '" />' . "\r\n";
 
 	if ($tag == "author") {
+
+		if($geo)
+			$o .= '<georss:point>'.xmlify($geo).'</georss:point>'."\r\n";
+
 		$r = q("SELECT `profile`.`locality`, `profile`.`region`, `profile`.`country-name`,
 				`profile`.`name`, `profile`.`pub_keywords`, `profile`.`about`,
 				`profile`.`homepage`,`contact`.`nick` FROM `profile`
@@ -4410,11 +4398,11 @@ function atom_entry($item,$type,$author,$owner,$comment = false,$cid = 0) {
 	$o = "\r\n\r\n<entry>\r\n";
 
 	if(is_array($author))
-		$o .= atom_author('author',$author['name'],$author['url'],80,80,$author['thumb']);
+		$o .= atom_author('author',$author['name'],$author['url'],80,80,$author['thumb'], $item['coord']);
 	else
-		$o .= atom_author('author',(($item['author-name']) ? $item['author-name'] : $item['name']),(($item['author-link']) ? $item['author-link'] : $item['url']),80,80,(($item['author-avatar']) ? $item['author-avatar'] : $item['thumb']));
+		$o .= atom_author('author',(($item['author-name']) ? $item['author-name'] : $item['name']),(($item['author-link']) ? $item['author-link'] : $item['url']),80,80,(($item['author-avatar']) ? $item['author-avatar'] : $item['thumb']), $item['coord']);
 	if(strlen($item['owner-name']))
-		$o .= atom_author('dfrn:owner',$item['owner-name'],$item['owner-link'],80,80,$item['owner-avatar']);
+		$o .= atom_author('dfrn:owner',$item['owner-name'],$item['owner-link'],80,80,$item['owner-avatar'], $item['coord']);
 
 	if(($item['parent'] != $item['id']) || ($item['parent-uri'] !== $item['uri']) || (($item['thr-parent'] !== '') && ($item['thr-parent'] !== $item['uri']))) {
 		$parent = q("SELECT `guid` FROM `item` WHERE `id` = %d", intval($item["parent"]));

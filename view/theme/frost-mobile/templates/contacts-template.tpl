@@ -15,11 +15,10 @@
 {{$tabs}}
 
 
-<div id="contacts-display-wrapper">
+
 {{foreach $contacts as $contact}}
 	{{include file="contact_template.tpl"}}
 {{/foreach}}
-</div>
 <div id="contact-edit-end"></div>
 
 {{$paginate}}

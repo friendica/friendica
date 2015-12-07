@@ -22,6 +22,7 @@ function queue_run(&$argv, &$argc){
 	require_once('include/items.php');
 	require_once('include/bbcode.php');
 	require_once('include/pidfile.php');
+	require_once('include/socgraph.php');
 
 	load_config('config');
 	load_config('system');
@@ -59,6 +60,10 @@ function queue_run(&$argv, &$argc){
 
 	$interval = ((get_config('system','delivery_interval') === false) ? 2 : intval(get_config('system','delivery_interval')));
 
+	// If we are using the worker we don't need a delivery interval
+	if (get_config("system", "worker"))
+		$interval = false;
+
 	$r = q("select * from deliverq where 1");
 	if($r) {
 		foreach($r as $rr) {
@@ -88,7 +93,7 @@ function queue_run(&$argv, &$argc){
 	else {
 
 		// For the first 12 hours we'll try to deliver every 15 minutes
-		// After that, we'll only attempt delivery once per hour. 
+		// After that, we'll only attempt delivery once per hour.
 
 		$r = q("SELECT `id` FROM `queue` WHERE (( `created` > UTC_TIMESTAMP() - INTERVAL 12 HOUR && `last` < UTC_TIMESTAMP() - INTERVAL 15 MINUTE ) OR ( `last` < UTC_TIMESTAMP() - INTERVAL 1 HOUR ))");
 	}
@@ -107,7 +112,7 @@ function queue_run(&$argv, &$argc){
 
 	foreach($r as $q_item) {
 
-		// queue_predeliver hooks may have changed the queue db details, 
+		// queue_predeliver hooks may have changed the queue db details,
 		// so check again if this entry still needs processing
 
 		if($queue_id) {
@@ -132,12 +137,18 @@ function queue_run(&$argv, &$argc){
 			continue;
 		}
 		if(in_array($c[0]['notify'],$deadguys)) {
-				logger('queue: skipping known dead url: ' . $c[0]['notify']);
-				update_queue_time($q_item['id']);
-				continue;
+			logger('queue: skipping known dead url: ' . $c[0]['notify']);
+			update_queue_time($q_item['id']);
+			continue;
 		}
 
-		$u = q("SELECT `user`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey` 
+		if (!poco_reachable($c[0]['url'])) {
+			logger('queue: skipping probably dead url: ' . $c[0]['url']);
+			update_queue_time($q_item['id']);
+			continue;
+		}
+
+		$u = q("SELECT `user`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey`
 			FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($c[0]['uid'])
 		);
@@ -194,9 +205,9 @@ function queue_run(&$argv, &$argc){
 				call_hooks('queue_deliver', $a, $params);
 
 				if($params['result'])
-						remove_queue_item($q_item['id']);
+					remove_queue_item($q_item['id']);
 				else
-						update_queue_time($q_item['id']);
+					update_queue_time($q_item['id']);
 
 				break;
 

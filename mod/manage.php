@@ -97,9 +97,23 @@ function manage_content(&$a) {
 		return;
 	}
 
+	if ($_GET['identity']) {
+		$_POST['identity'] = $_GET['identity'];
+		manage_post($a);
+		return;
+	}
+
 	$identities = $a->identities;
-	foreach($identities as $key=>$id) {
-		$identities[$key]['selected'] = (($id['nickname'] === $a->user['nickname']) ? ' selected="selected" ' : '');
+
+	//getting additinal information for each identity
+	foreach ($identities as $key=>$id) {
+		$thumb = q("SELECT `thumb` FROM `contact` WHERE `uid` = '%s' AND `self` = 1",
+			dbesc($id['uid'])
+		);
+
+		$identities[$key][thumb] = $thumb[0][thumb];
+
+		$identities[$key]['selected'] = (($id['nickname'] === $a->user['nickname']) ? true : false);
 	}
 
 	$o = replace_macros(get_markup_template('manage.tpl'), array(

@@ -41,6 +41,8 @@ function discover_poco_run(&$argv, &$argc){
 		$mode = 1;
 	} elseif(($argc == 2) && ($argv[1] == "checkcontact")) {
 		$mode = 2;
+	} elseif(($argc == 2) && ($argv[1] == "suggestions")) {
+		$mode = 3;
 	} elseif ($argc == 1) {
 		$search = "";
 		$mode = 0;
@@ -69,7 +71,9 @@ function discover_poco_run(&$argv, &$argc){
 
 	logger('start '.$search);
 
-	if (($mode == 2) AND get_config('system','poco_completion'))
+	if ($mode==3)
+		update_suggestions();
+	elseif (($mode == 2) AND get_config('system','poco_completion'))
 		discover_users();
 	elseif (($mode == 1) AND ($search != "") and get_config('system','poco_local_search'))
 		discover_directory($search);

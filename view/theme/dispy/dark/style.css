@@ -125,8 +125,6 @@ nav #nav-notifications-linkmenu.on .icon.s22.notify,nav #nav-notifications-linkm
 #notify-update{background-position:-60px 0px;}
 #home-update{background-position:-90px 0px;}
 #intro-update{background-position:-120px 0px;}
-#lang-select-icon{cursor:pointer;position:fixed;left:28px;bottom:6px;z-index:10;}
-#language-selector{position:fixed;bottom:2px;left:52px;z-index:10;}
 .menu-popup{position:absolute;display:none;background:white;color:#2e2f2e;margin:0px;padding:0px;font-size:small;line-height:1.2;border:3px solid #88a9d2;-o-border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;z-index:100000;-moz-box-shadow:5px 5px 5px 0px #111111;-o-box-shadow:5px 5px 5px 0px #111111;-webkit-box-shadow:5px 5px 5px 0px #111111;-ms-box-shadow:5px 5px 5px 0px #111111;box-shadow:5px 5px 5px 0px #111111;}.menu-popup a{display:block;color:#2e2f2e;padding:5px 10px;text-decoration:none;}.menu-popup a:hover{color:#eeeecc;background-color:#88a9d2;}
 .menu-popup .menu-sep{border-top:1px solid #4e4f4e;}
 .menu-popup li{float:none;overflow:auto;height:auto;display:block;}.menu-popup li img{float:left;width:16px;height:16px;padding-right:5px;}

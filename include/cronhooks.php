@@ -11,11 +11,11 @@ function cronhooks_run(&$argv, &$argc){
 	}
 
 	if(is_null($db)) {
-	    @include(".htconfig.php");
-    	require_once("include/dba.php");
-	    $db = new dba($db_host, $db_user, $db_pass, $db_data);
-    	unset($db_host, $db_user, $db_pass, $db_data);
-  	};
+		@include(".htconfig.php");
+		require_once("include/dba.php");
+		$db = new dba($db_host, $db_user, $db_pass, $db_data);
+		unset($db_host, $db_user, $db_pass, $db_data);
+	};
 
 	require_once('include/session.php');
 	require_once('include/datetime.php');
@@ -35,17 +35,31 @@ function cronhooks_run(&$argv, &$argc){
 		}
 	}
 
+	$last = get_config('system','last_cronhook');
+
+	$poll_interval = intval(get_config('system','cronhook_interval'));
+	if(! $poll_interval)
+		$poll_interval = 9;
+
+	if($last) {
+		$next = $last + ($poll_interval * 60);
+		if($next > time()) {
+			logger('cronhook intervall not reached');
+			return;
+		}
+	}
+
 	$lockpath = get_lockpath();
 	if ($lockpath != '') {
 		$pidfile = new pidfile($lockpath, 'cronhooks');
 		if($pidfile->is_already_running()) {
 			logger("cronhooks: Already running");
 			if ($pidfile->running_time() > 19*60) {
-                                $pidfile->kill();
-                                logger("cronhooks: killed stale process");
+				$pidfile->kill();
+				logger("cronhooks: killed stale process");
 				// Calling a new instance
 				proc_run('php','include/cronhooks.php');
-                        }
+			}
 			exit;
 		}
 	}
@@ -62,10 +76,12 @@ function cronhooks_run(&$argv, &$argc){
 
 	logger('cronhooks: end');
 
+	set_config('system','last_cronhook', time());
+
 	return;
 }
 
 if (array_search(__file__,get_included_files())===0){
-  cronhooks_run($_SERVER["argv"],$_SERVER["argc"]);
-  killme();
+	cronhooks_run($_SERVER["argv"],$_SERVER["argc"]);
+	killme();
 }

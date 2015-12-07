@@ -476,8 +476,8 @@ function dfrn_poll_content(&$a) {
 			// URL reply
 
 			if($dfrn_version < 2.2) {
-				$s = fetch_url($r[0]['poll'] 
-					. '?dfrn_id=' . $encrypted_id 
+				$s = fetch_url($r[0]['poll']
+					. '?dfrn_id=' . $encrypted_id
 					. '&type=profile-check'
 					. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
 					. '&challenge=' . $challenge
@@ -493,7 +493,7 @@ function dfrn_poll_content(&$a) {
 					'sec' => $sec
 				));
 			}
-			
+
 			$profile = ((count($r) && $r[0]['nickname']) ? $r[0]['nickname'] : $nickname);
 
 			switch($destination_url) {
@@ -506,7 +506,7 @@ function dfrn_poll_content(&$a) {
 				case 'status':
 				case '':
 					$dest = $a->get_baseurl() . '/profile/' . $profile;
-					break;		
+					break;
 				default:
 					$dest = $destination_url . '?f=&redir=1';
 					break;
@@ -564,5 +564,3 @@ function dfrn_poll_content(&$a) {
 		}
 	}
 }
-
-

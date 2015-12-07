@@ -27,37 +27,41 @@ function contacts_init(&$a) {
 	require_once('include/group.php');
 	require_once('include/contact_widgets.php');
 
+	if ($_GET['nets'] == "all")
+	$_GET['nets'] = "";
+
 	if(! x($a->page,'aside'))
 		$a->page['aside'] = '';
 
 	if($contact_id) {
 			$a->data['contact'] = $r[0];
 			$vcard_widget = replace_macros(get_markup_template("vcard-widget.tpl"),array(
-				'$name' => $a->data['contact']['name'],
+				'$name' => htmlentities($a->data['contact']['name']),
 				'$photo' => $a->data['contact']['photo'],
-			        '$url' => ($a->data['contact']['network'] == NETWORK_DFRN) ? $a->get_baseurl()."/redir/".$a->data['contact']['id'] : $a->data['contact']['url']
+				'$url' => ($a->data['contact']['network'] == NETWORK_DFRN) ? $a->get_baseurl()."/redir/".$a->data['contact']['id'] : $a->data['contact']['url']
 			));
+			$finpeople_widget = '';
 			$follow_widget = '';
+			$networks_widget = '';
 	}
 	else {
 		$vcard_widget = '';
+		$networks_widget .= networks_widget('contacts',$_GET['nets']);
 		if (isset($_GET['add']))
 			$follow_widget = follow_widget($_GET['add']);
 		else
 			$follow_widget = follow_widget();
+
+		$findpeople_widget .= findpeople_widget();
 	}
 
-	if ($_GET['nets'] == "all")
-		$_GET['nets'] = "";
-
 	$groups_widget .= group_side('contacts','group',false,0,$contact_id);
-	$findpeople_widget .= findpeople_widget();
-	$networks_widget .= networks_widget('contacts',$_GET['nets']);
+	
 	$a->page['aside'] .= replace_macros(get_markup_template("contacts-widget-sidebar.tpl"),array(
 		'$vcard_widget' => $vcard_widget,
+		'$findpeople_widget' => $findpeople_widget,
 		'$follow_widget' => $follow_widget,
 		'$groups_widget' => $groups_widget,
-		'$findpeople_widget' => $findpeople_widget,
 		'$networks_widget' => $networks_widget
 	));
 
@@ -238,12 +242,12 @@ function _contact_update_profile($contact_id) {
 
 	$data = probe_url($r[0]["url"]);
 
-	// "Feed" is mostly a sign of communication problems
-	if (($data["network"] == NETWORK_FEED) AND ($data["network"] != $r[0]["network"]))
+	// "Feed" or "Unknown" is mostly a sign of communication problems
+	if ((in_array($data["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) AND ($data["network"] != $r[0]["network"]))
 		return;
 
 	$updatefields = array("name", "nick", "url", "addr", "batch", "notify", "poll", "request", "confirm",
-				"poco", "network", "alias", "pubkey");
+				"poco", "network", "alias");
 	$update = array();
 
 	if ($data["network"] == NETWORK_OSTATUS) {
@@ -432,7 +436,7 @@ function contacts_content(&$a) {
 				}
 
 				$a->page['aside'] = '';
-				
+
 				return replace_macros(get_markup_template('contact_drop_confirm.tpl'), array(
 					'$contact' =>  _contact_detail_for_template($orig_record[0]),
 					'$method' => 'get',
@@ -509,7 +513,7 @@ function contacts_content(&$a) {
 		if(!in_array($contact['network'], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA)))
 				$relation_text = "";
 
-		$relation_text = sprintf($relation_text,$contact['name']);
+		$relation_text = sprintf($relation_text,htmlentities($contact['name']));
 
 		if(($contact['network'] === NETWORK_DFRN) && ($contact['rel'])) {
 			$url = "redir/{$contact['id']}";
@@ -550,6 +554,7 @@ function contacts_content(&$a) {
 				'url'   => $a->get_baseurl(true) . '/contacts/' . $contact_id . '/block',
 				'sel'   => '',
 				'title' => t('Toggle Blocked status'),
+				'id'	=> 'toggle-block-tab',
 				'accesskey' => 'b',
 			),
 			array(
@@ -557,6 +562,7 @@ function contacts_content(&$a) {
 				'url'   => $a->get_baseurl(true) . '/contacts/' . $contact_id . '/ignore',
 				'sel'   => '',
 				'title' => t('Toggle Ignored status'),
+				'id'	=> 'toggle-ignore-tab',
 				'accesskey' => 'i',
 			),
 
@@ -565,6 +571,7 @@ function contacts_content(&$a) {
 				'url'   => $a->get_baseurl(true) . '/contacts/' . $contact_id . '/archive',
 				'sel'   => '',
 				'title' => t('Toggle Archive status'),
+				'id'	=> 'toggle-archive-tab',
 				'accesskey' => 'v',
 			),
 			array(
@@ -572,6 +579,7 @@ function contacts_content(&$a) {
 				'url'   => $a->get_baseurl(true) . '/crepair/' . $contact_id,
 				'sel'   => '',
 				'title' => t('Advanced Contact Settings'),
+				'id'	=> 'repair-tab',
 				'accesskey' => 'r',
 			)
 		);
@@ -589,6 +597,10 @@ function contacts_content(&$a) {
 
 		if ($contact['network'] == NETWORK_DFRN)
 			$profile_select = contact_profile_assign($contact['profile-id'],(($contact['network'] !== NETWORK_DFRN) ? true : false));
+
+		if (in_array($contact['network'], array(NETWORK_DIASPORA, NETWORK_OSTATUS)) AND
+			($contact['rel'] == CONTACT_IS_FOLLOWER))
+			$follow = $a->get_baseurl(true)."/follow?url=".urlencode($contact["url"]);
 
 		$o .= replace_macros($tpl, array(
 			'$header' => t('Contact Editor'),
@@ -617,6 +629,8 @@ function contacts_content(&$a) {
 			'$updpub' => t('Update public posts'),
 			'$last_update' => $last_update,
 			'$udnow' => t('Update now'),
+			'$follow' => $follow,
+			'$follow_text' => t("Connect/Follow"),
 			'$profile_select' => $profile_select,
 			'$contact_id' => $contact['id'],
 			'$block_text' => (($contact['blocked']) ? t('Unblock') : t('Block') ),
@@ -632,7 +646,7 @@ function contacts_content(&$a) {
 			'$ffi_keyword_blacklist' => $contact['ffi_keyword_blacklist'],
 			'$ffi_keyword_blacklist' => array('ffi_keyword_blacklist', t('Blacklisted keywords'), $contact['ffi_keyword_blacklist'], t('Comma separated list of keywords that should not be converted to hashtags, when "Fetch information and keywords" is selected')),
 			'$photo' => $contact['photo'],
-			'$name' => $contact['name'],
+			'$name' => htmlentities($contact['name']),
 			'$dir_icon' => $dir_icon,
 			'$alt_text' => $alt_text,
 			'$sparkle' => $sparkle,
@@ -687,6 +701,7 @@ function contacts_content(&$a) {
 			'url'   => $a->get_baseurl(true) . '/suggest',
 			'sel'   => '',
 			'title' => t('Suggest potential friends'),
+			'id'	=> 'suggestions-tab',
 			'accesskey' => 'g',
 		),
 		array(
@@ -694,6 +709,7 @@ function contacts_content(&$a) {
 			'url'   => $a->get_baseurl(true) . '/contacts/all',
 			'sel'   => ($all) ? 'active' : '',
 			'title' => t('Show all contacts'),
+			'id'	=> 'showall-tab',
 			'accesskey' => 'l',
 		),
 		array(
@@ -701,6 +717,7 @@ function contacts_content(&$a) {
 			'url'   => $a->get_baseurl(true) . '/contacts',
 			'sel'   => ((! $all) && (! $blocked) && (! $hidden) && (! $search) && (! $nets) && (! $ignored) && (! $archived)) ? 'active' : '',
 			'title' => t('Only show unblocked contacts'),
+			'id'	=> 'showunblocked-tab',
 			'accesskey' => 'o',
 		),
 
@@ -709,6 +726,7 @@ function contacts_content(&$a) {
 			'url'   => $a->get_baseurl(true) . '/contacts/blocked',
 			'sel'   => ($blocked) ? 'active' : '',
 			'title' => t('Only show blocked contacts'),
+			'id'	=> 'showblocked-tab',
 			'accesskey' => 'b',
 		),
 
@@ -717,6 +735,7 @@ function contacts_content(&$a) {
 			'url'   => $a->get_baseurl(true) . '/contacts/ignored',
 			'sel'   => ($ignored) ? 'active' : '',
 			'title' => t('Only show ignored contacts'),
+			'id'	=> 'showignored-tab',
 			'accesskey' => 'i',
 		),
 
@@ -725,6 +744,7 @@ function contacts_content(&$a) {
 			'url'   => $a->get_baseurl(true) . '/contacts/archived',
 			'sel'   => ($archived) ? 'active' : '',
 			'title' => t('Only show archived contacts'),
+			'id'	=> 'showarchived-tab',
 			'accesskey' => 'y',
 		),
 
@@ -733,6 +753,7 @@ function contacts_content(&$a) {
 			'url'   => $a->get_baseurl(true) . '/contacts/hidden',
 			'sel'   => ($hidden) ? 'active' : '',
 			'title' => t('Only show hidden contacts'),
+			'id'	=> 'showhidden-tab',
 			'accesskey' => 'h',
 		),
 
@@ -793,6 +814,7 @@ function contacts_content(&$a) {
 		'$cmd' => $a->cmd,
 		'$contacts' => $contacts,
 		'$contact_drop_confirm' => t('Do you really want to delete this contact?'),
+		'multiselect' => 1,
 		'$batch_actions' => array(
 			'contacts_batch_update' => t('Update'),
 			'contacts_batch_block' => t('Block')."/".t("Unblock"),
@@ -832,8 +854,8 @@ function _contact_detail_for_template($rr){
 		$url = $rr['url'];
 		$sparkle = '';
 	}
-	
-	
+
+
 	return array(
 		'img_hover' => sprintf( t('Visit %s\'s profile [%s]'),$rr['name'],$rr['url']),
 		'edit_hover' => t('Edit contact'),
@@ -841,11 +863,11 @@ function _contact_detail_for_template($rr){
 		'id' => $rr['id'],
 		'alt_text' => $alt_text,
 		'dir_icon' => $dir_icon,
-		'thumb' => proxy_url($rr['thumb']),
-		'name' => $rr['name'],
-		'username' => $rr['name'],
+		'thumb' => proxy_url($rr['thumb'], false, PROXY_SIZE_THUMB),
+		'name' => htmlentities($rr['name']),
+		'username' => htmlentities($rr['name']),
 		'sparkle' => $sparkle,
-		'itemurl' => $rr['url'],
+		'itemurl' => (($rr['addr'] != "") ? $rr['addr'] : $rr['url']),
 		'url' => $url,
 		'network' => network_to_name($rr['network'], $rr['url']),
 	);

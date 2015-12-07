@@ -615,6 +615,10 @@ function notifier_run(&$argv, &$argc){
 
 	$interval = ((get_config('system','delivery_interval') === false) ? 2 : intval(get_config('system','delivery_interval')));
 
+	// If we are using the worker we don't need a delivery interval
+	if (get_config("system", "worker"))
+		$interval = false;
+
 	// delivery loop
 
 	if(count($r)) {
@@ -634,7 +638,7 @@ function notifier_run(&$argv, &$argc){
 
 		// This controls the number of deliveries to execute with each separate delivery process.
 		// By default we'll perform one delivery per process. Assuming a hostile shared hosting
-		// provider, this provides the greatest chance of deliveries if processes start getting 
+		// provider, this provides the greatest chance of deliveries if processes start getting
 		// killed. We can also space them out with the delivery_interval to also help avoid them
 		// getting whacked.
 
@@ -642,8 +646,10 @@ function notifier_run(&$argv, &$argc){
 		// together into a single process. This will reduce the overall number of processes
 		// spawned for each delivery, but they will run longer.
 
+		// When using the workerqueue, we don't need this functionality.
+
 		$deliveries_per_process = intval(get_config('system','delivery_batch_count'));
-		if($deliveries_per_process <= 0)
+		if (($deliveries_per_process <= 0) OR get_config("system", "worker"))
 			$deliveries_per_process = 1;
 
 		$this_batch = array();
@@ -728,9 +734,9 @@ function notifier_run(&$argv, &$argc){
 							$ssl_policy = get_config('system','ssl_policy');
 							fix_contact_ssl_policy($x[0],$ssl_policy);
 
-							// If we are setup as a soapbox we aren't accepting input from this person
+							// If we are setup as a soapbox we aren't accepting top level posts from this person
 
-							if($x[0]['page-flags'] == PAGE_SOAPBOX)
+							if (($x[0]['page-flags'] == PAGE_SOAPBOX) AND $top_level)
 								break;
 
 							require_once('library/simplepie/simplepie.inc');
@@ -902,11 +908,16 @@ function notifier_run(&$argv, &$argc){
 					if(! $contact['pubkey'])
 						break;
 
-					if($target_item['verb'] === ACTIVITY_DISLIKE) {
-						// unsupported
-						break;
+					$unsupported_activities = array(ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE);
+
+					//don't transmit activities which are not supported by diaspora
+					foreach($unsupported_activities as $act) {
+						if(activity_match($target_item['verb'],$act)) {
+							break 2;
+						}
 					}
-					elseif(($target_item['deleted']) && (($target_item['uri'] === $target_item['parent-uri']) || $followup)) {
+
+					if(($target_item['deleted']) && (($target_item['uri'] === $target_item['parent-uri']) || $followup)) {
 						// send both top-level retractions and relayable retractions for owner to relay
 						diaspora_send_retraction($target_item,$owner,$contact);
 						break;

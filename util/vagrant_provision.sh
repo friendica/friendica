@@ -21,18 +21,13 @@ organizationalUnitName=
 emailAddress=
 "
 sudo mkdir -p "$SSL_DIR"
-sudo openssl genrsa -out "$SSL_DIR/xip.io.key" 1024
+sudo openssl genrsa -out "$SSL_DIR/xip.io.key" 4096
 sudo openssl req -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -key "$SSL_DIR/xip.io.key" -out "$SSL_DIR/xip.io.csr" -passin pass:$PASSPHRASE
 sudo openssl x509 -req -days 365 -in "$SSL_DIR/xip.io.csr" -signkey "$SSL_DIR/xip.io.key" -out "$SSL_DIR/xip.io.crt"
 
 
 #Install apache2
 echo ">>> Installing Apache2 webserver"
-# The package python-software-properties provides add-apt-repository on Ubuntu Precise Server
-sudo apt-get install python-software-properties
-sudo add-apt-repository -y ppa:ondrej/apache2
-sudo apt-key update
-sudo apt-get update
 sudo apt-get install -y apache2
 sudo a2enmod rewrite actions ssl
 sudo cp /vagrant/util/vagrant_vhost.sh /usr/local/bin/vhost
@@ -44,7 +39,10 @@ sudo service apache2 restart
 #Install php
 echo ">>> Installing PHP5"
 sudo apt-get install -y php5 libapache2-mod-php5 php5-cli php5-mysql php5-curl php5-gd
+sudo apt-get install -y imagemagick
+sudo apt-get install -y php5-imagick
 sudo service apache2 restart
+
 
 #Install mysql
 echo ">>> Installing Mysql"

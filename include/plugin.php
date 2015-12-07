@@ -1,7 +1,17 @@
 <?php
+/**
+ * @file include/identity.php
+ * 
+ * @brief Some functions to handle addons and themes.
+ */
 
 
-// install and uninstall plugin
+/**
+ * @brief uninstalls an addon.
+ *
+ * @param string $plugin name of the addon
+ * @return boolean
+ */
 if (! function_exists('uninstall_plugin')){
 function uninstall_plugin($plugin){
 	logger("Addons: uninstalling " . $plugin);
@@ -16,6 +26,12 @@ function uninstall_plugin($plugin){
 	}
 }}
 
+/**
+ * @brief installs an addon.
+ *
+ * @param string $plugin name of the addon
+ * @return bool
+ */
 if (! function_exists('install_plugin')){
 function install_plugin($plugin) {
 	// silently fail if plugin was removed
@@ -42,7 +58,7 @@ function install_plugin($plugin) {
 		// This way the system won't fall over dead during the update.
 
 		if(file_exists('addon/' . $plugin . '/.hidden')) {
-			q("update addon set hidden = 1 where name = '%s'",
+			q("UPDATE `addon` SET `hidden` = 1 WHERE `name` = '%s'",
 				dbesc($plugin)
 			);
 		}
@@ -105,10 +121,27 @@ function reload_plugins() {
 
 }}
 
+/**
+ * @brief check if addon is enabled
+ *
+ * @param string $plugin
+ * @return boolean
+ */
+function plugin_enabled($plugin) {
+	$r = q("SELECT * FROM `addon` WHERE `installed` = 1 AND `name` = '%s'", $plugin);
+	return((bool)(count($r) > 0));
+}
 
 
-
-
+/**
+ * @brief registers a hook.
+ *
+ * @param string $hook the name of the hook
+ * @param string $file the name of the file that hooks into
+ * @param string $function the name of the function that the hook will call
+ * @param int $priority A priority (defaults to 0)
+ * @return mixed|bool
+ */
 if(! function_exists('register_hook')) {
 function register_hook($hook,$file,$function,$priority=0) {
 
@@ -129,6 +162,14 @@ function register_hook($hook,$file,$function,$priority=0) {
 	return $r;
 }}
 
+/**
+ * @brief unregisters a hook.
+ * 
+ * @param string $hook the name of the hook
+ * @param string $file the name of the file that hooks into
+ * @param string $function the name of the function that the hook called
+ * @return array
+ */
 if(! function_exists('unregister_hook')) {
 function unregister_hook($hook,$file,$function) {
 
@@ -155,7 +196,15 @@ function load_hooks() {
 	}
 }}
 
-
+/**
+ * @brief Calls a hook.
+ *
+ * Use this function when you want to be able to allow a hook to manipulate
+ * the provided data.
+ *
+ * @param string $name of the hook to call
+ * @param string|array &$data to transmit to the callback handler
+ */
 if(! function_exists('call_hooks')) {
 function call_hooks($name, &$data = null) {
 	$stamp1 = microtime(true);
@@ -178,7 +227,7 @@ function call_hooks($name, &$data = null) {
 			}
 			else {
 				// remove orphan hooks
-				q("delete from hook where hook = '%s' and file = '%s' and function = '%s'",
+				q("DELETE FROM `hook` WHERE `hook` = '%s' AND `file` = '%s' AND `function` = '%s'",
 					dbesc($name),
 					dbesc($hook[0]),
 					dbesc($hook[1])
@@ -204,16 +253,20 @@ function plugin_is_app($name) {
 	return false;
 }}
 
-/*
- * parse plugin comment in search of plugin infos.
- * like
+/**
+ * @brief Parse plugin comment in search of plugin infos.
  *
- * 	 * Name: Plugin
+ * like
+ * \code
+ *...* Name: Plugin
  *   * Description: A plugin which plugs in
- * 	 * Version: 1.2.3
+ * . * Version: 1.2.3
  *   * Author: John <profile url>
  *   * Author: Jane <email>
  *   *
+ *  *\endcode
+ * @param string $plugin the name of the plugin
+ * @return array with the plugin information
  */
 
 if (! function_exists('get_plugin_info')){
@@ -265,16 +318,20 @@ function get_plugin_info($plugin){
 }}
 
 
-/*
- * parse theme comment in search of theme infos.
+/**
+ * @brief Parse theme comment in search of theme infos.
+ * 
  * like
- *
- * 	 * Name: My Theme
+ * \code
+ * ..* Name: My Theme
  *   * Description: My Cool Theme
- * 	 * Version: 1.2.3
+ * . * Version: 1.2.3
  *   * Author: John <profile url>
  *   * Maintainer: Jane <profile url>
  *   *
+ * \endcode
+ * @param string $theme the name of the theme
+ * @return array
  */
 
 if (! function_exists('get_theme_info')){
@@ -340,7 +397,14 @@ function get_theme_info($theme){
 	return $info;
 }}
 
-
+/**
+ * @brief Returns the theme's screenshot.
+ *
+ * The screenshot is expected as view/theme/$theme/screenshot.[png|jpg].
+ *
+ * @param sring $theme The name of the theme
+ * @return string
+ */
 function get_theme_screenshot($theme) {
 	$a = get_app();
 	$exts = array('.png','.jpg');
@@ -402,7 +466,7 @@ function service_class_allows($uid,$property,$usage = false) {
 		$service_class = $a->user['service_class'];
 	}
 	else {
-		$r = q("select service_class from user where uid = %d limit 1",
+		$r = q("SELECT `service_class` FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($uid)
 		);
 		if($r !== false and count($r)) {
@@ -432,7 +496,7 @@ function service_class_fetch($uid,$property) {
 		$service_class = $a->user['service_class'];
 	}
 	else {
-		$r = q("select service_class from user where uid = %d limit 1",
+		$r = q("SELECT `service_class` FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($uid)
 		);
 		if($r !== false and count($r)) {

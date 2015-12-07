@@ -53,9 +53,21 @@ In the descirption and location field you can use BBCode to format the text.
 When you *Share* the event it will be posted to your wall with the access permissions you've selected.
 But before you do, you can also *preview* the event in a pop-up box.
 
+### Interaction with Events
+
+When you publish an event, you can choose who shall receive it, as with a regular new posting.
+The recipients will see the posting about the event in their network-stream.
+Additionally it will be added to their calendar and thus be shown in their events overview page.
+
+Recipients of the event-posting can comment or dis-/like the event, as with a regular posting, but also announce that they will attend, not attend or may-be attend the event with a single click.
+
 ### Addons
 
 #### OpenStreetMap
 
 If this addon is activated on you friendica node, the content of the location field will be mathced with the identification service of OSM when you submit the event.
 Should OSM find anything matching, a map for the location will be embedded automatically at the end of the events view.
+
+#### Calendar Export
+
+If this addon is activated the public events you have created will be published in ical or csv file. The URL of the published file is ``example.com/cal/nickname/export/format`` (where format is either ical of csv).

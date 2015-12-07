@@ -198,7 +198,7 @@ Config:
 
 This configures the URL to update the global directory, and is supplied in the default configuration.
 The undocumented part is that if this is not set, the global directory is completely unavailable to the application.
-This allows a private community to be completely isolated from the global mistpark network. 
+This allows a private community to be completely isolated from the global network. 
 
 	$a->config['system']['directory'] = 'http://dir.friendi.ca';
 

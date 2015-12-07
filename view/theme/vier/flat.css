@@ -12,3 +12,7 @@ div.pager, ul.tabs {
 aside {
   border-right: 1px solid #D2D2D2;
 }
+
+right_aside {
+  border-left: 1px solid #D2D2D2;
+}

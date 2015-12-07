@@ -1,4 +1,9 @@
 <?php
+/**
+ * @file include/identity.php
+ */
+
+require_once('include/forums.php');
 
 
 /**
@@ -59,15 +64,15 @@ if(! function_exists('profile_load')) {
 			$profile_int = intval($profile);
 			$r = q("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
 					INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
-					WHERE `user`.`nickname` = '%s' AND `profile`.`id` = %d and `contact`.`self` = 1 LIMIT 1",
+					WHERE `user`.`nickname` = '%s' AND `profile`.`id` = %d AND `contact`.`self` = 1 LIMIT 1",
 					dbesc($nickname),
 					intval($profile_int)
 			);
 		}
 		if((!$r) && (!count($r))) {
 			$r = q("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
-					INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
-					WHERE `user`.`nickname` = '%s' AND `profile`.`is-default` = 1 and `contact`.`self` = 1 LIMIT 1",
+					INNER JOIN `contact` ON `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
+					WHERE `user`.`nickname` = '%s' AND `profile`.`is-default` = 1 AND `contact`.`self` = 1 LIMIT 1",
 					dbesc($nickname)
 			);
 		}
@@ -82,7 +87,7 @@ if(! function_exists('profile_load')) {
 		// fetch user tags if this isn't the default profile
 
 		if(!$r[0]['is-default']) {
-			$x = q("select `pub_keywords` from `profile` where uid = %d and `is-default` = 1 limit 1",
+			$x = q("SELECT `pub_keywords` FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
 					intval($r[0]['profile_uid'])
 			);
 			if($x && count($x))
@@ -306,7 +311,7 @@ if(! function_exists('profile_sidebar')) {
 				if(count($r))
 					$updated =  date("c", strtotime($r[0]['updated']));
 
-				$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 and `pending` = 0 AND `hidden` = 0 AND `archive` = 0
+				$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 AND `hidden` = 0 AND `archive` = 0
 						AND `network` IN ('%s', '%s', '%s', '')",
 					intval($profile['uid']),
 					dbesc(NETWORK_DFRN),
@@ -501,7 +506,7 @@ if(! function_exists('get_events')) {
 				}
 
 				$today = ((substr($strt,0,10) === datetime_convert('UTC',$a->timezone,'now','Y-m-d')) ? true : false);
-				
+
 				$rr['title'] = $title;
 				$rr['description'] = $desciption;
 				$rr['date'] = day_translate(datetime_convert('UTC', $rr['adjust'] ? $a->timezone : 'UTC', $rr['start'], $bd_format)) . (($today) ?  ' ' . t('[today]') : '');
@@ -525,29 +530,30 @@ if(! function_exists('get_events')) {
 function advanced_profile(&$a) {
 
 	$o = '';
+	$uid = $a->profile['uid'];
 
-	$o .= replace_macros(get_markup_template("section_title.tpl"),array(
+	$o .= replace_macros(get_markup_template('section_title.tpl'),array(
 		'$title' => t('Profile')
 	));
 
 	if($a->profile['name']) {
 
 		$tpl = get_markup_template('profile_advanced.tpl');
-		
+
 		$profile = array();
-		
+
 		$profile['fullname'] = array( t('Full Name:'), $a->profile['name'] ) ;
-		
+
 		if($a->profile['gender']) $profile['gender'] = array( t('Gender:'),  $a->profile['gender'] );
-		
+
 
 		if(($a->profile['dob']) && ($a->profile['dob'] != '0000-00-00')) {
-		
+
 			$year_bd_format = t('j F, Y');
 			$short_bd_format = t('j F');
 
-		
-			$val = ((intval($a->profile['dob'])) 
+
+			$val = ((intval($a->profile['dob']))
 				? day_translate(datetime_convert('UTC','UTC',$a->profile['dob'] . ' 00:00 +00:00',$year_bd_format))
 				: day_translate(datetime_convert('UTC','UTC','2001-' . substr($a->profile['dob'],5) . ' 00:00 +00:00',$short_bd_format)));
 
@@ -556,7 +562,7 @@ function advanced_profile(&$a) {
 		}
 
 		if($age = age($a->profile['dob'],$a->profile['timezone'],''))  $profile['age'] = array( t('Age:'), $age );
-			
+
 
 		if($a->profile['marital']) $profile['marital'] = array( t('Status:'), $a->profile['marital']);
 
@@ -591,7 +597,7 @@ function advanced_profile(&$a) {
 		if($txt = prepare_text($a->profile['contact'])) $profile['contact'] = array( t('Contact information and Social Networks:'), $txt);
 
 		if($txt = prepare_text($a->profile['music'])) $profile['music'] = array( t('Musical interests:'), $txt);
-		
+
 		if($txt = prepare_text($a->profile['book'])) $profile['book'] = array( t('Books, literature:'), $txt);
 
 		if($txt = prepare_text($a->profile['tv'])) $profile['tv'] = array( t('Television:'), $txt);
@@ -599,14 +605,19 @@ function advanced_profile(&$a) {
 		if($txt = prepare_text($a->profile['film'])) $profile['film'] = array( t('Film/dance/culture/entertainment:'), $txt);
 
 		if($txt = prepare_text($a->profile['romance'])) $profile['romance'] = array( t('Love/Romance:'), $txt);
-		
+
 		if($txt = prepare_text($a->profile['work'])) $profile['work'] = array( t('Work/employment:'), $txt);
 
 		if($txt = prepare_text($a->profile['education'])) $profile['education'] = array( t('School/education:'), $txt );
-		
+	
+		//show subcribed forum if it is enabled in the usersettings
+		if (feature_enabled($uid,'forumlist_profile')) {
+			$profile['forumlist'] = array( t('Forums:'), forumlist_profile_advanced($uid));
+		}
+
 		if ($a->profile['uid'] == local_user())
 			$profile['edit'] = array($a->get_baseurl(). '/profiles/'.$a->profile['id'], t('Edit profile'),"", t('Edit profile'));
-		
+
 		return replace_macros($tpl, array(
 			'$title' => t('Profile'),
 			'$profile' => $profile
@@ -664,14 +675,15 @@ if(! function_exists('profile_tabs')){
 		);
 
 		if ($is_owner){
-			$tabs[] = array(
-				'label' => t('Events'),
-				'url'	=> $a->get_baseurl() . '/events',
-				'sel' 	=>((!isset($tab)&&$a->argv[0]=='events')?'active':''),
-				'title' => t('Events and Calendar'),
-				'id' => 'events-tab',
-				'accesskey' => 'e',
-			);
+			if ($a->theme_events_in_profile)
+				$tabs[] = array(
+					'label' => t('Events'),
+					'url'	=> $a->get_baseurl() . '/events',
+					'sel' 	=>((!isset($tab)&&$a->argv[0]=='events')?'active':''),
+					'title' => t('Events and Calendar'),
+					'id' => 'events-tab',
+					'accesskey' => 'e',
+				);
 			$tabs[] = array(
 				'label' => t('Personal Notes'),
 				'url'	=> $a->get_baseurl() . '/notes',
@@ -709,7 +721,7 @@ function zrl_init(&$a) {
 		$result = Cache::get("gprobe:".$urlparts["host"]);
 		if (!is_null($result)) {
 			$result = unserialize($result);
-			if ($result["network"] == NETWORK_FEED) {
+			if (in_array($result["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
 				logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
 				return;
 			}
@@ -737,8 +749,8 @@ function zrl($s,$force = false) {
 
 // Used from within PCSS themes to set theme parameters. If there's a
 // puid request variable, that is the "page owner" and normally their theme
-// settings take precedence; unless a local user sets the "always_my_theme" 
-// system pconfig, which means they don't want to see anybody else's theme 
+// settings take precedence; unless a local user sets the "always_my_theme"
+// system pconfig, which means they don't want to see anybody else's theme
 // settings except their own while on this site.
 
 function get_theme_uid() {

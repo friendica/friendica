@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 3.4.1 (Lily of the valley)
--- DB_UPDATE_VERSION 1188
+-- Friendica 3.4.2 (Lily of the valley)
+-- DB_UPDATE_VERSION 1190
 -- ------------------------------------------
 
 
@@ -317,6 +317,7 @@ CREATE TABLE IF NOT EXISTS `gcontact` (
 	`gender` varchar(32) NOT NULL DEFAULT '',
 	`community` tinyint(1) NOT NULL DEFAULT 0,
 	`network` varchar(255) NOT NULL DEFAULT '',
+	`addr` varchar(255) NOT NULL DEFAULT '',
 	`generation` tinyint(3) NOT NULL DEFAULT 0,
 	`server_url` varchar(255) NOT NULL DEFAULT '',
 	 INDEX `nurl` (`nurl`),
@@ -1018,5 +1019,18 @@ CREATE TABLE IF NOT EXISTS `userd` (
 	`id` int(11) NOT NULL auto_increment PRIMARY KEY,
 	`username` varchar(255) NOT NULL,
 	 INDEX `username` (`username`)
+) DEFAULT CHARSET=utf8;
+
+--
+-- TABLE workerqueue
+--
+CREATE TABLE IF NOT EXISTS `workerqueue` (
+	`id` int(11) NOT NULL auto_increment PRIMARY KEY,
+	`parameter` text NOT NULL,
+	`priority` tinyint(3) unsigned NOT NULL DEFAULT 0,
+	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`pid` int(11) NOT NULL DEFAULT 0,
+	`executed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	 INDEX `created` (`created`)
 ) DEFAULT CHARSET=utf8;
 

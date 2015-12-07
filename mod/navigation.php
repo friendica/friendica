@@ -12,8 +12,7 @@ function navigation_content(&$a) {
 
 	$tpl = get_markup_template('navigation.tpl');
 	return replace_macros($tpl, array(
-        '$baseurl' => $a->get_baseurl(),
-		'$langselector' => lang_selector(),
+		'$baseurl' => $a->get_baseurl(),
 		'$sitelocation' => $nav_info['sitelocation'],
 		'$nav' => $nav_info['nav'],
 		'$banner' =>  $nav_info['banner'],

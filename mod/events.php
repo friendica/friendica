@@ -154,6 +154,7 @@ function events_post(&$a) {
 	if(! $cid)
 		proc_run('php',"include/notifier.php","event","$item_id");
 
+	goaway($_SESSION['return_url']);
 }
 
 
@@ -164,6 +165,9 @@ function events_content(&$a) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
+
+	if($a->argc == 1)
+		$_SESSION['return_url'] = $a->get_baseurl() . '/' . $a->cmd;
 
 	if(($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
 		$r = q("update event set ignore = 1 where id = %d and uid = %d",
@@ -179,14 +183,69 @@ function events_content(&$a) {
 		);
 	}
 
+	if ($a->theme_events_in_profile)
+		nav_set_selected('home');
+	else
+		nav_set_selected('events');
 
 	$editselect = 'none';
 	if( feature_enabled(local_user(), 'richtext') )
 		$editselect = 'textareas';
 
+	// First day of the week (0 = Sunday)
+	$firstDay = get_pconfig(local_user(),'system','first_day_of_week');
+	if ($firstDay === false) $firstDay=0;
+
+	$i18n = array(
+			"firstDay" => $firstDay,
+			"Sun" => t("Sun"),
+			"Mon" => t("Mon"),
+			"Tue" => t("Tue"),
+			"Wed" => t("Wed"),
+			"Thu" => t("Thu"),
+			"Fri" => t("Fri"),
+			"Sat" => t("Sat"),
+			"Sunday" => t("Sunday"),
+			"Monday" => t("Monday"),
+			"Tuesday" => t("Tuesday"),
+			"Wednesday" => t("Wednesday"),
+			"Thursday" => t("Thursday"),
+			"Friday" => t("Friday"),
+			"Saturday" => t("Saturday"),
+			"Jan" => t("Jan"),
+			"Feb" => t("Feb"),
+			"Mar" => t("Mar"),
+			"Apr" => t("Apr"),
+			"May" => t("May"),
+			"Jun" => t("Jun"),
+			"Jul" => t("Jul"),
+			"Aug" => t("Aug"),
+			"Sep" => t("Sept"),
+			"Oct" => t("Oct"),
+			"Nov" => t("Nov"),
+			"Dec" => t("Dec"),
+			"January" => t("January"),
+			"February" => t("February"),
+			"March" => t("March"),
+			"April" => t("April"),
+			"May" => t("May"),
+			"June" => t("June"),
+			"July" => t("July"),
+			"August" => t("August"),
+			"September" => t("September"),
+			"October" => t("October"),
+			"November" => t("November"),
+			"December" => t("December"),
+			"today" => t("today"),
+			"month" => t("month"),
+			"week" => t("week"),
+			"day" => t("day"),
+		);
+
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl,array(
 		'$baseurl' => $a->get_baseurl(),
+		'$i18n' => $i18n,
 		'$editselect' => $editselect
 	));
 
@@ -198,7 +257,8 @@ function events_content(&$a) {
 
 	$o ="";
 	// tabs
-	$tabs = profile_tabs($a, True);
+	if ($a->theme_events_in_profile)
+		$tabs = profile_tabs($a, True);
 
 
 
@@ -234,7 +294,7 @@ function events_content(&$a) {
 			$m = intval($thismonth);
 
 		// Put some limits on dates. The PHP date functions don't seem to do so well before 1900.
-		// An upper limit was chosen to keep search engines from exploring links millions of years in the future. 
+		// An upper limit was chosen to keep search engines from exploring links millions of years in the future.
 
 		if($y < 1901)
 			$y = 1900;
@@ -449,7 +509,7 @@ function events_content(&$a) {
 		else
 			$sh_checked = (($orig_event['allow_cid'] === '<' . local_user() . '>' && (! $orig_event['allow_gid']) && (! $orig_event['deny_cid']) && (! $orig_event['deny_gid'])) ? '' : ' checked="checked" ' );
 
-		if($cid)
+		if($cid OR ($mode !== 'new'))
 			$sh_checked .= ' disabled="disabled" ';
 
 
@@ -480,6 +540,9 @@ function events_content(&$a) {
 
 		require_once('include/acl_selectors.php');
 
+		if ($mode === 'new')
+			$acl = (($cid) ? '' : populate_acl(((x($orig_event)) ? $orig_event : $a->user)));
+
 		$tpl = get_markup_template('event_form.tpl');
 
 		$o .= replace_macros($tpl,array(
@@ -507,7 +570,7 @@ function events_content(&$a) {
 			'$sh_text' => t('Share this event'),
 			'$sh_checked' => $sh_checked,
 			'$preview' => t('Preview'),
-			'$acl' => (($cid) ? '' : populate_acl(((x($orig_event)) ? $orig_event : $a->user))),
+			'$acl' => $acl,
 			'$submit' => t('Submit')
 
 		));

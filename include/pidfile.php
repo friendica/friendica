@@ -7,8 +7,8 @@ class pidfile {
 		$this->_file = "$dir/$name.pid";
 
 		if (file_exists($this->_file)) {
-			$pid = trim(file_get_contents($this->_file));
-			if (posix_kill($pid, 0)) {
+			$pid = trim(@file_get_contents($this->_file));
+			if (($pid != "") AND posix_kill($pid, 0)) {
 				$this->_running = true;
 			}
 		}
@@ -21,7 +21,7 @@ class pidfile {
 
 	public function __destruct() {
 		if ((! $this->_running) && file_exists($this->_file)) {
-			unlink($this->_file);
+			@unlink($this->_file);
 		}
 	}
 
@@ -30,7 +30,7 @@ class pidfile {
 	}
 
 	public function running_time() {
-		return(time() - filectime($this->_file));
+		return(time() - @filectime($this->_file));
 	}
 
 	public function kill() {

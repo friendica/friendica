@@ -18,7 +18,6 @@
 require_once('include/crypto.php');
 require_once('include/enotify.php');
 require_once('include/email.php');
-require_once('library/langdet/Text/LanguageDetect.php');
 require_once('include/tags.php');
 require_once('include/files.php');
 require_once('include/threads.php');
@@ -268,32 +267,8 @@ function item_post(&$a) {
 		$guid              = get_guid(32);
 
 
-		$naked_body = preg_replace('/\[(.+?)\]/','',$body);
-
-		if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-			$l = new Text_LanguageDetect;
-			//$lng = $l->detectConfidence($naked_body);
-			//$postopts = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
-
-			$lng = $l->detect($naked_body, 3);
-
-			if (sizeof($lng) > 0) {
-				$postopts = "";
-
-				foreach ($lng as $language => $score) {
-					if ($postopts == "")
-						$postopts = "lang=";
-					else
-						$postopts .= ":";
-
-					$postopts .= $language.";".$score;
-				}
-			}
-
-			logger('mod_item: detect language' . print_r($lng,true) . $naked_body, LOGGER_DATA);
-		}
-		else
-			$postopts = '';
+		item_add_language_opt($_REQUEST);
+		$postopts = $_REQUEST['postopts'] ? $_REQUEST['postopts'] : "";
 
 
 		$private = ((strlen($str_group_allow) || strlen($str_contact_allow) || strlen($str_group_deny) || strlen($str_contact_deny)) ? 1 : 0);
