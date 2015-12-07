@@ -11,15 +11,15 @@
 
 /*
  * Change history:
-	Gerhard Seeber		2015-NOV-25	Add API call /users/group_show to return all or a single group
+	Gerhard Seeber		2015-NOV-25	Add API call /friendica/group_show to return all or a single group
  						with the containing contacts (necessary for Windows 10 Universal app)
-	Gerhard Seeber 		2015-NOV-27	Add API call /users/group_delete to delete the specified group id
+	Gerhard Seeber 		2015-NOV-27	Add API call /friendica/group_delete to delete the specified group id
 						(necessary for Windows 10 Universal app)
-	Gerhard Seeber		2015-DEC-01	Add API call /users/group_create to create a group with the specified 
+	Gerhard Seeber		2015-DEC-01	Add API call /friendica/group_create to create a group with the specified 
 						name and the given list of contacts (necessary for Windows 10 Universal
 						app)
-	Gerhard Seeber		2015-DEC-07	Add API call /users/group_update to update a group with the given list of
-						contacts (necessary for Windows 10 Universal app)
+	Gerhard Seeber		2015-DEC-07	Add API call /friendica/group_update to update a group with the given 
+						list of contacts (necessary for Windows 10 Universal app)
  *
  */
 
@@ -3035,7 +3035,7 @@ function api_best_nickname(&$contacts) {
 }
 
 	// return all or a specified group of the user with the containing contacts
-	function api_users_group_show(&$a, $type) {
+	function api_friendica_group_show(&$a, $type) {
 		if (api_user()===false) return false;		
 
 		// params
@@ -3068,11 +3068,11 @@ function api_best_nickname(&$contacts) {
 		}
 		return api_apply_template("group_show", $type, array('$groups' => $grps));
 	}
-	api_register_func('api/users/group_show', 'api_users_group_show', true);
+	api_register_func('api/friendica/group_show', 'api_friendica_group_show', true);
 
 
 	// delete the specified group of the user
-	function api_users_group_delete(&$a, $type) {
+	function api_friendica_group_delete(&$a, $type) {
 		if (api_user()===false) return false;		
 
 		// params
@@ -3112,11 +3112,11 @@ function api_best_nickname(&$contacts) {
 		else
 			die(api_error($a, $type, 'other API error'));
 	}
-	api_register_func('api/users/group_delete', 'api_users_group_delete', true);
+	api_register_func('api/friendica/group_delete', 'api_friendica_group_delete', true);
 
 
 	// create the specified group with the posted array of contacts 
-	function api_users_group_create(&$a, $type) {
+	function api_friendica_group_create(&$a, $type) {
 		if (api_user()===false) return false;		
 
 		// params
@@ -3175,11 +3175,11 @@ function api_best_nickname(&$contacts) {
 		$success = array('success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers);
 		return api_apply_template("group_create", $type, array('result' => $success));		
 	}
-	api_register_func('api/users/group_create', 'api_users_group_create', true);
+	api_register_func('api/friendica/group_create', 'api_friendica_group_create', true);
 
 
 	// update the specified group with the posted array of contacts 
-	function api_users_group_update(&$a, $type) {
+	function api_friendica_group_update(&$a, $type) {
 		if (api_user()===false) return false;		
 
 		// params
@@ -3232,7 +3232,7 @@ function api_best_nickname(&$contacts) {
 		$success = array('success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers);
 		return api_apply_template("group_update", $type, array('result' => $success));		
 	}
-	api_register_func('api/users/group_update', 'api_users_group_update', true);
+	api_register_func('api/friendica/group_update', 'api_friendica_group_update', true);
 
 /*
 To.Do:
