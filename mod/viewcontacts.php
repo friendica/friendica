@@ -94,7 +94,7 @@ function viewcontacts_content(&$a) {
 
 		$contacts[] = array(
 			'id' => $rr['id'],
-			'img_hover' => sprintf( t('Visit %s\'s profile [%s]'), $rr['name'], $rr['url']),
+			'img_hover' => sprintf( t('Visit %s\'s profile [%s]'), htmlentities($rr['name']), $rr['url']),
 			'photo_menu' => contact_photo_menu($rr),
 			'thumb' => proxy_url($rr['thumb'], false, PROXY_SIZE_THUMB),
 			'name' => htmlentities(substr($rr['name'],0,20)),

@@ -75,7 +75,7 @@ function match_content(&$a) {
 					$entry = array(
 						'url' => zrl($jj->url),
 						'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $jj->url),
-						'name' => $jj->name,
+						'name' => htmlentities($jj->name),
 						'details'       => $contact_details['location'],
 						'tags'          => $contact_details['keywords'],
 						'about'         => $contact_details['about'],
