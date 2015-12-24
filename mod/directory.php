@@ -167,7 +167,7 @@ function directory_content(&$a) {
 				'itemurl' => $itemurl,
 				'thumb' => proxy_url($a->get_cached_avatar_image($rr[$photo]), false, PROXY_SIZE_THUMB),
 				'img_hover' => $rr['name'],
-				'name' => $rr['name'],
+				'name' => htmlentities($rr['name']),
 				'details' => $details,
 				'account_type' => ($community ? t('Forum') : ''),
 				'profile' => $profile,

@@ -90,7 +90,7 @@ function widget_forumlist($uid,$cid = 0) {
 			$entry = array(
 				'url' => z_root() . '/network?f=&cid=' . $contact['id'],
 				'external_url' => z_root() . '/redir/' . $contact['id'],
-				'name' => $contact['name'],
+				'name' => htmlentities($contact['name']),
 				'cid' => $contact['id'],
 				'selected' 	=> $selected,
 				'micro' => proxy_url($contact['micro'], false, PROXY_SIZE_MICRO),

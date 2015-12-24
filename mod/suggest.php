@@ -87,7 +87,7 @@ function suggest_content(&$a) {
 			'url' => zrl($rr['url']),
 			'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
 			'img_hover' => $rr['url'],
-			'name' => $rr['name'],
+			'name' => htmlentities($rr['name']),
 			'thumb' => proxy_url($rr['photo'], false, PROXY_SIZE_THUMB),
 			'details'       => $contact_details['location'],
 			'tags'          => $contact_details['keywords'],
