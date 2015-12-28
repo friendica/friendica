@@ -1,6 +1,6 @@
-Implemented API calls
+Friendica API
 ===
-The Friendica API aims to be compatible to the [GNU Social API](http://skilledtests.com/wiki/Twitter-compatible_API) and the [Twitter API](https://dev.twitter.com/rest/public). 
+The Friendica API aims to be compatible to the [GNU Social API](http://skilledtests.com/wiki/Twitter-compatible_API) and the [Twitter API](https://dev.twitter.com/rest/public).
 
 Please refer to the linked documentation for further information.
 
@@ -24,13 +24,45 @@ Please refer to the linked documentation for further information.
 * cid: Contact id of the user (important for "contact_allow" and "contact_deny")
 * network: network of the user
 
+#### Errors
+When an error occour in API call, an HTTP error code is returned, with an error message
+Usually:
+- 400 Bad Request: if parameter are missing or items can't be found
+- 403 Forbidden: if authenticated user is missing
+- 405 Method Not Allowed: if API was called with invalid method, eg. GET when API require POST
+- 501 Not Implemented: if requested API doesn't exists
+- 500 Internal Server Error: on other error contitions
+
+Error body is
+
+json:
+```
+	{
+	  "error": "Specific error message",
+	  "request": "API path requested",
+	  "code": "HTTP error code"
+	}
+```
+
+xml:
+```
+	<status>
+		<error>Specific error message</error>
+		<request>API path requested</request>
+		<code>HTTP error code</code>
+	</status>
+```
+
+---
 ### account/rate_limit_status
 
+---
 ### account/verify_credentials
 #### Parameters
 * skip_status: Don't show the "status" field. (Default: false)
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
+---
 ### conversation/show
 Unofficial Twitter command. It shows all direct answers (excluding the original post) to a given id.
 
@@ -43,10 +75,11 @@ Unofficial Twitter command. It shows all direct answers (excluding the original 
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* include_rts 
-* trim_user 
-* contributor_details 
+* include_rts
+* trim_user
+* contributor_details
 
+---
 ### direct_messages
 #### Parameters
 * count: Items per page (default: 20)
@@ -57,8 +90,9 @@ Unofficial Twitter command. It shows all direct answers (excluding the original 
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* skip_status 
+* skip_status
 
+---
 ### direct_messages/all
 #### Parameters
 * count: Items per page (default: 20)
@@ -67,6 +101,7 @@ Unofficial Twitter command. It shows all direct answers (excluding the original 
 * max_id: maximum id
 * getText: Defines the format of the status field. Can be "html" or "plain"
 
+---
 ### direct_messages/conversation
 Shows all direct messages of a conversation
 #### Parameters
@@ -77,14 +112,16 @@ Shows all direct messages of a conversation
 * getText: Defines the format of the status field. Can be "html" or "plain"
 * uri: URI of the conversation
 
+---
 ### direct_messages/new
 #### Parameters
-* user_id: id of the user 
+* user_id: id of the user
 * screen_name: screen name (for technical reasons, this value is not unique!)
 * text: The message
 * replyto: ID of the replied direct message
 * title: Title of the direct message
 
+---
 ### direct_messages/sent
 #### Parameters
 * count: Items per page (default: 20)
@@ -94,6 +131,7 @@ Shows all direct messages of a conversation
 * getText: Defines the format of the status field. Can be "html" or "plain"
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
+---
 ### favorites
 #### Parameters
 * count: Items per page (default: 20)
@@ -108,16 +146,19 @@ Shows all direct messages of a conversation
 
 Favorites aren't displayed to other users, so "user_id" and "screen_name". So setting this value will result in an empty array.
 
+---
 ### favorites/create
 #### Parameters
 * id
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
+---
 ### favorites/destroy
 #### Parameters
 * id
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
+---
 ### followers/ids
 #### Parameters
 * stringify_ids: Should the id numbers be sent as text (true) or number (false)? (default: false)
@@ -125,20 +166,144 @@ Favorites aren't displayed to other users, so "user_id" and "screen_name". So se
 #### Unsupported parameters
 * user_id
 * screen_name
-* cursor 
+* cursor
 
 Friendica doesn't allow showing followers of other users.
 
+---
+### friendica/activity/<verb>
+#### parameters
+* id: item id
+
+Add or remove an activity from an item.
+'verb' can be one of:
+- like
+- dislike
+- attendyes
+- attendno
+- attendmaybe
+
+To remove an activity, prepend the verb with "un", eg. "unlike" or "undislike"
+Attend verbs disable eachother: that means that if "attendyes" was added to an item,
+adding "attendno" remove previous "attendyes".
+Attend verbs should be used only with event-related items (there is no check at the moment)
+
+#### Return values
+
+On success:
+json
+```"ok"```
+
+xml
+```<ok>true</ok>```
+
+On error:
+HTTP 400 BadRequest
+
+---
 ### friendica/photo
 #### Parameters
 * photo_id: Resource id of a photo.
+* scale: (optional) scale value of the photo
 
 Returns data of a picture with the given resource.
+If 'scale' isn't provided, returned data include full url to each scale of the photo.
+If 'scale' is set, returned data include image data base64 encoded.
 
+possibile scale value are:
+0: original or max size by server settings
+1: image with or height at <= 640
+2: image with or height at <= 320
+3: thumbnail 160x160
+
+4: Profile image at 175x175
+5: Profile image at 80x80
+6: Profile image at 48x48
+
+An image used as profile image has only scale 4-6, other images only 0-3
+
+#### Return values
+
+json
+```
+	{
+	  "id": "photo id"
+	  "created": "date(YYYY-MM-GG HH:MM:SS)",
+	  "edited": "date(YYYY-MM-GG HH:MM:SS)",
+	  "title": "photo title",
+	  "desc": "photo description",
+	  "album": "album name",
+	  "filename": "original file name",
+	  "type": "mime type",
+	  "height": "number",
+	  "width": "number",
+	  "profile": "1 if is profile photo",
+	  "link": {
+		"<scale>": "url to image"
+		...
+	  },
+	  // if 'scale' is set
+	  "datasize": "size in byte",
+	  "data": "base64 encoded image data"
+	}
+```
+
+xml
+```
+	<photo>
+		<id>photo id</id>
+		<created>date(YYYY-MM-GG HH:MM:SS)</created>
+		<edited>date(YYYY-MM-GG HH:MM:SS)</edited>
+		<title>photo title</title>
+		<desc>photo description</desc>
+		<album>album name</album>
+		<filename>original file name</filename>
+		<type>mime type</type>
+		<height>number</height>
+		<width>number</width>
+		<profile>1 if is profile photo</profile>
+		<links type="array">
+			<link type="mime type" scale="scale number" href="image url"/>
+			...
+		</links>
+	</photo>
+```
+
+---
 ### friendica/photos/list
 
 Returns a list of all photo resources of the logged in user.
 
+#### Return values
+
+json
+```
+	[
+		{
+			id: "resource_id",
+			album: "album name",
+			filename: "original file name",
+			type: "image mime type",
+			thumb: "url to thumb sized image"
+		},
+		...
+	]
+```
+
+xml
+```
+	<photos type="array">
+		<photo id="resource_id"
+			album="album name"
+			filename="original file name"
+			type="image mime type">
+				"url to thumb sized image"
+		</photo>
+		...
+	</photos>
+```
+
+---
 ### friends/ids
 #### Parameters
 * stringify_ids: Should the id numbers be sent as text (true) or number (false)? (default: false)
@@ -146,46 +311,54 @@ Returns a list of all photo resources of the logged in user.
 #### Unsupported parameters
 * user_id
 * screen_name
-* cursor 
+* cursor
 
 Friendica doesn't allow showing friends of other users.
 
+---
 ### help/test
 
+---
 ### media/upload
 #### Parameters
 * media: image data
 
+---
 ### oauth/request_token
 #### Parameters
-* oauth_callback 
+* oauth_callback
 
 #### Unsupported parameters
-* x_auth_access_type 
+* x_auth_access_type
 
+---
 ### oauth/access_token
 #### Parameters
-* oauth_verifier 
+* oauth_verifier
 
 #### Unsupported parameters
-* x_auth_password 
-* x_auth_username 
-* x_auth_mode 
+* x_auth_password
+* x_auth_username
+* x_auth_mode
 
+---
 ### statuses/destroy
 #### Parameters
 * id: message number
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* trim_user 
+* trim_user
 
+---
 ### statuses/followers
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
+---
 ### statuses/friends
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
+---
 ### statuses/friends_timeline
 #### Parameters
 * count: Items per page (default: 20)
@@ -197,10 +370,11 @@ Friendica doesn't allow showing friends of other users.
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* include_rts 
-* trim_user 
-* contributor_details 
+* include_rts
+* trim_user
+* contributor_details
 
+---
 ### statuses/home_timeline
 #### Parameters
 * count: Items per page (default: 20)
@@ -212,10 +386,11 @@ Friendica doesn't allow showing friends of other users.
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* include_rts 
-* trim_user 
-* contributor_details 
+* include_rts
+* trim_user
+* contributor_details
 
+---
 ### statuses/mentions
 #### Parameters
 * count: Items per page (default: 20)
@@ -225,10 +400,11 @@ Friendica doesn't allow showing friends of other users.
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* include_rts 
-* trim_user 
-* contributor_details 
+* include_rts
+* trim_user
+* contributor_details
 
+---
 ### statuses/public_timeline
 #### Parameters
 * count: Items per page (default: 20)
@@ -240,8 +416,9 @@ Friendica doesn't allow showing friends of other users.
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* trim_user 
+* trim_user
 
+---
 ### statuses/replies
 #### Parameters
 * count: Items per page (default: 20)
@@ -251,18 +428,20 @@ Friendica doesn't allow showing friends of other users.
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* include_rts 
-* trim_user 
-* contributor_details 
+* include_rts
+* trim_user
+* contributor_details
 
+---
 ### statuses/retweet
 #### Parameters
 * id: message number
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* trim_user 
+* trim_user
 
+---
 ### statuses/show
 #### Parameters
 * id: message number
@@ -270,9 +449,10 @@ Friendica doesn't allow showing friends of other users.
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* include_my_retweet 
-* trim_user 
+* include_my_retweet
+* trim_user
 
+---
 ### statuses/update, statuses/update_with_media
 #### Parameters
 * title: Title of the status
@@ -289,16 +469,17 @@ Friendica doesn't allow showing friends of other users.
 * contact_deny
 * network
 * include_entities: "true" shows entities for pictures and links (Default: false)
-* media_ids: (By now only a single value, no array) 
+* media_ids: (By now only a single value, no array)
 
 #### Unsupported parameters
 * trim_user
 * place_id
 * display_coordinates
 
+---
 ### statuses/user_timeline
 #### Parameters
-* user_id: id of the user 
+* user_id: id of the user
 * screen_name: screen name (for technical reasons, this value is not unique!)
 * count: Items per page (default: 20)
 * page: page number
@@ -309,46 +490,51 @@ Friendica doesn't allow showing friends of other users.
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
-* include_rts 
-* trim_user 
-* contributor_details 
+* include_rts
+* trim_user
+* contributor_details
 
+---
 ### statusnet/config
 
+---
 ### statusnet/version
 
 #### Unsupported parameters
 * user_id
 * screen_name
-* cursor 
+* cursor
 
 Friendica doesn't allow showing followers of other users.
 
+---
 ### users/search
 #### Parameters
-* q: name of the user 
+* q: name of the user
 
 #### Unsupported parameters
 * page
 * count
 * include_entities
 
+---
 ### users/show
 #### Parameters
-* user_id: id of the user 
+* user_id: id of the user
 * screen_name: screen name (for technical reasons, this value is not unique!)
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
 #### Unsupported parameters
 * user_id
 * screen_name
-* cursor 
+* cursor
 
 Friendica doesn't allow showing friends of other users.
 
 
 ## Implemented API calls (not compatible with other APIs)
 
+---
 ### friendica/group_show
 Return all or a specified group of the user with the containing contacts as array.
 
@@ -362,12 +548,14 @@ Array of:
 * user: array of group members (return from api_get_user() function for each member)
 
 
+---
 ### friendica/group_delete
 delete the specified group of contacts; API call need to include the correct gid AND name of the group to be deleted.
 
+---
 ### Parameters
 * gid: id of the group to be deleted
-* name: name of the group to be deleted 
+* name: name of the group to be deleted
 
 #### Return values
 Array of:
@@ -378,8 +566,9 @@ Array of:
 * wrong users: empty array
 
 
+---
 ### friendica/group_create
-Create the group with the posted array of contacts as members. 
+Create the group with the posted array of contacts as members.
 #### Parameters
 * name: name of the group to be created
 
@@ -395,11 +584,12 @@ Array of:
 * gid: gid of the created group
 * name: name of the created group
 * status: „missing user“ | „reactivated“ | „ok“
-* wrong users: array of users, which were not available in the contact table 
+* wrong users: array of users, which were not available in the contact table
 
 
+---
 ### friendica/group_update
-Update the group with the posted array of contacts as members (post all members of the group to the call; function will remove members not posted). 
+Update the group with the posted array of contacts as members (post all members of the group to the call; function will remove members not posted).
 #### Parameters
 * gid: id of the group to be changed
 * name: name of the group to be changed
@@ -416,9 +606,9 @@ Array of:
 * gid: gid of the changed group
 * name: name of the changed group
 * status: „missing user“ | „ok“
-* wrong users: array of users, which were not available in the contact table 
+* wrong users: array of users, which were not available in the contact table
 
-
+---
 ## Not Implemented API calls
 The following API calls are implemented in GNU Social but not in Friendica: (incomplete)
 
@@ -504,6 +694,10 @@ The following API calls from the Twitter API aren't implemented neither in Frien
 * help/tos
 * trends/closest
 * users/report_spam
+
+---
+
+---
 
 ## Usage Examples
 ### BASH / cURL

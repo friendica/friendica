@@ -12,8 +12,8 @@ addon
 *~
 robots.txt
 
-#ignore documentation, it should be newly built 
-doc/api
+#ignore documentation, it should be newly built
+doc/html
 
 #ignore reports, should be generted with every build
 report/
@@ -23,7 +23,7 @@ report/
 .buildpath
 .externalToolBuilders
 .settings
-#ignore OSX .DS_Store files 
+#ignore OSX .DS_Store files
 .DS_Store
 
 /nbproject/private/

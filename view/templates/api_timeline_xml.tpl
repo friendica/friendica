@@ -1,5 +1,7 @@
 
-<statuses type="array" xmlns:statusnet="http://status.net/schema/api/1/">
+<statuses type="array"
+	xmlns:statusnet="http://status.net/schema/api/1/"
+	xmlns:friendica="http://friendi.ca/schema/api/1/">
 {{foreach $statuses as $status}} <status>
   <text>{{$status.text}}</text>
   <truncated>{{$status.truncated}}</truncated>
@@ -17,5 +19,8 @@
   <coordinates>{{$status.coordinates}}</coordinates>
   <place>{{$status.place}}</place>
   <contributors>{{$status.contributors}}</contributors>
+  <friendica:activities>{{foreach $status.friendica_activities as $k=>$v}}
+    <friendica:{{$k}}>{{$v}}</friendica:{{$k}}>
+  {{/foreach}}</friendica:activities>
  </status>
 {{/foreach}}</statuses>
