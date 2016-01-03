@@ -156,6 +156,7 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	}
 
 
+	$a->set_curl_redirect_url($url);
 	$a->set_curl_code($http_code);
 	$a->set_curl_content_type($curl_info['content_type']);
 
