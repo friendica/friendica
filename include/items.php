@@ -2643,7 +2643,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 
 		logger('consume_feed: feed item count = ' . $feed->get_item_quantity());
 
-	// in inverse date order
+		// in inverse date order
 		if ($datedir)
 			$items = array_reverse($feed->get_items());
 		else

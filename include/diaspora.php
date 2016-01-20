@@ -2852,9 +2852,6 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	$myaddr = $owner['nickname'] . '@' . substr($a->get_baseurl(), strpos($a->get_baseurl(),'://') + 3);
 //	$theiraddr = $contact['addr'];
 
-	$body = $item['body'];
-	$text = html_entity_decode(bb2diaspora($body));
-
 	// Diaspora doesn't support threaded comments, but some
 	// versions of Diaspora (i.e. Diaspora-pistos) support
 	// likes on comments
@@ -2905,61 +2902,57 @@ function diaspora_send_relay($item,$owner,$contact,$public_batch = false) {
 	// fetch the original signature	if the relayable was created by a Diaspora
 	// or DFRN user. Relayables for other networks are not supported.
 
-/*	$r = q("select * from sign where " . $sql_sign_id . " = %d limit 1",
+	$r = q("SELECT `signed_text`, `signature`, `signer` FROM `sign` WHERE " . $sql_sign_id . " = %d LIMIT 1",
 		intval($item['id'])
 	);
-	if(count($r)) { 
+	if(count($r)) {
 		$orig_sign = $r[0];
 		$signed_text = $orig_sign['signed_text'];
 		$authorsig = $orig_sign['signature'];
 		$handle = $orig_sign['signer'];
+
+		// Friendica servers lower than 3.5 had double encoded the signature ...
+		if (substr($authorsig, -1, 1) != "=")
+			$authorsig = base64_decode($authorsig);
+
+		// Split the signed text
+		$signed_parts = explode(";", $signed_text);
+
+		// Remove the parent guid
+		array_shift($signed_parts);
+
+		// Remove the comment guid
+		array_shift($signed_parts);
+
+		// Remove the handle
+		array_pop($signed_parts);
+
+		// Glue the parts together
+		$text = implode(";", $signed_parts);
 	}
 	else {
+		// This part is meant for cases where we don't have the signatur. (Which shouldn't happen with posts from Diaspora and Friendica)
+		// This means that the comment won't be accepted by newer Diaspora servers
 
-		// Author signature information (for likes, comments, and retractions of likes or comments,
-		// whether from Diaspora or Friendica) must be placed in the `sign` table before this 
-		// function is called
-		logger('diaspora_send_relay: original author signature not found, cannot send relayable');
-		return;
-	}*/
+		$body = $item['body'];
+		$text = html_entity_decode(bb2diaspora($body));
 
-	/* Since the author signature is only checked by the parent, not by the relay recipients,
-	 * I think it may not be necessary for us to do so much work to preserve all the original
-	 * signatures. The important thing that Diaspora DOES need is the original creator's handle.
-	 * Let's just generate that and forget about all the original author signature stuff.
-	 *
-	 * Note: this might be more of an problem if we want to support likes on comments for older
-	 * versions of Diaspora (diaspora-pistos), but since there are a number of problems with
-	 * doing that, let's ignore it for now.
-	 *
-	 * Currently, only DFRN contacts are supported. StatusNet shouldn't be hard, but it hasn't
-	 * been done yet
-	 */
+		$handle = diaspora_handle_from_contact($item['contact-id']);
+		if(! $handle)
+			return;
 
-	$handle = diaspora_handle_from_contact($item['contact-id']);
-	if(! $handle)
-		return;
+		if($relay_retract)
+			$signed_text = $item['guid'] . ';' . $target_type;
+		elseif($like)
+			$signed_text = $item['guid'] . ';' . $target_type . ';' . $parent['guid'] . ';' . $positive . ';' . $handle;
+		else
+			$signed_text = $item['guid'] . ';' . $parent['guid'] . ';' . $text . ';' . $handle;
 
-
-	if($relay_retract)
-		$sender_signed_text = $item['guid'] . ';' . $target_type;
-	elseif($like)
-		$sender_signed_text = $item['guid'] . ';' . $target_type . ';' . $parent['guid'] . ';' . $positive . ';' . $handle;
-	else
-		$sender_signed_text = $item['guid'] . ';' . $parent['guid'] . ';' . $text . ';' . $handle;
+		$authorsig = base64_encode(rsa_sign($signed_text,$owner['uprvkey'],'sha256'));
+	}
 
 	// Sign the relayable with the top-level owner's signature
-	//
-	// We'll use the $sender_signed_text that we just created, instead of the $signed_text
-	// stored in the database, because that provides the best chance that Diaspora will
-	// be able to reconstruct the signed text the same way we did. This is particularly a
-	// concern for the comment, whose signed text includes the text of the comment. The
-	// smallest change in the text of the comment, including removing whitespace, will
-	// make the signature verification fail. Since we translate from BB code to Diaspora's
-	// markup at the top of this function, which is AFTER we placed the original $signed_text
-	// in the database, it's hazardous to trust the original $signed_text.
-
-	$parentauthorsig = base64_encode(rsa_sign($sender_signed_text,$owner['uprvkey'],'sha256'));
+	$parentauthorsig = base64_encode(rsa_sign($signed_text,$owner['uprvkey'],'sha256'));
 
 	$msg = replace_macros($tpl,array(
 		'$guid' => xmlify($item['guid']),

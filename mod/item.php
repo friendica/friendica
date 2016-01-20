@@ -900,7 +900,7 @@ function item_post(&$a) {
 
 
 		// Store the comment signature information in case we need to relay to Diaspora
-		store_diaspora_comment_sig($datarray, $author, ($self ? $a->user['prvkey'] : false), $parent_item, $post_id);
+		store_diaspora_comment_sig($datarray, $author, ($self ? $user['prvkey'] : false), $parent_item, $post_id);
 
 	} else {
 		$parent = $post_id;
@@ -1271,7 +1271,7 @@ function store_diaspora_comment_sig($datarray, $author, $uprvkey, $parent_item, 
 	$signed_text = $datarray['guid'] . ';' . $parent_item['guid'] . ';' . $signed_body . ';' . $diaspora_handle;
 
 	if( $uprvkey !== false )
-		$authorsig = base64_encode(rsa_sign($signed_text,$uprvkey,'sha256'));
+		$authorsig = rsa_sign($signed_text,$uprvkey,'sha256');
 	else
 		$authorsig = '';
 
