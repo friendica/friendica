@@ -116,6 +116,9 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	// if it throws any errors.
 
 	$s = @curl_exec($ch);
+	if (curl_errno($ch) !== CURLE_OK) {
+		logger('fetch_url error fetching '.$url.': '.curl_error($ch), LOGGER_NORMAL);
+	}
 
 	$base = $s;
 	$curl_info = @curl_getinfo($ch);
