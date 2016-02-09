@@ -496,7 +496,12 @@ if(! class_exists('App')) {
 
 
 			$this->scheme = 'http';
-			if(x($_SERVER,'HTTPS') && $_SERVER['HTTPS'])
+			if((x($_SERVER,'HTTPS') && $_SERVER['HTTPS']) ||
+			   (x($_SERVER['HTTP_FORWARDED']) && preg_match("/proto=https/", $_SERVER['HTTP_FORWARDED'])) ||
+			   (x($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') ||
+			   (x($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') ||
+			   (x($_SERVER['FRONT_END_HTTPS']) && $_SERVER['FRONT_END_HTTPS'] == 'on')
+			   )
 				$this->scheme = 'https';
 			elseif(x($_SERVER,'SERVER_PORT') && (intval($_SERVER['SERVER_PORT']) == 443))
 				$this->scheme = 'https';

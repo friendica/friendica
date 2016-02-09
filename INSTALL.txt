@@ -136,8 +136,37 @@ $a->config['system']['addon'] = 'js_upload,poormancron';
 
 and save your changes.
 
+9. (Optional) Reverse-proxying and HTTPS
 
- 
+Friendica looks for some well-known HTTP headers indicating a reverse-proxy
+terminating an HTTPS connection. While the standard from RFC 7239 specifies
+the use of the `Forwaded` header.
+
+    Forwarded: for=192.0.2.1; proto=https; by=192.0.2.2
+
+Friendica also supports a number on non-standard headers in common use.
+
+
+    X-Forwarded-Proto: https
+
+    Front-End-Https: on 
+
+    X-Forwarded-Ssl: on 
+
+It is however preferable to use the standard approach if configuring a new server.
+In Nginx, this can be done as follows (assuming Friendica runs on port 8080).
+
+    location / {
+            if ( $scheme != https ) {		# Force Redirect to HTTPS
+                    return 302 https://$host$uri;
+            }
+            proxy_pass http://localhost:8080;
+            proxy_redirect off;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Forwarded "for=$proxy_add_x_forwarded_for; proto=$scheme";
+    }
+
 #####################################################################
 
 		If things don't work...
