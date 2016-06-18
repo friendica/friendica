@@ -4,7 +4,14 @@ AddType audio/ogg .oga
 #AddHandler php53-cgi .php
 
 <FilesMatch "\.(out|log)$">
-Deny from all
+  <IfModule authz_host_module> 
+    #Apache 2.4
+    Require all denied
+  </IfModule>
+  <IfModule !authz_host_module>
+    #Apache 2.2
+    Deny from all
+  </IfModule>
 </FilesMatch>
 
 <IfModule mod_rewrite.c>

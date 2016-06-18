@@ -1,3 +1,10 @@
 <FilesMatch "\.tpl">
-Deny from all
+  <IfModule authz_host_module> 
+    #Apache 2.4
+    Require all denied
+  </IfModule>
+  <IfModule !authz_host_module>
+    #Apache 2.2
+    Deny from all
+  </IfModule>
 </FilesMatch>
