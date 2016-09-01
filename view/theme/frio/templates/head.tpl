@@ -75,6 +75,7 @@
 <script type="text/javascript" src="view/theme/frio/frameworks/flexMenu/flexmenu.custom.js"></script>
 <script type="text/javascript" src="view/theme/frio/frameworks/jsmart/jsmart.custom.js"></script>
 <script type="text/javascript" src="view/theme/frio/frameworks/jquery-scrollspy/jquery-scrollspy.js"></script>
+<script type="text/javascript" src="view/theme/frio/frameworks/autosize/autosize.min.js"></script>
 
 {{* own js files *}}
 <script type="text/javascript" src="view/theme/frio/js/theme.js"></script>
@@ -82,7 +83,7 @@
 <script type="text/javascript" src="view/theme/frio/js/hovercard.js"></script>
 <script type="text/javascript" src="view/theme/frio/js/textedit.js"></script>
 
-<script>
+<script language="javascript" type="text/javascript">
 	window.showMore = "{{$showmore}}";
 	window.showFewer = "{{$showfewer}}";
 </script>

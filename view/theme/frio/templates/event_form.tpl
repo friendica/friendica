@@ -62,7 +62,7 @@
 			{{* The textarea for the event description *}}
 			<div class="form-group">
 				<div id="event-desc-text"><b>{{$d_text}}</b></div>
-				<textarea id="comment-edit-text-desc" class="form-control" name="desc" >{{$d_orig}}</textarea>
+				<textarea id="comment-edit-text-desc" class="form-control text-autosize" name="desc" >{{$d_orig}}</textarea>
 				<ul id="event-desc-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
 					{{* commented out because it isn't implemented yet
 					<li>
@@ -109,7 +109,7 @@
 			{{* The textarea for the event location *}}
 			<div class="form-group">
 				<div id="event-location-text"><b>{{$l_text}}</b></div>
-				<textarea id="comment-edit-text-loc" class="form-control" name="location">{{$l_orig}}</textarea>
+				<textarea id="comment-edit-text-loc" class="form-control text-autosize" name="location">{{$l_orig}}</textarea>
 				<ul id="comment-tools-loc" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
 					{{* commented out because it isn't implemented yet
 					<li>
@@ -168,11 +168,14 @@
 	</div>
 </div>
 
-<script>
+<script language="javascript" type="text/javascript">
 	$(document).ready( function() {
 		// disable finish date input if it isn't available
 		enableDisableFinishDate();
 		// load bbcode autocomplete for the description textarea
 		$('#comment-edit-text-desc, #comment-edit-text-loc').bbco_autocomplete('bbcode');
+
+		// initiale autosize for the textareas
+		autosize($("textarea.text-autosize"));
 	});
 </script>

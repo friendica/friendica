@@ -1,5 +1,5 @@
 
-<script>
+<script language="javascript" type="text/javascript">
 $(document).ready(function() {
 	// Add contact_filter autocompletion to the search field
 	$("#contacts-search").contact_filter(baseurl + '/acl', 'r', true);
@@ -17,6 +17,8 @@ $(document).ready(function() {
 			$("ul.textcomplete-dropdown").removeClass("show");
 		}
 	});
+	// initiale autosize for the textareas
+	autosize($("textarea.text-autosize"));
 
 });
 </script>

@@ -93,6 +93,8 @@ function commentOpenUI(obj, id) {
 			$("#comment-edit-text-" + id).attr('tabindex','9');
 			$("#comment-edit-submit-" + id).attr('tabindex','10');
 			$("#comment-edit-submit-wrapper-" + id).show();
+			// initiale autosize for this comment
+			autosize($("#comment-edit-text-" + id + ".text-autosize"));
 		}
 	};
 
@@ -109,6 +111,8 @@ function commentCloseUI(obj, id) {
 			$("#comment-edit-text-" + id).removeAttr('tabindex');
 			$("#comment-edit-submit-" + id).removeAttr('tabindex');
 			$("#comment-edit-submit-wrapper-" + id).hide();
+			// destroy the automatic textarea resizing
+			autosize.destroy($("#comment-edit-text-" + id + ".text-autosize"));
 		}
 	};
 
@@ -120,6 +124,8 @@ function jotTextOpenUI(obj) {
 	if(obj.value == aStr.share) {
 		obj.value = '';
 		$(".modal-body #profile-jot-text").addClass("profile-jot-text-full").removeClass("profile-jot-text-empty");
+		// initiale autosize for the jot
+		autosize($(".modal-body #profile-jot-text"));
 	}
 }
 
@@ -129,6 +135,8 @@ function jotTextCloseUI(obj) {
 	if(obj.value === '') {
 	obj.value = aStr.share;
 		$(".modal-body #profile-jot-text").removeClass("profile-jot-text-full").addClass("profile-jot-text-empty");
+		// destroy the automatic textarea resizing
+		autosize.destroy($(".modal-body #profile-jot-text"));
 	}
 }
 

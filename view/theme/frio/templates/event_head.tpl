@@ -3,7 +3,7 @@
 <script language="javascript" type="text/javascript"
 	  src="{{$baseurl}}/library/fullcalendar/fullcalendar.min.js"></script>
 
-<script>
+<script language="javascript" type="text/javascript">
 	// loads the event into a modal
 	function showEvent(eventid) {
 			addToModal('{{$baseurl}}{{$module_url}}/?id='+eventid);
