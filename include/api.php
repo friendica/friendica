@@ -2362,29 +2362,54 @@
 			'attendno' => array(),
 			'attendmaybe' => array()
 		);
+
 		$items = q('SELECT * FROM item
 					WHERE uid=%d AND `thr-parent`="%s" AND visible AND NOT deleted',
 					intval($item['uid']),
 					dbesc($item['uri']));
+
 		foreach ($items as $i){
-			builtin_activity_puller($i, $activities);
+			// not used as result should be structured like other user data
+			//builtin_activity_puller($i, $activities);
+
+			// get user data and add it to the array of the activity
+			$user = api_get_user($a, $i['author-link']);			
+			switch($i['verb']) {
+				case ACTIVITY_LIKE:
+					$activities['like'][] = $user;
+					break;
+				case ACTIVITY_DISLIKE:
+					$activities['dislike'][] = $user;
+					break;
+				case ACTIVITY_ATTEND:
+					$activities['attendyes'][] = $user;
+					break;
+				case ACTIVITY_ATTENDNO:
+					$activities['attendno'][] = $user;
+					break;
+				case ACTIVITY_ATTENDMAYBE:
+					$activities['attendmaybe'][] = $user;
+					break;
+				default:
+					break;
+			}
 		}
 
 		if ($type == "xml") {
 			$xml_activities = array();
-			foreach ($activities as $k => $v)
+			foreach ($activities as $k => $v) {
+				// change xml element from "like" to "friendica:like"
 				$xml_activities["friendica:".$k] = $v;
-
+				// add user data into xml output
+				$k_user = 0;
+				foreach ($v as $user)
+					$xml_activities["friendica:".$k][$k_user++.":user"] = $user;
+			}
 			$activities = $xml_activities;
 		}
 
-		$res = array();
-		$uri = $item['uri']."-l";
-		foreach($activities as $k => $v) {
-			$res[$k] = (x($v,$uri)?count($v[$uri]):0);
-			#$res[$k] = ( x($v,$uri) ? array_map("api_contactlink_to_array", $v[$uri]) : array() );
-		}
-		return $res;
+		return $activities;
+
 	}
 
 	/**
