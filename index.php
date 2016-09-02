@@ -489,7 +489,8 @@ if (isset($_GET["mode"]) AND ($_GET["mode"] == "raw")) {
 
 	echo substr($target->saveHTML(), 6, -8);
 
-	session_write_close();
+	if (!$a->is_backend())
+		session_write_close();
 	exit;
 
 }
@@ -514,5 +515,6 @@ if(!$template) {
 
 require_once($template);
 
-session_write_close();
+if (!$a->is_backend())
+	session_write_close();
 exit;

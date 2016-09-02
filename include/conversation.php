@@ -887,7 +887,7 @@ function best_link_url($item,&$sparkle,$ssl_state = false) {
 	$clean_url = normalise_link($item['author-link']);
 
 	if (local_user()) {
-		$r = q("SELECT `id` FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `nurl` = '%s' LIMIT 1",
+		$r = q("SELECT `id` FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `nurl` = '%s' AND NOT `pending` LIMIT 1",
 			dbesc(NETWORK_DFRN), intval(local_user()), dbesc(normalise_link($clean_url)));
 		if ($r) {
 			$best_url = 'redir/'.$r[0]['id'];

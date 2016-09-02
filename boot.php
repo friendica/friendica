@@ -392,11 +392,12 @@ define ( 'GRAVITY_COMMENT',      6);
  * Process priority for the worker
  * @{
  */
-define('PRIORITY_UNDEFINED', 0);
-define('PRIORITY_SYSTEM',   10);
-define('PRIORITY_HIGH',     20);
-define('PRIORITY_MEDIUM',   30);
-define('PRIORITY_LOW',      40);
+define('PRIORITY_UNDEFINED',  0);
+define('PRIORITY_CRITICAL',  10);
+define('PRIORITY_HIGH',      20);
+define('PRIORITY_MEDIUM',    30);
+define('PRIORITY_LOW',       40);
+define('PRIORITY_NEGLIGIBLE',50);
 /* @}*/
 
 
@@ -1266,8 +1267,20 @@ class App {
 	function proc_run($args) {
 
 		// Add the php path if it is a php call
-		if (count($args) && ($args[0] === 'php' OR is_int($args[0])))
+		if (count($args) && ($args[0] === 'php' OR is_int($args[0]))) {
+
+			// If the last worker fork was less than 10 seconds before then don't fork another one.
+			// This should prevent the forking of masses of workers.
+			if (get_config("system", "worker")) {
+				if ((time() - get_config("system", "proc_run_started")) < 10)
+					return;
+
+				// Set the timestamp of the last proc_run
+				set_config("system", "proc_run_started", time());
+			}
+
 			$args[0] = ((x($this->config,'php_path')) && (strlen($this->config['php_path'])) ? $this->config['php_path'] : 'php');
+		}
 
 		// add baseurl to args. cli scripts can't construct it
 		$args[] = $this->get_baseurl();
@@ -1398,7 +1411,7 @@ function check_db() {
 		$build = DB_UPDATE_VERSION;
 	}
 	if($build != DB_UPDATE_VERSION)
-		proc_run(PRIORITY_SYSTEM, 'include/dbupdate.php');
+		proc_run(PRIORITY_CRITICAL, 'include/dbupdate.php');
 
 }
 
@@ -1686,7 +1699,9 @@ function login($register = false, $hiddens=false) {
  * @brief Used to end the current process, after saving session state.
  */
 function killme() {
-	session_write_close();
+	if (!get_app()->is_backend())
+		session_write_close();
+
 	exit;
 }
 

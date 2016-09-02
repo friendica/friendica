@@ -285,7 +285,7 @@ function notifications_content(&$a) {
 				'$item_label' => $it['label'],
 				'$item_link' => $it['link'],
 				'$item_image' => $it['image'],
-				'$item_text' => $it['text'],
+				'$item_text' => htmlentities($it['text']),
 				'$item_when' => $it['when'],
 				'$item_seen' => $it['seen'],
 			));

@@ -82,7 +82,7 @@ function get_attachment_data($body) {
 
 	$data = array();
 
-	if (!preg_match("/(.*)\[attachment(.*)\](.*?)\[\/attachment\](.*)/ism", $body, $match))
+	if (!preg_match("/(.*)\[attachment(.*?)\](.*?)\[\/attachment\](.*)/ism", $body, $match))
 		return get_old_attachment_data($body);
 
 	$attributes = $match[2];

@@ -23,7 +23,7 @@ import os, glob, subprocess
 #  not work in some cases.
 dontinclude = ['root', 'friendica', 'bavatar', 'tony baldwin', 'Taek', 'silke m',
                'leberwurscht', 'abinoam', 'fabrixxm', 'FULL NAME', 'Hauke Zuehl',
-               'Michal Supler', 'michal_s', 'Manuel Pérez']
+               'Michal Supler', 'michal_s', 'Manuel Pérez', 'rabuzarus']
 
 
 #  this script is in the /util sub-directory of the friendica installation

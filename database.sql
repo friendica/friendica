@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `addon` (
 	`timestamp` bigint(20) NOT NULL DEFAULT 0,
 	`plugin_admin` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE attach
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `attach` (
 	`deny_cid` mediumtext NOT NULL,
 	`deny_gid` mediumtext NOT NULL,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE auth_codes
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `auth_codes` (
 	`expires` int(11) NOT NULL DEFAULT 0,
 	`scope` varchar(250) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE cache
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `cache` (
 	`updated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`k`),
 	 INDEX `updated` (`updated`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE challenge
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `challenge` (
 	`type` varchar(255) NOT NULL DEFAULT '',
 	`last_update` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE clients
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `clients` (
 	`icon` text,
 	`uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`client_id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE config
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `config` (
 	`v` text NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `cat_k` (`cat`(30),`k`(30))
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE contact
@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `nurl` (`nurl`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE conv
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `conv` (
 	`subject` mediumtext NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE deliverq
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `deliverq` (
 	`item` int(11) NOT NULL DEFAULT 0,
 	`contact` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE event
@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `event` (
 	`deny_gid` mediumtext NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE fcontact
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `fcontact` (
 	`updated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `addr` (`addr`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE ffinder
@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS `ffinder` (
 	`cid` int(10) unsigned NOT NULL DEFAULT 0,
 	`fid` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE fserver
@@ -275,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `fserver` (
 	`key` text NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `server` (`server`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE fsuggest
@@ -291,7 +291,7 @@ CREATE TABLE IF NOT EXISTS `fsuggest` (
 	`note` text NOT NULL,
 	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE gcign
@@ -303,7 +303,7 @@ CREATE TABLE IF NOT EXISTS `gcign` (
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `gcid` (`gcid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE gcontact
@@ -340,7 +340,7 @@ CREATE TABLE IF NOT EXISTS `gcontact` (
 	 INDEX `nick` (`nick`),
 	 INDEX `addr` (`addr`),
 	 INDEX `updated` (`updated`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE glink
@@ -356,7 +356,7 @@ CREATE TABLE IF NOT EXISTS `glink` (
 	 INDEX `cid_uid_gcid_zcid` (`cid`,`uid`,`gcid`,`zcid`),
 	 INDEX `gcid` (`gcid`),
 	 INDEX `zcid` (`zcid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE group
@@ -369,7 +369,7 @@ CREATE TABLE IF NOT EXISTS `group` (
 	`name` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE group_member
@@ -381,7 +381,7 @@ CREATE TABLE IF NOT EXISTS `group_member` (
 	`contact-id` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_gid_contactid` (`uid`,`gid`,`contact-id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE gserver
@@ -404,7 +404,7 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`last_failure` datetime DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `nurl` (`nurl`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE hook
@@ -417,7 +417,7 @@ CREATE TABLE IF NOT EXISTS `hook` (
 	`priority` int(11) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 INDEX `hook_file_function` (`hook`(30),`file`(60),`function`(30))
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE intro
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS `intro` (
 	`blocked` tinyint(1) NOT NULL DEFAULT 1,
 	`ignore` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE item
@@ -543,7 +543,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `uid_eventid` (`uid`,`event-id`),
 	 INDEX `uid_authorlink` (`uid`,`author-link`),
 	 INDEX `uid_ownerlink` (`uid`,`owner-link`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE item_id
@@ -559,7 +559,7 @@ CREATE TABLE IF NOT EXISTS `item_id` (
 	 INDEX `sid` (`sid`),
 	 INDEX `service` (`service`),
 	 INDEX `iid` (`iid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE locks
@@ -570,7 +570,7 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`locked` tinyint(1) NOT NULL DEFAULT 0,
 	`created` datetime DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE mail
@@ -600,7 +600,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
 	 INDEX `reply` (`reply`),
 	 INDEX `uri` (`uri`),
 	 INDEX `parent-uri` (`parent-uri`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE mailacct
@@ -620,7 +620,7 @@ CREATE TABLE IF NOT EXISTS `mailacct` (
 	`pubmail` tinyint(1) NOT NULL DEFAULT 0,
 	`last_check` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE manage
@@ -631,7 +631,7 @@ CREATE TABLE IF NOT EXISTS `manage` (
 	`mid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_mid` (`uid`,`mid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE notify
@@ -654,7 +654,7 @@ CREATE TABLE IF NOT EXISTS `notify` (
 	`otype` varchar(16) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE notify-threads
@@ -668,7 +668,7 @@ CREATE TABLE IF NOT EXISTS `notify-threads` (
 	 PRIMARY KEY(`id`),
 	 INDEX `master-parent-item` (`master-parent-item`),
 	 INDEX `receiver-uid` (`receiver-uid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE oembed
@@ -679,7 +679,7 @@ CREATE TABLE IF NOT EXISTS `oembed` (
 	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`url`),
 	 INDEX `created` (`created`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE parsed_url
@@ -692,7 +692,7 @@ CREATE TABLE IF NOT EXISTS `parsed_url` (
 	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`url`,`guessing`,`oembed`),
 	 INDEX `created` (`created`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE pconfig
@@ -705,7 +705,7 @@ CREATE TABLE IF NOT EXISTS `pconfig` (
 	`v` mediumtext NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_cat_k` (`uid`,`cat`(30),`k`(30))
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE photo
@@ -737,7 +737,7 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	 INDEX `uid` (`uid`),
 	 INDEX `resource-id` (`resource-id`),
 	 INDEX `guid` (`guid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE poll
@@ -757,7 +757,7 @@ CREATE TABLE IF NOT EXISTS `poll` (
 	`q9` mediumtext NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE poll_result
@@ -769,7 +769,7 @@ CREATE TABLE IF NOT EXISTS `poll_result` (
 	 PRIMARY KEY(`id`),
 	 INDEX `poll_id` (`poll_id`),
 	 INDEX `choice` (`choice`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE profile
@@ -818,7 +818,7 @@ CREATE TABLE IF NOT EXISTS `profile` (
 	`net-publish` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 INDEX `hometown` (`hometown`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE profile_check
@@ -831,7 +831,7 @@ CREATE TABLE IF NOT EXISTS `profile_check` (
 	`sec` varchar(255) NOT NULL DEFAULT '',
 	`expire` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE push_subscriber
@@ -846,7 +846,7 @@ CREATE TABLE IF NOT EXISTS `push_subscriber` (
 	`last_update` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	`secret` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE queue
@@ -865,7 +865,7 @@ CREATE TABLE IF NOT EXISTS `queue` (
 	 INDEX `last` (`last`),
 	 INDEX `network` (`network`),
 	 INDEX `batch` (`batch`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE register
@@ -878,7 +878,7 @@ CREATE TABLE IF NOT EXISTS `register` (
 	`password` varchar(255) NOT NULL DEFAULT '',
 	`language` varchar(16) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE search
@@ -890,7 +890,7 @@ CREATE TABLE IF NOT EXISTS `search` (
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `term` (`term`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE session
@@ -903,7 +903,7 @@ CREATE TABLE IF NOT EXISTS `session` (
 	 PRIMARY KEY(`id`),
 	 INDEX `sid` (`sid`),
 	 INDEX `expire` (`expire`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE sign
@@ -916,7 +916,7 @@ CREATE TABLE IF NOT EXISTS `sign` (
 	`signer` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `iid` (`iid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE spam
@@ -933,7 +933,7 @@ CREATE TABLE IF NOT EXISTS `spam` (
 	 INDEX `spam` (`spam`),
 	 INDEX `ham` (`ham`),
 	 INDEX `term` (`term`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE term
@@ -958,7 +958,7 @@ CREATE TABLE IF NOT EXISTS `term` (
 	 INDEX `uid_otype_type_term_global_created` (`uid`,`otype`,`type`,`term`,`global`,`created`),
 	 INDEX `otype_type_term_tid` (`otype`,`type`,`term`,`tid`),
 	 INDEX `guid` (`guid`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE thread
@@ -1002,7 +1002,7 @@ CREATE TABLE IF NOT EXISTS `thread` (
 	 INDEX `wall_private_received` (`wall`,`private`,`received`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_commented` (`uid`,`commented`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE tokens
@@ -1015,7 +1015,7 @@ CREATE TABLE IF NOT EXISTS `tokens` (
 	`scope` varchar(200) NOT NULL DEFAULT '',
 	`uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE user
@@ -1065,7 +1065,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`openidserver` text NOT NULL,
 	 PRIMARY KEY(`uid`),
 	 INDEX `nickname` (`nickname`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE userd
@@ -1075,7 +1075,7 @@ CREATE TABLE IF NOT EXISTS `userd` (
 	`username` varchar(255) NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `username` (`username`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- TABLE workerqueue
@@ -1089,5 +1089,5 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 	`executed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `created` (`created`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 

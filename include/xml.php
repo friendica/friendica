@@ -61,6 +61,18 @@ class xml {
 				continue;
 			}
 
+			$element_parts = explode(":", $key);
+			if ((count($element_parts) > 1) AND isset($namespaces[$element_parts[0]]))
+				$namespace = $namespaces[$element_parts[0]];
+			elseif (isset($namespaces[""])) {
+				$namespace = $namespaces[""];
+			} else
+				$namespace = NULL;
+
+			// Remove undefined namespaces from the key
+			if ((count($element_parts) > 1) AND is_null($namespace))
+				$key = $element_parts[1];
+
 			if (substr($key, 0, 11) == "@attributes") {
 				if (!isset($element) OR !is_array($value))
 					continue;
@@ -77,14 +89,6 @@ class xml {
 
 				continue;
 			}
-
-			$element_parts = explode(":", $key);
-			if ((count($element_parts) > 1) AND isset($namespaces[$element_parts[0]]))
-				$namespace = $namespaces[$element_parts[0]];
-			elseif (isset($namespaces[""]))
-				$namespace = $namespaces[""];
-			else
-				$namespace = NULL;
 
 			if (!is_array($value))
 				$element = $xml->addChild($key, xmlify($value), $namespace);

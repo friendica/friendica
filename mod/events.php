@@ -506,7 +506,8 @@ function events_content(&$a) {
 			'$acl' => $acl,
 			'$submit' => t('Submit'),
 			'$basic' => t("Basic"),
-			'$advanced' => t("Advanced")
+			'$advanced' => t("Advanced"),
+			'$permissions' => t('Permissions'),
 
 		));
 

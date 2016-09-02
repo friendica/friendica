@@ -232,17 +232,20 @@ function poller_kill_stale_workers() {
 			// Kill long running processes
 
 			// Check if the priority is in a valid range
-			if (!in_array($pid["priority"], array(PRIORITY_SYSTEM, PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW)))
+			if (!in_array($pid["priority"], array(PRIORITY_CRITICAL, PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW, PRIORITY_NEGLIGIBLE)))
 				$pid["priority"] = PRIORITY_MEDIUM;
 
 			// Define the maximum durations
-			$max_duration_defaults = array(PRIORITY_SYSTEM => 360, PRIORITY_HIGH => 10, PRIORITY_MEDIUM => 60, PRIORITY_LOW => 180);
+			$max_duration_defaults = array(PRIORITY_CRITICAL => 360, PRIORITY_HIGH => 10, PRIORITY_MEDIUM => 60, PRIORITY_LOW => 180, PRIORITY_NEGLIGIBLE => 360);
 			$max_duration = $max_duration_defaults[$pid["priority"]];
+
+			$argv = json_decode($pid["parameter"]);
+			$argv[0] = basename($argv[0]);
 
 			// How long is the process already running?
 			$duration = (time() - strtotime($pid["executed"])) / 60;
 			if ($duration > $max_duration) {
-				logger("Worker process ".$pid["pid"]." (".$pid["parameter"].") took more than ".$max_duration." minutes. It will be killed now.");
+				logger("Worker process ".$pid["pid"]." (".implode(" ", $argv).") took more than ".$max_duration." minutes. It will be killed now.");
 				posix_kill($pid["pid"], SIGTERM);
 
 				// We killed the stale process.
@@ -251,10 +254,10 @@ function poller_kill_stale_workers() {
 				q("UPDATE `workerqueue` SET `executed` = '0000-00-00 00:00:00', `created` = '%s',
 							`priority` = %d, `pid` = 0 WHERE `pid` = %d",
 					dbesc(datetime_convert()),
-					intval(PRIORITY_LOW),
+					intval(PRIORITY_NEGLIGIBLE),
 					intval($pid["pid"]));
 			} else
-				logger("Worker process ".$pid["pid"]." now runs for ".round($duration)." of ".$max_duration." allowed minutes. That's okay.", LOGGER_DEBUG);
+				logger("Worker process ".$pid["pid"]." (".implode(" ", $argv).") now runs for ".round($duration)." of ".$max_duration." allowed minutes. That's okay.", LOGGER_DEBUG);
 		}
 }
 
@@ -291,12 +294,11 @@ function poller_too_much_workers() {
 			$s = q("SELECT `priority` FROM `workerqueue` WHERE `executed` = '0000-00-00 00:00:00' ORDER BY `priority` LIMIT 1");
 			$top_priority = $s[0]["priority"];
 
-			$s = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `priority` <= %d AND `executed` != '0000-00-00 00:00:00'",
+			$s = q("SELECT `id` FROM `workerqueue` WHERE `priority` <= %d AND `executed` != '0000-00-00 00:00:00' LIMIT 1",
 				intval($top_priority));
-			$high_running = $s[0]["total"];
+			$high_running = dbm::is_result($s);
 
-			/// @todo define maximum number of fastlanes
-			if (($high_running == 0) AND ($top_priority != PRIORITY_UNDEFINED) AND ($top_priority < PRIORITY_LOW)) {
+			if (!$high_running AND ($top_priority > PRIORITY_UNDEFINED) AND ($top_priority < PRIORITY_NEGLIGIBLE)) {
 				logger("There are jobs with priority ".$top_priority." waiting but none is executed. Open a fastlane.", LOGGER_DEBUG);
 				$queues = $active + 1;
 			}

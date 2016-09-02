@@ -70,7 +70,7 @@ function cron_run(&$argv, &$argc){
 
 	// run queue delivery process in the background
 
-	proc_run(PRIORITY_LOW,"include/queue.php");
+	proc_run(PRIORITY_NEGLIGIBLE,"include/queue.php");
 
 	// run the process to discover global contacts in the background
 

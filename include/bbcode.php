@@ -34,7 +34,6 @@ function bb_map_location($match) {
 function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 
 	$data = get_attachment_data($Text);
-
 	if (!$data)
 		return $Text;
 
@@ -85,7 +84,7 @@ function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 				$text .= $oembed;
 
 			if (trim($data["description"]) != "")
-				$text .= sprintf('<blockquote>%s</blockquote></span>', trim($data["description"]));
+				$text .= sprintf('<blockquote>%s</blockquote></span>', trim(bbcode($data["description"])));
 		}
 	}
 	return $data["text"].$text.$data["after"];
@@ -920,6 +919,9 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	$Text = preg_replace("(\[h4\](.*?)\[\/h4\])ism",'<h4>$1</h4>',$Text);
 	$Text = preg_replace("(\[h5\](.*?)\[\/h5\])ism",'<h5>$1</h5>',$Text);
 	$Text = preg_replace("(\[h6\](.*?)\[\/h6\])ism",'<h6>$1</h6>',$Text);
+
+	// Check for paragraph
+	$Text = preg_replace("(\[p\](.*?)\[\/p\])ism",'<p>$1</p>',$Text);
 
 	// Check for bold text
 	$Text = preg_replace("(\[b\](.*?)\[\/b\])ism",'<strong>$1</strong>',$Text);

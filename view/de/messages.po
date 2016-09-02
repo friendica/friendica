@@ -35,9 +35,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-04 09:06+0200\n"
-"PO-Revision-Date: 2016-08-04 09:25+0000\n"
-"Last-Translator: Andreas H.\n"
+"POT-Creation-Date: 2016-08-09 18:10+0200\n"
+"PO-Revision-Date: 2016-08-10 10:19+0000\n"
+"Last-Translator: Tobias Diekershoff <tobias.diekershoff@gmx.net>\n"
 "Language-Team: German (http://www.transifex.com/Friendica/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -238,7 +238,7 @@ msgstr[1] "%d gemeinsame Kontakte"
 
 #: include/contact_widgets.php:242 include/ForumManager.php:119
 #: include/items.php:2122 mod/content.php:624 object/Item.php:432
-#: view/theme/vier/theme.php:260 boot.php:900
+#: view/theme/vier/theme.php:260 boot.php:903
 msgid "show more"
 msgstr "mehr anzeigen"
 
@@ -548,11 +548,6 @@ msgstr "Foren"
 msgid "External link to forum"
 msgstr "Externer Link zum Forum"
 
-#: include/dba.php:56 include/dba_pdo.php:72
-#, php-format
-msgid "Cannot locate DNS info for database server '%s'"
-msgstr "Kann die DNS Informationen für den Datenbankserver '%s' nicht ermitteln."
-
 #: include/event.php:16 include/bb2diaspora.php:148 mod/localtime.php:12
 msgid "l F d, Y \\@ g:i A"
 msgstr "l, d. F Y\\, H:i"
@@ -566,8 +561,8 @@ msgid "Finishes:"
 msgstr "Endet:"
 
 #: include/event.php:39 include/event.php:63 include/bb2diaspora.php:170
-#: include/identity.php:329 mod/directory.php:145 mod/notifications.php:208
-#: mod/contacts.php:628 mod/events.php:495
+#: include/identity.php:329 mod/directory.php:145 mod/contacts.php:628
+#: mod/events.php:495 mod/notifications.php:232
 msgid "Location:"
 msgstr "Ort:"
 
@@ -1024,6 +1019,11 @@ msgstr "$1 hat geschrieben:"
 msgid "Encrypted content"
 msgstr "Verschlüsselter Inhalt"
 
+#: include/dba_pdo.php:72 include/dba.php:56
+#, php-format
+msgid "Cannot locate DNS info for database server '%s'"
+msgstr "Kann die DNS Informationen für den Datenbankserver '%s' nicht ermitteln."
+
 #: include/auth.php:45
 msgid "Logged out."
 msgstr "Abgemeldet."
@@ -1174,11 +1174,11 @@ msgid "An error occurred creating your default profile. Please try again."
 msgstr "Bei der Erstellung des Standardprofils ist ein Fehler aufgetreten. Bitte versuche es noch einmal."
 
 #: include/user.php:345 include/user.php:352 include/user.php:359
-#: mod/photos.php:79 mod/photos.php:193 mod/photos.php:770 mod/photos.php:1233
-#: mod/photos.php:1256 mod/photos.php:1850 mod/profile_photo.php:74
-#: mod/profile_photo.php:81 mod/profile_photo.php:88 mod/profile_photo.php:210
-#: mod/profile_photo.php:302 mod/profile_photo.php:311
-#: view/theme/diabook/theme.php:500
+#: mod/profile_photo.php:74 mod/profile_photo.php:81 mod/profile_photo.php:88
+#: mod/profile_photo.php:210 mod/profile_photo.php:302
+#: mod/profile_photo.php:311 mod/photos.php:79 mod/photos.php:193
+#: mod/photos.php:770 mod/photos.php:1233 mod/photos.php:1256
+#: mod/photos.php:1849 view/theme/diabook/theme.php:500
 msgid "Profile Photos"
 msgstr "Profilbilder"
 
@@ -1441,7 +1441,7 @@ msgstr "Bereinige Benachrichtigungen"
 msgid "@name, !forum, #tags, content"
 msgstr "@name, !forum, #tags, content"
 
-#: include/nav.php:75 view/theme/frio/theme.php:243 boot.php:1652
+#: include/nav.php:75 view/theme/frio/theme.php:243 boot.php:1655
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -1510,7 +1510,7 @@ msgstr "Persönliche Notizen"
 msgid "Your personal notes"
 msgstr "Deine persönlichen Notizen"
 
-#: include/nav.php:94 mod/bookmarklet.php:12 boot.php:1653
+#: include/nav.php:94 mod/bookmarklet.php:12 boot.php:1656
 msgid "Login"
 msgstr "Anmeldung"
 
@@ -1518,8 +1518,8 @@ msgstr "Anmeldung"
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: include/nav.php:107 include/nav.php:163 mod/notifications.php:545
-#: view/theme/diabook/theme.php:123
+#: include/nav.php:107 include/nav.php:163
+#: include/NotificationsManager.php:174 view/theme/diabook/theme.php:123
 msgid "Home"
 msgstr "Pinnwand"
 
@@ -1527,7 +1527,7 @@ msgstr "Pinnwand"
 msgid "Home Page"
 msgstr "Homepage"
 
-#: include/nav.php:111 mod/register.php:280 boot.php:1628
+#: include/nav.php:111 mod/register.php:280 boot.php:1631
 msgid "Register"
 msgstr "Registrieren"
 
@@ -1608,7 +1608,7 @@ msgstr "Information"
 msgid "Information about this friendica instance"
 msgstr "Informationen zu dieser Friendica Instanz"
 
-#: include/nav.php:160 mod/notifications.php:533 mod/admin.php:402
+#: include/nav.php:160 include/NotificationsManager.php:160 mod/admin.php:402
 #: view/theme/frio/theme.php:253
 msgid "Network"
 msgstr "Netzwerk"
@@ -1625,7 +1625,7 @@ msgstr "Netzwerk zurücksetzen"
 msgid "Load Network page with no filters"
 msgstr "Netzwerk-Seite ohne Filter laden"
 
-#: include/nav.php:168 mod/notifications.php:551
+#: include/nav.php:168 include/NotificationsManager.php:181
 msgid "Introductions"
 msgstr "Kontaktanfragen"
 
@@ -1633,7 +1633,7 @@ msgstr "Kontaktanfragen"
 msgid "Friend Requests"
 msgstr "Kontaktanfragen"
 
-#: include/nav.php:171 mod/notifications.php:87
+#: include/nav.php:171 mod/notifications.php:96
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
@@ -1915,39 +1915,39 @@ msgstr "Nachricht/Beitrag"
 msgid "%1$s marked %2$s's %3$s as favorite"
 msgstr "%1$s hat %2$s\\s %3$s als Favorit markiert"
 
-#: include/conversation.php:587 mod/content.php:372 mod/photos.php:1635
-#: mod/profiles.php:345
+#: include/conversation.php:587 mod/content.php:372 mod/profiles.php:345
+#: mod/photos.php:1634
 msgid "Likes"
 msgstr "Likes"
 
-#: include/conversation.php:587 mod/content.php:372 mod/photos.php:1635
-#: mod/profiles.php:349
+#: include/conversation.php:587 mod/content.php:372 mod/profiles.php:349
+#: mod/photos.php:1634
 msgid "Dislikes"
 msgstr "Dislikes"
 
 #: include/conversation.php:588 include/conversation.php:1471
-#: mod/content.php:373 mod/photos.php:1636
+#: mod/content.php:373 mod/photos.php:1635
 msgid "Attending"
 msgid_plural "Attending"
 msgstr[0] "Teilnehmend"
 msgstr[1] "Teilnehmend"
 
-#: include/conversation.php:588 mod/content.php:373 mod/photos.php:1636
+#: include/conversation.php:588 mod/content.php:373 mod/photos.php:1635
 msgid "Not attending"
 msgstr "Nicht teilnehmend"
 
-#: include/conversation.php:588 mod/content.php:373 mod/photos.php:1636
+#: include/conversation.php:588 mod/content.php:373 mod/photos.php:1635
 msgid "Might attend"
 msgstr "Eventuell teilnehmend"
 
 #: include/conversation.php:710 mod/content.php:453 mod/content.php:758
-#: mod/photos.php:1710 object/Item.php:133
+#: mod/photos.php:1709 object/Item.php:133
 msgid "Select"
 msgstr "Auswählen"
 
 #: include/conversation.php:711 mod/group.php:171 mod/content.php:454
 #: mod/content.php:759 mod/admin.php:1391 mod/contacts.php:806
-#: mod/contacts.php:1021 mod/photos.php:1711 mod/settings.php:726
+#: mod/contacts.php:1021 mod/settings.php:726 mod/photos.php:1710
 #: object/Item.php:134
 msgid "Delete"
 msgstr "Löschen"
@@ -1979,7 +1979,7 @@ msgstr "Im Zusammenhang betrachten"
 #: include/conversation.php:793 include/conversation.php:1255
 #: mod/editpost.php:124 mod/wallmessage.php:156 mod/message.php:356
 #: mod/message.php:548 mod/content.php:515 mod/content.php:948
-#: mod/photos.php:1598 object/Item.php:406
+#: mod/photos.php:1597 object/Item.php:406
 msgid "Please wait"
 msgstr "Bitte warten"
 
@@ -2145,7 +2145,7 @@ msgstr "Wo hältst Du Dich jetzt gerade auf?"
 msgid "Delete item(s)?"
 msgstr "Einträge löschen?"
 
-#: include/conversation.php:1236 mod/photos.php:1597
+#: include/conversation.php:1236 mod/photos.php:1596
 msgid "Share"
 msgstr "Teilen"
 
@@ -2228,17 +2228,17 @@ msgid "Public post"
 msgstr "Öffentlicher Beitrag"
 
 #: include/conversation.php:1270 mod/editpost.php:145 mod/content.php:737
-#: mod/events.php:505 mod/photos.php:1619 mod/photos.php:1667
-#: mod/photos.php:1755 object/Item.php:729
+#: mod/events.php:505 mod/photos.php:1618 mod/photos.php:1666
+#: mod/photos.php:1754 object/Item.php:729
 msgid "Preview"
 msgstr "Vorschau"
 
 #: include/conversation.php:1274 include/items.php:1849 mod/fbrowser.php:101
 #: mod/fbrowser.php:136 mod/tagrm.php:11 mod/tagrm.php:94 mod/follow.php:121
 #: mod/suggest.php:32 mod/editpost.php:148 mod/message.php:220
-#: mod/dfrn_request.php:875 mod/contacts.php:445 mod/photos.php:248
-#: mod/photos.php:337 mod/settings.php:664 mod/settings.php:690
-#: mod/videos.php:131
+#: mod/dfrn_request.php:875 mod/contacts.php:445 mod/settings.php:664
+#: mod/settings.php:690 mod/videos.php:131 mod/photos.php:248
+#: mod/photos.php:337
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -2356,7 +2356,7 @@ msgstr "Cc: E-Mail-Addressen"
 msgid "Example: bob@example.com, mary@example.com"
 msgstr "Z.B.: bob@example.com, mary@example.com"
 
-#: include/acl_selectors.php:349 mod/photos.php:1178 mod/photos.php:1563
+#: include/acl_selectors.php:349 mod/photos.php:1178 mod/photos.php:1562
 msgid "Permissions"
 msgstr "Berechtigungen"
 
@@ -2495,13 +2495,13 @@ msgstr "Sichtbarkeit bearbeiten"
 #: mod/viewcontacts.php:105 mod/allfriends.php:79 mod/cal.php:44
 #: mod/suggest.php:98 mod/hovercard.php:80 mod/common.php:123
 #: mod/network.php:517 mod/contacts.php:51 mod/contacts.php:626
-#: mod/contacts.php:953 mod/dirfind.php:223 mod/photos.php:42
-#: mod/videos.php:37
+#: mod/contacts.php:953 mod/dirfind.php:223 mod/videos.php:37
+#: mod/photos.php:42
 msgid "Forum"
 msgstr "Forum"
 
 #: include/identity.php:331 include/identity.php:614 mod/directory.php:147
-#: mod/notifications.php:214
+#: mod/notifications.php:238
 msgid "Gender:"
 msgstr "Geschlecht:"
 
@@ -2514,11 +2514,11 @@ msgid "Homepage:"
 msgstr "Homepage:"
 
 #: include/identity.php:338 include/identity.php:655 mod/directory.php:153
-#: mod/notifications.php:210 mod/contacts.php:630
+#: mod/contacts.php:630 mod/notifications.php:234
 msgid "About:"
 msgstr "Über:"
 
-#: include/identity.php:420 mod/notifications.php:222 mod/contacts.php:50
+#: include/identity.php:420 mod/contacts.php:50 mod/notifications.php:246
 msgid "Network:"
 msgstr "Netzwerk:"
 
@@ -2583,8 +2583,8 @@ msgstr "Sexuelle Vorlieben:"
 msgid "Hometown:"
 msgstr "Heimatort:"
 
-#: include/identity.php:649 mod/follow.php:134 mod/notifications.php:212
-#: mod/contacts.php:632
+#: include/identity.php:649 mod/follow.php:134 mod/contacts.php:632
+#: mod/notifications.php:236
 msgid "Tags:"
 msgstr "Tags:"
 
@@ -2709,13 +2709,14 @@ msgstr "Ja"
 #: mod/wallmessage.php:79 mod/wallmessage.php:103 mod/api.php:26
 #: mod/api.php:31 mod/ostatus_subscribe.php:9 mod/message.php:46
 #: mod/message.php:182 mod/manage.php:96 mod/crepair.php:100
-#: mod/notifications.php:65 mod/contacts.php:350 mod/dfrn_confirm.php:57
-#: mod/dirfind.php:11 mod/events.php:190 mod/fsuggest.php:78 mod/item.php:185
-#: mod/item.php:197 mod/mood.php:114 mod/photos.php:172 mod/photos.php:1093
-#: mod/poke.php:150 mod/profile_photo.php:19 mod/profile_photo.php:175
-#: mod/profile_photo.php:186 mod/profile_photo.php:199 mod/profiles.php:166
-#: mod/profiles.php:598 mod/register.php:42 mod/regmod.php:110
-#: mod/settings.php:22 mod/settings.php:128 mod/settings.php:650 index.php:397
+#: mod/contacts.php:350 mod/dfrn_confirm.php:57 mod/dirfind.php:11
+#: mod/events.php:190 mod/fsuggest.php:78 mod/item.php:185 mod/item.php:197
+#: mod/mood.php:114 mod/poke.php:150 mod/profile_photo.php:19
+#: mod/profile_photo.php:175 mod/profile_photo.php:186
+#: mod/profile_photo.php:199 mod/profiles.php:166 mod/profiles.php:598
+#: mod/register.php:42 mod/regmod.php:110 mod/settings.php:22
+#: mod/settings.php:128 mod/settings.php:650 mod/notifications.php:71
+#: mod/photos.php:172 mod/photos.php:1093 index.php:397
 msgid "Permission denied."
 msgstr "Zugriff verweigert."
 
@@ -3008,6 +3009,67 @@ msgstr[1] "%d Kontakte nicht importiert"
 msgid "Done. You can now login with your username and password"
 msgstr "Erledigt. Du kannst Dich jetzt mit Deinem Nutzernamen und Passwort anmelden"
 
+#: include/NotificationsManager.php:153
+msgid "System"
+msgstr "System"
+
+#: include/NotificationsManager.php:167 mod/network.php:844
+#: mod/profiles.php:696
+msgid "Personal"
+msgstr "Persönlich"
+
+#: include/NotificationsManager.php:234 include/NotificationsManager.php:245
+#, php-format
+msgid "%s commented on %s's post"
+msgstr "%s hat %ss Beitrag kommentiert"
+
+#: include/NotificationsManager.php:244
+#, php-format
+msgid "%s created a new post"
+msgstr "%s hat einen neuen Beitrag erstellt"
+
+#: include/NotificationsManager.php:258
+#, php-format
+msgid "%s liked %s's post"
+msgstr "%s mag %ss Beitrag"
+
+#: include/NotificationsManager.php:269
+#, php-format
+msgid "%s disliked %s's post"
+msgstr "%s mag %ss Beitrag nicht"
+
+#: include/NotificationsManager.php:280
+#, php-format
+msgid "%s is attending %s's event"
+msgstr "%s nimmt an %s's Event teil"
+
+#: include/NotificationsManager.php:291
+#, php-format
+msgid "%s is not attending %s's event"
+msgstr "%s nimmt nicht an %s's Event teil"
+
+#: include/NotificationsManager.php:302
+#, php-format
+msgid "%s may attend %s's event"
+msgstr "%s nimmt eventuell an %s's Event teil"
+
+#: include/NotificationsManager.php:317
+#, php-format
+msgid "%s is now friends with %s"
+msgstr "%s ist jetzt mit %s befreundet"
+
+#: include/NotificationsManager.php:750
+msgid "Friend Suggestion"
+msgstr "Kontaktvorschlag"
+
+#: include/NotificationsManager.php:783
+msgid "Friend/Connect Request"
+msgstr "Kontakt-/Freundschaftsanfrage"
+
+#: include/NotificationsManager.php:783
+msgid "New Follower"
+msgstr "Neuer Bewunderer"
+
 #: mod/oexchange.php:25
 msgid "Post successful."
 msgstr "Beitrag erfolgreich veröffentlicht."
@@ -3027,11 +3089,11 @@ msgstr "Zugriff verweigert."
 msgid "Welcome to %s"
 msgstr "Willkommen zu %s"
 
-#: mod/notify.php:60 mod/notifications.php:338
+#: mod/notify.php:60
 msgid "No more system notifications."
 msgstr "Keine weiteren Systembenachrichtigungen."
 
-#: mod/notify.php:64 mod/notifications.php:318
+#: mod/notify.php:64 mod/notifications.php:111
 msgid "System Notifications"
 msgstr "Systembenachrichtigungen"
 
@@ -3041,7 +3103,7 @@ msgstr "Begriff entfernen"
 
 #: mod/search.php:93 mod/search.php:99 mod/directory.php:37
 #: mod/viewcontacts.php:35 mod/display.php:199 mod/community.php:22
-#: mod/dfrn_request.php:790 mod/photos.php:964 mod/videos.php:197
+#: mod/dfrn_request.php:790 mod/videos.php:197 mod/photos.php:964
 msgid "Public access denied."
 msgstr "Öffentlicher Zugriff verweigert."
 
@@ -3159,7 +3221,7 @@ msgid ""
 "Password reset failed."
 msgstr "Anfrage konnte nicht verifiziert werden. (Eventuell hast Du bereits eine ähnliche Anfrage gestellt.) Zurücksetzen des Passworts gescheitert."
 
-#: mod/lostpass.php:109 boot.php:1667
+#: mod/lostpass.php:109 boot.php:1670
 msgid "Password Reset"
 msgstr "Passwort zurücksetzen"
 
@@ -3225,7 +3287,7 @@ msgid ""
 "your email for further instructions."
 msgstr "Gib Deine E-Mail-Adresse an und fordere ein neues Passwort an. Es werden Dir dann weitere Informationen per Mail zugesendet."
 
-#: mod/lostpass.php:161 boot.php:1655
+#: mod/lostpass.php:161 boot.php:1658
 msgid "Nickname or Email: "
 msgstr "Spitzname oder E-Mail:"
 
@@ -3256,16 +3318,16 @@ msgstr "Seite nicht gefunden."
 msgid "Invalid request."
 msgstr "Ungültige Anfrage"
 
-#: mod/wall_upload.php:151 mod/photos.php:806 mod/profile_photo.php:150
+#: mod/wall_upload.php:151 mod/profile_photo.php:150 mod/photos.php:806
 #, php-format
 msgid "Image exceeds size limit of %s"
 msgstr "Bildgröße überschreitet das Limit von %s"
 
-#: mod/wall_upload.php:188 mod/photos.php:846 mod/profile_photo.php:159
+#: mod/wall_upload.php:188 mod/profile_photo.php:159 mod/photos.php:846
 msgid "Unable to process image."
 msgstr "Konnte das Bild nicht bearbeiten."
 
-#: mod/wall_upload.php:221 mod/photos.php:873 mod/profile_photo.php:307
+#: mod/wall_upload.php:221 mod/profile_photo.php:307 mod/photos.php:873
 msgid "Image upload failed."
 msgstr "Hochladen des Bildes gescheitert."
 
@@ -3500,24 +3562,23 @@ msgid ""
 "important, please visit http://friendica.com"
 msgstr "Für weitere Informationen über das Friendica Projekt und warum wir es für ein wichtiges Projekt halten, besuche bitte http://friendica.com"
 
-#: mod/invite.php:140 mod/install.php:272 mod/install.php:312
-#: mod/localtime.php:45 mod/message.php:357 mod/message.php:547
-#: mod/manage.php:143 mod/crepair.php:154 mod/content.php:728
-#: mod/contacts.php:577 mod/events.php:507 mod/fsuggest.php:107
-#: mod/mood.php:137 mod/photos.php:1125 mod/photos.php:1249
-#: mod/photos.php:1567 mod/photos.php:1618 mod/photos.php:1666
-#: mod/photos.php:1754 mod/poke.php:199 mod/profiles.php:681
-#: object/Item.php:720 view/theme/frio/config.php:59
-#: view/theme/cleanzero/config.php:80 view/theme/quattro/config.php:64
-#: view/theme/dispy/config.php:70 view/theme/vier/config.php:107
-#: view/theme/diabook/theme.php:633 view/theme/diabook/config.php:148
-#: view/theme/duepuntozero/config.php:59
+#: mod/invite.php:140 mod/localtime.php:45 mod/message.php:357
+#: mod/message.php:547 mod/manage.php:143 mod/crepair.php:154
+#: mod/content.php:728 mod/contacts.php:577 mod/events.php:507
+#: mod/fsuggest.php:107 mod/mood.php:137 mod/poke.php:199 mod/profiles.php:681
+#: mod/install.php:272 mod/install.php:312 mod/photos.php:1125
+#: mod/photos.php:1249 mod/photos.php:1566 mod/photos.php:1617
+#: mod/photos.php:1665 mod/photos.php:1753 object/Item.php:720
+#: view/theme/frio/config.php:59 view/theme/cleanzero/config.php:80
+#: view/theme/quattro/config.php:64 view/theme/dispy/config.php:70
+#: view/theme/vier/config.php:107 view/theme/diabook/theme.php:633
+#: view/theme/diabook/config.php:148 view/theme/duepuntozero/config.php:59
 msgid "Submit"
 msgstr "Senden"
 
 #: mod/fbrowser.php:41 mod/fbrowser.php:62 mod/photos.php:63
 #: mod/photos.php:193 mod/photos.php:1107 mod/photos.php:1233
-#: mod/photos.php:1256 mod/photos.php:1826 mod/photos.php:1838
+#: mod/photos.php:1256 mod/photos.php:1825 mod/photos.php:1837
 #: view/theme/diabook/theme.php:499
 msgid "Contact Photos"
 msgstr "Kontaktbilder"
@@ -3619,7 +3680,7 @@ msgstr "Ansehen"
 msgid "Previous"
 msgstr "Vorherige"
 
-#: mod/cal.php:281 mod/install.php:231 mod/events.php:383
+#: mod/cal.php:281 mod/events.php:383 mod/install.php:231
 msgid "Next"
 msgstr "Nächste"
 
@@ -3701,351 +3762,6 @@ msgstr "Friendica ist ein Gemeinschaftsprojekt, das nicht ohne die Hilfe vieler 
 msgid "- select -"
 msgstr "- auswählen -"
 
-#: mod/install.php:139
-msgid "Friendica Communications Server - Setup"
-msgstr "Friendica-Server für soziale Netzwerke – Setup"
-
-#: mod/install.php:145
-msgid "Could not connect to database."
-msgstr "Verbindung zur Datenbank gescheitert."
-
-#: mod/install.php:149
-msgid "Could not create table."
-msgstr "Tabelle konnte nicht angelegt werden."
-
-#: mod/install.php:155
-msgid "Your Friendica site database has been installed."
-msgstr "Die Datenbank Deiner Friendicaseite wurde installiert."
-
-#: mod/install.php:160
-msgid ""
-"You may need to import the file \"database.sql\" manually using phpmyadmin "
-"or mysql."
-msgstr "Möglicherweise musst Du die Datei \"database.sql\" manuell mit phpmyadmin oder mysql importieren."
-
-#: mod/install.php:161 mod/install.php:230 mod/install.php:597
-msgid "Please see the file \"INSTALL.txt\"."
-msgstr "Lies bitte die \"INSTALL.txt\"."
-
-#: mod/install.php:173
-msgid "Database already in use."
-msgstr "Die Datenbank wird bereits verwendet."
-
-#: mod/install.php:227
-msgid "System check"
-msgstr "Systemtest"
-
-#: mod/install.php:232
-msgid "Check again"
-msgstr "Noch einmal testen"
-
-#: mod/install.php:251
-msgid "Database connection"
-msgstr "Datenbankverbindung"
-
-#: mod/install.php:252
-msgid ""
-"In order to install Friendica we need to know how to connect to your "
-"database."
-msgstr "Um Friendica installieren zu können, müssen wir wissen, wie wir mit Deiner Datenbank Kontakt aufnehmen können."
-
-#: mod/install.php:253
-msgid ""
-"Please contact your hosting provider or site administrator if you have "
-"questions about these settings."
-msgstr "Bitte kontaktiere den Hosting Provider oder den Administrator der Seite, falls Du Fragen zu diesen Einstellungen haben solltest."
-
-#: mod/install.php:254
-msgid ""
-"The database you specify below should already exist. If it does not, please "
-"create it before continuing."
-msgstr "Die Datenbank, die Du unten angibst, sollte bereits existieren. Ist dies noch nicht der Fall, erzeuge sie bitte bevor Du mit der Installation fortfährst."
-
-#: mod/install.php:258
-msgid "Database Server Name"
-msgstr "Datenbank-Server"
-
-#: mod/install.php:259
-msgid "Database Login Name"
-msgstr "Datenbank-Nutzer"
-
-#: mod/install.php:260
-msgid "Database Login Password"
-msgstr "Datenbank-Passwort"
-
-#: mod/install.php:261
-msgid "Database Name"
-msgstr "Datenbank-Name"
-
-#: mod/install.php:262 mod/install.php:303
-msgid "Site administrator email address"
-msgstr "E-Mail-Adresse des Administrators"
-
-#: mod/install.php:262 mod/install.php:303
-msgid ""
-"Your account email address must match this in order to use the web admin "
-"panel."
-msgstr "Die E-Mail-Adresse, die in Deinem Friendica-Account eingetragen ist, muss mit dieser Adresse übereinstimmen, damit Du das Admin-Panel benutzen kannst."
-
-#: mod/install.php:266 mod/install.php:306
-msgid "Please select a default timezone for your website"
-msgstr "Bitte wähle die Standardzeitzone Deiner Webseite"
-
-#: mod/install.php:293
-msgid "Site settings"
-msgstr "Server-Einstellungen"
-
-#: mod/install.php:307
-msgid "System Language:"
-msgstr "Systemsprache:"
-
-#: mod/install.php:307
-msgid ""
-"Set the default language for your Friendica installation interface and to "
-"send emails."
-msgstr "Wähle die Standardsprache für deine Friendica-Installations-Oberfläche und den E-Mail-Versand"
-
-#: mod/install.php:347
-msgid "Could not find a command line version of PHP in the web server PATH."
-msgstr "Konnte keine Kommandozeilenversion von PHP im PATH des Servers finden."
-
-#: mod/install.php:348
-msgid ""
-"If you don't have a command line version of PHP installed on server, you "
-"will not be able to run background polling via cron. See <a "
-"href='https://github.com/friendica/friendica/blob/master/doc/Install.md#set-"
-"up-the-poller'>'Setup the poller'</a>"
-msgstr "Wenn Du keine Kommandozeilen-Version von PHP auf Deinem Server installiert hast, kannst Du keine Hintergrundprozesse via cron starten. Siehe <a href='https://github.com/friendica/friendica/blob/master/doc/Install.md#set-up-the-poller'>'Setup the poller'</a>"
-
-#: mod/install.php:352
-msgid "PHP executable path"
-msgstr "Pfad zu PHP"
-
-#: mod/install.php:352
-msgid ""
-"Enter full path to php executable. You can leave this blank to continue the "
-"installation."
-msgstr "Gib den kompletten Pfad zur ausführbaren Datei von PHP an. Du kannst dieses Feld auch frei lassen und mit der Installation fortfahren."
-
-#: mod/install.php:357
-msgid "Command line PHP"
-msgstr "Kommandozeilen-PHP"
-
-#: mod/install.php:366
-msgid "PHP executable is not the php cli binary (could be cgi-fgci version)"
-msgstr "Die ausführbare Datei von PHP stimmt nicht mit der PHP cli Version überein (es könnte sich um die cgi-fgci Version handeln)"
-
-#: mod/install.php:367
-msgid "Found PHP version: "
-msgstr "Gefundene PHP Version:"
-
-#: mod/install.php:369
-msgid "PHP cli binary"
-msgstr "PHP CLI Binary"
-
-#: mod/install.php:380
-msgid ""
-"The command line version of PHP on your system does not have "
-"\"register_argc_argv\" enabled."
-msgstr "Die Kommandozeilenversion von PHP auf Deinem System hat \"register_argc_argv\" nicht aktiviert."
-
-#: mod/install.php:381
-msgid "This is required for message delivery to work."
-msgstr "Dies wird für die Auslieferung von Nachrichten benötigt."
-
-#: mod/install.php:383
-msgid "PHP register_argc_argv"
-msgstr "PHP register_argc_argv"
-
-#: mod/install.php:404
-msgid ""
-"Error: the \"openssl_pkey_new\" function on this system is not able to "
-"generate encryption keys"
-msgstr "Fehler: Die Funktion \"openssl_pkey_new\" auf diesem System ist nicht in der Lage, Verschlüsselungsschlüssel zu erzeugen"
-
-#: mod/install.php:405
-msgid ""
-"If running under Windows, please see "
-"\"http://www.php.net/manual/en/openssl.installation.php\"."
-msgstr "Wenn der Server unter Windows läuft, schau Dir bitte \"http://www.php.net/manual/en/openssl.installation.php\" an."
-
-#: mod/install.php:407
-msgid "Generate encryption keys"
-msgstr "Schlüssel erzeugen"
-
-#: mod/install.php:414
-msgid "libCurl PHP module"
-msgstr "PHP: libCurl-Modul"
-
-#: mod/install.php:415
-msgid "GD graphics PHP module"
-msgstr "PHP: GD-Grafikmodul"
-
-#: mod/install.php:416
-msgid "OpenSSL PHP module"
-msgstr "PHP: OpenSSL-Modul"
-
-#: mod/install.php:417
-msgid "mysqli PHP module"
-msgstr "PHP: mysqli-Modul"
-
-#: mod/install.php:418
-msgid "mb_string PHP module"
-msgstr "PHP: mb_string-Modul"
-
-#: mod/install.php:419
-msgid "mcrypt PHP module"
-msgstr "PHP mcrypt Modul"
-
-#: mod/install.php:420
-msgid "XML PHP module"
-msgstr "XML PHP Modul"
-
-#: mod/install.php:424 mod/install.php:426
-msgid "Apache mod_rewrite module"
-msgstr "Apache mod_rewrite module"
-
-#: mod/install.php:424
-msgid ""
-"Error: Apache webserver mod-rewrite module is required but not installed."
-msgstr "Fehler: Das Apache-Modul mod-rewrite wird benötigt, es ist allerdings nicht installiert."
-
-#: mod/install.php:432
-msgid "Error: libCURL PHP module required but not installed."
-msgstr "Fehler: Das libCURL PHP Modul wird benötigt, ist aber nicht installiert."
-
-#: mod/install.php:436
-msgid ""
-"Error: GD graphics PHP module with JPEG support required but not installed."
-msgstr "Fehler: Das GD-Graphikmodul für PHP mit JPEG-Unterstützung ist nicht installiert."
-
-#: mod/install.php:440
-msgid "Error: openssl PHP module required but not installed."
-msgstr "Fehler: Das openssl-Modul von PHP ist nicht installiert."
-
-#: mod/install.php:444
-msgid "Error: mysqli PHP module required but not installed."
-msgstr "Fehler: Das mysqli-Modul von PHP ist nicht installiert."
-
-#: mod/install.php:448
-msgid "Error: mb_string PHP module required but not installed."
-msgstr "Fehler: mb_string PHP Module wird benötigt ist aber nicht installiert."
-
-#: mod/install.php:452
-msgid "Error: mcrypt PHP module required but not installed."
-msgstr "Fehler: Das mcrypt Modul von PHP ist nicht installiert"
-
-#: mod/install.php:461
-msgid ""
-"If you are using php_cli, please make sure that mcrypt module is enabled in "
-"its config file"
-msgstr "Wenn du das Modul \"php_cli\" benutzt dann versichere dich, daß das mcrypt Modul in seiner Konfigurationsdatei aktiviert ist. "
-
-#: mod/install.php:464
-msgid ""
-"Function mcrypt_create_iv() is not defined. This is needed to enable RINO2 "
-"encryption layer."
-msgstr "Die Funktion mcrypt_create_iv() ist nicht festgelegt. Dies ist notwendig um den RINO2-Encryption-Layer zu aktivieren."
-
-#: mod/install.php:466
-msgid "mcrypt_create_iv() function"
-msgstr "mcrypt_create_iv() function"
-
-#: mod/install.php:474
-msgid "Error, XML PHP module required but not installed."
-msgstr "Fehler: XML PHP Modul erforderlich aber nicht installiert."
-
-#: mod/install.php:489
-msgid ""
-"The web installer needs to be able to create a file called \".htconfig.php\""
-" in the top folder of your web server and it is unable to do so."
-msgstr "Der Installationswizard muss in der Lage sein, eine Datei im Stammverzeichnis Deines Webservers anzulegen, ist allerdings derzeit nicht in der Lage, dies zu tun."
-
-#: mod/install.php:490
-msgid ""
-"This is most often a permission setting, as the web server may not be able "
-"to write files in your folder - even if you can."
-msgstr "In den meisten Fällen ist dies ein Problem mit den Schreibrechten. Der Webserver könnte keine Schreiberlaubnis haben, selbst wenn Du sie hast."
-
-#: mod/install.php:491
-msgid ""
-"At the end of this procedure, we will give you a text to save in a file "
-"named .htconfig.php in your Friendica top folder."
-msgstr "Nachdem Du alles ausgefüllt hast, erhältst Du einen Text, den Du in eine Datei namens .htconfig.php in Deinem Friendica-Wurzelverzeichnis kopieren musst."
-
-#: mod/install.php:492
-msgid ""
-"You can alternatively skip this procedure and perform a manual installation."
-" Please see the file \"INSTALL.txt\" for instructions."
-msgstr "Alternativ kannst Du diesen Schritt aber auch überspringen und die Installation manuell durchführen. Eine Anleitung dazu (Englisch) findest Du in der Datei INSTALL.txt."
-
-#: mod/install.php:495
-msgid ".htconfig.php is writable"
-msgstr "Schreibrechte auf .htconfig.php"
-
-#: mod/install.php:505
-msgid ""
-"Friendica uses the Smarty3 template engine to render its web views. Smarty3 "
-"compiles templates to PHP to speed up rendering."
-msgstr "Friendica nutzt die Smarty3 Template Engine um die Webansichten zu rendern. Smarty3 kompiliert Templates zu PHP um das Rendern zu beschleunigen."
-
-#: mod/install.php:506
-msgid ""
-"In order to store these compiled templates, the web server needs to have "
-"write access to the directory view/smarty3/ under the Friendica top level "
-"folder."
-msgstr "Um diese kompilierten Templates zu speichern benötigt der Webserver Schreibrechte zum Verzeichnis view/smarty3/ im obersten Ordner von Friendica."
-
-#: mod/install.php:507
-msgid ""
-"Please ensure that the user that your web server runs as (e.g. www-data) has"
-" write access to this folder."
-msgstr "Bitte stelle sicher, dass der Nutzer unter dem der Webserver läuft (z.B. www-data) Schreibrechte zu diesem Verzeichnis hat."
-
-#: mod/install.php:508
-msgid ""
-"Note: as a security measure, you should give the web server write access to "
-"view/smarty3/ only--not the template files (.tpl) that it contains."
-msgstr "Hinweis: aus Sicherheitsgründen solltest Du dem Webserver nur Schreibrechte für view/smarty3/ geben -- Nicht den Templatedateien (.tpl) die sie enthalten."
-
-#: mod/install.php:511
-msgid "view/smarty3 is writable"
-msgstr "view/smarty3 ist schreibbar"
-
-#: mod/install.php:527
-msgid ""
-"Url rewrite in .htaccess is not working. Check your server configuration."
-msgstr "Umschreiben der URLs in der .htaccess funktioniert nicht. Überprüfe die Konfiguration des Servers."
-
-#: mod/install.php:529
-msgid "Url rewrite is working"
-msgstr "URL rewrite funktioniert"
-
-#: mod/install.php:546
-msgid "ImageMagick PHP extension is installed"
-msgstr "ImageMagick PHP Erweiterung ist installiert"
-
-#: mod/install.php:548
-msgid "ImageMagick supports GIF"
-msgstr "ImageMagick unterstützt GIF"
-
-#: mod/install.php:556
-msgid ""
-"The database configuration file \".htconfig.php\" could not be written. "
-"Please use the enclosed text to create a configuration file in your web "
-"server root."
-msgstr "Die Konfigurationsdatei \".htconfig.php\" konnte nicht angelegt werden. Bitte verwende den angefügten Text, um die Datei im Stammverzeichnis Deiner Friendica-Installation zu erzeugen."
-
-#: mod/install.php:595
-msgid "<h1>What next</h1>"
-msgstr "<h1>Wie geht es weiter?</h1>"
-
-#: mod/install.php:596
-msgid ""
-"IMPORTANT: You will need to [manually] setup a scheduled task for the "
-"poller."
-msgstr "WICHTIG: Du musst [manuell] einen Cronjob (o.ä.) für den Poller einrichten."
-
 #: mod/subthread.php:103
 #, php-format
 msgid "%1$s is following %2$s's %3$s"
@@ -4106,7 +3822,7 @@ msgstr "Eine persönliche Notiz beifügen:"
 msgid "Your Identity Address:"
 msgstr "Adresse Deines Profils:"
 
-#: mod/follow.php:126 mod/notifications.php:219 mod/contacts.php:624
+#: mod/follow.php:126 mod/contacts.php:624 mod/notifications.php:243
 msgid "Profile URL"
 msgstr "Profil URL"
 
@@ -4395,10 +4111,6 @@ msgstr "Neueste Beiträge"
 #: mod/network.php:836
 msgid "Sort by Post Date"
 msgstr "Nach Beitragsdatum sortieren"
-
-#: mod/network.php:844 mod/notifications.php:539 mod/profiles.php:696
-msgid "Personal"
-msgstr "Persönlich"
 
 #: mod/network.php:847
 msgid "Posts that mention or involve you"
@@ -5004,11 +4716,11 @@ msgid_plural "%d comments"
 msgstr[0] "%d Kommentar"
 msgstr[1] "%d Kommentare"
 
-#: mod/content.php:638 mod/photos.php:1406 object/Item.php:117
+#: mod/content.php:638 mod/photos.php:1405 object/Item.php:117
 msgid "Private Message"
 msgstr "Private Nachricht"
 
-#: mod/content.php:702 mod/photos.php:1595 object/Item.php:263
+#: mod/content.php:702 mod/photos.php:1594 object/Item.php:263
 msgid "I like this (toggle)"
 msgstr "Ich mag das (toggle)"
 
@@ -5016,7 +4728,7 @@ msgstr "Ich mag das (toggle)"
 msgid "like"
 msgstr "mag ich"
 
-#: mod/content.php:703 mod/photos.php:1596 object/Item.php:264
+#: mod/content.php:703 mod/photos.php:1595 object/Item.php:264
 msgid "I don't like this (toggle)"
 msgstr "Ich mag das nicht (toggle)"
 
@@ -5032,14 +4744,14 @@ msgstr "Weitersagen"
 msgid "share"
 msgstr "Teilen"
 
-#: mod/content.php:725 mod/photos.php:1615 mod/photos.php:1663
-#: mod/photos.php:1751 object/Item.php:717
+#: mod/content.php:725 mod/photos.php:1614 mod/photos.php:1662
+#: mod/photos.php:1750 object/Item.php:717
 msgid "This is you"
 msgstr "Das bist Du"
 
-#: mod/content.php:727 mod/content.php:945 mod/photos.php:1617
-#: mod/photos.php:1665 mod/photos.php:1753 object/Item.php:403
-#: object/Item.php:719 boot.php:899
+#: mod/content.php:727 mod/content.php:945 mod/photos.php:1616
+#: mod/photos.php:1664 mod/photos.php:1752 object/Item.php:403
+#: object/Item.php:719 boot.php:902
 msgid "Comment"
 msgstr "Kommentar"
 
@@ -5139,165 +4851,6 @@ msgstr "Wall-to-Wall"
 #: mod/content.php:914 object/Item.php:372
 msgid "via Wall-To-Wall:"
 msgstr "via Wall-To-Wall:"
-
-#: mod/notifications.php:29
-msgid "Invalid request identifier."
-msgstr "Invalid request identifier."
-
-#: mod/notifications.php:38 mod/notifications.php:143
-#: mod/notifications.php:228
-msgid "Discard"
-msgstr "Verwerfen"
-
-#: mod/notifications.php:54 mod/notifications.php:142
-#: mod/notifications.php:227 mod/contacts.php:606 mod/contacts.php:804
-#: mod/contacts.php:1005
-msgid "Ignore"
-msgstr "Ignorieren"
-
-#: mod/notifications.php:91
-msgid "Show Ignored Requests"
-msgstr "Zeige ignorierte Anfragen"
-
-#: mod/notifications.php:91
-msgid "Hide Ignored Requests"
-msgstr "Verberge ignorierte Anfragen"
-
-#: mod/notifications.php:127 mod/notifications.php:198
-msgid "Notification type: "
-msgstr "Benachrichtigungstyp: "
-
-#: mod/notifications.php:128
-msgid "Friend Suggestion"
-msgstr "Kontaktvorschlag"
-
-#: mod/notifications.php:130
-#, php-format
-msgid "suggested by %s"
-msgstr "vorgeschlagen von %s"
-
-#: mod/notifications.php:135 mod/notifications.php:215 mod/contacts.php:613
-msgid "Hide this contact from others"
-msgstr "Verbirg diesen Kontakt vor andere"
-
-#: mod/notifications.php:136 mod/notifications.php:216
-msgid "Post a new friend activity"
-msgstr "Neue-Kontakt Nachricht senden"
-
-#: mod/notifications.php:136 mod/notifications.php:216
-msgid "if applicable"
-msgstr "falls anwendbar"
-
-#: mod/notifications.php:139 mod/notifications.php:225 mod/admin.php:1389
-msgid "Approve"
-msgstr "Genehmigen"
-
-#: mod/notifications.php:159
-msgid "Claims to be known to you: "
-msgstr "Behauptet Dich zu kennen: "
-
-#: mod/notifications.php:160
-msgid "yes"
-msgstr "ja"
-
-#: mod/notifications.php:160
-msgid "no"
-msgstr "nein"
-
-#: mod/notifications.php:161
-msgid ""
-"Shall your connection be bidirectional or not? \"Friend\" implies that you "
-"allow to read and you subscribe to their posts. \"Fan/Admirer\" means that "
-"you allow to read but you do not want to read theirs. Approve as: "
-msgstr "Soll Deine Beziehung beidseitig sein oder nicht? \"Kontakt\" bedeutet, ihr könnt gegenseitig die Beiträge des Anderen lesen dürft. \"Fan/Verehrer\", dass du das lesen deiner Beiträge erlaubst aber nicht die Beiträge der anderen Seite lesen möchtest. Genehmigen als:"
-
-#: mod/notifications.php:164
-msgid ""
-"Shall your connection be bidirectional or not? \"Friend\" implies that you "
-"allow to read and you subscribe to their posts. \"Sharer\" means that you "
-"allow to read but you do not want to read theirs. Approve as: "
-msgstr "Soll Deine Beziehung beidseitig sein oder nicht? \"Freund\" bedeutet, ihr gegenseitig die Beiträge des Anderen lesen dürft. \"Teilenden\", das du das lesen deiner Beiträge erlaubst aber nicht die Beiträge der anderen Seite lesen möchtest. Genehmigen als:"
-
-#: mod/notifications.php:172
-msgid "Friend"
-msgstr "Kontakt"
-
-#: mod/notifications.php:173
-msgid "Sharer"
-msgstr "Teilenden"
-
-#: mod/notifications.php:173
-msgid "Fan/Admirer"
-msgstr "Fan/Verehrer"
-
-#: mod/notifications.php:199
-msgid "Friend/Connect Request"
-msgstr "Kontakt-/Freundschaftsanfrage"
-
-#: mod/notifications.php:199
-msgid "New Follower"
-msgstr "Neuer Bewunderer"
-
-#: mod/notifications.php:234
-msgid "No introductions."
-msgstr "Keine Kontaktanfragen."
-
-#: mod/notifications.php:238
-msgid "Network Notifications"
-msgstr "Netzwerk Benachrichtigungen"
-
-#: mod/notifications.php:265 mod/notifications.php:382
-#: mod/notifications.php:461
-#, php-format
-msgid "%s liked %s's post"
-msgstr "%s mag %ss Beitrag"
-
-#: mod/notifications.php:275 mod/notifications.php:392
-#: mod/notifications.php:471
-#, php-format
-msgid "%s disliked %s's post"
-msgstr "%s mag %ss Beitrag nicht"
-
-#: mod/notifications.php:290 mod/notifications.php:407
-#: mod/notifications.php:486
-#, php-format
-msgid "%s is now friends with %s"
-msgstr "%s ist jetzt mit %s befreundet"
-
-#: mod/notifications.php:297 mod/notifications.php:414
-#, php-format
-msgid "%s created a new post"
-msgstr "%s hat einen neuen Beitrag erstellt"
-
-#: mod/notifications.php:298 mod/notifications.php:415
-#: mod/notifications.php:496
-#, php-format
-msgid "%s commented on %s's post"
-msgstr "%s hat %ss Beitrag kommentiert"
-
-#: mod/notifications.php:313
-msgid "No more network notifications."
-msgstr "Keine weiteren Netzwerk-Benachrichtigungen."
-
-#: mod/notifications.php:343
-msgid "Personal Notifications"
-msgstr "Persönliche Benachrichtigungen"
-
-#: mod/notifications.php:430
-msgid "No more personal notifications."
-msgstr "Keine weiteren persönlichen Benachrichtigungen"
-
-#: mod/notifications.php:435
-msgid "Home Notifications"
-msgstr "Pinnwand Benachrichtigungen"
-
-#: mod/notifications.php:503
-msgid "No more home notifications."
-msgstr "Keine weiteren Pinnwand-Benachrichtigungen"
-
-#: mod/notifications.php:527
-msgid "System"
-msgstr "System"
 
 #: mod/admin.php:92
 msgid "Theme settings updated."
@@ -6488,6 +6041,10 @@ msgstr "Anfragedatum"
 msgid "No registrations."
 msgstr "Keine Neuanmeldungen."
 
+#: mod/admin.php:1389 mod/notifications.php:176 mod/notifications.php:249
+msgid "Approve"
+msgstr "Genehmigen"
+
 #: mod/admin.php:1390
 msgid "Deny"
 msgstr "Verwehren"
@@ -6831,6 +6388,12 @@ msgstr "Jetzt aktualisieren"
 msgid "Unignore"
 msgstr "Ignorieren aufheben"
 
+#: mod/contacts.php:606 mod/contacts.php:804 mod/contacts.php:1005
+#: mod/notifications.php:60 mod/notifications.php:179
+#: mod/notifications.php:251
+msgid "Ignore"
+msgstr "Ignorieren"
+
 #: mod/contacts.php:610
 msgid "Currently blocked"
 msgstr "Derzeit geblockt"
@@ -6842,6 +6405,10 @@ msgstr "Derzeit ignoriert"
 #: mod/contacts.php:612
 msgid "Currently archived"
 msgstr "Momentan archiviert"
+
+#: mod/contacts.php:613 mod/notifications.php:172 mod/notifications.php:239
+msgid "Hide this contact from others"
+msgstr "Verbirg diesen Kontakt vor andere"
 
 #: mod/contacts.php:613
 msgid ""
@@ -7183,193 +6750,6 @@ msgstr "Stimmung"
 #: mod/mood.php:134
 msgid "Set your current mood and tell your friends"
 msgstr "Wähle Deine aktuelle Stimmung und erzähle sie Deinen Kontakten"
-
-#: mod/photos.php:101 mod/photos.php:1887
-msgid "Recent Photos"
-msgstr "Neueste Fotos"
-
-#: mod/photos.php:104 mod/photos.php:1308 mod/photos.php:1889
-msgid "Upload New Photos"
-msgstr "Neue Fotos hochladen"
-
-#: mod/photos.php:118 mod/settings.php:36
-msgid "everybody"
-msgstr "jeder"
-
-#: mod/photos.php:182
-msgid "Contact information unavailable"
-msgstr "Kontaktinformationen nicht verfügbar"
-
-#: mod/photos.php:203
-msgid "Album not found."
-msgstr "Album nicht gefunden."
-
-#: mod/photos.php:233 mod/photos.php:245 mod/photos.php:1250
-msgid "Delete Album"
-msgstr "Album löschen"
-
-#: mod/photos.php:243
-msgid "Do you really want to delete this photo album and all its photos?"
-msgstr "Möchtest Du wirklich dieses Foto-Album und all seine Foto löschen?"
-
-#: mod/photos.php:323 mod/photos.php:334 mod/photos.php:1568
-msgid "Delete Photo"
-msgstr "Foto löschen"
-
-#: mod/photos.php:332
-msgid "Do you really want to delete this photo?"
-msgstr "Möchtest Du wirklich dieses Foto löschen?"
-
-#: mod/photos.php:707
-#, php-format
-msgid "%1$s was tagged in %2$s by %3$s"
-msgstr "%1$s wurde von %3$s in %2$s getaggt"
-
-#: mod/photos.php:707
-msgid "a photo"
-msgstr "einem Foto"
-
-#: mod/photos.php:814
-msgid "Image file is empty."
-msgstr "Bilddatei ist leer."
-
-#: mod/photos.php:974
-msgid "No photos selected"
-msgstr "Keine Bilder ausgewählt"
-
-#: mod/photos.php:1075 mod/videos.php:308
-msgid "Access to this item is restricted."
-msgstr "Zugriff zu diesem Eintrag wurde eingeschränkt."
-
-#: mod/photos.php:1135
-#, php-format
-msgid "You have used %1$.2f Mbytes of %2$.2f Mbytes photo storage."
-msgstr "Du verwendest %1$.2f Mbyte von %2$.2f Mbyte des Foto-Speichers."
-
-#: mod/photos.php:1170
-msgid "Upload Photos"
-msgstr "Bilder hochladen"
-
-#: mod/photos.php:1174 mod/photos.php:1245
-msgid "New album name: "
-msgstr "Name des neuen Albums: "
-
-#: mod/photos.php:1175
-msgid "or existing album name: "
-msgstr "oder existierender Albumname: "
-
-#: mod/photos.php:1176
-msgid "Do not show a status post for this upload"
-msgstr "Keine Status-Mitteilung für diesen Beitrag anzeigen"
-
-#: mod/photos.php:1187 mod/photos.php:1572 mod/settings.php:1250
-msgid "Show to Groups"
-msgstr "Zeige den Gruppen"
-
-#: mod/photos.php:1188 mod/photos.php:1573 mod/settings.php:1251
-msgid "Show to Contacts"
-msgstr "Zeige den Kontakten"
-
-#: mod/photos.php:1189
-msgid "Private Photo"
-msgstr "Privates Foto"
-
-#: mod/photos.php:1190
-msgid "Public Photo"
-msgstr "Öffentliches Foto"
-
-#: mod/photos.php:1258
-msgid "Edit Album"
-msgstr "Album bearbeiten"
-
-#: mod/photos.php:1264
-msgid "Show Newest First"
-msgstr "Zeige neueste zuerst"
-
-#: mod/photos.php:1266
-msgid "Show Oldest First"
-msgstr "Zeige älteste zuerst"
-
-#: mod/photos.php:1294 mod/photos.php:1872
-msgid "View Photo"
-msgstr "Foto betrachten"
-
-#: mod/photos.php:1341
-msgid "Permission denied. Access to this item may be restricted."
-msgstr "Zugriff verweigert. Zugriff zu diesem Eintrag könnte eingeschränkt sein."
-
-#: mod/photos.php:1343
-msgid "Photo not available"
-msgstr "Foto nicht verfügbar"
-
-#: mod/photos.php:1399
-msgid "View photo"
-msgstr "Fotos ansehen"
-
-#: mod/photos.php:1399
-msgid "Edit photo"
-msgstr "Foto bearbeiten"
-
-#: mod/photos.php:1400
-msgid "Use as profile photo"
-msgstr "Als Profilbild verwenden"
-
-#: mod/photos.php:1425
-msgid "View Full Size"
-msgstr "Betrachte Originalgröße"
-
-#: mod/photos.php:1511
-msgid "Tags: "
-msgstr "Tags: "
-
-#: mod/photos.php:1514
-msgid "[Remove any tag]"
-msgstr "[Tag entfernen]"
-
-#: mod/photos.php:1554
-msgid "New album name"
-msgstr "Name des neuen Albums"
-
-#: mod/photos.php:1555
-msgid "Caption"
-msgstr "Bildunterschrift"
-
-#: mod/photos.php:1556
-msgid "Add a Tag"
-msgstr "Tag hinzufügen"
-
-#: mod/photos.php:1556
-msgid ""
-"Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
-msgstr "Beispiel: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
-
-#: mod/photos.php:1557
-msgid "Do not rotate"
-msgstr "Nicht rotieren"
-
-#: mod/photos.php:1558
-msgid "Rotate CW (right)"
-msgstr "Drehen US (rechts)"
-
-#: mod/photos.php:1559
-msgid "Rotate CCW (left)"
-msgstr "Drehen EUS (links)"
-
-#: mod/photos.php:1574
-msgid "Private photo"
-msgstr "Privates Foto"
-
-#: mod/photos.php:1575
-msgid "Public photo"
-msgstr "Öffentliches Foto"
-
-#: mod/photos.php:1801
-msgid "Map"
-msgstr "Karte"
-
-#: mod/photos.php:1878 mod/videos.php:390
-msgid "View Album"
-msgstr "Album betrachten"
 
 #: mod/poke.php:192
 msgid "Poke/Prod"
@@ -7835,6 +7215,10 @@ msgstr "Registrierung für %s wurde zurückgezogen"
 #: mod/regmod.php:104
 msgid "Please login."
 msgstr "Bitte melde Dich an."
+
+#: mod/settings.php:36 mod/photos.php:118
+msgid "everybody"
+msgstr "jeder"
 
 #: mod/settings.php:60
 msgid "Display"
@@ -8381,6 +7765,14 @@ msgstr "Standard-Zugriffsrechte für Beiträge"
 msgid "(click to open/close)"
 msgstr "(klicke zum öffnen/schließen)"
 
+#: mod/settings.php:1250 mod/photos.php:1187 mod/photos.php:1571
+msgid "Show to Groups"
+msgstr "Zeige den Gruppen"
+
+#: mod/settings.php:1251 mod/photos.php:1188 mod/photos.php:1572
+msgid "Show to Contacts"
+msgstr "Zeige den Kontakten"
+
 #: mod/settings.php:1252
 msgid "Default Private Post"
 msgstr "Privater Standardbeitrag"
@@ -8503,6 +7895,14 @@ msgstr "Video Löschen"
 msgid "No videos selected"
 msgstr "Keine Videos  ausgewählt"
 
+#: mod/videos.php:308 mod/photos.php:1075
+msgid "Access to this item is restricted."
+msgstr "Zugriff zu diesem Eintrag wurde eingeschränkt."
+
+#: mod/videos.php:390 mod/photos.php:1877
+msgid "View Album"
+msgstr "Album betrachten"
+
 #: mod/videos.php:399
 msgid "Recent Videos"
 msgstr "Neueste Videos"
@@ -8510,6 +7910,627 @@ msgstr "Neueste Videos"
 #: mod/videos.php:401
 msgid "Upload New Videos"
 msgstr "Neues Video hochladen"
+
+#: mod/install.php:139
+msgid "Friendica Communications Server - Setup"
+msgstr "Friendica-Server für soziale Netzwerke – Setup"
+
+#: mod/install.php:145
+msgid "Could not connect to database."
+msgstr "Verbindung zur Datenbank gescheitert."
+
+#: mod/install.php:149
+msgid "Could not create table."
+msgstr "Tabelle konnte nicht angelegt werden."
+
+#: mod/install.php:155
+msgid "Your Friendica site database has been installed."
+msgstr "Die Datenbank Deiner Friendicaseite wurde installiert."
+
+#: mod/install.php:160
+msgid ""
+"You may need to import the file \"database.sql\" manually using phpmyadmin "
+"or mysql."
+msgstr "Möglicherweise musst Du die Datei \"database.sql\" manuell mit phpmyadmin oder mysql importieren."
+
+#: mod/install.php:161 mod/install.php:230 mod/install.php:602
+msgid "Please see the file \"INSTALL.txt\"."
+msgstr "Lies bitte die \"INSTALL.txt\"."
+
+#: mod/install.php:173
+msgid "Database already in use."
+msgstr "Die Datenbank wird bereits verwendet."
+
+#: mod/install.php:227
+msgid "System check"
+msgstr "Systemtest"
+
+#: mod/install.php:232
+msgid "Check again"
+msgstr "Noch einmal testen"
+
+#: mod/install.php:251
+msgid "Database connection"
+msgstr "Datenbankverbindung"
+
+#: mod/install.php:252
+msgid ""
+"In order to install Friendica we need to know how to connect to your "
+"database."
+msgstr "Um Friendica installieren zu können, müssen wir wissen, wie wir mit Deiner Datenbank Kontakt aufnehmen können."
+
+#: mod/install.php:253
+msgid ""
+"Please contact your hosting provider or site administrator if you have "
+"questions about these settings."
+msgstr "Bitte kontaktiere den Hosting Provider oder den Administrator der Seite, falls Du Fragen zu diesen Einstellungen haben solltest."
+
+#: mod/install.php:254
+msgid ""
+"The database you specify below should already exist. If it does not, please "
+"create it before continuing."
+msgstr "Die Datenbank, die Du unten angibst, sollte bereits existieren. Ist dies noch nicht der Fall, erzeuge sie bitte bevor Du mit der Installation fortfährst."
+
+#: mod/install.php:258
+msgid "Database Server Name"
+msgstr "Datenbank-Server"
+
+#: mod/install.php:259
+msgid "Database Login Name"
+msgstr "Datenbank-Nutzer"
+
+#: mod/install.php:260
+msgid "Database Login Password"
+msgstr "Datenbank-Passwort"
+
+#: mod/install.php:261
+msgid "Database Name"
+msgstr "Datenbank-Name"
+
+#: mod/install.php:262 mod/install.php:303
+msgid "Site administrator email address"
+msgstr "E-Mail-Adresse des Administrators"
+
+#: mod/install.php:262 mod/install.php:303
+msgid ""
+"Your account email address must match this in order to use the web admin "
+"panel."
+msgstr "Die E-Mail-Adresse, die in Deinem Friendica-Account eingetragen ist, muss mit dieser Adresse übereinstimmen, damit Du das Admin-Panel benutzen kannst."
+
+#: mod/install.php:266 mod/install.php:306
+msgid "Please select a default timezone for your website"
+msgstr "Bitte wähle die Standardzeitzone Deiner Webseite"
+
+#: mod/install.php:293
+msgid "Site settings"
+msgstr "Server-Einstellungen"
+
+#: mod/install.php:307
+msgid "System Language:"
+msgstr "Systemsprache:"
+
+#: mod/install.php:307
+msgid ""
+"Set the default language for your Friendica installation interface and to "
+"send emails."
+msgstr "Wähle die Standardsprache für deine Friendica-Installations-Oberfläche und den E-Mail-Versand"
+
+#: mod/install.php:347
+msgid "Could not find a command line version of PHP in the web server PATH."
+msgstr "Konnte keine Kommandozeilenversion von PHP im PATH des Servers finden."
+
+#: mod/install.php:348
+msgid ""
+"If you don't have a command line version of PHP installed on server, you "
+"will not be able to run background polling via cron. See <a "
+"href='https://github.com/friendica/friendica/blob/master/doc/Install.md#set-"
+"up-the-poller'>'Setup the poller'</a>"
+msgstr "Wenn Du keine Kommandozeilen-Version von PHP auf Deinem Server installiert hast, kannst Du keine Hintergrundprozesse via cron starten. Siehe <a href='https://github.com/friendica/friendica/blob/master/doc/Install.md#set-up-the-poller'>'Setup the poller'</a>"
+
+#: mod/install.php:352
+msgid "PHP executable path"
+msgstr "Pfad zu PHP"
+
+#: mod/install.php:352
+msgid ""
+"Enter full path to php executable. You can leave this blank to continue the "
+"installation."
+msgstr "Gib den kompletten Pfad zur ausführbaren Datei von PHP an. Du kannst dieses Feld auch frei lassen und mit der Installation fortfahren."
+
+#: mod/install.php:357
+msgid "Command line PHP"
+msgstr "Kommandozeilen-PHP"
+
+#: mod/install.php:366
+msgid "PHP executable is not the php cli binary (could be cgi-fgci version)"
+msgstr "Die ausführbare Datei von PHP stimmt nicht mit der PHP cli Version überein (es könnte sich um die cgi-fgci Version handeln)"
+
+#: mod/install.php:367
+msgid "Found PHP version: "
+msgstr "Gefundene PHP Version:"
+
+#: mod/install.php:369
+msgid "PHP cli binary"
+msgstr "PHP CLI Binary"
+
+#: mod/install.php:380
+msgid ""
+"The command line version of PHP on your system does not have "
+"\"register_argc_argv\" enabled."
+msgstr "Die Kommandozeilenversion von PHP auf Deinem System hat \"register_argc_argv\" nicht aktiviert."
+
+#: mod/install.php:381
+msgid "This is required for message delivery to work."
+msgstr "Dies wird für die Auslieferung von Nachrichten benötigt."
+
+#: mod/install.php:383
+msgid "PHP register_argc_argv"
+msgstr "PHP register_argc_argv"
+
+#: mod/install.php:404
+msgid ""
+"Error: the \"openssl_pkey_new\" function on this system is not able to "
+"generate encryption keys"
+msgstr "Fehler: Die Funktion \"openssl_pkey_new\" auf diesem System ist nicht in der Lage, Verschlüsselungsschlüssel zu erzeugen"
+
+#: mod/install.php:405
+msgid ""
+"If running under Windows, please see "
+"\"http://www.php.net/manual/en/openssl.installation.php\"."
+msgstr "Wenn der Server unter Windows läuft, schau Dir bitte \"http://www.php.net/manual/en/openssl.installation.php\" an."
+
+#: mod/install.php:407
+msgid "Generate encryption keys"
+msgstr "Schlüssel erzeugen"
+
+#: mod/install.php:414
+msgid "libCurl PHP module"
+msgstr "PHP: libCurl-Modul"
+
+#: mod/install.php:415
+msgid "GD graphics PHP module"
+msgstr "PHP: GD-Grafikmodul"
+
+#: mod/install.php:416
+msgid "OpenSSL PHP module"
+msgstr "PHP: OpenSSL-Modul"
+
+#: mod/install.php:417
+msgid "mysqli PHP module"
+msgstr "PHP: mysqli-Modul"
+
+#: mod/install.php:418
+msgid "mb_string PHP module"
+msgstr "PHP: mb_string-Modul"
+
+#: mod/install.php:419
+msgid "mcrypt PHP module"
+msgstr "PHP mcrypt Modul"
+
+#: mod/install.php:420
+msgid "XML PHP module"
+msgstr "XML PHP Modul"
+
+#: mod/install.php:421
+msgid "iconv module"
+msgstr "iconv module"
+
+#: mod/install.php:425 mod/install.php:427
+msgid "Apache mod_rewrite module"
+msgstr "Apache mod_rewrite module"
+
+#: mod/install.php:425
+msgid ""
+"Error: Apache webserver mod-rewrite module is required but not installed."
+msgstr "Fehler: Das Apache-Modul mod-rewrite wird benötigt, es ist allerdings nicht installiert."
+
+#: mod/install.php:433
+msgid "Error: libCURL PHP module required but not installed."
+msgstr "Fehler: Das libCURL PHP Modul wird benötigt, ist aber nicht installiert."
+
+#: mod/install.php:437
+msgid ""
+"Error: GD graphics PHP module with JPEG support required but not installed."
+msgstr "Fehler: Das GD-Graphikmodul für PHP mit JPEG-Unterstützung ist nicht installiert."
+
+#: mod/install.php:441
+msgid "Error: openssl PHP module required but not installed."
+msgstr "Fehler: Das openssl-Modul von PHP ist nicht installiert."
+
+#: mod/install.php:445
+msgid "Error: mysqli PHP module required but not installed."
+msgstr "Fehler: Das mysqli-Modul von PHP ist nicht installiert."
+
+#: mod/install.php:449
+msgid "Error: mb_string PHP module required but not installed."
+msgstr "Fehler: mb_string PHP Module wird benötigt ist aber nicht installiert."
+
+#: mod/install.php:453
+msgid "Error: mcrypt PHP module required but not installed."
+msgstr "Fehler: Das mcrypt Modul von PHP ist nicht installiert"
+
+#: mod/install.php:457
+msgid "Error: iconv PHP module required but not installed."
+msgstr "Fehler: Das iconv-Modul von PHP ist nicht installiert."
+
+#: mod/install.php:466
+msgid ""
+"If you are using php_cli, please make sure that mcrypt module is enabled in "
+"its config file"
+msgstr "Wenn du das Modul \"php_cli\" benutzt dann versichere dich, daß das mcrypt Modul in seiner Konfigurationsdatei aktiviert ist. "
+
+#: mod/install.php:469
+msgid ""
+"Function mcrypt_create_iv() is not defined. This is needed to enable RINO2 "
+"encryption layer."
+msgstr "Die Funktion mcrypt_create_iv() ist nicht festgelegt. Dies ist notwendig um den RINO2-Encryption-Layer zu aktivieren."
+
+#: mod/install.php:471
+msgid "mcrypt_create_iv() function"
+msgstr "mcrypt_create_iv() function"
+
+#: mod/install.php:479
+msgid "Error, XML PHP module required but not installed."
+msgstr "Fehler: XML PHP Modul erforderlich aber nicht installiert."
+
+#: mod/install.php:494
+msgid ""
+"The web installer needs to be able to create a file called \".htconfig.php\""
+" in the top folder of your web server and it is unable to do so."
+msgstr "Der Installationswizard muss in der Lage sein, eine Datei im Stammverzeichnis Deines Webservers anzulegen, ist allerdings derzeit nicht in der Lage, dies zu tun."
+
+#: mod/install.php:495
+msgid ""
+"This is most often a permission setting, as the web server may not be able "
+"to write files in your folder - even if you can."
+msgstr "In den meisten Fällen ist dies ein Problem mit den Schreibrechten. Der Webserver könnte keine Schreiberlaubnis haben, selbst wenn Du sie hast."
+
+#: mod/install.php:496
+msgid ""
+"At the end of this procedure, we will give you a text to save in a file "
+"named .htconfig.php in your Friendica top folder."
+msgstr "Nachdem Du alles ausgefüllt hast, erhältst Du einen Text, den Du in eine Datei namens .htconfig.php in Deinem Friendica-Wurzelverzeichnis kopieren musst."
+
+#: mod/install.php:497
+msgid ""
+"You can alternatively skip this procedure and perform a manual installation."
+" Please see the file \"INSTALL.txt\" for instructions."
+msgstr "Alternativ kannst Du diesen Schritt aber auch überspringen und die Installation manuell durchführen. Eine Anleitung dazu (Englisch) findest Du in der Datei INSTALL.txt."
+
+#: mod/install.php:500
+msgid ".htconfig.php is writable"
+msgstr "Schreibrechte auf .htconfig.php"
+
+#: mod/install.php:510
+msgid ""
+"Friendica uses the Smarty3 template engine to render its web views. Smarty3 "
+"compiles templates to PHP to speed up rendering."
+msgstr "Friendica nutzt die Smarty3 Template Engine um die Webansichten zu rendern. Smarty3 kompiliert Templates zu PHP um das Rendern zu beschleunigen."
+
+#: mod/install.php:511
+msgid ""
+"In order to store these compiled templates, the web server needs to have "
+"write access to the directory view/smarty3/ under the Friendica top level "
+"folder."
+msgstr "Um diese kompilierten Templates zu speichern benötigt der Webserver Schreibrechte zum Verzeichnis view/smarty3/ im obersten Ordner von Friendica."
+
+#: mod/install.php:512
+msgid ""
+"Please ensure that the user that your web server runs as (e.g. www-data) has"
+" write access to this folder."
+msgstr "Bitte stelle sicher, dass der Nutzer unter dem der Webserver läuft (z.B. www-data) Schreibrechte zu diesem Verzeichnis hat."
+
+#: mod/install.php:513
+msgid ""
+"Note: as a security measure, you should give the web server write access to "
+"view/smarty3/ only--not the template files (.tpl) that it contains."
+msgstr "Hinweis: aus Sicherheitsgründen solltest Du dem Webserver nur Schreibrechte für view/smarty3/ geben -- Nicht den Templatedateien (.tpl) die sie enthalten."
+
+#: mod/install.php:516
+msgid "view/smarty3 is writable"
+msgstr "view/smarty3 ist schreibbar"
+
+#: mod/install.php:532
+msgid ""
+"Url rewrite in .htaccess is not working. Check your server configuration."
+msgstr "Umschreiben der URLs in der .htaccess funktioniert nicht. Überprüfe die Konfiguration des Servers."
+
+#: mod/install.php:534
+msgid "Url rewrite is working"
+msgstr "URL rewrite funktioniert"
+
+#: mod/install.php:551
+msgid "ImageMagick PHP extension is installed"
+msgstr "ImageMagick PHP Erweiterung ist installiert"
+
+#: mod/install.php:553
+msgid "ImageMagick supports GIF"
+msgstr "ImageMagick unterstützt GIF"
+
+#: mod/install.php:561
+msgid ""
+"The database configuration file \".htconfig.php\" could not be written. "
+"Please use the enclosed text to create a configuration file in your web "
+"server root."
+msgstr "Die Konfigurationsdatei \".htconfig.php\" konnte nicht angelegt werden. Bitte verwende den angefügten Text, um die Datei im Stammverzeichnis Deiner Friendica-Installation zu erzeugen."
+
+#: mod/install.php:600
+msgid "<h1>What next</h1>"
+msgstr "<h1>Wie geht es weiter?</h1>"
+
+#: mod/install.php:601
+msgid ""
+"IMPORTANT: You will need to [manually] setup a scheduled task for the "
+"poller."
+msgstr "WICHTIG: Du musst [manuell] einen Cronjob (o.ä.) für den Poller einrichten."
+
+#: mod/notifications.php:35
+msgid "Invalid request identifier."
+msgstr "Invalid request identifier."
+
+#: mod/notifications.php:44 mod/notifications.php:180
+#: mod/notifications.php:252
+msgid "Discard"
+msgstr "Verwerfen"
+
+#: mod/notifications.php:105
+msgid "Network Notifications"
+msgstr "Netzwerk Benachrichtigungen"
+
+#: mod/notifications.php:117
+msgid "Personal Notifications"
+msgstr "Persönliche Benachrichtigungen"
+
+#: mod/notifications.php:123
+msgid "Home Notifications"
+msgstr "Pinnwand Benachrichtigungen"
+
+#: mod/notifications.php:152
+msgid "Show Ignored Requests"
+msgstr "Zeige ignorierte Anfragen"
+
+#: mod/notifications.php:152
+msgid "Hide Ignored Requests"
+msgstr "Verberge ignorierte Anfragen"
+
+#: mod/notifications.php:164 mod/notifications.php:222
+msgid "Notification type: "
+msgstr "Benachrichtigungstyp: "
+
+#: mod/notifications.php:167
+#, php-format
+msgid "suggested by %s"
+msgstr "vorgeschlagen von %s"
+
+#: mod/notifications.php:173 mod/notifications.php:240
+msgid "Post a new friend activity"
+msgstr "Neue-Kontakt Nachricht senden"
+
+#: mod/notifications.php:173 mod/notifications.php:240
+msgid "if applicable"
+msgstr "falls anwendbar"
+
+#: mod/notifications.php:195
+msgid "Claims to be known to you: "
+msgstr "Behauptet Dich zu kennen: "
+
+#: mod/notifications.php:196
+msgid "yes"
+msgstr "ja"
+
+#: mod/notifications.php:196
+msgid "no"
+msgstr "nein"
+
+#: mod/notifications.php:197
+msgid ""
+"Shall your connection be bidirectional or not? \"Friend\" implies that you "
+"allow to read and you subscribe to their posts. \"Fan/Admirer\" means that "
+"you allow to read but you do not want to read theirs. Approve as: "
+msgstr "Soll Deine Beziehung beidseitig sein oder nicht? \"Kontakt\" bedeutet, ihr könnt gegenseitig die Beiträge des Anderen lesen dürft. \"Fan/Verehrer\", dass du das lesen deiner Beiträge erlaubst aber nicht die Beiträge der anderen Seite lesen möchtest. Genehmigen als:"
+
+#: mod/notifications.php:200
+msgid ""
+"Shall your connection be bidirectional or not? \"Friend\" implies that you "
+"allow to read and you subscribe to their posts. \"Sharer\" means that you "
+"allow to read but you do not want to read theirs. Approve as: "
+msgstr "Soll Deine Beziehung beidseitig sein oder nicht? \"Freund\" bedeutet, ihr gegenseitig die Beiträge des Anderen lesen dürft. \"Teilenden\", das du das lesen deiner Beiträge erlaubst aber nicht die Beiträge der anderen Seite lesen möchtest. Genehmigen als:"
+
+#: mod/notifications.php:209
+msgid "Friend"
+msgstr "Kontakt"
+
+#: mod/notifications.php:210
+msgid "Sharer"
+msgstr "Teilenden"
+
+#: mod/notifications.php:210
+msgid "Fan/Admirer"
+msgstr "Fan/Verehrer"
+
+#: mod/notifications.php:260
+msgid "No introductions."
+msgstr "Keine Kontaktanfragen."
+
+#: mod/notifications.php:299
+msgid "Show unread"
+msgstr "Ungelesene anzeigen"
+
+#: mod/notifications.php:299
+msgid "Show all"
+msgstr "Alle anzeigen"
+
+#: mod/notifications.php:305
+#, php-format
+msgid "No more %s notifications."
+msgstr "Keine weiteren %s Benachrichtigungen"
+
+#: mod/photos.php:101 mod/photos.php:1886
+msgid "Recent Photos"
+msgstr "Neueste Fotos"
+
+#: mod/photos.php:104 mod/photos.php:1308 mod/photos.php:1888
+msgid "Upload New Photos"
+msgstr "Neue Fotos hochladen"
+
+#: mod/photos.php:182
+msgid "Contact information unavailable"
+msgstr "Kontaktinformationen nicht verfügbar"
+
+#: mod/photos.php:203
+msgid "Album not found."
+msgstr "Album nicht gefunden."
+
+#: mod/photos.php:233 mod/photos.php:245 mod/photos.php:1250
+msgid "Delete Album"
+msgstr "Album löschen"
+
+#: mod/photos.php:243
+msgid "Do you really want to delete this photo album and all its photos?"
+msgstr "Möchtest Du wirklich dieses Foto-Album und all seine Foto löschen?"
+
+#: mod/photos.php:323 mod/photos.php:334 mod/photos.php:1567
+msgid "Delete Photo"
+msgstr "Foto löschen"
+
+#: mod/photos.php:332
+msgid "Do you really want to delete this photo?"
+msgstr "Möchtest Du wirklich dieses Foto löschen?"
+
+#: mod/photos.php:707
+#, php-format
+msgid "%1$s was tagged in %2$s by %3$s"
+msgstr "%1$s wurde von %3$s in %2$s getaggt"
+
+#: mod/photos.php:707
+msgid "a photo"
+msgstr "einem Foto"
+
+#: mod/photos.php:814
+msgid "Image file is empty."
+msgstr "Bilddatei ist leer."
+
+#: mod/photos.php:974
+msgid "No photos selected"
+msgstr "Keine Bilder ausgewählt"
+
+#: mod/photos.php:1135
+#, php-format
+msgid "You have used %1$.2f Mbytes of %2$.2f Mbytes photo storage."
+msgstr "Du verwendest %1$.2f Mbyte von %2$.2f Mbyte des Foto-Speichers."
+
+#: mod/photos.php:1170
+msgid "Upload Photos"
+msgstr "Bilder hochladen"
+
+#: mod/photos.php:1174 mod/photos.php:1245
+msgid "New album name: "
+msgstr "Name des neuen Albums: "
+
+#: mod/photos.php:1175
+msgid "or existing album name: "
+msgstr "oder existierender Albumname: "
+
+#: mod/photos.php:1176
+msgid "Do not show a status post for this upload"
+msgstr "Keine Status-Mitteilung für diesen Beitrag anzeigen"
+
+#: mod/photos.php:1189
+msgid "Private Photo"
+msgstr "Privates Foto"
+
+#: mod/photos.php:1190
+msgid "Public Photo"
+msgstr "Öffentliches Foto"
+
+#: mod/photos.php:1258
+msgid "Edit Album"
+msgstr "Album bearbeiten"
+
+#: mod/photos.php:1264
+msgid "Show Newest First"
+msgstr "Zeige neueste zuerst"
+
+#: mod/photos.php:1266
+msgid "Show Oldest First"
+msgstr "Zeige älteste zuerst"
+
+#: mod/photos.php:1294 mod/photos.php:1871
+msgid "View Photo"
+msgstr "Foto betrachten"
+
+#: mod/photos.php:1340
+msgid "Permission denied. Access to this item may be restricted."
+msgstr "Zugriff verweigert. Zugriff zu diesem Eintrag könnte eingeschränkt sein."
+
+#: mod/photos.php:1342
+msgid "Photo not available"
+msgstr "Foto nicht verfügbar"
+
+#: mod/photos.php:1398
+msgid "View photo"
+msgstr "Fotos ansehen"
+
+#: mod/photos.php:1398
+msgid "Edit photo"
+msgstr "Foto bearbeiten"
+
+#: mod/photos.php:1399
+msgid "Use as profile photo"
+msgstr "Als Profilbild verwenden"
+
+#: mod/photos.php:1424
+msgid "View Full Size"
+msgstr "Betrachte Originalgröße"
+
+#: mod/photos.php:1510
+msgid "Tags: "
+msgstr "Tags: "
+
+#: mod/photos.php:1513
+msgid "[Remove any tag]"
+msgstr "[Tag entfernen]"
+
+#: mod/photos.php:1553
+msgid "New album name"
+msgstr "Name des neuen Albums"
+
+#: mod/photos.php:1554
+msgid "Caption"
+msgstr "Bildunterschrift"
+
+#: mod/photos.php:1555
+msgid "Add a Tag"
+msgstr "Tag hinzufügen"
+
+#: mod/photos.php:1555
+msgid ""
+"Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
+msgstr "Beispiel: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
+
+#: mod/photos.php:1556
+msgid "Do not rotate"
+msgstr "Nicht rotieren"
+
+#: mod/photos.php:1557
+msgid "Rotate CW (right)"
+msgstr "Drehen US (rechts)"
+
+#: mod/photos.php:1558
+msgid "Rotate CCW (left)"
+msgstr "Drehen EUS (links)"
+
+#: mod/photos.php:1573
+msgid "Private photo"
+msgstr "Privates Foto"
+
+#: mod/photos.php:1574
+msgid "Public photo"
+msgstr "Öffentliches Foto"
+
+#: mod/photos.php:1800
+msgid "Map"
+msgstr "Karte"
 
 #: object/Item.php:370
 msgid "via"
@@ -8546,14 +8567,6 @@ msgstr "Größe anpassen - Optimale Größe"
 #: view/theme/frio/php/Image.php:29
 msgid "Resize to best fit and retain aspect ratio."
 msgstr "Größe anpassen - Optimale Größe und Seitenverhältnisse beibehalten"
-
-#: view/theme/frio/theme.php:226
-msgid "Remote"
-msgstr "Entferne"
-
-#: view/theme/frio/theme.php:232
-msgid "Visitor"
-msgstr "Besucher"
 
 #: view/theme/frio/config.php:42
 msgid "Default"
@@ -8594,6 +8607,14 @@ msgstr "Transparanz des Hintergrunds von Beiträgem"
 #: view/theme/frio/config.php:68
 msgid "Set the background image"
 msgstr "Hintergrundbild festlegen"
+
+#: view/theme/frio/theme.php:226
+msgid "Guest"
+msgstr "Gast"
+
+#: view/theme/frio/theme.php:232
+msgid "Visitor"
+msgstr "Besucher"
 
 #: view/theme/cleanzero/config.php:83
 msgid "Set resize level for images in posts and comments (width and height)"
@@ -8774,51 +8795,51 @@ msgstr "Variationen"
 msgid "toggle mobile"
 msgstr "auf/von Mobile Ansicht wechseln"
 
-#: boot.php:898
+#: boot.php:901
 msgid "Delete this item?"
 msgstr "Diesen Beitrag löschen?"
 
-#: boot.php:901
+#: boot.php:904
 msgid "show fewer"
 msgstr "weniger anzeigen"
 
-#: boot.php:1515
+#: boot.php:1518
 #, php-format
 msgid "Update %s failed. See error logs."
 msgstr "Update %s fehlgeschlagen. Bitte Fehlerprotokoll überprüfen."
 
-#: boot.php:1627
+#: boot.php:1630
 msgid "Create a New Account"
 msgstr "Neues Konto erstellen"
 
-#: boot.php:1656
+#: boot.php:1659
 msgid "Password: "
 msgstr "Passwort: "
 
-#: boot.php:1657
+#: boot.php:1660
 msgid "Remember me"
 msgstr "Anmeldedaten merken"
 
-#: boot.php:1660
+#: boot.php:1663
 msgid "Or login using OpenID: "
 msgstr "Oder melde Dich mit Deiner OpenID an: "
 
-#: boot.php:1666
+#: boot.php:1669
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
 
-#: boot.php:1669
+#: boot.php:1672
 msgid "Website Terms of Service"
 msgstr "Website Nutzungsbedingungen"
 
-#: boot.php:1670
+#: boot.php:1673
 msgid "terms of service"
 msgstr "Nutzungsbedingungen"
 
-#: boot.php:1672
+#: boot.php:1675
 msgid "Website Privacy Policy"
 msgstr "Website Datenschutzerklärung"
 
-#: boot.php:1673
+#: boot.php:1676
 msgid "privacy policy"
 msgstr "Datenschutzerklärung"

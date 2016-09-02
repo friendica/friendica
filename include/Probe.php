@@ -788,6 +788,9 @@ class Probe {
 			isset($data["pubkey"]) AND ($hcard != "")) {
 			$data["network"] = NETWORK_DIASPORA;
 
+			// The Diaspora handle must always be lowercase
+			$data["addr"] = strtolower($data["addr"]);
+
 			// We have to overwrite the detected value for "notify" since Hubzilla doesn't send it
 			$data["notify"] = $data["baseurl"]."/receive/users/".$data["guid"];
 			$data["batch"] = $data["baseurl"]."/receive/public";

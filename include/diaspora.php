@@ -623,7 +623,7 @@ class diaspora {
 					dbesc($arr["photo"]),
 					dbesc($arr["request"]),
 					dbesc($arr["nick"]),
-					dbesc($arr["addr"]),
+					dbesc(strtolower($arr["addr"])),
 					dbesc($arr["guid"]),
 					dbesc($arr["batch"]),
 					dbesc($arr["notify"]),
@@ -677,7 +677,7 @@ class diaspora {
 			$r = q("SELECT `addr` FROM `gcontact` WHERE `id` = %d AND `addr` != ''",
 				intval($gcontact_id));
 			if ($r)
-				return $r[0]["addr"];
+				return strtolower($r[0]["addr"]);
 		}
 
 		$r = q("SELECT `network`, `addr`, `self`, `url`, `nick` FROM `contact` WHERE `id` = %d",
@@ -697,7 +697,7 @@ class diaspora {
 			}
 		}
 
-		return $handle;
+		return strtolower($handle);
 	}
 
 	/**
@@ -1652,7 +1652,7 @@ class diaspora {
 	 * @return bool Success
 	 */
 	private function receive_profile($importer, $data) {
-		$author = notags(unxmlify($data->author));
+		$author = strtolower(notags(unxmlify($data->author)));
 
 		$contact = self::contact_by_handle($importer["uid"], $author);
 		if (!$contact)

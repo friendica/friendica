@@ -16,6 +16,11 @@ $db_user = 'mysqlusername';
 $db_pass = 'mysqlpassword';
 $db_data = 'mysqldatabasename';
 
+// Set the database connection charset to UTF8.
+// Changing this value will likely corrupt the special characters.
+// You have been warned.
+$a->config['system']['db_charset'] = "utf8mb4";
+
 // Choose a legal default timezone. If you are unsure, use "America/Los_Angeles".
 // It can be changed later and only applies to timestamps for anonymous viewers.
 

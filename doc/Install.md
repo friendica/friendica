@@ -10,7 +10,7 @@ Not every PHP/MySQL hosting provider will be able to support Friendica.
 Many will.
 But **please** review the requirements and confirm these with your hosting provider prior to installation.
 
-Also if you encounter installation issues, please let us know via the [helper](http://helpers.pyxis.uberspace.de/profile/helpers) or the [developer](https://friendika.openmindspace.org/profile/friendicadevelopers) forum or [file an issue](https://github.com/friendica/friendica/issues).
+Also if you encounter installation issues, please let us know via the [helper](http://helpers.pyxis.uberspace.de/profile/helpers) or the [developer](https://helpers.pyxis.uberspace.de/profile/developers) forum or [file an issue](https://github.com/friendica/friendica/issues).
 Please be as clear as you can about your operating environment and provide as much detail as possible about any error messages you may see, so that we can prevent it from happening in the future.
 Due to the large variety of operating systems and PHP platforms in existence we may have only limited ability to debug your PHP installation or acquire any missing modules - but we will do our best to solve any general code issues.
 If you do not have a Friendica account yet, you can register a temporary one at [tryfriendica.de](https://tryfriendica.de) and join the forums mentioned above from there.
@@ -26,12 +26,12 @@ Requirements
 ---
 
 * Apache with mod-rewrite enabled and "Options All" so you can use a local .htaccess file
-* PHP  5.2+. The later the better. You'll need 5.3 for encryption of key exchange conversations. On a Windows environment, 5.2+ might not work as the function dns_get_record() is only available with version 5.3.
+* PHP 5.4+.
 * PHP *command line* access with register_argc_argv set to true in the php.ini file
 * curl, gd, mysql, hash and openssl extensions
 * some form of email server or email gateway such that PHP mail() works
 * mcrypt (optional; used for server-to-server message encryption)
-* Mysql 5.x or an equivalant alternative for MySQL (MariaDB etc.)
+* Mysql 5.5.3+ or an equivalant alternative for MySQL (MariaDB, Percona Server etc.)
 * the ability to schedule jobs with cron (Linux/Mac) or Scheduled Tasks (Windows) (Note: other options are presented in Section 7 of this document.)
 * Installation into a top-level domain or sub-domain (without a directory/path component in the URL) is preferred. Directory paths will not be as convenient to use and have not been thoroughly tested.
 * If your hosting provider doesn't allow Unix shell access, you might have trouble getting everything to work.

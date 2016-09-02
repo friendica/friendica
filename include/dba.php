@@ -66,6 +66,8 @@ class dba {
 			if(! mysqli_connect_errno()) {
 				$this->connected = true;
 			}
+			if (isset($a->config["system"]["db_charset"]))
+				$this->db->set_charset($a->config["system"]["db_charset"]);
 		}
 		else {
 			$this->mysqli = false;
@@ -73,6 +75,8 @@ class dba {
 			if($this->db && mysql_select_db($db,$this->db)) {
 				$this->connected = true;
 			}
+			if (isset($a->config["system"]["db_charset"]))
+				mysql_set_charset($a->config["system"]["db_charset"], $this->db);
 		}
 		if(! $this->connected) {
 			$this->db = null;
@@ -94,6 +98,14 @@ class dba {
 			return false;
 
 		$this->error = '';
+
+		// Check the connection (This can reconnect the connection - if configured)
+		if ($this->mysqli)
+			$connected = $this->db->ping();
+		else
+			$connected = mysql_ping($this->db);
+
+		$connstr = ($connected ? "Connected": "Disonnected");
 
 		$stamp1 = microtime(true);
 
@@ -122,14 +134,17 @@ class dba {
 		}
 
 		if($this->mysqli) {
-			if($this->db->errno)
+			if($this->db->errno) {
 				$this->error = $this->db->error;
+				$this->errorno = $this->db->errno;
+			}
+		} elseif(mysql_errno($this->db)) {
+			$this->error = mysql_error($this->db);
+			$this->errorno = mysql_errno($this->db);
 		}
-		elseif(mysql_errno($this->db))
-				$this->error = mysql_error($this->db);
 
 		if(strlen($this->error)) {
-			logger('dba: ' . $this->error);
+			logger('DB Error ('.$connstr.') '.$this->errorno.': '.$this->error);
 		}
 
 		if($this->debug) {

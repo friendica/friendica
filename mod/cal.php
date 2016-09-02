@@ -304,25 +304,32 @@ function cal_content(&$a) {
 
 		// Test permissions
 		// Respect the export feature setting for all other /cal pages if it's not the own profile
-		if( ((local_user() !== $owner_uid)) && ! feature_enabled($owner_uid, "export_calendar")) {
+		if( ((local_user() !== intval($owner_uid))) && ! feature_enabled($owner_uid, "export_calendar")) {
 			notice( t('Permission denied.') . EOL);
-			return;
+			goaway('cal/' . $nick);
 		}
 
 		// Get the export data by uid
 		$evexport = event_export($owner_uid, $format);
 
-		if ($evexport["success"] == false ) {
+		if (!$evexport["success"]) {
 			if($evexport["content"])
 				notice( t('This calendar format is not supported') );
 			else
 				notice( t('No exportable data found'));
 
-			return;
+			// If it the own calendar return to the events page
+			// otherwise to the profile calendar page
+			if (local_user() === intval($owner_uid))
+				$return_path = "events";
+			else
+				$returnpath = "cal/".$nick;
+
+			goaway($return_path);
 		}
 
 		// If nothing went wrong we can echo the export content
-		if ($evexport["success"] == true ) {
+		if ($evexport["success"]) {
 			header('Content-type: text/calendar');
 			header('content-disposition: attachment; filename="' . t('calendar') . '-' . $nick . '.' . $evexport["extension"] . '"' );
 			echo $evexport["content"];
