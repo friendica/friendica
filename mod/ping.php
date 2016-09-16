@@ -4,22 +4,18 @@ require_once('include/bbcode.php');
 require_once('include/ForumManager.php');
 require_once('include/group.php');
 require_once("mod/proxy.php");
+require_once('include/xml.php');
 
 function ping_init(&$a) {
 
-	header("Content-type: text/xml");
+	$xmlhead = "<"."?xml version='1.0' encoding='UTF-8' ?".">";
 
-	echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
-		<result>";
-
-	$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
-
-	if(local_user()){
-
+	if (local_user()){
 		// Different login session than the page that is calling us.
-
-		if(intval($_GET['uid']) && intval($_GET['uid']) != local_user()) {
-			echo '<invalid>1</invalid></result>';
+		if (intval($_GET['uid']) && intval($_GET['uid']) != local_user()) {
+		        $data = array("invalid" => 1);
+			header("Content-type: text/xml");
+			echo xml::from_array(array("result" => $data), $xml);
 			killme();
 		}
 
@@ -51,14 +47,14 @@ function ping_init(&$a) {
 			intval(local_user()), intval(local_user())
 		);
 
-		if(dbm::is_result($r)) {
+		if (dbm::is_result($r)) {
 
 			$arr = array('items' => $r);
 			call_hooks('network_ping', $arr);
 
 			foreach ($r as $it) {
 
-				if($it['wall'])
+				if ($it['wall'])
 					$home ++;
 				else
 					$network ++;
@@ -84,20 +80,20 @@ function ping_init(&$a) {
 						if ($it['parent']!=$it['id']) {
 							$comments[] = $it;
 						} else {
-							if(! $it['wall'])
+							if (!$it['wall'])
 								$posts[] = $it;
 						}
 				}
 			}
 		}
 
-		if($network) {
-			if(intval(feature_enabled(local_user(),'groups'))) {
+		if ($network) {
+			if (intval(feature_enabled(local_user(),'groups'))) {
 				// Find out how unseen network posts are spread across groups
 				$groups_unseen = groups_count_unseen();
 			}
 
-			if(intval(feature_enabled(local_user(),'forumlist_widget'))) {
+			if (intval(feature_enabled(local_user(),'forumlist_widget'))) {
 				$forums_unseen = ForumManager::count_unseen_items();
 			}
 		}
@@ -128,7 +124,7 @@ function ping_init(&$a) {
 
 		if ($a->config['register_policy'] == REGISTER_APPROVE && is_site_admin()){
 			$regs = q("SELECT `contact`.`name`, `contact`.`url`, `contact`.`micro`, `register`.`created`, COUNT(*) as `total` FROM `contact` RIGHT JOIN `register` ON `register`.`uid`=`contact`.`uid` WHERE `contact`.`self`=1");
-			if($regs)
+			if ($regs)
 				$register = $regs[0]['total'];
 		} else {
 			$register = "0";
@@ -150,23 +146,23 @@ function ping_init(&$a) {
 			dbesc(datetime_convert('UTC','UTC','now'))
 		);
 
-		if(dbm::is_result($ev)) {
+		if (dbm::is_result($ev)) {
 			$all_events = intval($ev[0]['total']);
 
-			if($all_events) {
+			if ($all_events) {
 				$str_now = datetime_convert('UTC',$a->timezone,'now','Y-m-d');
 				foreach($ev as $x) {
 					$bd = false;
-					if($x['type'] === 'birthday') {
+					if ($x['type'] === 'birthday') {
 						$birthdays ++;
 						$bd = true;
 					}
 					else {
 						$events ++;
 					}
-					if(datetime_convert('UTC',((intval($x['adjust'])) ? $a->timezone : 'UTC'), $x['start'],'Y-m-d') === $str_now) {
+					if (datetime_convert('UTC',((intval($x['adjust'])) ? $a->timezone : 'UTC'), $x['start'],'Y-m-d') === $str_now) {
 						$all_events_today ++;
-						if($bd)
+						if ($bd)
 							$birthdays_today ++;
 						else
 							$events_today ++;
@@ -175,92 +171,58 @@ function ping_init(&$a) {
 			}
 		}
 
+	        $data = array();
+	        $data["intro"] = $intro;
+	        $data["mail"] = $mail;
+	        $data["net"] = $network;
+	        $data["home"] = $home;
 
-		/**
-		 * return xml from notification array
-		 *
-		 * @param array $n Notification array:
-		 *		'href' => notification link
-		 *		'name' => subject name
-		 *		'url' => subject url
-		 *		'photo' => subject photo
-		 *		'date' => notification date
-		 *		'seen' => bool true/false
-		 *		'message' => notification message. "{0}" will be replaced by subject name
-		 **/
-		function xmlize($n){
+		if ($register!=0)
+		        $data["register"] = $register;
 
-			$contact = get_contact_details_by_url($n['url']);
-			if (isset($contact["micro"]))
-				$n['photo'] = proxy_url($contact["micro"], false, PROXY_SIZE_MICRO);
-			else
-				$n['photo'] = proxy_url($n['photo'], false, PROXY_SIZE_MICRO);
+		$groups = array();
 
-			$n['message'] = html_entity_decode($n['message'], ENT_COMPAT | ENT_HTML401, "UTF-8");
-			$n['name'] = html_entity_decode($n['name'], ENT_COMPAT | ENT_HTML401, "UTF-8");
-
-			// Are the nofications calles from the regular process or via the friendica app?
-			$regularnotifications = (intval($_GET['uid']) AND intval($_GET['_']));
-
-			$a = get_app();
-
-			if ($a->is_friendica_app() OR !$regularnotifications)
-				$n['message'] = str_replace("{0}", $n['name'], $n['message']);
-
-			$local_time = datetime_convert('UTC',date_default_timezone_get(),$n['date']);
-
-			call_hooks('ping_xmlize', $n);
-			$notsxml = '<note id="%d" href="%s" name="%s" url="%s" photo="%s" date="%s" seen="%s" timestamp="%s" >%s</note>'."\n";
-			return sprintf ( $notsxml, intval($n['id']),
-				xmlify($n['href']), xmlify(xmlify($n['name'])), xmlify($n['url']), xmlify($n['photo']),
-				xmlify(relative_date($n['date'])), xmlify($n['seen']), xmlify(strtotime($local_time)),
-				xmlify($n['message'])
-			);
-		}
-
-		echo "<intro>$intro</intro>
-				<mail>$mail</mail>
-				<net>$network</net>
-				<home>$home</home>\r\n";
-		if ($register!=0) echo "<register>$register</register>";
-
-		if ( dbm::is_result($groups_unseen) ) {
-			echo '<groups>';
+		if (dbm::is_result($groups_unseen)) {
+			$count = 0;
 			foreach ($groups_unseen as $it)
-				if ($it['count'] > 0)
-					echo '<group id="'.$it['id'].'">'.$it['count']."</group>";
-
-			echo "</groups>";
+				if ($it['count'] > 0) {
+					$count++;
+					$groups[$count.":group"] = $it['count'];
+					$groups[$count.":@attributes"] = array("id" => $it['id']);
+				}
+			$data["groups"] = $groups;
 		}
 
-		if ( dbm::is_result($forums_unseen) ) {
-			echo '<forums>';
+		$forums = array();
+
+		if (dbm::is_result($forums_unseen)) {
+			$count = 0;
 			foreach ($forums_unseen as $it)
-				if ($it['count'] > 0)
-					echo '<forum id="'.$it['id'].'">'.$it['count']."</forum>";
-
-			echo "</forums>";
+				if ($it['count'] > 0) {
+					$count++;
+					$forums[$count.":forum"] = $it['count'];
+					$forums[$count.":@attributes"] = array("id" => $it['id']);
+				}
+			$data["forums"] = $forums;
 		}
 
-		echo "<all-events>$all_events</all-events>
-			<all-events-today>$all_events_today</all-events-today>
-			<events>$events</events>
-			<events-today>$events_today</events-today>
-			<birthdays>$birthdays</birthdays>
-			<birthdays-today>$birthdays_today</birthdays-today>\r\n";
+		$data["all-events"] = $all_events;
+		$data["all-events-today"] = $all_events_today;
+		$data["events"] = $events;
+		$data["events-today"] = $events_today;
+		$data["birthdays"] = $birthdays;
+		$data["birthdays-today"] = $birthdays_today;
 
 
-		if (dbm::is_result($notifs) && (! $sysnotify)) {
+		if (dbm::is_result($notifs) && !$sysnotify) {
 			foreach ($notifs as $zz) {
-				if($zz['seen'] == 0)
+				if ($zz['seen'] == 0)
 					$sysnotify ++;
 			}
 		}
 
-		echo '	<notif count="'. ($sysnotify + $intro + $mail + $register) .'">';
-
 		// merge all notification types in one array
-		if ( dbm::is_result($intros) ) {
+		if (dbm::is_result($intros)) {
 			foreach ($intros as $i) {
 				$n = array(
 					'href' => $a->get_baseurl().'/notifications/intros/'.$i['id'],
@@ -275,7 +237,7 @@ function ping_init(&$a) {
 			}
 		}
 
-		if ( dbm::is_result($mails) ) {
+		if (dbm::is_result($mails)) {
 			foreach ($mails as $i) {
 				$n = array(
 					'href' => $a->get_baseurl().'/message/'.$i['id'],
@@ -290,7 +252,7 @@ function ping_init(&$a) {
 			}
 		}
 
-		if ( dbm::is_result($regs) ) {
+		if (dbm::is_result($regs)) {
 			foreach ($regs as $i) {
 				$n = array(
 					'href' => $a->get_baseurl().'/admin/users/',
@@ -316,34 +278,69 @@ function ping_init(&$a) {
 		};
 		usort($notifs, $sort_function);
 
-		if( dbm::is_result($notifs) ) {
+		if (dbm::is_result($notifs)) {
+
+			// Are the nofications calles from the regular process or via the friendica app?
+			$regularnotifications = (intval($_GET['uid']) AND intval($_GET['_']));
+
+			$count = 0;
 			foreach($notifs as $n) {
-				echo xmlize($n);
+				$count++;
+				if ($a->is_friendica_app() OR !$regularnotifications)
+					$n['message'] = str_replace("{0}", $n['name'], $n['message']);
+
+				$notifications[$count.":note"] = $n['message'];
+
+				$contact = get_contact_details_by_url($n['url']);
+				if (isset($contact["micro"]))
+					$n['photo'] = proxy_url($contact["micro"], false, PROXY_SIZE_MICRO);
+				else
+					$n['photo'] = proxy_url($n['photo'], false, PROXY_SIZE_MICRO);
+
+				$local_time = datetime_convert('UTC',date_default_timezone_get(),$n['date']);
+
+				call_hooks('ping_xmlize', $n);
+
+				$notifications[$count.":@attributes"] = array("id" => $n["id"],
+										"href" => $n['href'],
+										"name" => $n['name'],
+										"url" => $n['url'],
+										"photo" => $n['photo'],
+										"date" => relative_date($n['date']),
+										"seen" => $n['seen'],
+										"timestamp" => strtotime($local_time));
+
 			}
 		}
 
-
-		echo "  </notif>";
+		$data["notif"] = $notifications;
+		$data["@attributes"] = array("count" => $sysnotify + $intro + $mail + $register);
 	}
-	echo " <sysmsgs>";
 
-	if(x($_SESSION,'sysmsg')){
+	$sysmsg = array();
+
+	if (x($_SESSION,'sysmsg')){
+		$count = 0;
 		foreach ($_SESSION['sysmsg'] as $m){
-			echo "<notice>".xmlify($m)."</notice>";
+			$count++;
+			$sysmsg[$count.":notice"] = $m;
 		}
 		unset($_SESSION['sysmsg']);
 	}
-	if(x($_SESSION,'sysmsg_info')){
+
+	if (x($_SESSION,'sysmsg_info')){
+		$count = 0;
 		foreach ($_SESSION['sysmsg_info'] as $m){
-			echo "<info>".xmlify($m)."</info>";
+			$count++;
+			$sysmsg[$count.":info"] = $m;
 		}
 		unset($_SESSION['sysmsg_info']);
 	}
 
-	echo " </sysmsgs>";
-	echo"</result>
-	";
+	$data["sysmsgs"] = $sysmsg;
 
+	header("Content-type: text/xml");
+	echo xml::from_array(array("result" => $data), $xml);
 	killme();
 }
 

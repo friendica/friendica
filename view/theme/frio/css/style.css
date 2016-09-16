@@ -1404,6 +1404,15 @@ section #jotOpen {
 .wall-item-body > a > img {
     border-radius: 3px;
 }
+.wall-item-body .body-attach > a {
+    color: #555;
+    display: inline-block;
+}
+.wall-item-body .body-attach > a div {
+    color: #555;
+    width: 20px;
+}
+
 .shared-wrapper,
 .vevent {
     margin-left: 50px;
@@ -1486,7 +1495,8 @@ blockquote.shared_content {
 
 /* wall item hover effects */
 .wall-item-container .wall-item-links,
-.wall-item-container .wall-item-actions {
+.wall-item-container .wall-item-actions,
+.wall-item-container .body-attach > a {
     opacity: 0.3;
     -webkit-transition: all 0.25s ease-in-out;
     -moz-transition: all 0.25s ease-in-out;
@@ -1495,13 +1505,17 @@ blockquote.shared_content {
     transition: all 0.25s ease-in-out;
 }
 .wall-item-container:hover .wall-item-links,
-.wall-item-container:hover .wall-item-actions {
+.wall-item-container:hover .wall-item-actions,
+.wall-item-container:hover .body-attach > a {
     opacity: 0.6;
     -webkit-transition: all 0.25s ease-in-out;
     -moz-transition: all 0.25s ease-in-out;
     -o-transition: all 0.25s ease-in-out;
     -ms-transition: all 0.25s ease-in-out;
     transition: all 0.25s ease-in-out;
+}
+.wall-item-container .wall-item-body .body-attach > a:hover {
+    opacity: 1;
 }
 
 /*

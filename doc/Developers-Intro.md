@@ -16,7 +16,7 @@ Contact us
 
 The discussion of Friendica development takes place in the following Friendica forums:
 
-* The main [forum for Friendica development](https://friendika.openmindspace.org/profile/friendicadevelopers)
+* The main [forum for Friendica development](https://helpers.pyxis.uberspace.de/profile/developers)
 * The [forum for Friendica theme development](https://friendica.eu/profile/ftdevs)
 
 Help other users
@@ -79,7 +79,7 @@ If you want to get involved here:
 * Look at the first steps that were made (e.g. the clean theme).
 Ask us to find out whom to talk to about their experiences.
 * Talk to design people if you know any.
-* Let us know about your plans [in the dev forum](https://friendika.openmindspace.org/profile/friendicadevelopers) and the [theme developer forum](https://friendica.eu/profile/ftdevs).
+* Let us know about your plans [in the dev forum](https://helpers.pyxis.uberspace.de/profile/developers) and the [theme developer forum](https://friendica.eu/profile/ftdevs).
 Do not worry about cross-posting.
 
 ###Client software

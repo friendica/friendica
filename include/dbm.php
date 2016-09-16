@@ -20,8 +20,8 @@ class dbm {
 		foreach ($r AS $process) {
 			$state = trim($process["State"]);
 
-			// Filter out all idle processes
-			if (!in_array($state, array("", "init", "statistics"))) {
+			// Filter out all non blocking processes
+			if (!in_array($state, array("", "init", "statistics", "updating"))) {
 				++$states[$state];
 				++$processes;
 			}

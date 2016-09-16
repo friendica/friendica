@@ -1867,6 +1867,12 @@ function admin_page_logs(&$a){
 		LOGGER_DATA	=> 'Data',
 		LOGGER_ALL	=> 'All'
 	);
+	
+	if (ini_get('log_errors')) {
+		$phplogenabled = t('PHP log currently enabled.');
+	} else {
+		$phplogenabled = t('PHP log currently disabled.');
+	}
 
 	$t = get_markup_template("admin_logs.tpl");
 
@@ -1887,6 +1893,7 @@ function admin_page_logs(&$a){
 		'$phpheader' => t("PHP logging"),
 		'$phphint' => t("To enable logging of PHP errors and warnings you can add the following to the .htconfig.php file of your installation. The filename set in the 'error_log' line is relative to the friendica top-level directory and must be writeable by the web server. The option '1' for 'log_errors' and 'display_errors' is to enable these options, set to '0' to disable them."),
 		'$phplogcode' => "error_reporting(E_ERROR | E_WARNING | E_PARSE);\nini_set('error_log','php.out');\nini_set('log_errors','1');\nini_set('display_errors', '1');",
+		'$phplogenabled' => $phplogenabled,
 	));
 }
 

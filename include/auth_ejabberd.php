@@ -75,7 +75,7 @@ class exAuth
 
 	public function __construct($sLogFile, $bDebug)
 	{
-		global $db;
+		global $a, $db;
 
 		// setter
 		$this->sLogFile 	= $sLogFile;
@@ -135,36 +135,30 @@ class exAuth
 							} else {
 								// ovdje provjeri prijavu
 								$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
-								$this->writeDebugLog("[debug] doing auth for ". $sUser);
-								//$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `password`='".hash('whirlpool',$aCommand[3])."' AND `nickname`='". $db->escape($sUser) ."'";
-								$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `nickname`='". $db->escape($sUser) ."'";
-								$this->writeDebugLog("[debug] using query ". $sQuery);
-								if ($oResult = q($sQuery)){
-									$uid = $oResult[0]["uid"];
-									$Error = ($oResult[0]["password"] != hash('whirlpool',$aCommand[3]));
-/*
-									if ($oResult[0]["password"] == hash('whirlpool',$aCommand[3])) {
-										// korisnik OK
-										$this->writeLog("[exAuth] authentificated user ". $sUser ."@". $aCommand[2]);
-										fwrite(STDOUT, pack("nn", 2, 1));
-									} else {
-										// korisnik nije OK
-										$this->writeLog("[exAuth] authentification failed for user ". $sUser ."@". $aCommand[2]);
-										fwrite(STDOUT, pack("nn", 2, 0));
-									}
-									$oResult->close();
-*/
-								} else {
-									$this->writeLog("[MySQL] invalid query: ". $sQuery);
-									$Error = true;
-									$uid = -1;
-								}
-								if ($Error) {
-									$oConfig = q("SELECT `v` FROM `pconfig` WHERE `uid`=%d AND `cat` = 'xmpp' AND `k`='password' LIMIT 1;", intval($uid));
-									$this->writeLog("[exAuth] got password ".$oConfig[0]["v"]);
-									$Error = ($aCommand[3] != $oConfig[0]["v"]);
-								}
+								$this->writeDebugLog("[debug] doing auth for ".$sUser."@".$aCommand[2]);
 
+								// If the hostnames doesn't match, we try to authenticate remotely
+								if ($a->get_hostname() != $aCommand[2])
+									$Error = !$this->check_credentials($aCommand[2], $aCommand[1], $aCommand[3], true);
+								else {
+
+									//$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `password`='".hash('whirlpool',$aCommand[3])."' AND `nickname`='". $db->escape($sUser) ."'";
+									$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `nickname`='". $db->escape($sUser) ."'";
+									$this->writeDebugLog("[debug] using query ". $sQuery);
+									if ($oResult = q($sQuery)){
+										$uid = $oResult[0]["uid"];
+										$Error = ($oResult[0]["password"] != hash('whirlpool',$aCommand[3]));
+									} else {
+										$this->writeLog("[MySQL] invalid query: ". $sQuery);
+										$Error = true;
+										$uid = -1;
+									}
+									if ($Error) {
+										$oConfig = q("SELECT `v` FROM `pconfig` WHERE `uid`=%d AND `cat` = 'xmpp' AND `k`='password' LIMIT 1;", intval($uid));
+										$this->writeLog("[exAuth] got password ".$oConfig[0]["v"]);
+										$Error = ($aCommand[3] != $oConfig[0]["v"]);
+									}
+								}
 								if ($Error) {
 									$this->writeLog("[exAuth] authentification failed for user ". $sUser ."@". $aCommand[2]);
 									fwrite(STDOUT, pack("nn", 2, 0));
@@ -205,6 +199,27 @@ class exAuth
 		if (is_resource($this->rLogFile)){
 			fclose($this->rLogFile);
 		}
+	}
+
+	private function check_credentials($host, $user, $password, $ssl) {
+
+		$url = ($ssl ? "https":"http")."://".$host."/api/account/verify_credentials.json";
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_setopt($ch, CURLOPT_USERPWD, $user.':'.$password);
+
+		$header = curl_exec($ch);
+		$curl_info = @curl_getinfo($ch);
+		$http_code = $curl_info["http_code"];
+		curl_close($ch);
+
+		return($http_code == 200);
 	}
 
 	private function writeLog($sMessage)

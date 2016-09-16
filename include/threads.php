@@ -176,7 +176,7 @@ function delete_thread($itemid, $itemuri = "") {
 				intval($item["uid"])
 			);
 		if (!count($r)) {
-			$r = q("DELETE FROM `item` WHERE `uri` = '%s' AND `uid` = 0)",
+			$r = q("DELETE FROM `item` WHERE `uri` = '%s' AND `uid` = 0",
 				dbesc($itemuri)
 			);
 			logger("delete_thread: Deleted shadow for item ".$itemuri." - ".print_r($result, true), LOGGER_DEBUG);

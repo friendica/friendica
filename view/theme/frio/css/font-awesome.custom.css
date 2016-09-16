@@ -1,0 +1,21 @@
+/*
+@fiel view/theme/frio/css/font-awesome.custom.css
+@brief This file applies Font Awesome icons to some friendica standard classes
+*/
+
+.icon:before {
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    text-decoration: inherit;
+    vertical-align: top;
+    font-size: 1.4em;
+}
+/* media icons */
+.icon.type-image:before           { content: "\f1c5"; }
+.icon.type-video:before           { content: "\f1c8"; }
+.icon.type-audio:before           { content: "\f1c7"; }
+.icon.type-text:before            { content: "\f0f6"; }
+.icon.type-application:before     { content: "\f016"; }
+.icon.type-unkn:before            { content: "\f016"; }

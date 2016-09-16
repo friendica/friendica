@@ -36,9 +36,9 @@ require_once('include/dbstructure.php');
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
-define ( 'FRIENDICA_VERSION',      '3.5-dev' );
+define ( 'FRIENDICA_VERSION',      '3.5.1-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1200      );
+define ( 'DB_UPDATE_VERSION',      1202      );
 
 /**
  * @brief Constant with a HTML line break.
@@ -392,11 +392,12 @@ define ( 'GRAVITY_COMMENT',      6);
  * Process priority for the worker
  * @{
  */
-define('PRIORITY_UNDEFINED', 0);
-define('PRIORITY_SYSTEM',   10);
-define('PRIORITY_HIGH',     20);
-define('PRIORITY_MEDIUM',   30);
-define('PRIORITY_LOW',      40);
+define('PRIORITY_UNDEFINED',  0);
+define('PRIORITY_CRITICAL',  10);
+define('PRIORITY_HIGH',      20);
+define('PRIORITY_MEDIUM',    30);
+define('PRIORITY_LOW',       40);
+define('PRIORITY_NEGLIGIBLE',50);
 /* @}*/
 
 
@@ -1099,6 +1100,42 @@ class App {
 	}
 
 	/**
+	 * @brief Log active processes into the "process" table
+	 */
+	function start_process() {
+		$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+		$command = basename($trace[0]["file"]);
+
+		$this->remove_inactive_processes();
+
+		$r = q("SELECT `pid` FROM `process` WHERE `pid` = %d", intval(getmypid()));
+		if(!dbm::is_result($r))
+			q("INSERT INTO `process` (`pid`,`command`,`created`) VALUES (%d, '%s', '%s')",
+				intval(getmypid()),
+				dbesc($command),
+				dbesc(datetime_convert()));
+	}
+
+	/**
+	 * @brief Remove inactive processes
+	 */
+	function remove_inactive_processes() {
+		$r = q("SELECT `pid` FROM `process`");
+		if(dbm::is_result($r))
+			foreach ($r AS $process)
+				if (!posix_kill($process["pid"], 0))
+					q("DELETE FROM `process` WHERE `pid` = %d", intval($process["pid"]));
+	}
+
+	/**
+	 * @brief Remove the active process from the "process" table
+	 */
+	function end_process() {
+		q("DELETE FROM `process` WHERE `pid` = %d", intval(getmypid()));
+	}
+
+	/**
 	 * @brief Returns a string with a callstack. Can be used for logging.
 	 *
 	 * @return string
@@ -1266,8 +1303,20 @@ class App {
 	function proc_run($args) {
 
 		// Add the php path if it is a php call
-		if (count($args) && ($args[0] === 'php' OR is_int($args[0])))
+		if (count($args) && ($args[0] === 'php' OR is_int($args[0]))) {
+
+			// If the last worker fork was less than 10 seconds before then don't fork another one.
+			// This should prevent the forking of masses of workers.
+			if (get_config("system", "worker")) {
+				if ((time() - get_config("system", "proc_run_started")) < 10)
+					return;
+
+				// Set the timestamp of the last proc_run
+				set_config("system", "proc_run_started", time());
+			}
+
 			$args[0] = ((x($this->config,'php_path')) && (strlen($this->config['php_path'])) ? $this->config['php_path'] : 'php');
+		}
 
 		// add baseurl to args. cli scripts can't construct it
 		$args[] = $this->get_baseurl();
@@ -1398,7 +1447,7 @@ function check_db() {
 		$build = DB_UPDATE_VERSION;
 	}
 	if($build != DB_UPDATE_VERSION)
-		proc_run(PRIORITY_SYSTEM, 'include/dbupdate.php');
+		proc_run(PRIORITY_CRITICAL, 'include/dbupdate.php');
 
 }
 
@@ -1686,7 +1735,10 @@ function login($register = false, $hiddens=false) {
  * @brief Used to end the current process, after saving session state.
  */
 function killme() {
-	session_write_close();
+
+	if (!get_app()->is_backend())
+		session_write_close();
+
 	exit;
 }
 

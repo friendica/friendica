@@ -390,7 +390,6 @@ function item_fieldlists() {
 /*
 These Fields are not added below (yet). They are here to for bug search.
 `item`.`type`,
-`item`.`object`,
 `item`.`extid`,
 `item`.`received`,
 `item`.`changed`,
@@ -399,7 +398,6 @@ These Fields are not added below (yet). They are here to for bug search.
 `item`.`target`,
 `item`.`resource-id`,
 `item`.`tag`,
-`item`.`attach`,
 `item`.`inform`,
 `item`.`pubmail`,
 `item`.`visible`,
@@ -424,8 +422,8 @@ These Fields are not added below (yet). They are here to for bug search.
 		`item`.`verb`, `item`.`object-type`, `item`.`postopts`, `item`.`plink`,
 		`item`.`guid`, `item`.`wall`, `item`.`private`, `item`.`starred`,
 		`item`.`title`,	`item`.`body`, `item`.`file`, `item`.`event-id`,
-		`item`.`location`, `item`.`coord`, `item`.`app`,
-		`item`.`rendered-hash`, `item`.`rendered-html`,
+		`item`.`location`, `item`.`coord`, `item`.`app`, `item`.`attach`,
+		`item`.`rendered-hash`, `item`.`rendered-html`, `item`.`object`,
 		`item`.`allow_cid`, `item`.`allow_gid`, `item`.`deny_cid`, `item`.`deny_gid`,
 		`item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 
@@ -887,7 +885,7 @@ function best_link_url($item,&$sparkle,$ssl_state = false) {
 	$clean_url = normalise_link($item['author-link']);
 
 	if (local_user()) {
-		$r = q("SELECT `id` FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `nurl` = '%s' LIMIT 1",
+		$r = q("SELECT `id` FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `nurl` = '%s' AND NOT `pending` LIMIT 1",
 			dbesc(NETWORK_DFRN), intval(local_user()), dbesc(normalise_link($clean_url)));
 		if ($r) {
 			$best_url = 'redir/'.$r[0]['id'];

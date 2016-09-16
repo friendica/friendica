@@ -29,7 +29,7 @@ Friendica - Dokumentation und Ressourcen
 **Technische Dokumentation**
 
 * [Installation](help/Install)
-* [Konfigurationen](help/Settings)
+* [Konfigurationen & Admin-Panel](help/Settings)
 * [Plugins](help/Plugins)
 * [Konnektoren (Connectors) installieren (Twitter/GNU Social)](help/Installing-Connectors)
 * [Installation eines ejabberd Servers (XMPP-Chat) mit synchronisierten Anmeldedaten](help/install-ejabberd) (EN)

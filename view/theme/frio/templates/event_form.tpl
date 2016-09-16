@@ -9,7 +9,7 @@
 			the modal. Changing of the activity status is done by js in event_head.tpl *}}
 		<li class="active" role="menuitem"><a id="event-edit-lnk" onclick="eventEditActive(); return false;">{{$basic}}</a></li>
 		<li role="menuitem"><a id="event-desc-lnk" onclick="eventDescActive(); return false;">{{$advanced}}</a></li>
-		{{if $acl}}<li role="menuitem" {{if !$sh_checked}} style="display: none"{{/if}}><a id="event-perms-lnk" onclick="eventAclActive();return false;">Permissions</a></li>{{/if}}
+		{{if $acl}}<li role="menuitem" {{if !$sh_checked}} style="display: none"{{/if}}><a id="event-perms-lnk" onclick="eventAclActive();return false;">{{$permissions}}</a></li>{{/if}}
 		{{if $preview}}<li role="menuitem"><a id="event-preview-lnk" onclick="eventPreviewActive();return false;">{{$preview}}</a></li>{{/if}}
 		{{* commented out because it isn't implemented yet
 		<li role="menuitem"><a id="event-preview-link" onclick="fbrowserActive(); return false;"> Browser </a></li>

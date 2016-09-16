@@ -189,11 +189,19 @@ function confirmDelete() { return confirm(aStr.delitem); }
 
 function dropItem(url, object) {
 	var confirm = confirmDelete();
+
+	//if the first character of the object is #, remove it because
+	// we use getElementById which don't need the #
+	// getElementByID selects elements even if there are special characters
+	// in the ID (like %) which won't work with jQuery
+	/// @todo ceck if we can solve this in the template
+	object = object.indexOf('#') == 0 ? object.substring(1) : object;
+
 	if(confirm) {
 		$('body').css('cursor', 'wait');
-		$(object).fadeTo('fast', 0.33, function () {
+		$(document.getElementById(object)).fadeTo('fast', 0.33, function () {
 			$.get(url).done(function() {
-				$(object).remove();
+				$(document.getElementById(object)).remove();
 				$('body').css('cursor', 'auto');
 			});
 		});

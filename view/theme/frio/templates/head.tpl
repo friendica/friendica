@@ -30,6 +30,7 @@
 
 {{* own css files *}}
 <link rel="stylesheet" href="view/theme/frio/css/hovercard.css" type="text/css" media="screen"/>
+<link rel="stylesheet" href="view/theme/frio/css/font-awesome.custom.css" type="text/css" media="screen"/>
 
 <!--
 <link rel="shortcut icon" href="images/friendica-32.png" />

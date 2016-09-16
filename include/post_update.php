@@ -159,7 +159,7 @@ function post_update_1198() {
 	logger("Start", LOGGER_DEBUG);
 
 	// Check if the first step is done (Setting "author-id" and "owner-id" in the item table)
-	$r = q("SELECT `author-link`, `owner-link`, `uid` FROM `item` WHERE `author-id` = 0 AND `owner-id` = 0 LIMIT 1000");
+	$r = q("SELECT `author-link`, `owner-link`, `uid` FROM `item` WHERE `author-id` = 0 AND `owner-id` = 0 LIMIT 100");
 	if (!$r) {
 		// Are there unfinished entries in the thread table?
 		$r = q("SELECT COUNT(*) AS `total` FROM `thread`

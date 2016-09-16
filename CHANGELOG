@@ -1,3 +1,63 @@
+Version 3.5
+  Friendica Core:
+    NEW Optional local directory with possible federated contacts [heluecht]
+    NEW Autocompletion for @-mentions and BBCode tags [rabuzarus]
+    NEW Added a composer derived autoloader which allows composer autoloaders in addons/libraries [fabrixxm]
+    NEW theme: frio [rabuzarus, heluecht, fabrixxm]
+    Enhance .htaccess file (nerdoc, dissolve)
+    Updates to the translations (DE, ES, IS, IT, RU) [translation teams]
+    Updates to the documentation [tobiasd, heluecht, mexcon, silke, rabuzarus, fabrixxm, Olivier Mehani, gerhard6380, ben utzer]
+    Extended the BBCode by [abstract] tag used for bridged postings to networks with limited character length [heluecht]
+    Code cleanup [heluecht, QuixOr]
+    Improvements to the API and Friendica specific extensions [heluecht, fabrixxm, gerhard6380]
+    Improvements to the RSS/Atom feed import [mexcon]
+    Improvements to the communication with federated networks (Diaspora, Hubzilla, OStatus) [heluecht]
+    Improvements on the themes (quattro, vier, frost) [rabuzarus, fabrixxm, stieben, heluecht, Quix0r, tobiasd]
+    Improvements to the ACL dialog [fabrixxm, rabuzarus]
+    Improvements to the database structure and optimization of queries [heluecht]
+    Improvements to the UI (contacts, hotkeys, remember me, ARIA, code hightlighting) [rabuzarus, heluecht, tobiasd]
+    Improvements to the background process (poller, worker) [heluecht]
+    Improvements to the admin panel [tobiasd, heluecht, fabrixxm]
+    Improvements to the performance [heluecht]
+    Improvements to the installation wizzard (language selection, RINO version, check required PHP modules, default theme is now vier) [tobiasd]
+    Improvements to the relocation of nodes and accounts [heluecht]
+    Improvements to the DDoS detection [heluecht]
+    Improvements to the calendar/events module [heluecht, rabuzarus]
+    Improvements to OpenID login [strk]
+    Improvements to the ShaShape font [andi]
+    Reworked the implementation of the DFRN, Diaspora protocols [heluecht]
+    Reworked the notifications code [fabrixxm, rabuzarus, heluecht]
+    Reworked the p/config code [fabrixxm, rabuzarus]
+    Reworked XML generation [heluecht]
+    Removed now unused simplepie from library [heluecht]
+
+  Friendica Addons
+    Updated to the translations (DE, ES, IS, NL, PT BR), [translation teams]
+    Piwik [tobiasd]
+    Twitter Connector [heluecht]
+    Pumpio Connector [heluecht]
+    Rendertime [heluecht]
+    wppost [heluecht]
+    showmore [rabuzarus]
+    fromgplus [heluecht]
+    app.net Connector [heluecht]
+    GNU Social Connector [heluecht]
+    LDAP [Olivier Mehani]
+    smileybutton [rabuzarus]
+    retriver [mexon]
+    mailstream [mexon]
+    forumdirectory [tobiasd]
+    NEW notifyall (port from Hubzilla) [rabuzarus, tobiasd]
+    DEPRECATED cal (now in core), FB Connector, FB Post Connector, FB Sync
+
+  Closed Issues
+     683,  786,  796,  922, 1261, 1576, 1701, 1769, 1970, 1145, 1494,
+    1728, 1877, 2063, 2059, 2078, 2079, 2133, 2165, 2194, 2229, 2230,
+    2241, 2254, 2242, 2270, 2277, 2339, 2320, 2345, 2352, 2358, 2367,
+    2373, 2376, 2378, 2385, 2395, 2402, 2406, 2433, 2472, 2485, 2492,
+    2506, 2512, 2516, 2539, 2540, 2893, 2597, 2611, 2617, 2629, 2645,
+    2687, 2716, 2757, 2764
+
 Version 3.4.3
   What's new for the users:
 	Updates to the documentation (silke, tobiasd, annando, rebeka-catalina)

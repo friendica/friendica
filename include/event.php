@@ -293,7 +293,7 @@ function event_store($arr) {
 			`location` = '%s',
 			`type` = '%s',
 			`adjust` = %d,
-			`nofinish` = %d,
+			`nofinish` = %d
 			WHERE `id` = %d AND `uid` = %d",
 
 			dbesc($arr['edited']),
@@ -673,7 +673,7 @@ function event_format_export ($events, $format = 'ical', $timezone) {
 					$dtformat = "%Y%m%dT%H%M%S".$UTC;
 					$o .= 'DTSTART:'.strftime($dtformat, $tmp).PHP_EOL;
 				}
-				if ($event['finish']) {
+				if (!$event['nofinish']) {
 					$tmp = strtotime($event['finish']);
 					$dtformat = "%Y%m%dT%H%M%S".$UTC;
 					$o .= 'DTEND:'.strftime($dtformat, $tmp).PHP_EOL;
@@ -732,13 +732,13 @@ function events_by_uid($uid = 0, $sql_extra = '') {
 	//  requested? then show all of your events, otherwise only those that 
 	//  don't have limitations set in allow_cid and allow_gid
 	if (local_user() == $uid) {
-		$r = q("SELECT `start`, `finish`, `adjust`, `summary`, `desc`, `location`
+		$r = q("SELECT `start`, `finish`, `adjust`, `summary`, `desc`, `location`, `nofinish`
 			FROM `event` WHERE `uid`= %d AND `cid` = 0 ",
 			intval($uid)
 		);
 	} else {
-		$r = q("SELECT `start`, `finish`, `adjust`, `summary`, `desc`, `location`FROM `event`
-			WHERE  `uid` = %d AND `cid` = 0 $sql_extra ",
+		$r = q("SELECT `start`, `finish`, `adjust`, `summary`, `desc`, `location`, `nofinish`
+			FROM `event` WHERE `uid`= %d AND `cid` = 0 $sql_extra ",
 			intval($uid)
 		);
 	}

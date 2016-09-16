@@ -1,4 +1,5 @@
 <script type="text/javascript" src="view/theme/frio/frameworks/jquery-color/jquery.color.js"></script>
+{{if $mode == display}}<script type="text/javascript" src="view/theme/frio/js/mod_display.js"></script>{{/if}}
 
 {{$live_update}}
 
@@ -23,17 +24,3 @@
 </a>
 <img id="item-delete-selected-rotator" class="like-rotator" src="images/rotator.gif" style="display: none;" />
 {{/if}}
-
-<script>
-    var colWhite = {backgroundColor:'#F5F5F5'};
-    var colShiny = {backgroundColor:'#FFF176'};
-</script>
-
-{{if $mode == display}}
-<script>
-    var id = window.location.pathname.split("/").pop();
-    $(window).scrollTop($('#item-'+id).position().top);
-    $('#item-'+id).animate(colWhite, 1000).animate(colShiny).animate(colWhite, 2000);   
-</script>
-{{/if}}
-

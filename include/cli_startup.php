@@ -11,7 +11,7 @@ function cli_startup() {
 	if(is_null($a)) {
 		$a = new App;
 	}
-  
+
 	if(is_null($db)) {
 	    @include(".htconfig.php");
     	require_once("dba.php");

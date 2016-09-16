@@ -89,14 +89,14 @@ class Item extends BaseObject {
 		$a = $this->get_app();
 
 		$item = $this->get_data();
-                $edited = false;
-                if (strcmp($item['created'], $item['edited'])<>0) {
-                      $edited = array(
-                          'label' => t('This entry was edited'),
-                          'date' => datetime_convert('UTC', date_default_timezone_get(), $item['edited'], 'r'),
-                          'relative' => relative_date($item['edited'])
-                      );
-                }
+		$edited = false;
+		if (strcmp($item['created'], $item['edited'])<>0) {
+		      $edited = array(
+			  'label' => t('This entry was edited'),
+			  'date' => datetime_convert('UTC', date_default_timezone_get(), $item['edited'], 'r'),
+			  'relative' => relative_date($item['edited'])
+		      );
+		}
 		$commentww = '';
 		$sparkle = '';
 		$buttons = '';
@@ -439,10 +439,10 @@ class Item extends BaseObject {
 			}
 		}
 
-        if ($this->is_toplevel()) {
-            $result['total_comments_num'] = "$total_children";
-            $result['total_comments_text'] = tt('comment', 'comments', $total_children);
-        }
+	if ($this->is_toplevel()) {
+	    $result['total_comments_num'] = "$total_children";
+	    $result['total_comments_text'] = tt('comment', 'comments', $total_children);
+	}
 
 		$result['private'] = $item['private'];
 		$result['toplevel'] = ($this->is_toplevel() ? 'toplevel_item' : '');

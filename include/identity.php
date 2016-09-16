@@ -71,8 +71,8 @@ function profile_load(&$a, $nickname, $profile = 0, $profiledata = array()) {
 
 	$a->page['title'] = $a->profile['name'] . " @ " . $a->config['sitename'];
 
-//		if (!$profiledata)
-//			$_SESSION['theme'] = $a->profile['theme'];
+		if (!$profiledata  && !get_pconfig(local_user(),'system','always_my_theme'))
+			$_SESSION['theme'] = $a->profile['theme'];
 
 	$_SESSION['mobile-theme'] = $a->profile['mobile-theme'];
 

@@ -15,6 +15,11 @@ $db_user = '{{$dbuser}}';
 $db_pass = '{{$dbpass}}';
 $db_data = '{{$dbdata}}';
 
+// Set the database connection charset to UTF8.
+// Changing this value will likely corrupt the special characters.
+// You have been warned.
+$a->config['system']['db_charset'] = "utf8mb4";
+
 // email adress for the system admin
 
 $a->config['admin_email'] = '{{$adminmail}}';
