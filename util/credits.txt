@@ -72,6 +72,7 @@ hauke
 Hauke Altmann
 Hauke Zühl
 Hubert Kościański
+Hypolite Petovan
 Jak
 Jakob
 jensp
@@ -173,6 +174,7 @@ ufic
 Vasudev Kamath
 Vasya Novikov
 vislav
+Vít Šesták 'v6ak'
 Yasen Pramatarov
 ylms
 Zach Prezkuta

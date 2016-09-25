@@ -32,7 +32,7 @@ dontinclude = ['root', 'friendica', 'bavatar', 'tony baldwin', 'Taek', 'silke m'
 path = os.path.abspath(argv[0].split('util/make_credits.py')[0])
 print('> base directory is assumed to be: '+path)
 #  a place to store contributors
-contributors = ['Andi Stadler']
+contributors = ["Andi Stadler", "Vít Šesták 'v6ak'"]
 #  get the contributors
 print('> getting contributors to the friendica core repository')
 p = subprocess.Popen(['git', 'shortlog', '--no-merges', '-s'],
