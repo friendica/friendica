@@ -73,7 +73,7 @@ else
 						"; if(x($page,'right_aside')) echo $page['right_aside']; echo"
 					</aside>
 
-					<div class=\"col-lg-7 col-md-7 col-sm-12 col-xs-12\" id=\"content\">
+					<div class=\"col-lg-9 col-md-9 col-sm-12 col-xs-12\" id=\"content\">
 						<section class=\"sectiontop "; echo $a->argv[0]; echo "-content-wrapper\">";
 								if(x($page,'content')) echo $page['content']; echo"
 								<div id=\"pause\"></div> <!-- The pause/resume Ajax indicator -->
