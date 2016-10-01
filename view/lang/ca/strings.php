@@ -1,13 +1,16 @@
 <?php
 
-if(! function_exists("string_plural_select_ca")) {
-function string_plural_select_ca($n){
-	return ($n != 1);;
-}}
+if (! function_exists("string_plural_select_ca")) {
+    function string_plural_select_ca($n)
+    {
+        return ($n != 1);
+        ;
+    }
+}
 ;
 $a->strings["%d contact edited."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Could not access contact record."] = "No puc accedir al registre del contacte.";
 $a->strings["Could not locate selected profile."] = "No puc localitzar el perfil seleccionat.";
@@ -34,8 +37,8 @@ $a->strings["(Update was not successful)"] = "(L'actualització fracassà)";
 $a->strings["Suggest friends"] = "Suggerir amics";
 $a->strings["Network type: %s"] = "Xarxa tipus: %s";
 $a->strings["%d contact in common"] = array(
-	0 => "%d contacte en comú",
-	1 => "%d contactes en comú",
+    0 => "%d contacte en comú",
+    1 => "%d contactes en comú",
 );
 $a->strings["View all contacts"] = "Veure tots els contactes";
 $a->strings["Unblock"] = "Desbloquejar";
@@ -352,8 +355,8 @@ $a->strings["%s and You"] = "%s i Tu";
 $a->strings["Delete conversation"] = "Esborrar conversació";
 $a->strings["D, d M Y - g:i A"] = "D, d M Y - g:i A";
 $a->strings["%d message"] = array(
-	0 => "%d missatge",
-	1 => "%d missatges",
+    0 => "%d missatge",
+    1 => "%d missatges",
 );
 $a->strings["Message not available."] = "Missatge no disponible.";
 $a->strings["Delete message"] = "Esborra missatge";
@@ -568,12 +571,12 @@ $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up 
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "Detalls del registre per a %s";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "%s usuari bloquejar/desbloquejar",
-	1 => "%s usuaris bloquejar/desbloquejar",
+    0 => "%s usuari bloquejar/desbloquejar",
+    1 => "%s usuaris bloquejar/desbloquejar",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "%s usuari esborrat",
-	1 => "%s usuaris esborrats",
+    0 => "%s usuari esborrat",
+    1 => "%s usuaris esborrats",
 );
 $a->strings["User '%s' deleted"] = "Usuari %s' esborrat";
 $a->strings["User '%s' unblocked"] = "Usuari %s' desbloquejat";
@@ -638,8 +641,8 @@ $a->strings["Interesting Links"] = "Enllaços Interesants";
 $a->strings["Starred"] = "Favorits";
 $a->strings["Favourite Posts"] = "Enviaments Favorits";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "Advertència: Aquest grup conté el membre %s en una xarxa insegura.",
-	1 => "Advertència: Aquest grup conté %s membres d'una xarxa insegura.",
+    0 => "Advertència: Aquest grup conté el membre %s en una xarxa insegura.",
+    1 => "Advertència: Aquest grup conté %s membres d'una xarxa insegura.",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "Els missatges privats a aquest grup es troben en risc de divulgació pública.";
 $a->strings["No such group"] = "Cap grup com";
@@ -675,12 +678,12 @@ $a->strings["View %s's profile @ %s"] = "Veure perfil de %s @ %s";
 $a->strings["%s from %s"] = "%s des de %s";
 $a->strings["View in context"] = "Veure en context";
 $a->strings["%d comment"] = array(
-	0 => "%d comentari",
-	1 => "%d comentaris",
+    0 => "%d comentari",
+    1 => "%d comentaris",
 );
 $a->strings["comment"] = array(
-	0 => "",
-	1 => "comentari",
+    0 => "",
+    1 => "comentari",
 );
 $a->strings["show more"] = "Mostrar més";
 $a->strings["Private Message"] = "Missatge Privat";
@@ -957,8 +960,8 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "Atenció: El perfil de situació no te nom de propietari identificable.";
 $a->strings["Warning: profile location has no profile photo."] = "Atenció: El perfil de situació no te foto de perfil";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "%d el paràmetre requerit no es va trobar al lloc indicat",
-	1 => "%d els paràmetres requerits no es van trobar allloc indicat",
+    0 => "%d el paràmetre requerit no es va trobar al lloc indicat",
+    1 => "%d els paràmetres requerits no es van trobar allloc indicat",
 );
 $a->strings["Introduction complete."] = "Completada la presentació.";
 $a->strings["Unrecoverable protocol error."] = "Error de protocol irrecuperable.";
@@ -1176,8 +1179,8 @@ $a->strings["Please join us on Friendica"] = "Per favor, uneixi's a nosaltres en
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "Limit d'invitacions excedit. Per favor, Contacti amb l'administrador del lloc.";
 $a->strings["%s : Message delivery failed."] = "%s : Ha fallat l'entrega del missatge.";
 $a->strings["%d message sent."] = array(
-	0 => "%d missatge enviat",
-	1 => "%d missatges enviats.",
+    0 => "%d missatge enviat",
+    1 => "%d missatges enviats.",
 );
 $a->strings["You have no more invitations available"] = "No te més invitacions disponibles";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Visita %s per a una llista de llocs públics on unir-te. Els membres de Friendica d'altres llocs poden connectar-se de forma total, així com amb membres de moltes altres xarxes socials.";
@@ -1298,8 +1301,8 @@ $a->strings["Add New Contact"] = "Afegir Nou Contacte";
 $a->strings["Enter address or web location"] = "Introdueixi adreça o ubicació web";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Exemple: bob@example.com, http://example.com/barbara";
 $a->strings["%d invitation available"] = array(
-	0 => "%d invitació disponible",
-	1 => "%d invitacions disponibles",
+    0 => "%d invitació disponible",
+    1 => "%d invitacions disponibles",
 );
 $a->strings["Find People"] = "Trobar Gent";
 $a->strings["Enter name or interest"] = "Introdueixi nom o aficions";
@@ -1447,8 +1450,8 @@ $a->strings["last"] = "Últim";
 $a->strings["next"] = "següent";
 $a->strings["No contacts"] = "Sense contactes";
 $a->strings["%d Contact"] = array(
-	0 => "%d Contacte",
-	1 => "%d Contactes",
+    0 => "%d Contacte",
+    1 => "%d Contactes",
 );
 $a->strings["poke"] = "atia";
 $a->strings["ping"] = "toc";
@@ -1751,8 +1754,8 @@ $a->strings["User '%s' already exists on this server!"] = "El usuari %s' ja exis
 $a->strings["User creation error"] = "Error en la creació de l'usuari";
 $a->strings["User profile creation error"] = "Error en la creació del perfil d'usuari";
 $a->strings["%d contact not imported"] = array(
-	0 => "%d contacte no importat",
-	1 => "%d contactes no importats",
+    0 => "%d contacte no importat",
+    1 => "%d contactes no importats",
 );
 $a->strings["Done. You can now login with your username and password"] = "Fet. Ja pots identificar-te amb el teu nom d'usuari i contrasenya";
 $a->strings["toggle mobile"] = "canviar a mòbil";

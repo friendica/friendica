@@ -1,5 +1,6 @@
 <?php
 namespace Friendica\Core;
+
 /**
  * @file include/Core/Config.php
  *
@@ -17,174 +18,179 @@ namespace Friendica\Core;
  * There are a few places in the code (such as the admin panel) where boolean
  * configurations need to be fixed as of 10/08/2011.
  */
-class Config {
+class Config
+{
 
-	/**
-	 * @brief Loads all configuration values of family into a cached storage.
-	 *
-	 * All configuration values of the system are stored in global cache
-	 * which is available under the global variable $a->config
-	 *
-	 * @param string $family
-	 *  The category of the configuration value
-	 * @return void
-	 */
-	public static function load($family) {
-		global $a;
+    /**
+     * @brief Loads all configuration values of family into a cached storage.
+     *
+     * All configuration values of the system are stored in global cache
+     * which is available under the global variable $a->config
+     *
+     * @param string $family
+     *  The category of the configuration value
+     * @return void
+     */
+    public static function load($family)
+    {
+        global $a;
 
-		$r = q("SELECT `v`, `k` FROM `config` WHERE `cat` = '%s'", dbesc($family));
-		if(count($r)) {
-			foreach($r as $rr) {
-				$k = $rr['k'];
-				if ($family === 'config') {
-					$a->config[$k] = $rr['v'];
-				} else {
-					$a->config[$family][$k] = $rr['v'];
-				}
-			}
-		} else if ($family != 'config') {
-			// Negative caching
-			$a->config[$family] = "!<unset>!";
-		}
-	}
+        $r = q("SELECT `v`, `k` FROM `config` WHERE `cat` = '%s'", dbesc($family));
+        if (count($r)) {
+            foreach ($r as $rr) {
+                $k = $rr['k'];
+                if ($family === 'config') {
+                    $a->config[$k] = $rr['v'];
+                } else {
+                    $a->config[$family][$k] = $rr['v'];
+                }
+            }
+        } elseif ($family != 'config') {
+            // Negative caching
+            $a->config[$family] = "!<unset>!";
+        }
+    }
 
-	/**
-	 * @brief Get a particular user's config variable given the category name
-	 * ($family) and a key.
-	 *
-	 * Get a particular config value from the given category ($family)
-	 * and the $key from a cached storage in $a->config[$uid].
-	 * $instore is only used by the set_config function
-	 * to determine if the key already exists in the DB
-	 * If a key is found in the DB but doesn't exist in
-	 * local config cache, pull it into the cache so we don't have
-	 * to hit the DB again for this item.
-	 *
-	 * @param string $family
-	 *  The category of the configuration value
-	 * @param string $key
-	 *  The configuration key to query
-	 * @param mixed $default_value optional
-	 *  The value to return if key is not set (default: null)
-	 * @param boolean $refresh optional
-	 *  If true the config is loaded from the db and not from the cache (default: false)
-	 * @return mixed Stored value or null if it does not exist
-	 */
-	public static function get($family, $key, $default_value=null, $refresh = false) {
+    /**
+     * @brief Get a particular user's config variable given the category name
+     * ($family) and a key.
+     *
+     * Get a particular config value from the given category ($family)
+     * and the $key from a cached storage in $a->config[$uid].
+     * $instore is only used by the set_config function
+     * to determine if the key already exists in the DB
+     * If a key is found in the DB but doesn't exist in
+     * local config cache, pull it into the cache so we don't have
+     * to hit the DB again for this item.
+     *
+     * @param string $family
+     *  The category of the configuration value
+     * @param string $key
+     *  The configuration key to query
+     * @param mixed $default_value optional
+     *  The value to return if key is not set (default: null)
+     * @param boolean $refresh optional
+     *  If true the config is loaded from the db and not from the cache (default: false)
+     * @return mixed Stored value or null if it does not exist
+     */
+    public static function get($family, $key, $default_value=null, $refresh = false)
+    {
+        global $a;
 
-		global $a;
+        if (! $refresh) {
+            // Looking if the whole family isn't set
+            if (isset($a->config[$family])) {
+                if ($a->config[$family] === '!<unset>!') {
+                    return $default_value;
+                }
+            }
 
-		if(! $refresh) {
-			// Looking if the whole family isn't set
-			if(isset($a->config[$family])) {
-				if($a->config[$family] === '!<unset>!') {
-					return $default_value;
-				}
-			}
+            if (isset($a->config[$family][$key])) {
+                if ($a->config[$family][$key] === '!<unset>!') {
+                    return $default_value;
+                }
+                return $a->config[$family][$key];
+            }
+        }
 
-			if(isset($a->config[$family][$key])) {
-				if($a->config[$family][$key] === '!<unset>!') {
-					return $default_value;
-				}
-				return $a->config[$family][$key];
-			}
-		}
+        $ret = q("SELECT `v` FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
+            dbesc($family),
+            dbesc($key)
+        );
+        if (count($ret)) {
+            // manage array value
+            $val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize($ret[0]['v']):$ret[0]['v']);
+            $a->config[$family][$key] = $val;
 
-		$ret = q("SELECT `v` FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
-			dbesc($family),
-			dbesc($key)
-		);
-		if(count($ret)) {
-			// manage array value
-			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
-			$a->config[$family][$key] = $val;
+            return $val;
+        } else {
+            $a->config[$family][$key] = '!<unset>!';
+        }
+        return $default_value;
+    }
 
-			return $val;
-		}
-		else {
-			$a->config[$family][$key] = '!<unset>!';
-		}
-		return $default_value;
-	}
+    /**
+     * @brief Sets a configuration value for system config
+     *
+     * Stores a config value ($value) in the category ($family) under the key ($key)
+     * for the user_id $uid.
+     *
+     * Note: Please do not store booleans - convert to 0/1 integer values!
+     *
+     * @param string $family
+     *  The category of the configuration value
+     * @param string $key
+     *  The configuration key to set
+     * @param string $value
+     *  The value to store
+     * @return mixed Stored $value or false if the database update failed
+     */
+    public static function set($family, $key, $value)
+    {
+        global $a;
 
-	/**
-	 * @brief Sets a configuration value for system config
-	 *
-	 * Stores a config value ($value) in the category ($family) under the key ($key)
-	 * for the user_id $uid.
-	 *
-	 * Note: Please do not store booleans - convert to 0/1 integer values!
-	 *
-	 * @param string $family
-	 *  The category of the configuration value
-	 * @param string $key
-	 *  The configuration key to set
-	 * @param string $value
-	 *  The value to store
-	 * @return mixed Stored $value or false if the database update failed
-	 */
-	public static function set($family,$key,$value) {
-		global $a;
+        // If $a->config[$family] has been previously set to '!<unset>!', then
+        // $a->config[$family][$key] will evaluate to $a->config[$family][0], and
+        // $a->config[$family][$key] = $value will be equivalent to
+        // $a->config[$family][0] = $value[0] (this causes infuriating bugs),
+        // so unset the family before assigning a value to a family's key
+        if ($a->config[$family] === '!<unset>!') {
+            unset($a->config[$family]);
+        }
 
-		// If $a->config[$family] has been previously set to '!<unset>!', then
-		// $a->config[$family][$key] will evaluate to $a->config[$family][0], and
-		// $a->config[$family][$key] = $value will be equivalent to
-		// $a->config[$family][0] = $value[0] (this causes infuriating bugs),
-		// so unset the family before assigning a value to a family's key
-		if($a->config[$family] === '!<unset>!')
-			unset($a->config[$family]);
+        // manage array value
+        $dbvalue = (is_array($value)?serialize($value):$value);
+        $dbvalue = (is_bool($dbvalue) ? intval($dbvalue) : $dbvalue);
+        if (is_null(self::get($family, $key, null, true))) {
+            $a->config[$family][$key] = $value;
+            $ret = q("INSERT INTO `config` ( `cat`, `k`, `v` ) VALUES ( '%s', '%s', '%s' ) ",
+                dbesc($family),
+                dbesc($key),
+                dbesc($dbvalue)
+            );
+            if ($ret) {
+                return $value;
+            }
+            return $ret;
+        }
 
-		// manage array value
-		$dbvalue = (is_array($value)?serialize($value):$value);
-		$dbvalue = (is_bool($dbvalue) ? intval($dbvalue) : $dbvalue);
-		if(is_null(self::get($family,$key,null,true))) {
-			$a->config[$family][$key] = $value;
-			$ret = q("INSERT INTO `config` ( `cat`, `k`, `v` ) VALUES ( '%s', '%s', '%s' ) ",
-				dbesc($family),
-				dbesc($key),
-				dbesc($dbvalue)
-			);
-			if($ret)
-				return $value;
-			return $ret;
-		}
+        $ret = q("UPDATE `config` SET `v` = '%s' WHERE `cat` = '%s' AND `k` = '%s'",
+            dbesc($dbvalue),
+            dbesc($family),
+            dbesc($key)
+        );
 
-		$ret = q("UPDATE `config` SET `v` = '%s' WHERE `cat` = '%s' AND `k` = '%s'",
-			dbesc($dbvalue),
-			dbesc($family),
-			dbesc($key)
-		);
+        $a->config[$family][$key] = $value;
 
-		$a->config[$family][$key] = $value;
+        if ($ret) {
+            return $value;
+        }
+        return $ret;
+    }
 
-		if($ret)
-			return $value;
-		return $ret;
-	}
+    /**
+     * @brief Deletes the given key from the system configuration.
+     *
+     * Removes the configured value from the stored cache in $a->config
+     * and removes it from the database.
+     *
+     * @param string $family
+     *  The category of the configuration value
+     * @param string $key
+     *  The configuration key to delete
+     * @return mixed
+     */
+    public static function delete($family, $key)
+    {
+        global $a;
+        if (x($a->config[$family], $key)) {
+            unset($a->config[$family][$key]);
+        }
+        $ret = q("DELETE FROM `config` WHERE `cat` = '%s' AND `k` = '%s'",
+            dbesc($family),
+            dbesc($key)
+        );
 
-	/**
-	 * @brief Deletes the given key from the system configuration.
-	 *
-	 * Removes the configured value from the stored cache in $a->config
-	 * and removes it from the database.
-	 *
-	 * @param string $family
-	 *  The category of the configuration value
-	 * @param string $key
-	 *  The configuration key to delete
-	 * @return mixed
-	 */
-	public static function delete($family,$key) {
-
-		global $a;
-		if(x($a->config[$family],$key))
-			unset($a->config[$family][$key]);
-		$ret = q("DELETE FROM `config` WHERE `cat` = '%s' AND `k` = '%s'",
-			dbesc($family),
-			dbesc($key)
-		);
-
-		return $ret;
-	}
-
+        return $ret;
+    }
 }

@@ -9,36 +9,47 @@
 
 <html>
 <head>
-	<title><?php if(x($page,'title')) echo $page['title'] ?></title>
+	<title><?php if (x($page, 'title')) {
+    echo $page['title'];
+} ?></title>
 	<meta name="viewport" content="initial-scale=1.0">
 	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?> ">
 	<script>var baseurl="<?php echo $a->get_baseurl() ?>";</script>
 	<script>var frio="<?php echo "view/theme/frio"; ?>";</script>
 	<?php $baseurl = $a->get_baseurl(); ?>
 	<?php $frio = "view/theme/frio"; ?>
-	<?php if(x($page,'htmlhead')) echo $page['htmlhead']; ?>
+	<?php if (x($page, 'htmlhead')) {
+    echo $page['htmlhead'];
+} ?>
 	
 
 </head>
 <body id=\"top\">";
-<?php if($_SERVER['REQUEST_URI'] == "/"){header('Location: /login');} ?>
+<?php if ($_SERVER['REQUEST_URI'] == "/") {
+    header('Location: /login');
+} ?>
 <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 <?php
-	if(x($page,'nav')) {
-	echo	str_replace("~config.sitename~",get_config('config','sitename'),
-			str_replace("~system.banner~",get_config('system','banner'),
-			$page['nav']
-	));};
+    if (x($page, 'nav')) {
+        echo    str_replace("~config.sitename~", get_config('config', 'sitename'),
+            str_replace("~system.banner~", get_config('system', 'banner'),
+            $page['nav']
+    ));
+    };
 ?>
 	<main>
 
 		<div class="container">
 			<div class="row">
 <?php
-					echo"
+                    echo"
 					<aside class=\"col-lg-3 col-md-3 hidden-sm hidden-xs\">
-						"; if(x($page,'aside')) echo $page['aside']; echo"
-						"; if(x($page,'right_aside')) echo $page['right_aside']; echo"
+						"; if (x($page, 'aside')) {
+                        echo $page['aside'];
+                    } echo"
+						"; if (x($page, 'right_aside')) {
+                        echo $page['right_aside'];
+                    } echo"
 						"; include('includes/photo_side.php'); echo"
 					</aside>
 
@@ -46,7 +57,9 @@
 						<section class=\"sectiontop\">
 								<div class=\"panel "; echo $a->argv[0]; echo "-content-wrapper\">
 									<div class=\"panel-body\">";
-										if(x($page,'content')) echo $page['content']; echo"
+                                        if (x($page, 'content')) {
+                                            echo $page['content'];
+                                        } echo"
 										<div id=\"pause\"></div> <!-- The pause/resume Ajax indicator -->
 									</div>
 								</div>

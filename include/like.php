@@ -15,159 +15,165 @@ require_once("include/diaspora.php");
  * 		array $arr
  * 			'post_id' => ID of posted item
  */
-function do_like($item_id, $verb) {
-	$a = get_app();
+function do_like($item_id, $verb)
+{
+    $a = get_app();
 
-	if(! local_user() && ! remote_user()) {
-		return false;
-	}
+    if (! local_user() && ! remote_user()) {
+        return false;
+    }
 
-	switch($verb) {
-		case 'like':
-		case 'unlike':
-			$activity = ACTIVITY_LIKE;
-			break;
-		case 'dislike':
-		case 'undislike':
-			$activity = ACTIVITY_DISLIKE;
-			break;
-		case 'attendyes':
-		case 'unattendyes':
-			$activity = ACTIVITY_ATTEND;
-			break;
-		case 'attendno':
-		case 'unattendno':
-			$activity = ACTIVITY_ATTENDNO;
-			break;
-		case 'attendmaybe':
-		case 'unattendmaybe':
-			$activity = ACTIVITY_ATTENDMAYBE;
-			break;
-		default:
-			return false;
-			break;
-	}
-
-
-	logger('like: verb ' . $verb . ' item ' . $item_id);
+    switch ($verb) {
+        case 'like':
+        case 'unlike':
+            $activity = ACTIVITY_LIKE;
+            break;
+        case 'dislike':
+        case 'undislike':
+            $activity = ACTIVITY_DISLIKE;
+            break;
+        case 'attendyes':
+        case 'unattendyes':
+            $activity = ACTIVITY_ATTEND;
+            break;
+        case 'attendno':
+        case 'unattendno':
+            $activity = ACTIVITY_ATTENDNO;
+            break;
+        case 'attendmaybe':
+        case 'unattendmaybe':
+            $activity = ACTIVITY_ATTENDMAYBE;
+            break;
+        default:
+            return false;
+            break;
+    }
 
 
-	$r = q("SELECT * FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",
-		dbesc($item_id),
-		dbesc($item_id)
-	);
+    logger('like: verb ' . $verb . ' item ' . $item_id);
 
-	if(! $item_id || (! count($r))) {
-		logger('like: no item ' . $item_id);
-		return false;
-	}
 
-	$item = $r[0];
+    $r = q("SELECT * FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",
+        dbesc($item_id),
+        dbesc($item_id)
+    );
 
-	$owner_uid = $item['uid'];
+    if (! $item_id || (! count($r))) {
+        logger('like: no item ' . $item_id);
+        return false;
+    }
 
-	if(! can_write_wall($a,$owner_uid)) {
-		return false;
-	}
+    $item = $r[0];
 
-	$remote_owner = null;
+    $owner_uid = $item['uid'];
 
-	if(! $item['wall']) {
-		// The top level post may have been written by somebody on another system
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($item['contact-id']),
-			intval($item['uid'])
-		);
-		if(! count($r))
-			return false;
-		if(! $r[0]['self'])
-			$remote_owner = $r[0];
-	}
+    if (! can_write_wall($a, $owner_uid)) {
+        return false;
+    }
 
-	// this represents the post owner on this system.
+    $remote_owner = null;
 
-	$r = q("SELECT `contact`.*, `user`.`nickname` FROM `contact` LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
+    if (! $item['wall']) {
+        // The top level post may have been written by somebody on another system
+        $r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+            intval($item['contact-id']),
+            intval($item['uid'])
+        );
+        if (! count($r)) {
+            return false;
+        }
+        if (! $r[0]['self']) {
+            $remote_owner = $r[0];
+        }
+    }
+
+    // this represents the post owner on this system.
+
+    $r = q("SELECT `contact`.*, `user`.`nickname` FROM `contact` LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
 		WHERE `contact`.`self` = 1 AND `contact`.`uid` = %d LIMIT 1",
-		intval($owner_uid)
-	);
-	if(count($r))
-		$owner = $r[0];
+        intval($owner_uid)
+    );
+    if (count($r)) {
+        $owner = $r[0];
+    }
 
-	if(! $owner) {
-		logger('like: no owner');
-		return false;
-	}
+    if (! $owner) {
+        logger('like: no owner');
+        return false;
+    }
 
-	if(! $remote_owner)
-		$remote_owner = $owner;
-
-
-	// This represents the person posting
-
-	if((local_user()) && (local_user() == $owner_uid)) {
-		$contact = $owner;
-	}
-	else {
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($_SESSION['visitor_id']),
-			intval($owner_uid)
-		);
-		if(count($r))
-			$contact = $r[0];
-	}
-	if(! $contact) {
-		return false;
-	}
+    if (! $remote_owner) {
+        $remote_owner = $owner;
+    }
 
 
-	$verbs = " '".dbesc($activity)."' ";
+    // This represents the person posting
 
-	// event participation are essentially radio toggles. If you make a subsequent choice,
-	// we need to eradicate your first choice.
-	if($activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE) {
-		$verbs = " '" . dbesc(ACTIVITY_ATTEND) . "','" . dbesc(ACTIVITY_ATTENDNO) . "','" . dbesc(ACTIVITY_ATTENDMAYBE) . "' ";
-	}
+    if ((local_user()) && (local_user() == $owner_uid)) {
+        $contact = $owner;
+    } else {
+        $r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+            intval($_SESSION['visitor_id']),
+            intval($owner_uid)
+        );
+        if (count($r)) {
+            $contact = $r[0];
+        }
+    }
+    if (! $contact) {
+        return false;
+    }
 
-	$r = q("SELECT `id`, `guid` FROM `item` WHERE `verb` IN ( $verbs ) AND `deleted` = 0
+
+    $verbs = " '".dbesc($activity)."' ";
+
+    // event participation are essentially radio toggles. If you make a subsequent choice,
+    // we need to eradicate your first choice.
+    if ($activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE) {
+        $verbs = " '" . dbesc(ACTIVITY_ATTEND) . "','" . dbesc(ACTIVITY_ATTENDNO) . "','" . dbesc(ACTIVITY_ATTENDMAYBE) . "' ";
+    }
+
+    $r = q("SELECT `id`, `guid` FROM `item` WHERE `verb` IN ( $verbs ) AND `deleted` = 0
 		AND `contact-id` = %d AND `uid` = %d
 		AND (`parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s') LIMIT 1",
-		intval($contact['id']), intval($owner_uid),
-		dbesc($item_id), dbesc($item_id), dbesc($item['uri'])
-	);
+        intval($contact['id']), intval($owner_uid),
+        dbesc($item_id), dbesc($item_id), dbesc($item['uri'])
+    );
 
-	if(count($r)) {
-		$like_item = $r[0];
+    if (count($r)) {
+        $like_item = $r[0];
 
-		// Already voted, undo it
-		$r = q("UPDATE `item` SET `deleted` = 1, `unseen` = 1, `changed` = '%s' WHERE `id` = %d",
-			dbesc(datetime_convert()),
-			intval($like_item['id'])
-		);
+        // Already voted, undo it
+        $r = q("UPDATE `item` SET `deleted` = 1, `unseen` = 1, `changed` = '%s' WHERE `id` = %d",
+            dbesc(datetime_convert()),
+            intval($like_item['id'])
+        );
 
 
-		// Clean up the Diaspora signatures for this like
-		// Go ahead and do it even if Diaspora support is disabled. We still want to clean up
-		// if it had been enabled in the past
-		$r = q("DELETE FROM `sign` WHERE `iid` = %d",
-			intval($like_item['id'])
-		);
+        // Clean up the Diaspora signatures for this like
+        // Go ahead and do it even if Diaspora support is disabled. We still want to clean up
+        // if it had been enabled in the past
+        $r = q("DELETE FROM `sign` WHERE `iid` = %d",
+            intval($like_item['id'])
+        );
 
-		$like_item_id = $like_item['id'];
-		proc_run(PRIORITY_HIGH, "include/notifier.php", "like", $like_item_id);
+        $like_item_id = $like_item['id'];
+        proc_run(PRIORITY_HIGH, "include/notifier.php", "like", $like_item_id);
 
-		return true;
-	}
+        return true;
+    }
 
-	$uri = item_new_uri($a->get_hostname(),$owner_uid);
+    $uri = item_new_uri($a->get_hostname(), $owner_uid);
 
-	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
-	if($item['object-type'] === ACTIVITY_OBJ_EVENT)
-		$post_type = t('event');
-	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE );
-	$link = xmlify('<link rel="alternate" type="text/html" href="' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
-	$body = $item['body'];
+    $post_type = (($item['resource-id']) ? t('photo') : t('status'));
+    if ($item['object-type'] === ACTIVITY_OBJ_EVENT) {
+        $post_type = t('event');
+    }
+    $objtype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE);
+    $link = xmlify('<link rel="alternate" type="text/html" href="' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
+    $body = $item['body'];
 
-	$obj = <<< EOT
+    $obj = <<< EOT
 
 	<object>
 		<type>$objtype</type>
@@ -178,74 +184,80 @@ function do_like($item_id, $verb) {
 		<content>$body</content>
 	</object>
 EOT;
-	if($verb === 'like')
-		$bodyverb = t('%1$s likes %2$s\'s %3$s');
-	if($verb === 'dislike')
-		$bodyverb = t('%1$s doesn\'t like %2$s\'s %3$s');
-	if($verb === 'attendyes')
-		$bodyverb = t('%1$s is attending %2$s\'s %3$s');
-	if($verb === 'attendno')
-		$bodyverb = t('%1$s is not attending %2$s\'s %3$s');
-	if($verb === 'attendmaybe')
-		$bodyverb = t('%1$s may attend %2$s\'s %3$s');
+    if ($verb === 'like') {
+        $bodyverb = t('%1$s likes %2$s\'s %3$s');
+    }
+    if ($verb === 'dislike') {
+        $bodyverb = t('%1$s doesn\'t like %2$s\'s %3$s');
+    }
+    if ($verb === 'attendyes') {
+        $bodyverb = t('%1$s is attending %2$s\'s %3$s');
+    }
+    if ($verb === 'attendno') {
+        $bodyverb = t('%1$s is not attending %2$s\'s %3$s');
+    }
+    if ($verb === 'attendmaybe') {
+        $bodyverb = t('%1$s may attend %2$s\'s %3$s');
+    }
 
-	if(! isset($bodyverb))
-			return false;
+    if (! isset($bodyverb)) {
+        return false;
+    }
 
-	$arr = array();
+    $arr = array();
 
-	$arr['guid'] = get_guid(32);
-	$arr['uri'] = $uri;
-	$arr['uid'] = $owner_uid;
-	$arr['contact-id'] = $contact['id'];
-	$arr['type'] = 'activity';
-	$arr['wall'] = $item['wall'];
-	$arr['origin'] = 1;
-	$arr['gravity'] = GRAVITY_LIKE;
-	$arr['parent'] = $item['id'];
-	$arr['parent-uri'] = $item['uri'];
-	$arr['thr-parent'] = $item['uri'];
-	$arr['owner-name'] = $remote_owner['name'];
-	$arr['owner-link'] = $remote_owner['url'];
-	$arr['owner-avatar'] = $remote_owner['thumb'];
-	$arr['author-name'] = $contact['name'];
-	$arr['author-link'] = $contact['url'];
-	$arr['author-avatar'] = $contact['thumb'];
+    $arr['guid'] = get_guid(32);
+    $arr['uri'] = $uri;
+    $arr['uid'] = $owner_uid;
+    $arr['contact-id'] = $contact['id'];
+    $arr['type'] = 'activity';
+    $arr['wall'] = $item['wall'];
+    $arr['origin'] = 1;
+    $arr['gravity'] = GRAVITY_LIKE;
+    $arr['parent'] = $item['id'];
+    $arr['parent-uri'] = $item['uri'];
+    $arr['thr-parent'] = $item['uri'];
+    $arr['owner-name'] = $remote_owner['name'];
+    $arr['owner-link'] = $remote_owner['url'];
+    $arr['owner-avatar'] = $remote_owner['thumb'];
+    $arr['author-name'] = $contact['name'];
+    $arr['author-link'] = $contact['url'];
+    $arr['author-avatar'] = $contact['thumb'];
 
-	$ulink = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
-	$alink = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
-	$plink = '[url=' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . ']' . $post_type . '[/url]';
-	$arr['body'] =  sprintf( $bodyverb, $ulink, $alink, $plink );
+    $ulink = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
+    $alink = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
+    $plink = '[url=' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . ']' . $post_type . '[/url]';
+    $arr['body'] =  sprintf($bodyverb, $ulink, $alink, $plink);
 
-	$arr['verb'] = $activity;
-	$arr['object-type'] = $objtype;
-	$arr['object'] = $obj;
-	$arr['allow_cid'] = $item['allow_cid'];
-	$arr['allow_gid'] = $item['allow_gid'];
-	$arr['deny_cid'] = $item['deny_cid'];
-	$arr['deny_gid'] = $item['deny_gid'];
-	$arr['visible'] = 1;
-	$arr['unseen'] = 1;
-	$arr['last-child'] = 0;
+    $arr['verb'] = $activity;
+    $arr['object-type'] = $objtype;
+    $arr['object'] = $obj;
+    $arr['allow_cid'] = $item['allow_cid'];
+    $arr['allow_gid'] = $item['allow_gid'];
+    $arr['deny_cid'] = $item['deny_cid'];
+    $arr['deny_gid'] = $item['deny_gid'];
+    $arr['visible'] = 1;
+    $arr['unseen'] = 1;
+    $arr['last-child'] = 0;
 
-	$post_id = item_store($arr);
+    $post_id = item_store($arr);
 
-	if(! $item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
-			intval($item['id']),
-			intval($owner_uid)
-		);
-	}
+    if (! $item['visible']) {
+        $r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
+            intval($item['id']),
+            intval($owner_uid)
+        );
+    }
 
 
-	// Save the author information for the like in case we need to relay to Diaspora
-	diaspora::store_like_signature($contact, $post_id);
+    // Save the author information for the like in case we need to relay to Diaspora
+    diaspora::store_like_signature($contact, $post_id);
 
-	$arr['id'] = $post_id;
+    $arr['id'] = $post_id;
 
-	call_hooks('post_local_end', $arr);
+    call_hooks('post_local_end', $arr);
 
-	proc_run(PRIORITY_HIGH, "include/notifier.php", "like", $post_id);
+    proc_run(PRIORITY_HIGH, "include/notifier.php", "like", $post_id);
 
-	return true;
+    return true;
 }

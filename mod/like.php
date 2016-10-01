@@ -5,27 +5,31 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 require_once('include/like.php');
 
-function like_content(&$a) {
-	if(! local_user() && ! remote_user()) {
-		return false;
-	}
+function like_content(&$a)
+{
+    if (! local_user() && ! remote_user()) {
+        return false;
+    }
 
 
-	$verb = notags(trim($_GET['verb']));
+    $verb = notags(trim($_GET['verb']));
 
-	if(! $verb)
-		$verb = 'like';
+    if (! $verb) {
+        $verb = 'like';
+    }
 
-	$item_id = (($a->argc > 1) ? notags(trim($a->argv[1])) : 0);
+    $item_id = (($a->argc > 1) ? notags(trim($a->argv[1])) : 0);
 
-	$r = do_like($item_id, $verb);
-	if (!$r) return;
+    $r = do_like($item_id, $verb);
+    if (!$r) {
+        return;
+    }
 
-	// See if we've been passed a return path to redirect to
-	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
+    // See if we've been passed a return path to redirect to
+    $return_path = ((x($_REQUEST, 'return')) ? $_REQUEST['return'] : '');
 
-	like_content_return($a->get_baseurl(), $return_path);
-	killme(); // NOTREACHED
+    like_content_return($a->get_baseurl(), $return_path);
+    killme(); // NOTREACHED
 //	return; // NOTREACHED
 }
 
@@ -33,16 +37,18 @@ function like_content(&$a) {
 // Decide how to return. If we were called with a 'return' argument,
 // then redirect back to the calling page. If not, just quietly end
 
-function like_content_return($baseurl, $return_path) {
+function like_content_return($baseurl, $return_path)
+{
+    if ($return_path) {
+        $rand = '_=' . time();
+        if (strpos($return_path, '?')) {
+            $rand = "&$rand";
+        } else {
+            $rand = "?$rand";
+        }
 
-	if($return_path) {
-		$rand = '_=' . time();
-		if(strpos($return_path, '?')) $rand = "&$rand";
-		else $rand = "?$rand";
+        goaway($baseurl . "/" . $return_path . $rand);
+    }
 
-		goaway($baseurl . "/" . $return_path . $rand);
-	}
-
-	killme();
+    killme();
 }
-

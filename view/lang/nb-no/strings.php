@@ -1,13 +1,16 @@
 <?php
 
-if(! function_exists("string_plural_select_nb_no")) {
-function string_plural_select_nb_no($n){
-	return ($n != 1);;
-}}
+if (! function_exists("string_plural_select_nb_no")) {
+    function string_plural_select_nb_no($n)
+    {
+        return ($n != 1);
+        ;
+    }
+}
 ;
 $a->strings["%d contact edited."] = array(
-	0 => "%d kontakt redigert.",
-	1 => "%d kontakter redigert",
+    0 => "%d kontakt redigert.",
+    1 => "%d kontakter redigert",
 );
 $a->strings["Could not access contact record."] = "Fikk ikke tilgang til kontaktposten.";
 $a->strings["Could not locate selected profile."] = "Kunne ikke lokalisere valgt profil.";
@@ -34,8 +37,8 @@ $a->strings["(Update was not successful)"] = "(Oppdatering mislykket)";
 $a->strings["Suggest friends"] = "Foreslå venner";
 $a->strings["Network type: %s"] = "Nettverkstype: %s";
 $a->strings["%d contact in common"] = array(
-	0 => "%d felles kontakt",
-	1 => "%d felles kontakter",
+    0 => "%d felles kontakt",
+    1 => "%d felles kontakter",
 );
 $a->strings["View all contacts"] = "Vis alle kontakter";
 $a->strings["Unblock"] = "Ikke blokker";
@@ -352,8 +355,8 @@ $a->strings["%s and You"] = "%s og du";
 $a->strings["Delete conversation"] = "Slett samtale";
 $a->strings["D, d M Y - g:i A"] = "D, d M Y - g:i A";
 $a->strings["%d message"] = array(
-	0 => "%d melding",
-	1 => "%d meldinger",
+    0 => "%d melding",
+    1 => "%d meldinger",
 );
 $a->strings["Message not available."] = "Melding utilgjengelig.";
 $a->strings["Delete message"] = "Slett melding";
@@ -568,12 +571,12 @@ $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up 
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "Registeringsdetaljer for %s";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "%s bruker blokkert/ikke blokkert",
-	1 => "%s brukere blokkert/ikke blokkert",
+    0 => "%s bruker blokkert/ikke blokkert",
+    1 => "%s brukere blokkert/ikke blokkert",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "%s bruker slettet",
-	1 => "%s brukere slettet",
+    0 => "%s bruker slettet",
+    1 => "%s brukere slettet",
 );
 $a->strings["User '%s' deleted"] = "Brukeren '%s' er slettet";
 $a->strings["User '%s' unblocked"] = "Brukeren '%s' er ikke blokkert";
@@ -638,8 +641,8 @@ $a->strings["Interesting Links"] = "Interessante lenker";
 $a->strings["Starred"] = "Med stjerne";
 $a->strings["Favourite Posts"] = "Favorittinnlegg";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "Advarsel: denne gruppen inneholder %s medlem fra et usikkert nettverk.",
-	1 => "Advarsel: denne gruppe inneholder %s medlemmer fra et usikkert nettverk.",
+    0 => "Advarsel: denne gruppen inneholder %s medlem fra et usikkert nettverk.",
+    1 => "Advarsel: denne gruppe inneholder %s medlemmer fra et usikkert nettverk.",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "Private meldinger til denne gruppen risikerer å bli offentliggjort.";
 $a->strings["No such group"] = "Gruppen finnes ikke";
@@ -675,12 +678,12 @@ $a->strings["View %s's profile @ %s"] = "Besøk %ss profil [%s]";
 $a->strings["%s from %s"] = "%s fra %s";
 $a->strings["View in context"] = "Vis i sammenheng";
 $a->strings["%d comment"] = array(
-	0 => "%d kommentar",
-	1 => "%d kommentarer",
+    0 => "%d kommentar",
+    1 => "%d kommentarer",
 );
 $a->strings["comment"] = array(
-	0 => "kommentar",
-	1 => "kommentarer",
+    0 => "kommentar",
+    1 => "kommentarer",
 );
 $a->strings["show more"] = "vis mer";
 $a->strings["Private Message"] = "Privat melding";
@@ -957,8 +960,8 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "Advarsel: profilstedet har ikke identifiserbart eiernavn.";
 $a->strings["Warning: profile location has no profile photo."] = "Advarsel: profilstedet har ikke noe profilbilde.";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "one: %d nødvendig parameter ble ikke funnet på angitt sted",
-	1 => "other: %d nødvendige parametre ble ikke funnet på angitt sted",
+    0 => "one: %d nødvendig parameter ble ikke funnet på angitt sted",
+    1 => "other: %d nødvendige parametre ble ikke funnet på angitt sted",
 );
 $a->strings["Introduction complete."] = "Introduksjon ferdig.";
 $a->strings["Unrecoverable protocol error."] = "Uopprettelig protokollfeil.";
@@ -1176,8 +1179,8 @@ $a->strings["Please join us on Friendica"] = "Vær med oss på Friendica";
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "Invitasjonsgrense overskredet. Vennligst kontakt administrator på ditt nettsted.";
 $a->strings["%s : Message delivery failed."] = "%s: Mislyktes med å levere meldingen.";
 $a->strings["%d message sent."] = array(
-	0 => "one: %d melding sendt.",
-	1 => "other: %d meldinger sendt.",
+    0 => "one: %d melding sendt.",
+    1 => "other: %d meldinger sendt.",
 );
 $a->strings["You have no more invitations available"] = "Du har ingen flere tilgjengelige invitasjoner";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Besøk %s for en liste med offentlige nettsteder du kan bli med i. Friendica-medlemmer ved andre nettsteder kan alle opprette forbindelse til hverandre, og i tillegg til medlemmer av mange andre sosiale nettverk.";
@@ -1298,8 +1301,8 @@ $a->strings["Add New Contact"] = "Legg til ny kontakt";
 $a->strings["Enter address or web location"] = "Skriv adresse eller web-plassering";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Eksempel: ole@eksempel.no, http://eksempel.no/kari";
 $a->strings["%d invitation available"] = array(
-	0 => "%d invitasjon tilgjengelig",
-	1 => "%d invitasjoner tilgjengelig",
+    0 => "%d invitasjon tilgjengelig",
+    1 => "%d invitasjoner tilgjengelig",
 );
 $a->strings["Find People"] = "Finn personer";
 $a->strings["Enter name or interest"] = "Skriv navn eller interesse";
@@ -1447,8 +1450,8 @@ $a->strings["last"] = "siste";
 $a->strings["next"] = "neste";
 $a->strings["No contacts"] = "Ingen kontakter";
 $a->strings["%d Contact"] = array(
-	0 => "%d kontakt",
-	1 => "%d kontakter",
+    0 => "%d kontakt",
+    1 => "%d kontakter",
 );
 $a->strings["poke"] = "dytt";
 $a->strings["ping"] = "ping";
@@ -1751,8 +1754,8 @@ $a->strings["User '%s' already exists on this server!"] = "Brukeren '%s' finnes 
 $a->strings["User creation error"] = "Feil ved oppretting av bruker";
 $a->strings["User profile creation error"] = "Feil ved opprettelsen av brukerprofil";
 $a->strings["%d contact not imported"] = array(
-	0 => "%d kontakt ikke importert",
-	1 => "%d kontakter ikke importert",
+    0 => "%d kontakt ikke importert",
+    1 => "%d kontakter ikke importert",
 );
 $a->strings["Done. You can now login with your username and password"] = "Ferdig. Du kan nå logge inn med ditt brukernavn og passord";
 $a->strings["toggle mobile"] = "Velg mobilvisning";

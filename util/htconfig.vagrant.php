@@ -75,4 +75,3 @@ $a->config['system']['directory'] = 'http://dir.friendi.ca';
 $a->config['system']['debugging'] = true;
 $a->config['system']['logfile'] = 'logfile.out';
 $a->config['system']['loglevel'] = LOGGER_DEBUG;
-

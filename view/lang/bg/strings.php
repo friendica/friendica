@@ -1,13 +1,16 @@
 <?php
 
-if(! function_exists("string_plural_select_bg")) {
-function string_plural_select_bg($n){
-	return ($n != 1);;
-}}
+if (! function_exists("string_plural_select_bg")) {
+    function string_plural_select_bg($n)
+    {
+        return ($n != 1);
+        ;
+    }
+}
 ;
 $a->strings["%d contact edited."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Could not access contact record."] = "Не може да бъде достъп до запис за контакт.";
 $a->strings["Could not locate selected profile."] = "Не може да намери избрания профил.";
@@ -34,8 +37,8 @@ $a->strings["(Update was not successful)"] = "(Актуализация не е 
 $a->strings["Suggest friends"] = "Предложете приятели";
 $a->strings["Network type: %s"] = "Тип мрежа: %s";
 $a->strings["%d contact in common"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["View all contacts"] = "Преглед на всички контакти";
 $a->strings["Unblock"] = "Разблокиране";
@@ -352,8 +355,8 @@ $a->strings["%s and You"] = "%s";
 $a->strings["Delete conversation"] = "Изтриване на разговор";
 $a->strings["D, d M Y - g:i A"] = "D, D MY - Г: А";
 $a->strings["%d message"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Message not available."] = "Съобщението не е посочена.";
 $a->strings["Delete message"] = "Изтриване на съобщение";
@@ -568,12 +571,12 @@ $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up 
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "Регистрационни данни за %s";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["User '%s' deleted"] = "Потребителят \" %s \"Изтрити";
 $a->strings["User '%s' unblocked"] = "Потребителят \" %s \"отблокирани";
@@ -638,8 +641,8 @@ $a->strings["Interesting Links"] = "Интересни Връзки";
 $a->strings["Starred"] = "Със звезда";
 $a->strings["Favourite Posts"] = "Любими Мнения";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "Лични съобщения до тази група, са изложени на риск от публичното оповестяване.";
 $a->strings["No such group"] = "Няма такава група";
@@ -675,12 +678,12 @@ $a->strings["View %s's profile @ %s"] = "Преглед профила на %s �
 $a->strings["%s from %s"] = "%s от %s";
 $a->strings["View in context"] = "Поглед в контекста";
 $a->strings["%d comment"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["comment"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["show more"] = "покажи още";
 $a->strings["Private Message"] = "Лично съобщение";
@@ -957,8 +960,8 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "Внимание: профила място има няма установен име на собственика.";
 $a->strings["Warning: profile location has no profile photo."] = "Внимание: профила местоположение не е снимката на профила.";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Introduction complete."] = "Въведение завърши.";
 $a->strings["Unrecoverable protocol error."] = "Невъзстановима протокол грешка.";
@@ -1176,8 +1179,8 @@ $a->strings["Please join us on Friendica"] = "Моля, присъединете
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "";
 $a->strings["%s : Message delivery failed."] = "%s : Съобщение доставка не успя.";
 $a->strings["%d message sent."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["You have no more invitations available"] = "Имате няма повече покани";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Посетете %s за списък на публичните сайтове, които можете да се присъедините. Friendica членове на други сайтове могат да се свързват един с друг, както и с членовете на много други социални мрежи.";
@@ -1298,8 +1301,8 @@ $a->strings["Add New Contact"] = "Добавяне на нов контакт";
 $a->strings["Enter address or web location"] = "Въведете местоположение на адрес или уеб";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Пример: bob@example.com, http://example.com/barbara";
 $a->strings["%d invitation available"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Find People"] = "Намерете хора,";
 $a->strings["Enter name or interest"] = "Въведете името или интерес";
@@ -1447,8 +1450,8 @@ $a->strings["last"] = "Дата на последния одит. ";
 $a->strings["next"] = "следващ";
 $a->strings["No contacts"] = "Няма контакти";
 $a->strings["%d Contact"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["poke"] = "";
 $a->strings["ping"] = "";
@@ -1751,8 +1754,8 @@ $a->strings["User '%s' already exists on this server!"] = "";
 $a->strings["User creation error"] = "Грешка при създаване на потребителя";
 $a->strings["User profile creation error"] = "Грешка при създаване профила на потребителя";
 $a->strings["%d contact not imported"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Done. You can now login with your username and password"] = "";
 $a->strings["toggle mobile"] = "";

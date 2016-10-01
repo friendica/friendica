@@ -1,7 +1,7 @@
 <?php
 /**
  * @file include/config.php
- * 
+ *
  *  @brief (Deprecated) Arbitrary configuration storage
  * Note:
  * Please do not store booleans - convert to 0/1 integer values
@@ -24,8 +24,9 @@ use \Friendica\Core\PConfig;
  *  The category of the configuration value
  * @return void
  */
-function load_config($family) {
-	return Config::load($family);
+function load_config($family)
+{
+    return Config::load($family);
 }
 
 /**
@@ -42,9 +43,10 @@ function load_config($family) {
  *  If true the config is loaded from the db and not from the cache
  * @return mixed Stored value or false if it does not exist
  */
-function get_config($family, $key, $refresh = false) {
-	$v = Config::get($family, $key, false, $refresh);
-	return $v;
+function get_config($family, $key, $refresh = false)
+{
+    $v = Config::get($family, $key, false, $refresh);
+    return $v;
 }
 
 /**
@@ -60,8 +62,9 @@ function get_config($family, $key, $refresh = false) {
  *  The value to store
  * @return mixed Stored $value or false if the database update failed
  */
-function set_config($family,$key,$value) {
-	return Config::set($family, $key, $value);
+function set_config($family, $key, $value)
+{
+    return Config::set($family, $key, $value);
 }
 
 /**
@@ -75,8 +78,9 @@ function set_config($family,$key,$value) {
  *  The configuration key to delete
  * @return mixed
  */
-function del_config($family,$key) {
-	return Config::delete($family, $key);
+function del_config($family, $key)
+{
+    return Config::delete($family, $key);
 }
 
 /**
@@ -90,8 +94,9 @@ function del_config($family,$key) {
  *  The category of the configuration value
  * @return void
  */
-function load_pconfig($uid,$family) {
-	return PConfig::load($uid, $family);
+function load_pconfig($uid, $family)
+{
+    return PConfig::load($uid, $family);
 }
 
 /**
@@ -110,9 +115,10 @@ function load_pconfig($uid,$family) {
  *  If true the config is loaded from the db and not from the cache
  * @return mixed Stored value or false if it does not exist
  */
-function get_pconfig($uid, $family, $key, $refresh = false) {
-	$v = PConfig::get($uid, $family, $key, false, $refresh);
-	return $v;
+function get_pconfig($uid, $family, $key, $refresh = false)
+{
+    $v = PConfig::get($uid, $family, $key, false, $refresh);
+    return $v;
 }
 
 /**
@@ -130,8 +136,9 @@ function get_pconfig($uid, $family, $key, $refresh = false) {
  *  The value to store
  * @return mixed Stored $value or false
  */
-function set_pconfig($uid,$family,$key,$value) {
-	return PConfig::set($uid, $family, $key, $value);
+function set_pconfig($uid, $family, $key, $value)
+{
+    return PConfig::set($uid, $family, $key, $value);
 }
 
 /**
@@ -146,6 +153,7 @@ function set_pconfig($uid,$family,$key,$value) {
  *  The configuration key to delete
  * @return mixed
  */
-function del_pconfig($uid,$family,$key) {
-	return PConfig::delete($uid, $family, $key);
+function del_pconfig($uid, $family, $key)
+{
+    return PConfig::delete($uid, $family, $key);
 }

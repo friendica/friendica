@@ -7,14 +7,15 @@
  */
 
 
-function darkbubble_init(&$a) {
-$a->theme_info = array(
+function darkbubble_init(&$a)
+{
+    $a->theme_info = array(
   'extends' => 'testbubble',
 );
-set_template_engine($a, 'smarty3');
+    set_template_engine($a, 'smarty3');
 
 
-$a->page['htmlhead'] .= <<< EOT
+    $a->page['htmlhead'] .= <<< EOT
 <script>
 $(document).ready(function() {
 

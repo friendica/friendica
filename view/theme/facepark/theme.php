@@ -1,9 +1,10 @@
 <?php
 
-function facepark_init(&$a) {
-set_template_engine($a, 'smarty3');
+function facepark_init(&$a)
+{
+    set_template_engine($a, 'smarty3');
 
-$a->page['htmlhead'] .= <<< EOT
+    $a->page['htmlhead'] .= <<< EOT
 <script>
 $(document).ready(function() {
 
@@ -50,4 +51,3 @@ $('.savedsearchterm').hover(
 </script>
 EOT;
 }
-

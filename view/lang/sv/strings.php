@@ -1,7 +1,8 @@
 <?php
 
-function string_plural_select($n){
- return ($n != 1);
+function string_plural_select($n)
+{
+    return ($n != 1);
 }
 
 $a->strings['Not Found'] = 'Hittar inte';

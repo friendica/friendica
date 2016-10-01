@@ -27,7 +27,7 @@ class FriendicaAutoloaderInit
         self::$loader = $loader = new \Composer\Autoload\ClassLoader();
         spl_autoload_unregister(array('FriendicaAutoloaderInit', 'loadClassLoader'));
 
-        // library 
+        // library
         $map = require __DIR__ . '/autoloader/autoload_namespaces.php';
         foreach ($map as $namespace => $path) {
             $loader->set($namespace, $path);

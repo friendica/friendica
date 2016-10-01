@@ -2,8 +2,8 @@
 
 ;
 $a->strings["%d contact edited."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Could not access contact record."] = "";
 $a->strings["Could not locate selected profile."] = "";
@@ -30,8 +30,8 @@ $a->strings["(Update was not successful)"] = "";
 $a->strings["Suggest friends"] = "";
 $a->strings["Network type: %s"] = "";
 $a->strings["%d contact in common"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["View all contacts"] = "";
 $a->strings["Unblock"] = "";
@@ -348,8 +348,8 @@ $a->strings["%s and You"] = "";
 $a->strings["Delete conversation"] = "";
 $a->strings["D, d M Y - g:i A"] = "";
 $a->strings["%d message"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Message not available."] = "";
 $a->strings["Delete message"] = "";
@@ -547,12 +547,12 @@ $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up 
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["User '%s' deleted"] = "";
 $a->strings["User '%s' unblocked"] = "";
@@ -617,8 +617,8 @@ $a->strings["Interesting Links"] = "";
 $a->strings["Starred"] = "";
 $a->strings["Favourite Posts"] = "";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "";
 $a->strings["No such group"] = "";
@@ -654,12 +654,12 @@ $a->strings["View %s's profile @ %s"] = "";
 $a->strings["%s from %s"] = "";
 $a->strings["View in context"] = "";
 $a->strings["%d comment"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["comment"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["show more"] = "";
 $a->strings["Private Message"] = "";
@@ -936,8 +936,8 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "";
 $a->strings["Warning: profile location has no profile photo."] = "";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Introduction complete."] = "";
 $a->strings["Unrecoverable protocol error."] = "";
@@ -1155,8 +1155,8 @@ $a->strings["Please join us on Friendica"] = "";
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "";
 $a->strings["%s : Message delivery failed."] = "";
 $a->strings["%d message sent."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["You have no more invitations available"] = "";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "";
@@ -1278,8 +1278,8 @@ $a->strings["Add New Contact"] = "";
 $a->strings["Enter address or web location"] = "";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "";
 $a->strings["%d invitation available"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Find People"] = "";
 $a->strings["Enter name or interest"] = "";
@@ -1427,8 +1427,8 @@ $a->strings["last"] = "";
 $a->strings["next"] = "";
 $a->strings["No contacts"] = "";
 $a->strings["%d Contact"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["poke"] = "";
 $a->strings["ping"] = "";
@@ -1730,8 +1730,8 @@ $a->strings["User '%s' already exists on this server!"] = "";
 $a->strings["User creation error"] = "";
 $a->strings["User profile creation error"] = "";
 $a->strings["%d contact not imported"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Done. You can now login with your username and password"] = "";
 $a->strings["toggle mobile"] = "";

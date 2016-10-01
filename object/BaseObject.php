@@ -1,6 +1,7 @@
 <?php
-if(class_exists('BaseObject'))
-	return;
+if (class_exists('BaseObject')) {
+    return;
+}
 
 require_once('boot.php');
 
@@ -9,29 +10,32 @@ require_once('boot.php');
  *
  * Contains what is usefull to any object
  */
-class BaseObject {
-	private static $app = null;
+class BaseObject
+{
+    private static $app = null;
 
-	/**
-	 * Get the app
-	 * 
-	 * Same as get_app from boot.php
-	 */
-	public function get_app() {
-		if(self::$app)
-			return self::$app;
+    /**
+     * Get the app
+     *
+     * Same as get_app from boot.php
+     */
+    public function get_app()
+    {
+        if (self::$app) {
+            return self::$app;
+        }
 
-		global $a;
-		self::$app = $a;
+        global $a;
+        self::$app = $a;
 
-		return self::$app;
-	}
+        return self::$app;
+    }
 
-	/**
-	 * Set the app
-	 */
-	public static function set_app($app) {
-		self::$app = $app;
-	}
+    /**
+     * Set the app
+     */
+    public static function set_app($app)
+    {
+        self::$app = $app;
+    }
 }
-?>

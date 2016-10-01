@@ -8,13 +8,14 @@
  * Maintainer: Mike Macgirvin <mike@macgirvin.com>
  */
 
-function darkzero_init(&$a) {
-$a->theme_info = array(
+function darkzero_init(&$a)
+{
+    $a->theme_info = array(
   'extends' => 'duepuntozero',
 );
-set_template_engine($a, 'smarty3');
+    set_template_engine($a, 'smarty3');
 
-$a->page['htmlhead'] .= <<< EOT
+    $a->page['htmlhead'] .= <<< EOT
 <script>
 function insertFormatting(comment,BBcode,id) {
 	

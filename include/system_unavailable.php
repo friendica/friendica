@@ -1,7 +1,8 @@
 <?php
 
-function system_down() {
-echo <<< EOT
+function system_down()
+{
+    echo <<< EOT
 <html>
 <head><title>System Unavailable</title></head>
 <body>

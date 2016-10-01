@@ -1,7 +1,8 @@
 <?php
 
-function amcd_content(&$a) {
-//header("Content-type: text/json");
+function amcd_content(&$a)
+{
+    //header("Content-type: text/json");
 echo <<< EOT
 {
   "version":1,
@@ -45,5 +46,5 @@ echo <<< EOT
   }
 }
 EOT;
-killme();
+    killme();
 }

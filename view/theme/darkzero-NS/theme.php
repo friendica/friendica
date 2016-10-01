@@ -7,12 +7,13 @@
  * Author: Mike Macgirvin <mike@macgirvin.com>
  */
 
-function darkzero_NS_init(&$a) {
-$a->theme_info = array(
+function darkzero_NS_init(&$a)
+{
+    $a->theme_info = array(
   'extends' => 'duepuntozero',
 );
 
-$a->page['htmlhead'] .= <<< EOT
+    $a->page['htmlhead'] .= <<< EOT
 <script>
 function insertFormatting(comment,BBcode,id) {
 	

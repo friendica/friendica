@@ -3,76 +3,80 @@
 require_once('include/Scrape.php');
 require_once('include/follow.php');
 
-function ostatus_subscribe_content(&$a) {
+function ostatus_subscribe_content(&$a)
+{
+    if (! local_user()) {
+        notice(t('Permission denied.') . EOL);
+        goaway($_SESSION['return_url']);
+        // NOTREACHED
+    }
 
-	if(! local_user()) {
-		notice( t('Permission denied.') . EOL);
-		goaway($_SESSION['return_url']);
-		// NOTREACHED
-	}
+    $o = "<h2>".t("Subscribing to OStatus contacts")."</h2>";
 
-	$o = "<h2>".t("Subscribing to OStatus contacts")."</h2>";
+    $uid = local_user();
 
-	$uid = local_user();
+    $a = get_app();
 
-	$a = get_app();
+    $counter = intval($_REQUEST['counter']);
 
-	$counter = intval($_REQUEST['counter']);
+    if (get_pconfig($uid, "ostatus", "legacy_friends") == "") {
+        if ($_REQUEST["url"] == "") {
+            return $o.t("No contact provided.");
+        }
 
-	if (get_pconfig($uid, "ostatus", "legacy_friends") == "") {
+        $contact = probe_url($_REQUEST["url"]);
 
-		if ($_REQUEST["url"] == "")
-			return $o.t("No contact provided.");
+        if (!$contact) {
+            return $o.t("Couldn't fetch information for contact.");
+        }
 
-		$contact = probe_url($_REQUEST["url"]);
+        $api = $contact["baseurl"]."/api/";
 
-		if (!$contact)
-			return $o.t("Couldn't fetch information for contact.");
+        // Fetching friends
+        $data = z_fetch_url($api."statuses/friends.json?screen_name=".$contact["nick"]);
 
-		$api = $contact["baseurl"]."/api/";
+        if (!$data["success"]) {
+            return $o.t("Couldn't fetch friends for contact.");
+        }
 
-		// Fetching friends
-		$data = z_fetch_url($api."statuses/friends.json?screen_name=".$contact["nick"]);
+        set_pconfig($uid, "ostatus", "legacy_friends", $data["body"]);
+    }
 
-		if (!$data["success"])
-			return $o.t("Couldn't fetch friends for contact.");
+    $friends = json_decode(get_pconfig($uid, "ostatus", "legacy_friends"));
 
-		set_pconfig($uid, "ostatus", "legacy_friends", $data["body"]);
-	}
+    $total = sizeof($friends);
 
-	$friends = json_decode(get_pconfig($uid, "ostatus", "legacy_friends"));
+    if ($counter >= $total) {
+        $a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.$a->get_baseurl().'/settings/connectors">';
+        del_pconfig($uid, "ostatus", "legacy_friends");
+        del_pconfig($uid, "ostatus", "legacy_contact");
+        $o .= t("Done");
+        return $o;
+    }
 
-	$total = sizeof($friends);
+    $friend = $friends[$counter++];
 
-	if ($counter >= $total) {
-		$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.$a->get_baseurl().'/settings/connectors">';
-		del_pconfig($uid, "ostatus", "legacy_friends");
-		del_pconfig($uid, "ostatus", "legacy_contact");
-		$o .= t("Done");
-		return $o;
-	}
+    $url = $friend->statusnet_profile_url;
 
-	$friend = $friends[$counter++];
+    $o .= "<p>".$counter."/".$total.": ".$url;
 
-	$url = $friend->statusnet_profile_url;
+    $data = probe_url($url);
+    if ($data["network"] == NETWORK_OSTATUS) {
+        $result = new_contact($uid, $url, true);
+        if ($result["success"]) {
+            $o .= " - ".t("success");
+        } else {
+            $o .= " - ".t("failed");
+        }
+    } else {
+        $o .= " - ".t("ignored");
+    }
 
-	$o .= "<p>".$counter."/".$total.": ".$url;
+    $o .= "</p>";
 
-	$data = probe_url($url);
-	if ($data["network"] == NETWORK_OSTATUS) {
-		$result = new_contact($uid,$url,true);
-		if ($result["success"])
-			$o .= " - ".t("success");
-		else
-			$o .= " - ".t("failed");
-	} else
-		$o .= " - ".t("ignored");
+    $o .= "<p>".t("Keep this window open until done.")."</p>";
 
-	$o .= "</p>";
+    $a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.$a->get_baseurl().'/ostatus_subscribe?counter='.$counter.'">';
 
-	$o .= "<p>".t("Keep this window open until done.")."</p>";
-
-	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.$a->get_baseurl().'/ostatus_subscribe?counter='.$counter.'">';
-
-	return $o;
+    return $o;
 }

@@ -10,13 +10,14 @@
  * Screenshot: <a href="screenshot.png">Screenshot</a>
  */
 
-function smoothly_init(&$a) {
-	set_template_engine($a, 'smarty3');
+function smoothly_init(&$a)
+{
+    set_template_engine($a, 'smarty3');
 
-	$cssFile = null;
-	$ssl_state = null;
-	$baseurl = $a->get_baseurl($ssl_state);
-$a->page['htmlhead'] .= <<< EOT
+    $cssFile = null;
+    $ssl_state = null;
+    $baseurl = $a->get_baseurl($ssl_state);
+    $a->page['htmlhead'] .= <<< EOT
 
 <script>
 function insertFormatting(comment,BBcode,id) {
@@ -99,25 +100,25 @@ $('.savedsearchterm').hover(
 </script>
 EOT;
 
-    	/** custom css **/
-	if (!is_null($cssFile)) {
+        /** custom css **/
+    if (!is_null($cssFile)) {
         $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
-	}
+    }
 
-_js_in_foot();
-
+    _js_in_foot();
 }
 
-if(! function_exists('_js_in_foot')) {
-	function _js_in_foot() {
-		/** @purpose insert stuff in bottom of page
-		*/
-		$a = get_app();
-		$ssl_state = null;
-		$baseurl = $a->get_baseurl($ssl_state);
-		$bottom['$baseurl'] = $baseurl;
-		$tpl = get_markup_template('bottom.tpl');
+if (! function_exists('_js_in_foot')) {
+    function _js_in_foot()
+    {
+        /** @purpose insert stuff in bottom of page
+        */
+        $a = get_app();
+        $ssl_state = null;
+        $baseurl = $a->get_baseurl($ssl_state);
+        $bottom['$baseurl'] = $baseurl;
+        $tpl = get_markup_template('bottom.tpl');
 
-		return $a->page['bottom'] = replace_macros($tpl, $bottom);
-	}
+        return $a->page['bottom'] = replace_macros($tpl, $bottom);
+    }
 }

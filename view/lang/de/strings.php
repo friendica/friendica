@@ -1,9 +1,12 @@
 <?php
 
-if(! function_exists("string_plural_select_de")) {
-function string_plural_select_de($n){
-	return ($n != 1);;
-}}
+if (! function_exists("string_plural_select_de")) {
+    function string_plural_select_de($n)
+    {
+        return ($n != 1);
+        ;
+    }
+}
 ;
 $a->strings["Miscellaneous"] = "Verschiedenes";
 $a->strings["Birthday:"] = "Geburtstag:";
@@ -33,8 +36,8 @@ $a->strings["Enter address or web location"] = "Adresse oder Web-Link eingeben";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Beispiel: bob@example.com, http://example.com/barbara";
 $a->strings["Connect"] = "Verbinden";
 $a->strings["%d invitation available"] = array(
-	0 => "%d Einladung verfügbar",
-	1 => "%d Einladungen verfügbar",
+    0 => "%d Einladung verfügbar",
+    1 => "%d Einladungen verfügbar",
 );
 $a->strings["Find People"] = "Leute finden";
 $a->strings["Enter name or interest"] = "Name oder Interessen eingeben";
@@ -51,8 +54,8 @@ $a->strings["Saved Folders"] = "Gespeicherte Ordner";
 $a->strings["Everything"] = "Alles";
 $a->strings["Categories"] = "Kategorien";
 $a->strings["%d contact in common"] = array(
-	0 => "%d gemeinsamer Kontakt",
-	1 => "%d gemeinsame Kontakte",
+    0 => "%d gemeinsamer Kontakt",
+    1 => "%d gemeinsame Kontakte",
 );
 $a->strings["show more"] = "mehr anzeigen";
 $a->strings["Friendica Notification"] = "Friendica-Benachrichtigung";
@@ -135,8 +138,8 @@ $a->strings["Neuter"] = "Neuter";
 $a->strings["Non-specific"] = "Nicht spezifiziert";
 $a->strings["Other"] = "Andere";
 $a->strings["Undecided"] = array(
-	0 => "Unentschieden",
-	1 => "Unentschieden",
+    0 => "Unentschieden",
+    1 => "Unentschieden",
 );
 $a->strings["Males"] = "Männer";
 $a->strings["Females"] = "Frauen";
@@ -385,8 +388,8 @@ $a->strings["User '%s' already exists on this server!"] = "Nutzer '%s' existiert
 $a->strings["User creation error"] = "Fehler beim Anlegen des Nutzeraccounts aufgetreten";
 $a->strings["User profile creation error"] = "Fehler beim Anlegen des Nutzerkontos";
 $a->strings["%d contact not imported"] = array(
-	0 => "%d Kontakt nicht importiert",
-	1 => "%d Kontakte nicht importiert",
+    0 => "%d Kontakt nicht importiert",
+    1 => "%d Kontakte nicht importiert",
 );
 $a->strings["Done. You can now login with your username and password"] = "Erledigt. Du kannst Dich jetzt mit Deinem Nutzernamen und Passwort anmelden";
 $a->strings["System"] = "System";
@@ -525,8 +528,8 @@ $a->strings["%1\$s marked %2\$s's %3\$s as favorite"] = "%1\$s hat %2\$s\\s %3\$
 $a->strings["Likes"] = "Likes";
 $a->strings["Dislikes"] = "Dislikes";
 $a->strings["Attending"] = array(
-	0 => "Teilnehmend",
-	1 => "Teilnehmend",
+    0 => "Teilnehmend",
+    1 => "Teilnehmend",
 );
 $a->strings["Not attending"] = "Nicht teilnehmend";
 $a->strings["Might attend"] = "Eventuell teilnehmend";
@@ -593,16 +596,16 @@ $a->strings["Private post"] = "Privater Beitrag";
 $a->strings["Browser"] = "Browser";
 $a->strings["View all"] = "Zeige alle";
 $a->strings["Like"] = array(
-	0 => "mag ich",
-	1 => "Mag ich",
+    0 => "mag ich",
+    1 => "Mag ich",
 );
 $a->strings["Dislike"] = array(
-	0 => "mag ich nicht",
-	1 => "Mag ich nicht",
+    0 => "mag ich nicht",
+    1 => "Mag ich nicht",
 );
 $a->strings["Not Attending"] = array(
-	0 => "Nicht teilnehmend ",
-	1 => "Nicht teilnehmend",
+    0 => "Nicht teilnehmend ",
+    1 => "Nicht teilnehmend",
 );
 $a->strings["General Features"] = "Allgemeine Features";
 $a->strings["Multiple Profiles"] = "Mehrere Profile";
@@ -664,8 +667,8 @@ $a->strings["Loading more entries..."] = "lade weitere Einträge...";
 $a->strings["The end"] = "Das Ende";
 $a->strings["No contacts"] = "Keine Kontakte";
 $a->strings["%d Contact"] = array(
-	0 => "%d Kontakt",
-	1 => "%d Kontakte",
+    0 => "%d Kontakt",
+    1 => "%d Kontakte",
 );
 $a->strings["View Contacts"] = "Kontakte anzeigen";
 $a->strings["Save"] = "Speichern";
@@ -708,8 +711,8 @@ $a->strings["View on separate page"] = "Auf separater Seite ansehen";
 $a->strings["view on separate page"] = "auf separater Seite ansehen";
 $a->strings["activity"] = "Aktivität";
 $a->strings["comment"] = array(
-	0 => "Kommentar",
-	1 => "Kommentare",
+    0 => "Kommentar",
+    1 => "Kommentare",
 );
 $a->strings["post"] = "Beitrag";
 $a->strings["Item filed"] = "Beitrag abgelegt";
@@ -797,8 +800,8 @@ $a->strings["Please join us on Friendica"] = "Ich lade Dich zu unserem sozialen 
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "Limit für Einladungen erreicht. Bitte kontaktiere des Administrator der Seite.";
 $a->strings["%s : Message delivery failed."] = "%s: Zustellung der Nachricht fehlgeschlagen.";
 $a->strings["%d message sent."] = array(
-	0 => "%d Nachricht gesendet.",
-	1 => "%d Nachrichten gesendet.",
+    0 => "%d Nachricht gesendet.",
+    1 => "%d Nachrichten gesendet.",
 );
 $a->strings["You have no more invitations available"] = "Du hast keine weiteren Einladungen";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Besuche %s für eine Liste der öffentlichen Server, denen Du beitreten kannst. Friendica Mitglieder unterschiedlicher Server können sich sowohl alle miteinander verbinden, als auch mit Mitgliedern anderer Sozialer Netzwerke.";
@@ -909,8 +912,8 @@ $a->strings["Please enter your password for verification:"] = "Bitte gib Dein Pa
 $a->strings["Item not found"] = "Beitrag nicht gefunden";
 $a->strings["Edit post"] = "Beitrag bearbeiten";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "Warnung: Diese Gruppe beinhaltet %s Person aus einem unsicheren Netzwerk.",
-	1 => "Warnung: Diese Gruppe beinhaltet %s Personen aus unsicheren Netzwerken.",
+    0 => "Warnung: Diese Gruppe beinhaltet %s Person aus einem unsicheren Netzwerk.",
+    1 => "Warnung: Diese Gruppe beinhaltet %s Personen aus unsicheren Netzwerken.",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "Private Nachrichten an diese Gruppe könnten an die Öffentlichkeit geraten.";
 $a->strings["No such group"] = "Es gibt keine solche Gruppe";
@@ -999,8 +1002,8 @@ $a->strings["You and %s"] = "Du und %s";
 $a->strings["%s and You"] = "%s und Du";
 $a->strings["D, d M Y - g:i A"] = "D, d. M Y - g:i A";
 $a->strings["%d message"] = array(
-	0 => "%d Nachricht",
-	1 => "%d Nachrichten",
+    0 => "%d Nachricht",
+    1 => "%d Nachrichten",
 );
 $a->strings["Manage Identities and/or Pages"] = "Verwalte Identitäten und/oder Seiten";
 $a->strings["Toggle between different identities or community/group pages which share your account details or which you have been granted \"manage\" permissions"] = "Zwischen verschiedenen Identitäten oder Gemeinschafts-/Gruppenseiten wechseln, die Deine Kontoinformationen teilen oder zu denen Du „Verwalten“-Befugnisse bekommen hast.";
@@ -1032,8 +1035,8 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "Warnung: Es konnte kein Name des Besitzers von der angegebenen Profiladresse gefunden werden.";
 $a->strings["Warning: profile location has no profile photo."] = "Warnung: Es gibt kein Profilbild bei der angegebenen Profiladresse.";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "%d benötigter Parameter wurde an der angegebenen Stelle nicht gefunden",
-	1 => "%d benötigte Parameter wurden an der angegebenen Stelle nicht gefunden",
+    0 => "%d benötigter Parameter wurde an der angegebenen Stelle nicht gefunden",
+    1 => "%d benötigte Parameter wurden an der angegebenen Stelle nicht gefunden",
 );
 $a->strings["Introduction complete."] = "Kontaktanfrage abgeschlossen.";
 $a->strings["Unrecoverable protocol error."] = "Nicht behebbarer Protokollfehler.";
@@ -1064,8 +1067,8 @@ $a->strings["StatusNet/Federated Social Web"] = "StatusNet/Federated Social Web"
 $a->strings[" - please do not use this form.  Instead, enter %s into your Diaspora search bar."] = " - bitte verwende dieses Formular nicht. Stattdessen suche nach %s in Deiner Diaspora Suchleiste.";
 $a->strings["This entry was edited"] = "Dieser Beitrag wurde bearbeitet.";
 $a->strings["%d comment"] = array(
-	0 => "%d Kommentar",
-	1 => "%d Kommentare",
+    0 => "%d Kommentar",
+    1 => "%d Kommentare",
 );
 $a->strings["Private Message"] = "Private Nachricht";
 $a->strings["I like this (toggle)"] = "Ich mag das (toggle)";
@@ -1101,8 +1104,8 @@ $a->strings["to"] = "zu";
 $a->strings["Wall-to-Wall"] = "Wall-to-Wall";
 $a->strings["via Wall-To-Wall:"] = "via Wall-To-Wall:";
 $a->strings["%d contact edited."] = array(
-	0 => "%d Kontakt bearbeitet.",
-	1 => "%d Kontakte bearbeitet.",
+    0 => "%d Kontakt bearbeitet.",
+    1 => "%d Kontakte bearbeitet.",
 );
 $a->strings["Could not access contact record."] = "Konnte nicht auf die Kontaktdaten zugreifen.";
 $a->strings["Could not locate selected profile."] = "Konnte das ausgewählte Profil nicht finden.";
@@ -1898,12 +1901,12 @@ $a->strings["Attempt to execute this update step automatically"] = "Versuchen, d
 $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up an account for you."] = "\nHallo %1\$s,\n\nauf %2\$s wurde ein Account für Dich angelegt.";
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "\nNachfolgend die Anmelde-Details:\n\tAdresse der Seite:\t%1\$s\n\tBenutzername:\t%2\$s\n\tPasswort:\t%3\$s\n\nDu kannst Dein Passwort unter \"Einstellungen\" ändern, sobald Du Dich\nangemeldet hast.\n\nBitte nimm Dir ein paar Minuten um die anderen Einstellungen auf dieser\nSeite zu kontrollieren.\n\nEventuell magst Du ja auch einige Informationen über Dich in Deinem\nProfil veröffentlichen, damit andere Leute Dich einfacher finden können.\nBearbeite hierfür einfach Dein Standard-Profil (über die Profil-Seite).\n\nWir empfehlen Dir, Deinen kompletten Namen anzugeben und ein zu Dir\npassendes Profilbild zu wählen, damit Dich alte Bekannte wieder finden.\nAußerdem ist es nützlich, wenn Du auf Deinem Profil Schlüsselwörter\nangibst. Das erleichtert es, Leute zu finden, die Deine Interessen teilen.\n\nWir respektieren Deine Privatsphäre - keine dieser Angaben ist nötig.\nWenn Du neu im Netzwerk bist und noch niemanden kennst, dann können sie\nallerdings dabei helfen, neue und interessante Kontakte zu knüpfen.\n\nNun viel Spaß, gute Begegnungen und willkommen auf %4\$s.";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "%s Benutzer geblockt/freigegeben",
-	1 => "%s Benutzer geblockt/freigegeben",
+    0 => "%s Benutzer geblockt/freigegeben",
+    1 => "%s Benutzer geblockt/freigegeben",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "%s Nutzer gelöscht",
-	1 => "%s Nutzer gelöscht",
+    0 => "%s Nutzer gelöscht",
+    1 => "%s Nutzer gelöscht",
 );
 $a->strings["User '%s' deleted"] = "Nutzer '%s' gelöscht";
 $a->strings["User '%s' unblocked"] = "Nutzer '%s' entsperrt";

@@ -1,19 +1,21 @@
 <?php
 
-function uexport_init(&$a){
-	if(! local_user())
-		killme();
+function uexport_init(&$a)
+{
+    if (! local_user()) {
+        killme();
+    }
 
-	require_once("mod/settings.php");
-        settings_init($a);
+    require_once("mod/settings.php");
+    settings_init($a);
 }
 
-function uexport_content(&$a){
-
+function uexport_content(&$a)
+{
     if ($a->argc > 1) {
         header("Content-type: application/json");
         header('Content-Disposition: attachment; filename="'.$a->user['nickname'].'.'.$a->argv[1].'"');
-        switch($a->argv[1]) {
+        switch ($a->argv[1]) {
             case "backup": uexport_all($a); killme(); break;
             case "account": uexport_account($a); killme(); break;
             default:
@@ -37,71 +39,75 @@ function uexport_content(&$a){
         '$title' => t('Export personal data'),
         '$options' => $options
     ));
-
-
 }
 
-function _uexport_multirow($query) {
-	$result = array();
-	$r = q($query);
+function _uexport_multirow($query)
+{
+    $result = array();
+    $r = q($query);
 //	if(count($r)) {
-	if ($r){
-		foreach($r as $rr){
+    if ($r) {
+        foreach ($r as $rr) {
             $p = array();
-			foreach($rr as $k => $v)
-				$p[$k] = $v;
+            foreach ($rr as $k => $v) {
+                $p[$k] = $v;
+            }
             $result[] = $p;
         }
-	}
+    }
     return $result;
 }
 
-function _uexport_row($query) {
-	$result = array();
-	$r = q($query);
-	if ($r) {
-		foreach($r as $rr)
-			foreach($rr as $k => $v)
-				$result[$k] = $v;
-
-	}
+function _uexport_row($query)
+{
+    $result = array();
+    $r = q($query);
+    if ($r) {
+        foreach ($r as $rr) {
+            foreach ($rr as $k => $v) {
+                $result[$k] = $v;
+            }
+        }
+    }
     return $result;
 }
 
 
-function uexport_account($a){
+function uexport_account($a)
+{
+    $user = _uexport_row(
+        sprintf("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval(local_user()))
+    );
 
-	$user = _uexport_row(
-        sprintf( "SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval(local_user()) )
-	);
-
-	$contact = _uexport_multirow(
-        sprintf( "SELECT * FROM `contact` WHERE `uid` = %d ",intval(local_user()) )
-	);
+    $contact = _uexport_multirow(
+        sprintf("SELECT * FROM `contact` WHERE `uid` = %d ", intval(local_user()))
+    );
 
 
-	$profile =_uexport_multirow(
-        sprintf( "SELECT * FROM `profile` WHERE `uid` = %d ", intval(local_user()) )
-	);
+    $profile =_uexport_multirow(
+        sprintf("SELECT * FROM `profile` WHERE `uid` = %d ", intval(local_user()))
+    );
 
     $photo = _uexport_multirow(
-        sprintf( "SELECT * FROM `photo` WHERE uid = %d AND profile = 1", intval(local_user()) )
+        sprintf("SELECT * FROM `photo` WHERE uid = %d AND profile = 1", intval(local_user()))
     );
-    foreach ($photo as &$p) $p['data'] = bin2hex($p['data']);
+    foreach ($photo as &$p) {
+        $p['data'] = bin2hex($p['data']);
+    }
 
     $pconfig = _uexport_multirow(
-        sprintf( "SELECT * FROM `pconfig` WHERE uid = %d",intval(local_user()) )
+        sprintf("SELECT * FROM `pconfig` WHERE uid = %d", intval(local_user()))
     );
 
     $group = _uexport_multirow(
-        sprintf( "SELECT * FROM `group` WHERE uid = %d",intval(local_user()) )
+        sprintf("SELECT * FROM `group` WHERE uid = %d", intval(local_user()))
     );
 
     $group_member = _uexport_multirow(
-        sprintf( "SELECT * FROM `group_member` WHERE uid = %d",intval(local_user()) )
+        sprintf("SELECT * FROM `group_member` WHERE uid = %d", intval(local_user()))
     );
 
-	$output = array(
+    $output = array(
         'version' => FRIENDICA_VERSION,
         'schema' => DB_UPDATE_VERSION,
         'baseurl' => $a->get_baseurl(),
@@ -115,41 +121,40 @@ function uexport_account($a){
     );
 
     //echo "<pre>"; var_dump(json_encode($output)); killme();
-	echo json_encode($output);
-
+    echo json_encode($output);
 }
 
 /**
  * echoes account data and items as separated json, one per line
  */
-function uexport_all(&$a) {
+function uexport_all(&$a)
+{
+    uexport_account($a);
+    echo "\n";
 
-	uexport_account($a);
-	echo "\n";
+    $r = q("SELECT count(*) as `total` FROM `item` WHERE `uid` = %d ",
+        intval(local_user())
+    );
+    if (count($r)) {
+        $total = $r[0]['total'];
+    }
 
-	$r = q("SELECT count(*) as `total` FROM `item` WHERE `uid` = %d ",
-		intval(local_user())
-	);
-	if(count($r))
-		$total = $r[0]['total'];
+    // chunk the output to avoid exhausting memory
 
-	// chunk the output to avoid exhausting memory
+    for ($x = 0; $x < $total; $x += 500) {
+        $item = array();
+        $r = q("SELECT * FROM `item` WHERE `uid` = %d LIMIT %d, %d",
+            intval(local_user()),
+            intval($x),
+            intval(500)
+        );
+        /*if(count($r)) {
+            foreach($r as $rr)
+                foreach($rr as $k => $v)
+                    $item[][$k] = $v;
+        }*/
 
-	for($x = 0; $x < $total; $x += 500) {
-		$item = array();
-		$r = q("SELECT * FROM `item` WHERE `uid` = %d LIMIT %d, %d",
-			intval(local_user()),
-			intval($x),
-			intval(500)
-		);
-		/*if(count($r)) {
-			foreach($r as $rr)
-				foreach($rr as $k => $v)
-					$item[][$k] = $v;
-		}*/
-
-		$output = array('item' => $r);
-		echo json_encode($output)."\n";
-	}
-
+        $output = array('item' => $r);
+        echo json_encode($output)."\n";
+    }
 }

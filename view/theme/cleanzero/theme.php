@@ -1,18 +1,19 @@
 <?php
 /*
  * Name: cleanzero
- * Description: Theme with clean design derived from the zero theme family. Including options to set color schemes, font sizes and resizing of images in posts 
+ * Description: Theme with clean design derived from the zero theme family. Including options to set color schemes, font sizes and resizing of images in posts
  * Version:
  * Author: Christian Vogeley (https://christian-vogeley.de/profile/christian)
  */
 
-function cleanzero_init(&$a) {
-$a->theme_info = array(
+function cleanzero_init(&$a)
+{
+    $a->theme_info = array(
   'extends' => 'duepuntozero',
 );
-set_template_engine($a, 'smarty3');
+    set_template_engine($a, 'smarty3');
 
-$a->page['htmlhead'] .= <<< EOT
+    $a->page['htmlhead'] .= <<< EOT
 <script>
 
 function insertFormatting(comment,BBcode,id) {
@@ -106,21 +107,28 @@ EOT;
 // get resize configuration
 
 $resize=false;
-$site_resize = get_config('cleanzero', 'resize' );
-if(local_user()) $resize = get_pconfig(local_user(), 'cleanzero', 'resize' );
+    $site_resize = get_config('cleanzero', 'resize');
+    if (local_user()) {
+        $resize = get_pconfig(local_user(), 'cleanzero', 'resize');
+    }
 
-if ($resize===false) $resize=$site_resize;
-if ($resize===false) $resize=0;
+    if ($resize===false) {
+        $resize=$site_resize;
+    }
+    if ($resize===false) {
+        $resize=0;
+    }
 
-if (intval($resize) > 0) {
-//load jquery.ae.image.resize.js
+    if (intval($resize) > 0) {
+        //load jquery.ae.image.resize.js
 $imageresizeJS = $a->get_baseurl($ssl_state)."/view/theme/cleanzero/js/jquery.ae.image.resize.js";
-$a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" ></script>', $imageresizeJS);
-$a->page['htmlhead'] .= '
+        $a->page['htmlhead'] .= sprintf('<script language="JavaScript" src="%s" ></script>', $imageresizeJS);
+        $a->page['htmlhead'] .= '
 <script>
 
  $(function() {
 	$(".wall-item-content  img").aeImageResize({height: '.$resize.', width: '.$resize.'});
   });
-</script>';}
+</script>';
+    }
 }

@@ -1,12 +1,15 @@
 <?php
 
-if(! function_exists("string_plural_select_zh_cn")) {
-function string_plural_select_zh_cn($n){
-	return 0;;
-}}
+if (! function_exists("string_plural_select_zh_cn")) {
+    function string_plural_select_zh_cn($n)
+    {
+        return 0;
+        ;
+    }
+}
 ;
 $a->strings["%d contact edited."] = array(
-	0 => "%d熟人编辑了",
+    0 => "%d熟人编辑了",
 );
 $a->strings["Could not access contact record."] = "用不了熟人记录。";
 $a->strings["Could not locate selected profile."] = "找不到选择的简介。";
@@ -33,7 +36,7 @@ $a->strings["(Update was not successful)"] = "(更新不成功)";
 $a->strings["Suggest friends"] = "建议朋友们";
 $a->strings["Network type: %s"] = "网络种类: %s";
 $a->strings["%d contact in common"] = array(
-	0 => "%d共同熟人",
+    0 => "%d共同熟人",
 );
 $a->strings["View all contacts"] = "看所有的熟人";
 $a->strings["Unblock"] = "不拦";
@@ -350,7 +353,7 @@ $a->strings["%s and You"] = "%s和您";
 $a->strings["Delete conversation"] = "删除交谈";
 $a->strings["D, d M Y - g:i A"] = "D, d M Y - g:i A";
 $a->strings["%d message"] = array(
-	0 => "%d通知",
+    0 => "%d通知",
 );
 $a->strings["Message not available."] = "通信不可用的";
 $a->strings["Delete message"] = "删除消息";
@@ -565,10 +568,10 @@ $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up 
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "注册信息为%s";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "%s用户拦／不拦了",
+    0 => "%s用户拦／不拦了",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "%s用户删除了",
+    0 => "%s用户删除了",
 );
 $a->strings["User '%s' deleted"] = "用户「%s」删除了";
 $a->strings["User '%s' unblocked"] = "用户「%s」无拦了";
@@ -633,7 +636,7 @@ $a->strings["Interesting Links"] = "有意思的超链接";
 $a->strings["Starred"] = "被星";
 $a->strings["Favourite Posts"] = "最喜欢的文章";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "警告：这个组bao han%s成员从不安全网络。",
+    0 => "警告：这个组bao han%s成员从不安全网络。",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "私人通信给这组回被公开。";
 $a->strings["No such group"] = "没有这个组";
@@ -669,10 +672,10 @@ $a->strings["View %s's profile @ %s"] = "看%s的简介@ %s";
 $a->strings["%s from %s"] = "%s从%s";
 $a->strings["View in context"] = "看在上下文";
 $a->strings["%d comment"] = array(
-	0 => "%d评论",
+    0 => "%d评论",
 );
 $a->strings["comment"] = array(
-	0 => "评论",
+    0 => "评论",
 );
 $a->strings["show more"] = "看多";
 $a->strings["Private Message"] = "私人的新闻";
@@ -949,7 +952,7 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "警告：简介位置没有可设别的主名。";
 $a->strings["Warning: profile location has no profile photo."] = "警告：简介位置没有简介图。";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "%d需要的参数没找到在输入的位置。",
+    0 => "%d需要的参数没找到在输入的位置。",
 );
 $a->strings["Introduction complete."] = "介绍完成的。";
 $a->strings["Unrecoverable protocol error."] = "不能恢复的协议错误";
@@ -1167,7 +1170,7 @@ $a->strings["Please join us on Friendica"] = "请加入我们再Friendica";
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "邀请限超过了。请联系您的网站管理员。";
 $a->strings["%s : Message delivery failed."] = "%s : 送消息失败了。";
 $a->strings["%d message sent."] = array(
-	0 => "%d消息传送了。",
+    0 => "%d消息传送了。",
 );
 $a->strings["You have no more invitations available"] = "您没有别的邀请";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "参观%s看一单公开网站您会加入。Friendica成员在别的网站都会互相连接，再跟很多别的社会网络。";
@@ -1288,7 +1291,7 @@ $a->strings["Add New Contact"] = "增添新的熟人";
 $a->strings["Enter address or web location"] = "输入地址或网位置";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "比如：li@example.com, http://example.com/li";
 $a->strings["%d invitation available"] = array(
-	0 => "%d邀请可用的",
+    0 => "%d邀请可用的",
 );
 $a->strings["Find People"] = "找人物";
 $a->strings["Enter name or interest"] = "输入名字或兴趣";
@@ -1436,7 +1439,7 @@ $a->strings["last"] = "最后";
 $a->strings["next"] = "下个";
 $a->strings["No contacts"] = "没有熟人";
 $a->strings["%d Contact"] = array(
-	0 => "%d熟人",
+    0 => "%d熟人",
 );
 $a->strings["poke"] = "戳";
 $a->strings["ping"] = "砰";
@@ -1739,7 +1742,7 @@ $a->strings["User '%s' already exists on this server!"] = "用户「%s」已经�
 $a->strings["User creation error"] = "用户创造错误";
 $a->strings["User profile creation error"] = "用户简介创造错误";
 $a->strings["%d contact not imported"] = array(
-	0 => "%d熟人没进口了",
+    0 => "%d熟人没进口了",
 );
 $a->strings["Done. You can now login with your username and password"] = "完了。您现在会用您用户名和密码登录";
 $a->strings["toggle mobile"] = "交替手机";

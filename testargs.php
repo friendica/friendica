@@ -15,7 +15,8 @@
  */
 
 
-if(($_SERVER["argc"] > 1) && isset($_SERVER["argv"][1]))
-	echo $_SERVER["argv"][1];
-else
-	echo '';
+if (($_SERVER["argc"] > 1) && isset($_SERVER["argv"][1])) {
+    echo $_SERVER["argv"][1];
+} else {
+    echo '';
+}

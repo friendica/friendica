@@ -9,10 +9,11 @@
  */
 
 
-function testbubble_init(&$a) {
-set_template_engine($a, 'smarty3');
+function testbubble_init(&$a)
+{
+    set_template_engine($a, 'smarty3');
 
-$a->page['htmlhead'] .= <<< EOT
+    $a->page['htmlhead'] .= <<< EOT
 <script>
 $(document).ready(function() {
 

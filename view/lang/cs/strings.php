@@ -1,14 +1,17 @@
 <?php
 
-if(! function_exists("string_plural_select_cs")) {
-function string_plural_select_cs($n){
-	return ($n==1) ? 0 : ($n>=2 && $n<=4) ? 1 : 2;;
-}}
+if (! function_exists("string_plural_select_cs")) {
+    function string_plural_select_cs($n)
+    {
+        return ($n==1) ? 0 : ($n>=2 && $n<=4) ? 1 : 2;
+        ;
+    }
+}
 ;
 $a->strings["%d contact edited."] = array(
-	0 => "%d kontakt upraven.",
-	1 => "%d kontakty upraveny",
-	2 => "%d kontaktů upraveno",
+    0 => "%d kontakt upraven.",
+    1 => "%d kontakty upraveny",
+    2 => "%d kontaktů upraveno",
 );
 $a->strings["Could not access contact record."] = "Nelze získat přístup k záznamu kontaktu.";
 $a->strings["Could not locate selected profile."] = "Nelze nalézt vybraný profil.";
@@ -35,9 +38,9 @@ $a->strings["(Update was not successful)"] = "(Aktualizace nebyla úspěšná)";
 $a->strings["Suggest friends"] = "Navrhněte přátelé";
 $a->strings["Network type: %s"] = "Typ sítě: %s";
 $a->strings["%d contact in common"] = array(
-	0 => "%d sdílený kontakt",
-	1 => "%d sdílených kontaktů",
-	2 => "%d sdílených kontaktů",
+    0 => "%d sdílený kontakt",
+    1 => "%d sdílených kontaktů",
+    2 => "%d sdílených kontaktů",
 );
 $a->strings["View all contacts"] = "Zobrazit všechny kontakty";
 $a->strings["Unblock"] = "Odblokovat";
@@ -363,9 +366,9 @@ $a->strings["%s and You"] = "%s a Vy";
 $a->strings["Delete conversation"] = "Odstranit konverzaci";
 $a->strings["D, d M Y - g:i A"] = "D M R - g:i A";
 $a->strings["%d message"] = array(
-	0 => "%d zpráva",
-	1 => "%d zprávy",
-	2 => "%d zpráv",
+    0 => "%d zpráva",
+    1 => "%d zprávy",
+    2 => "%d zpráv",
 );
 $a->strings["Message not available."] = "Zpráva není k dispozici.";
 $a->strings["Delete message"] = "Smazat zprávu";
@@ -617,14 +620,14 @@ $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up 
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "\n\t\t\tVaše přihlašovací údaje jsou následující:\n\n\t\t\tAdresa webu: \t%1\$s\n\t\t\tpřihlašovací jméno:\t\t%2\$s\n\t\t\theslo:\t\t%3\$s\n\n\t\t\tHeslo si můžete změnit na stránce \"Nastavení\" vašeho účtu poté, co se přihlásíte.\n\n\t\t\tProsím věnujte pár chvil revizi dalšího nastavení vašeho účtu na dané stránce.\n\n\t\t\tTaké su můžete přidat nějaké základní informace do svého výchozího profilu (na stránce \"Profily\"), takže ostatní lidé vás snáze najdou. \n\n\t\t\tDoporučujeme Vám uvést celé jméno a i foto. Přidáním nějakých \"klíčových slov\" (velmi užitečné pro hledání nových přátel) a možná také zemi, ve které žijete, pokud nechcete být více konkrétní.\n\n\t\t\tPlně resepktujeme vaše právo na soukromí a nic z výše uvedeného není povinné. Pokud jste zde nový a neznáte zde nikoho, uvedením daných informací můžete získat nové přátele.\n\n\t\t\tDíky a vítejte na %4\$s.";
 $a->strings["Registration details for %s"] = "Registrační údaje pro %s";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "%s uživatel blokován/odblokován",
-	1 => "%s uživatelů blokováno/odblokováno",
-	2 => "%s uživatelů blokováno/odblokováno",
+    0 => "%s uživatel blokován/odblokován",
+    1 => "%s uživatelů blokováno/odblokováno",
+    2 => "%s uživatelů blokováno/odblokováno",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "%s uživatel smazán",
-	1 => "%s uživatelů smazáno",
-	2 => "%s uživatelů smazáno",
+    0 => "%s uživatel smazán",
+    1 => "%s uživatelů smazáno",
+    2 => "%s uživatelů smazáno",
 );
 $a->strings["User '%s' deleted"] = "Uživatel '%s' smazán";
 $a->strings["User '%s' unblocked"] = "Uživatel '%s' odblokován";
@@ -689,9 +692,9 @@ $a->strings["Interesting Links"] = "Zajímavé odkazy";
 $a->strings["Starred"] = "S hvězdičkou";
 $a->strings["Favourite Posts"] = "Oblíbené přízpěvky";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "Upozornění: Tato skupina obsahuje %s člena z nezabezpečené sítě.",
-	1 => "Upozornění: Tato skupina obsahuje %s členy z nezabezpečené sítě.",
-	2 => "Upozornění: Tato skupina obsahuje %s členy z nezabezpečené sítě.",
+    0 => "Upozornění: Tato skupina obsahuje %s člena z nezabezpečené sítě.",
+    1 => "Upozornění: Tato skupina obsahuje %s členy z nezabezpečené sítě.",
+    2 => "Upozornění: Tato skupina obsahuje %s členy z nezabezpečené sítě.",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "Soukromé zprávy této skupině jsou vystaveny riziku prozrazení.";
 $a->strings["No such group"] = "Žádná taková skupina";
@@ -727,14 +730,14 @@ $a->strings["View %s's profile @ %s"] = "Zobrazit profil uživatele %s na %s";
 $a->strings["%s from %s"] = "%s od %s";
 $a->strings["View in context"] = "Pohled v kontextu";
 $a->strings["%d comment"] = array(
-	0 => "%d komentář",
-	1 => "%d komentářů",
-	2 => "%d komentářů",
+    0 => "%d komentář",
+    1 => "%d komentářů",
+    2 => "%d komentářů",
 );
 $a->strings["comment"] = array(
-	0 => "",
-	1 => "",
-	2 => "komentář",
+    0 => "",
+    1 => "",
+    2 => "komentář",
 );
 $a->strings["show more"] = "zobrazit více";
 $a->strings["Private Message"] = "Soukromá zpráva";
@@ -1019,9 +1022,9 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "Varování: umístění profilu nemá žádné identifikovatelné jméno vlastníka";
 $a->strings["Warning: profile location has no profile photo."] = "Varování: umístění profilu nemá žádnou profilovou fotografii.";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "%d požadovaný parametr nebyl nalezen na daném místě",
-	1 => "%d požadované parametry nebyly nalezeny na daném místě",
-	2 => "%d požadované parametry nebyly nalezeny na daném místě",
+    0 => "%d požadovaný parametr nebyl nalezen na daném místě",
+    1 => "%d požadované parametry nebyly nalezeny na daném místě",
+    2 => "%d požadované parametry nebyly nalezeny na daném místě",
 );
 $a->strings["Introduction complete."] = "Představení dokončeno.";
 $a->strings["Unrecoverable protocol error."] = "Neopravitelná chyba protokolu";
@@ -1236,9 +1239,9 @@ $a->strings["Please join us on Friendica"] = "Prosím přidejte se k nám na Fri
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "Limit pozvánek byl překročen. Prosím kontaktujte vašeho administrátora webu.";
 $a->strings["%s : Message delivery failed."] = "%s : Doručení zprávy se nezdařilo.";
 $a->strings["%d message sent."] = array(
-	0 => "%d zpráva odeslána.",
-	1 => "%d zprávy odeslány.",
-	2 => "%d zprávy odeslány.",
+    0 => "%d zpráva odeslána.",
+    1 => "%d zprávy odeslány.",
+    2 => "%d zprávy odeslány.",
 );
 $a->strings["You have no more invitations available"] = "Nemáte k dispozici žádné další pozvánky";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Navštivte %s pro seznam veřejných serverů, na kterých se můžete přidat. Členové Friendica se mohou navzájem propojovat, stejně tak jako se mohou přiopojit se členy mnoha dalších sociálních sítí.";
@@ -1340,9 +1343,9 @@ $a->strings["Add New Contact"] = "Přidat nový kontakt";
 $a->strings["Enter address or web location"] = "Zadejte adresu nebo umístění webu";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Příklad: jan@příklad.cz, http://příklad.cz/jana";
 $a->strings["%d invitation available"] = array(
-	0 => "Pozvánka %d k dispozici",
-	1 => "Pozvánky %d k dispozici",
-	2 => "Pozvánky %d k dispozici",
+    0 => "Pozvánka %d k dispozici",
+    1 => "Pozvánky %d k dispozici",
+    2 => "Pozvánky %d k dispozici",
 );
 $a->strings["Find People"] = "Nalézt lidi";
 $a->strings["Enter name or interest"] = "Zadejte jméno nebo zájmy";
@@ -1527,9 +1530,9 @@ $a->strings["Loading more entries..."] = "Načítání více záznamů...";
 $a->strings["The end"] = "Konec";
 $a->strings["No contacts"] = "Žádné kontakty";
 $a->strings["%d Contact"] = array(
-	0 => "%d kontakt",
-	1 => "%d kontaktů",
-	2 => "%d kontaktů",
+    0 => "%d kontakt",
+    1 => "%d kontaktů",
+    2 => "%d kontaktů",
 );
 $a->strings["Full Text"] = "Celý text";
 $a->strings["Tags"] = "Štítky:";
@@ -1822,9 +1825,9 @@ $a->strings["User '%s' already exists on this server!"] = "Uživatel '%s' již n
 $a->strings["User creation error"] = "Chyba vytváření uživatele";
 $a->strings["User profile creation error"] = "Chyba vytváření uživatelského účtu";
 $a->strings["%d contact not imported"] = array(
-	0 => "%d kontakt nenaimporován",
-	1 => "%d kontaktů nenaimporováno",
-	2 => "%d kontakty nenaimporovány",
+    0 => "%d kontakt nenaimporován",
+    1 => "%d kontaktů nenaimporováno",
+    2 => "%d kontakty nenaimporovány",
 );
 $a->strings["Done. You can now login with your username and password"] = "Hotovo. Nyní  se můžete přihlásit se svými uživatelským účtem a heslem";
 $a->strings["toggle mobile"] = "přepnout mobil";

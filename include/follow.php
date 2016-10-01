@@ -3,52 +3,58 @@ require_once("include/Scrape.php");
 require_once("include/socgraph.php");
 require_once('include/group.php');
 
-function update_contact($id) {
-	/*
-	Warning: Never ever fetch the public key via probe_url and write it into the contacts.
-	This will reliably kill your communication with Friendica contacts.
-	*/
+function update_contact($id)
+{
+    /*
+    Warning: Never ever fetch the public key via probe_url and write it into the contacts.
+    This will reliably kill your communication with Friendica contacts.
+    */
 
-	$r = q("SELECT `url`, `nurl`, `addr`, `alias`, `batch`, `notify`, `poll`, `poco`, `network` FROM `contact` WHERE `id` = %d", intval($id));
-	if (!$r)
-		return false;
+    $r = q("SELECT `url`, `nurl`, `addr`, `alias`, `batch`, `notify`, `poll`, `poco`, `network` FROM `contact` WHERE `id` = %d", intval($id));
+    if (!$r) {
+        return false;
+    }
 
-	$ret = probe_url($r[0]["url"]);
+    $ret = probe_url($r[0]["url"]);
 
-	// If probe_url fails the network code will be different
-	if ($ret["network"] != $r[0]["network"])
-		return false;
+    // If probe_url fails the network code will be different
+    if ($ret["network"] != $r[0]["network"]) {
+        return false;
+    }
 
-	$update = false;
+    $update = false;
 
-	// make sure to not overwrite existing values with blank entries
-	foreach ($ret AS $key => $val) {
-		if (isset($r[0][$key]) AND ($r[0][$key] != "") AND ($val == ""))
-			$ret[$key] = $r[0][$key];
+    // make sure to not overwrite existing values with blank entries
+    foreach ($ret as $key => $val) {
+        if (isset($r[0][$key]) and ($r[0][$key] != "") and ($val == "")) {
+            $ret[$key] = $r[0][$key];
+        }
 
-		if (isset($r[0][$key]) AND ($ret[$key] != $r[0][$key]))
-			$update = true;
-	}
+        if (isset($r[0][$key]) and ($ret[$key] != $r[0][$key])) {
+            $update = true;
+        }
+    }
 
-	if (!$update)
-		return true;
+    if (!$update) {
+        return true;
+    }
 
-	q("UPDATE `contact` SET `url` = '%s', `nurl` = '%s', `addr` = '%s', `alias` = '%s', `batch` = '%s', `notify` = '%s', `poll` = '%s', `poco` = '%s' WHERE `id` = %d",
-		dbesc($ret['url']),
-		dbesc(normalise_link($ret['url'])),
-		dbesc($ret['addr']),
-		dbesc($ret['alias']),
-		dbesc($ret['batch']),
-		dbesc($ret['notify']),
-		dbesc($ret['poll']),
-		dbesc($ret['poco']),
-		intval($id)
-	);
+    q("UPDATE `contact` SET `url` = '%s', `nurl` = '%s', `addr` = '%s', `alias` = '%s', `batch` = '%s', `notify` = '%s', `poll` = '%s', `poco` = '%s' WHERE `id` = %d",
+        dbesc($ret['url']),
+        dbesc(normalise_link($ret['url'])),
+        dbesc($ret['addr']),
+        dbesc($ret['alias']),
+        dbesc($ret['batch']),
+        dbesc($ret['notify']),
+        dbesc($ret['poll']),
+        dbesc($ret['poco']),
+        intval($id)
+    );
 
-	// Update the corresponding gcontact entry
-	poco_last_updated($ret["url"]);
+    // Update the corresponding gcontact entry
+    poco_last_updated($ret["url"]);
 
-	return true;
+    return true;
 }
 
 //
@@ -63,250 +69,260 @@ function update_contact($id) {
 
 
 
-function new_contact($uid,$url,$interactive = false) {
+function new_contact($uid, $url, $interactive = false)
+{
+    $result = array('cid' => -1, 'success' => false,'message' => '');
 
-	$result = array('cid' => -1, 'success' => false,'message' => '');
+    $a = get_app();
 
-	$a = get_app();
+    // remove ajax junk, e.g. Twitter
 
-	// remove ajax junk, e.g. Twitter
+    $url = str_replace('/#!/', '/', $url);
 
-	$url = str_replace('/#!/','/',$url);
+    if (! allowed_url($url)) {
+        $result['message'] = t('Disallowed profile URL.');
+        return $result;
+    }
 
-	if(! allowed_url($url)) {
-		$result['message'] = t('Disallowed profile URL.');
-		return $result;
-	}
+    if (! $url) {
+        $result['message'] = t('Connect URL missing.');
+        return $result;
+    }
 
-	if(! $url) {
-		$result['message'] = t('Connect URL missing.');
-		return $result;
-	}
+    $arr = array('url' => $url, 'contact' => array());
 
-	$arr = array('url' => $url, 'contact' => array());
+    call_hooks('follow', $arr);
 
-	call_hooks('follow', $arr);
+    if (x($arr['contact'], 'name')) {
+        $ret = $arr['contact'];
+    } else {
+        $ret = probe_url($url);
+    }
 
-	if(x($arr['contact'],'name'))
-		$ret = $arr['contact'];
-	else
-		$ret = probe_url($url);
+    if ($ret['network'] === NETWORK_DFRN) {
+        if ($interactive) {
+            if (strlen($a->path)) {
+                $myaddr = bin2hex($a->get_baseurl() . '/profile/' . $a->user['nickname']);
+            } else {
+                $myaddr = bin2hex($a->user['nickname'] . '@' . $a->get_hostname());
+            }
 
-	if($ret['network'] === NETWORK_DFRN) {
-		if($interactive) {
-			if(strlen($a->path))
-				$myaddr = bin2hex($a->get_baseurl() . '/profile/' . $a->user['nickname']);
-			else
-				$myaddr = bin2hex($a->user['nickname'] . '@' . $a->get_hostname());
+            goaway($ret['request'] . "&addr=$myaddr");
 
-			goaway($ret['request'] . "&addr=$myaddr");
-
-			// NOTREACHED
-		}
-	}
-	else {
-		if(get_config('system','dfrn_only')) {
-			$result['message'] = t('This site is not configured to allow communications with other networks.') . EOL;
-			$result['message'] != t('No compatible communication protocols or feeds were discovered.') . EOL;
-			return $result;
-		}
-	}
-
-
-
-
-
-
-	// This extra param just confuses things, remove it
-	if($ret['network'] === NETWORK_DIASPORA)
-		$ret['url'] = str_replace('?absolute=true','',$ret['url']);
-
-
-	// do we have enough information?
-
-	if(! ((x($ret,'name')) && (x($ret,'poll')) && ((x($ret,'url')) || (x($ret,'addr'))))) {
-		$result['message'] .=  t('The profile address specified does not provide adequate information.') . EOL;
-		if(! x($ret,'poll'))
-			$result['message'] .= t('No compatible communication protocols or feeds were discovered.') . EOL;
-		if(! x($ret,'name'))
-			$result['message'] .=  t('An author or name was not found.') . EOL;
-		if(! x($ret,'url'))
-			$result['message'] .=  t('No browser URL could be matched to this address.') . EOL;
-		if(strpos($url,'@') !== false) {
-			$result['message'] .=  t('Unable to match @-style Identity Address with a known protocol or email contact.') . EOL;
-			$result['message'] .=  t('Use mailto: in front of address to force email check.') . EOL;
-		}
-		return $result;
-	}
-
-	if($ret['network'] === NETWORK_OSTATUS && get_config('system','ostatus_disabled')) {
-		$result['message'] .= t('The profile address specified belongs to a network which has been disabled on this site.') . EOL;
-		$ret['notify'] = '';
-	}
+            // NOTREACHED
+        }
+    } else {
+        if (get_config('system', 'dfrn_only')) {
+            $result['message'] = t('This site is not configured to allow communications with other networks.') . EOL;
+            $result['message'] != t('No compatible communication protocols or feeds were discovered.') . EOL;
+            return $result;
+        }
+    }
 
 
 
 
 
 
-	if(! $ret['notify']) {
-		$result['message'] .=  t('Limited profile. This person will be unable to receive direct/personal notifications from you.') . EOL;
-	}
-
-	$writeable = ((($ret['network'] === NETWORK_OSTATUS) && ($ret['notify'])) ? 1 : 0);
-
-	$subhub = (($ret['network'] === NETWORK_OSTATUS) ? true : false);
-
-	$hidden = (($ret['network'] === NETWORK_MAIL) ? 1 : 0);
-
-	if(in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA)))
-		$writeable = 1;
-
-	// check if we already have a contact
-	// the poll url is more reliable than the profile url, as we may have
-	// indirect links or webfinger links
-
-	$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `poll` IN ('%s', '%s') AND `network` = '%s' LIMIT 1",
-		intval($uid),
-		dbesc($ret['poll']),
-		dbesc(normalise_link($ret['poll'])),
-		dbesc($ret['network'])
-	);
-
-	if(!count($r))
-		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` = '%s' LIMIT 1",
-			intval($uid), dbesc(normalise_link($url)), dbesc($ret['network'])
-	);
-
-	if(count($r)) {
-		// update contact
-		if($r[0]['rel'] == CONTACT_IS_FOLLOWER || ($network === NETWORK_DIASPORA && $r[0]['rel'] == CONTACT_IS_SHARING)) {
-			q("UPDATE `contact` SET `rel` = %d , `subhub` = %d, `readonly` = 0 WHERE `id` = %d AND `uid` = %d",
-				intval(CONTACT_IS_FRIEND),
-				intval($subhub),
-				intval($r[0]['id']),
-				intval($uid)
-			);
-		}
-	} else {
+    // This extra param just confuses things, remove it
+    if ($ret['network'] === NETWORK_DIASPORA) {
+        $ret['url'] = str_replace('?absolute=true', '', $ret['url']);
+    }
 
 
-		// check service class limits
+    // do we have enough information?
 
-		$r = q("select count(*) as total from contact where uid = %d and pending = 0 and self = 0",
-			intval($uid)
-		);
-		if(count($r))
-			$total_contacts = $r[0]['total'];
+    if (! ((x($ret, 'name')) && (x($ret, 'poll')) && ((x($ret, 'url')) || (x($ret, 'addr'))))) {
+        $result['message'] .=  t('The profile address specified does not provide adequate information.') . EOL;
+        if (! x($ret, 'poll')) {
+            $result['message'] .= t('No compatible communication protocols or feeds were discovered.') . EOL;
+        }
+        if (! x($ret, 'name')) {
+            $result['message'] .=  t('An author or name was not found.') . EOL;
+        }
+        if (! x($ret, 'url')) {
+            $result['message'] .=  t('No browser URL could be matched to this address.') . EOL;
+        }
+        if (strpos($url, '@') !== false) {
+            $result['message'] .=  t('Unable to match @-style Identity Address with a known protocol or email contact.') . EOL;
+            $result['message'] .=  t('Use mailto: in front of address to force email check.') . EOL;
+        }
+        return $result;
+    }
 
-		if(! service_class_allows($uid,'total_contacts',$total_contacts)) {
-			$result['message'] .= upgrade_message();
-			return $result;
-		}
+    if ($ret['network'] === NETWORK_OSTATUS && get_config('system', 'ostatus_disabled')) {
+        $result['message'] .= t('The profile address specified belongs to a network which has been disabled on this site.') . EOL;
+        $ret['notify'] = '';
+    }
 
-		$r = q("select count(network) as total from contact where uid = %d and network = '%s' and pending = 0 and self = 0",
-			intval($uid),
-			dbesc($network)
-		);
-		if(count($r))
-			$total_network = $r[0]['total'];
 
-		if(! service_class_allows($uid,'total_contacts_' . $network,$total_network)) {
-			$result['message'] .= upgrade_message();
-			return $result;
-		}
 
-		$new_relation = ((in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA))) ? CONTACT_IS_FRIEND : CONTACT_IS_SHARING);
 
-		// create contact record
-		$r = q("INSERT INTO `contact` ( `uid`, `created`, `url`, `nurl`, `addr`, `alias`, `batch`, `notify`, `poll`, `poco`, `name`, `nick`, `network`, `pubkey`, `rel`, `priority`,
+
+
+    if (! $ret['notify']) {
+        $result['message'] .=  t('Limited profile. This person will be unable to receive direct/personal notifications from you.') . EOL;
+    }
+
+    $writeable = ((($ret['network'] === NETWORK_OSTATUS) && ($ret['notify'])) ? 1 : 0);
+
+    $subhub = (($ret['network'] === NETWORK_OSTATUS) ? true : false);
+
+    $hidden = (($ret['network'] === NETWORK_MAIL) ? 1 : 0);
+
+    if (in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA))) {
+        $writeable = 1;
+    }
+
+    // check if we already have a contact
+    // the poll url is more reliable than the profile url, as we may have
+    // indirect links or webfinger links
+
+    $r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `poll` IN ('%s', '%s') AND `network` = '%s' LIMIT 1",
+        intval($uid),
+        dbesc($ret['poll']),
+        dbesc(normalise_link($ret['poll'])),
+        dbesc($ret['network'])
+    );
+
+    if (!count($r)) {
+        $r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` = '%s' LIMIT 1",
+            intval($uid), dbesc(normalise_link($url)), dbesc($ret['network'])
+    );
+    }
+
+    if (count($r)) {
+        // update contact
+        if ($r[0]['rel'] == CONTACT_IS_FOLLOWER || ($network === NETWORK_DIASPORA && $r[0]['rel'] == CONTACT_IS_SHARING)) {
+            q("UPDATE `contact` SET `rel` = %d , `subhub` = %d, `readonly` = 0 WHERE `id` = %d AND `uid` = %d",
+                intval(CONTACT_IS_FRIEND),
+                intval($subhub),
+                intval($r[0]['id']),
+                intval($uid)
+            );
+        }
+    } else {
+
+
+        // check service class limits
+
+        $r = q("select count(*) as total from contact where uid = %d and pending = 0 and self = 0",
+            intval($uid)
+        );
+        if (count($r)) {
+            $total_contacts = $r[0]['total'];
+        }
+
+        if (! service_class_allows($uid, 'total_contacts', $total_contacts)) {
+            $result['message'] .= upgrade_message();
+            return $result;
+        }
+
+        $r = q("select count(network) as total from contact where uid = %d and network = '%s' and pending = 0 and self = 0",
+            intval($uid),
+            dbesc($network)
+        );
+        if (count($r)) {
+            $total_network = $r[0]['total'];
+        }
+
+        if (! service_class_allows($uid, 'total_contacts_' . $network, $total_network)) {
+            $result['message'] .= upgrade_message();
+            return $result;
+        }
+
+        $new_relation = ((in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA))) ? CONTACT_IS_FRIEND : CONTACT_IS_SHARING);
+
+        // create contact record
+        $r = q("INSERT INTO `contact` ( `uid`, `created`, `url`, `nurl`, `addr`, `alias`, `batch`, `notify`, `poll`, `poco`, `name`, `nick`, `network`, `pubkey`, `rel`, `priority`,
 			`writable`, `hidden`, `blocked`, `readonly`, `pending`, `subhub` )
 			VALUES ( %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, 0, 0, 0, %d ) ",
-			intval($uid),
-			dbesc(datetime_convert()),
-			dbesc($ret['url']),
-			dbesc(normalise_link($ret['url'])),
-			dbesc($ret['addr']),
-			dbesc($ret['alias']),
-			dbesc($ret['batch']),
-			dbesc($ret['notify']),
-			dbesc($ret['poll']),
-			dbesc($ret['poco']),
-			dbesc($ret['name']),
-			dbesc($ret['nick']),
-			dbesc($ret['network']),
-			dbesc($ret['pubkey']),
-			intval($new_relation),
-			intval($ret['priority']),
-			intval($writeable),
-			intval($hidden),
-			intval($subhub)
-		);
-	}
+            intval($uid),
+            dbesc(datetime_convert()),
+            dbesc($ret['url']),
+            dbesc(normalise_link($ret['url'])),
+            dbesc($ret['addr']),
+            dbesc($ret['alias']),
+            dbesc($ret['batch']),
+            dbesc($ret['notify']),
+            dbesc($ret['poll']),
+            dbesc($ret['poco']),
+            dbesc($ret['name']),
+            dbesc($ret['nick']),
+            dbesc($ret['network']),
+            dbesc($ret['pubkey']),
+            intval($new_relation),
+            intval($ret['priority']),
+            intval($writeable),
+            intval($hidden),
+            intval($subhub)
+        );
+    }
 
-	$r = q("SELECT * FROM `contact` WHERE `url` = '%s' AND `network` = '%s' AND `uid` = %d LIMIT 1",
-		dbesc($ret['url']),
-		dbesc($ret['network']),
-		intval($uid)
-	);
+    $r = q("SELECT * FROM `contact` WHERE `url` = '%s' AND `network` = '%s' AND `uid` = %d LIMIT 1",
+        dbesc($ret['url']),
+        dbesc($ret['network']),
+        intval($uid)
+    );
 
-	if(! count($r)) {
-		$result['message'] .=  t('Unable to retrieve contact information.') . EOL;
-		return $result;
-	}
+    if (! count($r)) {
+        $result['message'] .=  t('Unable to retrieve contact information.') . EOL;
+        return $result;
+    }
 
-	$contact = $r[0];
-	$contact_id  = $r[0]['id'];
-	$result['cid'] = $contact_id;
+    $contact = $r[0];
+    $contact_id  = $r[0]['id'];
+    $result['cid'] = $contact_id;
 
-	$def_gid = get_default_group($uid, $contact["network"]);
-	if (intval($def_gid))
-		group_add_member($uid, '', $contact_id, $def_gid);
+    $def_gid = get_default_group($uid, $contact["network"]);
+    if (intval($def_gid)) {
+        group_add_member($uid, '', $contact_id, $def_gid);
+    }
 
-	require_once("include/Photo.php");
+    require_once("include/Photo.php");
 
-	// Update the avatar
-	update_contact_avatar($ret['photo'],$uid,$contact_id);
+    // Update the avatar
+    update_contact_avatar($ret['photo'], $uid, $contact_id);
 
-	// pull feed and consume it, which should subscribe to the hub.
+    // pull feed and consume it, which should subscribe to the hub.
 
-	proc_run(PRIORITY_MEDIUM, "include/onepoll.php", $contact_id, "force");
+    proc_run(PRIORITY_MEDIUM, "include/onepoll.php", $contact_id, "force");
 
-	// create a follow slap
+    // create a follow slap
 
-	$tpl = get_markup_template('follow_slap.tpl');
-	$slap = replace_macros($tpl, array(
-		'$name' => $a->user['username'],
-		'$profile_page' => $a->get_baseurl() . '/profile/' . $a->user['nickname'],
-		'$photo' => $a->contact['photo'],
-		'$thumb' => $a->contact['thumb'],
-		'$published' => datetime_convert('UTC','UTC', 'now', ATOM_TIME),
-		'$item_id' => 'urn:X-dfrn:' . $a->get_hostname() . ':follow:' . get_guid(32),
-		'$title' => '',
-		'$type' => 'text',
-		'$content' => t('following'),
-		'$nick' => $a->user['nickname'],
-		'$verb' => ACTIVITY_FOLLOW,
-		'$ostat_follow' => ''
-	));
+    $tpl = get_markup_template('follow_slap.tpl');
+    $slap = replace_macros($tpl, array(
+        '$name' => $a->user['username'],
+        '$profile_page' => $a->get_baseurl() . '/profile/' . $a->user['nickname'],
+        '$photo' => $a->contact['photo'],
+        '$thumb' => $a->contact['thumb'],
+        '$published' => datetime_convert('UTC', 'UTC', 'now', ATOM_TIME),
+        '$item_id' => 'urn:X-dfrn:' . $a->get_hostname() . ':follow:' . get_guid(32),
+        '$title' => '',
+        '$type' => 'text',
+        '$content' => t('following'),
+        '$nick' => $a->user['nickname'],
+        '$verb' => ACTIVITY_FOLLOW,
+        '$ostat_follow' => ''
+    ));
 
-	$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
+    $r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
 			WHERE `user`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
-			intval($uid)
-	);
+            intval($uid)
+    );
 
-	if(count($r)) {
-		if(($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
-			require_once('include/salmon.php');
-			slapper($r[0],$contact['notify'],$slap);
-		}
-		if($contact['network'] == NETWORK_DIASPORA) {
-			require_once('include/diaspora.php');
-			$ret = diaspora::send_share($a->user,$contact);
-			logger('share returns: '.$ret);
-		}
-	}
+    if (count($r)) {
+        if (($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
+            require_once('include/salmon.php');
+            slapper($r[0], $contact['notify'], $slap);
+        }
+        if ($contact['network'] == NETWORK_DIASPORA) {
+            require_once('include/diaspora.php');
+            $ret = diaspora::send_share($a->user, $contact);
+            logger('share returns: '.$ret);
+        }
+    }
 
-	$result['success'] = true;
-	return $result;
+    $result['success'] = true;
+    return $result;
 }

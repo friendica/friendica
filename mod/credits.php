@@ -5,16 +5,17 @@
  * addons repository will be listed though ATM)
  */
 
-function credits_content (&$a) {
+function credits_content(&$a)
+{
     /* fill the page with credits */
-    $f = fopen('util/credits.txt','r');
+    $f = fopen('util/credits.txt', 'r');
     $names = fread($f, filesize('util/credits.txt'));
     $arr = explode("\n", htmlspecialchars($names));
     fclose($f);
     $tpl = get_markup_template('credits.tpl');
-    return replace_macros( $tpl, array(
-       '$title'		=> t('Credits'),
-       '$thanks'		=> t('Friendica is a community project, that would not be possible without the help of many people. Here is a list of those who have contributed to the code or the translation of Friendica. Thank you all!'),
+    return replace_macros($tpl, array(
+       '$title'        => t('Credits'),
+       '$thanks'        => t('Friendica is a community project, that would not be possible without the help of many people. Here is a list of those who have contributed to the code or the translation of Friendica. Thank you all!'),
        '$names'         => $arr,
     ));
 }

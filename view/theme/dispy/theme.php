@@ -2,7 +2,7 @@
 
 /*
  * Name: Dispy
- * Description: Dispy family (light, dark): Sleek and Functional Themes 
+ * Description: Dispy family (light, dark): Sleek and Functional Themes
  * Version: 1.2.1
  * Author: Simon <http://simon.kisikew.org/>
  * Maintainer: Simon <http://simon.kisikew.org/>
@@ -17,37 +17,39 @@
  * or rename to prefix1_function_name (prefix2_function_name), etc.
  */
 
-function dispy_init(&$a) {
-
-	$a->theme_info = array(
-		'family' => 'dispy',
-		'version' => '1.2.2'
-	);
-	set_template_engine($a, 'smarty3');
+function dispy_init(&$a)
+{
+    $a->theme_info = array(
+        'family' => 'dispy',
+        'version' => '1.2.2'
+    );
+    set_template_engine($a, 'smarty3');
 
     /** @purpose set some theme defaults
     */
     $cssFile = null;
     $colour = get_pconfig(local_user(), "dispy", "colour");
-	$baseurl = $a->get_baseurl($ssl_state);
+    $baseurl = $a->get_baseurl($ssl_state);
 
-    if ($colour === false) { $colour = "light"; }
+    if ($colour === false) {
+        $colour = "light";
+    }
     if ($colour == "light") {
-		$colour_path = "/light/";
-		require_once ('light/theme.php');
-	}
+        $colour_path = "/light/";
+        require_once('light/theme.php');
+    }
     if ($colour == "dark") {
-		$colour_path = "/dark/";
-		require_once ('dark/theme.php');
-	}
+        $colour_path = "/dark/";
+        require_once('dark/theme.php');
+    }
 
     /** @purpose aside on profile page
     */
-	if (($a->argv[0] . $a->argv[1]) === ("profile" . $a->user['nickname'])) {
-		dispy_community_info();
-	}
+    if (($a->argv[0] . $a->argv[1]) === ("profile" . $a->user['nickname'])) {
+        dispy_community_info();
+    }
 
-	$a->page['htmlhead'] .= <<<EOT
+    $a->page['htmlhead'] .= <<<EOT
 	<script type="text/javascript" src="$baseurl/view/theme/dispy/js/modernizr.custom.2.5.3.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
@@ -173,29 +175,31 @@ EOT;
         $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
     }
 
-	_js_in_foot();
+    _js_in_foot();
 }
 
-function dispy_community_info() {
+function dispy_community_info()
+{
     /** @purpose some sidebar stuff for new users
     */
-	$a = get_app();
-	$url = $a->get_baseurl($ssl_state);
-	$aside['$url'] = $url;
+    $a = get_app();
+    $url = $a->get_baseurl($ssl_state);
+    $aside['$url'] = $url;
 
-	$tpl = get_markup_template('communityhome.tpl');
-	return $a->page['aside_bottom'] = replace_macros($tpl, $aside);
+    $tpl = get_markup_template('communityhome.tpl');
+    return $a->page['aside_bottom'] = replace_macros($tpl, $aside);
 }
 
-if(! function_exists('_js_in_foot')) {
-	function _js_in_foot() {
-		/** @purpose insert stuff in bottom of page
-		*/
-		$a = get_app();
-		$baseurl = $a->get_baseurl($ssl_state);
-		$bottom['$baseurl'] = $baseurl;
-		$tpl = get_markup_template('bottom.tpl');
+if (! function_exists('_js_in_foot')) {
+    function _js_in_foot()
+    {
+        /** @purpose insert stuff in bottom of page
+        */
+        $a = get_app();
+        $baseurl = $a->get_baseurl($ssl_state);
+        $bottom['$baseurl'] = $baseurl;
+        $tpl = get_markup_template('bottom.tpl');
 
-		return $a->page['bottom'] = replace_macros($tpl, $bottom);
-	}
+        return $a->page['bottom'] = replace_macros($tpl, $bottom);
+    }
 }

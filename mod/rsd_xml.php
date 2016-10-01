@@ -2,9 +2,10 @@
 
 
 
-function rsd_xml_content(&$a) {
-	header ("Content-Type: text/xml");
-	echo '<?xml version="1.0" encoding="UTF-8"?>
+function rsd_xml_content(&$a)
+{
+    header("Content-Type: text/xml");
+    echo '<?xml version="1.0" encoding="UTF-8"?>
  <rsd version="1.0" xmlns="http://archipelago.phrasewise.com/rsd">
    <service>
      <engineName>Friendica</engineName>
@@ -20,5 +21,5 @@ function rsd_xml_content(&$a) {
    </service>
  </rsd>
 	';
-die();
+    die();
 }

@@ -1,13 +1,16 @@
 <?php
 
-if(! function_exists("string_plural_select_eo")) {
-function string_plural_select_eo($n){
-	return ($n != 1);;
-}}
+if (! function_exists("string_plural_select_eo")) {
+    function string_plural_select_eo($n)
+    {
+        return ($n != 1);
+        ;
+    }
+}
 ;
 $a->strings["%d contact edited."] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Could not access contact record."] = "Ne eblis atingi kontaktrikordo.";
 $a->strings["Could not locate selected profile."] = "Ne trovis elektitan profilon.";
@@ -34,8 +37,8 @@ $a->strings["(Update was not successful)"] = "(Ĝisdatigo malsukcesis.)";
 $a->strings["Suggest friends"] = "Sugesti amikojn";
 $a->strings["Network type: %s"] = "Reta tipo: %s";
 $a->strings["%d contact in common"] = array(
-	0 => "%d komuna kontakto",
-	1 => "%d komunaj kontaktoj",
+    0 => "%d komuna kontakto",
+    1 => "%d komunaj kontaktoj",
 );
 $a->strings["View all contacts"] = "Vidi ĉiujn kontaktojn";
 $a->strings["Unblock"] = "Malbloki";
@@ -352,8 +355,8 @@ $a->strings["%s and You"] = "%s kaj vi";
 $a->strings["Delete conversation"] = "Forviŝi dialogon";
 $a->strings["D, d M Y - g:i A"] = "D, d M Y - g:i A";
 $a->strings["%d message"] = array(
-	0 => "%d mesaĝo",
-	1 => "%d mesaĝoj",
+    0 => "%d mesaĝo",
+    1 => "%d mesaĝoj",
 );
 $a->strings["Message not available."] = "Mesaĝo nedisponebla.";
 $a->strings["Delete message"] = "Forviŝu mesaĝon";
@@ -568,12 +571,12 @@ $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up 
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "Detaloj de la registrado por %s";
 $a->strings["%s user blocked/unblocked"] = array(
-	0 => "Blokis/malblokis %s uzanton",
-	1 => "Blokis/malblokis %s uzantojn",
+    0 => "Blokis/malblokis %s uzanton",
+    1 => "Blokis/malblokis %s uzantojn",
 );
 $a->strings["%s user deleted"] = array(
-	0 => "%s uzanto forviŝita",
-	1 => "%s uzanto forviŝitaj",
+    0 => "%s uzanto forviŝita",
+    1 => "%s uzanto forviŝitaj",
 );
 $a->strings["User '%s' deleted"] = "Uzanto '%s' forviŝita";
 $a->strings["User '%s' unblocked"] = "Uzanto '%s' malblokita";
@@ -638,8 +641,8 @@ $a->strings["Interesting Links"] = "Interesaj Ligiloj";
 $a->strings["Starred"] = "Steligita";
 $a->strings["Favourite Posts"] = "Favorigitaj Afiŝoj";
 $a->strings["Warning: This group contains %s member from an insecure network."] = array(
-	0 => "Averto: La grupo enhavas %s membron el nesekuraj retejoj.",
-	1 => "Averto: La grupo enhavas %s membrojn el nesekuraj retejoj.",
+    0 => "Averto: La grupo enhavas %s membron el nesekuraj retejoj.",
+    1 => "Averto: La grupo enhavas %s membrojn el nesekuraj retejoj.",
 );
 $a->strings["Private messages to this group are at risk of public disclosure."] = "La privateco de privataj mesaĝoj al ĉi tiu grupo ne ĉiam estas garantita.";
 $a->strings["No such group"] = "Grupo ne estas trovita";
@@ -675,12 +678,12 @@ $a->strings["View %s's profile @ %s"] = "Vidi la profilon de %s ĉe %s";
 $a->strings["%s from %s"] = "%s de %s";
 $a->strings["View in context"] = "Vidi kun kunteksto";
 $a->strings["%d comment"] = array(
-	0 => "%d komento",
-	1 => "%d komentoj",
+    0 => "%d komento",
+    1 => "%d komentoj",
 );
 $a->strings["comment"] = array(
-	0 => "",
-	1 => "komento",
+    0 => "",
+    1 => "komento",
 );
 $a->strings["show more"] = "montri pli";
 $a->strings["Private Message"] = "Privata mesaĝo";
@@ -957,8 +960,8 @@ $a->strings["Profile location is not valid or does not contain profile informati
 $a->strings["Warning: profile location has no identifiable owner name."] = "Averto: La adreso de la profilo ne enhavas identeblan personan nomon.";
 $a->strings["Warning: profile location has no profile photo."] = "Averto: La adreso de la profilo ne enhavas bildon.";
 $a->strings["%d required parameter was not found at the given location"] = array(
-	0 => "%d bezonataj parametroj ne trovita ĉe la donata adreso.",
-	1 => "%d bezonataj parametroj ne trovita ĉe la donata adreso.",
+    0 => "%d bezonataj parametroj ne trovita ĉe la donata adreso.",
+    1 => "%d bezonataj parametroj ne trovita ĉe la donata adreso.",
 );
 $a->strings["Introduction complete."] = "Prezento sukcesis.";
 $a->strings["Unrecoverable protocol error."] = "Neĝustigebla eraro en protokolo.";
@@ -1176,8 +1179,8 @@ $a->strings["Please join us on Friendica"] = "Bonvolu aliĝi kun ni ĉe Friendic
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "";
 $a->strings["%s : Message delivery failed."] = "%s: La livero de la mesaĝo malsukcesis.";
 $a->strings["%d message sent."] = array(
-	0 => "Sendis %d mesaĝon.",
-	1 => "Sendis %d mesaĝojn.",
+    0 => "Sendis %d mesaĝon.",
+    1 => "Sendis %d mesaĝojn.",
 );
 $a->strings["You have no more invitations available"] = "Vi ne plu disponeblas invitaĵojn";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Vizitu %s por listo de publikaj retejoj kie vi povas aliĝi. Anoj de Friendica ĉe aliaj retejoj povas konekti unu kun la alian, kaj ankaŭ kun membroj de multaj aliaj retejoj.";
@@ -1298,8 +1301,8 @@ $a->strings["Add New Contact"] = "Aldonu Novan Kontakton";
 $a->strings["Enter address or web location"] = "Entajpu adreson aŭ retlokon";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Ekzemple: bob@example.com, http://example.com/barbara";
 $a->strings["%d invitation available"] = array(
-	0 => "Disponeblas %d invito",
-	1 => "Disponeblas %d invitoj",
+    0 => "Disponeblas %d invito",
+    1 => "Disponeblas %d invitoj",
 );
 $a->strings["Find People"] = "Trovi Homojn";
 $a->strings["Enter name or interest"] = "Entajpu nomon aŭ intereson";
@@ -1447,8 +1450,8 @@ $a->strings["last"] = "lasta";
 $a->strings["next"] = "sekvanta";
 $a->strings["No contacts"] = "Neniu kontaktoj";
 $a->strings["%d Contact"] = array(
-	0 => "%d Kontakto",
-	1 => "%d Kontaktoj",
+    0 => "%d Kontakto",
+    1 => "%d Kontaktoj",
 );
 $a->strings["poke"] = "";
 $a->strings["ping"] = "";
@@ -1751,8 +1754,8 @@ $a->strings["User '%s' already exists on this server!"] = "";
 $a->strings["User creation error"] = "";
 $a->strings["User profile creation error"] = "";
 $a->strings["%d contact not imported"] = array(
-	0 => "",
-	1 => "",
+    0 => "",
+    1 => "",
 );
 $a->strings["Done. You can now login with your username and password"] = "";
 $a->strings["toggle mobile"] = "";

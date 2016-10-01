@@ -22,14 +22,15 @@ require_once('include/Probe.php');
 define('PROBE_NORMAL',   0);
 define('PROBE_DIASPORA', 1);
 
-function probe_url($url, $mode = PROBE_NORMAL, $level = 1) {
+function probe_url($url, $mode = PROBE_NORMAL, $level = 1)
+{
+    if ($mode == PROBE_DIASPORA) {
+        $network = NETWORK_DIASPORA;
+    } else {
+        $network = "";
+    }
 
-	if ($mode == PROBE_DIASPORA)
-		$network = NETWORK_DIASPORA;
-	else
-		$network = "";
+    $data = Probe::uri($url, $network);
 
-	$data = Probe::uri($url, $network);
-
-	return $data;
+    return $data;
 }

@@ -8,7 +8,7 @@
 <!DOCTYPE html >
 
 <?php 
-	require_once('view/theme/frio/php/frio_boot.php');
+    require_once('view/theme/frio/php/frio_boot.php');
 
 //	$minimal = is_modal();
 
@@ -16,80 +16,98 @@
 
 <html>
 <head>
-	<title><?php if(x($page,'title')) echo $page['title'] ?></title>
+	<title><?php if (x($page, 'title')) {
+    echo $page['title'];
+} ?></title>
 	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?> ">
 	<script>var baseurl="<?php echo $a->get_baseurl() ?>";</script>
 	<script>var frio="<?php echo "view/theme/frio"; ?>";</script>
 	<?php $baseurl = $a->get_baseurl(); ?>
 	<?php $frio = "view/theme/frio"; ?>
 	<?php 
-		// Because we use minimal for modals the header and the included js stuff should be only loaded
-		// if the page is an standard page (so we don't have it twice for modals)
-		// 
-		/// @todo Think about to move js stuff in the footer
-		if(!$minimal) {
-			if(x($page,'htmlhead')) echo $page['htmlhead'];
-		}
-	?>
+        // Because we use minimal for modals the header and the included js stuff should be only loaded
+        // if the page is an standard page (so we don't have it twice for modals)
+        //
+        /// @todo Think about to move js stuff in the footer
+        if (!$minimal) {
+            if (x($page, 'htmlhead')) {
+                echo $page['htmlhead'];
+            }
+        }
+    ?>
 	
 
 </head>
 <?php
-if(($_SERVER['REQUEST_URI'] != "/register") && ($_SERVER['REQUEST_URI'] != "/lostpass") && ($_SERVER['REQUEST_URI'] != "/login"))
-{
-	echo"<body id=\"top\">";
-}
-else
-{
-	echo"<body id=\"top\">";
+if (($_SERVER['REQUEST_URI'] != "/register") && ($_SERVER['REQUEST_URI'] != "/lostpass") && ($_SERVER['REQUEST_URI'] != "/login")) {
+        echo"<body id=\"top\">";
+    } else {
+    echo"<body id=\"top\">";
 }
 ?>
 <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 <?php
-	if(x($page,'nav') && (!$minimal)){
-	echo	str_replace("~config.sitename~",get_config('config','sitename'),
-			str_replace("~system.banner~",get_config('system','banner'),
-			$page['nav']
-	));};
+    if (x($page, 'nav') && (!$minimal)) {
+        echo    str_replace("~config.sitename~", get_config('config', 'sitename'),
+            str_replace("~system.banner~", get_config('system', 'banner'),
+            $page['nav']
+    ));
+    };
 
-	// special minimal style for modal dialogs
-	if($minimal) {
-?>
-		<section class="minimal" style="margin:0px!important; padding:0px!important; float:none!important;display:block!important;"><?php if(x($page,'content')) echo $page['content']; ?>
+    // special minimal style for modal dialogs
+    if ($minimal) {
+        ?>
+		<section class="minimal" style="margin:0px!important; padding:0px!important; float:none!important;display:block!important;"><?php if (x($page, 'content')) {
+            echo $page['content'];
+        } ?>
 			<div id="page-footer"></div>
 		</section>
-<?php	}
-	// the style for all other pages
-	else {
-?>	<main>
+<?php	
+    }
+    // the style for all other pages
+    else {
+        ?>	<main>
 		<div class="container">
 			<div class="row">
 <?php
-				if(($_REQUEST['pagename'] != "register") && ($_REQUEST['pagename'] != "lostpass") && ($_REQUEST['pagename'] != "login") && ($_SERVER['REQUEST_URI'] != "/"))
-				{
-					echo"
+                if (($_REQUEST['pagename'] != "register") && ($_REQUEST['pagename'] != "lostpass") && ($_REQUEST['pagename'] != "login") && ($_SERVER['REQUEST_URI'] != "/")) {
+                    echo"
 					<aside class=\"col-lg-3 col-md-3 offcanvas-sm offcanvas-xs\">
-						"; if(x($page,'aside')) echo $page['aside']; echo"
-						"; if(x($page,'right_aside')) echo $page['right_aside']; echo"
+						";
+                    if (x($page, 'aside')) {
+                        echo $page['aside'];
+                    }
+                    echo"
+						";
+                    if (x($page, 'right_aside')) {
+                        echo $page['right_aside'];
+                    }
+                    echo"
 					</aside>
 
 					<div class=\"col-lg-7 col-md-7 col-sm-12 col-xs-12\" id=\"content\">
-						<section class=\"sectiontop "; echo $a->argv[0]; echo "-content-wrapper\">";
-								if(x($page,'content')) echo $page['content']; echo"
+						<section class=\"sectiontop ";
+                    echo $a->argv[0];
+                    echo "-content-wrapper\">";
+                    if (x($page, 'content')) {
+                        echo $page['content'];
+                    }
+                    echo"
 								<div id=\"pause\"></div> <!-- The pause/resume Ajax indicator -->
 						</section>
 					</div>
 						";
-				}
-				else
-				{
-					echo"
+                } else {
+                    echo"
 					<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" id=\"content\" style=\"margin-top:50px;\" >
-						"; if(x($page,'content')) echo $page['content']; echo"
+						";
+                    if (x($page, 'content')) {
+                        echo $page['content'];
+                    }
+                    echo"
 					</div>
 					";
-				}
-?>
+                } ?>
 		
 			</div><!--row-->
 		</div><!-- container -->
@@ -98,7 +116,9 @@ else
 	</main>
 
 <footer>
-<?php if(x($page,'footer')) echo $page['footer']; ?>
+<?php if (x($page, 'footer')) {
+                    echo $page['footer'];
+                } ?>
 <!-- Modal  -->
 <div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="plan-info" aria-hidden="true">
 	<div class="modal-dialog modal-full-screen">
@@ -120,5 +140,6 @@ else
 <div id="cache-container"></div>
 
 </footer>
-<?php } ?> <!-- End of condition if $minal else the rest -->
+<?php 
+    } ?> <!-- End of condition if $minal else the rest -->
 </body>
