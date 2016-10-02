@@ -29,7 +29,7 @@ Welcome them, answer their questions, point them to documentation or ping other 
 Translation
 ---
 
-The documentation contains help on how to translate Friendica in the [at Transifex](/help/translations) where the UI is translated.
+The documentation contains help on how to translate Friendica [at Transifex](/help/translations) where the UI is translated.
 If you don't want to translate the UI, or it is already done to your satisfaction, you might want to work on the translation of the /help files?
 
 Design
@@ -42,29 +42,43 @@ If you have seen Friendica you probably have ideas to improve it, haven't you?
 * Make plans for a better Friendica interface design and share them with us.
 * Tell us if you are able to realize your ideas or what kind of help you need.
 We can't promise we have the right skills in the group but we'll try.
-* Choose a thing to start with, e.g. work on the icon set of your favourite theme
+* Choose a thing to start with, e.g. work on the icon set of your favorite theme
 
 Programming
 ---
 
+###Coding standards
+
+For the sake of consistency between contribution and general code readability, Friendica follows the widespread [PSR-2 coding standards](http://www.php-fig.org/psr/psr-2/). Don't worry, you don't have to know by heart the PSR-2 coding standards. Before comitting your work, you can use the PHP Coding Standard Fixer located in the `util` folder this way:
+
+	$> php util/php-cs-fixer.phar fix <file or folder> --level=psr2
+
+Here's a few primers if you are new to the PSR-2 coding standards:
+ * Indentation is 4 spaces, period.
+ * By default, strings are enclosed in single quotes, but fell free to use double quotes if it makes more sense.
+ * Operators are wrapped by spaces, e.g. `$var === true`, `$var = 1 + 2` and `'string' . $concat' . 'enation'`
+ * Braces are mandatory in conditions
+ * No closing PHP tag
+ * No trailing spaces
+
 ###Code documentation
 
 If you are interested in having the documentation of the Friendica code outside of the code files, you can use [Doxygen](http://doxygen.org) to generate it.
-The configuration file for Doxygen is located in the ```util``` directory of the project sources.
+The configuration file for Doxygen is located in the `util` directory of the project sources.
 Run
 
     $> doxygen util/Doxyfile
 
-to generate the files which will be located in the ```doc/html``` subdirectory in the Friendica directory.
+to generate the files which will be located in the `doc/html` subdirectory in the Friendica directory.
 You can browse these files with any browser.
 
-If you find missing documentation, don't hestitate to contact us and write it down to enhance the code documentation.
+If you find missing documentation, don't hesitate to contact us and write it down to enhance the code documentation.
 
 ###Issues
 
 Have a look at our [issue tracker](https://github.com/friendica/friendica) on github!
 
- * Try to reproduce a bug that needs more inquries and write down what you find out.
+ * Try to reproduce a bug that needs more inquiries and write down what you find out.
  * If a bug looks fixed, ask the bug reporters for feedback to find out if the bug can be closed.
  * Fix a bug if you can. Please make the pull request against the *develop* branch of the repository.
  * There is a *Junior Job* label for issues we think might be a good point to start with.
