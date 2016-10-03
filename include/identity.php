@@ -310,15 +310,8 @@ function profile_sidebar($profile, $block = 0) {
 		);
 	}
 
-	// check if profile is a forum
-	if((intval($profile['page-flags']) == PAGE_COMMUNITY)
-			|| (intval($profile['page-flags']) == PAGE_PRVGROUP)
-			|| (isset($profile['forum']) && intval($profile['forum']))
-			|| (isset($profile['prv']) && intval($profile['prv']))
-			|| (isset($profile['community']) && intval($profile['community'])))
-		$account_type = t('Forum');
-	else
-		$account_type = "";
+	// Fetch the account type
+	$account_type = account_type($profile);
 
 	if((x($profile,'address') == 1)
 			|| (x($profile,'location') == 1)

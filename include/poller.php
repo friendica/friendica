@@ -29,6 +29,10 @@ function poller_run(&$argv, &$argc){
 		unset($db_host, $db_user, $db_pass, $db_data);
 	};
 
+	// Quit when in maintenance
+	if (get_config('system', 'maintenance', true))
+		return;
+
 	$a->start_process();
 
 	$mypid = getmypid();
@@ -70,6 +74,10 @@ function poller_run(&$argv, &$argc){
 	$starttime = time();
 
 	while ($r = q("SELECT * FROM `workerqueue` WHERE `executed` = '0000-00-00 00:00:00' ORDER BY `priority`, `created` LIMIT 1")) {
+
+		// Quit when in maintenance
+		if (get_config('system', 'maintenance', true))
+			return;
 
 		// Constantly check the number of parallel database processes
 		if ($a->max_processes_reached())

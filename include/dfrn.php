@@ -2492,7 +2492,19 @@ class dfrn {
 
 		logger("Import DFRN message for user ".$importer["uid"]." from contact ".$importer["id"], LOGGER_DEBUG);
 
-		// is it a public forum? Private forums aren't supported by now with this method
+		// The account type is new since 3.5.1
+		if ($xpath->query("/atom:feed/dfrn:account_type")->length > 0) {
+			$accounttype = intval($xpath->evaluate("/atom:feed/dfrn:account_type/text()", $context)->item(0)->nodeValue);
+
+			if ($accounttype != $importer["contact-type"])
+				q("UPDATE `contact` SET `contact-type` = %d WHERE `id` = %d",
+					intval($accounttype),
+					intval($importer["id"])
+				);
+		}
+
+		// is it a public forum? Private forums aren't supported with this method
+		// This is deprecated since 3.5.1
 		$forum = intval($xpath->evaluate("/atom:feed/dfrn:community/text()", $context)->item(0)->nodeValue);
 
 		if ($forum != $importer["forum"])

@@ -81,7 +81,7 @@ function match_content(&$a) {
 						'details'       => $contact_details['location'],
 						'tags'          => $contact_details['keywords'],
 						'about'         => $contact_details['about'],
-						'account_type'  => (($contact_details['community']) ? t('Forum') : ''),
+						'account_type'  => account_type($contact_details),
 						'thumb' => proxy_url($jj->photo, false, PROXY_SIZE_THUMB),
 						'inttxt' => ' ' . t('is interested in:'),
 						'conntxt' => t('Connect'),

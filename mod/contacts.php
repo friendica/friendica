@@ -38,7 +38,7 @@ function contacts_init(&$a) {
 
 			if (($a->data['contact']['network'] != "") AND ($a->data['contact']['network'] != NETWORK_DFRN)) {
 				$networkname = format_network_name($a->data['contact']['network'],$a->data['contact']['url']);
-			} else 
+			} else
 				$networkname = '';
 
 			$vcard_widget = replace_macros(get_markup_template("vcard-widget.tpl"),array(
@@ -48,7 +48,7 @@ function contacts_init(&$a) {
 				'$addr' => (($a->data['contact']['addr'] != "") ? ($a->data['contact']['addr']) : ""),
 				'$network_name' => $networkname,
 				'$network' => t('Network:'),
-				'account_type' => (($a->data['contact']['forum'] || $a->data['contact']['prv']) ? t('Forum') : '')
+				'$account_type' => account_type($a->data['contact'])
 			));
 			$finpeople_widget = '';
 			$follow_widget = '';
@@ -623,7 +623,7 @@ function contacts_content(&$a) {
 			'$url' => $url,
 			'$profileurllabel' => t('Profile URL'),
 			'$profileurl' => $contact['url'],
-			'account_type' => (($contact['forum'] || $contact['prv']) ? t('Forum') : ''),
+			'$account_type' => account_type($contact),
 			'$location' => bbcode($contact["location"]),
 			'$location_label' => t("Location:"),
 			'$xmpp' => bbcode($contact["xmpp"]),
@@ -910,8 +910,6 @@ function contact_posts($a, $contact_id) {
 
 function _contact_detail_for_template($rr){
 
-	$community = '';
-
 	switch($rr['rel']) {
 		case CONTACT_IS_FRIEND:
 			$dir_icon = 'images/lrarrow.gif';
@@ -937,11 +935,6 @@ function _contact_detail_for_template($rr){
 		$sparkle = '';
 	}
 
-	//test if contact is a forum page
-	if (isset($rr['forum']) OR isset($rr['prv']))
-				$community = ($rr['forum'] OR $rr['prv']);
-
-
 	return array(
 		'img_hover' => sprintf( t('Visit %s\'s profile [%s]'),$rr['name'],$rr['url']),
 		'edit_hover' => t('Edit contact'),
@@ -952,7 +945,7 @@ function _contact_detail_for_template($rr){
 		'thumb' => proxy_url($rr['thumb'], false, PROXY_SIZE_THUMB),
 		'name' => htmlentities($rr['name']),
 		'username' => htmlentities($rr['name']),
-		'account_type' => ($community ? t('Forum') : ''),
+		'account_type' => account_type($rr),
 		'sparkle' => $sparkle,
 		'itemurl' => (($rr['addr'] != "") ? $rr['addr'] : $rr['url']),
 		'url' => $url,

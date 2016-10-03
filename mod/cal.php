@@ -40,10 +40,7 @@ function cal_init(&$a) {
 
 		$profile = get_profiledata_by_nick($nick, $a->profile_uid);
 
-		if((intval($profile['page-flags']) == PAGE_COMMUNITY) || (intval($profile['page-flags']) == PAGE_PRVGROUP))
-			$account_type = t('Forum');
-		else
-			$account_type = "";
+		$account_type = account_type($profile);
 
 		$tpl = get_markup_template("vcard-widget.tpl");
 

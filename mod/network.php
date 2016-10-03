@@ -502,7 +502,7 @@ function network_content(&$a, $update = 0) {
 	}
 	elseif($cid) {
 
-		$r = q("SELECT `id`,`name`,`network`,`writable`,`nurl`, `forum`, `prv`, `addr`, `thumb`, `location` FROM `contact` WHERE `id` = %d
+		$r = q("SELECT `id`,`name`,`network`,`writable`,`nurl`, `forum`, `prv`, `contact-type`, `addr`, `thumb`, `location` FROM `contact` WHERE `id` = %d
 				AND `blocked` = 0 AND `pending` = 0 LIMIT 1",
 			intval($cid)
 		);
@@ -514,9 +514,10 @@ function network_content(&$a, $update = 0) {
 				'name' => htmlentities($r[0]['name']),
 				'itemurl' => (($r[0]['addr']) ? ($r[0]['addr']) : ($r[0]['nurl'])),
 				'thumb' => proxy_url($r[0]['thumb'], false, PROXY_SIZE_THUMB),
-				'account_type' => (($r[0]['forum']) || ($r[0]['prv']) ? t('Forum') : ''),
 				'details' => $r[0]['location'],
 			);
+
+			$entries[0]["account_type"] = account_type($r[0]);
 
 			$o = replace_macros(get_markup_template("viewcontact_template.tpl"),array(
 				'contacts' => $entries,

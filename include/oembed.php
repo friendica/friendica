@@ -210,8 +210,10 @@ function oembed_format_object($j){
 }
 
 /**
- * Generates the iframe HTML for an oembed attachment. Width and height are given
- * by the remote, and are regularly too small for the generated iframe.
+ * @brief Generates the iframe HTML for an oembed attachment.
+ *
+ * Width and height are given by the remote, and are regularly too small for
+ * the generated iframe.
  *
  * The width is entirely discarded for the actual width of the post, while fixed
  * height is used as a starting point before the inevitable resizing.
@@ -222,7 +224,7 @@ function oembed_format_object($j){
  * @param string $src Original remote URL to embed
  * @param string $width
  * @param string $height
- * @return string
+ * @return string formatted HTML
  *
  * @see oembed_format_object()
  */

@@ -102,7 +102,7 @@ function viewcontacts_content(&$a) {
 			'details'       => $contact_details['location'],
 			'tags'          => $contact_details['keywords'],
 			'about'         => $contact_details['about'],
-			'account_type'  => (($contact_details['community']) ? t('Forum') : ''),
+			'account_type'  => account_type($contact_details),
 			'url' => $url,
 			'sparkle' => '',
 			'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
