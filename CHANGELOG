@@ -9,6 +9,7 @@ Version 3.5.1
     Improvements to the themes [Hypolite]
     Improvements to the database handling [heluecht]
     Improvements to the admin panel [tobiasd, Hypolite]
+    Improvements to the update process [heluecht]
     Extension of the DFRN transmitted information fields [heluecht]
     Translations of the core are now in /vire/lang [Hypolite]
 
