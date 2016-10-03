@@ -204,23 +204,23 @@ function get_contact_details_by_url($url, $uid = -1, $default = array())
     }
 
     // Fetch contact data from the contact table for the given user
-    $r = q("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`,
-			`xmpp`, `keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `bd` AS `birthday`, `self`
+    $r = q("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+            `keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
 		FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d",
             dbesc(normalise_link($url)), intval($uid));
 
     // Fetch the data from the contact table with "uid=0" (which is filled automatically)
     if (!$r) {
-        $r = q("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`,
-				`xmpp`, `keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `bd` AS `birthday`, 0 AS `self`
+		$r = q("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
 			FROM `contact` WHERE `nurl` = '%s' AND `uid` = 0",
                 dbesc(normalise_link($url)));
     }
 
     // Fetch the data from the gcontact table
     if (!$r) {
-        $r = q("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`,
-				'' AS `xmpp`, `keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `birthday`, 0 AS `self`
+		$r = q("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
+			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, 0 AS `contact-type`, `birthday`, 0 AS `self`
 			FROM `gcontact` WHERE `nurl` = '%s'",
                 dbesc(normalise_link($url)));
     }
@@ -711,4 +711,52 @@ function formatted_location($profile)
     }
 
     return $location;
+}
+
+/**
+ * @brief Returns the account type name
+ *
+ * The function can be called with either the user or the contact array
+ *
+ * @param array $contact contact or user array
+ */
+function account_type($contact)
+{
+	// There are several fields that indicate that the contact or user is a forum
+	// "page-flags" is a field in the user table,
+	// "forum" and "prv" are used in the contact table. They stand for PAGE_COMMUNITY and PAGE_PRVGROUP.
+	// "community" is used in the gcontact table and is true if the contact is PAGE_COMMUNITY or PAGE_PRVGROUP.
+	if((isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_COMMUNITY))
+		|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_PRVGROUP))
+		|| (isset($contact['forum']) && intval($contact['forum']))
+		|| (isset($contact['prv']) && intval($contact['prv']))
+		|| (isset($contact['community']) && intval($contact['community']))) {
+		$type = ACCOUNT_TYPE_COMMUNITY;
+    } else {
+		$type = ACCOUNT_TYPE_PERSON;
+    }
+
+	// The "contact-type" (contact table) and "account-type" (user table) are more general then the chaos from above.
+	if (isset($contact['contact-type'])) {
+		$type = $contact['contact-type'];
+    }
+    if (isset($contact['account-type'])) {
+		$type = $contact['account-type'];
+    }
+	switch($type) {
+		case ACCOUNT_TYPE_ORGANISATION:
+			$account_type = t('Organisation');
+			break;
+		case ACCOUNT_TYPE_NEWS:
+			$account_type = t('News');
+			break;
+		case ACCOUNT_TYPE_COMMUNITY:
+			$account_type = t('Forum');
+			break;
+		default:
+			$account_type = '';
+			break;
+	}
+
+	return $account_type;
 }
