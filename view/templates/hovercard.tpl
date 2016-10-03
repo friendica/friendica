@@ -15,7 +15,7 @@
 					{{if $profile.network}}<span class="profile-network"> ({{$profile.network}})</span>{{/if}}
 				</div>
 				{{*{{if $profile.about}}<div class="profile-details profile-about">{{$profile.about}}</div>{{/if}}*}}
-	
+
 			</div>
 			<div class="hover-card-actions  right-aligned">
 				{{* here are the differnt actions like privat message, poke, delete and so on *}}
@@ -26,7 +26,7 @@
 				</div>
 				<div class="hover-card-actions-connection">
 					{{if $profile.actions.network}}<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.network.1}}" title="{{$profile.actions.network.0}}"><i class="fa fa-cloud" aria-hidden="true"></i></a>{{/if}}
-					{{if $profile.actions.edit}}<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.edit.1}}" title="{{$profile.actions.edit.0}}"><i class="fa fa-pencil" aria-hidden="true"></i></a>{{/if}}
+					{{if $profile.actions.edit}}<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.edit.1}}" title="{{$profile.actions.edit.0}}"><i class="fa fa-user" aria-hidden="true"></i></a>{{/if}}
 					{{if $profile.actions.follow}}<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.follow.1}}" title="{{$profile.actions.follow.0}}"><i class="fa fa-user-plus" aria-hidden="true"></i></a>{{/if}}
 				</div>
 			</div>

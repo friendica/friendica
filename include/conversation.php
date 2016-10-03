@@ -970,7 +970,7 @@ if (! function_exists('item_photo_menu')) {
                 t('View Profile') => $profile_link,
                 t('View Photos') => $photos_link,
                 t('Network Posts') => $posts_link,
-                t('Edit Contact') => $contact_url,
+                t('View Contact') => $contact_url,
                 t('Send PM') => $pm_url
             );
 

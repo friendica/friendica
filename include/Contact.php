@@ -376,7 +376,7 @@ if (! function_exists('contact_photo_menu')) {
             'profile' => array(t('View Profile'), $profile_link, true),
             'photos' => array(t('View Photos'), $photos_link,true),
             'network' => array(t('Network Posts'), $posts_link,false),
-            'edit' => array(t('Edit Contact'), $contact_url, false),
+            'edit' => array(t('View Contact'), $contact_url, false),
             'drop' => array(t('Drop Contact'), $contact_drop_link, false),
             'pm' => array(t('Send PM'), $pm_url, false),
             'poke' => array(t('Poke'), $poke_link, false),

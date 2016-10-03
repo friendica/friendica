@@ -120,7 +120,7 @@ function nav_info(&$a)
     if (strlen(get_config('system', 'singleuser'))) {
         $gdir = get_config('system', 'directory');
         if (strlen($gdir)) {
-            $gdirpath = $gdir;
+            $gdirpath = zrl($gdir, true);
         }
     } elseif (get_config('system', 'community_page_style') == CP_USERS_ON_SERVER) {
         $nav['community'] = array('community', t('Community'), '', t('Conversations on this site'));
