@@ -2412,6 +2412,59 @@
 
 	}
 
+
+	/**
+	 * @brief return data from profiles
+	 *
+	 * @param array $profile array containing data from db table 'profile'
+	 * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
+	 * @return array
+	 */
+	function api_format_items_profiles(&$profile = null, $type = "json") {
+		if ($profile != null) {
+			$profile = array('profile_id' => $profile['id'],
+							'profile_name' => $profile['profile-name'],
+							'is_default' => $profile['is-default'] ? true : false,
+							'hide_friends'=> $profile['hide-friends'] ? true : false,
+							'profile_photo' => $profile['photo'],
+							'profile_thumb' => $profile['thumb'],
+							'publish' => $profile['publish'] ? true : false,
+							'net_publish' => $profile['net-publish'] ? true : false,
+							'description' => $profile['pdesc'],
+							'date_of_birth' => $profile['dob'],
+							'address' => $profile['address'],
+							'city' => $profile['locality'],
+							'region' => $profile['region'],
+							'postal_code' => $profile['postal-code'],
+							'country' => $profile['country-name'],
+							'hometown' => $profile['hometown'],
+							'gender' => $profile['gender'],
+							'marital' => $profile['marital'],
+							'marital_with' => $profile['with'],
+							'marital_since' => $profile['howlong'],
+							'sexual' => $profile['sexual'],
+							'politic' => $profile['politic'],
+							'religion' => $profile['religion'],
+							'public_keywords' => $profile['pub_keywords'],
+							'private_keywords' => $profile['prv_keywords'],
+							'likes' => bbcode(api_clean_plain_items($profile['likes']), false, false, 2, true),
+							'dislikes' => bbcode(api_clean_plain_items($profile['dislikes']), false, false, 2, true),
+							'about' => bbcode(api_clean_plain_items($profile['about']), false, false, 2, true),
+							'music' => bbcode(api_clean_plain_items($profile['music']), false, false, 2, true),
+							'book' => bbcode(api_clean_plain_items($profile['book']), false, false, 2, true),
+							'tv' => bbcode(api_clean_plain_items($profile['tv']), false, false, 2, true),
+							'film' => bbcode(api_clean_plain_items($profile['film']), false, false, 2, true),
+							'interest' => bbcode(api_clean_plain_items($profile['interest']), false, false, 2, true),
+							'romance' => bbcode(api_clean_plain_items($profile['romance']), false, false, 2, true),
+							'work' => bbcode(api_clean_plain_items($profile['work']), false, false, 2, true),
+							'education' => bbcode(api_clean_plain_items($profile['education']), false, false, 2, true),
+							'social_networks' => bbcode(api_clean_plain_items($profile['contact']), false, false, 2, true),
+							'homepage' => $profile['homepage'],
+							'users' => null);
+			return $profile;
+		} 
+	}
+
 	/**
 	 * @brief format items to be returned by api
 	 *
@@ -3880,6 +3933,71 @@
 	api_register_func('api/friendica/direct_messages_search', 'api_friendica_direct_messages_search', true);
 
 
+	/**
+	 * @brief return data of all the profiles a user has to the client
+	 *
+	 * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
+	 * @return string
+	 */
+	function api_friendica_profile_show($type){
+		$a = get_app();
+
+		if (api_user()===false) throw new ForbiddenException();
+
+		// input params
+		$profileid = (x($_REQUEST,'profile_id') ? $_REQUEST['profile_id'] : 0);
+
+		// retrieve general information about profiles for user
+		$multi_profiles = feature_enabled(api_user(),'multi_profiles');
+		$directory = get_config('system', 'directory');
+
+// get data of the specified profile id or all profiles of the user if not specified
+		if ($profileid != 0) {
+			$r = q("SELECT * FROM `profile` WHERE `uid` = %d AND `id` = %d",
+				intval(api_user()),
+				intval($profileid));
+			// error message if specified gid is not in database
+			if (count($r) == 0)
+				throw new BadRequestException("profile_id not available");
+		}
+		else
+			$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
+				intval(api_user()));
+
+		// loop through all returned profiles and retrieve data and users
+		$k = 0;
+		foreach ($r as $rr) {
+			$profile = api_format_items_profiles($rr, $type);
+
+			// select all users from contact table, loop and prepare standard return for user data
+			$users = array();
+			$r = q("SELECT `id`, `nurl` FROM `contact` WHERE `uid`= %d AND `profile-id` = %d",
+				intval(api_user()),
+				intval($rr['profile_id']));
+
+			foreach ($r as $rr) {
+				$user = api_get_user($a, $rr['nurl']);
+				($type == "xml") ? $users[$k++.":user"] = $user : $users[] = $user;
+			}
+			$profile['users'] = $users;
+
+			// add prepared profile data to array for final return
+			if ($type == "xml") {
+				$profiles[$k++.":profile"] = $profile;
+			} else {
+				$profiles[] = $profile;
+			}
+		}
+
+		// return settings, authenticated user and profiles data
+		$result = array('multi_profiles' => $multi_profiles ? true : false,
+						'global_dir' => $directory,
+						'friendica_owner' => api_get_user($a, intval(api_user())),
+						'profiles' => $profiles);
+		return api_format_data("friendica_profiles", $type, array('$result' => $result));
+	}
+	api_register_func('api/friendica/profile/show', 'api_friendica_profile_show', true, API_METHOD_GET);
+
 /*
 To.Do:
     [pagename] => api/1.1/statuses/lookup.json
@@ -3905,6 +4023,9 @@ account/update_profile_background_image
 account/update_profile_image
 blocks/create
 blocks/destroy
+friendica/profile/update
+friendica/profile/create
+friendica/profile/delete
 
 Not implemented in status.net:
 statuses/retweeted_to_me

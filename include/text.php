@@ -988,7 +988,7 @@ function search($s,$id='search-box',$url='search',$save = false, $aside = true) 
 	$a = get_app();
 
 	$values = array(
-			'$s' => $s,
+			'$s' => htmlspecialchars($s),
 			'$id' => $id,
 			'$action_url' => $url,
 			'$search_label' => t('Search'),

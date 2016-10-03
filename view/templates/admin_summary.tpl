@@ -4,7 +4,7 @@
 
 	<dl>
 		<dt>{{$queues.label}}</dt>
-		<dd>{{$queues.deliverq}} - <a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a>{{if $queues.workerq}} - {{$queues.workerq}}{{/if}}</dd>
+		<dd>{{$queues.deliverq}} - <a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a>{{if $workeractive}} - {{$queues.workerq}}{{/if}}</dd>
 	</dl>
 	<dl>
 		<dt>{{$pending.0}}</dt>

@@ -460,6 +460,7 @@ function admin_page_summary(&$a) {
 		'$title' => t('Administration'),
 		'$page' => t('Summary'),
 		'$queues' => $queues,
+		'$workeractive' => get_config('system','worker'),
 		'$users' => array(t('Registered users'), $users),
 		'$accounts' => $accounts,
 		'$pending' => array(t('Pending registrations'), $pending),

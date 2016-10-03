@@ -249,6 +249,15 @@ class dba {
 		}
 	}
 
+	function connected() {
+		if ($this->mysqli)
+			$connected = $this->db->ping();
+		else
+			$connected = mysql_ping($this->db);
+
+		return $connected;
+	}
+
 	function __destruct() {
 		if ($this->db)
 			if($this->mysqli)

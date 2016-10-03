@@ -47,11 +47,10 @@ require_once("boot.php");
 
 global $a, $db;
 
-if(is_null($a)) {
+if (is_null($a))
 	$a = new App;
-}
 
-if(is_null($db)) {
+if (is_null($db)) {
 	@include(".htconfig.php");
 	require_once("include/dba.php");
 	$db = new dba($db_host, $db_user, $db_pass, $db_data);
@@ -66,142 +65,210 @@ $bDebug	= get_config('jabber','debug');
 
 $oAuth = new exAuth($sLogFile, $bDebug);
 
-class exAuth
-{
+class exAuth {
 	private $sLogFile;
 	private $bDebug;
 
 	private $rLogFile;
 
-	public function __construct($sLogFile, $bDebug)
-	{
-		global $a, $db;
+	/**
+	 * @brief Create the class and do the authentification studd
+	 *
+	 * @param string $sLogFile The logfile name
+	 * @param boolean $bDebug Debug mode
+	 */
+	public function __construct($sLogFile, $bDebug) {
+		global $db;
 
 		// setter
 		$this->sLogFile 	= $sLogFile;
 		$this->bDebug		= $bDebug;
 
-		// ovo ne provjeravamo jer ako ne mozes kreirati log file, onda si u kvascu :)
+		// Open the logfile if the logfile name is defined
 		if ($this->sLogFile != '')
 			$this->rLogFile = fopen($this->sLogFile, "a") or die("Error opening log file: ". $this->sLogFile);
 
 		$this->writeLog("[exAuth] start");
 
-		// ovdje bi trebali biti spojeni na MySQL, imati otvoren log i zavrtit cekalicu
+		// We are connected to the SQL server and are having a log file.
 		do {
-			$iHeader	= fgets(STDIN, 3);
-			$aLength 	= unpack("n", $iHeader);
-			$iLength	= $aLength["1"];
-			if($iLength > 0) {
-				// ovo znaci da smo nesto dobili
-				$sData = fgets(STDIN, $iLength + 1);
-				$this->writeDebugLog("[debug] received data: ". $sData);
-				$aCommand = explode(":", $sData);
-				if (is_array($aCommand)){
-					switch ($aCommand[0]){
-						case "isuser":
-							// provjeravamo je li korisnik dobar
-							if (!isset($aCommand[1])){
-								$this->writeLog("[exAuth] invalid isuser command, no username given");
-								fwrite(STDOUT, pack("nn", 2, 0));
-							} else {
-								// ovdje provjeri je li korisnik OK
-								$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
-								$this->writeDebugLog("[debug] checking isuser for ". $sUser);
-								$sQuery = "SELECT `uid` FROM `user` WHERE `nickname`='". $db->escape($sUser) ."'";
-								$this->writeDebugLog("[debug] using query ". $sQuery);
-								if ($oResult = q($sQuery)){
-									if ($oResult) {
-										// korisnik OK
-										$this->writeLog("[exAuth] valid user: ". $sUser);
-										fwrite(STDOUT, pack("nn", 2, 1));
-									} else {
-										// korisnik nije OK
-										$this->writeLog("[exAuth] invalid user: ". $sUser);
-										fwrite(STDOUT, pack("nn", 2, 0));
-									}
-									//$oResult->close();
-								} else {
-									$this->writeLog("[MySQL] invalid query: ". $sQuery);
-									fwrite(STDOUT, pack("nn", 2, 0));
-								}
-							}
-						break;
-						case "auth":
-							// provjeravamo autentifikaciju korisnika
-							if (sizeof($aCommand) != 4){
-								$this->writeLog("[exAuth] invalid auth command, data missing");
-								fwrite(STDOUT, pack("nn", 2, 0));
-							} else {
-								// ovdje provjeri prijavu
-								$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
-								$this->writeDebugLog("[debug] doing auth for ".$sUser."@".$aCommand[2]);
-
-								// If the hostnames doesn't match, we try to authenticate remotely
-								if ($a->get_hostname() != $aCommand[2])
-									$Error = !$this->check_credentials($aCommand[2], $aCommand[1], $aCommand[3], true);
-								else {
-
-									//$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `password`='".hash('whirlpool',$aCommand[3])."' AND `nickname`='". $db->escape($sUser) ."'";
-									$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `nickname`='". $db->escape($sUser) ."'";
-									$this->writeDebugLog("[debug] using query ". $sQuery);
-									if ($oResult = q($sQuery)){
-										$uid = $oResult[0]["uid"];
-										$Error = ($oResult[0]["password"] != hash('whirlpool',$aCommand[3]));
-									} else {
-										$this->writeLog("[MySQL] invalid query: ". $sQuery);
-										$Error = true;
-										$uid = -1;
-									}
-									if ($Error) {
-										$oConfig = q("SELECT `v` FROM `pconfig` WHERE `uid`=%d AND `cat` = 'xmpp' AND `k`='password' LIMIT 1;", intval($uid));
-										$this->writeLog("[exAuth] got password ".$oConfig[0]["v"]);
-										$Error = ($aCommand[3] != $oConfig[0]["v"]);
-									}
-								}
-								if ($Error) {
-									$this->writeLog("[exAuth] authentification failed for user ". $sUser ."@". $aCommand[2]);
-									fwrite(STDOUT, pack("nn", 2, 0));
-								} else {
-									$this->writeLog("[exAuth] authentificated user ". $sUser ."@". $aCommand[2]);
-									fwrite(STDOUT, pack("nn", 2, 1));
-								}
-							}
-						break;
-						case "setpass":
-							// postavljanje zaporke, onemoguceno
-							$this->writeLog("[exAuth] setpass command disabled");
-							fwrite(STDOUT, pack("nn", 2, 0));
-						break;
-						default:
-							// ako je uhvaceno ista drugo
-							$this->writeLog("[exAuth] unknown command ". $aCommand[0]);
-							fwrite(STDOUT, pack("nn", 2, 0));
-						break;
-					}
-				} else {
-					$this->writeDebugLog("[debug] invalid command string");
-					fwrite(STDOUT, pack("nn", 2, 0));
-				}
+			// Quit if the database connection went down
+			if (!$db->connected()) {
+				$this->writeDebugLog("[debug] the database connection went down");
+				return;
 			}
-			unset ($iHeader);
-			unset ($aLength);
-			unset ($iLength);
-			unset($aCommand);
+
+			$iHeader = fgets(STDIN, 3);
+			$aLength = unpack("n", $iHeader);
+			$iLength = $aLength["1"];
+
+			// No data? Then quit
+			if ($iLength == 0) {
+				$this->writeDebugLog("[debug] we got no data");
+				return;
+			}
+
+			// Fetching the data
+			$sData = fgets(STDIN, $iLength + 1);
+			$this->writeDebugLog("[debug] received data: ". $sData);
+			$aCommand = explode(":", $sData);
+			if (is_array($aCommand)) {
+				switch ($aCommand[0]) {
+					case "isuser":
+						// Check the existance of a given username
+						$this->isuser($aCommand);
+						break;
+					case "auth":
+						// Check if the givven password is correct
+						$this->auth($aCommand);
+						break;
+					case "setpass":
+						// We don't accept the setting of passwords here
+						$this->writeLog("[exAuth] setpass command disabled");
+						fwrite(STDOUT, pack("nn", 2, 0));
+						break;
+					default:
+						// We don't know the given command
+						$this->writeLog("[exAuth] unknown command ". $aCommand[0]);
+						fwrite(STDOUT, pack("nn", 2, 0));
+						break;
+				}
+			} else {
+				$this->writeDebugLog("[debug] invalid command string");
+				fwrite(STDOUT, pack("nn", 2, 0));
+			}
 		} while (true);
 	}
 
-	public function __destruct()
-	{
-		// zatvori log file
-		$this->writeLog("[exAuth] stop");
+	/**
+	 * @brief Check if the given username exists
+	 *
+	 * @param array $aCommand The command array
+	 */
+	private function isuser($aCommand) {
+		global $a;
 
-		if (is_resource($this->rLogFile)){
-			fclose($this->rLogFile);
+		// Check if there is a username
+		if (!isset($aCommand[1])) {
+			$this->writeLog("[exAuth] invalid isuser command, no username given");
+			fwrite(STDOUT, pack("nn", 2, 0));
+			return;
+		}
+
+		// Now we check if the given user is valid
+		$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
+		$this->writeDebugLog("[debug] checking isuser for ". $sUser."@".$aCommand[2]);
+
+		// If the hostnames doesn't match, we try to check remotely
+		if ($a->get_hostname() != $aCommand[2])
+			$found = $this->check_user($aCommand[2], $aCommand[1], true);
+		else {
+			$sQuery = "SELECT `uid` FROM `user` WHERE `nickname`='".dbesc($sUser)."'";
+			$this->writeDebugLog("[debug] using query ". $sQuery);
+			$r = q($sQuery);
+			$found = dbm::is_result($r);
+		}
+
+		if ($found) {
+			// The user is okay
+			$this->writeLog("[exAuth] valid user: ". $sUser);
+			fwrite(STDOUT, pack("nn", 2, 1));
+		} else {
+			// The user isn't okay
+			$this->writeLog("[exAuth] invalid user: ". $sUser);
+			fwrite(STDOUT, pack("nn", 2, 0));
 		}
 	}
 
+	/**
+	 * @brief Check remote user existance via HTTP(S)
+	 *
+	 * @param string $host The hostname
+	 * @param string $user Username
+	 * @param boolean $ssl Should the check be done via SSL?
+	 *
+	 * @return boolean Was the user found?
+	 */
+	private function check_user($host, $user, $ssl) {
+
+		$url = ($ssl ? "https":"http")."://".$host."/noscrape/".$user;
+
+		$data = z_fetch_url($url);
+
+		if (!is_array($data))
+			return(false);
+
+		if ($data["return_code"] != "200")
+			return(false);
+
+		$json = @json_decode($data["body"]);
+		if (!is_object($json))
+			return(false);
+
+		return($json->nick == $user);
+	}
+
+	/**
+	 * @brief Authenticate the givven user and password
+	 *
+	 * @param array $aCommand The command array
+	 */
+	private function auth($aCommand) {
+		global $a;
+
+		// check user authentication
+		if (sizeof($aCommand) != 4) {
+			$this->writeLog("[exAuth] invalid auth command, data missing");
+			fwrite(STDOUT, pack("nn", 2, 0));
+			return;
+		}
+
+		// We now check if the password match
+		$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
+		$this->writeDebugLog("[debug] doing auth for ".$sUser."@".$aCommand[2]);
+
+		// If the hostnames doesn't match, we try to authenticate remotely
+		if ($a->get_hostname() != $aCommand[2])
+			$Error = !$this->check_credentials($aCommand[2], $aCommand[1], $aCommand[3], true);
+		else {
+			$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `nickname`='".dbesc($sUser)."'";
+			$this->writeDebugLog("[debug] using query ". $sQuery);
+			if ($oResult = q($sQuery)) {
+				$uid = $oResult[0]["uid"];
+				$Error = ($oResult[0]["password"] != hash('whirlpool',$aCommand[3]));
+			} else {
+				$this->writeLog("[MySQL] invalid query: ". $sQuery);
+				$Error = true;
+				$uid = -1;
+			}
+			if ($Error) {
+				$oConfig = q("SELECT `v` FROM `pconfig` WHERE `uid` = %d AND `cat` = 'xmpp' AND `k`='password' LIMIT 1;", intval($uid));
+				$this->writeLog("[exAuth] got password ".$oConfig[0]["v"]);
+				$Error = ($aCommand[3] != $oConfig[0]["v"]);
+			}
+		}
+
+		if ($Error) {
+			$this->writeLog("[exAuth] authentification failed for user ".$sUser."@". $aCommand[2]);
+			fwrite(STDOUT, pack("nn", 2, 0));
+		} else {
+			$this->writeLog("[exAuth] authentificated user ".$sUser."@".$aCommand[2]);
+			fwrite(STDOUT, pack("nn", 2, 1));
+		}
+	}
+
+	/**
+	 * @brief Check remote credentials via HTTP(S)
+	 *
+	 * @param string $host The hostname
+	 * @param string $user Username
+	 * @param string $password Password
+	 * @param boolean $ssl Should the check be done via SSL?
+	 *
+	 * @return boolean Are the credentials okay?
+	 */
 	private function check_credentials($host, $user, $password, $ssl) {
+		$this->writeDebugLog("[debug] check credentials for user ".$user." on ".$host);
 
 		$url = ($ssl ? "https":"http")."://".$host."/api/account/verify_credentials.json";
 
@@ -219,24 +286,40 @@ class exAuth
 		$http_code = $curl_info["http_code"];
 		curl_close($ch);
 
-		return($http_code == 200);
+		$this->writeDebugLog("[debug] got HTTP code ".$http_code);
+
+		return ($http_code == 200);
 	}
 
-	private function writeLog($sMessage)
-	{
-		if (is_resource($this->rLogFile)) {
-			fwrite($this->rLogFile, date("r") ." ". $sMessage ."\n");
-		}
+	/**
+	 * @brief write data to the logfile
+	 *
+	 * @param string $sMessage The logfile message
+	 */
+	private function writeLog($sMessage) {
+		if (is_resource($this->rLogFile))
+			fwrite($this->rLogFile, date("r")." ".$sMessage."\n");
 	}
 
-	private function writeDebugLog($sMessage)
-	{
-		if ($this->bDebug){
+	/**
+	 * @brief write debug data to the logfile
+	 *
+	 * @param string $sMessage The logfile message
+	 */
+	private function writeDebugLog($sMessage) {
+		if ($this->bDebug)
 			$this->writeLog($sMessage);
-		}
 	}
 
+	/**
+	 * @brief destroy the class
+	 */
+	public function __destruct() {
+		// close the log file
+		$this->writeLog("[exAuth] stop");
+
+		if (is_resource($this->rLogFile))
+			fclose($this->rLogFile);
+	}
 }
 ?>
-
-

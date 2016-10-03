@@ -11,7 +11,7 @@
 <head>
 	<title><?php if(x($page,'title')) echo $page['title'] ?></title>
 	<meta name="viewport" content="initial-scale=1.0">
-	<meta request="<?php echo $_REQUEST['pagename'] ?> ">
+	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?> ">
 	<script>var baseurl="<?php echo $a->get_baseurl() ?>";</script>
 	<script>var frio="<?php echo "view/theme/frio"; ?>";</script>
 	<?php $baseurl = $a->get_baseurl(); ?>

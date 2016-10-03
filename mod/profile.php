@@ -10,7 +10,7 @@ function profile_init(&$a) {
 		$a->page['aside'] = '';
 
 	if($a->argc > 1)
-		$which = $a->argv[1];
+		$which = htmlspecialchars($a->argv[1]);
 	else {
 		$r = q("select nickname from user where blocked = 0 and account_expired = 0 and account_removed = 0 and verified = 1 order by rand() limit 1");
 		if(count($r)) {
@@ -27,7 +27,7 @@ function profile_init(&$a) {
 	$profile = 0;
 	if((local_user()) && ($a->argc > 2) && ($a->argv[2] === 'view')) {
 		$which = $a->user['nickname'];
-		$profile = $a->argv[1];
+		$profile = htmlspecialchars($a->argv[1]);
 	}
 	else {
 		auto_redir($a, $which);
