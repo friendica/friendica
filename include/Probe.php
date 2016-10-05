@@ -337,7 +337,6 @@ class Probe {
 			}
 			if (!$lrdd)
 				return self::feed($uri);
-
 			$nick = array_pop($path_parts);
 			$addr = $nick."@".$host;
 		}
@@ -345,6 +344,8 @@ class Probe {
 
 		/// @todo Do we need the prefix "acct:" or "acct://"?
 
+		$acct = $addr;
+		if(substr($acct,0, 5)!="acct:") $acct="acct:".$acct;
 		foreach ($lrdd AS $key => $link) {
 			if ($webfinger)
 				continue;
@@ -353,7 +354,7 @@ class Probe {
 				continue;
 
 			// Try webfinger with the address (user@domain.tld)
-			$path = str_replace('{uri}', urlencode($addr), $link);
+			$path = str_replace('{uri}', urlencode($acct), $link);
 			$webfinger = self::webfinger($path);
 
 			// If webfinger wasn't successful then try it with the URL - possibly in the format https://...
@@ -826,11 +827,10 @@ class Probe {
 				$data["poll"] = $link["href"];
 			elseif (($link["rel"] == "magic-public-key") AND ($link["href"] != "")) {
 				$pubkey = $link["href"];
-
-				if (substr($pubkey, 0, 5) === 'data:') {
+				if (substr($pubkey, 0, 4) !== 'http') {
 					if (strstr($pubkey, ','))
 						$pubkey = substr($pubkey, strpos($pubkey, ',') + 1);
-					else
+					if (substr($pubkey,0,5) === 'data:')
 						$pubkey = substr($pubkey, 5);
 				} else
 					$pubkey = fetch_url($pubkey);
