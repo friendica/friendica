@@ -446,9 +446,12 @@ function dfrn_request_post(&$a) {
 			// Detect the network
 			$data = probe_url($url);
 			$network = $data["network"];
+			$url = $data["url"];
 
-			// Canonicalise email-style profile locator
-			$url = Probe::webfinger_dfrn($url,$hcard);
+			if (!$url) {
+				// Canonicalise email-style profile locator
+				$url = Probe::webfinger_dfrn($url,$hcard);
+			}
 
 			if (substr($url,0,5) === 'stat:') {
 
