@@ -10,7 +10,6 @@ Version 3.5.1
     Improvements to the database handling [heluecht]
     Improvements to the admin panel [tobiasd, Hypolite]
     Improvements to the update process [heluecht]
-    Improvements to the federation as contact to Mastodon users can now be established [heluecht, fabrixxm]
     Extension of the DFRN transmitted information fields [heluecht]
     Translations of the core are now in /view/lang [Hypolite]
 
@@ -18,7 +17,7 @@ Version 3.5.1
     Updates to the translations (DE, FR, PT-BR) [translation teams]
 
   Closed Issues
-    1163, 2791, 2792, 2800, 2804, 2813, 2814, 2817, 2823
+    1163, 2791, 2792, 2800, 2804, 2813, 2814, 2816, 2817, 2823
 
 Version 3.5
   Friendica Core:
