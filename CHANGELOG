@@ -13,6 +13,7 @@ Version 3.5.1
     Improvements to the handling of worker processes [heluecht]
     Extension of the DFRN transmitted information fields [heluecht]
     Translations of the core are now in /view/lang [Hypolite, tobiasd]
+    Update of the fullCalendar libriry to 3.0.1 and adjusting the themes [rabuzarus]
 
   Friendica Addons:
     Updates to the translations (DE, ES, FR, PT-BR) [translation teams]
