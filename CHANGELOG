@@ -11,6 +11,7 @@ Version 3.5.1
     Improvements to the admin panel [tobiasd, Hypolite]
     Improvements to the update process [heluecht]
     Improvements to the handling of worker processes [heluecht]
+    Improvements to the performance [heluecht, Hypolite]
     Extension of the DFRN transmitted information fields [heluecht]
     Translations of the core are now in /view/lang [Hypolite, tobiasd]
     Update of the fullCalendar library to 3.0.1 and adjusting the themes [rabuzarus]
@@ -22,6 +23,7 @@ Version 3.5.1
 
   Closed Issues
     1163, 2791, 2792, 2800, 2804, 2813, 2814, 2816, 2817, 2823, 2850
+    2858, 2865
 
 Version 3.5
   Friendica Core:
