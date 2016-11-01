@@ -5,36 +5,38 @@
 
 	function _resizeIframe(obj, desth) {
 		var h = obj.style.height;
-		var ch = obj.contentWindow.document.body.scrollHeight + 'px';
-		if (h==ch) {
+		var ch = obj.contentWindow.document.body.scrollHeight;
+		if (h == (ch + 'px')) {
 			return;
 		}
-		//console.log("_resizeIframe", obj, desth, ch);
-		if (desth!=ch) {
-			setTimeout(_resizeIframe, 500, obj, ch);
-		} else {
-			if (ch>0) obj.style.height  = ch;
-			setTimeout(_resizeIframe, 1000, obj, ch);
+		if (desth == ch && ch>0) {
+			obj.style.height  = ch + 'px';
+		}
+		setTimeout(_resizeIframe, 100, obj, ch);
+	}
+
+	function openClose(theID) {
+		if(document.getElementById(theID).style.display == "block") {
+			document.getElementById(theID).style.display = "none"
+		}
+		else {
+			document.getElementById(theID).style.display = "block"
 		}
 	}
 
-  function openClose(theID) {
-    if(document.getElementById(theID).style.display == "block") {
-      document.getElementById(theID).style.display = "none"
-    }
-    else {
-      document.getElementById(theID).style.display = "block"
-    }
-  }
+	function openMenu(theID) {
+		document.getElementById(theID).style.display = "block"
+	}
 
-  function openMenu(theID) {
-      document.getElementById(theID).style.display = "block"
-  }
+	function closeMenu(theID) {
+		document.getElementById(theID).style.display = "none"
+	}
 
-  function closeMenu(theID) {
-      document.getElementById(theID).style.display = "none"
-  }
-
+	function decodeHtml(html) {
+		var txt = document.createElement("textarea");
+		txt.innerHTML = html;
+		return txt.value;
+	}
 
 
 	var src = null;
@@ -125,6 +127,7 @@
 		function close_last_popup_menu() {
 			if(last_popup_menu) {
 				last_popup_menu.hide();
+				last_popup_menu.off('click', function(e) {e.stopPropagation()});
 				last_popup_button.removeClass("selected");
 				last_popup_menu = null;
 				last_popup_button = null;
@@ -147,6 +150,7 @@
 				last_popup_button = null;
 			} else {
 				last_popup_menu = menu;
+				last_popup_menu.on('click', function(e) {e.stopPropagation()});
 				last_popup_button = parent;
 				$('#nav-notifications-menu').perfectScrollbar('update');
 			}
@@ -259,13 +263,13 @@
 					var html = notifications_tpl.format(
 						e.attr('href'),                     // {0}  // link to the source
 						e.attr('photo'),                    // {1}  // photo of the contact
-						text,                               // {2}  // preformatet text (autor + text)
+						text,                               // {2}  // preformatted text (autor + text)
 						e.attr('date'),                     // {3}  // date of notification (time ago)
-						seenclass,                          // {4}  // vistiting status of the notification
-						new Date(e.attr('timestamp')*1000), // {5}  //date of notification
+						seenclass,                          // {4}  // visited status of the notification
+						new Date(e.attr('timestamp')*1000), // {5}  // date of notification
 						e.attr('url'),                      // {6}  // profile url of the contact
-						e.text().format(""),                // {7}  // clean status text
-						contact                             // {8}  //preformatat author (name + profile url)
+						e.text().format(contact),           // {7}  // preformatted html (text including author profile url)
+						''                                  // {8}  // Deprecated
 					);
 					nnm.append(html);
 				});
@@ -275,7 +279,7 @@
 					if (notification_lastitem!== null && notification_id > notification_lastitem) {
 						if (getNotificationPermission()==="granted") {
 							var notification = new Notification(document.title, {
-											  body: e.text().replace('&rarr; ','').format(e.attr('name')),
+											  body: decodeHtml(e.text().replace('&rarr; ','').format(e.attr('name'))),
 											  icon: e.attr('photo'),
 											 });
 							notification['url'] = e.attr('href');
@@ -513,7 +517,7 @@
 			$(".comment-edit-form  textarea").editor_autocomplete(baseurl+"/acl");
 			/* autocomplete bbcode */
 			$(".comment-edit-form  textarea").bbco_autocomplete('bbcode');
-			
+
 			// setup videos, since VideoJS won't take care of any loaded via AJAX
 			if(typeof videojs != 'undefined') videojs.autoSetup();
 		});

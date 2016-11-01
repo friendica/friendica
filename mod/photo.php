@@ -72,7 +72,7 @@ function photo_init(&$a) {
 
 		$uid = str_replace(array('.jpg','.png'),array('',''), $person);
 
-		$r = q("SELECT * FROM `photo` WHERE `scale` = %d AND `uid` = %d AND `profile` = 1 LIMIT 1",
+		$r = qu("SELECT * FROM `photo` WHERE `scale` = %d AND `uid` = %d AND `profile` = 1 LIMIT 1",
 			intval($resolution),
 			intval($uid)
 		);
@@ -102,7 +102,7 @@ function photo_init(&$a) {
 		}
 
         // check if the photo exists and get the owner of the photo
-		$r = q("SELECT `uid` FROM `photo` WHERE `resource-id` = '%s' LIMIT 1",
+		$r = qu("SELECT `uid` FROM `photo` WHERE `resource-id` = '%s' LIMIT 1",
 			dbesc($photo),
 			intval($resolution)
 		);
@@ -112,7 +112,7 @@ function photo_init(&$a) {
 
 			// Now we'll see if we can access the photo
 
-			$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` <= %d $sql_extra ORDER BY scale DESC LIMIT 1",
+			$r = qu("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` <= %d $sql_extra ORDER BY scale DESC LIMIT 1",
 				dbesc($photo),
 				intval($resolution)
 			);

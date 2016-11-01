@@ -135,7 +135,7 @@ function proxy_init() {
 	$valid = true;
 
 	if (!$direct_cache AND ($cachefile == "")) {
-		$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' LIMIT 1", $urlhash);
+		$r = qu("SELECT * FROM `photo` WHERE `resource-id` = '%s' LIMIT 1", $urlhash);
 		if (count($r)) {
         		$img_str = $r[0]['data'];
 			$mime = $r[0]["desc"];

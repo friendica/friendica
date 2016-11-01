@@ -23,7 +23,7 @@ require_once('include/group.php');
 require_once('library/defuse/php-encryption-1.2.1/Crypto.php');
 
 function construct_verb($item) {
-	if($item['verb'])
+	if ($item['verb'])
 		return $item['verb'];
 	return ACTIVITY_POST;
 }
@@ -33,7 +33,7 @@ function construct_verb($item) {
  *		The purpose of this function is to apply system message length limits to
  *		imported messages without including any embedded photos in the length
  */
-if(! function_exists('limit_body_size')) {
+if (! function_exists('limit_body_size')) {
 function limit_body_size($body) {
 
 //	logger('limit_body_size: start', LOGGER_DEBUG);
@@ -42,7 +42,7 @@ function limit_body_size($body) {
 
 	// If the length of the body, including the embedded images, is smaller
 	// than the maximum, then don't waste time looking for the images
-	if($maxlen && (strlen($body) > $maxlen)) {
+	if ($maxlen && (strlen($body) > $maxlen)) {
 
 		logger('limit_body_size: the total body length exceeds the limit', LOGGER_DEBUG);
 
@@ -60,40 +60,37 @@ function limit_body_size($body) {
 			$img_end += $img_start;
 			$img_end += strlen('[/img]');
 
-			if(! strcmp(substr($orig_body, $img_start + $img_st_close, 5), 'data:')) {
+			if (! strcmp(substr($orig_body, $img_start + $img_st_close, 5), 'data:')) {
 				// This is an embedded image
 
-				if( ($textlen + $img_start) > $maxlen ) {
-					if($textlen < $maxlen) {
+				if ( ($textlen + $img_start) > $maxlen ) {
+					if ($textlen < $maxlen) {
 						logger('limit_body_size: the limit happens before an embedded image', LOGGER_DEBUG);
 						$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
 						$textlen = $maxlen;
 					}
-				}
-				else {
+				} else {
 					$new_body = $new_body . substr($orig_body, 0, $img_start);
 					$textlen += $img_start;
 				}
 
 				$new_body = $new_body . substr($orig_body, $img_start, $img_end - $img_start);
-			}
-			else {
+			} else {
 
-				if( ($textlen + $img_end) > $maxlen ) {
-					if($textlen < $maxlen) {
+				if ( ($textlen + $img_end) > $maxlen ) {
+					if ($textlen < $maxlen) {
 						logger('limit_body_size: the limit happens before the end of a non-embedded image', LOGGER_DEBUG);
 						$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
 						$textlen = $maxlen;
 					}
-				}
-				else {
+				} else {
 					$new_body = $new_body . substr($orig_body, 0, $img_end);
 					$textlen += $img_end;
 				}
 			}
 			$orig_body = substr($orig_body, $img_end);
 
-			if($orig_body === false) // in case the body ends on a closing image tag
+			if ($orig_body === false) // in case the body ends on a closing image tag
 				$orig_body = '';
 
 			$img_start = strpos($orig_body, '[img');
@@ -101,22 +98,20 @@ function limit_body_size($body) {
 			$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
 		}
 
-		if( ($textlen + strlen($orig_body)) > $maxlen) {
-			if($textlen < $maxlen) {
+		if ( ($textlen + strlen($orig_body)) > $maxlen) {
+			if ($textlen < $maxlen) {
 				logger('limit_body_size: the limit happens after the end of the last image', LOGGER_DEBUG);
 				$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
 				$textlen = $maxlen;
 			}
-		}
-		else {
+		} else {
 			logger('limit_body_size: the text size with embedded images extracted did not violate the limit', LOGGER_DEBUG);
 			$new_body = $new_body . $orig_body;
 			$textlen += strlen($orig_body);
 		}
 
 		return $new_body;
-	}
-	else
+	} else
 		return $body;
 }}
 
@@ -319,9 +314,7 @@ function item_add_language_opt(&$arr) {
 			return;
 		}
 		$postopts = $arr['postopts'];
-	}
-	else
-	{
+	} else {
 		$postopts = "";
 	}
 
@@ -383,7 +376,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	// item array and set it aside for later storage.
 
 	$dsprsig = null;
-	if(x($arr,'dsprsig')) {
+	if (x($arr,'dsprsig')) {
 		$dsprsig = json_decode(base64_decode($arr['dsprsig']));
 		unset($arr['dsprsig']);
 	}
@@ -396,16 +389,16 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			$arr['plink'] = ostatus::convert_href($arr['uri']);
 	}
 
-	if(x($arr, 'gravity'))
+	if (x($arr, 'gravity'))
 		$arr['gravity'] = intval($arr['gravity']);
-	elseif($arr['parent-uri'] === $arr['uri'])
+	elseif ($arr['parent-uri'] === $arr['uri'])
 		$arr['gravity'] = 0;
-	elseif(activity_match($arr['verb'],ACTIVITY_POST))
+	elseif (activity_match($arr['verb'],ACTIVITY_POST))
 		$arr['gravity'] = 6;
 	else
 		$arr['gravity'] = 6;   // extensible catchall
 
-	if(! x($arr,'type'))
+	if (! x($arr,'type'))
 		$arr['type']      = 'remote';
 
 
@@ -413,7 +406,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	/* check for create  date and expire time */
 	$uid = intval($arr['uid']);
 	$r = q("SELECT expire FROM user WHERE uid = %d", intval($uid));
-	if(count($r)) {
+	if (count($r)) {
 		$expire_interval = $r[0]['expire'];
 		if ($expire_interval>0) {
 			$expire_date =  new DateTime( '- '.$expire_interval.' days', new DateTimeZone('UTC'));
@@ -445,7 +438,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 
 	// Shouldn't happen but we want to make absolutely sure it doesn't leak from a plugin.
 	// Deactivated, since the bbcode parser can handle with it - and it destroys posts with some smileys that contain "<"
-	//if((strpos($arr['body'],'<') !== false) || (strpos($arr['body'],'>') !== false))
+	//if ((strpos($arr['body'],'<') !== false) || (strpos($arr['body'],'>') !== false))
 	//	$arr['body'] = strip_tags($arr['body']);
 
 	item_add_language_opt($arr);
@@ -530,19 +523,19 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			intval($arr['uid'])
 		);
 
-		if(!count($r))
+		if (!count($r))
 			$r = q("SELECT `network` FROM `gcontact` WHERE `network` IN ('%s', '%s', '%s') AND `nurl` = '%s' LIMIT 1",
 				dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS),
 				dbesc(normalise_link($arr['author-link']))
 			);
 
-		if(!count($r))
+		if (!count($r))
 			$r = q("SELECT `network` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($arr['contact-id']),
 				intval($arr['uid'])
 			);
 
-		if(count($r))
+		if (count($r))
 			$arr['network'] = $r[0]["network"];
 
 		// Fallback to friendica (why is it empty in some cases?)
@@ -556,7 +549,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	if ($arr["contact-id"] == 0) {
 		// First we are looking for a suitable contact that matches with the author of the post
 		// This is done only for comments (See below explanation at "gcontact-id")
-		if($arr['parent-uri'] != $arr['uri'])
+		if ($arr['parent-uri'] != $arr['uri'])
 			$arr["contact-id"] = get_contact($arr['author-link'], $uid);
 
 		// If not present then maybe the owner was found
@@ -576,7 +569,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		// The gcontact should mostly behave like the contact. But is is supposed to be global for the system.
 		// This means that wall posts, repeated posts, etc. should have the gcontact id of the owner.
 		// On comments the author is the better choice.
-		if($arr['parent-uri'] === $arr['uri'])
+		if ($arr['parent-uri'] === $arr['uri'])
 			$arr["gcontact-id"] = get_gcontact_id(array("url" => $arr['owner-link'], "network" => $arr['network'],
 								 "photo" => $arr['owner-avatar'], "name" => $arr['owner-name']));
 		else
@@ -596,7 +589,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		$r = q("SELECT `guid` FROM `item` WHERE `guid` = '%s' AND `network` = '%s' AND `uid` = '%d' LIMIT 1",
 			dbesc($arr['guid']), dbesc($arr['network']), intval($arr['uid']));
 
-		if(count($r)) {
+		if (count($r)) {
 			logger('found item with guid '.$arr['guid'].' for user '.$arr['uid'].' on network '.$arr['network'], LOGGER_DEBUG);
 			return 0;
 		}
@@ -606,7 +599,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	item_body_set_hashtags($arr);
 
 	$arr['thr-parent'] = $arr['parent-uri'];
-	if($arr['parent-uri'] === $arr['uri']) {
+	if ($arr['parent-uri'] === $arr['uri']) {
 		$parent_id = 0;
 		$parent_deleted = 0;
 		$allow_cid = $arr['allow_cid'];
@@ -614,8 +607,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		$deny_cid  = $arr['deny_cid'];
 		$deny_gid  = $arr['deny_gid'];
 		$notify_type = 'wall-new';
-	}
-	else {
+	} else {
 
 		// find the parent and snarf the item id and ACLs
 		// and anything else we need to inherit
@@ -625,13 +617,13 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			intval($arr['uid'])
 		);
 
-		if(count($r)) {
+		if (count($r)) {
 
 			// is the new message multi-level threaded?
 			// even though we don't support it now, preserve the info
 			// and re-attach to the conversation parent.
 
-			if($r[0]['uri'] != $r[0]['parent-uri']) {
+			if ($r[0]['uri'] != $r[0]['parent-uri']) {
 				$arr['parent-uri'] = $r[0]['parent-uri'];
 				$z = q("SELECT * FROM `item` WHERE `uri` = '%s' AND `parent-uri` = '%s' AND `uid` = %d
 					ORDER BY `id` ASC LIMIT 1",
@@ -639,7 +631,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 					dbesc($r[0]['parent-uri']),
 					intval($arr['uid'])
 				);
-				if($z && count($z))
+				if ($z && count($z))
 					$r = $z;
 			}
 
@@ -656,21 +648,21 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			// This differs from the above settings as it subtly allows comments from
 			// email correspondents to be private even if the overall thread is not.
 
-			if($r[0]['private'])
+			if ($r[0]['private'])
 				$arr['private'] = $r[0]['private'];
 
 			// Edge case. We host a public forum that was originally posted to privately.
 			// The original author commented, but as this is a comment, the permissions
 			// weren't fixed up so it will still show the comment as private unless we fix it here.
 
-			if((intval($r[0]['forum_mode']) == 1) && (! $r[0]['private']))
+			if ((intval($r[0]['forum_mode']) == 1) && (! $r[0]['private']))
 				$arr['private'] = 0;
 
 
 			// If its a post from myself then tag the thread as "mention"
 			logger("item_store: Checking if parent ".$parent_id." has to be tagged as mention for user ".$arr['uid'], LOGGER_DEBUG);
-			$u = q("select * from user where uid = %d limit 1", intval($arr['uid']));
-			if(count($u)) {
+			$u = q("SELECT `nickname` FROM `user` WHERE `uid` = %d", intval($arr['uid']));
+			if (count($u)) {
 				$a = get_app();
 				$self = normalise_link($a->get_baseurl() . '/profile/' . $u[0]['nickname']);
 				logger("item_store: 'myself' is ".$self." for parent ".$parent_id." checking against ".$arr['author-link']." and ".$arr['owner-link'], LOGGER_DEBUG);
@@ -679,19 +671,17 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 					logger("item_store: tagged thread ".$parent_id." as mention for user ".$self, LOGGER_DEBUG);
 				}
 			}
-		}
-		else {
+		} else {
 
 			// Allow one to see reply tweets from status.net even when
 			// we don't have or can't see the original post.
 
-			if($force_parent) {
+			if ($force_parent) {
 				logger('item_store: $force_parent=true, reply converted to top-level post.');
 				$parent_id = 0;
 				$arr['parent-uri'] = $arr['uri'];
 				$arr['gravity'] = 0;
-			}
-			else {
+			} else {
 				logger('item_store: item parent '.$arr['parent-uri'].' for '.$arr['uid'].' was not found - ignoring item');
 				return 0;
 			}
@@ -706,34 +696,60 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		dbesc(NETWORK_DFRN),
 		intval($arr['uid'])
 	);
-	if($r && count($r)) {
-		logger('duplicated item with the same uri found. ' . print_r($arr,true));
+	if (dbm::is_result($r)) {
+		logger('duplicated item with the same uri found. '.print_r($arr,true));
 		return 0;
 	}
 
-	// Check for an existing post with the same content. There seems to be a problem with OStatus.
-	$r = q("SELECT `id` FROM `item` WHERE `body` = '%s' AND `network` = '%s' AND `created` = '%s' AND `contact-id` = %d AND `uid` = %d LIMIT 1",
-		dbesc($arr['body']),
-		dbesc($arr['network']),
-		dbesc($arr['created']),
-		intval($arr['contact-id']),
-		intval($arr['uid'])
-	);
-	if($r && count($r)) {
-		logger('duplicated item with the same body found. ' . print_r($arr,true));
-		return 0;
+	// On Friendica and Diaspora the GUID is unique
+	if (in_array($arr['network'], array(NETWORK_DFRN, NETWORK_DIASPORA))) {
+		$r = q("SELECT `id` FROM `item` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
+			dbesc($arr['guid']),
+			intval($arr['uid'])
+		);
+		if (dbm::is_result($r)) {
+			logger('duplicated item with the same guid found. '.print_r($arr,true));
+			return 0;
+		}
+	} else {
+		// Check for an existing post with the same content. There seems to be a problem with OStatus.
+		$r = q("SELECT `id` FROM `item` WHERE `body` = '%s' AND `network` = '%s' AND `created` = '%s' AND `contact-id` = %d AND `uid` = %d LIMIT 1",
+			dbesc($arr['body']),
+			dbesc($arr['network']),
+			dbesc($arr['created']),
+			intval($arr['contact-id']),
+			intval($arr['uid'])
+		);
+		if (dbm::is_result($r)) {
+			logger('duplicated item with the same body found. '.print_r($arr,true));
+			return 0;
+		}
 	}
 
 	// Is this item available in the global items (with uid=0)?
 	if ($arr["uid"] == 0) {
 		$arr["global"] = true;
 
+		// Set the global flag on all items if this was a global item entry
 		q("UPDATE `item` SET `global` = 1 WHERE `uri` = '%s'", dbesc($arr["uri"]));
-	}  else {
+	} else {
 		$isglobal = q("SELECT `global` FROM `item` WHERE `uid` = 0 AND `uri` = '%s'", dbesc($arr["uri"]));
 
 		$arr["global"] = (count($isglobal) > 0);
 	}
+
+	// ACL settings
+	if (strlen($allow_cid) || strlen($allow_gid) || strlen($deny_cid) || strlen($deny_gid))
+		$private = 1;
+	else
+		$private = $arr['private'];
+
+	$arr["allow_cid"] = $allow_cid;
+	$arr["allow_gid"] = $allow_gid;
+	$arr["deny_cid"] = $deny_cid;
+	$arr["deny_gid"] = $deny_gid;
+	$arr["private"] = $private;
+	$arr["deleted"] = $parent_deleted;
 
 	// Fill the cache field
 	put_item_in_cache($arr);
@@ -743,9 +759,20 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	else
 		call_hooks('post_remote',$arr);
 
-	if(x($arr,'cancel')) {
+	if (x($arr,'cancel')) {
 		logger('item_store: post cancelled by plugin.');
 		return 0;
+	}
+
+	// Check for already added items.
+	// There is a timing issue here that sometimes creates double postings.
+	// An unique index would help - but the limitations of MySQL (maximum size of index values) prevent this.
+	if ($arr["uid"] == 0) {
+		$r = qu("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = 0 LIMIT 1", dbesc(trim($arr['uri'])));
+		if (dbm::is_result($r)) {
+			logger('Global item already stored. URI: '.$arr['uri'].' on network '.$arr['network'], LOGGER_DEBUG);
+			return 0;
+		}
 	}
 
 	// Store the unescaped version
@@ -755,93 +782,85 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 
 	logger('item_store: ' . print_r($arr,true), LOGGER_DATA);
 
+	q("COMMIT");
+	q("START TRANSACTION;");
+
 	$r = dbq("INSERT INTO `item` (`"
 			. implode("`, `", array_keys($arr))
 			. "`) VALUES ('"
 			. implode("', '", array_values($arr))
-			. "')" );
+			. "')");
 
 	// And restore it
 	$arr = $unescaped;
 
-	// find the item that we just created
-	$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = %d AND `network` = '%s' ORDER BY `id` ASC",
+	// When the item was successfully stored we fetch the ID of the item.
+	if (dbm::is_result($r)) {
+		$r = q("SELECT LAST_INSERT_ID() AS `item-id`");
+		if (dbm::is_result($r)) {
+			$current_post = $r[0]['item-id'];
+		} else {
+			// This shouldn't happen
+			$current_post = 0;
+		}
+	} else {
+		// This can happen - for example - if there are locking timeouts.
+		logger("Item wasn't stored - we quit here.");
+		q("COMMIT");
+		return 0;
+	}
+
+	if ($current_post == 0) {
+		// This is one of these error messages that never should occur.
+		logger("couldn't find created item - we better quit now.");
+		q("COMMIT");
+		return 0;
+	}
+
+	// How much entries have we created?
+	// We wouldn't need this query when we could use an unique index - but MySQL has length problems with them.
+	$r = q("SELECT COUNT(*) AS `entries` FROM `item` WHERE `uri` = '%s' AND `uid` = %d AND `network` = '%s'",
 		dbesc($arr['uri']),
 		intval($arr['uid']),
 		dbesc($arr['network'])
 	);
 
-	if(count($r) > 1) {
-		// There are duplicates. Keep the oldest one, delete the others
-		logger('item_store: duplicated post occurred. Removing newer duplicates. uri = '.$arr['uri'].' uid = '.$arr['uid']);
-		q("DELETE FROM `item` WHERE `uri` = '%s' AND `uid` = %d AND `network` = '%s' AND `id` > %d",
-			dbesc($arr['uri']),
-			intval($arr['uid']),
-			dbesc($arr['network']),
-			intval($r[0]["id"])
-		);
-		return 0;
-	} elseif(count($r)) {
-
-		$current_post = $r[0]['id'];
-		logger('item_store: created item ' . $current_post);
-
-		// Set "success_update" and "last-item" to the date of the last time we heard from this contact
-		// This can be used to filter for inactive contacts.
-		// Only do this for public postings to avoid privacy problems, since poco data is public.
-		// Don't set this value if it isn't from the owner (could be an author that we don't know)
-
-		$update = (!$arr['private'] AND (($arr["author-link"] === $arr["owner-link"]) OR ($arr["parent-uri"] === $arr["uri"])));
-
-		// Is it a forum? Then we don't care about the rules from above
-		if (!$update AND ($arr["network"] == NETWORK_DFRN) AND ($arr["parent-uri"] === $arr["uri"])) {
-			$isforum = q("SELECT `forum` FROM `contact` WHERE `id` = %d AND `forum`",
-					intval($arr['contact-id']));
-			if ($isforum)
-				$update = true;
-		}
-
-		if ($update)
-			q("UPDATE `contact` SET `success_update` = '%s', `last-item` = '%s' WHERE `id` = %d",
-				dbesc($arr['received']),
-				dbesc($arr['received']),
-				intval($arr['contact-id'])
-			);
-	} else {
-		logger('item_store: could not locate created item');
+	if (!dbm::is_result($r)) {
+		// This shouldn't happen, since COUNT always works when the database connection is there.
+		logger("We couldn't count the stored entries. Very strange ...");
+		q("COMMIT");
 		return 0;
 	}
 
-	if((! $parent_id) || ($arr['parent-uri'] === $arr['uri']))
+	if ($r[0]["entries"] > 1) {
+		// There are duplicates. We delete our just created entry.
+		logger('Duplicated post occurred. uri = '.$arr['uri'].' uid = '.$arr['uid']);
+
+		// Yes, we could do a rollback here - but we are having many users with MyISAM.
+		q("DELETE FROM `item` WHERE `id` = %d", intval($current_post));
+		q("COMMIT");
+		return 0;
+	} elseif ($r[0]["entries"] == 0) {
+		// This really should never happen since we quit earlier if there were problems.
+		logger("Something is terribly wrong. We haven't found our created entry.");
+		q("COMMIT");
+		return 0;
+	}
+
+	logger('item_store: created item '.$current_post);
+	item_set_last_item($arr);
+
+	if (!$parent_id || ($arr['parent-uri'] === $arr['uri']))
 		$parent_id = $current_post;
 
-	if(strlen($allow_cid) || strlen($allow_gid) || strlen($deny_cid) || strlen($deny_gid))
-		$private = 1;
-	else
-		$private = $arr['private'];
-
-	// Set parent id - and also make sure to inherit the parent's ACLs.
-
-	$r = q("UPDATE `item` SET `parent` = %d, `allow_cid` = '%s', `allow_gid` = '%s',
-		`deny_cid` = '%s', `deny_gid` = '%s', `private` = %d, `deleted` = %d WHERE `id` = %d",
+	// Set parent id
+	$r = q("UPDATE `item` SET `parent` = %d WHERE `id` = %d",
 		intval($parent_id),
-		dbesc($allow_cid),
-		dbesc($allow_gid),
-		dbesc($deny_cid),
-		dbesc($deny_gid),
-		intval($private),
-		intval($parent_deleted),
 		intval($current_post)
 	);
 
 	$arr['id'] = $current_post;
 	$arr['parent'] = $parent_id;
-	$arr['allow_cid'] = $allow_cid;
-	$arr['allow_gid'] = $allow_gid;
-	$arr['deny_cid'] = $deny_cid;
-	$arr['deny_gid'] = $deny_gid;
-	$arr['private'] = $private;
-	$arr['deleted'] = $parent_deleted;
 
 	// update the commented timestamp on the parent
 	// Only update "commented" if it is really a comment
@@ -857,7 +876,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			intval($parent_id)
 		);
 
-	if($dsprsig) {
+	if ($dsprsig) {
 
 		// Friendica servers lower than 3.4.3-2 had double encoded the signature ...
 		// We can check for this condition when we decode and encode the stuff again.
@@ -871,19 +890,6 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			dbesc($dsprsig->signed_text),
 			dbesc($dsprsig->signature),
 			dbesc($dsprsig->signer)
-		);
-	}
-
-
-	/**
-	 * If this is now the last-child, force all _other_ children of this parent to *not* be last-child
-	 */
-
-	if($arr['last-child']) {
-		$r = q("UPDATE `item` SET `last-child` = 0 WHERE `parent-uri` = '%s' AND `uid` = %d AND `id` != %d",
-			dbesc($arr['uri']),
-			intval($arr['uid']),
-			intval($current_post)
 		);
 	}
 
@@ -903,15 +909,33 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			logger('item_store: new item not found in DB, id ' . $current_post);
 	}
 
+	if ($arr['parent-uri'] === $arr['uri']) {
+		add_thread($current_post);
+	} else {
+		update_thread($parent_id);
+	}
+
+	q("COMMIT");
+
+	// Due to deadlock issues with the "term" table we are doing these steps after the commit.
+	// This is not perfect - but a workable solution until we found the reason for the problem.
 	create_tags_from_item($current_post);
 	create_files_from_item($current_post);
 
-	// Only check for notifications on start posts
-	if ($arr['parent-uri'] === $arr['uri'])
-		add_thread($current_post);
-	else {
-		update_thread($parent_id);
-		add_shadow_entry($arr);
+	// If this is now the last-child, force all _other_ children of this parent to *not* be last-child
+	// It is done after the transaction to avoid dead locks.
+	if ($arr['last-child']) {
+		$r = q("UPDATE `item` SET `last-child` = 0 WHERE `parent-uri` = '%s' AND `uid` = %d AND `id` != %d",
+			dbesc($arr['uri']),
+			intval($arr['uid']),
+			intval($current_post)
+		);
+	}
+
+	if ($arr['parent-uri'] === $arr['uri']) {
+		add_shadow_thread($current_post);
+	} else {
+		add_shadow_entry($current_post);
 	}
 
 	check_item_notification($current_post, $uid);
@@ -922,12 +946,59 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	return $current_post;
 }
 
+/**
+ * @brief Set "success_update" and "last-item" to the date of the last time we heard from this contact
+ *
+ * This can be used to filter for inactive contacts.
+ * Only do this for public postings to avoid privacy problems, since poco data is public.
+ * Don't set this value if it isn't from the owner (could be an author that we don't know)
+ *
+ * @param array $arr Contains the just posted item record
+ */
+function item_set_last_item($arr) {
+
+	$update = (!$arr['private'] AND (($arr["author-link"] === $arr["owner-link"]) OR ($arr["parent-uri"] === $arr["uri"])));
+
+	// Is it a forum? Then we don't care about the rules from above
+	if (!$update AND ($arr["network"] == NETWORK_DFRN) AND ($arr["parent-uri"] === $arr["uri"])) {
+		$isforum = q("SELECT `forum` FROM `contact` WHERE `id` = %d AND `forum`",
+				intval($arr['contact-id']));
+		if ($isforum) {
+			$update = true;
+		}
+	}
+
+	if ($update) {
+		q("UPDATE `contact` SET `success_update` = '%s', `last-item` = '%s' WHERE `id` = %d",
+			dbesc($arr['received']),
+			dbesc($arr['received']),
+			intval($arr['contact-id'])
+		);
+	}
+	// Now do the same for the system wide contacts with uid=0
+	if (!$arr['private']) {
+		q("UPDATE `contact` SET `success_update` = '%s', `last-item` = '%s' WHERE `id` = %d",
+			dbesc($arr['received']),
+			dbesc($arr['received']),
+			intval($arr['owner-id'])
+		);
+
+		if ($arr['owner-id'] != $arr['author-id']) {
+			q("UPDATE `contact` SET `success_update` = '%s', `last-item` = '%s' WHERE `id` = %d",
+				dbesc($arr['received']),
+				dbesc($arr['received']),
+				intval($arr['author-id'])
+			);
+		}
+	}
+}
+
 function item_body_set_hashtags(&$item) {
 
 	$tags = get_tags($item["body"]);
 
 	// No hashtags?
-	if(!count($tags))
+	if (!count($tags))
 		return(false);
 
 	// This sorting is important when there are hashtags that are part of other hashtags
@@ -967,10 +1038,10 @@ function item_body_set_hashtags(&$item) {
 
 
 	foreach($tags as $tag) {
-		if(strpos($tag,'#') !== 0)
+		if (strpos($tag,'#') !== 0)
 			continue;
 
-		if(strpos($tag,'[url='))
+		if (strpos($tag,'[url='))
 			continue;
 
 		$basetag = str_replace('_',' ',substr($tag,1));
@@ -979,8 +1050,8 @@ function item_body_set_hashtags(&$item) {
 
 		$item["body"] = str_replace($tag, $newtag, $item["body"]);
 
-		if(!stristr($item["tag"],"/search?tag=".$basetag."]".$basetag."[/url]")) {
-			if(strlen($item["tag"]))
+		if (!stristr($item["tag"],"/search?tag=".$basetag."]".$basetag."[/url]")) {
+			if (strlen($item["tag"]))
 				$item["tag"] = ','.$item["tag"];
 			$item["tag"] = $newtag.$item["tag"];
 		}
@@ -1035,10 +1106,10 @@ function get_item_id($guid, $uid = 0) {
 
 // return - test
 function get_item_contact($item,$contacts) {
-	if(! count($contacts) || (! is_array($item)))
+	if (! count($contacts) || (! is_array($item)))
 		return false;
 	foreach($contacts as $contact) {
-		if($contact['id'] == $item['contact-id']) {
+		if ($contact['id'] == $item['contact-id']) {
 			return $contact;
 			break; // NOTREACHED
 		}
@@ -1063,7 +1134,7 @@ function tag_deliver($uid,$item_id) {
 	$u = q("select * from user where uid = %d limit 1",
 		intval($uid)
 	);
-	if(! count($u))
+	if (! count($u))
 		return;
 
 	$community_page = (($u[0]['page-flags'] == PAGE_COMMUNITY) ? true : false);
@@ -1074,7 +1145,7 @@ function tag_deliver($uid,$item_id) {
 		intval($item_id),
 		intval($uid)
 	);
-	if(! count($i))
+	if (! count($i))
 		return;
 
 	$item = $i[0];
@@ -1087,16 +1158,16 @@ function tag_deliver($uid,$item_id) {
 	$dlink = normalise_link($a->get_baseurl() . '/u/' . $u[0]['nickname']);
 
 	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism',$item['body'],$matches,PREG_SET_ORDER);
-	if($cnt) {
+	if ($cnt) {
 		foreach($matches as $mtch) {
-			if(link_compare($link,$mtch[1]) || link_compare($dlink,$mtch[1])) {
+			if (link_compare($link,$mtch[1]) || link_compare($dlink,$mtch[1])) {
 				$mention = true;
 				logger('tag_deliver: mention found: ' . $mtch[2]);
 			}
 		}
 	}
 
-	if(! $mention){
+	if (! $mention){
 		if ( ($community_page || $prvgroup) &&
 			  (!$item['wall']) && (!$item['origin']) && ($item['id'] == $item['parent'])){
 			// mmh.. no mention.. community page or private group... no wall.. no origin.. top-post (not a comment)
@@ -1115,7 +1186,7 @@ function tag_deliver($uid,$item_id) {
 
 	call_hooks('tagged', $arr);
 
-	if((! $community_page) && (! $prvgroup))
+	if ((! $community_page) && (! $prvgroup))
 		return;
 
 
@@ -1123,7 +1194,7 @@ function tag_deliver($uid,$item_id) {
 	// prevent delivery looping - only proceed
 	// if the message originated elsewhere and is a top-level post
 
-	if(($item['wall']) || ($item['origin']) || ($item['id'] != $item['parent']))
+	if (($item['wall']) || ($item['origin']) || ($item['id'] != $item['parent']))
 		return;
 
 	// now change this copy of the post to a forum head message and deliver to all the tgroup members
@@ -1132,7 +1203,7 @@ function tag_deliver($uid,$item_id) {
 	$c = q("select name, url, thumb from contact where self = 1 and uid = %d limit 1",
 		intval($u[0]['uid'])
 	);
-	if(! count($c))
+	if (! count($c))
 		return;
 
 	// also reset all the privacy bits to the forum default permissions
@@ -1170,14 +1241,14 @@ function tgroup_check($uid,$item) {
 
 	// check that the message originated elsewhere and is a top-level post
 
-	if(($item['wall']) || ($item['origin']) || ($item['uri'] != $item['parent-uri']))
+	if (($item['wall']) || ($item['origin']) || ($item['uri'] != $item['parent-uri']))
 		return false;
 
 
 	$u = q("select * from user where uid = %d limit 1",
 		intval($uid)
 	);
-	if(! count($u))
+	if (! count($u))
 		return false;
 
 	$community_page = (($u[0]['page-flags'] == PAGE_COMMUNITY) ? true : false);
@@ -1192,19 +1263,19 @@ function tgroup_check($uid,$item) {
 	$dlink = normalise_link($a->get_baseurl() . '/u/' . $u[0]['nickname']);
 
 	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism',$item['body'],$matches,PREG_SET_ORDER);
-	if($cnt) {
+	if ($cnt) {
 		foreach($matches as $mtch) {
-			if(link_compare($link,$mtch[1]) || link_compare($dlink,$mtch[1])) {
+			if (link_compare($link,$mtch[1]) || link_compare($dlink,$mtch[1])) {
 				$mention = true;
 				logger('tgroup_check: mention found: ' . $mtch[2]);
 			}
 		}
 	}
 
-	if(! $mention)
+	if (! $mention)
 		return false;
 
-	if((! $community_page) && (! $prvgroup))
+	if ((! $community_page) && (! $prvgroup))
 		return false;
 
 	return true;
@@ -1367,13 +1438,13 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 
 	if (is_object($item)) {
 		$rawtag = $item->get_item_tags(NAMESPACE_ACTIVITY,'actor');
-		if($rawtag && $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'])
+		if ($rawtag && $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'])
 			$nick = $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'];
 	} else
 		$nick = $item;
 
-	if(is_array($contact)) {
-		if(($contact['network'] == NETWORK_OSTATUS && $contact['rel'] == CONTACT_IS_SHARING)
+	if (is_array($contact)) {
+		if (($contact['network'] == NETWORK_OSTATUS && $contact['rel'] == CONTACT_IS_SHARING)
 			|| ($sharing && $contact['rel'] == CONTACT_IS_FOLLOWER)) {
 			$r = q("UPDATE `contact` SET `rel` = %d, `writable` = 1 WHERE `id` = %d AND `uid` = %d",
 				intval(CONTACT_IS_FRIEND),
@@ -1403,7 +1474,7 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 				intval($importer['uid']),
 				dbesc($url)
 		);
-		if(count($r)) {
+		if (count($r)) {
 			$contact_record = $r[0];
 			update_contact_avatar($photo, $importer["uid"], $contact_record["id"], true);
 		}
@@ -1413,12 +1484,12 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 			intval($importer['uid'])
 		);
 		$a = get_app();
-		if(count($r) AND !in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
+		if (count($r) AND !in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
 
 			// create notification
 			$hash = random_string();
 
-			if(is_array($contact_record)) {
+			if (is_array($contact_record)) {
 				$ret = q("INSERT INTO `intro` ( `uid`, `contact-id`, `blocked`, `knowyou`, `hash`, `datetime`)
 					VALUES ( %d, %d, 0, 0, '%s', '%s' )",
 					intval($importer['uid']),
@@ -1430,10 +1501,10 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 
 			$def_gid = get_default_group($importer['uid'], $contact_record["network"]);
 
-			if(intval($def_gid))
+			if (intval($def_gid))
 				group_add_member($importer['uid'],'',$contact_record['id'],$def_gid);
 
-			if(($r[0]['notify-flags'] & NOTIFY_INTRO) &&
+			if (($r[0]['notify-flags'] & NOTIFY_INTRO) &&
 				in_array($r[0]['page-flags'], array(PAGE_NORMAL))) {
 
 				notification(array(
@@ -1464,26 +1535,24 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 
 function lose_follower($importer,$contact,$datarray = array(),$item = "") {
 
-	if(($contact['rel'] == CONTACT_IS_FRIEND) || ($contact['rel'] == CONTACT_IS_SHARING)) {
+	if (($contact['rel'] == CONTACT_IS_FRIEND) || ($contact['rel'] == CONTACT_IS_SHARING)) {
 		q("UPDATE `contact` SET `rel` = %d WHERE `id` = %d",
 			intval(CONTACT_IS_SHARING),
 			intval($contact['id'])
 		);
-	}
-	else {
+	} else {
 		contact_remove($contact['id']);
 	}
 }
 
 function lose_sharer($importer,$contact,$datarray = array(),$item = "") {
 
-	if(($contact['rel'] == CONTACT_IS_FRIEND) || ($contact['rel'] == CONTACT_IS_FOLLOWER)) {
+	if (($contact['rel'] == CONTACT_IS_FRIEND) || ($contact['rel'] == CONTACT_IS_FOLLOWER)) {
 		q("UPDATE `contact` SET `rel` = %d WHERE `id` = %d",
 			intval(CONTACT_IS_FOLLOWER),
 			intval($contact['id'])
 		);
-	}
-	else {
+	} else {
 		contact_remove($contact['id']);
 	}
 }
@@ -1492,7 +1561,7 @@ function subscribe_to_hub($url,$importer,$contact,$hubmode = 'subscribe') {
 
 	$a = get_app();
 
-	if(is_array($importer)) {
+	if (is_array($importer)) {
 		$r = q("SELECT `nickname` FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($importer['uid'])
 		);
@@ -1502,7 +1571,7 @@ function subscribe_to_hub($url,$importer,$contact,$hubmode = 'subscribe') {
 	// through the direct Diaspora protocol. If we try and use
 	// the feed, we'll get duplicates. So don't.
 
-	if((! count($r)) || $contact['network'] === NETWORK_DIASPORA)
+	if ((! count($r)) || $contact['network'] === NETWORK_DIASPORA)
 		return;
 
 	$push_url = get_config('system','url') . '/pubsub/' . $r[0]['nickname'] . '/' . $contact['id'];
@@ -1515,7 +1584,7 @@ function subscribe_to_hub($url,$importer,$contact,$hubmode = 'subscribe') {
 
 	logger('subscribe_to_hub: ' . $hubmode . ' ' . $contact['name'] . ' to hub ' . $url . ' endpoint: '  . $push_url . ' with verifier ' . $verify_token);
 
-	if(!strlen($contact['hub-verify']) OR ($contact['hub-verify'] != $verify_token)) {
+	if (!strlen($contact['hub-verify']) OR ($contact['hub-verify'] != $verify_token)) {
 		$r = q("UPDATE `contact` SET `hub-verify` = '%s' WHERE `id` = %d",
 			dbesc($verify_token),
 			intval($contact['id'])
@@ -1532,7 +1601,7 @@ function subscribe_to_hub($url,$importer,$contact,$hubmode = 'subscribe') {
 
 function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 
-	if(get_config('system','disable_embedded'))
+	if (get_config('system','disable_embedded'))
 		return $s;
 
 	$a = get_app();
@@ -1554,14 +1623,14 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 		logger('fix_private_photos: found photo ' . $image, LOGGER_DEBUG);
 
 
-		if(stristr($image , $site . '/photo/')) {
+		if (stristr($image , $site . '/photo/')) {
 			// Only embed locally hosted photos
 			$replace = false;
 			$i = basename($image);
 			$i = str_replace(array('.jpg','.png','.gif'),array('','',''),$i);
 			$x = strpos($i,'-');
 
-			if($x) {
+			if ($x) {
 				$res = substr($i,$x+1);
 				$i = substr($i,0,$x);
 				$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` = %d AND `uid` = %d",
@@ -1569,7 +1638,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 					intval($res),
 					intval($uid)
 				);
-				if($r) {
+				if ($r) {
 
 					// Check to see if we should replace this photo link with an embedded image
 					// 1. No need to do so if the photo is public
@@ -1579,31 +1648,30 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 					//    permissions, regardless of order but first check to see if they're an exact
 					//    match to save some processing overhead.
 
-					if(has_permissions($r[0])) {
-						if($cid) {
+					if (has_permissions($r[0])) {
+						if ($cid) {
 							$recips = enumerate_permissions($r[0]);
-							if(in_array($cid, $recips)) {
+							if (in_array($cid, $recips)) {
 								$replace = true;
 							}
-						}
-						elseif($item) {
-							if(compare_permissions($item,$r[0]))
+						} elseif ($item) {
+							if (compare_permissions($item,$r[0]))
 								$replace = true;
 						}
 					}
-					if($replace) {
+					if ($replace) {
 						$data = $r[0]['data'];
 						$type = $r[0]['type'];
 
 						// If a custom width and height were specified, apply before embedding
-						if(preg_match("/\[img\=([0-9]*)x([0-9]*)\]/is", substr($orig_body, $img_start, $img_st_close), $match)) {
+						if (preg_match("/\[img\=([0-9]*)x([0-9]*)\]/is", substr($orig_body, $img_start, $img_st_close), $match)) {
 							logger('fix_private_photos: scaling photo', LOGGER_DEBUG);
 
 							$width = intval($match[1]);
 							$height = intval($match[2]);
 
 							$ph = new Photo($data, $type);
-							if($ph->is_valid()) {
+							if ($ph->is_valid()) {
 								$ph->scaleImage(max($width, $height));
 								$data = $ph->imageString();
 								$type = $ph->getType();
@@ -1620,7 +1688,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 
 		$new_body = $new_body . substr($orig_body, 0, $img_start + $img_st_close) . $image . '[/img]';
 		$orig_body = substr($orig_body, $img_start + $img_st_close + $img_len + strlen('[/img]'));
-		if($orig_body === false)
+		if ($orig_body === false)
 			$orig_body = '';
 
 		$img_start = strpos($orig_body, '[img');
@@ -1634,14 +1702,14 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 }
 
 function has_permissions($obj) {
-	if(($obj['allow_cid'] != '') || ($obj['allow_gid'] != '') || ($obj['deny_cid'] != '') || ($obj['deny_gid'] != ''))
+	if (($obj['allow_cid'] != '') || ($obj['allow_gid'] != '') || ($obj['deny_cid'] != '') || ($obj['deny_gid'] != ''))
 		return true;
 	return false;
 }
 
 function compare_permissions($obj1,$obj2) {
 	// first part is easy. Check that these are exactly the same.
-	if(($obj1['allow_cid'] == $obj2['allow_cid'])
+	if (($obj1['allow_cid'] == $obj2['allow_cid'])
 		&& ($obj1['allow_gid'] == $obj2['allow_gid'])
 		&& ($obj1['deny_cid'] == $obj2['deny_cid'])
 		&& ($obj1['deny_gid'] == $obj2['deny_gid']))
@@ -1653,7 +1721,7 @@ function compare_permissions($obj1,$obj2) {
 	$recipients2 = enumerate_permissions($obj2);
 	sort($recipients1);
 	sort($recipients2);
-	if($recipients1 == $recipients2)
+	if ($recipients1 == $recipients2)
 		return true;
 	return false;
 }
@@ -1675,17 +1743,17 @@ function item_getfeedtags($item) {
 	$ret = array();
 	$matches = false;
 	$cnt = preg_match_all('|\#\[url\=(.*?)\](.*?)\[\/url\]|',$item['tag'],$matches);
-	if($cnt) {
+	if ($cnt) {
 		for($x = 0; $x < $cnt; $x ++) {
-			if($matches[1][$x])
+			if ($matches[1][$x])
 				$ret[$matches[2][$x]] = array('#',$matches[1][$x], $matches[2][$x]);
 		}
 	}
 	$matches = false;
 	$cnt = preg_match_all('|\@\[url\=(.*?)\](.*?)\[\/url\]|',$item['tag'],$matches);
-	if($cnt) {
+	if ($cnt) {
 		for($x = 0; $x < $cnt; $x ++) {
-			if($matches[1][$x])
+			if ($matches[1][$x])
 				$ret[] = array('@',$matches[1][$x], $matches[2][$x]);
 		}
 	}
@@ -1694,7 +1762,7 @@ function item_getfeedtags($item) {
 
 function item_expire($uid, $days, $network = "", $force = false) {
 
-	if((! $uid) || ($days < 1))
+	if ((! $uid) || ($days < 1))
 		return;
 
 	// $expire_network_only = save your own wall posts
@@ -1721,7 +1789,7 @@ function item_expire($uid, $days, $network = "", $force = false) {
 		intval($days)
 	);
 
-	if(! count($r))
+	if (! count($r))
 		return;
 
 	$expire_items = get_pconfig($uid, 'expire','items');
@@ -1746,18 +1814,18 @@ function item_expire($uid, $days, $network = "", $force = false) {
 
 		// don't expire filed items
 
-		if(strpos($item['file'],'[') !== false)
+		if (strpos($item['file'],'[') !== false)
 			continue;
 
 		// Only expire posts, not photos and photo comments
 
-		if($expire_photos==0 && strlen($item['resource-id']))
+		if ($expire_photos==0 && strlen($item['resource-id']))
 			continue;
-		if($expire_starred==0 && intval($item['starred']))
+		if ($expire_starred==0 && intval($item['starred']))
 			continue;
-		if($expire_notes==0 && $item['type']=='note')
+		if ($expire_notes==0 && $item['type']=='note')
 			continue;
-		if($expire_items==0 && $item['type']!='note')
+		if ($expire_items==0 && $item['type']!='note')
 			continue;
 
 		drop_item($item['id'],false);
@@ -1771,20 +1839,20 @@ function item_expire($uid, $days, $network = "", $force = false) {
 function drop_items($items) {
 	$uid = 0;
 
-	if(! local_user() && ! remote_user())
+	if (! local_user() && ! remote_user())
 		return;
 
-	if(count($items)) {
+	if (count($items)) {
 		foreach($items as $item) {
 			$owner = drop_item($item,false);
-			if($owner && ! $uid)
+			if ($owner && ! $uid)
 				$uid = $owner;
 		}
 	}
 
 	// multiple threads may have been deleted, send an expire notification
 
-	if($uid)
+	if ($uid)
 		proc_run(PRIORITY_HIGH,"include/notifier.php", "expire", $uid);
 }
 
@@ -1799,8 +1867,8 @@ function drop_item($id,$interactive = true) {
 		intval($id)
 	);
 
-	if(! count($r)) {
-		if(! $interactive)
+	if (! count($r)) {
+		if (! $interactive)
 			return 0;
 		notice( t('Item not found.') . EOL);
 		goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
@@ -1814,9 +1882,9 @@ function drop_item($id,$interactive = true) {
 
 	// check if logged in user is either the author or owner of this item
 
-	if(is_array($_SESSION['remote'])) {
+	if (is_array($_SESSION['remote'])) {
 		foreach($_SESSION['remote'] as $visitor) {
-			if($visitor['uid'] == $item['uid'] && $visitor['cid'] == $item['contact-id']) {
+			if ($visitor['uid'] == $item['uid'] && $visitor['cid'] == $item['contact-id']) {
 				$cid = $visitor['cid'];
 				break;
 			}
@@ -1824,16 +1892,16 @@ function drop_item($id,$interactive = true) {
 	}
 
 
-	if((local_user() == $item['uid']) || ($cid) || (! $interactive)) {
+	if ((local_user() == $item['uid']) || ($cid) || (! $interactive)) {
 
 		// Check if we should do HTML-based delete confirmation
-		if($_REQUEST['confirm']) {
+		if ($_REQUEST['confirm']) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
 			$query = explode_querystring($a->query_string);
 			$inputs = array();
 			foreach($query['args'] as $arg) {
-				if(strpos($arg, 'confirm=') === false) {
+				if (strpos($arg, 'confirm=') === false) {
 					$arg_parts = explode('=', $arg);
 					$inputs[] = array('name' => $arg_parts[0], 'value' => $arg_parts[1]);
 				}
@@ -1850,7 +1918,7 @@ function drop_item($id,$interactive = true) {
 			));
 		}
 		// Now check how the user responded to the confirmation query
-		if($_REQUEST['canceled']) {
+		if ($_REQUEST['canceled']) {
 			goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
 		}
 
@@ -1870,7 +1938,7 @@ function drop_item($id,$interactive = true) {
 
 		$matches = false;
 		$cnt = preg_match_all('/<(.*?)>/',$item['file'],$matches,PREG_SET_ORDER);
-		if($cnt) {
+		if ($cnt) {
 			foreach($matches as $mtch) {
 				file_tag_unsave_file($item['uid'],$item['id'],$mtch[1],true);
 			}
@@ -1879,7 +1947,7 @@ function drop_item($id,$interactive = true) {
 		$matches = false;
 
 		$cnt = preg_match_all('/\[(.*?)\]/',$item['file'],$matches,PREG_SET_ORDER);
-		if($cnt) {
+		if ($cnt) {
 			foreach($matches as $mtch) {
 				file_tag_unsave_file($item['uid'],$item['id'],$mtch[1],false);
 			}
@@ -1890,7 +1958,7 @@ function drop_item($id,$interactive = true) {
 		// This only applies to photos uploaded from the photos page. Photos inserted into a post do not
 		// generate a resource-id and therefore aren't intimately linked to the item.
 
-		if(strlen($item['resource-id'])) {
+		if (strlen($item['resource-id'])) {
 			q("DELETE FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d ",
 				dbesc($item['resource-id']),
 				intval($item['uid'])
@@ -1900,7 +1968,7 @@ function drop_item($id,$interactive = true) {
 
 		// If item is a link to an event, nuke the event record.
 
-		if(intval($item['event-id'])) {
+		if (intval($item['event-id'])) {
 			q("DELETE FROM `event` WHERE `id` = %d AND `uid` = %d",
 				intval($item['event-id']),
 				intval($item['uid'])
@@ -1962,7 +2030,7 @@ function drop_item($id,$interactive = true) {
 
 		// If it's the parent of a comment thread, kill all the kids
 
-		if($item['uri'] == $item['parent-uri']) {
+		if ($item['uri'] == $item['parent-uri']) {
 			$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s', `body` = '' , `title` = ''
 				WHERE `parent-uri` = '%s' AND `uid` = %d ",
 				dbesc(datetime_convert()),
@@ -1974,8 +2042,7 @@ function drop_item($id,$interactive = true) {
 			create_files_from_itemuri($item['parent-uri'], $item['uid']);
 			delete_thread_uri($item['parent-uri'], $item['uid']);
 			// ignore the result
-		}
-		else {
+		} else {
 			// ensure that last-child is set in case the comment that had it just got wiped.
 			q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d ",
 				dbesc(datetime_convert()),
@@ -1987,7 +2054,7 @@ function drop_item($id,$interactive = true) {
 				dbesc($item['parent-uri']),
 				intval($item['uid'])
 			);
-			if(count($r)) {
+			if (count($r)) {
 				q("UPDATE `item` SET `last-child` = 1 WHERE `id` = %d",
 					intval($r[0]['id'])
 				);
@@ -2000,13 +2067,12 @@ function drop_item($id,$interactive = true) {
 
 		proc_run(PRIORITY_HIGH,"include/notifier.php", "drop", $drop_id);
 
-		if(! $interactive)
+		if (! $interactive)
 			return $owner;
 		goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
 		//NOTREACHED
-	}
-	else {
-		if(! $interactive)
+	} else {
+		if (! $interactive)
 			return 0;
 		notice( t('Permission denied.') . EOL);
 		goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
@@ -2024,7 +2090,7 @@ function first_post_date($uid,$wall = false) {
 		intval($uid),
 		intval($wall ? 1 : 0)
 	);
-	if(count($r)) {
+	if (count($r)) {
 //		logger('first_post_date: ' . $r[0]['id'] . ' ' . $r[0]['created'], LOGGER_DATA);
 		return substr(datetime_convert('',date_default_timezone_get(),$r[0]['created']),0,10);
 	}
@@ -2036,7 +2102,7 @@ function list_post_dates($uid, $wall) {
 	$dnow = datetime_convert('',date_default_timezone_get(),'now','Y-m-d');
 
 	$dthen = first_post_date($uid, $wall);
-	if(! $dthen)
+	if (! $dthen)
 		return array();
 
 	// Set the start and end date to the beginning of the month
@@ -2054,7 +2120,7 @@ function list_post_dates($uid, $wall) {
 		$start_month = datetime_convert('','',$dstart,'Y-m-d');
 		$end_month = datetime_convert('','',$dend,'Y-m-d');
 		$str = day_translate(datetime_convert('','',$dnow,'F'));
-		if(! $ret[$dyear])
+		if (! $ret[$dyear])
 			$ret[$dyear] = array();
 		$ret[$dyear][] = array($str,$end_month,$start_month);
 		$dnow = datetime_convert('','',$dnow . ' -1 month', 'Y-m-d');
@@ -2066,7 +2132,7 @@ function posted_dates($uid,$wall) {
 	$dnow = datetime_convert('',date_default_timezone_get(),'now','Y-m-d');
 
 	$dthen = first_post_date($uid,$wall);
-	if(! $dthen)
+	if (! $dthen)
 		return array();
 
 	// Set the start and end date to the beginning of the month
@@ -2092,21 +2158,21 @@ function posted_dates($uid,$wall) {
 function posted_date_widget($url,$uid,$wall) {
 	$o = '';
 
-	if(! feature_enabled($uid,'archives'))
+	if (! feature_enabled($uid,'archives'))
 		return $o;
 
 	// For former Facebook folks that left because of "timeline"
 
-/*	if($wall && intval(get_pconfig($uid,'system','no_wall_archive_widget')))
+/*	if ($wall && intval(get_pconfig($uid,'system','no_wall_archive_widget')))
 		return $o;*/
 
 	$visible_years = get_pconfig($uid,'system','archive_visible_years');
-	if(! $visible_years)
+	if (! $visible_years)
 		$visible_years = 5;
 
 	$ret = list_post_dates($uid,$wall);
 
-	if(! count($ret))
+	if (! count($ret))
 		return $o;
 
 	$cutoff_year = intval(datetime_convert('',date_default_timezone_get(),'now','Y')) - $visible_years;

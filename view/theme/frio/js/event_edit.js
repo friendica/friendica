@@ -1,7 +1,6 @@
 $(document).ready(function() { 
 	// go to the permissions tab if the checkbox is checked
 	$('body').on("change", "#id_share", function() {
-
 		if ($('#id_share').is(':checked') && !( $('#id_share').attr("disabled"))) { 
 			$('#acl-wrapper').show();
 			$("a#event-perms-lnk").parent("li").show();
@@ -26,7 +25,7 @@ $(document).ready(function() {
 			selstr = $(this).text();
 			$('#jot-public').hide();
 		});
-		if(selstr == null) {
+		if (selstr == null) {
 			$('#jot-public').show();
 		}
 

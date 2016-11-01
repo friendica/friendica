@@ -1,19 +1,18 @@
 Config values that can only be set in .htconfig.php
 ===================================================
 
-There are some config values that haven't found their way into the administration page. This has several reasons. Maybe they are part of a 
-current development that isn't considered stable and will be added later in the administration page when it is considered safe. Or it triggers 
-something that isn't expected to be of public interest. Or it is for testing purposes only.
+There are some config values that haven't found their way into the administration page.
+This has several reasons.
+Maybe they are part of a current development that isn't considered stable and will be added later in the administration page when it is considered safe.
+Or it triggers something that isn't expected to be of public interest. Or it is for testing purposes only.
 
-**Attention:** Please be warned that you shouldn't use one of these values without the knowledge what it could trigger. Especially don't do that with 
-undocumented values.
+**Attention:** Please be warned that you shouldn't use one of these values without the knowledge what it could trigger.
+Especially don't do that with undocumented values.
 
-The header of the section describes the category, the value is the parameter. Example: To set the directory value please add this 
-line to your .htconfig.php:
+The header of the section describes the category, the value is the parameter.
+Example: To set the directory value please add this line to your .htconfig.php:
 
     $a->config['system']['directory'] = 'http://dir.friendi.ca';
-
-
 
 ## Jabber ##
 * debug (Boolean) - Enable debug level for the jabber account synchronisation.
@@ -23,7 +22,7 @@ line to your .htconfig.php:
 
 * birthday_input_format - Default value is "ymd".
 * block_local_dir (Boolean) - Blocks the access to the directory of the local users.
-* default_service_class - 
+* default_service_class -
 * delivery_batch_count - Number of deliveries per process. Default value is 1. (Disabled when using the worker)
 * diaspora_test (Boolean) - For development only. Disables the message transfer.
 * directory - The path to global directory. If not set then "http://dir.friendi.ca" is used.
@@ -40,6 +39,9 @@ line to your .htconfig.php:
 * max_batch_queue - Default value is 1000.
 * max_processes_backend - Maximum number of concurrent database processes for background tasks. Default value is 5.
 * max_processes_frontend - Maximum number of concurrent database processes for foreground tasks. Default value is 20.
+* memcache (Boolean) - Use memcache. To use memcache the PECL extension "memcache" has to be installed and activated.
+* memcache_host - Hostname of the memcache daemon. Default is '127.0.0.1'.
+* memcache_port- Portnumberof the memcache daemon. Default is 11211.
 * no_oembed (Boolean) - Don't use OEmbed to fetch more information about a link.
 * no_oembed_rich_content (Boolean) - Don't show the rich content (e.g. embedded PDF).
 * no_smilies (Boolean) - Don't show smilies.
@@ -48,12 +50,13 @@ line to your .htconfig.php:
 * ostatus_poll_timeframe - Defines how old an item can be to try to complete the conversation with it.
 * paranoia (Boolean) - Log out users if their IP address changed.
 * permit_crawling (Boolean) - Restricts the search for not logged in users to one search per minute.
+* profiler (Boolean) - Enable internal timings to help optimize code. Needed for "rendertime" addon. Default is false.
 * free_crawls - Number of "free" searches when "permit_crawling" is activated (Default value is 10)
 * crawl_permit_period - Period in seconds between allowed searches when the number of free searches is reached and "permit_crawling" is activated (Default value is 60)
 * png_quality - Default value is 8.
 * proc_windows (Boolean) - Should be enabled if Friendica is running under Windows.
 * proxy_cache_time - Time after which the cache is cleared. Default value is one day.
-* pushpoll_frequency - 
+* pushpoll_frequency -
 * qsearch_limit - Default value is 100.
 * relay_server - Experimental Diaspora feature. Address of the relay server where public posts should be send to. For example https://podrelay.net
 * relay_subscribe (Boolean) - Enables the receiving of public posts from the relay. They will be included in the search and on the community page when it is set up to show all public items.
@@ -72,7 +75,7 @@ line to your .htconfig.php:
 
 ## service_class ##
 
-* upgrade_link - 
+* upgrade_link -
 
 ## experimentals ##
 
@@ -84,19 +87,15 @@ line to your .htconfig.php:
 
 # Administrator Options #
 
-Enabling the admin panel for an account, and thus making the account holder
-admin of the node, is done by setting the variable
+Enabling the admin panel for an account, and thus making the account holder admin of the node, is done by setting the variable
 
     $a->config['admin_email'] = "someone@example.com";
 
-where you have to match the email address used for the account with the one you
-enter to the .htconfig file. If more then one account should be able to access
-the admin panel, seperate the email addresses with a comma.
+Where you have to match the email address used for the account with the one you enter to the .htconfig file.
+If more then one account should be able to access the admin panel, seperate the email addresses with a comma.
 
     $a->config['admin_email'] = "someone@example.com,someonelese@example.com";
 
-If you want to have a more personalized closing line for the notification
-emails you can set a variable for the admin_name.
+If you want to have a more personalized closing line for the notification emails you can set a variable for the admin_name.
 
     $a->config['admin_name'] = "Marvin";
-

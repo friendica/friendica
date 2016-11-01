@@ -1,6 +1,6 @@
 <?php
 
-define('UPDATE_VERSION' , 1202);
+define('UPDATE_VERSION' , 1207);
 
 /**
  *
@@ -1677,7 +1677,7 @@ function update_1190() {
 			$idx = array_search($plugin, $plugins_arr);
 			if ($idx !== false){
 				unset($plugins_arr[$idx]);
-				//delete forumlist manually from addon and hook table 
+				//delete forumlist manually from addon and hook table
 				// since uninstall_plugin() don't work here
 				q("DELETE FROM `addon` WHERE `name` = 'forumlist' ");
 				q("DELETE FROM `hook` WHERE `file` = 'addon/forumlist/forumlist.php' ");
@@ -1722,4 +1722,9 @@ function update_1190() {
 
 	return UPDATE_SUCCESS;
 
+}
+
+function update_1202() {
+	$r = q("UPDATE `user` SET `account-type` = %d WHERE `page-flags` IN (%d, %d)",
+		dbesc(ACCOUNT_TYPE_COMMUNITY), dbesc(PAGE_COMMUNITY), dbesc(PAGE_PRVGROUP));
 }

@@ -149,17 +149,23 @@ function get_profiledata_by_nick($nickname, $uid = 0, $profile = 0) {
 
 	if($profile) {
 		$profile_int = intval($profile);
-		$r = q("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `contact`.`addr`, `user`.* FROM `profile`
-				INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
-				WHERE `user`.`nickname` = '%s' AND `profile`.`id` = %d AND `contact`.`self` = 1 LIMIT 1",
+		$r = q("SELECT `contact`.`id` AS `contact_id`, `profile`.`uid` AS `profile_uid`, `profile`.*,
+				`contact`.`avatar-date` AS picdate, `contact`.`addr`, `user`.*
+			FROM `profile`
+			INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` AND `contact`.`self`
+			INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
+			WHERE `user`.`nickname` = '%s' AND `profile`.`id` = %d LIMIT 1",
 				dbesc($nickname),
 				intval($profile_int)
 		);
 	}
 	if((!$r) && (!count($r))) {
-		$r = q("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `contact`.`addr`, `user`.* FROM `profile`
-				INNER JOIN `contact` ON `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
-				WHERE `user`.`nickname` = '%s' AND `profile`.`is-default` = 1 AND `contact`.`self` = 1 LIMIT 1",
+		$r = q("SELECT `contact`.`id` AS `contact_id`, `profile`.`uid` AS `profile_uid`, `profile`.*,
+				`contact`.`avatar-date` AS picdate, `contact`.`addr`, `user`.*
+			FROM `profile`
+			INNER JOIN `contact` ON `contact`.`uid` = `profile`.`uid` AND `contact`.`self`
+			INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
+			WHERE `user`.`nickname` = '%s' AND `profile`.`is-default` LIMIT 1",
 				dbesc($nickname)
 		);
 	}
@@ -310,15 +316,8 @@ function profile_sidebar($profile, $block = 0) {
 		);
 	}
 
-	// check if profile is a forum
-	if((intval($profile['page-flags']) == PAGE_COMMUNITY)
-			|| (intval($profile['page-flags']) == PAGE_PRVGROUP)
-			|| (isset($profile['forum']) && intval($profile['forum']))
-			|| (isset($profile['prv']) && intval($profile['prv']))
-			|| (isset($profile['community']) && intval($profile['community'])))
-		$account_type = t('Forum');
-	else
-		$account_type = "";
+	// Fetch the account type
+	$account_type = account_type($profile);
 
 	if((x($profile,'address') == 1)
 			|| (x($profile,'location') == 1)
@@ -336,6 +335,8 @@ function profile_sidebar($profile, $block = 0) {
 	$homepage = ((x($profile,'homepage') == 1) ?  t('Homepage:') : False);
 
 	$about = ((x($profile,'about') == 1) ?  t('About:') : False);
+
+	$xmpp = ((x($profile,'xmpp') == 1) ?  t('XMPP:') : False);
 
 	if(($profile['hidewall'] || $block) && (! local_user()) && (! remote_user())) {
 		$location = $pdesc = $gender = $marital = $homepage = $about = False;
@@ -405,6 +406,7 @@ function profile_sidebar($profile, $block = 0) {
 	$tpl = get_markup_template('profile_vcard.tpl');
 	$o .= replace_macros($tpl, array(
 		'$profile' => $p,
+		'$xmpp' => $xmpp,
 		'$connect'  => $connect,
 		'$remoteconnect'  => $remoteconnect,
 		'$subscribe_feed' => $subscribe_feed,

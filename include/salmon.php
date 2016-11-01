@@ -31,8 +31,7 @@ function get_salmon_key($uri,$keyhash) {
 					$ret[$x] = substr($ret[$x],strpos($ret[$x],',')+1);
 				else
 					$ret[$x] = substr($ret[$x],5);
-			}
-			else
+			} elseif (normalise_link($ret[$x]) == 'http://')
 				$ret[$x] = fetch_url($ret[$x]);
 		}
 	}

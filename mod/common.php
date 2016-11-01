@@ -120,7 +120,7 @@ function common_content(&$a) {
 			'details'	=> $contact_details['location'],
 			'tags'		=> $contact_details['keywords'],
 			'about'		=> $contact_details['about'],
-			'account_type'	=> (($contact_details['community']) ? t('Forum') : ''),
+			'account_type'	=> account_type($contact_details),
 			'network'	=> network_to_name($contact_details['network'], $contact_details['url']),
 			'photo_menu'	=> $photo_menu,
 			'id'		=> ++$id,

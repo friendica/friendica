@@ -209,25 +209,34 @@ function oembed_format_object($j){
 	return mb_convert_encoding($ret, 'HTML-ENTITIES', mb_detect_encoding($ret));
 }
 
-function oembed_iframe($src,$width,$height) {
-
-	if(! $width || strstr($width,'%'))
-		$width = '640';
-	if(! $height || strstr($height,'%')) {
-		$height = '300';
-		$resize = 'onload="resizeIframe(this);"';
-	} else
-		$resize = '';
-
-	// try and leave some room for the description line.
-	$height = intval($height) + 80;
-	$width  = intval($width) + 40;
+/**
+ * @brief Generates the iframe HTML for an oembed attachment.
+ *
+ * Width and height are given by the remote, and are regularly too small for
+ * the generated iframe.
+ *
+ * The width is entirely discarded for the actual width of the post, while fixed
+ * height is used as a starting point before the inevitable resizing.
+ *
+ * Since the iframe is automatically resized on load, there are no need for ugly
+ * and impractical scrollbars.
+ *
+ * @param string $src Original remote URL to embed
+ * @param string $width
+ * @param string $height
+ * @return string formatted HTML
+ *
+ * @see oembed_format_object()
+ */
+function oembed_iframe($src, $width, $height) {
+	if (!$height || strstr($height,'%')) {
+		$height = '200';
+	}
+	$width = '100%';
 
 	$a = get_app();
-
-	$s = $a->get_baseurl()."/oembed/".base64url_encode($src);
-	return '<iframe '.$resize.' class="embed_rich" height="'.$height.'" width="'.$width.'" src="'.$s.'" frameborder="no">'.t('Embedded content').'</iframe>';
-
+	$s = $a->get_baseurl() . '/oembed/'.base64url_encode($src);
+	return '<iframe onload="resizeIframe(this);" class="embed_rich" height="' . $height . '" width="' . $width . '" src="' . $s . '" scrolling="no" frameborder="no">' . t('Embedded content') . '</iframe>';
 }
 
 

@@ -16,16 +16,16 @@
 					</a>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="event-calendar-views">
 						<li role="menuitem">
-
-							<a onclick="changeView('changeView', 'month')">{{$month}}</a>
+							<a onclick="changeView('changeView', 'month');$('#events-calendar').fullCalendar('option', {contentHeight: '', aspectRatio: 1});">{{$month}}</a>
 						</li>
 						<li role="menuitem">
-
-							<a onclick="changeView('changeView', 'agendaWeek')">{{$week}}</a>
+							<a onclick="changeView('changeView', 'agendaWeek');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$week}}</a>
 						</li>
 						<li role="menuitem">
-
-							<a onclick="changeView('changeView', 'agendaDay')">{{$day}}</a>
+							<a onclick="changeView('changeView', 'agendaDay');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$day}}</a>
+						</li>
+						<li role="menuitem">
+							<a onclick="changeView('changeView', 'listMonth');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$list}}</a>
 						</li>
 					</ul>
 				</li>

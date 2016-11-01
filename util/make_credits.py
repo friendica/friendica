@@ -67,7 +67,7 @@ os.chdir(path)
 #  get the translators
 print('> getting translators')
 intrans = False
-for f in glob.glob(path+'/view/*/messages.po'):
+for f in glob.glob(path+'/view/lang/*/messages.po'):
     i = open(f, 'r')
     l = i.readlines()
     i.close()

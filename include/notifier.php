@@ -134,7 +134,7 @@ function notifier_run(&$argv, &$argc){
 	} elseif($cmd === 'removeme') {
 		$r = q("SELECT `contact`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey`,
 				`user`.`timezone`, `user`.`nickname`, `user`.`sprvkey`, `user`.`spubkey`,
-				`user`.`page-flags`, `user`.`prvnets`, `user`.`guid`
+				`user`.`page-flags`, `user`.`prvnets`, `user`.`account-type`, `user`.`guid`
 			FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
 				WHERE `contact`.`uid` = %d AND `contact`.`self` LIMIT 1",
 				intval($item_id));
@@ -204,7 +204,7 @@ function notifier_run(&$argv, &$argc){
 
 	$r = q("SELECT `contact`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey`,
 		`user`.`timezone`, `user`.`nickname`, `user`.`sprvkey`, `user`.`spubkey`,
-		`user`.`page-flags`, `user`.`prvnets`
+		`user`.`page-flags`, `user`.`prvnets`, `user`.`account-type`
 		FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
 		WHERE `contact`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
 		intval($uid)
@@ -599,10 +599,10 @@ function notifier_run(&$argv, &$argc){
 
 			foreach($r as $rr) {
 				if((! $mail) && (! $fsuggest) && (! $followup)) {
-					q("insert into deliverq ( `cmd`,`item`,`contact` ) values ('%s', %d, %d )",
-						dbesc($cmd),
-						intval($item_id),
-						intval($rr['id'])
+					q("INSERT INTO `deliverq` (`cmd`,`item`,`contact`) VALUES ('%s', %d, %d)
+						ON DUPLICATE KEY UPDATE `cmd` = '%s', `item` = %d, `contact` = %d",
+						dbesc($cmd), intval($item_id), intval($rr['id']),
+						dbesc($cmd), intval($item_id), intval($rr['id'])
 					);
 				}
 			}

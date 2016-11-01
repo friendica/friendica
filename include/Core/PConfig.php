@@ -27,14 +27,14 @@ class PConfig {
 	 *  The category of the configuration value
 	 * @return void
 	 */
-	public static function load($uid,$family) {
+	public static function load($uid, $family) {
 		global $a;
-		$r = q("SELECT `v`,`k` FROM `pconfig` WHERE `cat` = '%s' AND `uid` = %d",
+		$r = q("SELECT `v`,`k` FROM `pconfig` WHERE `cat` = '%s' AND `uid` = %d ORDER BY `cat`, `k`, `id`",
 			dbesc($family),
 			intval($uid)
 		);
-		if(count($r)) {
-			foreach($r as $rr) {
+		if (count($r)) {
+			foreach ($r as $rr) {
 				$k = $rr['k'];
 				$a->config[$uid][$family][$k] = $rr['v'];
 			}
@@ -67,71 +67,35 @@ class PConfig {
 
 		global $a;
 
-		if(! $instore) {
+		if (!$refresh) {
 			// Looking if the whole family isn't set
-			if(isset($a->config[$uid][$family])) {
-				if($a->config[$uid][$family] === '!<unset>!') {
+			if (isset($a->config[$uid][$family])) {
+				if ($a->config[$uid][$family] === '!<unset>!') {
 					return $default_value;
 				}
 			}
 
-			if(isset($a->config[$uid][$family][$key])) {
-				if($a->config[$uid][$family][$key] === '!<unset>!') {
+			if (isset($a->config[$uid][$family][$key])) {
+				if ($a->config[$uid][$family][$key] === '!<unset>!') {
 					return $default_value;
 				}
 				return $a->config[$uid][$family][$key];
 			}
 		}
 
-		// If APC is enabled then fetch the data from there, else try XCache
-		/*if (function_exists("apc_fetch") AND function_exists("apc_exists"))
-			if (apc_exists($uid."|".$family."|".$key)) {
-				$val = apc_fetch($uid."|".$family."|".$key);
-				$a->config[$uid][$family][$key] = $val;
-
-				if ($val === '!<unset>!')
-					return false;
-				else
-					return $val;
-			}
-		elseif (function_exists("xcache_get") AND function_exists("xcache_isset"))
-			if (xcache_isset($uid."|".$family."|".$key)) {
-				$val = xcache_get($uid."|".$family."|".$key);
-				$a->config[$uid][$family][$key] = $val;
-
-				if ($val === '!<unset>!')
-					return false;
-				else
-					return $val;
-			}*/
-
-
-		$ret = q("SELECT `v` FROM `pconfig` WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s' LIMIT 1",
+		$ret = q("SELECT `v` FROM `pconfig` WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s' ORDER BY `id` DESC LIMIT 1",
 			intval($uid),
 			dbesc($family),
 			dbesc($key)
 		);
 
-		if(count($ret)) {
+		if (count($ret)) {
 			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
 			$a->config[$uid][$family][$key] = $val;
 
-			// If APC is enabled then store the data there, else try XCache
-			/*if (function_exists("apc_store"))
-				apc_store($uid."|".$family."|".$key, $val, 600);
-			elseif (function_exists("xcache_set"))
-				xcache_set($uid."|".$family."|".$key, $val, 600);*/
-
 			return $val;
-		}
-		else {
+		} else {
 			$a->config[$uid][$family][$key] = '!<unset>!';
-
-			// If APC is enabled then store the data there, else try XCache
-			/*if (function_exists("apc_store"))
-				apc_store($uid."|".$family."|".$key, '!<unset>!', 600);
-			elseif (function_exists("xcache_set"))
-				xcache_set($uid."|".$family."|".$key, '!<unset>!', 600);*/
 		}
 		return $default_value;
 	}
@@ -154,43 +118,41 @@ class PConfig {
 	 *  The value to store
 	 * @return mixed Stored $value or false
 	 */
-	public static function set($uid,$family,$key,$value) {
+	public static function set($uid, $family, $key, $value) {
 
 		global $a;
 
-		// manage array value
-		$dbvalue = (is_array($value)?serialize($value):$value);
+		$stored = self::get($uid, $family, $key);
 
-		if(is_null(self::get($uid,$family,$key,null, true))) {
-			$a->config[$uid][$family][$key] = $value;
-			$ret = q("INSERT INTO `pconfig` ( `uid`, `cat`, `k`, `v` ) VALUES ( %d, '%s', '%s', '%s' ) ",
-				intval($uid),
-				dbesc($family),
-				dbesc($key),
-				dbesc($dbvalue)
-			);
-			if($ret) 
-				return $value;
-			return $ret;
+		if ($stored == $value) {
+			return true;
 		}
-		$ret = q("UPDATE `pconfig` SET `v` = '%s' WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s'",
-			dbesc($dbvalue),
-			intval($uid),
-			dbesc($family),
-			dbesc($key)
-		);
+
+		// manage array value
+		$dbvalue = (is_array($value) ? serialize($value):$value);
 
 		$a->config[$uid][$family][$key] = $value;
 
-		// If APC is enabled then store the data there, else try XCache
-		/*if (function_exists("apc_store"))
-			apc_store($uid."|".$family."|".$key, $value, 600);
-		elseif (function_exists("xcache_set"))
-			xcache_set($uid."|".$family."|".$key, $value, 600);*/
+                if (is_null($stored)) {
+			$ret = q("INSERT INTO `pconfig` (`uid`, `cat`, `k`, `v`) VALUES (%d, '%s', '%s', '%s') ON DUPLICATE KEY UPDATE `v` = '%s'",
+				intval($uid),
+				dbesc($family),
+				dbesc($key),
+				dbesc($dbvalue),
+				dbesc($dbvalue)
+			);
+		} else {
+			$ret = q("UPDATE `pconfig` SET `v` = '%s' WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s'",
+				dbesc($dbvalue),
+				intval($uid),
+				dbesc($family),
+				dbesc($key)
+			);
+		}
 
-
-		if($ret)
+		if ($ret) {
 			return $value;
+		}
 		return $ret;
 	}
 
@@ -210,13 +172,17 @@ class PConfig {
 	public static function delete($uid,$family,$key) {
 
 		global $a;
-		if(x($a->config[$uid][$family],$key))
+
+		if (x($a->config[$uid][$family], $key)) {
 			unset($a->config[$uid][$family][$key]);
+		}
+
 		$ret = q("DELETE FROM `pconfig` WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s'",
 			intval($uid),
 			dbesc($family),
 			dbesc($key)
 		);
+
 		return $ret;
 	}
 }

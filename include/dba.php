@@ -5,7 +5,7 @@ require_once("dbm.php");
 # TODO: PDO is disabled for release 3.3. We need to investigate why
 # the update from 3.2 fails with pdo
 /*
-if(class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
+if (class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
   require_once("library/dddbl2/dddbl.php");
   require_once("include/dba_pdo.php");
 }
@@ -24,7 +24,7 @@ require_once('include/datetime.php');
  *
  */
 
-if(! class_exists('dba')) {
+if (! class_exists('dba')) {
 class dba {
 
 	private $debug = 0;
@@ -34,7 +34,7 @@ class dba {
 	public  $connected = false;
 	public  $error = false;
 
-	function __construct($server,$user,$pass,$db,$install = false) {
+	function __construct($server, $user, $pass, $db, $install = false) {
 		global $a;
 
 		$stamp1 = microtime(true);
@@ -44,15 +44,15 @@ class dba {
 		$pass = trim($pass);
 		$db = trim($db);
 
-		if (!(strlen($server) && strlen($user))){
+		if (!(strlen($server) && strlen($user))) {
 			$this->connected = false;
 			$this->db = null;
 			return;
 		}
 
-		if($install) {
-			if(strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
-				if(! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
+		if ($install) {
+			if (strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
+				if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
 					$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
 					$this->connected = false;
 					$this->db = null;
@@ -61,27 +61,28 @@ class dba {
 			}
 		}
 
-		if(class_exists('mysqli')) {
+		if (class_exists('mysqli')) {
 			$this->db = @new mysqli($server,$user,$pass,$db);
-			if(! mysqli_connect_errno()) {
+			if (! mysqli_connect_errno()) {
 				$this->connected = true;
 			}
-			if (isset($a->config["system"]["db_charset"]))
+			if (isset($a->config["system"]["db_charset"])) {
 				$this->db->set_charset($a->config["system"]["db_charset"]);
-		}
-		else {
+			}
+		} else {
 			$this->mysqli = false;
 			$this->db = mysql_connect($server,$user,$pass);
-			if($this->db && mysql_select_db($db,$this->db)) {
+			if ($this->db && mysql_select_db($db,$this->db)) {
 				$this->connected = true;
 			}
 			if (isset($a->config["system"]["db_charset"]))
 				mysql_set_charset($a->config["system"]["db_charset"], $this->db);
 		}
-		if(! $this->connected) {
+		if (!$this->connected) {
 			$this->db = null;
-			if(! $install)
+			if (!$install) {
 				system_unavailable();
+			}
 		}
 
 		$a->save_timestamp($stamp1, "network");
@@ -91,38 +92,80 @@ class dba {
 		return $this->db;
 	}
 
+	/**
+	 * @brief Returns the MySQL server version string
+	 * 
+	 * This function discriminate between the deprecated mysql API and the current
+	 * object-oriented mysqli API. Example of returned string: 5.5.46-0+deb8u1
+	 *
+	 * @return string
+	 */
+	public function server_info() {
+		if ($this->mysqli) {
+			$return = $this->db->server_info;
+		} else {
+			$return = mysql_get_server_info($this->db);
+		}
+		return $return;
+	}
+
+	/**
+	 * @brief Returns the number of rows
+	 *
+	 * @return integer
+	 */
+	public function num_rows() {
+		if (!$this->result) {
+			return 0;
+		}
+
+		if ($this->mysqli) {
+			$return = $this->result->num_rows;
+		} else {
+			$return = mysql_num_rows($this->result);
+		}
+		return $return;
+	}
+
 	public function q($sql, $onlyquery = false) {
 		global $a;
 
-		if((! $this->db) || (! $this->connected))
+		if (!$this->db || !$this->connected) {
 			return false;
+		}
 
 		$this->error = '';
 
 		// Check the connection (This can reconnect the connection - if configured)
-		if ($this->mysqli)
+		if ($this->mysqli) {
 			$connected = $this->db->ping();
-		else
+		} else {
 			$connected = mysql_ping($this->db);
-
-		$connstr = ($connected ? "Connected": "Disonnected");
+		}
+		$connstr = ($connected ? "Connected" : "Disonnected");
 
 		$stamp1 = microtime(true);
 
-		if($this->mysqli)
-			$result = @$this->db->query($sql);
-		else
-			$result = @mysql_query($sql,$this->db);
+		$orig_sql = $sql;
 
+		if (x($a->config,'system') && x($a->config['system'], 'db_callstack')) {
+			$sql = "/*".$a->callstack()." */ ".$sql;
+		}
+
+		if ($this->mysqli) {
+			$result = @$this->db->query($sql);
+		} else {
+			$result = @mysql_query($sql,$this->db);
+		}
 		$stamp2 = microtime(true);
 		$duration = (float)($stamp2-$stamp1);
 
 		$a->save_timestamp($stamp1, "database");
 
-		if (strtolower(substr($sql, 0, 6)) != "select")
+		if (strtolower(substr($orig_sql, 0, 6)) != "select") {
 			$a->save_timestamp($stamp1, "database_write");
-
-		if(x($a->config,'system') && x($a->config['system'],'db_log')) {
+		}
+		if (x($a->config,'system') && x($a->config['system'],'db_log')) {
 			if (($duration > $a->config["system"]["db_loglimit"])) {
 				$duration = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -133,33 +176,34 @@ class dba {
 			}
 		}
 
-		if($this->mysqli) {
-			if($this->db->errno) {
+		if ($this->mysqli) {
+			if ($this->db->errno) {
 				$this->error = $this->db->error;
 				$this->errorno = $this->db->errno;
 			}
-		} elseif(mysql_errno($this->db)) {
+		} elseif (mysql_errno($this->db)) {
 			$this->error = mysql_error($this->db);
 			$this->errorno = mysql_errno($this->db);
 		}
 
-		if(strlen($this->error)) {
+		if (strlen($this->error)) {
 			logger('DB Error ('.$connstr.') '.$this->errorno.': '.$this->error);
 		}
 
-		if($this->debug) {
+		if ($this->debug) {
 
 			$mesg = '';
 
-			if($result === false)
+			if ($result === false) {
 				$mesg = 'false';
-			elseif($result === true)
+			} elseif ($result === true) {
 				$mesg = 'true';
-			else {
-				if($this->mysqli)
+			} else {
+				if ($this->mysqli) {
 					$mesg = $result->num_rows . ' results' . EOL;
-    			else
+				} else {
 					$mesg = mysql_num_rows($result) . ' results' . EOL;
+				}
 			}
 
 			$str =  'SQL = ' . printable($sql) . EOL . 'SQL returned ' . $mesg
@@ -175,30 +219,30 @@ class dba {
 		 * These usually indicate SQL syntax errors that need to be resolved.
 		 */
 
-		if($result === false) {
+		if ($result === false) {
 			logger('dba: ' . printable($sql) . ' returned false.' . "\n" . $this->error);
-			if(file_exists('dbfail.out'))
+			if (file_exists('dbfail.out')) {
 				file_put_contents('dbfail.out', datetime_convert() . "\n" . printable($sql) . ' returned false' . "\n" . $this->error . "\n", FILE_APPEND);
+			}
 		}
 
-		if(($result === true) || ($result === false))
+		if (($result === true) || ($result === false)) {
 			return $result;
-
+		}
 		if ($onlyquery) {
 			$this->result = $result;
 			return true;
 		}
 
 		$r = array();
-		if($this->mysqli) {
-			if($result->num_rows) {
+		if ($this->mysqli) {
+			if ($result->num_rows) {
 				while($x = $result->fetch_array(MYSQLI_ASSOC))
 					$r[] = $x;
 				$result->free_result();
 			}
-		}
-		else {
-			if(mysql_num_rows($result)) {
+		} else {
+			if (mysql_num_rows($result)) {
 				while($x = mysql_fetch_array($result, MYSQL_ASSOC))
 					$r[] = $x;
 				mysql_free_result($result);
@@ -207,33 +251,35 @@ class dba {
 
 		//$a->save_timestamp($stamp1, "database");
 
-		if($this->debug)
+		if ($this->debug) {
 			logger('dba: ' . printable(print_r($r, true)));
+		}
 		return($r);
 	}
 
 	public function qfetch() {
 		$x = false;
 
-		if ($this->result)
-			if($this->mysqli) {
-				if($this->result->num_rows)
+		if ($this->result) {
+			if ($this->mysqli) {
+				if ($this->result->num_rows)
 					$x = $this->result->fetch_array(MYSQLI_ASSOC);
 			} else {
-				if(mysql_num_rows($this->result))
+				if (mysql_num_rows($this->result))
 					$x = mysql_fetch_array($this->result, MYSQL_ASSOC);
 			}
-
+		}
 		return($x);
 	}
 
 	public function qclose() {
-		if ($this->result)
-			if($this->mysqli) {
+		if ($this->result) {
+			if ($this->mysqli) {
 				$this->result->free_result();
 			} else {
 				mysql_free_result($this->result);
 			}
+		}
 	}
 
 	public function dbg($dbg) {
@@ -241,56 +287,62 @@ class dba {
 	}
 
 	public function escape($str) {
-		if($this->db && $this->connected) {
-			if($this->mysqli)
+		if ($this->db && $this->connected) {
+			if ($this->mysqli) {
 				return @$this->db->real_escape_string($str);
-			else
+			} else {
 				return @mysql_real_escape_string($str,$this->db);
+			}
 		}
 	}
 
 	function connected() {
-		if ($this->mysqli)
+		if ($this->mysqli) {
 			$connected = $this->db->ping();
-		else
+		} else {
 			$connected = mysql_ping($this->db);
-
+		}
 		return $connected;
 	}
 
 	function __destruct() {
-		if ($this->db)
-			if($this->mysqli)
+		if ($this->db) {
+			if ($this->mysqli) {
 				$this->db->close();
-			else
+			} else {
 				mysql_close($this->db);
+			}
+		}
 	}
 }}
 
-if(! function_exists('printable')) {
+if (! function_exists('printable')) {
 function printable($s) {
 	$s = preg_replace("~([\x01-\x08\x0E-\x0F\x10-\x1F\x7F-\xFF])~",".", $s);
 	$s = str_replace("\x00",'.',$s);
-	if(x($_SERVER,'SERVER_NAME'))
+	if (x($_SERVER,'SERVER_NAME')) {
 		$s = escape_tags($s);
+	}
 	return $s;
 }}
 
 // Procedural functions
-if(! function_exists('dbg')) {
+if (! function_exists('dbg')) {
 function dbg($state) {
 	global $db;
-	if($db)
-	$db->dbg($state);
+	if ($db) {
+		$db->dbg($state);
+	}
 }}
 
-if(! function_exists('dbesc')) {
+if (! function_exists('dbesc')) {
 function dbesc($str) {
 	global $db;
-	if($db && $db->connected)
+	if ($db && $db->connected) {
 		return($db->escape($str));
-	else
+	} else {
 		return(str_replace("'","\\'",$str));
+	}
 }}
 
 
@@ -300,17 +352,17 @@ function dbesc($str) {
 // Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
 //                   'user', 1);
 
-if(! function_exists('q')) {
+if (! function_exists('q')) {
 function q($sql) {
 
 	global $db;
 	$args = func_get_args();
 	unset($args[0]);
 
-	if($db && $db->connected) {
+	if ($db && $db->connected) {
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		//logger("dba: q: $stmt", LOGGER_ALL);
-		if($stmt === false)
+		if ($stmt === false)
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);
 		return $db->q($stmt);
 	}
@@ -327,19 +379,56 @@ function q($sql) {
 }}
 
 /**
+ * @brief Performs a query with "dirty reads"
+ *
+ * By doing dirty reads (reading uncommitted data) no locks are performed
+ * This function can be used to fetch data that doesn't need to be reliable.
+ *
+ * @param $args Query parameters (1 to N parameters of different types)
+ * @return array Query array
+ */
+function qu($sql) {
+
+	global $db;
+	$args = func_get_args();
+	unset($args[0]);
+
+	if ($db && $db->connected) {
+		$stmt = @vsprintf($sql,$args); // Disabled warnings
+		if ($stmt === false)
+			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);
+		$db->q("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;");
+		$retval = $db->q($stmt);
+		$db->q("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;");
+		return $retval;
+	}
+
+	/**
+	 *
+	 * This will happen occasionally trying to store the
+	 * session data after abnormal program termination
+	 *
+	 */
+	logger('dba: no database: ' . print_r($args,true));
+	return false;
+
+}
+
+/**
  *
  * Raw db query, no arguments
  *
  */
 
-if(! function_exists('dbq')) {
+if (! function_exists('dbq')) {
 function dbq($sql) {
 
 	global $db;
-	if($db && $db->connected)
+	if ($db && $db->connected) {
 		$ret = $db->q($sql);
-	else
+	} else {
 		$ret = false;
+	}
 	return $ret;
 }}
 
@@ -350,16 +439,16 @@ function dbq($sql) {
 // cast to int to avoid trouble.
 
 
-if(! function_exists('dbesc_array_cb')) {
+if (! function_exists('dbesc_array_cb')) {
 function dbesc_array_cb(&$item, $key) {
-	if(is_string($item))
+	if (is_string($item))
 		$item = dbesc($item);
 }}
 
 
-if(! function_exists('dbesc_array')) {
+if (! function_exists('dbesc_array')) {
 function dbesc_array(&$arr) {
-	if(is_array($arr) && count($arr)) {
+	if (is_array($arr) && count($arr)) {
 		array_walk($arr,'dbesc_array_cb');
 	}
 }}

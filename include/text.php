@@ -581,14 +581,14 @@ function get_intltext_template($s) {
 	if(! isset($lang))
 		$lang = 'en';
 
-	if(file_exists("view/$lang$engine/$s")) {
+	if(file_exists("view/lang/$lang$engine/$s")) {
 		$stamp1 = microtime(true);
-		$content = file_get_contents("view/$lang$engine/$s");
+		$content = file_get_contents("view/lang/$lang$engine/$s");
 		$a->save_timestamp($stamp1, "file");
 		return $content;
-	} elseif(file_exists("view/en$engine/$s")) {
+	} elseif(file_exists("view/lang/en$engine/$s")) {
 		$stamp1 = microtime(true);
-		$content = file_get_contents("view/en$engine/$s");
+		$content = file_get_contents("view/lang/en$engine/$s");
 		$a->save_timestamp($stamp1, "file");
 		return $content;
 	} else {
@@ -678,11 +678,13 @@ function attribute_contains($attr,$s) {
 	return false;
 }}
 
-if(! function_exists('logger')) {
+if (! function_exists('logger')) {
 /* setup int->string log level map */
 $LOGGER_LEVELS = array();
 
 /**
+ * @brief Logs the given message at the given log level
+ *
  * log levels:
  * LOGGER_NORMAL (default)
  * LOGGER_TRACE
@@ -692,51 +694,63 @@ $LOGGER_LEVELS = array();
  *
  * @global App $a
  * @global dba $db
+ * @global array $LOGGER_LEVELS
  * @param string $msg
  * @param int $level
  */
-function logger($msg,$level = 0) {
-	// turn off logger in install mode
+function logger($msg, $level = 0) {
 	global $a;
 	global $db;
 	global $LOGGER_LEVELS;
 
-	if(($a->module == 'install') || (! ($db && $db->connected))) return;
-
-	if (count($LOGGER_LEVELS)==0){
-		foreach (get_defined_constants() as $k=>$v){
-			if (substr($k,0,7)=="LOGGER_")
-				$LOGGER_LEVELS[$v] = substr($k,7,7);
-		}
+	// turn off logger in install mode
+	if (
+		$a->module == 'install'
+		|| ! ($db && $db->connected)
+	) {
+		return;
 	}
 
 	$debugging = get_config('system','debugging');
-	$loglevel  = intval(get_config('system','loglevel'));
 	$logfile   = get_config('system','logfile');
+	$loglevel = intval(get_config('system','loglevel'));
 
-	if((! $debugging) || (! $logfile) || ($level > $loglevel))
+	if (
+		! $debugging
+		|| ! $logfile
+		|| $level > $loglevel
+	) {
 		return;
+	}
+
+	if (count($LOGGER_LEVELS) == 0) {
+		foreach (get_defined_constants() as $k => $v) {
+			if (substr($k, 0, 7) == "LOGGER_") {
+				$LOGGER_LEVELS[$v] = substr($k, 7, 7);
+			}
+		}
+	}
 
 	$process_id = session_id();
 
-	if ($process_id == "")
+	if ($process_id == '') {
 		$process_id = get_app()->process_id;
+	}
 
 	$callers = debug_backtrace();
-	$logline =  sprintf("%s@%s\t[%s]:%s:%s:%s\t%s\n",
-				 datetime_convert(),
-				 $process_id,
-				 $LOGGER_LEVELS[$level],
-				 basename($callers[0]['file']),
-				 $callers[0]['line'],
-				 $callers[1]['function'],
-				 $msg
-				);
+	$logline = sprintf("%s@%s\t[%s]:%s:%s:%s\t%s\n",
+			datetime_convert(),
+			$process_id,
+			$LOGGER_LEVELS[$level],
+			basename($callers[0]['file']),
+			$callers[0]['line'],
+			$callers[1]['function'],
+			$msg
+		);
 
 	$stamp1 = microtime(true);
 	@file_put_contents($logfile, $logline, FILE_APPEND);
 	$a->save_timestamp($stamp1, "file");
-	return;
 }}
 
 
@@ -928,11 +942,11 @@ function contact_block() {
  *	string 'thumb' => The contact picture
  *	string 'click' => js code which is performed when clicking on the contact
  * @param boolean $redirect If true try to use the redir url if it's possible
- * @param string $class CSS class for the 
+ * @param string $class CSS class for the
  * @param boolean $textmode If true display the contacts as text links
  *	if false display the contacts as picture links
- 
- * @return string Formatted html 
+
+ * @return string Formatted html
  */
 function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 
@@ -2087,7 +2101,7 @@ function formatBytes($bytes, $precision = 2) {
 
 /**
  * @brief translate and format the networkname of a contact
- * 
+ *
  * @param string $network
  *	Networkname of the contact (e.g. dfrn, rss and so on)
  * @param sting $url
@@ -2132,7 +2146,7 @@ function text_highlight($s,$lang) {
 	$s = trim(html_entity_decode($s,ENT_COMPAT));
 	$s = str_replace("    ","\t",$s);
 
-	// The highlighter library insists on an opening php tag for php code blocks. If 
+	// The highlighter library insists on an opening php tag for php code blocks. If
 	// it isn't present, nothing is highlighted. So we're going to see if it's present.
 	// If not, we'll add it, and then quietly remove it after we get the processed output back.
 
@@ -2141,7 +2155,7 @@ function text_highlight($s,$lang) {
 			$s = '<?php' . "\n" . $s;
 			$tag_added = true;
 		}
-	} 
+	}
 
 	$renderer = new Text_Highlighter_Renderer_HTML($options);
 	$hl = Text_Highlighter::factory($lang);

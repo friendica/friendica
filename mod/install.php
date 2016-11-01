@@ -285,7 +285,7 @@ function install_content(&$a) {
 			$adminmail = notags(trim($_POST['adminmail']));
 			$timezone = ((x($_POST,'timezone')) ? ($_POST['timezone']) : 'America/Los_Angeles');
 			/* Installed langs */
-			$lang_choices = get_avaiable_languages();
+			$lang_choices = get_available_languages();
 
 			$tpl = get_markup_template('install_settings.tpl');
 			$o .= replace_macros($tpl, array(

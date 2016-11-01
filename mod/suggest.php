@@ -95,7 +95,7 @@ function suggest_content(&$a) {
 			'details'       => $contact_details['location'],
 			'tags'          => $contact_details['keywords'],
 			'about'         => $contact_details['about'],
-			'account_type'  => (($contact_details['community']) ? t('Forum') : ''),
+			'account_type'  => account_type($contact_details),
 			'ignlnk' => $ignlnk,
 			'ignid' => $rr['id'],
 			'conntxt' => t('Connect'),
@@ -113,7 +113,6 @@ function suggest_content(&$a) {
 	$o .= replace_macros($tpl,array(
 		'$title' => t('Friend Suggestions'),
 		'$contacts' => $entries,
-		
 	));
 
 	return $o;

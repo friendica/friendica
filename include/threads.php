@@ -18,42 +18,70 @@ function add_thread($itemid, $onlyshadow = false) {
 				.implode("', '", array_values($item))
 				."')");
 
-		logger("add_thread: Add thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
+		logger("Add thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
+	}
+}
+
+/**
+ * @brief Add a shadow entry for a given item id that is a thread starter
+ *
+ * We store every public item entry additionally with the user id "0".
+ * This is used for the community page and for the search.
+ * It is planned that in the future we will store public item entries only once.
+ *
+ * @param integer $itemid Item ID that should be added
+ */
+function add_shadow_thread($itemid) {
+	$items = q("SELECT `uid`, `wall`, `private`, `moderated`, `visible`, `contact-id`, `deleted`, `network`
+		FROM `item` WHERE `id` = %d AND (`parent` = %d OR `parent` = 0) LIMIT 1", intval($itemid), intval($itemid));
+
+	if (!dbm::is_result($items)) {
+		return;
 	}
 
+	$item = $items[0];
+
 	// is it already a copy?
-	if (($itemid == 0) OR ($item['uid'] == 0))
+	if (($itemid == 0) OR ($item['uid'] == 0)) {
 		return;
+	}
 
 	// Is it a visible public post?
-	if (!$item["visible"] OR $item["deleted"] OR $item["moderated"] OR $item["private"])
+	if (!$item["visible"] OR $item["deleted"] OR $item["moderated"] OR $item["private"]) {
 		return;
+	}
 
 	// is it an entry from a connector? Only add an entry for natively connected networks
-	if (!in_array($item["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, "")))
+	if (!in_array($item["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""))) {
 		return;
+	}
 
 	// Only do these checks if the post isn't a wall post
 	if (!$item["wall"]) {
 		// Check, if hide-friends is activated - then don't do a shadow entry
 		$r = q("SELECT `hide-friends` FROM `profile` WHERE `is-default` AND `uid` = %d AND NOT `hide-friends`",
 			$item['uid']);
-		if (!count($r))
+
+		if (!dbm::is_result($r)) {
 			return;
+		}
+
 		// Check if the contact is hidden or blocked
 		$r = q("SELECT `id` FROM `contact` WHERE NOT `hidden` AND NOT `blocked` AND `id` = %d",
 			$item['contact-id']);
-		if (!count($r))
+
+		if (!dbm::is_result($r)) {
 			return;
+		}
 	}
 
 	// Only add a shadow, if the profile isn't hidden
 	$r = q("SELECT `uid` FROM `user` where `uid` = %d AND NOT `hidewall`", $item['uid']);
-	if (!count($r))
+	if (!dbm::is_result($r)) {
 		return;
+	}
 
-	$item = q("SELECT * FROM `item` WHERE `id` = %d",
-		intval($itemid));
+	$item = q("SELECT * FROM `item` WHERE `id` = %d", intval($itemid));
 
 	if (count($item) AND ($item[0]["allow_cid"] == '')  AND ($item[0]["allow_gid"] == '') AND
 		($item[0]["deny_cid"] == '') AND ($item[0]["deny_gid"] == '')) {
@@ -61,7 +89,7 @@ function add_thread($itemid, $onlyshadow = false) {
 		$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = 0 LIMIT 1",
 			dbesc($item['uri']));
 
-		if (!$r) {
+		if (!dbm::is_result($r)) {
 			// Preparing public shadow (removing user specific data)
 			require_once("include/items.php");
 			require_once("include/Contact.php");
@@ -69,15 +97,33 @@ function add_thread($itemid, $onlyshadow = false) {
 			unset($item[0]['id']);
 			$item[0]['uid'] = 0;
 			$item[0]['origin'] = 0;
+			$item[0]['wall'] = 0;
 			$item[0]['contact-id'] = get_contact($item[0]['author-link'], 0);
+
+			if (in_array($item[0]['type'], array("net-comment", "wall-comment"))) {
+				$item[0]['type'] = 'remote-comment';
+			} elseif ($item[0]['type'] == 'wall') {
+				$item[0]['type'] = 'remote';
+			}
+
 			$public_shadow = item_store($item[0], false, false, true);
 
-			logger("add_thread: Stored public shadow for post ".$itemid." under id ".$public_shadow, LOGGER_DEBUG);
+			logger("Stored public shadow for thread ".$itemid." under id ".$public_shadow, LOGGER_DEBUG);
 		}
 	}
 }
 
-function add_shadow_entry($item) {
+/**
+ * @brief Add a shadow entry for a given item id that is a comment
+ *
+ * This function does the same like the function above - but for comments
+ *
+ * @param integer $itemid Item ID that should be added
+ */
+function add_shadow_entry($itemid) {
+
+	$items = q("SELECT * FROM `item` WHERE `id` = %d", intval($itemid));
+	$item = $items[0];
 
 	// Is this a shadow entry?
 	if ($item['uid'] == 0)
@@ -99,7 +145,16 @@ function add_shadow_entry($item) {
 
 	unset($item['id']);
 	$item['uid'] = 0;
+	$item['origin'] = 0;
+	$item['wall'] = 0;
 	$item['contact-id'] = get_contact($item['author-link'], 0);
+
+	if (in_array($item['type'], array("net-comment", "wall-comment"))) {
+		$item['type'] = 'remote-comment';
+	} elseif ($item['type'] == 'wall') {
+		$item['type'] = 'remote';
+	}
+
 	$public_shadow = item_store($item, false, false, true);
 
 	logger("Stored public shadow for comment ".$item['uri']." under id ".$public_shadow, LOGGER_DEBUG);
@@ -193,8 +248,10 @@ function update_threads() {
 
 	logger("update_threads: fetched messages: ".count($messages));
 
-	while ($message = $db->qfetch())
+	while ($message = $db->qfetch()) {
 		add_thread($message["id"]);
+		add_shadow_thread($message["id"]);
+	}
 	$db->qclose();
 }
 
@@ -227,7 +284,7 @@ function update_shadow_copy() {
 
 	logger("fetched messages: ".count($messages));
 	while ($message = $db->qfetch())
-		add_thread($message["iid"], true);
+		add_shadow_thread($message["iid"]);
 
 	$db->qclose();
 }

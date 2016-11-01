@@ -49,7 +49,7 @@ function notification($params) {
 	// with $params['show_in_notification_page'] == false, the notification isn't inserted into
 	// the database, and an email is sent if applicable.
 	// default, if not specified: true
-	$show_in_notification_page = ((x($params, 'show_in_notification_page'))	? $params['show_in_notification_page']:True);
+	$show_in_notification_page = ((x($params, 'show_in_notification_page'))	? $params['show_in_notification_page']:true);
 
 	$additional_mail_header = "";
 	$additional_mail_header .= "Precedence: list\n";

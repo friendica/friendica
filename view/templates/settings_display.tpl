@@ -13,6 +13,7 @@
 {{include file="field_checkbox.tpl" field=$nosmile}}
 {{include file="field_checkbox.tpl" field=$noinfo}}
 {{include file="field_checkbox.tpl" field=$infinite_scroll}}
+{{include file="field_checkbox.tpl" field=$bandwidth_saver}}
 <h2>{{$calendar_title}}</h2>
 {{include file="field_select.tpl" field=$first_day_of_week}}
 

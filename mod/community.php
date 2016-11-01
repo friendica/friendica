@@ -49,7 +49,7 @@ function community_content(&$a, $update = 0) {
 	// OR your own posts if you are a logged in member
 
 	if(get_config('system', 'old_pager')) {
-		$r = q("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
+		$r = qu("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
 			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			INNER JOIN `user` ON `user`.`uid` = `item`.`uid` AND `user`.`hidewall` = 0
@@ -120,7 +120,7 @@ function community_getitems($start, $itemspage) {
 	if (get_config('system','community_page_style') == CP_GLOBAL_COMMUNITY)
 		return(community_getpublicitems($start, $itemspage));
 
-	$r = q("SELECT %s
+	$r = qu("SELECT %s
 		FROM `thread` FORCE INDEX (`wall_private_received`)
 		INNER JOIN `user` ON `user`.`uid` = `thread`.`uid` AND NOT `user`.`hidewall`
 		INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
@@ -140,7 +140,7 @@ function community_getitems($start, $itemspage) {
 
 function community_getpublicitems($start, $itemspage) {
 
-	$r = q("SELECT %s
+	$r = qu("SELECT %s
 		FROM `thread`
 		INNER JOIN `item` ON `item`.`id` = `thread`.`iid` %s
 		WHERE `thread`.`uid` = 0

@@ -570,3 +570,13 @@ function scrollToItem(itemID) {
 		$(elm).animate(colWhite, 1000).animate(colShiny).animate(colWhite, 600);
 	});
 }
+
+// format a html string to pure text
+function htmlToText(htmlString) {
+	// Replace line breaks with spaces
+	var text = htmlString.replace(/<br>/g, ' ');
+	// Strip the text out of the html string
+	text = text.replace(/<[^>]*>/g, '');
+
+	return text;
+}

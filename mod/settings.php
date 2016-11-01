@@ -279,7 +279,7 @@ function settings_post(&$a) {
 		return;
 	}
 
-	if(($a->argc > 1) && ($a->argv[1] === 'features')) {
+	if (($a->argc > 1) && ($a->argv[1] === 'features')) {
 		check_form_security_token_redirectOnErr('/settings/features', 'settings_features');
 		foreach($_POST as $k => $v) {
 			if(strpos($k,'feature_') === 0) {
@@ -290,49 +290,50 @@ function settings_post(&$a) {
 		return;
 	}
 
-	if(($a->argc > 1) && ($a->argv[1] === 'display')) {
-
+	if (($a->argc > 1) && ($a->argv[1] === 'display')) {
 		check_form_security_token_redirectOnErr('/settings/display', 'settings_display');
 
-		$theme = ((x($_POST,'theme')) ? notags(trim($_POST['theme']))  : $a->user['theme']);
-		$mobile_theme = ((x($_POST,'mobile_theme')) ? notags(trim($_POST['mobile_theme']))  : '');
-		$nosmile = ((x($_POST,'nosmile')) ? intval($_POST['nosmile'])  : 0);
-		$first_day_of_week = ((x($_POST,'first_day_of_week')) ? intval($_POST['first_day_of_week'])  : 0);
-		$noinfo = ((x($_POST,'noinfo')) ? intval($_POST['noinfo'])  : 0);
-		$infinite_scroll = ((x($_POST,'infinite_scroll')) ? intval($_POST['infinite_scroll'])  : 0);
-		$no_auto_update = ((x($_POST,'no_auto_update')) ? intval($_POST['no_auto_update'])  : 0);
-		$browser_update   = ((x($_POST,'browser_update')) ? intval($_POST['browser_update']) : 0);
+		$theme             = x($_POST, 'theme')             ? notags(trim($_POST['theme']))        : $a->user['theme'];
+		$mobile_theme      = x($_POST, 'mobile_theme')      ? notags(trim($_POST['mobile_theme'])) : '';
+		$nosmile           = x($_POST, 'nosmile')           ? intval($_POST['nosmile'])            : 0;
+		$first_day_of_week = x($_POST, 'first_day_of_week') ? intval($_POST['first_day_of_week'])  : 0;
+		$noinfo            = x($_POST, 'noinfo')            ? intval($_POST['noinfo'])             : 0;
+		$infinite_scroll   = x($_POST, 'infinite_scroll')   ? intval($_POST['infinite_scroll'])    : 0;
+		$no_auto_update    = x($_POST, 'no_auto_update')    ? intval($_POST['no_auto_update'])     : 0;
+		$bandwidth_saver   = x($_POST, 'bandwidth_saver')   ? intval($_POST['bandwidth_saver'])    : 0;
+		$browser_update    = x($_POST, 'browser_update')    ? intval($_POST['browser_update'])     : 0;
 		if ($browser_update != -1) {
-			$browser_update   = $browser_update * 1000;
+			$browser_update = $browser_update * 1000;
 			if ($browser_update < 10000)
 				$browser_update = 10000;
 		}
 
-		$itemspage_network   = ((x($_POST,'itemspage_network')) ? intval($_POST['itemspage_network']) : 40);
-		if($itemspage_network > 100)
+		$itemspage_network = x($_POST,'itemspage_network')  ? intval($_POST['itemspage_network'])  : 40;
+		if ($itemspage_network > 100) {
 			$itemspage_network = 100;
-		$itemspage_mobile_network   = ((x($_POST,'itemspage_mobile_network')) ? intval($_POST['itemspage_mobile_network']) : 20);
-		if($itemspage_mobile_network > 100)
+		}
+		$itemspage_mobile_network = x($_POST,'itemspage_mobile_network') ? intval($_POST['itemspage_mobile_network']) : 20;
+		if ($itemspage_mobile_network > 100) {
 			$itemspage_mobile_network = 100;
-
+		}
 
 		if($mobile_theme !== '') {
 			set_pconfig(local_user(),'system','mobile_theme',$mobile_theme);
 		}
 
-		set_pconfig(local_user(),'system','update_interval', $browser_update);
-		set_pconfig(local_user(),'system','itemspage_network', $itemspage_network);
-		set_pconfig(local_user(),'system','itemspage_mobile_network', $itemspage_mobile_network);
-		set_pconfig(local_user(),'system','no_smilies',$nosmile);
-		set_pconfig(local_user(),'system','first_day_of_week',$first_day_of_week);
-		set_pconfig(local_user(),'system','ignore_info',$noinfo);
-		set_pconfig(local_user(),'system','infinite_scroll',$infinite_scroll);
-		set_pconfig(local_user(),'system','no_auto_update',$no_auto_update);
+		set_pconfig(local_user(), 'system', 'update_interval'         , $browser_update);
+		set_pconfig(local_user(), 'system', 'itemspage_network'       , $itemspage_network);
+		set_pconfig(local_user(), 'system', 'itemspage_mobile_network', $itemspage_mobile_network);
+		set_pconfig(local_user(), 'system', 'no_smilies'              , $nosmile);
+		set_pconfig(local_user(), 'system', 'first_day_of_week'       , $first_day_of_week);
+		set_pconfig(local_user(), 'system', 'ignore_info'             , $noinfo);
+		set_pconfig(local_user(), 'system', 'infinite_scroll'         , $infinite_scroll);
+		set_pconfig(local_user(), 'system', 'no_auto_update'          , $no_auto_update);
+		set_pconfig(local_user(), 'system', 'bandwidth_saver'         , $bandwidth_saver);
 
-
-		if ($theme == $a->user['theme']){
+		if ($theme == $a->user['theme']) {
 			// call theme_post only if theme has not been changed
-			if( ($themeconfigfile = get_theme_config_file($theme)) != null){
+			if (($themeconfigfile = get_theme_config_file($theme)) != null) {
 				require_once($themeconfigfile);
 				theme_post($a);
 			}
@@ -420,6 +421,7 @@ function settings_post(&$a) {
 	$publish          = (((x($_POST,'profile_in_directory')) && (intval($_POST['profile_in_directory']) == 1)) ? 1: 0);
 	$net_publish      = (((x($_POST,'profile_in_netdirectory')) && (intval($_POST['profile_in_netdirectory']) == 1)) ? 1: 0);
 	$old_visibility   = (((x($_POST,'visibility')) && (intval($_POST['visibility']) == 1)) ? 1 : 0);
+	$account_type     = (((x($_POST,'account-type')) && (intval($_POST['account-type']))) ? intval($_POST['account-type']) : 0);
 	$page_flags       = (((x($_POST,'page-flags')) && (intval($_POST['page-flags']))) ? intval($_POST['page-flags']) : 0);
 	$blockwall        = (((x($_POST,'blockwall')) && (intval($_POST['blockwall']) == 1)) ? 0: 1); // this setting is inverted!
 	$blocktags        = (((x($_POST,'blocktags')) && (intval($_POST['blocktags']) == 1)) ? 0: 1); // this setting is inverted!
@@ -452,6 +454,16 @@ function settings_post(&$a) {
 		$notify += intval($_POST['notify7']);
 	if(x($_POST,'notify8'))
 		$notify += intval($_POST['notify8']);
+
+	// Adjust the page flag if the account type doesn't fit to the page flag.
+	if (($account_type == ACCOUNT_TYPE_PERSON) AND !in_array($page_flags, array(PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE)))
+		$page_flags = PAGE_NORMAL;
+	elseif (($account_type == ACCOUNT_TYPE_ORGANISATION) AND !in_array($page_flags, array(PAGE_SOAPBOX)))
+		$page_flags = PAGE_SOAPBOX;
+	elseif (($account_type == ACCOUNT_TYPE_NEWS) AND !in_array($page_flags, array(PAGE_SOAPBOX)))
+		$page_flags = PAGE_SOAPBOX;
+	elseif (($account_type == ACCOUNT_TYPE_COMMUNITY) AND !in_array($page_flags, array(PAGE_COMMUNITY, PAGE_PRVGROUP)))
+		$page_flags = PAGE_COMMUNITY;
 
 	$email_changed = false;
 
@@ -553,7 +565,7 @@ function settings_post(&$a) {
 	$r = q("UPDATE `user` SET `username` = '%s', `email` = '%s',
 				`openid` = '%s', `timezone` = '%s',
 				`allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s',
-				`notify-flags` = %d, `page-flags` = %d, `default-location` = '%s',
+				`notify-flags` = %d, `page-flags` = %d, `account-type` = %d, `default-location` = '%s',
 				`allow_location` = %d, `maxreq` = %d, `expire` = %d, `openidserver` = '%s',
 				`def_gid` = %d, `blockwall` = %d, `hidewall` = %d, `blocktags` = %d,
 				`unkmail` = %d, `cntunkmail` = %d, `language` = '%s'
@@ -568,6 +580,7 @@ function settings_post(&$a) {
 			dbesc($str_group_deny),
 			intval($notify),
 			intval($page_flags),
+			intval($account_type),
 			dbesc($defloc),
 			intval($allow_location),
 			intval($maxreq),
@@ -963,8 +976,11 @@ function settings_content(&$a) {
 		$no_auto_update = get_pconfig(local_user(),'system','no_auto_update');
 		$no_auto_update = (($no_auto_update===false)? '0': $no_auto_update); // default if not set: 0
 
+		$bandwidth_saver = get_pconfig(local_user(), 'system', 'bandwidth_saver');
+		$bandwidth_saver = (($bandwidth_saver === false) ? '0' : $bandwidth_saver); // default if not set: 0
+
 		$theme_config = "";
-		if( ($themeconfigfile = get_theme_config_file($theme_selected)) != null){
+		if (($themeconfigfile = get_theme_config_file($theme_selected)) != null) {
 			require_once($themeconfigfile);
 			$theme_config = theme_content($a);
 		}
@@ -988,6 +1004,7 @@ function settings_content(&$a) {
 			'$noinfo'	=> array('noinfo', t("Don't show notices"), $noinfo, ''),
 			'$infinite_scroll'	=> array('infinite_scroll', t("Infinite scroll"), $infinite_scroll, ''),
 			'$no_auto_update'	=> array('no_auto_update', t("Automatic updates only at the top of the network page"), $no_auto_update, 'When disabled, the network page is updated all the time, which could be confusing while reading.'),
+			'$bandwidth_saver' => array('bandwidth_saver', t('Bandwith Saver Mode'), $bandwidth_saver, 'When enabled, embedded content is not displayed on automatic updates, they only show on page reload.'),
 
 			'$d_tset' => t('General Theme Settings'),
 			'$d_ctset' => t('Custom Theme Settings'),
@@ -1065,13 +1082,41 @@ function settings_content(&$a) {
 	if(! strlen($a->user['timezone']))
 		$timezone = date_default_timezone_get();
 
+	// Set the account type to "Community" when the page is a community page but the account type doesn't fit
+	// This is only happening on the first visit after the update
+	if (in_array($a->user['page-flags'], array(PAGE_COMMUNITY, PAGE_PRVGROUP)) AND
+		($a->user['account-type'] != ACCOUNT_TYPE_COMMUNITY))
+		$a->user['account-type'] = ACCOUNT_TYPE_COMMUNITY;
 
+	$pageset_tpl = get_markup_template('settings_pagetypes.tpl');
 
-	$pageset_tpl = get_markup_template('pagetypes.tpl');
 	$pagetype = replace_macros($pageset_tpl, array(
-		'$user' 	=> t("User Types"),
-		'$community' 	=> t("Community Types"),
-		'$page_normal' 	=> array('page-flags', t('Normal Account Page'), PAGE_NORMAL,
+		'$account_types'	=> t("Account Types"),
+		'$user' 		=> t("Personal Page Subtypes"),
+		'$community'		=> t("Community Forum Subtypes"),
+		'$account_type'		=> $a->user['account-type'],
+		'$type_person'		=> ACCOUNT_TYPE_PERSON,
+		'$type_organisation' 	=> ACCOUNT_TYPE_ORGANISATION,
+		'$type_news'		=> ACCOUNT_TYPE_NEWS,
+		'$type_community' 	=> ACCOUNT_TYPE_COMMUNITY,
+
+		'$account_person' 	=> array('account-type', t('Personal Page'), ACCOUNT_TYPE_PERSON,
+									t('This account is a regular personal profile'),
+									($a->user['account-type'] == ACCOUNT_TYPE_PERSON)),
+
+		'$account_organisation'	=> array('account-type', t('Organisation Page'), ACCOUNT_TYPE_ORGANISATION,
+									t('This account is a profile for an organisation'),
+									($a->user['account-type'] == ACCOUNT_TYPE_ORGANISATION)),
+
+		'$account_news'		=> array('account-type', t('News Page'), ACCOUNT_TYPE_NEWS,
+									t('This account is a news account/reflector'),
+									($a->user['account-type'] == ACCOUNT_TYPE_NEWS)),
+
+		'$account_community' 	=> array('account-type', t('Community Forum'), ACCOUNT_TYPE_COMMUNITY,
+									t('This account is a community forum where people can discuss with each other'),
+									($a->user['account-type'] == ACCOUNT_TYPE_COMMUNITY)),
+
+		'$page_normal'		=> array('page-flags', t('Normal Account Page'), PAGE_NORMAL,
 									t('This account is a normal personal profile'),
 									($a->user['page-flags'] == PAGE_NORMAL)),
 
@@ -1079,8 +1124,8 @@ function settings_content(&$a) {
 									t('Automatically approve all connection/friend requests as read-only fans'),
 									($a->user['page-flags'] == PAGE_SOAPBOX)),
 
-		'$page_community'	=> array('page-flags', t('Community Forum/Celebrity Account'), PAGE_COMMUNITY,
-									t('Automatically approve all connection/friend requests as read-write fans'),
+		'$page_community'	=> array('page-flags', t('Public Forum'), PAGE_COMMUNITY,
+									t('Automatically approve all contact requests'),
 									($a->user['page-flags'] == PAGE_COMMUNITY)),
 
 		'$page_freelove' 	=> array('page-flags', t('Automatic Friend Page'), PAGE_FREELOVE,
@@ -1206,7 +1251,7 @@ function settings_content(&$a) {
 		$public_post_link = '&public=1';
 
 	/* Installed langs */
-	$lang_choices = get_avaiable_languages();
+	$lang_choices = get_available_languages();
 
 	$o .= replace_macros($stpl, array(
 		'$ptitle' 	=> t('Account Settings'),
@@ -1307,4 +1352,3 @@ function settings_content(&$a) {
 	return $o;
 
 }
-

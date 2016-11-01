@@ -87,6 +87,12 @@
 			</div>
 		{{/if}}
 
+		{{if $profile.xmpp}}
+			<div class="xmpp">
+				<span class="xmpp-label icon"><i class="fa fa-comments"></i></span> 
+				<span class="xmpp-data">{{$profile.xmpp}}</span>
+			</div>
+		{{/if}}
 
 		{{if $gender}}
 		<div class="mf detail">

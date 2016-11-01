@@ -145,7 +145,6 @@ class Conversation extends BaseObject {
 			$result[] = $item_data;
 		}
 
-		//$a->mark_timestamp();
 		return $result;
 	}
 

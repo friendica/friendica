@@ -303,8 +303,8 @@ function events_content(&$a) {
 
 
 		if ($a->argv[1] === 'json'){
-			if (x($_GET,'start'))	$start = date("Y-m-d h:i:s", $_GET['start']);
-			if (x($_GET,'end'))	$finish = date("Y-m-d h:i:s", $_GET['end']);
+			if (x($_GET,'start'))	$start = $_GET['start'];
+			if (x($_GET,'end'))	$finish = $_GET['end'];
 		}
 
 		$start  = datetime_convert('UTC','UTC',$start);
@@ -357,7 +357,7 @@ function events_content(&$a) {
 			$tpl =  get_markup_template("event.tpl");
 		} else {
 //			if (get_config('experimentals','new_calendar')==1){
-				$tpl = get_markup_template("events-js.tpl");
+				$tpl = get_markup_template("events_js.tpl");
 //			} else {
 //				$tpl = get_markup_template("events.tpl");
 //			}
@@ -378,10 +378,10 @@ function events_content(&$a) {
 			'$tabs'		=> $tabs,
 			'$title'	=> t('Events'),
 			'$view'		=> t('View'),
-			'$new_event'=> array($a->get_baseurl().'/events/new',t('Create New Event'),'',''),
+			'$new_event'	=> array($a->get_baseurl().'/events/new',t('Create New Event'),'',''),
 			'$previus'	=> array($a->get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
 			'$next'		=> array($a->get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
-			'$calendar' => cal($y,$m,$links, ' eventcal'),
+			'$calendar'	=> cal($y,$m,$links, ' eventcal'),
 
 			'$events'	=> $events,
 
@@ -389,8 +389,7 @@ function events_content(&$a) {
 			"month" => t("month"),
 			"week" => t("week"),
 			"day" => t("day"),
-
-
+			"list" => t("list"),
 		));
 
 		if (x($_GET,'id')){ echo $o; killme(); }

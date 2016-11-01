@@ -806,11 +806,20 @@ class ostatus {
 		}
 
 		// Get the parent
+		$parents = q("SELECT `item`.`id`, `item`.`parent`, `item`.`uri`, `item`.`contact-id`, `item`.`type`,
+				`item`.`verb`, `item`.`visible` FROM `term`
+				STRAIGHT_JOIN `item` AS `thritem` ON `thritem`.`parent` = `term`.`oid`
+				STRAIGHT_JOIN `item` ON `item`.`parent` = `thritem`.`parent`
+				WHERE `term`.`uid` = %d AND `term`.`otype` = %d AND `term`.`type` = %d AND `term`.`url` = '%s'",
+				intval($uid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($conversation_url));
+
+/*		2016-10-23: The old query will be kept until we are sure that the query above is a good and fast replacement
+
 		$parents = q("SELECT `id`, `parent`, `uri`, `contact-id`, `type`, `verb`, `visible` FROM `item` WHERE `id` IN
 				(SELECT `parent` FROM `item` WHERE `id` IN
 					(SELECT `oid` FROM `term` WHERE `uid` = %d AND `otype` = %d AND `type` = %d AND `url` = '%s'))",
 				intval($uid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($conversation_url));
-
+*/
 		if ($parents)
 			$parent = $parents[0];
 		elseif (count($item) > 0) {
@@ -1961,9 +1970,23 @@ class ostatus {
 			$last_update = 'now -30 days';
 
 		$check_date = datetime_convert('UTC','UTC',$last_update,'Y-m-d H:i:s');
+		$authorid = get_contact($owner["url"], 0);
 
-		$items = q("SELECT STRAIGHT_JOIN `item`.*, `item`.`id` AS `item_id` FROM `item`
-				INNER JOIN `thread` ON `thread`.`iid` = `item`.`parent`
+		$items = q("SELECT `item`.*, `item`.`id` AS `item_id` FROM `item` USE INDEX (`uid_contactid_created`)
+				STRAIGHT_JOIN `thread` ON `thread`.`iid` = `item`.`parent`
+				WHERE `item`.`uid` = %d AND `item`.`contact-id` = %d AND
+					`item`.`author-id` = %d AND `item`.`created` > '%s' AND
+					NOT `item`.`deleted` AND NOT `item`.`private` AND
+					`thread`.`network` IN ('%s', '%s')
+				ORDER BY `item`.`created` DESC LIMIT 300",
+				intval($owner["uid"]), intval($owner["id"]),
+				intval($authorid), dbesc($check_date),
+				dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DFRN));
+
+/*		2016-10-23: The old query will be kept until we are sure that the query above is a good and fast replacement
+
+		$items = q("SELECT `item`.*, `item`.`id` AS `item_id` FROM `item`
+				STRAIGHT_JOIN `thread` ON `thread`.`iid` = `item`.`parent`
 				LEFT JOIN `item` AS `thritem` ON `thritem`.`uri`=`item`.`thr-parent` AND `thritem`.`uid`=`item`.`uid`
 				WHERE `item`.`uid` = %d AND `item`.`received` > '%s' AND NOT `item`.`private` AND NOT `item`.`deleted`
 					AND `item`.`allow_cid` = '' AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
@@ -1981,7 +2004,7 @@ class ostatus {
 				dbesc($owner["nurl"]), dbesc(str_replace("http://", "https://", $owner["nurl"])),
 				dbesc($owner["nurl"]), dbesc(str_replace("http://", "https://", $owner["nurl"]))
 			);
-
+*/
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
 

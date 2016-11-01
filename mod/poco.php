@@ -1,4 +1,6 @@
 <?php
+// See here for a documentation for portable contacts:
+// https://web.archive.org/web/20160405005550/http://portablecontacts.net/draft-spec.html
 
 function poco_init(&$a) {
 	require_once("include/bbcode.php");
@@ -104,9 +106,11 @@ function poco_init(&$a) {
 		);
 	} elseif($system_mode) {
 		logger("Start system mode query", LOGGER_DEBUG);
-		$r = q("SELECT `contact`.*, `profile`.`about` AS `pabout`, `profile`.`locality` AS `plocation`, `profile`.`pub_keywords`, `profile`.`gender` AS `pgender`,
-			`profile`.`address` AS `paddress`, `profile`.`region` AS `pregion`, `profile`.`postal-code` AS `ppostalcode`, `profile`.`country-name` AS `pcountry`
+		$r = q("SELECT `contact`.*, `profile`.`about` AS `pabout`, `profile`.`locality` AS `plocation`, `profile`.`pub_keywords`,
+				`profile`.`gender` AS `pgender`, `profile`.`address` AS `paddress`, `profile`.`region` AS `pregion`,
+				`profile`.`postal-code` AS `ppostalcode`, `profile`.`country-name` AS `pcountry`, `user`.`account-type`
 			FROM `contact` INNER JOIN `profile` ON `profile`.`uid` = `contact`.`uid`
+				INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
 			WHERE `self` = 1 AND `profile`.`is-default`
 			AND `contact`.`uid` IN (SELECT `uid` FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1) LIMIT %d, %d",
 			intval($startIndex),
@@ -155,6 +159,7 @@ function poco_init(&$a) {
 		'gender' => false,
 		'tags' => false,
 		'address' => false,
+		'contactType' => false,
 		'generation' => false
 	);
 
@@ -206,6 +211,9 @@ function poco_init(&$a) {
 
 				if (($rr['keywords'] == "") AND isset($rr['pub_keywords']))
 					$rr['keywords'] = $rr['pub_keywords'];
+
+				if (isset($rr['account-type']))
+					$rr['contact-type'] = $rr['account-type'];
 
 				$about = Cache::get("about:".$rr['updated'].":".$rr['nurl']);
 				if (is_null($about)) {
@@ -299,6 +307,9 @@ function poco_init(&$a) {
 					if (isset($rr['pcountry']))
 						 $entry['address']['country'] = $rr['pcountry'];
 				}
+
+				if($fields_ret['contactType'])
+					$entry['contactType'] = intval($rr['contact-type']);
 
 				$ret['entry'][] = $entry;
 			}

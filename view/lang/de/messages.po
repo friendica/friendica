@@ -35,9 +35,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-24 09:44+0200\n"
-"PO-Revision-Date: 2016-09-24 12:16+0000\n"
-"Last-Translator: Tobias Diekershoff <tobias.diekershoff@gmx.net>\n"
+"POT-Creation-Date: 2016-09-27 21:32+0200\n"
+"PO-Revision-Date: 2016-10-03 11:51+0000\n"
+"Last-Translator: Andreas H.\n"
 "Language-Team: German (http://www.transifex.com/Friendica/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -45,15 +45,15 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: include/datetime.php:57 include/datetime.php:59 mod/profiles.php:698
+#: include/datetime.php:57 include/datetime.php:59 mod/profiles.php:705
 msgid "Miscellaneous"
 msgstr "Verschiedenes"
 
-#: include/datetime.php:183 include/identity.php:627
+#: include/datetime.php:183 include/identity.php:630
 msgid "Birthday:"
 msgstr "Geburtstag:"
 
-#: include/datetime.php:185 mod/profiles.php:721
+#: include/datetime.php:185 mod/profiles.php:728
 msgid "Age: "
 msgstr "Alter: "
 
@@ -138,7 +138,7 @@ msgstr "%1$d %2$s her"
 msgid "%s's birthday"
 msgstr "%ss Geburtstag"
 
-#: include/datetime.php:579 include/dfrn.php:1111
+#: include/datetime.php:579 include/dfrn.php:1115
 #, php-format
 msgid "Happy Birthday %s"
 msgstr "Herzlichen Glückwunsch %s"
@@ -175,10 +175,10 @@ msgstr "Leute finden"
 msgid "Enter name or interest"
 msgstr "Name oder Interessen eingeben"
 
-#: include/contact_widgets.php:32 include/Contact.php:324
-#: include/conversation.php:976 mod/match.php:72 mod/allfriends.php:66
-#: mod/follow.php:103 mod/suggest.php:83 mod/contacts.php:602
-#: mod/dirfind.php:204
+#: include/contact_widgets.php:32 include/conversation.php:976
+#: include/Contact.php:324 mod/match.php:72 mod/allfriends.php:66
+#: mod/follow.php:103 mod/suggest.php:83 mod/dirfind.php:204
+#: mod/contacts.php:602
 msgid "Connect/Follow"
 msgstr "Verbinden/Folgen"
 
@@ -186,7 +186,7 @@ msgstr "Verbinden/Folgen"
 msgid "Examples: Robert Morgenstein, Fishing"
 msgstr "Beispiel: Robert Morgenstein, Angeln"
 
-#: include/contact_widgets.php:34 mod/directory.php:212 mod/contacts.php:796
+#: include/contact_widgets.php:34 mod/directory.php:212 mod/contacts.php:798
 msgid "Find"
 msgstr "Finde"
 
@@ -238,7 +238,7 @@ msgstr[1] "%d gemeinsame Kontakte"
 
 #: include/contact_widgets.php:242 include/ForumManager.php:119
 #: include/items.php:2122 mod/content.php:624 object/Item.php:432
-#: view/theme/vier/theme.php:260 boot.php:904
+#: view/theme/vier/theme.php:260 boot.php:926
 msgid "show more"
 msgstr "mehr anzeigen"
 
@@ -813,8 +813,8 @@ msgid "Finishes:"
 msgstr "Endet:"
 
 #: include/bb2diaspora.php:170 include/event.php:39 include/event.php:63
-#: include/identity.php:329 mod/directory.php:145 mod/contacts.php:628
-#: mod/events.php:495 mod/notifications.php:232
+#: include/identity.php:329 mod/directory.php:145 mod/events.php:495
+#: mod/notifications.php:232 mod/contacts.php:628
 msgid "Location:"
 msgstr "Ort:"
 
@@ -901,10 +901,6 @@ msgstr "hinzufügen"
 #: mod/wall_upload.php:232 mod/wall_upload.php:239 mod/item.php:472
 msgid "Wall Photos"
 msgstr "Pinnwand-Bilder"
-
-#: include/delivery.php:439
-msgid "(no subject)"
-msgstr "(kein Betreff)"
 
 #: include/user.php:39 mod/settings.php:370
 msgid "Passwords do not match. Password unchanged."
@@ -1045,7 +1041,7 @@ msgstr "Bereinige Benachrichtigungen"
 msgid "@name, !forum, #tags, content"
 msgstr "@name, !forum, #tags, content"
 
-#: include/nav.php:75 view/theme/frio/theme.php:243 boot.php:1704
+#: include/nav.php:75 view/theme/frio/theme.php:243 boot.php:1726
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -1053,8 +1049,8 @@ msgstr "Abmelden"
 msgid "End this session"
 msgstr "Diese Sitzung beenden"
 
-#: include/nav.php:78 include/identity.php:712 mod/contacts.php:635
-#: mod/contacts.php:831 view/theme/frio/theme.php:246
+#: include/nav.php:78 include/identity.php:715 mod/contacts.php:637
+#: mod/contacts.php:833 view/theme/frio/theme.php:246
 msgid "Status"
 msgstr "Status"
 
@@ -1063,9 +1059,9 @@ msgstr "Status"
 msgid "Your posts and conversations"
 msgstr "Deine Beiträge und Unterhaltungen"
 
-#: include/nav.php:79 include/identity.php:603 include/identity.php:689
-#: include/identity.php:720 mod/profperm.php:104 mod/newmember.php:32
-#: mod/contacts.php:637 mod/contacts.php:839 view/theme/frio/theme.php:247
+#: include/nav.php:79 include/identity.php:606 include/identity.php:692
+#: include/identity.php:723 mod/profperm.php:104 mod/newmember.php:32
+#: mod/contacts.php:639 mod/contacts.php:841 view/theme/frio/theme.php:247
 #: view/theme/diabook/theme.php:124
 msgid "Profile"
 msgstr "Profil"
@@ -1075,7 +1071,7 @@ msgstr "Profil"
 msgid "Your profile page"
 msgstr "Deine Profilseite"
 
-#: include/nav.php:80 include/identity.php:728 mod/fbrowser.php:32
+#: include/nav.php:80 include/identity.php:731 mod/fbrowser.php:32
 #: view/theme/frio/theme.php:248 view/theme/diabook/theme.php:126
 msgid "Photos"
 msgstr "Bilder"
@@ -1085,7 +1081,7 @@ msgstr "Bilder"
 msgid "Your photos"
 msgstr "Deine Fotos"
 
-#: include/nav.php:81 include/identity.php:736 include/identity.php:739
+#: include/nav.php:81 include/identity.php:739 include/identity.php:742
 #: view/theme/frio/theme.php:249
 msgid "Videos"
 msgstr "Videos"
@@ -1094,8 +1090,8 @@ msgstr "Videos"
 msgid "Your videos"
 msgstr "Deine Videos"
 
-#: include/nav.php:82 include/nav.php:146 include/identity.php:748
-#: include/identity.php:759 mod/cal.php:278 mod/events.php:379
+#: include/nav.php:82 include/nav.php:146 include/identity.php:751
+#: include/identity.php:762 mod/cal.php:278 mod/events.php:379
 #: view/theme/frio/theme.php:250 view/theme/frio/theme.php:254
 #: view/theme/diabook/theme.php:127
 msgid "Events"
@@ -1114,7 +1110,7 @@ msgstr "Persönliche Notizen"
 msgid "Your personal notes"
 msgstr "Deine persönlichen Notizen"
 
-#: include/nav.php:94 mod/bookmarklet.php:12 boot.php:1705
+#: include/nav.php:94 mod/bookmarklet.php:12 boot.php:1727
 msgid "Login"
 msgstr "Anmeldung"
 
@@ -1131,7 +1127,7 @@ msgstr "Pinnwand"
 msgid "Home Page"
 msgstr "Homepage"
 
-#: include/nav.php:111 mod/register.php:280 boot.php:1680
+#: include/nav.php:111 mod/register.php:280 boot.php:1702
 msgid "Register"
 msgstr "Registrieren"
 
@@ -1171,9 +1167,9 @@ msgstr "Volltext"
 msgid "Tags"
 msgstr "Tags"
 
-#: include/nav.php:127 include/nav.php:193 include/identity.php:781
-#: include/identity.php:784 include/text.php:1004 mod/viewcontacts.php:116
-#: mod/contacts.php:790 mod/contacts.php:851 view/theme/frio/theme.php:257
+#: include/nav.php:127 include/nav.php:193 include/text.php:1004
+#: include/identity.php:784 include/identity.php:787 mod/viewcontacts.php:116
+#: mod/contacts.php:792 mod/contacts.php:853 view/theme/frio/theme.php:257
 #: view/theme/diabook/theme.php:125
 msgid "Contacts"
 msgstr "Kontakte"
@@ -1191,7 +1187,7 @@ msgstr "Unterhaltungen auf dieser Seite"
 msgid "Conversations on the network"
 msgstr "Unterhaltungen im Netzwerk"
 
-#: include/nav.php:146 include/identity.php:751 include/identity.php:762
+#: include/nav.php:146 include/identity.php:754 include/identity.php:765
 #: view/theme/frio/theme.php:254
 msgid "Events and Calendar"
 msgstr "Ereignisse und Kalender"
@@ -1245,7 +1241,7 @@ msgstr "Benachrichtigungen"
 msgid "See all notifications"
 msgstr "Alle Benachrichtigungen anzeigen"
 
-#: include/nav.php:173 mod/settings.php:887
+#: include/nav.php:173 mod/settings.php:899
 msgid "Mark as seen"
 msgstr "Als gelesen markieren"
 
@@ -1289,8 +1285,8 @@ msgstr "Delegationen"
 msgid "Delegate Page Management"
 msgstr "Delegiere das Management für die Seite"
 
-#: include/nav.php:188 mod/newmember.php:22 mod/settings.php:111
-#: mod/admin.php:1502 mod/admin.php:1760 view/theme/frio/theme.php:256
+#: include/nav.php:188 mod/newmember.php:22 mod/admin.php:1502
+#: mod/admin.php:1760 mod/settings.php:111 view/theme/frio/theme.php:256
 #: view/theme/diabook/theme.php:544 view/theme/diabook/theme.php:648
 msgid "Settings"
 msgstr "Einstellungen"
@@ -1393,7 +1389,7 @@ msgid "Email"
 msgstr "E-Mail"
 
 #: include/contact_selectors.php:80 mod/dfrn_request.php:869
-#: mod/settings.php:827
+#: mod/settings.php:839
 msgid "Diaspora"
 msgstr "Diaspora"
 
@@ -1449,45 +1445,6 @@ msgstr "Hubzilla/Redmatrix"
 msgid "view full size"
 msgstr "Volle Größe anzeigen"
 
-#: include/Contact.php:119
-msgid "stopped following"
-msgstr "wird nicht mehr gefolgt"
-
-#: include/Contact.php:310 include/Contact.php:323 include/Contact.php:365
-#: include/conversation.php:964 include/conversation.php:978
-#: mod/directory.php:163 mod/match.php:71 mod/allfriends.php:65
-#: mod/suggest.php:82 mod/dirfind.php:203
-msgid "View Profile"
-msgstr "Profil anschauen"
-
-#: include/Contact.php:364 include/conversation.php:963
-msgid "View Status"
-msgstr "Pinnwand anschauen"
-
-#: include/Contact.php:366 include/conversation.php:965
-msgid "View Photos"
-msgstr "Bilder anschauen"
-
-#: include/Contact.php:367 include/conversation.php:966
-msgid "Network Posts"
-msgstr "Netzwerkbeiträge"
-
-#: include/Contact.php:368 include/conversation.php:967
-msgid "Edit Contact"
-msgstr "Kontakt bearbeiten"
-
-#: include/Contact.php:369
-msgid "Drop Contact"
-msgstr "Kontakt löschen"
-
-#: include/Contact.php:370 include/conversation.php:968
-msgid "Send PM"
-msgstr "Private Nachricht senden"
-
-#: include/Contact.php:371 include/conversation.php:972
-msgid "Poke"
-msgstr "Anstupsen"
-
 #: include/acl_selectors.php:327
 msgid "Post to Email"
 msgstr "An E-Mail senden"
@@ -1497,7 +1454,7 @@ msgstr "An E-Mail senden"
 msgid "Connectors disabled, since \"%s\" is enabled."
 msgstr "Konnektoren sind nicht verfügbar, da \"%s\" aktiv ist."
 
-#: include/acl_selectors.php:333 mod/settings.php:1131
+#: include/acl_selectors.php:333 mod/settings.php:1171
 msgid "Hide your profile details from unknown viewers?"
 msgstr "Profil-Details vor unbekannten Betrachtern verbergen?"
 
@@ -1531,11 +1488,6 @@ msgstr "Berechtigungen"
 #: include/acl_selectors.php:350
 msgid "Close"
 msgstr "Schließen"
-
-#: include/dfrn.php:1110
-#, php-format
-msgid "%s\\'s birthday"
-msgstr "%ss Geburtstag"
 
 #: include/follow.php:77 mod/dfrn_request.php:507
 msgid "Disallowed profile URL."
@@ -1612,21 +1564,21 @@ msgstr "Möchtest Du wirklich dieses Item löschen?"
 
 #: include/items.php:1846 mod/follow.php:110 mod/suggest.php:29
 #: mod/api.php:105 mod/message.php:217 mod/dfrn_request.php:861
-#: mod/contacts.php:442 mod/profiles.php:641 mod/profiles.php:644
-#: mod/profiles.php:670 mod/register.php:238 mod/settings.php:1113
-#: mod/settings.php:1119 mod/settings.php:1127 mod/settings.php:1131
-#: mod/settings.php:1136 mod/settings.php:1142 mod/settings.php:1148
-#: mod/settings.php:1154 mod/settings.php:1180 mod/settings.php:1181
-#: mod/settings.php:1182 mod/settings.php:1183 mod/settings.php:1184
+#: mod/register.php:238 mod/contacts.php:442 mod/profiles.php:648
+#: mod/profiles.php:651 mod/profiles.php:677 mod/settings.php:1153
+#: mod/settings.php:1159 mod/settings.php:1167 mod/settings.php:1171
+#: mod/settings.php:1176 mod/settings.php:1182 mod/settings.php:1188
+#: mod/settings.php:1194 mod/settings.php:1220 mod/settings.php:1221
+#: mod/settings.php:1222 mod/settings.php:1223 mod/settings.php:1224
 msgid "Yes"
 msgstr "Ja"
 
 #: include/items.php:1849 include/conversation.php:1272 mod/fbrowser.php:101
 #: mod/fbrowser.php:136 mod/tagrm.php:11 mod/tagrm.php:94 mod/follow.php:121
 #: mod/suggest.php:32 mod/editpost.php:148 mod/message.php:220
-#: mod/dfrn_request.php:875 mod/contacts.php:445 mod/settings.php:664
-#: mod/settings.php:690 mod/videos.php:131 mod/photos.php:248
-#: mod/photos.php:337
+#: mod/dfrn_request.php:875 mod/videos.php:131 mod/photos.php:248
+#: mod/photos.php:337 mod/contacts.php:445 mod/settings.php:676
+#: mod/settings.php:702
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -1640,15 +1592,15 @@ msgstr "Abbrechen"
 #: mod/wallmessage.php:9 mod/wallmessage.php:33 mod/wallmessage.php:79
 #: mod/wallmessage.php:103 mod/api.php:26 mod/api.php:31
 #: mod/ostatus_subscribe.php:9 mod/message.php:46 mod/message.php:182
-#: mod/manage.php:96 mod/crepair.php:100 mod/contacts.php:350
-#: mod/dfrn_confirm.php:57 mod/dirfind.php:11 mod/fsuggest.php:78
-#: mod/item.php:185 mod/item.php:197 mod/mood.php:114 mod/poke.php:150
-#: mod/profile_photo.php:19 mod/profile_photo.php:175
-#: mod/profile_photo.php:186 mod/profile_photo.php:199 mod/profiles.php:166
-#: mod/profiles.php:598 mod/register.php:42 mod/regmod.php:110
-#: mod/settings.php:22 mod/settings.php:128 mod/settings.php:650
+#: mod/manage.php:96 mod/crepair.php:100 mod/dfrn_confirm.php:57
+#: mod/dirfind.php:11 mod/fsuggest.php:78 mod/item.php:185 mod/item.php:197
+#: mod/mood.php:114 mod/poke.php:150 mod/profile_photo.php:19
+#: mod/profile_photo.php:175 mod/profile_photo.php:186
+#: mod/profile_photo.php:199 mod/register.php:42 mod/regmod.php:110
 #: mod/photos.php:172 mod/photos.php:1093 mod/cal.php:308 mod/events.php:190
-#: mod/notifications.php:71 index.php:397
+#: mod/notifications.php:71 mod/contacts.php:350 mod/profiles.php:166
+#: mod/profiles.php:605 mod/settings.php:22 mod/settings.php:128
+#: mod/settings.php:662 index.php:397
 msgid "Permission denied."
 msgstr "Zugriff verweigert."
 
@@ -1758,7 +1710,7 @@ msgid "System"
 msgstr "System"
 
 #: include/NotificationsManager.php:167 mod/network.php:844
-#: mod/profiles.php:696
+#: mod/profiles.php:703
 msgid "Personal"
 msgstr "Persönlich"
 
@@ -1846,31 +1798,6 @@ msgstr "$1 hat geschrieben:"
 msgid "Encrypted content"
 msgstr "Verschlüsselter Inhalt"
 
-#: include/dbstructure.php:26
-#, php-format
-msgid ""
-"\n"
-"\t\t\tThe friendica developers released update %s recently,\n"
-"\t\t\tbut when I tried to install it, something went terribly wrong.\n"
-"\t\t\tThis needs to be fixed soon and I can't do it alone. Please contact a\n"
-"\t\t\tfriendica developer if you can not help me on your own. My database might be invalid."
-msgstr "\nDie Friendica-Entwickler haben vor kurzem das Update %s veröffentlicht, aber bei der Installation ging etwas schrecklich schief.\n\nDas Problem sollte so schnell wie möglich gelöst werden, aber ich schaffe es nicht alleine. Bitte kontaktiere einen Friendica-Entwickler falls Du mir nicht alleine helfen kannst. Meine Datenbank könnte ungültig sein."
-
-#: include/dbstructure.php:31
-#, php-format
-msgid ""
-"The error message is\n"
-"[pre]%s[/pre]"
-msgstr "Die Fehlermeldung lautet\n[pre]%s[/pre]"
-
-#: include/dbstructure.php:153
-msgid "Errors encountered creating database tables."
-msgstr "Fehler aufgetreten während der Erzeugung der Datenbanktabellen."
-
-#: include/dbstructure.php:230
-msgid "Errors encountered performing database changes."
-msgstr "Es sind Fehler beim Bearbeiten der Datenbank aufgetreten."
-
 #: include/diaspora.php:1954
 msgid "Sharing notification from Diaspora network"
 msgstr "Freigabe-Benachrichtigung von Diaspora"
@@ -1907,11 +1834,11 @@ msgstr "Fr"
 msgid "Sat"
 msgstr "Sa"
 
-#: include/event.php:448 include/text.php:1112 mod/settings.php:955
+#: include/event.php:448 include/text.php:1112 mod/settings.php:967
 msgid "Sunday"
 msgstr "Sonntag"
 
-#: include/event.php:449 include/text.php:1112 mod/settings.php:955
+#: include/event.php:449 include/text.php:1112 mod/settings.php:967
 msgid "Monday"
 msgstr "Montag"
 
@@ -2055,231 +1982,6 @@ msgstr "Kalender als ical exportieren"
 msgid "Export calendar as csv"
 msgstr "Kalender als csv exportieren"
 
-#: include/identity.php:42
-msgid "Requested account is not available."
-msgstr "Das angefragte Profil ist nicht vorhanden."
-
-#: include/identity.php:51 mod/profile.php:21
-msgid "Requested profile is not available."
-msgstr "Das angefragte Profil ist nicht vorhanden."
-
-#: include/identity.php:95 include/identity.php:305 include/identity.php:686
-msgid "Edit profile"
-msgstr "Profil bearbeiten"
-
-#: include/identity.php:245
-msgid "Atom feed"
-msgstr "Atom-Feed"
-
-#: include/identity.php:250 include/conversation.php:1285 mod/editpost.php:152
-msgid "Message"
-msgstr "Nachricht"
-
-#: include/identity.php:276
-msgid "Manage/edit profiles"
-msgstr "Profile verwalten/editieren"
-
-#: include/identity.php:281 include/identity.php:307 mod/profiles.php:787
-msgid "Change profile photo"
-msgstr "Profilbild ändern"
-
-#: include/identity.php:282 mod/profiles.php:788
-msgid "Create New Profile"
-msgstr "Neues Profil anlegen"
-
-#: include/identity.php:292 mod/profiles.php:777
-msgid "Profile Image"
-msgstr "Profilbild"
-
-#: include/identity.php:295 mod/profiles.php:779
-msgid "visible to everybody"
-msgstr "sichtbar für jeden"
-
-#: include/identity.php:296 mod/profiles.php:684 mod/profiles.php:780
-msgid "Edit visibility"
-msgstr "Sichtbarkeit bearbeiten"
-
-#: include/identity.php:319 mod/directory.php:174 mod/match.php:84
-#: mod/viewcontacts.php:105 mod/allfriends.php:79 mod/suggest.php:98
-#: mod/hovercard.php:80 mod/common.php:123 mod/network.php:517
-#: mod/contacts.php:51 mod/contacts.php:626 mod/contacts.php:953
-#: mod/dirfind.php:223 mod/videos.php:37 mod/photos.php:42 mod/cal.php:44
-msgid "Forum"
-msgstr "Forum"
-
-#: include/identity.php:331 include/identity.php:614 mod/directory.php:147
-#: mod/notifications.php:238
-msgid "Gender:"
-msgstr "Geschlecht:"
-
-#: include/identity.php:334 include/identity.php:634 mod/directory.php:149
-msgid "Status:"
-msgstr "Status:"
-
-#: include/identity.php:336 include/identity.php:645 mod/directory.php:151
-msgid "Homepage:"
-msgstr "Homepage:"
-
-#: include/identity.php:338 include/identity.php:655 mod/directory.php:153
-#: mod/contacts.php:630 mod/notifications.php:234
-msgid "About:"
-msgstr "Über:"
-
-#: include/identity.php:420 mod/contacts.php:50 mod/notifications.php:246
-msgid "Network:"
-msgstr "Netzwerk:"
-
-#: include/identity.php:449 include/identity.php:533
-msgid "g A l F d"
-msgstr "l, d. F G \\U\\h\\r"
-
-#: include/identity.php:450 include/identity.php:534
-msgid "F d"
-msgstr "d. F"
-
-#: include/identity.php:495 include/identity.php:580
-msgid "[today]"
-msgstr "[heute]"
-
-#: include/identity.php:507
-msgid "Birthday Reminders"
-msgstr "Geburtstagserinnerungen"
-
-#: include/identity.php:508
-msgid "Birthdays this week:"
-msgstr "Geburtstage diese Woche:"
-
-#: include/identity.php:567
-msgid "[No description]"
-msgstr "[keine Beschreibung]"
-
-#: include/identity.php:591
-msgid "Event Reminders"
-msgstr "Veranstaltungserinnerungen"
-
-#: include/identity.php:592
-msgid "Events this week:"
-msgstr "Veranstaltungen diese Woche"
-
-#: include/identity.php:612 mod/settings.php:1229
-msgid "Full Name:"
-msgstr "Kompletter Name:"
-
-#: include/identity.php:619
-msgid "j F, Y"
-msgstr "j F, Y"
-
-#: include/identity.php:620
-msgid "j F"
-msgstr "j F"
-
-#: include/identity.php:631
-msgid "Age:"
-msgstr "Alter:"
-
-#: include/identity.php:640
-#, php-format
-msgid "for %1$d %2$s"
-msgstr "für %1$d %2$s"
-
-#: include/identity.php:643 mod/profiles.php:703
-msgid "Sexual Preference:"
-msgstr "Sexuelle Vorlieben:"
-
-#: include/identity.php:647 mod/profiles.php:729
-msgid "Hometown:"
-msgstr "Heimatort:"
-
-#: include/identity.php:649 mod/follow.php:134 mod/contacts.php:632
-#: mod/notifications.php:236
-msgid "Tags:"
-msgstr "Tags:"
-
-#: include/identity.php:651 mod/profiles.php:730
-msgid "Political Views:"
-msgstr "Politische Ansichten:"
-
-#: include/identity.php:653
-msgid "Religion:"
-msgstr "Religion:"
-
-#: include/identity.php:657
-msgid "Hobbies/Interests:"
-msgstr "Hobbies/Interessen:"
-
-#: include/identity.php:659 mod/profiles.php:734
-msgid "Likes:"
-msgstr "Likes:"
-
-#: include/identity.php:661 mod/profiles.php:735
-msgid "Dislikes:"
-msgstr "Dislikes:"
-
-#: include/identity.php:664
-msgid "Contact information and Social Networks:"
-msgstr "Kontaktinformationen und Soziale Netzwerke:"
-
-#: include/identity.php:666
-msgid "Musical interests:"
-msgstr "Musikalische Interessen:"
-
-#: include/identity.php:668
-msgid "Books, literature:"
-msgstr "Literatur/Bücher:"
-
-#: include/identity.php:670
-msgid "Television:"
-msgstr "Fernsehen:"
-
-#: include/identity.php:672
-msgid "Film/dance/culture/entertainment:"
-msgstr "Filme/Tänze/Kultur/Unterhaltung:"
-
-#: include/identity.php:674
-msgid "Love/Romance:"
-msgstr "Liebesleben:"
-
-#: include/identity.php:676
-msgid "Work/employment:"
-msgstr "Arbeit/Beschäftigung:"
-
-#: include/identity.php:678
-msgid "School/education:"
-msgstr "Schule/Ausbildung:"
-
-#: include/identity.php:682
-msgid "Forums:"
-msgstr "Foren:"
-
-#: include/identity.php:690 mod/events.php:508
-msgid "Basic"
-msgstr "Allgemein"
-
-#: include/identity.php:691 mod/contacts.php:868 mod/events.php:509
-#: mod/admin.php:931
-msgid "Advanced"
-msgstr "Erweitert"
-
-#: include/identity.php:715 mod/follow.php:143 mod/contacts.php:834
-msgid "Status Messages and Posts"
-msgstr "Statusnachrichten und Beiträge"
-
-#: include/identity.php:723 mod/contacts.php:842
-msgid "Profile Details"
-msgstr "Profildetails"
-
-#: include/identity.php:731 mod/photos.php:100
-msgid "Photo Albums"
-msgstr "Fotoalben"
-
-#: include/identity.php:770 mod/notes.php:46
-msgid "Personal Notes"
-msgstr "Persönliche Notizen"
-
-#: include/identity.php:773
-msgid "Only You Can See This"
-msgstr "Nur Du kannst das sehen"
-
 #: include/conversation.php:147
 #, php-format
 msgid "%1$s attends %2$s's %3$s"
@@ -2324,13 +2026,13 @@ msgstr "Nachricht/Beitrag"
 msgid "%1$s marked %2$s's %3$s as favorite"
 msgstr "%1$s hat %2$s\\s %3$s als Favorit markiert"
 
-#: include/conversation.php:585 mod/content.php:372 mod/profiles.php:345
-#: mod/photos.php:1634
+#: include/conversation.php:585 mod/content.php:372 mod/photos.php:1634
+#: mod/profiles.php:346
 msgid "Likes"
 msgstr "Likes"
 
-#: include/conversation.php:585 mod/content.php:372 mod/profiles.php:349
-#: mod/photos.php:1634
+#: include/conversation.php:585 mod/content.php:372 mod/photos.php:1634
+#: mod/profiles.php:350
 msgid "Dislikes"
 msgstr "Dislikes"
 
@@ -2355,8 +2057,8 @@ msgid "Select"
 msgstr "Auswählen"
 
 #: include/conversation.php:709 mod/group.php:171 mod/content.php:454
-#: mod/content.php:759 mod/contacts.php:806 mod/contacts.php:1021
-#: mod/settings.php:726 mod/photos.php:1710 mod/admin.php:1392
+#: mod/content.php:759 mod/photos.php:1710 mod/admin.php:1392
+#: mod/contacts.php:808 mod/contacts.php:1023 mod/settings.php:738
 #: object/Item.php:134
 msgid "Delete"
 msgstr "Löschen"
@@ -2403,6 +2105,37 @@ msgstr "Lösche die markierten Beiträge"
 #: include/conversation.php:962
 msgid "Follow Thread"
 msgstr "Folge der Unterhaltung"
+
+#: include/conversation.php:963 include/Contact.php:364
+msgid "View Status"
+msgstr "Pinnwand anschauen"
+
+#: include/conversation.php:964 include/conversation.php:978
+#: include/Contact.php:310 include/Contact.php:323 include/Contact.php:365
+#: mod/directory.php:163 mod/match.php:71 mod/allfriends.php:65
+#: mod/suggest.php:82 mod/dirfind.php:203
+msgid "View Profile"
+msgstr "Profil anschauen"
+
+#: include/conversation.php:965 include/Contact.php:366
+msgid "View Photos"
+msgstr "Bilder anschauen"
+
+#: include/conversation.php:966 include/Contact.php:367
+msgid "Network Posts"
+msgstr "Netzwerkbeiträge"
+
+#: include/conversation.php:967 include/Contact.php:368
+msgid "Edit Contact"
+msgstr "Kontakt bearbeiten"
+
+#: include/conversation.php:968 include/Contact.php:370
+msgid "Send PM"
+msgstr "Private Nachricht senden"
+
+#: include/conversation.php:972 include/Contact.php:371
+msgid "Poke"
+msgstr "Anstupsen"
 
 #: include/conversation.php:1086
 #, php-format
@@ -2622,6 +2355,10 @@ msgstr "Poste an Kontakte"
 #: include/conversation.php:1280
 msgid "Private post"
 msgstr "Privater Beitrag"
+
+#: include/conversation.php:1285 include/identity.php:250 mod/editpost.php:152
+msgid "Message"
+msgstr "Nachricht"
 
 #: include/conversation.php:1286 mod/editpost.php:153
 msgid "Browser"
@@ -3070,6 +2807,273 @@ msgstr "Beitrag"
 msgid "Item filed"
 msgstr "Beitrag abgelegt"
 
+#: include/Contact.php:119
+msgid "stopped following"
+msgstr "wird nicht mehr gefolgt"
+
+#: include/Contact.php:369
+msgid "Drop Contact"
+msgstr "Kontakt löschen"
+
+#: include/dbstructure.php:26
+#, php-format
+msgid ""
+"\n"
+"\t\t\tThe friendica developers released update %s recently,\n"
+"\t\t\tbut when I tried to install it, something went terribly wrong.\n"
+"\t\t\tThis needs to be fixed soon and I can't do it alone. Please contact a\n"
+"\t\t\tfriendica developer if you can not help me on your own. My database might be invalid."
+msgstr "\nDie Friendica-Entwickler haben vor kurzem das Update %s veröffentlicht, aber bei der Installation ging etwas schrecklich schief.\n\nDas Problem sollte so schnell wie möglich gelöst werden, aber ich schaffe es nicht alleine. Bitte kontaktiere einen Friendica-Entwickler falls Du mir nicht alleine helfen kannst. Meine Datenbank könnte ungültig sein."
+
+#: include/dbstructure.php:31
+#, php-format
+msgid ""
+"The error message is\n"
+"[pre]%s[/pre]"
+msgstr "Die Fehlermeldung lautet\n[pre]%s[/pre]"
+
+#: include/dbstructure.php:153
+msgid "Errors encountered creating database tables."
+msgstr "Fehler aufgetreten während der Erzeugung der Datenbanktabellen."
+
+#: include/dbstructure.php:230
+msgid "Errors encountered performing database changes."
+msgstr "Es sind Fehler beim Bearbeiten der Datenbank aufgetreten."
+
+#: include/delivery.php:439
+msgid "(no subject)"
+msgstr "(kein Betreff)"
+
+#: include/dfrn.php:1114
+#, php-format
+msgid "%s\\'s birthday"
+msgstr "%ss Geburtstag"
+
+#: include/identity.php:42
+msgid "Requested account is not available."
+msgstr "Das angefragte Profil ist nicht vorhanden."
+
+#: include/identity.php:51 mod/profile.php:21
+msgid "Requested profile is not available."
+msgstr "Das angefragte Profil ist nicht vorhanden."
+
+#: include/identity.php:95 include/identity.php:305 include/identity.php:689
+msgid "Edit profile"
+msgstr "Profil bearbeiten"
+
+#: include/identity.php:245
+msgid "Atom feed"
+msgstr "Atom-Feed"
+
+#: include/identity.php:276
+msgid "Manage/edit profiles"
+msgstr "Profile verwalten/editieren"
+
+#: include/identity.php:281 include/identity.php:307 mod/profiles.php:795
+msgid "Change profile photo"
+msgstr "Profilbild ändern"
+
+#: include/identity.php:282 mod/profiles.php:796
+msgid "Create New Profile"
+msgstr "Neues Profil anlegen"
+
+#: include/identity.php:292 mod/profiles.php:785
+msgid "Profile Image"
+msgstr "Profilbild"
+
+#: include/identity.php:295 mod/profiles.php:787
+msgid "visible to everybody"
+msgstr "sichtbar für jeden"
+
+#: include/identity.php:296 mod/profiles.php:691 mod/profiles.php:788
+msgid "Edit visibility"
+msgstr "Sichtbarkeit bearbeiten"
+
+#: include/identity.php:319 mod/directory.php:174 mod/match.php:84
+#: mod/viewcontacts.php:105 mod/allfriends.php:79 mod/suggest.php:98
+#: mod/hovercard.php:80 mod/common.php:123 mod/network.php:517
+#: mod/dirfind.php:223 mod/videos.php:37 mod/photos.php:42 mod/cal.php:44
+#: mod/contacts.php:51 mod/contacts.php:626 mod/contacts.php:955
+msgid "Forum"
+msgstr "Forum"
+
+#: include/identity.php:331 include/identity.php:617 mod/directory.php:147
+#: mod/notifications.php:238
+msgid "Gender:"
+msgstr "Geschlecht:"
+
+#: include/identity.php:334 include/identity.php:637 mod/directory.php:149
+msgid "Status:"
+msgstr "Status:"
+
+#: include/identity.php:336 include/identity.php:648 mod/directory.php:151
+msgid "Homepage:"
+msgstr "Homepage:"
+
+#: include/identity.php:338 include/identity.php:658 mod/directory.php:153
+#: mod/notifications.php:234 mod/contacts.php:632
+msgid "About:"
+msgstr "Über:"
+
+#: include/identity.php:340 mod/contacts.php:630
+msgid "XMPP:"
+msgstr "XMPP:"
+
+#: include/identity.php:423 mod/notifications.php:246 mod/contacts.php:50
+msgid "Network:"
+msgstr "Netzwerk:"
+
+#: include/identity.php:452 include/identity.php:536
+msgid "g A l F d"
+msgstr "l, d. F G \\U\\h\\r"
+
+#: include/identity.php:453 include/identity.php:537
+msgid "F d"
+msgstr "d. F"
+
+#: include/identity.php:498 include/identity.php:583
+msgid "[today]"
+msgstr "[heute]"
+
+#: include/identity.php:510
+msgid "Birthday Reminders"
+msgstr "Geburtstagserinnerungen"
+
+#: include/identity.php:511
+msgid "Birthdays this week:"
+msgstr "Geburtstage diese Woche:"
+
+#: include/identity.php:570
+msgid "[No description]"
+msgstr "[keine Beschreibung]"
+
+#: include/identity.php:594
+msgid "Event Reminders"
+msgstr "Veranstaltungserinnerungen"
+
+#: include/identity.php:595
+msgid "Events this week:"
+msgstr "Veranstaltungen diese Woche"
+
+#: include/identity.php:615 mod/settings.php:1269
+msgid "Full Name:"
+msgstr "Kompletter Name:"
+
+#: include/identity.php:622
+msgid "j F, Y"
+msgstr "j F, Y"
+
+#: include/identity.php:623
+msgid "j F"
+msgstr "j F"
+
+#: include/identity.php:634
+msgid "Age:"
+msgstr "Alter:"
+
+#: include/identity.php:643
+#, php-format
+msgid "for %1$d %2$s"
+msgstr "für %1$d %2$s"
+
+#: include/identity.php:646 mod/profiles.php:710
+msgid "Sexual Preference:"
+msgstr "Sexuelle Vorlieben:"
+
+#: include/identity.php:650 mod/profiles.php:737
+msgid "Hometown:"
+msgstr "Heimatort:"
+
+#: include/identity.php:652 mod/follow.php:134 mod/notifications.php:236
+#: mod/contacts.php:634
+msgid "Tags:"
+msgstr "Tags:"
+
+#: include/identity.php:654 mod/profiles.php:738
+msgid "Political Views:"
+msgstr "Politische Ansichten:"
+
+#: include/identity.php:656
+msgid "Religion:"
+msgstr "Religion:"
+
+#: include/identity.php:660
+msgid "Hobbies/Interests:"
+msgstr "Hobbies/Interessen:"
+
+#: include/identity.php:662 mod/profiles.php:742
+msgid "Likes:"
+msgstr "Likes:"
+
+#: include/identity.php:664 mod/profiles.php:743
+msgid "Dislikes:"
+msgstr "Dislikes:"
+
+#: include/identity.php:667
+msgid "Contact information and Social Networks:"
+msgstr "Kontaktinformationen und Soziale Netzwerke:"
+
+#: include/identity.php:669
+msgid "Musical interests:"
+msgstr "Musikalische Interessen:"
+
+#: include/identity.php:671
+msgid "Books, literature:"
+msgstr "Literatur/Bücher:"
+
+#: include/identity.php:673
+msgid "Television:"
+msgstr "Fernsehen:"
+
+#: include/identity.php:675
+msgid "Film/dance/culture/entertainment:"
+msgstr "Filme/Tänze/Kultur/Unterhaltung:"
+
+#: include/identity.php:677
+msgid "Love/Romance:"
+msgstr "Liebesleben:"
+
+#: include/identity.php:679
+msgid "Work/employment:"
+msgstr "Arbeit/Beschäftigung:"
+
+#: include/identity.php:681
+msgid "School/education:"
+msgstr "Schule/Ausbildung:"
+
+#: include/identity.php:685
+msgid "Forums:"
+msgstr "Foren:"
+
+#: include/identity.php:693 mod/events.php:508
+msgid "Basic"
+msgstr "Allgemein"
+
+#: include/identity.php:694 mod/events.php:509 mod/admin.php:931
+#: mod/contacts.php:870
+msgid "Advanced"
+msgstr "Erweitert"
+
+#: include/identity.php:718 mod/follow.php:143 mod/contacts.php:836
+msgid "Status Messages and Posts"
+msgstr "Statusnachrichten und Beiträge"
+
+#: include/identity.php:726 mod/contacts.php:844
+msgid "Profile Details"
+msgstr "Profildetails"
+
+#: include/identity.php:734 mod/photos.php:100
+msgid "Photo Albums"
+msgstr "Fotoalben"
+
+#: include/identity.php:773 mod/notes.php:46
+msgid "Personal Notes"
+msgstr "Persönliche Notizen"
+
+#: include/identity.php:776
+msgid "Only You Can See This"
+msgstr "Nur Du kannst das sehen"
+
 #: mod/oexchange.php:25
 msgid "Post successful."
 msgstr "Beitrag erfolgreich veröffentlicht."
@@ -3128,7 +3132,7 @@ msgstr "Keine Ergebnisse."
 msgid "Items tagged with: %s"
 msgstr "Beiträge die mit %s getaggt sind"
 
-#: mod/search.php:232 mod/network.php:146 mod/contacts.php:795
+#: mod/search.php:232 mod/network.php:146 mod/contacts.php:797
 #, php-format
 msgid "Results for: %s"
 msgstr "Ergebnisse für: %s"
@@ -3221,7 +3225,7 @@ msgid ""
 "Password reset failed."
 msgstr "Anfrage konnte nicht verifiziert werden. (Eventuell hast Du bereits eine ähnliche Anfrage gestellt.) Zurücksetzen des Passworts gescheitert."
 
-#: mod/lostpass.php:109 boot.php:1719
+#: mod/lostpass.php:109 boot.php:1741
 msgid "Password Reset"
 msgstr "Passwort zurücksetzen"
 
@@ -3287,7 +3291,7 @@ msgid ""
 "your email for further instructions."
 msgstr "Gib Deine E-Mail-Adresse an und fordere ein neues Passwort an. Es werden Dir dann weitere Informationen per Mail zugesendet."
 
-#: mod/lostpass.php:161 boot.php:1707
+#: mod/lostpass.php:161 boot.php:1729
 msgid "Nickname or Email: "
 msgstr "Spitzname oder E-Mail:"
 
@@ -3411,12 +3415,12 @@ msgid ""
 msgstr "Um Deinen Account zu exportieren, rufe \"Einstellungen -> Persönliche Daten exportieren\" auf und wähle \"Account exportieren\""
 
 #: mod/nogroup.php:41 mod/viewcontacts.php:97 mod/contacts.php:586
-#: mod/contacts.php:944
+#: mod/contacts.php:946
 #, php-format
 msgid "Visit %s's profile [%s]"
 msgstr "Besuche %ss Profil [%s]"
 
-#: mod/nogroup.php:42 mod/contacts.php:945
+#: mod/nogroup.php:42 mod/contacts.php:947
 msgid "Edit contact"
 msgstr "Kontakt bearbeiten"
 
@@ -3564,11 +3568,11 @@ msgstr "Für weitere Informationen über das Friendica Projekt und warum wir es 
 
 #: mod/invite.php:140 mod/localtime.php:45 mod/message.php:357
 #: mod/message.php:547 mod/manage.php:143 mod/crepair.php:154
-#: mod/content.php:728 mod/contacts.php:577 mod/fsuggest.php:107
-#: mod/mood.php:137 mod/poke.php:199 mod/profiles.php:681 mod/install.php:272
-#: mod/install.php:312 mod/photos.php:1125 mod/photos.php:1249
-#: mod/photos.php:1566 mod/photos.php:1617 mod/photos.php:1665
-#: mod/photos.php:1753 mod/events.php:507 object/Item.php:720
+#: mod/content.php:728 mod/fsuggest.php:107 mod/mood.php:137 mod/poke.php:199
+#: mod/install.php:272 mod/install.php:312 mod/photos.php:1125
+#: mod/photos.php:1249 mod/photos.php:1566 mod/photos.php:1617
+#: mod/photos.php:1665 mod/photos.php:1753 mod/events.php:507
+#: mod/contacts.php:577 mod/profiles.php:688 object/Item.php:720
 #: view/theme/frio/config.php:59 view/theme/cleanzero/config.php:80
 #: view/theme/quattro/config.php:64 view/theme/dispy/config.php:70
 #: view/theme/vier/config.php:107 view/theme/diabook/theme.php:633
@@ -3761,12 +3765,12 @@ msgid "Does %s know you?"
 msgstr "Kennt %s Dich?"
 
 #: mod/follow.php:110 mod/api.php:106 mod/dfrn_request.php:861
-#: mod/profiles.php:641 mod/profiles.php:645 mod/profiles.php:670
-#: mod/register.php:239 mod/settings.php:1113 mod/settings.php:1119
-#: mod/settings.php:1127 mod/settings.php:1131 mod/settings.php:1136
-#: mod/settings.php:1142 mod/settings.php:1148 mod/settings.php:1154
-#: mod/settings.php:1180 mod/settings.php:1181 mod/settings.php:1182
-#: mod/settings.php:1183 mod/settings.php:1184
+#: mod/register.php:239 mod/profiles.php:648 mod/profiles.php:652
+#: mod/profiles.php:677 mod/settings.php:1153 mod/settings.php:1159
+#: mod/settings.php:1167 mod/settings.php:1171 mod/settings.php:1176
+#: mod/settings.php:1182 mod/settings.php:1188 mod/settings.php:1194
+#: mod/settings.php:1220 mod/settings.php:1221 mod/settings.php:1222
+#: mod/settings.php:1223 mod/settings.php:1224
 msgid "No"
 msgstr "Nein"
 
@@ -3778,7 +3782,7 @@ msgstr "Eine persönliche Notiz beifügen:"
 msgid "Your Identity Address:"
 msgstr "Adresse Deines Profils:"
 
-#: mod/follow.php:126 mod/contacts.php:624 mod/notifications.php:243
+#: mod/follow.php:126 mod/notifications.php:243 mod/contacts.php:624
 msgid "Profile URL"
 msgstr "Profil URL"
 
@@ -3828,7 +3832,7 @@ msgstr "Eintrag wurde entfernt."
 msgid "No contacts in common."
 msgstr "Keine gemeinsamen Kontakte."
 
-#: mod/common.php:134 mod/contacts.php:861
+#: mod/common.php:134 mod/contacts.php:863
 msgid "Common Friends"
 msgstr "Gemeinsame Kontakte"
 
@@ -3882,7 +3886,7 @@ msgid ""
 "potential friends know exactly how to find you."
 msgstr "Überprüfe die restlichen Einstellungen, insbesondere die Einstellungen zur Privatsphäre. Wenn Du Dein Profil nicht veröffentlichst, ist das als wenn Du Deine Telefonnummer nicht ins Telefonbuch einträgst. Im Allgemeinen solltest Du es veröffentlichen - außer all Deine Kontakte und potentiellen Kontakte wissen genau, wie sie Dich finden können."
 
-#: mod/newmember.php:36 mod/profile_photo.php:250 mod/profiles.php:700
+#: mod/newmember.php:36 mod/profile_photo.php:250 mod/profiles.php:707
 msgid "Upload Profile Photo"
 msgstr "Profilbild hochladen"
 
@@ -4177,7 +4181,7 @@ msgstr "Gruppeneditor"
 msgid "Members"
 msgstr "Mitglieder"
 
-#: mod/group.php:192 mod/contacts.php:690
+#: mod/group.php:192 mod/contacts.php:692
 msgid "All Contacts"
 msgstr "Alle Kontakte"
 
@@ -4473,8 +4477,9 @@ msgid ""
 "entries from this contact."
 msgstr "Markiere diesen Kontakt als remote_self (entferntes Konto), dies veranlasst Friendica alle Top-Level Beiträge dieses Kontakts an all Deine Kontakte zu senden."
 
-#: mod/crepair.php:165 mod/settings.php:665 mod/settings.php:691
-#: mod/admin.php:1375 mod/admin.php:1388 mod/admin.php:1400 mod/admin.php:1416
+#: mod/crepair.php:165 mod/admin.php:1375 mod/admin.php:1388
+#: mod/admin.php:1400 mod/admin.php:1416 mod/settings.php:677
+#: mod/settings.php:703
 msgid "Name"
 msgstr "Name"
 
@@ -4706,7 +4711,7 @@ msgstr "Das bist Du"
 
 #: mod/content.php:727 mod/content.php:945 mod/photos.php:1616
 #: mod/photos.php:1664 mod/photos.php:1752 object/Item.php:403
-#: object/Item.php:719 boot.php:903
+#: object/Item.php:719 boot.php:925
 msgid "Comment"
 msgstr "Kommentar"
 
@@ -4742,7 +4747,7 @@ msgstr "Link"
 msgid "Video"
 msgstr "Video"
 
-#: mod/content.php:746 mod/settings.php:725 object/Item.php:122
+#: mod/content.php:746 mod/settings.php:737 object/Item.php:122
 #: object/Item.php:124
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -4807,353 +4812,8 @@ msgstr "Wall-to-Wall"
 msgid "via Wall-To-Wall:"
 msgstr "via Wall-To-Wall:"
 
-#: mod/contacts.php:128
-#, php-format
-msgid "%d contact edited."
-msgid_plural "%d contacts edited."
-msgstr[0] "%d Kontakt bearbeitet."
-msgstr[1] "%d Kontakte bearbeitet."
-
-#: mod/contacts.php:159 mod/contacts.php:368
-msgid "Could not access contact record."
-msgstr "Konnte nicht auf die Kontaktdaten zugreifen."
-
-#: mod/contacts.php:173
-msgid "Could not locate selected profile."
-msgstr "Konnte das ausgewählte Profil nicht finden."
-
-#: mod/contacts.php:206
-msgid "Contact updated."
-msgstr "Kontakt aktualisiert."
-
-#: mod/contacts.php:389
-msgid "Contact has been blocked"
-msgstr "Kontakt wurde blockiert"
-
-#: mod/contacts.php:389
-msgid "Contact has been unblocked"
-msgstr "Kontakt wurde wieder freigegeben"
-
-#: mod/contacts.php:400
-msgid "Contact has been ignored"
-msgstr "Kontakt wurde ignoriert"
-
-#: mod/contacts.php:400
-msgid "Contact has been unignored"
-msgstr "Kontakt wird nicht mehr ignoriert"
-
-#: mod/contacts.php:412
-msgid "Contact has been archived"
-msgstr "Kontakt wurde archiviert"
-
-#: mod/contacts.php:412
-msgid "Contact has been unarchived"
-msgstr "Kontakt wurde aus dem Archiv geholt"
-
-#: mod/contacts.php:437
-msgid "Drop contact"
-msgstr "Kontakt löschen"
-
-#: mod/contacts.php:440 mod/contacts.php:799
-msgid "Do you really want to delete this contact?"
-msgstr "Möchtest Du wirklich diesen Kontakt löschen?"
-
-#: mod/contacts.php:457
-msgid "Contact has been removed."
-msgstr "Kontakt wurde entfernt."
-
-#: mod/contacts.php:498
-#, php-format
-msgid "You are mutual friends with %s"
-msgstr "Du hast mit %s eine beidseitige Freundschaft"
-
-#: mod/contacts.php:502
-#, php-format
-msgid "You are sharing with %s"
-msgstr "Du teilst mit %s"
-
-#: mod/contacts.php:507
-#, php-format
-msgid "%s is sharing with you"
-msgstr "%s teilt mit Dir"
-
-#: mod/contacts.php:527
-msgid "Private communications are not available for this contact."
-msgstr "Private Kommunikation ist für diesen Kontakt nicht verfügbar."
-
-#: mod/contacts.php:530 mod/admin.php:860
-msgid "Never"
-msgstr "Niemals"
-
-#: mod/contacts.php:534
-msgid "(Update was successful)"
-msgstr "(Aktualisierung war erfolgreich)"
-
-#: mod/contacts.php:534
-msgid "(Update was not successful)"
-msgstr "(Aktualisierung war nicht erfolgreich)"
-
-#: mod/contacts.php:536 mod/contacts.php:978
-msgid "Suggest friends"
-msgstr "Kontakte vorschlagen"
-
-#: mod/contacts.php:540
-#, php-format
-msgid "Network type: %s"
-msgstr "Netzwerktyp: %s"
-
-#: mod/contacts.php:553
-msgid "Communications lost with this contact!"
-msgstr "Verbindungen mit diesem Kontakt verloren!"
-
-#: mod/contacts.php:556
-msgid "Fetch further information for feeds"
-msgstr "Weitere Informationen zu Feeds holen"
-
-#: mod/contacts.php:557 mod/admin.php:869
-msgid "Disabled"
-msgstr "Deaktiviert"
-
-#: mod/contacts.php:557
-msgid "Fetch information"
-msgstr "Beziehe Information"
-
-#: mod/contacts.php:557
-msgid "Fetch information and keywords"
-msgstr "Beziehe Information und Schlüsselworte"
-
-#: mod/contacts.php:575
-msgid "Contact"
-msgstr "Kontakt: "
-
-#: mod/contacts.php:578
-msgid "Profile Visibility"
-msgstr "Profil-Sichtbarkeit"
-
-#: mod/contacts.php:579
-#, php-format
-msgid ""
-"Please choose the profile you would like to display to %s when viewing your "
-"profile securely."
-msgstr "Bitte wähle eines Deiner Profile das angezeigt werden soll, wenn %s Dein Profil aufruft."
-
-#: mod/contacts.php:580
-msgid "Contact Information / Notes"
-msgstr "Kontakt Informationen / Notizen"
-
-#: mod/contacts.php:581
-msgid "Edit contact notes"
-msgstr "Notizen zum Kontakt bearbeiten"
-
-#: mod/contacts.php:587
-msgid "Block/Unblock contact"
-msgstr "Kontakt blockieren/freischalten"
-
-#: mod/contacts.php:588
-msgid "Ignore contact"
-msgstr "Ignoriere den Kontakt"
-
-#: mod/contacts.php:589
-msgid "Repair URL settings"
-msgstr "URL Einstellungen reparieren"
-
-#: mod/contacts.php:590
-msgid "View conversations"
-msgstr "Unterhaltungen anzeigen"
-
-#: mod/contacts.php:596
-msgid "Last update:"
-msgstr "Letzte Aktualisierung: "
-
-#: mod/contacts.php:598
-msgid "Update public posts"
-msgstr "Öffentliche Beiträge aktualisieren"
-
-#: mod/contacts.php:600 mod/contacts.php:988
-msgid "Update now"
-msgstr "Jetzt aktualisieren"
-
-#: mod/contacts.php:605 mod/contacts.php:803 mod/contacts.php:997
-#: mod/admin.php:1394
-msgid "Unblock"
-msgstr "Entsperren"
-
-#: mod/contacts.php:605 mod/contacts.php:803 mod/contacts.php:997
-#: mod/admin.php:1393
-msgid "Block"
-msgstr "Sperren"
-
-#: mod/contacts.php:606 mod/contacts.php:804 mod/contacts.php:1005
-msgid "Unignore"
-msgstr "Ignorieren aufheben"
-
-#: mod/contacts.php:606 mod/contacts.php:804 mod/contacts.php:1005
-#: mod/notifications.php:60 mod/notifications.php:179
-#: mod/notifications.php:251
-msgid "Ignore"
-msgstr "Ignorieren"
-
-#: mod/contacts.php:610
-msgid "Currently blocked"
-msgstr "Derzeit geblockt"
-
-#: mod/contacts.php:611
-msgid "Currently ignored"
-msgstr "Derzeit ignoriert"
-
-#: mod/contacts.php:612
-msgid "Currently archived"
-msgstr "Momentan archiviert"
-
-#: mod/contacts.php:613 mod/notifications.php:172 mod/notifications.php:239
-msgid "Hide this contact from others"
-msgstr "Verbirg diesen Kontakt vor andere"
-
-#: mod/contacts.php:613
-msgid ""
-"Replies/likes to your public posts <strong>may</strong> still be visible"
-msgstr "Antworten/Likes auf deine öffentlichen Beiträge <strong>könnten</strong> weiterhin sichtbar sein"
-
-#: mod/contacts.php:614
-msgid "Notification for new posts"
-msgstr "Benachrichtigung bei neuen Beiträgen"
-
-#: mod/contacts.php:614
-msgid "Send a notification of every new post of this contact"
-msgstr "Sende eine Benachrichtigung, wann immer dieser Kontakt einen neuen Beitrag schreibt."
-
-#: mod/contacts.php:617
-msgid "Blacklisted keywords"
-msgstr "Blacklistete Schlüsselworte "
-
-#: mod/contacts.php:617
-msgid ""
-"Comma separated list of keywords that should not be converted to hashtags, "
-"when \"Fetch information and keywords\" is selected"
-msgstr "Komma-Separierte Liste mit Schlüsselworten, die nicht in Hashtags konvertiert werden, wenn \"Beziehe Information und Schlüsselworte\" aktiviert wurde"
-
-#: mod/contacts.php:633
-msgid "Actions"
-msgstr "Aktionen"
-
-#: mod/contacts.php:636
-msgid "Contact Settings"
-msgstr "Kontakteinstellungen"
-
-#: mod/contacts.php:682
-msgid "Suggestions"
-msgstr "Kontaktvorschläge"
-
-#: mod/contacts.php:685
-msgid "Suggest potential friends"
-msgstr "Kontakte vorschlagen"
-
-#: mod/contacts.php:693
-msgid "Show all contacts"
-msgstr "Alle Kontakte anzeigen"
-
-#: mod/contacts.php:698
-msgid "Unblocked"
-msgstr "Ungeblockt"
-
-#: mod/contacts.php:701
-msgid "Only show unblocked contacts"
-msgstr "Nur nicht-blockierte Kontakte anzeigen"
-
-#: mod/contacts.php:707
-msgid "Blocked"
-msgstr "Geblockt"
-
-#: mod/contacts.php:710
-msgid "Only show blocked contacts"
-msgstr "Nur blockierte Kontakte anzeigen"
-
-#: mod/contacts.php:716
-msgid "Ignored"
-msgstr "Ignoriert"
-
-#: mod/contacts.php:719
-msgid "Only show ignored contacts"
-msgstr "Nur ignorierte Kontakte anzeigen"
-
-#: mod/contacts.php:725
-msgid "Archived"
-msgstr "Archiviert"
-
-#: mod/contacts.php:728
-msgid "Only show archived contacts"
-msgstr "Nur archivierte Kontakte anzeigen"
-
-#: mod/contacts.php:734
-msgid "Hidden"
-msgstr "Verborgen"
-
-#: mod/contacts.php:737
-msgid "Only show hidden contacts"
-msgstr "Nur verborgene Kontakte anzeigen"
-
-#: mod/contacts.php:794
-msgid "Search your contacts"
-msgstr "Suche in deinen Kontakten"
-
-#: mod/contacts.php:802 mod/settings.php:158 mod/settings.php:689
-msgid "Update"
-msgstr "Aktualisierungen"
-
-#: mod/contacts.php:805 mod/contacts.php:1013
-msgid "Archive"
-msgstr "Archivieren"
-
-#: mod/contacts.php:805 mod/contacts.php:1013
-msgid "Unarchive"
-msgstr "Aus Archiv zurückholen"
-
-#: mod/contacts.php:808
-msgid "Batch Actions"
-msgstr "Stapelverarbeitung"
-
-#: mod/contacts.php:854
-msgid "View all contacts"
-msgstr "Alle Kontakte anzeigen"
-
-#: mod/contacts.php:864
-msgid "View all common friends"
-msgstr "Alle Kontakte anzeigen"
-
-#: mod/contacts.php:871
-msgid "Advanced Contact Settings"
-msgstr "Fortgeschrittene Kontakteinstellungen"
-
-#: mod/contacts.php:916
-msgid "Mutual Friendship"
-msgstr "Beidseitige Freundschaft"
-
-#: mod/contacts.php:920
-msgid "is a fan of yours"
-msgstr "ist ein Fan von dir"
-
-#: mod/contacts.php:924
-msgid "you are a fan of"
-msgstr "Du bist Fan von"
-
-#: mod/contacts.php:999
-msgid "Toggle Blocked status"
-msgstr "Geblockt-Status ein-/ausschalten"
-
-#: mod/contacts.php:1007
-msgid "Toggle Ignored status"
-msgstr "Ignoriert-Status ein-/ausschalten"
-
-#: mod/contacts.php:1015
-msgid "Toggle Archive status"
-msgstr "Archiviert-Status ein-/ausschalten"
-
-#: mod/contacts.php:1023
-msgid "Delete contact"
-msgstr "Lösche den Kontakt"
-
 #: mod/dfrn_confirm.php:66 mod/profiles.php:19 mod/profiles.php:134
-#: mod/profiles.php:180 mod/profiles.php:610
+#: mod/profiles.php:180 mod/profiles.php:617
 msgid "Profile not found."
 msgstr "Profil nicht gefunden."
 
@@ -5378,295 +5038,6 @@ msgstr "Bearbeitung abgeschlossen"
 msgid "Image uploaded successfully."
 msgstr "Bild erfolgreich hochgeladen."
 
-#: mod/profiles.php:38
-msgid "Profile deleted."
-msgstr "Profil gelöscht."
-
-#: mod/profiles.php:56 mod/profiles.php:90
-msgid "Profile-"
-msgstr "Profil-"
-
-#: mod/profiles.php:75 mod/profiles.php:118
-msgid "New profile created."
-msgstr "Neues Profil angelegt."
-
-#: mod/profiles.php:96
-msgid "Profile unavailable to clone."
-msgstr "Profil nicht zum Duplizieren verfügbar."
-
-#: mod/profiles.php:190
-msgid "Profile Name is required."
-msgstr "Profilname ist erforderlich."
-
-#: mod/profiles.php:337
-msgid "Marital Status"
-msgstr "Familienstand"
-
-#: mod/profiles.php:341
-msgid "Romantic Partner"
-msgstr "Romanze"
-
-#: mod/profiles.php:353
-msgid "Work/Employment"
-msgstr "Arbeit / Beschäftigung"
-
-#: mod/profiles.php:356
-msgid "Religion"
-msgstr "Religion"
-
-#: mod/profiles.php:360
-msgid "Political Views"
-msgstr "Politische Ansichten"
-
-#: mod/profiles.php:364
-msgid "Gender"
-msgstr "Geschlecht"
-
-#: mod/profiles.php:368
-msgid "Sexual Preference"
-msgstr "Sexuelle Vorlieben"
-
-#: mod/profiles.php:372
-msgid "Homepage"
-msgstr "Webseite"
-
-#: mod/profiles.php:376 mod/profiles.php:695
-msgid "Interests"
-msgstr "Interessen"
-
-#: mod/profiles.php:380
-msgid "Address"
-msgstr "Adresse"
-
-#: mod/profiles.php:387 mod/profiles.php:691
-msgid "Location"
-msgstr "Wohnort"
-
-#: mod/profiles.php:470
-msgid "Profile updated."
-msgstr "Profil aktualisiert."
-
-#: mod/profiles.php:557
-msgid " and "
-msgstr " und "
-
-#: mod/profiles.php:565
-msgid "public profile"
-msgstr "öffentliches Profil"
-
-#: mod/profiles.php:568
-#, php-format
-msgid "%1$s changed %2$s to &ldquo;%3$s&rdquo;"
-msgstr "%1$s hat %2$s geändert auf &ldquo;%3$s&rdquo;"
-
-#: mod/profiles.php:569
-#, php-format
-msgid " - Visit %1$s's %2$s"
-msgstr " – %1$ss %2$s besuchen"
-
-#: mod/profiles.php:572
-#, php-format
-msgid "%1$s has an updated %2$s, changing %3$s."
-msgstr "%1$s hat folgendes aktualisiert %2$s, verändert wurde %3$s."
-
-#: mod/profiles.php:638
-msgid "Hide contacts and friends:"
-msgstr "Kontakte und Freunde verbergen"
-
-#: mod/profiles.php:643
-msgid "Hide your contact/friend list from viewers of this profile?"
-msgstr "Liste der Kontakte vor Betrachtern dieses Profils verbergen?"
-
-#: mod/profiles.php:667
-msgid "Show more profile fields:"
-msgstr "Zeige mehr Profil-Felder:"
-
-#: mod/profiles.php:679
-msgid "Profile Actions"
-msgstr "Profilaktionen"
-
-#: mod/profiles.php:680
-msgid "Edit Profile Details"
-msgstr "Profil bearbeiten"
-
-#: mod/profiles.php:682
-msgid "Change Profile Photo"
-msgstr "Profilbild ändern"
-
-#: mod/profiles.php:683
-msgid "View this profile"
-msgstr "Dieses Profil anzeigen"
-
-#: mod/profiles.php:685
-msgid "Create a new profile using these settings"
-msgstr "Neues Profil anlegen und diese Einstellungen verwenden"
-
-#: mod/profiles.php:686
-msgid "Clone this profile"
-msgstr "Dieses Profil duplizieren"
-
-#: mod/profiles.php:687
-msgid "Delete this profile"
-msgstr "Dieses Profil löschen"
-
-#: mod/profiles.php:689
-msgid "Basic information"
-msgstr "Grundinformationen"
-
-#: mod/profiles.php:690
-msgid "Profile picture"
-msgstr "Profilbild"
-
-#: mod/profiles.php:692
-msgid "Preferences"
-msgstr "Vorlieben"
-
-#: mod/profiles.php:693
-msgid "Status information"
-msgstr "Status Informationen"
-
-#: mod/profiles.php:694
-msgid "Additional information"
-msgstr "Zusätzliche Informationen"
-
-#: mod/profiles.php:697
-msgid "Relation"
-msgstr "Beziehung"
-
-#: mod/profiles.php:701
-msgid "Your Gender:"
-msgstr "Dein Geschlecht:"
-
-#: mod/profiles.php:702
-msgid "<span class=\"heart\">&hearts;</span> Marital Status:"
-msgstr "<span class=\"heart\">&hearts;</span> Beziehungsstatus:"
-
-#: mod/profiles.php:704
-msgid "Example: fishing photography software"
-msgstr "Beispiel: Fischen Fotografie Software"
-
-#: mod/profiles.php:709
-msgid "Profile Name:"
-msgstr "Profilname:"
-
-#: mod/profiles.php:709 mod/events.php:485 mod/events.php:497
-msgid "Required"
-msgstr "Benötigt"
-
-#: mod/profiles.php:711
-msgid ""
-"This is your <strong>public</strong> profile.<br />It <strong>may</strong> "
-"be visible to anybody using the internet."
-msgstr "Dies ist Dein <strong>öffentliches</strong> Profil.<br />Es <strong>könnte</strong> für jeden Nutzer des Internets sichtbar sein."
-
-#: mod/profiles.php:712
-msgid "Your Full Name:"
-msgstr "Dein kompletter Name:"
-
-#: mod/profiles.php:713
-msgid "Title/Description:"
-msgstr "Titel/Beschreibung:"
-
-#: mod/profiles.php:716
-msgid "Street Address:"
-msgstr "Adresse:"
-
-#: mod/profiles.php:717
-msgid "Locality/City:"
-msgstr "Wohnort:"
-
-#: mod/profiles.php:718
-msgid "Region/State:"
-msgstr "Region/Bundesstaat:"
-
-#: mod/profiles.php:719
-msgid "Postal/Zip Code:"
-msgstr "Postleitzahl:"
-
-#: mod/profiles.php:720
-msgid "Country:"
-msgstr "Land:"
-
-#: mod/profiles.php:724
-msgid "Who: (if applicable)"
-msgstr "Wer: (falls anwendbar)"
-
-#: mod/profiles.php:724
-msgid "Examples: cathy123, Cathy Williams, cathy@example.com"
-msgstr "Beispiele: cathy123, Cathy Williams, cathy@example.com"
-
-#: mod/profiles.php:725
-msgid "Since [date]:"
-msgstr "Seit [Datum]:"
-
-#: mod/profiles.php:727
-msgid "Tell us about yourself..."
-msgstr "Erzähle uns ein bisschen von Dir …"
-
-#: mod/profiles.php:728
-msgid "Homepage URL:"
-msgstr "Adresse der Homepage:"
-
-#: mod/profiles.php:731
-msgid "Religious Views:"
-msgstr "Religiöse Ansichten:"
-
-#: mod/profiles.php:732
-msgid "Public Keywords:"
-msgstr "Öffentliche Schlüsselwörter:"
-
-#: mod/profiles.php:732
-msgid "(Used for suggesting potential friends, can be seen by others)"
-msgstr "(Wird verwendet, um potentielle Kontakte zu finden, kann von Kontakten eingesehen werden)"
-
-#: mod/profiles.php:733
-msgid "Private Keywords:"
-msgstr "Private Schlüsselwörter:"
-
-#: mod/profiles.php:733
-msgid "(Used for searching profiles, never shown to others)"
-msgstr "(Wird für die Suche nach Profilen verwendet und niemals veröffentlicht)"
-
-#: mod/profiles.php:736
-msgid "Musical interests"
-msgstr "Musikalische Interessen"
-
-#: mod/profiles.php:737
-msgid "Books, literature"
-msgstr "Bücher, Literatur"
-
-#: mod/profiles.php:738
-msgid "Television"
-msgstr "Fernsehen"
-
-#: mod/profiles.php:739
-msgid "Film/dance/culture/entertainment"
-msgstr "Filme/Tänze/Kultur/Unterhaltung"
-
-#: mod/profiles.php:740
-msgid "Hobbies/Interests"
-msgstr "Hobbies/Interessen"
-
-#: mod/profiles.php:741
-msgid "Love/romance"
-msgstr "Liebe/Romantik"
-
-#: mod/profiles.php:742
-msgid "Work/employment"
-msgstr "Arbeit/Anstellung"
-
-#: mod/profiles.php:743
-msgid "School/education"
-msgstr "Schule/Ausbildung"
-
-#: mod/profiles.php:744
-msgid "Contact information and Social Networks"
-msgstr "Kontaktinformationen und Soziale Netzwerke"
-
-#: mod/profiles.php:786
-msgid "Edit/Manage Profiles"
-msgstr "Bearbeite/Verwalte Profile"
-
 #: mod/register.php:92
 msgid ""
 "Registration successful. Please check your email for further instructions."
@@ -5731,7 +5102,7 @@ msgstr "Dein vollständiger Name (z.B. Hans Mustermann, echt oder echt erscheine
 msgid "Your Email Address: "
 msgstr "Deine E-Mail-Adresse: "
 
-#: mod/register.php:274 mod/settings.php:1221
+#: mod/register.php:274 mod/settings.php:1261
 msgid "New Password:"
 msgstr "Neues Passwort:"
 
@@ -5739,7 +5110,7 @@ msgstr "Neues Passwort:"
 msgid "Leave empty for an auto generated password."
 msgstr "Leer lassen um das Passwort automatisch zu generieren."
 
-#: mod/register.php:275 mod/settings.php:1222
+#: mod/register.php:275 mod/settings.php:1262
 msgid "Confirm:"
 msgstr "Bestätigen:"
 
@@ -5770,704 +5141,6 @@ msgstr "Registrierung für %s wurde zurückgezogen"
 #: mod/regmod.php:104
 msgid "Please login."
 msgstr "Bitte melde Dich an."
-
-#: mod/settings.php:36 mod/photos.php:118
-msgid "everybody"
-msgstr "jeder"
-
-#: mod/settings.php:43 mod/admin.php:1375
-msgid "Account"
-msgstr "Nutzerkonto"
-
-#: mod/settings.php:52 mod/admin.php:160
-msgid "Additional features"
-msgstr "Zusätzliche Features"
-
-#: mod/settings.php:60
-msgid "Display"
-msgstr "Anzeige"
-
-#: mod/settings.php:67 mod/settings.php:871
-msgid "Social Networks"
-msgstr "Soziale Netzwerke"
-
-#: mod/settings.php:74 mod/admin.php:158 mod/admin.php:1500 mod/admin.php:1560
-msgid "Plugins"
-msgstr "Plugins"
-
-#: mod/settings.php:88
-msgid "Connected apps"
-msgstr "Verbundene Programme"
-
-#: mod/settings.php:102
-msgid "Remove account"
-msgstr "Konto löschen"
-
-#: mod/settings.php:155
-msgid "Missing some important data!"
-msgstr "Wichtige Daten fehlen!"
-
-#: mod/settings.php:269
-msgid "Failed to connect with email account using the settings provided."
-msgstr "Verbindung zum E-Mail-Konto mit den angegebenen Einstellungen nicht möglich."
-
-#: mod/settings.php:274
-msgid "Email settings updated."
-msgstr "E-Mail Einstellungen bearbeitet."
-
-#: mod/settings.php:289
-msgid "Features updated"
-msgstr "Features aktualisiert"
-
-#: mod/settings.php:356
-msgid "Relocate message has been send to your contacts"
-msgstr "Die Umzugsbenachrichtigung wurde an Deine Kontakte versendet."
-
-#: mod/settings.php:375
-msgid "Empty passwords are not allowed. Password unchanged."
-msgstr "Leere Passwörter sind nicht erlaubt. Passwort bleibt unverändert."
-
-#: mod/settings.php:383
-msgid "Wrong password."
-msgstr "Falsches Passwort."
-
-#: mod/settings.php:394
-msgid "Password changed."
-msgstr "Passwort geändert."
-
-#: mod/settings.php:396
-msgid "Password update failed. Please try again."
-msgstr "Aktualisierung des Passworts gescheitert, bitte versuche es noch einmal."
-
-#: mod/settings.php:465
-msgid " Please use a shorter name."
-msgstr " Bitte verwende einen kürzeren Namen."
-
-#: mod/settings.php:467
-msgid " Name too short."
-msgstr " Name ist zu kurz."
-
-#: mod/settings.php:476
-msgid "Wrong Password"
-msgstr "Falsches Passwort"
-
-#: mod/settings.php:481
-msgid " Not valid email."
-msgstr " Keine gültige E-Mail."
-
-#: mod/settings.php:487
-msgid " Cannot change to that email."
-msgstr "Ändern der E-Mail nicht möglich. "
-
-#: mod/settings.php:543
-msgid "Private forum has no privacy permissions. Using default privacy group."
-msgstr "Für das private Forum sind keine Zugriffsrechte eingestellt. Die voreingestellte Gruppe für neue Kontakte wird benutzt."
-
-#: mod/settings.php:547
-msgid "Private forum has no privacy permissions and no default privacy group."
-msgstr "Für das private Forum sind keine Zugriffsrechte eingestellt, und es gibt keine voreingestellte Gruppe für neue Kontakte."
-
-#: mod/settings.php:586
-msgid "Settings updated."
-msgstr "Einstellungen aktualisiert."
-
-#: mod/settings.php:662 mod/settings.php:688 mod/settings.php:724
-msgid "Add application"
-msgstr "Programm hinzufügen"
-
-#: mod/settings.php:663 mod/settings.php:773 mod/settings.php:820
-#: mod/settings.php:889 mod/settings.php:976 mod/settings.php:1214
-#: mod/admin.php:927 mod/admin.php:1561 mod/admin.php:1809 mod/admin.php:1883
-#: mod/admin.php:2033
-msgid "Save Settings"
-msgstr "Einstellungen speichern"
-
-#: mod/settings.php:666 mod/settings.php:692
-msgid "Consumer Key"
-msgstr "Consumer Key"
-
-#: mod/settings.php:667 mod/settings.php:693
-msgid "Consumer Secret"
-msgstr "Consumer Secret"
-
-#: mod/settings.php:668 mod/settings.php:694
-msgid "Redirect"
-msgstr "Umleiten"
-
-#: mod/settings.php:669 mod/settings.php:695
-msgid "Icon url"
-msgstr "Icon URL"
-
-#: mod/settings.php:680
-msgid "You can't edit this application."
-msgstr "Du kannst dieses Programm nicht bearbeiten."
-
-#: mod/settings.php:723
-msgid "Connected Apps"
-msgstr "Verbundene Programme"
-
-#: mod/settings.php:727
-msgid "Client key starts with"
-msgstr "Anwenderschlüssel beginnt mit"
-
-#: mod/settings.php:728
-msgid "No name"
-msgstr "Kein Name"
-
-#: mod/settings.php:729
-msgid "Remove authorization"
-msgstr "Autorisierung entziehen"
-
-#: mod/settings.php:741
-msgid "No Plugin settings configured"
-msgstr "Keine Plugin-Einstellungen konfiguriert"
-
-#: mod/settings.php:749
-msgid "Plugin Settings"
-msgstr "Plugin-Einstellungen"
-
-#: mod/settings.php:763 mod/admin.php:2022 mod/admin.php:2023
-msgid "Off"
-msgstr "Aus"
-
-#: mod/settings.php:763 mod/admin.php:2022 mod/admin.php:2023
-msgid "On"
-msgstr "An"
-
-#: mod/settings.php:771
-msgid "Additional Features"
-msgstr "Zusätzliche Features"
-
-#: mod/settings.php:781 mod/settings.php:785
-msgid "General Social Media Settings"
-msgstr "Allgemeine Einstellungen zu Sozialen Medien"
-
-#: mod/settings.php:791
-msgid "Disable intelligent shortening"
-msgstr "Intelligentes Link kürzen ausschalten"
-
-#: mod/settings.php:793
-msgid ""
-"Normally the system tries to find the best link to add to shortened posts. "
-"If this option is enabled then every shortened post will always point to the"
-" original friendica post."
-msgstr "Normalerweise versucht das System den besten Link zu finden um ihn zu gekürzten Postings hinzu zu fügen. Wird diese Option ausgewählt wird stets ein Link auf die originale Friendica Nachricht beigefügt."
-
-#: mod/settings.php:799
-msgid "Automatically follow any GNU Social (OStatus) followers/mentioners"
-msgstr "Automatisch allen GNU Social (OStatus) Followern/Erwähnern folgen"
-
-#: mod/settings.php:801
-msgid ""
-"If you receive a message from an unknown OStatus user, this option decides "
-"what to do. If it is checked, a new contact will be created for every "
-"unknown user."
-msgstr "Wenn du eine Nachricht eines unbekannten OStatus Nutzers bekommst, entscheidet diese Option wie diese behandelt werden soll. Ist die Option aktiviert, wird ein neuer Kontakt für den Verfasser erstellt,."
-
-#: mod/settings.php:807
-msgid "Default group for OStatus contacts"
-msgstr "Voreingestellte Gruppe für OStatus Kontakte"
-
-#: mod/settings.php:813
-msgid "Your legacy GNU Social account"
-msgstr "Dein alter GNU Social Account"
-
-#: mod/settings.php:815
-msgid ""
-"If you enter your old GNU Social/Statusnet account name here (in the format "
-"user@domain.tld), your contacts will be added automatically. The field will "
-"be emptied when done."
-msgstr "Wenn du deinen alten GNU Socual/Statusnet Accountnamen hier angibst (Format name@domain.tld) werden deine Kontakte automatisch hinzugefügt. Dieses Feld wird geleert, wenn die Kontakte hinzugefügt wurden."
-
-#: mod/settings.php:818
-msgid "Repair OStatus subscriptions"
-msgstr "OStatus Abonnements reparieren"
-
-#: mod/settings.php:827 mod/settings.php:828
-#, php-format
-msgid "Built-in support for %s connectivity is %s"
-msgstr "Eingebaute Unterstützung für Verbindungen zu %s ist %s"
-
-#: mod/settings.php:827 mod/settings.php:828
-msgid "enabled"
-msgstr "eingeschaltet"
-
-#: mod/settings.php:827 mod/settings.php:828
-msgid "disabled"
-msgstr "ausgeschaltet"
-
-#: mod/settings.php:828
-msgid "GNU Social (OStatus)"
-msgstr "GNU Social (OStatus)"
-
-#: mod/settings.php:864
-msgid "Email access is disabled on this site."
-msgstr "Zugriff auf E-Mails für diese Seite deaktiviert."
-
-#: mod/settings.php:876
-msgid "Email/Mailbox Setup"
-msgstr "E-Mail/Postfach-Einstellungen"
-
-#: mod/settings.php:877
-msgid ""
-"If you wish to communicate with email contacts using this service "
-"(optional), please specify how to connect to your mailbox."
-msgstr "Wenn Du mit E-Mail-Kontakten über diesen Service kommunizieren möchtest (optional), gib bitte die Einstellungen für Dein Postfach an."
-
-#: mod/settings.php:878
-msgid "Last successful email check:"
-msgstr "Letzter erfolgreicher E-Mail Check"
-
-#: mod/settings.php:880
-msgid "IMAP server name:"
-msgstr "IMAP-Server-Name:"
-
-#: mod/settings.php:881
-msgid "IMAP port:"
-msgstr "IMAP-Port:"
-
-#: mod/settings.php:882
-msgid "Security:"
-msgstr "Sicherheit:"
-
-#: mod/settings.php:882 mod/settings.php:887
-msgid "None"
-msgstr "Keine"
-
-#: mod/settings.php:883
-msgid "Email login name:"
-msgstr "E-Mail-Login-Name:"
-
-#: mod/settings.php:884
-msgid "Email password:"
-msgstr "E-Mail-Passwort:"
-
-#: mod/settings.php:885
-msgid "Reply-to address:"
-msgstr "Reply-to Adresse:"
-
-#: mod/settings.php:886
-msgid "Send public posts to all email contacts:"
-msgstr "Sende öffentliche Beiträge an alle E-Mail-Kontakte:"
-
-#: mod/settings.php:887
-msgid "Action after import:"
-msgstr "Aktion nach Import:"
-
-#: mod/settings.php:887
-msgid "Move to folder"
-msgstr "In einen Ordner verschieben"
-
-#: mod/settings.php:888
-msgid "Move to folder:"
-msgstr "In diesen Ordner verschieben:"
-
-#: mod/settings.php:919 mod/admin.php:834
-msgid "No special theme for mobile devices"
-msgstr "Kein spezielles Theme für mobile Geräte verwenden."
-
-#: mod/settings.php:974
-msgid "Display Settings"
-msgstr "Anzeige-Einstellungen"
-
-#: mod/settings.php:980 mod/settings.php:1001
-msgid "Display Theme:"
-msgstr "Theme:"
-
-#: mod/settings.php:981
-msgid "Mobile Theme:"
-msgstr "Mobiles Theme"
-
-#: mod/settings.php:982
-msgid "Update browser every xx seconds"
-msgstr "Browser alle xx Sekunden aktualisieren"
-
-#: mod/settings.php:982
-msgid "Minimum of 10 seconds. Enter -1 to disable it."
-msgstr "Minimum sind 10 Sekeunden. Gib -1 ein um abzuschalten."
-
-#: mod/settings.php:983
-msgid "Number of items to display per page:"
-msgstr "Zahl der Beiträge, die pro Netzwerkseite angezeigt werden sollen: "
-
-#: mod/settings.php:983 mod/settings.php:984
-msgid "Maximum of 100 items"
-msgstr "Maximal 100 Beiträge"
-
-#: mod/settings.php:984
-msgid "Number of items to display per page when viewed from mobile device:"
-msgstr "Zahl der Beiträge, die pro Netzwerkseite auf mobilen Geräten angezeigt werden sollen:"
-
-#: mod/settings.php:985
-msgid "Don't show emoticons"
-msgstr "Keine Smilies anzeigen"
-
-#: mod/settings.php:986
-msgid "Calendar"
-msgstr "Kalender"
-
-#: mod/settings.php:987
-msgid "Beginning of week:"
-msgstr "Wochenbeginn:"
-
-#: mod/settings.php:988
-msgid "Don't show notices"
-msgstr "Info-Popups nicht anzeigen"
-
-#: mod/settings.php:989
-msgid "Infinite scroll"
-msgstr "Endloses Scrollen"
-
-#: mod/settings.php:990
-msgid "Automatic updates only at the top of the network page"
-msgstr "Automatische Updates nur, wenn Du oben auf der Netzwerkseite bist."
-
-#: mod/settings.php:992
-msgid "General Theme Settings"
-msgstr "Allgemeine Themeneinstellungen"
-
-#: mod/settings.php:993
-msgid "Custom Theme Settings"
-msgstr "Benutzerdefinierte Theme Einstellungen"
-
-#: mod/settings.php:994
-msgid "Content Settings"
-msgstr "Einstellungen zum Inhalt"
-
-#: mod/settings.php:995 view/theme/frio/config.php:61
-#: view/theme/cleanzero/config.php:82 view/theme/quattro/config.php:66
-#: view/theme/dispy/config.php:72 view/theme/vier/config.php:109
-#: view/theme/diabook/config.php:150 view/theme/duepuntozero/config.php:61
-msgid "Theme settings"
-msgstr "Themeneinstellungen"
-
-#: mod/settings.php:1072
-msgid "User Types"
-msgstr "Nutzer Art"
-
-#: mod/settings.php:1073
-msgid "Community Types"
-msgstr "Gemeinschafts Art"
-
-#: mod/settings.php:1074
-msgid "Normal Account Page"
-msgstr "Normales Konto"
-
-#: mod/settings.php:1075
-msgid "This account is a normal personal profile"
-msgstr "Dieses Konto ist ein normales persönliches Profil"
-
-#: mod/settings.php:1078
-msgid "Soapbox Page"
-msgstr "Marktschreier-Konto"
-
-#: mod/settings.php:1079
-msgid "Automatically approve all connection/friend requests as read-only fans"
-msgstr "Kontaktanfragen werden automatisch als Nurlese-Fans akzeptiert"
-
-#: mod/settings.php:1082
-msgid "Community Forum/Celebrity Account"
-msgstr "Forum/Promi-Konto"
-
-#: mod/settings.php:1083
-msgid ""
-"Automatically approve all connection/friend requests as read-write fans"
-msgstr "Kontaktanfragen werden automatisch als Lese-und-Schreib-Fans akzeptiert"
-
-#: mod/settings.php:1086
-msgid "Automatic Friend Page"
-msgstr "Automatische Freunde Seite"
-
-#: mod/settings.php:1087
-msgid "Automatically approve all connection/friend requests as friends"
-msgstr "Kontaktanfragen werden automatisch als Freund akzeptiert"
-
-#: mod/settings.php:1090
-msgid "Private Forum [Experimental]"
-msgstr "Privates Forum [Versuchsstadium]"
-
-#: mod/settings.php:1091
-msgid "Private forum - approved members only"
-msgstr "Privates Forum, nur für Mitglieder"
-
-#: mod/settings.php:1103
-msgid "OpenID:"
-msgstr "OpenID:"
-
-#: mod/settings.php:1103
-msgid "(Optional) Allow this OpenID to login to this account."
-msgstr "(Optional) Erlaube die Anmeldung für dieses Konto mit dieser OpenID."
-
-#: mod/settings.php:1113
-msgid "Publish your default profile in your local site directory?"
-msgstr "Darf Dein Standardprofil im Verzeichnis dieses Servers veröffentlicht werden?"
-
-#: mod/settings.php:1119
-msgid "Publish your default profile in the global social directory?"
-msgstr "Darf Dein Standardprofil im weltweiten Verzeichnis veröffentlicht werden?"
-
-#: mod/settings.php:1127
-msgid "Hide your contact/friend list from viewers of your default profile?"
-msgstr "Liste der Kontakte vor Betrachtern des Standardprofils verbergen?"
-
-#: mod/settings.php:1131
-msgid ""
-"If enabled, posting public messages to Diaspora and other networks isn't "
-"possible."
-msgstr "Wenn aktiviert, ist das senden öffentliche Nachrichten zu Diaspora und anderen Netzwerken nicht möglich"
-
-#: mod/settings.php:1136
-msgid "Allow friends to post to your profile page?"
-msgstr "Dürfen Deine Kontakte auf Deine Pinnwand schreiben?"
-
-#: mod/settings.php:1142
-msgid "Allow friends to tag your posts?"
-msgstr "Dürfen Deine Kontakte Deine Beiträge mit Schlagwörtern versehen?"
-
-#: mod/settings.php:1148
-msgid "Allow us to suggest you as a potential friend to new members?"
-msgstr "Dürfen wir Dich neuen Mitgliedern als potentiellen Kontakt vorschlagen?"
-
-#: mod/settings.php:1154
-msgid "Permit unknown people to send you private mail?"
-msgstr "Dürfen Dir Unbekannte private Nachrichten schicken?"
-
-#: mod/settings.php:1162
-msgid "Profile is <strong>not published</strong>."
-msgstr "Profil ist <strong>nicht veröffentlicht</strong>."
-
-#: mod/settings.php:1170
-#, php-format
-msgid "Your Identity Address is <strong>'%s'</strong> or '%s'."
-msgstr "Die Adresse deines Profils lautet <strong>'%s'</strong> oder '%s'."
-
-#: mod/settings.php:1177
-msgid "Automatically expire posts after this many days:"
-msgstr "Beiträge verfallen automatisch nach dieser Anzahl von Tagen:"
-
-#: mod/settings.php:1177
-msgid "If empty, posts will not expire. Expired posts will be deleted"
-msgstr "Wenn leer verfallen Beiträge nie automatisch. Verfallene Beiträge werden gelöscht."
-
-#: mod/settings.php:1178
-msgid "Advanced expiration settings"
-msgstr "Erweiterte Verfallseinstellungen"
-
-#: mod/settings.php:1179
-msgid "Advanced Expiration"
-msgstr "Erweitertes Verfallen"
-
-#: mod/settings.php:1180
-msgid "Expire posts:"
-msgstr "Beiträge verfallen lassen:"
-
-#: mod/settings.php:1181
-msgid "Expire personal notes:"
-msgstr "Persönliche Notizen verfallen lassen:"
-
-#: mod/settings.php:1182
-msgid "Expire starred posts:"
-msgstr "Markierte Beiträge verfallen lassen:"
-
-#: mod/settings.php:1183
-msgid "Expire photos:"
-msgstr "Fotos verfallen lassen:"
-
-#: mod/settings.php:1184
-msgid "Only expire posts by others:"
-msgstr "Nur Beiträge anderer verfallen:"
-
-#: mod/settings.php:1212
-msgid "Account Settings"
-msgstr "Kontoeinstellungen"
-
-#: mod/settings.php:1220
-msgid "Password Settings"
-msgstr "Passwort-Einstellungen"
-
-#: mod/settings.php:1222
-msgid "Leave password fields blank unless changing"
-msgstr "Lass die Passwort-Felder leer, außer Du willst das Passwort ändern"
-
-#: mod/settings.php:1223
-msgid "Current Password:"
-msgstr "Aktuelles Passwort:"
-
-#: mod/settings.php:1223 mod/settings.php:1224
-msgid "Your current password to confirm the changes"
-msgstr "Dein aktuelles Passwort um die Änderungen zu bestätigen"
-
-#: mod/settings.php:1224
-msgid "Password:"
-msgstr "Passwort:"
-
-#: mod/settings.php:1228
-msgid "Basic Settings"
-msgstr "Grundeinstellungen"
-
-#: mod/settings.php:1230
-msgid "Email Address:"
-msgstr "E-Mail-Adresse:"
-
-#: mod/settings.php:1231
-msgid "Your Timezone:"
-msgstr "Deine Zeitzone:"
-
-#: mod/settings.php:1232
-msgid "Your Language:"
-msgstr "Deine Sprache:"
-
-#: mod/settings.php:1232
-msgid ""
-"Set the language we use to show you friendica interface and to send you "
-"emails"
-msgstr "Wähle die Sprache, in der wir Dir die Friendica-Oberfläche präsentieren sollen und Dir E-Mail schicken"
-
-#: mod/settings.php:1233
-msgid "Default Post Location:"
-msgstr "Standardstandort:"
-
-#: mod/settings.php:1234
-msgid "Use Browser Location:"
-msgstr "Standort des Browsers verwenden:"
-
-#: mod/settings.php:1237
-msgid "Security and Privacy Settings"
-msgstr "Sicherheits- und Privatsphäre-Einstellungen"
-
-#: mod/settings.php:1239
-msgid "Maximum Friend Requests/Day:"
-msgstr "Maximale Anzahl vonKontaktanfragen/Tag:"
-
-#: mod/settings.php:1239 mod/settings.php:1269
-msgid "(to prevent spam abuse)"
-msgstr "(um SPAM zu vermeiden)"
-
-#: mod/settings.php:1240
-msgid "Default Post Permissions"
-msgstr "Standard-Zugriffsrechte für Beiträge"
-
-#: mod/settings.php:1241
-msgid "(click to open/close)"
-msgstr "(klicke zum öffnen/schließen)"
-
-#: mod/settings.php:1250 mod/photos.php:1187 mod/photos.php:1571
-msgid "Show to Groups"
-msgstr "Zeige den Gruppen"
-
-#: mod/settings.php:1251 mod/photos.php:1188 mod/photos.php:1572
-msgid "Show to Contacts"
-msgstr "Zeige den Kontakten"
-
-#: mod/settings.php:1252
-msgid "Default Private Post"
-msgstr "Privater Standardbeitrag"
-
-#: mod/settings.php:1253
-msgid "Default Public Post"
-msgstr "Öffentlicher Standardbeitrag"
-
-#: mod/settings.php:1257
-msgid "Default Permissions for New Posts"
-msgstr "Standardberechtigungen für neue Beiträge"
-
-#: mod/settings.php:1269
-msgid "Maximum private messages per day from unknown people:"
-msgstr "Maximale Anzahl privater Nachrichten von Unbekannten pro Tag:"
-
-#: mod/settings.php:1272
-msgid "Notification Settings"
-msgstr "Benachrichtigungseinstellungen"
-
-#: mod/settings.php:1273
-msgid "By default post a status message when:"
-msgstr "Standardmäßig eine Statusnachricht posten, wenn:"
-
-#: mod/settings.php:1274
-msgid "accepting a friend request"
-msgstr "– Du eine Kontaktanfrage akzeptierst"
-
-#: mod/settings.php:1275
-msgid "joining a forum/community"
-msgstr "– Du einem Forum/einer Gemeinschaftsseite beitrittst"
-
-#: mod/settings.php:1276
-msgid "making an <em>interesting</em> profile change"
-msgstr "– Du eine <em>interessante</em> Änderung an Deinem Profil durchführst"
-
-#: mod/settings.php:1277
-msgid "Send a notification email when:"
-msgstr "Benachrichtigungs-E-Mail senden wenn:"
-
-#: mod/settings.php:1278
-msgid "You receive an introduction"
-msgstr "– Du eine Kontaktanfrage erhältst"
-
-#: mod/settings.php:1279
-msgid "Your introductions are confirmed"
-msgstr "– eine Deiner Kontaktanfragen akzeptiert wurde"
-
-#: mod/settings.php:1280
-msgid "Someone writes on your profile wall"
-msgstr "– jemand etwas auf Deine Pinnwand schreibt"
-
-#: mod/settings.php:1281
-msgid "Someone writes a followup comment"
-msgstr "– jemand auch einen Kommentar verfasst"
-
-#: mod/settings.php:1282
-msgid "You receive a private message"
-msgstr "– Du eine private Nachricht erhältst"
-
-#: mod/settings.php:1283
-msgid "You receive a friend suggestion"
-msgstr "– Du eine Empfehlung erhältst"
-
-#: mod/settings.php:1284
-msgid "You are tagged in a post"
-msgstr "– Du in einem Beitrag erwähnt wirst"
-
-#: mod/settings.php:1285
-msgid "You are poked/prodded/etc. in a post"
-msgstr "– Du von jemandem angestupst oder sonstwie behandelt wirst"
-
-#: mod/settings.php:1287
-msgid "Activate desktop notifications"
-msgstr "Desktop Benachrichtigungen einschalten"
-
-#: mod/settings.php:1287
-msgid "Show desktop popup on new notifications"
-msgstr "Desktop Benachrichtigungen einschalten"
-
-#: mod/settings.php:1289
-msgid "Text-only notification emails"
-msgstr "Benachrichtigungs E-Mail als Rein-Text."
-
-#: mod/settings.php:1291
-msgid "Send text only notification emails, without the html part"
-msgstr "Sende Benachrichtigungs E-Mail als Rein-Text - ohne HTML-Teil"
-
-#: mod/settings.php:1293
-msgid "Advanced Account/Page Type Settings"
-msgstr "Erweiterte Konto-/Seitentyp-Einstellungen"
-
-#: mod/settings.php:1294
-msgid "Change the behaviour of this account for special situations"
-msgstr "Verhalten dieses Kontos in bestimmten Situationen:"
-
-#: mod/settings.php:1297
-msgid "Relocate"
-msgstr "Umziehen"
-
-#: mod/settings.php:1298
-msgid ""
-"If you have moved this profile from another server, and some of your "
-"contacts don't receive your updates, try pushing this button."
-msgstr "Wenn Du Dein Profil von einem anderen Server umgezogen hast und einige Deiner Kontakte Deine Beiträge nicht erhalten, verwende diesen Button."
-
-#: mod/settings.php:1299
-msgid "Resend relocate message to contacts"
-msgstr "Umzugsbenachrichtigung erneut an Kontakte senden"
 
 #: mod/videos.php:123
 msgid "Do you really want to delete this video?"
@@ -6862,6 +5535,10 @@ msgstr "Neueste Fotos"
 msgid "Upload New Photos"
 msgstr "Neue Fotos hochladen"
 
+#: mod/photos.php:118 mod/settings.php:36
+msgid "everybody"
+msgstr "jeder"
+
 #: mod/photos.php:182
 msgid "Contact information unavailable"
 msgstr "Kontaktinformationen nicht verfügbar"
@@ -6923,6 +5600,14 @@ msgstr "oder existierender Albumname: "
 #: mod/photos.php:1176
 msgid "Do not show a status post for this upload"
 msgstr "Keine Status-Mitteilung für diesen Beitrag anzeigen"
+
+#: mod/photos.php:1187 mod/photos.php:1571 mod/settings.php:1290
+msgid "Show to Groups"
+msgstr "Zeige den Gruppen"
+
+#: mod/photos.php:1188 mod/photos.php:1572 mod/settings.php:1291
+msgid "Show to Contacts"
+msgstr "Zeige den Kontakten"
 
 #: mod/photos.php:1189
 msgid "Private Photo"
@@ -7069,6 +5754,10 @@ msgstr "Anfangszeitpunkt und Titel werden benötigt"
 msgid "Event Starts:"
 msgstr "Veranstaltungsbeginn:"
 
+#: mod/events.php:485 mod/events.php:497 mod/profiles.php:716
+msgid "Required"
+msgstr "Benötigt"
+
 #: mod/events.php:487 mod/events.php:503
 msgid "Finish date/time is not known or not relevant"
 msgstr "Enddatum/-zeit ist nicht bekannt oder nicht relevant"
@@ -7102,6 +5791,12 @@ msgstr "Invalid request identifier."
 msgid "Discard"
 msgstr "Verwerfen"
 
+#: mod/notifications.php:60 mod/notifications.php:179
+#: mod/notifications.php:251 mod/contacts.php:606 mod/contacts.php:806
+#: mod/contacts.php:1007
+msgid "Ignore"
+msgstr "Ignorieren"
+
 #: mod/notifications.php:105
 msgid "Network Notifications"
 msgstr "Netzwerk Benachrichtigungen"
@@ -7130,6 +5825,10 @@ msgstr "Benachrichtigungstyp: "
 #, php-format
 msgid "suggested by %s"
 msgstr "vorgeschlagen von %s"
+
+#: mod/notifications.php:172 mod/notifications.php:239 mod/contacts.php:613
+msgid "Hide this contact from others"
+msgstr "Verbirg diesen Kontakt vor andere"
 
 #: mod/notifications.php:173 mod/notifications.php:240
 msgid "Post a new friend activity"
@@ -7222,9 +5921,17 @@ msgstr "Seite"
 msgid "Users"
 msgstr "Nutzer"
 
+#: mod/admin.php:158 mod/admin.php:1500 mod/admin.php:1560 mod/settings.php:74
+msgid "Plugins"
+msgstr "Plugins"
+
 #: mod/admin.php:159 mod/admin.php:1758 mod/admin.php:1808
 msgid "Themes"
 msgstr "Themen"
+
+#: mod/admin.php:160 mod/settings.php:52
+msgid "Additional features"
+msgstr "Zusätzliche Features"
 
 #: mod/admin.php:161
 msgid "DB updates"
@@ -7377,6 +6084,10 @@ msgstr "RINO2 benötigt die PHP Extension mcrypt."
 msgid "Site settings updated."
 msgstr "Seiteneinstellungen aktualisiert."
 
+#: mod/admin.php:834 mod/settings.php:931
+msgid "No special theme for mobile devices"
+msgstr "Kein spezielles Theme für mobile Geräte verwenden."
+
 #: mod/admin.php:853
 msgid "No community page"
 msgstr "Keine Gemeinschaftsseite"
@@ -7389,9 +6100,17 @@ msgstr "Öffentliche Beiträge von Nutzer_innen dieser Seite"
 msgid "Global community page"
 msgstr "Globale Gemeinschaftsseite"
 
+#: mod/admin.php:860 mod/contacts.php:530
+msgid "Never"
+msgstr "Niemals"
+
 #: mod/admin.php:861
 msgid "At post arrival"
 msgstr "Beim Empfang von Nachrichten"
+
+#: mod/admin.php:869 mod/contacts.php:557
+msgid "Disabled"
+msgstr "Deaktiviert"
 
 #: mod/admin.php:871
 msgid "Users, Global Contacts"
@@ -7444,6 +6163,13 @@ msgstr "SSL für alle Links erzwingen"
 #: mod/admin.php:915
 msgid "Self-signed certificate, use SSL for local links only (discouraged)"
 msgstr "Selbst-unterzeichnetes Zertifikat, SSL nur für lokale Links verwenden (nicht empfohlen)"
+
+#: mod/admin.php:927 mod/admin.php:1561 mod/admin.php:1809 mod/admin.php:1883
+#: mod/admin.php:2033 mod/settings.php:675 mod/settings.php:785
+#: mod/settings.php:832 mod/settings.php:901 mod/settings.php:988
+#: mod/settings.php:1254
+msgid "Save Settings"
+msgstr "Einstellungen speichern"
 
 #: mod/admin.php:929
 msgid "File upload"
@@ -8340,6 +7066,10 @@ msgstr "Letzte Anmeldung"
 msgid "Last item"
 msgstr "Letzter Beitrag"
 
+#: mod/admin.php:1375 mod/settings.php:43
+msgid "Account"
+msgstr "Nutzerkonto"
+
 #: mod/admin.php:1384
 msgid "Add User"
 msgstr "Nutzer hinzufügen"
@@ -8367,6 +7097,16 @@ msgstr "Keine Neuanmeldungen."
 #: mod/admin.php:1391
 msgid "Deny"
 msgstr "Verwehren"
+
+#: mod/admin.php:1393 mod/contacts.php:605 mod/contacts.php:805
+#: mod/contacts.php:999
+msgid "Block"
+msgstr "Sperren"
+
+#: mod/admin.php:1394 mod/contacts.php:605 mod/contacts.php:805
+#: mod/contacts.php:999
+msgid "Unblock"
+msgstr "Entsperren"
 
 #: mod/admin.php:1395
 msgid "Site admin"
@@ -8526,6 +7266,14 @@ msgid ""
 "'display_errors' is to enable these options, set to '0' to disable them."
 msgstr "Um PHP Warnungen und Fehler zu protokollieren, kannst du die folgenden Zeilen zur .htconfig.php Datei deiner Installation hinzufügen. Den Dateinamen der Log-Datei legst du in der Zeile mit dem 'error_log' fest,  Er ist relativ zum Friendica-Stammverzeichnis und muss schreibbar durch den Webserver sein. Eine \"1\" als Option für die Punkte 'log_errors' und 'display_errors' aktiviert die Funktionen zum Protokollieren bzw. Anzeigen der Fehler, eine \"0\" deaktiviert sie."
 
+#: mod/admin.php:2022 mod/admin.php:2023 mod/settings.php:775
+msgid "Off"
+msgstr "Aus"
+
+#: mod/admin.php:2022 mod/admin.php:2023 mod/settings.php:775
+msgid "On"
+msgstr "An"
+
 #: mod/admin.php:2023
 #, php-format
 msgid "Lock feature %s"
@@ -8538,6 +7286,1313 @@ msgstr "Zusätzliche Features Verwalten"
 #: mod/profile.php:179
 msgid "Tips for New Members"
 msgstr "Tipps für neue Nutzer"
+
+#: mod/contacts.php:128
+#, php-format
+msgid "%d contact edited."
+msgid_plural "%d contacts edited."
+msgstr[0] "%d Kontakt bearbeitet."
+msgstr[1] "%d Kontakte bearbeitet."
+
+#: mod/contacts.php:159 mod/contacts.php:368
+msgid "Could not access contact record."
+msgstr "Konnte nicht auf die Kontaktdaten zugreifen."
+
+#: mod/contacts.php:173
+msgid "Could not locate selected profile."
+msgstr "Konnte das ausgewählte Profil nicht finden."
+
+#: mod/contacts.php:206
+msgid "Contact updated."
+msgstr "Kontakt aktualisiert."
+
+#: mod/contacts.php:389
+msgid "Contact has been blocked"
+msgstr "Kontakt wurde blockiert"
+
+#: mod/contacts.php:389
+msgid "Contact has been unblocked"
+msgstr "Kontakt wurde wieder freigegeben"
+
+#: mod/contacts.php:400
+msgid "Contact has been ignored"
+msgstr "Kontakt wurde ignoriert"
+
+#: mod/contacts.php:400
+msgid "Contact has been unignored"
+msgstr "Kontakt wird nicht mehr ignoriert"
+
+#: mod/contacts.php:412
+msgid "Contact has been archived"
+msgstr "Kontakt wurde archiviert"
+
+#: mod/contacts.php:412
+msgid "Contact has been unarchived"
+msgstr "Kontakt wurde aus dem Archiv geholt"
+
+#: mod/contacts.php:437
+msgid "Drop contact"
+msgstr "Kontakt löschen"
+
+#: mod/contacts.php:440 mod/contacts.php:801
+msgid "Do you really want to delete this contact?"
+msgstr "Möchtest Du wirklich diesen Kontakt löschen?"
+
+#: mod/contacts.php:457
+msgid "Contact has been removed."
+msgstr "Kontakt wurde entfernt."
+
+#: mod/contacts.php:498
+#, php-format
+msgid "You are mutual friends with %s"
+msgstr "Du hast mit %s eine beidseitige Freundschaft"
+
+#: mod/contacts.php:502
+#, php-format
+msgid "You are sharing with %s"
+msgstr "Du teilst mit %s"
+
+#: mod/contacts.php:507
+#, php-format
+msgid "%s is sharing with you"
+msgstr "%s teilt mit Dir"
+
+#: mod/contacts.php:527
+msgid "Private communications are not available for this contact."
+msgstr "Private Kommunikation ist für diesen Kontakt nicht verfügbar."
+
+#: mod/contacts.php:534
+msgid "(Update was successful)"
+msgstr "(Aktualisierung war erfolgreich)"
+
+#: mod/contacts.php:534
+msgid "(Update was not successful)"
+msgstr "(Aktualisierung war nicht erfolgreich)"
+
+#: mod/contacts.php:536 mod/contacts.php:980
+msgid "Suggest friends"
+msgstr "Kontakte vorschlagen"
+
+#: mod/contacts.php:540
+#, php-format
+msgid "Network type: %s"
+msgstr "Netzwerktyp: %s"
+
+#: mod/contacts.php:553
+msgid "Communications lost with this contact!"
+msgstr "Verbindungen mit diesem Kontakt verloren!"
+
+#: mod/contacts.php:556
+msgid "Fetch further information for feeds"
+msgstr "Weitere Informationen zu Feeds holen"
+
+#: mod/contacts.php:557
+msgid "Fetch information"
+msgstr "Beziehe Information"
+
+#: mod/contacts.php:557
+msgid "Fetch information and keywords"
+msgstr "Beziehe Information und Schlüsselworte"
+
+#: mod/contacts.php:575
+msgid "Contact"
+msgstr "Kontakt: "
+
+#: mod/contacts.php:578
+msgid "Profile Visibility"
+msgstr "Profil-Sichtbarkeit"
+
+#: mod/contacts.php:579
+#, php-format
+msgid ""
+"Please choose the profile you would like to display to %s when viewing your "
+"profile securely."
+msgstr "Bitte wähle eines Deiner Profile das angezeigt werden soll, wenn %s Dein Profil aufruft."
+
+#: mod/contacts.php:580
+msgid "Contact Information / Notes"
+msgstr "Kontakt Informationen / Notizen"
+
+#: mod/contacts.php:581
+msgid "Edit contact notes"
+msgstr "Notizen zum Kontakt bearbeiten"
+
+#: mod/contacts.php:587
+msgid "Block/Unblock contact"
+msgstr "Kontakt blockieren/freischalten"
+
+#: mod/contacts.php:588
+msgid "Ignore contact"
+msgstr "Ignoriere den Kontakt"
+
+#: mod/contacts.php:589
+msgid "Repair URL settings"
+msgstr "URL Einstellungen reparieren"
+
+#: mod/contacts.php:590
+msgid "View conversations"
+msgstr "Unterhaltungen anzeigen"
+
+#: mod/contacts.php:596
+msgid "Last update:"
+msgstr "Letzte Aktualisierung: "
+
+#: mod/contacts.php:598
+msgid "Update public posts"
+msgstr "Öffentliche Beiträge aktualisieren"
+
+#: mod/contacts.php:600 mod/contacts.php:990
+msgid "Update now"
+msgstr "Jetzt aktualisieren"
+
+#: mod/contacts.php:606 mod/contacts.php:806 mod/contacts.php:1007
+msgid "Unignore"
+msgstr "Ignorieren aufheben"
+
+#: mod/contacts.php:610
+msgid "Currently blocked"
+msgstr "Derzeit geblockt"
+
+#: mod/contacts.php:611
+msgid "Currently ignored"
+msgstr "Derzeit ignoriert"
+
+#: mod/contacts.php:612
+msgid "Currently archived"
+msgstr "Momentan archiviert"
+
+#: mod/contacts.php:613
+msgid ""
+"Replies/likes to your public posts <strong>may</strong> still be visible"
+msgstr "Antworten/Likes auf deine öffentlichen Beiträge <strong>könnten</strong> weiterhin sichtbar sein"
+
+#: mod/contacts.php:614
+msgid "Notification for new posts"
+msgstr "Benachrichtigung bei neuen Beiträgen"
+
+#: mod/contacts.php:614
+msgid "Send a notification of every new post of this contact"
+msgstr "Sende eine Benachrichtigung, wann immer dieser Kontakt einen neuen Beitrag schreibt."
+
+#: mod/contacts.php:617
+msgid "Blacklisted keywords"
+msgstr "Blacklistete Schlüsselworte "
+
+#: mod/contacts.php:617
+msgid ""
+"Comma separated list of keywords that should not be converted to hashtags, "
+"when \"Fetch information and keywords\" is selected"
+msgstr "Komma-Separierte Liste mit Schlüsselworten, die nicht in Hashtags konvertiert werden, wenn \"Beziehe Information und Schlüsselworte\" aktiviert wurde"
+
+#: mod/contacts.php:635
+msgid "Actions"
+msgstr "Aktionen"
+
+#: mod/contacts.php:638
+msgid "Contact Settings"
+msgstr "Kontakteinstellungen"
+
+#: mod/contacts.php:684
+msgid "Suggestions"
+msgstr "Kontaktvorschläge"
+
+#: mod/contacts.php:687
+msgid "Suggest potential friends"
+msgstr "Kontakte vorschlagen"
+
+#: mod/contacts.php:695
+msgid "Show all contacts"
+msgstr "Alle Kontakte anzeigen"
+
+#: mod/contacts.php:700
+msgid "Unblocked"
+msgstr "Ungeblockt"
+
+#: mod/contacts.php:703
+msgid "Only show unblocked contacts"
+msgstr "Nur nicht-blockierte Kontakte anzeigen"
+
+#: mod/contacts.php:709
+msgid "Blocked"
+msgstr "Geblockt"
+
+#: mod/contacts.php:712
+msgid "Only show blocked contacts"
+msgstr "Nur blockierte Kontakte anzeigen"
+
+#: mod/contacts.php:718
+msgid "Ignored"
+msgstr "Ignoriert"
+
+#: mod/contacts.php:721
+msgid "Only show ignored contacts"
+msgstr "Nur ignorierte Kontakte anzeigen"
+
+#: mod/contacts.php:727
+msgid "Archived"
+msgstr "Archiviert"
+
+#: mod/contacts.php:730
+msgid "Only show archived contacts"
+msgstr "Nur archivierte Kontakte anzeigen"
+
+#: mod/contacts.php:736
+msgid "Hidden"
+msgstr "Verborgen"
+
+#: mod/contacts.php:739
+msgid "Only show hidden contacts"
+msgstr "Nur verborgene Kontakte anzeigen"
+
+#: mod/contacts.php:796
+msgid "Search your contacts"
+msgstr "Suche in deinen Kontakten"
+
+#: mod/contacts.php:804 mod/settings.php:158 mod/settings.php:701
+msgid "Update"
+msgstr "Aktualisierungen"
+
+#: mod/contacts.php:807 mod/contacts.php:1015
+msgid "Archive"
+msgstr "Archivieren"
+
+#: mod/contacts.php:807 mod/contacts.php:1015
+msgid "Unarchive"
+msgstr "Aus Archiv zurückholen"
+
+#: mod/contacts.php:810
+msgid "Batch Actions"
+msgstr "Stapelverarbeitung"
+
+#: mod/contacts.php:856
+msgid "View all contacts"
+msgstr "Alle Kontakte anzeigen"
+
+#: mod/contacts.php:866
+msgid "View all common friends"
+msgstr "Alle Kontakte anzeigen"
+
+#: mod/contacts.php:873
+msgid "Advanced Contact Settings"
+msgstr "Fortgeschrittene Kontakteinstellungen"
+
+#: mod/contacts.php:918
+msgid "Mutual Friendship"
+msgstr "Beidseitige Freundschaft"
+
+#: mod/contacts.php:922
+msgid "is a fan of yours"
+msgstr "ist ein Fan von dir"
+
+#: mod/contacts.php:926
+msgid "you are a fan of"
+msgstr "Du bist Fan von"
+
+#: mod/contacts.php:1001
+msgid "Toggle Blocked status"
+msgstr "Geblockt-Status ein-/ausschalten"
+
+#: mod/contacts.php:1009
+msgid "Toggle Ignored status"
+msgstr "Ignoriert-Status ein-/ausschalten"
+
+#: mod/contacts.php:1017
+msgid "Toggle Archive status"
+msgstr "Archiviert-Status ein-/ausschalten"
+
+#: mod/contacts.php:1025
+msgid "Delete contact"
+msgstr "Lösche den Kontakt"
+
+#: mod/profiles.php:38
+msgid "Profile deleted."
+msgstr "Profil gelöscht."
+
+#: mod/profiles.php:56 mod/profiles.php:90
+msgid "Profile-"
+msgstr "Profil-"
+
+#: mod/profiles.php:75 mod/profiles.php:118
+msgid "New profile created."
+msgstr "Neues Profil angelegt."
+
+#: mod/profiles.php:96
+msgid "Profile unavailable to clone."
+msgstr "Profil nicht zum Duplizieren verfügbar."
+
+#: mod/profiles.php:190
+msgid "Profile Name is required."
+msgstr "Profilname ist erforderlich."
+
+#: mod/profiles.php:338
+msgid "Marital Status"
+msgstr "Familienstand"
+
+#: mod/profiles.php:342
+msgid "Romantic Partner"
+msgstr "Romanze"
+
+#: mod/profiles.php:354
+msgid "Work/Employment"
+msgstr "Arbeit / Beschäftigung"
+
+#: mod/profiles.php:357
+msgid "Religion"
+msgstr "Religion"
+
+#: mod/profiles.php:361
+msgid "Political Views"
+msgstr "Politische Ansichten"
+
+#: mod/profiles.php:365
+msgid "Gender"
+msgstr "Geschlecht"
+
+#: mod/profiles.php:369
+msgid "Sexual Preference"
+msgstr "Sexuelle Vorlieben"
+
+#: mod/profiles.php:373
+msgid "XMPP"
+msgstr "XMPP"
+
+#: mod/profiles.php:377
+msgid "Homepage"
+msgstr "Webseite"
+
+#: mod/profiles.php:381 mod/profiles.php:702
+msgid "Interests"
+msgstr "Interessen"
+
+#: mod/profiles.php:385
+msgid "Address"
+msgstr "Adresse"
+
+#: mod/profiles.php:392 mod/profiles.php:698
+msgid "Location"
+msgstr "Wohnort"
+
+#: mod/profiles.php:477
+msgid "Profile updated."
+msgstr "Profil aktualisiert."
+
+#: mod/profiles.php:564
+msgid " and "
+msgstr " und "
+
+#: mod/profiles.php:572
+msgid "public profile"
+msgstr "öffentliches Profil"
+
+#: mod/profiles.php:575
+#, php-format
+msgid "%1$s changed %2$s to &ldquo;%3$s&rdquo;"
+msgstr "%1$s hat %2$s geändert auf &ldquo;%3$s&rdquo;"
+
+#: mod/profiles.php:576
+#, php-format
+msgid " - Visit %1$s's %2$s"
+msgstr " – %1$ss %2$s besuchen"
+
+#: mod/profiles.php:579
+#, php-format
+msgid "%1$s has an updated %2$s, changing %3$s."
+msgstr "%1$s hat folgendes aktualisiert %2$s, verändert wurde %3$s."
+
+#: mod/profiles.php:645
+msgid "Hide contacts and friends:"
+msgstr "Kontakte und Freunde verbergen"
+
+#: mod/profiles.php:650
+msgid "Hide your contact/friend list from viewers of this profile?"
+msgstr "Liste der Kontakte vor Betrachtern dieses Profils verbergen?"
+
+#: mod/profiles.php:674
+msgid "Show more profile fields:"
+msgstr "Zeige mehr Profil-Felder:"
+
+#: mod/profiles.php:686
+msgid "Profile Actions"
+msgstr "Profilaktionen"
+
+#: mod/profiles.php:687
+msgid "Edit Profile Details"
+msgstr "Profil bearbeiten"
+
+#: mod/profiles.php:689
+msgid "Change Profile Photo"
+msgstr "Profilbild ändern"
+
+#: mod/profiles.php:690
+msgid "View this profile"
+msgstr "Dieses Profil anzeigen"
+
+#: mod/profiles.php:692
+msgid "Create a new profile using these settings"
+msgstr "Neues Profil anlegen und diese Einstellungen verwenden"
+
+#: mod/profiles.php:693
+msgid "Clone this profile"
+msgstr "Dieses Profil duplizieren"
+
+#: mod/profiles.php:694
+msgid "Delete this profile"
+msgstr "Dieses Profil löschen"
+
+#: mod/profiles.php:696
+msgid "Basic information"
+msgstr "Grundinformationen"
+
+#: mod/profiles.php:697
+msgid "Profile picture"
+msgstr "Profilbild"
+
+#: mod/profiles.php:699
+msgid "Preferences"
+msgstr "Vorlieben"
+
+#: mod/profiles.php:700
+msgid "Status information"
+msgstr "Status Informationen"
+
+#: mod/profiles.php:701
+msgid "Additional information"
+msgstr "Zusätzliche Informationen"
+
+#: mod/profiles.php:704
+msgid "Relation"
+msgstr "Beziehung"
+
+#: mod/profiles.php:708
+msgid "Your Gender:"
+msgstr "Dein Geschlecht:"
+
+#: mod/profiles.php:709
+msgid "<span class=\"heart\">&hearts;</span> Marital Status:"
+msgstr "<span class=\"heart\">&hearts;</span> Beziehungsstatus:"
+
+#: mod/profiles.php:711
+msgid "Example: fishing photography software"
+msgstr "Beispiel: Fischen Fotografie Software"
+
+#: mod/profiles.php:716
+msgid "Profile Name:"
+msgstr "Profilname:"
+
+#: mod/profiles.php:718
+msgid ""
+"This is your <strong>public</strong> profile.<br />It <strong>may</strong> "
+"be visible to anybody using the internet."
+msgstr "Dies ist Dein <strong>öffentliches</strong> Profil.<br />Es <strong>könnte</strong> für jeden Nutzer des Internets sichtbar sein."
+
+#: mod/profiles.php:719
+msgid "Your Full Name:"
+msgstr "Dein kompletter Name:"
+
+#: mod/profiles.php:720
+msgid "Title/Description:"
+msgstr "Titel/Beschreibung:"
+
+#: mod/profiles.php:723
+msgid "Street Address:"
+msgstr "Adresse:"
+
+#: mod/profiles.php:724
+msgid "Locality/City:"
+msgstr "Wohnort:"
+
+#: mod/profiles.php:725
+msgid "Region/State:"
+msgstr "Region/Bundesstaat:"
+
+#: mod/profiles.php:726
+msgid "Postal/Zip Code:"
+msgstr "Postleitzahl:"
+
+#: mod/profiles.php:727
+msgid "Country:"
+msgstr "Land:"
+
+#: mod/profiles.php:731
+msgid "Who: (if applicable)"
+msgstr "Wer: (falls anwendbar)"
+
+#: mod/profiles.php:731
+msgid "Examples: cathy123, Cathy Williams, cathy@example.com"
+msgstr "Beispiele: cathy123, Cathy Williams, cathy@example.com"
+
+#: mod/profiles.php:732
+msgid "Since [date]:"
+msgstr "Seit [Datum]:"
+
+#: mod/profiles.php:734
+msgid "Tell us about yourself..."
+msgstr "Erzähle uns ein bisschen von Dir …"
+
+#: mod/profiles.php:735
+msgid "XMPP (Jabber) address:"
+msgstr "XMPP (Jabber) Adresse"
+
+#: mod/profiles.php:735
+msgid ""
+"The XMPP address will be propagated to your contacts so that they can follow"
+" you."
+msgstr "Die XMPP Adresse wird an deine Kontakte verteilt werden, so dass sie auch über XMPP mit dir in Kontakt treten können."
+
+#: mod/profiles.php:736
+msgid "Homepage URL:"
+msgstr "Adresse der Homepage:"
+
+#: mod/profiles.php:739
+msgid "Religious Views:"
+msgstr "Religiöse Ansichten:"
+
+#: mod/profiles.php:740
+msgid "Public Keywords:"
+msgstr "Öffentliche Schlüsselwörter:"
+
+#: mod/profiles.php:740
+msgid "(Used for suggesting potential friends, can be seen by others)"
+msgstr "(Wird verwendet, um potentielle Kontakte zu finden, kann von Kontakten eingesehen werden)"
+
+#: mod/profiles.php:741
+msgid "Private Keywords:"
+msgstr "Private Schlüsselwörter:"
+
+#: mod/profiles.php:741
+msgid "(Used for searching profiles, never shown to others)"
+msgstr "(Wird für die Suche nach Profilen verwendet und niemals veröffentlicht)"
+
+#: mod/profiles.php:744
+msgid "Musical interests"
+msgstr "Musikalische Interessen"
+
+#: mod/profiles.php:745
+msgid "Books, literature"
+msgstr "Bücher, Literatur"
+
+#: mod/profiles.php:746
+msgid "Television"
+msgstr "Fernsehen"
+
+#: mod/profiles.php:747
+msgid "Film/dance/culture/entertainment"
+msgstr "Filme/Tänze/Kultur/Unterhaltung"
+
+#: mod/profiles.php:748
+msgid "Hobbies/Interests"
+msgstr "Hobbies/Interessen"
+
+#: mod/profiles.php:749
+msgid "Love/romance"
+msgstr "Liebe/Romantik"
+
+#: mod/profiles.php:750
+msgid "Work/employment"
+msgstr "Arbeit/Anstellung"
+
+#: mod/profiles.php:751
+msgid "School/education"
+msgstr "Schule/Ausbildung"
+
+#: mod/profiles.php:752
+msgid "Contact information and Social Networks"
+msgstr "Kontaktinformationen und Soziale Netzwerke"
+
+#: mod/profiles.php:794
+msgid "Edit/Manage Profiles"
+msgstr "Bearbeite/Verwalte Profile"
+
+#: mod/settings.php:60
+msgid "Display"
+msgstr "Anzeige"
+
+#: mod/settings.php:67 mod/settings.php:883
+msgid "Social Networks"
+msgstr "Soziale Netzwerke"
+
+#: mod/settings.php:88
+msgid "Connected apps"
+msgstr "Verbundene Programme"
+
+#: mod/settings.php:102
+msgid "Remove account"
+msgstr "Konto löschen"
+
+#: mod/settings.php:155
+msgid "Missing some important data!"
+msgstr "Wichtige Daten fehlen!"
+
+#: mod/settings.php:269
+msgid "Failed to connect with email account using the settings provided."
+msgstr "Verbindung zum E-Mail-Konto mit den angegebenen Einstellungen nicht möglich."
+
+#: mod/settings.php:274
+msgid "Email settings updated."
+msgstr "E-Mail Einstellungen bearbeitet."
+
+#: mod/settings.php:289
+msgid "Features updated"
+msgstr "Features aktualisiert"
+
+#: mod/settings.php:356
+msgid "Relocate message has been send to your contacts"
+msgstr "Die Umzugsbenachrichtigung wurde an Deine Kontakte versendet."
+
+#: mod/settings.php:375
+msgid "Empty passwords are not allowed. Password unchanged."
+msgstr "Leere Passwörter sind nicht erlaubt. Passwort bleibt unverändert."
+
+#: mod/settings.php:383
+msgid "Wrong password."
+msgstr "Falsches Passwort."
+
+#: mod/settings.php:394
+msgid "Password changed."
+msgstr "Passwort geändert."
+
+#: mod/settings.php:396
+msgid "Password update failed. Please try again."
+msgstr "Aktualisierung des Passworts gescheitert, bitte versuche es noch einmal."
+
+#: mod/settings.php:476
+msgid " Please use a shorter name."
+msgstr " Bitte verwende einen kürzeren Namen."
+
+#: mod/settings.php:478
+msgid " Name too short."
+msgstr " Name ist zu kurz."
+
+#: mod/settings.php:487
+msgid "Wrong Password"
+msgstr "Falsches Passwort"
+
+#: mod/settings.php:492
+msgid " Not valid email."
+msgstr " Keine gültige E-Mail."
+
+#: mod/settings.php:498
+msgid " Cannot change to that email."
+msgstr "Ändern der E-Mail nicht möglich. "
+
+#: mod/settings.php:554
+msgid "Private forum has no privacy permissions. Using default privacy group."
+msgstr "Für das private Forum sind keine Zugriffsrechte eingestellt. Die voreingestellte Gruppe für neue Kontakte wird benutzt."
+
+#: mod/settings.php:558
+msgid "Private forum has no privacy permissions and no default privacy group."
+msgstr "Für das private Forum sind keine Zugriffsrechte eingestellt, und es gibt keine voreingestellte Gruppe für neue Kontakte."
+
+#: mod/settings.php:598
+msgid "Settings updated."
+msgstr "Einstellungen aktualisiert."
+
+#: mod/settings.php:674 mod/settings.php:700 mod/settings.php:736
+msgid "Add application"
+msgstr "Programm hinzufügen"
+
+#: mod/settings.php:678 mod/settings.php:704
+msgid "Consumer Key"
+msgstr "Consumer Key"
+
+#: mod/settings.php:679 mod/settings.php:705
+msgid "Consumer Secret"
+msgstr "Consumer Secret"
+
+#: mod/settings.php:680 mod/settings.php:706
+msgid "Redirect"
+msgstr "Umleiten"
+
+#: mod/settings.php:681 mod/settings.php:707
+msgid "Icon url"
+msgstr "Icon URL"
+
+#: mod/settings.php:692
+msgid "You can't edit this application."
+msgstr "Du kannst dieses Programm nicht bearbeiten."
+
+#: mod/settings.php:735
+msgid "Connected Apps"
+msgstr "Verbundene Programme"
+
+#: mod/settings.php:739
+msgid "Client key starts with"
+msgstr "Anwenderschlüssel beginnt mit"
+
+#: mod/settings.php:740
+msgid "No name"
+msgstr "Kein Name"
+
+#: mod/settings.php:741
+msgid "Remove authorization"
+msgstr "Autorisierung entziehen"
+
+#: mod/settings.php:753
+msgid "No Plugin settings configured"
+msgstr "Keine Plugin-Einstellungen konfiguriert"
+
+#: mod/settings.php:761
+msgid "Plugin Settings"
+msgstr "Plugin-Einstellungen"
+
+#: mod/settings.php:783
+msgid "Additional Features"
+msgstr "Zusätzliche Features"
+
+#: mod/settings.php:793 mod/settings.php:797
+msgid "General Social Media Settings"
+msgstr "Allgemeine Einstellungen zu Sozialen Medien"
+
+#: mod/settings.php:803
+msgid "Disable intelligent shortening"
+msgstr "Intelligentes Link kürzen ausschalten"
+
+#: mod/settings.php:805
+msgid ""
+"Normally the system tries to find the best link to add to shortened posts. "
+"If this option is enabled then every shortened post will always point to the"
+" original friendica post."
+msgstr "Normalerweise versucht das System den besten Link zu finden um ihn zu gekürzten Postings hinzu zu fügen. Wird diese Option ausgewählt wird stets ein Link auf die originale Friendica Nachricht beigefügt."
+
+#: mod/settings.php:811
+msgid "Automatically follow any GNU Social (OStatus) followers/mentioners"
+msgstr "Automatisch allen GNU Social (OStatus) Followern/Erwähnern folgen"
+
+#: mod/settings.php:813
+msgid ""
+"If you receive a message from an unknown OStatus user, this option decides "
+"what to do. If it is checked, a new contact will be created for every "
+"unknown user."
+msgstr "Wenn du eine Nachricht eines unbekannten OStatus Nutzers bekommst, entscheidet diese Option wie diese behandelt werden soll. Ist die Option aktiviert, wird ein neuer Kontakt für den Verfasser erstellt,."
+
+#: mod/settings.php:819
+msgid "Default group for OStatus contacts"
+msgstr "Voreingestellte Gruppe für OStatus Kontakte"
+
+#: mod/settings.php:825
+msgid "Your legacy GNU Social account"
+msgstr "Dein alter GNU Social Account"
+
+#: mod/settings.php:827
+msgid ""
+"If you enter your old GNU Social/Statusnet account name here (in the format "
+"user@domain.tld), your contacts will be added automatically. The field will "
+"be emptied when done."
+msgstr "Wenn du deinen alten GNU Socual/Statusnet Accountnamen hier angibst (Format name@domain.tld) werden deine Kontakte automatisch hinzugefügt. Dieses Feld wird geleert, wenn die Kontakte hinzugefügt wurden."
+
+#: mod/settings.php:830
+msgid "Repair OStatus subscriptions"
+msgstr "OStatus Abonnements reparieren"
+
+#: mod/settings.php:839 mod/settings.php:840
+#, php-format
+msgid "Built-in support for %s connectivity is %s"
+msgstr "Eingebaute Unterstützung für Verbindungen zu %s ist %s"
+
+#: mod/settings.php:839 mod/settings.php:840
+msgid "enabled"
+msgstr "eingeschaltet"
+
+#: mod/settings.php:839 mod/settings.php:840
+msgid "disabled"
+msgstr "ausgeschaltet"
+
+#: mod/settings.php:840
+msgid "GNU Social (OStatus)"
+msgstr "GNU Social (OStatus)"
+
+#: mod/settings.php:876
+msgid "Email access is disabled on this site."
+msgstr "Zugriff auf E-Mails für diese Seite deaktiviert."
+
+#: mod/settings.php:888
+msgid "Email/Mailbox Setup"
+msgstr "E-Mail/Postfach-Einstellungen"
+
+#: mod/settings.php:889
+msgid ""
+"If you wish to communicate with email contacts using this service "
+"(optional), please specify how to connect to your mailbox."
+msgstr "Wenn Du mit E-Mail-Kontakten über diesen Service kommunizieren möchtest (optional), gib bitte die Einstellungen für Dein Postfach an."
+
+#: mod/settings.php:890
+msgid "Last successful email check:"
+msgstr "Letzter erfolgreicher E-Mail Check"
+
+#: mod/settings.php:892
+msgid "IMAP server name:"
+msgstr "IMAP-Server-Name:"
+
+#: mod/settings.php:893
+msgid "IMAP port:"
+msgstr "IMAP-Port:"
+
+#: mod/settings.php:894
+msgid "Security:"
+msgstr "Sicherheit:"
+
+#: mod/settings.php:894 mod/settings.php:899
+msgid "None"
+msgstr "Keine"
+
+#: mod/settings.php:895
+msgid "Email login name:"
+msgstr "E-Mail-Login-Name:"
+
+#: mod/settings.php:896
+msgid "Email password:"
+msgstr "E-Mail-Passwort:"
+
+#: mod/settings.php:897
+msgid "Reply-to address:"
+msgstr "Reply-to Adresse:"
+
+#: mod/settings.php:898
+msgid "Send public posts to all email contacts:"
+msgstr "Sende öffentliche Beiträge an alle E-Mail-Kontakte:"
+
+#: mod/settings.php:899
+msgid "Action after import:"
+msgstr "Aktion nach Import:"
+
+#: mod/settings.php:899
+msgid "Move to folder"
+msgstr "In einen Ordner verschieben"
+
+#: mod/settings.php:900
+msgid "Move to folder:"
+msgstr "In diesen Ordner verschieben:"
+
+#: mod/settings.php:986
+msgid "Display Settings"
+msgstr "Anzeige-Einstellungen"
+
+#: mod/settings.php:992 mod/settings.php:1013
+msgid "Display Theme:"
+msgstr "Theme:"
+
+#: mod/settings.php:993
+msgid "Mobile Theme:"
+msgstr "Mobiles Theme"
+
+#: mod/settings.php:994
+msgid "Update browser every xx seconds"
+msgstr "Browser alle xx Sekunden aktualisieren"
+
+#: mod/settings.php:994
+msgid "Minimum of 10 seconds. Enter -1 to disable it."
+msgstr "Minimum sind 10 Sekeunden. Gib -1 ein um abzuschalten."
+
+#: mod/settings.php:995
+msgid "Number of items to display per page:"
+msgstr "Zahl der Beiträge, die pro Netzwerkseite angezeigt werden sollen: "
+
+#: mod/settings.php:995 mod/settings.php:996
+msgid "Maximum of 100 items"
+msgstr "Maximal 100 Beiträge"
+
+#: mod/settings.php:996
+msgid "Number of items to display per page when viewed from mobile device:"
+msgstr "Zahl der Beiträge, die pro Netzwerkseite auf mobilen Geräten angezeigt werden sollen:"
+
+#: mod/settings.php:997
+msgid "Don't show emoticons"
+msgstr "Keine Smilies anzeigen"
+
+#: mod/settings.php:998
+msgid "Calendar"
+msgstr "Kalender"
+
+#: mod/settings.php:999
+msgid "Beginning of week:"
+msgstr "Wochenbeginn:"
+
+#: mod/settings.php:1000
+msgid "Don't show notices"
+msgstr "Info-Popups nicht anzeigen"
+
+#: mod/settings.php:1001
+msgid "Infinite scroll"
+msgstr "Endloses Scrollen"
+
+#: mod/settings.php:1002
+msgid "Automatic updates only at the top of the network page"
+msgstr "Automatische Updates nur, wenn Du oben auf der Netzwerkseite bist."
+
+#: mod/settings.php:1004
+msgid "General Theme Settings"
+msgstr "Allgemeine Themeneinstellungen"
+
+#: mod/settings.php:1005
+msgid "Custom Theme Settings"
+msgstr "Benutzerdefinierte Theme Einstellungen"
+
+#: mod/settings.php:1006
+msgid "Content Settings"
+msgstr "Einstellungen zum Inhalt"
+
+#: mod/settings.php:1007 view/theme/frio/config.php:61
+#: view/theme/cleanzero/config.php:82 view/theme/quattro/config.php:66
+#: view/theme/dispy/config.php:72 view/theme/vier/config.php:109
+#: view/theme/diabook/config.php:150 view/theme/duepuntozero/config.php:61
+msgid "Theme settings"
+msgstr "Themeneinstellungen"
+
+#: mod/settings.php:1089
+msgid "Account Types"
+msgstr "Kontenarten"
+
+#: mod/settings.php:1090
+msgid "Personal Page Subtypes"
+msgstr "Unterarten der persönlichen Seite"
+
+#: mod/settings.php:1091
+msgid "Community Forum Subtypes"
+msgstr "Unterarten des Gemeinschaftsforums"
+
+#: mod/settings.php:1098
+msgid "Personal Page"
+msgstr "Persönliche Seite"
+
+#: mod/settings.php:1099
+msgid "This account is a regular personal profile"
+msgstr "Dieses Konto ist ein normales persönliches Profil"
+
+#: mod/settings.php:1102
+msgid "Organisation Page"
+msgstr "Organisationsseite"
+
+#: mod/settings.php:1103
+msgid "This account is a profile for an organisation"
+msgstr "Diese Konto ist ein Profil für eine Organisation"
+
+#: mod/settings.php:1106
+msgid "News Page"
+msgstr "Nachrichtenseite"
+
+#: mod/settings.php:1107
+msgid "This account is a news account/reflector"
+msgstr "Dieses Konto ist ein News-Konto bzw. -Spiegel"
+
+#: mod/settings.php:1110
+msgid "Community Forum"
+msgstr "Gemeinschaftsforum"
+
+#: mod/settings.php:1111
+msgid ""
+"This account is a community forum where people can discuss with each other"
+msgstr "Dieses Konto ist ein Gemeinschaftskonto wo sich Leute untereinander austauschen können"
+
+#: mod/settings.php:1114
+msgid "Normal Account Page"
+msgstr "Normales Konto"
+
+#: mod/settings.php:1115
+msgid "This account is a normal personal profile"
+msgstr "Dieses Konto ist ein normales persönliches Profil"
+
+#: mod/settings.php:1118
+msgid "Soapbox Page"
+msgstr "Marktschreier-Konto"
+
+#: mod/settings.php:1119
+msgid "Automatically approve all connection/friend requests as read-only fans"
+msgstr "Kontaktanfragen werden automatisch als Nurlese-Fans akzeptiert"
+
+#: mod/settings.php:1122
+msgid "Public Forum"
+msgstr "Öffentliches Forum"
+
+#: mod/settings.php:1123
+msgid "Automatically approve all contact requests"
+msgstr "Bestätige alle Kontaktanfragen automatisch"
+
+#: mod/settings.php:1126
+msgid "Automatic Friend Page"
+msgstr "Automatische Freunde Seite"
+
+#: mod/settings.php:1127
+msgid "Automatically approve all connection/friend requests as friends"
+msgstr "Kontaktanfragen werden automatisch als Freund akzeptiert"
+
+#: mod/settings.php:1130
+msgid "Private Forum [Experimental]"
+msgstr "Privates Forum [Versuchsstadium]"
+
+#: mod/settings.php:1131
+msgid "Private forum - approved members only"
+msgstr "Privates Forum, nur für Mitglieder"
+
+#: mod/settings.php:1143
+msgid "OpenID:"
+msgstr "OpenID:"
+
+#: mod/settings.php:1143
+msgid "(Optional) Allow this OpenID to login to this account."
+msgstr "(Optional) Erlaube die Anmeldung für dieses Konto mit dieser OpenID."
+
+#: mod/settings.php:1153
+msgid "Publish your default profile in your local site directory?"
+msgstr "Darf Dein Standardprofil im Verzeichnis dieses Servers veröffentlicht werden?"
+
+#: mod/settings.php:1159
+msgid "Publish your default profile in the global social directory?"
+msgstr "Darf Dein Standardprofil im weltweiten Verzeichnis veröffentlicht werden?"
+
+#: mod/settings.php:1167
+msgid "Hide your contact/friend list from viewers of your default profile?"
+msgstr "Liste der Kontakte vor Betrachtern des Standardprofils verbergen?"
+
+#: mod/settings.php:1171
+msgid ""
+"If enabled, posting public messages to Diaspora and other networks isn't "
+"possible."
+msgstr "Wenn aktiviert, ist das senden öffentliche Nachrichten zu Diaspora und anderen Netzwerken nicht möglich"
+
+#: mod/settings.php:1176
+msgid "Allow friends to post to your profile page?"
+msgstr "Dürfen Deine Kontakte auf Deine Pinnwand schreiben?"
+
+#: mod/settings.php:1182
+msgid "Allow friends to tag your posts?"
+msgstr "Dürfen Deine Kontakte Deine Beiträge mit Schlagwörtern versehen?"
+
+#: mod/settings.php:1188
+msgid "Allow us to suggest you as a potential friend to new members?"
+msgstr "Dürfen wir Dich neuen Mitgliedern als potentiellen Kontakt vorschlagen?"
+
+#: mod/settings.php:1194
+msgid "Permit unknown people to send you private mail?"
+msgstr "Dürfen Dir Unbekannte private Nachrichten schicken?"
+
+#: mod/settings.php:1202
+msgid "Profile is <strong>not published</strong>."
+msgstr "Profil ist <strong>nicht veröffentlicht</strong>."
+
+#: mod/settings.php:1210
+#, php-format
+msgid "Your Identity Address is <strong>'%s'</strong> or '%s'."
+msgstr "Die Adresse deines Profils lautet <strong>'%s'</strong> oder '%s'."
+
+#: mod/settings.php:1217
+msgid "Automatically expire posts after this many days:"
+msgstr "Beiträge verfallen automatisch nach dieser Anzahl von Tagen:"
+
+#: mod/settings.php:1217
+msgid "If empty, posts will not expire. Expired posts will be deleted"
+msgstr "Wenn leer verfallen Beiträge nie automatisch. Verfallene Beiträge werden gelöscht."
+
+#: mod/settings.php:1218
+msgid "Advanced expiration settings"
+msgstr "Erweiterte Verfallseinstellungen"
+
+#: mod/settings.php:1219
+msgid "Advanced Expiration"
+msgstr "Erweitertes Verfallen"
+
+#: mod/settings.php:1220
+msgid "Expire posts:"
+msgstr "Beiträge verfallen lassen:"
+
+#: mod/settings.php:1221
+msgid "Expire personal notes:"
+msgstr "Persönliche Notizen verfallen lassen:"
+
+#: mod/settings.php:1222
+msgid "Expire starred posts:"
+msgstr "Markierte Beiträge verfallen lassen:"
+
+#: mod/settings.php:1223
+msgid "Expire photos:"
+msgstr "Fotos verfallen lassen:"
+
+#: mod/settings.php:1224
+msgid "Only expire posts by others:"
+msgstr "Nur Beiträge anderer verfallen:"
+
+#: mod/settings.php:1252
+msgid "Account Settings"
+msgstr "Kontoeinstellungen"
+
+#: mod/settings.php:1260
+msgid "Password Settings"
+msgstr "Passwort-Einstellungen"
+
+#: mod/settings.php:1262
+msgid "Leave password fields blank unless changing"
+msgstr "Lass die Passwort-Felder leer, außer Du willst das Passwort ändern"
+
+#: mod/settings.php:1263
+msgid "Current Password:"
+msgstr "Aktuelles Passwort:"
+
+#: mod/settings.php:1263 mod/settings.php:1264
+msgid "Your current password to confirm the changes"
+msgstr "Dein aktuelles Passwort um die Änderungen zu bestätigen"
+
+#: mod/settings.php:1264
+msgid "Password:"
+msgstr "Passwort:"
+
+#: mod/settings.php:1268
+msgid "Basic Settings"
+msgstr "Grundeinstellungen"
+
+#: mod/settings.php:1270
+msgid "Email Address:"
+msgstr "E-Mail-Adresse:"
+
+#: mod/settings.php:1271
+msgid "Your Timezone:"
+msgstr "Deine Zeitzone:"
+
+#: mod/settings.php:1272
+msgid "Your Language:"
+msgstr "Deine Sprache:"
+
+#: mod/settings.php:1272
+msgid ""
+"Set the language we use to show you friendica interface and to send you "
+"emails"
+msgstr "Wähle die Sprache, in der wir Dir die Friendica-Oberfläche präsentieren sollen und Dir E-Mail schicken"
+
+#: mod/settings.php:1273
+msgid "Default Post Location:"
+msgstr "Standardstandort:"
+
+#: mod/settings.php:1274
+msgid "Use Browser Location:"
+msgstr "Standort des Browsers verwenden:"
+
+#: mod/settings.php:1277
+msgid "Security and Privacy Settings"
+msgstr "Sicherheits- und Privatsphäre-Einstellungen"
+
+#: mod/settings.php:1279
+msgid "Maximum Friend Requests/Day:"
+msgstr "Maximale Anzahl vonKontaktanfragen/Tag:"
+
+#: mod/settings.php:1279 mod/settings.php:1309
+msgid "(to prevent spam abuse)"
+msgstr "(um SPAM zu vermeiden)"
+
+#: mod/settings.php:1280
+msgid "Default Post Permissions"
+msgstr "Standard-Zugriffsrechte für Beiträge"
+
+#: mod/settings.php:1281
+msgid "(click to open/close)"
+msgstr "(klicke zum öffnen/schließen)"
+
+#: mod/settings.php:1292
+msgid "Default Private Post"
+msgstr "Privater Standardbeitrag"
+
+#: mod/settings.php:1293
+msgid "Default Public Post"
+msgstr "Öffentlicher Standardbeitrag"
+
+#: mod/settings.php:1297
+msgid "Default Permissions for New Posts"
+msgstr "Standardberechtigungen für neue Beiträge"
+
+#: mod/settings.php:1309
+msgid "Maximum private messages per day from unknown people:"
+msgstr "Maximale Anzahl privater Nachrichten von Unbekannten pro Tag:"
+
+#: mod/settings.php:1312
+msgid "Notification Settings"
+msgstr "Benachrichtigungseinstellungen"
+
+#: mod/settings.php:1313
+msgid "By default post a status message when:"
+msgstr "Standardmäßig eine Statusnachricht posten, wenn:"
+
+#: mod/settings.php:1314
+msgid "accepting a friend request"
+msgstr "– Du eine Kontaktanfrage akzeptierst"
+
+#: mod/settings.php:1315
+msgid "joining a forum/community"
+msgstr "– Du einem Forum/einer Gemeinschaftsseite beitrittst"
+
+#: mod/settings.php:1316
+msgid "making an <em>interesting</em> profile change"
+msgstr "– Du eine <em>interessante</em> Änderung an Deinem Profil durchführst"
+
+#: mod/settings.php:1317
+msgid "Send a notification email when:"
+msgstr "Benachrichtigungs-E-Mail senden wenn:"
+
+#: mod/settings.php:1318
+msgid "You receive an introduction"
+msgstr "– Du eine Kontaktanfrage erhältst"
+
+#: mod/settings.php:1319
+msgid "Your introductions are confirmed"
+msgstr "– eine Deiner Kontaktanfragen akzeptiert wurde"
+
+#: mod/settings.php:1320
+msgid "Someone writes on your profile wall"
+msgstr "– jemand etwas auf Deine Pinnwand schreibt"
+
+#: mod/settings.php:1321
+msgid "Someone writes a followup comment"
+msgstr "– jemand auch einen Kommentar verfasst"
+
+#: mod/settings.php:1322
+msgid "You receive a private message"
+msgstr "– Du eine private Nachricht erhältst"
+
+#: mod/settings.php:1323
+msgid "You receive a friend suggestion"
+msgstr "– Du eine Empfehlung erhältst"
+
+#: mod/settings.php:1324
+msgid "You are tagged in a post"
+msgstr "– Du in einem Beitrag erwähnt wirst"
+
+#: mod/settings.php:1325
+msgid "You are poked/prodded/etc. in a post"
+msgstr "– Du von jemandem angestupst oder sonstwie behandelt wirst"
+
+#: mod/settings.php:1327
+msgid "Activate desktop notifications"
+msgstr "Desktop Benachrichtigungen einschalten"
+
+#: mod/settings.php:1327
+msgid "Show desktop popup on new notifications"
+msgstr "Desktop Benachrichtigungen einschalten"
+
+#: mod/settings.php:1329
+msgid "Text-only notification emails"
+msgstr "Benachrichtigungs E-Mail als Rein-Text."
+
+#: mod/settings.php:1331
+msgid "Send text only notification emails, without the html part"
+msgstr "Sende Benachrichtigungs E-Mail als Rein-Text - ohne HTML-Teil"
+
+#: mod/settings.php:1333
+msgid "Advanced Account/Page Type Settings"
+msgstr "Erweiterte Konto-/Seitentyp-Einstellungen"
+
+#: mod/settings.php:1334
+msgid "Change the behaviour of this account for special situations"
+msgstr "Verhalten dieses Kontos in bestimmten Situationen:"
+
+#: mod/settings.php:1337
+msgid "Relocate"
+msgstr "Umziehen"
+
+#: mod/settings.php:1338
+msgid ""
+"If you have moved this profile from another server, and some of your "
+"contacts don't receive your updates, try pushing this button."
+msgstr "Wenn Du Dein Profil von einem anderen Server umgezogen hast und einige Deiner Kontakte Deine Beiträge nicht erhalten, verwende diesen Button."
+
+#: mod/settings.php:1339
+msgid "Resend relocate message to contacts"
+msgstr "Umzugsbenachrichtigung erneut an Kontakte senden"
 
 #: object/Item.php:370
 msgid "via"
@@ -8798,55 +8853,55 @@ msgstr "slackr"
 msgid "Variations"
 msgstr "Variationen"
 
-#: boot.php:902
+#: index.php:447
+msgid "toggle mobile"
+msgstr "auf/von Mobile Ansicht wechseln"
+
+#: boot.php:924
 msgid "Delete this item?"
 msgstr "Diesen Beitrag löschen?"
 
-#: boot.php:905
+#: boot.php:927
 msgid "show fewer"
 msgstr "weniger anzeigen"
 
-#: boot.php:1567
+#: boot.php:1589
 #, php-format
 msgid "Update %s failed. See error logs."
 msgstr "Update %s fehlgeschlagen. Bitte Fehlerprotokoll überprüfen."
 
-#: boot.php:1679
+#: boot.php:1701
 msgid "Create a New Account"
 msgstr "Neues Konto erstellen"
 
-#: boot.php:1708
+#: boot.php:1730
 msgid "Password: "
 msgstr "Passwort: "
 
-#: boot.php:1709
+#: boot.php:1731
 msgid "Remember me"
 msgstr "Anmeldedaten merken"
 
-#: boot.php:1712
+#: boot.php:1734
 msgid "Or login using OpenID: "
 msgstr "Oder melde Dich mit Deiner OpenID an: "
 
-#: boot.php:1718
+#: boot.php:1740
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
 
-#: boot.php:1721
+#: boot.php:1743
 msgid "Website Terms of Service"
 msgstr "Website Nutzungsbedingungen"
 
-#: boot.php:1722
+#: boot.php:1744
 msgid "terms of service"
 msgstr "Nutzungsbedingungen"
 
-#: boot.php:1724
+#: boot.php:1746
 msgid "Website Privacy Policy"
 msgstr "Website Datenschutzerklärung"
 
-#: boot.php:1725
+#: boot.php:1747
 msgid "privacy policy"
 msgstr "Datenschutzerklärung"
-
-#: index.php:447
-msgid "toggle mobile"
-msgstr "auf/von Mobile Ansicht wechseln"

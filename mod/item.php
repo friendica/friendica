@@ -115,7 +115,7 @@ function item_post(&$a) {
 		if(($r === false) || (! count($r))) {
 			notice( t('Unable to locate original post.') . EOL);
 			if(x($_REQUEST,'return'))
-				goaway($a->get_baseurl() . "/" . $return_path );
+				goaway($return_path);
 			killme();
 		}
 		$parent_item = $r[0];
@@ -130,7 +130,7 @@ function item_post(&$a) {
 				intval($parent_item['contact-id']),
 				intval($uid)
 			);
-			if(count($r))
+			if (dbm::is_result($r))
 				$parent_contact = $r[0];
 
 			// If the contact id doesn't fit with the contact, then set the contact to null
@@ -175,6 +175,19 @@ function item_post(&$a) {
 	$app         = ((x($_REQUEST,'source'))      ? strip_tags($_REQUEST['source'])  : '');
 	$extid       = ((x($_REQUEST,'extid'))       ? strip_tags($_REQUEST['extid'])  : '');
 
+	// Check for multiple posts with the same message id (when the post was created via API)
+	if (($message_id != '') AND ($profile_uid != 0)) {
+		$r = q("SELECT * FROM `item` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
+			dbesc($message_id),
+			intval($profile_uid)
+		);
+
+		if (dbm::is_result($r)) {
+			logger("Message with URI ".$message_id." already exists for user ".$profile_uid, LOGGER_DEBUG);
+			return;
+		}
+	}
+
 	$allow_moderated = false;
 
 	// here is where we are going to check for permission to post a moderated comment.
@@ -184,7 +197,7 @@ function item_post(&$a) {
 	if((x($_REQUEST,'commenter')) && ((! $parent) || (! $parent_item['wall']))) {
 		notice( t('Permission denied.') . EOL) ;
 		if(x($_REQUEST,'return'))
-			goaway($a->get_baseurl() . "/" . $return_path );
+			goaway($return_path);
 		killme();
 	}
 
@@ -196,7 +209,7 @@ function item_post(&$a) {
 	if((! can_write_wall($a,$profile_uid)) && (! $allow_moderated)) {
 		notice( t('Permission denied.') . EOL) ;
 		if(x($_REQUEST,'return'))
-			goaway($a->get_baseurl() . "/" . $return_path );
+			goaway($return_path);
 		killme();
 	}
 
@@ -220,7 +233,7 @@ function item_post(&$a) {
 	$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 		intval($profile_uid)
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 		$user = $r[0];
 
 	if($orig_post) {
@@ -292,7 +305,6 @@ function item_post(&$a) {
 		// If this is a comment, set the permissions from the parent.
 
 		if($parent_item) {
-			$private = 0;
 
 			// for non native networks use the network of the original post as network of the item
 			if (($parent_item['network'] != NETWORK_DIASPORA)
@@ -300,19 +312,13 @@ function item_post(&$a) {
 				AND ($network == ""))
 				$network = $parent_item['network'];
 
-			if(($parent_item['private'])
-				|| strlen($parent_item['allow_cid'])
-				|| strlen($parent_item['allow_gid'])
-				|| strlen($parent_item['deny_cid'])
-				|| strlen($parent_item['deny_gid'])) {
-				$private = (($parent_item['private']) ? $parent_item['private'] : 1);
-			}
-
 			$str_contact_allow = $parent_item['allow_cid'];
 			$str_group_allow   = $parent_item['allow_gid'];
 			$str_contact_deny  = $parent_item['deny_cid'];
 			$str_group_deny    = $parent_item['deny_gid'];
+			$private           = $parent_item['private'];
 		}
+
 		$pubmail_enable    = ((x($_REQUEST,'pubmail_enable') && intval($_REQUEST['pubmail_enable']) && (! $private)) ? 1 : 0);
 
 		// if using the API, we won't see pubmail_enable - figure out if it should be set
@@ -333,7 +339,7 @@ function item_post(&$a) {
 				killme();
 			info( t('Empty post discarded.') . EOL );
 			if(x($_REQUEST,'return'))
-				goaway($a->get_baseurl() . "/" . $return_path );
+				goaway($return_path);
 			killme();
 		}
 	}
@@ -392,7 +398,7 @@ function item_post(&$a) {
 		}
 	}
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$author = $r[0];
 		$contact_id = $author['id'];
 	}
@@ -406,7 +412,7 @@ function item_post(&$a) {
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 1 LIMIT 1",
 			intval($profile_uid)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$contact_record = $r[0];
 	}
 
@@ -460,7 +466,6 @@ function item_post(&$a) {
 				if(! count($r))
 					continue;
 
-
 				$r = q("UPDATE `photo` SET `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s'
 					WHERE `resource-id` = '%s' AND `uid` = %d AND `album` = '%s' ",
 					dbesc($str_contact_allow),
@@ -471,7 +476,6 @@ function item_post(&$a) {
 					intval($profile_uid),
 					dbesc( t('Wall Photos'))
 				);
-
 			}
 		}
 	}
@@ -491,7 +495,7 @@ function item_post(&$a) {
 					intval($profile_uid),
 					intval($attach)
 				);
-				if(count($r)) {
+				if (dbm::is_result($r)) {
 					$r = q("UPDATE `attach` SET `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s'
 						WHERE `uid` = %d AND `id` = %d",
 						dbesc($str_contact_allow),
@@ -632,7 +636,7 @@ function item_post(&$a) {
 				intval($profile_uid),
 				intval($mtch)
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				if(strlen($attachments))
 					$attachments .= ',';
 				$attachments .= '[attach]href="' . $a->get_baseurl() . '/attach/' . $r[0]['id'] . '" length="' . $r[0]['filesize'] . '" type="' . $r[0]['filetype'] . '" title="' . (($r[0]['filename']) ? $r[0]['filename'] : '') . '"[/attach]';
@@ -725,6 +729,11 @@ function item_post(&$a) {
 	$datarray['self']          = $self;
 //	$datarray['prvnets']       = $user['prvnets'];
 
+	$datarray['parent-uri'] = ($parent == 0) ? $uri : $parent_item['uri'];
+	$datarray['plink'] = $a->get_baseurl().'/display/'.urlencode($datarray['guid']);
+	$datarray['last-child'] = 1;
+	$datarray['visible'] = 1;
+
 	if($orig_post)
 		$datarray['edit']      = true;
 
@@ -747,7 +756,7 @@ function item_post(&$a) {
 	if(x($datarray,'cancel')) {
 		logger('mod_item: post cancelled by plugin.');
 		if($return_path) {
-			goaway($a->get_baseurl() . "/" . $return_path);
+			goaway($return_path);
 		}
 
 		$json = array('cancel' => 1);
@@ -786,13 +795,14 @@ function item_post(&$a) {
 		proc_run(PRIORITY_HIGH, "include/notifier.php", 'edit_post', $post_id);
 		if((x($_REQUEST,'return')) && strlen($return_path)) {
 			logger('return: ' . $return_path);
-			goaway($a->get_baseurl() . "/" . $return_path );
+			goaway($return_path);
 		}
 		killme();
-	}
-	else
+	} else
 		$post_id = 0;
 
+	q("COMMIT");
+	q("START TRANSACTION;");
 
 	$r = q("INSERT INTO `item` (`guid`, `extid`, `uid`,`type`,`wall`,`gravity`, `network`, `contact-id`,
 					`owner-name`,`owner-link`,`owner-avatar`, `owner-id`,
@@ -802,7 +812,8 @@ function item_post(&$a) {
 					`tag`, `inform`, `verb`, `object-type`, `postopts`,
 					`allow_cid`, `allow_gid`, `deny_cid`, `deny_gid`, `private`,
 					`pubmail`, `attach`, `bookmark`,`origin`, `moderated`, `file`,
-					`rendered-html`, `rendered-hash`)
+					`rendered-html`, `rendered-hash`,
+					`parent`, `parent-uri`, `plink`, `last-child`, `visible`)
 		VALUES('%s', '%s', %d, '%s', %d, %d, '%s', %d,
 			'%s', '%s', '%s', %d,
 			'%s', '%s', '%s', %d,
@@ -811,7 +822,8 @@ function item_post(&$a) {
 			'%s', '%s', '%s', '%s', '%s',
 			'%s', '%s', '%s', '%s', %d,
 			%d, '%s', %d, %d, %d, '%s',
-			'%s', '%s')",
+			'%s', '%s',
+			%d, '%s', '%s', %d, %d)",
 		dbesc($datarray['guid']),
 		dbesc($datarray['extid']),
 		intval($datarray['uid']),
@@ -857,23 +869,39 @@ function item_post(&$a) {
 		intval($datarray['moderated']),
 		dbesc($datarray['file']),
 		dbesc($datarray['rendered-html']),
-		dbesc($datarray['rendered-hash'])
+		dbesc($datarray['rendered-hash']),
+		intval($datarray['parent']),
+		dbesc($datarray['parent-uri']),
+		dbesc($datarray['plink']),
+		intval($datarray['last-child']),
+		intval($datarray['visible'])
 	       );
 
-	$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' LIMIT 1",
-		dbesc($datarray['uri']));
-	if(!count($r)) {
+	if (dbm::is_result($r)) {
+		$r = q("SELECT LAST_INSERT_ID() AS `item-id`");
+		if (dbm::is_result($r)) {
+			$post_id = $r[0]['item-id'];
+		} else {
+			$post_id = 0;
+		}
+	} else {
+		logger('mod_item: unable to create post.');
+		$post_id = 0;
+	}
+
+	if ($post_id == 0) {
+		q("COMMIT");
 		logger('mod_item: unable to retrieve post that was just stored.');
-		notice( t('System error. Post not saved.') . EOL);
-		goaway($a->get_baseurl() . "/" . $return_path );
+		notice(t('System error. Post not saved.') . EOL);
+		goaway($return_path);
 		// NOTREACHED
 	}
 
-	$post_id = $r[0]['id'];
 	logger('mod_item: saved item ' . $post_id);
 
 	$datarray["id"] = $post_id;
-	$datarray["plink"] = $a->get_baseurl().'/display/'.urlencode($datarray["guid"]);
+
+	item_set_last_item($datarray);
 
 	// update filetags in pconfig
 	file_tag_update_pconfig($uid,$categories_old,$categories_new,'category');
@@ -881,22 +909,17 @@ function item_post(&$a) {
 	if($parent) {
 
 		// This item is the last leaf and gets the comment box, clear any ancestors
-		$r = q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent` = %d ",
+		$r = q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent` = %d AND `last-child` AND `id` != %d",
+			dbesc(datetime_convert()),
+			intval($parent),
+			intval($post_id)
+		);
+
+		// update the commented timestamp on the parent
+		q("UPDATE `item` SET `visible` = 1, `commented` = '%s', `changed` = '%s' WHERE `id` = %d",
+			dbesc(datetime_convert()),
 			dbesc(datetime_convert()),
 			intval($parent)
-		);
-		update_thread($parent, true);
-
-		// Inherit ACLs from the parent item.
-
-		$r = q("UPDATE `item` SET `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s', `private` = %d
-			WHERE `id` = %d",
-			dbesc($parent_item['allow_cid']),
-			dbesc($parent_item['allow_gid']),
-			dbesc($parent_item['deny_cid']),
-			dbesc($parent_item['deny_gid']),
-			intval($parent_item['private']),
-			intval($post_id)
 		);
 
 		if($contact_record != $author) {
@@ -927,6 +950,10 @@ function item_post(&$a) {
 	} else {
 		$parent = $post_id;
 
+		$r = q("UPDATE `item` SET `parent` = %d WHERE `id` = %d",
+			intval($parent),
+			intval($post_id));
+
 		if($contact_record != $author) {
 			notification(array(
 				'type'         => NOTIFY_WALL,
@@ -945,41 +972,6 @@ function item_post(&$a) {
 			));
 		}
 	}
-
-	// fallback so that parent always gets set to non-zero.
-
-	if(! $parent)
-		$parent = $post_id;
-
-	$r = q("UPDATE `item` SET `parent` = %d, `parent-uri` = '%s', `plink` = '%s', `changed` = '%s', `last-child` = 1, `visible` = 1
-		WHERE `id` = %d",
-		intval($parent),
-		dbesc(($parent == $post_id) ? $uri : $parent_item['uri']),
-		dbesc($a->get_baseurl().'/display/'.urlencode($datarray['guid'])),
-		dbesc(datetime_convert()),
-		intval($post_id)
-	);
-
-	// photo comments turn the corresponding item visible to the profile wall
-	// This way we don't see every picture in your new photo album posted to your wall at once.
-	// They will show up as people comment on them.
-
-	if(! $parent_item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d",
-			intval($parent_item['id'])
-		);
-		update_thread($parent_item['id']);
-	}
-
-	// update the commented timestamp on the parent
-
-	q("UPDATE `item` set `commented` = '%s', `changed` = '%s' WHERE `id` = %d",
-		dbesc(datetime_convert()),
-		dbesc(datetime_convert()),
-		intval($parent)
-	);
-	if ($post_id != $parent)
-		update_thread($parent);
 
 	call_hooks('post_local_end', $datarray);
 
@@ -1017,11 +1009,23 @@ function item_post(&$a) {
 		}
 	}
 
+	if ($post_id == $parent) {
+		add_thread($post_id);
+	} else {
+		update_thread($parent, true);
+	}
+
+	q("COMMIT");
+
 	create_tags_from_item($post_id);
 	create_files_from_item($post_id);
 
-	if ($post_id == $parent)
-		add_thread($post_id);
+	// Insert an item entry for UID=0 for global entries
+	if ($post_id != $parent) {
+		add_shadow_thread($post_id);
+	} else {
+		add_shadow_entry($post_id);
+	}
 
 	// This is a real juggling act on shared hosting services which kill your processes
 	// e.g. dreamhost. We used to start delivery to our native delivery agents in the background
@@ -1047,7 +1051,7 @@ function item_post_return($baseurl, $api_source, $return_path) {
 		return;
 
 	if($return_path) {
-		goaway($baseurl . "/" . $return_path);
+		goaway($return_path);
 	}
 
 	$json = array('success' => 1);

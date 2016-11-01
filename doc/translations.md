@@ -24,12 +24,12 @@ If you want to get your work into the source tree yourself, feel free to do so a
 The process is simple and friendica ships with all the tools necessary.
 
 The location of the translated files in the source tree is
-    /view/LNG-CODE/
+    /view/lang/LNG-CODE/
 where LNG-CODE is the language code used, e.g. de for German or fr for French.
 The translated strings come as a "message.po" file from transifex which needs to be translated into the PHP file friendica uses.
 To do so, place the file in the directory mentioned above and use the "po2php" utility from the util directory of your friendica installation.
 
-Assuming you want to convert the German localization which is placed in view/de/message.po you would do the following.
+Assuming you want to convert the German localization which is placed in view/lang/de/message.po you would do the following.
 
     1. Navigate at the command prompt to the base directory of your
        friendica installation
@@ -37,9 +37,9 @@ Assuming you want to convert the German localization which is placed in view/de/
     2. Execute the po2php script, which will place the translation
        in the strings.php file that is used by friendica.
 
-       $> php util/po2php.php view/de/messages.po
+       $> php util/po2php.php view/lang/de/messages.po
 
-       The output of the script will be placed at view/de/strings.php where
+       The output of the script will be placed at view/lang/de/strings.php where
        friendica is expecting it, so you can test your translation immediately.
 
     3. Visit your friendica page to check if it still works in the language you
@@ -50,7 +50,7 @@ Assuming you want to convert the German localization which is placed in view/de/
        not give any output if the file is ok but might give a hint for
        searching the bug in the file.
 
-       $> php view/de/strings.php
+       $> php view/lang/de/strings.php
 
     4. commit the two files with a meaningful commit message to your git
        repository, push it to your fork of the friendica repository at github and

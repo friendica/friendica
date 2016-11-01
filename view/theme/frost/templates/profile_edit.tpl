@@ -131,6 +131,12 @@
 </div>
 <div id="profile-edit-homepage-end"></div>
 
+<div id="profile-edit-xmpp-wrapper" >
+<label id="profile-edit-xmpp-label" for="profile-edit-xmpp" >{{$xmpp.1}} </label>
+<input type="text" size="28" name="xmpp" id="profile-edit-xmpp" title="{{$lbl_ex2}}" value="{{$xmpp.2}}" />
+</div><div id="profile-edit-xmpp-desc">{{$xmpp.3}}</div>
+<div id="profile-edit-xmpp-end"></div>
+
 <div id="profile-edit-politic-wrapper" >
 <label id="profile-edit-politic-label" for="profile-edit-politic" >{{$politic.1}} </label>
 <input type="text" size="28" name="politic" id="profile-edit-politic" value="{{$politic.2}}" />

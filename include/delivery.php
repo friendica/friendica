@@ -178,7 +178,7 @@ function delivery_run(&$argv, &$argc){
 
 		$r = q("SELECT `contact`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey`,
 			`user`.`timezone`, `user`.`nickname`, `user`.`sprvkey`, `user`.`spubkey`,
-			`user`.`page-flags`, `user`.`prvnets`
+			`user`.`page-flags`, `user`.`account-type`, `user`.`prvnets`
 			FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
 			WHERE `contact`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
 			intval($uid)

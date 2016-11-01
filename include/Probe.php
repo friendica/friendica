@@ -118,18 +118,16 @@ class Probe {
 	 */
 
 	public static function webfinger_dfrn($webbie, &$hcard) {
-		if (!strstr($webbie, '@'))
-			return $webbie;
 
 		$profile_link = '';
 
-		$links = self::webfinger($webbie);
+		$links = self::lrdd($webbie);
 		logger('webfinger_dfrn: '.$webbie.':'.print_r($links,true), LOGGER_DATA);
 		if (count($links)) {
 			foreach ($links as $link) {
 				if ($link['@attributes']['rel'] === NAMESPACE_DFRN)
 					$profile_link = $link['@attributes']['href'];
-				if ($link['@attributes']['rel'] === NAMESPACE_OSTATUSSUB)
+				if (($link['@attributes']['rel'] === NAMESPACE_OSTATUSSUB) AND ($profile_link == ""))
 					$profile_link = 'stat:'.$link['@attributes']['template'];
 				if ($link['@attributes']['rel'] === 'http://microformats.org/profile/hcard')
 					$hcard = $link['@attributes']['href'];
@@ -180,6 +178,11 @@ class Probe {
 
 			$path = str_replace('{uri}', urlencode($uri), $link);
 			$webfinger = self::webfinger($path);
+
+			if (!$webfinger AND (strstr($uri, "@"))) {
+				$path = str_replace('{uri}', urlencode("acct:".$uri), $link);
+				$webfinger = self::webfinger($path);
+			}
 		}
 
 		if (!is_array($webfinger["links"]))
@@ -310,6 +313,7 @@ class Probe {
 				return array("network" => NETWORK_TWITTER);
 
 			$lrdd = self::xrd($host);
+
 			if (!$lrdd)
 				return self::mail($uri, $uid);
 
@@ -355,6 +359,12 @@ class Probe {
 			// Try webfinger with the address (user@domain.tld)
 			$path = str_replace('{uri}', urlencode($addr), $link);
 			$webfinger = self::webfinger($path);
+
+			// Mastodon needs to have it with "acct:"
+			if (!$webfinger) {
+				$path = str_replace('{uri}', urlencode("acct:".$addr), $link);
+				$webfinger = self::webfinger($path);
+			}
 
 			// If webfinger wasn't successful then try it with the URL - possibly in the format https://...
 			if (!$webfinger AND ($uri != $addr)) {
@@ -651,8 +661,12 @@ class Probe {
 	 */
 	private function poll_hcard($hcard, $data, $dfrn = false) {
 
+		$content = fetch_url($hcard);
+		if (!$content)
+			return false;
+
 		$doc = new DOMDocument();
-		if (!@$doc->loadHTMLFile($hcard))
+		if (!@$doc->loadHTML($content))
 			return false;
 
 		$xpath = new DomXPath($doc);
@@ -661,39 +675,38 @@ class Probe {
 		if (!is_object($vcards))
 			return false;
 
-		if ($vcards->length == 0)
-			return false;
+		if ($vcards->length > 0) {
+			$vcard = $vcards->item(0);
 
-		$vcard = $vcards->item(0);
+			// We have to discard the guid from the hcard in favour of the guid from lrdd
+			// Reason: Hubzilla doesn't use the value "uid" in the hcard like Diaspora does.
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' uid ')]", $vcard); // */
+			if (($search->length > 0) AND ($data["guid"] == ""))
+				$data["guid"] = $search->item(0)->nodeValue;
 
-		// We have to discard the guid from the hcard in favour of the guid from lrdd
-		// Reason: Hubzilla doesn't use the value "uid" in the hcard like Diaspora does.
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' uid ')]", $vcard); // */
-		if (($search->length > 0) AND ($data["guid"] == ""))
-			$data["guid"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' nickname ')]", $vcard); // */
+			if ($search->length > 0)
+				$data["nick"] = $search->item(0)->nodeValue;
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' nickname ')]", $vcard); // */
-		if ($search->length > 0)
-			$data["nick"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' fn ')]", $vcard); // */
+			if ($search->length > 0)
+				$data["name"] = $search->item(0)->nodeValue;
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' fn ')]", $vcard); // */
-		if ($search->length > 0)
-			$data["name"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' searchable ')]", $vcard); // */
+			if ($search->length > 0)
+				$data["searchable"] = $search->item(0)->nodeValue;
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' searchable ')]", $vcard); // */
-		if ($search->length > 0)
-			$data["searchable"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' key ')]", $vcard); // */
+			if ($search->length > 0) {
+				$data["pubkey"] = $search->item(0)->nodeValue;
+				if (strstr($data["pubkey"], 'RSA '))
+					$data["pubkey"] = rsatopem($data["pubkey"]);
+			}
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' key ')]", $vcard); // */
-		if ($search->length > 0) {
-			$data["pubkey"] = $search->item(0)->nodeValue;
-			if (strstr($data["pubkey"], 'RSA '))
-				$data["pubkey"] = rsatopem($data["pubkey"]);
+			$search = $xpath->query("//*[@id='pod_location']", $vcard); // */
+			if ($search->length > 0)
+				$data["baseurl"] = trim($search->item(0)->nodeValue, "/");
 		}
-
-		$search = $xpath->query("//*[@id='pod_location']", $vcard); // */
-		if ($search->length > 0)
-			$data["baseurl"] = trim($search->item(0)->nodeValue, "/");
 
 		$avatar = array();
 		$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
@@ -815,6 +828,9 @@ class Probe {
 				if (strstr($alias, "@"))
 					$data["addr"] = str_replace('acct:', '', $alias);
 
+		if (is_string($webfinger["subject"]) AND strstr($webfinger["subject"], "@"))
+			$data["addr"] = str_replace('acct:', '', $webfinger["subject"]);
+
 		$pubkey = "";
 		foreach ($webfinger["links"] AS $link) {
 			if (($link["rel"] == "http://webfinger.net/rel/profile-page") AND
@@ -832,7 +848,7 @@ class Probe {
 						$pubkey = substr($pubkey, strpos($pubkey, ',') + 1);
 					else
 						$pubkey = substr($pubkey, 5);
-				} else
+				} elseif (normalise_link($pubkey) == 'http://')
 					$pubkey = fetch_url($pubkey);
 
 				$key = explode(".", $pubkey);

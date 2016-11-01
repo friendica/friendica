@@ -1,5 +1,5 @@
 
-<script>
+<script language="javascript" type="text/javascript">
 	// the following functions show/hide the specific profile page content 
 	// in dependence of the selected nav
 	function profileStandardActive() {
@@ -21,6 +21,19 @@
 <div id="profile-page" class="generic-page-wrapper">
 	<h3 class="">{{$title}}</h3>
 
+	{{* The link to edit the profile*}}
+	{{if $profile.edit}}
+	<ul class="nav nav-pills preferences">
+		<li class="pull-right">
+			<a class="btn btn-link btn-sm" type="button" id="profile-edit-link" href="{{$profile.edit.0}}" title="{{$profile.edit.3}}">
+				<i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;{{$profile.edit.1}}
+			</a>
+		</li>
+	</ul>
+	<div class="clear"></div>
+	{{/if}}
+
+	{{* Frio does split the profile information in "standard" and "advanced". This is the tab menu for swithching between this modes *}}
 	<ul id="profile-menu" class="nav nav-tabs" role="menubar" data-tabs="tabs">
 		<li class="active" role="menuitem"><a id="profile-tab-standard-link" onclick="profileStandardActive(); return false;">{{$basic}}</a></li>
 		<li role="menuitem"><a id="profile-tab-advanced-link" onclick="profileAdvancedActive(); return false;">{{$advanced}}</a></li>
@@ -226,4 +239,3 @@
 		{{/if}}
 	</div>
 </div>
-

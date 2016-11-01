@@ -99,7 +99,6 @@ function directory_content(&$a) {
 
 		foreach($r as $rr) {
 
-			$community = '';
 			$itemurl= '';
 
 			$itemurl = (($rr['addr'] != "") ? $rr['addr'] : $rr['profile_url']);
@@ -127,13 +126,6 @@ function directory_content(&$a) {
 //			}
 //			if(strlen($rr['gender']))
 //				$details .= '<br />' . t('Gender: ') . $rr['gender'];
-
-
-			// show if account is a community account
-			/// @TODO The other page types should be also respected, but first we need a good 
-			/// translatiion and systemwide consistency for displaying the page type
-			if((intval($rr['page-flags']) == PAGE_COMMUNITY) OR (intval($rr['page-flags']) == PAGE_PRVGROUP))
-				$community = true;
 
 			$profile = $rr;
 
@@ -171,7 +163,7 @@ function directory_content(&$a) {
 				'img_hover' => $rr['name'],
 				'name' => $rr['name'],
 				'details' => $details,
-				'account_type' => ($community ? t('Forum') : ''),
+				'account_type' => account_type($rr),
 				'profile' => $profile,
 				'location' => $location_e,
 				'tags' => $rr['pub_keywords'],

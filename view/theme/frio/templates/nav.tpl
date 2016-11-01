@@ -9,7 +9,7 @@
 		{{if $nav.remote}}
 		<a href="{{$baseurl}}"><div id="remote-logo-img"></div></a>
 		{{else}}
-		{{* #logo-img is the the placeholder to insert a mask (friendica logo) into this div 
+		{{* #logo-img is the the placeholder to insert a mask (friendica logo) into this div
 		For Firefox we have to call the paths of the mask (look at the bottom of this file).
 		Because for FF we need relative paths we apply them with js after the page is loaded (look at theme.js *}}
 		<a href="{{$baseurl}}"><div id="logo-img"></div></a>
@@ -275,14 +275,14 @@
 
 {{*The second part of the notifications dropdown menu. It handles the notifications *}}
 {{if $nav.notifications}}
-<ul id="nav-notifications-template" class="media-list" style="display:none;" rel="template"> <!-- needs further investigation. I thought the notifications have their own templates -->
-	<li class="{4} notif-entry" onclick="location.href='{0}';">
+<ul id="nav-notifications-template" class="media-list" style="display:none;" rel="template">
+	<li class="{4} notif-entry">
 		<div class="notif-entry-wrapper media">
 			<div class="notif-photo-wrapper media-object pull-left"><a href="{6}"><img data-src="{1}"></a></div>
-			<div class="notif-desc-wrapper media-body">
-				{8}{7}
+			<a href="{0}" class="notif-desc-wrapper media-body">
+				{2}
 				<div><time class="notif-when time" data-toggle="tooltip" title="{5}">{3}</time></div>
-			</div>
+			</a>
 		</div>
 	</li>
 </ul>

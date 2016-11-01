@@ -79,11 +79,9 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	header('X-Account-Management-Status: active; name="' . $a->user['username'] . '"; id="' . $a->user['nickname'] .'"');
 
 	if($login_initial || $login_refresh) {
-		$l = get_browser_language();
 
-		q("UPDATE `user` SET `login_date` = '%s', `language` = '%s' WHERE `uid` = %d",
+		q("UPDATE `user` SET `login_date` = '%s' WHERE `uid` = %d",
 			dbesc(datetime_convert()),
-			dbesc($l),
 			intval($_SESSION['uid'])
 		);
 

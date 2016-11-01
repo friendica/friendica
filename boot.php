@@ -38,7 +38,7 @@ define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
 define ( 'FRIENDICA_VERSION',      '3.5.1-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1202      );
+define ( 'DB_UPDATE_VERSION',      1207      );
 
 /**
  * @brief Constant with a HTML line break.
@@ -53,7 +53,7 @@ define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
 
 /**
  * @brief Image storage quality.
- * 
+ *
  * Lower numbers save space at cost of image detail.
  * For ease of upgrade, please do not change here. Change jpeg quality with
  * $a->config['system']['jpeg_quality'] = n;
@@ -95,7 +95,7 @@ define ( 'DEFAULT_DB_ENGINE',  'MyISAM'  );
 
 /**
  * @name SSL Policy
- * 
+ *
  * SSL redirection policies
  * @{
  */
@@ -106,7 +106,7 @@ define ( 'SSL_POLICY_SELFSIGN',     2 );
 
 /**
  * @name Logger
- * 
+ *
  * log levels
  * @{
  */
@@ -119,7 +119,7 @@ define ( 'LOGGER_ALL',             4 );
 
 /**
  * @name Cache
- * 
+ *
  * Cache levels
  * @{
  */
@@ -127,11 +127,15 @@ define ( 'CACHE_MONTH',            0 );
 define ( 'CACHE_WEEK',             1 );
 define ( 'CACHE_DAY',              2 );
 define ( 'CACHE_HOUR',             3 );
+define ( 'CACHE_HALF_HOUR',        4 );
+define ( 'CACHE_QUARTER_HOUR',     5 );
+define ( 'CACHE_FIVE_MINUTES',     6 );
+define ( 'CACHE_MINUTE',           7 );
 /* @}*/
 
 /**
  * @name Register
- * 
+ *
  * Registration policies
  * @{
  */
@@ -142,7 +146,7 @@ define ( 'REGISTER_OPEN',          2 );
 
 /**
  * @name Contact_is
- * 
+ *
  * Relationship types
  * @{
  */
@@ -153,7 +157,7 @@ define ( 'CONTACT_IS_FRIEND',   3);
 
 /**
  * @name Update
- * 
+ *
  * DB update return values
  * @{
  */
@@ -182,8 +186,30 @@ define ( 'PAGE_PRVGROUP',          5 );
 /** @}*/
 
 /**
+ * @name account types
+ *
+ * ACCOUNT_TYPE_PERSON - the account belongs to a person
+ *	Associated page types: PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE
+ *
+ * ACCOUNT_TYPE_ORGANISATION - the account belongs to an organisation
+ *	Associated page type: PAGE_SOAPBOX
+ *
+ * ACCOUNT_TYPE_NEWS - the account is a news reflector
+ *	Associated page type: PAGE_SOAPBOX
+ *
+ * ACCOUNT_TYPE_COMMUNITY - the account is community forum
+ *	Associated page types: PAGE_COMMUNITY, PAGE_PRVGROUP
+ * @{
+ */
+define ( 'ACCOUNT_TYPE_PERSON',      0 );
+define ( 'ACCOUNT_TYPE_ORGANISATION',1 );
+define ( 'ACCOUNT_TYPE_NEWS',        2 );
+define ( 'ACCOUNT_TYPE_COMMUNITY',   3 );
+/** @}*/
+
+/**
  * @name CP
- * 
+ *
  * Type of the community page
  * @{
  */
@@ -194,7 +220,7 @@ define ( 'CP_GLOBAL_COMMUNITY',    1 );
 
 /**
  * @name Network
- * 
+ *
  * Network and protocol family types
  * @{
  */
@@ -266,7 +292,7 @@ define ( 'ZCURL_TIMEOUT' , (-1));
 
 /**
  * @name Notify
- * 
+ *
  * Email notification options
  * @{
  */
@@ -288,7 +314,7 @@ define ( 'NOTIFY_SYSTEM',   0x8000 );
 
 /**
  * @name Term
- * 
+ *
  * Tag/term types
  * @{
  */
@@ -308,7 +334,7 @@ define ( 'TERM_OBJ_PHOTO', 2 );
 
 /**
  * @name Namespaces
- * 
+ *
  * Various namespaces we may need to parse
  * @{
  */
@@ -331,7 +357,7 @@ define ( 'NAMESPACE_ATOM1',           'http://www.w3.org/2005/Atom' );
 
 /**
  * @name Activity
- * 
+ *
  * Activity stream defines
  * @{
  */
@@ -377,7 +403,7 @@ define ( 'ACTIVITY_OBJ_QUESTION', 'http://activityschema.org/object/question' );
 
 /**
  * @name Gravity
- * 
+ *
  * Item weight for query ordering
  * @{
  */
@@ -444,9 +470,9 @@ function startup() {
 /**
  *
  * class: App
- * 
+ *
  * @brief Our main application structure for the life of this page.
- * 
+ *
  * Primarily deals with the URL that got us here
  * and tries to make some sense of it, and
  * stores our page contents and config storage
@@ -993,9 +1019,9 @@ class App {
 
 	/**
 	 * @brief Register template engine class
-	 * 
+	 *
 	 * If $name is "", is used class static property $class::$name
-	 * 
+	 *
 	 * @param string $class
 	 * @param string $name
 	 */
@@ -1013,7 +1039,7 @@ class App {
 
 	/**
 	 * @brief Return template engine instance.
-	 * 
+	 *
 	 * If $name is not defined, return engine defined by theme,
 	 * or default
 	 *
@@ -1078,6 +1104,9 @@ class App {
 	}
 
 	function save_timestamp($stamp, $value) {
+		if (!isset($this->config['system']['profiler']) || !$this->config['system']['profiler'])
+			return;
+
 		$duration = (float)(microtime(true)-$stamp);
 
 		if (!isset($this->performance[$value])) {
@@ -1109,23 +1138,33 @@ class App {
 
 		$this->remove_inactive_processes();
 
+		q("START TRANSACTION");
+
 		$r = q("SELECT `pid` FROM `process` WHERE `pid` = %d", intval(getmypid()));
-		if(!dbm::is_result($r))
+		if(!dbm::is_result($r)) {
 			q("INSERT INTO `process` (`pid`,`command`,`created`) VALUES (%d, '%s', '%s')",
 				intval(getmypid()),
 				dbesc($command),
 				dbesc(datetime_convert()));
+		}
+		q("COMMIT");
 	}
 
 	/**
 	 * @brief Remove inactive processes
 	 */
 	function remove_inactive_processes() {
+		q("START TRANSACTION");
+
 		$r = q("SELECT `pid` FROM `process`");
-		if(dbm::is_result($r))
-			foreach ($r AS $process)
-				if (!posix_kill($process["pid"], 0))
+		if(dbm::is_result($r)) {
+			foreach ($r AS $process) {
+				if (!posix_kill($process["pid"], 0)) {
 					q("DELETE FROM `process` WHERE `pid` = %d", intval($process["pid"]));
+				}
+			}
+		}
+		q("COMMIT");
 	}
 
 	/**
@@ -1152,11 +1191,6 @@ class App {
 			$callstack[] = $func["function"];
 
 		return implode(", ", $callstack);
-	}
-
-	function mark_timestamp($mark) {
-		//$this->performance["markstart"] -= microtime(true) - $this->performance["marktime"];
-		$this->performance["markstart"] = microtime(true) - $this->performance["markstart"] - $this->performance["marktime"];
 	}
 
 	function get_useragent() {
@@ -1336,7 +1370,7 @@ class App {
 
 /**
  * @brief Retrieve the App structure
- * 
+ *
  * Useful in functions which require it but don't get it passed to them
  */
 function get_app() {
@@ -1590,7 +1624,7 @@ function run_update_function($x) {
  * and mark it uninstalled in the database (for now we'll remove it).
  * Then go through the config list and if we have a plugin that isn't installed,
  * call the install procedure and add it to the database.
- * 
+ *
  * @param App $a
  *
 	 */
@@ -1656,17 +1690,17 @@ function get_guid($size=16, $prefix = "") {
 	}
 }
 
-/** 
+/**
  * @brief Wrapper for adding a login box.
- * 
+ *
  * @param bool $register
  *	If $register == true provide a registration link.
  *	This will most always depend on the value of $a->config['register_policy'].
  * @param bool $hiddens
- * 
+ *
  * @return string
  *	Returns the complete html for inserting into the page
- * 
+ *
  * @hooks 'login_hook'
  *	string $o
  */
@@ -1756,7 +1790,7 @@ function goaway($s) {
 
 /**
  * @brief Returns the user id of locally logged in user or false.
- * 
+ *
  * @return int|bool user id or false
  */
 function local_user() {
@@ -1767,7 +1801,7 @@ function local_user() {
 
 /**
  * @brief Returns contact id of authenticated site visitor or false
- * 
+ *
  * @return int|bool visitor_id or false
  */
 function remote_user() {
@@ -1824,13 +1858,13 @@ function get_max_import_size() {
  *	so plugins can take part in process :)
  *
  * @param (string|integer) $cmd program to run or priority
- * 
+ *
  * next args are passed as $cmd command line
  * e.g.: proc_run("ls","-la","/tmp");
  * or: proc_run(PRIORITY_HIGH, "include/notifier.php", "drop", $drop_id);
  *
  * @note $cmd and string args are surrounded with ""
- * 
+ *
  * @hooks 'proc_run'
  *	array $arr
  */
@@ -1989,9 +2023,9 @@ function current_theme(){
 
 /**
  * @brief Return full URL to theme which is currently in effect.
- * 
+ *
  * Provide a sane default if nothing is chosen or the specified theme does not exist.
- * 
+ *
  * @return string
  */
 function current_theme_url() {
@@ -2338,7 +2372,7 @@ function current_load() {
 
 /**
  * @brief get c-style args
- * 
+ *
  * @return int
  */
 function argc() {
@@ -2347,7 +2381,7 @@ function argc() {
 
 /**
  * @brief Returns the value of a argv key
- * 
+ *
  * @param int $x argv key
  * @return string Value of the argv key
  */
@@ -2360,12 +2394,12 @@ function argv($x) {
 
 /**
  * @brief Get the data which is needed for infinite scroll
- * 
+ *
  * For invinite scroll we need the page number of the actual page
  * and the the URI where the content of the next page comes from.
  * This data is needed for the js part in main.js.
  * Note: infinite scroll does only work for the network page (module)
- * 
+ *
  * @param string $module The name of the module (e.g. "network")
  * @return array Of infinite scroll data
  *	'pageno' => $pageno The number of the actual page

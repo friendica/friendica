@@ -78,8 +78,16 @@ function table_structure($table) {
 			if ($index["Index_type"] == "FULLTEXT")
 				continue;
 
+			if ($index['Key_name'] != 'PRIMARY' && $index['Non_unique'] == '0' && !isset($indexdata[$index["Key_name"]])) {
+				$indexdata[$index["Key_name"]] = array('UNIQUE');
+			}
+
 			$column = $index["Column_name"];
-			if ($index["Sub_part"] != "")
+			// On utf8mb4 a varchar index can only have a length of 191
+			// To avoid the need to add this to every index definition we just ignore it here.
+			// Exception are primary indexes
+			// Since there are some combindex primary indexes we use the limit of 180 here.
+			if (($index["Sub_part"] != "") AND (($index["Sub_part"] < 180) OR ($index["Key_name"] == "PRIMARY")))
 				$column .= "(".$index["Sub_part"].")";
 
 			$indexdata[$index["Key_name"]][] = $column;
@@ -104,7 +112,7 @@ function table_structure($table) {
 	return(array("fields"=>$fielddata, "indexes"=>$indexdata));
 }
 
-function print_structure($database) {
+function print_structure($database, $charset) {
 	echo "-- ------------------------------------------\n";
 	echo "-- ".FRIENDICA_PLATFORM." ".FRIENDICA_VERSION." (".FRIENDICA_CODENAME,")\n";
 	echo "-- DB_UPDATE_VERSION ".DB_UPDATE_VERSION."\n";
@@ -113,7 +121,7 @@ function print_structure($database) {
 		echo "--\n";
 		echo "-- TABLE $name\n";
 		echo "--\n";
-		db_create_table($name, $structure['fields'], true, false, $structure["indexes"]);
+		db_create_table($name, $structure['fields'], $charset, true, false, $structure["indexes"]);
 
 		echo "\n";
 	}
@@ -121,6 +129,14 @@ function print_structure($database) {
 
 function update_structure($verbose, $action, $tables=null, $definition=null) {
 	global $a, $db;
+
+	if ($action)
+		set_config('system', 'maintenance', 1);
+
+	if (isset($a->config["system"]["db_charset"]))
+		$charset = $a->config["system"]["db_charset"];
+	else
+		$charset = "utf8";
 
 	$errors = false;
 
@@ -140,15 +156,29 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 
 	// Get the definition
 	if (is_null($definition))
-		$definition = db_definition();
+		$definition = db_definition($charset);
 
+	// Ensure index conversion to unique removes duplicates
+	$sql_config = "SET session old_alter_table=1;";
+	if ($verbose)
+		echo $sql_config."\n";
+	if ($action)
+		@$db->q($sql_config);
+
+	// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
+	if ((version_compare($db->server_info(), '5.7.4') >= 0) AND
+		!(strpos($db->server_info(), 'MariaDB') !== false)) {
+		$ignore = '';
+	}else {
+		$ignore = ' IGNORE';
+	}
 
 	// Compare it
 	foreach ($definition AS $name => $structure) {
 		$is_new_table = False;
 		$sql3="";
 		if (!isset($database[$name])) {
-			$r = db_create_table($name, $structure["fields"], $verbose, $action, $structure['indexes']);
+			$r = db_create_table($name, $structure["fields"], $charset, $verbose, $action, $structure['indexes']);
 			if(false === $r) {
 				$errors .=  t('Errors encountered creating database tables.').$name.EOL;
 			}
@@ -167,7 +197,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 				if ($current_index_definition != $new_index_definition && substr($indexname, 0, 6) != 'local_') {
 					$sql2=db_drop_index($indexname);
 					if ($sql3 == "")
-						$sql3 = "ALTER TABLE `".$name."` ".$sql2;
+						$sql3 = "ALTER".$ignore." TABLE `".$name."` ".$sql2;
 					else
 						$sql3 .= ", ".$sql2;
 				}
@@ -211,7 +241,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					$sql2=db_create_index($indexname, $fieldnames);
 					if ($sql2 != "") {
 						if ($sql3 == "")
-							$sql3 = "ALTER TABLE `".$name."` ".$sql2;
+							$sql3 = "ALTER" . $ignore . " TABLE `".$name."` ".$sql2;
 						else
 							$sql3 .= ", ".$sql2;
 					}
@@ -231,6 +261,9 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 			}
 		}
 	}
+
+	if ($action)
+		set_config('system', 'maintenance', 0);
 
 	return $errors;
 }
@@ -257,15 +290,8 @@ function db_field_command($parameters, $create = true) {
 	return($fieldstruct);
 }
 
-function db_create_table($name, $fields, $verbose, $action, $indexes=null) {
+function db_create_table($name, $fields, $charset, $verbose, $action, $indexes=null) {
 	global $a, $db;
-
-	if (isset($a->config["system"]["db_charset"]))
-		$charset = $a->config["system"]["db_charset"];
-	elseif ($verbose)
-		$charset = "utf8mb4";
-	else
-		$charset = "utf8";
 
 	$r = true;
 
@@ -322,9 +348,9 @@ function db_create_index($indexname, $fieldnames, $method="ADD") {
 		killme();
 	}
 
-
-	if ($indexname == "PRIMARY") {
-		return sprintf("%s PRIMARY KEY(`%s`)", $method, implode("`,`", $fieldnames));
+	if ($fieldnames[0] == "UNIQUE") {
+		array_shift($fieldnames);
+		$method .= ' UNIQUE';
 	}
 
 	$names = "";
@@ -338,12 +364,26 @@ function db_create_index($indexname, $fieldnames, $method="ADD") {
 			$names .= "`".dbesc($fieldname)."`";
 	}
 
+	if ($indexname == "PRIMARY") {
+		return sprintf("%s PRIMARY KEY(%s)", $method, $names);
+	}
+
 
 	$sql = sprintf("%s INDEX `%s` (%s)", $method, dbesc($indexname), $names);
 	return($sql);
 }
 
-function db_definition() {
+function db_index_suffix($charset, $reduce = 0) {
+	if ($charset != "utf8mb4")
+		return "";
+
+	// On utf8mb4 indexes can only have a length of 191
+	$indexlength = 191 - $reduce;
+
+	return "(".$indexlength.")";
+}
+
+function db_definition($charset) {
 
 	$database = array();
 
@@ -401,8 +441,9 @@ function db_definition() {
 					"updated" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("k"),
+					"PRIMARY" => array("k".db_index_suffix($charset)),
 					"updated" => array("updated"),
+					"expire_mode_updated" => array("expire_mode", "updated"),
 					)
 			);
 	$database["challenge"] = array(
@@ -440,7 +481,7 @@ function db_definition() {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"cat_k" => array("cat(30)","k(30)"),
+					"cat_k" => array("UNIQUE", "cat(30)","k(30)"),
 					)
 			);
 	$database["contact"] = array(
@@ -459,6 +500,7 @@ function db_definition() {
 					"about" => array("type" => "text"),
 					"keywords" => array("type" => "text"),
 					"gender" => array("type" => "varchar(32)", "not null" => "1", "default" => ""),
+					"xmpp" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"attag" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"avatar" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"photo" => array("type" => "text"),
@@ -498,6 +540,7 @@ function db_definition() {
 					"writable" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"forum" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"prv" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
+					"contact-type" => array("type" => "int(11) unsigned", "not null" => "1", "default" => "0"),
 					"hidden" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"archive" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"pending" => array("type" => "tinyint(1)", "not null" => "1", "default" => "1"),
@@ -515,6 +558,7 @@ function db_definition() {
 			"indexes" => array(
 					"PRIMARY" => array("id"),
 					"uid" => array("uid"),
+					"addr_uid" => array("addr", "uid"),
 					"nurl" => array("nurl"),
 					)
 			);
@@ -543,6 +587,7 @@ function db_definition() {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
+					"cmd_item_contact" => array("UNIQUE", "cmd", "item", "contact"),
 					)
 			);
 	$database["event"] = array(
@@ -667,6 +712,7 @@ function db_definition() {
 					"gender" => array("type" => "varchar(32)", "not null" => "1", "default" => ""),
 					"birthday" => array("type" => "varchar(32)", "not null" => "1", "default" => "0000-00-00"),
 					"community" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
+					"contact-type" => array("type" => "tinyint(1)", "not null" => "1", "default" => "-1"),
 					"hide" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"nsfw" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"network" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
@@ -872,7 +918,7 @@ function db_definition() {
 					"ownerid_created" => array("owner-id","created"),
 					"wall_body" => array("wall","body(6)"),
 					"uid_visible_moderated_created" => array("uid","visible","moderated","created"),
-					"uid_uri" => array("uid","uri"),
+					"uid_uri" => array("uid", "uri"),
 					"uid_wall_created" => array("uid","wall","created"),
 					"resource-id" => array("resource-id"),
 					"uid_type" => array("uid","type"),
@@ -1020,7 +1066,7 @@ function db_definition() {
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("url"),
+					"PRIMARY" => array("url".db_index_suffix($charset)),
 					"created" => array("created"),
 					)
 			);
@@ -1033,7 +1079,7 @@ function db_definition() {
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("url", "guessing", "oembed"),
+					"PRIMARY" => array("url".db_index_suffix($charset), "guessing", "oembed"),
 					"created" => array("created"),
 					)
 			);
@@ -1047,7 +1093,7 @@ function db_definition() {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid_cat_k" => array("uid","cat(30)","k(30)"),
+					"uid_cat_k" => array("UNIQUE", "uid","cat(30)","k(30)"),
 					)
 			);
 	$database["photo"] = array(
@@ -1077,7 +1123,9 @@ function db_definition() {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid" => array("uid"),
+					"uid_contactid" => array("uid", "contact-id"),
+					"uid_profile" => array("uid", "profile"),
+					"uid_album_created" => array("uid", "album", "created"),
 					"resource-id" => array("resource-id"),
 					"guid" => array("guid"),
 					)
@@ -1164,6 +1212,7 @@ function db_definition() {
 					"education" => array("type" => "text"),
 					"contact" => array("type" => "text"),
 					"homepage" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"xmpp" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"photo" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"thumb" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"publish" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
@@ -1311,6 +1360,7 @@ function db_definition() {
 					"type_term" => array("type","term"),
 					"uid_otype_type_term_global_created" => array("uid","otype","type","term","global","created"),
 					"otype_type_term_tid" => array("otype","type","term","tid"),
+					"uid_otype_type_url" => array("uid","otype","type","url"),
 					"guid" => array("guid"),
 					)
 			);
@@ -1400,6 +1450,7 @@ function db_definition() {
 					"cntunkmail" => array("type" => "int(11)", "not null" => "1", "default" => "10"),
 					"notify-flags" => array("type" => "int(11) unsigned", "not null" => "1", "default" => "65535"),
 					"page-flags" => array("type" => "int(11) unsigned", "not null" => "1", "default" => "0"),
+					"account-type" => array("type" => "int(11) unsigned", "not null" => "1", "default" => "0"),
 					"prvnets" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"pwdreset" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"maxreq" => array("type" => "int(11)", "not null" => "1", "default" => "10"),
@@ -1469,12 +1520,33 @@ function dbstructure_run(&$argv, &$argc) {
 
 	if ($argc==2) {
 		switch ($argv[1]) {
+			case "dryrun":
+				update_structure(true, false);
+				return;
 			case "update":
 				update_structure(true, true);
+
+				$build = get_config('system','build');
+				if (!x($build)) {
+					set_config('system','build',DB_UPDATE_VERSION);
+					$build = DB_UPDATE_VERSION;
+				}
+
+				$stored = intval($build);
+				$current = intval(DB_UPDATE_VERSION);
+
+				// run any left update_nnnn functions in update.php
+				for($x = $stored; $x < $current; $x ++) {
+					$r = run_update_function($x);
+					if (!$r) break;
+				}
+
 				set_config('system','build',DB_UPDATE_VERSION);
 				return;
 			case "dumpsql":
-				print_structure(db_definition());
+				// For the dump that is used to create the database.sql we always assume utfmb4
+				$charset = "utf8mb4";
+				print_structure(db_definition($charset), $charset);
 				return;
 		}
 	}
@@ -1483,7 +1555,8 @@ function dbstructure_run(&$argv, &$argc) {
 	// print help
 	echo $argv[0]." <command>\n";
 	echo "\n";
-	echo "commands:\n";
+	echo "Commands:\n";
+	echo "dryrun		show database update schema queries without running them\n";
 	echo "update		update database schema\n";
 	echo "dumpsql		dump database schema\n";
 	return;

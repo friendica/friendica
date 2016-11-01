@@ -220,7 +220,7 @@ function dirfind_content(&$a, $prefix = "") {
 					'details'       => $contact_details['location'],
 					'tags'          => $contact_details['keywords'],
 					'about'         => $contact_details['about'],
-					'account_type'  => (($contact_details['community']) ? t('Forum') : ''),
+					'account_type'  => account_type($contact_details),
 					'network' => network_to_name($jj->network, $jj->url),
 					'id' => ++$id,
 				);
