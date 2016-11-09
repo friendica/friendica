@@ -248,7 +248,7 @@ function proxy_url($url, $writemode = false, $size = "") {
 		return($url);
 	}
 
-	if (get_config("system", "proxy_disabled"))
+	if (get_config("system", "proxy_disabled") || $a->module == "api")
 		return($url);
 
 	// Creating a sub directory to reduce the amount of files in the cache directory
