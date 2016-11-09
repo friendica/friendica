@@ -3,6 +3,7 @@ Version 3.5.1
     Updates to the translations (DE, FR, PT-BR) [translation teams]
     Fix for a potential XSS vector [heluecht, thanks to Vít Šesták 'v6ak' for reporting the problem]
     Fix for ghost request notifications on single user instances [Hypolite]
+    Fix user language selection [tobiasd]
     Improvements to the unliking of prior likes [Hypolite]
     Improvements to the API and Friendica specific extensions [gerhard6380]
     Improvements to the Browser Notification functionality [Hypolite]
@@ -22,8 +23,8 @@ Version 3.5.1
     Improvements to the language filter addon [strk]
 
   Closed Issues
-    1163, 2791, 2792, 2800, 2804, 2813, 2814, 2816, 2817, 2823, 2850
-    2858, 2865
+    1163, 2752, 2791, 2792, 2800, 2804, 2813, 2814, 2816, 2817, 2823, 
+    2850, 2858, 2865
 
 Version 3.5
   Friendica Core:
