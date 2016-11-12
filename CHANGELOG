@@ -4,6 +4,7 @@ Version 3.5.1
     Fix for a potential XSS vector [heluecht, thanks to Vít Šesták 'v6ak' for reporting the problem]
     Fix for ghost request notifications on single user instances [Hypolite]
     Fix user language selection [tobiasd]
+    Adjustments for the Vagrant VM settings [silke]
     Improvements to the unliking of prior likes [Hypolite]
     Improvements to the API and Friendica specific extensions [gerhard6380]
     Improvements to the Browser Notification functionality [Hypolite]
@@ -26,7 +27,7 @@ Version 3.5.1
     1163, 2752, 2791, 2792, 2800, 2804, 2813, 2814, 2816, 2817, 2823, 
     2850, 2858, 2865
 
-Version 3.5
+Version 3.5 (2016-09-13)
   Friendica Core:
     NEW Optional local directory with possible federated contacts [heluecht]
     NEW Autocompletion for @-mentions and BBCode tags [rabuzarus]
@@ -86,7 +87,7 @@ Version 3.5
     2506, 2512, 2516, 2539, 2540, 2893, 2597, 2611, 2617, 2629, 2645,
     2687, 2716, 2757, 2764
 
-Version 3.4.3
+Version 3.4.3 (2015-12-22)
   What's new for the users:
 	Updates to the documentation (silke, tobiasd, annando, rebeka-catalina)
 	Updated translations (tobiasd & translation teams)
@@ -165,7 +166,7 @@ Version 3.4.3
 	Fix bbcode conversion of the about text for the profile (issue #1607) (annando)
 	
 
-Version 3.4.2
+Version 3.4.2 (2015-09-29)
 
 	Updates to the documentation (tobiasd, silke, annando)
 	Updates to the translations (tobiasd & translation teams)
@@ -210,7 +211,7 @@ Version 3.4.2
 	Parse BBCode in contact request notification email (annando)
 	
 	
-Version 3.4.1
+Version 3.4.1 (2015-07-06)
 
 	Implement server-to-server encryption (RINO) using php-encryption library as "RINO 2", deprecate "RINO 1" (issue #1655) (fabrixxm)
 	Fix connection with Diaspora "freelove" account (issue #1572) (annando)
@@ -262,7 +263,7 @@ Version 3.4.1
 	Update to German documentation (Frank Dieckmann, tobias)
 	Updated translations (translation teams, tobias)
 
-Version 3.4
+Version 3.4 (2015-04-05)
 
 	Optionally, "like" and "dislike" activities don't update thread timestamp (annando)
 	Updated markdown libraries (annando)
@@ -290,7 +291,7 @@ Version 3.4
 	Add help text to explain the options for approving contacts (issue #1349) (silke)
 	API set as unseen only posts returned by the call (issue #1063) (annando)
 
-Version 3.3.3
+Version 3.3.3 (2015-02-24)
 
 	More separation between php and html in photo album (issue #1258) (rabuzarus)
 	Enhanced community page shows public posts from public contacts of public profiles (annando)
@@ -324,7 +325,7 @@ Version 3.3.3
 	Fix email validation (ddorian1)
 	Better documentation for developers (silke)
 
-Version 3.3.2
+Version 3.3.2 (2014-12-26)
 
 	Set default value for all not-null fields (fixes SQL warinigs) (annando)
 	Fix item filters in network page (issue #1222) (fabrixxm)
@@ -336,7 +337,7 @@ Version 3.3.2
 	Better display of pictures in posts (annando)
 	Fix out of control gprobe process (annando)
 
-Version 3.3.1
+Version 3.3.1 (2014-11-06)
 
 	JSONP support for API (fabrixxm)
 	Fixed small bug in direct messages API (fabrixxm)
@@ -354,7 +355,7 @@ Version 3.3.1
 	Translation updates
 	Added CHANGELOG
 
-Version 3.3
+Version 3.3 (2014-10-06)
 
 	API
 	added support in the API to allow image uploads from Twidere
