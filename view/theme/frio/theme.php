@@ -28,7 +28,7 @@ function frio_init(&$a) {
 
 	// if the device is a mobile device set js is_mobile
 	// variable so the js scripts can use this information
-	if($a->is_mobile || $a->is_tablet) {
+	if ($a->is_mobile || $a->is_tablet) {
 		$a->page["htmlhead"] .= <<< EOT
 			<script>
 				var is_mobile = 1;
@@ -36,8 +36,15 @@ function frio_init(&$a) {
 EOT;
 			}
 
-	if ($style == "")
+	if ($style == "") {
 		$style = get_config('frio', 'style');
+	}
+
+	// Disable the richtext editor for frio because frio don't support
+	// the richtext editor
+	if (local_user() && feature_enabled(local_user(), 'richtext')) {
+		set_pconfig(local_user(), 'feature', 'richtext', 0);
+	}
 }
 
 function frio_install() {
@@ -78,12 +85,12 @@ function frio_item_photo_links(&$a, &$body_info) {
 	$occurence = 1;
 	$p = bb_find_open_close($body_info['html'], "<a", ">");
 
-	while($p !== false && ($occurence++ < 500)) {
+	while ($p !== false && ($occurence++ < 500)) {
 		$link = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
 		$matches = array();
 
 		preg_match("/\/photos\/[\w]+\/image\/([\w]+)/", $link, $matches);
-		if($matches) {
+		if ($matches) {
 			// Replace the link for the photo's page with a direct link to the photo itself
 			$newlink = str_replace($matches[0], "/photo/{$matches[1]}", $link);
 
@@ -112,8 +119,8 @@ function frio_item_photo_links(&$a, &$body_info) {
  */
 function frio_item_photo_menu($a, &$arr){
 
-	foreach($arr["menu"] as $k =>$v) {
-		if(strpos($v,'poke/?f=&c=') === 0 || strpos($v,'message/new/') === 0) {
+	foreach ($arr["menu"] as $k =>$v) {
+		if (strpos($v,'poke/?f=&c=') === 0 || strpos($v,'message/new/') === 0) {
 			$v = "javascript:addToModal('" . $v . "'); return false;";
 			$arr["menu"][$k] = $v;
 		}
@@ -152,8 +159,8 @@ function frio_contact_photo_menu($a, &$args){
 	// The value for opening in a new tab is e.g. when 
 	// $args["menu"]["status"][2] is true. If the value of the [2] key is true
 	// and if it's a friendica contact we set it to false
-	foreach($args["menu"] as $k =>$v) {
-		if($k === "status" || $k === "profile" || $k === "photos") {
+	foreach ($args["menu"] as $k =>$v) {
+		if ($k === "status" || $k === "profile" || $k === "photos") {
 			$v[2] = (($args["contact"]["network"] === "dfrn") ? false : true);
 			$args["menu"][$k][2] = $v[2];
 		}
@@ -162,11 +169,13 @@ function frio_contact_photo_menu($a, &$args){
 	// Add to pm and poke links a new key with the value 'modal'.
 	// Later we can make conditions in the corresponing templates (e.g.
 	// contact_template.tpl)
-	if(strpos($pokelink,'poke/?f=&c='. $cid) !== false)
+	if (strpos($pokelink,'poke/?f=&c='. $cid) !== false) {
 		$args["menu"]["poke"][3] = "modal";
+	}
 
-	if(strpos($pmlink,'message/new/' . $cid) !== false)
+	if (strpos($pmlink,'message/new/' . $cid) !== false) {
 		$args["menu"]["pm"][3] = "modal";
+	}
 
 	$args = array('contact' => $contact, 'menu' => &$menu);
 }
@@ -188,8 +197,9 @@ function frio_contact_photo_menu($a, &$args){
 function frio_remote_nav($a,&$nav) {
 	// get the homelink from $_XSESSION
 	$homelink = get_my_url();
-	if(! $homelink)
+	if (! $homelink) {
 		$homelink = ((x($_SESSION,'visitor_home')) ? $_SESSION['visitor_home'] : '');
+	}
 
 	// split up the url in it's parts (protocol,domain/directory, /profile/, nickname
 	// I'm not familiar with regex, so someone might find a better solutionen
@@ -205,14 +215,14 @@ function frio_remote_nav($a,&$nav) {
 	// And construct a webbie (e.g. mickey@friendica.domain.com for the search in gcontact
 	// We use the webbie for search in gcontact because we don't know if gcontact table stores
 	// the right value if its http or https protocol
-	if(count($url_parts)) {
+	if (count($url_parts)) {
 		$server_url = $url_parts[1] . $url_parts[2];
 		$webbie = $url_parts[4] . '@' . $url_parts[2];
 	}
 
 	// since $userinfo isn't available for the hook we write it to the nav array
 	// this isn't optimal because the contact query will be done now twice
-	if(local_user()) {
+	if (local_user()) {
 		// empty the server url for local user because we won't need it
 		$server_url = '';
 		// user info
@@ -221,25 +231,25 @@ function frio_remote_nav($a,&$nav) {
 		$r[0]['photo'] = (count($r) ? $a->remove_baseurl($r[0]['micro']) : "images/person-48.jpg");
 		$r[0]['name'] = $a->user['username'];
 
-	} elseif(!local_user() && remote_user()) {
+	} elseif (!local_user() && remote_user()) {
 		$r = q("SELECT `name`, `nick`, `micro` AS `photo` FROM `contact` WHERE `id` = %d", intval(remote_user()));
 		$nav['remote'] = t("Guest");
 
-	} elseif(get_my_url ()) {
+	} elseif (get_my_url ()) {
 		$r = q("SELECT `name`, `nick`, `photo` FROM `gcontact`
 				WHERE `addr` = '%s' AND `network` = 'dfrn'",
 			dbesc($webbie));
 		$nav['remote'] = t("Visitor");
 	}
 
-	if(count($r)){
+	if (count($r)){
 			$nav['userinfo'] = array(
 				'icon' => (count($r) ? $r[0]['photo'] : "images/person-48.jpg"),
 				'name' => $r[0]['name'],
 			);
 		}
 
-	if(!local_user() && !empty($server_url)) {
+	if (!local_user() && !empty($server_url)) {
 		$nav['logout'] = Array($server_url . '/logout',t('Logout'), "", t('End this session'));
 
 		// user menu
@@ -278,17 +288,18 @@ function frio_acl_lookup($a, &$results) {
 
 	// we introduce a new search type, r should do the same query like it's
 	// done in /mod/contacts for connections
-	if($results["type"] == "r") {
+	if ($results["type"] == "r") {
 		$searching = false;
-		if($search) {
+		if ($search) {
 			$search_hdr = $search;
 			$search_txt = dbesc(protect_sprintf(preg_quote($search)));
 			$searching = true;
 		}
 		$sql_extra .= (($searching) ? " AND (`attag` LIKE '%%".dbesc($search_txt)."%%' OR `name` LIKE '%%".dbesc($search_txt)."%%' OR `nick` LIKE '%%".dbesc($search_txt)."%%') " : "");
 
-		if($nets)
+		if ($nets) {
 			$sql_extra .= sprintf(" AND network = '%s' ", dbesc($nets));
+		}
 
 		$sql_extra2 = ((($sort_type > 0) && ($sort_type <= CONTACT_IS_FRIEND)) ? sprintf(" AND `rel` = %d ",intval($sort_type)) : '');
 
@@ -296,7 +307,7 @@ function frio_acl_lookup($a, &$results) {
 		$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 			WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ",
 			intval($_SESSION['uid']));
-		if(count($r)) {
+		if (count($r)) {
 			$total = $r[0]["total"];
 		}
 
@@ -308,8 +319,8 @@ function frio_acl_lookup($a, &$results) {
 
 		$contacts = array();
 
-		if(count($r)) {
-			foreach($r as $rr) {
+		if (count($r)) {
+			foreach ($r as $rr) {
 				$contacts[] = _contact_detail_for_template($rr);
 			}
 		}
