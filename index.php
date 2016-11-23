@@ -16,6 +16,8 @@
 require_once('boot.php');
 require_once('object/BaseObject.php');
 
+use Friendica\Network\HTTP\HTTPException;
+
 $a = new App;
 BaseObject::set_app($a);
 
@@ -311,54 +313,64 @@ if(!$install && !$maintenance)
  */
 
 if($a->module_loaded) {
-	$a->page['page_title'] = $a->module;
-	$placeholder = '';
+	try {
+		$a->page['page_title'] = $a->module;
+		$placeholder = '';
 
-	if(function_exists($a->module . '_init')) {
-		call_hooks($a->module . '_mod_init', $placeholder);
-		$func = $a->module . '_init';
-		$func($a);
-	}
+		if(function_exists($a->module . '_init')) {
+			call_hooks($a->module . '_mod_init', $placeholder);
+			$func = $a->module . '_init';
+			$func($a);
+		}
 
-	if(function_exists(str_replace('-','_',current_theme()) . '_init')) {
-		$func = str_replace('-','_',current_theme()) . '_init';
-		$func($a);
-	}
-//	elseif (x($a->theme_info,"extends") && file_exists("view/theme/".$a->theme_info["extends"]."/theme.php")) {
-//		require_once("view/theme/".$a->theme_info["extends"]."/theme.php");
-//		if(function_exists(str_replace('-','_',$a->theme_info["extends"]) . '_init')) {
-//			$func = str_replace('-','_',$a->theme_info["extends"]) . '_init';
-//			$func($a);
-//		}
-//	}
+		if(function_exists(str_replace('-','_',current_theme()) . '_init')) {
+			$func = str_replace('-','_',current_theme()) . '_init';
+			$func($a);
+		}
+	//	elseif (x($a->theme_info,"extends") && file_exists("view/theme/".$a->theme_info["extends"]."/theme.php")) {
+	//		require_once("view/theme/".$a->theme_info["extends"]."/theme.php");
+	//		if(function_exists(str_replace('-','_',$a->theme_info["extends"]) . '_init')) {
+	//			$func = str_replace('-','_',$a->theme_info["extends"]) . '_init';
+	//			$func($a);
+	//		}
+	//	}
 
-	if(($_SERVER['REQUEST_METHOD'] === 'POST') && (! $a->error)
-		&& (function_exists($a->module . '_post'))
-		&& (! x($_POST,'auth-params'))) {
-		call_hooks($a->module . '_mod_post', $_POST);
-		$func = $a->module . '_post';
-		$func($a);
-	}
+		if(($_SERVER['REQUEST_METHOD'] === 'POST') && (! $a->error)
+			&& (function_exists($a->module . '_post'))
+			&& (! x($_POST,'auth-params'))) {
+			call_hooks($a->module . '_mod_post', $_POST);
+			$func = $a->module . '_post';
+			$func($a);
+		}
 
-	if((! $a->error) && (function_exists($a->module . '_afterpost'))) {
-		call_hooks($a->module . '_mod_afterpost',$placeholder);
-		$func = $a->module . '_afterpost';
-		$func($a);
-	}
+		if((! $a->error) && (function_exists($a->module . '_afterpost'))) {
+			call_hooks($a->module . '_mod_afterpost',$placeholder);
+			$func = $a->module . '_afterpost';
+			$func($a);
+		}
 
-	if((! $a->error) && (function_exists($a->module . '_content'))) {
-		$arr = array('content' => $a->page['content']);
-		call_hooks($a->module . '_mod_content', $arr);
-		$a->page['content'] = $arr['content'];
-		$func = $a->module . '_content';
-		$arr = array('content' => $func($a));
-		call_hooks($a->module . '_mod_aftercontent', $arr);
-		$a->page['content'] .= $arr['content'];
-	}
+		if((! $a->error) && (function_exists($a->module . '_content'))) {
+			$arr = array('content' => $a->page['content']);
+			call_hooks($a->module . '_mod_content', $arr);
+			$a->page['content'] = $arr['content'];
+			$func = $a->module . '_content';
+			$arr = array('content' => $func($a));
+			call_hooks($a->module . '_mod_aftercontent', $arr);
+			$a->page['content'] .= $arr['content'];
+		}
 
-	if(function_exists(str_replace('-','_',current_theme()) . '_content_loaded')) {
-		$func = str_replace('-','_',current_theme()) . '_content_loaded';
-		$func($a);
+		if(function_exists(str_replace('-','_',current_theme()) . '_content_loaded')) {
+			$func = str_replace('-','_',current_theme()) . '_content_loaded';
+			$func($a);
+		}
+	} catch(HTTPException $e) {
+		logger('index.php: HTTPException '. $e->httpcode . ' : '. $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
+		$e->send_header();
+		//TODO: template for main http response (404, 500,...)
+		$tpl = get_markup_template("404.tpl");
+		$a->page['content'] = replace_macros($tpl, array(
+			'$message' =>  ($e->getMessage()=="" ?  t('Page not found.' ) : $e->getMessage())
+		));
 	}
 }
 
@@ -501,7 +513,7 @@ $profile = $a->profile;
 header("X-Friendica-Version: ".FRIENDICA_VERSION);
 header("Content-type: text/html; charset=utf-8");
 
-// We use $_GET["mode"] for special page templates. So we will check if we have 
+// We use $_GET["mode"] for special page templates. So we will check if we have
 // to load another page template than the default one
 // The page templates are located in /view/php/ or in the theme directory
 if (isset($_GET["mode"])) {

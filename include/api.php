@@ -5,7 +5,8 @@
  *
  * @todo Automatically detect if incoming data is HTML or BBCode
  */
-	require_once('include/HTTPExceptions.php');
+
+	use Friendica\Network\HTTP;
 
 	require_once('include/bbcode.php');
 	require_once('include/datetime.php');
@@ -163,7 +164,7 @@
 		if (!isset($_SERVER['PHP_AUTH_USER'])) {
 			logger('API_login: ' . print_r($_SERVER,true), LOGGER_DEBUG);
 			header('WWW-Authenticate: Basic realm="Friendica"');
-			throw new UnauthorizedException("This API requires login");
+			throw new HTTP\UnauthorizedException("This API requires login");
 		}
 
 		$user = $_SERVER['PHP_AUTH_USER'];
@@ -217,7 +218,7 @@
 			header('WWW-Authenticate: Basic realm="Friendica"');
 			#header('HTTP/1.0 401 Unauthorized');
 			#die('This api requires login');
-			throw new UnauthorizedException("This API requires login");
+			throw new HTTP\UnauthorizedException("This API requires login");
 		}
 
 		authenticate_success($record);
@@ -263,7 +264,7 @@
 			foreach ($API as $p=>$info){
 				if (strpos($a->query_string, $p)===0){
 					if (!api_check_method($info['method'])){
-						throw new MethodNotAllowedException();
+						throw new HTTP\MethodNotAllowedException();
 					}
 
 					$called_api= explode("/",$p);
@@ -321,7 +322,7 @@
 					if ($r===false) {
 						// api function returned false withour throw an
 						// exception. This should not happend, throw a 500
-						throw new InternalServerErrorException();
+						throw new HTTP\InternalServerErrorException();
 					}
 
 					switch($type){
@@ -349,9 +350,9 @@
 					}
 				}
 			}
-			throw new NotImplementedException();
-		} catch (HTTPException $e) {
-			header("HTTP/1.1 {$e->httpcode} {$e->httpdesc}");
+			throw new HTTP\NotImplementedException();
+		} catch (HTTP\HTTPException $e) {
+			$e->send_header();
 			return api_error($type, $e);
 		}
 	}
@@ -466,7 +467,7 @@
 			$user = dbesc(api_unique_id_to_url($contact_id));
 
 			if ($user == "")
-				throw new BadRequestException("User not found.");
+				throw new HTTP\BadRequestException("User not found.");
 
 			$url = $user;
 			$extra_query = "AND `contact`.`nurl` = '%s' ";
@@ -477,7 +478,7 @@
 			$user = dbesc(api_unique_id_to_url($_GET['user_id']));
 
 			if ($user == "")
-				throw new BadRequestException("User not found.");
+				throw new HTTP\BadRequestException("User not found.");
 
 			$url = $user;
 			$extra_query = "AND `contact`.`nurl` = '%s' ";
@@ -586,7 +587,7 @@
 
 				return $ret;
 			} else {
-				throw new BadRequestException("User not found.");
+				throw new HTTP\BadRequestException("User not found.");
 			}
 		}
 
@@ -856,7 +857,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		unset($_REQUEST["user_id"]);
 		unset($_GET["user_id"]);
@@ -910,7 +911,7 @@
 
 		if (api_user()===false) {
 			logger('api_statuses_update: no user');
-			throw new ForbiddenException();
+			throw new HTTP\ForbiddenException();
 		}
 		$user_info = api_get_user($a);
 
@@ -952,7 +953,7 @@
 
 		if (api_user()===false) {
 			logger('api_statuses_update: no user');
-			throw new ForbiddenException();
+			throw new HTTP\ForbiddenException();
 		}
 
 		$user_info = api_get_user($a);
@@ -1015,7 +1016,7 @@
 				if ($posts_day > $throttle_day) {
 					logger('Daily posting limit reached for user '.api_user(), LOGGER_DEBUG);
 					#die(api_error($type, sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day)));
-					throw new TooManyRequestsException(sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day));
+					throw new HTTP\TooManyRequestsException(sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day));
 				}
 			}
 
@@ -1035,7 +1036,7 @@
 				if ($posts_week > $throttle_week) {
 					logger('Weekly posting limit reached for user '.api_user(), LOGGER_DEBUG);
 					#die(api_error($type, sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week)));
-					throw new TooManyRequestsException(sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week));
+					throw new HTTP\TooManyRequestsException(sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week));
 
 				}
 			}
@@ -1056,7 +1057,7 @@
 				if ($posts_month > $throttle_month) {
 					logger('Monthly posting limit reached for user '.api_user(), LOGGER_DEBUG);
 					#die(api_error($type, sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month)));
-					throw new TooManyRequestsException(sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month));
+					throw new HTTP\TooManyRequestsException(sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month));
 				}
 			}
 
@@ -1107,20 +1108,20 @@
 
 		if (api_user()===false) {
 			logger('no user');
-			throw new ForbiddenException();
+			throw new HTTP\ForbiddenException();
 		}
 
 		$user_info = api_get_user($a);
 
 		if(!x($_FILES,'media')) {
 			// Output error
-			throw new BadRequestException("No media.");
+			throw new HTTP\BadRequestException("No media.");
 		}
 
 		$media = wall_upload_post($a, false);
 		if(!$media) {
 			// Output error
-			throw new InternalServerErrorException();
+			throw new HTTP\InternalServerErrorException();
 		}
 
 		$returndata = array();
@@ -1341,10 +1342,10 @@
 				}
 				$userlist = array("users" => $userlist);
 			} else {
-				throw new BadRequestException("User not found.");
+				throw new HTTP\BadRequestException("User not found.");
 			}
 		} else {
-			throw new BadRequestException("User not found.");
+			throw new HTTP\BadRequestException("User not found.");
 		}
 		return api_format_data("users", $type, $userlist);
 	}
@@ -1362,7 +1363,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		unset($_REQUEST["user_id"]);
 		unset($_GET["user_id"]);
@@ -1444,7 +1445,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		$user_info = api_get_user($a);
 		// get last newtork messages
@@ -1513,7 +1514,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		$user_info = api_get_user($a);
 
@@ -1553,7 +1554,7 @@
 		);
 
 		if (!$r) {
-			throw new BadRequestException("There is no status with this id.");
+			throw new HTTP\BadRequestException("There is no status with this id.");
 		}
 
 		$ret = api_format_items($r,$user_info, false, $type);
@@ -1576,7 +1577,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		$user_info = api_get_user($a);
 
@@ -1632,7 +1633,7 @@
 		);
 
 		if (!$r)
-			throw new BadRequestException("There is no conversation with this id.");
+			throw new HTTP\BadRequestException("There is no conversation with this id.");
 
 		$ret = api_format_items($r,$user_info, false, $type);
 
@@ -1651,7 +1652,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		$user_info = api_get_user($a);
 
@@ -1706,7 +1707,7 @@
 
 			item_post($a);
 		} else
-			throw new ForbiddenException();
+			throw new HTTP\ForbiddenException();
 
 		// this should output the last post (the one we just posted).
 		$called_api = null;
@@ -1721,7 +1722,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		$user_info = api_get_user($a);
 
@@ -1754,7 +1755,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		unset($_REQUEST["user_id"]);
 		unset($_GET["user_id"]);
@@ -1830,7 +1831,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		$user_info = api_get_user($a);
 		// get last network messages
@@ -1904,14 +1905,14 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// for versioned api.
 		/// @TODO We need a better global soluton
 		$action_argv_id=2;
 		if ($a->argv[1]=="1.1") $action_argv_id=3;
 
-		if ($a->argc<=$action_argv_id) throw new BadRequestException("Invalid request.");
+		if ($a->argc<=$action_argv_id) throw new HTTP\BadRequestException("Invalid request.");
 		$action = str_replace(".".$type,"",$a->argv[$action_argv_id]);
 		if ($a->argc==$action_argv_id+2) {
 			$itemid = intval($a->argv[$action_argv_id+1]);
@@ -1923,7 +1924,7 @@
 				$itemid, api_user());
 
 		if ($item===false || count($item)==0)
-			throw new BadRequestException("Invalid item.");
+			throw new HTTP\BadRequestException("Invalid item.");
 
 		switch($action){
 			case "create":
@@ -1933,7 +1934,7 @@
 				$item[0]['starred']=0;
 				break;
 			default:
-				throw new BadRequestException("Invalid action ".$action);
+				throw new HTTP\BadRequestException("Invalid action ".$action);
 		}
 		$r = q("UPDATE item SET starred=%d WHERE id=%d AND uid=%d",
 				$item[0]['starred'], $itemid, api_user());
@@ -1966,7 +1967,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		$called_api= array();
 
@@ -2451,7 +2452,7 @@
 							'homepage' => $profile['homepage'],
 							'users' => null);
 			return $profile;
-		} 
+		}
 	}
 
 	/**
@@ -2625,7 +2626,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 		$user_info = api_get_user($a);
 
 		if (x($_GET,'cursor') && $_GET['cursor']=='undefined'){
@@ -2735,7 +2736,7 @@
 
 		$a = get_app();
 
-		if(! api_user()) throw new ForbiddenException();
+		if(! api_user()) throw new HTTP\ForbiddenException();
 
 		$user_info = api_get_user($a);
 
@@ -2782,7 +2783,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		if (!x($_POST, "text") OR (!x($_POST,"screen_name") AND !x($_POST,"user_id"))) return;
 
@@ -2851,7 +2852,7 @@
 	function api_direct_messages_destroy($type){
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -2872,16 +2873,16 @@
 		}
 
 		// BadRequestException if no id specified (for clients using Twitter API)
-		if ($id == 0) throw new BadRequestException('Message id not specified');
+		if ($id == 0) throw new HTTP\BadRequestException('Message id not specified');
 
-		// add parent-uri to sql command if specified by calling app		
+		// add parent-uri to sql command if specified by calling app
 		$sql_extra = ($parenturi != "" ? " AND `parent-uri` = '" . dbesc($parenturi) . "'" : "");
 
 		// get data of the specified message id
 		$r = q("SELECT `id` FROM `mail` WHERE `uid` = %d AND `id` = %d" . $sql_extra,
-			intval($uid), 
+			intval($uid),
 			intval($id));
-	
+
 		// error message if specified id is not in database
 		if (!dbm::is_result($r)) {
 			if ($verbose == "true") {
@@ -2889,12 +2890,12 @@
 				return api_format_data("direct_messages_delete", $type, array('$result' => $answer));
 			}
 			/// @todo BadRequestException ok for Twitter API clients?
-			throw new BadRequestException('message id not in database');
+			throw new HTTP\BadRequestException('message id not in database');
 		}
 
 		// delete message
-		$result = q("DELETE FROM `mail` WHERE `uid` = %d AND `id` = %d" . $sql_extra, 
-			intval($uid), 
+		$result = q("DELETE FROM `mail` WHERE `uid` = %d AND `id` = %d" . $sql_extra,
+			intval($uid),
 			intval($id));
 
 		if ($verbose == "true") {
@@ -2918,7 +2919,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$count = (x($_GET,'count')?$_GET['count']:20);
@@ -3057,7 +3058,7 @@
 
 
 	function api_fr_photos_list($type) {
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 		$r = q("select `resource-id`, max(scale) as scale, album, filename, type from photo
 				where uid = %d and album != 'Contact Photos' group by `resource-id`",
 			intval(local_user())
@@ -3089,8 +3090,8 @@
 	}
 
 	function api_fr_photo_detail($type) {
-		if (api_user()===false) throw new ForbiddenException();
-		if(!x($_REQUEST,'photo_id')) throw new BadRequestException("No photo id.");
+		if (api_user()===false) throw new HTTP\ForbiddenException();
+		if(!x($_REQUEST,'photo_id')) throw new HTTP\BadRequestException("No photo id.");
 
 		$scale = (x($_REQUEST, 'scale') ? intval($_REQUEST['scale']) : false);
 		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d",intval($scale)));
@@ -3136,7 +3137,7 @@
 			unset($data['photo']['maxscale']);
 
 		} else {
-			throw new NotFoundException();
+			throw new HTTP\NotFoundException();
 		}
 
 		return api_format_data("photo_detail", $type, $data);
@@ -3163,7 +3164,7 @@
 		$c_url = ((x($_GET,'c_url')) ? $_GET['c_url'] : '');
 
 		if ($url === '' || $c_url === '')
-			throw new BadRequestException("Wrong parameters.");
+			throw new HTTP\BadRequestException("Wrong parameters.");
 
 		$c_url = normalise_link($c_url);
 
@@ -3175,7 +3176,7 @@
 		);
 
 		if ((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
-			throw new BadRequestException("Unknown contact");
+			throw new HTTP\BadRequestException("Unknown contact");
 
 		$cid = $r[0]['id'];
 
@@ -3513,7 +3514,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3527,7 +3528,7 @@
 				intval($gid));
 			// error message if specified gid is not in database
 			if (count($r) == 0)
-				throw new BadRequestException("gid not available");
+				throw new HTTP\BadRequestException("gid not available");
 		}
 		else
 			$r = q("SELECT * FROM `group` WHERE `deleted` = 0 AND `uid` = %d",
@@ -3564,7 +3565,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3574,7 +3575,7 @@
 
 		// error if no gid specified
 		if ($gid == 0 || $name == "")
-			throw new BadRequestException('gid or name not specified');
+			throw new HTTP\BadRequestException('gid or name not specified');
 
 		// get data of the specified group id
 		$r = q("SELECT * FROM `group` WHERE `uid` = %d AND `id` = %d",
@@ -3582,7 +3583,7 @@
 			intval($gid));
 		// error message if specified gid is not in database
 		if (count($r) == 0)
-			throw new BadRequestException('gid not available');
+			throw new HTTP\BadRequestException('gid not available');
 
 		// get data of the specified group id and group name
 		$rname = q("SELECT * FROM `group` WHERE `uid` = %d AND `id` = %d AND `name` = '%s'",
@@ -3591,7 +3592,7 @@
 			dbesc($name));
 		// error message if specified gid is not in database
 		if (count($rname) == 0)
-			throw new BadRequestException('wrong group name');
+			throw new HTTP\BadRequestException('wrong group name');
 
 		// delete group
 		$ret = group_rmv($uid, $name);
@@ -3601,7 +3602,7 @@
 			return api_format_data("group_delete", $type, array('result' => $success));
 		}
 		else
-			throw new BadRequestException('other API error');
+			throw new HTTP\BadRequestException('other API error');
 	}
 	api_register_func('api/friendica/group_delete', 'api_friendica_group_delete', true, API_METHOD_DELETE);
 
@@ -3611,7 +3612,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3622,7 +3623,7 @@
 
 		// error if no name specified
 		if ($name == "")
-			throw new BadRequestException('group name not specified');
+			throw new HTTP\BadRequestException('group name not specified');
 
 		// get data of the specified group name
 		$rname = q("SELECT * FROM `group` WHERE `uid` = %d AND `name` = '%s' AND `deleted` = 0",
@@ -3630,7 +3631,7 @@
 			dbesc($name));
 		// error message if specified group name already exists
 		if (count($rname) != 0)
-			throw new BadRequestException('group name already exists');
+			throw new HTTP\BadRequestException('group name already exists');
 
 		// check if specified group name is a deleted group
 		$rname = q("SELECT * FROM `group` WHERE `uid` = %d AND `name` = '%s' AND `deleted` = 1",
@@ -3645,7 +3646,7 @@
 		if ($ret)
 			$gid = group_byname($uid, $name);
 		else
-			throw new BadRequestException('other API error');
+			throw new HTTP\BadRequestException('other API error');
 
 		// add members
 		$erroraddinguser = false;
@@ -3677,7 +3678,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3689,11 +3690,11 @@
 
 		// error if no name specified
 		if ($name == "")
-			throw new BadRequestException('group name not specified');
+			throw new HTTP\BadRequestException('group name not specified');
 
 		// error if no gid specified
 		if ($gid == "")
-			throw new BadRequestException('gid not specified');
+			throw new HTTP\BadRequestException('gid not specified');
 
 		// remove members
 		$members = group_get_members($gid);
@@ -3736,7 +3737,7 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 		$verb = strtolower($a->argv[3]);
 		$verb = preg_replace("|\..*$|", "", $verb);
 
@@ -3751,7 +3752,7 @@
 				$ok = "ok";
 			return api_format_data('ok', $type, array('ok' => $ok));
 		} else {
-			throw new BadRequestException('Error adding activity');
+			throw new HTTP\BadRequestException('Error adding activity');
 		}
 
 	}
@@ -3776,8 +3777,8 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
-		if ($a->argc!==3) throw new BadRequestException("Invalid argument count");
+		if (api_user()===false) throw new HTTP\ForbiddenException();
+		if ($a->argc!==3) throw new HTTP\BadRequestException("Invalid argument count");
 		$nm = new NotificationsManager();
 
 		$notes = $nm->getAll(array(), "+seen -date", 50);
@@ -3805,14 +3806,14 @@
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
-		if ($a->argc!==4) throw new BadRequestException("Invalid argument count");
+		if (api_user()===false) throw new HTTP\ForbiddenException();
+		if ($a->argc!==4) throw new HTTP\BadRequestException("Invalid argument count");
 
 		$id = (x($_REQUEST, 'id') ? intval($_REQUEST['id']) : 0);
 
 		$nm = new NotificationsManager();
 		$note = $nm->getByID($id);
-		if (is_null($note)) throw new BadRequestException("Invalid argument");
+		if (is_null($note)) throw new HTTP\BadRequestException("Invalid argument");
 
 		$nm->setSeen($note);
 		if ($note['otype']=='item') {
@@ -3845,7 +3846,7 @@
 	 */
 	function api_friendica_direct_messages_setseen($type){
 		$a = get_app();
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3860,7 +3861,7 @@
 
 		// get data of the specified message id
 		$r = q("SELECT `id` FROM `mail` WHERE `id` = %d AND `uid` = %d",
-			intval($id), 
+			intval($id),
 			intval($uid));
 		// error message if specified id is not in database
 		if (!dbm::is_result($r)) {
@@ -3869,8 +3870,8 @@
 		}
 
 		// update seen indicator
-		$result = q("UPDATE `mail` SET `seen` = 1 WHERE `id` = %d AND `uid` = %d", 
-			intval($id), 
+		$result = q("UPDATE `mail` SET `seen` = 1 WHERE `id` = %d AND `uid` = %d",
+			intval($id),
 			intval($uid));
 
 		if ($result) {
@@ -3898,7 +3899,7 @@
 	function api_friendica_direct_messages_search($type){
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3919,7 +3920,7 @@
 
 		$profile_url = $user_info["url"];
 		// message if nothing was found
-		if (count($r) == 0) 
+		if (count($r) == 0)
 			$success = array('success' => false, 'search_results' => 'nothing found');
 		else {
 			$ret = Array();
@@ -3951,7 +3952,7 @@
 	function api_friendica_profile_show($type){
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user()===false) throw new HTTP\ForbiddenException();
 
 		// input params
 		$profileid = (x($_REQUEST,'profile_id') ? $_REQUEST['profile_id'] : 0);
@@ -3967,7 +3968,7 @@
 				intval($profileid));
 			// error message if specified gid is not in database
 			if (count($r) == 0)
-				throw new BadRequestException("profile_id not available");
+				throw new HTTP\BadRequestException("profile_id not available");
 		}
 		else
 			$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
