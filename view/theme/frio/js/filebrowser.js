@@ -135,11 +135,13 @@ var FileBrowser = {
 				this.dataset.filename,
 				embed,
 				FileBrowser.id,
-				this.dataset.img
+				this.dataset.img,
 			]);
 
 			// close model
 			$('#modal').modal('hide');
+			// update autosize for this textarea
+			autosize.update($(".text-autosize"));
 //			if (id!=="") {
 //				commentExpand(FileBrowser.id);
 //				//$("#comment-edit-text-558").empty();

@@ -328,4 +328,10 @@
 	</form>
 </div>
 
-<script type="text/javascript">Fill_Country('{{$country_name.2}}');Fill_States('{{$region.2}}');</script>
+<script language="javascript" type="text/javascript">
+	Fill_Country('{{$country_name.2}}');
+	Fill_States('{{$region.2}}');
+
+	// initiale autosize for the textareas
+	autosize($("textarea.text-autosize"));
+</script>
