@@ -19,7 +19,11 @@
 				<div id="{{$g}}-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{$g}}-settings-title">
 					<div class="section-content-tools-wrapper">
 						{{foreach $f.1 as $fcat}}
+							{{* Here is an addional condition to filter the richtext feature
+							because frio doesn't support the richtext *}}
+							{{if $fcat.0 != 'feature_richtext'}}
 							{{include file="field_yesno.tpl" field=$fcat}}
+							{{/if}}
 						{{/foreach}}
 
 						<div class="form-group pull-right settings-submit-wrapper" >
