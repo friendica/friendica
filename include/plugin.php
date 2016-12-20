@@ -129,7 +129,7 @@ function reload_plugins() {
  */
 function plugin_enabled($plugin) {
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1 AND `name` = '%s'", $plugin);
-	return((bool)(count($r) > 0));
+	return ((dbm::is_result($r)) && (count($r) > 0));
 }
 
 

@@ -1,5 +1,5 @@
 <?php
-function network_init(&$a) {
+function network_init(App &$a) {
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
@@ -222,7 +222,7 @@ function saved_searches($search) {
  *
  * @return Array ( $no_active, $comment_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active );
  */
-function network_query_get_sel_tab($a) {
+function network_query_get_sel_tab(App &$a) {
 	$no_active='';
 	$starred_active = '';
 	$new_active = '';
@@ -293,7 +293,7 @@ function network_query_get_sel_net() {
 	return $network;
 }
 
-function network_query_get_sel_group($a) {
+function network_query_get_sel_group(App &$a) {
 	$group = false;
 
 	if($a->argc >= 2 && is_numeric($a->argv[1])) {
@@ -810,7 +810,7 @@ function network_content(&$a, $update = 0) {
  * @param app $a The global App
  * @return string Html of the networktab
  */
-function network_tabs($a) {
+function network_tabs(App &$a) {
 	// item filter tabs
 	/// @TODO fix this logic, reduce duplication
 	/// $a->page['content'] .= '<div class="tabs-wrapper">';

@@ -2355,7 +2355,7 @@ class dfrn {
 						dbesc($xt->id),
 						intval($importer["importer_uid"])
 					);
-					if(count($i)) {
+					if (dbm::is_result($i)) {
 
 						// For tags, the owner cannot remove the tag on the author's copy of the post.
 

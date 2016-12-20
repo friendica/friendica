@@ -1,6 +1,6 @@
 <?php
 
-function notes_init(&$a) {
+function notes_init(App &$a) {
 
 	if (! local_user()) {
 		return;

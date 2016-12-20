@@ -4,7 +4,7 @@ require_once "include/Photo.php";
 $install_wizard_pass=1;
 
 
-function install_init(&$a){
+function install_init(App &$a){
 
 	// $baseurl/install/testrwrite to test if rewite in .htaccess is working
 	if ($a->argc==2 && $a->argv[1]=="testrewrite") {
@@ -25,7 +25,7 @@ function install_init(&$a){
 
 }
 
-function install_post(&$a) {
+function install_post(App &$a) {
 	global $install_wizard_pass, $db;
 
 	switch($install_wizard_pass) {
@@ -131,7 +131,7 @@ function get_db_errno() {
 		return mysql_errno();
 }
 
-function install_content(&$a) {
+function install_content(App &$a) {
 
 	global $install_wizard_pass, $db;
 	$o = '';
@@ -560,7 +560,7 @@ function check_imagik(&$checks) {
 
 
 
-function manual_config(&$a) {
+function manual_config(App &$a) {
 	$data = htmlentities($a->data['txt'],ENT_COMPAT,'UTF-8');
 	$o = t('The database configuration file ".htconfig.php" could not be written. Please use the enclosed text to create a configuration file in your web server root.');
 	$o .= "<textarea rows=\"24\" cols=\"80\" >$data</textarea>";

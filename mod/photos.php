@@ -10,7 +10,7 @@ require_once('include/tags.php');
 require_once('include/threads.php');
 require_once('include/Probe.php');
 
-function photos_init(&$a) {
+function photos_init(App &$a) {
 
 	if ($a->argc > 1)
 		auto_redir($a, $a->argv[1]);
@@ -112,7 +112,7 @@ function photos_init(&$a) {
 
 
 
-function photos_post(&$a) {
+function photos_post(App &$a) {
 
 	logger('mod-photos: photos_post: begin' , LOGGER_DEBUG);
 
@@ -346,7 +346,7 @@ function photos_post(&$a) {
 				dbesc($r[0]['resource-id']),
 				intval($page_owner_uid)
 			);
-			if (count($i)) {
+			if (dbm::is_result($i)) {
 				q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 					dbesc(datetime_convert()),
 					dbesc(datetime_convert()),
@@ -681,7 +681,7 @@ function photos_post(&$a) {
 					$arr['visible']       = 1;
 					$arr['verb']          = ACTIVITY_TAG;
 					$arr['object-type']   = ACTIVITY_OBJ_PERSON;
-					$arr['target-type']   = ACTIVITY_OBJ_PHOTO;
+					$arr['target-type']   = ACTIVITY_OBJ_IMAGE;
 					$arr['tag']           = $tagged[4];
 					$arr['inform']        = $tagged[2];
 					$arr['origin']        = 1;
@@ -694,7 +694,7 @@ function photos_post(&$a) {
 						$arr['object'] .= xmlify('<link rel="photo" type="'.$p[0]['type'].'" href="' . $tagged[3]['photo'] . '" />' . "\n");
 					$arr['object'] .= '</link></object>' . "\n";
 
-					$arr['target'] = '<target><type>' . ACTIVITY_OBJ_PHOTO . '</type><title>' . $p[0]['desc'] . '</title><id>'
+					$arr['target'] = '<target><type>' . ACTIVITY_OBJ_IMAGE . '</type><title>' . $p[0]['desc'] . '</title><id>'
 						. App::get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . '</id>';
 					$arr['target'] .= '<link>' . xmlify('<link rel="alternate" type="text/html" href="' . App::get_baseurl() . '/photos/' . $owner_record['nickname'] . '/image/' . $p[0]['resource-id'] . '" />' . "\n" . '<link rel="preview" type="'.$p[0]['type'].'" href="' . App::get_baseurl() . "/photo/" . $p[0]['resource-id'] . '-' . $best . '.' . $ext . '" />') . '</link></target>';
 
@@ -928,7 +928,7 @@ function photos_post(&$a) {
 
 
 
-function photos_content(&$a) {
+function photos_content(App &$a) {
 
 	// URLs:
 	// photos/name

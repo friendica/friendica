@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 
 
-function filer_content(&$a) {
+function filer_content(App &$a) {
 
 	if (! local_user()) {
 		killme();

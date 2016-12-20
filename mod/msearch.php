@@ -1,6 +1,6 @@
 <?php
 
-function msearch_post(&$a) {
+function msearch_post(App &$a) {
 
 	$perpage = (($_POST['n']) ? $_POST['n'] : 80);
 	$page = (($_POST['p']) ? intval($_POST['p'] - 1) : 0);

@@ -1,6 +1,6 @@
 <?php
 
-function qsearch_init(&$a) {
+function qsearch_init(App &$a) {
 
 	if (! local_user()) {
 		killme();

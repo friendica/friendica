@@ -1560,7 +1560,7 @@ function get_gcontact_id($contact) {
 		proc_run(PRIORITY_LOW, 'include/gprobe.php', bin2hex($contact["url"]));
 	}
 
-	if ((count($r) > 1) AND ($gcontact_id > 0) AND ($contact["url"] != ""))
+	if ((dbm::is_result($r)) AND (count($r) > 1) AND ($gcontact_id > 0) AND ($contact["url"] != ""))
 	 q("DELETE FROM `gcontact` WHERE `nurl` = '%s' AND `id` != %d",
 		dbesc(normalise_link($contact["url"])),
 		intval($gcontact_id));

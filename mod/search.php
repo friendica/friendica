@@ -43,7 +43,7 @@ function search_saved_searches() {
 }
 
 
-function search_init(&$a) {
+function search_init(App &$a) {
 
 	$search = ((x($_GET,'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
 
@@ -81,13 +81,13 @@ function search_init(&$a) {
 
 
 
-function search_post(&$a) {
+function search_post(App &$a) {
 	if(x($_POST,'search'))
 		$a->data['search'] = $_POST['search'];
 }
 
 
-function search_content(&$a) {
+function search_content(App &$a) {
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		notice( t('Public access denied.') . EOL);

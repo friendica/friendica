@@ -3,7 +3,7 @@
 require_once("include/text.php");
 
 
-function manage_post(&$a) {
+function manage_post(App &$a) {
 
 	if (! local_user()) {
 		return;
@@ -92,7 +92,7 @@ function manage_post(&$a) {
 
 
 
-function manage_content(&$a) {
+function manage_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

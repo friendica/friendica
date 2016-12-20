@@ -2,7 +2,7 @@
 
 require_once('include/bbcode.php');
 
-function tagrm_post(&$a) {
+function tagrm_post(App &$a) {
 
 	if (! local_user()) {
 		goaway(App::get_baseurl() . '/' . $_SESSION['photo_return']);
@@ -49,7 +49,7 @@ function tagrm_post(&$a) {
 
 
 
-function tagrm_content(&$a) {
+function tagrm_content(App &$a) {
 
 	$o = '';
 

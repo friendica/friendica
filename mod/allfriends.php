@@ -5,7 +5,7 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function allfriends_content(&$a) {
+function allfriends_content(App &$a) {
 
 	$o = '';
 	if (! local_user()) {
@@ -21,7 +21,7 @@ function allfriends_content(&$a) {
 		return;
 	}
 
-	$uid = $a->user[uid];
+	$uid = $a->user['uid'];
 
 	$c = q("SELECT `name`, `url`, `photo` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 		intval($cid),

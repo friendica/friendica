@@ -164,7 +164,7 @@ function do_like($item_id, $verb) {
 	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
 	if($item['object-type'] === ACTIVITY_OBJ_EVENT)
 		$post_type = t('event');
-	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE );
+	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE );
 	$link = xmlify('<link rel="alternate" type="text/html" href="' . App::get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 	$body = $item['body'];
 

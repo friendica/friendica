@@ -1,12 +1,12 @@
 <?php
 require_once('mod/settings.php');
 
-function delegate_init(&$a) {
+function delegate_init(App &$a) {
 	return settings_init($a);
 }
 
 
-function delegate_content(&$a) {
+function delegate_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

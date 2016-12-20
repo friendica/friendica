@@ -1537,7 +1537,7 @@ function check_db() {
  * Sets the base url for use in cmdline programs which don't have
  * $_SERVER variables
  */
-function check_url(&$a) {
+function check_url(App &$a) {
 
 	$url = get_config('system','url');
 
@@ -1559,7 +1559,7 @@ function check_url(&$a) {
 /**
  * @brief Automatic database updates
  */
-function update_db(&$a) {
+function update_db(App &$a) {
 	$build = get_config('system','build');
 	if(! x($build))
 		$build = set_config('system','build',DB_UPDATE_VERSION);
@@ -1675,7 +1675,7 @@ function run_update_function($x) {
  * @param App $a
  *
 	 */
-function check_plugins(&$a) {
+function check_plugins(App &$a) {
 
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
 	if (dbm::is_result($r))
@@ -2410,7 +2410,8 @@ function get_temppath() {
 	return("");
 }
 
-function set_template_engine(&$a, $engine = 'internal') {
+/// @deprecated
+function set_template_engine(App &$a, $engine = 'internal') {
 /// @note This function is no longer necessary, but keep it as a wrapper to the class method
 /// to avoid breaking themes again unnecessarily
 

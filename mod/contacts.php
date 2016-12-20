@@ -7,7 +7,7 @@ require_once('include/Scrape.php');
 require_once('mod/proxy.php');
 require_once('include/Photo.php');
 
-function contacts_init(&$a) {
+function contacts_init(App &$a) {
 	if (! local_user()) {
 		return;
 	}
@@ -92,7 +92,7 @@ function contacts_init(&$a) {
 
 }
 
-function contacts_batch_actions(&$a){
+function contacts_batch_actions(App &$a){
 	$contacts_id = $_POST['contact_batch'];
 	if (!is_array($contacts_id)) return;
 
@@ -137,7 +137,7 @@ function contacts_batch_actions(&$a){
 }
 
 
-function contacts_post(&$a) {
+function contacts_post(App &$a) {
 
 	if (! local_user()) {
 		return;
@@ -342,7 +342,7 @@ function _contact_drop($contact_id, $orig_record) {
 }
 
 
-function contacts_content(&$a) {
+function contacts_content(App &$a) {
 
 	$sort_type = 0;
 	$o = '';

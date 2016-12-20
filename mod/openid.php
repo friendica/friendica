@@ -4,7 +4,7 @@
 require_once('library/openid.php');
 
 
-function openid_content(&$a) {
+function openid_content(App &$a) {
 
 	$noid = get_config('system','no_openid');
 	if($noid)

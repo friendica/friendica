@@ -1,6 +1,6 @@
 <?php
 
-function community_init(&$a) {
+function community_init(App &$a) {
 	if (! local_user()) {
 		unset($_SESSION['theme']);
 		unset($_SESSION['mobile-theme']);

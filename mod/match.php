@@ -13,7 +13,7 @@ require_once('mod/proxy.php');
  * @param App &$a
  * @return void|string
  */
-function match_content(&$a) {
+function match_content(App &$a) {
 
 	$o = '';
 	if (! local_user()) {

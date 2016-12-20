@@ -599,7 +599,7 @@ function get_events() {
 	));
 }
 
-function advanced_profile(&$a) {
+function advanced_profile(App &$a) {
 
 	$o = '';
 	$uid = $a->profile['uid'];
@@ -807,7 +807,7 @@ function get_my_url() {
 	return false;
 }
 
-function zrl_init(&$a) {
+function zrl_init(App &$a) {
 	$tmp_str = get_my_url();
 	if(validate_url($tmp_str)) {
 

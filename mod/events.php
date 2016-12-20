@@ -8,12 +8,12 @@ require_once('include/datetime.php');
 require_once('include/event.php');
 require_once('include/items.php');
 
-function events_init(&$a) {
+function events_init(App &$a) {
 	if (! local_user()) {
 		return;
 	}
 
-	if($a->argc == 1) {
+	if ($a->argc == 1) {
 		// if it's a json request abort here becaus we don't
 		// need the widget data
 		if($a->argv[1] === 'json')
@@ -21,8 +21,9 @@ function events_init(&$a) {
 
 		$cal_widget = widget_events();
 
-		if(! x($a->page,'aside'))
+		if (! x($a->page,'aside')) {
 			$a->page['aside'] = '';
+		}
 
 		$a->page['aside'] .= $cal_widget;
 	}
@@ -30,7 +31,7 @@ function events_init(&$a) {
 	return;
 }
 
-function events_post(&$a) {
+function events_post(App &$a) {
 
 	logger('post: ' . print_r($_REQUEST,true));
 
@@ -186,7 +187,7 @@ function events_post(&$a) {
 
 
 
-function events_content(&$a) {
+function events_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

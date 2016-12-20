@@ -1,7 +1,7 @@
 <?php
 require_once('view/theme/frio/php/Image.php');
 
-function theme_content(&$a) {
+function theme_content(App &$a) {
 	if (!local_user()) {
 		return;
 	}
@@ -19,7 +19,7 @@ function theme_content(&$a) {
 	return frio_form($a, $arr);
 }
 
-function theme_post(&$a) {
+function theme_post(App &$a) {
 	if (!local_user()) {
 		return;
 	}

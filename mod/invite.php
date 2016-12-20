@@ -9,7 +9,7 @@
 
 require_once('include/email.php');
 
-function invite_post(&$a) {
+function invite_post(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -95,7 +95,7 @@ function invite_post(&$a) {
 }
 
 
-function invite_content(&$a) {
+function invite_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

@@ -19,7 +19,7 @@ function salmon_return($val) {
 
 }
 
-function salmon_post(&$a) {
+function salmon_post(App &$a) {
 
 	$xml = file_get_contents('php://input');
 

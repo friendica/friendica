@@ -1,6 +1,6 @@
 <?php
 
-function hcard_init(&$a) {
+function hcard_init(App &$a) {
 
 	$blocked = (((get_config('system','block_public')) && (! local_user()) && (! remote_user())) ? true : false);
 

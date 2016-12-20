@@ -5,7 +5,7 @@
 
 
 
-function theme_content(&$a){
+function theme_content(App &$a){
 	if (!local_user()) {
 		return;
 	}
@@ -35,7 +35,7 @@ function theme_content(&$a){
 			$show_services, $show_friends, $show_lastusers);
 }
 
-function theme_post(&$a){
+function theme_post(App &$a){
 	if (! local_user()) {
 		return;
 	}
@@ -52,7 +52,7 @@ function theme_post(&$a){
 }
 
 
-function theme_admin(&$a){
+function theme_admin(App &$a){
 
 	if (!function_exists('get_vier_config'))
 		return;
@@ -81,7 +81,7 @@ function theme_admin(&$a){
 	return $o;
 }
 
-function theme_admin_post(&$a){
+function theme_admin_post(App &$a){
 	if (isset($_POST['vier-settings-submit'])){
 		set_config('vier', 'style', $_POST['vier_style']);
 		set_config('vier', 'show_pages', $_POST['vier_show_pages']);

@@ -2,7 +2,7 @@
 
 require_once('include/message.php');
 
-function wallmessage_post(&$a) {
+function wallmessage_post(App &$a) {
 
 	$replyto = get_my_url();
 	if(! $replyto) {
@@ -73,7 +73,7 @@ function wallmessage_post(&$a) {
 }
 
 
-function wallmessage_content(&$a) {
+function wallmessage_content(App &$a) {
 
 	if(! get_my_url()) {
 		notice( t('Permission denied.') . EOL);

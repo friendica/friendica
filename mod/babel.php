@@ -9,7 +9,7 @@ function visible_lf($s) {
 	return str_replace("\n",'<br />', $s);
 }
 
-function babel_content(&$a) {
+function babel_content(App &$a) {
 
 	$o .= '<h1>Babel Diagnostic</h1>';
 

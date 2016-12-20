@@ -10,7 +10,7 @@ require_once('include/crypto.php');
 require_once('include/diaspora.php');
 
 
-function receive_post(&$a) {
+function receive_post(App &$a) {
 
 
 	$enabled = intval(get_config('system','diaspora_enabled'));

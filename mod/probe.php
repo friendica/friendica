@@ -2,7 +2,7 @@
 
 require_once('include/Scrape.php');
 
-function probe_content(&$a) {
+function probe_content(App &$a) {
 
 	$o .= '<h3>Probe Diagnostic</h3>';
 

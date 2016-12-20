@@ -1,5 +1,5 @@
 <?php
-function share_init(&$a) {
+function share_init(App &$a) {
 
 	$post_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 	if((! $post_id) || (! local_user()))

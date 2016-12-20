@@ -1,6 +1,6 @@
 <?php
 
-function removeme_post(&$a) {
+function removeme_post(App &$a) {
 
 	if (! local_user()) {
 		return;
@@ -32,7 +32,7 @@ function removeme_post(&$a) {
 
 }
 
-function removeme_content(&$a) {
+function removeme_content(App &$a) {
 
 	if (! local_user()) {
 		goaway(z_root());

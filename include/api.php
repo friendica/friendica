@@ -133,7 +133,7 @@
 	 * @hook 'logged_in'
 	 * 		array $user	logged user record
 	 */
-	function api_login(&$a){
+	function api_login(App &$a){
 		// login with oauth
 		try{
 			$oauth = new FKOAuth1();
@@ -251,8 +251,8 @@
 	 * @param App $a
 	 * @return string API call result
 	 */
-	function api_call(&$a){
-		GLOBAL $API, $called_api;
+	function api_call(App &$a){
+		global $API, $called_api;
 
 		$type="json";
 		if (strpos($a->query_string, ".xml")>0) $type="xml";
@@ -3590,7 +3590,7 @@
 			intval($gid),
 			dbesc($name));
 		// error message if specified gid is not in database
-		if (count($rname) == 0)
+		if (!dbm::is_result($rname))
 			throw new BadRequestException('wrong group name');
 
 		// delete group
@@ -3629,7 +3629,7 @@
 			intval($uid),
 			dbesc($name));
 		// error message if specified group name already exists
-		if (count($rname) != 0)
+		if (dbm::is_result($rname))
 			throw new BadRequestException('group name already exists');
 
 		// check if specified group name is a deleted group
@@ -3637,7 +3637,7 @@
 			intval($uid),
 			dbesc($name));
 		// error message if specified group name already exists
-		if (count($rname) != 0)
+		if (dbm::is_result($rname))
 			$reactivate_group = true;
 
 		// create group

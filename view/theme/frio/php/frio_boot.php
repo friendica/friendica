@@ -13,7 +13,7 @@
  * 
  * @todo Check if this is really needed.
  */
-function load_page(&$a) {
+function load_page(App &$a) {
 	if(isset($_GET["mode"]) AND ($_GET["mode"] == "minimal")) {
 		require "view/theme/frio/minimal.php";
 	} elseif((isset($_GET["mode"]) AND ($_GET["mode"] == "none"))) {

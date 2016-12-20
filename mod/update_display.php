@@ -5,7 +5,7 @@
 require_once("mod/display.php");
 require_once("include/group.php");
 
-function update_display_content(&$a) {
+function update_display_content(App &$a) {
 
 	$profile_uid = intval($_GET["p"]);
 

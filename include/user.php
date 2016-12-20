@@ -241,7 +241,7 @@ function create_user($arr) {
 		WHERE `nickname` = '%s' ",
 		dbesc($nickname)
 	);
-	if((count($r) > 1) && $newuid) {
+	if ((dbm::is_result($r)) && (count($r) > 1) && $newuid) {
 		$result['message'] .= t('Nickname is already registered. Please choose another.') . EOL;
 		q("DELETE FROM `user` WHERE `uid` = %d",
 			intval($newuid)
@@ -262,7 +262,7 @@ function create_user($arr) {
 			intval($netpublish)
 
 		);
-		if($r === false) {
+		if ($r === false) {
 			$result['message'] .=  t('An error occurred creating your default profile. Please try again.') . EOL;
 			// Start fresh next time.
 			$r = q("DELETE FROM `user` WHERE `uid` = %d",
@@ -325,24 +325,27 @@ function create_user($arr) {
 
 			$r = $img->store($newuid, 0, $hash, $filename, t('Profile Photos'), 4 );
 
-			if($r === false)
+			if ($r === false) {
 				$photo_failure = true;
+			}
 
 			$img->scaleImage(80);
 
 			$r = $img->store($newuid, 0, $hash, $filename, t('Profile Photos'), 5 );
 
-			if($r === false)
+			if ($r === false) {
 				$photo_failure = true;
+			}
 
 			$img->scaleImage(48);
 
 			$r = $img->store($newuid, 0, $hash, $filename, t('Profile Photos'), 6 );
 
-			if($r === false)
+			if ($r === false) {
 				$photo_failure = true;
+			}
 
-			if(! $photo_failure) {
+			if (! $photo_failure) {
 				q("UPDATE `photo` SET `profile` = 1 WHERE `resource-id` = '%s' ",
 					dbesc($hash)
 				);

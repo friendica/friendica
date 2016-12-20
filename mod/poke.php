@@ -19,7 +19,7 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 
 
-function poke_init(&$a) {
+function poke_init(App &$a) {
 
 	if (! local_user()) {
 		return;
@@ -148,7 +148,7 @@ function poke_init(&$a) {
 
 
 
-function poke_content(&$a) {
+function poke_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

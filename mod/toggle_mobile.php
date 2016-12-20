@@ -1,6 +1,6 @@
 <?php
 
-function toggle_mobile_init(&$a) {
+function toggle_mobile_init(App &$a) {
 
 	if (isset($_GET['off'])) {
 		$_SESSION['show-mobile'] = false;

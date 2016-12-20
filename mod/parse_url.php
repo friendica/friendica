@@ -19,7 +19,7 @@ use \Friendica\ParseUrl;
 
 require_once("include/items.php");
 
-function parse_url_content(&$a) {
+function parse_url_content(App &$a) {
 
 	$text = null;
 	$str_tags = "";

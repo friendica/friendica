@@ -68,7 +68,7 @@ The code will be something like:
     file: mod/network.php
     <?php
     
-    function network_content(&$a) {
+    function network_content(App &$a) {
        $itemsmanager = new \Friendica\ItemsManager();
        $items = $itemsmanager->getAll();
     

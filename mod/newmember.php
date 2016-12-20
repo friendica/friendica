@@ -1,6 +1,6 @@
 <?php
 
-function newmember_content(&$a) {
+function newmember_content(App &$a) {
 
 
 	$o = '<h1>' . t('Welcome to Friendica') . '</h1>';

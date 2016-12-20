@@ -17,7 +17,7 @@ require_once('include/Scrape.php');
 require_once('include/Probe.php');
 require_once('include/group.php');
 
-function dfrn_request_init(&$a) {
+function dfrn_request_init(App &$a) {
 
 	if($a->argc > 1)
 		$which = $a->argv[1];
@@ -42,7 +42,7 @@ function dfrn_request_init(&$a) {
  * After logging in, we click 'submit' to approve the linkage.
  *
  */
-function dfrn_request_post(&$a) {
+function dfrn_request_post(App &$a) {
 
 	if(($a->argc != 2) || (! count($a->profile))) {
 		logger('Wrong count of argc or profiles: argc=' . $a->argc . ',profile()=' . count($a->profile));
@@ -654,7 +654,7 @@ function dfrn_request_post(&$a) {
 }
 
 
-function dfrn_request_content(&$a) {
+function dfrn_request_content(App &$a) {
 
 	if (($a->argc != 2) || (! count($a->profile))) {
 		return "";

@@ -2,7 +2,7 @@
 
 require_once('include/acl_selectors.php');
 
-function editpost_content(&$a) {
+function editpost_content(App &$a) {
 
 	$o = '';
 
@@ -23,7 +23,7 @@ function editpost_content(&$a) {
 		intval(local_user())
 	);
 
-	if (! count($itm)) {
+	if (! dbm::is_result($itm)) {
 		notice( t('Item not found') . EOL);
 		return;
 	}

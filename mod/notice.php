@@ -1,7 +1,7 @@
 <?php
 	/* identi.ca -> friendica items permanent-url compatibility */
 	
-	function notice_init(&$a){
+	function notice_init(App &$a){
 		$id = $a->argv[1];
 		$r = q("SELECT user.nickname FROM user LEFT JOIN item ON item.uid=user.uid WHERE item.id=%d",
 				intval($id)

@@ -10,8 +10,7 @@ require_once('include/Photo.php');
 /**
  * @param App $a
  */
-/// @TODO & is missing or App ?
-function fbrowser_content($a){
+function fbrowser_content(App &$a){
 
 	if (!local_user())
 		killme();

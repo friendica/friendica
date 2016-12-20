@@ -1,7 +1,7 @@
 <?php
 
 
-function lockview_content(&$a) {
+function lockview_content(App &$a) {
   
 	$type = (($a->argc > 1) ? $a->argv[1] : 0);
 	if (is_numeric($type)) {

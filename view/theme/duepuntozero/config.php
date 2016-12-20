@@ -5,7 +5,7 @@
 
 
 
-function theme_content(&$a){
+function theme_content(App &$a){
 	if (!local_user()) {
 		return;
 	}
@@ -16,8 +16,7 @@ function theme_content(&$a){
 	return clean_form($a, $colorset, $user);
 }
 
-function theme_post(&$a){
-
+function theme_post(App &$a){
 	if (! local_user()) {
 		return;
 	}
@@ -28,14 +27,14 @@ function theme_post(&$a){
 }
 
 
-function theme_admin(&$a){
+function theme_admin(App &$a){
 	$colorset = get_config( 'duepuntozero', 'colorset');
 	$user = false;
 
 	return clean_form($a, $colorset, $user);
 }
 
-function theme_admin_post(&$a){
+function theme_admin_post(App &$a){
 	if (isset($_POST['duepuntozero-settings-submit'])){
 		set_config('duepuntozero', 'colorset', $_POST['duepuntozero_colorset']);
 	}

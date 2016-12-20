@@ -4,7 +4,7 @@ require_once('include/Contact.php');
 require_once('include/socgraph.php');
 require_once('include/contact_selectors.php');
 
-function nogroup_init(&$a) {
+function nogroup_init(App &$a) {
 
 	if (! local_user()) {
 		return;
@@ -21,7 +21,7 @@ function nogroup_init(&$a) {
 }
 
 
-function nogroup_content(&$a) {
+function nogroup_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

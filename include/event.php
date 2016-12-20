@@ -206,7 +206,7 @@ function bbtoevent($s) {
 }
 
 
-function sort_by_date($a) {
+function sort_by_date(App &$a) {
 
 	usort($a,'ev_compare');
 	return $a;

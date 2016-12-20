@@ -2,7 +2,7 @@
 
 require_once('include/crypto.php');
 
-function xrd_init(&$a) {
+function xrd_init(App &$a) {
 
 	$uri = urldecode(notags(trim($_GET['uri'])));
 

@@ -679,7 +679,7 @@ function acl_lookup(&$a, $out_type = 'json') {
  * @param App $a
  * @return array with the search results
  */
-function navbar_complete(&$a) {
+function navbar_complete(App &$a) {
 
 //	logger('navbar_complete');
 

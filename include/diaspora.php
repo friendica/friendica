@@ -2290,7 +2290,7 @@ class diaspora {
 				$body = "[img]".unxmlify($photo->remote_photo_path).
 					unxmlify($photo->remote_photo_name)."[/img]\n".$body;
 
-			$datarray["object-type"] = ACTIVITY_OBJ_PHOTO;
+			$datarray["object-type"] = ACTIVITY_OBJ_IMAGE;
 		} else {
 			$datarray["object-type"] = ACTIVITY_OBJ_NOTE;
 

@@ -3,7 +3,7 @@
 require_once('include/Scrape.php');
 require_once('include/follow.php');
 
-function ostatus_subscribe_content(&$a) {
+function ostatus_subscribe_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

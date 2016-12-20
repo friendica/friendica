@@ -3,7 +3,7 @@
 require_once('include/datetime.php');
 
 
-function localtime_post(&$a) {
+function localtime_post(App &$a) {
 
 	$t = $_REQUEST['time'];
 	if(! $t)
@@ -16,7 +16,7 @@ function localtime_post(&$a) {
 
 }
 
-function localtime_content(&$a) {
+function localtime_content(App &$a) {
 	$t = $_REQUEST['time'];
 	if(! $t)
 		$t = 'now';

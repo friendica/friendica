@@ -11,7 +11,7 @@ $frio = "view/theme/frio";
 
 global $frio;
 
-function frio_init(&$a) {
+function frio_init(App &$a) {
 
 	// disable the events module link in the profile tab
 	$a->theme_events_in_profile = false;

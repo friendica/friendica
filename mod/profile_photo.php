@@ -2,7 +2,7 @@
 
 require_once("include/Photo.php");
 
-function profile_photo_init(&$a) {
+function profile_photo_init(App &$a) {
 
 	if (! local_user()) {
 		return;
@@ -13,7 +13,7 @@ function profile_photo_init(&$a) {
 }
 
 
-function profile_photo_post(&$a) {
+function profile_photo_post(App &$a) {
 
 	if (! local_user()) {
 		notice ( t('Permission denied.') . EOL );
@@ -73,22 +73,25 @@ function profile_photo_post(&$a) {
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 4, $is_default_profile);
 
-				if($r === false)
+				if ($r === false) {
 					notice ( sprintf(t('Image size reduction [%s] failed.'),"175") . EOL );
+				}
 
 				$im->scaleImage(80);
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 5, $is_default_profile);
 
-				if($r === false)
+				if ($r === false) {
 					notice( sprintf(t('Image size reduction [%s] failed.'),"80") . EOL );
+				}
 
 				$im->scaleImage(48);
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 6, $is_default_profile);
 
-				if($r === false)
+				if ($r === false) {
 					notice( sprintf(t('Image size reduction [%s] failed.'),"48") . EOL );
+				}
 
 				// If setting for the default profile, unset the profile photo flag from any other photos I own
 
@@ -170,7 +173,7 @@ function profile_photo_post(&$a) {
 
 
 if(! function_exists('profile_photo_content')) {
-function profile_photo_content(&$a) {
+function profile_photo_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
@@ -282,15 +285,17 @@ function profile_photo_content(&$a) {
 if(! function_exists('profile_photo_crop_ui_head')) {
 function profile_photo_crop_ui_head(&$a, $ph){
 	$max_length = get_config('system','max_image_length');
-	if(! $max_length)
+	if (! $max_length) {
 		$max_length = MAX_IMAGE_LENGTH;
-	if($max_length > 0)
+	}
+	if ($max_length > 0) {
 		$ph->scaleImage($max_length);
+	}
 
 	$width = $ph->getWidth();
 	$height = $ph->getHeight();
 
-	if($width < 175 || $height < 175) {
+	if ($width < 175 || $height < 175) {
 		$ph->scaleImageUp(200);
 		$width = $ph->getWidth();
 		$height = $ph->getHeight();
@@ -303,19 +308,21 @@ function profile_photo_crop_ui_head(&$a, $ph){
 
 	$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 0 );	
 
-	if($r)
+	if ($r) {
 		info( t('Image uploaded successfully.') . EOL );
-	else
+	} else {
 		notice( t('Image upload failed.') . EOL );
+	}
 
-	if($width > 640 || $height > 640) {
+	if ($width > 640 || $height > 640) {
 		$ph->scaleImage(640);
 		$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 1 );	
-		
-		if($r === false)
+
+		if ($r === false) {
 			notice( sprintf(t('Image size reduction [%s] failed.'),"640") . EOL );
-		else
+		} else {
 			$smallest = 1;
+		}
 	}
 
 	$a->config['imagecrop'] = $hash;

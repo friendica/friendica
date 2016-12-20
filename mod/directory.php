@@ -1,6 +1,6 @@
 <?php
 
-function directory_init(&$a) {
+function directory_init(App &$a) {
 	$a->set_pager_itemspage(60);
 
 	if(local_user()) {
@@ -20,14 +20,14 @@ function directory_init(&$a) {
 }
 
 
-function directory_post(&$a) {
+function directory_post(App &$a) {
 	if(x($_POST,'search'))
 		$a->data['search'] = $_POST['search'];
 }
 
 
 
-function directory_content(&$a) {
+function directory_content(App &$a) {
 	global $db;
 
 	require_once("mod/proxy.php");
