@@ -57,7 +57,9 @@ as the value of $top_child_total (this is done at the end of this file)
 
 <!-- TODO => Unknow block -->
 <div class="wall-item-decor" style="display:none;">
-	{{if $item.star}}<span class="icon s22 star {{$item.isstarred}}" id="starred-{{$item.id}}" title="{{$item.star.starred}}">{{$item.star.starred}}</span>{{/if}}
+	{{if $item.star}}
+	<span class="icon s22 star {{$item.isstarred}}" id="starred-{{$item.id}}" title="{{$item.star.starred}}">{{$item.star.starred}}</span>
+	{{/if}}
 	{{if $item.lock}}<span class="navicon lock fakelink" onclick="lockview(event,{{$item.id}});" title="{{$item.lock}}"></span><span class="fa fa-lock"></span>{{/if}}
 </div>
 <!-- ./TODO => Unknow block -->
