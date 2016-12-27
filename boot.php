@@ -762,7 +762,7 @@ class App {
 	function get_baseurl($ssl = false) {
 
 		// Is the function called statically?
-		if (!is_object($this))
+		if (!(isset($this) && get_class($this) == __CLASS__))
 			return(self::$a->get_baseurl($ssl));
 
 		$scheme = $this->scheme;
@@ -982,7 +982,7 @@ class App {
 	function remove_baseurl($url){
 
 		// Is the function called statically?
-		if (!is_object($this))
+		if (!(isset($this) && get_class($this) == __CLASS__))
 			return(self::$a->remove_baseurl($url));
 
 		$url = normalise_link($url);
@@ -1211,7 +1211,7 @@ class App {
 	function max_processes_reached() {
 
 		// Is the function called statically?
-		if (!is_object($this))
+		if (!(isset($this) && get_class($this) == __CLASS__))
 			return(self::$a->max_processes_reached());
 
 		if ($this->is_backend()) {
@@ -1246,7 +1246,7 @@ class App {
 	function maxload_reached() {
 
 		// Is the function called statically?
-		if (!is_object($this))
+		if (!(isset($this) && get_class($this) == __CLASS__))
 			return(self::$a->maxload_reached());
 
 		if ($this->is_backend()) {
