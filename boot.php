@@ -38,7 +38,7 @@ define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
 define ( 'FRIENDICA_VERSION',      '3.5.1-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1209      );
+define ( 'DB_UPDATE_VERSION',      1210      );
 
 /**
  * @brief Constant with a HTML line break.
@@ -809,7 +809,7 @@ class App {
 	function get_baseurl($ssl = false) {
 
 		// Is the function called statically?
-		if (!is_object($this)) {
+		if (!(isset($this) && get_class($this) == __CLASS__)) {
 			return self::$a->get_baseurl($ssl);
 		}
 
@@ -1053,7 +1053,7 @@ class App {
 	function remove_baseurl($orig_url){
 
 		// Is the function called statically?
-		if (!is_object($this)) {
+		if (!(isset($this) && get_class($this) == __CLASS__)) {
 			return(self::$a->remove_baseurl($orig_url));
 		}
 

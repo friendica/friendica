@@ -161,10 +161,12 @@
 		// fancyboxes
 		$("a.popupbox").colorbox({
 			'inline' : true,
-			'transition' : 'elastic'
+			'transition' : 'elastic',
+			'maxWidth' : '100%'
 		});
 		$("a.ajax-popupbox").colorbox({
-			'transition' : 'elastic'
+			'transition' : 'elastic',
+			'maxWidth' : '100%'
 		});
 
 		/* notifications template */

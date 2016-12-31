@@ -464,13 +464,13 @@ function db_definition($charset) {
 			);
 	$database["cache"] = array(
 			"fields" => array(
-					"k" => array("type" => "varchar(255)", "not null" => "1", "primary" => "1"),
+					"k" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"v" => array("type" => "text"),
 					"expire_mode" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"updated" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("k".db_index_suffix($charset)),
+					"PRIMARY" => array("k"),
 					"updated" => array("updated"),
 					"expire_mode_updated" => array("expire_mode", "updated"),
 					)
@@ -504,13 +504,13 @@ function db_definition($charset) {
 	$database["config"] = array(
 			"fields" => array(
 					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
-					"cat" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
-					"k" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"cat" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
+					"k" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"v" => array("type" => "text"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"cat_k" => array("UNIQUE", "cat(30)","k(30)"),
+					"cat_k" => array("UNIQUE", "cat", "k"),
 					)
 			);
 	$database["contact"] = array(
@@ -610,7 +610,7 @@ function db_definition($charset) {
 	$database["deliverq"] = array(
 			"fields" => array(
 					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
-					"cmd" => array("type" => "varchar(32)", "not null" => "1", "default" => ""),
+					"cmd" => array("type" => "varbinary(32)", "not null" => "1", "default" => ""),
 					"item" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"contact" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					),
@@ -1092,25 +1092,25 @@ function db_definition($charset) {
 			);
 	$database["oembed"] = array(
 			"fields" => array(
-					"url" => array("type" => "varchar(255)", "not null" => "1", "primary" => "1"),
+					"url" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"content" => array("type" => "text"),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("url".db_index_suffix($charset)),
+					"PRIMARY" => array("url"),
 					"created" => array("created"),
 					)
 			);
 	$database["parsed_url"] = array(
 			"fields" => array(
-					"url" => array("type" => "varchar(255)", "not null" => "1", "primary" => "1"),
+					"url" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"guessing" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0", "primary" => "1"),
 					"oembed" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0", "primary" => "1"),
 					"content" => array("type" => "text"),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("url".db_index_suffix($charset), "guessing", "oembed"),
+					"PRIMARY" => array("url", "guessing", "oembed"),
 					"created" => array("created"),
 					)
 			);
@@ -1118,13 +1118,13 @@ function db_definition($charset) {
 			"fields" => array(
 					"id" => array("type" => "int(11)", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
 					"uid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
-					"cat" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
-					"k" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"cat" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
+					"k" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"v" => array("type" => "mediumtext"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid_cat_k" => array("UNIQUE", "uid","cat(30)","k(30)"),
+					"uid_cat_k" => array("UNIQUE", "uid", "cat", "k"),
 					)
 			);
 	$database["photo"] = array(
@@ -1196,7 +1196,7 @@ function db_definition($charset) {
 	$database["process"] = array(
 			"fields" => array(
 					"pid" => array("type" => "int(10) unsigned", "not null" => "1", "primary" => "1"),
-					"command" => array("type" => "varchar(32)", "not null" => "1", "default" => ""),
+					"command" => array("type" => "varbinary(32)", "not null" => "1", "default" => ""),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
@@ -1330,7 +1330,7 @@ function db_definition($charset) {
 	$database["session"] = array(
 			"fields" => array(
 					"id" => array("type" => "bigint(20) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
-					"sid" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"sid" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"data" => array("type" => "text"),
 					"expire" => array("type" => "int(10) unsigned", "not null" => "1", "default" => "0"),
 					),

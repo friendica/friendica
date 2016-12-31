@@ -208,6 +208,9 @@ function photos_post(&$a) {
 				dbesc($album),
 				intval($page_owner_uid)
 			);
+			// Update the photo albums cache
+			photo_albums($page_owner_uid, true);
+
 			$newurl = str_replace(bin2hex($album),bin2hex($newalbum),$_SESSION['photo_return']);
 			goaway($newurl);
 			return; // NOTREACHED
@@ -294,7 +297,11 @@ function photos_post(&$a) {
 						proc_run(PRIORITY_HIGH, "include/notifier.php", "drop", $drop_id);
 				}
 			}
+
+			// Update the photo albums cache
+			photo_albums($page_owner_uid, true);
 		}
+
 		goaway('photos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
@@ -359,6 +366,9 @@ function photos_post(&$a) {
 				$url = App::get_baseurl();
 				$drop_id = intval($i[0]['id']);
 
+				// Update the photo albums cache
+				photo_albums($page_owner_uid, true);
+
 				if ($i[0]['visible'])
 					proc_run(PRIORITY_HIGH, "include/notifier.php", "drop", $drop_id);
 			}
@@ -370,10 +380,11 @@ function photos_post(&$a) {
 
 	if (($a->argc > 2) && ((x($_POST,'desc') !== false) || (x($_POST,'newtag') !== false)) || (x($_POST,'albname') !== false)) {
 
-		$desc        = ((x($_POST,'desc'))    ? notags(trim($_POST['desc']))    : '');
-		$rawtags     = ((x($_POST,'newtag'))  ? notags(trim($_POST['newtag']))  : '');
-		$item_id     = ((x($_POST,'item_id')) ? intval($_POST['item_id'])       : 0);
-		$albname     = ((x($_POST,'albname')) ? notags(trim($_POST['albname'])) : '');
+		$desc        = ((x($_POST,'desc'))      ? notags(trim($_POST['desc']))    : '');
+		$rawtags     = ((x($_POST,'newtag'))    ? notags(trim($_POST['newtag']))  : '');
+		$item_id     = ((x($_POST,'item_id'))   ? intval($_POST['item_id'])       : 0);
+		$albname     = ((x($_POST,'albname'))   ? notags(trim($_POST['albname'])) : '');
+		$origaname   = ((x($_POST,'origaname')) ? notags(trim($_POST['origaname'])) : '');
 		$str_group_allow   = perms2str($_POST['group_allow']);
 		$str_contact_allow = perms2str($_POST['contact_allow']);
 		$str_group_deny    = perms2str($_POST['group_deny']);
@@ -457,6 +468,10 @@ function photos_post(&$a) {
 				dbesc($resource_id),
 				intval($page_owner_uid)
 			);
+			// Update the photo albums cache if album name was changed
+			if ($albname !== $origaname) {
+				photo_albums($page_owner_uid, true);
+			}
 		}
 
 		/* Don't make the item visible if the only change was the album name */
@@ -913,6 +928,8 @@ function photos_post(&$a) {
 				. '[/url]';
 
 	$item_id = item_store($arr);
+	// Update the photo albums cache
+	photo_albums($page_owner_uid, true);
 
 	if ($visible)
 		proc_run(PRIORITY_HIGH, "include/notifier.php", 'wall-new', $item_id);

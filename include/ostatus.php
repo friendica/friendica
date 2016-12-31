@@ -596,21 +596,25 @@ class ostatus {
 		$last = get_config('system','ostatus_last_poll');
 
 		$poll_interval = intval(get_config('system','ostatus_poll_interval'));
-		if(! $poll_interval)
-			$poll_interval = OSTATUS_DEFAULT_POLL_INTERVAL;
+		if (!$poll_interval) {
+			$poll_interval = self::OSTATUS_DEFAULT_POLL_INTERVAL;
+		}
 
 		// Don't poll if the interval is set negative
-		if (($poll_interval < 0) AND !$override)
+		if (($poll_interval < 0) AND !$override) {
 			return;
+		}
 
 		if (!$mentions) {
 			$poll_timeframe = intval(get_config('system','ostatus_poll_timeframe'));
-			if (!$poll_timeframe)
-				$poll_timeframe = OSTATUS_DEFAULT_POLL_TIMEFRAME;
+			if (!$poll_timeframe) {
+				$poll_timeframe = self::OSTATUS_DEFAULT_POLL_TIMEFRAME;
+			}
 		} else {
 			$poll_timeframe = intval(get_config('system','ostatus_poll_timeframe'));
-			if (!$poll_timeframe)
-				$poll_timeframe = OSTATUS_DEFAULT_POLL_TIMEFRAME_MENTIONS;
+			if (!$poll_timeframe) {
+				$poll_timeframe = self::OSTATUS_DEFAULT_POLL_TIMEFRAME_MENTIONS;
+			}
 		}
 
 
@@ -626,15 +630,16 @@ class ostatus {
 
 		$start = date("Y-m-d H:i:s", time() - ($poll_timeframe * 60));
 
-		if ($mentions)
+		if ($mentions) {
 			$conversations = q("SELECT `term`.`oid`, `term`.`url`, `term`.`uid` FROM `term`
 						STRAIGHT_JOIN `thread` ON `thread`.`iid` = `term`.`oid` AND `thread`.`uid` = `term`.`uid`
 						WHERE `term`.`type` = 7 AND `term`.`term` > '%s' AND `thread`.`mention`
 						GROUP BY `term`.`url`, `term`.`uid` ORDER BY `term`.`term` DESC", dbesc($start));
-		else
+		} else {
 			$conversations = q("SELECT `oid`, `url`, `uid` FROM `term`
 						WHERE `type` = 7 AND `term` > '%s'
 						GROUP BY `url`, `uid` ORDER BY `term` DESC", dbesc($start));
+		}
 
 		foreach ($conversations AS $conversation) {
 			self::completion($conversation['url'], $conversation['uid']);

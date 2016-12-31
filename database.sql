@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 3.5.1-dev (Asparagus)
--- DB_UPDATE_VERSION 1208
+-- DB_UPDATE_VERSION 1210
 -- ------------------------------------------
 
 
@@ -54,11 +54,11 @@ CREATE TABLE IF NOT EXISTS `auth_codes` (
 -- TABLE cache
 --
 CREATE TABLE IF NOT EXISTS `cache` (
-	`k` varchar(255) NOT NULL,
+	`k` varbinary(255) NOT NULL,
 	`v` text,
 	`expire_mode` int(11) NOT NULL DEFAULT 0,
 	`updated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	 PRIMARY KEY(`k`(191)),
+	 PRIMARY KEY(`k`),
 	 INDEX `updated` (`updated`),
 	 INDEX `expire_mode_updated` (`expire_mode`,`updated`)
 ) DEFAULT CHARSET=utf8mb4;
@@ -94,11 +94,11 @@ CREATE TABLE IF NOT EXISTS `clients` (
 --
 CREATE TABLE IF NOT EXISTS `config` (
 	`id` int(10) unsigned NOT NULL auto_increment,
-	`cat` varchar(255) NOT NULL DEFAULT '',
-	`k` varchar(255) NOT NULL DEFAULT '',
+	`cat` varbinary(255) NOT NULL DEFAULT '',
+	`k` varbinary(255) NOT NULL DEFAULT '',
 	`v` text,
 	 PRIMARY KEY(`id`),
-	 UNIQUE INDEX `cat_k` (`cat`(30),`k`(30))
+	 UNIQUE INDEX `cat_k` (`cat`,`k`)
 ) DEFAULT CHARSET=utf8mb4;
 
 --
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `conv` (
 --
 CREATE TABLE IF NOT EXISTS `deliverq` (
 	`id` int(10) unsigned NOT NULL auto_increment,
-	`cmd` varchar(32) NOT NULL DEFAULT '',
+	`cmd` varbinary(32) NOT NULL DEFAULT '',
 	`item` int(11) NOT NULL DEFAULT 0,
 	`contact` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
@@ -682,10 +682,10 @@ CREATE TABLE IF NOT EXISTS `notify-threads` (
 -- TABLE oembed
 --
 CREATE TABLE IF NOT EXISTS `oembed` (
-	`url` varchar(255) NOT NULL,
+	`url` varbinary(255) NOT NULL,
 	`content` text,
 	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	 PRIMARY KEY(`url`(191)),
+	 PRIMARY KEY(`url`),
 	 INDEX `created` (`created`)
 ) DEFAULT CHARSET=utf8mb4;
 
@@ -693,12 +693,12 @@ CREATE TABLE IF NOT EXISTS `oembed` (
 -- TABLE parsed_url
 --
 CREATE TABLE IF NOT EXISTS `parsed_url` (
-	`url` varchar(255) NOT NULL,
+	`url` varbinary(255) NOT NULL,
 	`guessing` tinyint(1) NOT NULL DEFAULT 0,
 	`oembed` tinyint(1) NOT NULL DEFAULT 0,
 	`content` text,
 	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	 PRIMARY KEY(`url`(191),`guessing`,`oembed`),
+	 PRIMARY KEY(`url`,`guessing`,`oembed`),
 	 INDEX `created` (`created`)
 ) DEFAULT CHARSET=utf8mb4;
 
@@ -708,11 +708,11 @@ CREATE TABLE IF NOT EXISTS `parsed_url` (
 CREATE TABLE IF NOT EXISTS `pconfig` (
 	`id` int(11) NOT NULL auto_increment,
 	`uid` int(11) NOT NULL DEFAULT 0,
-	`cat` varchar(255) NOT NULL DEFAULT '',
-	`k` varchar(255) NOT NULL DEFAULT '',
+	`cat` varbinary(255) NOT NULL DEFAULT '',
+	`k` varbinary(255) NOT NULL DEFAULT '',
 	`v` mediumtext,
 	 PRIMARY KEY(`id`),
-	 UNIQUE INDEX `uid_cat_k` (`uid`,`cat`(30),`k`(30))
+	 UNIQUE INDEX `uid_cat_k` (`uid`,`cat`,`k`)
 ) DEFAULT CHARSET=utf8mb4;
 
 --
@@ -786,7 +786,7 @@ CREATE TABLE IF NOT EXISTS `poll_result` (
 --
 CREATE TABLE IF NOT EXISTS `process` (
 	`pid` int(10) unsigned NOT NULL,
-	`command` varchar(32) NOT NULL DEFAULT '',
+	`command` varbinary(32) NOT NULL DEFAULT '',
 	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	 PRIMARY KEY(`pid`),
 	 INDEX `command` (`command`)
@@ -920,7 +920,7 @@ CREATE TABLE IF NOT EXISTS `search` (
 --
 CREATE TABLE IF NOT EXISTS `session` (
 	`id` bigint(20) unsigned NOT NULL auto_increment,
-	`sid` varchar(255) NOT NULL DEFAULT '',
+	`sid` varbinary(255) NOT NULL DEFAULT '',
 	`data` text,
 	`expire` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
