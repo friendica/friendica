@@ -1,4 +1,6 @@
 <?php
+use \Friendica\Core\Config;
+
 require_once("include/oembed.php");
 require_once('include/event.php');
 require_once('include/map.php');
@@ -146,7 +148,7 @@ function cleancss($input) {
 		if (($char >= "a") and ($char <= "z"))
 			$cleaned .= $char;
 
-		if (!(strpos(" #;:0123456789-_", $char) === false))
+		if (!(strpos(" #;:0123456789-_.%", $char) === false))
 			$cleaned .= $char;
 	}
 
@@ -341,7 +343,7 @@ function bb_replace_images($body, $images) {
 	$newbody = $body;
 
 	$cnt = 0;
-	foreach($images as $image) {
+	foreach ($images as $image) {
 		// We're depending on the property of 'foreach' (specified on the PHP website) that
 		// it loops over the array starting from the first element and going sequentially
 		// to the last element
@@ -611,9 +613,7 @@ function GetProfileUsername($profile, $username, $compact = false, $getnetwork =
 }
 
 function bb_DiasporaLinks($match) {
-	$a = get_app();
-
-	return "[url=".$a->get_baseurl()."/display/".$match[1]."]".$match[2]."[/url]";
+	return "[url=".App::get_baseurl()."/display/".$match[1]."]".$match[2]."[/url]";
 }
 
 function bb_RemovePictureLinks($match) {
@@ -771,9 +771,6 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	$Text = str_replace("<", "&lt;", $Text);
 	$Text = str_replace(">", "&gt;", $Text);
 
-	// Allow non-breaking spaces to make code blocks more reliable
-	$Text = str_replace(array("\t","  "),array("&nbsp;&nbsp;&nbsp;&nbsp;","&nbsp;&nbsp;"),$Text);
-
 	// remove some newlines before the general conversion
 	$Text = preg_replace("/\s?\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","[share$1]$2[/share]",$Text);
 	$Text = preg_replace("/\s?\[quote(.*?)\]\s?(.*?)\s?\[\/quote\]\s?/ism","[quote$1]$2[/quote]",$Text);
@@ -895,8 +892,7 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	// we may need to restrict this further if it picks up too many strays
 	// link acct:user@host to a webfinger profile redirector
 
-	$Text = preg_replace('/acct:(.*?)@(.*?)([ ,])/', '<a href="' . $a->get_baseurl() . '/acctlink?addr=' . "$1@$2"
-		. '" target="extlink" >acct:' . "$1@$2$3" . '</a>',$Text);
+	$Text = preg_replace('/acct:([^@]+)@((?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63})/', '<a href="' . App::get_baseurl() . '/acctlink?addr=$1@$2" target="extlink">acct:$1@$2</a>',$Text);
 
 	// Perform MAIL Search
 	$Text = preg_replace("/\[mail\]([$MAILSearchString]*)\[\/mail\]/", '<a href="mailto:$1">$1</a>', $Text);
@@ -1065,9 +1061,9 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 			return(bb_ShareAttributes($match, $simplehtml));
 		},$Text);
 
-	$Text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism",'<br/><img src="' .$a->get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . t('Encrypted content') . '" /><br />', $Text);
-	$Text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism",'<br/><img src="' .$a->get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);
-	//$Text = preg_replace("/\[crypt=(.*?)\](.*?)\[\/crypt\]/ism",'<br/><img src="' .$a->get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);
+	$Text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism",'<br/><img src="' .App::get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . t('Encrypted content') . '" /><br />', $Text);
+	$Text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism",'<br/><img src="' .App::get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);
+	//$Text = preg_replace("/\[crypt=(.*?)\](.*?)\[\/crypt\]/ism",'<br/><img src="' .App::get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);
 
 
 	// Try to Oembed
@@ -1165,11 +1161,24 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	$Text = preg_replace('/\&quot\;/','"',$Text);
 
 	// fix any escaped ampersands that may have been converted into links
-	$Text = preg_replace("/\<([^>]*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$Text);
-	$Text = preg_replace("/\<([^>]*?)(src|href)=\"(?!http|ftp|mailto|gopher|cid)(.*?)\>/ism",'<$1$2="">',$Text);
+	$Text = preg_replace('/\<([^>]*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism', '<$1$2=$3&$4>', $Text);
 
-	if($saved_image)
+	// sanitizes src attributes (only relative redir URIs or http URLs)
+	$Text = preg_replace('#<([^>]*?)(src)="(?!http|redir)(.*?)"(.*?)>#ism', '<$1$2=""$4 class="invalid-src" title="' . t('Invalid source protocol') . '">', $Text);
+
+	// sanitize href attributes (only whitelisted protocols URLs)
+	// default value for backward compatibility
+	$allowed_link_protocols = Config::get('system', 'allowed_link_protocols', array('ftp', 'mailto', 'gopher', 'cid'));
+
+	// Always allowed protocol even if config isn't set or not including it
+	$allowed_link_protocols[] = 'http';
+
+	$regex = '#<([^>]*?)(href)="(?!' . implode('|', $allowed_link_protocols) . ')(.*?)"(.*?)>#ism';
+	$Text = preg_replace($regex, '<$1$2="javascript:void(0)"$4 class="invalid-href" title="' . t('Invalid link protocol') . '">', $Text);
+
+	if($saved_image) {
 		$Text = bb_replace_images($Text, $saved_image);
+	}
 
 	// Clean up the HTML by loading and saving the HTML with the DOM.
 	// Bad structured html can break a whole page.
