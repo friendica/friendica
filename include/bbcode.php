@@ -771,6 +771,9 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	$Text = str_replace("<", "&lt;", $Text);
 	$Text = str_replace(">", "&gt;", $Text);
 
+	// Allow non-breaking spaces to make code blocks more reliable
+	$Text = str_replace(array("\t","  "),array("&nbsp;&nbsp;&nbsp;&nbsp;","&nbsp;&nbsp;"),$Text);
+
 	// remove some newlines before the general conversion
 	$Text = preg_replace("/\s?\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","[share$1]$2[/share]",$Text);
 	$Text = preg_replace("/\s?\[quote(.*?)\]\s?(.*?)\s?\[\/quote\]\s?/ism","[quote$1]$2[/quote]",$Text);
