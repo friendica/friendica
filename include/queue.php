@@ -58,20 +58,21 @@ function queue_run(&$argv, &$argc){
 			$interval = false;
 
 		$r = q("select * from deliverq where 1");
-		if($r) {
-			foreach($r as $rr) {
+		if ($r) {
+			foreach ($r as $rr) {
 				logger('queue: deliverq');
 				proc_run(PRIORITY_HIGH,'include/delivery.php',$rr['cmd'],$rr['item'],$rr['contact']);
-				if($interval)
-				@time_sleep_until(microtime(true) + (float) $interval);
+				if($interval) {
+					time_sleep_until(microtime(true) + (float) $interval);
+				}
 			}
 		}
 
 		$r = q("SELECT `queue`.*, `contact`.`name`, `contact`.`uid` FROM `queue`
 			INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id`
 			WHERE `queue`.`created` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
-		if($r) {
-			foreach($r as $rr) {
+		if ($r) {
+			foreach ($r as $rr) {
 				logger('Removing expired queue item for ' . $rr['name'] . ', uid=' . $rr['uid']);
 				logger('Expired queue data :' . $rr['content'], LOGGER_DATA);
 			}
@@ -195,7 +196,7 @@ function queue_run(&$argv, &$argc){
 			case NETWORK_DIASPORA:
 				if($contact['notify']) {
 					logger('queue: diaspora_delivery: item '.$q_item['id'].' for '.$contact['name'].' <'.$contact['url'].'>');
-					$deliver_status = diaspora::transmit($owner,$contact,$data,$public,true);
+					$deliver_status = Diaspora::transmit($owner,$contact,$data,$public,true);
 
 					if($deliver_status == (-1)) {
 						update_queue_time($q_item['id']);

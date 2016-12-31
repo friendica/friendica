@@ -22,7 +22,7 @@ function wallmessage_post(&$a) {
 		dbesc($recipient)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		logger('wallmessage: no recipient');
 		return;
 	}
@@ -91,7 +91,7 @@ function wallmessage_content(&$a) {
 		dbesc($recipient)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('No recipient.') . EOL);
 		logger('wallmessage: no recipient');
 		return;

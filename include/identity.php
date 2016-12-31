@@ -138,7 +138,7 @@ function get_profiledata_by_nick($nickname, $uid = 0, $profile = 0) {
 					$r = q("SELECT `profile-id` FROM `contact` WHERE `id` = %d LIMIT 1",
 						intval($visitor['cid'])
 					);
-					if(count($r))
+					if (dbm::is_result($r))
 						$profile = $r[0]['profile-id'];
 					break;
 				}
@@ -159,7 +159,7 @@ function get_profiledata_by_nick($nickname, $uid = 0, $profile = 0) {
 				intval($profile_int)
 		);
 	}
-	if((!$r) && (!count($r))) {
+	if (!dbm::is_result($r)) {
 		$r = q("SELECT `contact`.`id` AS `contact_id`, `profile`.`uid` AS `profile_uid`, `profile`.*,
 				`contact`.`avatar-date` AS picdate, `contact`.`addr`, `user`.*
 			FROM `profile`
@@ -229,14 +229,17 @@ function profile_sidebar($profile, $block = 0) {
 
 	// Is the local user already connected to that user?
 	if ($connect AND local_user()) {
-		if (isset($profile["url"]))
+		if (isset($profile["url"])) {
 			$profile_url = normalise_link($profile["url"]);
-		else
-			$profile_url = normalise_link($a->get_baseurl()."/profile/".$profile["nickname"]);
+		}
+		else {
+			$profile_url = normalise_link(App::get_baseurl()."/profile/".$profile["nickname"]);
+		}
 
 		$r = q("SELECT * FROM `contact` WHERE NOT `pending` AND `uid` = %d AND `nurl` = '%s'",
 			local_user(), $profile_url);
-		if (count($r))
+
+		if (dbm::is_result($r))
 			$connect = false;
 	}
 
@@ -279,7 +282,7 @@ function profile_sidebar($profile, $block = 0) {
 
 	// show edit profile to yourself
 	if ($profile['uid'] == local_user() && feature_enabled(local_user(),'multi_profiles')) {
-		$profile['edit'] = array($a->get_baseurl(). '/profiles', t('Profiles'),"", t('Manage/edit profiles'));
+		$profile['edit'] = array(App::get_baseurl(). '/profiles', t('Profiles'),"", t('Manage/edit profiles'));
 		$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
 				local_user());
 
@@ -289,9 +292,9 @@ function profile_sidebar($profile, $block = 0) {
 			'entries' => array(),
 		);
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				$profile['menu']['entries'][] = array(
 					'photo' => $rr['thumb'],
 					'id' => $rr['id'],
@@ -308,7 +311,7 @@ function profile_sidebar($profile, $block = 0) {
 		}
 	}
 	if ($profile['uid'] == local_user() && !feature_enabled(local_user(),'multi_profiles')) {
-		$profile['edit'] = array($a->get_baseurl(). '/profiles/'.$profile['id'], t('Edit profile'),"", t('Edit profile'));
+		$profile['edit'] = array(App::get_baseurl(). '/profiles/'.$profile['id'], t('Edit profile'),"", t('Edit profile'));
 		$profile['menu'] = array(
 			'chg_photo' => t('Change profile photo'),
 			'cr_new' => null,
@@ -349,15 +352,15 @@ function profile_sidebar($profile, $block = 0) {
 	if ($profile['guid'] != "")
 		$diaspora = array(
 			'guid' => $profile['guid'],
-			'podloc' => $a->get_baseurl(),
+			'podloc' => App::get_baseurl(),
 			'searchable' => (($profile['publish'] && $profile['net-publish']) ? 'true' : 'false' ),
 			'nickname' => $profile['nickname'],
 			'fullname' => $profile['name'],
 			'firstname' => $firstname,
 			'lastname' => $lastname,
-			'photo300' => $a->get_baseurl() . '/photo/custom/300/' . $profile['uid'] . '.jpg',
-			'photo100' => $a->get_baseurl() . '/photo/custom/100/' . $profile['uid'] . '.jpg',
-			'photo50' => $a->get_baseurl() . '/photo/custom/50/'  . $profile['uid'] . '.jpg',
+			'photo300' => App::get_baseurl() . '/photo/custom/300/' . $profile['uid'] . '.jpg',
+			'photo100' => App::get_baseurl() . '/photo/custom/100/' . $profile['uid'] . '.jpg',
+			'photo50' => App::get_baseurl() . '/photo/custom/50/'  . $profile['uid'] . '.jpg',
 		);
 	else
 		$diaspora = false;
@@ -368,7 +371,7 @@ function profile_sidebar($profile, $block = 0) {
 		if(is_array($a->profile) AND !$a->profile['hide-friends']) {
 			$r = q("SELECT `gcontact`.`updated` FROM `contact` INNER JOIN `gcontact` WHERE `gcontact`.`nurl` = `contact`.`nurl` AND `self` AND `uid` = %d LIMIT 1",
 				intval($a->profile['uid']));
-			if(count($r))
+			if (dbm::is_result($r))
 				$updated =  date("c", strtotime($r[0]['updated']));
 
 			$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `hidden` AND NOT `archive`
@@ -378,7 +381,7 @@ function profile_sidebar($profile, $block = 0) {
 				dbesc(NETWORK_DIASPORA),
 				dbesc(NETWORK_OSTATUS)
 			);
-			if(count($r))
+			if (dbm::is_result($r))
 				$contacts = intval($r[0]['total']);
 		}
 	}
@@ -460,13 +463,13 @@ function get_birthdays() {
 			dbesc(datetime_convert('UTC','UTC','now'))
 	);
 
-	if($r && count($r)) {
+	if (dbm::is_result($r)) {
 		$total = 0;
 		$now = strtotime('now');
 		$cids = array();
 
 		$istoday = false;
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 			if(strlen($rr['name']))
 				$total ++;
 			if((strtotime($rr['start'] . ' +00:00') < $now) && (strtotime($rr['finish'] . ' +00:00') > $now))
@@ -489,7 +492,7 @@ function get_birthdays() {
 				$url = $rr['url'];
 				if($rr['network'] === NETWORK_DFRN) {
 					$sparkle = " sparkle";
-					$url = $a->get_baseurl() . '/redir/'  . $rr['cid'];
+					$url = App::get_baseurl() . '/redir/'  . $rr['cid'];
 				}
 
 				$rr['link'] = $url;
@@ -503,7 +506,7 @@ function get_birthdays() {
 	}
 	$tpl = get_markup_template("birthdays_reminder.tpl");
 	return replace_macros($tpl, array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$classtoday' => $classtoday,
 		'$count' => $total,
 		'$event_reminders' => t('Birthday Reminders'),
@@ -543,10 +546,10 @@ function get_events() {
 			dbesc(datetime_convert('UTC','UTC','now - 1 days'))
 	);
 
-	if($r && count($r)) {
+	if (dbm::is_result($r)) {
 		$now = strtotime('now');
 		$istoday = false;
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 			if(strlen($rr['name']))
 				$total ++;
 
@@ -587,7 +590,7 @@ function get_events() {
 
 	$tpl = get_markup_template("events_reminder.tpl");
 	return replace_macros($tpl, array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$classtoday' => $classtoday,
 		'$count' => count($r) - $skip,
 		'$event_reminders' => t('Event Reminders'),
@@ -684,8 +687,9 @@ function advanced_profile(&$a) {
 			$profile['forumlist'] = array( t('Forums:'), ForumManager::profile_advanced($uid));
 		}
 
-		if ($a->profile['uid'] == local_user())
-			$profile['edit'] = array($a->get_baseurl(). '/profiles/'.$a->profile['id'], t('Edit profile'),"", t('Edit profile'));
+		if ($a->profile['uid'] == local_user()) {
+			$profile['edit'] = array(App::get_baseurl(). '/profiles/'.$a->profile['id'], t('Edit profile'),"", t('Edit profile'));
+		}
 
 		return replace_macros($tpl, array(
 			'$title' => t('Profile'),
@@ -707,7 +711,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 	if(x($_GET,'tab'))
 		$tab = notags(trim($_GET['tab']));
 
-	$url = $a->get_baseurl() . '/profile/' . $nickname;
+	$url = App::get_baseurl() . '/profile/' . $nickname;
 
 	$tabs = array(
 		array(
@@ -728,7 +732,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		),
 		array(
 			'label' => t('Photos'),
-			'url'	=> $a->get_baseurl() . '/photos/' . $nickname,
+			'url'	=> App::get_baseurl() . '/photos/' . $nickname,
 			'sel'	=> ((!isset($tab)&&$a->argv[0]=='photos')?'active':''),
 			'title' => t('Photo Albums'),
 			'id' => 'photo-tab',
@@ -736,7 +740,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		),
 		array(
 			'label' => t('Videos'),
-			'url'	=> $a->get_baseurl() . '/videos/' . $nickname,
+			'url'	=> App::get_baseurl() . '/videos/' . $nickname,
 			'sel'	=> ((!isset($tab)&&$a->argv[0]=='videos')?'active':''),
 			'title' => t('Videos'),
 			'id' => 'video-tab',
@@ -748,7 +752,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 	if ($is_owner && $a->theme_events_in_profile) {
 			$tabs[] = array(
 				'label' => t('Events'),
-				'url'	=> $a->get_baseurl() . '/events',
+				'url'	=> App::get_baseurl() . '/events',
 				'sel' 	=>((!isset($tab)&&$a->argv[0]=='events')?'active':''),
 				'title' => t('Events and Calendar'),
 				'id' => 'events-tab',
@@ -759,7 +763,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 	} elseif (! $is_owner) {
 		$tabs[] = array(
 				'label' => t('Events'),
-				'url'	=> $a->get_baseurl() . '/cal/' . $nickname,
+				'url'	=> App::get_baseurl() . '/cal/' . $nickname,
 				'sel' 	=>((!isset($tab)&&$a->argv[0]=='cal')?'active':''),
 				'title' => t('Events and Calendar'),
 				'id' => 'events-tab',
@@ -770,7 +774,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 	if ($is_owner){
 		$tabs[] = array(
 			'label' => t('Personal Notes'),
-			'url'	=> $a->get_baseurl() . '/notes',
+			'url'	=> App::get_baseurl() . '/notes',
 			'sel' 	=>((!isset($tab)&&$a->argv[0]=='notes')?'active':''),
 			'title' => t('Only You Can See This'),
 			'id' => 'notes-tab',
@@ -781,7 +785,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 	if ((! $is_owner) && ((count($a->profile)) || (! $a->profile['hide-friends']))) {
 		$tabs[] = array(
 			'label' => t('Contacts'),
-			'url'	=> $a->get_baseurl() . '/viewcontacts/' . $nickname,
+			'url'	=> App::get_baseurl() . '/viewcontacts/' . $nickname,
 			'sel'	=> ((!isset($tab)&&$a->argv[0]=='viewcontacts')?'active':''),
 			'title' => t('Contacts'),
 			'id' => 'viewcontacts-tab',
@@ -813,7 +817,6 @@ function zrl_init(&$a) {
 
 		$result = Cache::get("gprobe:".$urlparts["host"]);
 		if (!is_null($result)) {
-			$result = unserialize($result);
 			if (in_array($result["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
 				logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
 				return;

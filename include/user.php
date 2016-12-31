@@ -130,7 +130,7 @@ function create_user($arr) {
 		$r = q("SELECT * FROM `user` WHERE `email` = '%s' LIMIT 1",
 			dbesc($email)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$result['message'] .= t('Cannot use that email.') . EOL;
 	}
 
@@ -143,7 +143,7 @@ function create_user($arr) {
 		WHERE `nickname` = '%s' LIMIT 1",
 		dbesc($nickname)
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 		$result['message'] .= t('Nickname is already registered. Please choose another.') . EOL;
 
 	// Check deleted accounts that had this nickname. Doesn't matter to us,
@@ -153,7 +153,7 @@ function create_user($arr) {
 		WHERE `username` = '%s' LIMIT 1",
 		dbesc($nickname)
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 		$result['message'] .= t('Nickname was once registered here and may not be re-used. Please choose another.') . EOL;
 
 	if(strlen($result['message'])) {
@@ -216,13 +216,13 @@ function create_user($arr) {
 		dbesc($default_service_class)
 	);
 
-	if($r) {
+	if ($r) {
 		$r = q("SELECT * FROM `user`
 			WHERE `username` = '%s' AND `password` = '%s' LIMIT 1",
 			dbesc($username),
 			dbesc($new_password_encoded)
 		);
-		if($r !== false && count($r)) {
+		if (dbm::is_result($r)) {
 			$u = $r[0];
 			$newuid = intval($r[0]['uid']);
 		}
@@ -269,28 +269,9 @@ function create_user($arr) {
 				intval($newuid));
 			return $result;
 		}
-		$r = q("INSERT INTO `contact` ( `uid`, `created`, `self`, `name`, `nick`, `photo`, `thumb`, `micro`, `blocked`, `pending`, `url`, `nurl`,
-			`addr`, `request`, `notify`, `poll`, `confirm`, `poco`, `name-date`, `uri-date`, `avatar-date`, `closeness` )
-			VALUES ( %d, '%s', 1, '%s', '%s', '%s', '%s', '%s', 0, 0, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 0 ) ",
-			intval($newuid),
-			datetime_convert(),
-			dbesc($username),
-			dbesc($nickname),
-			dbesc(z_root() . "/photo/profile/{$newuid}.jpg"),
-			dbesc(z_root() . "/photo/avatar/{$newuid}.jpg"),
-			dbesc(z_root() . "/photo/micro/{$newuid}.jpg"),
-			dbesc(z_root() . "/profile/$nickname"),
-			dbesc(normalise_link(z_root() . "/profile/$nickname")),
-			dbesc($nickname . '@' . substr(z_root(), strpos(z_root(),'://') + 3 )),
-			dbesc(z_root() . "/dfrn_request/$nickname"),
-			dbesc(z_root() . "/dfrn_notify/$nickname"),
-			dbesc(z_root() . "/dfrn_poll/$nickname"),
-			dbesc(z_root() . "/dfrn_confirm/$nickname"),
-			dbesc(z_root() . "/poco/$nickname"),
-			dbesc(datetime_convert()),
-			dbesc(datetime_convert()),
-			dbesc(datetime_convert())
-		);
+
+		// Create the self contact
+		user_create_self_contact($newuid);
 
 		// Create a group with no members. This allows somebody to use it
 		// right away as a default group for new contacts.
@@ -302,7 +283,7 @@ function create_user($arr) {
 			intval($newuid),
 			dbesc(t('Friends'))
 		);
-		if($r && count($r)) {
+		if (dbm::is_result($r)) {
 			$def_gid = $r[0]['id'];
 
 			q("UPDATE `user` SET `def_gid` = %d WHERE `uid` = %d",
@@ -377,6 +358,49 @@ function create_user($arr) {
 
 }
 
+/**
+ * @brief create the "self" contact from data from the user table
+ *
+ * @param integer $uid
+ */
+function user_create_self_contact($uid) {
+
+	// Only create the entry if it doesn't exist yet
+	$r = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `self`", intval($uid));
+	if (dbm::is_result($r)) {
+		return;
+	}
+
+	$r = q("SELECT `uid`, `username`, `nickname` FROM `user` WHERE `uid` = %d", intval($uid));
+	if (!dbm::is_result($r)) {
+		return;
+	}
+
+	$user = $r[0];
+
+	q("INSERT INTO `contact` (`uid`, `created`, `self`, `name`, `nick`, `photo`, `thumb`, `micro`, `blocked`, `pending`, `url`, `nurl`,
+		`addr`, `request`, `notify`, `poll`, `confirm`, `poco`, `name-date`, `uri-date`, `avatar-date`, `closeness`)
+		VALUES (%d, '%s', 1, '%s', '%s', '%s', '%s', '%s', 0, 0, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 0)",
+		intval($user['uid']),
+		datetime_convert(),
+		dbesc($user['username']),
+		dbesc($user['nickname']),
+		dbesc(z_root()."/photo/profile/".$user['uid'].".jpg"),
+		dbesc(z_root()."/photo/avatar/".$user['uid'].".jpg"),
+		dbesc(z_root()."/photo/micro/".$user['uid'].".jpg"),
+		dbesc(z_root()."/profile/".$user['nickname']),
+		dbesc(normalise_link(z_root()."/profile/".$user['nickname'])),
+		dbesc($user['nickname'].'@'.substr(z_root(), strpos(z_root(),'://') + 3)),
+		dbesc(z_root()."/dfrn_request/".$user['nickname']),
+		dbesc(z_root()."/dfrn_notify/".$user['nickname']),
+		dbesc(z_root()."/dfrn_poll/".$user['nickname']),
+		dbesc(z_root()."/dfrn_confirm/".$user['nickname']),
+		dbesc(z_root()."/poco/".$user['nickname']),
+		dbesc(datetime_convert()),
+		dbesc(datetime_convert()),
+		dbesc(datetime_convert())
+	);
+}
 
 /**
  * @brief send registration confiŕmation with the intormation that reg is pending

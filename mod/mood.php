@@ -7,8 +7,9 @@ require_once('include/items.php');
 
 function mood_init(&$a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$uid = local_user();
 	$verb = notags(trim($_GET['verb']));
@@ -36,7 +37,7 @@ function mood_init(&$a) {
 			intval($parent),
 			intval($uid)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$parent_uri = $r[0]['uri'];
 			$private    = $r[0]['private'];
 			$allow_cid  = $r[0]['allow_cid'];
@@ -91,7 +92,7 @@ function mood_init(&$a) {
 	$item_id = item_store($arr);
 	if($item_id) {
 		q("UPDATE `item` SET `plink` = '%s' WHERE `uid` = %d AND `id` = %d",
-			dbesc($a->get_baseurl() . '/display/' . $poster['nickname'] . '/' . $item_id),
+			dbesc(App::get_baseurl() . '/display/' . $poster['nickname'] . '/' . $item_id),
 			intval($uid),
 			intval($item_id)
 		);
@@ -110,7 +111,7 @@ function mood_init(&$a) {
 
 function mood_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}

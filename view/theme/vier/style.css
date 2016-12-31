@@ -24,69 +24,69 @@ img {
 }
 
 #pending-update {
-  float:right;
-  color: #ffffff;
-  font-weight: bold;
-  background-color: #FF0000;
-  padding: 0em 0.3em;
+	float:right;
+	color: #ffffff;
+	font-weight: bold;
+	background-color: #FF0000;
+	padding: 0em 0.3em;
 }
 
 .admin.linklist {
-  border: 0px;
-  padding: 0px;
-  list-style: none;
-  margin-top: 0px;
+	border: 0px;
+	padding: 0px;
+	list-style: none;
+	margin-top: 0px;
 }
 
 .admin.link {
-  list-style-position: inside;
-  font-size: 1em;
-/*  padding-left: 5px;
-    margin: 5px; */
+	list-style-position: inside;
+	font-size: 1em;
+/*        padding-left: 5px;
+	margin: 5px; */
 }
 
 #adminpage dl {
-  clear: left;
-  margin-bottom: 2px;
-  padding-bottom: 2px;
-  border-bottom: 1px solid black;
+	clear: left;
+	margin-bottom: 2px;
+	padding-bottom: 2px;
+	border-bottom: 1px solid black;
 }
 
 #adminpage dt {
-  width: 200px;
-  float: left;
-  font-weight: bold;
+	width: 200px;
+	float: left;
+	font-weight: bold;
 }
 
 #adminpage dd {
-  margin-left: 200px;
+	margin-left: 200px;
 }
 #adminpage h3 {
-  border-bottom: 1px solid #898989;
-  margin-bottom: 5px;
-  margin-top: 10px;
+	border-bottom: 1px solid #898989;
+	margin-bottom: 5px;
+	margin-top: 10px;
 }
 
 #adminpage .submit {
-  clear:left;
+	clear:left;
 }
 
 #adminpage #pluginslist {
-  margin: 0px; padding: 0px;
+	margin: 0px; padding: 0px;
 }
 
 #adminpage .plugin {
-  list-style: none;
-  display: block;
-  /* border: 1px solid #888888; */
-  padding: 1em;
-  margin-bottom: 5px;
-  clear: left;
+	list-style: none;
+	display: block;
+	/* border: 1px solid #888888; */
+	padding: 1em;
+	margin-bottom: 5px;
+	clear: left;
 }
 
 #adminpage .toggleplugin {
-  float:left;
-  margin-right: 1em;
+	float:left;
+	margin-right: 1em;
 }
 
 #adminpage table {width:100%; border-bottom: 1px solid #000000; margin: 5px 0px;}
@@ -1583,6 +1583,11 @@ section.minimal {
   margin-right: 1em;
   cursor: pointer;
 }
+.wall-item-container .wall-item-actions-social a.active,
+.wall-item-container .wall-item-actions-isevent a.active {
+	color: #36C;
+}
+
 .wall-item-container .wall-item-actions-tools {
   float: right;
   width: 80px;
@@ -1638,7 +1643,7 @@ section.minimal {
   max-width: calc(100% - 1px);
 }
 
-.children .wall-item-comment-wrapper textarea, 
+.children .wall-item-comment-wrapper textarea,
 .wall-item-container.thread_level_3 .wall-item-comment-wrapper textarea,
 .wall-item-container.thread_level_4 .wall-item-comment-wrapper textarea,
 .wall-item-container.thread_level_5 .wall-item-comment-wrapper textarea,

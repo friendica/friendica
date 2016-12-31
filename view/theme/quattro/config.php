@@ -6,21 +6,23 @@
 
 
 function theme_content(&$a){
-	if(!local_user())
-		return;		
-	
+	if (!local_user()) {
+		return;
+	}
+
 	$align = get_pconfig(local_user(), 'quattro', 'align' );
 	$color = get_pconfig(local_user(), 'quattro', 'color' );
-    $tfs = get_pconfig(local_user(),"quattro","tfs");
-    $pfs = get_pconfig(local_user(),"quattro","pfs");    
-    
+	$tfs = get_pconfig(local_user(),"quattro","tfs");
+	$pfs = get_pconfig(local_user(),"quattro","pfs");
+
 	return quattro_form($a,$align, $color, $tfs, $pfs);
 }
 
 function theme_post(&$a){
-	if(! local_user())
+	if (! local_user()) {
 		return;
-	
+	}
+
 	if (isset($_POST['quattro-settings-submit'])){
 		set_pconfig(local_user(), 'quattro', 'align', $_POST['quattro_align']);
 		set_pconfig(local_user(), 'quattro', 'color', $_POST['quattro_color']);
@@ -48,7 +50,7 @@ function theme_admin_post(&$a){
 	}
 }
 
-
+/// @TODO $a is no longer used here
 function quattro_form(&$a, $align, $color, $tfs, $pfs){
 	$colors = array(
 		"dark"=>"Quattro", 
@@ -62,7 +64,7 @@ function quattro_form(&$a, $align, $color, $tfs, $pfs){
 	$t = get_markup_template("theme_settings.tpl" );
 	$o .= replace_macros($t, array(
 		'$submit' => t('Submit'),
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$title' => t("Theme settings"),
 		'$align' => array('quattro_align', t('Alignment'), $align, '', array('left'=>t('Left'), 'center'=>t('Center'))),
 		'$color' => array('quattro_color', t('Color scheme'), $color, '', $colors),

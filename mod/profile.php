@@ -13,8 +13,8 @@ function profile_init(&$a) {
 		$which = htmlspecialchars($a->argv[1]);
 	else {
 		$r = q("select nickname from user where blocked = 0 and account_expired = 0 and account_removed = 0 and verified = 1 order by rand() limit 1");
-		if(count($r)) {
-			goaway($a->get_baseurl() . '/profile/' . $r[0]['nickname']);
+		if (dbm::is_result($r)) {
+			goaway(App::get_baseurl() . '/profile/' . $r[0]['nickname']);
 		}
 		else {
 			logger('profile error: mod_profile ' . $a->query_string, LOGGER_DEBUG);
@@ -56,15 +56,16 @@ function profile_init(&$a) {
 	}
 
 	$a->page['htmlhead'] .= '<meta name="dfrn-global-visibility" content="' . (($a->profile['net-publish']) ? 'true' : 'false') . '" />' . "\r\n" ;
-	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . $a->get_baseurl() . '/dfrn_poll/' . $which .'" />' . "\r\n" ;
+	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . App::get_baseurl() . '/dfrn_poll/' . $which .'" />' . "\r\n" ;
 	$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $a->get_hostname() . (($a->path) ? '/' . $a->path : ''));
-	$a->page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . $a->get_baseurl() . '/xrd/?uri=' . $uri . '" />' . "\r\n";
-	header('Link: <' . $a->get_baseurl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
+	$a->page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . App::get_baseurl() . '/xrd/?uri=' . $uri . '" />' . "\r\n";
+	header('Link: <' . App::get_baseurl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
 
 	$dfrn_pages = array('request', 'confirm', 'notify', 'poll');
-	foreach($dfrn_pages as $dfrn)
-		$a->page['htmlhead'] .= "<link rel=\"dfrn-{$dfrn}\" href=\"".$a->get_baseurl()."/dfrn_{$dfrn}/{$which}\" />\r\n";
-	$a->page['htmlhead'] .= "<link rel=\"dfrn-poco\" href=\"".$a->get_baseurl()."/poco/{$which}\" />\r\n";
+	foreach ($dfrn_pages as $dfrn) {
+		$a->page['htmlhead'] .= "<link rel=\"dfrn-{$dfrn}\" href=\"".App::get_baseurl()."/dfrn_{$dfrn}/{$which}\" />\r\n";
+	}
+	$a->page['htmlhead'] .= "<link rel=\"dfrn-poco\" href=\"".App::get_baseurl()."/poco/{$which}\" />\r\n";
 
 }
 
@@ -136,7 +137,7 @@ function profile_content(&$a, $update = 0) {
 			intval($contact_id),
 			intval($a->profile['profile_uid'])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
 			$remote_contact = true;
 		}
@@ -181,8 +182,8 @@ function profile_content(&$a, $update = 0) {
 		$commpage = (($a->profile['page-flags'] == PAGE_COMMUNITY) ? true : false);
 		$commvisitor = (($commpage && $remote_contact == true) ? true : false);
 
-		$a->page['aside'] .= posted_date_widget($a->get_baseurl(true) . '/profile/' . $a->profile['nickname'],$a->profile['profile_uid'],true);
-		$a->page['aside'] .= categories_widget($a->get_baseurl(true) . '/profile/' . $a->profile['nickname'],(x($category) ? xmlify($category) : ''));
+		$a->page['aside'] .= posted_date_widget(App::get_baseurl(true) . '/profile/' . $a->profile['nickname'],$a->profile['profile_uid'],true);
+		$a->page['aside'] .= categories_widget(App::get_baseurl(true) . '/profile/' . $a->profile['nickname'],(x($category) ? xmlify($category) : ''));
 
 		if(can_write_wall($a,$a->profile['profile_uid'])) {
 
@@ -256,21 +257,21 @@ function profile_content(&$a, $update = 0) {
 			    AND `thread`.`wall` = 1
 			    $sql_extra $sql_extra2 ",
 			    intval($a->profile['profile_uid'])
-		    );
+			);
 
-	        if(count($r)) {
-		        $a->set_pager_total($r[0]['total']);
+			if (dbm::is_result($r)) {
+				$a->set_pager_total($r[0]['total']);
 			}
 		}
 
 		//  check if we serve a mobile device and get the user settings
 		//  accordingly
 		if ($a->is_mobile) {
-		    $itemspage_network = get_pconfig(local_user(),'system','itemspage_mobile_network');
-		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 10);
+			$itemspage_network = get_pconfig(local_user(),'system','itemspage_mobile_network');
+			$itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 10);
 		} else {
-		    $itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
-		    $itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 20);
+			$itemspage_network = get_pconfig(local_user(),'system','itemspage_network');
+			$itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 20);
 		}
 		//  now that we have the user settings, see if the theme forces
 		//  a maximum item number which is lower then the user choice

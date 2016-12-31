@@ -12,7 +12,7 @@ function share_init(&$a) {
 		intval($post_id),
 		intval(local_user())
 	);
-	if(! count($r) || ($r[0]['private'] == 1))
+	if(! dbm::is_result($r) || ($r[0]['private'] == 1))
 		killme();
 
 	if (!intval(get_config('system','old_share'))) {

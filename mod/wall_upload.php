@@ -15,7 +15,7 @@ function wall_upload_post(&$a, $desktopmode = true) {
 				dbesc($nick)
 			);
 
-			if(! count($r)){
+			if (! dbm::is_result($r)) {
 				if ($r_json) {
 					echo json_encode(array('error'=>t('Invalid request.')));
 					killme();
@@ -63,7 +63,7 @@ function wall_upload_post(&$a, $desktopmode = true) {
 					intval($contact_id),
 					intval($page_owner_uid)
 				);
-				if(count($r)) {
+				if (dbm::is_result($r)) {
 					$can_post = true;
 					$visitor = $contact_id;
 				}
@@ -260,9 +260,9 @@ function wall_upload_post(&$a, $desktopmode = true) {
 		$picture["width"] = $r[0]["width"];
 		$picture["height"] = $r[0]["height"];
 		$picture["type"] = $r[0]["type"];
-		$picture["albumpage"] = $a->get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash;
-		$picture["picture"] = $a->get_baseurl()."/photo/{$hash}-0.".$ph->getExt();
-		$picture["preview"] = $a->get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt();
+		$picture["albumpage"] = App::get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash;
+		$picture["picture"] = App::get_baseurl()."/photo/{$hash}-0.".$ph->getExt();
+		$picture["preview"] = App::get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt();
 
 		if ($r_json) {
 			echo json_encode(array('picture'=>$picture));
@@ -282,14 +282,14 @@ function wall_upload_post(&$a, $desktopmode = true) {
 //if we get the signal then return the image url info in BBCODE, otherwise this outputs the info and bails (for the ajax image uploader on wall post)
 	if ($_REQUEST['hush']!='yeah') {
 		if(local_user() && (! feature_enabled(local_user(),'richtext') || x($_REQUEST['nomce'])) ) {
-			echo  "\n\n" . '[url=' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]\n\n";
+			echo  "\n\n" . '[url=' . App::get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . App::get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]\n\n";
 		}
 		else {
-			echo  '<br /><br /><a href="' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '" ><img src="' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."\" alt=\"$basename\" /></a><br /><br />";
+			echo  '<br /><br /><a href="' . App::get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '" ><img src="' . App::get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."\" alt=\"$basename\" /></a><br /><br />";
 		}
 	}
 	else {
-		$m = '[url='.$a->get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash.'][img]'.$a->get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]";
+		$m = '[url='.App::get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash.'][img]'.App::get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]";
 		return($m);
 	}
 /* mod Waitman Gobble NO WARRANTY */

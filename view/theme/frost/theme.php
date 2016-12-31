@@ -21,11 +21,13 @@ function frost_content_loaded(&$a) {
 	// I could do this in style.php, but by having the CSS in a file the browser will cache it,
 	// making pages load faster
 	if( $a->module === 'home' || $a->module === 'login' || $a->module === 'register' || $a->module === 'lostpass' ) {
-		//$a->page['htmlhead'] = str_replace('$stylesheet', $a->get_baseurl() . '/view/theme/frost/login-style.css', $a->page['htmlhead']);
-		$a->theme['stylesheet'] = $a->get_baseurl() . '/view/theme/frost/login-style.css';
+		//$a->page['htmlhead'] = str_replace('$stylesheet', App::get_baseurl() . '/view/theme/frost/login-style.css', $a->page['htmlhead']);
+		$a->theme['stylesheet'] = App::get_baseurl() . '/view/theme/frost/login-style.css';
 	}
-	if( $a->module === 'login' )
+
+	if ( $a->module === 'login' ) {
 		$a->page['end'] .= '<script type="text/javascript"> $(document).ready(function() { $("#id_" + window.loginName).focus();} );</script>';
+	}
 
 }
 

@@ -2,7 +2,9 @@
 require_once('view/theme/frio/php/Image.php');
 
 function theme_content(&$a) {
-	if(!local_user()) { return;}
+	if (!local_user()) {
+		return;
+	}
 	$arr = array();
 
 	$arr["schema"]		= get_pconfig(local_user(),'frio', 'schema');
@@ -18,7 +20,10 @@ function theme_content(&$a) {
 }
 
 function theme_post(&$a) {
-	if(!local_user()) { return;}
+	if (!local_user()) {
+		return;
+	}
+
 	if (isset($_POST['frio-settings-submit'])) {
 		set_pconfig(local_user(), 'frio', 'schema',		$_POST["frio_schema"]);
 		set_pconfig(local_user(), 'frio', 'nav_bg',		$_POST["frio_nav_bg"]);
@@ -57,7 +62,7 @@ function frio_form(&$a, $arr) {
 	$t = get_markup_template('theme_settings.tpl');
 	$o .= replace_macros($t, array(
 		'$submit'		=> t('Submit'),
-		'$baseurl'		=> $a->get_baseurl(),
+		'$baseurl'		=> App::get_baseurl(),
 		'$title'		=> t("Theme settings"),
 		'$schema'		=> array('frio_schema',		t("Select scheme"),			$arr["schema"], '', $scheme_choices),
 		'$nav_bg'		=> array_key_exists("nav_bg", $disable) ? "" : array('frio_nav_bg',		t('Navigation bar background color'),	$arr['nav_bg']),

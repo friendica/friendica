@@ -81,8 +81,8 @@ function display_init(&$a) {
 
 			$profiledata = display_fetchauthor($a, $r[0]);
 
-			if (strstr(normalise_link($profiledata["url"]), normalise_link($a->get_baseurl()))) {
-				$nickname = str_replace(normalise_link($a->get_baseurl())."/profile/", "", normalise_link($profiledata["url"]));
+			if (strstr(normalise_link($profiledata["url"]), normalise_link(App::get_baseurl()))) {
+				$nickname = str_replace(normalise_link(App::get_baseurl())."/profile/", "", normalise_link($profiledata["url"]));
 
 				if (($nickname != $a->user["nickname"])) {
 					$r = qu("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
@@ -184,7 +184,7 @@ function display_fetchauthor($a, $item) {
 
 	if (local_user()) {
 		if (in_array($profiledata["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
-			$profiledata["remoteconnect"] = $a->get_baseurl()."/follow?url=".urlencode($profiledata["url"]);
+			$profiledata["remoteconnect"] = App::get_baseurl()."/follow?url=".urlencode($profiledata["url"]);
 		}
 	} elseif ($profiledata["network"] == NETWORK_DFRN) {
 		$connect = str_replace("/profile/", "/dfrn_request/", $profiledata["url"]);

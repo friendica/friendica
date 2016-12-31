@@ -14,7 +14,7 @@ function oauth_get_client($request){
 			AND `tokens`.`id`='%s' AND `tokens`.`scope`='request'",
 			dbesc($token));
 
-	if (!count($r))
+	if (!dbm::is_result($r))
 		return null;
 
 	return $r[0];
@@ -22,7 +22,7 @@ function oauth_get_client($request){
 
 function api_post(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -84,7 +84,7 @@ function api_content(&$a) {
 		}
 
 
-		if(! local_user()) {
+		if (! local_user()) {
 			/// @TODO We need login form to redirect to this page
 			notice( t('Please login to continue.') . EOL );
 			return login(false,$request->get_parameters());

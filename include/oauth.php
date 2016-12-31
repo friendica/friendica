@@ -23,7 +23,7 @@ class FKOAuthDataStore extends OAuthDataStore {
 		$r = q("SELECT client_id, pw, redirect_uri FROM clients WHERE client_id='%s'",
 			dbesc($consumer_key)
 		);
-		if (count($r))
+		if (dbm::is_result($r))
 			return new OAuthConsumer($r[0]['client_id'],$r[0]['pw'],$r[0]['redirect_uri']);
 		return null;
   }
@@ -35,7 +35,7 @@ class FKOAuthDataStore extends OAuthDataStore {
 			dbesc($token_type),
 			dbesc($token)
 		);
-		if (count($r)){
+		if (dbm::is_result($r)){
 			$ot=new OAuthToken($r[0]['id'],$r[0]['secret']);
 			$ot->scope=$r[0]['scope'];
 			$ot->expires = $r[0]['expires'];
@@ -52,7 +52,7 @@ class FKOAuthDataStore extends OAuthDataStore {
 			dbesc($nonce),
 			intval($timestamp)
 		);
-		if (count($r))
+		if (dbm::is_result($r))
 			return new OAuthToken($r[0]['id'],$r[0]['secret']);
 		return null;
   }
@@ -136,7 +136,7 @@ class FKOAuth1 extends OAuthServer {
 		$r = q("SELECT * FROM `user` WHERE uid=%d AND `blocked` = 0 AND `account_expired` = 0 AND `account_removed` = 0 AND `verified` = 1 LIMIT 1",
 			intval($uid)
 		);
-		if(count($r)){
+		if (dbm::is_result($r)){
 			$record = $r[0];
 		} else {
 		   logger('FKOAuth1::loginUser failure: ' . print_r($_SERVER,true), LOGGER_DEBUG);
@@ -148,7 +148,7 @@ class FKOAuth1 extends OAuthServer {
 		$_SESSION['mobile-theme'] = get_pconfig($record['uid'], 'system', 'mobile_theme');
 		$_SESSION['authenticated'] = 1;
 		$_SESSION['page_flags'] = $record['page-flags'];
-		$_SESSION['my_url'] = $a->get_baseurl() . '/profile/' . $record['nickname'];
+		$_SESSION['my_url'] = App::get_baseurl() . '/profile/' . $record['nickname'];
 		$_SESSION['addr'] = $_SERVER['REMOTE_ADDR'];
 		$_SESSION["allow_api"] = true;
 
@@ -162,7 +162,7 @@ class FKOAuth1 extends OAuthServer {
 
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %s AND `self` = 1 LIMIT 1",
 			intval($_SESSION['uid']));
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$a->contact = $r[0];
 			$a->cid = $r[0]['id'];
 			$_SESSION['cid'] = $a->cid;
@@ -219,7 +219,7 @@ class FKOAuth2 extends OAuth2 {
 		$r = q("SELECT client_id, expires, scope FROM tokens WHERE id = '%s'",
 				dbesc($oauth_token));
 	
-		if (count($r))
+		if (dbm::is_result($r))
 			return $r[0];
 		return null;
 	}
@@ -247,7 +247,7 @@ class FKOAuth2 extends OAuth2 {
 		$r = q("SELECT id, client_id, redirect_uri, expires, scope FROM auth_codes WHERE id = '%s'",
 				dbesc($code));
 		
-		if (count($r))
+		if (dbm::is_result($r))
 			return $r[0];
 		return null;
 	}

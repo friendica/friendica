@@ -16,7 +16,7 @@
 				<div class="col-md-8 ">
 					<div class="form-group form-group-search">
 						<input type="text" name="search" id="contacts-search" class="search-input form-control form-search" onfocus="this.select();" value="{{$search|escape:'html'}}" placeholder="{{$desc}}"/>
-						<button class="btn btn-default btn-sm form-button-search" type="submit" name="submit" id="contacts-search-submit" value="{{$submit|escape:'html'}}">{{$submit}}</button>
+						<button class="btn btn-default btn-sm form-button-search" type="submit" id="contacts-search-submit">{{$submit}}</button>
 					</div>
 				</div>
 				<div class="col-md-2"></div>

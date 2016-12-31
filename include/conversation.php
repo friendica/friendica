@@ -78,7 +78,7 @@ function item_redir_and_replace_images($body, $images, $cid) {
 	$newbody .= $origbody;
 
 	$cnt = 0;
-	foreach($images as $image) {
+	foreach ($images as $image) {
 		// We're depending on the property of 'foreach' (specified on the PHP website) that
 		// it loops over the array starting from the first element and going sequentially
 		// to the last element
@@ -109,7 +109,7 @@ function localize_item(&$item){
 		$r = q("SELECT * from `item`,`contact` WHERE
 				`item`.`contact-id`=`contact`.`id` AND `item`.`uri`='%s';",
 				 dbesc($item['parent-uri']));
-		if(count($r)==0) return;
+		if (!dbm::is_result($r)) return;
 		$obj=$r[0];
 
 		$author  = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
@@ -245,7 +245,7 @@ function localize_item(&$item){
 		$r = q("SELECT * from `item`,`contact` WHERE
 		`item`.`contact-id`=`contact`.`id` AND `item`.`uri`='%s';",
 		 dbesc($item['parent-uri']));
-		if(count($r)==0) return;
+		if (!dbm::is_result($r)) return;
 		$obj=$r[0];
 
 		$author  = '[url=' . zrl($item['author-link']) . ']' . $item['author-name'] . '[/url]';
@@ -294,7 +294,7 @@ function localize_item(&$item){
 					dbesc($obj->id),
 					intval($item['uid'])
 			);
-			if(count($r) && $r[0]['plink']) {
+			if (dbm::is_result($r) && $r[0]['plink']) {
 				$target = $r[0];
 				$Bname = $target['author-name'];
 				$Blink = $target['author-link'];
@@ -324,11 +324,13 @@ function localize_item(&$item){
 	// add sparkle links to appropriate permalinks
 
 	$x = stristr($item['plink'],'/display/');
-	if($x) {
+	if ($x) {
 		$sparkle = false;
 		$y = best_link_url($item,$sparkle,true);
-		if(strstr($y,'/redir/'))
+
+		if (strstr($y,'/redir/')) {
 			$item['plink'] = $y . '?f=&url=' . $item['plink'];
+		}
 	}
 
 
@@ -439,7 +441,7 @@ These Fields are not added below (yet). They are here to for bug search.
 function item_joins() {
 
 	return "STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND
-		NOT `contact`.`blocked`
+		(NOT `contact`.`blocked` OR `contact`.`pending`)
 		LEFT JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id`
 		LEFT JOIN `contact` AS `owner` ON `owner`.`id`=`item`.`owner-id`";
 }
@@ -864,7 +866,7 @@ function conversation(&$a, $items, $mode, $update, $preview = false) {
 	}
 
 	$o = replace_macros($page_template, array(
-		'$baseurl' => $a->get_baseurl($ssl_state),
+		'$baseurl' => App::get_baseurl($ssl_state),
 		'$return_path' => $a->query_string,
 		'$live_update' => $live_update_div,
 		'$remove' => t('remove'),
@@ -885,7 +887,7 @@ function best_link_url($item,&$sparkle,$ssl_state = false) {
 	$clean_url = normalise_link($item['author-link']);
 
 	if (local_user()) {
-		$r = q("SELECT `id` FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `nurl` = '%s' LIMIT 1",
+		$r = q("SELECT `id` FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `nurl` = '%s' AND NOT `pending` LIMIT 1",
 			dbesc(NETWORK_DFRN), intval(local_user()), dbesc(normalise_link($clean_url)));
 		if ($r) {
 			$best_url = 'redir/'.$r[0]['id'];
@@ -1064,6 +1066,9 @@ function builtin_activity_puller($item, &$conv_responses) {
 			else
 				$conv_responses[$mode][$item['thr-parent']] ++;
 
+			if((local_user()) && (local_user() == $item['uid']) && ($item['self']))
+				$conv_responses[$mode][$item['thr-parent'] . '-self'] = 1;
+
 			$conv_responses[$mode][$item['thr-parent'] . '-l'][] = $url;
 
 			// there can only be one activity verb per item so if we found anything, we can stop looking
@@ -1180,7 +1185,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 	$tpl = get_markup_template('jot-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
 		'$newpost' => 'true',
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$geotag' => $geotag,
 		'$nickname' => $x['nickname'],
@@ -1198,7 +1203,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 	$tpl = get_markup_template('jot-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, array(
 		'$newpost' => 'true',
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$geotag' => $geotag,
 		'$nickname' => $x['nickname'],
@@ -1264,7 +1269,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		'$ptyp' => (($notes_cid) ? 'note' : 'wall'),
 		'$content' => $x['content'],
 		'$post_id' => $x['post_id'],
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$defloc' => $x['default_location'],
 		'$visitor' => $x['visitor'],
 		'$pvisit' => (($notes_cid) ? 'none' : $x['visitor']),
@@ -1443,6 +1448,7 @@ function get_responses($conv_responses,$response_verbs,$ob,$item) {
 		$ret[$v] = array();
 		$ret[$v]['count'] = ((x($conv_responses[$v],$item['uri'])) ? $conv_responses[$v][$item['uri']] : '');
 		$ret[$v]['list']  = ((x($conv_responses[$v],$item['uri'])) ? $conv_responses[$v][$item['uri'] . '-l'] : '');
+		$ret[$v]['self']  = ((x($conv_responses[$v],$item['uri'])) ? $conv_responses[$v][$item['uri'] . '-self'] : '0');
 		if(count($ret[$v]['list']) > MAX_LIKERS) {
 			$ret[$v]['list_part'] = array_slice($ret[$v]['list'], 0, MAX_LIKERS);
 			array_push($ret[$v]['list_part'], '<a href="#" data-toggle="modal" data-target="#' . $v . 'Modal-'

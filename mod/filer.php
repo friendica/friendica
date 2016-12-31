@@ -7,7 +7,7 @@ require_once('include/items.php');
 
 function filer_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		killme();
 	}
 

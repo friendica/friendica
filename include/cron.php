@@ -12,6 +12,7 @@ if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 
 require_once("boot.php");
 require_once("include/photos.php");
+require_once("include/user.php");
 
 
 function cron_run(&$argv, &$argc){
@@ -42,7 +43,7 @@ function cron_run(&$argv, &$argc){
 
 	// Don't check this stuff if the function is called by the poller
 	if (App::callstack() != "poller_run") {
-		if (App::maxload_reached())
+		if ($a->maxload_reached())
 			return;
 		if (App::is_already_running('cron', 'include/cron.php', 540))
 			return;
@@ -433,7 +434,7 @@ function cron_repair_diaspora(&$a) {
 	$r = q("SELECT `id`, `url` FROM `contact`
 		WHERE `network` = '%s' AND (`batch` = '' OR `notify` = '' OR `poll` = '' OR pubkey = '')
 			ORDER BY RAND() LIMIT 50", dbesc(NETWORK_DIASPORA));
-	if ($r) {
+	if (dbm::is_result($r)) {
 		foreach ($r AS $contact) {
 			if (poco_reachable($contact["url"])) {
 				$data = probe_url($contact["url"]);
@@ -454,6 +455,16 @@ function cron_repair_diaspora(&$a) {
  */
 function cron_repair_database() {
 
+	// Sometimes there seem to be issues where the "self" contact vanishes.
+	// We haven't found the origin of the problem by now.
+	$r = q("SELECT `uid` FROM `user` WHERE NOT EXISTS (SELECT `uid` FROM `contact` WHERE `contact`.`uid` = `user`.`uid` AND `contact`.`self`)");
+	if (dbm::is_result($r)) {
+		foreach ($r AS $user) {
+			logger('Create missing self contact for user '.$user['uid']);
+			user_create_self_contact($user['uid']);
+		}
+	}
+
 	// Set the parent if it wasn't set. (Shouldn't happen - but does sometimes)
 	// This call is very "cheap" so we can do it at any time without a problem
 	q("UPDATE `item` INNER JOIN `item` AS `parent` ON `parent`.`uri` = `item`.`parent-uri` AND `parent`.`uid` = `item`.`uid` SET `item`.`parent` = `parent`.`id` WHERE `item`.`parent` = 0");
@@ -463,7 +474,7 @@ function cron_repair_database() {
 
 	// Update the global contacts for local users
 	$r = q("SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`");
-	if ($r)
+	if (dbm::is_result($r))
 		foreach ($r AS $user)
 			update_gcontact_for_user($user["uid"]);
 

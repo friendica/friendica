@@ -10,6 +10,7 @@ require_once('include/Photo.php');
 /**
  * @param App $a
  */
+/// @TODO & is missing or App ?
 function fbrowser_content($a){
 
 	if (!local_user())
@@ -63,7 +64,7 @@ function fbrowser_content($a){
 			);
 
 			function _map_files1($rr){
-				global $a;
+				$a = get_app();
 				$types = Photo::supportedTypes();
 				$ext = $types[$rr['type']];
 
@@ -83,9 +84,9 @@ function fbrowser_content($a){
 					$scale = $rr['loq'];
 
 				return array(
-					$a->get_baseurl() . '/photos/' . $a->user['nickname'] . '/image/' . $rr['resource-id'],
+					App::get_baseurl() . '/photos/' . $a->user['nickname'] . '/image/' . $rr['resource-id'],
 					$filename_e,
-					$a->get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . $scale . '.'. $ext
+					App::get_baseurl() . '/photo/' . $rr['resource-id'] . '-' . $scale . '.'. $ext
 				);
 			}
 			$files = array_map("_map_files1", $r);
@@ -93,47 +94,47 @@ function fbrowser_content($a){
 			$tpl = get_markup_template($template_file);
 
 			$o =  replace_macros($tpl, array(
-				'$type' => 'image',
-				'$baseurl' => $a->get_baseurl(),
-				'$path' => $path,
-				'$folders' => $albums,
-				'$files' =>$files,
-				'$cancel' => t('Cancel'),
+				'$type'     => 'image',
+				'$baseurl'  => App::get_baseurl(),
+				'$path'     => $path,
+				'$folders'  => $albums,
+				'$files'    => $files,
+				'$cancel'   => t('Cancel'),
 				'$nickname' => $a->user['nickname'],
 			));
 
 
 			break;
 		case "file":
-			if ($a->argc==2){
+			if ($a->argc==2) {
 				$files = q("SELECT `id`, `filename`, `filetype` FROM `attach` WHERE `uid` = %d ",
 					intval(local_user())
 				);
 
-				function _map_files2($rr){ global $a;
+				function _map_files2($rr){
+					$a = get_app();
 					list($m1,$m2) = explode("/",$rr['filetype']);
 					$filetype = ( (file_exists("images/icons/$m1.png"))?$m1:"zip");
 
-					if($a->theme['template_engine'] === 'internal') {
+					if ($a->theme['template_engine'] === 'internal') {
 						$filename_e = template_escape($rr['filename']);
-					}
-					else {
+					} else {
 						$filename_e = $rr['filename'];
 					}
 
-					return array( $a->get_baseurl() . '/attach/' . $rr['id'], $filename_e, $a->get_baseurl() . '/images/icons/16/' . $filetype . '.png');
+					return array( App::get_baseurl() . '/attach/' . $rr['id'], $filename_e, App::get_baseurl() . '/images/icons/16/' . $filetype . '.png');
 				}
 				$files = array_map("_map_files2", $files);
 
 
 				$tpl = get_markup_template($template_file);
 				$o = replace_macros($tpl, array(
-					'$type' => 'file',
-					'$baseurl' => $a->get_baseurl(),
-					'$path' => array( array( "", t("Files")) ),
-					'$folders' => false,
-					'$files' =>$files,
-					'$cancel' => t('Cancel'),
+					'$type'     => 'file',
+					'$baseurl'  => App::get_baseurl(),
+					'$path'     => array( array( "", t("Files")) ),
+					'$folders'  => false,
+					'$files'    =>$files,
+					'$cancel'   => t('Cancel'),
 					'$nickname' => $a->user['nickname'],
 				));
 

@@ -8,16 +8,18 @@ require_once('mod/contacts.php');
 function allfriends_content(&$a) {
 
 	$o = '';
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
-	if($a->argc > 1)
+	if ($a->argc > 1) {
 		$cid = intval($a->argv[1]);
+	}
 
-	if(! $cid)
+	if (! $cid) {
 		return;
+	}
 
 	$uid = $a->user[uid];
 
@@ -26,8 +28,9 @@ function allfriends_content(&$a) {
 		intval(local_user())
 	);
 
-	if(! count($c))
+	if (! count($c)) {
 		return;
+	}
 
 	$a->page['aside'] = "";
 	profile_load($a, "", 0, get_contact_details_by_url($c[0]["url"]));
@@ -39,14 +42,14 @@ function allfriends_content(&$a) {
 
 	$r = all_friends(local_user(), $cid, $a->pager['start'], $a->pager['itemspage']);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		$o .= t('No friends to display.');
 		return $o;
 	}
 
 	$id = 0;
 
-	foreach($r as $rr) {
+	foreach ($r as $rr) {
 
 		//get further details of the contact
 		$contact_details = get_contact_details_by_url($rr['url'], $uid, $rr);
@@ -60,7 +63,7 @@ function allfriends_content(&$a) {
 			$photo_menu = contact_photo_menu ($rr);
 		}
 		else {
-			$connlnk = $a->get_baseurl() . '/follow/?url=' . $rr['url'];
+			$connlnk = App::get_baseurl() . '/follow/?url=' . $rr['url'];
 			$photo_menu = array(
 				'profile' => array(t("View Profile"), zrl($rr['url'])),
 				'follow' => array(t("Connect/Follow"), $connlnk)

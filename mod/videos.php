@@ -59,7 +59,7 @@ function videos_init(&$a) {
 
 			if($albums_visible) {
 				$o .= '<div id="sidebar-photos-albums" class="widget">';
-				$o .= '<h3>' . '<a href="' . $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '">' . t('Photo Albums') . '</a></h3>';
+				$o .= '<h3>' . '<a href="' . App::get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '">' . t('Photo Albums') . '</a></h3>';
 
 				$o .= '<ul>';
 				foreach($albums as $album) {
@@ -74,7 +74,7 @@ function videos_init(&$a) {
 				$o .= '</ul>';
 			}
 			if(local_user() && $a->data['user']['uid'] == local_user()) {
-				$o .= '<div id="photo-albums-upload-link"><a href="' . $a->get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/upload" >' .t('Upload New Photos') . '</a></div>';
+				$o .= '<div id="photo-albums-upload-link"><a href="' . App::get_baseurl() . '/photos/' . $a->data['user']['nickname'] . '/upload" >' .t('Upload New Photos') . '</a></div>';
 			}
 
 			$o .= '</div>';
@@ -87,12 +87,12 @@ function videos_init(&$a) {
 
 		$tpl = get_markup_template("videos_head.tpl");
 		$a->page['htmlhead'] .= replace_macros($tpl,array(
-			'$baseurl' => $a->get_baseurl(),
+			'$baseurl' => App::get_baseurl(),
 		));
 
 		$tpl = get_markup_template("videos_end.tpl");
 		$a->page['end'] .= replace_macros($tpl,array(
-			'$baseurl' => $a->get_baseurl(),
+			'$baseurl' => App::get_baseurl(),
 		));
 
 	}
@@ -106,13 +106,17 @@ function videos_post(&$a) {
 
 	$owner_uid = $a->data['user']['uid'];
 
-	if (local_user() != $owner_uid) goaway($a->get_baseurl() . '/videos/' . $a->data['user']['nickname']);
+	if (local_user() != $owner_uid) {
+		goaway(App::get_baseurl() . '/videos/' . $a->data['user']['nickname']);
+	}
 
-	if(($a->argc == 2) && x($_POST,'delete') && x($_POST, 'id')) {
+	if (($a->argc == 2) && x($_POST,'delete') && x($_POST, 'id')) {
 
 		// Check if we should do HTML-based delete confirmation
 		if(!x($_REQUEST,'confirm')) {
-			if(x($_REQUEST,'canceled')) goaway($a->get_baseurl() . '/videos/' . $a->data['user']['nickname']);
+			if (x($_REQUEST,'canceled')) {
+				goaway(App::get_baseurl() . '/videos/' . $a->data['user']['nickname']);
+			}
 
 			$drop_url = $a->query_string;
 			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), array(
@@ -140,7 +144,7 @@ function videos_post(&$a) {
 			dbesc($video_id)
 		);
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			q("DELETE FROM `attach` WHERE `uid` = %d AND `id` = '%s'",
 				intval(local_user()),
 				dbesc($video_id)
@@ -149,7 +153,7 @@ function videos_post(&$a) {
 				dbesc($video_id),
 				intval(local_user())
 			);
-			#echo "<pre>"; var_dump($i); killme();
+			//echo "<pre>"; var_dump($i); killme();
 			if(count($i)) {
 				q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 					dbesc(datetime_convert()),
@@ -160,7 +164,7 @@ function videos_post(&$a) {
 				create_tags_from_itemuri($i[0]['uri'], local_user());
 				delete_thread_uri($i[0]['uri'], local_user());
 
-				$url = $a->get_baseurl();
+				$url = App::get_baseurl();
 				$drop_id = intval($i[0]['id']);
 
 				if($i[0]['visible'])
@@ -168,11 +172,11 @@ function videos_post(&$a) {
 			}
 		}
 
-		goaway($a->get_baseurl() . '/videos/' . $a->data['user']['nickname']);
+		goaway(App::get_baseurl() . '/videos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
-    goaway($a->get_baseurl() . '/videos/' . $a->data['user']['nickname']);
+	goaway(App::get_baseurl() . '/videos/' . $a->data['user']['nickname']);
 
 }
 
@@ -259,7 +263,7 @@ function videos_content(&$a) {
 					intval($contact_id),
 					intval($owner_uid)
 				);
-				if(count($r)) {
+				if (dbm::is_result($r)) {
 					$can_post = true;
 					$contact = $r[0];
 					$remote_contact = true;
@@ -287,7 +291,7 @@ function videos_content(&$a) {
 				intval($contact_id),
 				intval($owner_uid)
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$contact = $r[0];
 				$remote_contact = true;
 			}
@@ -347,7 +351,7 @@ function videos_content(&$a) {
 		$sql_extra GROUP BY hash",
 		intval($a->data['user']['uid'])
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$a->set_pager_total(count($r));
 		$a->set_pager_itemspage(20);
 	}
@@ -363,9 +367,9 @@ function videos_content(&$a) {
 
 
 	$videos = array();
-	if(count($r)) {
-		foreach($r as $rr) {
-			if($a->theme['template_engine'] === 'internal') {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
+			if ($a->theme['template_engine'] === 'internal') {
 				$alt_e = template_escape($rr['filename']);
 				$name_e = template_escape($rr['album']);
 			}
@@ -376,13 +380,13 @@ function videos_content(&$a) {
 
 			$videos[] = array(
 				'id'       => $rr['id'],
-				'link'  	=> $a->get_baseurl() . '/videos/' . $a->data['user']['nickname'] . '/video/' . $rr['resource-id'],
-				'title' 	=> t('View Video'),
-				'src'     	=> $a->get_baseurl() . '/attach/' . $rr['id'] . '?attachment=0',
-				'alt'     	=> $alt_e,
-				'mime'		=> $rr['filetype'],
-				'album'	=> array(
-					'link'  => $a->get_baseurl() . '/videos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
+				'link'     => App::get_baseurl() . '/videos/' . $a->data['user']['nickname'] . '/video/' . $rr['resource-id'],
+				'title'    => t('View Video'),
+				'src'      => App::get_baseurl() . '/attach/' . $rr['id'] . '?attachment=0',
+				'alt'      => $alt_e,
+				'mime'     => $rr['filetype'],
+				'album' => array(
+					'link'  => App::get_baseurl() . '/videos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
 					'name'  => $name_e,
 					'alt'   => t('View Album'),
 				),
@@ -393,11 +397,11 @@ function videos_content(&$a) {
 
 	$tpl = get_markup_template('videos_recent.tpl');
 	$o .= replace_macros($tpl, array(
-		'$title' => t('Recent Videos'),
-		'$can_post' => $can_post,
-		'$upload' => array(t('Upload New Videos'), $a->get_baseurl().'/videos/'.$a->data['user']['nickname'].'/upload'),
-		'$videos' => $videos,
-        '$delete_url' => (($can_post)?$a->get_baseurl().'/videos/'.$a->data['user']['nickname']:False)
+		'$title'      => t('Recent Videos'),
+		'$can_post'   => $can_post,
+		'$upload'     => array(t('Upload New Videos'), App::get_baseurl().'/videos/'.$a->data['user']['nickname'].'/upload'),
+		'$videos'     => $videos,
+		'$delete_url' => (($can_post)?App::get_baseurl().'/videos/'.$a->data['user']['nickname']:False)
 	));
 
 

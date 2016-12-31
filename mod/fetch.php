@@ -6,7 +6,9 @@ require_once("include/crypto.php");
 require_once("include/diaspora.php");
 require_once("include/xml.php");
 
-function fetch_init($a){
+/// @TODO You always make it like this: function foo(&$a)
+/// @TODO This means that the value of $a can be changed in anything, remove & and use App as type-hint
+function fetch_init(&$a){
 
 	if (($a->argc != 3) OR (!in_array($a->argv[1], array("post", "status_message", "reshare")))) {
 		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
@@ -50,12 +52,12 @@ function fetch_init($a){
 	}
 	$user = $r[0];
 
-	$status = diaspora::build_status($item[0], $user);
-	$xml = diaspora::build_post_xml($status["type"], $status["message"]);
+	$status = Diaspora::build_status($item[0], $user);
+	$xml = Diaspora::build_post_xml($status["type"], $status["message"]);
 
 	// Send the envelope
 	header("Content-Type: application/magic-envelope+xml; charset=utf-8");
-	echo diaspora::build_magic_envelope($xml, $user);
+	echo Diaspora::build_magic_envelope($xml, $user);
 
 	killme();
 }

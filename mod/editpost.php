@@ -6,14 +6,14 @@ function editpost_content(&$a) {
 
 	$o = '';
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
 	$post_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 
-	if(! $post_id) {
+	if (! $post_id) {
 		notice( t('Item not found') . EOL);
 		return;
 	}
@@ -23,7 +23,7 @@ function editpost_content(&$a) {
 		intval(local_user())
 	);
 
-	if(! count($itm)) {
+	if (! count($itm)) {
 		notice( t('Item not found') . EOL);
 		return;
 	}
@@ -42,7 +42,7 @@ function editpost_content(&$a) {
 
 	$tpl = get_markup_template('jot-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$ispublic' => '&nbsp;', // t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
@@ -51,7 +51,7 @@ function editpost_content(&$a) {
 
 	$tpl = get_markup_template('jot-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$editselect' =>  (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$ispublic' => '&nbsp;', // t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
@@ -78,7 +78,7 @@ function editpost_content(&$a) {
 		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1",
 			intval(local_user())
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$mail_enabled = true;
 			if(intval($r[0]['pubmail']))
 				$pubmail_enabled = true;
@@ -126,7 +126,7 @@ function editpost_content(&$a) {
 		'$ptyp' => $itm[0]['type'],
 		'$content' => undo_post_tagging($itm[0]['body']),
 		'$post_id' => $post_id,
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$defloc' => $a->user['default-location'],
 		'$visitor' => 'none',
 		'$pvisit' => 'none',

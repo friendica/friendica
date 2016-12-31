@@ -1,5 +1,8 @@
 <?php
 namespace Friendica\Core;
+
+use dbm;
+
 /**
  * @file include/Core/PConfig.php
  * @brief contains the class with methods for the management
@@ -28,12 +31,12 @@ class PConfig {
 	 * @return void
 	 */
 	public static function load($uid, $family) {
-		global $a;
+		$a = get_app();
 		$r = q("SELECT `v`,`k` FROM `pconfig` WHERE `cat` = '%s' AND `uid` = %d ORDER BY `cat`, `k`, `id`",
 			dbesc($family),
 			intval($uid)
 		);
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				$k = $rr['k'];
 				$a->config[$uid][$family][$k] = $rr['v'];
@@ -65,7 +68,7 @@ class PConfig {
 	 */
 	public static function get($uid, $family, $key, $default_value = null, $refresh = false) {
 
-		global $a;
+		$a = get_app();
 
 		if (!$refresh) {
 			// Looking if the whole family isn't set
@@ -120,7 +123,7 @@ class PConfig {
 	 */
 	public static function set($uid, $family, $key, $value) {
 
-		global $a;
+		$a = get_app();
 
 		$stored = self::get($uid, $family, $key);
 
@@ -171,7 +174,7 @@ class PConfig {
 	 */
 	public static function delete($uid,$family,$key) {
 
-		global $a;
+		$a = get_app();
 
 		if (x($a->config[$uid][$family], $key)) {
 			unset($a->config[$uid][$family][$key]);

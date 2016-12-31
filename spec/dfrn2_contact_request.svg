@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="1458" height="2526" viewBox="0 0 1458 2526">
+<style type="text/css"><![CDATA[
+text { font:12px Dialog; }
+]]></style>
+<rect x="-485" y="-485" width="2428" height="3496" style="fill:rgb(255,255,255);stroke:none" />
+<clipPath id="clip1"><path d="M468,32 L867,32 L867,101 L468,101 L468,32 Z" /></clipPath>
+<path d="M470,34 L470,98 L864,98 L864,34 Z" style="fill:rgb(202,221,254);stroke:none" clip-path="url(#clip1)" />
+<clipPath id="clip2"><path d="M468,32 L867,32 L867,101 L468,101 L468,32 Z" /></clipPath>
+<path d="M470,34 L470,98 L864,98 L864,34 Z" style="fill:none;stroke:rgb(61,83,127)" clip-path="url(#clip2)" />
+<text x="503" y="71" style="font:18px Open Sans">Friendica - Contact request</text>
+<image x="0" y="0" width="834" height="74" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA0IAAABKCAYAAACW5eSEAAAEYElEQVR42u3dyW+VVRjAYRKNf4BSRFwwCImEQEAs2tpbCjIoIkJLC1KMgGAISlBQDGPgKhWQWKCATG3BtiiiRGIMCw0gaQspCGUokxJKyz+AsuiGvt7WIcatq9s8T/Iubr6czdn9cr7v3G7dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKBLi4j/NQAAAGkfQnkHrndPHGgqyam5cjE1bZ1z4GpjouZKsuOZEAIAALpUCD1fc2F6VsWFexnD58Xgov0xeevVmFR6JfJWHY2hi/dETlXT3UR101QhBAAAdIkQGrWvsShRdbl92LzD8djEszF8YVMU7WqJop0tUZiagu3NMXL1D5Fbfbl9VNWlIiEEAACkdQglKs5lJCov/pb9/tGYVHorxpfcjGm7W2L6npaYUd4aeWtuRL+ZjTFkflP0G1sZo6qbfs/+/EIPIQQAAKRvCO1pTA55a0dkL70W+WW349W9ralJRVBFa+Rvb46cVdej/+wL0XPK2XhkXEMMLF4fid3nS4QQAACQtiGUs/NcY9+RZfHMkiudr8LNKG+J4srWmLmvNcZtvBkjP7wReclr8UTxieg57lD0yV4RmSXfX00tf8gOAgAA6RlC2862Zb7dGJO3Nv/5OlxFa7y2vzVer7oTOWtvxMubf40Ri09G1pIvYumpulh25lTk7/rqfmp5LzsIAACkZwhtaWh7cf31f74LKu4MoTuRv6M5esz6OTKmnYin3zkUyxpSAbSpOp6du6Ezhgbk5ubaQQAAID1D6NPTjYn3jkT+9ttRtOt25wUJHSdChbtuRt/Zx+PJOdUxfl1NjF9dGbkLK+Kl5Lb44FRde/f+/Z+ygwAAQFqGUGJDfXLo3K0xJvlLDJp3KV7ZciuKy29FQWlD5G/6OlY01Mfcg0fizYPfxpSN+2JZ6vcL67bXp5Zn2EEAACAtQyj7k7oeOR/X3s1acCQeHncmBsxqjILN56Ow9HCsTEXPmBV7Ykb5NzH/8HedETT2o4q2xzMnD00tf9AOAgAAaRlCnadCH56c+lzyp/Y+OTtixLtNMSH5Yyw/XZuKoeroN3Fb5CzaGwWllZG7vLx90JzN8zoiyPXZAABAWodQ57dCa08UZq06dm/YG2WRveCzWHmmPsYuLY2Ja8piRUNdjFm7v23o/N2zUsse+HsNAABAWodQx+StOd49seZYSeaiL68WbKm53xFDy0/Xtk9IltU+OnzC4G5/nQQJIQAAoMuE0L8Cp+PPUnsNHD06t3vv3h23w2X8N4I65g/3mXiK17zpCgAAAABJRU5ErkJggg==" /><clipPath id="clip3"><path d="M1006,236 L1266,236 L1266,278 L1006,278 L1006,236 Z" /></clipPath>
+<path d="M1016,238 C1011.5820313,238 1008,241.5820313 1008,246 L1008,267 C1008,271.4179688 1011.5820313,275 1016,275 L1255,275 C1259.4179688,275 1263,271.4179688 1263,267 L1263,246 C1263,241.5820313 1259.4179688,238 1255,238 Z" style="fill:rgb(0,131,191);stroke:none" clip-path="url(#clip3)" />
+<clipPath id="clip4"><path d="M1006,236 L1266,236 L1266,278 L1006,278 L1006,236 Z" /></clipPath>
+<path d="M1016,238 C1011.5820313,238 1008,241.5820313 1008,246 L1008,267 C1008,271.4179688 1011.5820313,275 1016,275 L1255,275 C1259.4179688,275 1263,271.4179688 1263,267 L1263,246 C1263,241.5820313 1259.4179688,238 1255,238 Z" style="fill:none;stroke:rgb(0,131,191)" clip-path="url(#clip4)" />
+<text x="1021" y="259" style="font:13px Tahoma">karenn@karenhompage.com</text>
+<image x="0" y="0" width="1252" height="265" xlink:href="data:image/png;base64,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" /><clipPath id="clip5"><path d="M235,234 L425,234 L425,276 L235,276 L235,234 Z" /></clipPath>
+<path d="M245,236 C240.5820313,236 237,239.5820313 237,244 L237,265 C237,269.4179688 240.5820313,273 245,273 L414,273 C418.4179688,273 422,269.4179688 422,265 L422,244 C422,239.5820313 418.4179688,236 414,236 Z" style="fill:rgb(0,131,191);stroke:none" clip-path="url(#clip5)" />
+<clipPath id="clip6"><path d="M235,234 L425,234 L425,276 L235,276 L235,234 Z" /></clipPath>
+<path d="M245,236 C240.5820313,236 237,239.5820313 237,244 L237,265 C237,269.4179688 240.5820313,273 245,273 L414,273 C418.4179688,273 422,269.4179688 422,265 L422,244 C422,239.5820313 418.4179688,236 414,236 Z" style="fill:none;stroke:rgb(0,131,191)" clip-path="url(#clip6)" />
+<text x="251" y="257" style="font:13px Tahoma">bob@example.com</text>
+<image x="0" y="0" width="411" height="263" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZsAAAEHCAYAAAB4POvAAAAFDElEQVR42u3c3ZOOZRzAcTM1/QG1K+nAS8xkDEOibPusl1glFYslqwnRGGUUpWExPLKhpsUir7tkV0mZTNM4qEHGLrPELtaiDHb9A8rBnthf9z5NTdPR4rDPZ+Y6euY6uU6+87vv67k7dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+H+LiPtaAHDXsRm693JWam9DSW7VxXPJasmsvY11qaqL6bbfxAaA+4rN81X1kweX19/OHjAr+hTujrEbGuOV0osxdOmh6Dd/e+TuabiVqmyYIDYA3FNshu2qK0ztudDaf9aBeGzM6RgwtyEKtzZF4ZammJis8Zuux5BlP0Ze5YXWYXvOF4oNAHcVm1T5mexUxbnfcz44lEwy12JUydWYtK0pJm9viik7m2Po8ivRfWpd9J3dEN1HVsSwyoY/cr6o7yg2ALQ/Ntvr0n3f3hw5Cy9FQdmNeG1Hc7KS0JQ3R0Ey0eQuvRw9ptdHp3Gn45H82uhVtDpS286WiA0A7Y5N7pYzdd2GlMUzCy5mHptN2dkURRXNMXVXc+SvvRpDVl6JoelL8UTR0eiUvz+65hTHwJIfGpPtDzlBANoXm42nWwa+UxdjN1z/69FZMtG8vrs53thzM3JXXImX1/0Wg+Yfi8ELvoyFJ6pj0akTUbD16zvJ9s5OEID2xWZ9bcuLqy//856mKBObm1Gw+Xp0nPZLZE86Gk+/uz8W1SaR+bQynp25JhOcnnl5eU4QgPbF5rOTdan3D0bBphtRuPVG5lJA22QzcevV6Db9SDw5ozJGraqKUcsqIm9uebyU3hgfnqhuzerR4yknCEC7YpNaU5PuN3NDjEj/Gr1nnY9X11+Lop3XYnxpbTLJfBPFtTUxc9/BeGvfdzFu7a5kwqmJF1Ztqkm2ZztBANoVm5xPqjvmfnz81uA5B+Ph/FPRc1pdjF93NiaWHoglSVhGFG9Ppp1vY/aB7zOhGflRecvjA8f2S7Y/6AQBaFdsMtPNymMTnkv/3No1d3MMeq8hRqd/isUnjyfBqYzuYzZG7rwdyaRTEXmLd7b2nrFuVltoXH0G4K5ik3l3s+LoxMFLD9/u/2ZZ5Mz5PJacSqaYhaUxZnlZFNdWx4gVu1v6zd42Ldn2gC8IAHBPscl8iHP5kazU8sMlA+d91Th+fdWdtuAkE07r6HTZ8UcHjO7z90QjNgDcc2z+FZG2P2x27jV8eF5Wly5tt86y/xuatvUnRFJ4iu/wPU8AAAAASUVORK5CYII=" /><clipPath id="clip7"><path d="M953,363 L1344,363 L1344,451 L953,451 L953,363 Z" /></clipPath>
+<path d="M962,364 C957.5820313,364 954,367.5820313 954,372 L954,441 C954,445.4179688 957.5820313,449 962,449 L1334,449 C1338.4179688,449 1342,445.4179688 1342,441 L1342,372 C1342,367.5820313 1338.4179688,364 1334,364 Z" style="fill:rgb(127,127,127);stroke:none" clip-path="url(#clip7)" />
+<text x="1073" y="386" style="font:13px Open Sans"> dfrn_request.php</text>
+<text x="1146" y="409" style="font:13px Open Sans">-</text>
+<text x="968" y="432" style="font:13px Open Sans">https://karenhompage/dfrn_request/karin</text>
+<clipPath id="clip8"><path d="M890,808 L1416,808 L1416,1448 L890,1448 L890,808 Z" /></clipPath>
+<path d="M899,809 C894.5820313,809 891,812.5820313 891,817 L891,1438 C891,1442.4179688 894.5820313,1446 899,1446 L1406,1446 C1410.4179688,1446 1414,1442.4179688 1414,1438 L1414,817 C1414,812.5820313 1410.4179688,809 1406,809 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip8)" />
+<text x="904" y="831" style="font:13px Open Sans">dfrn_request_post - SCENARIO 1</text>
+<text x="904" y="854" style="font:13px Open Sans">----------------------------------------------</text>
+<text x="904" y="900" style="font:13px Open Sans">- Cleanup old introductions that remain blocked + Cleanup </text>
+<text x="904" y="923" style="font:13px Open Sans">any old email intros - which will have a greater lifetime</text>
+<text x="904" y="969" style="font:13px Open Sans">- probe_url Bobs posted dfrn_url and get the network with </text>
+<text x="904" y="992" style="font:13px Open Sans">webfinger_dfrn</text>
+<text x="904" y="1038" style="font:13px Open Sans">- try to select all contact data of Bob (contact table) by the </text>
+<text x="904" y="1061" style="font:13px Open Sans">url ($_POST['dfrn_url] and profile uid ($a-&gt;profile['uid']) </text>
+<text x="904" y="1084" style="font:13px Open Sans">where self = 0 to look if this contact is already there (if </text>
+<text x="904" y="1107" style="font:13px Open Sans">issued-id or rel is already available return here because it </text>
+<text x="904" y="1130" style="font:13px Open Sans">seems that we are already connected)</text>
+<text x="904" y="1176" style="font:13px Open Sans">- create a issued-id with $issued_id = random_string();</text>
+<text x="904" y="1222" style="font:13px Open Sans">- if we already found a contact record above update the </text>
+<text x="904" y="1245" style="font:13px Open Sans">issued-id with the one we have created</text>
+<text x="904" y="1291" style="font:13px Open Sans">- otherwise if Bob is not already in the contact table scrape </text>
+<text x="904" y="1314" style="font:13px Open Sans">Bobs profile and create a new contact with this data (e.g. </text>
+<text x="904" y="1337" style="font:13px Open Sans">the scraped issued-id / profiles pubkey becomes contacts </text>
+<text x="904" y="1360" style="font:13px Open Sans">site-pubkey) in the contact table (blocked = 1, pending = 1)</text>
+<text x="904" y="1406" style="font:13px Open Sans">- select this created contact from contact table and create </text>
+<text x="904" y="1429" style="font:13px Open Sans">an intro in the intro table (blocked = 1)</text>
+<clipPath id="clip9"><path d="M925,693 L1374,693 L1374,735 L925,735 L925,693 Z" /></clipPath>
+<path d="M934,694 C929.5820313,694 926,697.5820313 926,702 L926,725 C926,729.4179688 929.5820313,733 934,733 L1364,733 C1368.4179688,733 1372,729.4179688 1372,725 L1372,702 C1372,697.5820313 1368.4179688,694 1364,694 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip9)" />
+<text x="939" y="716" style="font:13px Open Sans">$_POST['dfrn_url'] is transmited and is Bobs profile url</text>
+<clipPath id="clip10"><path d="M888,1557 L1418,1557 L1418,1852 L888,1852 L888,1557 Z" /></clipPath>
+<path d="M897,1558 C892.5820313,1558 889,1561.5820313 889,1566 L889,1842 C889,1846.4179688 892.5820313,1850 897,1850 L1408,1850 C1412.4179688,1850 1416,1846.4179688 1416,1842 L1416,1566 C1416,1561.5820313 1412.4179688,1558 1408,1558 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip10)" />
+<text x="902" y="1580" style="font:13px Open Sans">redirect to Bobs request page</text>
+<text x="902" y="1626" style="font:13px Open Sans">goaway($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"</text>
+<text x="902" y="1649" style="font:13px Open Sans">				. '&amp;dfrn_version=' . </text>
+<text x="902" y="1672" style="font:13px Open Sans">DFRN_PROTOCOL_VERSION</text>
+<text x="902" y="1695" style="font:13px Open Sans">				. '&amp;confirm_key='  . $hash</text>
+<text x="902" y="1718" style="font:13px Open Sans">				. (($aes_allow) ? "&amp;aes_allow=1" : "")</text>
+<text x="902" y="1741" style="font:13px Open Sans">			);</text>
+<text x="902" y="1787" style="font:13px Open Sans">http://example.com/dfrn_request/bob?dfrn_url=6874747</text>
+<text x="902" y="1810" style="font:13px Open Sans">03a2f2f6b6172656e686f6d65706167652e636f6d2f70726f66</text>
+<text x="902" y="1833" style="font:13px Open Sans">696c652f6b6172656e&amp;aes_allow=1&amp;confirm_key=”ABC123”</text>
+<clipPath id="clip11"><path d="M287,1180 L464,1180 L464,1222 L287,1222 L287,1180 Z" /></clipPath>
+<path d="M296,1181 C291.5820313,1181 288,1184.5820313 288,1189 L288,1212 C288,1216.4179688 291.5820313,1220 296,1220 L454,1220 C458.4179688,1220 462,1216.4179688 462,1212 L462,1189 C462,1184.5820313 458.4179688,1181 454,1181 Z" style="fill:rgb(127,127,127);stroke:none" clip-path="url(#clip11)" />
+<text x="302" y="1203" style="font:13px Open Sans">dfrn_request.php</text>
+<clipPath id="clip12"><path d="M134,1399 L624,1399 L624,2315 L134,2315 L134,1399 Z" /></clipPath>
+<path d="M143,1400 C138.5820313,1400 135,1403.5820313 135,1408 L135,2305 C135,2309.4179688 138.5820313,2313 143,2313 L614,2313 C618.4179688,2313 622,2309.4179688 622,2305 L622,1408 C622,1403.5820313 618.4179688,1400 614,1400 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip12)" />
+<text x="149" y="1422" style="font:13px Open Sans">http://example.com/dfrn_request/bob?</text>
+<text x="149" y="1445" style="font:13px Open Sans">dfrn_url=</text>
+<text x="149" y="1468" style="font:13px Open Sans">687474703a2f2f6b6172656e686f6d65706167652e</text>
+<text x="149" y="1491" style="font:13px Open Sans">636f6d2f70726f66696c652f6b6172656e&amp;aes_allow=1&amp;</text>
+<text x="149" y="1514" style="font:13px Open Sans">confirm_key=”ABC123”</text>
+<text x="149" y="1560" style="font:13px Open Sans">dfrn_request_content()</text>
+<text x="149" y="1583" style="font:13px Open Sans">------------------------------------------</text>
+<text x="149" y="1606" style="font:13px Open Sans">- copy the posted parameters (dfrn_url, key and so on) </text>
+<text x="149" y="1629" style="font:13px Open Sans">to $_POST</text>
+<text x="149" y="1698" style="font:13px Open Sans"> dfrn_request_post() - SCENARIO 2 </text>
+<text x="149" y="1721" style="font:13px Open Sans">($_POST['localconfirm'] == 1)</text>
+<text x="149" y="1744" style="font:13px Open Sans">-----------------------------------------------------------------------</text>
+<text x="149" y="1767" style="font:13px Open Sans">- if(local_user() &amp;&amp; ($a-&gt;user['nickname'] == $a-</text>
+<text x="149" y="1790" style="font:13px Open Sans">&gt;argv[1]) &amp;&amp; (x($_POST,'dfrn_url')))</text>
+<text x="149" y="1813" style="font:13px Open Sans">-&gt;</text>
+<text x="149" y="1859" style="font:13px Open Sans">- $confirm_key comes from $_POST</text>
+<text x="149" y="1905" style="font:13px Open Sans">- get data for contact Karen (contact table) by </text>
+<text x="149" y="1928" style="font:13px Open Sans">$dfrn_url (contacts url and nurl) -&gt; if contact Karen </text>
+<text x="149" y="1951" style="font:13px Open Sans">does already have a dfrn-id Bob seems already </text>
+<text x="149" y="1974" style="font:13px Open Sans">connected with Karen (abort here)</text>
+<text x="149" y="2020" style="font:13px Open Sans">- if this contact (Karen) isn't available in the contact </text>
+<text x="149" y="2043" style="font:13px Open Sans">tabel, scrape Karens profile page to pick up the dfrn </text>
+<text x="149" y="2066" style="font:13px Open Sans">links, key, fn, and photo</text>
+<text x="149" y="2112" style="font:13px Open Sans">- create a contact for Karen in the contact table with </text>
+<text x="149" y="2135" style="font:13px Open Sans">the scraped data with blocked = 1 and pending = 1 </text>
+<text x="149" y="2158" style="font:13px Open Sans">(Karens pubkey becomes the contact site-pubkey)</text>
+<text x="149" y="2204" style="font:13px Open Sans">- fetch_url($dfrn_request . '?confirm_key=' . </text>
+<text x="149" y="2227" style="font:13px Open Sans">$confirm_key);</text>
+<text x="149" y="2273" style="font:13px Open Sans">- fetch_url(http://karenhomepage.com/dfrn_request?</text>
+<text x="149" y="2296" style="font:13px Open Sans">confirm_key=”ABC123”)</text>
+<clipPath id="clip13"><path d="M1061,2027 L1238,2027 L1238,2069 L1061,2069 L1061,2027 Z" /></clipPath>
+<path d="M1070,2028 C1065.5820313,2028 1062,2031.5820313 1062,2036 L1062,2059 C1062,2063.4179688 1065.5820313,2067 1070,2067 L1228,2067 C1232.4179688,2067 1236,2063.4179688 1236,2059 L1236,2036 C1236,2031.5820313 1232.4179688,2028 1228,2028 Z" style="fill:rgb(127,127,127);stroke:none" clip-path="url(#clip13)" />
+<text x="1075" y="2050" style="font:13px Open Sans">dfrn_request.php</text>
+<clipPath id="clip14"><path d="M857,2205 L1444,2205 L1444,2454 L857,2454 L857,2205 Z" /></clipPath>
+<path d="M866,2206 C861.5820313,2206 858,2209.5820313 858,2214 L858,2444 C858,2448.4179688 861.5820313,2452 866,2452 L1434,2452 C1438.4179688,2452 1442,2448.4179688 1442,2444 L1442,2214 C1442,2209.5820313 1438.4179688,2206 1434,2206 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip14)" />
+<text x="871" y="2228" style="font:13px Open Sans">http://karenhomepage.com/dfrn_request?confirm_key=”ABC123”</text>
+<text x="871" y="2274" style="font:13px Open Sans">dfrn_request_content() -</text>
+<text x="871" y="2297" style="font:13px Open Sans">(elseif((x($_GET,'confirm_key')) &amp;&amp; strlen($_GET['confirm_key'])) )</text>
+<text x="871" y="2320" style="font:13px Open Sans">----------------------------------------------------------------------------------------------</text>
+<text x="871" y="2366" style="font:13px Open Sans">- select the intro by confirm_key (intro table) -&gt; get contact id</text>
+<text x="871" y="2389" style="font:13px Open Sans">- use the intro contact id to get the contact in the contact table</text>
+<text x="871" y="2412" style="font:13px Open Sans">- build a notification package ( notification(array.....) )</text>
+<text x="871" y="2435" style="font:13px Open Sans">- update intro in intro table (blocked = 0)</text>
+<clipPath id="clip15"><path d="M227,2424 L531,2424 L531,2512 L227,2512 L227,2424 Z" /></clipPath>
+<path d="M236,2425 C231.5820313,2425 228,2428.5820313 228,2433 L228,2502 C228,2506.4179688 231.5820313,2510 236,2510 L521,2510 C525.4179688,2510 529,2506.4179688 529,2502 L529,2433 C529,2428.5820313 525.4179688,2425 521,2425 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip15)" />
+<text x="242" y="2447" style="font:13px Open Sans">Bob stays on his Friendica server</text>
+<text x="242" y="2493" style="font:13px Open Sans">- goaway($forwardurl);</text>
+<clipPath id="clip16"><path d="M14,14 L370,14 L370,125 L14,125 L14,14 Z" /></clipPath>
+<path d="M23,15 C18.5820313,15 15,18.5820313 15,23 L15,115 C15,119.4179688 18.5820313,123 23,123 L360,123 C364.4179688,123 368,119.4179688 368,115 L368,23 C368,18.5820313 364.4179688,15 360,15 Z" style="fill:rgb(255,255,255);stroke:none" clip-path="url(#clip16)" />
+<text x="29" y="38" style="font:13px Open Sans">Note: this chart respects only dfrn </text>
+<text x="29" y="61" style="font:13px Open Sans">contacts and focuses on key exchange </text>
+<text x="29" y="83" style="font:13px Open Sans">(for other areas it might be very </text>
+<text x="29" y="106" style="font:13px Open Sans">incomplete)</text>
+<clipPath id="clip17"><path d="M871,491 L1431,491 L1431,648 L871,648 L871,491 Z" /></clipPath>
+<path d="M880,492 C875.5820313,492 872,495.5820313 872,500 L872,638 C872,642.4179688 875.5820313,646 880,646 L1421,646 C1425.4179688,646 1429,642.4179688 1429,638 L1429,500 C1429,495.5820313 1425.4179688,492 1421,492 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip17)" />
+<text x="885" y="514" style="font:13px Open Sans">dfrn_request_content()</text>
+<text x="885" y="537" style="font:13px Open Sans">------------------------------------</text>
+<text x="885" y="583" style="font:13px Open Sans">- the page for the on Katrins server where Bob do a connection </text>
+<text x="885" y="606" style="font:13px Open Sans">request</text>
+<text x="885" y="629" style="font:13px Open Sans">- the form transmit on submit Bobs profile url as dfrn_url</text>
+<clipPath id="clip18"><path d="M402,267 L974,267 L974,313 L402,313 L402,267 Z" /></clipPath>
+<path d="M422,271.734375 L954,370.5703125" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip18)" />
+<clipPath id="clip19"><path d="M402,329 L974,329 L974,377 L402,377 L402,329 Z" /></clipPath>
+<path d="M422,271.734375 L954,370.5703125" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip19)" />
+<clipPath id="clip20"><path d="M402,311 L974,311 L974,331 L402,331 L402,311 Z" /></clipPath>
+<path d="M422,271.734375 L954,370.5703125" style="fill:none;stroke:rgb(182,44,37);opacity:0.09803921568627451;stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip20)" />
+<clipPath id="clip21"><path d="M402,267 L974,267 L974,377 L402,377 L402,267 Z" /></clipPath>
+<path d="M944.5703125,373.9023438 L954,370.5703125 L946.3984375,364.0703125 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip21)" />
+<clipPath id="clip22"><path d="M402,267 L974,267 L974,377 L402,377 L402,267 Z" /></clipPath>
+<path d="M944.5703125,373.9023438 L954,370.5703125 L946.3984375,364.0703125 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip22)" />
+<text x="405" y="323" style="font:10px Georgia">bob wants to make a request and is directed from karens profile page to karens dfrn-request page</text>
+<clipPath id="clip23"><path d="M1111,729 L1186,729 L1186,813 L1111,813 L1111,729 Z" /></clipPath>
+<path d="M1149.1875,733 L1149.4335938,763.3984375 L1149.5585938,778.6015625 L1149.8046875,809" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip23)" />
+<clipPath id="clip24"><path d="M1111,729 L1186,729 L1186,813 L1111,813 L1111,729 Z" /></clipPath>
+<path d="M1144.734375,800.3789063 L1149.8046875,809 L1154.734375,800.3007813 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip24)" />
+<clipPath id="clip25"><path d="M1111,729 L1186,729 L1186,813 L1111,813 L1111,729 Z" /></clipPath>
+<path d="M1144.734375,800.3789063 L1149.8046875,809 L1154.734375,800.3007813 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip25)" />
+<clipPath id="clip26"><path d="M1115,1442 L1190,1442 L1190,1562 L1115,1562 L1115,1442 Z" /></clipPath>
+<path d="M1152.7773438,1446 L1152.625,1558" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip26)" />
+<clipPath id="clip27"><path d="M1115,1442 L1190,1442 L1190,1562 L1115,1562 L1115,1442 Z" /></clipPath>
+<path d="M1147.6367188,1549.3320313 L1152.625,1558 L1157.6367188,1549.3476563 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip27)" />
+<clipPath id="clip28"><path d="M1115,1442 L1190,1442 L1190,1562 L1115,1562 L1115,1442 Z" /></clipPath>
+<path d="M1147.6367188,1549.3320313 L1152.625,1558 L1157.6367188,1549.3476563 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip28)" />
+<clipPath id="clip29"><path d="M458,1201 L893,1201 L893,1375 L458,1375 L458,1201 Z" /></clipPath>
+<path d="M889,1561.9492188 L462,1205.3515625" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip29)" />
+<clipPath id="clip30"><path d="M458,1391 L893,1391 L893,1565 L458,1565 L458,1391 Z" /></clipPath>
+<path d="M889,1561.9492188 L462,1205.3515625" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip30)" />
+<clipPath id="clip31"><path d="M458,1373 L575,1373 L575,1393 L458,1393 L458,1373 Z" /></clipPath>
+<path d="M889,1561.9492188 L462,1205.3515625" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip31)" />
+<clipPath id="clip32"><path d="M776,1373 L893,1373 L893,1393 L776,1393 L776,1373 Z" /></clipPath>
+<path d="M889,1561.9492188 L462,1205.3515625" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip32)" />
+<clipPath id="clip33"><path d="M573,1373 L778,1373 L778,1393 L573,1393 L573,1373 Z" /></clipPath>
+<path d="M889,1561.9492188 L462,1205.3515625" style="fill:none;stroke:rgb(182,44,37);opacity:0.09803921568627451;stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip33)" />
+<clipPath id="clip34"><path d="M458,1201 L893,1201 L893,1565 L458,1565 L458,1201 Z" /></clipPath>
+<path d="M471.8515625,1207.0664063 L462,1205.3515625 L465.4414063,1214.7421875 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip34)" />
+<clipPath id="clip35"><path d="M458,1201 L893,1201 L893,1565 L458,1565 L458,1201 Z" /></clipPath>
+<path d="M471.8515625,1207.0664063 L462,1205.3515625 L465.4414063,1214.7421875 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip35)" />
+<text x="576" y="1385" style="font:10px Georgia">redirict to bobs dfrn_request page</text>
+<clipPath id="clip36"><path d="M339,1216 L414,1216 L414,1404 L339,1404 L339,1216 Z" /></clipPath>
+<path d="M375.1171875,1220 L376.0625,1400" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip36)" />
+<clipPath id="clip37"><path d="M339,1216 L414,1216 L414,1404 L339,1404 L339,1216 Z" /></clipPath>
+<path d="M371.015625,1391.3671875 L376.0625,1400 L381.015625,1391.3125 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip37)" />
+<clipPath id="clip38"><path d="M339,1216 L414,1216 L414,1404 L339,1404 L339,1216 Z" /></clipPath>
+<path d="M371.015625,1391.3671875 L376.0625,1400 L381.015625,1391.3125 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip38)" />
+<clipPath id="clip39"><path d="M618,2024 L1072,2024 L1072,2158 L618,2158 L618,2024 Z" /></clipPath>
+<path d="M622,2305.015625 L1068.1992188,2028" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip39)" />
+<clipPath id="clip40"><path d="M618,2174 L1072,2174 L1072,2309 L618,2309 L618,2174 Z" /></clipPath>
+<path d="M622,2305.015625 L1068.1992188,2028" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip40)" />
+<clipPath id="clip41"><path d="M618,2156 L650,2156 L650,2176 L618,2176 L618,2156 Z" /></clipPath>
+<path d="M622,2305.015625 L1068.1992188,2028" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip41)" />
+<clipPath id="clip42"><path d="M1041,2156 L1072,2156 L1072,2176 L1041,2176 L1041,2156 Z" /></clipPath>
+<path d="M622,2305.015625 L1068.1992188,2028" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip42)" />
+<clipPath id="clip43"><path d="M648,2156 L1043,2156 L1043,2176 L648,2176 L648,2156 Z" /></clipPath>
+<path d="M622,2305.015625 L1068.1992188,2028" style="fill:none;stroke:rgb(182,44,37);opacity:0.09803921568627451;stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip43)" />
+<clipPath id="clip44"><path d="M618,2024 L1072,2024 L1072,2309 L618,2309 L618,2024 Z" /></clipPath>
+<path d="M1063.4804688,2036.8164063 L1068.1992188,2028 L1058.2070313,2028.3203125 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip44)" />
+<clipPath id="clip45"><path d="M618,2024 L1072,2024 L1072,2309 L618,2309 L618,2024 Z" /></clipPath>
+<path d="M1063.4804688,2036.8164063 L1068.1992188,2028 L1058.2070313,2028.3203125 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip45)" />
+<text x="651" y="2168" style="font:10px Georgia">http://karenhomepage.com/dfrn_request?confirm_key=”ABC123”</text>
+<clipPath id="clip46"><path d="M1111,2063 L1186,2063 L1186,2210 L1111,2210 L1111,2063 Z" /></clipPath>
+<path d="M1149.0703125,2067 L1149.5625,2206" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip46)" />
+<clipPath id="clip47"><path d="M1111,2063 L1186,2063 L1186,2210 L1111,2210 L1111,2063 Z" /></clipPath>
+<path d="M1144.53125,2197.359375 L1149.5625,2206 L1154.53125,2197.3203125 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip47)" />
+<clipPath id="clip48"><path d="M1111,2063 L1186,2063 L1186,2210 L1111,2210 L1111,2063 Z" /></clipPath>
+<path d="M1144.53125,2197.359375 L1149.5625,2206 L1154.53125,2197.3203125 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip48)" />
+<clipPath id="clip49"><path d="M342,2309 L417,2309 L417,2429 L342,2429 L342,2309 Z" /></clipPath>
+<path d="M378.875,2313 L378.5351563,2425" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip49)" />
+<clipPath id="clip50"><path d="M342,2309 L417,2309 L417,2429 L342,2429 L342,2309 Z" /></clipPath>
+<path d="M373.5625,2416.3242188 L378.5351563,2425 L383.5625,2416.3554688 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip50)" />
+<clipPath id="clip51"><path d="M342,2309 L417,2309 L417,2429 L342,2429 L342,2309 Z" /></clipPath>
+<path d="M373.5625,2416.3242188 L378.5351563,2425 L383.5625,2416.3554688 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip51)" />
+<clipPath id="clip52"><path d="M1111,445 L1186,445 L1186,496 L1111,496 L1111,445 Z" /></clipPath>
+<path d="M1148.7851563,449 L1149.3125,492" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip52)" />
+<clipPath id="clip53"><path d="M1111,445 L1186,445 L1186,496 L1111,496 L1111,445 Z" /></clipPath>
+<path d="M1144.2070313,483.4023438 L1149.3125,492 L1154.2070313,483.2773438 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip53)" />
+<clipPath id="clip54"><path d="M1111,445 L1186,445 L1186,496 L1111,496 L1111,445 Z" /></clipPath>
+<path d="M1144.2070313,483.4023438 L1149.3125,492 L1154.2070313,483.2773438 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip54)" />
+<clipPath id="clip55"><path d="M1026,642 L1272,642 L1272,662 L1026,662 L1026,642 Z" /></clipPath>
+<path d="M1149.703125,646 L1149.2695313,694" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip55)" />
+<clipPath id="clip56"><path d="M1026,678 L1272,678 L1272,698 L1026,698 L1026,678 Z" /></clipPath>
+<path d="M1149.703125,646 L1149.2695313,694" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip56)" />
+<clipPath id="clip57"><path d="M1026,660 L1272,660 L1272,680 L1026,680 L1026,660 Z" /></clipPath>
+<path d="M1149.703125,646 L1149.2695313,694" style="fill:none;stroke:rgb(182,44,37);opacity:0.09803921568627451;stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip57)" />
+<clipPath id="clip58"><path d="M1026,642 L1272,642 L1272,698 L1026,698 L1026,642 Z" /></clipPath>
+<path d="M1144.3476563,685.296875 L1149.2695313,694 L1154.3476563,685.3867188 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip58)" />
+<clipPath id="clip59"><path d="M1026,642 L1272,642 L1272,698 L1026,698 L1026,642 Z" /></clipPath>
+<path d="M1144.3476563,685.296875 L1149.2695313,694 L1154.3476563,685.3867188 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip59)" />
+<text x="1029" y="672" style="font:10px Georgia">Bob fills request form and presses submit</text>
+</svg>

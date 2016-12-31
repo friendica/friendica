@@ -23,7 +23,7 @@ function notification($params) {
 
 	$banner = t('Friendica Notification');
 	$product = FRIENDICA_PLATFORM;
-	$siteurl = $a->get_baseurl(true);
+	$siteurl = App::get_baseurl(true);
 	$thanks = t('Thank You,');
 	$sitename = $a->config['sitename'];
 	if (!x($a->config['admin_name']))
@@ -58,7 +58,7 @@ function notification($params) {
 	$additional_mail_header .= "X-Friendica-Platform: ".FRIENDICA_PLATFORM."\n";
 	$additional_mail_header .= "X-Friendica-Version: ".FRIENDICA_VERSION."\n";
 	$additional_mail_header .= "List-ID: <notification.".$hostname.">\n";
-	$additional_mail_header .= "List-Archive: <".$a->get_baseurl()."/notifications/system>\n";
+	$additional_mail_header .= "List-Archive: <".App::get_baseurl()."/notifications/system>\n";
 
 	if (array_key_exists('item', $params)) {
 		$title = $params['item']['title'];
@@ -411,7 +411,7 @@ function notification($params) {
 			$hash = random_string();
 			$r = q("SELECT `id` FROM `notify` WHERE `hash` = '%s' LIMIT 1",
 				dbesc($hash));
-			if (count($r))
+			if (dbm::is_result($r))
 				$dups = true;
 		} while($dups == true);
 
@@ -494,7 +494,7 @@ function notification($params) {
 		}
 
 
-		$itemlink = $a->get_baseurl().'/notify/view/'.$notify_id;
+		$itemlink = App::get_baseurl().'/notify/view/'.$notify_id;
 		$msg = replace_macros($epreamble, array('$itemlink' => $itemlink));
 		$msg_cache = format_notification_message($datarray['name_cache'], strip_tags(bbcode($msg)));
 		$r = q("UPDATE `notify` SET `msg` = '%s', `msg_cache` = '%s' WHERE `id` = %d AND `uid` = %d",
@@ -648,7 +648,6 @@ function notification($params) {
  * @param str $defaulttype (Optional) Forces a notification with this type.
  */
 function check_item_notification($itemid, $uid, $defaulttype = "") {
-
 	$notification_data = array("uid" => $uid, "profiles" => array());
 	call_hooks('check_item_notification', $notification_data);
 
@@ -732,17 +731,17 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 			intval($item[0]['contact-id']),
 			intval($uid)
 		);
-		$send_notification = count($r);
+		$send_notification = dbm::is_result($r);
 
 		if (!$send_notification) {
 			$tags = q("SELECT `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` = %d AND `uid` = %d",
 				intval(TERM_OBJ_POST), intval($itemid), intval(TERM_MENTION), intval($uid));
 
-			if (count($tags)) {
+			if (dbm::is_result($tags)) {
 				foreach ($tags AS $tag) {
 					$r = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d AND `notify_new_posts`",
 						normalise_link($tag["url"]), intval($uid));
-					if (count($r))
+					if (dbm::is_result($r))
 						$send_notification = true;
 				}
 			}

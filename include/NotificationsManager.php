@@ -88,7 +88,7 @@ class NotificationsManager {
 				intval(local_user())
 			);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			return $this->_set_extra($r);
 
 		return false;
@@ -105,7 +105,7 @@ class NotificationsManager {
 			intval($id),
 			intval(local_user())
 		);
-		if(dbm::is_result($r)) {
+		if (dbm::is_result($r)) {
 			return $this->_set_extra($r)[0];
 		}
 		return null;
@@ -198,8 +198,10 @@ class NotificationsManager {
 	 *	string 'label' => The type of the notification
 	 *	string 'link' => URL to the source
 	 *	string 'image' => The avatar image
+	 *	string 'url' => The profile url of the contact
 	 *	string 'text' => The notification text
-	 *	string 'when' => Relative date of the notification
+	 *	string 'when' => The date of the notification
+	 *	string 'ago' => T relative date of the notification
 	 *	bool 'seen' => Is the notification marked as "seen"
 	 */
 	private function formatNotifs($notifs, $ident = "") {
@@ -223,26 +225,32 @@ class NotificationsManager {
 						$default_item_label = 'notify';
 						$default_item_link = $this->a->get_baseurl(true).'/notify/view/'. $it['id'];
 						$default_item_image = proxy_url($it['photo'], false, PROXY_SIZE_MICRO);
+						$default_item_url = $it['url'];
 						$default_item_text = strip_tags(bbcode($it['msg']));
-						$default_item_when = relative_date($it['date']);
+						$default_item_when = datetime_convert('UTC', date_default_timezone_get(), $it['date'], 'r');
+						$default_item_ago = relative_date($it['date']);
 						break;
 
 					case 'home':
 						$default_item_label = 'comment';
 						$default_item_link = $this->a->get_baseurl(true).'/display/'.$it['pguid'];
 						$default_item_image = proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO);
+						$default_item_url = $it['author-link'];
 						$default_item_text = sprintf(t("%s commented on %s's post"), $it['author-name'], $it['pname']);
-						$default_item_when = relative_date($it['created']);
+						$default_item_when = datetime_convert('UTC', date_default_timezone_get(), $it['created'], 'r');
+						$default_item_ago = relative_date($it['created']);
 						break;
 
 					default:
 						$default_item_label = (($it['id'] == $it['parent']) ? 'post' : 'comment');
 						$default_item_link = $this->a->get_baseurl(true).'/display/'.$it['pguid'];
 						$default_item_image = proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO);
+						$default_item_url = $it['author-link'];
 						$default_item_text = (($it['id'] == $it['parent'])
 									? sprintf(t("%s created a new post"), $it['author-name'])
 									: sprintf(t("%s commented on %s's post"), $it['author-name'], $it['pname']));
-						$default_item_when = relative_date($it['created']);
+						$default_item_when = datetime_convert('UTC', date_default_timezone_get(), $it['created'], 'r');
+						$default_item_ago = relative_date($it['created']);
 
 				}
 
@@ -253,8 +261,10 @@ class NotificationsManager {
 							'label' => 'like',
 							'link' => $this->a->get_baseurl(true).'/display/'.$it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
+							'url' => $it['author-link'],
 							'text' => sprintf(t("%s liked %s's post"), $it['author-name'], $it['pname']),
-							'when' => relative_date($it['created']),
+							'when' => $default_item_when,
+							'ago' => $default_item_ago,
 							'seen' => $it['seen']
 						);
 						break;
@@ -264,8 +274,10 @@ class NotificationsManager {
 							'label' => 'dislike',
 							'link' => $this->a->get_baseurl(true).'/display/'.$it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
+							'url' => $it['author-link'],
 							'text' => sprintf(t("%s disliked %s's post"), $it['author-name'], $it['pname']),
-							'when' => relative_date($it['created']),
+							'when' => $default_item_when,
+							'ago' => $default_item_ago,
 							'seen' => $it['seen']
 						);
 						break;
@@ -275,8 +287,10 @@ class NotificationsManager {
 							'label' => 'attend',
 							'link' => $this->a->get_baseurl(true).'/display/'.$it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
+							'url' => $it['author-link'],
 							'text' => sprintf(t("%s is attending %s's event"), $it['author-name'], $it['pname']),
-							'when' => relative_date($it['created']),
+							'when' => $default_item_when,
+							'ago' => $default_item_ago,
 							'seen' => $it['seen']
 						);
 						break;
@@ -286,8 +300,10 @@ class NotificationsManager {
 							'label' => 'attendno',
 							'link' => $this->a->get_baseurl(true).'/display/'.$it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
+							'url' => $it['author-link'],
 							'text' => sprintf( t("%s is not attending %s's event"), $it['author-name'], $it['pname']),
-							'when' => relative_date($it['created']),
+							'when' => $default_item_when,
+							'ago' => $default_item_ago,
 							'seen' => $it['seen']
 						);
 						break;
@@ -297,8 +313,10 @@ class NotificationsManager {
 							'label' => 'attendmaybe',
 							'link' => $this->a->get_baseurl(true).'/display/'.$it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
+							'url' => $it['author-link'],
 							'text' => sprintf(t("%s may attend %s's event"), $it['author-name'], $it['pname']),
-							'when' => relative_date($it['created']),
+							'when' => $default_item_when,
+							'ago' => $default_item_ago,
 							'seen' => $it['seen']
 						);
 						break;
@@ -312,8 +330,10 @@ class NotificationsManager {
 							'label' => 'friend',
 							'link' => $this->a->get_baseurl(true).'/display/'.$it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
+							'url' => $it['author-link'],
 							'text' => sprintf(t("%s is now friends with %s"), $it['author-name'], $it['fname']),
-							'when' => relative_date($it['created']),
+							'when' => $default_item_when,
+							'ago' => $default_item_ago,
 							'seen' => $it['seen']
 						);
 						break;
@@ -323,8 +343,10 @@ class NotificationsManager {
 							'label' => $default_item_label,
 							'link' => $default_item_link,
 							'image' => $default_item_image,
+							'url' => $default_item_url,
 							'text' => $default_item_text,
 							'when' => $default_item_when,
+							'ago' => $default_item_ago,
 							'seen' => $it['seen']
 						);
 				}
@@ -358,7 +380,7 @@ class NotificationsManager {
 			intval(local_user())
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			return $r[0]['total'];
 
 		return 0;
@@ -401,7 +423,7 @@ class NotificationsManager {
 				intval($limit)
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			$notifs = $this->formatNotifs($r, $ident);
 
 		$arr = array (
@@ -430,7 +452,7 @@ class NotificationsManager {
 			intval(local_user())
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			return $r[0]['total'];
 
 		return 0;
@@ -459,14 +481,14 @@ class NotificationsManager {
 		if($seen === 0)
 			$sql_seen = " AND `seen` = 0 ";
 
-		$r = q("SELECT `id`, `photo`, `msg`, `date`, `seen` FROM `notify`
+		$r = q("SELECT `id`, `url`, `photo`, `msg`, `date`, `seen` FROM `notify`
 				WHERE `uid` = %d $sql_seen ORDER BY `date` DESC LIMIT %d, %d ",
 			intval(local_user()),
 			intval($start),
 			intval($limit)
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			$notifs = $this->formatNotifs($r, $ident);
 
 		$arr = array (
@@ -520,7 +542,7 @@ class NotificationsManager {
 			intval(local_user())
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			return $r[0]['total'];
 
 		return 0;
@@ -564,7 +586,7 @@ class NotificationsManager {
 				intval($limit)
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			$notifs = $this->formatNotifs($r, $ident);
 		
 		$arr = array (
@@ -596,7 +618,7 @@ class NotificationsManager {
 			intval(local_user())
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			return $r[0]['total'];
 
 		return 0;
@@ -626,9 +648,9 @@ class NotificationsManager {
 			$sql_seen = " AND `item`.`unseen` = 1 ";
 
 		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, `item`.`unseen`,
-				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` as `object`,
-				`pitem`.`author-name` as `pname`, `pitem`.`author-link` as `plink`, `pitem`.`guid` as `pguid`
-			FROM `item` INNER JOIN `item` as `pitem` ON `pitem`.`id`=`item`.`parent`
+				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`,
+				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid`
+			FROM `item` INNER JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
 			WHERE `item`.`visible` = 1 AND
 				 `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 1
 				$sql_seen
@@ -638,7 +660,7 @@ class NotificationsManager {
 				intval($limit)
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			$notifs = $this->formatNotifs($r, $ident);
 
 		$arr = array (
@@ -668,7 +690,7 @@ class NotificationsManager {
 				intval($_SESSION['uid'])
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			return $r[0]['total'];
 
 		return 0;
@@ -713,7 +735,7 @@ class NotificationsManager {
 				intval($limit)
 		);
 
-		if(dbm::is_result($r))
+		if (dbm::is_result($r))
 			$notifs = $this->formatIntros($r);
 
 		$arr = array (

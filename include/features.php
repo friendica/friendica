@@ -7,20 +7,27 @@
 
 /**
  * @brief check if feature is enabled
- * 
+ *
  * @return boolean
  */
-function feature_enabled($uid,$feature) {
+function feature_enabled($uid, $feature) {
 
-	$x = get_config('feature_lock',$feature);
-	if($x === false) {
-		$x = get_pconfig($uid,'feature',$feature);
-		if($x === false) {
-			$x = get_config('feature',$feature);
-			if($x === false)
+	if (($feature == 'richtext') AND !get_app()->theme_richtext_editor) {
+		return false;
+	}
+
+	$x = get_config('feature_lock', $feature);
+
+	if ($x === false) {
+		$x = get_pconfig($uid, 'feature', $feature);
+		if ($x === false) {
+			$x = get_config('feature', $feature);
+			if ($x === false) {
 				$x = get_feature_default($feature);
+			}
 		}
 	}
+
 	$arr = array('uid' => $uid, 'feature' => $feature, 'enabled' => $x);
 	call_hooks('feature_enabled',$arr);
 	return($arr['enabled']);
@@ -133,6 +140,11 @@ function get_features($filtered = true) {
 				unset($arr[$k]);
 			}
 		}
+	}
+
+	// Remove the richtext editor setting if the theme doesn't support it
+	if (!get_app()->theme_richtext_editor) {
+		unset($arr['composition'][1]);
 	}
 
 	call_hooks('get_features',$arr);

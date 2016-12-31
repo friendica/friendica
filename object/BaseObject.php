@@ -21,8 +21,7 @@ class BaseObject {
 		if(self::$app)
 			return self::$app;
 
-		global $a;
-		self::$app = $a;
+		self::$app = get_app();
 
 		return self::$app;
 	}

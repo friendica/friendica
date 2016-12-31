@@ -9,18 +9,19 @@ require_once('include/event.php');
 require_once('include/items.php');
 
 function events_init(&$a) {
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
-	if($a->argc == 1) {
+	if ($a->argc == 1) {
 		// if it's a json request abort here becaus we don't
 		// need the widget data
-		if($a->argv[1] === 'json')
+		if ($a->argv[1] === 'json')
 			return;
 
 		$cal_widget = widget_events();
 
-		if(! x($a->page,'aside'))
+		if (! x($a->page,'aside'))
 			$a->page['aside'] = '';
 
 		$a->page['aside'] .= $cal_widget;
@@ -33,8 +34,9 @@ function events_post(&$a) {
 
 	logger('post: ' . print_r($_REQUEST,true));
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$event_id = ((x($_POST,'event_id')) ? intval($_POST['event_id']) : 0);
 	$cid = ((x($_POST,'cid')) ? intval($_POST['cid']) : 0);
@@ -49,33 +51,35 @@ function events_post(&$a) {
 	// The default setting for the `private` field in event_store() is false, so mirror that
 	$private_event = false;
 
-	if($start_text) {
+	if ($start_text) {
 		$start = $start_text;
 	}
 	else {
 		$start    = sprintf('%d-%d-%d %d:%d:0',$startyear,$startmonth,$startday,$starthour,$startminute);
 	}
 
-	if($nofinish) {
+	if ($nofinish) {
 		$finish = '0000-00-00 00:00:00';
 	}
 
-	if($finish_text) {
+	if ($finish_text) {
 		$finish = $finish_text;
 	}
 	else {
 		$finish    = sprintf('%d-%d-%d %d:%d:0',$finishyear,$finishmonth,$finishday,$finishhour,$finishminute);
 	}
 
-	if($adjust) {
+	if ($adjust) {
 		$start = datetime_convert(date_default_timezone_get(),'UTC',$start);
-		if(! $nofinish)
+		if (! $nofinish) {
 			$finish = datetime_convert(date_default_timezone_get(),'UTC',$finish);
+		}
 	}
 	else {
 		$start = datetime_convert('UTC','UTC',$start);
-		if(! $nofinish)
+		if (! $nofinish) {
 			$finish = datetime_convert('UTC','UTC',$finish);
+		}
 	}
 
 	// Don't allow the event to finish before it begins.
@@ -89,11 +93,11 @@ function events_post(&$a) {
 	$type     = 'event';
 
 	$action = ($event_id == '') ? 'new' : "event/" . $event_id;
-	$onerror_url = $a->get_baseurl() . "/events/" . $action . "?summary=$summary&description=$desc&location=$location&start=$start_text&finish=$finish_text&adjust=$adjust&nofinish=$nofinish";
+	$onerror_url = App::get_baseurl() . "/events/" . $action . "?summary=$summary&description=$desc&location=$location&start=$start_text&finish=$finish_text&adjust=$adjust&nofinish=$nofinish";
 
-	if(strcmp($finish,$start) < 0 && !$nofinish) {
+	if (strcmp($finish,$start) < 0 && !$nofinish) {
 		notice( t('Event can not end before it has started.') . EOL);
-		if(intval($_REQUEST['preview'])) {
+		if (intval($_REQUEST['preview'])) {
 			echo( t('Event can not end before it has started.'));
 			killme();
 		}
@@ -186,43 +190,46 @@ function events_post(&$a) {
 
 function events_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
-	if($a->argc == 1)
-		$_SESSION['return_url'] = $a->get_baseurl() . '/' . $a->cmd;
+	if ($a->argc == 1) {
+		$_SESSION['return_url'] = App::get_baseurl() . '/' . $a->cmd;
+	}
 
-	if(($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
+	if (($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
 		$r = q("update event set ignore = 1 where id = %d and uid = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
 	}
 
-	if(($a->argc > 2) && ($a->argv[1] === 'unignore') && intval($a->argv[2])) {
+	if (($a->argc > 2) && ($a->argv[1] === 'unignore') && intval($a->argv[2])) {
 		$r = q("update event set ignore = 0 where id = %d and uid = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
 	}
 
-	if ($a->theme_events_in_profile)
+	if ($a->theme_events_in_profile) {
 		nav_set_selected('home');
-	else
+	} else {
 		nav_set_selected('events');
+	}
 
 	$editselect = 'none';
-	if( feature_enabled(local_user(), 'richtext') )
+	if ( feature_enabled(local_user(), 'richtext') ) {
 		$editselect = 'textareas';
+	}
 
 	// get the translation strings for the callendar
 	$i18n = get_event_strings();
 
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl,array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$module_url' => '/events',
 		'$modparams' => 1,
 		'$i18n' => $i18n,
@@ -231,7 +238,7 @@ function events_content(&$a) {
 
 	$etpl = get_markup_template('event_end.tpl');
 	$a->page['end'] .= replace_macros($etpl,array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$editselect' => $editselect
 	));
 
@@ -248,15 +255,15 @@ function events_content(&$a) {
 	$ignored = ((x($_REQUEST,'ignored')) ? intval($_REQUEST['ignored']) : 0);
 
 	if($a->argc > 1) {
-		if($a->argc > 2 && $a->argv[1] == 'event') {
+		if ($a->argc > 2 && $a->argv[1] == 'event') {
 			$mode = 'edit';
 			$event_id = intval($a->argv[2]);
 		}
-		if($a->argv[1] === 'new') {
+		if ($a->argv[1] === 'new') {
 			$mode = 'new';
 			$event_id = 0;
 		}
-		if($a->argc > 2 && intval($a->argv[1]) && intval($a->argv[2])) {
+		if ($a->argc > 2 && intval($a->argv[1]) && intval($a->argv[2])) {
 			$mode = 'view';
 			$y = intval($a->argv[1]);
 			$m = intval($a->argv[2]);
@@ -264,23 +271,27 @@ function events_content(&$a) {
 	}
 
 	// The view mode part is similiar to /mod/cal.php
-	if($mode == 'view') {
+	if ($mode == 'view') {
 
 
 		$thisyear = datetime_convert('UTC',date_default_timezone_get(),'now','Y');
 		$thismonth = datetime_convert('UTC',date_default_timezone_get(),'now','m');
-		if(! $y)
+		if (! $y) {
 			$y = intval($thisyear);
-		if(! $m)
+		}
+		if (! $m) {
 			$m = intval($thismonth);
+		}
 
 		// Put some limits on dates. The PHP date functions don't seem to do so well before 1900.
 		// An upper limit was chosen to keep search engines from exploring links millions of years in the future.
 
-		if($y < 1901)
+		if ($y < 1901) {
 			$y = 1900;
-		if($y > 2099)
+		}
+		if ($y > 2099) {
 			$y = 2100;
+		}
 
 		$nextyear = $y;
 		$nextmonth = $m + 1;
@@ -332,21 +343,23 @@ function events_content(&$a) {
 
 		$links = array();
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$r = sort_by_date($r);
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				$j = (($rr['adjust']) ? datetime_convert('UTC',date_default_timezone_get(),$rr['start'], 'j') : datetime_convert('UTC','UTC',$rr['start'],'j'));
-				if(! x($links,$j))
-					$links[$j] = $a->get_baseurl() . '/' . $a->cmd . '#link-' . $j;
+				if (! x($links,$j)) {
+					$links[$j] = App::get_baseurl() . '/' . $a->cmd . '#link-' . $j;
+				}
 			}
 		}
 
 		$events=array();
 
 		// transform the event in a usable array
-		if(count($r))
+		if (dbm::is_result($r)) {
 			$r = sort_by_date($r);
 			$events = process_events($r);
+		}
 
 		if ($a->argv[1] === 'json'){
 			echo json_encode($events); killme();
@@ -374,13 +387,13 @@ function events_content(&$a) {
 		}
 
 		$o = replace_macros($tpl, array(
-			'$baseurl'	=> $a->get_baseurl(),
+			'$baseurl'	=> App::get_baseurl(),
 			'$tabs'		=> $tabs,
 			'$title'	=> t('Events'),
 			'$view'		=> t('View'),
-			'$new_event'	=> array($a->get_baseurl().'/events/new',t('Create New Event'),'',''),
-			'$previus'	=> array($a->get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
-			'$next'		=> array($a->get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
+			'$new_event'	=> array(App::get_baseurl().'/events/new',t('Create New Event'),'',''),
+			'$previus'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
+			'$next'		=> array(App::get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
 			'$calendar'	=> cal($y,$m,$links, ' eventcal'),
 
 			'$events'	=> $events,
@@ -403,7 +416,7 @@ function events_content(&$a) {
 			intval($event_id),
 			intval(local_user())
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$orig_event = $r[0];
 	}
 
@@ -474,7 +487,7 @@ function events_content(&$a) {
 		$tpl = get_markup_template('event_form.tpl');
 
 		$o .= replace_macros($tpl,array(
-			'$post' => $a->get_baseurl() . '/events',
+			'$post' => App::get_baseurl() . '/events',
 			'$eid' => $eid,
 			'$cid' => $cid,
 			'$uri' => $uri,

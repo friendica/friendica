@@ -48,16 +48,14 @@ function do_like($item_id, $verb) {
 			break;
 	}
 
-
 	logger('like: verb ' . $verb . ' item ' . $item_id);
-
 
 	$r = q("SELECT * FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",
 		dbesc($item_id),
 		dbesc($item_id)
 	);
 
-	if(! $item_id || (! count($r))) {
+	if(! $item_id || (! dbm::is_result($r))) {
 		logger('like: no item ' . $item_id);
 		return false;
 	}
@@ -66,7 +64,7 @@ function do_like($item_id, $verb) {
 
 	$owner_uid = $item['uid'];
 
-	if(! can_write_wall($a,$owner_uid)) {
+	if (! can_write_wall($a,$owner_uid)) {
 		return false;
 	}
 
@@ -78,10 +76,12 @@ function do_like($item_id, $verb) {
 			intval($item['contact-id']),
 			intval($item['uid'])
 		);
-		if(! count($r))
+		if (! dbm::is_result($r)) {
 			return false;
-		if(! $r[0]['self'])
+		}
+		if (! $r[0]['self']) {
 			$remote_owner = $r[0];
+		}
 	}
 
 	// this represents the post owner on this system.
@@ -90,32 +90,32 @@ function do_like($item_id, $verb) {
 		WHERE `contact`.`self` = 1 AND `contact`.`uid` = %d LIMIT 1",
 		intval($owner_uid)
 	);
-	if(count($r))
+	if (dbm::is_result($r)) {
 		$owner = $r[0];
+	}
 
-	if(! $owner) {
+	if (! $owner) {
 		logger('like: no owner');
 		return false;
 	}
 
-	if(! $remote_owner)
+	if (! $remote_owner) {
 		$remote_owner = $owner;
-
+	}
 
 	// This represents the person posting
 
-	if((local_user()) && (local_user() == $owner_uid)) {
+	if ((local_user()) && (local_user() == $owner_uid)) {
 		$contact = $owner;
-	}
-	else {
+	} else {
 		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($_SESSION['visitor_id']),
 			intval($owner_uid)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$contact = $r[0];
 	}
-	if(! $contact) {
+	if (! $contact) {
 		return false;
 	}
 
@@ -124,7 +124,7 @@ function do_like($item_id, $verb) {
 
 	// event participation are essentially radio toggles. If you make a subsequent choice,
 	// we need to eradicate your first choice.
-	if($activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE) {
+	if ($activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE) {
 		$verbs = " '" . dbesc(ACTIVITY_ATTEND) . "','" . dbesc(ACTIVITY_ATTENDNO) . "','" . dbesc(ACTIVITY_ATTENDMAYBE) . "' ";
 	}
 
@@ -135,7 +135,7 @@ function do_like($item_id, $verb) {
 		dbesc($item_id), dbesc($item_id), dbesc($item['uri'])
 	);
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$like_item = $r[0];
 
 		// Already voted, undo it
@@ -161,10 +161,11 @@ function do_like($item_id, $verb) {
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
 
 	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
-	if($item['object-type'] === ACTIVITY_OBJ_EVENT)
+	if ($item['object-type'] === ACTIVITY_OBJ_EVENT) {
 		$post_type = t('event');
-	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE );
-	$link = xmlify('<link rel="alternate" type="text/html" href="' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
+	}
+	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE );
+	$link = xmlify('<link rel="alternate" type="text/html" href="' . App::get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 	$body = $item['body'];
 
 	$obj = <<< EOT
@@ -178,20 +179,31 @@ function do_like($item_id, $verb) {
 		<content>$body</content>
 	</object>
 EOT;
-	if($verb === 'like')
+	if ($verb === 'like') {
 		$bodyverb = t('%1$s likes %2$s\'s %3$s');
-	if($verb === 'dislike')
+	}
+	if ($verb === 'dislike') {
 		$bodyverb = t('%1$s doesn\'t like %2$s\'s %3$s');
-	if($verb === 'attendyes')
+	}
+	if ($verb === 'attendyes') {
 		$bodyverb = t('%1$s is attending %2$s\'s %3$s');
-	if($verb === 'attendno')
+	}
+	if ($verb === 'attendno') {
 		$bodyverb = t('%1$s is not attending %2$s\'s %3$s');
-	if($verb === 'attendmaybe')
+	}
+	if ($verb === 'attendmaybe') {
 		$bodyverb = t('%1$s may attend %2$s\'s %3$s');
+	}
 
-	if(! isset($bodyverb))
-			return false;
+	if (! isset($bodyverb)) {
+		return false;
+	}
 
+	$ulink = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
+	$alink = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
+	$plink = '[url=' . App::get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . ']' . $post_type . '[/url]';
+
+	/// @TODO Or rewrite this to multi-line initialization of the array?
 	$arr = array();
 
 	$arr['guid'] = get_guid(32);
@@ -211,12 +223,7 @@ EOT;
 	$arr['author-name'] = $contact['name'];
 	$arr['author-link'] = $contact['url'];
 	$arr['author-avatar'] = $contact['thumb'];
-
-	$ulink = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
-	$alink = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
-	$plink = '[url=' . $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . ']' . $post_type . '[/url]';
 	$arr['body'] =  sprintf( $bodyverb, $ulink, $alink, $plink );
-
 	$arr['verb'] = $activity;
 	$arr['object-type'] = $objtype;
 	$arr['object'] = $obj;
@@ -230,7 +237,7 @@ EOT;
 
 	$post_id = item_store($arr);
 
-	if(! $item['visible']) {
+	if (! $item['visible']) {
 		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval($item['id']),
 			intval($owner_uid)
@@ -239,7 +246,7 @@ EOT;
 
 
 	// Save the author information for the like in case we need to relay to Diaspora
-	diaspora::store_like_signature($contact, $post_id);
+	Diaspora::store_like_signature($contact, $post_id);
 
 	$arr['id'] = $post_id;
 

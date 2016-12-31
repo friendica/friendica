@@ -1,5 +1,7 @@
 # Settings
 
+* [Zur Startseite der Hilfe](help)
+
 Wenn du der Administrator einer Friendica Instanz bist, hast du Zugriff auf das so genannte **Admin Panel** in dem du die Friendica Instanz konfigurieren kannst,
 
 Auf der Startseite des Admin Panels werden die Informationen zu der Instanz zusammengefasst.

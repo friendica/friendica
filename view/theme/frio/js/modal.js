@@ -90,7 +90,11 @@ $(document).ready(function(){
 });
 
 // overwrite Dialog.show from main js to load the filebrowser into a bs modal
-Dialog.show = function(url, title="") {
+Dialog.show = function(url, title) {
+	if (typeof(title) === 'undefined') {
+		title = "";
+	}
+
 	var modal = $('#modal').modal();
 	modal.find("#modal-header h4").html(title);
 	modal

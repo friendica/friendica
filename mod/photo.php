@@ -76,7 +76,7 @@ function photo_init(&$a) {
 			intval($resolution),
 			intval($uid)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$data = $r[0]['data'];
 			$mimetype = $r[0]['type'];
 		}
@@ -106,7 +106,7 @@ function photo_init(&$a) {
 			dbesc($photo),
 			intval($resolution)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$sql_extra = permissions_sql($r[0]['uid']);
 
@@ -117,9 +117,9 @@ function photo_init(&$a) {
 				intval($resolution)
 			);
 
-			$public = ($r[0]['allow_cid'] == '') AND ($r[0]['allow_gid'] == '') AND ($r[0]['deny_cid']  == '') AND ($r[0]['deny_gid']  == '');
+			$public = (dbm::is_result($r)) AND ($r[0]['allow_cid'] == '') AND ($r[0]['allow_gid'] == '') AND ($r[0]['deny_cid']  == '') AND ($r[0]['deny_gid']  == '');
 
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$resolution = $r[0]['scale'];
 				$data = $r[0]['data'];
 				$mimetype = $r[0]['type'];

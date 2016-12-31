@@ -16,19 +16,21 @@ require_once('mod/proxy.php');
 function match_content(&$a) {
 
 	$o = '';
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$a->page['aside'] .= findpeople_widget();
 	$a->page['aside'] .= follow_widget();
 
-	$_SESSION['return_url'] = $a->get_baseurl() . '/' . $a->cmd;
+	$_SESSION['return_url'] = App::get_baseurl() . '/' . $a->cmd;
 
 	$r = q("SELECT `pub_keywords`, `prv_keywords` FROM `profile` WHERE `is-default` = 1 AND `uid` = %d LIMIT 1",
 		intval(local_user())
 	);
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		return;
+	}
 	if(! $r[0]['pub_keywords'] && (! $r[0]['prv_keywords'])) {
 		notice( t('No keywords to match. Please add keywords to your default profile.') . EOL);
 		return;
@@ -45,7 +47,7 @@ function match_content(&$a) {
 		if(strlen(get_config('system','directory')))
 			$x = post_url(get_server().'/msearch', $params);
 		else
-			$x = post_url($a->get_baseurl() . '/msearch', $params);
+			$x = post_url(App::get_baseurl() . '/msearch', $params);
 
 		$j = json_decode($x);
 
@@ -66,7 +68,7 @@ function match_content(&$a) {
 
 				if (!count($match)) {
 					$jj->photo = str_replace("http:///photo/", get_server()."/photo/", $jj->photo);
-					$connlnk = $a->get_baseurl() . '/follow/?url=' . $jj->url;
+					$connlnk = App::get_baseurl() . '/follow/?url=' . $jj->url;
 					$photo_menu = array(
 						'profile' => array(t("View Profile"), zrl($jj->url)),
 						'follow' => array(t("Connect/Follow"), $connlnk)

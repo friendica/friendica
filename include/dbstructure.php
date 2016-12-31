@@ -17,8 +17,15 @@ function update_fail($update_id, $error_message){
 		$admin_mail_list
 	);
 
-	// every admin could had different language
+	// No valid result?
+	if (!dbm::is_result($adminlist)) {
+		logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_WARNING);
 
+		// Don't continue
+		return;
+	}
+
+	// every admin could had different language
 	foreach ($adminlist as $admin) {
 		$lang = (($admin['language'])?$admin['language']:'en');
 		push_lang($lang);
@@ -48,11 +55,11 @@ function update_fail($update_id, $error_message){
 	$email_tpl = get_intltext_template("update_fail_eml.tpl");
 	$email_msg = replace_macros($email_tpl, array(
 		'$sitename' => $a->config['sitename'],
-		'$siteurl' =>  $a->get_baseurl(),
+		'$siteurl' =>  App::get_baseurl(),
 		'$update' => DB_UPDATE_VERSION,
 		'$error' => sprintf(t('Update %s failed. See error logs.'), DB_UPDATE_VERSION)
 	));
-	$subject=sprintf(t('Update Error at %s'), $a->get_baseurl());
+	$subject=sprintf(t('Update Error at %s'), App::get_baseurl());
 	require_once('include/email.php');
 	$subject = email_header_encode($subject,'UTF-8');
 	mail($a->config['admin_email'], $subject, $email_msg,
@@ -73,10 +80,11 @@ function table_structure($table) {
 	$fielddata = array();
 	$indexdata = array();
 
-	if (is_array($indexes))
+	if (dbm::is_result($indexes))
 		foreach ($indexes AS $index) {
-			if ($index["Index_type"] == "FULLTEXT")
+			if ($index["Index_type"] == "FULLTEXT") {
 				continue;
+			}
 
 			if ($index['Key_name'] != 'PRIMARY' && $index['Non_unique'] == '0' && !isset($indexdata[$index["Key_name"]])) {
 				$indexdata[$index["Key_name"]] = array('UNIQUE');
@@ -87,26 +95,31 @@ function table_structure($table) {
 			// To avoid the need to add this to every index definition we just ignore it here.
 			// Exception are primary indexes
 			// Since there are some combindex primary indexes we use the limit of 180 here.
-			if (($index["Sub_part"] != "") AND (($index["Sub_part"] < 180) OR ($index["Key_name"] == "PRIMARY")))
+			if (($index["Sub_part"] != "") AND (($index["Sub_part"] < 180) OR ($index["Key_name"] == "PRIMARY"))) {
 				$column .= "(".$index["Sub_part"].")";
+			}
 
 			$indexdata[$index["Key_name"]][] = $column;
 		}
 
-	if (is_array($structures)) {
-		foreach($structures AS $field) {
+	if (dbm::is_result($structures)) {
+		foreach ($structures AS $field) {
 			$fielddata[$field["Field"]]["type"] = $field["Type"];
-			if ($field["Null"] == "NO")
+			if ($field["Null"] == "NO") {
 				$fielddata[$field["Field"]]["not null"] = true;
+			}
 
-			if (isset($field["Default"]))
+			if (isset($field["Default"])) {
 				$fielddata[$field["Field"]]["default"] = $field["Default"];
+			}
 
-			if ($field["Extra"] != "")
+			if ($field["Extra"] != "") {
 				$fielddata[$field["Field"]]["extra"] = $field["Extra"];
+			}
 
-			if ($field["Key"] == "PRI")
+			if ($field["Key"] == "PRI") {
 				$fielddata[$field["Field"]]["primary"] = true;
+			}
 		}
 	}
 	return(array("fields"=>$fielddata, "indexes"=>$indexdata));
@@ -130,13 +143,15 @@ function print_structure($database, $charset) {
 function update_structure($verbose, $action, $tables=null, $definition=null) {
 	global $a, $db;
 
-	if ($action)
+	if ($action) {
 		set_config('system', 'maintenance', 1);
+	}
 
-	if (isset($a->config["system"]["db_charset"]))
+	if (isset($a->config["system"]["db_charset"])) {
 		$charset = $a->config["system"]["db_charset"];
-	else
+	} else {
 		$charset = "utf8";
+	}
 
 	$errors = false;
 
@@ -145,31 +160,36 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 	// Get the current structure
 	$database = array();
 
-	if (is_null($tables))
-		$tables = q("show tables");
+	if (is_null($tables)) {
+		$tables = q("SHOW TABLES");
+	}
 
 	foreach ($tables AS $table) {
 		$table = current($table);
 
+		logger(sprintf('updating structure for table %s ...', $table), LOGGER_DEBUG);
 		$database[$table] = table_structure($table);
 	}
 
 	// Get the definition
-	if (is_null($definition))
+	if (is_null($definition)) {
 		$definition = db_definition($charset);
+	}
 
 	// Ensure index conversion to unique removes duplicates
 	$sql_config = "SET session old_alter_table=1;";
-	if ($verbose)
+	if ($verbose) {
 		echo $sql_config."\n";
-	if ($action)
-		@$db->q($sql_config);
+	}
+	if ($action) {
+		$db->q($sql_config);
+	}
 
 	// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
 	if ((version_compare($db->server_info(), '5.7.4') >= 0) AND
 		!(strpos($db->server_info(), 'MariaDB') !== false)) {
 		$ignore = '';
-	}else {
+	} else {
 		$ignore = ' IGNORE';
 	}
 
@@ -179,15 +199,17 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		$sql3="";
 		if (!isset($database[$name])) {
 			$r = db_create_table($name, $structure["fields"], $charset, $verbose, $action, $structure['indexes']);
-			if(false === $r) {
+			if (!dbm::is_result($r)) {
 				$errors .=  t('Errors encountered creating database tables.').$name.EOL;
 			}
 			$is_new_table = True;
 		} else {
-			// Drop the index if it isn't present in the definition
-			// or the definition differ from current status
-			// and index name doesn't start with "local_"
-			foreach ($database[$name]["indexes"] AS $indexname => $fieldnames) {
+			/*
+			 * Drop the index if it isn't present in the definition
+			 * or the definition differ from current status
+			 * and index name doesn't start with "local_"
+			 */
+			foreach ($database[$name]["indexes"] as $indexname => $fieldnames) {
 				$current_index_definition = implode(",",$fieldnames);
 				if (isset($structure["indexes"][$indexname])) {
 					$new_index_definition = implode(",",$structure["indexes"][$indexname]);
@@ -196,39 +218,44 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 				}
 				if ($current_index_definition != $new_index_definition && substr($indexname, 0, 6) != 'local_') {
 					$sql2=db_drop_index($indexname);
-					if ($sql3 == "")
+					if ($sql3 == "") {
 						$sql3 = "ALTER".$ignore." TABLE `".$name."` ".$sql2;
-					else
+					} else {
 						$sql3 .= ", ".$sql2;
+					}
 				}
 			}
 			// Compare the field structure field by field
 			foreach ($structure["fields"] AS $fieldname => $parameters) {
 				if (!isset($database[$name]["fields"][$fieldname])) {
 					$sql2=db_add_table_field($fieldname, $parameters);
-					if ($sql3 == "")
+					if ($sql3 == "") {
 						$sql3 = "ALTER TABLE `".$name."` ".$sql2;
-					else
+					} else {
 						$sql3 .= ", ".$sql2;
+					}
 				} else {
 					// Compare the field definition
 					$current_field_definition = implode(",",$database[$name]["fields"][$fieldname]);
 					$new_field_definition = implode(",",$parameters);
 					if ($current_field_definition != $new_field_definition) {
 						$sql2=db_modify_table_field($fieldname, $parameters);
-						if ($sql3 == "")
+						if ($sql3 == "") {
 							$sql3 = "ALTER TABLE `".$name."` ".$sql2;
-						else
+						} else {
 							$sql3 .= ", ".$sql2;
+						}
 					}
 
 				}
 			}
 		}
 
-		// Create the index if the index don't exists in database
-		// or the definition differ from the current status.
-		// Don't create keys if table is new
+		/*
+		 * Create the index if the index don't exists in database
+		 * or the definition differ from the current status.
+		 * Don't create keys if table is new
+		 */
 		if (!$is_new_table) {
 			foreach ($structure["indexes"] AS $indexname => $fieldnames) {
 				if (isset($database[$name]["indexes"][$indexname])) {
@@ -256,7 +283,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 
 			if ($action) {
 				$r = @$db->q($sql3);
-				if(false === $r)
+				if (dbm::is_result($r))
 					$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
 			}
 		}
@@ -358,10 +385,11 @@ function db_create_index($indexname, $fieldnames, $method="ADD") {
 		if ($names != "")
 			$names .= ",";
 
-		if (preg_match('|(.+)\((\d+)\)|', $fieldname, $matches))
+		if (preg_match('|(.+)\((\d+)\)|', $fieldname, $matches)) {
 			$names .= "`".dbesc($matches[1])."`(".intval($matches[2]).")";
-		else
+		} else {
 			$names .= "`".dbesc($fieldname)."`";
+		}
 	}
 
 	if ($indexname == "PRIMARY") {
@@ -374,8 +402,9 @@ function db_create_index($indexname, $fieldnames, $method="ADD") {
 }
 
 function db_index_suffix($charset, $reduce = 0) {
-	if ($charset != "utf8mb4")
+	if ($charset != "utf8mb4") {
 		return "";
+	}
 
 	// On utf8mb4 indexes can only have a length of 191
 	$indexlength = 191 - $reduce;
@@ -435,13 +464,13 @@ function db_definition($charset) {
 			);
 	$database["cache"] = array(
 			"fields" => array(
-					"k" => array("type" => "varchar(255)", "not null" => "1", "primary" => "1"),
+					"k" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"v" => array("type" => "text"),
 					"expire_mode" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"updated" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("k".db_index_suffix($charset)),
+					"PRIMARY" => array("k"),
 					"updated" => array("updated"),
 					"expire_mode_updated" => array("expire_mode", "updated"),
 					)
@@ -475,13 +504,13 @@ function db_definition($charset) {
 	$database["config"] = array(
 			"fields" => array(
 					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
-					"cat" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
-					"k" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"cat" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
+					"k" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"v" => array("type" => "text"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"cat_k" => array("UNIQUE", "cat(30)","k(30)"),
+					"cat_k" => array("UNIQUE", "cat", "k"),
 					)
 			);
 	$database["contact"] = array(
@@ -581,7 +610,7 @@ function db_definition($charset) {
 	$database["deliverq"] = array(
 			"fields" => array(
 					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
-					"cmd" => array("type" => "varchar(32)", "not null" => "1", "default" => ""),
+					"cmd" => array("type" => "varbinary(32)", "not null" => "1", "default" => ""),
 					"item" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"contact" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					),
@@ -1063,25 +1092,25 @@ function db_definition($charset) {
 			);
 	$database["oembed"] = array(
 			"fields" => array(
-					"url" => array("type" => "varchar(255)", "not null" => "1", "primary" => "1"),
+					"url" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"content" => array("type" => "text"),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("url".db_index_suffix($charset)),
+					"PRIMARY" => array("url"),
 					"created" => array("created"),
 					)
 			);
 	$database["parsed_url"] = array(
 			"fields" => array(
-					"url" => array("type" => "varchar(255)", "not null" => "1", "primary" => "1"),
+					"url" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"guessing" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0", "primary" => "1"),
 					"oembed" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0", "primary" => "1"),
 					"content" => array("type" => "text"),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("url".db_index_suffix($charset), "guessing", "oembed"),
+					"PRIMARY" => array("url", "guessing", "oembed"),
 					"created" => array("created"),
 					)
 			);
@@ -1089,13 +1118,13 @@ function db_definition($charset) {
 			"fields" => array(
 					"id" => array("type" => "int(11)", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
 					"uid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
-					"cat" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
-					"k" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"cat" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
+					"k" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"v" => array("type" => "mediumtext"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid_cat_k" => array("UNIQUE", "uid","cat(30)","k(30)"),
+					"uid_cat_k" => array("UNIQUE", "uid", "cat", "k"),
 					)
 			);
 	$database["photo"] = array(
@@ -1167,7 +1196,7 @@ function db_definition($charset) {
 	$database["process"] = array(
 			"fields" => array(
 					"pid" => array("type" => "int(10) unsigned", "not null" => "1", "primary" => "1"),
-					"command" => array("type" => "varchar(32)", "not null" => "1", "default" => ""),
+					"command" => array("type" => "varbinary(32)", "not null" => "1", "default" => ""),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
@@ -1301,7 +1330,7 @@ function db_definition($charset) {
 	$database["session"] = array(
 			"fields" => array(
 					"id" => array("type" => "bigint(20) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
-					"sid" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"sid" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"data" => array("type" => "text"),
 					"expire" => array("type" => "int(10) unsigned", "not null" => "1", "default" => "0"),
 					),
@@ -1563,9 +1592,6 @@ function dbstructure_run(&$argv, &$argc) {
 	echo "update		update database schema\n";
 	echo "dumpsql		dump database schema\n";
 	return;
-
-
-
 
 }
 

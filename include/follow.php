@@ -2,6 +2,10 @@
 require_once("include/Scrape.php");
 require_once("include/socgraph.php");
 require_once('include/group.php');
+require_once('include/salmon.php');
+require_once('include/ostatus.php');
+require_once("include/Photo.php");
+require_once('include/diaspora.php');
 
 function update_contact($id) {
 	/*
@@ -73,12 +77,12 @@ function new_contact($uid,$url,$interactive = false) {
 
 	$url = str_replace('/#!/','/',$url);
 
-	if(! allowed_url($url)) {
+	if (! allowed_url($url)) {
 		$result['message'] = t('Disallowed profile URL.');
 		return $result;
 	}
 
-	if(! $url) {
+	if (! $url) {
 		$result['message'] = t('Connect URL missing.');
 		return $result;
 	}
@@ -87,17 +91,21 @@ function new_contact($uid,$url,$interactive = false) {
 
 	call_hooks('follow', $arr);
 
-	if(x($arr['contact'],'name'))
+	if (x($arr['contact'],'name')) {
 		$ret = $arr['contact'];
-	else
+	}
+	else {
 		$ret = probe_url($url);
+	}
 
-	if($ret['network'] === NETWORK_DFRN) {
-		if($interactive) {
-			if(strlen($a->path))
-				$myaddr = bin2hex($a->get_baseurl() . '/profile/' . $a->user['nickname']);
-			else
+	if ($ret['network'] === NETWORK_DFRN) {
+		if ($interactive) {
+			if (strlen($a->path)) {
+				$myaddr = bin2hex(App::get_baseurl() . '/profile/' . $a->user['nickname']);
+			}
+			else {
 				$myaddr = bin2hex($a->user['nickname'] . '@' . $a->get_hostname());
+			}
 
 			goaway($ret['request'] . "&addr=$myaddr");
 
@@ -173,12 +181,12 @@ function new_contact($uid,$url,$interactive = false) {
 		dbesc($ret['network'])
 	);
 
-	if(!count($r))
+	if (!dbm::is_result($r))
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` = '%s' LIMIT 1",
 			intval($uid), dbesc(normalise_link($url)), dbesc($ret['network'])
 	);
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		// update contact
 		if($r[0]['rel'] == CONTACT_IS_FOLLOWER || ($network === NETWORK_DIASPORA && $r[0]['rel'] == CONTACT_IS_SHARING)) {
 			q("UPDATE `contact` SET `rel` = %d , `subhub` = %d, `readonly` = 0 WHERE `id` = %d AND `uid` = %d",
@@ -196,7 +204,7 @@ function new_contact($uid,$url,$interactive = false) {
 		$r = q("select count(*) as total from contact where uid = %d and pending = 0 and self = 0",
 			intval($uid)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$total_contacts = $r[0]['total'];
 
 		if(! service_class_allows($uid,'total_contacts',$total_contacts)) {
@@ -208,7 +216,7 @@ function new_contact($uid,$url,$interactive = false) {
 			intval($uid),
 			dbesc($network)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$total_network = $r[0]['total'];
 
 		if(! service_class_allows($uid,'total_contacts_' . $network,$total_network)) {
@@ -250,7 +258,7 @@ function new_contact($uid,$url,$interactive = false) {
 		intval($uid)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		$result['message'] .=  t('Unable to retrieve contact information.') . EOL;
 		return $result;
 	}
@@ -263,8 +271,6 @@ function new_contact($uid,$url,$interactive = false) {
 	if (intval($def_gid))
 		group_add_member($uid, '', $contact_id, $def_gid);
 
-	require_once("include/Photo.php");
-
 	// Update the avatar
 	update_contact_avatar($ret['photo'],$uid,$contact_id);
 
@@ -272,37 +278,24 @@ function new_contact($uid,$url,$interactive = false) {
 
 	proc_run(PRIORITY_HIGH, "include/onepoll.php", $contact_id, "force");
 
-	// create a follow slap
-
-	$tpl = get_markup_template('follow_slap.tpl');
-	$slap = replace_macros($tpl, array(
-		'$name' => $a->user['username'],
-		'$profile_page' => $a->get_baseurl() . '/profile/' . $a->user['nickname'],
-		'$photo' => $a->contact['photo'],
-		'$thumb' => $a->contact['thumb'],
-		'$published' => datetime_convert('UTC','UTC', 'now', ATOM_TIME),
-		'$item_id' => 'urn:X-dfrn:' . $a->get_hostname() . ':follow:' . get_guid(32),
-		'$title' => '',
-		'$type' => 'text',
-		'$content' => t('following'),
-		'$nick' => $a->user['nickname'],
-		'$verb' => ACTIVITY_FOLLOW,
-		'$ostat_follow' => ''
-	));
-
 	$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
-			WHERE `user`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
+			WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 			intval($uid)
 	);
 
-	if(count($r)) {
-		if(($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
-			require_once('include/salmon.php');
-			slapper($r[0],$contact['notify'],$slap);
+	if (dbm::is_result($r)) {
+		if (($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
+
+			// create a follow slap
+			$item = array();
+			$item['verb'] = ACTIVITY_FOLLOW;
+			$item['follow'] = $contact["url"];
+			$slap = ostatus::salmon($item, $r[0]);
+			slapper($r[0], $contact['notify'], $slap);
 		}
-		if($contact['network'] == NETWORK_DIASPORA) {
-			require_once('include/diaspora.php');
-			$ret = diaspora::send_share($a->user,$contact);
+
+		if ($contact['network'] == NETWORK_DIASPORA) {
+			$ret = Diaspora::send_share($a->user,$contact);
 			logger('share returns: '.$ret);
 		}
 	}

@@ -18,7 +18,7 @@ function get_theme_config_file($theme){
 
 function settings_init(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
 		return;
 	}
@@ -118,31 +118,33 @@ function settings_init(&$a) {
 
 function settings_post(&$a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
-	if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
+	if (x($_SESSION,'submanage') && intval($_SESSION['submanage'])) {
 		return;
+	}
 
-	if(count($a->user) && x($a->user,'uid') && $a->user['uid'] != local_user()) {
+	if (count($a->user) && x($a->user,'uid') && $a->user['uid'] != local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
 	$old_page_flags = $a->user['page-flags'];
 
-	if(($a->argc > 1) && ($a->argv[1] === 'oauth') && x($_POST,'remove')){
+	if (($a->argc > 1) && ($a->argv[1] === 'oauth') && x($_POST,'remove')) {
 		check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth');
 
 		$key = $_POST['remove'];
 		q("DELETE FROM tokens WHERE id='%s' AND uid=%d",
 			dbesc($key),
 			local_user());
-		goaway($a->get_baseurl(true)."/settings/oauth/");
+		goaway(App::get_baseurl(true)."/settings/oauth/");
 		return;
 	}
 
-	if(($a->argc > 2) && ($a->argv[1] === 'oauth')  && ($a->argv[2] === 'edit'||($a->argv[2] === 'add')) && x($_POST,'submit')) {
+	if (($a->argc > 2) && ($a->argv[1] === 'oauth')  && ($a->argv[2] === 'edit'||($a->argv[2] === 'add')) && x($_POST,'submit')) {
 
 		check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth');
 
@@ -183,7 +185,7 @@ function settings_post(&$a) {
 						local_user());
 			}
 		}
-		goaway($a->get_baseurl(true)."/settings/oauth/");
+		goaway(App::get_baseurl(true)."/settings/oauth/");
 		return;
 	}
 
@@ -225,7 +227,7 @@ function settings_post(&$a) {
 				$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 					intval(local_user())
 				);
-				if(! count($r)) {
+				if (! dbm::is_result($r)) {
 					q("INSERT INTO `mailacct` (`uid`) VALUES (%d)",
 						intval(local_user())
 					);
@@ -255,7 +257,7 @@ function settings_post(&$a) {
 				$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 					intval(local_user())
 				);
-				if(count($r)) {
+				if (dbm::is_result($r)) {
 					$eacct = $r[0];
 					require_once('include/email.php');
 					$mb = construct_mailbox_name($eacct);
@@ -625,11 +627,12 @@ function settings_post(&$a) {
 		);
 	}
 
-	if(($old_visibility != $net_publish) || ($page_flags != $old_page_flags)) {
+	if (($old_visibility != $net_publish) || ($page_flags != $old_page_flags)) {
 		// Update global directory in background
 		$url = $_SESSION['my_url'];
-		if($url && strlen(get_config('system','directory')))
+		if ($url && strlen(get_config('system','directory'))) {
 			proc_run(PRIORITY_LOW, "include/directory.php", $url);
+		}
 	}
 
 	require_once('include/profile_update.php');
@@ -639,10 +642,10 @@ function settings_post(&$a) {
 	update_gcontact_for_user(local_user());
 
 	//$_SESSION['theme'] = $theme;
-	if($email_changed && $a->config['register_policy'] == REGISTER_VERIFY) {
+	if ($email_changed && $a->config['register_policy'] == REGISTER_VERIFY) {
 
-		// FIXME - set to un-verified, blocked and redirect to logout
-		// Why? Are we verifying people or email addresses?
+		/// @TODO set to un-verified, blocked and redirect to logout
+		/// @TODO Why? Are we verifying people or email addresses?
 
 	}
 
@@ -656,21 +659,21 @@ function settings_content(&$a) {
 	$o = '';
 	nav_set_selected('settings');
 
-	if(! local_user()) {
+	if (! local_user()) {
 		#notice( t('Permission denied.') . EOL );
 		return;
 	}
 
-	if(x($_SESSION,'submanage') && intval($_SESSION['submanage'])) {
+	if (x($_SESSION,'submanage') && intval($_SESSION['submanage'])) {
 		notice( t('Permission denied.') . EOL );
 		return;
 	}
 
 
 
-	if(($a->argc > 1) && ($a->argv[1] === 'oauth')) {
+	if (($a->argc > 1) && ($a->argv[1] === 'oauth')) {
 
-		if(($a->argc > 2) && ($a->argv[2] === 'add')) {
+		if (($a->argc > 2) && ($a->argv[2] === 'add')) {
 			$tpl = get_markup_template("settings_oauth_edit.tpl");
 			$o .= replace_macros($tpl, array(
 				'$form_security_token' => get_form_security_token("settings_oauth"),
@@ -686,12 +689,12 @@ function settings_content(&$a) {
 			return $o;
 		}
 
-		if(($a->argc > 3) && ($a->argv[2] === 'edit')) {
+		if (($a->argc > 3) && ($a->argv[2] === 'edit')) {
 			$r = q("SELECT * FROM clients WHERE client_id='%s' AND uid=%d",
 					dbesc($a->argv[3]),
 					local_user());
 
-			if (!count($r)){
+			if (!dbm::is_result($r)){
 				notice(t("You can't edit this application."));
 				return;
 			}
@@ -718,11 +721,11 @@ function settings_content(&$a) {
 			$r = q("DELETE FROM clients WHERE client_id='%s' AND uid=%d",
 					dbesc($a->argv[3]),
 					local_user());
-			goaway($a->get_baseurl(true)."/settings/oauth/");
+			goaway(App::get_baseurl(true)."/settings/oauth/");
 			return;
 		}
 
-
+		/// @TODO validate result with dbm::is_result()
 		$r = q("SELECT clients.*, tokens.id as oauth_token, (clients.uid=%d) AS my
 				FROM clients
 				LEFT JOIN tokens ON clients.client_id=tokens.client_id
@@ -734,7 +737,7 @@ function settings_content(&$a) {
 		$tpl = get_markup_template("settings_oauth.tpl");
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("settings_oauth"),
-			'$baseurl'	=> $a->get_baseurl(true),
+			'$baseurl'	=> App::get_baseurl(true),
 			'$title'	=> t('Connected Apps'),
 			'$add'		=> t('Add application'),
 			'$edit'		=> t('Edit'),
@@ -748,12 +751,13 @@ function settings_content(&$a) {
 
 	}
 
-	if(($a->argc > 1) && ($a->argv[1] === 'addon')) {
+	if (($a->argc > 1) && ($a->argv[1] === 'addon')) {
 		$settings_addons = "";
 
 		$r = q("SELECT * FROM `hook` WHERE `hook` = 'plugin_settings' ");
-		if(! count($r))
+		if (! dbm::is_result($r)) {
 			$settings_addons = t('No Plugin settings configured');
+		}
 
 		call_hooks('plugin_settings', $settings_addons);
 
@@ -767,14 +771,14 @@ function settings_content(&$a) {
 		return $o;
 	}
 
-	if(($a->argc > 1) && ($a->argv[1] === 'features')) {
+	if (($a->argc > 1) && ($a->argv[1] === 'features')) {
 
 		$arr = array();
 		$features = get_features();
-		foreach($features as $fname => $fdata) {
+		foreach ($features as $fname => $fdata) {
 			$arr[$fname] = array();
 			$arr[$fname][0] = $fdata[0];
-			foreach(array_slice($fdata,1) as $f) {
+			foreach (array_slice($fdata,1) as $f) {
 				$arr[$fname][1][] = array('feature_' .$f[0],$f[1],((intval(feature_enabled(local_user(),$f[0]))) ? "1" : ''),$f[2],array(t('Off'),t('On')));
 			}
 		}
@@ -783,14 +787,14 @@ function settings_content(&$a) {
 		$tpl = get_markup_template("settings_features.tpl");
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("settings_features"),
-			'$title'	=> t('Additional Features'),
-			'$features' => $arr,
-			'$submit'   => t('Save Settings'),
+			'$title'               => t('Additional Features'),
+			'$features'            => $arr,
+			'$submit'              => t('Save Settings'),
 		));
 		return $o;
 	}
 
-	if(($a->argc > 1) && ($a->argv[1] === 'connectors')) {
+	if (($a->argc > 1) && ($a->argv[1] === 'connectors')) {
 
 		$settings_connectors = '<span id="settings_general_inflated" class="settings-block fakelink" style="display: block;" onclick="openClose(\'settings_general_expanded\'); openClose(\'settings_general_inflated\');">';
 		$settings_connectors .= '<h3 class="connector">'. t('General Social Media Settings').'</h3>';
@@ -821,8 +825,10 @@ function settings_content(&$a) {
 
 		$settings_connectors .= mini_group_select(local_user(), $default_group, t("Default group for OStatus contacts"));
 
-		if ($legacy_contact != "")
-			$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.$a->get_baseurl().'/ostatus_subscribe?url='.urlencode($legacy_contact).'">';
+		/// @TODO Found to much different usage to test empty/non-empty strings (e.g. empty(), trim() == '' ) which is wanted?
+		if ($legacy_contact != "") {
+			$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.App::get_baseurl().'/ostatus_subscribe?url='.urlencode($legacy_contact).'">';
+		}
 
 		$settings_connectors .= '<div id="legacy-contact-wrapper" class="field input">';
 		$settings_connectors .= '<label id="legacy-contact-label" for="snautofollow-checkbox">'. t('Your legacy GNU Social account'). '</label>';
@@ -830,7 +836,7 @@ function settings_content(&$a) {
 		$settings_connectors .= '<span class="field_help">'.t('If you enter your old GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added automatically. The field will be emptied when done.').'</span>';
 		$settings_connectors .= '</div>';
 
-		$settings_connectors .= '<p><a href="'.$a->get_baseurl().'/repair_ostatus">'.t("Repair OStatus subscriptions").'</a></p>';
+		$settings_connectors .= '<p><a href="'.App::get_baseurl().'/repair_ostatus">'.t("Repair OStatus subscriptions").'</a></p>';
 
 		$settings_connectors .= '<div class="settings-submit-wrapper" ><input type="submit" name="general-submit" class="settings-submit" value="' . t('Save Settings') . '" /></div>';
 
@@ -854,28 +860,26 @@ function settings_content(&$a) {
 			$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 				local_user()
 			);
-		}
-		else {
+		} else {
 			$r = null;
 		}
 
-		$mail_server       = ((count($r)) ? $r[0]['server'] : '');
-		$mail_port         = ((count($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
-		$mail_ssl          = ((count($r)) ? $r[0]['ssltype'] : '');
-		$mail_user         = ((count($r)) ? $r[0]['user'] : '');
-		$mail_replyto      = ((count($r)) ? $r[0]['reply_to'] : '');
-		$mail_pubmail      = ((count($r)) ? $r[0]['pubmail'] : 0);
-		$mail_action       = ((count($r)) ? $r[0]['action'] : 0);
-		$mail_movetofolder = ((count($r)) ? $r[0]['movetofolder'] : '');
-		$mail_chk          = ((count($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
+		$mail_server       = ((dbm::is_result($r)) ? $r[0]['server'] : '');
+		$mail_port         = ((dbm::is_result($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
+		$mail_ssl          = ((dbm::is_result($r)) ? $r[0]['ssltype'] : '');
+		$mail_user         = ((dbm::is_result($r)) ? $r[0]['user'] : '');
+		$mail_replyto      = ((dbm::is_result($r)) ? $r[0]['reply_to'] : '');
+		$mail_pubmail      = ((dbm::is_result($r)) ? $r[0]['pubmail'] : 0);
+		$mail_action       = ((dbm::is_result($r)) ? $r[0]['action'] : 0);
+		$mail_movetofolder = ((dbm::is_result($r)) ? $r[0]['movetofolder'] : '');
+		$mail_chk          = ((dbm::is_result($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
 
 
 		$tpl = get_markup_template("settings_connectors.tpl");
 
-		if(! service_class_allows(local_user(),'email_connect')) {
+		if (! service_class_allows(local_user(),'email_connect')) {
 			$mail_disabled_message = upgrade_bool_message();
-		}
-		else {
+		} else {
 			$mail_disabled_message = (($mail_disabled) ? t('Email access is disabled on this site.') : '');
 		}
 
@@ -913,38 +917,42 @@ function settings_content(&$a) {
 	/*
 	 * DISPLAY SETTINGS
 	 */
-	if(($a->argc > 1) && ($a->argv[1] === 'display')) {
+	if (($a->argc > 1) && ($a->argv[1] === 'display')) {
 		$default_theme = get_config('system','theme');
-		if(! $default_theme)
+		if (! $default_theme) {
 			$default_theme = 'default';
+		}
 		$default_mobile_theme = get_config('system','mobile-theme');
-		if(! $mobile_default_theme)
+		if (! $mobile_default_theme) {
 			$mobile_default_theme = 'none';
+		}
 
 		$allowed_themes_str = get_config('system','allowed_themes');
 		$allowed_themes_raw = explode(',',$allowed_themes_str);
 		$allowed_themes = array();
-		if(count($allowed_themes_raw))
-			foreach($allowed_themes_raw as $x)
-				if(strlen(trim($x)) && is_dir("view/theme/$x"))
+		if (count($allowed_themes_raw)) {
+			foreach ($allowed_themes_raw as $x) {
+				if (strlen(trim($x)) && is_dir("view/theme/$x")) {
 					$allowed_themes[] = trim($x);
+				}
+			}
+		}
 
 
 		$themes = array();
 		$mobile_themes = array("---" => t('No special theme for mobile devices'));
 		$files = glob('view/theme/*'); /* */
-		if($allowed_themes) {
-			foreach($allowed_themes as $th) {
+		if ($allowed_themes) {
+			foreach ($allowed_themes as $th) {
 				$f = $th;
 				$is_experimental = file_exists('view/theme/' . $th . '/experimental');
 				$unsupported = file_exists('view/theme/' . $th . '/unsupported');
 				$is_mobile = file_exists('view/theme/' . $th . '/mobile');
 				if (!$is_experimental or ($is_experimental && (get_config('experimentals','exp_themes')==1 or get_config('experimentals','exp_themes')===false))){
 					$theme_name = (($is_experimental) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
-					if($is_mobile) {
+					if ($is_mobile) {
 						$mobile_themes[$f]=$theme_name;
-					}
-					else {
+					} else {
 						$themes[$f]=$theme_name;
 					}
 				}
@@ -956,8 +964,9 @@ function settings_content(&$a) {
 		$nowarn_insecure = intval(get_pconfig(local_user(), 'system', 'nowarn_insecure'));
 
 		$browser_update = intval(get_pconfig(local_user(), 'system','update_interval'));
-		if (intval($browser_update) != -1)
+		if (intval($browser_update) != -1) {
 			$browser_update = (($browser_update == 0) ? 40 : $browser_update / 1000); // default if not set: 40 seconds
+		}
 
 		$itemspage_network = intval(get_pconfig(local_user(), 'system','itemspage_network'));
 		$itemspage_network = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : 40); // default if not set: 40 items
@@ -994,7 +1003,7 @@ function settings_content(&$a) {
 			'$ptitle' 	=> t('Display Settings'),
 			'$form_security_token' => get_form_security_token("settings_display"),
 			'$submit' 	=> t('Save Settings'),
-			'$baseurl' => $a->get_baseurl(true),
+			'$baseurl' => App::get_baseurl(true),
 			'$uid' => local_user(),
 
 			'$theme'	=> array('theme', t('Display Theme:'), $theme_selected, '', $themes, true),
@@ -1036,8 +1045,9 @@ function settings_content(&$a) {
 	$p = q("SELECT * FROM `profile` WHERE `is-default` = 1 AND `uid` = %d LIMIT 1",
 		intval(local_user())
 	);
-	if(count($p))
+	if (count($p)) {
 		$profile = $p[0];
+	}
 
 	$username   = $a->user['username'];
 	$email      = $a->user['email'];
@@ -1084,8 +1094,9 @@ function settings_content(&$a) {
 
 	// nowarn_insecure
 
-	if(! strlen($a->user['timezone']))
+	if (! strlen($a->user['timezone'])) {
 		$timezone = date_default_timezone_get();
+	}
 
 	// Set the account type to "Community" when the page is a community page but the account type doesn't fit
 	// This is only happening on the first visit after the update
@@ -1146,32 +1157,28 @@ function settings_content(&$a) {
 
 	$noid = get_config('system','no_openid');
 
-	if($noid) {
+	if ($noid) {
 		$openid_field = false;
-	}
-	else {
+	} else {
 		$openid_field = array('openid_url', t('OpenID:'),$openid, t("\x28Optional\x29 Allow this OpenID to login to this account."), "", "", "url");
 	}
-
 
 	$opt_tpl = get_markup_template("field_yesno.tpl");
 	if(get_config('system','publish_all')) {
 		$profile_in_dir = '<input type="hidden" name="profile_in_directory" value="1" />';
-	}
-	else {
+	} else {
 		$profile_in_dir = replace_macros($opt_tpl,array(
 			'$field' 	=> array('profile_in_directory', t('Publish your default profile in your local site directory?'), $profile['publish'], '', array(t('No'),t('Yes'))),
 		));
 	}
 
-	if(strlen(get_config('system','directory'))) {
+	if (strlen(get_config('system','directory'))) {
 		$profile_in_net_dir = replace_macros($opt_tpl,array(
 			'$field' 	=> array('profile_in_netdirectory', t('Publish your default profile in the global social directory?'), $profile['net-publish'], '', array(t('No'),t('Yes'))),
 		));
-	}
-	else
+	} else {
 		$profile_in_net_dir = '';
-
+	}
 
 	$hide_friends = replace_macros($opt_tpl,array(
 			'$field' 	=> array('hide-friends', t('Hide your contact/friend list from viewers of your default profile?'), $profile['hide-friends'], '', array(t('No'),t('Yes'))),
@@ -1187,18 +1194,15 @@ function settings_content(&$a) {
 
 	));
 
-
 	$blocktags = replace_macros($opt_tpl,array(
 			'$field' 	=> array('blocktags',  t('Allow friends to tag your posts?'), (intval($a->user['blocktags']) ? '0' : '1'), '', array(t('No'),t('Yes'))),
 
 	));
 
-
 	$suggestme = replace_macros($opt_tpl,array(
 			'$field' 	=> array('suggestme',  t('Allow us to suggest you as a potential friend to new members?'), $suggestme, '', array(t('No'),t('Yes'))),
 
 	));
-
 
 	$unkmail = replace_macros($opt_tpl,array(
 			'$field' 	=> array('unkmail',  t('Permit unknown people to send you private mail?'), $unkmail, '', array(t('No'),t('Yes'))),
@@ -1208,16 +1212,16 @@ function settings_content(&$a) {
 	$invisible = (((! $profile['publish']) && (! $profile['net-publish']))
 		? true : false);
 
-	if($invisible)
+	if ($invisible) {
 		info( t('Profile is <strong>not published</strong>.') . EOL );
-
+	}
 
 	//$subdir = ((strlen($a->get_path())) ? '<br />' . t('or') . ' ' . 'profile/' . $nickname : '');
 
 	$tpl_addr = get_markup_template("settings_nick_set.tpl");
 
 	$prof_addr = replace_macros($tpl_addr,array(
-		'$desc' => sprintf(t("Your Identity Address is <strong>'%s'</strong> or '%s'."), $nickname.'@'.$a->get_hostname().$a->get_path(), $a->get_baseurl().'/profile/'.$nickname),
+		'$desc' => sprintf(t("Your Identity Address is <strong>'%s'</strong> or '%s'."), $nickname.'@'.$a->get_hostname().$a->get_path(), App::get_baseurl().'/profile/'.$nickname),
 		'$basepath' => $a->get_hostname()
 	));
 
@@ -1237,32 +1241,35 @@ function settings_content(&$a) {
 	require_once('include/group.php');
 	$group_select = mini_group_select(local_user(),$a->user['def_gid']);
 
-
 	// Private/public post links for the non-JS ACL form
 	$private_post = 1;
-	if($_REQUEST['public'])
+	if ($_REQUEST['public']) {
 		$private_post = 0;
+	}
 
 	$query_str = $a->query_string;
-	if(strpos($query_str, 'public=1') !== false)
+	if (strpos($query_str, 'public=1') !== false) {
 		$query_str = str_replace(array('?public=1', '&public=1'), array('', ''), $query_str);
+	}
 
 	// I think $a->query_string may never have ? in it, but I could be wrong
 	// It looks like it's from the index.php?q=[etc] rewrite that the web
 	// server does, which converts any ? to &, e.g. suggest&ignore=61 for suggest?ignore=61
-	if(strpos($query_str, '?') === false)
+	if (strpos($query_str, '?') === false) {
 		$public_post_link = '?public=1';
-	else
+	} else {
 		$public_post_link = '&public=1';
+	}
 
 	/* Installed langs */
 	$lang_choices = get_available_languages();
 
+	/// @TODO Fix indending (or so)
 	$o .= replace_macros($stpl, array(
 		'$ptitle' 	=> t('Account Settings'),
 
 		'$submit' 	=> t('Save Settings'),
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$uid' => local_user(),
 		'$form_security_token' => get_form_security_token("settings"),
 		'$nickname_block' => $prof_addr,

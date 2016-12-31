@@ -324,7 +324,7 @@ class Probe {
 				!isset($parts["path"]))
 				return false;
 
-			// todo: Ports?
+			/// @todo: Ports?
 			$host = $parts["host"];
 
 			if ($host == 'twitter.com')
@@ -569,6 +569,8 @@ class Probe {
 
 		$data = array();
 
+		logger("Check profile ".$profile, LOGGER_DEBUG);
+
 		// Fetch data via noscrape - this is faster
 		$noscrape = str_replace(array("/hcard/", "/profile/"), "/noscrape/", $profile);
 		$data = self::poll_noscrape($noscrape, $data);
@@ -590,6 +592,8 @@ class Probe {
 		$prof_data["photo"] = $data["photo"];
 		$prof_data["fn"] = $data["name"];
 		$prof_data["key"] = $data["pubkey"];
+
+		logger("Result for profile ".$profile.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
 		return $prof_data;
 	}
@@ -1080,7 +1084,7 @@ class Probe {
 
 		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-		if(count($x) && count($r)) {
+		if (dbm::is_result($x) && dbm::is_result($r)) {
 			$mailbox = construct_mailbox_name($r[0]);
 			$password = '';
 			openssl_private_decrypt(hex2bin($r[0]['pass']), $password,$x[0]['prvkey']);

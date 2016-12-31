@@ -1,6 +1,8 @@
 Friendica translations
 ======================
 
+* [Home](help)
+
 Translation Process
 -------------------
 

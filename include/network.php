@@ -338,7 +338,6 @@ function xml_status($st, $message = '') {
 	killme();
 }
 
-
 /**
  * @brief Send HTTP status header and exit.
  *
@@ -348,6 +347,14 @@ function xml_status($st, $message = '') {
  *    'description' => optional message
  */
 
+/**
+ * @brief Send HTTP status header and exit.
+ *
+ * @param integer $val HTTP status result value
+ * @param array $description optional message
+ *    'title' => header title
+ *    'description' => optional message
+ */
 function http_status_exit($val, $description = array()) {
 	$err = '';
 	if($val >= 400) {
@@ -381,19 +388,23 @@ function http_status_exit($val, $description = array()) {
  * @return boolean True if it's a valid URL, fals if something wrong with it
  */
 function validate_url(&$url) {
-
 	if(get_config('system','disable_url_validation'))
 		return true;
+
 	// no naked subdomains (allow localhost for tests)
 	if(strpos($url,'.') === false && strpos($url,'/localhost/') === false)
 		return false;
+
 	if(substr($url,0,4) != 'http')
 		$url = 'http://' . $url;
+
+	/// @TODO Really supress function outcomes? Why not find them + debug them?
 	$h = @parse_url($url);
 
-	if(($h) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
+	if((is_array($h)) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -502,8 +513,6 @@ function allowed_email($email) {
 
 function avatar_img($email) {
 
-	$a = get_app();
-
 	$avatar['size'] = 175;
 	$avatar['email'] = $email;
 	$avatar['url'] = '';
@@ -511,8 +520,9 @@ function avatar_img($email) {
 
 	call_hooks('avatar_lookup', $avatar);
 
-	if(! $avatar['success'])
-		$avatar['url'] = $a->get_baseurl() . '/images/person-175.jpg';
+	if (! $avatar['success']) {
+		$avatar['url'] = App::get_baseurl() . '/images/person-175.jpg';
+	}
 
 	logger('Avatar: ' . $avatar['email'] . ' ' . $avatar['url'], LOGGER_DEBUG);
 	return $avatar['url'];
@@ -558,7 +568,7 @@ function scale_external_images($srctext, $include_link = true, $scale_replace = 
 		foreach($matches as $mtch) {
 			logger('scale_external_image: ' . $mtch[1]);
 
-			$hostname = str_replace('www.','',substr($a->get_baseurl(),strpos($a->get_baseurl(),'://')+3));
+			$hostname = str_replace('www.','',substr(App::get_baseurl(),strpos(App::get_baseurl(),'://')+3));
 			if(stristr($mtch[1],$hostname))
 				continue;
 

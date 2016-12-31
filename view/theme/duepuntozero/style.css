@@ -1154,6 +1154,11 @@ input#dfrn-url {
 	margin-right: 10px;
 }
 
+.wall-item-like-buttons > a.active,
+.wall-item-attend-wrapper > a.active {
+	background-color: rgba(52, 101, 164, .5);
+}
+
 .editpost {
 	margin-left: 10px;
 	float: left;

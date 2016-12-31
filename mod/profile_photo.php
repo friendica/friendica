@@ -4,7 +4,7 @@ require_once("include/Photo.php");
 
 function profile_photo_init(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		return;
 	}
 
@@ -15,7 +15,7 @@ function profile_photo_init(&$a) {
 
 function profile_photo_post(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice ( t('Permission denied.') . EOL );
 		return;
 	}
@@ -32,7 +32,7 @@ function profile_photo_post(&$a) {
 				intval($_REQUEST['profile']),
 				intval(local_user())
 			);
-			if(count($r) && (! intval($r[0]['is-default'])))
+			if (dbm::is_result($r) && (! intval($r[0]['is-default'])))
 				$is_default_profile = 0;
 		}
 
@@ -63,7 +63,7 @@ function profile_photo_post(&$a) {
 			dbesc(local_user()),
 			intval($scale));
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$base_image = $r[0];
 
@@ -99,15 +99,15 @@ function profile_photo_post(&$a) {
 					);
 
 					$r = q("UPDATE `contact` SET `photo` = '%s', `thumb` = '%s', `micro` = '%s'  WHERE `self` AND `uid` = %d",
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-6.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-6.' . $im->getExt()),
 						intval(local_user())
 					);
 				} else {
 					$r = q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
 						intval($_REQUEST['profile']),
 						intval(local_user())
 					);
@@ -123,9 +123,10 @@ function profile_photo_post(&$a) {
 
 				info( t('Shift-reload the page or clear browser cache if the new photo does not display immediately.') . EOL);
 				// Update global directory in background
-				$url = $a->get_baseurl() . '/profile/' . $a->user['nickname'];
-				if($url && strlen(get_config('system','directory')))
+				$url = App::get_baseurl() . '/profile/' . $a->user['nickname'];
+				if ($url && strlen(get_config('system','directory'))) {
 					proc_run(PRIORITY_LOW, "include/directory.php", $url);
+				}
 
 				require_once('include/profile_update.php');
 				profile_change();
@@ -134,7 +135,7 @@ function profile_photo_post(&$a) {
 				notice( t('Unable to process image') . EOL);
 		}
 
-		goaway($a->get_baseurl() . '/profiles');
+		goaway(App::get_baseurl() . '/profiles');
 		return; // NOTREACHED
 	}
 
@@ -171,7 +172,7 @@ function profile_photo_post(&$a) {
 if(! function_exists('profile_photo_content')) {
 function profile_photo_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
 		return;
 	}
@@ -195,12 +196,12 @@ function profile_photo_content(&$a) {
 			intval(local_user()),
 			dbesc($resource_id)
 			);
-		if (!count($r)){
+		if (!dbm::is_result($r)){
 			notice( t('Permission denied.') . EOL );
 			return;
 		}
 		$havescale = false;
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 			if($rr['scale'] == 5)
 				$havescale = true;
 		}
@@ -223,10 +224,11 @@ function profile_photo_content(&$a) {
 
 			// Update global directory in background
 			$url = $_SESSION['my_url'];
-			if($url && strlen(get_config('system','directory')))
+			if ($url && strlen(get_config('system','directory'))) {
 				proc_run(PRIORITY_LOW, "include/directory.php", $url);
+			}
 
-			goaway($a->get_baseurl() . '/profiles');
+			goaway(App::get_baseurl() . '/profiles');
 			return; // NOTREACHED
 		}
 		$ph = new Photo($r[0]['data'], $r[0]['type']);
@@ -251,7 +253,7 @@ function profile_photo_content(&$a) {
 			'$submit' => t('Upload'),
 			'$profiles' => $profiles,
 			'$form_security_token' => get_form_security_token("profile_photo"),
-			'$select' => sprintf('%s %s', t('or'), ($newuser) ? '<a href="' . $a->get_baseurl() . '">' . t('skip this step') . '</a>' : '<a href="'. $a->get_baseurl() . '/photos/' . $a->user['nickname'] . '">' . t('select a photo from your photo albums') . '</a>')
+			'$select' => sprintf('%s %s', t('or'), ($newuser) ? '<a href="' . App::get_baseurl() . '">' . t('skip this step') . '</a>' : '<a href="'. App::get_baseurl() . '/photos/' . $a->user['nickname'] . '">' . t('select a photo from your photo albums') . '</a>')
 		));
 
 		return $o;
@@ -264,7 +266,7 @@ function profile_photo_content(&$a) {
 			'$filename' => $filename,
 			'$profile' => intval($_REQUEST['profile']),
 			'$resource' => $a->config['imagecrop'] . '-' . $a->config['imagecrop_resolution'],
-			'$image_url' => $a->get_baseurl() . '/photo/' . $filename,
+			'$image_url' => App::get_baseurl() . '/photo/' . $filename,
 			'$title' => t('Crop Image'),
 			'$desc' => t('Please adjust the image cropping for optimum viewing.'),
 			'$form_security_token' => get_form_security_token("profile_photo"),

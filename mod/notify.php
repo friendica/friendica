@@ -3,10 +3,13 @@ require_once('include/NotificationsManager.php');
 
 
 function notify_init(&$a) {
-	if(! local_user()) return;
+	if (! local_user()) {
+		return;
+	}
+
 	$nm = new NotificationsManager();
-		
-	if($a->argc > 2 && $a->argv[1] === 'view' && intval($a->argv[2])) {
+
+	if ($a->argc > 2 && $a->argv[1] === 'view' && intval($a->argv[2])) {
 		$note = $nm->getByID($a->argv[2]);
 		if ($note) {
 			$nm->setSeen($note);
@@ -17,17 +20,18 @@ function notify_init(&$a) {
 				$urldata = parse_url($note['link']);
 				$guid = basename($urldata["path"]);
 				$itemdata = get_item_id($guid, local_user());
-				if ($itemdata["id"] != 0)
-					$note['link'] = $a->get_baseurl().'/display/'.$itemdata["nick"].'/'.$itemdata["id"];
+				if ($itemdata["id"] != 0) {
+					$note['link'] = App::get_baseurl().'/display/'.$itemdata["nick"].'/'.$itemdata["id"];
+				}
 			}
 
 			goaway($note['link']);
 		}
 
-		goaway($a->get_baseurl(true));
+		goaway(App::get_baseurl(true));
 	}
 
-	if($a->argc > 2 && $a->argv[1] === 'mark' && $a->argv[2] === 'all' ) {
+	if ($a->argc > 2 && $a->argv[1] === 'mark' && $a->argv[2] === 'all' ) {
 		$r = $nm->setAllSeen();
 		$j = json_encode(array('result' => ($r) ? 'success' : 'fail'));
 		echo $j;
@@ -37,7 +41,9 @@ function notify_init(&$a) {
 }
 
 function notify_content(&$a) {
-	if(! local_user()) return login();
+	if (! local_user()) {
+		return login();
+	}
 
 	$nm = new NotificationsManager();
 	
@@ -47,10 +53,10 @@ function notify_content(&$a) {
 	require_once('include/bbcode.php');
 
 	$r = $nm->getAll(array('seen'=>0));
-	if ($r!==false && count($r) > 0) {
+	if (dbm::is_result($r) > 0) {
 		foreach ($r as $it) {
 			$notif_content .= replace_macros($not_tpl,array(
-				'$item_link' => $a->get_baseurl(true).'/notify/view/'. $it['id'],
+				'$item_link' => App::get_baseurl(true).'/notify/view/'. $it['id'],
 				'$item_image' => $it['photo'],
 				'$item_text' => strip_tags(bbcode($it['msg'])),
 				'$item_when' => relative_date($it['date'])

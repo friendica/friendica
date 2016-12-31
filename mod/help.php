@@ -77,7 +77,7 @@ function help_content(&$a) {
 					if ($level>$lastlevel) $toc.="<ul>";
 					$idnum[$level]++;
 					$id = implode("_", array_slice($idnum,1,$level));
-					$href = $a->get_baseurl()."/help/{$filename}#{$id}";
+					$href = App::get_baseurl()."/help/{$filename}#{$id}";
 					$toc .= "<li><a href='{$href}'>".strip_tags($line)."</a></li>";
 					$line = "<a name='{$id}'></a>".$line;
 					$lastlevel = $level;

@@ -45,7 +45,7 @@ function poco_init(&$a) {
 			where `user`.`nickname` = '%s' and `profile`.`is-default` = 1 limit 1",
 			dbesc($user)
 		);
-		if(! count($r) || $r[0]['hidewall'] || $r[0]['hide-friends'])
+		if(! dbm::is_result($r) || $r[0]['hidewall'] || $r[0]['hide-friends'])
 			http_status_exit(404);
 
 		$user = $r[0];
@@ -83,7 +83,7 @@ function poco_init(&$a) {
 			dbesc(NETWORK_STATUSNET)
 		);
 	}
-	if(count($r))
+	if (dbm::is_result($r))
 		$totalResults = intval($r[0]['total']);
 	else
 		$totalResults = 0;
@@ -173,8 +173,8 @@ function poco_init(&$a) {
 	}
 
 	if(is_array($r)) {
-		if(count($r)) {
-			foreach($r as $rr) {
+		if (dbm::is_result($r)) {
+			foreach ($r as $rr) {
 				if (!isset($rr['generation'])) {
 					if ($global)
 						$rr['generation'] = 3;

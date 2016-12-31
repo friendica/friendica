@@ -28,7 +28,7 @@ function nav(&$a) {
 	$tpl = get_markup_template('nav.tpl');
 
 	$a->page['nav'] .= replace_macros($tpl, array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$sitelocation' => $nav_info['sitelocation'],
 		'$nav' => $nav_info['nav'],
 		'$banner' => $nav_info['banner'],
@@ -65,7 +65,7 @@ function nav_info(App $a)
 
 	$myident = ((is_array($a->user) && isset($a->user['nickname'])) ? $a->user['nickname'] . '@' : '');
 
-	$sitelocation = $myident . substr($a->get_baseurl($ssl_state), strpos($a->get_baseurl($ssl_state), '//') + 2 );
+	$sitelocation = $myident . substr(App::get_baseurl($ssl_state), strpos(App::get_baseurl($ssl_state), '//') + 2 );
 
 	// nav links: array of array('href', 'text', 'extra css classes', 'title')
 	$nav = array();
@@ -88,7 +88,7 @@ function nav_info(App $a)
 		// user info
 		$r = q("SELECT `micro` FROM `contact` WHERE `uid` = %d AND `self` = 1", intval($a->user['uid']));
 		$userinfo = array(
-			'icon' => (count($r) ? $a->remove_baseurl($r[0]['micro']) : 'images/person-48.jpg'),
+			'icon' => (dbm::is_result($r) ? $a->remove_baseurl($r[0]['micro']) : 'images/person-48.jpg'),
 			'name' => $a->user['username'],
 		);
 	} else {

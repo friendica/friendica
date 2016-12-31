@@ -23,8 +23,9 @@ function post_post(&$a) {
 				AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 			dbesc($nickname)
 		);
-		if(! count($r))
+		if (! dbm::is_result($r)) {
 			http_status_exit(500);
+		}
 
 		$importer = $r[0];
 	}

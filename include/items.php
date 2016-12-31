@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @file include/items.php
+ */
+
+use \Friendica\ParseUrl;
+
 require_once('include/bbcode.php');
 require_once('include/oembed.php');
 require_once('include/salmon.php');
@@ -202,13 +208,12 @@ function add_page_info_data($data) {
 
 	$hashtags = "";
 	if (isset($data["keywords"]) AND count($data["keywords"])) {
-		$a = get_app();
 		$hashtags = "\n";
 		foreach ($data["keywords"] AS $keyword) {
 			/// @todo make a positive list of allowed characters
 			$hashtag = str_replace(array(" ", "+", "/", ".", "#", "'", "’", "`", "(", ")", "„", "“"),
 						array("","", "", "", "", "", "", "", "", "", "", ""), $keyword);
-			$hashtags .= "#[url=".$a->get_baseurl()."/search?tag=".rawurlencode($hashtag)."]".$hashtag."[/url] ";
+			$hashtags .= "#[url=".App::get_baseurl()."/search?tag=".rawurlencode($hashtag)."]".$hashtag."[/url] ";
 		}
 	}
 
@@ -216,9 +221,8 @@ function add_page_info_data($data) {
 }
 
 function query_page_info($url, $no_photos = false, $photo = "", $keywords = false, $keyword_blacklist = "") {
-	require_once("mod/parse_url.php");
 
-	$data = parseurl_getsiteinfo_cached($url, true);
+	$data = ParseUrl::getSiteinfoCached($url, true);
 
 	if ($photo != "")
 		$data["images"][0]["src"] = $photo;
@@ -246,7 +250,6 @@ function add_page_keywords($url, $no_photos = false, $photo = "", $keywords = fa
 
 	$tags = "";
 	if (isset($data["keywords"]) AND count($data["keywords"])) {
-		$a = get_app();
 		foreach ($data["keywords"] AS $keyword) {
 			$hashtag = str_replace(array(" ", "+", "/", ".", "#", "'"),
 						array("","", "", "", "", ""), $keyword);
@@ -254,7 +257,7 @@ function add_page_keywords($url, $no_photos = false, $photo = "", $keywords = fa
 			if ($tags != "")
 				$tags .= ",";
 
-			$tags .= "#[url=".$a->get_baseurl()."/search?tag=".rawurlencode($hashtag)."]".$hashtag."[/url]";
+			$tags .= "#[url=".App::get_baseurl()."/search?tag=".rawurlencode($hashtag)."]".$hashtag."[/url]";
 		}
 	}
 
@@ -274,6 +277,10 @@ function add_page_info_to_body($body, $texturl = false, $no_photos = false) {
 	logger('add_page_info_to_body: fetch page info for body '.$body, LOGGER_DEBUG);
 
 	$URLSearchString = "^\[\]";
+
+	// Fix for Mastodon where the mentions are in a different format
+	$body = preg_replace("/\[url\=([$URLSearchString]*)\]([#!@])(.*?)\[\/url\]/ism",
+				'$2[url=$1]$3[/url]', $body);
 
 	// Adding these spaces is a quick hack due to my problems with regular expressions :)
 	preg_match("/[^!#@]\[url\]([$URLSearchString]*)\[\/url\]/ism", " ".$body, $matches);
@@ -412,6 +419,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 
 	$dsprsig = null;
 	if (x($arr,'dsprsig')) {
+		$encoded_signature = $arr['dsprsig'];
 		$dsprsig = json_decode(base64_decode($arr['dsprsig']));
 		unset($arr['dsprsig']);
 	}
@@ -441,7 +449,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	/* check for create  date and expire time */
 	$uid = intval($arr['uid']);
 	$r = q("SELECT expire FROM user WHERE uid = %d", intval($uid));
-	if (count($r)) {
+	if (dbm::is_result($r)) {
 		$expire_interval = $r[0]['expire'];
 		if ($expire_interval>0) {
 			$expire_date =  new DateTime( '- '.$expire_interval.' days', new DateTimeZone('UTC'));
@@ -547,8 +555,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		logger("Both author-link and owner-link are empty. Called by: ".App::callstack(), LOGGER_DEBUG);
 
 	if ($arr['plink'] == "") {
-		$a = get_app();
-		$arr['plink'] = $a->get_baseurl().'/display/'.urlencode($arr['guid']);
+		$arr['plink'] = App::get_baseurl().'/display/'.urlencode($arr['guid']);
 	}
 
 	if ($arr['network'] == "") {
@@ -558,19 +565,19 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			intval($arr['uid'])
 		);
 
-		if (!count($r))
+		if (!dbm::is_result($r))
 			$r = q("SELECT `network` FROM `gcontact` WHERE `network` IN ('%s', '%s', '%s') AND `nurl` = '%s' LIMIT 1",
 				dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS),
 				dbesc(normalise_link($arr['author-link']))
 			);
 
-		if (!count($r))
+		if (!dbm::is_result($r))
 			$r = q("SELECT `network` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($arr['contact-id']),
 				intval($arr['uid'])
 			);
 
-		if (count($r))
+		if (dbm::is_result($r))
 			$arr['network'] = $r[0]["network"];
 
 		// Fallback to friendica (why is it empty in some cases?)
@@ -624,7 +631,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		$r = q("SELECT `guid` FROM `item` WHERE `guid` = '%s' AND `network` = '%s' AND `uid` = '%d' LIMIT 1",
 			dbesc($arr['guid']), dbesc($arr['network']), intval($arr['uid']));
 
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 			logger('found item with guid '.$arr['guid'].' for user '.$arr['uid'].' on network '.$arr['network'], LOGGER_DEBUG);
 			return 0;
 		}
@@ -652,7 +659,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			intval($arr['uid'])
 		);
 
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 
 			// is the new message multi-level threaded?
 			// even though we don't support it now, preserve the info
@@ -699,7 +706,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			$u = q("SELECT `nickname` FROM `user` WHERE `uid` = %d", intval($arr['uid']));
 			if (count($u)) {
 				$a = get_app();
-				$self = normalise_link($a->get_baseurl() . '/profile/' . $u[0]['nickname']);
+				$self = normalise_link(App::get_baseurl() . '/profile/' . $u[0]['nickname']);
 				logger("item_store: 'myself' is ".$self." for parent ".$parent_id." checking against ".$arr['author-link']." and ".$arr['owner-link'], LOGGER_DEBUG);
 				if ((normalise_link($arr['author-link']) == $self) OR (normalise_link($arr['owner-link']) == $self)) {
 					q("UPDATE `thread` SET `mention` = 1 WHERE `iid` = %d", intval($parent_id));
@@ -840,15 +847,27 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		}
 	} else {
 		// This can happen - for example - if there are locking timeouts.
-		logger("Item wasn't stored - we quit here.");
-		q("COMMIT");
+		q("ROLLBACK");
+
+		// Store the data into a spool file so that we can try again later.
+
+		// At first we restore the Diaspora signature that we removed above.
+		if (isset($encoded_signature)) {
+			$arr['dsprsig'] = $encoded_signature;
+		}
+
+		// Now we store the data in the spool directory
+		$file = 'item-'.round(microtime(true) * 10000).".msg";
+		$spool = get_spoolpath().'/'.$file;
+		file_put_contents($spool, json_encode($arr));
+		logger("Item wasn't stored - Item was spooled into file ".$file, LOGGER_DEBUG);
 		return 0;
 	}
 
 	if ($current_post == 0) {
 		// This is one of these error messages that never should occur.
 		logger("couldn't find created item - we better quit now.");
-		q("COMMIT");
+		q("ROLLBACK");
 		return 0;
 	}
 
@@ -863,7 +882,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	if (!dbm::is_result($r)) {
 		// This shouldn't happen, since COUNT always works when the database connection is there.
 		logger("We couldn't count the stored entries. Very strange ...");
-		q("COMMIT");
+		q("ROLLBACK");
 		return 0;
 	}
 
@@ -878,7 +897,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	} elseif ($r[0]["entries"] == 0) {
 		// This really should never happen since we quit earlier if there were problems.
 		logger("Something is terribly wrong. We haven't found our created entry.");
-		q("COMMIT");
+		q("ROLLBACK");
 		return 0;
 	}
 
@@ -1046,10 +1065,10 @@ function item_body_set_hashtags(&$item) {
 
 	// All hashtags should point to the home server
 	//$item["body"] = preg_replace("/#\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
-	//		"#[url=".$a->get_baseurl()."/search?tag=$2]$2[/url]", $item["body"]);
+	//		"#[url=".App::get_baseurl()."/search?tag=$2]$2[/url]", $item["body"]);
 
 	//$item["tag"] = preg_replace("/#\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
-	//		"#[url=".$a->get_baseurl()."/search?tag=$2]$2[/url]", $item["tag"]);
+	//		"#[url=".App::get_baseurl()."/search?tag=$2]$2[/url]", $item["tag"]);
 
 	// mask hashtags inside of url, bookmarks and attachments to avoid urls in urls
 	$item["body"] = preg_replace_callback("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
@@ -1081,7 +1100,7 @@ function item_body_set_hashtags(&$item) {
 
 		$basetag = str_replace('_',' ',substr($tag,1));
 
-		$newtag = '#[url='.$a->get_baseurl().'/search?tag='.rawurlencode($basetag).']'.$basetag.'[/url]';
+		$newtag = '#[url='.App::get_baseurl().'/search?tag='.rawurlencode($basetag).']'.$basetag.'[/url]';
 
 		$item["body"] = str_replace($tag, $newtag, $item["body"]);
 
@@ -1098,7 +1117,7 @@ function item_body_set_hashtags(&$item) {
 
 function get_item_guid($id) {
 	$r = q("SELECT `guid` FROM `item` WHERE `id` = %d LIMIT 1", intval($id));
-	if (count($r))
+	if (dbm::is_result($r))
 		return($r[0]["guid"]);
 	else
 		return("");
@@ -1117,7 +1136,7 @@ function get_item_id($guid, $uid = 0) {
 		$r = q("SELECT `item`.`id`, `user`.`nickname` FROM `item` INNER JOIN `user` ON `user`.`uid` = `item`.`uid`
 			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
 				AND `item`.`guid` = '%s' AND `item`.`uid` = %d", dbesc($guid), intval($uid));
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 			$id = $r[0]["id"];
 			$nick = $r[0]["nickname"];
 		}
@@ -1131,7 +1150,7 @@ function get_item_id($guid, $uid = 0) {
 				AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
 				AND `item`.`private` = 0 AND `item`.`wall` = 1
 				AND `item`.`guid` = '%s'", dbesc($guid));
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 			$id = $r[0]["id"];
 			$nick = $r[0]["nickname"];
 		}
@@ -1185,12 +1204,12 @@ function tag_deliver($uid,$item_id) {
 
 	$item = $i[0];
 
-	$link = normalise_link($a->get_baseurl() . '/profile/' . $u[0]['nickname']);
+	$link = normalise_link(App::get_baseurl() . '/profile/' . $u[0]['nickname']);
 
 	// Diaspora uses their own hardwired link URL in @-tags
 	// instead of the one we supply with webfinger
 
-	$dlink = normalise_link($a->get_baseurl() . '/u/' . $u[0]['nickname']);
+	$dlink = normalise_link(App::get_baseurl() . '/u/' . $u[0]['nickname']);
 
 	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism',$item['body'],$matches,PREG_SET_ORDER);
 	if ($cnt) {
@@ -1238,8 +1257,9 @@ function tag_deliver($uid,$item_id) {
 	$c = q("select name, url, thumb from contact where self = 1 and uid = %d limit 1",
 		intval($u[0]['uid'])
 	);
-	if (! count($c))
+	if (! count($c)) {
 		return;
+	}
 
 	// also reset all the privacy bits to the forum default permissions
 
@@ -1247,8 +1267,8 @@ function tag_deliver($uid,$item_id) {
 
 	$forum_mode = (($prvgroup) ? 2 : 1);
 
-	q("update item set wall = 1, origin = 1, forum_mode = %d, `owner-name` = '%s', `owner-link` = '%s', `owner-avatar` = '%s',
-		`private` = %d, `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s'  where id = %d",
+	q("UPDATE `item` SET `wall` = 1, `origin` = 1, `forum_mode` = %d, `owner-name` = '%s', `owner-link` = '%s', `owner-avatar` = '%s',
+		`private` = %d, `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s'  WHERE `id` = %d",
 		intval($forum_mode),
 		dbesc($c[0]['name']),
 		dbesc($c[0]['url']),
@@ -1290,16 +1310,16 @@ function tgroup_check($uid,$item) {
 	$prvgroup = (($u[0]['page-flags'] == PAGE_PRVGROUP) ? true : false);
 
 
-	$link = normalise_link($a->get_baseurl() . '/profile/' . $u[0]['nickname']);
+	$link = normalise_link(App::get_baseurl() . '/profile/' . $u[0]['nickname']);
 
 	// Diaspora uses their own hardwired link URL in @-tags
 	// instead of the one we supply with webfinger
 
-	$dlink = normalise_link($a->get_baseurl() . '/u/' . $u[0]['nickname']);
+	$dlink = normalise_link(App::get_baseurl() . '/u/' . $u[0]['nickname']);
 
 	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism',$item['body'],$matches,PREG_SET_ORDER);
 	if ($cnt) {
-		foreach($matches as $mtch) {
+		foreach ($matches as $mtch) {
 			if (link_compare($link,$mtch[1]) || link_compare($dlink,$mtch[1])) {
 				$mention = true;
 				logger('tgroup_check: mention found: ' . $mtch[2]);
@@ -1307,13 +1327,12 @@ function tgroup_check($uid,$item) {
 		}
 	}
 
-	if (! $mention)
+	if (! $mention) {
 		return false;
+	}
 
-	if ((! $community_page) && (! $prvgroup))
-		return false;
-
-	return true;
+	/// @TODO Combines both return statements into one
+	return (($community_page) || ($prvgroup));
 }
 
 /*
@@ -1325,15 +1344,16 @@ function tgroup_check($uid,$item) {
   assumes the update has been seen before and should be ignored.
   */
 function edited_timestamp_is_newer($existing, $update) {
-    if (!x($existing,'edited') || !$existing['edited']) {
-	return true;
-    }
-    if (!x($update,'edited') || !$update['edited']) {
-	return false;
-    }
-    $existing_edited = datetime_convert('UTC', 'UTC', $existing['edited']);
-    $update_edited = datetime_convert('UTC', 'UTC', $update['edited']);
-    return (strcmp($existing_edited, $update_edited) < 0);
+	if (!x($existing,'edited') || !$existing['edited']) {
+		return true;
+	}
+	if (!x($update,'edited') || !$update['edited']) {
+		return false;
+	}
+
+	$existing_edited = datetime_convert('UTC', 'UTC', $existing['edited']);
+	$update_edited = datetime_convert('UTC', 'UTC', $update['edited']);
+	return (strcmp($existing_edited, $update_edited) < 0);
 }
 
 /**
@@ -1432,7 +1452,7 @@ function item_is_remote_self($contact, &$datarray) {
 	if ($contact['remote_self'] == 2) {
 		$r = q("SELECT `id`,`url`,`name`,`thumb` FROM `contact` WHERE `uid` = %d AND `self`",
 			intval($contact['uid']));
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 			$datarray['contact-id'] = $r[0]["id"];
 
 			$datarray['owner-name'] = $r[0]["name"];
@@ -1509,7 +1529,7 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 				intval($importer['uid']),
 				dbesc($url)
 		);
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 			$contact_record = $r[0];
 			update_contact_avatar($photo, $importer["uid"], $contact_record["id"], true);
 		}
@@ -1519,7 +1539,8 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 			intval($importer['uid'])
 		);
 		$a = get_app();
-		if (count($r) AND !in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
+
+		if (dbm::is_result($r) AND !in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
 
 			// create notification
 			$hash = random_string();
@@ -1549,7 +1570,7 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 					'to_name'      => $r[0]['username'],
 					'to_email'     => $r[0]['email'],
 					'uid'          => $r[0]['uid'],
-					'link'		   => $a->get_baseurl() . '/notifications/intro',
+					'link'		   => App::get_baseurl() . '/notifications/intro',
 					'source_name'  => ((strlen(stripslashes($contact_record['name']))) ? stripslashes($contact_record['name']) : t('[Name Withheld]')),
 					'source_link'  => $contact_record['url'],
 					'source_photo' => $contact_record['photo'],
@@ -1558,7 +1579,7 @@ function new_follower($importer,$contact,$datarray,$item,$sharing = false) {
 				));
 
 			}
-		} elseif (count($r) AND in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
+		} elseif (dbm::is_result($r) AND in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
 			$r = q("UPDATE `contact` SET `pending` = 0 WHERE `uid` = %d AND `url` = '%s' AND `pending` LIMIT 1",
 					intval($importer['uid']),
 					dbesc($url)
@@ -1606,7 +1627,7 @@ function subscribe_to_hub($url,$importer,$contact,$hubmode = 'subscribe') {
 	// through the direct Diaspora protocol. If we try and use
 	// the feed, we'll get duplicates. So don't.
 
-	if ((! count($r)) || $contact['network'] === NETWORK_DIASPORA)
+	if ((! dbm::is_result($r)) || $contact['network'] === NETWORK_DIASPORA)
 		return;
 
 	$push_url = get_config('system','url') . '/pubsub/' . $r[0]['nickname'] . '/' . $contact['id'];
@@ -1642,7 +1663,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 	$a = get_app();
 
 	logger('fix_private_photos: check for photos', LOGGER_DEBUG);
-	$site = substr($a->get_baseurl(),strpos($a->get_baseurl(),'://'));
+	$site = substr(App::get_baseurl(),strpos(App::get_baseurl(),'://'));
 
 	$orig_body = $s;
 	$new_body = '';
@@ -1824,7 +1845,7 @@ function item_expire($uid, $days, $network = "", $force = false) {
 		intval($days)
 	);
 
-	if (! count($r))
+	if (! dbm::is_result($r))
 		return;
 
 	$expire_items = get_pconfig($uid, 'expire','items');
@@ -1902,11 +1923,11 @@ function drop_item($id,$interactive = true) {
 		intval($id)
 	);
 
-	if (! count($r)) {
+	if (! dbm::is_result($r)) {
 		if (! $interactive)
 			return 0;
 		notice( t('Item not found.') . EOL);
-		goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
+		goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
 	}
 
 	$item = $r[0];
@@ -1954,7 +1975,7 @@ function drop_item($id,$interactive = true) {
 		}
 		// Now check how the user responded to the confirmation query
 		if ($_REQUEST['canceled']) {
-			goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
+			goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
 		}
 
 		logger('delete item: ' . $item['id'], LOGGER_DEBUG);
@@ -2089,7 +2110,7 @@ function drop_item($id,$interactive = true) {
 				dbesc($item['parent-uri']),
 				intval($item['uid'])
 			);
-			if (count($r)) {
+			if (dbm::is_result($r)) {
 				q("UPDATE `item` SET `last-child` = 1 WHERE `id` = %d",
 					intval($r[0]['id'])
 				);
@@ -2104,13 +2125,13 @@ function drop_item($id,$interactive = true) {
 
 		if (! $interactive)
 			return $owner;
-		goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
+		goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
 		//NOTREACHED
 	} else {
 		if (! $interactive)
 			return 0;
 		notice( t('Permission denied.') . EOL);
-		goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
+		goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
 		//NOTREACHED
 	}
 
@@ -2125,7 +2146,7 @@ function first_post_date($uid,$wall = false) {
 		intval($uid),
 		intval($wall ? 1 : 0)
 	);
-	if (count($r)) {
+	if (dbm::is_result($r)) {
 //		logger('first_post_date: ' . $r[0]['id'] . ' ' . $r[0]['created'], LOGGER_DATA);
 		return substr(datetime_convert('',date_default_timezone_get(),$r[0]['created']),0,10);
 	}

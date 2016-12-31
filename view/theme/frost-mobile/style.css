@@ -1549,8 +1549,16 @@ input#dfrn-url {
 	background-repeat: repeat-x;*/
    	padding: 5px 5px 0px;
 	height: 32px;
-
 }
+.wall-item-tools a {
+	border-radius: 8px;
+	padding: 2px;
+	background-position: center;
+}
+.wall-item-tools a.active {
+	background-color: rgba(59, 101, 164, 0.5);
+}
+
 .wall-item-author {
 /*	margin-top: 10px;*/
 	margin-top: 0px;
@@ -3896,7 +3904,7 @@ aside input[type='text'] {
 .icon.like {
 	display: block; width: 26px; height: 28px;/*31 33*/
 	margin-right: 7px;
-	background-size: 100% 100%;
+	background-size: 26px 28px;
 	background-image: url('images/approve.png');
 	background-repeat: no-repeat;
 	opacity: 0.5;
@@ -3904,7 +3912,7 @@ aside input[type='text'] {
 
 .icon.link {
     display: block;  width: 22px; height: 24px;
-    background-size: 100% 100%;
+    background-size: 22px 24px;
     background-image: url('images/link.png');
     background-repeat: no-repeat;
 
@@ -3913,14 +3921,14 @@ aside input[type='text'] {
 /*.globe { background-position: 0px -16px;}*/
 .icon.globe {
 	display: block; width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/globe.png');
 	background-repeat: no-repeat;
 }
 /*.noglobe { background-position: -16px -16px;}*/
 .icon.noglobe {
 	display: block; width: 24px; height: 24px;
-	background-size: 100% 100%;
+	background-size: 24px 24px;
 	background-image: url('images/noglobe.png');
 	background-repeat: no-repeat;
 }
@@ -3931,14 +3939,14 @@ aside input[type='text'] {
 .small-pencil { background-position: -96px -16px;}*/
 .icon.pencil {
 	display: block; width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/pencil.png');
 	background-repeat: no-repeat;
 	opacity: 0.5;
 }
 .icon.small-pencil {
 	display: block; width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/pencil.png');
 	background-repeat: no-repeat;
 	opacity: 0.5;
@@ -3947,7 +3955,7 @@ aside input[type='text'] {
 .icon.recycle {
 	display: block;
 	width: 28px; height: 27px;/*33 32*/
-	background-size: 100% 100%;
+	background-size: 28px 27px;
 	background-image: url('images/recycle.png');
 	background-repeat: no-repeat;
 	opacity: 0.5;
@@ -3957,7 +3965,7 @@ aside input[type='text'] {
 /*	display: block;*/
 	display: none;
 	width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/remote-link.png');
 	background-repeat: no-repeat;
 	opacity: 0.5;
@@ -3969,7 +3977,7 @@ aside input[type='text'] {
 .icon.lock {
 	display: block; width: 17px; height: 25px;
 	margin-top: 1px;
-	background-size: 100% 100%;
+	background-size: 17px 25px;
 	background-image: url('images/lock.png');
 	background-repeat: no-repeat;
 }
@@ -3977,7 +3985,7 @@ aside input[type='text'] {
 .icon.unlock {
 	display: block; width: 17px; height: 28px;
 	margin-top: -2px;
-	background-size: 100% 100%;
+	background-size: 17px 28px;
 	background-image: url('images/unlock.png');
 	background-repeat: no-repeat;
 }
@@ -3987,7 +3995,7 @@ aside input[type='text'] {
 /*.attach { background-position: -80px -32px; }*/
 .icon.attach {
 	display: block; width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/paperclip.png');
 	background-repeat: no-repeat;
 }
@@ -4000,14 +4008,14 @@ aside input[type='text'] {
 /*.starred { background-position: -16px -48px; }*/
 .icon.starred {
 	display: block; width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/star-yellow.png');
 	background-repeat: no-repeat;
 }
 /*.unstarred { background-position: -32px -48px; }*/
 .icon.unstarred {
 	display: block; width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/star.png');
 	background-repeat: no-repeat;
 
@@ -4016,7 +4024,7 @@ aside input[type='text'] {
 /*.tagged { background-position: -48px -48px; }*/
 .icon.tagged {
 	display: block; width: 28px; height: 28px;
-	background-size: 100% 100%;
+	background-size: 28px 28px;
 	background-image: url('images/tag.png');
 	background-repeat: no-repeat;
 	opacity: 0.5;
@@ -4026,7 +4034,7 @@ aside input[type='text'] {
 
 .filer-icon {
 	display: block; width: 24px; height: 24px;
-	background-size: 100% 100%;
+	background-size: 24px 24px;
 	background-image: url('images/folder.png');
 	background-repeat: no-repeat;
 	opacity: 0.5;
@@ -4034,7 +4042,7 @@ aside input[type='text'] {
 
 .event-icon {
 	display: block; width: 33px; height: 33px;
-	background-size: 100% 100%;
+	background-size: 33px 33px;
 	background-repeat: no-repeat;
 	opacity: 0.5;
 }

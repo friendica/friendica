@@ -8,6 +8,6 @@
  */
 
 function quattro_init(&$a) {
-	$a->page['htmlhead'] .= '<script src="'.$a->get_baseurl().'/view/theme/quattro/tinycon.min.js"></script>';
-	$a->page['htmlhead'] .= '<script src="'.$a->get_baseurl().'/view/theme/quattro/js/quattro.js"></script>';;
+	$a->page['htmlhead'] .= '<script src="'.App::get_baseurl().'/view/theme/quattro/tinycon.min.js"></script>';
+	$a->page['htmlhead'] .= '<script src="'.App::get_baseurl().'/view/theme/quattro/js/quattro.js"></script>';;
 }

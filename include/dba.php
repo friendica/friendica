@@ -35,7 +35,7 @@ class dba {
 	public  $error = false;
 
 	function __construct($server, $user, $pass, $db, $install = false) {
-		global $a;
+		$a = get_app();
 
 		$stamp1 = microtime(true);
 
@@ -139,7 +139,7 @@ class dba {
 	}
 
 	public function q($sql, $onlyquery = false) {
-		global $a;
+		$a = get_app();
 
 		if (!$this->db || !$this->connected) {
 			return false;

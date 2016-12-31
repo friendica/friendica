@@ -1586,6 +1586,10 @@ ul .sidebar-group-li .icon {
 	margin-right: 10px;
 	display: inline;
 }
+.wall-item-like-buttons a.self {
+	background-color: rgba(52, 101, 164, .5);
+	border-radius: 6px;
+}
 
 .wall-item-links-wrapper {
 	width: 30px;

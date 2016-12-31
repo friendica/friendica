@@ -44,7 +44,7 @@ class dba {
 	public  $error = false;
 
 	function __construct($server,$user,$pass,$db,$install = false) {
-		global $a;
+		$a = get_app();
     
     # work around, to store the database - configuration in DDDBL
     $objDataObjectPool = new \DDDBL\DataObjectPool('Database-Definition');
@@ -99,7 +99,7 @@ class dba {
 	}
 
 	public function q($sql, $onlyquery = false) {
-		global $a;
+		$a = get_app();
 
     $strHandler = (true === $onlyquery) ? 'PDOStatement' : 'MULTI';
     

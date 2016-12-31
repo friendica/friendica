@@ -8,7 +8,6 @@
 function user_remove($uid) {
 	if(! $uid)
 		return;
-	$a = get_app();
 	logger('Removing user: ' . $uid);
 
 	$r = q("select * from user where uid = %d limit 1", intval($uid));
@@ -22,6 +21,7 @@ function user_remove($uid) {
 		$r[0]['nickname']
 	);
 
+	/// @todo Should be done in a background job since this likely will run into a time out
 	// don't delete yet, will be done later when contacts have deleted my stuff
 	// q("DELETE FROM `contact` WHERE `uid` = %d", intval($uid));
 	q("DELETE FROM `gcign` WHERE `uid` = %d", intval($uid));
@@ -53,7 +53,7 @@ function user_remove($uid) {
 	if($uid == local_user()) {
 		unset($_SESSION['authenticated']);
 		unset($_SESSION['uid']);
-		goaway($a->get_baseurl());
+		goaway(App::get_baseurl());
 	}
 }
 
@@ -63,7 +63,7 @@ function contact_remove($id) {
 	$r = q("select uid from contact where id = %d limit 1",
 		intval($id)
 	);
-	if((! count($r)) || (! intval($r[0]['uid'])))
+	if((! dbm::is_result($r)) || (! intval($r[0]['uid'])))
 		return;
 
 	$archive = get_pconfig($r[0]['uid'], 'system','archive_removed_contacts');
@@ -74,25 +74,10 @@ function contact_remove($id) {
 		return;
 	}
 
-	q("DELETE FROM `contact` WHERE `id` = %d",
-		intval($id)
-	);
-	q("DELETE FROM `item` WHERE `contact-id` = %d ",
-		intval($id)
-	);
-	q("DELETE FROM `photo` WHERE `contact-id` = %d ",
-		intval($id)
-	);
-	q("DELETE FROM `mail` WHERE `contact-id` = %d ",
-		intval($id)
-	);
-	q("DELETE FROM `event` WHERE `cid` = %d ",
-		intval($id)
-	);
-	q("DELETE FROM `queue` WHERE `cid` = %d ",
-		intval($id)
-	);
+	q("DELETE FROM `contact` WHERE `id` = %d", intval($id));
 
+	// Delete the rest in the background
+	proc_run(PRIORITY_LOW, 'include/remove_contact.php', $id);
 }
 
 
@@ -100,38 +85,29 @@ function contact_remove($id) {
 
 function terminate_friendship($user,$self,$contact) {
 
-
+	/// @TODO Get rid of this, include/datetime.php should care about by itself
 	$a = get_app();
 
 	require_once('include/datetime.php');
 
-	if($contact['network'] === NETWORK_OSTATUS) {
+	if ($contact['network'] === NETWORK_OSTATUS) {
 
-		$slap = replace_macros(get_markup_template('follow_slap.tpl'), array(
-			'$name' => $user['username'],
-			'$profile_page' => $a->get_baseurl() . '/profile/' . $user['nickname'],
-			'$photo' => $self['photo'],
-			'$thumb' => $self['thumb'],
-			'$published' => datetime_convert('UTC','UTC', 'now', ATOM_TIME),
-			'$item_id' => 'urn:X-dfrn:' . $a->get_hostname() . ':unfollow:' . get_guid(32),
-			'$title' => '',
-			'$type' => 'text',
-			'$content' => t('stopped following'),
-			'$nick' => $user['nickname'],
-			'$verb' => 'http://ostatus.org/schema/1.0/unfollow', // ACTIVITY_UNFOLLOW,
-			'$ostat_follow' => '' // '<as:verb>http://ostatus.org/schema/1.0/unfollow</as:verb>' . "\r\n"
-		));
+		require_once('include/ostatus.php');
 
-		if((x($contact,'notify')) && (strlen($contact['notify']))) {
+		// create an unfollow slap
+		$item = array();
+		$item['verb'] = NAMESPACE_OSTATUS."/unfollow";
+		$item['follow'] = $contact["url"];
+		$slap = ostatus::salmon($item, $user);
+
+		if ((x($contact,'notify')) && (strlen($contact['notify']))) {
 			require_once('include/salmon.php');
 			slapper($user,$contact['notify'],$slap);
 		}
-	}
-	elseif($contact['network'] === NETWORK_DIASPORA) {
+	} elseif ($contact['network'] === NETWORK_DIASPORA) {
 		require_once('include/diaspora.php');
-		diaspora::send_unshare($user,$contact);
-	}
-	elseif($contact['network'] === NETWORK_DFRN) {
+		Diaspora::send_unshare($user,$contact);
+	} elseif ($contact['network'] === NETWORK_DFRN) {
 		require_once('include/dfrn.php');
 		dfrn::deliver($user,$contact,'placeholder', 1);
 	}
@@ -263,7 +239,7 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 			FROM `gcontact` WHERE `nurl` = '%s'",
 				dbesc(normalise_link($url)));
 
-	if ($r) {
+	if (dbm::is_result($r)) {
 		// If there is more than one entry we filter out the connector networks
 		if (count($r) > 1) {
 			foreach ($r AS $id => $result) {
@@ -382,7 +358,7 @@ function contact_photo_menu($contact, $uid = 0)
 	$sparkle = false;
 	if ($contact['network'] === NETWORK_DFRN) {
 		$sparkle = true;
-		$profile_link = $a->get_baseurl() . '/redir/' . $contact['id'];
+		$profile_link = App::get_baseurl() . '/redir/' . $contact['id'];
 	} else {
 		$profile_link = $contact['url'];
 	}
@@ -398,17 +374,17 @@ function contact_photo_menu($contact, $uid = 0)
 	}
 
 	if (in_array($contact['network'], array(NETWORK_DFRN, NETWORK_DIASPORA))) {
-		$pm_url = $a->get_baseurl() . '/message/new/' . $contact['id'];
+		$pm_url = App::get_baseurl() . '/message/new/' . $contact['id'];
 	}
 
 	if ($contact['network'] == NETWORK_DFRN) {
-		$poke_link = $a->get_baseurl() . '/poke/?f=&c=' . $contact['id'];
+		$poke_link = App::get_baseurl() . '/poke/?f=&c=' . $contact['id'];
 	}
 
-	$contact_url = $a->get_baseurl() . '/contacts/' . $contact['id'];
+	$contact_url = App::get_baseurl() . '/contacts/' . $contact['id'];
 
-	$posts_link = $a->get_baseurl() . '/contacts/' . $contact['id'] . '/posts';
-	$contact_drop_link = $a->get_baseurl() . '/contacts/' . $contact['id'] . '/drop?confirm=1';
+	$posts_link = App::get_baseurl() . '/contacts/' . $contact['id'] . '/posts';
+	$contact_drop_link = App::get_baseurl() . '/contacts/' . $contact['id'] . '/drop?confirm=1';
 
 	/**
 	 * menu array:
@@ -449,7 +425,7 @@ function random_profile() {
 			ORDER BY rand() LIMIT 1",
 		dbesc(NETWORK_DFRN));
 
-	if(count($r))
+	if (dbm::is_result($r))
 		return dirname($r[0]['url']);
 	return '';
 }
@@ -680,57 +656,55 @@ function posts_from_gcontact($a, $gcontact_id) {
 
 	return $o;
 }
-
 /**
- * @brief Returns posts from a given contact
+ * @brief Returns posts from a given contact url
  *
  * @param App $a argv application class
- * @param int $contact_id contact
+ * @param string $contact_url Contact URL
  *
  * @return string posts in HTML
  */
-function posts_from_contact($a, $contact_id) {
+function posts_from_contact_url($a, $contact_url) {
 
 	require_once('include/conversation.php');
 
-	$r = q("SELECT `url` FROM `contact` WHERE `id` = %d", intval($contact_id));
-	if (!$r)
-		return false;
+	// There are no posts with "uid = 0" with connector networks
+	// This speeds up the query a lot
+	$r = q("SELECT `network`, `id` AS `author-id` FROM `contact`
+		WHERE `contact`.`nurl` = '%s' AND `contact`.`uid` = 0",
+		dbesc(normalise_link($contact_url)));
+	if (in_array($r[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""))) {
+		$sql = "(`item`.`uid` = 0 OR (`item`.`uid` = %d AND `item`.`private`))";
+	} else {
+		$sql = "`item`.`uid` = %d";
+	}
 
-	$contact = $r[0];
+	$author_id = intval($r[0]["author-id"]);
 
-	if(get_config('system', 'old_pager')) {
+	if (get_config('system', 'old_pager')) {
 		$r = q("SELECT COUNT(*) AS `total` FROM `item`
-			WHERE `item`.`uid` = %d AND `author-link` IN ('%s', '%s')",
-			intval(local_user()),
-			dbesc(str_replace("https://", "http://", $contact["url"])),
-			dbesc(str_replace("http://", "https://", $contact["url"])));
+			WHERE `author-id` = %d and $sql",
+			intval($author_id),
+			intval(local_user()));
 
 		$a->set_pager_total($r[0]['total']);
 	}
 
-	$r = q("SELECT `item`.`uri`, `item`.*, `item`.`id` AS `item_id`,
-			`author-name` AS `name`, `owner-avatar` AS `photo`,
-			`owner-link` AS `url`, `owner-avatar` AS `thumb`
-		FROM `item` FORCE INDEX (`uid_contactid_id`)
-		WHERE `item`.`uid` = %d AND `contact-id` = %d
-			AND `author-link` IN ('%s', '%s')
-			AND NOT `deleted` AND NOT `moderated` AND `visible`
-		ORDER BY `item`.`id` DESC LIMIT %d, %d",
+	$r = q(item_query()." AND `item`.`author-id` = %d AND ".$sql.
+		" ORDER BY `item`.`created` DESC LIMIT %d, %d",
+		intval($author_id),
 		intval(local_user()),
-		intval($contact_id),
-		dbesc(str_replace("https://", "http://", $contact["url"])),
-		dbesc(str_replace("http://", "https://", $contact["url"])),
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);
 
-	$o .= conversation($a,$r,'community',false);
+	$o = conversation($a,$r,'community',false);
 
-	if(!get_config('system', 'old_pager'))
+	if (!get_config('system', 'old_pager')) {
 		$o .= alt_pager($a,count($r));
-	else
+	} else {
 		$o .= paginate($a);
+	}
 
 	return $o;
 }

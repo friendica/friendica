@@ -142,12 +142,12 @@ function add_shadow_entry($itemid) {
 
 	// Is there a shadow parent?
 	$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = 0 LIMIT 1", dbesc($item['parent-uri']));
-	if (!count($r))
+	if (!dbm::is_result($r))
 		return;
 
 	// Is there already a shadow entry?
 	$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = 0 LIMIT 1", dbesc($item['uri']));
-	if (count($r))
+	if (dbm::is_result($r))
 		return;
 
 	// Preparing public shadow (removing user specific data)
@@ -174,7 +174,7 @@ function add_shadow_entry($itemid) {
 function update_thread_uri($itemuri, $uid) {
 	$messages = q("SELECT `id` FROM `item` WHERE uri ='%s' AND uid=%d", dbesc($itemuri), intval($uid));
 
-	if(count($messages))
+	if (dbm::is_result($messages))
 		foreach ($messages as $message)
 			update_thread($message["id"]);
 }
@@ -183,7 +183,7 @@ function update_thread($itemid, $setmention = false) {
 	$items = q("SELECT `uid`, `guid`, `title`, `body`, `created`, `edited`, `commented`, `received`, `changed`, `wall`, `private`, `pubmail`, `moderated`, `visible`, `spam`, `starred`, `bookmark`, `contact-id`, `gcontact-id`,
 			`deleted`, `origin`, `forum_mode`, `network`, `rendered-html`, `rendered-hash` FROM `item` WHERE `id` = %d AND (`parent` = %d OR `parent` = 0) LIMIT 1", intval($itemid), intval($itemid));
 
-	if (!$items)
+	if (!dbm::is_result($items))
 		return;
 
 	$item = $items[0];
@@ -241,7 +241,7 @@ function delete_thread($itemid, $itemuri = "") {
 				dbesc($itemuri),
 				intval($item["uid"])
 			);
-		if (!count($r)) {
+		if (!dbm::is_result($r)) {
 			$r = q("DELETE FROM `item` WHERE `uri` = '%s' AND `uid` = 0",
 				dbesc($itemuri)
 			);
@@ -267,12 +267,10 @@ function update_threads() {
 }
 
 function update_threads_mention() {
-	$a = get_app();
-
 	$users = q("SELECT `uid`, `nickname` FROM `user` ORDER BY `uid`");
 
 	foreach ($users AS $user) {
-		$self = normalise_link($a->get_baseurl() . '/profile/' . $user['nickname']);
+		$self = normalise_link(App::get_baseurl() . '/profile/' . $user['nickname']);
 		$selfhttps = str_replace("http://", "https://", $self);
 		$parents = q("SELECT DISTINCT(`parent`) FROM `item` WHERE `uid` = %d AND
 				((`owner-link` IN ('%s', '%s')) OR (`author-link` IN ('%s', '%s')))",

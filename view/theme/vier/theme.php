@@ -138,7 +138,7 @@ function vier_community_info() {
 	$show_lastusers  = get_vier_config("show_lastusers", 1);
 
 	//get_baseurl
-	$url = $a->get_baseurl($ssl_state);
+	$url = App::get_baseurl($ssl_state);
 	$aside['$url'] = $url;
 
 	// comunity_profiles
@@ -147,12 +147,12 @@ function vier_community_info() {
 		$r = suggestion_query(local_user(), 0, 9);
 
 		$tpl = get_markup_template('ch_directory_item.tpl');
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$aside['$comunity_profiles_title'] = t('Community Profiles');
 			$aside['$comunity_profiles_items'] = array();
 
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				$entry = replace_macros($tpl,array(
 					'$id' => $rr['id'],
 					//'$profile_link' => zrl($rr['url']),
@@ -170,18 +170,19 @@ function vier_community_info() {
 		$publish = (get_config('system','publish_all') ? '' : " AND `publish` = 1 ");
 		$order = " ORDER BY `register_date` DESC ";
 
+		$tpl = get_markup_template('ch_directory_item.tpl');
+
 		$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`
 				FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
 				WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $order LIMIT %d , %d ",
 				0, 9);
 
-		$tpl = get_markup_template('ch_directory_item.tpl');
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$aside['$lastusers_title'] = t('Last users');
 			$aside['$lastusers_items'] = array();
 
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				$profile_link = 'profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['profile_uid']);
 				$entry = replace_macros($tpl,array(
 					'$id' => $rr['id'],
@@ -299,7 +300,7 @@ function vier_community_info() {
 
 			$aside['$helpers_items'] = array();
 
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				$entry = replace_macros($tpl,array(
 					'$url' => $rr['url'],
 					'$title' => $rr['name'],
@@ -315,65 +316,82 @@ function vier_community_info() {
 	//connectable services
 	if ($show_services) {
 
+		/// @TODO This whole thing is hard-coded, better rewrite to Intercepting Filter Pattern (future-todo)
 		$r = array();
 
-		if (plugin_enabled("appnet"))
+		if (plugin_enabled("appnet")) {
 			$r[] = array("photo" => "images/appnet.png", "name" => "App.net");
+		}
 
-		if (plugin_enabled("buffer"))
+		if (plugin_enabled("buffer")) {
 			$r[] = array("photo" => "images/buffer.png", "name" => "Buffer");
+		}
 
-		if (plugin_enabled("blogger"))
+		if (plugin_enabled("blogger")) {
 			$r[] = array("photo" => "images/blogger.png", "name" => "Blogger");
+		}
 
-		if (plugin_enabled("dwpost"))
+		if (plugin_enabled("dwpost")) {
 			$r[] = array("photo" => "images/dreamwidth.png", "name" => "Dreamwidth");
+		}
 
-		if (plugin_enabled("fbpost"))
+		if (plugin_enabled("fbpost")) {
 			$r[] = array("photo" => "images/facebook.png", "name" => "Facebook");
+		}
 
-		if (plugin_enabled("ifttt"))
+		if (plugin_enabled("ifttt")) {
 			$r[] = array("photo" => "addon/ifttt/ifttt.png", "name" => "IFTTT");
+		}
 
-		if (plugin_enabled("statusnet"))
+		if (plugin_enabled("statusnet")) {
 			$r[] = array("photo" => "images/gnusocial.png", "name" => "GNU Social");
+		}
 
-		if (plugin_enabled("gpluspost"))
+		if (plugin_enabled("gpluspost")) {
 			$r[] = array("photo" => "images/googleplus.png", "name" => "Google+");
+		}
 
-		//if (plugin_enabled("ijpost"))
+		//if (plugin_enabled("ijpost")) {
 		//	$r[] = array("photo" => "images/", "name" => "");
+		//}
 
-		if (plugin_enabled("libertree"))
+		if (plugin_enabled("libertree")) {
 			$r[] = array("photo" => "images/libertree.png", "name" => "Libertree");
+		}
 
-		//if (plugin_enabled("ljpost"))
+		//if (plugin_enabled("ljpost")) {
 		//	$r[] = array("photo" => "images/", "name" => "");
+		//}
 
-		if (plugin_enabled("pumpio"))
+		if (plugin_enabled("pumpio")) {
 			$r[] = array("photo" => "images/pumpio.png", "name" => "pump.io");
+		}
 
-		if (plugin_enabled("tumblr"))
+		if (plugin_enabled("tumblr")) {
 			$r[] = array("photo" => "images/tumblr.png", "name" => "Tumblr");
+		}
 
-		if (plugin_enabled("twitter"))
+		if (plugin_enabled("twitter")) {
 			$r[] = array("photo" => "images/twitter.png", "name" => "Twitter");
+		}
 
-		if (plugin_enabled("wppost"))
+		if (plugin_enabled("wppost")) {
 			$r[] = array("photo" => "images/wordpress.png", "name" => "Wordpress");
+		}
 
-		if(function_exists("imap_open") AND !get_config("system","imap_disabled") AND !get_config("system","dfrn_only"))
+		if (function_exists("imap_open") AND !get_config("system","imap_disabled") AND !get_config("system","dfrn_only")) {
 			$r[] = array("photo" => "images/mail.png", "name" => "E-Mail");
+		}
 
 		$tpl = get_markup_template('ch_connectors.tpl');
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$con_services = array();
 			$con_services['title'] = Array("", t('Connect Services'), "", "");
 			$aside['$con_services'] = $con_services;
 
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				$entry = replace_macros($tpl,array(
 					'$url' => $url,
 					'$photo' => $rr['photo'],

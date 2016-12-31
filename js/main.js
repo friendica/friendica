@@ -92,7 +92,6 @@
 		/* event from comment textarea button popups */
 		/* insert returned bbcode at cursor position or replace selected text */
 		$("body").on("fbrowser.image.comment", function(e, filename, bbcode, id) {
-			console.log("on", id);
 			$.colorbox.close();
 			var textarea = document.getElementById("comment-edit-text-" +id);
 			var start = textarea.selectionStart;
@@ -117,7 +116,6 @@
 			$("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
 			$("#"+id+"_onoff ."+ (val==1?"on":"off")).removeClass("hidden");
 			input.val(val);
-			//console.log(id);
 		});
 
 		/* setup field_richtext */
@@ -163,10 +161,12 @@
 		// fancyboxes
 		$("a.popupbox").colorbox({
 			'inline' : true,
-			'transition' : 'elastic'
+			'transition' : 'elastic',
+			'maxWidth' : '100%'
 		});
 		$("a.ajax-popupbox").colorbox({
-			'transition' : 'elastic'
+			'transition' : 'elastic',
+			'maxWidth' : '100%'
 		});
 
 		/* notifications template */
@@ -276,8 +276,6 @@
 			} else {
 				$("#nav-notifications-linkmenu").removeClass("on");
 			}
-
-			console.log(data.sysmsgs);
 
 			$(data.sysmsgs.notice).each(function(key, message){
 				$.jGrowl(message, {sticky: true, theme: 'notice'});
@@ -691,8 +689,6 @@
 		// the page number to load is one higher than the actual
 		// page number
 		infinite_scroll.pageno+=1;
-
-		console.log('Loading page ' + infinite_scroll.pageno);
 
 		// get the raw content from the next page and insert this content
 		// right before "#conversation-end"

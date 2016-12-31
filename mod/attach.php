@@ -16,7 +16,7 @@ function attach_init(&$a) {
 	$r = q("SELECT * FROM `attach` WHERE `id` = %d LIMIT 1",
 		intval($item_id)
 	);
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('Item was not found.'). EOL);
 		return;
 	}
@@ -29,7 +29,7 @@ function attach_init(&$a) {
 		dbesc($item_id)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}

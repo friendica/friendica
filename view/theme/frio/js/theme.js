@@ -100,6 +100,7 @@ $(document).ready(function(){
 	// initialize the bootstrap tooltips
 	$('body').tooltip({
 		selector: '[data-toggle="tooltip"]',
+		container: 'body',
 		animation: true,
 		html: true,
 		placement: 'auto',

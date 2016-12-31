@@ -11,7 +11,7 @@ Some parts of this template will be moved by js to other places (see theme.js) -
 
 					<div class="form-group form-group-search">
 						<input type="text" name="search" id="search-text" class="search-input form-control form-search" data-toggle="tooltip" title="{{$search_hint}}" placeholder="{{$search_label}}" value="{{$s}}" />
-						<button id="search-submit" class="btn btn-default btn-sm form-button-search" type="submit" name="submit" value="{{$search_label}}">{{$search_label}}</button>
+						<button id="search-submit" class="btn btn-default btn-sm form-button-search" type="submit">{{$search_label}}</button>
 					</div>
 
 					<div class="col-md-4"></div>

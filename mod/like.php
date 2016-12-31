@@ -24,7 +24,7 @@ function like_content(&$a) {
 	// See if we've been passed a return path to redirect to
 	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
 
-	like_content_return($a->get_baseurl(), $return_path);
+	like_content_return(App::get_baseurl(), $return_path);
 	killme(); // NOTREACHED
 //	return; // NOTREACHED
 }

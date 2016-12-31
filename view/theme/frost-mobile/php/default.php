@@ -2,7 +2,7 @@
 <html lang="<?php echo $lang; ?>">
 <head>
   <title><?php if(x($page,'title')) echo $page['title'] ?></title>
-  <script>var baseurl="<?php echo $a->get_baseurl() ?>";</script>
+  <script>var baseurl="<?php echo App::get_baseurl() ?>";</script>
   <?php if(x($page,'htmlhead')) echo $page['htmlhead'] ?>
 </head>
 <body <?php if($a->module === 'home') echo 'onLoad="setTimeout(\'homeRedirect()\', 1500)"'?>>

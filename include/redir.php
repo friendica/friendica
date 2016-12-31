@@ -20,7 +20,7 @@ function auto_redir(&$a, $contact_nick) {
 		//
 		// We also have to make sure that I'm a legitimate contact--I'm not blocked or pending.
 
-		$baseurl = $a->get_baseurl();
+		$baseurl = App::get_baseurl();
 		$domain_st = strpos($baseurl, "://");
 		if($domain_st === false)
 			return;
@@ -36,9 +36,9 @@ function auto_redir(&$a, $contact_nick) {
                dbesc($nurl)
 		);
 
-		if((!$r) || (! count($r)) || $r[0]['id'] == remote_user())
+		if ((! dbm::is_result($r)) || $r[0]['id'] == remote_user()) {
 			return;
-
+		}
 
 		$r = q("SELECT * FROM contact WHERE nick = '%s'
 		        AND network = '%s' AND uid = %d  AND url LIKE '%%%s%%' LIMIT 1",
@@ -48,8 +48,9 @@ function auto_redir(&$a, $contact_nick) {
 		       dbesc($baseurl)
 		);
 
-		if(! ($r && count($r)))
+		if (! dbm::is_result($r)) {
 			return;
+		}
 
 		$cid = $r[0]['id'];
 

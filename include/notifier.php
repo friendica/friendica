@@ -170,7 +170,7 @@ function notifier_run(&$argv, &$argc){
 			intval($item_id)
 		);
 
-		if((! count($r)) || (! intval($r[0]['parent']))) {
+		if((! dbm::is_result($r)) || (! intval($r[0]['parent']))) {
 			return;
 		}
 
@@ -210,8 +210,9 @@ function notifier_run(&$argv, &$argc){
 		intval($uid)
 	);
 
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		return;
+	}
 
 	$owner = $r[0];
 
@@ -321,7 +322,7 @@ function notifier_run(&$argv, &$argc){
 						intval($uid),
 						dbesc(NETWORK_DFRN)
 					);
-					if(count($r))
+					if (dbm::is_result($r))
 						foreach($r as $rr)
 							$recipients_followup[] = $rr['id'];
 				}
@@ -445,7 +446,7 @@ function notifier_run(&$argv, &$argc){
 
 		$r = q("SELECT * FROM `contact` WHERE `id` IN ($conversant_str) AND NOT `blocked` AND NOT `pending` AND NOT `archive`".$sql_extra);
 
-		if(count($r))
+		if (dbm::is_result($r))
 			$contacts = $r;
 
 	} else
@@ -463,7 +464,7 @@ function notifier_run(&$argv, &$argc){
 				intval($uid),
 				dbesc(NETWORK_MAIL)
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				foreach($r as $rr)
 					$recipients[] = $rr['id'];
 			}
@@ -491,7 +492,7 @@ function notifier_run(&$argv, &$argc){
 
 	// delivery loop
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 
 		foreach($r as $contact) {
 			if(!$contact['self']) {
@@ -557,7 +558,7 @@ function notifier_run(&$argv, &$argc){
 	if($slap && count($url_recipients) && ($public_message || $push_notify) && $normal_mode) {
 		if(!get_config('system','dfrn_only')) {
 			foreach($url_recipients as $url) {
-				if($url) {
+				if ($url) {
 					logger('notifier: urldelivery: ' . $url);
 					$deliver_status = slapper($owner,$url,$slap);
 					/// @TODO Redeliver/queue these items on failure, though there is no contact record
@@ -570,12 +571,12 @@ function notifier_run(&$argv, &$argc){
 	if($public_message) {
 
 		if (!$followup)
-			$r0 = diaspora::relay_list();
+			$r0 = Diaspora::relay_list();
 		else
 			$r0 = array();
 
 		$r1 = q("SELECT DISTINCT(`batch`), `id`, `name`,`network` FROM `contact` WHERE `network` = '%s'
-			AND `uid` = %d AND `rel` != %d group by `batch` ORDER BY rand() ",
+			AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch` ORDER BY rand()",
 			dbesc(NETWORK_DIASPORA),
 			intval($owner['uid']),
 			intval(CONTACT_IS_SHARING)
@@ -592,12 +593,12 @@ function notifier_run(&$argv, &$argc){
 
 		$r = array_merge($r2,$r1,$r0);
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			logger('pubdeliver '.$target_item["guid"].': '.print_r($r,true), LOGGER_DEBUG);
 
 			// throw everything into the queue in case we get killed
 
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				if((! $mail) && (! $fsuggest) && (! $followup)) {
 					q("INSERT INTO `deliverq` (`cmd`,`item`,`contact`) VALUES ('%s', %d, %d)
 						ON DUPLICATE KEY UPDATE `cmd` = '%s', `item` = %d, `contact` = %d",
@@ -607,7 +608,7 @@ function notifier_run(&$argv, &$argc){
 				}
 			}
 
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 
 				// except for Diaspora batch jobs
 				// Don't deliver to folks who have already been delivered to
@@ -649,7 +650,7 @@ function notifier_run(&$argv, &$argc){
 
 				} else {
 
-					$params = 'hub.mode=publish&hub.url=' . urlencode( $a->get_baseurl() . '/dfrn_poll/' . $owner['nickname'] );
+					$params = 'hub.mode=publish&hub.url=' . urlencode( App::get_baseurl() . '/dfrn_poll/' . $owner['nickname'] );
 					post_url($h,$params);
 					logger('publish for item '.$item_id.' ' . $h . ' ' . $params . ' returned ' . $a->get_curl_code());
 				}

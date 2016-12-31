@@ -11,7 +11,7 @@ require_once("include/network.php");
 
 function notifications_post(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		goaway(z_root());
 	}
 
@@ -27,7 +27,7 @@ function notifications_post(&$a) {
 			intval(local_user())
 		);
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$intro_id = $r[0]['id'];
 			$contact_id = $r[0]['contact-id'];
 		}
@@ -67,7 +67,7 @@ function notifications_post(&$a) {
 
 function notifications_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -285,8 +285,10 @@ function notifications_content(&$a) {
 				'$item_label' => $it['label'],
 				'$item_link' => $it['link'],
 				'$item_image' => $it['image'],
+				'$item_url' => $it['url'],
 				'$item_text' => htmlentities($it['text']),
 				'$item_when' => $it['when'],
+				'$item_ago' => $it['ago'],
 				'$item_seen' => $it['seen'],
 			));
 		}
@@ -304,7 +306,6 @@ function notifications_content(&$a) {
 		if($notifs['total'] == 0)
 			$notif_nocontent = sprintf( t('No more %s notifications.'), $notifs['ident']);
 	}
-
 
 	$o .= replace_macros($notif_tpl, array(
 		'$notif_header' => $notif_header,

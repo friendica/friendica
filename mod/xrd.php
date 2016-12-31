@@ -21,8 +21,9 @@ function xrd_init(&$a) {
 	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' LIMIT 1",
 		dbesc($name)
 	);
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		killme();
+	}
 
 	$salmon_key = salmon_key($r[0]['spubkey']);
 
@@ -31,22 +32,24 @@ function xrd_init(&$a) {
 
 	$tpl = get_markup_template('xrd_diaspora.tpl');
 	$dspr = replace_macros($tpl,array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$dspr_guid' => $r[0]['guid'],
 		'$dspr_key' => base64_encode(pemtorsa($r[0]['pubkey']))
 	));
 
 	$tpl = get_markup_template('xrd_person.tpl');
 
-	$profile_url = $a->get_baseurl().'/profile/'.$r[0]['nickname'];
+	$profile_url = App::get_baseurl().'/profile/'.$r[0]['nickname'];
 
-	if ($acct)
+	if ($acct) {
 		$alias = $profile_url;
+	}
 	else {
 		$alias = 'acct:'.$r[0]['nickname'].'@'.$a->get_hostname();
 
-		if ($a->get_path())
+		if ($a->get_path()) {
 			$alias .= '/'.$a->get_path();
+		}
 	}
 
 	$o = replace_macros($tpl, array(
@@ -54,17 +57,17 @@ function xrd_init(&$a) {
 		'$accturi'     => $uri,
 		'$alias'       => $alias,
 		'$profile_url' => $profile_url,
-		'$hcard_url'   => $a->get_baseurl() . '/hcard/'         . $r[0]['nickname'],
-		'$atom'        => $a->get_baseurl() . '/dfrn_poll/'     . $r[0]['nickname'],
-		'$zot_post'    => $a->get_baseurl() . '/post/'          . $r[0]['nickname'],
-		'$poco_url'    => $a->get_baseurl() . '/poco/'          . $r[0]['nickname'],
-		'$photo'       => $a->get_baseurl() . '/photo/profile/' . $r[0]['uid']      . '.jpg',
+		'$hcard_url'   => App::get_baseurl() . '/hcard/'         . $r[0]['nickname'],
+		'$atom'        => App::get_baseurl() . '/dfrn_poll/'     . $r[0]['nickname'],
+		'$zot_post'    => App::get_baseurl() . '/post/'          . $r[0]['nickname'],
+		'$poco_url'    => App::get_baseurl() . '/poco/'          . $r[0]['nickname'],
+		'$photo'       => App::get_baseurl() . '/photo/profile/' . $r[0]['uid']      . '.jpg',
 		'$dspr'        => $dspr,
-		'$salmon'      => $a->get_baseurl() . '/salmon/'        . $r[0]['nickname'],
-		'$salmen'      => $a->get_baseurl() . '/salmon/'        . $r[0]['nickname'] . '/mention',
-		'$subscribe'   => $a->get_baseurl() . '/follow?url={uri}',
+		'$salmon'      => App::get_baseurl() . '/salmon/'        . $r[0]['nickname'],
+		'$salmen'      => App::get_baseurl() . '/salmon/'        . $r[0]['nickname'] . '/mention',
+		'$subscribe'   => App::get_baseurl() . '/follow?url={uri}',
 		'$modexp'      => 'data:application/magic-public-key,'  . $salmon_key,
-		'$bigkey'      =>  salmon_key($r[0]['pubkey'])
+		'$bigkey'      => salmon_key($r[0]['pubkey']),
 	));
 
 

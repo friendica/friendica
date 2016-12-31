@@ -271,7 +271,7 @@ function event_store($arr) {
 			intval($arr['id']),
 			intval($arr['uid'])
 		);
-		if((! count($r)) || ($r[0]['edited'] === $arr['edited'])) {
+		if((! dbm::is_result($r)) || ($r[0]['edited'] === $arr['edited'])) {
 
 			// Nothing has changed. Grab the item id to return.
 
@@ -279,7 +279,7 @@ function event_store($arr) {
 				intval($arr['id']),
 				intval($arr['uid'])
 			);
-			return((count($r)) ? $r[0]['id'] : 0);
+			return((dbm::is_result($r)) ? $r[0]['id'] : 0);
 		}
 
 		// The event changed. Update it.
@@ -312,7 +312,7 @@ function event_store($arr) {
 			intval($arr['id']),
 			intval($arr['uid'])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$object = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($arr['uri']) . '</id>';
 			$object .= '<content>' . xmlify(format_event_bbcode($arr)) . '</content>';
 			$object .= '</object>' . "\n";
@@ -365,7 +365,7 @@ function event_store($arr) {
 			dbesc($arr['uri']),
 			intval($arr['uid'])
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$event = $r[0];
 
 		$item_arr = array();
@@ -407,8 +407,8 @@ function event_store($arr) {
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($arr['uid'])
 		);
-		//if(count($r))
-		//	$plink = $a->get_baseurl() . '/display/' . $r[0]['nickname'] . '/' . $item_id;
+		//if (dbm::is_result($r))
+		//	$plink = App::get_baseurl() . '/display/' . $r[0]['nickname'] . '/' . $item_id;
 
 
 		if($item_id) {
@@ -515,7 +515,7 @@ function event_by_id($owner_uid = 0, $event_params, $sql_extra = '') {
 		intval($event_params["event_id"])
 	);
 
-	if(count($r))
+	if (dbm::is_result($r))
 		return $r;
 
 }
@@ -557,7 +557,7 @@ function events_by_date($owner_uid = 0, $event_params, $sql_extra = '') {
 			dbesc($event_params["adjust_finish"])
 	);
 
-	if(count($r))
+	if (dbm::is_result($r))
 		return $r;
 }
 
@@ -750,7 +750,7 @@ function events_by_uid($uid = 0, $sql_extra = '') {
 		);
 	}
 
-	if(count($r))
+	if (dbm::is_result($r))
 		return $r;
 }
 
@@ -773,7 +773,7 @@ function event_export($uid, $format = 'ical') {
 	// we are allowed to show events
 	// get the timezone the user is in
 	$r = q("SELECT `timezone` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
-	if (count($r))
+	if (dbm::is_result($r))
 		$timezone = $r[0]['timezone'];
 
 	// get all events which are owned by a uid (respects permissions);

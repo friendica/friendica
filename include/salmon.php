@@ -24,22 +24,24 @@ function get_salmon_key($uri,$keyhash) {
 	// We have found at least one key URL
 	// If it's inline, parse it - otherwise get the key
 
-	if(count($ret)) {
-		for($x = 0; $x < count($ret); $x ++) {
-			if(substr($ret[$x],0,5) === 'data:') {
-				if(strstr($ret[$x],','))
+	if (count($ret) > 0) {
+		for ($x = 0; $x < count($ret); $x ++) {
+			if (substr($ret[$x],0,5) === 'data:') {
+				if (strstr($ret[$x],',')) {
 					$ret[$x] = substr($ret[$x],strpos($ret[$x],',')+1);
-				else
+				} else {
 					$ret[$x] = substr($ret[$x],5);
-			} elseif (normalise_link($ret[$x]) == 'http://')
+				}
+			} elseif (normalise_link($ret[$x]) == 'http://') {
 				$ret[$x] = fetch_url($ret[$x]);
+			}
 		}
 	}
 
 
 	logger('Key located: ' . print_r($ret,true));
 
-	if(count($ret) == 1) {
+	if (count($ret) == 1) {
 
 		// We only found one one key so we don't care if the hash matches.
 		// If it's the wrong key we'll find out soon enough because
@@ -50,10 +52,11 @@ function get_salmon_key($uri,$keyhash) {
 		return $ret[0];
 	}
 	else {
-		foreach($ret as $a) {
+		foreach ($ret as $a) {
 			$hash = base64url_encode(hash('sha256',$a));
-			if($hash == $keyhash)
+			if ($hash == $keyhash) {
 				return $a;
+			}
 		}
 	}
 

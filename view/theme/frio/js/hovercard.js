@@ -79,7 +79,8 @@ $(document).ready(function(){
 									},
 									trigger: hctrigger,
 									template: '<div class="popover hovercard" data-card-created="' + timeNow + '"><div class="arrow"></div><div class="popover-content hovercard-content"></div></div>',
-									content: data
+									content: data,
+									container: "body",
 								}).popover('show');
 							}
 						});

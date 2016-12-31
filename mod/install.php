@@ -11,17 +11,16 @@ function install_init(&$a){
 		echo "ok";
 		killme();
 	}
-	
+
 	// We overwrite current theme css, because during install we could not have a working mod_rewrite
 	// so we could not have a css at all. Here we set a static css file for the install procedure pages
 	$a->config['system']['theme'] = "../install";
-	$a->theme['stylesheet'] = $a->get_baseurl()."/view/install/style.css";
-	
-	
-	
+	$a->theme['stylesheet'] = App::get_baseurl()."/view/install/style.css";
+
 	global $install_wizard_pass;
-	if (x($_POST,'pass'))
+	if (x($_POST,'pass')) {
 		$install_wizard_pass = intval($_POST['pass']);
+	}
 
 }
 
@@ -52,7 +51,7 @@ function install_post(&$a) {
 					$r = q("CREATE DATABASE '%s'",
 							dbesc($dbdata)
 					);
-					if($r) {
+					if ($r) {
 						unset($db);
 						$db = new dba($dbhost, $dbuser, $dbpass, $dbdata, true);
 					} else {
@@ -63,7 +62,7 @@ function install_post(&$a) {
 					return;
 				}
 			}*/
-			if(get_db_errno()) {
+			if (get_db_errno()) {
 				$a->data['db_conn_failed']=true;
 			}
 
@@ -107,17 +106,18 @@ function install_post(&$a) {
 
 
 			$result = file_put_contents('.htconfig.php', $txt);
-			if(! $result) {
+			if (! $result) {
 				$a->data['txt'] = $txt;
 			}
 
 			$errors = load_database($db);
 
 
-			if($errors)
+			if ($errors) {
 				$a->data['db_failed'] = $errors;
-			else
+			} else {
 				$a->data['db_installed'] = true;
+			}
 
 			return;
 		break;
@@ -125,10 +125,11 @@ function install_post(&$a) {
 }
 
 function get_db_errno() {
-	if(class_exists('mysqli'))
+	if (class_exists('mysqli')) {
 		return mysqli_connect_errno();
-	else
+	} else {
 		return mysql_errno();
+	}
 }
 
 function install_content(&$a) {
@@ -140,23 +141,23 @@ function install_content(&$a) {
 
 
 
-	if(x($a->data,'db_conn_failed')) {
+	if (x($a->data,'db_conn_failed')) {
 		$install_wizard_pass = 2;
 		$wizard_status =  t('Could not connect to database.');
 	}
-	if(x($a->data,'db_create_failed')) {
+	if (x($a->data,'db_create_failed')) {
 		$install_wizard_pass = 2;
 		$wizard_status =  t('Could not create table.');
 	}
 
 	$db_return_text="";
-	if(x($a->data,'db_installed')) {
+	if (x($a->data,'db_installed')) {
 		$txt = '<p style="font-size: 130%;">';
 		$txt .= t('Your Friendica site database has been installed.') . EOL;
 		$db_return_text .= $txt;
 	}
 
-	if(x($a->data,'db_failed')) {
+	if (x($a->data,'db_failed')) {
 		$txt = t('You may need to import the file "database.sql" manually using phpmyadmin or mysql.') . EOL;
 		$txt .= t('Please see the file "INSTALL.txt".') . EOL ."<hr>" ;
 		$txt .= "<pre>".$a->data['db_failed'] . "</pre>". EOL ;
@@ -165,7 +166,7 @@ function install_content(&$a) {
 
 	if($db && $db->connected) {
 		$r = q("SELECT COUNT(*) as `total` FROM `user`");
-		if($r && count($r) && $r[0]['total']) {
+		if (dbm::is_result($r) && $r[0]['total']) {
 			$tpl = get_markup_template('install.tpl');
 			return replace_macros($tpl, array(
 				'$title' => $install_title,
@@ -176,7 +177,7 @@ function install_content(&$a) {
 		}
 	}
 
-	if(x($a->data,'txt') && strlen($a->data['txt'])) {
+	if (x($a->data,'txt') && strlen($a->data['txt'])) {
 		$db_return_text .= manual_config($a);
 	}
 
@@ -205,16 +206,19 @@ function install_content(&$a) {
 
 			check_keys($checks);
 
-			if(x($_POST,'phpath'))
+			if (x($_POST,'phpath')) {
 				$phpath = notags(trim($_POST['phpath']));
+			}
 
 			check_php($phpath, $checks);
 
-            check_htaccess($checks);
+			check_htaccess($checks);
 
+			/// @TODO Maybe move this out?
 			function check_passed($v, $c){
-				if ($c['required'])
+				if ($c['required']) {
 					$v = $v && $c['status'];
+				}
 				return $v;
 			}
 			$checkspassed = array_reduce($checks, "check_passed", true);
@@ -231,7 +235,7 @@ function install_content(&$a) {
 				'$next' => t('Next'),
 				'$reload' => t('Check again'),
 				'$phpath' => $phpath,
-				'$baseurl' => $a->get_baseurl(),
+				'$baseurl' => App::get_baseurl(),
 			));
 			return $o;
 		}; break;
@@ -265,7 +269,7 @@ function install_content(&$a) {
 
 				'$lbl_10' => t('Please select a default timezone for your website'),
 
-				'$baseurl' => $a->get_baseurl(),
+				'$baseurl' => App::get_baseurl(),
 
 				'$phpath' => $phpath,
 
@@ -305,7 +309,7 @@ function install_content(&$a) {
 
 				'$timezone' => field_timezone('timezone', t('Please select a default timezone for your website'), $timezone, ''),
 				'$language' => array('language', t('System Language:'), 'en', t('Set the default language for your Friendica installation interface and to send emails.'), $lang_choices),
-				'$baseurl' => $a->get_baseurl(),
+				'$baseurl' => App::get_baseurl(),
 
 
 
@@ -343,7 +347,7 @@ function check_php(&$phpath, &$checks) {
 		$passed = strlen($phpath);
 	}
 	$help = "";
-	if(!$passed) {
+	if (!$passed) {
 		$help .= t('Could not find a command line version of PHP in the web server PATH.'). EOL;
 		$help .= t("If you don't have a command line version of PHP installed on server, you will not be able to run background polling via cron. See <a href='https://github.com/friendica/friendica/blob/master/doc/Install.md#set-up-the-poller'>'Setup the poller'</a>") . EOL ;
 		$help .= EOL . EOL ;
@@ -370,7 +374,7 @@ function check_php(&$phpath, &$checks) {
 	}
 
 
-	if($passed2) {
+	if ($passed2) {
 		$str = autoname(8);
 		$cmd = "$phpath testargs.php $str";
 		$result = trim(shell_exec($cmd));
@@ -392,15 +396,17 @@ function check_keys(&$checks) {
 
 	$res = false;
 
-	if(function_exists('openssl_pkey_new'))
-		$res=openssl_pkey_new(array(
-		'digest_alg' => 'sha1',
-		'private_key_bits' => 4096,
-		'encrypt_key' => false ));
+	if (function_exists('openssl_pkey_new')) {
+		$res = openssl_pkey_new(array(
+			'digest_alg'       => 'sha1',
+			'private_key_bits' => 4096,
+			'encrypt_key'      => false
+		));
+	}
 
 	// Get private key
 
-	if(! $res) {
+	if (! $res) {
 		$help .= t('Error: the "openssl_pkey_new" function on this system is not able to generate encryption keys'). EOL;
 		$help .= t('If running under Windows, please see "http://www.php.net/manual/en/openssl.installation.php".');
 	}
@@ -420,7 +426,7 @@ function check_funcs(&$checks) {
 	check_add($ck_funcs, t('XML PHP module'), true, true, "");
 	check_add($ck_funcs, t('iconv module'), true, true, "");
 
-	if(function_exists('apache_get_modules')){
+	if (function_exists('apache_get_modules')){
 		if (! in_array('mod_rewrite',apache_get_modules())) {
 			check_add($ck_funcs, t('Apache mod_rewrite module'), false, true, t('Error: Apache webserver mod-rewrite module is required but not installed.'));
 		} else {
@@ -428,31 +434,31 @@ function check_funcs(&$checks) {
 		}
 	}
 
-	if(! function_exists('curl_init')){
+	if (! function_exists('curl_init')){
 		$ck_funcs[0]['status']= false;
 		$ck_funcs[0]['help']= t('Error: libCURL PHP module required but not installed.');
 	}
-	if(! function_exists('imagecreatefromjpeg')){
+	if (! function_exists('imagecreatefromjpeg')){
 		$ck_funcs[1]['status']= false;
 		$ck_funcs[1]['help']= t('Error: GD graphics PHP module with JPEG support required but not installed.');
 	}
-	if(! function_exists('openssl_public_encrypt')) {
+	if (! function_exists('openssl_public_encrypt')) {
 		$ck_funcs[2]['status']= false;
 		$ck_funcs[2]['help']= t('Error: openssl PHP module required but not installed.');
 	}
-	if(! function_exists('mysqli_connect')){
+	if (! function_exists('mysqli_connect')){
 		$ck_funcs[3]['status']= false;
 		$ck_funcs[3]['help']= t('Error: mysqli PHP module required but not installed.');
 	}
-	if(! function_exists('mb_strlen')){
+	if (! function_exists('mb_strlen')){
 		$ck_funcs[4]['status']= false;
 		$ck_funcs[4]['help']= t('Error: mb_string PHP module required but not installed.');
 	}
-	if(! function_exists('mcrypt_create_iv')){
+	if (! function_exists('mcrypt_create_iv')){
 		$ck_funcs[5]['status']= false;
 		$ck_funcs[5]['help']= t('Error: mcrypt PHP module required but not installed.');
 	}
-	if(! function_exists('iconv_strlen')){
+	if (! function_exists('iconv_strlen')){
 		$ck_funcs[7]['status']= false;
 		$ck_funcs[7]['help']= t('Error: iconv PHP module required but not installed.');
 	}
@@ -487,7 +493,7 @@ function check_funcs(&$checks) {
 function check_htconfig(&$checks) {
 	$status = true;
 	$help = "";
-	if(	(file_exists('.htconfig.php') && !is_writable('.htconfig.php')) ||
+	if ((file_exists('.htconfig.php') && !is_writable('.htconfig.php')) ||
 		(!file_exists('.htconfig.php') && !is_writable('.')) ) {
 
 		$status=false;
@@ -504,7 +510,7 @@ function check_htconfig(&$checks) {
 function check_smarty3(&$checks) {
 	$status = true;
 	$help = "";
-	if(	!is_writable('view/smarty3') ) {
+	if (!is_writable('view/smarty3') ) {
 
 		$status=false;
 		$help = t('Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering.') .EOL;
@@ -518,14 +524,14 @@ function check_smarty3(&$checks) {
 }
 
 function check_htaccess(&$checks) {
-	$a = get_app();
 	$status = true;
 	$help = "";
-	if (function_exists('curl_init')){
-		$test = fetch_url($a->get_baseurl()."/install/testrewrite");
+	if (function_exists('curl_init')) {
+		$test = fetch_url(App::get_baseurl()."/install/testrewrite");
 
-		if ($test!="ok")
-			$test = fetch_url(normalise_link($a->get_baseurl()."/install/testrewrite"));
+		if ($test!="ok") {
+			$test = fetch_url(normalise_link(App::get_baseurl()."/install/testrewrite"));
+		}
 
 		if ($test!="ok") {
 			$status = false;
@@ -534,6 +540,7 @@ function check_htaccess(&$checks) {
 		check_add($checks, t('Url rewrite is working'), $status, true, $help);
 	} else {
 		// cannot check modrewrite if libcurl is not installed
+		/// @TODO Maybe issue warning here?
 	}
 }
 
@@ -548,13 +555,15 @@ function check_imagik(&$checks) {
 			$gif = true;
 		}
 	}
-	check_add($checks, t('ImageMagick PHP extension is installed'), $imagick, false, "");
-	if ($imagick) {
-		check_add($checks, t('ImageMagick supports GIF'), $gif, false, "");
+	if ($imagick == false) {
+		check_add($checks, t('ImageMagick PHP extension is not installed'), $imagick, false, "");
+	} else {
+		check_add($checks, t('ImageMagick PHP extension is installed'), $imagick, false, "");
+		if ($imagick) {
+			check_add($checks, t('ImageMagick supports GIF'), $gif, false, "");
+		}
 	}
 }
-
-
 
 function manual_config(&$a) {
 	$data = htmlentities($a->data['txt'],ENT_COMPAT,'UTF-8');
@@ -594,8 +603,7 @@ function load_database($db) {
 }
 
 function what_next() {
-	$a = get_app();
-	$baseurl = $a->get_baseurl();
+	$baseurl = App::get_baseurl();
 	return
 		t('<h1>What next</h1>')
 		."<p>".t('IMPORTANT: You will need to [manually] setup a scheduled task for the poller.')

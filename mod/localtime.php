@@ -36,7 +36,7 @@ function localtime_content(&$a) {
 		$o .= '<p>' . sprintf( t('Converted localtime: %s'),$a->data['mod-localtime']) . '</p>';
 
 
-	$o .= '<form action ="' . $a->get_baseurl() . '/localtime?f=&time=' . $t . '" method="post" >';
+	$o .= '<form action ="' . App::get_baseurl() . '/localtime?f=&time=' . $t . '" method="post" >';
 
 	$o .= '<p>' . t('Please select your timezone:') . '</p>'; 
 

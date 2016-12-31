@@ -209,7 +209,7 @@
 				dbesc(trim($user)),
 				dbesc($encrypted)
 			);
-			if(count($r))
+			if (dbm::is_result($r))
 				$record = $r[0];
 		}
 
@@ -409,13 +409,13 @@
 		if (is_null($user_info)) $user_info = api_get_user($a);
 		$arr['$user'] = $user_info;
 		$arr['$rss'] = array(
-			'alternate' => $user_info['url'],
-			'self' => App::get_baseurl(). "/". $a->query_string,
-			'base' => App::get_baseurl(),
-			'updated' => api_date(null),
+			'alternate'    => $user_info['url'],
+			'self'         => App::get_baseurl(). "/". $a->query_string,
+			'base'         => App::get_baseurl(),
+			'updated'      => api_date(null),
 			'atom_updated' => datetime_convert('UTC','UTC','now',ATOM_TIME),
-			'language' => $user_info['language'],
-			'logo'	=> App::get_baseurl()."/images/friendica-32.png",
+			'language'     => $user_info['language'],
+			'logo'         => App::get_baseurl()."/images/friendica-32.png",
 		);
 
 		return $arr;
@@ -624,7 +624,7 @@
 		// count friends
 		$r = q("SELECT count(*) as `count` FROM `contact`
 				WHERE  `uid` = %d AND `rel` IN ( %d, %d )
-				AND `self`=0 AND `blocked`=0 AND `hidden`=0",
+				AND `self`=0 AND NOT `blocked` AND `hidden`=0",
 				intval($uinfo[0]['uid']),
 				intval(CONTACT_IS_SHARING),
 				intval(CONTACT_IS_FRIEND)
@@ -633,7 +633,7 @@
 
 		$r = q("SELECT count(*) as `count` FROM `contact`
 				WHERE  `uid` = %d AND `rel` IN ( %d, %d )
-				AND `self`=0 AND `blocked`=0 AND `hidden`=0",
+				AND `self`=0 AND NOT `blocked` AND `hidden`=0",
 				intval($uinfo[0]['uid']),
 				intval(CONTACT_IS_FOLLOWER),
 				intval(CONTACT_IS_FRIEND)
@@ -1327,10 +1327,10 @@
 
 		if (isset($_GET["q"])) {
 			$r = q("SELECT id FROM `contact` WHERE `uid` = 0 AND `name` = '%s'", dbesc($_GET["q"]));
-			if (!count($r))
+			if (!dbm::is_result($r))
 				$r = q("SELECT `id` FROM `contact` WHERE `uid` = 0 AND `nick` = '%s'", dbesc($_GET["q"]));
 
-			if (count($r)) {
+			if (dbm::is_result($r)) {
 				$k = 0;
 				foreach ($r AS $user) {
 					$user_info = api_get_user($a, $user["id"], "json");
@@ -1400,7 +1400,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`uid` = %d AND `verb` = '%s'
 			AND `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			$sql_extra
@@ -1477,7 +1477,7 @@
 			`user`.`nickname`, `user`.`hidewall`
 			FROM `item`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			STRAIGHT_JOIN `user` ON `user`.`uid` = `item`.`uid`
 				AND NOT `user`.`hidewall`
 			WHERE `verb` = '%s' AND `item`.`visible` AND NOT `item`.`deleted` AND NOT `item`.`moderated`
@@ -1544,7 +1544,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			AND `item`.`uid` = %d AND `item`.`verb` = '%s'
 			$sql_extra",
@@ -1620,7 +1620,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`parent` = %d AND `item`.`visible`
 			AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			AND `item`.`uid` = %d AND `item`.`verb` = '%s'
@@ -1674,7 +1674,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			AND NOT `item`.`private` AND `item`.`allow_cid` = '' AND `item`.`allow`.`gid` = ''
 			AND `item`.`deny_cid` = '' AND `item`.`deny_gid` = ''
@@ -1793,7 +1793,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item` FORCE INDEX (`uid_id`)
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`uid` = %d AND `verb` = '%s'
 			AND NOT (`item`.`author-link` IN ('https://%s', 'http://%s'))
 			AND `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
@@ -1867,7 +1867,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item` FORCE INDEX (`uid_contactid_id`)
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`uid` = %d AND `verb` = '%s'
 			AND `item`.`contact-id` = %d
 			AND `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
@@ -2003,7 +2003,7 @@
 				AND `item`.`visible` = 1 and `item`.`moderated` = 0 AND `item`.`deleted` = 0
 				AND `item`.`starred` = 1
 				AND `contact`.`id` = `item`.`contact-id`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 				$sql_extra
 				AND `item`.`id`>%d
 				ORDER BY `item`.`id` DESC LIMIT %d ,%d ",
@@ -3069,8 +3069,8 @@
 		'image/gif' => 'gif'
 		);
 		$data = array('photo'=>array());
-		if($r) {
-			foreach($r as $rr) {
+		if ($r) {
+			foreach ($r as $rr) {
 				$photo = array();
 				$photo['id'] = $rr['resource-id'];
 				$photo['album'] = $rr['album'];
@@ -3091,7 +3091,7 @@
 
 	function api_fr_photo_detail($type) {
 		if (api_user()===false) throw new HTTP\ForbiddenException();
-		if(!x($_REQUEST,'photo_id')) throw new HTTP\BadRequestException("No photo id.");
+		if (!x($_REQUEST,'photo_id')) throw new HTTP\BadRequestException("No photo id.");
 
 		$scale = (x($_REQUEST, 'scale') ? intval($_REQUEST['scale']) : false);
 		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d",intval($scale)));
@@ -3175,7 +3175,7 @@
 			intval(api_user())
 		);
 
-		if ((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+		if ((! dbm::is_result($r)) || ($r[0]['network'] !== NETWORK_DFRN))
 			throw new HTTP\BadRequestException("Unknown contact");
 
 		$cid = $r[0]['id'];
@@ -3219,7 +3219,7 @@
 	function api_share_as_retweet(&$item) {
 		$body = trim($item["body"]);
 
-		if (diaspora::is_reshare($body, false)===false) {
+		if (Diaspora::is_reshare($body, false)===false) {
 			return false;
 		}
 
@@ -3527,7 +3527,7 @@
 				intval($uid),
 				intval($gid));
 			// error message if specified gid is not in database
-			if (count($r) == 0)
+			if (!dbm::is_result($r))
 				throw new HTTP\BadRequestException("gid not available");
 		}
 		else
@@ -3582,7 +3582,7 @@
 			intval($uid),
 			intval($gid));
 		// error message if specified gid is not in database
-		if (count($r) == 0)
+		if (!dbm::is_result($r))
 			throw new HTTP\BadRequestException('gid not available');
 
 		// get data of the specified group id and group name
@@ -3920,7 +3920,9 @@
 
 		$profile_url = $user_info["url"];
 		// message if nothing was found
-		if (count($r) == 0)
+		if (!dbm::is_result($r))
+			$success = array('success' => false, 'search_results' => 'problem with query');
+		else if (count($r) == 0) 
 			$success = array('success' => false, 'search_results' => 'nothing found');
 		else {
 			$ret = Array();
@@ -3941,7 +3943,6 @@
 		return api_format_data("direct_message_search", $type, array('$result' => $success));
 	}
 	api_register_func('api/friendica/direct_messages_search', 'api_friendica_direct_messages_search', true);
-
 
 	/**
 	 * @brief return data of all the profiles a user has to the client
@@ -3967,7 +3968,7 @@
 				intval(api_user()),
 				intval($profileid));
 			// error message if specified gid is not in database
-			if (count($r) == 0)
+			if (!dbm::is_result($r))
 				throw new HTTP\BadRequestException("profile_id not available");
 		}
 		else

@@ -12,7 +12,7 @@ if(! function_exists('replace_macros')) {
  * This is our template processor
  *
  * @param string|FriendicaSmarty $s the string requiring macro substitution,
- *									or an instance of FriendicaSmarty
+ *				or an instance of FriendicaSmarty
  * @param array $r key value pairs (search => replace)
  * @return string substituted string
  */
@@ -23,7 +23,7 @@ function replace_macros($s,$r) {
 	$a = get_app();
 
 	// pass $baseurl to all templates
-	$r['$baseurl'] = $a->get_baseurl();
+	$r['$baseurl'] = App::get_baseurl();
 
 
 	$t = $a->template_engine();
@@ -491,7 +491,7 @@ function item_new_uri($hostname,$uid, $guid = "") {
 
 		$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($uri));
-		if(count($r))
+		if (dbm::is_result($r))
 			$dups = true;
 	} while($dups == true);
 	return $uri;
@@ -515,7 +515,7 @@ function photo_new_resource() {
 		$r = q("SELECT `id` FROM `photo` WHERE `resource-id` = '%s' LIMIT 1",
 			dbesc($resource)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$found = true;
 	} while($found == true);
 	return $resource;
@@ -699,7 +699,7 @@ $LOGGER_LEVELS = array();
  * @param int $level
  */
 function logger($msg, $level = 0) {
-	global $a;
+	$a = get_app();
 	global $db;
 	global $LOGGER_LEVELS;
 
@@ -771,7 +771,7 @@ function activity_match($haystack,$needle) {
 
 /**
  * @brief Pull out all #hashtags and @person tags from $string.
- * 
+ *
  * We also get @person@domain.com - which would make
  * the regex quite complicated as tags can also
  * end a sentence. So we'll run through our results
@@ -882,7 +882,7 @@ function contact_block() {
 			dbesc(NETWORK_OSTATUS),
 			dbesc(NETWORK_DIASPORA)
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$total = intval($r[0]['total']);
 	}
 	if(! $total) {
@@ -901,17 +901,18 @@ function contact_block() {
 				dbesc(NETWORK_DIASPORA),
 				intval($shown)
 		);
-		if ($r) {
+		if (dbm::is_result($r)) {
 			$contacts = "";
 			foreach ($r AS $contact)
 				$contacts[] = $contact["id"];
 
 			$r = q("SELECT `id`, `uid`, `addr`, `url`, `name`, `thumb`, `network` FROM `contact` WHERE `id` IN (%s)",
 				dbesc(implode(",", $contacts)));
-			if(count($r)) {
+
+			if (dbm::is_result($r)) {
 				$contacts = sprintf( tt('%d Contact','%d Contacts', $total),$total);
 				$micropro = Array();
-				foreach($r as $rr) {
+				foreach ($r as $rr) {
 					$micropro[] = micropro($rr,true,'mpfriend');
 				}
 			}
@@ -1170,33 +1171,29 @@ function link_compare($a,$b) {
 	return false;
 }}
 
-
-if(! function_exists('redir_private_images')) {
 /**
- * Find any non-embedded images in private items and add redir links to them
+ * @brief Find any non-embedded images in private items and add redir links to them
  *
  * @param App $a
- * @param array $item
+ * @param array &$item The field array of an item row
  */
-function redir_private_images($a, &$item) {
-
+function redir_private_images($a, &$item)
+{
 	$matches = false;
 	$cnt = preg_match_all('|\[img\](http[^\[]*?/photo/[a-fA-F0-9]+?(-[0-9]\.[\w]+?)?)\[\/img\]|', $item['body'], $matches, PREG_SET_ORDER);
-	if($cnt) {
-		//logger("redir_private_images: matches = " . print_r($matches, true));
-		foreach($matches as $mtch) {
-			if(strpos($mtch[1], '/redir') !== false)
+	if ($cnt) {
+		foreach ($matches as $mtch) {
+			if (strpos($mtch[1], '/redir') !== false) {
 				continue;
+			}
 
-			if((local_user() == $item['uid']) && ($item['private'] != 0) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN)) {
-				//logger("redir_private_images: redir");
-				$img_url = 'redir?f=1&quiet=1&url=' . $mtch[1] . '&conurl=' . $item['author-link'];
-				$item['body'] = str_replace($mtch[0], "[img]".$img_url."[/img]", $item['body']);
+			if ((local_user() == $item['uid']) && ($item['private'] != 0) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN)) {
+				$img_url = 'redir?f=1&quiet=1&url=' . urlencode($mtch[1]) . '&conurl=' . urlencode($item['author-link']);
+				$item['body'] = str_replace($mtch[0], '[img]' . $img_url . '[/img]', $item['body']);
 			}
 		}
 	}
-
-}}
+}
 
 function put_item_in_cache(&$item, $update = false) {
 
@@ -1370,7 +1367,7 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 	// map
 	if(strpos($s,'<div class="map">') !== false && $item['coord']) {
 		$x = generate_map(trim($item['coord']));
-		if($x) {
+		if ($x) {
 			$s = preg_replace('/\<div class\=\"map\"\>/','$0' . $x,$s);
 		}
 	}
@@ -1720,7 +1717,7 @@ function bb_translate_video($s) {
 
 	$matches = null;
 	$r = preg_match_all("/\[video\](.*?)\[\/video\]/ism",$s,$matches,PREG_SET_ORDER);
-	if($r) {
+	if ($r) {
 		foreach($matches as $mtch) {
 			if((stristr($mtch[1],'youtube')) || (stristr($mtch[1],'youtu.be')))
 				$s = str_replace($mtch[0],'[youtube]' . $mtch[1] . '[/youtube]',$s);
@@ -1935,7 +1932,7 @@ function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
 			//	intval($uid)
 			//);
 
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				unset($deleted_tags[$key]);
 			}
 			else {
@@ -1965,7 +1962,7 @@ function file_tag_save_file($uid,$item,$file) {
 		intval($item),
 		intval($uid)
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		if(! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']'))
 			q("UPDATE `item` SET `file` = '%s' WHERE `id` = %d AND `uid` = %d",
 				dbesc($r[0]['file'] . '[' . file_tag_encode($file) . ']'),
@@ -2003,8 +2000,9 @@ function file_tag_unsave_file($uid,$item,$file,$cat = false) {
 		intval($item),
 		intval($uid)
 	);
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		return false;
+	}
 
 	q("UPDATE `item` SET `file` = '%s' WHERE `id` = %d AND `uid` = %d",
 		dbesc(str_replace($pattern,'',$r[0]['file'])),
@@ -2023,11 +2021,11 @@ function file_tag_unsave_file($uid,$item,$file,$cat = false) {
 	//$r = q("select file from item where uid = %d and deleted = 0 " . file_tag_file_query('item',$file,(($cat) ? 'category' : 'file')),
 	//);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		$saved = get_pconfig($uid,'system','filetags');
 		set_pconfig($uid,'system','filetags',str_replace($pattern,'',$saved));
-
 	}
+
 	return true;
 }
 

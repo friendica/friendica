@@ -3,7 +3,7 @@
 
 function viewsrc_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Access denied.') . EOL);
 		return;
 	}
@@ -24,7 +24,7 @@ function viewsrc_content(&$a) {
 		dbesc($item_id)
 	);
 
-	if(count($r))
+	if (dbm::is_result($r))
 		if(is_ajax()) {
 			echo str_replace("\n",'<br />',$r[0]['body']);
 			killme();

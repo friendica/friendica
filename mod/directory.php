@@ -78,7 +78,7 @@ function directory_content(&$a) {
 	$r = $db->q("SELECT COUNT(*) AS `total` FROM `profile`
 			LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
 			WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $sql_extra ");
-	if(count($r))
+	if (dbm::is_result($r))
 		$a->set_pager_total($r[0]['total']);
 
 	$order = " ORDER BY `name` ASC ";
@@ -90,14 +90,16 @@ function directory_content(&$a) {
 			LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
 			LEFT JOIN `contact` ON `contact`.`uid` = `user`.`uid`
 			WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 AND `contact`.`self` $sql_extra $order LIMIT ".$limit);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 
-		if(in_array('small', $a->argv))
+		if (in_array('small', $a->argv)) {
 			$photo = 'thumb';
-		else
+		}
+		else {
 			$photo = 'photo';
+		}
 
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 
 			$itemurl= '';
 

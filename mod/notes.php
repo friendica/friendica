@@ -2,8 +2,9 @@
 
 function notes_init(&$a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$profile = 0;
 
@@ -18,7 +19,7 @@ function notes_init(&$a) {
 
 function notes_content(&$a,$update = false) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -82,7 +83,7 @@ function notes_content(&$a,$update = false) {
 
 	);
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$a->set_pager_total($r[0]['total']);
 		$a->set_pager_itemspage(40);
 	}
@@ -102,7 +103,7 @@ function notes_content(&$a,$update = false) {
 	$parents_arr = array();
 	$parents_str = '';
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		foreach($r as $rr)
 			$parents_arr[] = $rr['item_id'];
 		$parents_str = implode(', ', $parents_arr);
@@ -116,7 +117,7 @@ function notes_content(&$a,$update = false) {
 			dbesc($parents_str)
 		);
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$items = conv_sort($r,"`commented`");
 
 			$o .= conversation($a,$items,'notes',$update);

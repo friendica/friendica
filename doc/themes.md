@@ -124,8 +124,9 @@ The selected 1st part will be saved in the database by the theme_post function.
 
     function theme_post(&$a){
         // non local users shall not pass
-        if(! local_user())
+        if (! local_user()) {
             return;
+        }
         // if the one specific submit button was pressed then proceed
         if (isset($_POST['duepuntozero-settings-submit'])){
             // and save the selection key into the personal config of the user

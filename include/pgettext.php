@@ -98,7 +98,7 @@ if(! function_exists('load_translation_table')) {
  * @param string $lang language code to load
  */
 function load_translation_table($lang) {
-	global $a;
+	$a = get_app();
 
 	$a->strings = array();
 	// load enabled plugins strings

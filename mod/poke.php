@@ -21,25 +21,29 @@ require_once('include/items.php');
 
 function poke_init(&$a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$uid = local_user();
 	$verb = notags(trim($_GET['verb']));
 
-	if(! $verb)
+	if (! $verb) {
 		return;
+	}
 
 	$verbs = get_poke_verbs();
 
-	if(! array_key_exists($verb,$verbs))
+	if (! array_key_exists($verb,$verbs)) {
 		return;
+	}
 
 	$activity = ACTIVITY_POKE . '#' . urlencode($verbs[$verb][0]);
 
 	$contact_id = intval($_GET['cid']);
-	if(! $contact_id)
+	if (! $contact_id) {
 		return;
+	}
 
 	$parent = ((x($_GET,'parent')) ? intval($_GET['parent']) : 0);
 
@@ -52,7 +56,7 @@ function poke_init(&$a) {
 		intval($uid)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		logger('poke: no contact ' . $contact_id);
 		return;
 	}
@@ -66,7 +70,7 @@ function poke_init(&$a) {
 			intval($parent),
 			intval($uid)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$parent_uri = $r[0]['uri'];
 			$private    = $r[0]['private'];
 			$allow_cid  = $r[0]['allow_cid'];
@@ -118,7 +122,7 @@ function poke_init(&$a) {
 	$arr['origin']        = 1;
 	$arr['body']          = '[url=' . $poster['url'] . ']' . $poster['name'] . '[/url]' . ' ' . t($verbs[$verb][0]) . ' ' . '[url=' . $target['url'] . ']' . $target['name'] . '[/url]';
 
-	$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $target['name'] . '</title><id>' . $a->get_baseurl() . '/contact/' . $target['id'] . '</id>';
+	$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $target['name'] . '</title><id>' . App::get_baseurl() . '/contact/' . $target['id'] . '</id>';
 	$arr['object'] .= '<link>' . xmlify('<link rel="alternate" type="text/html" href="' . $target['url'] . '" />' . "\n");
 
 	$arr['object'] .= xmlify('<link rel="photo" type="image/jpeg" href="' . $target['photo'] . '" />' . "\n");
@@ -127,7 +131,7 @@ function poke_init(&$a) {
 	$item_id = item_store($arr);
 	if($item_id) {
 		//q("UPDATE `item` SET `plink` = '%s' WHERE `uid` = %d AND `id` = %d",
-		//	dbesc($a->get_baseurl() . '/display/' . $poster['nickname'] . '/' . $item_id),
+		//	dbesc(App::get_baseurl() . '/display/' . $poster['nickname'] . '/' . $item_id),
 		//	intval($uid),
 		//	intval($item_id)
 		//);
@@ -146,7 +150,7 @@ function poke_init(&$a) {
 
 function poke_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -159,18 +163,18 @@ function poke_content(&$a) {
 			intval($_GET['c']),
 			intval(local_user())
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$name = $r[0]['name'];
 			$id = $r[0]['id'];
 		}
 	}
 
 
-	$base = $a->get_baseurl();
+	$base = App::get_baseurl();
 
 	$head_tpl = get_markup_template('poke_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($head_tpl,array(
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$base' => $base
 	));
 

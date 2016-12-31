@@ -13,7 +13,7 @@ function nodeinfo_wellknown(&$a) {
 		killme();
 	}
 	$nodeinfo = array("links" => array(array("rel" => "http://nodeinfo.diaspora.software/ns/schema/1.0",
-					"href" => $a->get_baseurl()."/nodeinfo/1.0")));
+					"href" => App::get_baseurl()."/nodeinfo/1.0")));
 
 	header('Content-type: application/json; charset=utf-8');
 	echo json_encode($nodeinfo, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
@@ -217,10 +217,7 @@ function nodeinfo_cron() {
 			set_config('nodeinfo','active_users_monthly', $active_users_monthly);
 	}
 
-	$posts = qu("SELECT COUNT(*) AS `local_posts` FROM `item`
-			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-			WHERE `contact`.`self` and `item`.`id` = `item`.`parent` AND left(body, 6) != '[share' AND `item`.`network` IN ('%s', '%s', '%s')",
-			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_DFRN));
+	$posts = qu("SELECT COUNT(*) AS local_posts FROM `thread` WHERE `thread`.`wall` AND `thread`.`uid` != 0");
 
 	if (!is_array($posts))
 		$local_posts = -1;

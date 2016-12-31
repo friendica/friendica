@@ -5,7 +5,7 @@ require_once('include/follow.php');
 
 function repair_ostatus_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
@@ -51,7 +51,7 @@ function repair_ostatus_content(&$a) {
 
 	$result = new_contact($uid,$r[0]["url"],true);
 
-	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="1; URL='.$a->get_baseurl().'/repair_ostatus?counter='.$counter.'">';
+	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="1; URL='.App::get_baseurl().'/repair_ostatus?counter='.$counter.'">';
 
 	return $o;
 }

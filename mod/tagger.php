@@ -27,7 +27,7 @@ function tagger_content(&$a) {
 		dbesc($item_id)
 	);
 
-	if(! $item_id || (! count($r))) {
+	if(! $item_id || (! dbm::is_result($r))) {
 		logger('tagger: no item ' . $item_id);
 		return;
 	}
@@ -39,7 +39,7 @@ function tagger_content(&$a) {
 	$r = q("select `nickname`,`blocktags` from user where uid = %d limit 1",
 		intval($owner_uid)
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$owner_nick = $r[0]['nickname'];
 		$blocktags = $r[0]['blocktags'];
 	}
@@ -50,7 +50,7 @@ function tagger_content(&$a) {
 	$r = q("select * from contact where self = 1 and uid = %d limit 1",
 		intval(local_user())
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 			$contact = $r[0];
 	else {
 		logger('tagger: no contact_id');
@@ -60,10 +60,10 @@ function tagger_content(&$a) {
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
 	$xterm = xmlify($term);
 	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
-	$targettype = (($item['resource-id']) ? ACTIVITY_OBJ_PHOTO : ACTIVITY_OBJ_NOTE );
+	$targettype = (($item['resource-id']) ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE );
 
 	$link = xmlify('<link rel="alternate" type="text/html" href="'
-		. $a->get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
+		. App::get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 
 	$body = xmlify($item['body']);
 
@@ -78,7 +78,7 @@ function tagger_content(&$a) {
 	</target>
 EOT;
 
-	$tagid = $a->get_baseurl() . '/search?tag=' . $term;
+	$tagid = App::get_baseurl() . '/search?tag=' . $term;
 	$objtype = ACTIVITY_OBJ_TAGTERM;
 
 	$obj = <<< EOT
@@ -94,10 +94,11 @@ EOT;
 
 	$bodyverb = t('%1$s tagged %2$s\'s %3$s with %4$s');
 
-	if(! isset($bodyverb))
-			return;
+	if (! isset($bodyverb)) {
+		return;
+	}
 
-	$termlink = html_entity_decode('&#x2317;') . '[url=' . $a->get_baseurl() . '/search?tag=' . urlencode($term) . ']'. $term . '[/url]';
+	$termlink = html_entity_decode('&#x2317;') . '[url=' . App::get_baseurl() . '/search?tag=' . urlencode($term) . ']'. $term . '[/url]';
 
 	$arr = array();
 
@@ -140,7 +141,7 @@ EOT;
 	$post_id = item_store($arr);
 
 //	q("UPDATE `item` set plink = '%s' where id = %d",
-//		dbesc($a->get_baseurl() . '/display/' . $owner_nick . '/' . $post_id),
+//		dbesc(App::get_baseurl() . '/display/' . $owner_nick . '/' . $post_id),
 //		intval($post_id)
 //	);
 
@@ -159,7 +160,7 @@ EOT;
         );
 	if((! $blocktags) && $t[0]['tcount']==0 ) {
 		/*q("update item set tag = '%s' where id = %d",
-			dbesc($item['tag'] . (strlen($item['tag']) ? ',' : '') . '#[url=' . $a->get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
+			dbesc($item['tag'] . (strlen($item['tag']) ? ',' : '') . '#[url=' . App::get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
 			intval($item['id'])
 		);*/
 
@@ -168,7 +169,7 @@ EOT;
 		   $term_objtype,
 		   TERM_HASHTAG,
 		   dbesc($term),
-		   dbesc($a->get_baseurl() . '/search?tag=' . $term),
+		   dbesc(App::get_baseurl() . '/search?tag=' . $term),
 		   intval($owner_uid)
 		);
 	}
@@ -178,7 +179,7 @@ EOT;
 	$r = q("select `tag`,`id`,`uid` from item where `origin` = 1 AND `uri` = '%s' LIMIT 1",
 		dbesc($item['uri'])
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$x = q("SELECT `blocktags` FROM `user` WHERE `uid` = %d limit 1",
 			intval($r[0]['uid'])
 		);
@@ -192,14 +193,14 @@ EOT;
 	                   $term_objtype,
 	                   TERM_HASHTAG,
 	                   dbesc($term),
-	                   dbesc($a->get_baseurl() . '/search?tag=' . $term),
+	                   dbesc(App::get_baseurl() . '/search?tag=' . $term),
 	                   intval($owner_uid)
 	                );
 		}
 
 		/*if(count($x) && !$x[0]['blocktags'] && (! stristr($r[0]['tag'], ']' . $term . '['))) {
 			q("update item set tag = '%s' where id = %d",
-				dbesc($r[0]['tag'] . (strlen($r[0]['tag']) ? ',' : '') . '#[url=' . $a->get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
+				dbesc($r[0]['tag'] . (strlen($r[0]['tag']) ? ',' : '') . '#[url=' . App::get_baseurl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
 				intval($r[0]['id'])
 			);
 		}*/

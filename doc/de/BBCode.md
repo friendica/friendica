@@ -475,6 +475,10 @@ Du kannst Videos, Musikdateien und weitere Dinge in Beitr&auml;gen einbinden.
   <td>Vimeo-Player im iframe einbinden.</td>
 </tr>
 <tr>
+  <td>[embed]URL[/embed]</td>
+  <td>OEmbed rich content einbetten.</td>
+</tr>
+<tr>
   <td>[iframe]URL[/iframe]</td>
   <td>General embed, iframe size is limited by the theme size for video players.</td>
 </tr>

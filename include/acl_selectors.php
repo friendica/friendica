@@ -33,8 +33,8 @@ function group_select($selname,$selclass,$preselected = false,$size = 4) {
 
 	call_hooks($a->module . '_pre_' . $selname, $arr);
 
-	if(count($r)) {
-		foreach($r as $rr) {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
 			if((is_array($preselected)) && in_array($rr['id'], $preselected))
 				$selected = " selected=\"selected\" ";
 			else
@@ -65,20 +65,24 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 	$exclude = false;
 	$size = 4;
 
-	if(is_array($options)) {
-		if(x($options,'size'))
+	if (is_array($options)) {
+		if (x($options,'size'))
 			$size = $options['size'];
 
-		if(x($options,'mutual_friends'))
+		if (x($options,'mutual_friends')) {
 			$mutual = true;
-		if(x($options,'single'))
+		}
+		if (x($options,'single')) {
 			$single = true;
-		if(x($options,'multiple'))
+		}
+		if (x($options,'multiple')) {
 			$single = false;
-		if(x($options,'exclude'))
+		}
+		if (x($options,'exclude')) {
 			$exclude = $options['exclude'];
+		}
 
-		if(x($options,'networks')) {
+		if (x($options,'networks')) {
 			switch($options['networks']) {
 				case 'DFRN_ONLY':
 					$networks = array(NETWORK_DFRN);
@@ -144,12 +148,13 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 
 	call_hooks($a->module . '_pre_' . $selname, $arr);
 
-	if(count($r)) {
-		foreach($r as $rr) {
-			if((is_array($preselected)) && in_array($rr['id'], $preselected))
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
+			if ((is_array($preselected)) && in_array($rr['id'], $preselected)) {
 				$selected = " selected=\"selected\" ";
-			else
+			} else {
 				$selected = '';
+			}
 
 			$trimmed = mb_substr($rr['name'],0,20);
 
@@ -220,17 +225,20 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 
 	$receiverlist = array();
 
-	if(count($r)) {
-		foreach($r as $rr) {
-			if((is_array($preselected)) && in_array($rr['id'], $preselected))
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
+			if ((is_array($preselected)) && in_array($rr['id'], $preselected)) {
 				$selected = " selected=\"selected\" ";
-			else
+			}
+			else {
 				$selected = '';
+			}
 
-			if($privmail)
+			if ($privmail) {
 				$trimmed = GetProfileUsername($rr['url'], $rr['name'], false);
-			else
+			} else {
 				$trimmed = mb_substr($rr['name'],0,20);
+			}
 
 			$receiverlist[] = $trimmed;
 
@@ -256,16 +264,22 @@ function fixacl(&$item) {
 
 function prune_deadguys($arr) {
 
-	if(! $arr)
+	if (! $arr) {
 		return $arr;
+	}
+
 	$str = dbesc(implode(',',$arr));
+
 	$r = q("SELECT `id` FROM `contact` WHERE `id` IN ( " . $str . ") AND `blocked` = 0 AND `pending` = 0 AND `archive` = 0 ");
-	if($r) {
+
+	if ($r) {
 		$ret = array();
-		foreach($r as $rr)
+		foreach ($r as $rr) {
 			$ret[] = intval($rr['id']);
+		}
 		return $ret;
 	}
+
 	return array();
 }
 
@@ -314,7 +328,7 @@ function populate_acl($user = null, $show_jotnets = false) {
 			$r = q("SELECT `pubmail` FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1",
 				intval(local_user())
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$mail_enabled = true;
 				if(intval($r[0]['pubmail']))
 					$pubmail_enabled = true;
@@ -392,8 +406,9 @@ function construct_acl_data(&$a, $user) {
 
 function acl_lookup(&$a, $out_type = 'json') {
 
-	if(!local_user())
-		return "";
+	if (!local_user()) {
+		return '';
+	}
 
 	$start	=	(x($_REQUEST,'start')		? $_REQUEST['start']		: 0);
 	$count	=	(x($_REQUEST,'count')		? $_REQUEST['count']		: 100);
@@ -540,35 +555,33 @@ function acl_lookup(&$a, $out_type = 'json') {
 			dbesc(NETWORK_ZOT),
 			dbesc(NETWORK_DIASPORA)
 		);
-	}
-	elseif($type == 'a') {
+	} elseif ($type == 'a') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND `pending` = 0
 			$sql_extra2
 			ORDER BY `name` ASC ",
 			intval(local_user())
 		);
-	}
-	elseif($type == 'x') {
+	} elseif ($type == 'x') {
 		// autocomplete for global contact search (e.g. navbar search)
 		$r = navbar_complete($a);
 		$contacts = array();
-		if($r) {
-			foreach($r as $g) {
+		if ($r) {
+			foreach ($r as $g) {
 				$contacts[] = array(
-					"photo"    => proxy_url($g['photo'], false, PROXY_SIZE_MICRO),
-					"name"     => $g['name'],
-					"nick"     => (x($g['addr']) ? $g['addr'] : $g['url']),
-					"network" => $g['network'],
-					"link" => $g['url'],
-					"forum"	   => (x($g['community']) ? 1 : 0),
+					'photo'   => proxy_url($g['photo'], false, PROXY_SIZE_MICRO),
+					'name'    => $g['name'],
+					'nick'    => (x($g['addr']) ? $g['addr'] : $g['url']),
+					'network' => $g['network'],
+					'link'    => $g['url'],
+					'forum'   => (x($g['community']) ? 1 : 0),
 				);
 			}
 		}
 		$o = array(
 			'start' => $start,
-			'count'	=> $count,
-			'items'	=> $contacts,
+			'count' => $count,
+			'items' => $contacts,
 		);
 		echo json_encode($o);
 		killme();
@@ -577,17 +590,17 @@ function acl_lookup(&$a, $out_type = 'json') {
 		$r = array();
 
 
-	if(count($r)) {
-		foreach($r as $g){
+	if (dbm::is_result($r)) {
+		foreach ($r as $g){
 			$contacts[] = array(
-				"type"  => "c",
-				"photo" => proxy_url($g['micro'], false, PROXY_SIZE_MICRO),
-				"name"  => htmlentities($g['name']),
-				"id"	=> intval($g['id']),
-				"network" => $g['network'],
-				"link" => $g['url'],
-				"nick" => htmlentities(($g['attag']) ? $g['attag'] : $g['nick']),
-				"forum" => ((x($g['forum']) || x($g['prv'])) ? 1 : 0),
+				'type'    => 'c',
+				'photo'   => proxy_url($g['micro'], false, PROXY_SIZE_MICRO),
+				'name'    => htmlentities($g['name']),
+				'id'      => intval($g['id']),
+				'network' => $g['network'],
+				'link'    => $g['url'],
+				'nick'    => htmlentities(($g['attag']) ? $g['attag'] : $g['nick']),
+				'forum'   => ((x($g['forum']) || x($g['prv'])) ? 1 : 0),
 			);
 		}
 	}
@@ -612,8 +625,8 @@ function acl_lookup(&$a, $out_type = 'json') {
 				dbesc($search),
 				implode("','", $known_contacts)
 		);
-		if (is_array($r) && count($r)){
-			foreach($r as $row) {
+		if (dbm::is_result($r)){
+			foreach ($r as $row) {
 				// nickname..
 				$up = parse_url($row['author-link']);
 				$nick = explode("/",$up['path']);
@@ -621,14 +634,14 @@ function acl_lookup(&$a, $out_type = 'json') {
 				$nick .= "@".$up['host'];
 				// /nickname
 				$unknow_contacts[] = array(
-					"type"  => "c",
-					"photo" => proxy_url($row['author-avatar'], false, PROXY_SIZE_MICRO),
-					"name"  => htmlentities($row['author-name']),
-					"id"	=> '',
-					"network" => "unknown",
-					"link" => $row['author-link'],
-					"nick" => htmlentities($nick),
-					"forum" => false
+					'type'    => 'c',
+					'photo'   => proxy_url($row['author-avatar'], false, PROXY_SIZE_MICRO),
+					'name'    => htmlentities($row['author-name']),
+					'id'      => '',
+					'network' => 'unknown',
+					'link'    => $row['author-link'],
+					'nick'    => htmlentities($nick),
+					'forum'   => false
 				);
 			}
 		}
@@ -638,34 +651,34 @@ function acl_lookup(&$a, $out_type = 'json') {
 	}
 
 	$results = array(
-		"tot"	=> $tot,
-		"start" => $start,
-		"count" => $count,
-		"groups" => $groups,
-		"contacts" => $contacts,
-		"items"	=> $items,
-		"type"	=> $type,
-		"search" => $search,
+		'tot'      => $tot,
+		'start'    => $start,
+		'count'    => $count,
+		'groups'   => $groups,
+		'contacts' => $contacts,
+		'items'    => $items,
+		'type'     => $type,
+		'search'   => $search,
 	);
 
 	call_hooks('acl_lookup_end', $results);
 
 	if($out_type === 'html') {
 		$o = array(
-			'tot'		=> $results["tot"],
-			'start'		=> $results["start"],
-			'count'		=> $results["count"],
-			'groups'	=> $results["groups"],
-			'contacts'	=> $results["contacts"],
+			'tot'      => $results['tot'],
+			'start'    => $results['start'],
+			'count'    => $results['count'],
+			'groups'   => $results['groups'],
+			'contacts' => $results['contacts'],
 		);
 		return $o;
 	}
 
 	$o = array(
-		'tot'	=> $results["tot"],
-		'start' => $results["start"],
-		'count'	=> $results["count"],
-		'items'	=> $results["items"],
+		'tot'   => $results['tot'],
+		'start' => $results['start'],
+		'count' => $results['count'],
+		'items' => $results['items'],
 	);
 
 	echo json_encode($o);
@@ -682,7 +695,7 @@ function navbar_complete(&$a) {
 
 //	logger('navbar_complete');
 
-	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
+	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		return;
 	}
 
@@ -693,28 +706,32 @@ function navbar_complete(&$a) {
 	$mode = $_REQUEST['smode'];
 
 	// don't search if search term has less than 2 characters
-	if(! $search || mb_strlen($search) < 2)
+	if (! $search || mb_strlen($search) < 2) {
 		return array();
+	}
 
-	if(substr($search,0,1) === '@')
+	if (substr($search,0,1) === '@') {
 		$search = substr($search,1);
+	}
 
-	if($localsearch) {
+	if ($localsearch) {
 		$x = DirSearch::global_search_by_name($search, $mode);
 		return $x;
 	}
 
-	if(! $localsearch) {
+	if (! $localsearch) {
 		$p = (($a->pager['page'] != 1) ? '&p=' . $a->pager['page'] : '');
 
 		$x = z_fetch_url(get_server().'/lsearch?f=' . $p .  '&search=' . urlencode($search));
-		if($x['success']) {
+		if ($x['success']) {
 			$t = 0;
 			$j = json_decode($x['body'],true);
-			if($j && $j['results']) {
+			if ($j && $j['results']) {
 				return $j['results'];
 			}
 		}
 	}
+
+	/// @TODO Not needed here?
 	return;
 }

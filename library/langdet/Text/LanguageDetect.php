@@ -396,7 +396,7 @@ class Text_LanguageDetect
      * Returns the list of detectable languages
      *
      * @access public
-     * @return array        the names of the languages known to this object<<<<<<<
+     * @return array        the names of the languages known to this object
      * @throws   Text_LanguageDetect_Exception
      */
     function getLanguages()

@@ -26,7 +26,7 @@ function discover_poco_run(&$argv, &$argc){
 
 	// Don't check this stuff if the function is called by the poller
 	if (App::callstack() != "poller_run")
-		if (App::maxload_reached())
+		if ($a->maxload_reached())
 			return;
 
 	if(($argc > 2) && ($argv[1] == "dirsearch")) {

@@ -141,7 +141,7 @@
 							{{/foreach}}
 							<li role="separator" class="divider"></li>
 							{{if $nav.notifications}}
-							<li role="menuitem"><a href="{{$nav.notifications.0}}" title="{{$nav.notifications.1}}"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a></li>
+							<li role="menuitem"><a href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a></li>
 							{{/if}}
 							{{if $nav.messages}}
 							<li role="menuitem"><a class="nav-commlink {{$nav.messages.2}} {{$sel.messages}}" href="{{$nav.messages.0}}" title="{{$nav.messages.3}}" ><i class="fa fa-envelope fa-fw"></i> {{$nav.messages.1}} <span id="mail-update-li" class="nav-mail-badge badge nav-notify"></span></a></li>
@@ -160,7 +160,7 @@
 							<li role="separator" class="divider"></li>
 							{{/if}}
 							{{if $nav.help}}
-							<li role="menuitem"><a id="nav-help-link" class="nav-link {{$nav.help.2}}" target="friendica-help" href="{{$nav.help.0}}" title="{{$nav.help.3}}" ><i class="fa fa-question-circle fa-fw"></i> {{$nav.help.3}}</a></li>
+							<li role="menuitem"><a id="nav-help-link" class="nav-link {{$nav.help.2}}" href="{{$nav.help.0}}" title="{{$nav.help.3}}" ><i class="fa fa-question-circle fa-fw"></i> {{$nav.help.3}}</a></li>
 							{{/if}}
 							{{if $nav.settings}}
 							<li role="menuitem"><a id="nav-settings-link" class="nav-link {{$nav.settings.2}}" href="{{$nav.settings.0}}" title="{{$nav.settings.3}}"><i class="fa fa-cog fa-fw"></i> {{$nav.settings.1}}</a></li>
@@ -196,7 +196,7 @@
 						<a role="menuitem" class="{{$usermenu.2}} list-group-item" href="{{$usermenu.0}}" title="{{$usermenu.3}}">{{$usermenu.1}}</a>
 						{{/foreach}}
 						{{if $nav.notifications}}
-						<a role="menuitem" href="{{$nav.notifications.0}}" title="{{$nav.notifications.1}}" class="list-group-item"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a>
+						<a role="menuitem" href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}" class="list-group-item"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a>
 						{{/if}}
 						{{if $nav.contacts}}
 						<a role="menuitem" class="nav-link {{$nav.contacts.2}} list-group-item" href="{{$nav.contacts.0}}" title="{{$nav.contacts.3}}"><i class="fa fa-users fa-fw"></i> {{$nav.contacts.1}}</a>
@@ -278,7 +278,7 @@
 <ul id="nav-notifications-template" class="media-list" style="display:none;" rel="template">
 	<li class="{4} notif-entry">
 		<div class="notif-entry-wrapper media">
-			<div class="notif-photo-wrapper media-object pull-left"><a href="{6}"><img data-src="{1}"></a></div>
+			<div class="notif-photo-wrapper media-object pull-left"><a href="{6}" class="userinfo"><img data-src="{1}"></a></div>
 			<a href="{0}" class="notif-desc-wrapper media-body">
 				{2}
 				<div><time class="notif-when time" data-toggle="tooltip" title="{5}">{3}</time></div>

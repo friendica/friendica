@@ -64,7 +64,7 @@ function register_post(&$a) {
 	$user = $result['user'];
 
 	if($netpublish && $a->config['register_policy'] != REGISTER_APPROVE) {
-		$url = $a->get_baseurl() . '/profile/' . $user['nickname'];
+		$url = App::get_baseurl() . '/profile/' . $user['nickname'];
 		proc_run(PRIORITY_LOW, "include/directory.php", $url);
 	}
 
@@ -85,7 +85,7 @@ function register_post(&$a) {
 			$res = send_register_open_eml(
 				$user['email'],
 				$a->config['sitename'],
-				$a->get_baseurl(),
+				App::get_baseurl(),
 				$user['username'],
 				$result['password']);
 
@@ -142,9 +142,9 @@ function register_post(&$a) {
 				'source_name' => $user['username'],
 				'source_mail' => $user['email'],
 				'source_nick' => $user['nickname'],
-				'source_link' => $a->get_baseurl()."/admin/users/",
-				'link' => $a->get_baseurl()."/admin/users/",
-				'source_photo' => $a->get_baseurl() . "/photo/avatar/".$user['uid'].".jpg",
+				'source_link' => App::get_baseurl()."/admin/users/",
+				'link' => App::get_baseurl()."/admin/users/",
+				'source_photo' => App::get_baseurl() . "/photo/avatar/".$user['uid'].".jpg",
 				'to_email' => $admin['email'],
 				'uid' => $admin['uid'],
 				'language' => ($admin['language']?$admin['language']:'en'),

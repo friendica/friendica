@@ -16,8 +16,9 @@ function viewcontacts_init(&$a) {
 			dbesc($nick)
 		);
 
-		if(! count($r))
+		if (! dbm::is_result($r)) {
 			return;
+		}
 
 		$a->data['user'] = $r[0];
 		$a->profile_uid = $r[0]['uid'];
@@ -47,18 +48,18 @@ function viewcontacts_content(&$a) {
 	}
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
-		WHERE `uid` = %d AND NOT `blocked` AND NOT `hidden` AND NOT `archive`
+		WHERE `uid` = %d AND (NOT `blocked` OR `pending`) AND NOT `hidden` AND NOT `archive`
 			AND `network` IN ('%s', '%s', '%s')",
 		intval($a->profile['uid']),
 		dbesc(NETWORK_DFRN),
 		dbesc(NETWORK_DIASPORA),
 		dbesc(NETWORK_OSTATUS)
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 		$a->set_pager_total($r[0]['total']);
 
 	$r = q("SELECT * FROM `contact`
-		WHERE `uid` = %d AND NOT `blocked` AND NOT `hidden` AND NOT `archive`
+		WHERE `uid` = %d AND (NOT `blocked` OR `pending`) AND NOT `hidden` AND NOT `archive`
 			AND `network` IN ('%s', '%s', '%s')
 		ORDER BY `name` ASC LIMIT %d, %d",
 		intval($a->profile['uid']),
@@ -68,16 +69,18 @@ function viewcontacts_content(&$a) {
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);
-	if(!count($r)) {
+	if (!dbm::is_result($r)) {
 		info(t('No contacts.').EOL);
 		return $o;
 	}
 
 	$contacts = array();
 
-	foreach($r as $rr) {
-		if($rr['self'])
+	foreach ($r as $rr) {
+		/// @TODO This triggers an E_NOTICE if 'self' is not there
+		if ($rr['self']) {
 			continue;
+		}
 
 		$url = $rr['url'];
 

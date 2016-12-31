@@ -6,14 +6,16 @@ require_once('include/contact_selectors.php');
 
 function nogroup_init(&$a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	require_once('include/group.php');
 	require_once('include/contact_widgets.php');
 
-	if(! x($a->page,'aside'))
+	if (! x($a->page,'aside')) {
 		$a->page['aside'] = '';
+	}
 
 	$a->page['aside'] .= group_side('contacts','group','extended',0,$contact_id);
 }
@@ -21,19 +23,19 @@ function nogroup_init(&$a) {
 
 function nogroup_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return '';
 	}
 
 	require_once('include/Contact.php');
 	$r = contacts_not_grouped(local_user());
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$a->set_pager_total($r[0]['total']);
 	}
 	$r = contacts_not_grouped(local_user(),$a->pager['start'],$a->pager['itemspage']);
-	if(count($r)) {
-		foreach($r as $rr) {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
 
 			$contact_details = get_contact_details_by_url($rr['url'], local_user(), $rr);
 

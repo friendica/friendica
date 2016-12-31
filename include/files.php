@@ -1,6 +1,6 @@
 <?php
 function create_files_from_item($itemid) {
-	global $a;
+	$a = get_app();
 
 	$messages = q("SELECT `guid`, `uid`, `id`, `edited`, `deleted`, `file`, `parent` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
 

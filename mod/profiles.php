@@ -6,7 +6,7 @@ function profiles_init(&$a) {
 
 	nav_set_selected('profiles');
 
-	if(! local_user()) {
+	if (! local_user()) {
 		return;
 	}
 
@@ -15,7 +15,7 @@ function profiles_init(&$a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Profile not found.') . EOL);
 			goaway('profiles');
 			return; // NOTREACHED
@@ -130,7 +130,7 @@ function profiles_init(&$a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Profile not found.') . EOL);
 			killme();
 			return;
@@ -162,7 +162,7 @@ function profile_clean_keywords($keywords) {
 
 function profiles_post(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -286,7 +286,7 @@ function profiles_post(&$a) {
 							intval(local_user())
 						);
 					}
-					if(count($r)) {
+					if (dbm::is_result($r)) {
 						$prf = $r[0]['url'];
 						$newname = $r[0]['name'];
 					}
@@ -502,8 +502,9 @@ function profiles_post(&$a) {
 
 			// Update global directory in background
 			$url = $_SESSION['my_url'];
-			if($url && strlen(get_config('system','directory')))
+			if ($url && strlen(get_config('system','directory'))) {
 				proc_run(PRIORITY_LOW, "include/directory.php", $url);
+			}
 
 			require_once('include/profile_update.php');
 			profile_change();
@@ -594,14 +595,15 @@ function profile_activity($changed, $value) {
 	$arr['deny_gid']  = $a->user['deny_gid'];
 
 	$i = item_store($arr);
-	if($i)
+	if ($i) {
 		proc_run(PRIORITY_HIGH, "include/notifier.php", "activity", $i);
+	}
 }
 
 
 function profiles_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -613,7 +615,7 @@ function profiles_content(&$a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Profile not found.') . EOL);
 			return;
 		}
@@ -629,11 +631,11 @@ function profiles_content(&$a) {
 			$editselect = 'textareas';
 
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('profed_head.tpl'), array(
-			'$baseurl' => $a->get_baseurl(true),
+			'$baseurl' => App::get_baseurl(true),
 			'$editselect' => $editselect,
 		));
 		$a->page['end'] .= replace_macros(get_markup_template('profed_end.tpl'), array(
-			'$baseurl' => $a->get_baseurl(true),
+			'$baseurl' => App::get_baseurl(true),
 			'$editselect' => $editselect,
 		));
 
@@ -711,7 +713,7 @@ function profiles_content(&$a) {
 			'$lbl_ex2' => t('Example: fishing photography software'),
 
 			'$disabled' => (($is_default) ? 'onclick="return false;" style="color: #BBBBFF;"' : ''),
-			'$baseurl' => $a->get_baseurl(true),
+			'$baseurl' => App::get_baseurl(true),
 			'$profile_id' => $r[0]['id'],
 			'$profile_name' => array('profile_name', t('Profile Name:'), $r[0]['profile-name'], t('Required'), '*'),
 			'$is_default'   => $is_default,
@@ -767,7 +769,7 @@ function profiles_content(&$a) {
 				"SELECT * FROM `profile` WHERE `uid` = %d AND `is-default`=1",
 				local_user()
 			);
-			if(count($r)){
+			if (dbm::is_result($r)){
 				//Go to the default profile.
 				goaway('profiles/'.$r[0]['id']);
 			}
@@ -775,27 +777,29 @@ function profiles_content(&$a) {
 
 		$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
 			local_user());
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$tpl = get_markup_template('profile_entry.tpl');
-			foreach($r as $rr) {
+
+			$profiles = '';
+			foreach ($r as $rr) {
 				$profiles .= replace_macros($tpl, array(
-					'$photo' => $a->remove_baseurl($rr['thumb']),
-					'$id' => $rr['id'],
-					'$alt' => t('Profile Image'),
+					'$photo'        => $a->remove_baseurl($rr['thumb']),
+					'$id'           => $rr['id'],
+					'$alt'          => t('Profile Image'),
 					'$profile_name' => $rr['profile-name'],
-					'$visible' => (($rr['is-default']) ? '<strong>' . t('visible to everybody') . '</strong>'
+					'$visible'      => (($rr['is-default']) ? '<strong>' . t('visible to everybody') . '</strong>'
 						: '<a href="'.'profperm/'.$rr['id'].'" />' . t('Edit visibility') . '</a>')
 				));
 			}
 
 			$tpl_header = get_markup_template('profile_listing_header.tpl');
 			$o .= replace_macros($tpl_header,array(
-				'$header' => t('Edit/Manage Profiles'),
-				'$chg_photo' => t('Change profile photo'),
-				'$cr_new' => t('Create New Profile'),
+				'$header'      => t('Edit/Manage Profiles'),
+				'$chg_photo'   => t('Change profile photo'),
+				'$cr_new'      => t('Create New Profile'),
 				'$cr_new_link' => 'profiles/new?t=' . get_form_security_token("profile_new"),
-				'$profiles' => $profiles
+				'$profiles'    => $profiles
 			));
 		}
 		return $o;

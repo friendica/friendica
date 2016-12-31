@@ -2,8 +2,9 @@
 
 function profperm_init(&$a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$which = $a->user['nickname'];
 	$profile = $a->argv[1];
@@ -15,7 +16,7 @@ function profperm_init(&$a) {
 
 function profperm_content(&$a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied') . EOL);
 		return;
 	}
@@ -42,7 +43,7 @@ function profperm_content(&$a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$change = intval($a->argv[2]);
 	}
 
@@ -52,7 +53,7 @@ function profperm_content(&$a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Invalid profile identifier.') . EOL );
 			return;
 		}
@@ -64,7 +65,7 @@ function profperm_content(&$a) {
 		);
 
 		$ingroup = array();
-		if(count($r))
+		if (dbm::is_result($r))
 			foreach($r as $member)
 				$ingroup[] = $member['id'];
 
@@ -94,7 +95,7 @@ function profperm_content(&$a) {
 			$members = $r;
 
 			$ingroup = array();
-			if(count($r))
+			if (dbm::is_result($r))
 				foreach($r as $member)
 					$ingroup[] = $member['id'];
 		}
@@ -138,7 +139,7 @@ function profperm_content(&$a) {
 			dbesc(NETWORK_DFRN)
 		);
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$textmode = (($switchtotext && (count($r) > $switchtotext)) ? true : false);
 			foreach($r as $member) {
 				if(! in_array($member['id'],$ingroup)) {

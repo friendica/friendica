@@ -8,7 +8,7 @@
 		{{* The search field *}}
 		<div class="form-group form-group-search">
 			<input id="side-peoplefind-url" class="search-input form-control form-search" type="text" name="search" data-toggle="tooltip" title="{{$hint|escape:'html'}}" />
-			<button id="side-peoplefind-submit" class="btn btn-default btn-sm form-button-search" type="submit" name="submit" value="{{$findthem|escape:'html'}}">{{$findthem}}</button>
+			<button id="side-peoplefind-submit" class="btn btn-default btn-sm form-button-search" type="submit">{{$findthem}}</button>
 		</div>
 	</form>
 

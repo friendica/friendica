@@ -9,8 +9,8 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	$_SESSION['mobile-theme'] = get_pconfig($user_record['uid'], 'system', 'mobile_theme');
 	$_SESSION['authenticated'] = 1;
 	$_SESSION['page_flags'] = $user_record['page-flags'];
-	$_SESSION['my_url'] = $a->get_baseurl() . '/profile/' . $user_record['nickname'];
-	$_SESSION['my_address'] = $user_record['nickname'] . '@' . substr($a->get_baseurl(),strpos($a->get_baseurl(),'://')+3);
+	$_SESSION['my_url'] = App::get_baseurl() . '/profile/' . $user_record['nickname'];
+	$_SESSION['my_address'] = $user_record['nickname'] . '@' . substr(App::get_baseurl(),strpos(App::get_baseurl(),'://')+3);
 	$_SESSION['addr'] = $_SERVER['REMOTE_ADDR'];
 
 	$a->user = $user_record;
@@ -42,7 +42,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		$r = q("select * from user where uid = %d limit 1",
 			intval($_SESSION['submanage'])
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$master_record = $r[0];
 	}
 
@@ -50,7 +50,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		dbesc($master_record['password']),
 		dbesc($master_record['email'])
 	);
-	if($r && count($r))
+	if (dbm::is_result($r))
 		$a->identities = $r;
 	else
 		$a->identities = array();
@@ -60,7 +60,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		and `manage`.`uid` = %d",
 		intval($master_record['uid'])
 	);
-	if($r && count($r))
+	if (dbm::is_result($r))
 		$a->identities = array_merge($a->identities,$r);
 
 	if($login_initial)
@@ -70,7 +70,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 	$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 1 LIMIT 1",
 		intval($_SESSION['uid']));
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$a->contact = $r[0];
 		$a->cid = $r[0]['id'];
 		$_SESSION['cid'] = $a->cid;
@@ -94,11 +94,12 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 
 	}
-	if($login_initial) {
+	if ($login_initial) {
 		call_hooks('logged_in', $a->user);
 
-		if(($a->module !== 'home') && isset($_SESSION['return_url']))
-			goaway($a->get_baseurl() . '/' . $_SESSION['return_url']);
+		if (($a->module !== 'home') && isset($_SESSION['return_url'])) {
+			goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
+		}
 	}
 
 }
@@ -109,16 +110,17 @@ function can_write_wall(&$a,$owner) {
 
 	static $verified = 0;
 
-	if((! (local_user())) && (! (remote_user())))
+	if ((! (local_user())) && (! (remote_user()))) {
 		return false;
+	}
 
 	$uid = local_user();
 
-	if(($uid) && ($uid == $owner)) {
+	if (($uid) && ($uid == $owner)) {
 		return true;
 	}
 
-	if(remote_user()) {
+	if (remote_user()) {
 
 		// use remembered decision and avoid a DB lookup for each and every display item
 		// DO NOT use this function if there are going to be multiple owners
@@ -126,25 +128,25 @@ function can_write_wall(&$a,$owner) {
 		// We have a contact-id for an authenticated remote user, this block determines if the contact
 		// belongs to this page owner, and has the necessary permissions to post content
 
-		if($verified === 2)
+		if ($verified === 2) {
 			return true;
-		elseif($verified === 1)
+		} elseif ($verified === 1) {
 			return false;
-		else {
+		} else {
 			$cid = 0;
 
-			if(is_array($_SESSION['remote'])) {
-				foreach($_SESSION['remote'] as $visitor) {
-					if($visitor['uid'] == $owner) {
+			if (is_array($_SESSION['remote'])) {
+				foreach ($_SESSION['remote'] as $visitor) {
+					if ($visitor['uid'] == $owner) {
 						$cid = $visitor['cid'];
 						break;
 					}
 				}
 			}
 
-			if(! $cid)
+			if (! $cid) {
 				return false;
-
+			}
 
 			$r = q("SELECT `contact`.*, `user`.`page-flags` FROM `contact` INNER JOIN `user` on `user`.`uid` = `contact`.`uid` 
 				WHERE `contact`.`uid` = %d AND `contact`.`id` = %d AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 
@@ -156,7 +158,7 @@ function can_write_wall(&$a,$owner) {
 				intval(PAGE_COMMUNITY)
 			);
 
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$verified = 2;
 				return true;
 			}
@@ -210,7 +212,7 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 				intval($remote_user),
 				intval($owner_id)
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$remote_verified = true;
 				$groups = init_groups_visitor($remote_user);
 			}
@@ -292,7 +294,7 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 				intval($remote_user),
 				intval($owner_id)
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$remote_verified = true;
 				$groups = init_groups_visitor($remote_user);
 			}
@@ -378,7 +380,7 @@ function check_form_security_token_redirectOnErr($err_redirect, $typename = '', 
 		logger('check_form_security_token failed: user ' . $a->user['guid'] . ' - form element ' . $typename);
 		logger('check_form_security_token failed: _REQUEST data: ' . print_r($_REQUEST, true), LOGGER_DATA);
 		notice( check_form_security_std_err_msg() );
-		goaway($a->get_baseurl() . $err_redirect );
+		goaway(App::get_baseurl() . $err_redirect );
 	}
 }
 function check_form_security_token_ForbiddenOnErr($typename = '', $formname = 'form_security_token') {
@@ -403,7 +405,7 @@ function init_groups_visitor($contact_id) {
 		WHERE `contact-id` = %d ",
 		intval($contact_id)
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		foreach($r as $rr)
 			$groups[] = $rr['gid'];
 	}

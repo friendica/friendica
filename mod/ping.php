@@ -6,13 +6,87 @@ require_once('include/group.php');
 require_once('mod/proxy.php');
 require_once('include/xml.php');
 
-function ping_init(&$a) {
-
+/**
+ * @brief Outputs the counts and the lists of various notifications
+ *
+ * The output format can be controlled via the GET parameter 'format'. It can be
+ * - xml (deprecated legacy default)
+ * - json (outputs JSONP with the 'callback' GET parameter)
+ *
+ * Expected JSON structure:
+ * {
+ *		"result": {
+ *			"intro": 0,
+ *			"mail": 0,
+ *			"net": 0,
+ *			"home": 0,
+ *			"register": 0,
+ *			"all-events": 0,
+ *			"all-events-today": 0,
+ *			"events": 0,
+ *			"events-today": 0,
+ *			"birthdays": 0,
+ *			"birthdays-today": 0,
+ *			"groups": [ ],
+ *			"forums": [ ],
+ *			"notify": 0,
+ *			"notifications": [ ],
+ *			"sysmsgs": {
+ *				"notice": [ ],
+ *				"info": [ ]
+ *			}
+ *		}
+ *	}
+ *
+ * @param App $a The Friendica App instance
+ */
+function ping_init(App $a)
+{
 	$format = 'xml';
 
 	if (isset($_GET['format']) && $_GET['format'] == 'json') {
 		$format = 'json';
 	}
+
+	$tags          = array();
+	$comments      = array();
+	$likes         = array();
+	$dislikes      = array();
+	$friends       = array();
+	$posts         = array();
+	$regs          = array();
+	$mails         = array();
+	$notifications = array();
+
+	$intro_count    = 0;
+	$mail_count     = 0;
+	$home_count     = 0;
+	$network_count  = 0;
+	$register_count = 0;
+	$sysnotify_count = 0;
+	$groups_unseen  = array();
+	$forums_unseen  = array();
+
+	$all_events       = 0;
+	$all_events_today = 0;
+	$events           = 0;
+	$events_today     = 0;
+	$birthdays        = 0;
+	$birthdays_today  = 0;
+
+	$data = array();
+	$data['intro']    = $intro_count;
+	$data['mail']     = $mail_count;
+	$data['net']      = $network_count;
+	$data['home']     = $home_count;
+	$data['register'] = $register_count;
+
+	$data['all-events']       = $all_events;
+	$data['all-events-today'] = $all_events_today;
+	$data['events']           = $events;
+	$data['events-today']     = $events_today;
+	$data['birthdays']        = $birthdays;
+	$data['birthdays-today']  = $birthdays_today;
 
 	if (local_user()){
 		// Different login session than the page that is calling us.
@@ -37,27 +111,11 @@ function ping_init(&$a) {
 		}
 
 		$notifs = ping_get_notifications(local_user());
-		$sysnotify_count = 0; // we will update this in a moment
 
-		$tags     = array();
-		$comments = array();
-		$likes    = array();
-		$dislikes = array();
-		$friends  = array();
-		$posts    = array();
-		$regs     = array();
-		$mails    = array();
-
-		$home_count = 0;
-		$network_count = 0;
-		$register_count = 0;
-		$groups_unseen = array();
-		$forums_unseen = array();
-
-		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`wall`, `item`.`author-name`,
+		$items_unseen = qu("SELECT `item`.`id`, `item`.`parent`, `item`.`verb`, `item`.`wall`, `item`.`author-name`,
 				`item`.`contact-id`, `item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object`,
-				`pitem`.`author-name` as `pname`, `pitem`.`author-link` as `plink`
-				FROM `item` INNER JOIN `item` as `pitem` ON  `pitem`.`id`=`item`.`parent`
+				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`
+				FROM `item` INNER JOIN `item` AS `pitem` ON  `pitem`.`id` = `item`.`parent`
 				WHERE `item`.`unseen` = 1 AND `item`.`visible` = 1 AND
 				 `item`.`deleted` = 0 AND `item`.`uid` = %d AND `pitem`.`parent` != 0
 				AND `item`.`contact-id` != %d
@@ -65,13 +123,12 @@ function ping_init(&$a) {
 			intval(local_user()), intval(local_user())
 		);
 
-		if (dbm::is_result($r)) {
-
-			$arr = array('items' => $r);
+		if (dbm::is_result($items_unseen)) {
+			$arr = array('items' => $items_unseen);
 			call_hooks('network_ping', $arr);
 
-			foreach ($r as $it) {
-				if ($it['wall']) {
+			foreach ($items_unseen as $item) {
+				if ($item['wall']) {
 					$home_count++;
 				} else {
 					$network_count++;
@@ -80,7 +137,7 @@ function ping_init(&$a) {
 		}
 
 		if ($network_count) {
-			if (intval(feature_enabled(local_user(),'groups'))) {
+			if (intval(feature_enabled(local_user(), 'groups'))) {
 				// Find out how unseen network posts are spread across groups
 				$group_counts = groups_count_unseen();
 				if (dbm::is_result($group_counts)) {
@@ -92,7 +149,7 @@ function ping_init(&$a) {
 				}
 			}
 
-			if (intval(feature_enabled(local_user(),'forumlist_widget'))) {
+			if (intval(feature_enabled(local_user(), 'forumlist_widget'))) {
 				$forum_counts = ForumManager::count_unseen_items();
 				if (dbm::is_result($forums_counts)) {
 					foreach ($forums_counts as $forum_count) {
@@ -104,24 +161,24 @@ function ping_init(&$a) {
 			}
 		}
 
-		$intros1 = q("SELECT  `intro`.`id`, `intro`.`datetime`,
+		$intros1 = qu("SELECT  `intro`.`id`, `intro`.`datetime`,
 			`fcontact`.`name`, `fcontact`.`url`, `fcontact`.`photo`
 			FROM `intro` LEFT JOIN `fcontact` ON `intro`.`fid` = `fcontact`.`id`
-			WHERE `intro`.`uid` = %d  AND `intro`.`blocked` = 0 AND `intro`.`ignore` = 0 AND `intro`.`fid`!=0",
+			WHERE `intro`.`uid` = %d  AND `intro`.`blocked` = 0 AND `intro`.`ignore` = 0 AND `intro`.`fid` != 0",
 			intval(local_user())
 		);
-		$intros2 = q("SELECT `intro`.`id`, `intro`.`datetime`,
+		$intros2 = qu("SELECT `intro`.`id`, `intro`.`datetime`,
 			`contact`.`name`, `contact`.`url`, `contact`.`photo`
 			FROM `intro` LEFT JOIN `contact` ON `intro`.`contact-id` = `contact`.`id`
-			WHERE `intro`.`uid` = %d  AND `intro`.`blocked` = 0 AND `intro`.`ignore` = 0 AND `intro`.`contact-id`!=0",
+			WHERE `intro`.`uid` = %d  AND `intro`.`blocked` = 0 AND `intro`.`ignore` = 0 AND `intro`.`contact-id` != 0",
 			intval(local_user())
 		);
 
 		$intro_count = count($intros1) + count($intros2);
-		$intros = $intros1+$intros2;
+		$intros = $intros1 + $intros2;
 
-		$myurl = $a->get_baseurl() . '/profile/' . $a->user['nickname'] ;
-		$mails = q("SELECT * FROM `mail`
+		$myurl = App::get_baseurl() . '/profile/' . $a->user['nickname'] ;
+		$mails = qu("SELECT `id`, `from-name`, `from-url`, `from-photo`, `created` FROM `mail`
 			WHERE `uid` = %d AND `seen` = 0 AND `from-url` != '%s' ",
 			intval(local_user()),
 			dbesc($myurl)
@@ -129,32 +186,28 @@ function ping_init(&$a) {
 		$mail_count = count($mails);
 
 		if ($a->config['register_policy'] == REGISTER_APPROVE && is_site_admin()){
-			$regs = q("SELECT `contact`.`name`, `contact`.`url`, `contact`.`micro`, `register`.`created`, COUNT(*) as `total` FROM `contact` RIGHT JOIN `register` ON `register`.`uid`=`contact`.`uid` WHERE `contact`.`self`=1");
-			if ($regs) {
+			$regs = qu("SELECT `contact`.`name`, `contact`.`url`, `contact`.`micro`, `register`.`created`, COUNT(*) AS `total`
+				FROM `contact` RIGHT JOIN `register` ON `register`.`uid` = `contact`.`uid`
+				WHERE `contact`.`self` = 1");
+
+			if (dbm::is_result($regs)) {
 				$register_count = $regs[0]['total'];
 			}
 		}
 
-		$all_events = 0;
-		$all_events_today = 0;
-		$events = 0;
-		$events_today = 0;
-		$birthdays = 0;
-		$birthdays_today = 0;
-
-		$ev = q("SELECT count(`event`.`id`) as total, type, start, adjust FROM `event`
+		$ev = qu("SELECT count(`event`.`id`) AS total, type, start, adjust FROM `event`
 			WHERE `event`.`uid` = %d AND `start` < '%s' AND `finish` > '%s' and `ignore` = 0
 			ORDER BY `start` ASC ",
 			intval(local_user()),
-			dbesc(datetime_convert('UTC','UTC','now + 7 days')),
-			dbesc(datetime_convert('UTC','UTC','now'))
+			dbesc(datetime_convert('UTC', 'UTC', 'now + 7 days')),
+			dbesc(datetime_convert('UTC', 'UTC', 'now'))
 		);
 
 		if (dbm::is_result($ev)) {
 			$all_events = intval($ev[0]['total']);
 
 			if ($all_events) {
-				$str_now = datetime_convert('UTC',$a->timezone,'now','Y-m-d');
+				$str_now = datetime_convert('UTC', $a->timezone, 'now', 'Y-m-d');
 				foreach($ev as $x) {
 					$bd = false;
 					if ($x['type'] === 'birthday') {
@@ -164,7 +217,7 @@ function ping_init(&$a) {
 					else {
 						$events ++;
 					}
-					if (datetime_convert('UTC',((intval($x['adjust'])) ? $a->timezone : 'UTC'), $x['start'],'Y-m-d') === $str_now) {
+					if (datetime_convert('UTC', ((intval($x['adjust'])) ? $a->timezone : 'UTC'), $x['start'], 'Y-m-d') === $str_now) {
 						$all_events_today ++;
 						if ($bd)
 							$birthdays_today ++;
@@ -175,7 +228,6 @@ function ping_init(&$a) {
 			}
 		}
 
-		$data = array();
 		$data['intro']    = $intro_count;
 		$data['mail']     = $mail_count;
 		$data['net']      = $network_count;
@@ -201,7 +253,7 @@ function ping_init(&$a) {
 		if (dbm::is_result($intros)) {
 			foreach ($intros as $intro) {
 				$notif = array(
-					'href'    => $a->get_baseurl() . '/notifications/intros/' . $intro['id'],
+					'href'    => App::get_baseurl() . '/notifications/intros/' . $intro['id'],
 					'name'    => $intro['name'],
 					'url'     => $intro['url'],
 					'photo'   => $intro['photo'],
@@ -216,7 +268,7 @@ function ping_init(&$a) {
 		if (dbm::is_result($mails)) {
 			foreach ($mails as $mail) {
 				$notif = array(
-					'href'    => $a->get_baseurl() . '/message/' . $mail['id'],
+					'href'    => App::get_baseurl() . '/message/' . $mail['id'],
 					'name'    => $mail['from-name'],
 					'url'     => $mail['from-url'],
 					'photo'   => $mail['from-photo'],
@@ -231,7 +283,7 @@ function ping_init(&$a) {
 		if (dbm::is_result($regs)) {
 			foreach ($regs as $reg) {
 				$notif = array(
-					'href'    => $a->get_baseurl() . '/admin/users/',
+					'href'    => App::get_baseurl() . '/admin/users/',
 					'name'    => $reg['name'],
 					'url'     => $reg['url'],
 					'photo'   => $reg['micro'],
@@ -290,12 +342,12 @@ function ping_init(&$a) {
 	$sysmsgs = array();
 	$sysmsgs_info = array();
 
-	if (x($_SESSION,'sysmsg')) {
+	if (x($_SESSION, 'sysmsg')) {
 		$sysmsgs = $_SESSION['sysmsg'];
 		unset($_SESSION['sysmsg']);
 	}
 
-	if (x($_SESSION,'sysmsg_info')) {
+	if (x($_SESSION, 'sysmsg_info')) {
 		$sysmsgs_info = $_SESSION['sysmsg_info'];
 		unset($_SESSION['sysmsg_info']);
 	}
@@ -337,19 +389,19 @@ function ping_init(&$a) {
  * @param int $uid User id
  * @return array Associative array of notifications
  */
-function ping_get_notifications($uid) {
-
-	$result = array();
-	$offset = 0;
-	$seen = false;
+function ping_get_notifications($uid)
+{
+	$result  = array();
+	$offset  = 0;
+	$seen    = false;
 	$seensql = "NOT";
-	$order = "DESC";
-	$quit = false;
+	$order   = "DESC";
+	$quit    = false;
 
 	$a = get_app();
 
 	do {
-		$r = q("SELECT `notify`.*, `item`.`visible`, `item`.`spam`, `item`.`deleted`
+		$r = qu("SELECT `notify`.*, `item`.`visible`, `item`.`spam`, `item`.`deleted`
 			FROM `notify` LEFT JOIN `item` ON `item`.`id` = `notify`.`iid`
 			WHERE `notify`.`uid` = %d AND `notify`.`msg` != ''
 			AND NOT (`notify`.`type` IN (%d, %d))
@@ -398,7 +450,7 @@ function ping_get_notifications($uid) {
 				);
 			}
 
-			$notification["href"] = $a->get_baseurl() . "/notify/view/" . $notification["id"];
+			$notification["href"] = App::get_baseurl() . "/notify/view/" . $notification["id"];
 
 			if ($notification["visible"] AND !$notification["spam"] AND
 				!$notification["deleted"] AND !is_array($result[$notification["parent"]])) {
@@ -419,39 +471,42 @@ function ping_get_notifications($uid) {
  * @param array $notifs Complete list of notification
  * @param array $sysmsgs List of system notice messages
  * @param array $sysmsgs_info List of system info messages
+ * @param int $groups_unseen Number of unseen group items
+ * @param int $forums_unseen Number of unseen forum items
  * @return array XML-transform ready data array
  */
-function ping_format_xml_data($data, $sysnotify_count, $notifs, $sysmsgs, $sysmsgs_info, $groups_unseen, $forums_unseen) {
+function ping_format_xml_data($data, $sysnotify, $notifs, $sysmsgs, $sysmsgs_info, $groups_unseen, $forums_unseen)
+{
 	$notifications = array();
-	foreach($notifs as $key => $n) {
-		$notifications[$key . ":note"] = $n['message'];
+	foreach($notifs as $key => $notif) {
+		$notifications[$key . ':note'] = $notif['message'];
 
-		$notifications[$key . ":@attributes"] = array(
-			"id" => $n["id"],
-			"href" => $n['href'],
-			"name" => $n['name'],
-			"url" => $n['url'],
-			"photo" => $n['photo'],
-			"date" => $n['date'],
-			"seen" => $n['seen'],
-			"timestamp" => $n['timestamp']
+		$notifications[$key . ':@attributes'] = array(
+			'id'        => $notif['id'],
+			'href'      => $notif['href'],
+			'name'      => $notif['name'],
+			'url'       => $notif['url'],
+			'photo'     => $notif['photo'],
+			'date'      => $notif['date'],
+			'seen'      => $notif['seen'],
+			'timestamp' => $notif['timestamp']
 		);
 	}
 
 	$sysmsg = array();
 	foreach ($sysmsgs as $key => $m){
-		$sysmsg[$key . ":notice"] = $m;
+		$sysmsg[$key . ':notice'] = $m;
 	}
 	foreach ($sysmsgs_info as $key => $m){
-		$sysmsg[$key . ":info"] = $m;
+		$sysmsg[$key . ':info'] = $m;
 	}
 
-	$data["notif"] = $notifications;
-	$data["@attributes"] = array("count" => $sysnotify_count + $data["intro"] + $data["mail"] + $data["register"]);
-	$data["sysmsgs"] = $sysmsg;
+	$data['notif'] = $notifications;
+	$data['@attributes'] = array('count' => $sysnotify_count + $data['intro'] + $data['mail'] + $data['register']);
+	$data['sysmsgs'] = $sysmsg;
 
-	if ($data["register"] == 0) {
-		unset($data["register"]);
+	if ($data['register'] == 0) {
+		unset($data['register']);
 	}
 
 	$groups = array();

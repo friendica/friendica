@@ -1499,13 +1499,18 @@ code > .hl-main {
 /* item social action buttons */
 .wall-item-actions, .wall-item-actions a {
     font-size: 13px;
-    /*color: #aeaeae;*/
     color: #555;
     margin-top: 15px;
     margin-bottom: 0;
 }
+.wall-item-actions a.active {
+    font-weight: bold;
+}
 .wall-item-actions a:hover {
     color: #555;
+}
+.wall-item-actions a.active:hover {
+    color: $link_color;
 }
 .wall-item-actions-left {
     display: table-cell;
@@ -1877,6 +1882,9 @@ ul.dropdown-menu li:hover {
     -moz-box-shadow: 0 0 3px #dadada;
 }
 
+.section-title-wrapper {
+    overflow: hidden;
+}
 /* Profile-page */
 #profile-content-standard,
 #profile-content-advanced {
@@ -2100,7 +2108,6 @@ ul li:hover .contact-wrapper a.contact-action-link:hover {
 
 /* Events page */
 
-
 .fc .fc-month-view .fc-content .fc-title .item-desc:hover {
     color: $link_hover_color;
 }
@@ -2204,7 +2211,7 @@ ul li:hover .contact-wrapper a.contact-action-link:hover {
     margin-left: 20px;
 }
 
-/* Notifications */
+/* Intro Notifications */
 ul.notif-network-list {
     margin-left: -15px;
     margin-right: -15px;
@@ -2213,17 +2220,12 @@ ul.notif-network-list > li {
     padding-left: 15px;
     padding-right: 15px;
 }
-ul.notif-network-list li.unseen {
-    border-left: 3px solid #f3fcfd;
-    background-color: #f3fcfd;
-}
 .intro-wrapper.media {
     overflow: visible;
     word-wrap: break-word;
     margin-top: 0;
 }
-.intro-photo-wrapper img.intro-photo,
-.notif-item img.notif-image {
+.intro-photo-wrapper img.intro-photo {
     height:80px;
     width: 80px;
     border-radius: 4px;
@@ -2276,6 +2278,26 @@ ul.notif-network-list > li:hover .intro-action-buttons {
     margin-top: 5px
 }
 
+/* Notifications Page */
+ul.notif-network-list li.unseen {
+    background-color: #f3fcfd;
+}
+.notif-item img.notif-image {
+    height: 48px;
+    width: 48px;
+    border-radius: 4px;
+}
+.notif-item .notif-desc-wrapper {
+    height: 48px;
+}
+.notif-item .notif-desc-wrapper a {
+    height: 100%;
+    display: block;
+    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 /* Search Page */
 
 /* This is a little bit hacky. Since the search page is used for diferent
@@ -2298,6 +2320,44 @@ little modifications to emulate a standard page template */
     box-shadow: 0 0 3px #dadada;
     -webkit-box-shadow: 0 0 3px #dadada;
     -moz-box-shadow: 0 0 3px #dadada;
+}
+
+/* Help Page */
+section.help-content-wrapper h1 {
+    padding-bottom: 0.3em;
+    font-size: 1.8em;
+    border-bottom: 1px solid #ddd;
+}
+section.help-content-wrapper h2 {
+    padding-bottom: 0.3em;
+    font-size: 1.5em;
+    border-bottom: 1px solid #ddd;
+}
+section.help-content-wrapper h3 {
+    font-size: 1.2em;
+}
+section.help-content-wrapper h4 {
+    font-size: 1em;
+}
+section.help-content-wrapper h1,
+section.help-content-wrapper h2,
+section.help-content-wrapper h3,
+section.help-content-wrapper h4,
+section.help-content-wrapper h5,
+section.help-content-wrapper h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+section.help-content-wrapper p {
+    margin: 0.4em 0;
+}
+section.help-content-wrapper p,
+section.help-content-wrapper a,
+section.help-content-wrapper li {
+    line-height: 1.6;
+    font-size: 0.96em;
 }
 
 /*

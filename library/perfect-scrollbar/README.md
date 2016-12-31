@@ -52,15 +52,25 @@ It's cool, isn't it?
 
 ## Install
 
+#### NPM
+
 The best way to install and use perfect-scrollbar is with NPM.
-It's registered on [npm](https://www.npmjs.org/package/perfect-scrollbar) as `perfect-scrollbar`.
+It's registered on [npm](https://www.npmjs.com/package/perfect-scrollbar) as `perfect-scrollbar`.
 
 ```
 $ npm install perfect-scrollbar
 ```
 
+#### Rails
+
+In the case you would like to have perfect-scrollbar in your Rails application, there is the [perfect-scrollbar-rails gem](https://github.com/YourCursus/perfect-scrollbar-rails).
+
+#### Manually
+
 You can download the latest stable version with download links [here](http://noraesae.github.io/perfect-scrollbar/).
 You also can find all releases on [Releases](https://github.com/noraesae/perfect-scrollbar/releases).
+
+#### From sources
 
 If you want to use the development version of the plugin, use the
 source files which are not minified. They're in the `src` directory.
@@ -74,6 +84,7 @@ $ npm install
 $ gulp # will lint and build the source code.
 ```
 
+#### Bower
 
 There is a Bower package for perfect-scrollbar as well. It is managed
 under the [perfect-scrollbar-bower](https://github.com/noraesae/perfect-scrollbar-bower)
@@ -83,26 +94,38 @@ repository. The plugin is registered as `perfect-scrollbar`.
 $ bower install perfect-scrollbar
 ```
 
+#### CDNs
 
-You can also load it from [cdnjs](http://cdnjs.com/).
-It is registered as [`jquery.perfect-scrollbar`](http://www.cdnjs.com/libraries/jquery.perfect-scrollbar).
+* [cdnjs](http://www.cdnjs.com/libraries/jquery.perfect-scrollbar)
+* [JSDelivr](https://www.jsdelivr.com/projects/perfect-scrollbar)
 
-## Requirements
+#### JSFiddle
 
-To make this plugin *perfect*, some requirements were unavoidable.
-But, they're all very trivial and there is nothing to worry about.
+You can fork the following JSFiddles for testing and experimenting purposes:
+
+* [Perfect Scrollbar](https://jsfiddle.net/DanielApt/xv0rrxv3/)
+* [Perfect Scrollbar (jQuery)](https://jsfiddle.net/DanielApt/gbfLazpx/)
+
+## Before using perfect-scrollbar
 
 The following requirements should meet.
 
 * the container must have a 'position' css style.
+* the container must be a normal container element.
+  * PS may not work well in `body`, `textarea`, `iframe` or flexbox.
 
 The following requirements are included in the basic CSS, but please
 keep in mind when you'd like to change the CSS files.
 
-* the container must have an 'overflow:hidden' css style.
+* the container must have an 'overflow: hidden' css style.
 * the scrollbar's position must be 'absolute'.
 * the scrollbar-x must have a 'bottom' css style, and the scrollbar-y
   must have a 'right' css style.
+  
+Please keep in mind that perfect-scrollbar won't completely emulate native
+scrolls. Scroll hooking is generally considered as bad practice, and
+perfect-scrollbar should be used with care. Unless custom scroll is really needed,
+please consider using native scrolls.
 
 ## How to use
 
@@ -155,7 +178,7 @@ If the size of your container or content changes, call `update`.
 Ps.update(container);
 ```
 
-If you want to destory the scrollbar, use `destroy`.
+If you want to destroy the scrollbar, use `destroy`.
 
 ```javascript
 Ps.destroy(container);
@@ -238,12 +261,12 @@ define([
   'perfectScrollbarJquery'
 ],
 function (angular) {
-  var myApp = angular.module('myApp', [])
-  .run(function() {
+  var app = angular.module('myApp', []);
+  app.run(function () {
     window.Ps = require('perfectScrollbar');
     require('perfectScrollbarJQuery');
-  })
-  return myApp;
+  });
+  return app;
 });
 ```
 
@@ -256,7 +279,7 @@ Ps.initialize(container);
 Ps.update(container);
 
 // or by jQuery:
-var imgLoader = $("#imgLoader")
+var imgLoader = $('#imgLoader')
 imgLoader.perfectScrollbar();
 ```
 
@@ -264,57 +287,80 @@ imgLoader.perfectScrollbar();
 
 perfect-scrollbar supports optional parameters.
 
+### handlers
+It is a list of handlers to use to scroll the element.  
+**Default**: `['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch']`  
+**Disabled by default**: `'selection'`
+
 ### wheelSpeed
 The scroll speed applied to mousewheel event.  
-**Default: 1**
+**Default**: `1`
 
 ### wheelPropagation
 If this option is true, when the scroll reaches the end of the side, mousewheel event will be propagated to parent element.  
-**Default: false**
+**Default**: `false`
 
 ### swipePropagation
 If this option is true, when the scroll reaches the end of the side, touch scrolling will be propagated to parent element.  
-**Default: true**
+**Default**: `true`
 
 ### minScrollbarLength
 When set to an integer value, the thumb part of the scrollbar will not shrink below that number of pixels.  
-**Default: null**
+**Default**: `null`
 
 ### maxScrollbarLength
 When set to an integer value, the thumb part of the scrollbar will not expand over that number of pixels.  
-**Default: null**
+**Default**: `null`
 
 ### useBothWheelAxes
 When set to true, and only one (vertical or horizontal) scrollbar is visible then both vertical and horizontal scrolling will affect the scrollbar.  
-**Default: false**
-
-### useKeyboard
-When set to true, the scroll works with arrow keys on the keyboard. The element is scrolled only when the mouse cursor hovers the element.  
-**Default: true**
+**Default**: `false`
 
 ### suppressScrollX
 When set to true, the scroll bar in X axis will not be available, regardless of the content width.  
-**Default: false**
+**Default**: `false`
 
 ### suppressScrollY
 When set to true, the scroll bar in Y axis will not be available, regardless of the content height.  
-**Default: false**
+**Default**: `false`
 
 ### scrollXMarginOffset
 The number of pixels the content width can surpass the container width without enabling the X axis scroll bar. Allows some "wiggle room" or "offset break", so that X axis scroll bar is not enabled just because of a few pixels.  
-**Default: 0**
+**Default**: `0`
 
 ### scrollYMarginOffset
 The number of pixels the content height can surpass the container height without enabling the Y axis scroll bar. Allows some "wiggle room" or "offset break", so that Y axis scroll bar is not enabled just because of a few pixels.  
-**Default: 0**
+**Default**: `0`
 
-### stopPropagationOnClick
-When set to false, when clicking on a rail, the click event will be allowed to propagate.  
-**Default: true**
+### theme
+A string. It's a class name added to the container element. The class name is prepended with `ps-theme-`. So default theme class name is `ps-theme-default`. In order to create custom themes with scss use `ps-container($theme)` mixin, where `$theme` is a scss map.  
+**Default**: `'default'`
 
-### useSelectionScroll
-When set to true, you can scroll the container by selecting text and move the cursor.  
-**Default: false**
+**Example 1:**
+
+Add `theme` parameter:
+```javascript
+Ps.initialize(container, {
+  theme: 'my-theme-name'
+});
+```
+Create a class name prefixed with `.ps-theme-`. Include `ps-container()` mixin. It's recommended to use `map-merge()` to extend `$ps-theme-default` map with your custom styles.
+```scss
+.ps-theme-my-theme-name {
+  @include ps-container(map-merge($ps-theme-default, (
+    border-radius: 0,
+    scrollbar-x-rail-height: 20px,
+    scrollbar-x-height: 20px,
+    scrollbar-y-rail-width: 20px,
+    scrollbar-y-width: 20px
+  )));
+}
+```
+
+**Example 2:**
+
+Alternatively, if you don't want to create your own themes, but only modify the default one, you could simply overwrite `$ps-*` variables with your own values. In this case `theme` parameter is not required when calling `.initialize()` method. Remember do define your own variables before the `theme.scss` file is imported.
+
 
 ## Events
 
@@ -363,24 +409,20 @@ $(document).on('ps-scroll-x', function () {
 })
 ```
 
-## Contribution
+## Tips
 
-#### Please read [Contributing](https://github.com/noraesae/perfect-scrollbar/wiki/Contributing) in the wiki before making any contribution.
+### Scrolling children inside perfect-scrollbar
 
-
-I *really* welcome contributions! Please feel free to fork and issue pull requests when...
-
-* You have a very nice idea to improve this plugin!
-* You found a bug!
-* You're good at English and can help my bad English!
-
-For IE problems, please refer to [IE Support](https://github.com/noraesae/perfect-scrollbar#ie-support).
+You can natively scroll children inside `perfect-scrollbar` with the mouse-wheel. Scrolling automatically works if 
+the child is a `textarea`. All other elements need to have the `ps-child` class. This is demonstrated in [`/examples/children-native-scroll.html`](examples/children-native-scroll.html)
 
 ## IE Support
 
-The plugin would work in IEs >= IE9 (not well, though).
+The plugin is designed to work in modern browsers, including the very latest
+version of IE and Edge. Specifically, it should work in IEs >= IE10. If there
+is any issue in the browsers, please [file it](https://github.com/noraesae/perfect-scrollbar/issues).
 
-**The patches to fix problems in IE<=8 won't be accepted.**
+**The patches to fix problems in IE<=9 won't be accepted.**
 
 When old IEs should be supported, please fork the project and
 make patches personally.
@@ -396,7 +438,7 @@ For common problems there is a
 
 ## License
 
-The MIT License (MIT) Copyright (c) 2015 Hyunje Alex Jun and other contributors.
+The MIT License (MIT) Copyright (c) 2016 Hyunje Alex Jun and other contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

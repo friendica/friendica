@@ -474,6 +474,10 @@ You can embed video, audio and more in a message.
   <td>Vimeo player iframe embed.</td>
 </tr>
 <tr>
+  <td>[embed]URL[/embed]</td>
+  <td>Embed OEmbed rich content.</td>
+</tr>
+<tr>
   <td>[iframe]URL[/iframe]</td>
   <td>General embed, iframe size is limited by the theme size for video players.</td>
 </tr>

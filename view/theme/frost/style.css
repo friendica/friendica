@@ -1391,6 +1391,17 @@ input#dfrn-url {
 	cursor: pointer;
 }
 
+.wall-item-tools a {
+	border-radius: 4px;
+	padding: 2px;
+	background-position: center;
+	background-size: initial !important;
+}
+
+.wall-item-tools a.active {
+	background-color: rgba(59, 101, 164, 0.5);
+}
+
 .wall-item-share-buttons {
 	margin-left: 10px;
 	margin-right: 10px;
@@ -3896,7 +3907,7 @@ aside input[type='text'] {
 .event-maybeattend-icon { background-image: url('images/event-maybeattend-16.png'); }
 .event-dontattend-icon { background-image: url('images/event-dontattend-16.png'); }
 
-.filer-icon:hover {
+.event-icon:hover {
 	opacity: 1.0;
 }
 

@@ -1,7 +1,7 @@
 <?php
 
 function community_init(&$a) {
-	if(! local_user()) {
+	if (! local_user()) {
 		unset($_SESSION['theme']);
 		unset($_SESSION['mobile-theme']);
 	}
@@ -59,7 +59,7 @@ function community_content(&$a, $update = 0) {
 			AND `item`.`private` = 0 AND `item`.`wall` = 1"
 		);
 
-		if(count($r))
+		if (dbm::is_result($r))
 			$a->set_pager_total($r[0]['total']);
 
 		if(! $r[0]['total']) {
@@ -71,7 +71,7 @@ function community_content(&$a, $update = 0) {
 
 	$r = community_getitems($a->pager['start'], $a->pager['itemspage']);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		info( t('No results.') . EOL);
 		return $o;
 	}

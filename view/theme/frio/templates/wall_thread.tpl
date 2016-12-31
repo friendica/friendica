@@ -61,7 +61,6 @@ as the value of $top_child_total (this is done at the end of this file)
 	<span class="icon s22 star {{$item.isstarred}}" id="starred-{{$item.id}}" title="{{$item.star.starred}}">{{$item.star.starred}}</span>
 	{{/if}}
 	{{if $item.lock}}<span class="navicon lock fakelink" onclick="lockview(event,{{$item.id}});" title="{{$item.lock}}"></span><span class="fa fa-lock"></span>{{/if}}
-	<img id="like-rotator-{{$item.id}}" class="like-rotator" src="images/rotator.gif" alt="{{$item.wait}}" title="{{$item.wait}}" style="display: none;" />
 </div>
 <!-- ./TODO => Unknow block -->
 
@@ -193,6 +192,7 @@ as the value of $top_child_total (this is done at the end of this file)
 			<div class="additional-info text-muted">
 				<div id="wall-item-ago-{{$item.id}}" class="wall-item-ago">
 					<small><a href="{{$item.plink.orig}}"><span class="time" title="{{$item.localtime}}" data-toggle="tooltip"><time class="dt-published" datetime="{{$item.localtime}}">{{$item.ago}}</time></span></a></small>
+					<img id="like-rotator-{{$item.id}}" class="like-rotator" src="images/rotator.gif" alt="{{$item.wait}}" title="{{$item.wait}}" style="display: none;" />
 				</div>
 
 				{{if $item.location}}
@@ -287,7 +287,7 @@ as the value of $top_child_total (this is done at the end of this file)
 				{{* Buttons for like and dislike *}}
 				{{if $item.vote}}
 					{{if $item.vote.like}}
-					<a role="button" class="button-likes" id="like-{{$item.id}}" title="{{$item.vote.like.1}}" onclick="dolike({{$item.id}},'like'); return false;"><i class="fa fa-thumbs-up"></i>&nbsp;{{$item.vote.like.1}}</a>
+					<a role="button" class="button-likes{{if $item.responses.like.self}} active{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="dolike({{$item.id}},'like'); return false;"><i class="fa fa-thumbs-up"></i>&nbsp;{{$item.vote.like.1}}</a>
 					{{/if}}
 
 					{{if $item.vote.like AND $item.vote.dislike}}
@@ -295,7 +295,7 @@ as the value of $top_child_total (this is done at the end of this file)
 					{{/if}}
 
 					{{if $item.vote.dislike}}
-					<a role="button" class="button-likes" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.1}}" onclick="dolike({{$item.id}},'dislike'); return false;"><i class="fa fa-thumbs-down"></i>&nbsp;{{$item.vote.dislike.1}}</a>
+					<a role="button" class="button-likes{{if $item.responses.dislike.self}} active{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="dolike({{$item.id}},'dislike'); return false;"><i class="fa fa-thumbs-down"></i>&nbsp;{{$item.vote.dislike.1}}</a>
 					{{/if}}
 
 					{{if ($item.vote.like OR $item.vote.dislike) AND $item.comment}}
@@ -314,7 +314,7 @@ as the value of $top_child_total (this is done at the end of this file)
 					<span role="presentation" class="separator">&nbsp;•&nbsp;</span>
 					{{/if}}
 					{{if $item.vote.share}}
-					<a role="button" class="button-votes" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}}); return false;"><i class="fa fa-retweet"></i>&nbsp;{{$item.vote.share.0}}</a>
+					<a role="button" class="button-votes" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}}); return false;"><i class="fa fa-retweet"></i>&nbsp;{{$item.vote.share.1}}</a>
 					{{/if}}
 				{{/if}}
 			</div>
@@ -323,9 +323,9 @@ as the value of $top_child_total (this is done at the end of this file)
 				{{* Event attendance buttons *}}
 				{{if $item.isevent}}
 				<div class="vote-event">
-					<a role="button" class="button-event" id="attendyes-{{$item.id}}" title="{{$item.attend.0}}" onclick="dolike({{$item.id}},'attendyes'); return false;"><i class="fa fa-check"><span class="sr-only">{{$item.attend.0}}</span></i></a>
-					<a role="button" class="button-event" id="attendno-{{$item.id}}" title="{{$item.attend.1}}" onclick="dolike({{$item.id}},'attendno'); return false;"><i class="fa fa-times"><span class="sr-only">{{$item.attend.1}}</span></i></a>
-					<a role="button" class="button-event" id="attendmaybe-{{$item.id}}" title="{{$item.attend.2}}" onclick="dolike({{$item.id}},'attendmaybe'); return false;"><i class="fa fa-question"><span class="sr-only">{{$item.attend.2}}</span></i></a>
+					<a role="button" class="button-event{{if $item.responses.attendyes.self}} active{{/if}}" id="attendyes-{{$item.id}}" title="{{$item.attend.0}}" onclick="dolike({{$item.id}},'attendyes'); return false;"><i class="fa fa-check"><span class="sr-only">{{$item.attend.0}}</span></i></a>
+					<a role="button" class="button-event{{if $item.responses.attendno.self}} active{{/if}}" id="attendno-{{$item.id}}" title="{{$item.attend.1}}" onclick="dolike({{$item.id}},'attendno'); return false;"><i class="fa fa-times"><span class="sr-only">{{$item.attend.1}}</span></i></a>
+					<a role="button" class="button-event{{if $item.responses.attendmaybe.self}} active{{/if}}" id="attendmaybe-{{$item.id}}" title="{{$item.attend.2}}" onclick="dolike({{$item.id}},'attendmaybe'); return false;"><i class="fa fa-question"><span class="sr-only">{{$item.attend.2}}</span></i></a>
 				</div>
 				{{/if}}
 

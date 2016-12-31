@@ -1,6 +1,6 @@
 <?php
 function network_init(&$a) {
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -100,7 +100,7 @@ function network_init(&$a) {
 
 			$redir_url = ($net_queries ? $net_baseurl."?".$net_queries : $net_baseurl);
 
-			goaway($a->get_baseurl() . $redir_url);
+			goaway(App::get_baseurl() . $redir_url);
 		}
 	}
 
@@ -126,7 +126,7 @@ function network_init(&$a) {
 			intval(local_user()),
 			dbesc($search)
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			q("INSERT INTO `search` ( `uid`,`term` ) VALUES ( %d, '%s') ",
 				intval(local_user()),
 				dbesc($search)
@@ -182,14 +182,14 @@ function saved_searches($search) {
 
 	$saved = array();
 
-	if(count($r)) {
-		foreach($r as $rr) {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
 			$saved[] = array(
-				'id'		=> $rr['id'],
-				'term'		=> $rr['term'],
-				'encodedterm' 	=> urlencode($rr['term']),
-				'delete'	=> t('Remove term'),
-				'selected'	=> ($search==$rr['term']),
+				'id'          => $rr['id'],
+				'term'        => $rr['term'],
+				'encodedterm' => urlencode($rr['term']),
+				'delete'      => t('Remove term'),
+				'selected'    => ($search==$rr['term']),
 			);
 		}
 	}
@@ -197,10 +197,10 @@ function saved_searches($search) {
 
 	$tpl = get_markup_template("saved_searches_aside.tpl");
 	$o = replace_macros($tpl, array(
-		'$title'	=> t('Saved Searches'),
-		'$add'		=> t('add'),
-		'$searchbox'	=> search($search,'netsearch-box',$srchurl,true),
-		'$saved' 	=> $saved,
+		'$title'     => t('Saved Searches'),
+		'$add'       => t('add'),
+		'$searchbox' => search($search,'netsearch-box',$srchurl,true),
+		'$saved'     => $saved,
 	));
 
 	return $o;
@@ -308,7 +308,7 @@ function network_content(&$a, $update = 0) {
 
 	require_once('include/conversation.php');
 
-	if(! local_user()) {
+	if (! local_user()) {
 		$_SESSION['return_url'] = $a->query_string;
 		return login(false);
 	}
@@ -381,7 +381,7 @@ function network_content(&$a, $update = 0) {
 		);
 
 		$str = '';
-		if(count($r))
+		if (dbm::is_result($r))
 			foreach($r as $rr)
 				$str .= '<' . $rr['id'] . '>';
 		if(strlen($str))
@@ -442,8 +442,8 @@ function network_content(&$a, $update = 0) {
 	// desired.
 
 	$sql_post_table = "";
-	$sql_options  = (($star) ? " and starred = 1 " : '');
-	$sql_options .= (($bmark) ? " and bookmark = 1 " : '');
+	$sql_options  = (($star) ? " AND `thread`.`starred` " : '');
+	$sql_options .= (($bmark) ? " AND `thread`.`bookmark` " : '');
 	$sql_extra = $sql_options;
 	$sql_extra2 = "";
 	$sql_extra3 = "";
@@ -463,7 +463,7 @@ function network_content(&$a, $update = 0) {
 			intval($group),
 			intval($_SESSION['uid'])
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			if($update)
 				killme();
 			notice( t('No such group') . EOL );
@@ -504,10 +504,10 @@ function network_content(&$a, $update = 0) {
 	elseif($cid) {
 
 		$r = qu("SELECT `id`,`name`,`network`,`writable`,`nurl`, `forum`, `prv`, `contact-type`, `addr`, `thumb`, `location` FROM `contact` WHERE `id` = %d
-				AND NOT `blocked` LIMIT 1",
+				AND (NOT `blocked` OR `pending`) LIMIT 1",
 			intval($cid)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$sql_extra = " AND ".$sql_table.".`contact-id` = ".intval($cid);
 
 			$entries[0] = array(
@@ -579,8 +579,8 @@ function network_content(&$a, $update = 0) {
 				$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
 			else
 				$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
-			$sql_order = "`item`.`received`";
-			$order_mode = "received";
+			$sql_order = "`item`.`id`";
+			$order_mode = "id";
 		}
 	}
 	if(strlen($file)) {
@@ -598,19 +598,18 @@ function network_content(&$a, $update = 0) {
 		// only setup pagination on initial page view
 		$pager_sql = '';
 
-	}
-	else {
+	} else {
 		if(get_config('system', 'old_pager')) {
 			$r = qu("SELECT COUNT(*) AS `total`
 				FROM $sql_table $sql_post_table INNER JOIN `contact` ON `contact`.`id` = $sql_table.`contact-id`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 				WHERE $sql_table.`uid` = %d AND $sql_table.`visible` AND NOT $sql_table.`deleted`
 				$sql_extra2 $sql_extra3
 				$sql_extra $sql_nets ",
 				intval($_SESSION['uid'])
 			);
 
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$a->set_pager_total($r[0]['total']);
 			}
 		}
@@ -638,7 +637,7 @@ function network_content(&$a, $update = 0) {
 		$simple_update = (($update) ? " AND `item`.`unseen` " : '');
 
 		if ($sql_order == "")
-			$sql_order = "`item`.`received`";
+			$sql_order = "`item`.`id`";
 
 		// "New Item View" - show all items unthreaded in reverse created date order
 		$items = qu("SELECT %s FROM $sql_table $sql_post_table %s
@@ -681,7 +680,7 @@ function network_content(&$a, $update = 0) {
 
 			$r = qu("SELECT `item`.`parent` AS `item_id`, `item`.`network` AS `item_network`, `contact`.`uid` AS `contact_uid`
 				FROM $sql_table $sql_post_table INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 				WHERE `item`.`uid` = %d AND `item`.`visible` AND NOT `item`.`deleted` $sql_extra4
 				AND NOT `item`.`moderated` AND `item`.`unseen`
 				$sql_extra3 $sql_extra $sql_nets
@@ -691,7 +690,7 @@ function network_content(&$a, $update = 0) {
 		} else {
 			$r = qu("SELECT `thread`.`iid` AS `item_id`, `thread`.`network` AS `item_network`, `contact`.`uid` AS `contact_uid`
 				FROM $sql_table $sql_post_table STRAIGHT_JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
-				AND NOT `contact`.`blocked`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 				WHERE `thread`.`uid` = %d AND `thread`.`visible` AND NOT `thread`.`deleted`
 				AND NOT `thread`.`moderated`
 				$sql_extra2 $sql_extra3 $sql_extra $sql_nets
@@ -706,7 +705,7 @@ function network_content(&$a, $update = 0) {
 		$parents_str = '';
 		$date_offset = "";
 
-		if(dbm::is_result($r)) {
+		if (dbm::is_result($r)) {
 			foreach($r as $rr)
 				if(! in_array($rr['item_id'],$parents_arr))
 					$parents_arr[] = $rr['item_id'];
@@ -730,7 +729,9 @@ function network_content(&$a, $update = 0) {
 					intval($parents),
 					intval($max_comments + 1)
 				);
-				$items = array_merge($items, $thread_items);
+	
+				if (dbm::is_result($thread_items))
+					$items = array_merge($items, $thread_items);
 			}
 			$items = conv_sort($items,$ordering);
 		} else {
