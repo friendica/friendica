@@ -375,7 +375,7 @@ if($a->module_loaded) {
 	} catch(HTTPException $e) {
 		logger('index.php: HTTPException '. $e->httpcode . ' : '. $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
 		$e->send_header();
-		//TODO: template for main http response (404, 500,...)
+		///@todo: template for main http response (404, 500,...)
 		$tpl = get_markup_template("404.tpl");
 		$a->page['content'] = replace_macros($tpl, array(
 			'$message' =>  ($e->getMessage()=="" ?  t('Page not found.' ) : $e->getMessage())

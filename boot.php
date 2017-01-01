@@ -1846,11 +1846,13 @@ function login($register = false, $hiddens=false) {
  */
 function killme(HTTPException $e = null) {
 
-	if (!get_app()->is_backend())
+	if (!get_app()->is_backend()) {
 		session_write_close();
+	}
 
-	if (!is_null($e))
+	if (!is_null($e)) {
 		$e->send_header();
+	}
 
 	exit;
 }
