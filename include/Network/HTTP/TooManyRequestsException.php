@@ -9,6 +9,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Too Many Requests (429) http exception
  */
-class TooManyRequestsException extends HTTPException {
+class TooManyRequestsException extends HTTPException 
+{
 	var $httpcode = 429;
 }

@@ -9,6 +9,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Not Implemented (501) http exception
  */
-class NotImplementedException extends HTTPException {
+class NotImplementedException extends HTTPException 
+{
 	var $httpcode = 501;
 }

@@ -9,6 +9,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Precondition Failed (412) http exception
  */
-class PreconditionFailedException extends HTTPException {
+class PreconditionFailedException extends HTTPException 
+{
 	var $httpcode = 412;
 }

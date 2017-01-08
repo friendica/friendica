@@ -9,6 +9,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Not Found (404) http exception
  */
-class NotFoundException extends HTTPException {
+class NotFoundException extends HTTPException 
+{
 	var $httpcode = 404;
 }

@@ -9,6 +9,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Gateway Timeout (504) http exception
  */
-class GatewayTimeoutException extends HTTPException {
+class GatewayTimeoutException extends HTTPException 
+{
 	var $httpcode = 504;
 }

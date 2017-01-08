@@ -9,6 +9,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Expetation Failes (417) http exception
  */
-class ExpetationFailesException extends HTTPException {
+class ExpetationFailesException extends HTTPException 
+{
 	var $httpcode = 417;
 }

@@ -14,7 +14,8 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Base class for HTTP response codes
  */
-class HTTPException extends \Exception {
+class HTTPException extends \Exception 
+{
 
 	var $httpcode = 200;
 	var $httpdesc = "";

@@ -9,6 +9,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Non Acceptable (406) http exception
  */
-class NonAcceptableException extends HTTPException {
+class NonAcceptableException extends HTTPException 
+{
 	var $httpcode = 406;
 }
