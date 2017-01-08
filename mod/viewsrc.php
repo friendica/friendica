@@ -1,7 +1,7 @@
 <?php
 
 
-function viewsrc_content(&$a) {
+function viewsrc_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Access denied.') . EOL);

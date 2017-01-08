@@ -217,6 +217,47 @@ $(document).ready(function(){
 		$(this).parent("li").hide();
 	});
 
+	/* setup onoff widgets */
+	// Add the correct class to the switcher according to the input
+	// value (On/Off)
+	$(".toggle input").each(function(){
+		// Get the value of the input element
+		val = $(this).val();
+		id = $(this).attr("id");
+
+		// The css classes for "on" and "off"
+		onstyle = "btn-primary";
+		offstyle = "btn-default off";
+
+		// Add the correct class in dependence of input value (On/Off)
+		toggleclass = (val == 0 ? offstyle : onstyle);
+		$("#"+id+"_onoff").addClass(toggleclass);
+
+	});
+
+	// Change the css class while clicking on the switcher elements
+	$(".toggle label, .toggle .toggle-handle").click(function(event){
+		event.preventDefault();
+		// Get the value of the input element
+		var input = $(this).siblings("input");
+		var val = 1-input.val();
+		var id = input.attr("id");
+
+		// The css classes for "on" and "off"
+		var onstyle = "btn-primary";
+		var offstyle = "btn-default off";
+
+		// According to the value of the input element we need to decide
+		// which class need to be added and removed when changing the switch
+		var removedclass = (val == 0 ? onstyle : offstyle);
+		var addedclass = (val == 0 ? offstyle : onstyle)
+		$("#"+id+"_onoff").addClass(addedclass).removeClass(removedclass);
+
+		// After changing the switch the input element is getting
+		// the newvalue
+		input.val(val);
+	});
+
 });
 //function commentOpenUI(obj, id) {
 //	$(document).unbind( "click.commentOpen", handler );

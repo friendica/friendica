@@ -69,6 +69,28 @@ function diaspora2bb($s) {
 	return $s;
 }
 
+/**
+ * @brief Callback function to replace a Friendica style mention in a mention for Diaspora
+ *
+ * @param array $match Matching values for the callback
+ * @return text Replaced mention
+ */
+function diaspora_mentions($match) {
+
+	$contact = get_contact_details_by_url($match[3]);
+
+	if (!isset($contact['addr'])) {
+		$contact = Probe::uri($match[3]);
+	}
+
+	if (!isset($contact['addr'])) {
+		return $match[0];
+	}
+
+	$mention = '@{'.$match[2].'; '.$contact['addr'].'}';
+	return $mention;
+}
+
 function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 
 	$a = get_app();
@@ -108,8 +130,8 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	} else
 		$Text = bbcode($Text, $preserve_nl, false, 4);
 
-    // mask some special HTML chars from conversation to markdown
-    $Text = str_replace(array('&lt;','&gt;','&amp;'),array('&_lt_;','&_gt_;','&_amp_;'),$Text);
+	// mask some special HTML chars from conversation to markdown
+	$Text = str_replace(array('&lt;','&gt;','&amp;'),array('&_lt_;','&_gt_;','&_amp_;'),$Text);
 
 	// If a link is followed by a quote then there should be a newline before it
 	// Maybe we should make this newline at every time before a quote.
@@ -120,8 +142,8 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	// Now convert HTML to Markdown
 	$Text = new HTML_To_Markdown($Text);
 
-    // unmask the special chars back to HTML
-    $Text = str_replace(array('&_lt_;','&_gt_;','&_amp_;'),array('&lt;','&gt;','&amp;'),$Text);
+	// unmask the special chars back to HTML
+	$Text = str_replace(array('&_lt_;','&_gt_;','&_amp_;'),array('&lt;','&gt;','&amp;'),$Text);
 
 	$a->save_timestamp($stamp1, "parser");
 
@@ -131,6 +153,11 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	// Remove any leading or trailing whitespace, as this will mess up
 	// the Diaspora signature verification and cause the item to disappear
 	$Text = trim($Text);
+
+	if ($fordiaspora) {
+		$URLSearchString = "^\[\]";
+		$Text = preg_replace_callback("/([@]\[(.*?)\])\(([$URLSearchString]*?)\)/ism", 'diaspora_mentions', $Text);
+	}
 
 	call_hooks('bb2diaspora',$Text);
 

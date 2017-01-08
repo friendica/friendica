@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 require_once('include/like.php');
 
-function like_content(&$a) {
+function like_content(App &$a) {
 	if(! local_user() && ! remote_user()) {
 		return false;
 	}

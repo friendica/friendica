@@ -2,7 +2,7 @@
 // See here for a documentation for portable contacts:
 // https://web.archive.org/web/20160405005550/http://portablecontacts.net/draft-spec.html
 
-function poco_init(&$a) {
+function poco_init(App &$a) {
 	require_once("include/bbcode.php");
 
 	$system_mode = false;
@@ -16,8 +16,9 @@ function poco_init(&$a) {
 	}
 	if(! x($user)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");
-		if(! count($c))
+		if (! dbm::is_result($c)) {
 			http_status_exit(401);
+		}
 		$system_mode = true;
 	}
 

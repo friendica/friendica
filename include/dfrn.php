@@ -1161,7 +1161,7 @@ class dfrn {
 
 		// Until now we aren't serving different sizes - but maybe later
 		$avatarlist = array();
-		// @todo check if "avatar" or "photo" would be the best field in the specification
+		/// @todo check if "avatar" or "photo" would be the best field in the specification
 		$avatars = $xpath->query($element."/atom:link[@rel='avatar']", $context);
 		foreach($avatars AS $avatar) {
 			$href = "";
@@ -1381,7 +1381,7 @@ class dfrn {
 
 		$objxml = $obj_doc->saveXML($obj_element);
 
-		// @todo This isn't totally clean. We should find a way to transform the namespaces
+		/// @todo This isn't totally clean. We should find a way to transform the namespaces
 		$objxml = str_replace("<".$element.' xmlns="http://www.w3.org/2005/Atom">', "<".$element.">", $objxml);
 		return($objxml);
 	}
@@ -2355,7 +2355,7 @@ class dfrn {
 						dbesc($xt->id),
 						intval($importer["importer_uid"])
 					);
-					if(count($i)) {
+					if (dbm::is_result($i)) {
 
 						// For tags, the owner cannot remove the tag on the author's copy of the post.
 

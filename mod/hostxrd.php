@@ -2,7 +2,7 @@
 
 require_once('include/crypto.php');
 
-function hostxrd_init(&$a) {
+function hostxrd_init(App &$a) {
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
 	$pubkey = get_config('system','site_pubkey');

@@ -6,7 +6,7 @@ require_once('include/security.php');
 require_once('include/redir.php');
 
 
-function videos_init(&$a) {
+function videos_init(App &$a) {
 
 	if($a->argc > 1)
 		auto_redir($a, $a->argv[1]);
@@ -102,7 +102,7 @@ function videos_init(&$a) {
 
 
 
-function videos_post(&$a) {
+function videos_post(App &$a) {
 
 	$owner_uid = $a->data['user']['uid'];
 
@@ -113,7 +113,7 @@ function videos_post(&$a) {
 	if (($a->argc == 2) && x($_POST,'delete') && x($_POST, 'id')) {
 
 		// Check if we should do HTML-based delete confirmation
-		if(!x($_REQUEST,'confirm')) {
+		if (!x($_REQUEST,'confirm')) {
 			if (x($_REQUEST,'canceled')) {
 				goaway(App::get_baseurl() . '/videos/' . $a->data['user']['nickname']);
 			}
@@ -138,7 +138,6 @@ function videos_post(&$a) {
 
 		$video_id = $_POST['id'];
 
-
 		$r = q("SELECT `id`  FROM `attach` WHERE `uid` = %d AND `id` = '%s' LIMIT 1",
 			intval(local_user()),
 			dbesc($video_id)
@@ -154,7 +153,7 @@ function videos_post(&$a) {
 				intval(local_user())
 			);
 			//echo "<pre>"; var_dump($i); killme();
-			if(count($i)) {
+			if (dbm::is_result($i)) {
 				q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 					dbesc(datetime_convert()),
 					dbesc(datetime_convert()),
@@ -167,8 +166,9 @@ function videos_post(&$a) {
 				$url = App::get_baseurl();
 				$drop_id = intval($i[0]['id']);
 
-				if($i[0]['visible'])
+				if ($i[0]['visible']) {
 					proc_run(PRIORITY_HIGH, "include/notifier.php", "drop", $drop_id);
+				}
 			}
 		}
 
@@ -182,7 +182,7 @@ function videos_post(&$a) {
 
 
 
-function videos_content(&$a) {
+function videos_content(App &$a) {
 
 	// URLs (most aren't currently implemented):
 	// videos/name
@@ -408,4 +408,3 @@ function videos_content(&$a) {
 	$o .= paginate($a);
 	return $o;
 }
-

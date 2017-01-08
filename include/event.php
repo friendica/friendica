@@ -206,7 +206,7 @@ function bbtoevent($s) {
 }
 
 
-function sort_by_date($a) {
+function sort_by_date(App &$a) {
 
 	usort($a,'ev_compare');
 	return $a;
@@ -246,6 +246,7 @@ function event_store($arr) {
 	$arr['cid']     = ((intval($arr['cid'])) ? intval($arr['cid']) : 0);
 	$arr['uri']     = (x($arr,'uri') ? $arr['uri'] : item_new_uri($a->get_hostname(),$arr['uid']));
 	$arr['private'] = ((x($arr,'private')) ? intval($arr['private']) : 0);
+	$arr['guid']    = get_guid(32);
 
 	if($arr['cid'])
 		$c = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -333,16 +334,16 @@ function event_store($arr) {
 		call_hooks("event_updated", $arr['id']);
 
 		return $item_id;
-	}
-	else {
+	} else {
 
 		// New event. Store it.
 
-		$r = q("INSERT INTO `event` ( `uid`,`cid`,`uri`,`created`,`edited`,`start`,`finish`,`summary`, `desc`,`location`,`type`,
+		$r = q("INSERT INTO `event` (`uid`,`cid`,`guid`,`uri`,`created`,`edited`,`start`,`finish`,`summary`, `desc`,`location`,`type`,
 			`adjust`,`nofinish`,`allow_cid`,`allow_gid`,`deny_cid`,`deny_gid`)
-			VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', '%s', '%s', '%s' ) ",
+			VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', '%s', '%s', '%s' ) ",
 			intval($arr['uid']),
 			intval($arr['cid']),
+			dbesc($arr['guid']),
 			dbesc($arr['uri']),
 			dbesc($arr['created']),
 			dbesc($arr['edited']),

@@ -5,7 +5,7 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function common_content(&$a) {
+function common_content(App &$a) {
 
 	$o = '';
 
@@ -53,8 +53,9 @@ function common_content(&$a) {
 		$a->page['aside'] .= $vcard_widget;
 	}
 
-	if(! count($c))
+	if (! dbm::is_result($c)) {
 		return;
+	}
 
 	if(! $cid) {
 		if(get_my_url()) {

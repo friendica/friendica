@@ -134,7 +134,7 @@
 	 * @hook 'logged_in'
 	 * 		array $user	logged user record
 	 */
-	function api_login(&$a){
+	function api_login(App &$a){
 		// login with oauth
 		try{
 			$oauth = new FKOAuth1();
@@ -264,7 +264,7 @@
 			foreach ($API as $p=>$info){
 				if (strpos($a->query_string, $p)===0){
 					if (!api_check_method($info['method'])){
-						throw new HTTP\MethodNotAllowedException();
+						throw new MethodNotAllowedException();
 					}
 
 					$called_api= explode("/",$p);
@@ -2649,7 +2649,7 @@
 		if ($user_info['self'] == 0)
 			$sql_extra = " AND false ";
 
-		$r = q("SELECT `nurl` FROM `contact` WHERE `uid` = %d AND NOT `self` AND NOT `blocked` $sql_extra",
+		$r = q("SELECT `nurl` FROM `contact` WHERE `uid` = %d AND NOT `self` AND (NOT `blocked` OR `pending`) $sql_extra",
 			intval(api_user())
 		);
 
@@ -2756,7 +2756,7 @@
 			intval(api_user())
 		);
 
-		if(!dbm::is_result($r))
+		if (!dbm::is_result($r))
 			return;
 
 		$ids = array();
@@ -3630,7 +3630,7 @@
 			intval($uid),
 			dbesc($name));
 		// error message if specified group name already exists
-		if (count($rname) != 0)
+		if (dbm::is_result($rname))
 			throw new HTTP\BadRequestException('group name already exists');
 
 		// check if specified group name is a deleted group
@@ -3638,7 +3638,7 @@
 			intval($uid),
 			dbesc($name));
 		// error message if specified group name already exists
-		if (count($rname) != 0)
+		if (dbm::is_result($rname))
 			$reactivate_group = true;
 
 		// create group

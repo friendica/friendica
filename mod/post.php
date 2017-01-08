@@ -10,11 +10,11 @@ require_once('include/crypto.php');
 // not yet ready for prime time
 //require_once('include/zot.php');
 	
-function post_post(&$a) {
+function post_post(App &$a) {
 
 	$bulk_delivery = false;
 
-	if($a->argc == 1) {
+	if ($a->argc == 1) {
 		$bulk_delivery = true;
 	}
 	else {

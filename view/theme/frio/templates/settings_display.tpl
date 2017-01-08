@@ -22,7 +22,10 @@
 
 						{{include file="field_themeselect.tpl" field=$theme}}
 
+						{{* Show the mobile theme selection only if mobile themes are available *}}
+						{{if count($mobile_theme.4) > 1}}
 						{{include file="field_themeselect.tpl" field=$mobile_theme}}
+						{{/if}}
 
 						<div class="form-group pull-right settings-submit-wrapper" >
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit|escape:'html'}}">{{$submit}}</button>

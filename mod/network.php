@@ -1,17 +1,18 @@
 <?php
-function network_init(&$a) {
+function network_init(App &$a) {
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
 	$is_a_date_query = false;
-	if(x($_GET['cid']) && intval($_GET['cid']) != 0)
+	if (x($_GET['cid']) && intval($_GET['cid']) != 0) {
 		$cid = $_GET['cid'];
+	}
 
-	if($a->argc > 1) {
-		for($x = 1; $x < $a->argc; $x ++) {
-			if(is_a_date_arg($a->argv[$x])) {
+	if ($a->argc > 1) {
+		for ($x = 1; $x < $a->argc; $x ++) {
+			if (is_a_date_arg($a->argv[$x])) {
 				$is_a_date_query = true;
 				break;
 			}
@@ -24,9 +25,8 @@ function network_init(&$a) {
 	parse_str($query_string, $query_array);
 	array_shift($query_array);
 
-
 	// fetch last used network view and redirect if needed
-	if(! $is_a_date_query) {
+	if (! $is_a_date_query) {
 		$sel_tabs = network_query_get_sel_tab($a);
 		$sel_nets = network_query_get_sel_net();
 		$sel_groups = network_query_get_sel_group($a);
@@ -41,10 +41,9 @@ function network_init(&$a) {
 		$net_baseurl = '/network';
 		$net_args = array();
 
-		if($remember_group) {
+		if ($remember_group) {
 			$net_baseurl .= '/' . $last_sel_groups; // Note that the group number must come before the "/new" tab selection
-		}
-		else if($sel_groups !== false) {
+		} elseif($sel_groups !== false) {
 			$net_baseurl .= '/' . $sel_groups;
 		}
 
@@ -222,7 +221,7 @@ function saved_searches($search) {
  *
  * @return Array ( $no_active, $comment_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active );
  */
-function network_query_get_sel_tab($a) {
+function network_query_get_sel_tab(App &$a) {
 	$no_active='';
 	$starred_active = '';
 	$new_active = '';
@@ -293,7 +292,7 @@ function network_query_get_sel_net() {
 	return $network;
 }
 
-function network_query_get_sel_group($a) {
+function network_query_get_sel_group(App &$a) {
 	$group = false;
 
 	if($a->argc >= 2 && is_numeric($a->argv[1])) {
@@ -810,7 +809,7 @@ function network_content(&$a, $update = 0) {
  * @param app $a The global App
  * @return string Html of the networktab
  */
-function network_tabs($a) {
+function network_tabs(App &$a) {
 	// item filter tabs
 	/// @TODO fix this logic, reduce duplication
 	/// $a->page['content'] .= '<div class="tabs-wrapper">';

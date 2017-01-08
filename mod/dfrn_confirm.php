@@ -415,23 +415,26 @@ function dfrn_confirm_post(&$a,$handsfree = null) {
 			);
 		}
 
-		if($r === false)
-				notice( t('Unable to set contact photo.') . EOL);
+		/// @TODO is dbm::is_result() working here?
+		if ($r === false) {
+			notice( t('Unable to set contact photo.') . EOL);
+		}
 
 		// reload contact info
 
 		$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 			intval($contact_id)
 		);
-		if (dbm::is_result($r))
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
-		else
+		} else {
 			$contact = null;
+		}
 
 
-		if((isset($new_relation) && $new_relation == CONTACT_IS_FRIEND)) {
+		if ((isset($new_relation) && $new_relation == CONTACT_IS_FRIEND)) {
 
-			if(($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
+			if (($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
 				require_once('include/diaspora.php');
 				$ret = Diaspora::send_share($user[0],$r[0]);
 				logger('share returns: ' . $ret);

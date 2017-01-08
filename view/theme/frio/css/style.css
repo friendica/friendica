@@ -169,6 +169,10 @@ a#item-delete-selected {
     line-height: 1.5;
     border-radius: 3px;
 }
+.btn-xs {
+    padding: 1px 5px;
+    font-size: 12px;
+}
 .btn-primary {
     background: $nav_bg;
     color: $btn_primary_color !important;
@@ -191,7 +195,6 @@ a#item-delete-selected {
 }
 
 .btn-link {
-/*    color: #6fdbe8;*/
     color: $link_color;
 }
 .btn-link:focus, .btn-link:hover {
@@ -220,19 +223,48 @@ a#item-delete-selected {
 }*/
 
 .btn-main {
-    /*background: #6fdbe8;*/
     background: $link_color;
     color: #fff!important;
 }
 .btn-main:hover, .btn-main:focus {
-    /*background: #59d6e4!important;*/
     background: $link_hover_color !important;
     text-decoration: none;
 }
 .btn-main:active, .btn-main.active {
     outline: 0;
-    /*background: #59d6e4;*/
     background: $link_hover_color;
+}
+.toggle.btn {
+    border: 1px solid transparent;
+}
+.toggle.btn-xs {
+    min-width: 45px;
+}
+.toggle.off {
+    border-color: #ccc;
+}
+.toggle .toggle-off,
+.toggle .toggle-off:hover {
+    color: #ccc;
+    background-color: #eee;
+    box-shadow: none;
+}
+.toggle.off .toggle-handle {
+    background-color: #eee;
+}
+.toggle-handle {
+    background-color: #fff;
+    border-width: 0 1px;
+    border: 1px solid transparent;
+    border-color: #ccc;
+}
+.field.yesno:hover .toggle {
+    border-color: $link_hover_color;
+    transition: all 0.25s ease-in-out;
+}
+.field.yesno:hover .toggle-handle {
+    background-color: #fff;
+    transition: all 0.25s ease-in-out;
 }
 
 .form-control-sm, .input-group-sm>.form-control, .input-group-sm>.input-group-addon, .input-group-sm>.input-group-btn>.btn {
@@ -270,6 +302,7 @@ a#item-delete-selected {
     vertical-align: baseline;
     background-color: $link_color;
     border-radius: 4px;
+    z-index: 1;
 }
 aside .badge {
     opacity: 0.7;

@@ -5,7 +5,7 @@
 
 require_once("include/plugin.php");
 
-function statistics_json_init(&$a) {
+function statistics_json_init(App &$a) {
 
         if (!get_config("system", "nodeinfo")) {
                 http_status_exit(404);

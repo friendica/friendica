@@ -704,7 +704,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 			// If its a post from myself then tag the thread as "mention"
 			logger("item_store: Checking if parent ".$parent_id." has to be tagged as mention for user ".$arr['uid'], LOGGER_DEBUG);
 			$u = q("SELECT `nickname` FROM `user` WHERE `uid` = %d", intval($arr['uid']));
-			if (count($u)) {
+			if (dbm::is_result($u)) {
 				$a = get_app();
 				$self = normalise_link(App::get_baseurl() . '/profile/' . $u[0]['nickname']);
 				logger("item_store: 'myself' is ".$self." for parent ".$parent_id." checking against ".$arr['author-link']." and ".$arr['owner-link'], LOGGER_DEBUG);
@@ -953,14 +953,16 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	// in it.
 	if (!$deleted AND !$dontcache) {
 
-		$r = q('SELECT * FROM `item` WHERE id = %d', intval($current_post));
-		if (count($r) == 1) {
-			if ($notify)
+		$r = q('SELECT * FROM `item` WHERE `id` = %d', intval($current_post));
+		if ((dbm::is_result($r)) && (count($r) == 1)) {
+			if ($notify) {
 				call_hooks('post_local_end', $r[0]);
-			else
+			} else {
 				call_hooks('post_remote_end', $r[0]);
-		} else
+			}
+		} else {
 			logger('item_store: new item not found in DB, id ' . $current_post);
+		}
 	}
 
 	if ($arr['parent-uri'] === $arr['uri']) {
@@ -994,8 +996,9 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 
 	check_item_notification($current_post, $uid);
 
-	if ($notify)
+	if ($notify) {
 		proc_run(PRIORITY_HIGH, "include/notifier.php", $notify_type, $current_post);
+	}
 
 	return $current_post;
 }
@@ -1188,19 +1191,22 @@ function tag_deliver($uid,$item_id) {
 	$u = q("select * from user where uid = %d limit 1",
 		intval($uid)
 	);
-	if (! count($u))
+
+	if (! dbm::is_result($u)) {
 		return;
+	}
 
 	$community_page = (($u[0]['page-flags'] == PAGE_COMMUNITY) ? true : false);
 	$prvgroup = (($u[0]['page-flags'] == PAGE_PRVGROUP) ? true : false);
 
 
-	$i = q("select * from item where id = %d and uid = %d limit 1",
+	$i = q("SELECT * FROM `item` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 		intval($item_id),
 		intval($uid)
 	);
-	if (! count($i))
+	if (! dbm::is_result($i)) {
 		return;
+	}
 
 	$item = $i[0];
 
@@ -1257,7 +1263,7 @@ function tag_deliver($uid,$item_id) {
 	$c = q("select name, url, thumb from contact where self = 1 and uid = %d limit 1",
 		intval($u[0]['uid'])
 	);
-	if (! count($c)) {
+	if (! dbm::is_result($c)) {
 		return;
 	}
 
@@ -1290,8 +1296,6 @@ function tag_deliver($uid,$item_id) {
 
 function tgroup_check($uid,$item) {
 
-	$a = get_app();
-
 	$mention = false;
 
 	// check that the message originated elsewhere and is a top-level post
@@ -1299,12 +1303,13 @@ function tgroup_check($uid,$item) {
 	if (($item['wall']) || ($item['origin']) || ($item['uri'] != $item['parent-uri']))
 		return false;
 
-
-	$u = q("select * from user where uid = %d limit 1",
+	/// @TODO Encapsulate this or find it encapsulated and replace all occurrances
+	$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 		intval($uid)
 	);
-	if (! count($u))
+	if (! dbm::is_result($u)) {
 		return false;
+	}
 
 	$community_page = (($u[0]['page-flags'] == PAGE_COMMUNITY) ? true : false);
 	$prvgroup = (($u[0]['page-flags'] == PAGE_PRVGROUP) ? true : false);
@@ -2228,7 +2233,7 @@ function posted_date_widget($url,$uid,$wall) {
 
 	$ret = list_post_dates($uid,$wall);
 
-	if (! count($ret))
+	if (! dbm::is_result($ret))
 		return $o;
 
 	$cutoff_year = intval(datetime_convert('',date_default_timezone_get(),'now','Y')) - $visible_years;

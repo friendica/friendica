@@ -369,7 +369,7 @@ if(! function_exists('paginate')) {
  * @param App $a App instance
  * @return string html for pagination #FIXME remove html
  */
-function paginate(&$a) {
+function paginate(App &$a) {
 
 	$data = paginate_data($a);
 	$tpl = get_markup_template("paginate.tpl");

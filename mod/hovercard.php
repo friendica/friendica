@@ -11,7 +11,7 @@
 require_once("include/socgraph.php");
 require_once("include/Contact.php");
 
-function hovercard_init(&$a) {
+function hovercard_init(App &$a) {
 	// Just for testing purposes
 	$_GET["mode"] = "minimal";
 }

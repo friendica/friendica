@@ -4,7 +4,7 @@ function validate_members(&$item) {
 	$item = intval($item);
 }
 
-function group_init(&$a) {
+function group_init(App &$a) {
 	if(local_user()) {
 		require_once('include/group.php');
 		$a->page['aside'] = group_side('contacts','group','extended',(($a->argc > 1) ? intval($a->argv[1]) : 0));
@@ -13,7 +13,7 @@ function group_init(&$a) {
 
 
 
-function group_post(&$a) {
+function group_post(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -31,8 +31,7 @@ function group_post(&$a) {
 			if ($r) {
 				goaway(App::get_baseurl() . '/group/' . $r);
 			}
-		}
-		else {
+		} else {
 			notice( t('Could not create group.') . EOL );
 		}
 		goaway(App::get_baseurl() . '/group');
@@ -70,7 +69,7 @@ function group_post(&$a) {
 	return;
 }
 
-function group_content(&$a) {
+function group_content(App &$a) {
 	$change = false;
 
 	if (! local_user()) {
@@ -92,7 +91,7 @@ function group_content(&$a) {
 			'$submit' => t('Save Group'),
 	);
 
-	if(($a->argc == 2) && ($a->argv[1] === 'new')) {
+	if (($a->argc == 2) && ($a->argv[1] === 'new')) {
 
 		return replace_macros($tpl, $context + array(
 			'$title' => t('Create a group of contacts/friends.'),

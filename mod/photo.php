@@ -3,7 +3,7 @@
 require_once('include/security.php');
 require_once('include/Photo.php');
 
-function photo_init(&$a) {
+function photo_init(App &$a) {
 	global $_SERVER;
 
 	$prvcachecontrol = false;

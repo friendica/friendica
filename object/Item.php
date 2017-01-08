@@ -38,9 +38,9 @@ class Item extends BaseObject {
 		$this->set_template('wall');
 		$this->toplevel = ($this->get_id() == $this->get_data_value('parent'));
 
-		if(is_array($_SESSION['remote'])) {
-			foreach($_SESSION['remote'] as $visitor) {
-				if($visitor['cid'] == $this->get_data_value('contact-id')) {
+		if (is_array($_SESSION['remote'])) {
+			foreach ($_SESSION['remote'] as $visitor) {
+				if ($visitor['cid'] == $this->get_data_value('contact-id')) {
 					$this->visiting = true;
 					break;
 				}
@@ -334,7 +334,9 @@ class Item extends BaseObject {
 		}
 
 		// Disable features that aren't available in several networks
-		if (($item["item_network"] != NETWORK_DFRN) AND isset($buttons["dislike"])) {
+
+		/// @todo Add NETWORK_DIASPORA when it will pass this information
+		if (!in_array($item["item_network"], array(NETWORK_DFRN)) AND isset($buttons["dislike"])) {
 			unset($buttons["dislike"],$isevent);
 			$tagger = '';
 		}
@@ -347,15 +349,11 @@ class Item extends BaseObject {
 			unset($buttons["like"]);
 		}
 
-		// Diaspora isn't able to do likes on comments - but red does
+ 		// Diaspora isn't able to do likes on comments - but Hubzilla does
+		/// @todo When Diaspora will pass this information we will remove these lines
 		if (($item["item_network"] == NETWORK_DIASPORA) AND ($indent == 'comment') AND
 			!Diaspora::is_redmatrix($item["owner-link"]) AND isset($buttons["like"])) {
 			unset($buttons["like"]);
-		}
-
-		// Diaspora doesn't has multithreaded comments
-		if (($item["item_network"] == NETWORK_DIASPORA) AND ($indent == 'comment')) {
-			unset($comment);
 		}
 
 		// Facebook can like comments - but it isn't programmed in the connector yet.

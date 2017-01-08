@@ -1,6 +1,6 @@
 <?php
 
-function apps_content(&$a) {
+function apps_content(App &$a) {
     $privateaddons = get_config('config','private_addons');
       if ($privateaddons === "1") {
 	if((! (local_user())))  {

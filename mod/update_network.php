@@ -5,7 +5,7 @@
 require_once("mod/network.php");
 require_once("include/group.php");
 
-function update_network_content(&$a) {
+function update_network_content(App &$a) {
 
 	$profile_uid = intval($_GET["p"]);
 

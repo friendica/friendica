@@ -102,8 +102,7 @@ function new_contact($uid,$url,$interactive = false) {
 		if ($interactive) {
 			if (strlen($a->path)) {
 				$myaddr = bin2hex(App::get_baseurl() . '/profile/' . $a->user['nickname']);
-			}
-			else {
+			} else {
 				$myaddr = bin2hex($a->user['nickname'] . '@' . $a->get_hostname());
 			}
 
@@ -111,53 +110,43 @@ function new_contact($uid,$url,$interactive = false) {
 
 			// NOTREACHED
 		}
+	} elseif (get_config('system','dfrn_only')) {
+		$result['message'] = t('This site is not configured to allow communications with other networks.') . EOL;
+		$result['message'] != t('No compatible communication protocols or feeds were discovered.') . EOL;
+		return $result;
 	}
-	else {
-		if(get_config('system','dfrn_only')) {
-			$result['message'] = t('This site is not configured to allow communications with other networks.') . EOL;
-			$result['message'] != t('No compatible communication protocols or feeds were discovered.') . EOL;
-			return $result;
-		}
-	}
-
-
-
-
-
 
 	// This extra param just confuses things, remove it
-	if($ret['network'] === NETWORK_DIASPORA)
+	if ($ret['network'] === NETWORK_DIASPORA) {
 		$ret['url'] = str_replace('?absolute=true','',$ret['url']);
-
+	}
 
 	// do we have enough information?
 
-	if(! ((x($ret,'name')) && (x($ret,'poll')) && ((x($ret,'url')) || (x($ret,'addr'))))) {
+	if (! ((x($ret,'name')) && (x($ret,'poll')) && ((x($ret,'url')) || (x($ret,'addr'))))) {
 		$result['message'] .=  t('The profile address specified does not provide adequate information.') . EOL;
-		if(! x($ret,'poll'))
+		if (! x($ret,'poll')) {
 			$result['message'] .= t('No compatible communication protocols or feeds were discovered.') . EOL;
-		if(! x($ret,'name'))
+		}
+		if (! x($ret,'name')) {
 			$result['message'] .=  t('An author or name was not found.') . EOL;
-		if(! x($ret,'url'))
+		}
+		if (! x($ret,'url')) {
 			$result['message'] .=  t('No browser URL could be matched to this address.') . EOL;
-		if(strpos($url,'@') !== false) {
+		}
+		if (strpos($url,'@') !== false) {
 			$result['message'] .=  t('Unable to match @-style Identity Address with a known protocol or email contact.') . EOL;
 			$result['message'] .=  t('Use mailto: in front of address to force email check.') . EOL;
 		}
 		return $result;
 	}
 
-	if($ret['network'] === NETWORK_OSTATUS && get_config('system','ostatus_disabled')) {
+	if ($ret['network'] === NETWORK_OSTATUS && get_config('system','ostatus_disabled')) {
 		$result['message'] .= t('The profile address specified belongs to a network which has been disabled on this site.') . EOL;
 		$ret['notify'] = '';
 	}
 
-
-
-
-
-
-	if(! $ret['notify']) {
+	if (! $ret['notify']) {
 		$result['message'] .=  t('Limited profile. This person will be unable to receive direct/personal notifications from you.') . EOL;
 	}
 
@@ -167,8 +156,9 @@ function new_contact($uid,$url,$interactive = false) {
 
 	$hidden = (($ret['network'] === NETWORK_MAIL) ? 1 : 0);
 
-	if(in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA)))
+	if (in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA))) {
 		$writeable = 1;
+	}
 
 	// check if we already have a contact
 	// the poll url is more reliable than the profile url, as we may have
@@ -188,7 +178,7 @@ function new_contact($uid,$url,$interactive = false) {
 
 	if (dbm::is_result($r)) {
 		// update contact
-		if($r[0]['rel'] == CONTACT_IS_FOLLOWER || ($network === NETWORK_DIASPORA && $r[0]['rel'] == CONTACT_IS_SHARING)) {
+		if ($r[0]['rel'] == CONTACT_IS_FOLLOWER || ($network === NETWORK_DIASPORA && $r[0]['rel'] == CONTACT_IS_SHARING)) {
 			q("UPDATE `contact` SET `rel` = %d , `subhub` = %d, `readonly` = 0 WHERE `id` = %d AND `uid` = %d",
 				intval(CONTACT_IS_FRIEND),
 				intval($subhub),
@@ -197,29 +187,28 @@ function new_contact($uid,$url,$interactive = false) {
 			);
 		}
 	} else {
-
-
 		// check service class limits
 
-		$r = q("select count(*) as total from contact where uid = %d and pending = 0 and self = 0",
+		$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE `uid` = %d AND `pending` = 0 AND `self` = 0",
 			intval($uid)
 		);
 		if (dbm::is_result($r))
 			$total_contacts = $r[0]['total'];
 
-		if(! service_class_allows($uid,'total_contacts',$total_contacts)) {
+		if (! service_class_allows($uid,'total_contacts',$total_contacts)) {
 			$result['message'] .= upgrade_message();
 			return $result;
 		}
 
-		$r = q("select count(network) as total from contact where uid = %d and network = '%s' and pending = 0 and self = 0",
+		$r = q("SELECT COUNT(`network`) AS `total` FROM `contact` WHERE `uid` = %d AND `network` = '%s' AND `pending` = 0 AND `self` = 0",
 			intval($uid),
 			dbesc($network)
 		);
-		if (dbm::is_result($r))
+		if (dbm::is_result($r)) {
 			$total_network = $r[0]['total'];
+		}
 
-		if(! service_class_allows($uid,'total_contacts_' . $network,$total_network)) {
+		if (! service_class_allows($uid,'total_contacts_' . $network,$total_network)) {
 			$result['message'] .= upgrade_message();
 			return $result;
 		}
@@ -268,8 +257,9 @@ function new_contact($uid,$url,$interactive = false) {
 	$result['cid'] = $contact_id;
 
 	$def_gid = get_default_group($uid, $contact["network"]);
-	if (intval($def_gid))
+	if (intval($def_gid)) {
 		group_add_member($uid, '', $contact_id, $def_gid);
+	}
 
 	// Update the avatar
 	update_contact_avatar($ret['photo'],$uid,$contact_id);
@@ -285,7 +275,6 @@ function new_contact($uid,$url,$interactive = false) {
 
 	if (dbm::is_result($r)) {
 		if (($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
-
 			// create a follow slap
 			$item = array();
 			$item['verb'] = ACTIVITY_FOLLOW;

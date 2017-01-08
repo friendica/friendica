@@ -26,7 +26,7 @@ function hub_post_return() {
 
 
 
-function pubsub_init(&$a) {
+function pubsub_init(App &$a) {
 
 	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
 	$contact_id = (($a->argc > 2) ? intval($a->argv[2])       : 0 );
@@ -98,7 +98,7 @@ function pubsub_init(&$a) {
 
 require_once('include/security.php');
 
-function pubsub_post(&$a) {
+function pubsub_post(App &$a) {
 
 	$xml = file_get_contents('php://input');
 

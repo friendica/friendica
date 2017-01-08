@@ -127,7 +127,7 @@ function queue_run(&$argv, &$argc){
 		$c = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 			intval($qi[0]['cid'])
 		);
-		if(! count($c)) {
+		if (! dbm::is_result($c)) {
 			remove_queue_item($q_item['id']);
 			continue;
 		}
@@ -157,7 +157,7 @@ function queue_run(&$argv, &$argc){
 			FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($c[0]['uid'])
 		);
-		if(! count($u)) {
+		if (! dbm::is_result($u)) {
 			remove_queue_item($q_item['id']);
 			continue;
 		}

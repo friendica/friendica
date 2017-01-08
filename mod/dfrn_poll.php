@@ -4,7 +4,7 @@ require_once('include/auth.php');
 require_once('include/dfrn.php');
 
 
-function dfrn_poll_init(&$a) {
+function dfrn_poll_init(App &$a) {
 
 
 	$dfrn_id         = ((x($_GET,'dfrn_id'))         ? $_GET['dfrn_id']              : '');
@@ -137,7 +137,7 @@ function dfrn_poll_init(&$a) {
 			$c = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 				intval($r[0]['cid'])
 			);
-			if(! count($c)) {
+			if (! dbm::is_result($c)) {
 				xml_status(3, 'No profile');
 			}
 			$contact = $c[0];
@@ -203,7 +203,7 @@ function dfrn_poll_init(&$a) {
 
 
 
-function dfrn_poll_post(&$a) {
+function dfrn_poll_post(App &$a) {
 
 	$dfrn_id      = ((x($_POST,'dfrn_id'))      ? $_POST['dfrn_id']              : '');
 	$challenge    = ((x($_POST,'challenge'))    ? $_POST['challenge']            : '');
@@ -234,7 +234,7 @@ function dfrn_poll_post(&$a) {
 			$c = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 				intval($r[0]['cid'])
 			);
-			if(! count($c)) {
+			if (! dbm::is_result($c)) {
 				xml_status(3, 'No profile');
 			}
 			$contact = $c[0];
@@ -383,7 +383,7 @@ function dfrn_poll_post(&$a) {
 	}
 }
 
-function dfrn_poll_content(&$a) {
+function dfrn_poll_content(App &$a) {
 
 	$dfrn_id         = ((x($_GET,'dfrn_id'))         ? $_GET['dfrn_id']              : '');
 	$type            = ((x($_GET,'type'))            ? $_GET['type']                 : 'data');

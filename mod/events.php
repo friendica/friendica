@@ -8,7 +8,7 @@ require_once('include/datetime.php');
 require_once('include/event.php');
 require_once('include/items.php');
 
-function events_init(&$a) {
+function events_init(App &$a) {
 	if (! local_user()) {
 		return;
 	}
@@ -21,8 +21,9 @@ function events_init(&$a) {
 
 		$cal_widget = widget_events();
 
-		if (! x($a->page,'aside'))
+		if (! x($a->page,'aside')) {
 			$a->page['aside'] = '';
+		}
 
 		$a->page['aside'] .= $cal_widget;
 	}
@@ -30,7 +31,7 @@ function events_init(&$a) {
 	return;
 }
 
-function events_post(&$a) {
+function events_post(App &$a) {
 
 	logger('post: ' . print_r($_REQUEST,true));
 
@@ -188,7 +189,7 @@ function events_post(&$a) {
 
 
 
-function events_content(&$a) {
+function events_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -353,7 +354,7 @@ function events_content(&$a) {
 			}
 		}
 
-		$events=array();
+		$events = array();
 
 		// transform the event in a usable array
 		if (dbm::is_result($r)) {

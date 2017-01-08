@@ -7,7 +7,7 @@
 
 require_once("include/plugin.php");
 
-function nodeinfo_wellknown(&$a) {
+function nodeinfo_wellknown(App &$a) {
 	if (!get_config("system", "nodeinfo")) {
 		http_status_exit(404);
 		killme();
@@ -20,7 +20,7 @@ function nodeinfo_wellknown(&$a) {
 	exit;
 }
 
-function nodeinfo_init(&$a){
+function nodeinfo_init(App &$a){
 	if (!get_config("system", "nodeinfo")) {
 		http_status_exit(404);
 		killme();

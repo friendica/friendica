@@ -4,7 +4,7 @@ require_once('include/email.php');
 require_once('include/enotify.php');
 require_once('include/text.php');
 
-function lostpass_post(&$a) {
+function lostpass_post(App &$a) {
 
 	$loginame = notags(trim($_POST['login-name']));
 	if(! $loginame)
@@ -77,7 +77,7 @@ function lostpass_post(&$a) {
 }
 
 
-function lostpass_content(&$a) {
+function lostpass_content(App &$a) {
 
 
 	if(x($_GET,'verify')) {
@@ -102,6 +102,8 @@ function lostpass_content(&$a) {
 			dbesc($new_password_encoded),
 			intval($uid)
 		);
+
+		/// @TODO Is dbm::is_result() okay here?
 		if ($r) {
 			$tpl = get_markup_template('pwdreset.tpl');
 			$o .= replace_macros($tpl,array(

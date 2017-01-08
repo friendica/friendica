@@ -1,6 +1,6 @@
 <?php
 
-function redir_init(&$a) {
+function redir_init(App &$a) {
 
 	$url = ((x($_GET,'url')) ? $_GET['url'] : '');
 	$quiet = ((x($_GET,'quiet')) ? '&quiet=1' : '');

@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 
 
-function tagger_content(&$a) {
+function tagger_content(App &$a) {
 
 	if(! local_user() && ! remote_user()) {
 		return;

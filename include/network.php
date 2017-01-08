@@ -541,10 +541,11 @@ function parse_xml_string($s,$strict = true) {
 	libxml_use_internal_errors(true);
 
 	$x = @simplexml_load_string($s2);
-	if(! $x) {
+	if (! $x) {
 		logger('libxml: parse: error: ' . $s2, LOGGER_DATA);
-		foreach(libxml_get_errors() as $err)
+		foreach (libxml_get_errors() as $err) {
 			logger('libxml: parse: ' . $err->code." at ".$err->line.":".$err->column." : ".$err->message, LOGGER_DATA);
+		}
 		libxml_clear_errors();
 	}
 	return $x;
@@ -553,8 +554,9 @@ function parse_xml_string($s,$strict = true) {
 function scale_external_images($srctext, $include_link = true, $scale_replace = false) {
 
 	// Suppress "view full size"
-	if (intval(get_config('system','no_view_full_size')))
+	if (intval(get_config('system','no_view_full_size'))) {
 		$include_link = false;
+	}
 
 	$a = get_app();
 
@@ -563,38 +565,41 @@ function scale_external_images($srctext, $include_link = true, $scale_replace = 
 
 	$matches = null;
 	$c = preg_match_all('/\[img.*?\](.*?)\[\/img\]/ism',$s,$matches,PREG_SET_ORDER);
-	if($c) {
+	if ($c) {
 		require_once('include/Photo.php');
-		foreach($matches as $mtch) {
+		foreach ($matches as $mtch) {
 			logger('scale_external_image: ' . $mtch[1]);
 
 			$hostname = str_replace('www.','',substr(App::get_baseurl(),strpos(App::get_baseurl(),'://')+3));
-			if(stristr($mtch[1],$hostname))
+			if (stristr($mtch[1],$hostname)) {
 				continue;
+			}
 
 			// $scale_replace, if passed, is an array of two elements. The
 			// first is the name of the full-size image. The second is the
 			// name of a remote, scaled-down version of the full size image.
 			// This allows Friendica to display the smaller remote image if
 			// one exists, while still linking to the full-size image
-			if($scale_replace)
+			if ($scale_replace) {
 				$scaled = str_replace($scale_replace[0], $scale_replace[1], $mtch[1]);
-			else
+			} else {
 				$scaled = $mtch[1];
-			$i = @fetch_url($scaled);
-			if(! $i)
+			}
+			$i = fetch_url($scaled);
+			if (! $i) {
 				return $srctext;
+			}
 
 			// guess mimetype from headers or filename
 			$type = guess_image_type($mtch[1],true);
 
-			if($i) {
+			if ($i) {
 				$ph = new Photo($i, $type);
-				if($ph->is_valid()) {
+				if ($ph->is_valid()) {
 					$orig_width = $ph->getWidth();
 					$orig_height = $ph->getHeight();
 
-					if($orig_width > 640 || $orig_height > 640) {
+					if ($orig_width > 640 || $orig_height > 640) {
 
 						$ph->scaleImage(640);
 						$new_width = $ph->getWidth();
@@ -620,7 +625,7 @@ function scale_external_images($srctext, $include_link = true, $scale_replace = 
 function fix_contact_ssl_policy(&$contact,$new_policy) {
 
 	$ssl_changed = false;
-	if((intval($new_policy) == SSL_POLICY_SELFSIGN || $new_policy === 'self') && strstr($contact['url'],'https:')) {
+	if ((intval($new_policy) == SSL_POLICY_SELFSIGN || $new_policy === 'self') && strstr($contact['url'],'https:')) {
 		$ssl_changed = true;
 		$contact['url']     = 	str_replace('https:','http:',$contact['url']);
 		$contact['request'] = 	str_replace('https:','http:',$contact['request']);
@@ -630,7 +635,7 @@ function fix_contact_ssl_policy(&$contact,$new_policy) {
 		$contact['poco']    = 	str_replace('https:','http:',$contact['poco']);
 	}
 
-	if((intval($new_policy) == SSL_POLICY_FULL || $new_policy === 'full') && strstr($contact['url'],'http:')) {
+	if ((intval($new_policy) == SSL_POLICY_FULL || $new_policy === 'full') && strstr($contact['url'],'http:')) {
 		$ssl_changed = true;
 		$contact['url']     = 	str_replace('http:','https:',$contact['url']);
 		$contact['request'] = 	str_replace('http:','https:',$contact['request']);
@@ -640,15 +645,15 @@ function fix_contact_ssl_policy(&$contact,$new_policy) {
 		$contact['poco']    = 	str_replace('http:','https:',$contact['poco']);
 	}
 
-	if($ssl_changed) {
-		q("update contact set
-			url = '%s',
-			request = '%s',
-			notify = '%s',
-			poll = '%s',
-			confirm = '%s',
-			poco = '%s'
-			where id = %d limit 1",
+	if ($ssl_changed) {
+		q("UPDATE `contact` SET
+			`url` = '%s',
+			`request` = '%s',
+			`notify` = '%s',
+			`poll` = '%s',
+			`confirm` = '%s',
+			`poco` = '%s'
+			WHERE `id` = %d LIMIT 1",
 			dbesc($contact['url']),
 			dbesc($contact['request']),
 			dbesc($contact['notify']),

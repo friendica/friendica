@@ -135,8 +135,8 @@ function fileas_widget($baseurl,$selected = '') {
 
 	$matches = false;
 	$terms = array();
-    $cnt = preg_match_all('/\[(.*?)\]/',$saved,$matches,PREG_SET_ORDER);
-    if($cnt) {
+	$cnt = preg_match_all('/\[(.*?)\]/',$saved,$matches,PREG_SET_ORDER);
+	if ($cnt) {
 		foreach($matches as $mtch) {
 			$unescaped = xmlify(file_tag_decode($mtch[1]));
 			$terms[] = array('name' => $unescaped,'selected' => (($selected == $unescaped) ? 'selected' : ''));
@@ -158,12 +158,14 @@ function categories_widget($baseurl,$selected = '') {
 
 	$a = get_app();
 
-	if(! feature_enabled($a->profile['profile_uid'],'categories'))
+	if (! feature_enabled($a->profile['profile_uid'],'categories')) {
 		return '';
+	}
 
 	$saved = get_pconfig($a->profile['profile_uid'],'system','filetags');
-	if(! strlen($saved))
+	if (! strlen($saved)) {
 		return;
+	}
 
 	$matches = false;
 	$terms = array();

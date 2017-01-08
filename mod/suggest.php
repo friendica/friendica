@@ -3,8 +3,7 @@
 require_once('include/socgraph.php');
 require_once('include/contact_widgets.php');
 
-
-function suggest_init(&$a) {
+function suggest_init(App &$a) {
 	if (! local_user()) {
 		return;
 	}
@@ -16,8 +15,8 @@ function suggest_init(&$a) {
 			// so add any arguments as hidden inputs
 			$query = explode_querystring($a->query_string);
 			$inputs = array();
-			foreach($query['args'] as $arg) {
-				if(strpos($arg, 'confirm=') === false) {
+			foreach ($query['args'] as $arg) {
+				if (strpos($arg, 'confirm=') === false) {
 					$arg_parts = explode('=', $arg);
 					$inputs[] = array('name' => $arg_parts[0], 'value' => $arg_parts[1]);
 				}
@@ -50,7 +49,7 @@ function suggest_init(&$a) {
 
 
 
-function suggest_content(&$a) {
+function suggest_content(App &$a) {
 
 	require_once("mod/proxy.php");
 

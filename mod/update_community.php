@@ -4,7 +4,7 @@
 
 require_once("mod/community.php");
 
-function update_community_content(&$a) {
+function update_community_content(App &$a) {
 
 	header("Content-type: text/html");
 	echo "<!DOCTYPE html><html><body>\r\n";

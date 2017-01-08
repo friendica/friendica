@@ -1,7 +1,7 @@
 <?php
 
 
-function starred_init(&$a) {
+function starred_init(App &$a) {
 
 	require_once("include/threads.php");
 

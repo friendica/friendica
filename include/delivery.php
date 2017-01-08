@@ -518,15 +518,6 @@ function delivery_run(&$argv, &$argc){
 				if (!$contact['pubkey'] && !$public_message)
 					break;
 
-				$unsupported_activities = array(ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE);
-
-				//don't transmit activities which are not supported by diaspora
-				foreach($unsupported_activities as $act) {
-					if (activity_match($target_item['verb'],$act)) {
-						break 2;
-					}
-				}
-
 				if (($target_item['deleted']) && (($target_item['uri'] === $target_item['parent-uri']) || $followup)) {
 					// top-level retraction
 					logger('diaspora retract: '.$loc);

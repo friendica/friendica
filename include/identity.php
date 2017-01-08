@@ -231,8 +231,7 @@ function profile_sidebar($profile, $block = 0) {
 	if ($connect AND local_user()) {
 		if (isset($profile["url"])) {
 			$profile_url = normalise_link($profile["url"]);
-		}
-		else {
+		} else {
 			$profile_url = normalise_link(App::get_baseurl()."/profile/".$profile["nickname"]);
 		}
 
@@ -599,7 +598,7 @@ function get_events() {
 	));
 }
 
-function advanced_profile(&$a) {
+function advanced_profile(App &$a) {
 
 	$o = '';
 	$uid = $a->profile['uid'];
@@ -638,50 +637,87 @@ function advanced_profile(&$a) {
 
 		if($a->profile['marital']) $profile['marital'] = array( t('Status:'), $a->profile['marital']);
 
-
-		if($a->profile['with']) $profile['marital']['with'] = $a->profile['with'];
-
-		if(strlen($a->profile['howlong']) && $a->profile['howlong'] !== '0000-00-00 00:00:00') {
-				$profile['howlong'] = relative_date($a->profile['howlong'], t('for %1$d %2$s'));
+		/// @TODO Maybe use x() here, plus below?
+		if ($a->profile['with']) {
+			$profile['marital']['with'] = $a->profile['with'];
 		}
 
-		if($a->profile['sexual']) $profile['sexual'] = array( t('Sexual Preference:'), $a->profile['sexual'] );
+		if (strlen($a->profile['howlong']) && $a->profile['howlong'] !== '0000-00-00 00:00:00') {
+			$profile['howlong'] = relative_date($a->profile['howlong'], t('for %1$d %2$s'));
+		}
 
-		if($a->profile['homepage']) $profile['homepage'] = array( t('Homepage:'), linkify($a->profile['homepage']) );
+		if ($a->profile['sexual']) {
+			$profile['sexual'] = array( t('Sexual Preference:'), $a->profile['sexual'] );
+		}
 
-		if($a->profile['hometown']) $profile['hometown'] = array( t('Hometown:'), linkify($a->profile['hometown']) );
+		if ($a->profile['homepage']) {
+			$profile['homepage'] = array( t('Homepage:'), linkify($a->profile['homepage']) );
+		}
 
-		if($a->profile['pub_keywords']) $profile['pub_keywords'] = array( t('Tags:'), $a->profile['pub_keywords']);
+		if ($a->profile['hometown']) {
+			$profile['hometown'] = array( t('Hometown:'), linkify($a->profile['hometown']) );
+		}
 
-		if($a->profile['politic']) $profile['politic'] = array( t('Political Views:'), $a->profile['politic']);
+		if ($a->profile['pub_keywords']) {
+			$profile['pub_keywords'] = array( t('Tags:'), $a->profile['pub_keywords']);
+		}
 
-		if($a->profile['religion']) $profile['religion'] = array( t('Religion:'), $a->profile['religion']);
+		if ($a->profile['politic']) {
+			$profile['politic'] = array( t('Political Views:'), $a->profile['politic']);
+		}
 
-		if($txt = prepare_text($a->profile['about'])) $profile['about'] = array( t('About:'), $txt );
+		if ($a->profile['religion']) {
+			$profile['religion'] = array( t('Religion:'), $a->profile['religion']);
+		}
 
-		if($txt = prepare_text($a->profile['interest'])) $profile['interest'] = array( t('Hobbies/Interests:'), $txt);
+		if ($txt = prepare_text($a->profile['about'])) {
+			$profile['about'] = array( t('About:'), $txt );
+		}
 
-		if($txt = prepare_text($a->profile['likes'])) $profile['likes'] = array( t('Likes:'), $txt);
+		if ($txt = prepare_text($a->profile['interest'])) {
+			$profile['interest'] = array( t('Hobbies/Interests:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['dislikes'])) $profile['dislikes'] = array( t('Dislikes:'), $txt);
+		if ($txt = prepare_text($a->profile['likes'])) {
+			$profile['likes'] = array( t('Likes:'), $txt);
+		}
 
+		if ($txt = prepare_text($a->profile['dislikes'])) {
+			$profile['dislikes'] = array( t('Dislikes:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['contact'])) $profile['contact'] = array( t('Contact information and Social Networks:'), $txt);
+		if ($txt = prepare_text($a->profile['contact'])) {
+			$profile['contact'] = array( t('Contact information and Social Networks:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['music'])) $profile['music'] = array( t('Musical interests:'), $txt);
+		if ($txt = prepare_text($a->profile['music'])) {
+			$profile['music'] = array( t('Musical interests:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['book'])) $profile['book'] = array( t('Books, literature:'), $txt);
+		if ($txt = prepare_text($a->profile['book'])) {
+			$profile['book'] = array( t('Books, literature:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['tv'])) $profile['tv'] = array( t('Television:'), $txt);
+		if ($txt = prepare_text($a->profile['tv'])) {
+			$profile['tv'] = array( t('Television:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['film'])) $profile['film'] = array( t('Film/dance/culture/entertainment:'), $txt);
+		if ($txt = prepare_text($a->profile['film'])) {
+			$profile['film'] = array( t('Film/dance/culture/entertainment:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['romance'])) $profile['romance'] = array( t('Love/Romance:'), $txt);
+		if ($txt = prepare_text($a->profile['romance'])) {
+			$profile['romance'] = array( t('Love/Romance:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['work'])) $profile['work'] = array( t('Work/employment:'), $txt);
+		if ($txt = prepare_text($a->profile['work'])) {
+			$profile['work'] = array( t('Work/employment:'), $txt);
+		}
 
-		if($txt = prepare_text($a->profile['education'])) $profile['education'] = array( t('School/education:'), $txt );
-	
+		if ($txt = prepare_text($a->profile['education'])) {
+			$profile['education'] = array( t('School/education:'), $txt );
+		}
+
 		//show subcribed forum if it is enabled in the usersettings
 		if (feature_enabled($uid,'forumlist_profile')) {
 			$profile['forumlist'] = array( t('Forums:'), ForumManager::profile_advanced($uid));
@@ -705,11 +741,13 @@ function advanced_profile(&$a) {
 function profile_tabs($a, $is_owner=False, $nickname=Null){
 	//echo "<pre>"; var_dump($a->user); killme();
 
-	if (is_null($nickname))
+	if (is_null($nickname)) {
 		$nickname  = $a->user['nickname'];
+	}
 
-	if(x($_GET,'tab'))
+	if (x($_GET,'tab')) {
 		$tab = notags(trim($_GET['tab']));
+	}
 
 	$url = App::get_baseurl() . '/profile/' . $nickname;
 
@@ -807,7 +845,7 @@ function get_my_url() {
 	return false;
 }
 
-function zrl_init(&$a) {
+function zrl_init(App &$a) {
 	$tmp_str = get_my_url();
 	if(validate_url($tmp_str)) {
 

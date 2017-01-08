@@ -1,7 +1,7 @@
 <?php
 
 
-function fsuggest_post(&$a) {
+function fsuggest_post(App &$a) {
 
 	if (! local_user()) {
 		return;
@@ -71,7 +71,7 @@ function fsuggest_post(&$a) {
 
 
 
-function fsuggest_content(&$a) {
+function fsuggest_content(App &$a) {
 
 	require_once('include/acl_selectors.php');
 

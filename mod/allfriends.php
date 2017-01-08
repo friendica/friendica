@@ -5,7 +5,7 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function allfriends_content(&$a) {
+function allfriends_content(App &$a) {
 
 	$o = '';
 	if (! local_user()) {
@@ -21,14 +21,14 @@ function allfriends_content(&$a) {
 		return;
 	}
 
-	$uid = $a->user[uid];
+	$uid = $a->user['uid'];
 
 	$c = q("SELECT `name`, `url`, `photo` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 		intval($cid),
 		intval(local_user())
 	);
 
-	if (! count($c)) {
+	if (! dbm::is_result($c)) {
 		return;
 	}
 
@@ -71,20 +71,20 @@ function allfriends_content(&$a) {
 		}
 
 		$entry = array(
-			'url'		=> $rr['url'],
-			'itemurl'	=> (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
-			'name'		=> htmlentities($contact_details['name']),
-			'thumb'		=> proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
-			'img_hover'	=> htmlentities($contact_details['name']),
-			'details'	=> $contact_details['location'],
-			'tags'		=> $contact_details['keywords'],
-			'about'		=> $contact_details['about'],
-			'account_type'	=> account_type($contact_details),
-			'network'	=> network_to_name($contact_details['network'], $contact_details['url']),
-			'photo_menu'	=> $photo_menu,
-			'conntxt'	=> t('Connect'),
-			'connlnk'	=> $connlnk,
-			'id'		=> ++$id,
+			'url'          => $rr['url'],
+			'itemurl'      => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
+			'name'         => htmlentities($contact_details['name']),
+			'thumb'        => proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
+			'img_hover'    => htmlentities($contact_details['name']),
+			'details'      => $contact_details['location'],
+			'tags'         => $contact_details['keywords'],
+			'about'        => $contact_details['about'],
+			'account_type' => account_type($contact_details),
+			'network'      => network_to_name($contact_details['network'], $contact_details['url']),
+			'photo_menu'   => $photo_menu,
+			'conntxt'      => t('Connect'),
+			'connlnk'      => $connlnk,
+			'id'           => ++$id,
 		);
 		$entries[] = $entry;
 	}

@@ -1,8 +1,7 @@
 <?php
 require_once('include/NotificationsManager.php');
 
-
-function notify_init(&$a) {
+function notify_init(App &$a) {
 	if (! local_user()) {
 		return;
 	}
@@ -40,7 +39,7 @@ function notify_init(&$a) {
 
 }
 
-function notify_content(&$a) {
+function notify_content(App &$a) {
 	if (! local_user()) {
 		return login();
 	}

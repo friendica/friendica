@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="view/theme/frio/frameworks/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" type="text/css" media="screen"/>
 <link rel="stylesheet" href="view/theme/frio/frameworks/justifiedGallery/justifiedGallery.min.css" type="text/css" media="screen"/>
 <link rel="stylesheet" href="view/theme/frio/frameworks/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css" type="text/css" media="screen"/>
+<link rel="stylesheet" href="view/theme/frio/frameworks/bootstrap-toggle/css/bootstrap-toggle.min.css" type="text/css" media="screen"/>
 <link rel="stylesheet" href="view/theme/frio/font/open_sans/open-sans.css" type="text/css" media="screen"/>
 
 {{* The own style.css *}}

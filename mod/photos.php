@@ -10,7 +10,7 @@ require_once('include/tags.php');
 require_once('include/threads.php');
 require_once('include/Probe.php');
 
-function photos_init(&$a) {
+function photos_init(App &$a) {
 
 	if ($a->argc > 1)
 		auto_redir($a, $a->argv[1]);
@@ -112,7 +112,7 @@ function photos_init(&$a) {
 
 
 
-function photos_post(&$a) {
+function photos_post(App &$a) {
 
 	logger('mod-photos: photos_post: begin' , LOGGER_DEBUG);
 
@@ -353,7 +353,7 @@ function photos_post(&$a) {
 				dbesc($r[0]['resource-id']),
 				intval($page_owner_uid)
 			);
-			if (count($i)) {
+			if (dbm::is_result($i)) {
 				q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 					dbesc(datetime_convert()),
 					dbesc(datetime_convert()),
@@ -945,7 +945,7 @@ function photos_post(&$a) {
 
 
 
-function photos_content(&$a) {
+function photos_content(App &$a) {
 
 	// URLs:
 	// photos/name

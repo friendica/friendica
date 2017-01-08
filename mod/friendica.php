@@ -1,6 +1,6 @@
 <?php
 
-function friendica_init(&$a) {
+function friendica_init(App &$a) {
 	if ($a->argv[1]=="json"){
 		$register_policy = Array('REGISTER_CLOSED', 'REGISTER_APPROVE', 'REGISTER_OPEN');
 
@@ -59,7 +59,7 @@ function friendica_init(&$a) {
 
 
 
-function friendica_content(&$a) {
+function friendica_content(App &$a) {
 
 	$o = '';
 	$o .= '<h3>Friendica</h3>';

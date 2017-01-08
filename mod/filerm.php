@@ -1,6 +1,6 @@
 <?php
 
-function filerm_content(&$a) {
+function filerm_content(App &$a) {
 
 	if (! local_user()) {
 		killme();

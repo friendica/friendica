@@ -1,7 +1,7 @@
 <?php
 
 if(! function_exists('home_init')) {
-function home_init(&$a) {
+function home_init(App &$a) {
 
 	$ret = array();
 	call_hooks('home_init',$ret);
@@ -17,7 +17,7 @@ function home_init(&$a) {
 }}
 
 if(! function_exists('home_content')) {
-function home_content(&$a) {
+function home_content(App &$a) {
 
 	$o = '';
 

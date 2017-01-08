@@ -160,7 +160,7 @@
 							<li role="separator" class="divider"></li>
 							{{/if}}
 							{{if $nav.help}}
-							<li role="menuitem"><a id="nav-help-link" class="nav-link {{$nav.help.2}}" href="{{$nav.help.0}}" title="{{$nav.help.3}}" ><i class="fa fa-question-circle fa-fw"></i> {{$nav.help.3}}</a></li>
+							<li role="menuitem"><a id="nav-help-link" class="nav-link {{$nav.help.2}}" href="{{$nav.help.0}}" title="{{$nav.help.3}}" ><i class="fa fa-question-circle fa-fw"></i> {{$nav.help.1}}</a></li>
 							{{/if}}
 							{{if $nav.settings}}
 							<li role="menuitem"><a id="nav-settings-link" class="nav-link {{$nav.settings.2}}" href="{{$nav.settings.0}}" title="{{$nav.settings.3}}"><i class="fa fa-cog fa-fw"></i> {{$nav.settings.1}}</a></li>

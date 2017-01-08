@@ -9,7 +9,7 @@
 
 require_once('include/email.php');
 
-function invite_post(&$a) {
+function invite_post(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -97,7 +97,7 @@ function invite_post(&$a) {
 }
 
 
-function invite_content(&$a) {
+function invite_content(App &$a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -120,7 +120,7 @@ function invite_content(&$a) {
 	if (strlen($dirloc)) {
 		if ($a->config['register_policy'] == REGISTER_CLOSED) {
 			$linktxt = sprintf( t('Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks.'), $dirloc . '/siteinfo');
-		} elseif($a->config['register_policy'] != REGISTER_CLOSED) {
+		} elseif ($a->config['register_policy'] != REGISTER_CLOSED) {
 			$linktxt = sprintf( t('To accept this invitation, please visit and register at %s or any other public Friendica website.'), App::get_baseurl())
 			. "\r\n" . "\r\n" . sprintf( t('Friendica sites all inter-connect to create a huge privacy-enhanced social web that is owned and controlled by its members. They can also connect with many traditional social networks. See %s for a list of alternate Friendica sites you can join.'),$dirloc . '/siteinfo');
 		}

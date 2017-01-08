@@ -13,6 +13,7 @@
 								class="{{if $group.selected}}ticked{{else}}unticked {{/if}} action"
 								onclick="contactgroupChangeMember('{{$group.id}}','{{$group.cid}}');return true;"
 								{{if $group.ismember}}checked="checked"{{/if}}
+								aria-checked="{{if $group.ismember}}true{{else}}false{{/if}}"
 							/>
 							<label for="group-{{$group.id}}"></label>
 							<div class="clearfix"></div>

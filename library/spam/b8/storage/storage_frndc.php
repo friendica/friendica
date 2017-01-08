@@ -123,15 +123,17 @@ class b8_storage_frndc extends b8_storage_base
 	function __destruct()
 	{
 
-		if($this->_connection === NULL)
+		if ($this->_connection === NULL) {
 			return;
+		}
 
-		# Commit any changes before closing
+		// Commit any changes before closing
 		$this->_commit();
 
-		# Just close the connection if no link-resource was passed and b8 created it's own connection
-		if($this->config['connection'] === NULL)
+		// Just close the connection if no link-resource was passed and b8 created it's own connection
+		if ($this->config['connection'] === NULL) {
 			mysql_close($this->_connection);
+		}
 
 		$this->connected = FALSE;
 
@@ -163,9 +165,8 @@ class b8_storage_frndc extends b8_storage_base
 	protected function _get_query($tokens, $uid)
 	{
 
-		# Construct the query ...
-
-		if(count($tokens) > 0) {
+		// Construct the query ...
+		if (count($tokens) > 0) {
 
 			$where = array();
 
@@ -175,42 +176,42 @@ class b8_storage_frndc extends b8_storage_base
 			}
 
 			$where = 'term IN ("' . implode('", "', $where) . '")';
-		}
-
-		else {
+		} else {
 			$token = dbesc($token);
 			$where = 'term = "' . $token . '"';
 		}
 
-		# ... and fetch the data
+		// ... and fetch the data
 
-		$result = q('
-			SELECT * FROM spam WHERE ' . $where . ' AND uid = ' . $uid );
+		$result = q('SELECT * FROM `spam` WHERE ' . $where . ' AND `uid` = ' . $uid );
 
 
 		$returned_tokens = array();
-		if(count($result)) {
-			foreach($result as $rr)
+		if (dbm::is_result($result)) {
+			foreach ($result as $rr) {
 				$returned_tokens[] = $rr['term'];
+			}
 		}
 		$to_create = array();
 
-		if(count($tokens) > 0) {
+		if (count($tokens) > 0) {
 			foreach($tokens as $token)
 				if(! in_array($token,$returned_tokens))
 					$to_create[] = str_tolower($token); 
 		}
-		if(count($to_create)) {
+		if (count($to_create)) {
 			$sql = '';
-			foreach($to_create as $term) {
-				if(strlen($sql))
+			foreach ($to_create as $term) {
+				if (strlen($sql)) {
 					$sql .= ',';
-				$sql .= sprintf("(term,datetime,uid) values('%s','%s',%d)",
-					dbesc(str_tolower($term))
+				}
+				$sql .= sprintf("(`term`,`datetime`,`uid`) VALUES('%s','%s',%d)",
+					dbesc(str_tolower($term)),
 					dbesc(datetime_convert()),
 					intval($uid)
 				);
-			q("insert into spam " . $sql);
+			}
+			q("INSERT INTO `spam` " . $sql);
 		}
 
 		return $result;
@@ -225,7 +226,6 @@ class b8_storage_frndc extends b8_storage_base
 	 * @param string $count
 	 * @return void
 	 */
-
 	protected function _put($token, $count, $uid) {
 		$token = dbesc($token);
 		$count = dbesc($count);
@@ -241,7 +241,6 @@ class b8_storage_frndc extends b8_storage_base
 	 * @param string $count
 	 * @return void
 	 */
-
 	protected function _update($token, $count, $uid)
 	{
 		$token = dbesc($token);
@@ -257,7 +256,6 @@ class b8_storage_frndc extends b8_storage_base
 	 * @param string $token
 	 * @return void
 	 */
-
 	protected function _del($token, $uid)
 	{
 		$token = dbesc($token);
@@ -272,7 +270,6 @@ class b8_storage_frndc extends b8_storage_base
 	 * @access protected
 	 * @return void
 	 */
-
 	protected function _commit($uid)
 	{
 
@@ -314,5 +311,3 @@ class b8_storage_frndc extends b8_storage_base
 	}
 
 }
-
-?>

@@ -213,7 +213,7 @@ function poller_max_connections_reached() {
 	// The processlist only shows entries of the current user
 	if ($max != 0) {
 		$r = q("SHOW PROCESSLIST");
-		if (!$r)
+		if (!dbm::is_result($r))
 			return false;
 
 		$used = count($r);

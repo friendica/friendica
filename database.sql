@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 3.5.1-dev (Asparagus)
--- DB_UPDATE_VERSION 1210
+-- DB_UPDATE_VERSION 1211
 -- ------------------------------------------
 
 
@@ -212,6 +212,7 @@ CREATE TABLE IF NOT EXISTS `deliverq` (
 --
 CREATE TABLE IF NOT EXISTS `event` (
 	`id` int(11) NOT NULL auto_increment,
+	`guid` varchar(255) NOT NULL DEFAULT '',
 	`uid` int(11) NOT NULL DEFAULT 0,
 	`cid` int(11) NOT NULL DEFAULT 0,
 	`uri` varchar(255) NOT NULL DEFAULT '',

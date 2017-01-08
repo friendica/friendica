@@ -112,8 +112,9 @@ function do_like($item_id, $verb) {
 			intval($_SESSION['visitor_id']),
 			intval($owner_uid)
 		);
-		if (dbm::is_result($r))
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
+		}
 	}
 	if (! $contact) {
 		return false;

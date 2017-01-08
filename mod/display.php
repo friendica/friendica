@@ -1,6 +1,6 @@
 <?php
 
-function display_init(&$a) {
+function display_init(App &$a) {
 
 	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		return;

@@ -1,5 +1,5 @@
 <?php
-    function opensearch_content(&$a) {
+    function opensearch_content(App &$a) {
     	
 		$tpl = get_markup_template('opensearch.tpl');
 	

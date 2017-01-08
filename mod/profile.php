@@ -4,7 +4,7 @@ require_once('include/contact_widgets.php');
 require_once('include/redir.php');
 
 
-function profile_init(&$a) {
+function profile_init(App &$a) {
 
 	if(! x($a->page,'aside'))
 		$a->page['aside'] = '';
@@ -41,14 +41,15 @@ function profile_init(&$a) {
 	if((x($a->profile,'page-flags')) && ($a->profile['page-flags'] == PAGE_COMMUNITY)) {
 		$a->page['htmlhead'] .= '<meta name="friendica.community" content="true" />';
 	}
-	if(x($a->profile,'openidserver'))
+	if (x($a->profile,'openidserver')) {
 		$a->page['htmlhead'] .= '<link rel="openid.server" href="' . $a->profile['openidserver'] . '" />' . "\r\n";
-	if(x($a->profile,'openid')) {
+	}
+	if (x($a->profile,'openid')) {
 		$delegate = ((strstr($a->profile['openid'],'://')) ? $a->profile['openid'] : 'https://' . $a->profile['openid']);
 		$a->page['htmlhead'] .= '<link rel="openid.delegate" href="' . $delegate . '" />' . "\r\n";
 	}
 	// site block
-	if((! $blocked) && (! $userblock)) {
+	if ((! $blocked) && (! $userblock)) {
 		$keywords = ((x($a->profile,'pub_keywords')) ? $a->profile['pub_keywords'] : '');
 		$keywords = str_replace(array('#',',',' ',',,'),array('',' ',',',','),$keywords);
 		if(strlen($keywords))
@@ -74,24 +75,25 @@ function profile_content(&$a, $update = 0) {
 
 	$category = $datequery = $datequery2 = '';
 
-	if($a->argc > 2) {
-		for($x = 2; $x < $a->argc; $x ++) {
-			if(is_a_date_arg($a->argv[$x])) {
-				if($datequery)
+	if ($a->argc > 2) {
+		for ($x = 2; $x < $a->argc; $x ++) {
+			if (is_a_date_arg($a->argv[$x])) {
+				if ($datequery) {
 					$datequery2 = escape_tags($a->argv[$x]);
-				else
+				} else {
 					$datequery = escape_tags($a->argv[$x]);
-			}
-			else
+				}
+			} else {
 				$category = $a->argv[$x];
+			}
 		}
 	}
 
-	if(! x($category)) {
+	if (! x($category)) {
 		$category = ((x($_GET,'category')) ? $_GET['category'] : '');
 	}
 
-	if(get_config('system','block_public') && (! local_user()) && (! remote_user())) {
+	if (get_config('system','block_public') && (! local_user()) && (! remote_user())) {
 		return login();
 	}
 
@@ -106,32 +108,28 @@ function profile_content(&$a, $update = 0) {
 	$tab = 'posts';
 	$o = '';
 
-	if($update) {
+	if ($update) {
 		// Ensure we've got a profile owner if updating.
 		$a->profile['profile_uid'] = $update;
+	} elseif ($a->profile['profile_uid'] == local_user()) {
+		nav_set_selected('home');
 	}
-	else {
-		if($a->profile['profile_uid'] == local_user()) {
-			nav_set_selected('home');
-		}
-	}
-
 
 	$contact = null;
 	$remote_contact = false;
 
 	$contact_id = 0;
 
-	if(is_array($_SESSION['remote'])) {
-		foreach($_SESSION['remote'] as $v) {
-			if($v['uid'] == $a->profile['profile_uid']) {
+	if (is_array($_SESSION['remote'])) {
+		foreach ($_SESSION['remote'] as $v) {
+			if ($v['uid'] == $a->profile['profile_uid']) {
 				$contact_id = $v['cid'];
 				break;
 			}
 		}
 	}
 
-	if($contact_id) {
+	if ($contact_id) {
 		$groups = init_groups_visitor($contact_id);
 		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($contact_id),
@@ -143,8 +141,8 @@ function profile_content(&$a, $update = 0) {
 		}
 	}
 
-	if(! $remote_contact) {
-		if(local_user()) {
+	if (! $remote_contact) {
+		if (local_user()) {
 			$contact_id = $_SESSION['cid'];
 			$contact = $a->contact;
 		}
@@ -152,32 +150,29 @@ function profile_content(&$a, $update = 0) {
 
 	$is_owner = ((local_user()) && (local_user() == $a->profile['profile_uid']) ? true : false);
 
-	if($a->profile['hidewall'] && (! $is_owner) && (! $remote_contact)) {
+	if ($a->profile['hidewall'] && (! $is_owner) && (! $remote_contact)) {
 		notice( t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
 
-	if(! $update) {
-
-
-		if(x($_GET,'tab'))
+	if (! $update) {
+		if (x($_GET,'tab')) {
 			$tab = notags(trim($_GET['tab']));
+		}
 
 		$o.=profile_tabs($a, $is_owner, $a->profile['nickname']);
 
-
-		if($tab === 'profile') {
+		if ($tab === 'profile') {
 			$o .= advanced_profile($a);
 			call_hooks('profile_advanced',$o);
 			return $o;
 		}
 
-
 		$o .= common_friends_visitor_widget($a->profile['profile_uid']);
 
-
-		if(x($_SESSION,'new_member') && $_SESSION['new_member'] && $is_owner)
+		if (x($_SESSION,'new_member') && $_SESSION['new_member'] && $is_owner) {
 			$o .= '<a href="newmember" id="newmember-tips" style="font-size: 1.2em;"><b>' . t('Tips for New Members') . '</b></a>' . EOL;
+		}
 
 		$commpage = (($a->profile['page-flags'] == PAGE_COMMUNITY) ? true : false);
 		$commvisitor = (($commpage && $remote_contact == true) ? true : false);
@@ -185,7 +180,7 @@ function profile_content(&$a, $update = 0) {
 		$a->page['aside'] .= posted_date_widget(App::get_baseurl(true) . '/profile/' . $a->profile['nickname'],$a->profile['profile_uid'],true);
 		$a->page['aside'] .= categories_widget(App::get_baseurl(true) . '/profile/' . $a->profile['nickname'],(x($category) ? xmlify($category) : ''));
 
-		if(can_write_wall($a,$a->profile['profile_uid'])) {
+		if (can_write_wall($a,$a->profile['profile_uid'])) {
 
 			$x = array(
 				'is_owner' => $is_owner,
@@ -204,18 +199,16 @@ function profile_content(&$a, $update = 0) {
 
 		$o .= status_editor($a,$x);
 		}
-
 	}
 
 
 	/**
 	 * Get permissions SQL - if $remote_contact is true, our remote user has been pre-verified and we already have fetched his/her groups
 	 */
-
 	$sql_extra = item_permissions_sql($a->profile['profile_uid'],$remote_contact,$groups);
 
 
-	if($update) {
+	if ($update) {
 
 		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`
 			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
@@ -234,16 +227,16 @@ function profile_content(&$a, $update = 0) {
 	} else {
 		$sql_post_table = "";
 
-		if(x($category)) {
+		if (x($category)) {
 			$sql_post_table = sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
 				dbesc(protect_sprintf($category)), intval(TERM_OBJ_POST), intval(TERM_CATEGORY), intval($a->profile['profile_uid']));
 			//$sql_extra .= protect_sprintf(file_tag_file_query('item',$category,'category'));
 		}
 
-		if($datequery) {
+		if ($datequery) {
 			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` <= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery))));
 		}
-		if($datequery2) {
+		if ($datequery2) {
 			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` >= '%s' ", dbesc(datetime_convert(date_default_timezone_get(),'',$datequery2))));
 		}
 

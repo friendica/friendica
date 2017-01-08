@@ -129,7 +129,7 @@ function reload_plugins() {
  */
 function plugin_enabled($plugin) {
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1 AND `name` = '%s'", $plugin);
-	return((bool)(count($r) > 0));
+	return ((dbm::is_result($r)) && (count($r) > 0));
 }
 
 
@@ -413,7 +413,7 @@ function get_theme_info($theme){
 function get_theme_screenshot($theme) {
 	$exts = array('.png','.jpg');
 	foreach($exts as $ext) {
-		if(file_exists('view/theme/' . $theme . '/screenshot' . $ext)) {
+		if (file_exists('view/theme/' . $theme . '/screenshot' . $ext)) {
 			return(App::get_baseurl() . '/view/theme/' . $theme . '/screenshot' . $ext);
 		}
 	}
@@ -425,8 +425,8 @@ if (! function_exists('uninstall_theme')){
 function uninstall_theme($theme){
 	logger("Addons: uninstalling theme " . $theme);
 
-	@include_once("view/theme/$theme/theme.php");
-	if(function_exists("{$theme}_uninstall")) {
+	include_once("view/theme/$theme/theme.php");
+	if (function_exists("{$theme}_uninstall")) {
 		$func = "{$theme}_uninstall";
 		$func();
 	}
@@ -436,19 +436,19 @@ if (! function_exists('install_theme')){
 function install_theme($theme) {
 	// silently fail if theme was removed
 
-	if(! file_exists("view/theme/$theme/theme.php"))
+	if (! file_exists("view/theme/$theme/theme.php")) {
 		return false;
+	}
 
 	logger("Addons: installing theme $theme");
 
-	@include_once("view/theme/$theme/theme.php");
+	include_once("view/theme/$theme/theme.php");
 
-	if(function_exists("{$theme}_install")) {
+	if (function_exists("{$theme}_install")) {
 		$func = "{$theme}_install";
 		$func();
 		return true;
-	}
-	else {
+	} else {
 		logger("Addons: FAILED installing theme $theme");
 		return false;
 	}
@@ -467,10 +467,9 @@ function install_theme($theme) {
 
 function service_class_allows($uid,$property,$usage = false) {
 
-	if($uid == local_user()) {
+	if ($uid == local_user()) {
 		$service_class = $a->user['service_class'];
-	}
-	else {
+	} else {
 		$r = q("SELECT `service_class` FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($uid)
 		);
@@ -478,18 +477,23 @@ function service_class_allows($uid,$property,$usage = false) {
 			$service_class = $r[0]['service_class'];
 		}
 	}
-	if(! x($service_class))
-		return true; // everything is allowed
+
+	if (! x($service_class)) {
+		// everything is allowed
+		return true;
+	}
 
 	$arr = get_config('service_class',$service_class);
-	if(! is_array($arr) || (! count($arr)))
+	if (! is_array($arr) || (! count($arr))) {
 		return true;
+	}
 
-	if($usage === false)
+	if ($usage === false) {
 		return ((x($arr[$property])) ? (bool) $arr['property'] : true);
-	else {
-		if(! array_key_exists($property,$arr))
+	} else {
+		if (! array_key_exists($property,$arr)) {
 			return true;
+		}
 		return (((intval($usage)) < intval($arr[$property])) ? true : false);
 	}
 }
@@ -497,10 +501,9 @@ function service_class_allows($uid,$property,$usage = false) {
 
 function service_class_fetch($uid,$property) {
 
-	if($uid == local_user()) {
+	if ($uid == local_user()) {
 		$service_class = $a->user['service_class'];
-	}
-	else {
+	} else {
 		$r = q("SELECT `service_class` FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($uid)
 		);

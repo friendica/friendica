@@ -23,7 +23,7 @@ require_once("include/text.php");
  * @param App $a
  *
  */
-function admin_post(&$a){
+function admin_post(App &$a){
 
 
 	if(!is_site_admin()) {
@@ -127,7 +127,7 @@ function admin_post(&$a){
  * @param App $a
  * @return string
  */
-function admin_content(&$a) {
+function admin_content(App &$a) {
 
 	if(!is_site_admin()) {
 		return login(false);
@@ -260,7 +260,7 @@ function admin_content(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_federation(&$a) {
+function admin_page_federation(App &$a) {
 	// get counts on active friendica, diaspora, redmatrix, hubzilla, gnu
 	// social and statusnet nodes this node is knowing
 	//
@@ -393,7 +393,7 @@ function admin_page_federation(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_queue(&$a) {
+function admin_page_queue(App &$a) {
 	// get content from the queue table
 	$r = q("SELECT `c`.`name`, `c`.`nurl`, `q`.`id`, `q`.`network`, `q`.`created`, `q`.`last`
 			FROM `queue` AS `q`, `contact` AS `c`
@@ -427,7 +427,7 @@ function admin_page_queue(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_summary(&$a) {
+function admin_page_summary(App &$a) {
 	global $db;
 	// are there MyISAM tables in the DB? If so, trigger a warning message
 	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1",
@@ -504,7 +504,7 @@ function admin_page_summary(&$a) {
  * 
  * @param App $a
  */
-function admin_page_site_post(&$a) {
+function admin_page_site_post(App &$a) {
 	if(!x($_POST,"page_site")) {
 		return;
 	}
@@ -845,7 +845,7 @@ function admin_page_site_post(&$a) {
  * @param  App $a
  * @return string
  */
-function admin_page_site(&$a) {
+function admin_page_site(App &$a) {
 
 	/* Installed langs */
 	$lang_choices = get_available_languages();
@@ -1072,7 +1072,7 @@ function admin_page_site(&$a) {
  * @param App $a
  * @return string
  **/
-function admin_page_dbsync(&$a) {
+function admin_page_dbsync(App &$a) {
 
 	$o = '';
 
@@ -1155,22 +1155,22 @@ function admin_page_dbsync(&$a) {
  * 
  * @param App $a
  */
-function admin_page_users_post(&$a){
-	$pending     =	(x($_POST, 'pending')           ? $_POST['pending']           : array());
-	$users       =	(x($_POST, 'user')              ? $_POST['user']		      : array());
-	$nu_name     =	(x($_POST, 'new_user_name')     ? $_POST['new_user_name']     : '');
-	$nu_nickname =	(x($_POST, 'new_user_nickname') ? $_POST['new_user_nickname'] : '');
-	$nu_email    =	(x($_POST, 'new_user_email')    ? $_POST['new_user_email']    : '');
+function admin_page_users_post(App &$a){
+	$pending     = (x($_POST, 'pending')           ? $_POST['pending']           : array());
+	$users       = (x($_POST, 'user')              ? $_POST['user']		      : array());
+	$nu_name     = (x($_POST, 'new_user_name')     ? $_POST['new_user_name']     : '');
+	$nu_nickname = (x($_POST, 'new_user_nickname') ? $_POST['new_user_nickname'] : '');
+	$nu_email    = (x($_POST, 'new_user_email')    ? $_POST['new_user_email']    : '');
 	$nu_language = get_config('system', 'language');
 
 	check_form_security_token_redirectOnErr('/admin/users', 'admin_users');
 
-	if(!($nu_name==="") && !($nu_email==="") && !($nu_nickname==="")) {
+	if (!($nu_name==="") && !($nu_email==="") && !($nu_nickname==="")) {
 		require_once('include/user.php');
 
 		$result = create_user(array('username'=>$nu_name, 'email'=>$nu_email, 
 			'nickname'=>$nu_nickname, 'verified'=>1, 'language'=>$nu_language));
-		if(! $result['success']) {
+		if (! $result['success']) {
 			notice($result['message']);
 			return;
 		}
@@ -1260,7 +1260,7 @@ function admin_page_users_post(&$a){
  * @param App $a
  * @return string
  */
-function admin_page_users(&$a){
+function admin_page_users(App &$a){
 	if($a->argc>2) {
 		$uid = $a->argv[3];
 		$user = q("SELECT `username`, `blocked` FROM `user` WHERE `uid` = %d", intval($uid));
@@ -1460,7 +1460,7 @@ function admin_page_users(&$a){
  * @param App $a
  * @return string
  */
-function admin_page_plugins(&$a){
+function admin_page_plugins(App &$a){
 
 	/*
 	 * Single plugin
@@ -1669,7 +1669,7 @@ function rebuild_theme_table($themes) {
  * @param App $a
  * @return string
  */
-function admin_page_themes(&$a){
+function admin_page_themes(App &$a){
 
 	$allowed_themes_str = get_config('system','allowed_themes');
 	$allowed_themes_raw = explode(',',$allowed_themes_str);
@@ -1850,13 +1850,13 @@ function admin_page_themes(&$a){
  * 
  * @param App $a
  */
-function admin_page_logs_post(&$a) {
-	if(x($_POST,"page_logs")) {
+function admin_page_logs_post(App &$a) {
+	if (x($_POST,"page_logs")) {
 		check_form_security_token_redirectOnErr('/admin/logs', 'admin_logs');
 
-		$logfile 	=	((x($_POST,'logfile'))		? notags(trim($_POST['logfile']))	: '');
-		$debugging	=	((x($_POST,'debugging'))	? true					: false);
-		$loglevel 	=	((x($_POST,'loglevel'))		? intval(trim($_POST['loglevel']))	: 0);
+		$logfile   = ((x($_POST,'logfile'))   ? notags(trim($_POST['logfile']))  : '');
+		$debugging = ((x($_POST,'debugging')) ? true                             : false);
+		$loglevel  = ((x($_POST,'loglevel'))  ? intval(trim($_POST['loglevel'])) : 0);
 
 		set_config('system','logfile', $logfile);
 		set_config('system','debugging',  $debugging);
@@ -1884,7 +1884,7 @@ function admin_page_logs_post(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_logs(&$a){
+function admin_page_logs(App &$a){
 
 	$log_choices = array(
 		LOGGER_NORMAL	=> 'Normal',
@@ -1941,7 +1941,7 @@ function admin_page_logs(&$a){
  * @param App $a
  * @return string
  */
-function admin_page_viewlogs(&$a){
+function admin_page_viewlogs(App &$a){
 	$t = get_markup_template("admin_viewlogs.tpl");
 	$f = get_config('system','logfile');
 	$data = '';
@@ -1983,7 +1983,7 @@ function admin_page_viewlogs(&$a){
  * 
  * @param App $a
  */
-function admin_page_features_post(&$a) {
+function admin_page_features_post(App &$a) {
 
 	check_form_security_token_redirectOnErr('/admin/features', 'admin_manage_features');
 
@@ -2029,7 +2029,7 @@ function admin_page_features_post(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_features(&$a) {
+function admin_page_features(App &$a) {
 	
 	if((argc() > 1) && (argv(1) === 'features')) {
 		$arr = array();

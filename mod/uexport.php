@@ -1,6 +1,6 @@
 <?php
 
-function uexport_init(&$a){
+function uexport_init(App &$a){
 	if (! local_user()) {
 		killme();
 	}
@@ -9,7 +9,8 @@ function uexport_init(&$a){
 	settings_init($a);
 }
 
-function uexport_content(&$a){
+/// @TODO Change space -> tab where wanted
+function uexport_content(App &$a){
 
     if ($a->argc > 1) {
         header("Content-type: application/json");
@@ -123,7 +124,7 @@ function uexport_account($a){
 /**
  * echoes account data and items as separated json, one per line
  */
-function uexport_all(&$a) {
+function uexport_all(App &$a) {
 
 	uexport_account($a);
 	echo "\n";

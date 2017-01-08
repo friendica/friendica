@@ -9,14 +9,14 @@
  * Maintainer: Zach P <techcity@f.shmuz.in>
  */
 
-function frost_init(&$a) {
+function frost_init(App &$a) {
 	$a->videowidth = 400;
 	$a->videoheight = 330;
 	$a->theme_thread_allow = false;
 	set_template_engine($a, 'smarty3');
 }
 
-function frost_content_loaded(&$a) {
+function frost_content_loaded(App &$a) {
 
 	// I could do this in style.php, but by having the CSS in a file the browser will cache it,
 	// making pages load faster

@@ -264,7 +264,7 @@ function cron_poll_contacts($argc, $argv) {
 			intval($c['id'])
 		);
 
-		if((! $res) || (! count($res)))
+		if (dbm::is_result($res))
 			continue;
 
 		foreach($res as $contact) {
@@ -343,7 +343,7 @@ function cron_poll_contacts($argc, $argv) {
  *
  * @param App $a
  */
-function cron_clear_cache(&$a) {
+function cron_clear_cache(App &$a) {
 
 	$last = get_config('system','cache_last_cleared');
 
@@ -430,7 +430,7 @@ function cron_clear_cache(&$a) {
  *
  * @param App $a
  */
-function cron_repair_diaspora(&$a) {
+function cron_repair_diaspora(App &$a) {
 	$r = q("SELECT `id`, `url` FROM `contact`
 		WHERE `network` = '%s' AND (`batch` = '' OR `notify` = '' OR `poll` = '' OR pubkey = '')
 			ORDER BY RAND() LIMIT 50", dbesc(NETWORK_DIASPORA));

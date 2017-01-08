@@ -9,7 +9,7 @@
  * Maintainer: Zach P <techcity@f.shmuz.in>
  */
 
-function frost_mobile_init(&$a) {
+function frost_mobile_init(App &$a) {
 	$a->sourcename = 'Friendica mobile web';
 	$a->videowidth = 250;
 	$a->videoheight = 200;
@@ -18,7 +18,7 @@ function frost_mobile_init(&$a) {
 	set_template_engine($a, 'smarty3');
 }
 
-function frost_mobile_content_loaded(&$a) {
+function frost_mobile_content_loaded(App &$a) {
 
 	// I could do this in style.php, but by having the CSS in a file the browser will cache it,
 	// making pages load faster

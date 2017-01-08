@@ -3,7 +3,7 @@
 require_once('include/attach.php');
 require_once('include/datetime.php');
 
-function wall_attach_post(&$a) {
+function wall_attach_post(App &$a) {
 
 	$r_json = (x($_GET,'response') && $_GET['response']=='json');
 

@@ -220,8 +220,9 @@ function poco_check($profile_url, $name, $network, $profile_photo, $about, $loca
 	$r = q("SELECT `network` FROM `contact` WHERE `nurl` = '%s' AND `network` != '' AND `network` != '%s' LIMIT 1",
 		dbesc(normalise_link($profile_url)), dbesc(NETWORK_STATUSNET)
 	);
-	if (dbm::is_result($r))
+	if (dbm::is_result($r)) {
 		$network = $r[0]["network"];
+	}
 
 	if (($network == "") OR ($network == NETWORK_OSTATUS)) {
 		$r = q("SELECT `network`, `url` FROM `contact` WHERE `alias` IN ('%s', '%s') AND `network` != '' AND `network` != '%s' LIMIT 1",
@@ -1575,7 +1576,7 @@ function get_gcontact_id($contact) {
 		proc_run(PRIORITY_LOW, 'include/gprobe.php', bin2hex($contact["url"]));
 	}
 
-	if ((count($r) > 1) AND ($gcontact_id > 0) AND ($contact["url"] != ""))
+	if ((dbm::is_result($r)) AND (count($r) > 1) AND ($gcontact_id > 0) AND ($contact["url"] != ""))
 	 q("DELETE FROM `gcontact` WHERE `nurl` = '%s' AND `id` != %d",
 		dbesc(normalise_link($contact["url"])),
 		intval($gcontact_id));

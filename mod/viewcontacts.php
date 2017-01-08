@@ -2,7 +2,7 @@
 require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 
-function viewcontacts_init(&$a) {
+function viewcontacts_init(App &$a) {
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		return;
@@ -29,7 +29,7 @@ function viewcontacts_init(&$a) {
 }
 
 
-function viewcontacts_content(&$a) {
+function viewcontacts_content(App &$a) {
 	require_once("mod/proxy.php");
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
