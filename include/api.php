@@ -1553,7 +1553,7 @@ function api_statuses_show($type){
 		intval($id)
 	);
 
-	if (!$r) {
+	if (!dbm::is_result($r)) {
 		throw new HTTP\BadRequestException("There is no status with this id.");
 	}
 
@@ -1923,7 +1923,7 @@ function api_favorites_create_destroy($type){
 	$item = q("SELECT * FROM item WHERE id=%d AND uid=%d",
 			$itemid, api_user());
 
-	if ($item===false || count($item)==0)
+	if (!dbm::is_result($item))
 		throw new HTTP\BadRequestException("Invalid item.");
 
 	switch($action){
@@ -1942,7 +1942,7 @@ function api_favorites_create_destroy($type){
 	q("UPDATE thread SET starred=%d WHERE iid=%d AND uid=%d",
 		$item[0]['starred'], $itemid, api_user());
 
-	if ($r===false)
+	if (!dbm::is_result($r))
 		throw InternalServerErrorException("DB error");
 
 
@@ -2785,7 +2785,7 @@ function api_direct_messages_new($type) {
 
 	if (api_user()===false) throw new HTTP\ForbiddenException();
 
-	if (!x($_POST, "text") OR (!x($_POST,"screen_name") AND !x($_POST,"user_id"))) return;
+	if (!x($_POST, "text") || (!x($_POST,"screen_name") && !x($_POST,"user_id"))) return;
 
 	$sender = api_get_user($a);
 
@@ -3069,7 +3069,7 @@ function api_fr_photos_list($type) {
 	'image/gif' => 'gif'
 	);
 	$data = array('photo'=>array());
-	if ($r) {
+	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			$photo = array();
 			$photo['id'] = $rr['resource-id'];
@@ -3112,7 +3112,7 @@ function api_fr_photo_detail($type) {
 	'image/gif' => 'gif'
 	);
 
-	if ($r) {
+	if (dbm::is_result($r)) {
 		$data = array('photo' => $r[0]);
 		$data['photo']['id'] = $data['photo']['resource-id'];
 		if ($scale !== false) {
@@ -3308,13 +3308,13 @@ function api_get_nick($profile) {
 
 	$r = q("SELECT `nick` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s'",
 		dbesc(normalise_link($profile)));
-	if ($r)
+	if (dbm::is_result($r))
 		$nick = $r[0]["nick"];
 
 	if (!$nick == "") {
 		$r = q("SELECT `nick` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s'",
 			dbesc(normalise_link($profile)));
-		if ($r)
+		if (dbm::is_result($r))
 			$nick = $r[0]["nick"];
 	}
 
@@ -3591,7 +3591,7 @@ function api_friendica_group_delete($type) {
 		intval($gid),
 		dbesc($name));
 	// error message if specified gid is not in database
-	if (count($rname) == 0)
+	if (!dbm::is_result($rname))
 		throw new HTTP\BadRequestException('wrong group name');
 
 	// delete group
@@ -3822,7 +3822,7 @@ function api_friendica_notification_seen($type){
 			intval($note['iid']),
 			intval(local_user())
 		);
-		if ($r!==false) {
+		if (dbm::is_result($r)) {
 			// we found the item, return it to the user
 			$user_info = api_get_user($a);
 			$ret = api_format_items($r,$user_info, false, $type);
@@ -3874,7 +3874,7 @@ function api_friendica_direct_messages_setseen($type){
 		intval($id),
 		intval($uid));
 
-	if ($result) {
+	if (dbm::is_result($result)) {
 		// return success
 		$answer = array('result' => 'ok', 'message' => 'message set to seen');
 		return api_format_data("direct_message_setseen", $type, array('$result' => $answer));
