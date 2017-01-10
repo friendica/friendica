@@ -27,6 +27,10 @@ a.btn, a.btn:hover {
   background-color: #2d2d2d;
 }
 
+.overline {
+	text-decoration: overline;
+}
+
 /* List of social Networks */
 img.connector, img.connector-disabled {
   height: 40px;
@@ -115,6 +119,7 @@ span.connector {
 
 .embed_rich {
   display: block;
+  transition: height .75s;
 }
 
 /* Shared Messages */
@@ -360,15 +365,15 @@ a {
   color: #00a700;
 }
 .federation-graph {
-  width: 400px; 
-  height: 400px; 
-  float: right; 
+  width: 400px;
+  height: 400px;
+  float: right;
   margin: 20px;
 }
 .federation-network-graph {
-  width: 240px; 
-  height: 240px; 
-  float: left; 
+  width: 240px;
+  height: 240px;
+  float: left;
   margin: 20px;
 }
 ul.federation-stats,
@@ -424,7 +429,7 @@ td.federation-data {
 }
 
 .p-addr {
-  clear: both;	
+  clear: both;
 }
 
 #live-community {
@@ -454,3 +459,32 @@ td.federation-data {
   display: none;
   margin: 10px 0;
 }
+
+/* settings page */
+#settings-form .pageflags {
+    margin: 0 0 20px 30px;
+}
+
+/* admin pending user notes */
+td.pendingnote {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+td.pendingnote > p > span {
+	font-weight: bold;
+}
+
+/* warning message */
+.warning-message {
+	padding: 10px;
+	margin: 5px;
+	border-left: 5px solid #f00;
+	font-weight: bold;
+}
+
+/* src/href attributes filter error display */
+.invalid-src { border: 1px dotted red;}
+.invalid-href { border-bottom: 1px dotted red;}
+.invalid-src:after,
+.invalid-href:after { content: '⚠️'}
+img.invalid-src:after { vertical-align: top;}

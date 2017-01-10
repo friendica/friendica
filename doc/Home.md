@@ -7,11 +7,11 @@ Friendica Documentation and Resources
 	* [Account Basics](help/Account-Basics)
 	* [New User Quick Start](help/Quick-Start-guide)
 	* [Creating posts](help/Text_editor)
-        * [BBCode tag reference](help/BBCode)
+	* [BBCode tag reference](help/BBCode)
 	* [Comment, sort and delete posts](help/Text_comment)
 	* [Profiles](help/Profiles)
 	* [Accesskey reference](help/Accesskeys)
-    * [Events](help/events)
+	* [Events](help/events)
 * You and other users
 	* [Connectors](help/Connectors)
 	* [Making Friends](help/Making-Friends)
@@ -20,7 +20,6 @@ Friendica Documentation and Resources
 	* [Community Forums](help/Forums)
 	* [Chats](help/Chats)
 * Further information
-	* [Improve Performance](help/Improve-Performance)
 	* [Move your account](help/Move-Account)
 	* [Delete your account](help/Remove-Account)
 	* [Frequently asked questions (FAQ)](help/FAQ)
@@ -31,10 +30,9 @@ Friendica Documentation and Resources
 * [Settings & Admin Panel](help/Settings)
 * [Installing Connectors (Twitter/GNU Social)](help/Installing-Connectors)
 * [Install an ejabberd server (XMPP chat) with synchronized credentials](help/install-ejabberd)
-* [Message Flow](help/Message-Flow)
 * [Using SSL with Friendica](help/SSL)
-* [Twitter/GNU Social API Functions](help/api)
 * [Config values that can only be set in .htconfig.php](help/htconfig)
+* [Improve Performance](help/Improve-Performance)
 
 **Developer Manual**
 
@@ -46,9 +44,11 @@ Friendica Documentation and Resources
 * [Plugin Development](help/Plugins)
 * [Theme Development](help/themes)
 * [Smarty 3 Templates](help/smarty3-templates)
+* [Protocol Documentation](help/Protocol)
 * [Database schema documantation](help/database)
 * [Class Autoloading](help/autoloader)
 * [Code - Reference(Doxygen generated - sets cookies)](doc/html/)
+* [Twitter/GNU Social API Functions](help/api)
 
 
 **External Resources**

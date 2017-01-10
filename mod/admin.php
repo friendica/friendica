@@ -2,7 +2,7 @@
 
  /**
  * @file mod/admin.php
- * 
+ *
  * @brief Friendica admin
  */
 
@@ -23,7 +23,7 @@ require_once("include/text.php");
  * @param App $a
  *
  */
-function admin_post(&$a){
+function admin_post(App $a) {
 
 
 	if(!is_site_admin()) {
@@ -32,13 +32,12 @@ function admin_post(&$a){
 
 	// do not allow a page manager to access the admin panel at all.
 
-	if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
+	if (x($_SESSION,'submanage') && intval($_SESSION['submanage'])) {
 		return;
-
-
+	}
 
 	// urls
-	if($a->argc > 1) {
+	if ($a->argc > 1) {
 		switch ($a->argv[1]){
 			case 'site':
 				admin_page_site_post($a);
@@ -67,7 +66,7 @@ function admin_post(&$a){
 
 				$theme = $a->argv[2];
 				if(is_file("view/theme/$theme/config.php")){
-					function __call_theme_admin_post(&$a, $theme) {
+					function __call_theme_admin_post(App $a, $theme) {
 						$orig_theme = $a->theme;
 						$orig_page = $a->page;
 						$orig_session_theme = $_SESSION['theme'];
@@ -128,14 +127,15 @@ function admin_post(&$a){
  * @param App $a
  * @return string
  */
-function admin_content(&$a) {
+function admin_content(App $a) {
 
 	if(!is_site_admin()) {
 		return login(false);
 	}
 
-	if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
+	if (x($_SESSION,'submanage') && intval($_SESSION['submanage'])) {
 		return "";
+	}
 
 	// APC deactivated, since there are problems with PHP 5.5
 	//if (function_exists("apc_delete")) {
@@ -260,7 +260,7 @@ function admin_content(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_federation(&$a) {
+function admin_page_federation(App $a) {
 	// get counts on active friendica, diaspora, redmatrix, hubzilla, gnu
 	// social and statusnet nodes this node is knowing
 	//
@@ -269,34 +269,43 @@ function admin_page_federation(&$a) {
 	// off one % two of them are needed in the query
 	// Add more platforms if you like, when one returns 0 known nodes it is not
 	// displayed on the stats page.
-	$platforms = array('Friendica', 'Diaspora', '%%red%%', 'Hubzilla', 'GNU Social', 'StatusNet');
+	$platforms = array('Friendica', 'Diaspora', '%%red%%', 'Hubzilla', 'BlaBlaNet', 'GNU Social', 'StatusNet', 'Mastodon');
 	$colors    = array('Friendica' => '#ffc018',     // orange from the logo
-			    'Diaspora'  => '#a1a1a1',     // logo is black and white, makes a gray
+			   'Diaspora'  => '#a1a1a1',     // logo is black and white, makes a gray
 			   '%%red%%'   => '#c50001',     // fire red from the logo
 			   'Hubzilla'  => '#43488a',     // blue from the logo
+			   'BlaBlaNet' => '#3B5998',     // blue from the navbar at blablanet-dot-com
 			   'GNU Social'=> '#a22430',     // dark red from the logo
-			   'StatusNet' => '#789240');    // the green from the logo (red and blue have already others
+			   'StatusNet' => '#789240',     // the green from the logo (red and blue have already others
+			   'Mastodon'  => '#1a9df9');    // blue from the Mastodon logo
 	$counts = array();
 	$total = 0;
 
 	foreach ($platforms as $p) {
 		// get a total count for the platform, the name and version of the
 		// highest version and the protocol tpe
-		$c = q('SELECT COUNT(*) AS `total`, `platform`, `network`, `version` FROM `gserver`
-				WHERE `platform` LIKE "%s" AND `last_contact` > `last_failure` AND `version` != ""
+		$c = qu('SELECT COUNT(*) AS `total`, `platform`, `network`, `version` FROM `gserver`
+				WHERE `platform` LIKE "%s" AND `last_contact` >= `last_failure`
 				ORDER BY `version` ASC;', $p);
 		$total = $total + $c[0]['total'];
 
 		// what versions for that platform do we know at all?
 		// again only the active nodes
-		$v = q('SELECT COUNT(*) AS `total`, `version` FROM `gserver`
-				WHERE `last_contact` > `last_failure` AND `platform` LIKE "%s"  AND `version` != ""
+		$v = qu('SELECT COUNT(*) AS `total`, `version` FROM `gserver`
+				WHERE `last_contact` >= `last_failure` AND `platform` LIKE "%s"
 				GROUP BY `version`
 				ORDER BY `version`;', $p);
 
 		//
 		// clean up version numbers
 		//
+		// some platforms do not provide version information, add a unkown there
+		// to the version string for the displayed list.
+		foreach ($v as $key => $value) {
+			if ($v[$key]['version'] == '') {
+				$v[$key] = array('total'=>$v[$key]['total'], 'version'=>t('unknown'));
+			}
+		}
 		// in the DB the Diaspora versions have the format x.x.x.x-xx the last
 		// part (-xx) should be removed to clean up the versions from the "head
 		// commit" information and combined into a single entry for x.x.x.x
@@ -307,12 +316,12 @@ function admin_page_federation(&$a) {
 				$newVC = $vv['total'];
 				$newVV = $vv['version'];
 				$posDash = strpos($newVV, '-');
-				if($posDash) 
+				if($posDash)
 					$newVV = substr($newVV, 0, $posDash);
 				if(isset($newV[$newVV]))
-					$newV[$newVV] += $newVC; 
+					$newV[$newVV] += $newVC;
 				else
-					$newV[$newVV] = $newVC; 
+					$newV[$newVV] = $newVC;
 			}
 			foreach ($newV as $key => $value) {
 				array_push($newVv, array('total'=>$value, 'version'=>$key));
@@ -367,7 +376,7 @@ function admin_page_federation(&$a) {
 		'$counts' => $counts,
 		'$version' => FRIENDICA_VERSION,
 		'$legendtext' => sprintf(t('Currently this node is aware of %d nodes from the following platforms:'), $total),
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 	));
 }
 
@@ -384,7 +393,7 @@ function admin_page_federation(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_queue(&$a) {
+function admin_page_queue(App $a) {
 	// get content from the queue table
 	$r = q("SELECT `c`.`name`, `c`.`nurl`, `q`.`id`, `q`.`network`, `q`.`created`, `q`.`last`
 			FROM `queue` AS `q`, `contact` AS `c`
@@ -418,7 +427,22 @@ function admin_page_queue(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_summary(&$a) {
+function admin_page_summary(App $a) {
+	global $db;
+	// are there MyISAM tables in the DB? If so, trigger a warning message
+	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1",
+		dbesc($db->database_name()));
+	$showwarning = false;
+	$warningtext = array();
+	if (dbm::is_result($r)) {
+		$showwarning = true;
+		$warningtext[] = sprintf(t('Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the <tt>convert_innodb.sql</tt> in the <tt>/util</tt> directory of your Friendica installation.<br />'), 'https://dev.mysql.com/doc/refman/5.7/en/converting-tables-to-innodb.html');
+	}
+	// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
+	if ((version_compare($db->server_info(), '5.7.4') >= 0) AND
+		!(strpos($db->server_info(), 'MariaDB') !== false)) {
+		$warningtext[] = t('You are using a MySQL version which does not support all features that Friendica uses. You should consider switching to MariaDB.');
+	}
 	$r = q("SELECT `page-flags`, COUNT(`uid`) AS `count` FROM `user` GROUP BY `page-flags`");
 	$accounts = array(
 		array(t('Normal Account'), 0),
@@ -434,17 +458,17 @@ function admin_page_summary(&$a) {
 
 	logger('accounts: '.print_r($accounts,true),LOGGER_DATA);
 
-	$r = q("SELECT COUNT(`id`) AS `count` FROM `register`");
+	$r = qu("SELECT COUNT(`id`) AS `count` FROM `register`");
 	$pending = $r[0]['count'];
 
-	$r = q("SELECT COUNT(*) AS `total` FROM `deliverq` WHERE 1");
+	$r = qu("SELECT COUNT(*) AS `total` FROM `deliverq` WHERE 1");
 	$deliverq = (($r) ? $r[0]['total'] : 0);
 
-	$r = q("SELECT COUNT(*) AS `total` FROM `queue` WHERE 1");
+	$r = qu("SELECT COUNT(*) AS `total` FROM `queue` WHERE 1");
 	$queue = (($r) ? $r[0]['total'] : 0);
 
 	if (get_config('system','worker')) {
-		$r = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE 1");
+		$r = qu("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE 1");
 		$workerqueue = (($r) ? $r[0]['total'] : 0);
 	} else {
 		$workerqueue = 0;
@@ -465,20 +489,22 @@ function admin_page_summary(&$a) {
 		'$accounts' => $accounts,
 		'$pending' => array(t('Pending registrations'), $pending),
 		'$version' => array(t('Version'), FRIENDICA_VERSION),
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$platform' => FRIENDICA_PLATFORM,
 		'$codename' => FRIENDICA_CODENAME,
 		'$build' =>  get_config('system','build'),
-		'$plugins' => array(t('Active plugins'), $a->plugins)
+		'$plugins' => array(t('Active plugins'), $a->plugins),
+		'$showwarning' => $showwarning,
+		'$warningtext' => $warningtext
 	));
 }
 
 /**
  * @brief Process send data from Admin Site Page
- * 
+ *
  * @param App $a
  */
-function admin_page_site_post(&$a) {
+function admin_page_site_post(App $a) {
 	if(!x($_POST,"page_site")) {
 		return;
 	}
@@ -501,7 +527,7 @@ function admin_page_site_post(&$a) {
 		 * send relocate for every local user
 		 * */
 
-		$old_url = $a->get_baseurl(true);
+		$old_url = App::get_baseurl(true);
 
 		// Generate host names for relocation the addresses in the format user@address.tld
 		$new_host = str_replace("http://", "@", normalise_link($new_url));
@@ -643,6 +669,7 @@ function admin_page_site_post(&$a) {
 	$worker_queues		=	((x($_POST,'worker_queues'))		? intval($_POST['worker_queues'])		: 4);
 	$worker_dont_fork	=	((x($_POST,'worker_dont_fork'))		? True						: False);
 	$worker_fastlane	=	((x($_POST,'worker_fastlane'))		? True						: False);
+	$worker_frontend	=	((x($_POST,'worker_frontend'))		? True						: False);
 
 	if($a->get_path() != "")
 		$diaspora_enabled = false;
@@ -793,6 +820,7 @@ function admin_page_site_post(&$a) {
 	set_config('system','worker_queues', $worker_queues);
 	set_config('system','worker_dont_fork', $worker_dont_fork);
 	set_config('system','worker_fastlane', $worker_fastlane);
+	set_config('system','frontend_worker', $worker_frontend);
 
 	if($rino==2 and !function_exists('mcrypt_create_iv')) {
 		notice(t("RINO2 needs mcrypt php extension to work."));
@@ -817,10 +845,10 @@ function admin_page_site_post(&$a) {
  * @param  App $a
  * @return string
  */
-function admin_page_site(&$a) {
+function admin_page_site(App $a) {
 
 	/* Installed langs */
-	$lang_choices = get_avaiable_languages();
+	$lang_choices = get_available_languages();
 
 	if(strlen(get_config('system','directory_submit_url')) AND
 		!strlen(get_config('system','directory'))) {
@@ -933,7 +961,7 @@ function admin_page_site(&$a) {
 		'$performance' => t('Performance'),
 		'$worker_title' => t('Worker'),
 		'$relocate'=> t('Relocate - WARNING: advanced function. Could make this server unreachable.'),
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		// name, label, value, help string, extra data...
 		'$sitename' 		=> array('sitename', t("Site name"), $a->config['sitename'],''),
 		'$hostname' 		=> array('hostname', t("Host name"), $a->config['hostname'], ""),
@@ -1015,7 +1043,7 @@ function admin_page_site(&$a) {
 		'$old_pager'		=> array('old_pager', t("Enable old style pager"), get_config('system','old_pager'), t("The old style pager has page numbers but slows down massively the page speed.")),
 		'$only_tag_search'	=> array('only_tag_search', t("Only search in tags"), get_config('system','only_tag_search'), t("On large systems the text search can slow down the system extremely.")),
 
-		'$relocate_url'		=> array('relocate_url', t("New base url"), $a->get_baseurl(), t("Change base url for this server. Sends relocate message to all DFRN contacts of all users.")),
+		'$relocate_url'		=> array('relocate_url', t("New base url"), App::get_baseurl(), t("Change base url for this server. Sends relocate message to all DFRN contacts of all users.")),
 
 		'$rino' 		=> array('rino', t("RINO Encryption"), intval(get_config('system','rino_encrypt')), t("Encryption layer between nodes."), array("Disabled", "RINO1 (deprecated)", "RINO2")),
 		'$embedly' 		=> array('embedly', t("Embedly API key"), get_config('system','embedly'), t("<a href='http://embed.ly'>Embedly</a> is used to fetch additional data for web pages. This is an optional parameter.")),
@@ -1024,6 +1052,7 @@ function admin_page_site(&$a) {
 		'$worker_queues' 	=> array('worker_queues', t("Maximum number of parallel workers"), get_config('system','worker_queues'), t("On shared hosters set this to 2. On larger systems, values of 10 are great. Default value is 4.")),
 		'$worker_dont_fork'	=> array('worker_dont_fork', t("Don't use 'proc_open' with the worker"), get_config('system','worker_dont_fork'), t("Enable this if your system doesn't allow the use of 'proc_open'. This can happen on shared hosters. If this is enabled you should increase the frequency of poller calls in your crontab.")),
 		'$worker_fastlane'	=> array('worker_fastlane', t("Enable fastlane"), get_config('system','worker_fastlane'), t("When enabed, the fastlane mechanism starts an additional worker if processes with higher priority are blocked by processes of lower priority.")),
+		'$worker_frontend'	=> array('worker_frontend', t('Enable frontend worker'), get_config('system','frontend_worker'), t('When enabled the Worker process is triggered when backend access is performed (e.g. messages being delivered). On smaller sites you might want to call yourdomain.tld/worker on a regular basis via an external cron job. You should only enable this option if you cannot utilize cron/scheduled jobs on your server. The worker background process needs to be activated for this.')),
 
 		'$form_security_token'	=> get_form_security_token("admin_site")
 
@@ -1043,7 +1072,7 @@ function admin_page_site(&$a) {
  * @param App $a
  * @return string
  **/
-function admin_page_dbsync(&$a) {
+function admin_page_dbsync(App $a) {
 
 	$o = '';
 
@@ -1092,27 +1121,27 @@ function admin_page_dbsync(&$a) {
 
 	$failed = array();
 	$r = q("SELECT `k`, `v` FROM `config` WHERE `cat` = 'database' ");
-	if(count($r)) {
-		foreach($r as $rr) {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
 			$upd = intval(substr($rr['k'],7));
 			if($upd < 1139 || $rr['v'] === 'success')
 				continue;
 			$failed[] = $upd;
 		}
 	}
-	if(! count($failed)) {
+	if (! count($failed)) {
 		$o = replace_macros(get_markup_template('structure_check.tpl'),array(
-			'$base' => $a->get_baseurl(true),
+			'$base'   => App::get_baseurl(true),
 			'$banner' => t('No failed updates.'),
-			'$check' => t('Check database structure'),
+			'$check'  => t('Check database structure'),
 		));
 	} else {
 		$o = replace_macros(get_markup_template('failed_updates.tpl'),array(
-			'$base' => $a->get_baseurl(true),
+			'$base'   => App::get_baseurl(true),
 			'$banner' => t('Failed Updates'),
-			'$desc' => t('This does not include updates prior to 1139, which did not return a status.'),
-			'$mark' => t('Mark success (if update was manually applied)'),
-			'$apply' => t('Attempt to execute this update step automatically'),
+			'$desc'   => t('This does not include updates prior to 1139, which did not return a status.'),
+			'$mark'   => t('Mark success (if update was manually applied)'),
+			'$apply'  => t('Attempt to execute this update step automatically'),
 			'$failed' => $failed
 		));
 	}
@@ -1123,23 +1152,25 @@ function admin_page_dbsync(&$a) {
 
 /**
  * @brief Process data send by Users admin page
- * 
+ *
  * @param App $a
  */
-function admin_page_users_post(&$a){
-	$pending	=	(x($_POST, 'pending')			? $_POST['pending']		: array());
-	$users		=	(x($_POST, 'user')			? $_POST['user']		: array());
-	$nu_name	=	(x($_POST, 'new_user_name')		? $_POST['new_user_name']	: '');
-	$nu_nickname	=	(x($_POST, 'new_user_nickname')		? $_POST['new_user_nickname']	: '');
-	$nu_email	=	(x($_POST, 'new_user_email')		? $_POST['new_user_email']	: '');
+function admin_page_users_post(App $a) {
+	$pending     = (x($_POST, 'pending')           ? $_POST['pending']           : array());
+	$users       = (x($_POST, 'user')              ? $_POST['user']		      : array());
+	$nu_name     = (x($_POST, 'new_user_name')     ? $_POST['new_user_name']     : '');
+	$nu_nickname = (x($_POST, 'new_user_nickname') ? $_POST['new_user_nickname'] : '');
+	$nu_email    = (x($_POST, 'new_user_email')    ? $_POST['new_user_email']    : '');
+	$nu_language = get_config('system', 'language');
 
 	check_form_security_token_redirectOnErr('/admin/users', 'admin_users');
 
-	if(!($nu_name==="") && !($nu_email==="") && !($nu_nickname==="")) {
+	if (!($nu_name==="") && !($nu_email==="") && !($nu_nickname==="")) {
 		require_once('include/user.php');
 
-		$result = create_user(array('username'=>$nu_name, 'email'=>$nu_email, 'nickname'=>$nu_nickname, 'verified'=>1));
-		if(! $result['success']) {
+		$result = create_user(array('username'=>$nu_name, 'email'=>$nu_email,
+			'nickname'=>$nu_nickname, 'verified'=>1, 'language'=>$nu_language));
+		if (! $result['success']) {
 			notice($result['message']);
 			return;
 		}
@@ -1174,7 +1205,7 @@ function admin_page_users_post(&$a){
 			Thank you and welcome to %4$s.'));
 
 		$preamble = sprintf($preamble, $nu['username'], $a->config['sitename']);
-		$body = sprintf($body, $a->get_baseurl(), $nu['email'], $result['password'], $a->config['sitename']);
+		$body = sprintf($body, App::get_baseurl(), $nu['email'], $result['password'], $a->config['sitename']);
 
 		notification(array(
 			'type' => "SYSTEM_EMAIL",
@@ -1229,7 +1260,7 @@ function admin_page_users_post(&$a){
  * @param App $a
  * @return string
  */
-function admin_page_users(&$a){
+function admin_page_users(App $a) {
 	if($a->argc>2) {
 		$uid = $a->argv[3];
 		$user = q("SELECT `username`, `blocked` FROM `user` WHERE `uid` = %d", intval($uid));
@@ -1269,7 +1300,7 @@ function admin_page_users(&$a){
 
 
 	/* get users */
-	$total = q("SELECT COUNT(*) AS `total` FROM `user` WHERE 1");
+	$total = qu("SELECT COUNT(*) AS `total` FROM `user` WHERE 1");
 	if(count($total)) {
 		$a->set_pager_total($total[0]['total']);
 		$a->set_pager_itemspage(100);
@@ -1277,14 +1308,14 @@ function admin_page_users(&$a){
 
 	/* ordering */
 	$valid_orders = array(
-		'contact.name', 
+		'contact.name',
 		'user.email',
 		'user.register_date',
 		'user.login_date',
-		'lastitem.lastitem_date',
+		'lastitem_date',
 		'user.page-flags'
 	);
-	
+
 	$order = "contact.name";
 	$order_direction = "+";
 	if (x($_GET,'o')){
@@ -1293,38 +1324,28 @@ function admin_page_users(&$a){
 			$order_direction = "-";
 			$new_order = substr($new_order,1);
 		}
-		
+
 		if (in_array($new_order, $valid_orders)){
 			$order = $new_order;
 		}
 		if (x($_GET,'d')){
 			$new_direction = $_GET['d'];
-			
 		}
 	}
 	$sql_order = "`".str_replace('.','`.`',$order)."`";
 	$sql_order_direction = ($order_direction==="+")?"ASC":"DESC";
-	
-	$users = q("SELECT `user`.* , `contact`.`name` , `contact`.`url` , `contact`.`micro`, `lastitem`.`lastitem_date`, `user`.`account_expired`
-				FROM
-					(SELECT MAX(`item`.`changed`) as `lastitem_date`, `item`.`uid`
-					FROM `item`
-					WHERE `item`.`type` = 'wall'
-					GROUP BY `item`.`uid`) AS `lastitem`
-						 RIGHT OUTER JOIN `user` ON `user`.`uid` = `lastitem`.`uid`,
-					   `contact`
-				WHERE
-					   `user`.`uid` = `contact`.`uid`
-						AND `user`.`verified` =1
-					AND `contact`.`self` =1
-				ORDER BY $sql_order $sql_order_direction LIMIT %d, %d
-				",
+
+	$users = qu("SELECT `user`.*, `contact`.`name`, `contact`.`url`, `contact`.`micro`, `user`.`account_expired`, `contact`.`last-item` AS `lastitem_date`
+				FROM `user`
+				INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`
+				WHERE `user`.`verified`
+				ORDER BY $sql_order $sql_order_direction LIMIT %d, %d",
 				intval($a->pager['start']),
 				intval($a->pager['itemspage'])
 				);
-    
+
 	//echo "<pre>$users"; killme();
-				
+
 	$adminlist = explode(",", str_replace(" ", "", $a->config['admin_email']));
 	$_setup_users = function ($e) use ($adminlist){
 		$accounts = array(
@@ -1375,7 +1396,7 @@ function admin_page_users(&$a){
 		array(t('Name'), t('Email'), t('Register date'), t('Last login'), t('Last item'),  t('Account')),
 		$valid_orders
 	);
-	
+
 	$t = get_markup_template("admin_users.tpl");
 	$o = replace_macros($t, array(
 		// strings //
@@ -1387,6 +1408,7 @@ function admin_page_users(&$a){
 		'$h_deleted' => t('User waiting for permanent deletion'),
 		'$th_pending' => array(t('Request date'), t('Name'), t('Email')),
 		'$no_pending' =>  t('No registrations.'),
+		'$pendingnotetext' => t('Note from the user'),
 		'$approve' => t('Approve'),
 		'$deny' => t('Deny'),
 		'$delete' => t('Delete'),
@@ -1408,7 +1430,7 @@ function admin_page_users(&$a){
 		'$form_security_token' => get_form_security_token("admin_users"),
 
 		// values //
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 
 		'$pending' => $pending,
 		'deleted' => $deleted,
@@ -1438,7 +1460,7 @@ function admin_page_users(&$a){
  * @param App $a
  * @return string
  */
-function admin_page_plugins(&$a){
+function admin_page_plugins(App $a) {
 
 	/*
 	 * Single plugin
@@ -1500,7 +1522,7 @@ function admin_page_plugins(&$a){
 			'$page' => t('Plugins'),
 			'$toggle' => t('Toggle'),
 			'$settings' => t('Settings'),
-			'$baseurl' => $a->get_baseurl(true),
+			'$baseurl' => App::get_baseurl(true),
 
 			'$plugin' => $plugin,
 			'$status' => $status,
@@ -1524,32 +1546,35 @@ function admin_page_plugins(&$a){
 	 * List plugins
 	 */
 
-	if(x($_GET,"a") && $_GET['a']=="r") {
-		check_form_security_token_redirectOnErr($a->get_baseurl().'/admin/plugins', 'admin_themes', 't');
+	if (x($_GET,"a") && $_GET['a']=="r") {
+		check_form_security_token_redirectOnErr(App::get_baseurl().'/admin/plugins', 'admin_themes', 't');
 		reload_plugins();
 		info("Plugins reloaded");
-		goaway($a->get_baseurl().'/admin/plugins');
+		goaway(App::get_baseurl().'/admin/plugins');
 	}
 
 	$plugins = array();
 	$files = glob("addon/*/");
-	if($files) {
-		foreach($files as $file) {
-			if(is_dir($file)) {
+	if ($files) {
+		foreach ($files as $file) {
+			if (is_dir($file)) {
 				list($tmp, $id)=array_map("trim", explode("/",$file));
 				$info = get_plugin_info($id);
 				$show_plugin = true;
 
 				// If the addon is unsupported, then only show it, when it is enabled
-				if((strtolower($info["status"]) == "unsupported") AND !in_array($id,  $a->plugins))
+				if ((strtolower($info["status"]) == "unsupported") AND !in_array($id,  $a->plugins)) {
 					$show_plugin = false;
+				}
 
 				// Override the above szenario, when the admin really wants to see outdated stuff
-				if(get_config("system", "show_unsupported_addons"))
+				if (get_config("system", "show_unsupported_addons")) {
 					$show_plugin = true;
+				}
 
-				if($show_plugin)
+				if ($show_plugin) {
 					$plugins[] = array($id, (in_array($id,  $a->plugins)?"on":"off") , $info);
+				}
 			}
 		}
 	}
@@ -1560,10 +1585,10 @@ function admin_page_plugins(&$a){
 		'$page' => t('Plugins'),
 		'$submit' => t('Save Settings'),
 		'$reload' => t('Reload active plugins'),
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$function' => 'plugins',
 		'$plugins' => $plugins,
-		'$pcount' => count($plugins), 
+		'$pcount' => count($plugins),
 		'$noplugshint' => sprintf(t('There are currently no plugins available on your node. You can find the official plugin repository at %1$s and might find other interesting plugins in the open plugin registry at %2$s'), 'https://github.com/friendica/friendica-addons', 'http://addons.friendi.ca'),
 		'$form_security_token' => get_form_security_token("admin_themes"),
 	));
@@ -1644,7 +1669,7 @@ function rebuild_theme_table($themes) {
  * @param App $a
  * @return string
  */
-function admin_page_themes(&$a){
+function admin_page_themes(App $a) {
 
 	$allowed_themes_str = get_config('system','allowed_themes');
 	$allowed_themes_raw = explode(',',$allowed_themes_str);
@@ -1724,7 +1749,7 @@ function admin_page_themes(&$a){
 
 		$admin_form="";
 		if(is_file("view/theme/$theme/config.php")) {
-			function __get_theme_admin_form(&$a, $theme) {
+			function __get_theme_admin_form(App $a, $theme) {
 				$orig_theme = $a->theme;
 				$orig_page = $a->page;
 				$orig_session_theme = $_SESSION['theme'];
@@ -1758,7 +1783,7 @@ function admin_page_themes(&$a){
 			'$page' => t('Themes'),
 			'$toggle' => t('Toggle'),
 			'$settings' => t('Settings'),
-			'$baseurl' => $a->get_baseurl(true),
+			'$baseurl' => App::get_baseurl(true),
 			'$plugin' => $theme,
 			'$status' => $status,
 			'$action' => $action,
@@ -1776,18 +1801,18 @@ function admin_page_themes(&$a){
 
 
 	// reload active themes
-	if(x($_GET,"a") && $_GET['a']=="r") {
-		check_form_security_token_redirectOnErr($a->get_baseurl().'/admin/themes', 'admin_themes', 't');
-		if($themes) {
-			foreach($themes as $th) {
-				if($th['allowed']) {
+	if (x($_GET,"a") && $_GET['a']=="r") {
+		check_form_security_token_redirectOnErr(App::get_baseurl().'/admin/themes', 'admin_themes', 't');
+		if ($themes) {
+			foreach ($themes as $th) {
+				if ($th['allowed']) {
 					uninstall_theme($th['name']);
 					install_theme($th['name']);
 				}
 			}
 		}
 		info("Themes reloaded");
-		goaway($a->get_baseurl().'/admin/themes');
+		goaway(App::get_baseurl().'/admin/themes');
 	}
 
 	/*
@@ -1795,7 +1820,7 @@ function admin_page_themes(&$a){
 	 */
 
 	$xthemes = array();
-	if($themes) {
+	if ($themes) {
 		foreach($themes as $th) {
 			$xthemes[] = array($th['name'],(($th['allowed']) ? "on" : "off"), get_theme_info($th['name']));
 		}
@@ -1804,17 +1829,17 @@ function admin_page_themes(&$a){
 
 	$t = get_markup_template("admin_plugins.tpl");
 	return replace_macros($t, array(
-		'$title' => t('Administration'),
-		'$page' => t('Themes'),
-		'$submit' => t('Save Settings'),
-		'$reload' => t('Reload active themes'),
-		'$baseurl' => $a->get_baseurl(true),
-		'$function' => 'themes',
-		'$plugins' => $xthemes,
-		'$pcount' => count($themes),
-		'$noplugshint' => sprintf(t('No themes found on the system. They should be paced in %1$s'),'<code>/view/themes</code>'),
-		'$experimental' => t('[Experimental]'),
-		'$unsupported' => t('[Unsupported]'),
+		'$title'               => t('Administration'),
+		'$page'                => t('Themes'),
+		'$submit'              => t('Save Settings'),
+		'$reload'              => t('Reload active themes'),
+		'$baseurl'             => App::get_baseurl(true),
+		'$function'            => 'themes',
+		'$plugins'             => $xthemes,
+		'$pcount'              => count($themes),
+		'$noplugshint'         => sprintf(t('No themes found on the system. They should be paced in %1$s'),'<code>/view/themes</code>'),
+		'$experimental'        => t('[Experimental]'),
+		'$unsupported'         => t('[Unsupported]'),
 		'$form_security_token' => get_form_security_token("admin_themes"),
 	));
 }
@@ -1822,16 +1847,16 @@ function admin_page_themes(&$a){
 
 /**
  * @brief Prosesses data send by Logs admin page
- * 
+ *
  * @param App $a
  */
-function admin_page_logs_post(&$a) {
-	if(x($_POST,"page_logs")) {
+function admin_page_logs_post(App $a) {
+	if (x($_POST,"page_logs")) {
 		check_form_security_token_redirectOnErr('/admin/logs', 'admin_logs');
 
-		$logfile 	=	((x($_POST,'logfile'))		? notags(trim($_POST['logfile']))	: '');
-		$debugging	=	((x($_POST,'debugging'))	? true					: false);
-		$loglevel 	=	((x($_POST,'loglevel'))		? intval(trim($_POST['loglevel']))	: 0);
+		$logfile   = ((x($_POST,'logfile'))   ? notags(trim($_POST['logfile']))  : '');
+		$debugging = ((x($_POST,'debugging')) ? true                             : false);
+		$loglevel  = ((x($_POST,'loglevel'))  ? intval(trim($_POST['loglevel'])) : 0);
 
 		set_config('system','logfile', $logfile);
 		set_config('system','debugging',  $debugging);
@@ -1859,7 +1884,7 @@ function admin_page_logs_post(&$a) {
  * @param App $a
  * @return string
  */
-function admin_page_logs(&$a){
+function admin_page_logs(App $a) {
 
 	$log_choices = array(
 		LOGGER_NORMAL	=> 'Normal',
@@ -1868,7 +1893,7 @@ function admin_page_logs(&$a){
 		LOGGER_DATA	=> 'Data',
 		LOGGER_ALL	=> 'All'
 	);
-	
+
 	if (ini_get('log_errors')) {
 		$phplogenabled = t('PHP log currently enabled.');
 	} else {
@@ -1882,7 +1907,7 @@ function admin_page_logs(&$a){
 		'$page' => t('Logs'),
 		'$submit' => t('Save Settings'),
 		'$clear' => t('Clear'),
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$logname' =>  get_config('system','logfile'),
 
 		// name, label, value, help string, extra data...
@@ -1916,7 +1941,7 @@ function admin_page_logs(&$a){
  * @param App $a
  * @return string
  */
-function admin_page_viewlogs(&$a){
+function admin_page_viewlogs(App $a) {
 	$t = get_markup_template("admin_viewlogs.tpl");
 	$f = get_config('system','logfile');
 	$data = '';
@@ -1955,10 +1980,10 @@ function admin_page_viewlogs(&$a){
 
 /**
  * @brief Prosesses data send by the features admin page
- * 
+ *
  * @param App $a
  */
-function admin_page_features_post(&$a) {
+function admin_page_features_post(App $a) {
 
 	check_form_security_token_redirectOnErr('/admin/features', 'admin_manage_features');
 
@@ -1992,20 +2017,20 @@ function admin_page_features_post(&$a) {
 
 /**
  * @brief Subpage for global additional feature management
- * 
+ *
  * This functin generates the subpage 'Manage Additional Features'
  * for the admin panel. At this page the admin can set preferences
- * for the user settings of the 'additional features'. If needed this 
+ * for the user settings of the 'additional features'. If needed this
  * preferences can be locked through the admin.
- * 
+ *
  * The returned string contains the HTML code of the subpage 'Manage
  * Additional Features'
- * 
+ *
  * @param App $a
  * @return string
  */
-function admin_page_features(&$a) {
-	
+function admin_page_features(App $a) {
+
 	if((argc() > 1) && (argv(1) === 'features')) {
 		$arr = array();
 		$features = get_features(false);
@@ -2024,7 +2049,7 @@ function admin_page_features(&$a) {
 				);
 			}
 		}
-		
+
 		$tpl = get_markup_template("admin_settings_features.tpl");
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("admin_manage_features"),

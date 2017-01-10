@@ -67,9 +67,9 @@ So würde http://example.com/plugin/arg1/arg2 nach einem Modul "plugin" suchen u
     $a->argc = 3
     $a->argv = array(0 => 'plugin', 1 => 'arg1', 2 => 'arg2');
 
-Deine Modulfunktionen umfassen oft die Funktion plugin_name_content(&$a), welche den Seiteninhalt definiert und zurückgibt.
-Sie können auch plugin_name_post(&$a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
-Du kannst ebenso plugin_name_init(&$a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
+Deine Modulfunktionen umfassen oft die Funktion plugin_name_content(App &$a), welche den Seiteninhalt definiert und zurückgibt.
+Sie können auch plugin_name_post(App &$a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
+Du kannst ebenso plugin_name_init(App &$a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
 
 
 Derzeitige Hooks

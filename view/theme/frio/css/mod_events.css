@@ -1,0 +1,151 @@
+/**
+ * @file view/theme/frio/css/mod_event.css
+ */
+
+/**
+ * The different views of js fullcalendar
+ */
+#fc-header {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+#fc-header-left,
+#fc-header-right,
+#event-calendar-title {
+    display: inline-block;
+}
+#fc-title {
+    margin: 0;
+    padding-left: 20px;
+
+}
+#fc-header-right {
+    margin-top: -4px;
+}
+#event-calendar-title {
+    vertical-align: middle;
+}
+a#event-calendar-views {
+    padding: 6px 9px;
+    font-size: 14px
+}
+.fc .fc-toolbar {
+    display: none;
+}
+.fc .fc-month-view td.fc-widget-content,
+.fc .fc-list-view,
+.fc .fc-list-view .fc-list-table td,
+.fc .fc-body td {
+    border-style: none;
+}
+.fc td.fc-widget-header,
+.fc th.fc-widget-header {
+    border-left: none;
+    border-right: none;
+    border-top: none;
+}
+.fc .fc-month-view td.fc-day {
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid;
+    padding: 0 6px;
+}
+.fc .fc-day-grid-container .fc-row {
+    border-bottom: 1px solid;
+    border-color: #ddd;
+}
+.fc .fc-day-grid-event .fc-content {
+    /*white-space: normal;*/
+}
+.fc tr td.fc-today {
+    border-style: none;
+}
+.fc .fc-month-view .fc-content .fc-title .item-desc {
+    font-size: 11px;
+}
+.fc .fc-view-container {
+    margin-top: 25px;
+}
+.fc .fc-list-view td {
+    padding: 0;
+}
+#events-calendar.fc-ltr .fc-basic-view .fc-day-top .fc-day-number {
+    float: left;
+    font-size: 12px;
+}
+.fc .fc-event {
+    background-color: transparent;
+    background-color: #E3F2FD;
+    border: 1px solid #BBDEFB;
+    color: #555;
+}
+.fc .fc-month-view .fc-time,
+.fc .fc-listMonth-view .fc-list-item-time,
+.fc .fc-listMonth-view .fc-list-item-marker,
+.fc .fc-listMonth-view .fc-widget-header {
+    display: none;
+}
+.fc .fc-listMonth-view .fc-list-item:hover td {
+    background: transparent;
+    cursor: pointer;
+}
+.fc .fc-listMonth-view .seperator {
+    margin-left: 30px;
+    width: 60px;
+}
+
+
+
+/**
+ * The event-card
+ */
+.event-card {
+	width: auto;
+}
+.event-card .event-label,
+.event-card .location-label {
+    font-weight: bold;
+}
+.popover.event-card .event-card-basic-content {
+    margin-top: 0;
+    padding: 9px;
+    padding-left: 0px;
+}
+.event-card .event-hover-left-date {
+    width: 60px;
+}
+.event-card .event-date-wrapper.medium > span {
+    display: block;
+    overflow: hidden;
+    text-align: center;
+    white-space: nowrap;
+}
+.event-card .event-date-wrapper.medium .event-hover-short-month {
+    font-size: 13px;
+    text-transform: uppercase;
+}
+.event-card .event-date-wrapper.medium .event-hover-short-date {
+    font-size: 24px;
+    line-height: 28px;
+    margin-top: 2px;
+}
+
+.event-card .event-card-basic-content .event-card-content {
+    width: 100%;
+    padding: 0 5px 0 15px;
+    box-shadow: 1.5px 0 0 0 rgba(0, 0, 0, .1) inset;
+}
+.event-card .event-hover-title {
+    font-size: 14px;
+    color: #555;
+    line-height: 15px;
+    font-weight: bold;
+}
+.event-card .event-hover-location {
+    margin-top: 10px;
+    font-size: 13px;
+}
+.event-card .event-hover-location .location {
+    color: #777;
+    font-size: 13px;
+}

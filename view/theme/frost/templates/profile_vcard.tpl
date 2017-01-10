@@ -26,6 +26,13 @@
 		</dl>
 	{{/if}}
 
+	{{if $profile.xmpp}}
+		<dl class="xmpp">
+			<dt class="xmpp-label">{{$xmpp}}</dt>
+			<dd class="xmpp-data">{{$profile.xmpp}}</dd>
+		</dl>
+	{{/if}}
+
 	{{if $gender}}<dl class="mf"><dt class="gender-label">{{$gender}}</dt> <dd class="p-gender">{{$profile.gender}}</dd></dl>{{/if}}
 	
 	{{if $profile.pubkey}}<div class="key" style="display:none;">{{$profile.pubkey}}</div>{{/if}}

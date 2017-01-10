@@ -5,9 +5,9 @@ require_once('include/follow.php');
 require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 
-function follow_content(&$a) {
+function follow_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
@@ -56,14 +56,15 @@ function follow_content(&$a) {
 		// NOTREACHED
 	}
 
-	if ($ret["network"] == NETWORK_MAIL)
+	if ($ret["network"] == NETWORK_MAIL) {
 		$ret["url"] = $ret["addr"];
+	}
 
-	if($ret['network'] === NETWORK_DFRN) {
+	if ($ret['network'] === NETWORK_DFRN) {
 		$request = $ret["request"];
 		$tpl = get_markup_template('dfrn_request.tpl');
 	} else {
-		$request = $a->get_baseurl()."/follow";
+		$request = App::get_baseurl()."/follow";
 		$tpl = get_markup_template('auto_request.tpl');
 	}
 
@@ -84,20 +85,22 @@ function follow_content(&$a) {
 	$r = q("SELECT `id`, `location`, `about`, `keywords` FROM `gcontact` WHERE `nurl` = '%s'",
 		normalise_link($ret["url"]));
 
-	if (!$r)
+	if (!$r) {
 		$r = array(array("location" => "", "about" => "", "keywords" => ""));
-	else
+	} else {
 		$gcontact_id = $r[0]["id"];
+	}
 
-	if($ret['network'] === NETWORK_DIASPORA) {
+	if ($ret['network'] === NETWORK_DIASPORA) {
 		$r[0]["location"] = "";
 		$r[0]["about"] = "";
 	}
 
 	$header = $ret["name"];
 
-	if ($ret["addr"] != "")
+	if ($ret["addr"] != "") {
 		$header .= " <".$ret["addr"].">";
+	}
 
 	//$header .= " (".network_to_name($ret['network'], $ret['url']).")";
 	$header = t("Connect/Follow");
@@ -137,28 +140,29 @@ function follow_content(&$a) {
 	$a->page['aside'] = "";
 	profile_load($a, "", 0, get_contact_details_by_url($ret["url"]));
 
-	// Show last public posts
 	if ($gcontact_id <> 0) {
 		$o .= replace_macros(get_markup_template('section_title.tpl'),
 						array('$title' => t('Status Messages and Posts')
 		));
 
-		$o .= posts_from_gcontact($a, $gcontact_id);
+		// Show last public posts
+		$o .= posts_from_contact_url($a, $ret["url"]);
 	}
 
 	return $o;
 }
 
-function follow_post(&$a) {
+function follow_post(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
-	if ($_REQUEST['cancel'])
+	if ($_REQUEST['cancel']) {
 		goaway($_SESSION['return_url']);
+	}
 
 	$uid = local_user();
 	$url = notags(trim($_REQUEST['url']));
@@ -170,17 +174,20 @@ function follow_post(&$a) {
 
 	$result = new_contact($uid,$url,true);
 
-	if($result['success'] == false) {
-		if($result['message'])
+	if ($result['success'] == false) {
+		if ($result['message']) {
 			notice($result['message']);
+		}
 		goaway($return_url);
-	} elseif ($result['cid'])
-		goaway($a->get_baseurl().'/contacts/'.$result['cid']);
+	} elseif ($result['cid']) {
+		goaway(App::get_baseurl().'/contacts/'.$result['cid']);
+	}
 
 	info( t('Contact added').EOL);
 
-	if(strstr($return_url,'contacts'))
-		goaway($a->get_baseurl().'/contacts/'.$contact_id);
+	if (strstr($return_url,'contacts')) {
+		goaway(App::get_baseurl().'/contacts/'.$contact_id);
+	}
 
 	goaway($return_url);
 	// NOTREACHED

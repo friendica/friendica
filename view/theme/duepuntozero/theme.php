@@ -1,6 +1,6 @@
 <?php
 
-function duepuntozero_init(&$a) {
+function duepuntozero_init(App &$a) {
 
 set_template_engine($a, 'smarty3');
 

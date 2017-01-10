@@ -26,7 +26,7 @@ function hub_post_return() {
 
 
 
-function pubsub_init(&$a) {
+function pubsub_init(App &$a) {
 
 	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
 	$contact_id = (($a->argc > 2) ? intval($a->argv[2])       : 0 );
@@ -47,7 +47,7 @@ function pubsub_init(&$a) {
 		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 			dbesc($nick)
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			logger('pubsub: local account not found: ' . $nick);
 			hub_return(false, '');
 		}
@@ -62,7 +62,7 @@ function pubsub_init(&$a) {
 			intval($contact_id),
 			intval($owner['uid'])
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			logger('pubsub: contact '.$contact_id.' not found.');
 			hub_return(false, '');
 		}
@@ -98,7 +98,7 @@ function pubsub_init(&$a) {
 
 require_once('include/security.php');
 
-function pubsub_post(&$a) {
+function pubsub_post(App &$a) {
 
 	$xml = file_get_contents('php://input');
 
@@ -117,8 +117,9 @@ function pubsub_post(&$a) {
 	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 		dbesc($nick)
 	);
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		hub_post_return();
+	}
 
 	$importer = $r[0];
 
@@ -131,7 +132,7 @@ function pubsub_post(&$a) {
 		dbesc(NETWORK_FEED)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		logger('pubsub: no contact record for "'.$nick.' ('.$contact_id.')" - ignored. '.$xml);
 		hub_post_return();
 	}

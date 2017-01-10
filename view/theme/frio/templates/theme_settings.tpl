@@ -16,8 +16,8 @@
 {{if $contentbg_transp}}
 <div class="form-group field input color">
 	<label for="id_{{$contentbg_transp.0}}" id="label_{{$contentbg_transp.0}}">{{$contentbg_transp.1}}</label>
-	<input type="hidden" class="form-control color slider-input" name="{{$contentbg_transp.0}}" id="{{$contentbg_transp.0}}" type="text" value="{{$contentbg_transp.2}}">
-	<span id="help_{{$contentbg_transp.0}}" class="help-block">{{$contentbg_transp.3}}</span>
+	<input type="hidden" class="form-control color slider-input" name="{{$contentbg_transp.0}}" id="{{$contentbg_transp.0}}" type="text" value="{{$contentbg_transp.2}}" aria-describedby="{{$contentbg_transp.0}}_tip">
+	<span id="{{$contentbg_transp.0}}_tip" class="help-block" role="tooltip">{{$contentbg_transp.3}}</span>
 	<div id="end_{{$contentbg_transp.0}}" class="field_end"></div>
 </div>
 {{/if}}
@@ -69,6 +69,5 @@
 <div class="clearfix"></div>
 
 <script>
-    
     $(".inputRange").rangeinput();
 </script>

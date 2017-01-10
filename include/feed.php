@@ -325,6 +325,14 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 			logger("Stored feed: ".print_r($item, true), LOGGER_DEBUG);
 
 			$notify = item_is_remote_self($contact, $item);
+
+			// Distributed items should have a well formatted URI.
+			// Additionally we have to avoid conflicts with identical URI between imported feeds and these items.
+			if ($notify) {
+				unset($item['uri']);
+				unset($item['parent-uri']);
+			}
+
 			$id = item_store($item, false, $notify);
 
 			logger("Feed for contact ".$contact["url"]." stored under id ".$id);

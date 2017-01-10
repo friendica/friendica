@@ -66,7 +66,7 @@ $a->config['system']['allowed_themes'] = 'quattro,vier,duepuntozero';
 
 // default system theme
 
-$a->config['system']['theme'] = 'duepuntozero';
+$a->config['system']['theme'] = 'vier';
 
 
 // By default allow pseudonyms
@@ -78,3 +78,6 @@ $a->config['system']['no_regfullname'] = true;
 
 // Location of the global directory
 $a->config['system']['directory'] = 'http://dir.friendi.ca';
+
+// Allowed protocols in link URLs; HTTP protocols always are accepted
+$a->config['system']['allowed_link_protocols'] = array('ftp', 'ftps', 'mailto', 'cid', 'gopher');

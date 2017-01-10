@@ -6,7 +6,7 @@
 
 require_once("include/Smilies.php");
 
-function smilies_content(&$a) {
+function smilies_content(App &$a) {
 	if ($a->argv[1]==="json"){
 		$tmp = Smilies::get_list();
 		$results = array();

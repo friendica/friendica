@@ -1,6 +1,6 @@
 <?php
 
-function pretheme_init(&$a) {
+function pretheme_init(App &$a) {
 	
 	if($_REQUEST['theme']) {
 		$theme = $_REQUEST['theme'];

@@ -43,6 +43,10 @@ class dbm {
 	 * @return      Whether $array is a filled array
 	 */
 	public static function is_result($array) {
+		// It could be a return value from an update statement
+		if (is_bool($array)) {
+			return $array;
+		}
 		return (is_array($array) && count($array) > 0);
 	}
 }

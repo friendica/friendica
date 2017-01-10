@@ -5,7 +5,7 @@ Friendica mit SSL nutzen
 
 Disclaimer
 ---
-**Dieses Dokument wurde im November 2015 aktualisiert.
+**Dieses Dokument wurde im November 2016 aktualisiert.
 SSL-Verschlüsselung ist sicherheitskritisch.
 Das bedeutet, dass sich die empfohlenen Einstellungen schnell verändern.
 Halte deine Installation auf dem aktuellen Stand und verlasse dich nicht darauf, dass dieses Dokument genau so schnell aktualisiert wird, wie sich Technologien verändern!**
@@ -45,55 +45,15 @@ Sie installieren es für dich oder haben in der Weboberfläche eine einfache Upl
 Um Geld zu sparen, kann es sich lohnen, dort auch nachzufragen, ob sie ein anderes Zertifikat, das du selbst beschaffst, für dich installieren würden.
 Wenn ja, dann lies weiter.
 
-Ein kostenloses StartSSL-Zertifikat besorgen
----
-
-StartSSL ist eine Zertifizierungsstelle, die kostenlose Zertifikate ausstellt.
-Sie sind für ein Jahr gültig und genügen für unsere Zwecke.
-
-### Schritt 1: Client-Zertifikat erstellen
-
-Wenn du dich erstmalig bei StartSSL anmeldest, erhältst du ein Zertifikat, das in deinem Browser installiert wird.
-Du brauchst es, um dich bei StartSSL einzuloggen, auch wenn du später wiederkommst.
-Dieses Client-Zertifikat hat nichts mit dem SSL-Zertifikat für deinen Server zu tun.
-
-### Schritt 2: Email-Adresse und Domain validieren
-
-Um fortzufahren musst du beweisen, dass du die Email-Adresse, die du angegeben hast, und die Domain, für die du das Zertifikat möchtest, besitzt.
-Gehe in den "Validation wizard" und fordere einen Bestätigungslink per Mail an.
-Dasselbe machst du auch für die Validierung der Domain.
-
-### Schritt 3: Das Zertifikat bestellen
-
-Gehe in den "Certificate wizard".
-Wähle das Target Webserver.
-Bei der ersten Abfrage der Domain gibst du deine Hauptdomain an.
-Im nächsten Schritt kannst du eine Subdomain hinzufügen.
-Ein Beispiel: Wenn die Adresse der Friendica-Instanz friendica.beispiel.net lautet, gibst du zuerst beispiel.net an und danach friendica.
-
-Wenn du weißt, wie man einen openssl-Schlüssel und einen Certificate Signing Request (CSR) erstellt, tu das.
-Kopiere den CSR in den Browser, um ihn von StartSSL signiert zu bekommen.
-
-Wenn du nicht weißt, wie man Schlüssel und CSR erzeugt, nimm das Angebot von StartSSL an, beides für dich zu generieren.
-Das bedeutet: StartSSL hat den Schlüssel zu deiner SSL-Verschlüsselung, aber das ist immer noch besser als gar kein Zertifikat.
-Lade dein Zertifikat von der Website herunter.
-(Oder im zweiten Fall: Lade Zertifikat und Schlüssel herunter.)
-
-Um dein Zertifikat auf einem Webserver zu installieren, brauchst du noch ein oder zwei andere Dateien: sub.class1.server.ca.pem und ca.pem, auch von StartSSL.
-Gehe in die Rubrik "Tool box" und lade "Class 1 Intermediate Server CA" und "StartCom Root CA (PEM encoded)" herunter.
-
-Wenn du dein Zertifikat zu deinem Hosting-Provider schicken möchtest, brauchen Sie mindestens Zertifikat und Schlüssel.
-Schick zur Sicherheit alle vier Dateien hin.
-**Du solltest sie auf einem verschlüsselten Weg hinschicken!**
-
-Wenn du deinen eigenen Server betreibst, lade die Dateien hoch und besuche das Mozilla-Wiki (Link unten).
 
 Let's encrypt
 ---
 
 Wenn du einen eigenen Server betreibst und den Nameserver kontrollierst, könnte auch die Initiative "Let's encrypt" interessant für dich werden.
-Momentan ist deren Angebot noch nicht fertig.
-Auf der [Website](https://letsencrypt.org/) kannst du dich über den Stand informieren.
+Sie bietet nicht nur freie SSL Zertifikate sondern auch einen automatisierten Prozess zum Erneuern der Zertifikate.
+Um letsencrypt Zertifikate verwenden zu können, musst du dir einen Client auf deinem Server installieren.
+Eine Anleitung zum offiziellen Client findet du [hier](https://certbot.eff.org/).
+Falls du dir andere Clients anschauen willst, kannst du einen Blick in diese [Liste von alternativen letsencrypt Clients](https://letsencrypt.org/docs/client-options/).
 
 Webserver-Einstellungen
 ---

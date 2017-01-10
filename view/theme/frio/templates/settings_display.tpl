@@ -22,7 +22,10 @@
 
 						{{include file="field_themeselect.tpl" field=$theme}}
 
+						{{* Show the mobile theme selection only if mobile themes are available *}}
+						{{if count($mobile_theme.4) > 1}}
 						{{include file="field_themeselect.tpl" field=$mobile_theme}}
+						{{/if}}
 
 						<div class="form-group pull-right settings-submit-wrapper" >
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit|escape:'html'}}">{{$submit}}</button>
@@ -66,10 +69,12 @@
 						{{include file="field_input.tpl" field=$itemspage_network}}
 						{{include file="field_input.tpl" field=$itemspage_mobile_network}}
 						{{include file="field_input.tpl" field=$ajaxint}}
+						{{include file="field_checkbox.tpl" field=$nowarn_insecure}}
 						{{include file="field_checkbox.tpl" field=$no_auto_update}}
 						{{include file="field_checkbox.tpl" field=$nosmile}}
 						{{include file="field_checkbox.tpl" field=$noinfo}}
 						{{include file="field_checkbox.tpl" field=$infinite_scroll}}
+						{{include file="field_checkbox.tpl" field=$bandwidth_saver}}
 
 						<div class="form-group pull-right settings-submit-wrapper" >
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit|escape:'html'}}">{{$submit}}</button>

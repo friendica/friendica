@@ -8,14 +8,18 @@
  */
 function post_update() {
 
-	if (!post_update_1192())
+	if (!post_update_1192()) {
 		return;
-
-	if (!post_update_1194())
+	}
+	if (!post_update_1194()) {
 		return;
-
-	if (!post_update_1198())
+	}
+	if (!post_update_1198()) {
 		return;
+	}
+	if (!post_update_1206()) {
+		return;
+	}
 }
 
 /**
@@ -174,13 +178,18 @@ function post_update_1198() {
 		}
 
 		// Update the thread table from the item table
-		q("UPDATE `thread` INNER JOIN `item` ON `item`.`id`=`thread`.`iid`
+		$r = q("UPDATE `thread` INNER JOIN `item` ON `item`.`id`=`thread`.`iid`
 				SET `thread`.`author-id` = `item`.`author-id`,
 				`thread`.`owner-id` = `item`.`owner-id`
 			WHERE `thread`.`author-id` = 0 AND `thread`.`owner-id` = 0 AND
 				(`thread`.`uid` IN (SELECT `uid` from `user`) OR `thread`.`uid` = 0)");
 
 		logger("Updated threads", LOGGER_DEBUG);
+		if (dbm::is_result($r)) {
+			set_config("system", "post_update_version", 1198);
+			logger("Done", LOGGER_DEBUG);
+			return true;
+		}
 		return false;
 	}
 
@@ -215,4 +224,39 @@ function post_update_1198() {
 	logger("Updated items", LOGGER_DEBUG);
 	return false;
 }
+
+/**
+ * @brief update the "last-item" field in the "self" contact
+ *
+ * This field avoids cost intensive calls in the admin panel and in "nodeinfo"
+ *
+ * @return bool "true" when the job is done
+ */
+function post_update_1206() {
+	// Was the script completed?
+	if (get_config("system", "post_update_version") >= 1206)
+		return true;
+
+	logger("Start", LOGGER_DEBUG);
+	$r = q("SELECT `contact`.`id`, `contact`.`last-item`,
+		(SELECT MAX(`changed`) FROM `item` FORCE INDEX (`uid_wall_changed`) WHERE `wall` AND `uid` = `user`.`uid`) AS `lastitem_date`
+		FROM `user`
+		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`");
+
+	if (!dbm::is_result($r)) {
+		return false;
+	}
+	foreach ($r AS $user) {
+		if (!empty($user["lastitem_date"]) AND ($user["lastitem_date"] > $user["last-item"])) {
+			q("UPDATE `contact` SET `last-item` = '%s' WHERE `id` = %d",
+				dbesc($user["lastitem_date"]),
+				intval($user["id"]));
+		}
+	}
+
+	set_config("system", "post_update_version", 1206);
+	logger("Done", LOGGER_DEBUG);
+	return true;
+}
+
 ?>

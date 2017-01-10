@@ -5,19 +5,19 @@
  */
 
 
-function cb_init(&$a) {
+function cb_init(App $a) {
 	call_hooks('cb_init');
 }
 
-function cb_post(&$a) {
+function cb_post(App $a) {
 	call_hooks('cb_post', $_POST);
 }
 
-function cb_afterpost(&$a) {
+function cb_afterpost(App $a) {
 	call_hooks('cb_afterpost');
 }
 
-function cb_content(&$a) {
+function cb_content(App $a) {
 	$o = '';
 	call_hooks('cb_content', $o);
 	return $o;

@@ -29,7 +29,7 @@
 			</select>
 		{{/if}}
 
-		<div class="comment-edit-text-end"></div>
+		<div class="comment-edit-text-end clear"></div>
 		<div class="comment-edit-submit-wrapper" id="comment-edit-submit-wrapper-{{$id}}" style="display: none;">
 			<button class="btn btn-primary btn-sm" type="submit" onclick="post_comment({{$id}}); return false;" id="comment-edit-submit-{{$id}}" name="submit"><i class="fa fa-envelope"></i> {{$submit}}</button>
 			{{if $preview}}
@@ -76,7 +76,7 @@
 			<div id="comment-edit-preview-{{$id}}" class="comment-edit-preview" style="display:none;"></div>
 		</div>
 
-		<div class="comment-edit-end"></div>
+		<div class="comment-edit-end clear"></div>
 	</form>
 
 </div>

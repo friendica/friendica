@@ -38,7 +38,6 @@
 			<form id="profile-jot-form" action="{{$action}}" method="post">
 				<div id="profile-jot-wrapper">
 					<div>
-						<div id="character-counter" class="grey jothidden text-info pull-left"></div>
 						<!--<div id="profile-jot-desc" class="jothidden pull-right">&nbsp;</div>-->
 					</div>
 
@@ -80,6 +79,7 @@
 						-->
 
 						<li class="pull-right"><button class="btn btn-primary" id="jot-submit" type="submit" id="profile-jot-submit" name="submit" ><i class="fa fa-slideshare fa-fw"></i> {{$share}}</button></li>
+						<li id="character-counter" class="grey jothidden text-info pull-right"></li>
 						<div id="profile-rotator-wrapper" style="display: {{$visitor}};" >
 							<img id="profile-rotator" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait}}" style="display: none;" />
 						</div> 

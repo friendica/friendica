@@ -1,11 +1,12 @@
 <?php
 /**
  * View for user import
+ * @TODO This file has DOS line endings!
  */
 
 require_once("include/uimport.php");
 
-function uimport_post(&$a) {
+function uimport_post(App &$a) {
 	switch($a->config['register_policy']) {
         case REGISTER_OPEN:
             $blocked = 0;
@@ -35,7 +36,7 @@ function uimport_post(&$a) {
     }
 }
 
-function uimport_content(&$a) {
+function uimport_content(App &$a) {
 	
 	if((! local_user()) && ($a->config['register_policy'] == REGISTER_CLOSED)) {
 		notice("Permission denied." . EOL);

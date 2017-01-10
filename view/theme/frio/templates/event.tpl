@@ -1,11 +1,11 @@
 <script language="javascript" type="text/javascript"
-	  src="{{$baseurl}}/view/theme/frio/js/event.js"></script>
+	  src="{{$baseurl}}/view/theme/frio/js/event_edit.js"></script>
 
 {{foreach $events as $event}}
 	<div class="event-wrapper">
 		<div class="event">
 			<div class="media">
-				<div class="event-owner pull-left">
+				<div class="event-owner media-left">
 					{{if $event.item.author_name}}
 					<a href="{{$event.item.author_link}}" ><img src="{{$event.item.author_avatar}}" /></a>
 					<a href="{{$event.item.author_link}}" >{{$event.item.author_name}}</a>

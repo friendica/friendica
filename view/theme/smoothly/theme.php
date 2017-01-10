@@ -10,12 +10,12 @@
  * Screenshot: <a href="screenshot.png">Screenshot</a>
  */
 
-function smoothly_init(&$a) {
+function smoothly_init(App &$a) {
 	set_template_engine($a, 'smarty3');
 
 	$cssFile = null;
 	$ssl_state = null;
-	$baseurl = $a->get_baseurl($ssl_state);
+	$baseurl = App::get_baseurl($ssl_state);
 $a->page['htmlhead'] .= <<< EOT
 
 <script>
@@ -114,7 +114,7 @@ if(! function_exists('_js_in_foot')) {
 		*/
 		$a = get_app();
 		$ssl_state = null;
-		$baseurl = $a->get_baseurl($ssl_state);
+		$baseurl = App::get_baseurl($ssl_state);
 		$bottom['$baseurl'] = $baseurl;
 		$tpl = get_markup_template('bottom.tpl');
 

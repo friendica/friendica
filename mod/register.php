@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/user.php');
 
 if(! function_exists('register_post')) {
-function register_post(&$a) {
+function register_post(App &$a) {
 
 	global $lang;
 
@@ -52,6 +52,7 @@ function register_post(&$a) {
 
 	$arr['blocked'] = $blocked;
 	$arr['verified'] = $verified;
+	$arr['language'] = get_browser_language();
 
 	$result = create_user($arr);
 
@@ -63,7 +64,7 @@ function register_post(&$a) {
 	$user = $result['user'];
 
 	if($netpublish && $a->config['register_policy'] != REGISTER_APPROVE) {
-		$url = $a->get_baseurl() . '/profile/' . $user['nickname'];
+		$url = App::get_baseurl() . '/profile/' . $user['nickname'];
 		proc_run(PRIORITY_LOW, "include/directory.php", $url);
 	}
 
@@ -84,7 +85,7 @@ function register_post(&$a) {
 			$res = send_register_open_eml(
 				$user['email'],
 				$a->config['sitename'],
-				$a->get_baseurl(),
+				App::get_baseurl(),
 				$user['username'],
 				$result['password']);
 
@@ -112,12 +113,13 @@ function register_post(&$a) {
 		}
 
 		$hash = random_string();
-		$r = q("INSERT INTO `register` ( `hash`, `created`, `uid`, `password`, `language` ) VALUES ( '%s', '%s', %d, '%s', '%s' ) ",
+		$r = q("INSERT INTO `register` ( `hash`, `created`, `uid`, `password`, `language`, `note` ) VALUES ( '%s', '%s', %d, '%s', '%s', '%s' ) ",
 			dbesc($hash),
 			dbesc(datetime_convert()),
 			intval($user['uid']),
 			dbesc($result['password']),
-			dbesc($lang)
+			dbesc($lang),
+			dbesc($_POST['permonlybox'])
 		);
 
 		// invite system
@@ -132,7 +134,7 @@ function register_post(&$a) {
 			$admin_mail_list
 		);
 
-
+		// send notification to admins
 		foreach ($adminlist as $admin) {
 			notification(array(
 				'type' => NOTIFY_SYSTEM,
@@ -140,15 +142,20 @@ function register_post(&$a) {
 				'source_name' => $user['username'],
 				'source_mail' => $user['email'],
 				'source_nick' => $user['nickname'],
-				'source_link' => $a->get_baseurl()."/admin/users/",
-				'link' => $a->get_baseurl()."/admin/users/",
-				'source_photo' => $a->get_baseurl() . "/photo/avatar/".$user['uid'].".jpg",
+				'source_link' => App::get_baseurl()."/admin/users/",
+				'link' => App::get_baseurl()."/admin/users/",
+				'source_photo' => App::get_baseurl() . "/photo/avatar/".$user['uid'].".jpg",
 				'to_email' => $admin['email'],
 				'uid' => $admin['uid'],
-				'language' => ($admin['language']?$admin['language']:'en'))
-			);
+				'language' => ($admin['language']?$admin['language']:'en'),
+				'show_in_notification_page' => false
+			));
 		}
-
+		// send notification to the user, that the registration is pending
+		send_register_pending_eml(
+				$user['email'],
+				$a->config['sitename'],
+				$user['username']);
 
 		info( t('Your registration is pending approval by the site owner.') . EOL ) ;
 		goaway(z_root());
@@ -165,7 +172,7 @@ function register_post(&$a) {
 
 
 if(! function_exists('register_content')) {
-function register_content(&$a) {
+function register_content(App &$a) {
 
 	// logged in users can register others (people/pages/groups)
 	// even with closed registrations, unless specifically prohibited by site policy.
@@ -256,6 +263,8 @@ function register_content(&$a) {
 	$o = replace_macros($o, array(
 		'$oidhtml' => $oidhtml,
 		'$invitations' => get_config('system','invitation_only'),
+		'$permonly' => $a->config['register_policy'] == REGISTER_APPROVE,
+		'$permonlybox' => array('permonlybox', t('Note for the admin'), '', t('Leave a message for the admin, why you want to join this node')),
 		'$invite_desc' => t('Membership on this site is by invitation only.'),
 		'$invite_label' => t('Your invitation ID: '),
 		'$invite_id' => $invite_id,

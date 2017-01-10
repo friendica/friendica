@@ -1,14 +1,16 @@
 <?php
 
-function uexport_init(&$a){
-	if(! local_user())
+function uexport_init(App &$a){
+	if (! local_user()) {
 		killme();
+	}
 
 	require_once("mod/settings.php");
-        settings_init($a);
+	settings_init($a);
 }
 
-function uexport_content(&$a){
+/// @TODO Change space -> tab where wanted
+function uexport_content(App &$a){
 
     if ($a->argc > 1) {
         header("Content-type: application/json");
@@ -33,7 +35,7 @@ function uexport_content(&$a){
 
     $tpl = get_markup_template("uexport.tpl");
     return replace_macros($tpl, array(
-        '$baseurl' => $a->get_baseurl(),
+        '$baseurl' => App::get_baseurl(),
         '$title' => t('Export personal data'),
         '$options' => $options
     ));
@@ -44,7 +46,7 @@ function uexport_content(&$a){
 function _uexport_multirow($query) {
 	$result = array();
 	$r = q($query);
-//	if(count($r)) {
+//	if (dbm::is_result($r)) {
 	if ($r){
 		foreach($r as $rr){
             $p = array();
@@ -104,7 +106,7 @@ function uexport_account($a){
 	$output = array(
         'version' => FRIENDICA_VERSION,
         'schema' => DB_UPDATE_VERSION,
-        'baseurl' => $a->get_baseurl(),
+        'baseurl' => App::get_baseurl(),
         'user' => $user,
         'contact' => $contact,
         'profile' => $profile,
@@ -122,7 +124,7 @@ function uexport_account($a){
 /**
  * echoes account data and items as separated json, one per line
  */
-function uexport_all(&$a) {
+function uexport_all(App &$a) {
 
 	uexport_account($a);
 	echo "\n";
@@ -130,7 +132,7 @@ function uexport_all(&$a) {
 	$r = q("SELECT count(*) as `total` FROM `item` WHERE `uid` = %d ",
 		intval(local_user())
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 		$total = $r[0]['total'];
 
 	// chunk the output to avoid exhausting memory
@@ -142,7 +144,7 @@ function uexport_all(&$a) {
 			intval($x),
 			intval(500)
 		);
-		/*if(count($r)) {
+		/*if (dbm::is_result($r)) {
 			foreach($r as $rr)
 				foreach($rr as $k => $v)
 					$item[][$k] = $v;

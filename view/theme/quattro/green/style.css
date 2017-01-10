@@ -1210,6 +1210,9 @@ section {
 .wall-item-container .wall-item-actions-social a {
   margin-right: 3em;
 }
+.wall-item-container .wall-item-actions-social a.active {
+  font-weight: bold;
+}
 .wall-item-container .wall-item-actions-tools {
   float: right;
   width: 15%;

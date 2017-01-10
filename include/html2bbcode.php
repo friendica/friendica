@@ -1,11 +1,14 @@
 <?php
-/*
-html2bbcode.php
-Converter for HTML to BBCode
-Made by: ike@piratenpartei.de
-Originally made for the syncom project: http://wiki.piratenpartei.de/Syncom
-					https://github.com/annando/Syncom
-*/
+/**
+ * @file include/html2bbcode.php
+ * @brief Converter for HTML to BBCode
+ * 
+ * Made by: ike@piratenpartei.de
+ * Originally made for the syncom project: http://wiki.piratenpartei.de/Syncom
+ * 					https://github.com/annando/Syncom
+ */
+
+require_once("include/xml.php");
 
 function node2bbcode(&$doc, $oldnode, $attributes, $startbb, $endbb)
 {
@@ -76,15 +79,6 @@ function node2bbcodesub(&$doc, $oldnode, $attributes, $startbb, $endbb)
 	return($replace);
 }
 
-if(!function_exists('deletenode')) {
-function deletenode(&$doc, $node)
-{
-	$xpath = new DomXPath($doc);
-	$list = $xpath->query("//".$node);
-	foreach ($list as $child)
-		$child->parentNode->removeChild($child);
-}}
-
 function _replace_code_cb($m){
 	return "<code>".str_replace("\n","<br>\n",$m[1]). "</code>";
 }
@@ -117,12 +111,12 @@ function html2bbcode($message)
 
 	@$doc->loadHTML($message);
 
-	deletenode($doc, 'style');
-	deletenode($doc, 'head');
-	deletenode($doc, 'title');
-	deletenode($doc, 'meta');
-	deletenode($doc, 'xml');
-	deletenode($doc, 'removeme');
+	xml::deleteNode($doc, 'style');
+	xml::deleteNode($doc, 'head');
+	xml::deleteNode($doc, 'title');
+	xml::deleteNode($doc, 'meta');
+	xml::deleteNode($doc, 'xml');
+	xml::deleteNode($doc, 'removeme');
 
 	$xpath = new DomXPath($doc);
 	$list = $xpath->query("//pre");
@@ -239,7 +233,7 @@ function html2bbcode($message)
 	node2bbcode($doc, 'iframe', array('src'=>'/(.+)/'), '[iframe]$1', '[/iframe]');
 
 	node2bbcode($doc, 'code', array(), '[code]', '[/code]');
-    node2bbcode($doc, 'key', array(), '[code]', '[/code]');
+	node2bbcode($doc, 'key', array(), '[code]', '[/code]');
 
 	$message = $doc->saveHTML();
 

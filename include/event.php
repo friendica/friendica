@@ -206,7 +206,7 @@ function bbtoevent($s) {
 }
 
 
-function sort_by_date($a) {
+function sort_by_date(App &$a) {
 
 	usort($a,'ev_compare');
 	return $a;
@@ -246,6 +246,7 @@ function event_store($arr) {
 	$arr['cid']     = ((intval($arr['cid'])) ? intval($arr['cid']) : 0);
 	$arr['uri']     = (x($arr,'uri') ? $arr['uri'] : item_new_uri($a->get_hostname(),$arr['uid']));
 	$arr['private'] = ((x($arr,'private')) ? intval($arr['private']) : 0);
+	$arr['guid']    = get_guid(32);
 
 	if($arr['cid'])
 		$c = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -271,7 +272,7 @@ function event_store($arr) {
 			intval($arr['id']),
 			intval($arr['uid'])
 		);
-		if((! count($r)) || ($r[0]['edited'] === $arr['edited'])) {
+		if((! dbm::is_result($r)) || ($r[0]['edited'] === $arr['edited'])) {
 
 			// Nothing has changed. Grab the item id to return.
 
@@ -279,7 +280,7 @@ function event_store($arr) {
 				intval($arr['id']),
 				intval($arr['uid'])
 			);
-			return((count($r)) ? $r[0]['id'] : 0);
+			return((dbm::is_result($r)) ? $r[0]['id'] : 0);
 		}
 
 		// The event changed. Update it.
@@ -312,7 +313,7 @@ function event_store($arr) {
 			intval($arr['id']),
 			intval($arr['uid'])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$object = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($arr['uri']) . '</id>';
 			$object .= '<content>' . xmlify(format_event_bbcode($arr)) . '</content>';
 			$object .= '</object>' . "\n";
@@ -333,16 +334,16 @@ function event_store($arr) {
 		call_hooks("event_updated", $arr['id']);
 
 		return $item_id;
-	}
-	else {
+	} else {
 
 		// New event. Store it.
 
-		$r = q("INSERT INTO `event` ( `uid`,`cid`,`uri`,`created`,`edited`,`start`,`finish`,`summary`, `desc`,`location`,`type`,
+		$r = q("INSERT INTO `event` (`uid`,`cid`,`guid`,`uri`,`created`,`edited`,`start`,`finish`,`summary`, `desc`,`location`,`type`,
 			`adjust`,`nofinish`,`allow_cid`,`allow_gid`,`deny_cid`,`deny_gid`)
-			VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', '%s', '%s', '%s' ) ",
+			VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', '%s', '%s', '%s' ) ",
 			intval($arr['uid']),
 			intval($arr['cid']),
+			dbesc($arr['guid']),
 			dbesc($arr['uri']),
 			dbesc($arr['created']),
 			dbesc($arr['edited']),
@@ -365,7 +366,7 @@ function event_store($arr) {
 			dbesc($arr['uri']),
 			intval($arr['uid'])
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$event = $r[0];
 
 		$item_arr = array();
@@ -407,8 +408,8 @@ function event_store($arr) {
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($arr['uid'])
 		);
-		//if(count($r))
-		//	$plink = $a->get_baseurl() . '/display/' . $r[0]['nickname'] . '/' . $item_id;
+		//if (dbm::is_result($r))
+		//	$plink = App::get_baseurl() . '/display/' . $r[0]['nickname'] . '/' . $item_id;
 
 
 		if($item_id) {
@@ -480,6 +481,13 @@ function get_event_strings() {
 			"month" => t("month"),
 			"week" => t("week"),
 			"day" => t("day"),
+			"allday" => t("all-day"),
+
+			"noevent" => t("No events to display"),
+
+			"dtstart_label" => t("Starts:"),
+			"dtend_label" => t("Finishes:"),
+			"location_label" => t("Location:")
 		);
 
 	return $i18n;
@@ -502,13 +510,13 @@ function event_by_id($owner_uid = 0, $event_params, $sql_extra = '') {
 	// query for the event by event id
 	$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
 			`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event`
-		LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
+		STRAIGHT_JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
 		WHERE `event`.`uid` = %d AND `event`.`id` = %d $sql_extra",
 		intval($owner_uid),
 		intval($event_params["event_id"])
 	);
 
-	if(count($r))
+	if (dbm::is_result($r))
 		return $r;
 
 }
@@ -535,7 +543,7 @@ function events_by_date($owner_uid = 0, $event_params, $sql_extra = '') {
 	// query for the event by date
 	$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
 				`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event`
-			LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
+			STRAIGHT_JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
 			WHERE `event`.`uid` = %d AND event.ignore = %d
 			AND ((`adjust` = 0 AND (`finish` >= '%s' OR (nofinish AND start >= '%s')) AND `start` <= '%s')
 			OR  (`adjust` = 1 AND (`finish` >= '%s' OR (nofinish AND start >= '%s')) AND `start` <= '%s'))
@@ -550,7 +558,7 @@ function events_by_date($owner_uid = 0, $event_params, $sql_extra = '') {
 			dbesc($event_params["adjust_finish"])
 	);
 
-	if(count($r))
+	if (dbm::is_result($r))
 		return $r;
 }
 
@@ -743,7 +751,7 @@ function events_by_uid($uid = 0, $sql_extra = '') {
 		);
 	}
 
-	if(count($r))
+	if (dbm::is_result($r))
 		return $r;
 }
 
@@ -766,7 +774,7 @@ function event_export($uid, $format = 'ical') {
 	// we are allowed to show events
 	// get the timezone the user is in
 	$r = q("SELECT `timezone` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
-	if (count($r))
+	if (dbm::is_result($r))
 		$timezone = $r[0]['timezone'];
 
 	// get all events which are owned by a uid (respects permissions);

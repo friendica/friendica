@@ -96,15 +96,20 @@ function email_get_msg($mbox,$uid, $reply) {
 		$html = '';
 		foreach($struc->parts as $ptop => $p) {
 			$x = email_get_part($mbox,$uid,$p,$ptop + 1, 'plain');
-			if($x)	$text .= $x;
+			if ($x) {
+				$text .= $x;
+			}
 
 			$x = email_get_part($mbox,$uid,$p,$ptop + 1, 'html');
-			if($x)	$html .= $x;
+			if ($x) {
+				$html .= $x;
+			}
 		}
-		if (trim($html) != '')
+		if (trim($html) != '') {
 			$ret['body'] = html2bbcode($html);
-		else
+		} else {
 			$ret['body'] = $text;
+		}
 	}
 
 	$ret['body'] = removegpg($ret['body']);
@@ -112,8 +117,9 @@ function email_get_msg($mbox,$uid, $reply) {
 	$ret['body'] = $msg['body'];
 	$ret['body'] = convertquote($ret['body'], $reply);
 
-	if (trim($html) != '')
+	if (trim($html) != '') {
 		$ret['body'] = removelinebreak($ret['body']);
+	}
 
 	$ret['body'] = unifyattributionline($ret['body']);
 
@@ -189,8 +195,9 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 		$x = "";
 		foreach ($p->parts as $partno0=>$p2) {
 			$x .=  email_get_part($mbox,$uid,$p2,$partno . '.' . ($partno0+1), $subtype);  // 1.2, 1.2.1, etc.
-			//if($x)
+			//if ($x) {
 			//	return $x;
+			//}
 		}
 		return $x;
 	}

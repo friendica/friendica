@@ -10,4 +10,4 @@
 		<div class="shared-wall-item-ago"><small><a href="{{$link}}" target="_blank"><span class="shared-time">{{$posted}}</a></a></small></div>
 	</div>
 	<blockquote class="shared_content">{{$content}}</blockquote>
-<div>
+</div>

@@ -11,6 +11,8 @@ if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 }
 
 require_once("boot.php");
+require_once("include/photos.php");
+require_once("include/user.php");
 
 
 function cron_run(&$argv, &$argc){
@@ -41,7 +43,7 @@ function cron_run(&$argv, &$argc){
 
 	// Don't check this stuff if the function is called by the poller
 	if (App::callstack() != "poller_run") {
-		if (App::maxload_reached())
+		if ($a->maxload_reached())
 			return;
 		if (App::is_already_running('cron', 'include/cron.php', 540))
 			return;
@@ -69,15 +71,15 @@ function cron_run(&$argv, &$argc){
 
 	// run queue delivery process in the background
 
-	proc_run(PRIORITY_NEGLIGIBLE,"include/queue.php");
+	proc_run(PRIORITY_NEGLIGIBLE, "include/queue.php");
 
 	// run the process to discover global contacts in the background
 
-	proc_run(PRIORITY_LOW,"include/discover_poco.php");
+	proc_run(PRIORITY_LOW, "include/discover_poco.php");
 
 	// run the process to update locally stored global contacts in the background
 
-	proc_run(PRIORITY_LOW,"include/discover_poco.php", "checkcontact");
+	proc_run(PRIORITY_LOW, "include/discover_poco.php", "checkcontact");
 
 	// Expire and remove user entries
 	cron_expire_and_remove_users();
@@ -120,11 +122,15 @@ function cron_run(&$argv, &$argc){
 
 		update_contact_birthdays();
 
-		proc_run(PRIORITY_LOW,"include/discover_poco.php", "suggestions");
+		proc_run(PRIORITY_LOW, "include/discover_poco.php", "suggestions");
 
 		set_config('system','last_expire_day',$d2);
 
-		proc_run(PRIORITY_LOW,'include/expire.php');
+		proc_run(PRIORITY_LOW, 'include/expire.php');
+
+		proc_run(PRIORITY_MEDIUM, 'include/dbclean.php');
+
+		cron_update_photo_albums();
 	}
 
 	// Clear cache entries
@@ -144,6 +150,20 @@ function cron_run(&$argv, &$argc){
 	set_config('system','last_cron', time());
 
 	return;
+}
+
+/**
+ * @brief Update the cached values for the number of photo albums per user
+ */
+function cron_update_photo_albums() {
+	$r = q("SELECT `uid` FROM `user` WHERE NOT `account_expired` AND NOT `account_removed`");
+	if (!dbm::is_result($r)) {
+		return;
+	}
+
+	foreach ($r AS $user) {
+		photo_albums($user['uid'], true);
+	}
 }
 
 /**
@@ -244,7 +264,7 @@ function cron_poll_contacts($argc, $argv) {
 			intval($c['id'])
 		);
 
-		if((! $res) || (! count($res)))
+		if (dbm::is_result($res))
 			continue;
 
 		foreach($res as $contact) {
@@ -306,7 +326,11 @@ function cron_poll_contacts($argc, $argv) {
 
 			logger("Polling ".$contact["network"]." ".$contact["id"]." ".$contact["nick"]." ".$contact["name"]);
 
-			proc_run(PRIORITY_MEDIUM,'include/onepoll.php',$contact['id']);
+			if (($contact['network'] == NETWORK_FEED) AND ($contact['priority'] <= 3)) {
+				proc_run(PRIORITY_MEDIUM, 'include/onepoll.php', $contact['id']);
+			} else {
+				proc_run(PRIORITY_LOW, 'include/onepoll.php', $contact['id']);
+			}
 
 			if($interval)
 				@time_sleep_until(microtime(true) + (float) $interval);
@@ -319,7 +343,7 @@ function cron_poll_contacts($argc, $argv) {
  *
  * @param App $a
  */
-function cron_clear_cache(&$a) {
+function cron_clear_cache(App &$a) {
 
 	$last = get_config('system','cache_last_cleared');
 
@@ -355,10 +379,10 @@ function cron_clear_cache(&$a) {
 	}
 
 	// Delete the cached OEmbed entries that are older than one year
-	q("DELETE FROM `oembed` WHERE `created` < NOW() - INTERVAL 1 YEAR");
+	q("DELETE FROM `oembed` WHERE `created` < NOW() - INTERVAL 3 MONTH");
 
 	// Delete the cached "parse_url" entries that are older than one year
-	q("DELETE FROM `parsed_url` WHERE `created` < NOW() - INTERVAL 1 YEAR");
+	q("DELETE FROM `parsed_url` WHERE `created` < NOW() - INTERVAL 3 MONTH");
 
 	// Maximum table size in megabyte
 	$max_tablesize = intval(get_config('system','optimize_max_tablesize')) * 1000000;
@@ -406,11 +430,11 @@ function cron_clear_cache(&$a) {
  *
  * @param App $a
  */
-function cron_repair_diaspora(&$a) {
+function cron_repair_diaspora(App &$a) {
 	$r = q("SELECT `id`, `url` FROM `contact`
 		WHERE `network` = '%s' AND (`batch` = '' OR `notify` = '' OR `poll` = '' OR pubkey = '')
 			ORDER BY RAND() LIMIT 50", dbesc(NETWORK_DIASPORA));
-	if ($r) {
+	if (dbm::is_result($r)) {
 		foreach ($r AS $contact) {
 			if (poco_reachable($contact["url"])) {
 				$data = probe_url($contact["url"]);
@@ -431,6 +455,16 @@ function cron_repair_diaspora(&$a) {
  */
 function cron_repair_database() {
 
+	// Sometimes there seem to be issues where the "self" contact vanishes.
+	// We haven't found the origin of the problem by now.
+	$r = q("SELECT `uid` FROM `user` WHERE NOT EXISTS (SELECT `uid` FROM `contact` WHERE `contact`.`uid` = `user`.`uid` AND `contact`.`self`)");
+	if (dbm::is_result($r)) {
+		foreach ($r AS $user) {
+			logger('Create missing self contact for user '.$user['uid']);
+			user_create_self_contact($user['uid']);
+		}
+	}
+
 	// Set the parent if it wasn't set. (Shouldn't happen - but does sometimes)
 	// This call is very "cheap" so we can do it at any time without a problem
 	q("UPDATE `item` INNER JOIN `item` AS `parent` ON `parent`.`uri` = `item`.`parent-uri` AND `parent`.`uid` = `item`.`uid` SET `item`.`parent` = `parent`.`id` WHERE `item`.`parent` = 0");
@@ -440,7 +474,7 @@ function cron_repair_database() {
 
 	// Update the global contacts for local users
 	$r = q("SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`");
-	if ($r)
+	if (dbm::is_result($r))
 		foreach ($r AS $user)
 			update_gcontact_for_user($user["uid"]);
 

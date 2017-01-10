@@ -21,7 +21,7 @@ function handle_pubsubhubbub($id) {
 
 	$headers = array("Content-type: application/atom+xml",
 			sprintf("Link: <%s>;rel=hub,<%s>;rel=self",
-				$a->get_baseurl().'/pubsubhubbub',
+				App::get_baseurl().'/pubsubhubbub',
 				$rr['topic']),
 			"X-Hub-Signature: sha1=".$hmac_sig);
 
@@ -76,16 +76,19 @@ function pubsubpublish_run(&$argv, &$argc){
 	load_config('system');
 
 	// Don't check this stuff if the function is called by the poller
-	if (App::callstack() != "poller_run")
-		if (App::is_already_running("pubsubpublish", "include/pubsubpublish.php", 540))
+	if (App::callstack() != "poller_run") {
+		if (App::is_already_running("pubsubpublish", "include/pubsubpublish.php", 540)) {
 			return;
+		}
+	}
 
 	$a->set_baseurl(get_config('system','url'));
 
 	load_hooks();
 
-	if($argc > 1)
+	if ($argc > 1) {
 		$pubsubpublish_id = intval($argv[1]);
+	}
 	else {
 		// We'll push to each subscriber that has push > 0,
 		// i.e. there has been an update (set in notifier.php).
@@ -95,10 +98,11 @@ function pubsubpublish_run(&$argv, &$argc){
 		$interval = Config::get("system", "delivery_interval", 2);
 
 		// If we are using the worker we don't need a delivery interval
-		if (get_config("system", "worker"))
+		if (get_config("system", "worker")) {
 			$interval = false;
+		}
 
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 			logger("Publish feed to ".$rr["callback_url"], LOGGER_DEBUG);
 			proc_run(PRIORITY_HIGH, 'include/pubsubpublish.php', $rr["id"]);
 

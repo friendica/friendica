@@ -53,11 +53,11 @@ function delivery_run(&$argv, &$argc){
 			dbesc($item_id),
 			dbesc($contact_id)
 		);
-		if (!count($r)) {
+		if (!dbm::is_result($r)) {
 			continue;
 		}
 
-		if (App::maxload_reached())
+		if ($a->maxload_reached())
 			return;
 
 		// It's ours to deliver. Remove it from the queue.
@@ -131,7 +131,7 @@ function delivery_run(&$argv, &$argc){
 				intval($item_id)
 			);
 
-			if ((!count($r)) || (!intval($r[0]['parent']))) {
+			if ((!dbm::is_result($r)) || (!intval($r[0]['parent']))) {
 				continue;
 			}
 
@@ -178,13 +178,13 @@ function delivery_run(&$argv, &$argc){
 
 		$r = q("SELECT `contact`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey`,
 			`user`.`timezone`, `user`.`nickname`, `user`.`sprvkey`, `user`.`spubkey`,
-			`user`.`page-flags`, `user`.`prvnets`
+			`user`.`page-flags`, `user`.`account-type`, `user`.`prvnets`
 			FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
 			WHERE `contact`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
 			intval($uid)
 		);
 
-		if (!count($r))
+		if (!dbm::is_result($r))
 			continue;
 
 		$owner = $r[0];
@@ -254,7 +254,7 @@ function delivery_run(&$argv, &$argc){
 			intval($contact_id)
 		);
 
-		if (count($r))
+		if (dbm::is_result($r))
 			$contact = $r[0];
 
 		if ($contact['self'])
@@ -323,7 +323,7 @@ function delivery_run(&$argv, &$argc){
 
 				// perform local delivery if we are on the same site
 
-				if (link_compare($basepath,$a->get_baseurl())) {
+				if (link_compare($basepath,App::get_baseurl())) {
 
 					$nickname = basename($contact['url']);
 					if ($contact['issued-id'])
@@ -381,7 +381,14 @@ function delivery_run(&$argv, &$argc){
 				if ($deliver_status == (-1)) {
 					logger('notifier: delivery failed: queuing message');
 					add_to_queue($contact['id'],NETWORK_DFRN,$atom);
+
+					// The message could not be delivered. We mark the contact as "dead"
+					mark_for_death($contact);
+				} else {
+					// We successfully delivered a message, the contact is alive
+					unmark_for_death($contact);
 				}
+
 				break;
 
 			case NETWORK_OSTATUS:
@@ -416,7 +423,7 @@ function delivery_run(&$argv, &$argc){
 							intval($argv[2]),
 							intval($uid)
 						);
-						if (count($r))
+						if (dbm::is_result($r))
 							$it = $r[0];
 					}
 					if (!$it)
@@ -471,14 +478,14 @@ function delivery_run(&$argv, &$argc){
 								dbesc($it['parent-uri']),
 								intval($uid));
 
-							if (count($r) AND ($r[0]['title'] != ''))
+							if (dbm::is_result($r) AND ($r[0]['title'] != ''))
 								$subject = $r[0]['title'];
 							else {
 								$r = q("SELECT `title` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d LIMIT 1",
 									dbesc($it['parent-uri']),
 									intval($uid));
 
-								if (count($r) AND ($r[0]['title'] != ''))
+								if (dbm::is_result($r) AND ($r[0]['title'] != ''))
 									$subject = $r[0]['title'];
 							}
 						}
@@ -501,7 +508,7 @@ function delivery_run(&$argv, &$argc){
 					break;
 
 				if ($mail) {
-					diaspora::send_mail($item,$owner,$contact);
+					Diaspora::send_mail($item,$owner,$contact);
 					break;
 				}
 
@@ -511,34 +518,25 @@ function delivery_run(&$argv, &$argc){
 				if (!$contact['pubkey'] && !$public_message)
 					break;
 
-				$unsupported_activities = array(ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE);
-
-				//don't transmit activities which are not supported by diaspora
-				foreach($unsupported_activities as $act) {
-					if (activity_match($target_item['verb'],$act)) {
-						break 2;
-					}
-				}
-
 				if (($target_item['deleted']) && (($target_item['uri'] === $target_item['parent-uri']) || $followup)) {
 					// top-level retraction
 					logger('diaspora retract: '.$loc);
-					diaspora::send_retraction($target_item,$owner,$contact,$public_message);
+					Diaspora::send_retraction($target_item,$owner,$contact,$public_message);
 					break;
 				} elseif ($followup) {
 					// send comments and likes to owner to relay
 					logger('diaspora followup: '.$loc);
-					diaspora::send_followup($target_item,$owner,$contact,$public_message);
+					Diaspora::send_followup($target_item,$owner,$contact,$public_message);
 					break;
 				} elseif ($target_item['uri'] !== $target_item['parent-uri']) {
 					// we are the relay - send comments, likes and relayable_retractions to our conversants
 					logger('diaspora relay: '.$loc);
-					diaspora::send_relay($target_item,$owner,$contact,$public_message);
+					Diaspora::send_relay($target_item,$owner,$contact,$public_message);
 					break;
 				} elseif ($top_level && !$walltowall) {
 					// currently no workable solution for sending walltowall
 					logger('diaspora status: '.$loc);
-					diaspora::send_status($target_item,$owner,$contact,$public_message);
+					Diaspora::send_status($target_item,$owner,$contact,$public_message);
 					break;
 				}
 

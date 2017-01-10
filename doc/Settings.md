@@ -1,5 +1,7 @@
 # Settings
 
+* [Home](help)
+
 If you are the admin of a Friendica node, you have access to the so called **Admin Panel** where you can configure your Friendica node.
 
 On the front page of the admin panel you will see a summary of information about your node.

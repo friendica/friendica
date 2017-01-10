@@ -1,7 +1,7 @@
 
 {{if $item.comment_firstcollapsed}}
 	<div class="hide-comments-outer">
-		<span id="hide-comments-total-{{$item.id}}" class="hide-comments-total">{{$item.num_comments}}</span> 
+		<span id="hide-comments-total-{{$item.id}}" class="hide-comments-total">{{$item.num_comments}}</span>
 		<span id="hide-comments-{{$item.id}}" class="hide-comments fakelink" onclick="showHideComments({{$item.id}});">{{$item.hide_text}}</span>
 	</div>
 	<div id="collapsed-comments-{{$item.id}}" class="collapsed-comments" style="display: none;">
@@ -19,7 +19,7 @@
 			</div>
 			<div class="wall-item-arrowphoto-wrapper" ><img src="view/theme/smoothly/images/larrow.gif" alt="{{$item.wall}}" /></div>
 			{{/if}}
-			<div class="wall-item-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}} p-author h-card" id="wall-item-photo-wrapper-{{$item.id}}" 
+			<div class="wall-item-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}} p-author h-card" id="wall-item-photo-wrapper-{{$item.id}}"
 				onmouseover="if (typeof t{{$item.id}} != 'undefined') clearTimeout(t{{$item.id}}); openMenu('wall-item-photo-menu-button-{{$item.id}}')"
                 onmouseout="t{{$item.id}}=setTimeout('closeMenu(\'wall-item-photo-menu-button-{{$item.id}}\'); closeMenu(\'wall-item-photo-menu-{{$item.id}}\');',200)">
 				<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-photo-link u-url" id="wall-item-photo-link-{{$item.id}}">
@@ -51,7 +51,7 @@
 			</a>
 			<div class="wall-item-ago">&bull;</div>
 			<div class="wall-item-ago" id="wall-item-ago-{{$item.id}}" title="{{$item.localtime}}"><time class="dt-published" datetime="{{$item.localtime}}">{{$item.ago}}</time></div>
-		</div>	
+		</div>
 
 		<div>
 		<hr class="line-dots">
@@ -66,15 +66,15 @@
 				</div>
 
 				{{if $item.has_cats}}
-				<div class="categorytags"><span>{{$item.txt_cats}} {{foreach $item.categories as $cat}}<span class="p-category">{{$cat.name}}</span> 
-				<a href="{{$cat.removeurl}}" title="{{$remove}}">[{{$remove}}]</a> 
+				<div class="categorytags"><span>{{$item.txt_cats}} {{foreach $item.categories as $cat}}<span class="p-category">{{$cat.name}}</span>
+				<a href="{{$cat.removeurl}}" title="{{$remove}}">[{{$remove}}]</a>
 				{{if $cat.last}}{{else}}, {{/if}}{{/foreach}}
 				</div>
 				{{/if}}
 
 				{{if $item.has_folders}}
-				<div class="filesavetags"><span>{{$item.txt_folders}} {{foreach $item.folders as $cat}}<span class="p-category">{{$cat.name}}</span> 
-				<a href="{{$cat.removeurl}}" title="{{$remove}}">[{{$remove}}]</a> 
+				<div class="filesavetags"><span>{{$item.txt_folders}} {{foreach $item.folders as $cat}}<span class="p-category">{{$cat.name}}</span>
+				<a href="{{$cat.removeurl}}" title="{{$remove}}">[{{$remove}}]</a>
 				{{if $cat.last}}{{else}}, {{/if}}{{/foreach}}
 				</div>
 				{{/if}}
@@ -85,9 +85,9 @@
 
 			{{if $item.vote}}
 			<div class="wall-item-like-buttons" id="wall-item-like-buttons-{{$item.id}}">
-				<a href="#" class="icon like" title="{{$item.vote.like.0}}" onclick="dolike({{$item.id}},'like'); return false"></a>
+				<a href="#" class="icon like{{if $item.responses.like.self}} self{{/if}}" title="{{$item.vote.like.0}}" onclick="dolike({{$item.id}},'like'); return false"></a>
 				{{if $item.vote.dislike}}
-				<a href="#" class="icon dislike" title="{{$item.vote.dislike.0}}" onclick="dolike({{$item.id}},'dislike'); return false"></a>
+				<a href="#" class="icon dislike{{if $item.responses.dislike.self}} self{{/if}}" title="{{$item.vote.dislike.0}}" onclick="dolike({{$item.id}},'dislike'); return false"></a>
 				{{/if}}
 				{{if $item.vote.share}}
 				<a href="#" class="icon recycle wall-item-share-buttons" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}}); return false"></a>				{{/if}}
@@ -100,7 +100,7 @@
 				<a href="{{$item.plink.href}}" title="{{$item.plink.title}}" target="external-link" class="icon remote-link u-url"></a>
 			</div>
 			{{/if}}
-		 
+
 			{{if $item.star}}
 			<a href="#" id="starred-{{$item.id}}" onclick="dostar({{$item.id}}); return false;" class="star-item icon {{$item.isstarred}}" title="{{$item.star.toggle}}"></a>
 			{{/if}}
@@ -111,7 +111,7 @@
 			{{if $item.filer}}
 			<a href="#" id="filer-{{$item.id}}" onclick="itemFiler({{$item.id}}); return false;" class="filer-item filer-icon" title="{{$item.filer}}"></a>
 			{{/if}}
-	
+
 		</div>
 
 		<div class="wall-item-tools" id="wall-item-tools-{{$item.id}}">
@@ -132,7 +132,7 @@
 			<div class="wall-item-delete-end"></div>
 		</div>
 
-	</div>	
+	</div>
 	<div class="wall-item-wrapper-end"></div>
 	<div class="wall-item-like" id="wall-item-like-{{$item.id}}">{{$item.like}}</div>
 	<div class="wall-item-dislike" id="wall-item-dislike-{{$item.id}}">{{$item.dislike}}</div>

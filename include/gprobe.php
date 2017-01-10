@@ -12,11 +12,11 @@ function gprobe_run(&$argv, &$argc){
 	}
 
 	if(is_null($db)) {
-	    @include(".htconfig.php");
-    	require_once("include/dba.php");
-	    $db = new dba($db_host, $db_user, $db_pass, $db_data);
-    	unset($db_host, $db_user, $db_pass, $db_data);
-  	};
+		@include(".htconfig.php");
+		require_once("include/dba.php");
+		$db = new dba($db_host, $db_user, $db_pass, $db_data);
+		unset($db_host, $db_user, $db_pass, $db_data);
+	};
 
 	require_once('include/session.php');
 	require_once('include/datetime.php');
@@ -39,14 +39,13 @@ function gprobe_run(&$argv, &$argc){
 
 	logger("gprobe start for ".normalise_link($url), LOGGER_DEBUG);
 
-	if (!count($r)) {
+	if (!dbm::is_result($r)) {
 
 		// Is it a DDoS attempt?
 		$urlparts = parse_url($url);
 
 		$result = Cache::get("gprobe:".$urlparts["host"]);
 		if (!is_null($result)) {
-			$result = unserialize($result);
 			if (in_array($result["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
 				logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
 				return;
@@ -56,7 +55,7 @@ function gprobe_run(&$argv, &$argc){
 		$arr = probe_url($url);
 
 		if (is_null($result))
-			Cache::set("gprobe:".$urlparts["host"],serialize($arr));
+			Cache::set("gprobe:".$urlparts["host"], $arr);
 
 		if (!in_array($arr["network"], array(NETWORK_FEED, NETWORK_PHANTOM)))
 			update_gcontact($arr);
@@ -65,7 +64,7 @@ function gprobe_run(&$argv, &$argc){
 			dbesc(normalise_link($url))
 		);
 	}
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		// Check for accessibility and do a poco discovery
 		if (poco_last_updated($r[0]['url'], true) AND ($r[0]["network"] == NETWORK_DFRN))
 			poco_load(0,0,$r[0]['id'], str_replace('/profile/','/poco/',$r[0]['url']));
@@ -76,6 +75,6 @@ function gprobe_run(&$argv, &$argc){
 }
 
 if (array_search(__file__,get_included_files())===0){
-  gprobe_run($_SERVER["argv"],$_SERVER["argc"]);
-  killme();
+	gprobe_run($_SERVER["argv"],$_SERVER["argc"]);
+	killme();
 }

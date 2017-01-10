@@ -77,9 +77,9 @@ This will include:
     $a->argc = 3
     $a->argv = array(0 => 'plugin', 1 => 'arg1', 2 => 'arg2');
 
-Your module functions will often contain the function plugin_name_content(&$a), which defines and returns the page body content.
-They may also contain plugin_name_post(&$a) which is called before the _content function and typically handles the results of POST forms.
-You may also have plugin_name_init(&$a) which is called very early on and often does module initialisation.
+Your module functions will often contain the function plugin_name_content(App &$a), which defines and returns the page body content.
+They may also contain plugin_name_post(App &$a) which is called before the _content function and typically handles the results of POST forms.
+You may also have plugin_name_init(App &$a) which is called very early on and often does module initialisation.
 
 Templates
 ---

@@ -80,11 +80,13 @@ function networks_widget($baseurl,$selected = '') {
 
 	$a = get_app();
 
-	if(!local_user())
+	if (!local_user()) {
 		return '';
+	}
 
-	if(!feature_enabled(local_user(),'networks'))
+	if (!feature_enabled(local_user(),'networks')) {
 		return '';
+	}
 
 	$extra_sql = unavailable_networks();
 
@@ -93,11 +95,13 @@ function networks_widget($baseurl,$selected = '') {
 	);
 
 	$nets = array();
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		require_once('include/contact_selectors.php');
-		foreach($r as $rr) {
-				if($rr['network'])
-					$nets[] = array('ref' => $rr['network'], 'name' => network_to_name($rr['network']), 'selected' => (($selected == $rr['network']) ? 'selected' : '' ));
+		foreach ($r as $rr) {
+			/// @TODO If 'network' is not there, this triggers an E_NOTICE
+			if ($rr['network']) {
+				$nets[] = array('ref' => $rr['network'], 'name' => network_to_name($rr['network']), 'selected' => (($selected == $rr['network']) ? 'selected' : '' ));
+			}
 		}
 	}
 
@@ -116,21 +120,23 @@ function networks_widget($baseurl,$selected = '') {
 }
 
 function fileas_widget($baseurl,$selected = '') {
-	$a = get_app();
-	if(! local_user())
+	if (! local_user()) {
 		return '';
+	}
 
-	if(! feature_enabled(local_user(),'filing'))
+	if (! feature_enabled(local_user(),'filing')) {
 		return '';
+	}
 
 	$saved = get_pconfig(local_user(),'system','filetags');
-	if(! strlen($saved))
+	if (! strlen($saved)) {
 		return;
+	}
 
 	$matches = false;
 	$terms = array();
-    $cnt = preg_match_all('/\[(.*?)\]/',$saved,$matches,PREG_SET_ORDER);
-    if($cnt) {
+	$cnt = preg_match_all('/\[(.*?)\]/',$saved,$matches,PREG_SET_ORDER);
+	if ($cnt) {
 		foreach($matches as $mtch) {
 			$unescaped = xmlify(file_tag_decode($mtch[1]));
 			$terms[] = array('name' => $unescaped,'selected' => (($selected == $unescaped) ? 'selected' : ''));
@@ -152,12 +158,14 @@ function categories_widget($baseurl,$selected = '') {
 
 	$a = get_app();
 
-	if(! feature_enabled($a->profile['profile_uid'],'categories'))
+	if (! feature_enabled($a->profile['profile_uid'],'categories')) {
 		return '';
+	}
 
 	$saved = get_pconfig($a->profile['profile_uid'],'system','filetags');
-	if(! strlen($saved))
+	if (! strlen($saved)) {
 		return;
+	}
 
 	$matches = false;
 	$terms = array();
@@ -204,13 +212,13 @@ function common_friends_visitor_widget($profile_uid) {
 				dbesc(normalise_link(get_my_url())),
 				intval($profile_uid)
 			);
-			if(count($r))
+			if (dbm::is_result($r))
 				$cid = $r[0]['id'];
 			else {
 				$r = q("select id from gcontact where nurl = '%s' limit 1",
 					dbesc(normalise_link(get_my_url()))
 				);
-				if(count($r))
+				if (dbm::is_result($r))
 					$zcid = $r[0]['id'];
 			}
 		}
@@ -235,7 +243,7 @@ function common_friends_visitor_widget($profile_uid) {
 
 	return replace_macros(get_markup_template('remote_friends_common.tpl'), array(
 		'$desc' =>  sprintf( tt("%d contact in common", "%d contacts in common", $t), $t),
-		'$base' => $a->get_baseurl(),
+		'$base' => App::get_baseurl(),
 		'$uid' => $profile_uid,
 		'$cid' => (($cid) ? $cid : '0'),
 		'$linkmore' => (($t > 5) ? 'true' : ''),

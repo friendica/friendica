@@ -5,29 +5,32 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function allfriends_content(&$a) {
+function allfriends_content(App $a) {
 
 	$o = '';
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
-	if($a->argc > 1)
+	if ($a->argc > 1) {
 		$cid = intval($a->argv[1]);
+	}
 
-	if(! $cid)
+	if (! $cid) {
 		return;
+	}
 
-	$uid = $a->user[uid];
+	$uid = $a->user['uid'];
 
 	$c = q("SELECT `name`, `url`, `photo` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 		intval($cid),
 		intval(local_user())
 	);
 
-	if(! count($c))
+	if (! dbm::is_result($c)) {
 		return;
+	}
 
 	$a->page['aside'] = "";
 	profile_load($a, "", 0, get_contact_details_by_url($c[0]["url"]));
@@ -39,14 +42,14 @@ function allfriends_content(&$a) {
 
 	$r = all_friends(local_user(), $cid, $a->pager['start'], $a->pager['itemspage']);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		$o .= t('No friends to display.');
 		return $o;
 	}
 
 	$id = 0;
 
-	foreach($r as $rr) {
+	foreach ($r as $rr) {
 
 		//get further details of the contact
 		$contact_details = get_contact_details_by_url($rr['url'], $uid, $rr);
@@ -60,7 +63,7 @@ function allfriends_content(&$a) {
 			$photo_menu = contact_photo_menu ($rr);
 		}
 		else {
-			$connlnk = $a->get_baseurl() . '/follow/?url=' . $rr['url'];
+			$connlnk = App::get_baseurl() . '/follow/?url=' . $rr['url'];
 			$photo_menu = array(
 				'profile' => array(t("View Profile"), zrl($rr['url'])),
 				'follow' => array(t("Connect/Follow"), $connlnk)
@@ -68,20 +71,20 @@ function allfriends_content(&$a) {
 		}
 
 		$entry = array(
-			'url'		=> $rr['url'],
-			'itemurl'	=> (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
-			'name'		=> htmlentities($contact_details['name']),
-			'thumb'		=> proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
-			'img_hover'	=> htmlentities($contact_details['name']),
-			'details'	=> $contact_details['location'],
-			'tags'		=> $contact_details['keywords'],
-			'about'		=> $contact_details['about'],
-			'account_type'	=> (($contact_details['community']) ? t('Forum') : ''),
-			'network'	=> network_to_name($contact_details['network'], $contact_details['url']),
-			'photo_menu'	=> $photo_menu,
-			'conntxt'	=> t('Connect'),
-			'connlnk'	=> $connlnk,
-			'id'		=> ++$id,
+			'url'          => $rr['url'],
+			'itemurl'      => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
+			'name'         => htmlentities($contact_details['name']),
+			'thumb'        => proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
+			'img_hover'    => htmlentities($contact_details['name']),
+			'details'      => $contact_details['location'],
+			'tags'         => $contact_details['keywords'],
+			'about'        => $contact_details['about'],
+			'account_type' => account_type($contact_details),
+			'network'      => network_to_name($contact_details['network'], $contact_details['url']),
+			'photo_menu'   => $photo_menu,
+			'conntxt'      => t('Connect'),
+			'connlnk'      => $connlnk,
+			'id'           => ++$id,
 		);
 		$entries[] = $entry;
 	}
