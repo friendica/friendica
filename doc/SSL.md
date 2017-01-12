@@ -24,7 +24,7 @@ This is confusing and disturbing.
 For this reason, we recommend to get a certificate signed by a CA.
 Normally, you have to pay for them - and they are valid for a limited period of time (e.g. a year or two).
 
-There are ways to get a trusted certificate for free.
+There is a way to get a trusted certificate for free.
 
 Chose your domain name
 ---
@@ -44,48 +44,6 @@ They will either install it for you or provide an easy way to upload the certifi
 
 It might be worth asking if your provider would install a certificate you provide yourself, to save money.
 If so, read on.
-
-Getting a free StartSSL certificate
----
-StartSSL is a certificate authority that issues certificates for free.
-They are valid for a year and are sufficient for our purposes.
-
-### Step 1: Create a client certificate
-
-When you initially sign up with StartSSL, you receive a certificate that is installed in your browser.
-You need it for the login on startssl.com, also when coming back to the site later.
-It has nothing to do with the SSL certificate for your server.
-
-### Step 2: Validate your email address and your domain
-
-To continue you have to prove that you own the email address you specified and the domain that you want a certificate for.
-Specify your email address, request a validation link via email from the "validations wizard".
-Same procedure for the domain validation.
-
-### Step 3: Request the certificate
-
-Go to the "certificates wizard".
-Choose the target web server.
-When you are first prompted for a domain to certify, you need to enter your main domain, e.g. example.com.
-In the next step, you will be able to specify a subdomain for Friendica, if needed.
-Example: If you have friendica.example.com, you first enter example.com, then specify the subdomain friendica later.
-
-If you know how to generate an openssl key and a certificate signing request (csr) yourself, do so.
-Paste the csr into your browser to get it signed by StartSSL.
-
-If you do not know how to generate a key and a csr, accept StartSSL's offer to generate it for you.
-This means: StartSSL has the key to your encryption but it is better than no certificate at all.
-Download your certificate from the website.
-(Or in the second case: Download your certificate and your key.)
-
-To install your certificate on a server, you need one or two extra files: sub.class1.server.ca.pem and ca.pem, delivered by startssl.com
-Go to the "Tool box" section and download "Class 1 Intermediate Server CA" and "StartCom Root CA (PEM encoded)".
-
-If you want to send your certificate to your hosting provider, they need the certificate, the key and probably at least the intermediate server CA.
-To be sure, send those three and the ca.pem file.
-**You should send them to your provider via an encrypted channel!**
-
-If you run your own server, upload the files and check out the Mozilla wiki link below.
 
 Let's encrypt
 ---
