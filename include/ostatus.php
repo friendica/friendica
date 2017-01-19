@@ -523,7 +523,9 @@ class ostatus {
 				$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s'",
 					intval($importer["uid"]), dbesc($item["parent-uri"]));
 
-				if (!$r AND ($related != "")) {
+				// Only fetch missing stuff if it is a comment or reshare.
+				if (in_array($item["verb"], array(ACTIVITY_POST, ACTIVITY_SHARE)) AND
+					!dbm::is_result($r) AND ($related != "")) {
 					$reply_path = str_replace("/notice/", "/api/statuses/show/", $related).".atom";
 
 					if ($reply_path != $related) {
@@ -2072,7 +2074,7 @@ class ostatus {
 	 *
 	 * @return string XML feed
 	 */
-	public static function feed(&$a, $owner_nick, $last_update) {
+	public static function feed(App $a, $owner_nick, $last_update) {
 
 		$r = q("SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`
 				FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`

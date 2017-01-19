@@ -78,7 +78,7 @@ function import_cleanup($newuid) {
 	q("DELETE FROM `pconfig` WHERE uid = %d", $newuid);
 }
 
-function import_account(&$a, $file) {
+function import_account(App $a, $file) {
 	logger("Start user import from " . $file['tmp_name']);
 	/*
 	  STEPS

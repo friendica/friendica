@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 
 
-function mood_init(App &$a) {
+function mood_init(App $a) {
 
 	if (! local_user()) {
 		return;
@@ -60,7 +60,7 @@ function mood_init(App &$a) {
 
 	$uri = item_new_uri($a->get_hostname(),$uid);
 
-	$action = sprintf( t('%1$s is currently %2$s'), '[url=' . $poster['url'] . ']' . $poster['name'] . '[/url]' , $verbs[$verb]); 
+	$action = sprintf( t('%1$s is currently %2$s'), '[url=' . $poster['url'] . ']' . $poster['name'] . '[/url]' , $verbs[$verb]);
 
 	$arr = array();
 	$arr['guid']          = get_guid(32);
@@ -109,7 +109,7 @@ function mood_init(App &$a) {
 
 
 
-function mood_content(App &$a) {
+function mood_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

@@ -276,7 +276,7 @@ if(! function_exists('paginate_data')) {
  * @param int $count [optional] item count (used with alt pager)
  * @return Array data for pagination template
  */
-function paginate_data(&$a, $count=null) {
+function paginate_data(App $a, $count=null) {
 	$stripped = preg_replace('/([&?]page=[0-9]*)/','',$a->query_string);
 
 	$stripped = str_replace('q=','',$stripped);
@@ -369,7 +369,7 @@ if(! function_exists('paginate')) {
  * @param App $a App instance
  * @return string html for pagination #FIXME remove html
  */
-function paginate(App &$a) {
+function paginate(App $a) {
 
 	$data = paginate_data($a);
 	$tpl = get_markup_template("paginate.tpl");
@@ -384,7 +384,7 @@ if(! function_exists('alt_pager')) {
  * @param int $i
  * @return string html for pagination #FIXME remove html
  */
-function alt_pager(&$a, $i) {
+function alt_pager(App $a, $i) {
 
 	$data = paginate_data($a, $i);
 	$tpl = get_markup_template("paginate.tpl");

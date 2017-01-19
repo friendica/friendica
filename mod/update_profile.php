@@ -7,7 +7,7 @@
 
 require_once("mod/profile.php");
 
-function update_profile_content(App &$a) {
+function update_profile_content(App $a) {
 
 	$profile_uid = intval($_GET["p"]);
 

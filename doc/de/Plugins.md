@@ -40,7 +40,7 @@ Argumente
 
 Deine Hook-Callback-Funktion wird mit mindestens einem und bis zu zwei Argumenten aufgerufen
 
-    function myhook_function(&$a, &$b) {
+    function myhook_function(App $a, &$b) {
 
     }
 
@@ -67,9 +67,9 @@ So würde http://example.com/plugin/arg1/arg2 nach einem Modul "plugin" suchen u
     $a->argc = 3
     $a->argv = array(0 => 'plugin', 1 => 'arg1', 2 => 'arg2');
 
-Deine Modulfunktionen umfassen oft die Funktion plugin_name_content(App &$a), welche den Seiteninhalt definiert und zurückgibt.
-Sie können auch plugin_name_post(App &$a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
-Du kannst ebenso plugin_name_init(App &$a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
+Deine Modulfunktionen umfassen oft die Funktion plugin_name_content(App $a), welche den Seiteninhalt definiert und zurückgibt.
+Sie können auch plugin_name_post(App $a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
+Du kannst ebenso plugin_name_init(App $a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
 
 
 Derzeitige Hooks
@@ -311,7 +311,7 @@ mod/photos.php:			call_hooks('photo_post_end',intval($item_id));
 
 mod/photos.php:			call_hooks('photo_upload_form',$ret);
 
-mod/friendica.php:		call_hooks('about_hook', $o); 	
+mod/friendica.php:		call_hooks('about_hook', $o);
 
 mod/editpost.php:		call_hooks('jot_tool', $jotplugins);
 

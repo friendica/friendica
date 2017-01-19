@@ -4,7 +4,7 @@ function validate_members(&$item) {
 	$item = intval($item);
 }
 
-function group_init(App &$a) {
+function group_init(App $a) {
 	if(local_user()) {
 		require_once('include/group.php');
 		$a->page['aside'] = group_side('contacts','group','extended',(($a->argc > 1) ? intval($a->argv[1]) : 0));
@@ -13,7 +13,7 @@ function group_init(App &$a) {
 
 
 
-function group_post(App &$a) {
+function group_post(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -69,7 +69,7 @@ function group_post(App &$a) {
 	return;
 }
 
-function group_content(App &$a) {
+function group_content(App $a) {
 	$change = false;
 
 	if (! local_user()) {

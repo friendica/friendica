@@ -1,6 +1,6 @@
 <?php
 
-function directory_init(App &$a) {
+function directory_init(App $a) {
 	$a->set_pager_itemspage(60);
 
 	if(local_user()) {
@@ -20,19 +20,19 @@ function directory_init(App &$a) {
 }
 
 
-function directory_post(App &$a) {
+function directory_post(App $a) {
 	if(x($_POST,'search'))
 		$a->data['search'] = $_POST['search'];
 }
 
 
 
-function directory_content(App &$a) {
+function directory_content(App $a) {
 	global $db;
 
 	require_once("mod/proxy.php");
 
-	if((get_config('system','block_public')) && (! local_user()) && (! remote_user()) || 
+	if((get_config('system','block_public')) && (! local_user()) && (! remote_user()) ||
 		(get_config('system','block_local_dir')) && (! local_user()) && (! remote_user())) {
 		notice( t('Public access denied.') . EOL);
 		return;
@@ -124,7 +124,7 @@ function directory_content(App &$a) {
 			}
 //			if(strlen($rr['dob'])) {
 //				if(($years = age($rr['dob'],$rr['timezone'],'')) != 0)
-//					$details .= '<br />' . t('Age: ') . $years ; 
+//					$details .= '<br />' . t('Age: ') . $years ;
 //			}
 //			if(strlen($rr['gender']))
 //				$details .= '<br />' . t('Gender: ') . $rr['gender'];

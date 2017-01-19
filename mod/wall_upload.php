@@ -2,7 +2,7 @@
 
 require_once('include/Photo.php');
 
-function wall_upload_post(&$a, $desktopmode = true) {
+function wall_upload_post(App $a, $desktopmode = true) {
 
 	logger("wall upload: starting new upload", LOGGER_DEBUG);
 
@@ -166,20 +166,18 @@ function wall_upload_post(&$a, $desktopmode = true) {
 			intval($page_owner_uid)
 		);
 		$size = $r[0]['total'];
-	} else
-		$size = 0;
 
-	if(($limit !== false) && (($size + strlen($imagedata)) > $limit)) {
-		$msg = upgrade_message(true);
-		if ($r_json) {
-			echo json_encode(array('error'=>$msg));
-		} else {
-			echo  $msg. EOL;
+		if (($size + strlen($imagedata)) > $limit) {
+			$msg = upgrade_message(true);
+			if ($r_json) {
+				echo json_encode(array('error'=>$msg));
+			} else {
+				echo  $msg. EOL;
+			}
+			@unlink($src);
+			killme();
 		}
-		@unlink($src);
-		killme();
 	}
-
 
 	$imagedata = @file_get_contents($src);
 	$ph = new Photo($imagedata, $filetype);

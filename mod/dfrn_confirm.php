@@ -22,7 +22,7 @@ require_once('include/enotify.php');
 require_once('include/group.php');
 require_once('include/Probe.php');
 
-function dfrn_confirm_post(&$a,$handsfree = null) {
+function dfrn_confirm_post(App $a, $handsfree = null) {
 
 	if(is_array($handsfree)) {
 

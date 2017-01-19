@@ -3,7 +3,7 @@
 require_once('include/attach.php');
 require_once('include/datetime.php');
 
-function wall_attach_post(App &$a) {
+function wall_attach_post(App $a) {
 
 	$r_json = (x($_GET,'response') && $_GET['response']=='json');
 
@@ -112,23 +112,25 @@ function wall_attach_post(App &$a) {
 		killme();
 	}
 
-	$r = q("select sum(octet_length(data)) as total from attach where uid = %d ",
-		intval($page_owner_uid)
-	);
-
 	$limit = service_class_fetch($page_owner_uid,'attach_upload_limit');
 
-	if(($limit !== false) && (($r[0]['total'] + strlen($imagedata)) > $limit)) {
-		$msg = upgrade_message(true);
-		if ($r_json) {
-			echo json_encode(array('error'=>$msg));
-		} else {
-			echo  $msg. EOL ;
-		}
-		@unlink($src);
-		killme();
-	}
+        if ($limit) {
+		$r = q("select sum(octet_length(data)) as total from photo where uid = %d and scale = 0 and album != 'Contact Photos' ",
+			intval($page_owner_uid)
+		);
+		$size = $r[0]['total'];
 
+		if (($size + strlen($imagedata)) > $limit) {
+			$msg = upgrade_message(true);
+			if ($r_json) {
+				echo json_encode(array('error'=>$msg));
+			} else {
+				echo  $msg. EOL ;
+			}
+			@unlink($src);
+			killme();
+		}
+	}
 
 	$filedata = @file_get_contents($src);
 	$mimetype = z_mime_content_type($filename);

@@ -466,7 +466,7 @@ function item_condition() {
  */
 
 if(!function_exists('conversation')) {
-function conversation(&$a, $items, $mode, $update, $preview = false) {
+function conversation(App $a, $items, $mode, $update, $preview = false) {
 
 	require_once('include/bbcode.php');
 	require_once('include/Contact.php');

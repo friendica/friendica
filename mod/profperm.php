@@ -1,6 +1,6 @@
 <?php
 
-function profperm_init(App &$a) {
+function profperm_init(App $a) {
 
 	if (! local_user()) {
 		return;
@@ -14,7 +14,7 @@ function profperm_init(App &$a) {
 }
 
 
-function profperm_content(App &$a) {
+function profperm_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied') . EOL);
@@ -109,9 +109,9 @@ function profperm_content(App &$a) {
 	}
 
 	$o .= '<div id="prof-update-wrapper">';
-	if($change) 
+	if($change)
 		$o = '';
-	
+
 	$o .= '<div id="prof-members-title">';
 	$o .= '<h3>' . t('Visible To') . '</h3>';
 	$o .= '</div>';

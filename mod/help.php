@@ -18,7 +18,7 @@ if (!function_exists('load_doc_file')) {
 
 }
 
-function help_content(App &$a) {
+function help_content(App $a) {
 
 	nav_set_selected('help');
 

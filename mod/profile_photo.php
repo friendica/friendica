@@ -2,7 +2,7 @@
 
 require_once("include/Photo.php");
 
-function profile_photo_init(App &$a) {
+function profile_photo_init(App $a) {
 
 	if (! local_user()) {
 		return;
@@ -13,7 +13,7 @@ function profile_photo_init(App &$a) {
 }
 
 
-function profile_photo_post(App &$a) {
+function profile_photo_post(App $a) {
 
 	if (! local_user()) {
 		notice ( t('Permission denied.') . EOL );
@@ -174,13 +174,13 @@ function profile_photo_post(App &$a) {
 
 
 if(! function_exists('profile_photo_content')) {
-function profile_photo_content(App &$a) {
+function profile_photo_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
 		return;
 	}
-	
+
 	$newuser = false;
 
 	if($a->argc == 2 && $a->argv[1] === 'new')
@@ -191,9 +191,9 @@ function profile_photo_content(App &$a) {
 			notice( t('Permission denied.') . EOL );
 			return;
 		};
-		
+
 //		check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
-        
+
 		$resource_id = $a->argv[2];
 		//die(":".local_user());
 		$r=q("SELECT * FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' ORDER BY `scale` ASC",
@@ -246,7 +246,7 @@ function profile_photo_content(App &$a) {
 
 
 	if(! x($a->config,'imagecrop')) {
-	
+
 		$tpl = get_markup_template('profile_photo.tpl');
 
 		$o .= replace_macros($tpl,array(
@@ -284,7 +284,7 @@ function profile_photo_content(App &$a) {
 
 
 if(! function_exists('profile_photo_crop_ui_head')) {
-function profile_photo_crop_ui_head(&$a, $ph){
+function profile_photo_crop_ui_head(App $a, $ph) {
 	$max_length = get_config('system','max_image_length');
 	if (! $max_length) {
 		$max_length = MAX_IMAGE_LENGTH;
@@ -303,11 +303,11 @@ function profile_photo_crop_ui_head(&$a, $ph){
 	}
 
 	$hash = photo_new_resource();
-	
+
 
 	$smallest = 0;
 
-	$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 0 );	
+	$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 0 );
 
 	if ($r) {
 		info( t('Image uploaded successfully.') . EOL );
@@ -317,7 +317,7 @@ function profile_photo_crop_ui_head(&$a, $ph){
 
 	if ($width > 640 || $height > 640) {
 		$ph->scaleImage(640);
-		$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 1 );	
+		$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 1 );
 
 		if ($r === false) {
 			notice( sprintf(t('Image size reduction [%s] failed.'),"640") . EOL );

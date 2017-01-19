@@ -25,6 +25,8 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **allowed_link_protocols** (Array) - Allowed protocols in links URLs, add at your own risk. http is always allowed.
 * **birthday_input_format** - Default value is "ymd".
 * **block_local_dir** (Boolean) - Blocks the access to the directory of the local users.
+* **curl_range_bytes** - Maximum number of bytes that should be fetched. Default is 0, which mean "no limit".
+* **dbclean** (Boolean) - Enable the automatic database cleanup process
 * **default_service_class** -
 * **delivery_batch_count** - Number of deliveries per process. Default value is 1. (Disabled when using the worker)
 * **diaspora_test** (Boolean) - For development only. Disables the message transfer.
@@ -45,7 +47,8 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **max_processes_frontend** - Maximum number of concurrent database processes for foreground tasks. Default value is 20.
 * **memcache** (Boolean) - Use memcache. To use memcache the PECL extension "memcache" has to be installed and activated.
 * **memcache_host** - Hostname of the memcache daemon. Default is '127.0.0.1'.
-* **memcache_port** - Portnumberof the memcache daemon. Default is 11211.
+* **memcache_port** - Portnumber of the memcache daemon. Default is 11211.
+* **no_count** (Boolean) - Don't do count calculations (currently only when showing albums)
 * **no_oembed** (Boolean) - Don't use OEmbed to fetch more information about a link.
 * **no_oembed_rich_content** (Boolean) - Don't show the rich content (e.g. embedded PDF).
 * **no_smilies** (Boolean) - Don't show smilies.

@@ -1,7 +1,7 @@
 <?php
 require_once('view/theme/frio/php/Image.php');
 
-function theme_content(App &$a) {
+function theme_content(App $a) {
 	if (!local_user()) {
 		return;
 	}
@@ -16,10 +16,10 @@ function theme_content(App &$a) {
 	$arr["background_image"] = get_pconfig(local_user(),'frio', 'background_image' );
 	$arr["bg_image_option"] = get_pconfig(local_user(),'frio', 'bg_image_option' );
 
-	return frio_form($a, $arr);
+	return frio_form($arr);
 }
 
-function theme_post(App &$a) {
+function theme_post(App $a) {
 	if (!local_user()) {
 		return;
 	}
@@ -36,9 +36,9 @@ function theme_post(App &$a) {
 	}
 }
 
-function frio_form(&$a, $arr) {
+function frio_form($arr) {
 	require_once("view/theme/frio/php/schema.php");
-	
+
 	$scheme_info = get_schema_info($arr["schema"]);
 	$disable = $scheme_info["overwrites"];
 	if (!is_array($disable)) $disable = array();

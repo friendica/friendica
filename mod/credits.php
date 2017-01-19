@@ -5,7 +5,7 @@
  * addons repository will be listed though ATM)
  */
 
-function credits_content (App &$a) {
+function credits_content (App $a) {
     /* fill the page with credits */
     $f = fopen('util/credits.txt','r');
     $names = fread($f, filesize('util/credits.txt'));

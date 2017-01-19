@@ -1,6 +1,6 @@
 <?php
 
-function nav(App &$a) {
+function nav(App $a) {
 
 	/*
 	 *

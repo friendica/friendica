@@ -10,7 +10,7 @@
  * Screenshot: <a href="screenshot.png">Screenshot</a>
  */
 
-function smoothly_init(App &$a) {
+function smoothly_init(App $a) {
 	set_template_engine($a, 'smarty3');
 
 	$cssFile = null;
@@ -20,7 +20,7 @@ $a->page['htmlhead'] .= <<< EOT
 
 <script>
 function insertFormatting(comment,BBcode,id) {
-	
+
 		var tmpStr = $("#comment-edit-text-" + id).val();
 		if(tmpStr == comment) {
 			tmpStr = "";
@@ -36,7 +36,7 @@ function insertFormatting(comment,BBcode,id) {
 		selected = document.selection.createRange();
 		if (BBcode == "url"){
 			selected.text = "["+BBcode+"]" + "http://" +  selected.text + "[/"+BBcode+"]";
-			} else			
+			} else
 		selected.text = "["+BBcode+"]" + selected.text + "[/"+BBcode+"]";
 	} else if (textarea.selectionStart || textarea.selectionStart == "0") {
 		var start = textarea.selectionStart;

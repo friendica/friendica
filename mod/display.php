@@ -1,6 +1,6 @@
 <?php
 
-function display_init(App &$a) {
+function display_init(App $a) {
 
 	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		return;
@@ -194,7 +194,7 @@ function display_fetchauthor($a, $item) {
 	return($profiledata);
 }
 
-function display_content(&$a, $update = 0) {
+function display_content(App $a, $update = 0) {
 
 	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		notice(t('Public access denied.') . EOL);

@@ -43,11 +43,11 @@ require_once('include/salmon.php');
 function notifier_run(&$argv, &$argc){
 	global $a, $db;
 
-	if(is_null($a)){
+	if (is_null($a)) {
 		$a = new App;
 	}
 
-	if(is_null($db)) {
+	if (is_null($db)) {
 		@include(".htconfig.php");
 		require_once("include/dba.php");
 		$db = new dba($db_host, $db_user, $db_pass, $db_data);
@@ -64,8 +64,9 @@ function notifier_run(&$argv, &$argc){
 
 	load_hooks();
 
-	if($argc < 3)
+	if ($argc < 3) {
 		return;
+	}
 
 	$a->set_baseurl(get_config('system','url'));
 
@@ -77,7 +78,7 @@ function notifier_run(&$argv, &$argc){
 		case 'mail':
 		default:
 			$item_id = intval($argv[2]);
-			if(! $item_id){
+			if (! $item_id) {
 				return;
 			}
 			break;
@@ -93,21 +94,20 @@ function notifier_run(&$argv, &$argc){
 
 	$normal_mode = true;
 
-	if($cmd === 'mail') {
+	if ($cmd === 'mail') {
 		$normal_mode = false;
 		$mail = true;
 		$message = q("SELECT * FROM `mail` WHERE `id` = %d LIMIT 1",
 				intval($item_id)
 		);
-		if(! count($message)){
+		if (! count($message)) {
 			return;
 		}
 		$uid = $message[0]['uid'];
 		$recipients[] = $message[0]['contact-id'];
 		$item = $message[0];
 
-	}
-	elseif($cmd === 'expire') {
+	} elseif ($cmd === 'expire') {
 		$normal_mode = false;
 		$expire = true;
 		$items = q("SELECT * FROM `item` WHERE `uid` = %d AND `wall` = 1
@@ -116,22 +116,23 @@ function notifier_run(&$argv, &$argc){
 		);
 		$uid = $item_id;
 		$item_id = 0;
-		if(! count($items))
+		if (! count($items)) {
 			return;
-	}
-	elseif($cmd === 'suggest') {
+		}
+	} elseif ($cmd === 'suggest') {
 		$normal_mode = false;
 		$fsuggest = true;
 
 		$suggest = q("SELECT * FROM `fsuggest` WHERE `id` = %d LIMIT 1",
 			intval($item_id)
 		);
-		if(! count($suggest))
+		if (! count($suggest)) {
 			return;
+		}
 		$uid = $suggest[0]['uid'];
 		$recipients[] = $suggest[0]['cid'];
 		$item = $suggest[0];
-	} elseif($cmd === 'removeme') {
+	} elseif ($cmd === 'removeme') {
 		$r = q("SELECT `contact`.*, `user`.`pubkey` AS `upubkey`, `user`.`prvkey` AS `uprvkey`,
 				`user`.`timezone`, `user`.`nickname`, `user`.`sprvkey`, `user`.`spubkey`,
 				`user`.`page-flags`, `user`.`prvnets`, `user`.`account-type`, `user`.`guid`
@@ -150,15 +151,15 @@ function notifier_run(&$argv, &$argc){
 		$self = $r[0];
 
 		$r = q("SELECT * FROM `contact` WHERE NOT `self` AND `uid` = %d", intval($item_id));
-		if(!$r)
+		if (!$r) {
 			return;
-
+		}
 		require_once('include/Contact.php');
-		foreach($r as $contact) {
+		foreach ($r as $contact) {
 			terminate_friendship($user, $self, $contact);
 		}
 		return;
-	} elseif($cmd === 'relocate') {
+	} elseif ($cmd === 'relocate') {
 		$normal_mode = false;
 		$relocate = true;
 		$uid = $item_id;
@@ -170,7 +171,7 @@ function notifier_run(&$argv, &$argc){
 			intval($item_id)
 		);
 
-		if((! dbm::is_result($r)) || (! intval($r[0]['parent']))) {
+		if ((! dbm::is_result($r)) || (! intval($r[0]['parent']))) {
 			return;
 		}
 
@@ -184,18 +185,19 @@ function notifier_run(&$argv, &$argc){
 			intval($parent_id)
 		);
 
-		if(! count($items)) {
+		if (! count($items)) {
 			return;
 		}
 
 		// avoid race condition with deleting entries
 
-		if($items[0]['deleted']) {
-			foreach($items as $item)
+		if ($items[0]['deleted']) {
+			foreach ($items as $item) {
 				$item['deleted'] = 1;
+			}
 		}
 
-		if((count($items) == 1) && ($items[0]['id'] === $target_item['id']) && ($items[0]['uri'] === $items[0]['parent-uri'])) {
+		if ((count($items) == 1) && ($items[0]['id'] === $target_item['id']) && ($items[0]['uri'] === $items[0]['parent-uri'])) {
 			logger('notifier: top level post');
 			$top_level = true;
 		}
@@ -220,6 +222,9 @@ function notifier_run(&$argv, &$argc){
 
 	$hub = get_config('system','huburl');
 
+	// Should the post be transmitted to Diaspora?
+	$diaspora_delivery = true;
+
 	// If this is a public conversation, notify the feed hub
 	$public_message = true;
 
@@ -229,7 +234,7 @@ function notifier_run(&$argv, &$argc){
 	// fill this in with a single salmon slap if applicable
 	$slap = '';
 
-	if(! ($mail || $fsuggest || $relocate)) {
+	if (! ($mail || $fsuggest || $relocate)) {
 
 		$slap = ostatus::salmon($target_item,$owner);
 
@@ -240,7 +245,7 @@ function notifier_run(&$argv, &$argc){
 		$thr_parent = q("SELECT `network`, `author-link`, `owner-link` FROM `item` WHERE `uri` = '%s' AND `uid` = %d",
 			dbesc($target_item["thr-parent"]), intval($target_item["uid"]));
 
-		logger('Parent is '.$parent['network'].'. Thread parent is '.$thr_parent[0]['network'], LOGGER_DEBUG);
+		logger('GUID: '.$target_item["guid"].': Parent is '.$parent['network'].'. Thread parent is '.$thr_parent[0]['network'], LOGGER_DEBUG);
 
 		// This is IMPORTANT!!!!
 
@@ -264,9 +269,9 @@ function notifier_run(&$argv, &$argc){
 
 
 		$localhost = str_replace('www.','',$a->get_hostname());
-		if(strpos($localhost,':'))
+		if (strpos($localhost,':')) {
 			$localhost = substr($localhost,0,strpos($localhost,':'));
-
+		}
 		/**
 		 *
 		 * Be VERY CAREFUL if you make any changes to the following several lines. Seemingly innocuous changes
@@ -277,12 +282,12 @@ function notifier_run(&$argv, &$argc){
 
 		$relay_to_owner = false;
 
-		if(!$top_level && ($parent['wall'] == 0) && !$expire && (stristr($target_item['uri'],$localhost))) {
+		if (!$top_level && ($parent['wall'] == 0) && !$expire && (stristr($target_item['uri'],$localhost))) {
 			$relay_to_owner = true;
 		}
 
 
-		if(($cmd === 'uplink') && (intval($parent['forum_mode']) == 1) && !$top_level) {
+		if (($cmd === 'uplink') && (intval($parent['forum_mode']) == 1) && !$top_level) {
 			$relay_to_owner = true;
 		}
 
@@ -290,13 +295,13 @@ function notifier_run(&$argv, &$argc){
 		// we will just use it as a fallback test
 		// later we will be able to use it as the primary test of whether or not to relay.
 
-		if(! $target_item['origin'])
+		if (! $target_item['origin']) {
 			$relay_to_owner = false;
-
-		if($parent['origin'])
+		}
+		if ($parent['origin']) {
 			$relay_to_owner = false;
-
-		if($relay_to_owner) {
+		}
+		if ($relay_to_owner) {
 			logger('notifier: followup '.$target_item["guid"], LOGGER_DEBUG);
 			// local followup to remote post
 			$followup = true;
@@ -322,9 +327,11 @@ function notifier_run(&$argv, &$argc){
 						intval($uid),
 						dbesc(NETWORK_DFRN)
 					);
-					if (dbm::is_result($r))
-						foreach($r as $rr)
+					if (dbm::is_result($r)) {
+						foreach ($r as $rr) {
 							$recipients_followup[] = $rr['id'];
+						}
+					}
 				}
 			}
 			logger("Notify ".$target_item["guid"]." via PuSH: ".($push_notify?"Yes":"No"), LOGGER_DEBUG);
@@ -335,12 +342,12 @@ function notifier_run(&$argv, &$argc){
 
 			// don't send deletions onward for other people's stuff
 
-			if($target_item['deleted'] && (! intval($target_item['wall']))) {
+			if ($target_item['deleted'] && (! intval($target_item['wall']))) {
 				logger('notifier: ignoring delete notification for non-wall item');
 				return;
 			}
 
-			if((strlen($parent['allow_cid']))
+			if ((strlen($parent['allow_cid']))
 				|| (strlen($parent['allow_gid']))
 				|| (strlen($parent['deny_cid']))
 				|| (strlen($parent['deny_gid']))) {
@@ -355,24 +362,23 @@ function notifier_run(&$argv, &$argc){
 			// if our parent is a public forum (forum_mode == 1), uplink to the origional author causing
 			// a delivery fork. private groups (forum_mode == 2) do not uplink
 
-			if((intval($parent['forum_mode']) == 1) && (! $top_level) && ($cmd !== 'uplink')) {
+			if ((intval($parent['forum_mode']) == 1) && (! $top_level) && ($cmd !== 'uplink')) {
 				proc_run(PRIORITY_HIGH,'include/notifier.php','uplink',$item_id);
 			}
 
 			$conversants = array();
 
-			foreach($items as $item) {
+			foreach ($items as $item) {
 				$recipients[] = $item['contact-id'];
 				$conversants[] = $item['contact-id'];
 				// pull out additional tagged people to notify (if public message)
-				if($public_message && strlen($item['inform'])) {
+				if ($public_message && strlen($item['inform'])) {
 					$people = explode(',',$item['inform']);
-					foreach($people as $person) {
-						if(substr($person,0,4) === 'cid:') {
+					foreach ($people as $person) {
+						if (substr($person,0,4) === 'cid:') {
 							$recipients[] = intval(substr($person,4));
 							$conversants[] = intval(substr($person,4));
-						}
-						else {
+						} else {
 							$url_recipients[] = substr($person,4);
 						}
 					}
@@ -396,16 +402,19 @@ function notifier_run(&$argv, &$argc){
 		// We have not only to look at the parent, since it could be a Friendica thread.
 		if (($thr_parent AND ($thr_parent[0]['network'] == NETWORK_OSTATUS)) OR ($parent['network'] == NETWORK_OSTATUS)) {
 
+			$diaspora_delivery = false;
+
 			logger('Some parent is OStatus for '.$target_item["guid"]." - Author: ".$thr_parent[0]['author-link']." - Owner: ".$thr_parent[0]['owner-link'], LOGGER_DEBUG);
 
 			// Send a salmon to the parent author
-			$r = q("SELECT `notify` FROM `contact` WHERE `nurl`='%s' AND `uid` IN (0, %d) AND `notify` != ''",
+			$r = q("SELECT `url`, `notify` FROM `contact` WHERE `nurl`='%s' AND `uid` IN (0, %d) AND `notify` != ''",
 				dbesc(normalise_link($thr_parent[0]['author-link'])),
 				intval($uid));
-			if ($r)
+			if (dbm::is_result($r)) {
 				$probed_contact = $r[0];
-			else
+			} else {
 				$probed_contact = probe_url($thr_parent[0]['author-link']);
+			}
 
 			if ($probed_contact["notify"] != "") {
 				logger('Notify parent author '.$probed_contact["url"].': '.$probed_contact["notify"]);
@@ -413,13 +422,15 @@ function notifier_run(&$argv, &$argc){
 			}
 
 			// Send a salmon to the parent owner
-			$r = q("SELECT `notify` FROM `contact` WHERE `nurl`='%s' AND `uid` IN (0, %d) AND `notify` != ''",
+			$r = q("SELECT `url`, `notify` FROM `contact` WHERE `nurl`='%s' AND `uid` IN (0, %d) AND `notify` != ''",
 				dbesc(normalise_link($thr_parent[0]['owner-link'])),
 				intval($uid));
-			if ($r)
+			if (dbm::is_result($r)) {
 				$probed_contact = $r[0];
-			else
+			} else {
 				$probed_contact = probe_url($thr_parent[0]['owner-link']);
+			}
+
 			if ($probed_contact["notify"] != "") {
 				logger('Notify parent owner '.$probed_contact["url"].': '.$probed_contact["notify"]);
 				$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
@@ -427,10 +438,10 @@ function notifier_run(&$argv, &$argc){
 
 			// Send a salmon notification to every person we mentioned in the post
 			$arr = explode(',',$target_item['tag']);
-			foreach($arr as $x) {
+			foreach ($arr as $x) {
 				//logger('Checking tag '.$x, LOGGER_DEBUG);
 				$matches = null;
-				if(preg_match('/@\[url=([^\]]*)\]/',$x,$matches)) {
+				if (preg_match('/@\[url=([^\]]*)\]/',$x,$matches)) {
 						$probed_contact = probe_url($matches[1]);
 					if ($probed_contact["notify"] != "") {
 						logger('Notify mentioned user '.$probed_contact["url"].': '.$probed_contact["notify"]);
@@ -441,23 +452,19 @@ function notifier_run(&$argv, &$argc){
 
 			// It only makes sense to distribute answers to OStatus messages to Friendica and OStatus - but not Diaspora
 			$sql_extra = " AND `network` IN ('".NETWORK_OSTATUS."', '".NETWORK_DFRN."')";
-		} else
+		} else {
 			$sql_extra = " AND `network` IN ('".NETWORK_OSTATUS."', '".NETWORK_DFRN."', '".NETWORK_DIASPORA."', '".NETWORK_MAIL."', '".NETWORK_MAIL2."')";
-
-		$r = q("SELECT * FROM `contact` WHERE `id` IN ($conversant_str) AND NOT `blocked` AND NOT `pending` AND NOT `archive`".$sql_extra);
-
-		if (dbm::is_result($r))
-			$contacts = $r;
-
-	} else
+		}
+	} else {
 		$public_message = false;
+	}
 
 	// If this is a public message and pubmail is set on the parent, include all your email contacts
 
 	$mail_disabled = ((function_exists('imap_open') && (! get_config('system','imap_disabled'))) ? 0 : 1);
 
-	if(! $mail_disabled) {
-		if((! strlen($target_item['allow_cid'])) && (! strlen($target_item['allow_gid']))
+	if (! $mail_disabled) {
+		if ((! strlen($target_item['allow_cid'])) && (! strlen($target_item['allow_gid']))
 			&& (! strlen($target_item['deny_cid'])) && (! strlen($target_item['deny_gid']))
 			&& (intval($target_item['pubmail']))) {
 			$r = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `network` = '%s'",
@@ -465,39 +472,40 @@ function notifier_run(&$argv, &$argc){
 				dbesc(NETWORK_MAIL)
 			);
 			if (dbm::is_result($r)) {
-				foreach($r as $rr)
+				foreach ($r as $rr) {
 					$recipients[] = $rr['id'];
+				}
 			}
 		}
 	}
 
-	if($followup)
+	if ($followup) {
 		$recip_str = implode(', ', $recipients_followup);
-	else
+	} else {
 		$recip_str = implode(', ', $recipients);
-
-	if ($relocate)
+	}
+	if ($relocate) {
 		$r = $recipients_relocate;
-	else
-		$r = q("SELECT * FROM `contact` WHERE `id` IN (%s) AND NOT `blocked` AND NOT `pending` AND NOT `archive`",
+	} else {
+		$r = q("SELECT * FROM `contact` WHERE `id` IN (%s) AND NOT `blocked` AND NOT `pending` AND NOT `archive`".$sql_extra,
 			dbesc($recip_str)
 		);
-
+	}
 
 	$interval = ((get_config('system','delivery_interval') === false) ? 2 : intval(get_config('system','delivery_interval')));
 
 	// If we are using the worker we don't need a delivery interval
-	if (get_config("system", "worker"))
+	if (get_config("system", "worker")) {
 		$interval = false;
-
+	}
 	// delivery loop
 
 	if (dbm::is_result($r)) {
-
-		foreach($r as $contact) {
-			if(!$contact['self']) {
-				if(($contact['network'] === NETWORK_DIASPORA) && ($public_message))
+		foreach ($r as $contact) {
+			if (!$contact['self']) {
+				if (($contact['network'] === NETWORK_DIASPORA) && ($public_message)) {
 					continue;
+				}
 				q("INSERT INTO `deliverq` (`cmd`,`item`,`contact`) VALUES ('%s', %d, %d)",
 					dbesc($cmd),
 					intval($item_id),
@@ -520,17 +528,18 @@ function notifier_run(&$argv, &$argc){
 		// When using the workerqueue, we don't need this functionality.
 
 		$deliveries_per_process = intval(get_config('system','delivery_batch_count'));
-		if (($deliveries_per_process <= 0) OR get_config("system", "worker"))
+		if (($deliveries_per_process <= 0) OR get_config("system", "worker")) {
 			$deliveries_per_process = 1;
+		}
 
 		$this_batch = array();
 
-		for($x = 0; $x < count($r); $x ++) {
+		for ($x = 0; $x < count($r); $x ++) {
 			$contact = $r[$x];
 
-			if($contact['self'])
+			if ($contact['self']) {
 				continue;
-
+			}
 			logger("Deliver ".$target_item["guid"]." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
 			// potentially more than one recipient. Start a new process and space them out a bit.
@@ -538,26 +547,28 @@ function notifier_run(&$argv, &$argc){
 
 			$this_batch[] = $contact['id'];
 
-			if(count($this_batch) >= $deliveries_per_process) {
+			if (count($this_batch) >= $deliveries_per_process) {
 				proc_run(PRIORITY_HIGH,'include/delivery.php',$cmd,$item_id,$this_batch);
 				$this_batch = array();
-				if($interval)
+				if ($interval) {
 					@time_sleep_until(microtime(true) + (float) $interval);
+				}
 			}
 			continue;
 		}
 
 		// be sure to pick up any stragglers
-		if(count($this_batch))
+		if (count($this_batch)) {
 			proc_run(PRIORITY_HIGH,'include/delivery.php',$cmd,$item_id,$this_batch);
+		}
 	}
 
 	// send salmon slaps to mentioned remote tags (@foo@example.com) in OStatus posts
 	// They are especially used for notifications to OStatus users that don't follow us.
 
-	if($slap && count($url_recipients) && ($public_message || $push_notify) && $normal_mode) {
-		if(!get_config('system','dfrn_only')) {
-			foreach($url_recipients as $url) {
+	if ($slap && count($url_recipients) && ($public_message || $push_notify) && $normal_mode) {
+		if (!get_config('system','dfrn_only')) {
+			foreach ($url_recipients as $url) {
 				if ($url) {
 					logger('notifier: urldelivery: ' . $url);
 					$deliver_status = slapper($owner,$url,$slap);
@@ -568,19 +579,23 @@ function notifier_run(&$argv, &$argc){
 	}
 
 
-	if($public_message) {
+	if ($public_message) {
 
-		if (!$followup)
-			$r0 = Diaspora::relay_list();
-		else
-			$r0 = array();
+		$r0 = array();
+		$r1 = array();
 
-		$r1 = q("SELECT DISTINCT(`batch`), `id`, `name`,`network` FROM `contact` WHERE `network` = '%s'
-			AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch` ORDER BY rand()",
-			dbesc(NETWORK_DIASPORA),
-			intval($owner['uid']),
-			intval(CONTACT_IS_SHARING)
-		);
+		if ($diaspora_delivery) {
+			if (!$followup) {
+				$r0 = Diaspora::relay_list();
+			}
+
+			$r1 = q("SELECT DISTINCT(`batch`), `id`, `name`,`network` FROM `contact` WHERE `network` = '%s'
+				AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch` ORDER BY rand()",
+				dbesc(NETWORK_DIASPORA),
+				intval($owner['uid']),
+				intval(CONTACT_IS_SHARING)
+			);
+		}
 
 		$r2 = q("SELECT `id`, `name`,`network` FROM `contact`
 			WHERE `network` in ( '%s', '%s')  AND `uid` = %d AND NOT `blocked` AND NOT `pending` AND NOT `archive`
@@ -599,7 +614,7 @@ function notifier_run(&$argv, &$argc){
 			// throw everything into the queue in case we get killed
 
 			foreach ($r as $rr) {
-				if((! $mail) && (! $fsuggest) && (! $followup)) {
+				if ((! $mail) && (! $fsuggest) && (! $followup)) {
 					q("INSERT INTO `deliverq` (`cmd`,`item`,`contact`) VALUES ('%s', %d, %d)
 						ON DUPLICATE KEY UPDATE `cmd` = '%s', `item` = %d, `contact` = %d",
 						dbesc($cmd), intval($item_id), intval($rr['id']),
@@ -613,16 +628,17 @@ function notifier_run(&$argv, &$argc){
 				// except for Diaspora batch jobs
 				// Don't deliver to folks who have already been delivered to
 
-				if(($rr['network'] !== NETWORK_DIASPORA) && (in_array($rr['id'],$conversants))) {
+				if (($rr['network'] !== NETWORK_DIASPORA) && (in_array($rr['id'],$conversants))) {
 					logger('notifier: already delivered id=' . $rr['id']);
 					continue;
 				}
 
-				if((! $mail) && (! $fsuggest) && (! $followup)) {
+				if ((! $mail) && (! $fsuggest) && (! $followup)) {
 					logger('notifier: delivery agent: '.$rr['name'].' '.$rr['id'].' '.$rr['network'].' '.$target_item["guid"]);
 					proc_run(PRIORITY_HIGH,'include/delivery.php',$cmd,$item_id,$rr['id']);
-					if($interval)
+					if ($interval) {
 						@time_sleep_until(microtime(true) + (float) $interval);
+					}
 				}
 			}
 		}
@@ -632,13 +648,14 @@ function notifier_run(&$argv, &$argc){
 	}
 
 	// Notify PuSH subscribers (Used for OStatus distribution of regular posts)
-	if($push_notify AND strlen($hub)) {
+	if ($push_notify AND strlen($hub)) {
 		$hubs = explode(',', $hub);
-		if(count($hubs)) {
-			foreach($hubs as $h) {
+		if (count($hubs)) {
+			foreach ($hubs as $h) {
 				$h = trim($h);
-				if(! strlen($h))
+				if (! strlen($h)) {
 					continue;
+				}
 
 				if ($h === '[internal]') {
 					// Set push flag for PuSH subscribers to this topic,
@@ -654,8 +671,9 @@ function notifier_run(&$argv, &$argc){
 					post_url($h,$params);
 					logger('publish for item '.$item_id.' ' . $h . ' ' . $params . ' returned ' . $a->get_curl_code());
 				}
-				if(count($hubs) > 1)
+				if (count($hubs) > 1) {
 					sleep(7);				// try and avoid multiple hubs responding at precisely the same time
+				}
 			}
 		}
 
@@ -665,8 +683,9 @@ function notifier_run(&$argv, &$argc){
 
 	logger('notifier: calling hooks', LOGGER_DEBUG);
 
-	if($normal_mode)
+	if ($normal_mode) {
 		call_hooks('notifier_normal',$target_item);
+	}
 
 	call_hooks('notifier_end',$target_item);
 

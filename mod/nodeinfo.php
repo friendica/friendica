@@ -1,13 +1,13 @@
 <?php
 /**
  * @file mod/nodeinfo.php
- * 
+ *
  * Documentation: http://nodeinfo.diaspora.software/schema.html
 */
 
 require_once("include/plugin.php");
 
-function nodeinfo_wellknown(App &$a) {
+function nodeinfo_wellknown(App $a) {
 	if (!get_config("system", "nodeinfo")) {
 		http_status_exit(404);
 		killme();
@@ -20,7 +20,7 @@ function nodeinfo_wellknown(App &$a) {
 	exit;
 }
 
-function nodeinfo_init(App &$a){
+function nodeinfo_init(App $a) {
 	if (!get_config("system", "nodeinfo")) {
 		http_status_exit(404);
 		killme();

@@ -5,7 +5,7 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function common_content(App &$a) {
+function common_content(App $a) {
 
 	$o = '';
 

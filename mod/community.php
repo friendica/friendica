@@ -1,6 +1,6 @@
 <?php
 
-function community_init(App &$a) {
+function community_init(App $a) {
 	if (! local_user()) {
 		unset($_SESSION['theme']);
 		unset($_SESSION['mobile-theme']);
@@ -10,7 +10,7 @@ function community_init(App &$a) {
 }
 
 
-function community_content(&$a, $update = 0) {
+function community_content(App $a, $update = 0) {
 
 	$o = '';
 
@@ -121,7 +121,7 @@ function community_getitems($start, $itemspage) {
 		return(community_getpublicitems($start, $itemspage));
 
 	$r = qu("SELECT %s
-		FROM `thread` FORCE INDEX (`wall_private_received`)
+		FROM `thread`
 		INNER JOIN `user` ON `user`.`uid` = `thread`.`uid` AND NOT `user`.`hidewall`
 		INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
 		AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''

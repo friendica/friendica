@@ -2,7 +2,7 @@
 
 require_once('include/acl_selectors.php');
 
-function editpost_content(App &$a) {
+function editpost_content(App $a) {
 
 	$o = '';
 

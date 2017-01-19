@@ -2,7 +2,7 @@
 
  /**
  * @file mod/admin.php
- * 
+ *
  * @brief Friendica admin
  */
 
@@ -23,7 +23,7 @@ require_once("include/text.php");
  * @param App $a
  *
  */
-function admin_post(App &$a){
+function admin_post(App $a) {
 
 
 	if(!is_site_admin()) {
@@ -66,7 +66,7 @@ function admin_post(App &$a){
 
 				$theme = $a->argv[2];
 				if(is_file("view/theme/$theme/config.php")){
-					function __call_theme_admin_post(&$a, $theme) {
+					function __call_theme_admin_post(App $a, $theme) {
 						$orig_theme = $a->theme;
 						$orig_page = $a->page;
 						$orig_session_theme = $_SESSION['theme'];
@@ -127,7 +127,7 @@ function admin_post(App &$a){
  * @param App $a
  * @return string
  */
-function admin_content(App &$a) {
+function admin_content(App $a) {
 
 	if(!is_site_admin()) {
 		return login(false);
@@ -260,7 +260,7 @@ function admin_content(App &$a) {
  * @param App $a
  * @return string
  */
-function admin_page_federation(App &$a) {
+function admin_page_federation(App $a) {
 	// get counts on active friendica, diaspora, redmatrix, hubzilla, gnu
 	// social and statusnet nodes this node is knowing
 	//
@@ -316,12 +316,12 @@ function admin_page_federation(App &$a) {
 				$newVC = $vv['total'];
 				$newVV = $vv['version'];
 				$posDash = strpos($newVV, '-');
-				if($posDash) 
+				if($posDash)
 					$newVV = substr($newVV, 0, $posDash);
 				if(isset($newV[$newVV]))
-					$newV[$newVV] += $newVC; 
+					$newV[$newVV] += $newVC;
 				else
-					$newV[$newVV] = $newVC; 
+					$newV[$newVV] = $newVC;
 			}
 			foreach ($newV as $key => $value) {
 				array_push($newVv, array('total'=>$value, 'version'=>$key));
@@ -393,7 +393,7 @@ function admin_page_federation(App &$a) {
  * @param App $a
  * @return string
  */
-function admin_page_queue(App &$a) {
+function admin_page_queue(App $a) {
 	// get content from the queue table
 	$r = q("SELECT `c`.`name`, `c`.`nurl`, `q`.`id`, `q`.`network`, `q`.`created`, `q`.`last`
 			FROM `queue` AS `q`, `contact` AS `c`
@@ -427,7 +427,7 @@ function admin_page_queue(App &$a) {
  * @param App $a
  * @return string
  */
-function admin_page_summary(App &$a) {
+function admin_page_summary(App $a) {
 	global $db;
 	// are there MyISAM tables in the DB? If so, trigger a warning message
 	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1",
@@ -501,10 +501,10 @@ function admin_page_summary(App &$a) {
 
 /**
  * @brief Process send data from Admin Site Page
- * 
+ *
  * @param App $a
  */
-function admin_page_site_post(App &$a) {
+function admin_page_site_post(App $a) {
 	if(!x($_POST,"page_site")) {
 		return;
 	}
@@ -845,7 +845,7 @@ function admin_page_site_post(App &$a) {
  * @param  App $a
  * @return string
  */
-function admin_page_site(App &$a) {
+function admin_page_site(App $a) {
 
 	/* Installed langs */
 	$lang_choices = get_available_languages();
@@ -1072,7 +1072,7 @@ function admin_page_site(App &$a) {
  * @param App $a
  * @return string
  **/
-function admin_page_dbsync(App &$a) {
+function admin_page_dbsync(App $a) {
 
 	$o = '';
 
@@ -1152,10 +1152,10 @@ function admin_page_dbsync(App &$a) {
 
 /**
  * @brief Process data send by Users admin page
- * 
+ *
  * @param App $a
  */
-function admin_page_users_post(App &$a){
+function admin_page_users_post(App $a) {
 	$pending     = (x($_POST, 'pending')           ? $_POST['pending']           : array());
 	$users       = (x($_POST, 'user')              ? $_POST['user']		      : array());
 	$nu_name     = (x($_POST, 'new_user_name')     ? $_POST['new_user_name']     : '');
@@ -1168,7 +1168,7 @@ function admin_page_users_post(App &$a){
 	if (!($nu_name==="") && !($nu_email==="") && !($nu_nickname==="")) {
 		require_once('include/user.php');
 
-		$result = create_user(array('username'=>$nu_name, 'email'=>$nu_email, 
+		$result = create_user(array('username'=>$nu_name, 'email'=>$nu_email,
 			'nickname'=>$nu_nickname, 'verified'=>1, 'language'=>$nu_language));
 		if (! $result['success']) {
 			notice($result['message']);
@@ -1260,7 +1260,7 @@ function admin_page_users_post(App &$a){
  * @param App $a
  * @return string
  */
-function admin_page_users(App &$a){
+function admin_page_users(App $a) {
 	if($a->argc>2) {
 		$uid = $a->argv[3];
 		$user = q("SELECT `username`, `blocked` FROM `user` WHERE `uid` = %d", intval($uid));
@@ -1396,7 +1396,7 @@ function admin_page_users(App &$a){
 		array(t('Name'), t('Email'), t('Register date'), t('Last login'), t('Last item'),  t('Account')),
 		$valid_orders
 	);
-	
+
 	$t = get_markup_template("admin_users.tpl");
 	$o = replace_macros($t, array(
 		// strings //
@@ -1460,7 +1460,7 @@ function admin_page_users(App &$a){
  * @param App $a
  * @return string
  */
-function admin_page_plugins(App &$a){
+function admin_page_plugins(App $a) {
 
 	/*
 	 * Single plugin
@@ -1588,7 +1588,7 @@ function admin_page_plugins(App &$a){
 		'$baseurl' => App::get_baseurl(true),
 		'$function' => 'plugins',
 		'$plugins' => $plugins,
-		'$pcount' => count($plugins), 
+		'$pcount' => count($plugins),
 		'$noplugshint' => sprintf(t('There are currently no plugins available on your node. You can find the official plugin repository at %1$s and might find other interesting plugins in the open plugin registry at %2$s'), 'https://github.com/friendica/friendica-addons', 'http://addons.friendi.ca'),
 		'$form_security_token' => get_form_security_token("admin_themes"),
 	));
@@ -1669,7 +1669,7 @@ function rebuild_theme_table($themes) {
  * @param App $a
  * @return string
  */
-function admin_page_themes(App &$a){
+function admin_page_themes(App $a) {
 
 	$allowed_themes_str = get_config('system','allowed_themes');
 	$allowed_themes_raw = explode(',',$allowed_themes_str);
@@ -1749,7 +1749,7 @@ function admin_page_themes(App &$a){
 
 		$admin_form="";
 		if(is_file("view/theme/$theme/config.php")) {
-			function __get_theme_admin_form(&$a, $theme) {
+			function __get_theme_admin_form(App $a, $theme) {
 				$orig_theme = $a->theme;
 				$orig_page = $a->page;
 				$orig_session_theme = $_SESSION['theme'];
@@ -1847,10 +1847,10 @@ function admin_page_themes(App &$a){
 
 /**
  * @brief Prosesses data send by Logs admin page
- * 
+ *
  * @param App $a
  */
-function admin_page_logs_post(App &$a) {
+function admin_page_logs_post(App $a) {
 	if (x($_POST,"page_logs")) {
 		check_form_security_token_redirectOnErr('/admin/logs', 'admin_logs');
 
@@ -1884,7 +1884,7 @@ function admin_page_logs_post(App &$a) {
  * @param App $a
  * @return string
  */
-function admin_page_logs(App &$a){
+function admin_page_logs(App $a) {
 
 	$log_choices = array(
 		LOGGER_NORMAL	=> 'Normal',
@@ -1893,7 +1893,7 @@ function admin_page_logs(App &$a){
 		LOGGER_DATA	=> 'Data',
 		LOGGER_ALL	=> 'All'
 	);
-	
+
 	if (ini_get('log_errors')) {
 		$phplogenabled = t('PHP log currently enabled.');
 	} else {
@@ -1941,7 +1941,7 @@ function admin_page_logs(App &$a){
  * @param App $a
  * @return string
  */
-function admin_page_viewlogs(App &$a){
+function admin_page_viewlogs(App $a) {
 	$t = get_markup_template("admin_viewlogs.tpl");
 	$f = get_config('system','logfile');
 	$data = '';
@@ -1980,10 +1980,10 @@ function admin_page_viewlogs(App &$a){
 
 /**
  * @brief Prosesses data send by the features admin page
- * 
+ *
  * @param App $a
  */
-function admin_page_features_post(App &$a) {
+function admin_page_features_post(App $a) {
 
 	check_form_security_token_redirectOnErr('/admin/features', 'admin_manage_features');
 
@@ -2017,20 +2017,20 @@ function admin_page_features_post(App &$a) {
 
 /**
  * @brief Subpage for global additional feature management
- * 
+ *
  * This functin generates the subpage 'Manage Additional Features'
  * for the admin panel. At this page the admin can set preferences
- * for the user settings of the 'additional features'. If needed this 
+ * for the user settings of the 'additional features'. If needed this
  * preferences can be locked through the admin.
- * 
+ *
  * The returned string contains the HTML code of the subpage 'Manage
  * Additional Features'
- * 
+ *
  * @param App $a
  * @return string
  */
-function admin_page_features(App &$a) {
-	
+function admin_page_features(App $a) {
+
 	if((argc() > 1) && (argv(1) === 'features')) {
 		$arr = array();
 		$features = get_features(false);
@@ -2049,7 +2049,7 @@ function admin_page_features(App &$a) {
 				);
 			}
 		}
-		
+
 		$tpl = get_markup_template("admin_settings_features.tpl");
 		$o .= replace_macros($tpl, array(
 			'$form_security_token' => get_form_security_token("admin_manage_features"),

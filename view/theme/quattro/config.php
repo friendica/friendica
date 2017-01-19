@@ -3,7 +3,7 @@
  * Theme settings
  */
 
-function theme_content(App &$a){
+function theme_content(App $a) {
 	if (!local_user()) {
 		return;
 	}
@@ -16,7 +16,7 @@ function theme_content(App &$a){
 	return quattro_form($a,$align, $color, $tfs, $pfs);
 }
 
-function theme_post(App &$a){
+function theme_post(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -29,7 +29,7 @@ function theme_post(App &$a){
 	}
 }
 
-function theme_admin(App &$a){
+function theme_admin(App $a) {
 	$align = get_config('quattro', 'align' );
 	$color = get_config('quattro', 'color' );
 	$tfs = get_config("quattro","tfs");
@@ -38,7 +38,7 @@ function theme_admin(App &$a){
 	return quattro_form($a,$align, $color, $tfs, $pfs);
 }
 
-function theme_admin_post(App &$a){
+function theme_admin_post(App $a) {
 	if (isset($_POST['quattro-settings-submit'])){
 		set_config('quattro', 'align', $_POST['quattro_align']);
 		set_config('quattro', 'color', $_POST['quattro_color']);
@@ -48,7 +48,7 @@ function theme_admin_post(App &$a){
 }
 
 /// @TODO $a is no longer used here
-function quattro_form(App &$a, $align, $color, $tfs, $pfs){
+function quattro_form(App $a, $align, $color, $tfs, $pfs) {
 	$colors = array(
 		"dark"  => "Quattro",
 		"lilac" => "Lilac",

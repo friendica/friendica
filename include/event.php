@@ -206,7 +206,7 @@ function bbtoevent($s) {
 }
 
 
-function sort_by_date(App &$a) {
+function sort_by_date($a) {
 
 	usort($a,'ev_compare');
 	return $a;
@@ -495,7 +495,7 @@ function get_event_strings() {
 
 /**
  * @brief Get an event by its event ID
- * 
+ *
  * @param type $owner_uid The User ID of the owner of the event
  * @param type $event_params An assoziative array with
  *	int 'event_id' => The ID of the event in the event table
@@ -510,7 +510,7 @@ function event_by_id($owner_uid = 0, $event_params, $sql_extra = '') {
 	// query for the event by event id
 	$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
 			`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event`
-		STRAIGHT_JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
+		LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
 		WHERE `event`.`uid` = %d AND `event`.`id` = %d $sql_extra",
 		intval($owner_uid),
 		intval($event_params["event_id"])
@@ -523,15 +523,15 @@ function event_by_id($owner_uid = 0, $event_params, $sql_extra = '') {
 
 /**
  * @brief Get all events in a specific timeframe
- * 
+ *
  * @param int $owner_uid The User ID of the owner of the events
  * @param array $event_params An assoziative array with
- *	int 'ignored' => 
+ *	int 'ignored' =>
  *	string 'start' => Start time of the timeframe
  *	string 'finish' => Finish time of the timeframe
- *	string 'adjust_start' => 
  *	string 'adjust_start' =>
- *	
+ *	string 'adjust_start' =>
+ *
  * @param string $sql_extra Additional sql conditions (e.g. permission request)
  * @return array Query results
  */
@@ -543,7 +543,7 @@ function events_by_date($owner_uid = 0, $event_params, $sql_extra = '') {
 	// query for the event by date
 	$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
 				`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event`
-			STRAIGHT_JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
+			LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
 			WHERE `event`.`uid` = %d AND event.ignore = %d
 			AND ((`adjust` = 0 AND (`finish` >= '%s' OR (nofinish AND start >= '%s')) AND `start` <= '%s')
 			OR  (`adjust` = 1 AND (`finish` >= '%s' OR (nofinish AND start >= '%s')) AND `start` <= '%s'))
@@ -564,7 +564,7 @@ function events_by_date($owner_uid = 0, $event_params, $sql_extra = '') {
 
 /**
  * @brief Convert an array query results in an arry which could be used by the events template
- * 
+ *
  * @param array $arr Event query array
  * @return array Event array for the template
  */
@@ -623,11 +623,11 @@ function process_events ($arr) {
 
 /**
  * @brief Format event to export format (ical/csv)
- * 
+ *
  * @param array $events Query result for events
  * @param string $format The output format (ical/csv)
  * @param string $timezone The timezone of the user (not implemented yet)
- * 
+ *
  * @return string Content according to selected export format
  */
 function event_format_export ($events, $format = 'ical', $timezone) {
@@ -641,7 +641,7 @@ function event_format_export ($events, $format = 'ical', $timezone) {
 			$o = '"Subject", "Start Date", "Start Time", "Description", "End Date", "End Time", "Location"' . PHP_EOL;
 
 			foreach ($events as $event) {
-			/// @todo the time / date entries don't include any information about the 
+			/// @todo the time / date entries don't include any information about the
 			// timezone the event is scheduled in :-/
 				$tmp1 = strtotime($event['start']);
 				$tmp2 = strtotime($event['finish']);
@@ -650,7 +650,7 @@ function event_format_export ($events, $format = 'ical', $timezone) {
 				$o .= '"'.$event['summary'].'", "'.strftime($date_format, $tmp1) .
 					'", "'.strftime($time_format, $tmp1).'", "'.$event['desc'] .
 					'", "'.strftime($date_format, $tmp2) .
-					'", "'.strftime($time_format, $tmp2) . 
+					'", "'.strftime($time_format, $tmp2) .
 					'", "'.$event['location'].'"' . PHP_EOL;
 			}
 			break;
@@ -672,7 +672,7 @@ function event_format_export ($events, $format = 'ical', $timezone) {
 			foreach ($events as $event) {
 				if ($event['adjust'] == 1) {
 					$UTC = 'Z';
-				} else { 
+				} else {
 					$UTC = '';
 				}
 				$o .= 'BEGIN:VEVENT' . PHP_EOL;
@@ -716,16 +716,16 @@ function event_format_export ($events, $format = 'ical', $timezone) {
 
 /**
  * @brief Get all events for a user ID
- * 
+ *
  *    The query for events is done permission sensitive
  *    If the user is the owner of the calendar he/she
  *    will get all of his/her available events.
  *    If the user is only a visitor only the public events will
  *    be available
- * 
+ *
  * @param int $uid The user ID
  * @param int $sql_extra Additional sql conditions for permission
- * 
+ *
  * @return array Query results
  */
 function events_by_uid($uid = 0, $sql_extra = '') {
@@ -736,8 +736,8 @@ function events_by_uid($uid = 0, $sql_extra = '') {
 	if($sql_extra == '')
 		$sql_extra = " AND `allow_cid` = '' AND `allow_gid` = '' ";
 
-	//  does the user who requests happen to be the owner of the events 
-	//  requested? then show all of your events, otherwise only those that 
+	//  does the user who requests happen to be the owner of the events
+	//  requested? then show all of your events, otherwise only those that
 	//  don't have limitations set in allow_cid and allow_gid
 	if (local_user() == $uid) {
 		$r = q("SELECT `start`, `finish`, `adjust`, `summary`, `desc`, `location`, `nofinish`
@@ -756,7 +756,7 @@ function events_by_uid($uid = 0, $sql_extra = '') {
 }
 
 /**
- * 
+ *
  * @param int $uid The user ID
  * @param string $format Output format (ical/csv)
  * @return array With the results
@@ -764,7 +764,7 @@ function events_by_uid($uid = 0, $sql_extra = '') {
  *	string 'format' => The output format
  *	string 'extension' => The file extension of the output format
  *	string 'content' => The formatted output content
- * 
+ *
  * @todo Respect authenticated users with events_by_uid()
  */
 function event_export($uid, $format = 'ical') {
@@ -815,7 +815,7 @@ function event_export($uid, $format = 'ical') {
 
 /**
  * @brief Get the events widget
- * 
+ *
  * @return string Formated html of the evens widget
  */
 function widget_events() {
@@ -835,11 +835,11 @@ function widget_events() {
 
 	// Cal logged in user (test permission at foreign profile page)
 	// If the $owner uid is available we know it is part of one of the profile pages (like /cal)
-	// So we have to test if if it's the own profile page of the logged in user 
+	// So we have to test if if it's the own profile page of the logged in user
 	// or a foreign one. For foreign profile pages we need to check if the feature
 	// for exporting the cal is enabled (otherwise the widget would appear for logged in users
 	// on foreigen profile pages even if the widget is disabled)
-	if(intval($owner_uid) && local_user() !== $owner_uid && ! feature_enabled($owner_uid, "export_calendar")) 
+	if(intval($owner_uid) && local_user() !== $owner_uid && ! feature_enabled($owner_uid, "export_calendar"))
 		return;
 
 	// If it's a kind of profile page (intval($owner_uid)) return if the user not logged in and

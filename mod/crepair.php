@@ -2,7 +2,7 @@
 require_once("include/contact_selectors.php");
 require_once("mod/contacts.php");
 
-function crepair_init(App &$a) {
+function crepair_init(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -30,7 +30,7 @@ function crepair_init(App &$a) {
 	}
 }
 
-function crepair_post(App &$a) {
+function crepair_post(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -96,7 +96,7 @@ function crepair_post(App &$a) {
 
 
 
-function crepair_content(App &$a) {
+function crepair_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

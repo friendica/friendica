@@ -3,7 +3,7 @@
 require_once("mod/hostxrd.php");
 require_once("mod/nodeinfo.php");
 
-function _well_known_init(App &$a){
+function _well_known_init(App $a) {
 	if ($a->argc > 1) {
 		switch($a->argv[1]) {
 			case "host-meta":
@@ -21,7 +21,7 @@ function _well_known_init(App &$a){
 	killme();
 }
 
-function wk_social_relay(App &$a) {
+function wk_social_relay(App $a) {
 
 	define('SR_SCOPE_ALL', 'all');
 	define('SR_SCOPE_TAGS', 'tags');

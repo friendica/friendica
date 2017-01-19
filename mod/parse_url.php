@@ -1,9 +1,9 @@
 <?php
 
-/** 
+/**
  * @file mod/parse_url.php
  * @brief The parse_url module
- * 
+ *
  * This module does parse an url for embedable content (audio, video, image files or link)
  * information and does format this information to BBCode or html (this depends
  * on the user settings - default is BBCode output).
@@ -11,15 +11,15 @@
  * (Note: This is not always possible and in some case not useful because
  * the richtext editor doesn't support all kind of html).
  * Otherwise the output will be constructed BBCode.
- * 
- * @see ParseUrl::getSiteinfo() for more information about scraping embeddable content 
+ *
+ * @see ParseUrl::getSiteinfo() for more information about scraping embeddable content
 */
 
 use \Friendica\ParseUrl;
 
 require_once("include/items.php");
 
-function parse_url_content(App &$a) {
+function parse_url_content(App $a) {
 
 	$text = null;
 	$str_tags = "";
@@ -153,20 +153,20 @@ function parse_url_content(App &$a) {
 
 /**
  * @brief Legacy function to call ParseUrl::getSiteinfoCached
- * 
+ *
  * Note: We have moved the function to ParseUrl.php. This function is only for
  * legacy support and will be remove in the future
- * 
+ *
  * @param type $url The url of the page which should be scraped
  * @param type $no_guessing If true the parse doens't search for
  *    preview pictures
  * @param type $do_oembed The false option is used by the function fetch_oembed()
  *    to avoid endless loops
- * 
+ *
  * @return array which contains needed data for embedding
- * 
+ *
  * @see ParseUrl::getSiteinfoCached()
- * 
+ *
  * @todo Remove this function after all Addons has been changed to use
  *    ParseUrl::getSiteinfoCached
  */

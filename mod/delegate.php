@@ -1,12 +1,12 @@
 <?php
 require_once('mod/settings.php');
 
-function delegate_init(App &$a) {
+function delegate_init(App $a) {
 	return settings_init($a);
 }
 
 
-function delegate_content(App &$a) {
+function delegate_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -90,12 +90,12 @@ function delegate_content(App &$a) {
 
 	// find every contact who might be a candidate for delegation
 
-	$r = q("select nurl from contact where substring_index(contact.nurl,'/',3) = '%s' 
+	$r = q("select nurl from contact where substring_index(contact.nurl,'/',3) = '%s'
 		and contact.uid = %d and contact.self = 0 and network = '%s' ",
 		dbesc(normalise_link(App::get_baseurl())),
 		intval(local_user()),
 		dbesc(NETWORK_DFRN)
-	); 
+	);
 
 	if (! dbm::is_result($r)) {
 		notice( t('No potential page delegates located.') . EOL);

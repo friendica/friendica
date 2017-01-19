@@ -1,7 +1,7 @@
 <?php
 
 
-function ignored_init(App &$a) {
+function ignored_init(App $a) {
 
 	$ignored = 0;
 

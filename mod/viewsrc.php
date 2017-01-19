@@ -1,7 +1,7 @@
 <?php
 
 
-function viewsrc_content(App &$a) {
+function viewsrc_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Access denied.') . EOL);
@@ -16,7 +16,7 @@ function viewsrc_content(App &$a) {
 		return;
 	}
 
-	$r = q("SELECT `item`.`body` FROM `item` 
+	$r = q("SELECT `item`.`body` FROM `item`
 		WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 		and `item`.`moderated` = 0
 		AND `item`.`id` = '%s' LIMIT 1",

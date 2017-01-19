@@ -2,7 +2,7 @@
 
 require_once('include/message.php');
 
-function wallmessage_post(App &$a) {
+function wallmessage_post(App $a) {
 
 	$replyto = get_my_url();
 	if(! $replyto) {
@@ -73,7 +73,7 @@ function wallmessage_post(App &$a) {
 }
 
 
-function wallmessage_content(App &$a) {
+function wallmessage_content(App $a) {
 
 	if(! get_my_url()) {
 		notice( t('Permission denied.') . EOL);
@@ -134,9 +134,9 @@ function wallmessage_content(App &$a) {
 		'$nickname' => $user['nickname'],
 		'$linkurl' => t('Please enter a link URL:')
 	));
-	
 
-	
+
+
 	$tpl = get_markup_template('wallmessage.tpl');
 	$o .= replace_macros($tpl,array(
 		'$header' => t('Send Private Message'),

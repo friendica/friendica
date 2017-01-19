@@ -2,7 +2,7 @@
 
 require_once('library/asn1.php');
 
-function modexp_init(App &$a) {
+function modexp_init(App $a) {
 
 	if($a->argc != 2)
 		killme();

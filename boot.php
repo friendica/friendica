@@ -40,7 +40,7 @@ define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
 define ( 'FRIENDICA_VERSION',      '3.5.1-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1211      );
+define ( 'DB_UPDATE_VERSION',      1212      );
 
 /**
  * @brief Constant with a HTML line break.
@@ -1561,7 +1561,7 @@ function check_db() {
  * Sets the base url for use in cmdline programs which don't have
  * $_SERVER variables
  */
-function check_url(App &$a) {
+function check_url(App $a) {
 
 	$url = get_config('system','url');
 
@@ -1583,7 +1583,7 @@ function check_url(App &$a) {
 /**
  * @brief Automatic database updates
  */
-function update_db(App &$a) {
+function update_db(App $a) {
 	$build = get_config('system','build');
 	if(! x($build))
 		$build = set_config('system','build',DB_UPDATE_VERSION);
@@ -1699,7 +1699,7 @@ function run_update_function($x) {
  * @param App $a
  *
 	 */
-function check_plugins(App &$a) {
+function check_plugins(App $a) {
 
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
 	if (dbm::is_result($r))
@@ -2445,7 +2445,7 @@ function get_temppath() {
 }
 
 /// @deprecated
-function set_template_engine(App &$a, $engine = 'internal') {
+function set_template_engine(App $a, $engine = 'internal') {
 /// @note This function is no longer necessary, but keep it as a wrapper to the class method
 /// to avoid breaking themes again unnecessarily
 

@@ -11,7 +11,7 @@
 require_once("include/socgraph.php");
 require_once("include/Contact.php");
 
-function hovercard_init(App &$a) {
+function hovercard_init(App $a) {
 	// Just for testing purposes
 	$_GET["mode"] = "minimal";
 }
@@ -96,10 +96,10 @@ function hovercard_content() {
 
 /**
  * @brief Get the raw content of a template file
- * 
+ *
  * @param string $template The name of the template
  * @param string $root Directory of the template
- * 
+ *
  * @return string|bool Output the raw content if existent, otherwise false
  */
 function get_template_content($template, $root = "") {

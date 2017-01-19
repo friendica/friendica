@@ -20,7 +20,7 @@ function oauth_get_client($request){
 	return $r[0];
 }
 
-function api_post(App &$a) {
+function api_post(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -34,7 +34,7 @@ function api_post(App &$a) {
 
 }
 
-function api_content(App &$a) {
+function api_content(App $a) {
 	if ($a->cmd=='api/oauth/authorize'){
 		/*
 		 * api/oauth/authorize interact with the user. return a standard page

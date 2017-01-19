@@ -296,7 +296,7 @@ function shortenmsg($msg, $limit, $twitter = false) {
  *
  * @return string The converted message
  */
-function plaintext($a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2, $target_network = "") {
+function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2, $target_network = "") {
 
 	// Remove the hash tags
 	$URLSearchString = "^\[\]";

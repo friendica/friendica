@@ -4,7 +4,7 @@ require_once('include/acl_selectors.php');
 require_once('include/message.php');
 require_once('include/Smilies.php');
 
-function message_init(App &$a) {
+function message_init(App $a) {
 
 	$tabs = '';
 
@@ -40,7 +40,7 @@ function message_init(App &$a) {
 
 }
 
-function message_post(App &$a) {
+function message_post(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -173,7 +173,7 @@ function item_redir_and_replace_images($body, $images, $cid) {
 
 
 
-function message_content(App &$a) {
+function message_content(App $a) {
 
 	$o = '';
 	nav_set_selected('messages');

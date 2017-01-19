@@ -1,6 +1,6 @@
 <?php
 
-function auto_redir(&$a, $contact_nick) {
+function auto_redir(App $a, $contact_nick) {
 
 	// prevent looping
 
@@ -27,13 +27,13 @@ function auto_redir(&$a, $contact_nick) {
 		$baseurl = substr($baseurl, $domain_st + 3);
 		$nurl = normalise_link($baseurl);
 
-
-		$r = q("SELECT id FROM contact WHERE uid = ( SELECT uid FROM user WHERE nickname = '%s' LIMIT 1 )
-		        AND nick = '%s' AND self = 0 AND ( url LIKE '%%%s%%' or nurl LIKE '%%%s%%' ) AND blocked = 0 AND pending = 0 LIMIT 1",
-			   dbesc($contact_nick),
-			   dbesc($a->user['nickname']),
-		       dbesc($baseurl),
-               dbesc($nurl)
+		/// @todo Why is there a query for "url" *and* "nurl"? Especially this normalising is strange.
+		$r = q("SELECT `id` FROM `contact` WHERE `uid` = (SELECT `uid` FROM `user` WHERE `nickname` = '%s' LIMIT 1)
+		        AND `nick` = '%s' AND NOT `self` AND (`url` LIKE '%%%s%%' OR `nurl` LIKE '%%%s%%') AND NOT `blocked` AND NOT `pending` LIMIT 1",
+				dbesc($contact_nick),
+				dbesc($a->user['nickname']),
+				dbesc($baseurl),
+				dbesc($nurl)
 		);
 
 		if ((! dbm::is_result($r)) || $r[0]['id'] == remote_user()) {
@@ -70,7 +70,7 @@ function auto_redir(&$a, $contact_nick) {
 
 		if(strlen($dfrn_id) < 3)
 			return;
-			
+
 		$sec = random_string();
 
 		q("INSERT INTO `profile_check` ( `uid`, `cid`, `dfrn_id`, `sec`, `expire`)
@@ -84,9 +84,9 @@ function auto_redir(&$a, $contact_nick) {
 
 		$url = curPageURL();
 
-		logger('auto_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG); 
+		logger('auto_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG);
 		$dest = (($url) ? '&destination_url=' . $url : '');
-		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id 
+		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id
 			. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest );
 	}
 

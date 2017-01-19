@@ -46,8 +46,7 @@ $called_api = null;
  * because this will open CSRF holes (just embed an image with src=friendicasite.com/api/statuses/update?status=CSRF
  * into a page, and visitors will post something without noticing it).
  */
-function api_user()
-{
+function api_user() {
 	if ($_SESSION['allow_api']) {
 		return local_user();
 	}
@@ -66,8 +65,7 @@ function api_user()
  * @return string
  * 		Client source name, default to "api" if unset/unknown
  */
-function api_source()
-{
+function api_source() {
 	if (requestdata('source')) {
 		return (requestdata('source'));
 	}
@@ -88,8 +86,7 @@ function api_source()
  * @param string $str Source date, as UTC
  * @return string Date in UTC formatted as "D M d H:i:s +0000 Y"
  */
-function api_date($str)
-{
+function api_date($str) {
 	//Wed May 23 06:01:13 +0000 2007
 	return datetime_convert('UTC', 'UTC', $str, "D M d H:i:s +0000 Y");
 }
@@ -107,8 +104,7 @@ function api_date($str)
  * 	One of API_METHOD_ANY, API_METHOD_GET, API_METHOD_POST.
  *  Default to API_METHOD_ANY
  */
-function api_register_func($path, $func, $auth=false, $method=API_METHOD_ANY)
-{
+function api_register_func($path, $func, $auth=false, $method=API_METHOD_ANY) {
 	global $API;
 	$API[$path] = array(
 		'func'=>$func,
@@ -141,8 +137,7 @@ function api_register_func($path, $func, $auth=false, $method=API_METHOD_ANY)
  * @hook 'logged_in'
  * 		array $user	logged user record
  */
-function api_login(App &$a)
-{
+function api_login(App &$a) {
 	// login with oauth
 	try {
 		$oauth = new FKOAuth1();
@@ -250,8 +245,7 @@ function api_login(App &$a)
  * @param string $method Required methods, uppercase, separated by comma
  * @return bool
  */
- function api_check_method($method)
- {
+ function api_check_method($method) {
 	 if ($method=="*") {
 		 return true;
 	 }
@@ -266,8 +260,7 @@ function api_login(App &$a)
  * @param App $a
  * @return string API call result
  */
-function api_call(&$a)
-{
+function api_call(&$a) {
 	global $API, $called_api;
 
 	$type="json";
@@ -392,8 +385,7 @@ function api_call(&$a)
  * @param HTTPException $error Error object
  * @return strin error message formatted as $type
  */
-function api_error($type, $e)
-{
+function api_error($type, $e) {
 	$a = get_app();
 
 	$error = ($e->getMessage() !== "" ? $e->getMessage() : $e->httpdesc);
@@ -433,8 +425,7 @@ function api_error($type, $e)
  * @param array $user_info
  * @return array
  */
-function api_rss_extra(&$a, $arr, $user_info)
-{
+function api_rss_extra(&$a, $arr, $user_info) {
 	if (is_null($user_info)) {
 		$user_info = api_get_user($a);
 	}
@@ -460,8 +451,7 @@ function api_rss_extra(&$a, $arr, $user_info)
  * @return bool|string
  * 		Contact url or False if contact id is unknown
  */
-function api_unique_id_to_url($id)
-{
+function api_unique_id_to_url($id) {
 	$r = q("SELECT `url` FROM `contact` WHERE `uid` = 0 AND `id` = %d LIMIT 1",
 		intval($id));
 	if (dbm::is_result($r)) {
@@ -478,8 +468,7 @@ function api_unique_id_to_url($id)
  * @param int|string $contact_id Contact ID or URL
  * @param string $type Return type (for errors)
  */
-function api_get_user(&$a, $contact_id = null, $type = "json")
-{
+function api_get_user(&$a, $contact_id = null, $type = "json") {
 	global $called_api;
 	$user = null;
 	$extra_query = "";
@@ -762,8 +751,7 @@ function api_get_user(&$a, $contact_id = null, $type = "json")
  * @param array $item : item from db
  * @return array(array:author, array:owner)
  */
-function api_item_get_user(&$a, $item)
-{
+function api_item_get_user(&$a, $item) {
 	$status_user = api_get_user($a, $item["author-link"]);
 
 	$status_user["protected"] = (($item["allow_cid"] != "") ||
@@ -785,8 +773,7 @@ function api_item_get_user(&$a, $item)
  *
  * @return array the transformed array
  */
-function api_walk_recursive(array &$array, callable $callback)
-{
+function api_walk_recursive(array &$array, callable $callback) {
 	$new_array = array();
 
 	foreach ($array as $k => $v) {
@@ -813,8 +800,7 @@ function api_walk_recursive(array &$array, callable $callback)
  *
  * @return boolean Should the array item be deleted?
  */
-function api_reformat_xml(&$item, &$key)
-{
+function api_reformat_xml(&$item, &$key) {
 	if (is_bool($item)) {
 		$item = ($item ? "true" : "false");
 	}
@@ -838,8 +824,7 @@ function api_reformat_xml(&$item, &$key)
  *
  * @return string The XML data
  */
-function api_create_xml($data, $root_element)
-{
+function api_create_xml($data, $root_element) {
 	$childname = key($data);
 	$data2 = array_pop($data);
 	$key = key($data2);
@@ -884,8 +869,7 @@ function api_create_xml($data, $root_element)
  *
  * @return (string|object) XML data or JSON data
  */
-function api_format_data($root_element, $type, $data)
-{
+function api_format_data($root_element, $type, $data) {
 	$a = get_app();
 
 	switch ($type) {
@@ -911,8 +895,7 @@ function api_format_data($root_element, $type, $data)
  * returns a 401 status code and an error message if not.
  * http://developer.twitter.com/doc/get/account/verify_credentials
  */
-function api_account_verify_credentials($type)
-{
+function api_account_verify_credentials($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -954,8 +937,7 @@ api_register_func('api/account/verify_credentials', 'api_account_verify_credenti
 /**
  * get data from $_POST or $_GET
  */
-function requestdata($k)
-{
+function requestdata($k) {
 	if (isset($_POST[$k])) {
 		return $_POST[$k];
 	}
@@ -966,8 +948,7 @@ function requestdata($k)
 }
 
 /*Waitman Gobble Mod*/
-function api_statuses_mediap($type)
-{
+function api_statuses_mediap($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1007,8 +988,7 @@ api_register_func('api/statuses/mediap', 'api_statuses_mediap', true, API_METHOD
 /*Waitman Gobble Mod*/
 
 
-function api_statuses_update($type)
-{
+function api_statuses_update($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1169,8 +1149,7 @@ api_register_func('api/statuses/update', 'api_statuses_update', true, API_METHOD
 api_register_func('api/statuses/update_with_media', 'api_statuses_update', true, API_METHOD_POST);
 
 
-function api_media_upload($type)
-{
+function api_media_upload($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1205,8 +1184,7 @@ function api_media_upload($type)
 }
 api_register_func('api/media/upload', 'api_media_upload', true, API_METHOD_POST);
 
-function api_status_show($type)
-{
+function api_status_show($type) {
 	$a = get_app();
 
 	$user_info = api_get_user($a);
@@ -1313,8 +1291,7 @@ function api_status_show($type)
  * The author's most recent status will be returned inline.
  * http://developer.twitter.com/doc/get/users/show
  */
-function api_users_show($type)
-{
+function api_users_show($type) {
 	$a = get_app();
 
 	$user_info = api_get_user($a);
@@ -1392,8 +1369,7 @@ function api_users_show($type)
 api_register_func('api/users/show', 'api_users_show');
 
 
-function api_users_search($type)
-{
+function api_users_search($type) {
 	$a = get_app();
 
 	$page = (x($_REQUEST, 'page')?$_REQUEST['page']-1:0);
@@ -1436,8 +1412,7 @@ api_register_func('api/users/search', 'api_users_search');
  * TODO: Optional parameters
  * TODO: Add reply info
  */
-function api_statuses_home_timeline($type)
-{
+function api_statuses_home_timeline($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1527,8 +1502,7 @@ function api_statuses_home_timeline($type)
 api_register_func('api/statuses/home_timeline', 'api_statuses_home_timeline', true);
 api_register_func('api/statuses/friends_timeline', 'api_statuses_home_timeline', true);
 
-function api_statuses_public_timeline($type)
-{
+function api_statuses_public_timeline($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1603,8 +1577,7 @@ api_register_func('api/statuses/public_timeline', 'api_statuses_public_timeline'
 /**
  *
  */
-function api_statuses_show($type)
-{
+function api_statuses_show($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1671,8 +1644,7 @@ api_register_func('api/statuses/show', 'api_statuses_show', true);
 /**
  *
  */
-function api_conversation_show($type)
-{
+function api_conversation_show($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1754,8 +1726,7 @@ api_register_func('api/statusnet/conversation', 'api_conversation_show', true);
 /**
  *
  */
-function api_statuses_repeat($type)
-{
+function api_statuses_repeat($type) {
 	global $called_api;
 
 	$a = get_app();
@@ -1833,8 +1804,7 @@ api_register_func('api/statuses/retweet', 'api_statuses_repeat', true, API_METHO
 /**
  *
  */
-function api_statuses_destroy($type)
-{
+function api_statuses_destroy($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1870,8 +1840,7 @@ api_register_func('api/statuses/destroy', 'api_statuses_destroy', true, API_METH
  * http://developer.twitter.com/doc/get/statuses/mentions
  *
  */
-function api_statuses_mentions($type)
-{
+function api_statuses_mentions($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -1951,8 +1920,7 @@ api_register_func('api/statuses/mentions', 'api_statuses_mentions', true);
 api_register_func('api/statuses/replies', 'api_statuses_mentions', true);
 
 
-function api_statuses_user_timeline($type)
-{
+function api_statuses_user_timeline($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -2032,8 +2000,7 @@ api_register_func('api/statuses/user_timeline', 'api_statuses_user_timeline', tr
  *
  * api v1 : https://web.archive.org/web/20131019055350/https://dev.twitter.com/docs/api/1/post/favorites/create/%3Aid
  */
-function api_favorites_create_destroy($type)
-{
+function api_favorites_create_destroy($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -2101,8 +2068,7 @@ function api_favorites_create_destroy($type)
 api_register_func('api/favorites/create', 'api_favorites_create_destroy', true, API_METHOD_POST);
 api_register_func('api/favorites/destroy', 'api_favorites_create_destroy', true, API_METHOD_DELETE);
 
-function api_favorites($type)
-{
+function api_favorites($type) {
 	global $called_api;
 
 	$a = get_app();
@@ -2171,8 +2137,7 @@ function api_favorites($type)
 }
 api_register_func('api/favorites', 'api_favorites', true);
 
-function api_format_messages($item, $recipient, $sender)
-{
+function api_format_messages($item, $recipient, $sender) {
 	// standard meta information
 	$ret=array(
 			'id'                    => $item['id'],
@@ -2215,8 +2180,7 @@ function api_format_messages($item, $recipient, $sender)
 	return $ret;
 }
 
-function api_convert_item($item)
-{
+function api_convert_item($item) {
 	$body = $item['body'];
 	$attachments = api_get_attachments($body);
 
@@ -2265,8 +2229,7 @@ function api_convert_item($item)
 	);
 }
 
-function api_get_attachments(&$body)
-{
+function api_get_attachments(&$body) {
 	$text = $body;
 	$text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $text);
 
@@ -2296,8 +2259,7 @@ function api_get_attachments(&$body)
 	return $attachments;
 }
 
-function api_get_entitities(&$text, $bbcode)
-{
+function api_get_entitities(&$text, $bbcode) {
 	/*
 	To-Do:
 	* Links at the first character of the post
@@ -2454,8 +2416,7 @@ function api_get_entitities(&$text, $bbcode)
 
 	return($entities);
 }
-function api_format_items_embeded_images(&$item, $text)
-{
+function api_format_items_embeded_images(&$item, $text) {
 	$text = preg_replace_callback(
 			"|data:image/([^;]+)[^=]+=*|m",
 			function ($match) use ($item) {
@@ -2474,8 +2435,7 @@ function api_format_items_embeded_images(&$item, $text)
  * 			name => 'name'
  * 			'url => 'url'
  */
-function api_contactlink_to_array($txt)
-{
+function api_contactlink_to_array($txt) {
 	$match = array();
 	$r = preg_match_all('|<a href="([^"]*)">([^<]*)</a>|', $txt, $match);
 	if ($r && count($match)==3) {
@@ -2501,8 +2461,7 @@ function api_contactlink_to_array($txt)
  * 			likes => int count
  * 			dislikes => int count
  */
-function api_format_items_activities(&$item, $type = "json")
-{
+function api_format_items_activities(&$item, $type = "json") {
 	$activities = array(
 		'like' => array(),
 		'dislike' => array(),
@@ -2568,8 +2527,7 @@ function api_format_items_activities(&$item, $type = "json")
  * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
  * @return array
  */
-function api_format_items_profiles(&$profile = null, $type = "json")
-{
+function api_format_items_profiles(&$profile = null, $type = "json") {
 	if ($profile != null) {
 		$profile = array('profile_id' => $profile['id'],
 						'profile_name' => $profile['profile-name'],
@@ -2621,8 +2579,7 @@ function api_format_items_profiles(&$profile = null, $type = "json")
  * @param array $user_info
  * @param bool $filter_user filter items by $user_info
  */
-function api_format_items($r, $user_info, $filter_user = false, $type = "json")
-{
+function api_format_items($r, $user_info, $filter_user = false, $type = "json") {
 	$a = get_app();
 
 	$ret = array();
@@ -2734,8 +2691,7 @@ function api_format_items($r, $user_info, $filter_user = false, $type = "json")
 }
 
 
-function api_account_rate_limit_status($type)
-{
+function api_account_rate_limit_status($type) {
 	if ($type == "xml") {
 		$hash = array(
 				'remaining-hits' => (string) 150,
@@ -2760,8 +2716,7 @@ function api_account_rate_limit_status($type)
 }
 api_register_func('api/account/rate_limit_status', 'api_account_rate_limit_status', true);
 
-function api_help_test($type)
-{
+function api_help_test($type) {
 	if ($type == 'xml') {
 		$ok = "true";
 	} else {
@@ -2772,16 +2727,14 @@ function api_help_test($type)
 }
 api_register_func('api/help/test', 'api_help_test', false);
 
-function api_lists($type)
-{
+function api_lists($type) {
 	$ret = array();
 	return api_format_data('lists', $type, array("lists_list" => $ret));
 }
 api_register_func('api/lists', 'api_lists', true);
 
-function api_lists_list($type)
-{
-	$ret = array();
+function api_lists_list($type) {
+		$ret = array();
 	return api_format_data('lists', $type, array("lists_list" => $ret));
 }
 api_register_func('api/lists/list', 'api_lists_list', true);
@@ -2791,8 +2744,7 @@ api_register_func('api/lists/list', 'api_lists_list', true);
  *  This function is deprecated by Twitter
  *  returns: json, xml
  **/
-function api_statuses_f($type, $qtype)
-{
+function api_statuses_f($type, $qtype) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -2841,16 +2793,14 @@ function api_statuses_f($type, $qtype)
 
 	return array('user' => $ret);
 }
-function api_statuses_friends($type)
-{
+function api_statuses_friends($type) {
 	$data =  api_statuses_f($type, "friends");
 	if ($data===false) {
 		return false;
 	}
 	return  api_format_data("users", $type, $data);
 }
-function api_statuses_followers($type)
-{
+function api_statuses_followers($type) {
 	$data = api_statuses_f($type, "followers");
 	if ($data===false) {
 		return false;
@@ -2865,8 +2815,7 @@ api_register_func('api/statuses/followers', 'api_statuses_followers', true);
 
 
 
-function api_statusnet_config($type)
-{
+function api_statusnet_config($type) {
 	$a = get_app();
 
 	$name = $a->config['sitename'];
@@ -2901,8 +2850,7 @@ function api_statusnet_config($type)
 }
 api_register_func('api/statusnet/config', 'api_statusnet_config', false);
 
-function api_statusnet_version($type)
-{
+function api_statusnet_version($type) {
 	// liar
 	$fake_statusnet_version = "0.9.7";
 
@@ -2913,8 +2861,7 @@ api_register_func('api/statusnet/version', 'api_statusnet_version', false);
 /**
  * @todo use api_format_data() to return data
  */
-function api_ff_ids($type, $qtype)
-{
+function api_ff_ids($type, $qtype) {
 	$a = get_app();
 
 	if (! api_user()) {
@@ -2958,20 +2905,17 @@ function api_ff_ids($type, $qtype)
 	return api_format_data("ids", $type, array('id' => $ids));
 }
 
-function api_friends_ids($type)
-{
+function api_friends_ids($type) {
 	return api_ff_ids($type, 'friends');
 }
-function api_followers_ids($type)
-{
+function api_followers_ids($type) {
 	return api_ff_ids($type, 'followers');
 }
 api_register_func('api/friends/ids', 'api_friends_ids', true);
 api_register_func('api/followers/ids', 'api_followers_ids', true);
 
 
-function api_direct_messages_new($type)
-{
+function api_direct_messages_new($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -3041,8 +2985,7 @@ api_register_func('api/direct_messages/new', 'api_direct_messages_new', true, AP
  * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
  * @return string
  */
-function api_direct_messages_destroy($type)
-{
+function api_direct_messages_destroy($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -3110,8 +3053,7 @@ function api_direct_messages_destroy($type)
 api_register_func('api/direct_messages/destroy', 'api_direct_messages_destroy', true, API_METHOD_DELETE);
 
 
-function api_direct_messages_box($type, $box, $verbose)
-{
+function api_direct_messages_box($type, $box, $verbose) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -3202,23 +3144,19 @@ function api_direct_messages_box($type, $box, $verbose)
 	return  api_format_data("direct-messages", $type, $data);
 }
 
-function api_direct_messages_sentbox($type)
-{
+function api_direct_messages_sentbox($type) {
 	$verbose = (x($_GET, 'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
 	return api_direct_messages_box($type, "sentbox", $verbose);
 }
-function api_direct_messages_inbox($type)
-{
+function api_direct_messages_inbox($type) {
 	$verbose = (x($_GET, 'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
 	return api_direct_messages_box($type, "inbox", $verbose);
 }
-function api_direct_messages_all($type)
-{
+function api_direct_messages_all($type) {
 	$verbose = (x($_GET, 'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
 	return api_direct_messages_box($type, "all", $verbose);
 }
-function api_direct_messages_conversation($type)
-{
+function api_direct_messages_conversation($type) {
 	$verbose = (x($_GET, 'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
 	return api_direct_messages_box($type, "conversation", $verbose);
 }
@@ -3229,8 +3167,7 @@ api_register_func('api/direct_messages', 'api_direct_messages_inbox', true);
 
 
 
-function api_oauth_request_token($type)
-{
+function api_oauth_request_token($type) {
 	try {
 		$oauth = new FKOAuth1();
 		$r = $oauth->fetch_request_token(OAuthRequest::from_request());
@@ -3241,8 +3178,7 @@ function api_oauth_request_token($type)
 	echo $r;
 	killme();
 }
-function api_oauth_access_token($type)
-{
+function api_oauth_access_token($type) {
 	try {
 		$oauth = new FKOAuth1();
 		$r = $oauth->fetch_access_token(OAuthRequest::from_request());
@@ -3258,8 +3194,7 @@ api_register_func('api/oauth/request_token', 'api_oauth_request_token', false);
 api_register_func('api/oauth/access_token', 'api_oauth_access_token', false);
 
 
-function api_fr_photos_list($type)
-{
+function api_fr_photos_list($type) {
 	if (api_user()===false) {
 		throw new HTTP\ForbiddenException();
 	}
@@ -3293,8 +3228,7 @@ function api_fr_photos_list($type)
 	return  api_format_data("photos", $type, $data);
 }
 
-function api_fr_photo_detail($type)
-{
+function api_fr_photo_detail($type) {
 	if (api_user()===false) {
 		throw new HTTP\ForbiddenException();
 	}
@@ -3368,8 +3302,7 @@ api_register_func('api/friendica/photo', 'api_fr_photo_detail', true);
  * 		c_url: url of remote contact to auth to
  * 		url: string, url to redirect after auth
  */
-function api_friendica_remoteauth()
-{
+function api_friendica_remoteauth() {
 	$url = ((x($_GET, 'url')) ? $_GET['url'] : '');
 	$c_url = ((x($_GET, 'c_url')) ? $_GET['c_url'] : '');
 
@@ -3428,8 +3361,7 @@ api_register_func('api/friendica/remoteauth', 'api_friendica_remoteauth', true);
  * @param array $item Sharer item
  * @return array Shared item or false if not a reshare
  */
-function api_share_as_retweet(&$item)
-{
+function api_share_as_retweet(&$item) {
 	$body = trim($item["body"]);
 
 	if (Diaspora::is_reshare($body, false)===false) {
@@ -3522,8 +3454,7 @@ function api_share_as_retweet(&$item)
 	return $reshared_item;
 }
 
-function api_get_nick($profile)
-{
+function api_get_nick($profile) {
 	/* To-Do:
 	 - remove trailing junk from profile url
 	 - pump.io check has to check the website
@@ -3597,8 +3528,7 @@ function api_get_nick($profile)
 	return(false);
 }
 
-function api_in_reply_to($item)
-{
+function api_in_reply_to($item) {
 	$in_reply_to = array();
 
 	$in_reply_to['status_id'] = null;
@@ -3652,8 +3582,7 @@ function api_in_reply_to($item)
 	return $in_reply_to;
 }
 
-function api_clean_plain_items($Text)
-{
+function api_clean_plain_items($Text) {
 	$include_entities = strtolower(x($_REQUEST, 'include_entities')?$_REQUEST['include_entities']:"false");
 
 	$Text = bb_CleanPictureLinks($Text);
@@ -3678,8 +3607,7 @@ function api_clean_plain_items($Text)
  *
  * @return string Cleaned body
  */
-function api_clean_attachments($body)
-{
+function api_clean_attachments($body) {
 	$data = get_attachment_data($body);
 
 	if (!$data) {
@@ -3705,8 +3633,7 @@ function api_clean_attachments($body)
 	return $body;
 }
 
-function api_best_nickname(&$contacts)
-{
+function api_best_nickname(&$contacts) {
 	$best_contact = array();
 
 	if (count($contact) == 0) {
@@ -3768,8 +3695,7 @@ function api_best_nickname(&$contacts)
 }
 
 // return all or a specified group of the user with the containing contacts
-function api_friendica_group_show($type)
-{
+function api_friendica_group_show($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -3822,8 +3748,7 @@ api_register_func('api/friendica/group_show', 'api_friendica_group_show', true);
 
 
 // delete the specified group of the user
-function api_friendica_group_delete($type)
-{
+function api_friendica_group_delete($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -3874,8 +3799,7 @@ api_register_func('api/friendica/group_delete', 'api_friendica_group_delete', tr
 
 
 // create the specified group with the posted array of contacts
-function api_friendica_group_create($type)
-{
+function api_friendica_group_create($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -3946,8 +3870,7 @@ api_register_func('api/friendica/group_create', 'api_friendica_group_create', tr
 
 
 // update the specified group with the posted array of contacts
-function api_friendica_group_update($type)
-{
+function api_friendica_group_update($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -4009,8 +3932,7 @@ function api_friendica_group_update($type)
 api_register_func('api/friendica/group_update', 'api_friendica_group_update', true, API_METHOD_POST);
 
 
-function api_friendica_activity($type)
-{
+function api_friendica_activity($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -4051,8 +3973,7 @@ api_register_func('api/friendica/activity/unattendmaybe', 'api_friendica_activit
  * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
  * @return string
 */
-function api_friendica_notification($type)
-{
+function api_friendica_notification($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -4085,8 +4006,7 @@ function api_friendica_notification($type)
  * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
  * @return string
  */
-function api_friendica_notification_seen($type)
-{
+function api_friendica_notification_seen($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -4133,8 +4053,7 @@ api_register_func('api/friendica/notification', 'api_friendica_notification', tr
  * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
  * @return string (success result=ok, error result=error with error message)
  */
-function api_friendica_direct_messages_setseen($type)
-{
+function api_friendica_direct_messages_setseen($type) {
 	$a = get_app();
 	if (api_user()===false) {
 		throw new HTTP\ForbiddenException();
@@ -4188,8 +4107,7 @@ api_register_func('api/friendica/direct_messages_setseen', 'api_friendica_direct
  *                          success=false if nothing was found, search_result='nothing found',
  * 		   error: result=error with error message)
  */
-function api_friendica_direct_messages_search($type)
-{
+function api_friendica_direct_messages_search($type) {
 	$a = get_app();
 
 	if (api_user()===false) {
@@ -4244,8 +4162,7 @@ api_register_func('api/friendica/direct_messages_search', 'api_friendica_direct_
  * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
  * @return string
  */
-function api_friendica_profile_show($type)
-{
+function api_friendica_profile_show($type) {
 	$a = get_app();
 
 	if (api_user()===false) {

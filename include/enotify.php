@@ -105,7 +105,7 @@ function notification($params) {
 		// If so don't create a second notification
 
 		$p = null;
-		$p = q("SELECT `id` FROM `notify` WHERE (`type` = %d OR `type` = %d OR `type` = %d) AND `link` = '%s' AND `uid` = %d LIMIT 1",
+		$p = q("SELECT `id` FROM `notify` WHERE `type` IN (%d, %d, %d) AND `link` = '%s' AND `uid` = %d LIMIT 1",
 			intval(NOTIFY_TAGSELF),
 			intval(NOTIFY_COMMENT),
 			intval(NOTIFY_SHARE),
@@ -472,7 +472,7 @@ function notification($params) {
 		// After we've stored everything, look again to see if there are any duplicates and if so remove them
 
 		$p = null;
-		$p = q("SELECT `id` FROM `notify` WHERE (`type` = %d OR `type` = %d) AND `link` = '%s' AND `uid` = %d ORDER BY `id`",
+		$p = q("SELECT `id` FROM `notify` WHERE `type` IN (%d, %d) AND `link` = '%s' AND `uid` = %d ORDER BY `id`",
 			intval(NOTIFY_TAGSELF),
 			intval(NOTIFY_COMMENT),
 			dbesc($params['link']),

@@ -1,6 +1,6 @@
 <?php
 
-function friendica_init(App &$a) {
+function friendica_init(App $a) {
 	if ($a->argv[1]=="json"){
 		$register_policy = Array('REGISTER_CLOSED', 'REGISTER_APPROVE', 'REGISTER_OPEN');
 
@@ -59,7 +59,7 @@ function friendica_init(App &$a) {
 
 
 
-function friendica_content(App &$a) {
+function friendica_content(App $a) {
 
 	$o = '';
 	$o .= '<h3>Friendica</h3>';
@@ -70,7 +70,7 @@ function friendica_content(App &$a) {
 	$o .= t('This is Friendica, version') . ' ' . FRIENDICA_VERSION . ' ';
 	$o .= t('running at web location') . ' ' . z_root() . '</p><p>';
 
-	$o .= t('Please visit <a href="http://friendica.com">Friendica.com</a> to learn more about the Friendica project.') . '</p><p>';	
+	$o .= t('Please visit <a href="http://friendica.com">Friendica.com</a> to learn more about the Friendica project.') . '</p><p>';
 
 	$o .= t('Bug reports and issues: please visit') . ' ' . '<a href="https://github.com/friendica/friendica/issues?state=open">'.t('the bugtracker at github').'</a></p><p>';
 	$o .= t('Suggestions, praise, donations, etc. - please email "Info" at Friendica - dot com') . '</p>';
@@ -102,7 +102,7 @@ function friendica_content(App &$a) {
 	else
 		$o .= '<p>' . t('No installed plugins/addons/apps') . '</p>';
 
-	call_hooks('about_hook', $o); 	
+	call_hooks('about_hook', $o);
 
 	return $o;
 

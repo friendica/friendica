@@ -2,7 +2,7 @@
 
 require_once('include/security.php');
 
-function attach_init(App &$a) {
+function attach_init(App $a) {
 
 	if($a->argc != 2) {
 		notice( t('Item not available.') . EOL);

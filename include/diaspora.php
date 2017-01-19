@@ -325,8 +325,9 @@ class Diaspora {
 				logger("delivering to: ".$rr["username"]);
 				self::dispatch($rr,$msg);
 			}
-		} else
-			logger("No subscribers for ".$msg["author"]." ".print_r($msg, true));
+		} else {
+			logger("No subscribers for ".$msg["author"]." ".print_r($msg, true), LOGGER_DEBUG);
+		}
 
 		return $message_id;
 	}
@@ -736,13 +737,28 @@ class Diaspora {
 	 * @return The contact id
 	 */
 	private static function contact_by_handle($uid, $handle) {
+
+		// First do a direct search on the contact table
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `addr` = '%s' LIMIT 1",
 			intval($uid),
 			dbesc($handle)
 		);
 
-		if ($r)
+		if (dbm::is_result($r)) {
 			return $r[0];
+		} else {
+			// We haven't found it?
+			// We use another function for it that will possibly create a contact entry
+			$cid = get_contact($handle, $uid);
+
+			if ($cid > 0) {
+				$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1", intval($cid));
+
+				if (dbm::is_result($r)) {
+					return $r[0];
+				}
+			}
+		}
 
 		$handle_parts = explode("@", $handle);
 		$nurl_sql = "%%://".$handle_parts[1]."%%/profile/".$handle_parts[0];
@@ -751,9 +767,11 @@ class Diaspora {
 			intval($uid),
 			dbesc($nurl_sql)
 		);
-		if($r)
+		if (dbm::is_result($r)) {
 			return $r[0];
+		}
 
+		logger("Haven't found contact for user ".$uid." and handle ".$handle, LOGGER_DEBUG);
 		return false;
 	}
 
@@ -833,7 +851,7 @@ class Diaspora {
 			dbesc($guid)
 		);
 
-		if ($r) {
+		if (dbm::is_result($r)) {
 			logger("message ".$guid." already exists for user ".$uid);
 			return $r[0]["id"];
 		}

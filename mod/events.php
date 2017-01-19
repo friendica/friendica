@@ -8,7 +8,7 @@ require_once('include/datetime.php');
 require_once('include/event.php');
 require_once('include/items.php');
 
-function events_init(App &$a) {
+function events_init(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -31,7 +31,7 @@ function events_init(App &$a) {
 	return;
 }
 
-function events_post(App &$a) {
+function events_post(App $a) {
 
 	logger('post: ' . print_r($_REQUEST,true));
 
@@ -189,7 +189,7 @@ function events_post(App &$a) {
 
 
 
-function events_content(App &$a) {
+function events_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

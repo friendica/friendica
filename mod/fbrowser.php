@@ -10,7 +10,7 @@ require_once('include/Photo.php');
 /**
  * @param App $a
  */
-function fbrowser_content(App &$a){
+function fbrowser_content(App $a) {
 
 	if (!local_user())
 		killme();

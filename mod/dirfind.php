@@ -5,7 +5,7 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function dirfind_init(App &$a) {
+function dirfind_init(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
@@ -23,7 +23,7 @@ function dirfind_init(App &$a) {
 
 
 
-function dirfind_content(&$a, $prefix = "") {
+function dirfind_content(App $a, $prefix = "") {
 
 	$community = false;
 	$discover_user = false;

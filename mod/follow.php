@@ -5,7 +5,7 @@ require_once('include/follow.php');
 require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 
-function follow_content(App &$a) {
+function follow_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -152,7 +152,7 @@ function follow_content(App &$a) {
 	return $o;
 }
 
-function follow_post(App &$a) {
+function follow_post(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

@@ -612,7 +612,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
  *
  * @return string posts in HTML
  */
-function posts_from_gcontact($a, $gcontact_id) {
+function posts_from_gcontact(App $a, $gcontact_id) {
 
 	require_once('include/conversation.php');
 
@@ -636,7 +636,7 @@ function posts_from_gcontact($a, $gcontact_id) {
 	$r = q("SELECT `item`.`uri`, `item`.*, `item`.`id` AS `item_id`,
 			`author-name` AS `name`, `owner-avatar` AS `photo`,
 			`owner-link` AS `url`, `owner-avatar` AS `thumb`
-		FROM `item` FORCE INDEX (`gcontactid_uid_created`)
+		FROM `item`
 		WHERE `gcontact-id` = %d AND $sql AND
 			NOT `deleted` AND NOT `moderated` AND `visible`
 		ORDER BY `item`.`created` DESC LIMIT %d, %d",
@@ -664,7 +664,7 @@ function posts_from_gcontact($a, $gcontact_id) {
  *
  * @return string posts in HTML
  */
-function posts_from_contact_url($a, $contact_url) {
+function posts_from_contact_url(App $a, $contact_url) {
 
 	require_once('include/conversation.php');
 

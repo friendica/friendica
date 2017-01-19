@@ -715,11 +715,19 @@ class Probe {
 		$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
 		foreach ($photos AS $photo) {
 			$attr = array();
-			foreach ($photo->attributes as $attribute)
+			foreach ($photo->attributes as $attribute) {
 				$attr[$attribute->name] = trim($attribute->value);
+			}
 
-			if (isset($attr["src"]) AND isset($attr["width"]))
+			if (isset($attr["src"]) AND isset($attr["width"])) {
 				$avatar[$attr["width"]] = $attr["src"];
+			}
+
+			// We don't have a width. So we just take everything that we got.
+			// This is a Hubzilla workaround which doesn't send a width.
+			if ((sizeof($avatar) == 0) AND isset($attr["src"])) {
+				$avatar[] = $attr["src"];
+			}
 		}
 
 		if (sizeof($avatar)) {

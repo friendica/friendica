@@ -7,7 +7,7 @@ require_once('include/Scrape.php');
 require_once('mod/proxy.php');
 require_once('include/Photo.php');
 
-function contacts_init(App &$a) {
+function contacts_init(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -97,7 +97,7 @@ function contacts_init(App &$a) {
 
 }
 
-function contacts_batch_actions(App &$a){
+function contacts_batch_actions(App $a) {
 	$contacts_id = $_POST['contact_batch'];
 	if (!is_array($contacts_id)) return;
 
@@ -144,7 +144,7 @@ function contacts_batch_actions(App &$a){
 }
 
 
-function contacts_post(App &$a) {
+function contacts_post(App $a) {
 
 	if (! local_user()) {
 		return;
@@ -349,7 +349,7 @@ function _contact_drop($contact_id, $orig_record) {
 }
 
 
-function contacts_content(App &$a) {
+function contacts_content(App $a) {
 
 	$sort_type = 0;
 	$o = '';
@@ -831,13 +831,13 @@ function contacts_content(App &$a) {
 
 /**
  * @brief List of pages for the Contact TabBar
- * 
+ *
  * Available Pages are 'Status', 'Profile', 'Contacts' and 'Common Friends'
- * 
+ *
  * @param app $a
  * @param int $contact_id The ID of the contact
  * @param int $active_tab 1 if tab should be marked as active
- * 
+ *
  * @return array with with contact TabBar data
  */
 function contacts_tab($a, $contact_id, $active_tab) {
@@ -961,9 +961,9 @@ function _contact_detail_for_template($rr){
 
 /**
  * @brief Gives a array with actions which can performed to a given contact
- * 
+ *
  * This includes actions like e.g. 'block', 'hide', 'archive', 'delete' and others
- * 
+ *
  * @param array $contact Data about the Contact
  * @return array with contact related actions
  */
@@ -1019,7 +1019,7 @@ function contact_actions($contact) {
 
 	$contact_actions['delete'] = array(
 						'label'	=> t('Delete'),
-						'url'	=> 'contacts/' . $contact['id'] . '/drop', 
+						'url'	=> 'contacts/' . $contact['id'] . '/drop',
 						'title'	=> t('Delete contact'),
 						'sel'	=> '',
 						'id'	=> 'delete',

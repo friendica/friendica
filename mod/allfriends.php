@@ -5,7 +5,7 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function allfriends_content(App &$a) {
+function allfriends_content(App $a) {
 
 	$o = '';
 	if (! local_user()) {

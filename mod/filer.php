@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 
 
-function filer_content(App &$a) {
+function filer_content(App $a) {
 
 	if (! local_user()) {
 		killme();
@@ -30,7 +30,7 @@ function filer_content(App &$a) {
 			'$field' => array('term', t("Save to Folder:"), '', '', $filetags, t('- select -')),
 			'$submit' => t('Save'),
 		));
-		
+
 		echo $o;
 	}
 	killme();

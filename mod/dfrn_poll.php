@@ -4,7 +4,7 @@ require_once('include/auth.php');
 require_once('include/dfrn.php');
 
 
-function dfrn_poll_init(App &$a) {
+function dfrn_poll_init(App $a) {
 
 
 	$dfrn_id         = ((x($_GET,'dfrn_id'))         ? $_GET['dfrn_id']              : '');
@@ -163,7 +163,7 @@ function dfrn_poll_init(App &$a) {
 
 			if($final_dfrn_id != $orig_id) {
 				logger('profile_check: ' . $final_dfrn_id . ' != ' . $orig_id, LOGGER_DEBUG);
-				// did not decode properly - cannot trust this site 
+				// did not decode properly - cannot trust this site
 				xml_status(3, 'Bad decryption');
 			}
 
@@ -203,7 +203,7 @@ function dfrn_poll_init(App &$a) {
 
 
 
-function dfrn_poll_post(App &$a) {
+function dfrn_poll_post(App $a) {
 
 	$dfrn_id      = ((x($_POST,'dfrn_id'))      ? $_POST['dfrn_id']              : '');
 	$challenge    = ((x($_POST,'challenge'))    ? $_POST['challenge']            : '');
@@ -260,7 +260,7 @@ function dfrn_poll_post(App &$a) {
 
 			if($final_dfrn_id != $orig_id) {
 				logger('profile_check: ' . $final_dfrn_id . ' != ' . $orig_id, LOGGER_DEBUG);
-				// did not decode properly - cannot trust this site 
+				// did not decode properly - cannot trust this site
 				xml_status(3, 'Bad decryption');
 			}
 
@@ -383,7 +383,7 @@ function dfrn_poll_post(App &$a) {
 	}
 }
 
-function dfrn_poll_content(App &$a) {
+function dfrn_poll_content(App $a) {
 
 	$dfrn_id         = ((x($_GET,'dfrn_id'))         ? $_GET['dfrn_id']              : '');
 	$type            = ((x($_GET,'type'))            ? $_GET['type']                 : 'data');

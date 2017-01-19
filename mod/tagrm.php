@@ -2,7 +2,7 @@
 
 require_once('include/bbcode.php');
 
-function tagrm_post(App &$a) {
+function tagrm_post(App $a) {
 
 	if (! local_user()) {
 		goaway(App::get_baseurl() . '/' . $_SESSION['photo_return']);
@@ -42,14 +42,14 @@ function tagrm_post(App &$a) {
 
 	info( t('Tag removed') . EOL );
 	goaway(App::get_baseurl() . '/' . $_SESSION['photo_return']);
-	
+
 	// NOTREACHED
 
 }
 
 
 
-function tagrm_content(App &$a) {
+function tagrm_content(App $a) {
 
 	$o = '';
 

@@ -2,7 +2,7 @@
 // See here for a documentation for portable contacts:
 // https://web.archive.org/web/20160405005550/http://portablecontacts.net/draft-spec.html
 
-function poco_init(App &$a) {
+function poco_init(App $a) {
 	require_once("include/bbcode.php");
 
 	$system_mode = false;

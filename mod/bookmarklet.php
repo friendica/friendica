@@ -3,11 +3,11 @@
 require_once('include/conversation.php');
 require_once('include/items.php');
 
-function bookmarklet_init(App &$a) {
+function bookmarklet_init(App $a) {
 	$_GET["mode"] = "minimal";
 }
 
-function bookmarklet_content(App &$a) {
+function bookmarklet_content(App $a) {
 	if (!local_user()) {
 		$o = '<h2>'.t('Login').'</h2>';
 		$o .= login(($a->config['register_policy'] == REGISTER_CLOSED) ? false : true);

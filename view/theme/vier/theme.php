@@ -13,7 +13,7 @@ require_once("include/plugin.php");
 require_once("include/socgraph.php");
 require_once("mod/proxy.php");
 
-function vier_init(App &$a) {
+function vier_init(App $a) {
 
 	$a->theme_events_in_profile = false;
 

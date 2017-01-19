@@ -3,7 +3,7 @@
 require_once('include/socgraph.php');
 require_once('include/contact_widgets.php');
 
-function suggest_init(App &$a) {
+function suggest_init(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -49,7 +49,7 @@ function suggest_init(App &$a) {
 
 
 
-function suggest_content(App &$a) {
+function suggest_content(App $a) {
 
 	require_once("mod/proxy.php");
 

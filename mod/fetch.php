@@ -6,9 +6,7 @@ require_once("include/crypto.php");
 require_once("include/diaspora.php");
 require_once("include/xml.php");
 
-/// @TODO You always make it like this: function foo(&$a)
-/// @TODO This means that the value of $a can be changed in anything, remove & and use App as type-hint
-function fetch_init(App &$a){
+function fetch_init(App $a) {
 
 	if (($a->argc != 3) OR (!in_array($a->argv[1], array("post", "status_message", "reshare")))) {
 		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));

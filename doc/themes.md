@@ -122,7 +122,7 @@ the 1st part of the line is the name of the CSS file (without the .css) the 2nd 
 Calling the t() function with the common name makes the string translateable.
 The selected 1st part will be saved in the database by the theme_post function.
 
-    function theme_post(App &$a){
+    function theme_post(App $a){
         // non local users shall not pass
         if (! local_user()) {
             return;
@@ -168,7 +168,7 @@ The content of this file should be something like
 
     <?php
     /* meta informations for the theme, see below */
-    function duepuntozero_lr_init(App &$a) {
+    function duepuntozero_lr_init(App $a) {
         $a-> theme_info = array(
             'extends' => 'duepuntozero'.
         );
@@ -251,7 +251,7 @@ Next crucial part of the theme.php file is a definition of an init function.
 The name of the function is <theme-name>_init.
 So in the case of quattro it is
 
-    function quattro_init(App &$a) {
+    function quattro_init(App $a) {
       $a->theme_info = array();
       set_template_engine($a, 'smarty3');
     }

@@ -11,7 +11,7 @@ require_once('include/event.php');
 
 require_once('library/defuse/php-encryption-1.2.1/Crypto.php');
 
-function dfrn_notify_post(App &$a) {
+function dfrn_notify_post(App $a) {
 	logger(__function__, LOGGER_TRACE);
 	$dfrn_id      = ((x($_POST,'dfrn_id'))      ? notags(trim($_POST['dfrn_id']))   : '');
 	$dfrn_version = ((x($_POST,'dfrn_version')) ? (float) $_POST['dfrn_version']    : 2.0);
@@ -221,7 +221,7 @@ function dfrn_notify_post(App &$a) {
 }
 
 
-function dfrn_notify_content(App &$a) {
+function dfrn_notify_content(App $a) {
 
 	if(x($_GET,'dfrn_id')) {
 

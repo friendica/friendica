@@ -1,6 +1,6 @@
 <?php
 
-function amcd_content(App &$a) {
+function amcd_content(App $a) {
 //header("Content-type: text/json");
 echo <<< EOT
 {
