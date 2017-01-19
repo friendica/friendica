@@ -14,7 +14,7 @@ namespace Friendica\Network\HTTP;
 /**
  * @brief Base class for HTTP response codes
  */
-class HTTPException extends \Exception 
+class HTTPException extends \Exception
 {
 
 	var $httpcode = 200;
@@ -29,11 +29,18 @@ class HTTPException extends \Exception
 	 */
 	public function __construct($message="", $code = 0, Exception $previous = null) {
 		if ($this->httpdesc=="") {
-			$this->httpdesc = preg_replace("|([a-z])([A-Z])|",'$1 $2',
-								str_replace("Exception","",
-									explode("\\",get_class($this))[3]
-								)
-							);
+			// if no description is set, we build it from class name.
+			$classpath_arr = explode("\\", get_class($this));
+			$classname = array_pop($classpath_arr);
+			$httpexceptionname = str_replace("Exception", "", $classname);
+
+			// add space between a lowercase and a uppercase char:
+			// "NotFound" -> "Not Found"
+			$this->httpdesc = preg_replace(
+				"|([a-z])([A-Z])|",
+				'$1 $2',
+				$httpexceptionname
+			);
 		}
 		parent::__construct($message, $code, $previous);
 	}
@@ -42,6 +49,6 @@ class HTTPException extends \Exception
 	 * @brief Send approriate HTTP header for the exception
 	 */
 	public function send_header() {
-		header($_SERVER["SERVER_PROTOCOL"] . ' '.$this->httpcode.' ' . $this->httpdesc);
+		header($_SERVER["SERVER_PROTOCOL"] . ' ' . $this->httpcode . ' ' . $this->httpdesc);
 	}
 }
