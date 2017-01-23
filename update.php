@@ -1302,7 +1302,7 @@ function update_1145() {
 }
 
 function update_1146() {
-	$r = q("ALTER TABLE profile add hometown char(255) not null after `country-name`, add index ( `hometown` ) ");
+	$r = q("ALTER TABLE `profile` ADD `hometown` CHAR(255) NOT NULL AFTER `country-name`, ADD INDEX ( `hometown` ) ");
 
 	if ($r) {
 		return UPDATE_SUCCESS ;
@@ -1324,7 +1324,7 @@ function update_1147() {
 }
 
 function update_1148() {
-	$r = q("ALTER TABLE photo ADD type CHAR(128) NOT NULL DEFAULT 'image/jpeg' AFTER filename");
+	$r = q("ALTER TABLE `photo` ADD `type` CHAR(128) NOT NULL DEFAULT 'image/jpeg' AFTER `filename`");
 
 	if ($r) {
 		return UPDATE_SUCCESS ;
@@ -1335,8 +1335,8 @@ function update_1148() {
 
 
 function update_1149() {
-	$r1 = q("ALTER TABLE profile ADD likes text NOT NULL after prv_keywords");
-	$r2 = q("ALTER TABLE profile ADD dislikes text NOT NULL after likes");
+	$r1 = q("ALTER TABLE `profile` ADD `likes` TEXT NOT NULL AFTER `prv_keywords`");
+	$r2 = q("ALTER TABLE `profile` ADD `dislikes` TEXT NOT NULL AFTER `likes`");
 
 	if ($r1 && $r2) {
 		return UPDATE_SUCCESS;
@@ -1347,7 +1347,7 @@ function update_1149() {
 
 
 function update_1150() {
-	$r = q("ALTER TABLE event ADD summary text NOT NULL after finish, add index ( uid ), add index ( cid ), add index ( uri ), add index ( `start` ), add index ( finish ), add index ( `type` ), add index ( adjust ) ");
+	$r = q("ALTER TABLE `event` ADD `summary` TEXT NOT NULL AFTER `finish`, ADD INDEX ( `uid` ), ADD INDEX ( `cid` ), ADD INDEX ( `uri` ), ADD INDEX ( `start` ), ADD INDEX ( `finish` ), ADD INDEX ( `type` ), ADD INDEX ( `adjust` ) ");
 
 	if ($r) {
 		return UPDATE_SUCCESS ;
@@ -1358,10 +1358,10 @@ function update_1150() {
 
 
 function update_1151() {
-	$r = q("CREATE TABLE IF NOT EXISTS locks (
-			id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-			name CHAR( 128 ) NOT NULL ,
-			locked TINYINT( 1 ) NOT NULL DEFAULT '0'
+	$r = q("CREATE TABLE IF NOT EXISTS `locks` (
+			`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`name` CHAR( 128 ) NOT NULL ,
+			`locked` TINYINT( 1 ) NOT NULL DEFAULT '0'
 		  ) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
 
 	if ($r) {
