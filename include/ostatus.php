@@ -104,24 +104,29 @@ class ostatus {
 			//	$contact["poll"] = $value;
 
 			$value = $xpath->evaluate('atom:author/atom:uri/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["alias"] = $value;
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:displayName/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["name"] = $value;
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:preferredUsername/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["nick"] = $value;
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:note/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["about"] = html2bbcode($value);
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:address/poco:formatted/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["location"] = $value;
+			}
 
 			if (($contact["name"] != $r[0]["name"]) OR ($contact["nick"] != $r[0]["nick"]) OR ($contact["about"] != $r[0]["about"]) OR
 				($contact["alias"] != $r[0]["alias"]) OR ($contact["location"] != $r[0]["location"])) {
@@ -179,8 +184,9 @@ class ostatus {
 	 */
 	public static function salmon_author($xml, $importer) {
 
-		if ($xml == "")
+		if ($xml == "") {
 			return;
+		}
 
 		$doc = new DOMDocument();
 		@$doc->loadXML($xml);
@@ -217,8 +223,9 @@ class ostatus {
 
 		logger("Import OStatus message", LOGGER_DEBUG);
 
-		if ($xml == "")
+		if ($xml == "") {
 			return;
+		}
 
 		//$tempfile = tempnam(get_temppath(), "import");
 		//file_put_contents($tempfile, $xml);
@@ -238,12 +245,14 @@ class ostatus {
 
 		$gub = "";
 		$hub_attributes = $xpath->query("/atom:feed/atom:link[@rel='hub']")->item(0)->attributes;
-		if (is_object($hub_attributes))
-			foreach($hub_attributes AS $hub_attribute)
+		if (is_object($hub_attributes)) {
+			foreach($hub_attributes AS $hub_attribute) {
 				if ($hub_attribute->name == "href") {
 					$hub = $hub_attribute->textContent;
 					logger("Found hub ".$hub, LOGGER_DEBUG);
 				}
+			}
+		}
 
 		$header = array();
 		$header["uid"] = $importer["uid"];
@@ -257,10 +266,11 @@ class ostatus {
 		// depending on that, the first node is different
 		$first_child = $doc->firstChild->tagName;
 
-		if ($first_child == "feed")
+		if ($first_child == "feed") {
 			$entries = $xpath->query('/atom:feed/atom:entry');
-		else
+		} else {
 			$entries = $xpath->query('/atom:entry');
+		}
 
 		$conversation = "";
 		$conversationlist = array();
@@ -277,16 +287,18 @@ class ostatus {
 			$mention = false;
 
 			// fetch the author
-			if ($first_child == "feed")
+			if ($first_child == "feed") {
 				$author = self::fetchauthor($xpath, $doc->firstChild, $importer, $contact, false);
-			else
+			} else {
 				$author = self::fetchauthor($xpath, $entry, $importer, $contact, false);
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:preferredUsername/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$nickname = $value;
-			else
+			} else {
 				$nickname = $author["author-name"];
+			}
 
 			$item = array_merge($header, $author);
 
@@ -295,7 +307,7 @@ class ostatus {
 
 			$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s'",
 				intval($importer["uid"]), dbesc($item["uri"]));
-			if ($r) {
+			if (dbm::is_result($r)) {
 				logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$r[0]["id"], LOGGER_DEBUG);
 				continue;
 			}
@@ -306,8 +318,9 @@ class ostatus {
 			if (($item["object-type"] == ACTIVITY_OBJ_BOOKMARK) OR ($item["object-type"] == ACTIVITY_OBJ_EVENT)) {
 				$item["title"] = $xpath->query('atom:title/text()', $entry)->item(0)->nodeValue;
 				$item["body"] = $xpath->query('atom:summary/text()', $entry)->item(0)->nodeValue;
-			} elseif ($item["object-type"] == ACTIVITY_OBJ_QUESTION)
+			} elseif ($item["object-type"] == ACTIVITY_OBJ_QUESTION) {
 				$item["title"] = $xpath->query('atom:title/text()', $entry)->item(0)->nodeValue;
+			}
 
 			$item["object"] = $xml;
 			$item["verb"] = $xpath->query('activity:verb/text()', $entry)->item(0)->nodeValue;
@@ -352,8 +365,9 @@ class ostatus {
 			}
 
 			// http://activitystrea.ms/schema/1.0/rsvp-yes
-			if (!in_array($item["verb"], array(ACTIVITY_POST, ACTIVITY_LIKE, ACTIVITY_SHARE)))
+			if (!in_array($item["verb"], array(ACTIVITY_POST, ACTIVITY_LIKE, ACTIVITY_SHARE))) {
 				logger("Unhandled verb ".$item["verb"]." ".print_r($item, true));
+			}
 
 			$item["created"] = $xpath->query('atom:published/text()', $entry)->item(0)->nodeValue;
 			$item["edited"] = $xpath->query('atom:updated/text()', $entry)->item(0)->nodeValue;
@@ -364,10 +378,12 @@ class ostatus {
 			$inreplyto = $xpath->query('thr:in-reply-to', $entry);
 			if (is_object($inreplyto->item(0))) {
 				foreach($inreplyto->item(0)->attributes AS $attributes) {
-					if ($attributes->name == "ref")
+					if ($attributes->name == "ref") {
 						$item["parent-uri"] = $attributes->textContent;
-					if ($attributes->name == "href")
+					}
+					if ($attributes->name == "href") {
 						$related = $attributes->textContent;
+					}
 				}
 			}
 
@@ -411,7 +427,7 @@ class ostatus {
 						if ($attributes->name == "title")
 							$title = $attributes->textContent;
 					}
-					if (($rel != "") AND ($href != ""))
+					if (($rel != "") AND ($href != "")) {
 						switch($rel) {
 							case "alternate":
 								$item["plink"] = $href;
@@ -448,6 +464,7 @@ class ostatus {
 									$mention = true;
 								break;
 						}
+					}
 				}
 			}
 
@@ -457,12 +474,15 @@ class ostatus {
 			$notice_info = $xpath->query('statusnet:notice_info', $entry);
 			if ($notice_info AND ($notice_info->length > 0)) {
 				foreach($notice_info->item(0)->attributes AS $attributes) {
-					if ($attributes->name == "source")
+					if ($attributes->name == "source") {
 						$item["app"] = strip_tags($attributes->textContent);
-					if ($attributes->name == "local_id")
+					}
+					if ($attributes->name == "local_id") {
 						$local_id = $attributes->textContent;
-					if ($attributes->name == "repeat_of")
+					}
+					if ($attributes->name == "repeat_of") {
 						$repeat_of = $attributes->textContent;
+					}
 				}
 			}
 
@@ -473,24 +493,32 @@ class ostatus {
 				if (is_object($activityobjects)) {
 
 					$orig_uri = $xpath->query("activity:object/atom:id", $activityobjects)->item(0)->nodeValue;
-					if (!isset($orig_uri))
+					if (!isset($orig_uri)) {
 						$orig_uri = $xpath->query('atom:id/text()', $activityobjects)->item(0)->nodeValue;
+					}
 
 					$orig_links = $xpath->query("activity:object/atom:link[@rel='alternate']", $activityobjects);
-					if ($orig_links AND ($orig_links->length > 0))
-						foreach($orig_links->item(0)->attributes AS $attributes)
-							if ($attributes->name == "href")
+					if ($orig_links AND ($orig_links->length > 0)) {
+						foreach ($orig_links->item(0)->attributes AS $attributes) {
+							if ($attributes->name == "href") {
 								$orig_link = $attributes->textContent;
+							}
+						}
+					}
 
-					if (!isset($orig_link))
+					if (!isset($orig_link)) {
 						$orig_link = $xpath->query("atom:link[@rel='alternate']", $activityobjects)->item(0)->nodeValue;
+					}
 
-					if (!isset($orig_link))
+					if (!isset($orig_link)) {
 						$orig_link =  self::convert_href($orig_uri);
+					}
 
 					$orig_body = $xpath->query('activity:object/atom:content/text()', $activityobjects)->item(0)->nodeValue;
-					if (!isset($orig_body))
+
+					if (!isset($orig_body)) {
 						$orig_body = $xpath->query('atom:content/text()', $activityobjects)->item(0)->nodeValue;
+					}
 
 					$orig_created = $xpath->query('atom:published/text()', $activityobjects)->item(0)->nodeValue;
 					$orig_edited = $xpath->query('atom:updated/text()', $activityobjects)->item(0)->nodeValue;
@@ -511,8 +539,10 @@ class ostatus {
 					$item["verb"] = $xpath->query('activity:verb/text()', $activityobjects)->item(0)->nodeValue;
 
 					$item["object-type"] = $xpath->query('activity:object/activity:object-type/text()', $activityobjects)->item(0)->nodeValue;
-					if (!isset($item["object-type"]))
+
+					if (!isset($item["object-type"])) {
 						$item["object-type"] = $xpath->query('activity:object-type/text()', $activityobjects)->item(0)->nodeValue;
+					}
 				}
 			}
 
@@ -540,12 +570,14 @@ class ostatus {
 							intval($importer["uid"]), dbesc($item["parent-uri"]));
 					}
 				}
-				if ($r) {
+
+				if (dbm::is_result($r)) {
 					$item["type"] = 'remote-comment';
 					$item["gravity"] = GRAVITY_COMMENT;
 				}
-			} else
+			} else {
 				$item["parent-uri"] = $item["uri"];
+			}
 
 			$item_id = self::completion($conversation, $importer["uid"], $item, $self);
 
