@@ -20,10 +20,11 @@ function crepair_init(App $a) {
 		}
 	}
 
-	if(! x($a->page,'aside'))
+	if (! x($a->page,'aside')) {
 		$a->page['aside'] = '';
+	}
 
-	if($contact_id) {
+	if ($contact_id) {
 		$a->data['contact'] = $r[0];
 		$contact = $r[0];
 		profile_load($a, "", 0, get_contact_details_by_url($contact["url"]));
@@ -35,9 +36,12 @@ function crepair_post(App $a) {
 		return;
 	}
 
+	// Init $r here if $cid is not set
+	$r = false;
+
 	$cid = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 
-	if($cid) {
+	if ($cid) {
 		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($cid),
 			intval(local_user())
@@ -78,18 +82,18 @@ function crepair_post(App $a) {
 		local_user()
 	);
 
-	if($photo) {
+	if ($photo) {
 		logger('mod-crepair: updating photo from ' . $photo);
 		require_once("include/Photo.php");
 
 		update_contact_avatar($photo,local_user(),$contact['id']);
 	}
 
-	if($r)
+	if ($r) {
 		info( t('Contact settings applied.') . EOL);
-	else
+	} else {
 		notice( t('Contact update failed.') . EOL);
-
+	}
 
 	return;
 }

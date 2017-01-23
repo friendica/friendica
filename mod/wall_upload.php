@@ -228,14 +228,14 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	if($width > 640 || $height > 640) {
 		$ph->scaleImage(640);
 		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 1, 0, $defperm);
-		if($r)
+		if ($r)
 			$smallest = 1;
 	}
 
-	if($width > 320 || $height > 320) {
+	if ($width > 320 || $height > 320) {
 		$ph->scaleImage(320);
 		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 2, 0, $defperm);
-		if($r AND ($smallest == 0))
+		if ($r AND ($smallest == 0))
 			$smallest = 2;
 	}
 
@@ -244,7 +244,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	if (!$desktopmode) {
 
 		$r = q("SELECT `id`, `datasize`, `width`, `height`, `type` FROM `photo` WHERE `resource-id` = '%s' ORDER BY `width` DESC LIMIT 1", $hash);
-		if (!$r){
+		if (!dbm::is_result($r)) {
 			if ($r_json) {
 				echo json_encode(array('error'=>''));
 				killme();

@@ -397,7 +397,7 @@ function settings_post(App $a) {
 				dbesc($password),
 				intval(local_user())
 			);
-			if($r) {
+			if ($r) {
 				info( t('Password changed.') . EOL);
 			} else {
 				notice( t('Password update failed. Please try again.') . EOL);
@@ -602,8 +602,9 @@ function settings_post(App $a) {
 			dbesc($language),
 			intval(local_user())
 	);
-	if($r)
+	if ($r) {
 		info( t('Settings updated.') . EOL);
+	}
 
 	// clear session language
 	unset($_SESSION['language']);
@@ -622,7 +623,7 @@ function settings_post(App $a) {
 	);
 
 
-	if($name_change) {
+	if ($name_change) {
 		q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s' WHERE `uid` = %d AND `self`",
 			dbesc($username),
 			dbesc(datetime_convert()),
