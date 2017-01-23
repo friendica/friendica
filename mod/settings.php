@@ -381,13 +381,15 @@ function settings_post(App $a) {
 			$err = true;
         }
 
-        //  check if the old password was supplied correctly before
-        //  changing it to the new value
-        $r = q("SELECT `password` FROM `user`WHERE `uid` = %d LIMIT 1", intval(local_user()));
-        if( $oldpass != $r[0]['password'] ) {
-            notice( t('Wrong password.') . EOL);
-            $err = true;
-        }
+		//  check if the old password was supplied correctly before
+		//  changing it to the new value
+		$r = q("SELECT `password` FROM `user`WHERE `uid` = %d LIMIT 1", intval(local_user()));
+		if (!dbm::is_result($r)) {
+			killme();
+		} elseif ( $oldpass != $r[0]['password'] ) {
+			notice( t('Wrong password.') . EOL);
+			$err = true;
+		}
 
 		if(! $err) {
 			$password = hash('whirlpool',$newpass);
@@ -395,10 +397,11 @@ function settings_post(App $a) {
 				dbesc($password),
 				intval(local_user())
 			);
-			if($r)
+			if($r) {
 				info( t('Password changed.') . EOL);
-			else
+			} else {
 				notice( t('Password update failed. Please try again.') . EOL);
+			}
 		}
 	}
 
