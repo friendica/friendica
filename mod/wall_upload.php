@@ -215,7 +215,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 
 	$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 0, 0, $defperm);
 
-	if(! $r) {
+	if (! $r) {
 		$msg = t('Image upload failed.');
 		if ($r_json) {
 			echo json_encode(array('error'=>$msg));
@@ -225,18 +225,20 @@ function wall_upload_post(App $a, $desktopmode = true) {
 		killme();
 	}
 
-	if($width > 640 || $height > 640) {
+	if ($width > 640 || $height > 640) {
 		$ph->scaleImage(640);
 		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 1, 0, $defperm);
-		if ($r)
+		if ($r) {
 			$smallest = 1;
+		}
 	}
 
 	if ($width > 320 || $height > 320) {
 		$ph->scaleImage(320);
 		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 2, 0, $defperm);
-		if ($r AND ($smallest == 0))
+		if ($r AND ($smallest == 0)) {
 			$smallest = 2;
+		}
 	}
 
 	$basename = basename($filename);
