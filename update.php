@@ -567,7 +567,6 @@ function update_1069() {
 	q("ALTER TABLE `fcontact` ADD `request` CHAR( 255 ) NOT NULL AFTER `photo` ");
 }
 
-/// @TODO Still meeded?
 // mail body needs to accomodate private photos
 
 function update_1070() {
@@ -596,7 +595,7 @@ function update_1074() {
 	q("ALTER TABLE `user` ADD `hidewall` TINYINT( 1) NOT NULL DEFAULT '0' AFTER `blockwall` ");
 	$r = q("SELECT `uid` FROM `profile` WHERE `is-default` = 1 AND `hidewall` = 1");
 	if (dbm::is_result($r)) {
-		foreach($r as $rr)
+		foreach ($r as $rr)
 			q("UPDATE `user` SET `hidewall` = 1 WHERE `uid` = %d",
 				intval($rr['uid'])
 			);
@@ -895,7 +894,7 @@ function update_1102() {
 
 
 function update_1103() {
-/// @TODO Comented out:
+/// @TODO Commented out:
 //	q("ALTER TABLE `item` ADD INDEX ( `wall` ) ");
 	q("ALTER TABLE `item` ADD FULLTEXT ( `tag` ) ");
 	q("ALTER TABLE `contact` ADD INDEX ( `pending` ) ");
@@ -1041,7 +1040,7 @@ function update_1120() {
 
 	$r = q("describe item");
 	if (dbm::is_result($r)) {
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 			if ($rr['Field'] == 'spam') {
 				return;
 			}
