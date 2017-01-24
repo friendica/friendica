@@ -157,14 +157,15 @@ function update_1014() {
 	$r = q("SELECT * FROM `contact` WHERE 1");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
-			if(stristr($rr['thumb'],'avatar'))
+			if (stristr($rr['thumb'],'avatar')) {
 				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('avatar','micro',$rr['thumb'])),
 					intval($rr['id']));
-			else
+			} else {
 				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('5.jpg','6.jpg',$rr['thumb'])),
 					intval($rr['id']));
+			}
 		}
 	}
 }
@@ -595,10 +596,11 @@ function update_1074() {
 	q("ALTER TABLE `user` ADD `hidewall` TINYINT( 1) NOT NULL DEFAULT '0' AFTER `blockwall` ");
 	$r = q("SELECT `uid` FROM `profile` WHERE `is-default` = 1 AND `hidewall` = 1");
 	if (dbm::is_result($r)) {
-		foreach ($r as $rr)
+		foreach ($r as $rr) {
 			q("UPDATE `user` SET `hidewall` = 1 WHERE `uid` = %d",
 				intval($rr['uid'])
 			);
+		}
 	}
 	q("ALTER TABLE `profile` DROP `hidewall`");
 }
@@ -1782,19 +1784,22 @@ function update_1190() {
 			$key = $rr['k'];
 			$value = $rr['v'];
 
-			if ($key === 'randomise')
+			if ($key === 'randomise') {
 				del_pconfig($uid,$family,$key);
+			}
 
 			if ($key === 'show_on_profile') {
-				if ($value)
+				if ($value) {
 					set_pconfig($uid,feature,forumlist_profile,$value);
+				}
 
 				del_pconfig($uid,$family,$key);
 			}
 
 			if ($key === 'show_on_network') {
-				if ($value)
+				if ($value) {
 					set_pconfig($uid,feature,forumlist_widget,$value);
+				}
 
 				del_pconfig($uid,$family,$key);
 			}
