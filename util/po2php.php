@@ -12,7 +12,7 @@ function po2php_run(&$argv, &$argc) {
 	$pofile = $argv[1];
 	$outfile = dirname($pofile)."/strings.php";
 
-	if(strstr($outfile,'util'))
+	if (strstr($outfile,'util'))
 		$lang = 'en';
 	else
 		$lang = str_replace('-','_',basename(dirname($pofile)));

@@ -264,13 +264,12 @@ function profiles_post(App $a) {
 				}
 				else {
 					$newname = $lookup;
-/*					if(strstr($lookup,' ')) {
+/*					if (strstr($lookup,' ')) {
 						$r = q("SELECT * FROM `contact` WHERE `name` = '%s' AND `uid` = %d LIMIT 1",
 							dbesc($newname),
 							intval(local_user())
 						);
-					}
-					else {
+					} else {
 						$r = q("SELECT * FROM `contact` WHERE `nick` = '%s' AND `uid` = %d LIMIT 1",
 							dbesc($lookup),
 							intval(local_user())

@@ -637,18 +637,24 @@ class dfrn {
 			$entry = $doc->createElement($element);
 
 			$r = parse_xml_string($activity, false);
-			if(!$r)
+			if (!$r) {
 				return false;
-			if($r->type)
+			}
+			if ($r->type) {
 				xml::add_element($doc, $entry, "activity:object-type", $r->type);
-			if($r->id)
+			}
+			if ($r->id) {
 				xml::add_element($doc, $entry, "id", $r->id);
-			if($r->title)
+			}
+			if ($r->title) {
 				xml::add_element($doc, $entry, "title", $r->title);
-			if($r->link) {
-				if(substr($r->link,0,1) == '<') {
-					if(strstr($r->link,'&') && (! strstr($r->link,'&amp;')))
+			}
+
+			if ($r->link) {
+				if (substr($r->link,0,1) == '<') {
+					if (strstr($r->link,'&') && (! strstr($r->link,'&amp;'))) {
 						$r->link = str_replace('&','&amp;', $r->link);
+					}
 
 					$r->link = preg_replace('/\<link(.*?)\"\>/','<link$1"/>',$r->link);
 
@@ -657,8 +663,9 @@ class dfrn {
 					if (is_object($data)) {
 						foreach ($data->link AS $link) {
 							$attributes = array();
-							foreach ($link->attributes() AS $parameter => $value)
+							foreach ($link->attributes() AS $parameter => $value) {
 								$attributes[$parameter] = $value;
+							}
 							xml::add_element($doc, $entry, "link", "", $attributes);
 						}
 					}
@@ -667,8 +674,9 @@ class dfrn {
 					xml::add_element($doc, $entry, "link", "", $attributes);
 				}
 			}
-			if($r->content)
+			if ($r->content) {
 				xml::add_element($doc, $entry, "content", bbcode($r->content), array("type" => "html"));
+			}
 
 			return $entry;
 		}
@@ -687,20 +695,22 @@ class dfrn {
 	 */
 	private function get_attachment($doc, $root, $item) {
 		$arr = explode('[/attach],',$item['attach']);
-		if(count($arr)) {
-			foreach($arr as $r) {
+		if (count($arr)) {
+			foreach ($arr as $r) {
 				$matches = false;
 				$cnt = preg_match('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|',$r,$matches);
-				if($cnt) {
+				if ($cnt) {
 					$attributes = array("rel" => "enclosure",
 							"href" => $matches[1],
 							"type" => $matches[3]);
 
-					if(intval($matches[2]))
+					if (intval($matches[2])) {
 						$attributes["length"] = intval($matches[2]);
+					}
 
-					if(trim($matches[4]) != "")
+					if (trim($matches[4]) != "") {
 						$attributes["title"] = trim($matches[4]);
+					}
 
 					xml::add_element($doc, $root, "link", "", $attributes);
 				}
@@ -724,20 +734,22 @@ class dfrn {
 
 		$mentioned = array();
 
-		if(!$item['parent'])
+		if (!$item['parent']) {
 			return;
+		}
 
-		if($item['deleted']) {
+		if ($item['deleted']) {
 			$attributes = array("ref" => $item['uri'], "when" => datetime_convert('UTC','UTC',$item['edited'] . '+00:00',ATOM_TIME));
 			return xml::create_element($doc, "at:deleted-entry", "", $attributes);
 		}
 
 		$entry = $doc->createElement("entry");
 
-		if($item['allow_cid'] || $item['allow_gid'] || $item['deny_cid'] || $item['deny_gid'])
+		if ($item['allow_cid'] || $item['allow_gid'] || $item['deny_cid'] || $item['deny_gid']) {
 			$body = fix_private_photos($item['body'],$owner['uid'],$item,$cid);
-		else
+		} else {
 			$body = $item['body'];
+		}
 
 		// Remove the abstract element. It is only locally important.
 		$body = remove_abstract($body);
@@ -745,8 +757,9 @@ class dfrn {
 		if ($type == 'html') {
 			$htmlbody = $body;
 
-			if ($item['title'] != "")
+			if ($item['title'] != "") {
 				$htmlbody = "[b]".$item['title']."[/b]\n\n".$htmlbody;
+			}
 
 			$htmlbody = bbcode($htmlbody, false, false, 7);
 		}
@@ -757,7 +770,7 @@ class dfrn {
 		$dfrnowner = self::add_entry_author($doc, "dfrn:owner", $item["owner-link"], $item);
 		$entry->appendChild($dfrnowner);
 
-		if(($item['parent'] != $item['id']) || ($item['parent-uri'] !== $item['uri']) || (($item['thr-parent'] !== '') && ($item['thr-parent'] !== $item['uri']))) {
+		if (($item['parent'] != $item['id']) || ($item['parent-uri'] !== $item['uri']) || (($item['thr-parent'] !== '') && ($item['thr-parent'] !== $item['uri']))) {
 			$parent = q("SELECT `guid` FROM `item` WHERE `id` = %d", intval($item["parent"]));
 			$parent_item = (($item['thr-parent']) ? $item['thr-parent'] : $item['parent-uri']);
 			$attributes = array("ref" => $parent_item, "type" => "text/html",
@@ -785,26 +798,33 @@ class dfrn {
 
 		// "comment-allow" is some old fashioned stuff for old Friendica versions.
 		// It is included in the rewritten code for completeness
-		if ($comment)
+		if ($comment) {
 			xml::add_element($doc, $entry, "dfrn:comment-allow", intval($item['last-child']));
+		}
 
-		if($item['location'])
+		if ($item['location']) {
 			xml::add_element($doc, $entry, "dfrn:location", $item['location']);
+		}
 
-		if($item['coord'])
+		if ($item['coord']) {
 			xml::add_element($doc, $entry, "georss:point", $item['coord']);
+		}
 
-		if(($item['private']) || strlen($item['allow_cid']) || strlen($item['allow_gid']) || strlen($item['deny_cid']) || strlen($item['deny_gid']))
+		if (($item['private']) || strlen($item['allow_cid']) || strlen($item['allow_gid']) || strlen($item['deny_cid']) || strlen($item['deny_gid'])) {
 			xml::add_element($doc, $entry, "dfrn:private", (($item['private']) ? $item['private'] : 1));
+		}
 
-		if($item['extid'])
+		if ($item['extid']) {
 			xml::add_element($doc, $entry, "dfrn:extid", $item['extid']);
+		}
 
-		if($item['bookmark'])
+		if ($item['bookmark']) {
 			xml::add_element($doc, $entry, "dfrn:bookmark", "true");
+		}
 
-		if($item['app'])
+		if ($item['app']) {
 			xml::add_element($doc, $entry, "statusnet:notice_info", "", array("local_id" => $item['id'], "source" => $item['app']));
+		}
 
 		xml::add_element($doc, $entry, "dfrn:diaspora_guid", $item["guid"]);
 
@@ -817,46 +837,56 @@ class dfrn {
 
 		xml::add_element($doc, $entry, "activity:verb", construct_verb($item));
 
-		if ($item['object-type'] != "")
+		if ($item['object-type'] != "") {
 			xml::add_element($doc, $entry, "activity:object-type", $item['object-type']);
-		elseif ($item['id'] == $item['parent'])
+		} elseif ($item['id'] == $item['parent']) {
 			xml::add_element($doc, $entry, "activity:object-type", ACTIVITY_OBJ_NOTE);
-		else
+		} else {
 			xml::add_element($doc, $entry, "activity:object-type", ACTIVITY_OBJ_COMMENT);
+		}
 
 		$actobj = self::create_activity($doc, "activity:object", $item['object']);
-		if ($actobj)
+		if ($actobj) {
 			$entry->appendChild($actobj);
+		}
 
 		$actarg = self::create_activity($doc, "activity:target", $item['target']);
-		if ($actarg)
+		if ($actarg) {
 			$entry->appendChild($actarg);
+		}
 
 		$tags = item_getfeedtags($item);
 
-		if(count($tags)) {
-			foreach($tags as $t)
-				if (($type != 'html') OR ($t[0] != "@"))
+		if( count($tags)) {
+			foreach ($tags as $t) {
+				if (($type != 'html') OR ($t[0] != "@")) {
 					xml::add_element($doc, $entry, "category", "", array("scheme" => "X-DFRN:".$t[0].":".$t[1], "term" => $t[2]));
+				}
+			}
 		}
 
-		if(count($tags))
-			foreach($tags as $t)
-				if ($t[0] == "@")
+		if (count($tags)) {
+			foreach($tags as $t) {
+				if ($t[0] == "@") {
 					$mentioned[$t[1]] = $t[1];
+				}
+			}
+		}
 
 		foreach ($mentioned AS $mention) {
 			$r = q("SELECT `forum`, `prv` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
 				intval($owner["uid"]),
 				dbesc(normalise_link($mention)));
-			if ($r[0]["forum"] OR $r[0]["prv"])
+
+			if ($r[0]["forum"] OR $r[0]["prv"]) {
 				xml::add_element($doc, $entry, "link", "", array("rel" => "mentioned",
 											"ostatus:object-type" => ACTIVITY_OBJ_GROUP,
 											"href" => $mention));
-			else
+			} else {
 				xml::add_element($doc, $entry, "link", "", array("rel" => "mentioned",
 											"ostatus:object-type" => ACTIVITY_OBJ_PERSON,
 											"href" => $mention));
+			}
 		}
 
 		self::get_attachment($doc, $entry, $item);
@@ -880,16 +910,20 @@ class dfrn {
 
 		$idtosend = $orig_id = (($contact['dfrn-id']) ? $contact['dfrn-id'] : $contact['issued-id']);
 
-		if($contact['duplex'] && $contact['dfrn-id'])
+		if ($contact['duplex'] && $contact['dfrn-id']) {
 			$idtosend = '0:' . $orig_id;
-		if($contact['duplex'] && $contact['issued-id'])
+		}
+		if ($contact['duplex'] && $contact['issued-id']) {
 			$idtosend = '1:' . $orig_id;
-
+		}
 
 		$rino = get_config('system','rino_encrypt');
 		$rino = intval($rino);
+
 		// use RINO1 if mcrypt isn't installed and RINO2 was selected
-		if ($rino==2 and !function_exists('mcrypt_create_iv')) $rino=1;
+		if ($rino==2 and !function_exists('mcrypt_create_iv')) {
+			$rino=1;
+		}
 
 		logger("Local rino version: ". $rino, LOGGER_DEBUG);
 
@@ -916,15 +950,17 @@ class dfrn {
 		$xml = fetch_url($url);
 
 		$curl_stat = $a->get_curl_code();
-		if(! $curl_stat)
+		if (! $curl_stat) {
 			return(-1); // timed out
+		}
 
 		logger('dfrn_deliver: ' . $xml, LOGGER_DATA);
 
-		if(! $xml)
+		if (! $xml) {
 			return 3;
+		}
 
-		if(strpos($xml,'<?xml') === false) {
+		if (strpos($xml,'<?xml') === false) {
 			logger('dfrn_deliver: no valid XML returned');
 			logger('dfrn_deliver: returned XML: ' . $xml, LOGGER_DATA);
 			return 3;
@@ -932,8 +968,9 @@ class dfrn {
 
 		$res = parse_xml_string($xml);
 
-		if((intval($res->status) != 0) || (! strlen($res->challenge)) || (! strlen($res->dfrn_id)))
+		if ((intval($res->status) != 0) || (! strlen($res->challenge)) || (! strlen($res->dfrn_id))) {
 			return (($res->status) ? $res->status : 3);
+		}
 
 		$postvars     = array();
 		$sent_dfrn_id = hex2bin((string) $res->dfrn_id);
@@ -945,13 +982,14 @@ class dfrn {
 
 		logger("Remote rino version: ".$rino_remote_version." for ".$contact["url"], LOGGER_DEBUG);
 
-		if($owner['page-flags'] == PAGE_PRVGROUP)
+		if ($owner['page-flags'] == PAGE_PRVGROUP) {
 			$page = 2;
+		}
 
 		$final_dfrn_id = '';
 
-		if($perm) {
-			if((($perm == 'rw') && (! intval($contact['writable'])))
+		if ($perm) {
+			if ((($perm == 'rw') && (! intval($contact['writable'])))
 				|| (($perm == 'r') && (intval($contact['writable'])))) {
 				q("update contact set writable = %d where id = %d",
 					intval(($perm == 'rw') ? 1 : 0),
@@ -961,7 +999,7 @@ class dfrn {
 			}
 		}
 
-		if(($contact['duplex'] && strlen($contact['pubkey']))
+		if (($contact['duplex'] && strlen($contact['pubkey']))
 			|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
 			|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))) {
 			openssl_public_decrypt($sent_dfrn_id,$final_dfrn_id,$contact['pubkey']);
@@ -973,10 +1011,11 @@ class dfrn {
 
 		$final_dfrn_id = substr($final_dfrn_id, 0, strpos($final_dfrn_id, '.'));
 
-		if(strpos($final_dfrn_id,':') == 1)
+		if (strpos($final_dfrn_id,':') == 1) {
 			$final_dfrn_id = substr($final_dfrn_id,2);
+		}
 
-		if($final_dfrn_id != $orig_id) {
+		if ($final_dfrn_id != $orig_id) {
 			logger('dfrn_deliver: wrong dfrn_id.');
 			// did not decode properly - cannot trust this site
 			return 3;
@@ -984,11 +1023,12 @@ class dfrn {
 
 		$postvars['dfrn_id']      = $idtosend;
 		$postvars['dfrn_version'] = DFRN_PROTOCOL_VERSION;
-		if($dissolve)
+		if ($dissolve) {
 			$postvars['dissolve'] = '1';
+		}
 
 
-		if((($contact['rel']) && ($contact['rel'] != CONTACT_IS_SHARING) && (! $contact['blocked'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
+		if ((($contact['rel']) && ($contact['rel'] != CONTACT_IS_SHARING) && (! $contact['blocked'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
 			$postvars['data'] = $atom;
 			$postvars['perm'] = 'rw';
 		} else {
@@ -998,11 +1038,12 @@ class dfrn {
 
 		$postvars['ssl_policy'] = $ssl_policy;
 
-		if($page)
+		if ($page) {
 			$postvars['page'] = $page;
+		}
 
 
-		if($rino>0 && $rino_remote_version>0 && (! $dissolve)) {
+		if ($rino>0 && $rino_remote_version>0 && (! $dissolve)) {
 			logger('rino version: '. $rino_remote_version);
 
 			switch($rino_remote_version) {
@@ -1040,23 +1081,25 @@ class dfrn {
 			$postvars['rino'] = $rino_remote_version;
 			$postvars['data'] = bin2hex($data);
 
-			#logger('rino: sent key = ' . $key, LOGGER_DEBUG);
+			//logger('rino: sent key = ' . $key, LOGGER_DEBUG);
 
 
-			if($dfrn_version >= 2.1) {
-				if(($contact['duplex'] && strlen($contact['pubkey']))
+			if ($dfrn_version >= 2.1) {
+				if (($contact['duplex'] && strlen($contact['pubkey'])) {
 					|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
 					|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey'])))
 
 					openssl_public_encrypt($key,$postvars['key'],$contact['pubkey']);
-				else
+				} else {
 					openssl_private_encrypt($key,$postvars['key'],$contact['prvkey']);
+				}
 
 			} else {
-				if(($contact['duplex'] && strlen($contact['prvkey'])) || ($owner['page-flags'] == PAGE_COMMUNITY))
+				if (($contact['duplex'] && strlen($contact['prvkey'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
 					openssl_private_encrypt($key,$postvars['key'],$contact['prvkey']);
-				else
+				} else {
 					openssl_public_encrypt($key,$postvars['key'],$contact['pubkey']);
+				}
 
 			}
 
@@ -1073,19 +1116,21 @@ class dfrn {
 		logger('dfrn_deliver: ' . "RECEIVED: " . $xml, LOGGER_DATA);
 
 		$curl_stat = $a->get_curl_code();
-		if((! $curl_stat) || (! strlen($xml)))
+		if ((! $curl_stat) || (! strlen($xml))) {
 			return(-1); // timed out
+		}
 
-		if(($curl_stat == 503) && (stristr($a->get_curl_headers(),'retry-after')))
+		if (($curl_stat == 503) && (stristr($a->get_curl_headers(),'retry-after'))) {
 			return(-1);
+		}
 
-		if(strpos($xml,'<?xml') === false) {
+		if (strpos($xml,'<?xml') === false) {
 			logger('dfrn_deliver: phase 2: no valid XML returned');
 			logger('dfrn_deliver: phase 2: returned XML: ' . $xml, LOGGER_DATA);
 			return 3;
 		}
 
-		if($contact['term-date'] != '0000-00-00 00:00:00') {
+		if ($contact['term-date'] != '0000-00-00 00:00:00') {
 			logger("dfrn_deliver: $url back from the dead - removing mark for death");
 			require_once('include/Contact.php');
 			unmark_for_death($contact);
@@ -1146,7 +1191,8 @@ class dfrn {
 				`name`, `nick`, `about`, `location`, `keywords`, `xmpp`, `bdyear`, `bd`, `hidden`, `contact-type`
 				FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` != '%s'",
 			intval($importer["uid"]), dbesc(normalise_link($author["link"])), dbesc(NETWORK_STATUSNET));
-		if ($r) {
+
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
 			$author["contact-id"] = $r[0]["id"];
 			$author["network"] = $r[0]["network"];
@@ -1167,15 +1213,19 @@ class dfrn {
 			$href = "";
 			$width = 0;
 			foreach($avatar->attributes AS $attributes) {
-				if ($attributes->name == "href")
+				if ($attributes->name == "href") {
 					$href = $attributes->textContent;
-				if ($attributes->name == "width")
+				}
+				if ($attributes->name == "width") {
 					$width = $attributes->textContent;
-				if ($attributes->name == "updated")
+				}
+				if ($attributes->name == "updated") {
 					$contact["avatar-date"] = $attributes->textContent;
+				}
 			}
-			if (($width > 0) AND ($href != ""))
+			if (($width > 0) AND ($href != "")) {
 				$avatarlist[$width] = $href;
+			}
 		}
 		if (count($avatarlist) > 0) {
 			krsort($avatarlist);
@@ -1189,40 +1239,50 @@ class dfrn {
 
 			// When was the last change to name or uri?
 			$name_element = $xpath->query($element."/atom:name", $context)->item(0);
-			foreach($name_element->attributes AS $attributes)
-				if ($attributes->name == "updated")
+			foreach ($name_element->attributes AS $attributes) {
+				if ($attributes->name == "updated") {
 					$poco["name-date"] = $attributes->textContent;
+				}
+			}
 
 			$link_element = $xpath->query($element."/atom:link", $context)->item(0);
-			foreach($link_element->attributes AS $attributes)
-				if ($attributes->name == "updated")
+			foreach ($link_element->attributes AS $attributes) {
+				if ($attributes->name == "updated") {
 					$poco["uri-date"] = $attributes->textContent;
+				}
+			}
 
 			// Update contact data
 			$value = $xpath->evaluate($element."/dfrn:handle/text()", $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$poco["addr"] = $value;
+			}
 
 			$value = $xpath->evaluate($element."/poco:displayName/text()", $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$poco["name"] = $value;
+			}
 
 			$value = $xpath->evaluate($element."/poco:preferredUsername/text()", $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$poco["nick"] = $value;
+			}
 
 			$value = $xpath->evaluate($element."/poco:note/text()", $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$poco["about"] = $value;
+			}
 
 			$value = $xpath->evaluate($element."/poco:address/poco:formatted/text()", $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$poco["location"] = $value;
+			}
 
 			/// @todo Only search for elements with "poco:type" = "xmpp"
 			$value = $xpath->evaluate($element."/poco:ims/poco:value/text()", $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$poco["xmpp"] = $value;
+			}
 
 			/// @todo Add support for the following fields that we don't support by now in the contact table:
 			/// - poco:utcOffset
@@ -1238,17 +1298,20 @@ class dfrn {
 
 			// If the contact isn't searchable then set the contact to "hidden".
 			// Problem: This can be manually overridden by the user.
-			if ($hide)
+			if ($hide) {
 				$contact["hidden"] = true;
+			}
 
 			// Save the keywords into the contact table
 			$tags = array();
 			$tagelements = $xpath->evaluate($element."/poco:tags/text()", $context);
-			foreach($tagelements AS $tag)
+			foreach ($tagelements AS $tag) {
 				$tags[$tag->nodeValue] = $tag->nodeValue;
+			}
 
-			if (count($tags))
+			if (count($tags)) {
 				$poco["keywords"] = implode(", ", $tags);
+			}
 
 			// "dfrn:birthday" contains the birthday converted to UTC
 			$old_bdyear = $contact["bdyear"];
@@ -1278,13 +1341,15 @@ class dfrn {
 
 			$contact = array_merge($contact, $poco);
 
-			if ($old_bdyear != $contact["bdyear"])
+			if ($old_bdyear != $contact["bdyear"]) {
 				self::birthday_event($contact, $birthday);
+			}
 
 			// Get all field names
 			$fields = array();
-			foreach ($r[0] AS $field => $data)
+			foreach ($r[0] AS $field => $data) {
 				$fields[$field] = $data;
+			}
 
 			unset($fields["id"]);
 			unset($fields["uid"]);
@@ -1349,8 +1414,9 @@ class dfrn {
 	 * @return string XML string
 	 */
 	private function transform_activity($xpath, $activity, $element) {
-		if (!is_object($activity))
+		if (!is_object($activity)) {
 			return "";
+		}
 
 		$obj_doc = new DOMDocument("1.0", "utf-8");
 		$obj_doc->formatOutput = true;
