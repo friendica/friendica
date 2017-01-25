@@ -43,7 +43,7 @@ class dfrn {
 	 * @param array $owner Owner record
 	 *
 	 * @return string DFRN entries
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	public static function entries($items,$owner) {
 
@@ -76,6 +76,7 @@ class dfrn {
 	 * @param boolean $onlyheader Output only the header without content? (Default is "no")
 	 *
 	 * @return string DFRN feed entries
+	 * @todo Find proper type-hints
 	 */
 	public static function feed($dfrn_id, $owner_nick, $last_update, $direction = 0, $onlyheader = false) {
 
@@ -100,8 +101,6 @@ class dfrn {
 			}
 		}
 
-
-
 		// default permissions - anonymous user
 
 		$sql_extra = " AND `item`.`allow_cid` = '' AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' ";
@@ -113,6 +112,7 @@ class dfrn {
 		);
 
 		if (! dbm::is_result($r)) {
+			logger(sprintf('No contact found for nickname=%d', $owner_nick), LOGGER_WARNING);
 			killme();
 		}
 
@@ -148,6 +148,7 @@ class dfrn {
 			);
 
 			if (! dbm::is_result($r)) {
+				logger(sprintf('No contact found for uid=%d', $owner_id), LOGGER_WARNING);
 				killme();
 			}
 
@@ -156,8 +157,9 @@ class dfrn {
 			$groups = init_groups_visitor($contact['id']);
 
 			if (count($groups)) {
-				for ($x = 0; $x < count($groups); $x ++)
+				for ($x = 0; $x < count($groups); $x ++) {
 					$groups[$x] = '<' . intval($groups[$x]) . '>' ;
+				}
 				$gs = implode('|', $groups);
 			} else {
 				$gs = '<<>>' ; // Impossible to match
@@ -347,7 +349,7 @@ class dfrn {
 	 * @param array $owner Owner record
 	 *
 	 * @return string DFRN mail
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	public static function mail($item, $owner) {
 		$doc = new DOMDocument('1.0', 'utf-8');
@@ -382,7 +384,7 @@ class dfrn {
 	 * @param array $owner Owner record
 	 *
 	 * @return string DFRN suggestions
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	public static function fsuggest($item, $owner) {
 		$doc = new DOMDocument('1.0', 'utf-8');
@@ -410,7 +412,7 @@ class dfrn {
 	 * @param int $uid User ID
 	 *
 	 * @return string DFRN relocations
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	public static function relocate($owner, $uid) {
 
@@ -424,11 +426,17 @@ class dfrn {
 
 		$rp = q("SELECT `resource-id` , `scale`, type FROM `photo`
 				WHERE `profile` = 1 AND `uid` = %d ORDER BY scale;", $uid);
+
+		if (!dbm::is_result($rp)) {
+			logger(sprintf('No photos looking for profile uid=%d', $uid), LOGGER_WARNING);
+			killme();
+		}
+
 		$photos = array();
 		$ext = Photo::supportedTypes();
 
 		foreach ($rp as $p) {
-			$photos[$p['scale']] = App::get_baseurl().'/photo/'.$p['resource-id'].'-'.$p['scale'].'.'.$ext[$p['type']];
+			$photos[$p['scale']] = App::get_baseurl() . '/photo/' . $p['resource-id'] . '-' . $p['scale'] . '.' . $ext[$p['type']];
 		}
 
 		unset($rp, $ext);
@@ -468,7 +476,7 @@ class dfrn {
 	 * @param bool $public Is it a header for public posts?
 	 *
 	 * @return object XML root object
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	private static function add_header($doc, $owner, $authorelement, $alternatelink = "", $public = false) {
 
@@ -542,7 +550,7 @@ class dfrn {
 	 * @param string $authorelement Element name for the author
 	 *
 	 * @return object XML author object
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	private static function add_author($doc, $owner, $authorelement, $public) {
 
@@ -595,8 +603,9 @@ class dfrn {
 
 		$birthday = feed_birthday($owner['uid'], $owner['timezone']);
 
-		if ($birthday)
+		if ($birthday) {
 			xml::add_element($doc, $author, "dfrn:birthday", $birthday);
+		}
 
 		// Only show contact details when we are allowed to
 		$r = q("SELECT `profile`.`about`, `profile`.`name`, `profile`.`homepage`, `user`.`nickname`,
@@ -606,6 +615,7 @@ class dfrn {
 				INNER JOIN `user` ON `user`.`uid` = `profile`.`uid`
 				WHERE `profile`.`is-default` AND NOT `user`.`hidewall` AND `user`.`uid` = %d",
 			intval($owner['uid']));
+
 		if (dbm::is_result($r)) {
 			$profile = $r[0];
 
@@ -682,7 +692,7 @@ class dfrn {
 	 * @param array $items Item elements
 	 *
 	 * @return object XML author object
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	private static function add_entry_author($doc, $element, $contact_url, $item) {
 
@@ -723,7 +733,7 @@ class dfrn {
 	 * @param string $activity activity value
 	 *
 	 * @return object XML activity object
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	private static function create_activity($doc, $element, $activity) {
 
@@ -734,12 +744,15 @@ class dfrn {
 			if (!$r) {
 				return false;
 			}
+
 			if ($r->type) {
 				xml::add_element($doc, $entry, "activity:object-type", $r->type);
 			}
+
 			if ($r->id) {
 				xml::add_element($doc, $entry, "id", $r->id);
 			}
+
 			if ($r->title) {
 				xml::add_element($doc, $entry, "title", $r->title);
 			}
@@ -786,7 +799,7 @@ class dfrn {
 	 * @param array $item Item element
 	 *
 	 * @return object XML attachment object
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	private static function get_attachment($doc, $root, $item) {
 		$arr = explode('[/attach],',$item['attach']);
@@ -824,7 +837,7 @@ class dfrn {
 	 * @param int $cid Contact ID of the recipient
 	 *
 	 * @return object XML entry object
-	 * @todo Add type-hints
+	 * @todo Find proper type-hints
 	 */
 	private static function entry($doc, $type, $item, $owner, $comment = false, $cid = 0) {
 
@@ -995,7 +1008,6 @@ class dfrn {
 			$r = q("SELECT `forum`, `prv` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
 				intval($owner["uid"]),
 				dbesc(normalise_link($mention)));
-
 			if (dbm::is_result($r) && ($r[0]["forum"] || $r[0]["prv"])) {
 				xml::add_element($doc, $entry, "link", "", array("rel" => "mentioned",
 											"ostatus:object-type" => ACTIVITY_OBJ_GROUP,
@@ -1171,7 +1183,6 @@ class dfrn {
 			$postvars['dissolve'] = '1';
 		}
 
-
 		if ((($contact['rel']) && ($contact['rel'] != CONTACT_IS_SHARING) && (! $contact['blocked'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
 			$postvars['data'] = $atom;
 			$postvars['perm'] = 'rw';
@@ -1229,9 +1240,10 @@ class dfrn {
 
 
 			if ($dfrn_version >= 2.1) {
-				if (($contact['duplex'] && strlen($contact['pubkey']))
-						|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
-						|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))) {
+				if (($contact['duplex'] && strlen($contact['pubkey'])) {
+					|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
+					|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey'])))
+
 					openssl_public_encrypt($key,$postvars['key'],$contact['pubkey']);
 				} else {
 					openssl_private_encrypt($key,$postvars['key'],$contact['prvkey']);
@@ -1367,7 +1379,7 @@ class dfrn {
 		foreach ($avatars AS $avatar) {
 			$href = "";
 			$width = 0;
-			foreach ($avatar->attributes AS $attributes) {
+			foreach ($avatar->attributes as $attributes) {
 				/// @TODO Rewrite these similar if () to one switch
 				if ($attributes->name == "href") {
 					$href = $attributes->textContent;
@@ -1379,6 +1391,7 @@ class dfrn {
 					$contact["avatar-date"] = $attributes->textContent;
 				}
 			}
+
 			if (($width > 0) && ($href != "")) {
 				$avatarlist[$width] = $href;
 			}
@@ -1395,14 +1408,14 @@ class dfrn {
 
 			// When was the last change to name or uri?
 			$name_element = $xpath->query($element . "/atom:name", $context)->item(0);
-			foreach ($name_element->attributes AS $attributes) {
+			foreach ($name_element->attributes as $attributes) {
 				if ($attributes->name == "updated") {
 					$poco["name-date"] = $attributes->textContent;
 				}
 			}
 
 			$link_element = $xpath->query($element . "/atom:link", $context)->item(0);
-			foreach ($link_element->attributes AS $attributes) {
+			foreach ($link_element->attributes as $attributes) {
 				if ($attributes->name == "updated") {
 					$poco["uri-date"] = $attributes->textContent;
 				}
