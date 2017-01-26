@@ -364,22 +364,22 @@ function settings_post(App $a) {
 
 	call_hooks('settings_post', $_POST);
 
-	if((x($_POST,'password')) || (x($_POST,'confirm'))) {
+	if ((x($_POST,'password')) || (x($_POST,'confirm'))) {
 
 		$newpass = $_POST['password'];
 		$confirm = $_POST['confirm'];
 		$oldpass = hash('whirlpool', $_POST['opassword']);
 
 		$err = false;
-		if($newpass != $confirm ) {
+		if ($newpass != $confirm ) {
 			notice( t('Passwords do not match. Password unchanged.') . EOL);
 			$err = true;
 		}
 
-		if((! x($newpass)) || (! x($confirm))) {
+		if ((! x($newpass)) || (! x($confirm))) {
 			notice( t('Empty passwords are not allowed. Password unchanged.') . EOL);
 			$err = true;
-        }
+		}
 
 		//  check if the old password was supplied correctly before
 		//  changing it to the new value
