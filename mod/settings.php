@@ -391,7 +391,7 @@ function settings_post(App $a) {
 			$err = true;
 		}
 
-		if(! $err) {
+		if (! $err) {
 			$password = hash('whirlpool',$newpass);
 			$r = q("UPDATE `user` SET `password` = '%s' WHERE `uid` = %d",
 				dbesc($password),
@@ -445,32 +445,41 @@ function settings_post(App $a) {
 
 	$notify = 0;
 
-	if(x($_POST,'notify1'))
+	if (x($_POST,'notify1')) {
 		$notify += intval($_POST['notify1']);
-	if(x($_POST,'notify2'))
+	}
+	if (x($_POST,'notify2')) {
 		$notify += intval($_POST['notify2']);
-	if(x($_POST,'notify3'))
+	}
+	if (x($_POST,'notify3')) {
 		$notify += intval($_POST['notify3']);
-	if(x($_POST,'notify4'))
+	}
+	if (x($_POST,'notify4')) {
 		$notify += intval($_POST['notify4']);
-	if(x($_POST,'notify5'))
+	}
+	if (x($_POST,'notify5')) {
 		$notify += intval($_POST['notify5']);
-	if(x($_POST,'notify6'))
+	}
+	if (x($_POST,'notify6')) {
 		$notify += intval($_POST['notify6']);
-	if(x($_POST,'notify7'))
+	}
+	if (x($_POST,'notify7')) {
 		$notify += intval($_POST['notify7']);
-	if(x($_POST,'notify8'))
+	}
+	if (x($_POST,'notify8')) {
 		$notify += intval($_POST['notify8']);
+	}
 
 	// Adjust the page flag if the account type doesn't fit to the page flag.
-	if (($account_type == ACCOUNT_TYPE_PERSON) AND !in_array($page_flags, array(PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE)))
+	if (($account_type == ACCOUNT_TYPE_PERSON) AND !in_array($page_flags, array(PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE))) {
 		$page_flags = PAGE_NORMAL;
-	elseif (($account_type == ACCOUNT_TYPE_ORGANISATION) AND !in_array($page_flags, array(PAGE_SOAPBOX)))
+	} elseif (($account_type == ACCOUNT_TYPE_ORGANISATION) AND !in_array($page_flags, array(PAGE_SOAPBOX))) {
 		$page_flags = PAGE_SOAPBOX;
-	elseif (($account_type == ACCOUNT_TYPE_NEWS) AND !in_array($page_flags, array(PAGE_SOAPBOX)))
+	} elseif (($account_type == ACCOUNT_TYPE_NEWS) AND !in_array($page_flags, array(PAGE_SOAPBOX))) {
 		$page_flags = PAGE_SOAPBOX;
-	elseif (($account_type == ACCOUNT_TYPE_COMMUNITY) AND !in_array($page_flags, array(PAGE_COMMUNITY, PAGE_PRVGROUP)))
+	} elseif (($account_type == ACCOUNT_TYPE_COMMUNITY) AND !in_array($page_flags, array(PAGE_COMMUNITY, PAGE_PRVGROUP))) {
 		$page_flags = PAGE_COMMUNITY;
+	}
 
 	$email_changed = false;
 
@@ -480,13 +489,15 @@ function settings_post(App $a) {
 
 	if($username != $a->user['username']) {
 		$name_change = true;
-		if(strlen($username) > 40)
+		if (strlen($username) > 40) {
 			$err .= t(' Please use a shorter name.');
-		if(strlen($username) < 3)
+		}
+		if (strlen($username) < 3) {
 			$err .= t(' Name too short.');
+		}
 	}
 
-	if($email != $a->user['email']) {
+	if ($email != $a->user['email']) {
 		$email_changed = true;
 		//  check for the correct password
 		$r = q("SELECT `password` FROM `user`WHERE `uid` = %d LIMIT 1", intval(local_user()));
@@ -496,11 +507,12 @@ function settings_post(App $a) {
 			$email = $a->user['email'];
 		}
 		//  check the email is valid
-		if(! valid_email($email))
+		if (! valid_email($email)) {
 			$err .= t(' Not valid email.');
+		}
 		//  ensure new email is not the admin mail
 		//if((x($a->config,'admin_email')) && (strcasecmp($email,$a->config['admin_email']) == 0)) {
-		if(x($a->config,'admin_email')) {
+		if (x($a->config,'admin_email')) {
 			$adminlist = explode(",", str_replace(" ", "", strtolower($a->config['admin_email'])));
 			if (in_array(strtolower($email), $adminlist)) {
 				$err .= t(' Cannot change to that email.');
@@ -509,14 +521,13 @@ function settings_post(App $a) {
 		}
 	}
 
-	if(strlen($err)) {
+	if (strlen($err)) {
 		notice($err . EOL);
 		return;
 	}
 
-	if($timezone != $a->user['timezone']) {
-		if(strlen($timezone))
-			date_default_timezone_set($timezone);
+	if ($timezone != $a->user['timezone'] && strlen($timezone)) {
+		date_default_timezone_set($timezone);
 	}
 
 	$str_group_allow   = perms2str($_POST['group_allow']);
@@ -529,17 +540,17 @@ function settings_post(App $a) {
 
 	// If openid has changed or if there's an openid but no openidserver, try and discover it.
 
-	if($openid != $a->user['openid'] || (strlen($openid) && (! strlen($openidserver)))) {
+	if ($openid != $a->user['openid'] || (strlen($openid) && (! strlen($openidserver)))) {
 		$tmp_str = $openid;
-		if(strlen($tmp_str) && validate_url($tmp_str)) {
+		if (strlen($tmp_str) && validate_url($tmp_str)) {
 			logger('updating openidserver');
 			require_once('library/openid.php');
 			$open_id_obj = new LightOpenID;
 			$open_id_obj->identity = $openid;
 			$openidserver = $open_id_obj->discover($open_id_obj->identity);
-		}
-		else
+		} else {
 			$openidserver = '';
+		}
 	}
 
 	set_pconfig(local_user(),'expire','items', $expire_items);
@@ -555,14 +566,13 @@ function settings_post(App $a) {
 
 	set_pconfig(local_user(),'system','email_textonly', $email_textonly);
 
-	if($page_flags == PAGE_PRVGROUP) {
+	if ($page_flags == PAGE_PRVGROUP) {
 		$hidewall = 1;
-		if((! $str_contact_allow) && (! $str_group_allow) && (! $str_contact_deny) && (! $str_group_deny)) {
-			if($def_gid) {
+		if ((! $str_contact_allow) && (! $str_group_allow) && (! $str_contact_deny) && (! $str_group_deny)) {
+			if ($def_gid) {
 				info( t('Private forum has no privacy permissions. Using default privacy group.'). EOL);
 				$str_group_allow = '<' . $def_gid . '>';
-			}
-			else {
+			} else {
 				notice( t('Private forum has no privacy permissions and no default privacy group.') . EOL);
 			}
 		}
@@ -672,8 +682,6 @@ function settings_content(App $a) {
 		notice( t('Permission denied.') . EOL );
 		return;
 	}
-
-
 
 	if (($a->argc > 1) && ($a->argv[1] === 'oauth')) {
 
