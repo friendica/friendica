@@ -37,9 +37,11 @@ class ostatus {
 	 * @param bool $onlyfetch Only fetch the header without updating the contact entries
 	 *
 	 * @return array Array of author related entries for the item
+	 * @todo Add type-hints
 	 */
 	private function fetchauthor($xpath, $context, $importer, &$contact, $onlyfetch) {
 
+		/// @TODO One statment is enough ...
 		$author = array();
 		$author["author-link"] = $xpath->evaluate('atom:author/atom:uri/text()', $context)->item(0)->nodeValue;
 		$author["author-name"] = $xpath->evaluate('atom:author/atom:name/text()', $context)->item(0)->nodeValue;
@@ -47,33 +49,41 @@ class ostatus {
 		$aliaslink = $author["author-link"];
 
 		$alternate = $xpath->query("atom:author/atom:link[@rel='alternate']", $context)->item(0)->attributes;
-		if (is_object($alternate))
-			foreach($alternate AS $attributes)
-				if ($attributes->name == "href")
+		if (is_object($alternate)) {
+			/// @TODO foreach() may only later work on objects that have iterator interface implemented, please check this
+			foreach ($alternate AS $attributes) {
+				if ($attributes->name == "href") {
 					$author["author-link"] = $attributes->textContent;
+				}
+			}
+		}
 
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` IN ('%s', '%s') AND `network` != '%s'",
 			intval($importer["uid"]), dbesc(normalise_link($author["author-link"])),
 			dbesc(normalise_link($aliaslink)), dbesc(NETWORK_STATUSNET));
-		if ($r) {
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
 			$author["contact-id"] = $r[0]["id"];
-		} else
+		} else {
 			$author["contact-id"] = $contact["id"];
+		}
 
 		$avatarlist = array();
 		$avatars = $xpath->query("atom:author/atom:link[@rel='avatar']", $context);
-		foreach($avatars AS $avatar) {
+		foreach ($avatars AS $avatar) {
 			$href = "";
 			$width = 0;
-			foreach($avatar->attributes AS $attributes) {
-				if ($attributes->name == "href")
+			foreach ($avatar->attributes AS $attributes) {
+				if ($attributes->name == "href") {
 					$href = $attributes->textContent;
-				if ($attributes->name == "width")
+				}
+				if ($attributes->name == "width") {
 					$width = $attributes->textContent;
+				}
 			}
-			if (($width > 0) AND ($href != ""))
+			if (($width > 0) AND ($href != "")) {
 				$avatarlist[$width] = $href;
+			}
 		}
 		if (count($avatarlist) > 0) {
 			krsort($avatarlist);
@@ -81,15 +91,16 @@ class ostatus {
 		}
 
 		$displayname = $xpath->evaluate('atom:author/poco:displayName/text()', $context)->item(0)->nodeValue;
-		if ($displayname != "")
+		if ($displayname != "") {
 			$author["author-name"] = $displayname;
+		}
 
 		$author["owner-name"] = $author["author-name"];
 		$author["owner-link"] = $author["author-link"];
 		$author["owner-avatar"] = $author["author-avatar"];
 
 		// Only update the contacts if it is an OStatus contact
-		if ($r AND !$onlyfetch AND ($contact["network"] == NETWORK_OSTATUS)) {
+		if (dbm::is_result($r) AND !$onlyfetch AND ($contact["network"] == NETWORK_OSTATUS)) {
 
 			// Update contact data
 
@@ -181,6 +192,7 @@ class ostatus {
 	 * @param array $importer user record of the importing user
 	 *
 	 * @return array Array of author related entries for the item
+	 * @todo add type-hints
 	 */
 	public static function salmon_author($xml, $importer) {
 
@@ -189,7 +201,7 @@ class ostatus {
 		}
 
 		$doc = new DOMDocument();
-		@$doc->loadXML($xml);
+		$doc->loadXML($xml);
 
 		$xpath = new DomXPath($doc);
 		$xpath->registerNamespace('atom', NAMESPACE_ATOM1);
@@ -217,6 +229,7 @@ class ostatus {
 	 * @param array $importer user record of the importing user
 	 * @param $contact
 	 * @param array $hub Called by reference, returns the fetched hub data
+	 * @todo Add missing-type hint + determine type for $contact
 	 */
 	public static function import($xml,$importer,&$contact, &$hub) {
 		/// @todo this function is too long. It has to be split in many parts
@@ -231,7 +244,7 @@ class ostatus {
 		//file_put_contents($tempfile, $xml);
 
 		$doc = new DOMDocument();
-		@$doc->loadXML($xml);
+		$doc->loadXML($xml);
 
 		$xpath = new DomXPath($doc);
 		$xpath->registerNamespace('atom', NAMESPACE_ATOM1);
@@ -246,7 +259,7 @@ class ostatus {
 		$gub = "";
 		$hub_attributes = $xpath->query("/atom:feed/atom:link[@rel='hub']")->item(0)->attributes;
 		if (is_object($hub_attributes)) {
-			foreach($hub_attributes AS $hub_attribute) {
+			foreach ($hub_attributes AS $hub_attribute) {
 				if ($hub_attribute->name == "href") {
 					$hub = $hub_attribute->textContent;
 					logger("Found hub ".$hub, LOGGER_DEBUG);
@@ -254,6 +267,7 @@ class ostatus {
 			}
 		}
 
+		/// @TODO One statement is enough ...
 		$header = array();
 		$header["uid"] = $importer["uid"];
 		$header["network"] = NETWORK_OSTATUS;
@@ -377,7 +391,7 @@ class ostatus {
 
 			$inreplyto = $xpath->query('thr:in-reply-to', $entry);
 			if (is_object($inreplyto->item(0))) {
-				foreach($inreplyto->item(0)->attributes AS $attributes) {
+				foreach ($inreplyto->item(0)->attributes AS $attributes) {
 					if ($attributes->name == "ref") {
 						$item["parent-uri"] = $attributes->textContent;
 					}
@@ -394,7 +408,7 @@ class ostatus {
 			$categories = $xpath->query('atom:category', $entry);
 			if ($categories) {
 				foreach ($categories AS $category) {
-					foreach($category->attributes AS $attributes)
+					foreach ($category->attributes AS $attributes)
 						if ($attributes->name == "term") {
 							$term = $attributes->textContent;
 							if(strlen($item["tag"]))
@@ -415,7 +429,7 @@ class ostatus {
 				$length = "0";
 				$title = "";
 				foreach ($links AS $link) {
-					foreach($link->attributes AS $attributes) {
+					foreach ($link->attributes AS $attributes) {
 						if ($attributes->name == "href")
 							$href = $attributes->textContent;
 						if ($attributes->name == "rel")
@@ -473,7 +487,7 @@ class ostatus {
 
 			$notice_info = $xpath->query('statusnet:notice_info', $entry);
 			if ($notice_info AND ($notice_info->length > 0)) {
-				foreach($notice_info->item(0)->attributes AS $attributes) {
+				foreach ($notice_info->item(0)->attributes AS $attributes) {
 					if ($attributes->name == "source") {
 						$item["app"] = strip_tags($attributes->textContent);
 					}
@@ -600,22 +614,26 @@ class ostatus {
 	public static function convert_href($href) {
 		$elements = explode(":",$href);
 
-		if ((count($elements) <= 2) OR ($elements[0] != "tag"))
+		if ((count($elements) <= 2) OR ($elements[0] != "tag")) {
 			return $href;
+		}
 
 		$server = explode(",", $elements[1]);
 		$conversation = explode("=", $elements[2]);
 
-		if ((count($elements) == 4) AND ($elements[2] == "post"))
+		if ((count($elements) == 4) AND ($elements[2] == "post")) {
 			return "http://".$server[0]."/notice/".$elements[3];
+		}
 
-		if ((count($conversation) != 2) OR ($conversation[1] ==""))
+		if ((count($conversation) != 2) OR ($conversation[1] =="")) {
 			return $href;
+		}
 
-		if ($elements[3] == "objectType=thread")
+		if ($elements[3] == "objectType=thread") {
 			return "http://".$server[0]."/conversation/".$conversation[1];
-		else
+		} else {
 			return "http://".$server[0]."/notice/".$conversation[1];
+		}
 
 		return $href;
 	}
@@ -688,42 +706,53 @@ class ostatus {
 	 * @brief Updates the gcontact table with actor data from the conversation
 	 *
 	 * @param object $actor The actor object that contains the contact data
+	 * @todo Add type-hint
 	 */
 	private function conv_fetch_actor($actor) {
 
 		// We set the generation to "3" since the data here is not as reliable as the data we get on other occasions
 		$contact = array("network" => NETWORK_OSTATUS, "generation" => 3);
 
-		if (isset($actor->url))
+		if (isset($actor->url)) {
 			$contact["url"] = $actor->url;
+		}
 
-		if (isset($actor->displayName))
+		if (isset($actor->displayName)) {
 			$contact["name"] = $actor->displayName;
+		}
 
-		if (isset($actor->portablecontacts_net->displayName))
+		if (isset($actor->portablecontacts_net->displayName)) {
 			$contact["name"] = $actor->portablecontacts_net->displayName;
+		}
 
-		if (isset($actor->portablecontacts_net->preferredUsername))
+		if (isset($actor->portablecontacts_net->preferredUsername)) {
 			$contact["nick"] = $actor->portablecontacts_net->preferredUsername;
+		}
 
-		if (isset($actor->id))
+		if (isset($actor->id)) {
 			$contact["alias"] = $actor->id;
+		}
 
-		if (isset($actor->summary))
+		if (isset($actor->summary)) {
 			$contact["about"] = $actor->summary;
+		}
 
-		if (isset($actor->portablecontacts_net->note))
+		if (isset($actor->portablecontacts_net->note)) {
 			$contact["about"] = $actor->portablecontacts_net->note;
+		}
 
-		if (isset($actor->portablecontacts_net->addresses->formatted))
+		if (isset($actor->portablecontacts_net->addresses->formatted)) {
 			$contact["location"] = $actor->portablecontacts_net->addresses->formatted;
+		}
 
 
-		if (isset($actor->image->url))
+		if (isset($actor->image->url)) {
 			$contact["photo"] = $actor->image->url;
+		}
 
-		if (isset($actor->image->width))
+		if (isset($actor->image->width)) {
 			$avatarwidth = $actor->image->width;
+		}
 
 		if (is_array($actor->status_net->avatarLinks))
 			foreach ($actor->status_net->avatarLinks AS $avatar) {
@@ -750,22 +779,26 @@ class ostatus {
 		if ($conversation_id != "") {
 			$elements = explode(":", $conversation_id);
 
-			if ((count($elements) <= 2) OR ($elements[0] != "tag"))
+			if ((count($elements) <= 2) OR ($elements[0] != "tag")) {
 				return $conversation_id;
+			}
 		}
 
-		if ($self == "")
+		if ($self == "") {
 			return "";
+		}
 
 		$json = str_replace(".atom", ".json", $self);
 
 		$raw = fetch_url($json);
-		if ($raw == "")
+		if ($raw == "") {
 			return "";
+		}
 
 		$data = json_decode($raw);
-		if (!is_object($data))
+		if (!is_object($data)) {
 			return "";
+		}
 
 		$conversation_id = $data->statusnet_conversation_id;
 
@@ -791,11 +824,12 @@ class ostatus {
 		$contact = q("SELECT `id`, `rel`, `network` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` != '%s'",
 					$uid, normalise_link($actor), NETWORK_STATUSNET);
 
-		if (!$contact)
+		if (!dbm::is_result($contact)) {
 			$contact = q("SELECT `id`, `rel`, `network` FROM `contact` WHERE `uid` = %d AND `alias` IN ('%s', '%s') AND `network` != '%s'",
 					$uid, $actor, normalise_link($actor), NETWORK_STATUSNET);
+		}
 
-		if ($contact) {
+		if (dbm::is_resul($contact)) {
 			logger("Found contact for url ".$actor, LOGGER_DEBUG);
 			$details["contact_id"] = $contact[0]["id"];
 			$details["network"] = $contact[0]["network"];
@@ -827,6 +861,7 @@ class ostatus {
 	 * @param array $item Data of the item that is to be posted
 	 *
 	 * @return integer The item id of the posted item array
+	 * @todo Add type-hints
 	 */
 	private function completion($conversation_url, $uid, $item = array(), $self = "") {
 
@@ -859,9 +894,9 @@ class ostatus {
 					(SELECT `oid` FROM `term` WHERE `uid` = %d AND `otype` = %d AND `type` = %d AND `url` = '%s'))",
 				intval($uid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($conversation_url));
 */
-		if ($parents)
+		if (dbm::is_result($parents)) {
 			$parent = $parents[0];
-		elseif (count($item) > 0) {
+		} elseif (count($item) > 0) {
 			$parent = $item;
 			$parent["type"] = "remote";
 			$parent["verb"] = ACTIVITY_POST;
@@ -869,9 +904,11 @@ class ostatus {
 		} else {
 			// Preset the parent
 			$r = q("SELECT `id` FROM `contact` WHERE `self` AND `uid`=%d", $uid);
-			if (!$r)
+			if (!dbm::is_result($r)) {
 				return(-2);
+			}
 
+			/// @TODO one statement is enough ...
 			$parent = array();
 			$parent["id"] = 0;
 			$parent["parent"] = 0;
@@ -898,20 +935,24 @@ class ostatus {
 			} elseif (!$conv_arr["success"] AND (substr($conv, 0, 8) == "https://")) {
 				$conv = str_replace("https://", "http://", $conv);
 				$conv_as = fetch_url($conv."?page=".$pageno);
-			} else
+			} else {
 				$conv_as = $conv_arr["body"];
+			}
 
 			$conv_as = str_replace(',"statusnet:notice_info":', ',"statusnet_notice_info":', $conv_as);
 			$conv_as = json_decode($conv_as);
 
 			$no_of_items = sizeof($items);
 
-			if (@is_array($conv_as->items))
-				foreach ($conv_as->items AS $single_item)
+			if (is_array($conv_as->items)) {
+				foreach ($conv_as->items AS $single_item) {
 					$items[$single_item->id] = $single_item;
+				}
+			}
 
-			if ($no_of_items == sizeof($items))
+			if ($no_of_items == sizeof($items)) {
 				break;
+			}
 
 			$pageno++;
 
@@ -929,13 +970,19 @@ class ostatus {
 				}
 
 				return($item_stored);
-			} else
+			} else {
 				return(-3);
+			}
 		}
 
 		$items = array_reverse($items);
 
 		$r = q("SELECT `nurl` FROM `contact` WHERE `uid` = %d AND `self`", intval($uid));
+
+		if (!dbm::is_result($r)) {
+			killme();
+		}
+
 		$importer = $r[0];
 
 		$new_parent = true;
@@ -951,15 +998,18 @@ class ostatus {
 
 			$mention = false;
 
-			if (isset($single_conv->object->id))
+			if (isset($single_conv->object->id)) {
 				$single_conv->id = $single_conv->object->id;
+			}
 
 			$plink = self::convert_href($single_conv->id);
-			if (isset($single_conv->object->url))
+			if (isset($single_conv->object->url)) {
 				$plink = self::convert_href($single_conv->object->url);
+			}
 
-			if (@!$single_conv->id)
+			if (!isset($single_conv->id)) {
 				continue;
+			}
 
 			logger("Got id ".$single_conv->id, LOGGER_DEBUG);
 
@@ -978,7 +1028,7 @@ class ostatus {
 								(SELECT `parent` FROM `item`
 									WHERE `uid` = %d AND `uri` = '%s' AND `network` IN ('%s','%s')) LIMIT 1",
 						intval($uid), dbesc($first_id), dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DFRN));
-					if ($new_parents) {
+					if (dbm::is_result($new_parents)) {
 						if ($new_parents[0]["parent"] == $parent["parent"]) {
 							// Option 2: This post is already present inside our thread - but not as thread starter
 							logger("Option 2: uri present in our thread: ".$first_id, LOGGER_DEBUG);
@@ -1009,16 +1059,18 @@ class ostatus {
 			if (isset($single_conv->context->inReplyTo->id)) {
 				$parent_exists = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s' AND `network` IN ('%s','%s') LIMIT 1",
 							intval($uid), dbesc($single_conv->context->inReplyTo->id), dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DFRN));
-				if ($parent_exists)
+				if (dbm::is_result($parent_exists)) {
 					$parent_uri = $single_conv->context->inReplyTo->id;
+				}
 			}
 
 			// This is the current way
 			if (isset($single_conv->object->inReplyTo->id)) {
 				$parent_exists = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s' AND `network` IN ('%s','%s') LIMIT 1",
 							intval($uid), dbesc($single_conv->object->inReplyTo->id), dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DFRN));
-				if ($parent_exists)
+				if (dbm::is_result($parent_exists)) {
 					$parent_uri = $single_conv->object->inReplyTo->id;
+				}
 			}
 
 			$message_exists = q("SELECT `id`, `parent`, `uri` FROM `item` WHERE `uid` = %d AND `uri` = '%s' AND `network` IN ('%s','%s') LIMIT 1",
@@ -1065,14 +1117,18 @@ class ostatus {
 				continue;
 			}
 
-			if (is_array($single_conv->to))
-				foreach($single_conv->to AS $to)
-					if ($importer["nurl"] == normalise_link($to->id))
+			if (is_array($single_conv->to)) {
+				foreach ($single_conv->to AS $to) {
+					if ($importer["nurl"] == normalise_link($to->id)) {
 						$mention = true;
+					}
+				}
+			}
 
 			$actor = $single_conv->actor->id;
-			if (isset($single_conv->actor->url))
+			if (isset($single_conv->actor->url)) {
 				$actor = $single_conv->actor->url;
+			}
 
 			$details = self::get_actor_details($actor, $uid, $parent["contact-id"]);
 
@@ -1082,6 +1138,7 @@ class ostatus {
 				continue;
 			}
 
+			/// @TODO One statment is okay (until if() )
 			$arr = array();
 			$arr["network"] = $details["network"];
 			$arr["uri"] = $single_conv->id;
@@ -1092,10 +1149,12 @@ class ostatus {
 			$arr["created"] = $single_conv->published;
 			$arr["edited"] = $single_conv->published;
 			$arr["owner-name"] = $single_conv->actor->displayName;
-			if ($arr["owner-name"] == '')
+			if ($arr["owner-name"] == '') {
 				$arr["owner-name"] = $single_conv->actor->contact->displayName;
-			if ($arr["owner-name"] == '')
+			}
+			if ($arr["owner-name"] == '') {
 				$arr["owner-name"] = $single_conv->actor->portablecontacts_net->displayName;
+			}
 
 			$arr["owner-link"] = $actor;
 			$arr["owner-avatar"] = $single_conv->actor->image->url;
@@ -1104,15 +1163,15 @@ class ostatus {
 			$arr["author-avatar"] = $single_conv->actor->image->url;
 			$arr["body"] = add_page_info_to_body(html2bbcode($single_conv->content));
 
-			if (isset($single_conv->status_net->notice_info->source))
+			if (isset($single_conv->status_net->notice_info->source)) {
 				$arr["app"] = strip_tags($single_conv->status_net->notice_info->source);
-			elseif (isset($single_conv->statusnet->notice_info->source))
+			} elseif (isset($single_conv->statusnet->notice_info->source)) {
 				$arr["app"] = strip_tags($single_conv->statusnet->notice_info->source);
-			elseif (isset($single_conv->statusnet_notice_info->source))
+			} elseif (isset($single_conv->statusnet_notice_info->source)) {
 				$arr["app"] = strip_tags($single_conv->statusnet_notice_info->source);
-			elseif (isset($single_conv->provider->displayName))
+			} elseif (isset($single_conv->provider->displayName)) {
 				$arr["app"] = $single_conv->provider->displayName;
-			else
+			} else {
 				$arr["app"] = "OStatus";
 
 
@@ -1131,20 +1190,23 @@ class ostatus {
 
 				// $single_conv->object->context->conversation;
 
-				if (isset($single_conv->object->object->id))
+				if (isset($single_conv->object->object->id)) {
 					$arr["uri"] = $single_conv->object->object->id;
-				else
+				} else {
 					$arr["uri"] = $single_conv->object->id;
+				}
 
-				if (isset($single_conv->object->object->url))
+				if (isset($single_conv->object->object->url)) {
 					$plink = self::convert_href($single_conv->object->object->url);
-				else
+				} else {
 					$plink = self::convert_href($single_conv->object->url);
+				}
 
-				if (isset($single_conv->object->object->content))
+				if (isset($single_conv->object->object->content)) {
 					$arr["body"] = add_page_info_to_body(html2bbcode($single_conv->object->object->content));
-				else
+				} else {
 					$arr["body"] = add_page_info_to_body(html2bbcode($single_conv->object->content));
+				}
 
 				$arr["plink"] = $plink;
 
@@ -1152,8 +1214,9 @@ class ostatus {
 				$arr["edited"] = $single_conv->object->published;
 
 				$arr["author-name"] = $single_conv->object->actor->displayName;
-				if ($arr["owner-name"] == '')
+				if ($arr["owner-name"] == '') {
 					$arr["author-name"] = $single_conv->object->actor->contact->displayName;
+				}
 
 				$arr["author-link"] = $single_conv->object->actor->url;
 				$arr["author-avatar"] = $single_conv->object->actor->image->url;
@@ -1165,20 +1228,24 @@ class ostatus {
 				$arr["coord"] = trim($single_conv->object->location->lat." ".$single_conv->object->location->lon);
 			}
 
-			if ($arr["location"] == "")
+			if ($arr["location"] == "") {
 				unset($arr["location"]);
+			}
 
-			if ($arr["coord"] == "")
+			if ($arr["coord"] == "") {
 				unset($arr["coord"]);
+			}
 
 			// Copy fields from given item array
 			if (isset($item["uri"]) AND (($item["uri"] == $arr["uri"]) OR ($item["uri"] ==  $single_conv->id))) {
 				$copy_fields = array("owner-name", "owner-link", "owner-avatar", "author-name", "author-link", "author-avatar",
 							"gravity", "body", "object-type", "object", "verb", "created", "edited", "coord", "tag",
 							"title", "attach", "app", "type", "location", "contact-id", "uri");
-				foreach ($copy_fields AS $field)
-					if (isset($item[$field]))
-						$arr[$field] = $item[$field];
+				foreach ($copy_fields AS $field) {
+					if (isset($item[$field])) {
+						$arr[$field] = $item[$field]; {
+					}
+				}
 
 			}
 
@@ -1204,8 +1271,9 @@ class ostatus {
 				logger('setting new parent to id '.$newitem);
 				$new_parents = q("SELECT `id`, `uri`, `contact-id`, `type`, `verb`, `visible` FROM `item` WHERE `uid` = %d AND `id` = %d LIMIT 1",
 					intval($uid), intval($newitem));
-				if ($new_parents)
+				if ($new_parents) {
 					$parent = $new_parents[0];
+				}
 			}
 		}
 
@@ -1240,8 +1308,9 @@ class ostatus {
 		$conversation_url = self::convert_href($conversation_url);
 
 		$messages = q("SELECT `uid`, `parent`, `created`, `received`, `guid` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
-		if (!$messages)
+		if (!dbm::is_result($messages)) {
 			return;
+		}
 		$message = $messages[0];
 
 		// Store conversation url if not done before
@@ -1262,32 +1331,38 @@ class ostatus {
 	 * @param array $item The item array of thw post
 	 *
 	 * @return string The guid if the post is a reshare
+	 * @todo Add type-hints
 	 */
 	private function get_reshared_guid($item) {
 		$body = trim($item["body"]);
 
 		// Skip if it isn't a pure repeated messages
 		// Does it start with a share?
-		if (strpos($body, "[share") > 0)
+		if (strpos($body, "[share") > 0) {
 			return("");
+		}
 
 		// Does it end with a share?
-		if (strlen($body) > (strrpos($body, "[/share]") + 8))
+		if (strlen($body) > (strrpos($body, "[/share]") + 8)) {
 			return("");
+		}
 
 		$attributes = preg_replace("/\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","$1",$body);
 		// Skip if there is no shared message in there
-		if ($body == $attributes)
+		if ($body == $attributes) {
 			return(false);
+		}
 
 		$guid = "";
 		preg_match("/guid='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$guid = $matches[1];
+		}
 
 		preg_match('/guid="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$guid = $matches[1];
+		}
 
 		return $guid;
 	}
@@ -1303,10 +1378,11 @@ class ostatus {
 		$siteinfo = get_attached_data($body);
 
 		if (($siteinfo["type"] == "photo")) {
-			if (isset($siteinfo["preview"]))
+			if (isset($siteinfo["preview"])) {
 				$preview = $siteinfo["preview"];
-			else
+			} else {
 				$preview = $siteinfo["image"];
+			}
 
 			// Is it a remote picture? Then make a smaller preview here
 			$preview = proxy_url($preview, false, PROXY_SIZE_SMALL);
@@ -1315,10 +1391,11 @@ class ostatus {
 			$preview = str_replace(array("-0.jpg", "-0.png"), array("-2.jpg", "-2.png"), $preview);
 			$preview = str_replace(array("-1.jpg", "-1.png"), array("-2.jpg", "-2.png"), $preview);
 
-			if (isset($siteinfo["url"]))
+			if (isset($siteinfo["url"])) {
 				$url = $siteinfo["url"];
-			else
+			} else {
 				$url = $siteinfo["image"];
+			}
 
 			$body = trim($siteinfo["text"])." [url]".$url."[/url]\n[img]".$preview."[/img]";
 		}
@@ -1333,6 +1410,7 @@ class ostatus {
 	 * @param array $owner Contact data of the poster
 	 *
 	 * @return object header root element
+	 * @todo Add type-hints
 	 */
 	private function add_header($doc, $owner) {
 
@@ -1392,20 +1470,23 @@ class ostatus {
 	 *
 	 * @param object $doc XML document
 	 * @param object $root XML root element where the hub links are added
+	 * @todo Add type-hints
 	 */
 	public static function hublinks($doc, $root) {
 		$hub = get_config('system','huburl');
 
 		$hubxml = '';
-		if(strlen($hub)) {
+		if (strlen($hub)) {
 			$hubs = explode(',', $hub);
-			if(count($hubs)) {
-				foreach($hubs as $h) {
+			if (count($hubs)) {
+				foreach ($hubs as $h) {
 					$h = trim($h);
-					if(! strlen($h))
+					if (! strlen($h)) {
 						continue;
-					if ($h === '[internal]')
+					}
+					if ($h === '[internal]') {
 						$h = App::get_baseurl() . '/pubsubhubbub';
+					}
 					xml::add_element($doc, $root, "link", "", array("href" => $h, "rel" => "hub"));
 				}
 			}
@@ -1418,6 +1499,7 @@ class ostatus {
 	 * @param object $doc XML document
 	 * @param object $root XML root element where the hub links are added
 	 * @param array $item Data of the item that is to be posted
+	 * @todo Add type-hints
 	 */
 	private function get_attachment($doc, $root, $item) {
 		$o = "";
@@ -1461,20 +1543,22 @@ class ostatus {
 
 
 		$arr = explode('[/attach],',$item['attach']);
-		if(count($arr)) {
-			foreach($arr as $r) {
+		if (count($arr)) {
+			foreach ($arr as $r) {
 				$matches = false;
 				$cnt = preg_match('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|',$r,$matches);
-				if($cnt) {
+				if ($cnt) {
 					$attributes = array("rel" => "enclosure",
 							"href" => $matches[1],
 							"type" => $matches[3]);
 
-					if(intval($matches[2]))
+					if (intval($matches[2])) {
 						$attributes["length"] = intval($matches[2]);
+					}
 
-					if(trim($matches[4]) != "")
+					if (trim($matches[4]) != "") {
 						$attributes["title"] = trim($matches[4]);
+					}
 
 					xml::add_element($doc, $root, "link", "", $attributes);
 				}
@@ -1489,12 +1573,15 @@ class ostatus {
 	 * @param array $owner Contact data of the poster
 	 *
 	 * @return object author element
+	 * @todo Add type-hints
 	 */
 	private function add_author($doc, $owner) {
 
+		$profile = null;
 		$r = q("SELECT `homepage` FROM `profile` WHERE `uid` = %d AND `is-default` LIMIT 1", intval($owner["uid"]));
-		if ($r)
+		if (dbm::is_result($r)) {
 			$profile = $r[0];
+		}
 
 		$author = $doc->createElement("author");
 		xml::add_element($doc, $author, "activity:object-type", ACTIVITY_OBJ_PERSON);
@@ -1562,10 +1649,12 @@ class ostatus {
 	 * @param array $item Data of the item that is to be posted
 	 *
 	 * @return string activity
+	 * @todo Add type-hints
 	 */
 	function construct_verb($item) {
-		if ($item['verb'])
+		if ($item['verb']) {
 			return $item['verb'];
+		}
 		return ACTIVITY_POST;
 	}
 
@@ -1575,10 +1664,12 @@ class ostatus {
 	 * @param array $item Data of the item that is to be posted
 	 *
 	 * @return string Object type
+	 * @todo Add type-hints
 	 */
 	function construct_objecttype($item) {
-		if (in_array($item['object-type'], array(ACTIVITY_OBJ_NOTE, ACTIVITY_OBJ_COMMENT)))
+		if (in_array($item['object-type'], array(ACTIVITY_OBJ_NOTE, ACTIVITY_OBJ_COMMENT))) {
 			return $item['object-type'];
+		};
 		return ACTIVITY_OBJ_NOTE;
 	}
 
@@ -1616,6 +1707,7 @@ class ostatus {
 	 * @param array $contact Array of the contact that is added
 	 *
 	 * @return object Source element
+	 * @todo Add type-hints
 	 */
 	private function source_entry($doc, $contact) {
 		$source = $doc->createElement("source");
@@ -1640,39 +1732,41 @@ class ostatus {
 	 * @param array $owner Contact data of the poster
 	 *
 	 * @return array Contact array
+	 * @todo Add array type-hint for $owner
 	 */
 	private function contact_entry($url, $owner) {
 
 		$r = q("SELECT * FROM `contact` WHERE `nurl` = '%s' AND `uid` IN (0, %d) ORDER BY `uid` DESC LIMIT 1",
 			dbesc(normalise_link($url)), intval($owner["uid"]));
-		if ($r) {
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
 			$contact["uid"] = -1;
-		}
-
-		if (!$r) {
+		} else {
 			$r = q("SELECT * FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
 				dbesc(normalise_link($url)));
-			if ($r) {
+			if (dbm::is_result($r)) {
 				$contact = $r[0];
 				$contact["uid"] = -1;
 				$contact["success_update"] = $contact["updated"];
 			}
 		}
 
-		if (!$r)
-			$contact = owner;
+		if (!dbm::is_result($r)) {
+			$contact = $owner;
+		}
 
 		if (!isset($contact["poll"])) {
 			$data = probe_url($url);
 			$contact["poll"] = $data["poll"];
 
-			if (!$contact["alias"])
+			if (!$contact["alias"]) {
 				$contact["alias"] = $data["alias"];
+			}
 		}
 
-		if (!isset($contact["alias"]))
+		if (!isset($contact["alias"])) {
 			$contact["alias"] = $contact["url"];
+		}
 
 		return $contact;
 	}
@@ -1687,6 +1781,7 @@ class ostatus {
 	 * @param bool $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return object Entry element
+	 * @todo Add type-hints
 	 */
 	private function reshare_entry($doc, $item, $owner, $repeated_guid, $toplevel) {
 
@@ -1699,10 +1794,12 @@ class ostatus {
 		$r = q("SELECT * FROM `item` WHERE `uid` = %d AND `guid` = '%s' AND NOT `private` AND `network` IN ('%s', '%s', '%s') LIMIT 1",
 			intval($owner["uid"]), dbesc($repeated_guid),
 			dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS));
-		if ($r)
-			$repeated_item = $r[0];
-		else
+
+		if (!dbm::is_result($r)) {
 			return false;
+		}
+
+		$repeated_item = $r[0];
 
 		$contact = self::contact_entry($repeated_item['author-link'], $owner);
 
@@ -1753,6 +1850,7 @@ class ostatus {
 	 * @param bool $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return object Entry element with "like"
+	 * @todo Add type-hints
 	 */
 	private function like_entry($doc, $item, $owner, $toplevel) {
 
@@ -1790,6 +1888,7 @@ class ostatus {
 	 * @param array $contact Contact data of the target
 	 *
 	 * @return object author element
+	 * @todo Add type-hints
 	 */
 	private function add_person_object($doc, $owner, $contact) {
 
@@ -1836,6 +1935,7 @@ class ostatus {
 	 * @param bool $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return object Entry element
+	 * @todo Add type-hints
 	 */
 	private function follow_entry($doc, $item, $owner, $toplevel) {
 
@@ -1898,6 +1998,7 @@ class ostatus {
 	 * @param bool $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return object Entry element
+	 * @todo Add type-hints
 	 */
 	private function note_entry($doc, $item, $owner, $toplevel) {
 
@@ -1925,6 +2026,7 @@ class ostatus {
 	 * @param bool $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return string The title for the element
+	 * @todo Add type-hints
 	 */
 	private function entry_header($doc, &$entry, $owner, $toplevel) {
 		/// @todo Check if this title stuff is really needed (I guess not)
@@ -1960,19 +2062,22 @@ class ostatus {
 	 * @param string $title Title for the post
 	 * @param string $verb The activity verb
 	 * @param bool $complete Add the "status_net" element?
+	 * @todo Add type-hints
 	 */
 	private function entry_content($doc, $entry, $item, $owner, $title, $verb = "", $complete = true) {
 
-		if ($verb == "")
+		if ($verb == "") {
 			$verb = self::construct_verb($item);
+		}
 
 		xml::add_element($doc, $entry, "id", $item["uri"]);
 		xml::add_element($doc, $entry, "title", $title);
 
 		$body = self::format_picture_post($item['body']);
 
-		if ($item['title'] != "")
+		if ($item['title'] != "") {
 			$body = "[b]".$item['title']."[/b]\n\n".$body;
+		}
 
 		$body = bbcode($body, false, false, 7);
 
@@ -1998,6 +2103,7 @@ class ostatus {
 	 * @param array $item Data of the item that is to be posted
 	 * @param array $owner Contact data of the poster
 	 * @param $complete
+	 * @todo Add type-hints
 	 */
 	private function entry_footer($doc, $entry, $item, $owner, $complete = true) {
 
@@ -2024,7 +2130,7 @@ class ostatus {
 			$thrparent = q("SELECT `guid`, `author-link`, `owner-link` FROM `item` WHERE `uid` = %d AND `uri` = '%s'",
 					intval($owner["uid"]),
 					dbesc($parent_item));
-			if ($thrparent) {
+			if (dbm::is_result($thrparent)) {
 				$mentioned[$thrparent[0]["author-link"]] = $thrparent[0]["author-link"];
 				$mentioned[$thrparent[0]["owner-link"]] = $thrparent[0]["owner-link"];
 			}
@@ -2038,10 +2144,13 @@ class ostatus {
 
 		$tags = item_getfeedtags($item);
 
-		if(count($tags))
-			foreach($tags as $t)
-				if ($t[0] == "@")
+		if (count($tags)) {
+			foreach ($tags as $t) {
+				if ($t[0] == "@") {
 					$mentioned[$t[1]] = $t[1];
+				}
+			}
+		}
 
 		// Make sure that mentions are accepted (GNU Social has problems with mixing HTTP and HTTPS)
 		$newmentions = array();
@@ -2055,14 +2164,15 @@ class ostatus {
 			$r = q("SELECT `forum`, `prv` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
 				intval($owner["uid"]),
 				dbesc(normalise_link($mention)));
-			if ($r[0]["forum"] OR $r[0]["prv"])
+			if ($r[0]["forum"] OR $r[0]["prv"]) {
 				xml::add_element($doc, $entry, "link", "", array("rel" => "mentioned",
 											"ostatus:object-type" => ACTIVITY_OBJ_GROUP,
 											"href" => $mention));
-			else
+			} else {
 				xml::add_element($doc, $entry, "link", "", array("rel" => "mentioned",
 											"ostatus:object-type" => ACTIVITY_OBJ_PERSON,
 											"href" => $mention));
+			}
 		}
 
 		if (!$item["private"]) {
@@ -2073,10 +2183,13 @@ class ostatus {
 									"href" => "http://activityschema.org/collection/public"));
 		}
 
-		if(count($tags))
-			foreach($tags as $t)
-				if ($t[0] != "@")
+		if (count($tags)) {
+			foreach ($tags as $t) {
+				if ($t[0] != "@") {
 					xml::add_element($doc, $entry, "category", "", array("term" => $t[2]));
+				}
+			}
+		}
 
 		self::get_attachment($doc, $entry, $item);
 
