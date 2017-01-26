@@ -217,6 +217,7 @@ function email_header_encode($in_str, $charset) {
 
 	if (! $need_to_convert)
 		return $in_str;
+	}
 
     if ($out_str && $charset) {
 

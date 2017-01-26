@@ -38,8 +38,9 @@ function get_feature_default($feature) {
 	$f = get_features();
 	foreach ($f as $cat) {
 		foreach ($cat as $feat) {
-			if (is_array($feat) && $feat[0] === $feature)
+			if (is_array($feat) && $feat[0] === $feature) {
 				return $feat[3];
+			}
 		}
 	}
 	return false;
@@ -124,8 +125,7 @@ function get_features($filtered = true) {
 				if (is_array($arr[$k][$y])) {
 					if ($arr[$k][$y][4] === false) {
 						$has_items = true;
-					}
-					else {
+					} else {
 						unset($arr[$k][$y]);
 					}
 				}
