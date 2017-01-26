@@ -465,7 +465,7 @@ function perms2str($p) {
 	if (is_array($p)) {
 		$tmp = $p;
 	} else {
-		$tmp = explode(',',$p);
+		$tmp = explode(',', $p);
 	}
 
 	if (is_array($tmp)) {
@@ -1772,12 +1772,12 @@ function str_getcsv($input, $delimiter = ',', $enclosure = '"', $escape = '\\', 
 					 */
 					if (is_array($line) && !empty($line[0])) {
 						$output[$line_num] = $line;
-				}
+					}
 				}
 			}
 			return $output;
 		} else {
-		return false;
+			return false;
 		}
 	} else {
 		return false;
