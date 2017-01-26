@@ -19,6 +19,8 @@
 
 require_once('include/autoloader.php');
 
+use Friendica\Network\HTTP\HTTPException;
+
 require_once('include/config.php');
 require_once('include/network.php');
 require_once('include/plugin.php');
@@ -788,6 +790,24 @@ class App {
 
 	function get_scheme() {
 		return($this->scheme);
+	}
+
+	/**
+	 * @brief return request headers as array
+	 *
+	 * Header names are normalized from "HTTP_HEADER__NAME" to "Header-Name"
+	 *
+	 * @return array of header=>value pairs
+	 */
+	function getRequestHeaders() {
+		$headers = array();
+		foreach ($_SERVER as $key => $value) {
+			if (substr($key, 0, 5) == 'HTTP_') {
+				$header = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
+				$headers[$header] = $value;
+			}
+		}
+		return $headers;
 	}
 
 	/**
@@ -1817,11 +1837,21 @@ function login($register = false, $hiddens=false) {
 
 /**
  * @brief Used to end the current process, after saving session state.
+ *
+ * If and HTTPException subclass is passed, the appropriate header is
+ * returned before end the process.
+ *
+ * @param HTTPException $e
  */
-function killme() {
+function killme(HTTPException $e = null) {
 
-	if (!get_app()->is_backend())
+	if (!get_app()->is_backend()) {
 		session_write_close();
+	}
+
+	if (!is_null($e)) {
+		$e->send_header();
+	}
 
 	exit;
 }
