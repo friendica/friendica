@@ -24,10 +24,11 @@ function share_init(App $a) {
 	} else {
 		$o = share_header($r[0]['author-name'], $r[0]['author-link'], $r[0]['author-avatar'], $r[0]['guid'], $r[0]['created'], $r[0]['plink']);
 
-		if($r[0]['title'])
+		if ($r[0]['title']) {
 			$o .= '[b]'.$r[0]['title'].'[/b]'."\n";
+		}
 		$o .= $r[0]['body'];
-		$o.= "[/share]";
+		$o .= "[/share]";
 	}
 
 	echo $o;
@@ -39,11 +40,13 @@ function share_header($author, $profile, $avatar, $guid, $posted, $link) {
 		"' profile='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$profile).
 		"' avatar='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$avatar);
 
-	if ($guid)
+	if ($guid) {
 		$header .= "' guid='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$guid);
+	}
 
-	if ($posted)
+	if ($posted) {
 		$header .= "' posted='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$posted);
+	}
 
 	$header .= "' link='".str_replace(array("'", "[", "]"), array("&#x27;", "&#x5B;", "&#x5D;"),$link)."']";
 

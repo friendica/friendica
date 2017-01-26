@@ -37,17 +37,18 @@ function wk_social_relay(App $a) {
 	$tags = array();
 
 	if ($scope == SR_SCOPE_TAGS) {
-		$server_tags = Config::get('system', 'relay_server_tags');
+
+		$server_tags = get_config('system', 'relay_server_tags');
 		$tagitems = explode(",", $server_tags);
 
-		foreach($tagitems AS $tag) {
+		foreach ($tagitems AS $tag) {
 			$tags[trim($tag, "# ")] = trim($tag, "# ");
 		}
 
-		if (Config::get('system', 'relay_user_tags')) {
+		if (get_config('system', 'relay_user_tags')) {
 			$terms = q("SELECT DISTINCT(`term`) FROM `search`");
 
-			foreach($terms AS $term) {
+			foreach ($terms AS $term) {
 				$tag = trim($term["term"], "#");
 				$tags[$tag] = $tag;
 			}

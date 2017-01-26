@@ -850,6 +850,7 @@ function admin_page_site_post(App $a) {
 	if (!$thread_allow) {
 		$ostatus_disabled = true;
 	}
+
 	if ($ssl_policy != intval(get_config('system','ssl_policy'))) {
 		if ($ssl_policy == SSL_POLICY_FULL) {
 			q("UPDATE `contact` SET
@@ -1921,7 +1922,8 @@ function admin_page_themes(App $a) {
 			$status="off"; $action= t("Enable");
 		}
 
-		$readme = Null;
+		$readme = null;
+
 		if (is_file("view/theme/$theme/README.md")) {
 			$readme = file_get_contents("view/theme/$theme/README.md");
 			$readme = Markdown($readme);

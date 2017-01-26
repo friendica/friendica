@@ -625,7 +625,6 @@ function profiles_content(App $a) {
 
 		require_once 'include/profile_selectors.php';
 
-
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('profed_head.tpl'), array(
 			'$baseurl' => App::get_baseurl(true),
 		));
