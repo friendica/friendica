@@ -1245,7 +1245,7 @@ class ostatus {
 							"title", "attach", "app", "type", "location", "contact-id", "uri");
 				foreach ($copy_fields AS $field) {
 					if (isset($item[$field])) {
-						$arr[$field] = $item[$field]; {
+						$arr[$field] = $item[$field];
 					}
 				}
 
