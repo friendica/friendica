@@ -229,18 +229,19 @@ function common_friends_visitor_widget($profile_uid) {
 
 	if (! $cid) {
 		if (get_my_url()) {
-			$r = q("select id from contact where nurl = '%s' and uid = %d limit 1",
+			$r = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d LIMIT 1",
 				dbesc(normalise_link(get_my_url())),
 				intval($profile_uid)
 			);
 			if (dbm::is_result($r)) {
 				$cid = $r[0]['id'];
 			} else {
-				$r = q("select id from gcontact where nurl = '%s' limit 1",
+				$r = q("SELECT `id` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
 					dbesc(normalise_link(get_my_url()))
 				);
-				if (dbm::is_result($r))
+				if (dbm::is_result($r)) {
 					$zcid = $r[0]['id'];
+				}
 			}
 		}
 	}

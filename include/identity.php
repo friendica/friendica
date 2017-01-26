@@ -490,21 +490,24 @@ function get_birthdays() {
 
 		$istoday = false;
 		foreach ($r as $rr) {
-			if (strlen($rr['name']))
+			if (strlen($rr['name'])) {
 				$total ++;
-			if ((strtotime($rr['start'] . ' +00:00') < $now) && (strtotime($rr['finish'] . ' +00:00') > $now))
+			}
+			if ((strtotime($rr['start'] . ' +00:00') < $now) && (strtotime($rr['finish'] . ' +00:00') > $now)) {
 				$istoday = true;
+			}
 		}
 		$classtoday = $istoday ? ' birthday-today ' : '';
 		if ($total) {
 			foreach ($r as &$rr) {
-				if (! strlen($rr['name']))
+				if (! strlen($rr['name'])) {
 					continue;
+				}
 
 				// avoid duplicates
-
-				if (in_array($rr['cid'],$cids))
+				if (in_array($rr['cid'], $cids)) {
 					continue;
+				}
 				$cids[] = $rr['cid'];
 
 				$today = (((strtotime($rr['start'] . ' +00:00') < $now) && (strtotime($rr['finish'] . ' +00:00') > $now)) ? true : false);
@@ -547,13 +550,16 @@ function get_events() {
 
 	if (! local_user() || $a->is_mobile || $a->is_tablet) {
 		return $o;
+	/*
+	 * @TODO No longer needed code? Then remove it.
+		$mobile_detect = new Mobile_Detect();
+		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
+
+		if ($is_mobile) {
+			return $o;
+		}
+	*/
 	}
-
-//		$mobile_detect = new Mobile_Detect();
-//		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
-
-//		if ($is_mobile)
-//			return $o;
 
 	$bd_format = t('g A l F d') ; // 8 AM Friday January 18
 	$bd_short = t('F d');
@@ -597,12 +603,12 @@ function get_events() {
 
 			$strt = datetime_convert('UTC',$rr['convert'] ? $a->timezone : 'UTC',$rr['start']);
 
-			if (substr($strt,0,10) < datetime_convert('UTC',$a->timezone,'now','Y-m-d')) {
+			if (substr($strt, 0, 10) < datetime_convert('UTC',$a->timezone, 'now', 'Y-m-d')) {
 				$skip++;
 				continue;
 			}
 
-			$today = ((substr($strt,0,10) === datetime_convert('UTC',$a->timezone,'now','Y-m-d')) ? true : false);
+			$today = ((substr($strt, 0, 10) === datetime_convert('UTC',$a->timezone, 'now', 'Y-m-d')) ? true : false);
 
 			$rr['title'] = $title;
 			$rr['description'] = $desciption;
@@ -648,7 +654,6 @@ function advanced_profile(App $a) {
 			$year_bd_format = t('j F, Y');
 			$short_bd_format = t('j F');
 
-
 			$val = ((intval($a->profile['dob']))
 				? day_translate(datetime_convert('UTC','UTC',$a->profile['dob'] . ' 00:00 +00:00',$year_bd_format))
 				: day_translate(datetime_convert('UTC','UTC','2001-' . substr($a->profile['dob'],5) . ' 00:00 +00:00',$short_bd_format)));
@@ -660,6 +665,10 @@ function advanced_profile(App $a) {
 			&& $a->profile['dob'] > '0001-01-01'
 			&& $age = age($a->profile['dob'], $a->profile['timezone'], '')
 		) {
+			$profile['age'] = array( t('Age:'), $age );
+		}
+
+		if ($age = age($a->profile['dob'], $a->profile['timezone'], '')) {
 			$profile['age'] = array( t('Age:'), $age );
 		}
 
@@ -879,7 +888,6 @@ function get_my_url() {
 function zrl_init(App $a) {
 	$tmp_str = get_my_url();
 	if (validate_url($tmp_str)) {
-
 		// Is it a DDoS attempt?
 		// The check fetches the cached value from gprobe to reduce the load for this system
 		$urlparts = parse_url($tmp_str);
@@ -929,8 +937,10 @@ function zrl($s, $force = false) {
  *      is set to true
  */
 function get_theme_uid() {
-	$uid = (($_REQUEST['puid']) ? intval($_REQUEST['puid']) : 0);
-	if ((local_user()) && ((get_pconfig(local_user(),'system','always_my_theme')) || (! $uid))) {
+	// Check if 'puid' is there, else set zero
+	$uid = (x($_REQUEST['puid']) ? intval($_REQUEST['puid']) : 0);
+
+	if (local_user() && (get_pconfig(local_user(), 'system', 'always_my_theme')) || (! $uid)) {
 		return local_user();
 	}
 

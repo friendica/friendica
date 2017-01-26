@@ -428,55 +428,66 @@ function bb_ShareAttributes($share, $simplehtml) {
 
 	$author = "";
 	preg_match("/author='(.*?)'/ism", $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$author = html_entity_decode($matches[1],ENT_QUOTES,'UTF-8');
+	}
 
 	preg_match('/author="(.*?)"/ism', $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$author = $matches[1];
+	}
 
 	$profile = "";
 	preg_match("/profile='(.*?)'/ism", $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$profile = $matches[1];
+	}
 
 	preg_match('/profile="(.*?)"/ism', $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$profile = $matches[1];
+	}
 
 	$avatar = "";
 	preg_match("/avatar='(.*?)'/ism", $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$avatar = $matches[1];
+	}
 
 	preg_match('/avatar="(.*?)"/ism', $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$avatar = $matches[1];
+	}
 
 	$link = "";
 	preg_match("/link='(.*?)'/ism", $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$link = $matches[1];
+	}
 
 	preg_match('/link="(.*?)"/ism', $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$link = $matches[1];
+	}
 
 	$posted = "";
 
 	$itemcache = get_itemcachepath();
 
 	preg_match("/posted='(.*?)'/ism", $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$posted = $matches[1];
+	}
 
 	preg_match('/posted="(.*?)"/ism', $attributes, $matches);
-	if ($matches[1] != "")
+	if ($matches[1] != "") {
 		$posted = $matches[1];
+	}
 
 	// relative dates only make sense when they aren't cached
-	if ($itemcache == "")
+	if ($itemcache == "") {
 		$reldate = (($posted) ? " " . relative_date($posted) : '');
+	}
 
 	// We only call this so that a previously unknown contact can be added.
 	// This is important for the function "get_contact_details_by_url".
@@ -485,26 +496,31 @@ function bb_ShareAttributes($share, $simplehtml) {
 
 	$data = get_contact_details_by_url($profile);
 
-	if (isset($data["name"]) && ($data["name"] != "") && isset($data["addr"]) && ($data["addr"] != ""))
-	        $userid_compact = $data["name"]." (".$data["addr"].")";
-	else
+	if (isset($data["name"]) && ($data["name"] != "") && isset($data["addr"]) && ($data["addr"] != "")) {
+		$userid_compact = $data["name"]." (".$data["addr"].")";
+	} else {
 		$userid_compact = GetProfileUsername($profile,$author, true);
+	}
 
-	if (isset($data["addr"]) && ($data["addr"] != ""))
+	if (isset($data["addr"]) && ($data["addr"] != "")) {
 		$userid = $data["addr"];
-	else
+	} else {
 		$userid = GetProfileUsername($profile,$author, false);
+	}
 
-	if (isset($data["name"]) && ($data["name"] != ""))
+	if (isset($data["name"]) && ($data["name"] != "")) {
 		$author = $data["name"];
+	}
 
-	if (isset($data["micro"]) && ($data["micro"] != ""))
+	if (isset($data["micro"]) && ($data["micro"] != "")) {
 		$avatar = $data["micro"];
+	}
 
 	$preshare = trim($share[1]);
 
-	if ($preshare != "")
+	if ($preshare != "") {
 		$preshare .= "<br /><br />";
+	}
 
 	switch ($simplehtml) {
 		case 1:
@@ -518,16 +534,19 @@ function bb_ShareAttributes($share, $simplehtml) {
 
 			$text = trim($share[1]);
 
-			if ($text != "")
+			if ($text != "") {
 				$text .= "<hr />";
+			}
 
 			if (substr(normalise_link($link), 0, 19) != "http://twitter.com/") {
 				$text .= $headline.'<blockquote>'.trim($share[3])."</blockquote><br />";
 
-				if ($link != "")
+				if ($link != "") {
 					$text .= '<br /><a href="'.$link.'">[l]</a>';
-			} else
+				}
+			} else {
 				$text .= '<br /><a href="'.$link.'">'.$link.'</a>';
+			}
 
 			break;
 		case 4:
@@ -538,8 +557,9 @@ function bb_ShareAttributes($share, $simplehtml) {
 
 			$text = trim($share[1]);
 
-			if ($text != "")
+			if ($text != "") {
 				$text .= "<hr />";
+			}
 
 			$text .= $headline.'<blockquote class="shared_content">'.trim($share[3])."</blockquote><br />";
 
@@ -559,8 +579,9 @@ function bb_ShareAttributes($share, $simplehtml) {
 		case 9: // Google+/Facebook
 			$text = $preshare.html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8').' '.$userid_compact.": <br />".$share[3];
 
-			if ($link != "")
+			if ($link != "") {
 				$text .= "<br /><br />".$link;
+			}
 			break;
 		default:
 			$text = trim($share[1])."\n";
@@ -712,9 +733,9 @@ function bb_RemovePictureLinks($match) {
 
 		$a->save_timestamp($stamp1, "network");
 
-		if (substr($curl_info["content_type"], 0, 6) == "image/")
+		if (substr($curl_info["content_type"], 0, 6) == "image/") {
 			$text = "[url=".$match[1]."]".$match[1]."[/url]";
-		else {
+		} else {
 			$text = "[url=".$match[2]."]".$match[2]."[/url]";
 
 			// if its not a picture then look if its a page that contains a picture link
@@ -729,12 +750,15 @@ function bb_RemovePictureLinks($match) {
 			foreach ($list as $node) {
 				$attr = array();
 
-				if ($node->attributes->length)
-					foreach ($node->attributes as $attribute)
+				if ($node->attributes->length) {
+					foreach ($node->attributes as $attribute) {
 						$attr[$attribute->name] = $attribute->value;
+					}
+				}
 
-				if (strtolower($attr["name"]) == "twitter:image")
+				if (strtolower($attr["name"]) == "twitter:image") {
 					$text = "[url=".$attr["content"]."]".$attr["content"]."[/url]";
+				}
 			}
 		}
 		Cache::set($match[1],$text);
@@ -743,6 +767,7 @@ function bb_RemovePictureLinks($match) {
 	return $text;
 }
 
+/// @TODO set array as type-hint
 function bb_expand_links($match) {
 	if (($match[3] == "") || ($match[2] == $match[3]) || stristr($match[2], $match[3])) {
 		return ($match[1] . "[url]" . $match[2] . "[/url]");
@@ -751,6 +776,7 @@ function bb_expand_links($match) {
 	}
 }
 
+/// @TODO set array as type-hint
 function bb_CleanPictureLinksSub($match) {
 	$text = Cache::get($match[1]);
 
@@ -769,9 +795,9 @@ function bb_CleanPictureLinksSub($match) {
 		$a->save_timestamp($stamp1, "network");
 
 		// if its a link to a picture then embed this picture
-		if (substr($curl_info["content_type"], 0, 6) == "image/")
+		if (substr($curl_info["content_type"], 0, 6) == "image/") {
 			$text = "[img]".$match[1]."[/img]";
-		else {
+		} else {
 			$text = "[img]".$match[2]."[/img]";
 
 			// if its not a picture then look if its a page that contains a picture link
@@ -786,12 +812,15 @@ function bb_CleanPictureLinksSub($match) {
 			foreach ($list as $node) {
 				$attr = array();
 
-				if ($node->attributes->length)
-					foreach ($node->attributes as $attribute)
+				if ($node->attributes->length) {
+					foreach ($node->attributes as $attribute) {
 						$attr[$attribute->name] = $attribute->value;
+					}
+				}
 
-				if (strtolower($attr["name"]) == "twitter:image")
+				if (strtolower($attr["name"]) == "twitter:image") {
 					$text = "[img]".$attr["content"]."[/img]";
+				}
 			}
 		}
 		Cache::set($match[1],$text);
@@ -1136,7 +1165,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 
 	// handle nested quotes
 	$endlessloop = 0;
-	while ((strpos($Text, "[/spoiler]")!== false)  && (strpos($Text, "[spoiler=") !== false) && (++$endlessloop < 20)) {
+	while ((strpos($Text, "[/spoiler]") !== false)  && (strpos($Text, "[spoiler=") !== false) && (++$endlessloop < 20)) {
 		$Text = preg_replace("/\[spoiler=[\"\']*(.*?)[\"\']*\](.*?)\[\/spoiler\]/ism",
 				     "<br /><strong class=".'"spoiler"'.">" . $t_wrote . "</strong><blockquote class=".'"spoiler"'.">$2</blockquote>",
 				     $Text);
@@ -1163,7 +1192,6 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 				     "<br /><strong class=".'"author"'.">" . $t_wrote . "</strong><blockquote>$2</blockquote>",
 				     $Text);
 	}
-
 
 	// [img=widthxheight]image source[/img]
 	$Text = preg_replace_callback("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", 'bb_PictureCacheExt', $Text);
@@ -1298,6 +1326,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 	$Text = preg_replace('/\<([^>]*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism', '<$1$2=$3&$4>', $Text);
 
 	// sanitizes src attributes (http and redir URLs for displaying in a web page, cid used for inline images in emails)
+	/// @TODO Somewhere in the code static attributes initialized is maybe not always a good idea
 	static $allowed_src_protocols = array('http', 'redir', 'cid');
 	$Text = preg_replace('#<([^>]*?)(src)="(?!' . implode('|', $allowed_src_protocols) . ')(.*?)"(.*?)>#ism',
 			     '<$1$2=""$4 class="invalid-src" title="' . t('Invalid source protocol') . '">', $Text);
@@ -1374,16 +1403,21 @@ function fetch_abstract($text, $addon = "") {
 	$abstracts = array();
 	$addon = strtolower($addon);
 
-	if (preg_match_all("/\[abstract=(.*?)\](.*?)\[\/abstract\]/ism",$text, $results, PREG_SET_ORDER))
-		foreach ($results AS $result)
+	if (preg_match_all("/\[abstract=(.*?)\](.*?)\[\/abstract\]/ism",$text, $results, PREG_SET_ORDER)) {
+		foreach ($results AS $result) {
 			$abstracts[strtolower($result[1])] = $result[2];
+		}
+	}
 
-	if (isset($abstracts[$addon]))
+	if (isset($abstracts[$addon])) {
 		$abstract = $abstracts[$addon];
+	}
 
-	if ($abstract == "")
-		if (preg_match("/\[abstract\](.*?)\[\/abstract\]/ism",$text, $result))
+	if ($abstract == "") {
+		if (preg_match("/\[abstract\](.*?)\[\/abstract\]/ism",$text, $result)) {
 			$abstract = $result[1];
+		}
+	}
 
 	return $abstract;
 }

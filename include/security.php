@@ -281,8 +281,9 @@ function permissions_sql($owner_id, $remote_verified = false, $groups = null) {
 			$gs = '<<>>'; // should be impossible to match
 
 			if (is_array($groups) && count($groups)) {
-				foreach ($groups as $g)
+				foreach ($groups as $g) {
 					$gs .= '|<' . intval($g) . '>';
+				}
 			}
 
 			/*
