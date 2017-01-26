@@ -1149,6 +1149,7 @@ class ostatus {
 			$arr["created"] = $single_conv->published;
 			$arr["edited"] = $single_conv->published;
 			$arr["owner-name"] = $single_conv->actor->displayName;
+
 			if ($arr["owner-name"] == '') {
 				$arr["owner-name"] = $single_conv->actor->contact->displayName;
 			}
@@ -1173,7 +1174,7 @@ class ostatus {
 				$arr["app"] = $single_conv->provider->displayName;
 			} else {
 				$arr["app"] = "OStatus";
-
+			}
 
 			$arr["object"] = json_encode($single_conv);
 			$arr["verb"] = $parent["verb"];
@@ -1183,8 +1184,9 @@ class ostatus {
 
 			// Is it a reshared item?
 			if (isset($single_conv->verb) AND ($single_conv->verb == "share") AND isset($single_conv->object)) {
-				if (is_array($single_conv->object))
+				if (is_array($single_conv->object)) {
 					$single_conv->object = $single_conv->object[0];
+				}
 
 				logger("Found reshared item ".$single_conv->object->id);
 
@@ -1271,7 +1273,7 @@ class ostatus {
 				logger('setting new parent to id '.$newitem);
 				$new_parents = q("SELECT `id`, `uri`, `contact-id`, `type`, `verb`, `visible` FROM `item` WHERE `uid` = %d AND `id` = %d LIMIT 1",
 					intval($uid), intval($newitem));
-				if ($new_parents) {
+				if (dbm::is_result($new_parents)) {
 					$parent = $new_parents[0];
 				}
 			}
@@ -1308,16 +1310,18 @@ class ostatus {
 		$conversation_url = self::convert_href($conversation_url);
 
 		$messages = q("SELECT `uid`, `parent`, `created`, `received`, `guid` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
+
 		if (!dbm::is_result($messages)) {
 			return;
 		}
+
 		$message = $messages[0];
 
 		// Store conversation url if not done before
 		$conversation = q("SELECT `url` FROM `term` WHERE `uid` = %d AND `oid` = %d AND `otype` = %d AND `type` = %d",
 			intval($message["uid"]), intval($itemid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION));
 
-		if (!$conversation) {
+		if (!dbm::is_result($conversation)) {
 			$r = q("INSERT INTO `term` (`uid`, `oid`, `otype`, `type`, `term`, `url`, `created`, `received`, `guid`) VALUES (%d, %d, %d, %d, '%s', '%s', '%s', '%s', '%s')",
 				intval($message["uid"]), intval($itemid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION),
 				dbesc($message["created"]), dbesc($conversation_url), dbesc($message["created"]), dbesc($message["received"]), dbesc($message["guid"]));
