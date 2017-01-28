@@ -770,14 +770,14 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 
 	// Is this item available in the global items (with uid=0)?
 	if ($arr["uid"] == 0) {
-		$arr["global"] = true;
+		$arr["global"] = 1;
 
 		// Set the global flag on all items if this was a global item entry
 		q("UPDATE `item` SET `global` = 1 WHERE `uri` = '%s'", dbesc($arr["uri"]));
 	} else {
 		$isglobal = q("SELECT `global` FROM `item` WHERE `uid` = 0 AND `uri` = '%s'", dbesc($arr["uri"]));
 
-		$arr["global"] = (count($isglobal) > 0);
+		$arr["global"] = (count($isglobal) > 0) ? 1 : 0;
 	}
 
 	// ACL settings
