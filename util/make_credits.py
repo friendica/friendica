@@ -23,7 +23,7 @@ import os, glob, subprocess
 #  not work in some cases.
 dontinclude = ['root', 'friendica', 'bavatar', 'tony baldwin', 'Taek', 'silke m',
                'leberwurscht', 'abinoam', 'fabrixxm', 'FULL NAME', 'Hauke Zuehl',
-               'Michal Supler', 'michal_s', 'Manuel Pérez', 'rabuzarus']
+               'Michal Supler', 'michal_s', 'Manuel Pérez', 'rabuzarus', 'Alberto Díaz']
 
 
 #  this script is in the /util sub-directory of the friendica installation
@@ -32,7 +32,7 @@ dontinclude = ['root', 'friendica', 'bavatar', 'tony baldwin', 'Taek', 'silke m'
 path = os.path.abspath(argv[0].split('util/make_credits.py')[0])
 print('> base directory is assumed to be: '+path)
 #  a place to store contributors
-contributors = ['Andi Stadler']
+contributors = ["Andi Stadler", "Vít Šesták 'v6ak'"]
 #  get the contributors
 print('> getting contributors to the friendica core repository')
 p = subprocess.Popen(['git', 'shortlog', '--no-merges', '-s'],

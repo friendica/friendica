@@ -2,6 +2,7 @@
 Abinoam P. Marques Jr.
 Abrax
 Adam Jurkiewicz
+Alberto Díaz
 Alex
 Alexander Kampmann
 AlfredSK
@@ -13,6 +14,7 @@ André Alves
 André Lohan
 Anthronaut
 Arian - Cazare Muncitori
+Athalbert
 aweiher
 axelt
 balderino
@@ -72,6 +74,7 @@ hauke
 Hauke Altmann
 Hauke Zühl
 Hubert Kościański
+Hypolite Petovan
 Jak
 Jakob
 jensp
@@ -173,6 +176,7 @@ ufic
 Vasudev Kamath
 Vasya Novikov
 vislav
+Vít Šesták 'v6ak'
 Yasen Pramatarov
 ylms
 Zach Prezkuta
