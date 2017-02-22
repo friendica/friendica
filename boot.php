@@ -19,6 +19,8 @@
 
 require_once('include/autoloader.php');
 
+use \Friendica\Core\Config;
+
 require_once('include/config.php');
 require_once('include/network.php');
 require_once('include/plugin.php');
@@ -38,7 +40,7 @@ define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
 define ( 'FRIENDICA_VERSION',      '3.5.1-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1212      );
+define ( 'DB_UPDATE_VERSION',      1214      );
 
 /**
  * @brief Constant with a HTML line break.
@@ -243,6 +245,7 @@ define ( 'NETWORK_STATUSNET',        'stac');    // Statusnet connector
 define ( 'NETWORK_APPNET',           'apdn');    // app.net
 define ( 'NETWORK_NEWS',             'nntp');    // Network News Transfer Protocol
 define ( 'NETWORK_ICALENDAR',        'ical');    // iCalendar
+define ( 'NETWORK_PNUT',             'pnut');    // pnut.io
 define ( 'NETWORK_PHANTOM',          'unkn');    // Place holder
 /** @}*/
 
@@ -272,6 +275,7 @@ $netgroup_ids = array(
 	NETWORK_APPNET    => (-17),
 	NETWORK_NEWS      => (-18),
 	NETWORK_ICALENDAR => (-19),
+	NETWORK_PNUT      => (-20),
 
 	NETWORK_PHANTOM  => (-127),
 );
@@ -426,6 +430,17 @@ define('PRIORITY_LOW',       40);
 define('PRIORITY_NEGLIGIBLE',50);
 /* @}*/
 
+/**
+ * @name Social Relay settings
+ *
+ * See here: https://github.com/jaywink/social-relay
+ * and here: https://wiki.diasporafoundation.org/Relay_servers_for_public_posts
+ * @{
+ */
+define('SR_SCOPE_NONE', '');
+define('SR_SCOPE_ALL',  'all');
+define('SR_SCOPE_TAGS', 'tags');
+/* @}*/
 
 // Normally this constant is defined - but not if "pcntl" isn't installed
 if (!defined("SIGTERM"))
@@ -530,7 +545,6 @@ class App {
 	public	$videoheight = 350;
 	public	$force_max_items = 0;
 	public	$theme_thread_allow = true;
-	public	$theme_richtext_editor = true;
 	public	$theme_events_in_profile = true;
 
 	/**
@@ -571,7 +585,6 @@ class App {
 
 	private $scheme;
 	private $hostname;
-	private $baseurl;
 	private $db;
 
 	private $curl_code;
@@ -799,8 +812,6 @@ class App {
 	 * - Host name is determined either by system.hostname or inferred from request
 	 * - Path is inferred from SCRIPT_NAME
 	 *
-	 * Caches the result (depending on $ssl value) for performance.
-	 *
 	 * Note: $ssl parameter value doesn't directly correlate with the resulting protocol
 	 *
 	 * @param bool $ssl Whether to append http or https under SSL_POLICY_SELFSIGN
@@ -813,40 +824,28 @@ class App {
 			return self::$a->get_baseurl($ssl);
 		}
 
-		// Arbitrary values, the resulting url protocol can be different
-		$cache_index = $ssl ? 'https' : 'http';
-
-		// Cached value found, nothing to process
-		if (isset($this->baseurl[$cache_index])) {
-			return $this->baseurl[$cache_index];
-		}
-
 		$scheme = $this->scheme;
 
-		if ((x($this->config, 'system')) && (x($this->config['system'], 'ssl_policy'))) {
-			if (intval($this->config['system']['ssl_policy']) === SSL_POLICY_FULL) {
+		if (Config::get('system', 'ssl_policy') == SSL_POLICY_FULL) {
+			$scheme = 'https';
+		}
+
+		//	Basically, we have $ssl = true on any links which can only be seen by a logged in user
+		//	(and also the login link). Anything seen by an outsider will have it turned off.
+
+		if (Config::get('system', 'ssl_policy') == SSL_POLICY_SELFSIGN) {
+			if ($ssl) {
 				$scheme = 'https';
-			}
-
-			//	Basically, we have $ssl = true on any links which can only be seen by a logged in user
-			//	(and also the login link). Anything seen by an outsider will have it turned off.
-
-			if ($this->config['system']['ssl_policy'] == SSL_POLICY_SELFSIGN) {
-				if ($ssl) {
-					$scheme = 'https';
-				} else {
-					$scheme = 'http';
-				}
+			} else {
+				$scheme = 'http';
 			}
 		}
 
-		if (get_config('config', 'hostname') != '') {
-			$this->hostname = get_config('config', 'hostname');
+		if (Config::get('config', 'hostname') != '') {
+			$this->hostname = Config::get('config', 'hostname');
 		}
 
-		$this->baseurl[$cache_index] = $scheme . "://" . $this->hostname . ((isset($this->path) && strlen($this->path)) ? '/' . $this->path : '' );
-
-		return $this->baseurl[$cache_index];
+		return $scheme . "://" . $this->hostname . ((isset($this->path) && strlen($this->path)) ? '/' . $this->path : '' );
 	}
 
 	/**
@@ -858,8 +857,6 @@ class App {
 	 */
 	function set_baseurl($url) {
 		$parsed = @parse_url($url);
-
-		$this->baseurl = [];
 
 		if($parsed) {
 			$this->scheme = $parsed['scheme'];
@@ -971,7 +968,6 @@ class App {
 			'$local_user' => local_user(),
 			'$generator' => 'Friendica' . ' ' . FRIENDICA_VERSION,
 			'$delitem' => t('Delete this item?'),
-			'$comment' => t('Comment'),
 			'$showmore' => t('show more'),
 			'$showfewer' => t('show fewer'),
 			'$update_interval' => $interval,
@@ -1391,11 +1387,15 @@ class App {
 			// If the last worker fork was less than 10 seconds before then don't fork another one.
 			// This should prevent the forking of masses of workers.
 			if (get_config("system", "worker")) {
-				if ((time() - get_config("system", "proc_run_started")) < 10)
-					return;
-
+				$cachekey = "app:proc_run:started";
+				$result = Cache::get($cachekey);
+				if (!is_null($result)) {
+					if ((time() - $result) < 10) {
+						return;
+					}
+				}
 				// Set the timestamp of the last proc_run
-				set_config("system", "proc_run_started", time());
+				Cache::set($cachekey, time(), CACHE_MINUTE);
 			}
 
 			$args[0] = ((x($this->config,'php_path')) && (strlen($this->config['php_path'])) ? $this->config['php_path'] : 'php');
@@ -1414,6 +1414,53 @@ class App {
 		else
 			proc_close(proc_open($cmdline." &",array(),$foo,dirname(__FILE__)));
 
+	}
+
+	/**
+	 * @brief Returns the system user that is executing the script
+	 *
+	 * This mostly returns something like "www-data".
+	 *
+	 * @return string system username
+	 */
+	static function systemuser() {
+		if (!function_exists('posix_getpwuid') OR !function_exists('posix_geteuid')) {
+			return '';
+		}
+
+		$processUser = posix_getpwuid(posix_geteuid());
+		return $processUser['name'];
+	}
+
+	/**
+	 * @brief Checks if a given directory is usable for the system
+	 *
+	 * @return boolean the directory is usable
+	 */
+	static function directory_usable($directory) {
+
+		if ($directory == '') {
+			logger("Directory is empty. This shouldn't happen.", LOGGER_DEBUG);
+			return false;
+		}
+
+		if (!file_exists($directory)) {
+			logger('Path "'.$directory.'" does not exist for user '.self::systemuser(), LOGGER_DEBUG);
+			return false;
+		}
+		if (is_file($directory)) {
+			logger('Path "'.$directory.'" is a file for user '.self::systemuser(), LOGGER_DEBUG);
+			return false;
+		}
+		if (!is_dir($directory)) {
+			logger('Path "'.$directory.'" is not a directory for user '.self::systemuser(), LOGGER_DEBUG);
+			return false;
+		}
+		if (!is_writable($directory)) {
+			logger('Path "'.$temppath.'" is not writable for user '.self::systemuser(), LOGGER_DEBUG);
+			return false;
+		}
+		return true;
 	}
 }
 
@@ -1475,9 +1522,7 @@ function system_unavailable() {
 
 function clean_urls() {
 	$a = get_app();
-	//	if($a->config['system']['clean_urls'])
 	return true;
-	//	return false;
 }
 
 function z_path() {
@@ -1540,7 +1585,7 @@ function check_db() {
  * Sets the base url for use in cmdline programs which don't have
  * $_SERVER variables
  */
-function check_url(App &$a) {
+function check_url(App $a) {
 
 	$url = get_config('system','url');
 
@@ -1562,7 +1607,7 @@ function check_url(App &$a) {
 /**
  * @brief Automatic database updates
  */
-function update_db(App &$a) {
+function update_db(App $a) {
 	$build = get_config('system','build');
 	if(! x($build))
 		$build = set_config('system','build',DB_UPDATE_VERSION);
@@ -1571,7 +1616,7 @@ function update_db(App &$a) {
 		$stored = intval($build);
 		$current = intval(DB_UPDATE_VERSION);
 		if($stored < $current) {
-			load_config('database');
+			Config::load('database');
 
 			// We're reporting a different version than what is currently installed.
 			// Run any existing update scripts to bring the database up to current.
@@ -1678,7 +1723,7 @@ function run_update_function($x) {
  * @param App $a
  *
 	 */
-function check_plugins(App &$a) {
+function check_plugins(App $a) {
 
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
 	if (dbm::is_result($r))
@@ -2041,16 +2086,18 @@ function current_theme(){
 //		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
 	$is_mobile = $a->is_mobile || $a->is_tablet;
 
-	$standard_system_theme = ((isset($a->config['system']['theme'])) ? $a->config['system']['theme'] : '');
+	$standard_system_theme = Config::get('system', 'theme', '');
 	$standard_theme_name = ((isset($_SESSION) && x($_SESSION,'theme')) ? $_SESSION['theme'] : $standard_system_theme);
 
-	if($is_mobile) {
-		if(isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
+	if ($is_mobile) {
+		if (isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
 			$system_theme = $standard_system_theme;
 			$theme_name = $standard_theme_name;
-		}
-		else {
-			$system_theme = ((isset($a->config['system']['mobile-theme'])) ? $a->config['system']['mobile-theme'] : $standard_system_theme);
+		} else {
+			$system_theme = Config::get('system', 'mobile-theme', '');
+			if ($system_theme == '') {
+				$system_theme = $standard_system_theme;
+			}
 			$theme_name = ((isset($_SESSION) && x($_SESSION,'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
 
 			if($theme_name === '---') {
@@ -2319,8 +2366,9 @@ function get_itemcachepath() {
 		return "";
 
 	$itemcache = get_config('system','itemcache');
-	if (($itemcache != "") AND is_dir($itemcache) AND is_writable($itemcache))
+	if (($itemcache != "") AND App::directory_usable($itemcache)) {
 		return($itemcache);
+	}
 
 	$temppath = get_temppath();
 
@@ -2330,7 +2378,7 @@ function get_itemcachepath() {
 			mkdir($itemcache);
 		}
 
-		if (is_dir($itemcache) AND is_writable($itemcache)) {
+		if (App::directory_usable($itemcache)) {
 			set_config("system", "itemcache", $itemcache);
 			return($itemcache);
 		}
@@ -2340,20 +2388,22 @@ function get_itemcachepath() {
 
 function get_lockpath() {
 	$lockpath = get_config('system','lockpath');
-	if (($lockpath != "") AND is_dir($lockpath) AND is_writable($lockpath))
+	if (($lockpath != "") AND App::directory_usable($lockpath)) {
 		return($lockpath);
+	}
 
 	$temppath = get_temppath();
 
 	if ($temppath != "") {
 		$lockpath = $temppath."/lock";
 
-		if (!is_dir($lockpath))
+		if (!is_dir($lockpath)) {
 			mkdir($lockpath);
-		elseif (!is_writable($lockpath))
+		} elseif (!App::directory_usable($lockpath)) {
 			$lockpath = $temppath;
+		}
 
-		if (is_dir($lockpath) AND is_writable($lockpath)) {
+		if (App::directory_usable($lockpath)) {
 			set_config("system", "lockpath", $lockpath);
 			return($lockpath);
 		}
@@ -2368,7 +2418,7 @@ function get_lockpath() {
  */
 function get_spoolpath() {
 	$spoolpath = get_config('system','spoolpath');
-	if (($spoolpath != "") AND is_dir($spoolpath) AND is_writable($spoolpath)) {
+	if (($spoolpath != "") AND App::directory_usable($spoolpath)) {
 		return($spoolpath);
 	}
 
@@ -2379,11 +2429,11 @@ function get_spoolpath() {
 
 		if (!is_dir($spoolpath)) {
 			mkdir($spoolpath);
-		} elseif (!is_writable($spoolpath)) {
+		} elseif (!App::directory_usable($spoolpath)) {
 			$spoolpath = $temppath;
 		}
 
-		if (is_dir($spoolpath) AND is_writable($spoolpath)) {
+		if (App::directory_usable($spoolpath)) {
 			set_config("system", "spoolpath", $spoolpath);
 			return($spoolpath);
 		}
@@ -2395,16 +2445,18 @@ function get_temppath() {
 	$a = get_app();
 
 	$temppath = get_config("system","temppath");
-	if (($temppath != "") AND is_dir($temppath) AND is_writable($temppath))
+
+	if (($temppath != "") AND App::directory_usable($temppath)) {
 		return($temppath);
+	}
 
 	$temppath = sys_get_temp_dir();
-	if (($temppath != "") AND is_dir($temppath) AND is_writable($temppath)) {
+	if (($temppath != "") AND App::directory_usable($temppath)) {
 		$temppath .= "/".$a->get_hostname();
 		if (!is_dir($temppath))
 			mkdir($temppath);
 
-		if (is_dir($temppath) AND is_writable($temppath)) {
+		if (App::directory_usable($temppath)) {
 			set_config("system", "temppath", $temppath);
 			return($temppath);
 		}
@@ -2414,7 +2466,7 @@ function get_temppath() {
 }
 
 /// @deprecated
-function set_template_engine(App &$a, $engine = 'internal') {
+function set_template_engine(App $a, $engine = 'internal') {
 /// @note This function is no longer necessary, but keep it as a wrapper to the class method
 /// to avoid breaking themes again unnecessarily
 

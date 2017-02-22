@@ -1,5 +1,6 @@
 <?php
 
+require_once('include/Probe.php');
 
 // Included here for completeness, but this is a very dangerous operation.
 // It is the caller's responsibility to confirm the requestor's intent and
@@ -60,14 +61,16 @@ function user_remove($uid) {
 
 function contact_remove($id) {
 
-	$r = q("select uid from contact where id = %d limit 1",
+	// We want just to make sure that we don't delete our "self" contact
+	$r = q("SELECT `uid` FROM `contact` WHERE `id` = %d AND NOT `self` LIMIT 1",
 		intval($id)
 	);
-	if((! dbm::is_result($r)) || (! intval($r[0]['uid'])))
+	if (!dbm::is_result($r) || !intval($r[0]['uid'])) {
 		return;
+	}
 
 	$archive = get_pconfig($r[0]['uid'], 'system','archive_removed_contacts');
-	if($archive) {
+	if ($archive) {
 		q("update contact set `archive` = 1, `network` = 'none', `writable` = 0 where id = %d",
 			intval($id)
 		);
@@ -310,6 +313,54 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 	}
 
 	$cache[$url][$uid] = $profile;
+
+	return $profile;
+}
+
+/**
+ * @brief Get contact data for a given address
+ *
+ * The function looks at several places (contact table and gcontact table) for the contact
+ *
+ * @param string $addr The profile link
+ * @param int $uid User id
+ *
+ * @return array Contact data
+ */
+function get_contact_details_by_addr($addr, $uid = -1) {
+	static $cache = array();
+
+	if ($uid == -1) {
+		$uid = local_user();
+	}
+
+	// Fetch contact data from the contact table for the given user
+	$r = q("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
+		FROM `contact` WHERE `addr` = '%s' AND `uid` = %d",
+			dbesc($addr), intval($uid));
+
+	// Fetch the data from the contact table with "uid=0" (which is filled automatically)
+	if (!dbm::is_result($r))
+		$r = q("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
+			FROM `contact` WHERE `addr` = '%s' AND `uid` = 0",
+				dbesc($addr));
+
+	// Fetch the data from the gcontact table
+	if (!dbm::is_result($r))
+		$r = q("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
+			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
+			FROM `gcontact` WHERE `addr` = '%s'",
+				dbesc($addr));
+
+	if (!dbm::is_result($r)) {
+		$data = Probe::uri($addr);
+
+		$profile = get_contact_details_by_url($data['url'], $uid);
+	} else {
+		$profile = $r[0];
+	}
 
 	return $profile;
 }
@@ -571,7 +622,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
 	}
 
 	if ((count($contact) > 1) AND ($uid == 0) AND ($contactid != 0) AND ($url != ""))
-		q("DELETE FROM `contact` WHERE `nurl` = '%s' AND `id` != %d",
+		q("DELETE FROM `contact` WHERE `nurl` = '%s' AND `id` != %d AND NOT `self`",
 			dbesc(normalise_link($url)),
 			intval($contactid));
 
@@ -612,7 +663,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
  *
  * @return string posts in HTML
  */
-function posts_from_gcontact($a, $gcontact_id) {
+function posts_from_gcontact(App $a, $gcontact_id) {
 
 	require_once('include/conversation.php');
 
@@ -664,7 +715,7 @@ function posts_from_gcontact($a, $gcontact_id) {
  *
  * @return string posts in HTML
  */
-function posts_from_contact_url($a, $contact_url) {
+function posts_from_contact_url(App $a, $contact_url) {
 
 	require_once('include/conversation.php');
 
@@ -677,6 +728,10 @@ function posts_from_contact_url($a, $contact_url) {
 		$sql = "(`item`.`uid` = 0 OR (`item`.`uid` = %d AND `item`.`private`))";
 	} else {
 		$sql = "`item`.`uid` = %d";
+	}
+
+	if (!dbm::is_result($r)) {
+		return '';
 	}
 
 	$author_id = intval($r[0]["author-id"]);

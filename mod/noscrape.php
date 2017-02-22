@@ -1,6 +1,6 @@
 <?php
 
-function noscrape_init(App &$a) {
+function noscrape_init(App $a) {
 
 	if($a->argc > 1)
 		$which = $a->argv[1];

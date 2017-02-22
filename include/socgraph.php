@@ -1529,7 +1529,7 @@ function get_gcontact_id($contact) {
 	if (in_array($contact["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS)))
 		$contact["url"] = clean_contact_url($contact["url"]);
 
-	$r = q("SELECT `id`, `last_contact`, `last_failure`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 2",
+	$r = q("SELECT `id`, `last_contact`, `last_failure`, `network` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 2",
 		dbesc(normalise_link($contact["url"])));
 
 	if ($r) {

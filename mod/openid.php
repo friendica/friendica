@@ -4,7 +4,7 @@
 require_once('library/openid.php');
 
 
-function openid_content(App &$a) {
+function openid_content(App $a) {
 
 	$noid = get_config('system','no_openid');
 	if($noid)
@@ -47,7 +47,7 @@ function openid_content(App &$a) {
 				require_once('include/security.php');
 				authenticate_success($r[0],true,true);
 
-				// just in case there was no return url set 
+				// just in case there was no return url set
 				// and we fell through
 
 				goaway(z_root());

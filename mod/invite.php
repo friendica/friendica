@@ -9,7 +9,7 @@
 
 require_once('include/email.php');
 
-function invite_post(App &$a) {
+function invite_post(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -73,8 +73,8 @@ function invite_post(App &$a) {
 			$nmessage = $message;
 		}
 
-		$res = mail($recip, email_header_encode( t('Please join us on Friendica'),'UTF-8'), 
-			$nmessage, 
+		$res = mail($recip, email_header_encode( t('Please join us on Friendica'),'UTF-8'),
+			$nmessage,
 			"From: " . $a->user['email'] . "\n"
 			. 'Content-type: text/plain; charset=UTF-8' . "\n"
 			. 'Content-transfer-encoding: 8bit' );
@@ -97,7 +97,7 @@ function invite_post(App &$a) {
 }
 
 
-function invite_content(App &$a) {
+function invite_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -136,7 +136,7 @@ function invite_content(App &$a) {
 		'$msg_text'            => t('Your message:'),
 		'$default_message'     => t('You are cordially invited to join me and other close friends on Friendica - and help us to create a better social web.') . "\r\n" . "\r\n"
 			. $linktxt
-			. "\r\n" . "\r\n" . (($invonly) ? t('You will need to supply this invitation code: $invite_code') . "\r\n" . "\r\n" : '') .t('Once you have registered, please connect with me via my profile page at:') 
+			. "\r\n" . "\r\n" . (($invonly) ? t('You will need to supply this invitation code: $invite_code') . "\r\n" . "\r\n" : '') .t('Once you have registered, please connect with me via my profile page at:')
 			. "\r\n" . "\r\n" . App::get_baseurl() . '/profile/' . $a->user['nickname']
 			. "\r\n" . "\r\n" . t('For more information about the Friendica project and why we feel it is important, please visit http://friendica.com') . "\r\n" . "\r\n"  ,
 		'$submit'              => t('Submit')

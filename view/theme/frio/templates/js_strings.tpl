@@ -8,7 +8,6 @@ They are loaded into the html <head> so that js functions can use them *}}
 	var localUser = {{if $local_user}}{{$local_user}}{{else}}false{{/if}};
 	var aStr = {
 		'delitem'     : "{{$delitem}}",
-		'comment'     : "{{$comment}}"
 	};
 
 	{{* Create an object with the data which is needed for infinite scroll.

@@ -64,7 +64,7 @@ you wish to communicate with the Diaspora network.
 password, database name).
 
     - Friendica needs the permission to create and delete fields and tables in its own database.
-
+    - Please check the additional notes if running on MySQ 5.7.17 or newer
 
 4. If you know in advance that it will be impossible for the web server to 
 write or create files in your web directory, create an empty file called 
@@ -291,3 +291,21 @@ This is obvious as soon as you notice that the friendica-cron uses proc_open to
 execute php-scripts that also use proc_open, but it took me quite some time to
 find that out. I hope this saves some time for other people using suhosin with
 function blacklists.
+
+########################################################################
+Unable to create all mysql tables on MySQL 5.7.17 or newer
+#######################################################################
+
+If the setup fails to create all the database tables and/or manual
+creation from the command line fails, with this error: 
+
+ERROR 1067 (42000) at line XX: Invalid default value for 'created' 
+
+You need to adjust your my.cnf and add the following setting under 
+the [mysqld] section : 
+
+sql_mode = '';
+
+After that, restart mysql and try again. 
+
+

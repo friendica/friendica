@@ -66,6 +66,9 @@ function unavailable_networks() {
 	if (!get_config("system","diaspora_enabled"))
 		$networks[] = NETWORK_DIASPORA;
 
+	if (!plugin_enabled("pnut"))
+		$networks[] = NETWORK_PNUT;
+
 	if (!sizeof($networks))
 		return "";
 
@@ -90,7 +93,7 @@ function networks_widget($baseurl,$selected = '') {
 
 	$extra_sql = unavailable_networks();
 
-	$r = q("SELECT DISTINCT(`network`) FROM `contact` WHERE `uid` = %d AND NOT `self` $extra_sql ORDER BY `network`",
+	$r = q("SELECT DISTINCT(`network`) FROM `contact` WHERE `uid` = %d AND `network` != '' $extra_sql ORDER BY `network`",
 		intval(local_user())
 	);
 

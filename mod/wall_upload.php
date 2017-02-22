@@ -2,7 +2,7 @@
 
 require_once('include/Photo.php');
 
-function wall_upload_post(&$a, $desktopmode = true) {
+function wall_upload_post(App $a, $desktopmode = true) {
 
 	logger("wall upload: starting new upload", LOGGER_DEBUG);
 
@@ -277,16 +277,10 @@ function wall_upload_post(&$a, $desktopmode = true) {
 
 /* mod Waitman Gobble NO WARRANTY */
 
-//if we get the signal then return the image url info in BBCODE, otherwise this outputs the info and bails (for the ajax image uploader on wall post)
+	// if we get the signal then return the image url info in BBCODE
 	if ($_REQUEST['hush']!='yeah') {
-		if(local_user() && (! feature_enabled(local_user(),'richtext') || x($_REQUEST['nomce'])) ) {
-			echo  "\n\n" . '[url=' . App::get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . App::get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]\n\n";
-		}
-		else {
-			echo  '<br /><br /><a href="' . App::get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '" ><img src="' . App::get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."\" alt=\"$basename\" /></a><br /><br />";
-		}
-	}
-	else {
+		echo  "\n\n" . '[url=' . App::get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . App::get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]\n\n";
+	} else {
 		$m = '[url='.App::get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash.'][img]'.App::get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]";
 		return($m);
 	}

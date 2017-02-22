@@ -3,6 +3,9 @@
  * @file include/remove_contact.php
  * @brief Removes orphaned data from deleted contacts
  */
+
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 
 function remove_contact_run($argv, $argc) {
@@ -19,8 +22,7 @@ function remove_contact_run($argv, $argc) {
 		unset($db_host, $db_user, $db_pass, $db_data);
 	}
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	if ($argc != 2) {
 		return;

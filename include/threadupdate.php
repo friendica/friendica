@@ -1,4 +1,7 @@
 <?php
+
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once("include/threads.php");
 
@@ -14,8 +17,7 @@ if(is_null($db)) {
 	unset($db_host, $db_user, $db_pass, $db_data);
 }
 
-load_config('config');
-load_config('system');
+Config::load();
 
 update_threads();
 update_threads_mention();

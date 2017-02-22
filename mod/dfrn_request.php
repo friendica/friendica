@@ -145,9 +145,7 @@ function dfrn_request_post(App $a) {
 					$photo = $parms["photo"];
 
 					// Escape the entire array
-
-					dbesc_array($parms);
-
+					dbm::esc_array($parms);
 
 					/*
 					 * Create a contact record on our site for the other person
@@ -303,7 +301,7 @@ function dfrn_request_post(App $a) {
 		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				if(! $rr['rel']) {
-					q("DELETE FROM `contact` WHERE `id` = %d",
+					q("DELETE FROM `contact` WHERE `id` = %d AND NOT `self`",
 						intval($rr['cid'])
 					);
 				}
@@ -328,7 +326,7 @@ function dfrn_request_post(App $a) {
 		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				if(! $rr['rel']) {
-					q("DELETE FROM `contact` WHERE `id` = %d",
+					q("DELETE FROM `contact` WHERE `id` = %d AND NOT `self`",
 						intval($rr['cid'])
 					);
 				}
@@ -547,7 +545,7 @@ function dfrn_request_post(App $a) {
 				$parms['issued-id'] = $issued_id;
 				$photo = $parms["photo"];
 
-				dbesc_array($parms);
+				dbm::esc_array($parms);
 				$r = q("INSERT INTO `contact` ( `uid`, `created`, `url`, `nurl`, `addr`, `name`, `nick`, `issued-id`, `photo`, `site-pubkey`,
 					`request`, `confirm`, `notify`, `poll`, `poco`, `network`, `blocked`, `pending` )
 					VALUES ( %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d )",

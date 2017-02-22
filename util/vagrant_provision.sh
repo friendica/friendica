@@ -51,7 +51,7 @@ if [ $( lsb_release -c | cut -f 2 ) == "trusty" ]; then
     sudo service apache2 restart
 elif [ $( lsb_release -c | cut -f 2 ) == "xenial" ]; then
     echo ">>> Installing PHP7"
-    sudo apt-get install -y php libapache2-mod-php php-cli php-mysql php-curl php-gd
+    sudo apt-get install -y php libapache2-mod-php php-cli php-mysql php-curl php-gd php-mbstring
     sudo apt-get install -y imagemagick
     sudo apt-get install -y php-imagick
     sudo systemctl restart apache2

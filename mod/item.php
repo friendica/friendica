@@ -27,7 +27,7 @@ require_once('include/Scrape.php');
 require_once('include/diaspora.php');
 require_once('include/Contact.php');
 
-function item_post(App &$a) {
+function item_post(App $a) {
 
 	if((! local_user()) && (! remote_user()) && (! x($_REQUEST,'commenter')))
 		return;
@@ -352,20 +352,6 @@ function item_post(App &$a) {
 		// append the fileas stuff to the new categories list
 		$categories .= file_tag_list_to_file($filedas, 'file');
 	}
-
-	// Work around doubled linefeeds in Tinymce 3.5b2
-	// First figure out if it's a status post that would've been
-	// created using tinymce. Otherwise leave it alone.
-
-/*	$plaintext = (local_user() ? intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled($profile_uid,'richtext') : 0);
-	if((! $parent) && (! $api_source) && (! $plaintext)) {
-		$body = fix_mce_lf($body);
-	}*/
-	$plaintext = (local_user() ? !feature_enabled($profile_uid,'richtext') : 0);
-	if((! $parent) && (! $api_source) && (! $plaintext)) {
-		$body = fix_mce_lf($body);
-	}
-
 
 	// get contact info for poster
 
@@ -1066,7 +1052,7 @@ function item_post_return($baseurl, $api_source, $return_path) {
 
 
 
-function item_content(App &$a) {
+function item_content(App $a) {
 
 	if ((! local_user()) && (! remote_user())) {
 		return;

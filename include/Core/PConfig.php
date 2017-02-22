@@ -18,6 +18,8 @@ use dbm;
  */
 class PConfig {
 
+	private static $in_db;
+
 	/**
 	 * @brief Loads all configuration values of a user's config family into a cached storage.
 	 *
@@ -40,6 +42,7 @@ class PConfig {
 			foreach ($r as $rr) {
 				$k = $rr['k'];
 				$a->config[$uid][$family][$k] = $rr['v'];
+				self::$in_db[$uid][$family][$k] = true;
 			}
 		} else if ($family != 'config') {
 			// Negative caching
@@ -95,12 +98,15 @@ class PConfig {
 		if (count($ret)) {
 			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
 			$a->config[$uid][$family][$key] = $val;
+			self::$in_db[$uid][$family][$key] = true;
 
 			return $val;
 		} else {
 			$a->config[$uid][$family][$key] = '!<unset>!';
+			self::$in_db[$uid][$family][$key] = false;
+
+			return $default_value;
 		}
-		return $default_value;
 	}
 
 	/**
@@ -125,18 +131,23 @@ class PConfig {
 
 		$a = get_app();
 
-		$stored = self::get($uid, $family, $key);
+		// We store our setting values in a string variable.
+		// So we have to do the conversion here so that the compare below works.
+		// The exception are array values.
+		$dbvalue = (!is_array($value) ? (string)$value : $value);
 
-		if ($stored == $value) {
+		$stored = self::get($uid, $family, $key, null, true);
+
+		if (($stored === $dbvalue) AND self::$in_db[$uid][$family][$key]) {
 			return true;
 		}
 
+		$a->config[$uid][$family][$key] = $dbvalue;
+
 		// manage array value
-		$dbvalue = (is_array($value) ? serialize($value):$value);
+		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
 
-		$a->config[$uid][$family][$key] = $value;
-
-                if (is_null($stored)) {
+		if (is_null($stored) OR !self::$in_db[$uid][$family][$key]) {
 			$ret = q("INSERT INTO `pconfig` (`uid`, `cat`, `k`, `v`) VALUES (%d, '%s', '%s', '%s') ON DUPLICATE KEY UPDATE `v` = '%s'",
 				intval($uid),
 				dbesc($family),
@@ -154,6 +165,7 @@ class PConfig {
 		}
 
 		if ($ret) {
+			self::$in_db[$uid][$family][$key] = true;
 			return $value;
 		}
 		return $ret;
@@ -178,6 +190,7 @@ class PConfig {
 
 		if (x($a->config[$uid][$family], $key)) {
 			unset($a->config[$uid][$family][$key]);
+			unset(self::$in_db[$uid][$family][$key]);
 		}
 
 		$ret = q("DELETE FROM `pconfig` WHERE `uid` = %d AND `cat` = '%s' AND `k` = '%s'",

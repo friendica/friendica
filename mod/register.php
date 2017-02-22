@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/user.php');
 
 if(! function_exists('register_post')) {
-function register_post(App &$a) {
+function register_post(App $a) {
 
 	global $lang;
 
@@ -172,7 +172,7 @@ function register_post(App &$a) {
 
 
 if(! function_exists('register_content')) {
-function register_content(App &$a) {
+function register_content(App $a) {
 
 	// logged in users can register others (people/pages/groups)
 	// even with closed registrations, unless specifically prohibited by site policy.

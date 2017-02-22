@@ -1,7 +1,7 @@
-<style> 
+<style>
 figure { border: 4px #eeeeee solid; }
 figure img { padding: 2px; }
-figure figcaption { background: #eeeeee; color: #444444; padding: 2px; font-style: italic;} 
+figure figcaption { background: #eeeeee; color: #444444; padding: 2px; font-style: italic;}
 </style>
 
 Creating posts
@@ -9,7 +9,7 @@ Creating posts
 
 * [Home](help)
 
-Here you can find an overview of the different ways to create and edit your post. 
+Here you can find an overview of the different ways to create and edit your post.
 
 One click on "Share" text box on top of your Home or Network page, and the post editor shows up:
 
@@ -42,7 +42,7 @@ The icons under the text area are there to help you to write posts quickly:
 <img src="doc/img/video.png" width="32" height="32" alt="video" align="left"> Add a video. Enter the url to a video (ogg) or to a video page on youtube or vimeo, and it will be embedded in your post with a preview. Friendica is using [HTML5](http://en.wikipedia.org/wiki/HTML5_video) for embedding content. Therefore, the supported files are depending on your browser and operating system (OS). Some filetypes are WebM, MP4 and OGG.*
 <p style="clear:both;"></p>
 
-<img src="doc/img/mic.png" width="32" height="32" alt="mic" align="left" style="padding-bottom: 20px;"> Add an audio. Same as video, but for audio. Depending on your browser and operation system MP3, OGG and AAC are supported. Additionally, you are able to add URLs from audiohosters like Soundcloud. 
+<img src="doc/img/mic.png" width="32" height="32" alt="mic" align="left" style="padding-bottom: 20px;"> Add an audio. Same as video, but for audio. Depending on your browser and operation system MP3, OGG and AAC are supported. Additionally, you are able to add URLs from audiohosters like Soundcloud.
 
 <p style="clear:both;"></p>
 
@@ -88,7 +88,7 @@ Click on "show" under contact name to hide the post to everyone but selected.
 
 Click on "Visible to everybody" to make the post public again.
 
-If you have defined some groups, you can check "show" for groups also. All contact in that group will see the post. 
+If you have defined some groups, you can check "show" for groups also. All contact in that group will see the post.
 If you want to hide the post to one contact of a group selected for "show", click "don't show" under contact name.
 
 Click again on "show" or "don't show" to switch it off.
@@ -96,18 +96,3 @@ Click again on "show" or "don't show" to switch it off.
 You can search for contacts or groups with the search box.
 
 See also [Group and Privacy](help/Groups-and-Privacy)
-
-
-
-WYSIAWYG (What You See Is About What You Get)
---------------------------------------------------
-
-Friendica can use TinyMCE as rich text editor. This way you can write beatifull post without the need to know [BBCode](help/BBCode).
-
-By default, rich editor is disabled. You can enable it from Settings -> [Aditional features](settings/features) page, turn on Richtext Editor and click "Submit".
-
-<figure>
-<img src="doc/img/friendica_rich_editor.png" alt="default editor">
-<figcaption>Rich editor, with default Friendica theme (duepuntozero)</figcaption>
-</figure>
-

@@ -1719,7 +1719,14 @@ img.acpopup-img {
 
 }
 /* Menubar Tabs */
+section > .tabbar-wrapper {
+/* The tabbar shouldn't' be visibile inside
+the section element. Only after we have
+moved it to the nav through js */
+    display: none !important;
+}
 #tabmenu,
+.tabbar-wrapper,
 .tabbar,
 .tabbar > li {
     height: 100%;

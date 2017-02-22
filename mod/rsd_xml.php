@@ -2,7 +2,7 @@
 
 
 
-function rsd_xml_content(App &$a) {
+function rsd_xml_content(App $a) {
 	header ("Content-Type: text/xml");
 	echo '<?xml version="1.0" encoding="UTF-8"?>
  <rsd version="1.0" xmlns="http://archipelago.phrasewise.com/rsd">

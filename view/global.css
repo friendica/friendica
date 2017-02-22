@@ -117,6 +117,10 @@ span.connector {
   position: relative;
 }
 
+.embed_video.active {
+  float: none;
+}
+
 .embed_rich {
   display: block;
   transition: height .75s;

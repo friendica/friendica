@@ -12,24 +12,23 @@ require_once('include/Photo.php');
  */
 function fbrowser_content(App $a) {
 
-	if (!local_user())
+	if (!local_user()) {
 		killme();
+	}
 
-	if ($a->argc==1)
+	if ($a->argc == 1) {
 		killme();
+	}
 
 	$template_file = "filebrowser.tpl";
 	$mode = "";
 	if (x($_GET,'mode')) {
-		$template_file = "filebrowser_plain.tpl";
 		$mode  = "?mode=".$_GET['mode'];
 	}
 
-	//echo "<pre>"; var_dump($a->argv); killme();
-
-	switch($a->argv[1]){
+	switch ($a->argv[1]) {
 		case "image":
-			$path = array( array("", t("Photos")));
+			$path = array(array("", t("Photos")));
 			$albums = false;
 			$sql_extra = "";
 			$sql_extra2 = " ORDER BY created DESC LIMIT 0, 10";

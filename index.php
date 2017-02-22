@@ -13,6 +13,8 @@
  *
  */
 
+use \Friendica\Core\Config;
+
 require_once('boot.php');
 require_once('object/BaseObject.php');
 
@@ -54,8 +56,7 @@ if(!$install) {
 	 * Load configs from db. Overwrite configs from .htconfig.php
 	 */
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	if ($a->max_processes_reached() OR $a->maxload_reached()) {
 		header($_SERVER["SERVER_PROTOCOL"].' 503 Service Temporarily Unavailable');

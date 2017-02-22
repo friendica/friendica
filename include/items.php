@@ -820,7 +820,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	// Store the unescaped version
 	$unescaped = $arr;
 
-	dbesc_array($arr);
+	dbm::esc_array($arr, true);
 
 	logger('item_store: ' . print_r($arr,true), LOGGER_DATA);
 
@@ -829,9 +829,9 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 
 	$r = dbq("INSERT INTO `item` (`"
 			. implode("`, `", array_keys($arr))
-			. "`) VALUES ('"
-			. implode("', '", array_values($arr))
-			. "')");
+			. "`) VALUES ("
+			. implode(", ", array_values($arr))
+			. ")");
 
 	// And restore it
 	$arr = $unescaped;

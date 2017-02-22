@@ -2,10 +2,10 @@
  * @brief Friendica people autocomplete
  *
  * require jQuery, jquery.textcomplete
- * 
+ *
  * for further documentation look at:
  * http://yuku-t.com/jquery-textcomplete/
- * 
+ *
  * https://github.com/yuku-t/jquery-textcomplete/blob/master/doc/how_to_use.md
  */
 
@@ -91,7 +91,7 @@ function editor_replace(item) {
 
 	// 16 chars of hash should be enough. Full hash could be used if it can be done in a visually appealing way.
 	// 16 chars is also the minimum length in the backend (otherwise it's interpreted as a local id).
-	if(id.length > 16) 
+	if(id.length > 16)
 		id = item.id.substring(0,16);
 
 	return '$1$2' + item.nick.replace(' ', '') + '+' + id + ' ';
@@ -347,61 +347,38 @@ function string2bb(element) {
 })( jQuery );
 
 /**
- * Friendica people autocomplete legacy
- * code which is needed for tinymce
+ * Friendica people autocomplete legacy code
  *
  * require jQuery, jquery.textareas
  */
-
-function ACPopup(elm,backend_url){
-	this.idsel=-1;
+function ACPopup(elm, backend_url){
+	this.idsel = -1;
 	this.element = elm;
-	this.searchText="";
-	this.ready=true;
+	this.searchText = '';
+	this.ready = true;
 	this.kp_timer = false;
 	this.url = backend_url;
 
 	this.conversation_id = null;
 	var conv_id = this.element.id.match(/\d+$/);
-	if (conv_id) this.conversation_id = conv_id[0];
-	console.log("ACPopup elm id",this.element.id,"conversation",this.conversation_id);
-
-	var w = 530;
-	var h = 130;
-
-
-	if(tinyMCE.activeEditor == null) {
-		style = $(elm).offset();
-		w = $(elm).width();
-		h = $(elm).height();
-	}
-	else {
-		// I can't find an "official" way to get the element who get all
-		// this fraking thing that is tinyMCE.
-		// This code will broke again at some point...
-		var container = $(tinyMCE.activeEditor.getContainer()).find("table");
-		style = $(container).offset();
-		w = $(container).width();
-		h = $(container).height();
+	if (conv_id) {
+		this.conversation_id = conv_id[0];
 	}
 
-	style.top=style.top+h;
+	var w = $(elm).width();
+	var h = $(elm).height();
+
+	var style = $(elm).offset();
+	style.top = style.top + h;
 	style.width = w;
 	style.position = 'absolute';
-	/*	style['max-height'] = '150px';
-		style.border = '1px solid red';
-		style.background = '#cccccc';
-
-		style.overflow = 'auto';
-		style['z-index'] = '100000';
-	*/
 	style.display = 'none';
 
-	this.cont = $("<div class='acpopup-mce'></div>");
+	this.cont = $('<div class="acpopup-mce"></div>');
 	this.cont.css(style);
 
-	$("body").append(this.cont);
-    }
+	$('body').append(this.cont);
+}
 
 ACPopup.prototype.close = function(){
 	$(this.cont).remove();
@@ -449,48 +426,42 @@ ACPopup.prototype._search = function(){
 }
 
 ACPopup.prototype.add = function(label, value){
-	var that=this;
-	var elm = $("<div class='acpopupitem' title='"+value+"'>"+label+"</div>");
+	var that = this;
+	var elm = $('<div class="acpopupitem" title="' + value + '">' + label + '</div>');
 	elm.click(function(e){
-		t = $(this).attr('title').replace(new RegExp(' \- .*'),'');
-		if(typeof(that.element.container) === "undefined") {
-			el=$(that.element);
-			sel = el.getSelection();
-			sel.start = sel.start- that.searchText.length;
-			el.setSelection(sel.start,sel.end).replaceSelectedText(t+' ').collapseSelection(false);
-			that.close();
-		}
-		else {
-			txt = tinyMCE.activeEditor.getContent();
-			//			alert(that.searchText + ':' + t);
-			newtxt = txt.replace('@' + that.searchText,'@' + t +' ');
-			tinyMCE.activeEditor.setContent(newtxt);
-			tinyMCE.activeEditor.focus();
-			that.close();
-		}
+		t = $(this).attr('title').replace(new RegExp(' \- .*'), '');
+		el = $(that.element);
+		sel = el.getSelection();
+		sel.start = sel.start - that.searchText.length;
+		el.setSelection(sel.start, sel.end).replaceSelectedText(t + ' ').collapseSelection(false);
+		that.close();
 	});
 	$(this.cont).append(elm);
 }
 
 ACPopup.prototype.onkey = function(event){
 	if (event.keyCode == '13') {
-		if(this.idsel>-1) {
+		if(this.idsel > -1) {
 			this.cont.children()[this.idsel].click();
 			event.preventDefault();
-		}
-		else
+		} else {
 			this.close();
+		}
 	}
 	if (event.keyCode == '38') { //cursor up
-		cmax = this.cont.children().size()-1;
+		var cmax = this.cont.children().size() - 1;
 		this.idsel--;
-		if (this.idsel<0) this.idsel=cmax;
+		if (this.idsel < 0) {
+			this.idsel = cmax;
+		}
 		event.preventDefault();
 	}
 	if (event.keyCode == '40' || event.keyCode == '9') { //cursor down
-		cmax = this.cont.children().size()-1;
+		var cmax = this.cont.children().size() - 1;
 		this.idsel++;
-		if (this.idsel>cmax) this.idsel=0;
+		if (this.idsel > cmax) {
+			this.idsel = 0;
+		}
 		event.preventDefault();
 	}
 

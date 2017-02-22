@@ -67,10 +67,6 @@ function cal_init(App $a) {
 function cal_content(App $a) {
 	nav_set_selected('events');
 
-	$editselect = 'none';
-	if( feature_enabled(local_user(), 'richtext') )
-		$editselect = 'textareas';
-
 	// First day of the week (0 = Sunday)
 	$firstDay = get_pconfig(local_user(),'system','first_day_of_week');
 	if ($firstDay === false) $firstDay=0;
@@ -84,13 +80,11 @@ function cal_content(App $a) {
 		'$module_url' => '/cal/' . $a->data['user']['nickname'],
 		'$modparams' => 2,
 		'$i18n' => $i18n,
-		'$editselect' => $editselect
 	));
 
 	$etpl = get_markup_template('event_end.tpl');
 	$a->page['end'] .= replace_macros($etpl,array(
 		'$baseurl' => App::get_baseurl(),
-		'$editselect' => $editselect
 	));
 
 	$o ="";
@@ -275,7 +269,7 @@ function cal_content(App $a) {
 			'$tabs'		=> $tabs,
 			'$title'	=> t('Events'),
 			'$view'		=> t('View'),
-			'$previus'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
+			'$previous'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
 			'$next'		=> array(App::get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
 			'$calendar' => cal($y,$m,$links, ' eventcal'),
 

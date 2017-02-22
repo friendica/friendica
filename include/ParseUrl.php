@@ -21,13 +21,13 @@ class ParseUrl {
 
 	/**
 	 * @brief Search for chached embeddable data of an url otherwise fetch it
-	 * 
+	 *
 	 * @param type $url The url of the page which should be scraped
 	 * @param type $no_guessing If true the parse doens't search for
 	 *    preview pictures
 	 * @param type $do_oembed The false option is used by the function fetch_oembed()
 	 *    to avoid endless loops
-	 * 
+	 *
 	 * @return array which contains needed data for embedding
 	 *    string 'url' => The url of the parsed page
 	 *    string 'type' => Content type
@@ -37,9 +37,9 @@ class ParseUrl {
 	 *                if $no_geuessing = false
 	 *    array'images' = Array of preview pictures
 	 *    string 'keywords' => The tags which belong to the content
-	 * 
+	 *
 	 * @see ParseUrl::getSiteinfo() for more information about scraping
-	 * embeddable content 
+	 * embeddable content
 	 */
 	public static function getSiteinfoCached($url, $no_guessing = false, $do_oembed = true) {
 
@@ -71,21 +71,21 @@ class ParseUrl {
 	}
 	/**
 	 * @brief Parse a page for embeddable content information
-	 * 
+	 *
 	 * This method parses to url for meta data which can be used to embed
 	 * the content. If available it prioritizes Open Graph meta tags.
 	 * If this is not available it uses the twitter cards meta tags.
 	 * As fallback it uses standard html elements with meta informations
 	 * like \<title\>Awesome Title\</title\> or
 	 * \<meta name="description" content="An awesome description"\>
-	 * 
+	 *
 	 * @param type $url The url of the page which should be scraped
 	 * @param type $no_guessing If true the parse doens't search for
 	 *    preview pictures
 	 * @param type $do_oembed The false option is used by the function fetch_oembed()
 	 *    to avoid endless loops
 	 * @param type $count Internal counter to avoid endless loops
-	 * 
+	 *
 	 * @return array which contains needed data for embedding
 	 *    string 'url' => The url of the parsed page
 	 *    string 'type' => Content type
@@ -95,13 +95,13 @@ class ParseUrl {
 	 *                if $no_geuessing = false
 	 *    array'images' = Array of preview pictures
 	 *    string 'keywords' => The tags which belong to the content
-	 * 
+	 *
 	 * @todo https://developers.google.com/+/plugins/snippet/
 	 * @verbatim
 	 * <meta itemprop="name" content="Awesome title">
 	 * <meta itemprop="description" content="An awesome description">
 	 * <meta itemprop="image" content="http://maple.libertreeproject.org/images/tree-icon.png">
-	 * 
+	 *
 	 * <body itemscope itemtype="http://schema.org/Product">
 	 *   <h1 itemprop="name">Shiny Trinket</h1>
 	 *   <img itemprop="image" src="{image-url}" />
@@ -130,7 +130,7 @@ class ParseUrl {
 		$url = trim($url, "'");
 		$url = trim($url, '"');
 
-		$url = original_url($url);
+		$url = strip_tracking_query_params($url);
 
 		$siteinfo["url"] = $url;
 		$siteinfo["type"] = "link";
@@ -142,8 +142,7 @@ class ParseUrl {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
-		curl_setopt($ch, CURLOPT_NOBODY, 1);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
@@ -151,7 +150,6 @@ class ParseUrl {
 
 		$header = curl_exec($ch);
 		$curl_info = @curl_getinfo($ch);
-		$http_code = $curl_info["http_code"];
 		curl_close($ch);
 
 		$a->save_timestamp($stamp1, "network");
@@ -196,26 +194,6 @@ class ParseUrl {
 				}
 			}
 		}
-
-		$stamp1 = microtime(true);
-
-		// Now fetch the body as well
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		curl_setopt($ch, CURLOPT_NOBODY, 0);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, (($check_cert) ? 2 : false));
-
-		$header = curl_exec($ch);
-		$curl_info = @curl_getinfo($ch);
-		$http_code = $curl_info["http_code"];
-		curl_close($ch);
-
-		$a->save_timestamp($stamp1, "network");
 
 		// Fetch the first mentioned charset. Can be in body or header
 		$charset = "";
@@ -476,7 +454,7 @@ class ParseUrl {
 
 	/**
 	 * @brief Convert tags from CSV to an array
-	 * 
+	 *
 	 * @param string $string Tags
 	 * @return array with formatted Hashtags
 	 */
@@ -492,9 +470,9 @@ class ParseUrl {
 
 	/**
 	 * @brief Add a hasht sign to a string
-	 * 
+	 *
 	 *  This method is used as callback function
-	 * 
+	 *
 	 * @param string $tag The pure tag name
 	 * @param int $k Counter for internal use
 	 */
@@ -504,16 +482,16 @@ class ParseUrl {
 
 	/**
 	 * @brief Add a scheme to an url
-	 * 
+	 *
 	 * The src attribute of some html elements (e.g. images)
 	 * can miss the scheme so we need to add the correct
 	 * scheme
-	 * 
+	 *
 	 * @param string $url The url which possibly does have
 	 *    a missing scheme (a link to an image)
 	 * @param string $scheme The url with a correct scheme
 	 *    (e.g. the url from the webpage which does contain the image)
-	 * 
+	 *
 	 * @return string The url with a scheme
 	 */
 	private static function completeUrl($url, $scheme) {

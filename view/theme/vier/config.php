@@ -5,7 +5,7 @@
 
 
 
-function theme_content(App &$a){
+function theme_content(App $a) {
 	if (!local_user()) {
 		return;
 	}
@@ -35,7 +35,7 @@ function theme_content(App &$a){
 			$show_services, $show_friends, $show_lastusers);
 }
 
-function theme_post(App &$a){
+function theme_post(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -52,7 +52,7 @@ function theme_post(App &$a){
 }
 
 
-function theme_admin(App &$a){
+function theme_admin(App $a) {
 
 	if (!function_exists('get_vier_config'))
 		return;
@@ -81,7 +81,7 @@ function theme_admin(App &$a){
 	return $o;
 }
 
-function theme_admin_post(App &$a){
+function theme_admin_post(App $a) {
 	if (isset($_POST['vier-settings-submit'])){
 		set_config('vier', 'style', $_POST['vier_style']);
 		set_config('vier', 'show_pages', $_POST['vier_show_pages']);
@@ -95,7 +95,7 @@ function theme_admin_post(App &$a){
 }
 
 /// @TODO $a is no longer used
-function vier_form(&$a, $style, $show_pages, $show_profiles, $show_helpers, $show_services, $show_friends, $show_lastusers){
+function vier_form(App $a, $style, $show_pages, $show_profiles, $show_helpers, $show_services, $show_friends, $show_lastusers) {
 	$styles = array(
 		"plus"=>"Plus",
 		"breathe"=>"Breathe",

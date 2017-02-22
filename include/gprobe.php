@@ -1,5 +1,7 @@
 <?php
 
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once('include/Scrape.php');
 require_once('include/socgraph.php');
@@ -21,8 +23,7 @@ function gprobe_run(&$argv, &$argc){
 	require_once('include/session.php');
 	require_once('include/datetime.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	$a->set_baseurl(get_config('system','url'));
 

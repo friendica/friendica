@@ -1,4 +1,7 @@
 <?php
+
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once('include/queue_fn.php');
 require_once('include/html2plain.php');
@@ -10,7 +13,7 @@ require_once("include/dfrn.php");
 function delivery_run(&$argv, &$argc){
 	global $a, $db;
 
-	if (is_null($a)){
+	if (is_null($a)) {
 		$a = new App;
 	}
 
@@ -27,13 +30,13 @@ function delivery_run(&$argv, &$argc){
 	require_once('include/bbcode.php');
 	require_once('include/email.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	load_hooks();
 
-	if ($argc < 3)
+	if ($argc < 3) {
 		return;
+	}
 
 	$a->set_baseurl(get_config('system','url'));
 
@@ -42,10 +45,11 @@ function delivery_run(&$argv, &$argc){
 	$cmd        = $argv[1];
 	$item_id    = intval($argv[2]);
 
-	for($x = 3; $x < $argc; $x ++) {
+	for ($x = 3; $x < $argc; $x ++) {
 
 		$contact_id = intval($argv[$x]);
 
+		/// @todo When switching completely to the worker we won't need this anymore
 		// Some other process may have delivered this item already.
 
 		$r = q("SELECT * FROM `deliverq` WHERE `cmd` = '%s' AND `item` = %d AND `contact` = %d LIMIT 1",
@@ -57,8 +61,9 @@ function delivery_run(&$argv, &$argc){
 			continue;
 		}
 
-		if ($a->maxload_reached())
+		if ($a->maxload_reached()) {
 			return;
+		}
 
 		// It's ours to deliver. Remove it from the queue.
 
@@ -68,8 +73,9 @@ function delivery_run(&$argv, &$argc){
 			dbesc($contact_id)
 		);
 
-		if (!$item_id || !$contact_id)
+		if (!$item_id || !$contact_id) {
 			continue;
+		}
 
 		$expire = false;
 		$mail = false;
@@ -90,14 +96,13 @@ function delivery_run(&$argv, &$argc){
 			$message = q("SELECT * FROM `mail` WHERE `id` = %d LIMIT 1",
 					intval($item_id)
 			);
-			if (!count($message)){
+			if (!count($message)) {
 				return;
 			}
 			$uid = $message[0]['uid'];
 			$recipients[] = $message[0]['contact-id'];
 			$item = $message[0];
-		}
-		elseif ($cmd === 'expire') {
+		} elseif ($cmd === 'expire') {
 			$normal_mode = false;
 			$expire = true;
 			$items = q("SELECT * FROM `item` WHERE `uid` = %d AND `wall` = 1
@@ -106,18 +111,19 @@ function delivery_run(&$argv, &$argc){
 			);
 			$uid = $item_id;
 			$item_id = 0;
-			if (!count($items))
+			if (!count($items)) {
 				continue;
-		}
-		elseif ($cmd === 'suggest') {
+			}
+		} elseif ($cmd === 'suggest') {
 			$normal_mode = false;
 			$fsuggest = true;
 
 			$suggest = q("SELECT * FROM `fsuggest` WHERE `id` = %d LIMIT 1",
 				intval($item_id)
 			);
-			if (!count($suggest))
+			if (!count($suggest)) {
 				return;
+			}
 			$uid = $suggest[0]['uid'];
 			$recipients[] = $suggest[0]['cid'];
 			$item = $suggest[0];
@@ -151,26 +157,33 @@ function delivery_run(&$argv, &$argc){
 
 			$icontacts = null;
 			$contacts_arr = array();
-			foreach($items as $item)
-				if (!in_array($item['contact-id'],$contacts_arr))
+			foreach ($items as $item) {
+				if (!in_array($item['contact-id'],$contacts_arr)) {
 					$contacts_arr[] = intval($item['contact-id']);
+				}
+			}
 			if (count($contacts_arr)) {
 				$str_contacts = implode(',',$contacts_arr);
 				$icontacts = q("SELECT * FROM `contact`
 					WHERE `id` IN ( $str_contacts ) "
 				);
 			}
-			if ( !($icontacts && count($icontacts)))
+			if ( !($icontacts && count($icontacts))) {
 				continue;
+			}
 
 			// avoid race condition with deleting entries
 
 			if ($items[0]['deleted']) {
-				foreach($items as $item)
+				foreach ($items as $item) {
 					$item['deleted'] = 1;
+				}
 			}
 
-			if ((count($items) == 1) && ($items[0]['uri'] === $items[0]['parent-uri'])) {
+			// When commenting too fast after delivery, a post wasn't recognized as top level post.
+			// The count then showed more than one entry. The additional check should help.
+			// The check for the "count" should be superfluous, but I'm not totally sure by now, so we keep it.
+			if ((($items[0]['id'] == $item_id) || (count($items) == 1)) && ($items[0]['uri'] === $items[0]['parent-uri'])) {
 				logger('delivery: top level post');
 				$top_level = true;
 			}
@@ -184,8 +197,9 @@ function delivery_run(&$argv, &$argc){
 			intval($uid)
 		);
 
-		if (!dbm::is_result($r))
+		if (!dbm::is_result($r)) {
 			continue;
+		}
 
 		$owner = $r[0];
 
@@ -217,9 +231,9 @@ function delivery_run(&$argv, &$argc){
 
 
 			$localhost = $a->get_hostname();
-			if (strpos($localhost,':'))
+			if (strpos($localhost,':')) {
 				$localhost = substr($localhost,0,strpos($localhost,':'));
-
+			}
 			/**
 			 *
 			 * Be VERY CAREFUL if you make any changes to the following line. Seemingly innocuous changes
@@ -254,12 +268,12 @@ function delivery_run(&$argv, &$argc){
 			intval($contact_id)
 		);
 
-		if (dbm::is_result($r))
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
-
-		if ($contact['self'])
+		}
+		if ($contact['self']) {
 			continue;
-
+		}
 		$deliver_status = 0;
 
 		logger("main delivery by delivery: followup=$followup mail=$mail fsuggest=$fsuggest relocate=$relocate - network ".$contact['network']);
@@ -275,13 +289,14 @@ function delivery_run(&$argv, &$argc){
 				} elseif ($fsuggest) {
 					$atom = dfrn::fsuggest($item, $owner);
 					q("DELETE FROM `fsuggest` WHERE `id` = %d LIMIT 1", intval($item['id']));
-				} elseif ($relocate)
+				} elseif ($relocate) {
 					$atom = dfrn::relocate($owner, $uid);
-				elseif ($followup) {
+				} elseif ($followup) {
 					$msgitems = array();
-					foreach($items as $item) {  // there is only one item
-						if (!$item['parent'])
+					foreach ($items as $item) {  // there is only one item
+						if (!$item['parent']) {
 							continue;
+						}
 						if ($item['id'] == $item_id) {
 							logger('followup: item: '. print_r($item,true), LOGGER_DATA);
 							$msgitems[] = $item;
@@ -290,17 +305,20 @@ function delivery_run(&$argv, &$argc){
 					$atom = dfrn::entries($msgitems,$owner);
 				} else {
 					$msgitems = array();
-					foreach($items as $item) {
-						if (!$item['parent'])
+					foreach ($items as $item) {
+						if (!$item['parent']) {
 							continue;
+						}
 
 						// private emails may be in included in public conversations. Filter them.
-						if ($public_message && $item['private'])
+						if ($public_message && $item['private']) {
 							continue;
+						}
 
 						$item_contact = get_item_contact($item,$icontacts);
-						if (!$item_contact)
+						if (!$item_contact) {
 							continue;
+						}
 
 						if ($normal_mode) {
 							if ($item_id == $item['id'] || $item['id'] == $item['parent']) {
@@ -326,10 +344,11 @@ function delivery_run(&$argv, &$argc){
 				if (link_compare($basepath,App::get_baseurl())) {
 
 					$nickname = basename($contact['url']);
-					if ($contact['issued-id'])
+					if ($contact['issued-id']) {
 						$sql_extra = sprintf(" AND `dfrn-id` = '%s' ", dbesc($contact['issued-id']));
-					else
+					} else {
 						$sql_extra = sprintf(" AND `issued-id` = '%s' ", dbesc($contact['dfrn-id']));
+					}
 
 					$x = q("SELECT	`contact`.*, `contact`.`uid` AS `importer_uid`,
 						`contact`.`pubkey` AS `cpubkey`,
@@ -362,19 +381,20 @@ function delivery_run(&$argv, &$argc){
 
 						// If we are setup as a soapbox we aren't accepting top level posts from this person
 
-						if (($x[0]['page-flags'] == PAGE_SOAPBOX) AND $top_level)
+						if (($x[0]['page-flags'] == PAGE_SOAPBOX) AND $top_level) {
 							break;
-
+						}
 						logger('mod-delivery: local delivery');
 						dfrn::import($atom, $x[0]);
 						break;
 					}
 				}
 
-				if (!was_recently_delayed($contact['id']))
+				if (!was_recently_delayed($contact['id'])) {
 					$deliver_status = dfrn::deliver($owner,$contact,$atom);
-				else
+				} else {
 					$deliver_status = (-1);
+				}
 
 				logger('notifier: dfrn_delivery to '.$contact["url"].' with guid '.$target_item["guid"].' returns '.$deliver_status);
 
@@ -393,10 +413,12 @@ function delivery_run(&$argv, &$argc){
 
 			case NETWORK_OSTATUS:
 				// Do not send to otatus if we are not configured to send to public networks
-				if ($owner['prvnets'])
+				if ($owner['prvnets']) {
 					break;
-				if (get_config('system','ostatus_disabled') || get_config('system','dfrn_only'))
+				}
+				if (get_config('system','ostatus_disabled') || get_config('system','dfrn_only')) {
 					break;
+				}
 
 				// There is currently no code here to distribute anything to OStatus.
 				// This is done in "notifier.php" (See "url_recipients" and "push_notify")
@@ -405,20 +427,22 @@ function delivery_run(&$argv, &$argc){
 			case NETWORK_MAIL:
 			case NETWORK_MAIL2:
 
-				if (get_config('system','dfrn_only'))
+				if (get_config('system','dfrn_only')) {
 					break;
+				}
 				// WARNING: does not currently convert to RFC2047 header encodings, etc.
 
 				$addr = $contact['addr'];
-				if (!strlen($addr))
+				if (!strlen($addr)) {
 					break;
+				}
 
 				if ($cmd === 'wall-new' || $cmd === 'comment-new') {
 
 					$it = null;
-					if ($cmd === 'wall-new')
+					if ($cmd === 'wall-new') {
 						$it = $items[0];
-					else {
+					} else {
 						$r = q("SELECT * FROM `item` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 							intval($argv[2]),
 							intval($uid)
@@ -451,10 +475,12 @@ function delivery_run(&$argv, &$argc){
 						if ($reply_to) {
 							$headers  = 'From: '.email_header_encode($local_user[0]['username'],'UTF-8').' <'.$reply_to.'>'."\n";
 							$headers .= 'Sender: '.$local_user[0]['email']."\n";
-						} else
+						} else {
 							$headers  = 'From: '.email_header_encode($local_user[0]['username'],'UTF-8').' <'.$local_user[0]['email'].'>'."\n";
-					} else
+						}
+					} else {
 						$headers  = 'From: '. email_header_encode($local_user[0]['username'],'UTF-8') .' <'. t('noreply') .'@'.$a->get_hostname() .'>'. "\n";
+					}
 
 					//if ($reply_to)
 					//	$headers .= 'Reply-to: '.$reply_to . "\n";
@@ -478,9 +504,9 @@ function delivery_run(&$argv, &$argc){
 								dbesc($it['parent-uri']),
 								intval($uid));
 
-							if (dbm::is_result($r) AND ($r[0]['title'] != ''))
+							if (dbm::is_result($r) AND ($r[0]['title'] != '')) {
 								$subject = $r[0]['title'];
-							else {
+							} else {
 								$r = q("SELECT `title` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d LIMIT 1",
 									dbesc($it['parent-uri']),
 									intval($uid));

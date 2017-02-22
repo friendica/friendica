@@ -10,6 +10,8 @@
  *
  */
 
+use \Friendica\Core\Config;
+
 require_once("include/dba.php");
 
 if(! function_exists('get_browser_language')) {
@@ -47,12 +49,12 @@ function get_browser_language() {
 			break;
 		}
 	}
-	if(isset($preferred))
+	if (isset($preferred)) {
 		return $preferred;
+	}
 
 	// in case none matches, get the system wide configured language, or fall back to English
-    $a = get_app();
-	return ((isset($a->config['system']['language'])) ? $a->config['system']['language'] : 'en');
+	return Config::get('system', 'language', 'en');
 }}
 
 

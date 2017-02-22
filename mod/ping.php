@@ -5,6 +5,7 @@ require_once('include/ForumManager.php');
 require_once('include/group.php');
 require_once('mod/proxy.php');
 require_once('include/xml.php');
+require_once('include/cache.php');
 
 /**
  * @brief Outputs the counts and the lists of various notifications
@@ -195,13 +196,20 @@ function ping_init(App $a)
 			}
 		}
 
-		$ev = qu("SELECT count(`event`.`id`) AS total, type, start, adjust FROM `event`
-			WHERE `event`.`uid` = %d AND `start` < '%s' AND `finish` > '%s' and `ignore` = 0
-			ORDER BY `start` ASC ",
-			intval(local_user()),
-			dbesc(datetime_convert('UTC', 'UTC', 'now + 7 days')),
-			dbesc(datetime_convert('UTC', 'UTC', 'now'))
-		);
+		$cachekey = "ping_init:".local_user();
+		$ev = Cache::get($cachekey);
+		if (is_null($ev)) {
+			$ev = qu("SELECT count(`event`.`id`) AS total, type, start, adjust FROM `event`
+				WHERE `event`.`uid` = %d AND `start` < '%s' AND `finish` > '%s' and `ignore` = 0
+				ORDER BY `start` ASC ",
+				intval(local_user()),
+				dbesc(datetime_convert('UTC', 'UTC', 'now + 7 days')),
+				dbesc(datetime_convert('UTC', 'UTC', 'now'))
+			);
+			if (dbm::is_result($ev)) {
+				Cache::set($cachekey, $ev, CACHE_HOUR);
+			}
+		}
 
 		if (dbm::is_result($ev)) {
 			$all_events = intval($ev[0]['total']);

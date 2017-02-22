@@ -1,10 +1,10 @@
 
 	function openClose(listID) {
-/*		if(document.getElementById(theID).style.display == "block") { 
-			document.getElementById(theID).style.display = "none" 
+/*		if(document.getElementById(theID).style.display == "block") {
+			document.getElementById(theID).style.display = "none"
 		}
-		else { 
-			document.getElementById(theID).style.display = "block" 
+		else {
+			document.getElementById(theID).style.display = "block"
 		}*/
 		listID = "#" + listID.replace(/:/g, "\\:");
 		listID = listID.replace(/\./g, "\\.");
@@ -21,11 +21,11 @@
 	}
 
 	function openMenu(theID) {
-		document.getElementById(theID).style.display = "block" 
+		document.getElementById(theID).style.display = "block"
 	}
 
 	function closeMenu(theID) {
-		document.getElementById(theID).style.display = "none" 
+		document.getElementById(theID).style.display = "none"
 	}
 
 
@@ -48,7 +48,7 @@
 		$.ajaxSetup({cache: false});
 
 		collapseHeight();
-		
+
 		/* setup tooltips *//*
 		$("a,.tt").each(function(){
 			var e = $(this);
@@ -59,18 +59,18 @@
 			if (e.hasClass("ttright")) pos="right";
 			e.tipTip({defaultPosition: pos, edgeOffset: 8});
 		});*/
-		
-		
-		
+
+
+
 		/* setup onoff widgets */
 		$(".onoff input").each(function(){
 			val = $(this).val();
 			id = $(this).attr("id");
 			$("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
-			
+
 		});
 		$(".onoff > a").click(function(event){
-			event.preventDefault();	
+			event.preventDefault();
 			var input = $(this).siblings("input");
 			var val = 1-input.val();
 			var id = input.attr("id");
@@ -79,9 +79,6 @@
 			input.val(val);
 			//console.log(id);
 		});
-		
-		/* setup field_richtext */
-		//setupFieldRichtext();
 
 		/* popup menus */
 		function close_last_popup_menu(e) {
@@ -119,20 +116,20 @@
 		$('html').click(function(e) {
 			close_last_popup_menu(e);
 		});
-		
+
 		// fancyboxes
 		$("a.popupbox").colorbox({
 			'inline' : true,
 			'transition' : 'elastic'
 		});
-		
+
 
 		/* notifications template */
 		var notifications_tpl= unescape($("#nav-notifications-template[rel=template]").html());
 		var notifications_all = unescape($('<div>').append( $("#nav-notifications-see-all").clone() ).html()); //outerHtml hack
 		var notifications_mark = unescape($('<div>').append( $("#nav-notifications-mark-all").clone() ).html()); //outerHtml hack
 		var notifications_empty = unescape($("#nav-notifications-menu").html());
-		
+
 		/* nav update event  */
 		$('nav').bind('nav-update', function(e,data){;
 			var invalid = $(data).find('invalid').text();
@@ -145,7 +142,7 @@
 			var home = $(data).find('home').text();
 			if(home == 0) { home = '';  $('#home-update').removeClass('show') } else { $('#home-update').addClass('show') }
 			$('#home-update').html(home);
-			
+
 			var intro = $(data).find('intro').text();
 			if(intro == 0) { intro = '';  $('#intro-update').removeClass('show') } else { $('#intro-update').addClass('show') }
 			$('#intro-update').html(intro);
@@ -153,7 +150,7 @@
 			var mail = $(data).find('mail').text();
 			if(mail == 0) { mail = '';  $('#mail-update').removeClass('show') } else { $('#mail-update').addClass('show') }
 			$('#mail-update').html(mail);
-			
+
 			var intro = $(data).find('intro').text();
 			if(intro == 0) { intro = '';  $('#intro-update-li').removeClass('show') } else { $('#intro-update-li').addClass('show') }
 			$('#intro-update-li').html(intro);
@@ -163,7 +160,7 @@
 			$('#mail-update-li').html(mail);
 
 			var eNotif = $(data).find('notif')
-			
+
 			if (eNotif.children("note").length==0){
 				$("#nav-notifications-menu").html(notifications_empty);
 			} else {
@@ -194,7 +191,7 @@
 			}
 			if(notif == 0) { notif = ''; $('#notify-update').removeClass('show') } else { $('#notify-update').addClass('show') }
 			$('#notify-update').html(notif);
-			
+
 			var eSysmsg = $(data).find('sysmsgs');
 			eSysmsg.children("notice").each(function(){
 				text = $(this).text();
@@ -204,11 +201,11 @@
 				text = $(this).text();
 				$.jGrowl(text, { sticky: false, theme: 'info', life: 1000 });
 			});
-			
+
 		});
-		
-		
- 		NavUpdate(); 
+
+
+ 		NavUpdate();
 		// Allow folks to stop the ajax page updates with the pause/break key
 		$(document).keydown(function(event) {
 			if(event.keyCode == '8') {
@@ -234,8 +231,8 @@
 				}
 			}
 		});
-		
-		
+
+
 	});
 
 	function NavUpdate() {
@@ -246,11 +243,11 @@
 				$(data).find('result').each(function() {
 					// send nav-update event
 					$('nav').trigger('nav-update', this);
-					
-					
+
+
 					// start live update
 
-					
+
 
 					if($('#live-network').length)   { src = 'network'; liveUpdate(); }
 					if($('#live-profile').length)   { src = 'profile'; liveUpdate(); }
@@ -260,19 +257,19 @@
 					/*if($('#live-display').length) {
 						if(liking) {
 							liking = 0;
-							window.location.href=window.location.href 
+							window.location.href=window.location.href
 						}
 					}*/
 					if($('#live-photos').length) {
 						if(liking) {
 							liking = 0;
-							window.location.href=window.location.href 
+							window.location.href=window.location.href
 						}
 					}
 
-					
-					
-					
+
+
+
 				});
 			}) ;
 		}
@@ -382,8 +379,8 @@
 						});
 						$('#' + prev).after($(this));
 				}
-				else { 
-					$('#' + ident + ' ' + '.wall-item-ago').replaceWith($(this).find('.wall-item-ago')); 
+				else {
+					$('#' + ident + ' ' + '.wall-item-ago').replaceWith($(this).find('.wall-item-ago'));
 					if($('#' + ident + ' ' + '.comment-edit-text-empty').length)
 						$('#' + ident + ' ' + '.wall-item-comment-wrapper').replaceWith($(this).find('.wall-item-comment-wrapper'));
 					$('#' + ident + ' ' + '.hide-comments-total').replaceWith($(this).find('.hide-comments-total'));
@@ -393,9 +390,9 @@
 						$(this).attr('src',$(this).attr('dst'));
 					});
 				}
-				prev = ident; 
+				prev = ident;
 			});*/
-			
+
 			$('.like-rotator').hide();
 			if(commentBusy) {
 				commentBusy = false;
@@ -403,7 +400,7 @@
 			}
 			/* autocomplete @nicknames */
 			$(".comment-edit-form  textarea").editor_autocomplete(baseurl+"/acl");
-		
+
 			collapseHeight();
 
 			// setup videos, since VideoJS won't take care of any loaded via AJAX
@@ -422,7 +419,7 @@
 				$(this).divgrow({ initialHeight: 400, showBrackets: false, speed: 0 });
 				$(this).addClass('divmore');
 				$('html').height('auto');
-			}					
+			}
 		});
 	}
 
@@ -434,10 +431,10 @@
 		$(node).removeClass("drop").addClass("drophide");
 	}*/
 
-	// Since our ajax calls are asynchronous, we will give a few 
-	// seconds for the first ajax call (setting like/dislike), then 
+	// Since our ajax calls are asynchronous, we will give a few
+	// seconds for the first ajax call (setting like/dislike), then
 	// run the updater to pick up any changes and display on the page.
-	// The updater will turn any rotators off when it's done. 
+	// The updater will turn any rotators off when it's done.
 	// This function will have returned long before any of these
 	// events have completed and therefore there won't be any
 	// visible feedback that anything changed without all this
@@ -461,13 +458,13 @@
 				$('#star-' + ident).addClass('hidden');
 				$('#unstar-' + ident).removeClass('hidden');
 			}
-			else {			
+			else {
 				$('#starred-' + ident).addClass('unstarred');
 				$('#starred-' + ident).removeClass('starred');
 				$('#star-' + ident).removeClass('hidden');
 				$('#unstar-' + ident).addClass('hidden');
 			}
-//			$('#like-rotator-' + ident).hide();	
+//			$('#like-rotator-' + ident).hide();
 		});
 	}
 
@@ -520,8 +517,8 @@
 		commentBusy = true;
 		$('body').css('cursor', 'wait');
 		$("#comment-preview-inp-" + id).val("0");
-		$.post(  
-             "item",  
+		$.post(
+             "item",
              $("#comment-edit-form-" + id).serialize(),
 			function(data) {
 				if(data.success) {
@@ -537,28 +534,28 @@
 					window.location.href=data.reload;
 				}
 			},
-			"json"  
-         );  
-         return false;  
+			"json"
+         );
+         return false;
 	}
 
 
 	function preview_comment(id) {
 		$("#comment-preview-inp-" + id).val("1");
 		$("#comment-edit-preview-" + id).show();
-		$.post(  
-             "item",  
+		$.post(
+             "item",
              $("#comment-edit-form-" + id).serialize(),
 			function(data) {
 				if(data.preview) {
-						
+
 					$("#comment-edit-preview-" + id).html(data.preview);
 					$("#comment-edit-preview-" + id + " a").click(function() { return false; });
 				}
 			},
-			"json"  
-         );  
-         return true;  
+			"json"
+         );
+         return true;
 	}
 
 
@@ -578,20 +575,19 @@
 	function preview_post() {
 		$("#jot-preview").val("1");
 		$("#jot-preview-content").show();
-		tinyMCE.triggerSave();
-		$.post(  
-			"item",  
+		$.post(
+			"item",
 			$("#profile-jot-form").serialize(),
 			function(data) {
-				if(data.preview) {			
+				if(data.preview) {
 					$("#jot-preview-content").html(data.preview);
 					$("#jot-preview-content" + " a").click(function() { return false; });
 				}
 			},
-			"json"  
-		);  
+			"json"
+		);
 		$("#jot-preview").val("0");
-		return true;  
+		return true;
 	}
 
 
@@ -630,7 +626,7 @@
 		$('body .fakelink').css('cursor', 'wait');
 		$.get('group/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
 				$('#group-update-wrapper').html(data);
-				$('body .fakelink').css('cursor', 'auto');				
+				$('body .fakelink').css('cursor', 'auto');
 		});
 	}
 
@@ -638,7 +634,7 @@
 		$('body .fakelink').css('cursor', 'wait');
 		$.get('profperm/' + gid + '/' + cid, function(data) {
 				$('#prof-update-wrapper').html(data);
-				$('body .fakelink').css('cursor', 'auto');				
+				$('body .fakelink').css('cursor', 'auto');
 		});
 	}
 
@@ -666,61 +662,9 @@ function notifyMarkAll() {
 	});
 }
 
-
-// code from http://www.tinymce.com/wiki.php/How-to_implement_a_custom_file_browser
-function fcFileBrowser (field_name, url, type, win) {
-    /* TODO: If you work with sessions in PHP and your client doesn't accept cookies you might need to carry
-       the session name and session ID in the request string (can look like this: "?PHPSESSID=88p0n70s9dsknra96qhuk6etm5").
-       These lines of code extract the necessary parameters and add them back to the filebrowser URL again. */
-
-
-    var cmsURL = baseurl+"/fbrowser/"+type+"/";
-
-    tinyMCE.activeEditor.windowManager.open({
-        file : cmsURL,
-        title : 'File Browser',
-        width : 420,  // Your dimensions may differ - toy around with them!
-        height : 400,
-        resizable : "yes",
-        inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
-        close_previous : "no"
-    }, {
-        window : win,
-        input : field_name
-    });
-    return false;
-  }
-
-/*function setupFieldRichtext(){
-	tinyMCE.init({
-		theme : "advanced",
-		mode : "specific_textareas",
-		editor_selector: "fieldRichtext",
-		plugins : "bbcode,paste, inlinepopups",
-		theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code",
-		theme_advanced_buttons2 : "",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "center",
-		theme_advanced_blockformats : "blockquote,code",
-		paste_text_sticky : true,
-		entity_encoding : "raw",
-		add_unload_trigger : false,
-		remove_linebreaks : false,
-		//force_p_newlines : false,
-		//force_br_newlines : true,
-		forced_root_block : 'div',
-		convert_urls: false,
-		content_css: baseurl+"/view/custom_tinymce.css",
-		theme_advanced_path : false,
-		file_browser_callback : "fcFileBrowser",
-	});
-}*/
-
-
-/** 
- * sprintf in javascript 
- *	"{0} and {1}".format('zero','uno'); 
+/**
+ * sprintf in javascript
+ *	"{0} and {1}".format('zero','uno');
  **/
 String.prototype.format = function() {
     var formatted = this;

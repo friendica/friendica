@@ -106,7 +106,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 
 
-function can_write_wall(&$a,$owner) {
+function can_write_wall(App $a, $owner) {
 
 	static $verified = 0;
 
@@ -148,8 +148,8 @@ function can_write_wall(&$a,$owner) {
 				return false;
 			}
 
-			$r = q("SELECT `contact`.*, `user`.`page-flags` FROM `contact` INNER JOIN `user` on `user`.`uid` = `contact`.`uid` 
-				WHERE `contact`.`uid` = %d AND `contact`.`id` = %d AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0 
+			$r = q("SELECT `contact`.*, `user`.`page-flags` FROM `contact` INNER JOIN `user` on `user`.`uid` = `contact`.`uid`
+				WHERE `contact`.`uid` = %d AND `contact`.`id` = %d AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 				AND `user`.`blockwall` = 0 AND `readonly` = 0  AND ( `contact`.`rel` IN ( %d , %d ) OR `user`.`page-flags` = %d ) LIMIT 1",
 				intval($owner),
 				intval($cid),
@@ -183,10 +183,10 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 	 * default permissions - anonymous user
 	 */
 
-	$sql = " AND allow_cid = '' 
-			 AND allow_gid = '' 
-			 AND deny_cid  = '' 
-			 AND deny_gid  = '' 
+	$sql = " AND allow_cid = ''
+			 AND allow_gid = ''
+			 AND deny_cid  = ''
+			 AND deny_gid  = ''
 	";
 
 	/**
@@ -194,11 +194,11 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 	 */
 
 	if(($local_user) && ($local_user == $owner_id)) {
-		$sql = ''; 
+		$sql = '';
 	}
 
 	/**
-	 * Authenticated visitor. Unless pre-verified, 
+	 * Authenticated visitor. Unless pre-verified,
 	 * check that the contact belongs to this $owner_id
 	 * and load the groups the visitor belongs to.
 	 * If pre-verified, the caller is expected to have already
@@ -224,11 +224,11 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 			if(is_array($groups) && count($groups)) {
 				foreach($groups as $g)
 					$gs .= '|<' . intval($g) . '>';
-			} 
+			}
 
 			/*$sql = sprintf(
-				" AND ( allow_cid = '' OR allow_cid REGEXP '<%d>' ) 
-				  AND ( deny_cid  = '' OR  NOT deny_cid REGEXP '<%d>' ) 
+				" AND ( allow_cid = '' OR allow_cid REGEXP '<%d>' )
+				  AND ( deny_cid  = '' OR  NOT deny_cid REGEXP '<%d>' )
 				  AND ( allow_gid = '' OR allow_gid REGEXP '%s' )
 				  AND ( deny_gid  = '' OR NOT deny_gid REGEXP '%s')
 				",
@@ -280,7 +280,7 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 	}
 
 	/**
-	 * Authenticated visitor. Unless pre-verified, 
+	 * Authenticated visitor. Unless pre-verified,
 	 * check that the contact belongs to this $owner_id
 	 * and load the groups the visitor belongs to.
 	 * If pre-verified, the caller is expected to have already
@@ -306,13 +306,13 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 			if(is_array($groups) && count($groups)) {
 				foreach($groups as $g)
 					$gs .= '|<' . intval($g) . '>';
-			} 
+			}
 
 			$sql = sprintf(
-				/*" AND ( private = 0 OR ( private in (1,2) AND wall = 1 AND ( allow_cid = '' OR allow_cid REGEXP '<%d>' ) 
-				  AND ( deny_cid  = '' OR  NOT deny_cid REGEXP '<%d>' ) 
+				/*" AND ( private = 0 OR ( private in (1,2) AND wall = 1 AND ( allow_cid = '' OR allow_cid REGEXP '<%d>' )
+				  AND ( deny_cid  = '' OR  NOT deny_cid REGEXP '<%d>' )
 				  AND ( allow_gid = '' OR allow_gid REGEXP '%s' )
-				  AND ( deny_gid  = '' OR NOT deny_gid REGEXP '%s'))) 
+				  AND ( deny_gid  = '' OR NOT deny_gid REGEXP '%s')))
 				",
 				intval($remote_user),
 				intval($remote_user),
@@ -345,29 +345,29 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
  *    If the new page contains by any chance external elements, then the used security token is exposed by the referrer.
  *    Actually, important actions should not be triggered by Links / GET-Requests at all, but somethimes they still are,
  *    so this mechanism brings in some damage control (the attacker would be able to forge a request to a form of this type, but not to forms of other types).
- */ 
+ */
 function get_form_security_token($typename = '') {
 	$a = get_app();
-	
+
 	$timestamp = time();
 	$sec_hash = hash('whirlpool', $a->user['guid'] . $a->user['prvkey'] . session_id() . $timestamp . $typename);
-	
+
 	return $timestamp . '.' . $sec_hash;
 }
 
 function check_form_security_token($typename = '', $formname = 'form_security_token') {
 	if (!x($_REQUEST, $formname)) return false;
 	$hash = $_REQUEST[$formname];
-	
+
 	$max_livetime = 10800; // 3 hours
-	
+
 	$a = get_app();
-	
+
 	$x = explode('.', $hash);
 	if (time() > (IntVal($x[0]) + $max_livetime)) return false;
-	
+
 	$sec_hash = hash('whirlpool', $a->user['guid'] . $a->user['prvkey'] . session_id() . $x[0] . $typename);
-	
+
 	return ($sec_hash == $x[1]);
 }
 
@@ -395,13 +395,13 @@ function check_form_security_token_ForbiddenOnErr($typename = '', $formname = 'f
 
 // Returns an array of group id's this contact is a member of.
 // This array will only contain group id's related to the uid of this
-// DFRN contact. They are *not* neccessarily unique across the entire site. 
+// DFRN contact. They are *not* neccessarily unique across the entire site.
 
 
 if(! function_exists('init_groups_visitor')) {
 function init_groups_visitor($contact_id) {
 	$groups = array();
-	$r = q("SELECT `gid` FROM `group_member` 
+	$r = q("SELECT `gid` FROM `group_member`
 		WHERE `contact-id` = %d ",
 		intval($contact_id)
 	);

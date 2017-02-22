@@ -25,6 +25,14 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **allowed_link_protocols** (Array) - Allowed protocols in links URLs, add at your own risk. http is always allowed.
 * **birthday_input_format** - Default value is "ymd".
 * **block_local_dir** (Boolean) - Blocks the access to the directory of the local users.
+* **curl_range_bytes** - Maximum number of bytes that should be fetched. Default is 0, which mean "no limit".
+* **db_log** - Name of a logfile to log slow database queries
+* **db_loglimit** - If a database call lasts longer than this value it is logged
+* **db_log_index** - Name of a logfile to log queries with bad indexes
+* **db_log_index_watch** - Watchlist of indexes to watch
+* **db_loglimit_index** - Number of index rows needed to be logged for indexes on the watchlist
+* **db_loglimit_index_high** - Number of index rows to be logged anyway (for any index)
+* **db_log_index_blacklist** - Blacklist of indexes that shouldn't be watched
 * **dbclean** (Boolean) - Enable the automatic database cleanup process
 * **default_service_class** -
 * **delivery_batch_count** - Number of deliveries per process. Default value is 1. (Disabled when using the worker)

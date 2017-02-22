@@ -1,8 +1,8 @@
 <?php
 
 
-function lockview_content(App &$a) {
-  
+function lockview_content(App $a) {
+
 	$type = (($a->argc > 1) ? $a->argv[1] : 0);
 	if (is_numeric($type)) {
 		$item_id = intval($type);
@@ -10,13 +10,13 @@ function lockview_content(App &$a) {
 	} else {
 		$item_id = (($a->argc > 2) ? intval($a->argv[2]) : 0);
 	}
-  
+
 	if(! $item_id)
 		killme();
 
 	if (!in_array($type, array('item','photo','event')))
 		killme();
-     
+
 	$r = q("SELECT * FROM `%s` WHERE `id` = %d LIMIT 1",
 		dbesc($type),
 		intval($item_id)
@@ -34,7 +34,7 @@ function lockview_content(App &$a) {
 	}
 
 
-	if(($item['private'] == 1) && (! strlen($item['allow_cid'])) && (! strlen($item['allow_gid'])) 
+	if(($item['private'] == 1) && (! strlen($item['allow_cid'])) && (! strlen($item['allow_gid']))
 		&& (! strlen($item['deny_cid'])) && (! strlen($item['deny_gid']))) {
 
 		echo t('Remote privacy information not available.') . '<br />';
@@ -54,7 +54,7 @@ function lockview_content(App &$a) {
 			dbesc(implode(', ', $allowed_groups))
 		);
 		if (dbm::is_result($r))
-			foreach($r as $rr) 
+			foreach($r as $rr)
 				$l[] = '<b>' . $rr['name'] . '</b>';
 	}
 	if(count($allowed_users)) {
@@ -62,7 +62,7 @@ function lockview_content(App &$a) {
 			dbesc(implode(', ',$allowed_users))
 		);
 		if (dbm::is_result($r))
-			foreach($r as $rr) 
+			foreach($r as $rr)
 				$l[] = $rr['name'];
 
 	}
@@ -72,7 +72,7 @@ function lockview_content(App &$a) {
 			dbesc(implode(', ', $deny_groups))
 		);
 		if (dbm::is_result($r))
-			foreach($r as $rr) 
+			foreach($r as $rr)
 				$l[] = '<b><strike>' . $rr['name'] . '</strike></b>';
 	}
 	if(count($deny_users)) {
@@ -80,7 +80,7 @@ function lockview_content(App &$a) {
 			dbesc(implode(', ',$deny_users))
 		);
 		if (dbm::is_result($r))
-			foreach($r as $rr) 
+			foreach($r as $rr)
 				$l[] = '<strike>' . $rr['name'] . '</strike>';
 
 	}

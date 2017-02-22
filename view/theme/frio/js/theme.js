@@ -10,7 +10,7 @@ $(document).ready(function(){
 			$("#back-to-top").fadeOut();
 		}
 	});
- 
+
 	// scroll body to 0px on click
 	$("#back-to-top").click(function () {
 		$("body,html").animate({
@@ -40,9 +40,7 @@ $(document).ready(function(){
 	$(".field.select > select, .field.custom > select").addClass("form-control");
 
 	// move the tabbar to the second nav bar
-	if( $("ul.tabbar").length ) {
-		$("ul.tabbar").appendTo("#topbar-second > .container > #tabmenu");
-	}
+	$("section .tabbar-wrapper").first().appendTo("#topbar-second > .container > #tabmenu");
 
 	// add mask css url to the logo-img container
 	//
@@ -56,7 +54,7 @@ $(document).ready(function(){
 	}
 
 	// make responsive tabmenu with flexmenu.js
-	// the menupoints which doesn't fit in the second nav bar will moved to a 
+	// the menupoints which doesn't fit in the second nav bar will moved to a
 	// dropdown menu. Look at common_tabs.tpl
 	$("ul.tabs.flex-nav").flexMenu({
 		'cutoff': 2,
@@ -84,17 +82,17 @@ $(document).ready(function(){
 				return false;
 			}
 		});
-		
+
 		if(checked == true) {
 			$("a#item-delete-selected").fadeTo(400, 1);
 			$("a#item-delete-selected").show();
 		} else {
 			$("a#item-delete-selected").fadeTo(400, 0, function(){
 				$("a#item-delete-selected").hide();
-			});	
+			});
 		}
 	});
-		
+
 	//$('ul.flex-nav').flexMenu();
 
 	// initialize the bootstrap tooltips
@@ -130,7 +128,7 @@ $(document).ready(function(){
 		// append the new heading to the navbar
 		$("#topbar-second > .container > #tabmenu").append(newText);
 
-		// try to get the value of the original search input to insert it 
+		// try to get the value of the original search input to insert it
 		// as value in the nav-search-input
 		var searchValue = $("#search-wrapper .form-group-search input").val();
 
@@ -258,40 +256,30 @@ $(document).ready(function(){
 		input.val(val);
 	});
 
+	// Set the padding for input elements with inline buttons
+	//
+	// In Frio we use some input elements where the submit button is visually
+	// inside the the input field (through css). We need to set a padding-right
+	// to the input element where the padding value would be at least the width
+	// of the button. Otherwise long user input would be invisible because it is
+	// behind the button.
+	$("body").on('click', '.form-group-search > input', function() {
+		// Get the width of the button (if the button isn't available
+		// buttonWidth will be null
+		var buttonWidth = $(this).next('.form-button-search').outerWidth();
+
+		if (buttonWidth) {
+			// Take the width of the button and ad 5px
+			var newWidth = buttonWidth + 5;
+			// Set the padding of the input element according
+			// to the width of the button
+			$(this).css('padding-right', newWidth);
+		}
+
+	});
+
+
 });
-//function commentOpenUI(obj, id) {
-//	$(document).unbind( "click.commentOpen", handler );
-//
-//	var handler = function() {
-//		if(obj.value == '{{$comment}}') {
-//			obj.value = '';
-//			$("#comment-edit-text-" + id).addClass("comment-edit-text-full").removeClass("comment-edit-text-empty");
-//			// Choose an arbitrary tab index that's greater than what we're using in jot (3 of them)
-//			// The submit button gets tabindex + 1
-//			$("#comment-edit-text-" + id).attr('tabindex','9');
-//			$("#comment-edit-submit-" + id).attr('tabindex','10');
-//			$("#comment-edit-submit-wrapper-" + id).show();
-//		}
-//	};
-//
-//	$(document).bind( "click.commentOpen", handler );
-//}
-//
-//function commentCloseUI(obj, id) {
-//	$(document).unbind( "click.commentClose", handler );
-//
-//	var handler = function() {
-//		if(obj.value === '') {
-//		obj.value = '{{$comment}}';
-//			$("#comment-edit-text-" + id).removeClass("comment-edit-text-full").addClass("comment-edit-text-empty");
-//			$("#comment-edit-text-" + id).removeAttr('tabindex');
-//			$("#comment-edit-submit-" + id).removeAttr('tabindex');
-//			$("#comment-edit-submit-wrapper-" + id).hide();
-//		}
-//	};
-//
-//	$(document).bind( "click.commentClose", handler );
-//}
 
 function openClose(theID) {
 	var elem = document.getElementById(theID);

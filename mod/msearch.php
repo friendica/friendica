@@ -1,6 +1,6 @@
 <?php
 
-function msearch_post(App &$a) {
+function msearch_post(App $a) {
 
 	$perpage = (($_POST['n']) ? $_POST['n'] : 80);
 	$page = (($_POST['p']) ? intval($_POST['p'] - 1) : 0);
@@ -28,8 +28,8 @@ function msearch_post(App &$a) {
 	if (dbm::is_result($r)) {
 		foreach($r as $rr)
 			$results[] = array(
-				'name' => $rr['name'], 
-				'url' => App::get_baseurl() . '/profile/' . $rr['nickname'], 
+				'name' => $rr['name'],
+				'url' => App::get_baseurl() . '/profile/' . $rr['nickname'],
 				'photo' => App::get_baseurl() . '/photo/avatar/' . $rr['uid'] . '.jpg',
 				'tags' => str_replace(array(',','  '),array(' ',' '),$rr['pub_keywords'])
 			);

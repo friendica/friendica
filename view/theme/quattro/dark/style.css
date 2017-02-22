@@ -463,7 +463,7 @@ a:hover {
   text-decoration: underline;
 }
 blockquote {
-  background: #ffffff;
+  background: #FFFFFF;
   padding: 1em;
   margin-left: 1em;
   border-left: 1em solid #e6e6e6;
@@ -1459,7 +1459,6 @@ blockquote.shared_content {
 }
 .oembed.video > a.embed_video {
   display: block;
-  float: left;
   position: relative;
 }
 .oembed.video > a.embed_video > div {

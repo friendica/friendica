@@ -30,8 +30,9 @@ function poller_run($argv, $argc){
 	};
 
 	// Quit when in maintenance
-	if (get_config('system', 'maintenance', true))
+	if (Config::get('system', 'maintenance', true)) {
 		return;
+	}
 
 	$a->start_process();
 
@@ -90,10 +91,8 @@ function poller_execute($queue) {
 
 	$mypid = getmypid();
 
-	$cooldown = Config::get("system", "worker_cooldown", 0);
-
 	// Quit when in maintenance
-	if (get_config('system', 'maintenance', true)) {
+	if (Config::get('system', 'maintenance', true)) {
 		return false;
 	}
 
@@ -137,8 +136,6 @@ function poller_execute($queue) {
 
 	$argv = json_decode($queue["parameter"]);
 
-	$argc = count($argv);
-
 	// Check for existance and validity of the include file
 	$include = $argv[0];
 
@@ -153,23 +150,8 @@ function poller_execute($queue) {
 	$funcname = str_replace(".php", "", basename($argv[0]))."_run";
 
 	if (function_exists($funcname)) {
-		logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]);
 
-		// For better logging create a new process id for every worker call
-		// But preserve the old one for the worker
-		$old_process_id = $a->process_id;
-		$a->process_id = uniqid("wrk", true);
-
-		$funcname($argv, $argc);
-
-		$a->process_id = $old_process_id;
-
-		if ($cooldown > 0) {
-			logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." - in cooldown for ".$cooldown." seconds");
-			sleep($cooldown);
-		}
-
-		logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." - done");
+		poller_exec_function($queue, $funcname, $argv);
 
 		q("DELETE FROM `workerqueue` WHERE `id` = %d", intval($queue["id"]));
 	} else {
@@ -180,6 +162,104 @@ function poller_execute($queue) {
 }
 
 /**
+ * @brief Execute a function from the queue
+ *
+ * @param array $queue Workerqueue entry
+ * @param string $funcname name of the function
+ * @param array $argv Array of values to be passed to the function
+ */
+function poller_exec_function($queue, $funcname, $argv) {
+
+	$a = get_app();
+
+	$mypid = getmypid();
+
+	$argc = count($argv);
+
+	logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]);
+
+	$stamp = (float)microtime(true);
+
+	// We use the callstack here to analyze the performance of executed worker entries.
+	// For this reason the variables have to be initialized.
+	if (Config::get("system", "profiler")) {
+		$a->performance["start"] = microtime(true);
+		$a->performance["database"] = 0;
+		$a->performance["database_write"] = 0;
+		$a->performance["network"] = 0;
+		$a->performance["file"] = 0;
+		$a->performance["rendering"] = 0;
+		$a->performance["parser"] = 0;
+		$a->performance["marktime"] = 0;
+		$a->performance["markstart"] = microtime(true);
+		$a->callstack = array();
+	}
+
+	// For better logging create a new process id for every worker call
+	// But preserve the old one for the worker
+	$old_process_id = $a->process_id;
+	$a->process_id = uniqid("wrk", true);
+
+	$funcname($argv, $argc);
+
+	$a->process_id = $old_process_id;
+
+	$duration = number_format(microtime(true) - $stamp, 3);
+
+	logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." - done in ".$duration." seconds.");
+
+	// Write down the performance values into the log
+	if (Config::get("system", "profiler")) {
+		$duration = microtime(true)-$a->performance["start"];
+
+		if (Config::get("rendertime", "callstack")) {
+			if (isset($a->callstack["database"])) {
+				$o = "\nDatabase Read:\n";
+				foreach ($a->callstack["database"] AS $func => $time) {
+					$time = round($time, 3);
+					if ($time > 0)
+						$o .= $func.": ".$time."\n";
+				}
+			}
+			if (isset($a->callstack["database_write"])) {
+				$o .= "\nDatabase Write:\n";
+				foreach ($a->callstack["database_write"] AS $func => $time) {
+					$time = round($time, 3);
+					if ($time > 0)
+						$o .= $func.": ".$time."\n";
+				}
+			}
+			if (isset($a->callstack["network"])) {
+				$o .= "\nNetwork:\n";
+				foreach ($a->callstack["network"] AS $func => $time) {
+					$time = round($time, 3);
+					if ($time > 0)
+						$o .= $func.": ".$time."\n";
+				}
+			}
+		} else {
+			$o = '';
+		}
+
+		logger("ID ".$queue["id"].": ".$funcname.": ".sprintf("DB: %s/%s, Net: %s, I/O: %s, Other: %s, Total: %s".$o,
+			number_format($a->performance["database"] - $a->performance["database_write"], 2),
+			number_format($a->performance["database_write"], 2),
+			number_format($a->performance["network"], 2),
+			number_format($a->performance["file"], 2),
+			number_format($duration - ($a->performance["database"] + $a->performance["network"] + $a->performance["file"]), 2),
+			number_format($duration, 2)),
+			LOGGER_DEBUG);
+	}
+
+	$cooldown = Config::get("system", "worker_cooldown", 0);
+
+	if ($cooldown > 0) {
+		logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." - in cooldown for ".$cooldown." seconds");
+		sleep($cooldown);
+	}
+}
+
+/**
  * @brief Checks if the number of database connections has reached a critical limit.
  *
  * @return bool Are more than 3/4 of the maximum connections used?
@@ -187,7 +267,7 @@ function poller_execute($queue) {
 function poller_max_connections_reached() {
 
 	// Fetch the max value from the config. This is needed when the system cannot detect the correct value by itself.
-	$max = get_config("system", "max_connections");
+	$max = Config::get("system", "max_connections");
 
 	// Fetch the percentage level where the poller will get active
 	$maxlevel = Config::get("system", "max_connections_level", 75);
@@ -371,7 +451,7 @@ function poller_too_much_workers() {
 		logger("Load: ".$load."/".$maxsysload." - processes: ".$active."/".$entries." (".$processlist.") - maximum: ".$queues."/".$maxqueues, LOGGER_DEBUG);
 
 		// Are there fewer workers running as possible? Then fork a new one.
-		if (!get_config("system", "worker_dont_fork") AND ($queues > ($active + 1)) AND ($entries > 1)) {
+		if (!Config::get("system", "worker_dont_fork") AND ($queues > ($active + 1)) AND ($entries > 1)) {
 			logger("Active workers: ".$active."/".$queues." Fork a new worker.", LOGGER_DEBUG);
 			$args = array("php", "include/poller.php", "no_cron");
 			$a = get_app();
@@ -500,7 +580,7 @@ function call_worker_if_idle() {
 	if (function_exists("proc_open")) {
 		// When was the last time that we called the worker?
 		// Less than one minute? Then we quit
-		if ((time() - get_config("system", "worker_started")) < 60) {
+		if ((time() - Config::get("system", "worker_started")) < 60) {
 			return;
 		}
 

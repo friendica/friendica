@@ -1,7 +1,7 @@
 <?php
 
 
-function randprof_init(App &$a) {
+function randprof_init(App $a) {
 	require_once('include/Contact.php');
 
 	$x = random_profile();

@@ -1,5 +1,7 @@
 <?php
 
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once("include/follow.php");
 
@@ -32,8 +34,7 @@ function onepoll_run(&$argv, &$argc){
 	require_once('include/socgraph.php');
 	require_once('include/queue_fn.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	$a->set_baseurl(get_config('system','url'));
 

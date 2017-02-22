@@ -19,7 +19,7 @@ function salmon_return($val) {
 
 }
 
-function salmon_post(App &$a) {
+function salmon_post(App $a) {
 
 	$xml = file_get_contents('php://input');
 
@@ -156,7 +156,7 @@ function salmon_post(App &$a) {
 		if(get_pconfig($importer['uid'],'system','ostatus_autofriend')) {
 			$result = new_contact($importer['uid'],$author_link);
 			if($result['success']) {
-				$r = q("SELECT * FROM `contact` WHERE `network` = '%s' AND ( `url` = '%s' OR `alias` = '%s') 
+				$r = q("SELECT * FROM `contact` WHERE `network` = '%s' AND ( `url` = '%s' OR `alias` = '%s')
 					AND `uid` = %d LIMIT 1",
 					dbesc(NETWORK_OSTATUS),
 					dbesc($author_link),

@@ -2,7 +2,7 @@
 require_once("include/Contact.php");
 require_once('include/Probe.php');
 
-function profiles_init(App &$a) {
+function profiles_init(App $a) {
 
 	nav_set_selected('profiles');
 
@@ -103,13 +103,13 @@ function profiles_init(App &$a) {
 		$r1[0]['net-publish'] = 0;
 		$r1[0]['profile-name'] = dbesc($name);
 
-		dbesc_array($r1[0]);
+		dbm::esc_array($r1[0], true);
 
 		$r2 = dbq("INSERT INTO `profile` (`"
 			. implode("`, `", array_keys($r1[0]))
-			. "`) VALUES ('"
-			. implode("', '", array_values($r1[0]))
-			. "')" );
+			. "`) VALUES ("
+			. implode(", ", array_values($r1[0]))
+			. ")" );
 
 		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
 			intval(local_user()),
@@ -160,7 +160,7 @@ function profile_clean_keywords($keywords) {
 	return $keywords;
 }
 
-function profiles_post(App &$a) {
+function profiles_post(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -313,19 +313,19 @@ function profiles_post(App &$a) {
 		$politic = notags(trim($_POST['politic']));
 		$religion = notags(trim($_POST['religion']));
 
-		$likes = fix_mce_lf(escape_tags(trim($_POST['likes'])));
-		$dislikes = fix_mce_lf(escape_tags(trim($_POST['dislikes'])));
+		$likes = escape_tags(trim($_POST['likes']));
+		$dislikes = escape_tags(trim($_POST['dislikes']));
 
-		$about = fix_mce_lf(escape_tags(trim($_POST['about'])));
-		$interest = fix_mce_lf(escape_tags(trim($_POST['interest'])));
-		$contact = fix_mce_lf(escape_tags(trim($_POST['contact'])));
-		$music = fix_mce_lf(escape_tags(trim($_POST['music'])));
-		$book = fix_mce_lf(escape_tags(trim($_POST['book'])));
-		$tv = fix_mce_lf(escape_tags(trim($_POST['tv'])));
-		$film = fix_mce_lf(escape_tags(trim($_POST['film'])));
-		$romance = fix_mce_lf(escape_tags(trim($_POST['romance'])));
-		$work = fix_mce_lf(escape_tags(trim($_POST['work'])));
-		$education = fix_mce_lf(escape_tags(trim($_POST['education'])));
+		$about = escape_tags(trim($_POST['about']));
+		$interest = escape_tags(trim($_POST['interest']));
+		$contact = escape_tags(trim($_POST['contact']));
+		$music = escape_tags(trim($_POST['music']));
+		$book = escape_tags(trim($_POST['book']));
+		$tv = escape_tags(trim($_POST['tv']));
+		$film = escape_tags(trim($_POST['film']));
+		$romance = escape_tags(trim($_POST['romance']));
+		$work = escape_tags(trim($_POST['work']));
+		$education = escape_tags(trim($_POST['education']));
 
 		$hide_friends = (($_POST['hide-friends'] == 1) ? 1: 0);
 
@@ -601,7 +601,7 @@ function profile_activity($changed, $value) {
 }
 
 
-function profiles_content(App &$a) {
+function profiles_content(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -623,22 +623,12 @@ function profiles_content(App &$a) {
 		require_once('include/profile_selectors.php');
 
 
-/*		$editselect = 'textareas';
-		if( intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext') )
-			$editselect = 'none';*/
-		$editselect = 'none';
-		if( feature_enabled(local_user(),'richtext') )
-			$editselect = 'textareas';
-
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('profed_head.tpl'), array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => $editselect,
 		));
 		$a->page['end'] .= replace_macros(get_markup_template('profed_end.tpl'), array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => $editselect,
 		));
-
 
 		$opt_tpl = get_markup_template("profile-hide-friends.tpl");
 		$hide_friends = replace_macros($opt_tpl,array(

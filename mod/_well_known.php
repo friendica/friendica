@@ -1,5 +1,7 @@
 <?php
-/// @TODO This file has DOS line endings!
+
+use \Friendica\Core\Config;
+
 require_once("mod/hostxrd.php");
 require_once("mod/nodeinfo.php");
 
@@ -23,27 +25,25 @@ function _well_known_init(App $a) {
 
 function wk_social_relay(App $a) {
 
-	define('SR_SCOPE_ALL', 'all');
-	define('SR_SCOPE_TAGS', 'tags');
+	$subscribe = (bool)Config::get('system', 'relay_subscribe', false);
 
-	$subscribe = (bool)get_config('system', 'relay_subscribe');
-
-	if ($subscribe)
-		$scope = get_config('system', 'relay_scope');
-	else
-		$scope = "";
+	if ($subscribe) {
+		$scope = Config::get('system', 'relay_scope', SR_SCOPE_ALL);
+	} else {
+		$scope = SR_SCOPE_NONE;
+	}
 
 	$tags = array();
 
 	if ($scope == SR_SCOPE_TAGS) {
-
-		$server_tags = get_config('system', 'relay_server_tags');
+		$server_tags = Config::get('system', 'relay_server_tags');
 		$tagitems = explode(",", $server_tags);
 
-		foreach($tagitems AS $tag)
+		foreach($tagitems AS $tag) {
 			$tags[trim($tag, "# ")] = trim($tag, "# ");
+		}
 
-		if (get_config('system', 'relay_user_tags')) {
+		if (Config::get('system', 'relay_user_tags')) {
 			$terms = q("SELECT DISTINCT(`term`) FROM `search`");
 
 			foreach($terms AS $term) {
@@ -54,8 +54,9 @@ function wk_social_relay(App $a) {
 	}
 
 	$taglist = array();
-	foreach($tags AS $tag)
+	foreach($tags AS $tag) {
 		$taglist[] = $tag;
+	}
 
 	$relay = array("subscribe" => $subscribe,
 			"scope" => $scope,

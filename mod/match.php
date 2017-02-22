@@ -10,10 +10,10 @@ require_once('mod/proxy.php');
  * It takes keywords from your profile and queries the directory server for
  * matching keywords from other profiles.
  *
- * @param App &$a
+ * @param App $a
  * @return void|string
  */
-function match_content(App &$a) {
+function match_content(App $a) {
 
 	$o = '';
 	if (! local_user()) {

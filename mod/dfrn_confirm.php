@@ -224,9 +224,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			 *
 			 */
 
-			$a->config['system']['curl_timeout'] = 120;
-
-			$res = post_url($dfrn_confirm,$params);
+			$res = post_url($dfrn_confirm, $params, null, $redirects, 120);
 
 			logger(' Confirm: received data: ' . $res, LOGGER_DATA);
 

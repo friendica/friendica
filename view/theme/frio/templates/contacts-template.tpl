@@ -1,7 +1,7 @@
 
-<div id="contacts" class="generic-page-wrapper">
+{{$tabs}}
 
-	{{$tabs}}
+<div id="contacts" class="generic-page-wrapper">
 
 	{{* The page heading with it's contacts counter *}}
 	<h2 class="heading">{{$header}} {{if $total}} ({{$total}}) {{/if}}</h2>

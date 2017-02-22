@@ -276,7 +276,7 @@ if(! function_exists('paginate_data')) {
  * @param int $count [optional] item count (used with alt pager)
  * @return Array data for pagination template
  */
-function paginate_data(&$a, $count=null) {
+function paginate_data(App $a, $count=null) {
 	$stripped = preg_replace('/([&?]page=[0-9]*)/','',$a->query_string);
 
 	$stripped = str_replace('q=','',$stripped);
@@ -369,7 +369,7 @@ if(! function_exists('paginate')) {
  * @param App $a App instance
  * @return string html for pagination #FIXME remove html
  */
-function paginate(App &$a) {
+function paginate(App $a) {
 
 	$data = paginate_data($a);
 	$tpl = get_markup_template("paginate.tpl");
@@ -384,7 +384,7 @@ if(! function_exists('alt_pager')) {
  * @param int $i
  * @return string html for pagination #FIXME remove html
  */
-function alt_pager(&$a, $i) {
+function alt_pager(App $a, $i) {
 
 	$data = paginate_data($a, $i);
 	$tpl = get_markup_template("paginate.tpl");
@@ -875,7 +875,7 @@ function contact_block() {
 		return $o;
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked`
-				AND NOT `hidden` AND NOT `archive`
+				AND NOT `pending` AND NOT `hidden` AND NOT `archive`
 				AND `network` IN ('%s', '%s', '%s')",
 			intval($a->profile['uid']),
 			dbesc(NETWORK_DFRN),
@@ -893,8 +893,9 @@ function contact_block() {
 		// Splitting the query in two parts makes it much faster
 		$r = q("SELECT `id` FROM `contact`
 				WHERE `uid` = %d AND NOT `self` AND NOT `blocked`
-					AND NOT `hidden` AND NOT `archive`
-				AND `network` IN ('%s', '%s', '%s') ORDER BY RAND() LIMIT %d",
+					AND NOT `pending` AND NOT `hidden` AND NOT `archive`
+					AND `network` IN ('%s', '%s', '%s')
+				ORDER BY RAND() LIMIT %d",
 				intval($a->profile['uid']),
 				dbesc(NETWORK_DFRN),
 				dbesc(NETWORK_OSTATUS),
@@ -2045,13 +2046,6 @@ function undo_post_tagging($s) {
 	return $s;
 }
 
-function fix_mce_lf($s) {
-	$s = str_replace("\r\n","\n",$s);
-//	$s = str_replace("\n\n","\n",$s);
-	return $s;
-}
-
-
 function protect_sprintf($s) {
 	return(str_replace('%','%%',$s));
 }
@@ -2073,17 +2067,19 @@ function is_a_date_arg($s) {
 /**
  * remove intentation from a text
  */
-function deindent($text, $chr="[\t ]", $count=NULL) {
-	$text = fix_mce_lf($text);
+function deindent($text, $chr = "[\t ]", $count = NULL) {
 	$lines = explode("\n", $text);
 	if (is_null($count)) {
 		$m = array();
-		$k=0; while($k<count($lines) && strlen($lines[$k])==0) $k++;
-		preg_match("|^".$chr."*|", $lines[$k], $m);
+		$k = 0;
+		while ($k < count($lines) && strlen($lines[$k]) == 0) {
+			$k++;
+		}
+		preg_match("|^" . $chr . "*|", $lines[$k], $m);
 		$count = strlen($m[0]);
 	}
-	for ($k=0; $k<count($lines); $k++){
-		$lines[$k] = preg_replace("|^".$chr."{".$count."}|", "", $lines[$k]);
+	for ($k=0; $k < count($lines); $k++) {
+		$lines[$k] = preg_replace("|^" . $chr . "{" . $count . "}|", "", $lines[$k]);
 	}
 
 	return implode("\n", $lines);

@@ -1,5 +1,5 @@
 <?php
-function network_init(App &$a) {
+function network_init(App $a) {
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
@@ -221,7 +221,7 @@ function saved_searches($search) {
  *
  * @return Array ( $no_active, $comment_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active, $spam_active );
  */
-function network_query_get_sel_tab(App &$a) {
+function network_query_get_sel_tab(App $a) {
 	$no_active='';
 	$starred_active = '';
 	$new_active = '';
@@ -292,7 +292,7 @@ function network_query_get_sel_net() {
 	return $network;
 }
 
-function network_query_get_sel_group(App &$a) {
+function network_query_get_sel_group(App $a) {
 	$group = false;
 
 	if($a->argc >= 2 && is_numeric($a->argv[1])) {
@@ -303,7 +303,7 @@ function network_query_get_sel_group(App &$a) {
 }
 
 
-function network_content(&$a, $update = 0) {
+function network_content(App $a, $update = 0) {
 
 	require_once('include/conversation.php');
 
@@ -574,9 +574,10 @@ function network_content(&$a, $update = 0) {
 			$sql_order = "`item`.`id`";
 			$order_mode = "id";
 		} else {
-			if (get_config('system','use_fulltext_engine'))
-				$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
-			else
+			// Disabled until final decision what to do with this
+			//if (get_config('system','use_fulltext_engine'))
+			//	$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
+			//else
 				$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
 			$sql_order = "`item`.`id`";
 			$order_mode = "id";
@@ -728,7 +729,7 @@ function network_content(&$a, $update = 0) {
 					intval($parents),
 					intval($max_comments + 1)
 				);
-	
+
 				if (dbm::is_result($thread_items))
 					$items = array_merge($items, $thread_items);
 			}
@@ -762,24 +763,23 @@ function network_content(&$a, $update = 0) {
 // on they just get buried deeper. It has happened to me a couple of times also.
 
 
-	if((! $group) && (! $cid) && (! $star)) {
+	if (!$group && !$cid && !$star) {
 
-		$unseen = q("SELECT `id` FROM `item` WHERE `unseen` AND `uid` = %d",
+		$unseen = q("SELECT `id` FROM `item` WHERE `unseen` AND `uid` = %d LIMIT 1",
 				intval(local_user()));
 
-		if ($unseen)
+		if (dbm::is_result($unseen)) {
 			$r = q("UPDATE `item` SET `unseen` = 0
 				WHERE `unseen` = 1 AND `uid` = %d",
 				intval(local_user())
 			);
-	}
-	else {
-		if($update_unseen) {
+		}
+	} elseif ($update_unseen) {
 
-			$unseen = q("SELECT `id` FROM `item` ".$update_unseen);
+		$unseen = q("SELECT `id` FROM `item` ".$update_unseen. " LIMIT 1");
 
-			if ($unseen)
-				$r = q("UPDATE `item` SET `unseen` = 0 $update_unseen");
+		if (dbm::is_result($unseen)) {
+			$r = q("UPDATE `item` SET `unseen` = 0 $update_unseen");
 		}
 	}
 
@@ -790,10 +790,10 @@ function network_content(&$a, $update = 0) {
 
 	$o .= conversation($a,$items,$mode,$update);
 
-	if(!$update) {
-		if(get_pconfig(local_user(),'system','infinite_scroll')) {
+	if (!$update) {
+		if (get_pconfig(local_user(),'system','infinite_scroll')) {
 			$o .= scroll_loader();
-		} elseif(!get_config('system', 'old_pager')) {
+		} elseif (!get_config('system', 'old_pager')) {
 			$o .= alt_pager($a,count($items));
 		} else {
 			$o .= paginate($a);
@@ -805,11 +805,11 @@ function network_content(&$a, $update = 0) {
 
 /**
  * @brief Get the network tabs menu
- * 
+ *
  * @param app $a The global App
  * @return string Html of the networktab
  */
-function network_tabs(App &$a) {
+function network_tabs(App $a) {
 	// item filter tabs
 	/// @TODO fix this logic, reduce duplication
 	/// $a->page['content'] .= '<div class="tabs-wrapper">';
@@ -892,7 +892,7 @@ function network_tabs(App &$a) {
 
 	$arr = array('tabs' => $tabs);
 	call_hooks('network_tabs', $arr);
-	
+
 	$tpl = get_markup_template('common_tabs.tpl');
 
 	return replace_macros($tpl, array('$tabs' => $arr['tabs']));

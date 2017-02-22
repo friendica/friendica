@@ -283,7 +283,7 @@ class Photo {
 			do {
 
 				// FIXME - implement horizantal bias for scaling as in followin GD functions
-				// to allow very tall images to be constrained only horizontally. 
+				// to allow very tall images to be constrained only horizontally.
 
 				$this->image->scaleImage($dest_width, $dest_height);
 			} while ($this->image->nextImage());
@@ -943,7 +943,7 @@ function scale_image($width, $height, $max) {
 	return array("width" => $dest_width, "height" => $dest_height);
 }
 
-function store_photo($a, $uid, $imagedata = "", $url = "") {
+function store_photo(App $a, $uid, $imagedata = "", $url = "") {
 	$r = q("SELECT `user`.`nickname`, `user`.`page-flags`, `contact`.`id` FROM `user` INNER JOIN `contact` on `user`.`uid` = `contact`.`uid`
 		WHERE `user`.`uid` = %d AND `user`.`blocked` = 0 AND `contact`.`self` = 1 LIMIT 1",
 		intval($uid));

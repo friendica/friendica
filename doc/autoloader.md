@@ -32,7 +32,7 @@ Let's say you have a php file in "include/" that define a very useful class:
     file: include/ItemsManager.php
     <?php
     namespace \Friendica;
-    
+
     class ItemsManager {
        public function getAll() { ... }
        public function getByID($id) { ... }
@@ -67,11 +67,11 @@ The code will be something like:
 ```
     file: mod/network.php
     <?php
-    
-    function network_content(App &$a) {
+
+    function network_content(App $a) {
        $itemsmanager = new \Friendica\ItemsManager();
        $items = $itemsmanager->getAll();
-    
+
        // pass $items to template
        // return result
     }
@@ -86,7 +86,7 @@ Going further: now we have a bunch of "*Manager" classes that cause some code du
     file: include/BaseManager.php
     <?php
     namespace \Friendica;
-    
+
     class BaseManager {
       public function thatFunctionEveryManagerUses() { ... }
     }
@@ -98,7 +98,7 @@ and then let's change the ItemsManager class to use this code
     file: include/ItemsManager.php
     <?php
     namespace \Friendica;
-    
+
     class ItemsManager extends BaseManager {
        public function getAll() { ... }
        public function getByID($id) { ... }
@@ -110,9 +110,9 @@ It works with the "BaseManager" example here, it works when we need to call stat
 
 ```
     file: include/dfrn.php
-    <?php    
+    <?php
     namespace \Friendica;
-    
+
     class dfrn {
       public static function  mail($item, $owner) { ... }
     }
@@ -121,7 +121,7 @@ It works with the "BaseManager" example here, it works when we need to call stat
 ```
     file: mod/mail.php
     <?php
-    
+
     mail_post($a){
      ...
      \Friendica\dfrn::mail($item, $owner);
@@ -134,15 +134,15 @@ If your code is in same namespace as the class you need, you don't need to prepe
 ```
     file: include/delivery.php
     <?php
-    
+
     namespace \Friendica;
-    
-    // this is the same content of current include/delivery.php, 
+
+    // this is the same content of current include/delivery.php,
     // but has been declared to be in "Friendica" namespace
-    
+
     [...]
     switch($contact['network']) {
-    
+
         case NETWORK_DFRN:
             if ($mail) {
                 $item['body'] = ...
@@ -160,11 +160,11 @@ But if you want to use classes from another library, you need to use the full na
 
 ```
     <?php
-    namespace \Frienidca;
-    
+    namespace \Friendica;
+
     class Diaspora {
       public function md2bbcode() {
-        $html = \Michelf\MarkdownExtra::defaultTransform($text); 
+        $html = \Michelf\MarkdownExtra::defaultTransform($text);
       }
     }
 ```
@@ -173,13 +173,13 @@ if you use that class in many places of the code and you don't want to write the
 
 ```
     <?php
-    namespace \Frienidca;
-    
+    namespace \Friendica;
+
     use \Michelf\MarkdownExtra;
-    
+
     class Diaspora {
       public function md2bbcode() {
-        $html = MarkdownExtra::defaultTransform($text); 
+        $html = MarkdownExtra::defaultTransform($text);
       }
     }
 ```
@@ -190,7 +190,7 @@ You can go more deep if you want to, like:
 ```
     <?php
     namespace \Friendica\Network;
-    
+
     class DFRN {
     }
 ```
@@ -200,7 +200,7 @@ or
 ```
     <?php
     namespace \Friendica\DBA;
-    
+
     class MySQL {
     }
 ```

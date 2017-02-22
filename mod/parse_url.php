@@ -1,36 +1,25 @@
 <?php
 
-/** 
+/**
  * @file mod/parse_url.php
  * @brief The parse_url module
- * 
- * This module does parse an url for embedable content (audio, video, image files or link)
- * information and does format this information to BBCode or html (this depends
- * on the user settings - default is BBCode output).
- * If the user has enabled the richtext editor setting the output will be in html
- * (Note: This is not always possible and in some case not useful because
- * the richtext editor doesn't support all kind of html).
- * Otherwise the output will be constructed BBCode.
- * 
- * @see ParseUrl::getSiteinfo() for more information about scraping embeddable content 
+ *
+ * This module does parse an url for embeddable content (audio, video, image files or link)
+ * information and does format this information to BBCode
+ *
+ * @see ParseUrl::getSiteinfo() for more information about scraping embeddable content
 */
 
 use \Friendica\ParseUrl;
 
 require_once("include/items.php");
 
-function parse_url_content(App &$a) {
+function parse_url_content(App $a) {
 
 	$text = null;
 	$str_tags = "";
 
-	$textmode = false;
-
-	if (local_user() && (!feature_enabled(local_user(), "richtext"))) {
-		$textmode = true;
-	}
-
-	$br = (($textmode) ? "\n" : "<br />");
+	$br = "\n";
 
 	if (x($_GET,"binurl")) {
 		$url = trim(hex2bin($_GET["binurl"]));
@@ -97,11 +86,7 @@ function parse_url_content(App &$a) {
 		}
 	}
 
-	if ($textmode) {
-		$template = "[bookmark=%s]%s[/bookmark]%s";
-	} else {
-		$template = "<a class=\"bookmark\" href=\"%s\" >%s</a>%s";
-	}
+	$template = "[bookmark=%s]%s[/bookmark]%s";
 
 	$arr = array("url" => $url, "text" => "");
 
@@ -118,12 +103,7 @@ function parse_url_content(App &$a) {
 
 		$title = str_replace(array("\r","\n"),array("",""),$title);
 
-		if ($textmode) {
-			$text = "[quote]" . trim($text) . "[/quote]" . $br;
-		} else {
-			$text = "<blockquote>" . htmlspecialchars(trim($text)) . "</blockquote><br />";
-			$title = htmlspecialchars($title);
-		}
+		$text = "[quote]" . trim($text) . "[/quote]" . $br;
 
 		$result = sprintf($template, $url, ($title) ? $title : $url, $text) . $str_tags;
 
@@ -141,11 +121,6 @@ function parse_url_content(App &$a) {
 	// Format it as BBCode attachment
 	$info = add_page_info_data($siteinfo);
 
-	if (!$textmode) {
-		// Replace ' with ’ - not perfect - but the richtext editor has problems otherwise
-		$info = str_replace(array("&#039;"), array("&#8217;"), $info);
-	}
-
 	echo $info;
 
 	killme();
@@ -153,20 +128,20 @@ function parse_url_content(App &$a) {
 
 /**
  * @brief Legacy function to call ParseUrl::getSiteinfoCached
- * 
+ *
  * Note: We have moved the function to ParseUrl.php. This function is only for
  * legacy support and will be remove in the future
- * 
+ *
  * @param type $url The url of the page which should be scraped
  * @param type $no_guessing If true the parse doens't search for
  *    preview pictures
  * @param type $do_oembed The false option is used by the function fetch_oembed()
  *    to avoid endless loops
- * 
+ *
  * @return array which contains needed data for embedding
- * 
+ *
  * @see ParseUrl::getSiteinfoCached()
- * 
+ *
  * @todo Remove this function after all Addons has been changed to use
  *    ParseUrl::getSiteinfoCached
  */

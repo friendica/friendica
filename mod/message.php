@@ -4,7 +4,7 @@ require_once('include/acl_selectors.php');
 require_once('include/message.php');
 require_once('include/Smilies.php');
 
-function message_init(App &$a) {
+function message_init(App $a) {
 
 	$tabs = '';
 
@@ -40,7 +40,7 @@ function message_init(App &$a) {
 
 }
 
-function message_post(App &$a) {
+function message_post(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -51,17 +51,6 @@ function message_post(App &$a) {
 	$subject   = ((x($_REQUEST,'subject'))   ? notags(trim($_REQUEST['subject']))   : '');
 	$body      = ((x($_REQUEST,'body'))      ? escape_tags(trim($_REQUEST['body'])) : '');
 	$recipient = ((x($_REQUEST,'messageto')) ? intval($_REQUEST['messageto'])       : 0 );
-
-	// Work around doubled linefeeds in Tinymce 3.5b2
-
-/*	$plaintext = intval(get_pconfig(local_user(),'system','plaintext') && !feature_enabled(local_user(),'richtext'));
-	if(! $plaintext) {
-		$body = fix_mce_lf($body);
-	}*/
-	$plaintext = intval(!feature_enabled(local_user(),'richtext'));
-	if(! $plaintext) {
-		$body = fix_mce_lf($body);
-	}
 
 	$ret = send_message($recipient, $body, $subject, $replyto);
 	$norecip = false;
@@ -173,7 +162,7 @@ function item_redir_and_replace_images($body, $images, $cid) {
 
 
 
-function message_content(App &$a) {
+function message_content(App $a) {
 
 	$o = '';
 	nav_set_selected('messages');
@@ -275,18 +264,9 @@ function message_content(App &$a) {
 
 		$o .= $header;
 
-/*		$plaintext = false;
-		if(intval(get_pconfig(local_user(),'system','plaintext')))
-			$plaintext = true;*/
-		$plaintext = true;
-		if( local_user() && feature_enabled(local_user(),'richtext') )
-			$plaintext = false;
-
-
 		$tpl = get_markup_template('msg-header.tpl');
 		$a->page['htmlhead'] .= replace_macros($tpl, array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
@@ -294,7 +274,6 @@ function message_content(App &$a) {
 		$tpl = get_markup_template('msg-end.tpl');
 		$a->page['end'] .= replace_macros($tpl, array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
@@ -397,10 +376,6 @@ function message_content(App &$a) {
 
 		$o .= $header;
 
-		$plaintext = true;
-		if( local_user() && feature_enabled(local_user(),'richtext') )
-			$plaintext = false;
-
 		$r = q("SELECT `mail`.*, `contact`.`name`, `contact`.`url`, `contact`.`thumb`
 			FROM `mail` LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
 			WHERE `mail`.`uid` = %d AND `mail`.`id` = %d LIMIT 1",
@@ -439,7 +414,6 @@ function message_content(App &$a) {
 		$tpl = get_markup_template('msg-header.tpl');
 		$a->page['htmlhead'] .= replace_macros($tpl, array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
@@ -447,11 +421,9 @@ function message_content(App &$a) {
 		$tpl = get_markup_template('msg-end.tpl');
 		$a->page['end'] .= replace_macros($tpl, array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
-
 
 		$mails = array();
 		$seen = 0;

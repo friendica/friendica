@@ -186,7 +186,7 @@ class Cache {
 			set_config("system", "cache_cleared_half_hour", time());
 		}
 
-		if (($max_level <= CACHE_QUARTER_HOUR) AND (get_config("system", "cache_cleared_hour")) < time() - self::duration(CACHE_QUARTER_HOUR)) {
+		if (($max_level <= CACHE_QUARTER_HOUR) AND (get_config("system", "cache_cleared_quarter_hour")) < time() - self::duration(CACHE_QUARTER_HOUR)) {
 			q("DELETE FROM `cache` WHERE `updated` < '%s' AND `expire_mode` = %d",
 				dbesc(datetime_convert('UTC','UTC',"now - 15 minutes")), intval(CACHE_QUARTER_HOUR));
 

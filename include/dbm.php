@@ -49,5 +49,42 @@ class dbm {
 		}
 		return (is_array($array) && count($array) > 0);
 	}
+
+	/**
+	 * @brief Callback function for "esc_array"
+	 *
+	 * @param mixed $value Array value
+	 * @param string $key Array key
+	 * @param boolean $add_quotation add quotation marks for string values
+	 */
+	private static function esc_array_callback(&$value, $key, $add_quotation) {
+
+		if (!$add_quotation) {
+			if (is_bool($value)) {
+				$value = ($value ? '1' : '0');
+			} else {
+				$value = dbesc($value);
+			}
+			return;
+		}
+
+		if (is_bool($value)) {
+			$value = ($value ? 'true' : 'false');
+		} elseif (is_float($value) OR is_integer($value)) {
+			$value = (string)$value;
+		} else {
+			 $value = "'".dbesc($value)."'";
+		}
+	}
+
+	/**
+	 * @brief Escapes a whole array
+	 *
+	 * @param mixed $arr Array with values to be escaped
+	 * @param boolean $add_quotation add quotation marks for string values
+	 */
+	public static function esc_array(&$arr, $add_quotation = false) {
+		array_walk($arr, 'self::esc_array_callback', $add_quotation);
+	}
 }
 ?>

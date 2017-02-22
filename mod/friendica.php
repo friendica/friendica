@@ -1,5 +1,7 @@
 <?php
 
+use \Friendica\Core\Config;
+
 function friendica_init(App $a) {
 	if ($a->argv[1]=="json"){
 		$register_policy = Array('REGISTER_CLOSED', 'REGISTER_APPROVE', 'REGISTER_OPEN');
@@ -29,7 +31,7 @@ function friendica_init(App $a) {
 					$visible_plugins[] = $rr['name'];
 		}
 
-		load_config('feature_lock');
+		Config::load('feature_lock');
 		$locked_features = array();
 		if(is_array($a->config['feature_lock']) && count($a->config['feature_lock'])) {
 			foreach($a->config['feature_lock'] as $k => $v) {

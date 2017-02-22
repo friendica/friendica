@@ -28,7 +28,7 @@
 # silke m <silke@silkemeyer.net>, 2015
 # Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2013-2016
 # Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2011-2013
-# Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2016
+# Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2016-2017
 # zottel <transifex@zottel.net>, 2011-2012
 # tschlotfeldt <ts+transifex@ml.tschlotfeldt.de>, 2011
 msgid ""
@@ -36,8 +36,8 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-19 07:46+0100\n"
-"PO-Revision-Date: 2017-01-02 17:16+0000\n"
-"Last-Translator: rabuzarus <rabuzarus@t-online.de>\n"
+"PO-Revision-Date: 2017-02-17 07:07+0000\n"
+"Last-Translator: Tobias Diekershoff <tobias.diekershoff@gmx.net>\n"
 "Language-Team: German (http://www.transifex.com/Friendica/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4667,7 +4667,7 @@ msgid ""
 "Shall your connection be bidirectional or not? \"Friend\" implies that you "
 "allow to read and you subscribe to their posts. \"Sharer\" means that you "
 "allow to read but you do not want to read theirs. Approve as: "
-msgstr "Soll Deine Beziehung beidseitig sein oder nicht? \"Freund\" bedeutet, ihr gegenseitig die Beiträge des Anderen lesen dürft. \"Teilenden\", das du das lesen deiner Beiträge erlaubst aber nicht die Beiträge der anderen Seite lesen möchtest. Genehmigen als:"
+msgstr "Soll Deine Beziehung beidseitig sein oder nicht? \"Kontakt\" bedeutet, ihr gegenseitig die Beiträge des Anderen lesen dürft. \"Teilenden\", das du das lesen deiner Beiträge erlaubst aber nicht die Beiträge der anderen Seite lesen möchtest. Genehmigen als:"
 
 #: mod/notifications.php:209
 msgid "Friend"

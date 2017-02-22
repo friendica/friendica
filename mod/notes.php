@@ -1,6 +1,6 @@
 <?php
 
-function notes_init(App &$a) {
+function notes_init(App $a) {
 
 	if (! local_user()) {
 		return;
@@ -17,7 +17,7 @@ function notes_init(App &$a) {
 }
 
 
-function notes_content(&$a,$update = false) {
+function notes_content(App $a, $update = false) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

@@ -23,8 +23,7 @@ function dbclean_run(&$argv, &$argc) {
 		unset($db_host, $db_user, $db_pass, $db_data);
 	}
 
-	Config::load('config');
-	Config::load('system');
+	Config::load();
 
 	if (!Config::get('system', 'dbclean', false)) {
 		return;

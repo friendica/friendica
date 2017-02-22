@@ -16,7 +16,7 @@ function get_theme_config_file($theme){
 	return null;
 }
 
-function settings_init(App &$a) {
+function settings_init(App $a) {
 
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
@@ -116,7 +116,7 @@ function settings_init(App &$a) {
 }
 
 
-function settings_post(App &$a) {
+function settings_post(App $a) {
 
 	if (! local_user()) {
 		return;
@@ -654,7 +654,7 @@ function settings_post(App &$a) {
 }
 
 
-function settings_content(App &$a) {
+function settings_content(App $a) {
 
 	$o = '';
 	nav_set_selected('settings');

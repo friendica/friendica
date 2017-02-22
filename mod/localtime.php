@@ -3,7 +3,7 @@
 require_once('include/datetime.php');
 
 
-function localtime_post(App &$a) {
+function localtime_post(App $a) {
 
 	$t = $_REQUEST['time'];
 	if(! $t)
@@ -16,7 +16,7 @@ function localtime_post(App &$a) {
 
 }
 
-function localtime_content(App &$a) {
+function localtime_content(App $a) {
 	$t = $_REQUEST['time'];
 	if(! $t)
 		$t = 'now';
@@ -38,7 +38,7 @@ function localtime_content(App &$a) {
 
 	$o .= '<form action ="' . App::get_baseurl() . '/localtime?f=&time=' . $t . '" method="post" >';
 
-	$o .= '<p>' . t('Please select your timezone:') . '</p>'; 
+	$o .= '<p>' . t('Please select your timezone:') . '</p>';
 
 	$o .= select_timezone(($_REQUEST['timezone']) ? $_REQUEST['timezone'] : 'America/Los_Angeles');
 

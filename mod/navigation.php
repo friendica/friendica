@@ -2,7 +2,7 @@
 
 require_once("include/nav.php");
 
-function navigation_content(App &$a) {
+function navigation_content(App $a) {
 
 	$nav_info = nav_info($a);
 

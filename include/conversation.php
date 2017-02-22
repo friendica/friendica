@@ -466,7 +466,7 @@ function item_condition() {
  */
 
 if(!function_exists('conversation')) {
-function conversation(&$a, $items, $mode, $update, $preview = false) {
+function conversation(App $a, $items, $mode, $update, $preview = false) {
 
 	require_once('include/bbcode.php');
 	require_once('include/Contact.php');
@@ -1170,23 +1170,14 @@ function format_like($cnt,$arr,$type,$id) {
 
 
 function status_editor($a,$x, $notes_cid = 0, $popup=false) {
-
 	$o = '';
 
 	$geotag = (($x['allow_location']) ? replace_macros(get_markup_template('jot_geotag.tpl'), array()) : '');
-
-/*	$plaintext = false;
-	if( local_user() && (intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext')) )
-		$plaintext = true;*/
-	$plaintext = true;
-	if( local_user() && feature_enabled(local_user(),'richtext') )
-		$plaintext = false;
 
 	$tpl = get_markup_template('jot-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
 		'$newpost' => 'true',
 		'$baseurl' => App::get_baseurl(true),
-		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$geotag' => $geotag,
 		'$nickname' => $x['nickname'],
 		'$ispublic' => t('Visible to <strong>everybody</strong>'),
@@ -1199,12 +1190,10 @@ function status_editor($a,$x, $notes_cid = 0, $popup=false) {
 		'$delitems' => t('Delete item(s)?')
 	));
 
-
 	$tpl = get_markup_template('jot-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, array(
 		'$newpost' => 'true',
 		'$baseurl' => App::get_baseurl(true),
-		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$geotag' => $geotag,
 		'$nickname' => $x['nickname'],
 		'$ispublic' => t('Visible to <strong>everybody</strong>'),

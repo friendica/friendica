@@ -28,14 +28,6 @@ function editpost_content(App $a) {
 		return;
 	}
 
-/*	$plaintext = false;
-	if( local_user() && intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext') )
-		$plaintext = true;*/
-	$plaintext = true;
-	if( local_user() && feature_enabled(local_user(),'richtext') )
-		$plaintext = false;
-
-
 	$o .= replace_macros(get_markup_template("section_title.tpl"),array(
 		'$title' => t('Edit post')
 	));
@@ -43,7 +35,6 @@ function editpost_content(App $a) {
 	$tpl = get_markup_template('jot-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
 		'$baseurl' => App::get_baseurl(),
-		'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$ispublic' => '&nbsp;', // t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
 		'$nickname' => $a->user['nickname']
@@ -52,7 +43,6 @@ function editpost_content(App $a) {
 	$tpl = get_markup_template('jot-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, array(
 		'$baseurl' => App::get_baseurl(),
-		'$editselect' =>  (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
 		'$ispublic' => '&nbsp;', // t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
 		'$nickname' => $a->user['nickname']

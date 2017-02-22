@@ -1,6 +1,6 @@
 <?php
 
-function auto_redir(&$a, $contact_nick) {
+function auto_redir(App $a, $contact_nick) {
 
 	// prevent looping
 
@@ -70,7 +70,7 @@ function auto_redir(&$a, $contact_nick) {
 
 		if(strlen($dfrn_id) < 3)
 			return;
-			
+
 		$sec = random_string();
 
 		q("INSERT INTO `profile_check` ( `uid`, `cid`, `dfrn_id`, `sec`, `expire`)
@@ -84,9 +84,9 @@ function auto_redir(&$a, $contact_nick) {
 
 		$url = curPageURL();
 
-		logger('auto_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG); 
+		logger('auto_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG);
 		$dest = (($url) ? '&destination_url=' . $url : '');
-		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id 
+		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id
 			. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest );
 	}
 

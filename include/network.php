@@ -4,16 +4,18 @@
  * @file include/network.php
  */
 
+use \Friendica\Core\Config;
+
 require_once("include/xml.php");
 require_once('include/Probe.php');
 
 /**
  * @brief Curl wrapper
- * 
+ *
  * If binary flag is true, return binary results.
  * Set the cookiejar argument to a string (e.g. "/tmp/friendica-cookies.txt")
  * to preserve cookies from one request to the next.
- * 
+ *
  * @param string $url URL to fetch
  * @param boolean $binary default false
  *    TRUE if asked to return binary results (file download)
@@ -21,7 +23,7 @@ require_once('include/Probe.php');
  * @param integer $timeout Timeout in seconds, default system config value or 60 seconds
  * @param string $accept_content supply Accept: header with 'accept_content' as the value
  * @param string $cookiejar Path to cookie jar file
- * 
+ *
  * @return string The fetched content
  */
 function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_content=Null, $cookiejar = 0) {
@@ -93,7 +95,10 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	@curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
 	@curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
 
-
+	$range = intval(Config::get('system', 'curl_range_bytes', 0));
+	if ($range > 0) {
+		@curl_setopt($ch, CURLOPT_RANGE, '0-'.$range);
+	}
 
 	if(x($opts,'headers')){
 		@curl_setopt($ch, CURLOPT_HTTPHEADER, $opts['headers']);
@@ -213,13 +218,13 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 
 /**
  * @brief Post request to $url
- * 
+ *
  * @param string $url URL to post
  * @param mixed $params
  * @param string $headers HTTP headers
  * @param integer $redirects Recursion counter for internal use - default = 0
  * @param integer $timeout The timeout in seconds, default system config value or 60 seconds
- * 
+ *
  * @return string The content
  */
 function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) {
@@ -380,10 +385,10 @@ function http_status_exit($val, $description = array()) {
 
 /**
  * @brief Check URL to se if ts's real
- * 
+ *
  * Take a URL from the wild, prepend http:// if necessary
  * and check DNS to see if it's real (or check if is a valid IP address)
- * 
+ *
  * @param string $url The URL to be validated
  * @return boolean True if it's a valid URL, fals if something wrong with it
  */
@@ -410,7 +415,7 @@ function validate_url(&$url) {
 
 /**
  * @brief Checks that email is an actual resolvable internet address
- * 
+ *
  * @param string $addr The email address
  * @return boolean True if it's a valid email address, false if it's not
  */
@@ -431,10 +436,10 @@ function validate_email($addr) {
 
 /**
  * @brief Check if URL is allowed
- * 
+ *
  * Check $url against our list of allowed sites,
  * wildcards allowed. If allowed_sites is unset return true;
- * 
+ *
  * @param string $url URL which get tested
  * @return boolean True if url is allowed otherwise return false
  */
@@ -476,9 +481,9 @@ function allowed_url($url) {
 
 /**
  * @brief Check if email address is allowed to register here.
- * 
+ *
  * Compare against our list (wildcards allowed).
- * 
+ *
  * @param type $email
  * @return boolean False if not allowed, true if allowed
  *    or if allowed list is not configured
@@ -665,41 +670,70 @@ function fix_contact_ssl_policy(&$contact,$new_policy) {
 	}
 }
 
-function original_url($url, $depth=1, $fetchbody = false) {
-
-	$a = get_app();
-
-	// Remove Analytics Data from Google and other tracking platforms
+/**
+ * @brief Remove Google Analytics and other tracking platforms params from URL
+ *
+ * @param string $url Any user-submitted URL that may contain tracking params
+ * @return string The same URL stripped of tracking parameters
+ */
+function strip_tracking_query_params($url)
+{
 	$urldata = parse_url($url);
 	if (is_string($urldata["query"])) {
 		$query = $urldata["query"];
 		parse_str($query, $querydata);
 
-		if (is_array($querydata))
-			foreach ($querydata AS $param=>$value)
+		if (is_array($querydata)) {
+			foreach ($querydata AS $param => $value) {
 				if (in_array($param, array("utm_source", "utm_medium", "utm_term", "utm_content", "utm_campaign",
 							"wt_mc", "pk_campaign", "pk_kwd", "mc_cid", "mc_eid",
 							"fb_action_ids", "fb_action_types", "fb_ref",
 							"awesm", "wtrid",
 							"woo_campaign", "woo_source", "woo_medium", "woo_content", "woo_term"))) {
 
-					$pair = $param."=".urlencode($value);
+					$pair = $param . "=" . urlencode($value);
 					$url = str_replace($pair, "", $url);
 
 					// Second try: if the url isn't encoded completely
-					$pair = $param."=".str_replace(" ", "+", $value);
+					$pair = $param . "=" . str_replace(" ", "+", $value);
 					$url = str_replace($pair, "", $url);
 
 					// Third try: Maybey the url isn't encoded at all
-					$pair = $param."=".$value;
+					$pair = $param . "=" . $value;
 					$url = str_replace($pair, "", $url);
 
 					$url = str_replace(array("?&", "&&"), array("?", ""), $url);
 				}
+			}
+		}
 
-		if (substr($url, -1, 1) == "?")
+		if (substr($url, -1, 1) == "?") {
 			$url = substr($url, 0, -1);
+		}
 	}
+
+	return $url;
+}
+
+/**
+ * @brief Returns the original URL of the provided URL
+ *
+ * This function strips tracking query params and follows redirections, either
+ * through HTTP code or meta refresh tags. Stops after 10 redirections.
+ *
+ * @todo Remove the $fetchbody parameter that generates an extraneous HEAD request
+ *
+ * @see ParseUrl::getSiteinfo
+ *
+ * @param string $url A user-submitted URL
+ * @param int $depth The current redirection recursion level (internal)
+ * @param bool $fetchbody Wether to fetch the body or not after the HEAD requests
+ * @return string A canonical URL
+ */
+function original_url($url, $depth = 1, $fetchbody = false) {
+	$a = get_app();
+
+	$url = strip_tracking_query_params($url);
 
 	if ($depth > 10)
 		return($url);
@@ -816,7 +850,7 @@ function short_link($url) {
 
 /**
  * @brief Encodes content to json
- * 
+ *
  * This function encodes an array to json format
  * and adds an application/json HTTP header to the output.
  * After finishing the process is getting killed.

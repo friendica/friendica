@@ -239,7 +239,7 @@ function post_update_1206() {
 
 	logger("Start", LOGGER_DEBUG);
 	$r = q("SELECT `contact`.`id`, `contact`.`last-item`,
-		(SELECT MAX(`changed`) FROM `item` FORCE INDEX (`uid_wall_changed`) WHERE `wall` AND `uid` = `user`.`uid`) AS `lastitem_date`
+		(SELECT MAX(`changed`) FROM `item` USE INDEX (`uid_wall_changed`) WHERE `wall` AND `uid` = `user`.`uid`) AS `lastitem_date`
 		FROM `user`
 		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`");
 

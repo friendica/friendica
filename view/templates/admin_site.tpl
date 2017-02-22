@@ -147,7 +147,7 @@
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	<h3>{{$performance}}</h3>
-	{{include file="field_checkbox.tpl" field=$use_fulltext_engine}}
+	<!-- {{include file="field_checkbox.tpl" field=$use_fulltext_engine}} -->
 	{{include file="field_checkbox.tpl" field=$only_tag_search}}
 	{{include file="field_input.tpl" field=$itemcache}}
 	{{include file="field_input.tpl" field=$itemcache_duration}}

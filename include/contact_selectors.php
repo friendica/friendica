@@ -89,6 +89,7 @@ function network_to_name($s, $profile = "") {
 		NETWORK_TWITTER  => t('Twitter'),
 		NETWORK_DIASPORA2 => t('Diaspora Connector'),
 		NETWORK_STATUSNET => t('GNU Social'),
+		NETWORK_PNUT      => t('pnut'),
 		NETWORK_APPNET => t('App.net')
 	);
 

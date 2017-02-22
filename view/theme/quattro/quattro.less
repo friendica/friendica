@@ -576,7 +576,7 @@ section {
 	 }
 	.wall-item-actions-social { float: left; margin-top: 0.5em;
 		a { margin-right: 3em;
-			.active { font-weight: bold;}
+			&.active { font-weight: bold;}
 		}
 	 }
 	.wall-item-actions-tools { float: right; width: 15%;
@@ -788,12 +788,10 @@ blockquote.shared_content {
         border: none;
 }
 
-
 .oembed.video {
 	> a.embed_video {
 		display: block;
-		float: left;
-        position: relative;
+		position: relative;
 		> div {
             position: absolute; top: 0px; left: 0px;
 			background:
@@ -804,7 +802,6 @@ blockquote.shared_content {
 		}
 	}
 }
-
 
 /* threaded comments */
 .children {

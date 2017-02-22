@@ -6,6 +6,7 @@
 require_once('include/ForumManager.php');
 require_once('include/bbcode.php');
 require_once("mod/proxy.php");
+require_once('include/cache.php');
 
 /**
  *
@@ -31,7 +32,7 @@ require_once("mod/proxy.php");
  * @param int $profile
  * @param array $profiledata
  */
-function profile_load(&$a, $nickname, $profile = 0, $profiledata = array()) {
+function profile_load(App $a, $nickname, $profile = 0, $profiledata = array()) {
 
 	$user = q("SELECT `uid` FROM `user` WHERE `nickname` = '%s' LIMIT 1",
 		dbesc($nickname)
@@ -118,12 +119,12 @@ function profile_load(&$a, $nickname, $profile = 0, $profiledata = array()) {
 
 /**
  * @brief Get all profil data of a local user
- * 
+ *
  * If the viewer is an authenticated remote viewer, the profile displayed is the
  * one that has been configured for his/her viewing in the Contact manager.
  * Passing a non-zero profile ID can also allow a preview of a selected profile
  * by the owner
- * 
+ *
  * @param string $nickname
  * @param int $uid
  * @param int $profile
@@ -177,17 +178,17 @@ function get_profiledata_by_nick($nickname, $uid = 0, $profile = 0) {
 
 /**
  * @brief Formats a profile for display in the sidebar.
- * 
+ *
  * It is very difficult to templatise the HTML completely
  * because of all the conditional logic.
- * 
+ *
  * @param array $profile
  * @param int $block
- * 
+ *
  * @return HTML string stuitable for sidebar inclusion
- * 
+ *
  * @note Returns empty string if passed $profile is wrong type or not populated
- * 
+ *
  * @hooks 'profile_sidebar_enter'
  *      array $profile - profile data
  * @hooks 'profile_sidebar'
@@ -373,7 +374,10 @@ function profile_sidebar($profile, $block = 0) {
 			if (dbm::is_result($r))
 				$updated =  date("c", strtotime($r[0]['updated']));
 
-			$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `hidden` AND NOT `archive`
+			$r = q("SELECT COUNT(*) AS `total` FROM `contact`
+				WHERE `uid` = %d
+					AND NOT `self` AND NOT `blocked` AND NOT `pending`
+					AND NOT `hidden` AND NOT `archive`
 					AND `network` IN ('%s', '%s', '%s', '')",
 				intval($profile['uid']),
 				dbesc(NETWORK_DFRN),
@@ -453,15 +457,21 @@ function get_birthdays() {
 	$bd_format = t('g A l F d') ; // 8 AM Friday January 18
 	$bd_short = t('F d');
 
-	$r = q("SELECT `event`.*, `event`.`id` AS `eid`, `contact`.* FROM `event`
-			INNER JOIN `contact` ON `contact`.`id` = `event`.`cid`
-			WHERE `event`.`uid` = %d AND `type` = 'birthday' AND `start` < '%s' AND `finish` > '%s'
-			ORDER BY `start` ASC ",
-			intval(local_user()),
-			dbesc(datetime_convert('UTC','UTC','now + 6 days')),
-			dbesc(datetime_convert('UTC','UTC','now'))
-	);
-
+	$cachekey = "get_birthdays:".local_user();
+	$r = Cache::get($cachekey);
+	if (is_null($r)) {
+		$r = q("SELECT `event`.*, `event`.`id` AS `eid`, `contact`.* FROM `event`
+				INNER JOIN `contact` ON `contact`.`id` = `event`.`cid`
+				WHERE `event`.`uid` = %d AND `type` = 'birthday' AND `start` < '%s' AND `finish` > '%s'
+				ORDER BY `start` ASC ",
+				intval(local_user()),
+				dbesc(datetime_convert('UTC','UTC','now + 6 days')),
+				dbesc(datetime_convert('UTC','UTC','now'))
+		);
+		if (dbm::is_result($r)) {
+			Cache::set($cachekey, $r, CACHE_HOUR);
+		}
+	}
 	if (dbm::is_result($r)) {
 		$total = 0;
 		$now = strtotime('now');
@@ -598,7 +608,7 @@ function get_events() {
 	));
 }
 
-function advanced_profile(App &$a) {
+function advanced_profile(App $a) {
 
 	$o = '';
 	$uid = $a->profile['uid'];
@@ -755,7 +765,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		array(
 			'label'=>t('Status'),
 			'url' => $url,
-			'sel' => ((!isset($tab)&&$a->argv[0]=='profile')?'active':''),
+			'sel' => ((!isset($tab) && $a->argv[0]=='profile')?'active':''),
 			'title' => t('Status Messages and Posts'),
 			'id' => 'status-tab',
 			'accesskey' => 'm',
@@ -771,7 +781,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		array(
 			'label' => t('Photos'),
 			'url'	=> App::get_baseurl() . '/photos/' . $nickname,
-			'sel'	=> ((!isset($tab)&&$a->argv[0]=='photos')?'active':''),
+			'sel'	=> ((!isset($tab) && $a->argv[0]=='photos')?'active':''),
 			'title' => t('Photo Albums'),
 			'id' => 'photo-tab',
 			'accesskey' => 'h',
@@ -779,7 +789,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		array(
 			'label' => t('Videos'),
 			'url'	=> App::get_baseurl() . '/videos/' . $nickname,
-			'sel'	=> ((!isset($tab)&&$a->argv[0]=='videos')?'active':''),
+			'sel'	=> ((!isset($tab) && $a->argv[0]=='videos')?'active':''),
 			'title' => t('Videos'),
 			'id' => 'video-tab',
 			'accesskey' => 'v',
@@ -791,7 +801,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 			$tabs[] = array(
 				'label' => t('Events'),
 				'url'	=> App::get_baseurl() . '/events',
-				'sel' 	=>((!isset($tab)&&$a->argv[0]=='events')?'active':''),
+				'sel' 	=>((!isset($tab) && $a->argv[0]=='events')?'active':''),
 				'title' => t('Events and Calendar'),
 				'id' => 'events-tab',
 				'accesskey' => 'e',
@@ -802,7 +812,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		$tabs[] = array(
 				'label' => t('Events'),
 				'url'	=> App::get_baseurl() . '/cal/' . $nickname,
-				'sel' 	=>((!isset($tab)&&$a->argv[0]=='cal')?'active':''),
+				'sel' 	=>((!isset($tab) && $a->argv[0]=='cal')?'active':''),
 				'title' => t('Events and Calendar'),
 				'id' => 'events-tab',
 				'accesskey' => 'e',
@@ -813,7 +823,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		$tabs[] = array(
 			'label' => t('Personal Notes'),
 			'url'	=> App::get_baseurl() . '/notes',
-			'sel' 	=>((!isset($tab)&&$a->argv[0]=='notes')?'active':''),
+			'sel' 	=>((!isset($tab) && $a->argv[0]=='notes')?'active':''),
 			'title' => t('Only You Can See This'),
 			'id' => 'notes-tab',
 			'accesskey' => 't',
@@ -824,7 +834,7 @@ function profile_tabs($a, $is_owner=False, $nickname=Null){
 		$tabs[] = array(
 			'label' => t('Contacts'),
 			'url'	=> App::get_baseurl() . '/viewcontacts/' . $nickname,
-			'sel'	=> ((!isset($tab)&&$a->argv[0]=='viewcontacts')?'active':''),
+			'sel'	=> ((!isset($tab) && $a->argv[0]=='viewcontacts')?'active':''),
 			'title' => t('Contacts'),
 			'id' => 'viewcontacts-tab',
 			'accesskey' => 'k',
@@ -845,7 +855,7 @@ function get_my_url() {
 	return false;
 }
 
-function zrl_init(App &$a) {
+function zrl_init(App $a) {
 	$tmp_str = get_my_url();
 	if(validate_url($tmp_str)) {
 
@@ -891,7 +901,7 @@ function zrl($s,$force = false) {
  * settings except their own while on this site.
  *
  * @return int user ID
- * 
+ *
  * @note Returns local_user instead of user ID if "always_my_theme"
  *      is set to true
  */

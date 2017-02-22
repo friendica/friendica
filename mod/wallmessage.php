@@ -2,7 +2,7 @@
 
 require_once('include/message.php');
 
-function wallmessage_post(App &$a) {
+function wallmessage_post(App $a) {
 
 	$replyto = get_my_url();
 	if(! $replyto) {
@@ -43,12 +43,6 @@ function wallmessage_post(App &$a) {
 		return;
 	}
 
-	// Work around doubled linefeeds in Tinymce 3.5b2
-
-	$body = str_replace("\r\n","\n",$body);
-	$body = str_replace("\n\n","\n",$body);
-
-
 	$ret = send_wallmessage($user, $body, $subject, $replyto);
 
 	switch($ret){
@@ -73,7 +67,7 @@ function wallmessage_post(App &$a) {
 }
 
 
-function wallmessage_content(App &$a) {
+function wallmessage_content(App $a) {
 
 	if(! get_my_url()) {
 		notice( t('Permission denied.') . EOL);
@@ -113,16 +107,9 @@ function wallmessage_content(App &$a) {
 		return;
 	}
 
-
-
-	$editselect = 'none';
-	if( feature_enabled(local_user(), 'richtext') )
-		$editselect = '/(profile-jot-text|prvmail-text)/';
-
 	$tpl = get_markup_template('wallmsg-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
-		'$editselect' => $editselect,
 		'$nickname' => $user['nickname'],
 		'$linkurl' => t('Please enter a link URL:')
 	));
@@ -130,13 +117,10 @@ function wallmessage_content(App &$a) {
 	$tpl = get_markup_template('wallmsg-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
-		'$editselect' => $editselect,
 		'$nickname' => $user['nickname'],
 		'$linkurl' => t('Please enter a link URL:')
 	));
-	
 
-	
 	$tpl = get_markup_template('wallmessage.tpl');
 	$o .= replace_macros($tpl,array(
 		'$header' => t('Send Private Message'),

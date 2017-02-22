@@ -220,11 +220,6 @@ function events_content(App $a) {
 		nav_set_selected('events');
 	}
 
-	$editselect = 'none';
-	if ( feature_enabled(local_user(), 'richtext') ) {
-		$editselect = 'textareas';
-	}
-
 	// get the translation strings for the callendar
 	$i18n = get_event_strings();
 
@@ -234,13 +229,11 @@ function events_content(App $a) {
 		'$module_url' => '/events',
 		'$modparams' => 1,
 		'$i18n' => $i18n,
-		'$editselect' => $editselect
 	));
 
 	$etpl = get_markup_template('event_end.tpl');
 	$a->page['end'] .= replace_macros($etpl,array(
 		'$baseurl' => App::get_baseurl(),
-		'$editselect' => $editselect
 	));
 
 	$o ="";
@@ -393,7 +386,7 @@ function events_content(App $a) {
 			'$title'	=> t('Events'),
 			'$view'		=> t('View'),
 			'$new_event'	=> array(App::get_baseurl().'/events/new',t('Create New Event'),'',''),
-			'$previus'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
+			'$previous'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
 			'$next'		=> array(App::get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
 			'$calendar'	=> cal($y,$m,$links, ' eventcal'),
 

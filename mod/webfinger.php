@@ -1,7 +1,7 @@
 <?php
 require_once("include/Probe.php");
 
-function webfinger_content(App &$a) {
+function webfinger_content(App $a) {
 
 	$o .= '<h3>Webfinger Diagnostic</h3>';
 

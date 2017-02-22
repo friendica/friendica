@@ -4,7 +4,7 @@ require_once('include/email.php');
 require_once('include/enotify.php');
 require_once('include/text.php');
 
-function lostpass_post(App &$a) {
+function lostpass_post(App $a) {
 
 	$loginame = notags(trim($_POST['login-name']));
 	if(! $loginame)
@@ -77,7 +77,7 @@ function lostpass_post(App &$a) {
 }
 
 
-function lostpass_content(App &$a) {
+function lostpass_content(App $a) {
 
 
 	if(x($_GET,'verify')) {

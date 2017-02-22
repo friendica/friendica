@@ -25,11 +25,17 @@
 	}
 
 	function openMenu(theID) {
-		document.getElementById(theID).style.display = "block"
+		var el = document.getElementById(theID)
+		if (el) {
+			el.style.display = "block";
+		}
 	}
 
 	function closeMenu(theID) {
-		document.getElementById(theID).style.display = "none"
+		var el = document.getElementById(theID)
+		if (el) {
+			el.style.display = "none";
+		}
 	}
 
 	function decodeHtml(html) {
@@ -72,21 +78,19 @@
 		/* setup comment textarea buttons */
 		/* comment textarea buttons needs some "data-*" attributes to work:
 		 * 		data-role="insert-formatting" : to mark the element as a formatting button
-		 * 		data-comment="<string>" : string for "Comment", used by insertFormatting() function
 		 * 		data-bbcode="<string>" : name of the bbcode element to insert. insertFormatting() will insert it as "[name][/name]"
 		 * 		data-id="<string>" : id of the comment, used to find other comment-related element, like the textarea
 		 * */
 		$('body').on('click','[data-role="insert-formatting"]', function(e) {
 			e.preventDefault();
 			var o = $(this);
-			var comment = o.data('comment');
 			var bbcode  = o.data('bbcode');
 			var id = o.data('id');
 			if (bbcode=="img") {
 				Dialog.doImageBrowser("comment", id);
 				return;
 			}
-			insertFormatting(comment, bbcode, id);
+			insertFormatting(bbcode, id);
 		});
 
 		/* event from comment textarea button popups */
@@ -117,9 +121,6 @@
 			$("#"+id+"_onoff ."+ (val==1?"on":"off")).removeClass("hidden");
 			input.val(val);
 		});
-
-		/* setup field_richtext */
-		setupFieldRichtext();
 
 		/* popup menus */
 		function close_last_popup_menu() {
@@ -655,7 +656,6 @@
 	function preview_post() {
 		$("#jot-preview").val("1");
 		$("#jot-preview-content").show();
-		tinyMCE.triggerSave();
 		$.post(
 			"item",
 			$("#profile-jot-form").serialize(),
@@ -766,59 +766,6 @@ function notifyMarkAll() {
 		force_update = true;
 	});
 }
-
-
-// code from http://www.tinymce.com/wiki.php/How-to_implement_a_custom_file_browser
-function fcFileBrowser (field_name, url, type, win) {
-    /* TODO: If you work with sessions in PHP and your client doesn't accept cookies you might need to carry
-       the session name and session ID in the request string (can look like this: "?PHPSESSID=88p0n70s9dsknra96qhuk6etm5").
-       These lines of code extract the necessary parameters and add them back to the filebrowser URL again. */
-
-
-    var cmsURL = baseurl+"/fbrowser/"+type+"/";
-
-    tinyMCE.activeEditor.windowManager.open({
-        file : cmsURL,
-        title : 'File Browser',
-        width : 420,  // Your dimensions may differ - toy around with them!
-        height : 400,
-        resizable : "yes",
-        inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
-        close_previous : "no"
-    }, {
-        window : win,
-        input : field_name
-    });
-    return false;
-  }
-
-function setupFieldRichtext(){
-	tinyMCE.init({
-		theme : "advanced",
-		mode : "specific_textareas",
-		editor_selector: "fieldRichtext",
-		plugins : "bbcode,paste, inlinepopups",
-		theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code",
-		theme_advanced_buttons2 : "",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "center",
-		theme_advanced_blockformats : "blockquote,code",
-		theme_advanced_resizing : true,
-		paste_text_sticky : true,
-		entity_encoding : "raw",
-		add_unload_trigger : false,
-		remove_linebreaks : false,
-		//force_p_newlines : false,
-		//force_br_newlines : true,
-		forced_root_block : 'div',
-		convert_urls: false,
-		content_css: baseurl+"/view/custom_tinymce.css",
-		theme_advanced_path : false,
-		file_browser_callback : "fcFileBrowser",
-	});
-}
-
 
 /**
  * sprintf in javascript

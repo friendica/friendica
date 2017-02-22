@@ -1,5 +1,5 @@
 <?php
 
-function session_content(&$a) {
+function session_content(App $a) {
 
 }

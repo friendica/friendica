@@ -420,11 +420,17 @@ function display_content(App $a, $update = 0) {
 		$title = trim(html2plain(bbcode($r[0]["title"], false, false), 0, true));
 		$author_name = $r[0]["author-name"];
 
-		$image = $a->remove_baseurl($r[0]["thumb"]);
+		$image = $a->remove_baseurl($r[0]["author-thumb"]);
 
 		if ($title == "") {
 			$title = $author_name;
 		}
+
+		// Limit the description to 160 characters
+		if (strlen($description) > 160) {
+			$description = substr($description, 0, 157) . '...';
+		}
+
 		$description = htmlspecialchars($description, ENT_COMPAT, 'UTF-8', true); // allow double encoding here
 		$title = htmlspecialchars($title, ENT_COMPAT, 'UTF-8', true); // allow double encoding here
 		$author_name = htmlspecialchars($author_name, ENT_COMPAT, 'UTF-8', true); // allow double encoding here

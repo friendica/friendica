@@ -8,6 +8,8 @@
  * This will change in the future.
  */
 
+use \Friendica\Core\Config;
+
 require_once("include/items.php");
 require_once("include/bb2diaspora.php");
 require_once("include/Scrape.php");
@@ -45,13 +47,13 @@ class Diaspora {
 
 		foreach($servers AS $server) {
 			$server = trim($server);
+			$addr = "relay@".str_replace("http://", "", normalise_link($server));
 			$batch = $server."/receive/public";
 
-			$relais = q("SELECT `batch`, `id`, `name`,`network` FROM `contact` WHERE `uid` = 0 AND `batch` = '%s' LIMIT 1", dbesc($batch));
+			$relais = q("SELECT `batch`, `id`, `name`,`network` FROM `contact` WHERE `uid` = 0 AND `batch` = '%s' AND `addr` = '%s' AND `nurl` = '%s' LIMIT 1",
+					dbesc($batch), dbesc($addr), dbesc(normalise_link($server)));
 
 			if (!$relais) {
-				$addr = "relay@".str_replace("http://", "", normalise_link($server));
-
 				$r = q("INSERT INTO `contact` (`uid`, `created`, `name`, `nick`, `addr`, `url`, `nurl`, `batch`, `network`, `rel`, `blocked`, `pending`, `writable`, `name-date`, `uri-date`, `avatar-date`)
 					VALUES (0, '%s', '%s', 'relay', '%s', '%s', '%s', '%s', '%s', %d, 0, 0, 1, '%s', '%s', '%s')",
 					datetime_convert(),
@@ -309,10 +311,6 @@ class Diaspora {
 			return false;
 		}
 
-		// Use a dummy importer to import the data for the public copy
-		$importer = array("uid" => 0, "page-flags" => PAGE_FREELOVE);
-		$message_id = self::dispatch($importer,$msg);
-
 		// Now distribute it to the followers
 		$r = q("SELECT `user`.* FROM `user` WHERE `user`.`uid` IN
 			(SELECT `contact`.`uid` FROM `contact` WHERE `contact`.`network` = '%s' AND `contact`.`addr` = '%s')
@@ -320,13 +318,23 @@ class Diaspora {
 			dbesc(NETWORK_DIASPORA),
 			dbesc($msg["author"])
 		);
-		if ($r) {
+
+		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				logger("delivering to: ".$rr["username"]);
 				self::dispatch($rr,$msg);
 			}
-		} else
-			logger("No subscribers for ".$msg["author"]." ".print_r($msg, true));
+		} else {
+			$social_relay = (bool)Config::get('system', 'relay_subscribe', false);
+
+			// Use a dummy importer to import the data for the public copy
+			if ($social_relay) {
+				$importer = array("uid" => 0, "page-flags" => PAGE_FREELOVE);
+				$message_id = self::dispatch($importer,$msg);
+			} else {
+				logger("Unwanted message from ".$msg["author"]." send by ".$_SERVER["REMOTE_ADDR"]." with ".$_SERVER["HTTP_USER_AGENT"].": ".print_r($msg, true), LOGGER_DEBUG);
+			}
+		}
 
 		return $message_id;
 	}

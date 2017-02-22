@@ -64,5 +64,34 @@ If you only want to translate friendica into another language you wont need any 
 
 For further information see the utils/README file.
 
-[1]:   https://www.transifex.com/projects/p/friendica/
+Transifex-Client
+----------------
 
+Transifex has a client program which let you interact with the translation files in a similar way to git.
+Help for the client can be found at the [Transifex Help Center] [2].
+Here we will only cover basic usage.
+
+After installation of the client, you should have a `tx` command available on your system.
+To use it, first create a configuration file with your credentials.
+On Linux this file should be placed into your home directory `~/.transifexrc`.
+The content of the file should be something like the following:
+
+    [https://www.transifex.com]
+    username = user
+    token =
+    password = p@ssw0rd
+    hostname = https://www.transifex.com
+
+Since Friendica version 3.5.1 we ship configuration files for the Transifex client in the core repository and the addon repository.
+To update the translation files after you have translated strings of e.g. Esperanto in the web-UI of transifex you can use `tx` to download the file.
+
+    $> tx pull -l eo
+
+And then use the `po2php` utility described above to convert the `messages.po` file to the `strings.php` file Friendica is loading.
+
+    $> php util/po2php.php view/lang/eo/messages.po
+
+Afterwards, just commit the two changed files to a feature branch of your Friendica repository, push the changes to github and open a pull request for your changes.
+
+[1]:   https://www.transifex.com/projects/p/friendica/
+[2]:   https://docs.transifex.com/client/introduction

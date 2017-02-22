@@ -5,7 +5,7 @@ require_once('include/bbcode.php');
 require_once('include/items.php');
 
 
-function subthread_content(App &$a) {
+function subthread_content(App $a) {
 
 	if(! local_user() && ! remote_user()) {
 		return;
@@ -49,7 +49,7 @@ function subthread_content(App &$a) {
 		}
 	}
 
-	// this represents the post owner on this system. 
+	// this represents the post owner on this system.
 
 	$r = q("SELECT `contact`.*, `user`.`nickname` FROM `contact` LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
 		WHERE `contact`.`self` = 1 AND `contact`.`uid` = %d LIMIT 1",

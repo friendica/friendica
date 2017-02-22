@@ -1,7 +1,7 @@
 <?php
 require_once('include/NotificationsManager.php');
 
-function notify_init(App &$a) {
+function notify_init(App $a) {
 	if (! local_user()) {
 		return;
 	}
@@ -12,7 +12,7 @@ function notify_init(App &$a) {
 		$note = $nm->getByID($a->argv[2]);
 		if ($note) {
 			$nm->setSeen($note);
-		
+
 			// The friendica client has problems with the GUID. this is some workaround
 			if ($a->is_friendica_app()) {
 				require_once("include/items.php");
@@ -39,13 +39,13 @@ function notify_init(App &$a) {
 
 }
 
-function notify_content(App &$a) {
+function notify_content(App $a) {
 	if (! local_user()) {
 		return login();
 	}
 
 	$nm = new NotificationsManager();
-	
+
 	$notif_tpl = get_markup_template('notifications.tpl');
 
 	$not_tpl = get_markup_template('notify.tpl');

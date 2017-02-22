@@ -1,6 +1,6 @@
 <?php
 
-function login_content(App &$a) {
+function login_content(App $a) {
 	if(x($_SESSION,'theme'))
 		unset($_SESSION['theme']);
 	if(x($_SESSION,'mobile-theme'))

@@ -3024,7 +3024,8 @@ a.btn#contact-edit-actions-button {
 }
 
 /* photo album page */
-.photo-top-image-wrapper {
+.photo-top-image-wrapper,
+.photo-album-image-wrapper {
   position: relative;
   float: left;
   margin-top: 15px;
@@ -3054,10 +3055,32 @@ a.btn#contact-edit-actions-button {
   float: left;
   width: 175px;
 }
-img.photo-top-photo {
+img.photo-top-photo,
+img.photo-album-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.photo-album-photo {
+  float: none;
+}
+.photo-album-image-wrapper .caption {
+  opacity: 0;
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  padding: 3px 5px;
+  background-color: rgb(255, 255, 255);
+  margin: 0;
+  overflow: hidden;
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  -ms-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+}
+.photo-album-image-wrapper:hover .caption {
+  opacity: 1;
 }
 
 .menu-profile-list{

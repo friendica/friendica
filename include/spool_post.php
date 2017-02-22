@@ -3,6 +3,9 @@
  * @file include/spool_post.php
  * @brief Posts items that wer spooled because they couldn't be posted.
  */
+
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once("include/items.php");
 
@@ -20,8 +23,7 @@ function spool_post_run($argv, $argc) {
 		unset($db_host, $db_user, $db_pass, $db_data);
 	}
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	$path = get_spoolpath();
 
@@ -33,7 +35,19 @@ function spool_post_run($argv, $argc) {
 					continue;
 				}
 				$arr = json_decode(file_get_contents($fullfile), true);
+
+				// If it isn't an array then it is no spool file
+				if (!is_array($arr)) {
+					continue;
+				}
+
+				// Skip if it doesn't seem to be an item array
+				if (!isset($arr['uid']) AND !isset($arr['uri']) AND !isset($arr['network'])) {
+					continue;
+				}
+
 				$result = item_store($arr);
+
 				logger("Spool file ".$file." stored: ".$result, LOGGER_DEBUG);
 				unlink($fullfile);
 			}

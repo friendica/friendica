@@ -2,150 +2,46 @@
 
 <script language="javascript" type="text/javascript">
 
-var editor=false;
+var editor = false;
 var textlen = 0;
-var plaintext = '{{$editselect}}';
 
-function initEditor(cb){
-	if (editor==false){
+function initEditor(callback) {
+	if (editor == false){
 		$("#profile-jot-text-loading").show();
-		if(plaintext == 'none') {
-			$("#profile-jot-text-loading").hide();
-            		$("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
-			$("#profile-jot-text").editor_autocomplete(baseurl+"/acl");
-			$("#profile-jot-text").bbco_autocomplete('bbcode');
-            		$(".jothidden").show();
-            		editor = true;
-            		$("a#jot-perms-icon").colorbox({
-						'inline' : true,
-						'transition' : 'elastic'
-            		});
-	                            $("#profile-jot-submit-wrapper").show();
-								{{if $newpost}}
-    	                            $("#profile-upload-wrapper").show();
-        	                        $("#profile-attach-wrapper").show();
-            	                    $("#profile-link-wrapper").show();
-                	                $("#profile-video-wrapper").show();
-                    	            $("#profile-audio-wrapper").show();
-                        	        $("#profile-location-wrapper").show();
-                            	    $("#profile-nolocation-wrapper").show();
-                                	$("#profile-title-wrapper").show();
-	                                $("#profile-jot-plugin-wrapper").show();
-	                                $("#jot-preview-link").show();
-								{{/if}}   
-
-
-			if (typeof cb!="undefined") cb();
-			return;
-        }
-        tinyMCE.init({
-                theme : "advanced",
-                mode : "specific_textareas",
-                editor_selector: /(profile-jot-text|prvmail-text)/,
-                plugins : "bbcode,paste,fullscreen,autoresize",
-                theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code,fullscreen",
-                theme_advanced_buttons2 : "",
-                theme_advanced_buttons3 : "",
-                theme_advanced_toolbar_location : "top",
-                theme_advanced_toolbar_align : "center",
-                theme_advanced_blockformats : "blockquote,code",
-                //theme_advanced_resizing : true,
-                //theme_advanced_statusbar_location : "bottom",
-                paste_text_sticky : true,
-                entity_encoding : "raw",
-                add_unload_trigger : false,
-                remove_linebreaks : false,
-                //force_p_newlines : false,
-                //force_br_newlines : true,
-                forced_root_block : 'div',
-                convert_urls: false,
-                content_css: "{{$baseurl}}/view/custom_tinymce.css",
-                theme_advanced_path : false,
-                setup : function(ed) {
-					cPopup = null;
-					ed.onKeyDown.add(function(ed,e) {
-						if(cPopup !== null)
-							cPopup.onkey(e);
-					});
-
-
-
-					ed.onKeyUp.add(function(ed, e) {
-						var txt = tinyMCE.activeEditor.getContent();
-						match = txt.match(/@([^ \n]+)$/);
-						if(match!==null) {
-							if(cPopup === null) {
-								cPopup = new ACPopup(this,baseurl+"/acl");
-							}
-							if(cPopup.ready && match[1]!==cPopup.searchText) cPopup.search(match[1]);
-							if(! cPopup.ready) cPopup = null;
-						}
-						else {
-							if(cPopup !== null) { cPopup.close(); cPopup = null; }
-						}
-
-						textlen = txt.length;
-						if(textlen != 0 && $('#jot-perms-icon').is('.unlock')) {
-							$('#profile-jot-desc').html(ispublic);
-						}
-                        else {
-                            $('#profile-jot-desc').html('&nbsp;');
-                        }
-
-				//Character count
-
-                                if(textlen <= 140) {
-                                        $('#character-counter').removeClass('red');
-                                        $('#character-counter').removeClass('orange');
-                                        $('#character-counter').addClass('grey');
-                                }
-                                if((textlen > 140) && (textlen <= 420)) {
-                                        $('#character-counter').removeClass('grey');
-                                        $('#character-counter').removeClass('red');
-                                        $('#character-counter').addClass('orange');
-                                }
-                                if(textlen > 420) {
-                                        $('#character-counter').removeClass('grey');
-                                        $('#character-counter').removeClass('orange');
-                                        $('#character-counter').addClass('red');
-                                }
-                                $('#character-counter').text(textlen);
-                        });
-                        ed.onInit.add(function(ed) {
-                                ed.pasteAsPlainText = true;
-								$("#profile-jot-text-loading").hide();
-								$(".jothidden").show();
-	                            $("#profile-jot-submit-wrapper").show();
-								{{if $newpost}}
-    	                            $("#profile-upload-wrapper").show();
-        	                        $("#profile-attach-wrapper").show();
-            	                    $("#profile-link-wrapper").show();
-                	                $("#profile-video-wrapper").show();
-                    	            $("#profile-audio-wrapper").show();
-                        	        $("#profile-location-wrapper").show();
-                            	    $("#profile-nolocation-wrapper").show();
-                                	$("#profile-title-wrapper").show();
-	                                $("#profile-jot-plugin-wrapper").show();
-	                                $("#jot-preview-link").show();
-								{{/if}}   
-                             $("#character-counter").show();
-                                if (typeof cb!="undefined") cb();
-                        });
-                }
-        });
-        editor = true;
-        // setup acl popup
-        $("a#jot-perms-icon").colorbox({
+		$("#profile-jot-text-loading").hide();
+		$("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
+		$("#profile-jot-text").editor_autocomplete(baseurl+"/acl");
+		$("#profile-jot-text").bbco_autocomplete('bbcode');
+		$(".jothidden").show();
+		$("a#jot-perms-icon").colorbox({
 			'inline' : true,
 			'transition' : 'elastic'
-        }); 
-    } else {
-        if (typeof cb!="undefined") cb();
+		});
+		$("#profile-jot-submit-wrapper").show();
+	{{if $newpost}}
+		$("#profile-upload-wrapper").show();
+		$("#profile-attach-wrapper").show();
+		$("#profile-link-wrapper").show();
+		$("#profile-video-wrapper").show();
+		$("#profile-audio-wrapper").show();
+		$("#profile-location-wrapper").show();
+		$("#profile-nolocation-wrapper").show();
+		$("#profile-title-wrapper").show();
+		$("#profile-jot-plugin-wrapper").show();
+		$("#jot-preview-link").show();
+	{{/if}}
+
+		editor = true;
     }
+	if (typeof callback != "undefined") {
+		callback();
+	}
 } // initEditor
 
 function enableOnUser(){
-	if (editor) return;
+	if (editor) {
+		return;
+	}
 	$(this).val("");
 	initEditor();
 }
@@ -159,8 +55,8 @@ function enableOnUser(){
 	var ispublic = '{{$ispublic}}';
 
 	$(document).ready(function() {
-		
-		/* enable tinymce on focus and click */
+
+		/* enable editor on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
 
@@ -172,7 +68,7 @@ function enableOnUser(){
 				onComplete: function(file,response) {
 					addeditortext(response);
 					$('#profile-rotator').hide();
-				}				 
+				}
 			}
 		);
 
@@ -184,9 +80,9 @@ function enableOnUser(){
 				onComplete: function(file,response) {
 					addeditortext(response);
 					$('#profile-rotator').hide();
-				}				 
+				}
 			}
-		);		
+		);
 		$('#contact_allow, #contact_deny, #group_allow, #group_deny').change(function() {
 			var selstr;
 			$('#contact_allow option:selected, #contact_deny option:selected, #group_allow option:selected, #group_deny option:selected').each( function() {
@@ -195,7 +91,7 @@ function enableOnUser(){
 				$('#jot-public').hide();
 				$('.profile-jot-net input').attr('disabled', 'disabled');
 			});
-			if(selstr == null) { 
+			if(selstr == null) {
 				$('#jot-perms-icon').removeClass('lock').addClass('unlock');
 				$('#jot-public').show();
 				$('.profile-jot-net input').attr('disabled', false);
@@ -220,7 +116,7 @@ function enableOnUser(){
 					else {
 						checkedstr = $(this).val();
 					}
-				}	
+				}
 			});
 			$.post('item', { dropitems: checkedstr }, function(data) {
 				window.location.reload();
@@ -320,11 +216,11 @@ function enableOnUser(){
 			}
 		}
 	}
-	
+
 	function itemFiler(id) {
-		
+
 		var bordercolor = $("input").css("border-color");
-		
+
 		$.get('filer/', function(data){
 			$.colorbox({html:data});
 			$("#id_term").keypress(function(){
@@ -333,7 +229,7 @@ function enableOnUser(){
 			$("#select_term").change(function(){
 				$("#id_term").css("border-color",bordercolor);
 			})
-			
+
 			$("#filer_save").click(function(e){
 				e.preventDefault();
 				reply = $("#id_term").val();
@@ -351,24 +247,20 @@ function enableOnUser(){
 				return false;
 			});
 		});
-		
+
 	}
 
-	
+
 
 	function jotClearLocation() {
 		$('#jot-coord').val('');
 		$('#profile-nolocation-wrapper').hide();
 	}
 
-  function addeditortext(data) {
-        if(plaintext == 'none') {
-            var currentText = $("#profile-jot-text").val();
-            $("#profile-jot-text").val(currentText + data);
-        }
-        else
-            tinyMCE.execCommand('mceInsertRawHTML',false,data);
-    }
+	function addeditortext(data) {
+		var currentText = $("#profile-jot-text").val();
+		$("#profile-jot-text").val(currentText + data);
+	}
 
 
 	{{$geotag}}

@@ -10,6 +10,8 @@ if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 	chdir($directory);
 }
 
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once("include/photos.php");
 require_once("include/user.php");
@@ -38,8 +40,7 @@ function cron_run(&$argv, &$argc){
 	require_once('mod/nodeinfo.php');
 	require_once('include/post_update.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	// Don't check this stuff if the function is called by the poller
 	if (App::callstack() != "poller_run") {
@@ -239,11 +240,13 @@ function cron_poll_contacts($argc, $argv) {
 		: ''
 	);
 
-	$contacts = q("SELECT `contact`.`id` FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
-		WHERE `rel` IN (%d, %d) AND `poll` != '' AND `network` IN ('%s', '%s', '%s', '%s', '%s', '%s')
-		$sql_extra
-		AND NOT `self` AND NOT `contact`.`blocked` AND NOT `contact`.`readonly` AND NOT `contact`.`archive`
-		AND NOT `user`.`account_expired` AND NOT `user`.`account_removed` $abandon_sql ORDER BY RAND()",
+	$contacts = q("SELECT `contact`.`id` FROM `user`
+			STRAIGHT_JOIN `contact`
+			ON `contact`.`uid` = `user`.`uid` AND `contact`.`rel` IN (%d, %d) AND `contact`.`poll` != ''
+				AND `contact`.`network` IN ('%s', '%s', '%s', '%s', '%s', '%s') $sql_extra
+				AND NOT `contact`.`self` AND NOT `contact`.`blocked` AND NOT `contact`.`readonly`
+				AND NOT `contact`.`archive`
+			WHERE NOT `user`.`account_expired` AND NOT `user`.`account_removed` $abandon_sql ORDER BY RAND()",
 		intval(CONTACT_IS_SHARING),
 		intval(CONTACT_IS_FRIEND),
 		dbesc(NETWORK_DFRN),
@@ -264,8 +267,9 @@ function cron_poll_contacts($argc, $argv) {
 			intval($c['id'])
 		);
 
-		if (dbm::is_result($res))
+		if (!dbm::is_result($res)) {
 			continue;
+		}
 
 		foreach($res as $contact) {
 
@@ -343,7 +347,7 @@ function cron_poll_contacts($argc, $argv) {
  *
  * @param App $a
  */
-function cron_clear_cache(App &$a) {
+function cron_clear_cache(App $a) {
 
 	$last = get_config('system','cache_last_cleared');
 
@@ -430,7 +434,7 @@ function cron_clear_cache(App &$a) {
  *
  * @param App $a
  */
-function cron_repair_diaspora(App &$a) {
+function cron_repair_diaspora(App $a) {
 	$r = q("SELECT `id`, `url` FROM `contact`
 		WHERE `network` = '%s' AND (`batch` = '' OR `notify` = '' OR `poll` = '' OR pubkey = '')
 			ORDER BY RAND() LIMIT 50", dbesc(NETWORK_DIASPORA));

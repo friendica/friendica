@@ -10,7 +10,7 @@ Internationalisation
 
 extract.php - extracts translatable strings from our project files. It
 currently doesn't pick up strings in other libraries we might be using such as
-tinymce and the HTML parsers.
+the HTML parsers.
 
 In order for extract to do its job, every use of the t() translation function
 must be preceded by one space. The string also can not contain parentheses. If

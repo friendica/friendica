@@ -34,8 +34,8 @@
 
 		{{* The buttons to change the month/weeks/days *}}
 		<div id="fc-fc-header-left" class="btn-group">
-			<button class="btn btn-eventnav" onclick="changeView('prev', false);" title="{{$prev}}"><i class="fa fa-angle-up" aria-hidden="true"></i></i></button>
-			<button class="btn btn-eventnav btn-separator" onclick="changeView('next', false);" title="{{$next}}"><i class="fa fa-angle-down" aria-hidden="true"></i></i></button>
+			<button class="btn btn-eventnav" onclick="changeView('prev', false);" title="{{$previous.1}}"><i class="fa fa-angle-up" aria-hidden="true"></i></i></button>
+			<button class="btn btn-eventnav btn-separator" onclick="changeView('next', false);" title="{{$next.1}}"><i class="fa fa-angle-down" aria-hidden="true"></i></i></button>
 			<button class="btn btn-eventnav btn-separator" onclick="changeView('today', false);" title="{{$today}}"><i class="fa fa-bullseye"></i></button>
 		</div>
 

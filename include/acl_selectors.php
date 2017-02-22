@@ -372,7 +372,7 @@ function populate_acl($user = null, $show_jotnets = false) {
 
 }
 
-function construct_acl_data(&$a, $user) {
+function construct_acl_data(App $a, $user) {
 
 	// Get group and contact information for html ACL selector
 	$acl_data = acl_lookup($a, 'html');
@@ -404,7 +404,7 @@ function construct_acl_data(&$a, $user) {
 
 }
 
-function acl_lookup(&$a, $out_type = 'json') {
+function acl_lookup(App $a, $out_type = 'json') {
 
 	if (!local_user()) {
 		return '';
@@ -495,6 +495,8 @@ function acl_lookup(&$a, $out_type = 'json') {
 
 	if ($type=='' || $type=='g'){
 
+		/// @todo We should cache this query.
+		// This can be done when we can delete cache entries via wildcard
 		$r = q("SELECT `group`.`id`, `group`.`name`, GROUP_CONCAT(DISTINCT `group_member`.`contact-id` SEPARATOR ',') AS uids
 				FROM `group`
 				INNER JOIN `group_member` ON `group_member`.`gid`=`group`.`id` AND `group_member`.`uid` = `group`.`uid`
@@ -687,11 +689,11 @@ function acl_lookup(&$a, $out_type = 'json') {
 }
 /**
  * @brief Searching for global contacts for autocompletion
- * 
+ *
  * @param App $a
  * @return array with the search results
  */
-function navbar_complete(App &$a) {
+function navbar_complete(App $a) {
 
 //	logger('navbar_complete');
 

@@ -138,6 +138,62 @@ class dba {
 		return $return;
 	}
 
+	/**
+	 * @brief Analyze a database query and log this if some conditions are met.
+	 *
+	 * @param string $query The database query that will be analyzed
+	 */
+	public function log_index($query) {
+		$a = get_app();
+
+		if ($a->config["system"]["db_log_index"] == "") {
+			return;
+		}
+
+		// Don't explain an explain statement
+		if (strtolower(substr($query, 0, 7)) == "explain") {
+			return;
+		}
+
+		// Only do the explain on "select", "update" and "delete"
+		if (!in_array(strtolower(substr($query, 0, 6)), array("select", "update", "delete"))) {
+			return;
+		}
+
+		$r = $this->q("EXPLAIN ".$query);
+		if (!dbm::is_result($r)) {
+			return;
+		}
+
+		$watchlist = explode(',', $a->config["system"]["db_log_index_watch"]);
+		$blacklist = explode(',', $a->config["system"]["db_log_index_blacklist"]);
+
+		foreach ($r AS $row) {
+			if ((intval($a->config["system"]["db_loglimit_index"]) > 0)) {
+				$log = (in_array($row['key'], $watchlist) AND
+					($row['rows'] >= intval($a->config["system"]["db_loglimit_index"])));
+			} else
+				$log = false;
+
+			if ((intval($a->config["system"]["db_loglimit_index_high"]) > 0) AND ($row['rows'] >= intval($a->config["system"]["db_loglimit_index_high"]))) {
+				$log = true;
+			}
+
+			if (in_array($row['key'], $blacklist) OR ($row['key'] == "")) {
+				$log = false;
+			}
+
+			if ($log) {
+				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+				@file_put_contents($a->config["system"]["db_log_index"], datetime_convert()."\t".
+						$row['key']."\t".$row['rows']."\t".$row['Extra']."\t".
+						basename($backtrace[1]["file"])."\t".
+						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
+						substr($query, 0, 2000)."\n", FILE_APPEND);
+			}
+		}
+	}
+
 	public function q($sql, $onlyquery = false) {
 		$a = get_app();
 
@@ -375,6 +431,9 @@ function q($sql) {
 		//logger("dba: q: $stmt", LOGGER_ALL);
 		if ($stmt === false)
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);
+
+		$db->log_index($stmt);
+
 		return $db->q($stmt);
 	}
 
@@ -408,6 +467,9 @@ function qu($sql) {
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		if ($stmt === false)
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);
+
+		$db->log_index($stmt);
+
 		$db->q("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;");
 		$retval = $db->q($stmt);
 		$db->q("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;");

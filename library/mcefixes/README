@@ -1,8 +1,0 @@
-In order to make TinyMCE work smoothly with Friendica, the files in this directory are those few files we've changed in TinyMCE. We will attempt to keep them current, but if you decide to upgrade tinymce, it is best to save current copies of the files in question from the active tinymce tree and replace them or merge them after upgrade. 
-
-Except for some simple theming, the primary changes are the advanced theme icon set, which we changed the "html" icon to "[]" to represent BBcode, and major changes have been made to the bbcode plugin. 
- 
-
-in TinyMCE 3.5b2 it appears that we are getting double linefeeds. Code has been put in place in mod/item.php and mod/message.php to reduce the duplicates. 
-
-

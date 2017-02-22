@@ -1,8 +1,9 @@
 <?php
 
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once("include/socgraph.php");
-
 
 function discover_poco_run(&$argv, &$argc){
 	global $a, $db;
@@ -21,8 +22,7 @@ function discover_poco_run(&$argv, &$argc){
 	require_once('include/session.php');
 	require_once('include/datetime.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	// Don't check this stuff if the function is called by the poller
 	if (App::callstack() != "poller_run")

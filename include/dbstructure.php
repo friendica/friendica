@@ -176,15 +176,6 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		$definition = db_definition($charset);
 	}
 
-	// Ensure index conversion to unique removes duplicates
-	$sql_config = "SET session old_alter_table=1;";
-	if ($verbose) {
-		echo $sql_config."\n";
-	}
-	if ($action) {
-		$db->q($sql_config);
-	}
-
 	// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
 	if ((version_compare($db->server_info(), '5.7.4') >= 0) AND
 		!(strpos($db->server_info(), 'MariaDB') !== false)) {
@@ -196,7 +187,8 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 	// Compare it
 	foreach ($definition AS $name => $structure) {
 		$is_new_table = False;
-		$sql3="";
+		$group_by = "";
+		$sql3 = "";
 		if (!isset($database[$name])) {
 			$r = db_create_table($name, $structure["fields"], $charset, $verbose, $action, $structure['indexes']);
 			if (!dbm::is_result($r)) {
@@ -204,6 +196,26 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 			}
 			$is_new_table = True;
 		} else {
+			$is_unique = false;
+			$temp_name = $name;
+
+			foreach ($structure["indexes"] AS $indexname => $fieldnames) {
+				if (isset($database[$name]["indexes"][$indexname])) {
+					$current_index_definition = implode(",",$database[$name]["indexes"][$indexname]);
+				} else {
+					$current_index_definition = "__NOT_SET__";
+				}
+				$new_index_definition = implode(",",$fieldnames);
+				if ($current_index_definition != $new_index_definition) {
+					if ($fieldnames[0] == "UNIQUE") {
+						$is_unique = true;
+						if ($ignore == "") {
+							$temp_name = "temp-".$name;
+						}
+					}
+				}
+			}
+
 			/*
 			 * Drop the index if it isn't present in the definition
 			 * or the definition differ from current status
@@ -219,7 +231,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 				if ($current_index_definition != $new_index_definition && substr($indexname, 0, 6) != 'local_') {
 					$sql2=db_drop_index($indexname);
 					if ($sql3 == "") {
-						$sql3 = "ALTER".$ignore." TABLE `".$name."` ".$sql2;
+						$sql3 = "ALTER".$ignore." TABLE `".$temp_name."` ".$sql2;
 					} else {
 						$sql3 .= ", ".$sql2;
 					}
@@ -230,7 +242,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 				if (!isset($database[$name]["fields"][$fieldname])) {
 					$sql2=db_add_table_field($fieldname, $parameters);
 					if ($sql3 == "") {
-						$sql3 = "ALTER TABLE `".$name."` ".$sql2;
+						$sql3 = "ALTER TABLE `".$temp_name."` ".$sql2;
 					} else {
 						$sql3 .= ", ".$sql2;
 					}
@@ -241,7 +253,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					if ($current_field_definition != $new_field_definition) {
 						$sql2=db_modify_table_field($fieldname, $parameters);
 						if ($sql3 == "") {
-							$sql3 = "ALTER TABLE `".$name."` ".$sql2;
+							$sql3 = "ALTER TABLE `".$temp_name."` ".$sql2;
 						} else {
 							$sql3 .= ", ".$sql2;
 						}
@@ -265,10 +277,15 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 				}
 				$new_index_definition = implode(",",$fieldnames);
 				if ($current_index_definition != $new_index_definition) {
-					$sql2=db_create_index($indexname, $fieldnames);
+					$sql2 = db_create_index($indexname, $fieldnames);
+
+					// Fetch the "group by" fields for unique indexes
+					if ($fieldnames[0] == "UNIQUE") {
+						$group_by = db_group_by($indexname, $fieldnames);
+					}
 					if ($sql2 != "") {
 						if ($sql3 == "")
-							$sql3 = "ALTER" . $ignore . " TABLE `".$name."` ".$sql2;
+							$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
 						else
 							$sql3 .= ", ".$sql2;
 					}
@@ -278,13 +295,68 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		if ($sql3 != "") {
 			$sql3 .= ";";
 
-			if ($verbose)
+			if ($verbose) {
+				// Ensure index conversion to unique removes duplicates
+				if ($is_unique) {
+					if ($ignore != "") {
+						echo "SET session old_alter_table=1;\n";
+					} else {
+						echo "CREATE TABLE `".$temp_name."` LIKE `".$name."`;\n";
+					}
+				}
+
 				echo $sql3."\n";
 
+				if ($is_unique) {
+					if ($ignore != "") {
+						echo "SET session old_alter_table=0;\n";
+					} else {
+						echo "INSERT INTO `".$temp_name."` SELECT * FROM `".$name."`".$group_by.";\n";
+						echo "DROP TABLE `".$name."`;\n";
+						echo "RENAME TABLE `".$temp_name."` TO `".$name."`;\n";
+					}
+				}
+			}
+
 			if ($action) {
+				// Ensure index conversion to unique removes duplicates
+				if ($is_unique) {
+					if ($ignore != "") {
+						$db->q("SET session old_alter_table=1;");
+					} else {
+						$r = $db->q("CREATE TABLE `".$temp_name."` LIKE `".$name."`;");
+						if (!dbm::is_result($r)) {
+							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							return $errors;
+						}
+					}
+				}
+
 				$r = @$db->q($sql3);
-				if (dbm::is_result($r))
+				if (!dbm::is_result($r))
 					$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+
+				if ($is_unique) {
+					if ($ignore != "") {
+						$db->q("SET session old_alter_table=0;");
+					} else {
+						$r = $db->q("INSERT INTO `".$temp_name."` SELECT * FROM `".$name."`".$group_by.";");
+						if (!dbm::is_result($r)) {
+							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							return $errors;
+						}
+						$r = $db->q("DROP TABLE `".$name."`;");
+						if (!dbm::is_result($r)) {
+							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							return $errors;
+						}
+						$r = $db->q("RENAME TABLE `".$temp_name."` TO `".$name."`;");
+						if (!dbm::is_result($r)) {
+							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							return $errors;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -401,6 +473,30 @@ function db_create_index($indexname, $fieldnames, $method="ADD") {
 	return($sql);
 }
 
+function db_group_by($indexname, $fieldnames) {
+
+	if ($fieldnames[0] != "UNIQUE") {
+		return "";
+	}
+
+	array_shift($fieldnames);
+
+	$names = "";
+	foreach ($fieldnames AS $fieldname) {
+		if ($names != "")
+			$names .= ",";
+
+		if (preg_match('|(.+)\((\d+)\)|', $fieldname, $matches)) {
+			$names .= "`".dbesc($matches[1])."`";
+		} else {
+			$names .= "`".dbesc($fieldname)."`";
+		}
+	}
+
+	$sql = sprintf(" GROUP BY %s", $names);
+	return $sql;
+}
+
 function db_index_suffix($charset, $reduce = 0) {
 	if ($charset != "utf8mb4") {
 		return "";
@@ -419,7 +515,7 @@ function db_definition($charset) {
 	$database["addon"] = array(
 			"fields" => array(
 					"id" => array("type" => "int(11)", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
-					"name" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
+					"name" => array("type" => "varchar(190)", "not null" => "1", "default" => ""),
 					"version" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"installed" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"hidden" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
@@ -428,6 +524,7 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
+					"name" => array("UNIQUE", "name"),
 					)
 			);
 	$database["attach"] = array(
@@ -465,13 +562,12 @@ function db_definition($charset) {
 	$database["cache"] = array(
 			"fields" => array(
 					"k" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
-					"v" => array("type" => "text"),
+					"v" => array("type" => "mediumtext"),
 					"expire_mode" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"updated" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("k"),
-					"updated" => array("updated"),
 					"expire_mode_updated" => array("expire_mode", "updated"),
 					)
 			);
@@ -506,7 +602,7 @@ function db_definition($charset) {
 					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
 					"cat" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"k" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
-					"v" => array("type" => "text"),
+					"v" => array("type" => "mediumtext"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
@@ -582,32 +678,34 @@ function db_definition($charset) {
 					"bd" => array("type" => "date", "not null" => "1", "default" => "0000-00-00"),
 					"notify_new_posts" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"fetch_further_information" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
-					"ffi_keyword_blacklist" => array("type" => "mediumtext"),
+					"ffi_keyword_blacklist" => array("type" => "text"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
 					"uid_name" => array("uid", "name"),
-					"uid_self" => array("uid", "self"),
+					"self_uid" => array("self", "uid"),
 					"alias_uid" => array("alias(32)", "uid"),
-					"uid_pending" => array("uid", "pending"),
-					"uid_blocked" => array("uid", "blocked"),
+					"pending_uid" => array("pending", "uid"),
+					"blocked_uid" => array("blocked", "uid"),
 					"uid_rel_network_poll" => array("uid", "rel", "network", "poll(64)", "archive"),
 					"uid_network_batch" => array("uid", "network", "batch(64)"),
 					"addr_uid" => array("addr(32)", "uid"),
 					"nurl_uid" => array("nurl(32)", "uid"),
 					"nick_uid" => array("nick(32)", "uid"),
+					"dfrn-id" => array("dfrn-id"),
+					"issued-id" => array("issued-id"),
 					)
 			);
 	$database["conv"] = array(
 			"fields" => array(
 					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
 					"guid" => array("type" => "varchar(64)", "not null" => "1", "default" => ""),
-					"recips" => array("type" => "mediumtext"),
+					"recips" => array("type" => "text"),
 					"uid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"creator" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					"updated" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
-					"subject" => array("type" => "mediumtext"),
+					"subject" => array("type" => "text"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
@@ -677,6 +775,7 @@ function db_definition($charset) {
 			"indexes" => array(
 					"PRIMARY" => array("id"),
 					"addr" => array("addr(32)"),
+					"url" => array("url"),
 					)
 			);
 	$database["ffinder"] = array(
@@ -761,10 +860,11 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"nurl" => array("nurl(32)"),
-					"name" => array("name(32)"),
+					"nurl" => array("nurl(64)"),
+					"name" => array("name(64)"),
 					"nick" => array("nick(32)"),
-					"addr" => array("addr(32)"),
+					"addr" => array("addr(64)"),
+					"hide_network_updated" => array("hide", "network", "updated"),
 					"updated" => array("updated"),
 					)
 			);
@@ -781,7 +881,6 @@ function db_definition($charset) {
 					"PRIMARY" => array("id"),
 					"cid_uid_gcid_zcid" => array("UNIQUE", "cid","uid","gcid","zcid"),
 					"gcid" => array("gcid"),
-					"zcid" => array("zcid"),
 					)
 			);
 	$database["group"] = array(
@@ -806,8 +905,8 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
+					"contactid" => array("contact-id"),
 					"gid_contactid" => array("gid", "contact-id"),
-					"uid_contactid" => array("uid", "contact-id"),
 					"uid_gid_contactid" => array("UNIQUE", "uid", "gid", "contact-id"),
 					)
 			);
@@ -844,7 +943,7 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"hook_file_function" => array("hook(30)","file(60)","function(30)"),
+					"hook_file_function" => array("UNIQUE", "hook(50)","file(80)","function(60)"),
 					)
 			);
 	$database["intro"] = array(
@@ -941,22 +1040,18 @@ function db_definition($charset) {
 					"parent-uri" => array("parent-uri"),
 					"extid" => array("extid"),
 					"uid_id" => array("uid","id"),
+					"uid_contactid_id" => array("uid","contact-id","id"),
 					"uid_created" => array("uid","created"),
 					"uid_unseen_contactid" => array("uid","unseen","contact-id"),
 					"uid_network_received" => array("uid","network","received"),
-					"uid_received" => array("uid","received"),
 					"uid_network_commented" => array("uid","network","commented"),
-					"uid_title" => array("uid","title"),
 					"uid_thrparent" => array("uid","thr-parent"),
 					"uid_parenturi" => array("uid","parent-uri"),
-					"uid_contactid_id" => array("uid","contact-id","id"),
 					"uid_contactid_created" => array("uid","contact-id","created"),
 					"authorid_created" => array("author-id","created"),
 					"uid_uri" => array("uid", "uri"),
-					"uid_wall_created" => array("uid","wall","created"),
 					"resource-id" => array("resource-id"),
-					"uid_type" => array("uid","type"),
-					"contactid_allowcid_allowpid_denycid_denygid" => array("contact-id","allow_cid(10)","allow_gid(10)","deny_cid(10)","deny_gid(10)"),
+					"contactid_allowcid_allowpid_denycid_denygid" => array("contact-id","allow_cid(10)","allow_gid(10)","deny_cid(10)","deny_gid(10)"), //
 					"uid_type_changed" => array("uid","type","changed"),
 					"contactid_verb" => array("contact-id","verb"),
 					"deleted_changed" => array("deleted","changed"),
@@ -1015,7 +1110,6 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid" => array("uid"),
 					"uid_seen" => array("uid", "seen"),
 					"convid" => array("convid"),
 					"uri" => array("uri(64)"),
@@ -1050,7 +1144,7 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid_mid" => array("uid","mid"),
+					"uid_mid" => array("UNIQUE", "uid","mid"),
 					)
 			);
 	$database["notify"] = array(
@@ -1075,11 +1169,10 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid_hash" => array("uid", "hash"),
-					"uid_seen_date" => array("uid", "seen", "date"),
-					"uid_type_link" => array("uid", "type", "link"),
-					"uid_link" => array("uid", "link"),
+					"hash_uid" => array("hash", "uid"),
+					"seen_uid_date" => array("seen", "uid", "date"),
 					"uid_date" => array("uid", "date"),
+					"uid_type_link" => array("uid", "type", "link"),
 					)
 			);
 	$database["notify-threads"] = array(
@@ -1092,13 +1185,12 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"master-parent-item" => array("master-parent-item"),
 					)
 			);
 	$database["oembed"] = array(
 			"fields" => array(
 					"url" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
-					"content" => array("type" => "text"),
+					"content" => array("type" => "mediumtext"),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
@@ -1111,7 +1203,7 @@ function db_definition($charset) {
 					"url" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"guessing" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0", "primary" => "1"),
 					"oembed" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0", "primary" => "1"),
-					"content" => array("type" => "text"),
+					"content" => array("type" => "mediumtext"),
 					"created" => array("type" => "datetime", "not null" => "1", "default" => "0000-00-00 00:00:00"),
 					),
 			"indexes" => array(
@@ -1161,7 +1253,7 @@ function db_definition($charset) {
 					"PRIMARY" => array("id"),
 					"uid_contactid" => array("uid", "contact-id"),
 					"uid_profile" => array("uid", "profile"),
-					"uid_album_created" => array("uid", "album(32)", "created"),
+					"uid_album_scale_created" => array("uid", "album(32)", "scale", "created"),
 					"uid_album_resource-id_created" => array("uid", "album(32)", "resource-id(64)", "created"),
 					"resource-id" => array("resource-id(64)"),
 					)
@@ -1170,16 +1262,16 @@ function db_definition($charset) {
 			"fields" => array(
 					"id" => array("type" => "int(11)", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
 					"uid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
-					"q0" => array("type" => "mediumtext"),
-					"q1" => array("type" => "mediumtext"),
-					"q2" => array("type" => "mediumtext"),
-					"q3" => array("type" => "mediumtext"),
-					"q4" => array("type" => "mediumtext"),
-					"q5" => array("type" => "mediumtext"),
-					"q6" => array("type" => "mediumtext"),
-					"q7" => array("type" => "mediumtext"),
-					"q8" => array("type" => "mediumtext"),
-					"q9" => array("type" => "mediumtext"),
+					"q0" => array("type" => "text"),
+					"q1" => array("type" => "text"),
+					"q2" => array("type" => "text"),
+					"q3" => array("type" => "text"),
+					"q4" => array("type" => "text"),
+					"q5" => array("type" => "text"),
+					"q6" => array("type" => "text"),
+					"q7" => array("type" => "text"),
+					"q8" => array("type" => "text"),
+					"q9" => array("type" => "text"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
@@ -1256,6 +1348,7 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
+					"uid_is-default" => array("uid", "is-default"),
 					)
 			);
 	$database["profile_check"] = array(
@@ -1391,8 +1484,6 @@ function db_definition($charset) {
 			"indexes" => array(
 					"PRIMARY" => array("tid"),
 					"oid_otype_type_term" => array("oid","otype","type","term"),
-					"uid_term_tid" => array("uid","term(32)","tid"),
-					"type_term" => array("type","term(32)"),
 					"uid_otype_type_term_global_created" => array("uid","otype","type","term(32)","global","created"),
 					"uid_otype_type_url" => array("uid","otype","type","url(64)"),
 					"guid" => array("guid(64)"),
@@ -1429,8 +1520,6 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("iid"),
-					"created" => array("created"),
-					"commented" => array("commented"),
 					"uid_network_commented" => array("uid","network","commented"),
 					"uid_network_created" => array("uid","network","created"),
 					"uid_contactid_commented" => array("uid","contact-id","commented"),
@@ -1524,7 +1613,6 @@ function db_definition($charset) {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"created" => array("created"),
 					)
 			);
 

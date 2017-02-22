@@ -4,7 +4,7 @@ require_once('include/contact_widgets.php');
 require_once('include/redir.php');
 
 
-function profile_init(App &$a) {
+function profile_init(App $a) {
 
 	if(! x($a->page,'aside'))
 		$a->page['aside'] = '';
@@ -71,7 +71,7 @@ function profile_init(App &$a) {
 }
 
 
-function profile_content(&$a, $update = 0) {
+function profile_content(App $a, $update = 0) {
 
 	$category = $datequery = $datequery2 = '';
 

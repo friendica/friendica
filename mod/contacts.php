@@ -191,13 +191,13 @@ function contacts_post(App $a) {
 
 	$fetch_further_information = intval($_POST['fetch_further_information']);
 
-	$ffi_keyword_blacklist = fix_mce_lf(escape_tags(trim($_POST['ffi_keyword_blacklist'])));
+	$ffi_keyword_blacklist = escape_tags(trim($_POST['ffi_keyword_blacklist']));
 
 	$priority = intval($_POST['poll']);
 	if($priority > 5 || $priority < 0)
 		$priority = 0;
 
-	$info = fix_mce_lf(escape_tags(trim($_POST['info'])));
+	$info = escape_tags(trim($_POST['info']));
 
 	$r = q("UPDATE `contact` SET `profile-id` = %d, `priority` = %d , `info` = '%s',
 		`hidden` = %d, `notify_new_posts` = %d, `fetch_further_information` = %d,
@@ -489,17 +489,11 @@ function contacts_content(App $a) {
 		$contact_id = $a->data['contact']['id'];
 		$contact = $a->data['contact'];
 
-		$editselect = 'none';
-		if( feature_enabled(local_user(),'richtext') )
-			$editselect = 'exact';
-
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('contact_head.tpl'), array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => $editselect,
 		));
 		$a->page['end'] .= replace_macros(get_markup_template('contact_end.tpl'), array(
 			'$baseurl' => App::get_baseurl(true),
-			'$editselect' => $editselect,
 		));
 
 		require_once('include/contact_selectors.php');
