@@ -16,14 +16,14 @@
 // and 10-20 milliseconds to fetch all the child items.
 
 
-function content_content(&$a, $update = 0) {
+function content_content(App $a, $update = 0) {
 
 	require_once('include/conversation.php');
 
 
 	// Currently security is based on the logged in user
 
-	if(! local_user()) {
+	if (! local_user()) {
 		return;
 	}
 
@@ -61,7 +61,7 @@ function content_content(&$a, $update = 0) {
 
 	$o = '';
 
-	
+
 
 	$contact_id = $a->cid;
 
@@ -93,14 +93,14 @@ function content_content(&$a, $update = 0) {
 		);
 
 		$str = '';
-		if(count($r))
+		if (dbm::is_result($r))
 			foreach($r as $rr)
 				$str .= '<' . $rr['id'] . '>';
 		if(strlen($str))
 			$def_acl = array('allow_cid' => $str);
 	}
 
-	
+
 	$sql_options  = (($star) ? " and starred = 1 " : '');
 	$sql_options .= (($bmark) ? " and bookmark = 1 " : '');
 
@@ -113,11 +113,11 @@ function content_content(&$a, $update = 0) {
 			intval($group),
 			intval($_SESSION['uid'])
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			if($update)
 				killme();
 			notice( t('No such group') . EOL );
-			goaway($a->get_baseurl(true) . '/network');
+			goaway(App::get_baseurl(true) . '/network');
 			// NOTREACHED
 		}
 
@@ -137,11 +137,11 @@ function content_content(&$a, $update = 0) {
 	}
 	elseif($cid) {
 
-		$r = q("SELECT `id`,`name`,`network`,`writable`,`nurl` FROM `contact` WHERE `id` = %d 
+		$r = q("SELECT `id`,`name`,`network`,`writable`,`nurl` FROM `contact` WHERE `id` = %d
 				AND `blocked` = 0 AND `pending` = 0 LIMIT 1",
 			intval($cid)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$sql_extra = " AND `item`.`parent` IN ( SELECT DISTINCT(`parent`) FROM `item` WHERE 1 $sql_options AND `contact-id` = " . intval($cid) . " and deleted = 0 ) ";
 
 		}
@@ -197,7 +197,7 @@ function content_content(&$a, $update = 0) {
 	}
 
 	if($conv) {
-		$myurl = $a->get_baseurl() . '/profile/'. $a->user['nickname'];
+		$myurl = App::get_baseurl() . '/profile/'. $a->user['nickname'];
 		$myurl = substr($myurl,strpos($myurl,'://')+3);
 		$myurl = str_replace('www.','',$myurl);
 		$diasp_url = str_replace('/profile/','/u/',$myurl);
@@ -259,7 +259,7 @@ function content_content(&$a, $update = 0) {
 		$parents_arr = array();
 		$parents_str = '';
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			foreach($r as $rr)
 				if(! in_array($rr['item_id'],$parents_arr))
 					$parents_arr[] = $rr['item_id'];
@@ -307,7 +307,7 @@ function content_content(&$a, $update = 0) {
 
 
 
-function render_content(&$a, $items, $mode, $update, $preview = false) {
+function render_content(App $a, $items, $mode, $update, $preview = false) {
 
 	require_once('include/bbcode.php');
 	require_once('mod/proxy.php');
@@ -382,7 +382,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 		if($mode === 'network-new' || $mode === 'search' || $mode === 'community') {
 
-			// "New Item View" on network page or search page results 
+			// "New Item View" on network page or search page results
 			// - just loop through the items and format them minimally for display
 
 			//$tpl = get_markup_template('search_item.tpl');
@@ -402,7 +402,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 						|| (activity_match($item['verb'],ACTIVITY_DISLIKE))
 						|| activity_match($item['verb'],ACTIVITY_ATTEND)
 						|| activity_match($item['verb'],ACTIVITY_ATTENDNO)
-						|| activity_match($item['verb'],ACTIVITY_ATTENDMAYBE)) 
+						|| activity_match($item['verb'],ACTIVITY_ATTENDMAYBE))
 						&& ($item['id'] != $item['parent']))
 						continue;
 					$nickname = $item['nickname'];
@@ -450,7 +450,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 				$drop = array(
 					'dropping' => $dropping,
-					'select' => t('Select'), 
+					'select' => t('Select'),
 					'delete' => t('Delete'),
 				);
 
@@ -509,8 +509,8 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 					'like' => '',
 					'dislike' => '',
 					'comment' => '',
-					//'conv' => (($preview) ? '' : array('href'=> $a->get_baseurl($ssl_state) . '/display/' . $nickname . '/' . $item['id'], 'title'=> t('View in context'))),
-					'conv' => (($preview) ? '' : array('href'=> $a->get_baseurl($ssl_state).'/display/'.$item['guid'], 'title'=> t('View in context'))),
+					//'conv' => (($preview) ? '' : array('href'=> App::get_baseurl($ssl_state) . '/display/' . $nickname . '/' . $item['id'], 'title'=> t('View in context'))),
+					'conv' => (($preview) ? '' : array('href'=> App::get_baseurl($ssl_state).'/display/'.$item['guid'], 'title'=> t('View in context'))),
 					'previewing' => $previewing,
 					'wait' => t('Please wait'),
 				);
@@ -540,11 +540,11 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 						$comments[$item['parent']] = 1;
 					else
 						$comments[$item['parent']] += 1;
-				} elseif(! x($comments,$item['parent'])) 
+				} elseif(! x($comments,$item['parent']))
 					$comments[$item['parent']] = 0; // avoid notices later on
 			}
 
-			// map all the like/dislike/attendance activities for each parent item 
+			// map all the like/dislike/attendance activities for each parent item
 			// Store these in the $alike and $dlike arrays
 
 			foreach($items as $item) {
@@ -633,14 +633,14 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 				$redirect_url = 'redir/' . $item['cid'] ;
 
-				$lock = ((($item['private'] == 1) || (($item['uid'] == local_user()) && (strlen($item['allow_cid']) || strlen($item['allow_gid']) 
+				$lock = ((($item['private'] == 1) || (($item['uid'] == local_user()) && (strlen($item['allow_cid']) || strlen($item['allow_gid'])
 					|| strlen($item['deny_cid']) || strlen($item['deny_gid']))))
 					? t('Private Message')
 					: false);
 
 
 				// Top-level wall post not written by the wall owner (wall-to-wall)
-				// First figure out who owns it. 
+				// First figure out who owns it.
 
 				$osparkle = '';
 
@@ -667,13 +667,13 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 						if((! $owner_linkmatch) && (! $alias_linkmatch) && (! $owner_namematch)) {
 
 							// The author url doesn't match the owner (typically the contact)
-							// and also doesn't match the contact alias. 
-							// The name match is a hack to catch several weird cases where URLs are 
+							// and also doesn't match the contact alias.
+							// The name match is a hack to catch several weird cases where URLs are
 							// all over the park. It can be tricked, but this prevents you from
 							// seeing "Bob Smith to Bob Smith via Wall-to-wall" and you know darn
-							// well that it's the same Bob Smith. 
+							// well that it's the same Bob Smith.
 
-							// But it could be somebody else with the same name. It just isn't highly likely. 
+							// But it could be somebody else with the same name. It just isn't highly likely.
 
 
 							$owner_url = $item['owner-link'];
@@ -682,7 +682,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 							$template = $wallwall;
 							$commentww = 'ww';
 							// If it is our contact, use a friendly redirect link
-							if((link_compare($item['owner-link'],$item['url'])) 
+							if((link_compare($item['owner-link'],$item['url']))
 								&& ($item['network'] === NETWORK_DFRN)) {
 								$owner_url = $redirect_url;
 								$osparkle = ' sparkle';
@@ -694,7 +694,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 				}
 
 				$likebuttons = '';
-				$shareable = ((($profile_owner == local_user()) && ($item['private'] != 1)) ? true : false); 
+				$shareable = ((($profile_owner == local_user()) && ($item['private'] != 1)) ? true : false);
 
 				if($page_writeable) {
 /*					if($toplevelpost) {  */
@@ -714,7 +714,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 					if(($show_comment_box) || (($show_comment_box == false) && ($override_comment_box == false) && ($item['last-child']))) {
 						$comment = replace_macros($cmnt_tpl,array(
-							'$return_path' => '', 
+							'$return_path' => '',
 							'$jsreload' => (($mode === 'display') ? $_SESSION['return_url'] : ''),
 							'$type' => (($mode === 'profile') ? 'wall-comment' : 'net-comment'),
 							'$id' => $item['item_id'],
@@ -742,10 +742,11 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 					}
 				}
 
-				if(local_user() && link_compare($a->contact['url'],$item['author-link']))
-					$edpost = array($a->get_baseurl($ssl_state)."/editpost/".$item['id'], t("Edit"));
-				else
+				if (local_user() && link_compare($a->contact['url'],$item['author-link'])) {
+					$edpost = array(App::get_baseurl($ssl_state)."/editpost/".$item['id'], t("Edit"));
+				} else {
 					$edpost = false;
+				}
 
 				$drop = '';
 				$dropping = false;
@@ -755,7 +756,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 				$drop = array(
 					'dropping' => $dropping,
-					'select' => t('Select'), 
+					'select' => t('Select'),
 					'delete' => t('Delete'),
 				);
 
@@ -764,7 +765,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 				$isstarred = "unstarred";
 				if ($profile_owner == local_user()) {
-					if($toplevelpost) {
+					if ($toplevelpost) {
 						$isstarred = (($item['starred']) ? "starred" : "unstarred");
 
 						$star = array(
@@ -782,7 +783,8 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 							intval($item['uid']),
 							intval($item['id'])
 						);
-						if (count($r)) {
+
+						if (dbm::is_result($r)) {
 							$ignore = array(
 								'do' => t("ignore thread"),
 								'undo' => t("unignore thread"),
@@ -793,7 +795,7 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 							);
 						}
 						$tagger = '';
-						if(feature_enabled($profile_owner,'commtag')) {
+						if (feature_enabled($profile_owner,'commtag')) {
 							$tagger = array(
 								'add' => t("add tag"),
 								'class' => "",
@@ -818,19 +820,22 @@ function render_content(&$a, $items, $mode, $update, $preview = false) {
 
 				$sp = false;
 				$profile_link = best_link_url($item,$sp);
-				if($profile_link === 'mailbox')
+				if ($profile_link === 'mailbox') {
 					$profile_link = '';
-				if($sp)
+				}
+				if ($sp) {
 					$sparkle = ' sparkle';
-				else
+				} else {
 					$profile_link = zrl($profile_link);
+				}
 
 				// Don't rely on the author-avatar. It is better to use the data from the contact table
 				$author_contact = get_contact_details_by_url($item['author-link'], $profile_owner);
-				if ($author_contact["thumb"])
+				if ($author_contact["thumb"]) {
 					$profile_avatar = $author_contact["thumb"];
-				else
+				} else {
 					$profile_avatar = $item['author-avatar'];
+				}
 
 				$like    = ((x($conv_responses['like'],$item['uri'])) ? format_like($conv_responses['like'][$item['uri']],$conv_responses['like'][$item['uri'] . '-l'],'like',$item['uri']) : '');
 				$dislike = ((x($conv_responses['dislike'],$item['uri'])) ? format_like($conv_responses['dislike'][$item['uri']],$conv_responses['dislike'][$item['uri'] . '-l'],'dislike',$item['uri']) : '');

@@ -2,13 +2,13 @@
 
 require_once('include/Scrape.php');
 
-function probe_content(&$a) {
+function probe_content(App $a) {
 
 	$o .= '<h3>Probe Diagnostic</h3>';
 
 	$o .= '<form action="probe" method="get">';
 	$o .= 'Lookup address: <input type="text" style="width: 250px;" name="addr" value="' . $_GET['addr'] .'" />';
-	$o .= '<input type="submit" name="submit" value="Submit" /></form>'; 
+	$o .= '<input type="submit" name="submit" value="Submit" /></form>';
 
 	$o .= '<br /><br />';
 

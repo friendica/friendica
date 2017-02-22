@@ -1,5 +1,7 @@
 <?php
 
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 
 function dbupdate_run(&$argv, &$argc) {
@@ -16,8 +18,11 @@ function dbupdate_run(&$argv, &$argc) {
 		        unset($db_host, $db_user, $db_pass, $db_data);
 	}
 
-	load_config('config');
-	load_config('system');
+	Config::load();
+
+	// We are deleting the latest dbupdate entry.
+	// This is done to avoid endless loops because the update was interupted.
+	Config::delete('database','dbupdate_'.DB_UPDATE_VERSION);
 
 	update_db($a);
 }

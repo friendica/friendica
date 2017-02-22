@@ -12,15 +12,17 @@ function user_allow($hash) {
 	);
 
 
-	if(! count($register))
+	if (! dbm::is_result($register)) {
 		return false;
+	}
 
 	$user = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 		intval($register[0]['uid'])
 	);
 
-	if(! count($user))
+	if (! dbm::is_result($user)) {
 		killme();
+	}
 
 	$r = q("DELETE FROM `register` WHERE `hash` = '%s'",
 		dbesc($register[0]['hash'])
@@ -34,10 +36,11 @@ function user_allow($hash) {
 	$r = q("SELECT * FROM `profile` WHERE `uid` = %d AND `is-default` = 1",
 		intval($user[0]['uid'])
 	);
-	if(count($r) && $r[0]['net-publish']) {
-		$url = $a->get_baseurl() . '/profile/' . $user[0]['nickname'];
-		if($url && strlen(get_config('system','directory')))
+	if (dbm::is_result($r) && $r[0]['net-publish']) {
+		$url = App::get_baseurl() . '/profile/' . $user[0]['nickname'];
+		if ($url && strlen(get_config('system','directory'))) {
 			proc_run(PRIORITY_LOW, "include/directory.php", $url);
+		}
 	}
 
 	push_lang($register[0]['language']);
@@ -45,7 +48,7 @@ function user_allow($hash) {
 	send_register_open_eml(
 		$user[0]['email'],
 		$a->config['sitename'],
-		$a->get_baseurl(),
+		App::get_baseurl(),
 		$user[0]['username'],
 		$register[0]['password']);
 
@@ -69,7 +72,7 @@ function user_deny($hash) {
 		dbesc($hash)
 	);
 
-	if(! count($register))
+	if(! dbm::is_result($register))
 		return false;
 
 	$user = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
@@ -94,40 +97,41 @@ function user_deny($hash) {
 
 }
 
-function regmod_content(&$a) {
+function regmod_content(App $a) {
 
 	global $lang;
 
 	$_SESSION['return_url'] = $a->cmd;
 
-	if(! local_user()) {
+	if (! local_user()) {
 		info( t('Please login.') . EOL);
 		$o .= '<br /><br />' . login(($a->config['register_policy'] == REGISTER_CLOSED) ? 0 : 1);
 		return $o;
 	}
 
-	if((!is_site_admin()) || (x($_SESSION,'submanage') && intval($_SESSION['submanage']))) {
+	if ((!is_site_admin()) || (x($_SESSION,'submanage') && intval($_SESSION['submanage']))) {
 		notice( t('Permission denied.') . EOL);
 		return '';
 	}
 
-	if($a->argc != 3)
+	if ($a->argc != 3) {
 		killme();
+	}
 
 	$cmd  = $a->argv[1];
 	$hash = $a->argv[2];
 
 
 
-	if($cmd === 'deny') {
+	if ($cmd === 'deny') {
 		user_deny($hash);
-		goaway($a->get_baseurl()."/admin/users/");
+		goaway(App::get_baseurl()."/admin/users/");
 		killme();
 	}
 
-	if($cmd === 'allow') {
+	if ($cmd === 'allow') {
 		user_allow($hash);
-		goaway($a->get_baseurl()."/admin/users/");
+		goaway(App::get_baseurl()."/admin/users/");
 		killme();
 	}
 }

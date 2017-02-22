@@ -1,5 +1,7 @@
 <?php
 
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 
 function expire_run(&$argv, &$argc){
@@ -10,19 +12,18 @@ function expire_run(&$argv, &$argc){
 	}
 
 	if(is_null($db)) {
-	    @include(".htconfig.php");
-    	require_once("include/dba.php");
-	    $db = new dba($db_host, $db_user, $db_pass, $db_data);
-    	unset($db_host, $db_user, $db_pass, $db_data);
-  	};
+		@include(".htconfig.php");
+		require_once("include/dba.php");
+		$db = new dba($db_host, $db_user, $db_pass, $db_data);
+		unset($db_host, $db_user, $db_pass, $db_data);
+	};
 
 	require_once('include/session.php');
 	require_once('include/datetime.php');
 	require_once('include/items.php');
 	require_once('include/Contact.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	$a->set_baseurl(get_config('system','url'));
 
@@ -39,8 +40,8 @@ function expire_run(&$argv, &$argc){
 	logger('expire: start');
 
 	$r = q("SELECT `uid`,`username`,`expire` FROM `user` WHERE `expire` != 0");
-	if(count($r)) {
-		foreach($r as $rr) {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
 			logger('Expire: ' . $rr['username'] . ' interval: ' . $rr['expire'], LOGGER_DEBUG);
 			item_expire($rr['uid'],$rr['expire']);
 		}

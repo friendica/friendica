@@ -1,58 +1,58 @@
 <?php
 require_once('mod/settings.php');
 
-function delegate_init(&$a) {
+function delegate_init(App $a) {
 	return settings_init($a);
 }
 
 
-function delegate_content(&$a) {
+function delegate_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
-	if($a->argc > 2 && $a->argv[1] === 'add' && intval($a->argv[2])) {
+	if ($a->argc > 2 && $a->argv[1] === 'add' && intval($a->argv[2])) {
 
 		// delegated admins can view but not change delegation permissions
 
-		if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
-			goaway($a->get_baseurl() . '/delegate');
-
+		if (x($_SESSION,'submanage') && intval($_SESSION['submanage'])) {
+			goaway(App::get_baseurl() . '/delegate');
+		}
 
 		$id = $a->argv[2];
 
 		$r = q("select `nickname` from user where uid = %d limit 1",
 			intval($id)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$r = q("select id from contact where uid = %d and nurl = '%s' limit 1",
 				intval(local_user()),
-				dbesc(normalise_link($a->get_baseurl() . '/profile/' . $r[0]['nickname']))
+				dbesc(normalise_link(App::get_baseurl() . '/profile/' . $r[0]['nickname']))
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				q("insert into manage ( uid, mid ) values ( %d , %d ) ",
 					intval($a->argv[2]),
 					intval(local_user())
 				);
 			}
 		}
-		goaway($a->get_baseurl() . '/delegate');
+		goaway(App::get_baseurl() . '/delegate');
 	}
 
-	if($a->argc > 2 && $a->argv[1] === 'remove' && intval($a->argv[2])) {
+	if ($a->argc > 2 && $a->argv[1] === 'remove' && intval($a->argv[2])) {
 
 		// delegated admins can view but not change delegation permissions
+		if (x($_SESSION,'submanage') && intval($_SESSION['submanage'])) {
+			goaway(App::get_baseurl() . '/delegate');
+		}
 
-		if(x($_SESSION,'submanage') && intval($_SESSION['submanage']))
-			goaway($a->get_baseurl() . '/delegate');
-
-		q("delete from manage where uid = %d and mid = %d limit 1",
+		q("DELETE FROM `manage` WHERE `uid` = %d AND `mid` = %d LIMIT 1",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		goaway($a->get_baseurl() . '/delegate');
+		goaway(App::get_baseurl() . '/delegate');
 
 	}
 
@@ -64,7 +64,7 @@ function delegate_content(&$a) {
 		dbesc($a->user['email']),
 		dbesc($a->user['password'])
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 		$full_managers = $r;
 
 	$delegates = array();
@@ -75,7 +75,7 @@ function delegate_content(&$a) {
 		intval(local_user())
 	);
 
-	if(count($r))
+	if (dbm::is_result($r))
 		$delegates = $r;
 
 	$uids = array();
@@ -90,22 +90,22 @@ function delegate_content(&$a) {
 
 	// find every contact who might be a candidate for delegation
 
-	$r = q("select nurl from contact where substring_index(contact.nurl,'/',3) = '%s' 
+	$r = q("select nurl from contact where substring_index(contact.nurl,'/',3) = '%s'
 		and contact.uid = %d and contact.self = 0 and network = '%s' ",
-		dbesc(normalise_link($a->get_baseurl())),
+		dbesc(normalise_link(App::get_baseurl())),
 		intval(local_user()),
 		dbesc(NETWORK_DFRN)
-	); 
+	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('No potential page delegates located.') . EOL);
 		return;
 	}
 
 	$nicknames = array();
 
-	if(count($r)) {
-		foreach($r as $rr) {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
 			$nicknames[] = "'" . dbesc(basename($rr['nurl'])) . "'";
 		}
 	}
@@ -118,7 +118,7 @@ function delegate_content(&$a) {
 
 	$r = q("select `uid`, `username`, `nickname` from user where nickname in ( $nicks )");
 
-	if(count($r))
+	if (dbm::is_result($r))
 		foreach($r as $rr)
 			if(! in_array($rr['uid'],$uids))
 				$potentials[] = $rr;
@@ -128,7 +128,7 @@ function delegate_content(&$a) {
 
 	$o = replace_macros(get_markup_template('delegate.tpl'),array(
 		'$header' => t('Delegate Page Management'),
-		'$base' => $a->get_baseurl(),
+		'$base' => App::get_baseurl(),
 		'$desc' => t('Delegates are able to manage all aspects of this account/page except for basic account settings. Please do not delegate your personal account to anybody that you do not trust completely.'),
 		'$head_managers' => t('Existing Page Managers'),
 		'$managers' => $full_managers,

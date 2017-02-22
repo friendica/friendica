@@ -25,7 +25,7 @@
 		{{/if}}
 		<div id="jot-text-wrap">
 		<img id="profile-jot-text-loading" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait}}" style="display: none;" />
-		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body" >{{if $content}}{{$content}}{{else}}{{$share}}{{/if}}</textarea>
+		<textarea rows="5" cols="64" class="profile-jot-text" id="profile-jot-text" name="body" placeholder="{{$share}}">{{if $content}}{{$content}}{{/if}}</textarea>
 		</div>
 
 <div id="profile-jot-submit-wrapper" class="jothidden">
@@ -33,26 +33,26 @@
 
 	<div id="profile-upload-wrapper" style="display: {{$visitor}};" >
 		<div id="wall-image-upload-div" ><a href="#" onclick="return false;" id="wall-image-upload" class="icon camera" title="{{$upload|escape:'html'}}"></a></div>
-	</div> 
+	</div>
 	<div id="profile-attach-wrapper" style="display: {{$visitor}};" >
 		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon attach" title="{{$attach|escape:'html'}}"></a></div>
-	</div> 
+	</div>
 
 	<div id="profile-link-wrapper" style="display: {{$visitor}};" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
 		<a id="profile-link" class="icon link" title="{{$weblink}}" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-video-wrapper" style="display: {{$visitor}};" >
 		<a id="profile-video" class="icon video" title="{{$video|escape:'html'}}" onclick="jotVideoURL();return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-audio-wrapper" style="display: {{$visitor}};" >
 		<a id="profile-audio" class="icon audio" title="{{$audio|escape:'html'}}" onclick="jotAudioURL();return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-location-wrapper" style="display: {{$visitor}};" >
 		<a id="profile-location" class="icon globe" title="{{$setloc|escape:'html'}}" onclick="jotGetLocation();return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-nolocation-wrapper" style="display: none;" >
 		<a id="profile-nolocation" class="icon noglobe" title="{{$noloc|escape:'html'}}" onclick="jotClearLocation();return false;"></a>
-	</div> 
+	</div>
 
 	<div id="profile-jot-perms" class="profile-jot-perms" style="display: {{$pvisit}};" >
 		<a href="#profile-jot-acl-wrapper" id="jot-perms-icon" class="icon {{$lockstate}}"  title="{{$permset|escape:'html'}}" ></a>{{$bang}}
@@ -70,8 +70,8 @@
 
 	<div id="profile-rotator-wrapper" style="display: {{$visitor}};" >
 		<img id="profile-rotator" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait|escape:'html'}}" style="display: none;" />
-	</div> 
-	
+	</div>
+
 	<div id="jot-preview-content" style="display:none;"></div>
 
 	<div style="display: none;">

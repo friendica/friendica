@@ -46,16 +46,16 @@ function p_init($a){
 
 	// Fetch some data from the author (We could combine both queries - but I think this is more readable)
 	$r = q("SELECT `user`.`prvkey`, `contact`.`addr`, `user`.`nickname`, `contact`.`nick` FROM `user`
-		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid`
+		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`
 		WHERE `user`.`uid` = %d", intval($item[0]["uid"]));
-	if (!$r) {
+	if (!dbm::is_result($r)) {
 		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
 		killme();
 	}
 	$user = $r[0];
 
-	$status = diaspora::build_status($item[0], $user);
-	$xml = diaspora::build_post_xml($status["type"], $status["message"]);
+	$status = Diaspora::build_status($item[0], $user);
+	$xml = Diaspora::build_post_xml($status["type"], $status["message"]);
 
 	header("Content-Type: application/xml; charset=utf-8");
 	echo $xml;

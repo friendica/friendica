@@ -3,7 +3,8 @@
  * @file include/dfrn.php
  * @brief The implementation of the dfrn protocol
  *
- * https://github.com/friendica/friendica/wiki/Protocol
+ * @see https://github.com/friendica/friendica/wiki/Protocol and
+ * https://github.com/friendica/friendica/blob/master/spec/dfrn2.pdf
  */
 
 require_once("include/Contact.php");
@@ -98,21 +99,21 @@ class dfrn {
 
 		$sql_extra = " AND `item`.`allow_cid` = '' AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' ";
 
-		$r = q("SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`
+		$r = q("SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`, `user`.`account-type`
 			FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
-			WHERE `contact`.`self` = 1 AND `user`.`nickname` = '%s' LIMIT 1",
+			WHERE `contact`.`self` AND `user`.`nickname` = '%s' LIMIT 1",
 			dbesc($owner_nick)
 		);
 
-		if(! count($r))
+		if (! dbm::is_result($r)) {
 			killme();
+		}
 
 		$owner = $r[0];
 		$owner_id = $owner['uid'];
 		$owner_nick = $owner['nickname'];
 
 		$sql_post_table = "";
-		$visibility = "";
 
 		if(! $public_feed) {
 
@@ -135,12 +136,13 @@ class dfrn {
 					break; // NOTREACHED
 			}
 
-			$r = q("SELECT * FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `contact`.`uid` = %d $sql_extra LIMIT 1",
+			$r = q("SELECT * FROM `contact` WHERE NOT `blocked` AND `contact`.`uid` = %d $sql_extra LIMIT 1",
 				intval($owner_id)
 			);
 
-			if(! count($r))
+			if (! dbm::is_result($r)) {
 				killme();
+			}
 
 			$contact = $r[0];
 			require_once('include/security.php');
@@ -171,9 +173,6 @@ class dfrn {
 		else
 			$sort = 'ASC';
 
-		$date_field = "`changed`";
-		$sql_order = "`item`.`parent` ".$sort.", `item`.`created` ASC";
-
 		if(! strlen($last_update))
 			$last_update = 'now -30 days';
 
@@ -190,22 +189,19 @@ class dfrn {
 
 		$check_date = datetime_convert('UTC','UTC',$last_update,'Y-m-d H:i:s');
 
-		//	AND ( `item`.`edited` > '%s' OR `item`.`changed` > '%s' )
-		//	dbesc($check_date),
-
-		$r = q("SELECT STRAIGHT_JOIN `item`.*, `item`.`id` AS `item_id`,
+		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
 			`contact`.`name`, `contact`.`network`, `contact`.`photo`, `contact`.`url`,
 			`contact`.`name-date`, `contact`.`uri-date`, `contact`.`avatar-date`,
 			`contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
 			`sign`.`signed_text`, `sign`.`signature`, `sign`.`signer`
-			FROM `item` $sql_post_table
-			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
+			FROM `item` USE INDEX (`uid_wall_changed`) $sql_post_table
+			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+			AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			LEFT JOIN `sign` ON `sign`.`iid` = `item`.`id`
-			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 and `item`.`moderated` = 0 AND `item`.`parent` != 0
-			AND ((`item`.`wall` = 1) $visibility) AND `item`.$date_field > '%s'
+			WHERE `item`.`uid` = %d AND `item`.`visible` AND NOT `item`.`moderated` AND `item`.`parent` != 0
+			AND `item`.`wall` AND `item`.`changed` > '%s'
 			$sql_extra
-			ORDER BY $sql_order LIMIT 0, 300",
+			ORDER BY `item`.`parent` ".$sort.", `item`.`created` ASC LIMIT 0, 300",
 			intval($owner_id),
 			dbesc($check_date),
 			dbesc($sort)
@@ -440,8 +436,12 @@ class dfrn {
 			xml::add_element($doc, $root, "link", "", $attributes);
 		}
 
+		// For backward compatibility we keep this element
 		if ($owner['page-flags'] == PAGE_COMMUNITY)
 			xml::add_element($doc, $root, "dfrn:community", 1);
+
+		// The former element is replaced by this one
+		xml::add_element($doc, $root, "dfrn:account_type", $owner["account-type"]);
 
 		/// @todo We need a way to transmit the different page flags like "PAGE_PRVGROUP"
 
@@ -512,14 +512,16 @@ class dfrn {
 			xml::add_element($doc, $author, "dfrn:birthday", $birthday);
 
 		// Only show contact details when we are allowed to
-		$r = q("SELECT `profile`.`about`, `profile`.`name`, `profile`.`homepage`, `user`.`nickname`, `user`.`timezone`,
-				`profile`.`locality`, `profile`.`region`, `profile`.`country-name`, `profile`.`pub_keywords`, `profile`.`dob`
+		$r = q("SELECT `profile`.`about`, `profile`.`name`, `profile`.`homepage`, `user`.`nickname`,
+				`user`.`timezone`, `profile`.`locality`, `profile`.`region`, `profile`.`country-name`,
+				`profile`.`pub_keywords`, `profile`.`xmpp`, `profile`.`dob`
 			FROM `profile`
 				INNER JOIN `user` ON `user`.`uid` = `profile`.`uid`
 				WHERE `profile`.`is-default` AND NOT `user`.`hidewall` AND `user`.`uid` = %d",
 			intval($owner['uid']));
 		if ($r) {
 			$profile = $r[0];
+
 			xml::add_element($doc, $author, "poco:displayName", $profile["name"]);
 			xml::add_element($doc, $author, "poco:updated", $namdate);
 
@@ -550,12 +552,10 @@ class dfrn {
 
 			}
 
-			/// @todo When we are having the XMPP address in the profile we should propagate it here
-			$xmpp = "";
-			if (trim($xmpp) != "") {
+			if (trim($profile["xmpp"]) != "") {
 				$ims = $doc->createElement("poco:ims");
 				xml::add_element($doc, $ims, "poco:type", "xmpp");
-				xml::add_element($doc, $ims, "poco:value", $xmpp);
+				xml::add_element($doc, $ims, "poco:value", $profile["xmpp"]);
 				xml::add_element($doc, $ims, "poco:primary", "true");
 				$author->appendChild($ims);
 			}
@@ -1105,11 +1105,21 @@ class dfrn {
 	 */
 	private function birthday_event($contact, $birthday) {
 
+		// Check for duplicates
+		$r = q("SELECT `id` FROM `event` WHERE `uid` = %d AND `cid` = %d AND `start` = '%s' AND `type` = '%s' LIMIT 1",
+			intval($contact["uid"]),
+			intval($contact["id"]),
+			dbesc(datetime_convert("UTC","UTC", $birthday)),
+			dbesc("birthday"));
+
+		if (dbm::is_result($r)) {
+			return;
+		}
+
 		logger("updating birthday: ".$birthday." for contact ".$contact["id"]);
 
 		$bdtext = sprintf(t("%s\'s birthday"), $contact["name"]);
 		$bdtext2 = sprintf(t("Happy Birthday %s"), " [url=".$contact["url"]."]".$contact["name"]."[/url]") ;
-
 
 		$r = q("INSERT INTO `event` (`uid`,`cid`,`created`,`edited`,`start`,`finish`,`summary`,`desc`,`type`)
 			VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s') ",
@@ -1143,7 +1153,7 @@ class dfrn {
 		$author["link"] = $xpath->evaluate($element."/atom:uri/text()", $context)->item(0)->nodeValue;
 
 		$r = q("SELECT `id`, `uid`, `url`, `network`, `avatar-date`, `name-date`, `uri-date`, `addr`,
-				`name`, `nick`, `about`, `location`, `keywords`, `bdyear`, `bd`, `hidden`
+				`name`, `nick`, `about`, `location`, `keywords`, `xmpp`, `bdyear`, `bd`, `hidden`, `contact-type`
 				FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` != '%s'",
 			intval($importer["uid"]), dbesc(normalise_link($author["link"])), dbesc(NETWORK_STATUSNET));
 		if ($r) {
@@ -1161,7 +1171,7 @@ class dfrn {
 
 		// Until now we aren't serving different sizes - but maybe later
 		$avatarlist = array();
-		// @todo check if "avatar" or "photo" would be the best field in the specification
+		/// @todo check if "avatar" or "photo" would be the best field in the specification
 		$avatars = $xpath->query($element."/atom:link[@rel='avatar']", $context);
 		foreach($avatars AS $avatar) {
 			$href = "";
@@ -1219,9 +1229,13 @@ class dfrn {
 			if ($value != "")
 				$poco["location"] = $value;
 
+			/// @todo Only search for elements with "poco:type" = "xmpp"
+			$value = $xpath->evaluate($element."/poco:ims/poco:value/text()", $context)->item(0)->nodeValue;
+			if ($value != "")
+				$poco["xmpp"] = $value;
+
 			/// @todo Add support for the following fields that we don't support by now in the contact table:
 			/// - poco:utcOffset
-			/// - poco:ims
 			/// - poco:urls
 			/// - poco:locality
 			/// - poco:region
@@ -1308,12 +1322,13 @@ class dfrn {
 
 				q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `about` = '%s', `location` = '%s',
 					`addr` = '%s', `keywords` = '%s', `bdyear` = '%s', `bd` = '%s', `hidden` = %d,
-					`name-date`  = '%s', `uri-date` = '%s'
+					`xmpp` = '%s', `name-date`  = '%s', `uri-date` = '%s'
 					WHERE `id` = %d AND `network` = '%s'",
 					dbesc($contact["name"]), dbesc($contact["nick"]), dbesc($contact["about"]), dbesc($contact["location"]),
 					dbesc($contact["addr"]), dbesc($contact["keywords"]), dbesc($contact["bdyear"]),
-					dbesc($contact["bd"]), intval($contact["hidden"]), dbesc($contact["name-date"]),
-					dbesc($contact["uri-date"]), intval($contact["id"]), dbesc($contact["network"]));
+					dbesc($contact["bd"]), intval($contact["hidden"]), dbesc($contact["xmpp"]),
+					dbesc($contact["name-date"]), dbesc($contact["uri-date"]),
+					intval($contact["id"]), dbesc($contact["network"]));
 			}
 
 			update_contact_avatar($author["avatar"], $importer["uid"], $contact["id"],
@@ -1327,6 +1342,7 @@ class dfrn {
 			$poco["generation"] = 2;
 			$poco["photo"] = $author["avatar"];
 			$poco["hide"] = $hide;
+			$poco["contact-type"] = $contact["contact-type"];
 			update_gcontact($poco);
 		}
 
@@ -1375,7 +1391,7 @@ class dfrn {
 
 		$objxml = $obj_doc->saveXML($obj_element);
 
-		// @todo This isn't totally clean. We should find a way to transform the namespaces
+		/// @todo This isn't totally clean. We should find a way to transform the namespaces
 		$objxml = str_replace("<".$element.' xmlns="http://www.w3.org/2005/Atom">', "<".$element.">", $objxml);
 		return($objxml);
 	}
@@ -1405,9 +1421,9 @@ class dfrn {
 		$msg["seen"] = 0;
 		$msg["replied"] = 0;
 
-		dbesc_array($msg);
+		dbm::esc_array($msg, true);
 
-		$r = dbq("INSERT INTO `mail` (`".implode("`, `", array_keys($msg))."`) VALUES ('".implode("', '", array_values($msg))."')");
+		$r = dbq("INSERT INTO `mail` (`".implode("`, `", array_keys($msg))."`) VALUES (".implode(", ", array_values($msg)).")");
 
 		// send notifications.
 
@@ -1439,6 +1455,7 @@ class dfrn {
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 */
 	private function process_suggestion($xpath, $suggestion, $importer) {
+		$a = get_app();
 
 		logger("Processing suggestions");
 
@@ -1458,7 +1475,7 @@ class dfrn {
 			dbesc(normalise_link($suggest["url"])),
 			intval($suggest["uid"])
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			return false;
 
 		// Do we already have an fcontact record for this person?
@@ -1469,7 +1486,7 @@ class dfrn {
 			dbesc($suggest["name"]),
 			dbesc($suggest["request"])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$fid = $r[0]["id"];
 
 			// OK, we do. Do we already have an introduction for this person ?
@@ -1477,7 +1494,7 @@ class dfrn {
 				intval($suggest["uid"]),
 				intval($fid)
 			);
-			if(count($r))
+			if (dbm::is_result($r))
 				return false;
 		}
 		if(!$fid)
@@ -1492,7 +1509,7 @@ class dfrn {
 			dbesc($suggest["name"]),
 			dbesc($suggest["request"])
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$fid = $r[0]["id"];
 		else
 			// database record did not get created. Quietly give up.
@@ -1741,7 +1758,7 @@ class dfrn {
 				LIMIT 1",
 				dbesc($item["parent-uri"])
 			);
-			if($r && count($r)) {
+			if (dbm::is_result($r)) {
 				$r = q("SELECT `item`.`forum_mode`, `item`.`wall` FROM `item`
 					INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 					WHERE `item`.`uri` = '%s' AND (`item`.`parent-uri` = '%s' OR `item`.`thr-parent` = '%s')
@@ -1753,7 +1770,7 @@ class dfrn {
 					dbesc($r[0]["parent-uri"]),
 					intval($importer["importer_uid"])
 				);
-				if($r && count($r))
+				if (dbm::is_result($r))
 					$is_a_remote_action = true;
 			}
 
@@ -1891,7 +1908,7 @@ class dfrn {
 					dbesc($item["verb"]),
 					dbesc($item["parent-uri"])
 				);
-				if($r && count($r))
+				if (dbm::is_result($r))
 					return false;
 
 				$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `author-link` = '%s' AND `verb` = '%s' AND `thr-parent` = '%s' AND NOT `deleted` LIMIT 1",
@@ -1900,7 +1917,7 @@ class dfrn {
 					dbesc($item["verb"]),
 					dbesc($item["parent-uri"])
 				);
-				if($r && count($r))
+				if (dbm::is_result($r))
 					return false;
 			} else
 				$is_like = false;
@@ -1916,7 +1933,7 @@ class dfrn {
 						intval($importer["importer_uid"])
 					);
 
-					if(!count($r))
+					if (!dbm::is_result($r))
 						return false;
 
 					// extract tag, if not duplicate, add to parent item
@@ -2188,7 +2205,7 @@ class dfrn {
 						dbesc($item["uri"]),
 						intval($importer["uid"])
 					);
-					if(count($r))
+					if (dbm::is_result($r))
 						$ev["id"] = $r[0]["id"];
 
 					$event_id = event_store($ev);
@@ -2209,7 +2226,7 @@ class dfrn {
 		}
 
 		// Update content if 'updated' changes
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			if (self::update_content($r[0], $item, $importer, $entrytype))
 				logger("Item ".$item["uri"]." was updated.", LOGGER_DEBUG);
 			else
@@ -2231,7 +2248,7 @@ class dfrn {
 					intval($posted_id),
 					intval($importer["importer_uid"])
 				);
-				if(count($r)) {
+				if (dbm::is_result($r)) {
 					$parent = $r[0]["parent"];
 					$parent_uri = $r[0]["parent-uri"];
 				}
@@ -2319,7 +2336,7 @@ class dfrn {
 				intval($importer["uid"]),
 				intval($importer["id"])
 			);
-		if(!count($r)) {
+		if (!dbm::is_result($r)) {
 			logger("Item with uri ".$uri." from contact ".$importer["id"]." for user ".$importer["uid"]." wasn't found.", LOGGER_DEBUG);
 			return;
 		} else {
@@ -2348,7 +2365,7 @@ class dfrn {
 						dbesc($xt->id),
 						intval($importer["importer_uid"])
 					);
-					if(count($i)) {
+					if (dbm::is_result($i)) {
 
 						// For tags, the owner cannot remove the tag on the author's copy of the post.
 
@@ -2413,7 +2430,7 @@ class dfrn {
 							dbesc($item["parent-uri"]),
 							intval($importer["uid"])
 					);
-					if(count($r)) {
+					if (dbm::is_result($r)) {
 						q("UPDATE `item` SET `last-child` = 1 WHERE `id` = %d",
 							intval($r[0]["id"])
 						);
@@ -2483,7 +2500,19 @@ class dfrn {
 
 		logger("Import DFRN message for user ".$importer["uid"]." from contact ".$importer["id"], LOGGER_DEBUG);
 
-		// is it a public forum? Private forums aren't supported by now with this method
+		// The account type is new since 3.5.1
+		if ($xpath->query("/atom:feed/dfrn:account_type")->length > 0) {
+			$accounttype = intval($xpath->evaluate("/atom:feed/dfrn:account_type/text()", $context)->item(0)->nodeValue);
+
+			if ($accounttype != $importer["contact-type"])
+				q("UPDATE `contact` SET `contact-type` = %d WHERE `id` = %d",
+					intval($accounttype),
+					intval($importer["id"])
+				);
+		}
+
+		// is it a public forum? Private forums aren't supported with this method
+		// This is deprecated since 3.5.1
 		$forum = intval($xpath->evaluate("/atom:feed/dfrn:community/text()", $context)->item(0)->nodeValue);
 
 		if ($forum != $importer["forum"])

@@ -4,7 +4,7 @@ Friendica Message Flow
 This page documents some of the details of how messages get from one person to another in the Friendica network.
 There are multiple paths, using multiple protocols and message formats.
 
-Those attempting to understand these message flows should become familiar with (at the minimum) the [DFRN protocol document](http://dfrn.org/dfrn.pdf) and the message passing elements of the OStatus stack (salmon and Pubsubhubbub).
+Those attempting to understand these message flows should become familiar with (at the minimum) the [DFRN protocol document](https://github.com/friendica/friendica/blob/master/spec/dfrn2.pdf) and the message passing elements of the OStatus stack (salmon and Pubsubhubbub).
 
 Most message passing involves the file include/items.php, which has functions for several feed-related import/export activities. 
 
@@ -21,8 +21,8 @@ Push (pubsubhubbub) feeds arrive via mod/pubsub.php
 
 DFRN-poll feed imports arrive via include/poller.php as a scheduled task, this implements the local side of the DFRN-poll protocol.  
 
-Scenario #1. Bob posts a public status message
----
+### Scenario #1. Bob posts a public status message
+
 This is a public message with no conversation members so no private transport is used.
 There are two paths it can take - as a bbcode path to DFRN clients, and converted to HTML with the server's PuSH (pubsubhubbub) hubs notified.
 When a PuSH hub is operational, dfrn-poll clients prefer to receive their information through the PuSH channel.
@@ -30,31 +30,31 @@ They will fall back on a daily poll in case the hub has delivery issues (this is
 If there is no specified hub or hubs, DFRN clients will poll at a configurable (per-contact) rate at up to 5-minute intervals.
 Feeds retrieved via dfrn-poll are bbcode and may also contain private conversations which the poller has permissions to see. 
 
-Scenario #2. Jack replies to Bob's public message. Jack is on the Friendica/DFRN network.
----
+### Scenario #2. Jack replies to Bob's public message. Jack is on the Friendica/DFRN network.
+
 Jack uses dfrn-notify to send a direct reply to Bob.
 Bob then creates a feed of the conversation and sends it to everybody involved in the conversation using dfrn-notify.
 PuSH hubs are notified that new content is available.
 The hub or hubs will then retrieve the latest feed and transmit it to all hub subscribers (which may be on different networks). 
 
-Scenario #3. Mary replies to Bob's public message. Mary is on the Friendica/DFRN network.
----
+### Scenario #3. Mary replies to Bob's public message. Mary is on the Friendica/DFRN network.
+
 Mary uses dfrn-notify to send a direct reply to Bob.
 Bob then creates a feed of the conversation and sends it to everybody involved in the conversation (excluding himself, the conversation is now sent to both Jack and Mary).
 Messages are sent using dfrn-notify.
 Push hubs are also notified that new content is available.
 The hub or hubs will then retrieve the latest feed and transmit it to all hub subscribers (which may be on different networks).  
 
-Scenario #4. William replies to Bob's public message. William is on the OStatus network.
----
+### Scenario #4. William replies to Bob's public message. William is on the OStatus network.
+
 William uses salmon to notify Bob of the reply.
 Content is html embedded in salmon magic envelope.
 Bob then creates a feed of the conversation and sends it to all Friendica participants involved in the conversation using dfrn-notify (excluding himself, the conversation is sent to both Jack and Mary).
 Push hubs are notified that new content is available.
 The hub or hubs will then retrieve the latest feed and transmit it to all hub subscribers (which may be on different networks).  
 
-Scenario #5. Bob posts a private message to Mary and Jack.
----
+### Scenario #5. Bob posts a private message to Mary and Jack.
+
 Message is delivered immediately to Mary and Jack using dfrn_notify.
 Public hubs are not notified.
 Requeueing is attempted in case of timeout.

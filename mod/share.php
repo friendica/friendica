@@ -1,18 +1,18 @@
 <?php
-function share_init(&$a) {
+function share_init(App $a) {
 
 	$post_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 	if((! $post_id) || (! local_user()))
 		killme();
 
-	$r = q("SELECT item.*, contact.network FROM `item` 
-		inner join contact on `item`.`contact-id` = `contact`.`id` 
+	$r = q("SELECT item.*, contact.network FROM `item`
+		inner join contact on `item`.`contact-id` = `contact`.`id`
 		WHERE `item`.`id` = %d AND `item`.`uid` = %d LIMIT 1",
 
 		intval($post_id),
 		intval(local_user())
 	);
-	if(! count($r) || ($r[0]['private'] == 1))
+	if(! dbm::is_result($r) || ($r[0]['private'] == 1))
 		killme();
 
 	if (!intval(get_config('system','old_share'))) {

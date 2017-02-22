@@ -1,8 +1,6 @@
 
 
 <script>
-	var none = "none"; // ugly hack: {{$editselect}} shouldn't be a string if TinyMCE is enabled, but should if it isn't
-	window.editSelect = {{$editselect}};
 	window.isPublic = "{{$ispublic}}";
 	window.nickname = "{{$nickname}}";
 	window.linkURL = "{{$linkurl}}";

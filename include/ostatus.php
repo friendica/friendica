@@ -467,7 +467,7 @@ class ostatus {
 			}
 
 			// Is it a repeated post?
-			if ($repeat_of != "") {
+			if (($repeat_of != "") OR ($item["verb"] == ACTIVITY_SHARE)) {
 				$activityobjects = $xpath->query('activity:object', $entry)->item(0);
 
 				if (is_object($activityobjects)) {
@@ -523,7 +523,9 @@ class ostatus {
 				$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s'",
 					intval($importer["uid"]), dbesc($item["parent-uri"]));
 
-				if (!$r AND ($related != "")) {
+				// Only fetch missing stuff if it is a comment or reshare.
+				if (in_array($item["verb"], array(ACTIVITY_POST, ACTIVITY_SHARE)) AND
+					!dbm::is_result($r) AND ($related != "")) {
 					$reply_path = str_replace("/notice/", "/api/statuses/show/", $related).".atom";
 
 					if ($reply_path != $related) {
@@ -596,21 +598,25 @@ class ostatus {
 		$last = get_config('system','ostatus_last_poll');
 
 		$poll_interval = intval(get_config('system','ostatus_poll_interval'));
-		if(! $poll_interval)
-			$poll_interval = OSTATUS_DEFAULT_POLL_INTERVAL;
+		if (!$poll_interval) {
+			$poll_interval = self::OSTATUS_DEFAULT_POLL_INTERVAL;
+		}
 
 		// Don't poll if the interval is set negative
-		if (($poll_interval < 0) AND !$override)
+		if (($poll_interval < 0) AND !$override) {
 			return;
+		}
 
 		if (!$mentions) {
 			$poll_timeframe = intval(get_config('system','ostatus_poll_timeframe'));
-			if (!$poll_timeframe)
-				$poll_timeframe = OSTATUS_DEFAULT_POLL_TIMEFRAME;
+			if (!$poll_timeframe) {
+				$poll_timeframe = self::OSTATUS_DEFAULT_POLL_TIMEFRAME;
+			}
 		} else {
 			$poll_timeframe = intval(get_config('system','ostatus_poll_timeframe'));
-			if (!$poll_timeframe)
-				$poll_timeframe = OSTATUS_DEFAULT_POLL_TIMEFRAME_MENTIONS;
+			if (!$poll_timeframe) {
+				$poll_timeframe = self::OSTATUS_DEFAULT_POLL_TIMEFRAME_MENTIONS;
+			}
 		}
 
 
@@ -626,15 +632,16 @@ class ostatus {
 
 		$start = date("Y-m-d H:i:s", time() - ($poll_timeframe * 60));
 
-		if ($mentions)
+		if ($mentions) {
 			$conversations = q("SELECT `term`.`oid`, `term`.`url`, `term`.`uid` FROM `term`
 						STRAIGHT_JOIN `thread` ON `thread`.`iid` = `term`.`oid` AND `thread`.`uid` = `term`.`uid`
 						WHERE `term`.`type` = 7 AND `term`.`term` > '%s' AND `thread`.`mention`
 						GROUP BY `term`.`url`, `term`.`uid` ORDER BY `term`.`term` DESC", dbesc($start));
-		else
+		} else {
 			$conversations = q("SELECT `oid`, `url`, `uid` FROM `term`
 						WHERE `type` = 7 AND `term` > '%s'
 						GROUP BY `url`, `uid` ORDER BY `term` DESC", dbesc($start));
+		}
 
 		foreach ($conversations AS $conversation) {
 			self::completion($conversation['url'], $conversation['uid']);
@@ -806,11 +813,20 @@ class ostatus {
 		}
 
 		// Get the parent
+		$parents = q("SELECT `item`.`id`, `item`.`parent`, `item`.`uri`, `item`.`contact-id`, `item`.`type`,
+				`item`.`verb`, `item`.`visible` FROM `term`
+				STRAIGHT_JOIN `item` AS `thritem` ON `thritem`.`parent` = `term`.`oid`
+				STRAIGHT_JOIN `item` ON `item`.`parent` = `thritem`.`parent`
+				WHERE `term`.`uid` = %d AND `term`.`otype` = %d AND `term`.`type` = %d AND `term`.`url` = '%s'",
+				intval($uid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($conversation_url));
+
+/*		2016-10-23: The old query will be kept until we are sure that the query above is a good and fast replacement
+
 		$parents = q("SELECT `id`, `parent`, `uri`, `contact-id`, `type`, `verb`, `visible` FROM `item` WHERE `id` IN
 				(SELECT `parent` FROM `item` WHERE `id` IN
 					(SELECT `oid` FROM `term` WHERE `uid` = %d AND `otype` = %d AND `type` = %d AND `url` = '%s'))",
 				intval($uid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($conversation_url));
-
+*/
 		if ($parents)
 			$parent = $parents[0];
 		elseif (count($item) > 0) {
@@ -1552,10 +1568,13 @@ class ostatus {
 		if ($xml)
 			return $xml;
 
-		if ($item["verb"] == ACTIVITY_LIKE)
+		if ($item["verb"] == ACTIVITY_LIKE) {
 			return self::like_entry($doc, $item, $owner, $toplevel);
-		else
+		} elseif (in_array($item["verb"], array(ACTIVITY_FOLLOW, NAMESPACE_OSTATUS."/unfollow"))) {
+			return self::follow_entry($doc, $item, $owner, $toplevel);
+		} else {
 			return self::note_entry($doc, $item, $owner, $toplevel);
+		}
 	}
 
 	/**
@@ -1732,6 +1751,113 @@ class ostatus {
 	}
 
 	/**
+	 * @brief Adds the person object element to the XML document
+	 *
+	 * @param object $doc XML document
+	 * @param array $owner Contact data of the poster
+	 * @param array $contact Contact data of the target
+	 *
+	 * @return object author element
+	 */
+	private function add_person_object($doc, $owner, $contact) {
+
+		$object = $doc->createElement("activity:object");
+		xml::add_element($doc, $object, "activity:object-type", ACTIVITY_OBJ_PERSON);
+
+		if ($contact['network'] == NETWORK_PHANTOM) {
+			xml::add_element($doc, $object, "id", $contact['url']);
+			return $object;
+		}
+
+		xml::add_element($doc, $object, "id", $contact["alias"]);
+		xml::add_element($doc, $object, "title", $contact["nick"]);
+
+		$attributes = array("rel" => "alternate", "type" => "text/html", "href" => $contact["url"]);
+		xml::add_element($doc, $object, "link", "", $attributes);
+
+		$attributes = array(
+				"rel" => "avatar",
+				"type" => "image/jpeg", // To-Do?
+				"media:width" => 175,
+				"media:height" => 175,
+				"href" => $contact["photo"]);
+		xml::add_element($doc, $object, "link", "", $attributes);
+
+		xml::add_element($doc, $object, "poco:preferredUsername", $contact["nick"]);
+		xml::add_element($doc, $object, "poco:displayName", $contact["name"]);
+
+		if (trim($contact["location"]) != "") {
+			$element = $doc->createElement("poco:address");
+			xml::add_element($doc, $element, "poco:formatted", $contact["location"]);
+			$object->appendChild($element);
+		}
+
+		return $object;
+	}
+
+	/**
+	 * @brief Adds a follow/unfollow entry element
+	 *
+	 * @param object $doc XML document
+	 * @param array $item Data of the follow/unfollow message
+	 * @param array $owner Contact data of the poster
+	 * @param bool $toplevel Is it for en entry element (false) or a feed entry (true)?
+	 *
+	 * @return object Entry element
+	 */
+	private function follow_entry($doc, $item, $owner, $toplevel) {
+
+		$item["id"] = $item["parent"] = 0;
+		$item["created"] = $item["edited"] = date("c");
+		$item["private"] = true;
+
+		$contact = Probe::uri($item['follow']);
+
+		if ($contact['alias'] == '') {
+			$contact['alias'] = $contact["url"];
+		} else {
+			$item['follow'] = $contact['alias'];
+		}
+
+		$r = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
+			intval($owner['uid']), dbesc(normalise_link($contact["url"])));
+
+		if (dbm::is_result($r)) {
+			$connect_id = $r[0]['id'];
+		} else {
+			$connect_id = 0;
+		}
+
+		if ($item['verb'] == ACTIVITY_FOLLOW) {
+			$message = t('%s is now following %s.');
+			$title = t('following');
+			$action = "subscription";
+		} else {
+			$message = t('%s stopped following %s.');
+			$title = t('stopped following');
+			$action = "unfollow";
+		}
+
+		$item["uri"] = $item['parent-uri'] = $item['thr-parent'] =
+				'tag:'.get_app()->get_hostname().
+				','.date('Y-m-d').':'.$action.':'.$owner['uid'].
+				':person:'.$connect_id.':'.$item['created'];
+
+		$item["body"] = sprintf($message, $owner["nick"], $contact["nick"]);
+
+		self::entry_header($doc, $entry, $owner, $toplevel);
+
+		self::entry_content($doc, $entry, $item, $owner, $title);
+
+		$object = self::add_person_object($doc, $owner, $contact);
+		$entry->appendChild($object);
+
+		self::entry_footer($doc, $entry, $item, $owner);
+
+		return $entry;
+	}
+
+	/**
 	 * @brief Adds a regular entry element
 	 *
 	 * @param object $doc XML document
@@ -1823,7 +1949,7 @@ class ostatus {
 		xml::add_element($doc, $entry, "link", "", array("rel" => "alternate", "type" => "text/html",
 								"href" => App::get_baseurl()."/display/".$item["guid"]));
 
-		if ($complete)
+		if ($complete AND ($item["id"] > 0))
 			xml::add_element($doc, $entry, "status_net", "", array("notice_id" => $item["id"]));
 
 		xml::add_element($doc, $entry, "activity:verb", $verb);
@@ -1872,9 +1998,11 @@ class ostatus {
 			}
 		}
 
-		xml::add_element($doc, $entry, "link", "", array("rel" => "ostatus:conversation",
-							"href" => App::get_baseurl()."/display/".$owner["nick"]."/".$item["parent"]));
-		xml::add_element($doc, $entry, "ostatus:conversation", App::get_baseurl()."/display/".$owner["nick"]."/".$item["parent"]);
+		if (intval($item["parent"]) > 0) {
+			$conversation = App::get_baseurl()."/display/".$owner["nick"]."/".$item["parent"];
+			xml::add_element($doc, $entry, "link", "", array("rel" => "ostatus:conversation", "href" => $conversation));
+			xml::add_element($doc, $entry, "ostatus:conversation", $conversation);
+		}
 
 		$tags = item_getfeedtags($item);
 
@@ -1920,7 +2048,7 @@ class ostatus {
 
 		self::get_attachment($doc, $entry, $item);
 
-		if ($complete) {
+		if ($complete AND ($item["id"] > 0)) {
 			$app = $item["app"];
 			if ($app == "")
 				$app = "web";
@@ -1946,7 +2074,7 @@ class ostatus {
 	 *
 	 * @return string XML feed
 	 */
-	public static function feed(&$a, $owner_nick, $last_update) {
+	public static function feed(App $a, $owner_nick, $last_update) {
 
 		$r = q("SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`
 				FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
@@ -1961,9 +2089,23 @@ class ostatus {
 			$last_update = 'now -30 days';
 
 		$check_date = datetime_convert('UTC','UTC',$last_update,'Y-m-d H:i:s');
+		$authorid = get_contact($owner["url"], 0);
 
-		$items = q("SELECT STRAIGHT_JOIN `item`.*, `item`.`id` AS `item_id` FROM `item`
-				INNER JOIN `thread` ON `thread`.`iid` = `item`.`parent`
+		$items = q("SELECT `item`.*, `item`.`id` AS `item_id` FROM `item` USE INDEX (`uid_contactid_created`)
+				STRAIGHT_JOIN `thread` ON `thread`.`iid` = `item`.`parent`
+				WHERE `item`.`uid` = %d AND `item`.`contact-id` = %d AND
+					`item`.`author-id` = %d AND `item`.`created` > '%s' AND
+					NOT `item`.`deleted` AND NOT `item`.`private` AND
+					`thread`.`network` IN ('%s', '%s')
+				ORDER BY `item`.`created` DESC LIMIT 300",
+				intval($owner["uid"]), intval($owner["id"]),
+				intval($authorid), dbesc($check_date),
+				dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DFRN));
+
+/*		2016-10-23: The old query will be kept until we are sure that the query above is a good and fast replacement
+
+		$items = q("SELECT `item`.*, `item`.`id` AS `item_id` FROM `item`
+				STRAIGHT_JOIN `thread` ON `thread`.`iid` = `item`.`parent`
 				LEFT JOIN `item` AS `thritem` ON `thritem`.`uri`=`item`.`thr-parent` AND `thritem`.`uid`=`item`.`uid`
 				WHERE `item`.`uid` = %d AND `item`.`received` > '%s' AND NOT `item`.`private` AND NOT `item`.`deleted`
 					AND `item`.`allow_cid` = '' AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
@@ -1981,7 +2123,7 @@ class ostatus {
 				dbesc($owner["nurl"]), dbesc(str_replace("http://", "https://", $owner["nurl"])),
 				dbesc($owner["nurl"]), dbesc(str_replace("http://", "https://", $owner["nurl"]))
 			);
-
+*/
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
 

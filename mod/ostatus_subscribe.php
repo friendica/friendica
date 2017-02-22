@@ -3,9 +3,9 @@
 require_once('include/Scrape.php');
 require_once('include/follow.php');
 
-function ostatus_subscribe_content(&$a) {
+function ostatus_subscribe_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
@@ -21,21 +21,24 @@ function ostatus_subscribe_content(&$a) {
 
 	if (get_pconfig($uid, "ostatus", "legacy_friends") == "") {
 
-		if ($_REQUEST["url"] == "")
+		if ($_REQUEST["url"] == "") {
 			return $o.t("No contact provided.");
+		}
 
 		$contact = probe_url($_REQUEST["url"]);
 
-		if (!$contact)
+		if (!$contact) {
 			return $o.t("Couldn't fetch information for contact.");
+		}
 
 		$api = $contact["baseurl"]."/api/";
 
 		// Fetching friends
 		$data = z_fetch_url($api."statuses/friends.json?screen_name=".$contact["nick"]);
 
-		if (!$data["success"])
+		if (!$data["success"]) {
 			return $o.t("Couldn't fetch friends for contact.");
+		}
 
 		set_pconfig($uid, "ostatus", "legacy_friends", $data["body"]);
 	}
@@ -45,7 +48,7 @@ function ostatus_subscribe_content(&$a) {
 	$total = sizeof($friends);
 
 	if ($counter >= $total) {
-		$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.$a->get_baseurl().'/settings/connectors">';
+		$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.App::get_baseurl().'/settings/connectors">';
 		del_pconfig($uid, "ostatus", "legacy_friends");
 		del_pconfig($uid, "ostatus", "legacy_contact");
 		$o .= t("Done");
@@ -61,18 +64,20 @@ function ostatus_subscribe_content(&$a) {
 	$data = probe_url($url);
 	if ($data["network"] == NETWORK_OSTATUS) {
 		$result = new_contact($uid,$url,true);
-		if ($result["success"])
+		if ($result["success"]) {
 			$o .= " - ".t("success");
-		else
+		} else {
 			$o .= " - ".t("failed");
-	} else
+		}
+	} else {
 		$o .= " - ".t("ignored");
+	}
 
 	$o .= "</p>";
 
 	$o .= "<p>".t("Keep this window open until done.")."</p>";
 
-	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.$a->get_baseurl().'/ostatus_subscribe?counter='.$counter.'">';
+	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL='.App::get_baseurl().'/ostatus_subscribe?counter='.$counter.'">';
 
 	return $o;
 }

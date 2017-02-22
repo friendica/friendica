@@ -2,11 +2,11 @@
 require_once("include/Contact.php");
 require_once('include/Probe.php');
 
-function profiles_init(&$a) {
+function profiles_init(App $a) {
 
 	nav_set_selected('profiles');
 
-	if(! local_user()) {
+	if (! local_user()) {
 		return;
 	}
 
@@ -15,7 +15,7 @@ function profiles_init(&$a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Profile not found.') . EOL);
 			goaway('profiles');
 			return; // NOTREACHED
@@ -92,7 +92,7 @@ function profiles_init(&$a) {
 			intval(local_user()),
 			intval($a->argv[2])
 		);
-		if(! count($r1)) {
+		if(! dbm::is_result($r1)) {
 			notice( t('Profile unavailable to clone.') . EOL);
 			killme();
 			return;
@@ -103,20 +103,20 @@ function profiles_init(&$a) {
 		$r1[0]['net-publish'] = 0;
 		$r1[0]['profile-name'] = dbesc($name);
 
-		dbesc_array($r1[0]);
+		dbm::esc_array($r1[0], true);
 
 		$r2 = dbq("INSERT INTO `profile` (`"
 			. implode("`, `", array_keys($r1[0]))
-			. "`) VALUES ('"
-			. implode("', '", array_values($r1[0]))
-			. "')" );
+			. "`) VALUES ("
+			. implode(", ", array_values($r1[0]))
+			. ")" );
 
 		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
 			intval(local_user()),
 			dbesc($name)
 		);
 		info( t('New profile created.') . EOL);
-		if(count($r3) == 1)
+		if ((dbm::is_result($r3)) && (count($r3) == 1))
 			goaway('profiles/'.$r3[0]['id']);
 
 		goaway('profiles');
@@ -130,7 +130,7 @@ function profiles_init(&$a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Profile not found.') . EOL);
 			killme();
 			return;
@@ -160,9 +160,9 @@ function profile_clean_keywords($keywords) {
 	return $keywords;
 }
 
-function profiles_post(&$a) {
+function profiles_post(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -286,7 +286,7 @@ function profiles_post(&$a) {
 							intval(local_user())
 						);
 					}
-					if(count($r)) {
+					if (dbm::is_result($r)) {
 						$prf = $r[0]['url'];
 						$newname = $r[0]['name'];
 					}
@@ -303,6 +303,7 @@ function profiles_post(&$a) {
 		}
 
 		$sexual = notags(trim($_POST['sexual']));
+		$xmpp = notags(trim($_POST['xmpp']));
 		$homepage = notags(trim($_POST['homepage']));
 		if ((strpos($homepage, 'http') !== 0) && (strlen($homepage))) {
 			// neither http nor https in URL, add them
@@ -312,19 +313,19 @@ function profiles_post(&$a) {
 		$politic = notags(trim($_POST['politic']));
 		$religion = notags(trim($_POST['religion']));
 
-		$likes = fix_mce_lf(escape_tags(trim($_POST['likes'])));
-		$dislikes = fix_mce_lf(escape_tags(trim($_POST['dislikes'])));
+		$likes = escape_tags(trim($_POST['likes']));
+		$dislikes = escape_tags(trim($_POST['dislikes']));
 
-		$about = fix_mce_lf(escape_tags(trim($_POST['about'])));
-		$interest = fix_mce_lf(escape_tags(trim($_POST['interest'])));
-		$contact = fix_mce_lf(escape_tags(trim($_POST['contact'])));
-		$music = fix_mce_lf(escape_tags(trim($_POST['music'])));
-		$book = fix_mce_lf(escape_tags(trim($_POST['book'])));
-		$tv = fix_mce_lf(escape_tags(trim($_POST['tv'])));
-		$film = fix_mce_lf(escape_tags(trim($_POST['film'])));
-		$romance = fix_mce_lf(escape_tags(trim($_POST['romance'])));
-		$work = fix_mce_lf(escape_tags(trim($_POST['work'])));
-		$education = fix_mce_lf(escape_tags(trim($_POST['education'])));
+		$about = escape_tags(trim($_POST['about']));
+		$interest = escape_tags(trim($_POST['interest']));
+		$contact = escape_tags(trim($_POST['contact']));
+		$music = escape_tags(trim($_POST['music']));
+		$book = escape_tags(trim($_POST['book']));
+		$tv = escape_tags(trim($_POST['tv']));
+		$film = escape_tags(trim($_POST['film']));
+		$romance = escape_tags(trim($_POST['romance']));
+		$work = escape_tags(trim($_POST['work']));
+		$education = escape_tags(trim($_POST['education']));
 
 		$hide_friends = (($_POST['hide-friends'] == 1) ? 1: 0);
 
@@ -368,6 +369,10 @@ function profiles_post(&$a) {
 				$changes[] = t('Sexual Preference');
 				$value = $sexual;
 			}
+			if($xmpp != $orig[0]['xmpp']) {
+				$changes[] = t('XMPP');
+				$value = $xmpp;
+			}
 			if($homepage != $orig[0]['homepage']) {
 				$changes[] = t('Homepage');
 				$value = $homepage;
@@ -409,6 +414,7 @@ function profiles_post(&$a) {
 			`with` = '%s',
 			`howlong` = '%s',
 			`sexual` = '%s',
+			`xmpp` = '%s',
 			`homepage` = '%s',
 			`hometown` = '%s',
 			`politic` = '%s',
@@ -443,6 +449,7 @@ function profiles_post(&$a) {
 			dbesc($with),
 			dbesc($howlong),
 			dbesc($sexual),
+			dbesc($xmpp),
 			dbesc($homepage),
 			dbesc($hometown),
 			dbesc($politic),
@@ -495,8 +502,9 @@ function profiles_post(&$a) {
 
 			// Update global directory in background
 			$url = $_SESSION['my_url'];
-			if($url && strlen(get_config('system','directory')))
+			if ($url && strlen(get_config('system','directory'))) {
 				proc_run(PRIORITY_LOW, "include/directory.php", $url);
+			}
 
 			require_once('include/profile_update.php');
 			profile_change();
@@ -587,14 +595,15 @@ function profile_activity($changed, $value) {
 	$arr['deny_gid']  = $a->user['deny_gid'];
 
 	$i = item_store($arr);
-	if($i)
+	if ($i) {
 		proc_run(PRIORITY_HIGH, "include/notifier.php", "activity", $i);
+	}
 }
 
 
-function profiles_content(&$a) {
+function profiles_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -606,7 +615,7 @@ function profiles_content(&$a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Profile not found.') . EOL);
 			return;
 		}
@@ -614,22 +623,12 @@ function profiles_content(&$a) {
 		require_once('include/profile_selectors.php');
 
 
-/*		$editselect = 'textareas';
-		if( intval(get_pconfig(local_user(),'system','plaintext')) || !feature_enabled(local_user(),'richtext') )
-			$editselect = 'none';*/
-		$editselect = 'none';
-		if( feature_enabled(local_user(),'richtext') )
-			$editselect = 'textareas';
-
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('profed_head.tpl'), array(
-			'$baseurl' => $a->get_baseurl(true),
-			'$editselect' => $editselect,
+			'$baseurl' => App::get_baseurl(true),
 		));
 		$a->page['end'] .= replace_macros(get_markup_template('profed_end.tpl'), array(
-			'$baseurl' => $a->get_baseurl(true),
-			'$editselect' => $editselect,
+			'$baseurl' => App::get_baseurl(true),
 		));
-
 
 		$opt_tpl = get_markup_template("profile-hide-friends.tpl");
 		$hide_friends = replace_macros($opt_tpl,array(
@@ -704,7 +703,7 @@ function profiles_content(&$a) {
 			'$lbl_ex2' => t('Example: fishing photography software'),
 
 			'$disabled' => (($is_default) ? 'onclick="return false;" style="color: #BBBBFF;"' : ''),
-			'$baseurl' => $a->get_baseurl(true),
+			'$baseurl' => App::get_baseurl(true),
 			'$profile_id' => $r[0]['id'],
 			'$profile_name' => array('profile_name', t('Profile Name:'), $r[0]['profile-name'], t('Required'), '*'),
 			'$is_default'   => $is_default,
@@ -725,6 +724,7 @@ function profiles_content(&$a) {
 			'$howlong' => array('howlong', t('Since [date]:'), ($r[0]['howlong'] === '0000-00-00 00:00:00' ? '' : datetime_convert('UTC',date_default_timezone_get(),$r[0]['howlong']))),
 			'$sexual' => sexpref_selector($r[0]['sexual']),
 			'$about' => array('about', t('Tell us about yourself...'), $r[0]['about']),
+			'$xmpp' => array('xmpp', t('XMPP (Jabber) address:'), $r[0]['xmpp'], t("The XMPP address will be propagated to your contacts so that they can follow you.")),
 			'$homepage' => array('homepage', t('Homepage URL:'), $r[0]['homepage']),
 			'$hometown' => array('hometown', t('Hometown:'), $r[0]['hometown']),
 			'$politic' => array('politic', t('Political Views:'), $r[0]['politic']),
@@ -759,7 +759,7 @@ function profiles_content(&$a) {
 				"SELECT * FROM `profile` WHERE `uid` = %d AND `is-default`=1",
 				local_user()
 			);
-			if(count($r)){
+			if (dbm::is_result($r)){
 				//Go to the default profile.
 				goaway('profiles/'.$r[0]['id']);
 			}
@@ -767,27 +767,29 @@ function profiles_content(&$a) {
 
 		$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
 			local_user());
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$tpl = get_markup_template('profile_entry.tpl');
-			foreach($r as $rr) {
+
+			$profiles = '';
+			foreach ($r as $rr) {
 				$profiles .= replace_macros($tpl, array(
-					'$photo' => $a->remove_baseurl($rr['thumb']),
-					'$id' => $rr['id'],
-					'$alt' => t('Profile Image'),
+					'$photo'        => $a->remove_baseurl($rr['thumb']),
+					'$id'           => $rr['id'],
+					'$alt'          => t('Profile Image'),
 					'$profile_name' => $rr['profile-name'],
-					'$visible' => (($rr['is-default']) ? '<strong>' . t('visible to everybody') . '</strong>'
+					'$visible'      => (($rr['is-default']) ? '<strong>' . t('visible to everybody') . '</strong>'
 						: '<a href="'.'profperm/'.$rr['id'].'" />' . t('Edit visibility') . '</a>')
 				));
 			}
 
 			$tpl_header = get_markup_template('profile_listing_header.tpl');
 			$o .= replace_macros($tpl_header,array(
-				'$header' => t('Edit/Manage Profiles'),
-				'$chg_photo' => t('Change profile photo'),
-				'$cr_new' => t('Create New Profile'),
+				'$header'      => t('Edit/Manage Profiles'),
+				'$chg_photo'   => t('Change profile photo'),
+				'$cr_new'      => t('Create New Profile'),
 				'$cr_new_link' => 'profiles/new?t=' . get_form_security_token("profile_new"),
-				'$profiles' => $profiles
+				'$profiles'    => $profiles
 			));
 		}
 		return $o;

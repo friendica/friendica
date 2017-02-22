@@ -3,10 +3,11 @@
 require_once("include/text.php");
 
 
-function manage_post(&$a) {
+function manage_post(App $a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$uid = local_user();
 	$orig_record = $a->user;
@@ -15,7 +16,7 @@ function manage_post(&$a) {
 		$r = q("select * from user where uid = %d limit 1",
 			intval($_SESSION['submanage'])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$uid = intval($r[0]['uid']);
 			$orig_record = $r[0];
 		}
@@ -56,8 +57,9 @@ function manage_post(&$a) {
 		);
 	}
 
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		return;
+	}
 
 	unset($_SESSION['authenticated']);
 	unset($_SESSION['uid']);
@@ -84,15 +86,15 @@ function manage_post(&$a) {
 	$ret = array();
 	call_hooks('home_init',$ret);
 
-	goaway( $a->get_baseurl() . "/profile/" . $a->user['nickname'] );
+	goaway( App::get_baseurl() . "/profile/" . $a->user['nickname'] );
 	// NOTREACHED
 }
 
 
 
-function manage_content(&$a) {
+function manage_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}

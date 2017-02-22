@@ -4,7 +4,7 @@ require_once('include/email.php');
 require_once('include/enotify.php');
 require_once('include/text.php');
 
-function lostpass_post(&$a) {
+function lostpass_post(App $a) {
 
 	$loginame = notags(trim($_POST['login-name']));
 	if(! $loginame)
@@ -15,7 +15,7 @@ function lostpass_post(&$a) {
 		dbesc($loginame)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('No valid account found.') . EOL);
 		goaway(z_root());
 	}
@@ -36,8 +36,7 @@ function lostpass_post(&$a) {
 
 
 	$sitename = $a->config['sitename'];
-	$siteurl = $a->get_baseurl();
-	$resetlink = $a->get_baseurl() . '/lostpass?verify=' . $new_password;
+	$resetlink = App::get_baseurl() . '/lostpass?verify=' . $new_password;
 
 	$preamble = deindent(t('
 		Dear %1$s,
@@ -64,7 +63,7 @@ function lostpass_post(&$a) {
 		Login Name:	%3$s'));
 
 	$preamble = sprintf($preamble, $username, $sitename);
-	$body = sprintf($body, $resetlink, $siteurl, $email);
+	$body = sprintf($body, $resetlink, App::get_baseurl(), $email);
 
 	notification(array(
 		'type' => "SYSTEM_EMAIL",
@@ -78,7 +77,7 @@ function lostpass_post(&$a) {
 }
 
 
-function lostpass_content(&$a) {
+function lostpass_content(App $a) {
 
 
 	if(x($_GET,'verify')) {
@@ -88,7 +87,7 @@ function lostpass_content(&$a) {
 		$r = q("SELECT * FROM `user` WHERE `pwdreset` = '%s' LIMIT 1",
 			dbesc($hash)
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			$o =  t("Request could not be verified. \x28You may have previously submitted it.\x29 Password reset failed.");
 			return $o;
 		}
@@ -103,24 +102,25 @@ function lostpass_content(&$a) {
 			dbesc($new_password_encoded),
 			intval($uid)
 		);
-		if($r) {
+
+		/// @TODO Is dbm::is_result() okay here?
+		if ($r) {
 			$tpl = get_markup_template('pwdreset.tpl');
 			$o .= replace_macros($tpl,array(
 				'$lbl1' => t('Password Reset'),
 				'$lbl2' => t('Your password has been reset as requested.'),
 				'$lbl3' => t('Your new password is'),
 				'$lbl4' => t('Save or copy your new password - and then'),
-				'$lbl5' => '<a href="' . $a->get_baseurl() . '">' . t('click here to login') . '</a>.',
+				'$lbl5' => '<a href="' . App::get_baseurl() . '">' . t('click here to login') . '</a>.',
 				'$lbl6' => t('Your password may be changed from the <em>Settings</em> page after successful login.'),
 				'$newpass' => $new_password,
-				'$baseurl' => $a->get_baseurl()
+				'$baseurl' => App::get_baseurl()
 
 			));
 				info("Your password has been reset." . EOL);
 
 
 			$sitename = $a->config['sitename'];
-			$siteurl = $a->get_baseurl();
 			// $username, $email, $new_password
 			$preamble = deindent(t('
 				Dear %1$s,
@@ -139,7 +139,7 @@ function lostpass_content(&$a) {
 			'));
 
 			$preamble = sprintf($preamble, $username);
-			$body = sprintf($body, $siteurl, $email, $new_password);
+			$body = sprintf($body, App::get_baseurl(), $email, $new_password);
 
 			notification(array(
 				'type' => "SYSTEM_EMAIL",

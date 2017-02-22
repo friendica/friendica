@@ -1,6 +1,6 @@
 <?php
 
-function redir_init(&$a) {
+function redir_init(App $a) {
 
 	$url = ((x($_GET,'url')) ? $_GET['url'] : '');
 	$quiet = ((x($_GET,'quiet')) ? '&quiet=1' : '');
@@ -18,7 +18,7 @@ function redir_init(&$a) {
 				intval(local_user())
 			);
 
-			if((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+			if((! dbm::is_result($r)) || ($r[0]['network'] !== NETWORK_DFRN))
 				goaway(z_root());
 
 			$cid = $r[0]['id'];
@@ -31,7 +31,7 @@ function redir_init(&$a) {
 				intval(local_user())
 			);
 
-			if((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+			if((! dbm::is_result($r)) || ($r[0]['network'] !== NETWORK_DFRN))
 				goaway(z_root());
 		}
 
@@ -57,18 +57,20 @@ function redir_init(&$a) {
 			intval(time() + 45)
 		);
 
-		logger('mod_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG); 
+		logger('mod_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG);
 		$dest = (($url) ? '&destination_url=' . $url : '');
-		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id 
+		goaway ($r[0]['poll'] . '?dfrn_id=' . $dfrn_id
 			. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest . $quiet );
 	}
 
-	if(local_user())
-		$handle = $a->user['nickname'] . '@' . substr($a->get_baseurl(),strpos($a->get_baseurl(),'://')+3);
-	if(remote_user())
+	if (local_user()) {
+		$handle = $a->user['nickname'] . '@' . substr(App::get_baseurl(),strpos(App::get_baseurl(),'://')+3);
+	}
+	if (remote_user()) {
 		$handle = $_SESSION['handle'];
+	}
 
-	if($url) {
+	if ($url) {
 		$url = str_replace('{zid}','&zid=' . $handle,$url);
 		goaway($url);
 	}

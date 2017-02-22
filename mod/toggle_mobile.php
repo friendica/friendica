@@ -1,16 +1,18 @@
 <?php
 
-function toggle_mobile_init(&$a) {
+function toggle_mobile_init(App $a) {
 
-	if(isset($_GET['off']))
+	if (isset($_GET['off'])) {
 		$_SESSION['show-mobile'] = false;
-	else
+	} else {
 		$_SESSION['show-mobile'] = true;
+	}
 
-	if(isset($_GET['address']))
+	if (isset($_GET['address'])) {
 		$address = $_GET['address'];
-	else
-		$address = $a->get_baseurl();
+	} else {
+		$address = App::get_baseurl();
+	}
 
 	goaway($address);
 }

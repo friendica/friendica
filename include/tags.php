@@ -1,13 +1,11 @@
 <?php
 function create_tags_from_item($itemid) {
-	global $a;
-
-	$profile_base = $a->get_baseurl();
+	$profile_base = App::get_baseurl();
 	$profile_data = parse_url($profile_base);
 	$profile_base_friendica = $profile_data['host'].$profile_data['path']."/profile/";
 	$profile_base_diaspora = $profile_data['host'].$profile_data['path']."/u/";
 
-	$searchpath = $a->get_baseurl()."/search?tag=";
+	$searchpath = App::get_baseurl()."/search?tag=";
 
 	$messages = q("SELECT `guid`, `uid`, `id`, `edited`, `deleted`, `created`, `received`, `title`, `body`, `tag`, `parent` FROM `item` WHERE `id` = %d LIMIT 1", intval($itemid));
 

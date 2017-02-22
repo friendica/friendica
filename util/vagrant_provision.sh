@@ -32,16 +32,30 @@ sudo apt-get install -y apache2
 sudo a2enmod rewrite actions ssl
 sudo cp /vagrant/util/vagrant_vhost.sh /usr/local/bin/vhost
 sudo chmod guo+x /usr/local/bin/vhost
-sudo vhost -s 192.168.22.10.xip.io -d /var/www -p /etc/ssl/xip.io -c xip.io -a friendica.dev
-sudo a2dissite 000-default
-sudo service apache2 restart
+if [ $( lsb_release -c | cut -f 2 ) == "trusty" ]; then
+    sudo vhost -s 192.168.22.10.xip.io -d /var/www -p /etc/ssl/xip.io -c xip.io -a friendica-trusty.dev
+    sudo a2dissite 000-default
+    sudo service apache2 restart
+elif [ $( lsb_release -c | cut -f 2 ) == "xenial" ]; then
+    sudo vhost -s 192.168.22.11.xip.io -d /var/www -p /etc/ssl/xip.io -c xip.io -a friendica-xenial.dev
+    sudo a2dissite 000-default
+    sudo systemctl restart apache2
+fi
 
 #Install php
-echo ">>> Installing PHP5"
-sudo apt-get install -y php5 libapache2-mod-php5 php5-cli php5-mysql php5-curl php5-gd
-sudo apt-get install -y imagemagick
-sudo apt-get install -y php5-imagick
-sudo service apache2 restart
+if [ $( lsb_release -c | cut -f 2 ) == "trusty" ]; then
+    echo ">>> Installing PHP5"
+    sudo apt-get install -y php5 libapache2-mod-php5 php5-cli php5-mysql php5-curl php5-gd
+    sudo apt-get install -y imagemagick
+    sudo apt-get install -y php5-imagick
+    sudo service apache2 restart
+elif [ $( lsb_release -c | cut -f 2 ) == "xenial" ]; then
+    echo ">>> Installing PHP7"
+    sudo apt-get install -y php libapache2-mod-php php-cli php-mysql php-curl php-gd php-mbstring
+    sudo apt-get install -y imagemagick
+    sudo apt-get install -y php-imagick
+    sudo systemctl restart apache2
+fi
 
 
 #Install mysql
@@ -59,12 +73,21 @@ Q1="GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;"
 Q2="FLUSH PRIVILEGES;"
 SQL="${Q1}${Q2}"
 $MYSQL -uroot -proot -e "$SQL"
-service mysql restart
+if [ $( lsb_release -c | cut -f 2 ) == "trusty" ]; then
+    service mysql restart
+elif [ $( lsb_release -c | cut -f 2 ) == "xenial" ]; then
+    systemctl restart mysql
+fi
+
 
 
 #configure rudimentary mail server (local delivery only)
 #add Friendica accounts for local user accounts, use email address like vagrant@friendica.dev, read the email with 'mail'.
-debconf-set-selections <<< "postfix postfix/mailname string friendica.dev"
+if [ $( lsb_release -c | cut -f 2 ) == "trusty" ]; then
+    debconf-set-selections <<< "postfix postfix/mailname string friendica-trusty.dev"
+elif [ $( lsb_release -c | cut -f 2 ) == "xenial" ]; then
+    debconf-set-selections <<< "postfix postfix/mailname string friendica-xenial.dev"
+fi
 debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Local Only'"
 sudo apt-get install -y postfix mailutils libmailutils-dev
 sudo echo -e "friendica1:	vagrant\nfriendica2:	vagrant\nfriendica3:	vagrant\nfriendica4:	vagrant\nfriendica5:	vagrant" >> /etc/aliases && sudo newaliases

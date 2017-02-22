@@ -203,6 +203,8 @@
 					<div class="section-content-tools-wrapper">
 						{{include file="field_input.tpl" field=$homepage}}
 
+						{{include file="field_input.tpl" field=$xmpp}}
+
 						{{include file="field_input.tpl" field=$pub_keywords}}
 
 						{{include file="field_input.tpl" field=$prv_keywords}}
@@ -267,6 +269,8 @@
 		{{/if}}
 
 		{{include file="field_input.tpl" field=$homepage}}
+
+		{{include file="field_input.tpl" field=$xmpp}}
 
 		{{$hide_friends}}
 

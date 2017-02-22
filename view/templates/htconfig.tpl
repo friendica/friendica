@@ -35,6 +35,9 @@ $a->config['php_path'] = '{{$phpath}}';
 
 $a->path = '{{$urlpath}}';
 
+// Allowed protocols in link URLs; HTTP protocols always are accepted
+$a->config['system']['allowed_link_protocols'] = array('ftp', 'ftps', 'mailto', 'cid', 'gopher');
+
 /* *********************************************************************
  *  The configuration below will be overruled by the admin panel.
  *  Changes made below will only have an effect if the database does
@@ -77,14 +80,16 @@ $a->config['system']['maximagesize'] = 800000;
 $a->config['system']['huburl'] = '[internal]';
 
 // Server-to-server private message encryption (RINO) is allowed by default.
-// Encryption will only be provided if this setting is true and the
-// PHP mcrypt extension is installed on both systems
+// Encryption will only be provided if this setting is set to a non zero
+// value and the PHP mcrypt extension is installed on both systems
+// set to 0 to disable, 2 to enable, 1 is deprecated but wont need mcrypt
 
 $a->config['system']['rino_encrypt'] = {{$rino}};
 
 // default system theme
 
 $a->config['system']['theme'] = 'vier';
+$a->config['system']['allowed_themes'] = 'vier,quattro,duepuntozero,smoothly';
 
 // By default allow pseudonyms
 

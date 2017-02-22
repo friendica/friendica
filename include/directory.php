@@ -1,6 +1,8 @@
 <?php
 require_once("boot.php");
 
+use \Friendica\Core\Config;
+
 function directory_run(&$argv, &$argc){
 	global $a, $db;
 
@@ -15,14 +17,10 @@ function directory_run(&$argv, &$argc){
 				unset($db_host, $db_user, $db_pass, $db_data);
 	};
 
-	load_config('config');
-	load_config('system');
-
+	Config::load();
 
 	if($argc != 2)
 		return;
-
-	load_config('system');
 
 	load_hooks();
 

@@ -1,5 +1,7 @@
 <?php
 
+use \Friendica\Core\Config;
+
 require_once("boot.php");
 require_once("include/follow.php");
 
@@ -32,8 +34,7 @@ function onepoll_run(&$argv, &$argc){
 	require_once('include/socgraph.php');
 	require_once('include/queue_fn.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	$a->set_baseurl(get_config('system','url'));
 
@@ -93,7 +94,7 @@ function onepoll_run(&$argv, &$argc){
 			where `cid` = %d and updated > UTC_TIMESTAMP() - INTERVAL 1 DAY",
 			intval($contact['id'])
 		);
-		if (count($r))
+		if (dbm::is_result($r))
 			if (!$r[0]['total'])
 				poco_load($contact['id'],$importer_uid,0,$contact['poco']);
 	}
@@ -143,8 +144,9 @@ function onepoll_run(&$argv, &$argc){
 	$r = q("SELECT `contact`.*, `user`.`page-flags` FROM `contact` INNER JOIN `user` on `contact`.`uid` = `user`.`uid` WHERE `user`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
 		intval($importer_uid)
 	);
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		return;
+	}
 
 	$importer = $r[0];
 
@@ -393,7 +395,7 @@ function onepoll_run(&$argv, &$argc){
 							dbesc($datarray['uri'])
 						);
 
-						if(count($r)) {
+						if (dbm::is_result($r)) {
 							logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user']." UID: ".$importer_uid." URI: ".$datarray['uri'],LOGGER_DEBUG);
 
 							// Only delete when mails aren't automatically moved or deleted
@@ -443,10 +445,10 @@ function onepoll_run(&$argv, &$argc){
 									$refs_arr[$x] = "'" . msgid2iri(str_replace(array('<','>',' '),array('','',''),dbesc($refs_arr[$x]))) . "'";
 							}
 							$qstr = implode(',',$refs_arr);
-							$r = q("SELECT `uri` , `parent-uri` FROM `item` WHERE `uri` IN ( $qstr ) AND `uid` = %d LIMIT 1",
+							$r = q("SELECT `uri` , `parent-uri` FROM `item` USE INDEX (`uid_uri`) WHERE `uri` IN ($qstr) AND `uid` = %d LIMIT 1",
 								intval($importer_uid)
 							);
-							if(count($r))
+							if (dbm::is_result($r))
 								$datarray['parent-uri'] = $r[0]['parent-uri'];  // Set the parent as the top-level item
 	//							$datarray['parent-uri'] = $r[0]['uri'];
 						}
@@ -475,10 +477,11 @@ function onepoll_run(&$argv, &$argc){
 
 						// If it seems to be a reply but a header couldn't be found take the last message with matching subject
 						if(!x($datarray,'parent-uri') and $reply) {
-							$r = q("SELECT `uri` , `parent-uri` FROM `item` WHERE `title` = \"%s\" AND `uid` = %d ORDER BY `created` DESC LIMIT 1",
+							$r = q("SELECT `uri` , `parent-uri` FROM `item` WHERE `title` = \"%s\" AND `uid` = %d AND `network` = '%s' ORDER BY `created` DESC LIMIT 1",
 								dbesc(protect_sprintf($datarray['title'])),
-								intval($importer_uid));
-							if(count($r))
+								intval($importer_uid),
+								dbesc(NETWORK_MAIL));
+							if (dbm::is_result($r))
 								$datarray['parent-uri'] = $r[0]['parent-uri'];
 						}
 

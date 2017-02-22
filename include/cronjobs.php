@@ -1,4 +1,6 @@
 <?php
+use \Friendica\Core\Config;
+
 if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
 
@@ -33,8 +35,7 @@ function cronjobs_run(&$argv, &$argc){
 	require_once('include/post_update.php');
 	require_once('mod/nodeinfo.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	$a->set_baseurl(get_config('system','url'));
 

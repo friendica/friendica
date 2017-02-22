@@ -1,6 +1,8 @@
 <?php
 
-function friendica_init(&$a) {
+use \Friendica\Core\Config;
+
+function friendica_init(App $a) {
 	if ($a->argv[1]=="json"){
 		$register_policy = Array('REGISTER_CLOSED', 'REGISTER_APPROVE', 'REGISTER_OPEN');
 
@@ -15,7 +17,7 @@ function friendica_init(&$a) {
 			$r = q("SELECT username, nickname FROM user WHERE email='%s' $sql_extra", dbesc($adminlist[0]));
 			$admin = array(
 				'name' => $r[0]['username'],
-				'profile'=> $a->get_baseurl().'/profile/'.$r[0]['nickname'],
+				'profile'=> App::get_baseurl().'/profile/'.$r[0]['nickname'],
 			);
 		} else {
 			$admin = false;
@@ -24,12 +26,12 @@ function friendica_init(&$a) {
 		$visible_plugins = array();
 		if(is_array($a->plugins) && count($a->plugins)) {
 			$r = q("select * from addon where hidden = 0");
-			if(count($r))
+			if (dbm::is_result($r))
 				foreach($r as $rr)
 					$visible_plugins[] = $rr['name'];
 		}
 
-		load_config('feature_lock');
+		Config::load('feature_lock');
 		$locked_features = array();
 		if(is_array($a->config['feature_lock']) && count($a->config['feature_lock'])) {
 			foreach($a->config['feature_lock'] as $k => $v) {
@@ -49,7 +51,7 @@ function friendica_init(&$a) {
 			'site_name' => $a->config['sitename'],
 			'platform' => FRIENDICA_PLATFORM,
 			'info' => ((x($a->config,'info')) ? $a->config['info'] : ''),
-			'no_scrape_url' => $a->get_baseurl().'/noscrape'
+			'no_scrape_url' => App::get_baseurl().'/noscrape'
 		);
 
 		echo json_encode($data);
@@ -59,7 +61,7 @@ function friendica_init(&$a) {
 
 
 
-function friendica_content(&$a) {
+function friendica_content(App $a) {
 
 	$o = '';
 	$o .= '<h3>Friendica</h3>';
@@ -70,7 +72,7 @@ function friendica_content(&$a) {
 	$o .= t('This is Friendica, version') . ' ' . FRIENDICA_VERSION . ' ';
 	$o .= t('running at web location') . ' ' . z_root() . '</p><p>';
 
-	$o .= t('Please visit <a href="http://friendica.com">Friendica.com</a> to learn more about the Friendica project.') . '</p><p>';	
+	$o .= t('Please visit <a href="http://friendica.com">Friendica.com</a> to learn more about the Friendica project.') . '</p><p>';
 
 	$o .= t('Bug reports and issues: please visit') . ' ' . '<a href="https://github.com/friendica/friendica/issues?state=open">'.t('the bugtracker at github').'</a></p><p>';
 	$o .= t('Suggestions, praise, donations, etc. - please email "Info" at Friendica - dot com') . '</p>';
@@ -80,7 +82,7 @@ function friendica_content(&$a) {
 	$visible_plugins = array();
 	if(is_array($a->plugins) && count($a->plugins)) {
 		$r = q("select * from addon where hidden = 0");
-		if(count($r))
+		if (dbm::is_result($r))
 			foreach($r as $rr)
 				$visible_plugins[] = $rr['name'];
 	}
@@ -102,7 +104,7 @@ function friendica_content(&$a) {
 	else
 		$o .= '<p>' . t('No installed plugins/addons/apps') . '</p>';
 
-	call_hooks('about_hook', $o); 	
+	call_hooks('about_hook', $o);
 
 	return $o;
 

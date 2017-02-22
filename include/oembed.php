@@ -1,12 +1,29 @@
 <?php
+
+/**
+ * @file include/oembed.php
+ */
+
+use \Friendica\ParseUrl;
+use \Friendica\Core\Config;
+
 function oembed_replacecb($matches){
 	$embedurl=$matches[1];
 	$j = oembed_fetch_url($embedurl);
 	$s =  oembed_format_object($j);
+
 	return $s;
 }
 
-
+/**
+ * @brief Get data from an URL to embed its content.
+ * 
+ * @param string $embedurl The URL from which the data should be fetched.
+ * @param bool $no_rich_type If set to true rich type content won't be fetched.
+ * 
+ * @return bool|object Returns object with embed content or false if no embedable
+ *	 content exists
+ */
 function oembed_fetch_url($embedurl, $no_rich_type = false){
 	$embedurl = trim($embedurl, "'");
 	$embedurl = trim($embedurl, '"');
@@ -16,11 +33,11 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 	$r = q("SELECT * FROM `oembed` WHERE `url` = '%s'",
 		dbesc(normalise_link($embedurl)));
 
-	if ($r)
+	if (dbm::is_result($r)) {
 		$txt = $r[0]["content"];
-	else
+	} else {
 		$txt = Cache::get($a->videowidth . $embedurl);
-
+	}
 	// These media files should now be caught in bbcode.php
 	// left here as a fallback in case this is called from another source
 
@@ -28,27 +45,27 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 	$ext = pathinfo(strtolower($embedurl),PATHINFO_EXTENSION);
 
 
-	if(is_null($txt)){
+	if (is_null($txt)) {
 		$txt = "";
 
 		if (!in_array($ext, $noexts)){
 			// try oembed autodiscovery
 			$redirects = 0;
-			$html_text = fetch_url($embedurl, false, $redirects, 15, "text/*"); /**/
-			if($html_text){
+			$html_text = fetch_url($embedurl, false, $redirects, 15, "text/*");
+			if ($html_text) {
 				$dom = @DOMDocument::loadHTML($html_text);
-				if ($dom){
+				if ($dom) {
 					$xpath = new DOMXPath($dom);
 					$attr = "oembed";
 					$xattr = oe_build_xpath("class","oembed");
 					$entries = $xpath->query("//link[@type='application/json+oembed']");
-					foreach($entries as $e){
+					foreach ($entries as $e) {
 						$href = $e->getAttributeNode("href")->nodeValue;
 						$txt = fetch_url($href . '&maxwidth=' . $a->videowidth);
 						break;
 					}
 					$entries = $xpath->query("//link[@type='text/json+oembed']");
-					foreach($entries as $e){
+					foreach ($entries as $e) {
 						$href = $e->getAttributeNode("href")->nodeValue;
 						$txt = fetch_url($href . '&maxwidth=' . $a->videowidth);
 						break;
@@ -57,8 +74,8 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 			}
 		}
 
-		if ($txt==false || $txt==""){
-			$embedly = get_config("system", "embedly");
+		if ($txt==false || $txt=="") {
+			$embedly = Config::get("system", "embedly");
 			if ($embedly != "") {
 				// try embedly service
 				$ourl = "https://api.embed.ly/1/oembed?key=".$embedly."&url=".urlencode($embedurl);
@@ -70,37 +87,39 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 
 		$txt=trim($txt);
 
-		if ($txt[0]!="{")
+		if ($txt[0]!="{") {
 			$txt='{"type":"error"}';
-		else {	//save in cache
+		} else {	//save in cache
 			$j = json_decode($txt);
-			if ($j->type != "error")
+			if ($j->type != "error") {
 				q("INSERT INTO `oembed` (`url`, `content`, `created`) VALUES ('%s', '%s', '%s')
 					ON DUPLICATE KEY UPDATE `content` = '%s', `created` = '%s'",
 					dbesc(normalise_link($embedurl)),
 					dbesc($txt), dbesc(datetime_convert()),
 					dbesc($txt), dbesc(datetime_convert()));
+			}
 
-			Cache::set($a->videowidth.$embedurl,$txt, CACHE_DAY);
+			Cache::set($a->videowidth.$embedurl, $txt, CACHE_DAY);
 		}
 	}
 
 	$j = json_decode($txt);
 
-	if (!is_object($j))
+	if (!is_object($j)) {
 		return false;
+	}
 
 	// Always embed the SSL version
-	if (isset($j->html))
+	if (isset($j->html)) {
 		$j->html = str_replace(array("http://www.youtube.com/", "http://player.vimeo.com/"),
 			array("https://www.youtube.com/", "https://player.vimeo.com/"), $j->html);
+	}
 
 	$j->embedurl = $embedurl;
 
 	// If fetching information doesn't work, then improve via internal functions
 	if (($j->type == "error") OR ($no_rich_type AND ($j->type == "rich"))) {
-		require_once("mod/parse_url.php");
-		$data = parseurl_getsiteinfo_cached($embedurl, true, false);
+		$data = ParseUrl::getSiteinfoCached($embedurl, true, false);
 		$j->type = $data["type"];
 
 		if ($j->type == "photo") {
@@ -109,16 +128,18 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 			//$j->height = $data["images"][0]["height"];
 		}
 
-		if (isset($data["title"]))
-		        $j->title = $data["title"];
+		if (isset($data["title"])) {
+			$j->title = $data["title"];
+		}
 
-		if (isset($data["text"]))
-	        	$j->description = $data["text"];
+		if (isset($data["text"])) {
+			$j->description = $data["text"];
+		}
 
 		if (is_array($data["images"])) {
-		        $j->thumbnail_url = $data["images"][0]["src"];
-		        $j->thumbnail_width = $data["images"][0]["width"];
-	        	$j->thumbnail_height = $data["images"][0]["height"];
+			$j->thumbnail_url = $data["images"][0]["src"];
+			$j->thumbnail_width = $data["images"][0]["width"];
+			$j->thumbnail_height = $data["images"][0]["height"];
 		}
 	}
 
@@ -130,12 +151,11 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 function oembed_format_object($j){
 	require_once("mod/proxy.php");
 
-	$a = get_app();
 	$embedurl = $j->embedurl;
 	$jhtml = oembed_iframe($j->embedurl,(isset($j->width) ? $j->width : null), (isset($j->height) ? $j->height : null) );
 	$ret="<span class='oembed ".$j->type."'>";
 	switch ($j->type) {
-		case "video": {
+		case "video":
 			if (isset($j->thumbnail_url)) {
 				$tw = (isset($j->thumbnail_width) && intval($j->thumbnail_width)) ? $j->thumbnail_width:200;
 				$th = (isset($j->thumbnail_height) && intval($j->thumbnail_height)) ? $j->thumbnail_height:180;
@@ -145,55 +165,61 @@ function oembed_format_object($j){
 				$th=120; $tw = $th*$tr;
 				$tpl=get_markup_template('oembed_video.tpl');
 				$ret.=replace_macros($tpl, array(
-				'$baseurl' => $a->get_baseurl(),
-					'$embedurl'=>$embedurl,
-					'$escapedhtml'=>base64_encode($jhtml),
-					'$tw'=>$tw,
-					'$th'=>$th,
-					'$turl'=>$j->thumbnail_url,
+					'$baseurl'     => App::get_baseurl(),
+					'$embedurl'    => $embedurl,
+					'$escapedhtml' => base64_encode($jhtml),
+					'$tw'          => $tw,
+					'$th'          => $th,
+					'$turl'        => $j->thumbnail_url,
 				));
 
 			} else {
 				$ret=$jhtml;
 			}
 			//$ret.="<br>";
-		}; break;
-		case "photo": {
+			break;
+		case "photo":
 			$ret.= "<img width='".$j->width."' src='".proxy_url($j->url)."'>";
-		}; break;
-		case "link": {
-		}; break;
-		case "rich": {
+			break;
+		case "link":
+			break;
+		case "rich":
 			// not so safe..
-			if (!get_config("system","no_oembed_rich_content"))
+			if (!Config::get("system","no_oembed_rich_content")) {
 				$ret.= proxy_parse_html($jhtml);
-		}; break;
+			}
+			break;
 	}
 
 	// add link to source if not present in "rich" type
 	if ($j->type!='rich' || !strpos($j->html,$embedurl) ){
 		$ret .= "<h4>";
 		if (isset($j->title)) {
-			if (isset($j->provider_name))
+			if (isset($j->provider_name)) {
 				$ret .= $j->provider_name.": ";
+			}
 
 			$embedlink = (isset($j->title))?$j->title:$embedurl;
 			$ret .= "<a href='$embedurl' rel='oembed'>$embedlink</a>";
-			if (isset($j->author_name))
+			if (isset($j->author_name)) {
 				$ret.=" (".$j->author_name.")";
+			}
 		} elseif (isset($j->provider_name) OR isset($j->author_name)) {
 			$embedlink = "";
-			if (isset($j->provider_name))
+			if (isset($j->provider_name)) {
 				$embedlink .= $j->provider_name;
+			}
 
 			if (isset($j->author_name)) {
-				if ($embedlink != "")
+				if ($embedlink != "") {
 					$embedlink .= ": ";
+				}
 
 				$embedlink .= $j->author_name;
 			}
-			if (trim($embedlink) == "")
+			if (trim($embedlink) == "") {
 				$embedlink = $embedurl;
+			}
 
 			$ret .= "<a href='$embedurl' rel='oembed'>$embedlink</a>";
 		}
@@ -209,31 +235,41 @@ function oembed_format_object($j){
 	return mb_convert_encoding($ret, 'HTML-ENTITIES', mb_detect_encoding($ret));
 }
 
-function oembed_iframe($src,$width,$height) {
-
-	if(! $width || strstr($width,'%'))
-		$width = '640';
-	if(! $height || strstr($height,'%')) {
-		$height = '300';
-		$resize = 'onload="resizeIframe(this);"';
-	} else
-		$resize = '';
-
-	// try and leave some room for the description line.
-	$height = intval($height) + 80;
-	$width  = intval($width) + 40;
-
+/**
+ * @brief Generates the iframe HTML for an oembed attachment.
+ *
+ * Width and height are given by the remote, and are regularly too small for
+ * the generated iframe.
+ *
+ * The width is entirely discarded for the actual width of the post, while fixed
+ * height is used as a starting point before the inevitable resizing.
+ *
+ * Since the iframe is automatically resized on load, there are no need for ugly
+ * and impractical scrollbars.
+ *
+ * @param string $src Original remote URL to embed
+ * @param string $width
+ * @param string $height
+ * @return string formatted HTML
+ *
+ * @see oembed_format_object()
+ */
+function oembed_iframe($src, $width, $height) {
 	$a = get_app();
 
-	$s = $a->get_baseurl()."/oembed/".base64url_encode($src);
-	return '<iframe '.$resize.' class="embed_rich" height="'.$height.'" width="'.$width.'" src="'.$s.'" frameborder="no">'.t('Embedded content').'</iframe>';
+	if (!$height || strstr($height,'%')) {
+		$height = '200';
+	}
+	$width = '100%';
 
+	$s = App::get_baseurl() . '/oembed/' . base64url_encode($src);
+	return '<iframe onload="resizeIframe(this);" class="embed_rich" height="' . $height . '" width="' . $width . '" src="' . $s . '" allowfullscreen scrolling="no" frameborder="no">' . t('Embedded content') . '</iframe>';
 }
 
 
 
 function oembed_bbcode2html($text){
-	$stopoembed = get_config("system","no_oembed");
+	$stopoembed = Config::get("system","no_oembed");
 	if ($stopoembed == true){
 		return preg_replace("/\[embed\](.+?)\[\/embed\]/is", "<!-- oembed $1 --><i>". t('Embedding disabled') ." : $1</i><!-- /oembed $1 -->" ,$text);
 	}
@@ -246,13 +282,13 @@ function oe_build_xpath($attr, $value){
 	return "contains( normalize-space( @$attr ), ' $value ' ) or substring( normalize-space( @$attr ), 1, string-length( '$value' ) + 1 ) = '$value ' or substring( normalize-space( @$attr ), string-length( @$attr ) - string-length( '$value' ) ) = ' $value' or @$attr = '$value'";
 }
 
-function oe_get_inner_html( $node ) {
-    $innerHTML= '';
-    $children = $node->childNodes;
-    foreach ($children as $child) {
-        $innerHTML .= $child->ownerDocument->saveXML( $child );
-    }
-    return $innerHTML;
+function oe_get_inner_html($node) {
+	$innerHTML= '';
+	$children = $node->childNodes;
+	foreach ($children as $child) {
+		$innerHTML .= $child->ownerDocument->saveXML($child);
+	}
+	return $innerHTML;
 }
 
 /**
@@ -261,15 +297,16 @@ function oe_get_inner_html( $node ) {
  */
 function oembed_html2bbcode($text) {
 	// start parser only if 'oembed' is in text
-	if (strpos($text, "oembed")){
+	if (strpos($text, "oembed")) {
 
 		// convert non ascii chars to html entities
 		$html_text = mb_convert_encoding($text, 'HTML-ENTITIES', mb_detect_encoding($text));
 
 		// If it doesn't parse at all, just return the text.
 		$dom = @DOMDocument::loadHTML($html_text);
-		if(! $dom)
+		if (! $dom) {
 			return $text;
+		}
 		$xpath = new DOMXPath($dom);
 		$attr = "oembed";
 

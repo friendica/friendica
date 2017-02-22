@@ -1,6 +1,15 @@
 <?php
 
+/**
+ * @file include/plaintext.php
+ */
+
+use \Friendica\ParseUrl;
+
 require_once("include/Photo.php");
+require_once("include/bbcode.php");
+require_once("include/html2plain.php");
+require_once("include/network.php");
 
 /**
  * @brief Fetches attachment data that were generated the old way
@@ -53,6 +62,10 @@ function get_old_attachment_data($body) {
 			if (preg_match("/\[bookmark\=([$URLSearchString]*)\](.*?)\[\/bookmark\]/ism", $attacheddata, $matches)) {
 				$post["url"] = $matches[1];
 				$post["title"] = $matches[2];
+			}
+			if (($post["url"] == "") AND (in_array($post["type"], array("link", "video")))
+				AND preg_match("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", $attacheddata, $matches)) {
+				$post["url"] = $matches[1];
 			}
 
 			// Search for description
@@ -181,20 +194,17 @@ function get_attached_data($body) {
 
 	// if nothing is found, it maybe having an image.
 	if (!isset($post["type"])) {
-		require_once("mod/parse_url.php");
-		require_once("include/Photo.php");
-
 		$URLSearchString = "^\[\]";
 		if (preg_match_all("(\[url=([$URLSearchString]*)\]\s*\[img\]([$URLSearchString]*)\[\/img\]\s*\[\/url\])ism", $body, $pictures,  PREG_SET_ORDER)) {
 			if (count($pictures) == 1) {
 				// Checking, if the link goes to a picture
-				$data = parseurl_getsiteinfo_cached($pictures[0][1], true);
+				$data = ParseUrl::getSiteinfoCached($pictures[0][1], true);
 
 				// Workaround:
 				// Sometimes photo posts to the own album are not detected at the start.
 				// So we seem to cannot use the cache for these cases. That's strange.
 				if (($data["type"] != "photo") AND strstr($pictures[0][1], "/photos/"))
-					$data = parseurl_getsiteinfo($pictures[0][1], true);
+					$data = ParseUrl::getSiteinfo($pictures[0][1], true);
 
 				if ($data["type"] == "photo") {
 					$post["type"] = "photo";
@@ -246,8 +256,7 @@ function get_attached_data($body) {
 			$post["text"] = trim($body);
 		}
 	} elseif (isset($post["url"]) AND ($post["type"] == "video")) {
-		require_once("mod/parse_url.php");
-		$data = parseurl_getsiteinfo_cached($post["url"], true);
+		$data = ParseUrl::getSiteinfoCached($post["url"], true);
 
 		if (isset($data["images"][0]))
 			$post["image"] = $data["images"][0]["src"];
@@ -263,12 +272,13 @@ function shortenmsg($msg, $limit, $twitter = false) {
 	$lines = explode("\n", $msg);
 	$msg = "";
 	$recycle = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8');
+	$ellipsis = html_entity_decode("&#x2026;", ENT_QUOTES, 'UTF-8');
 	foreach ($lines AS $row=>$line) {
 		if (iconv_strlen(trim($msg."\n".$line), "UTF-8") <= $limit)
 			$msg = trim($msg."\n".$line);
 		// Is the new message empty by now or is it a reshared message?
 		elseif (($msg == "") OR (($row == 1) AND (substr($msg, 0, 4) == $recycle)))
-			$msg = iconv_substr(iconv_substr(trim($msg."\n".$line), 0, $limit, "UTF-8"), 0, -3, "UTF-8")."...";
+			$msg = iconv_substr(iconv_substr(trim($msg."\n".$line), 0, $limit, "UTF-8"), 0, -3, "UTF-8").$ellipsis;
 		else
 			break;
 	}
@@ -287,10 +297,7 @@ function shortenmsg($msg, $limit, $twitter = false) {
  *
  * @return string The converted message
  */
-function plaintext($a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2, $target_network = "") {
-	require_once("include/bbcode.php");
-	require_once("include/html2plain.php");
-	require_once("include/network.php");
+function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2, $target_network = "") {
 
 	// Remove the hash tags
 	$URLSearchString = "^\[\]";

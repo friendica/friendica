@@ -2,7 +2,7 @@
 require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 
-function viewcontacts_init(&$a) {
+function viewcontacts_init(App $a) {
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		return;
@@ -16,8 +16,9 @@ function viewcontacts_init(&$a) {
 			dbesc($nick)
 		);
 
-		if(! count($r))
+		if (! dbm::is_result($r)) {
 			return;
+		}
 
 		$a->data['user'] = $r[0];
 		$a->profile_uid = $r[0]['uid'];
@@ -28,7 +29,7 @@ function viewcontacts_init(&$a) {
 }
 
 
-function viewcontacts_content(&$a) {
+function viewcontacts_content(App $a) {
 	require_once("mod/proxy.php");
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
@@ -47,18 +48,20 @@ function viewcontacts_content(&$a) {
 	}
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
-		WHERE `uid` = %d AND `blocked` = 0 AND `pending` = 0 AND `hidden` = 0 AND `archive` = 0
+		WHERE `uid` = %d AND NOT `blocked` AND NOT `pending`
+			AND NOT `hidden` AND NOT `archive`
 			AND `network` IN ('%s', '%s', '%s')",
 		intval($a->profile['uid']),
 		dbesc(NETWORK_DFRN),
 		dbesc(NETWORK_DIASPORA),
 		dbesc(NETWORK_OSTATUS)
 	);
-	if(count($r))
+	if (dbm::is_result($r))
 		$a->set_pager_total($r[0]['total']);
 
 	$r = q("SELECT * FROM `contact`
-		WHERE `uid` = %d AND `blocked` = 0 AND `pending` = 0 AND `hidden` = 0 AND `archive` = 0
+		WHERE `uid` = %d AND NOT `blocked` AND NOT `pending`
+			AND NOT `hidden` AND NOT `archive`
 			AND `network` IN ('%s', '%s', '%s')
 		ORDER BY `name` ASC LIMIT %d, %d",
 		intval($a->profile['uid']),
@@ -68,16 +71,18 @@ function viewcontacts_content(&$a) {
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);
-	if(!count($r)) {
+	if (!dbm::is_result($r)) {
 		info(t('No contacts.').EOL);
 		return $o;
 	}
 
 	$contacts = array();
 
-	foreach($r as $rr) {
-		if($rr['self'])
+	foreach ($r as $rr) {
+		/// @TODO This triggers an E_NOTICE if 'self' is not there
+		if ($rr['self']) {
 			continue;
+		}
 
 		$url = $rr['url'];
 
@@ -102,7 +107,7 @@ function viewcontacts_content(&$a) {
 			'details'       => $contact_details['location'],
 			'tags'          => $contact_details['keywords'],
 			'about'         => $contact_details['about'],
-			'account_type'  => (($contact_details['community']) ? t('Forum') : ''),
+			'account_type'  => account_type($contact_details),
 			'url' => $url,
 			'sparkle' => '',
 			'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),

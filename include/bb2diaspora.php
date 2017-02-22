@@ -7,6 +7,27 @@ require_once("include/html2bbcode.php");
 require_once("include/bbcode.php");
 require_once("library/html-to-markdown/HTML_To_Markdown.php");
 
+/**
+ * @brief Callback function to replace a Diaspora style mention in a mention for Friendica
+ *
+ * @param array $match Matching values for the callback
+ * @return string Replaced mention
+ */
+function diaspora_mention2bb($match) {
+	if ($match[2] == '') {
+		return;
+	}
+
+	$data = get_contact_details_by_addr($match[2]);
+
+	$name = $match[1];
+
+	if ($name == '') {
+		$name = $data['name'];
+	}
+
+	return '@[url='.$data['url'].']'.$name.'[/url]';
+}
 
 // we don't want to support a bbcode specific markdown interpreter
 // and the markdown library we have is pretty good, but provides HTML output.
@@ -15,24 +36,28 @@ require_once("library/html-to-markdown/HTML_To_Markdown.php");
 
 function diaspora2bb($s) {
 
-	$s = html_entity_decode($s,ENT_COMPAT,'UTF-8');
+	$s = html_entity_decode($s, ENT_COMPAT, 'UTF-8');
 
-	// Remove CR to avoid problems with following code
-	$s = str_replace("\r","",$s);
+	// Handles single newlines
+	$s = str_replace("\r", '<br>', $s);
 
-	$s = str_replace("\n"," \n",$s);
+	$s = str_replace("\n", " \n", $s);
+
+	// Replace lonely stars in lines not starting with it with literal stars
+	$s = preg_replace('/^([^\*]+)\*([^\*]*)$/im', '$1\*$2', $s);
 
 	// The parser cannot handle paragraphs correctly
-	$s = str_replace(array("</p>", "<p>", '<p dir="ltr">'),array("<br>", "<br>", "<br>"),$s);
+	$s = str_replace(array('</p>', '<p>', '<p dir="ltr">'), array('<br>', '<br>', '<br>'), $s);
 
 	// Escaping the hash tags
-	$s = preg_replace('/\#([^\s\#])/','&#35;$1',$s);
+	$s = preg_replace('/\#([^\s\#])/', '&#35;$1', $s);
 
 	$s = Markdown($s);
 
-	$s = preg_replace('/\@\{(.+?)\; (.+?)\@(.+?)\}/','@[url=https://$3/u/$2]$1[/url]',$s);
+	$regexp = "/@\{(?:([^\}]+?); )?([^\} ]+)\}/";
+	$s = preg_replace_callback($regexp, 'diaspora_mention2bb', $s);
 
-	$s = str_replace('&#35;','#',$s);
+	$s = str_replace('&#35;', '#', $s);
 
 	$search = array(" \n", "\n ");
 	$replace = array("\n", "\n");
@@ -41,28 +66,51 @@ function diaspora2bb($s) {
 		$s = str_replace($search, $replace, $s);
 	} while ($oldtext != $s);
 
-	$s = str_replace("\n\n", "<br>", $s);
+	$s = str_replace("\n\n", '<br>', $s);
 
 	$s = html2bbcode($s);
 
 	// protect the recycle symbol from turning into a tag, but without unescaping angles and naked ampersands
-	$s = str_replace('&#x2672;',html_entity_decode('&#x2672;',ENT_QUOTES,'UTF-8'),$s);
+	$s = str_replace('&#x2672;', html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8'), $s);
 
 	// Convert everything that looks like a link to a link
-	$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3]$2$3[/url]',$s);
+	$s = preg_replace('/([^\]=]|^)(https?\:\/\/)([a-zA-Z0-9:\/\-?&;.=_~#%$!+,@]+(?<!,))/ism', '$1[url=$2$3]$2$3[/url]', $s);
 
 	//$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)(vimeo|youtu|www\.youtube|soundcloud)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3$4]$2$3$4[/url]',$s);
-	$s = bb_tag_preg_replace("/\[url\=?(.*?)\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/url\]/ism",'[youtube]$2[/youtube]','url',$s);
-	$s = bb_tag_preg_replace("/\[url\=https?:\/\/www.youtube.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism",'[youtube]$1[/youtube]','url',$s);
-	$s = bb_tag_preg_replace("/\[url\=?(.*?)\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism",'[vimeo]$2[/vimeo]','url',$s);
-	$s = bb_tag_preg_replace("/\[url\=https?:\/\/vimeo.com\/([0-9]+)\](.*?)\[\/url\]/ism",'[vimeo]$1[/vimeo]','url',$s);
+	$s = bb_tag_preg_replace('/\[url\=?(.*?)\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
+	$s = bb_tag_preg_replace('/\[url\=https?:\/\/www.youtube.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism'   , '[youtube]$1[/youtube]', 'url', $s);
+	$s = bb_tag_preg_replace('/\[url\=?(.*?)\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism'        , '[vimeo]$2[/vimeo]'    , 'url', $s);
+	$s = bb_tag_preg_replace('/\[url\=https?:\/\/vimeo.com\/([0-9]+)\](.*?)\[\/url\]/ism'              , '[vimeo]$1[/vimeo]'    , 'url', $s);
+
 	// remove duplicate adjacent code tags
-	$s = preg_replace("/(\[code\])+(.*?)(\[\/code\])+/ism","[code]$2[/code]", $s);
+	$s = preg_replace('/(\[code\])+(.*?)(\[\/code\])+/ism', '[code]$2[/code]', $s);
 
 	// Don't show link to full picture (until it is fixed)
 	$s = scale_external_images($s, false);
 
 	return $s;
+}
+
+/**
+ * @brief Callback function to replace a Friendica style mention in a mention for Diaspora
+ *
+ * @param array $match Matching values for the callback
+ * @return string Replaced mention
+ */
+function diaspora_mentions($match) {
+
+	$contact = get_contact_details_by_url($match[3]);
+
+	if (!isset($contact['addr'])) {
+		$contact = Probe::uri($match[3]);
+	}
+
+	if (!isset($contact['addr'])) {
+		return $match[0];
+	}
+
+	$mention = '@{'.$match[2].'; '.$contact['addr'].'}';
+	return $mention;
 }
 
 function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
@@ -104,8 +152,8 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	} else
 		$Text = bbcode($Text, $preserve_nl, false, 4);
 
-    // mask some special HTML chars from conversation to markdown
-    $Text = str_replace(array('&lt;','&gt;','&amp;'),array('&_lt_;','&_gt_;','&_amp_;'),$Text);
+	// mask some special HTML chars from conversation to markdown
+	$Text = str_replace(array('&lt;','&gt;','&amp;'),array('&_lt_;','&_gt_;','&_amp_;'),$Text);
 
 	// If a link is followed by a quote then there should be a newline before it
 	// Maybe we should make this newline at every time before a quote.
@@ -116,8 +164,8 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	// Now convert HTML to Markdown
 	$Text = new HTML_To_Markdown($Text);
 
-    // unmask the special chars back to HTML
-    $Text = str_replace(array('&_lt_;','&_gt_;','&_amp_;'),array('&lt;','&gt;','&amp;'),$Text);
+	// unmask the special chars back to HTML
+	$Text = str_replace(array('&_lt_;','&_gt_;','&_amp_;'),array('&lt;','&gt;','&amp;'),$Text);
 
 	$a->save_timestamp($stamp1, "parser");
 
@@ -127,6 +175,11 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 	// Remove any leading or trailing whitespace, as this will mess up
 	// the Diaspora signature verification and cause the item to disappear
 	$Text = trim($Text);
+
+	if ($fordiaspora) {
+		$URLSearchString = "^\[\]";
+		$Text = preg_replace_callback("/([@]\[(.*?)\])\(([$URLSearchString]*?)\)/ism", 'diaspora_mentions', $Text);
+	}
 
 	call_hooks('bb2diaspora',$Text);
 
@@ -139,8 +192,6 @@ function unescape_underscores_in_links($m) {
 }
 
 function format_event_diaspora($ev) {
-
-	$a = get_app();
 
 	if(! ((is_array($ev)) && count($ev)))
 		return '';
@@ -156,7 +207,7 @@ function format_event_diaspora($ev) {
 			$ev['start'] , $bd_format ))
 			:  day_translate(datetime_convert('UTC', 'UTC',
 			$ev['start'] , $bd_format)))
-		.  '](' . $a->get_baseurl() . '/localtime/?f=&time=' . urlencode(datetime_convert('UTC','UTC',$ev['start'])) . ")\n";
+		.  '](' . App::get_baseurl() . '/localtime/?f=&time=' . urlencode(datetime_convert('UTC','UTC',$ev['start'])) . ")\n";
 
 	if(! $ev['nofinish'])
 		$o .= t('Finishes:') . ' ' . '['
@@ -164,7 +215,7 @@ function format_event_diaspora($ev) {
 				$ev['finish'] , $bd_format ))
 				:  day_translate(datetime_convert('UTC', 'UTC',
 				$ev['finish'] , $bd_format )))
-			. '](' . $a->get_baseurl() . '/localtime/?f=&time=' . urlencode(datetime_convert('UTC','UTC',$ev['finish'])) . ")\n";
+			. '](' . App::get_baseurl() . '/localtime/?f=&time=' . urlencode(datetime_convert('UTC','UTC',$ev['finish'])) . ")\n";
 
 	if(strlen($ev['location']))
 		$o .= t('Location:') . bb2diaspora($ev['location'])

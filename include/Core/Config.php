@@ -1,8 +1,11 @@
 <?php
 namespace Friendica\Core;
+
+use dbm;
+
 /**
  * @file include/Core/Config.php
- * 
+ *
  *  @brief Contains the class with methods for system configuration
  */
 
@@ -19,6 +22,9 @@ namespace Friendica\Core;
  */
 class Config {
 
+	private static $cache;
+	private static $in_db;
+
 	/**
 	 * @brief Loads all configuration values of family into a cached storage.
 	 *
@@ -29,22 +35,28 @@ class Config {
 	 *  The category of the configuration value
 	 * @return void
 	 */
-	public static function load($family) {
-		global $a;
+	public static function load($family = "config") {
+
+		// We don't preload "system" anymore.
+		// This reduces the number of database reads a lot.
+		if ($family === 'system') {
+			return;
+		}
+
+		$a = get_app();
 
 		$r = q("SELECT `v`, `k` FROM `config` WHERE `cat` = '%s'", dbesc($family));
-		if(count($r)) {
-			foreach($r as $rr) {
+		if (dbm::is_result($r)) {
+			foreach ($r as $rr) {
 				$k = $rr['k'];
 				if ($family === 'config') {
 					$a->config[$k] = $rr['v'];
 				} else {
 					$a->config[$family][$k] = $rr['v'];
+					self::$cache[$family][$k] = $rr['v'];
+					self::$in_db[$family][$k] = true;
 				}
 			}
-		} else if ($family != 'config') {
-			// Negative caching
-			$a->config[$family] = "!<unset>!";
 		}
 	}
 
@@ -70,75 +82,46 @@ class Config {
 	 *  If true the config is loaded from the db and not from the cache (default: false)
 	 * @return mixed Stored value or null if it does not exist
 	 */
-	public static function get($family, $key, $default_value=null, $refresh = false) {
+	public static function get($family, $key, $default_value = null, $refresh = false) {
 
-		global $a;
+		$a = get_app();
 
-		if(! $instore) {
-			// Looking if the whole family isn't set
-			if(isset($a->config[$family])) {
-				if($a->config[$family] === '!<unset>!') {
+		if (!$refresh) {
+
+			// Do we have the cached value? Then return it
+			if (isset(self::$cache[$family][$key])) {
+				if (self::$cache[$family][$key] === '!<unset>!') {
 					return $default_value;
+				} else {
+					return self::$cache[$family][$key];
 				}
-			}
-
-			if(isset($a->config[$family][$key])) {
-				if($a->config[$family][$key] === '!<unset>!') {
-					return $default_value;
-				}
-				return $a->config[$family][$key];
 			}
 		}
 
-		// If APC is enabled then fetch the data from there, else try XCache
-		/*if (function_exists("apc_fetch") AND function_exists("apc_exists"))
-			if (apc_exists($family."|".$key)) {
-				$val = apc_fetch($family."|".$key);
-				$a->config[$family][$key] = $val;
-
-				if ($val === '!<unset>!')
-					return false;
-				else
-					return $val;
-			}
-		elseif (function_exists("xcache_fetch") AND function_exists("xcache_isset"))
-			if (xcache_isset($family."|".$key)) {
-				$val = xcache_fetch($family."|".$key);
-				$a->config[$family][$key] = $val;
-
-				if ($val === '!<unset>!')
-					return false;
-				else
-					return $val;
-			}
-		*/
-
-		$ret = q("SELECT `v` FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
+		$ret = q("SELECT `v` FROM `config` WHERE `cat` = '%s' AND `k` = '%s'",
 			dbesc($family),
 			dbesc($key)
 		);
-		if(count($ret)) {
+		if (dbm::is_result($ret)) {
 			// manage array value
-			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v'])?unserialize( $ret[0]['v']):$ret[0]['v']);
-			$a->config[$family][$key] = $val;
+			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $ret[0]['v']) ? unserialize($ret[0]['v']) : $ret[0]['v']);
 
-			// If APC is enabled then store the data there, else try XCache
-			/*if (function_exists("apc_store"))
-				apc_store($family."|".$key, $val, 600);
-			elseif (function_exists("xcache_set"))
-				xcache_set($family."|".$key, $val, 600);*/
-
+			// Assign the value from the database to the cache
+			self::$cache[$family][$key] = $val;
+			self::$in_db[$family][$key] = true;
 			return $val;
-		}
-		else {
-			$a->config[$family][$key] = '!<unset>!';
+		} elseif (isset($a->config[$family][$key])) {
 
-			// If APC is enabled then store the data there, else try XCache
-			/*if (function_exists("apc_store"))
-				apc_store($family."|".$key, '!<unset>!', 600);
-			elseif (function_exists("xcache_set"))
-				xcache_set($family."|".$key, '!<unset>!', 600);*/
+			// Assign the value (mostly) from the .htconfig.php to the cache
+			self::$cache[$family][$key] = $a->config[$family][$key];
+			self::$in_db[$family][$key] = false;
+
+			return $a->config[$family][$key];
 		}
+
+		self::$cache[$family][$key] = '!<unset>!';
+		self::$in_db[$family][$key] = false;
+
 		return $default_value;
 	}
 
@@ -158,48 +141,50 @@ class Config {
 	 *  The value to store
 	 * @return mixed Stored $value or false if the database update failed
 	 */
-	public static function set($family,$key,$value) {
-		global $a;
+	public static function set($family, $key, $value) {
+		$a = get_app();
 
-		// If $a->config[$family] has been previously set to '!<unset>!', then
-		// $a->config[$family][$key] will evaluate to $a->config[$family][0], and
-		// $a->config[$family][$key] = $value will be equivalent to
-		// $a->config[$family][0] = $value[0] (this causes infuriating bugs),
-		// so unset the family before assigning a value to a family's key
-		if($a->config[$family] === '!<unset>!')
-			unset($a->config[$family]);
+		// We store our setting values in a string variable.
+		// So we have to do the conversion here so that the compare below works.
+		// The exception are array values.
+		$dbvalue = (!is_array($value) ? (string)$value : $value);
 
-		// manage array value
-		$dbvalue = (is_array($value)?serialize($value):$value);
-		$dbvalue = (is_bool($dbvalue) ? intval($dbvalue) : $dbvalue);
-		if(is_null(self::get($family,$key,null,true))) {
-			$a->config[$family][$key] = $value;
-			$ret = q("INSERT INTO `config` ( `cat`, `k`, `v` ) VALUES ( '%s', '%s', '%s' ) ",
-				dbesc($family),
-				dbesc($key),
-				dbesc($dbvalue)
-			);
-			if($ret)
-				return $value;
-			return $ret;
+		$stored = self::get($family, $key, null, true);
+
+		if (($stored === $dbvalue) AND self::$in_db[$family][$key]) {
+			return true;
 		}
 
-		$ret = q("UPDATE `config` SET `v` = '%s' WHERE `cat` = '%s' AND `k` = '%s'",
-			dbesc($dbvalue),
-			dbesc($family),
-			dbesc($key)
-		);
+		if ($family === 'config') {
+			$a->config[$key] = $dbvalue;
+		} elseif ($family != 'system') {
+			$a->config[$family][$key] = $dbvalue;
+		}
 
-		$a->config[$family][$key] = $value;
+		// Assign the just added value to the cache
+		self::$cache[$family][$key] = $dbvalue;
 
-		// If APC is enabled then store the data there, else try XCache
-		/*if (function_exists("apc_store"))
-			apc_store($family."|".$key, $value, 600);
-		elseif (function_exists("xcache_set"))
-			xcache_set($family."|".$key, $value, 600);*/
+		// manage array value
+		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
 
-		if($ret)
+		if (is_null($stored) OR !self::$in_db[$family][$key]) {
+			$ret = q("INSERT INTO `config` (`cat`, `k`, `v`) VALUES ('%s', '%s', '%s') ON DUPLICATE KEY UPDATE `v` = '%s'",
+				dbesc($family),
+				dbesc($key),
+				dbesc($dbvalue),
+				dbesc($dbvalue)
+			);
+		} else {
+			$ret = q("UPDATE `config` SET `v` = '%s' WHERE `cat` = '%s' AND `k` = '%s'",
+				dbesc($dbvalue),
+				dbesc($family),
+				dbesc($key)
+			);
+		}
+		if ($ret) {
+			self::$in_db[$family][$key] = true;
 			return $value;
+		}
 		return $ret;
 	}
 
@@ -215,22 +200,17 @@ class Config {
 	 *  The configuration key to delete
 	 * @return mixed
 	 */
-	public static function delete($family,$key) {
+	public static function delete($family, $key) {
 
-		global $a;
-		if(x($a->config[$family],$key))
-			unset($a->config[$family][$key]);
+		if (isset(self::$cache[$family][$key])) {
+			unset(self::$cache[$family][$key]);
+			unset(self::$in_db[$family][$key]);
+		}
 		$ret = q("DELETE FROM `config` WHERE `cat` = '%s' AND `k` = '%s'",
 			dbesc($family),
 			dbesc($key)
 		);
-		// If APC is enabled then delete the data from there, else try XCache
-		/*if (function_exists("apc_delete"))
-			apc_delete($family."|".$key);
-		elseif (function_exists("xcache_unset"))
-			xcache_unset($family."|".$key);*/
 
 		return $ret;
 	}
-
 }

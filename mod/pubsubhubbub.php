@@ -4,7 +4,7 @@ function post_var($name) {
 	return (x($_POST, $name)) ? notags(trim($_POST[$name])) : '';
 }
 
-function pubsubhubbub_init(&$a) {
+function pubsubhubbub_init(App $a) {
 	// PuSH subscription must be considered "public" so just block it
 	// if public access isn't enabled.
 	if (get_config('system', 'block_public')) {
@@ -55,7 +55,7 @@ function pubsubhubbub_init(&$a) {
 			   " AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 			   dbesc($nick));
 
-		if(!count($r)) {
+		if (!dbm::is_result($r)) {
 			logger('pubsubhubbub: local account not found: ' . $nick);
 			http_status_exit(404);
 		}
@@ -73,7 +73,7 @@ function pubsubhubbub_init(&$a) {
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND NOT `blocked`".
 			   " AND NOT `pending` AND `self` LIMIT 1",
 			   intval($owner['uid']));
-		if(!count($r)) {
+		if (!dbm::is_result($r)) {
 			logger('pubsubhubbub: contact not found.');
 			http_status_exit(404);
 		}
@@ -132,7 +132,7 @@ function pubsubhubbub_init(&$a) {
 
 			// if we are just updating an old subscription, keep the
 			// old values for push and last_update
-			if (count($r)) {
+			if (dbm::is_result($r)) {
 				$last_update = $r[0]['last_update'];
 				$push_flag = $r[0]['push'];
 			}

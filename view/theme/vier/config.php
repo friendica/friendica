@@ -5,20 +5,24 @@
 
 
 
-function theme_content(&$a){
-	if(!local_user())
+function theme_content(App $a) {
+	if (!local_user()) {
 		return;
+	}
 
-	if (!function_exists('get_vier_config'))
+	if (!function_exists('get_vier_config')) {
 		return;
+	}
 
 	$style = get_pconfig(local_user(), 'vier', 'style');
 
-	if ($style == "")
+	if ($style == "") {
 		$style = get_config('vier', 'style');
+	}
 
-	if ($style == "")
+	if ($style == "") {
 		$style = "plus";
+	}
 
 	$show_pages = get_vier_config('show_pages', true);
 	$show_profiles = get_vier_config('show_profiles', true);
@@ -31,9 +35,10 @@ function theme_content(&$a){
 			$show_services, $show_friends, $show_lastusers);
 }
 
-function theme_post(&$a){
-	if(! local_user())
+function theme_post(App $a) {
+	if (! local_user()) {
 		return;
+	}
 
 	if (isset($_POST['vier-settings-submit'])){
 		set_pconfig(local_user(), 'vier', 'style', $_POST['vier_style']);
@@ -47,7 +52,7 @@ function theme_post(&$a){
 }
 
 
-function theme_admin(&$a){
+function theme_admin(App $a) {
 
 	if (!function_exists('get_vier_config'))
 		return;
@@ -76,7 +81,7 @@ function theme_admin(&$a){
 	return $o;
 }
 
-function theme_admin_post(&$a){
+function theme_admin_post(App $a) {
 	if (isset($_POST['vier-settings-submit'])){
 		set_config('vier', 'style', $_POST['vier_style']);
 		set_config('vier', 'show_pages', $_POST['vier_show_pages']);
@@ -89,8 +94,8 @@ function theme_admin_post(&$a){
 	}
 }
 
-
-function vier_form(&$a, $style, $show_pages, $show_profiles, $show_helpers, $show_services, $show_friends, $show_lastusers){
+/// @TODO $a is no longer used
+function vier_form(App $a, $style, $show_pages, $show_profiles, $show_helpers, $show_services, $show_friends, $show_lastusers) {
 	$styles = array(
 		"plus"=>"Plus",
 		"breathe"=>"Breathe",
@@ -105,7 +110,7 @@ function vier_form(&$a, $style, $show_pages, $show_profiles, $show_helpers, $sho
 	$t = get_markup_template("theme_settings.tpl");
 	$o .= replace_macros($t, array(
 		'$submit' => t('Submit'),
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$title' => t("Theme settings"),
 		'$style' => array('vier_style',t ('Set style'),$style,'',$styles),
 		'$show_pages' => array('vier_show_pages', t('Community Pages'), $show_pages, '', $show_or_not),

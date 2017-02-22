@@ -39,6 +39,9 @@
 						<a href="{{$baseurl}}/regmod/deny/{{$u.hash}}" title='{{$deny}}'><span class='icon dislike'></span></a>
 					</td>
 				</tr>
+				<tr>
+					<td class="pendingnote"><p><span>{{$pendingnotetext}}:</span> {{$u.note}}</p></td>
+				</tr>
 			{{/foreach}}
 				</tbody>
 			</table>

@@ -4,7 +4,7 @@ function validate_members(&$item) {
 	$item = intval($item);
 }
 
-function group_init(&$a) {
+function group_init(App $a) {
 	if(local_user()) {
 		require_once('include/group.php');
 		$a->page['aside'] = group_side('contacts','group','extended',(($a->argc > 1) ? intval($a->argv[1]) : 0));
@@ -13,9 +13,9 @@ function group_init(&$a) {
 
 
 
-function group_post(&$a) {
+function group_post(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -25,39 +25,43 @@ function group_post(&$a) {
 
 		$name = notags(trim($_POST['groupname']));
 		$r = group_add(local_user(),$name);
-		if($r) {
+		if ($r) {
 			info( t('Group created.') . EOL );
 			$r = group_byname(local_user(),$name);
-			if($r)
-				goaway($a->get_baseurl() . '/group/' . $r);
-		}
-		else
+			if ($r) {
+				goaway(App::get_baseurl() . '/group/' . $r);
+			}
+		} else {
 			notice( t('Could not create group.') . EOL );
-		goaway($a->get_baseurl() . '/group');
+		}
+		goaway(App::get_baseurl() . '/group');
 		return; // NOTREACHED
 	}
-	if(($a->argc == 2) && (intval($a->argv[1]))) {
+
+	if (($a->argc == 2) && (intval($a->argv[1]))) {
 		check_form_security_token_redirectOnErr('/group', 'group_edit');
 
 		$r = q("SELECT * FROM `group` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Group not found.') . EOL );
-			goaway($a->get_baseurl() . '/contacts');
+			goaway(App::get_baseurl() . '/contacts');
 			return; // NOTREACHED
 		}
 		$group = $r[0];
 		$groupname = notags(trim($_POST['groupname']));
-		if((strlen($groupname))  && ($groupname != $group['name'])) {
+		if ((strlen($groupname))  && ($groupname != $group['name'])) {
 			$r = q("UPDATE `group` SET `name` = '%s' WHERE `uid` = %d AND `id` = %d",
 				dbesc($groupname),
 				intval(local_user()),
 				intval($group['id'])
 			);
-			if($r)
+
+			if ($r) {
 				info( t('Group name changed.') . EOL );
+			}
 		}
 
 		$a->page['aside'] = group_side();
@@ -65,10 +69,10 @@ function group_post(&$a) {
 	return;
 }
 
-function group_content(&$a) {
+function group_content(App $a) {
 	$change = false;
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied') . EOL);
 		return;
 	}
@@ -87,7 +91,7 @@ function group_content(&$a) {
 			'$submit' => t('Save Group'),
 	);
 
-	if(($a->argc == 2) && ($a->argv[1] === 'new')) {
+	if (($a->argc == 2) && ($a->argv[1] === 'new')) {
 
 		return replace_macros($tpl, $context + array(
 			'$title' => t('Create a group of contacts/friends.'),
@@ -99,46 +103,52 @@ function group_content(&$a) {
 
 	}
 
-	if(($a->argc == 3) && ($a->argv[1] === 'drop')) {
+	if (($a->argc == 3) && ($a->argv[1] === 'drop')) {
 		check_form_security_token_redirectOnErr('/group', 'group_drop', 't');
 
-		if(intval($a->argv[2])) {
+		if (intval($a->argv[2])) {
 			$r = q("SELECT `name` FROM `group` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($a->argv[2]),
 				intval(local_user())
 			);
-			if(count($r))
+
+			$result = null;
+
+			if (dbm::is_result($r)) {
 				$result = group_rmv(local_user(),$r[0]['name']);
-			if($result)
+			}
+
+			if ($result) {
 				info( t('Group removed.') . EOL);
-			else
+			} else {
 				notice( t('Unable to remove group.') . EOL);
+			}
 		}
-		goaway($a->get_baseurl() . '/group');
+		goaway(App::get_baseurl() . '/group');
 		// NOTREACHED
 	}
 
-	if(($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
+	if (($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
 		check_form_security_token_ForbiddenOnErr('group_member_change', 't');
 
 		$r = q("SELECT `id` FROM `contact` WHERE `id` = %d AND `uid` = %d and `self` = 0 and `blocked` = 0 AND `pending` = 0 LIMIT 1",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$change = intval($a->argv[2]);
 	}
 
-	if(($a->argc > 1) && (intval($a->argv[1]))) {
+	if (($a->argc > 1) && (intval($a->argv[1]))) {
 
 		require_once('include/acl_selectors.php');
 		$r = q("SELECT * FROM `group` WHERE `id` = %d AND `uid` = %d AND `deleted` = 0 LIMIT 1",
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if(! count($r)) {
+		if (! dbm::is_result($r)) {
 			notice( t('Group not found.') . EOL );
-			goaway($a->get_baseurl() . '/contacts');
+			goaway(App::get_baseurl() . '/contacts');
 		}
 		$group = $r[0];
 		$members = group_get_members($group['id']);
@@ -209,7 +219,7 @@ function group_content(&$a) {
 		intval(local_user())
 	);
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$textmode = (($switchtotext && (count($r) > $switchtotext)) ? true : false);
 		foreach($r as $member) {
 			if(! in_array($member['id'],$preselected)) {

@@ -13,32 +13,32 @@
 				<input type="hidden" name="preview" id="comment-preview-inp-{{$id}}" value="0" />
 				<input type="hidden" name="post_id_random" value="{{$rand_num}}" />
 
-				<div class="comment-edit-photo" id="comment-edit-photo-{{$id}}" >
+				<div class="comment-edit-photo" id="comment-edit-photo-{{$id}}">
 					<a class="comment-edit-photo-link" href="{{$mylink}}" title="{{$mytitle}}"><img class="my-comment-photo" src="{{$myphoto}}" alt="{{$mytitle}}" title="{{$mytitle}}" /></a>
 				</div>
 				<div class="comment-edit-photo-end"></div>
-				<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text-empty" name="body" onFocus="commentOpen(this,{{$id}});">{{$comment}}</textarea>
+				<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text-empty" name="body" placeholder="{{$comment}}" onFocus="commentOpen(this,{{$id}});"></textarea>
 				{{if $qcomment}}
-					<select id="qcomment-select-{{$id}}" name="qcomment-{{$id}}" class="qcomment" onchange="qCommentInsert(this,{{$id}});" >
+					<select id="qcomment-select-{{$id}}" name="qcomment-{{$id}}" class="qcomment" onchange="qCommentInsert(this,{{$id}});">
 					<option value=""></option>
 				{{foreach $qcomment as $qc}}
-					<option value="{{$qc}}">{{$qc}}</option>				
+					<option value="{{$qc}}">{{$qc}}</option>
 				{{/foreach}}
 					</select>
 				{{/if}}
 
 				<div class="comment-edit-text-end"></div>
-				<div class="comment-edit-submit-wrapper" id="comment-edit-submit-wrapper-{{$id}}" style="display: none;" >
+				<div class="comment-edit-submit-wrapper" id="comment-edit-submit-wrapper-{{$id}}" style="display: none;">
 
 				<div class="comment-edit-bb">
-	                                <a title="{{$edimg}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="img" data-id="{{$id}}"><i class="icon-picture"></i></a>      
-	                                <a title="{{$edurl}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="url" data-id="{{$id}}"><i class="icon-link"></i></a>
-	                                <a title="{{$edvideo}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="video" data-id="{{$id}}"><i class="icon-film"></i></a>
-                                                                                
-	                                <a title="{{$eduline}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="u" data-id="{{$id}}"><i class="icon-underline"></i></a>
-	                                <a title="{{$editalic}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="i" data-id="{{$id}}"><i class="icon-italic"></i></a>
-	                                <a title="{{$edbold}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="b" data-id="{{$id}}"><i class="icon-bold"></i></a>
-	                                <a title="{{$edquote}}" data-role="insert-formatting" data-comment="{{$comment}}" data-bbcode="quote" data-id="{{$id}}"><i class="icon-quote-left"></i></a>
+	                                <a title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}"><i class="icon-picture"></i></a>
+	                                <a title="{{$edurl}}" data-role="insert-formatting" data-bbcode="url" data-id="{{$id}}"><i class="icon-link"></i></a>
+	                                <a title="{{$edvideo}}" data-role="insert-formatting" data-bbcode="video" data-id="{{$id}}"><i class="icon-film"></i></a>
+
+	                                <a title="{{$eduline}}" data-role="insert-formatting" data-bbcode="u" data-id="{{$id}}"><i class="icon-underline"></i></a>
+	                                <a title="{{$editalic}}" data-role="insert-formatting" data-bbcode="i" data-id="{{$id}}"><i class="icon-italic"></i></a>
+	                                <a title="{{$edbold}}" data-role="insert-formatting" data-bbcode="b" data-id="{{$id}}"><i class="icon-bold"></i></a>
+	                                <a title="{{$edquote}}" data-role="insert-formatting" data-bbcode="quote" data-id="{{$id}}"><i class="icon-quote-left"></i></a>
 
                                 </div>
 					<input type="submit" onclick="post_comment({{$id}}); return false;" id="comment-edit-submit-{{$id}}" class="comment-edit-submit" name="submit" value="{{$submit}}" />

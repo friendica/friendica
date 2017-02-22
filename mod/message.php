@@ -4,7 +4,7 @@ require_once('include/acl_selectors.php');
 require_once('include/message.php');
 require_once('include/Smilies.php');
 
-function message_init(&$a) {
+function message_init(App $a) {
 
 	$tabs = '';
 
@@ -24,25 +24,25 @@ function message_init(&$a) {
 		'$tabs'=>$tabs,
 		'$new'=>$new,
 	));
-	$base = $a->get_baseurl();
+	$base = App::get_baseurl();
 
 	$head_tpl = get_markup_template('message-head.tpl');
 	$a->page['htmlhead'] .= replace_macros($head_tpl,array(
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$base' => $base
 	));
 
 	$end_tpl = get_markup_template('message-end.tpl');
 	$a->page['end'] .= replace_macros($end_tpl,array(
-		'$baseurl' => $a->get_baseurl(true),
+		'$baseurl' => App::get_baseurl(true),
 		'$base' => $base
 	));
 
 }
 
-function message_post(&$a) {
+function message_post(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -51,17 +51,6 @@ function message_post(&$a) {
 	$subject   = ((x($_REQUEST,'subject'))   ? notags(trim($_REQUEST['subject']))   : '');
 	$body      = ((x($_REQUEST,'body'))      ? escape_tags(trim($_REQUEST['body'])) : '');
 	$recipient = ((x($_REQUEST,'messageto')) ? intval($_REQUEST['messageto'])       : 0 );
-
-	// Work around doubled linefeeds in Tinymce 3.5b2
-
-/*	$plaintext = intval(get_pconfig(local_user(),'system','plaintext') && !feature_enabled(local_user(),'richtext'));
-	if(! $plaintext) {
-		$body = fix_mce_lf($body);
-	}*/
-	$plaintext = intval(!feature_enabled(local_user(),'richtext'));
-	if(! $plaintext) {
-		$body = fix_mce_lf($body);
-	}
 
 	$ret = send_message($recipient, $body, $subject, $replyto);
 	$norecip = false;
@@ -160,7 +149,7 @@ function item_redir_and_replace_images($body, $images, $cid) {
 	$newbody = $newbody . $origbody;
 
 	$cnt = 0;
-	foreach($images as $image) {
+	foreach ($images as $image) {
 		// We're depending on the property of 'foreach' (specified on the PHP website) that
 		// it loops over the array starting from the first element and going sequentially
 		// to the last element
@@ -173,17 +162,17 @@ function item_redir_and_replace_images($body, $images, $cid) {
 
 
 
-function message_content(&$a) {
+function message_content(App $a) {
 
 	$o = '';
 	nav_set_selected('messages');
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
 
-	$myprofile = $a->get_baseurl().'/profile/' . $a->user['nickname'];
+	$myprofile = App::get_baseurl().'/profile/' . $a->user['nickname'];
 
 	$tpl = get_markup_template('mail_head.tpl');
 	$header = replace_macros($tpl, array(
@@ -231,10 +220,10 @@ function message_content(&$a) {
 				intval($a->argv[2]),
 				intval(local_user())
 			);
-			if($r) {
+			if ($r) {
 				info( t('Message deleted.') . EOL );
 			}
-			//goaway($a->get_baseurl(true) . '/message' );
+			//goaway(App::get_baseurl(true) . '/message' );
 			goaway($_SESSION['return_url']);
 		}
 		else {
@@ -242,7 +231,7 @@ function message_content(&$a) {
 				intval($a->argv[2]),
 				intval(local_user())
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$parent = $r[0]['parent-uri'];
 				$convid = $r[0]['convid'];
 
@@ -265,7 +254,7 @@ function message_content(&$a) {
 				if($r)
 					info( t('Conversation removed.') . EOL );
 			}
-			//goaway($a->get_baseurl(true) . '/message' );
+			//goaway(App::get_baseurl(true) . '/message' );
 			goaway($_SESSION['return_url']);
 		}
 
@@ -275,26 +264,16 @@ function message_content(&$a) {
 
 		$o .= $header;
 
-/*		$plaintext = false;
-		if(intval(get_pconfig(local_user(),'system','plaintext')))
-			$plaintext = true;*/
-		$plaintext = true;
-		if( local_user() && feature_enabled(local_user(),'richtext') )
-			$plaintext = false;
-
-
 		$tpl = get_markup_template('msg-header.tpl');
 		$a->page['htmlhead'] .= replace_macros($tpl, array(
-			'$baseurl' => $a->get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
+			'$baseurl' => App::get_baseurl(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
 
 		$tpl = get_markup_template('msg-end.tpl');
 		$a->page['end'] .= replace_macros($tpl, array(
-			'$baseurl' => $a->get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
+			'$baseurl' => App::get_baseurl(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
@@ -309,19 +288,21 @@ function message_content(&$a) {
 				intval(local_user()),
 				intval($a->argv[2])
 			);
-			if(!$r) {
+			if (!dbm::is_result($r)) {
 				$r = q("SELECT `name`, `url`, `id` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' LIMIT 1",
 					intval(local_user()),
 					dbesc(normalise_link(base64_decode($a->argv[2])))
 				);
 			}
-			if(!$r) {
+
+			if (!dbm::is_result($r)) {
 				$r = q("SELECT `name`, `url`, `id` FROM `contact` WHERE `uid` = %d AND `addr` = '%s' LIMIT 1",
 					intval(local_user()),
 					dbesc(base64_decode($a->argv[2]))
 				);
 			}
-			if(count($r)) {
+
+			if (dbm::is_result($r)) {
 				$prename = $r[0]['name'];
 				$preurl = $r[0]['url'];
 				$preid = $r[0]['id'];
@@ -362,7 +343,7 @@ function message_content(&$a) {
 
 	$_SESSION['return_url'] = $a->query_string;
 
-	if($a->argc == 1) {
+	if ($a->argc == 1) {
 
 		// List messages
 
@@ -379,7 +360,7 @@ function message_content(&$a) {
 
 		$r = get_messages(local_user(), $a->pager['start'], $a->pager['itemspage']);
 
-		if(! dbm::is_result($r)) {
+		if (! dbm::is_result($r)) {
 			info( t('No messages.') . EOL);
 			return $o;
 		}
@@ -395,17 +376,13 @@ function message_content(&$a) {
 
 		$o .= $header;
 
-		$plaintext = true;
-		if( local_user() && feature_enabled(local_user(),'richtext') )
-			$plaintext = false;
-
 		$r = q("SELECT `mail`.*, `contact`.`name`, `contact`.`url`, `contact`.`thumb`
 			FROM `mail` LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
 			WHERE `mail`.`uid` = %d AND `mail`.`id` = %d LIMIT 1",
 			intval(local_user()),
 			intval($a->argv[1])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$contact_id = $r[0]['contact-id'];
 			$convid = $r[0]['convid'];
 
@@ -436,20 +413,17 @@ function message_content(&$a) {
 
 		$tpl = get_markup_template('msg-header.tpl');
 		$a->page['htmlhead'] .= replace_macros($tpl, array(
-			'$baseurl' => $a->get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
+			'$baseurl' => App::get_baseurl(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
 
 		$tpl = get_markup_template('msg-end.tpl');
 		$a->page['end'] .= replace_macros($tpl, array(
-			'$baseurl' => $a->get_baseurl(true),
-			'$editselect' => (($plaintext) ? 'none' : '/(profile-jot-text|prvmail-text)/'),
+			'$baseurl' => App::get_baseurl(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => t('Please enter a link URL:')
 		));
-
 
 		$mails = array();
 		$seen = 0;
@@ -571,7 +545,7 @@ function render_messages(array $msg, $t) {
 	$tpl = get_markup_template($t);
 	$rslt = '';
 
-	$myprofile = $a->get_baseurl().'/profile/' . $a->user['nickname'];
+	$myprofile = App::get_baseurl().'/profile/' . $a->user['nickname'];
 
 	foreach($msg as $rr) {
 

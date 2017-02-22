@@ -48,3 +48,6 @@ nbproject
 /php_friendica.phpproj
 /php_friendica.sln
 /php_friendica.phpproj.user
+
+#ignore things from transifex-client
+venv/

@@ -15,9 +15,9 @@ function search_saved_searches() {
 		intval(local_user())
 	);
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$saved = array();
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 			$saved[] = array(
 				'id'		=> $rr['id'],
 				'term'		=> $rr['term'],
@@ -43,7 +43,7 @@ function search_saved_searches() {
 }
 
 
-function search_init(&$a) {
+function search_init(App $a) {
 
 	$search = ((x($_GET,'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
 
@@ -53,7 +53,7 @@ function search_init(&$a) {
 				intval(local_user()),
 				dbesc($search)
 			);
-			if(! count($r)) {
+			if (! dbm::is_result($r)) {
 				q("INSERT INTO `search` (`uid`,`term`) VALUES ( %d, '%s')",
 					intval(local_user()),
 					dbesc($search)
@@ -81,13 +81,13 @@ function search_init(&$a) {
 
 
 
-function search_post(&$a) {
+function search_post(App $a) {
 	if(x($_POST,'search'))
 		$a->data['search'] = $_POST['search'];
 }
 
 
-function search_content(&$a) {
+function search_content(App $a) {
 
 	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
 		notice( t('Public access denied.') . EOL);
@@ -203,12 +203,12 @@ function search_content(&$a) {
 	} else {
 		logger("Start fulltext search for '".$search."'", LOGGER_DEBUG);
 
-		if (get_config('system','use_fulltext_engine')) {
-			$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
-		} else {
+		// Disabled until finally is decided how to proceed with this
+		//if (get_config('system','use_fulltext_engine')) {
+		//	$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
+		//} else {
 			$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
-		}
-
+		//}
 
 		$r = q("SELECT %s
 			FROM `item` %s
@@ -220,7 +220,7 @@ function search_content(&$a) {
 				intval($a->pager['start']), intval($a->pager['itemspage']));
 	}
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		info( t('No results.') . EOL);
 		return $o;
 	}

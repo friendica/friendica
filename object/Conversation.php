@@ -127,7 +127,7 @@ class Conversation extends BaseObject {
 	 *      _ false on failure
 	 */
 	public function get_template_data($conv_responses) {
-		global $a;
+		$a = get_app();
 		$result = array();
 
 		$i = 0;
@@ -145,7 +145,6 @@ class Conversation extends BaseObject {
 			$result[] = $item_data;
 		}
 
-		//$a->mark_timestamp();
 		return $result;
 	}
 

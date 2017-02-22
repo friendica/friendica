@@ -2,7 +2,7 @@
 
 require_once('include/Photo.php');
 
-function wall_upload_post(&$a, $desktopmode = true) {
+function wall_upload_post(App $a, $desktopmode = true) {
 
 	logger("wall upload: starting new upload", LOGGER_DEBUG);
 
@@ -15,10 +15,10 @@ function wall_upload_post(&$a, $desktopmode = true) {
 				dbesc($nick)
 			);
 
-			if(! count($r)){
+			if (! dbm::is_result($r)) {
 				if ($r_json) {
-				    echo json_encode(array('error'=>t('Invalid request.')));
-				    killme();
+					echo json_encode(array('error'=>t('Invalid request.')));
+					killme();
 				}
 				return;
 			}
@@ -30,8 +30,8 @@ function wall_upload_post(&$a, $desktopmode = true) {
 		}
 	} else {
 		if ($r_json) {
-		    echo json_encode(array('error'=>t('Invalid request.')));
-		    killme();
+			echo json_encode(array('error'=>t('Invalid request.')));
+			killme();
 		}
 		return;
 	}
@@ -48,24 +48,24 @@ function wall_upload_post(&$a, $desktopmode = true) {
 		$can_post = true;
 	else {
 		if($community_page && remote_user()) {
-			$cid = 0;
+			$contact_id = 0;
 			if(is_array($_SESSION['remote'])) {
 				foreach($_SESSION['remote'] as $v) {
 					if($v['uid'] == $page_owner_uid) {
-						$cid = $v['cid'];
+						$contact_id = $v['cid'];
 						break;
 					}
 				}
 			}
-			if($cid) {
+			if($contact_id) {
 
 				$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
-					intval($cid),
+					intval($contact_id),
 					intval($page_owner_uid)
 				);
-				if(count($r)) {
+				if (dbm::is_result($r)) {
 					$can_post = true;
-					$visitor = $cid;
+					$visitor = $contact_id;
 				}
 			}
 		}
@@ -74,8 +74,8 @@ function wall_upload_post(&$a, $desktopmode = true) {
 
 	if(! $can_post) {
 		if ($r_json) {
-		    echo json_encode(array('error'=>t('Permission denied.')));
-		    killme();
+			echo json_encode(array('error'=>t('Permission denied.')));
+			killme();
 		}
 		notice( t('Permission denied.') . EOL );
 		killme();
@@ -83,7 +83,7 @@ function wall_upload_post(&$a, $desktopmode = true) {
 
 	if(! x($_FILES,'userfile') && ! x($_FILES,'media')){
 		if ($r_json) {
-		    echo json_encode(array('error'=>t('Invalid request.')));
+			echo json_encode(array('error'=>t('Invalid request.')));
 		}
 		killme();
 	}
@@ -119,8 +119,8 @@ function wall_upload_post(&$a, $desktopmode = true) {
 
 	if ($src=="") {
 		if ($r_json) {
-		    echo json_encode(array('error'=>t('Invalid request.')));
-		    killme();
+			echo json_encode(array('error'=>t('Invalid request.')));
+			killme();
 		}
 		notice(t('Invalid request.').EOL);
 		killme();
@@ -166,20 +166,18 @@ function wall_upload_post(&$a, $desktopmode = true) {
 			intval($page_owner_uid)
 		);
 		$size = $r[0]['total'];
-	} else
-		$size = 0;
 
-	if(($limit !== false) && (($size + strlen($imagedata)) > $limit)) {
-		$msg = upgrade_message(true);
-		if ($r_json) {
-			echo json_encode(array('error'=>$msg));
-		} else {
-			echo  $msg. EOL;
+		if (($size + strlen($imagedata)) > $limit) {
+			$msg = upgrade_message(true);
+			if ($r_json) {
+				echo json_encode(array('error'=>$msg));
+			} else {
+				echo  $msg. EOL;
+			}
+			@unlink($src);
+			killme();
 		}
-		@unlink($src);
-		killme();
 	}
-
 
 	$imagedata = @file_get_contents($src);
 	$ph = new Photo($imagedata, $filetype);
@@ -248,8 +246,8 @@ function wall_upload_post(&$a, $desktopmode = true) {
 		$r = q("SELECT `id`, `datasize`, `width`, `height`, `type` FROM `photo` WHERE `resource-id` = '%s' ORDER BY `width` DESC LIMIT 1", $hash);
 		if (!$r){
 			if ($r_json) {
-			    echo json_encode(array('error'=>''));
-			    killme();
+				echo json_encode(array('error'=>''));
+				killme();
 			}
 			return false;
 		}
@@ -260,36 +258,30 @@ function wall_upload_post(&$a, $desktopmode = true) {
 		$picture["width"] = $r[0]["width"];
 		$picture["height"] = $r[0]["height"];
 		$picture["type"] = $r[0]["type"];
-		$picture["albumpage"] = $a->get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash;
-		$picture["picture"] = $a->get_baseurl()."/photo/{$hash}-0.".$ph->getExt();
-		$picture["preview"] = $a->get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt();
+		$picture["albumpage"] = App::get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash;
+		$picture["picture"] = App::get_baseurl()."/photo/{$hash}-0.".$ph->getExt();
+		$picture["preview"] = App::get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt();
 
 		if ($r_json) {
-		    echo json_encode(array('picture'=>$picture));
-		    killme();
+			echo json_encode(array('picture'=>$picture));
+			killme();
 		}
 		return $picture;
 	}
 
 
 	if ($r_json) {
-	    echo json_encode(array('ok'=>true));
-	    killme();
+		echo json_encode(array('ok'=>true));
+		killme();
 	}
 
 /* mod Waitman Gobble NO WARRANTY */
 
-//if we get the signal then return the image url info in BBCODE, otherwise this outputs the info and bails (for the ajax image uploader on wall post)
+	// if we get the signal then return the image url info in BBCODE
 	if ($_REQUEST['hush']!='yeah') {
-		if(local_user() && (! feature_enabled(local_user(),'richtext') || x($_REQUEST['nomce'])) ) {
-			echo  "\n\n" . '[url=' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]\n\n";
-		}
-		else {
-			echo  '<br /><br /><a href="' . $a->get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '" ><img src="' . $a->get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."\" alt=\"$basename\" /></a><br /><br />";
-		}
-	}
-	else {
-		$m = '[url='.$a->get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash.'][img]'.$a->get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]";
+		echo  "\n\n" . '[url=' . App::get_baseurl() . '/photos/' . $page_owner_nick . '/image/' . $hash . '][img]' . App::get_baseurl() . "/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]\n\n";
+	} else {
+		$m = '[url='.App::get_baseurl().'/photos/'.$page_owner_nick.'/image/'.$hash.'][img]'.App::get_baseurl()."/photo/{$hash}-{$smallest}.".$ph->getExt()."[/img][/url]";
 		return($m);
 	}
 /* mod Waitman Gobble NO WARRANTY */

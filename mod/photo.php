@@ -3,7 +3,7 @@
 require_once('include/security.php');
 require_once('include/Photo.php');
 
-function photo_init(&$a) {
+function photo_init(App $a) {
 	global $_SERVER;
 
 	$prvcachecontrol = false;
@@ -72,11 +72,11 @@ function photo_init(&$a) {
 
 		$uid = str_replace(array('.jpg','.png'),array('',''), $person);
 
-		$r = q("SELECT * FROM `photo` WHERE `scale` = %d AND `uid` = %d AND `profile` = 1 LIMIT 1",
+		$r = qu("SELECT * FROM `photo` WHERE `scale` = %d AND `uid` = %d AND `profile` = 1 LIMIT 1",
 			intval($resolution),
 			intval($uid)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$data = $r[0]['data'];
 			$mimetype = $r[0]['type'];
 		}
@@ -102,24 +102,24 @@ function photo_init(&$a) {
 		}
 
         // check if the photo exists and get the owner of the photo
-		$r = q("SELECT `uid` FROM `photo` WHERE `resource-id` = '%s' LIMIT 1",
+		$r = qu("SELECT `uid` FROM `photo` WHERE `resource-id` = '%s' LIMIT 1",
 			dbesc($photo),
 			intval($resolution)
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$sql_extra = permissions_sql($r[0]['uid']);
 
 			// Now we'll see if we can access the photo
 
-			$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` <= %d $sql_extra ORDER BY scale DESC LIMIT 1",
+			$r = qu("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` <= %d $sql_extra ORDER BY scale DESC LIMIT 1",
 				dbesc($photo),
 				intval($resolution)
 			);
 
-			$public = ($r[0]['allow_cid'] == '') AND ($r[0]['allow_gid'] == '') AND ($r[0]['deny_cid']  == '') AND ($r[0]['deny_gid']  == '');
+			$public = (dbm::is_result($r)) AND ($r[0]['allow_cid'] == '') AND ($r[0]['allow_gid'] == '') AND ($r[0]['deny_cid']  == '') AND ($r[0]['deny_gid']  == '');
 
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$resolution = $r[0]['scale'];
 				$data = $r[0]['data'];
 				$mimetype = $r[0]['type'];

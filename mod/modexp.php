@@ -2,7 +2,7 @@
 
 require_once('library/asn1.php');
 
-function modexp_init(&$a) {
+function modexp_init(App $a) {
 
 	if($a->argc != 2)
 		killme();
@@ -12,8 +12,9 @@ function modexp_init(&$a) {
 			dbesc($nick)
 	);
 
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		killme();
+	}
 
 	$lines = explode("\n",$r[0]['spubkey']);
 	unset($lines[0]);

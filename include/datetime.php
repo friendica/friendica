@@ -4,6 +4,7 @@
  * @brief Some functions for date and time related tasks.
  */
 
+use \Friendica\Core\Config;
 
 /**
  * @brief Two-level sort for timezones.
@@ -271,8 +272,9 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 	$lang = substr(get_browser_language(), 0, 2);
 
 	// Check if the detected language is supported by the picker
-	if (!in_array($lang, array("ar", "ro", "id", "bg", "fa", "ru", "uk", "en", "el", "de", "nl", "tr", "fr", "es", "th", "pl", "pt", "ch", "se", "kr", "it", "da", "no", "ja", "vi", "sl", "cs", "hu")))
-		$lang = ((isset($a->config['system']['language'])) ? $a->config['system']['language'] : 'en');
+	if (!in_array($lang, array("ar", "ro", "id", "bg", "fa", "ru", "uk", "en", "el", "de", "nl", "tr", "fr", "es", "th", "pl", "pt", "ch", "se", "kr", "it", "da", "no", "ja", "vi", "sl", "cs", "hu"))) {
+		$lang = Config::get('system', 'language', 'en');
+	}
 
 	$o = '';
 	$dateformat = '';
@@ -325,15 +327,15 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
  * Results relative to current timezone.
  * Limited to range of timestamps.
  *
- * @param string $posted_date
+ * @param string $posted_date MySQL-formatted date string (YYYY-MM-DD HH:MM:SS)
  * @param string $format (optional) Parsed with sprintf()
  *    <tt>%1$d %2$s ago</tt>, e.g. 22 hours ago, 1 minute ago
- * 
+ *
  * @return string with relative date
  */
-function relative_date($posted_date,$format = null) {
+function relative_date($posted_date, $format = null) {
 
-	$localtime = datetime_convert('UTC',date_default_timezone_get(),$posted_date);
+	$localtime = $posted_date . ' UTC';
 
 	$abs = strtotime($localtime);
 
@@ -346,13 +348,6 @@ function relative_date($posted_date,$format = null) {
 	if ($etime < 1) {
 		return t('less than a second ago');
 	}
-
-	/*
-	$time_append = '';
-	if ($etime >= 86400) {
-		$time_append = ' ('.$localtime.')';
-	}
-	*/
 
 	$a = array( 12 * 30 * 24 * 60 * 60  =>  array( t('year'),   t('years')),
 				30 * 24 * 60 * 60       =>  array( t('month'),  t('months')),
@@ -368,10 +363,11 @@ function relative_date($posted_date,$format = null) {
 		if ($d >= 1) {
 			$r = round($d);
 			// translators - e.g. 22 hours ago, 1 minute ago
-			if(! $format)
+			if (!$format) {
 				$format = t('%1$d %2$s ago');
+			}
 
-			return sprintf( $format,$r, (($r == 1) ? $str[0] : $str[1]));
+			return sprintf($format, $r, (($r == 1) ? $str[0] : $str[1]));
 		}
 	}
 }
@@ -558,8 +554,8 @@ function update_contact_birthdays() {
 	// In-network birthdays are handled within local_delivery
 
 	$r = q("SELECT * FROM contact WHERE `bd` != '' AND `bd` != '0000-00-00' AND SUBSTRING(`bd`,1,4) != `bdyear` ");
-	if(count($r)) {
-		foreach($r as $rr) {
+	if (dbm::is_result($r)) {
+		foreach ($r as $rr) {
 
 			logger('update_contact_birthday: ' . $rr['bd']);
 
@@ -574,6 +570,17 @@ function update_contact_birthdays() {
 			 * to contain a sparkle link and perhaps a photo.
 			 *
 			 */
+
+			// Check for duplicates
+			$s = q("SELECT `id` FROM `event` WHERE `uid` = %d AND `cid` = %d AND `start` = '%s' AND `type` = '%s' LIMIT 1",
+				intval($rr['uid']),
+				intval($rr['id']),
+				dbesc(datetime_convert('UTC','UTC', $nextbd)),
+				dbesc('birthday'));
+
+			if (dbm::is_result($s)) {
+				continue;
+			}
 
 			$bdtext = sprintf( t('%s\'s birthday'), $rr['name']);
 			$bdtext2 = sprintf( t('Happy Birthday %s'), ' [url=' . $rr['url'] . ']' . $rr['name'] . '[/url]') ;

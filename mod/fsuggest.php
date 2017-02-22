@@ -1,14 +1,15 @@
 <?php
 
 
-function fsuggest_post(&$a) {
+function fsuggest_post(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		return;
 	}
 
-	if($a->argc != 2)
+	if ($a->argc != 2) {
 		return;
+	}
 
 	$contact_id = intval($a->argv[1]);
 
@@ -16,7 +17,7 @@ function fsuggest_post(&$a) {
 		intval($contact_id),
 		intval(local_user())
 	);
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('Contact not found.') . EOL);
 		return;
 	}
@@ -33,24 +34,24 @@ function fsuggest_post(&$a) {
 			intval($new_contact),
 			intval(local_user())
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$x = q("INSERT INTO `fsuggest` ( `uid`,`cid`,`name`,`url`,`request`,`photo`,`note`,`created`)
 				VALUES ( %d, %d, '%s','%s','%s','%s','%s','%s')",
 				intval(local_user()),
 				intval($contact_id),
-				dbesc($r[0]['name']), 
-				dbesc($r[0]['url']), 
-				dbesc($r[0]['request']), 
-				dbesc($r[0]['photo']), 
-				dbesc($hash), 
+				dbesc($r[0]['name']),
+				dbesc($r[0]['url']),
+				dbesc($r[0]['request']),
+				dbesc($r[0]['photo']),
+				dbesc($hash),
 				dbesc(datetime_convert())
 			);
 			$r = q("SELECT `id` FROM `fsuggest` WHERE `note` = '%s' AND `uid` = %d LIMIT 1",
 				dbesc($hash),
 				intval(local_user())
 			);
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				$fsuggest_id = $r[0]['id'];
 				q("UPDATE `fsuggest` SET `note` = '%s' WHERE `id` = %d AND `uid` = %d",
 					dbesc($note),
@@ -70,11 +71,11 @@ function fsuggest_post(&$a) {
 
 
 
-function fsuggest_content(&$a) {
+function fsuggest_content(App $a) {
 
 	require_once('include/acl_selectors.php');
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -88,7 +89,7 @@ function fsuggest_content(&$a) {
 		intval($contact_id),
 		intval(local_user())
 	);
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('Contact not found.') . EOL);
 		return;
 	}
@@ -100,7 +101,7 @@ function fsuggest_content(&$a) {
 
 	$o .= '<form id="fsuggest-form" action="fsuggest/' . $contact_id . '" method="post" >';
 
-	$o .= contact_selector('suggest','suggest-select', false, 
+	$o .= contact_selector('suggest','suggest-select', false,
 		array('size' => 4, 'exclude' => $contact_id, 'networks' => 'DFRN_ONLY', 'single' => true));
 
 

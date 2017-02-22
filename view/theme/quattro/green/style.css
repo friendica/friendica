@@ -463,7 +463,7 @@ a:hover {
   text-decoration: underline;
 }
 blockquote {
-  background: #ffffff;
+  background: #FFFFFF;
   padding: 1em;
   margin-left: 1em;
   border-left: 1em solid #e6e6e6;
@@ -1210,6 +1210,9 @@ section {
 .wall-item-container .wall-item-actions-social a {
   margin-right: 3em;
 }
+.wall-item-container .wall-item-actions-social a.active {
+  font-weight: bold;
+}
 .wall-item-container .wall-item-actions-tools {
   float: right;
   width: 15%;
@@ -1456,7 +1459,6 @@ blockquote.shared_content {
 }
 .oembed.video > a.embed_video {
   display: block;
-  float: left;
   position: relative;
 }
 .oembed.video > a.embed_video > div {

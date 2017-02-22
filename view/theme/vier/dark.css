@@ -8,6 +8,9 @@ hr { background-color: #343434 !important; }
 a, .wall-item-name, .fakelink { 
 	color: #989898 !important; 
 }
+.wall-item-content a {
+	        font-weight: bold;
+}
 .btn, .btn:hover{
 	color: #989898;
 	border: 2px solid #0C1116;

@@ -69,6 +69,15 @@ Create an empty database and note the access details (hostname, username, passwo
 
 Friendica needs the permission to create and delete fields and tables in its own database.
 
+With newer releases of MySQL (5.7.17 or newer), you might need to set the sql_mode to '' (blank).
+Use this setting when the installer is unable to create all the needed tables due to a timestamp format problem.
+In this case find the [mysqld] section in your my.cnf file and add the line :
+
+    sql_mode = ''
+
+Restart mysql and you should be fine.
+
+
 ###Run the installer
 
 Point your web browser to the new site and follow the instructions.

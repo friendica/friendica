@@ -1,7 +1,8 @@
 <?php
 
-require_once("boot.php");
+use \Friendica\Core\Config;
 
+require_once("boot.php");
 
 function cronhooks_run(&$argv, &$argc){
 	global $a, $db;
@@ -20,12 +21,11 @@ function cronhooks_run(&$argv, &$argc){
 	require_once('include/session.php');
 	require_once('include/datetime.php');
 
-	load_config('config');
-	load_config('system');
+	Config::load();
 
 	// Don't check this stuff if the function is called by the poller
 	if (App::callstack() != "poller_run") {
-		if (App::maxload_reached())
+		if ($a->maxload_reached())
 			return;
 		if (App::is_already_running('cronhooks', 'include/cronhooks.php', 1140))
 			return;

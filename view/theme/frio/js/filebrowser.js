@@ -54,13 +54,13 @@
 
 /*
  * IMPORTANT
- * 
- *  This is a modified version to work with 
+ *
+ *  This is a modified version to work with
  *  the frio theme.and bootstrap modals
- *  
+ *
  *  The origninal file is under:
  *  js/filebrowser.js
- * 
+ *
  */
 
 
@@ -93,18 +93,18 @@ var FileBrowser = {
 			$(".error").addClass("hidden");
 		});
 
-		$(".folders a, .path a").on("click", function(e){
+		$(".folders a, .path a").on("click", function(e) {
 			e.preventDefault();
 			var url = baseurl + "/fbrowser/" + FileBrowser.type + "/" + this.dataset.folder + "?mode=none";
 
 			// load new content to fbrowser window
-			$(".fbrowser").load(url,function(){
+			$(".fbrowser").load(url,function() {
 				$(function() {FileBrowser.init(nickname, type, hash);});
 			});
 		});
 
 		//embed on click
-		$(".photo-album-photo-link").on('click', function(e){
+		$(".photo-album-photo-link").on('click', function(e) {
 			e.preventDefault();
 
 			var embed = "";
@@ -121,8 +121,7 @@ var FileBrowser = {
 			// work as expected (we need a way to wait until commentOpenUI would be finished).
 			// As for now we insert pieces of this function here
 			if ((commentElm !== null) && (typeof commentElm !== "undefined")) {
-				if (commentElm.value == aStr.comment){
-					commentElm.value = "";
+				if (commentElm.value == "") {
 					$("#comment-edit-text-" + FileBrowser.id).addClass("comment-edit-text-full").removeClass("comment-edit-text-empty");
 					$("#comment-edit-submit-wrapper-" + FileBrowser.id).show();
 					$("#comment-edit-text-" + FileBrowser.id).attr('tabindex','9');
@@ -142,11 +141,6 @@ var FileBrowser = {
 			$('#modal').modal('hide');
 			// update autosize for this textarea
 			autosize.update($(".text-autosize"));
-//			if (id!=="") {
-//				commentExpand(FileBrowser.id);
-//				//$("#comment-edit-text-558").empty();
-//			};
-
 		});
 
 		if ($("#upload-image").length)
@@ -168,7 +162,7 @@ var FileBrowser = {
 
 						var url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none"
 						// load new content to fbrowser window
-						$(".fbrowser").load(url,function(){
+						$(".fbrowser").load(url,function() {
 							$(function() {FileBrowser.init(nickname, type, hash);});
 						});
 					}
@@ -193,7 +187,7 @@ var FileBrowser = {
 
 						var url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none"
 						// load new content to fbrowser window
-						$(".fbrowser").load(url,function(){
+						$(".fbrowser").load(url,function() {
 							$(function() {FileBrowser.init(nickname, type, hash);});
 						});
 					}

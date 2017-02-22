@@ -5,6 +5,9 @@
  *
  * @todo Automatically detect if incoming data is HTML or BBCode
  */
+
+use \Friendica\Core\Config;
+
 	require_once('include/HTTPExceptions.php');
 
 	require_once('include/bbcode.php');
@@ -133,7 +136,7 @@
 	 * @hook 'logged_in'
 	 * 		array $user	logged user record
 	 */
-	function api_login(&$a){
+	function api_login(App $a){
 		// login with oauth
 		try{
 			$oauth = new FKOAuth1();
@@ -208,7 +211,7 @@
 				dbesc(trim($user)),
 				dbesc($encrypted)
 			);
-			if(count($r))
+			if (dbm::is_result($r))
 				$record = $r[0];
 		}
 
@@ -251,8 +254,8 @@
 	 * @param App $a
 	 * @return string API call result
 	 */
-	function api_call(&$a){
-		GLOBAL $API, $called_api;
+	function api_call(App $a){
+		global $API, $called_api;
 
 		$type="json";
 		if (strpos($a->query_string, ".xml")>0) $type="xml";
@@ -279,6 +282,44 @@
 					$r = call_user_func($info['func'], $type);
 					$duration = (float)(microtime(true)-$stamp);
 					logger("API call duration: ".round($duration, 2)."\t".$a->query_string, LOGGER_DEBUG);
+
+					if (get_config("system", "profiler")) {
+						$duration = microtime(true)-$a->performance["start"];
+
+						logger(parse_url($a->query_string, PHP_URL_PATH).": ".sprintf("Database: %s/%s, Network: %s, I/O: %s, Other: %s, Total: %s",
+							round($a->performance["database"] - $a->performance["database_write"], 3),
+							round($a->performance["database_write"], 3),
+							round($a->performance["network"], 2),
+							round($a->performance["file"], 2),
+							round($duration - ($a->performance["database"] + $a->performance["network"]
+								+ $a->performance["file"]), 2),
+							round($duration, 2)),
+							LOGGER_DEBUG);
+
+						if (get_config("rendertime", "callstack")) {
+							$o = "Database Read:\n";
+							foreach ($a->callstack["database"] AS $func => $time) {
+								$time = round($time, 3);
+								if ($time > 0)
+									$o .= $func.": ".$time."\n";
+							}
+							$o .= "\nDatabase Write:\n";
+							foreach ($a->callstack["database_write"] AS $func => $time) {
+								$time = round($time, 3);
+								if ($time > 0)
+									$o .= $func.": ".$time."\n";
+							}
+
+							$o .= "\nNetwork:\n";
+							foreach ($a->callstack["network"] AS $func => $time) {
+								$time = round($time, 3);
+								if ($time > 0)
+									$o .= $func.": ".$time."\n";
+							}
+							logger($o, LOGGER_DEBUG);
+						}
+					}
+
 
 					if ($r===false) {
 						// api function returned false withour throw an
@@ -366,17 +407,17 @@
 	 * @param array $user_info
 	 * @return array
 	 */
-	function api_rss_extra(&$a, $arr, $user_info){
+	function api_rss_extra(App $a, $arr, $user_info){
 		if (is_null($user_info)) $user_info = api_get_user($a);
 		$arr['$user'] = $user_info;
 		$arr['$rss'] = array(
-			'alternate' => $user_info['url'],
-			'self' => App::get_baseurl(). "/". $a->query_string,
-			'base' => App::get_baseurl(),
-			'updated' => api_date(null),
+			'alternate'    => $user_info['url'],
+			'self'         => App::get_baseurl(). "/". $a->query_string,
+			'base'         => App::get_baseurl(),
+			'updated'      => api_date(null),
 			'atom_updated' => datetime_convert('UTC','UTC','now',ATOM_TIME),
-			'language' => $user_info['language'],
-			'logo'	=> App::get_baseurl()."/images/friendica-32.png",
+			'language'     => $user_info['language'],
+			'logo'         => App::get_baseurl()."/images/friendica-32.png",
 		);
 
 		return $arr;
@@ -391,7 +432,7 @@
 	 * 		Contact url or False if contact id is unknown
 	 */
 	function api_unique_id_to_url($id){
-		$r = q("SELECT `url` FROM `gcontact` WHERE `id`=%d LIMIT 1",
+		$r = q("SELECT `url` FROM `contact` WHERE `uid` = 0 AND `id` = %d LIMIT 1",
 			intval($id));
 		if ($r)
 			return ($r[0]["url"]);
@@ -406,7 +447,7 @@
 	 * @param int|string $contact_id Contact ID or URL
 	 * @param string $type Return type (for errors)
 	 */
-	function api_get_user(&$a, $contact_id = Null, $type = "json"){
+	function api_get_user(App $a, $contact_id = Null, $type = "json"){
 		global $called_api;
 		$user = null;
 		$extra_query = "";
@@ -423,7 +464,7 @@
 			if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
 		}
 
-		// Searching for unique contact id
+		// Searching for contact id with uid = 0
 		if(!is_null($contact_id) AND (intval($contact_id) != 0)){
 			$user = dbesc(api_unique_id_to_url($contact_id));
 
@@ -496,14 +537,16 @@
 		// Selecting the id by priority, friendica first
 		api_best_nickname($uinfo);
 
-		// if the contact wasn't found, fetch it from the unique contacts
+		// if the contact wasn't found, fetch it from the contacts with uid = 0
 		if (count($uinfo)==0) {
 			$r = array();
 
 			if ($url != "")
-				$r = q("SELECT * FROM `gcontact` WHERE `nurl`='%s' LIMIT 1", dbesc(normalise_link($url)));
+				$r = q("SELECT * FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s' LIMIT 1", dbesc(normalise_link($url)));
 
 			if ($r) {
+				$network_name = network_to_name($r[0]['network'], $r[0]['url']);
+
 				// If no nick where given, extract it from the address
 				if (($r[0]['nick'] == "") OR ($r[0]['name'] == $r[0]['nick']))
 					$r[0]['nick'] = api_get_nick($r[0]["url"]);
@@ -513,8 +556,10 @@
 					'id_str' => (string) $r[0]["id"],
 					'name' => $r[0]["name"],
 					'screen_name' => (($r[0]['nick']) ? $r[0]['nick'] : $r[0]['name']),
-					'location' => $r[0]["location"],
+					'location' => ($r[0]["location"] != "") ? $r[0]["location"] : $network_name,
 					'description' => $r[0]["about"],
+					'profile_image_url' => $r[0]["micro"],
+					'profile_image_url_https' => $r[0]["micro"],
 					'url' => $r[0]["url"],
 					'protected' => false,
 					'followers_count' => 0,
@@ -531,16 +576,13 @@
 					'contributors_enabled' => false,
 					'is_translator' => false,
 					'is_translation_enabled' => false,
-					'profile_image_url' => $r[0]["photo"],
-					'profile_image_url_https' => $r[0]["photo"],
 					'following' => false,
 					'follow_request_sent' => false,
-					'notifications' => false,
 					'statusnet_blocking' => false,
 					'notifications' => false,
 					'statusnet_profile_url' => $r[0]["url"],
 					'uid' => 0,
-					'cid' => get_contact($r[0]["url"], api_user()),
+					'cid' => get_contact($r[0]["url"], api_user(), true),
 					'self' => 0,
 					'network' => $r[0]["network"],
 				);
@@ -563,28 +605,28 @@
 				intval(api_user())
 			);
 
-			//AND `allow_cid`='' AND `allow_gid`='' AND `deny_cid`='' AND `deny_gid`=''",
+			// Counting is deactivated by now, due to performance issues
 			// count public wall messages
-			$r = q("SELECT count(*) as `count` FROM `item`
-					WHERE  `uid` = %d
-					AND `type`='wall'",
-					intval($uinfo[0]['uid'])
-			);
-			$countitms = $r[0]['count'];
+			//$r = q("SELECT COUNT(*) as `count` FROM `item` WHERE `uid` = %d AND `wall`",
+			//		intval($uinfo[0]['uid'])
+			//);
+			//$countitms = $r[0]['count'];
+			$countitms = 0;
+		} else {
+			// Counting is deactivated by now, due to performance issues
+			//$r = q("SELECT count(*) as `count` FROM `item`
+			//		WHERE  `contact-id` = %d",
+			//		intval($uinfo[0]['id'])
+			//);
+			//$countitms = $r[0]['count'];
+			$countitms = 0;
 		}
-		else {
-			//AND `allow_cid`='' AND `allow_gid`='' AND `deny_cid`='' AND `deny_gid`=''",
-			$r = q("SELECT count(*) as `count` FROM `item`
-					WHERE  `contact-id` = %d",
-					intval($uinfo[0]['id'])
-			);
-			$countitms = $r[0]['count'];
-		}
-
+/*
+		// Counting is deactivated by now, due to performance issues
 		// count friends
 		$r = q("SELECT count(*) as `count` FROM `contact`
 				WHERE  `uid` = %d AND `rel` IN ( %d, %d )
-				AND `self`=0 AND `blocked`=0 AND `pending`=0 AND `hidden`=0",
+				AND `self`=0 AND NOT `blocked` AND NOT `pending` AND `hidden`=0",
 				intval($uinfo[0]['uid']),
 				intval(CONTACT_IS_SHARING),
 				intval(CONTACT_IS_FRIEND)
@@ -593,7 +635,7 @@
 
 		$r = q("SELECT count(*) as `count` FROM `contact`
 				WHERE  `uid` = %d AND `rel` IN ( %d, %d )
-				AND `self`=0 AND `blocked`=0 AND `pending`=0 AND `hidden`=0",
+				AND `self`=0 AND NOT `blocked` AND NOT `pending` AND `hidden`=0",
 				intval($uinfo[0]['uid']),
 				intval(CONTACT_IS_FOLLOWER),
 				intval(CONTACT_IS_FRIEND)
@@ -611,6 +653,10 @@
 			$countfollowers = 0;
 			$starred = 0;
 		}
+*/
+		$countfriends = 0;
+		$countfollowers = 0;
+		$starred = 0;
 
 		// Add a nick if it isn't present there
 		if (($uinfo[0]['nick'] == "") OR ($uinfo[0]['name'] == $uinfo[0]['nick'])) {
@@ -619,12 +665,11 @@
 
 		$network_name = network_to_name($uinfo[0]['network'], $uinfo[0]['url']);
 
-		$gcontact_id  = get_gcontact_id(array("url" => $uinfo[0]['url'], "network" => $uinfo[0]['network'],
-							"photo" => $uinfo[0]['micro'], "name" => $uinfo[0]['name']));
+		$pcontact_id  = get_contact($uinfo[0]['url'], 0, true);
 
 		$ret = Array(
-			'id' => intval($gcontact_id),
-			'id_str' => (string) intval($gcontact_id),
+			'id' => intval($pcontact_id),
+			'id_str' => (string) intval($pcontact_id),
 			'name' => (($uinfo[0]['name']) ? $uinfo[0]['name'] : $uinfo[0]['nick']),
 			'screen_name' => (($uinfo[0]['nick']) ? $uinfo[0]['nick'] : $uinfo[0]['name']),
 			'location' => ($usr) ? $usr[0]['default-location'] : $network_name,
@@ -635,13 +680,20 @@
 			'protected' => false,
 			'followers_count' => intval($countfollowers),
 			'friends_count' => intval($countfriends),
+			'listed_count' => 0,
 			'created_at' => api_date($uinfo[0]['created']),
 			'favourites_count' => intval($starred),
 			'utc_offset' => "0",
 			'time_zone' => 'UTC',
-			'statuses_count' => intval($countitms),
-			'following' => (($uinfo[0]['rel'] == CONTACT_IS_FOLLOWER) OR ($uinfo[0]['rel'] == CONTACT_IS_FRIEND)),
+			'geo_enabled' => false,
 			'verified' => true,
+			'statuses_count' => intval($countitms),
+			'lang' => '',
+			'contributors_enabled' => false,
+			'is_translator' => false,
+			'is_translation_enabled' => false,
+			'following' => (($uinfo[0]['rel'] == CONTACT_IS_FOLLOWER) OR ($uinfo[0]['rel'] == CONTACT_IS_FRIEND)),
+			'follow_request_sent' => false,
 			'statusnet_blocking' => false,
 			'notifications' => false,
 			//'statusnet_profile_url' => App::get_baseurl()."/contacts/".$uinfo[0]['cid'],
@@ -663,23 +715,17 @@
 	 * @param array $item : item from db
 	 * @return array(array:author, array:owner)
 	 */
-	function api_item_get_user(&$a, $item) {
+	function api_item_get_user(App $a, $item) {
 
-		// Make sure that there is an entry in the global contacts for author and owner
-		get_gcontact_id(array("url" => $item['author-link'], "network" => $item['network'],
-					"photo" => $item['author-avatar'], "name" => $item['author-name']));
+		$status_user = api_get_user($a, $item["author-link"]);
 
-		get_gcontact_id(array("url" => $item['owner-link'], "network" => $item['network'],
-					"photo" => $item['owner-avatar'], "name" => $item['owner-name']));
-
-		$status_user = api_get_user($a,$item["author-link"]);
 		$status_user["protected"] = (($item["allow_cid"] != "") OR
 						($item["allow_gid"] != "") OR
 						($item["deny_cid"] != "") OR
 						($item["deny_gid"] != "") OR
 						$item["private"]);
 
-		$owner_user = api_get_user($a,$item["owner-link"]);
+		$owner_user = api_get_user($a, $item["owner-link"]);
 
 		return (array($status_user, $owner_user));
 	}
@@ -1108,12 +1154,11 @@
 			$privacy_sql = "";
 
 		// get last public wall message
-		$lastwall = q("SELECT `item`.*, `i`.`contact-id` as `reply_uid`, `i`.`author-link` AS `item-author`
-				FROM `item`, `item` as `i`
+		$lastwall = q("SELECT `item`.*
+				FROM `item`
 				WHERE `item`.`contact-id` = %d AND `item`.`uid` = %d
 					AND ((`item`.`author-link` IN ('%s', '%s')) OR (`item`.`owner-link` IN ('%s', '%s')))
-					AND `i`.`id` = `item`.`parent`
-					AND `item`.`type`!='activity' $privacy_sql
+					AND `item`.`type` != 'activity' $privacy_sql
 				ORDER BY `item`.`id` DESC
 				LIMIT 1",
 				intval($user_info['cid']),
@@ -1127,37 +1172,7 @@
 		if (count($lastwall)>0){
 			$lastwall = $lastwall[0];
 
-			$in_reply_to_status_id = NULL;
-			$in_reply_to_user_id = NULL;
-			$in_reply_to_status_id_str = NULL;
-			$in_reply_to_user_id_str = NULL;
-			$in_reply_to_screen_name = NULL;
-			if (intval($lastwall['parent']) != intval($lastwall['id'])) {
-				$in_reply_to_status_id= intval($lastwall['parent']);
-				$in_reply_to_status_id_str = (string) intval($lastwall['parent']);
-
-				$r = q("SELECT * FROM `gcontact` WHERE `nurl` = '%s'", dbesc(normalise_link($lastwall['item-author'])));
-				if ($r) {
-					if ($r[0]['nick'] == "")
-						$r[0]['nick'] = api_get_nick($r[0]["url"]);
-
-					$in_reply_to_screen_name = (($r[0]['nick']) ? $r[0]['nick'] : $r[0]['name']);
-					$in_reply_to_user_id = intval($r[0]['id']);
-					$in_reply_to_user_id_str = (string) intval($r[0]['id']);
-				}
-			}
-
-			// There seems to be situation, where both fields are identical:
-			// https://github.com/friendica/friendica/issues/1010
-			// This is a bugfix for that.
-			if (intval($in_reply_to_status_id) == intval($lastwall['id'])) {
-				logger('api_status_show: this message should never appear: id: '.$lastwall['id'].' similar to reply-to: '.$in_reply_to_status_id, LOGGER_DEBUG);
-				$in_reply_to_status_id = NULL;
-				$in_reply_to_user_id = NULL;
-				$in_reply_to_status_id_str = NULL;
-				$in_reply_to_user_id_str = NULL;
-				$in_reply_to_screen_name = NULL;
-			}
+			$in_reply_to = api_in_reply_to($lastwall);
 
 			$converted = api_convert_item($lastwall);
 
@@ -1173,11 +1188,11 @@
 				'text' => $converted["text"],
 				'source' => (($lastwall['app']) ? $lastwall['app'] : 'web'),
 				'truncated' => false,
-				'in_reply_to_status_id' => $in_reply_to_status_id,
-				'in_reply_to_status_id_str' => $in_reply_to_status_id_str,
-				'in_reply_to_user_id' => $in_reply_to_user_id,
-				'in_reply_to_user_id_str' => $in_reply_to_user_id_str,
-				'in_reply_to_screen_name' => $in_reply_to_screen_name,
+				'in_reply_to_status_id' => $in_reply_to['status_id'],
+				'in_reply_to_status_id_str' => $in_reply_to['status_id_str'],
+				'in_reply_to_user_id' => $in_reply_to['user_id'],
+				'in_reply_to_user_id_str' => $in_reply_to['user_id_str'],
+				'in_reply_to_screen_name' => $in_reply_to['screen_name'],
 				'user' => $user_info,
 				$geo => NULL,
 				'coordinates' => "",
@@ -1254,29 +1269,7 @@
 		if (count($lastwall)>0){
 			$lastwall = $lastwall[0];
 
-			$in_reply_to_status_id = NULL;
-			$in_reply_to_user_id = NULL;
-			$in_reply_to_status_id_str = NULL;
-			$in_reply_to_user_id_str = NULL;
-			$in_reply_to_screen_name = NULL;
-			if ($lastwall['parent']!=$lastwall['id']) {
-				$reply = q("SELECT `item`.`id`, `item`.`contact-id` as `reply_uid`, `contact`.`nick` as `reply_author`, `item`.`author-link` AS `item-author`
-						FROM `item`,`contact` WHERE `contact`.`id`=`item`.`contact-id` AND `item`.`id` = %d", intval($lastwall['parent']));
-				if (count($reply)>0) {
-					$in_reply_to_status_id = intval($lastwall['parent']);
-					$in_reply_to_status_id_str = (string) intval($lastwall['parent']);
-
-					$r = q("SELECT * FROM `gcontact` WHERE `nurl` = '%s'", dbesc(normalise_link($reply[0]['item-author'])));
-					if ($r) {
-						if ($r[0]['nick'] == "")
-							$r[0]['nick'] = api_get_nick($r[0]["url"]);
-
-						$in_reply_to_screen_name = (($r[0]['nick']) ? $r[0]['nick'] : $r[0]['name']);
-						$in_reply_to_user_id = intval($r[0]['id']);
-						$in_reply_to_user_id_str = (string) intval($r[0]['id']);
-					}
-				}
-			}
+			$in_reply_to = api_in_reply_to($lastwall);
 
 			$converted = api_convert_item($lastwall);
 
@@ -1289,14 +1282,14 @@
 				'text' => $converted["text"],
 				'truncated' => false,
 				'created_at' => api_date($lastwall['created']),
-				'in_reply_to_status_id' => $in_reply_to_status_id,
-				'in_reply_to_status_id_str' => $in_reply_to_status_id_str,
+				'in_reply_to_status_id' => $in_reply_to['status_id'],
+				'in_reply_to_status_id_str' => $in_reply_to['status_id_str'],
 				'source' => (($lastwall['app']) ? $lastwall['app'] : 'web'),
 				'id' => intval($lastwall['contact-id']),
 				'id_str' => (string) $lastwall['contact-id'],
-				'in_reply_to_user_id' => $in_reply_to_user_id,
-				'in_reply_to_user_id_str' => $in_reply_to_user_id_str,
-				'in_reply_to_screen_name' => $in_reply_to_screen_name,
+				'in_reply_to_user_id' => $in_reply_to['user_id'],
+				'in_reply_to_user_id_str' => $in_reply_to['user_id_str'],
+				'in_reply_to_screen_name' => $in_reply_to['screen_name'],
 				$geo => NULL,
 				'favorited' => $lastwall['starred'] ? true : false,
 				'statusnet_html'		=> $converted["html"],
@@ -1335,11 +1328,11 @@
 		$userlist = array();
 
 		if (isset($_GET["q"])) {
-			$r = q("SELECT id FROM `gcontact` WHERE `name`='%s'", dbesc($_GET["q"]));
-			if (!count($r))
-				$r = q("SELECT `id` FROM `gcontact` WHERE `nick`='%s'", dbesc($_GET["q"]));
+			$r = q("SELECT id FROM `contact` WHERE `uid` = 0 AND `name` = '%s'", dbesc($_GET["q"]));
+			if (!dbm::is_result($r))
+				$r = q("SELECT `id` FROM `contact` WHERE `uid` = 0 AND `nick` = '%s'", dbesc($_GET["q"]));
 
-			if (count($r)) {
+			if (dbm::is_result($r)) {
 				$k = 0;
 				foreach ($r AS $user) {
 					$user_info = api_get_user($a, $user["id"], "json");
@@ -1383,7 +1376,6 @@
 		$user_info = api_get_user($a);
 		// get last newtork messages
 
-
 		// params
 		$count = (x($_REQUEST,'count')?$_REQUEST['count']:20);
 		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
@@ -1410,7 +1402,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`uid` = %d AND `verb` = '%s'
 			AND `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			$sql_extra
@@ -1487,7 +1479,7 @@
 			`user`.`nickname`, `user`.`hidewall`
 			FROM `item`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			STRAIGHT_JOIN `user` ON `user`.`uid` = `item`.`uid`
 				AND NOT `user`.`hidewall`
 			WHERE `verb` = '%s' AND `item`.`visible` AND NOT `item`.`deleted` AND NOT `item`.`moderated`
@@ -1554,7 +1546,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			AND `item`.`uid` = %d AND `item`.`verb` = '%s'
 			$sql_extra",
@@ -1630,7 +1622,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`parent` = %d AND `item`.`visible`
 			AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			AND `item`.`uid` = %d AND `item`.`verb` = '%s'
@@ -1684,7 +1676,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item`
 			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 			AND NOT `item`.`private` AND `item`.`allow_cid` = '' AND `item`.`allow`.`gid` = ''
 			AND `item`.`deny_cid` = '' AND `item`.`deny_gid` = ''
@@ -1803,7 +1795,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item` FORCE INDEX (`uid_id`)
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`uid` = %d AND `verb` = '%s'
 			AND NOT (`item`.`author-link` IN ('https://%s', 'http://%s'))
 			AND `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
@@ -1877,7 +1869,7 @@
 			`contact`.`id` AS `cid`
 			FROM `item` FORCE INDEX (`uid_contactid_id`)
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
-				AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			WHERE `item`.`uid` = %d AND `verb` = '%s'
 			AND `item`.`contact-id` = %d
 			AND `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
@@ -2013,7 +2005,7 @@
 				AND `item`.`visible` = 1 and `item`.`moderated` = 0 AND `item`.`deleted` = 0
 				AND `item`.`starred` = 1
 				AND `contact`.`id` = `item`.`contact-id`
-				AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 				$sql_extra
 				AND `item`.`id`>%d
 				ORDER BY `item`.`id` DESC LIMIT %d ,%d ",
@@ -2355,6 +2347,9 @@
 	 * 			dislikes => int count
 	 */
 	function api_format_items_activities(&$item, $type = "json") {
+
+		$a = get_app();
+
 		$activities = array(
 			'like' => array(),
 			'dislike' => array(),
@@ -2373,7 +2368,7 @@
 			//builtin_activity_puller($i, $activities);
 
 			// get user data and add it to the array of the activity
-			$user = api_get_user($a, $i['author-link']);			
+			$user = api_get_user($a, $i['author-link']);
 			switch($i['verb']) {
 				case ACTIVITY_LIKE:
 					$activities['like'][] = $user;
@@ -2462,7 +2457,7 @@
 							'homepage' => $profile['homepage'],
 							'users' => null);
 			return $profile;
-		} 
+		}
 	}
 
 	/**
@@ -2487,43 +2482,7 @@
 			if ($filter_user AND ($status_user["id"] != $user_info["id"]))
 				continue;
 
-			if ($item['thr-parent'] != $item['uri']) {
-				$r = q("SELECT id FROM item WHERE uid=%d AND uri='%s' LIMIT 1",
-					intval(api_user()),
-					dbesc($item['thr-parent']));
-				if ($r)
-					$in_reply_to_status_id = intval($r[0]['id']);
-				else
-					$in_reply_to_status_id = intval($item['parent']);
-
-				$in_reply_to_status_id_str = (string) intval($item['parent']);
-
-				$in_reply_to_screen_name = NULL;
-				$in_reply_to_user_id = NULL;
-				$in_reply_to_user_id_str = NULL;
-
-				$r = q("SELECT `author-link` FROM item WHERE uid=%d AND id=%d LIMIT 1",
-					intval(api_user()),
-					intval($in_reply_to_status_id));
-				if ($r) {
-					$r = q("SELECT * FROM `gcontact` WHERE `url` = '%s'", dbesc(normalise_link($r[0]['author-link'])));
-
-					if ($r) {
-						if ($r[0]['nick'] == "")
-							$r[0]['nick'] = api_get_nick($r[0]["url"]);
-
-						$in_reply_to_screen_name = (($r[0]['nick']) ? $r[0]['nick'] : $r[0]['name']);
-						$in_reply_to_user_id = intval($r[0]['id']);
-						$in_reply_to_user_id_str = (string) intval($r[0]['id']);
-					}
-				}
-			} else {
-				$in_reply_to_screen_name = NULL;
-				$in_reply_to_user_id = NULL;
-				$in_reply_to_status_id = NULL;
-				$in_reply_to_user_id_str = NULL;
-				$in_reply_to_status_id_str = NULL;
-			}
+			$in_reply_to = api_in_reply_to($item);
 
 			$converted = api_convert_item($item);
 
@@ -2536,14 +2495,14 @@
 				'text'		=> $converted["text"],
 				'truncated' => False,
 				'created_at'=> api_date($item['created']),
-				'in_reply_to_status_id' => $in_reply_to_status_id,
-				'in_reply_to_status_id_str' => $in_reply_to_status_id_str,
+				'in_reply_to_status_id' => $in_reply_to['status_id'],
+				'in_reply_to_status_id_str' => $in_reply_to['status_id_str'],
 				'source'    => (($item['app']) ? $item['app'] : 'web'),
 				'id'		=> intval($item['id']),
 				'id_str'	=> (string) intval($item['id']),
-				'in_reply_to_user_id' => $in_reply_to_user_id,
-				'in_reply_to_user_id_str' => $in_reply_to_user_id_str,
-				'in_reply_to_screen_name' => $in_reply_to_screen_name,
+				'in_reply_to_user_id' => $in_reply_to['user_id'],
+				'in_reply_to_user_id_str' => $in_reply_to['user_id_str'],
+				'in_reply_to_screen_name' => $in_reply_to['screen_name'],
 				$geo => NULL,
 				'favorited' => $item['starred'] ? true : false,
 				'user' =>  $status_user ,
@@ -2568,9 +2527,9 @@
 
 			// Retweets are only valid for top postings
 			// It doesn't work reliable with the link if its a feed
-			#$IsRetweet = ($item['owner-link'] != $item['author-link']);
-			#if ($IsRetweet)
-			#	$IsRetweet = (($item['owner-name'] != $item['author-name']) OR ($item['owner-avatar'] != $item['author-avatar']));
+			//$IsRetweet = ($item['owner-link'] != $item['author-link']);
+			//if ($IsRetweet)
+			//	$IsRetweet = (($item['owner-name'] != $item['author-name']) OR ($item['owner-avatar'] != $item['author-avatar']));
 
 
 			if ($item["id"] == $item["parent"]) {
@@ -2695,7 +2654,7 @@
 		if ($user_info['self'] == 0)
 			$sql_extra = " AND false ";
 
-		$r = q("SELECT `nurl` FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 AND `pending` = 0 $sql_extra",
+		$r = q("SELECT `nurl` FROM `contact` WHERE `uid` = %d AND NOT `self` AND (NOT `blocked` OR `pending`) $sql_extra",
 			intval(api_user())
 		);
 
@@ -2740,11 +2699,11 @@
 		$logo = App::get_baseurl() . '/images/friendica-64.png';
 		$email = $a->config['admin_email'];
 		$closed = (($a->config['register_policy'] == REGISTER_CLOSED) ? 'true' : 'false');
-		$private = (($a->config['system']['block_public']) ? 'true' : 'false');
+		$private = ((Config::get('system', 'block_public')) ? 'true' : 'false');
 		$textlimit = (string) (($a->config['max_import_size']) ? $a->config['max_import_size'] : 200000);
 		if($a->config['api_import_size'])
 			$texlimit = string($a->config['api_import_size']);
-		$ssl = (($a->config['system']['have_ssl']) ? 'true' : 'false');
+		$ssl = ((Config::get('system', 'have_ssl')) ? 'true' : 'false');
 		$sslserver = (($ssl === 'true') ? str_replace('http:','https:',App::get_baseurl()) : '');
 
 		$config = array(
@@ -2796,11 +2755,13 @@
 
 		$stringify_ids = (x($_REQUEST,'stringify_ids')?$_REQUEST['stringify_ids']:false);
 
-		$r = q("SELECT `gcontact`.`id` FROM `contact`, `gcontact` WHERE `contact`.`nurl` = `gcontact`.`nurl` AND `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` $sql_extra",
+		$r = q("SELECT `pcontact`.`id` FROM `contact`
+				INNER JOIN `contact` AS `pcontact` ON `contact`.`nurl` = `pcontact`.`nurl` AND `pcontact`.`uid` = 0
+				WHERE `contact`.`uid` = %s AND NOT `contact`.`self`",
 			intval(api_user())
 		);
 
-		if(!dbm::is_result($r))
+		if (!dbm::is_result($r))
 			return;
 
 		$ids = array();
@@ -2891,7 +2852,7 @@
 	 * @brief delete a direct_message from mail table through api
 	 *
 	 * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
- 	 * @return string 
+	 * @return string
 	 */
 	function api_direct_messages_destroy($type){
 		$a = get_app();
@@ -2919,14 +2880,14 @@
 		// BadRequestException if no id specified (for clients using Twitter API)
 		if ($id == 0) throw new BadRequestException('Message id not specified');
 
-		// add parent-uri to sql command if specified by calling app		
+		// add parent-uri to sql command if specified by calling app
 		$sql_extra = ($parenturi != "" ? " AND `parent-uri` = '" . dbesc($parenturi) . "'" : "");
 
 		// get data of the specified message id
 		$r = q("SELECT `id` FROM `mail` WHERE `uid` = %d AND `id` = %d" . $sql_extra,
-			intval($uid), 
+			intval($uid),
 			intval($id));
-	
+
 		// error message if specified id is not in database
 		if (!dbm::is_result($r)) {
 			if ($verbose == "true") {
@@ -2938,8 +2899,8 @@
 		}
 
 		// delete message
-		$result = q("DELETE FROM `mail` WHERE `uid` = %d AND `id` = %d" . $sql_extra, 
-			intval($uid), 
+		$result = q("DELETE FROM `mail` WHERE `uid` = %d AND `id` = %d" . $sql_extra,
+			intval($uid),
 			intval($id));
 
 		if ($verbose == "true") {
@@ -3113,8 +3074,8 @@
 		'image/gif' => 'gif'
 		);
 		$data = array('photo'=>array());
-		if($r) {
-			foreach($r as $rr) {
+		if ($r) {
+			foreach ($r as $rr) {
 				$photo = array();
 				$photo['id'] = $rr['resource-id'];
 				$photo['album'] = $rr['album'];
@@ -3219,7 +3180,7 @@
 			intval(api_user())
 		);
 
-		if ((! count($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+		if ((! dbm::is_result($r)) || ($r[0]['network'] !== NETWORK_DFRN))
 			throw new BadRequestException("Unknown contact");
 
 		$cid = $r[0]['id'];
@@ -3263,15 +3224,15 @@
 	function api_share_as_retweet(&$item) {
 		$body = trim($item["body"]);
 
-		if (diaspora::is_reshare($body, false)===false) {
+		if (Diaspora::is_reshare($body, false)===false) {
 			return false;
 		}
 
 		$attributes = preg_replace("/\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","$1",$body);
- 		// Skip if there is no shared message in there
- 		// we already checked this in diaspora::is_reshare()
- 		// but better one more than one less...
- 		if ($body == $attributes)
+		// Skip if there is no shared message in there
+		// we already checked this in diaspora::is_reshare()
+		// but better one more than one less...
+		if ($body == $attributes)
 			return false;
 
 
@@ -3350,7 +3311,7 @@
 
 		$nick = "";
 
-		$r = q("SELECT `nick` FROM `gcontact` WHERE `nurl` = '%s'",
+		$r = q("SELECT `nick` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s'",
 			dbesc(normalise_link($profile)));
 		if ($r)
 			$nick = $r[0]["nick"];
@@ -3407,6 +3368,60 @@
 			return($nick);
 
 		return(false);
+	}
+
+	function api_in_reply_to($item) {
+		$in_reply_to = array();
+
+		$in_reply_to['status_id'] = NULL;
+		$in_reply_to['user_id'] = NULL;
+		$in_reply_to['status_id_str'] = NULL;
+		$in_reply_to['user_id_str'] = NULL;
+		$in_reply_to['screen_name'] = NULL;
+
+		if (($item['thr-parent'] != $item['uri']) AND (intval($item['parent']) != intval($item['id']))) {
+			$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s' LIMIT 1",
+				intval($item['uid']),
+				dbesc($item['thr-parent']));
+
+			if (dbm::is_result($r)) {
+				$in_reply_to['status_id'] = intval($r[0]['id']);
+			} else {
+				$in_reply_to['status_id'] = intval($item['parent']);
+			}
+
+			$in_reply_to['status_id_str'] = (string) intval($in_reply_to['status_id']);
+
+			$r = q("SELECT `contact`.`nick`, `contact`.`name`, `contact`.`id`, `contact`.`url` FROM item
+				STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`author-id`
+				WHERE `item`.`id` = %d LIMIT 1",
+				intval($in_reply_to['status_id'])
+			);
+
+			if (dbm::is_result($r)) {
+				if ($r[0]['nick'] == "") {
+					$r[0]['nick'] = api_get_nick($r[0]["url"]);
+				}
+
+				$in_reply_to['screen_name'] = (($r[0]['nick']) ? $r[0]['nick'] : $r[0]['name']);
+				$in_reply_to['user_id'] = intval($r[0]['id']);
+				$in_reply_to['user_id_str'] = (string) intval($r[0]['id']);
+			}
+
+			// There seems to be situation, where both fields are identical:
+			// https://github.com/friendica/friendica/issues/1010
+			// This is a bugfix for that.
+			if (intval($in_reply_to['status_id']) == intval($item['id'])) {
+				logger('this message should never appear: id: '.$item['id'].' similar to reply-to: '.$in_reply_to['status_id'], LOGGER_DEBUG);
+				$in_reply_to['status_id'] = NULL;
+				$in_reply_to['user_id'] = NULL;
+				$in_reply_to['status_id_str'] = NULL;
+				$in_reply_to['user_id_str'] = NULL;
+				$in_reply_to['screen_name'] = NULL;
+			}
+		}
+
+		return $in_reply_to;
 	}
 
 	function api_clean_plain_items($Text) {
@@ -3517,7 +3532,7 @@
 				intval($uid),
 				intval($gid));
 			// error message if specified gid is not in database
-			if (count($r) == 0)
+			if (!dbm::is_result($r))
 				throw new BadRequestException("gid not available");
 		}
 		else
@@ -3572,7 +3587,7 @@
 			intval($uid),
 			intval($gid));
 		// error message if specified gid is not in database
-		if (count($r) == 0)
+		if (!dbm::is_result($r))
 			throw new BadRequestException('gid not available');
 
 		// get data of the specified group id and group name
@@ -3581,7 +3596,7 @@
 			intval($gid),
 			dbesc($name));
 		// error message if specified gid is not in database
-		if (count($rname) == 0)
+		if (!dbm::is_result($rname))
 			throw new BadRequestException('wrong group name');
 
 		// delete group
@@ -3620,7 +3635,7 @@
 			intval($uid),
 			dbesc($name));
 		// error message if specified group name already exists
-		if (count($rname) != 0)
+		if (dbm::is_result($rname))
 			throw new BadRequestException('group name already exists');
 
 		// check if specified group name is a deleted group
@@ -3628,7 +3643,7 @@
 			intval($uid),
 			dbesc($name));
 		// error message if specified group name already exists
-		if (count($rname) != 0)
+		if (dbm::is_result($rname))
 			$reactivate_group = true;
 
 		// create group
@@ -3851,7 +3866,7 @@
 
 		// get data of the specified message id
 		$r = q("SELECT `id` FROM `mail` WHERE `id` = %d AND `uid` = %d",
-			intval($id), 
+			intval($id),
 			intval($uid));
 		// error message if specified id is not in database
 		if (!dbm::is_result($r)) {
@@ -3860,8 +3875,8 @@
 		}
 
 		// update seen indicator
-		$result = q("UPDATE `mail` SET `seen` = 1 WHERE `id` = %d AND `uid` = %d", 
-			intval($id), 
+		$result = q("UPDATE `mail` SET `seen` = 1 WHERE `id` = %d AND `uid` = %d",
+			intval($id),
 			intval($uid));
 
 		if ($result) {
@@ -3895,7 +3910,7 @@
 		$user_info = api_get_user($a);
 		$searchstring = (x($_REQUEST,'searchstring') ? $_REQUEST['searchstring'] : "");
 		$uid = $user_info['uid'];
-	
+
 		// error if no searchstring specified
 		if ($searchstring == "") {
 			$answer = array('result' => 'error', 'message' => 'searchstring not specified');
@@ -3910,7 +3925,9 @@
 
 		$profile_url = $user_info["url"];
 		// message if nothing was found
-		if (count($r) == 0) 
+		if (!dbm::is_result($r))
+			$success = array('success' => false, 'search_results' => 'problem with query');
+		else if (count($r) == 0)
 			$success = array('success' => false, 'search_results' => 'nothing found');
 		else {
 			$ret = Array();
@@ -3931,7 +3948,6 @@
 		return api_format_data("direct_message_search", $type, array('$result' => $success));
 	}
 	api_register_func('api/friendica/direct_messages_search', 'api_friendica_direct_messages_search', true);
-
 
 	/**
 	 * @brief return data of all the profiles a user has to the client
@@ -3957,7 +3973,7 @@
 				intval(api_user()),
 				intval($profileid));
 			// error message if specified gid is not in database
-			if (count($r) == 0)
+			if (!dbm::is_result($r))
 				throw new BadRequestException("profile_id not available");
 		}
 		else

@@ -38,7 +38,6 @@
 			<form id="profile-jot-form" action="{{$action}}" method="post">
 				<div id="profile-jot-wrapper">
 					<div>
-						<div id="character-counter" class="grey jothidden text-info pull-left"></div>
 						<!--<div id="profile-jot-desc" class="jothidden pull-right">&nbsp;</div>-->
 					</div>
 
@@ -63,7 +62,7 @@
 
 					{{* The jot text field in which the post text is inserted *}}
 					<div id="jot-text-wrap">
-					<textarea rows="2" cols="64" class="profile-jot-text form-control text-autosize" id="profile-jot-text" name="body" onFocus="jotTextOpenUI(this);" onBlur="jotTextCloseUI(this);" style="min-width:100%; max-width:100%;">{{if $content}}{{$content}}{{else}}{{$share}}{{/if}}</textarea>
+					<textarea rows="2" cols="64" class="profile-jot-text form-control text-autosize" id="profile-jot-text" name="body" placeholder="{{$share}}" onFocus="jotTextOpenUI(this);" onBlur="jotTextCloseUI(this);" style="min-width:100%; max-width:100%;">{{if $content}}{{$content}}{{/if}}</textarea>
 					</div>
 
 					<ul id="profile-jot-submit-wrapper" class="jothidden nav nav-pills">
@@ -75,14 +74,15 @@
 						<li><a id="profile-video" onclick="jotVideoURL();return false;" title="{{$video}}"><i class="fa fa-film"></i></a></li>
 						<li><a id="profile-audio" onclick="jotAudioURL();return false;" title="{{$audio}}"><i class="fa fa-music"></i></a></li>
 						<li><a id="profile-location" onclick="jotGetLocation();return false;" title="{{$setloc}}"><i class="fa fa-map-marker"></i></a></li>
-						<!-- TODO: waiting for a better placement 
+						<!-- TODO: waiting for a better placement
 						<li><a id="profile-nolocation" onclick="jotClearLocation();return false;" title="{{$noloc}}">{{$shortnoloc}}</a></li>
 						-->
 
 						<li class="pull-right"><button class="btn btn-primary" id="jot-submit" type="submit" id="profile-jot-submit" name="submit" ><i class="fa fa-slideshare fa-fw"></i> {{$share}}</button></li>
+						<li id="character-counter" class="grey jothidden text-info pull-right"></li>
 						<div id="profile-rotator-wrapper" style="display: {{$visitor}};" >
 							<img id="profile-rotator" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait}}" style="display: none;" />
-						</div> 
+						</div>
 						<div id="profile-jot-plugin-wrapper">
 							{{$jotplugins}}
 						</div>
@@ -123,9 +123,5 @@ can load different content into the jot moadl (e.g. the item edit jot)
 	$('iframe').load(function() {
 		this.style.height = this.contentWindow.document.body.offsetHeight + 'px';
 	});
-
-	// insert new object with value to aStr
-	// function jotTextOpenUI does make use of it
-	aStr.share = "{{$share}}";
 </script>
 

@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="view/theme/frio/frameworks/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" type="text/css" media="screen"/>
 <link rel="stylesheet" href="view/theme/frio/frameworks/justifiedGallery/justifiedGallery.min.css" type="text/css" media="screen"/>
 <link rel="stylesheet" href="view/theme/frio/frameworks/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css" type="text/css" media="screen"/>
+<link rel="stylesheet" href="view/theme/frio/frameworks/bootstrap-toggle/css/bootstrap-toggle.min.css" type="text/css" media="screen"/>
 <link rel="stylesheet" href="view/theme/frio/font/open_sans/open-sans.css" type="text/css" media="screen"/>
 
 {{* The own style.css *}}
@@ -39,11 +40,15 @@
 <link rel="shortcut icon" href="{{$shortcut_icon}}" />
 <link rel="apple-touch-icon" href="{{$touch_icon}}"/>
 
-<meta name="apple-mobile-web-app-capable" content="yes" /> 
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<script>
+// Prevents links to switch to Safari in a home screen app - see https://gist.github.com/irae/1042167
+(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(chref=d.href).replace(e.href,"").indexOf("#")&&(!/^[a-z\+\.\-]+:/i.test(chref)||chref.indexOf(e.protocol+"//"+e.host)===0)&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone");
+</script>
 
 <link rel="search"
-         href="{{$baseurl}}/opensearch" 
-         type="application/opensearchdescription+xml" 
+         href="{{$baseurl}}/opensearch"
+         type="application/opensearchdescription+xml"
          title="Search in Friendica" />
 
 
@@ -61,8 +66,7 @@
 <script type="text/javascript" src="library/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="library/jgrowl/jquery.jgrowl_minimized.js"></script>
 <script type="text/javascript" src="library/datetimepicker/jquery.datetimepicker.js"></script>
-<script type="text/javascript" src="library/tinymce/jscripts/tiny_mce/tiny_mce_src.js" ></script>
-<script type="text/javascript" src="library/perfect-scrollbar/perfect-scrollbar.jquery.js" ></script>
+<script type="text/javascript" src="library/perfect-scrollbar/perfect-scrollbar.jquery.min.js" ></script>
 <script type="text/javascript" src="js/acl.js" ></script>
 <script type="text/javascript" src="js/webtoolkit.base64.js" ></script>
 <script type="text/javascript" src="js/main.js" ></script>

@@ -6,7 +6,7 @@ Bugs und Probleme
 Du solltest jeden Bug und jedes Problem, den/das Du findest, zunächst dem Administrator (oder gegebenenfalls der Support-Seite) Deines Servers melden, statt auf der allgemeinen Bug-Seite. 
 Das erleichtert den Entwicklern ihre Arbeit (z. B. neue Features zu entwickeln), da sie sich nicht mit Fehlern beschäftigen müssen, mit denen sie nichts zu tun haben.
 
-Wenn Du technisch versiert bist oder Dein Knoten keine Support-Seite hat, dann kannst Du den <a href="http://bugs.friendica.com/">Bug Tracker</a> nutzen. 
+Wenn Du technisch versiert bist oder Dein Knoten keine Support-Seite hat, dann kannst Du den <a href="https://github.com/friendica/friendica/issues">Bug Tracker</a> nutzen. 
 Bitte durchsuche zunächst die Seite, ob es bereits einen offenen Bug gibt, der Deiner Anfrage entspricht. 
 
 Liefere so viele Informationen wie möglich zu dem Bug. 

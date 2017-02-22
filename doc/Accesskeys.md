@@ -1,6 +1,8 @@
 Accesskeys in Friendica
 =======================
 
+* [Home](help)
+
 General
 -------
 * p: profile

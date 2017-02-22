@@ -146,7 +146,7 @@ class exAuth {
 	 * @param array $aCommand The command array
 	 */
 	private function isuser($aCommand) {
-		global $a;
+		$a = get_app();
 
 		// Check if there is a username
 		if (!isset($aCommand[1])) {
@@ -159,14 +159,19 @@ class exAuth {
 		$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
 		$this->writeDebugLog("[debug] checking isuser for ". $sUser."@".$aCommand[2]);
 
-		// If the hostnames doesn't match, we try to check remotely
-		if ($a->get_hostname() != $aCommand[2])
-			$found = $this->check_user($aCommand[2], $aCommand[1], true);
-		else {
+		// Does the hostname match? So we try directly
+		if ($a->get_hostname() == $aCommand[2]) {
 			$sQuery = "SELECT `uid` FROM `user` WHERE `nickname`='".dbesc($sUser)."'";
 			$this->writeDebugLog("[debug] using query ". $sQuery);
 			$r = q($sQuery);
 			$found = dbm::is_result($r);
+		} else {
+			$found = false;
+		}
+
+		// If the hostnames doesn't match or there is some failure, we try to check remotely
+		if (!$found) {
+			$found = $this->check_user($aCommand[2], $aCommand[1], true);
 		}
 
 		if ($found) {
@@ -214,7 +219,7 @@ class exAuth {
 	 * @param array $aCommand The command array
 	 */
 	private function auth($aCommand) {
-		global $a;
+		$a = get_app();
 
 		// check user authentication
 		if (sizeof($aCommand) != 4) {
@@ -227,10 +232,8 @@ class exAuth {
 		$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
 		$this->writeDebugLog("[debug] doing auth for ".$sUser."@".$aCommand[2]);
 
-		// If the hostnames doesn't match, we try to authenticate remotely
-		if ($a->get_hostname() != $aCommand[2])
-			$Error = !$this->check_credentials($aCommand[2], $aCommand[1], $aCommand[3], true);
-		else {
+		// Does the hostname match? So we try directly
+		if ($a->get_hostname() == $aCommand[2]) {
 			$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `nickname`='".dbesc($sUser)."'";
 			$this->writeDebugLog("[debug] using query ". $sQuery);
 			if ($oResult = q($sQuery)) {
@@ -246,6 +249,13 @@ class exAuth {
 				$this->writeLog("[exAuth] got password ".$oConfig[0]["v"]);
 				$Error = ($aCommand[3] != $oConfig[0]["v"]);
 			}
+		} else {
+			$Error = true;
+		}
+
+		// If the hostnames doesn't match or there is some failure, we try to check remotely
+		if ($Error) {
+			$Error = !$this->check_credentials($aCommand[2], $aCommand[1], $aCommand[3], true);
 		}
 
 		if ($Error) {

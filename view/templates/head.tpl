@@ -18,12 +18,15 @@
 <link rel="shortcut icon" href="{{$shortcut_icon}}" />
 <link rel="apple-touch-icon" href="{{$touch_icon}}"/>
 
-<meta name="apple-mobile-web-app-capable" content="yes" /> 
-
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<script>
+// Prevents links to switch to Safari in a home screen app - see https://gist.github.com/irae/1042167
+(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(chref=d.href).replace(e.href,"").indexOf("#")&&(!/^[a-z\+\.\-]+:/i.test(chref)||chref.indexOf(e.protocol+"//"+e.host)===0)&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone");
+</script>
 
 <link rel="search"
-         href="{{$baseurl}}/opensearch" 
-         type="application/opensearchdescription+xml" 
+         href="{{$baseurl}}/opensearch"
+         type="application/opensearchdescription+xml"
          title="Search in Friendica" />
 
 <!--[if IE]>
@@ -39,8 +42,7 @@
 <script type="text/javascript" src="library/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="library/jgrowl/jquery.jgrowl_minimized.js"></script>
 <script type="text/javascript" src="library/datetimepicker/jquery.datetimepicker.js"></script>
-<script type="text/javascript" src="library/tinymce/jscripts/tiny_mce/tiny_mce_src.js" ></script>
-<script type="text/javascript" src="library/perfect-scrollbar/perfect-scrollbar.jquery.js" ></script>
+<script type="text/javascript" src="library/perfect-scrollbar/perfect-scrollbar.jquery.min.js" ></script>
 <script type="text/javascript" src="js/acl.js" ></script>
 <script type="text/javascript" src="js/webtoolkit.base64.js" ></script>
 <script type="text/javascript" src="js/main.js" ></script>
@@ -53,14 +55,14 @@
 	For the relevant js part look at function loadContent() in main.js. *}}
 	{{if $infinite_scroll}}
 	var infinite_scroll = {
-				'pageno'	: {{$infinite_scroll.pageno}},
-				'reload_uri'	: "{{$infinite_scroll.reload_uri}}"
-				}
+		"pageno"	: {{$infinite_scroll.pageno}},
+		"reload_uri"	: "{{$infinite_scroll.reload_uri}}"
+	}
 	{{/if}}
 
 	function confirmDelete() { return confirm("{{$delitem}}"); }
 	function commentExpand(id) {
-		$("#comment-edit-text-" + id).value = '';
+		$("#comment-edit-text-" + id).value = "";
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 		$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 		$("#comment-edit-text-" + id).focus();
@@ -69,8 +71,7 @@
 		return true;
 	}
 	function commentOpen(obj,id) {
-		if(obj.value == '{{$comment}}') {
-			obj.value = '';
+		if (obj.value == "") {
 			$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 			$("#mod-cmnt-wrap-" + id).show();
@@ -80,8 +81,7 @@
 		return false;
 	}
 	function commentClose(obj,id) {
-		if(obj.value == '') {
-			obj.value = '{{$comment}}';
+		if (obj.value == "") {
 			$("#comment-edit-text-" + id).removeClass("comment-edit-text-full");
 			$("#comment-edit-text-" + id).addClass("comment-edit-text-empty");
 			$("#mod-cmnt-wrap-" + id).hide();
@@ -94,46 +94,43 @@
 
 	function commentInsert(obj,id) {
 		var tmpStr = $("#comment-edit-text-" + id).val();
-		if(tmpStr == '{{$comment}}') {
-			tmpStr = '';
+		if (tmpStr == "") {
 			$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 			openMenu("comment-edit-submit-wrapper-" + id);
 		}
 		var ins = $(obj).html();
-		ins = ins.replace('&lt;','<');
-		ins = ins.replace('&gt;','>');
-		ins = ins.replace('&amp;','&');
-		ins = ins.replace('&quot;','"');
+		ins = ins.replace("&lt;","<");
+		ins = ins.replace("&gt;",">");
+		ins = ins.replace("&amp;","&");
+		ins = ins.replace("&quot;","\"");
 		$("#comment-edit-text-" + id).val(tmpStr + ins);
 	}
 
 	function qCommentInsert(obj,id) {
 		var tmpStr = $("#comment-edit-text-" + id).val();
-		if(tmpStr == '{{$comment}}') {
-			tmpStr = '';
+		if (tmpStr == "") {
 			$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 			openMenu("comment-edit-submit-wrapper-" + id);
 		}
 		var ins = $(obj).val();
-		ins = ins.replace('&lt;','<');
-		ins = ins.replace('&gt;','>');
-		ins = ins.replace('&amp;','&');
-		ins = ins.replace('&quot;','"');
+		ins = ins.replace("&lt;","<");
+		ins = ins.replace("&gt;",">");
+		ins = ins.replace("&amp;","&");
+		ins = ins.replace("&quot;","\"");
 		$("#comment-edit-text-" + id).val(tmpStr + ins);
-		$(obj).val('');
+		$(obj).val("");
 	}
 
 	window.showMore = "{{$showmore}}";
 	window.showFewer = "{{$showfewer}}";
 
 	function showHideCommentBox(id) {
-		if( $('#comment-edit-form-' + id).is(':visible')) {
-			$('#comment-edit-form-' + id).hide();
-		}
-		else {
-			$('#comment-edit-form-' + id).show();
+		if ($("#comment-edit-form-" + id).is(":visible")) {
+			$("#comment-edit-form-" + id).hide();
+		} else {
+			$("#comment-edit-form-" + id).show();
 		}
 	}
 

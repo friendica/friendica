@@ -5,15 +5,16 @@ require_once('include/Contact.php');
 require_once('include/contact_selectors.php');
 require_once('mod/contacts.php');
 
-function dirfind_init(&$a) {
+function dirfind_init(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
 		return;
 	}
 
-	if(! x($a->page,'aside'))
+	if (! x($a->page,'aside')) {
 		$a->page['aside'] = '';
+	}
 
 	$a->page['aside'] .= findpeople_widget();
 
@@ -22,7 +23,7 @@ function dirfind_init(&$a) {
 
 
 
-function dirfind_content(&$a, $prefix = "") {
+function dirfind_content(App $a, $prefix = "") {
 
 	$community = false;
 	$discover_user = false;
@@ -31,7 +32,7 @@ function dirfind_content(&$a, $prefix = "") {
 
 	$search = $prefix.notags(trim($_REQUEST['search']));
 
-	if(strpos($search,'@') === 0) {
+	if (strpos($search,'@') === 0) {
 		$search = substr($search,1);
 		$header = sprintf( t('People Search - %s'), $search);
 		if ((valid_email($search) AND validate_email($search)) OR
@@ -41,7 +42,7 @@ function dirfind_content(&$a, $prefix = "") {
 		}
 	}
 
-	if(strpos($search,'!') === 0) {
+	if (strpos($search,'!') === 0) {
 		$search = substr($search,1);
 		$community = true;
 		$header = sprintf( t('Forum Search - %s'), $search);
@@ -49,7 +50,7 @@ function dirfind_content(&$a, $prefix = "") {
 
 	$o = '';
 
-	if($search) {
+	if ($search) {
 
 		if ($discover_user) {
 			$j = new stdClass();
@@ -85,18 +86,21 @@ function dirfind_content(&$a, $prefix = "") {
 			$perpage = 80;
 			$startrec = (($a->pager['page']) * $perpage) - $perpage;
 
-			if (get_config('system','diaspora_enabled'))
+			if (get_config('system','diaspora_enabled')) {
 				$diaspora = NETWORK_DIASPORA;
-			else
+			} else {
 				$diaspora = NETWORK_DFRN;
+			}
 
-			if (!get_config('system','ostatus_disabled'))
+			if (!get_config('system','ostatus_disabled')) {
 				$ostatus = NETWORK_OSTATUS;
-			else
+			} else {
 				$ostatus = NETWORK_DFRN;
+			}
 
 			$search2 = "%".$search."%";
 
+			/// @TODO These 2 SELECTs are not checked on validity with dbm::is_result()
 			$count = q("SELECT count(*) AS `total` FROM `gcontact`
 					LEFT JOIN `contact` ON `contact`.`nurl` = `gcontact`.`nurl`
 						AND `contact`.`network` = `gcontact`.`network`
@@ -133,8 +137,9 @@ function dirfind_content(&$a, $prefix = "") {
 			$j->items_page = $perpage;
 			$j->page = $a->pager['page'];
 			foreach ($results AS $result) {
-				if (poco_alternate_ostatus_url($result["url"]))
-					 continue;
+				if (poco_alternate_ostatus_url($result["url"])) {
+					continue;
+				}
 
 				$result = get_contact_details_by_url($result["url"], local_user(), $result);
 
@@ -167,16 +172,16 @@ function dirfind_content(&$a, $prefix = "") {
 			$j = json_decode($x);
 		}
 
-		if($j->total) {
+		if ($j->total) {
 			$a->set_pager_total($j->total);
 			$a->set_pager_itemspage($j->items_page);
 		}
 
-		if(count($j->results)) {
+		if (count($j->results)) {
 
 			$id = 0;
 
-			foreach($j->results as $jj) {
+			foreach ($j->results as $jj) {
 
 				$alt_text = "";
 
@@ -194,10 +199,11 @@ function dirfind_content(&$a, $prefix = "") {
 						$photo_menu = contact_photo_menu($contact[0]);
 						$details = _contact_detail_for_template($contact[0]);
 						$alt_text = $details['alt_text'];
-					} else
+					} else {
 						$photo_menu = array();
+					}
 				} else {
-					$connlnk = $a->get_baseurl().'/follow/?url='.(($jj->connect) ? $jj->connect : $jj->url);
+					$connlnk = App::get_baseurl().'/follow/?url='.(($jj->connect) ? $jj->connect : $jj->url);
 					$conntxt = t('Connect');
 					$photo_menu = array(
 						'profile' => array(t("View Profile"), zrl($jj->url)),
@@ -220,7 +226,7 @@ function dirfind_content(&$a, $prefix = "") {
 					'details'       => $contact_details['location'],
 					'tags'          => $contact_details['keywords'],
 					'about'         => $contact_details['about'],
-					'account_type'  => (($contact_details['community']) ? t('Forum') : ''),
+					'account_type'  => account_type($contact_details),
 					'network' => network_to_name($jj->network, $jj->url),
 					'id' => ++$id,
 				);
@@ -235,8 +241,7 @@ function dirfind_content(&$a, $prefix = "") {
 			'$paginate' => paginate($a),
 		));
 
-		}
-		else {
+		} else {
 			info( t('No matches') . EOL);
 		}
 
