@@ -37,7 +37,7 @@ define('UPDATE_VERSION' , 1214);
  */
 
 
-
+/// @TODO These old updates need to have UPDATE_SUCCESS returned on success?
 function update_1000() {
 
 	q("ALTER TABLE `item` DROP `like`, DROP `dislike` ");
@@ -157,14 +157,15 @@ function update_1014() {
 	$r = q("SELECT * FROM `contact` WHERE 1");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
-			if(stristr($rr['thumb'],'avatar'))
+			if (stristr($rr['thumb'],'avatar')) {
 				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('avatar','micro',$rr['thumb'])),
 					intval($rr['id']));
-			else
+			} else {
 				q("UPDATE `contact` SET `micro` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('5.jpg','6.jpg',$rr['thumb'])),
 					intval($rr['id']));
+			}
 		}
 	}
 }
@@ -308,9 +309,9 @@ function update_1030() {
 function update_1031() {
 	// Repair any bad links that slipped into the item table
 	$r = q("SELECT `id`, `object` FROM `item` WHERE `object` != '' ");
-	if($r && dbm::is_result($r)) {
+	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
-			if(strstr($rr['object'],'type=&quot;http')) {
+			if (strstr($rr['object'],'type=&quot;http')) {
 				q("UPDATE `item` SET `object` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('type=&quot;http','href=&quot;http',$rr['object'])),
 					intval($rr['id'])
@@ -368,13 +369,11 @@ function update_1036() {
 }
 
 function update_1037() {
-
 	q("ALTER TABLE `contact` CHANGE `lrdd` `alias` CHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ");
-
 }
 
 function update_1038() {
- q("ALTER TABLE `item` ADD `plink` CHAR( 255 ) NOT NULL AFTER `target` ");
+	q("ALTER TABLE `item` ADD `plink` CHAR( 255 ) NOT NULL AFTER `target` ");
 }
 
 function update_1039() {
@@ -532,8 +531,10 @@ function update_1065() {
 
 function update_1066() {
 	$r = q("ALTER TABLE `item` ADD `received` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `edited` ");
-	if($r)
+
+	if ($r) {
 		q("ALTER TABLE `item` ADD INDEX ( `received` ) ");
+	}
 
 	$r = q("UPDATE `item` SET `received` = `edited` WHERE 1");
 }
@@ -595,10 +596,11 @@ function update_1074() {
 	q("ALTER TABLE `user` ADD `hidewall` TINYINT( 1) NOT NULL DEFAULT '0' AFTER `blockwall` ");
 	$r = q("SELECT `uid` FROM `profile` WHERE `is-default` = 1 AND `hidewall` = 1");
 	if (dbm::is_result($r)) {
-		foreach($r as $rr)
+		foreach ($r as $rr) {
 			q("UPDATE `user` SET `hidewall` = 1 WHERE `uid` = %d",
 				intval($rr['uid'])
 			);
+		}
 	}
 	q("ALTER TABLE `profile` DROP `hidewall`");
 }
@@ -614,8 +616,9 @@ function update_1075() {
 				$x = q("SELECT `uid` FROM `user` WHERE `guid` = '%s' LIMIT 1",
 					dbesc($guid)
 				);
-				if(! count($x))
+				if (!dbm::is_result($x)) {
 					$found = false;
+				}
 			} while ($found == true );
 
 			q("UPDATE `user` SET `guid` = '%s' WHERE `uid` = %d",
@@ -684,14 +687,19 @@ function update_1082() {
 	q("ALTER TABLE `photo` ADD `guid` CHAR( 64 ) NOT NULL AFTER `contact-id`,
 		ADD INDEX ( `guid` )  ");
 	// make certain the following code is only executed once
-	$r = q("select `id` from `photo` where `guid` != '' limit 1");
-	if (dbm::is_result($r))
+
+	$r = q("SELECT `id` FROM `photo` WHERE `guid` != '' LIMIT 1");
+
+	if (dbm::is_result($r)) {
 		return;
+	}
+
 	$r = q("SELECT distinct(`resource-id`) FROM `photo` WHERE 1 group by `id`");
+
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			$guid = get_guid();
-			q("update `photo` set `guid` = '%s' where `resource-id` = '%s'",
+			q("UPDATE `photo` SET `guid` = '%s' WHERE `resource-id` = '%s'",
 				dbesc($guid),
 				dbesc($rr['resource-id'])
 			);
@@ -736,11 +744,13 @@ function update_1087() {
 			$x = q("SELECT max(`created`) AS `cdate` FROM `item` WHERE `parent` = %d LIMIT 1",
 				intval($rr['id'])
 			);
-			if(count($x))
+
+			if (dbm::is_result($x)) {
 				q("UPDATE `item` SET `commented` = '%s' WHERE `id` = %d",
 					dbesc($x[0]['cdate']),
 					intval($rr['id'])
 				);
+			}
 		}
 	}
 }
@@ -849,14 +859,14 @@ function update_1099() {
 
 function update_1100() {
 	q("ALTER TABLE `contact` ADD `nurl` CHAR( 255 ) NOT NULL AFTER `url` ");
-	q("alter table contact add index (`nurl`) ");
+	q("ALTER TABLE `contact` ADD INDEX (`nurl`) ");
 
 	require_once('include/text.php');
 
-	$r = q("select id, url from contact where url != '' and nurl = '' ");
+	$r = q("SELECT `id`, `url` FROM `contact` WHERE `url` != '' AND `nurl` = '' ");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
-			q("update contact set nurl = '%s' where id = %d",
+			q("UPDATE `contact` SET `nurl` = '%s' WHERE `id` = %d",
 				dbesc(normalise_link($rr['url'])),
 				intval($rr['id'])
 			);
@@ -886,6 +896,7 @@ function update_1102() {
 
 
 function update_1103() {
+/// @TODO Commented out:
 //	q("ALTER TABLE `item` ADD INDEX ( `wall` ) ");
 	q("ALTER TABLE `item` ADD FULLTEXT ( `tag` ) ");
 	q("ALTER TABLE `contact` ADD INDEX ( `pending` ) ");
@@ -1031,9 +1042,11 @@ function update_1120() {
 
 	$r = q("describe item");
 	if (dbm::is_result($r)) {
-		foreach($r as $rr)
-			if($rr['Field'] == 'spam')
+		foreach ($r as $rr) {
+			if ($rr['Field'] == 'spam') {
 				return;
+			}
+		}
 	}
 	q("ALTER TABLE `item` ADD `spam` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `visible` , ADD INDEX (`spam`) ");
 
@@ -1067,16 +1080,16 @@ function update_1121() {
 }
 
 function update_1122() {
-q("ALTER TABLE `notify` ADD `hash` CHAR( 64 ) NOT NULL AFTER `id` ,
+	q("ALTER TABLE `notify` ADD `hash` CHAR( 64 ) NOT NULL AFTER `id` ,
 ADD INDEX ( `hash` ) ");
 }
 
 function update_1123() {
-set_config('system','allowed_themes','dispy,quattro,testbubble,vier,darkbubble,darkzero,duepuntozero,greenzero,purplezero,quattro-green,slackr');
+	set_config('system','allowed_themes','dispy,quattro,testbubble,vier,darkbubble,darkzero,duepuntozero,greenzero,purplezero,quattro-green,slackr');
 }
 
 function update_1124() {
-q("alter table item add index (`author-name`) ");
+	q("ALTER TABLE `item` ADD INDEX (`author-name`) ");
 }
 
 function update_1125() {
@@ -1112,7 +1125,7 @@ function update_1127() {
 
 
 function update_1128() {
-	q("alter table spam add `date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `term` ");
+	q("ALTER TABLE `spam` ADD `date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `term` ");
 }
 
 function update_1129() {
@@ -1138,9 +1151,9 @@ INDEX ( `username` )
 }
 
 function update_1133() {
-q("ALTER TABLE `user` ADD `unkmail` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `blocktags` , ADD INDEX ( `unkmail` ) ");
-q("ALTER TABLE `user` ADD `cntunkmail` INT NOT NULL DEFAULT '10' AFTER `unkmail` , ADD INDEX ( `cntunkmail` ) ");
-q("ALTER TABLE `mail` ADD `unknown` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `replied` , ADD INDEX ( `unknown` ) ");
+	q("ALTER TABLE `user` ADD `unkmail` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `blocktags` , ADD INDEX ( `unkmail` ) ");
+	q("ALTER TABLE `user` ADD `cntunkmail` INT NOT NULL DEFAULT '10' AFTER `unkmail` , ADD INDEX ( `cntunkmail` ) ");
+	q("ALTER TABLE `mail` ADD `unknown` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `replied` , ADD INDEX ( `unknown` ) ");
 }
 
 function update_1134() {
@@ -1167,38 +1180,38 @@ function update_1136() {
 
 	// order in reverse so that we save the newest entry
 
-	$r = q("select * from config where 1 order by id desc");
+	$r = q("SELECT * FROM `config` WHERE 1 ORDER BY `id` DESC");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			$found = false;
-			foreach($arr as $x) {
-				if($x['cat'] == $rr['cat'] && $x['k'] == $rr['k']) {
+			foreach ($arr as $x) {
+				if ($x['cat'] == $rr['cat'] && $x['k'] == $rr['k']) {
 					$found = true;
-					q("delete from config where id = %d",
+					q("DELETE FROM `config` WHERE `id` = %d",
 						intval($rr['id'])
 					);
 				}
 			}
-			if(! $found) {
+			if (! $found) {
 				$arr[] = $rr;
 			}
 		}
 	}
 
 	$arr = array();
-	$r = q("select * from pconfig where 1 order by id desc");
+	$r = q("SELECT * FROM `pconfig` WHERE 1 ORDER BY `id` DESC");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			$found = false;
-			foreach($arr as $x) {
-				if($x['uid'] == $rr['uid'] && $x['cat'] == $rr['cat'] && $x['k'] == $rr['k']) {
+			foreach ($arr as $x) {
+				if ($x['uid'] == $rr['uid'] && $x['cat'] == $rr['cat'] && $x['k'] == $rr['k']) {
 					$found = true;
-					q("delete from pconfig where id = %d",
+					q("DELETE FROM `pconfig` WHERE `id` = %d",
 						intval($rr['id'])
 					);
 				}
 			}
-			if(! $found) {
+			if (! $found) {
 				$arr[] = $rr;
 			}
 		}
@@ -1210,114 +1223,153 @@ function update_1136() {
 
 
 function update_1137() {
-	q("alter table item_id DROP `face` , DROP `dspr` , DROP `twit` , DROP `stat` ");
-	q("ALTER TABLE `item_id` ADD `sid` CHAR( 255 ) NOT NULL AFTER `uid` , ADD `service` CHAR( 255 ) NOT NULL AFTER `sid` , add index (`sid`), add index ( `service`) ");
+	q("ALTER TABLE `item_id` DROP `face` , DROP `dspr` , DROP `twit` , DROP `stat` ");
+	q("ALTER TABLE `item_id` ADD `sid` CHAR( 255 ) NOT NULL AFTER `uid` , ADD `service` CHAR( 255 ) NOT NULL AFTER `sid` , ADD INDEX (`sid`), ADD INDEX ( `service`) ");
 }
 
 function update_1138() {
-	q("alter table contact add archive tinyint(1) not null default '0' after hidden, add index (archive)");
+	q("ALTER TABLE `contact` ADD `archive` TINYINT(1) NOT NULL DEFAULT '0' AFTER `hidden`, ADD INDEX (`archive`)");
 }
 
 function update_1139() {
-	$r = q("alter table user add account_removed tinyint(1) not null default '0' after expire, add index(account_removed) ");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `user` ADD `account_removed` TINYINT(1) NOT NULL DEFAULT '0' AFTER `expire`, ADD INDEX(`account_removed`)");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1140() {
-	$r = q("alter table addon add hidden tinyint(1) not null default '0' after installed, add index(hidden) ");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `addon` ADD `hidden` TINYINT(1) NOT NULL DEFAULT '0' AFTER `installed`, ADD INDEX(`hidden`) ");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1141() {
-	$r = q("alter table glink add zcid int(11) not null after gcid, add index(zcid) ");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `glink` ADD `zcid` INT(11) NOT NULL AFTER `gcid`, ADD INDEX(`zcid`) ");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 
 function update_1142() {
-	$r = q("alter table user add service_class char(32) not null after expire_notification_sent, add index(service_class) ");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `user` ADD `service_class` CHAR(32) NOT NULL AFTER `expire_notification_sent`, ADD INDEX(`service_class`) ");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1143() {
-	$r = q("alter table user add def_gid int(11) not null default '0' after service_class");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `user` ADD `def_gid` INT(11) NOT NULL DEFAULT '0' AFTER `service_class`");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1144() {
-	$r = q("alter table contact add prv tinyint(1) not null default '0' after forum");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `contact` ADD `prv` TINYINT(1) NOT NULL DEFAULT '0' AFTER `forum`");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1145() {
-	$r = q("alter table profile add howlong datetime not null default '0000-00-00 00:00:00' after `with`");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `profile` ADD `howlong` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `with`");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1146() {
-	$r = q("alter table profile add hometown char(255) not null after `country-name`, add index ( `hometown` ) ");
-	if(! $r)
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+	$r = q("ALTER TABLE `profile` ADD `hometown` CHAR(255) NOT NULL AFTER `country-name`, ADD INDEX ( `hometown` ) ");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1147() {
 	$r1 = q("ALTER TABLE `sign` ALTER `iid` SET DEFAULT '0'");
 	$r2 = q("ALTER TABLE `sign` ADD `retract_iid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `iid`");
 	$r3 = q("ALTER TABLE `sign` ADD INDEX ( `retract_iid` )");
-	if((! $r1) || (! $r2) || (! $r3))
-		return UPDATE_FAILED ;
-	return UPDATE_SUCCESS ;
+
+	if ($r1 && $r2 && $r3) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1148() {
-	$r = q("ALTER TABLE photo ADD type CHAR(128) NOT NULL DEFAULT 'image/jpeg' AFTER filename");
-	if (!$r)
-		return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+	$r = q("ALTER TABLE `photo` ADD `type` CHAR(128) NOT NULL DEFAULT 'image/jpeg' AFTER `filename`");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 
 function update_1149() {
-	$r1 = q("ALTER TABLE profile ADD likes text NOT NULL after prv_keywords");
-	$r2 = q("ALTER TABLE profile ADD dislikes text NOT NULL after likes");
-	if (! ($r1 && $r2))
-		return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+	$r1 = q("ALTER TABLE `profile` ADD `likes` TEXT NOT NULL AFTER `prv_keywords`");
+	$r2 = q("ALTER TABLE `profile` ADD `dislikes` TEXT NOT NULL AFTER `likes`");
+
+	if ($r1 && $r2) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 
 function update_1150() {
-	$r = q("ALTER TABLE event ADD summary text NOT NULL after finish, add index ( uid ), add index ( cid ), add index ( uri ), add index ( `start` ), add index ( finish ), add index ( `type` ), add index ( adjust ) ");
-	if(! $r)
-		return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+	$r = q("ALTER TABLE `event` ADD `summary` TEXT NOT NULL AFTER `finish`, ADD INDEX ( `uid` ), ADD INDEX ( `cid` ), ADD INDEX ( `uri` ), ADD INDEX ( `start` ), ADD INDEX ( `finish` ), ADD INDEX ( `type` ), ADD INDEX ( `adjust` ) ");
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 
 function update_1151() {
-	$r = q("CREATE TABLE IF NOT EXISTS locks (
-			id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-			name CHAR( 128 ) NOT NULL ,
-			locked TINYINT( 1 ) NOT NULL DEFAULT '0'
+	$r = q("CREATE TABLE IF NOT EXISTS `locks` (
+			`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`name` CHAR( 128 ) NOT NULL ,
+			`locked` TINYINT( 1 ) NOT NULL DEFAULT '0'
 		  ) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
-	if (!$r)
-		return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1152() {
@@ -1333,23 +1385,32 @@ function update_1152() {
 		KEY `type`  ( `type` ),
 		KEY `term`  ( `term` )
 		) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
-	if (!$r)
-		return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1153() {
 	$r = q("ALTER TABLE `hook` ADD `priority` INT(11) UNSIGNED NOT NULL DEFAULT '0'");
 
-	if(!$r) return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1154() {
 	$r = q("ALTER TABLE `event` ADD `ignore` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0' AFTER `adjust` , ADD INDEX ( `ignore` )");
 
-	if(!$r) return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1155() {
@@ -1357,8 +1418,9 @@ function update_1155() {
 	$r2 = q("ALTER TABLE `item_id` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
 	$r3 = q("ALTER TABLE `item_id` ADD INDEX ( `iid` ) ");
 
-	if($r1 && $r2 && $r3)
+	if ($r1 && $r2 && $r3) {
 		return UPDATE_SUCCESS;
+	}
 
 	return UPDATE_FAILED;
 }
@@ -1367,12 +1429,15 @@ function update_1156() {
 	$r = q("ALTER TABLE `photo` ADD `datasize` INT UNSIGNED NOT NULL DEFAULT '0' AFTER `width` ,
 ADD INDEX ( `datasize` ) ");
 
-	if(!$r) return UPDATE_FAILED;
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1157() {
-	$r = q("CREATE TABLE  IF NOT EXISTS `dsprphotoq` (
+	$r = q("CREATE TABLE IF NOT EXISTS `dsprphotoq` (
 	  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	  `uid` int(11) NOT NULL,
 	  `msg` mediumtext NOT NULL,
@@ -1381,8 +1446,11 @@ function update_1157() {
 	  ) ENGINE=MyISAM DEFAULT CHARSET=utf8"
 	);
 
-	if($r)
+	if ($r) {
 		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1158() {
@@ -1395,8 +1463,9 @@ function update_1158() {
 	$r = q("CREATE INDEX event_id ON item(`event-id`)");
 	set_config('system', 'maintenance', 0);
 
-	if($r)
+	if ($r) {
 		return UPDATE_SUCCESS;
+	}
 
 	return UPDATE_FAILED;
 }
@@ -1407,10 +1476,11 @@ function update_1159() {
 		ADD INDEX (`uid`),
 		ADD INDEX (`aid`)");
 
-	if(!$r)
-		return UPDATE_FAILED;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
 
-	return UPDATE_SUCCESS;
+	return UPDATE_FAILED;
 }
 
 function update_1160() {
@@ -1423,19 +1493,21 @@ function update_1160() {
 	$r = q("ALTER TABLE `item` ADD `mention` TINYINT(1) NOT NULL DEFAULT '0', ADD INDEX (`mention`)");
 	set_config('system', 'maintenance', 0);
 
-	if(!$r)
-		return UPDATE_FAILED;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
 
-	return UPDATE_SUCCESS;
+	return UPDATE_FAILED;
 }
 
 function update_1161() {
 	$r = q("ALTER TABLE `pconfig` ADD INDEX (`cat`)");
 
-	if(!$r)
-		return UPDATE_FAILED;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
 
-	return UPDATE_SUCCESS;
+	return UPDATE_FAILED;
 }
 
 function update_1162() {
@@ -1451,14 +1523,17 @@ function update_1163() {
 	$r = q("ALTER TABLE `item` ADD `network` char(32) NOT NULL");
 
 	set_config('system', 'maintenance', 0);
-	if(!$r)
-		return UPDATE_FAILED;
 
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 function update_1164() {
 	set_config('system', 'maintenance', 1);
 
+	/// @TODO If one update fails, should it continue?
 	$r = q("UPDATE `item` SET `network`='%s' WHERE `contact-id` IN (SELECT `id` FROM`contact` WHERE `network` = '' AND `contact`.`uid` = `item`.`uid`)",
 		NETWORK_DFRN);
 
@@ -1511,19 +1586,21 @@ function update_1164() {
 
 function update_1165() {
 	$r = q("CREATE TABLE IF NOT EXISTS `push_subscriber` (
-			`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-		    `uid` INT NOT NULL,
-	        `callback_url` CHAR( 255 ) NOT NULL,
-            `topic` CHAR( 255 ) NOT NULL,
-            `nickname` CHAR( 255 ) NOT NULL,
-            `push` INT NOT NULL,
-            `last_update` DATETIME NOT NULL,
-            `secret` CHAR( 255 ) NOT NULL
-		  ) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
-	if (!$r)
-		return UPDATE_FAILED;
+	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`uid` INT NOT NULL,
+	`callback_url` CHAR( 255 ) NOT NULL,
+	`topic` CHAR( 255 ) NOT NULL,
+	`nickname` CHAR( 255 ) NOT NULL,
+	`push` INT NOT NULL,
+	`last_update` DATETIME NOT NULL,
+	`secret` CHAR( 255 ) NOT NULL
+	) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
 
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1166() {
@@ -1535,26 +1612,32 @@ function update_1166() {
 			`avatar` CHAR(255) NOT NULL,
 			INDEX (`url`)
 		  ) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
-	if (!$r)
-		return UPDATE_FAILED;
 
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1167() {
 	$r = q("ALTER TABLE `contact` ADD `notify_new_posts` TINYINT(1) NOT NULL DEFAULT '0'");
-	if (!$r)
-		return UPDATE_FAILED;
 
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS;
+	}
+
+	return UPDATE_FAILED;
 }
 
 function update_1168() {
 	$r = q("ALTER TABLE `contact` ADD `fetch_further_information` TINYINT(1) NOT NULL DEFAULT '0'");
-	if (!$r)
-		return UPDATE_FAILED;
 
-	return UPDATE_SUCCESS;
+	if ($r) {
+		return UPDATE_SUCCESS ;
+	}
+
+	return UPDATE_FAILED ;
 }
 
 function update_1169() {
@@ -1592,8 +1675,10 @@ function update_1169() {
 		  KEY `uid_created` (`uid`,`created`),
 		  KEY `uid_commented` (`uid`,`commented`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
-	if (!$r)
+
+	if (!$r) {
 		return UPDATE_FAILED;
+	}
 
 	proc_run(PRIORITY_LOW, "include/threadupdate.php");
 
@@ -1699,19 +1784,22 @@ function update_1190() {
 			$key = $rr['k'];
 			$value = $rr['v'];
 
-			if ($key === 'randomise')
+			if ($key === 'randomise') {
 				del_pconfig($uid,$family,$key);
+			}
 
 			if ($key === 'show_on_profile') {
-				if ($value)
+				if ($value) {
 					set_pconfig($uid,feature,forumlist_profile,$value);
+				}
 
 				del_pconfig($uid,$family,$key);
 			}
 
 			if ($key === 'show_on_network') {
-				if ($value)
+				if ($value) {
 					set_pconfig($uid,feature,forumlist_widget,$value);
+				}
 
 				del_pconfig($uid,$family,$key);
 			}

@@ -136,8 +136,7 @@ function contacts_batch_actions(App $a) {
 
 	if (x($_SESSION,'return_url')) {
 		goaway('' . $_SESSION['return_url']);
-	}
-	else {
+	} else {
 		goaway('contacts');
 	}
 
@@ -194,8 +193,10 @@ function contacts_post(App $a) {
 	$ffi_keyword_blacklist = escape_tags(trim($_POST['ffi_keyword_blacklist']));
 
 	$priority = intval($_POST['poll']);
-	if($priority > 5 || $priority < 0)
+
+	if ($priority > 5 || $priority < 0) {
 		$priority = 0;
+	}
 
 	$info = escape_tags(trim($_POST['info']));
 
@@ -212,17 +213,20 @@ function contacts_post(App $a) {
 		intval($contact_id),
 		intval(local_user())
 	);
-	if($r)
+	if ($r) {
 		info( t('Contact updated.') . EOL);
-	else
+	} else {
 		notice( t('Failed to update contact record.') . EOL);
+	}
 
-	$r = q("select * from contact where id = %d and uid = %d limit 1",
+	$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 		intval($contact_id),
 		intval(local_user())
 	);
-	if($r && dbm::is_result($r))
+
+	if (dbm::is_result($r)) {
 		$a->data['contact'] = $r[0];
+	}
 
 	return;
 

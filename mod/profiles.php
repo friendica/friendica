@@ -34,8 +34,9 @@ function profiles_init(App $a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if($r)
+		if ($r) {
 			info(t('Profile deleted.').EOL);
+		}
 
 		goaway('profiles');
 		return; // NOTREACHED
@@ -263,13 +264,12 @@ function profiles_post(App $a) {
 				}
 				else {
 					$newname = $lookup;
-/*					if(strstr($lookup,' ')) {
+/*					if (strstr($lookup,' ')) {
 						$r = q("SELECT * FROM `contact` WHERE `name` = '%s' AND `uid` = %d LIMIT 1",
 							dbesc($newname),
 							intval(local_user())
 						);
-					}
-					else {
+					} else {
 						$r = q("SELECT * FROM `contact` WHERE `nick` = '%s' AND `uid` = %d LIMIT 1",
 							dbesc($lookup),
 							intval(local_user())
@@ -473,11 +473,12 @@ function profiles_post(App $a) {
 			intval(local_user())
 		);
 
-		if($r)
+		if ($r) {
 			info( t('Profile updated.') . EOL);
+		}
 
 
-		if($namechanged && $is_default) {
+		if ($namechanged && $is_default) {
 			$r = q("UPDATE `contact` SET `name` = '%s', `name-date` = '%s' WHERE `self` = 1 AND `uid` = %d",
 				dbesc($name),
 				dbesc(datetime_convert()),
@@ -489,7 +490,7 @@ function profiles_post(App $a) {
 			);
 		}
 
-		if($is_default) {
+		if ($is_default) {
 			$location = formatted_location(array("locality" => $locality, "region" => $region, "country-name" => $country_name));
 
 			q("UPDATE `contact` SET `about` = '%s', `location` = '%s', `keywords` = '%s', `gender` = '%s' WHERE `self` AND `uid` = %d",

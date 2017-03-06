@@ -586,17 +586,18 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			dbesc($decrypted_source_url),
 			intval($local_uid)
 		);
-		if(! count($ret)) {
-			if(strstr($decrypted_source_url,'http:'))
+		if (!dbm::is_result($ret)) {
+			if (strstr($decrypted_source_url,'http:')) {
 				$newurl = str_replace('http:','https:',$decrypted_source_url);
-			else
+			} else {
 				$newurl = str_replace('https:','http:',$decrypted_source_url);
+			}
 
 			$ret = q("SELECT * FROM `contact` WHERE `url` = '%s' AND `uid` = %d LIMIT 1",
 				dbesc($newurl),
 				intval($local_uid)
 			);
-			if(! count($ret)) {
+			if (!dbm::is_result($ret)) {
 				// this is either a bogus confirmation (?) or we deleted the original introduction.
 				$message = t('Contact record was not found for you on our site.');
 				xml_status(3,$message);
@@ -611,7 +612,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		$foreign_pubkey = $ret[0]['site-pubkey'];
 		$dfrn_record    = $ret[0]['id'];
 
-		if(! $foreign_pubkey) {
+		if (! $foreign_pubkey) {
 			$message = sprintf( t('Site public key not available in contact record for URL %s.'), $newurl);
 			xml_status(3,$message);
 		}
@@ -619,7 +620,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		$decrypted_dfrn_id = "";
 		openssl_public_decrypt($dfrn_id,$decrypted_dfrn_id,$foreign_pubkey);
 
-		if(strlen($aes_key)) {
+		if (strlen($aes_key)) {
 			$decrypted_aes_key = "";
 			openssl_private_decrypt($aes_key,$decrypted_aes_key,$my_prvkey);
 			$dfrn_pubkey = openssl_decrypt($public_key,'AES-256-CBC',$decrypted_aes_key);

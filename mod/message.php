@@ -251,8 +251,9 @@ function message_content(App $a) {
 				//	);
 				//}
 
-				if($r)
+				if ($r) {
 					info( t('Conversation removed.') . EOL );
+				}
 			}
 			//goaway(App::get_baseurl(true) . '/message' );
 			goaway($_SESSION['return_url']);
