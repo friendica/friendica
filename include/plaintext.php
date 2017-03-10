@@ -301,7 +301,12 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 
 	// Remove the hash tags
 	$URLSearchString = "^\[\]";
-	$body = preg_replace("/([#@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $b["body"]);
+	if ($htmlmode == 8) {
+		// Twitter: Remove @ signs, keep names and hashtags
+		$body = preg_replace("/((#)|(@))\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$2$5', $b["body"]);
+	} else {
+		$body = preg_replace("/([#@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $b["body"]);
+	}
 
 	// Add an URL element if the text contains a raw link
 	$body = preg_replace("/([^\]\='".'"'."]|^)(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url]$2[/url]', $body);
