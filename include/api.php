@@ -3147,7 +3147,25 @@ use \Friendica\Core\Config;
 	api_register_func('api/friendica/photos/list', 'api_fr_photos_list', true);
 	api_register_func('api/friendica/photo', 'api_fr_photo_detail', true);
 
+// delete the following - just implemented to pass the version check in the app
+	function api_account_update_profile_image() {
+		echo "Test";
+	}
+	api_register_func('api/account/update_profile_image', 'api_account_update_profile_image', true);
+// end of deletion part
 
+
+	function api_fr_photoalbum_delete($type) {
+		// TODO: check if user is authenticated
+		// TODO: get album string
+		// TODO: react on album == ""
+		// TODO: return if album is not available for selected user
+		// TODO: Delete data rows from server
+		// TODO: answer call (403 FORBIDDEN, 400 BADREQUEST [no album, wrong album, other], 200 OK [result: deleted, message: xyz]
+		echo "Das ist ein Test";
+	}
+
+	api_register_func('api/friendica/photoalbum/delete', 'api_fr_photoalbum_delete', true, API_METHOD_DELETE);
 
 	/**
 	 * similar as /mod/redir.php
