@@ -1310,6 +1310,47 @@ section #jotOpen {
 }
 
 /* Filebrowser */
+.fbrowser .breadcrumb {
+    margin-bottom: 0px;
+}
+.fbrowser .path a:before {
+    content: "";
+    padding: 0;
+}
+.fbrowser .breadcrumb > li:last-of-type a{
+    color: #777;
+    pointer-events: none;
+    cursor: default;
+}
+.fbrowser .folders {
+    box-shadow: -1.5px 0 0 0 rgba(0, 0, 0, .1) inset;
+    padding-right: 1px;
+}
+.fbrowser .folders ul {
+    padding-left: 0px;
+    margin-left: -15px;
+}
+.fbrowser .folders li {
+    padding-left: 20px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.fbrowser .folders li:hover {
+    z-index: 2;
+    color: #555;
+    background-color: rgba(247, 247, 247, $contentbg_transp);
+    border-left: 3px solid $link_color !important;
+    padding-left: 17px;
+}
+.fbrowser .folders li a,
+.fbrowser .folders li a:hover {
+    color: #555;
+    font-size: 13px;
+}
+.fbrowser .folders + .list {
+    padding-left: 10px;
+}
 .fbrowser .profile-rotator-wrapper {
     min-height: 200px;
 }

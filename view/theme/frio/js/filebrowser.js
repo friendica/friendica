@@ -81,15 +81,14 @@ var FileBrowser = {
 			FileBrowser.id = h.split("-")[1];
 			FileBrowser.event = FileBrowser.event + "." + destination;
 			if (destination == "comment") {
-				// get the comment textimput field
+				// Get the comment textimput field
 				var commentElm = document.getElementById("comment-edit-text-" + FileBrowser.id);
 			}
 		};
 
 		console.log("FileBrowser:", nickname, type,FileBrowser.event, FileBrowser.id );
 
-		// We need to add the AjaxUpload to the button
-		FileBrowser.uploadButtons();
+		FileBrowser.postLoad();
 
 		$(".error .close").on("click", function(e) {
 			e.preventDefault();
@@ -100,21 +99,11 @@ var FileBrowser = {
 		$(".fbrowser").on("click", ".folders a, .path a, .folders button, .path button", function(e) {
 			e.preventDefault();
 			var url = baseurl + "/fbrowser/" + FileBrowser.type + "/" + this.dataset.folder + "?mode=none";
-			$(".fbrowser-content").hide();
-			$(".fbrowser .profile-rotator-wrapper").show();
 
-			// load new content to fbrowser window
-			$(".fbrowser").load(url, function(responseText, textStatus){
-				$(".profile-rotator-wrapper").hide();
-				if (textStatus === 'success') {
-					$(".fbrowser_content").show();
-					// We need to add the AjaxUpload to the button
-					FileBrowser.uploadButtons();
-				}
-			});
+			FileBrowser.loadContent(url);
 		});
 
-		//embed on click
+		//Embed on click
 		$(".fbrowser").on('click', ".photo-album-photo-link", function(e) {
 			e.preventDefault();
 
@@ -122,7 +111,7 @@ var FileBrowser = {
 			if (FileBrowser.type == "image") {
 				embed = "[url="+this.dataset.link+"][img]"+this.dataset.img+"[/img][/url]";
 			}
-			if (FileBrowser.type=="file") {
+			if (FileBrowser.type == "file") {
 				// attachment links are "baseurl/attach/id"; we need id
 				embed = "[attachment]"+this.dataset.link.split("/").pop()+"[/attachment]";
 			}
@@ -148,13 +137,24 @@ var FileBrowser = {
 				this.dataset.img,
 			]);
 
-			// close model
+			// Close model
 			$('#modal').modal('hide');
-			// update autosize for this textarea
+			// Update autosize for this textarea
 			autosize.update($(".text-autosize"));
+		});
+
+		// EventListener for switching between image and file mode
+		$(".fbrowser").on('click', ".fbswitcher .btn", function(e) {
+			e.preventDefault();
+			FileBrowser.type = this.getAttribute("data-mode");
+			$(".fbrowser").removeClass().addClass("fbrowser " + FileBrowser.type);
+			url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none";
+
+			FileBrowser.loadContent(url);
 		});
 	},
 
+	// Initialize the AjaxUpload for the upload buttons
 	uploadButtons: function() {
 		if ($("#upload-image").length) {
 			var image_uploader = new window.AjaxUpload(
@@ -175,15 +175,12 @@ var FileBrowser = {
 							return;
 						}
 
-						$(".profile-rotator-wrapper").hide();
-						$(".fbrowser_content").show();
-
 //						location = baseurl + "/fbrowser/image/?mode=none"+location['hash'];
 //						location.reload(true);
 
 						var url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none"
 						// load new content to fbrowser window
-						$(".fbrowser").load(url);
+						FileBrowser.loadContent(url);
 					}
 				}
 			);
@@ -207,18 +204,36 @@ var FileBrowser = {
 							return;
 						}
 
-						$(".profile-rotator-wrapper").hide();
-						$(".fbrowser_content").show();
-
 //						location = baseurl + "/fbrowser/file/?mode=none"+location['hash'];
 //						location.reload(true);
 
 						var url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none"
-						// load new content to fbrowser window
-						$(".fbrowser").load(url);
+						// Load new content to fbrowser window
+						FileBrowser.loadContent(url)
 					}
 				}
 			);
 		}
+	},
+
+	postLoad: function() {
+		$(".fbrowser .fbswitcher .btn").removeClass("active");
+		$(".fbrowser .fbswitcher [data-mode=" + FileBrowser.type + "]").addClass("active");
+		// We need to add the AjaxUpload to the button
+		FileBrowser.uploadButtons();
+	},
+
+	loadContent: function(url) {
+		$(".fbrowser-content").hide();
+		$(".fbrowser .profile-rotator-wrapper").show();
+
+		// load new content to fbrowser window
+		$(".fbrowser").load(url, function(responseText, textStatus){
+			$(".profile-rotator-wrapper").hide();
+			if (textStatus === 'success') {
+				$(".fbrowser_content").show();
+				FileBrowser.postLoad();
+			}
+		});
 	}
 };
