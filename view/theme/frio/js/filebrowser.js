@@ -217,10 +217,12 @@ var FileBrowser = {
 	},
 
 	postLoad: function() {
+		FileBrowser.initGallery();
 		$(".fbrowser .fbswitcher .btn").removeClass("active");
 		$(".fbrowser .fbswitcher [data-mode=" + FileBrowser.type + "]").addClass("active");
 		// We need to add the AjaxUpload to the button
 		FileBrowser.uploadButtons();
+		
 	},
 
 	loadContent: function(url) {
@@ -234,6 +236,14 @@ var FileBrowser = {
 				$(".fbrowser_content").show();
 				FileBrowser.postLoad();
 			}
+		});
+	},
+
+	initGallery: function() {
+		$(".fbrowser.image .fbrowser-content-container").justifiedGallery({
+			'rowHeight': 80,
+			'margins': 3,
+			'border': 0
 		});
 	}
 };

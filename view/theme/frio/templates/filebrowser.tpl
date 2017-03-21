@@ -34,14 +34,16 @@
 			{{/if}}
 
 			<div class="list {{$type}} media-body">
-				{{foreach $files as $f}}
-				<div class="photo-album-image-wrapper">
-					<a href="#" class="photo-album-photo-link" data-link="{{$f.0}}" data-filename="{{$f.1}}" data-img="{{$f.2}}">
-						<img src="{{$f.2}}">
-						<p>{{$f.1}}</p>
-					</a>
+				<div class="fbrowser-content-container">
+					{{foreach $files as $f}}
+					<div class="photo-album-image-wrapper">
+						<a href="#" class="photo-album-photo-link" data-link="{{$f.0}}" data-filename="{{$f.1}}" data-img="{{$f.2}}">
+							<img src="{{$f.2}}" alt="{{$f.1}}">
+							<p>{{$f.1}}</p>
+						</a>
+					</div>
+					{{/foreach}}
 				</div>
-				{{/foreach}}
 			</div>
 		</div>
 
