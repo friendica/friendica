@@ -16,8 +16,11 @@
             <span></span> <button type="button" class="btn btn-link" class="close">X</a>
         </div>
 
+		{{* The breadcrumb navigation *}}
 		<ol class="path breadcrumb">
 			{{foreach $path as $p}}<li><a href="#" data-folder="{{$p.0}}">{{$p.1}}</a></li>{{/foreach}}
+
+			{{* Switch between image and file mode *}}
 			<div class="fbswitcher btn-group btn-group-xs pull-right">
 				<button type="button" class="btn btn-default" data-mode="image"><i class="fa fa-picture-o" aria-hidden="true"></i></button>
 				<button type="button" class="btn btn-default" data-mode="file"><i class="fa fa-file-o" aria-hidden="true"></i></button>
@@ -25,6 +28,8 @@
 		</ol>
 
 		<div class="media">
+
+			{{* List of photo albums *}}
 			{{if $folders }}
 			<div class="folders media-left">
 				<ul>
@@ -33,6 +38,7 @@
 			</div>
 			{{/if}}
 
+			{{* The main content (images or files) *}}
 			<div class="list {{$type}} media-body">
 				<div class="fbrowser-content-container">
 					{{foreach $files as $f}}
@@ -48,9 +54,11 @@
 		</div>
 
 		<div class="upload">
-			<button id="upload-{{$type}}"><img id="profile-rotator" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait|escape:'html'}}" style="display: none;" /> {{"Upload"|t}}</button>
+			<button id="upload-{{$type}}">{{"Upload"|t}}</button>
 		</div>
 	</div>
+
+	{{* This part contains the conent loader icon which is visible when new conent is loaded *}}
 	<div class="profile-rotator-wrapper" style="display: none;">
 		<i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
 	</div>

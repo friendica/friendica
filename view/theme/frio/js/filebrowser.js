@@ -68,6 +68,7 @@ var FileBrowser = {
 	nickname : "",
 	type : "",
 	event: "",
+	folder: "",
 	id : null,
 
 	init: function(nickname, type, hash) {
@@ -99,6 +100,7 @@ var FileBrowser = {
 		$(".fbrowser").on("click", ".folders a, .path a, .folders button, .path button", function(e) {
 			e.preventDefault();
 			var url = baseurl + "/fbrowser/" + FileBrowser.type + "/" + this.dataset.folder + "?mode=none";
+			FileBrowser.folder = this.dataset.folder;
 
 			FileBrowser.loadContent(url);
 		});
@@ -134,7 +136,7 @@ var FileBrowser = {
 				this.dataset.filename,
 				embed,
 				FileBrowser.id,
-				this.dataset.img,
+				this.dataset.img
 			]);
 
 			// Close model
@@ -157,9 +159,12 @@ var FileBrowser = {
 	// Initialize the AjaxUpload for the upload buttons
 	uploadButtons: function() {
 		if ($("#upload-image").length) {
+			// To get the albumname we need to convert it from hex
+			var albumname = hex2bin(FileBrowser.folder);
+			//AjaxUpload for images
 			var image_uploader = new window.AjaxUpload(
 				'upload-image',
-				{	action: 'wall_upload/'+FileBrowser.nickname+'?response=json',
+				{	action: 'wall_upload/'+FileBrowser.nickname+'?response=json&album=' + albumname,
 					name: 'userfile',
 					responseType: 'json',
 					onSubmit: function(file,ext) {
@@ -178,7 +183,7 @@ var FileBrowser = {
 //						location = baseurl + "/fbrowser/image/?mode=none"+location['hash'];
 //						location.reload(true);
 
-						var url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none"
+						var url = baseurl + "/fbrowser/" + FileBrowser.type + "/" + FileBrowser.folder + "?mode=none";
 						// load new content to fbrowser window
 						FileBrowser.loadContent(url);
 					}
@@ -187,9 +192,10 @@ var FileBrowser = {
 		}
 
 		if ($("#upload-file").length) {
+			//AjaxUpload for files
 			var file_uploader = new window.AjaxUpload(
 				'upload-file',
-				{	action: 'wall_attach/'+FileBrowser.nickname+'?response=json',
+				{	action: 'wall_attach/' + FileBrowser.nickname + '?response=json',
 					name: 'userfile',
 					onSubmit: function(file,ext) {
 						$(".fbrowser-content").hide();
@@ -207,15 +213,16 @@ var FileBrowser = {
 //						location = baseurl + "/fbrowser/file/?mode=none"+location['hash'];
 //						location.reload(true);
 
-						var url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none"
+						var url = baseurl + "/fbrowser/" + FileBrowser.type + "?mode=none";
 						// Load new content to fbrowser window
-						FileBrowser.loadContent(url)
+						FileBrowser.loadContent(url);
 					}
 				}
 			);
 		}
 	},
 
+	// Stuff which should be executed if ne content was loaded
 	postLoad: function() {
 		FileBrowser.initGallery();
 		$(".fbrowser .fbswitcher .btn").removeClass("active");
@@ -225,6 +232,7 @@ var FileBrowser = {
 		
 	},
 
+	// Load new content (e.g. change photo album)
 	loadContent: function(url) {
 		$(".fbrowser-content").hide();
 		$(".fbrowser .profile-rotator-wrapper").show();
@@ -239,6 +247,7 @@ var FileBrowser = {
 		});
 	},
 
+	// Initialize justified Gallery
 	initGallery: function() {
 		$(".fbrowser.image .fbrowser-content-container").justifiedGallery({
 			'rowHeight': 80,

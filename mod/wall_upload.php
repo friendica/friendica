@@ -7,6 +7,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	logger("wall upload: starting new upload", LOGGER_DEBUG);
 
 	$r_json = (x($_GET,'response') && $_GET['response']=='json');
+	$album = (x($_GET, 'album') ? notags(trim($_GET['album'])) : '');
 
 	if($a->argc > 1) {
 		if(! x($_FILES,'media')) {
@@ -211,9 +212,14 @@ function wall_upload_post(App $a, $desktopmode = true) {
 
 	$smallest = 0;
 
+	// If we don't have an album name use the Wall Photos album
+	if (! strlen($album)) {
+		$album = t('Wall Photos');
+	}
+
 	$defperm = '<' . $default_cid . '>';
 
-	$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 0, 0, $defperm);
+	$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, $album, 0, 0, $defperm);
 
 	if(! $r) {
 		$msg = t('Image upload failed.');
@@ -227,14 +233,14 @@ function wall_upload_post(App $a, $desktopmode = true) {
 
 	if($width > 640 || $height > 640) {
 		$ph->scaleImage(640);
-		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 1, 0, $defperm);
+		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, $album, 1, 0, $defperm);
 		if($r)
 			$smallest = 1;
 	}
 
 	if($width > 320 || $height > 320) {
 		$ph->scaleImage(320);
-		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, t('Wall Photos'), 2, 0, $defperm);
+		$r = $ph->store($page_owner_uid, $visitor, $hash, $filename, $album, 2, 0, $defperm);
 		if($r AND ($smallest == 0))
 			$smallest = 2;
 	}

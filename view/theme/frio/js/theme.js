@@ -618,23 +618,52 @@ function htmlToText(htmlString) {
 	return text;
 }
 
-/**
- * Sends a /like API call and updates the display of the relevant action button
- * before the update reloads the item.
- *
- * @param {string} ident The id of the relevant item
- * @param {string} verb The verb of the action
- * @returns {undefined}
- */
-function doLikeAction(ident, verb) {
-	unpause();
+// Decodes a hexadecimally encoded binary string
+function hex2bin (s) {
+	//  discuss at: http://locutus.io/php/hex2bin/
+	// original by: Dumitru Uzun (http://duzun.me)
+	//   example 1: hex2bin('44696d61')
+	//   returns 1: 'Dima'
+	//   example 2: hex2bin('00')
+	//   returns 2: '\x00'
+	//   example 3: hex2bin('2f1q')
+	//   returns 3: false
+	var ret = [];
+	var i = 0;
+	var l;
+	s += '';
 
-	if (verb.indexOf('attend') === 0) {
-		$('.item-' + ident + ' .button-event:not(#' + verb + '-' + ident + ')').removeClass('active');
+	for (l = s.length; i < l; i += 2) {
+		var c = parseInt(s.substr(i, 1), 16);
+		var k = parseInt(s.substr(i + 1, 1), 16);
+		if (isNaN(c) || isNaN(k)) {
+			return false;
+		}
+		ret.push((c << 4) | k);
 	}
-	$('#' + verb + '-' + ident).toggleClass('active');
-	$('#like-rotator-' + ident.toString()).show();
-	$.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
-	liking = 1;
-	force_update = true;
+	return String.fromCharCode.apply(String, ret);
+}
+
+// Convert binary data into hexadecimal representation
+function bin2hex (s) {
+	// From: http://phpjs.org/functions
+	// +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// +   bugfixed by: Onno Marsman
+	// +   bugfixed by: Linuxworld
+	// +   improved by: ntoniazzi (http://phpjs.org/functions/bin2hex:361#comment_177616)
+	// *     example 1: bin2hex('Kev');
+	// *     returns 1: '4b6576'
+	// *     example 2: bin2hex(String.fromCharCode(0x00));
+	// *     returns 2: '00'
+
+	var i, l, o = "", n;
+
+	s += "";
+
+	for (i = 0, l = s.length; i < l; i++) {
+		n = s.charCodeAt(i).toString(16);
+		o += n.length < 2 ? "0" + n : n;
+	}
+
+	return o;
 }
