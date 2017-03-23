@@ -1978,7 +1978,7 @@ class DFRN
 		 * link an introduction to it.
 		 */
 		if (!DBM::is_result($r)) {
-			// database record did not get created. Quietly give up.
+			// Database record did not get created. Quietly give up.
 			killme();
 		}
 
@@ -2058,7 +2058,7 @@ class DFRN
 
 		// update contact
 		$r = q(
-			"SELECT `photo`, `url` FROM `contact` WHERE `id` = %d AND `uid` = %d;",
+			"SELECT `photo`, `url` FROM `contact` WHERE `id` = %d AND `uid` = %d",
 			intval($importer["id"]),
 			intval($importer["importer_uid"])
 		);
@@ -2332,6 +2332,7 @@ class DFRN
 
 				if ($xt->type == ACTIVITY_OBJ_NOTE) {
 					$item_tag = Item::selectFirst(['id', 'tag'], ['uri' => $xt->id, 'uid' => $importer["importer_uid"]]);
+
 					if (!DBM::is_result($item_tag)) {
 						logger("Query failed to execute, no result returned in " . __FUNCTION__);
 						return false;

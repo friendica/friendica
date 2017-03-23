@@ -479,6 +479,7 @@ function profiles_post(App $a) {
 			intval(local_user())
 		);
 
+		/// @TODO decide to use dbm::is_result() here and check $r
 		if ($r) {
 			info(L10n::t('Profile updated.') . EOL);
 		}
