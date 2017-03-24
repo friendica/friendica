@@ -2,7 +2,7 @@
 	{{if $pager}}
 	{{if $pager.prev}}<span class="pager_prev {{$pager.prev.class}}"><a href="{{$pager.prev.url}}">{{$pager.prev.text}}</a></span>{{/if}}
 
-	{{if $pager.first}}<span class="pager_first $pager.first.class"><a href="{{$pager.first.url}}">{{$pager.first.text}}</a></span>{{/if}}
+	{{if $pager.first}}<span class="pager_first {{$pager.first.class}}"><a href="{{$pager.first.url}}">{{$pager.first.text}}</a></span>{{/if}}
 
 	{{foreach $pager.pages as $p}}<span class="pager_{{$p.class}}"><a href="{{$p.url}}">{{$p.text}}</a></span>{{/foreach}}
 

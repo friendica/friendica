@@ -1,12 +1,31 @@
 <?php
-require_once("boot.php");
-require_once("include/ostatus.php");
-
 use \Friendica\Core\Config;
-use \Friendica\Core\PConfig;
+
+require_once('include/items.php');
+require_once('include/ostatus.php');
+
+function pubsubpublish_run(&$argv, &$argc){
+
+	if ($argc > 1) {
+		$pubsubpublish_id = intval($argv[1]);
+	} else {
+		// We'll push to each subscriber that has push > 0,
+		// i.e. there has been an update (set in notifier.php).
+		$r = q("SELECT `id`, `callback_url` FROM `push_subscriber` WHERE `push` > 0");
+
+		foreach ($r as $rr) {
+			logger("Publish feed to ".$rr["callback_url"], LOGGER_DEBUG);
+			proc_run(PRIORITY_HIGH, 'include/pubsubpublish.php', $rr["id"]);
+		}
+	}
+
+	handle_pubsubhubbub($pubsubpublish_id);
+
+	return;
+}
 
 function handle_pubsubhubbub($id) {
-	global $a, $db;
+	global $a;
 
 	$r = q("SELECT * FROM `push_subscriber` WHERE `id` = %d", intval($id));
 	if (!$r)
@@ -54,70 +73,3 @@ function handle_pubsubhubbub($id) {
 			intval($rr['id']));
 	}
 }
-
-
-function pubsubpublish_run(&$argv, &$argc){
-	global $a, $db;
-
-	if(is_null($a)){
-		$a = new App;
-	}
-
-	if(is_null($db)){
-		@include(".htconfig.php");
-		require_once("include/dba.php");
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-	};
-
-	require_once('include/items.php');
-
-	Config::load();
-
-	// Don't check this stuff if the function is called by the poller
-	if (App::callstack() != "poller_run") {
-		if (App::is_already_running("pubsubpublish", "include/pubsubpublish.php", 540)) {
-			return;
-		}
-	}
-
-	$a->set_baseurl(get_config('system','url'));
-
-	load_hooks();
-
-	if ($argc > 1) {
-		$pubsubpublish_id = intval($argv[1]);
-	}
-	else {
-		// We'll push to each subscriber that has push > 0,
-		// i.e. there has been an update (set in notifier.php).
-		$r = q("SELECT `id`, `callback_url` FROM `push_subscriber` WHERE `push` > 0");
-
-		// Use the delivery interval that is also used for the notifier
-		$interval = Config::get("system", "delivery_interval", 2);
-
-		// If we are using the worker we don't need a delivery interval
-		if (get_config("system", "worker")) {
-			$interval = false;
-		}
-
-		foreach ($r as $rr) {
-			logger("Publish feed to ".$rr["callback_url"], LOGGER_DEBUG);
-			proc_run(PRIORITY_HIGH, 'include/pubsubpublish.php', $rr["id"]);
-
-			if($interval)
-				@time_sleep_until(microtime(true) + (float) $interval);
-		}
-	}
-
-	handle_pubsubhubbub($pubsubpublish_id);
-
-	return;
-
-}
-
-if (array_search(__file__,get_included_files())===0){
-  pubsubpublish_run($_SERVER["argv"],$_SERVER["argc"]);
-  killme();
-}
-

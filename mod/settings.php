@@ -872,7 +872,7 @@ function settings_content(App $a) {
 		$mail_pubmail      = ((dbm::is_result($r)) ? $r[0]['pubmail'] : 0);
 		$mail_action       = ((dbm::is_result($r)) ? $r[0]['action'] : 0);
 		$mail_movetofolder = ((dbm::is_result($r)) ? $r[0]['movetofolder'] : '');
-		$mail_chk          = ((dbm::is_result($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
+		$mail_chk          = ((dbm::is_result($r)) ? $r[0]['last_check'] : NULL_DATE);
 
 
 		$tpl = get_markup_template("settings_connectors.tpl");

@@ -15,7 +15,9 @@ function Markdown($text) {
 	$stamp1 = microtime(true);
 
 	# Read file and pass content through the Markdown parser
-	$html = MarkdownExtra::defaultTransform($text);
+	$MarkdownParser = new MarkdownExtra();
+	$MarkdownParser->hard_wrap = true;
+	$html = $MarkdownParser->transform($text);
 
 	$a->save_timestamp($stamp1, "parser");
 

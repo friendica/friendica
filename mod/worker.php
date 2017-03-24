@@ -10,7 +10,7 @@ use \Friendica\Core\PConfig;
 
 function worker_init($a){
 
-	if (!Config::get("system", "frontend_worker") OR !Config::get("system", "worker")) {
+	if (!Config::get("system", "frontend_worker")) {
 		return;
 	}
 

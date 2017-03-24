@@ -599,21 +599,6 @@ function network_content(App $a, $update = 0) {
 		$pager_sql = '';
 
 	} else {
-		if(get_config('system', 'old_pager')) {
-			$r = qu("SELECT COUNT(*) AS `total`
-				FROM $sql_table $sql_post_table INNER JOIN `contact` ON `contact`.`id` = $sql_table.`contact-id`
-				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
-				WHERE $sql_table.`uid` = %d AND $sql_table.`visible` AND NOT $sql_table.`deleted`
-				$sql_extra2 $sql_extra3
-				$sql_extra $sql_nets ",
-				intval($_SESSION['uid'])
-			);
-
-			if (dbm::is_result($r)) {
-				$a->set_pager_total($r[0]['total']);
-			}
-		}
-
 		//  check if we serve a mobile device and get the user settings
 		//  accordingly
 		if ($a->is_mobile) {
@@ -788,15 +773,13 @@ function network_content(App $a, $update = 0) {
 
 	$mode = (($nouveau) ? 'network-new' : 'network');
 
-	$o .= conversation($a,$items,$mode,$update);
+	$o .= conversation($a, $items, $mode, $update);
 
 	if (!$update) {
-		if (get_pconfig(local_user(),'system','infinite_scroll')) {
+		if (get_pconfig(local_user(), 'system', 'infinite_scroll')) {
 			$o .= scroll_loader();
-		} elseif (!get_config('system', 'old_pager')) {
-			$o .= alt_pager($a,count($items));
 		} else {
-			$o .= paginate($a);
+			$o .= alt_pager($a, count($items));
 		}
 	}
 

@@ -1163,8 +1163,10 @@ function bbcode($Text,$preserve_nl = false, $tryoembed = true, $simplehtml = fal
 	// fix any escaped ampersands that may have been converted into links
 	$Text = preg_replace('/\<([^>]*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism', '<$1$2=$3&$4>', $Text);
 
-	// sanitizes src attributes (only relative redir URIs or http URLs)
-	$Text = preg_replace('#<([^>]*?)(src)="(?!http|redir)(.*?)"(.*?)>#ism', '<$1$2=""$4 class="invalid-src" title="' . t('Invalid source protocol') . '">', $Text);
+	// sanitizes src attributes (http and redir URLs for displaying in a web page, cid used for inline images in emails)
+	static $allowed_src_protocols = array('http', 'redir', 'cid');
+	$Text = preg_replace('#<([^>]*?)(src)="(?!' . implode('|', $allowed_src_protocols) . ')(.*?)"(.*?)>#ism',
+			     '<$1$2=""$4 class="invalid-src" title="' . t('Invalid source protocol') . '">', $Text);
 
 	// sanitize href attributes (only whitelisted protocols URLs)
 	// default value for backward compatibility

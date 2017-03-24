@@ -30,7 +30,7 @@ function openid_content(App $a) {
 			//       mod/settings.php in 8367cad so it might have left mixed
 			//       records in the user table
 			//
-			$r = q("SELECT * FROM `user`
+			$r = q("SELECT *, `user`.`pubkey` as `upubkey`, `user`.`prvkey` as `uprvkey` FROM `user`
 				WHERE ( `openid` = '%s' OR `openid` = '%s' )
 				AND `blocked` = 0 AND `account_expired` = 0
 				AND `account_removed` = 0 AND `verified` = 1

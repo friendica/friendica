@@ -391,7 +391,7 @@ class dfrn {
 	 *
 	 * @return object XML root object
 	 */
-	private function add_header($doc, $owner, $authorelement, $alternatelink = "", $public = false) {
+	private static function add_header($doc, $owner, $authorelement, $alternatelink = "", $public = false) {
 
 		if ($alternatelink == "")
 			$alternatelink = $owner['url'];
@@ -462,7 +462,7 @@ class dfrn {
 	 *
 	 * @return object XML author object
 	 */
-	private function add_author($doc, $owner, $authorelement, $public) {
+	private static function add_author($doc, $owner, $authorelement, $public) {
 
 		// Is the profile hidden or shouldn't be published in the net? Then add the "hide" element
 		$r = q("SELECT `id` FROM `profile` INNER JOIN `user` ON `user`.`uid` = `profile`.`uid`
@@ -591,7 +591,7 @@ class dfrn {
 	 *
 	 * @return object XML author object
 	 */
-	private function add_entry_author($doc, $element, $contact_url, $item) {
+	private static function add_entry_author($doc, $element, $contact_url, $item) {
 
 		$contact = get_contact_details_by_url($contact_url, $item["uid"]);
 
@@ -631,7 +631,7 @@ class dfrn {
 	 *
 	 * @return object XML activity object
 	 */
-	private function create_activity($doc, $element, $activity) {
+	private static function create_activity($doc, $element, $activity) {
 
 		if($activity) {
 			$entry = $doc->createElement($element);
@@ -685,7 +685,7 @@ class dfrn {
 	 *
 	 * @return object XML attachment object
 	 */
-	private function get_attachment($doc, $root, $item) {
+	private static function get_attachment($doc, $root, $item) {
 		$arr = explode('[/attach],',$item['attach']);
 		if(count($arr)) {
 			foreach($arr as $r) {
@@ -720,7 +720,7 @@ class dfrn {
 	 *
 	 * @return object XML entry object
 	 */
-	private function entry($doc, $type, $item, $owner, $comment = false, $cid = 0) {
+	private static function entry($doc, $type, $item, $owner, $comment = false, $cid = 0) {
 
 		$mentioned = array();
 
@@ -913,11 +913,18 @@ class dfrn {
 
 		logger('dfrn_deliver: ' . $url);
 
-		$xml = fetch_url($url);
+		$ret = z_fetch_url($url);
+
+		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			return -2; // timed out
+		}
+
+		$xml = $ret['body'];
 
 		$curl_stat = $a->get_curl_code();
-		if(! $curl_stat)
-			return(-1); // timed out
+		if (!$curl_stat) {
+			return -3; // timed out
+		}
 
 		logger('dfrn_deliver: ' . $xml, LOGGER_DATA);
 
@@ -1017,24 +1024,24 @@ class dfrn {
 						$key = Crypto::createNewRandomKey();
 					} catch (CryptoTestFailed $ex) {
 						logger('Cannot safely create a key');
-						return -1;
+						return -4;
 					} catch (CannotPerformOperation $ex) {
 						logger('Cannot safely create a key');
-						return -1;
+						return -5;
 					}
 					try {
 						$data = Crypto::encrypt($postvars['data'], $key);
 					} catch (CryptoTestFailed $ex) {
 						logger('Cannot safely perform encryption');
-						return -1;
+						return -6;
 					} catch (CannotPerformOperation $ex) {
 						logger('Cannot safely perform encryption');
-						return -1;
+						return -7;
 					}
 					break;
 				default:
 					logger("rino: invalid requested verision '$rino_remote_version'");
-					return -1;
+					return -8;
 			}
 
 			$postvars['rino'] = $rino_remote_version;
@@ -1068,16 +1075,18 @@ class dfrn {
 
 		logger('dfrn_deliver: ' . "SENDING: " . print_r($postvars,true), LOGGER_DATA);
 
-		$xml = post_url($contact['notify'],$postvars);
+		$xml = post_url($contact['notify'], $postvars);
 
 		logger('dfrn_deliver: ' . "RECEIVED: " . $xml, LOGGER_DATA);
 
 		$curl_stat = $a->get_curl_code();
-		if((! $curl_stat) || (! strlen($xml)))
-			return(-1); // timed out
+		if ((!$curl_stat) || (!strlen($xml))) {
+			return -9; // timed out
+		}
 
-		if(($curl_stat == 503) && (stristr($a->get_curl_headers(),'retry-after')))
-			return(-1);
+		if (($curl_stat == 503) && (stristr($a->get_curl_headers(),'retry-after'))) {
+			return -10;
+		}
 
 		if(strpos($xml,'<?xml') === false) {
 			logger('dfrn_deliver: phase 2: no valid XML returned');
@@ -1085,7 +1094,7 @@ class dfrn {
 			return 3;
 		}
 
-		if($contact['term-date'] != '0000-00-00 00:00:00') {
+		if ($contact['term-date'] > NULL_DATE) {
 			logger("dfrn_deliver: $url back from the dead - removing mark for death");
 			require_once('include/Contact.php');
 			unmark_for_death($contact);
@@ -1103,7 +1112,7 @@ class dfrn {
 	 * @param string $birthday Birthday of the contact
 	 *
 	 */
-	private function birthday_event($contact, $birthday) {
+	private static function birthday_event($contact, $birthday) {
 
 		// Check for duplicates
 		$r = q("SELECT `id` FROM `event` WHERE `uid` = %d AND `cid` = %d AND `start` = '%s' AND `type` = '%s' LIMIT 1",
@@ -1146,7 +1155,7 @@ class dfrn {
 	 *
 	 * @return Returns an array with relevant data of the author
 	 */
-	private function fetchauthor($xpath, $context, $importer, $element, $onlyfetch, $xml = "") {
+	private static function fetchauthor($xpath, $context, $importer, $element, $onlyfetch, $xml = "") {
 
 		$author = array();
 		$author["name"] = $xpath->evaluate($element."/atom:name/text()", $context)->item(0)->nodeValue;
@@ -1358,7 +1367,7 @@ class dfrn {
 	 *
 	 * @return string XML string
 	 */
-	private function transform_activity($xpath, $activity, $element) {
+	private static function transform_activity($xpath, $activity, $element) {
 		if (!is_object($activity))
 			return "";
 
@@ -1403,7 +1412,7 @@ class dfrn {
 	 * @param object $mail mail elements
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 */
-	private function process_mail($xpath, $mail, $importer) {
+	private static function process_mail($xpath, $mail, $importer) {
 
 		logger("Processing mails");
 
@@ -1454,7 +1463,7 @@ class dfrn {
 	 * @param object $suggestion suggestion elements
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 */
-	private function process_suggestion($xpath, $suggestion, $importer) {
+	private static function process_suggestion($xpath, $suggestion, $importer) {
 		$a = get_app();
 
 		logger("Processing suggestions");
@@ -1556,7 +1565,7 @@ class dfrn {
 	 * @param object $relocation relocation elements
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 */
-	private function process_relocation($xpath, $relocation, $importer) {
+	private static function process_relocation($xpath, $relocation, $importer) {
 
 		logger("Processing relocations");
 
@@ -1685,7 +1694,7 @@ class dfrn {
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 * @param int $entrytype Is it a toplevel entry, a comment or a relayed comment?
 	 */
-	private function update_content($current, $item, $importer, $entrytype) {
+	private static function update_content($current, $item, $importer, $entrytype) {
 		$changed = false;
 
 		if (edited_timestamp_is_newer($current, $item)) {
@@ -1737,7 +1746,7 @@ class dfrn {
 	 *
 	 * @return int Is it a toplevel entry, a comment or a relayed comment?
 	 */
-	private function get_entry_type($importer, $item) {
+	private static function get_entry_type($importer, $item) {
 		if ($item["parent-uri"] != $item["uri"]) {
 			$community = false;
 
@@ -1803,7 +1812,7 @@ class dfrn {
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 * @param int $posted_id The record number of item record that was just posted
 	 */
-	private function do_poke($item, $importer, $posted_id) {
+	private static function do_poke($item, $importer, $posted_id) {
 		$verb = urldecode(substr($item["verb"],strpos($item["verb"], "#")+1));
 		if(!$verb)
 			return;
@@ -1858,7 +1867,7 @@ class dfrn {
 	 *
 	 * @return bool Should the processing of the entries be continued?
 	 */
-	private function process_verbs($entrytype, $importer, &$item, &$is_like) {
+	private static function process_verbs($entrytype, $importer, &$item, &$is_like) {
 
 		logger("Process verb ".$item["verb"]." and object-type ".$item["object-type"]." for entrytype ".$entrytype, LOGGER_DEBUG);
 
@@ -1958,7 +1967,7 @@ class dfrn {
 	 * @param object $links link elements
 	 * @param array $item the item record
 	 */
-	private function parse_links($links, &$item) {
+	private static function parse_links($links, &$item) {
 		$rel = "";
 		$href = "";
 		$type = "";
@@ -2001,7 +2010,7 @@ class dfrn {
 	 * @param object $entry entry elements
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 */
-	private function process_entry($header, $xpath, $entry, $importer) {
+	private static function process_entry($header, $xpath, $entry, $importer) {
 
 		logger("Processing entries");
 
@@ -2009,6 +2018,20 @@ class dfrn {
 
 		// Get the uri
 		$item["uri"] = $xpath->query("atom:id/text()", $entry)->item(0)->nodeValue;
+
+		$item["edited"] = $xpath->query("atom:updated/text()", $entry)->item(0)->nodeValue;
+
+		$current = q("SELECT `id`, `uid`, `last-child`, `edited`, `body` FROM `item` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
+			dbesc($item["uri"]),
+			intval($importer["importer_uid"])
+		);
+
+		// Is there an existing item?
+		if (dbm::is_result($current) AND edited_timestamp_is_newer($current[0], $item) AND
+			(datetime_convert("UTC","UTC",$item["edited"]) < $current[0]["edited"])) {
+			logger("Item ".$item["uri"]." already existed.", LOGGER_DEBUG);
+			return;
+		}
 
 		// Fetch the owner
 		$owner = self::fetchauthor($xpath, $entry, $importer, "dfrn:owner", true);
@@ -2027,7 +2050,6 @@ class dfrn {
 		$item["title"] = $xpath->query("atom:title/text()", $entry)->item(0)->nodeValue;
 
 		$item["created"] = $xpath->query("atom:published/text()", $entry)->item(0)->nodeValue;
-		$item["edited"] = $xpath->query("atom:updated/text()", $entry)->item(0)->nodeValue;
 
 		$item["body"] = $xpath->query("dfrn:env/text()", $entry)->item(0)->nodeValue;
 		$item["body"] = str_replace(array(' ',"\t","\r","\n"), array('','','',''),$item["body"]);
@@ -2215,18 +2237,13 @@ class dfrn {
 			}
 		}
 
-		$r = q("SELECT `id`, `uid`, `last-child`, `edited`, `body` FROM `item` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
-			dbesc($item["uri"]),
-			intval($importer["importer_uid"])
-		);
-
 		if (!self::process_verbs($entrytype, $importer, $item, $is_like)) {
 			logger("Exiting because 'process_verbs' told us so", LOGGER_DEBUG);
 			return;
 		}
 
 		// Update content if 'updated' changes
-		if (dbm::is_result($r)) {
+		if (dbm::is_result($current)) {
 			if (self::update_content($r[0], $item, $importer, $entrytype))
 				logger("Item ".$item["uri"]." was updated.", LOGGER_DEBUG);
 			else
@@ -2311,7 +2328,7 @@ class dfrn {
 	 * @param object $deletion deletion elements
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 */
-	private function process_deletion($xpath, $deletion, $importer) {
+	private static function process_deletion($xpath, $deletion, $importer) {
 
 		logger("Processing deletions");
 

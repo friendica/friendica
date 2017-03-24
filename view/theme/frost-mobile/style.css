@@ -1909,6 +1909,9 @@ input#profile-jot-email {
 	-webkit-border-radius: 10px;
 }
 
+.pager .disabled {
+	display: none;
+}
 
 .pager_first,
 .pager_last,

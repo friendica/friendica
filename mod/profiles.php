@@ -233,11 +233,11 @@ function profiles_post(App $a) {
 
 		$with = ((x($_POST,'with')) ? notags(trim($_POST['with'])) : '');
 
-		if(! strlen($howlong))
-			$howlong = '0000-00-00 00:00:00';
-		else
+		if(! strlen($howlong)) {
+			$howlong = NULL_DATE;
+		} else {
 			$howlong = datetime_convert(date_default_timezone_get(),'UTC',$howlong);
-
+		}
 		// linkify the relationship target if applicable
 
 		$withchanged = false;
@@ -721,7 +721,7 @@ function profiles_content(App $a) {
 			'$gender' => gender_selector($r[0]['gender']),
 			'$marital' => marital_selector($r[0]['marital']),
 			'$with' => array('with', t("Who: \x28if applicable\x29"), strip_tags($r[0]['with']), t('Examples: cathy123, Cathy Williams, cathy@example.com')),
-			'$howlong' => array('howlong', t('Since [date]:'), ($r[0]['howlong'] === '0000-00-00 00:00:00' ? '' : datetime_convert('UTC',date_default_timezone_get(),$r[0]['howlong']))),
+			'$howlong' => array('howlong', t('Since [date]:'), ($r[0]['howlong'] <= NULL_DATE ? '' : datetime_convert('UTC',date_default_timezone_get(),$r[0]['howlong']))),
 			'$sexual' => sexpref_selector($r[0]['sexual']),
 			'$about' => array('about', t('Tell us about yourself...'), $r[0]['about']),
 			'$xmpp' => array('xmpp', t('XMPP (Jabber) address:'), $r[0]['xmpp'], t("The XMPP address will be propagated to your contacts so that they can follow you.")),

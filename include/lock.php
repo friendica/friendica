@@ -68,7 +68,8 @@ function block_on_function_lock($fn_name, $wait_sec = 2, $timeout = 30) {
 
 if(! function_exists('unlock_function')) {
 function unlock_function($fn_name) {
-	$r = q("UPDATE `locks` SET `locked` = 0, `created` = '0000-00-00 00:00:00' WHERE `name` = '%s'",
+	$r = q("UPDATE `locks` SET `locked` = 0, `created` = '%s' WHERE `name` = '%s'",
+			dbesc(NULL_DATE),
 			dbesc($fn_name)
 	     );
 

@@ -1,17 +1,5 @@
 <?php
 require_once("dbm.php");
-
-# if PDO is avaible for mysql, use the new database abstraction
-# TODO: PDO is disabled for release 3.3. We need to investigate why
-# the update from 3.2 fails with pdo
-/*
-if (class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
-  require_once("library/dddbl2/dddbl.php");
-  require_once("include/dba_pdo.php");
-}
-*/
-
-
 require_once('include/datetime.php');
 
 /**
@@ -24,13 +12,12 @@ require_once('include/datetime.php');
  *
  */
 
-if (! class_exists('dba')) {
 class dba {
 
 	private $debug = 0;
 	private $db;
 	private $result;
-	public  $mysqli = true;
+	private $driver;
 	public  $connected = false;
 	public  $error = false;
 
@@ -53,7 +40,7 @@ class dba {
 		if ($install) {
 			if (strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
 				if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
-					$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
+					$this->error = sprintf(t('Cannot locate DNS info for database server \'%s\''), $server);
 					$this->connected = false;
 					$this->db = null;
 					return;
@@ -61,35 +48,50 @@ class dba {
 			}
 		}
 
-		if (class_exists('mysqli')) {
-			$this->db = @new mysqli($server,$user,$pass,$db);
-			if (! mysqli_connect_errno()) {
+		if (class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
+			$this->driver = 'pdo';
+			$connect = "mysql:host=".$server.";dbname=".$db;
+			if (isset($a->config["system"]["db_charset"])) {
+				$connect .= ";charset=".$a->config["system"]["db_charset"];
+			}
+			$this->db = @new PDO($connect, $user, $pass);
+			if (!$this->db->errorCode()) {
 				$this->connected = true;
 			}
-			if (isset($a->config["system"]["db_charset"])) {
-				$this->db->set_charset($a->config["system"]["db_charset"]);
+		} elseif (class_exists('mysqli')) {
+			$this->driver = 'mysqli';
+			$this->db = @new mysqli($server,$user,$pass,$db);
+			if (!mysqli_connect_errno()) {
+				$this->connected = true;
+
+				if (isset($a->config["system"]["db_charset"])) {
+					$this->db->set_charset($a->config["system"]["db_charset"]);
+				}
 			}
-		} else {
-			$this->mysqli = false;
+		} elseif (function_exists('mysql_connect')) {
+			$this->driver = 'mysql';
 			$this->db = mysql_connect($server,$user,$pass);
 			if ($this->db && mysql_select_db($db,$this->db)) {
 				$this->connected = true;
+
+				if (isset($a->config["system"]["db_charset"])) {
+					mysql_set_charset($a->config["system"]["db_charset"], $this->db);
+				}
 			}
-			if (isset($a->config["system"]["db_charset"]))
-				mysql_set_charset($a->config["system"]["db_charset"], $this->db);
+		} else {
+			// No suitable SQL driver was found.
+			if (!$install) {
+				system_unavailable();
+			}
 		}
+
 		if (!$this->connected) {
 			$this->db = null;
 			if (!$install) {
 				system_unavailable();
 			}
 		}
-
 		$a->save_timestamp($stamp1, "network");
-	}
-
-	public function getdb() {
-		return $this->db;
 	}
 
 	/**
@@ -101,12 +103,18 @@ class dba {
 	 * @return string
 	 */
 	public function server_info() {
-		if ($this->mysqli) {
-			$return = $this->db->server_info;
-		} else {
-			$return = mysql_get_server_info($this->db);
+		switch ($this->driver) {
+			case 'pdo':
+				$version = $this->db->getAttribute(PDO::ATTR_SERVER_VERSION);
+				break;
+			case 'mysqli':
+				$version = $this->db->server_info;
+				break;
+			case 'mysql':
+				$version = mysql_get_server_info($this->db);
+				break;
 		}
-		return $return;
+		return $version;
 	}
 
 	/**
@@ -130,12 +138,18 @@ class dba {
 			return 0;
 		}
 
-		if ($this->mysqli) {
-			$return = $this->result->num_rows;
-		} else {
-			$return = mysql_num_rows($this->result);
+		switch ($this->driver) {
+			case 'pdo':
+				$rows = $this->result->rowCount();
+				break;
+			case 'mysqli':
+				$rows = $this->result->num_rows;
+				break;
+			case 'mysql':
+				$rows = mysql_num_rows($this->result);
+				break;
 		}
-		return $return;
+		return $rows;
 	}
 
 	/**
@@ -172,8 +186,9 @@ class dba {
 			if ((intval($a->config["system"]["db_loglimit_index"]) > 0)) {
 				$log = (in_array($row['key'], $watchlist) AND
 					($row['rows'] >= intval($a->config["system"]["db_loglimit_index"])));
-			} else
+			} else {
 				$log = false;
+			}
 
 			if ((intval($a->config["system"]["db_loglimit_index_high"]) > 0) AND ($row['rows'] >= intval($a->config["system"]["db_loglimit_index_high"]))) {
 				$log = true;
@@ -203,13 +218,7 @@ class dba {
 
 		$this->error = '';
 
-		// Check the connection (This can reconnect the connection - if configured)
-		if ($this->mysqli) {
-			$connected = $this->db->ping();
-		} else {
-			$connected = mysql_ping($this->db);
-		}
-		$connstr = ($connected ? "Connected" : "Disonnected");
+		$connstr = ($this->connected() ? "Connected" : "Disonnected");
 
 		$stamp1 = microtime(true);
 
@@ -219,10 +228,22 @@ class dba {
 			$sql = "/*".$a->callstack()." */ ".$sql;
 		}
 
-		if ($this->mysqli) {
-			$result = @$this->db->query($sql);
-		} else {
-			$result = @mysql_query($sql,$this->db);
+		$columns = 0;
+
+		switch ($this->driver) {
+			case 'pdo':
+				$result = @$this->db->query($sql);
+				// Is used to separate between queries that returning data - or not
+				if (!is_bool($result)) {
+					$columns = $result->columnCount();
+				}
+				break;
+			case 'mysqli':
+				$result = @$this->db->query($sql);
+				break;
+			case 'mysql':
+				$result = @mysql_query($sql,$this->db);
+				break;
 		}
 		$stamp2 = microtime(true);
 		$duration = (float)($stamp2-$stamp1);
@@ -243,16 +264,27 @@ class dba {
 			}
 		}
 
-		if ($this->mysqli) {
-			if ($this->db->errno) {
-				$this->error = $this->db->error;
-				$this->errorno = $this->db->errno;
-			}
-		} elseif (mysql_errno($this->db)) {
-			$this->error = mysql_error($this->db);
-			$this->errorno = mysql_errno($this->db);
+		switch ($this->driver) {
+			case 'pdo':
+				$errorInfo = $this->db->errorInfo();
+				if ($errorInfo) {
+					$this->error = $errorInfo[2];
+					$this->errorno = $errorInfo[1];
+				}
+				break;
+			case 'mysqli':
+				if ($this->db->errno) {
+					$this->error = $this->db->error;
+					$this->errorno = $this->db->errno;
+				}
+				break;
+			case 'mysql':
+				if (mysql_errno($this->db)) {
+					$this->error = mysql_error($this->db);
+					$this->errorno = mysql_errno($this->db);
+				}
+				break;
 		}
-
 		if (strlen($this->error)) {
 			logger('DB Error ('.$connstr.') '.$this->errorno.': '.$this->error);
 		}
@@ -266,10 +298,16 @@ class dba {
 			} elseif ($result === true) {
 				$mesg = 'true';
 			} else {
-				if ($this->mysqli) {
-					$mesg = $result->num_rows . ' results' . EOL;
-				} else {
-					$mesg = mysql_num_rows($result) . ' results' . EOL;
+				switch ($this->driver) {
+					case 'pdo':
+						$mesg = $result->rowCount().' results'.EOL;
+						break;
+					case 'mysqli':
+						$mesg = $result->num_rows.' results'.EOL;
+						break;
+					case 'mysql':
+						$mesg = mysql_num_rows($result).' results'.EOL;
+						break;
 				}
 			}
 
@@ -293,7 +331,7 @@ class dba {
 			}
 		}
 
-		if (($result === true) || ($result === false)) {
+		if (is_bool($result)) {
 			return $result;
 		}
 		if ($onlyquery) {
@@ -302,18 +340,32 @@ class dba {
 		}
 
 		$r = array();
-		if ($this->mysqli) {
-			if ($result->num_rows) {
-				while($x = $result->fetch_array(MYSQLI_ASSOC))
+		switch ($this->driver) {
+			case 'pdo':
+				while ($x = $result->fetch(PDO::FETCH_ASSOC)) {
 					$r[] = $x;
+				}
+				$result->closeCursor();
+				break;
+			case 'mysqli':
+				while ($x = $result->fetch_array(MYSQLI_ASSOC)) {
+					$r[] = $x;
+				}
 				$result->free_result();
-			}
-		} else {
-			if (mysql_num_rows($result)) {
-				while($x = mysql_fetch_array($result, MYSQL_ASSOC))
+				break;
+			case 'mysql':
+				while ($x = mysql_fetch_array($result, MYSQL_ASSOC)) {
 					$r[] = $x;
+				}
 				mysql_free_result($result);
-			}
+				break;
+		}
+
+		// PDO doesn't return "true" on successful operations - like mysqli does
+		// Emulate this behaviour by checking if the query returned data and had columns
+		// This should be reliable enough
+		if (($this->driver == 'pdo') AND (count($r) == 0) AND ($columns == 0)) {
+			return true;
 		}
 
 		//$a->save_timestamp($stamp1, "database");
@@ -328,12 +380,16 @@ class dba {
 		$x = false;
 
 		if ($this->result) {
-			if ($this->mysqli) {
-				if ($this->result->num_rows)
+			switch ($this->driver) {
+				case 'pdo':
+					$x = $this->result->fetch(PDO::FETCH_ASSOC);
+					break;
+				case 'mysqli':
 					$x = $this->result->fetch_array(MYSQLI_ASSOC);
-			} else {
-				if (mysql_num_rows($this->result))
+					break;
+				case 'mysql':
 					$x = mysql_fetch_array($this->result, MYSQL_ASSOC);
+					break;
 			}
 		}
 		return($x);
@@ -341,10 +397,16 @@ class dba {
 
 	public function qclose() {
 		if ($this->result) {
-			if ($this->mysqli) {
-				$this->result->free_result();
-			} else {
-				mysql_free_result($this->result);
+			switch ($this->driver) {
+				case 'pdo':
+					$this->result->closeCursor();
+					break;
+				case 'mysqli':
+					$this->result->free_result();
+					break;
+				case 'mysql':
+					mysql_free_result($this->result);
+					break;
 			}
 		}
 	}
@@ -355,35 +417,65 @@ class dba {
 
 	public function escape($str) {
 		if ($this->db && $this->connected) {
-			if ($this->mysqli) {
-				return @$this->db->real_escape_string($str);
-			} else {
-				return @mysql_real_escape_string($str,$this->db);
+			switch ($this->driver) {
+				case 'pdo':
+					return substr(@$this->db->quote($str, PDO::PARAM_STR), 1, -1);
+				case 'mysqli':
+					return @$this->db->real_escape_string($str);
+				case 'mysql':
+					return @mysql_real_escape_string($str,$this->db);
 			}
 		}
 	}
 
 	function connected() {
-		if ($this->mysqli) {
-			$connected = $this->db->ping();
-		} else {
-			$connected = mysql_ping($this->db);
+		switch ($this->driver) {
+			case 'pdo':
+				// Not sure if this really is working like expected
+				$connected = ($this->db->getAttribute(PDO::ATTR_CONNECTION_STATUS) != "");
+				break;
+			case 'mysqli':
+				$connected = $this->db->ping();
+				break;
+			case 'mysql':
+				$connected = mysql_ping($this->db);
+				break;
 		}
 		return $connected;
 	}
 
+	function insert_id() {
+		switch ($this->driver) {
+			case 'pdo':
+				$id = $this->db->lastInsertId();
+				break;
+			case 'mysqli':
+				$id = $this->db->insert_id;
+				break;
+			case 'mysql':
+				$id = mysql_insert_id($this->db);
+				break;
+		}
+		return $id;
+	}
+
 	function __destruct() {
 		if ($this->db) {
-			if ($this->mysqli) {
-				$this->db->close();
-			} else {
-				mysql_close($this->db);
+			switch ($this->driver) {
+				case 'pdo':
+					$this->db = null;
+					break;
+				case 'mysqli':
+					$this->db->close();
+					break;
+				case 'mysql':
+					mysql_close($this->db);
+					break;
 			}
 		}
 	}
-}}
+}
 
-if (! function_exists('printable')) {
 function printable($s) {
 	$s = preg_replace("~([\x01-\x08\x0E-\x0F\x10-\x1F\x7F-\xFF])~",".", $s);
 	$s = str_replace("\x00",'.',$s);
@@ -391,37 +483,32 @@ function printable($s) {
 		$s = escape_tags($s);
 	}
 	return $s;
-}}
+}
 
 // Procedural functions
-if (! function_exists('dbg')) {
 function dbg($state) {
 	global $db;
+
 	if ($db) {
 		$db->dbg($state);
 	}
-}}
+}
 
-if (! function_exists('dbesc')) {
 function dbesc($str) {
 	global $db;
+
 	if ($db && $db->connected) {
 		return($db->escape($str));
 	} else {
 		return(str_replace("'","\\'",$str));
 	}
-}}
-
-
+}
 
 // Function: q($sql,$args);
 // Description: execute SQL query with printf style args.
 // Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
 //                   'user', 1);
-
-if (! function_exists('q')) {
 function q($sql) {
-
 	global $db;
 	$args = func_get_args();
 	unset($args[0]);
@@ -445,8 +532,7 @@ function q($sql) {
 	 */
 	logger('dba: no database: ' . print_r($args,true));
 	return false;
-
-}}
+}
 
 /**
  * @brief Performs a query with "dirty reads"
@@ -458,8 +544,8 @@ function q($sql) {
  * @return array Query array
  */
 function qu($sql) {
-
 	global $db;
+
 	$args = func_get_args();
 	unset($args[0]);
 
@@ -484,7 +570,6 @@ function qu($sql) {
 	 */
 	logger('dba: no database: ' . print_r($args,true));
 	return false;
-
 }
 
 /**
@@ -492,40 +577,31 @@ function qu($sql) {
  * Raw db query, no arguments
  *
  */
-
-if (! function_exists('dbq')) {
 function dbq($sql) {
-
 	global $db;
+
 	if ($db && $db->connected) {
 		$ret = $db->q($sql);
 	} else {
 		$ret = false;
 	}
 	return $ret;
-}}
-
+}
 
 // Caller is responsible for ensuring that any integer arguments to
 // dbesc_array are actually integers and not malformed strings containing
 // SQL injection vectors. All integer array elements should be specifically
 // cast to int to avoid trouble.
-
-
-if (! function_exists('dbesc_array_cb')) {
 function dbesc_array_cb(&$item, $key) {
 	if (is_string($item))
 		$item = dbesc($item);
-}}
+}
 
-
-if (! function_exists('dbesc_array')) {
 function dbesc_array(&$arr) {
 	if (is_array($arr) && count($arr)) {
 		array_walk($arr,'dbesc_array_cb');
 	}
-}}
-
+}
 
 function dba_timer() {
 	return microtime(true);

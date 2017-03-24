@@ -35,6 +35,10 @@ function poller_run($argv, $argc){
 		return;
 	}
 
+	$a->set_baseurl(Config::get('system', 'url'));
+
+	load_hooks();
+
 	$a->start_process();
 
 	if (poller_max_connections_reached()) {
@@ -207,6 +211,16 @@ function poller_exec_function($queue, $funcname, $argv) {
 
 	$duration = number_format(microtime(true) - $stamp, 3);
 
+	if ($duration > 3600) {
+		logger("Prio ".$queue["priority"].": ".$queue["parameter"]." - longer than 1 hour (".round($duration/60, 3).")", LOGGER_DEBUG);
+	} elseif ($duration > 600) {
+		logger("Prio ".$queue["priority"].": ".$queue["parameter"]." - longer than 10 minutes (".round($duration/60, 3).")", LOGGER_DEBUG);
+	} elseif ($duration > 300) {
+		logger("Prio ".$queue["priority"].": ".$queue["parameter"]." - longer than 5 minutes (".round($duration/60, 3).")", LOGGER_DEBUG);
+	} elseif ($duration > 120) {
+		logger("Prio ".$queue["priority"].": ".$queue["parameter"]." - longer than 2 minutes (".round($duration/60, 3).")", LOGGER_DEBUG);
+	}
+
 	logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." - done in ".$duration." seconds.");
 
 	// Write down the performance values into the log
@@ -343,18 +357,18 @@ function poller_max_connections_reached() {
  *
  */
 function poller_kill_stale_workers() {
-	$r = q("SELECT `pid`, `executed`, `priority`, `parameter` FROM `workerqueue` WHERE `executed` != '0000-00-00 00:00:00'");
+	$r = q("SELECT `pid`, `executed`, `priority`, `parameter` FROM `workerqueue` WHERE `executed` > '%s'", dbesc(NULL_DATE));
 
 	if (!dbm::is_result($r)) {
 		// No processing here needed
 		return;
 	}
 
-	foreach($r AS $pid)
-		if (!posix_kill($pid["pid"], 0))
-			q("UPDATE `workerqueue` SET `executed` = '0000-00-00 00:00:00', `pid` = 0 WHERE `pid` = %d",
-				intval($pid["pid"]));
-		else {
+	foreach ($r AS $pid) {
+		if (!posix_kill($pid["pid"], 0)) {
+			q("UPDATE `workerqueue` SET `executed` = '%s', `pid` = 0 WHERE `pid` = %d",
+				dbesc(NULL_DATE), intval($pid["pid"]));
+		} else {
 			// Kill long running processes
 
 			// Check if the priority is in a valid range
@@ -377,14 +391,17 @@ function poller_kill_stale_workers() {
 				// We killed the stale process.
 				// To avoid a blocking situation we reschedule the process at the beginning of the queue.
 				// Additionally we are lowering the priority.
-				q("UPDATE `workerqueue` SET `executed` = '0000-00-00 00:00:00', `created` = '%s',
+				q("UPDATE `workerqueue` SET `executed` = '%s', `created` = '%s',
 							`priority` = %d, `pid` = 0 WHERE `pid` = %d",
+					dbesc(NULL_DATE),
 					dbesc(datetime_convert()),
 					intval(PRIORITY_NEGLIGIBLE),
 					intval($pid["pid"]));
-			} else
+			} else {
 				logger("Worker process ".$pid["pid"]." (".implode(" ", $argv).") now runs for ".round($duration)." of ".$max_duration." allowed minutes. That's okay.", LOGGER_DEBUG);
+			}
 		}
+	}
 }
 
 /**
@@ -411,15 +428,15 @@ function poller_too_much_workers() {
 		$slope = $maxworkers / pow($maxsysload, $exponent);
 		$queues = ceil($slope * pow(max(0, $maxsysload - $load), $exponent));
 
-		$s = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `executed` = '0000-00-00 00:00:00'");
+		$s = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `executed` <= '%s'", dbesc(NULL_DATE));
 		$entries = $s[0]["total"];
 
 		if (Config::get("system", "worker_fastlane", false) AND ($queues > 0) AND ($entries > 0) AND ($active >= $queues)) {
-			$s = q("SELECT `priority` FROM `workerqueue` WHERE `executed` = '0000-00-00 00:00:00' ORDER BY `priority` LIMIT 1");
+			$s = q("SELECT `priority` FROM `workerqueue` WHERE `executed` <= '%s' ORDER BY `priority` LIMIT 1", dbesc(NULL_DATE));
 			$top_priority = $s[0]["priority"];
 
-			$s = q("SELECT `id` FROM `workerqueue` WHERE `priority` <= %d AND `executed` != '0000-00-00 00:00:00' LIMIT 1",
-				intval($top_priority));
+			$s = q("SELECT `id` FROM `workerqueue` WHERE `priority` <= %d AND `executed` > '%s' LIMIT 1",
+				intval($top_priority), dbesc(NULL_DATE));
 			$high_running = dbm::is_result($s);
 
 			if (!$high_running AND ($top_priority > PRIORITY_UNDEFINED) AND ($top_priority < PRIORITY_NEGLIGIBLE)) {
@@ -454,7 +471,7 @@ function poller_too_much_workers() {
 		// Are there fewer workers running as possible? Then fork a new one.
 		if (!Config::get("system", "worker_dont_fork") AND ($queues > ($active + 1)) AND ($entries > 1)) {
 			logger("Active workers: ".$active."/".$queues." Fork a new worker.", LOGGER_DEBUG);
-			$args = array("php", "include/poller.php", "no_cron");
+			$args = array("include/poller.php", "no_cron");
 			$a = get_app();
 			$a->proc_run($args);
 		}
@@ -539,21 +556,25 @@ function poller_worker_process() {
 	if (poller_passing_slow($highest_priority)) {
 		// Are there waiting processes with a higher priority than the currently highest?
 		$r = q("SELECT * FROM `workerqueue`
-				WHERE `executed` = '0000-00-00 00:00:00' AND `priority` < %d
-				ORDER BY `priority`, `created` LIMIT 1", dbesc($highest_priority));
-		if (dbm::is_result($r))
+				WHERE `executed` <= '%s' AND `priority` < %d
+				ORDER BY `priority`, `created` LIMIT 1",
+				dbesc(NULL_DATE),
+				intval($highest_priority));
+		if (dbm::is_result($r)) {
 			return $r;
-
+		}
 		// Give slower processes some processing time
 		$r = q("SELECT * FROM `workerqueue`
-				WHERE `executed` = '0000-00-00 00:00:00' AND `priority` > %d
-				ORDER BY `priority`, `created` LIMIT 1", dbesc($highest_priority));
+				WHERE `executed` <= '%s' AND `priority` > %d
+				ORDER BY `priority`, `created` LIMIT 1",
+				dbesc(NULL_DATE),
+				intval($highest_priority));
 	}
 
 	// If there is no result (or we shouldn't pass lower processes) we check without priority limit
-	if (($highest_priority == 0) OR !dbm::is_result($r))
-		$r = q("SELECT * FROM `workerqueue` WHERE `executed` = '0000-00-00 00:00:00' ORDER BY `priority`, `created` LIMIT 1");
-
+	if (($highest_priority == 0) OR !dbm::is_result($r)) {
+		$r = q("SELECT * FROM `workerqueue` WHERE `executed` <= '%s' ORDER BY `priority`, `created` LIMIT 1", dbesc(NULL_DATE));
+	}
 	return $r;
 }
 
@@ -561,7 +582,7 @@ function poller_worker_process() {
  * @brief Call the front end worker
  */
 function call_worker() {
-	if (!Config::get("system", "frontend_worker") OR !Config::get("system", "worker")) {
+	if (!Config::get("system", "frontend_worker")) {
 		return;
 	}
 
@@ -573,7 +594,7 @@ function call_worker() {
  * @brief Call the front end worker if there aren't any active
  */
 function call_worker_if_idle() {
-	if (!Config::get("system", "frontend_worker") OR !Config::get("system", "worker")) {
+	if (!Config::get("system", "frontend_worker")) {
 		return;
 	}
 
@@ -600,7 +621,7 @@ function call_worker_if_idle() {
 
 		logger('Call poller', LOGGER_DEBUG);
 
-		$args = array("php", "include/poller.php", "no_cron");
+		$args = array("include/poller.php", "no_cron");
 		$a = get_app();
 		$a->proc_run($args);
 		return;

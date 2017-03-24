@@ -39,9 +39,9 @@ function diaspora2bb($s) {
 	$s = html_entity_decode($s, ENT_COMPAT, 'UTF-8');
 
 	// Handles single newlines
-	$s = str_replace("\r", '<br>', $s);
-
+	$s = str_replace("\r\n", "\n", $s);
 	$s = str_replace("\n", " \n", $s);
+	$s = str_replace("\r", " \n", $s);
 
 	// Replace lonely stars in lines not starting with it with literal stars
 	$s = preg_replace('/^([^\*]+)\*([^\*]*)$/im', '$1\*$2', $s);

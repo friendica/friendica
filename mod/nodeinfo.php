@@ -228,9 +228,10 @@ function nodeinfo_cron() {
 
         logger("local_posts: ".$local_posts, LOGGER_DEBUG);
 
-	$posts = qu("SELECT COUNT(*) AS `local_comments` FROM `item`
-			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-			WHERE `contact`.`self` and `item`.`id` != `item`.`parent` AND `item`.`network` IN ('%s', '%s', '%s')",
+	$posts = qu("SELECT COUNT(*) FROM `contact`
+			INNER JOIN `item` ON `item`.`contact-id` = `contact`.`id` AND `item`.`uid` = `contact`.`uid` AND
+				`item`.`id` != `item`.`parent` AND `item`.`network` IN ('%s', '%s', '%s')
+			WHERE `contact`.`self`",
 			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_DFRN));
 
 	if (!is_array($posts))

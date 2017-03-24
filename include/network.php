@@ -72,8 +72,9 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	$a = get_app();
 
 	$ch = @curl_init($url);
-	if(($redirects > 8) || (! $ch))
-		return false;
+	if(($redirects > 8) || (! $ch)) {
+		return $ret;
+	}
 
 	@curl_setopt($ch, CURLOPT_HEADER, true);
 
@@ -142,6 +143,8 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	if (curl_errno($ch) !== CURLE_OK) {
 		logger('fetch_url error fetching '.$url.': '.curl_error($ch), LOGGER_NORMAL);
 	}
+
+	$ret['errno'] = curl_errno($ch);
 
 	$base = $s;
 	$curl_info = @curl_getinfo($ch);

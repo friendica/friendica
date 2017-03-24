@@ -1,4 +1,4 @@
-Version 3.5.1
+Version 3.5.1 (2017-03-12)
   Friendica Core:
     Updates to the translations (BG, CA, CS, DE, EO, ES, FR, IS, IT, NL, PL, PT-BR, RU, SV) [translation teams]
     Fix for a potential XSS vector [heluecht, thanks to Vít Šesták 'v6ak' for reporting the problem]

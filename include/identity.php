@@ -652,7 +652,7 @@ function advanced_profile(App $a) {
 			$profile['marital']['with'] = $a->profile['with'];
 		}
 
-		if (strlen($a->profile['howlong']) && $a->profile['howlong'] !== '0000-00-00 00:00:00') {
+		if (strlen($a->profile['howlong']) && $a->profile['howlong'] >= NULL_DATE) {
 			$profile['howlong'] = relative_date($a->profile['howlong'], t('for %1$d %2$s'));
 		}
 

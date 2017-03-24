@@ -27,7 +27,7 @@ require_once("include/text.php");
 function admin_post(App $a) {
 
 
-	if(!is_site_admin()) {
+	if (!is_site_admin()) {
 		return;
 	}
 
@@ -39,7 +39,7 @@ function admin_post(App $a) {
 
 	// urls
 	if ($a->argc > 1) {
-		switch ($a->argv[1]){
+		switch ($a->argv[1]) {
 			case 'site':
 				admin_page_site_post($a);
 				break;
@@ -47,10 +47,10 @@ function admin_post(App $a) {
 				admin_page_users_post($a);
 				break;
 			case 'plugins':
-				if($a->argc > 2 &&
+				if ($a->argc > 2 &&
 					is_file("addon/".$a->argv[2]."/".$a->argv[2].".php")) {
 						@include_once("addon/".$a->argv[2]."/".$a->argv[2].".php");
-						if(function_exists($a->argv[2].'_plugin_admin_post')) {
+						if (function_exists($a->argv[2].'_plugin_admin_post')) {
 							$func = $a->argv[2].'_plugin_admin_post';
 							$func($a);
 						}
@@ -59,14 +59,16 @@ function admin_post(App $a) {
 				return; // NOTREACHED
 				break;
 			case 'themes':
-				if($a->argc < 2) {
-					if(is_ajax()) return;
+				if ($a->argc < 2) {
+					if (is_ajax()) {
+						return;
+					}
 					goaway('admin/');
 					return;
 				}
 
 				$theme = $a->argv[2];
-				if(is_file("view/theme/$theme/config.php")){
+				if (is_file("view/theme/$theme/config.php")) {
 					function __call_theme_admin_post(App $a, $theme) {
 						$orig_theme = $a->theme;
 						$orig_page = $a->page;
@@ -77,8 +79,10 @@ function admin_post(App $a) {
 
 
 						$init = $theme."_init";
-						if(function_exists($init)) $init($a);
-						if(function_exists("theme_admin_post")) {
+						if (function_exists($init)) {
+							$init($a);
+						}
+						if (function_exists("theme_admin_post")) {
 							$admin_form = theme_admin_post($a);
 						}
 
@@ -90,8 +94,9 @@ function admin_post(App $a) {
 					__call_theme_admin_post($a, $theme);
 				}
 				info(t('Theme settings updated.'));
-				if(is_ajax()) return;
-
+				if (is_ajax()) {
+					return;
+				}
 				goaway('admin/themes/'.$theme);
 				return;
 				break;
@@ -130,7 +135,7 @@ function admin_post(App $a) {
  */
 function admin_content(App $a) {
 
-	if(!is_site_admin()) {
+	if (!is_site_admin()) {
 		return login(false);
 	}
 
@@ -168,7 +173,7 @@ function admin_content(App $a) {
 
 	$r = q("SELECT `name` FROM `addon` WHERE `plugin_admin` = 1 ORDER BY `name`");
 	$aside_tools['plugins_admin']=array();
-	foreach ($r as $h){
+	foreach ($r as $h) {
 		$plugin =$h['name'];
 		$aside_tools['plugins_admin'][] = array("admin/plugins/".$plugin, $plugin, "plugin");
 		// temp plugins with admin
@@ -199,8 +204,8 @@ function admin_content(App $a) {
 	 */
 	$o = '';
 	// urls
-	if($a->argc > 1) {
-		switch ($a->argv[1]){
+	if ($a->argc > 1) {
+		switch ($a->argv[1]) {
 			case 'site':
 				$o = admin_page_site($a);
 				break;
@@ -238,7 +243,7 @@ function admin_content(App $a) {
 		$o = admin_page_summary($a);
 	}
 
-	if(is_ajax()) {
+	if (is_ajax()) {
 		echo $o;
 		killme();
 		return '';
@@ -270,8 +275,8 @@ function admin_page_federation(App $a) {
 	// off one % two of them are needed in the query
 	// Add more platforms if you like, when one returns 0 known nodes it is not
 	// displayed on the stats page.
-	$platforms = array('Friendica', 'Diaspora', '%%red%%', 'Hubzilla', 'BlaBlaNet', 'GNU Social', 'StatusNet', 'Mastodon');
-	$colors    = array('Friendica' => '#ffc018',     // orange from the logo
+	$platforms = array('Friendi%%a', 'Diaspora', '%%red%%', 'Hubzilla', 'BlaBlaNet', 'GNU Social', 'StatusNet', 'Mastodon');
+	$colors    = array('Friendi%%a' => '#ffc018',     // orange from the logo
 			   'Diaspora'  => '#a1a1a1',     // logo is black and white, makes a gray
 			   '%%red%%'   => '#c50001',     // fire red from the logo
 			   'Hubzilla'  => '#43488a',     // blue from the logo
@@ -310,19 +315,21 @@ function admin_page_federation(App $a) {
 		// in the DB the Diaspora versions have the format x.x.x.x-xx the last
 		// part (-xx) should be removed to clean up the versions from the "head
 		// commit" information and combined into a single entry for x.x.x.x
-		if($p=='Diaspora') {
+		if ($p == 'Diaspora') {
 			$newV = array();
 			$newVv = array();
-			foreach($v as $vv) {
+			foreach ($v as $vv) {
 				$newVC = $vv['total'];
 				$newVV = $vv['version'];
 				$posDash = strpos($newVV, '-');
-				if($posDash)
+				if ($posDash) {
 					$newVV = substr($newVV, 0, $posDash);
-				if(isset($newV[$newVV]))
+				}
+				if (isset($newV[$newVV])) {
 					$newV[$newVV] += $newVC;
-				else
+				} else {
 					$newV[$newVV] = $newVC;
+				}
 			}
 			foreach ($newV as $key => $value) {
 				array_push($newVv, array('total'=>$value, 'version'=>$key));
@@ -333,7 +340,7 @@ function admin_page_federation(App $a) {
 		// early friendica versions have the format x.x.xxxx where xxxx is the
 		// DB version stamp; those should be operated out and versions be
 		// conbined
-		if($p=='Friendica') {
+		if ($p == 'Friendi%%a') {
 			$newV = array();
 			$newVv = array();
 			foreach ($v as $vv) {
@@ -341,12 +348,14 @@ function admin_page_federation(App $a) {
 				$newVV = $vv['version'];
 				$lastDot = strrpos($newVV,'.');
 				$len = strlen($newVV)-1;
-				if(($lastDot == $len-4) && (!strrpos($newVV,'-rc')==$len-3))
+				if (($lastDot == $len-4) && (!strrpos($newVV,'-rc') == $len-3)) {
 					$newVV = substr($newVV, 0, $lastDot);
-				if(isset($newV[$newVV]))
+				}
+				if (isset($newV[$newVV])) {
 					$newV[$newVV] += $newVC;
-				else
+				} else {
 					$newV[$newVV] = $newVC;
+				}
 			}
 			foreach ($newV as $key => $value) {
 				array_push($newVv, array('total'=>$value, 'version'=>$key));
@@ -455,7 +464,10 @@ function admin_page_summary(App $a) {
 	);
 
 	$users=0;
-	foreach ($r as $u){ $accounts[$u['page-flags']][1] = $u['count']; $users+= $u['count']; }
+	foreach ($r as $u) {
+		$accounts[$u['page-flags']][1] = $u['count'];
+		$users+= $u['count'];
+	}
 
 	logger('accounts: '.print_r($accounts,true),LOGGER_DATA);
 
@@ -468,12 +480,8 @@ function admin_page_summary(App $a) {
 	$r = qu("SELECT COUNT(*) AS `total` FROM `queue` WHERE 1");
 	$queue = (($r) ? $r[0]['total'] : 0);
 
-	if (get_config('system','worker')) {
-		$r = qu("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE 1");
-		$workerqueue = (($r) ? $r[0]['total'] : 0);
-	} else {
-		$workerqueue = 0;
-	}
+	$r = qu("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE 1");
+	$workerqueue = (($r) ? $r[0]['total'] : 0);
 
 	// We can do better, but this is a quick queue status
 
@@ -485,7 +493,6 @@ function admin_page_summary(App $a) {
 		'$title' => t('Administration'),
 		'$page' => t('Summary'),
 		'$queues' => $queues,
-		'$workeractive' => get_config('system','worker'),
 		'$users' => array(t('Registered users'), $users),
 		'$accounts' => $accounts,
 		'$pending' => array(t('Pending registrations'), $pending),
@@ -506,19 +513,19 @@ function admin_page_summary(App $a) {
  * @param App $a
  */
 function admin_page_site_post(App $a) {
-	if(!x($_POST,"page_site")) {
+	if (!x($_POST,"page_site")) {
 		return;
 	}
 
 	check_form_security_token_redirectOnErr('/admin/site', 'admin_site');
 
 	// relocate
-	if(x($_POST,'relocate') && x($_POST,'relocate_url') && $_POST['relocate_url']!="") {
+	if (x($_POST,'relocate') && x($_POST,'relocate_url') && $_POST['relocate_url'] != "") {
 		$new_url = $_POST['relocate_url'];
 		$new_url = rtrim($new_url,"/");
 
 		$parsed = @parse_url($new_url);
-		if(!$parsed || (!x($parsed,'host') || !x($parsed,'scheme'))) {
+		if (!$parsed || (!x($parsed,'host') || !x($parsed,'scheme'))) {
 			notice(t("Can not parse base url. Must have at least <scheme>://<domain>"));
 			goaway('admin/site');
 		}
@@ -551,7 +558,7 @@ function admin_page_site_post(App $a) {
 
 			$q = sprintf("UPDATE %s SET %s;", $table_name, $upds);
 			$r = q($q);
-			if(!$r) {
+			if (!$r) {
 				notice("Failed updating '$table_name': ".$db->error);
 				goaway('admin/site');
 			}
@@ -630,8 +637,6 @@ function admin_page_site_post(App $a) {
 	$proxyuser		=	((x($_POST,'proxyuser'))		? notags(trim($_POST['proxyuser']))		: '');
 	$proxy			=	((x($_POST,'proxy'))			? notags(trim($_POST['proxy']))			: '');
 	$timeout		=	((x($_POST,'timeout'))			? intval(trim($_POST['timeout']))		: 60);
-	$delivery_interval	=	((x($_POST,'delivery_interval'))	? intval(trim($_POST['delivery_interval']))	: 0);
-	$poll_interval		=	((x($_POST,'poll_interval'))		? intval(trim($_POST['poll_interval']))		: 0);
 	$maxloadavg		=	((x($_POST,'maxloadavg'))		? intval(trim($_POST['maxloadavg']))		: 50);
 	$maxloadavg_frontend	=	((x($_POST,'maxloadavg_frontend'))	? intval(trim($_POST['maxloadavg_frontend']))	: 50);
 	$optimize_max_tablesize	=	((x($_POST,'optimize_max_tablesize'))	? intval(trim($_POST['optimize_max_tablesize'])): 100);
@@ -649,37 +654,32 @@ function admin_page_site_post(App $a) {
 	$diaspora_enabled	=	((x($_POST,'diaspora_enabled'))		? True   					: False);
 	$ssl_policy		=	((x($_POST,'ssl_policy'))		? intval($_POST['ssl_policy']) 			: 0);
 	$force_ssl		=	((x($_POST,'force_ssl'))		? True   					: False);
-	$old_share		=	((x($_POST,'old_share'))		? True   					: False);
 	$hide_help		=	((x($_POST,'hide_help'))		? True   					: False);
-	$suppress_language	=	((x($_POST,'suppress_language'))	? True   					: False);
 	$suppress_tags		=	((x($_POST,'suppress_tags'))		? True   					: False);
 	$use_fulltext_engine	=	((x($_POST,'use_fulltext_engine'))	? True   					: False);
 	$itemcache		=	((x($_POST,'itemcache'))		? notags(trim($_POST['itemcache']))		: '');
 	$itemcache_duration	=	((x($_POST,'itemcache_duration'))	? intval($_POST['itemcache_duration'])		: 0);
 	$max_comments		=	((x($_POST,'max_comments'))		? intval($_POST['max_comments'])		: 0);
-	$lockpath		=	((x($_POST,'lockpath'))			? notags(trim($_POST['lockpath']))		: '');
 	$temppath		=	((x($_POST,'temppath'))			? notags(trim($_POST['temppath']))		: '');
 	$basepath		=	((x($_POST,'basepath'))			? notags(trim($_POST['basepath']))		: '');
 	$singleuser		=	((x($_POST,'singleuser'))		? notags(trim($_POST['singleuser']))		: '');
 	$proxy_disabled		=	((x($_POST,'proxy_disabled'))		? True						: False);
-	$old_pager		=	((x($_POST,'old_pager'))		? True						: False);
 	$only_tag_search	=	((x($_POST,'only_tag_search'))		? True						: False);
 	$rino			=	((x($_POST,'rino'))			? intval($_POST['rino'])			: 0);
 	$embedly		=	((x($_POST,'embedly'))			? notags(trim($_POST['embedly']))		: '');
-	$worker			=	((x($_POST,'worker'))			? True						: False);
 	$worker_queues		=	((x($_POST,'worker_queues'))		? intval($_POST['worker_queues'])		: 4);
 	$worker_dont_fork	=	((x($_POST,'worker_dont_fork'))		? True						: False);
 	$worker_fastlane	=	((x($_POST,'worker_fastlane'))		? True						: False);
 	$worker_frontend	=	((x($_POST,'worker_frontend'))		? True						: False);
 
-	if($a->get_path() != "")
+	if ($a->get_path() != "") {
 		$diaspora_enabled = false;
-
-	if(!$thread_allow)
+	}
+	if (!$thread_allow) {
 		$ostatus_disabled = true;
-
-	if($ssl_policy != intval(get_config('system','ssl_policy'))) {
-		if($ssl_policy == SSL_POLICY_FULL) {
+	}
+	if ($ssl_policy != intval(get_config('system','ssl_policy'))) {
+		if ($ssl_policy == SSL_POLICY_FULL) {
 			q("UPDATE `contact` SET
 				`url`     = REPLACE(`url`    , 'http:' , 'https:'),
 				`photo`   = REPLACE(`photo`  , 'http:' , 'https:'),
@@ -697,8 +697,7 @@ function admin_page_site_post(App $a) {
 				`thumb`   = REPLACE(`thumb`  , 'http:' , 'https:')
 				WHERE 1 "
 			);
-		}
-		elseif($ssl_policy == SSL_POLICY_SELFSIGN) {
+		} elseif ($ssl_policy == SSL_POLICY_SELFSIGN) {
 			q("UPDATE `contact` SET
 				`url`     = REPLACE(`url`    , 'https:' , 'http:'),
 				`photo`   = REPLACE(`photo`  , 'https:' , 'http:'),
@@ -719,8 +718,6 @@ function admin_page_site_post(App $a) {
 		}
 	}
 	set_config('system','ssl_policy',$ssl_policy);
-	set_config('system','delivery_interval',$delivery_interval);
-	set_config('system','poll_interval',$poll_interval);
 	set_config('system','maxloadavg',$maxloadavg);
 	set_config('system','maxloadavg_frontend',$maxloadavg_frontend);
 	set_config('system','optimize_max_tablesize',$optimize_max_tablesize);
@@ -734,12 +731,11 @@ function admin_page_site_post(App $a) {
 	set_config('config','sitename',$sitename);
 	set_config('config','hostname',$hostname);
 	set_config('config','sender_email', $sender_email);
-	set_config('system','suppress_language',$suppress_language);
 	set_config('system','suppress_tags',$suppress_tags);
 	set_config('system','shortcut_icon',$shortcut_icon);
 	set_config('system','touch_icon',$touch_icon);
 
-	if($banner=="") {
+	if ($banner == "") {
 		// don't know why, but del_config doesn't work...
 		q("DELETE FROM `config` WHERE `cat` = '%s' AND `k` = '%s' LIMIT 1",
 			dbesc("system"),
@@ -749,7 +745,7 @@ function admin_page_site_post(App $a) {
 		set_config('system','banner', $banner);
 	}
 
-	if($info=="") {
+	if ($info == "") {
 		del_config('config','info');
 	} else {
 		set_config('config','info',$info);
@@ -757,12 +753,12 @@ function admin_page_site_post(App $a) {
 	set_config('system','language', $language);
 	set_config('system','theme', $theme);
 
-	if($theme_mobile === '---') {
+	if ($theme_mobile === '---') {
 		del_config('system','mobile-theme');
 	} else {
 		set_config('system','mobile-theme', $theme_mobile);
 		}
-		if($singleuser === '---') {
+		if ($singleuser === '---') {
 			del_config('system','singleuser');
 		} else {
 			set_config('system','singleuser', $singleuser);
@@ -805,25 +801,21 @@ function admin_page_site_post(App $a) {
 	set_config('config','private_addons', $private_addons);
 
 	set_config('system','force_ssl', $force_ssl);
-	set_config('system','old_share', $old_share);
 	set_config('system','hide_help', $hide_help);
 	set_config('system','use_fulltext_engine', $use_fulltext_engine);
 	set_config('system','itemcache', $itemcache);
 	set_config('system','itemcache_duration', $itemcache_duration);
 	set_config('system','max_comments', $max_comments);
-	set_config('system','lockpath', $lockpath);
 	set_config('system','temppath', $temppath);
 	set_config('system','basepath', $basepath);
 	set_config('system','proxy_disabled', $proxy_disabled);
-	set_config('system','old_pager', $old_pager);
 	set_config('system','only_tag_search', $only_tag_search);
-	set_config('system','worker', $worker);
 	set_config('system','worker_queues', $worker_queues);
 	set_config('system','worker_dont_fork', $worker_dont_fork);
 	set_config('system','worker_fastlane', $worker_fastlane);
 	set_config('system','frontend_worker', $worker_frontend);
 
-	if($rino==2 and !function_exists('mcrypt_create_iv')) {
+	if (($rino == 2) and !function_exists('mcrypt_create_iv')) {
 		notice(t("RINO2 needs mcrypt php extension to work."));
 	} else {
 		set_config('system','rino_encrypt', $rino);
@@ -851,7 +843,7 @@ function admin_page_site(App $a) {
 	/* Installed langs */
 	$lang_choices = get_available_languages();
 
-	if(strlen(get_config('system','directory_submit_url')) AND
+	if (strlen(get_config('system','directory_submit_url')) AND
 		!strlen(get_config('system','directory'))) {
 			set_config('system','directory', dirname(get_config('system','directory_submit_url')));
 			del_config('system','directory_submit_url');
@@ -862,12 +854,12 @@ function admin_page_site(App $a) {
 	$theme_choices_mobile = array();
 	$theme_choices_mobile["---"] = t("No special theme for mobile devices");
 	$files = glob('view/theme/*');
-	if($files) {
+	if ($files) {
 
 		$allowed_theme_list = Config::get('system', 'allowed_themes');
 
-		foreach($files as $file) {
-			if(intval(file_exists($file.'/unsupported')))
+		foreach ($files as $file) {
+			if (intval(file_exists($file.'/unsupported')))
 				continue;
 
 			$f = basename($file);
@@ -879,7 +871,7 @@ function admin_page_site(App $a) {
 
 			$theme_name = ((file_exists($file.'/experimental')) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
 
-			if(file_exists($file.'/mobile')) {
+			if (file_exists($file.'/mobile')) {
 				$theme_choices_mobile[$f] = $theme_name;
 			} else {
 				$theme_choices[$f] = $theme_name;
@@ -928,15 +920,15 @@ function admin_page_site(App $a) {
 
 	/* Banner */
 	$banner = get_config('system','banner');
-	if($banner == false)
+	if ($banner == false) {
 		$banner = '<a href="http://friendica.com"><img id="logo-img" src="images/friendica-32.png" alt="logo" /></a><span id="logo-text"><a href="http://friendica.com">Friendica</a></span>';
+	}
 	$banner = htmlspecialchars($banner);
 	$info = get_config('config','info');
 	$info = htmlspecialchars($info);
 
 	// Automatically create temporary paths
 	get_temppath();
-	get_lockpath();
 	get_itemcachepath();
 
 	//echo "<pre>"; var_dump($lang_choices); die("</pre>");
@@ -954,9 +946,9 @@ function admin_page_site(App $a) {
 		SSL_POLICY_SELFSIGN => t("Self-signed certificate, use SSL for local links only (discouraged)")
 	);
 
-	if($a->config['hostname'] == "")
+	if ($a->config['hostname'] == "") {
 		$a->config['hostname'] = $a->get_hostname();
-
+	}
 	$diaspora_able = ($a->get_path() == "");
 
 	$optimize_max_tablesize = Config::get('system','optimize_max_tablesize', 100);
@@ -996,7 +988,6 @@ function admin_page_site(App $a) {
 		'$theme_mobile' 	=> array('theme_mobile', t("Mobile system theme"), get_config('system','mobile-theme'), t("Theme for mobile devices"), $theme_choices_mobile),
 		'$ssl_policy'		=> array('ssl_policy', t("SSL link policy"), (string) intval(get_config('system','ssl_policy')), t("Determines whether generated links should be forced to use SSL"), $ssl_choices),
 		'$force_ssl'		=> array('force_ssl', t("Force SSL"), get_config('system','force_ssl'), t("Force all Non-SSL requests to SSL - Attention: on some systems it could lead to endless loops.")),
-		'$old_share'		=> array('old_share', t("Old style 'Share'"), get_config('system','old_share'), t("Deactivates the bbcode element 'share' for repeating items.")),
 		'$hide_help'		=> array('hide_help', t("Hide help entry from navigation menu"), get_config('system','hide_help'), t("Hides the menu entry for the Help pages from the navigation menu. You can still access it calling /help directly.")),
 		'$singleuser' 		=> array('singleuser', t("Single user instance"), get_config('system','singleuser'), t("Make this instance multi-user or single-user for the named user"), $user_names),
 		'$maximagesize'		=> array('maximagesize', t("Maximum image size"), get_config('system','maximagesize'), t("Maximum size in bytes of uploaded images. Default is 0, which means no limits.")),
@@ -1036,8 +1027,6 @@ function admin_page_site(App $a) {
 		'$proxyuser'		=> array('proxyuser', t("Proxy user"), get_config('system','proxyuser'), ""),
 		'$proxy'		=> array('proxy', t("Proxy URL"), get_config('system','proxy'), ""),
 		'$timeout'		=> array('timeout', t("Network timeout"), (x(get_config('system','curl_timeout'))?get_config('system','curl_timeout'):60), t("Value is in seconds. Set to 0 for unlimited (not recommended).")),
-		'$delivery_interval'	=> array('delivery_interval', t("Delivery interval"), (x(get_config('system','delivery_interval'))?get_config('system','delivery_interval'):2), t("Delay background delivery processes by this many seconds to reduce system load. Recommend: 4-5 for shared hosts, 2-3 for virtual private servers. 0-1 for large dedicated servers.")),
-		'$poll_interval'	=> array('poll_interval', t("Poll interval"), (x(get_config('system','poll_interval'))?get_config('system','poll_interval'):2), t("Delay background polling processes by this many seconds to reduce system load. If 0, use delivery interval.")),
 		'$maxloadavg'		=> array('maxloadavg', t("Maximum Load Average"), ((intval(get_config('system','maxloadavg')) > 0)?get_config('system','maxloadavg'):50), t("Maximum system load before delivery and poll processes are deferred - default 50.")),
 		'$maxloadavg_frontend'	=> array('maxloadavg_frontend', t("Maximum Load Average (Frontend)"), ((intval(get_config('system','maxloadavg_frontend')) > 0)?get_config('system','maxloadavg_frontend'):50), t("Maximum system load before the frontend quits service - default 50.")),
 		'$optimize_max_tablesize'=> array('optimize_max_tablesize', t("Maximum table size for optimization"), $optimize_max_tablesize, t("Maximum table size (in MB) for the automatic optimization - default 100 MB. Enter -1 to disable it.")),
@@ -1052,16 +1041,13 @@ function admin_page_site(App $a) {
 		'$nodeinfo'		=> array('nodeinfo', t("Publish server information"), get_config('system','nodeinfo'), t("If enabled, general server and usage data will be published. The data contains the name and version of the server, number of users with public profiles, number of posts and the activated protocols and connectors. See <a href='http://the-federation.info/'>the-federation.info</a> for details.")),
 
 		'$use_fulltext_engine'	=> array('use_fulltext_engine', t("Use MySQL full text engine"), get_config('system','use_fulltext_engine'), t("Activates the full text engine. Speeds up search - but can only search for four and more characters.")),
-		'$suppress_language'	=> array('suppress_language', t("Suppress Language"), get_config('system','suppress_language'), t("Suppress language information in meta information about a posting.")),
 		'$suppress_tags'	=> array('suppress_tags', t("Suppress Tags"), get_config('system','suppress_tags'), t("Suppress showing a list of hashtags at the end of the posting.")),
 		'$itemcache'		=> array('itemcache', t("Path to item cache"), get_config('system','itemcache'), t("The item caches buffers generated bbcode and external images.")),
 		'$itemcache_duration' 	=> array('itemcache_duration', t("Cache duration in seconds"), get_config('system','itemcache_duration'), t("How long should the cache files be hold? Default value is 86400 seconds (One day). To disable the item cache, set the value to -1.")),
 		'$max_comments' 	=> array('max_comments', t("Maximum numbers of comments per post"), get_config('system','max_comments'), t("How much comments should be shown for each post? Default value is 100.")),
-		'$lockpath'		=> array('lockpath', t("Path for lock file"), get_config('system','lockpath'), t("The lock file is used to avoid multiple pollers at one time. Only define a folder here.")),
 		'$temppath'		=> array('temppath', t("Temp path"), get_config('system','temppath'), t("If you have a restricted system where the webserver can't access the system temp path, enter another path here.")),
 		'$basepath'		=> array('basepath', t("Base path to installation"), get_config('system','basepath'), t("If the system cannot detect the correct path to your installation, enter the correct path here. This setting should only be set if you are using a restricted system and symbolic links to your webroot.")),
 		'$proxy_disabled'	=> array('proxy_disabled', t("Disable picture proxy"), get_config('system','proxy_disabled'), t("The picture proxy increases performance and privacy. It shouldn't be used on systems with very low bandwith.")),
-		'$old_pager'		=> array('old_pager', t("Enable old style pager"), get_config('system','old_pager'), t("The old style pager has page numbers but slows down massively the page speed.")),
 		'$only_tag_search'	=> array('only_tag_search', t("Only search in tags"), get_config('system','only_tag_search'), t("On large systems the text search can slow down the system extremely.")),
 
 		'$relocate_url'		=> array('relocate_url', t("New base url"), App::get_baseurl(), t("Change base url for this server. Sends relocate message to all DFRN contacts of all users.")),
@@ -1069,7 +1055,6 @@ function admin_page_site(App $a) {
 		'$rino' 		=> array('rino', t("RINO Encryption"), intval(get_config('system','rino_encrypt')), t("Encryption layer between nodes."), array("Disabled", "RINO1 (deprecated)", "RINO2")),
 		'$embedly' 		=> array('embedly', t("Embedly API key"), get_config('system','embedly'), t("<a href='http://embed.ly'>Embedly</a> is used to fetch additional data for web pages. This is an optional parameter.")),
 
-		'$worker'		=> array('worker', t("Enable 'worker' background processing"), get_config('system','worker'), t("The worker background processing limits the number of parallel background jobs to a maximum number and respects the system load.")),
 		'$worker_queues' 	=> array('worker_queues', t("Maximum number of parallel workers"), get_config('system','worker_queues'), t("On shared hosters set this to 2. On larger systems, values of 10 are great. Default value is 4.")),
 		'$worker_dont_fork'	=> array('worker_dont_fork', t("Don't use 'proc_open' with the worker"), get_config('system','worker_dont_fork'), t("Enable this if your system doesn't allow the use of 'proc_open'. This can happen on shared hosters. If this is enabled you should increase the frequency of poller calls in your crontab.")),
 		'$worker_fastlane'	=> array('worker_fastlane', t("Enable fastlane"), get_config('system','worker_fastlane'), t("When enabed, the fastlane mechanism starts an additional worker if processes with higher priority are blocked by processes of lower priority.")),
@@ -1097,42 +1082,45 @@ function admin_page_dbsync(App $a) {
 
 	$o = '';
 
-	if($a->argc > 3 && intval($a->argv[3]) && $a->argv[2] === 'mark') {
+	if ($a->argc > 3 && intval($a->argv[3]) && $a->argv[2] === 'mark') {
 		set_config('database', 'update_'.intval($a->argv[3]), 'success');
 		$curr = get_config('system','build');
-		if(intval($curr) == intval($a->argv[3]))
+		if (intval($curr) == intval($a->argv[3])) {
 			set_config('system','build',intval($curr) + 1);
+		}
 		info(t('Update has been marked successful').EOL);
 		goaway('admin/dbsync');
 	}
 
-	if(($a->argc > 2) AND (intval($a->argv[2]) OR ($a->argv[2] === 'check'))) {
+	if (($a->argc > 2) AND (intval($a->argv[2]) OR ($a->argv[2] === 'check'))) {
 		require_once("include/dbstructure.php");
 		$retval = update_structure(false, true);
-		if(!$retval) {
+		if (!$retval) {
 			$o .= sprintf(t("Database structure update %s was successfully applied."), DB_UPDATE_VERSION)."<br />";
 			set_config('database', 'dbupdate_'.DB_UPDATE_VERSION, 'success');
-		} else
+		} else {
 			$o .= sprintf(t("Executing of database structure update %s failed with error: %s"),
 					DB_UPDATE_VERSION, $retval)."<br />";
-		if($a->argv[2] === 'check')
+		}
+		if ($a->argv[2] === 'check') {
 			return $o;
+		}
 	}
 
-	if($a->argc > 2 && intval($a->argv[2])) {
+	if ($a->argc > 2 && intval($a->argv[2])) {
 		require_once('update.php');
 		$func = 'update_'.intval($a->argv[2]);
-		if(function_exists($func)) {
+		if (function_exists($func)) {
 			$retval = $func();
-			if($retval === UPDATE_FAILED) {
+			if ($retval === UPDATE_FAILED) {
 				$o .= sprintf(t("Executing %s failed with error: %s"), $func, $retval);
 			}
-			elseif($retval === UPDATE_SUCCESS) {
+			elseif ($retval === UPDATE_SUCCESS) {
 				$o .= sprintf(t('Update %s was successfully applied.', $func));
 				set_config('database',$func, 'success');
-			}
-			else
+			} else {
 				$o .= sprintf(t('Update %s did not return a status. Unknown if it succeeded.'), $func);
+			}
 		} else {
 			$o .= sprintf(t('There was no additional update function %s that needed to be called.'), $func)."<br />";
 			set_config('database',$func, 'success');
@@ -1145,8 +1133,9 @@ function admin_page_dbsync(App $a) {
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			$upd = intval(substr($rr['k'],7));
-			if($upd < 1139 || $rr['v'] === 'success')
+			if ($upd < 1139 || $rr['v'] === 'success') {
 				continue;
+			}
 			$failed[] = $upd;
 		}
 	}
@@ -1186,7 +1175,7 @@ function admin_page_users_post(App $a) {
 
 	check_form_security_token_redirectOnErr('/admin/users', 'admin_users');
 
-	if (!($nu_name==="") && !($nu_email==="") && !($nu_nickname==="")) {
+	if (!($nu_name === "") && !($nu_email === "") && !($nu_nickname === "")) {
 		require_once('include/user.php');
 
 		$result = create_user(array('username'=>$nu_name, 'email'=>$nu_email,
@@ -1237,31 +1226,31 @@ function admin_page_users_post(App $a) {
 
 	}
 
-	if(x($_POST,'page_users_block')) {
-		foreach($users as $uid){
+	if (x($_POST,'page_users_block')) {
+		foreach ($users as $uid) {
 			q("UPDATE `user` SET `blocked` = 1-`blocked` WHERE `uid` = %s",
 				intval($uid)
 			);
 		}
 		notice(sprintf(tt("%s user blocked/unblocked", "%s users blocked/unblocked", count($users)), count($users)));
 	}
-	if(x($_POST,'page_users_delete')) {
+	if (x($_POST,'page_users_delete')) {
 		require_once("include/Contact.php");
-		foreach($users as $uid){
+		foreach ($users as $uid) {
 			user_remove($uid);
 		}
 		notice(sprintf(tt("%s user deleted", "%s users deleted", count($users)), count($users)));
 	}
 
-	if(x($_POST,'page_users_approve')) {
+	if (x($_POST,'page_users_approve')) {
 		require_once("mod/regmod.php");
-		foreach($pending as $hash){
+		foreach ($pending as $hash) {
 			user_allow($hash);
 		}
 	}
-	if(x($_POST,'page_users_deny')) {
+	if (x($_POST,'page_users_deny')) {
 		require_once("mod/regmod.php");
-		foreach($pending as $hash){
+		foreach ($pending as $hash) {
 			user_deny($hash);
 		}
 	}
@@ -1282,31 +1271,31 @@ function admin_page_users_post(App $a) {
  * @return string
  */
 function admin_page_users(App $a) {
-	if($a->argc>2) {
+	if ($a->argc>2) {
 		$uid = $a->argv[3];
 		$user = q("SELECT `username`, `blocked` FROM `user` WHERE `uid` = %d", intval($uid));
-		if(count($user)==0) {
+		if (count($user) == 0) {
 			notice('User not found'.EOL);
 			goaway('admin/users');
 			return ''; // NOTREACHED
 		}
-		switch($a->argv[2]){
-			case "delete":{
+		switch($a->argv[2]) {
+			case "delete":
 				check_form_security_token_redirectOnErr('/admin/users', 'admin_users', 't');
 				// delete user
 				require_once("include/Contact.php");
 				user_remove($uid);
 
 				notice(sprintf(t("User '%s' deleted"), $user[0]['username']).EOL);
-			}; break;
-			case "block":{
+				break;
+			case "block":
 				check_form_security_token_redirectOnErr('/admin/users', 'admin_users', 't');
 				q("UPDATE `user` SET `blocked` = %d WHERE `uid` = %s",
 					intval(1-$user[0]['blocked']),
 					intval($uid)
 				);
 				notice(sprintf(($user[0]['blocked']?t("User '%s' unblocked"):t("User '%s' blocked")) , $user[0]['username']).EOL);
-			}; break;
+				break;
 		}
 		goaway('admin/users');
 		return ''; // NOTREACHED
@@ -1322,7 +1311,7 @@ function admin_page_users(App $a) {
 
 	/* get users */
 	$total = qu("SELECT COUNT(*) AS `total` FROM `user` WHERE 1");
-	if(count($total)) {
+	if (count($total)) {
 		$a->set_pager_total($total[0]['total']);
 		$a->set_pager_itemspage(100);
 	}
@@ -1339,22 +1328,22 @@ function admin_page_users(App $a) {
 
 	$order = "contact.name";
 	$order_direction = "+";
-	if (x($_GET,'o')){
+	if (x($_GET,'o')) {
 		$new_order = $_GET['o'];
-		if ($new_order[0]==="-") {
+		if ($new_order[0] === "-") {
 			$order_direction = "-";
 			$new_order = substr($new_order,1);
 		}
 
-		if (in_array($new_order, $valid_orders)){
+		if (in_array($new_order, $valid_orders)) {
 			$order = $new_order;
 		}
-		if (x($_GET,'d')){
+		if (x($_GET,'d')) {
 			$new_direction = $_GET['d'];
 		}
 	}
 	$sql_order = "`".str_replace('.','`.`',$order)."`";
-	$sql_order_direction = ($order_direction==="+")?"ASC":"DESC";
+	$sql_order_direction = ($order_direction === "+")?"ASC":"DESC";
 
 	$users = qu("SELECT `user`.*, `contact`.`name`, `contact`.`url`, `contact`.`micro`, `user`.`account_expired`, `contact`.`last-item` AS `lastitem_date`
 				FROM `user`
@@ -1368,7 +1357,7 @@ function admin_page_users(App $a) {
 	//echo "<pre>$users"; killme();
 
 	$adminlist = explode(",", str_replace(" ", "", $a->config['admin_email']));
-	$_setup_users = function ($e) use ($adminlist){
+	$_setup_users = function ($e) use ($adminlist) {
 		$accounts = array(
 			t('Normal Account'),
 			t('Soapbox Account'),
@@ -1394,22 +1383,21 @@ function admin_page_users(App $a) {
 	$tmp_users = array();
 	$deleted = array();
 
-	while(count($users)) {
+	while (count($users)) {
 		$new_user = array();
-		foreach(array_pop($users) as $k => $v) {
+		foreach (array_pop($users) as $k => $v) {
 			$k = str_replace('-','_',$k);
 			$new_user[$k] = $v;
 		}
-		if($new_user['deleted']) {
+		if ($new_user['deleted']) {
 			array_push($deleted, $new_user);
-		}
-		else {
+		} else {
 			array_push($tmp_users, $new_user);
 		}
 	}
 	//Reversing the two array, and moving $tmp_users to $users
 	array_reverse($deleted);
-	while(count($tmp_users)) {
+	while (count($tmp_users)) {
 		array_push($users, array_pop($tmp_users));
 	}
 
@@ -1486,19 +1474,19 @@ function admin_page_plugins(App $a) {
 	/*
 	 * Single plugin
 	 */
-	if($a->argc == 3) {
+	if ($a->argc == 3) {
 		$plugin = $a->argv[2];
-		if(!is_file("addon/$plugin/$plugin.php")) {
+		if (!is_file("addon/$plugin/$plugin.php")) {
 			notice(t("Item not found."));
 			return '';
 		}
 
-		if(x($_GET,"a") && $_GET['a']=="t") {
+		if (x($_GET,"a") && $_GET['a']=="t") {
 			check_form_security_token_redirectOnErr('/admin/plugins', 'admin_themes', 't');
 
 			// Toggle plugin status
 			$idx = array_search($plugin, $a->plugins);
-			if($idx !== false) {
+			if ($idx !== false) {
 				unset($a->plugins[$idx]);
 				uninstall_plugin($plugin);
 				info(sprintf(t("Plugin %s disabled."), $plugin));
@@ -1515,22 +1503,22 @@ function admin_page_plugins(App $a) {
 		// display plugin details
 		require_once('library/markdown.php');
 
-		if(in_array($plugin, $a->plugins)) {
+		if (in_array($plugin, $a->plugins)) {
 			$status="on"; $action= t("Disable");
 		} else {
 			$status="off"; $action= t("Enable");
 		}
 
 		$readme=Null;
-		if(is_file("addon/$plugin/README.md")) {
+		if (is_file("addon/$plugin/README.md")) {
 			$readme = file_get_contents("addon/$plugin/README.md");
 			$readme = Markdown($readme);
-		} elseif(is_file("addon/$plugin/README")) {
+		} elseif (is_file("addon/$plugin/README")) {
 			$readme = "<pre>". file_get_contents("addon/$plugin/README") ."</pre>";
 		}
 
 		$admin_form="";
-		if(is_array($a->plugins_admin) && in_array($plugin, $a->plugins_admin)) {
+		if (is_array($a->plugins_admin) && in_array($plugin, $a->plugins_admin)) {
 			@require_once("addon/$plugin/$plugin.php");
 			$func = $plugin.'_plugin_admin';
 			$func($a, $admin_form);
@@ -1622,8 +1610,8 @@ function admin_page_plugins(App $a) {
  */
 function toggle_theme(&$themes,$th,&$result) {
 	for($x = 0; $x < count($themes); $x ++) {
-		if($themes[$x]['name'] === $th) {
-			if($themes[$x]['allowed']) {
+		if ($themes[$x]['name'] === $th) {
+			if ($themes[$x]['allowed']) {
 				$themes[$x]['allowed'] = 0;
 				$result = 0;
 			}
@@ -1642,8 +1630,8 @@ function toggle_theme(&$themes,$th,&$result) {
  */
 function theme_status($themes,$th) {
 	for($x = 0; $x < count($themes); $x ++) {
-		if($themes[$x]['name'] === $th) {
-			if($themes[$x]['allowed']) {
+		if ($themes[$x]['name'] === $th) {
+			if ($themes[$x]['allowed']) {
 				return 1;
 			}
 			else {
@@ -1661,11 +1649,12 @@ function theme_status($themes,$th) {
  */
 function rebuild_theme_table($themes) {
 	$o = '';
-	if(count($themes)) {
-		foreach($themes as $th) {
-			if($th['allowed']) {
-				if(strlen($o))
+	if (count($themes)) {
+		foreach ($themes as $th) {
+			if ($th['allowed']) {
+				if (strlen($o)) {
 					$o .= ',';
+				}
 				$o .= $th['name'];
 			}
 		}
@@ -1695,15 +1684,18 @@ function admin_page_themes(App $a) {
 	$allowed_themes_str = get_config('system','allowed_themes');
 	$allowed_themes_raw = explode(',',$allowed_themes_str);
 	$allowed_themes = array();
-	if(count($allowed_themes_raw))
-		foreach($allowed_themes_raw as $x)
-			if(strlen(trim($x)))
+	if (count($allowed_themes_raw)) {
+		foreach ($allowed_themes_raw as $x) {
+			if (strlen(trim($x))) {
 				$allowed_themes[] = trim($x);
+			}
+		}
+	}
 
 	$themes = array();
 	$files = glob('view/theme/*');
-	if($files) {
-		foreach($files as $file) {
+	if ($files) {
+		foreach ($files as $file) {
 			$f = basename($file);
 
 			// Is there a style file?
@@ -1718,12 +1710,13 @@ function admin_page_themes(App $a) {
 			$is_supported = 1-(intval(file_exists($file.'/unsupported')));
 			$is_allowed = intval(in_array($f,$allowed_themes));
 
-			if($is_allowed OR $is_supported OR get_config("system", "show_unsupported_themes"))
+			if ($is_allowed OR $is_supported OR get_config("system", "show_unsupported_themes")) {
 				$themes[] = array('name' => $f, 'experimental' => $is_experimental, 'supported' => $is_supported, 'allowed' => $is_allowed);
+			}
 		}
 	}
 
-	if(! count($themes)) {
+	if (! count($themes)) {
 		notice(t('No themes found.'));
 		return '';
 	}
@@ -1732,25 +1725,24 @@ function admin_page_themes(App $a) {
 	 * Single theme
 	 */
 
-	if($a->argc == 3) {
+	if ($a->argc == 3) {
 		$theme = $a->argv[2];
-		if(! is_dir("view/theme/$theme")) {
+		if (! is_dir("view/theme/$theme")) {
 			notice(t("Item not found."));
 			return '';
 		}
 
-		if(x($_GET,"a") && $_GET['a']=="t") {
+		if (x($_GET,"a") && $_GET['a']=="t") {
 			check_form_security_token_redirectOnErr('/admin/themes', 'admin_themes', 't');
 
 			// Toggle theme status
 
 			toggle_theme($themes,$theme,$result);
 			$s = rebuild_theme_table($themes);
-			if($result) {
+			if ($result) {
 				install_theme($theme);
 				info(sprintf('Theme %s enabled.',$theme));
-			}
-			else {
+			} else {
 				uninstall_theme($theme);
 				info(sprintf('Theme %s disabled.',$theme));
 			}
@@ -1763,22 +1755,22 @@ function admin_page_themes(App $a) {
 		// display theme details
 		require_once('library/markdown.php');
 
-		if(theme_status($themes,$theme)) {
+		if (theme_status($themes,$theme)) {
 			$status="on"; $action= t("Disable");
 		} else {
 			$status="off"; $action= t("Enable");
 		}
 
-		$readme=Null;
-		if(is_file("view/theme/$theme/README.md")) {
+		$readme = Null;
+		if (is_file("view/theme/$theme/README.md")) {
 			$readme = file_get_contents("view/theme/$theme/README.md");
 			$readme = Markdown($readme);
-		} elseif(is_file("view/theme/$theme/README")) {
+		} elseif (is_file("view/theme/$theme/README")) {
 			$readme = "<pre>". file_get_contents("view/theme/$theme/README") ."</pre>";
 		}
 
-		$admin_form="";
-		if(is_file("view/theme/$theme/config.php")) {
+		$admin_form = "";
+		if (is_file("view/theme/$theme/config.php")) {
 			function __get_theme_admin_form(App $a, $theme) {
 				$orig_theme = $a->theme;
 				$orig_page = $a->page;
@@ -1789,8 +1781,10 @@ function admin_page_themes(App $a) {
 
 
 				$init = $theme."_init";
-				if(function_exists($init)) $init($a);
-				if(function_exists("theme_admin")) {
+				if (function_exists($init)) {
+					$init($a);
+				}
+				if (function_exists("theme_admin")) {
 					$admin_form = theme_admin($a);
 				}
 
@@ -1803,9 +1797,9 @@ function admin_page_themes(App $a) {
 		}
 
 		$screenshot = array(get_theme_screenshot($theme), t('Screenshot'));
-		if(! stristr($screenshot[0],$theme))
+		if (! stristr($screenshot[0],$theme)) {
 			$screenshot = null;
-
+		}
 
 		$t = get_markup_template("admin_plugins_details.tpl");
 		return replace_macros($t, array(
@@ -1851,7 +1845,7 @@ function admin_page_themes(App $a) {
 
 	$xthemes = array();
 	if ($themes) {
-		foreach($themes as $th) {
+		foreach ($themes as $th) {
 			$xthemes[] = array($th['name'],(($th['allowed']) ? "on" : "off"), get_theme_info($th['name']));
 		}
 	}
@@ -1976,25 +1970,25 @@ function admin_page_viewlogs(App $a) {
 	$f = get_config('system','logfile');
 	$data = '';
 
-	if(!file_exists($f)) {
+	if (!file_exists($f)) {
 		$data = t("Error trying to open <strong>$f</strong> log file.\r\n<br/>Check to see if file $f exist and is readable.");
-	}
-	else {
+	} else {
 		$fp = fopen($f, 'r');
-		if(!$fp) {
+		if (!$fp) {
 			$data = t("Couldn't open <strong>$f</strong> log file.\r\n<br/>Check to see if file $f is readable.");
-		}
-		else {
+		} else {
 			$fstat = fstat($fp);
 			$size = $fstat['size'];
-			if($size != 0) {
-				if($size > 5000000 || $size < 0)
+			if ($size != 0) {
+				if ($size > 5000000 || $size < 0) {
 					$size = 5000000;
+				}
 				$seek = fseek($fp,0-$size,SEEK_END);
-				if($seek === 0) {
+				if ($seek === 0) {
 					$data = escape_tags(fread($fp,$size));
-					while(! feof($fp))
+					while (! feof($fp)) {
 						$data .= escape_tags(fread($fp,4096));
+					}
 				}
 			}
 			fclose($fp);
@@ -2022,22 +2016,24 @@ function admin_page_features_post(App $a) {
 	$arr = array();
 	$features = get_features(false);
 
-	foreach($features as $fname => $fdata) {
-		foreach(array_slice($fdata,1) as $f) {
+	foreach ($features as $fname => $fdata) {
+		foreach (array_slice($fdata,1) as $f) {
 			$feature = $f[0];
 			$feature_state = 'feature_'.$feature;
 			$featurelock = 'featurelock_'.$feature;
 
-			if(x($_POST[$feature_state]))
+			if (x($_POST[$feature_state])) {
 				$val = intval($_POST['feature_'.$feature]);
-			else
+			} else {
 				$val = 0;
+			}
 			set_config('feature',$feature,$val);
 
-			if(x($_POST[$featurelock]))
+			if (x($_POST[$featurelock])) {
 				set_config('feature_lock',$feature,$val);
-			else
+			} else {
 				del_config('feature_lock',$feature);
+			}
 		}
 	}
 
@@ -2061,18 +2057,19 @@ function admin_page_features_post(App $a) {
  */
 function admin_page_features(App $a) {
 
-	if((argc() > 1) && (argv(1) === 'features')) {
+	if ((argc() > 1) && (argv(1) === 'features')) {
 		$arr = array();
 		$features = get_features(false);
 
-		foreach($features as $fname => $fdata) {
+		foreach ($features as $fname => $fdata) {
 			$arr[$fname] = array();
 			$arr[$fname][0] = $fdata[0];
-			foreach(array_slice($fdata,1) as $f) {
+			foreach (array_slice($fdata,1) as $f) {
 
 				$set = get_config('feature',$f[0]);
-				if($set === false)
+				if ($set === false) {
 					$set = $f[3];
+				}
 				$arr[$fname][1][] = array(
 					array('feature_' .$f[0],$f[1],$set,$f[2],array(t('Off'),t('On'))),
 					array('featurelock_' .$f[0],sprintf(t('Lock feature %s'),$f[1]),(($f[4] !== false) ? "1" : ''),'',array(t('Off'),t('On')))

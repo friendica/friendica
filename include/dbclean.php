@@ -5,26 +5,8 @@
  */
 
 use \Friendica\Core\Config;
-use \Friendica\Core\PConfig;
-
-require_once("boot.php");
 
 function dbclean_run(&$argv, &$argc) {
-	global $a, $db;
-
-	if (is_null($a)) {
-		$a = new App;
-	}
-
-	if (is_null($db)) {
-		@include(".htconfig.php");
-		require_once("include/dba.php");
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-	}
-
-	Config::load();
-
 	if (!Config::get('system', 'dbclean', false)) {
 		return;
 	}
@@ -35,7 +17,7 @@ function dbclean_run(&$argv, &$argc) {
 		$stage = 0;
 	}
 
-	if (Config::get("system", "worker") AND ($stage == 0)) {
+	if ($stage == 0) {
 		proc_run(PRIORITY_LOW, 'include/dbclean.php', 1);
 		proc_run(PRIORITY_LOW, 'include/dbclean.php', 2);
 		proc_run(PRIORITY_LOW, 'include/dbclean.php', 3);
@@ -56,12 +38,8 @@ function remove_orphans($stage = 0) {
 
 	$count = 0;
 
-	// With activated worker we split the deletion in many small tasks
-	if (Config::get("system", "worker")) {
-		$limit = 1000;
-	} else {
-		$limit = 10000;
-	}
+	// We split the deletion in many small tasks
+	$limit = 1000;
 
 	if (($stage == 1) OR ($stage == 0)) {
 		logger("Deleting old global item entries from item table without user copy");
@@ -159,14 +137,9 @@ function remove_orphans($stage = 0) {
 	}
 
 	// Call it again if not all entries were purged
-	if (($stage != 0) AND ($count > 0) AND Config::get("system", "worker")) {
+	if (($stage != 0) AND ($count > 0)) {
 		proc_run(PRIORITY_MEDIUM, 'include/dbclean.php');
 	}
 
-}
-
-if (array_search(__file__,get_included_files())===0){
-  dbclean_run($_SERVER["argv"],$_SERVER["argc"]);
-  killme();
 }
 ?>

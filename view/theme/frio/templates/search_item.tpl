@@ -7,7 +7,7 @@
 <!-- ./TODO => Unknow block -->
 
 
-<div class="panel">
+<div class="panel" id="item-{{$item.guid}}">
 	<div class="wall-item-container panel-body{{$item.indent}} {{$item.shiny}} {{$item.previewing}}" >
 		<div class="media">
 			{{* Put additional actions in a top-right dropdown menu *}}
@@ -54,7 +54,7 @@
 						{{if $item.drop.dropping}}
 						<li role="separator" class="divider"></li>
 						<li role="menuitem">
-							<a class="navicon delete" onclick="dropItem('item/drop/{{$item.id}}', '#item-{{$item.guid}}'); return false;" title="{{$item.drop.delete}}"><i class="fa fa-trash"></i> {{$item.drop.delete}}</a>
+							<a class="navicon delete" onclick="dropItem('item/drop/{{$item.id}}', 'item-{{$item.guid}}'); return false;" title="{{$item.drop.delete}}"><i class="fa fa-trash"></i> {{$item.drop.delete}}</a>
 						</li>
 						{{/if}}
 					</ul>

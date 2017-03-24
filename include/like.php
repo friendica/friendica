@@ -18,155 +18,169 @@ require_once("include/diaspora.php");
 function do_like($item_id, $verb) {
 	$a = get_app();
 
-	if(! local_user() && ! remote_user()) {
+	if (! local_user() && ! remote_user()) {
 		return false;
 	}
 
-	switch($verb) {
+	switch ($verb) {
 		case 'like':
+			$bodyverb = t('%1$s likes %2$s\'s %3$s');
+			$activity = ACTIVITY_LIKE;
+			break;
 		case 'unlike':
+			$bodyverb = t('%1$s doesn\'t like %2$s\'s %3$s');
 			$activity = ACTIVITY_LIKE;
 			break;
 		case 'dislike':
 		case 'undislike':
+			$bodyverb = t('%1$s doesn\'t like %2$s\'s %3$s');
 			$activity = ACTIVITY_DISLIKE;
 			break;
 		case 'attendyes':
 		case 'unattendyes':
+			$bodyverb = t('%1$s is attending %2$s\'s %3$s');
 			$activity = ACTIVITY_ATTEND;
 			break;
 		case 'attendno':
 		case 'unattendno':
+			$bodyverb = t('%1$s is not attending %2$s\'s %3$s');
 			$activity = ACTIVITY_ATTENDNO;
 			break;
 		case 'attendmaybe':
 		case 'unattendmaybe':
+			$bodyverb = t('%1$s may attend %2$s\'s %3$s');
 			$activity = ACTIVITY_ATTENDMAYBE;
 			break;
 		default:
+			logger('like: unknown verb ' . $verb . ' for item ' . $item_id);
 			return false;
-			break;
 	}
+
+	// Enable activity toggling instead of on/off
+	$event_verb_flag = $activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE;
 
 	logger('like: verb ' . $verb . ' item ' . $item_id);
 
-	$r = q("SELECT * FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",
+	// Retrieve item
+	$items = q("SELECT * FROM `item` WHERE `id` = '%s' OR `uri` = '%s' LIMIT 1",
 		dbesc($item_id),
 		dbesc($item_id)
 	);
 
-	if(! $item_id || (! dbm::is_result($r))) {
-		logger('like: no item ' . $item_id);
+	if (! $item_id || ! dbm::is_result($items)) {
+		logger('like: unknown item ' . $item_id);
 		return false;
 	}
 
-	$item = $r[0];
+	$item = $items[0];
 
-	$owner_uid = $item['uid'];
-
-	if (! can_write_wall($a,$owner_uid)) {
+	if (! can_write_wall($a, $item['uid'])) {
+		logger('like: unable to write on wall ' . $item['uid']);
 		return false;
 	}
 
-	$remote_owner = null;
+	// Retrieves the local post owner
+	$owners = q("SELECT `contact`.* FROM `contact`
+		WHERE `contact`.`self` = 1
+		AND `contact`.`uid` = %d",
+		intval($item['uid'])
+	);
+	if (dbm::is_result($owners)) {
+		$owner_self_contact = $owners[0];
+	} else {
+		logger('like: unknown owner ' . $item['uid']);
+		return false;
+	}
 
-	if(! $item['wall']) {
-		// The top level post may have been written by somebody on another system
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($item['contact-id']),
-			intval($item['uid'])
+	// Retrieve the current logged in user's public contact
+	$author_id = public_contact();
+
+	$contacts = q("SELECT * FROM `contact` WHERE `id` = %d",
+		intval($author_id)
+	);
+	if (dbm::is_result($contacts)) {
+		$author_contact = $contacts[0];
+	} else {
+		logger('like: unknown author ' . $author_id);
+		return false;
+	}
+
+	// Contact-id is the uid-dependant author contact
+	if (local_user() == $item['uid']) {
+		$item_contact_id = $owner_self_contact['id'];
+		$item_contact = $owner_self_contact;
+	} else {
+		$item_contact_id = get_contact($author_contact['url'], $item['uid']);
+
+		$contacts = q("SELECT * FROM `contact` WHERE `id` = %d",
+			intval($item_contact_id)
 		);
-		if (! dbm::is_result($r)) {
+		if (dbm::is_result($contacts)) {
+			$item_contact = $contacts[0];
+		} else {
+			logger('like: unknown item contact ' . $item_contact_id);
 			return false;
 		}
-		if (! $r[0]['self']) {
-			$remote_owner = $r[0];
-		}
 	}
 
-	// this represents the post owner on this system.
-
-	$r = q("SELECT `contact`.*, `user`.`nickname` FROM `contact` LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
-		WHERE `contact`.`self` = 1 AND `contact`.`uid` = %d LIMIT 1",
-		intval($owner_uid)
-	);
-	if (dbm::is_result($r)) {
-		$owner = $r[0];
-	}
-
-	if (! $owner) {
-		logger('like: no owner');
-		return false;
-	}
-
-	if (! $remote_owner) {
-		$remote_owner = $owner;
-	}
-
-	// This represents the person posting
-
-	if ((local_user()) && (local_user() == $owner_uid)) {
-		$contact = $owner;
-	} else {
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($_SESSION['visitor_id']),
-			intval($owner_uid)
-		);
-		if (dbm::is_result($r)) {
-			$contact = $r[0];
-		}
-	}
-	if (! $contact) {
-		return false;
-	}
-
-
-	$verbs = " '".dbesc($activity)."' ";
-
+	// Look for an existing verb row
 	// event participation are essentially radio toggles. If you make a subsequent choice,
 	// we need to eradicate your first choice.
-	if ($activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE) {
-		$verbs = " '" . dbesc(ACTIVITY_ATTEND) . "','" . dbesc(ACTIVITY_ATTENDNO) . "','" . dbesc(ACTIVITY_ATTENDMAYBE) . "' ";
+	if ($event_verb_flag) {
+		$verbs = "'" . dbesc(ACTIVITY_ATTEND) . "', '" . dbesc(ACTIVITY_ATTENDNO) . "', '" . dbesc(ACTIVITY_ATTENDMAYBE) . "'";
+	} else {
+		$verbs = "'".dbesc($activity)."'";
 	}
 
-	$r = q("SELECT `id`, `guid` FROM `item` WHERE `verb` IN ( $verbs ) AND `deleted` = 0
-		AND `contact-id` = %d AND `uid` = %d
-		AND (`parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s') LIMIT 1",
-		intval($contact['id']), intval($owner_uid),
+	$existing_like = q("SELECT `id`, `guid`, `verb` FROM `item`
+		WHERE `verb` IN ($verbs)
+		AND `deleted` = 0
+		AND `author-id` = %d
+		AND `uid` = %d
+		AND (`parent` = '%s' OR `parent-uri` = '%s' OR `thr-parent` = '%s')
+		LIMIT 1",
+		intval($author_contact['id']),
+		intval($item['uid']),
 		dbesc($item_id), dbesc($item_id), dbesc($item['uri'])
 	);
 
-	if (dbm::is_result($r)) {
-		$like_item = $r[0];
+	// If it exists, mark it as deleted
+	if (dbm::is_result($existing_like)) {
+		$like_item = $existing_like[0];
 
 		// Already voted, undo it
-		$r = q("UPDATE `item` SET `deleted` = 1, `unseen` = 1, `changed` = '%s' WHERE `id` = %d",
+		q("UPDATE `item` SET `deleted` = 1, `unseen` = 1, `changed` = '%s' WHERE `id` = %d",
 			dbesc(datetime_convert()),
 			intval($like_item['id'])
 		);
 
-
 		// Clean up the Diaspora signatures for this like
 		// Go ahead and do it even if Diaspora support is disabled. We still want to clean up
 		// if it had been enabled in the past
-		$r = q("DELETE FROM `sign` WHERE `iid` = %d",
+		q("DELETE FROM `sign` WHERE `iid` = %d",
 			intval($like_item['id'])
 		);
 
 		$like_item_id = $like_item['id'];
 		proc_run(PRIORITY_HIGH, "include/notifier.php", "like", $like_item_id);
 
+		if (!$event_verb_flag || $like_item['verb'] == $activity) {
+			return true;
+		}
+	}
+
+	// Verb is "un-something", just trying to delete existing entries
+	if (strpos($verb, 'un') === 0) {
 		return true;
 	}
 
-	$uri = item_new_uri($a->get_hostname(),$owner_uid);
-
+	// Else or if event verb different from existing row, create a new item row
 	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
 	if ($item['object-type'] === ACTIVITY_OBJ_EVENT) {
 		$post_type = t('event');
 	}
-	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE );
-	$link = xmlify('<link rel="alternate" type="text/html" href="' . App::get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
+	$objtype = $item['resource-id'] ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE ;
+	$link = xmlify('<link rel="alternate" type="text/html" href="' . App::get_baseurl() . '/display/' . $owner_self_contact['nick'] . '/' . $item['id'] . '" />' . "\n") ;
 	$body = $item['body'];
 
 	$obj = <<< EOT
@@ -180,80 +194,62 @@ function do_like($item_id, $verb) {
 		<content>$body</content>
 	</object>
 EOT;
-	if ($verb === 'like') {
-		$bodyverb = t('%1$s likes %2$s\'s %3$s');
-	}
-	if ($verb === 'dislike') {
-		$bodyverb = t('%1$s doesn\'t like %2$s\'s %3$s');
-	}
-	if ($verb === 'attendyes') {
-		$bodyverb = t('%1$s is attending %2$s\'s %3$s');
-	}
-	if ($verb === 'attendno') {
-		$bodyverb = t('%1$s is not attending %2$s\'s %3$s');
-	}
-	if ($verb === 'attendmaybe') {
-		$bodyverb = t('%1$s may attend %2$s\'s %3$s');
-	}
 
-	if (! isset($bodyverb)) {
-		return false;
-	}
-
-	$ulink = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
+	$ulink = '[url=' . $author_contact['url'] . ']' . $author_contact['name'] . '[/url]';
 	$alink = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
-	$plink = '[url=' . App::get_baseurl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . ']' . $post_type . '[/url]';
+	$plink = '[url=' . App::get_baseurl() . '/display/' . $owner_self_contact['nick'] . '/' . $item['id'] . ']' . $post_type . '[/url]';
 
-	/// @TODO Or rewrite this to multi-line initialization of the array?
-	$arr = array();
+	$new_item = array(
+		'guid'          => get_guid(32),
+		'uri'           => item_new_uri($a->get_hostname(), $item['uid']),
+		'uid'           => $item['uid'],
+		'contact-id'    => $item_contact_id,
+		'type'          => 'activity',
+		'wall'          => $item['wall'],
+		'origin'        => 1,
+		'gravity'       => GRAVITY_LIKE,
+		'parent'        => $item['id'],
+		'parent-uri'    => $item['uri'],
+		'thr-parent'    => $item['uri'],
+		'owner-id'      => $item['owner-id'],
+		'owner-name'    => $item['owner-name'],
+		'owner-link'    => $item['owner-link'],
+		'owner-avatar'  => $item['owner-avatar'],
+		'author-id'     => $author_contact['id'],
+		'author-name'   => $author_contact['name'],
+		'author-link'   => $author_contact['url'],
+		'author-avatar' => $author_contact['thumb'],
+		'body'          => sprintf($bodyverb, $ulink, $alink, $plink),
+		'verb'          => $activity,
+		'object-type'   => $objtype,
+		'object'        => $obj,
+		'allow_cid'     => $item['allow_cid'],
+		'allow_gid'     => $item['allow_gid'],
+		'deny_cid'      => $item['deny_cid'],
+		'deny_gid'      => $item['deny_gid'],
+		'visible'       => 1,
+		'unseen'        => 1,
+		'last-child'    => 0
+	);
 
-	$arr['guid'] = get_guid(32);
-	$arr['uri'] = $uri;
-	$arr['uid'] = $owner_uid;
-	$arr['contact-id'] = $contact['id'];
-	$arr['type'] = 'activity';
-	$arr['wall'] = $item['wall'];
-	$arr['origin'] = 1;
-	$arr['gravity'] = GRAVITY_LIKE;
-	$arr['parent'] = $item['id'];
-	$arr['parent-uri'] = $item['uri'];
-	$arr['thr-parent'] = $item['uri'];
-	$arr['owner-name'] = $remote_owner['name'];
-	$arr['owner-link'] = $remote_owner['url'];
-	$arr['owner-avatar'] = $remote_owner['thumb'];
-	$arr['author-name'] = $contact['name'];
-	$arr['author-link'] = $contact['url'];
-	$arr['author-avatar'] = $contact['thumb'];
-	$arr['body'] =  sprintf( $bodyverb, $ulink, $alink, $plink );
-	$arr['verb'] = $activity;
-	$arr['object-type'] = $objtype;
-	$arr['object'] = $obj;
-	$arr['allow_cid'] = $item['allow_cid'];
-	$arr['allow_gid'] = $item['allow_gid'];
-	$arr['deny_cid'] = $item['deny_cid'];
-	$arr['deny_gid'] = $item['deny_gid'];
-	$arr['visible'] = 1;
-	$arr['unseen'] = 1;
-	$arr['last-child'] = 0;
+	$new_item_id = item_store($new_item);
 
-	$post_id = item_store($arr);
-
+	// @todo: Explain this block
 	if (! $item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
+		q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval($item['id']),
-			intval($owner_uid)
+			intval($item['uid'])
 		);
 	}
 
-
 	// Save the author information for the like in case we need to relay to Diaspora
-	Diaspora::store_like_signature($contact, $post_id);
+	Diaspora::store_like_signature($item_contact, $new_item_id);
 
-	$arr['id'] = $post_id;
+	$new_item['id'] = $new_item_id;
 
-	call_hooks('post_local_end', $arr);
+	call_hooks('post_local_end', $new_item);
 
-	proc_run(PRIORITY_HIGH, "include/notifier.php", "like", $post_id);
+	proc_run(PRIORITY_HIGH, "include/notifier.php", "like", $new_item_id);
 
 	return true;
 }

@@ -11,14 +11,11 @@ define("IMPORT_DEBUG", False);
 
 function last_insert_id() {
 	global $db;
+
 	if (IMPORT_DEBUG)
 		return 1;
-	if ($db->mysqli) {
-		$thedb = $db->getdb();
-		return $thedb->insert_id;
-	} else {
-		return mysql_insert_id();
-	}
+
+	return $db->insert_id();
 }
 
 function last_error() {
@@ -186,8 +183,8 @@ function import_account(App $a, $file) {
 			}
 		}
 		if ($contact['uid'] == $olduid && $contact['self'] == '0') {
-			// set contacts 'avatar-date' to "0000-00-00 00:00:00" to let poller to update urls
-			$contact["avatar-date"] = "0000-00-00 00:00:00" ;
+			// set contacts 'avatar-date' to NULL_DATE to let poller to update urls
+			$contact["avatar-date"] = NULL_DATE;
 
 
 			switch ($contact['network']) {

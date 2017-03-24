@@ -2,43 +2,24 @@
 
 use \Friendica\Core\Config;
 
-require_once("boot.php");
 require_once('include/queue_fn.php');
 require_once('include/html2plain.php');
-require_once("include/Scrape.php");
+require_once('include/Scrape.php');
 require_once('include/diaspora.php');
-require_once("include/ostatus.php");
-require_once("include/dfrn.php");
+require_once('include/ostatus.php');
+require_once('include/dfrn.php');
 
 function delivery_run(&$argv, &$argc){
-	global $a, $db;
+	global $a;
 
-	if (is_null($a)) {
-		$a = new App;
-	}
-
-	if (is_null($db)) {
-		@include(".htconfig.php");
-		require_once("include/dba.php");
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-	}
-
-	require_once("include/session.php");
-	require_once("include/datetime.php");
+	require_once('include/datetime.php');
 	require_once('include/items.php');
 	require_once('include/bbcode.php');
 	require_once('include/email.php');
 
-	Config::load();
-
-	load_hooks();
-
 	if ($argc < 3) {
 		return;
 	}
-
-	$a->set_baseurl(get_config('system','url'));
 
 	logger('delivery: invoked: '. print_r($argv,true), LOGGER_DEBUG);
 
@@ -48,30 +29,6 @@ function delivery_run(&$argv, &$argc){
 	for ($x = 3; $x < $argc; $x ++) {
 
 		$contact_id = intval($argv[$x]);
-
-		/// @todo When switching completely to the worker we won't need this anymore
-		// Some other process may have delivered this item already.
-
-		$r = q("SELECT * FROM `deliverq` WHERE `cmd` = '%s' AND `item` = %d AND `contact` = %d LIMIT 1",
-			dbesc($cmd),
-			dbesc($item_id),
-			dbesc($contact_id)
-		);
-		if (!dbm::is_result($r)) {
-			continue;
-		}
-
-		if ($a->maxload_reached()) {
-			return;
-		}
-
-		// It's ours to deliver. Remove it from the queue.
-
-		q("DELETE FROM `deliverq` WHERE `cmd` = '%s' AND `item` = %d AND `contact` = %d",
-			dbesc($cmd),
-			dbesc($item_id),
-			dbesc($contact_id)
-		);
 
 		if (!$item_id || !$contact_id) {
 			continue;
@@ -398,7 +355,7 @@ function delivery_run(&$argv, &$argc){
 
 				logger('notifier: dfrn_delivery to '.$contact["url"].' with guid '.$target_item["guid"].' returns '.$deliver_status);
 
-				if ($deliver_status == (-1)) {
+				if ($deliver_status < 0) {
 					logger('notifier: delivery failed: queuing message');
 					add_to_queue($contact['id'],NETWORK_DFRN,$atom);
 
@@ -576,9 +533,4 @@ function delivery_run(&$argv, &$argc){
 	}
 
 	return;
-}
-
-if (array_search(__file__,get_included_files())===0){
-  delivery_run($_SERVER["argv"],$_SERVER["argc"]);
-  killme();
 }

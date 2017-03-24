@@ -2193,6 +2193,9 @@ ul li:hover .contact-wrapper a.contact-action-link:hover {
 #event-edit-form-wrapper #event-edit-time {
     padding: 10px 0;
 }
+.event-buttons .plink-event-link {
+    margin-left: 20px;
+}
 /* Profiles Page */
 .profile-listing-table {
     display: table;
@@ -2506,6 +2509,56 @@ body .tread-wrapper .hovercard a:hover {
 }
 body .tread-wrapper .hovercard:hover .hover-card-content a {
     color: $link_color !important;
+}
+
+/* Pagination improvements */
+.pagination {
+    text-align: center;
+    display: block;
+}
+.pagination > li > a,
+.pagination > li > span {
+    color: $link_color;
+    float: none;
+}
+.pagination>li>a:hover,
+.pagination>li>span:hover {
+    color: $link_hover_color;
+}
+.pagination > .active > a,
+.pagination > .active > a:focus,
+.pagination > .active > a:hover,
+.pagination > .active > span,
+.pagination > .active > span:focus,
+.pagination > .active > span:hover {
+    background-color: $link_color;
+    border-color: $link_color;
+    border-radius: 3px;
+}
+.pagination li.pager_n a {
+    margin-left: 3px;
+    border-radius: 3px;
+}
+.pagination .pager_prev a {
+    margin-left: -5px;
+    margin-right: 4px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.pagination .pager_next a {
+    margin-left: 4px;
+    margin-right: -5px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+.pager .next > a,
+.pager .previous > a {
+    float: none;
+    border-radius: 3px;
+}
+.pagination .disabled > a,
+.pager .disabled > a {
+    display: none;
 }
 
 /*

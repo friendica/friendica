@@ -162,21 +162,29 @@ function qCommentInsert(obj,id) {
 
 function confirmDelete() { return confirm(aStr.delitem); }
 
-function dropItem(url, object) {
+/**
+ * Hide and removes an item element from the DOM after the deletion url is
+ * successful, restore it else.
+ *
+ * @param {string} url The item removal URL
+ * @param {string} elementId The DOM id of the item element
+ * @returns {undefined}
+ */
+function dropItem(url, elementId) {
 	var confirm = confirmDelete();
 
-	//if the first character of the object is #, remove it because
-	// we use getElementById which don't need the #
-	// getElementByID selects elements even if there are special characters
-	// in the ID (like %) which won't work with jQuery
-	/// @todo ceck if we can solve this in the template
-	object = object.indexOf('#') == 0 ? object.substring(1) : object;
-
-	if(confirm) {
+	if (confirm) {
 		$('body').css('cursor', 'wait');
-		$(document.getElementById(object)).fadeTo('fast', 0.33, function () {
-			$.get(url).done(function() {
-				$(document.getElementById(object)).remove();
+
+		var $el = $(document.getElementById(elementId));
+
+		$el.fadeTo('fast', 0.33, function () {
+			$.get(url).then(function() {
+				$el.remove();
+			}).fail(function() {
+				// @todo Show related error message
+				$el.show();
+			}).always(function() {
 				$('body').css('cursor', 'auto');
 			});
 		});

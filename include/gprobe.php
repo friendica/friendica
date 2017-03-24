@@ -2,36 +2,14 @@
 
 use \Friendica\Core\Config;
 
-require_once("boot.php");
 require_once('include/Scrape.php');
 require_once('include/socgraph.php');
+require_once('include/datetime.php');
 
 function gprobe_run(&$argv, &$argc){
-	global $a, $db;
-
-	if(is_null($a)) {
-		$a = new App;
-	}
-
-	if(is_null($db)) {
-		@include(".htconfig.php");
-		require_once("include/dba.php");
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-	};
-
-	require_once('include/session.php');
-	require_once('include/datetime.php');
-
-	Config::load();
-
-	$a->set_baseurl(get_config('system','url'));
-
-	load_hooks();
-
-	if($argc != 2)
+	if ($argc != 2) {
 		return;
-
+	}
 	$url = hex2bin($argv[1]);
 
 	$r = q("SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
@@ -73,9 +51,4 @@ function gprobe_run(&$argv, &$argc){
 
 	logger("gprobe end for ".normalise_link($url), LOGGER_DEBUG);
 	return;
-}
-
-if (array_search(__file__,get_included_files())===0){
-	gprobe_run($_SERVER["argv"],$_SERVER["argc"]);
-	killme();
 }

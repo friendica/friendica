@@ -2,12 +2,11 @@
 
 use \Friendica\Core\Config;
 
-require_once("boot.php");
 require_once('include/queue_fn.php');
 require_once('include/html2plain.php');
-require_once("include/Scrape.php");
+require_once('include/Scrape.php');
 require_once('include/diaspora.php');
-require_once("include/ostatus.php");
+require_once('include/ostatus.php');
 require_once('include/salmon.php');
 
 /*
@@ -44,34 +43,16 @@ require_once('include/salmon.php');
 
 
 function notifier_run(&$argv, &$argc){
-	global $a, $db;
+	global $a;
 
-	if (is_null($a)) {
-		$a = new App;
-	}
-
-	if (is_null($db)) {
-		@include(".htconfig.php");
-		require_once("include/dba.php");
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-			unset($db_host, $db_user, $db_pass, $db_data);
-	}
-
-	require_once("include/session.php");
-	require_once("include/datetime.php");
+	require_once('include/datetime.php');
 	require_once('include/items.php');
 	require_once('include/bbcode.php');
 	require_once('include/email.php');
 
-	Config::load();
-
-	load_hooks();
-
 	if ($argc < 3) {
 		return;
 	}
-
-	$a->set_baseurl(get_config('system','url'));
 
 	logger('notifier: invoked: ' . print_r($argv,true), LOGGER_DEBUG);
 
@@ -490,79 +471,22 @@ function notifier_run(&$argv, &$argc){
 	if ($relocate) {
 		$r = $recipients_relocate;
 	} else {
-		$r = q("SELECT * FROM `contact` WHERE `id` IN (%s) AND NOT `blocked` AND NOT `pending` AND NOT `archive`".$sql_extra,
+		$r = q("SELECT `id`, `url`, `network`, `self` FROM `contact`
+			WHERE `id` IN (%s) AND NOT `blocked` AND NOT `pending` AND NOT `archive`".$sql_extra,
 			dbesc($recip_str)
 		);
 	}
 
-	$interval = ((get_config('system','delivery_interval') === false) ? 2 : intval(get_config('system','delivery_interval')));
-
-	// If we are using the worker we don't need a delivery interval
-	if (get_config("system", "worker")) {
-		$interval = false;
-	}
 	// delivery loop
 
 	if (dbm::is_result($r)) {
 		foreach ($r as $contact) {
-			if (!$contact['self']) {
-				if (($contact['network'] === NETWORK_DIASPORA) && ($public_message)) {
-					continue;
-				}
-				q("INSERT INTO `deliverq` (`cmd`,`item`,`contact`) VALUES ('%s', %d, %d)",
-					dbesc($cmd),
-					intval($item_id),
-					intval($contact['id'])
-				);
-			}
-		}
-
-
-		// This controls the number of deliveries to execute with each separate delivery process.
-		// By default we'll perform one delivery per process. Assuming a hostile shared hosting
-		// provider, this provides the greatest chance of deliveries if processes start getting
-		// killed. We can also space them out with the delivery_interval to also help avoid them
-		// getting whacked.
-
-		// If $deliveries_per_process > 1, we will chain this number of multiple deliveries
-		// together into a single process. This will reduce the overall number of processes
-		// spawned for each delivery, but they will run longer.
-
-		// When using the workerqueue, we don't need this functionality.
-
-		$deliveries_per_process = intval(get_config('system','delivery_batch_count'));
-		if (($deliveries_per_process <= 0) OR get_config("system", "worker")) {
-			$deliveries_per_process = 1;
-		}
-
-		$this_batch = array();
-
-		for ($x = 0; $x < count($r); $x ++) {
-			$contact = $r[$x];
-
 			if ($contact['self']) {
 				continue;
 			}
 			logger("Deliver ".$target_item["guid"]." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
-			// potentially more than one recipient. Start a new process and space them out a bit.
-			// we will deliver single recipient types of message and email recipients here.
-
-			$this_batch[] = $contact['id'];
-
-			if (count($this_batch) >= $deliveries_per_process) {
-				proc_run(PRIORITY_HIGH,'include/delivery.php',$cmd,$item_id,$this_batch);
-				$this_batch = array();
-				if ($interval) {
-					@time_sleep_until(microtime(true) + (float) $interval);
-				}
-			}
-			continue;
-		}
-
-		// be sure to pick up any stragglers
-		if (count($this_batch)) {
-			proc_run(PRIORITY_HIGH,'include/delivery.php',$cmd,$item_id,$this_batch);
+			proc_run(PRIORITY_HIGH,'include/delivery.php', $cmd, $item_id, $contact['id']);
 		}
 	}
 
@@ -614,18 +538,6 @@ function notifier_run(&$argv, &$argc){
 		if (dbm::is_result($r)) {
 			logger('pubdeliver '.$target_item["guid"].': '.print_r($r,true), LOGGER_DEBUG);
 
-			// throw everything into the queue in case we get killed
-
-			foreach ($r as $rr) {
-				if ((! $mail) && (! $fsuggest) && (! $followup)) {
-					q("INSERT INTO `deliverq` (`cmd`,`item`,`contact`) VALUES ('%s', %d, %d)
-						ON DUPLICATE KEY UPDATE `cmd` = '%s', `item` = %d, `contact` = %d",
-						dbesc($cmd), intval($item_id), intval($rr['id']),
-						dbesc($cmd), intval($item_id), intval($rr['id'])
-					);
-				}
-			}
-
 			foreach ($r as $rr) {
 
 				// except for Diaspora batch jobs
@@ -639,9 +551,6 @@ function notifier_run(&$argv, &$argc){
 				if ((! $mail) && (! $fsuggest) && (! $followup)) {
 					logger('notifier: delivery agent: '.$rr['name'].' '.$rr['id'].' '.$rr['network'].' '.$target_item["guid"]);
 					proc_run(PRIORITY_HIGH,'include/delivery.php',$cmd,$item_id,$rr['id']);
-					if ($interval) {
-						@time_sleep_until(microtime(true) + (float) $interval);
-					}
 				}
 			}
 		}
@@ -693,10 +602,4 @@ function notifier_run(&$argv, &$argc){
 	call_hooks('notifier_end',$target_item);
 
 	return;
-}
-
-
-if (array_search(__file__,get_included_files())===0){
-	notifier_run($_SERVER["argv"],$_SERVER["argc"]);
-	killme();
 }

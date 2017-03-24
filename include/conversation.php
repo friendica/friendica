@@ -416,8 +416,8 @@ These Fields are not added below (yet). They are here to for bug search.
 `item`.`shadow`,
 */
 
-	return "`item`.`author-link`, `item`.`author-name`, `item`.`author-avatar`,
-		`item`.`owner-link`, `item`.`owner-name`, `item`.`owner-avatar`,
+	return "`item`.`author-id`, `item`.`author-link`, `item`.`author-name`, `item`.`author-avatar`,
+		`item`.`owner-id`, `item`.`owner-link`, `item`.`owner-name`, `item`.`owner-avatar`,
 		`item`.`contact-id`, `item`.`uid`, `item`.`id`, `item`.`parent`,
 		`item`.`uri`, `item`.`thr-parent`, `item`.`parent-uri`,
 		`item`.`commented`, `item`.`created`, `item`.`edited`,
@@ -1066,8 +1066,9 @@ function builtin_activity_puller($item, &$conv_responses) {
 			else
 				$conv_responses[$mode][$item['thr-parent']] ++;
 
-			if((local_user()) && (local_user() == $item['uid']) && ($item['self']))
+			if (public_contact() == $item['author-id']) {
 				$conv_responses[$mode][$item['thr-parent'] . '-self'] = 1;
+			}
 
 			$conv_responses[$mode][$item['thr-parent'] . '-l'][] = $url;
 

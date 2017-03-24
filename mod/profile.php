@@ -251,23 +251,6 @@ function profile_content(App $a, $update = 0) {
 			$sql_extra3 = sprintf(" AND `thread`.`contact-id` = %d ", intval(intval($a->profile['contact_id'])));
 		}
 
-		if(get_config('system', 'old_pager')) {
-		    $r = q("SELECT COUNT(*) AS `total`
-			    FROM `thread` INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
-			    $sql_post_table INNER JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
-			    AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-			    WHERE `thread`.`uid` = %d AND `thread`.`visible` = 1 AND `thread`.`deleted` = 0
-			    and `thread`.`moderated` = 0
-			    AND `thread`.`wall` = 1
-			    $sql_extra3 $sql_extra $sql_extra2 ",
-			    intval($a->profile['profile_uid'])
-			);
-
-			if (dbm::is_result($r)) {
-				$a->set_pager_total($r[0]['total']);
-			}
-		}
-
 		//  check if we serve a mobile device and get the user settings
 		//  accordingly
 		if ($a->is_mobile) {
@@ -335,14 +318,10 @@ function profile_content(App $a, $update = 0) {
 		);
 	}
 
-	$o .= conversation($a,$items,'profile',$update);
+	$o .= conversation($a, $items, 'profile', $update);
 
-	if(! $update) {
-		if(!get_config('system', 'old_pager')) {
-			$o .= alt_pager($a,count($items));
-		} else {
-			$o .= paginate($a);
-		}
+	if (!$update) {
+		$o .= alt_pager($a, count($items));
 	}
 
 	return $o;

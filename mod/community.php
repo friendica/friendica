@@ -48,27 +48,6 @@ function community_content(App $a, $update = 0) {
 	// Only public posts can be shown
 	// OR your own posts if you are a logged in member
 
-	if(get_config('system', 'old_pager')) {
-		$r = qu("SELECT COUNT(distinct(`item`.`uri`)) AS `total`
-			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
-			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-			INNER JOIN `user` ON `user`.`uid` = `item`.`uid` AND `user`.`hidewall` = 0
-			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
-			AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''
-			AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
-			AND `item`.`private` = 0 AND `item`.`wall` = 1"
-		);
-
-		if (dbm::is_result($r))
-			$a->set_pager_total($r[0]['total']);
-
-		if(! $r[0]['total']) {
-			info( t('No results.') . EOL);
-			return $o;
-		}
-
-	}
-
 	$r = community_getitems($a->pager['start'], $a->pager['itemspage']);
 
 	if (! dbm::is_result($r)) {
@@ -105,13 +84,9 @@ function community_content(App $a, $update = 0) {
 
 	// we behave the same in message lists as the search module
 
-	$o .= conversation($a,$s,'community',$update);
+	$o .= conversation($a, $s, 'community', $update);
 
-	if(!get_config('system', 'old_pager')) {
-	        $o .= alt_pager($a,count($r));
-	} else {
-	        $o .= paginate($a);
-	}
+        $o .= alt_pager($a, count($r));
 
 	return $o;
 }

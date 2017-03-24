@@ -573,31 +573,38 @@ String.prototype.rtrim = function() {
 	return trimmed;
 };
 
-// Scroll to a specific item and highlight it
-// Note: jquery.color.js is needed
-function scrollToItem(itemID) {
-	if( typeof itemID === "undefined")
+/**
+ * Scroll the screen to the item element whose id is provided, then highlights it
+ *
+ * Note: jquery.color.js is required
+ *
+ * @param {string} elementId The item element id
+ * @returns {undefined}
+ */
+function scrollToItem(elementId) {
+	if (typeof elementId === "undefined") {
 		return;
+	}
 
-	var elm = $('#'+itemID);
+	var $el = $(document.getElementById(elementId));
 	// Test if the Item exists
-	if(!elm.length)
+	if (!$el.length) {
 		return;
+	}
 
 	// Define the colors which are used for highlighting
 	var colWhite = {backgroundColor:'#F5F5F5'};
 	var colShiny = {backgroundColor:'#FFF176'};
 
-	// Get the Item Position (we need to substract 100 to match
-	// correct position
-	var itemPos = $(elm).offset().top - 100;
+	// Get the Item Position (we need to substract 100 to match correct position
+	var itemPos = $el.offset().top - 100;
 
 	// Scroll to the DIV with the ID (GUID)
 	$('html, body').animate({
 		scrollTop: itemPos
 	}, 400, function() {
 		// Highlight post/commenent with ID  (GUID)
-		$(elm).animate(colWhite, 1000).animate(colShiny).animate(colWhite, 600);
+		$el.animate(colWhite, 1000).animate(colShiny).animate(colWhite, 600);
 	});
 }
 
