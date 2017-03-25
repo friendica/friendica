@@ -11,7 +11,7 @@
 			in with dropdows the close button needs to be inserted after the dropdown. *}}
 			<button type="button" class="close hidden-xs" data-dismiss="modal" style="float: right;">&times;</button>
 
-			{{* The Jot navigation menu (text input, permissions, preview, filebrowser) *}}
+			{{* The Jot navigation menu for desktop user (text input, permissions, preview, filebrowser) *}}
 			<ul class="nav nav-tabs hidden-xs jot-nav" role="menubar" data-tabs="tabs">
 				{{* Mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
@@ -33,24 +33,16 @@
 				</li>
 			</ul>
 
+			{{* The Jot navigation menu for small displays (text input, permissions, preview, filebrowser) *}}
 			<div class="dropdown dropdown-head dropdown-mobile-jot jot-nav hidden-lg hidden-md hidden-sm" role="menubar" data-tabs="tabs" style="float: left;">
 				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{$message}}&nbsp;<span class="caret"></span></button>
 				<ul class="dropdown-menu nav nav-pills">
 					{{* mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
-					<li role="menuitem" style="display: none;">
-						<a class="jot-text-lnk" id="jot-text-lnk-mobile" onclick="jotActive(); return false;">{{$message}}</a>
-					</li>
-					{{if $acl}}
-					<li role="menuitem">
-						<a class="jot-perms-lnk" id="jot-perms-lnk-mobile" onclick="aclActive(); return false;">{{$shortpermset}}</a>
-					</li>
-					{{/if}}
-					{{if $preview}}
-					<li role="menuitem">
-						<a class="jot-preview-lnk" id="jot-preview-lnk-mobile" onclick="previewActive(); return false;">{{$preview}}</a>
-					</li>
-					{{/if}}
+					<li role="menuitem" style="display: none;"><a id="jot-text-lnk-mobile" class="jot-text-lnk" onclick="jotActive(); return false;">{{$message}}</a></li>
+					{{if $acl}}<li role="menuitem"><a id="jot-perms-lnk-mobile" class="jot-perms-lnk" onclick="aclActive();return false;">{{$shortpermset}}</a></li>{{/if}}
+					{{if $preview}}<li role="menuitem"><a id="jot-preview-lnk-mobile" class="jot-preview-lnk" onclick="previewActive();return false;">{{$preview}}</a></li>{{/if}}
+					<li role="menuitem"><a id="jot-browser-lnk-mobile" onclick="fbrowserActive(); return false;">{{$browser}}</a></li>
 				</ul>
 			</div>
 			<button type="button" class="close hidden-lg hidden-md hidden-sm" data-dismiss="modal" style="float: right;">&times;</button>

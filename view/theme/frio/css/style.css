@@ -1327,8 +1327,11 @@ section #jotOpen {
     padding-right: 1px;
 }
 .fbrowser .folders ul {
-    padding-left: 0px;
+    padding: 0px;
     margin-left: -15px;
+    margin-bottom: 0px;
+    overflow-y: auto;
+    max-height: calc(100vh - 210px);
 }
 .fbrowser .folders li {
     padding-left: 20px;
@@ -1350,6 +1353,10 @@ section #jotOpen {
 }
 .fbrowser .folders + .list {
     padding-left: 10px;
+}
+.fbrowser .fbrowser-content-container {
+    overflow-y: auto;
+    max-height: calc(100vh - 175px);
 }
 .fbrowser .profile-rotator-wrapper {
     min-height: 200px;
