@@ -87,7 +87,7 @@ var FileBrowser = {
 			}
 		};
 
-		console.log("FileBrowser:", nickname, type,FileBrowser.event, FileBrowser.id );
+		console.log("FileBrowser:", nickname, type,FileBrowser.event, FileBrowser.id);
 
 		FileBrowser.postLoad();
 
@@ -111,11 +111,11 @@ var FileBrowser = {
 
 			var embed = "";
 			if (FileBrowser.type == "image") {
-				embed = "[url="+this.dataset.link+"][img]"+this.dataset.img+"[/img][/url]";
+				embed = "[url=" + this.dataset.link + "][img]" + this.dataset.img + "[/img][/url]";
 			}
 			if (FileBrowser.type == "file") {
 				// attachment links are "baseurl/attach/id"; we need id
-				embed = "[attachment]"+this.dataset.link.split("/").pop()+"[/attachment]";
+				embed = "[attachment]" + this.dataset.link.split("/").pop() + "[/attachment]";
 			}
 
 			// Delete prefilled Text of the comment input
@@ -131,7 +131,9 @@ var FileBrowser = {
 				}
 
 			}
+
 			console.log(FileBrowser.event, this.dataset.filename, embed, FileBrowser.id);
+
 			parent.$("body").trigger(FileBrowser.event, [
 				this.dataset.filename,
 				embed,
@@ -164,16 +166,16 @@ var FileBrowser = {
 			//AjaxUpload for images
 			var image_uploader = new window.AjaxUpload(
 				'upload-image',
-				{	action: 'wall_upload/'+FileBrowser.nickname+'?response=json&album=' + albumname,
+				{	action: 'wall_upload/' + FileBrowser.nickname + '?response=json&album=' + albumname,
 					name: 'userfile',
 					responseType: 'json',
-					onSubmit: function(file,ext) {
+					onSubmit: function(file, ext) {
 						$(".fbrowser-content").hide();
 						$(".fbrowser .profile-rotator-wrapper").show();
 						$(".error").addClass('hidden');
 					},
 					onComplete: function(file,response) {
-						if (response['error']!= undefined) {
+						if (response['error'] != undefined) {
 							$(".error span").html(response['error']);
 							$(".error").removeClass('hidden');
 							$(".fbrowser .profile-rotator-wrapper").hide();
@@ -197,7 +199,7 @@ var FileBrowser = {
 				'upload-file',
 				{	action: 'wall_attach/' + FileBrowser.nickname + '?response=json',
 					name: 'userfile',
-					onSubmit: function(file,ext) {
+					onSubmit: function(file, ext) {
 						$(".fbrowser-content").hide();
 						$(".fbrowser .profile-rotator-wrapper").show();
 						$(".error").addClass('hidden');
@@ -238,7 +240,7 @@ var FileBrowser = {
 		$(".fbrowser .profile-rotator-wrapper").show();
 
 		// load new content to fbrowser window
-		$(".fbrowser").load(url, function(responseText, textStatus){
+		$(".fbrowser").load(url, function(responseText, textStatus) {
 			$(".profile-rotator-wrapper").hide();
 			if (textStatus === 'success') {
 				$(".fbrowser_content").show();
