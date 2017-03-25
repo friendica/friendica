@@ -9,7 +9,10 @@
  * to the url
  */
 
+use \Friendica\Core\Config;
+
 require_once 'include/Photo.php';
+
 
 function wall_upload_post(App $a, $desktopmode = true) {
 
@@ -172,7 +175,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	logger("File upload src: " . $src . " - filename: " . $filename .
 		" - size: " . $filesize . " - type: " . $filetype, LOGGER_DEBUG);
 
-	$maximagesize = get_config('system', 'maximagesize');
+	$maximagesize = Config::get('system', 'maximagesize');
 
 	if (($maximagesize) && ($filesize > $maximagesize)) {
 		$msg = sprintf(t('Image exceeds size limit of %s'), formatBytes($maximagesize));
@@ -225,7 +228,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	$ph->orient($src);
 	@unlink($src);
 
-	$max_length = get_config('system', 'max_image_length');
+	$max_length = Config::get('system', 'max_image_length');
 	if (! $max_length) {
 		$max_length = MAX_IMAGE_LENGTH;
 	}
