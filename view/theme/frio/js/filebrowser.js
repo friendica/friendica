@@ -253,7 +253,7 @@ var FileBrowser = {
 	initGallery: function() {
 		$(".fbrowser.image .fbrowser-content-container").justifiedGallery({
 			'rowHeight': 80,
-			'margins': 2,
+			'margins': 3,
 			'border': 0
 		});
 	}

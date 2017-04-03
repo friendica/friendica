@@ -1377,8 +1377,8 @@ section #jotOpen {
         max-height: calc(100vh - 220px);
     }
 }
-.fbrowser.image .photo-album-image-wrapper img {
-    border: 1px solid #ddd;
+.fbrowser.image .photo-album-image-wrapper {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .fbrowser .profile-rotator-wrapper {
     min-height: 200px;
