@@ -1314,9 +1314,6 @@ section #jotOpen {
 }
 
 /* Filebrowser */
-#jot-fbrowser-wrapper {
-    overflow: hidden;
-}
 .fbrowser .breadcrumb {
     margin-bottom: 0px;
 }
