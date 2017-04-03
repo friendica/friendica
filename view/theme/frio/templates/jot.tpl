@@ -112,14 +112,14 @@
 
 				</div>
 
-				<div id="profile-jot-acl-wrapper" style="display: none;">
+				<div id="profile-jot-acl-wrapper" class="minimize">
 					{{$acl}}
 				</div>
 
-				<div id="jot-preview-content" style="display:none;"></div>
+				<div id="jot-preview-content" class="minimize"></div>
 			</form>
 
-			<div id="jot-fbrowser-wrapper" style="display: none"></div>
+			<div id="jot-fbrowser-wrapper" class="minimize"></div>
 
 			{{if $content}}<script>initEditor();</script>{{/if}}
 		</div>

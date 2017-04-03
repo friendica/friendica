@@ -283,19 +283,22 @@
 	// the following functions show/hide the specific jot content
 	// in dependence of the selected nav
 	function aclActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").hide();
-		$(".modal-body #profile-jot-acl-wrapper").show();
+		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").addClass("minimize");
+		$(".modal-body #profile-jot-acl-wrapper").removeClass("minimize");
 	}
 
 
 	function previewActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #profile-jot-acl-wrapper,.modal-body #jot-fbrowser-wrapper").hide();
-		preview_post();
+		$(".modal-body #profile-jot-wrapper, .modal-body #profile-jot-acl-wrapper,.modal-body #jot-fbrowser-wrapper").addClass("minimize");
+		var postPreview = preview_post();
+		if (postPreview && typeof postPreview !== "undefined") {
+			$(".modal-body #jot-preview-content").removeClass("minimize");
+		}
 	}
 
 	function jotActive() {
-		$(".modal-body #profile-jot-acl-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").hide();
-		$(".modal-body #profile-jot-wrapper").show();
+		$(".modal-body #profile-jot-acl-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").addClass("minimize");
+		$(".modal-body #profile-jot-wrapper").removeClass("minimize");
 
 		//make sure jot text does have really the active class (we do this because there are some
 		// other events which trigger jot text
@@ -303,9 +306,9 @@
 	}
 
 	function fbrowserActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #profile-jot-acl-wrapper").hide();
+		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #profile-jot-acl-wrapper").addClass("minimize");
 
-		$(".modal-body #jot-fbrowser-wrapper").show();
+		$(".modal-body #jot-fbrowser-wrapper").removeClass("minimize");
 
 		$(function() {Dialog.showJot();});
 	}

@@ -91,6 +91,10 @@ blockquote {
 .hidden {
     display: none !important;
 }
+.minimize {
+    max-height: 0px !important;
+    overflow: hidden !important;
+}
 code {
     white-space: pre-wrap;
 }
