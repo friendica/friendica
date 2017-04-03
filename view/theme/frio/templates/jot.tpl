@@ -16,20 +16,20 @@
 				{{* Mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
 				<li class="active" role="menuitem">
-					<a class="jot-text-lnk" id="jot-text-lnk" onclick="jotActive(); return false;">{{$message}}</a>
+					<a href="#profile-jot-wrapper" class="jot-text-lnk" id="jot-text-lnk" onclick="jotActive(); return false;">{{$message}}</a>
 				</li>
 				{{if $acl}}
 				<li role="menuitem">
-					<a class="jot-perms-lnk" id="jot-perms-lnk" onclick="aclActive(); return false;">{{$shortpermset}}</a>
+					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk" id="jot-perms-lnk" onclick="aclActive(); return false;">{{$shortpermset}}</a>
 				</li>
 				{{/if}}
 				{{if $preview}}
 				<li role="menuitem">
-					<a class="jot-preview-lnk" id="jot-preview-lnk" onclick="previewActive(); return false;">{{$preview}}</a>
+					<a href="#jot-preview-content" class="jot-preview-lnk" id="jot-preview-lnk" onclick="previewActive(); return false;">{{$preview}}</a>
 				</li>
 				{{/if}}
 				<li role="menuitem">
-					<a class="jot-browser-lnk" id="jot-browser-link" onclick="fbrowserActive(); return false;">{{$browser}}</a>
+					<a href="#jot-fbrowser-wrapper" class="jot-browser-lnk" id="jot-browser-link" onclick="fbrowserActive(); return false;">{{$browser}}</a>
 				</li>
 			</ul>
 
@@ -40,20 +40,20 @@
 					{{* mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
 					<li role="menuitem" style="display: none;">
-						<a class="jot-text-lnk" id="jot-text-lnk-mobile" onclick="jotActive(); return false;">{{$message}}</a>
+						<a href="#profile-jot-wrapper" class="jot-text-lnk" id="jot-text-lnk-mobile" onclick="jotActive(); return false;">{{$message}}</a>
 					</li>
 					{{if $acl}}
 					<li role="menuitem">
-						<a class="jot-perms-lnk" id="jot-perms-lnk-mobile" onclick="aclActive(); return false;">{{$shortpermset}}</a>
+						<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk" id="jot-perms-lnk-mobile" onclick="aclActive(); return false;">{{$shortpermset}}</a>
 					</li>
 					{{/if}}
 					{{if $preview}}
 					<li role="menuitem">
-						<a class="jot-preview-lnk" id="jot-preview-lnk-mobile" onclick="previewActive(); return false;">{{$preview}}</a>
+						<a <a href="#jot-preview-content" class="jot-preview-lnk" id="jot-preview-lnk-mobile" onclick="previewActive(); return false;">{{$preview}}</a>
 					</li>
 					{{/if}}
 					<li role="menuitem">
-						<a id="jot-browser-lnk-mobile" onclick="fbrowserActive(); return false;">{{$browser}}</a>
+						<a href="#jot-fbrowser-wrapper" id="jot-browser-lnk-mobile" onclick="fbrowserActive(); return false;">{{$browser}}</a>
 					</li>
 				</ul>
 			</div>
