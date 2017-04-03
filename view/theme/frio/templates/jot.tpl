@@ -40,20 +40,20 @@
 					{{* mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
 					<li role="menuitem" style="display: none;">
-						<a href="#profile-jot-wrapper" class="jot-text-lnk" id="jot-text-lnk-mobile" onclick="jotActive(); return false;">{{$message}}</a>
+						<button class="jot-text-lnk btn-link" id="jot-text-lnk-mobile" onclick="jotActive(); return false;">{{$message}}</button>
 					</li>
 					{{if $acl}}
 					<li role="menuitem">
-						<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk" id="jot-perms-lnk-mobile" onclick="aclActive(); return false;">{{$shortpermset}}</a>
+						<button class="jot-perms-lnk btn-link" id="jot-perms-lnk-mobile" onclick="aclActive(); return false;">{{$shortpermset}}</button>
 					</li>
 					{{/if}}
 					{{if $preview}}
 					<li role="menuitem">
-						<a <a href="#jot-preview-content" class="jot-preview-lnk" id="jot-preview-lnk-mobile" onclick="previewActive(); return false;">{{$preview}}</a>
+						<button class="jot-preview-lnk btn-link" id="jot-preview-lnk-mobile" onclick="previewActive(); return false;">{{$preview}}</button>
 					</li>
 					{{/if}}
 					<li role="menuitem">
-						<a href="#jot-fbrowser-wrapper" id="jot-browser-lnk-mobile" onclick="fbrowserActive(); return false;">{{$browser}}</a>
+						<button class="jot-browser-lnk-mobile btn-link" id="jot-browser-lnk-mobile" onclick="fbrowserActive(); return false;">{{$browser}}</button>
 					</li>
 				</ul>
 			</div>
