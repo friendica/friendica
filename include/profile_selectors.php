@@ -8,8 +8,8 @@ function gender_selector($current="",$suffix="") {
 	call_hooks('gender_selector', $select);
 
 	$o .= "<select name=\"gender$suffix\" id=\"gender-select$suffix\" size=\"1\" >";
-	foreach($select as $selection) {
-		if($selection !== 'NOTRANSLATION') {
+	foreach ($select as $selection) {
+		if ($selection !== 'NOTRANSLATION') {
 			$selected = (($selection == $current) ? ' selected="selected" ' : '');
 			$o .= "<option value=\"$selection\" $selected >$selection</option>";
 		}
@@ -26,8 +26,8 @@ function sexpref_selector($current="",$suffix="") {
 	call_hooks('sexpref_selector', $select);
 
 	$o .= "<select name=\"sexual$suffix\" id=\"sexual-select$suffix\" size=\"1\" >";
-	foreach($select as $selection) {
-		if($selection !== 'NOTRANSLATION') {
+	foreach ($select as $selection) {
+		if ($selection !== 'NOTRANSLATION') {
 			$selected = (($selection == $current) ? ' selected="selected" ' : '');
 			$o .= "<option value=\"$selection\" $selected >$selection</option>";
 		}
@@ -44,8 +44,8 @@ function marital_selector($current="",$suffix="") {
 	call_hooks('marital_selector', $select);
 
 	$o .= "<select name=\"marital\" id=\"marital-select\" size=\"1\" >";
-	foreach($select as $selection) {
-		if($selection !== 'NOTRANSLATION') {
+	foreach ($select as $selection) {
+		if ($selection !== 'NOTRANSLATION') {
 			$selected = (($selection == $current) ? ' selected="selected" ' : '');
 			$o .= "<option value=\"$selection\" $selected >$selection</option>";
 		}

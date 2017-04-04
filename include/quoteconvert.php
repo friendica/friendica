@@ -83,7 +83,7 @@ function removetofu($message)
 
 	$start = 0;
 
-	while(($pos = strpos($message, '[quote', $start)) > 0) {
+	while (($pos = strpos($message, '[quote', $start)) > 0) {
 		$quotes[$pos] = -1;
 		$start = $pos + 7;
 		$startquotes++;
@@ -92,7 +92,7 @@ function removetofu($message)
 	$endquotes = 0;
 	$start = 0;
 
-	while(($pos = strpos($message, '[/quote]', $start)) > 0) {
+	while (($pos = strpos($message, '[/quote]', $start)) > 0) {
 		$start = $pos + 7;
 		$endquotes++;
 	}
@@ -104,7 +104,7 @@ function removetofu($message)
 
 	$start = 0;
 
-	while(($pos = strpos($message, '[/quote]', $start)) > 0) {
+	while (($pos = strpos($message, '[/quote]', $start)) > 0) {
 		$quotes[$pos] = 1;
 		$start = $pos + 7;
 	}

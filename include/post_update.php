@@ -68,7 +68,7 @@ function post_update_1192() {
 	}
 
 	// Set the "gcontact-id" in the item table and add a new gcontact entry if needed
-	foreach($item_arr AS $item) {
+	foreach ($item_arr AS $item) {
 		$gcontact_id = get_gcontact_id(array("url" => $item['author-link'], "network" => $item['network'],
 						"photo" => $item['author-avatar'], "name" => $item['author-name']));
 		q("UPDATE `item` SET `gcontact-id` = %d WHERE `uid` = %d AND `author-link` = '%s' AND `gcontact-id` = 0",
@@ -204,7 +204,7 @@ function post_update_1198() {
 	}
 
 	// Set the "gcontact-id" in the item table and add a new gcontact entry if needed
-	foreach($item_arr AS $item) {
+	foreach ($item_arr AS $item) {
 		$author_id = get_contact($item["author-link"], 0);
 		$owner_id = get_contact($item["owner-link"], 0);
 

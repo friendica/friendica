@@ -17,11 +17,11 @@ require_once("boot.php");
 function poller_run($argv, $argc){
 	global $a, $db;
 
-	if(is_null($a)) {
+	if (is_null($a)) {
 		$a = new App;
 	}
 
-	if(is_null($db)) {
+	if (is_null($db)) {
 		@include(".htconfig.php");
 		require_once("include/dba.php");
 		$db = new dba($db_host, $db_user, $db_pass, $db_data);
@@ -49,7 +49,7 @@ function poller_run($argv, $argc){
 		return;
 	}
 
-	if(($argc <= 1) OR ($argv[1] != "no_cron")) {
+	if (($argc <= 1) OR ($argv[1] != "no_cron")) {
 		poller_run_cron();
 	}
 
@@ -372,8 +372,9 @@ function poller_kill_stale_workers() {
 			// Kill long running processes
 
 			// Check if the priority is in a valid range
-			if (!in_array($pid["priority"], array(PRIORITY_CRITICAL, PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW, PRIORITY_NEGLIGIBLE)))
+			if (!in_array($pid["priority"], array(PRIORITY_CRITICAL, PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW, PRIORITY_NEGLIGIBLE))) {
 				$pid["priority"] = PRIORITY_MEDIUM;
+			}
 
 			// Define the maximum durations
 			$max_duration_defaults = array(PRIORITY_CRITICAL => 360, PRIORITY_HIGH => 10, PRIORITY_MEDIUM => 60, PRIORITY_LOW => 180, PRIORITY_NEGLIGIBLE => 360);
@@ -418,7 +419,7 @@ function poller_too_much_workers() {
 
 	// Decrease the number of workers at higher load
 	$load = current_load();
-	if($load) {
+	if ($load) {
 		$maxsysload = intval(Config::get("system", "maxloadavg", 50));
 
 		$maxworkers = $queues;

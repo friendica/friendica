@@ -20,7 +20,7 @@ function uninstall_plugin($plugin){
 	);
 
 	@include_once('addon/' . $plugin . '/' . $plugin . '.php');
-	if(function_exists($plugin . '_uninstall')) {
+	if (function_exists($plugin . '_uninstall')) {
 		$func = $plugin . '_uninstall';
 		$func();
 	}
@@ -36,12 +36,12 @@ if (! function_exists('install_plugin')){
 function install_plugin($plugin) {
 	// silently fail if plugin was removed
 
-	if(! file_exists('addon/' . $plugin . '/' . $plugin . '.php'))
+	if (! file_exists('addon/' . $plugin . '/' . $plugin . '.php'))
 		return false;
 	logger("Addons: installing " . $plugin);
 	$t = @filemtime('addon/' . $plugin . '/' . $plugin . '.php');
 	@include_once('addon/' . $plugin . '/' . $plugin . '.php');
-	if(function_exists($plugin . '_install')) {
+	if (function_exists($plugin . '_install')) {
 		$func = $plugin . '_install';
 		$func();
 
@@ -57,7 +57,7 @@ function install_plugin($plugin) {
 		// once most site tables have been updated.
 		// This way the system won't fall over dead during the update.
 
-		if(file_exists('addon/' . $plugin . '/.hidden')) {
+		if (file_exists('addon/' . $plugin . '/.hidden')) {
 			q("UPDATE `addon` SET `hidden` = 1 WHERE `name` = '%s'",
 				dbesc($plugin)
 			);
@@ -73,10 +73,10 @@ function install_plugin($plugin) {
 
 // reload all updated plugins
 
-if(! function_exists('reload_plugins')) {
+if (! function_exists('reload_plugins')) {
 function reload_plugins() {
 	$plugins = get_config('system','addon');
-	if(strlen($plugins)) {
+	if (strlen($plugins)) {
 
 		$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
 		if (dbm::is_result($r))
@@ -86,25 +86,25 @@ function reload_plugins() {
 
 		$parr = explode(',',$plugins);
 
-		if(count($parr)) {
-			foreach($parr as $pl) {
+		if (count($parr)) {
+			foreach ($parr as $pl) {
 
 				$pl = trim($pl);
 
 				$fname = 'addon/' . $pl . '/' . $pl . '.php';
 
-				if(file_exists($fname)) {
+				if (file_exists($fname)) {
 					$t = @filemtime($fname);
-					foreach($installed as $i) {
-						if(($i['name'] == $pl) && ($i['timestamp'] != $t)) {
+					foreach ($installed as $i) {
+						if (($i['name'] == $pl) && ($i['timestamp'] != $t)) {
 							logger('Reloading plugin: ' . $i['name']);
 							@include_once($fname);
 
-							if(function_exists($pl . '_uninstall')) {
+							if (function_exists($pl . '_uninstall')) {
 								$func = $pl . '_uninstall';
 								$func();
 							}
-							if(function_exists($pl . '_install')) {
+							if (function_exists($pl . '_install')) {
 								$func = $pl . '_install';
 								$func();
 							}
@@ -142,7 +142,7 @@ function plugin_enabled($plugin) {
  * @param int $priority A priority (defaults to 0)
  * @return mixed|bool
  */
-if(! function_exists('register_hook')) {
+if (! function_exists('register_hook')) {
 function register_hook($hook,$file,$function,$priority=0) {
 
 	$r = q("SELECT * FROM `hook` WHERE `hook` = '%s' AND `file` = '%s' AND `function` = '%s' LIMIT 1",
@@ -170,7 +170,7 @@ function register_hook($hook,$file,$function,$priority=0) {
  * @param string $function the name of the function that the hook called
  * @return array
  */
-if(! function_exists('unregister_hook')) {
+if (! function_exists('unregister_hook')) {
 function unregister_hook($hook,$file,$function) {
 
 	$r = q("DELETE FROM `hook` WHERE `hook` = '%s' AND `file` = '%s' AND `function` = '%s'",
@@ -182,7 +182,7 @@ function unregister_hook($hook,$file,$function) {
 }}
 
 
-if(! function_exists('load_hooks')) {
+if (! function_exists('load_hooks')) {
 function load_hooks() {
 	$a = get_app();
 	$a->hooks = array();
@@ -190,7 +190,7 @@ function load_hooks() {
 
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
-			if(! array_key_exists($rr['hook'],$a->hooks))
+			if (! array_key_exists($rr['hook'],$a->hooks))
 				$a->hooks[$rr['hook']] = array();
 			$a->hooks[$rr['hook']][] = array($rr['file'],$rr['function']);
 		}
@@ -244,13 +244,13 @@ function call_single_hook($a, $name, $hook, &$data = null) {
 
 //check if an app_menu hook exist for plugin $name.
 //Return true if the plugin is an app
-if(! function_exists('plugin_is_app')) {
+if (! function_exists('plugin_is_app')) {
 function plugin_is_app($name) {
 	$a = get_app();
 
-	if(is_array($a->hooks) && (array_key_exists('app_menu',$a->hooks))) {
-		foreach($a->hooks['app_menu'] as $hook) {
-			if($hook[0] == 'addon/'.$name.'/'.$name.'.php')
+	if (is_array($a->hooks) && (array_key_exists('app_menu',$a->hooks))) {
+		foreach ($a->hooks['app_menu'] as $hook) {
+			if ($hook[0] == 'addon/'.$name.'/'.$name.'.php')
 				return true;
 		}
 	}
@@ -297,7 +297,7 @@ function get_plugin_info($plugin){
 
 	if ($r){
 		$ll = explode("\n", $m[0]);
-		foreach( $ll as $l ) {
+		foreach ( $ll as $l ) {
 			$l = trim($l,"\t\n\r */");
 			if ($l!=""){
 				list($k,$v) = array_map("trim", explode(":",$l,2));
@@ -352,9 +352,9 @@ function get_theme_info($theme){
 		'unsupported' => false
 	);
 
-	if(file_exists("view/theme/$theme/experimental"))
+	if (file_exists("view/theme/$theme/experimental"))
 		$info['experimental'] = true;
-	if(file_exists("view/theme/$theme/unsupported"))
+	if (file_exists("view/theme/$theme/unsupported"))
 		$info['unsupported'] = true;
 
 	if (!is_file("view/theme/$theme/theme.php")) return $info;
@@ -368,7 +368,7 @@ function get_theme_info($theme){
 
 	if ($r){
 		$ll = explode("\n", $m[0]);
-		foreach( $ll as $l ) {
+		foreach ( $ll as $l ) {
 			$l = trim($l,"\t\n\r */");
 			if ($l!=""){
 				list($k,$v) = array_map("trim", explode(":",$l,2));
@@ -412,7 +412,7 @@ function get_theme_info($theme){
  */
 function get_theme_screenshot($theme) {
 	$exts = array('.png','.jpg');
-	foreach($exts as $ext) {
+	foreach ($exts as $ext) {
 		if (file_exists('view/theme/' . $theme . '/screenshot' . $ext)) {
 			return(App::get_baseurl() . '/view/theme/' . $theme . '/screenshot' . $ext);
 		}
@@ -511,11 +511,11 @@ function service_class_fetch($uid,$property) {
 			$service_class = $r[0]['service_class'];
 		}
 	}
-	if(! x($service_class))
+	if (! x($service_class))
 		return false; // everything is allowed
 
 	$arr = get_config('service_class',$service_class);
-	if(! is_array($arr) || (! count($arr)))
+	if (! is_array($arr) || (! count($arr)))
 		return false;
 
 	return((array_key_exists($property,$arr)) ? $arr[$property] : false);
@@ -524,12 +524,14 @@ function service_class_fetch($uid,$property) {
 
 function upgrade_link($bbcode = false) {
 	$l = get_config('service_class','upgrade_link');
-	if(! $l)
+	if (! $l) {
 		return '';
-	if($bbcode)
+	}
+	if ($bbcode) {
 		$t = sprintf('[url=%s]' . t('Click here to upgrade.') . '[/url]', $l);
-	else
+	} else {
 		$t = sprintf('<a href="%s">' . t('Click here to upgrade.') . '</div>', $l);
+	}
 	return $t;
 }
 
@@ -556,13 +558,15 @@ function upgrade_bool_message($bbcode = false) {
  */
 function theme_include($file, $root = '') {
 	// Make sure $root ends with a slash / if it's not blank
-	if($root !== '' && $root[strlen($root)-1] !== '/')
+	if ($root !== '' && $root[strlen($root)-1] !== '/') {
 		$root = $root . '/';
+	}
 	$theme_info = $a->theme_info;
-	if(is_array($theme_info) AND array_key_exists('extends',$theme_info))
+	if (is_array($theme_info) AND array_key_exists('extends',$theme_info)) {
 		$parent = $theme_info['extends'];
-	else
+	} else {
 		$parent = 'NOPATH';
+	}
 	$theme = current_theme();
 	$thname = $theme;
 	$ext = substr($file,strrpos($file,'.')+1);
@@ -571,12 +575,13 @@ function theme_include($file, $root = '') {
 		"{$root}view/theme/$parent/$ext/$file",
 		"{$root}view/$ext/$file",
 	);
-	foreach($paths as $p) {
+	foreach ($paths as $p) {
 		// strpos() is faster than strstr when checking if one string is in another (http://php.net/manual/en/function.strstr.php)
-		if(strpos($p,'NOPATH') !== false)
+		if (strpos($p,'NOPATH') !== false) {
 			continue;
-		if(file_exists($p))
+		} elseif (file_exists($p)) {
 			return $p;
+		}
 	}
 	return '';
 }

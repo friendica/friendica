@@ -28,10 +28,11 @@ function handle_pubsubhubbub($id) {
 	global $a;
 
 	$r = q("SELECT * FROM `push_subscriber` WHERE `id` = %d", intval($id));
-	if (!$r)
+	if (!dbm::is_result($r)) {
 		return;
-	else
-		$rr = $r[0];
+	}
+
+	$rr = $r[0];
 
 	logger("Generate feed of user ".$rr['nickname']." to ".$rr['callback_url']." - last updated ".$rr['last_update'], LOGGER_DEBUG);
 
