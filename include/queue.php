@@ -2,15 +2,15 @@
 
 use Friendica\Core\Config;
 
-require_once('include/queue_fn.php');
-require_once('include/dfrn.php');
-require_once("include/datetime.php");
-require_once('include/items.php');
-require_once('include/bbcode.php');
-require_once('include/socgraph.php');
-require_once('include/cache.php');
+require_once 'include/queue_fn.php';
+require_once 'include/dfrn.php';
+require_once 'include/datetime.php';
+require_once 'include/items.php';
+require_once 'include/bbcode.php';
+require_once 'include/socgraph.php';
+require_once 'include/cache.php';
 
-function queue_run(&$argv, &$argc){
+function queue_run(&$argv, &$argc) {
 	global $a;
 
 	if ($argc > 1) {
@@ -28,6 +28,25 @@ function queue_run(&$argv, &$argc){
 
 		// Handling the pubsubhubbub requests
 		proc_run(PRIORITY_HIGH,'include/pubsubpublish.php');
+
+		$interval = ((get_config('system','delivery_interval') === false) ? 2 : intval(get_config('system','delivery_interval')));
+
+		// If we are using the worker we don't need a delivery interval
+		/// @TODO To much get_config() here
+		if (get_config("system", "worker")) {
+			$interval = false;
+		}
+
+		$r = q("select * from deliverq where 1");
+		if ($r) {
+			foreach ($r as $rr) {
+				logger('queue: deliverq');
+				proc_run(PRIORITY_HIGH,'include/delivery.php',$rr['cmd'],$rr['item'],$rr['contact']);
+				if ($interval) {
+					time_sleep_until(microtime(true) + (float) $interval);
+				}
+			}
+		}
 
 		$r = q("SELECT `queue`.*, `contact`.`name`, `contact`.`uid` FROM `queue`
 			INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id`
@@ -60,8 +79,8 @@ function queue_run(&$argv, &$argc){
 
 	// delivering
 
-	require_once('include/salmon.php');
-	require_once('include/diaspora.php');
+	require_once 'include/salmon.php';
+	require_once 'include/diaspora.php';
 
 	$r = q("SELECT * FROM `queue` WHERE `id` = %d LIMIT 1",
 		intval($queue_id));

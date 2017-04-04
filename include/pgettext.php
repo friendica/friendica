@@ -92,7 +92,6 @@ function pop_lang() {
 	$lang = $a->langsave;
 }
 
-
 // l
 
 if (! function_exists('load_translation_table')) {
