@@ -2225,7 +2225,6 @@ function text_highlight($s, $lang) {
 	$o = $hl->highlight($s);
 	$o = str_replace("\n", '', $o);
 
-
 	if ($tag_added) {
 		$b = substr($o, 0, strpos($o, '<li>'));
 		$e = substr($o, strpos($o, '</li>'));
