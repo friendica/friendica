@@ -1322,6 +1322,7 @@ function get_item_contact($item, $contacts) {
 	if (! count($contacts) || (! is_array($item))) {
 		return false;
 	}
+
 	foreach ($contacts as $contact) {
 		if ($contact['id'] == $item['contact-id']) {
 			return $contact;
@@ -2203,7 +2204,7 @@ function drop_item($id, $interactive = true) {
 		$cnt = preg_match_all('/<(.*?)>/', $item['file'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],true);
+				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1], true);
 			}
 		}
 
@@ -2212,7 +2213,7 @@ function drop_item($id, $interactive = true) {
 		$cnt = preg_match_all('/\[(.*?)\]/', $item['file'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],false);
+				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1], false);
 			}
 		}
 
@@ -2240,7 +2241,7 @@ function drop_item($id, $interactive = true) {
 		}
 
 		// If item has attachments, drop them
-		foreach (explode(", ", $item['attach']) as $attach) {
+		foreach (explode(",", $item['attach']) as $attach) {
 			preg_match("|attach/(\d+)|", $attach, $matches);
 			q("DELETE FROM `attach` WHERE `id` = %d AND `uid` = %d",
 				intval($matches[1]),

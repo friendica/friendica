@@ -321,7 +321,7 @@ function expand_groups($a,$check_dead = false, $use_gcontact = false) {
 		foreach ($r as $rr)
 			$ret[] = $rr['contact-id'];
 	if ($check_dead && !$use_gcontact) {
-		require_once('include/acl_selectors.php');
+		require_once 'include/acl_selectors.php';
 		$ret = prune_deadguys($ret);
 	}
 	return $ret;

@@ -360,7 +360,7 @@ function profile_sidebar($profile, $block = 0) {
 			? trim(substr($profile['name'],0,strpos($profile['name'],' '))) : $profile['name']);
 	$lastname = (($firstname === $profile['name']) ? '' : trim(substr($profile['name'],strlen($firstname))));
 
-	if ($profile['guid'] != "")
+	if ($profile['guid'] != "") {
 		$diaspora = array(
 			'guid' => $profile['guid'],
 			'podloc' => App::get_baseurl(),
@@ -373,8 +373,9 @@ function profile_sidebar($profile, $block = 0) {
 			'photo100' => $profile['contact_thumb'],
 			'photo50' => $profile['contact_micro'],
 		);
-	else
+	} else {
 		$diaspora = false;
+	}
 
 	if (!$block) {
 		$contact_block = contact_block();
@@ -382,8 +383,9 @@ function profile_sidebar($profile, $block = 0) {
 		if (is_array($a->profile) && !$a->profile['hide-friends']) {
 			$r = q("SELECT `gcontact`.`updated` FROM `contact` INNER JOIN `gcontact` WHERE `gcontact`.`nurl` = `contact`.`nurl` AND `self` AND `uid` = %d LIMIT 1",
 				intval($a->profile['uid']));
-			if (dbm::is_result($r))
+			if (dbm::is_result($r)) {
 				$updated =  date("c", strtotime($r[0]['updated']));
+			}
 
 			$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 				WHERE `uid` = %d
@@ -406,19 +408,23 @@ function profile_sidebar($profile, $block = 0) {
 		$p[$k] = $v;
 	}
 
-	if (isset($p["about"]))
+	if (isset($p["about"])) {
 		$p["about"] = bbcode($p["about"]);
+	}
 
-	if (isset($p["address"]))
+	if (isset($p["address"])) {
 		$p["address"] = bbcode($p["address"]);
-	else
+	} else {
 		$p["address"] = bbcode($p["location"]);
+	}
 
 	if (isset($p["photo"])) {
 		$p["photo"] = proxy_url($p["photo"], false, PROXY_SIZE_SMALL);
 	}
-	if ($a->theme['template_engine'] === 'internal')
+
+	if ($a->theme['template_engine'] === 'internal') {
 		$location = template_escape($location);
+	}
 
 	$tpl = get_markup_template('profile_vcard.tpl');
 	$o .= replace_macros($tpl, array(
