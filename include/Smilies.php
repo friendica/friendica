@@ -125,7 +125,7 @@ class Smilies {
 	 * @return string HML Output of the Smilie
 	 */
 	public static function replace($s, $sample = false) {
-		if(intval(get_config('system','no_smilies'))
+		if (intval(get_config('system','no_smilies'))
 			|| (local_user() && intval(get_pconfig(local_user(),'system','no_smilies'))))
 			return $s;
 
@@ -135,9 +135,9 @@ class Smilies {
 		$params = self::get_list();
 		$params['string'] = $s;
 
-		if($sample) {
+		if ($sample) {
 			$s = '<div class="smiley-sample">';
-			for($x = 0; $x < count($params['texts']); $x ++) {
+			for ($x = 0; $x < count($params['texts']); $x ++) {
 				$s .= '<dl><dt>' . $params['texts'][$x] . '</dt><dd>' . $params['icons'][$x] . '</dd></dl>';
 			}
 		}
@@ -170,11 +170,13 @@ class Smilies {
 	 * @todo: Rework because it doesn't work correctly
 	 */
 	private function preg_heart($x) {
-		if(strlen($x[1]) == 1)
+		if (strlen($x[1]) == 1) {
 			return $x[0];
+		}
 		$t = '';
-		for($cnt = 0; $cnt < strlen($x[1]); $cnt ++)
+		for ($cnt = 0; $cnt < strlen($x[1]); $cnt ++) {
 			$t .= '<img class="smiley" src="' . app::get_baseurl() . '/images/smiley-heart.gif" alt="&lt;3" />';
+		}
 		$r =  str_replace($x[0],$t,$x[0]);
 		return $r;
 	}

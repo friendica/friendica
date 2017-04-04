@@ -50,7 +50,7 @@ class xml {
 			}
 		}
 
-		foreach($array as $key => $value) {
+		foreach ($array as $key => $value) {
 			if (!isset($element) AND isset($xml)) {
 				$element = $xml;
 			}
@@ -305,7 +305,7 @@ class xml {
 			//Set the attributes too.
 			if (isset($attributes) and $get_attributes) {
 				foreach ($attributes as $attr => $val) {
-					if($priority == 'tag') {
+					if ($priority == 'tag') {
 						$attributes_data[$attr] = $val;
 					} else {
 						$result['@attributes'][$attr] = $val; // Set all the attributes in a array called 'attr'
