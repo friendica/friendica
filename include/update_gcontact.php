@@ -32,26 +32,30 @@ function update_gcontact_run(&$argv, &$argc) {
 	$data = probe_url($r[0]["url"]);
 
 	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
-		if ($r[0]["server_url"] != "")
+		if ($r[0]["server_url"] != "") {
 			poco_check_server($r[0]["server_url"], $r[0]["network"]);
+		}
 
 		q("UPDATE `gcontact` SET `last_failure` = '%s' WHERE `id` = %d",
 			dbesc(datetime_convert()), intval($contact_id));
 		return;
 	}
 
-	if (($data["name"] == "") && ($r[0]['name'] != ""))
+	if (($data["name"] == "") && ($r[0]['name'] != "")) {
 		$data["name"] = $r[0]['name'];
+	}
 
-	if (($data["nick"] == "") && ($r[0]['nick'] != ""))
+	if (($data["nick"] == "") && ($r[0]['nick'] != "")) {
 		$data["nick"] = $r[0]['nick'];
+	}
 
-	if (($data["addr"] == "") && ($r[0]['addr'] != ""))
+	if (($data["addr"] == "") && ($r[0]['addr'] != "")) {
 		$data["addr"] = $r[0]['addr'];
+	}
 
-	if (($data["photo"] == "") && ($r[0]['photo'] != ""))
+	if (($data["photo"] == "") && ($r[0]['photo'] != "")) {
 		$data["photo"] = $r[0]['photo'];
-
+	}
 
 	q("UPDATE `gcontact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `photo` = '%s'
 				WHERE `id` = %d",

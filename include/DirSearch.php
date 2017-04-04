@@ -20,7 +20,7 @@ class DirSearch {
 	 */
 	public static function global_search_by_name($search, $mode = '') {
 
-		if($search) {
+		if ($search) {
 			// check supported networks
 			if (get_config('system','diaspora_enabled'))
 				$diaspora = NETWORK_DIASPORA;
@@ -33,10 +33,11 @@ class DirSearch {
 				$ostatus = NETWORK_DFRN;
 
 			// check if we search only communities or every contact
-			if($mode === "community")
+			if ($mode === "community") {
 				$extra_sql = " AND `community`";
-			else
+			} else {
 				$extra_sql = "";
+			}
 
 			$search .= "%";
 

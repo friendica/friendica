@@ -127,7 +127,7 @@ class Smilies {
 	 * @return string HML Output of the Smilie
 	 */
 	public static function replace($s, $sample = false) {
-		if(intval(get_config('system','no_smilies'))
+		if (intval(get_config('system','no_smilies'))
 			|| (local_user() && intval(get_pconfig(local_user(),'system','no_smilies'))))
 			return $s;
 
@@ -137,29 +137,28 @@ class Smilies {
 		$params = self::get_list();
 		$params['string'] = $s;
 
-		if($sample) {
+		if ($sample) {
 			$s = '<div class="smiley-sample">';
-			for($x = 0; $x < count($params['texts']); $x ++) {
+			for ($x = 0; $x < count($params['texts']); $x ++) {
 				$s .= '<dl><dt>' . $params['texts'][$x] . '</dt><dd>' . $params['icons'][$x] . '</dd></dl>';
 			}
-		}
-		else {
-			$params['string'] = preg_replace_callback('/&lt;(3+)/','self::preg_heart',$params['string']);
-			$s = str_replace($params['texts'],$params['icons'],$params['string']);
+		} else {
+			$params['string'] = preg_replace_callback('/&lt;(3+)/', 'self::preg_heart', $params['string']);
+			$s = str_replace($params['texts'], $params['icons'], $params['string']);
 		}
 
-		$s = preg_replace_callback('/<pre>(.*?)<\/pre>/ism','self::decode',$s);
-		$s = preg_replace_callback('/<code>(.*?)<\/code>/ism','self::decode',$s);
+		$s = preg_replace_callback('/<pre>(.*?)<\/pre>/ism', 'self::decode', $s);
+		$s = preg_replace_callback('/<code>(.*?)<\/code>/ism', 'self::decode', $s);
 
 		return $s;
 	}
 
 	private function encode($m) {
-		return(str_replace($m[1],base64url_encode($m[1]),$m[0]));
+		return(str_replace($m[1], base64url_encode($m[1]), $m[0]));
 	}
 
 	private function decode($m) {
-		return(str_replace($m[1],base64url_decode($m[1]),$m[0]));
+		return(str_replace($m[1], base64url_decode($m[1]), $m[0]));
 	}
 
 
@@ -172,12 +171,14 @@ class Smilies {
 	 * @todo: Rework because it doesn't work correctly
 	 */
 	private function preg_heart($x) {
-		if(strlen($x[1]) == 1)
+		if (strlen($x[1]) == 1) {
 			return $x[0];
+		}
 		$t = '';
-		for($cnt = 0; $cnt < strlen($x[1]); $cnt ++)
+		for ($cnt = 0; $cnt < strlen($x[1]); $cnt ++) {
 			$t .= '<img class="smiley" src="' . App::get_baseurl() . '/images/smiley-heart.gif" alt="&lt;3" />';
-		$r =  str_replace($x[0],$t,$x[0]);
+		}
+		$r =  str_replace($x[0], $t, $x[0]);
 		return $r;
 	}
 

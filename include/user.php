@@ -43,21 +43,21 @@ function create_user($arr) {
 
 	$tmp_str = $openid_url;
 
-	if($using_invites) {
-		if(! $invite_id) {
+	if ($using_invites) {
+		if (! $invite_id) {
 			$result['message'] .= t('An invitation is required.') . EOL;
 			return $result;
 		}
 		$r = q("SELECT * FROM `register` WHERE `hash` = '%s' LIMIT 1", dbesc($invite_id));
-		if(! results($r)) {
+		if (! results($r)) {
 			$result['message'] .= t('Invitation could not be verified.') . EOL;
 			return $result;
 		}
 	}
 
-	if((! x($username)) || (! x($email)) || (! x($nickname))) {
-		if($openid_url) {
-			if(! validate_url($tmp_str)) {
+	if ((! x($username)) || (! x($email)) || (! x($nickname))) {
+		if ($openid_url) {
+			if (! validate_url($tmp_str)) {
 				$result['message'] .= t('Invalid OpenID url') . EOL;
 				return $result;
 			}
@@ -83,7 +83,7 @@ function create_user($arr) {
 		return;
 	}
 
-	if(! validate_url($tmp_str))
+	if (! validate_url($tmp_str))
 		$openid_url = '';
 
 
@@ -92,25 +92,25 @@ function create_user($arr) {
 	// collapse multiple spaces in name
 	$username = preg_replace('/ +/',' ',$username);
 
-	if(mb_strlen($username) > 48)
+	if (mb_strlen($username) > 48)
 		$result['message'] .= t('Please use a shorter name.') . EOL;
-	if(mb_strlen($username) < 3)
+	if (mb_strlen($username) < 3)
 		$result['message'] .= t('Name too short.') . EOL;
 
 	// So now we are just looking for a space in the full name.
 
 	$loose_reg = get_config('system','no_regfullname');
-	if(! $loose_reg) {
+	if (! $loose_reg) {
 		$username = mb_convert_case($username,MB_CASE_TITLE,'UTF-8');
-		if(! strpos($username,' '))
+		if (! strpos($username,' '))
 			$result['message'] .= t("That doesn't appear to be your full \x28First Last\x29 name.") . EOL;
 	}
 
 
-	if(! allowed_email($email))
+	if (! allowed_email($email))
 		$result['message'] .= t('Your email domain is not among those allowed on this site.') . EOL;
 
-	if((! valid_email($email)) || (! validate_email($email)))
+	if ((! valid_email($email)) || (! validate_email($email)))
 		$result['message'] .= t('Not a valid email address.') . EOL;
 
 	// Disallow somebody creating an account using openid that uses the admin email address,
@@ -118,8 +118,8 @@ function create_user($arr) {
 
 	$adminlist = explode(",", str_replace(" ", "", strtolower($a->config['admin_email'])));
 
-	//if((x($a->config,'admin_email')) && (strcasecmp($email,$a->config['admin_email']) == 0) && strlen($openid_url)) {
-	if((x($a->config,'admin_email')) && in_array(strtolower($email), $adminlist) && strlen($openid_url)) {
+	//if ((x($a->config,'admin_email')) && (strcasecmp($email,$a->config['admin_email']) == 0) && strlen($openid_url)) {
+	if ((x($a->config,'admin_email')) && in_array(strtolower($email), $adminlist) && strlen($openid_url)) {
 		$r = q("SELECT * FROM `user` WHERE `email` = '%s' LIMIT 1",
 			dbesc($email)
 		);
@@ -129,7 +129,7 @@ function create_user($arr) {
 
 	$nickname = $arr['nickname'] = strtolower($nickname);
 
-	if(! preg_match("/^[a-z0-9][a-z0-9\_]*$/",$nickname))
+	if (! preg_match("/^[a-z0-9][a-z0-9\_]*$/",$nickname))
 		$result['message'] .= t('Your "nickname" can only contain "a-z", "0-9" and "_".') . EOL;
 
 	$r = q("SELECT `uid` FROM `user`
@@ -149,7 +149,7 @@ function create_user($arr) {
 	if (dbm::is_result($r))
 		$result['message'] .= t('Nickname was once registered here and may not be re-used. Please choose another.') . EOL;
 
-	if(strlen($result['message'])) {
+	if (strlen($result['message'])) {
 		return $result;
 	}
 
@@ -162,13 +162,13 @@ function create_user($arr) {
 
 	$keys = new_keypair(4096);
 
-	if($keys === false) {
+	if ($keys === false) {
 		$result['message'] .= t('SERIOUS ERROR: Generation of security keys failed.') . EOL;
 		return $result;
 	}
 
 	$default_service_class = get_config('system','default_service_class');
-	if(! $default_service_class)
+	if (! $default_service_class)
 		$default_service_class = '';
 
 
@@ -230,7 +230,7 @@ function create_user($arr) {
 		return $result;
 	}
 
-	if(x($newuid) !== false) {
+	if (x($newuid) !== false) {
 		$r = q("INSERT INTO `profile` ( `uid`, `profile-name`, `is-default`, `name`, `photo`, `thumb`, `publish`, `net-publish` )
 			VALUES ( %d, '%s', %d, '%s', '%s', '%s', %d, %d ) ",
 			intval($newuid),
@@ -272,7 +272,7 @@ function create_user($arr) {
 			);
 		}
 
-		if(get_config('system', 'newuser_private') && $def_gid) {
+		if (get_config('system', 'newuser_private') && $def_gid) {
 			q("UPDATE `user` SET `allow_gid` = '%s' WHERE `uid` = %d",
 				dbesc("<" . $def_gid . ">"),
 				intval($newuid)
@@ -282,11 +282,11 @@ function create_user($arr) {
 	}
 
 	// if we have no OpenID photo try to look up an avatar
-	if(! strlen($photo))
+	if (! strlen($photo))
 		$photo = avatar_img($email);
 
 	// unless there is no avatar-plugin loaded
-	if(strlen($photo)) {
+	if (strlen($photo)) {
 		require_once('include/Photo.php');
 		$photo_failure = false;
 
@@ -297,7 +297,7 @@ function create_user($arr) {
 
 
 		$img = new Photo($img_str, $type);
-		if($img->is_valid()) {
+		if ($img->is_valid()) {
 
 			$img->scaleImageSquare(175);
 

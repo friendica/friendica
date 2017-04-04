@@ -1063,7 +1063,8 @@ class Probe {
 	private function ostatus($webfinger) {
 		$data = array();
 		if (is_array($webfinger["aliases"])) {
-			foreach ($webfinger["aliases"] as $alias) {
+			/// @TODO AS here should be lower-case
+			foreach ($webfinger["aliases"] AS $alias) {
 				if (strstr($alias, "@")) {
 					$data["addr"] = str_replace('acct:', '', $alias);
 				}
@@ -1369,7 +1370,7 @@ class Probe {
 			$password = '';
 			openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
 			$mbox = email_connect($mailbox, $r[0]['user'], $password);
-			if (!mbox) {
+			if (!$mbox) {
 				return false;
 			}
 		}
