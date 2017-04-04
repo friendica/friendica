@@ -178,11 +178,12 @@ function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d 
 function dob($dob) {
 	list($year,$month,$day) = sscanf($dob,'%4d-%2d-%2d');
 
-	$f = get_config('system','birthday_input_format');
+	$f = get_config('system', 'birthday_input_format');
 
 	if (! $f) {
 		$f = 'ymd';
 	}
+
 	if ($dob <= '0001-01-01') {
 		$value = '';
 	} else {
@@ -204,7 +205,7 @@ function dob($dob) {
 
 	/// @TODO Old-lost code?
 //	if ($dob && $dob > '0001-01-01')
-//		$o = datesel($f,mktime(0,0,0,0,0,1900),mktime(),mktime(0,0,0,$month,$day,$year),'dob');
+//		$o = datesel($f,mktime(0,0,0,0,0,1900),mktime(),mktime(0,0,0,$month,$day,$year), 'dob');
 //	else
 //		$o = datesel($f,mktime(0,0,0,0,0,1900),mktime(),false,'dob');
 
@@ -280,7 +281,7 @@ function timesel($format, $h, $m, $id = 'timepicker') {
 function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicker', $pickdate = true, $picktime = true, $minfrom = '', $maxfrom = '', $required = false) {
 
 	// First day of the week (0 = Sunday)
-	$firstDay = get_pconfig(local_user(),'system','first_day_of_week');
+	$firstDay = get_pconfig(local_user(), 'system', 'first_day_of_week');
 	if ($firstDay === false) {
 		$firstDay=0;
 	}
@@ -313,14 +314,14 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 
 	$pickers = '';
 	if (!$pickdate) {
-		$pickers .= ',datepicker: false';
+		$pickers .= ', datepicker: false';
 	}
 	if (!$picktime) {
 		$pickers .= ',timepicker: false';
 	}
 
 	$extra_js = '';
-	$pickers .= ",dayOfWeekStart: ".$firstDay.",lang:'".$lang."'";
+	$pickers .= ",dayOfWeekStart: " . $firstDay . ",lang:'" . $lang . "'";
 	if ($minfrom != '') {
 		$extra_js .= "\$('#id_$minfrom').data('xdsoft_datetimepicker').setOptions({onChangeDateTime: function (currentDateTime) { \$('#id_$id').data('xdsoft_datetimepicker').setOptions({minDate: currentDateTime})}})";
 	}
@@ -336,7 +337,7 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 	$readable_format = str_replace('i','MM',$readable_format);
 
 	$tpl = get_markup_template('field_input.tpl');
-	$o .= replace_macros($tpl,array(
+	$o .= replace_macros($tpl, array(
 			'$field' => array($id, $label, $input_text, '', (($required) ? '*' : ''), 'placeholder="' . $readable_format . '"'),
 		));
 
@@ -432,11 +433,11 @@ function age($dob, $owner_tz = '', $viewer_tz = '') {
 		$viewer_tz = date_default_timezone_get();
 	}
 
-	$birthdate = datetime_convert('UTC',$owner_tz,$dob . ' 00:00:00+00:00','Y-m-d');
-	list($year,$month,$day) = explode("-",$birthdate);
-	$year_diff  = datetime_convert('UTC',$viewer_tz,'now','Y') - $year;
-	$curr_month = datetime_convert('UTC',$viewer_tz,'now','m');
-	$curr_day   = datetime_convert('UTC',$viewer_tz,'now','d');
+	$birthdate = datetime_convert('UTC', $owner_tz,$dob . ' 00:00:00+00:00','Y-m-d');
+	list($year, $month, $day) = explode("-", $birthdate);
+	$year_diff  = datetime_convert('UTC',$viewer_tz, 'now', 'Y') - $year;
+	$curr_month = datetime_convert('UTC',$viewer_tz, 'now', 'm');
+	$curr_day   = datetime_convert('UTC',$viewer_tz, 'now', 'd');
 
 	if (($curr_month < $month) || (($curr_month == $month) && ($curr_day < $day))) {
 		$year_diff--;
@@ -508,14 +509,14 @@ function cal($y = 0, $m = 0, $links = false, $class = '') {
 	// month table - start at 1 to match human usage.
 
 	$mtab = array(' ',
-		'January','February','March',
-		'April','May','June',
-		'July','August','September',
-		'October','November','December'
+		'January', 'February', 'March',
+		'April'  , 'May'     , 'June',
+		'July'   , 'August'  , 'September',
+		'October', 'November', 'December'
 	);
 
-	$thisyear = datetime_convert('UTC',date_default_timezone_get(),'now','Y');
-	$thismonth = datetime_convert('UTC',date_default_timezone_get(),'now','m');
+	$thisyear = datetime_convert('UTC', date_default_timezone_get(), 'now','Y');
+	$thismonth = datetime_convert('UTC', date_default_timezone_get(), 'now','m');
 	if (! $y) {
 		$y = $thisyear;
 	}
@@ -531,14 +532,14 @@ function cal($y = 0, $m = 0, $links = false, $class = '') {
 	$started = false;
 
 	if (($y == $thisyear) && ($m == $thismonth)) {
-		$tddate = intval(datetime_convert('UTC',date_default_timezone_get(),'now','j'));
+		$tddate = intval(datetime_convert('UTC', date_default_timezone_get(), 'now', 'j'));
 	}
 
 	$str_month = day_translate($mtab[$m]);
 	$o = '<table class="calendar' . $class . '">';
 	$o .= "<caption>$str_month $y</caption><tr>";
 	for ($a = 0; $a < 7; $a ++) {
-		$o .= '<th>' . mb_substr(day_translate($dn[$a]),0,3,'UTF-8') . '</th>';
+		$o .= '<th>' . mb_substr(day_translate($dn[$a]), 0, 3, 'UTF-8') . '</th>';
 	}
 
 	$o .= '</tr><tr>';
@@ -550,7 +551,7 @@ function cal($y = 0, $m = 0, $links = false, $class = '') {
 
 		$today = (((isset($tddate)) && ($tddate == $d)) ? "class=\"today\" " : '');
 		$o .= "<td $today>";
-		$day = str_replace(' ','&nbsp;',sprintf('%2.2d', $d));
+		$day = str_replace(' ', '&nbsp;', sprintf('%2.2d', $d));
 		if ($started) {
 			if (is_array($links) && isset($links[$d])) {
 				$o .=  "<a href=\"{$links[$d]}\">$day</a>";
@@ -593,22 +594,19 @@ function update_contact_birthdays() {
 	 * In-network birthdays are handled within local_delivery
 	 */
 
-	$r = q("SELECT * FROM contact WHERE `bd` != '' AND `bd` > '0001-01-01' AND SUBSTRING(`bd`,1,4) != `bdyear` ");
-
+	$r = q("SELECT * FROM `contact` WHERE `bd` != '' AND `bd` > '0001-01-01' AND SUBSTRING(`bd`, 1, 4) != `bdyear` ");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			logger('update_contact_birthday: ' . $rr['bd']);
 
 			$nextbd = datetime_convert('UTC', 'UTC', 'now', 'Y') . substr($rr['bd'], 4);
 
-			/**
-			 *
+			/*
 			 * Add new birthday event for this person
 			 *
 			 * $bdtext is just a readable placeholder in case the event is shared
 			 * with others. We will replace it during presentation to our $importer
 			 * to contain a sparkle link and perhaps a photo.
-			 *
 			 */
 
 			// Check for duplicates
@@ -641,7 +639,6 @@ function update_contact_birthdays() {
 
 
 			// update bdyear
-
 			q("UPDATE `contact` SET `bdyear` = '%s', `bd` = '%s' WHERE `uid` = %d AND `id` = %d",
 				dbesc(substr($nextbd,0,4)),
 				dbesc($nextbd),
