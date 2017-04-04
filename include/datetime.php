@@ -139,7 +139,7 @@ function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d 
 	 * months and days always start with 1.
 	 */
 
-	if (substr($s,0,10) <= '0001-01-01') {
+	if (substr($s, 0, 10) == '0000-00-00') {
 		$d = new DateTime($s . ' + 32 days', new DateTimeZone('UTC'));
 		return str_replace('1','0',$d->format($fmt));
 	}
@@ -178,11 +178,11 @@ function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d 
 function dob($dob) {
 	list($year,$month,$day) = sscanf($dob,'%4d-%2d-%2d');
 
-	$f = get_config('system', 'birthday_input_format');
+	$f = get_config('system','birthday_input_format');
 	if (! $f) {
 		$f = 'ymd';
 	}
-	if ($dob <= '0001-01-01') {
+	if ($dob === '0000-00-00') {
 		$value = '';
 	} else {
 		$value = (($year) ? datetime_convert('UTC','UTC',$dob,'Y-m-d') : datetime_convert('UTC','UTC',$dob,'m-d'));
@@ -311,6 +311,7 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 	$defaultdatejs = $default ? ",defaultDate: new Date({$default->getTimestamp()}*1000)" : '';
 
 	$pickers = '';
+
 	if (!$pickdate) {
 		$pickers .= ', datepicker: false';
 	}
@@ -320,6 +321,7 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 
 	$extra_js = '';
 	$pickers .= ",dayOfWeekStart: " . $firstDay . ",lang:'" . $lang . "'";
+
 	if ($minfrom != '') {
 		$extra_js .= "\$('#id_$minfrom').data('xdsoft_datetimepicker').setOptions({onChangeDateTime: function (currentDateTime) { \$('#id_$id').data('xdsoft_datetimepicker').setOptions({minDate: currentDateTime})}})";
 	}
@@ -328,11 +330,11 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 	}
 
 	$readable_format = $dateformat;
-	$readable_format = str_replace('Y','yyyy',$readable_format);
-	$readable_format = str_replace('m','mm',$readable_format);
-	$readable_format = str_replace('d','dd',$readable_format);
-	$readable_format = str_replace('H','HH',$readable_format);
-	$readable_format = str_replace('i','MM',$readable_format);
+	$readable_format = str_replace('Y', 'yyyy', $readable_format);
+	$readable_format = str_replace('m', 'mm', $readable_format);
+	$readable_format = str_replace('d', 'dd', $readable_format);
+	$readable_format = str_replace('H', 'HH', $readable_format);
+	$readable_format = str_replace('i', 'MM', $readable_format);
 
 	$tpl = get_markup_template('field_input.tpl');
 	$o .= replace_macros($tpl, array(
@@ -513,8 +515,8 @@ function cal($y = 0,$m = 0, $links = false, $class='') {
 		'October', 'November', 'December'
 	);
 
-	$thisyear = datetime_convert('UTC', date_default_timezone_get(), 'now','Y');
-	$thismonth = datetime_convert('UTC', date_default_timezone_get(), 'now','m');
+	$thisyear = datetime_convert('UTC', date_default_timezone_get(), 'now', 'Y');
+	$thismonth = datetime_convert('UTC', date_default_timezone_get(), 'now', 'm');
 	if (! $y) {
 		$y = $thisyear;
 	}

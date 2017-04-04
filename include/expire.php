@@ -5,44 +5,18 @@ use Friendica\Core\Config;
 function expire_run(&$argv, &$argc){
 	global $a;
 
-	require_once('include/datetime.php');
-	require_once('include/items.php');
-	require_once('include/Contact.php');
+	require_once 'include/datetime.php';
+	require_once 'include/items.php';
+	require_once 'include/Contact.php';
 
 	load_hooks();
 
-	if (($argc == 2) && ($argv[1] == 'delete')) {
-		logger('Delete expired items', LOGGER_DEBUG);
-		// physically remove anything that has been deleted for more than two months
-		$r = dba::p("SELECT `id` FROM `item` WHERE `deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
-		while ($row = dba::fetch($r)) {
-			dba::delete('item', array('id' => $row['id']));
-		}
-		dba::close($r);
+	$r = q("DELETE FROM `item` WHERE `deleted` = 1 AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
 
-		logger('Delete expired items - done', LOGGER_DEBUG);
+	logger('Delete expired items - done', LOGGER_DEBUG);
 
-		// make this optional as it could have a performance impact on large sites
-		if (intval(get_config('system', 'optimize_items'))) {
-			q("OPTIMIZE TABLE `item`");
-		}
-		return;
-	} elseif (($argc == 2) && (intval($argv[1]) > 0)) {
-		$user = dba::select('user', array('uid', 'username', 'expire'), array('uid' => $argv[1]), array('limit' => 1));
-		if (dbm::is_result($user)) {
-			logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - interval: '.$user['expire'], LOGGER_DEBUG);
-			item_expire($user['uid'], $user['expire']);
-			logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - done ', LOGGER_DEBUG);
-		}
-		return;
-	} elseif (($argc == 3) && ($argv[1] == 'hook') && is_array($a->hooks) && array_key_exists("expire", $a->hooks)) {
-		foreach ($a->hooks["expire"] as $hook) {
-			if ($hook[1] == $argv[2]) {
-				logger("Calling expire hook '" . $hook[1] . "'", LOGGER_DEBUG);
-				call_single_hook($a, $name, $hook, $data);
-			}
-		}
-		return;
+	if (intval(get_config('system', 'optimize_items'))) {
+		q("OPTIMIZE TABLE `item`");
 	}
 
 	logger('expire: start');

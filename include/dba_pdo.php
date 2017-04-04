@@ -37,6 +37,8 @@ if (! class_exists('dba')) {
  * the debugging stream is safe to view within both terminals and web pages.
  *
  */
+
+if (! class_exists('dba')) { 
 class dba {
 
 	private $debug = 0;
@@ -70,26 +72,28 @@ class dba {
 			return;
 		}
 
-		if ($install && strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
-			if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
-				$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
-				$this->connected = false;
-				$this->db = null;
-				return;
+		if ($install) {
+			if (strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
+				if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
+					$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
+					$this->connected = false;
+					$this->db = null;
+					return;
+				}
 			}
 		}
 
-		// Establish connection to database and store PDO object
-		DDDBL\connect();
-		$this->db = DDDBL\getDB();
+		// etablish connection to database and store PDO object
+		\DDDBL\connect();
+		$this->db = \DDDBL\getDB();
 
-		if (DDDBL\isConnected()) {
+		if (\DDDBL\isConnected()) {
 			$this->connected = true;
 		}
 
 		if (! $this->connected) {
 			$this->db = null;
-			if (! $install) {
+			if (! $install)
 				system_unavailable();
 			}
 		}
@@ -107,19 +111,17 @@ class dba {
 		$strHandler = (true === $onlyquery) ? 'PDOStatement' : 'MULTI';
 
 		$strQueryAlias = md5($sql);
-		$strSQLType    = strtoupper(strstr($sql, ' ', true));
+		$strSQLType = strtoupper(strstr($sql, ' ', true));
 
-		$objPreparedQueryPool = new DataObjectPool('Query-Definition');
+		$objPreparedQueryPool = new \DDDBL\DataObjectPool('Query-Definition');
 
 		// check if query do not exists till now, if so create its definition
 		if (!$objPreparedQueryPool->exists($strQueryAlias)) {
-			$objPreparedQueryPool->add($strQueryAlias, array(
-				'QUERY'   => $sql,
-				'HANDLER' => $strHandler
-			));
+			$objPreparedQueryPool->add($strQueryAlias, array('QUERY'   => $sql,
+				'HANDLER' => $strHandler));
 		}
 
-		if ((! $this->db) || (! $this->connected)) {
+		if ((! $this->db) || (! $this->connected))
 			return false;
 		}
 
@@ -128,14 +130,14 @@ class dba {
 		$stamp1 = microtime(true);
 
 		try {
-			$r = DDDBL\get($strQueryAlias);
+			$r = \DDDBL\get($strQueryAlias);
 
 			// bad workaround to emulate the bizzare behavior of mysql_query
 			if (in_array($strSQLType, array('INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'SET'))) {
 				$result = true;
 			}
 			$intErrorCode = false;
-		} catch (Exception $objException) {
+		} catch (\Exception $objException) {
 			$result = false;
 			$intErrorCode = $objPreparedQueryPool->get($strQueryAlias)->get('PDOStatement')->errorCode();
 		}
@@ -145,14 +147,10 @@ class dba {
 
 		$a->save_timestamp($stamp1, "database");
 
-		/*
-		 * Check if the configuration group 'system' and db_log is there. The
-		 * extra first check needs to be done to avoid endless loop.
-		 */
 		if (x($a->config, 'system') && x($a->config['system'], 'db_log') && ($duration > $a->config["system"]["db_loglimit"])) {
 			$duration = round($duration, 3);
 			$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-			@file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
+			file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
 					basename($backtrace[1]["file"])."\t".
 					$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
 					substr($sql, 0, 2000)."\n", FILE_APPEND);
@@ -190,14 +188,14 @@ class dba {
 		 * regardless of any logging that may or may nor be in effect.
 		 * These usually indicate SQL syntax errors that need to be resolved.
 		 */
-		if (isset($result) && ($result === false)) {
+		if (isset($result) AND ($result === false)) {
 			logger('dba: ' . printable($sql) . ' returned false.' . "\n" . $this->error);
 			if (file_exists('dbfail.out')) {
 				file_put_contents('dbfail.out', datetime_convert() . "\n" . printable($sql) . ' returned false' . "\n" . $this->error . "\n", FILE_APPEND);
 			}
 		}
 
-		if (isset($result) && (($result === true) || ($result === false))) {
+		if (isset($result) AND (($result === true) || ($result === false))) {
 			return $result;
 		}
 
@@ -274,7 +272,7 @@ function dbg($state) {
 	$db->dbg($state);
 }}
 
-if (! function_exists('dbesc')) {
+if (! function_exists('dbesc')) { 
 function dbesc($str) {
 	global $db;
 

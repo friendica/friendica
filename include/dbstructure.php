@@ -1762,7 +1762,7 @@ function dbstructure_run(&$argv, &$argc) {
 	global $a, $db;
 
 	if (is_null($a)) {
-		$a = new App(dirname(__DIR__));
+		$a = new App;
 	}
 
 	if (is_null($db)) {

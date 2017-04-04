@@ -946,11 +946,11 @@ class Diaspora {
 			// Yes, then it is fine.
 			return true;
 		// Is it a post to a community?
-		} elseif (($contact["rel"] == CONTACT_IS_FOLLOWER) && ($importer["page-flags"] == PAGE_COMMUNITY)) {
+		} elseif (($contact["rel"] == CONTACT_IS_FOLLOWER) && ($importer["page-flags"] == PAGE_COMMUNITY) || $is_comment) {
 			// That's good
 			return true;
 		// Is the message a global user or a comment?
-		} elseif (($importer["uid"] == 0) || $is_comment) {
+		} elseif ($importer["uid"] == 0) {
 			// Messages for the global users and comments are always accepted
 			return true;
 		}
@@ -1472,7 +1472,6 @@ class Diaspora {
 
 		// If we are the origin of the parent we store the original data and notify our followers
 		if ($message_id && $parent_item["origin"]) {
-
 			// Formerly we stored the signed text, the signature and the author in different fields.
 			// We now store the raw data so that we are more flexible.
 			q("INSERT INTO `sign` (`iid`,`signed_text`) VALUES (%d,'%s')",
@@ -1780,9 +1779,11 @@ class Diaspora {
 
 		// If we are the origin of the parent we store the original data and notify our followers
 		if ($message_id && $parent_item["origin"]) {
-
-			// Formerly we stored the signed text, the signature and the author in different fields.
-			// We now store the raw data so that we are more flexible.
+			/*
+			 * Formerly we stored the signed text, the signature and the author
+			 * in different fields.
+			 * We now store the raw data so that we are more flexible.
+			 */
 			q("INSERT INTO `sign` (`iid`,`signed_text`) VALUES (%d,'%s')",
 				intval($message_id),
 				dbesc(json_encode($data))
