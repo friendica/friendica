@@ -72,6 +72,7 @@ function slapper($owner, $url, $slap) {
 		return;
 	}
 
+
 	if (! $owner['sprvkey']) {
 		logger(sprintf("user '%s' (%d) does not have a salmon private key. Send failed.",
 		$owner['username'], $owner['uid']));
@@ -149,14 +150,6 @@ function slapper($owner, $url, $slap) {
 	if ($return_code > 299) {
 		logger('compliant salmon failed. Falling back to old status.net');
 
-		// Last try. This will most likely fail as well.
-		$xmldata = array("me:env" => array("me:data" => $data,
-				"@attributes" => array("type" => $data_type),
-				"me:encoding" => $encoding,
-				"me:alg" => $algorithm,
-				"me:sig" => $signature3,
-				"@attributes2" => array("key_id" => $keyhash)));
-
 		$namespaces = array("me" => "http://salmon-protocol.org/ns/magic-env");
 
 		$salmon = xml::from_array($xmldata, $xml, false, $namespaces);
@@ -169,7 +162,7 @@ function slapper($owner, $url, $slap) {
 		$return_code = $a->get_curl_code();
 	}
 
-	logger('slapper for '.$url.' returned ' . $return_code);
+	logger('slapper for ' . $url . ' returned ' . $return_code);
 
 	if (! $return_code) {
 		return -1;

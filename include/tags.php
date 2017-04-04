@@ -116,10 +116,10 @@ function create_tags_from_itemuri($itemuri, $uid) {
 
 function update_items() {
 
-	$messages = dba::p("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''");
+	$messages = $db->q("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''", true);
 
-	logger("fetched messages: ".dba::num_rows($messages));
-	while ($message = dba::fetch($messages)) {
+	logger("fetched messages: " . count($messages));
+	while ($message = $db->qfetch()) {
 
 		if ($message["uid"] == 0) {
 			$global = true;
@@ -138,7 +138,7 @@ function update_items() {
 			intval($global), intval(TERM_OBJ_POST), intval($message["oid"]));
 	}
 
-	dba::close($messages);
+	$db->qclose();
 
 	$messages = dba::p("SELECT `guid` FROM `item` WHERE `uid` = 0");
 

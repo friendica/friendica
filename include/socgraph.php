@@ -1239,6 +1239,10 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			} else {
 				$register_policy = REGISTER_CLOSED;
 			}
+
+			if (isset($data->version)) {
+				$last_contact = datetime_convert();
+			}
 		}
 	}
 
@@ -1919,11 +1923,11 @@ function poco_discover_server($data, $default_generation = 0) {
 			$gender = $entry->gender;
 		}
 
-		if(isset($entry->generation) && ($entry->generation > 0)) {
+		if (isset($entry->generation) && ($entry->generation > 0)) {
 			$generation = ++$entry->generation;
 		}
 
-		if(isset($entry->contactType) && ($entry->contactType >= 0)) {
+		if (isset($entry->contactType) && ($entry->contactType >= 0)) {
 			$contact_type = $entry->contactType;
 		}
 
@@ -1988,7 +1992,7 @@ function clean_contact_url($url) {
 	}
 
 	if ($new_url != $url) {
-		logger("Cleaned contact url ".$url." to ".$new_url." - Called by: ".App::callstack(), LOGGER_DEBUG);
+		logger("Cleaned contact url " . $url . " to " . $new_url . " - Called by: " . App::callstack(), LOGGER_DEBUG);
 	}
 
 	return $new_url;
@@ -2028,6 +2032,7 @@ function get_gcontact_id($contact) {
 		return false;
 	}
 
+	/// @TODO backward-compatibility or old-lost code?
 	if ($contact["network"] == NETWORK_STATUSNET) {
 		$contact["network"] = NETWORK_OSTATUS;
 	}
@@ -2156,6 +2161,7 @@ function update_gcontact($contact) {
 
 	$fields["hide"] = $r[0]["hide"];
 
+	/// @TODO backward-compatibility or old-lost code?
 	if ($contact["network"] == NETWORK_STATUSNET) {
 		$contact["network"] = NETWORK_OSTATUS;
 	}
@@ -2164,7 +2170,7 @@ function update_gcontact($contact) {
 	fix_alternate_contact_address($contact);
 
 	if (!isset($contact["updated"])) {
-		$contact["updated"] = dbm::date();
+		$contact["updated"] = datetime_convert();
 	}
 
 	if ($contact["server_url"] == "") {

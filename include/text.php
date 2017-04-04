@@ -654,7 +654,7 @@ function get_template_file($a, $filename, $root = '') {
 	$theme = current_theme();
 
 	// Make sure $root ends with a slash /
-	if ($root !== '' && substr($root, -1, 1) !== '/') {
+	if ($root !== '' && $root[strlen($root)-1] !== '/') {
 		$root = $root . '/';
 	}
 
@@ -670,7 +670,6 @@ function get_template_file($a, $filename, $root = '') {
 
 	return $template_file;
 }}
-
 
 if (! function_exists('attribute_contains')) {
 /**
@@ -689,7 +688,7 @@ if (! function_exists('attribute_contains')) {
  */
 function attribute_contains($attr, $s) {
 	$a = explode(' ', $attr);
-	return (count($a) && in_array($s,$a));
+	return (count($a) && in_array($s, $a));
 }}
 
 if (! function_exists('logger')) {
@@ -1074,8 +1073,6 @@ function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 
 	));
 }
-
-
 
 if (! function_exists('search')) {
 /**
@@ -1659,9 +1656,11 @@ function generate_user_guid() {
 	$found = true;
 	do {
 		$guid = get_guid(32);
+
 		$x = q("SELECT `uid` FROM `user` WHERE `guid` = '%s' LIMIT 1",
 			dbesc($guid)
 		);
+
 		if (! dbm::is_result($x)) {
 			$found = false;
 		}
@@ -1904,7 +1903,7 @@ function item_post_type($item) {
 // To do this we need to escape these characters if they appear in our tag.
 
 function file_tag_encode($s) {
-	return str_replace(array('<','>','[',']'),array('%3c','%3e','%5b','%5d'),$s);
+	return str_replace(array('<', '>', '[', ']'), array('%3c', '%3e', '%5b', '%5d'), $s);
 }
 
 function file_tag_decode($s) {
@@ -1968,11 +1967,13 @@ function file_tag_update_pconfig($uid, $file_old, $file_new, $type = 'file') {
 	// $file_old - categories previously associated with an item
 	// $file_new - new list of categories for an item
 
-	if (! intval($uid))
+	if (! intval($uid)) {
 		return false;
+	}
 
-	if ($file_old == $file_new)
+	if ($file_old == $file_new) {
 		return true;
+	}
 
 	$saved = get_pconfig($uid,'system','filetags');
 	if (strlen($saved)) {
@@ -1980,8 +1981,7 @@ function file_tag_update_pconfig($uid, $file_old, $file_new, $type = 'file') {
 			$lbracket = '[';
 			$rbracket = ']';
 			$termtype = TERM_FILE;
-		}
-		else {
+		} else {
 			$lbracket = '<';
 			$rbracket = '>';
 			$termtype = TERM_CATEGORY;
@@ -2028,12 +2028,12 @@ function file_tag_update_pconfig($uid, $file_old, $file_new, $type = 'file') {
 			set_pconfig($uid, 'system', 'filetags', $filetags_updated);
 		}
 		return true;
-	}
-	else
+	} else {
 		if (strlen($file_new)) {
 			set_pconfig($uid, 'system', 'filetags', $file_new);
 		}
 		return true;
+	}
 }
 
 function file_tag_save_file($uid, $item, $file) {
@@ -2047,7 +2047,7 @@ function file_tag_save_file($uid, $item, $file) {
 		intval($uid)
 	);
 	if (dbm::is_result($r)) {
-		if (! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']')) {
+		if (! stristr($r[0]['file'], '[' . file_tag_encode($file) . ']')) {
 			q("UPDATE `item` SET `file` = '%s' WHERE `id` = %d AND `uid` = %d",
 				dbesc($r[0]['file'] . '[' . file_tag_encode($file) . ']'),
 				intval($item),
@@ -2139,8 +2139,9 @@ function is_a_date_arg($s) {
 		$y = date('Y');
 		if ($i <= $y + 1 && strpos($s, '-') == 4) {
 			$m = intval(substr($s,5));
-			if ($m > 0 && $m <= 12)
+			if ($m > 0 && $m <= 12) {
 				return true;
+			}
 		}
 	}
 	return false;
@@ -2211,6 +2212,10 @@ function format_network_name($network, $url = 0) {
 function text_highlight($s, $lang) {
 	if ($lang === 'js') {
 		$lang = 'javascript';
+	}
+
+	if (! strpos('Text_Highlighter', get_include_path())) {
+		set_include_path(get_include_path() . PATH_SEPARATOR . 'library/Text_Highlighter');
 	}
 
 	// @TODO: Replace Text_Highlighter_Renderer_Html by scrivo/highlight.php
