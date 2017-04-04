@@ -200,7 +200,7 @@ function profile_sidebar($profile, $block = 0) {
 	$o = '';
 	$location = false;
 	$address = false;
-//		$pdesc = true;
+	// $pdesc = true;
 
 	// This function can also use contact information in $profile
 	$is_contact = x($profile, 'cid');
@@ -212,7 +212,7 @@ function profile_sidebar($profile, $block = 0) {
 	$profile['picdate'] = urlencode($profile['picdate']);
 
 	if (($profile['network'] != "") && ($profile['network'] != NETWORK_DFRN)) {
-		$profile['network_name'] = format_network_name($profile['network'],$profile['url']);
+		$profile['network_name'] = format_network_name($profile['network'], $profile['url']);
 	} else {
 		$profile['network_name'] = "";
 	}
@@ -333,8 +333,9 @@ function profile_sidebar($profile, $block = 0) {
 			|| (x($profile, 'locality') == 1)
 			|| (x($profile, 'region') == 1)
 			|| (x($profile, 'postal-code') == 1)
-			|| (x($profile, 'country-name') == 1))
+			|| (x($profile, 'country-name') == 1)) {
 		$location = t('Location:');
+	}
 
 	$gender = ((x($profile, 'gender') == 1) ? t('Gender:') : false);
 
@@ -569,7 +570,7 @@ function get_events() {
 			}
 
 			$strt = datetime_convert('UTC',$rr['convert'] ? $a->timezone : 'UTC',$rr['start'],'Y-m-d');
-			if ($strt === datetime_convert('UTC',$a->timezone,'now','Y-m-d')) {
+			if ($strt === datetime_convert('UTC', $a->timezone, 'now', 'Y-m-d')) {
 				$istoday = true;
 			}
 		}
@@ -578,13 +579,13 @@ function get_events() {
 		$skip = 0;
 
 		foreach ($r as &$rr) {
-			$title = strip_tags(html_entity_decode(bbcode($rr['summary']),ENT_QUOTES,'UTF-8'));
+			$title = strip_tags(html_entity_decode(bbcode($rr['summary']), ENT_QUOTES, 'UTF-8'));
 
 			if (strlen($title) > 35) {
 				$title = substr($title, 0, 32) . '... ';
 			}
 
-			$description = substr(strip_tags(bbcode($rr['desc'])),0,32) . '... ';
+			$description = substr(strip_tags(bbcode($rr['desc'])), 0, 32) . '... ';
 			if (! $description) {
 				$description = t('[No description]');
 			}
