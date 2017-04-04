@@ -72,13 +72,13 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	$a = get_app();
 
 	$ch = @curl_init($url);
-	if(($redirects > 8) || (! $ch)) {
+	if (($redirects > 8) || (! $ch)) {
 		return $ret;
 	}
 
 	@curl_setopt($ch, CURLOPT_HEADER, true);
 
-	if(x($opts,"cookiejar")) {
+	if (x($opts,"cookiejar")) {
 		curl_setopt($ch, CURLOPT_COOKIEJAR, $opts["cookiejar"]);
 		curl_setopt($ch, CURLOPT_COOKIEFILE, $opts["cookiejar"]);
 	}
@@ -101,13 +101,13 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 		@curl_setopt($ch, CURLOPT_RANGE, '0-'.$range);
 	}
 
-	if(x($opts,'headers')){
+	if (x($opts,'headers')){
 		@curl_setopt($ch, CURLOPT_HTTPHEADER, $opts['headers']);
 	}
-	if(x($opts,'nobody')){
+	if (x($opts,'nobody')){
 		@curl_setopt($ch, CURLOPT_NOBODY, $opts['nobody']);
 	}
-	if(x($opts,'timeout')){
+	if (x($opts,'timeout')){
 		@curl_setopt($ch, CURLOPT_TIMEOUT, $opts['timeout']);
 	} else {
 		$curl_time = intval(get_config('system','curl_timeout'));
@@ -124,14 +124,14 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	}
 
 	$prx = get_config('system','proxy');
-	if(strlen($prx)) {
+	if (strlen($prx)) {
 		@curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
 		@curl_setopt($ch, CURLOPT_PROXY, $prx);
 		$prxusr = @get_config('system','proxyuser');
-		if(strlen($prxusr))
+		if (strlen($prxusr))
 			@curl_setopt($ch, CURLOPT_PROXYUSERPWD, $prxusr);
 	}
-	if($binary)
+	if ($binary)
 		@curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
 
 	$a->set_curl_code(0);
@@ -156,7 +156,7 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	// Pull out multiple headers, e.g. proxy and continuation headers
 	// allow for HTTP/2.x without fixing code
 
-	while(preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/',$base)) {
+	while (preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/',$base)) {
 		$chunk = substr($base,0,strpos($base,"\r\n\r\n")+4);
 		$header .= $chunk;
 		$base = substr($base,strlen($chunk));
@@ -166,7 +166,7 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	$a->set_curl_content_type($curl_info['content_type']);
 	$a->set_curl_headers($header);
 
-	if($http_code == 301 || $http_code == 302 || $http_code == 303 || $http_code == 307) {
+	if ($http_code == 301 || $http_code == 302 || $http_code == 303 || $http_code == 307) {
 		$new_location_info = @parse_url($curl_info["redirect_url"]);
 		$old_location_info = @parse_url($curl_info["url"]);
 
@@ -179,7 +179,7 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 		if (preg_match('/(Location:|URI:)(.*?)\n/i', $header, $matches)) {
 			$newurl = trim(array_pop($matches));
 		}
-		if(strpos($newurl,'/') === 0)
+		if (strpos($newurl,'/') === 0)
 			$newurl = $old_location_info["scheme"]."://".$old_location_info["host"].$newurl;
 		if (filter_var($newurl, FILTER_VALIDATE_URL)) {
 			$redirects++;
@@ -200,7 +200,7 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	$ret['return_code'] = $rc;
 	$ret['success'] = (($rc >= 200 && $rc <= 299) ? true : false);
 	$ret['redirect_url'] = $url;
-	if(! $ret['success']) {
+	if (! $ret['success']) {
 		$ret['error'] = curl_error($ch);
 		$ret['debug'] = $curl_info;
 		logger('z_fetch_url: error: ' . $url . ': ' . $ret['error'], LOGGER_DEBUG);
@@ -208,7 +208,7 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	}
 	$ret['body'] = substr($s,strlen($header));
 	$ret['header'] = $header;
-	if(x($opts,'debug')) {
+	if (x($opts,'debug')) {
 		$ret['debug'] = $curl_info;
 	}
 	@curl_close($ch);
@@ -237,7 +237,7 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 
 	$a = get_app();
 	$ch = curl_init($url);
-	if(($redirects > 8) || (! $ch))
+	if (($redirects > 8) || (! $ch))
 		return false;
 
 	logger("post_url: start ".$url, LOGGER_DATA);
@@ -248,7 +248,7 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 	curl_setopt($ch, CURLOPT_POSTFIELDS,$params);
 	curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
 
-	if(intval($timeout)) {
+	if (intval($timeout)) {
 		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 	}
 	else {
@@ -256,16 +256,16 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 		curl_setopt($ch, CURLOPT_TIMEOUT, (($curl_time !== false) ? $curl_time : 60));
 	}
 
-	if(defined('LIGHTTPD')) {
-		if(!is_array($headers)) {
+	if (defined('LIGHTTPD')) {
+		if (!is_array($headers)) {
 			$headers = array('Expect:');
 		} else {
-			if(!in_array('Expect:', $headers)) {
+			if (!in_array('Expect:', $headers)) {
 				array_push($headers, 'Expect:');
 			}
 		}
 	}
-	if($headers)
+	if ($headers)
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 	$check_cert = get_config('system','verifyssl');
@@ -274,11 +274,11 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 		@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 	}
 	$prx = get_config('system','proxy');
-	if(strlen($prx)) {
+	if (strlen($prx)) {
 		curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
 		curl_setopt($ch, CURLOPT_PROXY, $prx);
 		$prxusr = get_config('system','proxyuser');
-		if(strlen($prxusr))
+		if (strlen($prxusr))
 			curl_setopt($ch, CURLOPT_PROXYUSERPWD, $prxusr);
 	}
 
@@ -300,17 +300,17 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 	// Pull out multiple headers, e.g. proxy and continuation headers
 	// allow for HTTP/2.x without fixing code
 
-	while(preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/',$base)) {
+	while (preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/',$base)) {
 		$chunk = substr($base,0,strpos($base,"\r\n\r\n")+4);
 		$header .= $chunk;
 		$base = substr($base,strlen($chunk));
 	}
 
-	if($http_code == 301 || $http_code == 302 || $http_code == 303 || $http_code == 307) {
+	if ($http_code == 301 || $http_code == 302 || $http_code == 303 || $http_code == 307) {
 		$matches = array();
 		preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
 		$newurl = trim(array_pop($matches));
-		if(strpos($newurl,'/') === 0)
+		if (strpos($newurl,'/') === 0)
 			$newurl = $old_location_info["scheme"] . "://" . $old_location_info["host"] . $newurl;
 		if (filter_var($newurl, FILTER_VALIDATE_URL)) {
 			$redirects++;
@@ -341,7 +341,7 @@ function xml_status($st, $message = '') {
 
 	$xml_message = ((strlen($message)) ? "\t<message>" . xmlify($message) . "</message>\r\n" : '');
 
-	if($st)
+	if ($st)
 		logger('xml_status returning non_zero: ' . $st . " message=" . $message);
 
 	header( "Content-type: text/xml" );
@@ -369,12 +369,12 @@ function xml_status($st, $message = '') {
  */
 function http_status_exit($val, $description = array()) {
 	$err = '';
-	if($val >= 400) {
+	if ($val >= 400) {
 		$err = 'Error';
 		if (!isset($description["title"]))
 			$description["title"] = $err." ".$val;
 	}
-	if($val >= 200 && $val < 300)
+	if ($val >= 200 && $val < 300)
 		$err = 'OK';
 
 	logger('http_status_exit ' . $val);
@@ -400,20 +400,20 @@ function http_status_exit($val, $description = array()) {
  * @return boolean True if it's a valid URL, fals if something wrong with it
  */
 function validate_url(&$url) {
-	if(get_config('system','disable_url_validation'))
+	if (get_config('system','disable_url_validation'))
 		return true;
 
 	// no naked subdomains (allow localhost for tests)
-	if(strpos($url,'.') === false && strpos($url,'/localhost/') === false)
+	if (strpos($url,'.') === false && strpos($url,'/localhost/') === false)
 		return false;
 
-	if(substr($url,0,4) != 'http')
+	if (substr($url,0,4) != 'http')
 		$url = 'http://' . $url;
 
 	/// @TODO Really supress function outcomes? Why not find them + debug them?
 	$h = @parse_url($url);
 
-	if((is_array($h)) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
+	if ((is_array($h)) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
 		return true;
 	}
 
@@ -428,14 +428,14 @@ function validate_url(&$url) {
  */
 function validate_email($addr) {
 
-	if(get_config('system','disable_email_validation'))
+	if (get_config('system','disable_email_validation'))
 		return true;
 
-	if(! strpos($addr,'@'))
+	if (! strpos($addr,'@'))
 		return false;
 	$h = substr($addr,strpos($addr,'@') + 1);
 
-	if(($h) && (dns_get_record($h, DNS_A + DNS_CNAME + DNS_PTR + DNS_MX) || filter_var($h, FILTER_VALIDATE_IP) )) {
+	if (($h) && (dns_get_record($h, DNS_A + DNS_CNAME + DNS_PTR + DNS_MX) || filter_var($h, FILTER_VALIDATE_IP) )) {
 		return true;
 	}
 	return false;
@@ -454,12 +454,12 @@ function allowed_url($url) {
 
 	$h = @parse_url($url);
 
-	if(! $h) {
+	if (! $h) {
 		return false;
 	}
 
 	$str_allowed = get_config('system','allowed_sites');
-	if(! $str_allowed)
+	if (! $str_allowed)
 		return true;
 
 	$found = false;
@@ -468,16 +468,16 @@ function allowed_url($url) {
 
 	// always allow our own site
 
-	if($host == strtolower($_SERVER['SERVER_NAME']))
+	if ($host == strtolower($_SERVER['SERVER_NAME']))
 		return true;
 
 	$fnmatch = function_exists('fnmatch');
 	$allowed = explode(',',$str_allowed);
 
-	if(count($allowed)) {
-		foreach($allowed as $a) {
+	if (count($allowed)) {
+		foreach ($allowed as $a) {
 			$pat = strtolower(trim($a));
-			if(($fnmatch && fnmatch($pat,$host)) || ($pat == $host)) {
+			if (($fnmatch && fnmatch($pat,$host)) || ($pat == $host)) {
 				$found = true;
 				break;
 			}
@@ -497,24 +497,25 @@ function allowed_url($url) {
  */
 function allowed_email($email) {
 
-
 	$domain = strtolower(substr($email,strpos($email,'@') + 1));
-	if(! $domain)
+	if (! $domain) {
 		return false;
+	}
 
 	$str_allowed = get_config('system','allowed_email');
-	if(! $str_allowed)
+	if (! $str_allowed) {
 		return true;
+	}
 
 	$found = false;
 
 	$fnmatch = function_exists('fnmatch');
 	$allowed = explode(',',$str_allowed);
 
-	if(count($allowed)) {
-		foreach($allowed as $a) {
+	if (count($allowed)) {
+		foreach ($allowed as $a) {
 			$pat = strtolower(trim($a));
-			if(($fnmatch && fnmatch($pat,$domain)) || ($pat == $domain)) {
+			if (($fnmatch && fnmatch($pat,$domain)) || ($pat == $domain)) {
 				$found = true;
 				break;
 			}
@@ -543,8 +544,8 @@ function avatar_img($email) {
 
 function parse_xml_string($s,$strict = true) {
 	/// @todo Move this function to the xml class
-	if($strict) {
-		if(! strstr($s,'<?xml'))
+	if ($strict) {
+		if (! strstr($s,'<?xml'))
 			return false;
 		$s2 = substr($s,strpos($s,'<?xml'));
 	}

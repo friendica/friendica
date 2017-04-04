@@ -155,7 +155,7 @@ class FKOAuth1 extends OAuthServer {
 		//notice( t("Welcome back ") . $record['username'] . EOL);
 		$a->user = $record;
 
-		if(strlen($a->user['timezone'])) {
+		if (strlen($a->user['timezone'])) {
 			date_default_timezone_set($a->user['timezone']);
 			$a->timezone = $a->user['timezone'];
 		}

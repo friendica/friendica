@@ -154,7 +154,7 @@ function removelinebreak($message)
 	$lines = array();
 	$lineno = 0;
 
-	foreach($arrbody as $i => $line) {
+	foreach ($arrbody as $i => $line) {
 		$currquotelevel = 0;
 		$currline = $line;
 		while ((strlen($currline)>0) and ((substr($currline, 0, 1) == '>')

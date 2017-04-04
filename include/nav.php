@@ -8,7 +8,7 @@ function nav(App $a) {
 	 *
 	 */
 
-	if(!(x($a->page,'nav')))
+	if (!(x($a->page,'nav')))
 		$a->page['nav'] = '';
 
 	$a->page['htmlhead'] .= replace_macros(get_markup_template('nav_head.tpl'), array());
@@ -136,7 +136,7 @@ function nav_info(App $a)
 
 	if (strlen(get_config('system', 'singleuser'))) {
 		$gdir = get_config('system', 'directory');
-		if(strlen($gdir)) {
+		if (strlen($gdir)) {
 			$gdirpath = zrl($gdir, true);
 		}
 	} elseif (get_config('system', 'community_page_style') == CP_USERS_ON_SERVER) {

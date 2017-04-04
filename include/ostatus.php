@@ -83,33 +83,40 @@ class ostatus {
 		$aliaslink = $author["author-link"];
 
 		$alternate = $xpath->query("atom:author/atom:link[@rel='alternate']", $context)->item(0)->attributes;
-		if (is_object($alternate))
-			foreach($alternate AS $attributes)
-				if ($attributes->name == "href")
+		if (is_object($alternate)) {
+			foreach($alternate AS $attributes) {
+				if ($attributes->name == "href") {
 					$author["author-link"] = $attributes->textContent;
+				}
+			}
+		}
 
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` IN ('%s', '%s') AND `network` != '%s'",
 			intval($importer["uid"]), dbesc(normalise_link($author["author-link"])),
 			dbesc(normalise_link($aliaslink)), dbesc(NETWORK_STATUSNET));
-		if ($r) {
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
 			$author["contact-id"] = $r[0]["id"];
-		} else
+		} else {
 			$author["contact-id"] = $contact["id"];
+		}
 
 		$avatarlist = array();
 		$avatars = $xpath->query("atom:author/atom:link[@rel='avatar']", $context);
-		foreach($avatars AS $avatar) {
+		foreach ($avatars AS $avatar) {
 			$href = "";
 			$width = 0;
-			foreach($avatar->attributes AS $attributes) {
-				if ($attributes->name == "href")
+			foreach ($avatar->attributes AS $attributes) {
+				if ($attributes->name == "href") {
 					$href = $attributes->textContent;
-				if ($attributes->name == "width")
+				}
+				if ($attributes->name == "width") {
 					$width = $attributes->textContent;
+				}
 			}
-			if (($width > 0) AND ($href != ""))
+			if (($width > 0) AND ($href != "")) {
 				$avatarlist[$width] = $href;
+			}
 		}
 		if (count($avatarlist) > 0) {
 			krsort($avatarlist);
@@ -117,8 +124,9 @@ class ostatus {
 		}
 
 		$displayname = $xpath->evaluate('atom:author/poco:displayName/text()', $context)->item(0)->nodeValue;
-		if ($displayname != "")
+		if ($displayname != "") {
 			$author["author-name"] = $displayname;
+		}
 
 		$author["owner-name"] = $author["author-name"];
 		$author["owner-link"] = $author["author-link"];
@@ -436,7 +444,7 @@ class ostatus {
 					foreach ($category->attributes AS $attributes) {
 						if ($attributes->name == "term") {
 							$term = $attributes->textContent;
-							if(strlen($item["tag"])) {
+							if (strlen($item["tag"])) {
 								$item["tag"] .= ',';
 							}
 							$item["tag"] .= "#[url=".App::get_baseurl()."/search?tag=".$term."]".$term."[/url]";
@@ -1130,6 +1138,7 @@ class ostatus {
 				continue;
 			}
 
+			/// @TODO One statment is okay (until if () )
 			$arr = array();
 			$arr["network"] = $details["network"];
 			$arr["uri"] = $single_conv->id;
@@ -2166,7 +2175,7 @@ class ostatus {
 
 		$owner = $r[0];
 
-		if(!strlen($last_update))
+		if (!strlen($last_update))
 			$last_update = 'now -30 days';
 
 		$check_date = datetime_convert('UTC','UTC',$last_update,'Y-m-d H:i:s');

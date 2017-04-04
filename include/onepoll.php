@@ -170,7 +170,7 @@ function onepoll_run(&$argv, &$argc){
 		// But this may be our first communication, so set the writable flag if it isn't set already.
 
 		if (! intval($contact['writable'])) {
-			q("update contact set writable = 1 where id = %d", intval($contact['id']));
+			q("UPDATE `contact` SET `writable` = 1 WHERE `id` = %d", intval($contact['id']));
 		}
 
 		$url = $contact['poll'] . '?dfrn_id=' . $idtosend
@@ -437,16 +437,18 @@ function onepoll_run(&$argv, &$argc){
 						if ($raw_refs) {
 							$refs_arr = explode(' ', $raw_refs);
 							if (count($refs_arr)) {
-								for($x = 0; $x < count($refs_arr); $x ++)
+								for ($x = 0; $x < count($refs_arr); $x ++) {
 									$refs_arr[$x] = "'" . msgid2iri(str_replace(array('<','>',' '),array('','',''),dbesc($refs_arr[$x]))) . "'";
+								}
 							}
 							$qstr = implode(',',$refs_arr);
 							$r = q("SELECT `uri` , `parent-uri` FROM `item` USE INDEX (`uid_uri`) WHERE `uri` IN ($qstr) AND `uid` = %d LIMIT 1",
 								intval($importer_uid)
 							);
-							if (dbm::is_result($r))
+							if (dbm::is_result($r)) {
 								$datarray['parent-uri'] = $r[0]['parent-uri'];  // Set the parent as the top-level item
-	//							$datarray['parent-uri'] = $r[0]['uri'];
+								//$datarray['parent-uri'] = $r[0]['uri'];
+							}
 						}
 
 						// Decoding the header
@@ -611,14 +613,17 @@ function onepoll_run(&$argv, &$argc){
 		consume_feed($xml,$importer,$contact,$hub,1,2);
 
 		$hubmode = 'subscribe';
-		if ($contact['network'] === NETWORK_DFRN || $contact['blocked'] || $contact['readonly'])
+		if ($contact['network'] === NETWORK_DFRN || $contact['blocked'] || $contact['readonly']) {
 			$hubmode = 'unsubscribe';
+		}
 
-		if (($contact['network'] === NETWORK_OSTATUS ||  $contact['network'] == NETWORK_FEED) && (! $contact['hub-verify']))
+		if (($contact['network'] === NETWORK_OSTATUS ||  $contact['network'] == NETWORK_FEED) && (! $contact['hub-verify'])) {
 			$hub_update = true;
+		}
 
-		if ($force)
+		if ($force) {
 			$hub_update = true;
+		}
 
 		logger("Contact ".$contact['id']." returned hub: ".$hub." Network: ".$contact['network']." Relation: ".$contact['rel']." Update: ".$hub_update);
 
