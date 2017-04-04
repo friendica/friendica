@@ -14,18 +14,19 @@ $objDDDBLResultHandler = new DataObjectPool('Result-Handler');
   *
   **/
 $cloPDOStatementResultHandler = function(Queue $objQueue) {
+	$objPDO = $objQueue->getState()->get('PDOStatement');
+	$objQueue->getState()->update(array('result' => $objPDO));
 
-  $objPDO = $objQueue->getState()->get('PDOStatement');
-  $objQueue->getState()->update(array('result' => $objPDO));
-
-  # delete handler which closes the PDOStatement-cursor
-  # this will be done manual if using this handler
-  $objQueue->deleteHandler(QUEUE_CLOSE_CURSOR_POSITION);
-
+	/*
+	 * delete handler which closes the PDOStatement-cursor
+	 * this will be done manual if using this handler
+	 */
+	$objQueue->deleteHandler(QUEUE_CLOSE_CURSOR_POSITION);
 };
 
 $objDDDBLResultHandler->add('PDOStatement', array('HANDLER' => $cloPDOStatementResultHandler));
 
+if (! class_exists('dba')) {
 /**
  *
  * MySQL database class
@@ -36,8 +37,6 @@ $objDDDBLResultHandler->add('PDOStatement', array('HANDLER' => $cloPDOStatementR
  * the debugging stream is safe to view within both terminals and web pages.
  *
  */
-
-if (! class_exists('dba')) {
 class dba {
 
 	private $debug = 0;
@@ -147,15 +146,13 @@ class dba {
 		$a->save_timestamp($stamp1, "database");
 
 		/// @TODO really check $a->config for 'system'? it is very generic and should be there
-		if (x($a->config, 'system') && x($a->config['system'], 'db_log')) {
-			if (($duration > $a->config["system"]["db_loglimit"])) {
-				$duration = round($duration, 3);
-				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-				@file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
-						basename($backtrace[1]["file"])."\t".
-						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
-						substr($sql, 0, 2000)."\n", FILE_APPEND);
-			}
+		if (x($a->config, 'system') && x($a->config['system'], 'db_log') && ($duration > $a->config["system"]["db_loglimit"])) {
+			$duration = round($duration, 3);
+			$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+			@file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
+					basename($backtrace[1]["file"])."\t".
+					$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
+					substr($sql, 0, 2000)."\n", FILE_APPEND);
 		}
 
 		if ($intErrorCode) {
@@ -202,8 +199,11 @@ class dba {
 		}
 
 		if ($onlyquery) {
-			$this->result = $r;       # this will store an PDOStatement Object in result
-			$this->result->execute(); # execute the Statement, to get its result
+			// this will store an PDOStatement Object in result
+			$this->result = $r;
+
+			// execute the Statement, to get its result
+			$this->result->execute();
 			return true;
 		}
 
@@ -262,7 +262,8 @@ function printable($s) {
 	return $s;
 }}
 
-// Procedural functions
+// --- Procedural functions ---
+
 if (! function_exists('dbg')) {
 function dbg($state) {
 	global $db;
@@ -273,18 +274,20 @@ function dbg($state) {
 if (! function_exists('dbesc')) {
 function dbesc($str) {
 	global $db;
-	if ($db && $db->connected)
-		return($db->escape($str));
-	else
-		return(str_replace("'","\\'",$str));
+
+	if ($db && $db->connected) {
+		return $db->escape($str);
+	} else {
+		return str_replace("'","\\'",$str);
+	}
 }}
 
 if (! function_exists('q')) {
-/**
+/*
  * Function: q($sql,$args);
  * Description: execute SQL query with printf style args.
  * Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
- *   'user', 1);
+ *                   'user', 1);
  */
 function q($sql) {
 
@@ -301,23 +304,19 @@ function q($sql) {
 		return $db->q($stmt);
 	}
 
-	/**
-	 *
+	/*
 	 * This will happen occasionally trying to store the
 	 * session data after abnormal program termination
-	 *
 	 */
 	logger('dba: no database: ' . print_r($args,true));
 	return false;
-
 }}
 
 if (! function_exists('dbq')) {
-/**
+/*
  * Raw db query, no arguments
  */
 function dbq($sql) {
-
 	global $db;
 	if ($db && $db->connected) {
 		$ret = $db->q($sql);
@@ -327,15 +326,14 @@ function dbq($sql) {
 	return $ret;
 }}
 
-
-/*
- * Caller is responsible for ensuring that any integer arguments to
- * dbesc_array are actually integers and not malformed strings containing
- * SQL injection vectors. All integer array elements should be specifically
- * cast to int to avoid trouble.
- */
 if (! function_exists('dbesc_array_cb')) {
 function dbesc_array_cb(&$item, $key) {
+	/*
+	 * Caller is responsible for ensuring that any integer arguments to
+	 * dbesc_array are actually integers and not malformed strings containing
+	 * SQL injection vectors. All integer array elements should be specifically
+	 * cast to int to avoid trouble.
+	 */
 	if (is_string($item)) {
 		$item = dbesc($item);
 	}

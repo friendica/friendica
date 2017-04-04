@@ -932,18 +932,20 @@ class Diaspora {
 			logger("defining user ".$contact["nick"]." as friend");
 		}
 
-		// We don't seem to like that person
+		// Is this contact wanted?
 		if ($contact["blocked"] || $contact["readonly"] || $contact["archive"]) {
+			// Maybe blocked, don't accept.
 			return false;
-		// We are following this person? Then it is okay
+		// Is this person being followed?
 		} elseif (($contact["rel"] == CONTACT_IS_SHARING) || ($contact["rel"] == CONTACT_IS_FRIEND)) {
+			// Yes, then it is fine.
 			return true;
-		// Is it a post to a community? That's good
+		// Is it a post to a community?
 		} elseif (($contact["rel"] == CONTACT_IS_FOLLOWER) && ($importer["page-flags"] == PAGE_COMMUNITY)) {
+			// That's good
 			return true;
-		}
-		// Messages for the global users and comments are always accepted
-		if (($importer["uid"] == 0) || $is_comment) {
+		} elseif (($importer["uid"] == 0) || $is_comment) {
+			// Messages for the global users and comments are always accepted
 			return true;
 		}
 

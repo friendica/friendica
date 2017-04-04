@@ -853,18 +853,22 @@ function widget_events() {
 		return;
 	}
 
-	// Cal logged in user (test permission at foreign profile page)
-	// If the $owner uid is available we know it is part of one of the profile pages (like /cal)
-	// So we have to test if if it's the own profile page of the logged in user
-	// or a foreign one. For foreign profile pages we need to check if the feature
-	// for exporting the cal is enabled (otherwise the widget would appear for logged in users
-	// on foreigen profile pages even if the widget is disabled)
+	/*
+	 * Cal logged in user (test permission at foreign profile page)
+	 * If the $owner uid is available we know it is part of one of the profile pages (like /cal)
+	 * So we have to test if if it's the own profile page of the logged in user
+	 * or a foreign one. For foreign profile pages we need to check if the feature
+	 * for exporting the cal is enabled (otherwise the widget would appear for logged in users
+	 * on foreigen profile pages even if the widget is disabled)
+	 */
 	if (intval($owner_uid) && local_user() !== $owner_uid && ! feature_enabled($owner_uid, "export_calendar")) {
 		return;
 	}
 
-	// If it's a kind of profile page (intval($owner_uid)) return if the user not logged in and
-	// export feature isn't enabled
+	/*
+	 * If it's a kind of profile page (intval($owner_uid)) return if the user not logged in and
+	 * export feature isn't enabled
+	 */
 	if (intval($owner_uid) && ! local_user() && ! feature_enabled($owner_uid, "export_calendar")) {
 		return;
 	}
