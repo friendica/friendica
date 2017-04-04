@@ -512,14 +512,16 @@ function service_class_fetch($uid,$property) {
 			$service_class = $r[0]['service_class'];
 		}
 	}
-	if (! x($service_class))
+	if (! x($service_class)) {
 		return false; // everything is allowed
+	}
 
 	$arr = get_config('service_class',$service_class);
-	if (! is_array($arr) || (! count($arr)))
+	if (! is_array($arr) || (! count($arr))) {
 		return false;
+	}
 
-	return((array_key_exists($property,$arr)) ? $arr[$property] : false);
+	return ((array_key_exists($property, $arr)) ? $arr[$property] : false);
 
 }
 
@@ -559,11 +561,11 @@ function upgrade_bool_message($bbcode = false) {
  */
 function theme_include($file, $root = '') {
 	// Make sure $root ends with a slash / if it's not blank
-	if ($root !== '' && $root[strlen($root)-1] !== '/') {
+	if ($root !== '' && $root[strlen($root) - 1] !== '/') {
 		$root = $root . '/';
 	}
 	$theme_info = $a->theme_info;
-	if (is_array($theme_info) && array_key_exists('extends',$theme_info)) {
+	if (is_array($theme_info) && array_key_exists('extends', $theme_info)) {
 		$parent = $theme_info['extends'];
 	} else {
 		$parent = 'NOPATH';
@@ -578,7 +580,7 @@ function theme_include($file, $root = '') {
 	);
 	foreach ($paths as $p) {
 		// strpos() is faster than strstr when checking if one string is in another (http://php.net/manual/en/function.strstr.php)
-		if (strpos($p,'NOPATH') !== false) {
+		if (strpos($p, 'NOPATH') !== false) {
 			continue;
 		} elseif (file_exists($p)) {
 			return $p;

@@ -44,7 +44,7 @@ function get_browser_language() {
 	// check if we have translations for the preferred languages and pick the 1st that has
 	for ($i = 0; $i < count($lang_list); $i++) {
 		$lang = $lang_list[$i];
-		if ($lang === 'en' || (file_exists("view/lang/$lang") && is_dir("view/lang/$lang"))) {
+		if (file_exists("view/lang/$lang") && is_dir("view/lang/$lang")) {
 			$preferred = $lang;
 			break;
 		}

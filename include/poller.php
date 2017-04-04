@@ -20,14 +20,16 @@ require_once("boot.php");
 function poller_run($argv, $argc){
 	global $a, $db, $poller_up_start, $poller_db_duration;
 
-	$poller_up_start = microtime(true);
+	if (is_null($a)) {
+		$a = new App;
+	}
 
-	$a = new App(dirname(__DIR__));
-
-	@include(".htconfig.php");
-	require_once("include/dba.php");
-	$db = new dba($db_host, $db_user, $db_pass, $db_data);
-	unset($db_host, $db_user, $db_pass, $db_data);
+	if (is_null($db)) {
+		@include ".htconfig.php";
+		require_once "include/dba.php";
+		$db = new dba($db_host, $db_user, $db_pass, $db_data);
+		unset($db_host, $db_user, $db_pass, $db_data);
+	};
 
 	Config::load();
 
@@ -68,10 +70,8 @@ function poller_run($argv, $argc){
 		return;
 	}
 
-	// Possibly there are too much database connections
-	if (poller_max_connections_reached()) {
-		logger('Pre check: maximum connections reached, quitting.', LOGGER_DEBUG);
-		return;
+	if (($argc <= 1) OR ($argv[1] != "no_cron")) {
+		poller_run_cron();
 	}
 
 	// Possibly there are too much database processes that block the system
@@ -481,8 +481,8 @@ function poller_kill_stale_workers() {
 		} else {
 			// Kill long running processes
 			// Check if the priority is in a valid range
-			if (!in_array($entry["priority"], array(PRIORITY_CRITICAL, PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW, PRIORITY_NEGLIGIBLE))) {
-				$entry["priority"] = PRIORITY_MEDIUM;
+			if (!in_array($pid["priority"], array(PRIORITY_CRITICAL, PRIORITY_HIGH, PRIORITY_MEDIUM, PRIORITY_LOW, PRIORITY_NEGLIGIBLE))) {
+				$pid["priority"] = PRIORITY_MEDIUM;
 			}
 
 			// Define the maximum durations
