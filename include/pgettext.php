@@ -12,7 +12,7 @@
 
 use Friendica\Core\Config;
 
-require_once("include/dba.php");
+require_once "include/dba.php";
 
 if (! function_exists('get_browser_language')) {
 /**
@@ -20,7 +20,7 @@ if (! function_exists('get_browser_language')) {
  */
 function get_browser_language() {
 
-	if (x($_SERVER,'HTTP_ACCEPT_LANGUAGE')) {
+	if (x($_SERVER, 'HTTP_ACCEPT_LANGUAGE')) {
 		// break up string into pieces (languages and q factors)
 		preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
 			$_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
@@ -29,11 +29,11 @@ function get_browser_language() {
 		if (count($lang_parse[1])) {
 			// go through the list of prefered languages and add a generic language
 			// for sub-linguas (e.g. de-ch will add de) if not already in array
-			for ($i=0; $i<count($lang_parse[1]); $i++) {
+			for ($i = 0; $i < count($lang_parse[1]); $i++) {
 				$lang_list[] = strtolower($lang_parse[1][$i]);
-				if ( strlen($lang_parse[1][$i])>3 ) {
+				if (strlen($lang_parse[1][$i])>3 ) {
 					$dashpos = strpos($lang_parse[1][$i], '-');
-					if (! in_array(substr($lang_parse[1][$i], 0, $dashpos), $lang_list ) ) {
+					if (!in_array(substr($lang_parse[1][$i], 0, $dashpos), $lang_list ) ) {
 						$lang_list[] = strtolower(substr($lang_parse[1][$i], 0, $dashpos));
 					}
 				}
@@ -42,7 +42,7 @@ function get_browser_language() {
 	}
 
 	// check if we have translations for the preferred languages and pick the 1st that has
-	for ($i=0; $i<count($lang_list); $i++) {
+	for ($i = 0; $i < count($lang_list); $i++) {
 		$lang = $lang_list[$i];
 		if ($lang === 'en' || (file_exists("view/lang/$lang") && is_dir("view/lang/$lang"))) {
 			$preferred = $lang;
