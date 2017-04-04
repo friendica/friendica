@@ -69,7 +69,7 @@ class Template implements ITemplateEngine {
 	 * {{ if <$var>==<val|$var> }}...[{{ else }} ...]{{ endif }}
 	 * {{ if <$var>!=<val|$var> }}...[{{ else }} ...]{{ endif }}
 	 */
-	private function _replcb_if($args) {
+	private function _replcb_if ($args) {
 		if (strpos($args[2], "==") > 0) {
 			list($a, $b) = array_map("trim", explode("==", $args[2]));
 			$a = $this->_get_var($a);
@@ -95,7 +95,7 @@ class Template implements ITemplateEngine {
 	 * {{ for <$var> as $name }}...{{ endfor }}
 	 * {{ for <$var> as $key=>$name }}...{{ endfor }}
 	 */
-	private function _replcb_for($args) {
+	private function _replcb_for ($args) {
 		$m = array_map('trim', explode(" as ", $args[2]));
 		$x = explode("=>", $m[1]);
 		if (count($x) == 1) {
@@ -109,14 +109,16 @@ class Template implements ITemplateEngine {
 		//$vals = $this->r[$m[0]];
 		$vals = $this->_get_var($m[0]);
 		$ret = "";
-		if (!is_array($vals))
+		if (!is_array($vals)) {
 			return $ret;
+		}
 		foreach ($vals as $k => $v) {
 			$this->_push_stack();
 			$r = $this->r;
 			$r[$varname] = $v;
-			if ($keyname != '')
+			if ($keyname != '') {
 				$r[$keyname] = (($k === 0) ? '0' : $k);
+			}
 			$ret .= $this->replace($args[3], $r);
 			$this->_pop_stack();
 		}

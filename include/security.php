@@ -54,58 +54,65 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 	$a->user = $user_record;
 
-	if($interactive) {
+	if ($interactive) {
 		if ($a->user['login_date'] <= NULL_DATE) {
 			$_SESSION['return_url'] = 'profile_photo/new';
 			$a->module = 'profile_photo';
 			info( t("Welcome ") . $a->user['username'] . EOL);
 			info( t('Please upload a profile photo.') . EOL);
-		}
-		else
+		} else {
 			info( t("Welcome back ") . $a->user['username'] . EOL);
+		}
 	}
 
 	$member_since = strtotime($a->user['register_date']);
-	if(time() < ($member_since + ( 60 * 60 * 24 * 14)))
+	if (time() < ($member_since + ( 60 * 60 * 24 * 14))) {
 		$_SESSION['new_member'] = true;
-	else
+	} else {
 		$_SESSION['new_member'] = false;
-	if(strlen($a->user['timezone'])) {
+	}
+	if (strlen($a->user['timezone'])) {
 		date_default_timezone_set($a->user['timezone']);
 		$a->timezone = $a->user['timezone'];
 	}
 
 	$master_record = $a->user;
 
-	if((x($_SESSION,'submanage')) && intval($_SESSION['submanage'])) {
-		$r = q("select * from user where uid = %d limit 1",
+	if ((x($_SESSION,'submanage')) && intval($_SESSION['submanage'])) {
+		$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($_SESSION['submanage'])
 		);
-		if (dbm::is_result($r))
+		if (dbm::is_result($r)) {
 			$master_record = $r[0];
+		}
 	}
 
 	$r = q("SELECT `uid`,`username`,`nickname` FROM `user` WHERE `password` = '%s' AND `email` = '%s' AND `account_removed` = 0 ",
 		dbesc($master_record['password']),
 		dbesc($master_record['email'])
 	);
-	if (dbm::is_result($r))
+	if (dbm::is_result($r)) {
 		$a->identities = $r;
-	else
+	} else {
 		$a->identities = array();
+	}
 
-	$r = q("select `user`.`uid`, `user`.`username`, `user`.`nickname`
-		from manage INNER JOIN user on manage.mid = user.uid where `user`.`account_removed` = 0
-		and `manage`.`uid` = %d",
+	$r = q("SELECT `user`.`uid`, `user`.`username`, `user`.`nickname`
+		FROM `manage`
+		INNER JOIN `user` ON `manage`.`mid` = `user`.`uid`
+		WHERE `user`.`account_removed` = 0 AND `manage`.`uid` = %d",
 		intval($master_record['uid'])
 	);
-	if (dbm::is_result($r))
+	if (dbm::is_result($r)) {
 		$a->identities = array_merge($a->identities,$r);
+	}
 
-	if($login_initial)
+	if ($login_initial) {
 		logger('auth_identities: ' . print_r($a->identities,true), LOGGER_DEBUG);
-	if($login_refresh)
+	}
+	if ($login_refresh) {
 		logger('auth_identities refresh: ' . print_r($a->identities,true), LOGGER_DEBUG);
+	}
 
 	$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 1 LIMIT 1",
 		intval($_SESSION['uid']));
@@ -117,7 +124,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 	header('X-Account-Management-Status: active; name="' . $a->user['username'] . '"; id="' . $a->user['nickname'] .'"');
 
-	if($login_initial || $login_refresh) {
+	if ($login_initial || $login_refresh) {
 
 		q("UPDATE `user` SET `login_date` = '%s' WHERE `uid` = %d",
 			dbesc(datetime_convert()),
@@ -247,7 +254,7 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 	 * Profile owner - everything is visible
 	 */
 
-	if(($local_user) && ($local_user == $owner_id)) {
+	if (($local_user) && ($local_user == $owner_id)) {
 		$sql = '';
 	}
 
@@ -259,9 +266,9 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 	 * done this and passed the groups into this function.
 	 */
 
-	elseif($remote_user) {
+	elseif ($remote_user) {
 
-		if(! $remote_verified) {
+		if (! $remote_verified) {
 			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
 				intval($remote_user),
 				intval($owner_id)
@@ -271,12 +278,12 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 				$groups = init_groups_visitor($remote_user);
 			}
 		}
-		if($remote_verified) {
+		if ($remote_verified) {
 
 			$gs = '<<>>'; // should be impossible to match
 
-			if(is_array($groups) && count($groups)) {
-				foreach($groups as $g)
+			if (is_array($groups) && count($groups)) {
+				foreach ($groups as $g)
 					$gs .= '|<' . intval($g) . '>';
 			}
 
@@ -329,7 +336,7 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 	 * Profile owner - everything is visible
 	 */
 
-	if($local_user && ($local_user == $owner_id)) {
+	if ($local_user && ($local_user == $owner_id)) {
 		$sql = '';
 	}
 
@@ -341,9 +348,9 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 	 * done this and passed the groups into this function.
 	 */
 
-	elseif($remote_user) {
+	elseif ($remote_user) {
 
-		if(! $remote_verified) {
+		if (! $remote_verified) {
 			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
 				intval($remote_user),
 				intval($owner_id)
@@ -353,12 +360,12 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 				$groups = init_groups_visitor($remote_user);
 			}
 		}
-		if($remote_verified) {
+		if ($remote_verified) {
 
 			$gs = '<<>>'; // should be impossible to match
 
-			if(is_array($groups) && count($groups)) {
-				foreach($groups as $g)
+			if (is_array($groups) && count($groups)) {
+				foreach ($groups as $g)
 					$gs .= '|<' . intval($g) . '>';
 			}
 
@@ -452,7 +459,7 @@ function check_form_security_token_ForbiddenOnErr($typename = '', $formname = 'f
 // DFRN contact. They are *not* neccessarily unique across the entire site.
 
 
-if(! function_exists('init_groups_visitor')) {
+if (! function_exists('init_groups_visitor')) {
 function init_groups_visitor($contact_id) {
 	$groups = array();
 	$r = q("SELECT `gid` FROM `group_member`
@@ -460,9 +467,8 @@ function init_groups_visitor($contact_id) {
 		intval($contact_id)
 	);
 	if (dbm::is_result($r)) {
-		foreach($r as $rr)
+		foreach ($r as $rr)
 			$groups[] = $rr['gid'];
 	}
 	return $groups;
 }}
-

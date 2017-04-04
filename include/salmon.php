@@ -10,14 +10,13 @@ function get_salmon_key($uri,$keyhash) {
 
 	$arr = Probe::lrdd($uri);
 
-	if(is_array($arr)) {
-		foreach($arr as $a) {
-			if($a['@attributes']['rel'] === 'magic-public-key') {
+	if (is_array($arr)) {
+		foreach ($arr as $a) {
+			if ($a['@attributes']['rel'] === 'magic-public-key') {
 				$ret[] = $a['@attributes']['href'];
 			}
 		}
-	}
-	else {
+	} else {
 		return '';
 	}
 
@@ -69,11 +68,12 @@ function slapper($owner,$url,$slap) {
 
 	// does contact have a salmon endpoint?
 
-	if(! strlen($url))
+	if (! strlen($url)) {
 		return;
+	}
 
 
-	if(! $owner['sprvkey']) {
+	if (! $owner['sprvkey']) {
 		logger(sprintf("user '%s' (%d) does not have a salmon private key. Send failed.",
 		$owner['username'],$owner['uid']));
 		return;
@@ -120,7 +120,7 @@ function slapper($owner,$url,$slap) {
 
 	// check for success, e.g. 2xx
 
-	if($return_code > 299) {
+	if ($return_code > 299) {
 
 		logger('compliant salmon failed. Falling back to status.net hack2');
 
@@ -144,7 +144,7 @@ function slapper($owner,$url,$slap) {
 		$return_code = $a->get_curl_code();
 
 
-		if($return_code > 299) {
+		if ($return_code > 299) {
 
 			logger('compliant salmon failed. Falling back to status.net hack3');
 
@@ -169,10 +169,12 @@ function slapper($owner,$url,$slap) {
 		}
 	}
 	logger('slapper for '.$url.' returned ' . $return_code);
-	if(! $return_code)
+	if (! $return_code) {
 		return(-1);
-	if(($return_code == 503) && (stristr($a->get_curl_headers(),'retry-after')))
+	}
+	if (($return_code == 503) && (stristr($a->get_curl_headers(),'retry-after'))) {
 		return(-1);
+	}
 
 	return ((($return_code >= 200) && ($return_code < 300)) ? 0 : 1);
 }

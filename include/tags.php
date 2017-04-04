@@ -55,10 +55,10 @@ function create_tags_from_item($itemid) {
 
 		if (substr(trim($tag), 0, 1) == "#") {
 			// try to ignore #039 or #1 or anything like that
-			if(ctype_digit(substr(trim($tag),1)))
+			if (ctype_digit(substr(trim($tag),1)))
 				continue;
 			// try to ignore html hex escapes, e.g. #x2317
-			if((substr(trim($tag),1,1) == 'x' || substr(trim($tag),1,1) == 'X') && ctype_digit(substr(trim($tag),2)))
+			if ((substr(trim($tag),1,1) == 'x' || substr(trim($tag),1,1) == 'X') && ctype_digit(substr(trim($tag),2)))
 				continue;
 			$type = TERM_HASHTAG;
 			$term = substr($tag, 1);
@@ -104,19 +104,20 @@ function create_tags_from_item($itemid) {
 function create_tags_from_itemuri($itemuri, $uid) {
 	$messages = q("SELECT `id` FROM `item` WHERE uri ='%s' AND uid=%d", dbesc($itemuri), intval($uid));
 
-	if(count($messages)) {
-		foreach ($messages as $message)
+	if (count($messages)) {
+		foreach ($messages as $message) {
 			create_tags_from_item($message["id"]);
+		}
 	}
 }
 
 function update_items() {
 	global $db;
 
-        $messages = $db->q("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''", true);
+	$messages = $db->q("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''", true);
 
-        logger("fetched messages: ".count($messages));
-        while ($message = $db->qfetch()) {
+	logger("fetched messages: ".count($messages));
+	while ($message = $db->qfetch()) {
 
 		if ($message["uid"] == 0) {
 			$global = true;
@@ -135,7 +136,7 @@ function update_items() {
 			intval($global), intval(TERM_OBJ_POST), intval($message["oid"]));
 	}
 
-        $db->qclose();
+	$db->qclose();
 
 	$messages = $db->q("SELECT `guid` FROM `item` WHERE `uid` = 0", true);
 
