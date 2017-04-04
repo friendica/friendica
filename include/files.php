@@ -33,7 +33,7 @@ function create_files_from_item($itemid) {
 function create_files_from_itemuri($itemuri, $uid) {
 	$messages = q("SELECT `id` FROM `item` WHERE uri ='%s' AND uid=%d", dbesc($itemuri), intval($uid));
 
-	if(count($messages)) {
+	if (count($messages)) {
 		foreach ($messages as $message)
 			create_files_from_item($message["id"]);
 	}

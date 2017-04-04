@@ -55,7 +55,7 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 	if ($xpath->query('/atom:feed')->length > 0) {
 		$alternate = $xpath->query("atom:link[@rel='alternate']")->item(0)->attributes;
 		if (is_object($alternate)) {
-			foreach($alternate AS $attributes) {
+			foreach ($alternate AS $attributes) {
 				if ($attributes->name == "href") {
 					$author["author-link"] = $attributes->textContent;
 				}
@@ -68,7 +68,7 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		if ($author["author-link"] == "") {
 			$self = $xpath->query("atom:link[@rel='self']")->item(0)->attributes;
 			if (is_object($self)) {
-				foreach($self AS $attributes) {
+				foreach ($self AS $attributes) {
 					if ($attributes->name == "href") {
 						$author["author-link"] = $attributes->textContent;
 					}
@@ -163,7 +163,7 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 
 	$header["contact-id"] = $contact["id"];
 
-	if(!strlen($contact["notify"])) {
+	if (!strlen($contact["notify"])) {
 		// one way feed - no remote comment ability
 		$header["last-child"] = 0;
 	}
@@ -188,7 +188,7 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 			$alternate = $xpath->query("atom:link", $entry)->item(0)->attributes;
 		}
 		if (is_object($alternate)) {
-			foreach($alternate AS $attributes) {
+			foreach ($alternate AS $attributes) {
 				if ($attributes->name == "href") {
 					$item["plink"] = $attributes->textContent;
 				}
@@ -267,6 +267,7 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		if ($creator != "") {
 			$item["author-name"] = $creator;
 		}
+
 		/// @TODO ?
 		// <category>Ausland</category>
 		// <media:thumbnail width="152" height="76" url="http://www.taz.de/picture/667875/192/14388767.jpg"/>
@@ -280,7 +281,7 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 			$type = "";
 			$title = "";
 
-			foreach($enclosure->attributes AS $attributes) {
+			foreach ($enclosure->attributes AS $attributes) {
 				if ($attributes->name == "url") {
 					$href = $attributes->textContent;
 				} elseif ($attributes->name == "length") {
@@ -289,8 +290,9 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 					$type = $attributes->textContent;
 				}
 			}
-			if(strlen($item["attach"]))
+			if (strlen($item["attach"])) {
 				$item["attach"] .= ',';
+			}
 
 			$attachments[] = array("link" => $href, "type" => $type, "length" => $length);
 
