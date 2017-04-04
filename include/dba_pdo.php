@@ -49,12 +49,14 @@ class dba {
 	function __construct($server,$user,$pass,$db,$install = false) {
 		$a = get_app();
 
-    # work around, to store the database - configuration in DDDBL
-    $objDataObjectPool = new DataObjectPool('Database-Definition');
-    $objDataObjectPool->add('DEFAULT', array('CONNECTION' => "mysql:host=$server;dbname=$db",
-                                             'USER'       => $user,
-                                             'PASS'       => $pass,
-                                             'DEFAULT'    => true));
+		// work around, to store the database - configuration in DDDBL
+		$objDataObjectPool = new DataObjectPool('Database-Definition');
+		$objDataObjectPool->add('DEFAULT', array(
+			'CONNECTION' => "mysql:host=$server;dbname=$db",
+			'USER'       => $user,
+			'PASS'       => $pass,
+			'DEFAULT'    => true
+		));
 
 		$stamp1 = microtime(true);
 
@@ -63,35 +65,34 @@ class dba {
 		$pass = trim($pass);
 		$db = trim($db);
 
-		if (!(strlen($server) && strlen($user))){
+		if (!(strlen($server) && strlen($user))) {
 			$this->connected = false;
 			$this->db = null;
 			return;
 		}
 
-		if ($install) {
-			if (strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
-				if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
-					$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
-					$this->connected = false;
-					$this->db = null;
-					return;
-				}
+		if ($install && strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
+			if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
+				$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
+				$this->connected = false;
+				$this->db = null;
+				return;
 			}
 		}
 
-    # etablish connection to database and store PDO object
-    DDDBL\connect();
-    $this->db = DDDBL\getDB();
+		// Establish connection to database and store PDO object
+		DDDBL\connect();
+		$this->db = DDDBL\getDB();
 
-    if (DDDBL\isConnected()) {
-      $this->connected = true;
-    }
+		if (DDDBL\isConnected()) {
+			$this->connected = true;
+		}
 
 		if (! $this->connected) {
 			$this->db = null;
-			if (! $install)
+			if (! $install) {
 				system_unavailable();
+			}
 		}
 
 		$a->save_timestamp($stamp1, "network");
@@ -104,44 +105,49 @@ class dba {
 	public function q($sql, $onlyquery = false) {
 		$a = get_app();
 
-    $strHandler = (true === $onlyquery) ? 'PDOStatement' : 'MULTI';
+		$strHandler = (true === $onlyquery) ? 'PDOStatement' : 'MULTI';
 
-    $strQueryAlias = md5($sql);
-    $strSQLType    = strtoupper(strstr($sql, ' ', true));
+		$strQueryAlias = md5($sql);
+		$strSQLType    = strtoupper(strstr($sql, ' ', true));
 
-    $objPreparedQueryPool = new DataObjectPool('Query-Definition');
+		$objPreparedQueryPool = new DataObjectPool('Query-Definition');
 
-    # check if query do not exists till now, if so create its definition
-    if (!$objPreparedQueryPool->exists($strQueryAlias))
-      $objPreparedQueryPool->add($strQueryAlias, array('QUERY'   => $sql,
-                                                       'HANDLER' => $strHandler));
+		// check if query do not exists till now, if so create its definition
+		if (!$objPreparedQueryPool->exists($strQueryAlias)) {
+			$objPreparedQueryPool->add($strQueryAlias, array(
+				'QUERY'   => $sql,
+				'HANDLER' => $strHandler
+			));
+		}
 
-		if ((! $this->db) || (! $this->connected))
+		if ((! $this->db) || (! $this->connected)) {
 			return false;
+		}
 
 		$this->error = '';
 
 		$stamp1 = microtime(true);
 
-    try {
-      $r = DDDBL\get($strQueryAlias);
+		try {
+			$r = DDDBL\get($strQueryAlias);
 
-      # bad workaround to emulate the bizzare behavior of mysql_query
-      if (in_array($strSQLType, array('INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'SET')))
-        $result = true;
-      $intErrorCode = false;
-
-    } catch (Exception $objException) {
-      $result = false;
-      $intErrorCode = $objPreparedQueryPool->get($strQueryAlias)->get('PDOStatement')->errorCode();
-    }
+			// bad workaround to emulate the bizzare behavior of mysql_query
+			if (in_array($strSQLType, array('INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'SET'))) {
+				$result = true;
+			}
+			$intErrorCode = false;
+		} catch (Exception $objException) {
+			$result = false;
+			$intErrorCode = $objPreparedQueryPool->get($strQueryAlias)->get('PDOStatement')->errorCode();
+		}
 
 		$stamp2 = microtime(true);
 		$duration = (float)($stamp2-$stamp1);
 
 		$a->save_timestamp($stamp1, "database");
 
-		if (x($a->config,'system') && x($a->config['system'],'db_log')) {
+		/// @TODO really check $a->config for 'system'? it is very generic and should be there
+		if (x($a->config, 'system') && x($a->config['system'], 'db_log')) {
 			if (($duration > $a->config["system"]["db_loglimit"])) {
 				$duration = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -152,24 +158,24 @@ class dba {
 			}
 		}
 
-		if ($intErrorCode)
-      $this->error = $intErrorCode;
+		if ($intErrorCode) {
+			$this->error = $intErrorCode;
+		}
 
 		if (strlen($this->error)) {
 			logger('dba: ' . $this->error);
 		}
 
 		if ($this->debug) {
-
 			$mesg = '';
 
-			if ($result === false)
+			if ($result === false) {
 				$mesg = 'false';
-			elseif ($result === true)
+			} elseif ($result === true) {
 				$mesg = 'true';
-			else {
-        # this needs fixing, but is a bug itself
-				#$mesg = mysql_num_rows($result) . ' results' . EOL;
+			} else {
+				/// @TODO this needs fixing, but is a bug itself
+				// $mesg = mysql_num_rows($result) . ' results' . EOL;
 			}
 
 			$str =  'SQL = ' . printable($sql) . EOL . 'SQL returned ' . $mesg
@@ -179,46 +185,49 @@ class dba {
 			logger('dba: ' . $str );
 		}
 
-		/**
+		/*
 		 * If dbfail.out exists, we will write any failed calls directly to it,
 		 * regardless of any logging that may or may nor be in effect.
 		 * These usually indicate SQL syntax errors that need to be resolved.
 		 */
-
 		if (isset($result) AND ($result === false)) {
 			logger('dba: ' . printable($sql) . ' returned false.' . "\n" . $this->error);
-			if (file_exists('dbfail.out'))
+			if (file_exists('dbfail.out')) {
 				file_put_contents('dbfail.out', datetime_convert() . "\n" . printable($sql) . ' returned false' . "\n" . $this->error . "\n", FILE_APPEND);
+			}
 		}
 
-		if (isset($result) AND (($result === true) || ($result === false)))
+		if (isset($result) AND (($result === true) || ($result === false))) {
 			return $result;
+		}
 
 		if ($onlyquery) {
 			$this->result = $r;       # this will store an PDOStatement Object in result
-      $this->result->execute(); # execute the Statement, to get its result
+			$this->result->execute(); # execute the Statement, to get its result
 			return true;
 		}
 
 		//$a->save_timestamp($stamp1, "database");
 
-		if ($this->debug)
+		if ($this->debug) {
 			logger('dba: ' . printable(print_r($r, true)));
-		return($r);
+		}
+
+		return $r;
 	}
 
 	public function qfetch() {
+		if (false === $this->result) {
+			return false;
+		}
 
-		if (false === $this->result)
-      return false;
-
-    return $this->result->fetch();
-
+		return $this->result->fetch();
 	}
 
 	public function qclose() {
-		if ($this->result)
-      return $this->result->closeCursor();
+		if ($this->result) {
+			return $this->result->closeCursor();
+		}
 	}
 
 	public function dbg($dbg) {
@@ -227,17 +236,20 @@ class dba {
 
 	public function escape($str) {
 		if ($this->db && $this->connected) {
-      $strQuoted = $this->db->quote($str);
-      # this workaround is needed, because quote creates "'" and the beginning and the end
-      # of the string, which is correct. but until now the queries set this delimiter manually,
-      # so we must remove them from here and wait until everything uses prepared statements
-      return mb_substr($strQuoted, 1, mb_strlen($strQuoted) - 2);
+			$strQuoted = $this->db->quote($str);
+			/*
+			 * this workaround is needed, because quote creates "'" and the beginning and the end
+			 * of the string, which is correct. but until now the queries set this delimiter manually,
+			 * so we must remove them from here and wait until everything uses prepared statements
+			 */
+			return mb_substr($strQuoted, 1, mb_strlen($strQuoted) - 2);
 		}
 	}
 
-	function __destruct() {
-		if ($this->db)
-		  DDDBL\disconnect();
+	public function __destruct() {
+		if ($this->db) {
+			DDDBL\disconnect();
+		}
 	}
 }}
 
@@ -300,34 +312,33 @@ function q($sql) {
 
 }}
 
-/**
- *
- * Raw db query, no arguments
- *
- */
-
 if (! function_exists('dbq')) {
+/**
+ * Raw db query, no arguments
+ */
 function dbq($sql) {
 
 	global $db;
-	if ($db && $db->connected)
+	if ($db && $db->connected) {
 		$ret = $db->q($sql);
-	else
+	} else {
 		$ret = false;
+	}
 	return $ret;
 }}
 
 
-// Caller is responsible for ensuring that any integer arguments to
-// dbesc_array are actually integers and not malformed strings containing
-// SQL injection vectors. All integer array elements should be specifically
-// cast to int to avoid trouble.
-
-
+/*
+ * Caller is responsible for ensuring that any integer arguments to
+ * dbesc_array are actually integers and not malformed strings containing
+ * SQL injection vectors. All integer array elements should be specifically
+ * cast to int to avoid trouble.
+ */
 if (! function_exists('dbesc_array_cb')) {
 function dbesc_array_cb(&$item, $key) {
-	if (is_string($item))
+	if (is_string($item)) {
 		$item = dbesc($item);
+	}
 }}
 
 
@@ -340,5 +351,5 @@ function dbesc_array(&$arr) {
 
 if (! function_exists('dba_timer')) {
 function dba_timer() {
-  return microtime(true);
+	return microtime(true);
 }}

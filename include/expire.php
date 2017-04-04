@@ -19,18 +19,17 @@ function expire_run(&$argv, &$argc){
 	}
 
 	// make this optional as it could have a performance impact on large sites
-
-	if (intval(get_config('system','optimize_items'))) {
+	if (intval(get_config('system', 'optimize_items'))) {
 		q("OPTIMIZE TABLE `item`");
 	}
 
 	logger('expire: start');
 
-	$r = q("SELECT `uid`,`username`,`expire` FROM `user` WHERE `expire` != 0");
+	$r = q("SELECT `uid`, `username`, `expire` FROM `user` WHERE `expire` != 0");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			logger('Expire: ' . $rr['username'] . ' interval: ' . $rr['expire'], LOGGER_DEBUG);
-			item_expire($rr['uid'],$rr['expire']);
+			item_expire($rr['uid'], $rr['expire']);
 		}
 	}
 

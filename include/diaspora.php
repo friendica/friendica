@@ -3777,8 +3777,10 @@ class Diaspora {
 		$message = self::construct_like($r[0], $contact);
 		$message["author_signature"] = self::signature($contact, $message);
 
-		// We now store the signature more flexible to dynamically support new fields.
-		// This will break Diaspora compatibility with Friendica versions prior to 3.5.
+		/*
+		 * Now store the signature more flexible to dynamically support new fields.
+		 * This will break Diaspora compatibility with Friendica versions prior to 3.5.
+		 */
 		q("INSERT INTO `sign` (`iid`,`signed_text`) VALUES (%d,'%s')",
 			intval($message_id),
 			dbesc(json_encode($message))
@@ -3810,9 +3812,11 @@ class Diaspora {
 		$message = self::construct_comment($item, $contact);
 		$message["author_signature"] = self::signature($contact, $message);
 
-		// We now store the signature more flexible to dynamically support new fields.
-		// This will break Diaspora compatibility with Friendica versions prior to 3.5.
-		q("INSERT INTO `sign` (`iid`,`signed_text`) VALUES (%d,'%s')",
+		/*
+		 * Now store the signature more flexible to dynamically support new fields.
+		 * This will break Diaspora compatibility with Friendica versions prior to 3.5.
+		 */
+		q("INSERT INTO `sign` (`iid`, `signed_text`) VALUES (%d, '%s')",
 			intval($message_id),
 			dbesc(json_encode($message))
 		);

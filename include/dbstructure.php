@@ -3,12 +3,12 @@
 use Friendica\App;
 use Friendica\Core\Config;
 
-require_once("boot.php");
-require_once("include/text.php");
+require_once "boot.php";
+require_once "include/text.php";
 
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
-/*
+/**
  * Converts all tables from MyISAM to InnoDB
  */
 function convert_to_innodb() {
@@ -1756,7 +1756,7 @@ function dbstructure_run(&$argv, &$argc) {
 			unset($db_host, $db_user, $db_pass, $db_data);
 	}
 
-	if ($argc==2) {
+	if ($argc == 2) {
 		switch ($argv[1]) {
 			case "dryrun":
 				update_structure(true, false);
@@ -1766,7 +1766,7 @@ function dbstructure_run(&$argv, &$argc) {
 
 				$build = get_config('system','build');
 				if (!x($build)) {
-					set_config('system','build',DB_UPDATE_VERSION);
+					set_config('system', 'build', DB_UPDATE_VERSION);
 					$build = DB_UPDATE_VERSION;
 				}
 
@@ -1776,7 +1776,9 @@ function dbstructure_run(&$argv, &$argc) {
 				// run any left update_nnnn functions in update.php
 				for ($x = $stored; $x < $current; $x ++) {
 					$r = run_update_function($x);
-					if (!$r) break;
+					if (!$r) {
+						break;
+					}
 				}
 
 				set_config('system','build',DB_UPDATE_VERSION);
@@ -1803,7 +1805,7 @@ function dbstructure_run(&$argv, &$argc) {
 
 }
 
-if (array_search(__file__,get_included_files())===0) {
+if (array_search(__FILE__,get_included_files())===0) {
 	dbstructure_run($_SERVER["argv"],$_SERVER["argc"]);
 	killme();
 }
