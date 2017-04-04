@@ -1,4 +1,5 @@
 <?php
+/// @TODO no longer used?
 use \Friendica\Core\Config;
 
 function directory_run(&$argv, &$argc){
@@ -22,5 +23,6 @@ function directory_run(&$argv, &$argc){
 	if (strlen($arr['url'])) {
 		fetch_url($dir . '?url=' . bin2hex($arr['url']));
 	}
+
 	return;
 }

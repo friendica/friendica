@@ -411,10 +411,12 @@ function notification($params) {
 			$hash = random_string();
 			$r = q("SELECT `id` FROM `notify` WHERE `hash` = '%s' LIMIT 1",
 				dbesc($hash));
-			if (dbm::is_result($r))
+			if (dbm::is_result($r)) {
 				$dups = true;
-		} while($dups == true);
+			}
+		} while ($dups == true);
 
+		/// @TODO One statement is enough
 		$datarray = array();
 		$datarray['hash']  = $hash;
 		$datarray['name']  = $params['source_name'];

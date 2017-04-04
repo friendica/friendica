@@ -867,7 +867,7 @@ class dfrn {
 
 		// The signed text contains the content in Markdown, the sender handle and the signatur for the content
 		// It is needed for relayed comments to Diaspora.
-		if($item['signed_text']) {
+		if ($item['signed_text']) {
 			$sign = base64_encode(json_encode(array('signed_text' => $item['signed_text'],'signature' => $item['signature'],'signer' => $item['signer'])));
 			xml::add_element($doc, $entry, "dfrn:diaspora_signature", $sign);
 		}
@@ -1287,7 +1287,7 @@ class dfrn {
 			$href = "";
 			$width = 0;
 			foreach ($avatar->attributes AS $attributes) {
-				/// @TODO Rewrite these similar if() to one switch
+				/// @TODO Rewrite these similar if () to one switch
 				if ($attributes->name == "href") {
 					$href = $attributes->textContent;
 				}
@@ -2164,7 +2164,7 @@ class dfrn {
 		$title = "";
 		foreach ($links AS $link) {
 			foreach ($link->attributes AS $attributes) {
-				/// @TODO Rewrite these repeated (same) if() statements to a switch()
+				/// @TODO Rewrite these repeated (same) if () statements to a switch()
 				if ($attributes->name == "href") {
 					$href = $attributes->textContent;
 				}
@@ -2414,7 +2414,7 @@ class dfrn {
 			// When activated, forums don't work.
 			// And: Why should we disallow commenting by followers?
 			// the behaviour is now similar to the Diaspora part.
-			//if($importer["rel"] == CONTACT_IS_FOLLOWER) {
+			//if ($importer["rel"] == CONTACT_IS_FOLLOWER) {
 			//	logger("Contact ".$importer["id"]." is only follower. Quitting", LOGGER_DEBUG);
 			//	return;
 			//}
@@ -2539,7 +2539,7 @@ class dfrn {
 
 			logger("Item was stored with id ".$posted_id, LOGGER_DEBUG);
 
-			if(stristr($item["verb"],ACTIVITY_POKE))
+			if (stristr($item["verb"],ACTIVITY_POKE))
 				self::do_poke($item, $importer, $posted_id);
 		}
 	}
@@ -2666,7 +2666,7 @@ class dfrn {
 				create_tags_from_itemuri($uri, $importer["uid"]);
 				create_files_from_itemuri($uri, $importer["uid"]);
 				update_thread_uri($uri, $importer["importer_uid"]);
-				if($item["last-child"]) {
+				if ($item["last-child"]) {
 					// ensure that last-child is set in case the comment that had it just got wiped.
 					q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d ",
 						dbesc(datetime_convert()),

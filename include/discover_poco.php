@@ -209,10 +209,10 @@ function discover_directory($search) {
 	$j = json_decode($x);
 
 	if (count($j->results)) {
-		foreach($j->results as $jj) {
+		foreach ($j->results as $jj) {
 			// Check if the contact already exists
 			$exists = q("SELECT `id`, `last_contact`, `last_failure`, `updated` FROM `gcontact` WHERE `nurl` = '%s'", normalise_link($jj->url));
-			if ($exists) {
+			if (dbm::is_result($exists)) {
 				logger("Profile ".$jj->url." already exists (".$search.")", LOGGER_DEBUG);
 
 				if (($exists[0]["last_contact"] < $exists[0]["last_failure"]) AND
@@ -272,12 +272,16 @@ function gs_search_user($search) {
 	if (!$result["success"]) {
 		return false;
 	}
+
 	$contacts = json_decode($result["body"]);
 
 	if ($contacts->status == 'ERROR') {
 		return false;
 	}
-	foreach($contacts->data AS $user) {
+
+	/// @TODO AS is considered as a notation for constants (as they usually being written all upper-case)
+	/// @TODO find all those and convert to all lower-case which is a keyword then
+	foreach ($contacts->data AS $user) {
 		$contact = probe_url($user->site_address."/".$user->name);
 		if ($contact["network"] != NETWORK_PHANTOM) {
 			$contact["about"] = $user->description;

@@ -34,7 +34,7 @@ $objDDDBLResultHandler->add('PDOStatement', array('HANDLER' => $cloPDOStatementR
  *
  */
  
-if(! class_exists('dba')) { 
+if (! class_exists('dba')) { 
 class dba {
 
 	private $debug = 0;
@@ -66,9 +66,9 @@ class dba {
 			return;
 		}
 
-		if($install) {
-			if(strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
-				if(! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
+		if ($install) {
+			if (strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
+				if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
 					$this->error = sprintf( t('Cannot locate DNS info for database server \'%s\''), $server);
 					$this->connected = false;
 					$this->db = null;
@@ -81,13 +81,13 @@ class dba {
     \DDDBL\connect();
     $this->db = \DDDBL\getDB();
     
-    if(\DDDBL\isConnected()) {
+    if (\DDDBL\isConnected()) {
       $this->connected = true;
     }
   
-		if(! $this->connected) {
+		if (! $this->connected) {
 			$this->db = null;
-			if(! $install)
+			if (! $install)
 				system_unavailable();
 		}
 
@@ -109,11 +109,11 @@ class dba {
     $objPreparedQueryPool = new \DDDBL\DataObjectPool('Query-Definition');
     
     # check if query do not exists till now, if so create its definition
-    if(!$objPreparedQueryPool->exists($strQueryAlias))
+    if (!$objPreparedQueryPool->exists($strQueryAlias))
       $objPreparedQueryPool->add($strQueryAlias, array('QUERY'   => $sql,
                                                        'HANDLER' => $strHandler));
 
-		if((! $this->db) || (! $this->connected))
+		if ((! $this->db) || (! $this->connected))
 			return false;
 
 		$this->error = '';
@@ -124,7 +124,7 @@ class dba {
       $r = \DDDBL\get($strQueryAlias);
       
       # bad workaround to emulate the bizzare behavior of mysql_query
-      if(in_array($strSQLType, array('INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'SET')))
+      if (in_array($strSQLType, array('INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'SET')))
         $result = true;
       $intErrorCode = false;
         
@@ -138,7 +138,7 @@ class dba {
 
 		$a->save_timestamp($stamp1, "database");
 
-		if(x($a->config,'system') && x($a->config['system'],'db_log')) {
+		if (x($a->config,'system') && x($a->config['system'],'db_log')) {
 			if (($duration > $a->config["system"]["db_loglimit"])) {
 				$duration = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -149,20 +149,20 @@ class dba {
 			}
 		}
 
-		if($intErrorCode)
+		if ($intErrorCode)
       $this->error = $intErrorCode;
 
-		if(strlen($this->error)) {
+		if (strlen($this->error)) {
 			logger('dba: ' . $this->error);
 		}
 
-		if($this->debug) {
+		if ($this->debug) {
 
 			$mesg = '';
 
-			if($result === false)
+			if ($result === false)
 				$mesg = 'false';
-			elseif($result === true)
+			elseif ($result === true)
 				$mesg = 'true';
 			else {
         # this needs fixing, but is a bug itself
@@ -182,13 +182,13 @@ class dba {
 		 * These usually indicate SQL syntax errors that need to be resolved.
 		 */
 
-		if(isset($result) AND ($result === false)) {
+		if (isset($result) AND ($result === false)) {
 			logger('dba: ' . printable($sql) . ' returned false.' . "\n" . $this->error);
-			if(file_exists('dbfail.out'))
+			if (file_exists('dbfail.out'))
 				file_put_contents('dbfail.out', datetime_convert() . "\n" . printable($sql) . ' returned false' . "\n" . $this->error . "\n", FILE_APPEND);
 		}
 
-		if(isset($result) AND (($result === true) || ($result === false)))
+		if (isset($result) AND (($result === true) || ($result === false)))
 			return $result;
     
 		if ($onlyquery) {
@@ -199,7 +199,7 @@ class dba {
     
 		//$a->save_timestamp($stamp1, "database");
 
-		if($this->debug)
+		if ($this->debug)
 			logger('dba: ' . printable(print_r($r, true)));
 		return($r);
 	}
@@ -223,7 +223,7 @@ class dba {
 	}
 
 	public function escape($str) {
-		if($this->db && $this->connected) {
+		if ($this->db && $this->connected) {
       $strQuoted = $this->db->quote($str);
       # this workaround is needed, because quote creates "'" and the beginning and the end
       # of the string, which is correct. but until now the queries set this delimiter manually,
@@ -238,27 +238,27 @@ class dba {
 	}
 }}
 
-if(! function_exists('printable')) {
+if (! function_exists('printable')) {
 function printable($s) {
 	$s = preg_replace("~([\x01-\x08\x0E-\x0F\x10-\x1F\x7F-\xFF])~",".", $s);
 	$s = str_replace("\x00",'.',$s);
-	if(x($_SERVER,'SERVER_NAME'))
+	if (x($_SERVER,'SERVER_NAME'))
 		$s = escape_tags($s);
 	return $s;
 }}
 
 // Procedural functions
-if(! function_exists('dbg')) { 
+if (! function_exists('dbg')) { 
 function dbg($state) {
 	global $db;
-	if($db)
+	if ($db)
 	$db->dbg($state);
 }}
 
-if(! function_exists('dbesc')) { 
+if (! function_exists('dbesc')) { 
 function dbesc($str) {
 	global $db;
-	if($db && $db->connected)
+	if ($db && $db->connected)
 		return($db->escape($str));
 	else
 		return(str_replace("'","\\'",$str));
@@ -271,17 +271,17 @@ function dbesc($str) {
 // Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
 //                   'user', 1);
 
-if(! function_exists('q')) { 
+if (! function_exists('q')) { 
 function q($sql) {
 
 	global $db;
 	$args = func_get_args();
 	unset($args[0]);
 
-	if($db && $db->connected) {
+	if ($db && $db->connected) {
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		//logger("dba: q: $stmt", LOGGER_ALL);
-		if($stmt === false)
+		if ($stmt === false)
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);
 		return $db->q($stmt);
 	}
@@ -303,11 +303,11 @@ function q($sql) {
  *
  */
 
-if(! function_exists('dbq')) { 
+if (! function_exists('dbq')) { 
 function dbq($sql) {
 
 	global $db;
-	if($db && $db->connected)
+	if ($db && $db->connected)
 		$ret = $db->q($sql);
 	else
 		$ret = false;
@@ -321,21 +321,21 @@ function dbq($sql) {
 // cast to int to avoid trouble. 
 
 
-if(! function_exists('dbesc_array_cb')) {
+if (! function_exists('dbesc_array_cb')) {
 function dbesc_array_cb(&$item, $key) {
-	if(is_string($item))
+	if (is_string($item))
 		$item = dbesc($item);
 }}
 
 
-if(! function_exists('dbesc_array')) {
+if (! function_exists('dbesc_array')) {
 function dbesc_array(&$arr) {
-	if(is_array($arr) && count($arr)) {
+	if (is_array($arr) && count($arr)) {
 		array_walk($arr,'dbesc_array_cb');
 	}
 }}
 
-if(! function_exists('dba_timer')) {
+if (! function_exists('dba_timer')) {
 function dba_timer() {
   return microtime(true);
 }}

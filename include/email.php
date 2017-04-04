@@ -4,7 +4,7 @@ require_once('include/msgclean.php');
 require_once('include/quoteconvert.php');
 
 function email_connect($mailbox,$username,$password) {
-	if(! function_exists('imap_open'))
+	if (! function_exists('imap_open'))
 		return false;
 
 	$mbox = @imap_open($mailbox,$username,$password);
@@ -14,23 +14,23 @@ function email_connect($mailbox,$username,$password) {
 
 function email_poll($mbox,$email_addr) {
 
-	if(! ($mbox && $email_addr))
+	if (! ($mbox && $email_addr))
 		return array();
 
 	$search1 = @imap_search($mbox,'FROM "' . $email_addr . '"', SE_UID);
-	if(! $search1)
+	if (! $search1)
 		$search1 = array();
 
 	$search2 = @imap_search($mbox,'TO "' . $email_addr . '"', SE_UID);
-	if(! $search2)
+	if (! $search2)
 		$search2 = array();
 
 	$search3 = @imap_search($mbox,'CC "' . $email_addr . '"', SE_UID);
-	if(! $search3)
+	if (! $search3)
 		$search3 = array();
 
 	$search4 = @imap_search($mbox,'BCC "' . $email_addr . '"', SE_UID);
-	if(! $search4)
+	if (! $search4)
 		$search4 = array();
 
 	$res = array_unique(array_merge($search1,$search2,$search3,$search4));
@@ -57,8 +57,8 @@ function email_msg_headers($mbox,$uid) {
 	$raw_header = str_replace("\r",'',$raw_header);
 	$ret = array();
 	$h = explode("\n",$raw_header);
-	if(count($h))
-	foreach($h as $line ) {
+	if (count($h))
+	foreach ($h as $line ) {
 	    if (preg_match("/^[a-zA-Z]/", $line)) {
 			$key = substr($line,0,strpos($line,':'));
 			$value = substr($line,strpos($line,':')+1);
@@ -79,10 +79,10 @@ function email_get_msg($mbox,$uid, $reply) {
 
 	$struc = (($mbox && $uid) ? @imap_fetchstructure($mbox,$uid,FT_UID) : null);
 
-	if(! $struc)
+	if (! $struc)
 		return $ret;
 
-	if(! $struc->parts) {
+	if (! $struc->parts) {
 		$ret['body'] = email_get_part($mbox,$uid,$struc,0, 'html');
 		$html = $ret['body'];
 
@@ -94,7 +94,7 @@ function email_get_msg($mbox,$uid, $reply) {
 	else {
 		$text = '';
 		$html = '';
-		foreach($struc->parts as $ptop => $p) {
+		foreach ($struc->parts as $ptop => $p) {
 			$x = email_get_part($mbox,$uid,$p,$ptop + 1, 'plain');
 			if ($x) {
 				$text .= $x;
@@ -206,16 +206,16 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 
 
 function email_header_encode($in_str, $charset) {
-    $out_str = $in_str;
+	$out_str = $in_str;
 	$need_to_convert = false;
 
-	for($x = 0; $x < strlen($in_str); $x ++) {
-		if((ord($in_str[$x]) == 0) || ((ord($in_str[$x]) > 128))) {
+	for ($x = 0; $x < strlen($in_str); $x ++) {
+		if ((ord($in_str[$x]) == 0) || ((ord($in_str[$x]) > 128))) {
 			$need_to_convert = true;
 		}
 	}
 
-	if(! $need_to_convert)
+	if (! $need_to_convert)
 		return $in_str;
 
     if ($out_str && $charset) {

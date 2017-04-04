@@ -10,7 +10,7 @@ require_once 'include/datetime.php';
 
 function format_event_html($ev, $simple = false) {
 
-	if(! ((is_array($ev)) && count($ev))) {
+	if (! ((is_array($ev)) && count($ev)))
 		return '';
 	}
 
@@ -98,26 +98,26 @@ function parse_event($h) {
 		logger('parse_event: parse error: ' . $e);
 	}
 
-	if(! $dom)
+	if (! $dom)
  		return $ret;
 
 	$items = $dom->getElementsByTagName('*');
 
-	foreach($items as $item) {
-		if(attribute_contains($item->getAttribute('class'), 'vevent')) {
+	foreach ($items as $item) {
+		if (attribute_contains($item->getAttribute('class'), 'vevent')) {
 			$level2 = $item->getElementsByTagName('*');
-			foreach($level2 as $x) {
-				if(attribute_contains($x->getAttribute('class'),'dtstart') && $x->getAttribute('title')) {
+			foreach ($level2 as $x) {
+				if (attribute_contains($x->getAttribute('class'),'dtstart') && $x->getAttribute('title')) {
 					$ret['start'] = $x->getAttribute('title');
-					if(! strpos($ret['start'],'Z'))
+					if (! strpos($ret['start'],'Z'))
 						$ret['adjust'] = true;
 				}
-				if(attribute_contains($x->getAttribute('class'),'dtend') && $x->getAttribute('title'))
+				if (attribute_contains($x->getAttribute('class'),'dtend') && $x->getAttribute('title'))
 					$ret['finish'] = $x->getAttribute('title');
 
-				if(attribute_contains($x->getAttribute('class'),'description'))
+				if (attribute_contains($x->getAttribute('class'),'description'))
 					$ret['desc'] = $x->textContent;
-				if(attribute_contains($x->getAttribute('class'),'location'))
+				if (attribute_contains($x->getAttribute('class'),'location'))
 					$ret['location'] = $x->textContent;
 			}
 		}
@@ -125,23 +125,23 @@ function parse_event($h) {
 
 	// sanitise
 
-	if((x($ret,'desc')) && ((strpos($ret['desc'],'<') !== false) || (strpos($ret['desc'],'>') !== false))) {
+	if ((x($ret,'desc')) && ((strpos($ret['desc'],'<') !== false) || (strpos($ret['desc'],'>') !== false))) {
 		$config = HTMLPurifier_Config::createDefault();
 		$config->set('Cache.DefinitionImpl', null);
 		$purifier = new HTMLPurifier($config);
 		$ret['desc'] = html2bbcode($purifier->purify($ret['desc']));
 	}
 
-	if((x($ret,'location')) && ((strpos($ret['location'],'<') !== false) || (strpos($ret['location'],'>') !== false))) {
+	if ((x($ret,'location')) && ((strpos($ret['location'],'<') !== false) || (strpos($ret['location'],'>') !== false))) {
 		$config = HTMLPurifier_Config::createDefault();
 		$config->set('Cache.DefinitionImpl', null);
 		$purifier = new HTMLPurifier($config);
 		$ret['location'] = html2bbcode($purifier->purify($ret['location']));
 	}
 
-	if(x($ret,'start'))
+	if (x($ret,'start'))
 		$ret['start'] = datetime_convert('UTC','UTC',$ret['start']);
-	if(x($ret,'finish'))
+	if (x($ret,'finish'))
 		$ret['finish'] = datetime_convert('UTC','UTC',$ret['finish']);
 
 	return $ret;
@@ -595,7 +595,7 @@ function event_by_id($owner_uid = 0, $event_params, $sql_extra = '') {
  */
 function events_by_date($owner_uid = 0, $event_params, $sql_extra = '') {
 	// Only allow events if there is a valid owner_id
-	if($owner_uid == 0) {
+	if ($owner_uid == 0) {
 		return;
 	}
 
