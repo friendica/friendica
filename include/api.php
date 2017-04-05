@@ -2642,7 +2642,7 @@ $called_api = null;
 		foreach ($r as $item) {
 
 			localize_item($item);
-			list($status_user, $owner_user) = api_item_get_user($a,$item);
+			list($status_user, $owner_user) = api_item_get_user($a, $item);
 
 			// Look if the posts are matching if they should be filtered by user id
 			if ($filter_user AND ($status_user["id"] != $user_info["id"])) {
@@ -2708,7 +2708,7 @@ $called_api = null;
 				if ($retweeted_item !== false) {
 					$retweeted_status = $status;
 					try {
-						$retweeted_status["user"] = api_get_user($a,$retweeted_item["author-link"]);
+						$retweeted_status["user"] = api_get_user($a, $retweeted_item["author-link"]);
 					} catch( BadRequestException $e ) {
 						// user not found. should be found?
 						/// @todo check if the user should be always found
