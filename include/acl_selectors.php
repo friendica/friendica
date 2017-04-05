@@ -608,7 +608,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 
 	if (dbm::is_result($r)) {
-		foreach ($r as $g){
+		foreach ($r as $g) {
 			$contacts[] = array(
 				'type'    => 'c',
 				'photo'   => proxy_url($g['micro'], false, PROXY_SIZE_MICRO),
@@ -617,7 +617,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 				'network' => $g['network'],
 				'link'    => $g['url'],
 				'nick'    => htmlentities(($g['attag']) ? $g['attag'] : $g['nick']),
-				'forum'   => ((x($g['forum']) || x($g['prv'])) ? 1 : 0),
+				'forum'   => ((x($g, 'forum') || x($g, 'prv')) ? 1 : 0),
 			);
 		}
 	}
