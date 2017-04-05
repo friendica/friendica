@@ -353,7 +353,7 @@ $called_api = null;
 							header ("Content-Type: application/json");
 							foreach ($r as $rr)
 								$json = json_encode($rr);
-								if ($_GET['callback']) {
+								if (x($_GET, 'callback')) {
 									$json = $_GET['callback'] . "(" . $json . ")";
 								}
 								return $json;
@@ -2224,7 +2224,7 @@ $called_api = null;
 		} else {
 			$ret['text'] = $item['title'] . "\n" . html2plain(bbcode(api_clean_plain_items($item['body']), false, false, 2, true), 0);
 		}
-		if (x($_GET, 'getUserObjects']) && $_GET['getUserObjects'] == 'false') {
+		if (x($_GET, 'getUserObjects') && $_GET['getUserObjects'] == 'false') {
 			unset($ret['sender']);
 			unset($ret['recipient']);
 		}
