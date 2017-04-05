@@ -394,20 +394,22 @@ function construct_acl_data(App $a, $user) {
 		foreach ($acl_data['groups'] as $key=>$group) {
 			// Add a "selected" flag to groups that are posted to by default
 			if ($user_defaults['allow_gid'] &&
-			   in_array($group['id'], $user_defaults['allow_gid']) && !in_array($group['id'], $user_defaults['deny_gid']) )
+					in_array($group['id'], $user_defaults['allow_gid']) && !in_array($group['id'], $user_defaults['deny_gid']) ) {
 				$acl_data['groups'][$key]['selected'] = 1;
-			else
+			} else {
 				$acl_data['groups'][$key]['selected'] = 0;
+			}
 		}
 	}
 	if ($acl_data['contacts']) {
 		foreach ($acl_data['contacts'] as $key=>$contact) {
 			// Add a "selected" flag to groups that are posted to by default
 			if ($user_defaults['allow_cid'] &&
-			   in_array($contact['id'], $user_defaults['allow_cid']) && !in_array($contact['id'], $user_defaults['deny_cid']) )
+					in_array($contact['id'], $user_defaults['allow_cid']) && !in_array($contact['id'], $user_defaults['deny_cid']) ) {
 				$acl_data['contacts'][$key]['selected'] = 1;
-			else
+			} else {
 				$acl_data['contacts'][$key]['selected'] = 0;
+			}
 		}
 	}
 
@@ -430,9 +432,10 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 	// For use with jquery.textcomplete for private mail completion
 
-	if (x($_REQUEST,'query') && strlen($_REQUEST['query'])) {
-		if (! $type)
+	if (x($_REQUEST, 'query') && strlen($_REQUEST['query'])) {
+		if (! $type) {
 			$type = 'm';
+		}
 		$search = $_REQUEST['query'];
 	}
 
@@ -624,9 +627,9 @@ function acl_lookup(App $a, $out_type = 'json') {
 	if ($conv_id) {
 		/* if $conv_id is set, get unknow contacts in thread */
 		/* but first get know contacts url to filter them out */
-		function _contact_link($i){ return dbesc($i['link']); }
-		$known_contacts = array_map(_contact_link, $contacts);
-		$unknow_contacts=array();
+		function _contact_link($i) { return dbesc($i['link']); }
+		$known_contacts = array_map('_contact_link', $contacts);
+		$unknow_contacts = array();
 		$r = q("SELECT `author-avatar`,`author-name`,`author-link`
 				FROM `item` WHERE `parent` = %d
 					AND (`author-name` LIKE '%%%s%%' OR `author-link` LIKE '%%%s%%')
@@ -639,13 +642,13 @@ function acl_lookup(App $a, $out_type = 'json') {
 				dbesc($search),
 				implode("','", $known_contacts)
 		);
-		if (dbm::is_result($r)){
+		if (dbm::is_result($r)) {
 			foreach ($r as $row) {
 				// nickname..
 				$up = parse_url($row['author-link']);
-				$nick = explode("/",$up['path']);
-				$nick = $nick[count($nick)-1];
-				$nick .= "@".$up['host'];
+				$nick = explode("/", $up['path']);
+				$nick = $nick[count($nick) - 1];
+				$nick .= "@" . $up['host'];
 				// /nickname
 				$unknow_contacts[] = array(
 					'type'    => 'c',
