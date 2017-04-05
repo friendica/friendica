@@ -146,4 +146,3 @@ can load different content into the jot moadl (e.g. the item edit jot)
 		this.style.height = this.contentWindow.document.body.offsetHeight + 'px';
 	});
 </script>
-
