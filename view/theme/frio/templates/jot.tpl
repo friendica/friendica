@@ -9,7 +9,7 @@
 			{{* Note: We need 2 modal close buttons here to bypass a bug in bootstrap.
 			The second is for mobile view. The first one doesnt work with dropdowns. To get a working close button
 			in with dropdows the close button needs to be inserted after the dropdown. *}}
-			<button type="button" class="close hidden-xs" data-dismiss="modal" style="float: right;">&times;</button>
+			<button type="button" class="close hidden-xs" data-dismiss="modal" aria-label="Close" style="float: right;">&times;</button>
 
 			{{* The Jot navigation menu for desktop user (text input, permissions, preview, filebrowser) *}}
 			<ul class="nav nav-tabs hidden-xs jot-nav" role="tablist" data-tabs="tabs">
