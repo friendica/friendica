@@ -96,3 +96,20 @@ If a package needs to be updated, whether to the next minor version or to the ne
 Then you should run `util/composer.phar update` to update it in your local `vendor` folder and update the `composer.lock` file that specifies the current versions of the dependencies.
 
 Please note that you should commit both `composer.json` and `composer.lock` with your work every time you make a change to the former.
+
+## Composer FAQ
+
+### I used the `composer` command and got a warning about not to run it as root.
+
+See [https://getcomposer.org/root]().
+Composer should be run as the web server user, usually `www-data` with Apache or `http` with nginx.
+If you can't switch to the web server user using `su - [web user]`, you can directly run the Composer command with `sudo -u [web user]`.
+
+### Running Composer with `sudo` complains about not being able to create the composer cache directory in `/root/.composer`
+
+This is because `sudo` doesn't always change the `HOME` environment variable, which means that the command is run as the web server user but the system still uses `root` home directory.
+However, you can temporarily change environment variable for the execution of a single command.
+For Composer, this would be:
+````
+$> COMPOSER_HOME=/var/tmp/composer sudo -u [web user] util/composer.phar [mode]
+````
