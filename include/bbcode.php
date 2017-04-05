@@ -212,13 +212,14 @@ function bb_unspacefy_and_trim($st) {
 	return $unspacefied;
 }
 
-function bb_find_open_close($s, $open, $close, $occurance = 1) {
+function bb_find_open_close($s, $open, $close, $occurence = 1) {
 
-	if ($occurance < 1)
-		$occurance = 1;
+	if ($occurence < 1) {
+		$occurence = 1;
+	}
 
 	$start_pos = -1;
-	for ($i = 1; $i <= $occurance; $i++) {
+	for ($i = 1; $i <= $occurence; $i++) {
 		if ( $start_pos !== false) {
 			$start_pos = strpos($s, $open, $start_pos + 1);
 		}
@@ -239,14 +240,15 @@ function bb_find_open_close($s, $open, $close, $occurance = 1) {
 	return $res;
 }
 
-function get_bb_tag_pos($s, $name, $occurance = 1) {
+function get_bb_tag_pos($s, $name, $occurence = 1) {
 
-	if ($occurance < 1)
-		$occurance = 1;
+	if ($occurence < 1) {
+		$occurence = 1;
+	}
 
 	$start_open = -1;
-	for ($i = 1; $i <= $occurance; $i++) {
-		if ( $start_open !== false) {
+	for ($i = 1; $i <= $occurence; $i++) {
+		if ($start_open !== false) {
 			$start_open = strpos($s, '[' . $name, $start_open + 1); // allow [name= type tags
 		}
 	}
@@ -291,9 +293,9 @@ function bb_tag_preg_replace($pattern, $replace, $name, $s) {
 
 	$string = $s;
 
-	$occurance = 1;
-	$pos = get_bb_tag_pos($string, $name, $occurance);
-	while ($pos !== false && $occurance < 1000) {
+	$occurence = 1;
+	$pos = get_bb_tag_pos($string, $name, $occurence);
+	while ($pos !== false && $occurence < 1000) {
 
 		$start = substr($string, 0, $pos['start']['open']);
 		$subject = substr($string, $pos['start']['open'], $pos['end']['close'] - $pos['start']['open']);
@@ -304,8 +306,8 @@ function bb_tag_preg_replace($pattern, $replace, $name, $s) {
 		$subject = preg_replace($pattern, $replace, $subject);
 		$string = $start . $subject . $end;
 
-		$occurance++;
-		$pos = get_bb_tag_pos($string, $name, $occurance);
+		$occurence++;
+		$pos = get_bb_tag_pos($string, $name, $occurence);
 	}
 
 	return $string;
