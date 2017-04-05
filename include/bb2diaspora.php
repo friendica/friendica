@@ -1,11 +1,11 @@
 <?php
 
-require_once("include/oembed.php");
-require_once("include/event.php");
-require_once("library/markdown.php");
-require_once("include/html2bbcode.php");
-require_once("include/bbcode.php");
-require_once("library/html-to-markdown/HTML_To_Markdown.php");
+require_once 'include/oembed.php';
+require_once 'include/event.php';
+require_once 'library/markdown.php';
+require_once 'include/html2bbcode.php';
+require_once 'include/bbcode.php';
+require_once 'library/html-to-markdown/HTML_To_Markdown.php';
 
 /**
  * @brief Callback function to replace a Diaspora style mention in a mention for Friendica
@@ -26,14 +26,15 @@ function diaspora_mention2bb($match) {
 		$name = $data['name'];
 	}
 
-	return '@[url='.$data['url'].']'.$name.'[/url]';
+	return '@[url=' . $data['url'] . ']' . $name . '[/url]';
 }
 
-// we don't want to support a bbcode specific markdown interpreter
-// and the markdown library we have is pretty good, but provides HTML output.
-// So we'll use that to convert to HTML, then convert the HTML back to bbcode,
-// and then clean up a few Diaspora specific constructs.
-
+/*
+ * we don't want to support a bbcode specific markdown interpreter
+ * and the markdown library we have is pretty good, but provides HTML output.
+ * So we'll use that to convert to HTML, then convert the HTML back to bbcode,
+ * and then clean up a few Diaspora specific constructs.
+ */
 function diaspora2bb($s) {
 
 	$s = html_entity_decode($s, ENT_COMPAT, 'UTF-8');
@@ -92,27 +93,28 @@ function diaspora_mentions($match) {
 
 	$contact = get_contact_details_by_url($match[3]);
 
-	if (!isset($contact['addr'])) {
+	if (!x($contact, 'addr')) {
 		$contact = Probe::uri($match[3]);
 	}
 
-	if (!isset($contact['addr'])) {
+	if (!x($contact, 'addr')) {
 		return $match[0];
 	}
 
-	$mention = '@{'.$match[2].'; '.$contact['addr'].'}';
+	$mention = '@{' . $match[2] . '; ' . $contact['addr'] . '}';
 	return $mention;
 }
 
-function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
+function bb2diaspora($Text, $preserve_nl = false, $fordiaspora = true) {
 
 	$a = get_app();
 
 	$OriginalText = $Text;
 
 	// Since Diaspora is creating a summary for links, this function removes them before posting
-	if ($fordiaspora)
+	if ($fordiaspora) {
 		$Text = bb_remove_share_information($Text);
+	}
 
 	/**
 	 * Transform #tags, strip off the [url] and replace spaces with underscore
@@ -130,18 +132,20 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 		$Text = bbcode($Text, $preserve_nl, false, 3);
 
 		// Add all tags that maybe were removed
-		if (preg_match_all("/#\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",$OriginalText, $tags)) {
+		if (preg_match_all("/#\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", $OriginalText, $tags)) {
 			$tagline = "";
 			foreach ($tags[2] as $tag) {
 				$tag = html_entity_decode($tag, ENT_QUOTES, 'UTF-8');
-				if (!strpos(html_entity_decode($Text, ENT_QUOTES, 'UTF-8'), "#".$tag))
-					$tagline .= "#".$tag." ";
+				if (!strpos(html_entity_decode($Text, ENT_QUOTES, 'UTF-8'), "#" . $tag)) {
+					$tagline .= "#" . $tag . " ";
+				}
 			}
 			$Text = $Text." ".$tagline;
 		}
 
-	} else
+	} else {
 		$Text = bbcode($Text, $preserve_nl, false, 4);
+	}
 
 	// mask some special HTML chars from conversation to markdown
 	$Text = str_replace(array('&lt;','&gt;','&amp;'),array('&_lt_;','&_gt_;','&_amp_;'),$Text);
@@ -179,13 +183,13 @@ function bb2diaspora($Text,$preserve_nl = false, $fordiaspora = true) {
 
 function unescape_underscores_in_links($m) {
 	$y = str_replace('\\_','_', $m[2]);
-	return('[' . $m[1] . '](' . $y . ')');
+	return '[' . $m[1] . '](' . $y . ')';
 }
 
 function format_event_diaspora($ev) {
-
-	if (! ((is_array($ev)) && count($ev)))
+	if (! ((is_array($ev)) && count($ev))) {
 		return '';
+	}
 
 	$bd_format = t('l F d, Y \@ g:i A') ; // Friday January 18, 2011 @ 8 AM
 
@@ -200,17 +204,19 @@ function format_event_diaspora($ev) {
 			$ev['start'] , $bd_format)))
 		.  '](' . App::get_baseurl() . '/localtime/?f=&time=' . urlencode(datetime_convert('UTC','UTC',$ev['start'])) . ")\n";
 
-	if (! $ev['nofinish'])
+	if (! $ev['nofinish']) {
 		$o .= t('Finishes:') . ' ' . '['
 			. (($ev['adjust']) ? day_translate(datetime_convert('UTC', 'UTC',
 				$ev['finish'] , $bd_format ))
 				:  day_translate(datetime_convert('UTC', 'UTC',
 				$ev['finish'] , $bd_format )))
 			. '](' . App::get_baseurl() . '/localtime/?f=&time=' . urlencode(datetime_convert('UTC','UTC',$ev['finish'])) . ")\n";
+	}
 
-	if (strlen($ev['location']))
+	if (strlen($ev['location'])) {
 		$o .= t('Location:') . bb2diaspora($ev['location'])
 			. "\n";
+	}
 
 	$o .= "\n";
 	return $o;

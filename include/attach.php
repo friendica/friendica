@@ -1060,13 +1060,14 @@ function z_mime_content_type($filename) {
 		'zsh' => 'text/x-script.zsh',
 	);
 
-	$dot = strpos($filename,'.');
+	$dot = strpos($filename, '.');
 	if ($dot !== false) {
-		$ext = strtolower(substr($filename,$dot+1));
+		$ext = strtolower(substr($filename, $dot + 1));
 		if (array_key_exists($ext, $mime_types)) {
 			return $mime_types[$ext];
 		}
 	}
+	/// @TODO Then let's get rid of it?
 // can't use this because we're just passing a name, e.g. not a file that can be opened
 //	elseif (function_exists('finfo_open')) {
 //		$finfo = @finfo_open(FILEINFO_MIME);
