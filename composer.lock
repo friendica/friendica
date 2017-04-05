@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "49b00f1ed3192e5173bd5577a3b91ba2",
+    "content-hash": "4d3a9e742e7ad746fb7206f3b5aff5af",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -101,6 +101,224 @@
                 "php mobile detect"
             ],
             "time": "2017-03-29T13:59:30+00:00"
+        },
+        {
+            "name": "pear-pear.php.net/Archive_Tar",
+            "version": "1.4.2",
+            "dist": {
+                "type": "file",
+                "url": "https://pear.php.net/get/Archive_Tar-1.4.2.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "php": ">=5.2.0.0"
+            },
+            "replace": {
+                "pear-pear/archive_tar": "== 1.4.2.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "license": [
+                "New BSD License"
+            ],
+            "description": "This class provides handling of tar files in PHP.\nIt supports creating, listing, extracting and adding to tar files.\nGzip support is available if PHP has the zlib extension built-in or\nloaded. Bz2 compression is also supported with the bz2 extension loaded."
+        },
+        {
+            "name": "pear-pear.php.net/Console_Getopt",
+            "version": "1.4.1",
+            "dist": {
+                "type": "file",
+                "url": "https://pear.php.net/get/Console_Getopt-1.4.1.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "php": ">=5.4.0.0"
+            },
+            "replace": {
+                "pear-pear/console_getopt": "== 1.4.1.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "This is a PHP implementation of \"getopt\" supporting both\nshort and long options."
+        },
+        {
+            "name": "pear-pear.php.net/PEAR",
+            "version": "1.10.3",
+            "dist": {
+                "type": "file",
+                "url": "https://pear.php.net/get/PEAR-1.10.3.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "ext-pcre": "*",
+                "ext-xml": "*",
+                "pear-pear.php.net/archive_tar": ">=1.4.0.0",
+                "pear-pear.php.net/console_getopt": ">=1.4.1.0",
+                "pear-pear.php.net/structures_graph": ">=1.1.0.0",
+                "pear-pear.php.net/xml_util": ">=1.3.0.0",
+                "php": ">=5.4.0.0"
+            },
+            "conflict": {
+                "pear-pear.php.net/pear_frontend_gtk": "<0.4.0.0",
+                "pear-pear.php.net/pear_frontend_web": "<=0.4.0.0"
+            },
+            "replace": {
+                "pear-pear/pear": "== 1.10.3.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "license": [
+                "New BSD License"
+            ],
+            "description": "The PEAR package contains:\n * the PEAR installer, for creating, distributing\n   and installing packages\n * the PEAR_Exception PHP5 error handling mechanism\n * the PEAR_ErrorStack advanced error handling mechanism\n * the PEAR_Error error handling mechanism\n * the OS_Guess class for retrieving info about the OS\n   where PHP is running on\n * the System class for quick handling of common operations\n   with files and directories\n * the PEAR base class\n  Features in a nutshell:\n  * full support for channels\n  * pre-download dependency validation\n  * new package.xml 2.0 format allows tremendous flexibility while maintaining BC\n  * support for optional dependency groups and limited support for sub-packaging\n  * robust dependency support\n  * full dependency validation on uninstall\n  * remote install for hosts with only ftp access - no more problems with\n    restricted host installation\n  * full support for mirroring\n  * support for bundling several packages into a single tarball\n  * support for static dependencies on a url-based package\n  * support for custom file roles and installation tasks"
+        },
+        {
+            "name": "pear-pear.php.net/Structures_Graph",
+            "version": "1.1.1",
+            "dist": {
+                "type": "file",
+                "url": "https://pear.php.net/get/Structures_Graph-1.1.1.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "php": ">=5.3.0.0"
+            },
+            "replace": {
+                "pear-pear/structures_graph": "== 1.1.1.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "license": [
+                "LGPL-3.0+"
+            ],
+            "description": "Structures_Graph is a package for creating and manipulating graph datastructures. It allows building of directed\nand undirected graphs, with data and metadata stored in nodes. The library provides functions for graph traversing\nas well as for characteristic extraction from the graph topology."
+        },
+        {
+            "name": "pear-pear.php.net/Text_Highlighter",
+            "version": "0.8.0",
+            "dist": {
+                "type": "file",
+                "url": "https://pear.php.net/get/Text_Highlighter-0.8.0.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "pear-pear.php.net/console_getopt": ">=1.4.1.0",
+                "pear-pear.php.net/pear": ">=1.10.3.0",
+                "pear-pear.php.net/xml_parser": ">=1.3.7.0",
+                "php": ">=5.4.0.0"
+            },
+            "replace": {
+                "pear-pear/text_highlighter": "== 0.8.0.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "license": [
+                "PHP License"
+            ],
+            "description": "Text_Highlighter is a package for syntax highlighting.\n\nIt provides a base class provining all the functionality,\nand a descendent classes geneator class.\n\nThe main idea is to simplify creation of subclasses\nimplementing syntax highlighting for particular language.\nSubclasses do not implement any new functioanality,\nthey just provide syntax highlighting rules.\nThe rules sources are in XML format.\n\nTo create a highlighter for a language, there is no need\nto code a new class manually. Simply describe the rules\nin XML file and use Text_Highlighter_Generator to create\na new class."
+        },
+        {
+            "name": "pear-pear.php.net/XML_Parser",
+            "version": "1.3.7",
+            "dist": {
+                "type": "file",
+                "url": "https://pear.php.net/get/XML_Parser-1.3.7.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "pear-pear.php.net/pear": "*",
+                "php": ">=4.2.0.0"
+            },
+            "replace": {
+                "pear-pear/xml_parser": "== 1.3.7.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "license": [
+                "BSD License"
+            ],
+            "description": "This is an XML parser based on PHPs built-in xml extension.\nIt supports two basic modes of operation: \"func\" and \"event\".  In \"func\" mode, it will look for a function named after each element (xmltag_ELEMENT for start tags and xmltag_ELEMENT_ for end tags), and in \"event\" mode it uses a set of generic callbacks.\n\nSince version 1.2.0 there's a new XML_Parser_Simple class that makes parsing of most XML documents easier, by automatically providing a stack for the elements.\nFurthermore its now possible to split the parser from the handler object, so you do not have to extend XML_Parser anymore in order to parse a document with it."
+        },
+        {
+            "name": "pear-pear.php.net/XML_Util",
+            "version": "1.4.2",
+            "dist": {
+                "type": "file",
+                "url": "https://pear.php.net/get/XML_Util-1.4.2.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "ext-pcre": "*",
+                "php": ">=5.4.0.0"
+            },
+            "replace": {
+                "pear-pear/xml_util": "== 1.4.2.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "license": [
+                "BSD License"
+            ],
+            "description": "Selection of methods that are often needed when working with XML documents.  Functionality includes creating of attribute lists from arrays, creation of tags, validation of XML names and more."
         }
     ],
     "packages-dev": [],

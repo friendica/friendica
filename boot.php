@@ -646,11 +646,11 @@ class App {
 		startup();
 
 		set_include_path(
-				'include' . PATH_SEPARATOR
+				get_include_path() . PATH_SEPARATOR
+				. 'include' . PATH_SEPARATOR
 				. 'library' . PATH_SEPARATOR
 				. 'library/langdet' . PATH_SEPARATOR
 				. '.' );
-
 
 		$this->scheme = 'http';
 

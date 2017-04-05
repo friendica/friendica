@@ -14,8 +14,15 @@
 	},
 	"require": {
 		"ezyang/htmlpurifier": "~4.7.0",
-		"mobiledetect/mobiledetectlib": "2.8.*"
+		"mobiledetect/mobiledetectlib": "2.8.*",
+		"pear-pear.php.net/Text_Highlighter": "*"
 	},
+	"repositories": [
+        {
+            "type": "pear",
+            "url": "https://pear.php.net"
+        }
+    ],
 	"autoload": {
 		"psr-4": {
 			"Friendica\\": "src/"
