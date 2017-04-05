@@ -81,13 +81,13 @@ var FileBrowser = {
 			var destination = h.split("-")[0];
 			FileBrowser.id = h.split("-")[1];
 			FileBrowser.event = FileBrowser.event + "." + destination;
-			if (destination == "comment") {
+			if (destination === "comment") {
 				// Get the comment textimput field
 				var commentElm = document.getElementById("comment-edit-text-" + FileBrowser.id);
 			}
 		};
 
-		console.log("FileBrowser:", nickname, type,FileBrowser.event, FileBrowser.id);
+		console.log("FileBrowser: " + nickname,  type, FileBrowser.event, FileBrowser.id);
 
 		FileBrowser.postLoad();
 
@@ -110,10 +110,10 @@ var FileBrowser = {
 			e.preventDefault();
 
 			var embed = "";
-			if (FileBrowser.type == "image") {
+			if (FileBrowser.type === "image") {
 				embed = "[url=" + this.dataset.link + "][img]" + this.dataset.img + "[/img][/url]";
 			}
-			if (FileBrowser.type == "file") {
+			if (FileBrowser.type === "file") {
 				// attachment links are "baseurl/attach/id"; we need id
 				embed = "[attachment]" + this.dataset.link.split("/").pop() + "[/attachment]";
 			}
@@ -123,7 +123,7 @@ var FileBrowser = {
 			// work as expected (we need a way to wait until commentOpenUI would be finished).
 			// As for now we insert pieces of this function here
 			if ((commentElm !== null) && (typeof commentElm !== "undefined")) {
-				if (commentElm.value == "") {
+				if (commentElm.value === "") {
 					$("#comment-edit-text-" + FileBrowser.id).addClass("comment-edit-text-full").removeClass("comment-edit-text-empty");
 					$("#comment-edit-submit-wrapper-" + FileBrowser.id).show();
 					$("#comment-edit-text-" + FileBrowser.id).attr('tabindex','9');

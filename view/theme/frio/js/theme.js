@@ -208,11 +208,8 @@ $(document).ready(function(){
 
 	// Dropdown menus with the class "dropdown-head" will display the active tab
 	// as button text
-	$("body").on('click', '.dropdown-head .dropdown-menu li a', function(){
-		$(this).closest(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-		$(this).closest(".dropdown").find('.btn').val($(this).data('value'));
-		$(this).closest("ul").children("li").show();
-		$(this).parent("li").hide();
+	$("body").on('click', '.dropdown-head .dropdown-menu li a, .dropdown-head .dropdown-menu li button', function(){
+		toggleDropdownText(this);
 	});
 
 	/* setup onoff widgets */
@@ -666,4 +663,18 @@ function bin2hex (s) {
 	}
 
 	return o;
+}
+
+// Dropdown menus with the class "dropdown-head" will display the active tab
+// as button text
+function toggleDropdownText(elm) {
+		$(elm).closest(".dropdown").find('.btn').html($(elm).text() + ' <span class="caret"></span>');
+		$(elm).closest(".dropdown").find('.btn').val($(elm).data('value'));
+		$(elm).closest("ul").children("li").show();
+		$(elm).parent("li").hide();
+}
+
+// Check if element does have a specific class
+function hasClass(elem, cls) {
+	return (" " + elem.className + " " ).indexOf( " "+cls+" " ) > -1;
 }

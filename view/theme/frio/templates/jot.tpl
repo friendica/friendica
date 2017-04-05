@@ -12,48 +12,48 @@
 			<button type="button" class="close hidden-xs" data-dismiss="modal" style="float: right;">&times;</button>
 
 			{{* The Jot navigation menu for desktop user (text input, permissions, preview, filebrowser) *}}
-			<ul class="nav nav-tabs hidden-xs jot-nav" role="menubar" data-tabs="tabs">
+			<ul class="nav nav-tabs hidden-xs jot-nav" role="tablist" data-tabs="tabs">
 				{{* Mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
-				<li class="active" role="menuitem">
-					<a href="#profile-jot-wrapper" class="jot-text-lnk" id="jot-text-lnk" onclick="jotActive(); return false;">{{$message}}</a>
+				<li class="active" role="presentation">
+					<a href="#profile-jot-wrapper" class="jot-text-lnk jot-nav-lnk" id="jot-text-lnk" role="tab" aria-controls="profile-jot-wrapper" aria-selected="true">{{$message}}</a>
 				</li>
 				{{if $acl}}
-				<li role="menuitem">
-					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk" id="jot-perms-lnk" onclick="aclActive(); return false;">{{$shortpermset}}</a>
+				<li role="presentation">
+					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk jot-nav-lnk" id="jot-perms-lnk" role="tab" aria-controls="profile-jot-acl-wrapper" aria-selected="false">{{$shortpermset}}</a>
 				</li>
 				{{/if}}
 				{{if $preview}}
-				<li role="menuitem">
-					<a href="#jot-preview-content" class="jot-preview-lnk" id="jot-preview-lnk" onclick="previewActive(); return false;">{{$preview}}</a>
+				<li role="presentation">
+					<a href="#jot-preview-content" class="jot-preview-lnk jot-nav-lnk" id="jot-preview-lnk" role="tab" aria-controls="jot-preview-content" aria-selected="false">{{$preview}}</a>
 				</li>
 				{{/if}}
-				<li role="menuitem">
-					<a href="#jot-fbrowser-wrapper" class="jot-browser-lnk" id="jot-browser-link" onclick="fbrowserActive(); return false;">{{$browser}}</a>
+				<li role="presentation">
+					<a href="#jot-fbrowser-wrapper" class="jot-browser-lnk jot-nav-lnk" id="jot-browser-link" role="tab" aria-controls="jot-fbrowser-wrapper" aria-selected="false">{{$browser}}</a>
 				</li>
 			</ul>
 
 			{{* The Jot navigation menu for small displays (text input, permissions, preview, filebrowser) *}}
 			<div class="dropdown dropdown-head dropdown-mobile-jot jot-nav hidden-lg hidden-md hidden-sm" role="menubar" data-tabs="tabs" style="float: left;">
-				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{$message}}&nbsp;<span class="caret"></span></button>
-				<ul class="dropdown-menu nav nav-pills">
+				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true">{{$message}}&nbsp;<span class="caret"></span></button>
+				<ul class="dropdown-menu nav nav-pills" aria-label="submenu">
 					{{* mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
-					<li role="menuitem" style="display: none;">
-						<button class="jot-text-lnk btn-link" id="jot-text-lnk-mobile" onclick="jotActive(); return false;">{{$message}}</button>
+					<li role="presentation" style="display: none;">
+						<button class="jot-text-lnk btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-text-lnk-mobile" aria-controls="profile-jot-wrapper" role="menuitem" aria-selected="true">{{$message}}</button>
 					</li>
 					{{if $acl}}
-					<li role="menuitem">
-						<button class="jot-perms-lnk btn-link" id="jot-perms-lnk-mobile" onclick="aclActive(); return false;">{{$shortpermset}}</button>
+					<li role="presentation">
+						<button class="jot-perms-lnk btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-perms-lnk-mobile" aria-controls="profile-jot-acl-wrapper" role="menuitem" aria-selected="false">{{$shortpermset}}</button>
 					</li>
 					{{/if}}
 					{{if $preview}}
-					<li role="menuitem">
-						<button class="jot-preview-lnk btn-link" id="jot-preview-lnk-mobile" onclick="previewActive(); return false;">{{$preview}}</button>
+					<li role="presentation">
+						<button class="jot-preview-lnk btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-preview-lnk-mobile" aria-controls="jot-preview-content" role="menuitem" aria-selected="false">{{$preview}}</button>
 					</li>
 					{{/if}}
-					<li role="menuitem">
-						<button class="jot-browser-lnk-mobile btn-link" id="jot-browser-lnk-mobile" onclick="fbrowserActive(); return false;">{{$browser}}</button>
+					<li role="presentation">
+						<button class="jot-browser-lnk-mobile btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-browser-lnk-mobile" aria-controls="jot-fbrowser-wrapper" role="menuitem" aria-selected="false">{{$browser}}</button>
 					</li>
 				</ul>
 			</div>
@@ -62,7 +62,7 @@
 
 		<div id="jot-modal-body" class="modal-body">
 			<form id="profile-jot-form" action="{{$action}}" method="post">
-				<div id="profile-jot-wrapper">
+				<div id="profile-jot-wrapper" aria-labelledby="jot-text-lnk" role="tabpanel" aria-hidden="false">
 					<div>
 						<!--<div id="profile-jot-desc" class="jothidden pull-right">&nbsp;</div>-->
 					</div>
@@ -112,14 +112,14 @@
 
 				</div>
 
-				<div id="profile-jot-acl-wrapper" class="minimize">
+				<div id="profile-jot-acl-wrapper" class="minimize" aria-labelledby="jot-perms-lnk" role="tabpanel" aria-hidden="true">
 					{{$acl}}
 				</div>
 
-				<div id="jot-preview-content" class="minimize"></div>
+				<div id="jot-preview-content" class="minimize" aria-labelledby="jot-preview-lnk" role="tabpanel" aria-hidden="true"></div>
 			</form>
 
-			<div id="jot-fbrowser-wrapper" class="minimize"></div>
+			<div id="jot-fbrowser-wrapper" class="minimize" aria-labelledby="jot-browser-link" role="tabpanel" aria-hidden="true"></div>
 
 			{{if $content}}<script>initEditor();</script>{{/if}}
 		</div>

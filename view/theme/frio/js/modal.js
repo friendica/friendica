@@ -59,7 +59,7 @@ $(document).ready(function(){
 	});
 
 	// Jot nav menu.
-	$("body").on("click", "#jot-modal .jot-nav li a", function(e){
+	$("body").on("click", "#jot-modal .jot-nav li .jot-nav-lnk", function(e){
 		e.preventDefault();
 		toggleJotNav(this);
 	});
@@ -306,10 +306,37 @@ function jotreset() {
 
 // Give the active "jot-nav" list element the class "active"
 function toggleJotNav (elm) {
-	// select all li of jot-nav and remove the active class
-	$(".jot-nav li").removeClass("active");
-	// add the active class to the parent of the link which was selected
+	// Get the ID of the tab panel which should be activated
+	var tabpanel = elm.getAttribute("aria-controls");
+	var cls = hasClass(elm, "jot-nav-lnk-mobile");
+
+	// Select all li of jot-nav and remove the active class
+	$(elm).parent("li").siblings("li").removeClass("active");
+	// Add the active class to the parent of the link which was selected
 	$(elm).parent("li").addClass("active");
+
+	// Minimize all tab content wrapper and activate only the selected
+	// tab panel
+	$('#jot-modal [role=tabpanel]').addClass("minimize").attr("aria-hidden" ,"true");
+	$('#jot-modal #' + tabpanel).removeClass("minimize").attr("aria-hidden" ,"false");
+
+	// Set the aria-selected states
+	$("#jot-modal .nav-tabs .jot-nav-lnk").attr("aria-selected", "false");
+	elm.setAttribute("aria-selected", "true");
+
+	// For some some tab panels we need to execute other js functions
+	if (tabpanel === "jot-preview-content") {
+		preview_post();
+	} else if (tabpanel === "jot-fbrowser-wrapper") {
+		$(function() {
+			Dialog.showJot();
+		});
+	}
+
+	// If element is a mobile dropdown nav menu we need to change the botton text
+	if (cls) {
+		toggleDropdownText(elm);
+	}
 }
 
 // Wall Message needs a special handling because in some cases
