@@ -8,39 +8,36 @@
 
 use \Friendica\Core\Config;
 
-	require_once('include/HTTPExceptions.php');
+require_once 'include/HTTPExceptions.php';
+require_once 'include/bbcode.php';
+require_once 'include/datetime.php';
+require_once 'include/conversation.php';
+require_once 'include/oauth.php';
+require_once 'include/html2plain.php';
+require_once 'mod/share.php';
+require_once 'include/Photo.php';
+require_once 'mod/item.php';
+require_once 'include/security.php';
+require_once 'include/contact_selectors.php';
+require_once 'include/html2bbcode.php';
+require_once 'mod/wall_upload.php';
+require_once 'mod/proxy.php';
+require_once 'include/message.php';
+require_once 'include/group.php';
+require_once 'include/like.php';
+require_once 'include/NotificationsManager.php';
+require_once 'include/plaintext.php';
+require_once 'include/xml.php';
 
-	require_once('include/bbcode.php');
-	require_once('include/datetime.php');
-	require_once('include/conversation.php');
-	require_once('include/oauth.php');
-	require_once('include/html2plain.php');
-	require_once('mod/share.php');
-	require_once('include/Photo.php');
-	require_once('mod/item.php');
-	require_once('include/security.php');
-	require_once('include/contact_selectors.php');
-	require_once('include/html2bbcode.php');
-	require_once('mod/wall_upload.php');
-	require_once('mod/proxy.php');
-	require_once('include/message.php');
-	require_once('include/group.php');
-	require_once('include/like.php');
-	require_once('include/NotificationsManager.php');
-	require_once('include/plaintext.php');
-	require_once('include/xml.php');
+define('API_METHOD_ANY', '*');
+define('API_METHOD_GET', 'GET');
+define('API_METHOD_POST', 'POST,PUT');
+define('API_METHOD_DELETE', 'POST,DELETE');
 
+$API = array();
+$called_api = null;
 
-	define('API_METHOD_ANY','*');
-	define('API_METHOD_GET','GET');
-	define('API_METHOD_POST','POST,PUT');
-	define('API_METHOD_DELETE','POST,DELETE');
-
-
-
-	$API = Array();
-	$called_api = Null;
-
+/// @TODO Fix intending
 	/**
 	 * @brief Auth API user
 	 *
@@ -49,8 +46,9 @@ use \Friendica\Core\Config;
 	 * into a page, and visitors will post something without noticing it).
 	 */
 	function api_user() {
-		if ($_SESSION['allow_api'])
+		if (x($_SESSION, 'allow_api')) {
 			return local_user();
+		}
 
 		return false;
 	}
@@ -67,16 +65,18 @@ use \Friendica\Core\Config;
 	 * 		Client source name, default to "api" if unset/unknown
 	 */
 	function api_source() {
-		if (requestdata('source'))
-			return (requestdata('source'));
+		if (requestdata('source')) {
+			return requestdata('source');
+		}
 
 		// Support for known clients that doesn't send a source name
-		if (strstr($_SERVER['HTTP_USER_AGENT'], "Twidere"))
-			return ("Twidere");
+		if (strpos($_SERVER['HTTP_USER_AGENT'], "Twidere") !== false) {
+			return "Twidere";
+		}
 
 		logger("Unrecognized user-agent ".$_SERVER['HTTP_USER_AGENT'], LOGGER_DEBUG);
 
-		return ("api");
+		return "api";
 	}
 
 	/**
@@ -85,8 +85,8 @@ use \Friendica\Core\Config;
 	 * @param string $str Source date, as UTC
 	 * @return string Date in UTC formatted as "D M d H:i:s +0000 Y"
 	 */
-	function api_date($str){
-		//Wed May 23 06:01:13 +0000 2007
+	function api_date($str) {
+		// Wed May 23 06:01:13 +0000 2007
 		return datetime_convert('UTC', 'UTC', $str, "D M d H:i:s +0000 Y" );
 	}
 
@@ -98,25 +98,27 @@ use \Friendica\Core\Config;
 	 * @param string $path API URL path, relative to App::get_baseurl()
 	 * @param string $func Function name to call on path request
 	 * @param bool $auth API need logged user
-	 * @param string $method
-	 * 	HTTP method reqiured to call this endpoint.
-	 * 	One of API_METHOD_ANY, API_METHOD_GET, API_METHOD_POST.
-	 *  Default to API_METHOD_ANY
+	 * @param string $method HTTP method reqiured to call this endpoint.
+	 *
+	 * One of API_METHOD_ANY, API_METHOD_GET, API_METHOD_POST.
+	 * Default to API_METHOD_ANY
 	 */
-	function api_register_func($path, $func, $auth=false, $method=API_METHOD_ANY){
+	function api_register_func($path, $func, $auth = false, $method = API_METHOD_ANY) {
 		global $API;
+
 		$API[$path] = array(
-			'func'=>$func,
-			'auth'=>$auth,
-			'method'=> $method
+			'func'   => $func,
+			'auth'   => $auth,
+			'method' => $method,
 		);
 
 		// Workaround for hotot
 		$path = str_replace("api/", "api/1.1/", $path);
+
 		$API[$path] = array(
-			'func'=>$func,
-			'auth'=>$auth,
-			'method'=> $method
+			'func'   => $func,
+			'auth'   => $auth,
+			'method' => $method,
 		);
 	}
 
@@ -136,26 +138,28 @@ use \Friendica\Core\Config;
 	 * @hook 'logged_in'
 	 * 		array $user	logged user record
 	 */
-	function api_login(App $a){
+	function api_login(App $a) {
 		// login with oauth
-		try{
+		try {
 			$oauth = new FKOAuth1();
 			list($consumer,$token) = $oauth->verify_request(OAuthRequest::from_request());
-			if (!is_null($token)){
+			if (!is_null($token)) {
 				$oauth->loginUser($token->uid);
 				call_hooks('logged_in', $a->user);
 				return;
 			}
-			echo __file__.__line__.__function__."<pre>"; var_dump($consumer, $token); die();
-		}catch(Exception $e){
+			echo __FILE__.__LINE__.__FUNCTION__ . "<pre>";
+			var_dump($consumer, $token);
+			die();
+		} catch (Exception $e) {
 			logger($e);
 		}
 
 
 
 		// workaround for HTTP-auth in CGI mode
-		if (x($_SERVER,'REDIRECT_REMOTE_USER')) {
-			$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"],6)) ;
+		if (x($_SERVER, 'REDIRECT_REMOTE_USER')) {
+			$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"], 6)) ;
 			if (strlen($userpass)) {
 				list($name, $password) = explode(':', $userpass);
 				$_SERVER['PHP_AUTH_USER'] = $name;
@@ -171,55 +175,51 @@ use \Friendica\Core\Config;
 
 		$user = $_SERVER['PHP_AUTH_USER'];
 		$password = $_SERVER['PHP_AUTH_PW'];
-		$encrypted = hash('whirlpool',trim($password));
+		$encrypted = hash('whirlpool', trim($password));
 
 		// allow "user@server" login (but ignore 'server' part)
-		$at=strstr($user, "@", true);
-		if ( $at ) $user=$at;
+		$at = strstr($user, "@", true);
+		if ($at) {
+			$user = $at;
+		}
 
-		/**
-		 *  next code from mod/auth.php. needs better solution
-		 */
+		// next code from mod/auth.php. needs better solution
 		$record = null;
 
 		$addon_auth = array(
 			'username' => trim($user),
 			'password' => trim($password),
 			'authenticated' => 0,
-			'user_record' => null
+			'user_record' => null,
 		);
 
-		/**
-		 *
+		/*
 		 * A plugin indicates successful login by setting 'authenticated' to non-zero value and returning a user record
 		 * Plugins should never set 'authenticated' except to indicate success - as hooks may be chained
 		 * and later plugins should not interfere with an earlier one that succeeded.
-		 *
 		 */
-
 		call_hooks('authenticate', $addon_auth);
 
 		if (($addon_auth['authenticated']) && (count($addon_auth['user_record']))) {
 			$record = $addon_auth['user_record'];
-		}
-		else {
+		} else {
 			// process normal login request
-
 			$r = q("SELECT * FROM `user` WHERE (`email` = '%s' OR `nickname` = '%s')
 				AND `password` = '%s' AND NOT `blocked` AND NOT `account_expired` AND NOT `account_removed` AND `verified` LIMIT 1",
 				dbesc(trim($user)),
 				dbesc(trim($user)),
 				dbesc($encrypted)
 			);
-			if (dbm::is_result($r))
+			if (dbm::is_result($r)) {
 				$record = $r[0];
+			}
 		}
 
 		if ((! $record) || (! count($record))) {
-			logger('API_login failure: ' . print_r($_SERVER,true), LOGGER_DEBUG);
+			logger('API_login failure: ' . print_r($_SERVER, true), LOGGER_DEBUG);
 			header('WWW-Authenticate: Basic realm="Friendica"');
-			#header('HTTP/1.0 401 Unauthorized');
-			#die('This api requires login');
+			//header('HTTP/1.0 401 Unauthorized');
+			//die('This api requires login');
 			throw new UnauthorizedException("This API requires login");
 		}
 
@@ -242,8 +242,10 @@ use \Friendica\Core\Config;
 	 * @return bool
 	 */
 	 function api_check_method($method) {
-		if ($method=="*") return True;
-		return strpos($method, $_SERVER['REQUEST_METHOD']) !== false;
+		if ($method == "*") {
+			return true;
+		}
+		return (strpos($method, $_SERVER['REQUEST_METHOD']) !== false);
 	 }
 
 	/**
@@ -254,39 +256,49 @@ use \Friendica\Core\Config;
 	 * @param App $a
 	 * @return string API call result
 	 */
-	function api_call(App $a){
+	function api_call(App $a) {
 		global $API, $called_api;
 
-		$type="json";
-		if (strpos($a->query_string, ".xml")>0) $type="xml";
-		if (strpos($a->query_string, ".json")>0) $type="json";
-		if (strpos($a->query_string, ".rss")>0) $type="rss";
-		if (strpos($a->query_string, ".atom")>0) $type="atom";
+		$type = "json";
+		if (strpos($a->query_string, ".xml") > 0) {
+			$type = "xml";
+		}
+		if (strpos($a->query_string, ".json") > 0) {
+			$type = "json";
+		}
+		if (strpos($a->query_string, ".rss") > 0) {
+			$type = "rss";
+		}
+		if (strpos($a->query_string, ".atom") > 0) {
+			$type = "atom";
+		}
+
 		try {
-			foreach ($API as $p=>$info){
-				if (strpos($a->query_string, $p)===0){
-					if (!api_check_method($info['method'])){
+			foreach ($API as $p => $info) {
+				if (strpos($a->query_string, $p) === 0) {
+					if (!api_check_method($info['method'])) {
 						throw new MethodNotAllowedException();
 					}
 
-					$called_api= explode("/",$p);
+					$called_api = explode("/", $p);
 					//unset($_SERVER['PHP_AUTH_USER']);
-					if ($info['auth']===true && api_user()===false) {
-							api_login($a);
+					if ($info['auth'] === true && api_user() === false) {
+						api_login($a);
 					}
 
 					logger('API call for ' . $a->user['username'] . ': ' . $a->query_string);
-					logger('API parameters: ' . print_r($_REQUEST,true));
+					logger('API parameters: ' . print_r($_REQUEST, true));
 
 					$stamp =  microtime(true);
 					$r = call_user_func($info['func'], $type);
-					$duration = (float)(microtime(true)-$stamp);
-					logger("API call duration: ".round($duration, 2)."\t".$a->query_string, LOGGER_DEBUG);
+					$duration = (float) (microtime(true) - $stamp);
+					logger("API call duration: " . round($duration, 2) . "\t" . $a->query_string, LOGGER_DEBUG);
 
 					if (get_config("system", "profiler")) {
 						$duration = microtime(true)-$a->performance["start"];
 
-						logger(parse_url($a->query_string, PHP_URL_PATH).": ".sprintf("Database: %s/%s, Network: %s, I/O: %s, Other: %s, Total: %s",
+						/// @TODO round() really everywhere?
+						logger(parse_url($a->query_string, PHP_URL_PATH) . ": " . sprintf("Database: %s/%s, Network: %s, I/O: %s, Other: %s, Total: %s",
 							round($a->performance["database"] - $a->performance["database_write"], 3),
 							round($a->performance["database_write"], 3),
 							round($a->performance["network"], 2),
@@ -294,40 +306,45 @@ use \Friendica\Core\Config;
 							round($duration - ($a->performance["database"] + $a->performance["network"]
 								+ $a->performance["file"]), 2),
 							round($duration, 2)),
-							LOGGER_DEBUG);
+							LOGGER_DEBUG
+						);
 
 						if (get_config("rendertime", "callstack")) {
 							$o = "Database Read:\n";
 							foreach ($a->callstack["database"] AS $func => $time) {
 								$time = round($time, 3);
-								if ($time > 0)
-									$o .= $func.": ".$time."\n";
+								if ($time > 0) {
+									$o .= $func . ": " . $time . "\n";
+								}
 							}
 							$o .= "\nDatabase Write:\n";
 							foreach ($a->callstack["database_write"] AS $func => $time) {
 								$time = round($time, 3);
-								if ($time > 0)
-									$o .= $func.": ".$time."\n";
+								if ($time > 0) {
+									$o .= $func . ": " . $time . "\n";
+								}
 							}
 
 							$o .= "\nNetwork:\n";
 							foreach ($a->callstack["network"] AS $func => $time) {
 								$time = round($time, 3);
-								if ($time > 0)
-									$o .= $func.": ".$time."\n";
+								if ($time > 0) {
+									$o .= $func . ": " . $time . "\n";
+								}
 							}
 							logger($o, LOGGER_DEBUG);
 						}
 					}
 
-
-					if ($r===false) {
-						// api function returned false withour throw an
-						// exception. This should not happend, throw a 500
+					if (false === $r) {
+						/*
+						 * api function returned false withour throw an
+						 * exception. This should not happend, throw a 500
+						 */
 						throw new InternalServerErrorException();
 					}
 
-					switch($type){
+					switch ($type) {
 						case "xml":
 							header ("Content-Type: text/xml");
 							return $r;
@@ -336,23 +353,24 @@ use \Friendica\Core\Config;
 							header ("Content-Type: application/json");
 							foreach ($r as $rr)
 								$json = json_encode($rr);
-								if ($_GET['callback'])
-									$json = $_GET['callback']."(".$json.")";
+								if ($_GET['callback']) {
+									$json = $_GET['callback'] . "(" . $json . ")";
+								}
 								return $json;
 							break;
 						case "rss":
 							header ("Content-Type: application/rss+xml");
-							return '<?xml version="1.0" encoding="UTF-8"?>'."\n".$r;
+							return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . $r;
 							break;
 						case "atom":
 							header ("Content-Type: application/atom+xml");
-							return '<?xml version="1.0" encoding="UTF-8"?>'."\n".$r;
+							return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . $r;
 							break;
-
 					}
 				}
 			}
-			logger('API call not implemented: '.$a->query_string);
+
+			logger('API call not implemented: ' . $a->query_string);
 			throw new NotImplementedException();
 		} catch (HTTPException $e) {
 			header("HTTP/1.1 {$e->httpcode} {$e->httpdesc}");
@@ -371,16 +389,16 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		$error = ($e->getMessage()!==""?$e->getMessage():$e->httpdesc);
-		# TODO:  https://dev.twitter.com/overview/api/response-codes
+		$error = ($e->getMessage() !== "" ? $e->getMessage() : $e->httpdesc);
+		/// @TODO:  https://dev.twitter.com/overview/api/response-codes
 
 		$error = array("error" => $error,
-				"code" => $e->httpcode." ".$e->httpdesc,
+				"code" => $e->httpcode . " " . $e->httpdesc,
 				"request" => $a->query_string);
 
 		$ret = api_format_data('status', $type, array('status' => $error));
 
-		switch($type){
+		switch ($type) {
 			case "xml":
 				header ("Content-Type: text/xml");
 				return $ret;
@@ -407,18 +425,22 @@ use \Friendica\Core\Config;
 	 * @param array $arr Array to be passed to template
 	 * @param array $user_info
 	 * @return array
+	 * @todo find proper type-hints
 	 */
-	function api_rss_extra(App $a, $arr, $user_info){
-		if (is_null($user_info)) $user_info = api_get_user($a);
+	function api_rss_extra(App $a, $arr, $user_info) {
+		if (is_null($user_info)) {
+			$user_info = api_get_user($a);
+		}
+
 		$arr['$user'] = $user_info;
 		$arr['$rss'] = array(
 			'alternate'    => $user_info['url'],
-			'self'         => App::get_baseurl(). "/". $a->query_string,
+			'self'         => App::get_baseurl() . "/" . $a->query_string,
 			'base'         => App::get_baseurl(),
 			'updated'      => api_date(null),
-			'atom_updated' => datetime_convert('UTC','UTC','now',ATOM_TIME),
+			'atom_updated' => datetime_convert('UTC', 'UTC', 'now', ATOM_TIME),
 			'language'     => $user_info['language'],
-			'logo'         => App::get_baseurl()."/images/friendica-32.png",
+			'logo'         => App::get_baseurl() . "/images/friendica-32.png",
 		);
 
 		return $arr;
@@ -432,13 +454,11 @@ use \Friendica\Core\Config;
 	 * @return bool|string
 	 * 		Contact url or False if contact id is unknown
 	 */
-	function api_unique_id_to_url($id){
+	function api_unique_id_to_url($id) {
 		$r = q("SELECT `url` FROM `contact` WHERE `uid` = 0 AND `id` = %d LIMIT 1",
 			intval($id));
-		if ($r)
-			return ($r[0]["url"]);
-		else
-			return false;
+
+		return (dbm::is_result($r) && $r[0]["url"]);
 	}
 
 	/**
@@ -448,8 +468,9 @@ use \Friendica\Core\Config;
 	 * @param int|string $contact_id Contact ID or URL
 	 * @param string $type Return type (for errors)
 	 */
-	function api_get_user(App $a, $contact_id = Null, $type = "json"){
+	function api_get_user(App $a, $contact_id = null, $type = "json") {
 		global $called_api;
+
 		$user = null;
 		$extra_query = "";
 		$url = "";
@@ -458,68 +479,83 @@ use \Friendica\Core\Config;
 		logger("api_get_user: Fetching user data for user ".$contact_id, LOGGER_DEBUG);
 
 		// Searching for contact URL
-		if (!is_null($contact_id) AND (intval($contact_id) == 0)){
+		if (!is_null($contact_id) AND (intval($contact_id) == 0)) {
 			$user = dbesc(normalise_link($contact_id));
 			$url = $user;
 			$extra_query = "AND `contact`.`nurl` = '%s' ";
-			if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
+			if (api_user() !== false) {
+				$extra_query .= "AND `contact`.`uid`=" . intval(api_user());
+			}
 		}
 
 		// Searching for contact id with uid = 0
-		if (!is_null($contact_id) AND (intval($contact_id) != 0)){
+		if (!is_null($contact_id) AND (intval($contact_id) != 0)) {
 			$user = dbesc(api_unique_id_to_url($contact_id));
 
-			if ($user == "")
+			if ($user == "") {
 				throw new BadRequestException("User not found.");
+			}
 
 			$url = $user;
 			$extra_query = "AND `contact`.`nurl` = '%s' ";
-			if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
+			if (api_user() !== false) {
+				$extra_query .= "AND `contact`.`uid`=" . intval(api_user());
+			}
 		}
 
 		if (is_null($user) && x($_GET, 'user_id')) {
 			$user = dbesc(api_unique_id_to_url($_GET['user_id']));
 
-			if ($user == "")
+			if ($user == "") {
 				throw new BadRequestException("User not found.");
+			}
 
 			$url = $user;
 			$extra_query = "AND `contact`.`nurl` = '%s' ";
-			if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
+			if (api_user() !== false) {
+				$extra_query .= "AND `contact`.`uid`=" . intval(api_user());
+			}
 		}
 		if (is_null($user) && x($_GET, 'screen_name')) {
 			$user = dbesc($_GET['screen_name']);
 			$nick = $user;
 			$extra_query = "AND `contact`.`nick` = '%s' ";
-			if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
+			if (api_user() !== false) {
+				$extra_query .= "AND `contact`.`uid`=".intval(api_user());
+			}
 		}
 
-		if (is_null($user) AND ($a->argc > (count($called_api)-1)) AND (count($called_api) > 0)){
+		if (is_null($user) AND ($a->argc > (count($called_api) - 1)) AND (count($called_api) > 0)) {
 			$argid = count($called_api);
-			list($user, $null) = explode(".",$a->argv[$argid]);
-			if (is_numeric($user)){
+			list($user, $null) = explode(".", $a->argv[$argid]);
+			if (is_numeric($user)) {
 				$user = dbesc(api_unique_id_to_url($user));
 
-				if ($user == "")
+				if ($user == "") {
 					return false;
+				}
 
 				$url = $user;
 				$extra_query = "AND `contact`.`nurl` = '%s' ";
-				if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
+				if (api_user() !== false) {
+					$extra_query .= "AND `contact`.`uid`=" . intval(api_user());
+				}
 			} else {
 				$user = dbesc($user);
 				$nick = $user;
 				$extra_query = "AND `contact`.`nick` = '%s' ";
-				if (api_user()!==false)  $extra_query .= "AND `contact`.`uid`=".intval(api_user());
+				if (api_user() !== false) {
+					$extra_query .= "AND `contact`.`uid`=" . intval(api_user());
+				}
 			}
 		}
 
 		logger("api_get_user: user ".$user, LOGGER_DEBUG);
 
 		if (!$user) {
-			if (api_user()===false) {
+			if (api_user() === false) {
 				api_login($a);
-				return False;
+				return false;
 			} else {
 				$user = $_SESSION['uid'];
 				$extra_query = "AND `contact`.`uid` = %d AND `contact`.`self` ";
@@ -528,8 +564,9 @@ use \Friendica\Core\Config;
 		}
 
 		logger('api_user: ' . $extra_query . ', user: ' . $user);
+
 		// user info
-		$uinfo = q("SELECT *, `contact`.`id` as `cid` FROM `contact`
+		$uinfo = q("SELECT *, `contact`.`id` AS `cid` FROM `contact`
 				WHERE 1
 				$extra_query",
 				$user
@@ -539,18 +576,20 @@ use \Friendica\Core\Config;
 		api_best_nickname($uinfo);
 
 		// if the contact wasn't found, fetch it from the contacts with uid = 0
-		if (count($uinfo)==0) {
+		if (!dbm::is_result($uinfo)) {
 			$r = array();
 
-			if ($url != "")
+			if ($url != "") {
 				$r = q("SELECT * FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s' LIMIT 1", dbesc(normalise_link($url)));
+			}
 
-			if ($r) {
+			if (dbm::is_result($r)) {
 				$network_name = network_to_name($r[0]['network'], $r[0]['url']);
 
 				// If no nick where given, extract it from the address
-				if (($r[0]['nick'] == "") OR ($r[0]['name'] == $r[0]['nick']))
+				if (($r[0]['nick'] == "") OR ($r[0]['name'] == $r[0]['nick'])) {
 					$r[0]['nick'] = api_get_nick($r[0]["url"]);
+				}
 
 				$ret = array(
 					'id' => $r[0]["id"],
@@ -596,16 +635,18 @@ use \Friendica\Core\Config;
 
 		if ($uinfo[0]['self']) {
 
-			if ($uinfo[0]['network'] == "")
+			if ($uinfo[0]['network'] == "") {
 				$uinfo[0]['network'] = NETWORK_DFRN;
+			}
 
-			$usr = q("select * from user where uid = %d limit 1",
+			$usr = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 				intval(api_user())
 			);
-			$profile = q("select * from profile where uid = %d and `is-default` = 1 limit 1",
+			$profile = q("SELECT * FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
 				intval(api_user())
 			);
 
+			/// @TODO old-lost code? (twice)
 			// Counting is deactivated by now, due to performance issues
 			// count public wall messages
 			//$r = q("SELECT COUNT(*) as `count` FROM `item` WHERE `uid` = %d AND `wall`",
@@ -622,6 +663,8 @@ use \Friendica\Core\Config;
 			//$countitms = $r[0]['count'];
 			$countitms = 0;
 		}
+
+		/// @TODO old-lost code? (twice)
 /*
 		// Counting is deactivated by now, due to performance issues
 		// count friends
@@ -668,7 +711,7 @@ use \Friendica\Core\Config;
 
 		$pcontact_id  = get_contact($uinfo[0]['url'], 0, true);
 
-		$ret = Array(
+		$ret = array(
 			'id' => intval($pcontact_id),
 			'id_str' => (string) intval($pcontact_id),
 			'name' => (($uinfo[0]['name']) ? $uinfo[0]['name'] : $uinfo[0]['nick']),
@@ -697,6 +740,7 @@ use \Friendica\Core\Config;
 			'follow_request_sent' => false,
 			'statusnet_blocking' => false,
 			'notifications' => false,
+			/// @TODO old way?
 			//'statusnet_profile_url' => App::get_baseurl()."/contacts/".$uinfo[0]['cid'],
 			'statusnet_profile_url' => $uinfo[0]['url'],
 			'uid' => intval($uinfo[0]['uid']),
@@ -745,11 +789,13 @@ use \Friendica\Core\Config;
 
 		foreach ($array as $k => $v) {
 			if (is_array($v)) {
-				if ($callback($v, $k))
+				if ($callback($v, $k)) {
 					$new_array[$k] = api_walk_recursive($v, $callback);
+				}
 			} else {
-				if ($callback($v, $k))
+				if ($callback($v, $k)) {
 					$new_array[$k] = $v;
+				}
 			}
 		}
 		$array = $new_array;
@@ -766,13 +812,16 @@ use \Friendica\Core\Config;
 	 * @return boolean Should the array item be deleted?
 	 */
 	function api_reformat_xml(&$item, &$key) {
-		if (is_bool($item))
+		if (is_bool($item)) {
 			$item = ($item ? "true" : "false");
+		}
 
-		if (substr($key, 0, 10) == "statusnet_")
+		if (substr($key, 0, 10) == "statusnet_") {
 			$key = "statusnet:".substr($key, 10);
-		elseif (substr($key, 0, 10) == "friendica_")
+		} elseif (substr($key, 0, 10) == "friendica_") {
 			$key = "friendica:".substr($key, 10);
+		}
+		/// @TODO old-lost code?
 		//else
 		//	$key = "default:".$key;
 
@@ -798,18 +847,21 @@ use \Friendica\Core\Config;
 					"georss" => "http://www.georss.org/georss");
 
 		/// @todo Auto detection of needed namespaces
-		if (in_array($root_element, array("ok", "hash", "config", "version", "ids", "notes", "photos")))
+		if (in_array($root_element, array("ok", "hash", "config", "version", "ids", "notes", "photos"))) {
 			$namespaces = array();
+		}
 
-		if (is_array($data2))
+		if (is_array($data2)) {
 			api_walk_recursive($data2, "api_reformat_xml");
+		}
 
 		if ($key == "0") {
 			$data4 = array();
 			$i = 1;
 
-			foreach ($data2 AS $item)
+			foreach ($data2 AS $item) {
 				$data4[$i++.":".$childname] = $item;
+			}
 
 			$data2 = $data4;
 		}
@@ -829,11 +881,11 @@ use \Friendica\Core\Config;
 	 *
 	 * @return (string|object) XML data or JSON data
 	 */
-	function api_format_data($root_element, $type, $data){
+	function api_format_data($root_element, $type, $data) {
 
 		$a = get_app();
 
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 			case "xml":
@@ -856,11 +908,13 @@ use \Friendica\Core\Config;
 	 * returns a 401 status code and an error message if not.
 	 * http://developer.twitter.com/doc/get/account/verify_credentials
 	 */
-	function api_account_verify_credentials($type){
+	function api_account_verify_credentials($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		unset($_REQUEST["user_id"]);
 		unset($_GET["user_id"]);
@@ -868,7 +922,7 @@ use \Friendica\Core\Config;
 		unset($_REQUEST["screen_name"]);
 		unset($_GET["screen_name"]);
 
-		$skip_status = (x($_REQUEST,'skip_status')?$_REQUEST['skip_status']:false);
+		$skip_status = (x($_REQUEST, 'skip_status')?$_REQUEST['skip_status'] : false);
 
 		$user_info = api_get_user($a);
 
@@ -878,10 +932,11 @@ use \Friendica\Core\Config;
 		// - Adding last status
 		if (!$skip_status) {
 			$user_info["status"] = api_status_show("raw");
-			if (!count($user_info["status"]))
+			if (!count($user_info["status"])) {
 				unset($user_info["status"]);
-			else
+			} else {
 				unset($user_info["status"]["user"]);
+			}
 		}
 
 		// "uid" and "self" are only needed for some internal stuff, so remove it from here
@@ -891,17 +946,18 @@ use \Friendica\Core\Config;
 		return api_format_data("user", $type, array('user' => $user_info));
 
 	}
-	api_register_func('api/account/verify_credentials','api_account_verify_credentials', true);
 
+	/// @TODO move to top of file or somwhere better
+	api_register_func('api/account/verify_credentials','api_account_verify_credentials', true);
 
 	/**
 	 * get data from $_POST or $_GET
 	 */
-	function requestdata($k){
-		if (isset($_POST[$k])){
+	function requestdata($k) {
+		if (isset($_POST[$k])) {
 			return $_POST[$k];
 		}
-		if (isset($_GET[$k])){
+		if (isset($_GET[$k])) {
 			return $_GET[$k];
 		}
 		return null;
@@ -912,7 +968,7 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) {
+		if (api_user() === false) {
 			logger('api_statuses_update: no user');
 			throw new ForbiddenException();
 		}
@@ -922,6 +978,7 @@ use \Friendica\Core\Config;
 		$_REQUEST['profile_uid'] = api_user();
 		$_REQUEST['api_source'] = true;
 		$txt = requestdata('status');
+		/// @TODO old-lost code?
 		//$txt = urldecode(requestdata('status'));
 
 		if ((strpos($txt,'<') !== false) || (strpos($txt,'>') !== false)) {
@@ -936,25 +993,26 @@ use \Friendica\Core\Config;
 
 		$a->argv[1]=$user_info['screen_name']; //should be set to username?
 
-		$_REQUEST['hush']='yeah'; //tell wall_upload function to return img info instead of echo
+		// tell wall_upload function to return img info instead of echo
+		$_REQUEST['hush'] = 'yeah';
 		$bebop = wall_upload_post($a);
 
-		//now that we have the img url in bbcode we can add it to the status and insert the wall item.
-		$_REQUEST['body']=$txt."\n\n".$bebop;
+		// now that we have the img url in bbcode we can add it to the status and insert the wall item.
+		$_REQUEST['body'] = $txt . "\n\n" . $bebop;
 		item_post($a);
 
 		// this should output the last post (the one we just posted).
 		return api_status_show($type);
 	}
-	api_register_func('api/statuses/mediap','api_statuses_mediap', true, API_METHOD_POST);
-/*Waitman Gobble Mod*/
 
+	/// @TODO move this to top of file or somewhere better!
+	api_register_func('api/statuses/mediap','api_statuses_mediap', true, API_METHOD_POST);
 
 	function api_statuses_update($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) {
+		if (api_user() === false) {
 			logger('api_statuses_update: no user');
 			throw new ForbiddenException();
 		}
@@ -967,7 +1025,7 @@ use \Friendica\Core\Config;
 
 		if (requestdata('htmlstatus')) {
 			$txt = requestdata('htmlstatus');
-			if ((strpos($txt,'<') !== false) || (strpos($txt,'>') !== false)) {
+			if ((strpos($txt, '<') !== false) || (strpos($txt, '>') !== false)) {
 				$txt = html2bb_video($txt);
 
 				$config = HTMLPurifier_Config::createDefault();
@@ -979,29 +1037,33 @@ use \Friendica\Core\Config;
 				$_REQUEST['body'] = html2bbcode($txt);
 			}
 
-		} else
+		} else {
 			$_REQUEST['body'] = requestdata('status');
+		}
 
 		$_REQUEST['title'] = requestdata('title');
 
 		$parent = requestdata('in_reply_to_status_id');
 
 		// Twidere sends "-1" if it is no reply ...
-		if ($parent == -1)
+		if ($parent == -1) {
 			$parent = "";
+		}
 
-		if (ctype_digit($parent))
+		if (ctype_digit($parent)) {
 			$_REQUEST['parent'] = $parent;
-		else
+		} else {
 			$_REQUEST['parent_uri'] = $parent;
+		}
 
-		if (requestdata('lat') && requestdata('long'))
-			$_REQUEST['coord'] = sprintf("%s %s",requestdata('lat'),requestdata('long'));
+		if (requestdata('lat') && requestdata('long')) {
+			$_REQUEST['coord'] = sprintf("%s %s", requestdata('lat'), requestdata('long'));
+		}
 		$_REQUEST['profile_uid'] = api_user();
 
-		if ($parent)
+		if ($parent) {
 			$_REQUEST['type'] = 'net-comment';
-		else {
+		} else {
 			// Check for throttling (maximum posts per day, week and month)
 			$throttle_day = get_config('system','throttle_limit_day');
 			if ($throttle_day > 0) {
@@ -1011,14 +1073,15 @@ use \Friendica\Core\Config;
 					AND `created` > '%s' AND `id` = `parent`",
 					intval(api_user()), dbesc($datefrom));
 
-				if ($r)
+				if (dbm::is_result($r)) {
 					$posts_day = $r[0]["posts_day"];
-				else
+				} else {
 					$posts_day = 0;
+				}
 
 				if ($posts_day > $throttle_day) {
 					logger('Daily posting limit reached for user '.api_user(), LOGGER_DEBUG);
-					#die(api_error($type, sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day)));
+					// die(api_error($type, sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day)));
 					throw new TooManyRequestsException(sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day));
 				}
 			}
@@ -1031,16 +1094,16 @@ use \Friendica\Core\Config;
 					AND `created` > '%s' AND `id` = `parent`",
 					intval(api_user()), dbesc($datefrom));
 
-				if ($r)
+				if (dbm::is_result($r)) {
 					$posts_week = $r[0]["posts_week"];
-				else
+				} else {
 					$posts_week = 0;
+				}
 
 				if ($posts_week > $throttle_week) {
 					logger('Weekly posting limit reached for user '.api_user(), LOGGER_DEBUG);
-					#die(api_error($type, sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week)));
+					// die(api_error($type, sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week)));
 					throw new TooManyRequestsException(sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week));
-
 				}
 			}
 
@@ -1052,14 +1115,15 @@ use \Friendica\Core\Config;
 					AND `created` > '%s' AND `id` = `parent`",
 					intval(api_user()), dbesc($datefrom));
 
-				if ($r)
+				if (dbm::is_result($r)) {
 					$posts_month = $r[0]["posts_month"];
-				else
+				} else {
 					$posts_month = 0;
+				}
 
 				if ($posts_month > $throttle_month) {
 					logger('Monthly posting limit reached for user '.api_user(), LOGGER_DEBUG);
-					#die(api_error($type, sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month)));
+					// die(api_error($type, sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month)));
 					throw new TooManyRequestsException(sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month));
 				}
 			}
@@ -1067,23 +1131,24 @@ use \Friendica\Core\Config;
 			$_REQUEST['type'] = 'wall';
 		}
 
-		if (x($_FILES,'media')) {
+		if (x($_FILES, 'media')) {
 			// upload the image if we have one
-			$_REQUEST['hush']='yeah'; //tell wall_upload function to return img info instead of echo
+			$_REQUEST['hush'] = 'yeah'; //tell wall_upload function to return img info instead of echo
 			$media = wall_upload_post($a);
-			if (strlen($media)>0)
-				$_REQUEST['body'] .= "\n\n".$media;
+			if (strlen($media) > 0) {
+				$_REQUEST['body'] .= "\n\n" . $media;
+			}
 		}
 
 		// To-Do: Multiple IDs
 		if (requestdata('media_ids')) {
 			$r = q("SELECT `resource-id`, `scale`, `nickname`, `type` FROM `photo` INNER JOIN `user` ON `user`.`uid` = `photo`.`uid` WHERE `resource-id` IN (SELECT `resource-id` FROM `photo` WHERE `id` = %d) AND `scale` > 0 AND `photo`.`uid` = %d ORDER BY `photo`.`width` DESC LIMIT 1",
 				intval(requestdata('media_ids')), api_user());
-			if ($r) {
+			if (dbm::is_result($r)) {
 				$phototypes = Photo::supportedTypes();
 				$ext = $phototypes[$r[0]['type']];
-				$_REQUEST['body'] .= "\n\n".'[url='.App::get_baseurl().'/photos/'.$r[0]['nickname'].'/image/'.$r[0]['resource-id'].']';
-				$_REQUEST['body'] .= '[img]'.App::get_baseurl()."/photo/".$r[0]['resource-id']."-".$r[0]['scale'].".".$ext."[/img][/url]";
+				$_REQUEST['body'] .= "\n\n" . '[url=' . App::get_baseurl() . '/photos/' . $r[0]['nickname'] . '/image/' . $r[0]['resource-id'] . ']';
+				$_REQUEST['body'] .= '[img]' . App::get_baseurl() . '/photo/' . $r[0]['resource-id'] . '-' . $r[0]['scale'] . '.' . $ext . '[/img][/url]';
 			}
 		}
 
@@ -1091,32 +1156,33 @@ use \Friendica\Core\Config;
 
 		$_REQUEST['api_source'] = true;
 
-		if (!x($_REQUEST, "source"))
+		if (!x($_REQUEST, "source")) {
 			$_REQUEST["source"] = api_source();
+		}
 
 		// call out normal post function
-
 		item_post($a);
 
 		// this should output the last post (the one we just posted).
 		return api_status_show($type);
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/statuses/update','api_statuses_update', true, API_METHOD_POST);
 	api_register_func('api/statuses/update_with_media','api_statuses_update', true, API_METHOD_POST);
-
 
 	function api_media_upload($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) {
+		if (api_user() === false) {
 			logger('no user');
 			throw new ForbiddenException();
 		}
 
 		$user_info = api_get_user($a);
 
-		if (!x($_FILES,'media')) {
+		if (!x($_FILES, 'media')) {
 			// Output error
 			throw new BadRequestException("No media.");
 		}
@@ -1135,13 +1201,15 @@ use \Friendica\Core\Config;
 						"h" => $media["height"],
 						"image_type" => $media["type"]);
 
-		logger("Media uploaded: ".print_r($returndata, true), LOGGER_DEBUG);
+		logger("Media uploaded: " . print_r($returndata, true), LOGGER_DEBUG);
 
 		return array("media" => $returndata);
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/media/upload','api_media_upload', true, API_METHOD_POST);
 
-	function api_status_show($type){
+	function api_status_show($type) {
 
 		$a = get_app();
 
@@ -1149,10 +1217,11 @@ use \Friendica\Core\Config;
 
 		logger('api_status_show: user_info: '.print_r($user_info, true), LOGGER_DEBUG);
 
-		if ($type == "raw")
+		if ($type == "raw") {
 			$privacy_sql = "AND `item`.`allow_cid`='' AND `item`.`allow_gid`='' AND `item`.`deny_cid`='' AND `item`.`deny_gid`=''";
-		else
+		} else {
 			$privacy_sql = "";
+		}
 
 		// get last public wall message
 		$lastwall = q("SELECT `item`.*
@@ -1170,17 +1239,18 @@ use \Friendica\Core\Config;
 				dbesc(normalise_link($user_info['url']))
 		);
 
-		if (count($lastwall)>0){
+		if (dbm::is_result($lastwall)) {
 			$lastwall = $lastwall[0];
 
 			$in_reply_to = api_in_reply_to($lastwall);
 
 			$converted = api_convert_item($lastwall);
 
-			if ($type == "xml")
+			if ($type == "xml") {
 				$geo = "georss:point";
-			else
+			} else {
 				$geo = "geo";
+			}
 
 			$status_info = array(
 				'created_at' => api_date($lastwall['created']),
@@ -1210,16 +1280,19 @@ use \Friendica\Core\Config;
 				'statusnet_conversation_id'	=> $lastwall['parent'],
 			);
 
-			if (count($converted["attachments"]) > 0)
+			if (count($converted["attachments"]) > 0) {
 				$status_info["attachments"] = $converted["attachments"];
+			}
 
-			if (count($converted["entities"]) > 0)
+			if (count($converted["entities"]) > 0) {
 				$status_info["entities"] = $converted["entities"];
+			}
 
-			if (($lastwall['item_network'] != "") AND ($status["source"] == 'web'))
+			if (($lastwall['item_network'] != "") AND ($status["source"] == 'web')) {
 				$status_info["source"] = network_to_name($lastwall['item_network'], $user_info['url']);
-			elseif (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $status_info["source"]))
+			} elseif (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $status_info["source"])) {
 				$status_info["source"] = trim($status_info["source"].' ('.network_to_name($lastwall['item_network'], $user_info['url']).')');
+			}
 
 			// "uid" and "self" are only needed for some internal stuff, so remove it from here
 			unset($status_info["user"]["uid"]);
@@ -1228,23 +1301,20 @@ use \Friendica\Core\Config;
 
 		logger('status_info: '.print_r($status_info, true), LOGGER_DEBUG);
 
-		if ($type == "raw")
-			return($status_info);
+		if ($type == "raw") {
+			return $status_info;
+		}
 
-		return  api_format_data("statuses", $type, array('status' => $status_info));
+		return api_format_data("statuses", $type, array('status' => $status_info));
 
 	}
-
-
-
-
 
 	/**
 	 * Returns extended information of a given user, specified by ID or screen name as per the required id parameter.
 	 * The author's most recent status will be returned inline.
 	 * http://developer.twitter.com/doc/get/users/show
 	 */
-	function api_users_show($type){
+	function api_users_show($type) {
 
 		$a = get_app();
 
@@ -1267,17 +1337,18 @@ use \Friendica\Core\Config;
 				dbesc(normalise_link($user_info['url']))
 		);
 
-		if (count($lastwall)>0){
+		if (dbm::is_result($lastwall)) {
 			$lastwall = $lastwall[0];
 
 			$in_reply_to = api_in_reply_to($lastwall);
 
 			$converted = api_convert_item($lastwall);
 
-			if ($type == "xml")
+			if ($type == "xml") {
 				$geo = "georss:point";
-			else
+			} else {
 				$geo = "geo";
+			}
 
 			$user_info['status'] = array(
 				'text' => $converted["text"],
@@ -1293,20 +1364,25 @@ use \Friendica\Core\Config;
 				'in_reply_to_screen_name' => $in_reply_to['screen_name'],
 				$geo => NULL,
 				'favorited' => $lastwall['starred'] ? true : false,
-				'statusnet_html'		=> $converted["html"],
+				'statusnet_html' => $converted["html"],
 				'statusnet_conversation_id'	=> $lastwall['parent'],
 			);
 
-			if (count($converted["attachments"]) > 0)
+			if (count($converted["attachments"]) > 0) {
 				$user_info["status"]["attachments"] = $converted["attachments"];
+			}
 
-			if (count($converted["entities"]) > 0)
+			if (count($converted["entities"]) > 0) {
 				$user_info["status"]["entities"] = $converted["entities"];
+			}
 
-			if (($lastwall['item_network'] != "") AND ($user_info["status"]["source"] == 'web'))
+			if (($lastwall['item_network'] != "") AND ($user_info["status"]["source"] == 'web')) {
 				$user_info["status"]["source"] = network_to_name($lastwall['item_network'], $user_info['url']);
-			if (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $user_info["status"]["source"]))
-				$user_info["status"]["source"] = trim($user_info["status"]["source"].' ('.network_to_name($lastwall['item_network'], $user_info['url']).')');
+			}
+
+			if (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $user_info["status"]["source"])) {
+				$user_info["status"]["source"] = trim($user_info["status"]["source"] . ' (' . network_to_name($lastwall['item_network'], $user_info['url']) . ')');
+			}
 
 		}
 
@@ -1317,31 +1393,35 @@ use \Friendica\Core\Config;
 		return  api_format_data("user", $type, array('user' => $user_info));
 
 	}
-	api_register_func('api/users/show','api_users_show');
 
+	/// @TODO move to top of file or somewhere better
+	api_register_func('api/users/show','api_users_show');
 
 	function api_users_search($type) {
 
 		$a = get_app();
 
-		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
+		$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] - 1 : 0);
 
 		$userlist = array();
 
-		if (isset($_GET["q"])) {
+		if (x($_GET, 'q')) {
 			$r = q("SELECT id FROM `contact` WHERE `uid` = 0 AND `name` = '%s'", dbesc($_GET["q"]));
-			if (!dbm::is_result($r))
+
+			if (!dbm::is_result($r)) {
 				$r = q("SELECT `id` FROM `contact` WHERE `uid` = 0 AND `nick` = '%s'", dbesc($_GET["q"]));
+			}
 
 			if (dbm::is_result($r)) {
 				$k = 0;
 				foreach ($r AS $user) {
 					$user_info = api_get_user($a, $user["id"], "json");
 
-					if ($type == "xml")
+					if ($type == "xml") {
 						$userlist[$k++.":user"] = $user_info;
-					else
+					} else {
 						$userlist[] = $user_info;
+					}
 				}
 				$userlist = array("users" => $userlist);
 			} else {
@@ -1353,6 +1433,7 @@ use \Friendica\Core\Config;
 		return api_format_data("users", $type, $userlist);
 	}
 
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/users/search','api_users_search');
 
 	/**
@@ -1362,11 +1443,13 @@ use \Friendica\Core\Config;
 	 * TODO: Optional parameters
 	 * TODO: Add reply info
 	 */
-	function api_statuses_home_timeline($type){
+	function api_statuses_home_timeline($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		unset($_REQUEST["user_id"]);
 		unset($_GET["user_id"]);
@@ -1378,24 +1461,29 @@ use \Friendica\Core\Config;
 		// get last newtork messages
 
 		// params
-		$count = (x($_REQUEST,'count')?$_REQUEST['count']:20);
-		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
-		if ($page<0) $page=0;
-		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
-		//$since_id = 0;//$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$exclude_replies = (x($_REQUEST,'exclude_replies')?1:0);
-		$conversation_id = (x($_REQUEST,'conversation_id')?$_REQUEST['conversation_id']:0);
+		$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
+		$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] - 1 : 0);
+		if ($page < 0) {
+			$page = 0;
+		}
+		$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+		$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
+		//$since_id = 0;//$since_id = (x($_REQUEST, 'since_id')?$_REQUEST['since_id'] : 0);
+		$exclude_replies = (x($_REQUEST, 'exclude_replies') ? 1 : 0);
+		$conversation_id = (x($_REQUEST, 'conversation_id') ? $_REQUEST['conversation_id'] : 0);
 
-		$start = $page*$count;
+		$start = $page * $count;
 
 		$sql_extra = '';
-		if ($max_id > 0)
-			$sql_extra .= ' AND `item`.`id` <= '.intval($max_id);
-		if ($exclude_replies > 0)
+		if ($max_id > 0) {
+			$sql_extra .= ' AND `item`.`id` <= ' . intval($max_id);
+		}
+		if ($exclude_replies > 0) {
 			$sql_extra .= ' AND `item`.`parent` = `item`.`id`';
-		if ($conversation_id > 0)
-			$sql_extra .= ' AND `item`.`parent` = '.intval($conversation_id);
+		}
+		if ($conversation_id > 0) {
+			$sql_extra .= ' AND `item`.`parent` = ' . intval($conversation_id);
+		}
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -1415,63 +1503,73 @@ use \Friendica\Core\Config;
 			intval($start),	intval($count)
 		);
 
-		$ret = api_format_items($r,$user_info, false, $type);
+		$ret = api_format_items($r, $user_info, false, $type);
 
 		// Set all posts from the query above to seen
 		$idarray = array();
-		foreach ($r AS $item)
+		foreach ($r AS $item) {
 			$idarray[] = intval($item["id"]);
+		}
 
 		$idlist = implode(",", $idarray);
 
 		if ($idlist != "") {
 			$unseen = q("SELECT `id` FROM `item` WHERE `unseen` AND `id` IN (%s)", $idlist);
 
-			if ($unseen)
+			if ($unseen) {
 				$r = q("UPDATE `item` SET `unseen` = 0 WHERE `unseen` AND `id` IN (%s)", $idlist);
+			}
 		}
 
 		$data = array('status' => $ret);
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
 				break;
 		}
 
-		return  api_format_data("statuses", $type, $data);
+		return api_format_data("statuses", $type, $data);
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/statuses/home_timeline','api_statuses_home_timeline', true);
 	api_register_func('api/statuses/friends_timeline','api_statuses_home_timeline', true);
 
-	function api_statuses_public_timeline($type){
+	function api_statuses_public_timeline($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		$user_info = api_get_user($a);
 		// get last newtork messages
 
-
 		// params
-		$count = (x($_REQUEST,'count')?$_REQUEST['count']:20);
-		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
-		if ($page<0) $page=0;
-		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
-		//$since_id = 0;//$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$exclude_replies = (x($_REQUEST,'exclude_replies')?1:0);
-		$conversation_id = (x($_REQUEST,'conversation_id')?$_REQUEST['conversation_id']:0);
+		$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
+		$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] -1 : 0);
+		if ($page < 0) {
+			$page = 0;
+		}
+		$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+		$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
+		//$since_id = 0;//$since_id = (x($_REQUEST, 'since_id')?$_REQUEST['since_id'] : 0);
+		$exclude_replies = (x($_REQUEST, 'exclude_replies') ? 1 : 0);
+		$conversation_id = (x($_REQUEST, 'conversation_id') ? $_REQUEST['conversation_id'] : 0);
 
-		$start = $page*$count;
+		$start = $page * $count;
 
-		if ($max_id > 0)
-			$sql_extra = 'AND `item`.`id` <= '.intval($max_id);
-		if ($exclude_replies > 0)
+		if ($max_id > 0) {
+			$sql_extra = 'AND `item`.`id` <= ' . intval($max_id);
+		}
+		if ($exclude_replies > 0) {
 			$sql_extra .= ' AND `item`.`parent` = `item`.`id`';
-		if ($conversation_id > 0)
-			$sql_extra .= ' AND `item`.`parent` = '.intval($conversation_id);
+		}
+		if ($conversation_id > 0) {
+			$sql_extra .= ' AND `item`.`parent` = ' . intval($conversation_id);
+		}
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -1495,11 +1593,10 @@ use \Friendica\Core\Config;
 			intval($start),
 			intval($count));
 
-		$ret = api_format_items($r,$user_info, false, $type);
-
+		$ret = api_format_items($r, $user_info, false, $type);
 
 		$data = array('status' => $ret);
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
@@ -1508,38 +1605,45 @@ use \Friendica\Core\Config;
 
 		return  api_format_data("statuses", $type, $data);
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/statuses/public_timeline','api_statuses_public_timeline', true);
 
 	/**
-	 *
+	 * @TODO nothing to say?
 	 */
-	function api_statuses_show($type){
+	function api_statuses_show($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		$user_info = api_get_user($a);
 
 		// params
 		$id = intval($a->argv[3]);
 
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($_REQUEST["id"]);
+		}
 
 		// Hotot workaround
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($a->argv[4]);
+		}
 
-		logger('API: api_statuses_show: '.$id);
+		logger('API: api_statuses_show: ' . $id);
 
-		$conversation = (x($_REQUEST,'conversation')?1:0);
+		$conversation = (x($_REQUEST, 'conversation') ? 1 : 0);
 
 		$sql_extra = '';
-		if ($conversation)
+		if ($conversation) {
 			$sql_extra .= " AND `item`.`parent` = %d ORDER BY `id` ASC ";
-		else
+		} else {
 			$sql_extra .= " AND `item`.`id` = %d";
+		}
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -1556,7 +1660,8 @@ use \Friendica\Core\Config;
 			intval($id)
 		);
 
-		if (!$r) {
+		/// @TODO How about copying this to above methods which don't check $r ?
+		if (!dbm::is_result($r)) {
 			throw new BadRequestException("There is no status with this id.");
 		}
 
@@ -1570,47 +1675,56 @@ use \Friendica\Core\Config;
 			return  api_format_data("status", $type, $data);
 		}
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/statuses/show','api_statuses_show', true);
 
-
 	/**
-	 *
+	 * @TODO nothing to say?
 	 */
-	function api_conversation_show($type){
+	function api_conversation_show($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		$user_info = api_get_user($a);
 
 		// params
 		$id = intval($a->argv[3]);
-		$count = (x($_REQUEST,'count')?$_REQUEST['count']:20);
-		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
-		if ($page<0) $page=0;
-		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
+		$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
+		$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] - 1 : 0);
+		if ($page < 0) {
+			$page = 0;
+		}
+		$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+		$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
 
 		$start = $page*$count;
 
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($_REQUEST["id"]);
+		}
 
 		// Hotot workaround
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($a->argv[4]);
+		}
 
 		logger('API: api_conversation_show: '.$id);
 
 		$r = q("SELECT `parent` FROM `item` WHERE `id` = %d", intval($id));
-		if ($r)
+		if (dbm::is_result($r)) {
 			$id = $r[0]["parent"];
+		}
 
 		$sql_extra = '';
 
-		if ($max_id > 0)
-			$sql_extra = ' AND `item`.`id` <= '.intval($max_id);
+		if ($max_id > 0) {
+			$sql_extra = ' AND `item`.`id` <= ' . intval($max_id);
+		}
 
 		// Not sure why this query was so complicated. We should keep it here for a while,
 		// just to make sure that we really don't need it.
@@ -1635,39 +1749,45 @@ use \Friendica\Core\Config;
 			intval($start), intval($count)
 		);
 
-		if (!$r)
-			throw new BadRequestException("There is no conversation with this id.");
+		if (!dbm::is_result($r)) {
+			throw new BadRequestException("There is no status with this id.");
+		}
 
-		$ret = api_format_items($r,$user_info, false, $type);
+		$ret = api_format_items($r, $user_info, false, $type);
 
 		$data = array('status' => $ret);
 		return api_format_data("statuses", $type, $data);
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/conversation/show','api_conversation_show', true);
 	api_register_func('api/statusnet/conversation','api_conversation_show', true);
 
-
 	/**
-	 *
+	 * @TODO nothing to say?
 	 */
-	function api_statuses_repeat($type){
+	function api_statuses_repeat($type) {
 		global $called_api;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		$user_info = api_get_user($a);
 
 		// params
 		$id = intval($a->argv[3]);
 
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($_REQUEST["id"]);
+		}
 
 		// Hotot workaround
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($a->argv[4]);
+		}
 
 		logger('API: api_statuses_repeat: '.$id);
 
@@ -1686,7 +1806,8 @@ use \Friendica\Core\Config;
 			intval($id)
 		);
 
-		if ($r[0]['body'] != "") {
+		/// @TODO other style than above functions!
+		if (dbm::is_result($r) && $r[0]['body'] != "") {
 			if (strpos($r[0]['body'], "[/share]") !== false) {
 				$pos = strpos($r[0]['body'], "[share");
 				$post = substr($r[0]['body'], $pos);
@@ -1701,39 +1822,47 @@ use \Friendica\Core\Config;
 			$_REQUEST['type'] = 'wall';
 			$_REQUEST['api_source'] = true;
 
-			if (!x($_REQUEST, "source"))
+			if (!x($_REQUEST, "source")) {
 				$_REQUEST["source"] = api_source();
+			}
 
 			item_post($a);
-		} else
+		} else {
 			throw new ForbiddenException();
+		}
 
 		// this should output the last post (the one we just posted).
 		$called_api = null;
-		return(api_status_show($type));
+		return api_status_show($type);
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/statuses/retweet','api_statuses_repeat', true, API_METHOD_POST);
 
 	/**
-	 *
+	 * @TODO nothing to say?
 	 */
-	function api_statuses_destroy($type){
+	function api_statuses_destroy($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		$user_info = api_get_user($a);
 
 		// params
 		$id = intval($a->argv[3]);
 
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($_REQUEST["id"]);
+		}
 
 		// Hotot workaround
-		if ($id == 0)
+		if ($id == 0) {
 			$id = intval($a->argv[4]);
+		}
 
 		logger('API: api_statuses_destroy: '.$id);
 
@@ -1741,20 +1870,23 @@ use \Friendica\Core\Config;
 
 		drop_item($id, false);
 
-		return($ret);
+		return $ret;
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/statuses/destroy','api_statuses_destroy', true, API_METHOD_DELETE);
 
 	/**
-	 *
+	 * @TODO Nothing more than an URL to say?
 	 * http://developer.twitter.com/doc/get/statuses/mentions
-	 *
 	 */
-	function api_statuses_mentions($type){
+	function api_statuses_mentions($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		unset($_REQUEST["user_id"]);
 		unset($_GET["user_id"]);
@@ -1767,24 +1899,27 @@ use \Friendica\Core\Config;
 
 
 		// params
-		$count = (x($_REQUEST,'count')?$_REQUEST['count']:20);
-		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
-		if ($page<0) $page=0;
-		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
-		//$since_id = 0;//$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
+		$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
+		$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] -1 : 0);
+		if ($page < 0) {
+			$page = 0;
+		}
+		$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+		$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
+		//$since_id = 0;//$since_id = (x($_REQUEST, 'since_id')?$_REQUEST['since_id'] : 0);
 
-		$start = $page*$count;
+		$start = $page * $count;
 
 		// Ugly code - should be changed
 		$myurl = App::get_baseurl() . '/profile/'. $a->user['nickname'];
-		$myurl = substr($myurl,strpos($myurl,'://')+3);
+		$myurl = substr($myurl,strpos($myurl, '://') + 3);
 		//$myurl = str_replace(array('www.','.'),array('','\\.'),$myurl);
-		$myurl = str_replace('www.','',$myurl);
-		$diasp_url = str_replace('/profile/','/u/',$myurl);
+		$myurl = str_replace('www.', '', $myurl);
+		$diasp_url = str_replace('/profile/', '/u/', $myurl);
 
-		if ($max_id > 0)
-			$sql_extra = ' AND `item`.`id` <= '.intval($max_id);
+		if ($max_id > 0) {
+			$sql_extra = ' AND `item`.`id` <= ' . intval($max_id);
+		}
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -1809,28 +1944,30 @@ use \Friendica\Core\Config;
 			intval($start),	intval($count)
 		);
 
-		$ret = api_format_items($r,$user_info, false, $type);
-
+		$ret = api_format_items($r, $user_info, false, $type);
 
 		$data = array('status' => $ret);
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
 				break;
 		}
 
-		return  api_format_data("statuses", $type, $data);
+		return api_format_data("statuses", $type, $data);
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/statuses/mentions','api_statuses_mentions', true);
 	api_register_func('api/statuses/replies','api_statuses_mentions', true);
 
-
-	function api_statuses_user_timeline($type){
+	function api_statuses_user_timeline($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		$user_info = api_get_user($a);
 		// get last network messages
@@ -1841,24 +1978,29 @@ use \Friendica\Core\Config;
 			   LOGGER_DEBUG);
 
 		// params
-		$count = (x($_REQUEST,'count')?$_REQUEST['count']:20);
-		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
-		if ($page<0) $page=0;
-		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		//$since_id = 0;//$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$exclude_replies = (x($_REQUEST,'exclude_replies')?1:0);
-		$conversation_id = (x($_REQUEST,'conversation_id')?$_REQUEST['conversation_id']:0);
+		$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
+		$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] -1 : 0);
+		if ($page < 0) {
+			$page = 0;
+		}
+		$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+		//$since_id = 0;//$since_id = (x($_REQUEST, 'since_id')?$_REQUEST['since_id'] : 0);
+		$exclude_replies = (x($_REQUEST, 'exclude_replies') ? 1 : 0);
+		$conversation_id = (x($_REQUEST, 'conversation_id') ? $_REQUEST['conversation_id'] : 0);
 
-		$start = $page*$count;
+		$start = $page * $count;
 
 		$sql_extra = '';
-		if ($user_info['self']==1)
+		if ($user_info['self'] == 1) {
 			$sql_extra .= " AND `item`.`wall` = 1 ";
+		}
 
-		if ($exclude_replies > 0)
+		if ($exclude_replies > 0) {
 			$sql_extra .= ' AND `item`.`parent` = `item`.`id`';
-		if ($conversation_id > 0)
-			$sql_extra .= ' AND `item`.`parent` = '.intval($conversation_id);
+		}
+		if ($conversation_id > 0) {
+			$sql_extra .= ' AND `item`.`parent` = ' . intval($conversation_id);
+		}
 
 		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 			`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -1880,19 +2022,21 @@ use \Friendica\Core\Config;
 			intval($start),	intval($count)
 		);
 
-		$ret = api_format_items($r,$user_info, true, $type);
+		$ret = api_format_items($r, $user_info, true, $type);
 
 		$data = array('status' => $ret);
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
+				break;
 		}
 
 		return  api_format_data("statuses", $type, $data);
 	}
-	api_register_func('api/statuses/user_timeline','api_statuses_user_timeline', true);
 
+	/// @TODO move to top of file or somwhere better
+	api_register_func('api/statuses/user_timeline','api_statuses_user_timeline', true);
 
 	/**
 	 * Star/unstar an item
@@ -1900,49 +2044,59 @@ use \Friendica\Core\Config;
 	 *
 	 * api v1 : https://web.archive.org/web/20131019055350/https://dev.twitter.com/docs/api/1/post/favorites/create/%3Aid
 	 */
-	function api_favorites_create_destroy($type){
+	function api_favorites_create_destroy($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		// for versioned api.
 		/// @TODO We need a better global soluton
-		$action_argv_id=2;
-		if ($a->argv[1]=="1.1") $action_argv_id=3;
+		$action_argv_id = 2;
+		if ($a->argv[1] == "1.1") {
+			$action_argv_id = 3;
+		}
 
-		if ($a->argc<=$action_argv_id) throw new BadRequestException("Invalid request.");
-		$action = str_replace(".".$type,"",$a->argv[$action_argv_id]);
-		if ($a->argc==$action_argv_id+2) {
-			$itemid = intval($a->argv[$action_argv_id+1]);
+		if ($a->argc <= $action_argv_id) {
+			throw new BadRequestException("Invalid request.");
+		}
+		$action = str_replace("." . $type, "", $a->argv[$action_argv_id]);
+		if ($a->argc == $action_argv_id + 2) {
+			$itemid = intval($a->argv[$action_argv_id + 1]);
 		} else {
+			///  @TODO use x() to check if _REQUEST contains 'id'
 			$itemid = intval($_REQUEST['id']);
 		}
 
-		$item = q("SELECT * FROM item WHERE id=%d AND uid=%d",
+		$item = q("SELECT * FROM `item` WHERE `id`=%d AND `uid`=%d LIMIT 1",
 				$itemid, api_user());
 
-		if ($item===false || count($item)==0)
+		if (!dbm::is_result($item) || count($item) == 0) {
 			throw new BadRequestException("Invalid item.");
+		}
 
-		switch($action){
+		switch ($action) {
 			case "create":
-				$item[0]['starred']=1;
+				$item[0]['starred'] = 1;
 				break;
 			case "destroy":
-				$item[0]['starred']=0;
+				$item[0]['starred'] = 0;
 				break;
 			default:
 				throw new BadRequestException("Invalid action ".$action);
 		}
+
 		$r = q("UPDATE item SET starred=%d WHERE id=%d AND uid=%d",
 				$item[0]['starred'], $itemid, api_user());
 
 		q("UPDATE thread SET starred=%d WHERE iid=%d AND uid=%d",
 			$item[0]['starred'], $itemid, api_user());
 
-		if ($r===false)
-			throw InternalServerErrorException("DB error");
+		if ($r === false) {
+			throw new InternalServerErrorException("DB error");
+		}
 
 
 		$user_info = api_get_user($a);
@@ -1950,7 +2104,7 @@ use \Friendica\Core\Config;
 		$ret = $rets[0];
 
 		$data = array('status' => $ret);
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
@@ -1958,17 +2112,21 @@ use \Friendica\Core\Config;
 
 		return api_format_data("status", $type, $data);
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/favorites/create', 'api_favorites_create_destroy', true, API_METHOD_POST);
 	api_register_func('api/favorites/destroy', 'api_favorites_create_destroy', true, API_METHOD_DELETE);
 
-	function api_favorites($type){
+	function api_favorites($type) {
 		global $called_api;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
-		$called_api= array();
+		$called_api = array();
 
 		$user_info = api_get_user($a);
 
@@ -1976,22 +2134,25 @@ use \Friendica\Core\Config;
 		// return favorites only for self
 		logger('api_favorites: self:' . $user_info['self']);
 
-		if ($user_info['self']==0) {
+		if ($user_info['self'] == 0) {
 			$ret = array();
 		} else {
 			$sql_extra = "";
 
 			// params
-			$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-			$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
-			$count = (x($_GET,'count')?$_GET['count']:20);
-			$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
-			if ($page<0) $page=0;
+			$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+			$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
+			$count = (x($_GET, 'count') ? $_GET['count'] : 20);
+			$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] -1 : 0);
+			if ($page < 0) {
+				$page = 0;
+			}
 
 			$start = $page*$count;
 
-			if ($max_id > 0)
-				$sql_extra .= ' AND `item`.`id` <= '.intval($max_id);
+			if ($max_id > 0) {
+				$sql_extra .= ' AND `item`.`id` <= ' . intval($max_id);
+			}
 
 			$r = q("SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
 				`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
@@ -2016,7 +2177,7 @@ use \Friendica\Core\Config;
 		}
 
 		$data = array('status' => $ret);
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
@@ -2024,6 +2185,8 @@ use \Friendica\Core\Config;
 
 		return  api_format_data("statuses", $type, $data);
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/favorites','api_favorites', true);
 
 	function api_format_messages($item, $recipient, $sender) {
@@ -2038,9 +2201,9 @@ use \Friendica\Core\Config;
 				'recipient_screen_name' => $recipient['screen_name'],
 				'sender'                => $sender,
 				'recipient'             => $recipient,
-				'title'			=> "",
-				'friendica_seen'	=> $item['seen'],
-				'friendica_parent_uri'	=> $item['parent-uri'],
+				'title'                 => "",
+				'friendica_seen'        => $item['seen'],
+				'friendica_parent_uri'  => $item['parent-uri'],
 		);
 
 		// "uid" and "self" are only needed for some internal stuff, so remove it from here
@@ -2052,18 +2215,16 @@ use \Friendica\Core\Config;
 		//don't send title to regular StatusNET requests to avoid confusing these apps
 		if (x($_GET, 'getText')) {
 			$ret['title'] = $item['title'] ;
-			if ($_GET["getText"] == "html") {
+			if ($_GET['getText'] == 'html') {
 				$ret['text'] = bbcode($item['body'], false, false);
-			}
-			elseif ($_GET["getText"] == "plain") {
+			} elseif ($_GET['getText'] == 'plain') {
 				//$ret['text'] = html2plain(bbcode($item['body'], false, false, true), 0);
 				$ret['text'] = trim(html2plain(bbcode(api_clean_plain_items($item['body']), false, false, 2, true), 0));
 			}
+		} else {
+			$ret['text'] = $item['title'] . "\n" . html2plain(bbcode(api_clean_plain_items($item['body']), false, false, 2, true), 0);
 		}
-		else {
-			$ret['text'] = $item['title']."\n".html2plain(bbcode(api_clean_plain_items($item['body']), false, false, 2, true), 0);
-		}
-		if (isset($_GET["getUserObjects"]) && $_GET["getUserObjects"] == "false") {
+		if (x($_GET, 'getUserObjects']) && $_GET['getUserObjects'] == 'false') {
 			unset($ret['sender']);
 			unset($ret['recipient']);
 		}
@@ -2084,13 +2245,15 @@ use \Friendica\Core\Config;
 
 		$statustitle = trim($item['title']);
 
-		if (($statustitle != '') and (strpos($statusbody, $statustitle) !== false))
+		if (($statustitle != '') and (strpos($statusbody, $statustitle) !== false)) {
 			$statustext = trim($statusbody);
-		else
+		} else {
 			$statustext = trim($statustitle."\n\n".$statusbody);
+		}
 
-		if (($item["network"] == NETWORK_FEED) and (strlen($statustext)> 1000))
+		if (($item["network"] == NETWORK_FEED) and (strlen($statustext)> 1000)) {
 			$statustext = substr($statustext, 0, 1000)."... \n".$item["plink"];
+		}
 
 		$statushtml = trim(bbcode($body, false, false));
 
@@ -2104,8 +2267,9 @@ use \Friendica\Core\Config;
 				"\n<h5>", "</h5>\n", "\n<h6>", "</h6>\n");
 		$statushtml = str_replace($search, $replace, $statushtml);
 
-		if ($item['title'] != "")
-			$statushtml = "<h4>".bbcode($item['title'])."</h4>\n".$statushtml;
+		if ($item['title'] != "") {
+			$statushtml = "<h4>" . bbcode($item['title']) . "</h4>\n" . $statushtml;
+		}
 
 		$entities = api_get_entitities($statustext, $body);
 
@@ -2125,21 +2289,25 @@ use \Friendica\Core\Config;
 		$URLSearchString = "^\[\]";
 		$ret = preg_match_all("/\[img\]([$URLSearchString]*)\[\/img\]/ism", $text, $images);
 
-		if (!$ret)
+		if (!$ret) {
 			return false;
+		}
 
 		$attachments = array();
 
 		foreach ($images[1] AS $image) {
 			$imagedata = get_photo_info($image);
 
-			if ($imagedata)
+			if ($imagedata) {
 				$attachments[] = array("url" => $image, "mimetype" => $imagedata["mime"], "size" => $imagedata["size"]);
+			}
 		}
 
-		if (strstr($_SERVER['HTTP_USER_AGENT'], "AndStatus"))
-			foreach ($images[0] AS $orig)
+		if (strstr($_SERVER['HTTP_USER_AGENT'], "AndStatus")) {
+			foreach ($images[0] AS $orig) {
 				$body = str_replace($orig, "", $body);
+			}
+		}
 
 		return $attachments;
 	}
@@ -2152,7 +2320,7 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		$include_entities = strtolower(x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:"false");
+		$include_entities = strtolower(x($_REQUEST, 'include_entities') ? $_REQUEST['include_entities'] : "false");
 
 		if ($include_entities != "true") {
 
@@ -2198,11 +2366,12 @@ use \Friendica\Core\Config;
 		preg_match_all("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", $bbcode, $urls);
 
 		$ordered_urls = array();
-		foreach ($urls[1] AS $id=>$url) {
+		foreach ($urls[1] AS $id => $url) {
 			//$start = strpos($text, $url, $offset);
 			$start = iconv_strpos($text, $url, 0, "UTF-8");
-			if (!($start === false))
+			if (!($start === false)) {
 				$ordered_urls[$start] = array("url" => $url, "title" => $urls[2][$id]);
+			}
 		}
 
 		ksort($ordered_urls);
@@ -2296,9 +2465,9 @@ use \Friendica\Core\Config;
 			}
 		}
 
-		return($entities);
+		return $entities;
 	}
-	function api_format_items_embeded_images(&$item, $text){
+	function api_format_items_embeded_images(&$item, $text) {
 		$text = preg_replace_callback(
 				"|data:image/([^;]+)[^=]+=*|m",
 				function($match) use ($item) {
@@ -2352,7 +2521,7 @@ use \Friendica\Core\Config;
 			'dislike' => array(),
 			'attendyes' => array(),
 			'attendno' => array(),
-			'attendmaybe' => array()
+			'attendmaybe' => array(),
 		);
 
 		$items = q('SELECT * FROM item
@@ -2360,13 +2529,13 @@ use \Friendica\Core\Config;
 					intval($item['uid']),
 					dbesc($item['uri']));
 
-		foreach ($items as $i){
+		foreach ($items as $i) {
 			// not used as result should be structured like other user data
 			//builtin_activity_puller($i, $activities);
 
 			// get user data and add it to the array of the activity
 			$user = api_get_user($a, $i['author-link']);
-			switch($i['verb']) {
+			switch ($i['verb']) {
 				case ACTIVITY_LIKE:
 					$activities['like'][] = $user;
 					break;
@@ -2468,7 +2637,7 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		$ret = Array();
+		$ret = array();
 
 		foreach ($r as $item) {
 
@@ -2510,16 +2679,19 @@ use \Friendica\Core\Config;
 				'friendica_activities' => api_format_items_activities($item, $type),
 			);
 
-			if (count($converted["attachments"]) > 0)
+			if (count($converted["attachments"]) > 0) {
 				$status["attachments"] = $converted["attachments"];
+			}
 
-			if (count($converted["entities"]) > 0)
+			if (count($converted["entities"]) > 0) {
 				$status["entities"] = $converted["entities"];
+			}
 
-			if (($item['item_network'] != "") AND ($status["source"] == 'web'))
+			if (($item['item_network'] != "") AND ($status["source"] == 'web')) {
 				$status["source"] = network_to_name($item['item_network'], $user_info['url']);
-			else if (($item['item_network'] != "") AND (network_to_name($item['item_network'], $user_info['url']) != $status["source"]))
+			} elseif (($item['item_network'] != "") AND (network_to_name($item['item_network'], $user_info['url']) != $status["source"])) {
 				$status["source"] = trim($status["source"].' ('.network_to_name($item['item_network'], $user_info['url']).')');
+			}
 
 
 			// Retweets are only valid for top postings
@@ -2571,67 +2743,81 @@ use \Friendica\Core\Config;
 		return $ret;
 	}
 
-
 	function api_account_rate_limit_status($type) {
 
-		if ($type == "xml")
+		if ($type == "xml") {
 			$hash = array(
-					'remaining-hits' => (string) 150,
+					'remaining-hits' => '150',
 					'@attributes' => array("type" => "integer"),
-					'hourly-limit' => (string) 150,
+					'hourly-limit' => '150',
 					'@attributes2' => array("type" => "integer"),
-					'reset-time' => datetime_convert('UTC','UTC','now + 1 hour',ATOM_TIME),
+					'reset-time' => datetime_convert('UTC', 'UTC','now + 1 hour',ATOM_TIME),
 					'@attributes3' => array("type" => "datetime"),
 					'reset_time_in_seconds' => strtotime('now + 1 hour'),
 					'@attributes4' => array("type" => "integer"),
 				);
-		else
+		} else {
 			$hash = array(
 					'reset_time_in_seconds' => strtotime('now + 1 hour'),
-					'remaining_hits' => (string) 150,
-					'hourly_limit' => (string) 150,
-					'reset_time' => api_date(datetime_convert('UTC','UTC','now + 1 hour',ATOM_TIME)),
+					'remaining_hits' => '150',
+					'hourly_limit' => '150',
+					'reset_time' => api_date(datetime_convert('UTC', 'UTC','now + 1 hour',ATOM_TIME)),
 				);
+		}
 
 		return api_format_data('hash', $type, array('hash' => $hash));
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/account/rate_limit_status','api_account_rate_limit_status',true);
 
 	function api_help_test($type) {
-		if ($type == 'xml')
+		if ($type == 'xml') {
 			$ok = "true";
-		else
+		} else {
 			$ok = "ok";
+		}
 
 		return api_format_data('ok', $type, array("ok" => $ok));
 	}
-	api_register_func('api/help/test','api_help_test',false);
+
+	/// @TODO move to top of file or somwhere better
+	api_register_func('api/help/test','api_help_test', false);
 
 	function api_lists($type) {
 		$ret = array();
+		/// @TODO $ret is not filled here?
 		return api_format_data('lists', $type, array("lists_list" => $ret));
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/lists','api_lists',true);
 
 	function api_lists_list($type) {
 		$ret = array();
+		/// @TODO $ret is not filled here?
 		return api_format_data('lists', $type, array("lists_list" => $ret));
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/lists/list','api_lists_list',true);
 
 	/**
-	 *  https://dev.twitter.com/docs/api/1/get/statuses/friends
-	 *  This function is deprecated by Twitter
-	 *  returns: json, xml
-	 **/
+	 * https://dev.twitter.com/docs/api/1/get/statuses/friends
+	 * This function is deprecated by Twitter
+	 * returns: json, xml
+	 */
 	function api_statuses_f($type, $qtype) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
+
 		$user_info = api_get_user($a);
 
-		if (x($_GET,'cursor') && $_GET['cursor']=='undefined'){
+		if (x($_GET, 'cursor') && $_GET['cursor']=='undefined') {
 			/* this is to stop Hotot to load friends multiple times
 			*  I'm not sure if I'm missing return something or
 			*  is a bug in hotot. Workaround, meantime
@@ -2656,7 +2842,7 @@ use \Friendica\Core\Config;
 		);
 
 		$ret = array();
-		foreach ($r as $cid){
+		foreach ($r as $cid) {
 			$user = api_get_user($a, $cid['nurl']);
 			// "uid" and "self" are only needed for some internal stuff, so remove it from here
 			unset($user["uid"]);
@@ -2669,12 +2855,12 @@ use \Friendica\Core\Config;
 		return array('user' => $ret);
 
 	}
-	function api_statuses_friends($type){
+	function api_statuses_friends($type) {
 		$data =  api_statuses_f($type, "friends");
 		if ($data===false) return false;
 		return  api_format_data("users", $type, $data);
 	}
-	function api_statuses_followers($type){
+	function api_statuses_followers($type) {
 		$data = api_statuses_f($type, "followers");
 		if ($data===false) return false;
 		return  api_format_data("users", $type, $data);
@@ -2698,8 +2884,9 @@ use \Friendica\Core\Config;
 		$closed = (($a->config['register_policy'] == REGISTER_CLOSED) ? 'true' : 'false');
 		$private = ((Config::get('system', 'block_public')) ? 'true' : 'false');
 		$textlimit = (string) (($a->config['max_import_size']) ? $a->config['max_import_size'] : 200000);
-		if ($a->config['api_import_size'])
+		if ($a->config['api_import_size']) {
 			$texlimit = string($a->config['api_import_size']);
+		}
 		$ssl = ((Config::get('system', 'have_ssl')) ? 'true' : 'false');
 		$sslserver = (($ssl === 'true') ? str_replace('http:','https:',App::get_baseurl()) : '');
 
@@ -2721,8 +2908,8 @@ use \Friendica\Core\Config;
 		return api_format_data('config', $type, array('config' => $config));
 
 	}
-	api_register_func('api/gnusocial/config','api_statusnet_config',false);
-	api_register_func('api/statusnet/config','api_statusnet_config',false);
+	api_register_func('api/gnusocial/config','api_statusnet_config', false);
+	api_register_func('api/statusnet/config','api_statusnet_config', false);
 
 	function api_statusnet_version($type) {
 		// liar
@@ -2730,8 +2917,8 @@ use \Friendica\Core\Config;
 
 		return api_format_data('version', $type, array('version' => $fake_statusnet_version));
 	}
-	api_register_func('api/gnusocial/version','api_statusnet_version',false);
-	api_register_func('api/statusnet/version','api_statusnet_version',false);
+	api_register_func('api/gnusocial/version','api_statusnet_version', false);
+	api_register_func('api/statusnet/version','api_statusnet_version', false);
 
 	/**
 	 * @todo use api_format_data() to return data
@@ -2740,19 +2927,24 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (! api_user()) throw new ForbiddenException();
+		if (! api_user()) {
+			throw new ForbiddenException();
+		}
 
 		$user_info = api_get_user($a);
 
-		if ($qtype == 'friends')
+		if ($qtype == 'friends') {
 			$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(CONTACT_IS_SHARING), intval(CONTACT_IS_FRIEND));
-		if ($qtype == 'followers')
+		}
+		if ($qtype == 'followers') {
 			$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(CONTACT_IS_FOLLOWER), intval(CONTACT_IS_FRIEND));
+		}
 
-		if (!$user_info["self"])
+		if (!$user_info["self"]) {
 			$sql_extra = " AND false ";
+		}
 
-		$stringify_ids = (x($_REQUEST,'stringify_ids')?$_REQUEST['stringify_ids']:false);
+		$stringify_ids = (x($_REQUEST, 'stringify_ids') ? $_REQUEST['stringify_ids'] : false);
 
 		$r = q("SELECT `pcontact`.`id` FROM `contact`
 				INNER JOIN `contact` AS `pcontact` ON `contact`.`nurl` = `pcontact`.`nurl` AND `pcontact`.`uid` = 0
@@ -2760,15 +2952,17 @@ use \Friendica\Core\Config;
 			intval(api_user())
 		);
 
-		if (!dbm::is_result($r))
+		if (!dbm::is_result($r)) {
 			return;
+		}
 
 		$ids = array();
 		foreach ($r as $rr)
 			if ($stringify_ids)
 				$ids[] = $rr['id'];
-			else
+			} else {
 				$ids[] = intval($rr['id']);
+			}
 
 		return api_format_data("ids", $type, array('id' => $ids));
 	}
@@ -2779,6 +2973,7 @@ use \Friendica\Core\Config;
 	function api_followers_ids($type) {
 		return api_ff_ids($type,'followers');
 	}
+
 	api_register_func('api/friends/ids','api_friends_ids',true);
 	api_register_func('api/followers/ids','api_followers_ids',true);
 
@@ -2787,7 +2982,7 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 
 		if (!x($_POST, "text") OR (!x($_POST,"screen_name") AND !x($_POST,"user_id"))) return;
 
@@ -2807,35 +3002,32 @@ use \Friendica\Core\Config;
 
 		$replyto = '';
 		$sub     = '';
-		if (x($_REQUEST,'replyto')) {
+		if (x($_REQUEST, 'replyto')) {
 			$r = q('SELECT `parent-uri`, `title` FROM `mail` WHERE `uid`=%d AND `id`=%d',
 					intval(api_user()),
 					intval($_REQUEST['replyto']));
 			$replyto = $r[0]['parent-uri'];
 			$sub     = $r[0]['title'];
-		}
-		else {
-			if (x($_REQUEST,'title')) {
+		} else {
+			if (x($_REQUEST, 'title')) {
 				$sub = $_REQUEST['title'];
-			}
-			else {
-				$sub = ((strlen($_POST['text'])>10)?substr($_POST['text'],0,10)."...":$_POST['text']);
+			} else {
+				$sub = ((strlen($_POST['text'])>10) ? substr($_POST['text'],0,10)."...":$_POST['text']);
 			}
 		}
 
 		$id = send_message($recipient['cid'], $_POST['text'], $sub, $replyto);
 
-		if ($id>-1) {
+		if ($id > -1) {
 			$r = q("SELECT * FROM `mail` WHERE id=%d", intval($id));
 			$ret = api_format_messages($r[0], $recipient, $sender);
-
 		} else {
 			$ret = array("error"=>$id);
 		}
 
-		$data = Array('direct_message'=>$ret);
+		$data = array('direct_message'=>$ret);
 
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
@@ -2844,8 +3036,8 @@ use \Friendica\Core\Config;
 		return  api_format_data("direct-messages", $type, $data);
 
 	}
-	api_register_func('api/direct_messages/new','api_direct_messages_new',true, API_METHOD_POST);
 
+	api_register_func('api/direct_messages/new','api_direct_messages_new',true, API_METHOD_POST);
 
 	/**
 	 * @brief delete a direct_message from mail table through api
@@ -2853,31 +3045,33 @@ use \Friendica\Core\Config;
 	 * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
 	 * @return string
 	 */
-	function api_direct_messages_destroy($type){
+	function api_direct_messages_destroy($type) {
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		// params
 		$user_info = api_get_user($a);
 		//required
-		$id = (x($_REQUEST,'id') ? $_REQUEST['id'] : 0);
+		$id = (x($_REQUEST, 'id') ? $_REQUEST['id'] : 0);
 		// optional
 		$parenturi = (x($_REQUEST, 'friendica_parenturi') ? $_REQUEST['friendica_parenturi'] : "");
-		$verbose = (x($_GET,'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
+		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		/// @todo optional parameter 'include_entities' from Twitter API not yet implemented
 
 		$uid = $user_info['uid'];
 		// error if no id or parenturi specified (for clients posting parent-uri as well)
-		if ($verbose == "true") {
-			if ($id == 0 || $parenturi == "") {
-				$answer = array('result' => 'error', 'message' => 'message id or parenturi not specified');
-				return api_format_data("direct_messages_delete", $type, array('$result' => $answer));
-			}
+		if ($verbose == "true" && ($id == 0 || $parenturi == "")) {
+			$answer = array('result' => 'error', 'message' => 'message id or parenturi not specified');
+			return api_format_data("direct_messages_delete", $type, array('$result' => $answer));
 		}
 
 		// BadRequestException if no id specified (for clients using Twitter API)
-		if ($id == 0) throw new BadRequestException('Message id not specified');
+		if ($id == 0) {
+			throw new BadRequestException('Message id not specified');
+		}
 
 		// add parent-uri to sql command if specified by calling app
 		$sql_extra = ($parenturi != "" ? " AND `parent-uri` = '" . dbesc($parenturi) . "'" : "");
@@ -2907,8 +3101,7 @@ use \Friendica\Core\Config;
 				// return success
 				$answer = array('result' => 'ok', 'message' => 'message deleted');
 				return api_format_data("direct_message_delete", $type, array('$result' => $answer));
-			}
-			else {
+			} else {
 				$answer = array('result' => 'error', 'message' => 'unknown error');
 				return api_format_data("direct_messages_delete", $type, array('$result' => $answer));
 			}
@@ -2923,18 +3116,22 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		// params
-		$count = (x($_GET,'count')?$_GET['count']:20);
-		$page = (x($_REQUEST,'page')?$_REQUEST['page']-1:0);
-		if ($page<0) $page=0;
+		$count = (x($_GET, 'count') ? $_GET['count'] : 20);
+		$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] -1 : 0);
+		if ($page < 0) {
+			$page = 0;
+		}
 
-		$since_id = (x($_REQUEST,'since_id')?$_REQUEST['since_id']:0);
-		$max_id = (x($_REQUEST,'max_id')?$_REQUEST['max_id']:0);
+		$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+		$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
 
-		$user_id = (x($_REQUEST,'user_id')?$_REQUEST['user_id']:"");
-		$screen_name = (x($_REQUEST,'screen_name')?$_REQUEST['screen_name']:"");
+		$user_id = (x($_REQUEST, 'user_id') ? $_REQUEST['user_id'] : "");
+		$screen_name = (x($_REQUEST, 'screen_name') ? $_REQUEST['screen_name'] : "");
 
 		//  caller user info
 		unset($_REQUEST["user_id"]);
@@ -2946,31 +3143,27 @@ use \Friendica\Core\Config;
 		$user_info = api_get_user($a);
 		$profile_url = $user_info["url"];
 
-
 		// pagination
-		$start = $page*$count;
+		$start = $page * $count;
 
 		// filters
 		if ($box=="sentbox") {
-			$sql_extra = "`mail`.`from-url`='".dbesc( $profile_url )."'";
-		}
-		elseif ($box=="conversation") {
-			$sql_extra = "`mail`.`parent-uri`='".dbesc( $_GET["uri"] )  ."'";
-		}
-		elseif ($box=="all") {
+			$sql_extra = "`mail`.`from-url`='" . dbesc( $profile_url ) . "'";
+		} elseif ($box == "conversation") {
+			$sql_extra = "`mail`.`parent-uri`='" . dbesc( $_GET["uri"] )  . "'";
+		} elseif ($box == "all") {
 			$sql_extra = "true";
-		}
-		elseif ($box=="inbox") {
-			$sql_extra = "`mail`.`from-url`!='".dbesc( $profile_url )."'";
+		} elseif ($box == "inbox") {
+			$sql_extra = "`mail`.`from-url`!='" . dbesc( $profile_url ) . "'";
 		}
 
-		if ($max_id > 0)
-			$sql_extra .= ' AND `mail`.`id` <= '.intval($max_id);
+		if ($max_id > 0) {
+			$sql_extra .= ' AND `mail`.`id` <= ' . intval($max_id);
+		}
 
-		if ($user_id !="") {
+		if ($user_id != "") {
 			$sql_extra .= ' AND `mail`.`contact-id` = ' . intval($user_id);
-		}
-		elseif ($screen_name !=""){
+		} elseif ($screen_name !="") {
 			$sql_extra .= " AND `contact`.`nick` = '" . dbesc($screen_name). "'";
 		}
 
@@ -2979,31 +3172,27 @@ use \Friendica\Core\Config;
 				intval($since_id),
 				intval($start),	intval($count)
 		);
-		if ($verbose == "true") {
-			// stop execution and return error message if no mails available
-			if ($r == null) {
-				$answer = array('result' => 'error', 'message' => 'no mails available');
-				return api_format_data("direct_messages_all", $type, array('$result' => $answer));
-			}
+		if ($verbose == "true" && !dbm::is_result($r)) {
+			$answer = array('result' => 'error', 'message' => 'no mails available');
+			return api_format_data("direct_messages_all", $type, array('$result' => $answer));
 		}
 
-		$ret = Array();
+		$ret = array();
 		foreach ($r as $item) {
-			if ($box == "inbox" || $item['from-url'] != $profile_url){
+			if ($box == "inbox" || $item['from-url'] != $profile_url) {
 				$recipient = $user_info;
 				$sender = api_get_user($a,normalise_link($item['contact-url']));
-			}
-			elseif ($box == "sentbox" || $item['from-url'] == $profile_url){
+			} elseif ($box == "sentbox" || $item['from-url'] == $profile_url) {
 				$recipient = api_get_user($a,normalise_link($item['contact-url']));
 				$sender = $user_info;
-
 			}
-			$ret[]=api_format_messages($item, $recipient, $sender);
+
+			$ret[] = api_format_messages($item, $recipient, $sender);
 		}
 
 
 		$data = array('direct_message' => $ret);
-		switch($type){
+		switch ($type) {
 			case "atom":
 			case "rss":
 				$data = api_rss_extra($a, $data, $user_info);
@@ -3013,78 +3202,84 @@ use \Friendica\Core\Config;
 
 	}
 
-	function api_direct_messages_sentbox($type){
-		$verbose = (x($_GET,'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
+	function api_direct_messages_sentbox($type) {
+		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "sentbox", $verbose);
 	}
-	function api_direct_messages_inbox($type){
-		$verbose = (x($_GET,'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
+	function api_direct_messages_inbox($type) {
+		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "inbox", $verbose);
 	}
-	function api_direct_messages_all($type){
-		$verbose = (x($_GET,'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
+	function api_direct_messages_all($type) {
+		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "all", $verbose);
 	}
-	function api_direct_messages_conversation($type){
-		$verbose = (x($_GET,'friendica_verbose')?strtolower($_GET['friendica_verbose']):"false");
+	function api_direct_messages_conversation($type) {
+		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "conversation", $verbose);
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/direct_messages/conversation','api_direct_messages_conversation',true);
 	api_register_func('api/direct_messages/all','api_direct_messages_all',true);
 	api_register_func('api/direct_messages/sent','api_direct_messages_sentbox',true);
 	api_register_func('api/direct_messages','api_direct_messages_inbox',true);
 
-
-
-	function api_oauth_request_token($type){
-		try{
+	function api_oauth_request_token($type) {
+		try {
 			$oauth = new FKOAuth1();
 			$r = $oauth->fetch_request_token(OAuthRequest::from_request());
-		}catch(Exception $e){
-			echo "error=". OAuthUtil::urlencode_rfc3986($e->getMessage()); killme();
+		} catch (Exception $e) {
+			echo "error=" . OAuthUtil::urlencode_rfc3986($e->getMessage());
+			killme();
 		}
 		echo $r;
 		killme();
 	}
-	function api_oauth_access_token($type){
-		try{
+
+	function api_oauth_access_token($type) {
+		try {
 			$oauth = new FKOAuth1();
 			$r = $oauth->fetch_access_token(OAuthRequest::from_request());
-		}catch(Exception $e){
+		} catch (Exception $e) {
 			echo "error=". OAuthUtil::urlencode_rfc3986($e->getMessage()); killme();
 		}
 		echo $r;
 		killme();
 	}
 
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/oauth/request_token', 'api_oauth_request_token', false);
 	api_register_func('api/oauth/access_token', 'api_oauth_access_token', false);
 
-
 	function api_fr_photos_list($type) {
-		if (api_user()===false) throw new ForbiddenException();
-		$r = q("select `resource-id`, max(scale) as scale, album, filename, type from photo
-				where uid = %d and album != 'Contact Photos' group by `resource-id`",
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
+
+		$r = q("SELECT `resource-id`, MAX(`scale`) AS `scale`, `album`, `filename`, `type`
+				FROM `photo`
+				WHERE `uid` = %d AND `album` != 'Contact Photos' GROUP BY `resource-id`",
 			intval(local_user())
 		);
 		$typetoext = array(
-		'image/jpeg' => 'jpg',
-		'image/png' => 'png',
-		'image/gif' => 'gif'
+			'image/jpeg' => 'jpg',
+			'image/png' => 'png',
+			'image/gif' => 'gif'
 		);
-		$data = array('photo'=>array());
-		if ($r) {
+		$data = array('photo' => array());
+		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				$photo = array();
 				$photo['id'] = $rr['resource-id'];
 				$photo['album'] = $rr['album'];
 				$photo['filename'] = $rr['filename'];
 				$photo['type'] = $rr['type'];
-				$thumb = App::get_baseurl()."/photo/".$rr['resource-id']."-".$rr['scale'].".".$typetoext[$rr['type']];
+				$thumb = App::get_baseurl() . "/photo/" . $rr['resource-id'] . "-" . $rr['scale'] . "." . $typetoext[$rr['type']];
 
-				if ($type == "xml")
+				if ($type == "xml") {
 					$data['photo'][] = array("@attributes" => $photo, "1" => $thumb);
-				else {
+				} else {
 					$photo['thumb'] = $thumb;
 					$data['photo'][] = $photo;
 				}
@@ -3094,16 +3289,19 @@ use \Friendica\Core\Config;
 	}
 
 	function api_fr_photo_detail($type) {
-		if (api_user()===false) throw new ForbiddenException();
-		if (!x($_REQUEST,'photo_id')) throw new BadRequestException("No photo id.");
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		} elseif (!x($_REQUEST, 'photo_id')) {
+			throw new BadRequestException("No photo id.");
+		}
 
 		$scale = (x($_REQUEST, 'scale') ? intval($_REQUEST['scale']) : false);
-		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d",intval($scale)));
+		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d", intval($scale)));
 		$data_sql = ($scale === false ? "" : "data, ");
 
-		$r = q("select %s `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
-						`type`, `height`, `width`, `datasize`, `profile`, min(`scale`) as minscale, max(`scale`) as maxscale
-				from photo where `uid` = %d and `resource-id` = '%s' %s group by `resource-id`",
+		$r = q("SELECT %s `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
+						`type`, `height`, `width`, `datasize`, `profile`, MIN(`scale`) AS `minscale`, MAX(`scale`) AS `maxscale`
+				FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' %s GROUP BY `resource-id`",
 			$data_sql,
 			intval(local_user()),
 			dbesc($_REQUEST['photo_id']),
@@ -3111,12 +3309,12 @@ use \Friendica\Core\Config;
 		);
 
 		$typetoext = array(
-		'image/jpeg' => 'jpg',
-		'image/png' => 'png',
-		'image/gif' => 'gif'
+			'image/jpeg' => 'jpg',
+			'image/png' => 'png',
+			'image/gif' => 'gif'
 		);
 
-		if ($r) {
+		if (dbm::is_result($r)) {
 			$data = array('photo' => $r[0]);
 			$data['photo']['id'] = $data['photo']['resource-id'];
 			if ($scale !== false) {
@@ -3126,14 +3324,15 @@ use \Friendica\Core\Config;
 			}
 			if ($type == "xml") {
 				$data['photo']['links'] = array();
-				for ($k=intval($data['photo']['minscale']); $k<=intval($data['photo']['maxscale']); $k++)
-					$data['photo']['links'][$k.":link"]["@attributes"] = array("type" => $data['photo']['type'],
-											"scale" => $k,
-											"href" => App::get_baseurl()."/photo/".$data['photo']['resource-id']."-".$k.".".$typetoext[$data['photo']['type']]);
+				for ($k = intval($data['photo']['minscale']); $k <= intval($data['photo']['maxscale']); $k++) {
+					$data['photo']['links'][$k . ":link"]["@attributes"] = array("type" => $data['photo']['type'],
+						"scale" => $k,
+						"href" => App::get_baseurl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']]);
+				}
 			} else {
 				$data['photo']['link'] = array();
-				for ($k=intval($data['photo']['minscale']); $k<=intval($data['photo']['maxscale']); $k++) {
-					$data['photo']['link'][$k] = App::get_baseurl()."/photo/".$data['photo']['resource-id']."-".$k.".".$typetoext[$data['photo']['type']];
+				for ($k = intval($data['photo']['minscale']); $k <= intval($data['photo']['maxscale']); $k++) {
+					$data['photo']['link'][$k] = App::get_baseurl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']];
 				}
 			}
 			unset($data['photo']['resource-id']);
@@ -3164,11 +3363,12 @@ use \Friendica\Core\Config;
 	 * 		url: string, url to redirect after auth
 	 */
 	function api_friendica_remoteauth() {
-		$url = ((x($_GET,'url')) ? $_GET['url'] : '');
-		$c_url = ((x($_GET,'c_url')) ? $_GET['c_url'] : '');
+		$url = ((x($_GET, 'url')) ? $_GET['url'] : '');
+		$c_url = ((x($_GET, 'c_url')) ? $_GET['c_url'] : '');
 
-		if ($url === '' || $c_url === '')
+		if ($url === '' || $c_url === '') {
 			throw new BadRequestException("Wrong parameters.");
+		}
 
 		$c_url = normalise_link($c_url);
 
@@ -3179,8 +3379,9 @@ use \Friendica\Core\Config;
 			intval(api_user())
 		);
 
-		if ((! dbm::is_result($r)) || ($r[0]['network'] !== NETWORK_DFRN))
+		if ((! dbm::is_result($r)) || ($r[0]['network'] !== NETWORK_DFRN)) {
 			throw new BadRequestException("Unknown contact");
+		}
 
 		$cid = $r[0]['id'];
 
@@ -3227,12 +3428,16 @@ use \Friendica\Core\Config;
 			return false;
 		}
 
-		$attributes = preg_replace("/\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","$1",$body);
-		// Skip if there is no shared message in there
-		// we already checked this in diaspora::is_reshare()
-		// but better one more than one less...
-		if ($body == $attributes)
+		/// @TODO "$1" should maybe mean '$1' ?
+		$attributes = preg_replace("/\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism", "$1", $body);
+		/*
+		 * Skip if there is no shared message in there
+		 * we already checked this in diaspora::is_reshare()
+		 * but better one more than one less...
+		 */
+		if ($body == $attributes) {
 			return false;
+		}
 
 
 		// build the fake reshared item
@@ -3240,55 +3445,63 @@ use \Friendica\Core\Config;
 
 		$author = "";
 		preg_match("/author='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "")
-			$author = html_entity_decode($matches[1],ENT_QUOTES,'UTF-8');
+		if ($matches[1] != "") {
+			$author = html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8');
+		}
 
 		preg_match('/author="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$author = $matches[1];
+		}
 
 		$profile = "";
 		preg_match("/profile='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$profile = $matches[1];
+		}
 
 		preg_match('/profile="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$profile = $matches[1];
+		}
 
 		$avatar = "";
 		preg_match("/avatar='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$avatar = $matches[1];
+		}
 
 		preg_match('/avatar="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$avatar = $matches[1];
+		}
 
 		$link = "";
 		preg_match("/link='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$link = $matches[1];
+		}
 
 		preg_match('/link="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$link = $matches[1];
+		}
 
 		$posted = "";
 		preg_match("/posted='(.*?)'/ism", $attributes, $matches);
 		if ($matches[1] != "")
-			$posted= $matches[1];
+			$posted = $matches[1];
 
 		preg_match('/posted="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "")
+		if ($matches[1] != "") {
 			$posted = $matches[1];
+		}
 
 		$shared_body = preg_replace("/\[share(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism","$2",$body);
 
-		if (($shared_body == "") || ($profile == "") || ($author == "") || ($avatar == "") || ($posted == ""))
+		if (($shared_body == "") || ($profile == "") || ($author == "") || ($avatar == "") || ($posted == "")) {
 			return false;
-
-
+		}
 
 		$reshared_item["body"] = $shared_body;
 		$reshared_item["author-name"] = $author;
@@ -3312,32 +3525,39 @@ use \Friendica\Core\Config;
 
 		$r = q("SELECT `nick` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s'",
 			dbesc(normalise_link($profile)));
-		if ($r)
+
+		if (dbm::is_result($r)) {
 			$nick = $r[0]["nick"];
+		}
 
 		if (!$nick == "") {
 			$r = q("SELECT `nick` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s'",
 				dbesc(normalise_link($profile)));
-			if ($r)
+
+			if (dbm::is_result($r)) {
 				$nick = $r[0]["nick"];
+			}
 		}
 
 		if (!$nick == "") {
 			$friendica = preg_replace("=https?://(.*)/profile/(.*)=ism", "$2", $profile);
-			if ($friendica != $profile)
+			if ($friendica != $profile) {
 				$nick = $friendica;
+			}
 		}
 
 		if (!$nick == "") {
 			$diaspora = preg_replace("=https?://(.*)/u/(.*)=ism", "$2", $profile);
-			if ($diaspora != $profile)
+			if ($diaspora != $profile) {
 				$nick = $diaspora;
+			}
 		}
 
 		if (!$nick == "") {
 			$twitter = preg_replace("=https?://twitter.com/(.*)=ism", "$1", $profile);
-			if ($twitter != $profile)
+			if ($twitter != $profile) {
 				$nick = $twitter;
+			}
 		}
 
 
@@ -3348,8 +3568,9 @@ use \Friendica\Core\Config;
 				if ($StatusnetUser != $profile) {
 					$UserData = fetch_url("http://".$StatusnetHost."/api/users/show.json?user_id=".$StatusnetUser);
 					$user = json_decode($UserData);
-					if ($user)
+					if ($user) {
 						$nick = $user->screen_name;
+					}
 				}
 			}
 		}
@@ -3363,10 +3584,11 @@ use \Friendica\Core\Config;
 
 		//}
 
-		if ($nick != "")
-			return($nick);
+		if ($nick != "") {
+			return $nick;
+		}
 
-		return(false);
+		return false;
 	}
 
 	function api_in_reply_to($item) {
@@ -3424,7 +3646,7 @@ use \Friendica\Core\Config;
 	}
 
 	function api_clean_plain_items($Text) {
-		$include_entities = strtolower(x($_REQUEST,'include_entities')?$_REQUEST['include_entities']:"false");
+		$include_entities = strtolower(x($_REQUEST, 'include_entities') ? $_REQUEST['include_entities'] : "false");
 
 		$Text = bb_CleanPictureLinks($Text);
 		$URLSearchString = "^\[\]";
@@ -3518,11 +3740,11 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
-		$gid = (x($_REQUEST,'gid') ? $_REQUEST['gid'] : 0);
+		$gid = (x($_REQUEST, 'gid') ? $_REQUEST['gid'] : 0);
 		$uid = $user_info['uid'];
 
 		// get data of the specified group id or all groups if not specified
@@ -3569,11 +3791,11 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
-		$gid = (x($_REQUEST,'gid') ? $_REQUEST['gid'] : 0);
+		$gid = (x($_REQUEST, 'gid') ? $_REQUEST['gid'] : 0);
 		$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
 		$uid = $user_info['uid'];
 
@@ -3616,7 +3838,7 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3682,7 +3904,7 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 
 		// params
 		$user_info = api_get_user($a);
@@ -3734,14 +3956,14 @@ use \Friendica\Core\Config;
 		$success = array('success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers);
 		return api_format_data("group_update", $type, array('result' => $success));
 	}
-	api_register_func('api/friendica/group_update', 'api_friendica_group_update', true, API_METHOD_POST);
 
+	api_register_func('api/friendica/group_update', 'api_friendica_group_update', true, API_METHOD_POST);
 
 	function api_friendica_activity($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 		$verb = strtolower($a->argv[3]);
 		$verb = preg_replace("|\..*$|", "", $verb);
 
@@ -3760,6 +3982,8 @@ use \Friendica\Core\Config;
 		}
 
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/friendica/activity/like', 'api_friendica_activity', true, API_METHOD_POST);
 	api_register_func('api/friendica/activity/dislike', 'api_friendica_activity', true, API_METHOD_POST);
 	api_register_func('api/friendica/activity/attendyes', 'api_friendica_activity', true, API_METHOD_POST);
@@ -3781,7 +4005,7 @@ use \Friendica\Core\Config;
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 		if ($a->argc!==3) throw new BadRequestException("Invalid argument count");
 		$nm = new NotificationsManager();
 
@@ -3806,11 +4030,11 @@ use \Friendica\Core\Config;
 	 * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
 	 * @return string
 	 */
-	function api_friendica_notification_seen($type){
+	function api_friendica_notification_seen($type) {
 
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) throw new ForbiddenException();
 		if ($a->argc!==4) throw new BadRequestException("Invalid argument count");
 
 		$id = (x($_REQUEST, 'id') ? intval($_REQUEST['id']) : 0);
@@ -3838,9 +4062,9 @@ use \Friendica\Core\Config;
 		return api_format_data('result', $type, array('result' => "success"));
 	}
 
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/friendica/notification/seen', 'api_friendica_notification_seen', true, API_METHOD_POST);
 	api_register_func('api/friendica/notification', 'api_friendica_notification', true, API_METHOD_GET);
-
 
 	/**
 	 * @brief update a direct_message to seen state
@@ -3848,9 +4072,11 @@ use \Friendica\Core\Config;
 	 * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
 	 * @return string (success result=ok, error result=error with error message)
 	 */
-	function api_friendica_direct_messages_setseen($type){
+	function api_friendica_direct_messages_setseen($type) {
 		$a = get_app();
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		// params
 		$user_info = api_get_user($a);
@@ -3867,6 +4093,7 @@ use \Friendica\Core\Config;
 		$r = q("SELECT `id` FROM `mail` WHERE `id` = %d AND `uid` = %d",
 			intval($id),
 			intval($uid));
+
 		// error message if specified id is not in database
 		if (!dbm::is_result($r)) {
 			$answer = array('result' => 'error', 'message' => 'message id not in database');
@@ -3887,10 +4114,9 @@ use \Friendica\Core\Config;
 			return api_format_data("direct_messages_setseen", $type, array('$result' => $answer));
 		}
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/friendica/direct_messages_setseen', 'api_friendica_direct_messages_setseen', true);
-
-
-
 
 	/**
 	 * @brief search for direct_messages containing a searchstring through api
@@ -3900,14 +4126,16 @@ use \Friendica\Core\Config;
 	 *                          success=false if nothing was found, search_result='nothing found',
 	 * 		   error: result=error with error message)
 	 */
-	function api_friendica_direct_messages_search($type){
+	function api_friendica_direct_messages_search($type) {
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		// params
 		$user_info = api_get_user($a);
-		$searchstring = (x($_REQUEST,'searchstring') ? $_REQUEST['searchstring'] : "");
+		$searchstring = (x($_REQUEST, 'searchstring') ? $_REQUEST['searchstring'] : "");
 		$uid = $user_info['uid'];
 
 		// error if no searchstring specified
@@ -3923,29 +4151,32 @@ use \Friendica\Core\Config;
 		);
 
 		$profile_url = $user_info["url"];
+
 		// message if nothing was found
-		if (!dbm::is_result($r))
+		if (!dbm::is_result($r)) {
 			$success = array('success' => false, 'search_results' => 'problem with query');
-		else if (count($r) == 0)
+		} elseif (count($r) == 0) {
 			$success = array('success' => false, 'search_results' => 'nothing found');
-		else {
-			$ret = Array();
+		} else {
+			$ret = array();
 			foreach ($r as $item) {
-				if ($box == "inbox" || $item['from-url'] != $profile_url){
+				if ($box == "inbox" || $item['from-url'] != $profile_url) {
 					$recipient = $user_info;
 					$sender = api_get_user($a,normalise_link($item['contact-url']));
-				}
-				elseif ($box == "sentbox" || $item['from-url'] == $profile_url){
+				} elseif ($box == "sentbox" || $item['from-url'] == $profile_url) {
 					$recipient = api_get_user($a,normalise_link($item['contact-url']));
 					$sender = $user_info;
 				}
-				$ret[]=api_format_messages($item, $recipient, $sender);
+
+				$ret[] = api_format_messages($item, $recipient, $sender);
 			}
 			$success = array('success' => true, 'search_results' => $ret);
 		}
 
 		return api_format_data("direct_message_search", $type, array('$result' => $success));
 	}
+
+	/// @TODO move to top of file or somwhere better
 	api_register_func('api/friendica/direct_messages_search', 'api_friendica_direct_messages_search', true);
 
 	/**
@@ -3954,13 +4185,15 @@ use \Friendica\Core\Config;
 	 * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
 	 * @return string
 	 */
-	function api_friendica_profile_show($type){
+	function api_friendica_profile_show($type) {
 		$a = get_app();
 
-		if (api_user()===false) throw new ForbiddenException();
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
 
 		// input params
-		$profileid = (x($_REQUEST,'profile_id') ? $_REQUEST['profile_id'] : 0);
+		$profileid = (x($_REQUEST, 'profile_id') ? $_REQUEST['profile_id'] : 0);
 
 		// retrieve general information about profiles for user
 		$multi_profiles = feature_enabled(api_user(),'multi_profiles');
@@ -3971,9 +4204,11 @@ use \Friendica\Core\Config;
 			$r = q("SELECT * FROM `profile` WHERE `uid` = %d AND `id` = %d",
 				intval(api_user()),
 				intval($profileid));
+
 			// error message if specified gid is not in database
-			if (!dbm::is_result($r))
+			if (!dbm::is_result($r)) {
 				throw new BadRequestException("profile_id not available");
+			}
 		} else {
 			$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
 				intval(api_user()));
@@ -3991,13 +4226,13 @@ use \Friendica\Core\Config;
 
 			foreach ($r as $rr) {
 				$user = api_get_user($a, $rr['nurl']);
-				($type == "xml") ? $users[$k++.":user"] = $user : $users[] = $user;
+				($type == "xml") ? $users[$k++ . ":user"] = $user : $users[] = $user;
 			}
 			$profile['users'] = $users;
 
 			// add prepared profile data to array for final return
 			if ($type == "xml") {
-				$profiles[$k++.":profile"] = $profile;
+				$profiles[$k++ . ":profile"] = $profile;
 			} else {
 				$profiles[] = $profile;
 			}
@@ -4015,6 +4250,7 @@ use \Friendica\Core\Config;
 	api_register_func('api/friendica/profile/show', 'api_friendica_profile_show', true, API_METHOD_GET);
 
 /*
+@TODO Maybe open to implement?
 To.Do:
     [pagename] => api/1.1/statuses/lookup.json
     [id] => 605138389168451584
