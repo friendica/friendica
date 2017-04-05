@@ -88,18 +88,20 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 					$networks = array(NETWORK_DFRN);
 					break;
 				case 'PRIVATE':
-					if (is_array($a->user) && $a->user['prvnets'])
-						$networks = array(NETWORK_DFRN,NETWORK_MAIL,NETWORK_DIASPORA);
-					else
-						$networks = array(NETWORK_DFRN,NETWORK_FACEBOOK,NETWORK_MAIL, NETWORK_DIASPORA);
+					if (is_array($a->user) && $a->user['prvnets']) {
+						$networks = array(NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA);
+					} else {
+						$networks = array(NETWORK_DFRN, NETWORK_FACEBOOK, NETWORK_MAIL, NETWORK_DIASPORA);
+					}
 					break;
 				case 'TWO_WAY':
-					if (is_array($a->user) && $a->user['prvnets'])
-						$networks = array(NETWORK_DFRN,NETWORK_MAIL,NETWORK_DIASPORA);
-					else
-						$networks = array(NETWORK_DFRN,NETWORK_FACEBOOK,NETWORK_MAIL,NETWORK_DIASPORA,NETWORK_OSTATUS);
+					if (is_array($a->user) && $a->user['prvnets']) {
+						$networks = array(NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA);
+					} else {
+						$networks = array(NETWORK_DFRN, NETWORK_FACEBOOK, NETWORK_MAIL, NETWORK_DIASPORA, NETWORK_OSTATUS);
+					}
 					break;
-				default:
+				default: /// @TODO Maybe log this call?
 					break;
 			}
 		}
@@ -117,10 +119,12 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 		$sql_extra .= sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
 	}
 
-	if (intval($x['exclude']))
+	if (intval($x['exclude'])) {
 		$sql_extra .= sprintf(" AND `id` != %d ", intval($x['exclude']));
+	}
 
 	if (is_array($x['networks']) && count($x['networks'])) {
+		/// @TODO rewrite to foreach()
 		for ($y = 0; $y < count($x['networks']) ; $y ++) {
 			$x['networks'][$y] = "'" . dbesc($x['networks'][$y]) . "'";
 		}
@@ -130,10 +134,11 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 
 	$tabindex = (x($options, 'tabindex') ? "tabindex=\"" . $options["tabindex"] . "\"" : "");
 
-	if ($x['single'])
+	if ($x['single']) {
 		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"" . $x['size'] . "\" $tabindex >\r\n";
-	else
+	} else {
 		$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"" . $x['size'] . "$\" $tabindex >\r\n";
+	}
 
 	$r = q("SELECT `id`, `name`, `url`, `network` FROM `contact`
 		WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
@@ -175,7 +180,7 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 
 function contact_select($selname, $selclass, $preselected = false, $size = 4, $privmail = false, $celeb = false, $privatenet = false, $tabindex = null) {
 
-	require_once("include/bbcode.php");
+	require_once "include/bbcode.php";
 
 	$a = get_app();
 
@@ -190,25 +195,28 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 		$sql_extra .= sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
 	}
 
-	if ($privmail)
+	if ($privmail) {
 		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ",
 					NETWORK_DFRN, NETWORK_DIASPORA);
-	elseif ($privatenet)
+	} elseif ($privatenet) {
 		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s', '%s', '%s') ",
 					NETWORK_DFRN, NETWORK_MAIL, NETWORK_FACEBOOK, NETWORK_DIASPORA);
+	}
 
 	$tabindex = ($tabindex > 0 ? "tabindex=\"$tabindex\"" : "");
 
 	if ($privmail AND $preselected) {
 		$sql_extra .= " AND `id` IN (".implode(",", $preselected).")";
 		$hidepreselected = ' style="display: none;"';
-	} else
+	} else {
 		$hidepreselected = "";
+	}
 
-	if ($privmail)
+	if ($privmail) {
 		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"$size\" $tabindex $hidepreselected>\r\n";
-	else
+	} else {
 		$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"$size\" $tabindex >\r\n";
+	}
 
 	$r = q("SELECT `id`, `name`, `url`, `network` FROM `contact`
 		WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
@@ -230,8 +238,7 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 		foreach ($r as $rr) {
 			if ((is_array($preselected)) && in_array($rr['id'], $preselected)) {
 				$selected = " selected=\"selected\" ";
-			}
-			else {
+			} else {
 				$selected = '';
 			}
 
@@ -250,8 +257,9 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 
 	$o .= "</select>\r\n";
 
-	if ($privmail AND $preselected)
+	if ($privmail AND $preselected) {
 		$o .= implode(", ", $receiverlist);
+	}
 
 	call_hooks($a->module . '_post_' . $selname, $o);
 
@@ -260,7 +268,7 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 
 
 function fixacl(&$item) {
-	$item = intval(str_replace(array('<','>'),array('',''),$item));
+	$item = intval(str_replace(array('<', '>'), array('', ''), $item));
 }
 
 function prune_deadguys($arr) {
@@ -331,8 +339,9 @@ function populate_acl($user = null, $show_jotnets = false) {
 			);
 			if (dbm::is_result($r)) {
 				$mail_enabled = true;
-				if (intval($r[0]['pubmail']))
+				if (intval($r[0]['pubmail'])) {
 					$pubmail_enabled = true;
+				}
 			}
 		}
 
@@ -343,10 +352,11 @@ function populate_acl($user = null, $show_jotnets = false) {
 			}
 
 			call_hooks('jot_networks', $jotnets);
-		} else
+		} else {
 			$jotnets .= sprintf(t('Connectors disabled, since "%s" is enabled.'),
 					    t('Hide your profile details from unknown viewers?'));
 		}
+	}
 
 	$tpl = get_markup_template("acl_selector.tpl");
 	$o = replace_macros($tpl, array(
@@ -364,7 +374,7 @@ function populate_acl($user = null, $show_jotnets = false) {
 		'$aclModalTitle' => t('Permissions'),
 		'$aclModalDismiss' => t('Close'),
 		'$features' => array(
-		"aclautomention"=>(feature_enabled($user['uid'],"aclautomention")?"true":"false")
+		'aclautomention' => (feature_enabled($user['uid'],"aclautomention")?"true":"false")
 		),
 	));
 
@@ -432,6 +442,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 		$sql_extra = "AND `name` LIKE '%%".dbesc($search)."%%'";
 		$sql_extra2 = "AND (`attag` LIKE '%%".dbesc($search)."%%' OR `name` LIKE '%%".dbesc($search)."%%' OR `nick` LIKE '%%".dbesc($search)."%%')";
 	} else {
+		/// @TODO Avoid these needless else blocks by putting variable-initialization atop of if()
 		$sql_extra = $sql_extra2 = "";
 	}
 
@@ -447,8 +458,8 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 	$sql_extra2 .= " ".unavailable_networks();
 
-	// autocomplete for editor mentions
-	if ($type=='' || $type=='c'){
+	if ($type == '' || $type == 'c') {
+		// autocomplete for editor mentions
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
 				WHERE `uid` = %d AND NOT `self`
 				AND NOT `blocked` AND NOT `pending` AND NOT `archive`
