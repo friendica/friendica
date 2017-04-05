@@ -9,35 +9,38 @@ require_once('include/Contact.php');
 require_once('include/plaintext.php');
 
 function bb_PictureCacheExt($matches) {
-	if (strpos($matches[3], "data:image/") === 0)
+	if (strpos($matches[3], "data:image/") === 0) {
 		return ($matches[0]);
+	}
 
 	$matches[3] = proxy_url($matches[3]);
-	return "[img=".$matches[1]."x".$matches[2]."]".$matches[3]."[/img]";
+	return "[img=" . $matches[1] . "x" . $matches[2] . "]" . $matches[3] . "[/img]";
 }
 
 function bb_PictureCache($matches) {
-	if (strpos($matches[1], "data:image/") === 0)
+	if (strpos($matches[1], "data:image/") === 0) {
 		return ($matches[0]);
+	}
 
 	$matches[1] = proxy_url($matches[1]);
-	return "[img]".$matches[1]."[/img]";
+	return "[img]" . $matches[1] . "[/img]";
 }
 
 function bb_map_coords($match) {
 	// the extra space in the following line is intentional
-	return str_replace($match[0],'<div class="map"  >' . generate_map(str_replace('/',' ',$match[1])) . '</div>', $match[0]);
+	return str_replace($match[0], '<div class="map"  >' . generate_map(str_replace('/',' ', $match[1])) . '</div>', $match[0]);
 }
 function bb_map_location($match) {
 	// the extra space in the following line is intentional
-	return str_replace($match[0],'<div class="map"  >' . generate_named_map($match[1]) . '</div>', $match[0]);
+	return str_replace($match[0], '<div class="map"  >' . generate_named_map($match[1]) . '</div>', $match[0]);
 }
 
 function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 
 	$data = get_attachment_data($Text);
-	if (!$data)
+	if (!$data) {
 		return $Text;
+	}
 
 	if (isset($data["title"])) {
 		$data["title"] = strip_tags($data["title"]);
@@ -57,83 +60,91 @@ function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 
 		// If the link description is similar to the text above then don't add the link description
 		if (($data["title"] != "") AND ((strpos($test1,$test2) !== false) OR
-			(similar_text($test1,$test2) / strlen($data["title"])) > 0.9))
+			(similar_text($test1,$test2) / strlen($data["title"])) > 0.9)) {
 			$title2 = $data["url"];
+		}
 		$text = sprintf('<a href="%s" title="%s" class="attachment thumbnail" rel="nofollow external">%s</a><br />',
 				$data["url"], $data["title"], $title2);
-	} elseif (($simplehtml != 4) AND ($simplehtml != 0))
+	} elseif (($simplehtml != 4) AND ($simplehtml != 0)) {
 		$text = sprintf('<a href="%s" target="_blank">%s</a><br>', $data["url"], $data["title"]);
-	else {
+	} else {
 		$text = sprintf('<span class="type-%s">', $data["type"]);
 
 		$bookmark = array(sprintf('[bookmark=%s]%s[/bookmark]', $data["url"], $data["title"]), $data["url"], $data["title"]);
-		if ($tryoembed)
+		if ($tryoembed) {
 			$oembed = tryoembed($bookmark);
-		else
+		} else {
 			$oembed = $bookmark[0];
+		}
 
-		if (strstr(strtolower($oembed), "<iframe "))
+		if (strstr(strtolower($oembed), "<iframe ")) {
 			$text = $oembed;
-		else {
-			if (($data["image"] != "") AND !strstr(strtolower($oembed), "<img "))
+		} else {
+			if (($data["image"] != "") AND !strstr(strtolower($oembed), "<img ")) {
 				$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $data["url"], proxy_url($data["image"]), $data["title"]);
-			elseif (($data["preview"] != "") AND !strstr(strtolower($oembed), "<img "))
+			} elseif (($data["preview"] != "") AND !strstr(strtolower($oembed), "<img ")) {
 				$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $data["url"], proxy_url($data["preview"]), $data["title"]);
+			}
 
-			if (($data["type"] == "photo") AND ($data["url"] != "") AND ($data["image"] != ""))
+			if (($data["type"] == "photo") AND ($data["url"] != "") AND ($data["image"] != "")) {
 				$text .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a>', $data["url"], proxy_url($data["image"]), $data["title"]);
-			else
+			} else {
 				$text .= $oembed;
+			}
 
-			if (trim($data["description"]) != "")
+			if (trim($data["description"]) != "") {
 				$text .= sprintf('<blockquote>%s</blockquote></span>', trim(bbcode($data["description"])));
+			}
 		}
 	}
-	return $data["text"].$text.$data["after"];
+	return $data["text"] . $text . $data["after"];
 }
 
 function bb_remove_share_information($Text, $plaintext = false, $nolink = false) {
 
 	$data = get_attachment_data($Text);
 
-	if (!$data)
+	if (!$data) {
 		return $Text;
-
-	if ($nolink)
-		return $data["text"].$data["after"];
+	} elseif ($nolink) {
+		return $data["text"] . $data["after"];
+	}
 
 	$title = htmlentities($data["title"], ENT_QUOTES, 'UTF-8', false);
 	$text = htmlentities($data["text"], ENT_QUOTES, 'UTF-8', false);
-	if ($plaintext OR (($title != "") AND strstr($text, $title)))
+	if ($plaintext OR (($title != "") AND strstr($text, $title))) {
 		$data["title"] = $data["url"];
-	elseif (($text != "") AND strstr($title, $text)) {
+	} elseif (($text != "") AND strstr($title, $text)) {
 		$data["text"] = $data["title"];
 		$data["title"] = $data["url"];
 	}
 
-	if (($data["text"] == "") AND ($data["title"] != "") AND ($data["url"] == ""))
-		return $data["title"].$data["after"];
+	if (($data["text"] == "") AND ($data["title"] != "") AND ($data["url"] == "")) {
+		return $data["title"] . $data["after"];
+	}
 
 	// If the link already is included in the post, don't add it again
-	if (($data["url"] != "") AND strpos($data["text"], $data["url"]))
-		return $data["text"].$data["after"];
+	if (($data["url"] != "") AND strpos($data["text"], $data["url"])) {
+		return $data["text"] . $data["after"];
+	}
 
 	$text = $data["text"];
 
-	if (($data["url"] != "") AND ($data["title"] != ""))
-		$text .= "\n[url=".$data["url"]."]".$data["title"]."[/url]";
-	elseif (($data["url"] != ""))
-		$text .= "\n".$data["url"];
+	if (($data["url"] != "") AND ($data["title"] != "")) {
+		$text .= "\n[url=" . $data["url"] . "]" . $data["title"] . "[/url]";
+	} elseif (($data["url"] != "")) {
+		$text .= "\n" . $data["url"];
+	}
 
-	return $text."\n".$data["after"];
+	return $text . "\n" . $data["after"];
 }
 
 function bb_cleanstyle($st) {
-  return "<span style=\"".cleancss($st[1]).";\">".$st[2]."</span>";
+  return "<span style=\"" . cleancss($st[1]) . ";\">" . $st[2] . "</span>";
 }
 
 function bb_cleanclass($st) {
-  return "<span class=\"".cleancss($st[1])."\">".$st[2]."</span>";
+  return "<span class=\"" . cleancss($st[1]) . "\">" . $st[2] . "</span>";
 }
 
 function cleancss($input) {
@@ -145,11 +156,13 @@ function cleancss($input) {
 	for ($i = 0; $i < strlen($input); $i++) {
 		$char = substr($input, $i, 1);
 
-		if (($char >= "a") and ($char <= "z"))
+		if (($char >= "a") and ($char <= "z")) {
 			$cleaned .= $char;
+		}
 
-		if (!(strpos(" #;:0123456789-_.%", $char) === false))
+		if (!(strpos(" #;:0123456789-_.%", $char) === false)) {
 			$cleaned .= $char;
+		}
 	}
 
 	return($cleaned);
@@ -160,10 +173,10 @@ function stripcode_br_cb($s) {
 }
 
 function bb_onelinecode_cb($match) {
-	if (strpos($match[1],"<br>")===false){
-		return "<key>".$match[1]."</key>";
+	if (strpos($match[1], "<br>") === false) {
+		return "<key>" . $match[1] . "</key>";
 	}
-	return "<code>".$match[1]."</code>";
+	return "<code>" . $match[1] . "</code>";
 }
 
 function tryoembed($match){
@@ -173,18 +186,22 @@ function tryoembed($match){
 	$url = str_replace(array("http://www.youtube.com/", "http://player.vimeo.com/"),
 				array("https://www.youtube.com/", "https://player.vimeo.com/"), $url);
 
-
 	$o = oembed_fetch_url($url);
 
-	if (!is_object($o))
+	if (!is_object($o)) {
 		return $match[0];
+	}
 
-	if (isset($match[2]))
+	if (isset($match[2])) {
 		$o->title = $match[2];
+	}
 
-	if ($o->type=="error") return $match[0];
+	if ($o->type == "error") {
+		return $match[0];
+	}
 
 	$html = oembed_format_object($o);
+
 	return $html;
 
 }
@@ -194,11 +211,11 @@ function tryoembed($match){
 // to hide them from parser.
 
 function bb_spacefy($st) {
-  $whole_match = $st[0];
-  $captured = $st[1];
-  $spacefied = preg_replace("/\[(.*?)\]/", "[ $1 ]", $captured);
-  $new_str = str_replace($captured, $spacefied, $whole_match);
-  return $new_str;
+	$whole_match = $st[0];
+	$captured = $st[1];
+	$spacefied = preg_replace("/\[(.*?)\]/", "[ $1 ]", $captured);
+	$new_str = str_replace($captured, $spacefied, $whole_match);
+	return $new_str;
 }
 
 // The previously spacefied [noparse][ i ]italic[ /i ][/noparse],
