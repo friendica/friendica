@@ -155,8 +155,6 @@ $called_api = null;
 			logger($e);
 		}
 
-
-
 		// workaround for HTTP-auth in CGI mode
 		if (x($_SERVER, 'REDIRECT_REMOTE_USER')) {
 			$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"], 6)) ;
@@ -167,7 +165,7 @@ $called_api = null;
 			}
 		}
 
-		if (!isset($_SERVER['PHP_AUTH_USER'])) {
+		if (!x($_SERVER, 'PHP_AUTH_USER')) {
 			logger('API_login: ' . print_r($_SERVER,true), LOGGER_DEBUG);
 			header('WWW-Authenticate: Basic realm="Friendica"');
 			throw new UnauthorizedException("This API requires login");
@@ -282,6 +280,8 @@ $called_api = null;
 
 					$called_api = explode("/", $p);
 					//unset($_SERVER['PHP_AUTH_USER']);
+
+					/// @TODO should be "true ==[=] $info['auth']", if you miss only one = character, you assign a variable (only with ==). Let's make all this even.
 					if ($info['auth'] === true && api_user() === false) {
 						api_login($a);
 					}
@@ -954,10 +954,10 @@ $called_api = null;
 	 * get data from $_POST or $_GET
 	 */
 	function requestdata($k) {
-		if (isset($_POST[$k])) {
+		if (x($_POST, $k)) {
 			return $_POST[$k];
 		}
-		if (isset($_GET[$k])) {
+		if (x($_GET, $k)) {
 			return $_GET[$k];
 		}
 		return null;
@@ -1390,7 +1390,7 @@ $called_api = null;
 		unset($user_info["uid"]);
 		unset($user_info["self"]);
 
-		return  api_format_data("user", $type, array('user' => $user_info));
+		return api_format_data("user", $type, array('user' => $user_info));
 
 	}
 
@@ -1603,7 +1603,7 @@ $called_api = null;
 				break;
 		}
 
-		return  api_format_data("statuses", $type, $data);
+		return api_format_data("statuses", $type, $data);
 	}
 
 	/// @TODO move to top of file or somewhere better
@@ -1672,7 +1672,7 @@ $called_api = null;
 			return api_format_data("statuses", $type, $data);
 		} else {
 			$data = array('status' => $ret[0]);
-			return  api_format_data("status", $type, $data);
+			return api_format_data("status", $type, $data);
 		}
 	}
 
@@ -2032,7 +2032,7 @@ $called_api = null;
 				break;
 		}
 
-		return  api_format_data("statuses", $type, $data);
+		return api_format_data("statuses", $type, $data);
 	}
 
 	/// @TODO move to top of file or somwhere better
@@ -2183,7 +2183,7 @@ $called_api = null;
 				$data = api_rss_extra($a, $data, $user_info);
 		}
 
-		return  api_format_data("statuses", $type, $data);
+		return api_format_data("statuses", $type, $data);
 	}
 
 	/// @TODO move to top of file or somwhere better
@@ -2645,17 +2645,19 @@ $called_api = null;
 			list($status_user, $owner_user) = api_item_get_user($a,$item);
 
 			// Look if the posts are matching if they should be filtered by user id
-			if ($filter_user AND ($status_user["id"] != $user_info["id"]))
+			if ($filter_user AND ($status_user["id"] != $user_info["id"])) {
 				continue;
+			}
 
 			$in_reply_to = api_in_reply_to($item);
 
 			$converted = api_convert_item($item);
 
-			if ($type == "xml")
+			if ($type == "xml") {
 				$geo = "georss:point";
-			else
+			} else {
 				$geo = "geo";
+			}
 
 			$status = array(
 				'text'		=> $converted["text"],
@@ -2828,14 +2830,17 @@ $called_api = null;
 			return false;
 		}
 
-		if ($qtype == 'friends')
+		if ($qtype == 'friends') {
 			$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(CONTACT_IS_SHARING), intval(CONTACT_IS_FRIEND));
-		if ($qtype == 'followers')
+		}
+		if ($qtype == 'followers') {
 			$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(CONTACT_IS_FOLLOWER), intval(CONTACT_IS_FRIEND));
+		}
 
 		// friends and followers only for self
-		if ($user_info['self'] == 0)
+		if ($user_info['self'] == 0) {
 			$sql_extra = " AND false ";
+		}
 
 		$r = q("SELECT `nurl` FROM `contact` WHERE `uid` = %d AND NOT `self` AND (NOT `blocked` OR `pending`) $sql_extra",
 			intval(api_user())
@@ -2848,30 +2853,34 @@ $called_api = null;
 			unset($user["uid"]);
 			unset($user["self"]);
 
-			if ($user)
+			if ($user) {
 				$ret[] = $user;
+			}
 		}
 
 		return array('user' => $ret);
 
 	}
+
 	function api_statuses_friends($type) {
 		$data =  api_statuses_f($type, "friends");
-		if ($data===false) return false;
-		return  api_format_data("users", $type, $data);
+		if ($data === false) {
+			return false;
+		}
+		return api_format_data("users", $type, $data);
 	}
+
 	function api_statuses_followers($type) {
 		$data = api_statuses_f($type, "followers");
-		if ($data===false) return false;
-		return  api_format_data("users", $type, $data);
+		if ($data === false) {
+			return false;
+		}
+		return api_format_data("users", $type, $data);
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/statuses/friends','api_statuses_friends',true);
 	api_register_func('api/statuses/followers','api_statuses_followers',true);
-
-
-
-
-
 
 	function api_statusnet_config($type) {
 
@@ -2908,6 +2917,8 @@ $called_api = null;
 		return api_format_data('config', $type, array('config' => $config));
 
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/gnusocial/config','api_statusnet_config', false);
 	api_register_func('api/statusnet/config','api_statusnet_config', false);
 
@@ -2917,6 +2928,8 @@ $called_api = null;
 
 		return api_format_data('version', $type, array('version' => $fake_statusnet_version));
 	}
+
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/gnusocial/version','api_statusnet_version', false);
 	api_register_func('api/statusnet/version','api_statusnet_version', false);
 
@@ -2970,13 +2983,14 @@ $called_api = null;
 	function api_friends_ids($type) {
 		return api_ff_ids($type,'friends');
 	}
+
 	function api_followers_ids($type) {
 		return api_ff_ids($type,'followers');
 	}
 
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/friends/ids','api_friends_ids',true);
 	api_register_func('api/followers/ids','api_followers_ids',true);
-
 
 	function api_direct_messages_new($type) {
 
@@ -3033,10 +3047,11 @@ $called_api = null;
 				$data = api_rss_extra($a, $data, $user_info);
 		}
 
-		return  api_format_data("direct-messages", $type, $data);
+		return api_format_data("direct-messages", $type, $data);
 
 	}
 
+	/// @TODO move to top of file or somewhere better
 	api_register_func('api/direct_messages/new','api_direct_messages_new',true, API_METHOD_POST);
 
 	/**
@@ -3109,8 +3124,9 @@ $called_api = null;
 		/// @todo return JSON data like Twitter API not yet implemented
 
 	}
-	api_register_func('api/direct_messages/destroy', 'api_direct_messages_destroy', true, API_METHOD_DELETE);
 
+	/// @TODO move to top of file or somewhere better
+	api_register_func('api/direct_messages/destroy', 'api_direct_messages_destroy', true, API_METHOD_DELETE);
 
 	function api_direct_messages_box($type, $box, $verbose) {
 
@@ -3198,7 +3214,7 @@ $called_api = null;
 				$data = api_rss_extra($a, $data, $user_info);
 		}
 
-		return  api_format_data("direct-messages", $type, $data);
+		return api_format_data("direct-messages", $type, $data);
 
 	}
 
@@ -3206,14 +3222,17 @@ $called_api = null;
 		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "sentbox", $verbose);
 	}
+
 	function api_direct_messages_inbox($type) {
 		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "inbox", $verbose);
 	}
+
 	function api_direct_messages_all($type) {
 		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "all", $verbose);
 	}
+
 	function api_direct_messages_conversation($type) {
 		$verbose = (x($_GET, 'friendica_verbose') ? strtolower($_GET['friendica_verbose']) : "false");
 		return api_direct_messages_box($type, "conversation", $verbose);
@@ -3285,7 +3304,7 @@ $called_api = null;
 				}
 			}
 		}
-		return  api_format_data("photos", $type, $data);
+		return api_format_data("photos", $type, $data);
 	}
 
 	function api_fr_photo_detail($type) {
