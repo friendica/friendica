@@ -128,7 +128,7 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 		for ($y = 0; $y < count($x['networks']) ; $y ++) {
 			$x['networks'][$y] = "'" . dbesc($x['networks'][$y]) . "'";
 		}
-		$str_nets = implode(',',$x['networks']);
+		$str_nets = implode(',', $x['networks']);
 		$sql_extra .= " AND `network` IN ( $str_nets ) ";
 	}
 
@@ -277,7 +277,7 @@ function prune_deadguys($arr) {
 		return $arr;
 	}
 
-	$str = dbesc(implode(',',$arr));
+	$str = dbesc(implode(',', $arr));
 
 	$r = q("SELECT `id` FROM `contact` WHERE `id` IN ( " . $str . ") AND `blocked` = 0 AND `pending` = 0 AND `archive` = 0 ");
 
