@@ -119,7 +119,7 @@ code {
     line-height: 1.5;
 }
 
-a#item-delete-selected {
+#item-delete-selected {
     cursor: pointer;
     color: white;
     position: fixed;

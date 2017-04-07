@@ -83,12 +83,12 @@ $(document).ready(function(){
 			}
 		});
 
-		if(checked == true) {
-			$("a#item-delete-selected").fadeTo(400, 1);
-			$("a#item-delete-selected").show();
+		if(checked) {
+			$("#item-delete-selected").fadeTo(400, 1);
+			$("#item-delete-selected").show();
 		} else {
-			$("a#item-delete-selected").fadeTo(400, 0, function(){
-				$("a#item-delete-selected").hide();
+			$("#item-delete-selected").fadeTo(400, 0, function(){
+				$("#item-delete-selected").hide();
 			});
 		}
 	});
