@@ -104,8 +104,18 @@ function diaspora_mentions($match) {
 	return $mention;
 }
 
+/**
+ * @brief Converts a BBCode text into Markdown
+ *
+ * This function converts a BBCode item body to be sent to Markdown-enabled
+ * systems like Diaspora and Libertree
+ *
+ * @param string $Text
+ * @param bool $preserve_nl Effects unclear, unused in Friendica
+ * @param bool $fordiaspora Diaspora requires more changes than Libertree
+ * @return string
+ */
 function bb2diaspora($Text, $preserve_nl = false, $fordiaspora = true) {
-
 	$a = get_app();
 
 	$OriginalText = $Text;
@@ -127,6 +137,18 @@ function bb2diaspora($Text, $preserve_nl = false, $fordiaspora = true) {
 
 	// Converting images with size parameters to simple images. Markdown doesn't know it.
 	$Text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $Text);
+
+	// Extracting multi-line code blocks before the whitespace processing/code highlighter in bbcode()
+	$codeblocks = [];
+	$Text = preg_replace_callback('#\[code(?:=([^\]]*))?\](?=\n)(.*?)\[\/code\]#is',
+		function ($matches) use (&$codeblocks) {
+			$return = '#codeblock-' . count($codeblocks) . '#';
+
+            $prefix = '````' . $matches[1] . PHP_EOL;
+			$codeblocks[] = $prefix . trim($matches[2]) . PHP_EOL . '````';
+			return $return;
+		}
+	, $Text);
 
 	// Convert it to HTML - don't try oembed
 	if ($fordiaspora) {
@@ -157,7 +179,8 @@ function bb2diaspora($Text, $preserve_nl = false, $fordiaspora = true) {
 	$stamp1 = microtime(true);
 
 	// Now convert HTML to Markdown
-	$Text = new HTML_To_Markdown($Text);
+	$converter = new HtmlConverter();
+	$Text = $converter->convert($Text);
 
 	// unmask the special chars back to HTML
 	$Text = str_replace(array('&_lt_;', '&_gt_;', '&_amp_;'), array('&lt;', '&gt;', '&amp;'), $Text);
@@ -175,6 +198,17 @@ function bb2diaspora($Text, $preserve_nl = false, $fordiaspora = true) {
 		$URLSearchString = "^\[\]";
 		$Text = preg_replace_callback("/([@]\[(.*?)\])\(([$URLSearchString]*?)\)/ism", 'diaspora_mentions', $Text);
 	}
+
+	// Restore code blocks
+	$Text = preg_replace_callback('/#codeblock-([0-9]+)#/iU',
+		function ($matches) use ($codeblocks) {
+            $return = '';
+            if (isset($codeblocks[intval($matches[1])])) {
+                $return = $codeblocks[$matches[1]];
+            }
+			return $return;
+		}
+	, $Text);
 
 	call_hooks('bb2diaspora',$Text);
 

@@ -172,13 +172,6 @@ function stripcode_br_cb($s) {
 	return '[code]' . str_replace('<br />', '', $s[1]) . '[/code]';
 }
 
-function bb_onelinecode_cb($match) {
-	if (strpos($match[1], "<br>") === false) {
-		return "<key>" . $match[1] . "</key>";
-	}
-	return "<code>" . $match[1] . "</code>";
-}
-
 function tryoembed($match) {
 	$url = $match[1];
 
@@ -765,9 +758,31 @@ function bb_highlight($match) {
 	return $match[0];
 }
 
-	// BBcode 2 HTML was written by WAY2WEB.net
-	// extended to work with Mistpark/Friendica - Mike Macgirvin
-
+/**
+ * @brief Converts a BBCode message to HTML message
+ *
+ * BBcode 2 HTML was written by WAY2WEB.net
+ * extended to work with Mistpark/Friendica - Mike Macgirvin
+ *
+ * Simple HTML values meaning:
+ * - 0: Friendica display
+ * - 1: Unused
+ * - 2: Used for Facebook, Google+, Windows Phone push, Friendica API
+ * - 3: Used before converting to Markdown in bb2diaspora.php
+ * - 4: Used for WordPress, Libertree (before Markdown), pump.io and tumblr
+ * - 5: Unused
+ * - 6: Used for Appnet
+ * - 7: Used for dfrn, OStatus
+ * - 8: Used for WP backlink text setting
+ *
+ * @staticvar array $allowed_src_protocols
+ * @param string $Text
+ * @param bool $preserve_nl
+ * @param bool $tryoembed
+ * @param int $simplehtml
+ * @param bool $forplaintext
+ * @return string
+ */
 function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = false, $forplaintext = false) {
 
 	$a = get_app();
@@ -1193,8 +1208,17 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 	}
 
 
-	//replace oneliner <code> with <key>
-	$Text = preg_replace_callback("|(?!<br[^>]*>)<code>([^<]*)</code>(?!<br[^>]*>)|ism", 'bb_onelinecode_cb', $Text);
+	// Replace inline code blocks
+	$Text = preg_replace_callback("|(?!<br[^>]*>)<code>([^<]*)</code>(?!<br[^>]*>)|ism",
+		function ($match) use ($simplehtml) {
+			$return = '<key>' . $match[1] . '</key>';
+			// Use <code> for Diaspora inline code blocks
+			if ($simplehtml === 3) {
+				$return = '<code>' . $match[1] . '</code>';
+			}
+			return $return;
+		}
+	, $Text);
 
 	// Unhide all [noparse] contained bbtags unspacefying them
 	// and triming the [noparse] tag.
