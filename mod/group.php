@@ -209,7 +209,14 @@ function group_content(App $a) {
 	foreach($members as $member) {
 		if($member['url']) {
 			$member['click'] = 'groupChangeMember(' . $group['id'] . ',' . $member['id'] . ',\'' . $sec_token . '\'); return true;';
-			$groupeditor['members'][] = micropro($member,true,'mpgroup', $textmode);
+			//$groupeditor['members'][] = micropro($member,true,'mpgroup', $textmode);
+			$groupeditor['members'][] = array (
+				'url'   => $member['url'],
+				'photo' => proxy_url($member['thumb'], false, PROXY_SIZE_THUMB),
+				'name'  => $member['name'],
+				'title' => $member['name'] . ' [' . $contact['addr'] . ']',
+				
+			);
 		}
 		else
 			group_rmv_member(local_user(),$group['name'],$member['id']);
