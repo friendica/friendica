@@ -28,7 +28,7 @@ function bb_PictureCache($matches) {
 
 function bb_map_coords($match) {
 	// the extra space in the following line is intentional
-	return str_replace($match[0], '<div class="map"  >' . generate_map(str_replace('/',' ', $match[1])) . '</div>', $match[0]);
+	return str_replace($match[0], '<div class="map"  >' . generate_map(str_replace('/', ' ', $match[1])) . '</div>', $match[0]);
 }
 function bb_map_location($match) {
 	// the extra space in the following line is intentional
@@ -757,9 +757,10 @@ function bb_CleanPictureLinks($text) {
 }
 
 function bb_highlight($match) {
-	if (in_array(strtolower($match[1]),['php','css','mysql','sql','abap','diff','html','perl','ruby',
-		'vbscript','avrc','dtd','java','xml','cpp','python','javascript','js','sh']))
+	if (in_array(strtolower($match[1]), ['php', 'css', 'mysql', 'sql', 'abap', 'diff', 'html', 'perl', 'ruby',
+		'vbscript', 'avrc', 'dtd', 'java', 'xml', 'cpp', 'python', 'javascript', 'js', 'sh'])) {
 		return text_highlight($match[2],strtolower($match[1]));
+	}
 	return $match[0];
 }
 
@@ -868,7 +869,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 	// Handle attached links or videos
 	$Text = bb_attachment($Text, $simplehtml, $tryoembed);
 
-	$Text = str_replace(array("\r","\n"), array('<br />','<br />'), $Text);
+	$Text = str_replace(array("\r","\n"), array('<br />', '<br />'), $Text);
 
 	if ($preserve_nl) {
 		$Text = str_replace(array("\n", "\r"), array('', ''), $Text);
