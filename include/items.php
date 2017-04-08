@@ -6,31 +6,33 @@
 
 use \Friendica\ParseUrl;
 
-require_once('include/bbcode.php');
-require_once('include/oembed.php');
-require_once('include/salmon.php');
-require_once('include/crypto.php');
-require_once('include/Photo.php');
-require_once('include/tags.php');
-require_once('include/files.php');
-require_once('include/text.php');
-require_once('include/email.php');
-require_once('include/threads.php');
-require_once('include/socgraph.php');
-require_once('include/plaintext.php');
-require_once('include/ostatus.php');
-require_once('include/feed.php');
-require_once('include/Contact.php');
-require_once('mod/share.php');
-require_once('include/enotify.php');
-require_once('include/dfrn.php');
-require_once('include/group.php');
+require_once 'include/bbcode.php';
+require_once 'include/oembed.php';
+require_once 'include/salmon.php';
+require_once 'include/crypto.php';
+require_once 'include/Photo.php';
+require_once 'include/tags.php';
+require_once 'include/files.php';
+require_once 'include/text.php';
+require_once 'include/email.php';
+require_once 'include/threads.php';
+require_once 'include/socgraph.php';
+require_once 'include/plaintext.php';
+require_once 'include/ostatus.php';
+require_once 'include/feed.php';
+require_once 'include/Contact.php';
+require_once 'mod/share.php';
+require_once 'include/enotify.php';
+require_once 'include/dfrn.php';
+require_once 'include/group.php';
 
-require_once('library/defuse/php-encryption-1.2.1/Crypto.php');
+/// @TODO one day with composer autploader no more needed
+require_once 'library/defuse/php-encryption-1.2.1/Crypto.php';
 
 function construct_verb($item) {
-	if ($item['verb'])
+	if ($item['verb']) {
 		return $item['verb'];
+	}
 	return ACTIVITY_POST;
 }
 
@@ -69,7 +71,7 @@ function limit_body_size($body) {
 			if (! strcmp(substr($orig_body, $img_start + $img_st_close, 5), 'data:')) {
 				// This is an embedded image
 
-				if ( ($textlen + $img_start) > $maxlen ) {
+				if (($textlen + $img_start) > $maxlen ) {
 					if ($textlen < $maxlen) {
 						logger('limit_body_size: the limit happens before an embedded image', LOGGER_DEBUG);
 						$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
@@ -83,7 +85,7 @@ function limit_body_size($body) {
 				$new_body = $new_body . substr($orig_body, $img_start, $img_end - $img_start);
 			} else {
 
-				if ( ($textlen + $img_end) > $maxlen ) {
+				if (($textlen + $img_end) > $maxlen ) {
 					if ($textlen < $maxlen) {
 						logger('limit_body_size: the limit happens before the end of a non-embedded image', LOGGER_DEBUG);
 						$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
@@ -96,15 +98,17 @@ function limit_body_size($body) {
 			}
 			$orig_body = substr($orig_body, $img_end);
 
-			if ($orig_body === false) // in case the body ends on a closing image tag
+			if ($orig_body === false) {
+				// in case the body ends on a closing image tag
 				$orig_body = '';
+			}
 
 			$img_start = strpos($orig_body, '[img');
 			$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
 			$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
 		}
 
-		if ( ($textlen + strlen($orig_body)) > $maxlen) {
+		if (($textlen + strlen($orig_body)) > $maxlen) {
 			if ($textlen < $maxlen) {
 				logger('limit_body_size: the limit happens after the end of the last image', LOGGER_DEBUG);
 				$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
@@ -117,8 +121,9 @@ function limit_body_size($body) {
 		}
 
 		return $new_body;
-	} else
+	} else {
 		return $body;
+	}
 }}
 
 function title_is_body($title, $body) {
@@ -126,12 +131,12 @@ function title_is_body($title, $body) {
 	$title = strip_tags($title);
 	$title = trim($title);
 	$title = html_entity_decode($title, ENT_QUOTES, 'UTF-8');
-	$title = str_replace(array("\n", "\r", "\t", " "), array("","","",""), $title);
+	$title = str_replace(array("\n", "\r", "\t", " "), array("", "", "", ""), $title);
 
 	$body = strip_tags($body);
 	$body = trim($body);
 	$body = html_entity_decode($body, ENT_QUOTES, 'UTF-8');
-	$body = str_replace(array("\n", "\r", "\t", " "), array("","","",""), $body);
+	$body = str_replace(array("\n", "\r", "\t", " "), array("", "", "", ""), $body);
 
 	if (strlen($title) < strlen($body))
 		$body = substr($body, 0, strlen($title));
@@ -212,7 +217,7 @@ function add_page_info_data($data) {
 		foreach ($data["keywords"] AS $keyword) {
 			/// @todo make a positive list of allowed characters
 			$hashtag = str_replace(array(" ", "+", "/", ".", "#", "'", "’", "`", "(", ")", "„", "“"),
-						array("","", "", "", "", "", "", "", "", "", "", ""), $keyword);
+						array("", "", "", "", "", "", "", "", "", "", "", ""), $keyword);
 			$hashtags .= "#[url=".App::get_baseurl()."/search?tag=".rawurlencode($hashtag)."]".$hashtag."[/url] ";
 		}
 	}
@@ -224,21 +229,24 @@ function query_page_info($url, $no_photos = false, $photo = "", $keywords = fals
 
 	$data = ParseUrl::getSiteinfoCached($url, true);
 
-	if ($photo != "")
+	if ($photo != "") {
 		$data["images"][0]["src"] = $photo;
+	}
 
 	logger('fetch page info for '.$url.' '.print_r($data, true), LOGGER_DEBUG);
 
-	if (!$keywords AND isset($data["keywords"]))
+	if (!$keywords AND isset($data["keywords"])) {
 		unset($data["keywords"]);
+	}
 
 	if (($keyword_blacklist != "") AND isset($data["keywords"])) {
-		$list = explode(",", $keyword_blacklist);
+		$list = explode(", ", $keyword_blacklist);
 		foreach ($list AS $keyword) {
 			$keyword = trim($keyword);
 			$index = array_search($keyword, $data["keywords"]);
-			if ($index !== false)
+			if ($index !== false) {
 				unset($data["keywords"][$index]);
+			}
 		}
 	}
 
@@ -252,12 +260,13 @@ function add_page_keywords($url, $no_photos = false, $photo = "", $keywords = fa
 	if (isset($data["keywords"]) AND count($data["keywords"])) {
 		foreach ($data["keywords"] AS $keyword) {
 			$hashtag = str_replace(array(" ", "+", "/", ".", "#", "'"),
-						array("","", "", "", "", ""), $keyword);
+				array("", "", "", "", "", ""), $keyword);
 
-			if ($tags != "")
-				$tags .= ",";
+			if ($tags != "") {
+				$tags .= ", ";
+			}
 
-			$tags .= "#[url=".App::get_baseurl()."/search?tag=".rawurlencode($hashtag)."]".$hashtag."[/url]";
+			$tags .= "#[url=" . App::get_baseurl() . "/search?tag=" . rawurlencode($hashtag) . "]" . $hashtag . "[/url]";
 		}
 	}
 
@@ -330,9 +339,9 @@ function item_add_language_opt(&$arr) {
 
 	if (version_compare(PHP_VERSION, '5.3.0', '<')) return; // LanguageDetect.php not available ?
 
-	if ( x($arr, 'postopts') )
+	if (x($arr, 'postopts') )
 	{
-		if ( strstr($arr['postopts'], 'lang=') )
+		if (strstr($arr['postopts'], 'lang=') )
 		{
 			// do not override
 			/// @TODO Add parameter to request overriding
@@ -344,7 +353,7 @@ function item_add_language_opt(&$arr) {
 	}
 
 	require_once('library/langdet/Text/LanguageDetect.php');
-	$naked_body = preg_replace('/\[(.+?)\]/','',$arr['body']);
+	$naked_body = preg_replace('/\[(.+?)\]/','', $arr['body']);
 	$l = new Text_LanguageDetect;
 	//$lng = $l->detectConfidence($naked_body);
 	//$arr['postopts'] = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
@@ -392,7 +401,7 @@ function uri_to_guid($uri, $host = "") {
 	return $guid_prefix.$host_hash;
 }
 
-function item_store($arr,$force_parent = false, $notify = false, $dontcache = false) {
+function item_store($arr, $force_parent = false, $notify = false, $dontcache = false) {
 
 	$a = get_app();
 
@@ -509,11 +518,11 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	$arr['owner-name']    = ((x($arr,'owner-name'))    ? trim($arr['owner-name'])    : '');
 	$arr['owner-link']    = ((x($arr,'owner-link'))    ? notags(trim($arr['owner-link']))    : '');
 	$arr['owner-avatar']  = ((x($arr,'owner-avatar'))  ? notags(trim($arr['owner-avatar']))  : '');
-	$arr['created']       = ((x($arr,'created') !== false) ? datetime_convert('UTC','UTC',$arr['created']) : datetime_convert());
-	$arr['edited']        = ((x($arr,'edited')  !== false) ? datetime_convert('UTC','UTC',$arr['edited'])  : datetime_convert());
-	$arr['commented']     = ((x($arr,'commented')  !== false) ? datetime_convert('UTC','UTC',$arr['commented'])  : datetime_convert());
-	$arr['received']      = ((x($arr,'received')  !== false) ? datetime_convert('UTC','UTC',$arr['received'])  : datetime_convert());
-	$arr['changed']       = ((x($arr,'changed')  !== false) ? datetime_convert('UTC','UTC',$arr['changed'])  : datetime_convert());
+	$arr['created']       = ((x($arr,'created') !== false) ? datetime_convert('UTC','UTC', $arr['created']) : datetime_convert());
+	$arr['edited']        = ((x($arr,'edited')  !== false) ? datetime_convert('UTC','UTC', $arr['edited'])  : datetime_convert());
+	$arr['commented']     = ((x($arr,'commented')  !== false) ? datetime_convert('UTC','UTC', $arr['commented'])  : datetime_convert());
+	$arr['received']      = ((x($arr,'received')  !== false) ? datetime_convert('UTC','UTC', $arr['received'])  : datetime_convert());
+	$arr['changed']       = ((x($arr,'changed')  !== false) ? datetime_convert('UTC','UTC', $arr['changed'])  : datetime_convert());
 	$arr['title']         = ((x($arr,'title'))         ? trim($arr['title'])         : '');
 	$arr['location']      = ((x($arr,'location'))      ? trim($arr['location'])      : '');
 	$arr['coord']         = ((x($arr,'coord'))         ? notags(trim($arr['coord']))         : '');
@@ -799,9 +808,9 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 	put_item_in_cache($arr);
 
 	if ($notify)
-		call_hooks('post_local',$arr);
+		call_hooks('post_local', $arr);
 	else
-		call_hooks('post_remote',$arr);
+		call_hooks('post_remote', $arr);
 
 	if (x($arr,'cancel')) {
 		logger('item_store: post cancelled by plugin.');
@@ -954,7 +963,7 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		);
 	}
 
-	$deleted = tag_deliver($arr['uid'],$current_post);
+	$deleted = tag_deliver($arr['uid'], $current_post);
 
 	// current post can be deleted if is for a community page and no mention are
 	// in it.
@@ -1082,19 +1091,19 @@ function item_body_set_hashtags(&$item) {
 
 	// mask hashtags inside of url, bookmarks and attachments to avoid urls in urls
 	$item["body"] = preg_replace_callback("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
-		function ($match){
+		function ($match) {
 			return("[url=".str_replace("#", "&num;", $match[1])."]".str_replace("#", "&num;", $match[2])."[/url]");
-		},$item["body"]);
+		}, $item["body"]);
 
 	$item["body"] = preg_replace_callback("/\[bookmark\=([$URLSearchString]*)\](.*?)\[\/bookmark\]/ism",
-		function ($match){
+		function ($match) {
 			return("[bookmark=".str_replace("#", "&num;", $match[1])."]".str_replace("#", "&num;", $match[2])."[/bookmark]");
-		},$item["body"]);
+		}, $item["body"]);
 
 	$item["body"] = preg_replace_callback("/\[attachment (.*)\](.*?)\[\/attachment\]/ism",
-		function ($match){
+		function ($match) {
 			return("[attachment ".str_replace("#", "&num;", $match[1])."]".$match[2]."[/attachment]");
-		},$item["body"]);
+		}, $item["body"]);
 
 	// Repair recursive urls
 	$item["body"] = preg_replace("/&num;\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
@@ -1114,7 +1123,7 @@ function item_body_set_hashtags(&$item) {
 
 		$item["body"] = str_replace($tag, $newtag, $item["body"]);
 
-		if (!stristr($item["tag"],"/search?tag=".$basetag."]".$basetag."[/url]")) {
+		if (!stristr($item["tag"], "/search?tag=".$basetag."]".$basetag."[/url]")) {
 			if (strlen($item["tag"]))
 				$item["tag"] = ','.$item["tag"];
 			$item["tag"] = $newtag.$item["tag"];
@@ -1169,7 +1178,7 @@ function get_item_id($guid, $uid = 0) {
 }
 
 // return - test
-function get_item_contact($item,$contacts) {
+function get_item_contact($item, $contacts) {
 	if (! count($contacts) || (! is_array($item)))
 		return false;
 	foreach ($contacts as $contact) {
@@ -1187,7 +1196,7 @@ function get_item_contact($item,$contacts) {
  * @param int $item_id
  * @return bool true if item was deleted, else false
  */
-function tag_deliver($uid,$item_id) {
+function tag_deliver($uid, $item_id) {
 
 	//
 
@@ -1195,7 +1204,7 @@ function tag_deliver($uid,$item_id) {
 
 	$mention = false;
 
-	$u = q("select * from user where uid = %d limit 1",
+	$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 		intval($uid)
 	);
 
@@ -1224,19 +1233,19 @@ function tag_deliver($uid,$item_id) {
 
 	$dlink = normalise_link(App::get_baseurl() . '/u/' . $u[0]['nickname']);
 
-	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism',$item['body'],$matches,PREG_SET_ORDER);
+	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches,PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
-			if (link_compare($link,$mtch[1]) || link_compare($dlink,$mtch[1])) {
+			if (link_compare($link, $mtch[1]) || link_compare($dlink, $mtch[1])) {
 				$mention = true;
 				logger('tag_deliver: mention found: ' . $mtch[2]);
 			}
 		}
 	}
 
-	if (! $mention){
-		if ( ($community_page || $prvgroup) &&
-			  (!$item['wall']) && (!$item['origin']) && ($item['id'] == $item['parent'])){
+	if (! $mention) {
+		if (($community_page || $prvgroup) &&
+			  (!$item['wall']) && (!$item['origin']) && ($item['id'] == $item['parent'])) {
 			// mmh.. no mention.. community page or private group... no wall.. no origin.. top-post (not a comment)
 			// delete it!
 			logger("tag_deliver: no-mention top-level post to communuty or private group. delete.");
@@ -1261,8 +1270,9 @@ function tag_deliver($uid,$item_id) {
 	// prevent delivery looping - only proceed
 	// if the message originated elsewhere and is a top-level post
 
-	if (($item['wall']) || ($item['origin']) || ($item['id'] != $item['parent']))
+	if (($item['wall']) || ($item['origin']) || ($item['id'] != $item['parent'])) {
 		return;
+	}
 
 	// now change this copy of the post to a forum head message and deliver to all the tgroup members
 
@@ -1301,14 +1311,15 @@ function tag_deliver($uid,$item_id) {
 
 
 
-function tgroup_check($uid,$item) {
+function tgroup_check($uid, $item) {
 
 	$mention = false;
 
 	// check that the message originated elsewhere and is a top-level post
 
-	if (($item['wall']) || ($item['origin']) || ($item['uri'] != $item['parent-uri']))
+	if (($item['wall']) || ($item['origin']) || ($item['uri'] != $item['parent-uri'])) {
 		return false;
+	}
 
 	/// @TODO Encapsulate this or find it encapsulated and replace all occurrances
 	$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
@@ -1329,10 +1340,10 @@ function tgroup_check($uid,$item) {
 
 	$dlink = normalise_link(App::get_baseurl() . '/u/' . $u[0]['nickname']);
 
-	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism',$item['body'],$matches,PREG_SET_ORDER);
+	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches,PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
-			if (link_compare($link,$mtch[1]) || link_compare($dlink,$mtch[1])) {
+			if (link_compare($link, $mtch[1]) || link_compare($dlink, $mtch[1])) {
 				$mention = true;
 				logger('tgroup_check: mention found: ' . $mtch[2]);
 			}
@@ -1395,14 +1406,14 @@ function edited_timestamp_is_newer($existing, $update) {
  * recursion.
  */
 
-function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) {
+function consume_feed($xml, $importer,&$contact, &$hub, $datedir = 0, $pass = 0) {
 	if ($contact['network'] === NETWORK_OSTATUS) {
 		if ($pass < 2) {
 			// Test - remove before flight
 			//$tempfile = tempnam(get_temppath(), "ostatus2");
 			//file_put_contents($tempfile, $xml);
 			logger("Consume OStatus messages ", LOGGER_DEBUG);
-			ostatus::import($xml,$importer,$contact, $hub);
+			ostatus::import($xml, $importer, $contact, $hub);
 		}
 		return;
 	}
@@ -1410,7 +1421,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 	if ($contact['network'] === NETWORK_FEED) {
 		if ($pass < 2) {
 			logger("Consume feeds", LOGGER_DEBUG);
-			feed_import($xml,$importer,$contact, $hub);
+			feed_import($xml, $importer, $contact, $hub);
 		}
 		return;
 	}
@@ -1432,7 +1443,7 @@ function consume_feed($xml,$importer,&$contact, &$hub, $datedir = 0, $pass = 0) 
 		);
 		if ($r) {
 			logger("Now import the DFRN feed");
-			dfrn::import($xml,$r[0], true);
+			dfrn::import($xml, $r[0], true);
 			return;
 		}
 	}
@@ -1479,7 +1490,7 @@ function item_is_remote_self($contact, &$datarray) {
 		if ($contact['network'] != NETWORK_FEED) {
 			$datarray["guid"] = get_guid(32);
 			unset($datarray["plink"]);
-			$datarray["uri"] = item_new_uri($a->get_hostname(),$contact['uid'], $datarray["guid"]);
+			$datarray["uri"] = item_new_uri($a->get_hostname(), $contact['uid'], $datarray["guid"]);
 			$datarray["parent-uri"] = $datarray["uri"];
 			$datarray["extid"] = $contact['network'];
 			$urlpart = parse_url($datarray2['author-link']);
@@ -1660,7 +1671,7 @@ function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
 		);
 	}
 
-	post_url($url,$params);
+	post_url($url, $params);
 
 	logger('subscribe_to_hub: returns: ' . $a->get_curl_code(), LOGGER_DEBUG);
 
@@ -1696,12 +1707,12 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 			// Only embed locally hosted photos
 			$replace = false;
 			$i = basename($image);
-			$i = str_replace(array('.jpg','.png','.gif'),array('','',''),$i);
+			$i = str_replace(array('.jpg','.png','.gif'),array('', '',''), $i);
 			$x = strpos($i,'-');
 
 			if ($x) {
-				$res = substr($i,$x+1);
-				$i = substr($i,0,$x);
+				$res = substr($i, $x+1);
+				$i = substr($i,0, $x);
 				$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` = %d AND `uid` = %d",
 					dbesc($i),
 					intval($res),
@@ -1724,7 +1735,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 								$replace = true;
 							}
 						} elseif ($item) {
-							if (compare_permissions($item,$r[0]))
+							if (compare_permissions($item, $r[0]))
 								$replace = true;
 						}
 					}
@@ -1757,8 +1768,9 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 
 		$new_body = $new_body . substr($orig_body, 0, $img_start + $img_st_close) . $image . '[/img]';
 		$orig_body = substr($orig_body, $img_start + $img_st_close + $img_len + strlen('[/img]'));
-		if ($orig_body === false)
+		if ($orig_body === false) {
 			$orig_body = '';
+		}
 
 		$img_start = strpos($orig_body, '[img');
 		$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
@@ -1776,7 +1788,7 @@ function has_permissions($obj) {
 	return false;
 }
 
-function compare_permissions($obj1,$obj2) {
+function compare_permissions($obj1, $obj2) {
 	// first part is easy. Check that these are exactly the same.
 	if (($obj1['allow_cid'] == $obj2['allow_cid'])
 		&& ($obj1['allow_gid'] == $obj2['allow_gid'])
@@ -1802,28 +1814,28 @@ function enumerate_permissions($obj) {
 	$allow_groups = expand_groups(expand_acl($obj['allow_gid']));
 	$deny_people  = expand_acl($obj['deny_cid']);
 	$deny_groups  = expand_groups(expand_acl($obj['deny_gid']));
-	$recipients   = array_unique(array_merge($allow_people,$allow_groups));
-	$deny         = array_unique(array_merge($deny_people,$deny_groups));
-	$recipients   = array_diff($recipients,$deny);
+	$recipients   = array_unique(array_merge($allow_people, $allow_groups));
+	$deny         = array_unique(array_merge($deny_people, $deny_groups));
+	$recipients   = array_diff($recipients, $deny);
 	return $recipients;
 }
 
 function item_getfeedtags($item) {
 	$ret = array();
 	$matches = false;
-	$cnt = preg_match_all('|\#\[url\=(.*?)\](.*?)\[\/url\]|',$item['tag'],$matches);
+	$cnt = preg_match_all('|\#\[url\=(.*?)\](.*?)\[\/url\]|', $item['tag'], $matches);
 	if ($cnt) {
 		for ($x = 0; $x < $cnt; $x ++) {
 			if ($matches[1][$x])
-				$ret[$matches[2][$x]] = array('#',$matches[1][$x], $matches[2][$x]);
+				$ret[$matches[2][$x]] = array('#', $matches[1][$x], $matches[2][$x]);
 		}
 	}
 	$matches = false;
-	$cnt = preg_match_all('|\@\[url\=(.*?)\](.*?)\[\/url\]|',$item['tag'],$matches);
+	$cnt = preg_match_all('|\@\[url\=(.*?)\](.*?)\[\/url\]|', $item['tag'], $matches);
 	if ($cnt) {
 		for ($x = 0; $x < $cnt; $x ++) {
 			if ($matches[1][$x])
-				$ret[] = array('@',$matches[1][$x], $matches[2][$x]);
+				$ret[] = array('@', $matches[1][$x], $matches[2][$x]);
 		}
 	}
 	return $ret;
@@ -1900,7 +1912,7 @@ function item_expire($uid, $days, $network = "", $force = false) {
 		drop_item($item['id'],false);
 	}
 
-	proc_run(PRIORITY_HIGH,"include/notifier.php", "expire", $uid);
+	proc_run(PRIORITY_HIGH, "include/notifier.php", "expire", $uid);
 
 }
 
@@ -1921,12 +1933,13 @@ function drop_items($items) {
 
 	// multiple threads may have been deleted, send an expire notification
 
-	if ($uid)
-		proc_run(PRIORITY_HIGH,"include/notifier.php", "expire", $uid);
+	if ($uid) {
+		proc_run(PRIORITY_HIGH, "include/notifier.php", "expire", $uid);
+	}
 }
 
 
-function drop_item($id,$interactive = true) {
+function drop_item($id, $interactive = true) {
 
 	$a = get_app();
 
@@ -1937,8 +1950,9 @@ function drop_item($id,$interactive = true) {
 	);
 
 	if (! dbm::is_result($r)) {
-		if (! $interactive)
+		if (! $interactive) {
 			return 0;
+		}
 		notice( t('Item not found.') . EOL);
 		goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
 	}
@@ -2006,19 +2020,19 @@ function drop_item($id,$interactive = true) {
 		// clean up categories and tags so they don't end up as orphans
 
 		$matches = false;
-		$cnt = preg_match_all('/<(.*?)>/',$item['file'],$matches,PREG_SET_ORDER);
+		$cnt = preg_match_all('/<(.*?)>/', $item['file'], $matches,PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				file_tag_unsave_file($item['uid'],$item['id'],$mtch[1],true);
+				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],true);
 			}
 		}
 
 		$matches = false;
 
-		$cnt = preg_match_all('/\[(.*?)\]/',$item['file'],$matches,PREG_SET_ORDER);
+		$cnt = preg_match_all('/\[(.*?)\]/', $item['file'], $matches,PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				file_tag_unsave_file($item['uid'],$item['id'],$mtch[1],false);
+				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],false);
 			}
 		}
 
@@ -2076,7 +2090,7 @@ function drop_item($id,$interactive = true) {
 		// The new code splits the queries since the mysql optimizer really has bad problems with subqueries
 
 		// Creating list of parents
-		$r = q("select id from item where parent = %d and uid = %d",
+		$r = q("SELECT `id` FROM `item` WHERE `parent` = %d AND `uid` = %d",
 			intval($item['id']),
 			intval($item['uid'])
 		);
@@ -2092,13 +2106,11 @@ function drop_item($id,$interactive = true) {
 
 		// Now delete them
 		if ($parentid != "") {
-			$r = q("DELETE FROM item_id where iid in (%s)", dbesc($parentid));
-
-			$r = q("DELETE FROM sign where iid in (%s)", dbesc($parentid));
+			$r = q("DELETE FROM `item_id` WHERE `iid` IN (%s)", dbesc($parentid));
+			$r = q("DELETE FROM `sign` WHERE `iid` IN (%s)", dbesc($parentid));
 		}
 
 		// If it's the parent of a comment thread, kill all the kids
-
 		if ($item['uri'] == $item['parent-uri']) {
 			$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s', `body` = '' , `title` = ''
 				WHERE `parent-uri` = '%s' AND `uid` = %d ",
@@ -2134,15 +2146,17 @@ function drop_item($id,$interactive = true) {
 
 		// send the notification upstream/downstream as the case may be
 
-		proc_run(PRIORITY_HIGH,"include/notifier.php", "drop", $drop_id);
+		proc_run(PRIORITY_HIGH, "include/notifier.php", "drop", $drop_id);
 
-		if (! $interactive)
+		if (! $interactive) {
 			return $owner;
+		}
 		goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
 		//NOTREACHED
 	} else {
-		if (! $interactive)
+		if (! $interactive) {
 			return 0;
+		}
 		notice( t('Permission denied.') . EOL);
 		goaway(App::get_baseurl() . '/' . $_SESSION['return_url']);
 		//NOTREACHED
@@ -2151,17 +2165,17 @@ function drop_item($id,$interactive = true) {
 }
 
 
-function first_post_date($uid,$wall = false) {
-	$r = q("select id, created from item
-		where uid = %d and wall = %d and deleted = 0 and visible = 1 AND moderated = 0
-		and id = parent
-		order by created asc limit 1",
+function first_post_date($uid, $wall = false) {
+	$r = q("SELECT `id`, `created` FROM `item`
+		WHERE `uid` = %d AND `wall` = %d AND `deleted` = 0 AND `visible` = 1 AND `moderated` = 0
+		AND `id` = `parent`
+		ORDER BY `created` ASC LIMIT 1",
 		intval($uid),
 		intval($wall ? 1 : 0)
 	);
 	if (dbm::is_result($r)) {
 //		logger('first_post_date: ' . $r[0]['id'] . ' ' . $r[0]['created'], LOGGER_DATA);
-		return substr(datetime_convert('',date_default_timezone_get(),$r[0]['created']),0,10);
+		return substr(datetime_convert('',date_default_timezone_get(), $r[0]['created']),0,10);
 	}
 	return false;
 }
@@ -2171,8 +2185,9 @@ function list_post_dates($uid, $wall) {
 	$dnow = datetime_convert('',date_default_timezone_get(),'now','Y-m-d');
 
 	$dthen = first_post_date($uid, $wall);
-	if (! $dthen)
+	if (! $dthen) {
 		return array();
+	}
 
 	// Set the start and end date to the beginning of the month
 	$dnow = substr($dnow,0,8).'01';
@@ -2180,29 +2195,33 @@ function list_post_dates($uid, $wall) {
 
 	$ret = array();
 
-	// Starting with the current month, get the first and last days of every
-	// month down to and including the month of the first post
+	/*
+	 * Starting with the current month, get the first and last days of every
+	 * month down to and including the month of the first post
+	 */
 	while (substr($dnow, 0, 7) >= substr($dthen, 0, 7)) {
 		$dyear = intval(substr($dnow,0,4));
 		$dstart = substr($dnow,0,8) . '01';
 		$dend = substr($dnow,0,8) . get_dim(intval($dnow),intval(substr($dnow,5)));
-		$start_month = datetime_convert('','',$dstart,'Y-m-d');
-		$end_month = datetime_convert('','',$dend,'Y-m-d');
-		$str = day_translate(datetime_convert('','',$dnow,'F'));
-		if (! $ret[$dyear])
+		$start_month = datetime_convert('', '', $dstart,'Y-m-d');
+		$end_month = datetime_convert('', '', $dend,'Y-m-d');
+		$str = day_translate(datetime_convert('', '', $dnow,'F'));
+		if (!$ret[$dyear]) {
 			$ret[$dyear] = array();
-		$ret[$dyear][] = array($str,$end_month,$start_month);
-		$dnow = datetime_convert('','',$dnow . ' -1 month', 'Y-m-d');
+		}
+		$ret[$dyear][] = array($str, $end_month, $start_month);
+		$dnow = datetime_convert('', '', $dnow . ' -1 month', 'Y-m-d');
 	}
 	return $ret;
 }
 
-function posted_dates($uid,$wall) {
+function posted_dates($uid, $wall) {
 	$dnow = datetime_convert('',date_default_timezone_get(),'now','Y-m-d');
 
-	$dthen = first_post_date($uid,$wall);
-	if (! $dthen)
+	$dthen = first_post_date($uid, $wall);
+	if (! $dthen) {
 		return array();
+	}
 
 	// Set the start and end date to the beginning of the month
 	$dnow = substr($dnow,0,8).'01';
@@ -2214,21 +2233,22 @@ function posted_dates($uid,$wall) {
 	while (substr($dnow, 0, 7) >= substr($dthen, 0, 7)) {
 		$dstart = substr($dnow,0,8) . '01';
 		$dend = substr($dnow,0,8) . get_dim(intval($dnow),intval(substr($dnow,5)));
-		$start_month = datetime_convert('','',$dstart,'Y-m-d');
-		$end_month = datetime_convert('','',$dend,'Y-m-d');
-		$str = day_translate(datetime_convert('','',$dnow,'F Y'));
-		$ret[] = array($str,$end_month,$start_month);
-		$dnow = datetime_convert('','',$dnow . ' -1 month', 'Y-m-d');
+		$start_month = datetime_convert('', '', $dstart,'Y-m-d');
+		$end_month = datetime_convert('', '', $dend,'Y-m-d');
+		$str = day_translate(datetime_convert('', '', $dnow,'F Y'));
+		$ret[] = array($str, $end_month, $start_month);
+		$dnow = datetime_convert('', '', $dnow . ' -1 month', 'Y-m-d');
 	}
 	return $ret;
 }
 
 
-function posted_date_widget($url,$uid,$wall) {
+function posted_date_widget($url, $uid, $wall) {
 	$o = '';
 
-	if (! feature_enabled($uid,'archives'))
+	if (! feature_enabled($uid, 'archives')) {
 		return $o;
+	}
 
 	// For former Facebook folks that left because of "timeline"
 
@@ -2236,16 +2256,18 @@ function posted_date_widget($url,$uid,$wall) {
 		return $o;*/
 
 	$visible_years = get_pconfig($uid,'system','archive_visible_years');
-	if (! $visible_years)
+	if (! $visible_years) {
 		$visible_years = 5;
+	}
 
-	$ret = list_post_dates($uid,$wall);
+	$ret = list_post_dates($uid, $wall);
 
-	if (! dbm::is_result($ret))
+	if (! dbm::is_result($ret)) {
 		return $o;
+	}
 
 	$cutoff_year = intval(datetime_convert('',date_default_timezone_get(),'now','Y')) - $visible_years;
-	$cutoff = ((array_key_exists($cutoff_year,$ret))? true : false);
+	$cutoff = ((array_key_exists($cutoff_year, $ret))? true : false);
 
 	$o = replace_macros(get_markup_template('posted_date_widget.tpl'),array(
 		'$title' => t('Archives'),
