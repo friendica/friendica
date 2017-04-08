@@ -652,7 +652,7 @@ function bb_DiasporaLinks($match) {
 function bb_RemovePictureLinks($match) {
 	$text = Cache::get($match[1]);
 
-	if (is_null($text)){
+	if (is_null($text)) {
 		$a = get_app();
 
 		$stamp1 = microtime(true);
@@ -706,7 +706,7 @@ function bb_expand_links($match) {
 function bb_CleanPictureLinksSub($match) {
 	$text = Cache::get($match[1]);
 
-	if (is_null($text)){
+	if (is_null($text)) {
 		$a = get_app();
 
 		$stamp1 = microtime(true);
