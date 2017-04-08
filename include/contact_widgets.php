@@ -206,8 +206,9 @@ function common_friends_visitor_widget($profile_uid) {
 
 	$a = get_app();
 
-	if (local_user() == $profile_uid)
+	if (local_user() == $profile_uid) {
 		return;
+	}
 
 	$cid = $zcid = 0;
 
