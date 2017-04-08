@@ -70,8 +70,9 @@ function item_redir_and_replace_images($body, $images, $cid) {
 		$newbody .= substr($origbody, 0, $pos['start']['open']);
 		$subject = substr($origbody, $pos['start']['open'], $pos['end']['close'] - $pos['start']['open']);
 		$origbody = substr($origbody, $pos['end']['close']);
-		if ($origbody === false)
+		if ($origbody === false) {
 			$origbody = '';
+		}
 
 		$subject = preg_replace($search, $replace, $subject);
 		$newbody .= $subject;
@@ -97,22 +98,26 @@ function item_redir_and_replace_images($body, $images, $cid) {
 /**
  * Render actions localized
  */
-function localize_item(&$item){
+function localize_item(&$item) {
 
 	$extracted = item_extract_images($item['body']);
-	if ($extracted['images'])
+	if ($extracted['images']) {
 		$item['body'] = item_redir_and_replace_images($extracted['body'], $extracted['images'], $item['contact-id']);
+	}
 
-	$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
+	/// @Separted ???
+	$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 	if (activity_match($item['verb'], ACTIVITY_LIKE)
 		|| activity_match($item['verb'], ACTIVITY_DISLIKE)
 		|| activity_match($item['verb'], ACTIVITY_ATTEND)
 		|| activity_match($item['verb'], ACTIVITY_ATTENDNO)
-		|| activity_match($item['verb'], ACTIVITY_ATTENDMAYBE)){
+		|| activity_match($item['verb'], ACTIVITY_ATTENDMAYBE)) {
 
-		$r = q("SELECT * from `item`,`contact` WHERE
-				`item`.`contact-id`=`contact`.`id` AND `item`.`uri`='%s';",
-				 dbesc($item['parent-uri']));
+		/// @TODO may hurt performance
+		$r = q("SELECT * FROM `item`, `contact`
+			WHERE `item`.`contact-id`=`contact`.`id`
+			AND `item`.`uri`='%s'",
+			dbesc($item['parent-uri']));
 		if (!dbm::is_result($r)) {
 			return;
 		}
@@ -176,57 +181,65 @@ function localize_item(&$item){
 
 		$Bname = $obj->title;
 		$Blink = ""; $Bphoto = "";
-		foreach ($links->link as $l){
+		foreach ($links->link as $l) {
 			$atts = $l->attributes();
-			switch($atts['rel']){
+			switch ($atts['rel']) {
 				case "alternate": $Blink = $atts['href'];
 				case "photo": $Bphoto = $atts['href'];
 			}
-
 		}
 
 		$A = '[url=' . zrl($Alink) . ']' . $Aname . '[/url]';
 		$B = '[url=' . zrl($Blink) . ']' . $Bname . '[/url]';
-		if ($Bphoto!="") $Bphoto = '[url=' . zrl($Blink) . '][img]' . $Bphoto . '[/img][/url]';
+		if ($Bphoto != "") {
+			$Bphoto = '[url=' . zrl($Blink) . '][img]' . $Bphoto . '[/img][/url]';
+		}
 
 		$item['body'] = sprintf( t('%1$s is now friends with %2$s'), $A, $B)."\n\n\n".$Bphoto;
 
 	}
 	if (stristr($item['verb'], ACTIVITY_POKE)) {
 		$verb = urldecode(substr($item['verb'],strpos($item['verb'],'#')+1));
-		if (! $verb)
+		if (! $verb) {
 			return;
-		if ($item['object-type']=="" || $item['object-type']!== ACTIVITY_OBJ_PERSON) return;
+		}
+		if ($item['object-type']=="" || $item['object-type']!== ACTIVITY_OBJ_PERSON) {
+			return;
+		}
 
 		$Aname = $item['author-name'];
 		$Alink = $item['author-link'];
 
-		$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
+		$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 
 		$obj = parse_xml_string($xmlhead.$item['object']);
 		$links = parse_xml_string($xmlhead."<links>".unxmlify($obj->link)."</links>");
 
 		$Bname = $obj->title;
-		$Blink = ""; $Bphoto = "";
-		foreach ($links->link as $l){
+		$Blink = "";
+		$Bphoto = "";
+		foreach ($links->link as $l) {
 			$atts = $l->attributes();
-			switch($atts['rel']){
+			switch ($atts['rel']) {
 				case "alternate": $Blink = $atts['href'];
 				case "photo": $Bphoto = $atts['href'];
 			}
-
 		}
 
 		$A = '[url=' . zrl($Alink) . ']' . $Aname . '[/url]';
 		$B = '[url=' . zrl($Blink) . ']' . $Bname . '[/url]';
-		if ($Bphoto!="") $Bphoto = '[url=' . zrl($Blink) . '][img=80x80]' . $Bphoto . '[/img][/url]';
+		if ($Bphoto != "") {
+			$Bphoto = '[url=' . zrl($Blink) . '][img=80x80]' . $Bphoto . '[/img][/url]';
+		}
 
-		// we can't have a translation string with three positions but no distinguishable text
-		// So here is the translate string.
+		/*
+		 * we can't have a translation string with three positions but no distinguishable text
+		 * So here is the translate string.
+		 */
 		$txt = t('%1$s poked %2$s');
 
 		// now translate the verb
-		$poked_t = trim(sprintf($txt, "",""));
+		$poked_t = trim(sprintf($txt, "", ""));
 		$txt = str_replace( $poked_t, t($verb), $txt);
 
 		// then do the sprintf on the translation string
@@ -235,9 +248,10 @@ function localize_item(&$item){
 
 	}
 	if (stristr($item['verb'], ACTIVITY_MOOD)) {
-		$verb = urldecode(substr($item['verb'],strpos($item['verb'],'#')+1));
-		if (! $verb)
+		$verb = urldecode(substr($item['verb'], strpos($item['verb'], '#') + 1));
+		if (! $verb) {
 			return;
+		}
 
 		$Aname = $item['author-name'];
 		$Alink = $item['author-link'];
@@ -249,18 +263,24 @@ function localize_item(&$item){
 	}
 
 	if (activity_match($item['verb'], ACTIVITY_TAG)) {
-		$r = q("SELECT * from `item`,`contact` WHERE
-		`item`.`contact-id`=`contact`.`id` AND `item`.`uri`='%s';",
-		 dbesc($item['parent-uri']));
-		if (!dbm::is_result($r)) return;
-		$obj=$r[0];
+		/// @TODO may hurt performance "joining" two tables + asterisk
+		$r = q("SELECT * FROM `item`, `contact`
+			WHERE `item`.`contact-id`=`contact`.`id`
+			AND `item`.`uri`='%s'",
+			dbesc($item['parent-uri']));
+
+		if (!dbm::is_result($r)) {
+			return;
+		}
+
+		$obj = $r[0];
 
 		$author  = '[url=' . zrl($item['author-link']) . ']' . $item['author-name'] . '[/url]';
 		$objauthor =  '[url=' . zrl($obj['author-link']) . ']' . $obj['author-name'] . '[/url]';
 
-		switch($obj['verb']){
+		switch ($obj['verb']) {
 			case ACTIVITY_POST:
-				switch ($obj['object-type']){
+				switch ($obj['object-type']) {
 					case ACTIVITY_OBJ_EVENT:
 						$post_type = t('event');
 						break;
@@ -269,13 +289,15 @@ function localize_item(&$item){
 				}
 				break;
 			default:
-				if ($obj['resource-id']){
+				if ($obj['resource-id']) {
 					$post_type = t('photo');
 					$m=array(); preg_match("/\[url=([^]]*)\]/", $obj['body'], $m);
 					$rr['plink'] = $m[1];
 				} else {
 					$post_type = t('status');
 				}
+				// Let's break everthing ... ;-)
+				break;
 		}
 		$plink = '[url=' . $obj['plink'] . ']' . $post_type . '[/url]';
 
@@ -285,22 +307,24 @@ function localize_item(&$item){
 		$item['body'] = sprintf( t('%1$s tagged %2$s\'s %3$s with %4$s'), $author, $objauthor, $plink, $tag );
 
 	}
-	if (activity_match($item['verb'], ACTIVITY_FAVORITE)){
+	if (activity_match($item['verb'], ACTIVITY_FAVORITE)) {
 
-		if ($item['object-type']== "")
+		if ($item['object-type'] == "") {
 			return;
+		}
 
 		$Aname = $item['author-name'];
 		$Alink = $item['author-link'];
 
-		$xmlhead="<"."?xml version='1.0' encoding='UTF-8' ?".">";
+		$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 
 		$obj = parse_xml_string($xmlhead.$item['object']);
 		if (strlen($obj->id)) {
-			$r = q("select * from item where uri = '%s' and uid = %d limit 1",
+			$r = q("SELECT * FROM `item` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
 					dbesc($obj->id),
 					intval($item['uid'])
 			);
+
 			if (dbm::is_result($r) && $r[0]['plink']) {
 				$target = $r[0];
 				$Bname = $target['author-name'];
@@ -309,21 +333,21 @@ function localize_item(&$item){
 				$B = '[url=' . zrl($Blink) . ']' . $Bname . '[/url]';
 				$P = '[url=' . $target['plink'] . ']' . t('post/item') . '[/url]';
 				$item['body'] = sprintf( t('%1$s marked %2$s\'s %3$s as favorite'), $A, $B, $P)."\n";
-
 			}
 		}
 	}
 	$matches = null;
-	if (preg_match_all('/@\[url=(.*?)\]/is',$item['body'],$matches,PREG_SET_ORDER)) {
+	if (preg_match_all('/@\[url=(.*?)\]/is', $item['body'], $matches, PREG_SET_ORDER)) {
 		foreach ($matches as $mtch) {
-			if (! strpos($mtch[1],'zrl='))
-				$item['body'] = str_replace($mtch[0],'@[url=' . zrl($mtch[1]). ']',$item['body']);
+			if (! strpos($mtch[1], 'zrl=')) {
+				$item['body'] = str_replace($mtch[0], '@[url=' . zrl($mtch[1]) . ']', $item['body']);
+			}
 		}
 	}
 
 	// add zrl's to public images
 	$photo_pattern = "/\[url=(.*?)\/photos\/(.*?)\/image\/(.*?)\]\[img(.*?)\]h(.*?)\[\/img\]\[\/url\]/is";
-	if (preg_match($photo_pattern,$item['body'])) {
+	if (preg_match($photo_pattern, $item['body'])) {
 		$photo_replace = '[url=' . zrl('$1' . '/photos/' . '$2' . '/image/' . '$3' ,true) . '][img' . '$4' . ']h' . '$5'  . '[/img][/url]';
 		$item['body'] = bb_tag_preg_replace($photo_pattern, $photo_replace, 'url', $item['body']);
 	}
@@ -333,19 +357,17 @@ function localize_item(&$item){
 	$x = stristr($item['plink'],'/display/');
 	if ($x) {
 		$sparkle = false;
-		$y = best_link_url($item,$sparkle,true);
+		$y = best_link_url($item, $sparkle, true);
 
-		if (strstr($y,'/redir/')) {
+		if (strstr($y, '/redir/')) {
 			$item['plink'] = $y . '?f=&url=' . $item['plink'];
 		}
 	}
-
-
-
 }
 
 /**
  * Count the total of comments on this item and its desendants
+ * @TODO proper type-hint + doc-tag
  */
 function count_descendants($item) {
 	$total = count($item['children']);
@@ -363,8 +385,10 @@ function count_descendants($item) {
 
 function visible_activity($item) {
 
-	// likes (etc.) can apply to other things besides posts. Check if they are post children,
-	// in which case we handle them specially
+	/*
+	 * likes (etc.) can apply to other things besides posts. Check if they are post children,
+	 * in which case we handle them specially
+	 */
 
 	$hidden_activities = array(ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE);
 	foreach ($hidden_activities as $act) {
@@ -386,7 +410,6 @@ function visible_activity($item) {
  * @brief SQL query for items
  */
 function item_query() {
-
 	return "SELECT ".item_fieldlists()." FROM `item` ".
 		item_joins()." WHERE ".item_condition();
 }
@@ -446,7 +469,6 @@ These Fields are not added below (yet). They are here to for bug search.
  * @brief SQL join for contacts that are needed for displaying items
  */
 function item_joins() {
-
 	return "STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND
 		(NOT `contact`.`blocked` OR `contact`.`pending`)
 		LEFT JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id`
@@ -457,10 +479,10 @@ function item_joins() {
  * @brief SQL condition for items that are needed for displaying items
  */
 function item_condition() {
-
 	return "`item`.`visible` AND NOT `item`.`deleted` AND NOT `item`.`moderated`";
 }
 
+if (!function_exists('conversation')) {
 /**
  * "Render" a conversation or list of items for HTML display.
  * There are two major forms of display:
@@ -471,8 +493,6 @@ function item_condition() {
  * that are based on unique features of the calling module.
  *
  */
-
-if (!function_exists('conversation')) {
 function conversation(App $a, $items, $mode, $update, $preview = false) {
 
 	require_once 'include/bbcode.php';
@@ -605,10 +625,13 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 
 		if ($mode === 'network-new' || $mode === 'search' || $mode === 'community') {
 
-			// "New Item View" on network page or search page results
-			// - just loop through the items and format them minimally for display
+			/*
+			 * "New Item View" on network page or search page results
+			 * - just loop through the items and format them minimally for display
+			 */
 
-//			$tpl = get_markup_template('search_item.tpl');
+			/// @TODO old lost code?
+			// $tpl = get_markup_template('search_item.tpl');
 			$tpl = 'search_item.tpl';
 
 			foreach ($items as $item) {
@@ -688,7 +711,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 					$profile_link = zrl($profile_link);
 				}
 
-				if (!isset($item['author-thumb']) OR ($item['author-thumb'] == "")) {
+				if (!x($item, 'author-thumb') OR ($item['author-thumb'] == "")) {
 					$author_contact = get_contact_details_by_url($item['author-link'], $profile_owner);
 					if ($author_contact["thumb"]) {
 						$item['author-thumb'] = $author_contact["thumb"];
@@ -975,7 +998,7 @@ function item_photo_menu($item) {
 	}
 
 	if (local_user()) {
-		$menu = Array(
+		$menu = array(
 			t('Follow Thread') => $sub_link,
 			t('View Status') => $status_link,
 			t('View Profile') => $profile_link,
@@ -1029,7 +1052,7 @@ function builtin_activity_puller($item, &$conv_responses) {
 		$url = '';
 		$sparkle = '';
 
-		switch($mode) {
+		switch ($mode) {
 			case 'like':
 				$verb = ACTIVITY_LIKE;
 				break;
@@ -1111,7 +1134,7 @@ function format_like($cnt, array $arr, $type, $id) {
 
 		// Phrase if there is only one liker. In other cases it will be uses for the expanded
 		// list which show all likers
-		switch($type) {
+		switch ($type) {
 			case 'like' :
 				$phrase = sprintf( t('%s likes this.'), $likers);
 				break;
@@ -1308,7 +1331,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup = false) {
 	));
 
 
-	if ($popup==true){
+	if ($popup == true) {
 		$o = '<div id="jot-popup" style="display: none;">'.$o.'</div>';
 	}
 
