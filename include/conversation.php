@@ -1422,7 +1422,7 @@ function conv_sort($arr, $order) {
 	}
 
 	if (count($parents)) {
-		foreach ($parents as $i=>$_x) {
+		foreach ($parents as $i => $_x) {
 			$parents[$i]['children'] = get_item_children($arr, $_x);
 		}
 	}
