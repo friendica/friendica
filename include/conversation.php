@@ -1155,8 +1155,9 @@ function format_like($cnt, array $arr, $type, $id) {
 
 	if ($cnt > 1) {
 		$total = count($arr);
-		if ($total >= MAX_LIKERS)
+		if ($total >= MAX_LIKERS) {
 			$arr = array_slice($arr, 0, MAX_LIKERS - 1);
+		}
 		if ($total < MAX_LIKERS) {
 			$last = t('and') . ' ' . $arr[count($arr)-1];
 			$arr2 = array_slice($arr, 0, -1);
