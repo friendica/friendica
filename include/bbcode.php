@@ -310,8 +310,9 @@ function bb_tag_preg_replace($pattern, $replace, $name, $s) {
 		$start = substr($string, 0, $pos['start']['open']);
 		$subject = substr($string, $pos['start']['open'], $pos['end']['close'] - $pos['start']['open']);
 		$end = substr($string, $pos['end']['close']);
-		if ($end === false)
+		if ($end === false) {
 			$end = '';
+		}
 
 		$subject = preg_replace($pattern, $replace, $subject);
 		$string = $start . $subject . $end;
