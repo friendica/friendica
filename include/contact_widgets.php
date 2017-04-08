@@ -2,7 +2,7 @@
 
 function follow_widget($value = "") {
 
-	return replace_macros(get_markup_template('follow.tpl'),array(
+	return replace_macros(get_markup_template('follow.tpl'), array(
 		'$connect' => t('Add New Contact'),
 		'$desc' => t('Enter address or web location'),
 		'$hint' => t('Example: bob@example.com, http://example.com/barbara'),
@@ -25,7 +25,7 @@ function findpeople_widget() {
 		}
 	}
 
-	return replace_macros(get_markup_template('peoplefind.tpl'),array(
+	return replace_macros(get_markup_template('peoplefind.tpl'), array(
 		'$findpeople' => t('Find People'),
 		'$desc' => t('Enter name or interest'),
 		'$label' => t('Connect/Follow'),
@@ -120,7 +120,7 @@ function networks_widget($baseurl, $selected = '') {
 		return '';
 	}
 
-	return replace_macros(get_markup_template('nets.tpl'),array(
+	return replace_macros(get_markup_template('nets.tpl'), array(
 		'$title' => t('Networks'),
 		'$desc' => '',
 		'$sel_all' => (($selected == '') ? 'selected' : ''),
@@ -147,7 +147,7 @@ function fileas_widget($baseurl, $selected = '') {
 
 	$matches = false;
 	$terms = array();
-	$cnt = preg_match_all('/\[(.*?)\]/', $saved, $matches,PREG_SET_ORDER);
+	$cnt = preg_match_all('/\[(.*?)\]/', $saved, $matches, PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
 			$unescaped = xmlify(file_tag_decode($mtch[1]));
@@ -155,7 +155,7 @@ function fileas_widget($baseurl, $selected = '') {
 		}
 	}
 
-	return replace_macros(get_markup_template('fileas_widget.tpl'),array(
+	return replace_macros(get_markup_template('fileas_widget.tpl'), array(
 		'$title' => t('Saved Folders'),
 		'$desc' => '',
 		'$sel_all' => (($selected == '') ? 'selected' : ''),
@@ -189,7 +189,7 @@ function categories_widget($baseurl, $selected = '') {
 		}
 	}
 
-	return replace_macros(get_markup_template('categories_widget.tpl'),array(
+	return replace_macros(get_markup_template('categories_widget.tpl'), array(
 		'$title' => t('Categories'),
 		'$desc' => '',
 		'$sel_all' => (($selected == '') ? 'selected' : ''),
