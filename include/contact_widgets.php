@@ -17,10 +17,11 @@ function findpeople_widget() {
 
 	$a = get_app();
 
+	if (get_config('system', 'invitation_only')) {
 		$x = get_pconfig(local_user(), 'system', 'invites_remaining');
 		if ($x || is_site_admin()) {
 			$a->page['aside'] .= '<div class="side-link" id="side-invite-remain">'
-			. sprintf( tt('%d invitation available','%d invitations available', $x), $x)
+			. sprintf( tt('%d invitation available', '%d invitations available', $x), $x)
 			. '</div>' . $inv;
 		}
 	}
@@ -95,7 +96,7 @@ function networks_widget($baseurl, $selected = '') {
 		return '';
 	}
 
-	if (!feature_enabled(local_user(),'networks')) {
+	if (!feature_enabled(local_user(), 'networks')) {
 		return '';
 	}
 
@@ -136,11 +137,11 @@ function fileas_widget($baseurl, $selected = '') {
 		return '';
 	}
 
-	if (! feature_enabled(local_user(),'filing')) {
+	if (! feature_enabled(local_user(), 'filing')) {
 		return '';
 	}
 
-	$saved = get_pconfig(local_user(),'system', 'filetags');
+	$saved = get_pconfig(local_user(), 'system', 'filetags');
 	if (! strlen($saved)) {
 		return;
 	}
@@ -151,7 +152,7 @@ function fileas_widget($baseurl, $selected = '') {
 	if ($cnt) {
 		foreach ($matches as $mtch) {
 			$unescaped = xmlify(file_tag_decode($mtch[1]));
-			$terms[] = array('name' => $unescaped,'selected' => (($selected == $unescaped) ? 'selected' : ''));
+			$terms[] = array('name' => $unescaped, 'selected' => (($selected == $unescaped) ? 'selected' : ''));
 		}
 	}
 
@@ -170,22 +171,23 @@ function categories_widget($baseurl, $selected = '') {
 
 	$a = get_app();
 
-	if (! feature_enabled($a->profile['profile_uid'],'categories')) {
+	if (! feature_enabled($a->profile['profile_uid'], 'categories')) {
 		return '';
 	}
 
-	$saved = get_pconfig($a->profile['profile_uid'],'system', 'filetags');
+	$saved = get_pconfig($a->profile['profile_uid'], 'system', 'filetags');
 	if (! strlen($saved)) {
 		return;
 	}
 
 	$matches = false;
 	$terms = array();
-        $cnt = preg_match_all('/<(.*?)>/',$saved,$matches,PREG_SET_ORDER);
-        if ($cnt) {
-                foreach ($matches as $mtch) {
-		        $unescaped = xmlify(file_tag_decode($mtch[1]));
-			$terms[] = array('name' => $unescaped,'selected' => (($selected == $unescaped) ? 'selected' : ''));
+	$cnt = preg_match_all('/<(.*?)>/', $saved, $matches, PREG_SET_ORDER);
+
+	if ($cnt) {
+		foreach ($matches as $mtch) {
+			$unescaped = xmlify(file_tag_decode($mtch[1]));
+			$terms[] = array('name' => $unescaped, 'selected' => (($selected == $unescaped) ? 'selected' : ''));
 		}
 	}
 
