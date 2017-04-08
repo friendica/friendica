@@ -1168,40 +1168,40 @@ function settings_content(App $a) {
 		$profile_in_dir = '<input type="hidden" name="profile_in_directory" value="1" />';
 	} else {
 		$profile_in_dir = replace_macros($opt_tpl, array(
-			'$field' 	=> array('profile_in_directory', t('Publish your default profile in your local site directory?'), $profile['publish'], t("Your profile may be visible in public."), array(t('No'), t('Yes')))
+			'$field' => array('profile_in_directory', t('Publish your default profile in your local site directory?'), $profile['publish'], t("Your profile may be visible in public."), array(t('No'), t('Yes')))
 		));
 	}
 
 	if (strlen(get_config('system','directory'))) {
 		$profile_in_net_dir = replace_macros($opt_tpl,array(
-			'$field' 	=> array('profile_in_netdirectory', t('Publish your default profile in the global social directory?'), $profile['net-publish'], '', array(t('No'), t('Yes'))),
+			'$field' => array('profile_in_netdirectory', t('Publish your default profile in the global social directory?'), $profile['net-publish'], '', array(t('No'), t('Yes'))),
 		));
 	} else {
 		$profile_in_net_dir = '';
 	}
 
 	$hide_friends = replace_macros($opt_tpl,array(
-		'$field' 	=> array('hide-friends', t('Hide your contact/friend list from viewers of your default profile?'), $profile['hide-friends'], '', array(t('No'), t('Yes'))),
+		'$field' => array('hide-friends', t('Hide your contact/friend list from viewers of your default profile?'), $profile['hide-friends'], '', array(t('No'), t('Yes'))),
 	));
 
 	$hide_wall = replace_macros($opt_tpl,array(
-		'$field' 	=> array('hidewall',  t('Hide your profile details from unknown viewers?'), $a->user['hidewall'], t("If enabled, posting public messages to Diaspora and other networks isn't possible."), array(t('No'), t('Yes'))),
+		'$field' => array('hidewall',  t('Hide your profile details from unknown viewers?'), $a->user['hidewall'], t("If enabled, posting public messages to Diaspora and other networks isn't possible."), array(t('No'), t('Yes'))),
 	));
 
 	$blockwall = replace_macros($opt_tpl,array(
-		'$field' 	=> array('blockwall',  t('Allow friends to post to your profile page?'), (intval($a->user['blockwall']) ? '0' : '1'), '', array(t('No'), t('Yes'))),
+		'$field' => array('blockwall',  t('Allow friends to post to your profile page?'), (intval($a->user['blockwall']) ? '0' : '1'), '', array(t('No'), t('Yes'))),
 	));
 
 	$blocktags = replace_macros($opt_tpl,array(
-		'$field' 	=> array('blocktags',  t('Allow friends to tag your posts?'), (intval($a->user['blocktags']) ? '0' : '1'), '', array(t('No'), t('Yes'))),
+		'$field' => array('blocktags',  t('Allow friends to tag your posts?'), (intval($a->user['blocktags']) ? '0' : '1'), '', array(t('No'), t('Yes'))),
 	));
 
 	$suggestme = replace_macros($opt_tpl,array(
-		'$field' 	=> array('suggestme',  t('Allow us to suggest you as a potential friend to new members?'), $suggestme, '', array(t('No'), t('Yes'))),
+		'$field' => array('suggestme',  t('Allow us to suggest you as a potential friend to new members?'), $suggestme, '', array(t('No'), t('Yes'))),
 	));
 
 	$unkmail = replace_macros($opt_tpl,array(
-		'$field' 	=> array('unkmail',  t('Permit unknown people to send you private mail?'), $unkmail, '', array(t('No'), t('Yes'))),
+		'$field' => array('unkmail',  t('Permit unknown people to send you private mail?'), $unkmail, '', array(t('No'), t('Yes'))),
 	));
 
 	$invisible = ((! $profile['publish']) && (! $profile['net-publish']));
