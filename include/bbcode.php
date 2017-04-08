@@ -262,7 +262,7 @@ function get_bb_tag_pos($s, $name, $occurence = 1) {
 		}
 	}
 
-	if ( $start_open === false) {
+	if ($start_open === false) {
 		return false;
 	}
 
@@ -277,7 +277,7 @@ function get_bb_tag_pos($s, $name, $occurence = 1) {
 
 	$end_open = strpos($s, '[/' . $name . ']', $start_close);
 
-	if ( $end_open === false) {
+	if ($end_open === false) {
 		return false;
 	}
 
