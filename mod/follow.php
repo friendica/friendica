@@ -110,7 +110,7 @@ function follow_content(App $a) {
 			//'$photo' => proxy_url($ret["photo"], false, PROXY_SIZE_SMALL),
 			'$desc' => "",
 			'$pls_answer' => t('Please answer the following:'),
-			'$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$ret["name"]), false, '', array(t('No'),t('Yes'))),
+			'$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$ret["name"]), false, '', array(t('No'), t('Yes'))),
 			'$add_note' => t('Add a personal note:'),
 			'$page_desc' => "",
 			'$friendica' => "",

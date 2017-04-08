@@ -637,7 +637,7 @@ function profiles_content(App $a) {
 				t('Hide contacts and friends:'), //Label
 				!!$r[0]['hide-friends'], //Value
 				'', //Help string
-				array(t('No'),t('Yes')) //Off - On strings
+				array(t('No'), t('Yes')) //Off - On strings
 			),
 			'$desc' => t('Hide your contact/friend list from viewers of this profile?'),
 			'$yes_str' => t('Yes'),
@@ -739,7 +739,7 @@ function profiles_content(App $a) {
 			'$tv' => array('tv', t('Television'), $r[0]['tv']),
 			'$film' => array('film', t('Film/dance/culture/entertainment'), $r[0]['film']),
 			'$interest' => array('interest', t('Hobbies/Interests'), $r[0]['interest']),
-			'$romance' => array('romance',t('Love/romance'), $r[0]['romance']),
+			'$romance' => array('romance', t('Love/romance'), $r[0]['romance']),
 			'$work' => array('work', t('Work/employment'), $r[0]['work']),
 			'$education' => array('education', t('School/education'), $r[0]['education']),
 			'$contact' => array('contact', t('Contact information and Social Networks'), $r[0]['contact']),

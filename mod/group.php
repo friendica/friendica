@@ -95,7 +95,7 @@ function group_content(App $a) {
 
 		return replace_macros($tpl, $context + array(
 			'$title' => t('Create a group of contacts/friends.'),
-			'$gname' => array('groupname',t('Group Name: '), '', ''),
+			'$gname' => array('groupname', t('Group Name: '), '', ''),
 			'$gid' => 'new',
 			'$form_security_token' => get_form_security_token("group_edit"),
 		));
@@ -185,7 +185,7 @@ function group_content(App $a) {
 
 		$context = $context + array(
 			'$title' => t('Group Editor'),
-			'$gname' => array('groupname',t('Group Name: '),$group['name'], ''),
+			'$gname' => array('groupname', t('Group Name: '),$group['name'], ''),
 			'$gid' => $group['id'],
 			'$drop' => $drop_txt,
 			'$form_security_token' => get_form_security_token('group_edit'),

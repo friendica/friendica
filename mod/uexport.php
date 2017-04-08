@@ -34,8 +34,8 @@ function uexport_content(App $a) {
 	 * list of array( 'link url', 'link text', 'help text' )
 	 */
 	$options = array(
-		array('uexport/account',t('Export account'),t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')),
-		array('uexport/backup',t('Export all'),t('Export your accout info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)')),
+		array('uexport/account', t('Export account'), t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')),
+		array('uexport/backup', t('Export all'), t('Export your accout info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)')),
 	);
 	call_hooks('uexport_options', $options);
 

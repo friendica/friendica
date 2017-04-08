@@ -1581,9 +1581,9 @@ function photos_content(App $a) {
 				'$album' => array('albname', t('New album name'), $album_e,''),
 				'$caption' => array('desc', t('Caption'), $caption_e, ''),
 				'$tags' => array('newtag', t('Add a Tag'), "", t('Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping')),
-				'$rotate_none' => array('rotate',t('Do not rotate'),0,'', true),
-				'$rotate_cw' => array('rotate',t('Rotate CW (right)'),1,''),
-				'$rotate_ccw' => array('rotate',t('Rotate CCW (left)'),2,''),
+				'$rotate_none' => array('rotate', t('Do not rotate'),0,'', true),
+				'$rotate_cw' => array('rotate', t('Rotate CW (right)'),1,''),
+				'$rotate_ccw' => array('rotate', t('Rotate CCW (left)'),2,''),
 
 				'$nickname' => $a->data['user']['nickname'],
 				'$resource_id' => $ph[0]['resource-id'],

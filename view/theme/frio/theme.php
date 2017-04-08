@@ -240,7 +240,7 @@ function frio_remote_nav($a,&$nav) {
 		}
 
 	if(!local_user() && !empty($server_url)) {
-		$nav['logout'] = Array($server_url . '/logout',t('Logout'), "", t('End this session'));
+		$nav['logout'] = Array($server_url . '/logout', t('Logout'), "", t('End this session'));
 
 		// user menu
 		$nav['usermenu'][] = Array($server_url . '/profile/' . $a->user['nickname'], t('Status'), "", t('Your posts and conversations'));
