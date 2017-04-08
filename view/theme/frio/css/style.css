@@ -447,7 +447,7 @@ nav.navbar .nav>li>a:focus{
     border-radius: 3px;
 }
 #topbar-first .nav>.account .dropdown-toggle {
-    padding: 10px 5px 8px;
+    padding: 10px 5px 0px;
     line-height: 1.1em;
     text-align: left
 }
