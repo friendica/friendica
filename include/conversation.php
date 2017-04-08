@@ -374,8 +374,9 @@ function count_descendants($item) {
 
 	if ($total > 0) {
 		foreach ($item['children'] as $child) {
-			if (! visible_activity($child))
+			if (! visible_activity($child)) {
 				$total --;
+			}
 			$total += count_descendants($child);
 		}
 	}
@@ -389,7 +390,6 @@ function visible_activity($item) {
 	 * likes (etc.) can apply to other things besides posts. Check if they are post children,
 	 * in which case we handle them specially
 	 */
-
 	$hidden_activities = array(ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE);
 	foreach ($hidden_activities as $act) {
 		if (activity_match($item['verb'],$act)) {
