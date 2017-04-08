@@ -392,7 +392,7 @@ function visible_activity($item) {
 	 */
 	$hidden_activities = array(ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE);
 	foreach ($hidden_activities as $act) {
-		if (activity_match($item['verb'],$act)) {
+		if (activity_match($item['verb'], $act)) {
 			return false;
 		}
 	}
@@ -410,8 +410,8 @@ function visible_activity($item) {
  * @brief SQL query for items
  */
 function item_query() {
-	return "SELECT ".item_fieldlists()." FROM `item` ".
-		item_joins()." WHERE ".item_condition();
+	return "SELECT " . item_fieldlists() . " FROM `item` " .
+		item_joins() . " WHERE " . item_condition();
 }
 
 /**
