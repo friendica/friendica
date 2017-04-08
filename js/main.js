@@ -223,8 +223,11 @@
 				var nnm = $("#nav-notifications-menu");
 				nnm.html(notifications_all + notifications_mark);
 
-				var notification_lastitem = parseInt(localStorage.getItem("notification-lastitem"));
+				var lastItemStorageKey = "notification-lastitem:" + localUser;
+				var notification_lastitem = parseInt(localStorage.getItem(lastItemStorageKey));
 				var notification_id = 0;
+
+				// Insert notifs into the notifications-menu
 				$(data.notifications).each(function(key, notif){
 					var text = notif.message.format('<span class="contactname">' + notif.name + '</span>');
 					var contact = ('<a href="' + notif.url + '"><span class="contactname">' + notif.name + '</span></a>');
@@ -232,19 +235,21 @@
 					var html = notifications_tpl.format(
 						notif.href,                     // {0}  // link to the source
 						notif.photo,                    // {1}  // photo of the contact
-						text,                       // {2}  // preformatted text (autor + text)
+						text,                           // {2}  // preformatted text (autor + text)
 						notif.date,                     // {3}  // date of notification (time ago)
-						seenclass,                  // {4}  // visited status of the notification
+						seenclass,                      // {4}  // visited status of the notification
 						new Date(notif.timestamp*1000), // {5}  // date of notification
 						notif.url,                      // {6}  // profile url of the contact
 						notif.message.format(contact),  // {7}  // preformatted html (text including author profile url)
-						''                          // {8}  // Deprecated
+						''                              // {8}  // Deprecated
 					);
 					nnm.append(html);
 				});
+
+				// Desktop Notifications
 				$(data.notifications.reverse()).each(function(key, e){
 					notification_id = parseInt(e.timestamp);
-					if (notification_lastitem !== null && notification_id > notification_lastitem) {
+					if (notification_lastitem !== null && notification_id > notification_lastitem && !e.seen) {
 						if (getNotificationPermission() === "granted") {
 							var notification = new Notification(document.title, {
 											  body: decodeHtml(e.message.replace('&rarr; ', '').format(e.name)),
@@ -259,7 +264,7 @@
 
 				});
 				notification_lastitem = notification_id;
-				localStorage.setItem("notification-lastitem", notification_lastitem)
+				localStorage.setItem(lastItemStorageKey, notification_lastitem)
 
 				$("img[data-src]", nnm).each(function(i, el){
 					// Add src attribute for images with a data-src attribute
@@ -285,7 +290,7 @@
 				$.jGrowl(message, {sticky: false, theme: 'info', life: 5000});
 			});
 
-			/* update the js scrollbars */
+			// Update the js scrollbars
 			$('#nav-notifications-menu').perfectScrollbar('update');
 
 		});
