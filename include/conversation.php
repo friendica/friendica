@@ -1373,8 +1373,10 @@ function conv_sort($arr, $order) {
 	$children = array();
 	$newarr = array();
 
-	// This is a preparation for having two different items with the same uri in one thread
-	// This will otherwise lead to an endless loop.
+	/*
+	 * This is a preparation for having two different items with the same uri in one thread
+	 * This will otherwise lead to an endless loop.
+	 */
 	foreach ($arr as $x) {
 		if (!isset($newarr[$x['uri']])) {
 			$newarr[$x['uri']] = $x;
