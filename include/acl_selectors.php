@@ -120,7 +120,7 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 		$sql_extra .= sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
 	}
 
-	if (x($x, 'exclude'])) {
+	if (x($x, 'exclude')) {
 		$sql_extra .= sprintf(" AND `id` != %d ", intval($x['exclude']));
 	}
 
