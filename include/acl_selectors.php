@@ -4,11 +4,11 @@
  * @file include/acl_selectors.php
  */
 
-require_once("include/contact_selectors.php");
-require_once("include/contact_widgets.php");
-require_once("include/DirSearch.php");
-require_once("include/features.php");
-require_once("mod/proxy.php");
+require_once "include/contact_selectors.php";
+require_once "include/contact_widgets.php";
+require_once "include/DirSearch.php";
+require_once "include/features.php";
+require_once "mod/proxy.php";
 
 
 /**
@@ -35,10 +35,11 @@ function group_select($selname,$selclass,$preselected = false,$size = 4) {
 
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
-			if ((is_array($preselected)) && in_array($rr['id'], $preselected))
+			if ((is_array($preselected)) && in_array($rr['id'], $preselected)) {
 				$selected = " selected=\"selected\" ";
-			else
+			} else {
 				$selected = '';
+			}
 
 			$trimmed = mb_substr($rr['name'],0,12);
 
@@ -66,23 +67,23 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 	$size = 4;
 
 	if (is_array($options)) {
-		if (x($options,'size'))
+		if (x($options, 'size'))
 			$size = $options['size'];
 
-		if (x($options,'mutual_friends')) {
+		if (x($options, 'mutual_friends')) {
 			$mutual = true;
 		}
-		if (x($options,'single')) {
+		if (x($options, 'single')) {
 			$single = true;
 		}
-		if (x($options,'multiple')) {
+		if (x($options, 'multiple')) {
 			$single = false;
 		}
-		if (x($options,'exclude')) {
+		if (x($options, 'exclude')) {
 			$exclude = $options['exclude'];
 		}
 
-		if (x($options,'networks')) {
+		if (x($options, 'networks')) {
 			switch($options['networks']) {
 				case 'DFRN_ONLY':
 					$networks = array(NETWORK_DFRN);
@@ -115,11 +116,11 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 
 	$sql_extra = '';
 
-	if ($x['mutual']) {
+	if (x($x, 'mutual')) {
 		$sql_extra .= sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
 	}
 
-	if (intval($x['exclude'])) {
+	if (x($x, 'exclude'])) {
 		$sql_extra .= sprintf(" AND `id` != %d ", intval($x['exclude']));
 	}
 
@@ -441,7 +442,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 	logger("Searching for ".$search." - type ".$type, LOGGER_DEBUG);
 
-	if ($search!=""){
+	if ($search!="") {
 		$sql_extra = "AND `name` LIKE '%%".dbesc($search)."%%'";
 		$sql_extra2 = "AND (`attag` LIKE '%%".dbesc($search)."%%' OR `name` LIKE '%%".dbesc($search)."%%' OR `nick` LIKE '%%".dbesc($search)."%%')";
 	} else {
@@ -450,7 +451,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 	}
 
 	// count groups and contacts
-	if ($type=='' || $type=='g'){
+	if ($type == '' || $type == 'g') {
 		$r = q("SELECT COUNT(*) AS g FROM `group` WHERE `deleted` = 0 AND `uid` = %d $sql_extra",
 			intval(local_user())
 		);
@@ -508,7 +509,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 	$groups = array();
 	$contacts = array();
 
-	if ($type=='' || $type=='g'){
+	if ($type == '' || $type == 'g') {
 
 		/// @todo We should cache this query.
 		// This can be done when we can delete cache entries via wildcard
@@ -525,7 +526,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval($count)
 		);
 
-		foreach ($r as $g){
+		foreach ($r as $g) {
 //		logger('acl: group: ' . $g['name'] . ' members: ' . $g['uids']);
 			$groups[] = array(
 				"type"  => "g",
@@ -539,7 +540,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 		}
 	}
 
-	if ($type==''){
+	if ($type == '') {
 
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
@@ -549,9 +550,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval(local_user()),
 			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_STATUSNET)
 		);
-	}
-	elseif ($type=='c'){
-
+	} elseif ($type == 'c') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			AND NOT (`network` IN ('%s'))
