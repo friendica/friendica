@@ -1168,14 +1168,13 @@ function settings_content(App $a) {
 		$profile_in_dir = '<input type="hidden" name="profile_in_directory" value="1" />';
 	} else {
 		$profile_in_dir = replace_macros($opt_tpl,array(
-			'$field' 	=> array('profile_in_directory', t('Publish your default profile in your local site directory?'), $profile['publish'], '', array(t('No'),t('Yes'))),
+			'$field' 	=> array('profile_in_directory', t('Publish your default profile in your local site directory?'), $profile['publish'], t("Depending on the server settings your profile may be visible in public."), array(t('No'),t('Yes'))),
 		));
 	}
 
 	if (strlen(get_config('system','directory'))) {
 		$profile_in_net_dir = replace_macros($opt_tpl,array(
-			'$field' 	=> array('profile_in_netdirectory', t('Publish your default profile in the global social directory?'), $profile_in_directory, t("Depending on the server settings your profile may be visible in public."), $profile['net-publish'], '', array(t('No'),t('Yes'))),
-		));
+		'$field'        => array('profile_in_netdirectory', t('Publish your default profile in the global social directory?'), $profile['net-publish'], '', array(t('No'),t('Yes'))),));
 	} else {
 		$profile_in_net_dir = '';
 	}
