@@ -1415,9 +1415,9 @@ function conv_sort($arr, $order) {
 		}
 	}
 
-	if (stristr($order,'created')) {
+	if (stristr($order, 'created')) {
 		usort($parents,'sort_thr_created');
-	} elseif (stristr($order,'commented')) {
+	} elseif (stristr($order, 'commented')) {
 		usort($parents,'sort_thr_commented');
 	}
 
