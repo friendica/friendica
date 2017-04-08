@@ -639,7 +639,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 				if ($arr_blocked) {
 					$blocked = false;
 					foreach ($arr_blocked as $b) {
-						if ($b && link_compare($item['author-link'],$b)) {
+						if ($b && link_compare($item['author-link'], $b)) {
 							$blocked = true;
 							break;
 						}
@@ -858,7 +858,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 				if ($arr_blocked) {
 					$blocked = false;
 					foreach ($arr_blocked as $b) {
-						if ($b && link_compare($item['author-link'],$b)) {
+						if ($b && link_compare($item['author-link'], $b)) {
 							$blocked = true;
 							break;
 						}
@@ -1075,7 +1075,7 @@ function builtin_activity_puller($item, &$conv_responses) {
 
 		if ((activity_match($item['verb'], $verb)) && ($item['id'] != $item['parent'])) {
 			$url = $item['author-link'];
-			if ((local_user()) && (local_user() == $item['uid']) && ($item['network'] === NETWORK_DFRN) && (! $item['self']) && (link_compare($item['author-link'],$item['url']))) {
+			if ((local_user()) && (local_user() == $item['uid']) && ($item['network'] === NETWORK_DFRN) && (! $item['self']) && (link_compare($item['author-link'], $item['url']))) {
 				$url = 'redir/' . $item['contact-id'];
 				$sparkle = ' class="sparkle" ';
 			} else {
