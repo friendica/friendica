@@ -407,10 +407,12 @@ function item_store($arr,$force_parent = false, $notify = false, $dontcache = fa
 		// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
 		// In difference to the call to "uri_to_guid" several lines below we add the hash of our own host.
 		// This is done because our host is the original creator of the post.
-		if (isset($arr['plink'])) {
-			$arr['guid'] = uri_to_guid($arr['plink'], $a->get_hostname());
-		} elseif (isset($arr['uri'])) {
-			$arr['guid'] = uri_to_guid($arr['uri'], $a->get_hostname());
+		if (!isset($arr['guid'])) {
+			if (isset($arr['plink'])) {
+				$arr['guid'] = uri_to_guid($arr['plink'], $a->get_hostname());
+			} elseif (isset($arr['uri'])) {
+				$arr['guid'] = uri_to_guid($arr['uri'], $a->get_hostname());
+			}
 		}
 	}
 

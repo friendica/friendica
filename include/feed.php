@@ -200,7 +200,6 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		if ($item["plink"] == "") {
 			$item["plink"] = $xpath->evaluate('rss:link/text()', $entry)->item(0)->nodeValue;
 		}
-		$item["plink"] = original_url($item["plink"]);
 
 		$item["uri"] = $xpath->evaluate('atom:id/text()', $entry)->item(0)->nodeValue;
 
@@ -210,12 +209,17 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		if ($item["uri"] == "") {
 			$item["uri"] = $item["plink"];
 		}
+
+		$orig_plink = $item["plink"];
+
+		$item["plink"] = original_url($item["plink"]);
+
 		$item["parent-uri"] = $item["uri"];
 
 		if (!$simulate) {
 			$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s' AND `network` IN ('%s', '%s')",
 				intval($importer["uid"]), dbesc($item["uri"]), dbesc(NETWORK_FEED), dbesc(NETWORK_DFRN));
-			if ($r) {
+			if (dbm::is_result($r)) {
 				logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$r[0]["id"], LOGGER_DEBUG);
 				continue;
 			}
@@ -342,6 +346,7 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 			// Distributed items should have a well formatted URI.
 			// Additionally we have to avoid conflicts with identical URI between imported feeds and these items.
 			if ($notify) {
+				$item['guid'] = uri_to_guid($orig_plink, $a->get_hostname());
 				unset($item['uri']);
 				unset($item['parent-uri']);
 			}
