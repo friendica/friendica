@@ -242,10 +242,6 @@ function cron_poll_contacts($argc, $argv) {
 			} else {
 				proc_run(PRIORITY_LOW, 'include/onepoll.php', intval($contact['id']));
 			}
-
-			if ($interval) {
-				time_sleep_until(microtime(true) + (float) $interval);
-			}
 		}
 	}
 }
