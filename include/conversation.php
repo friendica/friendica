@@ -508,9 +508,9 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 	$arr_blocked = null;
 
 	if (local_user()) {
-		$str_blocked = get_pconfig(local_user(),'system','blocked');
+		$str_blocked = get_pconfig(local_user(), 'system', 'blocked');
 		if ($str_blocked) {
-			$arr_blocked = explode(',',$str_blocked);
+			$arr_blocked = explode(',', $str_blocked);
 			for ($x = 0; $x < count($arr_blocked); $x ++) {
 				$arr_blocked[$x] = trim($arr_blocked[$x]);
 			}
@@ -907,7 +907,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 		'$mode' => $mode,
 		'$user' => $a->user,
 		'$threads' => $threads,
-		'$dropping' => ($page_dropping && feature_enabled(local_user(),'multi_delete') ? t('Delete Selected Items') : False),
+		'$dropping' => ($page_dropping && feature_enabled(local_user(), 'multi_delete') ? t('Delete Selected Items') : False),
 	));
 
 	return $o;
@@ -1293,7 +1293,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup = false) {
 		'$title' => $x['title'],
 		'$placeholdertitle' => t('Set title'),
 		'$category' => $x['category'],
-		'$placeholdercategory' => (feature_enabled(local_user(),'categories') ? t('Categories (comma-separated list)') : ''),
+		'$placeholdercategory' => (feature_enabled(local_user(), 'categories') ? t('Categories (comma-separated list)') : ''),
 		'$wait' => t('Please wait'),
 		'$permset' => t('Permission settings'),
 		'$shortpermset' => t('permissions'),
