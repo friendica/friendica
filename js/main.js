@@ -249,7 +249,7 @@
 				// Desktop Notifications
 				$(data.notifications.reverse()).each(function(key, e){
 					notification_id = parseInt(e.timestamp);
-					if (notification_lastitem !== null && notification_id > notification_lastitem && !e.seen) {
+					if (notification_lastitem !== null && notification_id > notification_lastitem && Number(e.seen) === 0) {
 						if (getNotificationPermission() === "granted") {
 							var notification = new Notification(document.title, {
 											  body: decodeHtml(e.message.replace('&rarr; ', '').format(e.name)),
