@@ -364,9 +364,9 @@ class Probe {
 				return self::mail($uri, $uid);
 			}
 
-			if ($network == NETWORK_MAIL)
+			if ($network == NETWORK_MAIL) {
 				return self::mail($uri, $uid);
-
+			}
 			// Remove "acct:" from the URI
 			$uri = str_replace('acct:', '', $uri);
 
@@ -391,37 +391,37 @@ class Probe {
 		/// @todo Do we need the prefix "acct:" or "acct://"?
 
 		foreach ($lrdd AS $key => $link) {
-			if ($webfinger)
+			if ($webfinger) {
 				continue;
+			}
+			if (!in_array($key, array("lrdd", "lrdd-xml", "lrdd-json"))) {
+				continue;
+			}
+			// At first try it with the given uri
+			$path = str_replace('{uri}', urlencode($uri), $link);
+			$webfinger = self::webfinger($path);
 
-			if (!in_array($key, array("lrdd", "lrdd-xml", "lrdd-json")))
-				continue;
+			// We cannot be sure that the detected address was correct, so we don't use the values
+			if ($webfinger AND ($uri != $addr)) {
+				$nick = "";
+				$addr = "";
+			}
 
 			// Try webfinger with the address (user@domain.tld)
-			$path = str_replace('{uri}', urlencode($addr), $link);
-			$webfinger = self::webfinger($path);
+			if (!$webfinger) {
+				$path = str_replace('{uri}', urlencode($addr), $link);
+				$webfinger = self::webfinger($path);
+			}
 
 			// Mastodon needs to have it with "acct:"
 			if (!$webfinger) {
 				$path = str_replace('{uri}', urlencode("acct:".$addr), $link);
 				$webfinger = self::webfinger($path);
 			}
-
-			// If webfinger wasn't successful then try it with the URL - possibly in the format https://...
-			if (!$webfinger AND ($uri != $addr)) {
-				$path = str_replace('{uri}', urlencode($uri), $link);
-				$webfinger = self::webfinger($path);
-
-				// Since the detection with the address wasn't successful, we delete it.
-				if ($webfinger) {
-					$nick = "";
-					$addr = "";
-				}
-			}
-
 		}
-		if (!$webfinger)
+		if (!$webfinger) {
 			return self::feed($uri);
+		}
 
 		$result = false;
 
