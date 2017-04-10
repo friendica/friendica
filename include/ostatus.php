@@ -362,8 +362,9 @@ class ostatus {
 			}
 
 			$item["object-type"] = $xpath->query('activity:object-type/text()', $entry)->item(0)->nodeValue;
+			$item["verb"] = $xpath->query('activity:verb/text()', $entry)->item(0)->nodeValue;
 
-			if ($item["object-type"] == ACTIVITY_OBJ_NOTE && $xpath->evaluate('boolean(atom:summary)', $entry)) {
+			if ($item["verb"] == ACTIVITY_POST && $xpath->evaluate('boolean(atom:summary)', $entry)) {
 				// Mastodon Content Warning
 				$clear_text = $xpath->query('atom:summary/text()', $entry)->item(0)->nodeValue;
 				$hidden_text = $xpath->query('atom:content/text()', $entry)->item(0)->nodeValue;
@@ -378,7 +379,7 @@ class ostatus {
 				$item["body"] = add_page_info_to_body(html2bbcode($xpath->query('atom:content/text()', $entry)->item(0)->nodeValue));
 			}
 			$item["object"] = $xml;
-			$item["verb"] = $xpath->query('activity:verb/text()', $entry)->item(0)->nodeValue;
+
 
 			/// @TODO
 			/// Delete a message
