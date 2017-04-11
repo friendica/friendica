@@ -643,12 +643,12 @@ function acl_lookup(App $a, $out_type = 'json') {
 		);
 		if (dbm::is_result($r)) {
 			foreach ($r as $row) {
-				// nickname..
 				$up = parse_url($row['author-link']);
-				$nick = explode("/", $up['path']);
-				$nick = $nick[count($nick) - 1];
-				$nick .= "@" . $up['host'];
-				// /nickname
+				$nick = explode('/', $up['path']);
+				// Fix for Mastodon URLs with format https://domain.tld/@nick
+				$nick = ltrim($nick[count($nick) - 1], '@');
+				$nick .= '@' . $up['host'];
+
 				$unknow_contacts[] = array(
 					'type'    => 'c',
 					'photo'   => proxy_url($row['author-avatar'], false, PROXY_SIZE_MICRO),
