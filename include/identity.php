@@ -628,8 +628,7 @@ function advanced_profile(App $a) {
 		if ($a->profile['gender']) $profile['gender'] = array( t('Gender:'),  $a->profile['gender'] );
 
 
-		if (($a->profile['dob']) && ($a->profile['dob'] != '0000-00-00')) {
-
+		if (($a->profile['dob']) && ($a->profile['dob'] > '0001-01-01')) {
 			$year_bd_format = t('j F, Y');
 			$short_bd_format = t('j F');
 
@@ -642,13 +641,16 @@ function advanced_profile(App $a) {
 
 		}
 
-		if ($age = age($a->profile['dob'],$a->profile['timezone'],''))  $profile['age'] = array( t('Age:'), $age );
+		if ($age = age($a->profile['dob'], $a->profile['timezone'],'')) {
+			$profile['age'] = array( t('Age:'), $age );
+		}
 
 
-		if ($a->profile['marital']) $profile['marital'] = array( t('Status:'), $a->profile['marital']);
+		if ($a->profile['marital']) {
+			$profile['marital'] = array( t('Status:'), $a->profile['marital']);
+		}
 
-		/// @TODO Maybe use x() here, plus below?
-		if ($a->profile['with']) {
+		if (x($a->profile, 'with')) {
 			$profile['marital']['with'] = $a->profile['with'];
 		}
 

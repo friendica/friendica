@@ -554,7 +554,7 @@ class dfrn {
 			xml::add_element($doc, $author, "poco:displayName", $profile["name"]);
 			xml::add_element($doc, $author, "poco:updated", $namdate);
 
-			if (trim($profile["dob"]) != "0000-00-00")
+			if (trim($profile["dob"]) > '0001-01-01')
 				xml::add_element($doc, $author, "poco:birthday", "0000-".date("m-d", strtotime($profile["dob"])));
 
 			xml::add_element($doc, $author, "poco:note", $profile["about"]);
@@ -1402,7 +1402,7 @@ class dfrn {
 			// "poco:birthday" is the birthday in the format "yyyy-mm-dd"
 			$value = $xpath->evaluate($element . "/poco:birthday/text()", $context)->item(0)->nodeValue;
 
-			if (!in_array($value, array("", "0000-00-00"))) {
+			if (!in_array($value, array("", "0000-00-00", "0001-01-01"))) {
 				$bdyear = date("Y");
 				$value = str_replace("0000", $bdyear, $value);
 

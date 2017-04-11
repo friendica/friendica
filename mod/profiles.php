@@ -193,7 +193,7 @@ function profiles_post(App $a) {
 			return;
 		}
 
-		$dob = $_POST['dob'] ? escape_tags(trim($_POST['dob'])) : '0000-00-00'; // FIXME: Needs to be validated?
+		$dob = $_POST['dob'] ? escape_tags(trim($_POST['dob'])) : '0001-01-01'; // FIXME: Needs to be validated?
 
 		$y = substr($dob, 0, 4);
 		if ((! ctype_digit($y)) || ($y < 1900)) {
@@ -201,15 +201,15 @@ function profiles_post(App $a) {
 		} else {
 			$ignore_year = false;
 		}
-		if ($dob != '0000-00-00') {
-			if (strpos($dob, '0000-') === 0) {
+		if ($dob > '0001-01-01') {
+			if (strpos($dob, '0000-') === 0 || strpos($dob, '0001-') === 0) {
 				$ignore_year = true;
 				$dob = substr($dob, 5);
 			}
 			$dob = datetime_convert('UTC', 'UTC', (($ignore_year) ? '1900-' . $dob : $dob), (($ignore_year) ? 'm-d' : 'Y-m-d'));
 
 			if ($ignore_year) {
-				$dob = '0000-' . $dob;
+				$dob = '0001-' . $dob;
 			}
 		}
 

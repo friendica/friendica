@@ -75,7 +75,7 @@ function hovercard_content() {
 		'tags' => $contact["keywords"],
 //		'nsfw' => intval($contact["nsfw"]),
 //		'server_url' => $contact["server_url"],
-		'bd' => (($contact["birthday"] == "0000-00-00") ? "" : $contact["birthday"]),
+		'bd' => (($contact["birthday"] <= '0001-01-01') ? "" : $contact["birthday"]),
 //		'generation' => $contact["generation"],
 		'account_type' => account_type($contact),
 		'actions' => $actions,

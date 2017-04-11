@@ -14,10 +14,10 @@ Table gserver
 | noscrape        |                  | varchar(255)     | NO   |     |                     |                |
 | network         |                  | varchar(32)      | NO   |     |                     |                |
 | platform        |                  | varchar(255)     | NO   |     |                     |                |
-| created         |                  | datetime         | NO   |     | 0000-00-00 00:00:00 |                |
-| last_poco_query |                  | datetime         | YES  |     | 0000-00-00 00:00:00 |                |
-| last_contact    |                  | datetime         | YES  |     | 0000-00-00 00:00:00 |                |
-| last_failure    |                  | datetime         | YES  |     | 0000-00-00 00:00:00 |                |
+| created         |                  | datetime         | NO   |     | 0001-01-01 00:00:00 |                |
+| last_poco_query |                  | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
+| last_contact    |                  | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
+| last_failure    |                  | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
 
 
 Return to [database documentation](help/database)

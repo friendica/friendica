@@ -12,8 +12,8 @@ Table user
 | openid                   |                                                                                         | varchar(255)        | NO   |     |                     |                |
 | timezone                 | PHP-legal timezone                                                                      | varchar(128)        | NO   |     |                     |                |
 | language                 | default language                                                                        | varchar(32)         | NO   |     | en                  |                |
-| register_date            | timestamp of registration                                                               | datetime            | NO   |     | 0000-00-00 00:00:00 |                |
-| login_date               | timestamp of last login                                                                 | datetime            | NO   |     | 0000-00-00 00:00:00 |                |
+| register_date            | timestamp of registration                                                               | datetime            | NO   |     | 0001-01-01 00:00:00 |                |
+| login_date               | timestamp of last login                                                                 | datetime            | NO   |     | 0001-01-01 00:00:00 |                |
 | default-location         | Default for item.location                                                               | varchar(255)        | NO   |     |                     |                |
 | allow_location           | 1 allows to display the location                                                        | tinyint(1)          | NO   |     | 0                   |                |
 | theme                    | user theme preference                                                                   | varchar(255)        | NO   |     |                     |                |
@@ -36,8 +36,8 @@ Table user
 | expire                   |                                                                                         | int(11) unsigned    | NO   |     | 0                   |                |
 | account_removed          | if 1 the account is removed                                                             | tinyint(1)          | NO   |     | 0                   |                |
 | account_expired          |                                                                                         | tinyint(1)          | NO   |     | 0                   |                |
-| account_expires_on       | timestamp when account expires and will be deleted                                      | datetime            | NO   |     | 0000-00-00 00:00:00 |                |
-| expire_notification_sent | timestamp of last warning of account expiration                                         | datetime            | NO   |     | 0000-00-00 00:00:00 |                |
+| account_expires_on       | timestamp when account expires and will be deleted                                      | datetime            | NO   |     | 0001-01-01 00:00:00 |                |
+| expire_notification_sent | timestamp of last warning of account expiration                                         | datetime            | NO   |     | 0001-01-01 00:00:00 |                |
 | service_class            | service class for this account, determines what if any limits/restrictions are in place | varchar(32)         | NO   |     |                     |                |
 | def_gid                  |                                                                                         | int(11)             | NO   |     | 0                   |                |
 | allow_cid                | default permission for this user                                                        | mediumtext          | NO   |     | NULL                |                |

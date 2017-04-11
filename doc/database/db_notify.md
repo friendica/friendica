@@ -9,7 +9,7 @@ Table notify
 | name       |                                   | varchar(255) | NO   |     |                     |                 |
 | url        |                                   | varchar(255) | NO   |     |                     |                 |
 | photo      |                                   | varchar(255) | NO   |     |                     |                 |
-| date       |                                   | datetime     | NO   |     | 0000-00-00 00:00:00 |                 |
+| date       |                                   | datetime     | NO   |     | 0001-01-01 00:00:00 |                 |
 | msg        |                                   | mediumtext   | YES  |     | NULL                |                 |
 | uid        | user.id of the owner of this data | int(11)      | NO   | MUL | 0                   |                 |
 | link       |                                   | varchar(255) | NO   |     |                     |                 |

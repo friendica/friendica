@@ -8,8 +8,8 @@ Table photo
 | contact-id  | contact.id                                             | int(10) unsigned | NO   |     | 0                   |                 |
 | guid        | A unique identifier for this photo                     | varchar(64)      | NO   | MUL |                     |                 |
 | resource-id |                                                        | varchar(255)     | NO   | MUL |                     |                 |
-| created     | creation date                                          | datetime         | NO   |     | 0000-00-00 00:00:00 |                 |
-| edited      | last edited date                                       | datetime         | NO   |     | 0000-00-00 00:00:00 |                 |
+| created     | creation date                                          | datetime         | NO   |     | 0001-01-01 00:00:00 |                 |
+| edited      | last edited date                                       | datetime         | NO   |     | 0001-01-01 00:00:00 |                 |
 | title       |                                                        | varchar(255)     | NO   |     |                     |                 |
 | desc        |                                                        | text             | NO   |     | NULL                |                 |
 | album       | The name of the album to which the photo belongs       | varchar(255)     | NO   |     |                     |                 |

@@ -8,6 +8,6 @@ Table spam
 | spam  |             | int(11)      | NO   | MUL | 0                   |                 |
 | ham   |             | int(11)      | NO   | MUL | 0                   |                 |
 | term  |             | varchar(255) | NO   | MUL |                     |                 |
-| date  |             | datetime     | NO   |     | 0000-00-00 00:00:00 |                 |
+| date  |             | datetime     | NO   |     | 0001-01-01 00:00:00 |                 |
 
 Return to [database documentation](help/database)

@@ -15,6 +15,6 @@ Table mailacct
 | action       |                  | int(11)      | NO   |     | 0                   |                |
 | movetofolder |                  | varchar(255) | NO   |     |                     |                |
 | pubmail      |                  | tinyint(1)   | NO   |     | 0                   |                |
-| last_check   |                  | datetime     | NO   |     | 0000-00-00 00:00:00 |                |
+| last_check   |                  | datetime     | NO   |     | 0001-01-01 00:00:00 |                |
 
 Return to [database documentation](help/database)

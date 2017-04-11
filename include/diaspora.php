@@ -3591,7 +3591,7 @@ class Diaspora {
 		if ($searchable === 'true') {
 			$dob = '1000-00-00';
 
-			if (($profile['dob']) && ($profile['dob'] != '0000-00-00'))
+			if (($profile['dob']) && ($profile['dob'] > '0001-01-01'))
 				$dob = ((intval($profile['dob'])) ? intval($profile['dob']) : '1000') .'-'. datetime_convert('UTC','UTC',$profile['dob'],'m-d');
 
 			$about = $profile['about'];
