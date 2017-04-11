@@ -626,10 +626,14 @@ function acl_lookup(App $a, $out_type = 'json') {
 	if ($conv_id) {
 		/* if $conv_id is set, get unknow contacts in thread */
 		/* but first get know contacts url to filter them out */
-		function _contact_link($i) { return dbesc($i['link']); }
-		$known_contacts = array_map('_contact_link', $contacts);
+		function _contact_link($i) {
+			return dbesc($i['link']);
+		}
+
+		$known_contacts = array_map(_contact_link, $contacts);
 		$unknow_contacts = array();
-		$r = q("SELECT `author-avatar`,`author-name`,`author-link`
+
+		$r = q("SELECT `author-avatar`,`author-name`,`author-link`, `network`
 				FROM `item` WHERE `parent` = %d
 					AND (`author-name` LIKE '%%%s%%' OR `author-link` LIKE '%%%s%%')
 					AND `author-link` NOT IN ('%s')
@@ -641,6 +645,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 				dbesc($search),
 				implode("','", $known_contacts)
 		);
+
 		if (dbm::is_result($r)) {
 			foreach ($r as $row) {
 				$up = parse_url($row['author-link']);
@@ -654,7 +659,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 					'photo'   => proxy_url($row['author-avatar'], false, PROXY_SIZE_MICRO),
 					'name'    => htmlentities($row['author-name']),
 					'id'      => '',
-					'network' => 'unknown',
+					'network' => $row['network'],
 					'link'    => $row['author-link'],
 					'nick'    => htmlentities($nick),
 					'forum'   => false
