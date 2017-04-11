@@ -624,16 +624,18 @@ function acl_lookup(App $a, $out_type = 'json') {
 	$items = array_merge($groups, $contacts);
 
 	if ($conv_id) {
-		/* if $conv_id is set, get unknow contacts in thread */
-		/* but first get know contacts url to filter them out */
-		function _contact_link($i) {
-			return dbesc($i['link']);
-		}
+		/*
+		 * if $conv_id is set, get unknown contacts in thread
+		 * but first get known contacts url to filter them out
+		 */
+		$known_contacts = array_map(
+			function ($i) {
+				return dbesc($i['link']);
+			}
+		, $contacts);
 
-		$known_contacts = array_map(_contact_link, $contacts);
-		$unknow_contacts = array();
-
-		$r = q("SELECT `author-avatar`,`author-name`,`author-link`, `network`
+		$unknown_contacts = array();
+		$r = q("SELECT `author-link`
 				FROM `item` WHERE `parent` = %d
 					AND (`author-name` LIKE '%%%s%%' OR `author-link` LIKE '%%%s%%')
 					AND `author-link` NOT IN ('%s')
@@ -643,32 +645,28 @@ function acl_lookup(App $a, $out_type = 'json') {
 				intval($conv_id),
 				dbesc($search),
 				dbesc($search),
-				implode("','", $known_contacts)
+				implode("', '", $known_contacts)
 		);
 
 		if (dbm::is_result($r)) {
 			foreach ($r as $row) {
-				$up = parse_url($row['author-link']);
-				$nick = explode('/', $up['path']);
-				// Fix for Mastodon URLs with format https://domain.tld/@nick
-				$nick = ltrim($nick[count($nick) - 1], '@');
-				$nick .= '@' . $up['host'];
+				$contact = get_contact_details_by_url($row['author-link'], 0);
 
-				$unknow_contacts[] = array(
-					'type'    => 'c',
-					'photo'   => proxy_url($row['author-avatar'], false, PROXY_SIZE_MICRO),
-					'name'    => htmlentities($row['author-name']),
-					'id'      => '',
-					'network' => $row['network'],
-					'link'    => $row['author-link'],
-					'nick'    => htmlentities($nick),
+				$unknown_contacts[] = array(
+					'type'    => 'cu',
+					'photo'   => proxy_url($contact['micro'], false, PROXY_SIZE_MICRO),
+					'name'    => htmlentities($contact['name']),
+					'id'      => intval($contact['id']),
+					'network' => $contact['network'],
+					'link'    => $contact['url'],
+					'nick'    => $contact['nick'],
 					'forum'   => false
 				);
 			}
 		}
 
-		$items = array_merge($items, $unknow_contacts);
-		$tot += count($unknow_contacts);
+		$items = array_merge($items, $unknown_contacts);
+		$tot += count($unknown_contacts);
 	}
 
 	$results = array(
