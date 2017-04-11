@@ -366,7 +366,7 @@ class ostatus {
 			$item["verb"] = $xpath->query('activity:verb/text()', $entry)->item(0)->nodeValue;
 
 			// Mastodon Content Warning
-			if ($item["verb"] == ACTIVITY_POST AND $xpath->evaluate('boolean(atom:summary)', $entry)) {
+			if (($item["verb"] == ACTIVITY_POST) AND $xpath->evaluate('boolean(atom:summary)', $entry)) {
 				$clear_text = $xpath->query('atom:summary/text()', $entry)->item(0)->nodeValue;
 
 				$item["body"] = html2bbcode($clear_text) . '[spoiler]' . $item["body"] . '[/spoiler]';
