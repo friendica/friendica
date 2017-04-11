@@ -382,7 +382,7 @@ class ostatus {
 
 			/// @TODO
 			/// Delete a message
-			if ($item["verb"] == "qvitter-delete-notice") {
+			if ($item["verb"] == "qvitter-delete-notice" || $item["verb"] == ACTIVITY_DELETE) {
 				// ignore "Delete" messages (by now)
 				logger("Ignore delete message ".print_r($item, true));
 				continue;
