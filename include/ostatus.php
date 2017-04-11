@@ -732,7 +732,7 @@ class ostatus {
 		} else {
 			$conversations = q("SELECT `oid`, `url`, `uid` FROM `term`
 						WHERE `type` = 7 AND `term` > '%s'
-						GROUP BY `url`, `uid` ORDER BY `term` DESC", dbesc($start));
+						GROUP BY `url`, `uid`, `oid`, `term` ORDER BY `term` DESC", dbesc($start));
 		}
 
 		foreach ($conversations AS $conversation) {
