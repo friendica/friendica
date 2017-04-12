@@ -210,7 +210,7 @@ function profile_content(App $a, $update = 0) {
 
 	if ($update) {
 
-		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`
+		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`, `item`.`created`
 			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND
