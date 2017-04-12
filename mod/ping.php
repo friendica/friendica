@@ -201,6 +201,7 @@ function ping_init(App $a)
 		if (is_null($ev)) {
 			$ev = qu("SELECT count(`event`.`id`) AS total, type, start, adjust FROM `event`
 				WHERE `event`.`uid` = %d AND `start` < '%s' AND `finish` > '%s' and `ignore` = 0
+				GROUP BY type, start, adjust
 				ORDER BY `start` ASC ",
 				intval(local_user()),
 				dbesc(datetime_convert('UTC', 'UTC', 'now + 7 days')),
