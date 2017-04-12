@@ -214,7 +214,7 @@ function search_content(App $a) {
 			FROM `item` %s
 			WHERE %s AND (`item`.`uid` = 0 OR (`item`.`uid` = %s AND NOT `item`.`global`))
 				$sql_extra
-			GROUP BY `item`.`uri` ORDER BY `item`.`id` DESC LIMIT %d , %d",
+			GROUP BY `item`.`uri`, `item`.`id` ORDER BY `item`.`id` DESC LIMIT %d , %d",
 				item_fieldlists(), item_joins(), item_condition(),
 				intval(local_user()),
 				intval($a->pager['start']), intval($a->pager['itemspage']));
