@@ -652,16 +652,18 @@ function acl_lookup(App $a, $out_type = 'json') {
 			foreach ($r as $row) {
 				$contact = get_contact_details_by_url($row['author-link'], 0);
 
-				$unknown_contacts[] = array(
-					'type'    => 'cu',
-					'photo'   => proxy_url($contact['micro'], false, PROXY_SIZE_MICRO),
-					'name'    => htmlentities($contact['name']),
-					'id'      => intval($contact['id']),
-					'network' => $contact['network'],
-					'link'    => $contact['url'],
-					'nick'    => $contact['nick'],
-					'forum'   => false
-				);
+				if (count($contact) > 0) {
+					$unknown_contacts[] = array(
+						'type'    => 'cu',
+						'photo'   => proxy_url($contact['micro'], false, PROXY_SIZE_MICRO),
+						'name'    => htmlentities($contact['name']),
+						'id'      => intval($contact['id']),
+						'network' => $contact['network'],
+						'link'    => $contact['url'],
+						'nick'    => $contact['nick'],
+						'forum'   => false
+					);
+				}
 			}
 		}
 
