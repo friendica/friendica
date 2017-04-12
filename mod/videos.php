@@ -358,7 +358,7 @@ function videos_content(App $a) {
 
 	$r = q("SELECT hash, `id`, `filename`, filetype FROM `attach`
 		WHERE `uid` = %d AND filetype LIKE '%%video%%'
-		$sql_extra GROUP BY hash ORDER BY `created` DESC LIMIT %d , %d",
+		$sql_extra GROUP BY hash, `id` ORDER BY `created` DESC LIMIT %d , %d",
 		intval($a->data['user']['uid']),
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])

@@ -518,7 +518,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 				INNER JOIN `group_member` ON `group_member`.`gid`=`group`.`id` AND `group_member`.`uid` = `group`.`uid`
 				WHERE NOT `group`.`deleted` AND `group`.`uid` = %d
 					$sql_extra
-				GROUP BY `group`.`name`
+				GROUP BY `group`.`name`, `group`.`id`
 				ORDER BY `group`.`name`
 				LIMIT %d,%d",
 			intval(local_user()),
@@ -639,7 +639,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 				FROM `item` WHERE `parent` = %d
 					AND (`author-name` LIKE '%%%s%%' OR `author-link` LIKE '%%%s%%')
 					AND `author-link` NOT IN ('%s')
-				GROUP BY `author-link`
+				GROUP BY `author-link`, `author-avatar`, `author-name`
 				ORDER BY `author-name` ASC
 				",
 				intval($conv_id),

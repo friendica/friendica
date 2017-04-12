@@ -51,7 +51,7 @@ function photo_albums($uid, $update = false) {
 			$albums = qu("SELECT COUNT(DISTINCT `resource-id`) AS `total`, `album`
 				FROM `photo`
 				WHERE `uid` = %d  AND `album` != '%s' AND `album` != '%s' $sql_extra
-				GROUP BY `album` ORDER BY `created` DESC",
+				GROUP BY `album`, `created` ORDER BY `created` DESC",
 				intval($uid),
 				dbesc('Contact Photos'),
 				dbesc(t('Contact Photos'))
@@ -61,7 +61,7 @@ function photo_albums($uid, $update = false) {
 			$albums = qu("SELECT DISTINCT(`album`), '' AS `total`
 				FROM `photo`
 				WHERE `uid` = %d  AND `album` != '%s' AND `album` != '%s' $sql_extra
-				GROUP BY `album` ORDER BY `created` DESC",
+				GROUP BY `album`, `created` ORDER BY `created` DESC",
 				intval($uid),
 				dbesc('Contact Photos'),
 				dbesc(t('Contact Photos'))

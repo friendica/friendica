@@ -350,7 +350,7 @@ function message_content(App $a) {
 		$o .= $header;
 
 		$r = q("SELECT count(*) AS `total` FROM `mail`
-			WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `created` DESC",
+			WHERE `mail`.`uid` = %d GROUP BY `parent-uri`, `created` ORDER BY `created` DESC",
 			intval(local_user())
 		);
 
@@ -533,7 +533,7 @@ function get_messages($user, $lstart, $lend) {
 		`mail`.* , `contact`.`name`, `contact`.`url`, `contact`.`thumb` , `contact`.`network`,
 		count( * ) as count
 		FROM `mail` LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
-		WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `mailcreated` DESC  LIMIT %d , %d ",
+		WHERE `mail`.`uid` = %d GROUP BY `parent-uri`, `mail`.id ORDER BY `mailcreated` DESC  LIMIT %d , %d ",
 		intval($user), intval($lstart), intval($lend)
 	);
 }

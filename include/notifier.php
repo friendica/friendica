@@ -517,7 +517,7 @@ function notifier_run(&$argv, &$argc){
 			}
 
 			$r1 = q("SELECT DISTINCT(`batch`), `id`, `name`,`network` FROM `contact` WHERE `network` = '%s'
-				AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch` ORDER BY rand()",
+				AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch`, `id` ORDER BY rand()",
 				dbesc(NETWORK_DIASPORA),
 				intval($owner['uid']),
 				intval(CONTACT_IS_SHARING)

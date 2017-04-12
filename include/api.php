@@ -3278,7 +3278,8 @@ $called_api = null;
 
 		$r = q("SELECT `resource-id`, MAX(`scale`) AS `scale`, `album`, `filename`, `type`
 				FROM `photo`
-				WHERE `uid` = %d AND `album` != 'Contact Photos' GROUP BY `resource-id`",
+				WHERE `uid` = %d AND `album` != 'Contact Photos'
+				GROUP BY `resource-id`, `album`, `filename`, `type`",
 			intval(local_user())
 		);
 		$typetoext = array(
@@ -3319,8 +3320,11 @@ $called_api = null;
 		$data_sql = ($scale === false ? "" : "data, ");
 
 		$r = q("SELECT %s `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
-						`type`, `height`, `width`, `datasize`, `profile`, MIN(`scale`) AS `minscale`, MAX(`scale`) AS `maxscale`
-				FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' %s GROUP BY `resource-id`",
+					`type`, `height`, `width`, `datasize`, `profile`, MIN(`scale`) AS `minscale`, MAX(`scale`) AS `maxscale`
+				FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'
+				%s
+				GROUP BY `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
+					`type`, `height`, `width`, `datasize`, `profile`",
 			$data_sql,
 			intval(local_user()),
 			dbesc($_REQUEST['photo_id']),
@@ -3354,10 +3358,10 @@ $called_api = null;
 					$data['photo']['link'][$k] = App::get_baseurl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']];
 				}
 			}
+
 			unset($data['photo']['resource-id']);
 			unset($data['photo']['minscale']);
 			unset($data['photo']['maxscale']);
-
 		} else {
 			throw new NotFoundException();
 		}
@@ -3365,10 +3369,9 @@ $called_api = null;
 		return api_format_data("photo_detail", $type, $data);
 	}
 
+	/// @TODO Move these upwards
 	api_register_func('api/friendica/photos/list', 'api_fr_photos_list', true);
 	api_register_func('api/friendica/photo', 'api_fr_photo_detail', true);
-
-
 
 	/**
 	 * similar as /mod/redir.php
