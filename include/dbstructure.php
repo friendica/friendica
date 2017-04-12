@@ -5,7 +5,7 @@ use \Friendica\Core\Config;
 require_once("boot.php");
 require_once("include/text.php");
 
-define('NEW_UPDATE_ROUTINE_VERSION', 1170);
+define('NEW_UPDATE_ROUTINE_VERSION', 1171);
 
 /*
  * send the email and do what is needed to do on update fails
@@ -671,7 +671,7 @@ function db_definition($charset) {
 					"writable" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"forum" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"prv" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
-					"contact-type" => array("type" => "int(11) unsigned", "not null" => "1", "default" => "0"),
+					"contact-type" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"hidden" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"archive" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"pending" => array("type" => "tinyint(1)", "not null" => "1", "default" => "1"),
