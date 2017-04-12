@@ -154,7 +154,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 	if (isset($a->config["system"]["db_charset"])) {
 		$charset = $a->config["system"]["db_charset"];
 	} else {
-		$charset = "utf8";
+		$charset = "utf8mb4";
 	}
 
 	$errors = false;
