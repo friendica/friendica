@@ -6,12 +6,10 @@ If you are the admin of a Friendica node, you have access to the so called **Adm
 
 On the front page of the admin panel you will see a summary of information about your node.
 These information include the amount of messages currently being processed in the queues.
-The first number is the number of messages being actively sent.
-This number should decrease quickly.
-The second is the messages which could for various reasons not being delivered.
+The first number is the number of messages which could not been delivered for various reasons.
 They will be resend later.
 You can have a quick glance into that second queus in the "Inspect Queue" section of the admin panel.
-If you have activated the background workers, there is a third number representing the count of jobs queued for the workers.
+The second number represents the current number of jobs for the background workers.
 These worker tasks are prioritised and are done accordingly.
 
 Then you get an overview of the accounts on your node, which can be moderated in the "Users" section of the panel.

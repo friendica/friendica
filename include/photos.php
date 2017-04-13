@@ -42,9 +42,11 @@ function gps2Num($coordPart) {
 function photo_albums($uid, $update = false) {
 	$sql_extra = permissions_sql($uid);
 
-	$key = "photo_albums:".$uid.":".local_user().":".remote_user();
+	$key = "photo_albums:" . $uid . ":" . local_user() . ":" . remote_user();
+
 	$albums = Cache::get($key);
-	if (is_null($albums) OR $update) {
+
+	if (is_null($albums) || $update) {
 		if (!Config::get('system', 'no_count', false)) {
 			/// @todo This query needs to be renewed. It is really slow
 			// At this time we just store the data in the cache
@@ -59,9 +61,8 @@ function photo_albums($uid, $update = false) {
 		} else {
 			// This query doesn't do the count and is much faster
 			$albums = qu("SELECT DISTINCT(`album`), '' AS `total`
-				FROM `photo`
-				WHERE `uid` = %d  AND `album` != '%s' AND `album` != '%s' $sql_extra
-				GROUP BY `album`, `created` ORDER BY `created` DESC",
+				FROM `photo` USE INDEX (`uid_album_scale_created`)
+				WHERE `uid` = %d  AND `album` != '%s' AND `album` != '%s' $sql_extra",
 				intval($uid),
 				dbesc('Contact Photos'),
 				dbesc(t('Contact Photos'))
