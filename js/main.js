@@ -322,6 +322,7 @@
 			}
 		});
 
+		// Scroll to the next/previous thread when pressing J and K
 		$(document).keydown(function (event) {
 			var threads = $('.thread_level_1');
 			if ((event.keyCode === 74 || event.keyCode === 75) && !$(event.target).is('textarea, input')) {
