@@ -654,13 +654,13 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 				if (count($contact) > 0) {
 					$unknown_contacts[] = array(
-						'type'    => 'cu',
+						'type'    => 'c',
 						'photo'   => proxy_url($contact['micro'], false, PROXY_SIZE_MICRO),
 						'name'    => htmlentities($contact['name']),
 						'id'      => intval($contact['cid']),
 						'network' => $contact['network'],
 						'link'    => $contact['url'],
-						'nick'    => $contact['nick'] ? : $contact['addr'],
+						'nick'    => htmlentities($contact['nick'] ? : $contact['addr']),
 						'forum'   => $contact['forum']
 					);
 				}
