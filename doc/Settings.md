@@ -133,6 +133,9 @@ By default, any (valid) email address is allowed in registrations.
 If you enable the `Allow Users to set remote_self` users can select Atom feeds from their contact list being their *remote self* in die advanced contact settings.
 Which means that postings by the remote self are automatically reposted by Friendica in their names.
 
+This feature can be used for let the user mirror e.g. blog postings into her Friendica postings.
+It is disabled by default, as it casus additional load on the server and may be mis-used to distribute SPAM.
+
 As admin of the node you can also set this flag directly in the database.
 Before doing so, you should be sure you know what you do and have a backup of the database.
 
@@ -166,6 +169,19 @@ This will mean you cannot connect (at all) to self-signed SSL sites.
 ### Performance
 
 ### Worker
+
+This section allows you to configure the background process that is triggered by the `cron` job that was created during the installation.
+The process does check the available system resources before creating a new worker for a task.
+Because of this, it may happen that the maximom number of worker processes you allow will not be reached.
+
+If your servers setup does not allow you to use the `proc_open` function of PHP, please disable it in this section.
+
+The tasks for the background process have priorities.
+To guarantee that important tasks are executet even though the system has a lot of work to do, it is useful to enable the *fastlane*.
+
+Should you not be able to run a cron job on your server, you can also activate the *frontend* worker.
+If you have done so, you can call `example.com/worker` (replace example.com with your actual domain name) on a regular basis from an external servie.
+This will then trigger the execution of the background process.
 
 ### Relocate
 
