@@ -28,6 +28,27 @@
 			if(x($page,'htmlhead')) echo $page['htmlhead'];
 		}
 	?>
+	<?php
+		require_once("view/theme/frio/php/schema.php");
+		$uid = $a->profile_uid;
+		if (is_null($uid)) {
+			$uid = get_theme_uid();
+		}
+		$schema = get_pconfig($uid, 'frio', 'schema');
+		if (($schema) && ($schema != '---')) {
+			if(file_exists('view/theme/frio/schema/'.$schema.'.php')) {
+				$schemefile = 'view/theme/frio/schema/'.$schema.'.php';
+				require_once($schemefile);
+			}
+		} else {
+			$nav_bg = get_pconfig($uid, 'frio', 'nav_bg');
+		}
+		if(!$nav_bg) {
+			$nav_bg = "#708fa0";
+		}
+		echo '<meta name="theme-color" content="'.$nav_bg.'" />';
+	?>
+
 </head>
 <?php
 if(($_SERVER['REQUEST_URI'] != "/register") && ($_SERVER['REQUEST_URI'] != "/lostpass") && ($_SERVER['REQUEST_URI'] != "/login"))
