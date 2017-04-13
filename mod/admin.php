@@ -474,9 +474,6 @@ function admin_page_summary(App $a) {
 	$r = qu("SELECT COUNT(`id`) AS `count` FROM `register`");
 	$pending = $r[0]['count'];
 
-	$r = qu("SELECT COUNT(*) AS `total` FROM `deliverq` WHERE 1");
-	$deliverq = (($r) ? $r[0]['total'] : 0);
-
 	$r = qu("SELECT COUNT(*) AS `total` FROM `queue` WHERE 1");
 	$queue = (($r) ? $r[0]['total'] : 0);
 
@@ -485,7 +482,7 @@ function admin_page_summary(App $a) {
 
 	// We can do better, but this is a quick queue status
 
-	$queues = array('label' => t('Message queues'), 'deliverq' => $deliverq, 'queue' => $queue, 'workerq' => $workerqueue);
+	$queues = array('label' => t('Message queues'), 'queue' => $queue, 'workerq' => $workerqueue);
 
 
 	$t = get_markup_template("admin_summary.tpl");
