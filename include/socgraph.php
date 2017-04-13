@@ -2136,7 +2136,7 @@ function update_gcontact($contact) {
 	fix_alternate_contact_address($contact);
 
 	if (!isset($contact["updated"])) {
-		$contact["updated"] = datetime_convert();
+		$contact["updated"] = dbm::date();
 	}
 
 	if ($contact["server_url"] == "") {
@@ -2197,7 +2197,7 @@ function update_gcontact($contact) {
 			dbesc($contact["gender"]), dbesc($contact["keywords"]), intval($contact["hide"]),
 			intval($contact["nsfw"]), intval($contact["contact-type"]), dbesc($contact["alias"]),
 			dbesc($contact["notify"]), dbesc($contact["url"]), dbesc($contact["location"]),
-			dbesc($contact["about"]), intval($contact["generation"]), dbesc($contact["updated"]),
+			dbesc($contact["about"]), intval($contact["generation"]), dbesc(dbm::date($contact["updated"])),
 			dbesc($contact["server_url"]), dbesc($contact["connect"]),
 			dbesc(normalise_link($contact["url"])), intval($contact["generation"]));
 
