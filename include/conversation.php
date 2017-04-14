@@ -1209,7 +1209,7 @@ function format_like($cnt, array $arr, $type, $id) {
 	return $o;
 }}
 
-function status_editor($a,$x, $notes_cid = 0, $popup = false) {
+function status_editor(App $a, $x, $notes_cid = 0, $popup = false) {
 	$o = '';
 
 	$geotag = (x($x, 'allow_location') ? replace_macros(get_markup_template('jot_geotag.tpl'), array()) : '');
@@ -1250,7 +1250,7 @@ function status_editor($a,$x, $notes_cid = 0, $popup = false) {
 
 	// Private/public post links for the non-JS ACL form
 	$private_post = 1;
-	if ($_REQUEST['public']) {
+	if (x($_REQUEST, 'public')) {
 		$private_post = 0;
 	}
 
