@@ -393,7 +393,7 @@ function construct_acl_data(App $a, $user) {
 	$user_defaults = get_acl_permissions($user);
 
 	if ($acl_data['groups']) {
-		foreach ($acl_data['groups'] as $key=>$group) {
+		foreach ($acl_data['groups'] as $key => $group) {
 			// Add a "selected" flag to groups that are posted to by default
 			if ($user_defaults['allow_gid'] &&
 					in_array($group['id'], $user_defaults['allow_gid']) && !in_array($group['id'], $user_defaults['deny_gid']) ) {
@@ -404,7 +404,7 @@ function construct_acl_data(App $a, $user) {
 		}
 	}
 	if ($acl_data['contacts']) {
-		foreach ($acl_data['contacts'] as $key=>$contact) {
+		foreach ($acl_data['contacts'] as $key => $contact) {
 			// Add a "selected" flag to groups that are posted to by default
 			if ($user_defaults['allow_cid'] &&
 					in_array($contact['id'], $user_defaults['allow_cid']) && !in_array($contact['id'], $user_defaults['deny_cid']) ) {
@@ -443,7 +443,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 	logger("Searching for ".$search." - type ".$type, LOGGER_DEBUG);
 
-	if ($search!="") {
+	if ($search != "") {
 		$sql_extra = "AND `name` LIKE '%%".dbesc($search)."%%'";
 		$sql_extra2 = "AND (`attag` LIKE '%%".dbesc($search)."%%' OR `name` LIKE '%%".dbesc($search)."%%' OR `nick` LIKE '%%".dbesc($search)."%%')";
 	} else {
