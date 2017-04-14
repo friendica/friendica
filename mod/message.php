@@ -536,6 +536,7 @@ function get_messages($user, $lstart, $lend) {
 		ANY_VALUE(`mail`.`reply`), ANY_VALUE(`mail`.`replied`), ANY_VALUE(`mail`.`unknown`),
 		ANY_VALUE(`mail`.`uri`), ANY_VALUE(`mail`.`parent-uri`), ANY_VALUE(`mail`.`created`),
 		ANY_VALUE(`contact`.`name`), ANY_VALUE(`contact`.`url`), ANY_VALUE(`contact`.`thumb`), ANY_VALUE(`contact`.`network`),
+		count( * ) as count
 		FROM `mail` LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
 		WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `mailcreated` DESC  LIMIT %d , %d ",
 		intval($user), intval($lstart), intval($lend)
