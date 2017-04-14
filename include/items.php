@@ -2323,8 +2323,8 @@ function posted_dates($uid, $wall) {
 	}
 
 	// Set the start and end date to the beginning of the month
-	$dnow = substr($dnow, 0, 8).'01';
-	$dthen = substr($dthen, 0, 8).'01';
+	$dnow = substr($dnow, 0, 8) . '01';
+	$dthen = substr($dthen, 0, 8) . '01';
 
 	$ret = array();
 	/*
