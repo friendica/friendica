@@ -78,7 +78,17 @@ function update_fail($update_id, $error_message){
 function table_structure($table) {
 	$structures = q("DESCRIBE `%s`", $table);
 
+	$full_columns = q("SHOW FULL COLUMNS FROM `%s`", $table);
+
 	$indexes = q("SHOW INDEX FROM `%s`", $table);
+
+	$table_status = q("SHOW TABLE STATUS WHERE `name` = '%s'", $table);
+
+	if (dbm::is_result($table_status)) {
+		$table_status = $table_status[0];
+	} else {
+		$table_status = array();
+	}
 
 	$fielddata = array();
 	$indexdata = array();
@@ -104,7 +114,6 @@ function table_structure($table) {
 
 			$indexdata[$index["Key_name"]][] = $column;
 		}
-
 	if (dbm::is_result($structures)) {
 		foreach ($structures AS $field) {
 			$fielddata[$field["Field"]]["type"] = $field["Type"];
@@ -125,10 +134,16 @@ function table_structure($table) {
 			}
 		}
 	}
-	return(array("fields"=>$fielddata, "indexes"=>$indexdata));
+	if (dbm::is_result($full_columns)) {
+		foreach ($full_columns AS $column) {
+			$fielddata[$column["Field"]]["Collation"] = $column["Collation"];
+		}
+	}
+
+	return array("fields" => $fielddata, "indexes" => $indexdata, "table_status" => $table_status);
 }
 
-function print_structure($database, $charset) {
+function print_structure($database) {
 	echo "-- ------------------------------------------\n";
 	echo "-- ".FRIENDICA_PLATFORM." ".FRIENDICA_VERSION." (".FRIENDICA_CODENAME,")\n";
 	echo "-- DB_UPDATE_VERSION ".DB_UPDATE_VERSION."\n";
@@ -137,7 +152,7 @@ function print_structure($database, $charset) {
 		echo "--\n";
 		echo "-- TABLE $name\n";
 		echo "--\n";
-		db_create_table($name, $structure['fields'], $charset, true, false, $structure["indexes"]);
+		db_create_table($name, $structure['fields'], true, false, $structure["indexes"]);
 
 		echo "\n";
 	}
@@ -151,12 +166,6 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		Config::set('system', 'maintenance_reason', 'Database update');
 	}
 
-	if (isset($a->config["system"]["db_charset"])) {
-		$charset = $a->config["system"]["db_charset"];
-	} else {
-		$charset = "utf8mb4";
-	}
-
 	$errors = false;
 
 	logger('updating structure', LOGGER_DEBUG);
@@ -168,16 +177,18 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		$tables = q("SHOW TABLES");
 	}
 
-	foreach ($tables AS $table) {
-		$table = current($table);
+	if (dbm::is_result($tables)) {
+		foreach ($tables AS $table) {
+			$table = current($table);
 
-		logger(sprintf('updating structure for table %s ...', $table), LOGGER_DEBUG);
-		$database[$table] = table_structure($table);
+			logger(sprintf('updating structure for table %s ...', $table), LOGGER_DEBUG);
+			$database[$table] = table_structure($table);
+		}
 	}
 
 	// Get the definition
 	if (is_null($definition)) {
-		$definition = db_definition($charset);
+		$definition = db_definition();
 	}
 
 	// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
@@ -194,7 +205,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		$group_by = "";
 		$sql3 = "";
 		if (!isset($database[$name])) {
-			$r = db_create_table($name, $structure["fields"], $charset, $verbose, $action, $structure['indexes']);
+			$r = db_create_table($name, $structure["fields"], $verbose, $action, $structure['indexes']);
 			if (!dbm::is_result($r)) {
 				$errors .=  t('Errors encountered creating database tables.').$name.EOL;
 			}
@@ -252,17 +263,22 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					}
 				} else {
 					// Compare the field definition
-					$current_field_definition = implode(",",$database[$name]["fields"][$fieldname]);
-					$new_field_definition = implode(",",$parameters);
-					if ($current_field_definition != $new_field_definition) {
-						$sql2=db_modify_table_field($fieldname, $parameters);
+					// At first remove the collation from the array that is about to be compared
+					$field_definition = $database[$name]["fields"][$fieldname];
+					$collation = $field_definition['Collation'];
+					unset($field_definition['Collation']);
+
+					$current_field_definition = implode(",", $field_definition);
+					$new_field_definition = implode(",", $parameters);
+					if (($current_field_definition != $new_field_definition) OR
+						(!is_null($collation) AND ($collation != 'utf8mb4_general_ci'))) {
+						$sql2 = db_modify_table_field($fieldname, $parameters, $collation);
 						if ($sql3 == "") {
 							$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
 						} else {
 							$sql3 .= ", ".$sql2;
 						}
 					}
-
 				}
 			}
 		}
@@ -288,10 +304,23 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 						$group_by = db_group_by($indexname, $fieldnames);
 					}
 					if ($sql2 != "") {
-						if ($sql3 == "")
+						if ($sql3 == "") {
 							$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
-						else
+						} else {
 							$sql3 .= ", ".$sql2;
+						}
+					}
+				}
+			}
+
+			if (isset($database[$name]["table_status"]["Collation"])) {
+				if ($database[$name]["table_status"]["Collation"] != 'utf8mb4_general_ci') {
+					$sql2 = "DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci";
+
+					if ($sql3 == "") {
+						$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
+					} else {
+						$sql3 .= ", ".$sql2;
 					}
 				}
 			}
@@ -395,7 +424,7 @@ function db_field_command($parameters, $create = true) {
 	return($fieldstruct);
 }
 
-function db_create_table($name, $fields, $charset, $verbose, $action, $indexes=null) {
+function db_create_table($name, $fields, $verbose, $action, $indexes=null) {
 	global $a, $db;
 
 	$r = true;
@@ -420,7 +449,7 @@ function db_create_table($name, $fields, $charset, $verbose, $action, $indexes=n
 
 	$sql = implode(",\n\t", $sql_rows);
 
-	$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", dbesc($name)).$sql."\n) DEFAULT CHARSET=".$charset;
+	$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", dbesc($name)).$sql."\n) DEFAULT CHARSET=utf8mb4";
 	if ($verbose)
 		echo $sql.";\n";
 
@@ -435,8 +464,13 @@ function db_add_table_field($fieldname, $parameters) {
 	return($sql);
 }
 
-function db_modify_table_field($fieldname, $parameters) {
+function db_modify_table_field($fieldname, $parameters, $collation) {
 	$sql = sprintf("MODIFY `%s` %s", dbesc($fieldname), db_field_command($parameters, false));
+
+	if (!is_null($collation) AND ($collation != 'utf8mb4_general_ci')) {
+		$sql .= " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci";
+	}
+
 	return($sql);
 }
 
@@ -503,18 +537,7 @@ function db_group_by($indexname, $fieldnames) {
 	return $sql;
 }
 
-function db_index_suffix($charset, $reduce = 0) {
-	if ($charset != "utf8mb4") {
-		return "";
-	}
-
-	// On utf8mb4 indexes can only have a length of 191
-	$indexlength = 191 - $reduce;
-
-	return "(".$indexlength.")";
-}
-
-function db_definition($charset) {
+function db_definition() {
 
 	$database = array();
 
@@ -1658,9 +1681,7 @@ function dbstructure_run(&$argv, &$argc) {
 				set_config('system','build',DB_UPDATE_VERSION);
 				return;
 			case "dumpsql":
-				// For the dump that is used to create the database.sql we always assume utfmb4
-				$charset = "utf8mb4";
-				print_structure(db_definition($charset), $charset);
+				print_structure(db_definition());
 				return;
 		}
 	}
