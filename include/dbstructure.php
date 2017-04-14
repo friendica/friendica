@@ -163,7 +163,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 
 	if ($action) {
 		Config::set('system', 'maintenance', 1);
-		Config::set('system', 'maintenance_reason', 'Database update');
+		Config::set('system', 'maintenance_reason', sprintf(t(': Database update'), dbm::date().' '.date('e')));
 	}
 
 	$errors = false;
@@ -352,6 +352,8 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 			}
 
 			if ($action) {
+				Config::set('system', 'maintenance_reason', sprintf(t('%s: updating %s table.'), dbm::date().' '.date('e'), $name));
+
 				// Ensure index conversion to unique removes duplicates
 				if ($is_unique) {
 					if ($ignore != "") {
@@ -402,8 +404,12 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 	return $errors;
 }
 
-function db_field_command($parameters, $create = true) {
+function db_field_command($parameters, $collation = null, $create = true) {
 	$fieldstruct = $parameters["type"];
+
+	if (!is_null($collation)) {
+		$fieldstruct .= " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci";
+	}
 
 	if ($parameters["not null"])
 		$fieldstruct .= " NOT NULL";
@@ -465,12 +471,7 @@ function db_add_table_field($fieldname, $parameters) {
 }
 
 function db_modify_table_field($fieldname, $parameters, $collation) {
-	$sql = sprintf("MODIFY `%s` %s", dbesc($fieldname), db_field_command($parameters, false));
-
-	if (!is_null($collation) AND ($collation != 'utf8mb4_general_ci')) {
-		$sql .= " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci";
-	}
-
+	$sql = sprintf("MODIFY `%s` %s", dbesc($fieldname), db_field_command($parameters, $collation, false));
 	return($sql);
 }
 
