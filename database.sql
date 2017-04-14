@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 3.5.2-dev (Asparagus)
--- DB_UPDATE_VERSION 1216
+-- DB_UPDATE_VERSION 1218
 -- ------------------------------------------
 
 
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `addon` (
 	`plugin_admin` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `name` (`name`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE attach
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `attach` (
 	`deny_cid` mediumtext,
 	`deny_gid` mediumtext,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE auth_codes
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `auth_codes` (
 	`expires` int(11) NOT NULL DEFAULT 0,
 	`scope` varchar(250) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE cache
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `cache` (
 	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`k`),
 	 INDEX `expire_mode_updated` (`expire_mode`,`updated`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE challenge
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `challenge` (
 	`type` varchar(255) NOT NULL DEFAULT '',
 	`last_update` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE clients
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `clients` (
 	`icon` text,
 	`uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`client_id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE config
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `config` (
 	`v` mediumtext,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `cat_k` (`cat`,`k`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE contact
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	 INDEX `nick_uid` (`nick`(32),`uid`),
 	 INDEX `dfrn-id` (`dfrn-id`),
 	 INDEX `issued-id` (`issued-id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE conv
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS `conv` (
 	`subject` text,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE event
@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS `event` (
 	`deny_gid` mediumtext,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_start` (`uid`,`start`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE fcontact
@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `fcontact` (
 	 PRIMARY KEY(`id`),
 	 INDEX `addr` (`addr`(32)),
 	 INDEX `url` (`url`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE ffinder
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS `ffinder` (
 	`cid` int(10) unsigned NOT NULL DEFAULT 0,
 	`fid` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE fserver
@@ -279,7 +279,7 @@ CREATE TABLE IF NOT EXISTS `fserver` (
 	`key` text,
 	 PRIMARY KEY(`id`),
 	 INDEX `server` (`server`(32))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE fsuggest
@@ -295,7 +295,7 @@ CREATE TABLE IF NOT EXISTS `fsuggest` (
 	`note` text,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE gcign
@@ -307,7 +307,7 @@ CREATE TABLE IF NOT EXISTS `gcign` (
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `gcid` (`gcid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE gcontact
@@ -346,7 +346,7 @@ CREATE TABLE IF NOT EXISTS `gcontact` (
 	 INDEX `addr` (`addr`(64)),
 	 INDEX `hide_network_updated` (`hide`,`network`,`updated`),
 	 INDEX `updated` (`updated`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE glink
@@ -361,7 +361,7 @@ CREATE TABLE IF NOT EXISTS `glink` (
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `cid_uid_gcid_zcid` (`cid`,`uid`,`gcid`,`zcid`),
 	 INDEX `gcid` (`gcid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE group
@@ -374,7 +374,7 @@ CREATE TABLE IF NOT EXISTS `group` (
 	`name` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE group_member
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS `group_member` (
 	 INDEX `contactid` (`contact-id`),
 	 INDEX `gid_contactid` (`gid`,`contact-id`),
 	 UNIQUE INDEX `uid_gid_contactid` (`uid`,`gid`,`contact-id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE gserver
@@ -411,7 +411,7 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`last_failure` datetime DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `nurl` (`nurl`(32))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE hook
@@ -424,7 +424,7 @@ CREATE TABLE IF NOT EXISTS `hook` (
 	`priority` int(11) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `hook_file_function` (`hook`(50),`file`(80),`function`(60))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE intro
@@ -442,7 +442,7 @@ CREATE TABLE IF NOT EXISTS `intro` (
 	`blocked` tinyint(1) NOT NULL DEFAULT 1,
 	`ignore` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE item
@@ -539,7 +539,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `uid_eventid` (`uid`,`event-id`),
 	 INDEX `uid_authorlink` (`uid`,`author-link`),
 	 INDEX `uid_ownerlink` (`uid`,`owner-link`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE item_id
@@ -555,7 +555,7 @@ CREATE TABLE IF NOT EXISTS `item_id` (
 	 INDEX `sid` (`sid`),
 	 INDEX `service` (`service`(32)),
 	 INDEX `iid` (`iid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE locks
@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`locked` tinyint(1) NOT NULL DEFAULT 0,
 	`created` datetime DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE mail
@@ -594,7 +594,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
 	 INDEX `convid` (`convid`),
 	 INDEX `uri` (`uri`(64)),
 	 INDEX `parent-uri` (`parent-uri`(64))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE mailacct
@@ -614,7 +614,7 @@ CREATE TABLE IF NOT EXISTS `mailacct` (
 	`pubmail` tinyint(1) NOT NULL DEFAULT 0,
 	`last_check` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE manage
@@ -625,7 +625,7 @@ CREATE TABLE IF NOT EXISTS `manage` (
 	`mid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_mid` (`uid`,`mid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE notify
@@ -653,7 +653,7 @@ CREATE TABLE IF NOT EXISTS `notify` (
 	 INDEX `seen_uid_date` (`seen`,`uid`,`date`),
 	 INDEX `uid_date` (`uid`,`date`),
 	 INDEX `uid_type_link` (`uid`,`type`,`link`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE notify-threads
@@ -665,7 +665,7 @@ CREATE TABLE IF NOT EXISTS `notify-threads` (
 	`parent-item` int(10) unsigned NOT NULL DEFAULT 0,
 	`receiver-uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE oembed
@@ -676,7 +676,7 @@ CREATE TABLE IF NOT EXISTS `oembed` (
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`url`),
 	 INDEX `created` (`created`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE parsed_url
@@ -689,7 +689,7 @@ CREATE TABLE IF NOT EXISTS `parsed_url` (
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`url`,`guessing`,`oembed`),
 	 INDEX `created` (`created`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE pconfig
@@ -702,7 +702,7 @@ CREATE TABLE IF NOT EXISTS `pconfig` (
 	`v` mediumtext,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_cat_k` (`uid`,`cat`,`k`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE photo
@@ -736,7 +736,7 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	 INDEX `uid_album_scale_created` (`uid`,`album`(32),`scale`,`created`),
 	 INDEX `uid_album_resource-id_created` (`uid`,`album`(32),`resource-id`(64),`created`),
 	 INDEX `resource-id` (`resource-id`(64))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE poll
@@ -756,7 +756,7 @@ CREATE TABLE IF NOT EXISTS `poll` (
 	`q9` text,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE poll_result
@@ -768,7 +768,7 @@ CREATE TABLE IF NOT EXISTS `poll_result` (
 	 PRIMARY KEY(`id`),
 	 INDEX `poll_id` (`poll_id`),
 	 INDEX `choice` (`choice`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE process
@@ -779,7 +779,7 @@ CREATE TABLE IF NOT EXISTS `process` (
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`pid`),
 	 INDEX `command` (`command`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE profile
@@ -829,7 +829,7 @@ CREATE TABLE IF NOT EXISTS `profile` (
 	`net-publish` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_is-default` (`uid`,`is-default`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE profile_check
@@ -842,7 +842,7 @@ CREATE TABLE IF NOT EXISTS `profile_check` (
 	`sec` varchar(255) NOT NULL DEFAULT '',
 	`expire` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE push_subscriber
@@ -857,7 +857,7 @@ CREATE TABLE IF NOT EXISTS `push_subscriber` (
 	`last_update` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`secret` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE queue
@@ -876,7 +876,7 @@ CREATE TABLE IF NOT EXISTS `queue` (
 	 INDEX `last` (`last`),
 	 INDEX `network` (`network`),
 	 INDEX `batch` (`batch`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE register
@@ -890,7 +890,7 @@ CREATE TABLE IF NOT EXISTS `register` (
 	`language` varchar(16) NOT NULL DEFAULT '',
 	`note` text,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE search
@@ -901,7 +901,7 @@ CREATE TABLE IF NOT EXISTS `search` (
 	`term` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE session
@@ -914,7 +914,7 @@ CREATE TABLE IF NOT EXISTS `session` (
 	 PRIMARY KEY(`id`),
 	 INDEX `sid` (`sid`(64)),
 	 INDEX `expire` (`expire`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE sign
@@ -927,7 +927,7 @@ CREATE TABLE IF NOT EXISTS `sign` (
 	`signer` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `iid` (`iid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE spam
@@ -944,7 +944,7 @@ CREATE TABLE IF NOT EXISTS `spam` (
 	 INDEX `spam` (`spam`),
 	 INDEX `ham` (`ham`),
 	 INDEX `term` (`term`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE term
@@ -967,7 +967,7 @@ CREATE TABLE IF NOT EXISTS `term` (
 	 INDEX `uid_otype_type_term_global_created` (`uid`,`otype`,`type`,`term`(32),`global`,`created`),
 	 INDEX `uid_otype_type_url` (`uid`,`otype`,`type`,`url`(64)),
 	 INDEX `guid` (`guid`(64))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE thread
@@ -1007,7 +1007,7 @@ CREATE TABLE IF NOT EXISTS `thread` (
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_commented` (`uid`,`commented`),
 	 INDEX `uid_wall_created` (`uid`,`wall`,`created`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE tokens
@@ -1020,7 +1020,7 @@ CREATE TABLE IF NOT EXISTS `tokens` (
 	`scope` varchar(200) NOT NULL DEFAULT '',
 	`uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE user
@@ -1071,7 +1071,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`openidserver` text,
 	 PRIMARY KEY(`uid`),
 	 INDEX `nickname` (`nickname`(32))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE userd
@@ -1081,7 +1081,7 @@ CREATE TABLE IF NOT EXISTS `userd` (
 	`username` varchar(255) NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `username` (`username`(32))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE workerqueue
@@ -1094,5 +1094,5 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 	`pid` int(11) NOT NULL DEFAULT 0,
 	`executed` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
