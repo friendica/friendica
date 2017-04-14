@@ -26,7 +26,7 @@ require_once 'include/enotify.php';
 require_once 'include/dfrn.php';
 require_once 'include/group.php';
 
-/// @TODO one day with composer autploader no more needed
+/// @TODO one day with composer autoloader no more needed
 require_once 'library/defuse/php-encryption-1.2.1/Crypto.php';
 
 function construct_verb($item) {
