@@ -1416,9 +1416,9 @@ function conv_sort($arr, $order) {
 	}
 
 	if (stristr($order, 'created')) {
-		usort($parents,'sort_thr_created');
+		usort($parents, 'sort_thr_created');
 	} elseif (stristr($order, 'commented')) {
-		usort($parents,'sort_thr_commented');
+		usort($parents, 'sort_thr_commented');
 	}
 
 	if (count($parents)) {
@@ -1532,19 +1532,19 @@ function get_responses($conv_responses, $response_verbs, $ob, $item) {
 function get_response_button_text($v, $count) {
 	switch ($v) {
 		case 'like':
-			return tt('Like','Likes', $count,'noun');
+			return tt('Like', 'Likes', $count, 'noun');
 			break;
 		case 'dislike':
-			return tt('Dislike','Dislikes', $count,'noun');
+			return tt('Dislike', 'Dislikes', $count, 'noun');
 			break;
 		case 'attendyes':
-			return tt('Attending','Attending', $count,'noun');
+			return tt('Attending', 'Attending', $count, 'noun');
 			break;
 		case 'attendno':
-			return tt('Not Attending','Not Attending', $count,'noun');
+			return tt('Not Attending', 'Not Attending', $count, 'noun');
 			break;
 		case 'attendmaybe':
-			return tt('Undecided','Undecided', $count,'noun');
+			return tt('Undecided', 'Undecided', $count, 'noun');
 			break;
 	}
 }

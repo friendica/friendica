@@ -74,7 +74,7 @@ function cron_run(&$argv, &$argc){
 
 		proc_run(PRIORITY_LOW, "include/discover_poco.php", "suggestions");
 
-		set_config('system', 'last_expire_day',$d2);
+		set_config('system', 'last_expire_day', $d2);
 
 		proc_run(PRIORITY_LOW, 'include/expire.php');
 
