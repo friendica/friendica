@@ -10,7 +10,7 @@ require_once 'include/plaintext.php';
 
 function bb_PictureCacheExt($matches) {
 	if (strpos($matches[3], "data:image/") === 0) {
-		return ($matches[0]);
+		return $matches[0];
 	}
 
 	$matches[3] = proxy_url($matches[3]);
@@ -19,7 +19,7 @@ function bb_PictureCacheExt($matches) {
 
 function bb_PictureCache($matches) {
 	if (strpos($matches[1], "data:image/") === 0) {
-		return ($matches[0]);
+		return $matches[0];
 	}
 
 	$matches[1] = proxy_url($matches[1]);
@@ -165,7 +165,7 @@ function cleancss($input) {
 		}
 	}
 
-	return($cleaned);
+	return $cleaned;
 }
 
 function stripcode_br_cb($s) {
@@ -545,85 +545,94 @@ function bb_ShareAttributes($share, $simplehtml) {
 				);
 			break;
 	}
-	return($text);
+
+	return $text;
 }
 
 function GetProfileUsername($profile, $username, $compact = false, $getnetwork = false) {
 
 	$twitter = preg_replace("=https?://twitter.com/(.*)=ism", "$1@twitter.com", $profile);
 	if ($twitter != $profile) {
-		if ($getnetwork)
-			return(NETWORK_TWITTER);
-		elseif ($compact)
-			return($twitter);
-		else
-			return($username." (".$twitter.")");
+		if ($getnetwork) {
+			return NETWORK_TWITTER;
+		} elseif ($compact) {
+			return $twitter;
+		} else {
+			return ($username . " (" . $twitter . ")");
+		}
 	}
 
 	$appnet = preg_replace("=https?://alpha.app.net/(.*)=ism", "$1@alpha.app.net", $profile);
 	if ($appnet != $profile) {
-		if ($getnetwork)
-			return(NETWORK_APPNET);
-		elseif ($compact)
-			return($appnet);
-		else
-			return($username." (".$appnet.")");
+		if ($getnetwork) {
+			return NETWORK_APPNET;
+		} elseif ($compact) {
+			return $appnet;
+		} else {
+			return ($username . " (" . $appnet . ")");
+		}
 	}
 
 	$gplus = preg_replace("=https?://plus.google.com/(.*)=ism", "$1@plus.google.com", $profile);
 	if ($gplus != $profile) {
-		if ($getnetwork)
-			return(NETWORK_GPLUS);
-		elseif ($compact)
-			return($gplususername." (".$username.")");
-		else
-			return($username." (".$gplus.")");
+		if ($getnetwork) {
+			return NETWORK_GPLUS);
+		} elseif ($compact) {
+			return ($gplususername . " (" . $username . ")");
+		} else {
+			return ($username . " (" . $gplus . ")");
+		}
 	}
 
 	$friendica = preg_replace("=https?://(.*)/profile/(.*)=ism", "$2@$1", $profile);
 	if ($friendica != $profile) {
-		if ($getnetwork)
-			return(NETWORK_DFRN);
-		elseif ($compact)
-			return($friendica);
-		else
-			return($username." (".$friendica.")");
+		if ($getnetwork) {
+			return NETWORK_DFRN;
+		} elseif ($compact) {
+			return $friendica;
+		} else {
+			return ($username . " (" . $friendica . ")");
+		}
 	}
 
 	$diaspora = preg_replace("=https?://(.*)/u/(.*)=ism", "$2@$1", $profile);
 	if ($diaspora != $profile) {
-		if ($getnetwork)
-			return(NETWORK_DIASPORA);
-		elseif ($compact)
-			return($diaspora);
-		else
-			return($username." (".$diaspora.")");
+		if ($getnetwork) {
+			return NETWORK_DIASPORA;
+		} elseif ($compact) {
+			return $diaspora;
+		} else {
+			return ($username . " (" . $diaspora . ")");
+		}
 	}
 
 	$red = preg_replace("=https?://(.*)/channel/(.*)=ism", "$2@$1", $profile);
 	if ($red != $profile) {
-		if ($getnetwork)
+		if ($getnetwork) {
 			// red is identified as Diaspora - friendica can't connect directly to it
-			return(NETWORK_DIASPORA);
-		elseif ($compact)
-			return($red);
-		else
-			return($username." (".$red.")");
+			return NETWORK_DIASPORA;
+		} elseif ($compact) {
+			return $red;
+		} else {
+			return ($username . " (" . $red . ")");
+		}
 	}
 
 	$StatusnetHost = preg_replace("=https?://(.*)/user/(.*)=ism", "$1", $profile);
 	if ($StatusnetHost != $profile) {
 		$StatusnetUser = preg_replace("=https?://(.*)/user/(.*)=ism", "$2", $profile);
 		if ($StatusnetUser != $profile) {
+			/// @TODO Some hosts run on https, not just http and sometimes http is disabled, let's support both here
 			$UserData = fetch_url("http://".$StatusnetHost."/api/users/show.json?user_id=".$StatusnetUser);
 			$user = json_decode($UserData);
 			if ($user) {
-				if ($getnetwork)
-					return(NETWORK_STATUSNET);
-				elseif ($compact)
-					return($user->screen_name."@".$StatusnetHost);
-				else
-					return($username." (".$user->screen_name."@".$StatusnetHost.")");
+				if ($getnetwork) {
+					return NETWORK_STATUSNET;
+				} elseif ($compact) {
+					return ($user->screen_name . "@" . $StatusnetHost);
+				} else {
+					return ($username . " (" . $user->screen_name . "@" . $StatusnetHost . ")");
+				}
 			}
 		}
 	}
@@ -633,16 +642,17 @@ function GetProfileUsername($profile, $username, $compact = false, $getnetwork =
 	if ($rest == "") {
 		$pumpio = preg_replace("=https?://([\.\w]+)/([\.\w]+)(.*)=ism", "$2@$1", $profile);
 		if ($pumpio != $profile) {
-			if ($getnetwork)
-				return(NETWORK_PUMPIO);
-			elseif ($compact)
-				return($pumpio);
-			else
-				return($username." (".$pumpio.")");
+			if ($getnetwork) {
+				return NETWORK_PUMPIO;
+			} elseif ($compact) {
+				return $pumpio;
+			} else {
+				return ($username . " (" . $pumpio . ")");
+			}
 		}
 	}
 
-	return($username);
+	return $username;
 }
 
 function bb_DiasporaLinks($match) {
@@ -693,14 +703,16 @@ function bb_RemovePictureLinks($match) {
 		}
 		Cache::set($match[1],$text);
 	}
-	return($text);
+
+	return $text;
 }
 
 function bb_expand_links($match) {
-	if (($match[3] == "") OR ($match[2] == $match[3]) OR stristr($match[2], $match[3]))
-		return ($match[1]."[url]".$match[2]."[/url]");
-	else
-		return ($match[1].$match[3]." [url]".$match[2]."[/url]");
+	if (($match[3] == "") OR ($match[2] == $match[3]) OR stristr($match[2], $match[3])) {
+		return ($match[1] . "[url]" . $match[2] . "[/url]");
+	} else {
+		return ($match[1] . $match[3] . " [url]" . $match[2] . "[/url]");
+	}
 }
 
 function bb_CleanPictureLinksSub($match) {
@@ -748,12 +760,13 @@ function bb_CleanPictureLinksSub($match) {
 		}
 		Cache::set($match[1],$text);
 	}
-	return($text);
+
+	return $text;
 }
 
 function bb_CleanPictureLinks($text) {
 	$text = preg_replace_callback("&\[url=([^\[\]]*)\]\[img\](.*)\[\/img\]\[\/url\]&Usi", 'bb_CleanPictureLinksSub', $text);
-	return ($text);
+	return $text;
 }
 
 function bb_highlight($match) {
@@ -1124,14 +1137,13 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 
 	// Shared content
 	$Text = preg_replace_callback("/(.*?)\[share(.*?)\](.*?)\[\/share\]/ism",
-		function ($match) use ($simplehtml){
-			return(bb_ShareAttributes($match, $simplehtml));
+		function ($match) use ($simplehtml) {
+			return bb_ShareAttributes($match, $simplehtml);
 		}, $Text);
 
 	$Text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism", '<br/><img src="' .App::get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . t('Encrypted content') . '" /><br />', $Text);
 	$Text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism", '<br/><img src="' .App::get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);
 	//$Text = preg_replace("/\[crypt=(.*?)\](.*?)\[\/crypt\]/ism", '<br/><img src="' .App::get_baseurl() . '/images/lock_icon.gif" alt="' . t('Encrypted content') . '" title="' . '$1' . ' ' . t('Encrypted content') . '" /><br />', $Text);
-
 
 	// Try to Oembed
 	if ($tryoembed) {
