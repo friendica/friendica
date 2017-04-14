@@ -2333,7 +2333,7 @@ function posted_dates($uid, $wall) {
 	 */
 	while (substr($dnow, 0, 7) >= substr($dthen, 0, 7)) {
 		$dstart = substr($dnow, 0, 8) . '01';
-		$dend = substr($dnow, 0, 8) . get_dim(intval($dnow),intval(substr($dnow,5)));
+		$dend = substr($dnow, 0, 8) . get_dim(intval($dnow), intval(substr($dnow, 5)));
 		$start_month = datetime_convert('', '', $dstart, 'Y-m-d');
 		$end_month = datetime_convert('', '', $dend, 'Y-m-d');
 		$str = day_translate(datetime_convert('', '', $dnow, 'F Y'));
