@@ -263,16 +263,19 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					}
 				} else {
 					// Compare the field definition
-					// At first remove the collation from the array that is about to be compared
 					$field_definition = $database[$name]["fields"][$fieldname];
-					$collation = $field_definition['Collation'];
-					unset($field_definition['Collation']);
+
+					// Define the default collation if not given
+					if (!isset($parameters['Collation']) AND !is_null($field_definition['Collation'])) {
+						$parameters['Collation'] = 'utf8mb4_general_ci';
+					} else {
+						$parameters['Collation'] = null;
+					}
 
 					$current_field_definition = implode(",", $field_definition);
 					$new_field_definition = implode(",", $parameters);
-					if (($current_field_definition != $new_field_definition) OR
-						(!is_null($collation) AND ($collation != 'utf8mb4_general_ci'))) {
-						$sql2 = db_modify_table_field($fieldname, $parameters, $collation);
+					if ($current_field_definition != $new_field_definition) {
+						$sql2 = db_modify_table_field($fieldname, $parameters);
 						if ($sql3 == "") {
 							$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
 						} else {
@@ -315,7 +318,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 
 			if (isset($database[$name]["table_status"]["Collation"])) {
 				if ($database[$name]["table_status"]["Collation"] != 'utf8mb4_general_ci') {
-					$sql2 = "DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci";
+					$sql2 = "DEFAULT COLLATE utf8mb4_general_ci";
 
 					if ($sql3 == "") {
 						$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
@@ -404,11 +407,11 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 	return $errors;
 }
 
-function db_field_command($parameters, $collation = null, $create = true) {
+function db_field_command($parameters, $create = true) {
 	$fieldstruct = $parameters["type"];
 
-	if (!is_null($collation)) {
-		$fieldstruct .= " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci";
+	if (!is_null($parameters["Collation"])) {
+		$fieldstruct .= " COLLATE ".$parameters["Collation"];
 	}
 
 	if ($parameters["not null"])
@@ -455,7 +458,7 @@ function db_create_table($name, $fields, $verbose, $action, $indexes=null) {
 
 	$sql = implode(",\n\t", $sql_rows);
 
-	$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", dbesc($name)).$sql."\n) DEFAULT CHARSET=utf8mb4";
+	$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", dbesc($name)).$sql."\n) DEFAULT COLLATE utf8mb4_general_ci";
 	if ($verbose)
 		echo $sql.";\n";
 
@@ -470,8 +473,8 @@ function db_add_table_field($fieldname, $parameters) {
 	return($sql);
 }
 
-function db_modify_table_field($fieldname, $parameters, $collation) {
-	$sql = sprintf("MODIFY `%s` %s", dbesc($fieldname), db_field_command($parameters, $collation, false));
+function db_modify_table_field($fieldname, $parameters) {
+	$sql = sprintf("MODIFY `%s` %s", dbesc($fieldname), db_field_command($parameters, false));
 	return($sql);
 }
 
