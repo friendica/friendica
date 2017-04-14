@@ -1293,7 +1293,7 @@ function tag_deliver($uid, $item_id) {
 	 */
 	$dlink = normalise_link(App::get_baseurl() . '/u/' . $u[0]['nickname']);
 
-	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches,PREG_SET_ORDER);
+	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
 			if (link_compare($link, $mtch[1]) || link_compare($dlink, $mtch[1])) {
@@ -1399,7 +1399,7 @@ function tgroup_check($uid, $item) {
 	 */
 	$dlink = normalise_link(App::get_baseurl() . '/u/' . $u[0]['nickname']);
 
-	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches,PREG_SET_ORDER);
+	$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
 			if (link_compare($link, $mtch[1]) || link_compare($dlink, $mtch[1])) {
@@ -1785,8 +1785,8 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0) {
 			$x = strpos($i, '-');
 
 			if ($x) {
-				$res = substr($i, $x+1);
-				$i = substr($i,0, $x);
+				$res = substr($i, $x + 1);
+				$i = substr($i, 0, $x);
 				$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` = %d AND `uid` = %d",
 					dbesc($i),
 					intval($res),
@@ -2119,7 +2119,7 @@ function drop_item($id, $interactive = true) {
 		// clean up categories and tags so they don't end up as orphans
 
 		$matches = false;
-		$cnt = preg_match_all('/<(.*?)>/', $item['file'], $matches,PREG_SET_ORDER);
+		$cnt = preg_match_all('/<(.*?)>/', $item['file'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
 				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],true);
@@ -2128,7 +2128,7 @@ function drop_item($id, $interactive = true) {
 
 		$matches = false;
 
-		$cnt = preg_match_all('/\[(.*?)\]/', $item['file'], $matches,PREG_SET_ORDER);
+		$cnt = preg_match_all('/\[(.*?)\]/', $item['file'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
 				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],false);

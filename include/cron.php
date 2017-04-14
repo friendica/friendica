@@ -64,7 +64,7 @@ function cron_run(&$argv, &$argc){
 
 	// once daily run birthday_updates and then expire in background
 	$d1 = get_config('system', 'last_expire_day');
-	$d2 = intval(datetime_convert('UTC','UTC','now','d'));
+	$d2 = intval(datetime_convert('UTC', 'UTC', 'now', 'd'));
 
 	if ($d2 != intval($d1)) {
 
