@@ -140,11 +140,11 @@ function bb_remove_share_information($Text, $plaintext = false, $nolink = false)
 }
 
 function bb_cleanstyle($st) {
-  return "<span style=\"" . cleancss($st[1]) . ";\">" . $st[2] . "</span>";
+	return "<span style=\"" . cleancss($st[1]) . ";\">" . $st[2] . "</span>";
 }
 
 function bb_cleanclass($st) {
-  return "<span class=\"" . cleancss($st[1]) . "\">" . $st[2] . "</span>";
+	return "<span class=\"" . cleancss($st[1]) . "\">" . $st[2] . "</span>";
 }
 
 function cleancss($input) {
@@ -224,7 +224,6 @@ function bb_unspacefy_and_trim($st) {
 }
 
 function bb_find_open_close($s, $open, $close, $occurence = 1) {
-
 	if ($occurence < 1) {
 		$occurence = 1;
 	}
