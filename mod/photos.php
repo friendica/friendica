@@ -1240,8 +1240,10 @@ function photos_content(App $a) {
 			$order = 'DESC';
 		}
 
-		$r = q("SELECT `resource-id`, `id`, `filename`, type, max(`scale`) AS `scale`, `desc` FROM `photo` WHERE `uid` = %d AND `album` = '%s'
-			AND `scale` <= 4 $sql_extra GROUP BY `resource-id`, `id` ORDER BY `created` $order LIMIT %d , %d",
+		$r = q("SELECT `resource-id`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`filename`) AS `filename`,
+			ANY_VALUE(`type`) AS `type`, max(`scale`) AS `scale`, ANY_VALUE(`desc`) as `desc`
+			FROM `photo` WHERE `uid` = %d AND `album` = '%s'
+			AND `scale` <= 4 $sql_extra GROUP BY `resource-id` ORDER BY `created` $order LIMIT %d , %d",
 			intval($owner_uid),
 			dbesc($album),
 			intval($a->pager['start']),

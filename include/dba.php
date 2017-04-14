@@ -504,6 +504,14 @@ function dbesc($str) {
 	}
 }
 
+function any_value_fallback($sql) {
+	//Considerations for Standard SQL, or MySQL with ONLY_FULL_GROUP_BY (default since 5.7.5).
+	//ANY_VALUE() is available from MySQL 5.7 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
+	//A standard fallback is to use MIN(), or nothing () in old MySQL 5.6-
+	//TODO: Skip this line when we know we are on a platform supporting ANY_VALUE()
+	return str_ireplace('ANY_VALUE(', 'MIN(', $sql);
+}
+
 // Function: q($sql,$args);
 // Description: execute SQL query with printf style args.
 // Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
@@ -514,6 +522,7 @@ function q($sql) {
 	unset($args[0]);
 
 	if ($db && $db->connected) {
+		$sql = any_value_fallback($sql);
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		//logger("dba: q: $stmt", LOGGER_ALL);
 		if ($stmt === false)
@@ -550,6 +559,7 @@ function qu($sql) {
 	unset($args[0]);
 
 	if ($db && $db->connected) {
+		$sql = any_value_fallback($sql);
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		if ($stmt === false)
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);

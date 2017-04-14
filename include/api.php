@@ -3316,6 +3316,7 @@ $called_api = null;
 		}
 
 		$scale = (x($_REQUEST, 'scale') ? intval($_REQUEST['scale']) : false);
+<<<<<<< HEAD
 		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d", intval($scale)));
 		$data_sql = ($scale === false ? "" : "data, ");
 
@@ -3325,6 +3326,17 @@ $called_api = null;
 				%s
 				GROUP BY `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
 					`type`, `height`, `width`, `datasize`, `profile`",
+=======
+		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d",intval($scale)));
+		$data_sql = ($scale === false ? "" : "ANY_VALUE(data) AS data,");
+
+		$r = q("select %s ANY_VALUE(`resource-id`) AS `resource-id`, ANY_VALUE(`created`) AS `created`,
+				ANY_VALUE(`edited`) AS `edited`, ANY_VALUE(`title`) AS `title`, ANY_VALUE(`desc`) AS `desc`,
+				ANY_VALUE(`album`) AS `album`, ANY_VALUE(`filename`) AS `filename`, ANY_VALUE(`type`) AS `type`,
+				ANY_VALUE(`height`) AS `height`, ANY_VALUE(`width`) AS `width`, ANY_VALUE(`datasize`) AS `datasize`,
+				ANY_VALUE(`profile`) AS `profile`, min(`scale`) as minscale, max(`scale`) as maxscale
+				from photo where `uid` = %d and `resource-id` = '%s' %s",
+>>>>>>> MySQL ANY_VALUE with fallback to MIN
 			$data_sql,
 			intval(local_user()),
 			dbesc($_REQUEST['photo_id']),

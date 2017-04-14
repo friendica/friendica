@@ -349,8 +349,8 @@ function message_content(App $a) {
 
 		$o .= $header;
 
-		$r = q("SELECT count(*) AS `total` FROM `mail`
-			WHERE `mail`.`uid` = %d GROUP BY `parent-uri`, `created` ORDER BY `created` DESC",
+		$r = q("SELECT count(*) AS `total` FROM `mail`, ANY_VALUE(`created`) AS `created`
+			WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `created` DESC",
 			intval(local_user())
 		);
 
@@ -528,12 +528,16 @@ function message_content(App $a) {
 }
 
 function get_messages($user, $lstart, $lend) {
-
+	//TODO: rewritte with a sub-query to get the first message of each private thread with certainty
 	return q("SELECT max(`mail`.`created`) AS `mailcreated`, min(`mail`.`seen`) AS `mailseen`,
-		`mail`.* , `contact`.`name`, `contact`.`url`, `contact`.`thumb` , `contact`.`network`,
-		count( * ) as count
+		ANY_VALUE(`mail`.`id`), ANY_VALUE(`mail`.`uid`), ANY_VALUE(`mail`.`guid`), ANY_VALUE(`mail`.`from-name`),
+		ANY_VALUE(`mail`.`from-photo`), ANY_VALUE(`mail`.`from-url`), ANY_VALUE(`mail`.`contact-id`),
+		ANY_VALUE(`mail`.`convid`), ANY_VALUE(`mail`.`title`), ANY_VALUE(`mail`.`body`), ANY_VALUE(`mail`.`seen`),
+		ANY_VALUE(`mail`.`reply`), ANY_VALUE(`mail`.`replied`), ANY_VALUE(`mail`.`unknown`),
+		ANY_VALUE(`mail`.`uri`), ANY_VALUE(`mail`.`parent-uri`), ANY_VALUE(`mail`.`created`),
+		ANY_VALUE(`contact`.`name`), ANY_VALUE(`contact`.`url`), ANY_VALUE(`contact`.`thumb`), ANY_VALUE(`contact`.`network`),
 		FROM `mail` LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
-		WHERE `mail`.`uid` = %d GROUP BY `parent-uri`, `mail`.id ORDER BY `mailcreated` DESC  LIMIT %d , %d ",
+		WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `mailcreated` DESC  LIMIT %d , %d ",
 		intval($user), intval($lstart), intval($lend)
 	);
 }
