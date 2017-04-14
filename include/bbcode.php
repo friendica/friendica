@@ -575,7 +575,7 @@ function GetProfileUsername($profile, $username, $compact = false, $getnetwork =
 	$gplus = preg_replace("=https?://plus.google.com/(.*)=ism", "$1@plus.google.com", $profile);
 	if ($gplus != $profile) {
 		if ($getnetwork) {
-			return NETWORK_GPLUS);
+			return NETWORK_GPLUS;
 		} elseif ($compact) {
 			return ($gplususername . " (" . $username . ")");
 		} else {

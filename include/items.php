@@ -1169,7 +1169,7 @@ function item_body_set_hashtags(&$item) {
 			"&num;$2", $item["body"]);
 
 	foreach ($tags as $tag) {
-		if ((strpos($tag, '#') !== 0) || (strpos($tag, '[url=')) {
+		if ((strpos($tag, '#') !== 0) || (strpos($tag, '[url='))) {
 			continue;
 		}
 
@@ -2198,7 +2198,7 @@ function drop_item($id, $interactive = true) {
 		foreach ($r as $row) {
 			if ($parentid != "") {
 				$parentid .= ", ";
-			]
+			}
 
 			$parentid .= $row["id"];
 		}
