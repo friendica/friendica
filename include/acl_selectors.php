@@ -55,7 +55,8 @@ function group_select($selname,$selclass,$preselected = false,$size = 4) {
 	return $o;
 }
 
-
+/// @TODO after an optional parameter, no mandadory parameter can follow
+/// @TODO find proper type-hints
 function contact_selector($selname, $selclass, $preselected = false, $options) {
 
 	$a = get_app();
@@ -84,7 +85,7 @@ function contact_selector($selname, $selclass, $preselected = false, $options) {
 		}
 
 		if (x($options, 'networks')) {
-			switch($options['networks']) {
+			switch ($options['networks']) {
 				case 'DFRN_ONLY':
 					$networks = array(NETWORK_DFRN);
 					break;
@@ -375,7 +376,7 @@ function populate_acl($user = null, $show_jotnets = false) {
 		'$aclModalTitle' => t('Permissions'),
 		'$aclModalDismiss' => t('Close'),
 		'$features' => array(
-		'aclautomention' => (feature_enabled($user['uid'],"aclautomention")?"true":"false")
+		'aclautomention' => (feature_enabled($user['uid'], "aclautomention") ? "true" : "false")
 		),
 	));
 
