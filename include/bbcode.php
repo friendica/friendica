@@ -771,7 +771,7 @@ function bb_CleanPictureLinks($text) {
 function bb_highlight($match) {
 	if (in_array(strtolower($match[1]), ['php', 'css', 'mysql', 'sql', 'abap', 'diff', 'html', 'perl', 'ruby',
 		'vbscript', 'avrc', 'dtd', 'java', 'xml', 'cpp', 'python', 'javascript', 'js', 'sh'])) {
-		return text_highlight($match[2],strtolower($match[1]));
+		return text_highlight($match[2], strtolower($match[1]));
 	}
 	return $match[0];
 }
