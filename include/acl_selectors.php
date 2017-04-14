@@ -626,17 +626,17 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 	if ($conv_id) {
 		/*
-		 * if $conv_id is set, get unknown contacts in thread
-		 * but first get known contacts url to filter them out
+		 * if $conv_id is set, get unknow contacts in thread
+		 * but first get know contacts url to filter them out
+		 * @TODO rewrite below function to closure
 		 */
-		$known_contacts = array_map(
-			function ($i) {
-				return dbesc($i['link']);
-			}
-		, $contacts);
+		function _contact_link($i) {
+			return dbesc($i['link']);
+		}
 
-		$unknown_contacts = array();
-		$r = q("SELECT `author-link`
+		$known_contacts = array_map('_contact_link', $contacts);
+		$unknow_contacts = array();
+		$r = q("SELECT `author-avatar`,`author-name`,`author-link`
 				FROM `item` WHERE `parent` = %d
 					AND (`author-name` LIKE '%%%s%%' OR `author-link` LIKE '%%%s%%')
 					AND `author-link` NOT IN ('%s')
