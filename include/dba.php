@@ -507,12 +507,20 @@ function dbesc($str) {
 	}
 }
 
+/**
+ * @brief Replaces ANY_VALUE() function by MIN() function,
+ *  if the database server does not support ANY_VALUE().
+ *
+ * Considerations for Standard SQL, or MySQL with ONLY_FULL_GROUP_BY (default since 5.7.5).
+ * ANY_VALUE() is available from MySQL 5.7.5 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
+ * A standard fall-back is to use MIN().
+ *
+ * @param string $sql An SQL string without the values
+ * @return string The input SQL string modified if necessary.
+ */
 function any_value_fallback($sql) {
 	global $db;
 	$server_info = $db->server_info();
-	//Considerations for Standard SQL, or MySQL with ONLY_FULL_GROUP_BY (default since 5.7.5).
-	//ANY_VALUE() is available from MySQL 5.7.5 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
-	//A standard fallback is to use MIN()
 	if (version_compare($server_info, '5.7.5', '<') ||
 		(stripos($server_info, 'MariaDB') !== false)) {
 		$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
