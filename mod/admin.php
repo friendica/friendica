@@ -290,7 +290,8 @@ function admin_page_federation(App $a) {
 	foreach ($platforms as $p) {
 		// get a total count for the platform, the name and version of the
 		// highest version and the protocol tpe
-		$c = qu('SELECT COUNT(*) AS `total`, `platform`, `network`, `version` FROM `gserver`
+		$c = qu('SELECT COUNT(*) AS `total`, ANY_VALUE(`platform`),
+				ANY_VALUE(`network`), MAX(`version`) FROM `gserver`
 				WHERE `platform` LIKE "%s" AND `last_contact` >= `last_failure`
 				ORDER BY `version` ASC;', $p);
 		$total = $total + $c[0]['total'];
