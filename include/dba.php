@@ -477,6 +477,26 @@ class dba {
 			}
 		}
 	}
+
+	/**
+	 * @brief Replaces ANY_VALUE() function by MIN() function,
+	 *  if the database server does not support ANY_VALUE().
+	 *
+	 * Considerations for Standard SQL, or MySQL with ONLY_FULL_GROUP_BY (default since 5.7.5).
+	 * ANY_VALUE() is available from MySQL 5.7.5 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
+	 * A standard fall-back is to use MIN().
+	 *
+	 * @param string $sql An SQL string without the values
+	 * @return string The input SQL string modified if necessary.
+	 */
+	public function any_value_fallback($sql) {
+		$server_info = $this->server_info();
+		if (version_compare($server_info, '5.7.5', '<') ||
+			(stripos($server_info, 'MariaDB') !== false)) {
+			$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
+		}
+		return $sql;
+	}
 }
 
 function printable($s) {
@@ -507,27 +527,6 @@ function dbesc($str) {
 	}
 }
 
-/**
- * @brief Replaces ANY_VALUE() function by MIN() function,
- *  if the database server does not support ANY_VALUE().
- *
- * Considerations for Standard SQL, or MySQL with ONLY_FULL_GROUP_BY (default since 5.7.5).
- * ANY_VALUE() is available from MySQL 5.7.5 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
- * A standard fall-back is to use MIN().
- *
- * @param string $sql An SQL string without the values
- * @return string The input SQL string modified if necessary.
- */
-function any_value_fallback($sql) {
-	global $db;
-	$server_info = $db->server_info();
-	if (version_compare($server_info, '5.7.5', '<') ||
-		(stripos($server_info, 'MariaDB') !== false)) {
-		$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
-	}
-	return $sql;
-}
-
 // Function: q($sql,$args);
 // Description: execute SQL query with printf style args.
 // Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
@@ -538,7 +537,7 @@ function q($sql) {
 	unset($args[0]);
 
 	if ($db && $db->connected) {
-		$sql = any_value_fallback($sql);
+		$sql = $db->any_value_fallback($sql);
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		//logger("dba: q: $stmt", LOGGER_ALL);
 		if ($stmt === false)
@@ -575,7 +574,7 @@ function qu($sql) {
 	unset($args[0]);
 
 	if ($db && $db->connected) {
-		$sql = any_value_fallback($sql);
+		$sql = $db->any_value_fallback($sql);
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		if ($stmt === false)
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);
