@@ -20,6 +20,7 @@ class dba {
 	private $driver;
 	public  $connected = false;
 	public  $error = false;
+	private $_server_info = '';
 
 	function __construct($server, $user, $pass, $db, $install = false) {
 		$a = get_app();
@@ -103,18 +104,20 @@ class dba {
 	 * @return string
 	 */
 	public function server_info() {
-		switch ($this->driver) {
-			case 'pdo':
-				$version = $this->db->getAttribute(PDO::ATTR_SERVER_VERSION);
-				break;
-			case 'mysqli':
-				$version = $this->db->server_info;
-				break;
-			case 'mysql':
-				$version = mysql_get_server_info($this->db);
-				break;
+		if ($this->_server_info == '') {
+			switch ($this->driver) {
+				case 'pdo':
+					$this->_server_info = $this->db->getAttribute(PDO::ATTR_SERVER_VERSION);
+					break;
+				case 'mysqli':
+					$this->_server_info = $this->db->server_info;
+					break;
+				case 'mysql':
+					$this->_server_info = mysql_get_server_info($this->db);
+					break;
+			}
 		}
-		return $version;
+		return $this->_server_info;
 	}
 
 	/**
@@ -505,11 +508,16 @@ function dbesc($str) {
 }
 
 function any_value_fallback($sql) {
+	global $db;
+	$server_info = $db->server_info();
 	//Considerations for Standard SQL, or MySQL with ONLY_FULL_GROUP_BY (default since 5.7.5).
-	//ANY_VALUE() is available from MySQL 5.7 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
-	//A standard fallback is to use MIN(), or nothing () in old MySQL 5.6-
-	//TODO: Skip this line when we know we are on a platform supporting ANY_VALUE()
-	return str_ireplace('ANY_VALUE(', 'MIN(', $sql);
+	//ANY_VALUE() is available from MySQL 5.7.5 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
+	//A standard fallback is to use MIN()
+	if (version_compare($server_info, '5.7.5', '<') ||
+		(stripos($server_info, 'MariaDB') !== false)) {
+		$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
+	}
+	return $sql;
 }
 
 // Function: q($sql,$args);
