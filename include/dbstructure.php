@@ -158,6 +158,14 @@ function print_structure($database) {
 	}
 }
 
+/**
+ * @brief Print out database error messages
+ *
+ * @param object $db Database object
+ * @param string $message Message to be added to the error message
+ *
+ * @return string Error message
+ */
 function print_update_error($db, $message) {
 	echo sprintf(t("\nError %d occured during database update:\n%s\n"),
 		$db->errorno, $db->error);
