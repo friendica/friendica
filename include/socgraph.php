@@ -7,6 +7,8 @@
  * @todo Detect if it is a forum
  */
 
+use \Friendica\Core\Config;
+
 require_once('include/datetime.php');
 require_once("include/Scrape.php");
 require_once("include/network.php");
@@ -1671,6 +1673,20 @@ function poco_discover_federation() {
 
 		foreach ($servers->pods AS $server) {
 			proc_run(PRIORITY_LOW, "include/discover_poco.php", "server", base64_encode("https://".$server->host));
+		}
+	}
+
+	// Disvover Mastodon servers
+	if (!Config::get('system','ostatus_disabled')) {
+		$serverdata = fetch_url("https://instances.mastodon.xyz/instances.json");
+
+		if ($serverdata) {
+			$servers = json_decode($serverdata);
+
+			foreach ($servers AS $server) {
+				$url = (is_null($server->https_score) ? 'http' : 'https').'://'.$server->name;
+				proc_run(PRIORITY_LOW, "include/discover_poco.php", "server", base64_encode($url));
+			}
 		}
 	}
 
