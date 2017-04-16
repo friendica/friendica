@@ -48,7 +48,7 @@ function install_post(App $a) {
 				$db = new dba($dbhost, $dbuser, $dbpass, '', true);
 
 				if(! get_db_errno()) {
-					$r = q("CREATE DATABASE '%s'",
+					$r = q("CREATE DATABASE '%s' DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci",
 							dbesc($dbdata)
 					);
 					if ($r) {

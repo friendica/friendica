@@ -19,7 +19,7 @@
 -- Current Database: `friendica`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `friendica` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `friendica` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 
 USE `friendica`;
 
