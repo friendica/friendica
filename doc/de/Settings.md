@@ -126,6 +126,10 @@ Wildcards werden akzeptiert (Wildcard-Unterstützung unter Windows benötigt PHP
 Webb du die Option `Nutzern erlauben das remote_self Flag zu setzen` aktivierst, können alle Nutzer Atom Feeds in den erweiterten Einstellungen des Kontakts als "Entferntes Konto" markieren.
 Dadurch werden automatisch alle Beiträge dieser Feeds für diesen Nutzer gespiegelt und an die Kontakte bei Friendica verteilt.
 
+Dieses Feature kann z.B. dafür genutzt werden Blogbeiträge zu spiegeln.
+In der Grundeinstellung ist es nicht aktiviert, da es zusätzliche Last auf dem Server verursachen kann.
+Außerdem könnte es durch Nutzer als SPAM Verteiler missbraucht werden.
+
 Als Administrator der Friendica Instanz kannst du diese Einstellungen ansonsten nur direkt in der Datenbank vornehmen.
 Bevor du das tust solltest du sicherstellen, dass du ein Backup der Datenbank hast und genau weißt was die Änderungen an der Datenbank bewirken, die du vornehmen willst.
 
