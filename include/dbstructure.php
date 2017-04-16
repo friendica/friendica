@@ -158,6 +158,13 @@ function print_structure($database) {
 	}
 }
 
+function print_update_error($db, $message) {
+	echo sprintf(t("\nError %d occured during database update:\n%s\n"),
+		$db->errorno, $db->error);
+
+	return t('Errors encountered performing database changes: ').$message.EOL;
+}
+
 function update_structure($verbose, $action, $tables=null, $definition=null) {
 	global $a, $db;
 
@@ -207,7 +214,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		if (!isset($database[$name])) {
 			$r = db_create_table($name, $structure["fields"], $verbose, $action, $structure['indexes']);
 			if (!dbm::is_result($r)) {
-				$errors .=  t('Errors encountered creating database tables.').$name.EOL;
+				$errors .= print_update_error($db, $name);
 			}
 			$is_new_table = True;
 		} else {
@@ -364,33 +371,33 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					} else {
 						$r = $db->q("CREATE TABLE `".$temp_name."` LIKE `".$name."`;");
 						if (!dbm::is_result($r)) {
-							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							$errors .= print_update_error($db, $sql3);
 							return $errors;
 						}
 					}
 				}
 
 				$r = @$db->q($sql3);
-				if (!dbm::is_result($r))
-					$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
-
+				if (!dbm::is_result($r)) {
+					$errors .= print_update_error($db, $sql3);
+				}
 				if ($is_unique) {
 					if ($ignore != "") {
 						$db->q("SET session old_alter_table=0;");
 					} else {
 						$r = $db->q("INSERT INTO `".$temp_name."` SELECT * FROM `".$name."`".$group_by.";");
 						if (!dbm::is_result($r)) {
-							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							$errors .= print_update_error($db, $sql3);
 							return $errors;
 						}
 						$r = $db->q("DROP TABLE `".$name."`;");
 						if (!dbm::is_result($r)) {
-							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							$errors .= print_update_error($db, $sql3);
 							return $errors;
 						}
 						$r = $db->q("RENAME TABLE `".$temp_name."` TO `".$name."`;");
 						if (!dbm::is_result($r)) {
-							$errors .= t('Errors encountered performing database changes.').$sql3.EOL;
+							$errors .= print_update_error($db, $sql3);
 							return $errors;
 						}
 					}
