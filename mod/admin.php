@@ -668,6 +668,12 @@ function admin_page_site_post(App $a) {
 	$worker_fastlane	=	((x($_POST,'worker_fastlane'))		? True						: False);
 	$worker_frontend	=	((x($_POST,'worker_frontend'))		? True						: False);
 
+	// Has the directory url changed? If yes, then resubmit the existing profiles there
+	if ($global_directory != Config::get('system', 'directory') AND ($global_directory != '')) {
+		Config::set('system', 'directory', $global_directory);
+		proc_run(PRIORITY_LOW, 'include/directory.php');
+	}
+
 	if ($a->get_path() != "") {
 		$diaspora_enabled = false;
 	}
@@ -771,7 +777,6 @@ function admin_page_site_post(App $a) {
 	set_config('system', 'allowed_email', $allowed_email);
 	set_config('system', 'block_public', $block_public);
 	set_config('system', 'publish_all', $force_publish);
-	set_config('system', 'directory', $global_directory);
 	set_config('system', 'thread_allow', $thread_allow);
 	set_config('system', 'newuser_private', $newuser_private);
 	set_config('system', 'enotify_no_content', $enotify_no_content);
