@@ -29,21 +29,22 @@
 		}
 	?>
 	<?php
-		require_once("view/theme/frio/php/schema.php");
+		// Add the theme color meta
+		// It makes mobile Chrome UI match Frio's top bar color.
 		$uid = $a->profile_uid;
 		if (is_null($uid)) {
 			$uid = get_theme_uid();
 		}
 		$schema = get_pconfig($uid, 'frio', 'schema');
 		if (($schema) && ($schema != '---')) {
-			if(file_exists('view/theme/frio/schema/'.$schema.'.php')) {
+			if (file_exists('view/theme/frio/schema/'.$schema.'.php')) {
 				$schemefile = 'view/theme/frio/schema/'.$schema.'.php';
 				require_once($schemefile);
 			}
 		} else {
 			$nav_bg = get_pconfig($uid, 'frio', 'nav_bg');
 		}
-		if(!$nav_bg) {
+		if (!$nav_bg) {
 			$nav_bg = "#708fa0";
 		}
 		echo '<meta name="theme-color" content="'.$nav_bg.'" />';
