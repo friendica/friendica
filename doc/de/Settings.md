@@ -128,7 +128,7 @@ Dadurch werden automatisch alle Beiträge dieser Feeds für diesen Nutzer gespie
 
 Dieses Feature kann z.B. dafür genutzt werden Blogbeiträge zu spiegeln.
 In der Grundeinstellung ist es nicht aktiviert, da es zusätzliche Last auf dem Server verursachen kann.
-Außerdem könnte es durch Nutzer als SPAM Verteiler missbraucht werden.
+Außerdem könnte es durch Nutzer als Spam Verteiler missbraucht werden.
 
 Als Administrator der Friendica Instanz kannst du diese Einstellungen ansonsten nur direkt in der Datenbank vornehmen.
 Bevor du das tust solltest du sicherstellen, dass du ein Backup der Datenbank hast und genau weißt was die Änderungen an der Datenbank bewirken, die du vornehmen willst.
