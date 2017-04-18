@@ -3320,27 +3320,15 @@ $called_api = null;
 		}
 
 		$scale = (x($_REQUEST, 'scale') ? intval($_REQUEST['scale']) : false);
-<<<<<<< HEAD
-		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d", intval($scale)));
-		$data_sql = ($scale === false ? "" : "data, ");
+		$scale_sql = ($scale === false ? "" : sprintf("AND `scale`=%d", intval($scale)));
+		$data_sql = ($scale === false ? "" : "ANY_VALUE(`data`) AS `data`,");
 
-		$r = q("SELECT %s `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
-					`type`, `height`, `width`, `datasize`, `profile`, MIN(`scale`) AS `minscale`, MAX(`scale`) AS `maxscale`
-				FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'
-				%s
-				GROUP BY `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
-					`type`, `height`, `width`, `datasize`, `profile`",
-=======
-		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d",intval($scale)));
-		$data_sql = ($scale === false ? "" : "ANY_VALUE(data) AS data,");
-
-		$r = q("select %s ANY_VALUE(`resource-id`) AS `resource-id`, ANY_VALUE(`created`) AS `created`,
+		$r = q("SELECT %s ANY_VALUE(`resource-id`) AS `resource-id`, ANY_VALUE(`created`) AS `created`,
 				ANY_VALUE(`edited`) AS `edited`, ANY_VALUE(`title`) AS `title`, ANY_VALUE(`desc`) AS `desc`,
 				ANY_VALUE(`album`) AS `album`, ANY_VALUE(`filename`) AS `filename`, ANY_VALUE(`type`) AS `type`,
 				ANY_VALUE(`height`) AS `height`, ANY_VALUE(`width`) AS `width`, ANY_VALUE(`datasize`) AS `datasize`,
-				ANY_VALUE(`profile`) AS `profile`, min(`scale`) as minscale, max(`scale`) as maxscale
-				from photo where `uid` = %d and `resource-id` = '%s' %s",
->>>>>>> MySQL ANY_VALUE with fallback to MIN
+				ANY_VALUE(`profile`) AS `profile`, MIN(`scale`) AS `minscale`, MAX(`scale`) AS `maxscale`
+				FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' %s",
 			$data_sql,
 			intval(local_user()),
 			dbesc($_REQUEST['photo_id']),
@@ -3364,9 +3352,11 @@ $called_api = null;
 			if ($type == "xml") {
 				$data['photo']['links'] = array();
 				for ($k = intval($data['photo']['minscale']); $k <= intval($data['photo']['maxscale']); $k++) {
-					$data['photo']['links'][$k . ":link"]["@attributes"] = array("type" => $data['photo']['type'],
+					$data['photo']['links'][$k . ":link"]["@attributes"] = array(
+						"type" => $data['photo']['type'],
 						"scale" => $k,
-						"href" => App::get_baseurl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']]);
+						"href" => App::get_baseurl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']]
+					);
 				}
 			} else {
 				$data['photo']['link'] = array();
