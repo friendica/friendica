@@ -1367,11 +1367,15 @@ class App {
 		$cmdline = implode($args, " ");
 
 		if (get_config('system', 'proc_windows')) {
-			proc_close(proc_open('cmd /c start /b ' . $cmdline, array(), $foo, dirname(__FILE__)));
+			$resource = proc_open('cmd /c start /b ' . $cmdline, array(), $foo, dirname(__FILE__));
 		} else {
-			proc_close(proc_open($cmdline . " &", array(), $foo, dirname(__FILE__)));
+			$resource = proc_open($cmdline . " &", array(), $foo, dirname(__FILE__));
 		}
-
+		if (!is_resource($resource)) {
+			logger('We got no resource for command '.$cmdline, LOGGER_DEBUG);
+			return;
+		}
+		proc_close($resource);
 	}
 
 	/**
