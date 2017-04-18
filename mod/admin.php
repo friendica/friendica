@@ -653,7 +653,6 @@ function admin_page_site_post(App $a) {
 	$force_ssl		=	((x($_POST,'force_ssl'))		? True   					: False);
 	$hide_help		=	((x($_POST,'hide_help'))		? True   					: False);
 	$suppress_tags		=	((x($_POST,'suppress_tags'))		? True   					: False);
-	$use_fulltext_engine	=	((x($_POST,'use_fulltext_engine'))	? True   					: False);
 	$itemcache		=	((x($_POST,'itemcache'))		? notags(trim($_POST['itemcache']))		: '');
 	$itemcache_duration	=	((x($_POST,'itemcache_duration'))	? intval($_POST['itemcache_duration'])		: 0);
 	$max_comments		=	((x($_POST,'max_comments'))		? intval($_POST['max_comments'])		: 0);
@@ -802,7 +801,6 @@ function admin_page_site_post(App $a) {
 
 	set_config('system', 'force_ssl', $force_ssl);
 	set_config('system', 'hide_help', $hide_help);
-	set_config('system', 'use_fulltext_engine', $use_fulltext_engine);
 	set_config('system', 'itemcache', $itemcache);
 	set_config('system', 'itemcache_duration', $itemcache_duration);
 	set_config('system', 'max_comments', $max_comments);
@@ -1031,7 +1029,6 @@ function admin_page_site(App $a) {
 
 		'$nodeinfo'		=> array('nodeinfo', t("Publish server information"), get_config('system','nodeinfo'), t("If enabled, general server and usage data will be published. The data contains the name and version of the server, number of users with public profiles, number of posts and the activated protocols and connectors. See <a href='http://the-federation.info/'>the-federation.info</a> for details.")),
 
-		'$use_fulltext_engine'	=> array('use_fulltext_engine', t("Use MySQL full text engine"), get_config('system','use_fulltext_engine'), t("Activates the full text engine. Speeds up search - but can only search for four and more characters.")),
 		'$suppress_tags'	=> array('suppress_tags', t("Suppress Tags"), get_config('system','suppress_tags'), t("Suppress showing a list of hashtags at the end of the posting.")),
 		'$itemcache'		=> array('itemcache', t("Path to item cache"), get_config('system','itemcache'), t("The item caches buffers generated bbcode and external images.")),
 		'$itemcache_duration' 	=> array('itemcache_duration', t("Cache duration in seconds"), get_config('system','itemcache_duration'), t("How long should the cache files be hold? Default value is 86400 seconds (One day). To disable the item cache, set the value to -1.")),

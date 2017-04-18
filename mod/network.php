@@ -581,11 +581,7 @@ function network_content(App $a, $update = 0) {
 			$sql_order = "`item`.`id`";
 			$order_mode = "id";
 		} else {
-			// Disabled until final decision what to do with this
-			//if (get_config('system','use_fulltext_engine'))
-			//	$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
-			//else
-				$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
+			$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
 			$sql_order = "`item`.`id`";
 			$order_mode = "id";
 		}
