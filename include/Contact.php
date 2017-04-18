@@ -212,6 +212,10 @@ function unmark_for_death($contact) {
 function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 	static $cache = array();
 
+	if ($url == '') {
+		return $default;
+	}
+
 	if ($uid == -1) {
 		$uid = local_user();
 	}
@@ -327,6 +331,10 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
  */
 function get_contact_details_by_addr($addr, $uid = -1) {
 	static $cache = array();
+
+	if ($addr == '') {
+		return array();
+	}
 
 	if ($uid == -1) {
 		$uid = local_user();
@@ -533,6 +541,10 @@ function get_contact($url, $uid = 0, $no_update = false) {
 
 	$data = array();
 	$contact_id = 0;
+
+	if ($url == '') {
+		return 0;
+	}
 
 	// We first try the nurl (http://server.tld/nick), most common case
 	$contacts = q("SELECT `id`, `avatar-date` FROM `contact`
