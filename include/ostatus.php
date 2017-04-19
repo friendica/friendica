@@ -1489,14 +1489,6 @@ class ostatus {
 		$siteinfo = get_attached_data($item["body"]);
 
 		switch($siteinfo["type"]) {
-			case 'link':
-				$attributes = array("rel" => "enclosure",
-						"href" => $siteinfo["url"],
-						"type" => "text/html; charset=UTF-8",
-						"length" => "",
-						"title" => $siteinfo["title"]);
-				xml::add_element($doc, $root, "link", "", $attributes);
-				break;
 			case 'photo':
 				$imgdata = get_photo_info($siteinfo["image"]);
 				$attributes = array("rel" => "enclosure",
@@ -1518,29 +1510,31 @@ class ostatus {
 		}
 
 		if (($siteinfo["type"] != "photo") AND isset($siteinfo["image"])) {
-			$photodata = get_photo_info($siteinfo["image"]);
+			$imgdata = get_photo_info($siteinfo["image"]);
+			$attributes = array("rel" => "enclosure",
+					"href" => $siteinfo["image"],
+					"type" => $imgdata["mime"],
+					"length" => intval($imgdata["size"]));
 
-			$attributes = array("rel" => "preview", "href" => $siteinfo["image"], "media:width" => $photodata[0], "media:height" => $photodata[1]);
 			xml::add_element($doc, $root, "link", "", $attributes);
 		}
 
-
-		$arr = explode('[/attach],',$item['attach']);
-		if(count($arr)) {
-			foreach($arr as $r) {
+		$arr = explode('[/attach],', $item['attach']);
+		if (count($arr)) {
+			foreach ($arr as $r) {
 				$matches = false;
-				$cnt = preg_match('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|',$r,$matches);
-				if($cnt) {
+				$cnt = preg_match('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|', $r, $matches);
+				if ($cnt) {
 					$attributes = array("rel" => "enclosure",
 							"href" => $matches[1],
 							"type" => $matches[3]);
 
-					if(intval($matches[2]))
+					if (intval($matches[2])) {
 						$attributes["length"] = intval($matches[2]);
-
-					if(trim($matches[4]) != "")
+					}
+					if (trim($matches[4]) != "") {
 						$attributes["title"] = trim($matches[4]);
-
+					}
 					xml::add_element($doc, $root, "link", "", $attributes);
 				}
 			}
@@ -2098,7 +2092,13 @@ class ostatus {
 		if (intval($item["parent"]) > 0) {
 			$conversation = App::get_baseurl()."/display/".$owner["nick"]."/".$item["parent"];
 			xml::add_element($doc, $entry, "link", "", array("rel" => "ostatus:conversation", "href" => $conversation));
-			xml::add_element($doc, $entry, "ostatus:conversation", $conversation);
+
+			$attributes = array(
+					"href" => $conversation,
+					"local_id" => $item["parent"],
+					"ref" => $conversation);
+
+			xml::add_element($doc, $entry, "ostatus:conversation", $conversation, $attributes);
 		}
 
 		$tags = item_getfeedtags($item);

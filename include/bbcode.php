@@ -59,13 +59,17 @@ function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 		$test2 = trim(html_entity_decode($data["title"],ENT_QUOTES,'UTF-8'));
 
 		// If the link description is similar to the text above then don't add the link description
-		if (($data["title"] != "") AND ((strpos($test1,$test2) !== false) OR
+		if (($data["title"] != "") && ((strpos($test1,$test2) !== false) ||
 			(similar_text($test1,$test2) / strlen($data["title"])) > 0.9)) {
 			$title2 = $data["url"];
 		}
-		$text = sprintf('<a href="%s" title="%s" class="attachment thumbnail" rel="nofollow external">%s</a><br />',
-				$data["url"], $data["title"], $title2);
-	} elseif (($simplehtml != 4) AND ($simplehtml != 0)) {
+		/// @TODO remove class=thumbnail?
+		$text = sprintf('<a href="%s" title="%s" class="attachment" rel="nofollow external">%s</a><br />',
+			$data["url"],
+			$data["title"],
+			$title2
+		);
+	} elseif (($simplehtml != 4) && ($simplehtml != 0)) {
 		$text = sprintf('<a href="%s" target="_blank">%s</a><br>', $data["url"], $data["title"]);
 	} else {
 		$text = sprintf('<span class="type-%s">', $data["type"]);
@@ -97,40 +101,40 @@ function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 			}
 		}
 	}
-	return $data["text"] . $text . $data["after"];
+	return trim($data["text"] . ' ' . $text . ' ' . $data["after"]);
 }
 
-function bb_remove_share_information($Text, $plaintext = false, $nolink = false) {
+function bb_remove_share_information($text, $plaintext = false, $nolink = false) {
 
-	$data = get_attachment_data($Text);
+	$data = get_attachment_data($text);
 
 	if (!$data) {
-		return $Text;
+		return $text;
 	} elseif ($nolink) {
 		return $data["text"] . $data["after"];
 	}
 
 	$title = htmlentities($data["title"], ENT_QUOTES, 'UTF-8', false);
 	$text = htmlentities($data["text"], ENT_QUOTES, 'UTF-8', false);
-	if ($plaintext OR (($title != "") AND strstr($text, $title))) {
+	if ($plaintext || (($title != "") && strstr($text, $title))) {
 		$data["title"] = $data["url"];
-	} elseif (($text != "") AND strstr($title, $text)) {
+	} elseif (($text != "") && strstr($title, $text)) {
 		$data["text"] = $data["title"];
 		$data["title"] = $data["url"];
 	}
 
-	if (($data["text"] == "") AND ($data["title"] != "") AND ($data["url"] == "")) {
+	if (($data["text"] == "") && ($data["title"] != "") && ($data["url"] == "")) {
 		return $data["title"] . $data["after"];
 	}
 
 	// If the link already is included in the post, don't add it again
-	if (($data["url"] != "") AND strpos($data["text"], $data["url"])) {
+	if (($data["url"] != "") && strpos($data["text"], $data["url"])) {
 		return $data["text"] . $data["after"];
 	}
 
 	$text = $data["text"];
 
-	if (($data["url"] != "") AND ($data["title"] != "")) {
+	if (($data["url"] != "") && ($data["title"] != "")) {
 		$text .= "\n[url=" . $data["url"] . "]" . $data["title"] . "[/url]";
 	} elseif (($data["url"] != "")) {
 		$text .= "\n" . $data["url"];

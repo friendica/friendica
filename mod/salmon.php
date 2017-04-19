@@ -79,7 +79,7 @@ function salmon_post(App $a) {
 
 	$signed_data = $data  . '.' . base64url_encode($type) . '.' . base64url_encode($encoding) . '.' . base64url_encode($alg);
 
-	$compliant_format = str_replace('=','',$signed_data);
+	$compliant_format = str_replace('=', '', $signed_data);
 
 
 	// decode the data
@@ -115,24 +115,28 @@ function salmon_post(App $a) {
 
 	// We should have everything we need now. Let's see if it verifies.
 
-	$verify = rsa_verify($compliant_format,$signature,$pubkey);
+	// Try GNU Social format
+	$verify = rsa_verify($signed_data, $signature, $pubkey);
+	$mode = 1;
 
-	if(! $verify) {
-		logger('mod-salmon: message did not verify using protocol. Trying padding hack.');
-	    $verify = rsa_verify($signed_data,$signature,$pubkey);
+	if (! $verify) {
+		logger('mod-salmon: message did not verify using protocol. Trying compliant format.');
+		$verify = rsa_verify($compliant_format, $signature, $pubkey);
+		$mode = 2;
 	}
 
-	if(! $verify) {
-		logger('mod-salmon: message did not verify using padding. Trying old statusnet hack.');
-	    $verify = rsa_verify($stnet_signed_data,$signature,$pubkey);
+	if (! $verify) {
+		logger('mod-salmon: message did not verify using padding. Trying old statusnet format.');
+		$verify = rsa_verify($stnet_signed_data, $signature, $pubkey);
+		$mode = 3;
 	}
 
-	if(! $verify) {
+	if (! $verify) {
 		logger('mod-salmon: Message did not verify. Discarding.');
 		http_status_exit(400);
 	}
 
-	logger('mod-salmon: Message verified.');
+	logger('mod-salmon: Message verified with mode '.$mode);
 
 
 	/*
