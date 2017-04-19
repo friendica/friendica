@@ -166,7 +166,7 @@ function listNewLineAutocomplete(id) {
 	if (word != null) {
 		var textBefore = text.value.substring(0, caretPos);
 		var textAfter  = text.value.substring(caretPos, text.length);
-		$('#' + id).val(textBefore + '\r\n[*] ' + textAfter);
+		$('#' + id).val(textBefore + '\r\n[*] ' + textAfter).trigger('change');
 		setCaretPosition(text, caretPos + 5);
 		return true;
 	}

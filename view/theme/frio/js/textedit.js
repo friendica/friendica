@@ -30,6 +30,8 @@ function insertFormatting(BBcode,id) {
 		}
 	}
 
+	$(textarea).trigger('change');
+
 	return true;
 }
 

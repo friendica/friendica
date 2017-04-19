@@ -300,6 +300,13 @@ $(document).ready(function(){
 		});
 	});
 
+	/*
+	 * This event listeners ensures that the textarea size is updated event if the
+	 * value is changed externally (textcomplete, insertFormatting, fbrowser...)
+	 */
+	$(document).on('change', 'textarea', function(event) {
+		autosize.update(event.target);
+	});
 });
 
 function openClose(theID) {

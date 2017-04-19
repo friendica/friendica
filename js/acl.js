@@ -65,7 +65,7 @@ ACL.prototype.add_mention = function(id) {
 	if (this.element.val().indexOf( searchText) >= 0 ) {
 		return;
 	}
-	this.element.val(searchText + this.element.val());
+	this.element.val(searchText + this.element.val()).trigger('change');
 }
 
 ACL.prototype.on_submit = function(){

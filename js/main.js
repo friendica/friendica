@@ -101,6 +101,7 @@
 			var start = textarea.selectionStart;
 			var end = textarea.selectionEnd;
 			textarea.value = textarea.value.substring(0, start) + bbcode + textarea.value.substring(end, textarea.value.length);
+			$(textarea).trigger('change');
 		});
 
 
