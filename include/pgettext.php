@@ -44,7 +44,7 @@ function get_browser_language() {
 	// check if we have translations for the preferred languages and pick the 1st that has
 	for ($i=0; $i<count($lang_list); $i++) {
 		$lang = $lang_list[$i];
-		if ($lang === 'en' || file_exists("view/lang/$lang") && is_dir("view/lang/$lang")) {
+		if ($lang === 'en' || (file_exists("view/lang/$lang") && is_dir("view/lang/$lang"))) {
 			$preferred = $lang;
 			break;
 		}
@@ -63,12 +63,14 @@ function push_lang($language) {
 
 	$a->langsave = $lang;
 
-	if ($language === $lang)
+	if ($language === $lang) {
 		return;
+	}
 
 	if (isset($a->strings) && count($a->strings)) {
 		$a->stringsave = $a->strings;
 	}
+
 	$a->strings = array();
 	load_translation_table($language);
 	$lang = $language;
@@ -77,13 +79,15 @@ function push_lang($language) {
 function pop_lang() {
 	global $lang, $a;
 
-	if ($lang === $a->langsave)
+	if ($lang === $a->langsave) {
 		return;
+	}
 
-	if (isset($a->stringsave))
+	if (isset($a->stringsave)) {
 		$a->strings = $a->stringsave;
-	else
+	} else {
 		$a->strings = array();
+	}
 
 	$lang = $a->langsave;
 }
@@ -104,18 +108,18 @@ function load_translation_table($lang) {
 
 	$a->strings = array();
 	// load enabled plugins strings
-	$plugins = q("SELECT name FROM addon WHERE installed=1;");
-	if ($plugins!==false) {
+	$plugins = q("SELECT `name` FROM `addon` WHERE `installed`=1;");
+	if (dbm::is_result($plugins)) {
 		foreach ($plugins as $p) {
 			$name = $p['name'];
 			if (file_exists("addon/$name/lang/$lang/strings.php")) {
-				include("addon/$name/lang/$lang/strings.php");
+				include "addon/$name/lang/$lang/strings.php";
 			}
 		}
 	}
 
 	if (file_exists("view/lang/$lang/strings.php")) {
-		include("view/lang/$lang/strings.php");
+		include "view/lang/$lang/strings.php";
 	}
 
 }}
@@ -124,13 +128,13 @@ function load_translation_table($lang) {
 
 if (! function_exists('t')) {
 function t($s) {
-
 	$a = get_app();
 
-	if (x($a->strings,$s)) {
+	if (x($a->strings, $s)) {
 		$t = $a->strings[$s];
-		return is_array($t)?$t[0]:$t;
+		return is_array($t) ? $t[0] : $t;
 	}
+
 	return $s;
 }}
 
@@ -139,16 +143,18 @@ function tt($singular, $plural, $count){
 	global $lang;
 	$a = get_app();
 
-	if (x($a->strings,$singular)) {
+	if (x($a->strings, $singular)) {
 		$t = $a->strings[$singular];
-		$f = 'string_plural_select_' . str_replace('-','_',$lang);
-		if (! function_exists($f))
+		$f = 'string_plural_select_' . str_replace('-', '_', $lang);
+		if (! function_exists($f)) {
 			$f = 'string_plural_select_default';
+		}
 		$k = $f($count);
-		return is_array($t)?$t[$k]:$t;
+
+		return is_array($t) ? $t[$k] : $t;
 	}
 
-	if ($count!=1){
+	if ($count != 1) {
 		return $plural;
 	} else {
 		return $singular;
