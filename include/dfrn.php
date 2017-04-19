@@ -554,8 +554,9 @@ class dfrn {
 			xml::add_element($doc, $author, "poco:displayName", $profile["name"]);
 			xml::add_element($doc, $author, "poco:updated", $namdate);
 
-			if (trim($profile["dob"]) > '0001-01-01')
+			if (trim($profile["dob"]) > '0001-01-01') {
 				xml::add_element($doc, $author, "poco:birthday", "0000-".date("m-d", strtotime($profile["dob"])));
+			}
 
 			xml::add_element($doc, $author, "poco:note", $profile["about"]);
 			xml::add_element($doc, $author, "poco:preferredUsername", $profile["nickname"]);
