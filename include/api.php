@@ -2974,12 +2974,13 @@ $called_api = null;
 		}
 
 		$ids = array();
-		foreach ($r as $rr)
-			if ($stringify_ids)
+		foreach ($r as $rr) {
+			if ($stringify_ids) {
 				$ids[] = $rr['id'];
 			} else {
 				$ids[] = intval($rr['id']);
 			}
+		}
 
 		return api_format_data("ids", $type, array('id' => $ids));
 	}
