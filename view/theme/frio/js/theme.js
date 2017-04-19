@@ -275,6 +275,30 @@ $(document).ready(function(){
 
 	});
 
+	/*
+	 * This event handler hides all comment UI when the user clicks anywhere on the page
+	 * It ensures that we aren't closing the current comment box
+	 *
+	 * We are making an exception for buttons because of a race condition with the
+	 * comment opening button that results in an already closed comment UI.
+	 */
+	$(document).on('click', function(event) {
+		if (event.target.type === 'button') {
+			return true;
+		}
+
+		var $dontclosethis = $(event.target).closest('.wall-item-comment-wrapper').find('.comment-edit-form');
+		$('.wall-item-comment-wrapper .comment-edit-submit-wrapper:visible').each(function() {
+			var $parent = $(this).parent('.comment-edit-form');
+			var itemId = $parent.data('itemId');
+
+			if ($dontclosethis[0] != $parent[0]) {
+				var textarea = $parent.find('textarea').get(0)
+
+				commentCloseUI(textarea, itemId);
+			}
+		});
+	});
 
 });
 
