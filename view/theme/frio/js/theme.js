@@ -300,6 +300,14 @@ $(document).ready(function(){
 		});
 	});
 
+	// Customize some elements when the app is used in standalone mode on Android
+	if (window.matchMedia('(display-mode: standalone)').matches) {
+		// Open links to source outside of the webview
+		$('.plink').on('click', function (e) {
+			$(e.target).attr('target', '_blank');
+		});
+	}
+
 	/*
 	 * This event listeners ensures that the textarea size is updated event if the
 	 * value is changed externally (textcomplete, insertFormatting, fbrowser...)
