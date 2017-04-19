@@ -303,7 +303,7 @@ $(document).ready(function(){
 	// Customize some elements when the app is used in standalone mode on Android
 	if (window.matchMedia('(display-mode: standalone)').matches) {
 		// Open links to source outside of the webview
-		$('.plink').on('click', function (e) {
+		$('body').on('click', '.plink', function (e) {
 			$(e.target).attr('target', '_blank');
 		});
 	}
