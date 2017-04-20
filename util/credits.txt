@@ -6,8 +6,8 @@ Albert
 Alberto Díaz Tormo
 Alex
 Alexander Kampmann
+Alexandre Alapetite
 AlfredSK
-Aliaksei Sakalou
 Andi Stadler
 Andreas H.
 Andrej Stieben
@@ -130,11 +130,12 @@ Paolo Wave
 Pavel Morozov
 Perig Gouanvic
 peturisfeld
+Pierre Rudloff
 Piotr Blonkowski
 pokerazor
 Rabuzarus
 Radek
-Rafael
+Rafael Garau
 Rainulf Pineda
 Ralph
 rcmaniac
@@ -153,6 +154,7 @@ Seth
 Silke Meyer
 Simon L'nu
 Simó Albert i Beltran
+soko1
 Stanislav N.
 StefOfficiel
 Sveinn í Felli
