@@ -1488,7 +1488,7 @@ class ostatus {
 		$o = "";
 		$siteinfo = get_attached_data($item["body"]);
 
-		switch($siteinfo["type"]) {
+		switch ($siteinfo["type"]) {
 			case 'photo':
 				$imgdata = get_photo_info($siteinfo["image"]);
 				$attributes = array("rel" => "enclosure",
