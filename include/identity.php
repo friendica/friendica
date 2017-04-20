@@ -202,15 +202,20 @@ function profile_sidebar($profile, $block = 0) {
 	$address = false;
 //		$pdesc = true;
 
-	if ((! is_array($profile)) && (! count($profile)))
+	// This function can also use contact information in $profile
+	$is_contact = x($profile, 'cid');
+
+	if ((! is_array($profile)) && (! count($profile))) {
 		return $o;
+	}
 
 	$profile['picdate'] = urlencode($profile['picdate']);
 
-	if (($profile['network'] != "") AND ($profile['network'] != NETWORK_DFRN)) {
+	if (($profile['network'] != "") && ($profile['network'] != NETWORK_DFRN)) {
 		$profile['network_name'] = format_network_name($profile['network'],$profile['url']);
-	} else
+	} else {
 		$profile['network_name'] = "";
+	}
 
 	call_hooks('profile_sidebar_enter', $profile);
 
@@ -229,7 +234,7 @@ function profile_sidebar($profile, $block = 0) {
 	}
 
 	// Is the local user already connected to that user?
-	if ($connect AND local_user()) {
+	if ($connect && local_user()) {
 		if (isset($profile["url"])) {
 			$profile_url = normalise_link($profile["url"]);
 		} else {
@@ -239,23 +244,27 @@ function profile_sidebar($profile, $block = 0) {
 		$r = q("SELECT * FROM `contact` WHERE NOT `pending` AND `uid` = %d AND `nurl` = '%s'",
 			local_user(), $profile_url);
 
-		if (dbm::is_result($r))
+		if (dbm::is_result($r)) {
 			$connect = false;
+		}
 	}
 
-	if ($connect AND ($profile['network'] != NETWORK_DFRN) AND !isset($profile['remoteconnect']))
+	if ($connect && ($profile['network'] != NETWORK_DFRN) && !isset($profile['remoteconnect'])) {
 		$connect = false;
+	}
 
 	$remoteconnect = NULL;
-	if (isset($profile['remoteconnect']))
+	if (isset($profile['remoteconnect'])) {
 		$remoteconnect = $profile['remoteconnect'];
+	}
 
-	if ($connect AND ($profile['network'] == NETWORK_DFRN) AND !isset($remoteconnect))
+	if ($connect && ($profile['network'] == NETWORK_DFRN) && !isset($remoteconnect)) {
 		$subscribe_feed = t("Atom feed");
-	else
+	} else {
 		$subscribe_feed = false;
+	}
 
-	if (remote_user() OR (get_my_url() && $profile['unkmail'] && ($profile['uid'] != local_user()))) {
+	if (remote_user() || (get_my_url() && $profile['unkmail'] && ($profile['uid'] != local_user()))) {
 		$wallmessage = t('Message');
 		$wallmessage_link = "wallmessage/".$profile["nickname"];
 
@@ -270,7 +279,7 @@ function profile_sidebar($profile, $block = 0) {
 				dbesc(normalise_link(get_my_url())),
 				intval(CONTACT_IS_FRIEND));
 		}
-		if ($r) {
+		if (dbm::is_result($r)) {
 			$remote_url = $r[0]["url"];
 			$message_path = preg_replace("=(.*)/profile/(.*)=ism", "$1/message/new/", $remote_url);
 			$wallmessage_link = $message_path.base64_encode($profile["addr"]);
@@ -280,8 +289,10 @@ function profile_sidebar($profile, $block = 0) {
 		$wallmessage_link = false;
 	}
 
+	var_dump($profile);
+
 	// show edit profile to yourself
-	if ($profile['uid'] == local_user() && feature_enabled(local_user(),'multi_profiles')) {
+	if (!$is_contact && $profile['uid'] == local_user() && feature_enabled(local_user(),'multi_profiles')) {
 		$profile['edit'] = array(App::get_baseurl(). '/profiles', t('Profiles'),"", t('Manage/edit profiles'));
 		$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
 				local_user());
@@ -293,7 +304,6 @@ function profile_sidebar($profile, $block = 0) {
 		);
 
 		if (dbm::is_result($r)) {
-
 			foreach ($r as $rr) {
 				$profile['menu']['entries'][] = array(
 					'photo' => $rr['thumb'],
@@ -303,14 +313,12 @@ function profile_sidebar($profile, $block = 0) {
 					'isdefault' => $rr['is-default'],
 					'visibile_to_everybody' =>  t('visible to everybody'),
 					'edit_visibility' => t('Edit visibility'),
-
 				);
 			}
-
-
 		}
 	}
-	if ($profile['uid'] == local_user() && !feature_enabled(local_user(),'multi_profiles')) {
+
+	if (!$is_contact && $profile['uid'] == local_user() && !feature_enabled(local_user(),'multi_profiles')) {
 		$profile['edit'] = array(App::get_baseurl(). '/profiles/'.$profile['id'], t('Edit profile'),"", t('Edit profile'));
 		$profile['menu'] = array(
 			'chg_photo' => t('Change profile photo'),
@@ -322,27 +330,26 @@ function profile_sidebar($profile, $block = 0) {
 	// Fetch the account type
 	$account_type = account_type($profile);
 
-	if ((x($profile,'address') == 1)
-			|| (x($profile,'location') == 1)
-			|| (x($profile,'locality') == 1)
-			|| (x($profile,'region') == 1)
-			|| (x($profile,'postal-code') == 1)
-			|| (x($profile,'country-name') == 1))
+	if ((x($profile, 'address') == 1)
+			|| (x($profile, 'location') == 1)
+			|| (x($profile, 'locality') == 1)
+			|| (x($profile, 'region') == 1)
+			|| (x($profile, 'postal-code') == 1)
+			|| (x($profile, 'country-name') == 1))
 		$location = t('Location:');
 
-	$gender = ((x($profile,'gender') == 1) ? t('Gender:') : False);
+	$gender = ((x($profile, 'gender') == 1) ? t('Gender:') : false);
 
+	$marital = ((x($profile, 'marital') == 1) ?  t('Status:') : false);
 
-	$marital = ((x($profile,'marital') == 1) ?  t('Status:') : False);
+	$homepage = ((x($profile, 'homepage') == 1) ?  t('Homepage:') : false);
 
-	$homepage = ((x($profile,'homepage') == 1) ?  t('Homepage:') : False);
+	$about = ((x($profile, 'about') == 1) ?  t('About:') : false);
 
-	$about = ((x($profile,'about') == 1) ?  t('About:') : False);
-
-	$xmpp = ((x($profile,'xmpp') == 1) ?  t('XMPP:') : False);
+	$xmpp = ((x($profile, 'xmpp') == 1) ?  t('XMPP:') : false);
 
 	if (($profile['hidewall'] || $block) && (! local_user()) && (! remote_user())) {
-		$location = $pdesc = $gender = $marital = $homepage = $about = False;
+		$location = $pdesc = $gender = $marital = $homepage = $about = false;
 	}
 
 	$firstname = ((strpos($profile['name'],' '))
@@ -559,12 +566,14 @@ function get_events() {
 		$now = strtotime('now');
 		$istoday = false;
 		foreach ($r as $rr) {
-			if (strlen($rr['name']))
+			if (strlen($rr['name'])) {
 				$total ++;
+			}
 
 			$strt = datetime_convert('UTC',$rr['convert'] ? $a->timezone : 'UTC',$rr['start'],'Y-m-d');
-			if ($strt === datetime_convert('UTC',$a->timezone,'now','Y-m-d'))
+			if ($strt === datetime_convert('UTC',$a->timezone,'now','Y-m-d')) {
 				$istoday = true;
+			}
 		}
 		$classtoday = (($istoday) ? 'event-today' : '');
 
@@ -573,12 +582,14 @@ function get_events() {
 		foreach ($r as &$rr) {
 			$title = strip_tags(html_entity_decode(bbcode($rr['summary']),ENT_QUOTES,'UTF-8'));
 
-			if (strlen($title) > 35)
-				$title = substr($title,0,32) . '... ';
+			if (strlen($title) > 35) {
+				$title = substr($title, 0, 32) . '... ';
+			}
 
 			$description = substr(strip_tags(bbcode($rr['desc'])),0,32) . '... ';
-			if (! $description)
+			if (! $description) {
 				$description = t('[No description]');
+			}
 
 			$strt = datetime_convert('UTC',$rr['convert'] ? $a->timezone : 'UTC',$rr['start']);
 
@@ -625,13 +636,13 @@ function advanced_profile(App $a) {
 
 		$profile['fullname'] = array( t('Full Name:'), $a->profile['name'] ) ;
 
-		if ($a->profile['gender']) $profile['gender'] = array( t('Gender:'),  $a->profile['gender'] );
-
+		if ($a->profile['gender']) {
+			$profile['gender'] = array( t('Gender:'),  $a->profile['gender'] );
+		}
 
 		if (($a->profile['dob']) && ($a->profile['dob'] > '0001-01-01')) {
 			$year_bd_format = t('j F, Y');
 			$short_bd_format = t('j F');
-
 
 			$val = ((intval($a->profile['dob']))
 				? day_translate(datetime_convert('UTC','UTC',$a->profile['dob'] . ' 00:00 +00:00',$year_bd_format))
@@ -645,7 +656,7 @@ function advanced_profile(App $a) {
 			$profile['age'] = array( t('Age:'), $age );
 		}
 
-
+		/// @TODO use x() for all of these
 		if ($a->profile['marital']) {
 			$profile['marital'] = array( t('Status:'), $a->profile['marital']);
 		}
@@ -750,7 +761,7 @@ function advanced_profile(App $a) {
 	return '';
 }
 
-function profile_tabs($a, $is_owner=False, $nickname=Null){
+function profile_tabs(App $a, $is_owner = false, $nickname = null){
 	//echo "<pre>"; var_dump($a->user); killme();
 
 	if (is_null($nickname)) {
