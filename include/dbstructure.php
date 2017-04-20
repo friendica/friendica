@@ -280,12 +280,11 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					// Compare the field definition
 					$field_definition = $database[$name]["fields"][$fieldname];
 
-					// Define the default collation if not given
-					if (!isset($parameters['Collation']) AND !is_null($field_definition['Collation'])) {
-						$parameters['Collation'] = 'utf8mb4_general_ci';
-					} else {
-						$parameters['Collation'] = null;
-					}
+					// We change the collation after the indexes had been changed.
+					// This is done to avoid index length problems.
+					// So here we always ensure that there is no need to change it.
+					unset($parameters['Collation']);
+					unset($field_definition['Collation']);
 
 					$current_field_definition = implode(",", $field_definition);
 					$new_field_definition = implode(",", $parameters);
@@ -342,9 +341,39 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					}
 				}
 			}
+
+			if ($sql3 != "") {
+				$sql3 .= "; ";
+			}
+
+			// Now have a look at the field collations
+			// Compare the field structure field by field
+			foreach ($structure["fields"] AS $fieldname => $parameters) {
+				// Compare the field definition
+				$field_definition = $database[$name]["fields"][$fieldname];
+
+				// Define the default collation if not given
+				if (!isset($parameters['Collation']) AND !is_null($field_definition['Collation'])) {
+					$parameters['Collation'] = 'utf8mb4_general_ci';
+				} else {
+					$parameters['Collation'] = null;
+				}
+
+				if ($field_definition['Collation'] != $parameters['Collation']) {
+					$sql2 = db_modify_table_field($fieldname, $parameters);
+					if (($sql3 == "") OR (substr($sql3, -2, 2) == "; ")) {
+						$sql3 .= "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
+					} else {
+						$sql3 .= ", ".$sql2;
+					}
+				}
+			}
 		}
+
 		if ($sql3 != "") {
-			$sql3 .= ";";
+			if (substr($sql3, -2, 2) != "; ") {
+				$sql3 .= ";";
+			}
 
 			if ($verbose) {
 				// Ensure index conversion to unique removes duplicates
