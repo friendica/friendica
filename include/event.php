@@ -10,7 +10,7 @@ require_once 'include/datetime.php';
 
 function format_event_html($ev, $simple = false) {
 
-	if (! ((is_array($ev)) && count($ev)))
+	if (! ((is_array($ev)) && count($ev))) {
 		return '';
 	}
 
