@@ -289,8 +289,6 @@ function profile_sidebar($profile, $block = 0) {
 		$wallmessage_link = false;
 	}
 
-	var_dump($profile);
-
 	// show edit profile to yourself
 	if (!$is_contact && $profile['uid'] == local_user() && feature_enabled(local_user(),'multi_profiles')) {
 		$profile['edit'] = array(App::get_baseurl(). '/profiles', t('Profiles'),"", t('Manage/edit profiles'));
