@@ -99,3 +99,6 @@ $a->config['system']['no_regfullname'] = true;
 
 // Location of the global directory
 $a->config['system']['directory'] = 'http://dir.friendi.ca';
+
+// Authentication cookie lifetime, in days
+$a->config['system']['auth_cookie_lifetime'] = 7;
