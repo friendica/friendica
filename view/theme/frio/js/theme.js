@@ -10,7 +10,7 @@ $(document).ready(function(){
 			$("#back-to-top").fadeOut();
 		}
 	});
- 
+
 	// scroll body to 0px on click
 	$("#back-to-top").click(function () {
 		$("body,html").animate({
@@ -82,7 +82,7 @@ $(document).ready(function(){
 				return false;
 			}
 		});
-		
+
 		if(checked) {
 			$("#item-delete-selected").fadeTo(400, 1);
 			$("#item-delete-selected").show();
@@ -92,7 +92,7 @@ $(document).ready(function(){
 			});
 		}
 	});
-		
+
 	//$('ul.flex-nav').flexMenu();
 
 	// initialize the bootstrap tooltips
@@ -212,7 +212,7 @@ $(document).ready(function(){
 		toggleDropdownText(this);
 	});
 
-});
+
 
 	// Change the css class while clicking on the switcher elements
 	$(".toggle label, .toggle .toggle-handle").click(function(event){
