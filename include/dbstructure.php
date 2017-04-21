@@ -105,10 +105,9 @@ function table_structure($table) {
 
 			$column = $index["Column_name"];
 			// On utf8mb4 a varchar index can only have a length of 191
-			// To avoid the need to add this to every index definition we just ignore it here.
-			// Exception are primary indexes
-			// Since there are some combindex primary indexes we use the limit of 180 here.
-			if (($index["Sub_part"] != "") AND (($index["Sub_part"] < 180) OR ($index["Key_name"] == "PRIMARY"))) {
+			// The "show index" command sometimes returns this value although this value wasn't added manually.
+			// Because we don't want to add this number to every index, we ignore bigger numbers
+			if (($index["Sub_part"] != "") AND (($index["Sub_part"] < 191) OR ($index["Key_name"] == "PRIMARY"))) {
 				$column .= "(".$index["Sub_part"].")";
 			}
 
@@ -167,7 +166,7 @@ function print_structure($database) {
  * @return string Error message
  */
 function print_update_error($db, $message) {
-	echo sprintf(t("\nError %d occured during database update:\n%s\n"),
+	echo sprintf(t("\nError %d occurred during database update:\n%s\n"),
 		$db->errorno, $db->error);
 
 	return t('Errors encountered performing database changes: ').$message.EOL;
@@ -759,13 +758,13 @@ function db_definition() {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
-					"uid_name" => array("uid", "name"),
+					"uid_name" => array("uid", "name(190)"),
 					"self_uid" => array("self", "uid"),
 					"alias_uid" => array("alias(32)", "uid"),
 					"pending_uid" => array("pending", "uid"),
 					"blocked_uid" => array("blocked", "uid"),
-					"uid_rel_network_poll" => array("uid", "rel", "network", "poll(64)", "archive"),
-					"uid_network_batch" => array("uid", "network", "batch(64)"),
+					"uid_rel_network_poll" => array("uid", "rel", "network(4)", "poll(64)", "archive"),
+					"uid_network_batch" => array("uid", "network(4)", "batch(64)"),
 					"addr_uid" => array("addr(32)", "uid"),
 					"nurl_uid" => array("nurl(32)", "uid"),
 					"nick_uid" => array("nick(32)", "uid"),
@@ -929,7 +928,7 @@ function db_definition() {
 					"name" => array("name(64)"),
 					"nick" => array("nick(32)"),
 					"addr" => array("addr(64)"),
-					"hide_network_updated" => array("hide", "network", "updated"),
+					"hide_network_updated" => array("hide", "network(4)", "updated"),
 					"updated" => array("updated"),
 					)
 			);
@@ -1108,22 +1107,22 @@ function db_definition() {
 					"uid_contactid_id" => array("uid","contact-id","id"),
 					"uid_created" => array("uid","created"),
 					"uid_unseen_contactid" => array("uid","unseen","contact-id"),
-					"uid_network_received" => array("uid","network","received"),
-					"uid_network_commented" => array("uid","network","commented"),
-					"uid_thrparent" => array("uid","thr-parent"),
-					"uid_parenturi" => array("uid","parent-uri"),
+					"uid_network_received" => array("uid","network(4)","received"),
+					"uid_network_commented" => array("uid","network(4)","commented"),
+					"uid_thrparent" => array("uid","thr-parent(190)"),
+					"uid_parenturi" => array("uid","parent-uri(190)"),
 					"uid_contactid_created" => array("uid","contact-id","created"),
 					"authorid_created" => array("author-id","created"),
-					"uid_uri" => array("uid", "uri"),
+					"uid_uri" => array("uid", "uri(190)"),
 					"resource-id" => array("resource-id"),
 					"contactid_allowcid_allowpid_denycid_denygid" => array("contact-id","allow_cid(10)","allow_gid(10)","deny_cid(10)","deny_gid(10)"), //
-					"uid_type_changed" => array("uid","type","changed"),
-					"contactid_verb" => array("contact-id","verb"),
+					"uid_type_changed" => array("uid","type(190)","changed"),
+					"contactid_verb" => array("contact-id","verb(190)"),
 					"deleted_changed" => array("deleted","changed"),
 					"uid_wall_changed" => array("uid","wall","changed"),
 					"uid_eventid" => array("uid","event-id"),
-					"uid_authorlink" => array("uid","author-link"),
-					"uid_ownerlink" => array("uid","owner-link"),
+					"uid_authorlink" => array("uid","author-link(190)"),
+					"uid_ownerlink" => array("uid","owner-link(190)"),
 					)
 			);
 	$database["item_id"] = array(
@@ -1237,7 +1236,7 @@ function db_definition() {
 					"hash_uid" => array("hash", "uid"),
 					"seen_uid_date" => array("seen", "uid", "date"),
 					"uid_date" => array("uid", "date"),
-					"uid_type_link" => array("uid", "type", "link"),
+					"uid_type_link" => array("uid", "type", "link(190)"),
 					)
 			);
 	$database["notify-threads"] = array(
@@ -1548,7 +1547,7 @@ function db_definition() {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("tid"),
-					"oid_otype_type_term" => array("oid","otype","type","term"),
+					"oid_otype_type_term" => array("oid","otype","type","term(32)"),
 					"uid_otype_type_term_global_created" => array("uid","otype","type","term(32)","global","created"),
 					"uid_otype_type_url" => array("uid","otype","type","url(64)"),
 					"guid" => array("guid(64)"),
