@@ -19,8 +19,10 @@ if (isset($_COOKIE["Friendica"])) {
 			}
 
 			// Renew the cookie
-			// Expires after 90 days - TODO: use a configuration variable
-			new_cookie(90*24*60*60, $r[0]);
+			// Expires after 7 days by default,
+			// can be set via system.auth_cookie_lifetime
+			$authcookiedays = get_config('system','auth_cookie_lifetime') || 7;
+			new_cookie($authcookiedays*24*60*60, $r[0]);
 
 			// Do the authentification if not done by now
 			if (!isset($_SESSION) OR !isset($_SESSION['authenticated'])) {
