@@ -1460,7 +1460,7 @@ class dfrn {
 					dbesc($contact["name"]), dbesc($contact["nick"]), dbesc($contact["about"]), dbesc($contact["location"]),
 					dbesc($contact["addr"]), dbesc($contact["keywords"]), dbesc($contact["bdyear"]),
 					dbesc($contact["bd"]), intval($contact["hidden"]), dbesc($contact["xmpp"]),
-					dbesc($contact["name-date"]), dbesc($contact["uri-date"]),
+					dbesc(dbm::date($contact["name-date"])), dbesc(dbm::date($contact["uri-date"])),
 					intval($contact["id"]), dbesc($contact["network"]));
 			}
 
