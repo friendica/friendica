@@ -93,4 +93,4 @@ $a->config['system']['directory'] = 'https://dir.friendica.social';
 $a->config['system']['allowed_link_protocols'] = array('ftp', 'ftps', 'mailto', 'cid', 'gopher');
 
 // Authentication cookie lifetime, in days
-$a->config['system']['auth_cookie_lifetime'] = 7
+$a->config['system']['auth_cookie_lifetime'] = 7;
