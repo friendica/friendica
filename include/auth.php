@@ -24,7 +24,7 @@ if (isset($_COOKIE["Friendica"])) {
 			// Renew the cookie
 			// Expires after 7 days by default,
 			// can be set via system.auth_cookie_lifetime
-			$authcookiedays = Config::get('system', 'auth_cookie_lifetime') || 7;
+			$authcookiedays = Config::get('system', 'auth_cookie_lifetime', 7);
 			new_cookie($authcookiedays*24*60*60, $r[0]);
 
 			// Do the authentification if not done by now
