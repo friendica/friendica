@@ -5,6 +5,8 @@
 		id="group-delete-icon-{{$id}}" 
 		class="icon drophide group-delete-icon" 
 		onmouseover="imgbright(this);" 
-		onmouseout="imgdull(this);" ></a>
+		onmouseout="imgdull(this);" 
+		title="{{$delete}}">
+	</a>
 </div>
 <div class="group-delete-end"></div>

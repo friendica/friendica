@@ -163,6 +163,9 @@ code {
     font-weight: 600;
     padding: 8px 16px;
 }
+a.btn:hover {
+    color: #333;
+}
 
 .btn-default {
     background: #ededed;
@@ -215,8 +218,11 @@ code {
     padding-left: 0;
     padding-right: 0;
 }
-.btn {
-	color: inherit;
+.btn-clear,
+.btn-clear:active {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 .btn-eventnav, btn-eventnav:hover {
     font-size: 16px;
@@ -1401,6 +1407,12 @@ section #jotOpen {
     border-radius: 4px;
     position: relative;
 }
+.panel.panel-inline {
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-top: 15px;
+    padding: 15px;
+}
 .panel .panel-body {
     padding: 15px;
     font-size: 14px;
@@ -1930,7 +1942,8 @@ ul.dropdown-menu li:hover {
     font-size: 12px;
 }
 .media-list > li:hover,
-.media-list > li.selected {
+.media-list > li.selected,
+.media-list > li.active {
     border-left: 3px solid $link_color;
     background-color: rgba(247, 247, 247, $contentbg_transp);
 }
@@ -2018,9 +2031,9 @@ ul.dropdown-menu li:hover {
 .allfriends-content-wrapper, .match-content-wrapper, .dirfind-content-wrapper,
 .directory-content-wrapper, .manage-content-wrapper, .notes-content-wrapper,
 .message-content-wrapper, .apps-content-wrapper, .photos-content-wrapper,
-.admin-content-wrapper, .group-content-wrapper, .viewcontacts-content-wrapper,
-.dfrn_request-content-wrapper, .friendica-content-wrapper, .credits-content-wrapper,
-.nogroup-content-wrapper, .profperm-content-wrapper {
+.admin-content-wrapper, .viewcontacts-content-wrapper, .dfrn_request-content-wrapper,
+.friendica-content-wrapper, .credits-content-wrapper, .nogroup-content-wrapper,
+.profperm-content-wrapper {
     min-height: calc(100vh - 150px);
     padding: 15px;
     padding-bottom: 20px;
@@ -2067,6 +2080,9 @@ ul.viewcontact_wrapper > li {
     position: relative;*/
     /*border-left: 3px solid white;*/
 }
+.contact-wrapper .contact-photo-wrapper button {
+    padding: 0;
+}
 .contact-wrapper.media {
     overflow: visible;
     word-wrap: break-word;
@@ -2096,6 +2112,9 @@ ul.viewcontact_wrapper > li {
 }
 .contact-wrapper .contact-photo-overlay-content.xl {
     font-size: 48px;
+}
+.contact-wrapper .contact-photo-menu {
+    top: auto;
 }
 
 .contact-entry-desc {
@@ -2168,6 +2187,61 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 /* directory page */
 #directory-search-heading {
     padding-top: 10px;
+}
+
+/* group edit page */
+.group-actions {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 30px;
+}
+.group-actions button,
+.group-actions a {
+    font-size: 18px;
+}
+#group-edit-wrapper {
+    display: none;
+}
+#group-update-wrapper .contact-photo-overlay {
+    display: none;
+}
+#group-update-wrapper .viewcontact_wrapper .contact-group-actions {
+    height: 100%;
+    margin-top: -10px;
+    display: flex;
+}
+#group-update-wrapper .viewcontact_wrapper .contact-action-link {
+    opacity: 0.8;
+    font-size: 20px;
+    line-height: 50px;
+}
+#group-update-wrapper .viewcontact_wrapper .contact-action-link:hover {
+    opacity: 1;
+}
+#group-update-wrapper .shortmode {
+    height: 53px;
+    overflow: hidden;
+}
+#group-update-wrapper .shortmode .contact-photo {
+    height: 32px;
+    width: 32px;
+}
+#group-update-wrapper .shortmode .media {
+    overflow: hidden;
+}
+#group-update-wrapper .shortmode .contact-entry-desc {
+    font-size: 12px !important;
+}
+#group-update-wrapper .shortmode .contact-entry-desc h4.media-heading {
+    margin: 0;
+}
+#group-update-wrapper .shortmode .contact-entry-desc h4.media-heading a {
+    font-size: 13px !important;
+    white-space: nowrap;
+}
+#group-update-wrapper .shortmode .contact-entry-desc .contact-entry-rel,
+#group-update-wrapper .shortmode .contact-entry-desc .contact-entry-network {
+    display: none;
 }
 
 /* private mail */

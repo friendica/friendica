@@ -1,11 +1,11 @@
 
-<div class="contact-wrapper media" id="contact-entry-wrapper-{{$contact.id}}" >
+<div class="contact-wrapper media" id="contact-entry-wrapper-{{$contact.id}}">
 
 		{{* This is a wrapper for the contact picture and the dropdown menu with contact relating actions *}}
-		<div class="contact-photo-wrapper dropdown pull-left" >
-			<div class="contact-entry-photo mframe" id="contact-entry-photo-{{$contact.id}}" >
+		<div class="contact-photo-wrapper dropdown media-left">
+			<div class="contact-entry-photo mframe" id="contact-entry-photo-{{$contact.id}}">
 
-				<button type="button" class="btn btn-link dropdown-toggle" id="contact-photo-menu-{{$contact.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+				<button type="button" class="btn btn-link dropdown-toggle" id="contact-photo-menu-{{$contact.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<div class="contact-photo-image-wrapper hidden-xs">
 						<img class="contact-photo media-object xl" src="{{$contact.thumb}}" {{$contact.sparkle}} alt="{{$contact.name}}" />
 
@@ -56,20 +56,33 @@
 				{{if $contact.photo_menu.hide   }}<a class="contact-action-link btn-link" href="{{$contact.photo_menu.hide.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.hide.0}}"><i class="fa fa-times" aria-hidden="true"></i></a>{{/if}}
 			</div>
 
+			{{* The button to add or remove contacts from a contact group - group edit page *}}
+			{{if $contact.change_member}}
+			<div class="contact-group-actions pull-right nav-pills preferences">
+				<button type="button" class="contact-action-link btn-link" onclick="groupChangeMember({{$contact.change_member.gid}},{{$contact.change_member.cid}},'{{$contact.change_member.sec_token}}'); return true;" data-toggle="tooltip" title="{{$contact.change_member.title}}">
+					{{if $contact.label == "members"}}
+					<i class="fa fa-times-circle" aria-hidden="true"></i>
+					{{elseif $contact.label == "contacts"}}
+					<i class="fa fa-plus-circle" aria-hidden="true"></i>
+					{{/if}}
+				</button>
+			</div>
+			{{/if}}
+
 			{{* The contact description (e.g. Name, Network, kind of connection and so on *}}
 			<div class="contact-entry-desc">
-				<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}" >
+				<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}">
 					<h4 class="media-heading"><a href="{{$contact.url}}">{{$contact.name}}</a>
 					{{if $contact.account_type}} <small class="contact-entry-details" id="contact-entry-accounttype-{{$contact.id}}">({{$contact.account_type}})</small>{{/if}}
 					{{if $contact.account_type == 'Forum'}}<i class="fa fa-comments-o" aria-hidden="true"></i>{{/if}}
 					{{* @todo this needs some changing in core because $contact.account_type contains a translated string which may notbe the same in every language *}}
 					</h4>
 				</div>
-				{{if $contact.alt_text}}<div class="contact-entry-details" id="contact-entry-rel-{{$contact.id}}" >{{$contact.alt_text}}</div>{{/if}}
-				{{if $contact.itemurl}}<div class="contact-entry-details" id="contact-entry-url-{{$contact.id}}" >{{$contact.itemurl}}</div>{{/if}}
+				{{if $contact.alt_text}}<div class="contact-entry-details contact-entry-rel" id="contact-entry-rel-{{$contact.id}}" >{{$contact.alt_text}}</div>{{/if}}
+				{{if $contact.itemurl}}<div class="contact-entry-details contact-entry-url" id="contact-entry-url-{{$contact.id}}" >{{$contact.itemurl}}</div>{{/if}}
 				{{if $contact.tags}}<div class="contact-entry-details" id="contact-entry-tags-{{$contact.id}}" >{{$contact.tags}}</div>{{/if}}
-				{{if $contact.details}}<div class="contact-entry-details" id="contact-entry-details-{{$contact.id}}" >{{$contact.details}}</div>{{/if}}
-				{{if $contact.network}}<div class="contact-entry-details" id="contact-entry-network-{{$contact.id}}" >{{$contact.network}}</div>{{/if}}
+				{{if $contact.details}}<div class="contact-entry-details contact-entry-tags" id="contact-entry-details-{{$contact.id}}" >{{$contact.details}}</div>{{/if}}
+				{{if $contact.network}}<div class="contact-entry-details contact-entry-network" id="contact-entry-network-{{$contact.id}}" >{{$contact.network}}</div>{{/if}}
 			</div>
 
 			{{* The checkbox to perform batch actions to these contacts (for batch actions have a look at contacts-template.tpl) *}}
@@ -88,13 +101,13 @@
 {{* the following part is a nearly a copy of the part above but it is modified for working with js.
 We use this part to filter the contacts with jquery.textcomplete *}}
 <div class="javascript-template" rel="contact-template" style="display: none">
-	<div class="contact-wrapper media" id="contact-entry-wrapper-{$id}" >
+	<div class="contact-wrapper media" id="contact-entry-wrapper-{$id}">
 
 			{{* This is a wrapper for the contact picture and the dropdown menu with contact relating actions *}}
-			<div class="contact-photo-wrapper dropdown pull-left" >
-				<div class="contact-entry-photo mframe" id="contact-entry-photo-{$id}" >
+			<div class="contact-photo-wrapper dropdown media-left">
+				<div class="contact-entry-photo mframe" id="contact-entry-photo-{$id}">
 
-					<button type="button" class="btn btn-link dropdown-toggle" id="contact-photo-menu-{$id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+					<button type="button" class="btn btn-link dropdown-toggle" id="contact-photo-menu-{$id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<div class="contact-photo-image-wrapper hidden-xs">
 							<img class="contact-photo media-object xl" src="{$thumb}" {11} alt="{$name}" />
 
@@ -147,7 +160,7 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 
 				{{* The contact description (e.g. Name, Network, kind of connection and so on *}}
 				<div class="contact-entry-desc">
-					<div class="contact-entry-name" id="contact-entry-name-{$id}" >
+					<div class="contact-entry-name" id="contact-entry-name-{$id}">
 						<h4 class="media-heading"><a href="{$url}">{$name}</a>
 						{if $account_type} <small class="contact-entry-details" id="contact-entry-accounttype-{$id}">({$account_type})</small>{/if}
 						{if $account_type == 'Forum'}<i class="fa fa-comments-o" aria-hidden="true"></i>{/if}
