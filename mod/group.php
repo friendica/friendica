@@ -6,10 +6,6 @@
  */
 
 
-function validate_members(&$item) {
-	$item = intval($item);
-}
-
 function group_init(App $a) {
 	if (local_user()) {
 		require_once 'include/group.php';
