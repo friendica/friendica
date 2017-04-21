@@ -1,35 +1,37 @@
-/* 
+/*
  * @brief The file contains functions for text editing and commenting
  */
 
 
-function insertFormatting(comment,BBcode,id) {
-
-		var tmpStr = $("#comment-edit-text-" + id).val();
-		if(tmpStr == comment) {
-			tmpStr = "";
-			$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
-			$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
-			openMenu("comment-edit-submit-wrapper-" + id);
-			$("#comment-edit-text-" + id).val(tmpStr);
-		}
+function insertFormatting(BBcode,id) {
+	var tmpStr = $("#comment-edit-text-" + id).val();
+	if (tmpStr == '') {
+		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
+		$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
+		openMenu("comment-edit-submit-wrapper-" + id);
+	}
 
 	textarea = document.getElementById("comment-edit-text-" +id);
 	if (document.selection) {
 		textarea.focus();
 		selected = document.selection.createRange();
-		if (BBcode == "url"){
+		if (BBcode == "url") {
 			selected.text = "["+BBcode+"]" + "http://" +  selected.text + "[/"+BBcode+"]";
-			} else
-		selected.text = "["+BBcode+"]" + selected.text + "[/"+BBcode+"]";
+		} else {
+			selected.text = "["+BBcode+"]" + selected.text + "[/"+BBcode+"]";
+		}
 	} else if (textarea.selectionStart || textarea.selectionStart == "0") {
 		var start = textarea.selectionStart;
 		var end = textarea.selectionEnd;
-		if (BBcode == "url"){
+		if (BBcode == "url") {
 			textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + "http://" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
-			} else
-		textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
+		} else {
+			textarea.value = textarea.value.substring(0, start) + "["+BBcode+"]" + textarea.value.substring(start, end) + "[/"+BBcode+"]" + textarea.value.substring(end, textarea.value.length);
+		}
 	}
+
+	$(textarea).trigger('change');
+
 	return true;
 }
 
@@ -61,8 +63,7 @@ function commentExpand(id) {
 }
 
 function commentClose(obj,id) {
-	if(obj.value == '') {
-		obj.value = aStr.comment;
+	if (obj.value == '') {
 		$("#comment-edit-text-" + id).removeClass("comment-edit-text-full");
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-empty");
 		$("#mod-cmnt-wrap-" + id).hide();
@@ -82,59 +83,45 @@ function showHideCommentBox(id) {
 }
 
 function commentOpenUI(obj, id) {
-	$(document).unbind( "click.commentOpen", handler );
-
-	var handler = function() {
-		if(obj.value == aStr.comment) {
-			obj.value = '';
-			$("#comment-edit-text-" + id).addClass("comment-edit-text-full").removeClass("comment-edit-text-empty");
-			// Choose an arbitrary tab index that's greater than what we're using in jot (3 of them)
-			// The submit button gets tabindex + 1
-			$("#comment-edit-text-" + id).attr('tabindex','9');
-			$("#comment-edit-submit-" + id).attr('tabindex','10');
-			$("#comment-edit-submit-wrapper-" + id).show();
-		}
-	};
-
-	$(document).bind( "click.commentOpen", handler );
+	$("#comment-edit-text-" + id).addClass("comment-edit-text-full").removeClass("comment-edit-text-empty");
+	// Choose an arbitrary tab index that's greater than what we're using in jot (3 of them)
+	// The submit button gets tabindex + 1
+	$("#comment-edit-text-" + id).attr('tabindex','9');
+	$("#comment-edit-submit-" + id).attr('tabindex','10');
+	$("#comment-edit-submit-wrapper-" + id).show();
+	// initialize autosize for this comment
+	autosize($("#comment-edit-text-" + id + ".text-autosize"));
 }
 
 function commentCloseUI(obj, id) {
-	$(document).unbind( "click.commentClose", handler );
-
-	var handler = function() {
-		if(obj.value === '') {
-		obj.value = aStr.comment;
-			$("#comment-edit-text-" + id).removeClass("comment-edit-text-full").addClass("comment-edit-text-empty");
-			$("#comment-edit-text-" + id).removeAttr('tabindex');
-			$("#comment-edit-submit-" + id).removeAttr('tabindex');
-			$("#comment-edit-submit-wrapper-" + id).hide();
-		}
-	};
-
-	$(document).bind( "click.commentClose", handler );
-}
-
-// test if there is default content in the jot text box and remove it
-function jotTextOpenUI(obj) {
-	if(obj.value == aStr.share) {
-		obj.value = '';
-		$(".modal-body #profile-jot-text").addClass("profile-jot-text-full").removeClass("profile-jot-text-empty");
+	if (obj.value === '') {
+		$("#comment-edit-text-" + id).removeClass("comment-edit-text-full").addClass("comment-edit-text-empty");
+		$("#comment-edit-text-" + id).removeAttr('tabindex');
+		$("#comment-edit-submit-" + id).removeAttr('tabindex');
+		$("#comment-edit-submit-wrapper-" + id).hide();
+		// destroy the automatic textarea resizing
+		autosize.destroy($("#comment-edit-text-" + id + ".text-autosize"));
 	}
 }
 
-// insert default content into the jot text box
-// if it's empty
+function jotTextOpenUI(obj) {
+	if (obj.value == '') {
+		$(".modal-body #profile-jot-text").addClass("profile-jot-text-full").removeClass("profile-jot-text-empty");
+		// initiale autosize for the jot
+		autosize($(".modal-body #profile-jot-text"));
+	}
+}
+
 function jotTextCloseUI(obj) {
-	if(obj.value === '') {
-	obj.value = aStr.share;
+	if (obj.value === '') {
 		$(".modal-body #profile-jot-text").removeClass("profile-jot-text-full").addClass("profile-jot-text-empty");
+		// destroy the automatic textarea resizing
+		autosize.destroy($(".modal-body #profile-jot-text"));
 	}
 }
 
 function commentOpen(obj,id) {
-	if(obj.value == aStr.comment) {
-		obj.value = '';
+	if (obj.value == '') {
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 		$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 		$("#mod-cmnt-wrap-" + id).show();
@@ -146,8 +133,7 @@ function commentOpen(obj,id) {
 
 function commentInsert(obj,id) {
 	var tmpStr = $("#comment-edit-text-" + id).val();
-	if(tmpStr == aStr.comment) {
-		tmpStr = '';
+	if (tmpStr == '') {
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 		$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 		openMenu("comment-edit-submit-wrapper-" + id);
@@ -162,8 +148,7 @@ function commentInsert(obj,id) {
 
 function qCommentInsert(obj,id) {
 	var tmpStr = $("#comment-edit-text-" + id).val();
-	if(tmpStr == aStr.comment) {
-		tmpStr = '';
+	if (tmpStr == '') {
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 		$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
 		openMenu("comment-edit-submit-wrapper-" + id);
@@ -179,21 +164,29 @@ function qCommentInsert(obj,id) {
 
 function confirmDelete() { return confirm(aStr.delitem); }
 
-function dropItem(url, object) {
+/**
+ * Hide and removes an item element from the DOM after the deletion url is
+ * successful, restore it else.
+ *
+ * @param {string} url The item removal URL
+ * @param {string} elementId The DOM id of the item element
+ * @returns {undefined}
+ */
+function dropItem(url, elementId) {
 	var confirm = confirmDelete();
 
-	//if the first character of the object is #, remove it because
-	// we use getElementById which don't need the #
-	// getElementByID selects elements even if there are special characters
-	// in the ID (like %) which won't work with jQuery
-	/// @todo ceck if we can solve this in the template
-	object = object.indexOf('#') == 0 ? object.substring(1) : object;
-
-	if(confirm) {
+	if (confirm) {
 		$('body').css('cursor', 'wait');
-		$(document.getElementById(object)).fadeTo('fast', 0.33, function () {
-			$.get(url).done(function() {
-				$(document.getElementById(object)).remove();
+
+		var $el = $(document.getElementById(elementId));
+
+		$el.fadeTo('fast', 0.33, function () {
+			$.get(url).then(function() {
+				$el.remove();
+			}).fail(function() {
+				// @todo Show related error message
+				$el.show();
+			}).always(function() {
 				$('body').css('cursor', 'auto');
 			});
 		});

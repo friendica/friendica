@@ -1,10 +1,17 @@
 
 <div id='adminpage'>
 	<h1>{{$title}} - {{$page}}</h1>
+{{if $showwarning}}
+	<div id="admin-warning-message-wrapper">
+		{{foreach $warningtext as $wt}}
+		<p class="warning-message">{{$wt}}</p>
+		{{/foreach}}
+	</div>
+{{/if}}
 
 	<dl>
 		<dt>{{$queues.label}}</dt>
-		<dd>{{$queues.deliverq}} - <a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a>{{if $queues.workerq}} - {{$queues.workerq}}{{/if}}</dd>
+		<dd><a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a> - {{$queues.workerq}}</dd>
 	</dl>
 	<dl>
 		<dt>{{$pending.0}}</dt>

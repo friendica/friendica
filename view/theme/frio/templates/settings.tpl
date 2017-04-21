@@ -196,9 +196,9 @@
 							{{include file="field_checkbox.tpl" field=$email_textonly}}
 
 
-							{{* commented out because it was commented out in the original template 
+							{{* commented out because it was commented out in the original template
 							<div class="field">
-							 <button onclick="javascript:Notification.requestPermission(function(perm){if(perm === 'granted')alert('{{$desktop_notifications_success_message}}');});return false;">{{$desktop_notifications}}</button>
+							 <button type="button" onclick="javascript:Notification.requestPermission(function(perm){if(perm === 'granted')alert('{{$desktop_notifications_success_message}}');});">{{$desktop_notifications}}</button>
 							 <span class="field_help">{{$desktop_notifications_note}}</span>
 							</div>
 							*}}

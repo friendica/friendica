@@ -1,5 +1,5 @@
 <script language="javascript" type="text/javascript"
-	  src="{{$baseurl}}/view/theme/frio/js/event.js"></script>
+	  src="{{$baseurl}}/view/theme/frio/js/event_edit.js"></script>
 <div id="event-form-wrapper">
 	<h3 class="heading">{{$title}}</h3>
 
@@ -7,10 +7,22 @@
 	<ul id="event-nav" class="nav nav-tabs event-nav" role="menubar" data-tabs="tabs">
 		{{* Mark the first list entry as active because it is the first which is active after opening
 			the modal. Changing of the activity status is done by js in event_head.tpl *}}
-		<li class="active" role="menuitem"><a id="event-edit-lnk" onclick="eventEditActive(); return false;">{{$basic}}</a></li>
-		<li role="menuitem"><a id="event-desc-lnk" onclick="eventDescActive(); return false;">{{$advanced}}</a></li>
-		{{if $acl}}<li role="menuitem" {{if !$sh_checked}} style="display: none"{{/if}}><a id="event-perms-lnk" onclick="eventAclActive();return false;">{{$permissions}}</a></li>{{/if}}
-		{{if $preview}}<li role="menuitem"><a id="event-preview-lnk" onclick="eventPreviewActive();return false;">{{$preview}}</a></li>{{/if}}
+		<li class="active" role="menuitem">
+			<a id="event-edit-lnk" onclick="eventEditActive(); return false;">{{$basic}}</a>
+		</li>
+		<li role="menuitem">
+			<a id="event-desc-lnk" onclick="eventDescActive(); return false;">{{$advanced}}</a>
+		</li>
+		{{if $acl}}
+		<li role="menuitem" {{if !$sh_checked}} style="display: none"{{/if}}>
+			<a id="event-perms-lnk" onclick="eventAclActive(); return false;">{{$permissions}}</a>
+		</li>
+		{{/if}}
+		{{if $preview}}
+		<li role="menuitem">
+			<a id="event-preview-lnk" onclick="eventPreviewActive(); return false;">{{$preview}}</a>
+		</li>
+		{{/if}}
 		{{* commented out because it isn't implemented yet
 		<li role="menuitem"><a id="event-preview-link" onclick="fbrowserActive(); return false;"> Browser </a></li>
 		*}}
@@ -62,45 +74,45 @@
 			{{* The textarea for the event description *}}
 			<div class="form-group">
 				<div id="event-desc-text"><b>{{$d_text}}</b></div>
-				<textarea id="comment-edit-text-desc" class="form-control" name="desc" >{{$d_orig}}</textarea>
+				<textarea id="comment-edit-text-desc" class="form-control text-autosize" name="desc" >{{$d_orig}}</textarea>
 				<ul id="event-desc-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
 					{{* commented out because it isn't implemented yet
 					<li>
-						<a class="icon" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="desc">
+						<button type="button" class="btn-link icon" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="desc">
 							<i class="fa fa-picture-o"></i>
-						</a>
+						</button>
 					</li>
 					*}}
 					<li>
-						<a class="icon bb-url" style="cursor: pointer;" title="{{$edurl|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="desc">
+						<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" title="{{$edurl|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="desc">
 							<i class="fa fa-link"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon bb-video" style="cursor: pointer;" title="{{$edvideo|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="desc">
+						<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" title="{{$edvideo|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="desc">
 							<i class="fa fa-video-camera"></i>
-						</a>
+						</button>
 					</li>
 
 					<li>
-						<a class="icon underline" style="cursor: pointer;" title="{{$eduline|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="desc">
+						<button type="button" class="btn-link icon underline" style="cursor: pointer;" title="{{$eduline|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="desc">
 							<i class="fa fa-underline"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon italic" style="cursor: pointer;" title="{{$editalic|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="desc">
+						<button type="button" class="btn-link icon italic" style="cursor: pointer;" title="{{$editalic|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="desc">
 							<i class="fa fa-italic"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon bold" style="cursor: pointer;"  title="{{$edbold|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="desc">
+						<button type="button" class="btn-link icon bold" style="cursor: pointer;"  title="{{$edbold|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="desc">
 							<i class="fa fa-bold"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon quote" style="cursor: pointer;" title="{{$edquote|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="desc">
+						<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="desc">
 							<i class="fa fa-quote-left"></i>
-						</a>
+						</button>
 					</li>
 				</ul>
 				<div class="clear"></div>
@@ -109,45 +121,45 @@
 			{{* The textarea for the event location *}}
 			<div class="form-group">
 				<div id="event-location-text"><b>{{$l_text}}</b></div>
-				<textarea id="comment-edit-text-loc" class="form-control" name="location">{{$l_orig}}</textarea>
+				<textarea id="comment-edit-text-loc" class="form-control text-autosize" name="location">{{$l_orig}}</textarea>
 				<ul id="comment-tools-loc" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
 					{{* commented out because it isn't implemented yet
 					<li>
-						<a class="icon" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="loc">
+						<button type="button" class="btn-link icon" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="loc">
 							<i class="fa fa-picture-o"></i>
-						</a>
+						</button>
 					</li>
 					*}}
 					<li>
-						<a class="icon bb-url" style="cursor: pointer;" title="{{$edurl|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="loc">
+						<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" title="{{$edurl|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="loc">
 							<i class="fa fa-link"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon bb-video" style="cursor: pointer;" title="{{$edvideo|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="loc">
+						<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" title="{{$edvideo|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="loc">
 							<i class="fa fa-video-camera"></i>
-						</a>
+						</button>
 					</li>
 
 					<li>
-						<a class="icon underline" style="cursor: pointer;" title="{{$eduline|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="loc">
+						<button type="button" class="btn-link icon underline" style="cursor: pointer;" title="{{$eduline|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="loc">
 							<i class="fa fa-underline"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon italic" style="cursor: pointer;" title="{{$editalic|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="loc">
+						<button type="button" class="btn-link icon italic" style="cursor: pointer;" title="{{$editalic|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="loc">
 							<i class="fa fa-italic"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon bold" style="cursor: pointer;"  title="{{$edbold|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="loc">
+						<button type="button" class="btn-link icon bold" style="cursor: pointer;"  title="{{$edbold|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="loc">
 							<i class="fa fa-bold"></i>
-						</a>
+						</button>
 					</li>
 					<li>
-						<a class="icon quote" style="cursor: pointer;" title="{{$edquote|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="loc">
+						<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="loc">
 							<i class="fa fa-quote-left"></i>
-						</a>
+						</button>
 					</li>
 				</ul>
 				<div class="clear"></div>
@@ -168,11 +180,14 @@
 	</div>
 </div>
 
-<script>
+<script language="javascript" type="text/javascript">
 	$(document).ready( function() {
 		// disable finish date input if it isn't available
 		enableDisableFinishDate();
 		// load bbcode autocomplete for the description textarea
 		$('#comment-edit-text-desc, #comment-edit-text-loc').bbco_autocomplete('bbcode');
+
+		// initiale autosize for the textareas
+		autosize($("textarea.text-autosize"));
 	});
 </script>

@@ -3,10 +3,11 @@
 require_once("include/text.php");
 
 
-function manage_post(&$a) {
+function manage_post(App $a) {
 
-	if(! local_user())
+	if (! local_user()) {
 		return;
+	}
 
 	$uid = local_user();
 	$orig_record = $a->user;
@@ -15,40 +16,40 @@ function manage_post(&$a) {
 		$r = q("select * from user where uid = %d limit 1",
 			intval($_SESSION['submanage'])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$uid = intval($r[0]['uid']);
 			$orig_record = $r[0];
 		}
 	}
 
-	$r = q("select * from manage where uid = %d",
+	$r = q("SELECT * FROM `manage` WHERE `uid` = %d",
 		intval($uid)
 	);
 
 	$submanage = $r;
 
 	$identity = ((x($_POST['identity'])) ? intval($_POST['identity']) : 0);
-	if(! $identity)
+	if (! $identity) {
 		return;
+	}
 
 	$limited_id = 0;
 	$original_id = $uid;
 
-	if(count($submanage)) {
-		foreach($submanage as $m) {
-			if($identity == $m['mid']) {
+	if (dbm::is_result($submanage)) {
+		foreach ($submanage as $m) {
+			if ($identity == $m['mid']) {
 				$limited_id = $m['mid'];
 				break;
 			}
 		}
 	}
 
-	if($limited_id) {
+	if ($limited_id) {
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($limited_id)
 		);
-	}
-	else {
+	} else {
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d AND `email` = '%s' AND `password` = '%s' LIMIT 1",
 			intval($identity),
 			dbesc($orig_record['email']),
@@ -56,8 +57,9 @@ function manage_post(&$a) {
 		);
 	}
 
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		return;
+	}
 
 	unset($_SESSION['authenticated']);
 	unset($_SESSION['uid']);
@@ -68,31 +70,35 @@ function manage_post(&$a) {
 	unset($_SESSION['mobile-theme']);
 	unset($_SESSION['page_flags']);
 	unset($_SESSION['return_url']);
-	if(x($_SESSION,'submanage'))
+	if (x($_SESSION, 'submanage')) {
 		unset($_SESSION['submanage']);
-	if(x($_SESSION,'sysmsg'))
+	}
+	if (x($_SESSION, 'sysmsg')) {
 		unset($_SESSION['sysmsg']);
-	if(x($_SESSION,'sysmsg_info'))
+	}
+	if (x($_SESSION, 'sysmsg_info')) {
 		unset($_SESSION['sysmsg_info']);
+	}
 
 	require_once('include/security.php');
-	authenticate_success($r[0],true,true);
+	authenticate_success($r[0], true, true);
 
-	if($limited_id)
+	if ($limited_id) {
 		$_SESSION['submanage'] = $original_id;
+	}
 
 	$ret = array();
 	call_hooks('home_init',$ret);
 
-	goaway( $a->get_baseurl() . "/profile/" . $a->user['nickname'] );
+	goaway( App::get_baseurl() . "/profile/" . $a->user['nickname'] );
 	// NOTREACHED
 }
 
 
 
-function manage_content(&$a) {
+function manage_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
 		return;
 	}
@@ -111,26 +117,32 @@ function manage_content(&$a) {
 			dbesc($id['uid'])
 		);
 
-		$identities[$key][thumb] = $thumb[0][thumb];
+		$identities[$key]['thumb'] = $thumb[0]['thumb'];
 
-		$identities[$key]['selected'] = (($id['nickname'] === $a->user['nickname']) ? true : false);
+		$identities[$key]['selected'] = ($id['nickname'] === $a->user['nickname']);
 
 		$notifications = 0;
 
 		$r = q("SELECT DISTINCT(`parent`) FROM `notify` WHERE `uid` = %d AND NOT `seen` AND NOT (`type` IN (%d, %d))",
 			intval($id['uid']), intval(NOTIFY_INTRO), intval(NOTIFY_MAIL));
-		if ($r)
+
+		if (dbm::is_result($r)) {
 			$notifications = sizeof($r);
+		}
 
 		$r = q("SELECT DISTINCT(`convid`) FROM `mail` WHERE `uid` = %d AND NOT `seen`",
 			intval($id['uid']));
-		if ($r)
+
+		if (dbm::is_result($r)) {
 			$notifications = $notifications + sizeof($r);
+		}
 
 		$r = q("SELECT COUNT(*) AS `introductions` FROM `intro` WHERE NOT `blocked` AND NOT `ignore` AND `uid` = %d",
 			intval($id['uid']));
-		if ($r)
+
+		if (dbm::is_result($r)) {
 			$notifications = $notifications + $r[0]["introductions"];
+		}
 
 		$identities[$key]['notifications'] = $notifications;
 	}

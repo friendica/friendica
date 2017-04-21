@@ -5,7 +5,7 @@
 		<div class="contact-photo-wrapper dropdown pull-left" >
 			<div class="contact-entry-photo mframe" id="contact-entry-photo-{{$contact.id}}" >
 
-				<a class="dropdown-toggle" id="contact-photo-menu-{{$contact.id}}" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+				<button type="button" class="btn btn-link dropdown-toggle" id="contact-photo-menu-{{$contact.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
 					<div class="contact-photo-image-wrapper hidden-xs">
 						<img class="contact-photo media-object xl" src="{{$contact.thumb}}" {{$contact.sparkle}} alt="{{$contact.name}}" />
 
@@ -24,7 +24,7 @@
 							<span class="contact-photo-overlay-content overlay-xs"><i class="fa fa-angle-down"></i></span>
 						</div>
 					</div>
-				</a>
+				</button>
 
 
 				{{if $contact.photo_menu}}
@@ -33,7 +33,7 @@
 					{{if $c.2}}
 					<li role="menuitem"><a target="redir" href="{{$c.1}}">{{$c.0}}</a></li>
 					{{elseif $c.3}}
-					<li role="menuitem"><a onclick="addToModal('{{$c.1}}')">{{$c.0}}</a></li>
+					<li role="menuitem"><button type="button" class="btn-link" onclick="addToModal('{{$c.1}}')">{{$c.0}}</button></li>
 					{{else}}
 					<li role="menuitem"><a href="{{$c.1}}">{{$c.0}}</a></li>
 					{{/if}}
@@ -42,19 +42,18 @@
 
 				{{/if}}
 			</div>
-
 		</div>
 
 		<div class="media-body">
 			{{* The contact actions like private mail, delete contact, edit contact and so on *}}
 			<div class="contact-actions pull-right nav-pills preferences hidden-xs">
-				{{if $contact.photo_menu.pm}}<a class="contact-action-link" onclick="addToModal('{{$contact.photo_menu.pm.1}}')" data-toggle="tooltip" title="{{$contact.photo_menu.pm.0}}"><i class="fa fa-envelope" aria-hidden="true"></i></a>{{/if}}
-				{{if $contact.photo_menu.poke}}<a class="contact-action-link" onclick="addToModal('{{$contact.photo_menu.poke.1}}')" data-toggle="tooltip" title="{{$contact.photo_menu.poke.0}}"><i class="fa fa-heartbeat" aria-hidden="true"></i></a>{{/if}}
-				{{if $contact.photo_menu.network}}<a class="contact-action-link" href="{{$contact.photo_menu.network.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.network.0}}"><i class="fa fa-cloud" aria-hidden="true"></i></a>{{/if}}
-				{{if $contact.photo_menu.edit}}<a class="contact-action-link" href="{{$contact.photo_menu.edit.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.edit.0}}"><i class="fa fa-pencil" aria-hidden="true"></i></a>{{/if}}
-				{{if $contact.photo_menu.drop}}<a class="contact-action-link" onclick="addToModal('{{$contact.photo_menu.drop.1}}')" data-toggle="tooltip" title="{{$contact.photo_menu.drop.0}}"><i class="fa fa-user-times" aria-hidden="true"></i></a>{{/if}}
-				{{if $contact.photo_menu.follow}}<a class="contact-action-link" href="{{$contact.photo_menu.follow.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.follow.0}}"><i class="fa fa-user-plus" aria-hidden="true"></i></a>{{/if}}
-				{{if $contact.photo_menu.hide}}<a class="contact-action-link" href="{{$contact.photo_menu.hide.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.hide.0}}"><i class="fa fa-times" aria-hidden="true"></i></a>{{/if}}
+				{{if $contact.photo_menu.pm     }}<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.pm.1}}')" data-toggle="tooltip" title="{{$contact.photo_menu.pm.0}}"><i class="fa fa-envelope" aria-hidden="true"></i></button>{{/if}}
+				{{if $contact.photo_menu.poke   }}<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.poke.1}}')" data-toggle="tooltip" title="{{$contact.photo_menu.poke.0}}"><i class="fa fa-heartbeat" aria-hidden="true"></i></button>{{/if}}
+				{{if $contact.photo_menu.network}}<a class="contact-action-link btn-link" href="{{$contact.photo_menu.network.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.network.0}}"><i class="fa fa-cloud" aria-hidden="true"></i></a>{{/if}}
+				{{if $contact.photo_menu.edit   }}<a class="contact-action-link btn-link" href="{{$contact.photo_menu.edit.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.edit.0}}"><i class="fa fa-user" aria-hidden="true"></i></a>{{/if}}
+				{{if $contact.photo_menu.drop   }}<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.drop.1}}')" data-toggle="tooltip" title="{{$contact.photo_menu.drop.0}}"><i class="fa fa-user-times" aria-hidden="true"></i></button>{{/if}}
+				{{if $contact.photo_menu.follow }}<a class="contact-action-link btn-link" href="{{$contact.photo_menu.follow.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.follow.0}}"><i class="fa fa-user-plus" aria-hidden="true"></i></a>{{/if}}
+				{{if $contact.photo_menu.hide   }}<a class="contact-action-link btn-link" href="{{$contact.photo_menu.hide.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.hide.0}}"><i class="fa fa-times" aria-hidden="true"></i></a>{{/if}}
 			</div>
 
 			{{* The contact description (e.g. Name, Network, kind of connection and so on *}}
@@ -85,8 +84,8 @@
 
 </div>
 
-		
-{{* the following part is a nearly a copy of the part above but it is modyfied for working with js.
+
+{{* the following part is a nearly a copy of the part above but it is modified for working with js.
 We use this part to filter the contacts with jquery.textcomplete *}}
 <div class="javascript-template" rel="contact-template" style="display: none">
 	<div class="contact-wrapper media" id="contact-entry-wrapper-{$id}" >
@@ -95,7 +94,7 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 			<div class="contact-photo-wrapper dropdown pull-left" >
 				<div class="contact-entry-photo mframe" id="contact-entry-photo-{$id}" >
 
-					<a class="dropdown-toggle" id="contact-photo-menu-{$id}" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+					<button type="button" class="btn btn-link dropdown-toggle" id="contact-photo-menu-{$id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
 						<div class="contact-photo-image-wrapper hidden-xs">
 							<img class="contact-photo media-object xl" src="{$thumb}" {11} alt="{$name}" />
 
@@ -114,7 +113,7 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 								<span class="contact-photo-overlay-content overlay-xs"><i class="fa fa-angle-down"></i></span>
 							</div>
 						</div>
-					</a>
+					</button>
 
 
 					{if $photo_menu}
@@ -123,7 +122,7 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 						{if $c.2}
 						<li role="menuitem"><a target="redir" href="{$c.1}">{$c.0}</a></li>
 						{elseif $c.3}
-						<li role="menuitem"><a onclick="addToModal('{$c.1}')">{$c.0}</a></li>
+						<li role="menuitem"><button type="button" class="btn-link" onclick="addToModal('{$c.1}')">{$c.0}</button></li>
 						{else}
 						<li role="menuitem"><a href="{$c.1}">{$c.0}</a></li>
 						{/if}
@@ -138,12 +137,12 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 			<div class="media-body">
 				{{* The contact actions like private mail, delete contact, edit contact and so on *}}
 				<div class="contact-actions pull-right nav-pills preferences hidden-xs">
-					{if $photo_menu.pm}<a class="contact-action-link" onclick="addToModal('{$photo_menu.pm.1}')" data-toggle="tooltip" title="{$photo_menu.pm.0}"><i class="fa fa-envelope" aria-hidden="true"></i></a>{/if}
-					{if $photo_menu.poke}<a class="contact-action-link" onclick="addToModal('{$photo_menu.poke.1}')" data-toggle="tooltip" title="{$photo_menu.poke.0}"><i class="fa fa-heartbeat" aria-hidden="true"></i></a>{/if}
-					{if $photo_menu.network}<a class="contact-action-link" href="{$photo_menu.network.1}" data-toggle="tooltip" title="{$photo_menu.network.0}"><i class="fa fa-cloud" aria-hidden="true"></i></a>{/if}
-					{if $photo_menu.edit}<a class="contact-action-link" href="{$photo_menu.edit.1}" data-toggle="tooltip" title="{$photo_menu.edit.0}"><i class="fa fa-pencil" aria-hidden="true"></i></a>{/if}
-					{if $photo_menu.drop}<a class="contact-action-link" href="{$photo_menu.drop.1}" data-toggle="tooltip" title="{$photo_menu.drop.0}"><i class="fa fa-user-times" aria-hidden="true"></i></a>{/if}
-					{if $photo_menu.follow}<a class="contact-action-link" href="{$photo_menu.follow.1}" data-toggle="tooltip" title="{$photo_menu.follow.0}"><i class="fa fa-user-plus" aria-hidden="true"></i></a>{/if}
+					{if $photo_menu.pm}<button type="button" class="contact-action-link btn-link" onclick="addToModal('{$photo_menu.pm.1}')" data-toggle="tooltip" title="{$photo_menu.pm.0}"><i class="fa fa-envelope" aria-hidden="true"></i></button>{/if}
+					{if $photo_menu.poke}<button type="button" class="contact-action-link btn-link" onclick="addToModal('{$photo_menu.poke.1}')" data-toggle="tooltip" title="{$photo_menu.poke.0}"><i class="fa fa-heartbeat" aria-hidden="true"></i></button>{/if}
+					{if $photo_menu.network}<a class="contact-action-link btn-link" href="{$photo_menu.network.1}" data-toggle="tooltip" title="{$photo_menu.network.0}"><i class="fa fa-cloud" aria-hidden="true"></i></a>{/if}
+					{if $photo_menu.edit}<a class="contact-action-link btn-link" href="{$photo_menu.edit.1}" data-toggle="tooltip" title="{$photo_menu.edit.0}"><i class="fa fa-pencil" aria-hidden="true"></i></a>{/if}
+					{if $photo_menu.drop}<a class="contact-action-link btn-link" href="{$photo_menu.drop.1}" data-toggle="tooltip" title="{$photo_menu.drop.0}"><i class="fa fa-user-times" aria-hidden="true"></i></a>{/if}
+					{if $photo_menu.follow}<a class="contact-action-link btn-link" href="{$photo_menu.follow.1}" data-toggle="tooltip" title="{$photo_menu.follow.0}"><i class="fa fa-user-plus" aria-hidden="true"></i></a>{/if}
 				</div>
 
 				{{* The contact description (e.g. Name, Network, kind of connection and so on *}}

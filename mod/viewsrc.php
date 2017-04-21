@@ -1,9 +1,9 @@
 <?php
 
 
-function viewsrc_content(&$a) {
+function viewsrc_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Access denied.') . EOL);
 		return;
 	}
@@ -16,7 +16,7 @@ function viewsrc_content(&$a) {
 		return;
 	}
 
-	$r = q("SELECT `item`.`body` FROM `item` 
+	$r = q("SELECT `item`.`body` FROM `item`
 		WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND `item`.`deleted` = 0
 		and `item`.`moderated` = 0
 		AND `item`.`id` = '%s' LIMIT 1",
@@ -24,7 +24,7 @@ function viewsrc_content(&$a) {
 		dbesc($item_id)
 	);
 
-	if(count($r))
+	if (dbm::is_result($r))
 		if(is_ajax()) {
 			echo str_replace("\n",'<br />',$r[0]['body']);
 			killme();

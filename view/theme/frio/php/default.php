@@ -4,23 +4,20 @@
  * @brief The default site template
  */
 ?>
-
 <!DOCTYPE html >
-
-<?php 
+<?php
 	require_once('view/theme/frio/php/frio_boot.php');
 
 //	$minimal = is_modal();
 
 ?>
-
 <html>
 <head>
 	<title><?php if(x($page,'title')) echo $page['title'] ?></title>
-	<meta request="<?php echo $_REQUEST['pagename'] ?> ">
-	<script>var baseurl="<?php echo $a->get_baseurl() ?>";</script>
+	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?>">
+	<script>var baseurl="<?php echo App::get_baseurl() ?>";</script>
 	<script>var frio="<?php echo "view/theme/frio"; ?>";</script>
-	<?php $baseurl = $a->get_baseurl(); ?>
+	<?php $baseurl = App::get_baseurl(); ?>
 	<?php $frio = "view/theme/frio"; ?>
 	<?php 
 		// Because we use minimal for modals the header and the included js stuff should be only loaded
@@ -31,7 +28,27 @@
 			if(x($page,'htmlhead')) echo $page['htmlhead'];
 		}
 	?>
-	
+	<?php
+		// Add the theme color meta
+		// It makes mobile Chrome UI match Frio's top bar color.
+		$uid = $a->profile_uid;
+		if (is_null($uid)) {
+			$uid = get_theme_uid();
+		}
+		$schema = get_pconfig($uid, 'frio', 'schema');
+		if (($schema) && ($schema != '---')) {
+			if (file_exists('view/theme/frio/schema/'.$schema.'.php')) {
+				$schemefile = 'view/theme/frio/schema/'.$schema.'.php';
+				require_once($schemefile);
+			}
+		} else {
+			$nav_bg = get_pconfig($uid, 'frio', 'nav_bg');
+		}
+		if (!$nav_bg) {
+			$nav_bg = "#708fa0";
+		}
+		echo '<meta name="theme-color" content="'.$nav_bg.'" />';
+	?>
 
 </head>
 <?php
@@ -90,7 +107,6 @@ else
 					";
 				}
 ?>
-		
 			</div><!--row-->
 		</div><!-- container -->
 

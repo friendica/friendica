@@ -52,7 +52,6 @@
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit}}" /></div>
 	
 	<h3>{{$advanced}}</h3>
-	{{include file="field_checkbox.tpl" field=$no_utf}}
 	{{include file="field_checkbox.tpl" field=$verifyssl}}
 	{{include file="field_input.tpl" field=$proxy}}
 	{{include file="field_input.tpl" field=$proxyuser}}
@@ -66,7 +65,6 @@
 	{{include file="field_input.tpl" field=$basepath}}
 
 	<h3>{{$performance}}</h3>
-	{{include file="field_checkbox.tpl" field=$use_fulltext_engine}}
 	{{include file="field_input.tpl" field=$itemcache}}
 	{{include file="field_input.tpl" field=$itemcache_duration}}
 

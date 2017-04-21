@@ -19,6 +19,6 @@ Table mail
 | unknown    | if sender not in the contact table this is 1 | varchar(255)     | NO   |     | 0                   |                 |
 | uri        |                                              | varchar(255)     | NO   | MUL |                     |                 |
 | parent-uri |                                              | varchar(255)     | NO   | MUL |                     |                 |
-| created    | creation time of the private message         | datetime         | NO   |     | 0000-00-00 00:00:00 |                 |
+| created    | creation time of the private message         | datetime         | NO   |     | 0001-01-01 00:00:00 |                 |
 
 Return to [database documentation](help/database)

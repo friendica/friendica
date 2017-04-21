@@ -2,19 +2,19 @@
 	"name": "michelf/php-markdown",
 	"type": "library",
 	"description": "PHP Markdown",
-	"homepage": "http://michelf.ca/projects/php-markdown/",
+	"homepage": "https://michelf.ca/projects/php-markdown/",
 	"keywords": ["markdown"],
 	"license": "BSD-3-Clause",
 	"authors": [
 		{
 			"name": "Michel Fortin",
 			"email": "michel.fortin@michelf.ca",
-			"homepage": "http://michelf.ca/",
+			"homepage": "https://michelf.ca/",
 			"role": "Developer"
 		},
 		{
 			"name": "John Gruber",
-			"homepage": "http://daringfireball.net/"
+			"homepage": "https://daringfireball.net/"
 		}
 	],
 	"require": {
@@ -22,10 +22,5 @@
 	},
 	"autoload": {
  		"psr-0": { "Michelf": "" }
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-lib": "1.4.x-dev"
-		}
 	}
 }

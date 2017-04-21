@@ -4,16 +4,18 @@
  * @file include/network.php
  */
 
+use \Friendica\Core\Config;
+
 require_once("include/xml.php");
 require_once('include/Probe.php');
 
 /**
  * @brief Curl wrapper
- * 
+ *
  * If binary flag is true, return binary results.
  * Set the cookiejar argument to a string (e.g. "/tmp/friendica-cookies.txt")
  * to preserve cookies from one request to the next.
- * 
+ *
  * @param string $url URL to fetch
  * @param boolean $binary default false
  *    TRUE if asked to return binary results (file download)
@@ -21,7 +23,7 @@ require_once('include/Probe.php');
  * @param integer $timeout Timeout in seconds, default system config value or 60 seconds
  * @param string $accept_content supply Accept: header with 'accept_content' as the value
  * @param string $cookiejar Path to cookie jar file
- * 
+ *
  * @return string The fetched content
  */
 function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_content=Null, $cookiejar = 0) {
@@ -70,8 +72,9 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	$a = get_app();
 
 	$ch = @curl_init($url);
-	if(($redirects > 8) || (! $ch))
-		return false;
+	if(($redirects > 8) || (! $ch)) {
+		return $ret;
+	}
 
 	@curl_setopt($ch, CURLOPT_HEADER, true);
 
@@ -93,7 +96,10 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	@curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
 	@curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
 
-
+	$range = intval(Config::get('system', 'curl_range_bytes', 0));
+	if ($range > 0) {
+		@curl_setopt($ch, CURLOPT_RANGE, '0-'.$range);
+	}
 
 	if(x($opts,'headers')){
 		@curl_setopt($ch, CURLOPT_HTTPHEADER, $opts['headers']);
@@ -113,7 +119,9 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 
 	$check_cert = get_config('system','verifyssl');
 	@curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
-	@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, (($check_cert) ? 2 : false));
+	if ($check_cert) {
+		@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+	}
 
 	$prx = get_config('system','proxy');
 	if(strlen($prx)) {
@@ -135,6 +143,8 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	if (curl_errno($ch) !== CURLE_OK) {
 		logger('fetch_url error fetching '.$url.': '.curl_error($ch), LOGGER_NORMAL);
 	}
+
+	$ret['errno'] = curl_errno($ch);
 
 	$base = $s;
 	$curl_info = @curl_getinfo($ch);
@@ -213,13 +223,13 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 
 /**
  * @brief Post request to $url
- * 
+ *
  * @param string $url URL to post
  * @param mixed $params
  * @param string $headers HTTP headers
  * @param integer $redirects Recursion counter for internal use - default = 0
  * @param integer $timeout The timeout in seconds, default system config value or 60 seconds
- * 
+ *
  * @return string The content
  */
 function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) {
@@ -260,7 +270,9 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 
 	$check_cert = get_config('system','verifyssl');
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
-	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, (($check_cert) ? 2 : false));
+	if ($check_cert) {
+		@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+	}
 	$prx = get_config('system','proxy');
 	if(strlen($prx)) {
 		curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
@@ -338,7 +350,6 @@ function xml_status($st, $message = '') {
 	killme();
 }
 
-
 /**
  * @brief Send HTTP status header and exit.
  *
@@ -348,6 +359,14 @@ function xml_status($st, $message = '') {
  *    'description' => optional message
  */
 
+/**
+ * @brief Send HTTP status header and exit.
+ *
+ * @param integer $val HTTP status result value
+ * @param array $description optional message
+ *    'title' => header title
+ *    'description' => optional message
+ */
 function http_status_exit($val, $description = array()) {
 	$err = '';
 	if($val >= 400) {
@@ -373,33 +392,37 @@ function http_status_exit($val, $description = array()) {
 
 /**
  * @brief Check URL to se if ts's real
- * 
+ *
  * Take a URL from the wild, prepend http:// if necessary
  * and check DNS to see if it's real (or check if is a valid IP address)
- * 
+ *
  * @param string $url The URL to be validated
  * @return boolean True if it's a valid URL, fals if something wrong with it
  */
 function validate_url(&$url) {
-
 	if(get_config('system','disable_url_validation'))
 		return true;
+
 	// no naked subdomains (allow localhost for tests)
 	if(strpos($url,'.') === false && strpos($url,'/localhost/') === false)
 		return false;
+
 	if(substr($url,0,4) != 'http')
 		$url = 'http://' . $url;
+
+	/// @TODO Really supress function outcomes? Why not find them + debug them?
 	$h = @parse_url($url);
 
-	if(($h) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
+	if((is_array($h)) && (dns_get_record($h['host'], DNS_A + DNS_CNAME + DNS_PTR) || filter_var($h['host'], FILTER_VALIDATE_IP) )) {
 		return true;
 	}
+
 	return false;
 }
 
 /**
  * @brief Checks that email is an actual resolvable internet address
- * 
+ *
  * @param string $addr The email address
  * @return boolean True if it's a valid email address, false if it's not
  */
@@ -420,10 +443,10 @@ function validate_email($addr) {
 
 /**
  * @brief Check if URL is allowed
- * 
+ *
  * Check $url against our list of allowed sites,
  * wildcards allowed. If allowed_sites is unset return true;
- * 
+ *
  * @param string $url URL which get tested
  * @return boolean True if url is allowed otherwise return false
  */
@@ -465,9 +488,9 @@ function allowed_url($url) {
 
 /**
  * @brief Check if email address is allowed to register here.
- * 
+ *
  * Compare against our list (wildcards allowed).
- * 
+ *
  * @param type $email
  * @return boolean False if not allowed, true if allowed
  *    or if allowed list is not configured
@@ -502,8 +525,6 @@ function allowed_email($email) {
 
 function avatar_img($email) {
 
-	$a = get_app();
-
 	$avatar['size'] = 175;
 	$avatar['email'] = $email;
 	$avatar['url'] = '';
@@ -511,8 +532,9 @@ function avatar_img($email) {
 
 	call_hooks('avatar_lookup', $avatar);
 
-	if(! $avatar['success'])
-		$avatar['url'] = $a->get_baseurl() . '/images/person-175.jpg';
+	if (! $avatar['success']) {
+		$avatar['url'] = App::get_baseurl() . '/images/person-175.jpg';
+	}
 
 	logger('Avatar: ' . $avatar['email'] . ' ' . $avatar['url'], LOGGER_DEBUG);
 	return $avatar['url'];
@@ -531,10 +553,11 @@ function parse_xml_string($s,$strict = true) {
 	libxml_use_internal_errors(true);
 
 	$x = @simplexml_load_string($s2);
-	if(! $x) {
+	if (! $x) {
 		logger('libxml: parse: error: ' . $s2, LOGGER_DATA);
-		foreach(libxml_get_errors() as $err)
+		foreach (libxml_get_errors() as $err) {
 			logger('libxml: parse: ' . $err->code." at ".$err->line.":".$err->column." : ".$err->message, LOGGER_DATA);
+		}
 		libxml_clear_errors();
 	}
 	return $x;
@@ -543,8 +566,9 @@ function parse_xml_string($s,$strict = true) {
 function scale_external_images($srctext, $include_link = true, $scale_replace = false) {
 
 	// Suppress "view full size"
-	if (intval(get_config('system','no_view_full_size')))
+	if (intval(get_config('system','no_view_full_size'))) {
 		$include_link = false;
+	}
 
 	$a = get_app();
 
@@ -553,38 +577,41 @@ function scale_external_images($srctext, $include_link = true, $scale_replace = 
 
 	$matches = null;
 	$c = preg_match_all('/\[img.*?\](.*?)\[\/img\]/ism',$s,$matches,PREG_SET_ORDER);
-	if($c) {
+	if ($c) {
 		require_once('include/Photo.php');
-		foreach($matches as $mtch) {
+		foreach ($matches as $mtch) {
 			logger('scale_external_image: ' . $mtch[1]);
 
-			$hostname = str_replace('www.','',substr($a->get_baseurl(),strpos($a->get_baseurl(),'://')+3));
-			if(stristr($mtch[1],$hostname))
+			$hostname = str_replace('www.','',substr(App::get_baseurl(),strpos(App::get_baseurl(),'://')+3));
+			if (stristr($mtch[1],$hostname)) {
 				continue;
+			}
 
 			// $scale_replace, if passed, is an array of two elements. The
 			// first is the name of the full-size image. The second is the
 			// name of a remote, scaled-down version of the full size image.
 			// This allows Friendica to display the smaller remote image if
 			// one exists, while still linking to the full-size image
-			if($scale_replace)
+			if ($scale_replace) {
 				$scaled = str_replace($scale_replace[0], $scale_replace[1], $mtch[1]);
-			else
+			} else {
 				$scaled = $mtch[1];
-			$i = @fetch_url($scaled);
-			if(! $i)
+			}
+			$i = fetch_url($scaled);
+			if (! $i) {
 				return $srctext;
+			}
 
 			// guess mimetype from headers or filename
 			$type = guess_image_type($mtch[1],true);
 
-			if($i) {
+			if ($i) {
 				$ph = new Photo($i, $type);
-				if($ph->is_valid()) {
+				if ($ph->is_valid()) {
 					$orig_width = $ph->getWidth();
 					$orig_height = $ph->getHeight();
 
-					if($orig_width > 640 || $orig_height > 640) {
+					if ($orig_width > 640 || $orig_height > 640) {
 
 						$ph->scaleImage(640);
 						$new_width = $ph->getWidth();
@@ -610,7 +637,7 @@ function scale_external_images($srctext, $include_link = true, $scale_replace = 
 function fix_contact_ssl_policy(&$contact,$new_policy) {
 
 	$ssl_changed = false;
-	if((intval($new_policy) == SSL_POLICY_SELFSIGN || $new_policy === 'self') && strstr($contact['url'],'https:')) {
+	if ((intval($new_policy) == SSL_POLICY_SELFSIGN || $new_policy === 'self') && strstr($contact['url'],'https:')) {
 		$ssl_changed = true;
 		$contact['url']     = 	str_replace('https:','http:',$contact['url']);
 		$contact['request'] = 	str_replace('https:','http:',$contact['request']);
@@ -620,7 +647,7 @@ function fix_contact_ssl_policy(&$contact,$new_policy) {
 		$contact['poco']    = 	str_replace('https:','http:',$contact['poco']);
 	}
 
-	if((intval($new_policy) == SSL_POLICY_FULL || $new_policy === 'full') && strstr($contact['url'],'http:')) {
+	if ((intval($new_policy) == SSL_POLICY_FULL || $new_policy === 'full') && strstr($contact['url'],'http:')) {
 		$ssl_changed = true;
 		$contact['url']     = 	str_replace('http:','https:',$contact['url']);
 		$contact['request'] = 	str_replace('http:','https:',$contact['request']);
@@ -630,15 +657,15 @@ function fix_contact_ssl_policy(&$contact,$new_policy) {
 		$contact['poco']    = 	str_replace('http:','https:',$contact['poco']);
 	}
 
-	if($ssl_changed) {
-		q("update contact set
-			url = '%s',
-			request = '%s',
-			notify = '%s',
-			poll = '%s',
-			confirm = '%s',
-			poco = '%s'
-			where id = %d limit 1",
+	if ($ssl_changed) {
+		q("UPDATE `contact` SET
+			`url` = '%s',
+			`request` = '%s',
+			`notify` = '%s',
+			`poll` = '%s',
+			`confirm` = '%s',
+			`poco` = '%s'
+			WHERE `id` = %d LIMIT 1",
 			dbesc($contact['url']),
 			dbesc($contact['request']),
 			dbesc($contact['notify']),
@@ -650,41 +677,70 @@ function fix_contact_ssl_policy(&$contact,$new_policy) {
 	}
 }
 
-function original_url($url, $depth=1, $fetchbody = false) {
-
-	$a = get_app();
-
-	// Remove Analytics Data from Google and other tracking platforms
+/**
+ * @brief Remove Google Analytics and other tracking platforms params from URL
+ *
+ * @param string $url Any user-submitted URL that may contain tracking params
+ * @return string The same URL stripped of tracking parameters
+ */
+function strip_tracking_query_params($url)
+{
 	$urldata = parse_url($url);
 	if (is_string($urldata["query"])) {
 		$query = $urldata["query"];
 		parse_str($query, $querydata);
 
-		if (is_array($querydata))
-			foreach ($querydata AS $param=>$value)
+		if (is_array($querydata)) {
+			foreach ($querydata AS $param => $value) {
 				if (in_array($param, array("utm_source", "utm_medium", "utm_term", "utm_content", "utm_campaign",
 							"wt_mc", "pk_campaign", "pk_kwd", "mc_cid", "mc_eid",
 							"fb_action_ids", "fb_action_types", "fb_ref",
 							"awesm", "wtrid",
 							"woo_campaign", "woo_source", "woo_medium", "woo_content", "woo_term"))) {
 
-					$pair = $param."=".urlencode($value);
+					$pair = $param . "=" . urlencode($value);
 					$url = str_replace($pair, "", $url);
 
 					// Second try: if the url isn't encoded completely
-					$pair = $param."=".str_replace(" ", "+", $value);
+					$pair = $param . "=" . str_replace(" ", "+", $value);
 					$url = str_replace($pair, "", $url);
 
 					// Third try: Maybey the url isn't encoded at all
-					$pair = $param."=".$value;
+					$pair = $param . "=" . $value;
 					$url = str_replace($pair, "", $url);
 
 					$url = str_replace(array("?&", "&&"), array("?", ""), $url);
 				}
+			}
+		}
 
-		if (substr($url, -1, 1) == "?")
+		if (substr($url, -1, 1) == "?") {
 			$url = substr($url, 0, -1);
+		}
 	}
+
+	return $url;
+}
+
+/**
+ * @brief Returns the original URL of the provided URL
+ *
+ * This function strips tracking query params and follows redirections, either
+ * through HTTP code or meta refresh tags. Stops after 10 redirections.
+ *
+ * @todo Remove the $fetchbody parameter that generates an extraneous HEAD request
+ *
+ * @see ParseUrl::getSiteinfo
+ *
+ * @param string $url A user-submitted URL
+ * @param int $depth The current redirection recursion level (internal)
+ * @param bool $fetchbody Wether to fetch the body or not after the HEAD requests
+ * @return string A canonical URL
+ */
+function original_url($url, $depth = 1, $fetchbody = false) {
+	$a = get_app();
+
+	$url = strip_tracking_query_params($url);
 
 	if ($depth > 10)
 		return($url);
@@ -789,19 +845,19 @@ function short_link($url) {
 		$yourls->set('password', $yourls_password);
 		$yourls->set('ssl', $yourls_ssl);
 		$yourls->set('yourls-url', $yourls_url);
-		$slinky->set_cascade( array($yourls, new Slinky_UR1ca(), new Slinky_Trim(), new Slinky_IsGd(), new Slinky_TinyURL()));
+		$slinky->set_cascade(array($yourls, new Slinky_Ur1ca(), new Slinky_TinyURL()));
 	} else {
 		// setup a cascade of shortening services
 		// try to get a short link from these services
-		// in the order ur1.ca, trim, id.gd, tinyurl
-		$slinky->set_cascade(array(new Slinky_UR1ca(), new Slinky_Trim(), new Slinky_IsGd(), new Slinky_TinyURL()));
+		// in the order ur1.ca, tinyurl
+		$slinky->set_cascade(array(new Slinky_Ur1ca(), new Slinky_TinyURL()));
 	}
 	return $slinky->short();
 }
 
 /**
  * @brief Encodes content to json
- * 
+ *
  * This function encodes an array to json format
  * and adds an application/json HTTP header to the output.
  * After finishing the process is getting killed.

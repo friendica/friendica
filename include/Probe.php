@@ -18,6 +18,8 @@ require_once('include/network.php');
  */
 class Probe {
 
+	private static $baseurl;
+
 	/**
 	 * @brief Rearrange the array so that it always has the same order
 	 *
@@ -54,17 +56,29 @@ class Probe {
 	 */
 	private function xrd($host) {
 
+		// Reset the static variable
+		self::$baseurl = '';
+
 		$ssl_url = "https://".$host."/.well-known/host-meta";
 		$url = "http://".$host."/.well-known/host-meta";
 
 		$xrd_timeout = Config::get('system','xrd_timeout', 20);
 		$redirects = 0;
 
-		$xml = fetch_url($ssl_url, false, $redirects, $xrd_timeout, "application/xrd+xml");
+		$ret = z_fetch_url($ssl_url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
+		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			return false;
+		}
+		$xml = $ret['body'];
+
 		$xrd = parse_xml_string($xml, false);
 
 		if (!is_object($xrd)) {
-			$xml = fetch_url($url, false, $redirects, $xrd_timeout, "application/xrd+xml");
+			$ret = z_fetch_url($url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
+			if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+				return false;
+			}
+			$xml = $ret['body'];
 			$xrd = parse_xml_string($xml, false);
 		}
 		if (!is_object($xrd))
@@ -93,6 +107,9 @@ class Probe {
 			elseif ($attributes["rel"] == "lrdd")
 				$xrd_data["lrdd"] = $attributes["template"];
 		}
+
+		self::$baseurl = "http://".$host;
+
 		return $xrd_data;
 	}
 
@@ -118,18 +135,16 @@ class Probe {
 	 */
 
 	public static function webfinger_dfrn($webbie, &$hcard) {
-		if (!strstr($webbie, '@'))
-			return $webbie;
 
 		$profile_link = '';
 
-		$links = self::webfinger($webbie);
+		$links = self::lrdd($webbie);
 		logger('webfinger_dfrn: '.$webbie.':'.print_r($links,true), LOGGER_DATA);
 		if (count($links)) {
 			foreach ($links as $link) {
 				if ($link['@attributes']['rel'] === NAMESPACE_DFRN)
 					$profile_link = $link['@attributes']['href'];
-				if ($link['@attributes']['rel'] === NAMESPACE_OSTATUSSUB)
+				if (($link['@attributes']['rel'] === NAMESPACE_OSTATUSSUB) AND ($profile_link == ""))
 					$profile_link = 'stat:'.$link['@attributes']['template'];
 				if ($link['@attributes']['rel'] === 'http://microformats.org/profile/hcard')
 					$hcard = $link['@attributes']['href'];
@@ -162,6 +177,8 @@ class Probe {
 
 			$path_parts = explode("/", trim($parts["path"], "/"));
 
+			$nick = array_pop($path_parts);
+
 			do {
 				$lrdd = self::xrd($host);
 				$host .= "/".array_shift($path_parts);
@@ -180,6 +197,24 @@ class Probe {
 
 			$path = str_replace('{uri}', urlencode($uri), $link);
 			$webfinger = self::webfinger($path);
+
+			if (!$webfinger AND (strstr($uri, "@"))) {
+				$path = str_replace('{uri}', urlencode("acct:".$uri), $link);
+				$webfinger = self::webfinger($path);
+			}
+
+			// Special treatment for Mastodon
+			// Problem is that Mastodon uses an URL format like http://domain.tld/@nick
+			// But the webfinger for this format fails.
+			if (!$webfinger AND isset($nick)) {
+				// Mastodon uses a "@" as prefix for usernames in their url format
+				$nick = ltrim($nick, '@');
+
+				$addr = $nick."@".$host;
+
+				$path = str_replace('{uri}', urlencode("acct:".$addr), $link);
+				$webfinger = self::webfinger($path);
+			}
 		}
 
 		if (!is_array($webfinger["links"]))
@@ -214,7 +249,6 @@ class Probe {
 		if ($cache) {
 			$result = Cache::get("probe_url:".$network.":".$uri);
 			if (!is_null($result)) {
-				$result = unserialize($result);
 				return $result;
 			}
 		}
@@ -247,14 +281,19 @@ class Probe {
 				$data['nick'] = trim(substr($data['nick'], 0, strpos($data['nick'], ' ')));
 		}
 
-		if (!isset($data["network"]))
+		if (self::$baseurl != "") {
+			$data["baseurl"] = self::$baseurl;
+		}
+
+		if (!isset($data["network"])) {
 			$data["network"] = NETWORK_PHANTOM;
+		}
 
 		$data = self::rearrange_data($data);
 
 		// Only store into the cache if the value seems to be valid
 		if (!in_array($data['network'], array(NETWORK_PHANTOM, NETWORK_MAIL))) {
-			Cache::set("probe_url:".$network.":".$uri,serialize($data), CACHE_DAY);
+			Cache::set("probe_url:".$network.":".$uri, $data, CACHE_DAY);
 
 			/// @todo temporary fix - we need a real contact update function that updates only changing fields
 			/// The biggest problem is the avatar picture that could have a reduced image size.
@@ -275,6 +314,7 @@ class Probe {
 					dbesc(normalise_link($data['url']))
 			);
 		}
+
 		return $data;
 	}
 
@@ -290,43 +330,16 @@ class Probe {
 	 * @return array uri data
 	 */
 	private function detect($uri, $network, $uid) {
-		if (strstr($uri, '@')) {
-			// If the URI starts with "mailto:" then jump directly to the mail detection
-			if (strpos($url,'mailto:') !== false) {
-				$uri = str_replace('mailto:', '', $url);
-				return self::mail($uri, $uid);
-			}
+		$parts = parse_url($uri);
 
-			if ($network == NETWORK_MAIL)
-				return self::mail($uri, $uid);
+		if (isset($parts["scheme"]) AND isset($parts["host"]) AND isset($parts["path"])) {
 
-			// Remove "acct:" from the URI
-			$uri = str_replace('acct:', '', $uri);
-
-			$host = substr($uri,strpos($uri, '@') + 1);
-			$nick = substr($uri,0, strpos($uri, '@'));
-
-			if (strpos($uri, '@twitter.com'))
-				return array("network" => NETWORK_TWITTER);
-
-			$lrdd = self::xrd($host);
-			if (!$lrdd)
-				return self::mail($uri, $uid);
-
-			$addr = $uri;
-		} else {
-			$parts = parse_url($uri);
-			if (!isset($parts["scheme"]) OR
-				!isset($parts["host"]) OR
-				!isset($parts["path"]))
-				return false;
-
-			// todo: Ports?
+			/// @todo: Ports?
 			$host = $parts["host"];
 
-			if ($host == 'twitter.com')
+			if ($host == 'twitter.com') {
 				return array("network" => NETWORK_TWITTER);
-
+			}
 			$lrdd = self::xrd($host);
 
 			$path_parts = explode("/", trim($parts["path"], "/"));
@@ -335,42 +348,80 @@ class Probe {
 				$host .= "/".array_shift($path_parts);
 				$lrdd = self::xrd($host);
 			}
-			if (!$lrdd)
+			if (!$lrdd) {
 				return self::feed($uri);
-
+			}
 			$nick = array_pop($path_parts);
+
+			// Mastodon uses a "@" as prefix for usernames in their url format
+			$nick = ltrim($nick, '@');
+
 			$addr = $nick."@".$host;
+		} elseif (strstr($uri, '@')) {
+			// If the URI starts with "mailto:" then jump directly to the mail detection
+			if (strpos($url,'mailto:') !== false) {
+				$uri = str_replace('mailto:', '', $url);
+				return self::mail($uri, $uid);
+			}
+
+			if ($network == NETWORK_MAIL) {
+				return self::mail($uri, $uid);
+			}
+			// Remove "acct:" from the URI
+			$uri = str_replace('acct:', '', $uri);
+
+			$host = substr($uri,strpos($uri, '@') + 1);
+			$nick = substr($uri,0, strpos($uri, '@'));
+
+			if (strpos($uri, '@twitter.com')) {
+				return array("network" => NETWORK_TWITTER);
+			}
+			$lrdd = self::xrd($host);
+
+			if (!$lrdd) {
+				return self::mail($uri, $uid);
+			}
+			$addr = $uri;
+		} else {
+			return false;
 		}
+
 		$webfinger = false;
 
 		/// @todo Do we need the prefix "acct:" or "acct://"?
 
 		foreach ($lrdd AS $key => $link) {
-			if ($webfinger)
+			if ($webfinger) {
 				continue;
-
-			if (!in_array($key, array("lrdd", "lrdd-xml", "lrdd-json")))
+			}
+			if (!in_array($key, array("lrdd", "lrdd-xml", "lrdd-json"))) {
 				continue;
-
-			// Try webfinger with the address (user@domain.tld)
-			$path = str_replace('{uri}', urlencode($addr), $link);
+			}
+			// At first try it with the given uri
+			$path = str_replace('{uri}', urlencode($uri), $link);
 			$webfinger = self::webfinger($path);
 
-			// If webfinger wasn't successful then try it with the URL - possibly in the format https://...
-			if (!$webfinger AND ($uri != $addr)) {
-				$path = str_replace('{uri}', urlencode($uri), $link);
-				$webfinger = self::webfinger($path);
-
-				// Since the detection with the address wasn't successful, we delete it.
-				if ($webfinger) {
-					$nick = "";
-					$addr = "";
-				}
+			// We cannot be sure that the detected address was correct, so we don't use the values
+			if ($webfinger AND ($uri != $addr)) {
+				$nick = "";
+				$addr = "";
 			}
 
+			// Try webfinger with the address (user@domain.tld)
+			if (!$webfinger) {
+				$path = str_replace('{uri}', urlencode($addr), $link);
+				$webfinger = self::webfinger($path);
+			}
+
+			// Mastodon needs to have it with "acct:"
+			if (!$webfinger) {
+				$path = str_replace('{uri}', urlencode("acct:".$addr), $link);
+				$webfinger = self::webfinger($path);
+			}
 		}
-		if (!$webfinger)
+		if (!$webfinger) {
 			return self::feed($uri);
+		}
 
 		$result = false;
 
@@ -421,7 +472,12 @@ class Probe {
 		$xrd_timeout = Config::get('system','xrd_timeout', 20);
 		$redirects = 0;
 
-		$data = fetch_url($url, false, $redirects, $xrd_timeout, "application/xrd+xml");
+		$ret = z_fetch_url($url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
+		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			return false;
+		}
+		$data = $ret['body'];
+
 		$xrd = parse_xml_string($data, false);
 
 		if (!is_object($xrd)) {
@@ -473,9 +529,14 @@ class Probe {
 	 * @return array noscrape data
 	 */
 	private function poll_noscrape($noscrape, $data) {
-		$content = fetch_url($noscrape);
-		if (!$content)
+		$ret = z_fetch_url($noscrape);
+		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
+		}
+		$content = $ret['body'];
+		if (!$content) {
+			return false;
+		}
 
 		$json = json_decode($content, true);
 		if (!is_array($json))
@@ -560,6 +621,8 @@ class Probe {
 
 		$data = array();
 
+		logger("Check profile ".$profile, LOGGER_DEBUG);
+
 		// Fetch data via noscrape - this is faster
 		$noscrape = str_replace(array("/hcard/", "/profile/"), "/noscrape/", $profile);
 		$data = self::poll_noscrape($noscrape, $data);
@@ -581,6 +644,8 @@ class Probe {
 		$prof_data["photo"] = $data["photo"];
 		$prof_data["fn"] = $data["name"];
 		$prof_data["key"] = $data["pubkey"];
+
+		logger("Result for profile ".$profile.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
 		return $prof_data;
 	}
@@ -650,9 +715,17 @@ class Probe {
 	 * @return array hcard data
 	 */
 	private function poll_hcard($hcard, $data, $dfrn = false) {
+		$ret = z_fetch_url($hcard);
+		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			return false;
+		}
+		$content = $ret['body'];
+		if (!$content) {
+			return false;
+		}
 
 		$doc = new DOMDocument();
-		if (!@$doc->loadHTMLFile($hcard))
+		if (!@$doc->loadHTML($content))
 			return false;
 
 		$xpath = new DomXPath($doc);
@@ -661,49 +734,56 @@ class Probe {
 		if (!is_object($vcards))
 			return false;
 
-		if ($vcards->length == 0)
-			return false;
+		if ($vcards->length > 0) {
+			$vcard = $vcards->item(0);
 
-		$vcard = $vcards->item(0);
+			// We have to discard the guid from the hcard in favour of the guid from lrdd
+			// Reason: Hubzilla doesn't use the value "uid" in the hcard like Diaspora does.
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' uid ')]", $vcard); // */
+			if (($search->length > 0) AND ($data["guid"] == ""))
+				$data["guid"] = $search->item(0)->nodeValue;
 
-		// We have to discard the guid from the hcard in favour of the guid from lrdd
-		// Reason: Hubzilla doesn't use the value "uid" in the hcard like Diaspora does.
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' uid ')]", $vcard); // */
-		if (($search->length > 0) AND ($data["guid"] == ""))
-			$data["guid"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' nickname ')]", $vcard); // */
+			if ($search->length > 0)
+				$data["nick"] = $search->item(0)->nodeValue;
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' nickname ')]", $vcard); // */
-		if ($search->length > 0)
-			$data["nick"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' fn ')]", $vcard); // */
+			if ($search->length > 0)
+				$data["name"] = $search->item(0)->nodeValue;
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' fn ')]", $vcard); // */
-		if ($search->length > 0)
-			$data["name"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' searchable ')]", $vcard); // */
+			if ($search->length > 0)
+				$data["searchable"] = $search->item(0)->nodeValue;
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' searchable ')]", $vcard); // */
-		if ($search->length > 0)
-			$data["searchable"] = $search->item(0)->nodeValue;
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' key ')]", $vcard); // */
+			if ($search->length > 0) {
+				$data["pubkey"] = $search->item(0)->nodeValue;
+				if (strstr($data["pubkey"], 'RSA '))
+					$data["pubkey"] = rsatopem($data["pubkey"]);
+			}
 
-		$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' key ')]", $vcard); // */
-		if ($search->length > 0) {
-			$data["pubkey"] = $search->item(0)->nodeValue;
-			if (strstr($data["pubkey"], 'RSA '))
-				$data["pubkey"] = rsatopem($data["pubkey"]);
+			$search = $xpath->query("//*[@id='pod_location']", $vcard); // */
+			if ($search->length > 0)
+				$data["baseurl"] = trim($search->item(0)->nodeValue, "/");
 		}
-
-		$search = $xpath->query("//*[@id='pod_location']", $vcard); // */
-		if ($search->length > 0)
-			$data["baseurl"] = trim($search->item(0)->nodeValue, "/");
 
 		$avatar = array();
 		$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
 		foreach ($photos AS $photo) {
 			$attr = array();
-			foreach ($photo->attributes as $attribute)
+			foreach ($photo->attributes as $attribute) {
 				$attr[$attribute->name] = trim($attribute->value);
+			}
 
-			if (isset($attr["src"]) AND isset($attr["width"]))
+			if (isset($attr["src"]) AND isset($attr["width"])) {
 				$avatar[$attr["width"]] = $attr["src"];
+			}
+
+			// We don't have a width. So we just take everything that we got.
+			// This is a Hubzilla workaround which doesn't send a width.
+			if ((sizeof($avatar) == 0) AND isset($attr["src"])) {
+				$avatar[] = $attr["src"];
+			}
 		}
 
 		if (sizeof($avatar)) {
@@ -808,32 +888,43 @@ class Probe {
 	 * @return array OStatus data
 	 */
 	private function ostatus($webfinger) {
-
 		$data = array();
-		if (is_array($webfinger["aliases"]))
-			foreach($webfinger["aliases"] AS $alias)
-				if (strstr($alias, "@"))
+		if (is_array($webfinger["aliases"])) {
+			foreach ($webfinger["aliases"] AS $alias) {
+				if (strstr($alias, "@")) {
 					$data["addr"] = str_replace('acct:', '', $alias);
+				}
+			}
+		}
 
+		if (is_string($webfinger["subject"]) AND strstr($webfinger["subject"], "@")) {
+			$data["addr"] = str_replace('acct:', '', $webfinger["subject"]);
+		}
 		$pubkey = "";
 		foreach ($webfinger["links"] AS $link) {
 			if (($link["rel"] == "http://webfinger.net/rel/profile-page") AND
-				($link["type"] == "text/html") AND ($link["href"] != ""))
+				($link["type"] == "text/html") AND ($link["href"] != "")) {
 				$data["url"] = $link["href"];
-			elseif (($link["rel"] == "salmon") AND ($link["href"] != ""))
+			} elseif (($link["rel"] == "salmon") AND ($link["href"] != "")) {
 				$data["notify"] = $link["href"];
-			elseif (($link["rel"] == NAMESPACE_FEED) AND ($link["href"] != ""))
+			} elseif (($link["rel"] == NAMESPACE_FEED) AND ($link["href"] != "")) {
 				$data["poll"] = $link["href"];
-			elseif (($link["rel"] == "magic-public-key") AND ($link["href"] != "")) {
+			} elseif (($link["rel"] == "magic-public-key") AND ($link["href"] != "")) {
 				$pubkey = $link["href"];
 
 				if (substr($pubkey, 0, 5) === 'data:') {
-					if (strstr($pubkey, ','))
+					if (strstr($pubkey, ',')) {
 						$pubkey = substr($pubkey, strpos($pubkey, ',') + 1);
-					else
+					} else {
 						$pubkey = substr($pubkey, 5);
-				} else
-					$pubkey = fetch_url($pubkey);
+					}
+				} elseif (normalise_link($pubkey) == 'http://') {
+					$ret = z_fetch_url($pubkey);
+					if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+						return false;
+					}
+					$pubkey = $ret['body'];
+				}
 
 				$key = explode(".", $pubkey);
 
@@ -842,45 +933,48 @@ class Probe {
 					$e = base64url_decode($key[2]);
 					$data["pubkey"] = metopem($m,$e);
 				}
-
 			}
 		}
 
 		if (isset($data["notify"]) AND isset($data["pubkey"]) AND
 			isset($data["poll"]) AND isset($data["url"])) {
 			$data["network"] = NETWORK_OSTATUS;
-		} else
+		} else {
 			return false;
-
+		}
 		// Fetch all additional data from the feed
-		$feed = fetch_url($data["poll"]);
-		$feed_data = feed_import($feed,$dummy1,$dummy2, $dummy3, true);
-		if (!$feed_data)
+		$ret = z_fetch_url($data["poll"]);
+		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
-
-		if ($feed_data["header"]["author-name"] != "")
+		}
+		$feed = $ret['body'];
+		$feed_data = feed_import($feed,$dummy1,$dummy2, $dummy3, true);
+		if (!$feed_data) {
+			return false;
+		}
+		if ($feed_data["header"]["author-name"] != "") {
 			$data["name"] = $feed_data["header"]["author-name"];
-
-		if ($feed_data["header"]["author-nick"] != "")
+		}
+		if ($feed_data["header"]["author-nick"] != "") {
 			$data["nick"] = $feed_data["header"]["author-nick"];
-
-		if ($feed_data["header"]["author-avatar"] != "")
-			$data["photo"] = $feed_data["header"]["author-avatar"];
-
-		if ($feed_data["header"]["author-id"] != "")
+		}
+		if ($feed_data["header"]["author-avatar"] != "") {
+			$data["photo"] = ostatus::fix_avatar($feed_data["header"]["author-avatar"], $data["url"]);
+		}
+		if ($feed_data["header"]["author-id"] != "") {
 			$data["alias"] = $feed_data["header"]["author-id"];
-
-		if ($feed_data["header"]["author-location"] != "")
+		}
+		if ($feed_data["header"]["author-location"] != "") {
 			$data["location"] = $feed_data["header"]["author-location"];
-
-		if ($feed_data["header"]["author-about"] != "")
+		}
+		if ($feed_data["header"]["author-about"] != "") {
 			$data["about"] = $feed_data["header"]["author-about"];
-
+		}
 		// OStatus has serious issues when the the url doesn't fit (ssl vs. non ssl)
 		// So we take the value that we just fetched, although the other one worked as well
-		if ($feed_data["header"]["author-link"] != "")
+		if ($feed_data["header"]["author-link"] != "") {
 			$data["url"] = $feed_data["header"]["author-link"];
-
+		}
 		/// @todo Fetch location and "about" from the feed as well
 		return $data;
 	}
@@ -1008,7 +1102,11 @@ class Probe {
 	 * @return array feed data
 	 */
 	private function feed($url, $probe = true) {
-		$feed = fetch_url($url);
+		$ret = z_fetch_url($url);
+		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			return false;
+		}
+		$feed = $ret['body'];
 		$feed_data = feed_import($feed, $dummy1, $dummy2, $dummy3, true);
 
 		if (!$feed_data) {
@@ -1065,7 +1163,7 @@ class Probe {
 
 		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-		if(count($x) && count($r)) {
+		if (dbm::is_result($x) && dbm::is_result($r)) {
 			$mailbox = construct_mailbox_name($r[0]);
 			$password = '';
 			openssl_private_decrypt(hex2bin($r[0]['pass']), $password,$x[0]['prvkey']);

@@ -43,29 +43,29 @@ We recommend to talk to the admin(s) of the affected friendica server. (Admins, 
 
 ###How can I upload images, files, links, videos and sound files to posts?
 
-You can upload images from your computer by using the [editor](help/Text_editor).
+You can upload images from your computer using the [editor](help/Text_editor).
 An overview of all uploaded images is listed at *yourpage.com/photos/profilename*.
-On that page, you can also upload images directly and choose, if your contacts shall receive a message about this upload.
+On that page, you can also upload images directly and choose if your contacts will receive a message about this upload.
 
-Generally, you could attach every kind of file to a post.
+Generally, you can attach any kind of file to a post.
 This is possible by using the "paper-clip"-symbol in the editor.
 These files will be linked to your post and can be downloaded by your contacts.
-But it's not possible to get a preview for these ones.
-Because of this, this upload method is recommended for office or zipped files. 
-If you want share content from Dropbox, Owncloud or any other [filehoster](http://en.wikipedia.org/wiki/Comparison_of_file_hosting_services), use the "link"-button (chain-symbol). 
+But it's not possible to get a preview for these items.
+Because of this, this upload method is only recommended for office or zipped files. 
+If you want to share content from Dropbox, Owncloud or any other [filehoster](http://en.wikipedia.org/wiki/Comparison_of_file_hosting_services), use the "link"-button (chain-symbol). 
 
 When you're adding URLs of other webpages with the "link"-button, Friendica tries to create a small preview.
 If this doesn't work, try to add the link by typing: [url=http://example.com]*self-chosen name*[/url].
 
 You can also add video and audio files to posts.
-But instead of a direct upload you have to use one of the following methods:
+However, instead of a direct upload you have to use one of the following methods:
 
-1. Add the video or audio link of a hoster (Youtube, Vimeo, Soundcloud and everyone else with oembed/opengraph-support). Videos will be shown with a preview image you can click on to start it. SoundCloud directly inserts a player to your post. 
+1. Add the video or audio link of a hoster (Youtube, Vimeo, Soundcloud and anyone else with oembed/opengraph-support). Videos will be shown with a preview image you can click on to start. SoundCloud directly inserts a player to your post. 
 
 2. If you have your own server, you can upload multimedia files via FTP and insert the URL. 
 
-Friendica is using HTML5 for embedding content.
-Therefore, the supported files are depending on your browser and operating system.
+Friendica uses HTML5 for embedding content.
+Therefore, the supported files are dependent on your browser and operating system.
 Some supported filetypes are WebM, MP4, MP3 and OGG.
 See Wikipedia for more of them ([video](http://en.wikipedia.org/wiki/HTML5_video), [audio](http://en.wikipedia.org/wiki/HTML5_audio)).
 
@@ -188,7 +188,7 @@ Admin
 
 ###Can I configure multiple domains with the same code instance?
 
-No, this function is not supported anymore starting from Friendica 3.3.
+No, this function is no longer supported from Friendica 3.3 onwards.
 
 <a name="sources"></a>
 
@@ -202,12 +202,12 @@ Addons are listed at [this page](https://github.com/friendica/friendica-addons).
 If you are searching for new themes, you can find them at [Friendica-Themes.com](http://friendica-themes.com/) 
 
 <a name="adminaccount1"></a>
-###I've changed the my email address now the admin panel is gone?
+###I've changed my email address now the admin panel is gone?
 
 Have a look into your <tt>.htconfig.php</tt> and fix your email address there.
 
 <a name="adminaccount2"></a>
-###Can there be more then just one admin for a node?
+###Can there be more then one admin for a node?
 
 Yes. You just have to list more then one email address in the
 <tt>.htconfig.php</tt> file. The listed emails need to be separated by a comma.

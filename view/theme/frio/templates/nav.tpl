@@ -9,7 +9,7 @@
 		{{if $nav.remote}}
 		<a href="{{$baseurl}}"><div id="remote-logo-img"></div></a>
 		{{else}}
-		{{* #logo-img is the the placeholder to insert a mask (friendica logo) into this div 
+		{{* #logo-img is the the placeholder to insert a mask (friendica logo) into this div
 		For Firefox we have to call the paths of the mask (look at the bottom of this file).
 		Because for FF we need relative paths we apply them with js after the page is loaded (look at theme.js *}}
 		<a href="{{$baseurl}}"><div id="logo-img"></div></a>
@@ -20,7 +20,7 @@
 	<div class="container">
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding"><!-- div for navbar width-->
 			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="topbar-nav" role=”navigation”>
+			<div class="topbar-nav" role="navigation">
 
 				{{* Buttons for the mobile view *}}
 				<button role="menu" type="button" class="navbar-toggle collapsed pull-right" data-toggle="offcanvas" data-target="#myNavmenu">
@@ -70,7 +70,7 @@
 					{{* The notifications dropdown *}}
 					{{if $nav.notifications}}
 						<li id="nav-notification" class="nav-segment hidden-xs" role="presentation">
-							<a role="menuitem" href="{{$nav.notifications.0}}" rel="#nav-notifications-menu" data-toggle="tooltip" data-toggle="tooltip" title="{{$nav.notifications.1}}" class="btn-link" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<a role="menuitem" href="{{$nav.notifications.0}}" rel="#nav-notifications-menu" data-toggle="tooltip" data-toggle="tooltip" title="{{$nav.notifications.1}}" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								<i class="fa fa-exclamation-circle fa-lg"></i>
 								<span class="sr-only">{{$nav.notifications.1}}</span>
 								<span id="notify-update" class="nav-notify-badge badge nav-notify dropdown" data-toggle="dropdown"></span>
@@ -84,7 +84,7 @@
 									<div class="arrow"></div>
 									{{$nav.notifications.1}}
 									<div class="dropdown-header-link">
-										<a href="#" onclick="notifyMarkAll(); return false;" data-toggle="tooltip" title="{{$nav.notifications.mark.3}}" class="">{{$nav.notifications.mark.1}}</a>
+										<button type="button" class="btn-link" onclick="notifyMarkAll();" data-toggle="tooltip" title="{{$nav.notifications.mark.3}}">{{$nav.notifications.mark.1}}</button>
 									</div>
 
 								</li>
@@ -119,7 +119,7 @@
 					{{* The user dropdown menu *}}
 					{{if $nav.userinfo}}
 					<li role="menu" id="nav-user-linkmenu" class="dropdown account nav-menu hidden-xs">
-						<a href="#" id="main-menu" class="dropdown-toggle nav-avatar " data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+						<button id="main-menu" class="btn-link dropdown-toggle nav-avatar" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
 							<div class="user-title pull-left hidden-xs hidden-sm hidden-md">
 								<strong>{{$nav.userinfo.name}}</strong><br>
 								{{if $nav.remote}}<span class="trunctate">{{$nav.remote}}</span>{{/if}}
@@ -127,8 +127,7 @@
 
 							<img  id="avatar" src="{{$nav.userinfo.icon}}" alt="{{$nav.userinfo.name}}">
 							<span class="caret"></span>
-
-						</a>
+						</button>
 
 						{{* The list of available usermenu links *}}
 						<ul id="nav-user-menu" class="dropdown-menu pull-right menu-popup" role="group" aria-labelledby="main-menu">
@@ -141,7 +140,7 @@
 							{{/foreach}}
 							<li role="separator" class="divider"></li>
 							{{if $nav.notifications}}
-							<li role="menuitem"><a href="{{$nav.notifications.0}}" title="{{$nav.notifications.1}}"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a></li>
+							<li role="menuitem"><a href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a></li>
 							{{/if}}
 							{{if $nav.messages}}
 							<li role="menuitem"><a class="nav-commlink {{$nav.messages.2}} {{$sel.messages}}" href="{{$nav.messages.0}}" title="{{$nav.messages.3}}" ><i class="fa fa-envelope fa-fw"></i> {{$nav.messages.1}} <span id="mail-update-li" class="nav-mail-badge badge nav-notify"></span></a></li>
@@ -160,7 +159,7 @@
 							<li role="separator" class="divider"></li>
 							{{/if}}
 							{{if $nav.help}}
-							<li role="menuitem"><a id="nav-help-link" class="nav-link {{$nav.help.2}}" target="friendica-help" href="{{$nav.help.0}}" title="{{$nav.help.3}}" ><i class="fa fa-question-circle fa-fw"></i> {{$nav.help.3}}</a></li>
+							<li role="menuitem"><a id="nav-help-link" class="nav-link {{$nav.help.2}}" href="{{$nav.help.0}}" title="{{$nav.help.3}}" ><i class="fa fa-question-circle fa-fw"></i> {{$nav.help.1}}</a></li>
 							{{/if}}
 							{{if $nav.settings}}
 							<li role="menuitem"><a id="nav-settings-link" class="nav-link {{$nav.settings.2}}" href="{{$nav.settings.0}}" title="{{$nav.settings.3}}"><i class="fa fa-cog fa-fw"></i> {{$nav.settings.1}}</a></li>
@@ -196,7 +195,7 @@
 						<a role="menuitem" class="{{$usermenu.2}} list-group-item" href="{{$usermenu.0}}" title="{{$usermenu.3}}">{{$usermenu.1}}</a>
 						{{/foreach}}
 						{{if $nav.notifications}}
-						<a role="menuitem" href="{{$nav.notifications.0}}" title="{{$nav.notifications.1}}" class="list-group-item"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a>
+						<a role="menuitem" href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}" class="list-group-item"><i class="fa fa-exclamation-circle fa-fw"></i> {{$nav.notifications.1}}</a>
 						{{/if}}
 						{{if $nav.contacts}}
 						<a role="menuitem" class="nav-link {{$nav.contacts.2}} list-group-item" href="{{$nav.contacts.0}}" title="{{$nav.contacts.3}}"><i class="fa fa-users fa-fw"></i> {{$nav.contacts.1}}</a>
@@ -275,14 +274,14 @@
 
 {{*The second part of the notifications dropdown menu. It handles the notifications *}}
 {{if $nav.notifications}}
-<ul id="nav-notifications-template" class="media-list" style="display:none;" rel="template"> <!-- needs further investigation. I thought the notifications have their own templates -->
-	<li class="{4} notif-entry" onclick="location.href='{0}';">
+<ul id="nav-notifications-template" class="media-list" style="display:none;" rel="template">
+	<li class="{4} notif-entry">
 		<div class="notif-entry-wrapper media">
-			<div class="notif-photo-wrapper media-object pull-left"><a href="{6}"><img data-src="{1}"></a></div>
-			<div class="notif-desc-wrapper media-body">
-				{8}{7}
+			<div class="notif-photo-wrapper media-object pull-left"><a href="{6}" class="userinfo"><img data-src="{1}"></a></div>
+			<a href="{0}" class="notif-desc-wrapper media-body">
+				{2}
 				<div><time class="notif-when time" data-toggle="tooltip" title="{5}">{3}</time></div>
-			</div>
+			</a>
 		</div>
 	</li>
 </ul>

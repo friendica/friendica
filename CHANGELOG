@@ -1,4 +1,71 @@
-Version 3.5
+Version 3.5.1 (2017-03-12)
+  Friendica Core:
+    Updates to the translations (BG, CA, CS, DE, EO, ES, FR, IS, IT, NL, PL, PT-BR, RU, SV) [translation teams]
+    Fix for a potential XSS vector [heluecht, thanks to Vít Šesták 'v6ak' for reporting the problem]
+    Fix for ghost request notifications on single user instances [Hypolite]
+    Fix user language selection [tobiasd]
+    Fix a problem with communication to Diaspora with set posting locations [heluecht]
+    Fix schema handling of direct links to a original posting [Rabuzarus]
+    Fix a bug in notification handling [Rabuzarus]
+    Adjustments for the Vagrant VM settings [silke, eelcomaljaars]
+    Improvements to the unliking of prior likes [Hypolite]
+    Improvements to the API and Friendica specific extensions [gerhard6380]
+    Improvements to the Browser Notification functionality [Hypolite]
+    Improvements to the themes [Hypolite, rabuzarus, rebeka-catalina, tobiasd]
+    Improvements to the database handling [heluecht]
+    Improvements to the admin panel [tobiasd, Hypolite]
+    Improvements to the update process [heluecht]
+    Improvements to the handling of worker processes [heluecht]
+    Improvements to the performance [heluecht, Hypolite]
+    Improvements to the documentation [Hypolite, tobiasd, rabuzarus, beardyunixer, eelcomaljaars]
+    Improvements to the BBCode / Markdown conversation [Hypolite]
+    Improvements to the OStatus protocol implementation [heluecht]
+    Improvements to the installation wizzard [tobiasd]
+    Improvements to the Diaspora connectivity [heluecht, Hypolite]
+    Work on PHP7 compatibility [ddorian1]
+    Code cleanup [Hypolite, Quix0r]
+    Initial federation with Mastodon [heluecht]
+    The worker process can now also be started from the frontend [heluecht]
+    Deletion of postings is now done in the background [heluecht]
+    Extension of the DFRN transmitted information fields [heluecht]
+    Translations of the core are now in /view/lang [Hypolite, tobiasd]
+    Update of the fullCalendar library to 3.0.1 and adjusting the themes [rabuzarus]
+    ping now works with JSON as well [Hypolite]
+    On pending registrations, an email is now send to inform the user about it [tobiasd]
+    On systems where the registration needs approval, a note for the admin can now be written [tobiasd]
+    Meta Information for HTML descriptions is now limited to 160 character [rabuzarus]
+    Removed very old deprecated themes from the repository [silke]
+    Marked frost and frost mobile as deprecated [silke]
+    When creating new postings in the UI, focus is automatically put into the Title field [Hypolite]
+    We are now shipping config files for "tx" (the Transifex client) and the "EditorConfig" addon for many common editors [fabrixxm, tobiasd]
+    The TinyMCE richtext editor was removed [Hypolite]
+    We defined a coding style, PSR-2 with some adjustments
+    Various bugfixes
+
+  Friendica Addons:
+    Updates to the translations (DE, ES, FR, IT, PT-BR) [translation teams]
+    Improvements to the IFTTT addon [Hypolite]
+    Improvements to the language filter addon [strk]
+    Improvements to the pump.io bridge [heluecht]
+    Improvements to the jappixmini addon [heluecht]
+    Improvements to the gpluspost addon [heluecht]
+    Improvements to the performance of the Twitter bridge when using workers [heluecht]
+    Diaspora Export addon is now working again [heluecht]
+    Pledgie badge now uses https protocol for embedding [tobiasd]
+    Better posting loop prevention for the Google+/Twitter/GS connectors [heluecht]
+    One can now configure the message for wppost bridged blog postings [tobiasd]
+    On some pages the result of the Rendertime is not shown anymore [heluecht]
+    Twitter-bridge now supports quotes and long posts when importing tweets [heluecht]
+
+  Closed Issues
+    1019, 1163, 1612, 1613, 2103, 2177, 2252, 2260, 2403, 2991, 2614, 
+    2751, 2752, 2772, 2791, 2800, 2804, 2813, 2814, 2816, 2817, 2823, 
+    2850, 2858, 2865, 2892, 2894, 2895, 2907, 2908, 2914, 2015, 2926,
+    2948, 2955, 2958, 2963, 2964, 2968, 2987, 2993, 3020, 3052, 3062,
+    3066, 3091, 3108, 3113, 3116, 3117, 3118, 3126, 3130, 3135, 3155,
+    3160, 3163, 3187, 3196
+
+Version 3.5 (2016-09-13)
   Friendica Core:
     NEW Optional local directory with possible federated contacts [heluecht]
     NEW Autocompletion for @-mentions and BBCode tags [rabuzarus]
@@ -58,7 +125,7 @@ Version 3.5
     2506, 2512, 2516, 2539, 2540, 2893, 2597, 2611, 2617, 2629, 2645,
     2687, 2716, 2757, 2764
 
-Version 3.4.3
+Version 3.4.3 (2015-12-22)
   What's new for the users:
 	Updates to the documentation (silke, tobiasd, annando, rebeka-catalina)
 	Updated translations (tobiasd & translation teams)
@@ -137,7 +204,7 @@ Version 3.4.3
 	Fix bbcode conversion of the about text for the profile (issue #1607) (annando)
 	
 
-Version 3.4.2
+Version 3.4.2 (2015-09-29)
 
 	Updates to the documentation (tobiasd, silke, annando)
 	Updates to the translations (tobiasd & translation teams)
@@ -182,7 +249,7 @@ Version 3.4.2
 	Parse BBCode in contact request notification email (annando)
 	
 	
-Version 3.4.1
+Version 3.4.1 (2015-07-06)
 
 	Implement server-to-server encryption (RINO) using php-encryption library as "RINO 2", deprecate "RINO 1" (issue #1655) (fabrixxm)
 	Fix connection with Diaspora "freelove" account (issue #1572) (annando)
@@ -234,7 +301,7 @@ Version 3.4.1
 	Update to German documentation (Frank Dieckmann, tobias)
 	Updated translations (translation teams, tobias)
 
-Version 3.4
+Version 3.4 (2015-04-05)
 
 	Optionally, "like" and "dislike" activities don't update thread timestamp (annando)
 	Updated markdown libraries (annando)
@@ -262,7 +329,7 @@ Version 3.4
 	Add help text to explain the options for approving contacts (issue #1349) (silke)
 	API set as unseen only posts returned by the call (issue #1063) (annando)
 
-Version 3.3.3
+Version 3.3.3 (2015-02-24)
 
 	More separation between php and html in photo album (issue #1258) (rabuzarus)
 	Enhanced community page shows public posts from public contacts of public profiles (annando)
@@ -296,7 +363,7 @@ Version 3.3.3
 	Fix email validation (ddorian1)
 	Better documentation for developers (silke)
 
-Version 3.3.2
+Version 3.3.2 (2014-12-26)
 
 	Set default value for all not-null fields (fixes SQL warinigs) (annando)
 	Fix item filters in network page (issue #1222) (fabrixxm)
@@ -308,7 +375,7 @@ Version 3.3.2
 	Better display of pictures in posts (annando)
 	Fix out of control gprobe process (annando)
 
-Version 3.3.1
+Version 3.3.1 (2014-11-06)
 
 	JSONP support for API (fabrixxm)
 	Fixed small bug in direct messages API (fabrixxm)
@@ -326,7 +393,7 @@ Version 3.3.1
 	Translation updates
 	Added CHANGELOG
 
-Version 3.3
+Version 3.3 (2014-10-06)
 
 	API
 	added support in the API to allow image uploads from Twidere

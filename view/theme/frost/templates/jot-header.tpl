@@ -1,7 +1,6 @@
 
 
 <script>
-	window.editSelect = "{{$editselect}}";
 	window.isPublic = "{{$ispublic}}";
 	window.nickname = "{{$nickname}}";
 	window.linkURL = "{{$linkurl}}";

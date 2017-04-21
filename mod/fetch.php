@@ -6,7 +6,7 @@ require_once("include/crypto.php");
 require_once("include/diaspora.php");
 require_once("include/xml.php");
 
-function fetch_init($a){
+function fetch_init(App $a) {
 
 	if (($a->argc != 3) OR (!in_array($a->argv[1], array("post", "status_message", "reshare")))) {
 		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
@@ -42,7 +42,7 @@ function fetch_init($a){
 
 	// Fetch some data from the author (We could combine both queries - but I think this is more readable)
 	$r = q("SELECT `user`.`prvkey`, `contact`.`addr`, `user`.`nickname`, `contact`.`nick` FROM `user`
-		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid`
+		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`
 		WHERE `user`.`uid` = %d", intval($item[0]["uid"]));
 	if (!$r) {
 		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
@@ -50,12 +50,12 @@ function fetch_init($a){
 	}
 	$user = $r[0];
 
-	$status = diaspora::build_status($item[0], $user);
-	$xml = diaspora::build_post_xml($status["type"], $status["message"]);
+	$status = Diaspora::build_status($item[0], $user);
+	$xml = Diaspora::build_post_xml($status["type"], $status["message"]);
 
 	// Send the envelope
 	header("Content-Type: application/magic-envelope+xml; charset=utf-8");
-	echo diaspora::build_magic_envelope($xml, $user);
+	echo Diaspora::build_magic_envelope($xml, $user);
 
 	killme();
 }

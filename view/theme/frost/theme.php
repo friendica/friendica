@@ -9,23 +9,25 @@
  * Maintainer: Zach P <techcity@f.shmuz.in>
  */
 
-function frost_init(&$a) {
+function frost_init(App $a) {
 	$a->videowidth = 400;
 	$a->videoheight = 330;
 	$a->theme_thread_allow = false;
 	set_template_engine($a, 'smarty3');
 }
 
-function frost_content_loaded(&$a) {
+function frost_content_loaded(App $a) {
 
 	// I could do this in style.php, but by having the CSS in a file the browser will cache it,
 	// making pages load faster
 	if( $a->module === 'home' || $a->module === 'login' || $a->module === 'register' || $a->module === 'lostpass' ) {
-		//$a->page['htmlhead'] = str_replace('$stylesheet', $a->get_baseurl() . '/view/theme/frost/login-style.css', $a->page['htmlhead']);
-		$a->theme['stylesheet'] = $a->get_baseurl() . '/view/theme/frost/login-style.css';
+		//$a->page['htmlhead'] = str_replace('$stylesheet', App::get_baseurl() . '/view/theme/frost/login-style.css', $a->page['htmlhead']);
+		$a->theme['stylesheet'] = App::get_baseurl() . '/view/theme/frost/login-style.css';
 	}
-	if( $a->module === 'login' )
+
+	if ( $a->module === 'login' ) {
 		$a->page['end'] .= '<script type="text/javascript"> $(document).ready(function() { $("#id_" + window.loginName).focus();} );</script>';
+	}
 
 }
 
@@ -41,7 +43,7 @@ function frost_uninstall() {
 	logger("uninstalled theme frost");
 }
 
-function frost_item_photo_links(&$a, &$body_info) {
+function frost_item_photo_links(App $a, &$body_info) {
 	require_once('include/Photo.php');
 	$phototypes = Photo::supportedTypes();
 
@@ -66,7 +68,7 @@ function frost_item_photo_links(&$a, &$body_info) {
 			$body_info['html'] = str_replace($link, $newlink, $body_info['html']);
 
 		}
-		
+
 		$p = bb_find_open_close($body_info['html'], "<a", ">", $occurence);
 	}
 }

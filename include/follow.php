@@ -2,6 +2,10 @@
 require_once("include/Scrape.php");
 require_once("include/socgraph.php");
 require_once('include/group.php');
+require_once('include/salmon.php');
+require_once('include/ostatus.php');
+require_once("include/Photo.php");
+require_once('include/diaspora.php');
 
 function update_contact($id) {
 	/*
@@ -73,12 +77,12 @@ function new_contact($uid,$url,$interactive = false) {
 
 	$url = str_replace('/#!/','/',$url);
 
-	if(! allowed_url($url)) {
+	if (! allowed_url($url)) {
 		$result['message'] = t('Disallowed profile URL.');
 		return $result;
 	}
 
-	if(! $url) {
+	if (! $url) {
 		$result['message'] = t('Connect URL missing.');
 		return $result;
 	}
@@ -87,69 +91,62 @@ function new_contact($uid,$url,$interactive = false) {
 
 	call_hooks('follow', $arr);
 
-	if(x($arr['contact'],'name'))
+	if (x($arr['contact'],'name')) {
 		$ret = $arr['contact'];
-	else
+	}
+	else {
 		$ret = probe_url($url);
+	}
 
-	if($ret['network'] === NETWORK_DFRN) {
-		if($interactive) {
-			if(strlen($a->path))
-				$myaddr = bin2hex($a->get_baseurl() . '/profile/' . $a->user['nickname']);
-			else
+	if ($ret['network'] === NETWORK_DFRN) {
+		if ($interactive) {
+			if (strlen($a->path)) {
+				$myaddr = bin2hex(App::get_baseurl() . '/profile/' . $a->user['nickname']);
+			} else {
 				$myaddr = bin2hex($a->user['nickname'] . '@' . $a->get_hostname());
+			}
 
 			goaway($ret['request'] . "&addr=$myaddr");
 
 			// NOTREACHED
 		}
+	} elseif (get_config('system','dfrn_only')) {
+		$result['message'] = t('This site is not configured to allow communications with other networks.') . EOL;
+		$result['message'] != t('No compatible communication protocols or feeds were discovered.') . EOL;
+		return $result;
 	}
-	else {
-		if(get_config('system','dfrn_only')) {
-			$result['message'] = t('This site is not configured to allow communications with other networks.') . EOL;
-			$result['message'] != t('No compatible communication protocols or feeds were discovered.') . EOL;
-			return $result;
-		}
-	}
-
-
-
-
-
 
 	// This extra param just confuses things, remove it
-	if($ret['network'] === NETWORK_DIASPORA)
+	if ($ret['network'] === NETWORK_DIASPORA) {
 		$ret['url'] = str_replace('?absolute=true','',$ret['url']);
-
+	}
 
 	// do we have enough information?
 
-	if(! ((x($ret,'name')) && (x($ret,'poll')) && ((x($ret,'url')) || (x($ret,'addr'))))) {
+	if (! ((x($ret,'name')) && (x($ret,'poll')) && ((x($ret,'url')) || (x($ret,'addr'))))) {
 		$result['message'] .=  t('The profile address specified does not provide adequate information.') . EOL;
-		if(! x($ret,'poll'))
+		if (! x($ret,'poll')) {
 			$result['message'] .= t('No compatible communication protocols or feeds were discovered.') . EOL;
-		if(! x($ret,'name'))
+		}
+		if (! x($ret,'name')) {
 			$result['message'] .=  t('An author or name was not found.') . EOL;
-		if(! x($ret,'url'))
+		}
+		if (! x($ret,'url')) {
 			$result['message'] .=  t('No browser URL could be matched to this address.') . EOL;
-		if(strpos($url,'@') !== false) {
+		}
+		if (strpos($url,'@') !== false) {
 			$result['message'] .=  t('Unable to match @-style Identity Address with a known protocol or email contact.') . EOL;
 			$result['message'] .=  t('Use mailto: in front of address to force email check.') . EOL;
 		}
 		return $result;
 	}
 
-	if($ret['network'] === NETWORK_OSTATUS && get_config('system','ostatus_disabled')) {
+	if ($ret['network'] === NETWORK_OSTATUS && get_config('system','ostatus_disabled')) {
 		$result['message'] .= t('The profile address specified belongs to a network which has been disabled on this site.') . EOL;
 		$ret['notify'] = '';
 	}
 
-
-
-
-
-
-	if(! $ret['notify']) {
+	if (! $ret['notify']) {
 		$result['message'] .=  t('Limited profile. This person will be unable to receive direct/personal notifications from you.') . EOL;
 	}
 
@@ -159,8 +156,9 @@ function new_contact($uid,$url,$interactive = false) {
 
 	$hidden = (($ret['network'] === NETWORK_MAIL) ? 1 : 0);
 
-	if(in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA)))
+	if (in_array($ret['network'], array(NETWORK_MAIL, NETWORK_DIASPORA))) {
 		$writeable = 1;
+	}
 
 	// check if we already have a contact
 	// the poll url is more reliable than the profile url, as we may have
@@ -173,14 +171,14 @@ function new_contact($uid,$url,$interactive = false) {
 		dbesc($ret['network'])
 	);
 
-	if(!count($r))
+	if (!dbm::is_result($r))
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` = '%s' LIMIT 1",
 			intval($uid), dbesc(normalise_link($url)), dbesc($ret['network'])
 	);
 
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		// update contact
-		if($r[0]['rel'] == CONTACT_IS_FOLLOWER || ($network === NETWORK_DIASPORA && $r[0]['rel'] == CONTACT_IS_SHARING)) {
+		if ($r[0]['rel'] == CONTACT_IS_FOLLOWER || ($network === NETWORK_DIASPORA && $r[0]['rel'] == CONTACT_IS_SHARING)) {
 			q("UPDATE `contact` SET `rel` = %d , `subhub` = %d, `readonly` = 0 WHERE `id` = %d AND `uid` = %d",
 				intval(CONTACT_IS_FRIEND),
 				intval($subhub),
@@ -189,29 +187,28 @@ function new_contact($uid,$url,$interactive = false) {
 			);
 		}
 	} else {
-
-
 		// check service class limits
 
-		$r = q("select count(*) as total from contact where uid = %d and pending = 0 and self = 0",
+		$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE `uid` = %d AND `pending` = 0 AND `self` = 0",
 			intval($uid)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$total_contacts = $r[0]['total'];
 
-		if(! service_class_allows($uid,'total_contacts',$total_contacts)) {
+		if (! service_class_allows($uid,'total_contacts',$total_contacts)) {
 			$result['message'] .= upgrade_message();
 			return $result;
 		}
 
-		$r = q("select count(network) as total from contact where uid = %d and network = '%s' and pending = 0 and self = 0",
+		$r = q("SELECT COUNT(`network`) AS `total` FROM `contact` WHERE `uid` = %d AND `network` = '%s' AND `pending` = 0 AND `self` = 0",
 			intval($uid),
 			dbesc($network)
 		);
-		if(count($r))
+		if (dbm::is_result($r)) {
 			$total_network = $r[0]['total'];
+		}
 
-		if(! service_class_allows($uid,'total_contacts_' . $network,$total_network)) {
+		if (! service_class_allows($uid,'total_contacts_' . $network,$total_network)) {
 			$result['message'] .= upgrade_message();
 			return $result;
 		}
@@ -250,7 +247,7 @@ function new_contact($uid,$url,$interactive = false) {
 		intval($uid)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		$result['message'] .=  t('Unable to retrieve contact information.') . EOL;
 		return $result;
 	}
@@ -260,49 +257,34 @@ function new_contact($uid,$url,$interactive = false) {
 	$result['cid'] = $contact_id;
 
 	$def_gid = get_default_group($uid, $contact["network"]);
-	if (intval($def_gid))
+	if (intval($def_gid)) {
 		group_add_member($uid, '', $contact_id, $def_gid);
-
-	require_once("include/Photo.php");
+	}
 
 	// Update the avatar
 	update_contact_avatar($ret['photo'],$uid,$contact_id);
 
 	// pull feed and consume it, which should subscribe to the hub.
 
-	proc_run(PRIORITY_MEDIUM, "include/onepoll.php", $contact_id, "force");
-
-	// create a follow slap
-
-	$tpl = get_markup_template('follow_slap.tpl');
-	$slap = replace_macros($tpl, array(
-		'$name' => $a->user['username'],
-		'$profile_page' => $a->get_baseurl() . '/profile/' . $a->user['nickname'],
-		'$photo' => $a->contact['photo'],
-		'$thumb' => $a->contact['thumb'],
-		'$published' => datetime_convert('UTC','UTC', 'now', ATOM_TIME),
-		'$item_id' => 'urn:X-dfrn:' . $a->get_hostname() . ':follow:' . get_guid(32),
-		'$title' => '',
-		'$type' => 'text',
-		'$content' => t('following'),
-		'$nick' => $a->user['nickname'],
-		'$verb' => ACTIVITY_FOLLOW,
-		'$ostat_follow' => ''
-	));
+	proc_run(PRIORITY_HIGH, "include/onepoll.php", $contact_id, "force");
 
 	$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
-			WHERE `user`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
+			WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 			intval($uid)
 	);
 
-	if(count($r)) {
-		if(($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
-			require_once('include/salmon.php');
-			slapper($r[0],$contact['notify'],$slap);
+	if (dbm::is_result($r)) {
+		if (($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
+			// create a follow slap
+			$item = array();
+			$item['verb'] = ACTIVITY_FOLLOW;
+			$item['follow'] = $contact["url"];
+			$slap = ostatus::salmon($item, $r[0]);
+			slapper($r[0], $contact['notify'], $slap);
 		}
-		if($contact['network'] == NETWORK_DIASPORA) {
-			require_once('include/diaspora.php');
-			$ret = diaspora::send_share($a->user,$contact);
+
+		if ($contact['network'] == NETWORK_DIASPORA) {
+			$ret = Diaspora::send_share($a->user,$contact);
 			logger('share returns: '.$ret);
 		}
 	}

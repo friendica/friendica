@@ -2,9 +2,9 @@
 
 require_once("include/Photo.php");
 
-function profile_photo_init(&$a) {
+function profile_photo_init(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		return;
 	}
 
@@ -13,9 +13,9 @@ function profile_photo_init(&$a) {
 }
 
 
-function profile_photo_post(&$a) {
+function profile_photo_post(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice ( t('Permission denied.') . EOL );
 		return;
 	}
@@ -32,7 +32,7 @@ function profile_photo_post(&$a) {
 				intval($_REQUEST['profile']),
 				intval(local_user())
 			);
-			if(count($r) && (! intval($r[0]['is-default'])))
+			if (dbm::is_result($r) && (! intval($r[0]['is-default'])))
 				$is_default_profile = 0;
 		}
 
@@ -63,7 +63,7 @@ function profile_photo_post(&$a) {
 			dbesc(local_user()),
 			intval($scale));
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 
 			$base_image = $r[0];
 
@@ -73,22 +73,25 @@ function profile_photo_post(&$a) {
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 4, $is_default_profile);
 
-				if($r === false)
+				if ($r === false) {
 					notice ( sprintf(t('Image size reduction [%s] failed.'),"175") . EOL );
+				}
 
 				$im->scaleImage(80);
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 5, $is_default_profile);
 
-				if($r === false)
+				if ($r === false) {
 					notice( sprintf(t('Image size reduction [%s] failed.'),"80") . EOL );
+				}
 
 				$im->scaleImage(48);
 
 				$r = $im->store(local_user(), 0, $base_image['resource-id'],$base_image['filename'], t('Profile Photos'), 6, $is_default_profile);
 
-				if($r === false)
+				if ($r === false) {
 					notice( sprintf(t('Image size reduction [%s] failed.'),"48") . EOL );
+				}
 
 				// If setting for the default profile, unset the profile photo flag from any other photos I own
 
@@ -99,15 +102,15 @@ function profile_photo_post(&$a) {
 					);
 
 					$r = q("UPDATE `contact` SET `photo` = '%s', `thumb` = '%s', `micro` = '%s'  WHERE `self` AND `uid` = %d",
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-6.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-6.' . $im->getExt()),
 						intval(local_user())
 					);
 				} else {
 					$r = q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
-						dbesc($a->get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-4.' . $im->getExt()),
+						dbesc(App::get_baseurl() . '/photo/' . $base_image['resource-id'] . '-5.' . $im->getExt()),
 						intval($_REQUEST['profile']),
 						intval(local_user())
 					);
@@ -123,18 +126,19 @@ function profile_photo_post(&$a) {
 
 				info( t('Shift-reload the page or clear browser cache if the new photo does not display immediately.') . EOL);
 				// Update global directory in background
-				$url = $a->get_baseurl() . '/profile/' . $a->user['nickname'];
-				if($url && strlen(get_config('system','directory')))
+				$url = App::get_baseurl() . '/profile/' . $a->user['nickname'];
+				if ($url && strlen(get_config('system','directory'))) {
 					proc_run(PRIORITY_LOW, "include/directory.php", $url);
+				}
 
 				require_once('include/profile_update.php');
 				profile_change();
-			}
-			else
+			} else {
 				notice( t('Unable to process image') . EOL);
+			}
 		}
 
-		goaway($a->get_baseurl() . '/profiles');
+		goaway(App::get_baseurl() . '/profiles');
 		return; // NOTREACHED
 	}
 
@@ -142,11 +146,13 @@ function profile_photo_post(&$a) {
 	$filename = basename($_FILES['userfile']['name']);
 	$filesize = intval($_FILES['userfile']['size']);
 	$filetype = $_FILES['userfile']['type'];
-    if ($filetype=="") $filetype=guess_image_type($filename);
-    
+	if ($filetype == "") {
+		$filetype = guess_image_type($filename);
+	}
+
 	$maximagesize = get_config('system','maximagesize');
 
-	if(($maximagesize) && ($filesize > $maximagesize)) {
+	if (($maximagesize) && ($filesize > $maximagesize)) {
 		notice( sprintf(t('Image exceeds size limit of %s'), formatBytes($maximagesize)) . EOL);
 		@unlink($src);
 		return;
@@ -155,7 +161,7 @@ function profile_photo_post(&$a) {
 	$imagedata = @file_get_contents($src);
 	$ph = new Photo($imagedata, $filetype);
 
-	if(! $ph->is_valid()) {
+	if (! $ph->is_valid()) {
 		notice( t('Unable to process image.') . EOL );
 		@unlink($src);
 		return;
@@ -164,18 +170,17 @@ function profile_photo_post(&$a) {
 	$ph->orient($src);
 	@unlink($src);
 	return profile_photo_crop_ui_head($a, $ph);
-	
 }
 
 
 if(! function_exists('profile_photo_content')) {
-function profile_photo_content(&$a) {
+function profile_photo_content(App $a) {
 
-	if(! local_user()) {
+	if (! local_user()) {
 		notice( t('Permission denied.') . EOL );
 		return;
 	}
-	
+
 	$newuser = false;
 
 	if($a->argc == 2 && $a->argv[1] === 'new')
@@ -186,21 +191,21 @@ function profile_photo_content(&$a) {
 			notice( t('Permission denied.') . EOL );
 			return;
 		};
-		
+
 //		check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
-        
+
 		$resource_id = $a->argv[2];
 		//die(":".local_user());
 		$r=q("SELECT * FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' ORDER BY `scale` ASC",
 			intval(local_user()),
 			dbesc($resource_id)
 			);
-		if (!count($r)){
+		if (!dbm::is_result($r)){
 			notice( t('Permission denied.') . EOL );
 			return;
 		}
 		$havescale = false;
-		foreach($r as $rr) {
+		foreach ($r as $rr) {
 			if($rr['scale'] == 5)
 				$havescale = true;
 		}
@@ -223,10 +228,11 @@ function profile_photo_content(&$a) {
 
 			// Update global directory in background
 			$url = $_SESSION['my_url'];
-			if($url && strlen(get_config('system','directory')))
+			if ($url && strlen(get_config('system','directory'))) {
 				proc_run(PRIORITY_LOW, "include/directory.php", $url);
+			}
 
-			goaway($a->get_baseurl() . '/profiles');
+			goaway(App::get_baseurl() . '/profiles');
 			return; // NOTREACHED
 		}
 		$ph = new Photo($r[0]['data'], $r[0]['type']);
@@ -240,7 +246,7 @@ function profile_photo_content(&$a) {
 
 
 	if(! x($a->config,'imagecrop')) {
-	
+
 		$tpl = get_markup_template('profile_photo.tpl');
 
 		$o .= replace_macros($tpl,array(
@@ -251,7 +257,7 @@ function profile_photo_content(&$a) {
 			'$submit' => t('Upload'),
 			'$profiles' => $profiles,
 			'$form_security_token' => get_form_security_token("profile_photo"),
-			'$select' => sprintf('%s %s', t('or'), ($newuser) ? '<a href="' . $a->get_baseurl() . '">' . t('skip this step') . '</a>' : '<a href="'. $a->get_baseurl() . '/photos/' . $a->user['nickname'] . '">' . t('select a photo from your photo albums') . '</a>')
+			'$select' => sprintf('%s %s', t('or'), ($newuser) ? '<a href="' . App::get_baseurl() . '">' . t('skip this step') . '</a>' : '<a href="'. App::get_baseurl() . '/photos/' . $a->user['nickname'] . '">' . t('select a photo from your photo albums') . '</a>')
 		));
 
 		return $o;
@@ -264,7 +270,7 @@ function profile_photo_content(&$a) {
 			'$filename' => $filename,
 			'$profile' => intval($_REQUEST['profile']),
 			'$resource' => $a->config['imagecrop'] . '-' . $a->config['imagecrop_resolution'],
-			'$image_url' => $a->get_baseurl() . '/photo/' . $filename,
+			'$image_url' => App::get_baseurl() . '/photo/' . $filename,
 			'$title' => t('Crop Image'),
 			'$desc' => t('Please adjust the image cropping for optimum viewing.'),
 			'$form_security_token' => get_form_security_token("profile_photo"),
@@ -278,42 +284,46 @@ function profile_photo_content(&$a) {
 
 
 if(! function_exists('profile_photo_crop_ui_head')) {
-function profile_photo_crop_ui_head(&$a, $ph){
+function profile_photo_crop_ui_head(App $a, $ph) {
 	$max_length = get_config('system','max_image_length');
-	if(! $max_length)
+	if (! $max_length) {
 		$max_length = MAX_IMAGE_LENGTH;
-	if($max_length > 0)
+	}
+	if ($max_length > 0) {
 		$ph->scaleImage($max_length);
+	}
 
 	$width = $ph->getWidth();
 	$height = $ph->getHeight();
 
-	if($width < 175 || $height < 175) {
+	if ($width < 175 || $height < 175) {
 		$ph->scaleImageUp(200);
 		$width = $ph->getWidth();
 		$height = $ph->getHeight();
 	}
 
 	$hash = photo_new_resource();
-	
+
 
 	$smallest = 0;
 
-	$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 0 );	
+	$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 0 );
 
-	if($r)
+	if ($r) {
 		info( t('Image uploaded successfully.') . EOL );
-	else
+	} else {
 		notice( t('Image upload failed.') . EOL );
+	}
 
-	if($width > 640 || $height > 640) {
+	if ($width > 640 || $height > 640) {
 		$ph->scaleImage(640);
-		$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 1 );	
-		
-		if($r === false)
+		$r = $ph->store(local_user(), 0 , $hash, $filename, t('Profile Photos'), 1 );
+
+		if ($r === false) {
 			notice( sprintf(t('Image size reduction [%s] failed.'),"640") . EOL );
-		else
+		} else {
 			$smallest = 1;
+		}
 	}
 
 	$a->config['imagecrop'] = $hash;

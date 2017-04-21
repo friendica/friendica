@@ -1,5 +1,8 @@
 Friendica API
 ===
+
+* [Home](help)
+
 The Friendica API aims to be compatible to the [GNU Social API](http://wiki.gnusocial.de/gnusocial:api) and the [Twitter API](https://dev.twitter.com/rest/public).
 
 Please refer to the linked documentation for further information.
@@ -743,6 +746,38 @@ On success:
 
 On error:
 * different JSON returns {"result":"error","message":"searchstring not specified"}
+
+---
+### friendica/profile/show (GET; AUTH)
+show data of all profiles or a single profile of the authenticated user
+
+#### Parameters
+* profile_id: id of the profile to be returned (optional, if omitted all profiles are returned by default)
+
+#### Return values
+On success: Array of:
+
+* multi_profiles: true if user has activated multi_profiles
+* global_dir: URL of the global directory set in server settings
+* friendica_owner: user data of the authenticated user
+* profiles: array of the profile data
+
+On error: 
+HTTP 403 Forbidden: when no authentication provided
+HTTP 400 Bad Request: if given profile_id is not in db or not assigned to authenticated user
+
+General description of profile data in API returns:
+* profile_id
+* profile_name
+* is_default: true if this is the public profile
+* hide_friends: true if friends are hidden
+* profile_photo
+* profile_thumb
+* publish: true if published on the server's local directory
+* net_publish: true if published to global_dir
+* description ... homepage: different data fields from 'profile' table in database
+* users: array with the users allowed to view this profile (empty if is_default=true)
+
 
 ---
 ## Not Implemented API calls

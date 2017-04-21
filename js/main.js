@@ -5,36 +5,44 @@
 
 	function _resizeIframe(obj, desth) {
 		var h = obj.style.height;
-		var ch = obj.contentWindow.document.body.scrollHeight + 'px';
-		if (h==ch) {
+		var ch = obj.contentWindow.document.body.scrollHeight;
+		if (h == (ch + 'px')) {
 			return;
 		}
-		//console.log("_resizeIframe", obj, desth, ch);
-		if (desth!=ch) {
-			setTimeout(_resizeIframe, 500, obj, ch);
-		} else {
-			if (ch>0) obj.style.height  = ch;
-			setTimeout(_resizeIframe, 1000, obj, ch);
+		if (desth == ch && ch>0) {
+			obj.style.height  = ch + 'px';
+		}
+		setTimeout(_resizeIframe, 100, obj, ch);
+	}
+
+	function openClose(theID) {
+		if(document.getElementById(theID).style.display == "block") {
+			document.getElementById(theID).style.display = "none"
+		}
+		else {
+			document.getElementById(theID).style.display = "block"
 		}
 	}
 
-  function openClose(theID) {
-    if(document.getElementById(theID).style.display == "block") {
-      document.getElementById(theID).style.display = "none"
-    }
-    else {
-      document.getElementById(theID).style.display = "block"
-    }
-  }
+	function openMenu(theID) {
+		var el = document.getElementById(theID)
+		if (el) {
+			el.style.display = "block";
+		}
+	}
 
-  function openMenu(theID) {
-      document.getElementById(theID).style.display = "block"
-  }
+	function closeMenu(theID) {
+		var el = document.getElementById(theID)
+		if (el) {
+			el.style.display = "none";
+		}
+	}
 
-  function closeMenu(theID) {
-      document.getElementById(theID).style.display = "none"
-  }
-
+	function decodeHtml(html) {
+		var txt = document.createElement("textarea");
+		txt.innerHTML = html;
+		return txt.value;
+	}
 
 
 	var src = null;
@@ -70,32 +78,30 @@
 		/* setup comment textarea buttons */
 		/* comment textarea buttons needs some "data-*" attributes to work:
 		 * 		data-role="insert-formatting" : to mark the element as a formatting button
-		 * 		data-comment="<string>" : string for "Comment", used by insertFormatting() function
 		 * 		data-bbcode="<string>" : name of the bbcode element to insert. insertFormatting() will insert it as "[name][/name]"
 		 * 		data-id="<string>" : id of the comment, used to find other comment-related element, like the textarea
 		 * */
 		$('body').on('click','[data-role="insert-formatting"]', function(e) {
 			e.preventDefault();
 			var o = $(this);
-			var comment = o.data('comment');
 			var bbcode  = o.data('bbcode');
 			var id = o.data('id');
 			if (bbcode=="img") {
 				Dialog.doImageBrowser("comment", id);
 				return;
 			}
-			insertFormatting(comment, bbcode, id);
+			insertFormatting(bbcode, id);
 		});
 
 		/* event from comment textarea button popups */
 		/* insert returned bbcode at cursor position or replace selected text */
 		$("body").on("fbrowser.image.comment", function(e, filename, bbcode, id) {
-			console.log("on", id);
 			$.colorbox.close();
 			var textarea = document.getElementById("comment-edit-text-" +id);
 			var start = textarea.selectionStart;
 			var end = textarea.selectionEnd;
 			textarea.value = textarea.value.substring(0, start) + bbcode + textarea.value.substring(end, textarea.value.length);
+			$(textarea).trigger('change');
 		});
 
 
@@ -115,16 +121,13 @@
 			$("#"+id+"_onoff ."+ (val==0?"on":"off")).addClass("hidden");
 			$("#"+id+"_onoff ."+ (val==1?"on":"off")).removeClass("hidden");
 			input.val(val);
-			//console.log(id);
 		});
-
-		/* setup field_richtext */
-		setupFieldRichtext();
 
 		/* popup menus */
 		function close_last_popup_menu() {
 			if(last_popup_menu) {
 				last_popup_menu.hide();
+				last_popup_menu.off('click', function(e) {e.stopPropagation()});
 				last_popup_button.removeClass("selected");
 				last_popup_menu = null;
 				last_popup_button = null;
@@ -147,6 +150,7 @@
 				last_popup_button = null;
 			} else {
 				last_popup_menu = menu;
+				last_popup_menu.on('click', function(e) {e.stopPropagation()});
 				last_popup_button = parent;
 				$('#nav-notifications-menu').perfectScrollbar('update');
 			}
@@ -159,10 +163,12 @@
 		// fancyboxes
 		$("a.popupbox").colorbox({
 			'inline' : true,
-			'transition' : 'elastic'
+			'transition' : 'elastic',
+			'maxWidth' : '100%'
 		});
 		$("a.ajax-popupbox").colorbox({
-			'transition' : 'elastic'
+			'transition' : 'elastic',
+			'maxWidth' : '100%'
 		});
 
 		/* notifications template */
@@ -175,110 +181,82 @@
 		$('#nav-notifications-menu, aside').perfectScrollbar();
 
 		/* nav update event  */
-		$('nav').bind('nav-update', function(e,data){
-			var invalid = $(data).find('invalid').text();
+		$('nav').bind('nav-update', function(e, data){
+			var invalid = data.invalid || 0;
 			if(invalid == 1) { window.location.href=window.location.href }
 
-			var net = $(data).find('net').text();
-			if(net == 0) { net = ''; $('#net-update').removeClass('show') } else { $('#net-update').addClass('show') }
-			$('#net-update').html(net);
+			['net', 'home', 'intro', 'mail', 'events', 'birthdays', 'notify'].forEach(function(type) {
+				var number = data[type];
+				if (number == 0) {
+					number = '';
+					$('#' + type + '-update').removeClass('show');
+				} else {
+					$('#' + type + '-update').addClass('show');
+				}
+				$('#' + type + '-update').text(number);
+			});
 
-			var home = $(data).find('home').text();
-			if(home == 0) { home = '';  $('#home-update').removeClass('show') } else { $('#home-update').addClass('show') }
-			$('#home-update').html(home);
-
-			var intro = $(data).find('intro').text();
-			if(intro == 0) { intro = '';  $('#intro-update').removeClass('show') } else { $('#intro-update').addClass('show') }
-			$('#intro-update').html(intro);
-
-			var mail = $(data).find('mail').text();
-			if(mail == 0) { mail = '';  $('#mail-update').removeClass('show') } else { $('#mail-update').addClass('show') }
-			$('#mail-update').html(mail);
-
-			var intro = $(data).find('intro').text();
-			if(intro == 0) { intro = '';  $('#intro-update-li').removeClass('show') } else { $('#intro-update-li').addClass('show') }
+			var intro = data['intro'];
+			if(intro == 0) { intro = ''; $('#intro-update-li').removeClass('show') } else { $('#intro-update-li').addClass('show') }
 			$('#intro-update-li').html(intro);
 
-			var mail = $(data).find('mail').text();
-			if(mail == 0) { mail = '';  $('#mail-update-li').removeClass('show') } else { $('#mail-update-li').addClass('show') }
+			var mail = data['mail'];
+			if(mail == 0) { mail = ''; $('#mail-update-li').removeClass('show') } else { $('#mail-update-li').addClass('show') }
 			$('#mail-update-li').html(mail);
 
-
-			var allevents = $(data).find('all-events').text();
-			if(allevents == 0) { allevents = ''; $('#allevents-update').removeClass('show') } else { $('#allevents-update').addClass('show') }
-			$('#allevents-update').html(allevents);
-
-			var alleventstoday = $(data).find('all-events-today').text();
-			if(alleventstoday == 0) { $('#allevents-update').removeClass('notif-allevents-today') } else { $('#allevents-update').addClass('notif-allevents-today') }
-
-			var events = $(data).find('events').text();
-			if(events == 0) { events = ''; $('#events-update').removeClass('show') } else { $('#events-update').addClass('show') }
-			$('#events-update').html(events);
-
-			var eventstoday = $(data).find('events-today').text();
-			if(eventstoday == 0) { $('#events-update').removeClass('notif-events-today') } else { $('#events-update').addClass('notif-events-today') }
-
-			var birthdays = $(data).find('birthdays').text();
-			if(birthdays == 0) {birthdays = ''; $('#birthdays-update').removeClass('show') } else { $('#birthdays-update').addClass('show') }
-			$('#birthdays-update').html(birthdays);
-
-			var birthdaystoday = $(data).find('birthdays-today').text();
-			if(birthdaystoday == 0) { $('#birthdays-update').removeClass('notif-birthdays-today') } else { $('#birthdays-update').addClass('notif-birthdays-today') }
-
 			$(".sidebar-group-li .notify").removeClass("show");
-			$(data).find("group").each(function() {
-				var gid = this.id;
-				var gcount = this.innerHTML;
+			$(data.groups).each(function(key, group) {
+				var gid = group.id;
+				var gcount = group.count;
 				$(".group-"+gid+" .notify").addClass("show").text(gcount);
 			});
 
 			$(".forum-widget-entry .notify").removeClass("show");
-			$(data).find("forum").each(function() {
-				var fid = this.id;
-				var fcount = this.innerHTML;
+			$(data.forums).each(function(key, forum) {
+				var fid = forum.id;
+				var fcount = forum.count;
 				$(".forum-"+fid+" .notify").addClass("show").text(fcount);
 			});
 
-
-			var eNotif = $(data).find('notif')
-
-			if (eNotif.children("note").length==0){
+			if (data.notifications.length == 0) {
 				$("#nav-notifications-menu").html(notifications_empty);
 			} else {
-				nnm = $("#nav-notifications-menu");
+				var nnm = $("#nav-notifications-menu");
 				nnm.html(notifications_all + notifications_mark);
-				//nnm.attr('popup','true');
 
-				var notification_lastitem = parseInt(localStorage.getItem("notification-lastitem"));
+				var lastItemStorageKey = "notification-lastitem:" + localUser;
+				var notification_lastitem = parseInt(localStorage.getItem(lastItemStorageKey));
 				var notification_id = 0;
-				eNotif.children("note").each(function(){
-					e = $(this);
-					var text = e.text().format("<span class='contactname'>"+e.attr('name')+"</span>");
-					var contact = ("<a href="+e.attr('url')+"><span class='contactname'>"+e.attr('name')+"</span></a>");
-					var seenclass = (e.attr('seen')==1)?"notify-seen":"notify-unseen";
+
+				// Insert notifs into the notifications-menu
+				$(data.notifications).each(function(key, notif){
+					var text = notif.message.format('<span class="contactname">' + notif.name + '</span>');
+					var contact = ('<a href="' + notif.url + '"><span class="contactname">' + notif.name + '</span></a>');
+					var seenclass = (notif.seen == 1) ? "notify-seen" : "notify-unseen";
 					var html = notifications_tpl.format(
-						e.attr('href'),                     // {0}  // link to the source
-						e.attr('photo'),                    // {1}  // photo of the contact
-						text,                               // {2}  // preformatet text (autor + text)
-						e.attr('date'),                     // {3}  // date of notification (time ago)
-						seenclass,                          // {4}  // vistiting status of the notification
-						new Date(e.attr('timestamp')*1000), // {5}  //date of notification
-						e.attr('url'),                      // {6}  // profile url of the contact
-						e.text().format(""),                // {7}  // clean status text
-						contact                             // {8}  //preformatat author (name + profile url)
+						notif.href,                     // {0}  // link to the source
+						notif.photo,                    // {1}  // photo of the contact
+						text,                           // {2}  // preformatted text (autor + text)
+						notif.date,                     // {3}  // date of notification (time ago)
+						seenclass,                      // {4}  // visited status of the notification
+						new Date(notif.timestamp*1000), // {5}  // date of notification
+						notif.url,                      // {6}  // profile url of the contact
+						notif.message.format(contact),  // {7}  // preformatted html (text including author profile url)
+						''                              // {8}  // Deprecated
 					);
 					nnm.append(html);
 				});
-				$(eNotif.children("note").get().reverse()).each(function(){
-					e = $(this);
-					notification_id = parseInt(e.attr('timestamp'));
-					if (notification_lastitem!== null && notification_id > notification_lastitem) {
-						if (getNotificationPermission()==="granted") {
+
+				// Desktop Notifications
+				$(data.notifications.reverse()).each(function(key, e){
+					notification_id = parseInt(e.timestamp);
+					if (notification_lastitem !== null && notification_id > notification_lastitem && Number(e.seen) === 0) {
+						if (getNotificationPermission() === "granted") {
 							var notification = new Notification(document.title, {
-											  body: e.text().replace('&rarr; ','').format(e.attr('name')),
-											  icon: e.attr('photo'),
+											  body: decodeHtml(e.message.replace('&rarr; ', '').format(e.name)),
+											  icon: e.photo,
 											 });
-							notification['url'] = e.attr('href');
+							notification['url'] = e.href;
 							notification.addEventListener("click", function(ev){
 								window.location = ev.target.url;
 							});
@@ -287,7 +265,7 @@
 
 				});
 				notification_lastitem = notification_id;
-				localStorage.setItem("notification-lastitem", notification_lastitem)
+				localStorage.setItem(lastItemStorageKey, notification_lastitem)
 
 				$("img[data-src]", nnm).each(function(i, el){
 					// Add src attribute for images with a data-src attribute
@@ -299,26 +277,21 @@
 				});
 			}
 
-			notif = eNotif.attr('count');
-			if (notif>0){
+			var notif = data['notify'];
+			if (notif > 0){
 				$("#nav-notifications-linkmenu").addClass("on");
 			} else {
 				$("#nav-notifications-linkmenu").removeClass("on");
 			}
-			if(notif == 0) { notif = ''; $('#notify-update').removeClass('show') } else { $('#notify-update').addClass('show') }
-			$('#notify-update').html(notif);
 
-			var eSysmsg = $(data).find('sysmsgs');
-			eSysmsg.children("notice").each(function(){
-				text = $(this).text();
-				$.jGrowl(text, { sticky: true, theme: 'notice' });
+			$(data.sysmsgs.notice).each(function(key, message){
+				$.jGrowl(message, {sticky: true, theme: 'notice'});
 			});
-			eSysmsg.children("info").each(function(){
-				text = $(this).text();
-				$.jGrowl(text, { sticky: false, theme: 'info', life: 5000 });
+			$(data.sysmsgs.info).each(function(key, message){
+				$.jGrowl(message, {sticky: false, theme: 'info', life: 5000});
 			});
 
-			/* update the js scrollbars */
+			// Update the js scrollbars
 			$('#nav-notifications-menu').perfectScrollbar('update');
 
 		});
@@ -350,6 +323,30 @@
 			}
 		});
 
+		// Scroll to the next/previous thread when pressing J and K
+		$(document).keydown(function (event) {
+			var threads = $('.thread_level_1');
+			if ((event.keyCode === 74 || event.keyCode === 75) && !$(event.target).is('textarea, input')) {
+				var scrollTop = $(window).scrollTop();
+				if (event.keyCode === 75) {
+					threads = $(threads.get().reverse());
+				}
+				threads.each(function(key, item) {
+					var comparison;
+					var top = $(item).offset().top - 100;
+					if (event.keyCode === 74) {
+						comparison = top > scrollTop + 1;
+					} else if (event.keyCode === 75) {
+						comparison = top < scrollTop - 1;
+					}
+					if (comparison) {
+						$('html, body').animate({ scrollTop: top }, 200);
+						return false;
+					}
+				});
+			}
+		});
+
 		// Set an event listener for infinite scroll
 		if(typeof infinite_scroll !== 'undefined') {
 			$(window).scroll(function(e){
@@ -370,50 +367,38 @@
 
 	function NavUpdate() {
 
-		if(! stopped) {
-			var pingCmd = 'ping' + ((localUser != 0) ? '?f=&uid=' + localUser : '');
-			$.get(pingCmd,function(data) {
-				$(data).find('result').each(function() {
+		if (!stopped) {
+			var pingCmd = 'ping?format=json' + ((localUser != 0) ? '&f=&uid=' + localUser : '');
+			$.get(pingCmd, function(data) {
+				if (data.result) {
 					// send nav-update event
-					$('nav').trigger('nav-update', this);
-
+					$('nav').trigger('nav-update', data.result);
 
 					// start live update
-
-					if($('#live-network').length)   { src = 'network'; liveUpdate(); }
-					if($('#live-profile').length)   { src = 'profile'; liveUpdate(); }
-					if($('#live-community').length) { src = 'community'; liveUpdate(); }
-					if($('#live-notes').length)     { src = 'notes'; liveUpdate(); }
-					if($('#live-display').length)     { src = 'display'; liveUpdate(); }
-/*					if($('#live-display').length) {
-						if(liking) {
-							liking = 0;
-							window.location.href=window.location.href
+					['network', 'profile', 'community', 'notes', 'display'].forEach(function (src) {
+						if ($('#live-' + src).length) {
+							liveUpdate(src);
 						}
-					}*/
-					if($('#live-photos').length) {
-						if(liking) {
+					});
+					if ($('#live-photos').length) {
+						if (liking) {
 							liking = 0;
-							window.location.href=window.location.href
+							window.location.href = window.location.href;
 						}
 					}
-
-
-
-
-				});
+				}
 			}) ;
 		}
-		timer = setTimeout(NavUpdate,updateInterval);
+		timer = setTimeout(NavUpdate, updateInterval);
 	}
 
-	function liveUpdate() {
+	function liveUpdate(src) {
 		if((src == null) || (stopped) || (! profile_uid)) { $('.like-rotator').hide(); return; }
 		if(($('.comment-edit-text-full').length) || (in_progress)) {
 			if(livetime) {
 				clearTimeout(livetime);
 			}
-			livetime = setTimeout(liveUpdate, 5000);
+			livetime = setTimeout(function() {liveUpdate(src)}, 5000);
 			return;
 		}
 		if(livetime != null)
@@ -513,7 +498,7 @@
 			$(".comment-edit-form  textarea").editor_autocomplete(baseurl+"/acl");
 			/* autocomplete bbcode */
 			$(".comment-edit-form  textarea").bbco_autocomplete('bbcode');
-			
+
 			// setup videos, since VideoJS won't take care of any loaded via AJAX
 			if(typeof videojs != 'undefined') videojs.autoSetup();
 		});
@@ -701,7 +686,6 @@
 	function preview_post() {
 		$("#jot-preview").val("1");
 		$("#jot-preview-content").show();
-		tinyMCE.triggerSave();
 		$.post(
 			"item",
 			$("#profile-jot-form").serialize(),
@@ -735,8 +719,6 @@
 		// the page number to load is one higher than the actual
 		// page number
 		infinite_scroll.pageno+=1;
-
-		console.log('Loading page ' + infinite_scroll.pageno);
 
 		// get the raw content from the next page and insert this content
 		// right before "#conversation-end"
@@ -814,59 +796,6 @@ function notifyMarkAll() {
 		force_update = true;
 	});
 }
-
-
-// code from http://www.tinymce.com/wiki.php/How-to_implement_a_custom_file_browser
-function fcFileBrowser (field_name, url, type, win) {
-    /* TODO: If you work with sessions in PHP and your client doesn't accept cookies you might need to carry
-       the session name and session ID in the request string (can look like this: "?PHPSESSID=88p0n70s9dsknra96qhuk6etm5").
-       These lines of code extract the necessary parameters and add them back to the filebrowser URL again. */
-
-
-    var cmsURL = baseurl+"/fbrowser/"+type+"/";
-
-    tinyMCE.activeEditor.windowManager.open({
-        file : cmsURL,
-        title : 'File Browser',
-        width : 420,  // Your dimensions may differ - toy around with them!
-        height : 400,
-        resizable : "yes",
-        inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
-        close_previous : "no"
-    }, {
-        window : win,
-        input : field_name
-    });
-    return false;
-  }
-
-function setupFieldRichtext(){
-	tinyMCE.init({
-		theme : "advanced",
-		mode : "specific_textareas",
-		editor_selector: "fieldRichtext",
-		plugins : "bbcode,paste, inlinepopups",
-		theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code",
-		theme_advanced_buttons2 : "",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "center",
-		theme_advanced_blockformats : "blockquote,code",
-		theme_advanced_resizing : true,
-		paste_text_sticky : true,
-		entity_encoding : "raw",
-		add_unload_trigger : false,
-		remove_linebreaks : false,
-		//force_p_newlines : false,
-		//force_br_newlines : true,
-		forced_root_block : 'div',
-		convert_urls: false,
-		content_css: baseurl+"/view/custom_tinymce.css",
-		theme_advanced_path : false,
-		file_browser_callback : "fcFileBrowser",
-	});
-}
-
 
 /**
  * sprintf in javascript

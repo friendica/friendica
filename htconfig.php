@@ -16,7 +16,7 @@ $db_user = 'mysqlusername';
 $db_pass = 'mysqlpassword';
 $db_data = 'mysqldatabasename';
 
-// Set the database connection charset to UTF8.
+// Set the database connection charset to full Unicode (utf8mb4).
 // Changing this value will likely corrupt the special characters.
 // You have been warned.
 $a->config['system']['db_charset'] = "utf8mb4";
@@ -25,6 +25,10 @@ $a->config['system']['db_charset'] = "utf8mb4";
 // It can be changed later and only applies to timestamps for anonymous viewers.
 
 $default_timezone = 'America/Los_Angeles';
+
+// Default system language
+
+$a->config['system']['language'] = 'en';
 
 // What is your site name?
 
@@ -60,13 +64,19 @@ $a->config['php_path'] = 'php';
 
 $a->config['system']['huburl'] = '[internal]';
 
+// Server-to-server private message encryption (RINO) is allowed by default.
+// Encryption will only be provided if this setting is set to a non zero value
+// set to 0 to disable, 2 to enable, 1 is deprecated
+
+$a->config['system']['rino_encrypt'] = 2;
+
 // allowed themes (change this from admin panel after installation)
 
-$a->config['system']['allowed_themes'] = 'quattro,vier,duepuntozero';
+$a->config['system']['allowed_themes'] = 'quattro,vier,duepuntozero,smoothly';
 
 // default system theme
 
-$a->config['system']['theme'] = 'duepuntozero';
+$a->config['system']['theme'] = 'vier';
 
 
 // By default allow pseudonyms
@@ -77,4 +87,7 @@ $a->config['system']['no_regfullname'] = true;
 //$a->config['system']['block_local_dir'] = false;
 
 // Location of the global directory
-$a->config['system']['directory'] = 'http://dir.friendi.ca';
+$a->config['system']['directory'] = 'https://dir.friendica.social';
+
+// Allowed protocols in link URLs; HTTP protocols always are accepted
+$a->config['system']['allowed_link_protocols'] = array('ftp', 'ftps', 'mailto', 'cid', 'gopher');

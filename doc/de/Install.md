@@ -26,7 +26,6 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
         - PHP *Kommandozeilen*-Zugang mit register_argc_argv auf "true" gesetzt in der php.ini-Datei
         - curl, gd, mysql und openssl-Erweiterung
         - etwas in der Art eines Email-Servers oder eines Gateways wie PHP mail()
-        - mcrypt (optional; wird für die Server-zu-Server Nachrichtenentschlüsselung benötigt)
     - Mysql 5.x
     - die Möglichkeit, wiederkehrende Aufgaben mit cron (Linux/Mac) oder "Scheduled Tasks" einzustellen (Windows) [Beachte: andere Optionen sind in Abschnitt 7 dieser Dokumentation zu finden] 
     - Installation in einer Top-Level-Domain oder Subdomain (ohne eine Verzeichnis/Pfad-Komponente in der URL) wird bevorzugt. Verzeichnispfade sind für diesen Zweck nicht so günstig und wurden auch nicht ausführlich getestet.
@@ -37,7 +36,7 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
     1.1. APT-Pakete
 		- Apache: sudo apt-get install apache2
 		- PHP5: sudo apt-get install php5
-			- PHP5-Zusätzliche Pakete: sudo apt-get install php5-curl php5-gd php5-mysql php5-mcrypt
+			- PHP5-Zusätzliche Pakete: sudo apt-get install php5-curl php5-gd php5-mysql
 		- MySQL: sudo apt-get install mysql-server
 
 2. Entpacke die Friendica-Daten in das Quellverzeichnis (root) des Dokumentenbereichs deines Webservers.

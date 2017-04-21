@@ -1,0 +1,42 @@
+{
+	"name": "friendica/friendica",
+	"description": "A decentralized social network part of The Federation",
+	"type": "project",
+	"keywords": [
+		"social network",
+		"dfrn",
+		"ostatus",
+		"diaspora"
+	],
+	"licence": "GNU-Affero",
+	"support": {
+		"issues": "https://github.com/friendica/friendica/issues"
+	},
+	"require": {
+		"ezyang/htmlpurifier": "~4.7.0",
+		"mobiledetect/mobiledetectlib": "2.8.*",
+		"league/html-to-markdown": "~4.4.1",
+		"pear-pear.php.net/Text_Highlighter": "*"
+	},
+	"repositories": [
+        {
+            "type": "pear",
+            "url": "https://pear.php.net"
+        }
+    ],
+	"autoload": {
+		"psr-4": {
+			"Friendica\\": "src/"
+		}
+	},
+	"config": {
+		"autoloader-suffix": "Friendica",
+		"optimize-autoloader": true,
+		"preferred-install": "dist"
+	},
+	"archive": {
+		"exclude": [
+			"log", "cache", "/photo", "/proxy"
+		]
+	}
+}

@@ -10,7 +10,7 @@ $(document).ready(function(){
 			$("#back-to-top").fadeOut();
 		}
 	});
-
+ 
 	// scroll body to 0px on click
 	$("#back-to-top").click(function () {
 		$("body,html").animate({
@@ -40,9 +40,7 @@ $(document).ready(function(){
 	$(".field.select > select, .field.custom > select").addClass("form-control");
 
 	// move the tabbar to the second nav bar
-	if( $("ul.tabbar").length ) {
-		$("ul.tabbar").appendTo("#topbar-second > .container > #tabmenu");
-	}
+	$("section .tabbar-wrapper").first().appendTo("#topbar-second > .container > #tabmenu");
 
 	// add mask css url to the logo-img container
 	//
@@ -84,22 +82,23 @@ $(document).ready(function(){
 				return false;
 			}
 		});
-
-		if(checked == true) {
-			$("a#item-delete-selected").fadeTo(400, 1);
-			$("a#item-delete-selected").show();
+		
+		if(checked) {
+			$("#item-delete-selected").fadeTo(400, 1);
+			$("#item-delete-selected").show();
 		} else {
-			$("a#item-delete-selected").fadeTo(400, 0, function(){
-				$("a#item-delete-selected").hide();
+			$("#item-delete-selected").fadeTo(400, 0, function(){
+				$("#item-delete-selected").hide();
 			});
 		}
 	});
-
+		
 	//$('ul.flex-nav').flexMenu();
 
 	// initialize the bootstrap tooltips
 	$('body').tooltip({
 		selector: '[data-toggle="tooltip"]',
+		container: 'body',
 		animation: true,
 		html: true,
 		placement: 'auto',
@@ -209,82 +208,98 @@ $(document).ready(function(){
 
 	// Dropdown menus with the class "dropdown-head" will display the active tab
 	// as button text
-	$("body").on('click', '.dropdown-head .dropdown-menu li a', function(){
-		$(this).closest(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-		$(this).closest(".dropdown").find('.btn').val($(this).data('value'));
-		$(this).closest("ul").children("li").show();
-		$(this).parent("li").hide();
+	$("body").on('click', '.dropdown-head .dropdown-menu li a, .dropdown-head .dropdown-menu li button', function(){
+		toggleDropdownText(this);
 	});
 
-	// Fixed aside
-	fixscroll();
 });
 
-function fixscroll(){
-	var last = 0;
-	var aside = $("aside");
-	var startfrom =  aside.offset().top;
-	console.log("fixscroll startfrom", startfrom);
+	// Change the css class while clicking on the switcher elements
+	$(".toggle label, .toggle .toggle-handle").click(function(event){
+		event.preventDefault();
+		// Get the value of the input element
+		var input = $(this).siblings("input");
+		var val = 1-input.val();
+		var id = input.attr("id");
 
-	function update() {
-		if (window.innerWidth <= 990) return; //mobile
-		var scrolltop = $(window).scrollTop();
-		var val;
-		if (scrolltop > last) {
-			// going down
-			if (scrolltop > aside.offset().top + aside.height() - window.innerHeight) {
-				// past aside bottom, move it
-				val = scrolltop + window.innerHeight - aside.height() - startfrom;
-				aside.css('top', val+'px');
-			}
-		} else {
-			if ( (scrolltop + startfrom) < aside.offset().top  ) {
-				// before aside top, move it
-				val = scrolltop;
-				aside.css('top', val+'px');
-			}
+		// The css classes for "on" and "off"
+		var onstyle = "btn-primary";
+		var offstyle = "btn-default off";
+
+		// According to the value of the input element we need to decide
+		// which class need to be added and removed when changing the switch
+		var removedclass = (val == 0 ? onstyle : offstyle);
+		var addedclass = (val == 0 ? offstyle : onstyle)
+		$("#"+id+"_onoff").addClass(addedclass).removeClass(removedclass);
+
+		// After changing the switch the input element is getting
+		// the newvalue
+		input.val(val);
+	});
+
+	// Set the padding for input elements with inline buttons
+	//
+	// In Frio we use some input elements where the submit button is visually
+	// inside the the input field (through css). We need to set a padding-right
+	// to the input element where the padding value would be at least the width
+	// of the button. Otherwise long user input would be invisible because it is
+	// behind the button.
+	$("body").on('click', '.form-group-search > input', function() {
+		// Get the width of the button (if the button isn't available
+		// buttonWidth will be null
+		var buttonWidth = $(this).next('.form-button-search').outerWidth();
+
+		if (buttonWidth) {
+			// Take the width of the button and ad 5px
+			var newWidth = buttonWidth + 5;
+			// Set the padding of the input element according
+			// to the width of the button
+			$(this).css('padding-right', newWidth);
 		}
-		last = scrolltop;
-	};
 
-	$(window).scroll(update);
+	});
 
-	update();
+	/*
+	 * This event handler hides all comment UI when the user clicks anywhere on the page
+	 * It ensures that we aren't closing the current comment box
+	 *
+	 * We are making an exception for buttons because of a race condition with the
+	 * comment opening button that results in an already closed comment UI.
+	 */
+	$(document).on('click', function(event) {
+		if (event.target.type === 'button') {
+			return true;
+		}
 
-}
-//function commentOpenUI(obj, id) {
-//	$(document).unbind( "click.commentOpen", handler );
-//
-//	var handler = function() {
-//		if(obj.value == '{{$comment}}') {
-//			obj.value = '';
-//			$("#comment-edit-text-" + id).addClass("comment-edit-text-full").removeClass("comment-edit-text-empty");
-//			// Choose an arbitrary tab index that's greater than what we're using in jot (3 of them)
-//			// The submit button gets tabindex + 1
-//			$("#comment-edit-text-" + id).attr('tabindex','9');
-//			$("#comment-edit-submit-" + id).attr('tabindex','10');
-//			$("#comment-edit-submit-wrapper-" + id).show();
-//		}
-//	};
-//
-//	$(document).bind( "click.commentOpen", handler );
-//}
-//
-//function commentCloseUI(obj, id) {
-//	$(document).unbind( "click.commentClose", handler );
-//
-//	var handler = function() {
-//		if(obj.value === '') {
-//		obj.value = '{{$comment}}';
-//			$("#comment-edit-text-" + id).removeClass("comment-edit-text-full").addClass("comment-edit-text-empty");
-//			$("#comment-edit-text-" + id).removeAttr('tabindex');
-//			$("#comment-edit-submit-" + id).removeAttr('tabindex');
-//			$("#comment-edit-submit-wrapper-" + id).hide();
-//		}
-//	};
-//
-//	$(document).bind( "click.commentClose", handler );
-//}
+		var $dontclosethis = $(event.target).closest('.wall-item-comment-wrapper').find('.comment-edit-form');
+		$('.wall-item-comment-wrapper .comment-edit-submit-wrapper:visible').each(function() {
+			var $parent = $(this).parent('.comment-edit-form');
+			var itemId = $parent.data('itemId');
+
+			if ($dontclosethis[0] != $parent[0]) {
+				var textarea = $parent.find('textarea').get(0)
+
+				commentCloseUI(textarea, itemId);
+			}
+		});
+	});
+
+	// Customize some elements when the app is used in standalone mode on Android
+	if (window.matchMedia('(display-mode: standalone)').matches) {
+		// Open links to source outside of the webview
+		$('body').on('click', '.plink', function (e) {
+			$(e.target).attr('target', '_blank');
+		});
+	}
+
+	/*
+	 * This event listeners ensures that the textarea size is updated event if the
+	 * value is changed externally (textcomplete, insertFormatting, fbrowser...)
+	 */
+	$(document).on('change', 'textarea', function(event) {
+		autosize.update(event.target);
+	});
+});
 
 function openClose(theID) {
 	var elem = document.getElementById(theID);

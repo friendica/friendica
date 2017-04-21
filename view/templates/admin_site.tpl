@@ -1,6 +1,6 @@
 <script>
 	$(function(){
-		
+
 		$("#cnftheme").click(function(){
 			$.colorbox({
 				width: 800,
@@ -22,16 +22,16 @@
 							data[$(this).attr('name')] = $(this).children(":selected").val();
 						});
 						console.log(":)", url, data);
-					
+
 						$.post(url, data, function(data) {
 							if(timer) clearTimeout(timer);
 							NavUpdate();
 							$.colorbox.close();
 						})
-					
+
 						return false;
 					});
-				
+
 				}
 			});
 			return false;
@@ -40,7 +40,7 @@
 </script>
 <div id='adminpage'>
 	<h1>{{$title}} - {{$page}}</h1>
-	
+
 	<form action="{{$baseurl}}/admin/site" method="post">
     <input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
 
@@ -56,11 +56,10 @@
 	{{include file="field_select.tpl" field=$theme_mobile}}
 	{{include file="field_select.tpl" field=$ssl_policy}}
 	{{if $ssl_policy.2 == 1}}{{include file="field_checkbox.tpl" field=$force_ssl}}{{/if}}
-	{{include file="field_checkbox.tpl" field=$old_share}}
 	{{include file="field_checkbox.tpl" field=$hide_help}}
 	{{include file="field_select.tpl" field=$singleuser}}
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
-	
+
 	<h3>{{$registration}}</h3>
 	{{include file="field_input.tpl" field=$register_text}}
 	{{include file="field_select.tpl" field=$register_policy}}
@@ -75,7 +74,7 @@
 	{{include file="field_input.tpl" field=$maximagelength}}
 	{{include file="field_input.tpl" field=$jpegimagequality}}
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
-	
+
 	<h3>{{$corporate}}</h3>
 	{{include file="field_input.tpl" field=$allowed_sites}}
 	{{include file="field_input.tpl" field=$allowed_email}}
@@ -108,34 +107,26 @@
 	{{include file="field_checkbox.tpl" field=$thread_allow}}
 	{{include file="field_checkbox.tpl" field=$newuser_private}}
 	{{include file="field_checkbox.tpl" field=$enotify_no_content}}
-	{{include file="field_checkbox.tpl" field=$private_addons}}	
+	{{include file="field_checkbox.tpl" field=$private_addons}}
 	{{include file="field_checkbox.tpl" field=$disable_embedded}}
 	{{include file="field_checkbox.tpl" field=$allow_users_remote_self}}
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
-	
+
 	<h3>{{$advanced}}</h3>
 	{{include file="field_select.tpl" field=$rino}}
-	{{include file="field_checkbox.tpl" field=$no_utf}}
 	{{include file="field_checkbox.tpl" field=$verifyssl}}
 	{{include file="field_input.tpl" field=$proxy}}
 	{{include file="field_input.tpl" field=$proxyuser}}
 	{{include file="field_input.tpl" field=$timeout}}
-	{{if NOT $worker.2}}
-		{{include file="field_input.tpl" field=$delivery_interval}}
-		{{include file="field_input.tpl" field=$poll_interval}}
-	{{/if}}
 	{{include file="field_input.tpl" field=$maxloadavg}}
 	{{include file="field_input.tpl" field=$maxloadavg_frontend}}
 	{{include file="field_input.tpl" field=$optimize_max_tablesize}}
 	{{include file="field_input.tpl" field=$optimize_fragmentation}}
 	{{include file="field_input.tpl" field=$abandon_days}}
-	{{include file="field_input.tpl" field=$lockpath}}
 	{{include file="field_input.tpl" field=$temppath}}
 	{{include file="field_input.tpl" field=$basepath}}
-	{{include file="field_checkbox.tpl" field=$suppress_language}}
 	{{include file="field_checkbox.tpl" field=$suppress_tags}}
 	{{include file="field_checkbox.tpl" field=$nodeinfo}}
-	{{include file="field_input.tpl" field=$embedly}}
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	<h3>{{$portable_contacts}}</h3>
@@ -147,24 +138,22 @@
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	<h3>{{$performance}}</h3>
-	{{include file="field_checkbox.tpl" field=$use_fulltext_engine}}
 	{{include file="field_checkbox.tpl" field=$only_tag_search}}
 	{{include file="field_input.tpl" field=$itemcache}}
 	{{include file="field_input.tpl" field=$itemcache_duration}}
 	{{include file="field_input.tpl" field=$max_comments}}
 	{{include file="field_checkbox.tpl" field=$proxy_disabled}}
-	{{include file="field_checkbox.tpl" field=$old_pager}}
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	<h3>{{$worker_title}}</h3>
-	{{include file="field_checkbox.tpl" field=$worker}}
 	{{include file="field_input.tpl" field=$worker_queues}}
 	{{include file="field_checkbox.tpl" field=$worker_dont_fork}}
 	{{include file="field_checkbox.tpl" field=$worker_fastlane}}
+	{{include file="field_checkbox.tpl" field=$worker_frontend}}
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	</form>
-	
+
 	{{* separate form for relocate... *}}
 	<form action="{{$baseurl}}/admin/site" method="post">
 	<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
@@ -173,5 +162,5 @@
 	<input type="hidden" name="page_site" value="{{$submit|escape:'html'}}">
 	<div class="submit"><input type="submit" name="relocate" value="{{$submit|escape:'html'}}" /></div>
 	</form>
-	
+
 </div>

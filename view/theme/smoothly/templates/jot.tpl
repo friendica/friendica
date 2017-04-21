@@ -1,6 +1,6 @@
 
 
-<div id="profile-jot-wrapper" > 
+<div id="profile-jot-wrapper" >
 	<div id="profile-jot-banner-wrapper">
 		<div id="profile-jot-desc" >&nbsp;</div>
 		<div id="character-counter" class="grey" style="display: none;">0</div>
@@ -26,9 +26,8 @@
 		{{/if}}
 		<div id="jot-text-wrap">
                 	<img id="profile-jot-text-loading" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait}}" style="display: none;" /><br>
-                	<textarea rows="5" cols="80" class="profile-jot-text" id="profile-jot-text" name="body" >
-			{{if $content}}{{$content}}{{else}}{{$share}}
-			{{/if}}
+                	<textarea rows="5" cols="80" class="profile-jot-text" id="profile-jot-text" name="body" placeholder="{{$share}}">
+			{{if $content}}{{$content}}{{/if}}
 			</textarea>
 		</div>
 
@@ -37,22 +36,22 @@
 	</div>
 	<div id="profile-attach-wrapper" class="jot-tool" style="display: none;" >
 		<div id="wall-file-upload-div" ><a href="#" onclick="return false;" id="wall-file-upload" class="icon border attach" title="{{$attach}}"></a></div>
-	</div>  
+	</div>
 	<div id="profile-link-wrapper" class="jot-tool" style="display: none;" ondragenter="linkdropper(event);" ondragover="linkdropper(event);" ondrop="linkdrop(event);" >
 		<a href="#" id="profile-link" class="icon border  link" title="{{$weblink}}" ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-video-wrapper" class="jot-tool" style="display: none;" >
 		<a href="#" id="profile-video" class="icon border  video" title="{{$video}}" onclick="jotVideoURL(); return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-audio-wrapper" class="jot-tool" style="display: none;" >
 		<a href="#" id="profile-audio" class="icon border  audio" title="{{$audio}}" onclick="jotAudioURL(); return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-location-wrapper" class="jot-tool" style="display: none;" >
 		<a href="#" id="profile-location" class="icon border  globe" title="{{$setloc}}" onclick="jotGetLocation(); return false;"></a>
-	</div> 
+	</div>
 	<div id="profile-nolocation-wrapper" class="jot-tool" style="display: none;" >
 		<a href="#" id="profile-nolocation" class="icon border  noglobe" title="{{$noloc}}" onclick="jotClearLocation(); return false;"></a>
-	</div> 
+	</div>
 
 	<span onclick="preview_post();" id="jot-preview-link" class="fakelink" style="display: none;" >{{$preview}}</span>
 
@@ -66,7 +65,7 @@
   	{{$jotplugins}}
 	</div>
 	<div id="profile-jot-tools-end"></div>
-	
+
 	<div id="jot-preview-content" style="display:none;"></div>
 
         <div style="display: none;">

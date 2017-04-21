@@ -7,20 +7,22 @@
 
 /**
  * @brief check if feature is enabled
- * 
+ *
  * @return boolean
  */
-function feature_enabled($uid,$feature) {
+function feature_enabled($uid, $feature) {
+	$x = get_config('feature_lock', $feature);
 
-	$x = get_config('feature_lock',$feature);
-	if($x === false) {
-		$x = get_pconfig($uid,'feature',$feature);
-		if($x === false) {
-			$x = get_config('feature',$feature);
-			if($x === false)
+	if ($x === false) {
+		$x = get_pconfig($uid, 'feature', $feature);
+		if ($x === false) {
+			$x = get_config('feature', $feature);
+			if ($x === false) {
 				$x = get_feature_default($feature);
+			}
 		}
 	}
+
 	$arr = array('uid' => $uid, 'feature' => $feature, 'enabled' => $x);
 	call_hooks('feature_enabled',$arr);
 	return($arr['enabled']);
@@ -28,7 +30,7 @@ function feature_enabled($uid,$feature) {
 
 /**
  * @brief check if feature is enabled or disabled by default
- * 
+ *
  * @param string $feature
  * @return boolean
  */
@@ -45,13 +47,13 @@ function get_feature_default($feature) {
 
 /**
  * @brief Get a list of all available features
- * 
+ *
  * The array includes the setting group, the setting name,
  * explainations for the setting and if it's enabled or disabled
  * by default
- * 
+ *
  * @param bool $filtered True removes any locked features
- * 
+ *
  * @return array
  */
 function get_features($filtered = true) {
@@ -70,9 +72,8 @@ function get_features($filtered = true) {
 		// Post composition
 		'composition' => array(
 			t('Post Composition Features'),
-			array('richtext',	t('Richtext Editor'),			t('Enable richtext editor'), false, get_config('feature_lock','richtext')),
 			array('preview',	t('Post Preview'),			t('Allow previewing posts and comments before publishing them'), false, get_config('feature_lock','preview')),
-			array('aclautomention',	t('Auto-mention Forums'),		t('Add/remove mention when a fourm page is selected/deselected in ACL window.'), false, get_config('feature_lock','aclautomention')),
+			array('aclautomention',	t('Auto-mention Forums'),		t('Add/remove mention when a forum page is selected/deselected in ACL window.'), false, get_config('feature_lock','aclautomention')),
 		),
 
 		// Network sidebar widgets

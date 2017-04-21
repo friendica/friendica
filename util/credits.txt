@@ -2,10 +2,12 @@
 Abinoam P. Marques Jr.
 Abrax
 Adam Jurkiewicz
+Albert
+Alberto Díaz Tormo
 Alex
 Alexander Kampmann
+Alexandre Alapetite
 AlfredSK
-Aliaksei Sakalou
 Andi Stadler
 Andreas H.
 Andrej Stieben
@@ -13,10 +15,12 @@ André Alves
 André Lohan
 Anthronaut
 Arian - Cazare Muncitori
+Athalbert
 aweiher
 axelt
 balderino
 Beanow
+beardyunixer
 Beatriz Vital
 Ben Roberts
 ben-utzer
@@ -46,6 +50,7 @@ Doru  DEACONU
 Dylan Thiedeke
 Développeur égaré
 eddy2508
+Eelco Maljaars
 effex7
 Elena
 emilia.krawczyk
@@ -72,13 +77,16 @@ hauke
 Hauke Altmann
 Hauke Zühl
 Hubert Kościański
+Hypolite Petovan
 Jak
 Jakob
+Jens Tautenhahn
 jensp
 Jeroen S
 jeroenpraat
 Johannes Schwab
 John Brazil
+Jonatan Nyberg
 Josef Moravek
 juanman
 julia.domagalska
@@ -122,18 +130,19 @@ Paolo Wave
 Pavel Morozov
 Perig Gouanvic
 peturisfeld
+Pierre Rudloff
 Piotr Blonkowski
 pokerazor
 Rabuzarus
 Radek
-Rafael
+Rafael Garau
 Rainulf Pineda
 Ralph
 rcmaniac
 rebeka-catalina
 repat
 Ricardo Pereira
-Roland Haeder
+Roland Häder
 Rui Andrada
 Sakałoŭ Alaksiej
 Sam
@@ -145,6 +154,7 @@ Seth
 Silke Meyer
 Simon L'nu
 Simó Albert i Beltran
+soko1
 Stanislav N.
 StefOfficiel
 Sveinn í Felli
@@ -173,6 +183,7 @@ ufic
 Vasudev Kamath
 Vasya Novikov
 vislav
+Vít Šesták 'v6ak'
 Yasen Pramatarov
 ylms
 Zach Prezkuta

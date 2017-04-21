@@ -1,11 +1,14 @@
 <?php
-/*
-html2bbcode.php
-Converter for HTML to BBCode
-Made by: ike@piratenpartei.de
-Originally made for the syncom project: http://wiki.piratenpartei.de/Syncom
-					https://github.com/annando/Syncom
-*/
+/**
+ * @file include/html2bbcode.php
+ * @brief Converter for HTML to BBCode
+ *
+ * Made by: ike@piratenpartei.de
+ * Originally made for the syncom project: http://wiki.piratenpartei.de/Syncom
+ * 					https://github.com/annando/Syncom
+ */
+
+require_once("include/xml.php");
 
 function node2bbcode(&$doc, $oldnode, $attributes, $startbb, $endbb)
 {
@@ -76,25 +79,25 @@ function node2bbcodesub(&$doc, $oldnode, $attributes, $startbb, $endbb)
 	return($replace);
 }
 
-if(!function_exists('deletenode')) {
-function deletenode(&$doc, $node)
-{
-	$xpath = new DomXPath($doc);
-	$list = $xpath->query("//".$node);
-	foreach ($list as $child)
-		$child->parentNode->removeChild($child);
-}}
-
-function _replace_code_cb($m){
-	return "<code>".str_replace("\n","<br>\n",$m[1]). "</code>";
-}
-
 function html2bbcode($message)
 {
 
 	$message = str_replace("\r", "", $message);
 
-	$message = preg_replace_callback("|<pre><code>([^<]*)</code></pre>|ism", "_replace_code_cb", $message);
+	// Removing code blocks before the whitespace removal processing below
+	$codeblocks = [];
+	$message = preg_replace_callback('#<pre><code(?: class="([^"]*)")?>(.*)</code></pre>#iUs',
+		function ($matches) use (&$codeblocks) {
+			$return = '[codeblock-' . count($codeblocks) . ']';
+
+            $prefix = '[code]';
+            if ($matches[1] != '') {
+                $prefix = '[code=' . $matches[1] . ']';
+            }
+			$codeblocks[] = $prefix . $matches[2] . '[/code]';
+			return $return;
+		}
+	, $message);
 
 	$message = str_replace(array(
 					"<li><p>",
@@ -117,12 +120,12 @@ function html2bbcode($message)
 
 	@$doc->loadHTML($message);
 
-	deletenode($doc, 'style');
-	deletenode($doc, 'head');
-	deletenode($doc, 'title');
-	deletenode($doc, 'meta');
-	deletenode($doc, 'xml');
-	deletenode($doc, 'removeme');
+	xml::deleteNode($doc, 'style');
+	xml::deleteNode($doc, 'head');
+	xml::deleteNode($doc, 'title');
+	xml::deleteNode($doc, 'meta');
+	xml::deleteNode($doc, 'xml');
+	xml::deleteNode($doc, 'removeme');
 
 	$xpath = new DomXPath($doc);
 	$list = $xpath->query("//pre");
@@ -238,8 +241,7 @@ function html2bbcode($message)
 	node2bbcode($doc, 'audio', array('src'=>'/(.+)/'), '[audio]$1', '[/audio]');
 	node2bbcode($doc, 'iframe', array('src'=>'/(.+)/'), '[iframe]$1', '[/iframe]');
 
-	node2bbcode($doc, 'code', array(), '[code]', '[/code]');
-    node2bbcode($doc, 'key', array(), '[code]', '[/code]');
+	node2bbcode($doc, 'key', array(), '[code]', '[/code]');
 
 	$message = $doc->saveHTML();
 
@@ -308,6 +310,19 @@ function html2bbcode($message)
 	// Handling Yahoo style of mails
 	$message = str_replace('[hr][b]From:[/b]', '[quote][b]From:[/b]', $message);
 
-	return(trim($message));
+	// Restore code blocks
+	$message = preg_replace_callback('#\[codeblock-([0-9]+)\]#iU',
+		function ($matches) use ($codeblocks) {
+            $return = '';
+            if (isset($codeblocks[intval($matches[1])])) {
+                $return = $codeblocks[$matches[1]];
+            }
+			return $return;
+		}
+	, $message);
+
+	$message = trim($message);
+
+	return $message;
 }
 ?>

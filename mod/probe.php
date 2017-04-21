@@ -2,13 +2,20 @@
 
 require_once('include/Scrape.php');
 
-function probe_content(&$a) {
+function probe_content(App $a) {
+
+	if (!local_user()) {
+		http_status_exit(403,
+				array("title" => t("Public access denied."),
+					"description" => t("Only logged in users are permitted to perform a probing.")));
+		killme();
+	}
 
 	$o .= '<h3>Probe Diagnostic</h3>';
 
 	$o .= '<form action="probe" method="get">';
 	$o .= 'Lookup address: <input type="text" style="width: 250px;" name="addr" value="' . $_GET['addr'] .'" />';
-	$o .= '<input type="submit" name="submit" value="Submit" /></form>'; 
+	$o .= '<input type="submit" name="submit" value="Submit" /></form>';
 
 	$o .= '<br /><br />';
 

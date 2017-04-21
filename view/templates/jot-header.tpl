@@ -2,12 +2,11 @@
 
 <script language="javascript" type="text/javascript">
 
-var editor=false;
+var editor = false;
 var textlen = 0;
-var plaintext = '{{$editselect}}';
 
-function initEditor(cb){
-	if (editor==false){
+function initEditor(callback) {
+	if (editor == false) {
 		var  colorbox_options = {
 			{{if $APP->is_mobile}}
 			'width' : '100%',
@@ -16,115 +15,27 @@ function initEditor(cb){
 			'inline' : true,
 			'transition' : 'elastic'
 		}
-		
-		
-		
+
 		$("#profile-jot-text-loading").show();
-		if(plaintext == 'none') {
-			$("#profile-jot-text-loading").hide();
-			$("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
-			$("#profile-jot-text").editor_autocomplete(baseurl+"/acl");
-			$("#profile-jot-text").bbco_autocomplete('bbcode');
-			editor = true;
-			$("a#jot-perms-icon").colorbox(colorbox_options);
-			$(".jothidden").show();
-			if (typeof cb!="undefined") cb();
-			return;
-		}
-		tinyMCE.init({
-			theme : "advanced",
-			mode : "specific_textareas",
-			editor_selector: {{$editselect}},
-			auto_focus: "profile-jot-text",
-			plugins : "bbcode,paste,autoresize, inlinepopups",
-			theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code",
-			theme_advanced_buttons2 : "",
-			theme_advanced_buttons3 : "",
-			theme_advanced_toolbar_location : "top",
-			theme_advanced_toolbar_align : "center",
-			theme_advanced_blockformats : "blockquote,code",
-			theme_advanced_resizing : true,
-			gecko_spellcheck : true,
-			paste_text_sticky : true,
-			entity_encoding : "raw",
-			add_unload_trigger : false,
-			remove_linebreaks : false,
-			//force_p_newlines : false,
-			//force_br_newlines : true,
-			forced_root_block : 'div',
-			convert_urls: false,
-			content_css: "{{$baseurl}}/view/custom_tinymce.css",
-			theme_advanced_path : false,
-			file_browser_callback : "fcFileBrowser",
-			setup : function(ed) {
-				cPopup = null;
-				ed.onKeyDown.add(function(ed,e) {
-					if(cPopup !== null)
-						cPopup.onkey(e);
-				});
-
-				ed.onKeyUp.add(function(ed, e) {
-					var txt = tinyMCE.activeEditor.getContent();
-					match = txt.match(/@([^ \n]+)$/);
-					if(match!==null) {
-						if(cPopup === null) {
-							cPopup = new ACPopup(this,baseurl+"/acl");
-						}
-						if(cPopup.ready && match[1]!==cPopup.searchText) cPopup.search(match[1]);
-						if(! cPopup.ready) cPopup = null;
-					}
-					else {
-						if(cPopup !== null) { cPopup.close(); cPopup = null; }
-					}
-
-					textlen = txt.length;
-					if(textlen != 0 && $('#jot-perms-icon').is('.unlock')) {
-						$('#profile-jot-desc').html(ispublic);
-					}
-					else {
-						$('#profile-jot-desc').html('&nbsp;');
-					}
-
-				 //Character count
-
-					if(textlen <= 140) {
-						$('#character-counter').removeClass('red');
-						$('#character-counter').removeClass('orange');
-						$('#character-counter').addClass('grey');
-					}
-					if((textlen > 140) && (textlen <= 420)) {
-						$('#character-counter').removeClass('grey');
-						$('#character-counter').removeClass('red');
-						$('#character-counter').addClass('orange');
-					}
-					if(textlen > 420) {
-						$('#character-counter').removeClass('grey');
-						$('#character-counter').removeClass('orange');
-						$('#character-counter').addClass('red');
-					}
-					$('#character-counter').text(textlen);
-				});
-
-				ed.onInit.add(function(ed) {
-					ed.pasteAsPlainText = true;
-					$("#profile-jot-text-loading").hide();
-					$(".jothidden").show();
-					if (typeof cb!="undefined") cb();
-				});
-
-			}
-		});
-		editor = true;
-		// setup acl popup
+		$("#profile-jot-text-loading").hide();
+		$("#profile-jot-text").css({ 'height': 200, 'color': '#000' });
+		$("#profile-jot-text").editor_autocomplete(baseurl+"/acl");
+		$("#profile-jot-text").bbco_autocomplete('bbcode');
 		$("a#jot-perms-icon").colorbox(colorbox_options);
-	} else {
-		if (typeof cb!="undefined") cb();
+		$(".jothidden").show();
+
+		editor = true;
+	}
+	if (typeof callback != "undefined") {
+		callback();
 	}
 }
 
 function enableOnUser(){
-	if (editor) return;
-	$(this).val("");
+	if (editor) {
+		return;
+	}
+	$(this).val('');
 	initEditor();
 }
 
@@ -136,12 +47,9 @@ function enableOnUser(){
 
 	$(document).ready(function() {
 
-		/* enable tinymce on focus and click */
+		/* enable editor on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
-
-
-
 
 		/* show images / file browser window
 		 *
@@ -164,33 +72,6 @@ function enableOnUser(){
 		$('#wall-file-upload').on('click', function(){
 			Dialog.doFileBrowser("main");
 		});
-
-		/**
-			var uploader = new window.AjaxUpload(
-				'wall-image-upload',
-				{ action: 'wall_upload/{{$nickname}}',
-					name: 'userfile',
-					onSubmit: function(file,ext) { $('#profile-rotator').show(); },
-					onComplete: function(file,response) {
-						addeditortext(response);
-						$('#profile-rotator').hide();
-					}
-				}
-			);
-			var file_uploader = new window.AjaxUpload(
-				'wall-file-upload',
-				{ action: 'wall_attach/{{$nickname}}',
-					name: 'userfile',
-					onSubmit: function(file,ext) { $('#profile-rotator').show(); },
-					onComplete: function(file,response) {
-						addeditortext(response);
-						$('#profile-rotator').hide();
-					}
-				}
-			);
-
-		}
-		**/
 	});
 
 
@@ -345,12 +226,8 @@ function enableOnUser(){
 	}
 
 	function addeditortext(data) {
-		if(plaintext == 'none') {
-			var currentText = $("#profile-jot-text").val();
-			$("#profile-jot-text").val(currentText + data);
-		}
-		else
-			tinyMCE.execCommand('mceInsertRawHTML',false,data);
+		var currentText = $("#profile-jot-text").val();
+		$("#profile-jot-text").val(currentText + data);
 	}
 
 	{{$geotag}}

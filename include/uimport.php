@@ -11,14 +11,11 @@ define("IMPORT_DEBUG", False);
 
 function last_insert_id() {
 	global $db;
+
 	if (IMPORT_DEBUG)
 		return 1;
-	if ($db->mysqli) {
-		$thedb = $db->getdb();
-		return $thedb->insert_id;
-	} else {
-		return mysql_insert_id();
-	}
+
+	return $db->insert_id();
 }
 
 function last_error() {
@@ -78,7 +75,7 @@ function import_cleanup($newuid) {
 	q("DELETE FROM `pconfig` WHERE uid = %d", $newuid);
 }
 
-function import_account(&$a, $file) {
+function import_account(App $a, $file) {
 	logger("Start user import from " . $file['tmp_name']);
 	/*
 	  STEPS
@@ -116,7 +113,7 @@ function import_account(&$a, $file) {
 		notice(t('Error! Cannot check nickname'));
 		return;
 	}
-	if (count($r) > 0) {
+	if (dbm::is_result($r) > 0) {
 		notice(sprintf(t("User '%s' already exists on this server!"), $account['user']['nickname']));
 		return;
 	}
@@ -127,13 +124,13 @@ function import_account(&$a, $file) {
 		notice(t('Error! Cannot check nickname'));
 		return;
 	}
-	if (count($r) > 0) {
+	if (dbm::is_result($r) > 0) {
 		notice(sprintf(t("User '%s' already exists on this server!"), $account['user']['nickname']));
 		return;
 	}
 
 	$oldbaseurl = $account['baseurl'];
-	$newbaseurl = $a->get_baseurl();
+	$newbaseurl = App::get_baseurl();
 	$olduid = $account['user']['uid'];
 
         unset($account['user']['uid']);
@@ -186,8 +183,8 @@ function import_account(&$a, $file) {
 			}
 		}
 		if ($contact['uid'] == $olduid && $contact['self'] == '0') {
-			// set contacts 'avatar-date' to "0000-00-00 00:00:00" to let poller to update urls
-			$contact["avatar-date"] = "0000-00-00 00:00:00" ;
+			// set contacts 'avatar-date' to NULL_DATE to let poller to update urls
+			$contact["avatar-date"] = NULL_DATE;
 
 
 			switch ($contact['network']) {
@@ -290,5 +287,5 @@ function import_account(&$a, $file) {
 	proc_run(PRIORITY_HIGH, 'include/notifier.php', 'relocate', $newuid);
 
 	info(t("Done. You can now login with your username and password"));
-	goaway($a->get_baseurl() . "/login");
+	goaway(App::get_baseurl() . "/login");
 }

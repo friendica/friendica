@@ -12,7 +12,7 @@ if(! function_exists('replace_macros')) {
  * This is our template processor
  *
  * @param string|FriendicaSmarty $s the string requiring macro substitution,
- *									or an instance of FriendicaSmarty
+ *				or an instance of FriendicaSmarty
  * @param array $r key value pairs (search => replace)
  * @return string substituted string
  */
@@ -23,7 +23,7 @@ function replace_macros($s,$r) {
 	$a = get_app();
 
 	// pass $baseurl to all templates
-	$r['$baseurl'] = $a->get_baseurl();
+	$r['$baseurl'] = App::get_baseurl();
 
 
 	$t = $a->template_engine();
@@ -268,90 +268,90 @@ function hex2bin($s) {
 }}
 
 
-if(! function_exists('paginate_data')) {
 /**
- * Automatica pagination data.
+ * @brief Paginator function. Pushes relevant links in a pager array structure.
+ *
+ * Links are generated depending on the current page and the total number of items.
+ * Inactive links (like "first" and "prev" on page 1) are given the "disabled" class.
+ * Current page link is given the "active" CSS class
  *
  * @param App $a App instance
- * @param int $count [optional] item count (used with alt pager)
+ * @param int $count [optional] item count (used with minimal pager)
  * @return Array data for pagination template
  */
-function paginate_data(&$a, $count=null) {
-	$stripped = preg_replace('/([&?]page=[0-9]*)/','',$a->query_string);
+function paginate_data(App $a, $count = null) {
+	$stripped = preg_replace('/([&?]page=[0-9]*)/', '', $a->query_string);
 
-	$stripped = str_replace('q=','',$stripped);
-	$stripped = trim($stripped,'/');
+	$stripped = str_replace('q=', '', $stripped);
+	$stripped = trim($stripped, '/');
 	$pagenum = $a->pager['page'];
 
-	if (($a->page_offset != "") AND !preg_match('/[?&].offset=/', $stripped))
-		$stripped .= "&offset=".urlencode($a->page_offset);
-
-	$url = $stripped;
-
-	$data = array();
-	function _l(&$d, $name, $url, $text, $class="") {
-		if (!strpos($url, "?")) {
-			if ($pos = strpos($url, "&"))
-				$url = substr($url, 0, $pos)."?".substr($url, $pos + 1);
-		}
-
-		$d[$name] = array('url'=>$url, 'text'=>$text, 'class'=>$class);
+	if (($a->page_offset != '') AND !preg_match('/[?&].offset=/', $stripped)) {
+		$stripped .= '&offset=' . urlencode($a->page_offset);
 	}
 
-	if (!is_null($count)){
-		// alt pager
-		if($a->pager['page']>1)
-			_l($data,  "prev", $url.'&page='.($a->pager['page'] - 1), t('newer'));
-		if($count>0)
-			_l($data,  "next", $url.'&page='.($a->pager['page'] + 1), t('older'));
+	$url = $stripped;
+	$data = array();
+
+	function _l(&$d, $name, $url, $text, $class = '') {
+		if (strpos($url, '?') === false && ($pos = strpos($url, '&')) !== false) {
+			$url = substr($url, 0, $pos) . '?' . substr($url, $pos + 1);
+		}
+
+		$d[$name] = array('url' => $url, 'text' => $text, 'class' => $class);
+	}
+
+	if (!is_null($count)) {
+		// minimal pager (newer / older)
+		$data['class'] = 'pager';
+		_l($data, 'prev', $url . '&page=' . ($a->pager['page'] - 1), t('newer'), 'previous' . ($a->pager['page'] == 1 ? ' disabled' : ''));
+		_l($data, 'next', $url . '&page=' . ($a->pager['page'] + 1), t('older'), 'next' . ($count <= 0 ? ' disabled' : ''));
 	} else {
-		// full pager
-		if($a->pager['total'] > $a->pager['itemspage']) {
-			if($a->pager['page'] != 1)
-				_l($data,  "prev", $url.'&page='.($a->pager['page'] - 1), t('prev'));
-
-			_l($data, "first", $url."&page=1",  t('first'));
-
+		// full pager (first / prev / 1 / 2 / ... / 14 / 15 / next / last)
+		$data['class'] = 'pagination';
+		if ($a->pager['total'] > $a->pager['itemspage']) {
+			_l($data, 'first', $url . '&page=1',  t('first'), $a->pager['page'] == 1 ? 'disabled' : '');
+			_l($data, 'prev', $url . '&page=' . ($a->pager['page'] - 1), t('prev'), $a->pager['page'] == 1 ? 'disabled' : '');
 
 			$numpages = $a->pager['total'] / $a->pager['itemspage'];
 
 			$numstart = 1;
 			$numstop = $numpages;
 
-			if($numpages > 14) {
-				$numstart = (($pagenum > 7) ? ($pagenum - 7) : 1);
-				$numstop = (($pagenum > ($numpages - 7)) ? $numpages : ($numstart + 14));
+			// Limit the number of displayed page number buttons.
+			if ($numpages > 8) {
+				$numstart = (($pagenum > 4) ? ($pagenum - 4) : 1);
+				$numstop = (($pagenum > ($numpages - 7)) ? $numpages : ($numstart + 8));
 			}
 
 			$pages = array();
 
-			for($i = $numstart; $i <= $numstop; $i++){
-				if($i == $a->pager['page'])
-					_l($pages, $i, "#",  $i, "current");
-				else
-					_l($pages, $i, $url."&page=$i", $i, "n");
+			for ($i = $numstart; $i <= $numstop; $i++) {
+				if ($i == $a->pager['page']) {
+					_l($pages, $i, '#',  $i, 'current active');
+				} else {
+					_l($pages, $i, $url . '&page='. $i, $i, 'n');
+				}
 			}
 
-			if(($a->pager['total'] % $a->pager['itemspage']) != 0) {
-				if($i == $a->pager['page'])
-					_l($pages, $i, "#",  $i, "current");
-				else
-					_l($pages, $i, $url."&page=$i", $i, "n");
+			if (($a->pager['total'] % $a->pager['itemspage']) != 0) {
+				if ($i == $a->pager['page']) {
+					_l($pages, $i, '#',  $i, 'current active');
+				} else {
+					_l($pages, $i, $url . '&page=' . $i, $i, 'n');
+				}
 			}
 
 			$data['pages'] = $pages;
 
 			$lastpage = (($numpages > intval($numpages)) ? intval($numpages)+1 : $numpages);
-			_l($data, "last", $url."&page=$lastpage", t('last'));
-
-			if(($a->pager['total'] - ($a->pager['itemspage'] * $a->pager['page'])) > 0)
-				_l($data, "next", $url."&page=".($a->pager['page'] + 1), t('next'));
-
+			_l($data, 'next', $url . '&page=' . ($a->pager['page'] + 1), t('next'), $a->pager['page'] == $lastpage ? 'disabled' : '');
+			_l($data, 'last', $url . '&page=' . $lastpage, t('last'), $a->pager['page'] == $lastpage ? 'disabled' : '');
 		}
 	}
-	return $data;
 
-}}
+	return $data;
+}
 
 if(! function_exists('paginate')) {
 /**
@@ -369,7 +369,7 @@ if(! function_exists('paginate')) {
  * @param App $a App instance
  * @return string html for pagination #FIXME remove html
  */
-function paginate(&$a) {
+function paginate(App $a) {
 
 	$data = paginate_data($a);
 	$tpl = get_markup_template("paginate.tpl");
@@ -384,7 +384,7 @@ if(! function_exists('alt_pager')) {
  * @param int $i
  * @return string html for pagination #FIXME remove html
  */
-function alt_pager(&$a, $i) {
+function alt_pager(App $a, $i) {
 
 	$data = paginate_data($a, $i);
 	$tpl = get_markup_template("paginate.tpl");
@@ -491,7 +491,7 @@ function item_new_uri($hostname,$uid, $guid = "") {
 
 		$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($uri));
-		if(count($r))
+		if (dbm::is_result($r))
 			$dups = true;
 	} while($dups == true);
 	return $uri;
@@ -515,7 +515,7 @@ function photo_new_resource() {
 		$r = q("SELECT `id` FROM `photo` WHERE `resource-id` = '%s' LIMIT 1",
 			dbesc($resource)
 		);
-		if(count($r))
+		if (dbm::is_result($r))
 			$found = true;
 	} while($found == true);
 	return $resource;
@@ -581,14 +581,14 @@ function get_intltext_template($s) {
 	if(! isset($lang))
 		$lang = 'en';
 
-	if(file_exists("view/$lang$engine/$s")) {
+	if(file_exists("view/lang/$lang$engine/$s")) {
 		$stamp1 = microtime(true);
-		$content = file_get_contents("view/$lang$engine/$s");
+		$content = file_get_contents("view/lang/$lang$engine/$s");
 		$a->save_timestamp($stamp1, "file");
 		return $content;
-	} elseif(file_exists("view/en$engine/$s")) {
+	} elseif(file_exists("view/lang/en$engine/$s")) {
 		$stamp1 = microtime(true);
-		$content = file_get_contents("view/en$engine/$s");
+		$content = file_get_contents("view/lang/en$engine/$s");
 		$a->save_timestamp($stamp1, "file");
 		return $content;
 	} else {
@@ -678,11 +678,13 @@ function attribute_contains($attr,$s) {
 	return false;
 }}
 
-if(! function_exists('logger')) {
+if (! function_exists('logger')) {
 /* setup int->string log level map */
 $LOGGER_LEVELS = array();
 
 /**
+ * @brief Logs the given message at the given log level
+ *
  * log levels:
  * LOGGER_NORMAL (default)
  * LOGGER_TRACE
@@ -692,51 +694,63 @@ $LOGGER_LEVELS = array();
  *
  * @global App $a
  * @global dba $db
+ * @global array $LOGGER_LEVELS
  * @param string $msg
  * @param int $level
  */
-function logger($msg,$level = 0) {
-	// turn off logger in install mode
-	global $a;
+function logger($msg, $level = 0) {
+	$a = get_app();
 	global $db;
 	global $LOGGER_LEVELS;
 
-	if(($a->module == 'install') || (! ($db && $db->connected))) return;
-
-	if (count($LOGGER_LEVELS)==0){
-		foreach (get_defined_constants() as $k=>$v){
-			if (substr($k,0,7)=="LOGGER_")
-				$LOGGER_LEVELS[$v] = substr($k,7,7);
-		}
+	// turn off logger in install mode
+	if (
+		$a->module == 'install'
+		|| ! ($db && $db->connected)
+	) {
+		return;
 	}
 
 	$debugging = get_config('system','debugging');
-	$loglevel  = intval(get_config('system','loglevel'));
 	$logfile   = get_config('system','logfile');
+	$loglevel = intval(get_config('system','loglevel'));
 
-	if((! $debugging) || (! $logfile) || ($level > $loglevel))
+	if (
+		! $debugging
+		|| ! $logfile
+		|| $level > $loglevel
+	) {
 		return;
+	}
+
+	if (count($LOGGER_LEVELS) == 0) {
+		foreach (get_defined_constants() as $k => $v) {
+			if (substr($k, 0, 7) == "LOGGER_") {
+				$LOGGER_LEVELS[$v] = substr($k, 7, 7);
+			}
+		}
+	}
 
 	$process_id = session_id();
 
-	if ($process_id == "")
+	if ($process_id == '') {
 		$process_id = get_app()->process_id;
+	}
 
 	$callers = debug_backtrace();
-	$logline =  sprintf("%s@%s\t[%s]:%s:%s:%s\t%s\n",
-				 datetime_convert(),
-				 $process_id,
-				 $LOGGER_LEVELS[$level],
-				 basename($callers[0]['file']),
-				 $callers[0]['line'],
-				 $callers[1]['function'],
-				 $msg
-				);
+	$logline = sprintf("%s@%s\t[%s]:%s:%s:%s\t%s\n",
+			datetime_convert(),
+			$process_id,
+			$LOGGER_LEVELS[$level],
+			basename($callers[0]['file']),
+			$callers[0]['line'],
+			$callers[1]['function'],
+			$msg
+		);
 
 	$stamp1 = microtime(true);
 	@file_put_contents($logfile, $logline, FILE_APPEND);
 	$a->save_timestamp($stamp1, "file");
-	return;
 }}
 
 
@@ -755,71 +769,75 @@ function activity_match($haystack,$needle) {
 }}
 
 
-if(! function_exists('get_tags')) {
 /**
- * Pull out all #hashtags and @person tags from $s;
+ * @brief Pull out all #hashtags and @person tags from $string.
+ *
  * We also get @person@domain.com - which would make
  * the regex quite complicated as tags can also
  * end a sentence. So we'll run through our results
  * and strip the period from any tags which end with one.
  * Returns array of tags found, or empty array.
  *
- * @param string $s
- * @return array
+ * @param string $string Post content
+ * @return array List of tag and person names
  */
-function get_tags($s) {
+function get_tags($string) {
 	$ret = array();
 
 	// Convert hashtag links to hashtags
-	$s = preg_replace("/#\[url\=([^\[\]]*)\](.*?)\[\/url\]/ism", "#$2", $s);
+	$string = preg_replace('/#\[url\=([^\[\]]*)\](.*?)\[\/url\]/ism', '#$2', $string);
 
 	// ignore anything in a code block
-	$s = preg_replace('/\[code\](.*?)\[\/code\]/sm','',$s);
+	$string = preg_replace('/\[code\](.*?)\[\/code\]/sm', '', $string);
 
 	// Force line feeds at bbtags
-	$s = str_replace(array("[", "]"), array("\n[", "]\n"), $s);
+	$string = str_replace(array('[', ']'), array("\n[", "]\n"), $string);
 
 	// ignore anything in a bbtag
-	$s = preg_replace('/\[(.*?)\]/sm','',$s);
+	$string = preg_replace('/\[(.*?)\]/sm', '', $string);
 
 	// Match full names against @tags including the space between first and last
 	// We will look these up afterward to see if they are full names or not recognisable.
 
-	if(preg_match_all('/(@[^ \x0D\x0A,:?]+ [^ \x0D\x0A@,:?]+)([ \x0D\x0A@,:?]|$)/',$s,$match)) {
-		foreach($match[1] as $mtch) {
-			if(strstr($mtch,"]")) {
+	if (preg_match_all('/(@[^ \x0D\x0A,:?]+ [^ \x0D\x0A@,:?]+)([ \x0D\x0A@,:?]|$)/', $string, $matches)) {
+		foreach ($matches[1] as $match) {
+			if (strstr($match, ']')) {
 				// we might be inside a bbcode color tag - leave it alone
 				continue;
 			}
-			if(substr($mtch,-1,1) === '.')
-				$ret[] = substr($mtch,0,-1);
-			else
-				$ret[] = $mtch;
+			if (substr($match, -1, 1) === '.') {
+				$ret[] = substr($match, 0, -1);
+			} else {
+				$ret[] = $match;
+			}
 		}
 	}
 
 	// Otherwise pull out single word tags. These can be @nickname, @first_last
 	// and #hash tags.
 
-	if(preg_match_all('/([!#@][^ \x0D\x0A,;:?]+)([ \x0D\x0A,;:?]|$)/',$s,$match)) {
-		foreach($match[1] as $mtch) {
-			if(strstr($mtch,"]")) {
+	if (preg_match_all('/([!#@][^\^ \x0D\x0A,;:?]+)([ \x0D\x0A,;:?]|$)/', $string, $matches)) {
+		foreach($matches[1] as $match) {
+			if (strstr($match, ']')) {
 				// we might be inside a bbcode color tag - leave it alone
 				continue;
 			}
-			if(substr($mtch,-1,1) === '.')
-				$mtch = substr($mtch,0,-1);
+			if (substr($match, -1, 1) === '.') {
+				$match = substr($match,0,-1);
+			}
 			// ignore strictly numeric tags like #1
-			if((strpos($mtch,'#') === 0) && ctype_digit(substr($mtch,1)))
+			if ((strpos($match, '#') === 0) && ctype_digit(substr($match, 1))) {
 				continue;
+			}
 			// try not to catch url fragments
-			if(strpos($s,$mtch) && preg_match('/[a-zA-z0-9\/]/',substr($s,strpos($s,$mtch)-1,1)))
+			if (strpos($string, $match) && preg_match('/[a-zA-z0-9\/]/', substr($string, strpos($string, $match) - 1, 1))) {
 				continue;
-			$ret[] = $mtch;
+			}
+			$ret[] = $match;
 		}
 	}
 	return $ret;
-}}
+}
 
 
 //
@@ -856,15 +874,15 @@ function contact_block() {
 	if((! is_array($a->profile)) || ($a->profile['hide-friends']))
 		return $o;
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
-			WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 and `pending` = 0
-				AND `hidden` = 0 AND `archive` = 0
+			WHERE `uid` = %d AND NOT `self` AND NOT `blocked`
+				AND NOT `pending` AND NOT `hidden` AND NOT `archive`
 				AND `network` IN ('%s', '%s', '%s')",
 			intval($a->profile['uid']),
 			dbesc(NETWORK_DFRN),
 			dbesc(NETWORK_OSTATUS),
 			dbesc(NETWORK_DIASPORA)
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		$total = intval($r[0]['total']);
 	}
 	if(! $total) {
@@ -874,26 +892,28 @@ function contact_block() {
 	} else {
 		// Splitting the query in two parts makes it much faster
 		$r = q("SELECT `id` FROM `contact`
-				WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending`
-					AND NOT `hidden` AND NOT `archive`
-				AND `network` IN ('%s', '%s', '%s') ORDER BY RAND() LIMIT %d",
+				WHERE `uid` = %d AND NOT `self` AND NOT `blocked`
+					AND NOT `pending` AND NOT `hidden` AND NOT `archive`
+					AND `network` IN ('%s', '%s', '%s')
+				ORDER BY RAND() LIMIT %d",
 				intval($a->profile['uid']),
 				dbesc(NETWORK_DFRN),
 				dbesc(NETWORK_OSTATUS),
 				dbesc(NETWORK_DIASPORA),
 				intval($shown)
 		);
-		if ($r) {
-			$contacts = "";
-			foreach ($r AS $contact)
+		if (dbm::is_result($r)) {
+			$contacts = array();
+			foreach ($r AS $contact) {
 				$contacts[] = $contact["id"];
-
+			}
 			$r = q("SELECT `id`, `uid`, `addr`, `url`, `name`, `thumb`, `network` FROM `contact` WHERE `id` IN (%s)",
 				dbesc(implode(",", $contacts)));
-			if(count($r)) {
+
+			if (dbm::is_result($r)) {
 				$contacts = sprintf( tt('%d Contact','%d Contacts', $total),$total);
 				$micropro = Array();
-				foreach($r as $rr) {
+				foreach ($r as $rr) {
 					$micropro[] = micropro($rr,true,'mpfriend');
 				}
 			}
@@ -928,11 +948,11 @@ function contact_block() {
  *	string 'thumb' => The contact picture
  *	string 'click' => js code which is performed when clicking on the contact
  * @param boolean $redirect If true try to use the redir url if it's possible
- * @param string $class CSS class for the 
+ * @param string $class CSS class for the
  * @param boolean $textmode If true display the contacts as text links
  *	if false display the contacts as picture links
- 
- * @return string Formatted html 
+
+ * @return string Formatted html
  */
 function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 
@@ -988,7 +1008,7 @@ function search($s,$id='search-box',$url='search',$save = false, $aside = true) 
 	$a = get_app();
 
 	$values = array(
-			'$s' => $s,
+			'$s' => htmlspecialchars($s),
 			'$id' => $id,
 			'$action_url' => $url,
 			'$search_label' => t('Search'),
@@ -1152,33 +1172,29 @@ function link_compare($a,$b) {
 	return false;
 }}
 
-
-if(! function_exists('redir_private_images')) {
 /**
- * Find any non-embedded images in private items and add redir links to them
+ * @brief Find any non-embedded images in private items and add redir links to them
  *
  * @param App $a
- * @param array $item
+ * @param array &$item The field array of an item row
  */
-function redir_private_images($a, &$item) {
-
+function redir_private_images($a, &$item)
+{
 	$matches = false;
 	$cnt = preg_match_all('|\[img\](http[^\[]*?/photo/[a-fA-F0-9]+?(-[0-9]\.[\w]+?)?)\[\/img\]|', $item['body'], $matches, PREG_SET_ORDER);
-	if($cnt) {
-		//logger("redir_private_images: matches = " . print_r($matches, true));
-		foreach($matches as $mtch) {
-			if(strpos($mtch[1], '/redir') !== false)
+	if ($cnt) {
+		foreach ($matches as $mtch) {
+			if (strpos($mtch[1], '/redir') !== false) {
 				continue;
+			}
 
-			if((local_user() == $item['uid']) && ($item['private'] != 0) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN)) {
-				//logger("redir_private_images: redir");
-				$img_url = 'redir?f=1&quiet=1&url=' . $mtch[1] . '&conurl=' . $item['author-link'];
-				$item['body'] = str_replace($mtch[0], "[img]".$img_url."[/img]", $item['body']);
+			if ((local_user() == $item['uid']) && ($item['private'] != 0) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN)) {
+				$img_url = 'redir?f=1&quiet=1&url=' . urlencode($mtch[1]) . '&conurl=' . urlencode($item['author-link']);
+				$item['body'] = str_replace($mtch[0], '[img]' . $img_url . '[/img]', $item['body']);
 			}
 		}
 	}
-
-}}
+}
 
 function put_item_in_cache(&$item, $update = false) {
 
@@ -1352,7 +1368,7 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 	// map
 	if(strpos($s,'<div class="map">') !== false && $item['coord']) {
 		$x = generate_map(trim($item['coord']));
-		if($x) {
+		if ($x) {
 			$s = preg_replace('/\<div class\=\"map\"\>/','$0' . $x,$s);
 		}
 	}
@@ -1702,7 +1718,7 @@ function bb_translate_video($s) {
 
 	$matches = null;
 	$r = preg_match_all("/\[video\](.*?)\[\/video\]/ism",$s,$matches,PREG_SET_ORDER);
-	if($r) {
+	if ($r) {
 		foreach($matches as $mtch) {
 			if((stristr($mtch[1],'youtube')) || (stristr($mtch[1],'youtu.be')))
 				$s = str_replace($mtch[0],'[youtube]' . $mtch[1] . '[/youtube]',$s);
@@ -1917,7 +1933,7 @@ function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
 			//	intval($uid)
 			//);
 
-			if(count($r)) {
+			if (dbm::is_result($r)) {
 				unset($deleted_tags[$key]);
 			}
 			else {
@@ -1947,7 +1963,7 @@ function file_tag_save_file($uid,$item,$file) {
 		intval($item),
 		intval($uid)
 	);
-	if(count($r)) {
+	if (dbm::is_result($r)) {
 		if(! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']'))
 			q("UPDATE `item` SET `file` = '%s' WHERE `id` = %d AND `uid` = %d",
 				dbesc($r[0]['file'] . '[' . file_tag_encode($file) . ']'),
@@ -1985,8 +2001,9 @@ function file_tag_unsave_file($uid,$item,$file,$cat = false) {
 		intval($item),
 		intval($uid)
 	);
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		return false;
+	}
 
 	q("UPDATE `item` SET `file` = '%s' WHERE `id` = %d AND `uid` = %d",
 		dbesc(str_replace($pattern,'',$r[0]['file'])),
@@ -2005,11 +2022,11 @@ function file_tag_unsave_file($uid,$item,$file,$cat = false) {
 	//$r = q("select file from item where uid = %d and deleted = 0 " . file_tag_file_query('item',$file,(($cat) ? 'category' : 'file')),
 	//);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		$saved = get_pconfig($uid,'system','filetags');
 		set_pconfig($uid,'system','filetags',str_replace($pattern,'',$saved));
-
 	}
+
 	return true;
 }
 
@@ -2028,13 +2045,6 @@ function undo_post_tagging($s) {
 	}
 	return $s;
 }
-
-function fix_mce_lf($s) {
-	$s = str_replace("\r\n","\n",$s);
-//	$s = str_replace("\n\n","\n",$s);
-	return $s;
-}
-
 
 function protect_sprintf($s) {
 	return(str_replace('%','%%',$s));
@@ -2057,17 +2067,19 @@ function is_a_date_arg($s) {
 /**
  * remove intentation from a text
  */
-function deindent($text, $chr="[\t ]", $count=NULL) {
-	$text = fix_mce_lf($text);
+function deindent($text, $chr = "[\t ]", $count = NULL) {
 	$lines = explode("\n", $text);
 	if (is_null($count)) {
 		$m = array();
-		$k=0; while($k<count($lines) && strlen($lines[$k])==0) $k++;
-		preg_match("|^".$chr."*|", $lines[$k], $m);
+		$k = 0;
+		while ($k < count($lines) && strlen($lines[$k]) == 0) {
+			$k++;
+		}
+		preg_match("|^" . $chr . "*|", $lines[$k], $m);
 		$count = strlen($m[0]);
 	}
-	for ($k=0; $k<count($lines); $k++){
-		$lines[$k] = preg_replace("|^".$chr."{".$count."}|", "", $lines[$k]);
+	for ($k=0; $k < count($lines); $k++) {
+		$lines[$k] = preg_replace("|^" . $chr . "{" . $count . "}|", "", $lines[$k]);
 	}
 
 	return implode("\n", $lines);
@@ -2087,7 +2099,7 @@ function formatBytes($bytes, $precision = 2) {
 
 /**
  * @brief translate and format the networkname of a contact
- * 
+ *
  * @param string $network
  *	Networkname of the contact (e.g. dfrn, rss and so on)
  * @param sting $url
@@ -2113,47 +2125,48 @@ function format_network_name($network, $url = 0) {
  * @param string $lang Programming language
  * @return string Formated html
  */
-function text_highlight($s,$lang) {
-	if($lang === 'js')
+function text_highlight($s, $lang) {
+	if ($lang === 'js') {
 		$lang = 'javascript';
-
-	if(! strpos('Text_Highlighter',get_include_path())) {
-		set_include_path(get_include_path() . PATH_SEPARATOR . 'library/Text_Highlighter');
 	}
 
-	require_once('library/Text_Highlighter/Text/Highlighter.php');
-	require_once('library/Text_Highlighter/Text/Highlighter/Renderer/Html.php');
+	// @TODO: Replace Text_Highlighter_Renderer_Html by scrivo/highlight.php
+
+	// Autoload the library to make constants available
+	class_exists('Text_Highlighter_Renderer_Html');
+
 	$options = array(
 		'numbers' => HL_NUMBERS_LI,
 		'tabsize' => 4,
-		);
+	);
 
 	$tag_added = false;
-	$s = trim(html_entity_decode($s,ENT_COMPAT));
-	$s = str_replace("    ","\t",$s);
+	$s = trim(html_entity_decode($s, ENT_COMPAT));
+	$s = str_replace('    ', "\t", $s);
 
-	// The highlighter library insists on an opening php tag for php code blocks. If 
+	// The highlighter library insists on an opening php tag for php code blocks. If
 	// it isn't present, nothing is highlighted. So we're going to see if it's present.
 	// If not, we'll add it, and then quietly remove it after we get the processed output back.
 
-	if($lang === 'php') {
-		if(strpos('<?php',$s) !== 0) {
+	if ($lang === 'php') {
+		if (strpos($s, '<?php') !== 0) {
 			$s = '<?php' . "\n" . $s;
 			$tag_added = true;
 		}
-	} 
+	}
 
-	$renderer = new Text_Highlighter_Renderer_HTML($options);
+	$renderer = new Text_Highlighter_Renderer_Html($options);
 	$hl = Text_Highlighter::factory($lang);
 	$hl->setRenderer($renderer);
 	$o = $hl->highlight($s);
-	$o = str_replace(["    ","\n"],["&nbsp;&nbsp;&nbsp;&nbsp;",''],$o);
+	$o = str_replace("\n", '', $o);
 
-	if($tag_added) {
-		$b = substr($o,0,strpos($o,'<li>'));
-		$e = substr($o,strpos($o,'</li>'));
+
+	if ($tag_added) {
+		$b = substr($o, 0, strpos($o, '<li>'));
+		$e = substr($o, strpos($o, '</li>'));
 		$o = $b . $e;
 	}
 
-	return('<code>' . $o . '</code>');
+	return '<code>' . $o . '</code>';
 }

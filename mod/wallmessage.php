@@ -2,7 +2,7 @@
 
 require_once('include/message.php');
 
-function wallmessage_post(&$a) {
+function wallmessage_post(App $a) {
 
 	$replyto = get_my_url();
 	if(! $replyto) {
@@ -22,7 +22,7 @@ function wallmessage_post(&$a) {
 		dbesc($recipient)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		logger('wallmessage: no recipient');
 		return;
 	}
@@ -42,12 +42,6 @@ function wallmessage_post(&$a) {
 		notice( sprintf( t('Number of daily wall messages for %s exceeded. Message failed.', $user['username'])));
 		return;
 	}
-
-	// Work around doubled linefeeds in Tinymce 3.5b2
-
-	$body = str_replace("\r\n","\n",$body);
-	$body = str_replace("\n\n","\n",$body);
-
 
 	$ret = send_wallmessage($user, $body, $subject, $replyto);
 
@@ -73,7 +67,7 @@ function wallmessage_post(&$a) {
 }
 
 
-function wallmessage_content(&$a) {
+function wallmessage_content(App $a) {
 
 	if(! get_my_url()) {
 		notice( t('Permission denied.') . EOL);
@@ -91,7 +85,7 @@ function wallmessage_content(&$a) {
 		dbesc($recipient)
 	);
 
-	if(! count($r)) {
+	if (! dbm::is_result($r)) {
 		notice( t('No recipient.') . EOL);
 		logger('wallmessage: no recipient');
 		return;
@@ -113,16 +107,9 @@ function wallmessage_content(&$a) {
 		return;
 	}
 
-
-
-	$editselect = 'none';
-	if( feature_enabled(local_user(), 'richtext') )
-		$editselect = '/(profile-jot-text|prvmail-text)/';
-
 	$tpl = get_markup_template('wallmsg-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
-		'$editselect' => $editselect,
 		'$nickname' => $user['nickname'],
 		'$linkurl' => t('Please enter a link URL:')
 	));
@@ -130,13 +117,10 @@ function wallmessage_content(&$a) {
 	$tpl = get_markup_template('wallmsg-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, array(
 		'$baseurl' => $a->get_baseurl(true),
-		'$editselect' => $editselect,
 		'$nickname' => $user['nickname'],
 		'$linkurl' => t('Please enter a link URL:')
 	));
-	
 
-	
 	$tpl = get_markup_template('wallmessage.tpl');
 	$o .= replace_macros($tpl,array(
 		'$header' => t('Send Private Message'),

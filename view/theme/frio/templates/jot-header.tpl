@@ -1,17 +1,13 @@
 
+<script type="text/javascript" src="{{$baseurl}}/js/ajaxupload.js" ></script>
 
-{{*<script language="javascript" type="text/javascript">*}}
+<script type="text/javascript">
+	var editor = false;
+	var textlen = 0;
 
-
-<script>
-var editor=false;
-var textlen = 0;
-var plaintext = '{{$editselect}}';
-
-function initEditor(cb){
-	if (editor==false){
-		$("#profile-jot-text-loading").show();
-		if(plaintext == 'none') {
+	function initEditor(callback) {
+		if (editor == false) {
+			$("#profile-jot-text-loading").show();
 			$("#profile-jot-text-loading").hide();
 			//$("#profile-jot-text").addClass("profile-jot-text-full").removeClass("profile-jot-text-empty");
 			$("#jot-category").show();
@@ -19,130 +15,35 @@ function initEditor(cb){
 			$("#jot-profile-jot-wrapper").show();
 			$("#profile-jot-text").editor_autocomplete(baseurl+"/acl");
 			$("#profile-jot-text").bbco_autocomplete('bbcode');
-			editor = true;
 			$("a#jot-perms-icon").colorbox({
 				'inline' : true,
 				'transition' : 'elastic'
 			});
 			$(".jothidden").show();
-			if (typeof cb!="undefined") cb();
-			return;
-		}	
-		tinyMCE.init({
-			theme : "advanced",
-			mode : "specific_textareas",
-			editor_selector: {{$editselect}},
-			auto_focus: "profile-jot-text",
-			plugins : "bbcode,paste,autoresize, inlinepopups",
-			theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,formatselect,code",
-			theme_advanced_buttons2 : "",
-			theme_advanced_buttons3 : "",
-			theme_advanced_toolbar_location : "top",
-			theme_advanced_toolbar_align : "center",
-			theme_advanced_blockformats : "blockquote,code",
-			theme_advanced_resizing : true,
-			gecko_spellcheck : true,
-			paste_text_sticky : true,
-			entity_encoding : "raw",
-			add_unload_trigger : false,
-			remove_linebreaks : false,
-			//force_p_newlines : false,
-			//force_br_newlines : true,
-			forced_root_block : 'div',
-			convert_urls: false,
-			content_css: "{{$baseurl}}/view/custom_tinymce.css",
-			theme_advanced_path : false,
-			file_browser_callback : "fcFileBrowser",
-			setup : function(ed) {
-				cPopup = null;
-				ed.onKeyDown.add(function(ed,e) {
-					if(cPopup !== null)
-						cPopup.onkey(e);
-				});
+			$("#profile-jot-text").keyup(function(){
+				var textlen = $(this).val().length;
+				$('#character-counter').text(textlen);
+			});
 
-				ed.onKeyUp.add(function(ed, e) {
-					var txt = tinyMCE.activeEditor.getContent();
-					match = txt.match(/@([^ \n]+)$/);
-					if(match!==null) {
-						if(cPopup === null) {
-							cPopup = new ACPopup(this,baseurl+"/acl");
-						}
-						if(cPopup.ready && match[1]!==cPopup.searchText) cPopup.search(match[1]);
-						if(! cPopup.ready) cPopup = null;
-					}
-					else {
-						if(cPopup !== null) { cPopup.close(); cPopup = null; }
-					}
-
-					textlen = txt.length;
-					if(textlen != 0 && $('#jot-perms-icon').is('.unlock')) {
-						$('#profile-jot-desc').html(ispublic);
-					}
-					else {
-						$('#profile-jot-desc').html('&nbsp;');
-					}	 
-
-				 //Character count
-
-					if(textlen <= 140) {
-						$('#character-counter').removeClass('red');
-						$('#character-counter').removeClass('orange');
-						$('#character-counter').addClass('grey');
-					}
-					if((textlen > 140) && (textlen <= 420)) {
-						$('#character-counter').removeClass('grey');
-						$('#character-counter').removeClass('red');
-						$('#character-counter').addClass('orange');
-					}
-					if(textlen > 420) {
-						$('#character-counter').removeClass('grey');
-						$('#character-counter').removeClass('orange');
-						$('#character-counter').addClass('red');
-					}
-					$('#character-counter').text(textlen);
-				});
-
-				ed.onInit.add(function(ed) {
-					ed.pasteAsPlainText = true;
-					$("#profile-jot-text-loading").hide();
-					$(".jothidden").show();
-					if (typeof cb!="undefined") cb();
-				});
-
-			}
-
-		});
-		editor = true;
-
-		// setup acl popup
-		$("a#jot-perms-icon").colorbox({
-			'inline' : true,
-			'transition' : 'elastic'
-		}); 
-
-	} else {
-		if (typeof cb!="undefined") cb();
+			editor = true;
+		}
+		if (typeof callback != "undefined") {
+			callback();
+		}
 	}
-}
 
-function enableOnUser(){
-	if (editor) return;
-	//$(this).val("");
-	initEditor();
-}
-
-
-
-
+	function enableOnUser(){
+		initEditor();
+	}
 </script>
-<script type="text/javascript" src="{{$baseurl}}/js/ajaxupload.js" ></script>
-<script>
+
+<script type="text/javascript">
 	var ispublic = '{{$ispublic}}';
 
 
 	$(document).ready(function() {
 
-		/* enable tinymce on focus and click */
+		/* enable editor on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
 
@@ -179,33 +80,6 @@ function enableOnUser(){
 			Dialog.doFileBrowser("main");
 			jotActive();
 		});
-
-		/**
-			var uploader = new window.AjaxUpload(
-				'wall-image-upload',
-				{ action: 'wall_upload/{{$nickname}}',
-					name: 'userfile',
-					onSubmit: function(file,ext) { $('#profile-rotator').show(); },
-					onComplete: function(file,response) {
-						addeditortext(response);
-						$('#profile-rotator').hide();
-					}
-				}
-			);
-			var file_uploader = new window.AjaxUpload(
-				'wall-file-upload',
-				{ action: 'wall_attach/{{$nickname}}',
-					name: 'userfile',
-					onSubmit: function(file,ext) { $('#profile-rotator').show(); },
-					onComplete: function(file,response) {
-						addeditortext(response);
-						$('#profile-rotator').hide();
-					}
-				}
-			);
-
-		}
-		**/
 	});
 
 	function deleteCheckedItems() {
@@ -379,18 +253,14 @@ function enableOnUser(){
 	}
 
 	function addeditortext(data) {
-		if(plaintext == 'none') {
-			// get the textfield
-			var textfield = document.getElementById("profile-jot-text");
-			// check if the textfield does have the default-value
-			jotTextOpenUI(textfield);
-			// save already existent content
-			var currentText = $("#profile-jot-text").val();
-			//insert the data as new value
-			textfield.value = currentText + data;
-		}
-		else
-			tinyMCE.execCommand('mceInsertRawHTML',false,data);
+		// get the textfield
+		var textfield = document.getElementById("profile-jot-text");
+		// check if the textfield does have the default-value
+		jotTextOpenUI(textfield);
+		// save already existent content
+		var currentText = $("#profile-jot-text").val();
+		//insert the data as new value
+		textfield.value = currentText + data;
 	}
 
 	{{$geotag}}
@@ -399,42 +269,25 @@ function enableOnUser(){
 		var modal = $('#jot-modal').modal();
 		jotcache = $("#jot-sections");
 
+		// Auto focus on the first enabled field in the modal
+		modal.on('shown.bs.modal', function (e) {
+			$('#jot-modal-content').find('select:not([disabled]), input:not([type=hidden]):not([disabled]), textarea:not([disabled])').first().focus();
+		})
+
 		modal
 			.find('#jot-modal-content')
 			.append(jotcache)
 			.modal.show;
 	}
 
-	// the following functions show/hide the specific jot content 
-	// in dependence of the selected nav
-	function aclActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").hide();
-		$(".modal-body #profile-jot-acl-wrapper").show();
-	}
-
-
-	function previewActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #profile-jot-acl-wrapper,.modal-body #jot-fbrowser-wrapper").hide();
-		preview_post();
-	}
-
+	// Activate the jot text section in the jot modal
 	function jotActive() {
-		$(".modal-body #profile-jot-acl-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").hide();
-		$(".modal-body #profile-jot-wrapper").show();
-
-		//make sure jot text does have really the active class (we do this because there are some
-		// other events which trigger jot text
-		toggleJotNav($("#jot-modal .jot-nav #jot-text-lnk"));
+		// Make sure jot text does have really the active class (we do this because there are some
+		// other events which trigger jot text (we need to do this for the desktop and mobile
+		// jot nav
+		var elem = $("#jot-modal .jot-nav #jot-text-lnk");
+		var elemMobile = $("#jot-modal .jot-nav #jot-text-lnk-mobile")
+		toggleJotNav(elem[0]);
+		toggleJotNav(elemMobile[0]);
 	}
-
-	function fbrowserActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #profile-jot-acl-wrapper").hide();
-
-		$(".modal-body #jot-fbrowser-wrapper").show();
-
-		$(function() {Dialog.showJot();});
-	}
-
-
 </script>
-

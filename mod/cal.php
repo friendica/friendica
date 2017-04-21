@@ -9,7 +9,7 @@
 require_once('include/event.php');
 require_once('include/redir.php');
 
-function cal_init(&$a) {
+function cal_init(App $a) {
 	if($a->argc > 1)
 		auto_redir($a, $a->argv[1]);
 
@@ -40,10 +40,7 @@ function cal_init(&$a) {
 
 		$profile = get_profiledata_by_nick($nick, $a->profile_uid);
 
-		if((intval($profile['page-flags']) == PAGE_COMMUNITY) || (intval($profile['page-flags']) == PAGE_PRVGROUP))
-			$account_type = t('Forum');
-		else
-			$account_type = "";
+		$account_type = account_type($profile);
 
 		$tpl = get_markup_template("vcard-widget.tpl");
 
@@ -67,12 +64,8 @@ function cal_init(&$a) {
 	return;
 }
 
-function cal_content(&$a) {
+function cal_content(App $a) {
 	nav_set_selected('events');
-
-	$editselect = 'none';
-	if( feature_enabled(local_user(), 'richtext') )
-		$editselect = 'textareas';
 
 	// First day of the week (0 = Sunday)
 	$firstDay = get_pconfig(local_user(),'system','first_day_of_week');
@@ -83,17 +76,15 @@ function cal_content(&$a) {
 
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl,array(
-		'$baseurl' => $a->get_baseurl(),
+		'$baseurl' => App::get_baseurl(),
 		'$module_url' => '/cal/' . $a->data['user']['nickname'],
 		'$modparams' => 2,
 		'$i18n' => $i18n,
-		'$editselect' => $editselect
 	));
 
 	$etpl = get_markup_template('event_end.tpl');
 	$a->page['end'] .= replace_macros($etpl,array(
-		'$baseurl' => $a->get_baseurl(),
-		'$editselect' => $editselect
+		'$baseurl' => App::get_baseurl(),
 	));
 
 	$o ="";
@@ -135,7 +126,7 @@ function cal_content(&$a) {
 			intval($contact_id),
 			intval($a->profile['profile_uid'])
 		);
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$contact = $r[0];
 			$remote_contact = true;
 		}
@@ -201,8 +192,8 @@ function cal_content(&$a) {
 
 
 		if ($a->argv[2] === 'json'){
-			if (x($_GET,'start'))	$start = date("Y-m-d h:i:s", $_GET['start']);
-			if (x($_GET,'end'))	$finish = date("Y-m-d h:i:s", $_GET['end']);
+			if (x($_GET,'start'))	$start = $_GET['start'];
+			if (x($_GET,'end'))	$finish = $_GET['end'];
 		}
 
 		$start  = datetime_convert('UTC','UTC',$start);
@@ -230,12 +221,13 @@ function cal_content(&$a) {
 
 		$links = array();
 
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$r = sort_by_date($r);
-			foreach($r as $rr) {
+			foreach ($r as $rr) {
 				$j = (($rr['adjust']) ? datetime_convert('UTC',date_default_timezone_get(),$rr['start'], 'j') : datetime_convert('UTC','UTC',$rr['start'],'j'));
-				if(! x($links,$j))
-					$links[$j] = $a->get_baseurl() . '/' . $a->cmd . '#link-' . $j;
+				if (! x($links,$j)) {
+					$links[$j] = App::get_baseurl() . '/' . $a->cmd . '#link-' . $j;
+				}
 			}
 		}
 
@@ -243,7 +235,7 @@ function cal_content(&$a) {
 		$events=array();
 
 		// transform the event in a usable array
-		if(count($r))
+		if (dbm::is_result($r))
 			$r = sort_by_date($r);
 			$events = process_events($r);
 
@@ -256,7 +248,7 @@ function cal_content(&$a) {
 			$tpl =  get_markup_template("event.tpl");
 		} else {
 //			if (get_config('experimentals','new_calendar')==1){
-				$tpl = get_markup_template("events-js.tpl");
+				$tpl = get_markup_template("events_js.tpl");
 //			} else {
 //				$tpl = get_markup_template("events.tpl");
 //			}
@@ -273,12 +265,12 @@ function cal_content(&$a) {
 		}
 
 		$o = replace_macros($tpl, array(
-			'$baseurl'	=> $a->get_baseurl(),
+			'$baseurl'	=> App::get_baseurl(),
 			'$tabs'		=> $tabs,
 			'$title'	=> t('Events'),
 			'$view'		=> t('View'),
-			'$previus'	=> array($a->get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
-			'$next'		=> array($a->get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
+			'$previous'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth", t('Previous'),'',''),
+			'$next'		=> array(App::get_baseurl()."/events/$nextyear/$nextmonth", t('Next'),'',''),
 			'$calendar' => cal($y,$m,$links, ' eventcal'),
 
 			'$events'	=> $events,
@@ -287,8 +279,7 @@ function cal_content(&$a) {
 			"month" => t("month"),
 			"week" => t("week"),
 			"day" => t("day"),
-
-
+			"list" => t("list"),
 		));
 
 		if (x($_GET,'id')){ echo $o; killme(); }

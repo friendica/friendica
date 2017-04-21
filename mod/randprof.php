@@ -1,10 +1,14 @@
 <?php
 
 
-function randprof_init(&$a) {
+function randprof_init(App $a) {
 	require_once('include/Contact.php');
+
 	$x = random_profile();
-	if($x)
+
+	if ($x) {
 		goaway(zrl($x));
-	goaway($a->get_baseurl() . '/profile');
+	}
+
+	goaway(App::get_baseurl() . '/profile');
 }

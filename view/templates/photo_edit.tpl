@@ -3,6 +3,7 @@
 <form action="photos/{{$nickname}}/{{$resource_id}}" method="post" id="photo_edit_form" >
 
 	<input type="hidden" name="item_id" value="{{$item_id}}" />
+	<input type="hidden" name="origaname" value="{{$album.2}}" />
 
 	{{include file="field_input.tpl" field=$album}}
 	{{include file="field_input.tpl" field=$caption}}

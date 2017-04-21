@@ -1,3 +1,0 @@
-
-{{$follow_widget}}
-

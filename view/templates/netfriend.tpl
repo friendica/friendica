@@ -1,5 +1,9 @@
 
-<div class="intro-approve-as-friend-desc">{{$approve_as}}</div>
+<div class="intro-approve-as-friend-desc">
+  <p>{{$approve_as1}}</p>
+  <p>{{$approve_as2}}</p>
+  <p>{{$approve_as3}}</p>
+</div>
 
 <div class="intro-approve-as-friend-wrapper">
 	<label class="intro-approve-as-friend-label" for="intro-approve-as-friend-{{$intro_id}}">{{$as_friend}}</label>

@@ -1,15 +1,16 @@
 # Settings
 
+* [Home](help)
+
 If you are the admin of a Friendica node, you have access to the so called **Admin Panel** where you can configure your Friendica node.
 
 On the front page of the admin panel you will see a summary of information about your node.
 These information include the amount of messages currently being processed in the queues.
-The first number is the number of messages being actively sent.
-This number should decrease quickly.
-The second is the messages which could for various reasons not being delivered.
+The first number is the number of messages which could not been delivered for various reasons.
 They will be resend later.
 You can have a quick glance into that second queus in the "Inspect Queue" section of the admin panel.
-If you have activated the background workers, there might be a third number representing the count of jobs queued for the workers.
+The second number represents the current number of jobs for the background workers.
+These worker tasks are prioritised and are done accordingly.
 
 Then you get an overview of the accounts on your node, which can be moderated in the "Users" section of the panel.
 As well as an overview of the currently active addons
@@ -33,7 +34,7 @@ Therefore this document does not yet cover all the options
 
 Set the content for the site banner.
 The default logo is the Friendica logo and name.
-You may wish to provide HTML/CSS to style and/or position this content, as it may not be themed by default. 
+You may wish to provide HTML/CSS to style and/or position this content, as it may not be themed by default.
 
 #### Language
 
@@ -62,7 +63,7 @@ You may find a lot of spammers trying to register on your site.
 During testing we discovered that since these registrations were automatic, the "Full Name" field was often set to just an account name with no space between first and last name.
 If you would like to support people with only one name as their full name, you may change this setting to true.
 Default is false.
- 
+
 #### OpenID
 
 By default, OpenID may be used for both registration and logins.
@@ -77,7 +78,7 @@ By default, logged in users can register additional accounts for use as pages.
 These will still require approval if the registration policy is set to *require approval*
 You may prohibit logged in users from creating additional accounts by setting *block multible registrations* to true.
 Default is false.
- 
+
 ### File upload
 
 #### Maximum Image Size
@@ -91,7 +92,7 @@ The default is set to 0, which means no limits.
 
 This configures the URL to update the global directory, and is supplied in the default configuration.
 The undocumented part is that if this is not set, the global directory is completely unavailable to the application.
-This allows a private community to be completely isolated from the global network. 
+This allows a private community to be completely isolated from the global network.
 
 #### Force Publish
 
@@ -127,10 +128,13 @@ Wildcards are accepted.
 (Wildcard support on Windows platforms requires PHP5.3).
 By default, any (valid) email address is allowed in registrations.
 
-#### Allow Users to set remote_self 
+#### Allow Users to set remote_self
 
 If you enable the `Allow Users to set remote_self` users can select Atom feeds from their contact list being their *remote self* in die advanced contact settings.
 Which means that postings by the remote self are automatically reposted by Friendica in their names.
+
+This feature can be used to let the user mirror e.g. blog postings into their Friendica postings.
+It is disabled by default, as it causes additional load on the server and may be misused to distribute SPAM.
 
 As admin of the node you can also set this flag directly in the database.
 Before doing so, you should be sure you know what you do and have a backup of the database.
@@ -149,20 +153,13 @@ Value is in seconds.
 Default is 60 seconds.
 Set to 0 for unlimited (not recommended).
 
-#### UTF-8 Regular Expressions
-
-During registrations, full names are checked using UTF-8 regular expressions.
-This requires PHP to have been compiled with a special setting to allow UTF-8 expressions.
-If you are completely unable to register accounts, set no_utf to true.
-The default is set to false (meaning UTF8 regular expressions are supported and working).
-
 #### Verify SSL Certitificates
 
 By default Friendica allows SSL communication between websites that have "self-signed" SSL certificates.
 For the widest compatibility with browsers and other networks we do not recommend using self-signed certificates, but we will not prevent you from using them.
 SSL encrypts all the data transmitted between sites (and to your browser).
 This allows you to have completely encrypted communications, and also protect your login session from hijacking.
-Self-signed certificates can be generated for free, without paying top-dollar for a website SSL certificate. 
+Self-signed certificates can be generated for free, without paying top-dollar for a website SSL certificate.
 However these aren't looked upon favourably in the security community because they can be subject to so-called "man-in-the-middle" attacks.
 If you wish, you can turn on strict certificate checking.
 This will mean you cannot connect (at all) to self-signed SSL sites.
@@ -172,6 +169,19 @@ This will mean you cannot connect (at all) to self-signed SSL sites.
 ### Performance
 
 ### Worker
+
+This section allows you to configure the background process that is triggered by the `cron` job that was created during the installation.
+The process does check the available system resources before creating a new worker for a task.
+Because of this, it may happen that the maximum number of worker processes you allow will not be reached.
+
+If your server setup does not allow you to use the `proc_open` function of PHP, please disable it in this section.
+
+The tasks for the background process have priorities.
+To guarantee that important tasks are executed even though the system has a lot of work to do, it is useful to enable the *fastlane*.
+
+Should you not be able to run a cron job on your server, you can also activate the *frontend* worker.
+If you have done so, you can call `example.com/worker` (replace example.com with your actual domain name) on a regular basis from an external servie.
+This will then trigger the execution of the background process.
 
 ### Relocate
 
@@ -210,8 +220,7 @@ To select a default theme for the Friendica node, see the *Site* section of the 
 
 ## Additional Features
 
-There are several optional features in Friendica.
-Like the *dislike* button or the usage of a *richtext editor* for composing new postings.
+There are several optional features in Friendica like the *dislike* button.
 In this section of the admin panel you can select a default setting for your node and eventually fix it, so users cannot change the setting anymore.
 
 ## DB Updates
@@ -267,7 +276,7 @@ You should set up some kind of [log rotation](https://en.wikipedia.org/wiki/Log_
 
 By default PHP warnings and error messages are supressed.
 If you want to enable those, you have to activate them in the ``.htconfig.php`` file.
-Use the following settings to redirect PHP errors to a file. 
+Use the following settings to redirect PHP errors to a file.
 
 Config:
 
@@ -280,7 +289,7 @@ This will put all PHP errors in the file php.out (which must be writeable by the
 Undeclared variables are occasionally referenced in the program and therefore we do not recommend using `E_NOTICE` or `E_ALL`.
 The vast majority of issues reported at these levels are completely harmless.
 Please report to the developers any errors you encounter in the logs using the recommended settings above.
-They generally indicate issues which need to be resolved. 
+They generally indicate issues which need to be resolved.
 
 If you encounter a blank (white) page when using the application, view the PHP logs - as this almost always indicates an error has occurred.
 

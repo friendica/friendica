@@ -6,12 +6,12 @@
 	<div id="profile-edit-links">
 		<ul class="nav nav-pills preferences">
 			<li class="dropdown pull-right">
-				<a class="btn btn-link btn-sm dropdown-toggle" type="button" id="profile-edit-links-dropdown" data-toggle="dropdown" aria-expanded="true">
-							<i class="fa fa-angle-down"  aria-hidden="true"></i>&nbsp;{{$profile_action}}
-				</a>
+				<button type="button" class="btn btn-link btn-sm dropdown-toggle" id="profile-edit-links-dropdown" data-toggle="dropdown" aria-expanded="true">
+					<i class="fa fa-angle-down"  aria-hidden="true"></i>&nbsp;{{$profile_action}}
+				</button>
 				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="profile-edit-links-dropdown">
 					<li role="menuitem"><a href="profile_photo" id="profile-photo_upload-link" title="{{$profpic|escape:'html'}}"><i class="fa fa-user"  aria-hidden="true"></i>&nbsp;{{$profpic}}</a></li>
-					<li role="menuitem"><a id="profile-photo_upload-link" title="{{$profpic|escape:'html'}}" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user"  aria-hidden="true"></i>&nbsp;{{$profpic}}</a></li>
+					<li role="menuitem"><button type="button" class="btn-link" id="profile-photo_upload-link" title="{{$profpic|escape:'html'}}" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$profpic}}</button></li>
 					{{if ! $is_default}}
 					<li class="nav-item"><a href="profperm/{{$profile_id}}" id="profile-edit-visibility-link" title="{{$editvis}}"><i class="fa fa-pencil"  aria-hidden="true"></i>&nbsp;{{$editvis}}</a>
 					</li>
@@ -203,6 +203,8 @@
 					<div class="section-content-tools-wrapper">
 						{{include file="field_input.tpl" field=$homepage}}
 
+						{{include file="field_input.tpl" field=$xmpp}}
+
 						{{include file="field_input.tpl" field=$pub_keywords}}
 
 						{{include file="field_input.tpl" field=$prv_keywords}}
@@ -268,6 +270,8 @@
 
 		{{include file="field_input.tpl" field=$homepage}}
 
+		{{include file="field_input.tpl" field=$xmpp}}
+
 		{{$hide_friends}}
 
 		{{include file="field_input.tpl" field=$address}}
@@ -328,4 +332,10 @@
 	</form>
 </div>
 
-<script type="text/javascript">Fill_Country('{{$country_name.2}}');Fill_States('{{$region.2}}');</script>
+<script language="javascript" type="text/javascript">
+	Fill_Country('{{$country_name.2}}');
+	Fill_States('{{$region.2}}');
+
+	// initiale autosize for the textareas
+	autosize($("textarea.text-autosize"));
+</script>

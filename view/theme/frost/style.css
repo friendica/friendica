@@ -918,6 +918,7 @@ input#dfrn-url {
 #profile-edit-religion-label,
 #profile-edit-pubkeywords-label,
 #profile-edit-prvkeywords-label,
+#profile-edit-xmpp-label,
 #profile-edit-homepage-label,
 #profile-edit-hometown-label {
 	font-weight: 700;
@@ -939,6 +940,7 @@ input#dfrn-url {
 #sexual-select,
 #profile-edit-politic,
 #profile-edit-religion,
+#profile-edit-xmpp,
 #profile-edit-pubkeywords,
 #profile-edit-prvkeywords,
 #profile-in-dir-yes,
@@ -952,6 +954,7 @@ input#dfrn-url {
 	float: left;
 	margin-bottom: 20px;
 }
+#profile-edit-xmpp,
 #profile-edit-pubkeywords,
 #profile-edit-prvkeywords {
 	margin-bottom: 5px;
@@ -1024,6 +1027,7 @@ input#dfrn-url {
 
 
 #profile-edit-pdesc-desc,
+#profile-edit-xmpp-desc,
 #profile-edit-pubkeywords-desc,
 #profile-edit-prvkeywords-desc {
 	float: left;
@@ -1039,7 +1043,8 @@ input#dfrn-url {
 	float: left;
 	margin-bottom: 35px;
 }*/
-#profile-edit-homepage, #profile-edit-hometown {
+#profile-edit-homepage,
+#profile-edit-hometown {
 	float: left;
 	margin-bottom: 25px;
 }
@@ -1082,6 +1087,7 @@ input#dfrn-url {
 #profile-edit-pubkeywords-end,
 #profile-edit-prvkeywords-end,
 #profile-edit-homepage-end,
+#profile-edit-xmpp-end,
 #profile-edit-hometown-end,
 #profile-in-dir-break,
 #profile-in-dir-end,
@@ -1383,6 +1389,17 @@ input#dfrn-url {
 
 .wall-item-like-buttons img {
 	cursor: pointer;
+}
+
+.wall-item-tools a {
+	border-radius: 4px;
+	padding: 2px;
+	background-position: center;
+	background-size: initial !important;
+}
+
+.wall-item-tools a.active {
+	background-color: rgba(59, 101, 164, 0.5);
 }
 
 .wall-item-share-buttons {
@@ -1849,6 +1866,9 @@ input#dfrn-url {
 	-webkit-border-radius: 10px;
 }
 
+.pager .disabled {
+	display: none;
+}
 
 .pager_first,
 .pager_last,
@@ -1897,6 +1917,7 @@ input#dfrn-url {
 #advanced-profile-marital-wrapper,
 #advanced-profile-sexual-wrapper,
 #advanced-profile-homepage-wrapper,
+#advanced-profile-xmpp-wrapper,
 #advanced-profile-politic-wrapper,
 #advanced-profile-religion-wrapper,
 #advanced-profile-about-wrapper,
@@ -1919,6 +1940,7 @@ input#dfrn-url {
 #advanced-profile-marital-text,
 #advanced-profile-sexual-text,
 #advanced-profile-homepage-text,
+#advanced-profile-xmpp-text,
 #advanced-profile-politic-text,
 #advanced-profile-religion-text,
 #advanced-profile-about-text,
@@ -1942,6 +1964,7 @@ input#dfrn-url {
 #advanced-profile-marital-end,
 #advanced-profile-sexual-end,
 #advanced-profile-homepage-end,
+#advanced-profile-xmpp-end,
 #advanced-profile-politic-end,
 #advanced-profile-religion-end {
 	height: 10px;
@@ -1968,6 +1991,7 @@ input#dfrn-url {
 #advanced-profile-marital,
 #advanced-profile-sexual,
 #advanced-profile-homepage,
+#advanced-profile-xmpp,
 #advanced-profile-politic,
 #advanced-profile-religion {
 	float: left;
@@ -2912,14 +2936,14 @@ aside input[type='text'] {
 	margin-bottom: 25px;
 }
 
-.location-label, .gender-label, .marital-label, .homepage-label, .network-label {
+.location-label, .gender-label, .marital-label, .homepage-label, .ympp-label, .network-label, .xmpp-label {
 	float: left;
 	text-align: right;
 	display: block;
 	width: 65px;
 }
 
-.adr, .x-gender, .marital-text, .homepage-url, .x-network {
+.adr, .x-gender, .marital-text, .homepage-url, .x-network, .xmpp-data {
 	float: left;
 	display: block;
 	margin-left: 8px;
@@ -3886,7 +3910,7 @@ aside input[type='text'] {
 .event-maybeattend-icon { background-image: url('images/event-maybeattend-16.png'); }
 .event-dontattend-icon { background-image: url('images/event-dontattend-16.png'); }
 
-.filer-icon:hover {
+.event-icon:hover {
 	opacity: 1.0;
 }
 

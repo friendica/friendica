@@ -4,21 +4,21 @@
  * Description: Bootstrap V3 theme. The theme is currently under construction, so it is far from finished. For further information have a look at the <a href="https://github.com/friendica/friendica/tree/develop/view/theme/frio/README.md">ReadMe</a>.
  * Version: V.0.7
  * Author: Rabuzarus <https://friendica.kommune4.de/profile/rabuzarus>
- * 
+ *
  */
 
 $frio = "view/theme/frio";
 
 global $frio;
 
-function frio_init(&$a) {
+function frio_init(App $a) {
 
 	// disable the events module link in the profile tab
 	$a->theme_events_in_profile = false;
 
 	set_template_engine($a, 'smarty3');
 
-	$baseurl = $a->get_baseurl();
+	$baseurl = App::get_baseurl();
 
 	$style = get_pconfig(local_user(), 'frio', 'style');
 
@@ -60,18 +60,18 @@ function frio_uninstall() {
 	logger("uninstalled theme frio");
 }
 /**
- * @brief Replace friendica photo links
- * 
+ * @brief Replace friendica photo links hook
+ *
  *  This function does replace the links to photos
  *  of other friendica users. Original the photos are
  *  linked to the photo page. Now they will linked directly
  *  to the photo file. This function is nessesary to use colorbox
  *  in the network stream
- * 
- * @param App $a
+ *
+ * @param App $a Unused but required by hook definition
  * @param array $body_info The item and its html output
  */
-function frio_item_photo_links(&$a, &$body_info) {
+function frio_item_photo_links(App $a, &$body_info) {
 	require_once('include/Photo.php');
 
 	$phototypes = Photo::supportedTypes();
@@ -101,16 +101,16 @@ function frio_item_photo_links(&$a, &$body_info) {
 }
 
 /**
- * @brief Replace links of the item_photo_menu
- * 
+ * @brief Replace links of the item_photo_menu hook
+ *
  *  This function replaces the original poke and the message links
  *  to call the addToModal javascript function so this pages can
  *  be loaded in a bootstrap modal
- * 
- * @param app $a The app data
+ *
+ * @param App $a Unused but required by the hook definition
  * @param array $arr Contains item data and the original photo_menu
  */
-function frio_item_photo_menu($a, &$arr){
+function frio_item_photo_menu(App $a, &$arr) {
 
 	foreach($arr["menu"] as $k =>$v) {
 		if(strpos($v,'poke/?f=&c=') === 0 || strpos($v,'message/new/') === 0) {
@@ -123,17 +123,17 @@ function frio_item_photo_menu($a, &$arr){
 
 /**
  * @brief Replace links of the contact_photo_menu
- * 
+ *
  *  This function replaces the original poke and the message links
  *  to call the addToModal javascript function so this pages can
  *  be loaded in a bootstrap modal
  *  Additionally the profile, status and photo page links  will be changed
  *  to don't open in a new tab if the contact is a friendica contact.
- * 
+ *
  * @param app $a The app data
  * @param array $args Contains contact data and the original photo_menu
  */
-function frio_contact_photo_menu($a, &$args){
+function frio_contact_photo_menu(App $a, &$args){
 
 	$pokelink = "";
 	$pmlink = "";
@@ -149,7 +149,7 @@ function frio_contact_photo_menu($a, &$args){
 	// friendicas "magic-link" which indicates a friendica user on froreign
 	// friendica servers as remote user or visitor
 	//
-	// The value for opening in a new tab is e.g. when 
+	// The value for opening in a new tab is e.g. when
 	// $args["menu"]["status"][2] is true. If the value of the [2] key is true
 	// and if it's a friendica contact we set it to false
 	foreach($args["menu"] as $k =>$v) {
@@ -173,15 +173,15 @@ function frio_contact_photo_menu($a, &$args){
 
 /**
  * @brief Construct remote nav menu
- * 
+ *
  *  It creates a remote baseurl form $_SESSION for remote users and friendica
- *  visitors. This url will be added to some of the nav links. With this behaviour 
+ *  visitors. This url will be added to some of the nav links. With this behaviour
  *  the user will come back to her/his own pages on his/her friendica server.
  *  Not all possible links are available (notifications, administrator, manage,
  *  notes aren't available because we have no way the check remote permissions)..
  *  Some links will point to the local pages because the user would expect
  *  local page (these pages are: search, community, help, apps, directory).
- * 
+ *
  * @param app $a The App class
  * @param array $nav The original nav menu
  */
@@ -193,11 +193,11 @@ function frio_remote_nav($a,&$nav) {
 
 	// split up the url in it's parts (protocol,domain/directory, /profile/, nickname
 	// I'm not familiar with regex, so someone might find a better solutionen
-	// 
+	//
 	// E.g $homelink = 'https://friendica.domain.com/profile/mickey' should result in an array
 	// with 0 => 'https://friendica.domain.com/profile/mickey' 1 => 'https://',
 	// 2 => 'friendica.domain.com' 3 => '/profile/' 4 => 'mickey'
-	// 
+	//
 	//$server_url = preg_match('/^(https?:\/\/.*?)\/profile\//2', $homelink);
 	preg_match('/^(https?:\/\/)?(.*?)(\/profile\/)(.*)/', $homelink, $url_parts);
 
@@ -216,9 +216,9 @@ function frio_remote_nav($a,&$nav) {
 		// empty the server url for local user because we won't need it
 		$server_url = '';
 		// user info
-		$r = q("SELECT `micro` FROM `contact` WHERE `uid` = %d AND `self` = 1", intval($a->user['uid']));
-		
-		$r[0]['photo'] = (count($r) ? $a->remove_baseurl($r[0]['micro']) : "images/person-48.jpg");
+		$r = q("SELECT `micro` FROM `contact` WHERE `uid` = %d AND `self`", intval($a->user['uid']));
+
+		$r[0]['photo'] = (dbm::is_result($r) ? $a->remove_baseurl($r[0]['micro']) : "images/person-48.jpg");
 		$r[0]['name'] = $a->user['username'];
 
 	} elseif(!local_user() && remote_user()) {
@@ -232,15 +232,15 @@ function frio_remote_nav($a,&$nav) {
 		$nav['remote'] = t("Visitor");
 	}
 
-	if(count($r)){
+	if (dbm::is_result($r)){
 			$nav['userinfo'] = array(
-				'icon' => (count($r) ? $r[0]['photo'] : "images/person-48.jpg"),
+				'icon' => (dbm::is_result($r) ? $r[0]['photo'] : "images/person-48.jpg"),
 				'name' => $r[0]['name'],
 			);
 		}
 
 	if(!local_user() && !empty($server_url)) {
-		$nav['logout'] = Array($server_url . '/logout',t('Logout'), "", t('End this session'));
+		$nav['logout'] = Array($server_url . '/logout', t('Logout'), "", t('End this session'));
 
 		// user menu
 		$nav['usermenu'][] = Array($server_url . '/profile/' . $a->user['nickname'], t('Status'), "", t('Your posts and conversations'));
@@ -260,15 +260,15 @@ function frio_remote_nav($a,&$nav) {
 }
 /**
  * @brief: Search for contacts
- * 
+ *
  * This function search for a users contacts. The code is copied from contact search
  * in /mod/contacts.php. With this function the contacts will permitted to acl_lookup()
- * and can grabbed as json. For this we use the type="r". This is usful to to let js 
+ * and can grabbed as json. For this we use the type="r". This is usful to to let js
  * grab the contact data.
  * We use this to give the data to textcomplete and have a filter function at the
  * contact page.
- * 
- * @param App $a The app data
+ *
+ * @param App $a The app data @TODO Unused
  * @param array $results The array with the originals from acl_lookup()
  */
 function frio_acl_lookup($a, &$results) {
@@ -278,38 +278,39 @@ function frio_acl_lookup($a, &$results) {
 
 	// we introduce a new search type, r should do the same query like it's
 	// done in /mod/contacts for connections
-	if($results["type"] == "r") {
+	if ($results["type"] == "r") {
 		$searching = false;
-		if($search) {
+		if ($search) {
 			$search_hdr = $search;
 			$search_txt = dbesc(protect_sprintf(preg_quote($search)));
 			$searching = true;
 		}
 		$sql_extra .= (($searching) ? " AND (`attag` LIKE '%%".dbesc($search_txt)."%%' OR `name` LIKE '%%".dbesc($search_txt)."%%' OR `nick` LIKE '%%".dbesc($search_txt)."%%') " : "");
 
-		if($nets)
+		if ($nets) {
 			$sql_extra .= sprintf(" AND network = '%s' ", dbesc($nets));
+		}
 
 		$sql_extra2 = ((($sort_type > 0) && ($sort_type <= CONTACT_IS_FRIEND)) ? sprintf(" AND `rel` = %d ",intval($sort_type)) : '');
 
 
 		$r = q("SELECT COUNT(*) AS `total` FROM `contact`
-			WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ",
+			WHERE `uid` = %d AND NOT `self` AND NOT `pending` $sql_extra $sql_extra2 ",
 			intval($_SESSION['uid']));
-		if(count($r)) {
+		if (dbm::is_result($r)) {
 			$total = $r[0]["total"];
 		}
 
 		$sql_extra3 = unavailable_networks();
 
-		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 $sql_extra3 ORDER BY `name` ASC LIMIT 100 ",
+		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND NOT `self` AND NOT `pending` $sql_extra $sql_extra2 $sql_extra3 ORDER BY `name` ASC LIMIT 100 ",
 			intval($_SESSION['uid'])
 		);
 
 		$contacts = array();
 
-		if(count($r)) {
-			foreach($r as $rr) {
+		if (dbm::is_result($r)) {
+			foreach ($r as $rr) {
 				$contacts[] = _contact_detail_for_template($rr);
 			}
 		}

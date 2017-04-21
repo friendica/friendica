@@ -38,11 +38,27 @@ body a {
     color: $link_color;
     text-decoration: none;
 }
+/* Anchors incorrectly display with a fixed top menu. This global rule offsets all
+ * anchors so that accessing them with a # link will actually scroll the associated
+ * content in the visible part of the page.
+ *
+ * anchor.top should be the opposite of body.padding-top
+ */
+body a[name]:not([href]) {
+    display: block;
+    position: relative;
+    top: -110px;
+    visibility: hidden;
+}
 
-body a:hover, body a:focus, body a:active, body a.active, body .btn-link:hover{
+body a:hover, .btn-link:hover,
+body a:focus, .btn-link:focus,
+body a:active, .btn-link:active,
+body a.active, .btn-link.active {
     /*color: #59d6e4;*/
     color: $link_hover_color;
     text-decoration: none;
+    outline: none;
 }
 
 .wall-item-container a:hover {
@@ -60,6 +76,9 @@ section hr {
 iframe, img {
     max-width: 100%;
 }
+blockquote {
+    font-size: inherit;
+}
 .clear {
     clear: both;
 }
@@ -72,6 +91,14 @@ iframe, img {
 .hidden {
     display: none !important;
 }
+.minimize {
+    max-height: 0px !important;
+    overflow: hidden !important;
+}
+code {
+    white-space: pre-wrap;
+}
+.help-content-wrapper code {display: inline}
 
 /**
  * mobile aside
@@ -105,7 +132,7 @@ iframe, img {
     line-height: 1.5;
 }
 
-a#item-delete-selected {
+#item-delete-selected {
     cursor: pointer;
     color: white;
     position: fixed;
@@ -148,6 +175,7 @@ a#item-delete-selected {
     font-size: 14px;
     font-weight: 600;
     padding: 8px 16px;
+    color: inherit;
 }
 
 .btn-default {
@@ -164,6 +192,10 @@ a#item-delete-selected {
     line-height: 1.5;
     border-radius: 3px;
 }
+.btn-xs {
+    padding: 1px 5px;
+    font-size: 12px;
+}
 .btn-primary {
     background: $nav_bg;
     color: $btn_primary_color !important;
@@ -176,6 +208,7 @@ a#item-delete-selected {
     outline: 0;
     background: $btn_primary_hover_color !important;
 }
+
 .btn-primary.active.focus, .btn-primary.active:focus, .btn-primary.active:hover,
 .btn-primary:active.focus, .btn-primary:active:focus, .btn-primary:active:hover,
 .open>.dropdown-toggle.btn-primary.focus, .open>.dropdown-toggle.btn-primary:focus,
@@ -186,11 +219,10 @@ a#item-delete-selected {
 }
 
 .btn-link {
-/*    color: #6fdbe8;*/
+    border: 0;
     color: $link_color;
-}
-.btn-link:focus, .btn-link:hover {
-    color: #23527c;
+    padding-left: 0;
+    padding-right: 0;
 }
 .btn-eventnav, btn-eventnav:hover {
     font-size: 16px;
@@ -215,19 +247,48 @@ a#item-delete-selected {
 }*/
 
 .btn-main {
-    /*background: #6fdbe8;*/
     background: $link_color;
     color: #fff!important;
 }
 .btn-main:hover, .btn-main:focus {
-    /*background: #59d6e4!important;*/
     background: $link_hover_color !important;
     text-decoration: none;
 }
 .btn-main:active, .btn-main.active {
     outline: 0;
-    /*background: #59d6e4;*/
     background: $link_hover_color;
+}
+.toggle.btn {
+    border: 1px solid transparent;
+}
+.toggle.btn-xs {
+    min-width: 45px;
+}
+.toggle.off {
+    border-color: #ccc;
+}
+.toggle .toggle-off,
+.toggle .toggle-off:hover {
+    color: #ccc;
+    background-color: #eee;
+    box-shadow: none;
+}
+.toggle.off .toggle-handle {
+    background-color: #eee;
+}
+.toggle-handle {
+    background-color: #fff;
+    border-width: 0 1px;
+    border: 1px solid transparent;
+    border-color: #ccc;
+}
+.field.yesno:hover .toggle {
+    border-color: $link_hover_color;
+    transition: all 0.25s ease-in-out;
+}
+.field.yesno:hover .toggle-handle {
+    background-color: #fff;
+    transition: all 0.25s ease-in-out;
 }
 
 .form-control-sm, .input-group-sm>.form-control, .input-group-sm>.input-group-addon, .input-group-sm>.input-group-btn>.btn {
@@ -265,6 +326,7 @@ a#item-delete-selected {
     vertical-align: baseline;
     background-color: $link_color;
     border-radius: 4px;
+    z-index: 1;
 }
 aside .badge {
     opacity: 0.7;
@@ -356,7 +418,8 @@ header #banner #logo-img,
     top: 2px;
     right: 10px
 }
-.topbar .dropdown-header .dropdown-header-link a {
+.topbar .dropdown-header .dropdown-header-link a,
+.topbar .dropdown-header .dropdown-header-link .btn-link {
     /*color: #6fdbe8!important;*/
     color: $link_color !important;
     font-size: 12px;
@@ -390,7 +453,7 @@ nav.navbar .nav>li>a:focus{
     border-radius: 3px;
 }
 #topbar-first .nav>.account .dropdown-toggle {
-    padding: 10px 5px 8px;
+    padding: 10px 5px 0px;
     line-height: 1.1em;
     text-align: left
 }
@@ -509,9 +572,8 @@ nav.navbar .nav>li>a:focus{
 #topbar-first .dropdown-footer {
     margin: 10px 10px 5px
 }
-#topbar-first a,
-nav.navbar a {
-    /*color: #fff*/
+#topbar-first a, #topbar-first .btn-link,
+nav.navbar a, nav.navbar .btn-link {
     color: $nav_icon_color;
 }
 #topbar-first .caret {
@@ -605,10 +667,12 @@ nav.navbar a {
 #myNavmenu li.nav-sitename {
     font-weight: bold;
 }
-#topbar-first .dropdown.account>a,
-#topbar-first .dropdown.account.open>a,
-#topbar-first .dropdown.account>a:hover,
-#topbar-first .dropdown.account.open>a:hover {
+#topbar-first .dropdown.account > a,
+#topbar-first .dropdown.account.open > a,
+#topbar-first .dropdown.account > button,
+#topbar-first .dropdown.account.open > button,
+#topbar-first .dropdown.account > :hover,
+#topbar-first .dropdown.account.open > :hover {
     background-color: $nav_bg;
 }
 #topbar-first .dropdown.account li#nav-sitename {
@@ -657,7 +721,7 @@ nav.navbar a {
 @media screen and (max-width: 767px) {
     #topbar-second > .container,
     #topbar-second #navbar-button {
-	padding: 0;
+    padding: 0;
     }
 }
 #topbar-second .dropdown-menu {
@@ -776,6 +840,25 @@ nav.navbar a {
 }
 
 /* Dropdown Menus */
+.nav > li > .btn-link {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}
+.nav > li > .btn-link:focus,
+.nav > li > .btn-link:hover {
+    text-decoration: none;
+    background-color: #eee;
+}
+.nav .open > .btn-link,
+.nav .open > .btn-link:focus,
+.nav .open > .btn-link:hover {
+    background-color: #eee;
+    border-color: #337ab7;
+}
+.nav-pills > li > .btn-link {
+    border-radius: 4px;
+}
 .nav-pills .dropdown-menu,
 .nav-tabs .dropdown-menu,
 .account .dropdown-menu,
@@ -797,40 +880,43 @@ nav.navbar a {
 .contact-photo-wrapper .dropdown-menu li {
     border-left: 3px solid $nav_bg;
 }
-.nav-pills .dropdown-menu li a,
-.nav-tabs .dropdown-menu li a,
-.account .dropdown-menu li a,
-.contact-photo-wrapper .dropdown-menu li a {
+.nav-pills .dropdown-menu li a, .nav-pills .dropdown-menu li .btn-link,
+.nav-tabs .dropdown-menu li a, .nav-tabs .dropdown-menu li .btn-link,
+.account .dropdown-menu li a, .account .dropdown-menu li .btn-link,
+.contact-photo-wrapper .dropdown-menu li a, .contact-photo-wrapper .dropdown-menu li .btn-link {
     color: $nav_icon_color;
     font-weight: 400;
     font-size: 13px;
-    padding: 4px 15px
+    padding: 4px 15px;
+    text-transform: capitalize;
+    width: 100%;
+    text-align: left;
 }
-.nav-pills .dropdown-menu li a i,
-.nav-tabs .dropdown-menu li a i,
-.account .dropdown-menu li a i,
-.contact-photo-wrapper .dropdown-menu li a i {
+.nav-pills .dropdown-menu li a i, .nav-pills .dropdown-menu li .btn-link i,
+.nav-tabs .dropdown-menu li a i, .nav-tabs .dropdown-menu li .btn-link i,
+.account .dropdown-menu li a i, .account .dropdown-menu li .btn-link i,
+.contact-photo-wrapper .dropdown-menu li a i, .contact-photo-wrapper .dropdown-menu li .btn-link i {
     margin-right: 5px;
     font-size: 14px;
     display: inline-block;
     width: 14px
 }
-.nav-pills .dropdown-menu li a:hover,
-.nav-tabs .dropdown-menu li a:hover,
-.account .dropdown-menu li a:hover,
-.contact-photo-wrapper .dropdown-menu li a:hover,
-.nav-pills .dropdown-menu li a:visited,
-.nav-tabs .dropdown-menu li a:visited,
-.account .dropdown-menu li a:visited,
-.contact-photo-wrapper .dropdown-menu li a:visited,
-.nav-pills .dropdown-menu li a:hover,
-.nav-tabs .dropdown-menu li a:hover,
-.account .dropdown-menu li a:hover,
-.contact-photo-wrapper .dropdown-menu li a:hover,
-.nav-pills .dropdown-menu li a:focus,
-.nav-tabs .dropdown-menu li a:focus,
-.account .dropdown-menu li a:focus,
-.contact-photo-wrapper .dropdown-menu li a:focus {
+.nav-pills .dropdown-menu li a:hover, .nav-pills .dropdown-menu li .btn-link:hover,
+.nav-tabs .dropdown-menu li a:hover, .nav-tabs .dropdown-menu li .btn-link:hover,
+.account .dropdown-menu li a:hover, .account .dropdown-menu li .btn-link:hover,
+.contact-photo-wrapper .dropdown-menu li a:hover, .contact-photo-wrapper .dropdown-menu li .btn-link:hover,
+.nav-pills .dropdown-menu li a:visited, .nav-pills .dropdown-menu li .btn-link:visited,
+.nav-tabs .dropdown-menu li a:visited, .nav-tabs .dropdown-menu li .btn-link:visited,
+.account .dropdown-menu li a:visited, .account .dropdown-menu li .btn-link:visited,
+.contact-photo-wrapper .dropdown-menu li a:visited, .contact-photo-wrapper .dropdown-menu li .btn-link:visited,
+.nav-pills .dropdown-menu li a:hover, .nav-pills .dropdown-menu li .btn-link:hover,
+.nav-tabs .dropdown-menu li a:hover, .nav-tabs .dropdown-menu li .btn-link:hover,
+.account .dropdown-menu li a:hover, .account .dropdown-menu li .btn-link:hover,
+.contact-photo-wrapper .dropdown-menu li a:hover, .contact-photo-wrapper .dropdown-menu li .btn-link:hover,
+.nav-pills .dropdown-menu li a:focus, .nav-pills .dropdown-menu li .btn-link:focus,
+.nav-tabs .dropdown-menu li a:focus, .nav-tabs .dropdown-menu li .btn-link:focus,
+.account .dropdown-menu li a:focus, .account .dropdown-menu li .btn-link:focus,
+.contact-photo-wrapper .dropdown-menu li a:focus, .contact-photo-wrapper .dropdown-menu li .btn-link:focus {
     background: 0 0
 }
 .nav-pills .dropdown-menu li:hover,
@@ -844,17 +930,19 @@ nav.navbar a {
     /*border-left: 3px solid #6fdbe8;*/
     border-left: 3px solid $link_color;
     color: #fff!important;
-    background-color: $menu_background_hover_color !important
+    background-color: $menu_background_hover_color !important;
 }
-.nav-pills.preferences .dropdown .dropdown-toggle {
-    color: #bebebe
+.nav-pills.preferences .dropdown .dropdown-toggle,
+.nav-pills.preferences > li > .btn {
+    color: #bebebe;
 }
 .nav-pills.preferences .dropdown.open .dropdown-toggle,
 .nav-pills.preferences .dropdown.open .dropdown-toggle:hover {
-    background-color: $nav_bg
+    background-color: $nav_bg;
 }
 
-.nav-pills.preferences .dropdown .dropdown-toggle {
+.nav-pills.preferences .dropdown .dropdown-toggle,
+.nav-pills.preferences > li > .btn {
     padding: 2px 10px;
 }
 
@@ -980,9 +1068,13 @@ aside .vcard .p-addr {
     white-space: nowrap;
     padding-bottom: 2px;
 }
+
 aside .vcard .detail {
     display: table;
     padding: 5px 0;
+}
+aside .xmpp {
+    display: table;
 }
 aside .vcard .icon {
     display: table-cell;
@@ -1125,9 +1217,10 @@ section #jotOpen {
 .jothidden {
     /*display: none;*/
 }
-#jot-modal .modal-header a,
-#profile-jot-submit-wrapper a {
+#jot-modal .modal-header a, #jot-modal .modal-header .btn-link,
+#profile-jot-submit-wrapper a, #profile-jot-submit-wrapper .btn-link {
     color: #555;
+    text-transform: capitalize;
 }
 #jot-modal .modal-header {
     border-bottom: none;
@@ -1143,6 +1236,9 @@ section #jotOpen {
 }
 #profile-jot-wrapper button#jot-submit {
     margin-top: 5px;
+}
+#profile-jot-wrapper #character-counter {
+    padding: 10px 15px;
 }
 
 /* ACL */
@@ -1223,6 +1319,81 @@ section #jotOpen {
     color: #fff;
 }
 
+/* Filebrowser */
+.fbrowser .breadcrumb {
+    margin-bottom: 0px;
+}
+.fbrowser .path a:before {
+    content: "";
+    padding: 0;
+}
+.fbrowser .breadcrumb > li:last-of-type a{
+    color: #777;
+    pointer-events: none;
+    cursor: default;
+}
+.fbrowser .folders {
+    box-shadow: -1.5px 0 0 0 rgba(0, 0, 0, .1) inset;
+    padding-right: 1px;
+}
+.fbrowser .folders ul {
+    padding: 0px;
+    margin-left: -15px;
+    margin-bottom: 0px;
+    overflow-y: auto;
+    min-width: 100px;
+    max-height: calc(100vh - 210px);
+    line-height: 1.3;
+}
+@media (min-width: 768px) {
+    .fbrowser .folders ul {
+        max-height: calc(100vh - 255px);
+    }
+}
+.fbrowser .folders li {
+    padding-left: 20px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+.fbrowser .folders li:hover {
+    z-index: 2;
+    color: #555;
+    background-color: rgba(247, 247, 247, $contentbg_transp);
+    border-left: 3px solid $link_color !important;
+    padding-left: 17px;
+}
+.fbrowser .folders li a,
+.fbrowser .folders li a:hover {
+    color: #555;
+    font-size: 13px;
+}
+.fbrowser .folders + .list {
+    padding-left: 10px;
+}
+.fbrowser .fbrowser-content-container {
+    overflow-y: auto;
+    max-height: calc(100vh - 175px);
+}
+@media (min-width: 768px) {
+    .fbrowser .fbrowser-content-container {
+        max-height: calc(100vh - 220px);
+    }
+}
+.fbrowser.image .photo-album-image-wrapper {
+    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.2);
+}
+.fbrowser .profile-rotator-wrapper {
+    min-height: 200px;
+}
+.fbrowser .fa-spin {
+   position: absolute;
+   left: 45%;
+   top: 40%;
+   font-size: 48px;
+   margin:0px auto;
+}
+
 /*
 /* Stream
 */
@@ -1253,8 +1424,6 @@ section #jotOpen {
 .wall-item-container a,
 .wall-item-container .fakelink,
 .toplevel_item .fakelink,
-.toplevel_item .wall-item-container .btn-link,
-.wall-item-container .btn-link,
 .toplevel_item .wall-item-container .wall-item-responses a {
     color: #555;
     -webkit-transition: all 0.25s ease-in-out;
@@ -1265,7 +1434,6 @@ section #jotOpen {
 }
 
 .toplevel_item:hover .fakelink, .wall-item-container:hover .fakelink,
-.toplevel_item:hover .wall-item-container:hover .btn-link,
 .toplevel_item:hover .wall-item-container:hover .wall-item-responses a,
 .toplevel_item:hover .wall-item-content a,
 .toplevel_item:hover .wall-item-name,
@@ -1426,18 +1594,17 @@ section #jotOpen {
     width: 20px;
 }
 
+/* wall-item content elements */
 .shared-wrapper,
 .vevent {
-    margin-left: 50px;
-    margin-right: 50px;
     padding: 10px;
     box-shadow: 0 0 0 1.5px rgba(0, 0, 0, .1) inset, 0 1px 1px rgba(0, 0, 0, .05);
 }
 @media screen and (max-width: 767px) {
     .shared-wrapper,
     .vevent {
-	margin-left: 0px;
-	margin-right: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
     }
 }
 .shared-wrapper:hover,
@@ -1446,14 +1613,22 @@ section #jotOpen {
 }
 .shared_header {
     margin-left: 0px;
-        margin-top: 0px;
+    margin-top: 0px;
     padding-top: 0px;
+    margin-bottom: 10px;
     border-top: none;
     color: inherit;
 }
 blockquote.shared_content {
-    margin-left: 20px;
+    padding: 0px;
+    margin-left: 0px;
     color: inherit;
+}
+code > .hl-main {
+    padding: 10px 10px 1px 0;
+}
+.hl-main ol {
+    line-height: 1.7;
 }
 .wall-item-tags,
 .itemedited {
@@ -1474,15 +1649,19 @@ blockquote.shared_content {
 }
 
 /* item social action buttons */
-.wall-item-actions, .wall-item-actions a {
-    font-size: 13px;
-    /*color: #aeaeae;*/
-    color: #555;
+.wall-item-actions {
     margin-top: 15px;
+}
+.wall-item-actions, .wall-item-actions a, .wall-item-actions button {
+    font-size: 13px;
+    color: #555;
     margin-bottom: 0;
 }
-.wall-item-actions a:hover {
-    color: #555;
+.wall-item-actions .active {
+    font-weight: bold;
+}
+.wall-item-actions .active:hover {
+    color: $link_color;
 }
 .wall-item-actions-left {
     display: table-cell;
@@ -1502,8 +1681,14 @@ blockquote.shared_content {
 .wall-item-actions .button-comments,
 .wall-item-actions .button-votes,
 .wall-item-actions .button-likes {
-    padding-left: 0px;
-    padding-right: 0px;
+    text-transform: capitalize;
+}
+.wall-item-actions button:hover {
+    color: #555;
+    text-decoration: underline;
+}
+.wall-item-actions .separator {
+	margin: 0 .3em;
 }
 
 /* wall item hover effects */
@@ -1587,8 +1772,8 @@ blockquote.shared_content {
     padding-top: 5px !important;
     padding-bottom: 5px !important;
 }
-.comment-icon-list a.icon,
-.comment-icon-list a.icon:hover {
+.comment-icon-list > li > .icon,
+.comment-icon-list > li > .icon:hover {
     color: #555;
     background-color: transparent;
 }
@@ -1657,7 +1842,14 @@ img.acpopup-img {
 
 }
 /* Menubar Tabs */
+section > .tabbar-wrapper {
+/* The tabbar shouldn't' be visibile inside
+the section element. Only after we have
+moved it to the nav through js */
+    display: none !important;
+}
 #tabmenu,
+.tabbar-wrapper,
 .tabbar,
 .tabbar > li {
     height: 100%;
@@ -1711,12 +1903,14 @@ ul.dropdown-menu li:hover {
 
 
 /* Dropdown Menu */
-.dropdown-menu li a {
+.dropdown-menu li a,
+.dropdown-menu li .btn-link {
     font-size: 13px!important;
     font-weight: 600!important;
 }
-.dropdown-menu li a:hover, .dropdown-menu li a:visited,
-.dropdown-menu li a:hover, .dropdown-menu li a:focus {
+.dropdown-menu li > :hover,
+.dropdown-menu li > :visited,
+.dropdown-menu li > :focus {
     background: 0 0;
 }
 
@@ -1853,6 +2047,9 @@ ul.dropdown-menu li:hover {
     -moz-box-shadow: 0 0 3px #dadada;
 }
 
+.section-title-wrapper {
+    overflow: hidden;
+}
 /* Profile-page */
 #profile-content-standard,
 #profile-content-advanced {
@@ -1925,22 +2122,22 @@ ul.viewcontact_wrapper > li {
 .contact-wrapper .contact-actions {
     display: flex;
 }
-.contact-wrapper a.contact-action-link {
+.contact-wrapper .contact-action-link,
+.contact-wrapper .contact-action-link:hover,
+.textcomplete-item .contact-wrapper .contact-action-link {
+    padding: 0 5px;
+    color: #555;
+    border: 0;
+}
+.contact-wrapper .contact-action-link {
     opacity: 0.1;
     transition: all 0.25s ease-in-out;
 }
-.contact-wrapper a.contact-action-link,
-.contact-wrapper a.contact-action-link:hover,
-.textcomplete-item .contact-wrapper a.contact-action-link {
-    padding-right: 5px;
-    padding-left: 5px;
-    color: #555;
-}
-ul li:hover .contact-wrapper a.contact-action-link {
+ul li:hover .contact-wrapper .contact-action-link {
     opacity: 0.8;
     transition: all 0.25s ease-in-out;
 }
-ul li:hover .contact-wrapper a.contact-action-link:hover {
+ul li:hover .contact-wrapper .contact-action-link:hover {
     opacity: 1;
 }
 #contacts-search-wrapper,
@@ -2075,45 +2272,20 @@ ul li:hover .contact-wrapper a.contact-action-link:hover {
 }
 
 /* Events page */
-#fc-header {
-    margin-top: 20px;
-    margin-bottom: 10px;
-}
-#fc-header-left,
-#fc-header-right,
-#event-calendar-title {
-    display: inline-block;
-}
-#fc-title {
-    margin: 0;
-    padding-left: 20px;
 
+.fc .fc-month-view .fc-content .fc-title .item-desc:hover {
+    color: $link_hover_color;
 }
-#fc-header-right {
-    margin-top: -4px;
+.fc .fc-list-item-title a {
+    color: $link_color;
 }
-#event-calendar-title {
-    vertical-align: middle;
+.fc .fc-list-item-title a[href]:hover {
+    color: $link_hover_color;
+    text-decoration: none;
 }
-a#event-calendar-views {
-    padding: 6px 9px;
-    font-size: 14px
-}
-tr.fc-first,
-tr.fc-first th {
-    border-left: none;
-    border-right: none;
-    border-top: none;
-}
-td.fc-day {
-    border-left: none;
-    border-right: none;
-    padding: 0 6px;
-}
-#events-calendar .fc-grid .fc-day-number {
-    float: left;
-    font-size: 0.9em;
-}
+/*.event-date-wrapper.medium .event-hover-short-month {
+    color: $link_color;
+}*/
 .event-wrapper .event-owner {
   margin-bottom: 15px;
 }
@@ -2145,6 +2317,9 @@ td.fc-day {
 }
 #event-edit-form-wrapper #event-edit-time {
     padding: 10px 0;
+}
+.event-buttons .plink-event-link {
+    margin-left: 20px;
 }
 /* Profiles Page */
 .profile-listing-table {
@@ -2204,7 +2379,7 @@ td.fc-day {
     margin-left: 20px;
 }
 
-/* Notifications */
+/* Intro Notifications */
 ul.notif-network-list {
     margin-left: -15px;
     margin-right: -15px;
@@ -2213,17 +2388,12 @@ ul.notif-network-list > li {
     padding-left: 15px;
     padding-right: 15px;
 }
-ul.notif-network-list li.unseen {
-    border-left: 3px solid #f3fcfd;
-    background-color: #f3fcfd;
-}
 .intro-wrapper.media {
     overflow: visible;
     word-wrap: break-word;
     margin-top: 0;
 }
-.intro-photo-wrapper img.intro-photo,
-.notif-item img.notif-image {
+.intro-photo-wrapper img.intro-photo {
     height:80px;
     width: 80px;
     border-radius: 4px;
@@ -2276,6 +2446,26 @@ ul.notif-network-list > li:hover .intro-action-buttons {
     margin-top: 5px
 }
 
+/* Notifications Page */
+ul.notif-network-list li.unseen {
+    background-color: #f3fcfd;
+}
+.notif-item img.notif-image {
+    height: 48px;
+    width: 48px;
+    border-radius: 4px;
+}
+.notif-item .notif-desc-wrapper {
+    height: 48px;
+}
+.notif-item .notif-desc-wrapper a {
+    height: 100%;
+    display: block;
+    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 /* Search Page */
 
 /* This is a little bit hacky. Since the search page is used for diferent
@@ -2298,6 +2488,44 @@ little modifications to emulate a standard page template */
     box-shadow: 0 0 3px #dadada;
     -webkit-box-shadow: 0 0 3px #dadada;
     -moz-box-shadow: 0 0 3px #dadada;
+}
+
+/* Help Page */
+section.help-content-wrapper h1 {
+    padding-bottom: 0.3em;
+    font-size: 1.8em;
+    border-bottom: 1px solid #ddd;
+}
+section.help-content-wrapper h2 {
+    padding-bottom: 0.3em;
+    font-size: 1.5em;
+    border-bottom: 1px solid #ddd;
+}
+section.help-content-wrapper h3 {
+    font-size: 1.2em;
+}
+section.help-content-wrapper h4 {
+    font-size: 1em;
+}
+section.help-content-wrapper h1,
+section.help-content-wrapper h2,
+section.help-content-wrapper h3,
+section.help-content-wrapper h4,
+section.help-content-wrapper h5,
+section.help-content-wrapper h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+section.help-content-wrapper p {
+    margin: 0.4em 0;
+}
+section.help-content-wrapper p,
+section.help-content-wrapper a,
+section.help-content-wrapper li {
+    line-height: 1.6;
+    font-size: 0.96em;
 }
 
 /*
@@ -2406,4 +2634,62 @@ body .tread-wrapper .hovercard a:hover {
 }
 body .tread-wrapper .hovercard:hover .hover-card-content a {
     color: $link_color !important;
+}
+
+/* Pagination improvements */
+.pagination {
+    text-align: center;
+    display: block;
+}
+.pagination > li > a,
+.pagination > li > span {
+    color: $link_color;
+    float: none;
+}
+.pagination>li>a:hover,
+.pagination>li>span:hover {
+    color: $link_hover_color;
+}
+.pagination > .active > a,
+.pagination > .active > a:focus,
+.pagination > .active > a:hover,
+.pagination > .active > span,
+.pagination > .active > span:focus,
+.pagination > .active > span:hover {
+    background-color: $link_color;
+    border-color: $link_color;
+    border-radius: 3px;
+}
+.pagination li.pager_n a {
+    margin-left: 3px;
+    border-radius: 3px;
+}
+.pagination .pager_prev a {
+    margin-left: -5px;
+    margin-right: 4px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.pagination .pager_next a {
+    margin-left: 4px;
+    margin-right: -5px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+.pager .next > a,
+.pager .previous > a {
+    float: none;
+    border-radius: 3px;
+}
+.pagination .disabled > a,
+.pager .disabled > a {
+    display: none;
+}
+
+/*
+ * some temporary workarounds until this will solved
+ * elsewhere (e.g. new templates)
+ */
+section .profile-match-wrapper {
+    float: left;
 }

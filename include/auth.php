@@ -50,7 +50,7 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 		$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 			intval($_SESSION['visitor_id'])
 		);
-		if (count($r)) {
+		if (dbm::is_result($r)) {
 			$a->contact = $r[0];
 		}
 	}
@@ -73,7 +73,7 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 			intval($_SESSION['uid'])
 		);
 
-		if (!count($r)) {
+		if (!dbm::is_result($r)) {
 			nuke_session();
 			goaway(z_root());
 		}
@@ -125,8 +125,8 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 				$openid = new LightOpenID;
 				$openid->identity = $openid_url;
 				$_SESSION['openid'] = $openid_url;
-				$a = get_app();
-				$openid->returnUrl = $a->get_baseurl(true).'/openid';
+				$_SESSION['remember'] = $_POST['remember'];
+				$openid->returnUrl = App::get_baseurl(true).'/openid';
 				goaway($openid->authUrl());
 			} catch (Exception $e) {
 				notice(t('We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID.').'<br /><br >'.t('The error message was:').' '.$e->getMessage());
@@ -169,7 +169,7 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 				dbesc(trim($_POST['username'])),
 				dbesc($encrypted)
 			);
-			if (count($r))
+			if (dbm::is_result($r))
 				$record = $r[0];
 		}
 
@@ -179,17 +179,12 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 			goaway(z_root());
 		}
 
-		// If the user specified to remember the authentication, then set a cookie
-		// that expires after one week (the default is when the browser is closed).
-		// The cookie will be renewed automatically.
-		// The week ensures that sessions will expire after some inactivity.
-		if ($_POST['remember'])
-			new_cookie(604800, $r[0]);
-		else
+		if (! $_POST['remember']) {
 			new_cookie(0); // 0 means delete on browser exit
+		}
 
 		// if we haven't failed up this point, log them in.
-
+		$_SESSION['remember'] = $_POST['remember'];
 		$_SESSION['last_login_date'] = datetime_convert('UTC','UTC');
 		authenticate_success($record, true, true);
 	}
@@ -203,40 +198,4 @@ function nuke_session() {
 	new_cookie(-3600); // make sure cookie is deleted on browser close, as a security measure
 	session_unset();
 	session_destroy();
-}
-
-/**
- * @brief Calculate the hash that is needed for the "Friendica" cookie
- *
- * @param array $user Record from "user" table
- *
- * @return string Hashed data
- */
-function cookie_hash($user) {
-	return(hash("sha256", get_config("system", "site_prvkey").
-				$user["uprvkey"].
-				$user["password"]));
-}
-
-/**
- * @brief Set the "Friendica" cookie
- *
- * @param int $time
- * @param array $user Record from "user" table
- */
-function new_cookie($time, $user = array()) {
-
-	if ($time != 0)
-		$time = $time + time();
-
-	if ($user)
-		$value = json_encode(array("uid" => $user["uid"],
-					"hash" => cookie_hash($user),
-					"ip" => $_SERVER['REMOTE_ADDR']));
-	else
-		$value = "";
-
-	setcookie("Friendica", $value, $time, "/", "",
-		(get_config('system', 'ssl_policy') == SSL_POLICY_FULL), true);
-
 }

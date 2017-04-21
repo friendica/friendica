@@ -1,47 +1,47 @@
 Utilities
 
-typo.php  - is a crude syntax checker to avoid checking in files with simple 
-typos. It basically just loads each of our project files at once. Run from 
+typo.php  - is a crude syntax checker to avoid checking in files with simple
+typos. It basically just loads each of our project files at once. Run from
 cmdline and see if any parsing errors are reported.
 
 
 
 Internationalisation
 
-extract.php - extracts translatable strings from our project files. It 
-currently doesn't pick up strings in other libraries we might be using such as 
-tinymce and the HTML parsers.
+extract.php - extracts translatable strings from our project files. It
+currently doesn't pick up strings in other libraries we might be using such as
+the HTML parsers.
 
-In order for extract to do its job, every use of the t() translation function 
+In order for extract to do its job, every use of the t() translation function
 must be preceded by one space. The string also can not contain parentheses. If
 parens are required in a string which requires translation, please use hex escapes.
 
 \x28 = (
 \x29 = )
 
-This only applies to English. Other languages may use parens in strings 
+This only applies to English. Other languages may use parens in strings
 because they don't require extraction.
- 
+
 strings.php - a recent run of the strings program. This provides output that
-is suitable for direct inclusion in the program. 
+is suitable for direct inclusion in the program.
 
-There are also translatable strings in the various files in the view/en
-directory. By setting $lang = 'something' in .htconfig.php, the application 
-will search for view/something/filename prior to the English version in 
-view/en/filename when loading templates and view files. 
+There are also translatable strings in the various files in the view/lang/en
+directory. By setting $lang = 'something' in .htconfig.php, the application
+will search for view/lang/something/filename prior to the English version in
+view/lang/en/filename when loading templates and view files.
 
-The translated string table should be placed in view/$lang/strings.php for
+The translated string table should be placed in view/lang/$lang/strings.php for
 automatic inclusion.
 
 You are not restricted to using known languages. You may also use this to
 translate the software into "pirate", "surfer" or merely to replace certain
-text which you don't care for.  
+text which you don't care for.
 
-Note: The view/en directory contains many HTML template files, some of which 
+Note: The view/lang/en directory contains many HTML template files, some of which
 only have a few words of English text amongst the HTML. Over time we will move
-the translation to the replace_macros() function which calls these files and 
-then relocate the files to the view directory. The files in the top-level view 
-directory are template files which do not require translation. 
+the translation to the replace_macros() function which calls these files and
+then relocate the files to the view directory. The files in the top-level view
+directory are template files which do not require translation.
 
 
 Placeholders
@@ -61,7 +61,7 @@ e.g.
 
 Plural
 
-The tt() function supports plural form. Script extract.php write this in 
+The tt() function supports plural form. Script extract.php write this in
 strings.php as an array, one string for every plural form language supports:
 
 $a->string["%d message sent"] = Array(
@@ -82,12 +82,12 @@ Xgettext and .po workflow
 	This script runs xgettext on source tree, extracting strings from t() and tt()
 	functions, and creates a util/messages.po file.
 
-	$ cd util; ./run_xgettext.sh 
+	$ cd util; ./run_xgettext.sh
 
-2. copy util/messages.po to view/<langauage>/messages.po
-	Replace <language> with the language you are working on - e.g. 'es', 'fr', 'de', etc. 
+2. copy util/messages.po to view/lang/<language>/messages.po
+	Replace <language> with the language you are working on - e.g. 'es', 'fr', 'de', etc.
 
-3. open view/<langauage>/messages.po with a text editor and fill in infos in
+3. open view/lang/<language>/messages.po with a text editor and fill in infos in
 	"Last-Translator: FULL NAME <EMAIL@ADDRESS>"
 	"Language-Team: LANGUAGE <LL@li.org>\n"
 	"Language: \n"
@@ -97,30 +97,30 @@ Xgettext and .po workflow
 	"Language-Team: Pirate Friendika <pirate-friendika-ml@host.com>\n"
 	"Language: pi\n"
 	)
-	
+
 	For the line
 	"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-	read GNU gettext manual at 
+	read GNU gettext manual at
 	http://www.gnu.org/software/hello/manual/gettext/Plural-forms.html
-	
+
 4. You could then translate the strings in text editor, but I suggest to use one
 	of the many .po editors out there, like QtLinguist
-	
-5. run 
-	$ php util/po2php.php view/<language>/messages.po
+
+5. run
+	$ php util/po2php.php view/lang/<language>/messages.po
  	to create the strings.php file
- 	
+
 When strings are added or modified in source, you could run
-	$ cd util; ./run_xgettext.sh ../view/<language>/messages.po
+	$ cd util; ./run_xgettext.sh ../view/lang/<language>/messages.po
 	to extract strings from source files and join them with the existing .po file:
 	new strings are added, the existing are not overwritten.
-	
+
 If you already translated Friendica using strings.php, you could import your old
 translation to messages.po. Run:
-$ php util/php2po.php view/<language>/strings.php
+$ php util/php2po.php view/lang/<language>/strings.php
 
 
-You may also use the util/string_translator.php web interface to translate the string file, but it is disabled for website security reasons. The web server will need write permission to your language directories and the "Deny ..." line in util/.htaccess will need to be modified or commented to use the utility. 
- 
+You may also use the util/string_translator.php web interface to translate the string file, but it is disabled for website security reasons. The web server will need write permission to your language directories and the "Deny ..." line in util/.htaccess will need to be modified or commented to use the utility.
 
-      
+
+

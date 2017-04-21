@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="1633" height="2173" viewBox="0 0 1633 2173">
+<style type="text/css"><![CDATA[
+text { font:12px Dialog; }
+]]></style>
+<rect x="-485" y="-485" width="2603" height="3143" style="fill:rgb(255,255,255);stroke:none" />
+<clipPath id="clip1"><path d="M614,37 L1056,37 L1056,106 L614,106 L614,37 Z" /></clipPath>
+<path d="M616,39 L616,103 L1053,103 L1053,39 Z" style="fill:rgb(202,221,254);stroke:none" clip-path="url(#clip1)" />
+<clipPath id="clip2"><path d="M614,37 L1056,37 L1056,106 L614,106 L614,37 Z" /></clipPath>
+<path d="M616,39 L616,103 L1053,103 L1053,39 Z" style="fill:none;stroke:rgb(61,83,127)" clip-path="url(#clip2)" />
+<text x="649" y="76" style="font:18px Open Sans">Friendica - Contact confirmation</text>
+<clipPath id="clip3"><path d="M1198,202 L1388,202 L1388,244 L1198,244 L1198,202 Z" /></clipPath>
+<path d="M1208,204 C1203.5820313,204 1200,207.5820313 1200,212 L1200,233 C1200,237.4179688 1203.5820313,241 1208,241 L1377,241 C1381.4179688,241 1385,237.4179688 1385,233 L1385,212 C1385,207.5820313 1381.4179688,204 1377,204 Z" style="fill:rgb(0,131,191);stroke:none" clip-path="url(#clip3)" />
+<clipPath id="clip4"><path d="M1198,202 L1388,202 L1388,244 L1198,244 L1198,202 Z" /></clipPath>
+<path d="M1208,204 C1203.5820313,204 1200,207.5820313 1200,212 L1200,233 C1200,237.4179688 1203.5820313,241 1208,241 L1377,241 C1381.4179688,241 1385,237.4179688 1385,233 L1385,212 C1385,207.5820313 1381.4179688,204 1377,204 Z" style="fill:none;stroke:rgb(0,131,191)" clip-path="url(#clip4)" />
+<text x="1213" y="225" style="font:13px Tahoma">bob@example.com</text>
+<image x="0" y="0" width="1374" height="231" xlink:href="data:image/png;base64,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" /><clipPath id="clip5"><path d="M181,198 L432,198 L432,240 L181,240 L181,198 Z" /></clipPath>
+<path d="M191,200 C186.5820313,200 183,203.5820313 183,208 L183,229 C183,233.4179688 186.5820313,237 191,237 L421,237 C425.4179688,237 429,233.4179688 429,229 L429,208 C429,203.5820313 425.4179688,200 421,200 Z" style="fill:rgb(0,131,191);stroke:none" clip-path="url(#clip5)" />
+<clipPath id="clip6"><path d="M181,198 L432,198 L432,240 L181,240 L181,198 Z" /></clipPath>
+<path d="M191,200 C186.5820313,200 183,203.5820313 183,208 L183,229 C183,233.4179688 186.5820313,237 191,237 L421,237 C425.4179688,237 429,233.4179688 429,229 L429,208 C429,203.5820313 425.4179688,200 421,200 Z" style="fill:none;stroke:rgb(0,131,191)" clip-path="url(#clip6)" />
+<text x="197" y="221" style="font:13px Tahoma">karen@karenhompage.com</text>
+<image x="0" y="0" width="418" height="227" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaIAAADjCAYAAADHeBASAAAE2klEQVR42u3cS29VVRiAYRKNP0ApIg64CImEQEAEbe0pF6EookKhBSlGQGoISlBQDNeUg1RAI5cCcm3BtiiiRGIMAw0goYUUhHIpNyVAyx9AGXRCP3eP0RinLXHyPMkanazJmrz59l5nd+oEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+PiGjXAoAODdHwvVc7p/Y2luXWXDqfrJbM2nu5IVVzKd32mxABcN9C9HzNuSnZFefuZg0uif5Fe2L8xsvxyrpLMXzZoRg4f0fkVjXeSVU3ThIiADo8RCN2NxSlqi62Dio5EI+NOx2D5zZG0bamKNraFIXJmrj5Zgxb/mPkVV9sHVF1oUiIAOiwEKUqzmSlKs//nvPBoWQCuhFjyq7H5O1NMWVHU0zd1RzDS69Fr2kNMWB2Y/QaXRkjqhv/yPniXBchAqBjQrSjIT3g7S2Rs/BKFJTfitd2NicriVBFcxQkk1DusqvRe8a56DrhdDySXx99i1dHavvZMiECoENClLv1TEPPYeXxzIJLmUdxU3c1RXFlc0zb3Rz5a6/HsJXXYnj6SjxRfDS65u+PHjlLYkjZD5eT7Q85QQDaH6JNp1uGvNMQ4zfe/OtxXDIJvb6nOd6ouh25K67Fy+t/i6Hzj0X2gi9j4YnaWHTqRBRs+/pesr2bEwSg/SHaUN/y4uqr/7wXKs6E6HYUbLkZXab/ElmTj8bT7+6PRfVJgD6tjmdnrcnEqE9eXp4TBKD9IfrsZEPq/YNRsPlWFG27lbmg0DYRFW67Hj1nHIknZ1bHmFU1MWZ5ZeTNrYiX0pviwxO1rZ17937KCQLQ7hCl1tSlB87aGKPSv0a/kgvx6oYbUbzrRkxcV59MQN/Ekvq6mLXvYLy177uYsHZ3MhnVxQurNtcl27OcIADtDlHOJ7Vdcj8+fid7zsF4OP9U9JneEBPXn43CdQdiaRKdUUt2JFPStzH7wPeZCI3+qKLl8SHjBybbH3SCALQ7RJmpaOWxSc+lf27tkbslhr7XGGPTP8Xik8eTGFVHr3GbInfezmRCqoy8xbta+81cX9IWIde3AeiwEGXeFa04Wpi97PDdQW+WR86cz2PpqWT6WbguxpWWx5L62hi1Yk/LwNnbpyfbHvBlBQA6PESZj56WHumcKj1cNmTeV5cnbqi51xajZDJqHZsuP/7o4LH9/56EhAiA+xKifwWm7c+q3fqOHJnXuXv3tttxWf+NUNv6E/vueIp8e9bqAAAAAElFTkSuQmCC" /><clipPath id="clip7"><path d="M215,325 L390,325 L390,367 L215,367 L215,325 Z" /></clipPath>
+<path d="M224,326 C219.5820313,326 216,329.5820313 216,334 L216,357 C216,361.4179688 219.5820313,365 224,365 L380,365 C384.4179688,365 388,361.4179688 388,357 L388,334 C388,329.5820313 384.4179688,326 380,326 Z" style="fill:rgb(127,127,127);stroke:none" clip-path="url(#clip7)" />
+<text x="230" y="348" style="font:13px Open Sans">notifications.php</text>
+<clipPath id="clip8"><path d="M30,409 L580,409 L580,566 L30,566 L30,409 Z" /></clipPath>
+<path d="M39,410 C34.5820313,410 31,413.5820313 31,418 L31,556 C31,560.4179688 34.5820313,564 39,564 L570,564 C574.4179688,564 578,560.4179688 578,556 L578,418 C578,413.5820313 574.4179688,410 570,410 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip8)" />
+<text x="45" y="432" style="font:13px Open Sans">notifications_content()</text>
+<text x="45" y="455" style="font:13px Open Sans">-----------------------------------------</text>
+<text x="45" y="501" style="font:13px Open Sans">- This is the page where Karen see Bobs friendship request</text>
+<text x="45" y="524" style="font:13px Open Sans">- the submit form redirects to Karens local dfrn_confirm page </text>
+<text x="45" y="547" style="font:13px Open Sans">($dfrn_id, $contact_id, $intro_id are submitted)</text>
+<clipPath id="clip9"><path d="M219,640 L399,640 L399,682 L219,682 L219,640 Z" /></clipPath>
+<path d="M228,641 C223.5820313,641 220,644.5820313 220,649 L220,672 C220,676.4179688 223.5820313,680 228,680 L389,680 C393.4179688,680 397,676.4179688 397,672 L397,649 C397,644.5820313 393.4179688,641 389,641 Z" style="fill:rgb(127,127,127);stroke:none" clip-path="url(#clip9)" />
+<text x="234" y="663" style="font:13px Open Sans">dfrn_confirm.php</text>
+<clipPath id="clip10"><path d="M14,698 L594,698 L594,1798 L14,1798 L14,698 Z" /></clipPath>
+<path d="M23,699 C18.5820313,699 15,702.5820313 15,707 L15,1788 C15,1792.4179688 18.5820313,1796 23,1796 L584,1796 C588.4179688,1796 592,1792.4179688 592,1788 L592,707 C592,702.5820313 588.4179688,699 584,699 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip10)" />
+<text x="29" y="721" style="font:13px Open Sans">dfrn_confirm_post()</text>
+<text x="29" y="744" style="font:13px Open Sans">SCENARIO 1 ( no $_POST['source_url'] available)</text>
+<text x="29" y="767" style="font:13px Open Sans">--------------------------------------------------------------------------------</text>
+<text x="29" y="813" style="font:13px Open Sans">- contact data come either form $handsfree (if autoconfirm) or </text>
+<text x="29" y="836" style="font:13px Open Sans">from $_POST</text>
+<text x="29" y="882" style="font:13px Open Sans">- get all data about Karen form the user table</text>
+<text x="29" y="928" style="font:13px Open Sans">[Note: Bob have been issued an ID (contact issue-id) when he first </text>
+<text x="29" y="951" style="font:13px Open Sans">requested the friendship. Locate Bobs contact record. At this </text>
+<text x="29" y="974" style="font:13px Open Sans">time, his record will have both pending and blocked set to 1. </text>
+<text x="29" y="997" style="font:13px Open Sans">There won't be any dfrn_id if this is a network follower, so use </text>
+<text x="29" y="1020" style="font:13px Open Sans">the contact_id instead]</text>
+<text x="29" y="1066" style="font:13px Open Sans">- search for Bob in the contact table by contact_id, dfrn_id and </text>
+<text x="29" y="1089" style="font:13px Open Sans">issued-id not empty (for the uid -&gt; Karens user id)</text>
+<text x="29" y="1135" style="font:13px Open Sans">- if network = dfrn </text>
+<text x="29" y="1158" style="font:13px Open Sans">  -&gt; create a new keypair (prvkey &amp; pubkey) and update the </text>
+<text x="29" y="1181" style="font:13px Open Sans">contact</text>
+<text x="29" y="1227" style="font:13px Open Sans">[Note: Generate a key pair for all further communications with </text>
+<text x="29" y="1250" style="font:13px Open Sans">this person. We have a keypair for every contact, and a site key </text>
+<text x="29" y="1273" style="font:13px Open Sans">for unknown people. This provides a means to carry on </text>
+<text x="29" y="1296" style="font:13px Open Sans">relationships with other people any single key is compromised. It </text>
+<text x="29" y="1319" style="font:13px Open Sans">is a robust key. We're much more worried about key leakage </text>
+<text x="29" y="1342" style="font:13px Open Sans">than anybody cracking it.]</text>
+<text x="29" y="1388" style="font:13px Open Sans">	-&gt; update Bobs contact record (in the contact table) with the </text>
+<text x="29" y="1411" style="font:13px Open Sans">generated prvkey</text>
+<text x="29" y="1457" style="font:13px Open Sans">  -&gt; encrypting the dfrn_id with Karens prvkey (Bob can decrypt it </text>
+<text x="29" y="1480" style="font:13px Open Sans">on the other and with Karens site-pubkey) and add it to the </text>
+<text x="29" y="1503" style="font:13px Open Sans">transmit params.</text>
+<text x="29" y="1549" style="font:13px Open Sans">	-&gt; encrypting Karens profile url with Bobs site-pubkey (Bob </text>
+<text x="29" y="1572" style="font:13px Open Sans">can decrypt it with his own private key)  and add it to the </text>
+<text x="29" y="1595" style="font:13px Open Sans">transmit params.</text>
+<text x="29" y="1641" style="font:13px Open Sans">	-&gt; add the above generated public key to params which </text>
+<text x="29" y="1664" style="font:13px Open Sans">getting transmitted (if $aes_allow -&gt; encrypt the the public key)</text>
+<text x="29" y="1710" style="font:13px Open Sans">	-&gt; add duplex state and page-flags to the params</text>
+<text x="29" y="1756" style="font:13px Open Sans">  -&gt; send params to Bobs dfrn_confirm page ($res = </text>
+<text x="29" y="1779" style="font:13px Open Sans">post_url($dfrn_confirm,$params);</text>
+<clipPath id="clip11"><path d="M1041,1319 L1619,1319 L1619,1913 L1041,1913 L1041,1319 Z" /></clipPath>
+<path d="M1050,1320 C1045.5820313,1320 1042,1323.5820313 1042,1328 L1042,1903 C1042,1907.4179688 1045.5820313,1911 1050,1911 L1609,1911 C1613.4179688,1911 1617,1907.4179688 1617,1903 L1617,1328 C1617,1323.5820313 1613.4179688,1320 1609,1320 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip11)" />
+<text x="1055" y="1342" style="font:13px Open Sans">dfrn_confirm_post()</text>
+<text x="1055" y="1365" style="font:13px Open Sans">SCENARIO 2 ( $_POST['source_url'] is available)</text>
+<text x="1055" y="1388" style="font:13px Open Sans">------------------------------------------------------------------------</text>
+<text x="1055" y="1434" style="font:13px Open Sans">- get all data about Bob from the user table (prvkey and uid form </text>
+<text x="1055" y="1457" style="font:13px Open Sans">Bob )</text>
+<text x="1055" y="1503" style="font:13px Open Sans">- decrypt the transmitted source_url  (profile url) with Bobs </text>
+<text x="1055" y="1526" style="font:13px Open Sans">prvkey</text>
+<text x="1055" y="1572" style="font:13px Open Sans">- get data of Karen from contact table by her source_url (and by </text>
+<text x="1055" y="1595" style="font:13px Open Sans">her user id)</text>
+<text x="1055" y="1641" style="font:13px Open Sans">- decrypt the dfrn_id sent by Karen with Karens site-pubkey </text>
+<text x="1055" y="1664" style="font:13px Open Sans">(taken from contact table)</text>
+<text x="1055" y="1710" style="font:13px Open Sans">- if possible decrpyt the pubkey sent by Karen with the prvkey of </text>
+<text x="1055" y="1733" style="font:13px Open Sans">Bob (taken from user table) -&gt; if this is not possible use the raw </text>
+<text x="1055" y="1756" style="font:13px Open Sans">pubkey</text>
+<text x="1055" y="1802" style="font:13px Open Sans">- search if the dfrn_id is already present in the contact table (if it </text>
+<text x="1055" y="1825" style="font:13px Open Sans">is prensent it is a duplicate)</text>
+<text x="1055" y="1871" style="font:13px Open Sans">- update dfrn-id and pubkey for Karens contact entry in the </text>
+<text x="1055" y="1894" style="font:13px Open Sans">contact table</text>
+<clipPath id="clip12"><path d="M42,1841 L559,1841 L559,1906 L42,1906 L42,1841 Z" /></clipPath>
+<path d="M51,1842 C46.5820313,1842 43,1845.5820313 43,1850 L43,1896 C43,1900.4179688 46.5820313,1904 51,1904 L549,1904 C553.4179688,1904 557,1900.4179688 557,1896 L557,1850 C557,1845.5820313 553.4179688,1842 549,1842 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip12)" />
+<text x="57" y="1864" style="font:13px Open Sans"> -&gt; set the relation for the contact and set pending = 0 and </text>
+<text x="57" y="1887" style="font:13px Open Sans">blocked = 0</text>
+<clipPath id="clip13"><path d="M1128,1950 L1541,1950 L1541,2061 L1128,2061 L1128,1950 Z" /></clipPath>
+<path d="M1137,1951 C1132.5820313,1951 1129,1954.5820313 1129,1959 L1129,2051 C1129,2055.4179688 1132.5820313,2059 1137,2059 L1531,2059 C1535.4179688,2059 1539,2055.4179688 1539,2051 L1539,1959 C1539,1954.5820313 1535.4179688,1951 1531,1951 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip13)" />
+<text x="1142" y="1973" style="font:13px Open Sans">- update the relationship of the contact Karen</text>
+<text x="1142" y="2019" style="font:13px Open Sans">-&gt; if duplex delete the issued-id</text>
+<text x="1142" y="2042" style="font:13px Open Sans">-&gt; set blocked = 0 and pending = 0</text>
+<clipPath id="clip14"><path d="M1241,2117 L1428,2117 L1428,2159 L1241,2159 L1241,2117 Z" /></clipPath>
+<path d="M1250,2118 C1245.5820313,2118 1242,2121.5820313 1242,2126 L1242,2149 C1242,2153.4179688 1245.5820313,2157 1250,2157 L1418,2157 C1422.4179688,2157 1426,2153.4179688 1426,2149 L1426,2126 C1426,2121.5820313 1422.4179688,2118 1418,2118 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip14)" />
+<text x="1255" y="2140" style="font:13px Open Sans">send a notification</text>
+<clipPath id="clip15"><path d="M190,1937 L410,1937 L410,1979 L190,1979 L190,1937 Z" /></clipPath>
+<path d="M199,1938 C194.5820313,1938 191,1941.5820313 191,1946 L191,1969 C191,1973.4179688 194.5820313,1977 199,1977 L400,1977 C404.4179688,1977 408,1973.4179688 408,1969 L408,1946 C408,1941.5820313 404.4179688,1938 400,1938 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip15)" />
+<text x="205" y="1960" style="font:13px Open Sans">delete the intro of Bob</text>
+<clipPath id="clip16"><path d="M156,14 L512,14 L512,125 L156,125 L156,14 Z" /></clipPath>
+<path d="M165,15 C160.5820313,15 157,18.5820313 157,23 L157,115 C157,119.4179688 160.5820313,123 165,123 L502,123 C506.4179688,123 510,119.4179688 510,115 L510,23 C510,18.5820313 506.4179688,15 502,15 Z" style="fill:rgb(255,255,255);stroke:none" clip-path="url(#clip16)" />
+<text x="171" y="38" style="font:13px Open Sans">Note: this chart respects only dfrn </text>
+<text x="171" y="61" style="font:13px Open Sans">contacts and focuses on key exchange </text>
+<text x="171" y="84" style="font:13px Open Sans">(for other areas it might be very </text>
+<text x="171" y="106" style="font:13px Open Sans">incomplete)</text>
+<clipPath id="clip17"><path d="M266,361 L341,361 L341,414 L266,414 L266,361 Z" /></clipPath>
+<path d="M302.4140625,365 L303.1328125,410" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip17)" />
+<clipPath id="clip18"><path d="M266,361 L341,361 L341,414 L266,414 L266,361 Z" /></clipPath>
+<path d="M297.9960938,401.421875 L303.1328125,410 L307.9960938,401.2617188 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip18)" />
+<clipPath id="clip19"><path d="M266,361 L341,361 L341,414 L266,414 L266,361 Z" /></clipPath>
+<path d="M297.9960938,401.421875 L303.1328125,410 L307.9960938,401.2617188 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip19)" />
+<clipPath id="clip20"><path d="M271,676 L346,676 L346,703 L271,703 L271,676 Z" /></clipPath>
+<path d="M308.3515625,680 L308.6445313,699" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip20)" />
+<clipPath id="clip21"><path d="M271,676 L346,676 L346,703 L271,703 L271,676 Z" /></clipPath>
+<path d="M303.5117188,690.4179688 L308.6445313,699 L313.5078125,690.265625 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip21)" />
+<clipPath id="clip22"><path d="M271,676 L346,676 L346,703 L271,703 L271,676 Z" /></clipPath>
+<path d="M303.5117188,690.4179688 L308.6445313,699 L313.5078125,690.265625 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip22)" />
+<clipPath id="clip23"><path d="M270,560 L345,560 L345,645 L270,645 L270,560 Z" /></clipPath>
+<path d="M306.4921875,564 L308.1054688,641" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip23)" />
+<clipPath id="clip24"><path d="M270,560 L345,560 L345,645 L270,645 L270,560 Z" /></clipPath>
+<path d="M302.9257813,632.4453125 L308.1054688,641 L312.9257813,632.2382813 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip24)" />
+<clipPath id="clip25"><path d="M270,560 L345,560 L345,645 L270,645 L270,560 Z" /></clipPath>
+<path d="M302.9257813,632.4453125 L308.1054688,641 L312.9257813,632.2382813 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip25)" />
+<clipPath id="clip26"><path d="M588,1338 L1046,1338 L1046,1770 L588,1770 L588,1338 Z" /></clipPath>
+<path d="M592,1766.2265625 L1042,1342.65625" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip26)" />
+<clipPath id="clip27"><path d="M588,1338 L1046,1338 L1046,1770 L588,1770 L588,1338 Z" /></clipPath>
+<path d="M1039.1210938,1352.2304688 L1042,1342.65625 L1032.265625,1344.9492188 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip27)" />
+<clipPath id="clip28"><path d="M588,1338 L1046,1338 L1046,1770 L588,1770 L588,1338 Z" /></clipPath>
+<path d="M1039.1210938,1352.2304688 L1042,1342.65625 L1032.265625,1344.9492188 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip28)" />
+<clipPath id="clip29"><path d="M263,1792 L338,1792 L338,1846 L263,1846 L263,1792 Z" /></clipPath>
+<path d="M300.4296875,1796 L300.1992188,1842" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip29)" />
+<clipPath id="clip30"><path d="M263,1792 L338,1792 L338,1846 L263,1846 L263,1792 Z" /></clipPath>
+<path d="M295.2421875,1833.3164063 L300.1992188,1842 L305.2421875,1833.3632813 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip30)" />
+<clipPath id="clip31"><path d="M263,1792 L338,1792 L338,1846 L263,1846 L263,1792 Z" /></clipPath>
+<path d="M295.2421875,1833.3164063 L300.1992188,1842 L305.2421875,1833.3632813 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip31)" />
+<clipPath id="clip32"><path d="M1295,1907 L1370,1907 L1370,1955 L1295,1955 L1295,1907 Z" /></clipPath>
+<path d="M1332.9140625,1911 L1333.4453125,1951" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip32)" />
+<clipPath id="clip33"><path d="M1295,1907 L1370,1907 L1370,1955 L1295,1955 L1295,1907 Z" /></clipPath>
+<path d="M1328.3320313,1942.40625 L1333.4453125,1951 L1338.328125,1942.2734375 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip33)" />
+<clipPath id="clip34"><path d="M1295,1907 L1370,1907 L1370,1955 L1295,1955 L1295,1907 Z" /></clipPath>
+<path d="M1328.3320313,1942.40625 L1333.4453125,1951 L1338.328125,1942.2734375 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip34)" />
+<clipPath id="clip35"><path d="M1296,2055 L1371,2055 L1371,2122 L1296,2122 L1296,2055 Z" /></clipPath>
+<path d="M1334,2059 L1334,2118" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip35)" />
+<clipPath id="clip36"><path d="M1296,2055 L1371,2055 L1371,2122 L1296,2122 L1296,2055 Z" /></clipPath>
+<path d="M1329,2109.3398438 L1334,2118 L1339,2109.3398438 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip36)" />
+<clipPath id="clip37"><path d="M1296,2055 L1371,2055 L1371,2122 L1296,2122 L1296,2055 Z" /></clipPath>
+<path d="M1329,2109.3398438 L1334,2118 L1339,2109.3398438 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip37)" />
+<clipPath id="clip38"><path d="M263,1900 L338,1900 L338,1942 L263,1942 L263,1900 Z" /></clipPath>
+<path d="M300,1904 L299.6171875,1938" style="fill:none;stroke:rgb(182,44,37);stroke-width:3;stroke-dasharray:18,9;stroke-dashoffset:0" clip-path="url(#clip38)" />
+<clipPath id="clip39"><path d="M263,1900 L338,1900 L338,1942 L263,1942 L263,1900 Z" /></clipPath>
+<path d="M294.7148438,1929.2851563 L299.6171875,1938 L304.7148438,1929.3984375 Z" style="fill:rgb(182,44,37);stroke:none" clip-path="url(#clip39)" />
+<clipPath id="clip40"><path d="M263,1900 L338,1900 L338,1942 L263,1942 L263,1900 Z" /></clipPath>
+<path d="M294.7148438,1929.2851563 L299.6171875,1938 L304.7148438,1929.3984375 Z" style="fill:none;stroke:rgb(182,44,37);stroke-width:3" clip-path="url(#clip40)" />
+</svg>

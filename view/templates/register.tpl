@@ -57,6 +57,10 @@
 	</div>
 	<div id="register-nickname-end" ></div>
 
+{{if $permonly}}
+    {{include file="field_textarea.tpl" field=$permonlybox}}
+{{/if}}
+
 	{{$publish}}
 
 	<div id="register-submit-wrapper">

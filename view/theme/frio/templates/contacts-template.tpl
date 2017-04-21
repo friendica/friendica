@@ -1,7 +1,7 @@
 
-<div id="contacts" class="generic-page-wrapper">
+{{$tabs}}
 
-	{{$tabs}}
+<div id="contacts" class="generic-page-wrapper">
 
 	{{* The page heading with it's contacts counter *}}
 	<h2 class="heading">{{$header}} {{if $total}} ({{$total}}) {{/if}}</h2>
@@ -16,7 +16,7 @@
 				<div class="col-md-8 ">
 					<div class="form-group form-group-search">
 						<input type="text" name="search" id="contacts-search" class="search-input form-control form-search" onfocus="this.select();" value="{{$search|escape:'html'}}" placeholder="{{$desc}}"/>
-						<button class="btn btn-default btn-sm form-button-search" type="submit" name="submit" id="contacts-search-submit" value="{{$submit|escape:'html'}}">{{$submit}}</button>
+						<button class="btn btn-default btn-sm form-button-search" type="submit" id="contacts-search-submit">{{$submit}}</button>
 					</div>
 				</div>
 				<div class="col-md-2"></div>
@@ -36,14 +36,14 @@
 		{{* We put the contact batch actions in a dropdown menu *}}
 		<ul class="nav nav-pills preferences">
 			<li class="dropdown pull-right">
-				<a class="btn btn-link btn-sm dropdown-toggle" type="button" id="BatchActionDropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
+				<button type="button" class="btn btn-link btn-sm dropdown-toggle" id="BatchActionDropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
 					<i class="fa fa-angle-down"></i>&nbsp;{{$h_batch_actions}}
-				</a>
+				</button>
 				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="BatchActionDropdownMenuTools">
 				{{foreach $batch_actions as $n=>$l}}
 					<li role="menuitem">
 						{{* call the js batch_submit_handler. Have a look at the buttom of this file *}}
-						<a onclick="batch_submit_handler('{{$n}}', '{{$l}}')">{{$l}}</a>
+						<button type="button" class="btn-link" onclick="batch_submit_handler('{{$n}}', '{{$l}}')">{{$l}}</button>
 					</li>
 				{{/foreach}}
 				</ul>
@@ -75,7 +75,7 @@
      return false;
     }
   });
- 
+
   // add javascript confirm dialog to "drop" links. Plain html url have "?confirm=1" to show confirmation form, we need to remove it
   $(".drop").each(function() {
    $(this).attr('href', $(this).attr('href').replace("confirm=1","") );
@@ -87,7 +87,7 @@
      return false;
     }
    });
-   
+
   });
  });
 

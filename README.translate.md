@@ -24,12 +24,12 @@ If you want to get your work into the source tree yourself, feel free to do so a
 The process is simple and friendica ships with all the tools necessary.
 
 The location of the translated files in the source tree is
-    /view/LNG-CODE/
+    /view/lang/LNG-CODE/
 where LNG-CODE is the language code used, e.g. de for German or fr for French.
 The translated strings come as a "message.po" file from transifex which needs to be translated into the PHP file friendica uses.
 To do so, place the file in the directory mentioned above and use the "po2php" utility from the util directory of your friendica installation.
 
-Assuming you want to convert the German localization which is placed in view/de/message.po you would do the following.
+Assuming you want to convert the German localization which is placed in view/lang/de/message.po you would do the following.
 
     1. Navigate at the command prompt to the base directory of your
        friendica installation
@@ -37,9 +37,9 @@ Assuming you want to convert the German localization which is placed in view/de/
     2. Execute the po2php script, which will place the translation
        in the strings.php file that is used by friendica.
 
-       $> php util/po2php.php view/de/messages.po
+       $> php util/po2php.php view/lang/de/messages.po
 
-       The output of the script will be placed at view/de/strings.php where
+       The output of the script will be placed at view/lang/de/strings.php where
        friendica is expecting it, so you can test your translation immediately.
 
     3. Visit your friendica page to check if it still works in the language you
@@ -50,7 +50,7 @@ Assuming you want to convert the German localization which is placed in view/de/
        not give any output if the file is ok but might give a hint for
        searching the bug in the file.
 
-       $> php view/de/strings.php
+       $> php view/lang/de/strings.php
 
     4. commit the two files with a meaningful commit message to your git
        repository, push it to your fork of the friendica repository at github and
@@ -64,5 +64,34 @@ If you only want to translate friendica into another language you wont need any 
 
 For further information see the utils/README file.
 
-[1]:   https://www.transifex.com/projects/p/friendica/
+Transifex-Client
+----------------
 
+Transifex has a client program which let you interact with the translation files in a similar way to git.
+Help for the client can be found at the [Transifex Help Center] [2].
+Here we will only cover basic usage.
+
+After installation of the client, you should have a `tx` command available on your system.
+To use it, first create a configuration file with your credentials.
+On Linux this file should be placed into your home directory `~/.transifexrc`.
+The content of the file should be something like the following:
+
+    [https://www.transifex.com]
+    username = user
+    token =
+    password = p@ssw0rd
+    hostname = https://www.transifex.com
+
+Since Friendica version 3.5.1 we ship configuration files for the Transifex client in the core repository and the addon repository.
+To update the translation files after you have translated strings of e.g. Esperanto in the web-UI of transifex you can use `tx` to download the file.
+
+    $> tx pull -l eo
+
+And then use the `po2php` utility described above to convert the `messages.po` file to the `strings.php` file Friendica is loading.
+
+    $> php util/po2php.php view/lang/eo/messages.po
+
+Afterwards, just commit the two changed files to a feature branch of your Friendica repository, push the changes to github and open a pull request for your changes.
+
+[1]:   https://www.transifex.com/projects/p/friendica/
+[2]:   https://docs.transifex.com/client/introduction

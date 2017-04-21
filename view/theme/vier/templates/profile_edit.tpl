@@ -93,6 +93,13 @@
       </div>
       <div id="profile-edit-pdesc-end"></div>
       
+      <div id="profile-edit-xmpp-wrapper" >
+        <label id="profile-edit-xmpp-label" for="profile-edit-xmpp" >{{$xmpp.1}} </label>
+        <input type="text" size="32" name="xmpp" id="profile-edit-xmpp" value="{{$xmpp.2}}" />
+      </div>
+      <div id="profile-edit-xmpp-desc">{{$xmpp.3}}</div>
+      <div id="profile-edit-xmpp-end"></div>
+
       <div id="profile-edit-homepage-wrapper" >
         <label id="profile-edit-homepage-label" for="profile-edit-homepage" >{{$homepage.1}} </label>
         <input type="text" size="32" name="homepage" id="profile-edit-homepage" value="{{$homepage.2}}" />
@@ -341,6 +348,13 @@
 </div>
 <div id="profile-edit-dob-end"></div>
 {{/if}}
+
+      <div id="profile-edit-xmpp-wrapper" >
+        <label id="profile-edit-xmpp-label" for="profile-edit-xmpp" >{{$xmpp.1}} </label>
+        <input type="text" size="32" name="xmpp" id="profile-edit-xmpp" value="{{$xmpp.2}}" />
+      </div>
+      <div id="profile-edit-xmpp-desc">{{$xmpp.3}}</div>
+      <div id="profile-edit-xmpp-end"></div>
 
       <div id="profile-edit-homepage-wrapper" >
         <label id="profile-edit-homepage-label" for="profile-edit-homepage" >{{$homepage.1}} </label>

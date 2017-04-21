@@ -1,8 +1,8 @@
 <?php
 
 
-function lockview_content(&$a) {
-  
+function lockview_content(App $a) {
+
 	$type = (($a->argc > 1) ? $a->argv[1] : 0);
 	if (is_numeric($type)) {
 		$item_id = intval($type);
@@ -10,19 +10,20 @@ function lockview_content(&$a) {
 	} else {
 		$item_id = (($a->argc > 2) ? intval($a->argv[2]) : 0);
 	}
-  
+
 	if(! $item_id)
 		killme();
 
 	if (!in_array($type, array('item','photo','event')))
 		killme();
-     
+
 	$r = q("SELECT * FROM `%s` WHERE `id` = %d LIMIT 1",
 		dbesc($type),
 		intval($item_id)
 	);
-	if(! count($r))
+	if (! dbm::is_result($r)) {
 		killme();
+	}
 	$item = $r[0];
 
 	call_hooks('lockview_content', $item);
@@ -33,7 +34,7 @@ function lockview_content(&$a) {
 	}
 
 
-	if(($item['private'] == 1) && (! strlen($item['allow_cid'])) && (! strlen($item['allow_gid'])) 
+	if(($item['private'] == 1) && (! strlen($item['allow_cid'])) && (! strlen($item['allow_gid']))
 		&& (! strlen($item['deny_cid'])) && (! strlen($item['deny_gid']))) {
 
 		echo t('Remote privacy information not available.') . '<br />';
@@ -52,16 +53,16 @@ function lockview_content(&$a) {
 		$r = q("SELECT `name` FROM `group` WHERE `id` IN ( %s )",
 			dbesc(implode(', ', $allowed_groups))
 		);
-		if(count($r))
-			foreach($r as $rr) 
+		if (dbm::is_result($r))
+			foreach($r as $rr)
 				$l[] = '<b>' . $rr['name'] . '</b>';
 	}
 	if(count($allowed_users)) {
 		$r = q("SELECT `name` FROM `contact` WHERE `id` IN ( %s )",
 			dbesc(implode(', ',$allowed_users))
 		);
-		if(count($r))
-			foreach($r as $rr) 
+		if (dbm::is_result($r))
+			foreach($r as $rr)
 				$l[] = $rr['name'];
 
 	}
@@ -70,16 +71,16 @@ function lockview_content(&$a) {
 		$r = q("SELECT `name` FROM `group` WHERE `id` IN ( %s )",
 			dbesc(implode(', ', $deny_groups))
 		);
-		if(count($r))
-			foreach($r as $rr) 
+		if (dbm::is_result($r))
+			foreach($r as $rr)
 				$l[] = '<b><strike>' . $rr['name'] . '</strike></b>';
 	}
 	if(count($deny_users)) {
 		$r = q("SELECT `name` FROM `contact` WHERE `id` IN ( %s )",
 			dbesc(implode(', ',$deny_users))
 		);
-		if(count($r))
-			foreach($r as $rr) 
+		if (dbm::is_result($r))
+			foreach($r as $rr)
 				$l[] = '<strike>' . $rr['name'] . '</strike>';
 
 	}

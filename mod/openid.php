@@ -4,7 +4,7 @@
 require_once('library/openid.php');
 
 
-function openid_content(&$a) {
+function openid_content(App $a) {
 
 	$noid = get_config('system','no_openid');
 	if($noid)
@@ -30,7 +30,7 @@ function openid_content(&$a) {
 			//       mod/settings.php in 8367cad so it might have left mixed
 			//       records in the user table
 			//
-			$r = q("SELECT * FROM `user`
+			$r = q("SELECT *, `user`.`pubkey` as `upubkey`, `user`.`prvkey` as `uprvkey` FROM `user`
 				WHERE ( `openid` = '%s' OR `openid` = '%s' )
 				AND `blocked` = 0 AND `account_expired` = 0
 				AND `account_removed` = 0 AND `verified` = 1
@@ -38,7 +38,7 @@ function openid_content(&$a) {
 				dbesc($authid), dbesc(normalise_openid($authid))
 			);
 
-			if($r && count($r)) {
+			if (dbm::is_result($r)) {
 
 				// successful OpenID login
 
@@ -47,7 +47,7 @@ function openid_content(&$a) {
 				require_once('include/security.php');
 				authenticate_success($r[0],true,true);
 
-				// just in case there was no return url set 
+				// just in case there was no return url set
 				// and we fell through
 
 				goaway(z_root());
@@ -56,7 +56,7 @@ function openid_content(&$a) {
 			// Successful OpenID login - but we can't match it to an existing account.
 			// New registration?
 
-			if($a->config['register_policy'] == REGISTER_CLOSED) {
+			if ($a->config['register_policy'] == REGISTER_CLOSED) {
 				notice( t('Account not found and OpenID registration is not permitted on this site.') . EOL);
 				goaway(z_root());
 			}
@@ -64,35 +64,45 @@ function openid_content(&$a) {
 			unset($_SESSION['register']);
 			$args = '';
 			$attr = $openid->getAttributes();
-			if(is_array($attr) && count($attr)) {
-				foreach($attr as $k => $v) {
-					if($k === 'namePerson/friendly')
+			if (is_array($attr) && count($attr)) {
+				foreach ($attr as $k => $v) {
+					if ($k === 'namePerson/friendly') {
 						$nick = notags(trim($v));
-					if($k === 'namePerson/first')
+					}
+					if($k === 'namePerson/first') {
 						$first = notags(trim($v));
-					if($k === 'namePerson')
+					}
+					if($k === 'namePerson') {
 						$args .= '&username=' . notags(trim($v));
-					if($k === 'contact/email')
+					}
+					if ($k === 'contact/email') {
 						$args .= '&email=' . notags(trim($v));
-					if($k === 'media/image/aspect11')
+					}
+					if ($k === 'media/image/aspect11') {
 						$photosq = bin2hex(trim($v));
-					if($k === 'media/image/default')
+					}
+					if ($k === 'media/image/default') {
 						$photo = bin2hex(trim($v));
+					}
 				}
 			}
-			if($nick)
+			if ($nick) {
 				$args .= '&nickname=' . $nick;
-			elseif($first)
+			}
+			elseif ($first) {
 				$args .= '&nickname=' . $first;
+			}
 
-			if($photosq)
+			if ($photosq) {
 				$args .= '&photo=' . $photosq;
-			elseif($photo)
+			}
+			elseif ($photo) {
 				$args .= '&photo=' . $photo;
+			}
 
 			$args .= '&openid_url=' . notags(trim($authid));
 
-			goaway($a->get_baseurl() . '/register' . $args);
+			goaway(App::get_baseurl() . '/register' . $args);
 
 			// NOTREACHED
 		}

@@ -396,6 +396,10 @@ ul.menu-popup li a:hover {
 	margin: 4px;
 }
 
+.pager .disabled {
+	display: none;
+}
+
 .pager_current {
 	background-color: #1873a2;
 	color: #ffffff;
@@ -1585,6 +1589,10 @@ ul .sidebar-group-li .icon {
 	float: left;
 	margin-right: 10px;
 	display: inline;
+}
+.wall-item-like-buttons a.self {
+	background-color: rgba(52, 101, 164, .5);
+	border-radius: 6px;
 }
 
 .wall-item-links-wrapper {

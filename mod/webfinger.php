@@ -1,7 +1,14 @@
 <?php
 require_once("include/Probe.php");
 
-function webfinger_content(&$a) {
+function webfinger_content(App $a) {
+
+	if (!local_user()) {
+		http_status_exit(403,
+				array("title" => t("Public access denied."),
+					"description" => t("Only logged in users are permitted to perform a probing.")));
+		killme();
+	}
 
 	$o .= '<h3>Webfinger Diagnostic</h3>';
 

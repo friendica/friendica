@@ -17,11 +17,11 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 
 	$a = get_app();
 
-	if (!$simulate)
+	if (!$simulate) {
 		logger("Import Atom/RSS feed '".$contact["name"]."' (Contact ".$contact["id"].") for user ".$importer["uid"], LOGGER_DEBUG);
-	else
+	} else {
 		logger("Test Atom/RSS feed", LOGGER_DEBUG);
-
+	}
 	if ($xml == "") {
 		logger('XML is empty.', LOGGER_DEBUG);
 		return;
@@ -45,63 +45,69 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		$author["author-link"] = $xpath->evaluate('/rdf:RDF/rss:channel/rss:link/text()')->item(0)->nodeValue;
 		$author["author-name"] = $xpath->evaluate('/rdf:RDF/rss:channel/rss:title/text()')->item(0)->nodeValue;
 
-		if ($author["author-name"] == "")
+		if ($author["author-name"] == "") {
 			$author["author-name"] = $xpath->evaluate('/rdf:RDF/rss:channel/rss:description/text()')->item(0)->nodeValue;
-
+		}
 		$entries = $xpath->query('/rdf:RDF/rss:item');
 	}
 
 	// Is it Atom?
 	if ($xpath->query('/atom:feed')->length > 0) {
 		$alternate = $xpath->query("atom:link[@rel='alternate']")->item(0)->attributes;
-		if (is_object($alternate))
-			foreach($alternate AS $attributes)
-				if ($attributes->name == "href")
+		if (is_object($alternate)) {
+			foreach($alternate AS $attributes) {
+				if ($attributes->name == "href") {
 					$author["author-link"] = $attributes->textContent;
-
-		if ($author["author-link"] == "")
-			$author["author-link"] = $author["author-id"];
-
-		if ($author["author-link"] == "") {
-			$self = $xpath->query("atom:link[@rel='self']")->item(0)->attributes;
-			if (is_object($self))
-				foreach($self AS $attributes)
-					if ($attributes->name == "href")
-						$author["author-link"] = $attributes->textContent;
+				}
+			}
 		}
 
-		if ($author["author-link"] == "")
-			$author["author-link"] = $xpath->evaluate('/atom:feed/atom:id/text()')->item(0)->nodeValue;
+		if ($author["author-link"] == "") {
+			$author["author-link"] = $author["author-id"];
+		}
+		if ($author["author-link"] == "") {
+			$self = $xpath->query("atom:link[@rel='self']")->item(0)->attributes;
+			if (is_object($self)) {
+				foreach($self AS $attributes) {
+					if ($attributes->name == "href") {
+						$author["author-link"] = $attributes->textContent;
+					}
+				}
+			}
+		}
 
+		if ($author["author-link"] == "") {
+			$author["author-link"] = $xpath->evaluate('/atom:feed/atom:id/text()')->item(0)->nodeValue;
+		}
 		$author["author-avatar"] = $xpath->evaluate('/atom:feed/atom:logo/text()')->item(0)->nodeValue;
 
 		$author["author-name"] = $xpath->evaluate('/atom:feed/atom:title/text()')->item(0)->nodeValue;
 
-		if ($author["author-name"] == "")
+		if ($author["author-name"] == "") {
 			$author["author-name"] = $xpath->evaluate('/atom:feed/atom:subtitle/text()')->item(0)->nodeValue;
-
-		if ($author["author-name"] == "")
+		}
+		if ($author["author-name"] == "") {
 			$author["author-name"] = $xpath->evaluate('/atom:feed/atom:author/atom:name/text()')->item(0)->nodeValue;
-
+		}
 		$value = $xpath->evaluate('atom:author/poco:displayName/text()')->item(0)->nodeValue;
-		if ($value != "")
+		if ($value != "") {
 			$author["author-name"] = $value;
-
+		}
 		if ($simulate) {
 			$author["author-id"] = $xpath->evaluate('/atom:feed/atom:author/atom:uri/text()')->item(0)->nodeValue;
 
 			$value = $xpath->evaluate('atom:author/poco:preferredUsername/text()')->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$author["author-nick"] = $value;
-
+			}
 			$value = $xpath->evaluate('atom:author/poco:address/poco:formatted/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$author["author-location"] = $value;
-
+			}
 			$value = $xpath->evaluate('atom:author/poco:note/text()')->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$author["author-about"] = $value;
-
+			}
 		}
 
 		$author["edited"] = $author["created"] = $xpath->query('/atom:feed/atom:updated/text()')->item(0)->nodeValue;
@@ -118,12 +124,12 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		$author["author-name"] = $xpath->evaluate('/rss/channel/title/text()')->item(0)->nodeValue;
 		$author["author-avatar"] = $xpath->evaluate('/rss/channel/image/url/text()')->item(0)->nodeValue;
 
-		if ($author["author-name"] == "")
+		if ($author["author-name"] == "") {
 			$author["author-name"] = $xpath->evaluate('/rss/channel/copyright/text()')->item(0)->nodeValue;
-
-		if ($author["author-name"] == "")
+		}
+		if ($author["author-name"] == "") {
 			$author["author-name"] = $xpath->evaluate('/rss/channel/description/text()')->item(0)->nodeValue;
-
+		}
 		$author["edited"] = $author["created"] = $xpath->query('/rss/channel/pubDate/text()')->item(0)->nodeValue;
 
 		$author["app"] = $xpath->evaluate('/rss/channel/generator/text()')->item(0)->nodeValue;
@@ -134,9 +140,9 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 	if (!$simulate) {
 		$author["author-link"] = $contact["url"];
 
-		if ($author["author-name"] == "")
+		if ($author["author-name"] == "") {
 			$author["author-name"] = $contact["name"];
-
+		}
 		$author["author-avatar"] = $contact["thumb"];
 
 		$author["owner-link"] = $contact["url"];
@@ -171,94 +177,100 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 
 	$entrylist = array();
 
-	foreach ($entries AS $entry)
+	foreach ($entries AS $entry) {
 		$entrylist[] = $entry;
-
+	}
 	foreach (array_reverse($entrylist) AS $entry) {
 		$item = array_merge($header, $author);
 
-		$item["title"] = $xpath->evaluate('atom:title/text()', $entry)->item(0)->nodeValue;
-
-		if ($item["title"] == "")
-			$item["title"] = $xpath->evaluate('title/text()', $entry)->item(0)->nodeValue;
-
-		if ($item["title"] == "")
-			$item["title"] = $xpath->evaluate('rss:title/text()', $entry)->item(0)->nodeValue;
-
 		$alternate = $xpath->query("atom:link[@rel='alternate']", $entry)->item(0)->attributes;
-		if (!is_object($alternate))
+		if (!is_object($alternate)) {
 			$alternate = $xpath->query("atom:link", $entry)->item(0)->attributes;
-
-		if (is_object($alternate))
-			foreach($alternate AS $attributes)
-				if ($attributes->name == "href")
+		}
+		if (is_object($alternate)) {
+			foreach($alternate AS $attributes) {
+				if ($attributes->name == "href") {
 					$item["plink"] = $attributes->textContent;
-
-		if ($item["plink"] == "")
+				}
+			}
+		}
+		if ($item["plink"] == "") {
 			$item["plink"] = $xpath->evaluate('link/text()', $entry)->item(0)->nodeValue;
-
-		if ($item["plink"] == "")
+		}
+		if ($item["plink"] == "") {
 			$item["plink"] = $xpath->evaluate('rss:link/text()', $entry)->item(0)->nodeValue;
-
-		$item["plink"] = original_url($item["plink"]);
+		}
 
 		$item["uri"] = $xpath->evaluate('atom:id/text()', $entry)->item(0)->nodeValue;
 
-		if ($item["uri"] == "")
+		if ($item["uri"] == "") {
 			$item["uri"] = $xpath->evaluate('guid/text()', $entry)->item(0)->nodeValue;
-
-		if ($item["uri"] == "")
+		}
+		if ($item["uri"] == "") {
 			$item["uri"] = $item["plink"];
+		}
+
+		$orig_plink = $item["plink"];
+
+		$item["plink"] = original_url($item["plink"]);
 
 		$item["parent-uri"] = $item["uri"];
-
-		$published = $xpath->query('atom:published/text()', $entry)->item(0)->nodeValue;
-
-		if ($published == "")
-			$published = $xpath->query('pubDate/text()', $entry)->item(0)->nodeValue;
-
-		if ($published == "")
-			$published = $xpath->query('dc:date/text()', $entry)->item(0)->nodeValue;
-
-		$updated = $xpath->query('atom:updated/text()', $entry)->item(0)->nodeValue;
-
-		if ($updated == "")
-			$updated = $published;
-
-		if ($published != "")
-			$item["created"] = $published;
-
-		if ($updated != "")
-			$item["edited"] = $updated;
-
-		$creator = $xpath->query('author/text()', $entry)->item(0)->nodeValue;
-
-		if ($creator == "")
-			$creator = $xpath->query('atom:author/atom:name/text()', $entry)->item(0)->nodeValue;
-
-		if ($creator == "")
-			$creator = $xpath->query('dc:creator/text()', $entry)->item(0)->nodeValue;
-
-		if ($creator != "")
-			$item["author-name"] = $creator;
-
-		if ($pubDate != "")
-			$item["edited"] = $item["created"] = $pubDate;
-
-		$creator = $xpath->query('dc:creator/text()', $entry)->item(0)->nodeValue;
-
-		if ($creator != "")
-			$item["author-name"] = $creator;
 
 		if (!$simulate) {
 			$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s' AND `network` IN ('%s', '%s')",
 				intval($importer["uid"]), dbesc($item["uri"]), dbesc(NETWORK_FEED), dbesc(NETWORK_DFRN));
-			if ($r) {
+			if (dbm::is_result($r)) {
 				logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$r[0]["id"], LOGGER_DEBUG);
 				continue;
 			}
 		}
 
+		$item["title"] = $xpath->evaluate('atom:title/text()', $entry)->item(0)->nodeValue;
+
+		if ($item["title"] == "") {
+			$item["title"] = $xpath->evaluate('title/text()', $entry)->item(0)->nodeValue;
+		}
+		if ($item["title"] == "") {
+			$item["title"] = $xpath->evaluate('rss:title/text()', $entry)->item(0)->nodeValue;
+		}
+		$published = $xpath->query('atom:published/text()', $entry)->item(0)->nodeValue;
+
+		if ($published == "") {
+			$published = $xpath->query('pubDate/text()', $entry)->item(0)->nodeValue;
+		}
+		if ($published == "") {
+			$published = $xpath->query('dc:date/text()', $entry)->item(0)->nodeValue;
+		}
+		$updated = $xpath->query('atom:updated/text()', $entry)->item(0)->nodeValue;
+
+		if ($updated == "") {
+			$updated = $published;
+		}
+		if ($published != "") {
+			$item["created"] = $published;
+		}
+		if ($updated != "") {
+			$item["edited"] = $updated;
+		}
+		$creator = $xpath->query('author/text()', $entry)->item(0)->nodeValue;
+
+		if ($creator == "") {
+			$creator = $xpath->query('atom:author/atom:name/text()', $entry)->item(0)->nodeValue;
+		}
+		if ($creator == "") {
+			$creator = $xpath->query('dc:creator/text()', $entry)->item(0)->nodeValue;
+		}
+		if ($creator != "") {
+			$item["author-name"] = $creator;
+		}
+		if ($pubDate != "") {
+			$item["edited"] = $item["created"] = $pubDate;
+		}
+		$creator = $xpath->query('dc:creator/text()', $entry)->item(0)->nodeValue;
+
+		if ($creator != "") {
+			$item["author-name"] = $creator;
+		}
 		/// @TODO ?
 		// <category>Ausland</category>
 		// <media:thumbnail width="152" height="76" url="http://www.taz.de/picture/667875/192/14388767.jpg"/>
@@ -273,12 +285,13 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 			$title = "";
 
 			foreach($enclosure->attributes AS $attributes) {
-				if ($attributes->name == "url")
+				if ($attributes->name == "url") {
 					$href = $attributes->textContent;
-				elseif ($attributes->name == "length")
+				} elseif ($attributes->name == "length") {
 					$length = $attributes->textContent;
-				elseif ($attributes->name == "type")
+				} elseif ($attributes->name == "type") {
 					$type = $attributes->textContent;
+				}
 			}
 			if(strlen($item["attach"]))
 				$item["attach"] .= ',';
@@ -292,9 +305,11 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 			$preview = "";
 
 			// Handle enclosures and treat them as preview picture
-			foreach ($attachments AS $attachment)
-				if ($attachment["type"] == "image/jpeg")
+			foreach ($attachments AS $attachment) {
+				if ($attachment["type"] == "image/jpeg") {
 					$preview = $attachment["link"];
+				}
+			}
 
 			$item["body"] = $item["title"].add_page_info($item["plink"], false, $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_blacklist"]);
 			$item["tag"] = add_page_keywords($item["plink"], false, $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_blacklist"]);
@@ -304,20 +319,20 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		} else {
 			$body = trim($xpath->evaluate('atom:content/text()', $entry)->item(0)->nodeValue);
 
-			if ($body == "")
+			if ($body == "") {
 				$body = trim($xpath->evaluate('content:encoded/text()', $entry)->item(0)->nodeValue);
-
-			if ($body == "")
+			}
+			if ($body == "") {
 				$body = trim($xpath->evaluate('description/text()', $entry)->item(0)->nodeValue);
-
-			if ($body == "")
+			}
+			if ($body == "") {
 				$body = trim($xpath->evaluate('atom:summary/text()', $entry)->item(0)->nodeValue);
-
+			}
 			// remove the content of the title if it is identically to the body
 			// This helps with auto generated titles e.g. from tumblr
-			if (title_is_body($item["title"], $body))
+			if (title_is_body($item["title"], $body)) {
 				$item["title"] = "";
-
+			}
 			$item["body"] = html2bbcode($body);
 		}
 
@@ -325,17 +340,28 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 			logger("Stored feed: ".print_r($item, true), LOGGER_DEBUG);
 
 			$notify = item_is_remote_self($contact, $item);
+
+			// Distributed items should have a well formatted URI.
+			// Additionally we have to avoid conflicts with identical URI between imported feeds and these items.
+			if ($notify) {
+				$item['guid'] = uri_to_guid($orig_plink, $a->get_hostname());
+				unset($item['uri']);
+				unset($item['parent-uri']);
+			}
+
 			$id = item_store($item, false, $notify);
 
 			logger("Feed for contact ".$contact["url"]." stored under id ".$id);
-		} else
+		} else {
 			$items[] = $item;
-
-		if ($simulate)
+		}
+		if ($simulate) {
 			break;
+		}
 	}
 
-	if ($simulate)
+	if ($simulate) {
 		return array("header" => $author, "items" => $items);
+	}
 }
 ?>
