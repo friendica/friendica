@@ -8,12 +8,37 @@ require_once("include/text.php");
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /*
+ * Converts all tables from MyISAM to InnoDB
+ */
+function convert_to_innodb() {
+	global $db;
+
+	$r = q("SELECT `TABLE_NAME` FROM `information_schema`.`tables` WHERE `engine` = 'MyISAM' AND `table_schema` = '%s'",
+		dbesc($db->database_name()));
+
+	if (!dbm::is_result($r)) {
+		echo t('There are no tables on MyISAM.')."\n";
+		return;
+	}
+
+	foreach ($r AS $table) {
+		$sql = sprintf("ALTER TABLE `%s` engine=InnoDB;", dbesc($table['TABLE_NAME']));
+		echo $sql."\n";
+
+		$result = @$db->q($sql);
+		if (!dbm::is_result($result)) {
+			print_update_error($db, $sql);
+		}
+	}
+}
+
+/*
  * send the email and do what is needed to do on update fails
  *
  * @param update_id		(int) number of failed update
  * @param error_message	(str) error message
  */
-function update_fail($update_id, $error_message){
+function update_fail($update_id, $error_message) {
 	//send the administrators an e-mail
 	$admin_mail_list = "'".implode("','", array_map(dbesc, explode(",", str_replace(" ", "", $a->config['admin_email']))))."'";
 	$adminlist = q("SELECT uid, language, email FROM user WHERE email IN (%s)",
@@ -95,10 +120,6 @@ function table_structure($table) {
 
 	if (dbm::is_result($indexes))
 		foreach ($indexes AS $index) {
-			if ($index["Index_type"] == "FULLTEXT") {
-				continue;
-			}
-
 			if ($index['Key_name'] != 'PRIMARY' && $index['Non_unique'] == '0' && !isset($indexdata[$index["Key_name"]])) {
 				$indexdata[$index["Key_name"]] = array('UNIQUE');
 			}
@@ -460,7 +481,7 @@ function db_field_command($parameters, $create = true) {
 	if ($parameters["not null"])
 		$fieldstruct .= " NOT NULL";
 
-	if (isset($parameters["default"])){
+	if (isset($parameters["default"])) {
 		if (strpos(strtolower($parameters["type"]),"int")!==false) {
 			$fieldstruct .= " DEFAULT ".$parameters["default"];
 		} else {
@@ -487,7 +508,7 @@ function db_create_table($name, $fields, $verbose, $action, $indexes=null) {
 	$primary_keys = array();
 	foreach ($fields AS $fieldname => $field) {
 		$sql_rows[] = "`".dbesc($fieldname)."` ".db_field_command($field);
-		if (x($field,'primary') and $field['primary']!=''){
+		if (x($field,'primary') and $field['primary']!='') {
 			$primary_keys[] = $fieldname;
 		}
 	}
@@ -1704,7 +1725,7 @@ function db_definition() {
 function dbstructure_run(&$argv, &$argc) {
 	global $a, $db;
 
-	if (is_null($a)){
+	if (is_null($a)) {
 		$a = new App;
 	}
 
@@ -1743,6 +1764,9 @@ function dbstructure_run(&$argv, &$argc) {
 			case "dumpsql":
 				print_structure(db_definition());
 				return;
+			case "innodb":
+				convert_to_innodb();
+				return;
 		}
 	}
 
@@ -1754,11 +1778,12 @@ function dbstructure_run(&$argv, &$argc) {
 	echo "dryrun		show database update schema queries without running them\n";
 	echo "update		update database schema\n";
 	echo "dumpsql		dump database schema\n";
+	echo "innodb		convert all tables from MyISAM to InnoDB\n";
 	return;
 
 }
 
-if (array_search(__file__,get_included_files())===0){
+if (array_search(__file__,get_included_files())===0) {
 	dbstructure_run($_SERVER["argv"],$_SERVER["argc"]);
 	killme();
 }

@@ -447,7 +447,7 @@ function admin_page_summary(App $a) {
 	$warningtext = array();
 	if (dbm::is_result($r)) {
 		$showwarning = true;
-		$warningtext[] = sprintf(t('Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the <tt>convert_innodb.sql</tt> in the <tt>/util</tt> directory of your Friendica installation.<br />'), 'https://dev.mysql.com/doc/refman/5.7/en/converting-tables-to-innodb.html');
+		$warningtext[] = sprintf(t('Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php include/dbstructure.php innodb</tt> of your Friendica installation for an automatic conversion.<br />'), 'https://dev.mysql.com/doc/refman/5.7/en/converting-tables-to-innodb.html');
 	}
 	// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
 	if ((version_compare($db->server_info(), '5.7.4') >= 0) AND
