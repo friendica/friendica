@@ -304,7 +304,7 @@ function profile_content(App $a, $update = 0) {
 	$parents_str = '';
 
 	// Set a time stamp for this page. We will make use of it when we
-	// search fornew items (update routine)
+	// search for new items (update routine)
 	$_SESSION['last_updated'][$last_updated_key] = time();
 
 	if (dbm::is_result($r)) {
