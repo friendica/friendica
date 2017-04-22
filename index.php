@@ -174,6 +174,10 @@ if (! x($_SESSION,'sysmsg_info')) {
 	$_SESSION['sysmsg_info'] = array();
 }
 
+// Array for informations about last received items
+if (! x($_SESSION,'last_updated')) {
+	$_SESSION['last_updated'] = array();
+}
 /*
  * check_config() is responsible for running update scripts. These automatically
  * update the DB schema whenever we push a new one out. It also checks to see if
