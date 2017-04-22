@@ -1764,7 +1764,7 @@ function dbstructure_run(&$argv, &$argc) {
 			case "dumpsql":
 				print_structure(db_definition());
 				return;
-			case "innodb":
+			case "toinnodb":
 				convert_to_innodb();
 				return;
 		}
@@ -1778,7 +1778,7 @@ function dbstructure_run(&$argv, &$argc) {
 	echo "dryrun		show database update schema queries without running them\n";
 	echo "update		update database schema\n";
 	echo "dumpsql		dump database schema\n";
-	echo "innodb		convert all tables from MyISAM to InnoDB\n";
+	echo "toinnodb		convert all tables from MyISAM to InnoDB\n";
 	return;
 
 }
