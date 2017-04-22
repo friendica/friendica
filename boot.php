@@ -219,6 +219,20 @@ define ( 'CP_GLOBAL_COMMUNITY',    1 );
 /** @}*/
 
 /**
+ * @name Protocols
+ *
+ * Different protocols that we are storing
+ * @{
+ */
+define('PROTOCOL_UNKNOWN',         0);
+define('PROTOCOL_DFRN',            1);
+define('PROTOCOL_DIASPORA',        2);
+define('PROTOCOL_OSTATUS_SALMON',  3);
+define('PROTOCOL_OSTATUS_FEED',    4);
+define('PROTOCOL_GS_CONVERSATION', 5);
+/** @}*/
+
+/**
  * @name Network
  *
  * Network and protocol family types

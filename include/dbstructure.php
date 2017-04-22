@@ -788,6 +788,19 @@ function db_definition() {
 					"uid" => array("uid"),
 					)
 			);
+	$database["conversation"] = array(
+			"fields" => array(
+					"item-uri" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
+					"reply-to-uri" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
+					"conversation-uri" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
+					"protocol" => array("type" => "tinyint(1) unsigned", "not null" => "1", "default" => "0"),
+					"source" => array("type" => "mediumtext"),
+					),
+			"indexes" => array(
+					"PRIMARY" => array("item-uri"),
+					"conversation-uri" => array("conversation-uri"),
+					)
+			);
 	$database["event"] = array(
 			"fields" => array(
 					"id" => array("type" => "int(11)", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
