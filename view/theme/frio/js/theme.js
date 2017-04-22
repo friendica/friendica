@@ -315,6 +315,13 @@ $(document).ready(function(){
 	$(document).on('change', 'textarea', function(event) {
 		autosize.update(event.target);
 	});
+
+	/*
+	 * Sticky aside on page scroll
+	 */
+	$("aside").stick_in_parent({
+		offset_top: 100 // px, header + tab bar + spacing
+	});
 });
 
 function openClose(theID) {

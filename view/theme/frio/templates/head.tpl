@@ -82,6 +82,7 @@
 <script type="text/javascript" src="view/theme/frio/frameworks/jsmart/jsmart.custom.js"></script>
 <script type="text/javascript" src="view/theme/frio/frameworks/jquery-scrollspy/jquery-scrollspy.js"></script>
 <script type="text/javascript" src="view/theme/frio/frameworks/autosize/autosize.min.js"></script>
+<script type="text/javascript" src="view/theme/frio/frameworks/sticky-kit/jquery.sticky-kit.min.js"></script>
 
 {{* own js files *}}
 <script type="text/javascript" src="view/theme/frio/js/theme.js"></script>
