@@ -23,8 +23,10 @@ $(document).ready(function(){
  * @returns {undefined}
  */
 function groupChangeMember(gid, cid, sec_token) {
+	$("#contact-entry-wrapper-" + cid).fadeTo("fast", 0.33);
 	$(".tooltip").tooltip("hide");
 	$("body").css("cursor", "wait");
+
 	$.get('group/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
 			// Insert the new group member list
 			$("#group-update-wrapper").html(data);
