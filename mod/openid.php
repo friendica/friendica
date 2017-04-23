@@ -102,7 +102,7 @@ function openid_content(App $a) {
 
 			$args .= '&openid_url=' . notags(trim($authid));
 
-			goaway(App::get_baseurl() . '/register' . $args);
+			goaway(App::get_baseurl() . '/register?' . $args);
 
 			// NOTREACHED
 		}
