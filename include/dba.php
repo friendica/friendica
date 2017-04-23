@@ -15,12 +15,15 @@ require_once('include/datetime.php');
 class dba {
 
 	private $debug = 0;
-	private $db;
+	//private $db;
+	public $db;
 	private $result;
-	private $driver;
+	//private $driver;
+	public $driver;
 	public  $connected = false;
 	public  $error = false;
 	private $_server_info = '';
+	private static $dbo;
 
 	function __construct($server, $user, $pass, $db, $install = false) {
 		$a = get_app();
@@ -93,6 +96,8 @@ class dba {
 			}
 		}
 		$a->save_timestamp($stamp1, "network");
+
+		self::$dbo = $this;
 	}
 
 	/**
@@ -462,22 +467,6 @@ class dba {
 		return $id;
 	}
 
-	function __destruct() {
-		if ($this->db) {
-			switch ($this->driver) {
-				case 'pdo':
-					$this->db = null;
-					break;
-				case 'mysqli':
-					$this->db->close();
-					break;
-				case 'mysql':
-					mysql_close($this->db);
-					break;
-			}
-		}
-	}
-
 	/**
 	 * @brief Replaces ANY_VALUE() function by MIN() function,
 	 *  if the database server does not support ANY_VALUE().
@@ -496,6 +485,223 @@ class dba {
 			$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
 		}
 		return $sql;
+	}
+
+	function __destruct() {
+		if ($this->db) {
+			switch ($this->driver) {
+				case 'pdo':
+					$this->db = null;
+					break;
+				case 'mysqli':
+					$this->db->close();
+					break;
+				case 'mysql':
+					mysql_close($this->db);
+					break;
+			}
+		}
+	}
+
+	/**
+	 * @brief Executes a prepared statement
+	 *
+	 * @param string $sql SQL statement
+	 * @return object statement object
+	 */
+	static public function p($sql) {
+		$a = get_app();
+
+		$stamp1 = microtime(true);
+
+		$args = func_get_args();
+		unset($args[0]);
+
+		if (!self::$dbo OR !self::$dbo->connected) {
+			return false;
+		}
+
+		$sql = self::$dbo->any_value_fallback($sql);
+
+		$orig_sql = $sql;
+
+		if (x($a->config,'system') && x($a->config['system'], 'db_callstack')) {
+			$sql = "/*".$a->callstack()." */ ".$sql;
+		}
+
+		switch (self::$dbo->driver) {
+			case 'pdo':
+				$stmt = self::$dbo->db->prepare($sql);
+
+				foreach ($args AS $param => $value) {
+					$stmt->bindParam($param, $args[$param]);
+				}
+
+				$success = $stmt->execute();
+
+				if ($success) {
+					$retval = $stmt;
+				} else {
+					$retval = false;
+				}
+
+				$errorInfo = self::$dbo->db->errorInfo();
+
+				if ($errorInfo) {
+					self::$dbo->error = $errorInfo[2];
+					self::$dbo->errorno = $errorInfo[1];
+				}
+
+				break;
+			case 'mysqli':
+				$stmt = self::$dbo->db->stmt_init();
+
+				if (!$stmt->prepare($sql)) {
+					self::$dbo->error = self::$dbo->db->error;
+					self::$dbo->errorno = self::$dbo->db->errno;
+					$retval = false;
+					break;
+				}
+
+				$params = '';
+				$values = array();
+				foreach ($args AS $param => $value) {
+					if (is_int($args[$param])) {
+						$params .= 'i';
+					} elseif (is_float($args[$param])) {
+						$params .= 'd';
+					} elseif (is_string($args[$param])) {
+						$params .= 's';
+					} else {
+						$params .= 'b';
+					}
+					$values[] = &$args[$param];
+				}
+
+				array_unshift($values, $params);
+
+				call_user_func_array(array($stmt, 'bind_param'), $values);
+
+				if (!$stmt->execute()) {
+					self::$dbo->error = self::$dbo->db->error;
+					self::$dbo->errorno = self::$dbo->db->errno;
+					$retval = false;
+				} elseif (method_exists($stmt, 'get_result')) {
+					// Is mysqlnd installed?
+					$retval = $stmt->get_result();
+				} else {
+					$retval = $stmt;
+				}
+				break;
+			case 'mysql':
+				// For the old "mysql" functions we cannot use prepared statements
+				foreach ($args AS $param => $value) {
+					if (is_int($args[$param]) OR is_float($args[$param])) {
+						$replace = intval($args[$param]);
+					} else {
+						$replace = "'".dbesc($args[$param])."'";
+					}
+
+					$pos = strpos($sql, '?');
+					if ($pos !== false) {
+						$sql = substr_replace($sql, $replace, $pos, 1);
+					}
+				}
+
+				$retval = mysql_query($sql, self::$dbo->db);
+				if (mysql_errno(self::$dbo->db)) {
+					self::$dbo->error = mysql_error(self::$dbo->db);
+					self::$dbo->errorno = mysql_errno(self::$dbo->db);
+				}
+				break;
+		}
+
+		$stamp2 = microtime(true);
+		$duration = (float)($stamp2 - $stamp1);
+
+		$a->save_timestamp($stamp1, 'database');
+
+		if (strtolower(substr($orig_sql, 0, 6)) != "select") {
+			$a->save_timestamp($stamp1, "database_write");
+		}
+
+		return $retval;
+	}
+
+	/**
+	 * @brief Executes a prepared statement
+	 *
+	 * @param string $sql SQL statement
+	 * @return boolean Was the query successfull?
+	 */
+	static public function e($sql) {
+	}
+
+	/**
+	 * @brief Fetch a single row
+	 *
+	 * @param object $stmt statement object
+	 * @return array current row
+	 */
+	static public function fetch($stmt) {
+		switch (self::$dbo->driver) {
+			case 'pdo':
+				return $stmt->fetch(PDO::FETCH_ASSOC);
+			case 'mysqli':
+				// When mysqlnd is installed, we can use a shortcut
+				if (method_exists($stmt, 'fetch_array')) {
+					return $stmt->fetch_array(MYSQLI_ASSOC);
+				}
+
+				// This code works, but is slow
+
+				// Bind the result to a result array
+				$cols = array();
+
+				$cols_num = array();
+				for ($x = 0; $x < $stmt->field_count; $x++) {
+					$cols[] = &$cols_num[$x];
+				}
+
+				call_user_func_array(array($stmt, 'bind_result'), $cols);
+
+				$success = $stmt->fetch();
+
+				if (!$success) {
+					return false;
+				}
+
+				// The slow part:
+				// We need to get the field names for the array keys
+				// It seems that there is no better way to do this.
+				$result = $stmt->result_metadata();
+
+				$columns = array();
+				foreach ($cols_num AS $col) {
+					$field = $result->fetch_field();
+					$columns[$field->name] = $col;
+				}
+				return $columns;
+			case 'mysql':
+				return mysql_fetch_array(self::$dbo->result, MYSQL_ASSOC);
+		}
+	}
+
+	/**
+	 * @brief Closes the current statement
+	 *
+	 * @param object $stmt statement object
+	 * @return boolean was the close successfull?
+	 */
+	static public function close($stmt) {
+		switch (self::$dbo->driver) {
+			case 'pdo':
+				return $stmt->closeCursor();
+			case 'mysqli':
+				return $stmt->close();
+			case 'mysql':
+				return mysql_free_result($stmt);
+		}
 	}
 }
 

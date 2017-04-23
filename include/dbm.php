@@ -47,6 +47,11 @@ class dbm {
 		if (is_bool($array)) {
 			return $array;
 		}
+
+		if (is_object($array)) {
+			return true;
+		}
+
 		return (is_array($array) && count($array) > 0);
 	}
 
