@@ -210,13 +210,15 @@ function profile_content(App $a, $update = 0) {
 
 
 	if ($update) {
+		$last_updated = (x($_SESSION['last_updated'], $last_updated_key) ? $_SESSION['last_updated'][$last_updated_key] : 0);
+
 		// If the page user is the owner of the page we should query for unseen
 		// items. Otherwise use a timestamp of the last succesful update request.
-		if ($is_owner) {
+		if ($is_owner || !$last_updated) {
 			$sql_extra4 = " AND `item`.`unseen`";
 		} else {
-			$last_updated = gmdate("Y-m-d H:i:s", $_SESSION['last_updated'][$last_updated_key]);
-			$sql_extra4 = " AND `item`.`received` > '" . $last_updated . "'";
+			$gmupdate = gmdate("Y-m-d H:i:s", $last_updated);
+			$sql_extra4 = " AND `item`.`received` > '" . $gmupdate . "'";
 		}
 
 		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`, `item`.`created`
