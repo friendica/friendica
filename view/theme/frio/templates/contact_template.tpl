@@ -214,6 +214,19 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 				</div>
 				{/if}
 
+				{{* The button to add or remove contacts from a contact group - group edit page *}}
+				{if $contact.change_member}
+				<div class="contact-group-actions pull-right nav-pills preferences">
+					<button type="button" class="contact-action-link btn-link" onclick="groupChangeMember({$contact.change_member.gid},{$contact.change_member.cid},'{$contact.change_member.sec_token}'); return true;" data-toggle="tooltip" title="{$contact.change_member.title}">
+						{if $contact.label == "members"}
+						<i class="fa fa-times-circle" aria-hidden="true"></i>
+						{elseif $contact.label == "contacts"}
+						<i class="fa fa-plus-circle" aria-hidden="true"></i>
+						{/if}
+					</button>
+				</div>
+				{/if}
+
 				{{* The contact description (e.g. Name, Network, kind of connection and so on *}}
 				<div class="contact-entry-desc">
 					<div class="contact-entry-name" id="contact-entry-name-{$id}">
