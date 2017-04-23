@@ -73,10 +73,10 @@ function openid_content(App $a) {
 						$first = notags(trim($v));
 					}
 					if($k === 'namePerson') {
-						$args .= '&username=' . notags(trim($v));
+						$args .= '&username=' . urlencode(notags(trim($v)));
 					}
 					if ($k === 'contact/email') {
-						$args .= '&email=' . notags(trim($v));
+						$args .= '&email=' . urlencode(notags(trim($v)));
 					}
 					if ($k === 'media/image/aspect11') {
 						$photosq = bin2hex(trim($v));
@@ -87,20 +87,20 @@ function openid_content(App $a) {
 				}
 			}
 			if ($nick) {
-				$args .= '&nickname=' . $nick;
+				$args .= '&nickname=' . urlencode($nick);
 			}
 			elseif ($first) {
-				$args .= '&nickname=' . $first;
+				$args .= '&nickname=' . urlencode($first);
 			}
 
 			if ($photosq) {
-				$args .= '&photo=' . $photosq;
+				$args .= '&photo=' . urlencode($photosq);
 			}
 			elseif ($photo) {
-				$args .= '&photo=' . $photo;
+				$args .= '&photo=' . urlencode($photo);
 			}
 
-			$args .= '&openid_url=' . notags(trim($authid));
+			$args .= '&openid_url=' . urlencode(notags(trim($authid)));
 
 			goaway(App::get_baseurl() . '/register?' . $args);
 
