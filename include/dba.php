@@ -709,6 +709,7 @@ class dba {
 			case 'pdo':
 				return $stmt->closeCursor();
 			case 'mysqli':
+				return $stmt->free_result();
 				return $stmt->close();
 			case 'mysql':
 				return mysql_free_result($stmt);
