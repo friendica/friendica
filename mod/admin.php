@@ -264,7 +264,8 @@ function admin_content(App $a) {
  *
  * This function generates the subpage of the admin panel to allow the
  * modification of the node wide block/black list to block entire
- * remote servers from communication with this node.
+ * remote servers from communication with this node. The page allows
+ * adding, removing and editing of entries from the blocklist.
  *
  * @param App $a
  * @return string
