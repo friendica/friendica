@@ -462,8 +462,6 @@ class dba {
 
 		$sql = self::$dbo->any_value_fallback($sql);
 
-		$orig_sql = $sql;
-
 		if (x($a->config,'system') && x($a->config['system'], 'db_callstack')) {
 			$sql = "/*".$a->callstack()." */ ".$sql;
 		}
@@ -676,9 +674,7 @@ class dba {
 
 				call_user_func_array(array($stmt, 'bind_result'), $cols);
 
-				$success = $stmt->fetch();
-
-				if (!$success) {
+				if (!$stmt->fetch()) {
 					return false;
 				}
 
