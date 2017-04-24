@@ -252,7 +252,7 @@ class dba {
 				break;
 		}
 		$stamp2 = microtime(true);
-		$duration = (float)($stamp2-$stamp1);
+		$duration = (float)($stamp2 - $stamp1);
 
 		$a->save_timestamp($stamp1, "database");
 
@@ -529,27 +529,26 @@ class dba {
 
 		switch (self::$dbo->driver) {
 			case 'pdo':
-				$stmt = self::$dbo->db->prepare($sql);
+				if (!$stmt = self::$dbo->db->prepare($sql)) {
+					$errorInfo = self::$dbo->db->errorInfo();
+					self::$dbo->error = $errorInfo[2];
+					self::$dbo->errorno = $errorInfo[1];
+					$retval = false;
+					break;
+				}
 
 				foreach ($args AS $param => $value) {
 					$stmt->bindParam($param, $args[$param]);
 				}
 
-				$success = $stmt->execute();
-
-				if ($success) {
-					$retval = $stmt;
-				} else {
-					$retval = false;
-				}
-
-				$errorInfo = self::$dbo->db->errorInfo();
-
-				if ($errorInfo) {
+				if (!$stmt->execute()) {
+					$errorInfo = self::$dbo->db->errorInfo();
 					self::$dbo->error = $errorInfo[2];
 					self::$dbo->errorno = $errorInfo[1];
+					$retval = false;
+				} else {
+					$retval = $stmt;
 				}
-
 				break;
 			case 'mysqli':
 				$stmt = self::$dbo->db->stmt_init();
@@ -614,15 +613,22 @@ class dba {
 				break;
 		}
 
-		$stamp2 = microtime(true);
-		$duration = (float)($stamp2 - $stamp1);
-
 		$a->save_timestamp($stamp1, 'database');
 
-		if (strtolower(substr($orig_sql, 0, 6)) != "select") {
-			$a->save_timestamp($stamp1, "database_write");
-		}
+                if (x($a->config,'system') && x($a->config['system'], 'db_log')) {
 
+			$stamp2 = microtime(true);
+			$duration = (float)($stamp2 - $stamp1);
+
+                        if (($duration > $a->config["system"]["db_loglimit"])) {
+                                $duration = round($duration, 3);
+                                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                                @file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
+                                                basename($backtrace[1]["file"])."\t".
+                                                $backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
+                                                substr($sql, 0, 2000)."\n", FILE_APPEND);
+                        }
+                }
 		return $retval;
 	}
 
@@ -633,10 +639,49 @@ class dba {
 	 * @return boolean Was the query successfull?
 	 */
 	static public function e($sql) {
+		$a = get_app();
+
+		$stamp = microtime(true);
+
 		$args = func_get_args();
 
-		$stmt = self::p();
+		$stmt = call_user_func_array('self::p', $args);
+
+		if (is_bool($stmt)) {
+			$retval = $stmt;
+		} elseif (is_object($stmt)) {
+			$retval = true;
+		} else {
+			$retval = false;
+		}
+
 		self::close($stmt);
+
+		$a->save_timestamp($stamp, "database_write");
+
+		return $retval;
+	}
+
+	/**
+	 * @brief Check if data exists
+	 *
+	 * @param string $sql SQL statement
+	 * @return boolean Are there rows for that query?
+	 */
+	static public function exists($sql) {
+		$args = func_get_args();
+
+		$stmt = call_user_func_array('self::p', $args);
+
+		if (is_bool($stmt)) {
+			$retval = $stmt;
+		} else {
+			$retval = is_array(self::fetch($stmt));
+		}
+
+		self::close($stmt);
+
+		return $retval;
 	}
 
 	/**
@@ -646,6 +691,10 @@ class dba {
 	 * @return array current row
 	 */
 	static public function fetch($stmt) {
+		if (!is_object($stmt)) {
+			return false;
+		}
+
 		switch (self::$dbo->driver) {
 			case 'pdo':
 				return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -696,6 +745,10 @@ class dba {
 	 * @return boolean was the close successfull?
 	 */
 	static public function close($stmt) {
+		if (!is_object($stmt)) {
+			return false;
+		}
+
 		switch (self::$dbo->driver) {
 			case 'pdo':
 				return $stmt->closeCursor();
