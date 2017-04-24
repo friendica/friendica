@@ -15,11 +15,9 @@ require_once('include/datetime.php');
 class dba {
 
 	private $debug = 0;
-	//private $db;
-	public $db;
+	private $db;
 	private $result;
-	//private $driver;
-	public $driver;
+	private $driver;
 	public  $connected = false;
 	public  $error = false;
 	private $_server_info = '';
