@@ -625,7 +625,7 @@ class dba {
 	}
 
 	/**
-	 * @brief Returnr the number of rows of a statement
+	 * @brief Returns the number of rows of a statement
 	 *
 	 * @param object Statement object
 	 * @return int Number of rows
