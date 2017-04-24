@@ -743,6 +743,8 @@ function dbesc($str) {
 //                   'user', 1);
 function q($sql) {
 	global $db;
+	$args = func_get_args();
+	unset($args[0]);
 
 	if ($db && $db->connected) {
 		$sql = $db->any_value_fallback($sql);
