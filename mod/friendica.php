@@ -104,6 +104,16 @@ function friendica_content(App $a) {
 	else
 		$o .= '<p>' . t('No installed plugins/addons/apps') . '</p>';
 
+	$blocklist = Config::get('system', 'blocklist');
+	if (count($blocklist)) {
+		$o .= '<div id="about_blocklist"><p>'. t('On this server the following remote servers are blocked.') .'</p>';
+		$o .= '<table><thead><tr><th>'. t('Blocked URL') .'</th><th>'. t('Reason for the block') .'</th></thead><tbody>';
+		foreach ($blocklist as $b) {
+			$o .= '<tr><td>'. $b['URL'] .'</td><td>'. $b['reason'] .'</td></tr>';
+		}
+		$o .= '</tbody></table></div>';
+	}
+
 	call_hooks('about_hook', $o);
 
 	return $o;
