@@ -522,9 +522,6 @@ class dba {
 					self::$dbo->error = self::$dbo->db->error;
 					self::$dbo->errorno = self::$dbo->db->errno;
 					$retval = false;
-				} elseif (method_exists($stmt, 'get_result')) {
-					// Is mysqlnd installed?
-					$retval = $stmt->get_result();
 				} else {
 					$stmt->store_result();
 					$retval = $stmt;
@@ -657,11 +654,6 @@ class dba {
 			case 'pdo':
 				return $stmt->fetch(PDO::FETCH_ASSOC);
 			case 'mysqli':
-				// When mysqlnd is installed, we can use a shortcut
-				if (method_exists($stmt, 'fetch_array')) {
-					return $stmt->fetch_array(MYSQLI_ASSOC);
-				}
-
 				// This code works, but is slow
 
 				// Bind the result to a result array
