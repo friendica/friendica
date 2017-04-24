@@ -259,19 +259,17 @@ function delete_thread($itemid, $itemuri = "") {
 }
 
 function update_threads() {
-	global $db;
-
 	logger("update_threads: start");
 
-	$messages = $db->q("SELECT `id` FROM `item` WHERE `id` = `parent`", true);
+	$messages = dba::p("SELECT `id` FROM `item` WHERE `id` = `parent`");
 
-	logger("update_threads: fetched messages: ".count($messages));
+	logger("update_threads: fetched messages: ".dba::num_rows($messages));
 
-	while ($message = $db->qfetch()) {
+	while ($message = dba::fetch($messages)) {
 		add_thread($message["id"]);
 		add_shadow_thread($message["id"]);
 	}
-	$db->qclose();
+	dba::close($messages);
 }
 
 function update_threads_mention() {
@@ -291,18 +289,16 @@ function update_threads_mention() {
 
 
 function update_shadow_copy() {
-	global $db;
-
 	logger("start");
 
-	$messages = $db->q(sprintf("SELECT `iid` FROM `thread` WHERE `uid` != 0 AND `network` IN ('', '%s', '%s', '%s')
-					AND `visible` AND NOT `deleted` AND NOT `moderated` AND NOT `private` ORDER BY `created`",
-				NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS), true);
+	$messages = dba::p("SELECT `iid` FROM `thread` WHERE `uid` != 0 AND `network` IN ('', ?, ?, ?)
+				AND `visible` AND NOT `deleted` AND NOT `moderated` AND NOT `private` ORDER BY `created`",
+				NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS);
 
-	logger("fetched messages: ".count($messages));
-	while ($message = $db->qfetch())
+	logger("fetched messages: ".dba::num_rows($messages));
+	while ($message = dba::fetch($messages))
 		add_shadow_thread($message["iid"]);
 
-	$db->qclose();
+	dba::close($messages);
 }
 ?>

@@ -135,30 +135,6 @@ class dba {
 	}
 
 	/**
-	 * @brief Returns the number of rows
-	 *
-	 * @return integer
-	 */
-	public function num_rows() {
-		if (!$this->result) {
-			return 0;
-		}
-
-		switch ($this->driver) {
-			case 'pdo':
-				$rows = $this->result->rowCount();
-				break;
-			case 'mysqli':
-				$rows = $this->result->num_rows;
-				break;
-			case 'mysql':
-				$rows = mysql_num_rows($this->result);
-				break;
-		}
-		return $rows;
-	}
-
-	/**
 	 * @brief Analyze a database query and log this if some conditions are met.
 	 *
 	 * @param string $query The database query that will be analyzed
@@ -380,41 +356,6 @@ class dba {
 			logger('dba: ' . printable(print_r($r, true)));
 		}
 		return($r);
-	}
-
-	public function qfetch() {
-		$x = false;
-
-		if ($this->result) {
-			switch ($this->driver) {
-				case 'pdo':
-					$x = $this->result->fetch(PDO::FETCH_ASSOC);
-					break;
-				case 'mysqli':
-					$x = $this->result->fetch_array(MYSQLI_ASSOC);
-					break;
-				case 'mysql':
-					$x = mysql_fetch_array($this->result, MYSQL_ASSOC);
-					break;
-			}
-		}
-		return($x);
-	}
-
-	public function qclose() {
-		if ($this->result) {
-			switch ($this->driver) {
-				case 'pdo':
-					$this->result->closeCursor();
-					break;
-				case 'mysqli':
-					$this->result->free_result();
-					break;
-				case 'mysql':
-					mysql_free_result($this->result);
-					break;
-			}
-		}
 	}
 
 	public function dbg($dbg) {
@@ -691,7 +632,7 @@ class dba {
 	 * @param object Statement object
 	 * @return int Number of rows
 	 */
-	static public function rows($stmt) {
+	static public function num_rows($stmt) {
 		switch (self::$dbo->driver) {
 			case 'pdo':
 				return $stmt->rowCount();

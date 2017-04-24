@@ -43,96 +43,103 @@ function remove_orphans($stage = 0) {
 
 	if (($stage == 1) OR ($stage == 0)) {
 		logger("Deleting old global item entries from item table without user copy");
-		if ($db->q("SELECT `id` FROM `item` WHERE `uid` = 0
+		$r = dba::p("SELECT `id` FROM `item` WHERE `uid` = 0
 				AND NOT EXISTS (SELECT `guid` FROM `item` AS `i` WHERE `item`.`guid` = `i`.`guid` AND `i`.`uid` != 0)
-				AND `received` < UTC_TIMESTAMP() - INTERVAL 90 DAY LIMIT ".intval($limit), true)) {
-			$count = $db->num_rows();
+				AND `received` < UTC_TIMESTAMP() - INTERVAL 90 DAY LIMIT ".intval($limit));
+		$count = dba::num_rows($r);
+		if ($count > 0) {
 			logger("found global item orphans: ".$count);
-			while ($orphan = $db->qfetch()) {
+			while ($orphan = dba::fetch($r)) {
 				q("DELETE FROM `item` WHERE `id` = %d", intval($orphan["id"]));
 			}
 		}
-		$db->qclose();
+		dba::close($r);
 		logger("Done deleting old global item entries from item table without user copy");
 	}
 
 	if (($stage == 2) OR ($stage == 0)) {
 		logger("Deleting items without parents");
-		if ($db->q("SELECT `id` FROM `item` WHERE NOT EXISTS (SELECT `id` FROM `item` AS `i` WHERE `item`.`parent` = `i`.`id`) LIMIT ".intval($limit), true)) {
-			$count = $db->num_rows();
+		$r = dba::p("SELECT `id` FROM `item` WHERE NOT EXISTS (SELECT `id` FROM `item` AS `i` WHERE `item`.`parent` = `i`.`id`) LIMIT ".intval($limit));
+		$count = dba::num_rows($r);
+		if ($count > 0) {
 			logger("found item orphans without parents: ".$count);
-			while ($orphan = $db->qfetch()) {
+			while ($orphan = dba::fetch($r)) {
 				q("DELETE FROM `item` WHERE `id` = %d", intval($orphan["id"]));
 			}
 		}
-		$db->qclose();
+		dba::close($r);
 		logger("Done deleting items without parents");
 	}
 
 	if (($stage == 3) OR ($stage == 0)) {
 		logger("Deleting orphaned data from thread table");
-		if ($db->q("SELECT `iid` FROM `thread` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `thread`.`iid`) LIMIT ".intval($limit), true)) {
-			$count = $db->num_rows();
+		$r = dba::p("SELECT `iid` FROM `thread` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `thread`.`iid`) LIMIT ".intval($limit));
+		$count = dba::num_rows($r);
+		if ($count > 0) {
 			logger("found thread orphans: ".$count);
-			while ($orphan = $db->qfetch()) {
+			while ($orphan = dba::fetch($r)) {
 				q("DELETE FROM `thread` WHERE `iid` = %d", intval($orphan["iid"]));
 			}
 		}
-		$db->qclose();
+		dba::close($r);
 		logger("Done deleting orphaned data from thread table");
 	}
 
 	if (($stage == 4) OR ($stage == 0)) {
 		logger("Deleting orphaned data from notify table");
-		if ($db->q("SELECT `iid` FROM `notify` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `notify`.`iid`) LIMIT ".intval($limit), true)) {
-			$count = $db->num_rows();
+		$r = dba::p("SELECT `iid` FROM `notify` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `notify`.`iid`) LIMIT ".intval($limit));
+		$count = dba::num_rows($r);
+		if ($count > 0) {
 			logger("found notify orphans: ".$count);
-			while ($orphan = $db->qfetch()) {
+			while ($orphan = dba::fetch($r)) {
 				q("DELETE FROM `notify` WHERE `iid` = %d", intval($orphan["iid"]));
 			}
 		}
-		$db->qclose();
+		dba::close($r);
 		logger("Done deleting orphaned data from notify table");
 	}
 
 	if (($stage == 5) OR ($stage == 0)) {
 		logger("Deleting orphaned data from notify-threads table");
-		if ($db->q("SELECT `id` FROM `notify-threads` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `notify-threads`.`master-parent-item`) LIMIT ".intval($limit), true)) {
-			$count = $db->num_rows();
+		$r = dba::p("SELECT `id` FROM `notify-threads` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `notify-threads`.`master-parent-item`) LIMIT ".intval($limit));
+		$count = dba::num_rows($r);
+		if ($count > 0) {
 			logger("found notify-threads orphans: ".$count);
-			while ($orphan = $db->qfetch()) {
+			while ($orphan = dba::fetch($r)) {
 				q("DELETE FROM `notify-threads` WHERE `id` = %d", intval($orphan["id"]));
 			}
 		}
-		$db->qclose();
+		dba::close($r);
 		logger("Done deleting orphaned data from notify-threads table");
 	}
 
 
 	if (($stage == 6) OR ($stage == 0)) {
 		logger("Deleting orphaned data from sign table");
-		if ($db->q("SELECT `iid` FROM `sign` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `sign`.`iid`) LIMIT ".intval($limit), true)) {
-			$count = $db->num_rows();
+		$r = dba::p("SELECT `iid` FROM `sign` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `sign`.`iid`) LIMIT ".intval($limit));
+		$count = dba::num_rows($r);
+		if ($count > 0) {
 			logger("found sign orphans: ".$count);
-			while ($orphan = $db->qfetch()) {
+			while ($orphan = dba::fetch($r)) {
 				q("DELETE FROM `sign` WHERE `iid` = %d", intval($orphan["iid"]));
 			}
 		}
-		$db->qclose();
+		dba::close($r);
 		logger("Done deleting orphaned data from sign table");
 	}
 
 
 	if (($stage == 7) OR ($stage == 0)) {
 		logger("Deleting orphaned data from term table");
-		if ($db->q("SELECT `oid` FROM `term` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `term`.`oid`) LIMIT ".intval($limit), true)) {
-			$count = $db->num_rows();
+		$r = dba::p("SELECT `oid` FROM `term` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `term`.`oid`) LIMIT ".intval($limit));
+		$count = dba::num_rows($r);
+		if ($count > 0) {
 			logger("found term orphans: ".$count);
-			while ($orphan = $db->qfetch()) {
+			while ($orphan = dba::fetch($r)) {
 				q("DELETE FROM `term` WHERE `oid` = %d", intval($orphan["oid"]));
 			}
 		}
-		$db->qclose();
+		dba::close($r);
 		logger("Done deleting orphaned data from term table");
 	}
 

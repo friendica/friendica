@@ -112,12 +112,11 @@ function create_tags_from_itemuri($itemuri, $uid) {
 }
 
 function update_items() {
-	global $db;
 
-	$messages = $db->q("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''", true);
+	$messages = dba::p("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''");
 
-	logger("fetched messages: ".count($messages));
-	while ($message = $db->qfetch()) {
+	logger("fetched messages: ".dba::num_rows($messages));
+	while ($message = dba::fetch($messages)) {
 
 		if ($message["uid"] == 0) {
 			$global = true;
@@ -136,15 +135,15 @@ function update_items() {
 			intval($global), intval(TERM_OBJ_POST), intval($message["oid"]));
 	}
 
-	$db->qclose();
+	dba::close($messages);
 
-	$messages = $db->q("SELECT `guid` FROM `item` WHERE `uid` = 0", true);
+	$messages = dba::p("SELECT `guid` FROM `item` WHERE `uid` = 0");
 
-	logger("fetched messages: ".count($messages));
-	while ($message = $db->qfetch()) {
+	logger("fetched messages: ".dba::num_rows($messages));
+	while ($message = dba::fetch(messages)) {
 		q("UPDATE `item` SET `global` = 1 WHERE `guid` = '%s'", dbesc($message["guid"]));
 	}
 
-	$db->qclose();
+	dba::close($messages);
 }
 ?>
