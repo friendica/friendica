@@ -467,6 +467,22 @@ class dba {
 		return $id;
 	}
 
+	function __destruct() {
+		if ($this->db) {
+			switch ($this->driver) {
+				case 'pdo':
+					$this->db = null;
+					break;
+				case 'mysqli':
+					$this->db->close();
+					break;
+				case 'mysql':
+					mysql_close($this->db);
+					break;
+			}
+		}
+	}
+
 	/**
 	 * @brief Replaces ANY_VALUE() function by MIN() function,
 	 *  if the database server does not support ANY_VALUE().
@@ -485,22 +501,6 @@ class dba {
 			$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
 		}
 		return $sql;
-	}
-
-	function __destruct() {
-		if ($this->db) {
-			switch ($this->driver) {
-				case 'pdo':
-					$this->db = null;
-					break;
-				case 'mysqli':
-					$this->db->close();
-					break;
-				case 'mysql':
-					mysql_close($this->db);
-					break;
-			}
-		}
 	}
 
 	/**
