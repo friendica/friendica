@@ -32,8 +32,6 @@
  *
  */
 
-die();
-
 if (sizeof($_SERVER["argv"]) == 0)
 	die();
 
