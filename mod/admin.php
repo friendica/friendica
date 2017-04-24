@@ -109,6 +109,9 @@ function admin_post(App $a) {
 			case 'dbsync':
 				admin_page_dbsync_post($a);
 				break;
+			case 'blocklist':
+				admin_page_blocklist_post($a);
+				break;
 		}
 	}
 
@@ -166,6 +169,7 @@ function admin_content(App $a) {
 		'features' =>	array("admin/features/", t("Additional features") , "features"),
 		'dbsync' => 	array("admin/dbsync/", t('DB updates'), "dbsync"),
 		'queue'	 =>	array("admin/queue/", t('Inspect Queue'), "queue"),
+		'blocklist' => array("admin/blocklist/", t('Server Blocklist'), "blocklist"),
 		'federation' => array("admin/federation/", t('Federation Statistics'), "federation"),
 	);
 
@@ -236,6 +240,9 @@ function admin_content(App $a) {
 			case 'federation':
 				$o = admin_page_federation($a);
 				break;
+			case 'blocklist':
+				$o = admin_page_blocklist($a);
+				break;
 			default:
 				notice(t("Item not found."));
 		}
@@ -250,6 +257,92 @@ function admin_content(App $a) {
 	} else {
 		return $o;
 	}
+}
+
+/**
+ * @brief Subpage to modify the server wide block list via the admin panel.
+ *
+ * This function generates the subpage of the admin panel to allow the
+ * modification of the node wide block/black list to block entire
+ * remote servers from communication with this node.
+ *
+ * @param App $a
+ * @return string
+ */
+function admin_page_blocklist(App $a) {
+	$blocklist = Config::get('system', 'blocklist');
+	$blocklistform = array();
+	if (is_array($blocklist)) {
+		foreach($blocklist as $id =>$b) {
+			$blocklistform[] = Array(
+				'url' => Array("url[$id]", t('Blocked URL'), $b['URL'], '', t('The blocked URL'), 'required', '', ''),
+				'reason' => Array("reason[$id]", t("Reason for the block"), $b['reason'], t('The reason why you blocked this URL.').'('.$b['URL'].')', 'required', '', ''),
+				'delete' => Array("delete[$id]", t("Delete UFL").' ('.$b['URL'].')', False , "Check to delete this entry from the blocklist")
+			);
+		}
+	}
+	$t = get_markup_template("admin_blocklist.tpl");
+	return replace_macros($t, array(
+		'$title' => t('Administration'),
+		'$page' => t('Server Blocklist'),
+		'$intro' => t('This page can be used to define a black list of servers from the federated network that are not allowed to interact with your node. For all entered URLs you should also give a reason, why you have blocked the remote server.'),
+		'$public' => t('The list of blocked servers will be made publically available on the /friendica page so that your users and people investigating communication problems can find the reason easily.'),
+		'$addtitle' => t('Add new entry to block list'),
+		'$newurl' => Array('newentry_url', t('Server URL'), '', t('The URL of the new server to add to the block list. Do not include the protocol to the URL.'), 'required', '', ''),
+		'$newreason' => Array('newentry_reason', t('Block reason'), '', t('The reason why you blocked this URL.'), 'required', '', ''),
+		'$submit' => t('Add Entry'),
+		'$savechanges' => t('Save changes to the blocklist'),
+		'$currenttitle' => t('Current Entries in the Blocklist'),
+		'$thurl' => t('Blocked URL'),
+		'$threason' => t('Reason for the block'),
+		'$delentry' => t('Delete entry from blocklist'),
+		'$entries' => $blocklistform,
+		'$baseurl' => App::get_baseurl(true),
+		'$confirm_delete' => t('Delete entriy from blocklist?'),
+		'$form_security_token'	=> get_form_security_token("admin_blocklist")
+	));
+}
+
+/**
+ * @brief Process send data from Admin Blocklist Page
+ *
+ * @param App $a
+ */
+function admin_page_blocklist_post(App $a) {
+	if (!x($_POST,"page_blocklist_save") && (!x($_POST['page_blocklist_edit']))) {
+		return;
+	}
+
+	check_form_security_token_redirectOnErr('/admin/blocklist', 'admin_blocklist');
+
+	if (x($_POST['page_blocklist_save'])) {
+		//  Add new item to blocklist
+		$blocklist = get_config('system', 'blocklist');
+		$blocklist[] = Array(
+			'URL' => notags(trim($_POST['newentry_url'])),
+			'reason' => notags(trim($_POST['newentry_reason']))
+		);
+		Config::set('system', 'blocklist', $blocklist);
+		info(t('Server added to blocklist.').EOL);
+	} else {
+		// Edit the entries from blocklist
+		$blocklist = array();
+		foreach ($_POST['url'] as $id => $URL) {
+			$URL = notags(trim($URL));
+			$reason = notags(trim($_POST['reason'][$id]));
+			if (!x($_POST['delete'][$id])) {
+				$blocklist[] = Array(
+					'URL' => $URL,
+					'reason' => $reason
+				);
+			}
+		}
+		Config::set('system', 'blocklist', $blocklist);
+		info(t('Site blocklist updated.').EOL);
+	}
+	goaway('admin/blocklist');
+	
+	return; // NOTREACHED
 }
 
 /**
