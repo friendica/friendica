@@ -587,6 +587,7 @@ class dba {
 					// Is mysqlnd installed?
 					$retval = $stmt->get_result();
 				} else {
+					$stmt->store_result();
 					$retval = $stmt;
 				}
 				break;
@@ -676,12 +677,30 @@ class dba {
 		if (is_bool($stmt)) {
 			$retval = $stmt;
 		} else {
-			$retval = is_array(self::fetch($stmt));
+			$retval = (self::rows($stmt) > 0);
 		}
 
 		self::close($stmt);
 
 		return $retval;
+	}
+
+	/**
+	 * @brief Returnr the number of rows of a statement
+	 *
+	 * @param object Statement object
+	 * @return int Number of rows
+	 */
+	static public function rows($stmt) {
+		switch (self::$dbo->driver) {
+			case 'pdo':
+				return $stmt->rowCount();
+			case 'mysqli':
+				return $stmt->num_rows;
+			case 'mysql':
+				return mysql_num_rows($stmt);
+		}
+		return 0;
 	}
 
 	/**
@@ -726,11 +745,11 @@ class dba {
 				// We need to get the field names for the array keys
 				// It seems that there is no better way to do this.
 				$result = $stmt->result_metadata();
+				$fields = $result->fetch_fields();
 
 				$columns = array();
-				foreach ($cols_num AS $col) {
-					$field = $result->fetch_field();
-					$columns[$field->name] = $col;
+				foreach ($cols_num AS $param => $col) {
+					$columns[$fields[$param]->name] = $col;
 				}
 				return $columns;
 			case 'mysql':
