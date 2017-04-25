@@ -415,6 +415,10 @@ function check_funcs(&$checks) {
 		$ck_funcs[3]['status'] = false;
 		$ck_funcs[3]['help'] = t('Error: PDO or MySQLi PHP module required but not installed.');
 	}
+	if (!function_exists('mysqli_connect') && class_exists('pdo') && !in_array('mysql', PDO::getAvailableDrivers())) {
+		$ck_funcs[3]['status'] = false;
+		$ck_funcs[3]['help'] = t('Error: The MySQL driver for PDO is not installed.');
+	}
 	if (! function_exists('mb_strlen')) {
 		$ck_funcs[4]['status'] = false;
 		$ck_funcs[4]['help'] = t('Error: mb_string PHP module required but not installed.');
