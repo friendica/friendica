@@ -10,6 +10,7 @@ require_once('include/datetime.php');
  * When logging, all binary info is converted to text and html entities are escaped so that
  * the debugging stream is safe to view within both terminals and web pages.
  *
+ * This class is for the low level database stuff that does driver specific things.
  */
 
 class dba {

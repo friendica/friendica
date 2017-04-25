@@ -2,6 +2,7 @@
 /**
  * @brief This class contain functions for the database management
  *
+ * This class contains functions that doesn't need to know if pdo, mysqli or whatever is used.
  */
 class dbm {
 	/**
