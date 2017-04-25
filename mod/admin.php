@@ -274,11 +274,11 @@ function admin_page_blocklist(App $a) {
 	$blocklist = Config::get('system', 'blocklist');
 	$blocklistform = array();
 	if (is_array($blocklist)) {
-		foreach($blocklist as $id =>$b) {
-			$blocklistform[] = Array(
-				'url' => Array("url[$id]", t('Blocked URL'), $b['URL'], '', t('The blocked URL'), 'required', '', ''),
-				'reason' => Array("reason[$id]", t("Reason for the block"), $b['reason'], t('The reason why you blocked this URL.').'('.$b['URL'].')', 'required', '', ''),
-				'delete' => Array("delete[$id]", t("Delete UFL").' ('.$b['URL'].')', False , "Check to delete this entry from the blocklist")
+		foreach($blocklist as $id => $b) {
+			$blocklistform[] = array(
+				'url' => array("url[$id]", t('Blocked URL'), $b['URL'], '', t('The blocked URL'), 'required', '', ''),
+				'reason' => array("reason[$id]", t("Reason for the block"), $b['reason'], t('The reason why you blocked this URL.').'('.$b['URL'].')', 'required', '', ''),
+				'delete' => array("delete[$id]", t("Delete UFL").' ('.$b['URL'].')', False , "Check to delete this entry from the blocklist")
 			);
 		}
 	}
@@ -289,8 +289,8 @@ function admin_page_blocklist(App $a) {
 		'$intro' => t('This page can be used to define a black list of servers from the federated network that are not allowed to interact with your node. For all entered URLs you should also give a reason, why you have blocked the remote server.'),
 		'$public' => t('The list of blocked servers will be made publically available on the /friendica page so that your users and people investigating communication problems can find the reason easily.'),
 		'$addtitle' => t('Add new entry to block list'),
-		'$newurl' => Array('newentry_url', t('Server URL'), '', t('The URL of the new server to add to the block list. Do not include the protocol to the URL.'), 'required', '', ''),
-		'$newreason' => Array('newentry_reason', t('Block reason'), '', t('The reason why you blocked this URL.'), 'required', '', ''),
+		'$newurl' => array('newentry_url', t('Server URL'), '', t('The URL of the new server to add to the block list. Do not include the protocol to the URL.'), 'required', '', ''),
+		'$newreason' => array('newentry_reason', t('Block reason'), '', t('The reason why you blocked this URL.'), 'required', '', ''),
 		'$submit' => t('Add Entry'),
 		'$savechanges' => t('Save changes to the blocklist'),
 		'$currenttitle' => t('Current Entries in the Blocklist'),
@@ -299,7 +299,7 @@ function admin_page_blocklist(App $a) {
 		'$delentry' => t('Delete entry from blocklist'),
 		'$entries' => $blocklistform,
 		'$baseurl' => App::get_baseurl(true),
-		'$confirm_delete' => t('Delete entriy from blocklist?'),
+		'$confirm_delete' => t('Delete entry from blocklist?'),
 		'$form_security_token'	=> get_form_security_token("admin_blocklist")
 	));
 }
@@ -319,7 +319,7 @@ function admin_page_blocklist_post(App $a) {
 	if (x($_POST['page_blocklist_save'])) {
 		//  Add new item to blocklist
 		$blocklist = get_config('system', 'blocklist');
-		$blocklist[] = Array(
+		$blocklist[] = array(
 			'URL' => notags(trim($_POST['newentry_url'])),
 			'reason' => notags(trim($_POST['newentry_reason']))
 		);
@@ -332,7 +332,7 @@ function admin_page_blocklist_post(App $a) {
 			$URL = notags(trim($URL));
 			$reason = notags(trim($_POST['reason'][$id]));
 			if (!x($_POST['delete'][$id])) {
-				$blocklist[] = Array(
+				$blocklist[] = array(
 					'URL' => $URL,
 					'reason' => $reason
 				);
