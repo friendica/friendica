@@ -443,8 +443,8 @@ class dba {
 	}
 
 	/**
-	 * @brief Executes a prepared statement
-	 *
+	 * @brief Executes a prepared statement that returns data
+	 * @usage Example: $r = p("SELECT * FROM `item` WHERE `guid` = ?", $guid);
 	 * @param string $sql SQL statement
 	 * @return object statement object
 	 */
@@ -529,6 +529,7 @@ class dba {
 				break;
 			case 'mysql':
 				// For the old "mysql" functions we cannot use prepared statements
+				$offset = 0;
 				foreach ($args AS $param => $value) {
 					if (is_int($args[$param]) OR is_float($args[$param])) {
 						$replace = intval($args[$param]);
@@ -536,10 +537,11 @@ class dba {
 						$replace = "'".dbesc($args[$param])."'";
 					}
 
-					$pos = strpos($sql, '?');
+					$pos = strpos($sql, '?', $offset);
 					if ($pos !== false) {
 						$sql = substr_replace($sql, $replace, $pos, 1);
 					}
+					$offset = $pos + strlen($replace);
 				}
 
 				$retval = mysql_query($sql, self::$dbo->db);
@@ -570,10 +572,10 @@ class dba {
 	}
 
 	/**
-	 * @brief Executes a prepared statement
+	 * @brief Executes a prepared statement like UPDATE or INSERT that doesn't return data
 	 *
 	 * @param string $sql SQL statement
-	 * @return boolean Was the query successfull?
+	 * @return boolean Was the query successfull? False is returned only if an error occurred
 	 */
 	static public function e($sql) {
 		$a = get_app();
