@@ -443,6 +443,31 @@ class dba {
 	}
 
 	/**
+	 * @brief Replaces the ? placeholders with the parameters in the $args array
+	 *
+	 * @param string $sql SQL query
+	 * @param array $args The parameters that are to replace the ? placeholders
+	 * @return string The replaced SQL query
+	 */
+	static private function replace_parameters($sql, $args) {
+		$offset = 0;
+		foreach ($args AS $param => $value) {
+			if (is_int($args[$param]) OR is_float($args[$param])) {
+				$replace = intval($args[$param]);
+			} else {
+				$replace = "'".dbesc($args[$param])."'";
+			}
+
+			$pos = strpos($sql, '?', $offset);
+			if ($pos !== false) {
+				$sql = substr_replace($sql, $replace, $pos, 1);
+			}
+			$offset = $pos + strlen($replace);
+		}
+		return $sql;
+	}
+
+	/**
 	 * @brief Executes a prepared statement that returns data
 	 * @usage Example: $r = p("SELECT * FROM `item` WHERE `guid` = ?", $guid);
 	 * @param string $sql SQL statement
@@ -529,22 +554,7 @@ class dba {
 				break;
 			case 'mysql':
 				// For the old "mysql" functions we cannot use prepared statements
-				$offset = 0;
-				foreach ($args AS $param => $value) {
-					if (is_int($args[$param]) OR is_float($args[$param])) {
-						$replace = intval($args[$param]);
-					} else {
-						$replace = "'".dbesc($args[$param])."'";
-					}
-
-					$pos = strpos($sql, '?', $offset);
-					if ($pos !== false) {
-						$sql = substr_replace($sql, $replace, $pos, 1);
-					}
-					$offset = $pos + strlen($replace);
-				}
-
-				$retval = mysql_query($sql, self::$dbo->db);
+				$retval = mysql_query(self::replace_parameters($sql, $args), self::$dbo->db);
 				if (mysql_errno(self::$dbo->db)) {
 					self::$dbo->error = mysql_error(self::$dbo->db);
 					self::$dbo->errorno = mysql_errno(self::$dbo->db);
@@ -562,10 +572,11 @@ class dba {
 			if (($duration > $a->config["system"]["db_loglimit"])) {
 				$duration = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
 				@file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
 						basename($backtrace[1]["file"])."\t".
 						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
-						substr($sql, 0, 2000)."\n", FILE_APPEND);
+						substr(self::replace_parameters($sql, $args), 0, 2000)."\n", FILE_APPEND);
 			}
 		}
 		return $retval;
