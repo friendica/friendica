@@ -109,10 +109,22 @@ code {
         top: 0!important;
         background-color: #fff;
         width: 100%;
+        max-width: 300px;
         height: 100%;
         padding-top: 100px;
         z-index: 10;
     }
+    aside::before {
+        content: " ";
+        position: fixed;
+        display: block;
+        top: 0; left: 300px; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.4);
+    }
+    aside + div {
+        display:none!important;
+    }
+
 }
 /*
 * standard page elements
