@@ -514,7 +514,7 @@ function dfrn_request_post(App $a) {
 					return; // NOTREACHED
 				}
 
-				if (! check_domain_blocklist($url)) {
+				if (blocked_url($url)) {
 					notice( t('Blocked domain') . EOL);
 					goaway(App::get_baseurl() . '/' . $a->cmd);
 					return; // NOTREACHED

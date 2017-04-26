@@ -82,7 +82,7 @@ function new_contact($uid,$url,$interactive = false) {
 		return $result;
 	}
 
-	if (! check_domain_blocklist($url)) {
+	if (blocked_url($url)) {
 		$result['message'] = t('Blocked domain');
 		return $result;
 	}

@@ -69,7 +69,7 @@ function z_fetch_url($url, $binary = false, &$redirects = 0, $opts = array()) {
 
 	$a = get_app();
 
-	if (! check_domain_blocklist($url)) {
+	if (blocked_url($url)) {
 		logger('z_fetch_url: domain of ' . $url . ' is blocked', LOGGER_DATA);
 		return $ret;
 	}
@@ -251,7 +251,7 @@ function z_fetch_url($url, $binary = false, &$redirects = 0, $opts = array()) {
 function post_url($url, $params, $headers = null, &$redirects = 0, $timeout = 0) {
 	$stamp1 = microtime(true);
 
-	if (!check_domain_blocklist($url)) {
+	if (blocked_url($url)) {
 		logger('post_url: domain of ' . $url . ' is blocked', LOGGER_DATA);
 		return false;
 	}
@@ -521,34 +521,33 @@ function allowed_url($url) {
 }
 
 /**
- * Checks if the provided url domain isn't on the domain blacklist.
- * Return true if the check passed (not on the blacklist), false if not
- * or malformed URL
+ * Checks if the provided url domain is on the domain blocklist.
+ * Returns true if it is or malformed URL, false if not.
  *
  * @param string $url The url to check the domain from
  * @return boolean
  */
-function check_domain_blocklist($url) {
+function blocked_url($url) {
 	$h = @parse_url($url);
 
 	if (! $h) {
-		return false;
+		return true;
 	}
 
 	$domain_blocklist = get_config('system', 'blocklist', array());
 	if (! $domain_blocklist) {
-		return true;
+		return false;
 	}
 
 	$host = strtolower($h['host']);
 
 	foreach ($domain_blocklist as $domain_block) {
 		if (strtolower($domain_block['domain']) == $host) {
-			return false;
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
 /**

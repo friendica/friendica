@@ -272,7 +272,6 @@ function admin_content(App $a) {
  */
 function admin_page_blocklist(App $a) {
 	$blocklist = Config::get('system', 'blocklist');
-	var_dump($blocklist);
 	$blocklistform = array();
 	if (is_array($blocklist)) {
 		foreach($blocklist as $id => $b) {
