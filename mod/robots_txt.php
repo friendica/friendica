@@ -1,29 +1,27 @@
 <?php
 /**
  * return the default robots.txt
- * @version 0.1.0
+ * @version 0.1.1
  */
 
 /**
  * Simple robots.txt
- * @inheritdoc (?)
+ * @param App $a
+ * @return void
  */
 function robots_txt_init(App $a) {
 
-    /** @var string[] globally disallowed url */
-    $allDisalloweds=array(
-        '/settings/',
-        '/admin/',
-        '/message/',
-    );
+	/** @var string[] globally disallowed url */
+	$allDisalloweds = array(
+		"/settings/",
+		"/admin/",
+		"/message/",
+	);
 
-    header("Content-Type: text/plain");
-    echo "User-agent: *\n";
-    echo "Disallow:\n";
-    echo "\n";
-    echo "User-agent: *\n";
-    foreach($allDisalloweds as $disallowed) {
-        echo "Disallow: {$disallowed}\n";
-    }
-    killme();
+	header("Content-Type: text/plain");
+	echo "User-agent: *\n";
+	foreach($allDisalloweds as $disallowed) {
+		echo "Disallow: {$disallowed}\n";
+	}
+	killme();
 }
