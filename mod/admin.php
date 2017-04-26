@@ -272,13 +272,14 @@ function admin_content(App $a) {
  */
 function admin_page_blocklist(App $a) {
 	$blocklist = Config::get('system', 'blocklist');
+	var_dump($blocklist);
 	$blocklistform = array();
 	if (is_array($blocklist)) {
 		foreach($blocklist as $id => $b) {
 			$blocklistform[] = array(
-				'url' => array("url[$id]", t('Blocked URL'), $b['URL'], '', t('The blocked URL'), 'required', '', ''),
-				'reason' => array("reason[$id]", t("Reason for the block"), $b['reason'], t('The reason why you blocked this URL.').'('.$b['URL'].')', 'required', '', ''),
-				'delete' => array("delete[$id]", t("Delete UFL").' ('.$b['URL'].')', False , "Check to delete this entry from the blocklist")
+				'domain' => array("domain[$id]", t('Blocked domain'), $b['domain'], '', t('The blocked domain'), 'required', '', ''),
+				'reason' => array("reason[$id]", t("Reason for the block"), $b['reason'], t('The reason why you blocked this domain.').'('.$b['domain'].')', 'required', '', ''),
+				'delete' => array("delete[$id]", t("Delete domain").' ('.$b['domain'].')', False , "Check to delete this entry from the blocklist")
 			);
 		}
 	}
@@ -286,15 +287,15 @@ function admin_page_blocklist(App $a) {
 	return replace_macros($t, array(
 		'$title' => t('Administration'),
 		'$page' => t('Server Blocklist'),
-		'$intro' => t('This page can be used to define a black list of servers from the federated network that are not allowed to interact with your node. For all entered URLs you should also give a reason, why you have blocked the remote server.'),
+		'$intro' => t('This page can be used to define a black list of servers from the federated network that are not allowed to interact with your node. For all entered domains you should also give a reason why you have blocked the remote server.'),
 		'$public' => t('The list of blocked servers will be made publically available on the /friendica page so that your users and people investigating communication problems can find the reason easily.'),
 		'$addtitle' => t('Add new entry to block list'),
-		'$newurl' => array('newentry_url', t('Server URL'), '', t('The URL of the new server to add to the block list. Do not include the protocol to the URL.'), 'required', '', ''),
-		'$newreason' => array('newentry_reason', t('Block reason'), '', t('The reason why you blocked this URL.'), 'required', '', ''),
+		'$newdomain' => array('newentry_domain', t('Server Domain'), '', t('The domain of the new server to add to the block list. Do not include the protocol.'), 'required', '', ''),
+		'$newreason' => array('newentry_reason', t('Block reason'), '', t('The reason why you blocked this domain.'), 'required', '', ''),
 		'$submit' => t('Add Entry'),
 		'$savechanges' => t('Save changes to the blocklist'),
 		'$currenttitle' => t('Current Entries in the Blocklist'),
-		'$thurl' => t('Blocked URL'),
+		'$thurl' => t('Blocked domain'),
 		'$threason' => t('Reason for the block'),
 		'$delentry' => t('Delete entry from blocklist'),
 		'$entries' => $blocklistform,
@@ -320,7 +321,7 @@ function admin_page_blocklist_post(App $a) {
 		//  Add new item to blocklist
 		$blocklist = get_config('system', 'blocklist');
 		$blocklist[] = array(
-			'URL' => notags(trim($_POST['newentry_url'])),
+			'domain' => notags(trim($_POST['newentry_domain'])),
 			'reason' => notags(trim($_POST['newentry_reason']))
 		);
 		Config::set('system', 'blocklist', $blocklist);
@@ -328,12 +329,13 @@ function admin_page_blocklist_post(App $a) {
 	} else {
 		// Edit the entries from blocklist
 		$blocklist = array();
-		foreach ($_POST['url'] as $id => $URL) {
-			$URL = notags(trim($URL));
+		foreach ($_POST['domain'] as $id => $domain) {
+			// Trimming whitespaces as well as any lingering slashes
+			$domain = notags(trim($domain, "\x00..\x1F/"));
 			$reason = notags(trim($_POST['reason'][$id]));
 			if (!x($_POST['delete'][$id])) {
 				$blocklist[] = array(
-					'URL' => $URL,
+					'domain' => $domain,
 					'reason' => $reason
 				);
 			}
@@ -342,7 +344,7 @@ function admin_page_blocklist_post(App $a) {
 		info(t('Site blocklist updated.').EOL);
 	}
 	goaway('admin/blocklist');
-	
+
 	return; // NOTREACHED
 }
 

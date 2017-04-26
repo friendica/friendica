@@ -11,7 +11,7 @@
 	<h2>{{$addtitle}}</h2>
 	<form action="{{$baseurl}}/admin/blocklist" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-		{{include file="field_input.tpl" field=$newurl}}
+		{{include file="field_input.tpl" field=$newdomain}}
 		{{include file="field_input.tpl" field=$newreason}}
 		<div class="submit"><input type="submit" name="page_blocklist_save" value="{{$submit}}" /></div>
 	</form>
@@ -22,7 +22,7 @@
 	<form action="{{$baseurl}}/admin/blocklist" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		{{foreach $entries as $e}}
-			{{include file="field_input.tpl" field=$e.url}}
+			{{include file="field_input.tpl" field=$e.domain}}
 			{{include file="field_input.tpl" field=$e.reason}}
 			{{include file="field_checkbox.tpl" field=$e.delete}}
 		{{/foreach}}
