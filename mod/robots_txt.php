@@ -1,11 +1,13 @@
 <?php
 /**
- * return the default robots.txt
- * @version 0.1.1
+ * @file mod/robots_text.php
+ * @brief Module which returns the default robots.txt
+ * @version 0.1.2
  */
 
+
 /**
- * Simple robots.txt
+ * Return at init
  * @param App $a
  * @return void
  */
