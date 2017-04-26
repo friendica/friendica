@@ -7,23 +7,24 @@
 
 
 /**
- * Return at init
+ * @brief Return default robots.txt when init
  * @param App $a
  * @return void
  */
-function robots_txt_init(App $a) {
+function robots_txt_init(App $a)
+{
 
 	/** @var string[] globally disallowed url */
 	$allDisalloweds = array(
-		"/settings/",
-		"/admin/",
-		"/message/",
+		'/settings/',
+		'/admin/',
+		'/message/',
 	);
 
-	header("Content-Type: text/plain");
-	echo "User-agent: *\n";
-	foreach($allDisalloweds as $disallowed) {
-		echo "Disallow: {$disallowed}\n";
+	header('Content-Type: text/plain');
+	echo 'User-agent: *'.PHP_EOL;
+	foreach ($allDisalloweds as $disallowed) {
+		echo 'Disallow: '.$disallowed.PHP_EOL;
 	}
 	killme();
 }
