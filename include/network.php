@@ -62,23 +62,26 @@ function fetch_url($url,$binary = false, &$redirects = 0, $timeout = 0, $accept_
  *    string 'header' => HTTP headers
  *    string 'body' => fetched content
  */
-function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
-
-	$ret = array('return_code' => 0, 'success' => false, 'header' => "", 'body' => "");
-
+function z_fetch_url($url, $binary = false, &$redirects = 0, $opts = array()) {
+	$ret = array('return_code' => 0, 'success' => false, 'header' => '', 'body' => '');
 
 	$stamp1 = microtime(true);
 
 	$a = get_app();
 
+	if (! check_domain_blocklist($url)) {
+		logger('z_fetch_url: domain of ' . $url . ' is blocked', LOGGER_DATA);
+		return $ret;
+	}
+
 	$ch = @curl_init($url);
-	if (($redirects > 8) || (! $ch)) {
+	if (($redirects > 8) || (!$ch)) {
 		return $ret;
 	}
 
 	@curl_setopt($ch, CURLOPT_HEADER, true);
 
-	if (x($opts,"cookiejar")) {
+	if (x($opts, "cookiejar")) {
 		curl_setopt($ch, CURLOPT_COOKIEJAR, $opts["cookiejar"]);
 		curl_setopt($ch, CURLOPT_COOKIEFILE, $opts["cookiejar"]);
 	}
@@ -87,52 +90,61 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 //	@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 //	@curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
 
-	if (x($opts,'accept_content')){
-		curl_setopt($ch,CURLOPT_HTTPHEADER, array (
-			"Accept: " . $opts['accept_content']
+	if (x($opts, 'accept_content')) {
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Accept: ' . $opts['accept_content']
 		));
 	}
 
-	@curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
+	@curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	@curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
 
 	$range = intval(Config::get('system', 'curl_range_bytes', 0));
+
 	if ($range > 0) {
-		@curl_setopt($ch, CURLOPT_RANGE, '0-'.$range);
+		@curl_setopt($ch, CURLOPT_RANGE, '0-' . $range);
 	}
 
-	if (x($opts,'headers')){
+	if (x($opts, 'headers')) {
 		@curl_setopt($ch, CURLOPT_HTTPHEADER, $opts['headers']);
 	}
-	if (x($opts,'nobody')){
+
+	if (x($opts, 'nobody')) {
 		@curl_setopt($ch, CURLOPT_NOBODY, $opts['nobody']);
 	}
-	if (x($opts,'timeout')){
+
+	if (x($opts, 'timeout')) {
 		@curl_setopt($ch, CURLOPT_TIMEOUT, $opts['timeout']);
 	} else {
-		$curl_time = intval(get_config('system','curl_timeout'));
+		$curl_time = intval(get_config('system', 'curl_timeout'));
 		@curl_setopt($ch, CURLOPT_TIMEOUT, (($curl_time !== false) ? $curl_time : 60));
 	}
 
 	// by default we will allow self-signed certs
 	// but you can override this
 
-	$check_cert = get_config('system','verifyssl');
+	$check_cert = get_config('system', 'verifyssl');
 	@curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
+
 	if ($check_cert) {
 		@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 	}
 
-	$prx = get_config('system','proxy');
-	if (strlen($prx)) {
+	$proxy = get_config('system', 'proxy');
+
+	if (strlen($proxy)) {
 		@curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
-		@curl_setopt($ch, CURLOPT_PROXY, $prx);
-		$prxusr = @get_config('system','proxyuser');
-		if (strlen($prxusr))
-			@curl_setopt($ch, CURLOPT_PROXYUSERPWD, $prxusr);
+		@curl_setopt($ch, CURLOPT_PROXY, $proxy);
+		$proxyuser = @get_config('system', 'proxyuser');
+
+		if (strlen($proxyuser)) {
+			@curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyuser);
+		}
 	}
-	if ($binary)
-		@curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+
+	if ($binary) {
+		@curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+	}
 
 	$a->set_curl_code(0);
 
@@ -140,8 +152,9 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	// if it throws any errors.
 
 	$s = @curl_exec($ch);
+
 	if (curl_errno($ch) !== CURLE_OK) {
-		logger('fetch_url error fetching '.$url.': '.curl_error($ch), LOGGER_NORMAL);
+		logger('fetch_url error fetching ' . $url . ': ' . curl_error($ch), LOGGER_NORMAL);
 	}
 
 	$ret['errno'] = curl_errno($ch);
@@ -150,16 +163,16 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	$curl_info = @curl_getinfo($ch);
 
 	$http_code = $curl_info['http_code'];
-	logger('fetch_url '.$url.': '.$http_code." ".$s, LOGGER_DATA);
+	logger('fetch_url ' . $url . ': ' . $http_code . " " . $s, LOGGER_DATA);
 	$header = '';
 
 	// Pull out multiple headers, e.g. proxy and continuation headers
 	// allow for HTTP/2.x without fixing code
 
-	while (preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/',$base)) {
-		$chunk = substr($base,0,strpos($base,"\r\n\r\n")+4);
+	while (preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/', $base)) {
+		$chunk = substr($base, 0, strpos($base, "\r\n\r\n") + 4);
 		$header .= $chunk;
-		$base = substr($base,strlen($chunk));
+		$base = substr($base, strlen($chunk));
 	}
 
 	$a->set_curl_code($http_code);
@@ -167,92 +180,101 @@ function z_fetch_url($url,$binary = false, &$redirects = 0, $opts=array()) {
 	$a->set_curl_headers($header);
 
 	if ($http_code == 301 || $http_code == 302 || $http_code == 303 || $http_code == 307) {
-		$new_location_info = @parse_url($curl_info["redirect_url"]);
-		$old_location_info = @parse_url($curl_info["url"]);
+		$new_location_info = @parse_url($curl_info['redirect_url']);
+		$old_location_info = @parse_url($curl_info['url']);
 
-		$newurl = $curl_info["redirect_url"];
+		$newurl = $curl_info['redirect_url'];
 
-		if (($new_location_info["path"] == "") AND ($new_location_info["host"] != ""))
-			$newurl = $new_location_info["scheme"]."://".$new_location_info["host"].$old_location_info["path"];
+		if (($new_location_info['path'] == '') AND ( $new_location_info['host'] != '')) {
+			$newurl = $new_location_info['scheme'] . '://' . $new_location_info['host'] . $old_location_info['path'];
+		}
 
 		$matches = array();
+
 		if (preg_match('/(Location:|URI:)(.*?)\n/i', $header, $matches)) {
 			$newurl = trim(array_pop($matches));
 		}
-		if (strpos($newurl,'/') === 0)
-			$newurl = $old_location_info["scheme"]."://".$old_location_info["host"].$newurl;
+
+		if (strpos($newurl, '/') === 0) {
+			$newurl = $old_location_info['scheme'] . '://' . $old_location_info['host'] . $newurl;
+		}
+
 		if (filter_var($newurl, FILTER_VALIDATE_URL)) {
 			$redirects++;
 			@curl_close($ch);
-			return z_fetch_url($newurl,$binary, $redirects, $opts);
+			return z_fetch_url($newurl, $binary, $redirects, $opts);
 		}
 	}
-
 
 	$a->set_curl_code($http_code);
 	$a->set_curl_content_type($curl_info['content_type']);
 
-	$body = substr($s,strlen($header));
-
-
+	$body = substr($s, strlen($header));
 
 	$rc = intval($http_code);
 	$ret['return_code'] = $rc;
 	$ret['success'] = (($rc >= 200 && $rc <= 299) ? true : false);
 	$ret['redirect_url'] = $url;
-	if (! $ret['success']) {
+
+	if (!$ret['success']) {
 		$ret['error'] = curl_error($ch);
 		$ret['debug'] = $curl_info;
 		logger('z_fetch_url: error: ' . $url . ': ' . $ret['error'], LOGGER_DEBUG);
-		logger('z_fetch_url: debug: ' . print_r($curl_info,true), LOGGER_DATA);
+		logger('z_fetch_url: debug: ' . print_r($curl_info, true), LOGGER_DATA);
 	}
-	$ret['body'] = substr($s,strlen($header));
+
+	$ret['body'] = substr($s, strlen($header));
 	$ret['header'] = $header;
-	if (x($opts,'debug')) {
+
+	if (x($opts, 'debug')) {
 		$ret['debug'] = $curl_info;
 	}
+
 	@curl_close($ch);
 
-	$a->save_timestamp($stamp1, "network");
+	$a->save_timestamp($stamp1, 'network');
 
 	return($ret);
-
 }
 
-// post request to $url. $params is an array of post variables.
-
 /**
- * @brief Post request to $url
+ * @brief Send POST request to $url
  *
  * @param string $url URL to post
- * @param mixed $params
+ * @param mixed $params array of POST variables
  * @param string $headers HTTP headers
  * @param integer $redirects Recursion counter for internal use - default = 0
  * @param integer $timeout The timeout in seconds, default system config value or 60 seconds
  *
  * @return string The content
  */
-function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) {
+function post_url($url, $params, $headers = null, &$redirects = 0, $timeout = 0) {
 	$stamp1 = microtime(true);
+
+	if (!check_domain_blocklist($url)) {
+		logger('post_url: domain of ' . $url . ' is blocked', LOGGER_DATA);
+		return false;
+	}
 
 	$a = get_app();
 	$ch = curl_init($url);
-	if (($redirects > 8) || (! $ch))
-		return false;
 
-	logger("post_url: start ".$url, LOGGER_DATA);
+	if (($redirects > 8) || (!$ch)) {
+		return false;
+	}
+
+	logger('post_url: start ' . $url, LOGGER_DATA);
 
 	curl_setopt($ch, CURLOPT_HEADER, true);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
-	curl_setopt($ch, CURLOPT_POST,1);
-	curl_setopt($ch, CURLOPT_POSTFIELDS,$params);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 	curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
 
 	if (intval($timeout)) {
 		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-	}
-	else {
-		$curl_time = intval(get_config('system','curl_timeout'));
+	} else {
+		$curl_time = intval(get_config('system', 'curl_timeout'));
 		curl_setopt($ch, CURLOPT_TIMEOUT, (($curl_time !== false) ? $curl_time : 60));
 	}
 
@@ -265,21 +287,27 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 			}
 		}
 	}
-	if ($headers)
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-	$check_cert = get_config('system','verifyssl');
+	if ($headers) {
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	}
+
+	$check_cert = get_config('system', 'verifyssl');
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
+
 	if ($check_cert) {
 		@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 	}
-	$prx = get_config('system','proxy');
-	if (strlen($prx)) {
+
+	$proxy = get_config('system', 'proxy');
+
+	if (strlen($proxy)) {
 		curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
-		curl_setopt($ch, CURLOPT_PROXY, $prx);
-		$prxusr = get_config('system','proxyuser');
-		if (strlen($prxusr))
-			curl_setopt($ch, CURLOPT_PROXYUSERPWD, $prxusr);
+		curl_setopt($ch, CURLOPT_PROXY, $proxy);
+		$proxyuser = get_config('system', 'proxyuser');
+		if (strlen($proxyuser)) {
+			curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyuser);
+		}
 	}
 
 	$a->set_curl_code(0);
@@ -293,44 +321,48 @@ function post_url($url,$params, $headers = null, &$redirects = 0, $timeout = 0) 
 	$curl_info = curl_getinfo($ch);
 	$http_code = $curl_info['http_code'];
 
-	logger("post_url: result ".$http_code." - ".$url, LOGGER_DATA);
+	logger('post_url: result ' . $http_code . ' - ' . $url, LOGGER_DATA);
 
 	$header = '';
 
 	// Pull out multiple headers, e.g. proxy and continuation headers
 	// allow for HTTP/2.x without fixing code
 
-	while (preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/',$base)) {
-		$chunk = substr($base,0,strpos($base,"\r\n\r\n")+4);
+	while (preg_match('/^HTTP\/[1-2].+? [1-5][0-9][0-9]/', $base)) {
+		$chunk = substr($base, 0, strpos($base, "\r\n\r\n") + 4);
 		$header .= $chunk;
-		$base = substr($base,strlen($chunk));
+		$base = substr($base, strlen($chunk));
 	}
 
 	if ($http_code == 301 || $http_code == 302 || $http_code == 303 || $http_code == 307) {
 		$matches = array();
 		preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
 		$newurl = trim(array_pop($matches));
-		if (strpos($newurl,'/') === 0)
-			$newurl = $old_location_info["scheme"] . "://" . $old_location_info["host"] . $newurl;
+
+		if (strpos($newurl, '/') === 0) {
+			$newurl = $old_location_info['scheme'] . '://' . $old_location_info['host'] . $newurl;
+		}
+
 		if (filter_var($newurl, FILTER_VALIDATE_URL)) {
 			$redirects++;
-			logger("post_url: redirect ".$url." to ".$newurl);
-			return post_url($newurl,$params, $headers, $redirects, $timeout);
-			//return fetch_url($newurl,false,$redirects,$timeout);
+			logger('post_url: redirect ' . $url . ' to ' . $newurl);
+			return post_url($newurl, $params, $headers, $redirects, $timeout);
 		}
 	}
+
 	$a->set_curl_code($http_code);
-	$body = substr($s,strlen($header));
+
+	$body = substr($s, strlen($header));
 
 	$a->set_curl_headers($header);
 
 	curl_close($ch);
 
-	$a->save_timestamp($stamp1, "network");
+	$a->save_timestamp($stamp1, 'network');
 
-	logger("post_url: end ".$url, LOGGER_DATA);
+	logger('post_url: end ' . $url, LOGGER_DATA);
 
-	return($body);
+	return $body;
 }
 
 // Generic XML return
