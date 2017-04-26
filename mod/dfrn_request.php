@@ -514,6 +514,11 @@ function dfrn_request_post(App $a) {
 					return; // NOTREACHED
 				}
 
+				if (! check_domain_blocklist($url)) {
+					notice( t('Blocked domain') . EOL);
+					goaway(App::get_baseurl() . '/' . $a->cmd);
+					return; // NOTREACHED
+				}
 
 				require_once('include/Scrape.php');
 

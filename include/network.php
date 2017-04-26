@@ -458,9 +458,10 @@ function allowed_url($url) {
 		return false;
 	}
 
-	$str_allowed = get_config('system','allowed_sites');
-	if (! $str_allowed)
+	$str_allowed = get_config('system', 'allowed_sites');
+	if (! $str_allowed) {
 		return true;
+	}
 
 	$found = false;
 
@@ -468,22 +469,54 @@ function allowed_url($url) {
 
 	// always allow our own site
 
-	if ($host == strtolower($_SERVER['SERVER_NAME']))
+	if ($host == strtolower($_SERVER['SERVER_NAME'])) {
 		return true;
+	}
 
 	$fnmatch = function_exists('fnmatch');
-	$allowed = explode(',',$str_allowed);
+	$allowed = explode(',', $str_allowed);
 
 	if (count($allowed)) {
 		foreach ($allowed as $a) {
 			$pat = strtolower(trim($a));
-			if (($fnmatch && fnmatch($pat,$host)) || ($pat == $host)) {
+			if (($fnmatch && fnmatch($pat, $host)) || ($pat == $host)) {
 				$found = true;
 				break;
 			}
 		}
 	}
 	return $found;
+}
+
+/**
+ * Checks if the provided url domain isn't on the domain blacklist.
+ * Return true if the check passed (not on the blacklist), false if not
+ * or malformed URL
+ *
+ * @param string $url The url to check the domain from
+ * @return boolean
+ */
+function check_domain_blocklist($url) {
+	$h = @parse_url($url);
+
+	if (! $h) {
+		return false;
+	}
+
+	$domain_blocklist = get_config('system', 'blocklist', array());
+	if (! $domain_blocklist) {
+		return true;
+	}
+
+	$host = strtolower($h['host']);
+
+	foreach ($domain_blocklist as $domain_block) {
+		if (strtolower($domain_block['domain']) == $host) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**

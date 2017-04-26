@@ -82,6 +82,11 @@ function new_contact($uid,$url,$interactive = false) {
 		return $result;
 	}
 
+	if (! check_domain_blocklist($url)) {
+		$result['message'] = t('Blocked domain');
+		return $result;
+	}
+
 	if (! $url) {
 		$result['message'] = t('Connect URL missing.');
 		return $result;
