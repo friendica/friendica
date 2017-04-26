@@ -120,6 +120,11 @@ code {
         display: block;
         top: 0; left: 300px; right: 0; bottom: 0;
         background-color: rgba(0,0,0,0.4);
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+    aside.canvas-slid::before {
+        opacity: 1;
     }
     aside + div {
         display:none!important;
