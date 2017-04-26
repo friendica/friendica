@@ -690,6 +690,42 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	item_body_set_hashtags($arr);
 
 	$arr['thr-parent'] = $arr['parent-uri'];
+
+	if (in_array($arr['network'], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
+		$conversation = array('item-uri' => $arr['uri'], 'received' => dbm::date());
+		if (isset($arr['thr-parent'])) {
+			if ($arr['thr-parent'] != $arr['uri']) {
+				$conversation['reply-to-uri'] = $arr['thr-parent'];
+			}
+		}
+		if (isset($arr['conversation-uri'])) {
+			$conversation['conversation-uri'] = $arr['conversation-uri'];
+			unset($arr['conversation-uri']);
+		}
+
+		if ($arr['network'] == NETWORK_DFRN) {
+			$conversation['protocol'] = PROTOCOL_DFRN;
+		} elseif ($arr['network'] == NETWORK_DIASPORA) {
+			$conversation['protocol'] = PROTOCOL_DIASPORA;
+		}
+
+		if (isset($arr['protocol'])) {
+			$conversation['protocol'] = $arr['protocol'];
+			unset($arr['protocol']);
+		}
+		if (isset($arr['object'])) {
+			$conversation['source'] = $arr['object'];
+			if (in_array($arr['network'], array(NETWORK_DIASPORA, NETWORK_OSTATUS))) {
+				unset($arr['object']);
+			}
+		}
+		if (isset($arr['source'])) {
+			$conversation['source'] = $arr['source'];
+			unset($arr['source']);
+		}
+		dba::insert('conversation', $conversation);
+	}
+
 	if ($arr['parent-uri'] === $arr['uri']) {
 		$parent_id = 0;
 		$parent_deleted = 0;

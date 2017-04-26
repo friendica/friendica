@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 3.5.2-dev (Asparagus)
--- DB_UPDATE_VERSION 1219
+-- DB_UPDATE_VERSION 1220
 -- ------------------------------------------
 
 
@@ -174,13 +174,13 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`fetch_further_information` tinyint(1) NOT NULL DEFAULT 0,
 	`ffi_keyword_blacklist` text,
 	 PRIMARY KEY(`id`),
-	 INDEX `uid_name` (`uid`,`name`),
+	 INDEX `uid_name` (`uid`,`name`(190)),
 	 INDEX `self_uid` (`self`,`uid`),
 	 INDEX `alias_uid` (`alias`(32),`uid`),
 	 INDEX `pending_uid` (`pending`,`uid`),
 	 INDEX `blocked_uid` (`blocked`,`uid`),
-	 INDEX `uid_rel_network_poll` (`uid`,`rel`,`network`,`poll`(64),`archive`),
-	 INDEX `uid_network_batch` (`uid`,`network`,`batch`(64)),
+	 INDEX `uid_rel_network_poll` (`uid`,`rel`,`network`(4),`poll`(64),`archive`),
+	 INDEX `uid_network_batch` (`uid`,`network`(4),`batch`(64)),
 	 INDEX `addr_uid` (`addr`(32),`uid`),
 	 INDEX `nurl_uid` (`nurl`(32),`uid`),
 	 INDEX `nick_uid` (`nick`(32),`uid`),
@@ -202,6 +202,19 @@ CREATE TABLE IF NOT EXISTS `conv` (
 	`subject` text,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
+) DEFAULT COLLATE utf8mb4_general_ci;
+
+--
+-- TABLE conversation
+--
+CREATE TABLE IF NOT EXISTS `conversation` (
+	`item-uri` varbinary(255) NOT NULL,
+	`reply-to-uri` varbinary(255) NOT NULL DEFAULT '',
+	`conversation-uri` varbinary(255) NOT NULL DEFAULT '',
+	`protocol` tinyint(1) unsigned NOT NULL DEFAULT 0,
+	`source` mediumtext,
+	 PRIMARY KEY(`item-uri`),
+	 INDEX `conversation-uri` (`conversation-uri`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
@@ -344,7 +357,7 @@ CREATE TABLE IF NOT EXISTS `gcontact` (
 	 INDEX `name` (`name`(64)),
 	 INDEX `nick` (`nick`(32)),
 	 INDEX `addr` (`addr`(64)),
-	 INDEX `hide_network_updated` (`hide`,`network`,`updated`),
+	 INDEX `hide_network_updated` (`hide`,`network`(4),`updated`),
 	 INDEX `updated` (`updated`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
@@ -523,22 +536,22 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `uid_contactid_id` (`uid`,`contact-id`,`id`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_unseen_contactid` (`uid`,`unseen`,`contact-id`),
-	 INDEX `uid_network_received` (`uid`,`network`,`received`),
-	 INDEX `uid_network_commented` (`uid`,`network`,`commented`),
-	 INDEX `uid_thrparent` (`uid`,`thr-parent`),
-	 INDEX `uid_parenturi` (`uid`,`parent-uri`),
+	 INDEX `uid_network_received` (`uid`,`network`(4),`received`),
+	 INDEX `uid_network_commented` (`uid`,`network`(4),`commented`),
+	 INDEX `uid_thrparent` (`uid`,`thr-parent`(190)),
+	 INDEX `uid_parenturi` (`uid`,`parent-uri`(190)),
 	 INDEX `uid_contactid_created` (`uid`,`contact-id`,`created`),
 	 INDEX `authorid_created` (`author-id`,`created`),
-	 INDEX `uid_uri` (`uid`,`uri`),
+	 INDEX `uid_uri` (`uid`,`uri`(190)),
 	 INDEX `resource-id` (`resource-id`),
 	 INDEX `contactid_allowcid_allowpid_denycid_denygid` (`contact-id`,`allow_cid`(10),`allow_gid`(10),`deny_cid`(10),`deny_gid`(10)),
-	 INDEX `uid_type_changed` (`uid`,`type`,`changed`),
-	 INDEX `contactid_verb` (`contact-id`,`verb`),
+	 INDEX `uid_type_changed` (`uid`,`type`(190),`changed`),
+	 INDEX `contactid_verb` (`contact-id`,`verb`(190)),
 	 INDEX `deleted_changed` (`deleted`,`changed`),
 	 INDEX `uid_wall_changed` (`uid`,`wall`,`changed`),
 	 INDEX `uid_eventid` (`uid`,`event-id`),
-	 INDEX `uid_authorlink` (`uid`,`author-link`),
-	 INDEX `uid_ownerlink` (`uid`,`owner-link`)
+	 INDEX `uid_authorlink` (`uid`,`author-link`(190)),
+	 INDEX `uid_ownerlink` (`uid`,`owner-link`(190))
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
@@ -652,7 +665,7 @@ CREATE TABLE IF NOT EXISTS `notify` (
 	 INDEX `hash_uid` (`hash`,`uid`),
 	 INDEX `seen_uid_date` (`seen`,`uid`,`date`),
 	 INDEX `uid_date` (`uid`,`date`),
-	 INDEX `uid_type_link` (`uid`,`type`,`link`)
+	 INDEX `uid_type_link` (`uid`,`type`,`link`(190))
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
@@ -963,7 +976,7 @@ CREATE TABLE IF NOT EXISTS `term` (
 	`aid` int(10) unsigned NOT NULL DEFAULT 0,
 	`uid` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`tid`),
-	 INDEX `oid_otype_type_term` (`oid`,`otype`,`type`,`term`),
+	 INDEX `oid_otype_type_term` (`oid`,`otype`,`type`,`term`(32)),
 	 INDEX `uid_otype_type_term_global_created` (`uid`,`otype`,`type`,`term`(32),`global`,`created`),
 	 INDEX `uid_otype_type_url` (`uid`,`otype`,`type`,`url`(64)),
 	 INDEX `guid` (`guid`(64))

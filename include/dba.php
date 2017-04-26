@@ -492,6 +492,9 @@ class dba {
 			$sql = "/*".$a->callstack()." */ ".$sql;
 		}
 
+		self::$dbo->error = '';
+		self::$dbo->errorno = 0;
+
 		switch (self::$dbo->driver) {
 			case 'pdo':
 				if (!$stmt = self::$dbo->db->prepare($sql)) {
@@ -561,6 +564,10 @@ class dba {
 					self::$dbo->errorno = mysql_errno(self::$dbo->db);
 				}
 				break;
+		}
+
+		if (self::$dbo->errorno != 0) {
+			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error);
 		}
 
 		$a->save_timestamp($stamp1, 'database');
@@ -698,6 +705,23 @@ class dba {
 			case 'mysql':
 				return mysql_fetch_array(self::$dbo->result, MYSQL_ASSOC);
 		}
+	}
+
+	/**
+	 * @brief Insert a row into a table
+	 *
+	 * @param string $table Table name
+	 * @param array $param parameter array
+	 *
+	 * @return boolean was the insert successfull?
+	 */
+	static public function insert($table, $param) {
+		$sql = "INSERT INTO `".$table."` (`".implode("`, `", array_keys($param))."`) VALUES (".
+			substr(str_repeat("?, ", count($param)), 0, -2).");";
+
+		$sql = self::replace_parameters($sql, $param);
+
+		return self::e($sql);
 	}
 
 	/**

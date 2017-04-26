@@ -816,6 +816,7 @@ function db_definition() {
 					"conversation-uri" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"protocol" => array("type" => "tinyint(1) unsigned", "not null" => "1", "default" => "0"),
 					"source" => array("type" => "mediumtext"),
+					"received" => array("type" => "datetime", "not null" => "1", "default" => NULL_DATE),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("item-uri"),

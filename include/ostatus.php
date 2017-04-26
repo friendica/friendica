@@ -320,8 +320,10 @@ class ostatus {
 
 		if ($first_child == "feed") {
 			$entries = $xpath->query('/atom:feed/atom:entry');
+			$header["protocol"] = PROTOCOL_OSTATUS_FEED;
 		} else {
 			$entries = $xpath->query('/atom:entry');
+			$header["protocol"] = PROTOCOL_OSTATUS_SALMON;
 		}
 		$conversation = "";
 		$conversationlist = array();
@@ -378,7 +380,7 @@ class ostatus {
 			} elseif ($item["object-type"] == ACTIVITY_OBJ_QUESTION) {
 				$item["title"] = $xpath->query('atom:title/text()', $entry)->item(0)->nodeValue;
 			}
-			$item["object"] = $xml;
+			$item["source"] = $xml;
 
 			/// @TODO
 			/// Delete a message
@@ -1181,7 +1183,9 @@ class ostatus {
 				$arr["app"] = "OStatus";
 
 
-			$arr["object"] = json_encode($single_conv);
+			$arr["source"] = json_encode($single_conv);
+			$arr["protocol"] = PROTOCOL_GS_CONVERSATION;
+
 			$arr["verb"] = $parent["verb"];
 			$arr["visible"] = $parent["visible"];
 			$arr["location"] = $single_conv->location->displayName;
