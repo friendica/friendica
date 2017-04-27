@@ -238,6 +238,12 @@ Aber keine Panik!
 Friendica wird die Beiträge nicht für alle Zeiten in der Warteschlange behalten.
 Nach einiger Zeit werden Knoten als inaktiv identifiziert und Nachrichten an Nutzer dieser Knoten aus der Warteschlange gelöscht.
 
+## Server Blockliste
+
+Auf dieser Seite des Admin Panels können Administratoren einer Friendica Instanz die komplette Kommunikation (eingehdnd und ausgehend) mit bestimmten Domains unterbinden.
+Für jede dieser Blockierungen muss ein Grund angegeben werden, welcher auf der Informationsseite [friendica](/friendica) angezeigt wird.
+Der Abgleich der Domainnamen ist exakt, Subdomains werden nicht automatisch ebenfalls blockiert.
+
 ## Federation Statistik
 
 Deine Instanz ist ein Teil eines Netzwerks von Servern dezentraler sozialer Netzwerke, der sogenannten **Federation**.
