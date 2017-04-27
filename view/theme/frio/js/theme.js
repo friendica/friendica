@@ -317,17 +317,19 @@ $(document).ready(function(){
 	});
 
 	/*
-	 * Sticky aside on page scroll
+	 * Sticky aside on page scroll, only on desktop
 	 */
-	$("aside").stick_in_parent({
-		offset_top: 100, // px, header + tab bar + spacing
-		recalc_every: 10
-	});
-	// recalculate sticky aside on clicks.
-	// this handle height changes on expanding submenus
-	$("aside").on("click", function(){
-		$(document.body).trigger("sticky_kit:recalc");
-	});
+	if ($(window).width() > 976) {
+		$("aside").stick_in_parent({
+			offset_top: 100, // px, header + tab bar + spacing
+			recalc_every: 10
+		});
+		// recalculate sticky aside on clicks.
+		// this handle height changes on expanding submenus
+		$("aside").on("click", function(){
+			$(document.body).trigger("sticky_kit:recalc");
+		});
+	}
 });
 
 function openClose(theID) {

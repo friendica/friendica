@@ -126,9 +126,6 @@ code {
     aside.canvas-slid::before {
         opacity: 1;
     }
-    aside + div {
-        display:none!important;
-    }
 
 }
 /*
