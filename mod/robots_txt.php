@@ -14,7 +14,6 @@
 function robots_txt_init(App $a)
 {
 
-	/** @var string[] globally disallowed url */
 	$allDisalloweds = array(
 		'/settings/',
 		'/admin/',
