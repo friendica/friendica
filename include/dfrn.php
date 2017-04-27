@@ -817,6 +817,28 @@ class dfrn {
 			xml::add_element($doc, $entry, "thr:in-reply-to", "", $attributes);
 		}
 
+		// Add conversation data. This is used for OStatus
+		$conversation_href = App::get_baseurl()."/display/".$owner["nick"]."/".$item["parent"];
+		$conversation_uri = $conversation_href;
+
+		if (isset($parent_item)) {
+			$r = dba::fetch_first("SELECT `conversation-uri`, `conversation-href` FROM `conversation` WHERE `item-uri` = ?", $item['parent-uri']);
+			if (dbm::is_result($r)) {
+				if ($r['conversation-uri'] != '') {
+					$conversation_uri = $r['conversation-uri'];
+				}
+				if ($r['conversation-href'] != '') {
+					$conversation_href = $r['conversation-href'];
+				}
+			}
+		}
+
+		$attributes = array(
+				"href" => $conversation_href,
+				"ref" => $conversation_uri);
+
+		xml::add_element($doc, $entry, "ostatus:conversation", $conversation_uri, $attributes);
+
 		xml::add_element($doc, $entry, "id", $item["uri"]);
 		xml::add_element($doc, $entry, "title", $item["title"]);
 
@@ -2209,11 +2231,15 @@ class dfrn {
 	 * @param array $importer Record of the importer user mixed with contact of the content
 	 * @todo Add type-hints
 	 */
-	private static function process_entry($header, $xpath, $entry, $importer) {
+	private static function process_entry($header, $xpath, $entry, $importer, $xml) {
 
 		logger("Processing entries");
 
 		$item = $header;
+
+		$item["protocol"] = PROTOCOL_DFRN;
+
+		$item["source"] = $xml;
 
 		// Get the uri
 		$item["uri"] = $xpath->query("atom:id/text()", $entry)->item(0)->nodeValue;
@@ -2371,6 +2397,20 @@ class dfrn {
 		$links = $xpath->query("atom:link", $entry);
 		if ($links) {
 			self::parse_links($links, $item);
+		}
+
+		$item['conversation-uri'] = $xpath->query('ostatus:conversation/text()', $entry)->item(0)->nodeValue;
+
+		$conv = $xpath->query('ostatus:conversation', $entry);
+		if (is_object($conv->item(0))) {
+			foreach ($conv->item(0)->attributes AS $attributes) {
+				if ($attributes->name == "ref") {
+					$item['conversation-uri'] = $attributes->textContent;
+				}
+				if ($attributes->name == "href") {
+					$item['conversation-href'] = $attributes->textContent;
+				}
+			}
 		}
 
 		// Is it a reply or a top level posting?
@@ -2801,7 +2841,7 @@ class dfrn {
 		if (!$sort_by_date) {
 			$entries = $xpath->query("/atom:feed/atom:entry");
 			foreach ($entries AS $entry) {
-				self::process_entry($header, $xpath, $entry, $importer);
+				self::process_entry($header, $xpath, $entry, $importer, $xml);
 			}
 		} else {
 			$newentries = array();
@@ -2815,7 +2855,7 @@ class dfrn {
 			ksort($newentries);
 
 			foreach ($newentries AS $entry) {
-				self::process_entry($header, $xpath, $entry, $importer);
+				self::process_entry($header, $xpath, $entry, $importer, $xml);
 			}
 		}
 		logger("Import done for user " . $importer["uid"] . " from contact " . $importer["id"], LOGGER_DEBUG);

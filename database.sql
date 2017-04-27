@@ -211,8 +211,10 @@ CREATE TABLE IF NOT EXISTS `conversation` (
 	`item-uri` varbinary(255) NOT NULL,
 	`reply-to-uri` varbinary(255) NOT NULL DEFAULT '',
 	`conversation-uri` varbinary(255) NOT NULL DEFAULT '',
+	`conversation-href` varbinary(255) NOT NULL DEFAULT '',
 	`protocol` tinyint(1) unsigned NOT NULL DEFAULT 0,
 	`source` mediumtext,
+	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`item-uri`),
 	 INDEX `conversation-uri` (`conversation-uri`)
 ) DEFAULT COLLATE utf8mb4_general_ci;

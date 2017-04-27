@@ -1308,7 +1308,9 @@ class Diaspora {
 		}
 
 		$datarray["object-type"] = ACTIVITY_OBJ_COMMENT;
-		$datarray["object"] = $xml;
+
+		$datarray["protocol"] = PROTOCOL_DIASPORA;
+		$datarray["source"] = $xml;
 
 		$datarray["changed"] = $datarray["created"] = $datarray["edited"] = $created_at;
 
@@ -2278,7 +2280,8 @@ class Diaspora {
 		$datarray["verb"] = ACTIVITY_POST;
 		$datarray["gravity"] = GRAVITY_PARENT;
 
-		$datarray["object"] = $xml;
+		$datarray["protocol"] = PROTOCOL_DIASPORA;
+		$datarray["source"] = $xml;
 
 		$prefix = share_header($original_item["author-name"], $original_item["author-link"], $original_item["author-avatar"],
 					$original_item["guid"], $original_item["created"], $orig_url);
@@ -2481,7 +2484,8 @@ class Diaspora {
 		$datarray["verb"] = ACTIVITY_POST;
 		$datarray["gravity"] = GRAVITY_PARENT;
 
-		$datarray["object"] = $xml;
+		$datarray["protocol"] = PROTOCOL_DIASPORA;
+		$datarray["source"] = $xml;
 
 		$datarray["body"] = self::replace_people_guid($body, $contact["url"]);
 

@@ -814,12 +814,13 @@ function db_definition() {
 					"item-uri" => array("type" => "varbinary(255)", "not null" => "1", "primary" => "1"),
 					"reply-to-uri" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"conversation-uri" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
+					"conversation-href" => array("type" => "varbinary(255)", "not null" => "1", "default" => ""),
 					"protocol" => array("type" => "tinyint(1) unsigned", "not null" => "1", "default" => "0"),
 					"source" => array("type" => "mediumtext"),
 					"received" => array("type" => "datetime", "not null" => "1", "default" => NULL_DATE),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("item-uri"),
+					"PRIMARY" => array("item-uri", "protocol"),
 					"conversation-uri" => array("conversation-uri"),
 					)
 			);

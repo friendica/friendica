@@ -634,7 +634,29 @@ class dba {
 		if (is_bool($stmt)) {
 			$retval = $stmt;
 		} else {
-			$retval = (self::rows($stmt) > 0);
+			$retval = (self::num_rows($stmt) > 0);
+		}
+
+		self::close($stmt);
+
+		return $retval;
+	}
+
+	/**
+	 * @brief Fetches the first row
+	 *
+	 * @param string $sql SQL statement
+	 * @return array first row of query
+	 */
+	static public function fetch_first($sql) {
+		$args = func_get_args();
+
+		$stmt = call_user_func_array('self::p', $args);
+
+		if (is_bool($stmt)) {
+			$retval = $stmt;
+		} else {
+			$retval = self::fetch($stmt);
 		}
 
 		self::close($stmt);
