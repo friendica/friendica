@@ -242,6 +242,12 @@ The receiving end might be off-line, there might be a high system load and so on
 Don't panic!
 Friendica will not queue messages for all time but will sort out *dead* nodes automatically after a while and remove messages from the queue then.
 
+## Server Blocklist
+
+This page allows to block all communications (inbound and outbound) with a specific domain name.
+Each blocked domain entry requires a reason that will be displayed on the [friendica](/friendica) page.
+Matching is exact, blocking a domain doesn't block subdomains.
+
 ## Federation Statistics
 
 The federation statistics page gives you a short summery of the nodes/servers/pods of the decentralized social network federation your node knows.
