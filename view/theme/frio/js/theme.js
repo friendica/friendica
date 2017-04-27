@@ -317,7 +317,15 @@ $(document).ready(function(){
 	});
 
 	/*
-	 * Sticky aside on page scroll, only on desktop
+	 * Sticky aside on page scroll
+	 * We enable the sticky aside only when window is wider than
+	 * 976px - which is the maximum width where the aside is shown in
+	 * mobile style - because on chrome-based browsers (desktop and
+	 * android) the sticky plugin in mobile style causes the browser to
+	 * scroll back to top the main content, making it impossible
+	 * to navigate.
+	 * A side effect is that the sitky aside isn't really responsive,
+	 * since is enabled or not at page loading time.
 	 */
 	if ($(window).width() > 976) {
 		$("aside").stick_in_parent({
