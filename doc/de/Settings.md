@@ -240,7 +240,7 @@ Nach einiger Zeit werden Knoten als inaktiv identifiziert und Nachrichten an Nut
 
 ## Server Blockliste
 
-Auf dieser Seite des Admin Panels können Administratoren einer Friendica-Instanz die komplette Kommunikation (eingehdnd und ausgehend) mit bestimmten Domains unterbinden.
+Auf dieser Seite des Admin Panels können Administratoren einer Friendica-Instanz die komplette Kommunikation (eingehend und ausgehend) mit bestimmten Domains unterbinden.
 Für jede dieser Blockierungen muss ein Grund angegeben werden, welcher auf der Informationsseite [friendica](/friendica) angezeigt wird.
 Der Abgleich der Domainnamen ist exakt, Subdomains werden nicht automatisch ebenfalls blockiert.
 
