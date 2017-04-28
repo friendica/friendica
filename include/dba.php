@@ -482,6 +482,15 @@ class dba {
 		$args = func_get_args();
 		unset($args[0]);
 
+		// When the second function parameter is an array then use this as the parameter array
+		if ((count($args) == 1) AND (is_array($args[1]))) {
+			$params = $args[1];
+			$i = 0;
+			foreach ($params AS $param) {
+				$args[++$i] = $param;
+			}
+		}
+
 		if (!self::$dbo OR !self::$dbo->connected) {
 			return false;
 		}
@@ -741,9 +750,7 @@ class dba {
 		$sql = "INSERT INTO `".self::$dbo->escape($table)."` (`".implode("`, `", array_keys($param))."`) VALUES (".
 			substr(str_repeat("?, ", count($param)), 0, -2).");";
 
-		$sql = self::replace_parameters($sql, $param);
-
-		return self::e($sql);
+		return self::e($sql, $param);
 	}
 
 	/**
