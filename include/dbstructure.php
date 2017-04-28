@@ -820,7 +820,7 @@ function db_definition() {
 					"received" => array("type" => "datetime", "not null" => "1", "default" => NULL_DATE),
 					),
 			"indexes" => array(
-					"PRIMARY" => array("item-uri", "protocol"),
+					"PRIMARY" => array("item-uri"),
 					"conversation-uri" => array("conversation-uri"),
 					)
 			);

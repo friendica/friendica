@@ -754,6 +754,32 @@ class dba {
 	}
 
 	/**
+	 * @brief Updates rows
+	 *
+	 * @param string $table Table name
+	 * @param array $fields contains the fields that are updated
+	 * @param array $condition condition array with the key values
+	 *
+	 * @return boolean was the update successfull?
+	 */
+	static public function update($table, $fields, $condition) {
+
+		$sql = "UPDATE `".self::$dbo->escape($table)."` SET `".
+			implode("` = ?, `", array_keys($fields))."` = ? WHERE `".
+			implode("` = ? AND `", array_keys($condition))."` = ?";
+
+		$params = array();
+		foreach ($fields AS $value) {
+			$params[] = $value;
+		}
+		foreach ($condition AS $value) {
+			$params[] = $value;
+		}
+
+		self::e($sql, $params);
+	}
+
+	/**
 	 * @brief Closes the current statement
 	 *
 	 * @param object $stmt statement object
