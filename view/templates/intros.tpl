@@ -14,7 +14,9 @@
 <div class="intro-wrapper-end" id="intro-wrapper-end-{{$contact_id}}"></div>
 <form class="intro-form" action="notifications/{{$intro_id}}" method="post">
 <input class="intro-submit-ignore" type="submit" name="submit" value="{{$ignore|escape:'html'}}" />
-<input class="intro-submit-discard" type="submit" name="submit" value="{{$discard|escape:'html'}}" />
+{{if $network != diaspora}}
+	<input class="intro-submit-discard" type="submit" name="submit" value="{{$discard|escape:'html'}}" />
+{{/if}}
 </form>
 <div class="intro-form-end"></div>
 
