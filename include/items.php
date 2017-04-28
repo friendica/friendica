@@ -410,7 +410,60 @@ function uri_to_guid($uri, $host = "") {
 	return $guid_prefix.$host_hash;
 }
 
-/// @TODO Maybe $arr must be called-by-reference? This function modifies it
+function store_conversation($arr) {
+	if (in_array($arr['network'], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
+		$conversation = array('item-uri' => $arr['uri'], 'received' => dbm::date());
+
+		if (isset($arr['parent-uri']) AND ($arr['parent-uri'] != $arr['uri'])) {
+			$conversation['reply-to-uri'] = $arr['parent-uri'];
+		}
+		if (isset($arr['thr-parent']) AND ($arr['thr-parent'] != $arr['uri'])) {
+			$conversation['reply-to-uri'] = $arr['thr-parent'];
+		}
+
+		if (isset($arr['conversation-uri'])) {
+			$conversation['conversation-uri'] = $arr['conversation-uri'];
+		}
+
+		if (isset($arr['conversation-href'])) {
+			$conversation['conversation-href'] = $arr['conversation-href'];
+		}
+
+		if (isset($arr['protocol'])) {
+			$conversation['protocol'] = $arr['protocol'];
+		}
+
+		if (isset($arr['source'])) {
+			$conversation['source'] = $arr['source'];
+		}
+
+		$conv = dba::fetch_first("SELECT `protocol` FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
+		if (dbm::is_result($conv)) {
+			if (($conv['protocol'] < $conversation['protocol']) AND ($conv['protocol'] != 0)) {
+				unset($conversation['protocol']);
+				unset($conversation['source']);
+			}
+			// Replace the conversation entry when the new one is better
+			//if ((($conv['protocol'] == 0) OR ($conv['protocol'] >= $conversation['protocol'])) AND ($conversation['protocol'] > 0)) {
+				if (!dba::update('conversation', $conversation, array('item-uri' => $conversation['item-uri']))) {
+					logger('Conversation: update for '.$conversation['item-uri'].' from '.$conv['protocol'].' to '.$conversation['protocol'].' failed', LOGGER_DEBUG);
+				}
+			//}
+		} else {
+			if (!dba::insert('conversation', $conversation)) {
+				logger('Conversation: insert for '.$conversation['item-uri'].' (protocol '.$conversation['protocol'].') failed', LOGGER_DEBUG);
+			}
+		}
+	}
+
+	unset($arr['conversation-uri']);
+	unset($arr['conversation-href']);
+	unset($arr['protocol']);
+	unset($arr['source']);
+
+	return $arr;
+}
+
 /// @TODO add type-hint array
 function item_store($arr, $force_parent = false, $notify = false, $dontcache = false) {
 
@@ -435,6 +488,9 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 			}
 		}
 	}
+
+	// Store conversation data
+	$arr = store_conversation($arr);
 
 	/*
 	 * If a Diaspora signature structure was passed in, pull it out of the
@@ -690,51 +746,6 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	item_body_set_hashtags($arr);
 
 	$arr['thr-parent'] = $arr['parent-uri'];
-
-	if (in_array($arr['network'], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
-		$conversation = array('item-uri' => $arr['uri'], 'received' => dbm::date());
-
-		if (isset($arr['thr-parent'])) {
-			if ($arr['thr-parent'] != $arr['uri']) {
-				$conversation['reply-to-uri'] = $arr['thr-parent'];
-			}
-		}
-
-		if (isset($arr['conversation-uri'])) {
-			$conversation['conversation-uri'] = $arr['conversation-uri'];
-		}
-
-		if (isset($arr['conversation-href'])) {
-			$conversation['conversation-href'] = $arr['conversation-href'];
-		}
-
-		if (isset($arr['protocol'])) {
-			$conversation['protocol'] = $arr['protocol'];
-		}
-
-		if (isset($arr['source'])) {
-			$conversation['source'] = $arr['source'];
-		}
-
-		$conv = dba::fetch_first("SELECT `protocol` FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
-		if (dbm::is_result($conv)) {
-			// Replace the conversation entry when the new one is better
-			if ((($conv['protocol'] == 0) OR ($conv['protocol'] > $conversation['protocol'])) AND ($conversation['protocol'] > 0)) {
-				if (!dba::update('conversation', $conversation, array('item-uri' => $conversation['item-uri']))) {
-					logger('Conversation: update for '.$conversation['item-uri'].' from '.$conv['protocol'].' to '.$conversation['protocol'].' failed', LOGGER_DEBUG);
-				}
-			}
-		} else {
-			if (!dba::insert('conversation', $conversation)) {
-				logger('Conversation: insert for '.$conversation['item-uri'].' (protocol '.$conversation['protocol'].') failed', LOGGER_DEBUG);
-			}
-		}
-	}
-
-	unset($arr['conversation-uri']);
-	unset($arr['conversation-href']);
-	unset($arr['protocol']);
-	unset($arr['source']);
 
 	if ($arr['parent-uri'] === $arr['uri']) {
 		$parent_id = 0;

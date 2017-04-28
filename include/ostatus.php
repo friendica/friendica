@@ -924,6 +924,8 @@ class ostatus {
 			($item["verb"] == ACTIVITY_LIKE) OR ($conversation_url == "")) {
 			$item_stored = item_store($item, $all_threads);
 			return $item_stored;
+		} elseif (count($item) > 0) {
+			$item = store_conversation($item);
 		}
 
 		// Get the parent
