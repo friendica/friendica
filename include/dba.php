@@ -456,7 +456,7 @@ class dba {
 			if (is_int($args[$param]) OR is_float($args[$param])) {
 				$replace = intval($args[$param]);
 			} else {
-				$replace = "'".dbesc($args[$param])."'";
+				$replace = "'".self::$dbo->escape($args[$param])."'";
 			}
 
 			$pos = strpos($sql, '?', $offset);
@@ -738,7 +738,7 @@ class dba {
 	 * @return boolean was the insert successfull?
 	 */
 	static public function insert($table, $param) {
-		$sql = "INSERT INTO `".$table."` (`".implode("`, `", array_keys($param))."`) VALUES (".
+		$sql = "INSERT INTO `".self::$dbo->escape($table)."` (`".implode("`, `", array_keys($param))."`) VALUES (".
 			substr(str_repeat("?, ", count($param)), 0, -2).");";
 
 		$sql = self::replace_parameters($sql, $param);
