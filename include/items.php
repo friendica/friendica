@@ -719,11 +719,15 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		$conv = dba::fetch_first("SELECT `protocol` FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
 		if (dbm::is_result($conv)) {
 			// Replace the conversation entry when the new one is better
-			if (($conv['protocol'] == 0) OR ($conv['protocol'] > $conversation['protocol'])) {
-				dba::update('conversation', $conversation, array('item-uri' => $conversation['item-uri']));
+			if ((($conv['protocol'] == 0) OR ($conv['protocol'] > $conversation['protocol'])) AND ($conversation['protocol'] > 0)) {
+				if (!dba::update('conversation', $conversation, array('item-uri' => $conversation['item-uri']))) {
+					logger('Conversation: update for '.$conversation['item-uri'].' from '.$conv['protocol'].' to '.$conversation['protocol'].' failed', LOGGER_DEBUG);
+				}
 			}
 		} else {
-			dba::insert('conversation', $conversation);
+			if (!dba::insert('conversation', $conversation)) {
+				logger('Conversation: insert for '.$conversation['item-uri'].' (protocol '.$conversation['protocol'].') failed', LOGGER_DEBUG);
+			}
 		}
 	}
 

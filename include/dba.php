@@ -776,7 +776,7 @@ class dba {
 			$params[] = $value;
 		}
 
-		self::e($sql, $params);
+		return self::e($sql, $params);
 	}
 
 	/**
