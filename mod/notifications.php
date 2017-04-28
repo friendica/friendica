@@ -223,6 +223,12 @@ function notifications_content(App $a) {
 
 					$header .= " (".network_to_name($it['network'], $it['url']).")";
 
+					if ($it['network'] != NETWORK_DIASPORA) {
+						$discard = t('Discard');
+					} else {
+						$discard = '';
+					}
+
 					$notif_content[] = replace_macros($tpl, array(
 						'$header' => htmlentities($header),
 						'$str_notifytype' => t('Notification type: '),
@@ -255,7 +261,7 @@ function notifications_content(App $a) {
 						'$approve' => t('Approve'),
 						'$note' => $it['note'],
 						'$ignore' => t('Ignore'),
-						'$discard' => t('Discard'),
+						'$discard' => $discard,
 
 					));
 					break;

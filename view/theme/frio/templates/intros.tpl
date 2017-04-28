@@ -13,7 +13,7 @@
 
 			<form class="intro-form" action="notifications/{{$intro_id}}" method="post">
 				<button class="btn-link intro-submit-ignore intro-action-link" type="submit" name="submit" value="{{$ignore|escape:'html'}}" title="{{$ignore|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-ban" aria-hidden="true"></i></button>
-				<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="{{$discard|escape:'html'}}" title="{{$discard|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+				{{if $discard}}<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="{{$discard|escape:'html'}}" title="{{$discard|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-trash-o" aria-hidden="true"></i></button>{{/if}}
 			</form>
 		</div>
 		<div class='intro-enty-name'><h4 class="media-heading"><a href="{{$zrl}}">{{$fullname}}</a></h4></div>
@@ -70,7 +70,7 @@
 	<div class="intro-action-buttons">
 		<form class="intro-form pull-left" action="notifications/{{$intro_id}}" method="post">
 			<button class="btn btn-small btn-default intro-submit-ignore" type="submit" name="submit" value="{{$ignore|escape:'html'}}">{{$ignore|escape:'html'}}</button>
-			<button class="btn btn-small btn-default intro-submit-discard" type="submit" name="submit" value="{{$discard|escape:'html'}}">{{$discard|escape:'html'}}</button>&nbsp;
+			{{if $discard}}<button class="btn btn-small btn-default intro-submit-discard" type="submit" name="submit" value="{{$discard|escape:'html'}}">{{$discard|escape:'html'}}</button>&nbsp;{{/if}}
 		</form>
 		<button class="btn btn-small btn-primary intro-submit-approve pull-right" onclick="addElmToModal('#intro-approve-wrapper-{{$contact_id}}')">{{$approve|escape:'html'}}</button>
 	</div>
