@@ -1630,6 +1630,8 @@ class Diaspora {
 
 		$datarray = array();
 
+		$datarray["protocol"] = PROTOCOL_DIASPORA;
+
 		$datarray["uid"] = $importer["uid"];
 		$datarray["contact-id"] = $author_contact["cid"];
 		$datarray["network"]  = $author_contact["network"];
@@ -1921,6 +1923,7 @@ class Diaspora {
 			if ($self && $contact["rel"] == CONTACT_IS_FOLLOWER) {
 
 				$arr = array();
+				$arr["protocol"] = PROTOCOL_DIASPORA;
 				$arr["uri"] = $arr["parent-uri"] = item_new_uri($a->get_hostname(), $importer["uid"]);
 				$arr["uid"] = $importer["uid"];
 				$arr["contact-id"] = $self[0]["id"];
