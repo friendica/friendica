@@ -410,6 +410,12 @@ function uri_to_guid($uri, $host = "") {
 	return $guid_prefix.$host_hash;
 }
 
+/**
+ * @brief Store the conversation data
+ *
+ * @param array $arr Item array with conversation data
+ * @return array Item array with removed conversation data
+ */
 function store_conversation($arr) {
 	if (in_array($arr['network'], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
 		$conversation = array('item-uri' => $arr['uri'], 'received' => dbm::date());
@@ -476,6 +482,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		$arr['origin'] = 1;
 		$arr['last-child'] = 1;
 		$arr['network'] = NETWORK_DFRN;
+		$arr['protocol'] = PROTOCOL_DFRN;
 
 		// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
 		// In difference to the call to "uri_to_guid" several lines below we add the hash of our own host.

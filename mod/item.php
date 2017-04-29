@@ -723,6 +723,18 @@ function item_post(App $a) {
 	$datarray['last-child'] = 1;
 	$datarray['visible'] = 1;
 
+	$datarray['protocol'] = PROTOCOL_DFRN;
+
+	$r = dba::fetch_first("SELECT `conversation-uri`, `conversation-href` FROM `conversation` WHERE `item-uri` = ?", $datarray['parent-uri']);
+	if (dbm::is_result($r)) {
+		if ($r['conversation-uri'] != '') {
+			$datarray['conversation-uri'] = $r['conversation-uri'];
+		}
+		if ($r['conversation-href'] != '') {
+			$datarray['conversation-href'] = $r['conversation-href'];
+		}
+	}
+
 	if ($orig_post) {
 		$datarray['edit'] = true;
 	}
@@ -761,6 +773,8 @@ function item_post(App $a) {
 
 	// Fill the cache field
 	put_item_in_cache($datarray);
+
+	$datarray = store_conversation($datarray);
 
 	if ($orig_post) {
 		$r = q("UPDATE `item` SET `title` = '%s', `body` = '%s', `tag` = '%s', `attach` = '%s', `file` = '%s', `rendered-html` = '%s', `rendered-hash` = '%s', `edited` = '%s', `changed` = '%s' WHERE `id` = %d AND `uid` = %d",
