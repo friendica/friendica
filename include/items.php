@@ -446,6 +446,12 @@ function store_conversation($arr) {
 		$old_conv = dba::fetch_first("SELECT `item-uri`, `reply-to-uri`, `conversation-uri`, `conversation-href`, `protocol`, `source`
 				FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
 		if (dbm::is_result($old_conv)) {
+			// Don't update when only the source has changed.
+			// Only do this when there had been no source before.
+			if ($old_conv['source'] != '') {
+				unset($old_conv['source']);
+			}
+			// Update structure data all the time but the source only when its from a better protocol.
 			if (($old_conv['protocol'] < $conversation['protocol']) AND ($old_conv['protocol'] != 0)) {
 				unset($conversation['protocol']);
 				unset($conversation['source']);
