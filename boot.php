@@ -1420,6 +1420,10 @@ class App {
 
 		$cmdline = implode($args, " ");
 
+		if ($this->min_memory_reached()) {
+			return;
+		}
+
 		if (get_config('system', 'proc_windows')) {
 			$resource = proc_open('cmd /c start /b ' . $cmdline, array(), $foo, dirname(__FILE__));
 		} else {
