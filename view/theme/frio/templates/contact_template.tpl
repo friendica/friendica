@@ -49,12 +49,12 @@
 			{{* The contact actions like private mail, delete contact, edit contact and so on *}}
 			<div class="contact-actions pull-right nav-pills preferences hidden-xs">
 				{{if $contact.photo_menu.pm}}
-				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.pm.1}}'); retrurn false;" data-toggle="tooltip" title="{{$contact.photo_menu.pm.0}}">
+				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.pm.1}}'); return false;" data-toggle="tooltip" title="{{$contact.photo_menu.pm.0}}">
 					<i class="fa fa-envelope" aria-hidden="true"></i>
 				</button>
 				{{/if}}
 				{{if $contact.photo_menu.poke}}
-				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.poke.1}}'); retrurn false;" data-toggle="tooltip" title="{{$contact.photo_menu.poke.0}}">
+				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.poke.1}}'); return false;" data-toggle="tooltip" title="{{$contact.photo_menu.poke.0}}">
 					<i class="fa fa-heartbeat" aria-hidden="true"></i>
 				</button>
 				{{/if}}
@@ -69,7 +69,7 @@
 				</a>
 				{{/if}}
 				{{if $contact.photo_menu.drop}}
-				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.drop.1}}'); retrurn false;" data-toggle="tooltip" title="{{$contact.photo_menu.drop.0}}">
+				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.drop.1}}'); return false;" data-toggle="tooltip" title="{{$contact.photo_menu.drop.0}}">
 					<i class="fa fa-user-times" aria-hidden="true"></i>
 				</button>
 				{{/if}}
