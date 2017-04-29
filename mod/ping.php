@@ -305,10 +305,6 @@ function ping_init(App $a)
 
 		// sort notifications by $[]['date']
 		$sort_function = function($a, $b) {
-			//if (!$a['seen'] AND $b['seen']) {
-			//	return -1;
-			//}
-
 			$adate = strtotime($a['date']);
 			$bdate = strtotime($b['date']);
 
