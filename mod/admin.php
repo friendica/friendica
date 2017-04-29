@@ -731,6 +731,7 @@ function admin_page_site_post(App $a) {
 	$timeout		=	((x($_POST,'timeout'))			? intval(trim($_POST['timeout']))		: 60);
 	$maxloadavg		=	((x($_POST,'maxloadavg'))		? intval(trim($_POST['maxloadavg']))		: 50);
 	$maxloadavg_frontend	=	((x($_POST,'maxloadavg_frontend'))	? intval(trim($_POST['maxloadavg_frontend']))	: 50);
+	$min_memory		=	((x($_POST,'min_memory'))		? intval(trim($_POST['min_memory']))		: 0);
 	$optimize_max_tablesize	=	((x($_POST,'optimize_max_tablesize'))	? intval(trim($_POST['optimize_max_tablesize'])): 100);
 	$optimize_fragmentation	=	((x($_POST,'optimize_fragmentation'))	? intval(trim($_POST['optimize_fragmentation'])): 30);
 	$poco_completion	=	((x($_POST,'poco_completion'))		? intval(trim($_POST['poco_completion']))	: false);
@@ -816,6 +817,7 @@ function admin_page_site_post(App $a) {
 	set_config('system','ssl_policy',$ssl_policy);
 	set_config('system','maxloadavg',$maxloadavg);
 	set_config('system','maxloadavg_frontend',$maxloadavg_frontend);
+	set_config('system','min_memory',$min_memory);
 	set_config('system','optimize_max_tablesize',$optimize_max_tablesize);
 	set_config('system','optimize_fragmentation',$optimize_fragmentation);
 	set_config('system','poco_completion',$poco_completion);
@@ -1113,6 +1115,7 @@ function admin_page_site(App $a) {
 		'$timeout'		=> array('timeout', t("Network timeout"), (x(get_config('system','curl_timeout'))?get_config('system','curl_timeout'):60), t("Value is in seconds. Set to 0 for unlimited (not recommended).")),
 		'$maxloadavg'		=> array('maxloadavg', t("Maximum Load Average"), ((intval(get_config('system','maxloadavg')) > 0)?get_config('system','maxloadavg'):50), t("Maximum system load before delivery and poll processes are deferred - default 50.")),
 		'$maxloadavg_frontend'	=> array('maxloadavg_frontend', t("Maximum Load Average (Frontend)"), ((intval(get_config('system','maxloadavg_frontend')) > 0)?get_config('system','maxloadavg_frontend'):50), t("Maximum system load before the frontend quits service - default 50.")),
+		'$min_memory'		=> array('min_memory', t("Minimal Memory"), ((intval(get_config('system','min_memory')) > 0)?get_config('system','min_memory'):0), t("Minimal free memory in MB for the poller. Needs access to /proc/meminfo - default 0 (deactivated).")),
 		'$optimize_max_tablesize'=> array('optimize_max_tablesize', t("Maximum table size for optimization"), $optimize_max_tablesize, t("Maximum table size (in MB) for the automatic optimization - default 100 MB. Enter -1 to disable it.")),
 		'$optimize_fragmentation'=> array('optimize_fragmentation', t("Minimum level of fragmentation"), ((intval(get_config('system','optimize_fragmentation')) > 0)?get_config('system','optimize_fragmentation'):30), t("Minimum fragmenation level to start the automatic optimization - default value is 30%.")),
 

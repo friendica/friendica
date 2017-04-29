@@ -1322,6 +1322,45 @@ class App {
 	}
 
 	/**
+	 * @brief Checks if the minimal memory is reached
+	 *
+	 * @return bool Is the memory limit reached?
+	 */
+	public function min_memory_reached() {
+		$min_memory = Config::get('system', 'min_memory', 0);
+		if ($min_memory == 0) {
+			return false;
+		}
+
+		if (!is_readable("/proc/meminfo")) {
+			return false;
+		}
+
+		$memdata = explode("\n", file_get_contents('/proc/meminfo'));
+
+		$meminfo = array();
+		foreach ($memdata as $line) {
+			list($key, $val) = explode(":", $line);
+			$meminfo[$key] = (int)trim(str_replace("kB", "", $val));
+			$meminfo[$key] = (int)($meminfo[$key] / 1024);
+		}
+
+		if (!isset($meminfo['MemAvailable']) OR !isset($meminfo['MemFree'])) {
+			return false;
+		}
+
+		$free = $meminfo['MemAvailable'] + $meminfo['MemFree'];
+
+		$reached = ($free < $min_memory);
+
+		if ($reached) {
+			logger('Minimal memory reached: '.$free.'/'.$meminfo['MemTotal'].' - limit '.$min_memory, LOGGER_DEBUG);
+		}
+
+		return $reached;
+	}
+
+	/**
 	 * @brief Checks if the maximum load is reached
 	 *
 	 * @return bool Is the load reached?

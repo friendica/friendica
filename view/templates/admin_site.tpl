@@ -118,7 +118,6 @@
 	{{include file="field_input.tpl" field=$proxy}}
 	{{include file="field_input.tpl" field=$proxyuser}}
 	{{include file="field_input.tpl" field=$timeout}}
-	{{include file="field_input.tpl" field=$maxloadavg}}
 	{{include file="field_input.tpl" field=$maxloadavg_frontend}}
 	{{include file="field_input.tpl" field=$optimize_max_tablesize}}
 	{{include file="field_input.tpl" field=$optimize_fragmentation}}
@@ -146,6 +145,8 @@
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	<h3>{{$worker_title}}</h3>
+	{{include file="field_input.tpl" field=$maxloadavg}}
+	{{include file="field_input.tpl" field=$min_memory}}
 	{{include file="field_input.tpl" field=$worker_queues}}
 	{{include file="field_checkbox.tpl" field=$worker_dont_fork}}
 	{{include file="field_checkbox.tpl" field=$worker_fastlane}}

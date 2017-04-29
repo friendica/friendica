@@ -41,6 +41,10 @@ function poller_run($argv, $argc){
 
 	$a->start_process();
 
+	if ($a->min_memory_reached()) {
+		return;
+	}
+
 	if (poller_max_connections_reached()) {
 		return;
 	}
