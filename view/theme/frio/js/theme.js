@@ -212,23 +212,7 @@ $(document).ready(function(){
 		toggleDropdownText(this);
 	});
 
-	/* setup onoff widgets */
-	// Add the correct class to the switcher according to the input
-	// value (On/Off)
-	$(".toggle input").each(function(){
-		// Get the value of the input element
-		val = $(this).val();
-		id = $(this).attr("id");
 
-		// The css classes for "on" and "off"
-		onstyle = "btn-primary";
-		offstyle = "btn-default off";
-
-		// Add the correct class in dependence of input value (On/Off)
-		toggleclass = (val == 0 ? offstyle : onstyle);
-		$("#"+id+"_onoff").addClass(toggleclass);
-
-	});
 
 	// Change the css class while clicking on the switcher elements
 	$(".toggle label, .toggle .toggle-handle").click(function(event){
@@ -314,6 +298,13 @@ $(document).ready(function(){
 	 */
 	$(document).on('change', 'textarea', function(event) {
 		autosize.update(event.target);
+	});
+
+	/*
+	 * Sicky aside on page scroll
+	 */
+	$("aside").stick_in_parent({
+		offset_top: 100 // px, header + tab bar + spacing
 	});
 });
 
@@ -609,132 +600,30 @@ String.prototype.rtrim = function() {
 	return trimmed;
 };
 
-/**
- * Scroll the screen to the item element whose id is provided, then highlights it
- *
- * Note: jquery.color.js is required
- *
- * @param {string} elementId The item element id
- * @returns {undefined}
- */
-function scrollToItem(elementId) {
-	if (typeof elementId === "undefined") {
+// Scroll to a specific item and highlight it
+// Note: jquery.color.js is needed
+function scrollToItem(itemID) {
+	if( typeof itemID === "undefined")
 		return;
-	}
 
-	var $el = $(document.getElementById(elementId));
+	var elm = $('#'+itemID);
 	// Test if the Item exists
-	if (!$el.length) {
+	if(!elm.length)
 		return;
-	}
 
 	// Define the colors which are used for highlighting
 	var colWhite = {backgroundColor:'#F5F5F5'};
 	var colShiny = {backgroundColor:'#FFF176'};
 
-	// Get the Item Position (we need to substract 100 to match correct position
-	var itemPos = $el.offset().top - 100;
+	// Get the Item Position (we need to substract 100 to match
+	// correct position
+	var itemPos = $(elm).offset().top - 100;
 
 	// Scroll to the DIV with the ID (GUID)
 	$('html, body').animate({
 		scrollTop: itemPos
 	}, 400, function() {
 		// Highlight post/commenent with ID  (GUID)
-		$el.animate(colWhite, 1000).animate(colShiny).animate(colWhite, 600);
+		$(elm).animate(colWhite, 1000).animate(colShiny).animate(colWhite, 600);
 	});
-}
-
-// format a html string to pure text
-function htmlToText(htmlString) {
-	// Replace line breaks with spaces
-	var text = htmlString.replace(/<br>/g, ' ');
-	// Strip the text out of the html string
-	text = text.replace(/<[^>]*>/g, '');
-
-	return text;
-}
-
-/**
- * Sends a /like API call and updates the display of the relevant action button
- * before the update reloads the item.
- *
- * @param {string} ident The id of the relevant item
- * @param {string} verb The verb of the action
- * @returns {undefined}
- */
-function doLikeAction(ident, verb) {
-	unpause();
-
-	if (verb.indexOf('attend') === 0) {
-		$('.item-' + ident + ' .button-event:not(#' + verb + '-' + ident + ')').removeClass('active');
-	}
-	$('#' + verb + '-' + ident).toggleClass('active');
-	$('#like-rotator-' + ident.toString()).show();
-	$.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
-	liking = 1;
-	force_update = true;
-}
-
-// Decodes a hexadecimally encoded binary string
-function hex2bin (s) {
-	//  discuss at: http://locutus.io/php/hex2bin/
-	// original by: Dumitru Uzun (http://duzun.me)
-	//   example 1: hex2bin('44696d61')
-	//   returns 1: 'Dima'
-	//   example 2: hex2bin('00')
-	//   returns 2: '\x00'
-	//   example 3: hex2bin('2f1q')
-	//   returns 3: false
-	var ret = [];
-	var i = 0;
-	var l;
-	s += '';
-
-	for (l = s.length; i < l; i += 2) {
-		var c = parseInt(s.substr(i, 1), 16);
-		var k = parseInt(s.substr(i + 1, 1), 16);
-		if (isNaN(c) || isNaN(k)) {
-			return false;
-		}
-		ret.push((c << 4) | k);
-	}
-	return String.fromCharCode.apply(String, ret);
-}
-
-// Convert binary data into hexadecimal representation
-function bin2hex (s) {
-	// From: http://phpjs.org/functions
-	// +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	// +   bugfixed by: Onno Marsman
-	// +   bugfixed by: Linuxworld
-	// +   improved by: ntoniazzi (http://phpjs.org/functions/bin2hex:361#comment_177616)
-	// *     example 1: bin2hex('Kev');
-	// *     returns 1: '4b6576'
-	// *     example 2: bin2hex(String.fromCharCode(0x00));
-	// *     returns 2: '00'
-
-	var i, l, o = "", n;
-
-	s += "";
-
-	for (i = 0, l = s.length; i < l; i++) {
-		n = s.charCodeAt(i).toString(16);
-		o += n.length < 2 ? "0" + n : n;
-	}
-
-	return o;
-}
-
-// Dropdown menus with the class "dropdown-head" will display the active tab
-// as button text
-function toggleDropdownText(elm) {
-		$(elm).closest(".dropdown").find('.btn').html($(elm).text() + ' <span class="caret"></span>');
-		$(elm).closest(".dropdown").find('.btn').val($(elm).data('value'));
-		$(elm).closest("ul").children("li").show();
-		$(elm).parent("li").hide();
-}
-
-// Check if element does have a specific class
-function hasClass(elem, cls) {
-	return (" " + elem.className + " " ).indexOf( " "+cls+" " ) > -1;
 }
