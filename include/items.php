@@ -443,18 +443,16 @@ function store_conversation($arr) {
 			$conversation['source'] = $arr['source'];
 		}
 
-		$conv = dba::fetch_first("SELECT `protocol` FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
-		if (dbm::is_result($conv)) {
-			if (($conv['protocol'] < $conversation['protocol']) AND ($conv['protocol'] != 0)) {
+		$old_conv = dba::fetch_first("SELECT `item-uri`, `reply-to-uri`, `conversation-uri`, `conversation-href`, `protocol`, `source`
+				FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
+		if (dbm::is_result($old_conv)) {
+			if (($old_conv['protocol'] < $conversation['protocol']) AND ($old_conv['protocol'] != 0)) {
 				unset($conversation['protocol']);
 				unset($conversation['source']);
 			}
-			// Replace the conversation entry when the new one is better
-			//if ((($conv['protocol'] == 0) OR ($conv['protocol'] >= $conversation['protocol'])) AND ($conversation['protocol'] > 0)) {
-				if (!dba::update('conversation', $conversation, array('item-uri' => $conversation['item-uri']))) {
-					logger('Conversation: update for '.$conversation['item-uri'].' from '.$conv['protocol'].' to '.$conversation['protocol'].' failed', LOGGER_DEBUG);
-				}
-			//}
+			if (!dba::update('conversation', $conversation, array('item-uri' => $conversation['item-uri']), $old_conv)) {
+				logger('Conversation: update for '.$conversation['item-uri'].' from '.$conv['protocol'].' to '.$conversation['protocol'].' failed', LOGGER_DEBUG);
+			}
 		} else {
 			if (!dba::insert('conversation', $conversation)) {
 				logger('Conversation: insert for '.$conversation['item-uri'].' (protocol '.$conversation['protocol'].') failed', LOGGER_DEBUG);

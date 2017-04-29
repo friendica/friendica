@@ -756,15 +756,77 @@ class dba {
 	/**
 	 * @brief Updates rows
 	 *
+	 * Updates rows in the database. When $old_fields is set to an array,
+	 * the system will only do an update if the fields in that array changed.
+	 *
+	 * Attention:
+	 * Only the values in $old_fields are compared.
+	 * This is an intentional behaviour.
+	 *
+	 * Example:
+	 * We include the timestamp field in $fields but not in $old_fields.
+	 * Then the row will only get the new timestamp when the other fields had changed.
+	 *
+	 * When $old_fields is set to a boolean value the system will do this compare itself.
+	 * When $old_fields is set to "true" the system will do an insert if the row doesn't exists.
+	 *
+	 * Attention:
+	 * Only set $old_fields to a boolean value when you are sure that you will update a single row.
+	 * When you set $old_fields to "true" then $fields must contain all relevant fields!
+	 *
 	 * @param string $table Table name
 	 * @param array $fields contains the fields that are updated
 	 * @param array $condition condition array with the key values
+	 * @param array|boolean $old_fields array with the old field values that are about to be replaced
 	 *
 	 * @return boolean was the update successfull?
 	 */
-	static public function update($table, $fields, $condition) {
+	static public function update($table, $fields, $condition, $old_fields = array()) {
 
-		$sql = "UPDATE `".self::$dbo->escape($table)."` SET `".
+		/** @todo We may use MySQL specific functions here:
+		 * INSERT INTO `config` (`cat`, `k`, `v`) VALUES ('%s', '%s', '%s') ON DUPLICATE KEY UPDATE `v` = '%s'"
+		 * But I think that it doesn't make sense here.
+		*/
+
+		$table = self::$dbo->escape($table);
+
+		if (is_bool($old_fields)) {
+			$sql = "SELECT * FROM `".$table."` WHERE `".
+			implode("` = ? AND `", array_keys($condition))."` = ? LIMIT 1";
+
+			$params = array();
+			foreach ($condition AS $value) {
+				$params[] = $value;
+			}
+
+			$do_insert = $old_fields;
+
+			$old_fields = self::fetch_first($sql, $params);
+			if (is_bool($old_fields)) {
+				if ($do_insert) {
+					return self::insert($table, $fields);
+				}
+				$old_fields = array();
+			}
+		}
+
+		$do_update = (count($old_fields) == 0);
+
+		foreach ($old_fields AS $fieldname => $content) {
+			if (isset($fields[$fieldname])) {
+				if ($fields[$fieldname] == $content) {
+					unset($fields[$fieldname]);
+				} else {
+					$do_update = true;
+				}
+			}
+		}
+
+		if (!$do_update OR (count($fields) == 0)) {
+			return true;
+		}
+
+		$sql = "UPDATE `".$table."` SET `".
 			implode("` = ?, `", array_keys($fields))."` = ? WHERE `".
 			implode("` = ? AND `", array_keys($condition))."` = ?";
 
