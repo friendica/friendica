@@ -1180,7 +1180,6 @@ function get_mood_verbs() {
 		'motivated'  => t('motivated'),
 		'relaxed'    => t('relaxed'),
 		'surprised'  => t('surprised'),
-		'incapable'  => t('incapable of producing a suitable verb to suit this situation, despite being famed for the legendary range of additonal verbs he previously added to morechoice, morepoke, and moremoods.  That\'s right, the worlds most famous verb-smith is out of verbs.'),
 	);
 
 	call_hooks('mood_verbs', $arr);
