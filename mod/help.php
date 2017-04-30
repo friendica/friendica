@@ -90,7 +90,7 @@ function help_content(App $a) {
 		for($k=0;$k<$lastlevel; $k++) $toc.="</ul>";
 		$html = implode("\n",$lines);
 
-		$a->page['aside'] = $toc.$a->page['aside'];
+		$a->page['aside'] = '<section class="help-aside-wrapper">' . $toc . $a->page['aside'] . '</section>';
 	}
 
 	$html = "

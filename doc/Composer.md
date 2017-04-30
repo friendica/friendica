@@ -113,3 +113,8 @@ For Composer, this would be:
 ````
 $> COMPOSER_HOME=/var/tmp/composer sudo -u [web user] util/composer.phar [mode]
 ````
+
+## Related
+
+* [Class autoloading](help/autoloader)
+* [How To Move Classes to `src`](help/Developer-How-To-Move-Classes-to-src)
