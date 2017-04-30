@@ -1,13 +1,13 @@
 <?php
 /**
  * @file include/socgraph.php
- * 
+ *
  * @todo Move GNU Social URL schemata (http://server.tld/user/number) to http://server.tld/username
  * @todo Fetch profile data from profile page for Redmatrix users
  * @todo Detect if it is a forum
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 require_once('include/datetime.php');
 require_once("include/Scrape.php");
@@ -1438,7 +1438,7 @@ function common_friends_zcid($uid,$zcid,$start = 0, $limit = 9999,$shuffle = fal
 	$r = q("SELECT `gcontact`.*
 		FROM `glink` INNER JOIN `gcontact` on `glink`.`gcid` = `gcontact`.`id`
 		where `glink`.`zcid` = %d
-		and `gcontact`.`nurl` in (select nurl from contact where uid = %d and self = 0 and blocked = 0 and hidden = 0 ) 
+		and `gcontact`.`nurl` in (select nurl from contact where uid = %d and self = 0 and blocked = 0 and hidden = 0 )
 		$sql_extra limit %d, %d",
 		intval($zcid),
 		intval($uid),

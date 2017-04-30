@@ -3,10 +3,7 @@ require_once('include/items.php');
 require_once('include/auth.php');
 require_once('include/dfrn.php');
 
-
 function dfrn_poll_init(App $a) {
-
-
 	$dfrn_id         = ((x($_GET,'dfrn_id'))         ? $_GET['dfrn_id']              : '');
 	$type            = ((x($_GET,'type'))            ? $_GET['type']                 : 'data');
 	$last_update     = ((x($_GET,'last_update'))     ? $_GET['last_update']          : '');

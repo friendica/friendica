@@ -3,7 +3,7 @@
 /**
  * @file view/theme/frio/php/frio_boot.php
  *
- * @brief This file contains functions for page contstruction
+ * @brief This file contains functions for page construction
  *
  */
 

@@ -4,7 +4,6 @@ require_once('include/security.php');
 require_once('include/bbcode.php');
 require_once('include/items.php');
 
-
 function mood_init(App $a) {
 
 	if (! local_user()) {

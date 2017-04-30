@@ -1,8 +1,7 @@
 <?php
 
 function amcd_content(App $a) {
-//header("Content-type: text/json");
-echo <<< EOT
+	echo <<< JSON
 {
   "version":1,
   "sessionstatus":{
@@ -44,6 +43,6 @@ echo <<< EOT
     }
   }
 }
-EOT;
-killme();
+JSON;
+	killme();
 }

@@ -1,5 +1,6 @@
 <?php
-use \Friendica\Core\Config;
+
+use Friendica\Core\Config;
 
 require_once 'include/oembed.php';
 require_once 'include/event.php';

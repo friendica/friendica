@@ -3,8 +3,6 @@
 require_once('include/group.php');
 
 function contactgroup_content(App $a) {
-
-
 	if (! local_user()) {
 		killme();
 	}

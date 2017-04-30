@@ -9,9 +9,7 @@ function profile_photo_init(App $a) {
 	}
 
 	profile_load($a,$a->user['nickname']);
-
 }
-
 
 function profile_photo_post(App $a) {
 

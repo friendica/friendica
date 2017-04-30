@@ -5,7 +5,6 @@ function delegate_init(App $a) {
 	return settings_init($a);
 }
 
-
 function delegate_content(App $a) {
 
 	if (! local_user()) {

@@ -48,4 +48,3 @@ function qsearch_init(App $a) {
 	echo json_encode((object) $results);
 	killme();
 }
-
