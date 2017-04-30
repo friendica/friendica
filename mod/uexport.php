@@ -11,7 +11,6 @@ function uexport_init(App $a) {
 	settings_init($a);
 }
 
-/// @TODO Change space -> tab where wanted
 function uexport_content(App $a) {
 
 	if ($a->argc > 1) {
@@ -151,11 +150,6 @@ function uexport_all(App $a) {
 			intval($x),
 			intval(500)
 		);
-		/* if (dbm::is_result($r)) {
-		  foreach($r as $rr)
-		  foreach($rr as $k => $v)
-		  $item[][$k] = $v;
-		  } */
 
 		$output = array('item' => $r);
 		echo json_encode($output) . "\n";
