@@ -432,4 +432,3 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 
 	return($post);
 }
-?>

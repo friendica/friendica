@@ -38,4 +38,3 @@ class pidfile {
 			return(posix_kill(file_get_contents($this->_file), SIGTERM));
 	}
 }
-?>

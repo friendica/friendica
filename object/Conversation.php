@@ -164,4 +164,3 @@ class Conversation extends BaseObject {
 		return false;
 	}
 }
-?>

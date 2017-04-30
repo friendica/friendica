@@ -17,4 +17,3 @@ function create_shadowentry_run($argv, $argc) {
 
 	add_shadow_entry($message_id);
 }
-?>

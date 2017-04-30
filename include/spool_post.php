@@ -55,4 +55,3 @@ function spool_post_run($argv, $argc) {
 		}
 	}
 }
-?>

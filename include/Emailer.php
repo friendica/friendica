@@ -81,4 +81,3 @@ class Emailer {
 		return $res;
 	}
 }
-?>

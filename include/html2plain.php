@@ -233,4 +233,3 @@ function html2plain($html, $wraplength = 75, $compact = false)
 
 	return(trim($message));
 }
-?>

@@ -29,4 +29,3 @@ function remove_contact_run($argv, $argc) {
 
 	q("DELETE FROM `queue` WHERE `cid` = %d", intval($id));
 }
-?>
