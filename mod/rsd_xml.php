@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function rsd_xml_content(App $a)
 {

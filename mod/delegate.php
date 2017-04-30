@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once('mod/settings.php');
 
 function delegate_init(App $a) {

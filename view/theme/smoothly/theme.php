@@ -10,6 +10,8 @@
  * Screenshot: <a href="screenshot.png">Screenshot</a>
  */
 
+use Friendica\App;
+
 function smoothly_init(App $a) {
 	set_template_engine($a, 'smarty3');
 

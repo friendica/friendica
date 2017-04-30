@@ -2,6 +2,9 @@
 /*
 This file is part of the Diaspora protocol. It is used for fetching single public posts.
 */
+
+use Friendica\App;
+
 require_once("include/diaspora.php");
 
 function p_init($a){

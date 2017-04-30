@@ -5,6 +5,8 @@
  * Purpose: AJAX synchronisation of profile page
  */
 
+use Friendica\App;
+
 require_once("mod/profile.php");
 
 function update_profile_content(App $a) {

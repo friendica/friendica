@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function filerm_content(App $a) {
 
 	if (! local_user()) {

@@ -15,6 +15,8 @@
  * posting categories go through item_store() instead of this function.
  */
 
+use Friendica\App;
+
 require_once 'include/crypto.php';
 require_once 'include/enotify.php';
 require_once 'include/email.php';

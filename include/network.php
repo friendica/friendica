@@ -4,6 +4,7 @@
  * @file include/network.php
  */
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once("include/xml.php");

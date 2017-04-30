@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once('include/items.php');
 require_once('include/auth.php');
 require_once('include/dfrn.php');

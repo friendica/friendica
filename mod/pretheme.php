@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function pretheme_init(App $a) {
 
 	if ($_REQUEST['theme']) {

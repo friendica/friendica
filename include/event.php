@@ -4,6 +4,8 @@
  * @brief functions specific to event handling
  */
 
+use Friendica\App;
+
 require_once 'include/bbcode.php';
 require_once 'include/map.php';
 require_once 'include/datetime.php';

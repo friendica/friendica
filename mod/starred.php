@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function starred_init(App $a) {
 

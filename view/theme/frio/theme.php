@@ -7,6 +7,8 @@
  *
  */
 
+use Friendica\App;
+
 $frio = "view/theme/frio";
 
 global $frio;

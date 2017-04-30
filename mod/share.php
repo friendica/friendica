@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 function share_init(App $a) {
 
 	$post_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);

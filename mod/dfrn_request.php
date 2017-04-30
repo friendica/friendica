@@ -12,6 +12,8 @@
  *    https://github.com/friendica/friendica/blob/master/spec/dfrn2_contact_request.png
  */
 
+use Friendica\App;
+
 require_once('include/enotify.php');
 require_once('include/Scrape.php');
 require_once('include/Probe.php');

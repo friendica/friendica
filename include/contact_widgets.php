@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function follow_widget($value = "") {
 
 	return replace_macros(get_markup_template('follow.tpl'), array(

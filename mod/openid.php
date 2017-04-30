@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 require_once('library/openid.php');
 

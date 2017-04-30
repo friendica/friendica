@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 function friendica_init(App $a) {

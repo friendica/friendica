@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {

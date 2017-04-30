@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/attach.php');
 require_once('include/datetime.php');
 

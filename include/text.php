@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once("include/template_processor.php");
 require_once("include/friendica_smarty.php");
 require_once("include/Smilies.php");

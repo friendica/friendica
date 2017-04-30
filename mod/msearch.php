@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function msearch_post(App $a) {
 
 	$perpage = (($_POST['n']) ? $_POST['n'] : 80);

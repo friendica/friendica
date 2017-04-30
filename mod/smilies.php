@@ -3,6 +3,7 @@
 /**
  * @file mod/smilies.php
  */
+use Friendica\App;
 
 require_once("include/Smilies.php");
 

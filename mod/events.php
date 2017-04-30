@@ -3,6 +3,9 @@
  * @file mod/events.php
  * @brief The events module
  */
+
+use Friendica\App;
+
 require_once 'include/bbcode.php';
 require_once 'include/datetime.php';
 require_once 'include/event.php';

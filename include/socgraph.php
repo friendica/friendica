@@ -7,6 +7,7 @@
  * @todo Detect if it is a forum
  */
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once('include/datetime.php');

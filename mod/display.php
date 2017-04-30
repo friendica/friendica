@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function display_init(App $a) {
 
 	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {

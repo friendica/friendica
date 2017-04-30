@@ -3,6 +3,7 @@
 // Run this from cmdline in basedir and quickly see if we've
 // got any parse errors in our application files.
 
+use Friendica\App;
 
 error_reporting(E_ERROR | E_WARNING | E_PARSE );
 ini_set('display_errors', '1');

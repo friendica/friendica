@@ -18,6 +18,8 @@
  *    https://github.com/friendica/friendica/blob/master/spec/dfrn2_contact_confirmation.png
  */
 
+use Friendica\App;
+
 require_once('include/enotify.php');
 require_once('include/group.php');
 require_once('include/Probe.php');

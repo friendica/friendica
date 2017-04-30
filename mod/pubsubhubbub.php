@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function post_var($name) {
 	return (x($_POST, $name)) ? notags(trim($_POST[$name])) : '';
 }
