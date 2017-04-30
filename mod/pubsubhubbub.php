@@ -160,5 +160,3 @@ function pubsubhubbub_init(App $a) {
 
 	killme();
 }
-
-?>

@@ -334,4 +334,3 @@ class exAuth {
 			fclose($this->rLogFile);
 	}
 }
-?>

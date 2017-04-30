@@ -22,4 +22,3 @@ function remove_contact_run($argv, $argc) {
 	// Now we delete all the depending table entries
 	dba::delete('contact', array('id' => $id));
 }
-?>

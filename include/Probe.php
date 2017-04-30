@@ -1220,4 +1220,3 @@ class Probe {
 		return $data;
 	}
 }
-?>

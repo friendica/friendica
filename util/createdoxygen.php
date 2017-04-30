@@ -91,4 +91,3 @@ function add_documentation($line) {
 
 	return $block;
 }
-?>

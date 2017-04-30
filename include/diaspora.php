@@ -3745,4 +3745,3 @@ class Diaspora {
 		return true;
 	}
 }
-?>
