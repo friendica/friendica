@@ -884,8 +884,8 @@ class dfrn {
 			xml::add_element($doc, $entry, "dfrn:bookmark", "true");
 		}
 
-		if ($item['App']) {
-			xml::add_element($doc, $entry, "statusnet:notice_info", "", array("local_id" => $item['id'], "source" => $item['App']));
+		if ($item['app']) {
+			xml::add_element($doc, $entry, "statusnet:notice_info", "", array("local_id" => $item['id'], "source" => $item['app']));
 		}
 
 		xml::add_element($doc, $entry, "dfrn:diaspora_guid", $item["guid"]);
@@ -2331,7 +2331,7 @@ class dfrn {
 		if ($notice_info AND ($notice_info->length > 0)) {
 			foreach ($notice_info->item(0)->attributes AS $attributes) {
 				if ($attributes->name == "source") {
-					$item["App"] = strip_tags($attributes->textContent);
+					$item["app"] = strip_tags($attributes->textContent);
 				}
 			}
 		}
