@@ -108,8 +108,6 @@ function api_content(App $a) {
 			'$no'	=> t('No'),
 		));
 
-		//echo "<pre>"; var_dump($app); killme();
-
 		return $o;
 	}
 
