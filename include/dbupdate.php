@@ -1,6 +1,6 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 function dbupdate_run(&$argv, &$argc) {
 	global $a;

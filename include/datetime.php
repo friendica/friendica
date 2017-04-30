@@ -4,7 +4,7 @@
  * @brief Some functions for date and time related tasks.
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 /**
  * @brief Two-level sort for timezones.
@@ -34,7 +34,7 @@ function timezone_cmp($a, $b) {
 
 /**
  * @brief Emit a timezone selector grouped (primarily) by continent
- * 
+ *
  * @param string $current Timezone
  * @return string Parsed HTML output
  */
@@ -81,17 +81,17 @@ function select_timezone($current = 'America/Los_Angeles') {
 
 /**
  * @brief Generating a Timezone selector
- * 
+ *
  * Return a select using 'field_select_raw' template, with timezones
  * groupped (primarily) by continent
  * arguments follow convetion as other field_* template array:
  * 'name', 'label', $value, 'help'
- * 
+ *
  * @param string $name Name of the selector
  * @param string $label Label for the selector
  * @param string $current Timezone
  * @param string $help Help text
- * 
+ *
  * @return string Parsed HTML
  */
 function field_timezone($name='timezone', $label='', $current = 'America/Los_Angeles', $help){
@@ -114,7 +114,7 @@ function field_timezone($name='timezone', $label='', $current = 'America/Los_Ang
  * @param string $s Some parseable date/time string
  * @param string $fmt Output format recognised from php's DateTime class
  *   http://www.php.net/manual/en/datetime.format.php
- * 
+ *
  * @return string Formatted date according to given format
  */
 function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d H:i:s") {
@@ -212,7 +212,7 @@ function dob($dob) {
 
 /**
  * @brief Returns a date selector
- * 
+ *
  * @param string $format
  *  Format string, e.g. 'ymd' or 'mdy'. Not currently supported
  * @param string $min
@@ -223,7 +223,7 @@ function dob($dob) {
  *  Unix timestamp of default date
  * @param string $id
  *  ID and name of datetimepicker (defaults to "datetimepicker")
- * 
+ *
  * @return string Parsed HTML output.
  */
 function datesel($format, $min, $max, $default, $id = 'datepicker') {
@@ -232,7 +232,7 @@ function datesel($format, $min, $max, $default, $id = 'datepicker') {
 
 /**
  * @brief Returns a time selector
- * 
+ *
  * @param string $format
  *  Format string, e.g. 'ymd' or 'mdy'. Not currently supported
  * @param $h
@@ -241,7 +241,7 @@ function datesel($format, $min, $max, $default, $id = 'datepicker') {
  *  Already selected minute
  * @param string $id
  *  ID and name of datetimepicker (defaults to "timepicker")
- * 
+ *
  * @return string Parsed HTML output.
  */
 function timesel($format, $h, $m, $id = 'timepicker') {
@@ -270,7 +270,7 @@ function timesel($format, $h, $m, $id = 'timepicker') {
  * @param $maxfrom
  *  set maximum date from picker with id $maxfrom (none by default)
  * @param bool $required default false
- * 
+ *
  * @return string Parsed HTML output.
  *
  * @todo Once browser support is better this could probably be replaced with
@@ -417,7 +417,7 @@ function relative_date($posted_date, $format = null) {
  * @param string $dob Date of Birth
  * @param string $owner_tz (optional) Timezone of the person of interest
  * @param string $viewer_tz (optional) Timezone of the person viewing
- * 
+ *
  * @return int Age in years
  */
 function age($dob, $owner_tz = '', $viewer_tz = '') {
@@ -452,7 +452,7 @@ function age($dob, $owner_tz = '', $viewer_tz = '') {
  *
  * @param int $y Year
  * @param int $m Month (1=January, 12=December)
- * 
+ *
  * @return int Number of days in the given month
  */
 function get_dim($y, $m) {
@@ -477,7 +477,7 @@ function get_dim($y, $m) {
  *
  * @param int $y Year
  * @param int $m Month (1=January, 12=December)
- * 
+ *
  * @return string day 0 = Sunday through 6 = Saturday
  */
 function get_first_dim($y,$m) {
@@ -498,7 +498,7 @@ function get_first_dim($y,$m) {
  * @param int $m Month
  * @param bool $links (default false)
  * @param string $class
- * 
+ *
  * @return string
  *
  * @todo Provide (prev,next) links, define class variations for different size calendars
