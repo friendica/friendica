@@ -3,6 +3,8 @@
 * @package util
 */
 
+use Friendica\App;
+
 /*
 * require boot.php
 */

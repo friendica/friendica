@@ -6,6 +6,7 @@
  * @todo Automatically detect if incoming data is HTML or BBCode
  */
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once 'include/HTTPExceptions.php';

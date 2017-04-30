@@ -10,6 +10,7 @@
  * @see ParseUrl::getSiteinfo() for more information about scraping embeddable content
 */
 
+use Friendica\App;
 use Friendica\ParseUrl;
 
 require_once("include/items.php");

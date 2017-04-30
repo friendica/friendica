@@ -2,6 +2,7 @@
 
 /* identi.ca -> friendica items permanent-url compatibility */
 
+use Friendica\App;
 
 function notice_init(App $a) {
 

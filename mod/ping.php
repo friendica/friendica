@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once('include/datetime.php');
 require_once('include/bbcode.php');
 require_once('include/ForumManager.php');

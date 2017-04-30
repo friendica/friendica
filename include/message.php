@@ -2,6 +2,7 @@
 
 // send a private message
 
+use Friendica\App;
 
 function send_message($recipient=0, $body='', $subject='', $replyto=''){
 

@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 function network_init(App $a) {
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);

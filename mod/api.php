@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/api.php');
 
 function oauth_get_client($request){

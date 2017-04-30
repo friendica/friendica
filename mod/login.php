@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function login_content(App $a) {
 	if (x($_SESSION, 'theme')) {
 		unset($_SESSION['theme']);

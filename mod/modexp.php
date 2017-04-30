@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('library/asn1.php');
 
 function modexp_init(App $a) {

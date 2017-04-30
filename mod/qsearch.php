@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function qsearch_init(App $a) {
 
 	if (! local_user()) {

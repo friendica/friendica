@@ -5,6 +5,7 @@
  *
  */
 
+use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 

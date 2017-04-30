@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/socgraph.php');
 require_once('include/contact_widgets.php');
 

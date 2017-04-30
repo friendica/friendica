@@ -7,6 +7,7 @@
  *
  */
 
+use Friendica\App;
 
 /**
  * @brief Load page template in dependence of the template mode

@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function ignored_init(App $a) {
 

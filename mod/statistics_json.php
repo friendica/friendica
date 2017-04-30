@@ -4,6 +4,8 @@
  * @file mod/statistics_json.php
  */
 
+use Friendica\App;
+
 require_once("include/plugin.php");
 
 function statistics_json_init(App $a) {

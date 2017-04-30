@@ -3,6 +3,8 @@
  * @file include/identity.php
  */
 
+use Friendica\App;
+
 require_once 'include/ForumManager.php';
 require_once 'include/bbcode.php';
 require_once 'mod/proxy.php';

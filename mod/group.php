@@ -5,6 +5,7 @@
  *	remove contacts to the contact groups
  */
 
+use Friendica\App;
 
 function group_init(App $a) {
 	if (local_user()) {

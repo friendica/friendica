@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function uexport_init(App $a) {
 	if (!local_user()) {
 		killme();

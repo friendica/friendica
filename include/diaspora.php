@@ -8,6 +8,7 @@
  * This will change in the future.
  */
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once 'include/items.php';

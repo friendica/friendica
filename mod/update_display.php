@@ -2,6 +2,8 @@
 
 // See update_profile.php for documentation
 
+use Friendica\App;
+
 require_once("mod/display.php");
 require_once("include/group.php");
 

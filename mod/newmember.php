@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function newmember_content(App $a) {
 

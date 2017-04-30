@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/message.php');
 
 function wallmessage_post(App $a) {

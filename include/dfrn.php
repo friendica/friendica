@@ -7,6 +7,8 @@
  * https://github.com/friendica/friendica/blob/master/spec/dfrn2.pdf
  */
 
+use Friendica\App;
+
 require_once("include/Contact.php");
 require_once("include/ostatus.php");
 require_once("include/enotify.php");

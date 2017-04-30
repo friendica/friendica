@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once('include/queue_fn.php');

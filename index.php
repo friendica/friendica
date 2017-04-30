@@ -13,6 +13,7 @@
  *
  */
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once('boot.php');

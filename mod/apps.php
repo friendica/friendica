@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function apps_content(App $a) {
 	$privateaddons = get_config('config', 'private_addons');

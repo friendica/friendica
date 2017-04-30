@@ -5,6 +5,8 @@
  * @brief The notifications module
  */
 
+use Friendica\App;
+
 require_once("include/NotificationsManager.php");
 require_once("include/contact_selectors.php");
 require_once("include/network.php");
