@@ -830,7 +830,7 @@ function contacts_content(App $a) {
  *
  * Available Pages are 'Status', 'Profile', 'Contacts' and 'Common Friends'
  *
- * @param app $a
+ * @param App $a
  * @param int $contact_id The ID of the contact
  * @param int $active_tab 1 if tab should be marked as active
  *

@@ -667,7 +667,7 @@ class App {
 		q('START TRANSACTION');
 
 		$r = q('SELECT `pid` FROM `process` WHERE `pid` = %d', intval(getmypid()));
-		if (!dbm::is_result($r)) {
+		if (!\dbm::is_result($r)) {
 			q("INSERT INTO `process` (`pid`,`command`,`created`) VALUES (%d, '%s', '%s')", intval(getmypid()), dbesc($command), dbesc(datetime_convert()));
 		}
 		q('COMMIT');
@@ -680,7 +680,7 @@ class App {
 		q('START TRANSACTION');
 
 		$r = q('SELECT `pid` FROM `process`');
-		if (dbm::is_result($r)) {
+		if (\dbm::is_result($r)) {
 			foreach ($r AS $process) {
 				if (!posix_kill($process['pid'], 0)) {
 					q('DELETE FROM `process` WHERE `pid` = %d', intval($process['pid']));
@@ -785,7 +785,7 @@ class App {
 			}
 		}
 
-		$processlist = dbm::processlist();
+		$processlist = \dbm::processlist();
 		if ($processlist['list'] != '') {
 			logger('Processcheck: Processes: ' . $processlist['amount'] . ' - Processlist: ' . $processlist['list'], LOGGER_DEBUG);
 
@@ -876,14 +876,14 @@ class App {
 		// If the last worker fork was less than 10 seconds before then don't fork another one.
 		// This should prevent the forking of masses of workers.
 		$cachekey = 'app:proc_run:started';
-		$result = Cache::get($cachekey);
+		$result = \Cache::get($cachekey);
 
 		if (!is_null($result) AND ( time() - $result) < 10) {
 			return;
 		}
 
 		// Set the timestamp of the last proc_run
-		Cache::set($cachekey, time(), CACHE_MINUTE);
+		\Cache::set($cachekey, time(), CACHE_MINUTE);
 
 		array_unshift($args, ((x($this->config, 'php_path')) && (strlen($this->config['php_path'])) ? $this->config['php_path'] : 'php'));
 
