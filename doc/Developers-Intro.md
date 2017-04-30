@@ -52,7 +52,9 @@ Friendica uses [Composer](https://getcomposer.org) to manage dependencies librar
 
 It's a command-line tool that downloads required libraries into the `vendor` folder and makes any namespaced class in `src` available through the whole application through `boot.php`.
 
+* [Class autoloading](help/autoloader)
 * [Using Composer](help/Composer)
+* [How To Move Classes to `src`](help/Developer-How-To-Move-Classes-to-src)
 
 ###Coding standards
 
