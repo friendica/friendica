@@ -1069,7 +1069,7 @@ function db_definition() {
 			);
 	$database["item"] = array(
 			"fields" => array(
-					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1"),
+					"id" => array("type" => "int(10) unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => array("thread" => "iid")),
 					"guid" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"uri" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"uid" => array("type" => "int(10) unsigned", "not null" => "1", "default" => "0", "relation" => array("user" => "uid")),
