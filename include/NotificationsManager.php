@@ -24,7 +24,7 @@ class NotificationsManager {
 	 *
 	 * @param array $notes array of note arrays from db
 	 * @return array Copy of input array with added properties
-	 * 
+	 *
 	 * Set some extra properties to note array from db:
 	 *  - timestamp as int in default TZ
 	 *  - date_rel : relative date string
@@ -143,8 +143,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief List of pages for the Notifications TabBar
-	 * 
-	 * @param app $a The 
+	 *
 	 * @return array with with notifications TabBar data
 	 */
 	public function getTabs() {
@@ -191,7 +190,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief Format the notification query in an usable array
-	 * 
+	 *
 	 * @param array $notifs The array from the db query
 	 * @param string $ident The notifications identifier (e.g. network)
 	 * @return array
@@ -360,7 +359,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of network notifications 
+	 * @brief Total number of network notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -388,13 +387,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get network notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available network notifications
@@ -436,7 +435,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of system notifications 
+	 * @brief Total number of system notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -460,13 +459,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get system notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available system notifications
@@ -502,7 +501,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief Addional SQL query string for the personal notifications
-	 * 
+	 *
 	 * @return string The additional sql query
 	 */
 	private function _personal_sql_extra() {
@@ -520,7 +519,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of personal notifications 
+	 * @brief Total number of personal notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -550,13 +549,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get personal notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available personal notifications
@@ -573,13 +572,13 @@ class NotificationsManager {
 			$sql_seen = " AND `item`.`unseen` = 1 ";
 
 		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, `item`.`unseen`,
-				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`, 
-				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid` 
+				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`,
+				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid`
 			FROM `item` INNER JOIN `item` AS `pitem` ON  `pitem`.`id`=`item`.`parent`
 			WHERE `item`.`visible` = 1
 				$sql_extra
 				$sql_seen
-				AND `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0 
+				AND `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0
 			ORDER BY `item`.`created` DESC LIMIT %d, %d " ,
 				intval(local_user()),
 				intval($start),
@@ -588,7 +587,7 @@ class NotificationsManager {
 
 		if (dbm::is_result($r))
 			$notifs = $this->formatNotifs($r, $ident);
-		
+
 		$arr = array (
 			'notifications' => $notifs,
 			'ident' => $ident,
@@ -599,7 +598,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of home notifications 
+	 * @brief Total number of home notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -626,13 +625,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get home notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available home notifications
@@ -673,7 +672,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of introductions 
+	 * @brief Total number of introductions
 	 * @param bool $all
 	 *	If false only include introductions into the query
 	 *	which aren't marked as ignored
@@ -698,13 +697,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get introductions
-	 * 
+	 *
 	 * @param bool $all
 	 *	If false only include introductions into the query
 	 *	which aren't marked as ignored
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available introductions
@@ -749,7 +748,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief Format the notification query in an usable array
-	 * 
+	 *
 	 * @param array $intros The array from the db query
 	 * @return array with the introductions
 	 */

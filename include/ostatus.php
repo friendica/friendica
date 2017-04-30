@@ -2217,7 +2217,7 @@ class ostatus {
 	/**
 	 * @brief Creates the XML feed for a given nickname
 	 *
-	 * @param app $a The application class
+	 * @param App $a The application class
 	 * @param string $owner_nick Nickname of the feed owner
 	 * @param string $last_update Date of the last update
 	 *
