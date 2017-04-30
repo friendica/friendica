@@ -252,5 +252,3 @@ function nodeinfo_cron() {
         logger('cron_end');
 	Config::set('nodeinfo', 'last_calucation', time());
 }
-
-?>

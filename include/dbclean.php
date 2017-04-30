@@ -149,4 +149,3 @@ function remove_orphans($stage = 0) {
 	}
 
 }
-?>

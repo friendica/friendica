@@ -129,4 +129,3 @@ function removetofu($message)
 
 	return($message);
 }
-?>

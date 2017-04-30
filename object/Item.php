@@ -112,7 +112,7 @@ class Item extends BaseObject {
 
 		$conv = $this->get_conversation();
 
-		$lock = ((($item['private'] == 1) || (($item['uid'] == local_user()) && (strlen($item['allow_cid']) || strlen($item['allow_gid']) 
+		$lock = ((($item['private'] == 1) || (($item['uid'] == local_user()) && (strlen($item['allow_cid']) || strlen($item['allow_gid'])
 			|| strlen($item['deny_cid']) || strlen($item['deny_gid']))))
 			? t('Private Message')
 			: false);
@@ -754,20 +754,20 @@ class Item extends BaseObject {
 					if ((! $owner_linkmatch) && (! $alias_linkmatch) && (! $owner_namematch)) {
 
 						// The author url doesn't match the owner (typically the contact)
-						// and also doesn't match the contact alias. 
-						// The name match is a hack to catch several weird cases where URLs are 
+						// and also doesn't match the contact alias.
+						// The name match is a hack to catch several weird cases where URLs are
 						// all over the park. It can be tricked, but this prevents you from
 						// seeing "Bob Smith to Bob Smith via Wall-to-wall" and you know darn
-						// well that it's the same Bob Smith. 
+						// well that it's the same Bob Smith.
 
-						// But it could be somebody else with the same name. It just isn't highly likely. 
+						// But it could be somebody else with the same name. It just isn't highly likely.
 
 
 						$this->owner_photo = $this->get_data_value('owner-avatar');
 						$this->owner_name = $this->get_data_value('owner-name');
 						$this->wall_to_wall = true;
 						// If it is our contact, use a friendly redirect link
-						if ((link_compare($this->get_data_value('owner-link'),$this->get_data_value('url'))) 
+						if ((link_compare($this->get_data_value('owner-link'),$this->get_data_value('url')))
 							&& ($this->get_data_value('network') === NETWORK_DFRN)) {
 							$this->owner_url = $this->get_redirect_url();
 						} else {
@@ -807,5 +807,3 @@ class Item extends BaseObject {
 	}
 
 }
-/// @TODO These are discouraged and should be removed:
-?>

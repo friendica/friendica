@@ -854,4 +854,3 @@ function account_type($contact) {
 
 	return $account_type;
 }
-?>

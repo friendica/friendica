@@ -149,4 +149,3 @@ function update_items() {
 
 	dba::close($messages);
 }
-?>

@@ -47,4 +47,3 @@ function update_files_for_items() {
 		create_files_from_item($message["id"]);
 	}
 }
-?>

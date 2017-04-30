@@ -690,4 +690,3 @@ if (array_search(__file__,get_included_files())===0){
 
 	killme();
 }
-?>

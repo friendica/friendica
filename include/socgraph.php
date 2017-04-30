@@ -2392,4 +2392,3 @@ function poco_serverlist() {
 	}
 	return $r;
 }
-?>

@@ -325,4 +325,3 @@ function html2bbcode($message)
 
 	return $message;
 }
-?>

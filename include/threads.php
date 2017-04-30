@@ -304,4 +304,3 @@ function update_shadow_copy() {
 
 	dba::close($messages);
 }
-?>
