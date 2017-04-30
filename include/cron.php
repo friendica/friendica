@@ -1,5 +1,6 @@
 <?php
-use \Friendica\Core\Config;
+
+use Friendica\Core\Config;
 
 function cron_run(&$argv, &$argc){
 	global $a;

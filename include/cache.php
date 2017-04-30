@@ -5,8 +5,8 @@
  * @brief Class for storing data for a short time
  */
 
-use \Friendica\Core\Config;
-use \Friendica\Core\PConfig;
+use Friendica\Core\Config;
+use Friendica\Core\PConfig;
 
 class Cache {
 	/**
@@ -121,9 +121,9 @@ class Cache {
 
 	/**
 	 * @brief Put data in the cache according to the key
-	 * 
+	 *
 	 * The input $value can have multiple formats.
-	 * 
+	 *
 	 * @param string $key The key to the cached data
 	 * @param mixed $valie The value that is about to be stored
 	 * @param integer $duration The cache lifespan
