@@ -9,6 +9,7 @@
  * to the url
  */
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once 'include/Photo.php';

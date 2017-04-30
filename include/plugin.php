@@ -5,6 +5,7 @@
  * @brief Some functions to handle addons and themes.
  */
 
+use Friendica\App;
 
 /**
  * @brief uninstalls an addon.

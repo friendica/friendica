@@ -5,6 +5,8 @@
  *
  */
 
+use Friendica\App;
+
 define('REQUEST_TOKEN_DURATION', 300);
 define('ACCESS_TOKEN_DURATION', 31536000);
 

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function directory_init(App $a) {
 	$a->set_pager_itemspage(60);
 

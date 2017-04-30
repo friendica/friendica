@@ -1,7 +1,8 @@
 <?php
 
-require_once("include/text.php");
+use Friendica\App;
 
+require_once("include/text.php");
 
 function manage_post(App $a) {
 

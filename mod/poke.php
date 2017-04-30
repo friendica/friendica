@@ -11,12 +11,14 @@
  *
  * private creates a private conversation with the recipient. Otherwise your profile's default post privacy is used.
  *
- */
  * @file mod/poke.php
+ */
+
+use Friendica\App;
+
 require_once('include/security.php');
 require_once('include/bbcode.php');
 require_once('include/items.php');
-
 
 function poke_init(App $a) {
 

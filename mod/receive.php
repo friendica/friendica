@@ -4,6 +4,7 @@
  * Diaspora endpoint
  */
 
+use Friendica\App;
 
 require_once('include/salmon.php');
 require_once('include/crypto.php');

@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function lockview_content(App $a) {
 

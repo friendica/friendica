@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/Scrape.php');
 
 function acctlink_init(App $a) {

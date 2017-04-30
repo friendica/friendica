@@ -6,6 +6,7 @@
  * addons repository will be listed though ATM)
  */
 
+use Friendica\App;
 
 function credits_content(App $a) {
 	/* fill the page with credits */

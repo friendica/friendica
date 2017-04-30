@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once("include/oembed.php");
 
 function oembed_content(App $a) {

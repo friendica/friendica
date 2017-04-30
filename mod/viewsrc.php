@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function viewsrc_content(App $a) {
 

@@ -2,6 +2,9 @@
 /*
 This file is part of the Diaspora protocol. It is used for fetching single public posts.
 */
+
+use Friendica\App;
+
 require_once("include/crypto.php");
 require_once("include/diaspora.php");
 require_once("include/xml.php");

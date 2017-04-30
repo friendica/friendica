@@ -4,6 +4,7 @@
  * @file include/oembed.php
  */
 
+use Friendica\App;
 use Friendica\ParseUrl;
 use Friendica\Core\Config;
 

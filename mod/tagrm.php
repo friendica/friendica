@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/bbcode.php');
 
 function tagrm_post(App $a) {

@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 function oexchange_init(App $a) {
 
 	if (($a->argc > 1) && ($a->argv[1] === 'xrd')) {

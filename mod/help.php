@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once('library/markdown.php');
 
 if (!function_exists('load_doc_file')) {

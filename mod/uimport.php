@@ -4,6 +4,8 @@
  * View for user import
  */
 
+use Friendica\App;
+
 require_once("include/uimport.php");
 
 function uimport_post(App $a) {

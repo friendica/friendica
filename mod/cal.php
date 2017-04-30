@@ -6,6 +6,8 @@
  *	of the profile owner
  */
 
+use Friendica\App;
+
 require_once('include/event.php');
 require_once('include/redir.php');
 

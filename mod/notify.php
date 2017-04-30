@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once('include/NotificationsManager.php');
 
 function notify_init(App $a) {

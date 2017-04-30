@@ -7,6 +7,7 @@
  * Output to <path/to/messages.po>
  */
 
+use Friendica\App;
 
 DEFINE("NORM_REGEXP", "|[\\\]|");
 

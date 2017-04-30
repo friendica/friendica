@@ -8,6 +8,8 @@
  * License: GNU AFFERO GENERAL PUBLIC LICENSE (Version 3)
  */
 
+use Friendica\App;
+
 require_once("include/socgraph.php");
 require_once("include/Contact.php");
 

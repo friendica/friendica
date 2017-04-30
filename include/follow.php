@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once("include/Scrape.php");
 require_once("include/socgraph.php");
 require_once('include/group.php');

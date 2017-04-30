@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/email.php');
 require_once('include/enotify.php');
 require_once('include/text.php');

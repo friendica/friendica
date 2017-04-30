@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 if(! function_exists('home_init')) {
 function home_init(App $a) {
 

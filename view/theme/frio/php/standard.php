@@ -10,9 +10,9 @@
 	<title><?php if(x($page,'title')) echo $page['title'] ?></title>
 	<meta name="viewport" content="initial-scale=1.0">
 	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?>">
-	<script>var baseurl="<?php echo App::get_baseurl() ?>";</script>
+	<script>var baseurl="<?php echo Friendica\App::get_baseurl() ?>";</script>
 	<script>var frio="<?php echo "view/theme/frio"; ?>";</script>
-	<?php $baseurl = App::get_baseurl(); ?>
+	<?php $baseurl = Friendica\App::get_baseurl(); ?>
 	<?php $frio = "view/theme/frio"; ?>
 	<?php if(x($page,'htmlhead')) echo $page['htmlhead']; ?>
 </head>

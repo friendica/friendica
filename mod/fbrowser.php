@@ -5,6 +5,8 @@
  * @author		Fabio Comuni <fabrixxm@kirgroup.com>
  */
 
+use Friendica\App;
+
 require_once('include/Photo.php');
 
 /**

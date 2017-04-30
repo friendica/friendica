@@ -5,6 +5,9 @@
  * @brief The dfrn notify endpoint
  * @see PDF with dfrn specs: https://github.com/friendica/friendica/blob/master/spec/dfrn2.pdf
  */
+
+use Friendica\App;
+
 require_once('include/items.php');
 require_once('include/dfrn.php');
 require_once('include/event.php');

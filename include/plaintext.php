@@ -4,6 +4,7 @@
  * @file include/plaintext.php
  */
 
+use Friendica\App;
 use Friendica\ParseUrl;
 
 require_once("include/Photo.php");

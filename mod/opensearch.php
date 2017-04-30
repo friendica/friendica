@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function opensearch_content(App $a) {
 

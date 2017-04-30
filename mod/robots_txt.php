@@ -6,6 +6,7 @@
  * @version 0.1.2
  */
 
+use Friendica\App;
 
 /**
  * @brief Return default robots.txt when init

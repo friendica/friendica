@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once("include/Photo.php");
 
 function profile_photo_init(App $a) {

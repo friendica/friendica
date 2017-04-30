@@ -9,6 +9,8 @@
  * Maintainer: Zach P <techcity@f.shmuz.in>
  */
 
+use Friendica\App;
+
 function frost_init(App $a) {
 	$a->videowidth = 400;
 	$a->videoheight = 330;

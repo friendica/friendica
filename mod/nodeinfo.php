@@ -5,6 +5,7 @@
  * Documentation: http://nodeinfo.diaspora.software/schema.html
 */
 
+use Friendica\App;
 use Friendica\Core\Config;
 
 require_once 'include/plugin.php';

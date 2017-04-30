@@ -4,6 +4,7 @@
  * @file include/items.php
  */
 
+use Friendica\App;
 use Friendica\ParseUrl;
 
 require_once 'include/bbcode.php';

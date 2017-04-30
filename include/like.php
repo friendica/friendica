@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once("include/diaspora.php");
 
 /**
