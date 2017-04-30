@@ -53,6 +53,7 @@ class ComposerStaticInitFriendica
         'Archive_Tar' => __DIR__ . '/..' . '/pear-pear.php.net/Archive_Tar/Archive/Tar.php',
         'Console_Getopt' => __DIR__ . '/..' . '/pear-pear.php.net/Console_Getopt/Console/Getopt.php',
         'Detection\\MobileDetect' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/namespaced/Detection/MobileDetect.php',
+        'Friendica\\App' => __DIR__ . '/../..' . '/src/App.php',
         'Friendica\\Core\\Config' => __DIR__ . '/../..' . '/src/Core/Config.php',
         'Friendica\\Core\\PConfig' => __DIR__ . '/../..' . '/src/Core/PConfig.php',
         'Friendica\\ParseUrl' => __DIR__ . '/../..' . '/src/ParseUrl.php',

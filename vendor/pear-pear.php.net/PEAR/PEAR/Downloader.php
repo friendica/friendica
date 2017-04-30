@@ -39,7 +39,7 @@ define('PEAR_INSTALLER_ERROR_NO_PREF_STATE', 2);
  * @author     Martin Jansen <mj@php.net>
  * @copyright  1997-2009 The Authors
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    Release: 1.10.3
+ * @version    Release: 1.10.4
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 1.3.0
  */
@@ -1635,7 +1635,7 @@ class PEAR_Downloader extends PEAR_Common
         }
 
         $request .= $ifmodifiedsince .
-            "User-Agent: PEAR/1.10.3/PHP/" . PHP_VERSION . "\r\n";
+            "User-Agent: PEAR/1.10.4/PHP/" . PHP_VERSION . "\r\n";
 
         if ($object !== null) { // only pass in authentication for non-static calls
             $username = $config->get('username', null, $channel);

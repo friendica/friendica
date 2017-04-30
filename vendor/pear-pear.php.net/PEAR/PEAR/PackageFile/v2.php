@@ -22,7 +22,7 @@ require_once 'PEAR/ErrorStack.php';
  * @author     Greg Beaver <cellog@php.net>
  * @copyright  1997-2009 The Authors
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    Release: 1.10.3
+ * @version    Release: 1.10.4
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 1.4.0a1
  */
@@ -1668,7 +1668,7 @@ class PEAR_PackageFile_v2
                     if ($dtype == 'pearinstaller' && $nopearinstaller) {
                         continue;
                     }
-                    if (!isset($deps[0])) {
+                    if ((is_array($deps) && !isset($deps[0])) || !is_array($deps)) {
                         $deps = array($deps);
                     }
                     foreach ($deps as $dep) {
