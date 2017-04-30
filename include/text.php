@@ -753,6 +753,72 @@ function logger($msg, $level = 0) {
 	$a->save_timestamp($stamp1, "file");
 }}
 
+/**
+ * @brief An alternative logger for development.
+ * Works largely as logger() but allows developers
+ * to isolate particular elements they are targetting
+ * personally without background noise
+ *
+ * log levels:
+ * LOGGER_NORMAL (default)
+ * LOGGER_TRACE
+ * LOGGER_DEBUG
+ * LOGGER_DATA
+ * LOGGER_ALL
+ *
+ * @global App $a
+ * @global dba $db
+ * @global array $LOGGER_LEVELS
+ * @param string $msg
+ * @param int $level
+ */
+
+function dlogger($msg, $level = 0) {
+	$a = get_app();
+	global $db;
+
+	// turn off logger in install mode
+	if (
+		$a->module == 'install'
+		|| ! ($db && $db->connected)
+	) {
+		return;
+	}
+
+	$logfile = get_config('system','dlogfile');
+
+	if (! $logfile) {
+		return;
+	}
+
+	if (count($LOGGER_LEVELS) == 0) {
+		foreach (get_defined_constants() as $k => $v) {
+			if (substr($k, 0, 7) == "LOGGER_") {
+				$LOGGER_LEVELS[$v] = substr($k, 7, 7);
+			}
+		}
+	}
+
+	$process_id = session_id();
+
+	if ($process_id == '') {
+		$process_id = get_app()->process_id;
+	}
+
+	$callers = debug_backtrace();
+	$logline = sprintf("%s@\t%s:\t%s:\t%s\t%s\t%s\n",
+			datetime_convert(),
+			$process_id,
+			basename($callers[0]['file']),
+			$callers[0]['line'],
+			$callers[1]['function'],
+			$msg
+		);
+
+	$stamp1 = microtime(true);
+	@file_put_contents($logfile, $logline, FILE_APPEND);
+	$a->save_timestamp($stamp1, "file");
+}
 
 if (! function_exists('activity_match')) {
 /**
@@ -1114,6 +1180,7 @@ function get_mood_verbs() {
 		'motivated'  => t('motivated'),
 		'relaxed'    => t('relaxed'),
 		'surprised'  => t('surprised'),
+		'incapable'  => t('incapable of producing a suitable verb to suit this situation, despite being famed for the legendary range of additonal verbs he previously added to morechoice, morepoke, and moremoods.  That\'s right, the worlds most famous verb-smith is out of verbs.'),
 	);
 
 	call_hooks('mood_verbs', $arr);
