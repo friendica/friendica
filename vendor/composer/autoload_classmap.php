@@ -9,6 +9,7 @@ return array(
     'Archive_Tar' => $vendorDir . '/pear-pear.php.net/Archive_Tar/Archive/Tar.php',
     'Console_Getopt' => $vendorDir . '/pear-pear.php.net/Console_Getopt/Console/Getopt.php',
     'Detection\\MobileDetect' => $vendorDir . '/mobiledetect/mobiledetectlib/namespaced/Detection/MobileDetect.php',
+    'Friendica\\App' => $baseDir . '/src/App.php',
     'Friendica\\Core\\Config' => $baseDir . '/src/Core/Config.php',
     'Friendica\\Core\\PConfig' => $baseDir . '/src/Core/PConfig.php',
     'Friendica\\ParseUrl' => $baseDir . '/src/ParseUrl.php',
