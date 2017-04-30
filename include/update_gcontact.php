@@ -1,6 +1,6 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 function update_gcontact_run(&$argv, &$argc) {
 	global $a;

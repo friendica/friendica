@@ -4,7 +4,7 @@
  * @brief Removes orphaned data from deleted contacts
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 function remove_contact_run($argv, $argc) {
 	if ($argc != 2) {
