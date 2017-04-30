@@ -16,4 +16,3 @@ function toggle_mobile_init(App $a) {
 
 	goaway($address);
 }
-

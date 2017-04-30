@@ -1,6 +1,6 @@
 <?php /** @file */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 require_once('boot.php');
 

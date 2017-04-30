@@ -19,7 +19,7 @@
 
 require_once(__DIR__ . DIRECTORY_SEPARATOR. 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 require_once('include/config.php');
 require_once('include/network.php');

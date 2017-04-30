@@ -1,26 +1,25 @@
 <?php
-    use Friendica\Core\Config;
 
-    function manifest_content(App $a) {
+use Friendica\Core\Config;
 
-		$tpl = get_markup_template('manifest.tpl');
+function manifest_content(App $a) {
 
-		header('Content-type: application/manifest+json');
+	$tpl = get_markup_template('manifest.tpl');
 
-		$touch_icon = Config::get('system', 'touch_icon', 'images/friendica-128.png');
-		if ($touch_icon == '') {
-			$touch_icon = 'images/friendica-128.png';
-		}
+	header('Content-type: application/manifest+json');
 
-		$o = replace_macros($tpl, array(
-			'$baseurl' => App::get_baseurl(),
-			'$touch_icon' => $touch_icon,
-			'$title' => Config::get('config', 'sitename', 'Friendica'),
-		));
-
-		echo $o;
-
-		killme();
-
+	$touch_icon = Config::get('system', 'touch_icon', 'images/friendica-128.png');
+	if ($touch_icon == '') {
+		$touch_icon = 'images/friendica-128.png';
 	}
-?>
+
+	$o = replace_macros($tpl, array(
+		'$baseurl' => App::get_baseurl(),
+		'$touch_icon' => $touch_icon,
+		'$title' => Config::get('config', 'sitename', 'Friendica'),
+	));
+
+	echo $o;
+
+	killme();
+}

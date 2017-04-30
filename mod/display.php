@@ -106,7 +106,6 @@ function display_init(App $a) {
 	}
 
 	profile_load($a, $nick, 0, $profiledata);
-
 }
 
 function display_fetchauthor($a, $item) {

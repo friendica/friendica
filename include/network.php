@@ -4,7 +4,7 @@
  * @file include/network.php
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 require_once("include/xml.php");
 require_once('include/Probe.php');

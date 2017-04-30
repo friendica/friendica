@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\Core\Config;
+
 require_once 'include/Photo.php';
 require_once 'include/photos.php';
 require_once 'include/items.php';
@@ -9,8 +12,6 @@ require_once 'include/redir.php';
 require_once 'include/tags.php';
 require_once 'include/threads.php';
 require_once 'include/Probe.php';
-
-use \Friendica\Core\Config;
 
 function photos_init(App $a) {
 

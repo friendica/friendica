@@ -535,7 +535,7 @@ function get_event_strings() {
  *
  * @param array $dates Array of possibly duplicated events
  * @return array Cleaned events
- * 
+ *
  * @todo We should replace this with a separate update function if there is some time left
  */
 function event_remove_duplicates($dates) {

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 use League\HTMLToMarkdown\HtmlConverter;
 
 require_once "include/oembed.php";

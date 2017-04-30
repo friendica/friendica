@@ -3,7 +3,6 @@
 require_once "include/bbcode.php";
 require_once "include/acl_selectors.php";
 
-
 /*
  * Note: the code in 'item_extract_images' and 'item_redir_and_replace_images'
  * is identical to the code in mod/message.php for 'item_extract_images' and

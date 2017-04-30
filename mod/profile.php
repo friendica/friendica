@@ -3,7 +3,6 @@
 require_once('include/contact_widgets.php');
 require_once('include/redir.php');
 
-
 function profile_init(App $a) {
 
 	if(! x($a->page,'aside'))
