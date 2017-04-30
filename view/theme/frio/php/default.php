@@ -19,10 +19,10 @@
 	<script>var frio="<?php echo "view/theme/frio"; ?>";</script>
 	<?php $baseurl = App::get_baseurl(); ?>
 	<?php $frio = "view/theme/frio"; ?>
-	<?php 
+	<?php
 		// Because we use minimal for modals the header and the included js stuff should be only loaded
 		// if the page is an standard page (so we don't have it twice for modals)
-		// 
+		//
 		/// @todo Think about to move js stuff in the footer
 		if(!$minimal) {
 			if(x($page,'htmlhead')) echo $page['htmlhead'];

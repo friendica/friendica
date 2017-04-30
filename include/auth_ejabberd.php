@@ -32,6 +32,8 @@
  *
  */
 
+use Friendica\App;
+
 if (sizeof($_SERVER["argv"]) == 0)
 	die();
 

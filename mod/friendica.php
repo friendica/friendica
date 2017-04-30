@@ -1,6 +1,6 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 function friendica_init(App $a) {
 	if ($a->argv[1] == "json"){

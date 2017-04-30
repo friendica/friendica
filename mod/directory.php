@@ -9,23 +9,17 @@ function directory_init(App $a) {
 		$a->page['aside'] .= findpeople_widget();
 
 		$a->page['aside'] .= follow_widget();
-
 	}
 	else {
 		unset($_SESSION['theme']);
 		unset($_SESSION['mobile-theme']);
 	}
-
-
 }
-
 
 function directory_post(App $a) {
 	if(x($_POST,'search'))
 		$a->data['search'] = $_POST['search'];
 }
-
-
 
 function directory_content(App $a) {
 	global $db;

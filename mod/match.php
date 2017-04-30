@@ -1,5 +1,5 @@
 <?php
-include_once('include/text.php');
+require_once('include/text.php');
 require_once('include/socgraph.php');
 require_once('include/contact_widgets.php');
 require_once('mod/proxy.php');

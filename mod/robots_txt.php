@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file mod/robots_text.php
  * @brief Module which returns the default robots.txt
@@ -13,7 +14,6 @@
  */
 function robots_txt_init(App $a)
 {
-
 	$allDisalloweds = array(
 		'/settings/',
 		'/admin/',
@@ -21,9 +21,9 @@ function robots_txt_init(App $a)
 	);
 
 	header('Content-Type: text/plain');
-	echo 'User-agent: *'.PHP_EOL;
+	echo 'User-agent: *' . PHP_EOL;
 	foreach ($allDisalloweds as $disallowed) {
-		echo 'Disallow: '.$disallowed.PHP_EOL;
+		echo 'Disallow: ' . $disallowed . PHP_EOL;
 	}
 	killme();
 }

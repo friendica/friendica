@@ -5,8 +5,8 @@
  *
  */
 
-use \Friendica\Core\Config;
-use \Friendica\Core\PConfig;
+use Friendica\Core\Config;
+use Friendica\Core\PConfig;
 
 require_once("include/feed.php");
 require_once('include/email.php');

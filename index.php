@@ -13,7 +13,7 @@
  *
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 require_once('boot.php');
 require_once('object/BaseObject.php');
@@ -486,7 +486,7 @@ header("X-Friendica-Version: " . FRIENDICA_VERSION);
 header("Content-type: text/html; charset=utf-8");
 
 /*
- * We use $_GET["mode"] for special page templates. So we will check if we have 
+ * We use $_GET["mode"] for special page templates. So we will check if we have
  * to load another page template than the default one.
  * The page templates are located in /view/php/ or in the theme directory.
  */

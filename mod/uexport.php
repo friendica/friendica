@@ -1,7 +1,7 @@
 <?php
 
 function uexport_init(App $a) {
-	if (! local_user()) {
+	if (!local_user()) {
 		killme();
 	}
 
@@ -14,8 +14,8 @@ function uexport_content(App $a) {
 
 	if ($a->argc > 1) {
 		header("Content-type: application/json");
-		header('Content-Disposition: attachment; filename="'.$a->user['nickname'].'.'.$a->argv[1].'"');
-		switch($a->argv[1]) {
+		header('Content-Disposition: attachment; filename="' . $a->user['nickname'] . '.' . $a->argv[1] . '"');
+		switch ($a->argv[1]) {
 			case "backup":
 				uexport_all($a);
 				killme();
@@ -51,9 +51,9 @@ function _uexport_multirow($query) {
 	$result = array();
 	$r = q($query);
 	if (dbm::is_result($r)) {
-		foreach($r as $rr){
+		foreach ($r as $rr) {
 			$p = array();
-			foreach($rr as $k => $v) {
+			foreach ($rr as $k => $v) {
 				$p[$k] = $v;
 			}
 			$result[] = $p;
@@ -66,8 +66,8 @@ function _uexport_row($query) {
 	$result = array();
 	$r = q($query);
 	if (dbm::is_result($r)) {
-		foreach($r as $rr) {
-			foreach($rr as $k => $v) {
+		foreach ($r as $rr) {
+			foreach ($rr as $k => $v) {
 				$result[$k] = $v;
 			}
 		}
@@ -75,39 +75,38 @@ function _uexport_row($query) {
 	return $result;
 }
 
-
-function uexport_account($a){
+function uexport_account($a) {
 
 	$user = _uexport_row(
-		sprintf( "SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval(local_user()) )
+		sprintf("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval(local_user()))
 	);
 
 	$contact = _uexport_multirow(
-		sprintf( "SELECT * FROM `contact` WHERE `uid` = %d ",intval(local_user()) )
+		sprintf("SELECT * FROM `contact` WHERE `uid` = %d ", intval(local_user()))
 	);
 
 
-	$profile =_uexport_multirow(
-		sprintf( "SELECT * FROM `profile` WHERE `uid` = %d ", intval(local_user()) )
+	$profile = _uexport_multirow(
+		sprintf("SELECT * FROM `profile` WHERE `uid` = %d ", intval(local_user()))
 	);
 
 	$photo = _uexport_multirow(
-		sprintf( "SELECT * FROM `photo` WHERE uid = %d AND profile = 1", intval(local_user()) )
+		sprintf("SELECT * FROM `photo` WHERE uid = %d AND profile = 1", intval(local_user()))
 	);
 	foreach ($photo as &$p) {
 		$p['data'] = bin2hex($p['data']);
 	}
 
 	$pconfig = _uexport_multirow(
-		sprintf( "SELECT * FROM `pconfig` WHERE uid = %d",intval(local_user()) )
+		sprintf("SELECT * FROM `pconfig` WHERE uid = %d", intval(local_user()))
 	);
 
 	$group = _uexport_multirow(
-		sprintf( "SELECT * FROM `group` WHERE uid = %d",intval(local_user()) )
+		sprintf("SELECT * FROM `group` WHERE uid = %d", intval(local_user()))
 	);
 
 	$group_member = _uexport_multirow(
-		sprintf( "SELECT * FROM `group_member` WHERE uid = %d",intval(local_user()) )
+		sprintf("SELECT * FROM `group_member` WHERE uid = %d", intval(local_user()))
 	);
 
 	$output = array(
@@ -150,13 +149,13 @@ function uexport_all(App $a) {
 			intval($x),
 			intval(500)
 		);
-		/*if (dbm::is_result($r)) {
-			foreach($r as $rr)
-				foreach($rr as $k => $v)
-					$item[][$k] = $v;
-		}*/
+		/* if (dbm::is_result($r)) {
+		  foreach($r as $rr)
+		  foreach($rr as $k => $v)
+		  $item[][$k] = $v;
+		  } */
 
 		$output = array('item' => $r);
-		echo json_encode($output)."\n";
+		echo json_encode($output) . "\n";
 	}
 }

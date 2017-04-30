@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\Core\Config;
+
 if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
 
@@ -9,8 +12,6 @@ if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 
 	chdir($directory);
 }
-
-use \Friendica\Core\Config;
 
 require_once("boot.php");
 

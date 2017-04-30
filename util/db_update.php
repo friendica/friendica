@@ -3,7 +3,7 @@
 * @package util
 */
 
-/* 
+/*
 * require boot.php
 */
 require_once("boot.php");

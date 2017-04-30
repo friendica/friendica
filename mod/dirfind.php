@@ -21,8 +21,6 @@ function dirfind_init(App $a) {
 	$a->page['aside'] .= follow_widget();
 }
 
-
-
 function dirfind_content(App $a, $prefix = "") {
 
 	$community = false;

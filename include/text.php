@@ -6,7 +6,6 @@ require_once("include/Smilies.php");
 require_once("include/map.php");
 require_once("mod/proxy.php");
 
-
 if(! function_exists('replace_macros')) {
 /**
  * This is our template processor

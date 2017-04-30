@@ -4,7 +4,7 @@
  * @file include/plaintext.php
  */
 
-use \Friendica\ParseUrl;
+use Friendica\ParseUrl;
 
 require_once("include/Photo.php");
 require_once("include/bbcode.php");

@@ -15,6 +15,7 @@ function hovercard_init(App $a) {
 	// Just for testing purposes
 	$_GET["mode"] = "minimal";
 }
+
 function hovercard_content() {
 	$profileurl	=	(x($_REQUEST,'profileurl')	? $_REQUEST['profileurl']	: "");
 	$datatype	=	(x($_REQUEST,'datatype')	?$_REQUEST['datatype']		: "json");
