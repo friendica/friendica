@@ -23,6 +23,7 @@ class dba {
 	public  $error = false;
 	private $_server_info = '';
 	private static $dbo;
+	private static $relation = array();
 
 	function __construct($server, $user, $pass, $db, $install = false) {
 		$a = get_app();
@@ -751,6 +752,101 @@ class dba {
 			substr(str_repeat("?, ", count($param)), 0, -2).");";
 
 		return self::e($sql, $param);
+	}
+
+	/**
+	 * @brief Build the array with the table relations
+	 *
+	 * The array is build from the database definitions in dbstructure.php
+	 *
+	 * This process must only be started once, since the value is cached.
+	 */
+	static private function build_relation_data() {
+		$definition = db_definition();
+
+		foreach ($definition AS $table => $structure) {
+		        foreach ($structure['fields'] AS $field => $field_struct) {
+		                if (isset($field_struct['relation'])) {
+		                        foreach ($field_struct['relation'] AS $rel_table => $rel_field) {
+		                                self::$relation[$rel_table][$rel_field][$table] = $field;
+		                        }
+		                }
+		        }
+		}
+	}
+
+	/**
+	 * @brief Insert a row into a table
+	 *
+	 * @param string $table Table name
+	 * @param array $param parameter array
+	 * @param boolean $in_commit Internal use: Only do a commit after the last delete
+	 * @param array $callstack Internal use: prevent endless loops
+	 *
+	 * @return boolean was the delete successfull?
+	 */
+	static public function delete($table, $param, $in_commit = false, $callstack = array()) {
+
+		// Create a key for the loop prevention
+		$key = $table.':'.implode(':', array_keys($param)).':'.implode(':', $param);
+
+		// We quit when this key already exists in the callstack.
+		if (isset($callstack[$key])) {
+			return true;
+		}
+
+		$callstack[$key] = $key;
+
+		$table = self::$dbo->escape($table);
+
+		// To speed up the whole process we cache the table relations
+		if (count(self::$relation) == 0) {
+			self::build_relation_data();
+		}
+
+		if (!$in_commit) {
+			self::p("COMMIT");
+			self::p("START TRANSACTION");
+		}
+
+		// Is there a relation entry for the table?
+		if (isset(self::$relation[$table])) {
+			foreach (self::$relation[$table] AS $field => $rel_def) {
+				// Fetch all rows that are to be deleted
+				$sql = "SELECT ".self::$dbo->escape($field)." FROM `".$table."` WHERE `".
+					implode("` = ? AND `", array_keys($param))."` = ?";
+
+				$retval = false;
+				$data = self::p($sql, $param);
+				while ($row = self::fetch($data)) {
+					foreach ($rel_def AS $rel_table => $rel_field) {
+						// We do a separate delete process per row
+						$retval = self::delete($rel_table, array($rel_field => $row[$field]), true, $callstack);
+						if (!$retval) {
+							return false;
+						}
+					}
+				}
+				if (!$retval) {
+					return true;
+				}
+			}
+		}
+
+		$sql = "DELETE FROM `".$table."` WHERE `".
+			implode("` = ? AND `", array_keys($param))."` = ?";
+
+		$retval = self::e($sql, $param);
+
+		if (!$in_commit) {
+			if ($retval) {
+				self::p("COMMIT");
+			} else {
+				self::p("ROLLBACK");
+			}
+		}
+
+		return $retval;
 	}
 
 	/**

@@ -1078,7 +1078,7 @@ function db_definition() {
 					"type" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"wall" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					"gravity" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
-					"parent" => array("type" => "int(10) unsigned", "not null" => "1", "default" => "0"),
+					"parent" => array("type" => "int(10) unsigned", "not null" => "1", "default" => "0", "relation" => array("item" => "id")),
 					"parent-uri" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"extid" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
 					"thr-parent" => array("type" => "varchar(255)", "not null" => "1", "default" => ""),
@@ -1284,7 +1284,7 @@ function db_definition() {
 					"notify-id" => array("type" => "int(11)", "not null" => "1", "default" => "0", "relation" => array("notify" => "id")),
 					"master-parent-item" => array("type" => "int(10) unsigned", "not null" => "1", "default" => "0", "relation" => array("item" => "id")),
 					"parent-item" => array("type" => "int(10) unsigned", "not null" => "1", "default" => "0"),
-					"receiver-uid" => array("type" => "int(11)", "not null" => "1", "default" => "0", "relation" => array("user" => "id")),
+					"receiver-uid" => array("type" => "int(11)", "not null" => "1", "default" => "0", "relation" => array("user" => "uid")),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
