@@ -3284,16 +3284,16 @@ $called_api = null;
 	 * @return string
 	 */
 	function api_fr_photoalbum_delete($type) {
-		if (api_user()===false)
+		if (api_user() === false) {
 			throw new ForbiddenException();
-
+		}
 		// input params
 		$album = (x($_REQUEST,'album') ? $_REQUEST['album'] : "");
 
 		// we do not allow calls without album string
-		if ($album == "")
+		if ($album == "") {
 			throw new BadRequestException("no albumname specified");
-
+		}
 		// check if album is existing
 		$r = q("SELECT DISTINCT `resource-id` FROM `photo` WHERE `uid` = %d AND `album` = '%s'",
 				intval(api_user()),
@@ -3309,9 +3309,9 @@ $called_api = null;
 						dbesc($rr['resource-id'])
 						);
 
-			if (!dbm::is_result($photo_item))
+			if (!dbm::is_result($photo_item)) {
 				throw new InternalServerErrorException("problem with deleting items occured");
-
+			}
 			drop_item($photo_item[0]['id'],false);
 		}
 
@@ -3324,9 +3324,8 @@ $called_api = null;
 		if ($result) {
 			$answer = array('result' => 'deleted', 'message' => 'album `' . $album . '` with all containing photos has been deleted.');
 			return api_format_data("photoalbum_delete", $type, array('$result' => $answer));
-		}
-		else {
-			throw new BadRequestException("unknown error");
+		} else {
+			throw new BadRequestException("unknown error - deleting from database failed");
 		}
 
 	}
@@ -3338,26 +3337,27 @@ $called_api = null;
 	 * @return string
 	 */
 	function api_fr_photoalbum_update($type) {
-		if (api_user()===false)
+		if (api_user() === false) {
 			throw new ForbiddenException();
-
+		}
 		// input params
 		$album = (x($_REQUEST,'album') ? $_REQUEST['album'] : "");
 		$album_new = (x($_REQUEST,'album_new') ? $_REQUEST['album_new'] : "");
 
 		// we do not allow calls without album string
-		if ($album == "")
+		if ($album == "") {
 			throw new BadRequestException("no albumname specified");
-		if ($album_new == "")
+		}
+		if ($album_new == "") {
 			throw new BadRequestException("no new albumname specified");
-
+		}
 		// check if album is existing
 		$r = q("SELECT * FROM `photo` WHERE `uid` = %d AND `album` = '%s'",
 				intval(api_user()),
 				dbesc($album));
-		if (!dbm::is_result($r))
+		if (!dbm::is_result($r)) {
 			throw new BadRequestException("album not available");
-
+		}
 		// now let's update all photos to the albumname
 		$result = q("UPDATE `photo` SET `album` = '%s' WHERE `uid` = %d AND `album` = '%s'",
 				dbesc($album_new),
@@ -3368,9 +3368,8 @@ $called_api = null;
 		if ($result) {
 			$answer = array('result' => 'updated', 'message' => 'album `' . $album . '` with all containing photos has been renamed to `' . $album_new . '`.');
 			return api_format_data("photoalbum_update", $type, array('$result' => $answer));
-		}
-		else {
-			throw new BadRequestException("unknown error");
+		} else {
+			throw new BadRequestException("unknown error - updating in database failed");
 		}
 	}
 
@@ -3382,10 +3381,12 @@ $called_api = null;
 	 * @return string
 	 */
 	function api_fr_photos_list($type) {
-		if (api_user()===false) throw new ForbiddenException();
-		$r = q("select `resource-id`, max(scale) as scale, album, filename, type, max(created) as created,
-				max(edited) as edited, max(`desc`) as `desc` from photo
-				where uid = %d and album != 'Contact Photos' group by `resource-id`",
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
+		$r = q("SELECT `resource-id`, MAX(scale) AS `scale`, `album`, `filename`, `type`, MAX(`created`) AS `created`,
+				MAX(`edited`) AS `edited`, MAX(`desc`) AS `desc` FROM `photo`
+				WHERE `uid` = %d AND `album` != 'Contact Photos' GROUP BY `resource-id`",
 			intval(local_user())
 		);
 		$typetoext = array(
@@ -3394,27 +3395,27 @@ $called_api = null;
 		'image/gif' => 'gif'
 		);
 		$data = array('photo'=>array());
-		if ($r) {
+		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				$photo = array();
 				$photo['id'] = $rr['resource-id'];
 				$photo['album'] = $rr['album'];
 				$photo['filename'] = $rr['filename'];
 				$photo['type'] = $rr['type'];
-				$thumb = App::get_baseurl()."/photo/".$rr['resource-id']."-".$rr['scale'].".".$typetoext[$rr['type']];
+				$thumb = App::get_baseurl() . "/photo/" . $rr['resource-id'] . "-" . $rr['scale'] . "." . $typetoext[$rr['type']];
 				$photo['created'] = $rr['created'];
 				$photo['edited'] = $rr['edited'];
 				$photo['desc'] = $rr['desc'];
 
-				if ($type == "xml")
+				if ($type == "xml") {
 					$data['photo'][] = array("@attributes" => $photo, "1" => $thumb);
-				else {
+				} else {
 					$photo['thumb'] = $thumb;
 					$data['photo'][] = $photo;
 				}
 			}
 		}
-		return  api_format_data("photos", $type, $data);
+		return api_format_data("photos", $type, $data);
 	}
 
 	/**
@@ -3424,9 +3425,9 @@ $called_api = null;
 	 * @return string
 	 */
 	function api_fr_photo_create_update($type) {
-		if (api_user()===false)
+		if (api_user() === false) {
 			throw new ForbiddenException();
-
+		}
 		// input params
 		$photo_id = (x($_REQUEST, 'photo_id') ? $_REQUEST['photo_id'] : null);
 		$desc = (x($_REQUEST, 'desc') ? $_REQUEST['desc'] : (array_key_exists('desc', $_REQUEST) ? "" : null)); // extra check necessary to distinguish between 'not provided' and 'empty string'
@@ -3440,15 +3441,15 @@ $called_api = null;
 
 		// do several checks on input parameters
 		// we do not allow calls without album string
-		if ($album == null)
+		if ($album == null) {
 			throw new BadRequestException("no albumname specified");
-
+		}
 		// if photo_id == null --> we are uploading a new photo
 		if ($photo_id == null) {
 			$mode = "create";
 
 			// error if no media posted in create-mode
-			if(!x($_FILES,'media')) {
+			if (!x($_FILES,'media')) {
 				// Output error
 				throw new BadRequestException("no media data submitted");
 			}
@@ -3463,30 +3464,30 @@ $called_api = null;
 					intval(api_user()),
 					dbesc($photo_id),
 					dbesc($album));
-			if (!dbm::is_result($r))
+			if (!dbm::is_result($r)) {
 				throw new BadRequestException("photo not available");
+			}
 		}
 
 		// checks on acl strings provided by clients
 		$acl_input_error = false;
-		$acl_input_error |= CheckACLInput($allow_cid);
-		$acl_input_error |= CheckACLInput($deny_cid);
-		$acl_input_error |= CheckACLInput($allow_gid);
-		$acl_input_error |= CheckACLInput($deny_gid);
-		if ($acl_input_error)
+		$acl_input_error |= check_acl_input($allow_cid);
+		$acl_input_error |= check_acl_input($deny_cid);
+		$acl_input_error |= check_acl_input($allow_gid);
+		$acl_input_error |= check_acl_input($deny_gid);
+		if ($acl_input_error) {
 			throw new BadRequestException("acl data invalid");
-
+		}
 		// now let's upload the new media in create-mode
 		if ($mode == "create") {
 			$media = $_FILES['media'];
-			$data = SaveMediaToDatabase("photo", $media, $type, $album, trim($allow_cid), trim($deny_cid), trim($allow_gid), trim($deny_gid), $desc, $visibility);
+			$data = save_media_to_database("photo", $media, $type, $album, trim($allow_cid), trim($deny_cid), trim($allow_gid), trim($deny_gid), $desc, $visibility);
 
 			// return success of updating or error message
 			if (!is_null($data)) {
 				return api_format_data("photo_create", $type, $data);
-			}
-			else {
-				throw new BadRequestException("unknown error");
+			} else {
+				throw new BadRequestException("unknown error - uploading photo failed, see Friendica log for more information");
 			}
 		}
 
@@ -3535,28 +3536,28 @@ $called_api = null;
 				$nothingtodo = true;
 			}
 
-			if(x($_FILES,'media')) {
+			if (x($_FILES,'media')) {
 				$nothingtodo = false;
 				$media = $_FILES['media'];
-				$data = SaveMediaToDatabase("photo", $media, $type, $album, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $desc, 0, $visibility, $photo_id);
-				if (!is_null($data))
+				$data = save_media_to_database("photo", $media, $type, $album, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $desc, 0, $visibility, $photo_id);
+				if (!is_null($data)) {
 					return api_format_data("photo_update", $type, $data);
+				}
 			}
 
 			// return success of updating or error message
 			if ($result) {
 				$answer = array('result' => 'updated', 'message' => 'Image id `' . $photo_id . '` has been updated.');
 				return api_format_data("photo_update", $type, array('$result' => $answer));
-			}
-			else {
+			} else {
 				if ($nothingtodo) {
 					$answer = array('result' => 'cancelled', 'message' => 'Nothing to update for image id `' . $photo_id . '`.');
 					return api_format_data("photo_update", $type, array('$result' => $answer));
 				}
-				throw new BadRequestException("unknown error");
+				throw new BadRequestException("unknown error - update photo entry in database failed");
 			}
 		}
-		throw new BadRequestException("unknown error");
+		throw new BadRequestException("unknown error - this error on uploading or updating a photo should never happen");
 	}
 
 
@@ -3567,25 +3568,25 @@ $called_api = null;
 	 * @return string
 	 */
 	function api_fr_photo_delete($type) {
-		if (api_user()===false)
+		if (api_user() === false) {
 			throw new ForbiddenException();
-
+		}
 		// input params
 		$photo_id = (x($_REQUEST, 'photo_id') ? $_REQUEST['photo_id'] : null);
 
 		// do several checks on input parameters
 		// we do not allow calls without photo id
-		if ($photo_id == null)
+		if ($photo_id == null) {
 			throw new BadRequestException("no photo_id specified");
-
+		}
 		// check if photo is existing in database
 		$r = q("SELECT * FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'",
 				intval(api_user()),
 				dbesc($photo_id)
 			);
-		if (!dbm::is_result($r))
+		if (!dbm::is_result($r)) {
 			throw new BadRequestException("photo not available");
-
+		}
 		// now we can perform on the deletion of the photo
 		$result = q("DELETE FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'",
 				intval(api_user()),
@@ -3599,18 +3600,17 @@ $called_api = null;
 				dbesc($photo_id)
 				);
 
-			if (!dbm::is_result($photo_item))
+			if (!dbm::is_result($photo_item)) {
 				throw new InternalServerErrorException("problem with deleting items occured");
-
+			}
 			// function for setting the items to "deleted = 1" which ensures that comments, likes etc. are not shown anymore
 			// to the user and the contacts of the users (drop_items() do all the necessary magic to avoid orphans in database and federate deletion)
-			drop_item($photo_item[0]['id'],false);
+			drop_item($photo_item[0]['id'], false);
 
 			$answer = array('result' => 'deleted', 'message' => 'photo with id `' . $photo_id . '` has been deleted from server.');
 			return api_format_data("photo_delete", $type, array('$result' => $answer));
-		}
-		else {
-			throw new InternalServerErrorException("unknown error on deleting photo");
+		} else {
+			throw new InternalServerErrorException("unknown error on deleting photo from database table");
 		}
 	}
 
@@ -3622,8 +3622,12 @@ $called_api = null;
 	 * @return string
 	 */
 	function api_fr_photo_detail($type) {
-		if (api_user()===false) throw new ForbiddenException();
-		if(!x($_REQUEST,'photo_id')) throw new BadRequestException("No photo id.");
+		if (api_user() === false) {
+			throw new ForbiddenException();
+		}
+		if (!x($_REQUEST, 'photo_id')) {
+			throw new BadRequestException("No photo id.");
+		}
 
 		$scale = (x($_REQUEST, 'scale') ? intval($_REQUEST['scale']) : false);
 		$photo_id = $_REQUEST['photo_id'];
@@ -3642,14 +3646,14 @@ $called_api = null;
 	 * @return string
 	 */
 	function api_account_update_profile_image($type) {
-		if (api_user()===false)
+		if (api_user() === false) {
 			throw new ForbiddenException();
-
+		}
 		// input params
-		$profileid = (x($_REQUEST,'profile_id') ? $_REQUEST['profile_id'] : 0);
+		$profileid = (x($_REQUEST, 'profile_id') ? $_REQUEST['profile_id'] : 0);
 
 		// error if image data is missing
-		if(!x($_FILES,'image')) {
+		if (!x($_FILES, 'image')) {
 			throw new BadRequestException("no media data submitted");
 		}
 
@@ -3659,8 +3663,9 @@ $called_api = null;
 				intval(api_user()),
 				intval($profileid));
 			// error message if specified profile id is not in database
-			if (!dbm::is_result($r))
+			if (!dbm::is_result($r)) {
 				throw new BadRequestException("profile_id not available");
+			}
 			$is_default_profile = $r['profile'];
 		} else {
 			$is_default_profile = 1;
@@ -3668,27 +3673,27 @@ $called_api = null;
 
 		// get mediadata from image or media (Twitter call api/account/update_profile_image provides image)
 		$media = null;
-		if(x($_FILES, 'image'))
+		if (x($_FILES, 'image')) {
 			$media = $_FILES['image'];
-		elseif(x($_FILES, 'media'))
+		} elseif (x($_FILES, 'media')) {
 			$media = $_FILES['media'];
-
+		}
 		// save new profile image
-		$data = SaveMediaToDatabase("profileimage", $media, $type, t('Profile Photos'), "", "", "", "", "", $is_default_profile);
+		$data = save_media_to_database("profileimage", $media, $type, t('Profile Photos'), "", "", "", "", "", $is_default_profile);
 
 		// get filetype
-		if (is_array($media['type']))
+		if (is_array($media['type'])) {
 			$filetype = $media['type'][0];
-		else
+		} else {
 			$filetype = $media['type'];
-
-		if ($filetype = "image/jpeg")
+		}
+		if ($filetype == "image/jpeg") {
 			$fileext = "jpg";
-		else if ($filetype = "image/png")
+		} elseif ($filetype == "image/png") {
 			$fileext = "png";
-
+		}
 		// change specified profile or all profiles to the new resource-id
-		if($is_default_profile) {
+		if ($is_default_profile) {
 			$r = q("UPDATE `photo` SET `profile` = 0 WHERE `profile` = 1 AND `resource-id` != '%s' AND `uid` = %d",
 				dbesc($data['photo']['id']),
 				intval(local_user())
@@ -3720,18 +3725,17 @@ $called_api = null;
 		// Update global directory in background
 		//$user = api_get_user(get_app());
 		$url = App::get_baseurl() . '/profile/' . get_app()->user['nickname'];
-		if ($url && strlen(get_config('system','directory'))) {
+		if ($url && strlen(get_config('system', 'directory'))) {
 			proc_run(PRIORITY_LOW, "include/directory.php", $url);
 		}
 
-		require_once('include/profile_update.php');
+		require_once 'include/profile_update.php';
 		profile_change();
 
 		// output for client
 		if ($data) {
 			return api_account_verify_credentials($type);
-		}
-		else {
+		} else {
 			// SaveMediaToDatabase failed for some reason
 			throw new InternalServerErrorException("image upload failed");
 		}
@@ -3748,10 +3752,10 @@ $called_api = null;
 	api_register_func('api/account/update_profile_image', 'api_account_update_profile_image', true, API_METHOD_POST);
 
 
-	function CheckACLInput($acl_string) {
-		if ($acl_string == null || $acl_string == " ")
+	function check_acl_input($acl_string) {
+		if ($acl_string == null || $acl_string == " ") {
 			return false;
-
+		}
 		$contact_not_found = false;
 
 		// split <x><y><z> into array of cid's
@@ -3770,52 +3774,53 @@ $called_api = null;
 		return $contact_not_found;
 	}
 
-	function SaveMediaToDatabase($mediatype, $media, $type, $album, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $desc, $profile = 0, $visibility = false, $photo_id = null) {
+	function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $desc, $profile = 0, $visibility = false, $photo_id = null) {
 		$visitor   = 0;
 		$src = "";
 		$filetype = "";
 		$filename = "";
 		$filesize = 0;
 
-		if(is_array($media)) {
-			if (is_array($media['tmp_name']))
+		if (is_array($media)) {
+			if (is_array($media['tmp_name'])) {
 				$src = $media['tmp_name'][0];
-			else
+			} else {
 				$src = $media['tmp_name'];
-
-			if (is_array($media['name']))
+			}
+			if (is_array($media['name'])) {
 				$filename = basename($media['name'][0]);
-			else
+			} else {
 				$filename = basename($media['name']);
-
-			if (is_array($media['size']))
+			}
+			if (is_array($media['size'])) {
 				$filesize = intval($media['size'][0]);
-			else
+			} else {
 				$filesize = intval($media['size']);
-
-			if (is_array($media['type']))
+			}
+			if (is_array($media['type'])) {
 				$filetype = $media['type'][0];
-			else
+			} else {
 				$filetype = $media['type'];
+			}
 		}
 
-		if ($filetype=="")
+		if ($filetype == "") {
 			$filetype=guess_image_type($filename);
-
+		}
 		$imagedata = getimagesize($src);
-		if ($imagedata)
+		if ($imagedata) {
 			$filetype = $imagedata['mime'];
-
-		logger("File upload src: ".$src." - filename: ".$filename.
-			" - size: ".$filesize." - type: ".$filetype, LOGGER_DEBUG);
+		}
+		logger("File upload src: " . $src . " - filename: " . $filename .
+			" - size: " . $filesize . " - type: " . $filetype, LOGGER_DEBUG);
 
 		// check if there was a php upload error
-		if ($filesize == 0 && $media['error'] == 1)
+		if ($filesize == 0 && $media['error'] == 1) {
 			throw new InternalServerErrorException("image size exceeds PHP config settings, file was rejected by server");
-
+		}
 		// check against max upload size within Friendica instance
-		$maximagesize = get_config('system','maximagesize');
-		if(($maximagesize) && ($filesize > $maximagesize)) {
+		$maximagesize = get_config('system', 'maximagesize');
+		if (($maximagesize) && ($filesize > $maximagesize)) {
 			$formattedBytes = formatBytes($maximagesize);
 			throw new InternalServerErrorException("image size exceeds Friendica config setting (uploaded size: $formattedBytes)");
 		}
@@ -3823,7 +3828,7 @@ $called_api = null;
 		// create Photo instance with the data of the image
 		$imagedata = @file_get_contents($src);
 		$ph = new Photo($imagedata, $filetype);
-		if(! $ph->is_valid()) {
+		if (! $ph->is_valid()) {
 			throw new InternalServerErrorException("unable to process image data");
 		}
 
@@ -3832,12 +3837,13 @@ $called_api = null;
 		@unlink($src);
 
 		// check max length of images on server
-		$max_length = get_config('system','max_image_length');
-		if(! $max_length)
+		$max_length = get_config('system', 'max_image_length');
+		if (! $max_length) {
 			$max_length = MAX_IMAGE_LENGTH;
-		if($max_length > 0) {
+		}
+		if ($max_length > 0) {
 			$ph->scaleImage($max_length);
-			logger("File upload: Scaling picture to new size ".$max_length, LOGGER_DEBUG);
+			logger("File upload: Scaling picture to new size " . $max_length, LOGGER_DEBUG);
 		}
 		$width = $ph->getWidth();
 		$height = $ph->getHeight();
@@ -3850,47 +3856,51 @@ $called_api = null;
 			logger("photo upload: starting new photo upload", LOGGER_DEBUG);
 
 			$r =$ph->store(local_user(), $visitor, $hash, $filename, $album, 0, 0, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-			if (! $r)
+			if (! $r) {
 				logger("photo upload: image upload with scale 0 (original size) failed");
-
+			}
 			if($width > 640 || $height > 640) {
 				$ph->scaleImage(640);
 				$r = $ph->store(local_user(),$visitor, $hash, $filename, $album, 1, 0, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-				if (! $r)
+				if (! $r) {
 					logger("photo upload: image upload with scale 1 (640x640) failed");
+				}
 			}
 
-			if($width > 320 || $height > 320) {
+			if ($width > 320 || $height > 320) {
 				$ph->scaleImage(320);
 				$r = $ph->store(local_user(), $visitor, $hash, $filename, $album, 2, 0, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-				if (! $r)
+				if (! $r) {
 					logger("photo upload: image upload with scale 2 (320x320) failed");
+				}
 			}
 			logger("photo upload: new photo upload ended", LOGGER_DEBUG);
-		}
-		elseif ($mediatype == "profileimage") {
+		} elseif ($mediatype == "profileimage") {
 			// upload profile image (scales 4, 5, 6)
 			logger("photo upload: starting new profile image upload", LOGGER_DEBUG);
 
-			if($width > 175 || $height > 175) {
+			if ($width > 175 || $height > 175) {
 				$ph->scaleImage(175);
 				$r = $ph->store(local_user(),$visitor, $hash, $filename, $album, 4, $profile, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-				if (! $r)
+				if (! $r) {
 					logger("photo upload: profile image upload with scale 4 (175x175) failed");
+				}
 			}
 
-			if($width > 80 || $height > 80) {
+			if ($width > 80 || $height > 80) {
 				$ph->scaleImage(80);
 				$r = $ph->store(local_user(),$visitor, $hash, $filename, $album, 5, $profile, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-				if (! $r)
+				if (! $r) {
 					logger("photo upload: profile image upload with scale 5 (80x80) failed");
+				}
 			}
 
-			if($width > 48 || $height > 48) {
+			if ($width > 48 || $height > 48) {
 				$ph->scaleImage(48);
 				$r = $ph->store(local_user(), $visitor, $hash, $filename, $album, 6, $profile, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-				if (! $r)
+				if (! $r) {
 					logger("photo upload: profile image upload with scale 6 (48x48) failed");
+				}
 			}
 			$ph->__destruct();
 			logger("photo upload: new profile image upload ended", LOGGER_DEBUG);
@@ -3898,17 +3908,17 @@ $called_api = null;
 
 		if ($r) {
 			// create entry in 'item'-table on new uploads to enable users to comment/like/dislike the photo
-			if ($photo_id == null && $mediatype == "photo")
-				PostPhotoItem($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $filetype, $visibility);
-
+			if ($photo_id == null && $mediatype == "photo") {
+				post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $filetype, $visibility);
+			}
 			// on success return image data in json/xml format (like /api/friendica/photo does when no scale is given)
 			return prepare_photo_data($type, false, $hash);
-		}
-		else
+		} else {
 			throw new InternalServerErrorException("image upload failed");
+		}
 	}
 
-	function PostPhotoItem($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $filetype, $visibility = false) {
+	function post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $filetype, $visibility = false) {
 		// get data about the api authenticated user
 		$uri = item_new_uri(get_app()->get_hostname(), intval(api_user()));
 		$owner_record = q("SELECT * FROM `contact` WHERE `uid`= %d AND `self` LIMIT 1", intval(api_user()));
@@ -3953,15 +3963,15 @@ $called_api = null;
 	}
 
 	function prepare_photo_data($type, $scale, $photo_id) {
-		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d",intval($scale)));
+		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d", intval($scale)));
 		$data_sql = ($scale === false ? "" : "data, ");
 
 		// added allow_cid, allow_gid, deny_cid, deny_gid to output as string like stored in database
 		// clients needs to convert this in their way for further processing
-		$r = q("select %s `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
+		$r = q("SELECT %s `resource-id`, `created`, `edited`, `title`, `desc`, `album`, `filename`,
 						`type`, `height`, `width`, `datasize`, `profile`, `allow_cid`, `deny_cid`, `allow_gid`, `deny_gid`,
-					    min(`scale`) as minscale, max(`scale`) as maxscale
-				from photo where `uid` = %d and `resource-id` = '%s' %s group by `resource-id`",
+					    MIN(`scale`) AS `minscale`, MAX(`scale`) AS `maxscale`
+				FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' %s GROUP BY `resource-id`",
 			$data_sql,
 			intval(local_user()),
 			dbesc($photo_id),
@@ -3969,13 +3979,13 @@ $called_api = null;
 		);
 
 		$typetoext = array(
-		'image/jpeg' => 'jpg',
-		'image/png' => 'png',
-		'image/gif' => 'gif'
+			'image/jpeg' => 'jpg',
+			'image/png' => 'png',
+			'image/gif' => 'gif'
 		);
 
 		// prepare output data for photo
-		if ($r) {
+		if (dbm::is_result($r)) {
 			$data = array('photo' => $r[0]);
 			$data['photo']['id'] = $data['photo']['resource-id'];
 			if ($scale !== false) {
@@ -3985,16 +3995,17 @@ $called_api = null;
 			}
 			if ($type == "xml") {
 				$data['photo']['links'] = array();
-				for ($k=intval($data['photo']['minscale']); $k<=intval($data['photo']['maxscale']); $k++)
-					$data['photo']['links'][$k.":link"]["@attributes"] = array("type" => $data['photo']['type'],
+				for ($k = intval($data['photo']['minscale']); $k <= intval($data['photo']['maxscale']); $k++) {
+					$data['photo']['links'][$k . ":link"]["@attributes"] = array("type" => $data['photo']['type'],
 											"scale" => $k,
-											"href" => App::get_baseurl()."/photo/".$data['photo']['resource-id']."-".$k.".".$typetoext[$data['photo']['type']]);
+											"href" => App::get_baseurl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']]);
+				}
 			} else {
 				$data['photo']['link'] = array();
 				// when we have profile images we could have only scales from 4 to 6, but index of array always needs to start with 0
 				$i = 0;
-				for ($k=intval($data['photo']['minscale']); $k<=intval($data['photo']['maxscale']); $k++) {
-					$data['photo']['link'][$i] = App::get_baseurl()."/photo/".$data['photo']['resource-id']."-".$k.".".$typetoext[$data['photo']['type']];
+				for ($k = intval($data['photo']['minscale']); $k <= intval($data['photo']['maxscale']); $k++) {
+					$data['photo']['link'][$i] = App::get_baseurl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']];
 					$i++;
 				}
 			}
@@ -4007,7 +4018,7 @@ $called_api = null;
 		}
 
 		// retrieve item element for getting activities (like, dislike etc.) related to photo
-		$item = q("select * from `item` where `uid` = %d and `resource-id` = '%s' and `type` = 'photo'",
+		$item = q("SELECT * FROM `item` WHERE `uid` = %d AND `resource-id` = '%s' AND `type` = 'photo'",
 			intval(local_user()),
 			dbesc($photo_id)
 		);
@@ -4035,7 +4046,7 @@ $called_api = null;
 		if ($type == "xml") {
 			$k = 0;
 			foreach ($commentData as $comment) {
-				$comments[$k++.":comment"] = $comment;
+				$comments[$k++ . ":comment"] = $comment;
 			}
 		} else {
 			foreach ($commentData as $comment) {
