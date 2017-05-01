@@ -520,7 +520,7 @@ class dba {
 				}
 
 				if (!$stmt->execute()) {
-					$errorInfo = self::$dbo->db->errorInfo();
+					$errorInfo = $stmt->errorInfo();
 					self::$dbo->error = $errorInfo[2];
 					self::$dbo->errorno = $errorInfo[1];
 					$retval = false;
@@ -532,8 +532,8 @@ class dba {
 				$stmt = self::$dbo->db->stmt_init();
 
 				if (!$stmt->prepare($sql)) {
-					self::$dbo->error = self::$dbo->db->error;
-					self::$dbo->errorno = self::$dbo->db->errno;
+					self::$dbo->error = $stmt->error;
+					self::$dbo->errorno = $stmt->errno;
 					$retval = false;
 					break;
 				}
