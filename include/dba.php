@@ -812,23 +812,37 @@ class dba {
 		// Is there a relation entry for the table?
 		if (isset(self::$relation[$table])) {
 			foreach (self::$relation[$table] AS $field => $rel_def) {
-				// Fetch all rows that are to be deleted
-				$sql = "SELECT ".self::$dbo->escape($field)." FROM `".$table."` WHERE `".
-					implode("` = ? AND `", array_keys($param))."` = ?";
+				// Currently we only support relations with a single variable
+				if (count($rel_def) > 1) {
+					return false;
+				}
 
-				$retval = false;
-				$data = self::p($sql, $param);
-				while ($row = self::fetch($data)) {
-					foreach ($rel_def AS $rel_table => $rel_field) {
-						// We do a separate delete process per row
+				$rel_field = array_values($rel_def)[0];
+				$rel_table = array_keys($rel_def)[0];
+
+				// When the search field is the relation field, we don't need to fetch the rows
+				// This is useful when the leading record is already deleted in the frontend but the rest is done in the backend
+				if ((count($param) == 1) AND ($field == array_keys($param)[0])) {
+					$retval = self::delete($rel_table, array($rel_field => array_values($param)[0]), true, $callstack);
+					if (!$retval) {
+						return false;
+					}
+				} else {
+					// Fetch all rows that are to be deleted
+					$sql = "SELECT ".self::$dbo->escape($field)." FROM `".$table."` WHERE `".
+					implode("` = ? AND `", array_keys($param))."` = ?";
+					$retval = false;
+					$data = self::p($sql, $param);
+					while ($row = self::fetch($data)) {
+						// We have to do a separate delete process per row
 						$retval = self::delete($rel_table, array($rel_field => $row[$field]), true, $callstack);
 						if (!$retval) {
 							return false;
 						}
 					}
-				}
-				if (!$retval) {
-					return true;
+					if (!$retval) {
+						return true;
+					}
 				}
 			}
 		}
