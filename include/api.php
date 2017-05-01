@@ -4976,7 +4976,6 @@ friendships/exists
 friendships/show
 account/update_location
 account/update_profile_background_image
-account/update_profile_image
 blocks/create
 blocks/destroy
 friendica/profile/update
