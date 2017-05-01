@@ -3325,7 +3325,7 @@ $called_api = null;
 			$answer = array('result' => 'deleted', 'message' => 'album `' . $album . '` with all containing photos has been deleted.');
 			return api_format_data("photoalbum_delete", $type, array('$result' => $answer));
 		} else {
-			throw new BadRequestException("unknown error - deleting from database failed");
+			throw new InternalServerErrorException("unknown error - deleting from database failed");
 		}
 
 	}
@@ -3369,7 +3369,7 @@ $called_api = null;
 			$answer = array('result' => 'updated', 'message' => 'album `' . $album . '` with all containing photos has been renamed to `' . $album_new . '`.');
 			return api_format_data("photoalbum_update", $type, array('$result' => $answer));
 		} else {
-			throw new BadRequestException("unknown error - updating in database failed");
+			throw new InternalServerErrorException("unknown error - updating in database failed");
 		}
 	}
 
@@ -3390,9 +3390,9 @@ $called_api = null;
 			intval(local_user())
 		);
 		$typetoext = array(
-		'image/jpeg' => 'jpg',
-		'image/png' => 'png',
-		'image/gif' => 'gif'
+			'image/jpeg' => 'jpg',
+			'image/png' => 'png',
+			'image/gif' => 'gif'
 		);
 		$data = array('photo'=>array());
 		if (dbm::is_result($r)) {
@@ -3487,7 +3487,7 @@ $called_api = null;
 			if (!is_null($data)) {
 				return api_format_data("photo_create", $type, $data);
 			} else {
-				throw new BadRequestException("unknown error - uploading photo failed, see Friendica log for more information");
+				throw new InternalServerErrorException("unknown error - uploading photo failed, see Friendica log for more information");
 			}
 		}
 
@@ -3554,10 +3554,10 @@ $called_api = null;
 					$answer = array('result' => 'cancelled', 'message' => 'Nothing to update for image id `' . $photo_id . '`.');
 					return api_format_data("photo_update", $type, array('$result' => $answer));
 				}
-				throw new BadRequestException("unknown error - update photo entry in database failed");
+				throw new InternalServerErrorException("unknown error - update photo entry in database failed");
 			}
 		}
-		throw new BadRequestException("unknown error - this error on uploading or updating a photo should never happen");
+		throw new InternalServerErrorException("unknown error - this error on uploading or updating a photo should never happen");
 	}
 
 
