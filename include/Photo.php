@@ -68,7 +68,8 @@ class Photo {
 				$this->image->destroy();
 				return;
 			}
-			imagedestroy($this->image);
+			if (is_resource($this->image))
+				imagedestroy($this->image);
 		}
 	}
 
@@ -324,6 +325,7 @@ class Photo {
 			return;
 		}
 
+		// if script dies at this point check memory_limit setting in php.ini
 		$this->image  = imagerotate($this->image,$degrees,0);
 		$this->width  = imagesx($this->image);
 		$this->height = imagesy($this->image);
@@ -620,7 +622,7 @@ class Photo {
 
 
 
-	public function store($uid, $cid, $rid, $filename, $album, $scale, $profile = 0, $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '') {
+	public function store($uid, $cid, $rid, $filename, $album, $scale, $profile = 0, $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '', $desc = '') {
 
 		$r = q("SELECT `guid` FROM `photo` WHERE `resource-id` = '%s' AND `guid` != '' LIMIT 1",
 			dbesc($rid)
@@ -657,7 +659,8 @@ class Photo {
 				`allow_cid` = '%s',
 				`allow_gid` = '%s',
 				`deny_cid` = '%s',
-				`deny_gid` = '%s'
+				`deny_gid` = '%s',
+				`desc` = '%s'
 				WHERE `id` = %d",
 
 				intval($uid),
@@ -679,12 +682,13 @@ class Photo {
 				dbesc($allow_gid),
 				dbesc($deny_cid),
 				dbesc($deny_gid),
+				dbesc($desc),
 				intval($x[0]['id'])
 			);
 		} else {
 			$r = q("INSERT INTO `photo`
-				(`uid`, `contact-id`, `guid`, `resource-id`, `created`, `edited`, `filename`, type, `album`, `height`, `width`, `datasize`, `data`, `scale`, `profile`, `allow_cid`, `allow_gid`, `deny_cid`, `deny_gid`)
-				VALUES (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, '%s', %d, %d, '%s', '%s', '%s', '%s')",
+				(`uid`, `contact-id`, `guid`, `resource-id`, `created`, `edited`, `filename`, type, `album`, `height`, `width`, `datasize`, `data`, `scale`, `profile`, `allow_cid`, `allow_gid`, `deny_cid`, `deny_gid`, `desc`)
+				VALUES (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, '%s', %d, %d, '%s', '%s', '%s', '%s', '%s')",
 				intval($uid),
 				intval($cid),
 				dbesc($guid),
@@ -703,7 +707,8 @@ class Photo {
 				dbesc($allow_cid),
 				dbesc($allow_gid),
 				dbesc($deny_cid),
-				dbesc($deny_gid)
+				dbesc($deny_gid),
+				dbesc($desc)
 			);
 		}
 
