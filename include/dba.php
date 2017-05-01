@@ -783,80 +783,105 @@ class dba {
 	 * @param boolean $in_commit Internal use: Only do a commit after the last delete
 	 * @param array $callstack Internal use: prevent endless loops
 	 *
-	 * @return boolean was the delete successfull?
+	 * @return boolean|array was the delete successfull? When $in_commit is set: deletion data
 	 */
 	static public function delete($table, $param, $in_commit = false, $callstack = array()) {
+
+		$commands = array();
 
 		// Create a key for the loop prevention
 		$key = $table.':'.implode(':', array_keys($param)).':'.implode(':', $param);
 
 		// We quit when this key already exists in the callstack.
 		if (isset($callstack[$key])) {
-			return true;
+			return $commands;
 		}
 
 		$callstack[$key] = $key;
 
 		$table = self::$dbo->escape($table);
 
+		$commands[$key] = array('table' => $table, 'param' => $param);
+
 		// To speed up the whole process we cache the table relations
 		if (count(self::$relation) == 0) {
 			self::build_relation_data();
 		}
 
-		if (!$in_commit) {
-			self::p("COMMIT");
-			self::p("START TRANSACTION");
-		}
-
 		// Is there a relation entry for the table?
 		if (isset(self::$relation[$table])) {
-			foreach (self::$relation[$table] AS $field => $rel_def) {
-				// When the search field is the relation field, we don't need to fetch the rows
-				// This is useful when the leading record is already deleted in the frontend but the rest is done in the backend
-				if ((count($param) == 1) AND ($field == array_keys($param)[0])) {
-					foreach ($rel_def AS $rel_table => $rel_field) {
-						$retval = self::delete($rel_table, array($rel_field => array_values($param)[0]), true, $callstack);
-						if (!$retval) {
-							return false;
-						}
+			// We only allow a simple "one field" relation.
+			$field = array_keys(self::$relation[$table])[0];
+			$rel_def = array_values(self::$relation[$table])[0];
+
+			// When the search field is the relation field, we don't need to fetch the rows
+			// This is useful when the leading record is already deleted in the frontend but the rest is done in the backend
+			if ((count($param) == 1) AND ($field == array_keys($param)[0])) {
+				foreach ($rel_def AS $rel_table => $rel_field) {
+					$retval = self::delete($rel_table, array($rel_field => array_values($param)[0]), true, $callstack);
+					$commands = array_merge($commands, $retval);
+				}
+			} else {
+				// Fetch all rows that are to be deleted
+				$sql = "SELECT ".self::$dbo->escape($field)." FROM `".$table."` WHERE `".
+				implode("` = ? AND `", array_keys($param))."` = ?";
+				$retval = false;
+				$data = self::p($sql, $param);
+				while ($row = self::fetch($data)) {
+					// Now we accumulate the delete commands
+					$retval = self::delete($table, array($field => $row[$field]), true, $callstack);
+					$commands = array_merge($commands, $retval);
+				}
+
+				// When we don't find data then we don't need to delete it
+				if (is_bool($retval)) {
+					return $in_commit ? $commands : true;
+				}
+				// Since we had split the delete command we don't need the original command anymore
+				unset($commands[$key]);
+			}
+		}
+
+		if (!$in_commit) {
+			// Now we finalize the process
+			self::p("COMMIT");
+			self::p("START TRANSACTION");
+
+			$compacted = array();
+			foreach ($commands AS $command) {
+				if (count($command['param']) > 1) {
+					$sql = "DELETE FROM `".$command['table']."` WHERE `".
+						implode("` = ? AND `", array_keys($command['param']))."` = ?";
+
+					logger(dba::replace_parameters($sql, $command['param']), LOGGER_DATA);
+
+					if (!self::e($sql, $param)) {
+						self::p("ROLLBACK");
+						return false;
 					}
 				} else {
-					// Fetch all rows that are to be deleted
-					$sql = "SELECT ".self::$dbo->escape($field)." FROM `".$table."` WHERE `".
-					implode("` = ? AND `", array_keys($param))."` = ?";
-					$retval = false;
-					$data = self::p($sql, $param);
-					while ($row = self::fetch($data)) {
-						foreach ($rel_def AS $rel_table => $rel_field) {
-							// We have to do a separate delete process per row
-							$retval = self::delete($rel_table, array($rel_field => $row[$field]), true, $callstack);
-							if (!$retval) {
-								return false;
-							}
-						}
-					}
-					if (!$retval) {
-						return true;
+					$value = array_values($command['param'])[0];
+					$compacted[$command['table']][array_keys($command['param'])[0]][$value] = $value;
+				}
+			}
+			foreach ($compacted AS $table => $values) {
+				foreach ($values AS $field => $field_values) {
+					$sql = "DELETE FROM `".$table."` WHERE `".$field."` IN (".
+					substr(str_repeat("?, ", count($field_values)), 0, -2).");";
+
+					logger(dba::replace_parameters($sql, $field_values), LOGGER_DATA);
+
+					if (!self::e($sql, $param)) {
+						self::p("ROLLBACK");
+						return false;
 					}
 				}
 			}
+			self::p("COMMIT");
+			return true;
 		}
 
-		$sql = "DELETE FROM `".$table."` WHERE `".
-			implode("` = ? AND `", array_keys($param))."` = ?";
-
-		$retval = self::e($sql, $param);
-
-		if (!$in_commit) {
-			if ($retval) {
-				self::p("COMMIT");
-			} else {
-				self::p("ROLLBACK");
-			}
-		}
-
-		return $retval;
+		return $commands;
 	}
 
 	/**
