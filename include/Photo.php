@@ -68,8 +68,9 @@ class Photo {
 				$this->image->destroy();
 				return;
 			}
-			if (is_resource($this->image))
+			if (is_resource($this->image)) {
 				imagedestroy($this->image);
+			}
 		}
 	}
 
