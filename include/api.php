@@ -3253,8 +3253,7 @@ $called_api = null;
 		try {
 			$oauth = new FKOAuth1();
 			$r = $oauth->fetch_request_token(OAuthRequest::from_request());
-		}
-		catch (Exception $e) {
+		} catch (Exception $e) {
 			echo "error=" . OAuthUtil::urlencode_rfc3986($e->getMessage());
 			killme();
 		}
@@ -3266,8 +3265,7 @@ $called_api = null;
 		try {
 			$oauth = new FKOAuth1();
 			$r = $oauth->fetch_access_token(OAuthRequest::from_request());
-		}
-		catch (Exception $e) {
+		} catch (Exception $e) {
 			echo "error=". OAuthUtil::urlencode_rfc3986($e->getMessage()); killme();
 		}
 		echo $r;
