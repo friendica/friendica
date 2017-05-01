@@ -768,7 +768,7 @@ class dba {
 		        foreach ($structure['fields'] AS $field => $field_struct) {
 		                if (isset($field_struct['relation'])) {
 		                        foreach ($field_struct['relation'] AS $rel_table => $rel_field) {
-		                                self::$relation[$rel_table][$rel_field][$table] = $field;
+		                                self::$relation[$rel_table][$rel_field][$table][] = $field;
 		                        }
 		                }
 		        }
@@ -817,15 +817,17 @@ class dba {
 			// When the search field is the relation field, we don't need to fetch the rows
 			// This is useful when the leading record is already deleted in the frontend but the rest is done in the backend
 			if ((count($param) == 1) AND ($field == array_keys($param)[0])) {
-				foreach ($rel_def AS $rel_table => $rel_field) {
-					$retval = self::delete($rel_table, array($rel_field => array_values($param)[0]), true, $callstack);
-					$commands = array_merge($commands, $retval);
+				foreach ($rel_def AS $rel_table => $rel_fields) {
+					foreach ($rel_fields AS $rel_field) {
+						$retval = self::delete($rel_table, array($rel_field => array_values($param)[0]), true, $callstack);
+						$commands = array_merge($commands, $retval);
+					}
 				}
 			} else {
 				// Fetch all rows that are to be deleted
 				$sql = "SELECT ".self::$dbo->escape($field)." FROM `".$table."` WHERE `".
 				implode("` = ? AND `", array_keys($param))."` = ?";
-				$retval = false;
+
 				$data = self::p($sql, $param);
 				while ($row = self::fetch($data)) {
 					// Now we accumulate the delete commands
@@ -833,10 +835,6 @@ class dba {
 					$commands = array_merge($commands, $retval);
 				}
 
-				// When we don't find data then we don't need to delete it
-				if (is_bool($retval)) {
-					return $in_commit ? $commands : true;
-				}
 				// Since we had split the delete command we don't need the original command anymore
 				unset($commands[$key]);
 			}
@@ -848,6 +846,7 @@ class dba {
 			self::p("START TRANSACTION");
 
 			$compacted = array();
+			$counter = array();
 			foreach ($commands AS $command) {
 				if (count($command['param']) > 1) {
 					$sql = "DELETE FROM `".$command['table']."` WHERE `".
@@ -860,20 +859,33 @@ class dba {
 						return false;
 					}
 				} else {
+					$key_table = $command['table'];
+					$key_param = array_keys($command['param'])[0];
 					$value = array_values($command['param'])[0];
-					$compacted[$command['table']][array_keys($command['param'])[0]][$value] = $value;
+
+					// Split the SQL queries in chunks of 100 values
+					// We do the $i stuff here to make the code better readable
+					$i = $counter[$key_table][$key_param];
+					if (count($compacted[$key_table][$key_param][$i]) > 100) {
+						++$i;
+					}
+
+					$compacted[$key_table][$key_param][$i][$value] = $value;
+					$counter[$key_table][$key_param] = $i;
 				}
 			}
 			foreach ($compacted AS $table => $values) {
-				foreach ($values AS $field => $field_values) {
-					$sql = "DELETE FROM `".$table."` WHERE `".$field."` IN (".
-					substr(str_repeat("?, ", count($field_values)), 0, -2).");";
+				foreach ($values AS $field => $field_value_list) {
+					foreach ($field_value_list AS $field_values) {
+						$sql = "DELETE FROM `".$table."` WHERE `".$field."` IN (".
+							substr(str_repeat("?, ", count($field_values)), 0, -2).");";
 
-					logger(dba::replace_parameters($sql, $field_values), LOGGER_DATA);
+						logger(dba::replace_parameters($sql, $field_values), LOGGER_DATA);
 
-					if (!self::e($sql, $param)) {
-						self::p("ROLLBACK");
-						return false;
+						if (!self::e($sql, $param)) {
+							self::p("ROLLBACK");
+							return false;
+						}
 					}
 				}
 			}

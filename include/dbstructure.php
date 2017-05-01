@@ -1152,6 +1152,7 @@ function db_definition() {
 					"uid_parenturi" => array("uid","parent-uri(190)"),
 					"uid_contactid_created" => array("uid","contact-id","created"),
 					"authorid_created" => array("author-id","created"),
+					"ownerid" => array("owner-id"),
 					"uid_uri" => array("uid", "uri(190)"),
 					"resource-id" => array("resource-id"),
 					"contactid_allowcid_allowpid_denycid_denygid" => array("contact-id","allow_cid(10)","allow_gid(10)","deny_cid(10)","deny_gid(10)"), //
@@ -1627,6 +1628,9 @@ function db_definition() {
 					"uid_network_created" => array("uid","network","created"),
 					"uid_contactid_commented" => array("uid","contact-id","commented"),
 					"uid_contactid_created" => array("uid","contact-id","created"),
+					"contactid" => array("contact-id"),
+					"ownerid" => array("owner-id"),
+					"authorid" => array("author-id"),
 					"uid_created" => array("uid","created"),
 					"uid_commented" => array("uid","commented"),
 					"uid_wall_created" => array("uid","wall","created"),
