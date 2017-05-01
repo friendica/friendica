@@ -19,14 +19,7 @@ function remove_contact_run($argv, $argc) {
 		return;
 	}
 
-	q("DELETE FROM `item` WHERE `contact-id` = %d", intval($id));
-
-	q("DELETE FROM `photo` WHERE `contact-id` = %d", intval($id));
-
-	q("DELETE FROM `mail` WHERE `contact-id` = %d", intval($id));
-
-	q("DELETE FROM `event` WHERE `cid` = %d", intval($id));
-
-	q("DELETE FROM `queue` WHERE `cid` = %d", intval($id));
+	// Now we delete all the depending table entries
+	dba::delete('contact', array('id' => $id));
 }
 ?>
