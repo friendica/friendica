@@ -1,10 +1,10 @@
 <script>
 	// update pending count //
 	$(function(){
-		$("nav").bind('nav-update',  function(e,data){
+		$("nav").bind('nav-update', function(e,data){
 			var elm = $('#pending-update');
 			var register = $(data).find('register').text();
-			if (register=="0") { register=""; }
+			if (register=="0") { register = ""; }
 			elm.html(register);
 		});
 	});
@@ -14,15 +14,15 @@
 	<h3><a href="{{$admurl}}">{{$admtxt}}</a></h3>
 
 	<ul role="menu">
-		{{foreach $subpages as $name=>$item}}
-			<li role="menuitem" class="{{$item.2}}">
-				<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}"{{/if}}>
-					{{$item.1}}
-					{{if $name=="users"}}
-					 <span id="pending-update" class="badge pull-right"></span>
-					{{/if}}
-				</a>
-			</li>
+		{{foreach $subpages as $name => $item}}
+		<li role="menuitem" class="{{$item.2}}">
+			<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}"{{/if}}>
+				{{$item.1}}
+				{{if $name == "users"}}
+				 <span id="pending-update" class="badge pull-right"></span>
+				{{/if}}
+			</a>
+		</li>
 		{{/foreach}}
 	</ul>
 
@@ -41,13 +41,13 @@
 <div class="widget">
 	<h3>{{$plugadmtxt}}</h3>
 	<ul role="menu">
-	{{foreach $admin.plugins_admin as $name=>$item}}
+		{{foreach $admin.plugins_admin as $name => $item}}
 		<li role="menuitem" class="{{$item.2}}">
 			<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}"{{/if}}>
 				{{$item.1}}
 			</a>
 		</li>
-	{{/foreach}}
+		{{/foreach}}
 	</ul>
 </div>
 {{/if}}
