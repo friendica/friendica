@@ -785,7 +785,7 @@ class dba {
 	 *
 	 * @return boolean|array was the delete successfull? When $in_commit is set: deletion data
 	 */
-	static public function delete($table, $param, $in_commit = false, $callstack = array()) {
+	static public function delete($table, $param, $in_commit = false, &$callstack = array()) {
 
 		$commands = array();
 
@@ -797,7 +797,7 @@ class dba {
 			return $commands;
 		}
 
-		$callstack[$key] = $key;
+		$callstack[$key] = true;
 
 		$table = self::$dbo->escape($table);
 
@@ -824,6 +824,16 @@ class dba {
 					}
 				}
 			} else {
+				// Create a key for preventing double queries
+				$qkey = $field.'-'.$table.':'.implode(':', array_keys($param)).':'.implode(':', $param);
+
+				// We quit when this key already exists in the callstack.
+				if (isset($callstack[$qkey])) {
+					continue;
+				}
+
+				$callstack[$qkey] = true;
+
 				// Fetch all rows that are to be deleted
 				$sql = "SELECT ".self::$dbo->escape($field)." FROM `".$table."` WHERE `".
 				implode("` = ? AND `", array_keys($param))."` = ?";
