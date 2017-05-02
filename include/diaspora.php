@@ -344,13 +344,13 @@ class Diaspora {
 		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				logger("delivering to: ".$rr["username"]);
-				self::dispatch($rr,$msg);
+				self::dispatch($rr, $msg);
 			}
 		} else {
 			// Use a dummy importer to import the data for the public copy
 			// or for comments from unknown people
 			$importer = array("uid" => 0, "page-flags" => PAGE_FREELOVE);
-			$message_id = self::dispatch($importer,$msg);
+			$message_id = self::dispatch($importer, $msg);
 		}
 
 		return $message_id;
@@ -378,7 +378,7 @@ class Diaspora {
 		$type = $fields->getName();
 
 		$social_relay = Config::get('system', 'relay_subscribe', false);
-		if (!$social_relay AND ($type == 'message')) {
+		if (!$social_relay AND (in_array($type, array('status_message', 'reshare')))) {
 			logger("Unwanted message from ".$sender." send by ".$_SERVER["REMOTE_ADDR"]." with ".$_SERVER["HTTP_USER_AGENT"].": ".print_r($msg, true), LOGGER_DEBUG);
 		}
 
@@ -828,17 +828,17 @@ class Diaspora {
 			logger("defining user ".$contact["nick"]." as friend");
 		}
 
-		if (($contact["blocked"]) || ($contact["readonly"]) || ($contact["archive"]))
+		if ($contact["blocked"] || $contact["readonly"] || $contact["archive"]) {
 			return false;
-		if ($contact["rel"] == CONTACT_IS_SHARING || $contact["rel"] == CONTACT_IS_FRIEND)
+		} elseif (($contact["rel"] == CONTACT_IS_SHARING) || ($contact["rel"] == CONTACT_IS_FRIEND)) {
 			return true;
-		if ($contact["rel"] == CONTACT_IS_FOLLOWER)
-			if (($importer["page-flags"] == PAGE_COMMUNITY) OR $is_comment)
-				return true;
-
-		// Messages for the global users are always accepted
-		if ($importer["uid"] == 0)
+		} elseif (($contact["rel"] == CONTACT_IS_FOLLOWER) && ($importer["page-flags"] == PAGE_COMMUNITY)) {
 			return true;
+		}
+		// Messages for the global users and comments are always accepted
+		if (($importer["uid"] == 0) || $is_comment) {
+			return true;
+		}
 
 		return false;
 	}
@@ -1240,7 +1240,7 @@ class Diaspora {
 
 		if (dbm::is_result($item)) {
 			logger("Found user ".$item['uid']." as owner of item ".$guid, LOGGER_DEBUG);
-			$contact = dba::fetch_first("SELECT * FROM `contact` WHERE `self` AND `uid` = ?", $item['uid']);
+			$contact = dba::fetch_first("SELECT `uid`, `page-flags` FROM `contact` WHERE `self` AND `uid` = ?", $item['uid']);
 			if (dbm::is_result($contact)) {
 				$importer = $contact;
 			}
@@ -1625,6 +1625,11 @@ class Diaspora {
 		// But maybe this will be supported in the future, so we will accept it.
 		if (!in_array($parent_type, array("Post", "Comment")))
 			return false;
+
+		// Find the best importer when there was no importer found
+		if ($importer["uid"] == 0) {
+			$importer = self::importer_for_comment($importer, $parent_guid);
+		}
 
 		$contact = self::allowed_contact_by_handle($importer, $sender, true);
 		if (!$contact)
