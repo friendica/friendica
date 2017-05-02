@@ -577,7 +577,7 @@ class dba {
 		}
 
 		if (self::$dbo->errorno != 0) {
-			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error);
+			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".self::replace_parameters($sql, $args));
 		}
 
 		$a->save_timestamp($stamp1, 'database');
@@ -814,6 +814,9 @@ class dba {
 			$field = array_keys(self::$relation[$table])[0];
 			$rel_def = array_values(self::$relation[$table])[0];
 
+			// Create a key for preventing double queries
+			$qkey = $field.'-'.$table.':'.implode(':', array_keys($param)).':'.implode(':', $param);
+
 			// When the search field is the relation field, we don't need to fetch the rows
 			// This is useful when the leading record is already deleted in the frontend but the rest is done in the backend
 			if ((count($param) == 1) AND ($field == array_keys($param)[0])) {
@@ -823,14 +826,8 @@ class dba {
 						$commands = array_merge($commands, $retval);
 					}
 				}
-			} else {
-				// Create a key for preventing double queries
-				$qkey = $field.'-'.$table.':'.implode(':', array_keys($param)).':'.implode(':', $param);
-
-				// We quit when this key already exists in the callstack.
-				if (isset($callstack[$qkey])) {
-					continue;
-				}
+			// We quit when this key already exists in the callstack.
+			} elseif (!isset($callstack[$qkey])) {
 
 				$callstack[$qkey] = true;
 
