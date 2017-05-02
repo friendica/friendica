@@ -829,7 +829,7 @@ class dba {
 
 				// We quit when this key already exists in the callstack.
 				if (isset($callstack[$qkey])) {
-					continue;
+					return false;
 				}
 
 				$callstack[$qkey] = true;
