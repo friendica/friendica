@@ -856,7 +856,12 @@ class Diaspora {
 		$contact = self::contact_by_handle($importer["uid"], $handle);
 		if (!$contact) {
 			logger("A Contact for handle ".$handle." and user ".$importer["uid"]." was not found");
-			return false;
+			// If a contact isn't found, we accept it anyway if it is a comment
+			if ($is_comment) {
+				return $importer;
+			} else {
+				return true;
+			}
 		}
 
 		if (!self::post_allow($importer, $contact, $is_comment)) {
@@ -1111,9 +1116,9 @@ class Diaspora {
 			$cid = $r[0]["id"];
 			$network = $r[0]["network"];
 
-			// We are receiving content from a user that is about to be terminated
+			// We are receiving content from a user that possibly is about to be terminated
 			// This means the user is vital, so we remove a possible termination date.
-			unmark_for_death($contact);
+			unmark_for_death($r[0]);
 		} else {
 			$cid = $contact["id"];
 			$network = NETWORK_DIASPORA;
@@ -1240,7 +1245,7 @@ class Diaspora {
 
 		if (dbm::is_result($item)) {
 			logger("Found user ".$item['uid']." as owner of item ".$guid, LOGGER_DEBUG);
-			$contact = dba::fetch_first("SELECT `uid`, `page-flags` FROM `contact` WHERE `self` AND `uid` = ?", $item['uid']);
+			$contact = dba::fetch_first("SELECT * FROM `contact` WHERE `self` AND `uid` = ?", $item['uid']);
 			if (dbm::is_result($contact)) {
 				$importer = $contact;
 			}
