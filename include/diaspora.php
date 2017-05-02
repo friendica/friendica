@@ -347,15 +347,10 @@ class Diaspora {
 				self::dispatch($rr,$msg);
 			}
 		} else {
-			$social_relay = (bool)Config::get('system', 'relay_subscribe', false);
-
 			// Use a dummy importer to import the data for the public copy
-			if ($social_relay) {
-				$importer = array("uid" => 0, "page-flags" => PAGE_FREELOVE);
-				$message_id = self::dispatch($importer,$msg);
-			} else {
-				logger("Unwanted message from ".$msg["author"]." send by ".$_SERVER["REMOTE_ADDR"]." with ".$_SERVER["HTTP_USER_AGENT"].": ".print_r($msg, true), LOGGER_DEBUG);
-			}
+			// or for comments from unknown people
+			$importer = array("uid" => 0, "page-flags" => PAGE_FREELOVE);
+			$message_id = self::dispatch($importer,$msg);
 		}
 
 		return $message_id;
@@ -381,6 +376,11 @@ class Diaspora {
 		}
 
 		$type = $fields->getName();
+
+		$social_relay = Config::get('system', 'relay_subscribe', false);
+		if (!$social_relay AND ($type == 'message')) {
+			logger("Unwanted message from ".$sender." send by ".$_SERVER["REMOTE_ADDR"]." with ".$_SERVER["HTTP_USER_AGENT"].": ".print_r($msg, true), LOGGER_DEBUG);
+		}
 
 		logger("Received message type ".$type." from ".$sender." for user ".$importer["uid"], LOGGER_DEBUG);
 
@@ -1228,6 +1228,27 @@ class Diaspora {
 	}
 
 	/**
+	 * @brief Find the best importer for a comment
+	 *
+	 * @param array $importer Array of the importer user
+	 * @param string $guid The guid of the item
+	 *
+	 * @return array the importer that fits the best
+	 */
+	private static function importer_for_comment($importer, $guid) {
+		$item = dba::fetch_first("SELECT `uid` FROM `item` WHERE `origin` AND `guid` = ? LIMIT 1", $guid);
+
+		if (dbm::is_result($item)) {
+			logger("Found user ".$item['uid']." as owner of item ".$guid, LOGGER_DEBUG);
+			$contact = dba::fetch_first("SELECT * FROM `contact` WHERE `self` AND `uid` = ?", $item['uid']);
+			if (dbm::is_result($contact)) {
+				$importer = $contact;
+			}
+		}
+		return $importer;
+	}
+
+	/**
 	 * @brief Processes an incoming comment
 	 *
 	 * @param array $importer Array of the importer user
@@ -1254,6 +1275,11 @@ class Diaspora {
 			$thr_uri = self::get_uri_from_guid("", $thread_parent_guid, true);
 		} else {
 			$thr_uri = "";
+		}
+
+		// Find the best importer when there was no importer found
+		if ($importer["uid"] == 0) {
+			$importer = self::importer_for_comment($importer, $parent_guid);
 		}
 
 		$contact = self::allowed_contact_by_handle($importer, $sender, true);
