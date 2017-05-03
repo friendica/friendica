@@ -16,8 +16,8 @@
 use Friendica\App;
 use Friendica\Core\Config;
 
-require_once('boot.php');
-require_once('object/BaseObject.php');
+require_once 'boot.php';
+require_once 'object/BaseObject.php';
 
 $a = new App;
 BaseObject::set_app($a);
@@ -74,7 +74,7 @@ if (!$install) {
 		exit();
 	}
 
-	require_once("include/session.php");
+	require_once 'include/session.php';
 	load_hooks();
 	call_hooks('init_1');
 

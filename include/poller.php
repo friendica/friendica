@@ -91,7 +91,6 @@ function poller_run($argv, $argc){
 		if (time() > ($starttime + 3600))
 			return;
 	}
-
 }
 
 /**

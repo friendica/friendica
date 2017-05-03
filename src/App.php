@@ -375,8 +375,8 @@ class App {
 				include '.htpreconfig.php';
 			}
 
-			if (get_config('config', 'hostname') != '') {
-				$this->hostname = get_config('config', 'hostname');
+			if (Config::get('config', 'hostname') != '') {
+				$this->hostname = Config::get('config', 'hostname');
 			}
 
 			if (!isset($this->hostname) OR ( $this->hostname == '')) {
@@ -386,8 +386,8 @@ class App {
 	}
 
 	function get_hostname() {
-		if (get_config('config', 'hostname') != '') {
-			$this->hostname = get_config('config', 'hostname');
+		if (Config::get('config', 'hostname') != '') {
+			$this->hostname = Config::get('config', 'hostname');
 		}
 
 		return $this->hostname;
@@ -420,7 +420,7 @@ class App {
 	}
 
 	function init_pagehead() {
-		$interval = ((local_user()) ? get_pconfig(local_user(), 'system', 'update_interval') : 40000);
+		$interval = ((local_user()) ? PConfig::get(local_user(), 'system', 'update_interval') : 40000);
 
 		// If the update is 'deactivated' set it to the highest integer number (~24 days)
 		if ($interval < 0) {
@@ -457,12 +457,12 @@ class App {
 			$stylesheet = '$stylesheet';
 		}
 
-		$shortcut_icon = get_config('system', 'shortcut_icon');
+		$shortcut_icon = Config::get('system', 'shortcut_icon');
 		if ($shortcut_icon == '') {
 			$shortcut_icon = 'images/friendica-32.png';
 		}
 
-		$touch_icon = get_config('system', 'touch_icon');
+		$touch_icon = Config::get('system', 'touch_icon');
 		if ($touch_icon == '') {
 			$touch_icon = 'images/friendica-128.png';
 		}
@@ -773,13 +773,13 @@ class App {
 
 		if ($this->is_backend()) {
 			$process = 'backend';
-			$max_processes = get_config('system', 'max_processes_backend');
+			$max_processes = Config::get('system', 'max_processes_backend');
 			if (intval($max_processes) == 0) {
 				$max_processes = 5;
 			}
 		} else {
 			$process = 'frontend';
-			$max_processes = get_config('system', 'max_processes_frontend');
+			$max_processes = Config::get('system', 'max_processes_frontend');
 			if (intval($max_processes) == 0) {
 				$max_processes = 20;
 			}
@@ -845,13 +845,13 @@ class App {
 
 		if ($this->is_backend()) {
 			$process = 'backend';
-			$maxsysload = intval(get_config('system', 'maxloadavg'));
+			$maxsysload = intval(Config::get('system', 'maxloadavg'));
 			if ($maxsysload < 1) {
 				$maxsysload = 50;
 			}
 		} else {
 			$process = 'frontend';
-			$maxsysload = intval(get_config('system', 'maxloadavg_frontend'));
+			$maxsysload = intval(Config::get('system', 'maxloadavg_frontend'));
 			if ($maxsysload < 1) {
 				$maxsysload = 50;
 			}
@@ -957,5 +957,4 @@ class App {
 		}
 		return true;
 	}
-
 }
