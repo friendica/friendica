@@ -1,4 +1,5 @@
 <?php
+
 /** @file boot.php
  *
  * This file defines some global constants and includes the central App class.
@@ -17,23 +18,23 @@
  * easily as email does today.
  */
 
-require_once(__DIR__ . DIRECTORY_SEPARATOR. 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 use Friendica\App;
 use Friendica\Core\Config;
 
-require_once('include/config.php');
-require_once('include/network.php');
-require_once('include/plugin.php');
-require_once('include/text.php');
-require_once('include/datetime.php');
-require_once('include/pgettext.php');
-require_once('include/nav.php');
-require_once('include/cache.php');
-require_once('include/features.php');
-require_once('include/identity.php');
-require_once('update.php');
-require_once('include/dbstructure.php');
+require_once 'include/config.php';
+require_once 'include/network.php';
+require_once 'include/plugin.php';
+require_once 'include/text.php';
+require_once 'include/datetime.php';
+require_once 'include/pgettext.php';
+require_once 'include/nav.php';
+require_once 'include/cache.php';
+require_once 'include/features.php';
+require_once 'include/identity.php';
+require_once 'update.php';
+require_once 'include/dbstructure.php';
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
@@ -51,7 +52,6 @@ define ( 'DB_UPDATE_VERSION',      1222      );
 define ( 'EOL',                    "<br />\r\n"     );
 define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
 
-
 /**
  * @brief Image storage quality.
  *
@@ -62,8 +62,8 @@ define ( 'ATOM_TIME',              'Y-m-d\TH:i:s\Z' );
  * below about 50
  *
  */
-
 define ( 'JPEG_QUALITY',            100  );
+
 /**
  * $a->config['system']['png_quality'] from 0 (uncompressed) to 9
  */
@@ -87,12 +87,10 @@ define ( 'PNG_QUALITY',             8  );
  */
 define ( 'MAX_IMAGE_LENGTH',        -1  );
 
-
 /**
  * Not yet used
  */
-
-define ( 'DEFAULT_DB_ENGINE',  'MyISAM'  );
+define ( 'DEFAULT_DB_ENGINE',  'InnoDB' );
 
 /**
  * @name SSL Policy
@@ -165,7 +163,6 @@ define ( 'CONTACT_IS_FRIEND',   3);
 define ( 'UPDATE_SUCCESS', 0);
 define ( 'UPDATE_FAILED',  1);
 /** @}*/
-
 
 /**
  * @name page/profile types
@@ -292,19 +289,15 @@ $netgroup_ids = array(
 	NETWORK_PHANTOM  => (-127),
 );
 
-
 /**
  * Maximum number of "people who like (or don't like) this"  that we will list by name
  */
-
 define ( 'MAX_LIKERS',    75);
 
 /**
  * Communication timeout
  */
-
 define ( 'ZCURL_TIMEOUT' , (-1));
-
 
 /**
  * @name Notify
@@ -345,8 +338,6 @@ define ( 'TERM_CONVERSATION', 7 );
 
 define ( 'TERM_OBJ_POST',  1 );
 define ( 'TERM_OBJ_PHOTO', 2 );
-
-
 
 /**
  * @name Namespaces
@@ -459,14 +450,13 @@ define('SR_SCOPE_TAGS', 'tags');
 /**
  * Lowest possible date time value
  */
-
 define ('NULL_DATE', '0001-01-01 00:00:00');
-
 
 // Normally this constant is defined - but not if "pcntl" isn't installed
 if (!defined("SIGTERM")) {
 	define("SIGTERM", 15);
 }
+
 /**
  *
  * Reverse the effect of magic_quotes_gpc if it is enabled.
@@ -474,16 +464,13 @@ if (!defined("SIGTERM")) {
  * See http://php.net/manual/en/security.magicquotes.disabling.php
  *
  */
-
 function startup() {
-
 	error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 	set_time_limit(0);
 
 	// This has to be quite large to deal with embedded private photos
 	ini_set('pcre.backtrack_limit', 500000);
-
 
 	if (get_magic_quotes_gpc()) {
 		$process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
@@ -500,7 +487,6 @@ function startup() {
 		}
 		unset($process);
 	}
-
 }
 
 /**
@@ -512,7 +498,6 @@ function get_app() {
 	global $a;
 	return $a;
 }
-
 
 /**
  * @brief Multi-purpose function to check variable state.
@@ -528,7 +513,7 @@ function get_app() {
  *
  * @return bool|int
  */
-function x($s,$k = NULL) {
+function x($s, $k = NULL) {
 	if ($k != NULL) {
 		if ((is_array($s)) && (array_key_exists($k, $s))) {
 			if ($s[$k]) {
@@ -548,7 +533,6 @@ function x($s,$k = NULL) {
 	}
 }
 
-
 /**
  * @brief Called from db initialisation if db is dead.
  */
@@ -558,7 +542,6 @@ function system_unavailable() {
 	killme();
 }
 
-
 function clean_urls() {
 	$a = get_app();
 	return true;
@@ -567,7 +550,7 @@ function clean_urls() {
 function z_path() {
 	$base = App::get_baseurl();
 
-	if (! clean_urls()) {
+	if (!clean_urls()) {
 		$base .= '/?q=';
 	}
 
@@ -594,7 +577,7 @@ function z_root() {
  * @return string
  */
 function absurl($path) {
-	if (strpos($path,'/') === 0) {
+	if (strpos($path, '/') === 0) {
 		return z_path() . $path;
 	}
 	return $path;
@@ -611,17 +594,15 @@ function is_ajax() {
 
 function check_db() {
 
-	$build = get_config('system','build');
-	if (! x($build)) {
-		set_config('system','build',DB_UPDATE_VERSION);
+	$build = get_config('system', 'build');
+	if (!x($build)) {
+		set_config('system', 'build', DB_UPDATE_VERSION);
 		$build = DB_UPDATE_VERSION;
 	}
 	if ($build != DB_UPDATE_VERSION) {
 		proc_run(PRIORITY_CRITICAL, 'include/dbupdate.php');
 	}
-
 }
-
 
 /**
  * Sets the base url for use in cmdline programs which don't have
@@ -629,7 +610,7 @@ function check_db() {
  */
 function check_url(App $a) {
 
-	$url = get_config('system','url');
+	$url = get_config('system', 'url');
 
 	// if the url isn't set or the stored url is radically different
 	// than the currently visited url, store the current value accordingly.
@@ -637,24 +618,23 @@ function check_url(App $a) {
 	// and www.example.com vs example.com.
 	// We will only change the url to an ip address if there is no existing setting
 
-	if (! x($url)) {
-		$url = set_config('system','url',App::get_baseurl());
+	if (!x($url)) {
+		$url = set_config('system', 'url', App::get_baseurl());
 	}
-	if ((! link_compare($url,App::get_baseurl())) && (! preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/",$a->get_hostname))) {
-		$url = set_config('system','url',App::get_baseurl());
+	if ((!link_compare($url, App::get_baseurl())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $a->get_hostname))) {
+		$url = set_config('system', 'url', App::get_baseurl());
 	}
 
 	return;
 }
 
-
 /**
  * @brief Automatic database updates
  */
 function update_db(App $a) {
-	$build = get_config('system','build');
-	if (! x($build)) {
-		$build = set_config('system','build',DB_UPDATE_VERSION);
+	$build = get_config('system', 'build');
+	if (!x($build)) {
+		$build = set_config('system', 'build', DB_UPDATE_VERSION);
 	}
 
 	if ($build != DB_UPDATE_VERSION) {
@@ -665,7 +645,6 @@ function update_db(App $a) {
 
 			// We're reporting a different version than what is currently installed.
 			// Run any existing update scripts to bring the database up to current.
-
 			// make sure that boot.php and update.php are the same release, we might be
 			// updating right this very second and the correct version of the update.php
 			// file may not be here yet. This can happen on a very busy site.
@@ -673,12 +652,12 @@ function update_db(App $a) {
 			if (DB_UPDATE_VERSION == UPDATE_VERSION) {
 				// Compare the current structure with the defined structure
 
-				$t = get_config('database','dbupdate_'.DB_UPDATE_VERSION);
+				$t = get_config('database', 'dbupdate_' . DB_UPDATE_VERSION);
 				if ($t !== false) {
 					return;
 				}
 
-				set_config('database','dbupdate_'.DB_UPDATE_VERSION, time());
+				set_config('database', 'dbupdate_' . DB_UPDATE_VERSION, time());
 
 				// run old update routine (wich could modify the schema and
 				// conflits with new routine)
@@ -702,7 +681,7 @@ function update_db(App $a) {
 					);
 					return;
 				} else {
-					set_config('database','dbupdate_'.DB_UPDATE_VERSION, 'success');
+					set_config('database', 'dbupdate_' . DB_UPDATE_VERSION, 'success');
 				}
 
 				// run any left update_nnnn functions in update.php
@@ -726,15 +705,14 @@ function run_update_function($x) {
 		// We want exactly one process to run the update command.
 		// So store the fact that we're taking responsibility
 		// after first checking to see if somebody else already has.
-
 		// If the update fails or times-out completely you may need to
 		// delete the config entry to try again.
 
-		$t = get_config('database','update_' . $x);
+		$t = get_config('database', 'update_' . $x);
 		if ($t !== false) {
 			return false;
 		}
-		set_config('database','update_' . $x, time());
+		set_config('database', 'update_' . $x, time());
 
 		// call the specific update
 
@@ -749,13 +727,13 @@ function run_update_function($x) {
 			);
 			return false;
 		} else {
-			set_config('database','update_' . $x, 'success');
-			set_config('system','build', $x + 1);
+			set_config('database', 'update_' . $x, 'success');
+			set_config('system', 'build', $x + 1);
 			return true;
 		}
 	} else {
-		set_config('database','update_' . $x, 'success');
-		set_config('system','build', $x + 1);
+		set_config('database', 'update_' . $x, 'success');
+		set_config('system', 'build', $x + 1);
 		return true;
 	}
 	return true;
@@ -784,11 +762,11 @@ function check_plugins(App $a) {
 		$installed = array();
 	}
 
-	$plugins = get_config('system','addon');
+	$plugins = get_config('system', 'addon');
 	$plugins_arr = array();
 
 	if ($plugins) {
-		$plugins_arr = explode(',',str_replace(' ', '',$plugins));
+		$plugins_arr = explode(',', str_replace(' ', '', $plugins));
 	}
 
 	$a->plugins = $plugins_arr;
@@ -797,7 +775,7 @@ function check_plugins(App $a) {
 
 	if (count($installed)) {
 		foreach ($installed as $i) {
-			if (! in_array($i['name'],$plugins_arr)) {
+			if (!in_array($i['name'], $plugins_arr)) {
 				uninstall_plugin($i['name']);
 			} else {
 				$installed_arr[] = $i['name'];
@@ -807,20 +785,18 @@ function check_plugins(App $a) {
 
 	if (count($plugins_arr)) {
 		foreach ($plugins_arr as $p) {
-			if (! in_array($p,$installed_arr)) {
+			if (!in_array($p, $installed_arr)) {
 				install_plugin($p);
 			}
 		}
 	}
-
 
 	load_hooks();
 
 	return;
 }
 
-function get_guid($size=16, $prefix = "") {
-
+function get_guid($size = 16, $prefix = "") {
 	if ($prefix == "") {
 		$a = get_app();
 		$prefix = hash("crc32", $a->get_hostname());
@@ -853,7 +829,7 @@ function get_guid($size=16, $prefix = "") {
  * @hooks 'login_hook'
  *	string $o
  */
-function login($register = false, $hiddens=false) {
+function login($register = false, $hiddens = false) {
 	$a = get_app();
 	$o = "";
 	$reg = false;
@@ -864,14 +840,14 @@ function login($register = false, $hiddens=false) {
 		);
 	}
 
-	$noid = get_config('system','no_openid');
+	$noid = get_config('system', 'no_openid');
 
 	$dest_url = $a->query_string;
 
 	if (local_user()) {
 		$tpl = get_markup_template("logout.tpl");
 	} else {
-		$a->page['htmlhead'] .= replace_macros(get_markup_template("login_head.tpl"),array(
+		$a->page['htmlhead'] .= replace_macros(get_markup_template("login_head.tpl"), array(
 			'$baseurl' => $a->get_baseurl(true)
 		));
 
@@ -905,10 +881,9 @@ function login($register = false, $hiddens=false) {
 
 		'$privacytitle' => t('Website Privacy Policy'),
 		'$privacylink'  => t('privacy policy'),
-
 	));
 
-	call_hooks('login_hook',$o);
+	call_hooks('login_hook', $o);
 
 	return $o;
 }
@@ -917,7 +892,6 @@ function login($register = false, $hiddens=false) {
  * @brief Used to end the current process, after saving session state.
  */
 function killme() {
-
 	if (!get_app()->is_backend()) {
 		session_write_close();
 	}
@@ -930,13 +904,12 @@ function killme() {
  */
 function goaway($s) {
 	if (!strstr(normalise_link($s), "http://")) {
-		$s = App::get_baseurl()."/".$s;
+		$s = App::get_baseurl() . "/" . $s;
 	}
 
 	header("Location: $s");
 	killme();
 }
-
 
 /**
  * @brief Returns the user id of locally logged in user or false.
@@ -979,7 +952,7 @@ function public_contact() {
  * @return int|bool visitor_id or false
  */
 function remote_user() {
-	if ((x($_SESSION,'authenticated')) && (x($_SESSION,'visitor_id'))) {
+	if ((x($_SESSION, 'authenticated')) && (x($_SESSION, 'visitor_id'))) {
 		return intval($_SESSION['visitor_id']);
 	}
 	return false;
@@ -994,7 +967,7 @@ function remote_user() {
  */
 function notice($s) {
 	$a = get_app();
-	if (! x($_SESSION,'sysmsg')) {
+	if (!x($_SESSION, 'sysmsg')) {
 		$_SESSION['sysmsg'] = array();
 	}
 	if ($a->interactive) {
@@ -1012,18 +985,17 @@ function notice($s) {
 function info($s) {
 	$a = get_app();
 
-	if (local_user() AND get_pconfig(local_user(),'system','ignore_info')) {
+	if (local_user() AND get_pconfig(local_user(), 'system', 'ignore_info')) {
 		return;
 	}
 
-	if (! x($_SESSION,'sysmsg_info')) {
+	if (!x($_SESSION, 'sysmsg_info')) {
 		$_SESSION['sysmsg_info'] = array();
 	}
 	if ($a->interactive) {
 		$_SESSION['sysmsg_info'][] = $s;
 	}
 }
-
 
 /**
  * @brief Wrapper around config to limit the text length of an incoming message
@@ -1032,12 +1004,12 @@ function info($s) {
  */
 function get_max_import_size() {
 	$a = get_app();
-	return ((x($a->config,'max_import_size')) ? $a->config['max_import_size'] : 0 );
+	return ((x($a->config, 'max_import_size')) ? $a->config['max_import_size'] : 0 );
 }
 
 /**
  * @brief Wrap calls to proc_close(proc_open()) and call hook
- *	so plugins can take part in process :)
+ * 	so plugins can take part in process :)
  *
  * @param (integer|array) priority or parameter array, $cmd atrings are deprecated and are ignored
  *
@@ -1048,9 +1020,9 @@ function get_max_import_size() {
  * @note $cmd and string args are surrounded with ""
  *
  * @hooks 'proc_run'
- *	array $arr
+ * 	array $arr
  */
-function proc_run($cmd){
+function proc_run($cmd) {
 
 	$a = get_app();
 
@@ -1083,7 +1055,7 @@ function proc_run($cmd){
 	$arr = array('args' => $args, 'run_cmd' => true);
 
 	call_hooks("proc_run", $arr);
-	if (!$arr['run_cmd'] OR !count($args)) {
+	if (!$arr['run_cmd'] OR ! count($args)) {
 		return;
 	}
 
@@ -1105,8 +1077,7 @@ function proc_run($cmd){
 	array_shift($argv);
 
 	$parameters = json_encode($argv);
-	$found = q("SELECT `id` FROM `workerqueue` WHERE `parameter` = '%s'",
-		dbesc($parameters));
+	$found = q("SELECT `id` FROM `workerqueue` WHERE `parameter` = '%s'", dbesc($parameters));
 
 	if (!dbm::is_result($found)) {
 		q("INSERT INTO `workerqueue` (`parameter`, `created`, `priority`)
@@ -1142,7 +1113,7 @@ function proc_run($cmd){
 	$a->proc_run($args);
 }
 
-function current_theme(){
+function current_theme() {
 	$app_base_themes = array('duepuntozero', 'dispy', 'quattro');
 
 	$a = get_app();
@@ -1164,7 +1135,7 @@ function current_theme(){
 	// This works only if the user is on the same server
 
 	if ($page_theme && local_user() && (local_user() != $a->profile_uid)) {
-		if (get_pconfig(local_user(),'system','always_my_theme')) {
+		if (get_pconfig(local_user(), 'system', 'always_my_theme')) {
 			$page_theme = null;
 		}
 	}
@@ -1174,7 +1145,7 @@ function current_theme(){
 	$is_mobile = $a->is_mobile || $a->is_tablet;
 
 	$standard_system_theme = Config::get('system', 'theme', '');
-	$standard_theme_name = ((isset($_SESSION) && x($_SESSION,'theme')) ? $_SESSION['theme'] : $standard_system_theme);
+	$standard_theme_name = ((isset($_SESSION) && x($_SESSION, 'theme')) ? $_SESSION['theme'] : $standard_system_theme);
 
 	if ($is_mobile) {
 		if (isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
@@ -1185,7 +1156,7 @@ function current_theme(){
 			if ($system_theme == '') {
 				$system_theme = $standard_system_theme;
 			}
-			$theme_name = ((isset($_SESSION) && x($_SESSION,'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
+			$theme_name = ((isset($_SESSION) && x($_SESSION, 'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
 
 			if ($theme_name === '---') {
 				// user has selected to have the mobile theme be the same as the normal one
@@ -1207,21 +1178,21 @@ function current_theme(){
 	}
 
 	if ($theme_name &&
-			(file_exists('view/theme/' . $theme_name . '/style.css') ||
-					file_exists('view/theme/' . $theme_name . '/style.php'))) {
+		(file_exists('view/theme/' . $theme_name . '/style.css') ||
+		file_exists('view/theme/' . $theme_name . '/style.php'))) {
 		return($theme_name);
 	}
 
 	foreach ($app_base_themes as $t) {
 		if (file_exists('view/theme/' . $t . '/style.css') ||
-				file_exists('view/theme/' . $t . '/style.php')) {
+			file_exists('view/theme/' . $t . '/style.php')) {
 			return($t);
 		}
 	}
 
-	$fallback = array_merge(glob('view/theme/*/style.css'),glob('view/theme/*/style.php'));
+	$fallback = array_merge(glob('view/theme/*/style.css'), glob('view/theme/*/style.php'));
 	if (count($fallback)) {
-		return (str_replace('view/theme/','', substr($fallback[0],0,-10)));
+		return (str_replace('view/theme/', '', substr($fallback[0], 0, -10)));
 	}
 
 	/// @TODO No final return statement?
@@ -1241,13 +1212,13 @@ function current_theme_url() {
 
 	$opts = (($a->profile_uid) ? '?f=&puid=' . $a->profile_uid : '');
 	if (file_exists('view/theme/' . $t . '/style.php')) {
-		return('view/theme/'.$t.'/style.pcss'.$opts);
+		return('view/theme/' . $t . '/style.pcss' . $opts);
 	}
 
-	return('view/theme/'.$t.'/style.css');
+	return('view/theme/' . $t . '/style.css');
 }
 
-function feed_birthday($uid,$tz) {
+function feed_birthday($uid, $tz) {
 
 	/**
 	 *
@@ -1267,11 +1238,9 @@ function feed_birthday($uid,$tz) {
 	 * 6:00PM the day before, but that will correspond to midnight to the birthday person.
 	 *
 	 */
-
-
 	$birthday = '';
 
-	if (! strlen($tz)) {
+	if (!strlen($tz)) {
 		$tz = 'UTC';
 	}
 
@@ -1280,16 +1249,16 @@ function feed_birthday($uid,$tz) {
 	);
 
 	if (dbm::is_result($p)) {
-		$tmp_dob = substr($p[0]['dob'],5);
+		$tmp_dob = substr($p[0]['dob'], 5);
 		if (intval($tmp_dob)) {
-			$y = datetime_convert($tz,$tz,'now','Y');
+			$y = datetime_convert($tz, $tz, 'now', 'Y');
 			$bd = $y . '-' . $tmp_dob . ' 00:00';
 			$t_dob = strtotime($bd);
-			$now = strtotime(datetime_convert($tz,$tz,'now'));
+			$now = strtotime(datetime_convert($tz, $tz, 'now'));
 			if ($t_dob < $now) {
 				$bd = $y + 1 . '-' . $tmp_dob . ' 00:00';
 			}
-			$birthday = datetime_convert($tz,'UTC',$bd,ATOM_TIME);
+			$birthday = datetime_convert($tz, 'UTC', $bd, ATOM_TIME);
 		}
 	}
 
@@ -1307,7 +1276,7 @@ function is_site_admin() {
 	$adminlist = explode(",", str_replace(" ", "", $a->config['admin_email']));
 
 	//if(local_user() && x($a->user,'email') && x($a->config,'admin_email') && ($a->user['email'] === $a->config['admin_email']))
-	if (local_user() && x($a->user,'email') && x($a->config,'admin_email') && in_array($a->user['email'], $adminlist)) {
+	if (local_user() && x($a->user, 'email') && x($a->config, 'admin_email') && in_array($a->user['email'], $adminlist)) {
 		return true;
 	}
 	return false;
@@ -1329,7 +1298,7 @@ function build_querystring($params, $name = null) {
 			if ($name == null) {
 				$ret .= build_querystring($val, $key);
 			} else {
-				$ret .= build_querystring($val, $name."[$key]");
+				$ret .= build_querystring($val, $name . "[$key]");
 			}
 		} else {
 			$val = urlencode($val);
@@ -1377,10 +1346,10 @@ function explode_querystring($query) {
 }
 
 /**
-* Returns the complete URL of the current page, e.g.: http(s)://something.com/network
-*
-* Taken from http://webcheatsheet.com/php/get_current_page_url.php
-*/
+ * Returns the complete URL of the current page, e.g.: http(s)://something.com/network
+ *
+ * Taken from http://webcheatsheet.com/php/get_current_page_url.php
+ */
 function curPageURL() {
 	$pageURL = 'http';
 	if ($_SERVER["HTTPS"] == "on") {
@@ -1390,9 +1359,9 @@ function curPageURL() {
 	$pageURL .= "://";
 
 	if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
-		$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+		$pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
 	} else {
-		$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+		$pageURL .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
 	}
 	return $pageURL;
 }
@@ -1401,7 +1370,7 @@ function random_digits($digits) {
 	$rn = '';
 	for ($i = 0; $i < $digits; $i++) {
 		/// @TODO rand() is different to mt_rand() and maybe lesser "random"
-		$rn .= rand(0,9);
+		$rn .= rand(0, 9);
 	}
 	return $rn;
 }
@@ -1419,7 +1388,7 @@ function get_server() {
 function get_cachefile($file, $writemode = true) {
 	$cache = get_itemcachepath();
 
-	if ((! $cache) || (! is_dir($cache))) {
+	if ((!$cache) || (!is_dir($cache))) {
 		return("");
 	}
 
@@ -1444,7 +1413,7 @@ function clear_cache($basepath = "", $path = "") {
 		$path = $basepath;
 	}
 
-	if (($path == "") OR (!is_dir($path))) {
+	if (($path == "") OR ( !is_dir($path))) {
 		return;
 	}
 
@@ -1452,19 +1421,19 @@ function clear_cache($basepath = "", $path = "") {
 		return;
 	}
 
-	$cachetime = (int)get_config('system','itemcache_duration');
+	$cachetime = (int) get_config('system', 'itemcache_duration');
 	if ($cachetime == 0) {
 		$cachetime = 86400;
 	}
 
-	if (is_writable($path)){
+	if (is_writable($path)) {
 		if ($dh = opendir($path)) {
 			while (($file = readdir($dh)) !== false) {
-				$fullpath = $path."/".$file;
-				if ((filetype($fullpath) == "dir") and ($file != ".") and ($file != "..")) {
+				$fullpath = $path . "/" . $file;
+				if ((filetype($fullpath) == "dir") and ( $file != ".") and ( $file != "..")) {
 					clear_cache($basepath, $fullpath);
 				}
-				if ((filetype($fullpath) == "file") and (filectime($fullpath) < (time() - $cachetime))) {
+				if ((filetype($fullpath) == "file") and ( filectime($fullpath) < (time() - $cachetime))) {
 					unlink($fullpath);
 				}
 			}
@@ -1475,12 +1444,12 @@ function clear_cache($basepath = "", $path = "") {
 
 function get_itemcachepath() {
 	// Checking, if the cache is deactivated
-	$cachetime = (int)get_config('system','itemcache_duration');
+	$cachetime = (int) get_config('system', 'itemcache_duration');
 	if ($cachetime < 0) {
 		return "";
 	}
 
-	$itemcache = get_config('system','itemcache');
+	$itemcache = get_config('system', 'itemcache');
 	if (($itemcache != "") AND App::directory_usable($itemcache)) {
 		return $itemcache;
 	}
@@ -1488,7 +1457,7 @@ function get_itemcachepath() {
 	$temppath = get_temppath();
 
 	if ($temppath != "") {
-		$itemcache = $temppath."/itemcache";
+		$itemcache = $temppath . "/itemcache";
 		if (!file_exists($itemcache) && !is_dir($itemcache)) {
 			mkdir($itemcache);
 		}
@@ -1507,7 +1476,7 @@ function get_itemcachepath() {
  * @return string Spool path
  */
 function get_spoolpath() {
-	$spoolpath = get_config('system','spoolpath');
+	$spoolpath = get_config('system', 'spoolpath');
 	if (($spoolpath != "") AND App::directory_usable($spoolpath)) {
 		// We have a spool path and it is usable
 		return $spoolpath;
@@ -1518,7 +1487,7 @@ function get_spoolpath() {
 
 	if ($temppath != "") {
 		// To avoid any interferences with other systems we create our own directory
-		$spoolpath = $temppath."/spool";
+		$spoolpath = $temppath . "/spool";
 		if (!is_dir($spoolpath)) {
 			mkdir($spoolpath);
 		}
@@ -1554,7 +1523,7 @@ function get_temppath() {
 	// Check if it is usable
 	if (($temppath != "") AND App::directory_usable($temppath)) {
 		// To avoid any interferences with other systems we create our own directory
-		$new_temppath = $temppath."/".$a->get_hostname();
+		$new_temppath = $temppath . "/" . $a->get_hostname();
 		if (!is_dir($new_temppath)) {
 			/// @TODO There is a mkdir()+chmod() upwards, maybe generalize this (+ configurable) into a function/method?
 			mkdir($new_temppath);
@@ -1600,7 +1569,7 @@ function validate_include(&$file) {
 		return false;
 	}
 
-	$file = str_replace(getcwd()."/", "", $file, $count);
+	$file = str_replace(getcwd() . "/", "", $file, $count);
 	if ($count != 1) {
 		return false;
 	}
@@ -1652,7 +1621,7 @@ function argc() {
  * @return string Value of the argv key
  */
 function argv($x) {
-	if (array_key_exists($x,get_app()->argv)) {
+	if (array_key_exists($x, get_app()->argv)) {
 		return get_app()->argv[$x];
 	}
 
@@ -1669,13 +1638,13 @@ function argv($x) {
  *
  * @param string $module The name of the module (e.g. "network")
  * @return array Of infinite scroll data
- *	'pageno' => $pageno The number of the actual page
- *	'reload_uri' => $reload_uri The URI of the content we have to load
+ * 	'pageno' => $pageno The number of the actual page
+ * 	'reload_uri' => $reload_uri The URI of the content we have to load
  */
 function infinite_scroll_data($module) {
 
-	if (get_pconfig(local_user(),'system','infinite_scroll')
-		AND ($module == "network") AND ($_GET["mode"] != "minimal")) {
+	if (get_pconfig(local_user(), 'system', 'infinite_scroll')
+		AND ( $module == "network") AND ( $_GET["mode"] != "minimal")) {
 
 		// get the page number
 		if (is_string($_GET["page"])) {
@@ -1688,12 +1657,12 @@ function infinite_scroll_data($module) {
 
 		// try to get the uri from which we load the content
 		foreach ($_GET AS $param => $value) {
-			if (($param != "page") AND ($param != "q")) {
+			if (($param != "page") AND ( $param != "q")) {
 				$reload_uri .= "&" . $param . "=" . urlencode($value);
 			}
 		}
 
-		if (($a->page_offset != "") AND !strstr($reload_uri, "&offset=")) {
+		if (($a->page_offset != "") AND ! strstr($reload_uri, "&offset=")) {
 			$reload_uri .= "&offset=" . urlencode($a->page_offset);
 		}
 
