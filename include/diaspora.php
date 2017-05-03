@@ -2380,11 +2380,16 @@ class Diaspora {
 			return false;
 		}
 
+		if (!isset($contact["url"])) {
+			$contact["url"] = $person["url"];
+		}
+
 		$r = q("SELECT `id`, `parent`, `parent-uri`, `author-link` FROM `item` WHERE `guid` = '%s' AND `uid` = %d AND NOT `file` LIKE '%%[%%' LIMIT 1",
 			dbesc($target_guid),
 			intval($importer["uid"])
 		);
 		if (!$r) {
+			logger("Target guid ".$target_guid." was not found for user ".$importer["uid"]);
 			return false;
 		}
 
@@ -2430,7 +2435,7 @@ class Diaspora {
 		$target_type = notags(unxmlify($data->target_type));
 
 		$contact = self::contact_by_handle($importer["uid"], $sender);
-		if (!$contact) {
+		if (!$contact AND (in_array($target_type, array("Contact", "Person")))) {
 			logger("cannot find contact for sender: ".$sender." and user ".$importer["uid"]);
 			return false;
 		}
@@ -2443,7 +2448,7 @@ class Diaspora {
 			case "Post": // "Post" will be supported in a future version
 			case "Reshare":
 			case "StatusMessage":
-				return self::item_retraction($importer, $contact, $data);;
+				return self::item_retraction($importer, $contact, $data);
 
 			case "Contact":
 			case "Person":
