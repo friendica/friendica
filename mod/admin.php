@@ -279,7 +279,7 @@ function admin_page_blocklist(App $a) {
 			$blocklistform[] = array(
 				'domain' => array("domain[$id]", t('Blocked domain'), $b['domain'], '', t('The blocked domain'), 'required', '', ''),
 				'reason' => array("reason[$id]", t("Reason for the block"), $b['reason'], t('The reason why you blocked this domain.').'('.$b['domain'].')', 'required', '', ''),
-				'delete' => array("delete[$id]", t("Delete domain").' ('.$b['domain'].')', False , "Check to delete this entry from the blocklist")
+				'delete' => array("delete[$id]", t("Delete domain").' ('.$b['domain'].')', False , t("Check to delete this entry from the blocklist"))
 			);
 		}
 	}
