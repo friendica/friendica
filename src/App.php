@@ -40,6 +40,7 @@ class App {
 	public $module;
 	public $pager;
 	public $strings;
+	public $basepath;
 	public $path;
 	public $hooks;
 	public $timezone;
@@ -112,8 +113,10 @@ class App {
 
 	/**
 	 * @brief App constructor.
+	 *
+	 * @param string $basepath Path to the app base folder
 	 */
-	function __construct() {
+	function __construct($basepath) {
 
 		global $default_timezone;
 
@@ -154,13 +157,6 @@ class App {
 
 		startup();
 
-		set_include_path(
-			get_include_path() . PATH_SEPARATOR
-			. 'include' . PATH_SEPARATOR
-			. 'library' . PATH_SEPARATOR
-			. 'library/langdet' . PATH_SEPARATOR
-			. '.');
-
 		$this->scheme = 'http';
 
 		if ((x($_SERVER, 'HTTPS') && $_SERVER['HTTPS']) ||
@@ -194,6 +190,20 @@ class App {
 		if ($hostname != '') {
 			$this->hostname = $hostname;
 		}
+
+		if (! static::directory_usable($basepath)) {
+			throw new Exception('Basepath ' . $basepath . ' isn\'t usable.');
+		}
+
+		$this->basepath = rtrim($basepath, DIRECTORY_SEPARATOR);
+
+		set_include_path(
+			get_include_path() . PATH_SEPARATOR
+			. $this->basepath . DIRECTORY_SEPARATOR . 'include' . PATH_SEPARATOR
+			. $this->basepath . DIRECTORY_SEPARATOR . 'library' . PATH_SEPARATOR
+			. $this->basepath . DIRECTORY_SEPARATOR . 'library/langdet' . PATH_SEPARATOR
+			. $this->basepath);
+
 
 		if (is_array($_SERVER['argv']) && $_SERVER['argc'] > 1 && substr(end($_SERVER['argv']), 0, 4) == 'http') {
 			$this->set_baseurl(array_pop($_SERVER['argv']));
@@ -284,18 +294,28 @@ class App {
 		self::$a = $this;
 	}
 
+	/**
+	 * @brief Returns the base filesystem path of the App
+	 *
+	 * It first checks for the internal variable, then for DOCUMENT_ROOT and
+	 * finally for PWD
+	 *
+	 * @return string
+	 */
 	public static function get_basepath() {
-		$basepath = get_config('system', 'basepath');
-
-		if ($basepath == '') {
-			$basepath = dirname(__FILE__);
+		if (isset($this)) {
+			$basepath = $this->basepath;
 		}
 
-		if ($basepath == '') {
+		if (! $basepath) {
+			$basepath = Config::get('system', 'basepath');
+		}
+
+		if (! $basepath && x($_SERVER, 'DOCUMENT_ROOT')) {
 			$basepath = $_SERVER['DOCUMENT_ROOT'];
 		}
 
-		if ($basepath == '') {
+		if (! $basepath && x($_SERVER, 'PWD')) {
 			$basepath = $_SERVER['PWD'];
 		}
 
@@ -900,10 +920,10 @@ class App {
 			return;
 		}
 
-		if (get_config('system', 'proc_windows')) {
-			$resource = proc_open('cmd /c start /b ' . $cmdline, array(), $foo, dirname(__FILE__));
+		if (Config::get('system', 'proc_windows')) {
+			$resource = proc_open('cmd /c start /b ' . $cmdline, array(), $foo, $this->get_basepath());
 		} else {
-			$resource = proc_open($cmdline . ' &', array(), $foo, dirname(__FILE__));
+			$resource = proc_open($cmdline . ' &', array(), $foo, $this->get_basepath());
 		}
 		if (!is_resource($resource)) {
 			logger('We got no resource for command ' . $cmdline, LOGGER_DEBUG);

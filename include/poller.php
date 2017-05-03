@@ -3,29 +3,30 @@
 use Friendica\App;
 use Friendica\Core\Config;
 
-if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
+if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
 
-	if (substr($directory, 0, 1) != "/")
-		$directory = $_SERVER["PWD"]."/".$directory;
+	if (substr($directory, 0, 1) != "/") {
+		$directory = $_SERVER["PWD"] . "/" . $directory;
+	}
 
-	$directory = realpath($directory."/..");
+	$directory = realpath($directory . "/..");
 
 	chdir($directory);
 }
 
-require_once("boot.php");
+require_once "boot.php";
 
 function poller_run($argv, $argc){
 	global $a, $db;
 
 	if (is_null($a)) {
-		$a = new App;
+		$a = new App(dirname(__DIR__));
 	}
 
 	if (is_null($db)) {
-		@include(".htconfig.php");
-		require_once("include/dba.php");
+		@include ".htconfig.php";
+		require_once "include/dba.php";
 		$db = new dba($db_host, $db_user, $db_pass, $db_data);
 		unset($db_host, $db_user, $db_pass, $db_data);
 	};
