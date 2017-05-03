@@ -25,10 +25,19 @@ class dba {
 	private static $dbo;
 	private static $relation = array();
 
-	function __construct($server, $user, $pass, $db, $install = false) {
+	function __construct($serveraddr, $user, $pass, $db, $install = false) {
 		$a = get_app();
 
 		$stamp1 = microtime(true);
+
+		$serveraddr = trim($serveraddr);
+
+		$serverdata = explode(':', $serveraddr);
+		$server = $serverdata[0];
+
+		if (count($serverdata) > 1) {
+			$port = trim($serverdata[1]);
+		}
 
 		$server = trim($server);
 		$user = trim($user);
@@ -55,6 +64,11 @@ class dba {
 		if (class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
 			$this->driver = 'pdo';
 			$connect = "mysql:host=".$server.";dbname=".$db;
+
+			if (isset($port)) {
+				$connect .= ";port=".$port;
+			}
+
 			if (isset($a->config["system"]["db_charset"])) {
 				$connect .= ";charset=".$a->config["system"]["db_charset"];
 			}
@@ -64,7 +78,7 @@ class dba {
 			}
 		} elseif (class_exists('mysqli')) {
 			$this->driver = 'mysqli';
-			$this->db = @new mysqli($server,$user,$pass,$db);
+			$this->db = @new mysqli($server, $user, $pass, $db, $port);
 			if (!mysqli_connect_errno()) {
 				$this->connected = true;
 
@@ -74,8 +88,8 @@ class dba {
 			}
 		} elseif (function_exists('mysql_connect')) {
 			$this->driver = 'mysql';
-			$this->db = mysql_connect($server,$user,$pass);
-			if ($this->db && mysql_select_db($db,$this->db)) {
+			$this->db = mysql_connect($serveraddr, $user, $pass);
+			if ($this->db && mysql_select_db($db, $this->db)) {
 				$this->connected = true;
 
 				if (isset($a->config["system"]["db_charset"])) {
@@ -553,9 +567,10 @@ class dba {
 					$values[] = &$args[$param];
 				}
 
-				array_unshift($values, $params);
-
-				call_user_func_array(array($stmt, 'bind_param'), $values);
+				if (count($values) > 0) {
+					array_unshift($values, $params);
+					call_user_func_array(array($stmt, 'bind_param'), $values);
+				}
 
 				if (!$stmt->execute()) {
 					self::$dbo->error = self::$dbo->db->error;
