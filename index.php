@@ -19,7 +19,7 @@ use Friendica\Core\Config;
 require_once 'boot.php';
 require_once 'object/BaseObject.php';
 
-$a = new App;
+$a = new App(__DIR__);
 BaseObject::set_app($a);
 
 // We assume that the index.php is called by a frontend process

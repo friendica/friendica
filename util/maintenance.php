@@ -5,7 +5,7 @@ use Friendica\Core\Config;
 
 require_once("boot.php");
 
-$a = new App;
+$a = new App(dirname(__DIR__));
 @include(".htconfig.php");
 
 $lang = get_browser_language();
