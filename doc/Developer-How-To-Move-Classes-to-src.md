@@ -99,6 +99,9 @@ Howevever, this tool isn't bullet-proof, and a staging install of Friendica is r
 
 Most of Friendica processes are run in the background, so make sure to turn on your debug log to check for errors that wouldn't show up while simply browsing Friendica.
 
+Check the class file for any magic constant `__FILE__` or `__DIR__`, as their value changed since you moved the class in the file tree.
+Most of the time it's used for debugging purposes but there can be instances where it's used to create cache folders for example.
+
 ## Related
 
 * [Class autoloading](help/autoloader)
