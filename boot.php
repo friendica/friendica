@@ -1413,7 +1413,7 @@ function clear_cache($basepath = "", $path = "") {
 		$path = $basepath;
 	}
 
-	if (($path == "") OR ( !is_dir($path))) {
+	if (($path == "") OR (!is_dir($path))) {
 		return;
 	}
 
@@ -1430,10 +1430,10 @@ function clear_cache($basepath = "", $path = "") {
 		if ($dh = opendir($path)) {
 			while (($file = readdir($dh)) !== false) {
 				$fullpath = $path . "/" . $file;
-				if ((filetype($fullpath) == "dir") and ( $file != ".") and ( $file != "..")) {
+				if ((filetype($fullpath) == "dir") and ($file != ".") and ($file != "..")) {
 					clear_cache($basepath, $fullpath);
 				}
-				if ((filetype($fullpath) == "file") and ( filectime($fullpath) < (time() - $cachetime))) {
+				if ((filetype($fullpath) == "file") and (filectime($fullpath) < (time() - $cachetime))) {
 					unlink($fullpath);
 				}
 			}
@@ -1644,7 +1644,7 @@ function argv($x) {
 function infinite_scroll_data($module) {
 
 	if (get_pconfig(local_user(), 'system', 'infinite_scroll')
-		AND ( $module == "network") AND ( $_GET["mode"] != "minimal")) {
+		AND ($module == "network") AND ($_GET["mode"] != "minimal")) {
 
 		// get the page number
 		if (is_string($_GET["page"])) {
@@ -1657,7 +1657,7 @@ function infinite_scroll_data($module) {
 
 		// try to get the uri from which we load the content
 		foreach ($_GET AS $param => $value) {
-			if (($param != "page") AND ( $param != "q")) {
+			if (($param != "page") AND ($param != "q")) {
 				$reload_uri .= "&" . $param . "=" . urlencode($value);
 			}
 		}
