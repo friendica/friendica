@@ -381,6 +381,7 @@ class Diaspora {
 	 *
 	 * @param array $importer Array of the importer user
 	 * @param array $msg The post that will be dispatched
+	 * @param object $fields SimpleXML object that contains the message
 	 *
 	 * @return int The message id of the generated message, "true" or "false" if there was an error
 	 */
@@ -458,9 +459,8 @@ class Diaspora {
 	 * It also does the conversion between the old and the new diaspora format.
 	 *
 	 * @param array $msg Array with the XML, the sender handle and the sender signature
-	 * @param object $fields SimpleXML object that contains the posting when it is valid
 	 *
-	 * @return bool Is the posting valid?
+	 * @return bool|array If the posting is valid then an array with an SimpleXML object is returned
 	 */
 	private static function valid_posting($msg) {
 
@@ -557,9 +557,9 @@ class Diaspora {
 			}
 
 		// Only some message types have signatures. So we quit here for the other types.
-		if (!in_array($type, array("comment", "message", "like")))
+		if (!in_array($type, array("comment", "message", "like"))) {
 			return array("fields" => $fields, "relayed" => false);
-
+		}
 		// No author_signature? This is a must, so we quit.
 		if (!isset($author_signature)) {
 			logger("No author signature for type ".$type." - Message: ".$msg["message"], LOGGER_DEBUG);
@@ -584,8 +584,9 @@ class Diaspora {
 		if (!rsa_verify($signed_data, $author_signature, $key, "sha256")) {
 			logger("No valid author signature for author ".$fields->author. " in type ".$type." - signed data: ".$signed_data." - Message: ".$msg["message"]." - Signature ".$author_signature, LOGGER_DEBUG);
 			return false;
-		} else
+		} else {
 			return array("fields" => $fields, "relayed" => $relayed);
+		}
 	}
 
 	/**
