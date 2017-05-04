@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 // Tired of chasing typos and finding them after a commit.
@@ -18,6 +19,16 @@ if (x($a->config, 'php_path')) {
 	$phpath = $a->config['php_path'];
 } else {
 	$phpath = 'php';
+}
+
+echo 'Directory: src' . PHP_EOL;
+$Iterator = new RecursiveDirectoryIterator('src');
+
+foreach (new RecursiveIteratorIterator($Iterator) as $file) {
+	if (substr($file, -4) === '.php') {
+		passthru("$phpath -l $file", $ret);
+		$ret === 0 or die();
+	}
 }
 
 echo "Directory: mod\n";
@@ -52,7 +63,6 @@ foreach ($dirs as $dir) {
 		$ret === 0 or die();
 	}
 }
-
 
 echo "String files\n";
 
