@@ -526,6 +526,15 @@ $called_api = null;
 			}
 		}
 
+		if (is_null($user) && x($_GET, 'profileurl')) {
+			$user = dbesc(normalise_link($_GET['profileurl']));
+			$nick = $user;
+			$extra_query = "AND `contact`.`nurl` = '%s' ";
+			if (api_user() !== false) {
+				$extra_query .= "AND `contact`.`uid`=".intval(api_user());
+			}
+		}
+
 		if (is_null($user) AND ($a->argc > (count($called_api) - 1)) AND (count($called_api) > 0)) {
 			$argid = count($called_api);
 			list($user, $null) = explode(".", $a->argv[$argid]);
@@ -1401,6 +1410,7 @@ $called_api = null;
 
 	/// @TODO move to top of file or somewhere better
 	api_register_func('api/users/show','api_users_show');
+	api_register_func('api/externalprofile/show','api_users_show');
 
 	function api_users_search($type) {
 
