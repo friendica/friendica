@@ -4,21 +4,22 @@
  */
 
 use Friendica\App;
+use \Friendica\Core\Config;
 
-require_once("include/Contact.php");
-require_once("include/threads.php");
-require_once("include/html2bbcode.php");
-require_once("include/bbcode.php");
-require_once("include/items.php");
-require_once("mod/share.php");
-require_once("include/enotify.php");
-require_once("include/socgraph.php");
-require_once("include/Photo.php");
-require_once("include/Scrape.php");
-require_once("include/follow.php");
-require_once("include/api.php");
-require_once("mod/proxy.php");
-require_once("include/xml.php");
+require_once "include/Contact.php";
+require_once "include/threads.php";
+require_once "include/html2bbcode.php";
+require_once "include/bbcode.php";
+require_once "include/items.php";
+require_once "mod/share.php";
+require_once "include/enotify.php";
+require_once "include/socgraph.php";
+require_once "include/Photo.php";
+require_once "include/Scrape.php";
+require_once "include/follow.php";
+require_once "include/api.php";
+require_once "mod/proxy.php";
+require_once "include/xml.php";
 
 /**
  * @brief This class contain functions for the OStatus protocol
@@ -81,26 +82,43 @@ class ostatus {
 		$author = array();
 		$author["author-link"] = $xpath->evaluate('atom:author/atom:uri/text()', $context)->item(0)->nodeValue;
 		$author["author-name"] = $xpath->evaluate('atom:author/atom:name/text()', $context)->item(0)->nodeValue;
+		$addr = $xpath->evaluate('atom:author/atom:email/text()', $context)->item(0)->nodeValue;
 
 		$aliaslink = $author["author-link"];
 
 		$alternate = $xpath->query("atom:author/atom:link[@rel='alternate']", $context)->item(0)->attributes;
 		if (is_object($alternate)) {
-			foreach($alternate AS $attributes) {
-				if ($attributes->name == "href") {
+			foreach ($alternate as $attributes) {
+				if (($attributes->name == "href") && ($attributes->textContent != "")) {
 					$author["author-link"] = $attributes->textContent;
 				}
 			}
 		}
 
-		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` IN ('%s', '%s') AND `network` != '%s'",
-			intval($importer["uid"]), dbesc(normalise_link($author["author-link"])),
-			dbesc(normalise_link($aliaslink)), dbesc(NETWORK_STATUSNET));
-		if (dbm::is_result($r)) {
-			$contact = $r[0];
-			$author["contact-id"] = $r[0]["id"];
-		} else {
-			$author["contact-id"] = $contact["id"];
+		$author["contact-id"] = $contact["id"];
+
+		if ($author["author-link"] != "") {
+			if ($aliaslink == "") {
+				$aliaslink = $author["author-link"];
+			}
+
+			$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` IN ('%s', '%s') AND `network` != '%s'",
+				intval($importer["uid"]), dbesc(normalise_link($author["author-link"])),
+				dbesc(normalise_link($aliaslink)), dbesc(NETWORK_STATUSNET));
+			if (dbm::is_result($r)) {
+				$contact = $r[0];
+				$author["contact-id"] = $r[0]["id"];
+				$author["author-link"] = $r[0]["url"];
+			}
+		} elseif ($addr != "") {
+			// Should not happen
+			$contact = dba::fetch_first("SELECT * FROM `contact` WHERE `uid` = ? AND `addr` = ? AND `network` != ?",
+					$importer["uid"], $addr, NETWORK_STATUSNET);
+
+			if (dbm::is_result($contact)) {
+				$author["contact-id"] = $contact["id"];
+				$author["author-link"] = $contact["url"];
+			}
 		}
 
 		$avatarlist = array();
@@ -150,24 +168,29 @@ class ostatus {
 			//	$contact["poll"] = $value;
 
 			$value = $xpath->evaluate('atom:author/atom:uri/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["alias"] = $value;
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:displayName/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["name"] = $value;
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:preferredUsername/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["nick"] = $value;
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:note/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["about"] = html2bbcode($value);
+			}
 
 			$value = $xpath->evaluate('atom:author/poco:address/poco:formatted/text()', $context)->item(0)->nodeValue;
-			if ($value != "")
+			if ($value != "") {
 				$contact["location"] = $value;
+			}
 
 			if (($contact["name"] != $r[0]["name"]) OR ($contact["nick"] != $r[0]["nick"]) OR ($contact["about"] != $r[0]["about"]) OR
 				($contact["alias"] != $r[0]["alias"]) OR ($contact["location"] != $r[0]["location"])) {
@@ -224,8 +247,9 @@ class ostatus {
 	 */
 	public static function salmon_author($xml, $importer) {
 
-		if ($xml == "")
+		if ($xml == "") {
 			return;
+		}
 
 		$doc = new DOMDocument();
 		@$doc->loadXML($xml);
@@ -2279,6 +2303,9 @@ class ostatus {
 		$root = self::add_header($doc, $owner);
 
 		foreach ($items AS $item) {
+			if (Config::get('system', 'ostatus_debug')) {
+				$item['body'] .= '🍼';
+			}
 			$entry = self::entry($doc, $item, $owner);
 			$root->appendChild($entry);
 		}
@@ -2298,6 +2325,10 @@ class ostatus {
 
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
+
+		if (Config::get('system', 'ostatus_debug')) {
+			$item['body'] .= '🐟';
+		}
 
 		$entry = self::entry($doc, $item, $owner, true);
 
