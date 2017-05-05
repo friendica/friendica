@@ -4,7 +4,8 @@
  * @file include/items.php
  */
 
-use \Friendica\ParseUrl;
+use Friendica\App;
+use Friendica\ParseUrl;
 
 require_once 'include/bbcode.php';
 require_once 'include/oembed.php';
@@ -339,7 +340,7 @@ function add_page_info_to_body($body, $texturl = false, $no_photos = false) {
  * Adds a "lang" specification in a "postopts" element of given $arr,
  * if possible and not already present.
  * Expects "body" element to exist in $arr.
- * 
+ *
  * @todo Add a parameter to request forcing override
  */
 function item_add_language_opt(&$arr) {

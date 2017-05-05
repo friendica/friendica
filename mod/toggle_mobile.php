@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function toggle_mobile_init(App $a) {
 
 	if (isset($_GET['off'])) {
@@ -16,4 +18,3 @@ function toggle_mobile_init(App $a) {
 
 	goaway($address);
 }
-

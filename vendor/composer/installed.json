@@ -257,47 +257,6 @@
         "description": "This is an XML parser based on PHPs built-in xml extension.\nIt supports two basic modes of operation: \"func\" and \"event\".  In \"func\" mode, it will look for a function named after each element (xmltag_ELEMENT for start tags and xmltag_ELEMENT_ for end tags), and in \"event\" mode it uses a set of generic callbacks.\n\nSince version 1.2.0 there's a new XML_Parser_Simple class that makes parsing of most XML documents easier, by automatically providing a stack for the elements.\nFurthermore its now possible to split the parser from the handler object, so you do not have to extend XML_Parser anymore in order to parse a document with it."
     },
     {
-        "name": "pear-pear.php.net/PEAR",
-        "version": "1.10.3",
-        "version_normalized": "1.10.3.0",
-        "dist": {
-            "type": "file",
-            "url": "https://pear.php.net/get/PEAR-1.10.3.tgz",
-            "reference": null,
-            "shasum": null
-        },
-        "require": {
-            "ext-pcre": "*",
-            "ext-xml": "*",
-            "pear-pear.php.net/archive_tar": ">=1.4.0.0",
-            "pear-pear.php.net/console_getopt": ">=1.4.1.0",
-            "pear-pear.php.net/structures_graph": ">=1.1.0.0",
-            "pear-pear.php.net/xml_util": ">=1.3.0.0",
-            "php": ">=5.4.0.0"
-        },
-        "conflict": {
-            "pear-pear.php.net/pear_frontend_gtk": "<0.4.0.0",
-            "pear-pear.php.net/pear_frontend_web": "<=0.4.0.0"
-        },
-        "replace": {
-            "pear-pear/pear": "== 1.10.3.0"
-        },
-        "type": "pear-library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                ""
-            ]
-        },
-        "include-path": [
-            "/"
-        ],
-        "license": [
-            "New BSD License"
-        ],
-        "description": "The PEAR package contains:\n * the PEAR installer, for creating, distributing\n   and installing packages\n * the PEAR_Exception PHP5 error handling mechanism\n * the PEAR_ErrorStack advanced error handling mechanism\n * the PEAR_Error error handling mechanism\n * the OS_Guess class for retrieving info about the OS\n   where PHP is running on\n * the System class for quick handling of common operations\n   with files and directories\n * the PEAR base class\n  Features in a nutshell:\n  * full support for channels\n  * pre-download dependency validation\n  * new package.xml 2.0 format allows tremendous flexibility while maintaining BC\n  * support for optional dependency groups and limited support for sub-packaging\n  * robust dependency support\n  * full dependency validation on uninstall\n  * remote install for hosts with only ftp access - no more problems with\n    restricted host installation\n  * full support for mirroring\n  * support for bundling several packages into a single tarball\n  * support for static dependencies on a url-based package\n  * support for custom file roles and installation tasks"
-    },
-    {
         "name": "pear-pear.php.net/Text_Highlighter",
         "version": "0.8.0",
         "version_normalized": "0.8.0.0",
@@ -396,5 +355,46 @@
             "html",
             "markdown"
         ]
+    },
+    {
+        "name": "pear-pear.php.net/PEAR",
+        "version": "1.10.4",
+        "version_normalized": "1.10.4.0",
+        "dist": {
+            "type": "file",
+            "url": "https://pear.php.net/get/PEAR-1.10.4.tgz",
+            "reference": null,
+            "shasum": null
+        },
+        "require": {
+            "ext-pcre": "*",
+            "ext-xml": "*",
+            "pear-pear.php.net/archive_tar": ">=1.4.0.0",
+            "pear-pear.php.net/console_getopt": ">=1.4.1.0",
+            "pear-pear.php.net/structures_graph": ">=1.1.0.0",
+            "pear-pear.php.net/xml_util": ">=1.3.0.0",
+            "php": ">=5.4.0.0"
+        },
+        "conflict": {
+            "pear-pear.php.net/pear_frontend_gtk": "<0.4.0.0",
+            "pear-pear.php.net/pear_frontend_web": "<=0.4.0.0"
+        },
+        "replace": {
+            "pear-pear/pear": "== 1.10.4.0"
+        },
+        "type": "pear-library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                ""
+            ]
+        },
+        "include-path": [
+            "/"
+        ],
+        "license": [
+            "New BSD License"
+        ],
+        "description": "The PEAR package contains:\n * the PEAR installer, for creating, distributing\n   and installing packages\n * the PEAR_Exception PHP5 error handling mechanism\n * the PEAR_ErrorStack advanced error handling mechanism\n * the PEAR_Error error handling mechanism\n * the OS_Guess class for retrieving info about the OS\n   where PHP is running on\n * the System class for quick handling of common operations\n   with files and directories\n * the PEAR base class\n  Features in a nutshell:\n  * full support for channels\n  * pre-download dependency validation\n  * new package.xml 2.0 format allows tremendous flexibility while maintaining BC\n  * support for optional dependency groups and limited support for sub-packaging\n  * robust dependency support\n  * full dependency validation on uninstall\n  * remote install for hosts with only ftp access - no more problems with\n    restricted host installation\n  * full support for mirroring\n  * support for bundling several packages into a single tarball\n  * support for static dependencies on a url-based package\n  * support for custom file roles and installation tasks"
     }
 ]

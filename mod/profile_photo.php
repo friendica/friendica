@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once("include/Photo.php");
 
 function profile_photo_init(App $a) {
@@ -9,9 +11,7 @@ function profile_photo_init(App $a) {
 	}
 
 	profile_load($a,$a->user['nickname']);
-
 }
-
 
 function profile_photo_post(App $a) {
 

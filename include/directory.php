@@ -1,9 +1,9 @@
 <?php
-/// @TODO no longer used?
-use \Friendica\Core\Config;
+
+use Friendica\Core\Config;
 
 function directory_run(&$argv, &$argc){
-	$dir = get_config('system', 'directory');
+	$dir = Config::get('system', 'directory');
 
 	if (!strlen($dir)) {
 		return;

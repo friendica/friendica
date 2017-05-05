@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function redir_init(App $a) {
 
 	$url = ((x($_GET,'url')) ? $_GET['url'] : '');

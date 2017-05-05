@@ -3,16 +3,16 @@
 /**
  * @file mod/wall_upload.php
  * @brief Module for uploading a picture to the profile wall
- * 
+ *
  * By default the picture will be stored in the photo album with the name Wall Photos.
  * You can specify a different album by adding an optional query string "album="
  * to the url
  */
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 require_once 'include/Photo.php';
-
 
 function wall_upload_post(App $a, $desktopmode = true) {
 

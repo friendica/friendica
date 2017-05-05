@@ -1,9 +1,10 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/security.php');
 require_once('include/bbcode.php');
 require_once('include/items.php');
-
 
 function filer_content(App $a) {
 

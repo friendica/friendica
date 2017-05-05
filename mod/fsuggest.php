@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\App;
 
 function fsuggest_post(App $a) {
 

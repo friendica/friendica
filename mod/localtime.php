@@ -1,7 +1,8 @@
 <?php
 
-require_once('include/datetime.php');
+use Friendica\App;
 
+require_once('include/datetime.php');
 
 function localtime_post(App $a) {
 

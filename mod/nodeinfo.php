@@ -5,7 +5,8 @@
  * Documentation: http://nodeinfo.diaspora.software/schema.html
 */
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 require_once 'include/plugin.php';
 
@@ -251,5 +252,3 @@ function nodeinfo_cron() {
         logger('cron_end');
 	Config::set('nodeinfo', 'last_calucation', time());
 }
-
-?>

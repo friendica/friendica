@@ -7,6 +7,8 @@
  * https://github.com/friendica/friendica/blob/master/spec/dfrn2.pdf
  */
 
+use Friendica\App;
+
 require_once("include/Contact.php");
 require_once("include/ostatus.php");
 require_once("include/enotify.php");
@@ -370,7 +372,7 @@ class dfrn {
 		$ext = Photo::supportedTypes();
 
 		foreach ($rp as $p) {
-			$photos[$p['scale']] = app::get_baseurl().'/photo/'.$p['resource-id'].'-'.$p['scale'].'.'.$ext[$p['type']];
+			$photos[$p['scale']] = App::get_baseurl().'/photo/'.$p['resource-id'].'-'.$p['scale'].'.'.$ext[$p['type']];
 		}
 
 		unset($rp, $ext);
@@ -431,7 +433,7 @@ class dfrn {
 		$root->setAttribute("xmlns:ostatus", NAMESPACE_OSTATUS);
 		$root->setAttribute("xmlns:statusnet", NAMESPACE_STATUSNET);
 
-		xml::add_element($doc, $root, "id", app::get_baseurl()."/profile/".$owner["nick"]);
+		xml::add_element($doc, $root, "id", App::get_baseurl()."/profile/".$owner["nick"]);
 		xml::add_element($doc, $root, "title", $owner["name"]);
 
 		$attributes = array("uri" => "https://friendi.ca", "version" => FRIENDICA_VERSION."-".DB_UPDATE_VERSION);
@@ -448,13 +450,13 @@ class dfrn {
 			// DFRN itself doesn't uses this. But maybe someone else wants to subscribe to the public feed.
 			ostatus::hublinks($doc, $root);
 
-			$attributes = array("rel" => "salmon", "href" => app::get_baseurl()."/salmon/".$owner["nick"]);
+			$attributes = array("rel" => "salmon", "href" => App::get_baseurl()."/salmon/".$owner["nick"]);
 			xml::add_element($doc, $root, "link", "", $attributes);
 
-			$attributes = array("rel" => "http://salmon-protocol.org/ns/salmon-replies", "href" => app::get_baseurl()."/salmon/".$owner["nick"]);
+			$attributes = array("rel" => "http://salmon-protocol.org/ns/salmon-replies", "href" => App::get_baseurl()."/salmon/".$owner["nick"]);
 			xml::add_element($doc, $root, "link", "", $attributes);
 
-			$attributes = array("rel" => "http://salmon-protocol.org/ns/salmon-mention", "href" => app::get_baseurl()."/salmon/".$owner["nick"]);
+			$attributes = array("rel" => "http://salmon-protocol.org/ns/salmon-mention", "href" => App::get_baseurl()."/salmon/".$owner["nick"]);
 			xml::add_element($doc, $root, "link", "", $attributes);
 		}
 
@@ -511,7 +513,7 @@ class dfrn {
 		}
 
 		xml::add_element($doc, $author, "name", $owner["name"], $attributes);
-		xml::add_element($doc, $author, "uri", app::get_baseurl().'/profile/'.$owner["nickname"], $attributes);
+		xml::add_element($doc, $author, "uri", App::get_baseurl().'/profile/'.$owner["nickname"], $attributes);
 		xml::add_element($doc, $author, "dfrn:handle", $owner["addr"], $attributes);
 
 		$attributes = array("rel" => "photo", "type" => "image/jpeg",
@@ -812,7 +814,7 @@ class dfrn {
 			$parent = q("SELECT `guid` FROM `item` WHERE `id` = %d", intval($item["parent"]));
 			$parent_item = (($item['thr-parent']) ? $item['thr-parent'] : $item['parent-uri']);
 			$attributes = array("ref" => $parent_item, "type" => "text/html",
-						"href" => app::get_baseurl().'/display/'.$parent[0]['guid'],
+						"href" => App::get_baseurl().'/display/'.$parent[0]['guid'],
 						"dfrn:diaspora_guid" => $parent[0]['guid']);
 			xml::add_element($doc, $entry, "thr:in-reply-to", "", $attributes);
 		}
@@ -854,7 +856,7 @@ class dfrn {
 
 		// We save this value in "plink". Maybe we should read it from there as well?
 		xml::add_element($doc, $entry, "link", "", array("rel" => "alternate", "type" => "text/html",
-								"href" => app::get_baseurl()."/display/".$item["guid"]));
+								"href" => App::get_baseurl()."/display/".$item["guid"]));
 
 		// "comment-allow" is some old fashioned stuff for old Friendica versions.
 		// It is included in the rewritten code for completeness

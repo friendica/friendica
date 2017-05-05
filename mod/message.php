@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/acl_selectors.php');
 require_once('include/message.php');
 require_once('include/Smilies.php');

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function duepuntozero_init(App $a) {
 
 set_template_engine($a, 'smarty3');

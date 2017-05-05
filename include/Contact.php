@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 // Included here for completeness, but this is a very dangerous operation.
 // It is the caller's responsibility to confirm the requestor's intent and
 // authorisation to do this.
@@ -852,4 +854,3 @@ function account_type($contact) {
 
 	return $account_type;
 }
-?>

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/crypto.php');
 
 function hostxrd_init(App $a) {

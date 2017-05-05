@@ -14,7 +14,7 @@ class BaseObject {
 
 	/**
 	 * Get the app
-	 * 
+	 *
 	 * Same as get_app from boot.php
 	 */
 	public function get_app() {
@@ -33,4 +33,3 @@ class BaseObject {
 		self::$app = $app;
 	}
 }
-?>

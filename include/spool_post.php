@@ -4,7 +4,7 @@
  * @brief Posts items that wer spooled because they couldn't be posted.
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 require_once("include/items.php");
 
@@ -55,4 +55,3 @@ function spool_post_run($argv, $argc) {
 		}
 	}
 }
-?>

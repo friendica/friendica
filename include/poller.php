@@ -1,4 +1,8 @@
 <?php
+
+use Friendica\App;
+use Friendica\Core\Config;
+
 if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
 
@@ -10,15 +14,13 @@ if (!file_exists("boot.php") AND (sizeof($_SERVER["argv"]) != 0)) {
 	chdir($directory);
 }
 
-use \Friendica\Core\Config;
-
 require_once("boot.php");
 
 function poller_run($argv, $argc){
 	global $a, $db;
 
-	if(is_null($a)) {
-		$a = new App;
+	if (is_null($a)) {
+		$a = new App(dirname(__DIR__));
 	}
 
 	if(is_null($db)) {
@@ -89,7 +91,6 @@ function poller_run($argv, $argc){
 		if (time() > ($starttime + 3600))
 			return;
 	}
-
 }
 
 /**
@@ -687,4 +688,3 @@ if (array_search(__file__,get_included_files())===0){
 
 	killme();
 }
-?>

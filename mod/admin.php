@@ -6,7 +6,8 @@
  * @brief Friendica admin
  */
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 require_once("include/enotify.php");
 require_once("include/text.php");

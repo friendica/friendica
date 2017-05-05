@@ -4,14 +4,13 @@
  * Diaspora endpoint
  */
 
+use Friendica\App;
 
 require_once('include/salmon.php');
 require_once('include/crypto.php');
 require_once('include/diaspora.php');
 
-
 function receive_post(App $a) {
-
 
 	$enabled = intval(get_config('system','diaspora_enabled'));
 	if(! $enabled) {

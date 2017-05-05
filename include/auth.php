@@ -1,6 +1,7 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 require_once('include/security.php');
 require_once('include/datetime.php');

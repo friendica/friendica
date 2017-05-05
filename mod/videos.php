@@ -1,10 +1,12 @@
 <?php
+
+use Friendica\App;
+
 require_once('include/items.php');
 require_once('include/acl_selectors.php');
 require_once('include/bbcode.php');
 require_once('include/security.php');
 require_once('include/redir.php');
-
 
 function videos_init(App $a) {
 

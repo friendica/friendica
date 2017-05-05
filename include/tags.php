@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 function create_tags_from_item($itemid) {
 	$profile_base = App::get_baseurl();
 	$profile_data = parse_url($profile_base);
@@ -145,4 +148,3 @@ function update_items() {
 
 	dba::close($messages);
 }
-?>

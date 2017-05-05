@@ -7,7 +7,7 @@
 
 namespace Friendica;
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 require_once("include/network.php");
 require_once("include/Photo.php");

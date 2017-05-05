@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function auto_redir(App $a, $contact_nick) {
 
 	// prevent looping

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/security.php');
 
 function attach_init(App $a) {

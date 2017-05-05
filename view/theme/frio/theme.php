@@ -7,6 +7,8 @@
  *
  */
 
+use Friendica\App;
+
 $frio = "view/theme/frio";
 
 global $frio;
@@ -130,7 +132,7 @@ function frio_item_photo_menu(App $a, &$arr) {
  *  Additionally the profile, status and photo page links  will be changed
  *  to don't open in a new tab if the contact is a friendica contact.
  *
- * @param app $a The app data
+ * @param App $a The app data
  * @param array $args Contains contact data and the original photo_menu
  */
 function frio_contact_photo_menu(App $a, &$args){
@@ -182,7 +184,7 @@ function frio_contact_photo_menu(App $a, &$args){
  *  Some links will point to the local pages because the user would expect
  *  local page (these pages are: search, community, help, apps, directory).
  *
- * @param app $a The App class
+ * @param App $a The App class
  * @param array $nav The original nav menu
  */
 function frio_remote_nav($a,&$nav) {
@@ -271,7 +273,7 @@ function frio_remote_nav($a,&$nav) {
  * @param App $a The app data @TODO Unused
  * @param array $results The array with the originals from acl_lookup()
  */
-function frio_acl_lookup($a, &$results) {
+function frio_acl_lookup(App $a, &$results) {
 	require_once("mod/contacts.php");
 
 	$nets = ((x($_GET,"nets")) ? notags(trim($_GET["nets"])) : "");

@@ -1,8 +1,10 @@
 <?php
+
+use Friendica\App;
+
 require_once "include/Photo.php";
 
-$install_wizard_pass=1;
-
+$install_wizard_pass = 1;
 
 function install_init(App $a) {
 

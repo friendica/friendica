@@ -1,8 +1,9 @@
 <?php
 
+use Friendica\App;
+
 require_once "include/bbcode.php";
 require_once "include/acl_selectors.php";
-
 
 /*
  * Note: the code in 'item_extract_images' and 'item_redir_and_replace_images'

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function display_init(App $a) {
 
 	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
@@ -106,7 +108,6 @@ function display_init(App $a) {
 	}
 
 	profile_load($a, $nick, 0, $profiledata);
-
 }
 
 function display_fetchauthor($a, $item) {

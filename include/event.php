@@ -4,6 +4,8 @@
  * @brief functions specific to event handling
  */
 
+use Friendica\App;
+
 require_once 'include/bbcode.php';
 require_once 'include/map.php';
 require_once 'include/datetime.php';
@@ -535,7 +537,7 @@ function get_event_strings() {
  *
  * @param array $dates Array of possibly duplicated events
  * @return array Cleaned events
- * 
+ *
  * @todo We should replace this with a separate update function if there is some time left
  */
 function event_remove_duplicates($dates) {

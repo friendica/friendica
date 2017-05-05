@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/conversation.php');
 require_once('include/items.php');
 

@@ -30,7 +30,7 @@ require_once 'XML/Util.php';
  * @author     Stephan Schmidt (original XML_Serializer code)
  * @copyright  1997-2009 The Authors
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    Release: 1.10.3
+ * @version    Release: 1.10.4
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 1.4.0a1
  */
@@ -112,7 +112,7 @@ http://pear.php.net/dtd/package-2.0.xsd',
      */
     function getPackagerVersion()
     {
-        return '1.10.3';
+        return '1.10.4';
     }
 
     /**
@@ -397,7 +397,7 @@ http://pear.php.net/dtd/package-2.0.xsd',
             $this->options['beautifyFilelist'] = true;
         }
 
-        $arr['attribs']['packagerversion'] = '1.10.3';
+        $arr['attribs']['packagerversion'] = '1.10.4';
         if ($this->serialize($arr, $options)) {
             return $this->_serializedData . "\n";
         }

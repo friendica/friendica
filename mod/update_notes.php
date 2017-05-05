@@ -5,6 +5,8 @@
  * Purpose: AJAX synchronisation of notes page
  */
 
+use Friendica\App;
+
 require_once("mod/notes.php");
 
 function update_notes_content(App $a) {

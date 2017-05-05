@@ -366,4 +366,3 @@ function feed_import($xml,$importer,&$contact, &$hub, $simulate = false) {
 		return array("header" => $author, "items" => $items);
 	}
 }
-?>

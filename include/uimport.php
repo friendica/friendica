@@ -1,11 +1,7 @@
 <?php
 
-/**
- * import account file exported from mod/uexport
- * args:
- *  $a       App     Friendica App Class
- *  $file   Array   array from $_FILES
- */
+use Friendica\App;
+
 require_once("include/Photo.php");
 define("IMPORT_DEBUG", False);
 
@@ -75,6 +71,12 @@ function import_cleanup($newuid) {
 	q("DELETE FROM `pconfig` WHERE uid = %d", $newuid);
 }
 
+/**
+ * @brief Import account file exported from mod/uexport
+ *
+ * @param App $a Friendica App Class
+ * @param array $file array from $_FILES
+ */
 function import_account(App $a, $file) {
 	logger("Start user import from " . $file['tmp_name']);
 	/*
@@ -254,10 +256,6 @@ function import_account(App $a, $file) {
 			}
 		}
 	}
-
-
-
-
 
 	foreach ($account['photo'] as &$photo) {
 		$photo['uid'] = $newuid;

@@ -2,6 +2,8 @@
 
 // See update_profile.php for documentation
 
+use Friendica\App;
+
 require_once("mod/community.php");
 
 function update_community_content(App $a) {

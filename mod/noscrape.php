@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function noscrape_init(App $a) {
 
 	if($a->argc > 1)

@@ -1,6 +1,8 @@
 <?php
 // Based upon "Privacy Image Cache" by Tobias Hößl <https://github.com/CatoTH/>
 
+use Friendica\App;
+
 define('PROXY_DEFAULT_TIME', 86400); // 1 Day
 
 define('PROXY_SIZE_MICRO', 'micro');

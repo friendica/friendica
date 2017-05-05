@@ -11,6 +11,6 @@ return array(
     $vendorDir . '/pear-pear.php.net/Structures_Graph',
     $vendorDir . '/pear-pear.php.net/XML_Util',
     $vendorDir . '/pear-pear.php.net/XML_Parser',
-    $vendorDir . '/pear-pear.php.net/PEAR',
     $vendorDir . '/pear-pear.php.net/Text_Highlighter',
+    $vendorDir . '/pear-pear.php.net/PEAR',
 );

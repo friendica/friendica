@@ -4,8 +4,8 @@
  * @brief Functions related to photo handling.
  */
 
-use \Friendica\Core\Config;
-use \Friendica\Core\PConfig;
+use Friendica\Core\Config;
+use Friendica\Core\PConfig;
 
 function getGps($exifCoord, $hemi) {
 	$degrees = count($exifCoord) > 0 ? gps2Num($exifCoord[0]) : 0;

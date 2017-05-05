@@ -13,12 +13,13 @@
  *
  */
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
-require_once('boot.php');
-require_once('object/BaseObject.php');
+require_once 'boot.php';
+require_once 'object/BaseObject.php';
 
-$a = new App;
+$a = new App(__DIR__);
 BaseObject::set_app($a);
 
 // We assume that the index.php is called by a frontend process
@@ -73,7 +74,7 @@ if (!$install) {
 		exit();
 	}
 
-	require_once("include/session.php");
+	require_once 'include/session.php';
 	load_hooks();
 	call_hooks('init_1');
 
@@ -486,7 +487,7 @@ header("X-Friendica-Version: " . FRIENDICA_VERSION);
 header("Content-type: text/html; charset=utf-8");
 
 /*
- * We use $_GET["mode"] for special page templates. So we will check if we have 
+ * We use $_GET["mode"] for special page templates. So we will check if we have
  * to load another page template than the default one.
  * The page templates are located in /view/php/ or in the theme directory.
  */

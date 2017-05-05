@@ -1,6 +1,7 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 function maintenance_content(App $a) {
 

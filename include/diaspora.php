@@ -8,7 +8,8 @@
  * This will change in the future.
  */
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 require_once 'include/items.php';
 require_once 'include/bb2diaspora.php';
@@ -3774,4 +3775,3 @@ class Diaspora {
 		return true;
 	}
 }
-?>

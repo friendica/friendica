@@ -4,6 +4,8 @@
  * @brief This file contains the Photo class for image processing
  */
 
+use Friendica\App;
+
 require_once("include/photos.php");
 
 class Photo {

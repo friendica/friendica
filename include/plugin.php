@@ -1,10 +1,11 @@
 <?php
 /**
  * @file include/plugin.php
- * 
+ *
  * @brief Some functions to handle addons and themes.
  */
 
+use Friendica\App;
 
 /**
  * @brief uninstalls an addon.
@@ -164,7 +165,7 @@ function register_hook($hook,$file,$function,$priority=0) {
 
 /**
  * @brief unregisters a hook.
- * 
+ *
  * @param string $hook the name of the hook
  * @param string $file the name of the file that hooks into
  * @param string $function the name of the function that the hook called
@@ -325,7 +326,7 @@ function get_plugin_info($plugin){
 
 /**
  * @brief Parse theme comment in search of theme infos.
- * 
+ *
  * like
  * \code
  * ..* Name: My Theme
@@ -545,11 +546,11 @@ function upgrade_bool_message($bbcode = false) {
 
 /**
  * @brief Get the full path to relevant theme files by filename
- * 
+ *
  * This function search in the theme directory (and if not present in global theme directory)
  * if there is a directory with the file extension and  for a file with the given
- * filename. 
- * 
+ * filename.
+ *
  * @param string $file Filename
  * @param string $root Full root path
  * @return string Path to the file or empty string if the file isn't found

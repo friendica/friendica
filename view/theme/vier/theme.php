@@ -9,6 +9,8 @@
  * Description: "Vier" is a very compact and modern theme. It uses the font awesome font library: http://fortawesome.github.com/Font-Awesome/
  */
 
+use Friendica\App;
+
 require_once "include/plugin.php";
 require_once "include/socgraph.php";
 require_once "mod/proxy.php";

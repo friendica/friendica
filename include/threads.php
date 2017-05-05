@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 function add_thread($itemid, $onlyshadow = false) {
 	$items = q("SELECT `uid`, `created`, `edited`, `commented`, `received`, `changed`, `wall`, `private`, `pubmail`,
 			`moderated`, `visible`, `spam`, `starred`, `bookmark`, `contact-id`, `gcontact-id`,
@@ -293,4 +296,3 @@ function update_shadow_copy() {
 
 	dba::close($messages);
 }
-?>

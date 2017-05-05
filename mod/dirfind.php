@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once('include/contact_widgets.php');
 require_once('include/socgraph.php');
 require_once('include/Contact.php');
@@ -20,8 +23,6 @@ function dirfind_init(App $a) {
 
 	$a->page['aside'] .= follow_widget();
 }
-
-
 
 function dirfind_content(App $a, $prefix = "") {
 

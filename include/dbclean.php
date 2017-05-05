@@ -4,7 +4,7 @@
  * @brief The script is called from time to time to clean the database entries and remove orphaned data.
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 function dbclean_run(&$argv, &$argc) {
 	if (!Config::get('system', 'dbclean', false)) {
@@ -149,4 +149,3 @@ function remove_orphans($stage = 0) {
 	}
 
 }
-?>

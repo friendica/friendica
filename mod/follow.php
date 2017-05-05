@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/Scrape.php');
 require_once('include/follow.php');
 require_once('include/Contact.php');

@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 function network_init(App $a) {
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -792,7 +795,7 @@ function network_content(App $a, $update = 0) {
 /**
  * @brief Get the network tabs menu
  *
- * @param app $a The global App
+ * @param App $a The global App
  * @return string Html of the networktab
  */
 function network_tabs(App $a) {

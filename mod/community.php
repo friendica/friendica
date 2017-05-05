@@ -1,6 +1,7 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 function community_init(App $a) {
 	if (! local_user()) {
@@ -8,7 +9,6 @@ function community_init(App $a) {
 		unset($_SESSION['mobile-theme']);
 	}
 }
-
 
 function community_content(App $a, $update = 0) {
 

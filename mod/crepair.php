@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once("include/contact_selectors.php");
 require_once("mod/contacts.php");
 

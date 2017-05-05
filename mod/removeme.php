@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function removeme_post(App $a) {
 
 	if (! local_user()) {

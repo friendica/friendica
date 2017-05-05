@@ -1,5 +1,7 @@
 <?php
-use \Friendica\Core\Config;
+
+use Friendica\App;
+use Friendica\Core\Config;
 
 function cronjobs_run(&$argv, &$argc){
 	global $a;

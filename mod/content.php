@@ -15,6 +15,7 @@
 // fast - e.g. one or two milliseconds to fetch parent items for the current content,
 // and 10-20 milliseconds to fetch all the child items.
 
+use Friendica\App;
 
 function content_content(App $a, $update = 0) {
 

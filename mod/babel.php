@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once 'include/bbcode.php';
 require_once 'library/markdown.php';
 require_once 'include/bb2diaspora.php';

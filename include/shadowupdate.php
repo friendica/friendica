@@ -1,6 +1,7 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 require_once("boot.php");
 require_once("include/threads.php");
@@ -9,7 +10,7 @@ function shadowupdate_run(&$argv, &$argc){
 	global $a, $db;
 
 	if (is_null($a)) {
-		$a = new App;
+		$a = new App(dirname(__DIR__));
 	}
 
 	if (is_null($db)) {

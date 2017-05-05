@@ -4,8 +4,9 @@
  * @file include/oembed.php
  */
 
-use \Friendica\ParseUrl;
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\ParseUrl;
+use Friendica\Core\Config;
 
 function oembed_replacecb($matches){
 	$embedurl=$matches[1];
