@@ -173,6 +173,11 @@ HTTP 400 BadRequest
 * on friendica_verbose=true: different JSON returns {"result":"error","message":"xyz"}
 
 ---
+### externalprofile/show (*)
+#### Parameters
+* profileurl: profile url
+
+---
 ### favorites (*; AUTH)
 #### Parameters
 * count: Items per page (default: 20)
