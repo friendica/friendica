@@ -1011,6 +1011,7 @@ function poco_check_server($server_url, $network = "", $force = false) {
 	if (dbm::is_result($servers) AND ($orig_server_url == $server_url) AND
 		($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 		logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
+		dba::p("UPDATE `gserver` SET `last_failure` = ? WHERE `nurl` = ?", datetime_convert(), normalise_link($server_url));
 		return false;
 	}
 
@@ -1025,6 +1026,7 @@ function poco_check_server($server_url, $network = "", $force = false) {
 		// Quit if there is a timeout
 		if ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
+			dba::p("UPDATE `gserver` SET `last_failure` = ? WHERE `nurl` = ?", datetime_convert(), normalise_link($server_url));
 			return false;
 		}
 
@@ -1034,12 +1036,10 @@ function poco_check_server($server_url, $network = "", $force = false) {
 	if (!$serverret["success"] OR ($serverret["body"] == "") OR (sizeof($xmlobj) == 0) OR !is_object($xmlobj)) {
 		// Workaround for bad configured servers (known nginx problem)
 		if (!in_array($serverret["debug"]["http_code"], array("403", "404"))) {
-			$last_failure = datetime_convert();
 			$failure = true;
 		}
 		$possible_failure = true;
-	} elseif ($network == NETWORK_DIASPORA)
-		$last_contact = datetime_convert();
+	}
 
 	// If the server has no possible failure we reset the cached data
 	if (!$possible_failure) {
@@ -1057,8 +1057,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			$data = json_decode($serverret["body"]);
 			if (isset($data->totalResults)) {
 				$poco = $server_url."/poco";
-				$last_contact = datetime_convert();
-
 				$server = poco_detect_poco_data($data);
 				if ($server) {
 					$platform = $server['platform'];
@@ -1075,7 +1073,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 		$serverret = z_fetch_url($server_url);
 
 		if (!$serverret["success"] OR ($serverret["body"] == "")) {
-			$last_failure = datetime_convert();
 			$failure = true;
 		} else {
 			$server = poco_detect_server_type($serverret["body"]);
@@ -1084,7 +1081,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 				$network = $server['network'];
 				$version = $server['version'];
 				$site_name = $server['site_name'];
-				$last_contact = datetime_convert();
 			}
 
 			$lines = explode("\n",$serverret["header"]);
@@ -1098,15 +1094,11 @@ function poco_check_server($server_url, $network = "", $force = false) {
 						$network = NETWORK_DIASPORA;
 						$versionparts = explode("-", $version);
 						$version = $versionparts[0];
-						$last_contact = datetime_convert();
 					}
 
 					if (stristr($line,'Server: Mastodon')) {
 						$platform = "Mastodon";
 						$network = NETWORK_OSTATUS;
-						// Mastodon doesn't reveal version numbers
-						$version = "";
-						$last_contact = datetime_convert();
 					}
 				}
 			}
@@ -1125,7 +1117,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			$version = str_replace(chr(239).chr(187).chr(191), "", $serverret["body"]);
 			$version = trim($version, '"');
 			$network = NETWORK_OSTATUS;
-			$last_contact = datetime_convert();
 		}
 
 		// Test for GNU Social
@@ -1137,7 +1128,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			$version = str_replace(chr(239).chr(187).chr(191), "", $serverret["body"]);
 			$version = trim($version, '"');
 			$network = NETWORK_OSTATUS;
-			$last_contact = datetime_convert();
 		}
 
 		// Test for Mastodon
@@ -1150,7 +1140,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 				$site_name = $data->title;
 				$info = $data->description;
 				$network = NETWORK_OSTATUS;
-				$last_contact = datetime_convert();
 			}
 		}
 	}
@@ -1161,8 +1150,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 		if ($serverret["success"]) {
 			$data = json_decode($serverret["body"]);
 			if (isset($data->site->server)) {
-				$last_contact = datetime_convert();
-
 				if (isset($data->site->platform)) {
 					$platform = $data->site->platform->PLATFORM_NAME;
 					$version = $data->site->platform->STD_VERSION;
@@ -1211,7 +1198,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 		}
 	}
 
-
 	// Query statistics.json. Optional package for Diaspora, Friendica and Redmatrix
 	if (!$failure) {
 		$serverret = z_fetch_url($server_url."/statistics.json");
@@ -1239,10 +1225,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			} else {
 				$register_policy = REGISTER_CLOSED;
 			}
-
-			if (isset($data->version)) {
-				$last_contact = datetime_convert();
-			}
 		}
 	}
 
@@ -1267,8 +1249,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			if (isset($server['site_name'])) {
 				$site_name = $server['site_name'];
 			}
-
-			$last_contact = datetime_convert();
 		}
 	}
 
@@ -1285,7 +1265,6 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			$data = json_decode($serverret["body"]);
 
 			if (isset($data->version)) {
-				$last_contact = datetime_convert();
 				$network = NETWORK_DFRN;
 
 				$noscrape = $data->no_scrape_url;
@@ -1311,13 +1290,14 @@ function poco_check_server($server_url, $network = "", $force = false) {
 	}
 
 	if ($possible_failure AND !$failure) {
-		$last_failure = datetime_convert();
 		$failure = true;
 	}
 
 	if ($failure) {
 		$last_contact = $orig_last_contact;
+		$last_failure = datetime_convert();
 	} else {
+		$last_contact = datetime_convert();
 		$last_failure = $orig_last_failure;
 	}
 
