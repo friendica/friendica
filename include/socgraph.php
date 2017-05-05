@@ -1139,6 +1139,20 @@ function poco_check_server($server_url, $network = "", $force = false) {
 			$network = NETWORK_OSTATUS;
 			$last_contact = datetime_convert();
 		}
+
+		// Test for Mastodon
+		$serverret = z_fetch_url($server_url."/api/v1/instance");
+		if ($serverret["success"] AND ($serverret["body"] != '')) {
+			$data = json_decode($serverret["body"]);
+			if (isset($data->version)) {
+				$platform = "Mastodon";
+				$version = $data->version;
+				$site_name = $data->title;
+				$info = $data->description;
+				$network = NETWORK_OSTATUS;
+				$last_contact = datetime_convert();
+			}
+		}
 	}
 
 	if (!$failure) {
