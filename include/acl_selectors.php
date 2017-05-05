@@ -545,7 +545,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 	if ($type == '') {
 
-		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `forum`, `prv` FROM `contact`
+		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			AND NOT (`network` IN ('%s', '%s'))
 			$sql_extra2
@@ -554,7 +554,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_STATUSNET)
 		);
 	} elseif ($type == 'c') {
-		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `forum`, `prv` FROM `contact`
+		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			AND NOT (`network` IN ('%s'))
 			$sql_extra2
@@ -564,7 +564,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 		);
 	}
 	elseif ($type == 'm') {
-		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag` FROM `contact`
+		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive`
 			AND `network` IN ('%s','%s','%s')
 			$sql_extra2
@@ -575,7 +575,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 			dbesc(NETWORK_DIASPORA)
 		);
 	} elseif ($type == 'a') {
-		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `forum`, `prv` FROM `contact`
+		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND `pending` = 0
 			$sql_extra2
 			ORDER BY `name` ASC ",
@@ -619,6 +619,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 				'network' => $g['network'],
 				'link'    => $g['url'],
 				'nick'    => htmlentities(($g['attag']) ? $g['attag'] : $g['nick']),
+				'addr'    => htmlentities(($g['addr']) ? $g['addr'] : $g['url']),
 				'forum'   => ((x($g, 'forum') || x($g, 'prv')) ? 1 : 0),
 			);
 		}
@@ -664,6 +665,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 						'network' => $contact['network'],
 						'link'    => $contact['url'],
 						'nick'    => htmlentities($contact['nick'] ? : $contact['addr']),
+						'addr'    => htmlentities(($contact['addr']) ? $contact['addr'] : $contact['url']),
 						'forum'   => $contact['forum']
 					);
 				}
