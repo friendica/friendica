@@ -3353,7 +3353,7 @@ $called_api = null;
 			throw new BadRequestException("no new albumname specified");
 		}
 		// check if album is existing
-		$r = q("SELECT * FROM `photo` WHERE `uid` = %d AND `album` = '%s'",
+		$r = q("SELECT `id` FROM `photo` WHERE `uid` = %d AND `album` = '%s'",
 				intval(api_user()),
 				dbesc($album));
 		if (!dbm::is_result($r)) {
@@ -3461,7 +3461,7 @@ $called_api = null;
 			$mode = "update";
 
 			// check if photo is existing in database
-			$r = q("SELECT * FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' AND `album` = '%s'",
+			$r = q("SELECT `id` FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' AND `album` = '%s'",
 					intval(api_user()),
 					dbesc($photo_id),
 					dbesc($album));
@@ -3581,7 +3581,7 @@ $called_api = null;
 			throw new BadRequestException("no photo_id specified");
 		}
 		// check if photo is existing in database
-		$r = q("SELECT * FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'",
+		$r = q("SELECT `id` FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'",
 				intval(api_user()),
 				dbesc($photo_id)
 			);
@@ -3660,7 +3660,7 @@ $called_api = null;
 
 		// check if specified profile id is valid
 		if ($profileid != 0) {
-			$r = q("SELECT * FROM `profile` WHERE `uid` = %d AND `id` = %d",
+			$r = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `id` = %d",
 				intval(api_user()),
 				intval($profileid));
 			// error message if specified profile id is not in database
@@ -3707,7 +3707,7 @@ $called_api = null;
 				intval(local_user())
 			);
 		} else {
-			$r = q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
+			$r = q("UPDATE `profile` SET `photo` = '%s', `thumb` = '%s' WHERE `id` = %d AND `uid` = %d",
 				dbesc(App::get_baseurl() . '/photo/' . $data['photo']['id'] . '-4.' . $filetype),
 				dbesc(App::get_baseurl() . '/photo/' . $data['photo']['id'] . '-5.' . $filetype),
 				intval($_REQUEST['profile']),
