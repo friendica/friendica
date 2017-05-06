@@ -725,6 +725,120 @@ xml
 ```
 
 ---
+### friendica/photoalbum/delete (POST,DELETE; AUTH)
+#### Parameters
+* album: name of the album to be deleted
+
+deletes all images with the specified album name, is not reversible -> ensure that client is asking user for being sure to do this
+
+#### Return values
+
+On success:
+* JSON return {"result":"deleted","message":"album 'xyz' with all containing photos has been deleted."}
+
+On error:
+* 403 FORBIDDEN: if not authenticated
+* 400 BADREQUEST: "no albumname specified", "album not available"
+* 500 INTERNALSERVERERROR: "problem with deleting item occured", "unknown error - deleting from database failed"
+
+
+---
+### friendica/photoalbum/update (POST,PUT; AUTH)
+#### Parameters
+* album: name of the album to be updated
+* album_new: new name of the album
+
+changes the album name to album_new for all photos in album
+
+#### Return values
+
+On success:
+* JSON return {"result":"updated","message":"album 'abc' with all containing photos has been renamed to 'xyz'."}
+
+On error:
+* 403 FORBIDDEN: if not authenticated
+* 400 BADREQUEST: "no albumname specified", "no new albumname specified", "album not available"
+* 500 INTERNALSERVERERROR: "unknown error - updating in database failed"
+
+
+---
+### friendica/photo/create (POST; AUTH)
+### friendica/photo/update (POST; AUTH)
+#### Parameters
+* photo_id (optional): if specified the photo with this id will be updated
+* media (optional): image data as base64, only optional if photo_id is specified (new upload must have media)
+* desc (optional): description for the photo, updated when photo_id is specified
+* album: name of the album to be deleted (always necessary)
+* album_new (optional): can be used to change the album of a single photo if photo_id is specified
+* allow_cid/allow_gid/deny_cid/deny_gid (optional): on create: empty string or omitting = public photo, specify in format '<x><y><z>' for private photo; 
+			on update: keys need to be present with empty values for setting a private photo now to public
+
+both calls point to one function for creating AND updating photos. Saves data for the scales 0-2 to database (see above for scale description). Call adds non-visible entries to items table to enable authenticated contacts to comment/like the photo. 
+Client should pay attention to the fact that updated access rights are not transferred to the contacts. i.e. public photos remain publicly visible if they have been commented/liked before setting visibility back to a limited group. Or: previously limited photos remain limited even if changed to publicly visible. 
+Currently it is best way to inform user that updating rights is not the best way, offer a solution to add photo as a new photo with the new rights. 
+
+#### Return values
+
+On success:
+* new photo uploaded: JSON return with photo data (see friendica/photo)
+* photo updated - changed photo data: JSON return with photo data (see friendica/photo)
+* photo updated - changed info: JSON return {"result":"updated","message":"Image id 'xyz' has been updated."}
+* photo updated - nothing changed: JSON return {"result":"cancelled","message":"Nothing to update for image id 'xyz'."}
+
+On error:
+* 403 FORBIDDEN: if not authenticated
+* 400 BADREQUEST: "no albumname specified", "no media data submitted", "photo not available", "acl data invalid"
+* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server", 
+			"image size exceeds Friendica Config setting (uploaded size: x)", 
+			"unable to process image data", 
+			"image upload failed", 
+			"unknown error - uploading photo failed, see Friendica log for more information", 
+			"unknown error - update photo entry in database failed", 
+			"unknown error - this error on uploading or updating a photo should never happen"
+
+
+---
+### friendica/photo/delete (DELETE; AUTH)
+#### Parameters
+* photo_id: id of the photo to be deleted
+
+deletes a single image with the specified id, is not reversible -> ensure that client is asking user for being sure to do this
+Sets item table entries for this photo to deleted = 1
+
+#### Return values
+
+On success:
+* JSON return {"result":"deleted","message":"photo with id 'xyz' has been deleted from server."}
+
+On error:
+* 403 FORBIDDEN: if not authenticated
+* 400 BADREQUEST: "no photo_id specified", "photo not available"
+* 500 INTERNALSERVERERROR: "unknown error on deleting photo", "problem with deleting items occurred"
+
+
+---
+### account/update_profile_image (POST; AUTH)
+#### Parameters
+* image: image data as base64 (Twitter has a limit of 700kb, Friendica allows more)
+* profile_id (optional): id of the profile for which the image should be used, default is changing the default profile
+
+uploads a new profile image (scales 4-6) to database, changes default or specified profile to the new photo
+
+#### Return values
+
+On success:
+* JSON return: returns the updated user details (see account/verify_credentials)
+
+On error:
+* 403 FORBIDDEN: if not authenticated
+* 400 BADREQUEST: "no media data submitted", "profile_id not available"
+* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server", 
+			"image size exceeds Friendica Config setting (uploaded size: x)", 
+			"unable to process image data", 
+			"image upload failed"
+
+
+---
 ### friendica/direct_messages_setseen (GET; AUTH)
 #### Parameters
 * id: id of the message to be updated as seen
@@ -794,7 +908,6 @@ The following API calls are implemented in GNU Social but not in Friendica: (inc
 * friendships/exists
 * friendships/show
 * account/update_profile_background_image
-* account/update_profile_image
 * blocks/create
 * blocks/destroy
 
@@ -817,7 +930,6 @@ The following API calls from the Twitter API aren't implemented neither in Frien
 * account/update_delivery_device
 * account/update_profile
 * account/update_profile_background_image
-* account/update_profile_image
 * blocks/list
 * blocks/ids
 * users/lookup
