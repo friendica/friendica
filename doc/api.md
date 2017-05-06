@@ -465,6 +465,28 @@ Friendica doesn't allow showing followers of other users.
 Friendica doesn't allow showing friends of other users.
 
 
+---
+### account/update_profile_image (POST; AUTH)
+#### Parameters
+* image: image data as base64 (Twitter has a limit of 700kb, Friendica allows more)
+* profile_id (optional): id of the profile for which the image should be used, default is changing the default profile
+
+uploads a new profile image (scales 4-6) to database, changes default or specified profile to the new photo
+
+#### Return values
+
+On success:
+* JSON return: returns the updated user details (see account/verify_credentials)
+
+On error:
+* 403 FORBIDDEN: if not authenticated
+* 400 BADREQUEST: "no media data submitted", "profile_id not available"
+* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server", 
+			"image size exceeds Friendica Config setting (uploaded size: x)", 
+			"unable to process image data", 
+			"image upload failed"
+
+
 ## Implemented API calls (not compatible with other APIs)
 
 
@@ -770,7 +792,7 @@ On error:
 * desc (optional): description for the photo, updated when photo_id is specified
 * album: name of the album to be deleted (always necessary)
 * album_new (optional): can be used to change the album of a single photo if photo_id is specified
-* allow_cid/allow_gid/deny_cid/deny_gid (optional): on create: empty string or omitting = public photo, specify in format '<x><y><z>' for private photo; 
+* allow_cid/allow_gid/deny_cid/deny_gid (optional): on create: empty string or omitting = public photo, specify in format '```<x><y><z>```' for private photo; 
 			on update: keys need to be present with empty values for setting a private photo now to public
 
 both calls point to one function for creating AND updating photos. Saves data for the scales 0-2 to database (see above for scale description). Call adds non-visible entries to items table to enable authenticated contacts to comment/like the photo. 
@@ -814,28 +836,6 @@ On error:
 * 403 FORBIDDEN: if not authenticated
 * 400 BADREQUEST: "no photo_id specified", "photo not available"
 * 500 INTERNALSERVERERROR: "unknown error on deleting photo", "problem with deleting items occurred"
-
-
----
-### account/update_profile_image (POST; AUTH)
-#### Parameters
-* image: image data as base64 (Twitter has a limit of 700kb, Friendica allows more)
-* profile_id (optional): id of the profile for which the image should be used, default is changing the default profile
-
-uploads a new profile image (scales 4-6) to database, changes default or specified profile to the new photo
-
-#### Return values
-
-On success:
-* JSON return: returns the updated user details (see account/verify_credentials)
-
-On error:
-* 403 FORBIDDEN: if not authenticated
-* 400 BADREQUEST: "no media data submitted", "profile_id not available"
-* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server", 
-			"image size exceeds Friendica Config setting (uploaded size: x)", 
-			"unable to process image data", 
-			"image upload failed"
 
 
 ---
