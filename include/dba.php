@@ -1058,7 +1058,7 @@ class dba {
 			$param_string .= " ORDER BY ";
 			foreach ($params['order'] AS $fields => $order) {
 				if (!is_int($fields)) {
-					$param_string .= "`".$fields."` ".($order ? "ASC" : "DESC").", ";
+					$param_string .= "`".$fields."` ".($order ? "DESC" : "ASC").", ";
 				} else {
 					$param_string .= "`".$order."`, ";
 				}
