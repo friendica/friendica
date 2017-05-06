@@ -3,6 +3,7 @@
 <form action="register" method="post" id="register-form">
 
 	<input type="hidden" name="photo" value="{{$photo}}" />
+	<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
 	{{if $registertext != ""}}<div class="error-message">{{$registertext}} </div>{{/if}}
 

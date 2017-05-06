@@ -8,6 +8,7 @@ require_once('include/user.php');
 
 if(! function_exists('register_post')) {
 function register_post(App $a) {
+	check_form_security_token_redirectOnErr('/register', 'register');
 
 	global $lang;
 
@@ -296,7 +297,7 @@ function register_content(App $a) {
 		'$sitename'  => $a->get_hostname(),
 		'$importh'   => t('Import'),
 		'$importt'   => t('Import your profile to this friendica instance'),
-
+		'$form_security_token'	=> get_form_security_token("register")
 	));
 	return $o;
 
