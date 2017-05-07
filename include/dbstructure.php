@@ -400,11 +400,13 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 			}
 
 			$field_list = '';
-			foreach ($structure['fields'] AS $fieldname => $parameters) {
-				$field_list .= 'ANY_VALUE(`' . $fieldname . '`),';
+			if ($is_unique && $ignore == '') {
+				foreach ($structure['fields'] AS $fieldname => $parameters) {
+					$field_list .= 'ANY_VALUE(`' . $fieldname . '`),';
+				}
+				$field_list = rtrim($field_list, ',');
 			}
-			$field_list = rtrim($field_list, ',');
-			
+
 			if ($verbose) {
 				// Ensure index conversion to unique removes duplicates
 				if ($is_unique) {
