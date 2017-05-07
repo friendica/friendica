@@ -175,6 +175,9 @@ class Probe {
 				return array();
 
 			$host = $parts["host"];
+			if (isset($parts["port"])) {
+				$host .= ':'.$parts["port"];
+			}
 
 			$path_parts = explode("/", trim($parts["path"], "/"));
 
@@ -335,8 +338,10 @@ class Probe {
 
 		if (isset($parts["scheme"]) AND isset($parts["host"]) AND isset($parts["path"])) {
 
-			/// @todo: Ports?
 			$host = $parts["host"];
+			if (isset($parts["port"])) {
+				$host .= ':'.$parts["port"];
+			}
 
 			if ($host == 'twitter.com') {
 				return array("network" => NETWORK_TWITTER);

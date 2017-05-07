@@ -188,7 +188,80 @@ class Diaspora {
 	}
 
 	/**
-	 * @brief: Decodes incoming Diaspora message
+	 * @brief: Decodes incoming Diaspora message in the new format
+	 *
+	 * @param array $importer Array of the importer user
+	 * @param string $raw raw post message
+	 *
+	 * @return array
+	 * 'message' -> decoded Diaspora XML message
+	 * 'author' -> author diaspora handle
+	 * 'key' -> author public key (converted to pkcs#8)
+	 */
+	public static function decode_raw($importer, $raw) {
+		$data = json_decode($raw);
+
+		// Is it a private post? Then decrypt the outer Salmon
+		if (is_object($data)) {
+			$encrypted_aes_key_bundle = base64_decode($data->aes_key);
+			$ciphertext = base64_decode($data->encrypted_magic_envelope);
+
+			$outer_key_bundle = '';
+			@openssl_private_decrypt($encrypted_aes_key_bundle, $outer_key_bundle, $importer['prvkey']);
+			$j_outer_key_bundle = json_decode($outer_key_bundle);
+
+			if (!is_object($j_outer_key_bundle)) {
+				logger('Outer Salmon did not verify. Discarding.');
+				http_status_exit(400);
+			}
+
+			$outer_iv = base64_decode($j_outer_key_bundle->iv);
+			$outer_key = base64_decode($j_outer_key_bundle->key);
+
+			$xml = diaspora::aes_decrypt($outer_key, $outer_iv, $ciphertext);
+		} else {
+			$xml = $raw;
+		}
+
+		$basedom = parse_xml_string($xml);
+
+		if (!is_object($basedom)) {
+			logger('Received data does not seem to be an XML. Discarding.');
+			http_status_exit(400);
+		}
+
+		$base = $basedom->children(NAMESPACE_SALMON_ME);
+
+		// Not sure if this cleaning is needed
+		$data = str_replace(array(" ", "\t", "\r", "\n"), array("", "", "", ""), $base->data);
+
+		// Build the signed data
+		$type = $base->data[0]->attributes()->type[0];
+		$encoding = $base->encoding;
+		$alg = $base->alg;
+		$signed_data = $data.'.'.base64url_encode($type).'.'.base64url_encode($encoding).'.'.base64url_encode($alg);
+
+		// This is the signature
+		$signature = base64url_decode($base->sig);
+
+		// Get the senders' public key
+		$key_id = $base->sig[0]->attributes()->key_id[0];
+		$author_addr = base64_decode($key_id);
+		$key = diaspora::key($author_addr);
+
+		$verify = rsa_verify($signed_data, $signature, $key);
+		if (!$verify) {
+			logger('Message did not verify. Discarding.');
+			http_status_exit(400);
+		}
+
+		return array('message' => (string)base64url_decode($base->data),
+				'author' => unxmlify($author_addr),
+				'key' => (string)$key);
+	}
+
+	/**
+	 * @brief: Decodes incoming Diaspora message in the deprecated format
 	 *
 	 * @param array $importer Array of the importer user
 	 * @param string $xml urldecoded Diaspora salmon
@@ -203,9 +276,10 @@ class Diaspora {
 		$public = false;
 		$basedom = parse_xml_string($xml);
 
-		if (!is_object($basedom))
+		if (!is_object($basedom)) {
+			logger("XML is not parseable.");
 			return false;
-
+		}
 		$children = $basedom->children('https://joindiaspora.com/protocol');
 
 		if ($children->header) {
