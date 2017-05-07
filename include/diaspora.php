@@ -1517,8 +1517,9 @@ class Diaspora {
 
 		$person = self::person_by_handle($msg_author);
 
-		$r = q("SELECT `id` FROM `mail` WHERE `uri` = '%s' LIMIT 1",
-			dbesc($message_uri)
+		$r = q("SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
+			dbesc($msg_guid),
+			intval($importer["uid"])
 		);
 		if (dbm::is_result($r)) {
 			logger("duplicate message already delivered.", LOGGER_DEBUG);
@@ -1814,8 +1815,8 @@ class Diaspora {
 			return false;
 		}
 
-		$r = q("SELECT `id` FROM `mail` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
-			dbesc($message_uri),
+		$r = q("SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
+			dbesc($guid),
 			intval($importer["uid"])
 		);
 		if (dbm::is_result($r)) {
