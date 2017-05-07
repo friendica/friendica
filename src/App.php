@@ -192,7 +192,7 @@ class App {
 		}
 
 		if (! static::directory_usable($basepath)) {
-			throw new Exception('Basepath ' . $basepath . ' isn\'t usable.');
+			throw new \Exception('Basepath ' . $basepath . ' isn\'t usable.');
 		}
 
 		$this->basepath = rtrim($basepath, DIRECTORY_SEPARATOR);
