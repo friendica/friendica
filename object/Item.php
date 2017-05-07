@@ -242,17 +242,14 @@ class Item extends BaseObject {
 					'classundo' => (($item['starred']) ? "" : "hidden"),
 					'starred'   =>  t('starred'),
 				);
-				$r = q("SELECT `ignored` FROM `thread` WHERE `uid` = %d AND `iid` = %d LIMIT 1",
-					intval($item['uid']),
-					intval($item['id'])
-				);
+				$r = dba::select('thread', array('ignored'), array('uid' => $item['uid'], 'iid' => $item['id']), array('limit' => 1));
 				if (dbm::is_result($r)) {
 					$ignore = array(
 						'do'        => t("ignore thread"),
 						'undo'      => t("unignore thread"),
 						'toggle'    => t("toggle ignore status"),
-						'classdo'   => (($r[0]['ignored']) ? "hidden" : ""),
-						'classundo' => (($r[0]['ignored']) ? "" : "hidden"),
+						'classdo'   => (($r['ignored']) ? "hidden" : ""),
+						'classundo' => (($r['ignored']) ? "" : "hidden"),
 						'ignored'   =>  t('ignored'),
 					);
 				}

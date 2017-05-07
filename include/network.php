@@ -724,22 +724,7 @@ function fix_contact_ssl_policy(&$contact,$new_policy) {
 	}
 
 	if ($ssl_changed) {
-		q("UPDATE `contact` SET
-			`url` = '%s',
-			`request` = '%s',
-			`notify` = '%s',
-			`poll` = '%s',
-			`confirm` = '%s',
-			`poco` = '%s'
-			WHERE `id` = %d LIMIT 1",
-			dbesc($contact['url']),
-			dbesc($contact['request']),
-			dbesc($contact['notify']),
-			dbesc($contact['poll']),
-			dbesc($contact['confirm']),
-			dbesc($contact['poco']),
-			intval($contact['id'])
-		);
+		dba::update('contact', $contact, array('id' => $contact['id']));
 	}
 }
 

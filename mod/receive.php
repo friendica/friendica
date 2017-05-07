@@ -27,14 +27,10 @@ function receive_post(App $a) {
 		}
 		$guid = $a->argv[2];
 
-		$r = q("SELECT * FROM `user` WHERE `guid` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
-			dbesc($guid)
-		);
-		if (!dbm::is_result($r)) {
+		$importer = dba::select('user', array(), array('guid' => $guid, 'account_expired' => false, 'account_removed' => false), array('limit' => 1));
+		if (!dbm::is_result($importer)) {
 			http_status_exit(500);
 		}
-
-		$importer = $r[0];
 	}
 
 	// It is an application/x-www-form-urlencoded

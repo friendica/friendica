@@ -41,9 +41,9 @@ function hovercard_content() {
 	// the real url (nurl)
 	if(local_user() && strpos($profileurl, "redir/") === 0) {
 		$cid = intval(substr($profileurl, 6));
-		$r = q("SELECT `nurl`, `self`  FROM `contact` WHERE `id` = '%d' LIMIT 1", intval($cid));
-		$profileurl = ($r[0]["nurl"] ? $r[0]["nurl"] : "");
-		$self = ($r[0]["self"] ? $r[0]["self"] : "");
+		$r = dba::select('contact', array('nurl', 'self'), array('id' => $cid), array('limit' => 1));
+		$profileurl = ($r["nurl"] ? $r["nurl"] : "");
+		$self = ($r["self"] ? $r["self"] : "");
 	}
 
 	// if it's the url containing https it should be converted to http

@@ -14,7 +14,7 @@ function remove_contact_run($argv, $argc) {
 	$id = intval($argv[1]);
 
 	// Only delete if the contact doesn't exist (anymore)
-	$r = q("SELECT `id` FROM `contact` WHERE `id` = %d", intval($id));
+	$r = dba::select('contact', array('id'), array('id' => $id), array('limit' => 1));
 	if (dbm::is_result($r)) {
 		return;
 	}
