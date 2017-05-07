@@ -2,11 +2,12 @@
 
 use Friendica\App;
 
-require_once('include/contact_widgets.php');
-require_once('include/socgraph.php');
-require_once('include/Contact.php');
-require_once('include/contact_selectors.php');
-require_once('mod/contacts.php');
+require_once 'include/contact_widgets.php';
+require_once 'include/probe.php';
+require_once 'include/socgraph.php';
+require_once 'include/Contact.php';
+require_once 'include/contact_selectors.php';
+require_once 'mod/contacts.php';
 
 function dirfind_init(App $a) {
 
