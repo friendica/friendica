@@ -795,8 +795,10 @@ On error:
 * allow_cid/allow_gid/deny_cid/deny_gid (optional): on create: empty string or omitting = public photo, specify in format '```<x><y><z>```' for private photo; 
 			on update: keys need to be present with empty values for setting a private photo now to public
 
-both calls point to one function for creating AND updating photos. Saves data for the scales 0-2 to database (see above for scale description). Call adds non-visible entries to items table to enable authenticated contacts to comment/like the photo. 
-Client should pay attention to the fact that updated access rights are not transferred to the contacts. i.e. public photos remain publicly visible if they have been commented/liked before setting visibility back to a limited group. Or: previously limited photos remain limited even if changed to publicly visible. 
+both calls point to one function for creating AND updating photos. 
+Saves data for the scales 0-2 to database (see above for scale description). 
+Call adds non-visible entries to items table to enable authenticated contacts to comment/like the photo. 
+Client should pay attention to the fact that updated access rights are not transferred to the contacts. i.e. public photos remain publicly visible if they have been commented/liked before setting visibility back to a limited group.
 Currently it is best way to inform user that updating rights is not the best way, offer a solution to add photo as a new photo with the new rights. 
 
 #### Return values
