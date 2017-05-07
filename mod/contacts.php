@@ -262,7 +262,7 @@ function _contact_update_profile($contact_id) {
 	if ($uid != local_user())
 		return;
 
-	$data = probe_url($r[0]["url"]);
+	$data = Probe::uri($r[0]["url"], "", 0, false);
 
 	// "Feed" or "Unknown" is mostly a sign of communication problems
 	if ((in_array($data["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) AND ($data["network"] != $r[0]["network"]))
