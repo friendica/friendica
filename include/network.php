@@ -6,9 +6,9 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Network\Probe;
 
 require_once("include/xml.php");
-require_once('include/Probe.php');
 
 /**
  * @brief Curl wrapper

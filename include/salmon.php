@@ -1,7 +1,8 @@
 <?php
 
+use Friendica\Network\Probe;
+
 require_once 'include/crypto.php';
-require_once('include/Probe.php');
 
 function get_salmon_key($uri, $keyhash) {
 	$ret = array();

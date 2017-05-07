@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Network\Probe;
 
 use League\HTMLToMarkdown\HtmlConverter;
 

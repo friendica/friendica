@@ -15,7 +15,7 @@
 use Friendica\App;
 
 require_once('include/Scrape.php');
-require_once('include/Probe.php');
+use Friendica\Network\Probe;
 require_once 'include/enotify.php';
 require_once 'include/group.php';
 

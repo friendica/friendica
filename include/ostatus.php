@@ -5,8 +5,9 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
-require_once 'include/Scrape.php';
+use Friendica\Network\Probe;
 
+require_once 'include/Scrape.php';
 require_once 'include/Contact.php';
 require_once 'include/threads.php';
 require_once 'include/html2bbcode.php';

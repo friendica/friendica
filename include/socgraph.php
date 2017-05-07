@@ -10,6 +10,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 require_once("include/Scrape.php");
+use Friendica\Network\Probe;
 
 require_once 'include/datetime.php';
 require_once 'include/network.php';

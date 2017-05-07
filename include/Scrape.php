@@ -1,5 +1,6 @@
 <?php
-require_once('include/Probe.php');
+
+use Friendica\Network\Probe;
 
 /**
  *

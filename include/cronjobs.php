@@ -2,11 +2,11 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Network\Probe;
 
 function cronjobs_run(&$argv, &$argc){
 	global $a;
 
-	require_once('include/Probe.php');
 	require_once 'include/datetime.php';
 	require_once 'include/ostatus.php';
 	require_once 'include/post_update.php';

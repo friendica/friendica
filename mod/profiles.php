@@ -1,9 +1,9 @@
 <?php
 
 use Friendica\App;
+use Friendica\Network\Probe;
 
 require_once 'include/Contact.php';
-require_once('include/Probe.php');
 
 function profiles_init(App $a) {
 

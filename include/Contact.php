@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Network\Probe;
 
 // Included here for completeness, but this is a very dangerous operation.
 // It is the caller's responsibility to confirm the requestor's intent and
@@ -363,7 +364,6 @@ function get_contact_details_by_addr($addr, $uid = -1) {
 				dbesc($addr));
 
 	if (!dbm::is_result($r)) {
-		require_once('include/Probe.php');
 		$data = Probe::uri($addr);
 
 		$profile = get_contact_details_by_url($data['url'], $uid);
@@ -589,7 +589,6 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		return 0;
 	}
 
-	require_once('include/Probe.php');
 	$data = Probe::uri($url);
 
 	// Last try in gcontact for unsupported networks

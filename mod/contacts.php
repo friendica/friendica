@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Network\Probe;
 
 require_once('include/Scrape.php');
 require_once 'include/Contact.php';

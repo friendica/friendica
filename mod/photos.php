@@ -2,6 +2,7 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Network\Probe;
 
 require_once 'include/Photo.php';
 require_once 'include/photos.php';
@@ -12,7 +13,6 @@ require_once 'include/security.php';
 require_once 'include/redir.php';
 require_once 'include/tags.php';
 require_once 'include/threads.php';
-require_once 'include/Probe.php';
 
 function photos_init(App $a) {
 

@@ -1,6 +1,9 @@
 <?php
+
+namespace Friendica\Network;
+
 /**
- * @file include/Probe.php
+ * @file src/Network/Probe.php
  * @brief Functions for probing URL
  *
  */
