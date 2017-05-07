@@ -56,6 +56,7 @@ class ComposerStaticInitFriendica
         'Friendica\\App' => __DIR__ . '/../..' . '/src/App.php',
         'Friendica\\Core\\Config' => __DIR__ . '/../..' . '/src/Core/Config.php',
         'Friendica\\Core\\PConfig' => __DIR__ . '/../..' . '/src/Core/PConfig.php',
+        'Friendica\\Network\\Probe' => __DIR__ . '/../..' . '/src/Network/Probe.php',
         'Friendica\\ParseUrl' => __DIR__ . '/../..' . '/src/ParseUrl.php',
         'HTMLPurifier' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.php',
         'HTMLPurifier_Arborize' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier/Arborize.php',

@@ -12,6 +12,7 @@ return array(
     'Friendica\\App' => $baseDir . '/src/App.php',
     'Friendica\\Core\\Config' => $baseDir . '/src/Core/Config.php',
     'Friendica\\Core\\PConfig' => $baseDir . '/src/Core/PConfig.php',
+    'Friendica\\Network\\Probe' => $baseDir . '/src/Network/Probe.php',
     'Friendica\\ParseUrl' => $baseDir . '/src/ParseUrl.php',
     'HTMLPurifier' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier.php',
     'HTMLPurifier_Arborize' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier/Arborize.php',
