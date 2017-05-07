@@ -2,7 +2,7 @@
 
 use Friendica\App;
 
-require_once("include/Scrape.php");
+require_once 'include/probe.php';
 require_once 'include/socgraph.php';
 require_once 'include/group.php';
 require_once 'include/salmon.php';

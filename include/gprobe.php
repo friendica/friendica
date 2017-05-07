@@ -2,7 +2,7 @@
 
 use Friendica\Core\Config;
 
-require_once('include/Scrape.php');
+require_once 'include/probe.php';
 require_once 'include/socgraph.php';
 require_once 'include/datetime.php';
 

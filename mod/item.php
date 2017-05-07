@@ -25,7 +25,7 @@ require_once 'include/files.php';
 require_once 'include/threads.php';
 require_once 'include/text.php';
 require_once 'include/items.php';
-require_once 'include/Scrape.php';
+require_once 'include/probe.php';
 require_once 'include/diaspora.php';
 require_once 'include/Contact.php';
 

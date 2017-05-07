@@ -2,7 +2,7 @@
 
 use Friendica\App;
 
-require_once('include/Scrape.php');
+require_once 'include/probe.php';
 
 function probe_content(App $a) {
 

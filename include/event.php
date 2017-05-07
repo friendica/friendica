@@ -87,7 +87,7 @@ function format_event_html($ev, $simple = false) {
 @TODO old-lost code found?
 function parse_event($h) {
 
-	require_once('include/Scrape.php');
+	require_once 'include/probe.php';
 	require_once 'include/html2bbcode';
 
 	$h = '<html><body>' . $h . '</body></html>';

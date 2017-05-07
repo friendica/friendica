@@ -13,7 +13,7 @@ use Friendica\Core\Config;
 
 require_once 'include/items.php';
 require_once 'include/bb2diaspora.php';
-require_once 'include/Scrape.php';
+require_once 'include/probe.php';
 require_once 'include/Contact.php';
 require_once 'include/Photo.php';
 require_once 'include/socgraph.php';

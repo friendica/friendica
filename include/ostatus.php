@@ -17,6 +17,7 @@ require_once 'mod/share.php';
 require_once 'include/enotify.php';
 require_once 'include/socgraph.php';
 require_once 'include/Photo.php';
+require_once 'include/probe.php';
 require_once 'include/follow.php';
 require_once 'include/api.php';
 require_once 'mod/proxy.php';

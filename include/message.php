@@ -174,7 +174,7 @@ function send_wallmessage($recipient='', $body='', $subject='', $replyto=''){
 	$convid = 0;
 	$reply = false;
 
-	require_once('include/Scrape.php');
+	require_once 'include/probe.php';
 
 	$me = probe_url($replyto);
 
