@@ -1219,6 +1219,7 @@ function db_definition() {
 					"convid" => array("convid"),
 					"uri" => array("uri(64)"),
 					"parent-uri" => array("parent-uri(64)"),
+					"contactid" => array("contact-id"),
 					)
 			);
 	$database["mailacct"] = array(
@@ -1356,6 +1357,7 @@ function db_definition() {
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),
+					"contactid" => array("contact-id"),
 					"uid_contactid" => array("uid", "contact-id"),
 					"uid_profile" => array("uid", "profile"),
 					"uid_album_scale_created" => array("uid", "album(32)", "scale", "created"),

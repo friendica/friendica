@@ -914,7 +914,7 @@ class dba {
 
 						logger(dba::replace_parameters($sql, $field_values), LOGGER_DATA);
 
-						if (!self::e($sql, $param)) {
+						if (!self::e($sql, $field_values)) {
 							self::p("ROLLBACK");
 							return false;
 						}
