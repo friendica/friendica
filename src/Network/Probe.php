@@ -733,11 +733,11 @@ class Probe {
 			return false;
 		}
 
-		$doc = new DOMDocument();
+		$doc = new \DOMDocument();
 		if (!@$doc->loadHTML($content))
 			return false;
 
-		$xpath = new DomXPath($doc);
+		$xpath = new \DomXPath($doc);
 
 		$vcards = $xpath->query("//div[contains(concat(' ', @class, ' '), ' vcard ')]");
 		if (!is_object($vcards))
@@ -998,11 +998,11 @@ class Probe {
 	 */
 	private function pumpio_profile_data($profile) {
 
-		$doc = new DOMDocument();
+		$doc = new \DOMDocument();
 		if (!@$doc->loadHTMLFile($profile))
 			return false;
 
-		$xpath = new DomXPath($doc);
+		$xpath = new \DomXPath($doc);
 
 		$data = array();
 
@@ -1074,12 +1074,12 @@ class Probe {
 	 * @return string feed link
 	 */
 	private function get_feed_link($url) {
-		$doc = new DOMDocument();
+		$doc = new \DOMDocument();
 
 		if (!@$doc->loadHTMLFile($url))
 			return false;
 
-		$xpath = new DomXPath($doc);
+		$xpath = new \DomXPath($doc);
 
 		//$feeds = $xpath->query("/html/head/link[@type='application/rss+xml']");
 		$feeds = $xpath->query("/html/head/link[@type='application/rss+xml' and @rel='alternate']");
