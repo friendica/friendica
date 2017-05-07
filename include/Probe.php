@@ -794,7 +794,7 @@ class Probe {
 
 		if (sizeof($avatar)) {
 			ksort($avatar);
-			$data["photo"] = array_pop($avatar);
+			$data["photo"] = self::fix_avatar(array_pop($avatar), $data["baseurl"]);
 		}
 
 		if ($dfrn) {
@@ -966,7 +966,7 @@ class Probe {
 			$data["nick"] = $feed_data["header"]["author-nick"];
 		}
 		if ($feed_data["header"]["author-avatar"] != "") {
-			$data["photo"] = ostatus::fix_avatar($feed_data["header"]["author-avatar"], $data["url"]);
+			$data["photo"] = self::fix_avatar($feed_data["header"]["author-avatar"], $data["url"]);
 		}
 		if ($feed_data["header"]["author-id"] != "") {
 			$data["alias"] = $feed_data["header"]["author-id"];
@@ -1230,4 +1230,41 @@ class Probe {
 
 		return $data;
 	}
+
+	/**
+	 * @brief Mix two paths together to possibly fix missing parts
+	 *
+	 * @param string $avatar Path to the avatar
+	 * @param string $base Another path that is hopefully complete
+	 *
+	 * @return string fixed avatar path
+	 */
+	public static function fix_avatar($avatar, $base) {
+		$base_parts = parse_url($base);
+
+		// Remove all parts that could create a problem
+		unset($base_parts['path']);
+		unset($base_parts['query']);
+		unset($base_parts['fragment']);
+
+		$avatar_parts = parse_url($avatar);
+
+		// Now we mix them
+		$parts = array_merge($base_parts, $avatar_parts);
+
+		// And put them together again
+		$scheme   = isset($parts['scheme']) ? $parts['scheme'] . '://' : '';
+		$host     = isset($parts['host']) ? $parts['host'] : '';
+		$port     = isset($parts['port']) ? ':' . $parts['port'] : '';
+		$path     = isset($parts['path']) ? $parts['path'] : '';
+		$query    = isset($parts['query']) ? '?' . $parts['query'] : '';
+		$fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
+
+		$fixed = $scheme.$host.$port.$path.$query.$fragment;
+
+		logger('Base: '.$base.' - Avatar: '.$avatar.' - Fixed: '.$fixed, LOGGER_DATA);
+
+		return $fixed;
+	}
+
 }

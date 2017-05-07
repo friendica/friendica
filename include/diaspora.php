@@ -637,7 +637,7 @@ class Diaspora {
 			}
 
 		// Only some message types have signatures. So we quit here for the other types.
-		if (!in_array($type, array("comment", "message", "like"))) {
+		if (!in_array($type, array("comment", "like"))) {
 			return array("fields" => $fields, "relayed" => false);
 		}
 		// No author_signature? This is a must, so we quit.
@@ -695,7 +695,7 @@ class Diaspora {
 	 *
 	 * @return array the queried data
 	 */
-	private static function person_by_handle($handle) {
+	public static function person_by_handle($handle) {
 
 		$r = q("SELECT * FROM `fcontact` WHERE `network` = '%s' AND `addr` = '%s' LIMIT 1",
 			dbesc(NETWORK_DIASPORA),
@@ -1507,11 +1507,6 @@ class Diaspora {
 		$msg_text = unxmlify($mesg->text);
 		$msg_created_at = datetime_convert("UTC", "UTC", notags(unxmlify($mesg->created_at)));
 
-		/// @todo these fields doesn't seem to be supported by the new protocol
-		$msg_parent_guid = notags(unxmlify($mesg->parent_guid));
-		$msg_parent_author_signature = notags(unxmlify($mesg->parent_author_signature));
-		$msg_author_signature = notags(unxmlify($mesg->author_signature));
-
 		if ($msg_conversation_guid != $guid) {
 			logger("message conversation guid does not belong to the current conversation.");
 			return false;
@@ -1520,41 +1515,7 @@ class Diaspora {
 		$body = diaspora2bb($msg_text);
 		$message_uri = $msg_author.":".$msg_guid;
 
-		$author_signed_data = $msg_guid.";".$msg_parent_guid.";".$msg_text.";".unxmlify($mesg->created_at).";".$msg_author.";".$msg_conversation_guid;
-
-		$author_signature = base64_decode($msg_author_signature);
-
-		if (strcasecmp($msg_author,$msg["author"]) == 0) {
-			$person = $contact;
-			$key = $msg["key"];
-		} else {
-			$person = self::person_by_handle($msg_author);
-
-			if (is_array($person) && x($person, "pubkey")) {
-				$key = $person["pubkey"];
-			} else {
-				logger("unable to find author details");
-					return false;
-			}
-		}
-
-		if (!rsa_verify($author_signed_data, $author_signature, $key, "sha256")) {
-			logger("verification failed.");
-			return false;
-		}
-
-		if ($msg_parent_author_signature) {
-			$owner_signed_data = $msg_guid.";".$msg_parent_guid.";".$msg_text.";".unxmlify($mesg->created_at).";".$msg_author.";".$msg_conversation_guid;
-
-			$parent_author_signature = base64_decode($msg_parent_author_signature);
-
-			$key = $msg["key"];
-
-			if (!rsa_verify($owner_signed_data, $parent_author_signature, $key, "sha256")) {
-				logger("owner verification failed.");
-				return false;
-			}
-		}
+		$person = self::person_by_handle($msg_author);
 
 		$r = q("SELECT `id` FROM `mail` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($message_uri)
@@ -1827,9 +1788,6 @@ class Diaspora {
 		$text = unxmlify($data->text);
 		$created_at = datetime_convert("UTC", "UTC", notags(unxmlify($data->created_at)));
 
-		/// @todo "parent_guid" doesn't seem to be part of the new protocol
-		$parent_guid = notags(unxmlify($data->parent_guid));
-
 		$contact = self::allowed_contact_by_handle($importer, $author, true);
 		if (!$contact) {
 			return false;
@@ -1883,7 +1841,7 @@ class Diaspora {
 			0,
 			1,
 			dbesc($message_uri),
-			dbesc($author.":".$parent_guid),
+			dbesc($author.":".$conversation["guid"]),
 			dbesc($created_at)
 		);
 
