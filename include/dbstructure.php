@@ -399,6 +399,12 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 				$sql3 .= ";";
 			}
 
+			$field_list = '';
+			foreach ($structure['fields'] AS $fieldname => $parameters) {
+				$field_list .= 'ANY_VALUE(`' . $fieldname . '`),';
+			}
+			$field_list = rtrim($field_list, ',');
+			
 			if ($verbose) {
 				// Ensure index conversion to unique removes duplicates
 				if ($is_unique) {
@@ -415,7 +421,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					if ($ignore != "") {
 						echo "SET session old_alter_table=0;\n";
 					} else {
-						echo "INSERT INTO `".$temp_name."` SELECT * FROM `".$name."`".$group_by.";\n";
+						echo "INSERT INTO `".$temp_name."` SELECT ".$field_list." FROM `".$name."`".$group_by.";\n";
 						echo "DROP TABLE `".$name."`;\n";
 						echo "RENAME TABLE `".$temp_name."` TO `".$name."`;\n";
 					}
@@ -446,7 +452,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					if ($ignore != "") {
 						$db->q("SET session old_alter_table=0;");
 					} else {
-						$r = $db->q("INSERT INTO `".$temp_name."` SELECT * FROM `".$name."`".$group_by.";");
+						$r = $db->q("INSERT INTO `".$temp_name."` SELECT ".$field_list." FROM `".$name."`".$group_by.";");
 						if (!dbm::is_result($r)) {
 							$errors .= print_update_error($db, $sql3);
 							return $errors;
