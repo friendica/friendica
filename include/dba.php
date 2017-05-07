@@ -886,7 +886,7 @@ class dba {
 
 					logger(dba::replace_parameters($sql, $command['param']), LOGGER_DATA);
 
-					if (!self::e($sql, $param)) {
+					if (!self::e($sql, $command['param'])) {
 						self::p("ROLLBACK");
 						return false;
 					}
