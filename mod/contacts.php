@@ -2,12 +2,12 @@
 
 use Friendica\App;
 
-require_once('include/Contact.php');
-require_once('include/socgraph.php');
-require_once('include/contact_selectors.php');
 require_once('include/Scrape.php');
-require_once('mod/proxy.php');
-require_once('include/Photo.php');
+require_once 'include/Contact.php';
+require_once 'include/socgraph.php';
+require_once 'include/contact_selectors.php';
+require_once 'mod/proxy.php';
+require_once 'include/Photo.php';
 
 function contacts_init(App $a) {
 	if (! local_user()) {
@@ -27,8 +27,8 @@ function contacts_init(App $a) {
 		}
 	}
 
-	require_once('include/group.php');
-	require_once('include/contact_widgets.php');
+	require_once 'include/group.php';
+	require_once 'include/contact_widgets.php';
 
 	if ($_GET['nets'] == "all") {
 		$_GET['nets'] = "";
@@ -498,7 +498,7 @@ function contacts_content(App $a) {
 			'$baseurl' => App::get_baseurl(true),
 		));
 
-		require_once('include/contact_selectors.php');
+		require_once 'include/contact_selectors.php';
 
 		$tpl = get_markup_template("contact_edit.tpl");
 

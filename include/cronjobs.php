@@ -6,14 +6,14 @@ use Friendica\Core\Config;
 function cronjobs_run(&$argv, &$argc){
 	global $a;
 
-	require_once('include/datetime.php');
-	require_once('include/ostatus.php');
-	require_once('include/post_update.php');
-	require_once('mod/nodeinfo.php');
-	require_once('include/photos.php');
-	require_once('include/user.php');
-	require_once('include/socgraph.php');
 	require_once('include/Probe.php');
+	require_once 'include/datetime.php';
+	require_once 'include/ostatus.php';
+	require_once 'include/post_update.php';
+	require_once 'mod/nodeinfo.php';
+	require_once 'include/photos.php';
+	require_once 'include/user.php';
+	require_once 'include/socgraph.php';
 
 	// No parameter set? So return
 	if ($argc <= 1) {

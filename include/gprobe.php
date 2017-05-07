@@ -3,8 +3,8 @@
 use Friendica\Core\Config;
 
 require_once('include/Scrape.php');
-require_once('include/socgraph.php');
-require_once('include/datetime.php');
+require_once 'include/socgraph.php';
+require_once 'include/datetime.php';
 
 function gprobe_run(&$argv, &$argc){
 	if ($argc != 2) {

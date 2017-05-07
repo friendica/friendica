@@ -20,9 +20,9 @@
 
 use Friendica\App;
 
-require_once('include/enotify.php');
-require_once('include/group.php');
 require_once('include/Probe.php');
+require_once 'include/enotify.php';
+require_once 'include/group.php';
 
 function dfrn_confirm_post(App $a, $handsfree = null) {
 
@@ -154,7 +154,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			 * worried about key leakage than anybody cracking it.
 			 *
 			 */
-			require_once('include/crypto.php');
+			require_once 'include/crypto.php';
 
 			$res = new_keypair(4096);
 
@@ -319,7 +319,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		 *
 		 */
 
-		require_once('include/Photo.php');
+		require_once 'include/Photo.php';
 
 		update_contact_avatar($contact['photo'],$uid,$contact_id);
 
@@ -435,7 +435,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		if ((isset($new_relation) && $new_relation == CONTACT_IS_FRIEND)) {
 
 			if (($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
-				require_once('include/diaspora.php');
+				require_once 'include/diaspora.php';
 				$ret = Diaspora::send_share($user[0],$r[0]);
 				logger('share returns: ' . $ret);
 			}
@@ -448,7 +448,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 
 			if((dbm::is_result($r)) && ($r[0]['hide-friends'] == 0) && ($activity) && (! $hidden)) {
 
-				require_once('include/items.php');
+				require_once 'include/items.php';
 
 				$self = q("SELECT * FROM `contact` WHERE `self` = 1 AND `uid` = %d LIMIT 1",
 					intval($uid)
@@ -672,7 +672,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			$photo = App::get_baseurl() . '/images/person-175.jpg';
 		}
 
-		require_once("include/Photo.php");
+		require_once 'include/Photo.php';
 
 		update_contact_avatar($photo,$local_uid,$dfrn_record);
 
@@ -752,7 +752,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 
 			if((dbm::is_result($r)) && ($r[0]['hide-friends'] == 0)) {
 
-				require_once('include/items.php');
+				require_once 'include/items.php';
 
 				$self = q("SELECT * FROM `contact` WHERE `self` = 1 AND `uid` = %d LIMIT 1",
 					intval($local_uid)

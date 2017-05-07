@@ -3,20 +3,20 @@
 use Friendica\App;
 use Friendica\Core\Config;
 
-require_once('include/queue_fn.php');
-require_once('include/html2plain.php');
 require_once('include/Scrape.php');
-require_once('include/diaspora.php');
-require_once('include/ostatus.php');
-require_once('include/dfrn.php');
+require_once 'include/queue_fn.php';
+require_once 'include/html2plain.php';
+require_once 'include/diaspora.php';
+require_once 'include/ostatus.php';
+require_once 'include/dfrn.php';
 
 function delivery_run(&$argv, &$argc){
 	global $a;
 
-	require_once('include/datetime.php');
-	require_once('include/items.php');
-	require_once('include/bbcode.php');
-	require_once('include/email.php');
+	require_once 'include/datetime.php';
+	require_once 'include/items.php';
+	require_once 'include/bbcode.php';
+	require_once 'include/email.php';
 
 	if ($argc < 3) {
 		return;
@@ -166,7 +166,7 @@ function delivery_run(&$argv, &$argc){
 		$public_message = true;
 
 		if (!($mail || $fsuggest || $relocate)) {
-			require_once('include/group.php');
+			require_once 'include/group.php';
 
 			$parent = $items[0];
 

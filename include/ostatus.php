@@ -4,22 +4,22 @@
  */
 
 use Friendica\App;
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
+require_once 'include/Scrape.php';
 
-require_once "include/Contact.php";
-require_once "include/threads.php";
-require_once "include/html2bbcode.php";
-require_once "include/bbcode.php";
-require_once "include/items.php";
-require_once "mod/share.php";
-require_once "include/enotify.php";
-require_once "include/socgraph.php";
-require_once "include/Photo.php";
-require_once "include/Scrape.php";
-require_once "include/follow.php";
-require_once "include/api.php";
-require_once "mod/proxy.php";
-require_once "include/xml.php";
+require_once 'include/Contact.php';
+require_once 'include/threads.php';
+require_once 'include/html2bbcode.php';
+require_once 'include/bbcode.php';
+require_once 'include/items.php';
+require_once 'mod/share.php';
+require_once 'include/enotify.php';
+require_once 'include/socgraph.php';
+require_once 'include/Photo.php';
+require_once 'include/follow.php';
+require_once 'include/api.php';
+require_once 'mod/proxy.php';
+require_once 'include/xml.php';
 
 /**
  * @brief This class contain functions for the OStatus protocol

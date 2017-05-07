@@ -4,9 +4,9 @@
  * @brief Methods for read and write notifications from/to database
  *  or for formatting notifications
  */
-require_once('include/html2plain.php');
-require_once("include/datetime.php");
-require_once("include/bbcode.php");
+require_once 'include/html2plain.php';
+require_once 'include/datetime.php';
+require_once 'include/bbcode.php';
 
 /**
  * @brief Methods for read and write notifications from/to database

@@ -144,7 +144,6 @@ function item_post(App $a) {
 				$parent_contact = get_contact_details_by_url($thrparent[0]["author-link"]);
 
 				if (!isset($parent_contact["nick"])) {
-					require_once 'include/Scrape.php';
 					$probed_contact = probe_url($thrparent[0]["author-link"]);
 					if ($probed_contact["network"] != NETWORK_FEED) {
 						$parent_contact = $probed_contact;
@@ -1106,7 +1105,6 @@ function item_content(App $a) {
  * @return boolean true if replaced, false if not replaced
  */
 function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $network = "") {
-	require_once 'include/Scrape.php';
 	require_once 'include/socgraph.php';
 
 	$replaced = false;

@@ -14,10 +14,10 @@
 
 use Friendica\App;
 
-require_once('include/enotify.php');
 require_once('include/Scrape.php');
 require_once('include/Probe.php');
-require_once('include/group.php');
+require_once 'include/enotify.php';
+require_once 'include/group.php';
 
 function dfrn_request_init(App $a) {
 
@@ -522,8 +522,6 @@ function dfrn_request_post(App $a) {
 					return; // NOTREACHED
 				}
 
-				require_once('include/Scrape.php');
-
 				$parms = Probe::profile(($hcard) ? $hcard : $url);
 
 				if (! count($parms)) {
@@ -767,7 +765,7 @@ function dfrn_request_content(App $a) {
 				}
 
 				if($auto_confirm) {
-					require_once('mod/dfrn_confirm.php');
+					require_once 'mod/dfrn_confirm.php';
 					$handsfree = array(
 						'uid'      => $r[0]['uid'],
 						'node'     => $r[0]['nickname'],

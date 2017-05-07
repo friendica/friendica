@@ -88,7 +88,7 @@ function format_event_html($ev, $simple = false) {
 function parse_event($h) {
 
 	require_once('include/Scrape.php');
-	require_once('include/html2bbcode');
+	require_once 'include/html2bbcode';
 
 	$h = '<html><body>' . $h . '</body></html>';
 

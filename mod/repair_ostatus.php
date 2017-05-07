@@ -3,7 +3,7 @@
 use Friendica\App;
 
 require_once('include/Scrape.php');
-require_once('include/follow.php');
+require_once 'include/follow.php';
 
 function repair_ostatus_content(App $a) {
 

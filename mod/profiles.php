@@ -2,7 +2,7 @@
 
 use Friendica\App;
 
-require_once("include/Contact.php");
+require_once 'include/Contact.php';
 require_once('include/Probe.php');
 
 function profiles_init(App $a) {
@@ -504,7 +504,7 @@ function profiles_post(App $a) {
 				proc_run(PRIORITY_LOW, "include/directory.php", $url);
 			}
 
-			require_once('include/profile_update.php');
+			require_once 'include/profile_update.php';
 			profile_change();
 
 			// Update the global contact for the user
@@ -529,7 +529,7 @@ function profile_activity($changed, $value) {
 		return;
 	}
 
-	require_once('include/items.php');
+	require_once 'include/items.php';
 
 	$self = q("SELECT * FROM `contact` WHERE `self` = 1 AND `uid` = %d LIMIT 1",
 		intval(local_user())
@@ -623,7 +623,7 @@ function profiles_content(App $a) {
 			return;
 		}
 
-		require_once('include/profile_selectors.php');
+		require_once 'include/profile_selectors.php';
 
 
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('profed_head.tpl'), array(

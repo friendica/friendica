@@ -982,9 +982,9 @@ function photos_content(App $a) {
 		return;
 	}
 
-	require_once('include/bbcode.php');
-	require_once('include/security.php');
-	require_once('include/conversation.php');
+	require_once 'include/bbcode.php';
+	require_once 'include/security.php';
+	require_once 'include/conversation.php';
 
 	if (! x($a->data,'user')) {
 		notice( t('No photos selected') . EOL );
