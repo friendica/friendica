@@ -31,7 +31,7 @@ class Probe {
 	 *
 	 * @return array Ordered data
 	 */
-	private function rearrange_data($data) {
+	private function rearrangeData($data) {
 		$fields = array("name", "nick", "guid", "url", "addr", "alias",
 				"photo", "community", "keywords", "location", "about",
 				"batch", "notify", "poll", "request", "confirm", "poco",
@@ -52,7 +52,9 @@ class Probe {
 
 	/**
 	 * @brief Probes for XRD data
-	 *
+	 * 
+	 * @param string $host The host part of an url
+	 * 
 	 * @return array
 	 *      'lrdd' => Link to LRDD endpoint
 	 *      'lrdd-xml' => Link to LRDD endpoint in XML format
@@ -138,12 +140,12 @@ class Probe {
 	 * @return string profile link
 	 */
 
-	public static function webfinger_dfrn($webbie, &$hcard) {
+	public static function webfingerDfrn($webbie, &$hcard) {
 
 		$profile_link = '';
 
 		$links = self::lrdd($webbie);
-		logger('webfinger_dfrn: '.$webbie.':'.print_r($links,true), LOGGER_DATA);
+		logger('webfingerDfrn: '.$webbie.':'.print_r($links,true), LOGGER_DATA);
 		if (count($links)) {
 			foreach ($links as $link) {
 				if ($link['@attributes']['rel'] === NAMESPACE_DFRN)
@@ -296,7 +298,7 @@ class Probe {
 			$data["network"] = NETWORK_PHANTOM;
 		}
 
-		$data = self::rearrange_data($data);
+		$data = self::rearrangeData($data);
 
 		// Only store into the cache if the value seems to be valid
 		if (!in_array($data['network'], array(NETWORK_PHANTOM, NETWORK_MAIL))) {
@@ -537,7 +539,7 @@ class Probe {
 	 *
 	 * @return array noscrape data
 	 */
-	private function poll_noscrape($noscrape, $data) {
+	private function pollNoscrape($noscrape, $data) {
 		$ret = z_fetch_url($noscrape);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
@@ -604,7 +606,7 @@ class Probe {
 	 *
 	 * @return int Number of errors
 	 */
-	public static function valid_dfrn($data) {
+	public static function validDfrn($data) {
 		$errors = 0;
 		if (!isset($data['key']))
 			$errors ++;
@@ -634,13 +636,13 @@ class Probe {
 
 		// Fetch data via noscrape - this is faster
 		$noscrape = str_replace(array("/hcard/", "/profile/"), "/noscrape/", $profile);
-		$data = self::poll_noscrape($noscrape, $data);
+		$data = self::pollNoscrape($noscrape, $data);
 
 		if (!isset($data["notify"]) OR !isset($data["confirm"]) OR
 			!isset($data["request"]) OR !isset($data["poll"]) OR
 			!isset($data["poco"]) OR !isset($data["name"]) OR
 			!isset($data["photo"]))
-			$data = self::poll_hcard($profile, $data, true);
+			$data = self::pollHcard($profile, $data, true);
 
 		$prof_data = array();
 		$prof_data["addr"] = $data["addr"];
@@ -703,13 +705,13 @@ class Probe {
 
 		// Fetch data via noscrape - this is faster
 		$noscrape = str_replace("/hcard/", "/noscrape/", $hcard);
-		$data = self::poll_noscrape($noscrape, $data);
+		$data = self::pollNoscrape($noscrape, $data);
 
 		if (isset($data["notify"]) AND isset($data["confirm"]) AND isset($data["request"]) AND
 			isset($data["poll"]) AND isset($data["name"]) AND isset($data["photo"]))
 			return $data;
 
-		$data = self::poll_hcard($hcard, $data, true);
+		$data = self::pollHcard($hcard, $data, true);
 
 		return $data;
 	}
@@ -723,7 +725,7 @@ class Probe {
 	 *
 	 * @return array hcard data
 	 */
-	private function poll_hcard($hcard, $data, $dfrn = false) {
+	private function pollHcard($hcard, $data, $dfrn = false) {
 		$ret = z_fetch_url($hcard);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
@@ -797,7 +799,7 @@ class Probe {
 
 		if (sizeof($avatar)) {
 			ksort($avatar);
-			$data["photo"] = self::fix_avatar(array_pop($avatar), $data["baseurl"]);
+			$data["photo"] = self::fixAvatar(array_pop($avatar), $data["baseurl"]);
 		}
 
 		if ($dfrn) {
@@ -868,7 +870,7 @@ class Probe {
 					$data["alias"] = $alias;
 
 		// Fetch further information from the hcard
-		$data = self::poll_hcard($hcard, $data);
+		$data = self::pollHcard($hcard, $data);
 
 		if (!$data)
 			return false;
@@ -969,7 +971,7 @@ class Probe {
 			$data["nick"] = $feed_data["header"]["author-nick"];
 		}
 		if ($feed_data["header"]["author-avatar"] != "") {
-			$data["photo"] = self::fix_avatar($feed_data["header"]["author-avatar"], $data["url"]);
+			$data["photo"] = self::fixAvatar($feed_data["header"]["author-avatar"], $data["url"]);
 		}
 		if ($feed_data["header"]["author-id"] != "") {
 			$data["alias"] = $feed_data["header"]["author-id"];
@@ -996,7 +998,7 @@ class Probe {
 	 *
 	 * @return array profile data
 	 */
-	private function pumpio_profile_data($profile) {
+	private function pumpioProfileData($profile) {
 
 		$doc = new \DOMDocument();
 		if (!@$doc->loadHTMLFile($profile))
@@ -1056,7 +1058,7 @@ class Probe {
 		} else
 			return false;
 
-		$profile_data = self::pumpio_profile_data($data["url"]);
+		$profile_data = self::pumpioProfileData($data["url"]);
 
 		if (!$profile_data)
 			return false;
@@ -1073,7 +1075,7 @@ class Probe {
 	 *
 	 * @return string feed link
 	 */
-	private function get_feed_link($url) {
+	private function getFeedLink($url) {
 		$doc = new \DOMDocument();
 
 		if (!@$doc->loadHTMLFile($url))
@@ -1123,7 +1125,7 @@ class Probe {
 			if (!$probe)
 				return false;
 
-			$feed_url = self::get_feed_link($url);
+			$feed_url = self::getFeedLink($url);
 
 			if (!$feed_url)
 				return false;
@@ -1242,7 +1244,7 @@ class Probe {
 	 *
 	 * @return string fixed avatar path
 	 */
-	public static function fix_avatar($avatar, $base) {
+	public static function fixAvatar($avatar, $base) {
 		$base_parts = parse_url($base);
 
 		// Remove all parts that could create a problem

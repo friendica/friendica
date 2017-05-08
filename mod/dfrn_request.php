@@ -133,7 +133,7 @@ function dfrn_request_post(App $a) {
 						if (! x($parms,'photo')) {
 							notice( t('Warning: profile location has no profile photo.') . EOL );
 						}
-						$invalid = Probe::valid_dfrn($parms);
+						$invalid = Probe::validDfrn($parms);
 						if ($invalid) {
 							notice( sprintf( tt("%d required parameter was not found at the given location",
 												"%d required parameters were not found at the given location",
@@ -455,7 +455,7 @@ function dfrn_request_post(App $a) {
 			$network = $data["network"];
 
 			// Canonicalise email-style profile locator
-			$url = Probe::webfinger_dfrn($url,$hcard);
+			$url = Probe::webfingerDfrn($url,$hcard);
 
 			if (substr($url,0,5) === 'stat:') {
 
@@ -535,7 +535,7 @@ function dfrn_request_post(App $a) {
 					if (! x($parms,'photo')) {
 						notice( t('Warning: profile location has no profile photo.') . EOL );
 					}
-					$invalid = Probe::valid_dfrn($parms);
+					$invalid = Probe::validDfrn($parms);
 					if ($invalid) {
 						notice( sprintf( tt("%d required parameter was not found at the given location",
 											"%d required parameters were not found at the given location",

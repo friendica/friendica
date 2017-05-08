@@ -106,7 +106,7 @@ class ostatus {
 		}
 		if (count($avatarlist) > 0) {
 			krsort($avatarlist);
-			$author["author-avatar"] = Probe::fix_avatar(current($avatarlist), $author["author-link"]);
+			$author["author-avatar"] = Probe::fixAvatar(current($avatarlist), $author["author-link"]);
 		}
 
 		$displayname = $xpath->evaluate('atom:author/poco:displayName/text()', $context)->item(0)->nodeValue;
@@ -1175,7 +1175,7 @@ class ostatus {
 				$arr["owner-name"] = $single_conv->actor->portablecontacts_net->displayName;
 
 			$arr["owner-link"] = $actor;
-			$arr["owner-avatar"] = Probe::fix_avatar($single_conv->actor->image->url, $arr["owner-link"]);
+			$arr["owner-avatar"] = Probe::fixAvatar($single_conv->actor->image->url, $arr["owner-link"]);
 
 			$arr["author-name"] = $arr["owner-name"];
 			$arr["author-link"] = $arr["owner-link"];
@@ -1240,7 +1240,7 @@ class ostatus {
 					$arr["author-name"] = $single_conv->object->actor->contact->displayName;
 				}
 				$arr["author-link"] = $single_conv->object->actor->url;
-				$arr["author-avatar"] = Probe::fix_avatar($single_conv->object->actor->image->url, $arr["author-link"]);
+				$arr["author-avatar"] = Probe::fixAvatar($single_conv->object->actor->image->url, $arr["author-link"]);
 
 				$arr["app"] = $single_conv->object->provider->displayName."#";
 				//$arr["verb"] = $single_conv->object->verb;
