@@ -332,8 +332,9 @@ class Probe {
 			/// @todo temporary fix - we need a real contact update function that updates only changing fields
 			/// The biggest problem is the avatar picture that could have a reduced image size.
 			/// It should only be updated if the existing picture isn't existing anymore.
+			/// We only update the contact when it is no probing for a specific network.
 			if (($data['network'] != NETWORK_FEED)
-				AND ($data["network"] != NETWORK_DIASPORA)
+				AND ($network == "")
 				AND $data["name"]
 				AND $data["nick"]
 				AND $data["url"]
