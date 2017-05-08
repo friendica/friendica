@@ -191,7 +191,7 @@ class App {
 			$this->hostname = $hostname;
 		}
 
-		if (! static::directory_usable($basepath)) {
+		if (! static::directory_usable($basepath, false)) {
 			throw new \Exception('Basepath ' . $basepath . ' isn\'t usable.');
 		}
 
@@ -953,7 +953,7 @@ class App {
 	 *
 	 * @return boolean the directory is usable
 	 */
-	static function directory_usable($directory) {
+	static function directory_usable($directory, $check_writable = true) {
 		if ($directory == '') {
 			logger('Directory is empty. This shouldn\'t happen.', LOGGER_DEBUG);
 			return false;
@@ -971,7 +971,7 @@ class App {
 			logger('Path "' . $directory . '" is not a directory for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}
-		if (!is_writable($directory)) {
+		if ($check_writable AND !is_writable($directory)) {
 			logger('Path "' . $directory . '" is not writable for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}
