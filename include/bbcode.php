@@ -180,7 +180,7 @@ function bb_style_url($match) {
 }
 
 /**
- * @brief Converts [url] BBCodes in a format that looks fine on Mastodon.
+ * @brief Converts [url] BBCodes in a format that looks fine on Mastodon and GNU Social.
  * @param string $url URL that is about to be reformatted
  * @return string reformatted link including HTML codes
  */
@@ -191,7 +191,7 @@ function style_url_for_mastodon($url) {
         $scheme = $parts['scheme'].'://';
         $styled_url = str_replace($scheme, '', $styled_url);
 
-        $html = '<a href="%s" rel="nofollow noopener" target="_blank">'.
+        $html = '<a href="%s" class="attachment" rel="nofollow noopener" target="_blank">'.
                  '<span class="invisible">%s</span>';
 
         if (strlen($styled_url) > 30) {
