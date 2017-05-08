@@ -143,12 +143,12 @@ class Probe {
 	 * a lengthy content page to scrape dfrn attributes
 	 *
 	 * @param string $webbie Address that should be probed
-	 * @param string $hcard Link to the hcard - is returned by reference
+	 * @param string $hcard_url Link to the hcard - is returned by reference
 	 *
 	 * @return string profile link
 	 */
 
-	public static function webfingerDfrn($webbie, &$hcard) {
+	public static function webfingerDfrn($webbie, &$hcard_url) {
 
 		$profile_link = '';
 
@@ -163,7 +163,7 @@ class Probe {
 					$profile_link = 'stat:'.$link['@attributes']['template'];
 				}
 				if ($link['@attributes']['rel'] === 'http://microformats.org/profile/hcard') {
-					$hcard = $link['@attributes']['href'];
+					$hcard_url = $link['@attributes']['href'];
 				}
 			}
 		}
@@ -579,13 +579,13 @@ class Probe {
 	 * "noscrape" is a faster alternative to fetch the data from the hcard.
 	 * This functionality was originally created for the directory.
 	 *
-	 * @param string $noscrape Link to the noscrape page
+	 * @param string $noscrape_url Link to the noscrape page
 	 * @param array $data The already fetched data
 	 *
 	 * @return array noscrape data
 	 */
-	private function pollNoscrape($noscrape, $data) {
-		$ret = z_fetch_url($noscrape);
+	private function pollNoscrape($noscrape_url, $data) {
+		$ret = z_fetch_url($noscrape_url);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
 		}
@@ -688,19 +688,19 @@ class Probe {
 	/**
 	 * @brief Fetch data from a DFRN profile page and via "noscrape"
 	 *
-	 * @param string $profile Link to the profile page
+	 * @param string $profile_link Link to the profile page
 	 *
 	 * @return array profile data
 	 */
-	public static function profile($profile) {
+	public static function profile($profile_link) {
 
 		$data = array();
 
-		logger("Check profile ".$profile, LOGGER_DEBUG);
+		logger("Check profile ".$profile_link, LOGGER_DEBUG);
 
 		// Fetch data via noscrape - this is faster
-		$noscrape = str_replace(array("/hcard/", "/profile/"), "/noscrape/", $profile);
-		$data = self::pollNoscrape($noscrape, $data);
+		$noscrape_url = str_replace(array("/hcard/", "/profile/"), "/noscrape/", $profile_link);
+		$data = self::pollNoscrape($noscrape_url, $data);
 
 		if (!isset($data["notify"])
 			OR !isset($data["confirm"])
@@ -710,7 +710,7 @@ class Probe {
 			OR !isset($data["name"])
 			OR !isset($data["photo"])
 		) {
-			$data = self::pollHcard($profile, $data, true);
+			$data = self::pollHcard($profile_link, $data, true);
 		}
 
 		$prof_data = array();
@@ -725,7 +725,7 @@ class Probe {
 		$prof_data["fn"] = $data["name"];
 		$prof_data["key"] = $data["pubkey"];
 
-		logger("Result for profile ".$profile.": ".print_r($prof_data, true), LOGGER_DEBUG);
+		logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
 		return $prof_data;
 	}
@@ -739,7 +739,7 @@ class Probe {
 	 */
 	private function dfrn($webfinger) {
 
-		$hcard = "";
+		$hcard_url = "";
 		$data = array();
 		foreach ($webfinger["links"] as $link) {
 			if (($link["rel"] == NAMESPACE_DFRN) AND ($link["href"] != "")) {
@@ -749,7 +749,7 @@ class Probe {
 			} elseif (($link["rel"] == "http://webfinger.net/rel/profile-page") AND ($link["type"] == "text/html") AND ($link["href"] != "")) {
 				$data["url"] = $link["href"];
 			} elseif (($link["rel"] == "http://microformats.org/profile/hcard") AND ($link["href"] != "")) {
-				$hcard = $link["href"];
+				$hcard_url = $link["href"];
 			} elseif (($link["rel"] == NAMESPACE_POCO) AND ($link["href"] != "")) {
 				$data["poco"] = $link["href"];
 			} elseif (($link["rel"] == "http://webfinger.net/rel/avatar") AND ($link["href"] != "")) {
@@ -768,13 +768,13 @@ class Probe {
 			}
 		}
 
-		if (!isset($data["network"]) OR ($hcard == "")) {
+		if (!isset($data["network"]) OR ($hcard_url == "")) {
 			return false;
 		}
 
 		// Fetch data via noscrape - this is faster
-		$noscrape = str_replace("/hcard/", "/noscrape/", $hcard);
-		$data = self::pollNoscrape($noscrape, $data);
+		$noscrape_url = str_replace("/hcard/", "/noscrape/", $hcard_url);
+		$data = self::pollNoscrape($noscrape_url, $data);
 
 		if (isset($data["notify"])
 			AND isset($data["confirm"])
@@ -786,7 +786,7 @@ class Probe {
 			return $data;
 		}
 
-		$data = self::pollHcard($hcard, $data, true);
+		$data = self::pollHcard($hcard_url, $data, true);
 
 		return $data;
 	}
@@ -794,14 +794,14 @@ class Probe {
 	/**
 	 * @brief Poll the hcard page (Diaspora and Friendica specific)
 	 *
-	 * @param string $hcard Link to the hcard page
+	 * @param string $hcard_url Link to the hcard page
 	 * @param array $data The already fetched data
 	 * @param boolean $dfrn Poll DFRN specific data
 	 *
 	 * @return array hcard data
 	 */
-	private function pollHcard($hcard, $data, $dfrn = false) {
-		$ret = z_fetch_url($hcard);
+	private function pollHcard($hcard_url, $data, $dfrn = false) {
+		$ret = z_fetch_url($hcard_url);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
 		}
@@ -919,11 +919,11 @@ class Probe {
 	 */
 	private function diaspora($webfinger) {
 
-		$hcard = "";
+		$hcard_url = "";
 		$data = array();
 		foreach ($webfinger["links"] as $link) {
 			if (($link["rel"] == "http://microformats.org/profile/hcard") AND ($link["href"] != "")) {
-				$hcard = $link["href"];
+				$hcard_url = $link["href"];
 			} elseif (($link["rel"] == "http://joindiaspora.com/seed_location") AND ($link["href"] != "")) {
 				$data["baseurl"] = trim($link["href"], '/');
 			} elseif (($link["rel"] == "http://joindiaspora.com/guid") AND ($link["href"] != "")) {
@@ -946,7 +946,7 @@ class Probe {
 			}
 		}
 
-		if (!isset($data["url"]) OR ($hcard == "")) {
+		if (!isset($data["url"]) OR ($hcard_url == "")) {
 			return false;
 		}
 
@@ -959,7 +959,7 @@ class Probe {
 		}
 
 		// Fetch further information from the hcard
-		$data = self::pollHcard($hcard, $data);
+		$data = self::pollHcard($hcard_url, $data);
 
 		if (!$data) {
 			return false;
@@ -969,7 +969,7 @@ class Probe {
 			AND isset($data["guid"])
 			AND isset($data["baseurl"])
 			AND isset($data["pubkey"])
-			AND ($hcard != "")
+			AND ($hcard_url != "")
 		) {
 			$data["network"] = NETWORK_DIASPORA;
 
@@ -1092,14 +1092,14 @@ class Probe {
 	/**
 	 * @brief Fetch data from a pump.io profile page
 	 *
-	 * @param string $profile Link to the profile page
+	 * @param string $profile_link Link to the profile page
 	 *
 	 * @return array profile data
 	 */
-	private function pumpioProfileData($profile) {
+	private function pumpioProfileData($profile_link) {
 
 		$doc = new \DOMDocument();
-		if (!@$doc->loadHTMLFile($profile)) {
+		if (!@$doc->loadHTMLFile($profile_link)) {
 			return false;
 		}
 
