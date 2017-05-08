@@ -174,6 +174,36 @@ function cleancss($input) {
 	return $cleaned;
 }
 
+function bb_style_url($match) {
+        $url = $match[1];
+
+        $parts = parse_url($url);
+        if (!isset($parts['scheme'])) {
+                return $url;
+        }
+
+        $styled_url = $url;
+
+        $scheme = $parts['scheme'].'://';
+        $styled_url = str_replace($scheme, '', $styled_url);
+
+        $html = '<a href="%s" rel="nofollow noopener" target="_blank">'.
+                 '<span class="invisible">%s</span>';
+
+        if (strlen($styled_url) > 30) {
+                $html .= '<span class="ellipsis">%s</span>'.
+                        '<span class="invisible">%s</span></a>';
+
+                $ellipsis = substr($styled_url, 0, 30);
+                $rest = substr($styled_url, 30);
+                return sprintf($html, $url, $scheme, $ellipsis, $rest);
+        } else {
+                $html .= '%s</a>';
+                return sprintf($html, $url, $scheme, $styled_url);
+        }
+}
+
+
 function stripcode_br_cb($s) {
 	return '[code]' . str_replace('<br />', '', $s[1]) . '[/code]';
 }
@@ -961,6 +991,10 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 
 	$Text = preg_replace("/([#])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
 				'$1<a href="$2" class="tag" title="$3">$3</a>', $Text);
+
+	if ($simplehtml == 7) {
+		$Text = preg_replace_callback("/\[url\]([$URLSearchString]*)\[\/url\]/ism", 'bb_style_url', $Text);
+	}
 
 	$Text = preg_replace("/\[url\]([$URLSearchString]*)\[\/url\]/ism", '<a href="$1" target="_blank">$1</a>', $Text);
 	$Text = preg_replace("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '<a href="$1" target="_blank">$2</a>', $Text);
