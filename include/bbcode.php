@@ -55,23 +55,8 @@ function bb_attachment($Text, $simplehtml = false, $tryoembed = true) {
 	}
 
 	if ($simplehtml == 7) {
-		$title2 = $data["title"];
-
-		$test1 = trim(html_entity_decode($data["text"],ENT_QUOTES,'UTF-8'));
-		$test2 = trim(html_entity_decode($data["title"],ENT_QUOTES,'UTF-8'));
-
-		// If the link description is similar to the text above then don't add the link description
-		if (($data["title"] != "") && ((strpos($test1,$test2) !== false) ||
-			(similar_text($test1,$test2) / strlen($data["title"])) > 0.9)) {
-			$title2 = $data["url"];
-		}
-		/// @TODO remove class=thumbnail?
-		$text = sprintf('<a href="%s" title="%s" class="attachment" rel="nofollow external">%s</a><br />',
-			$data["url"],
-			$data["title"],
-			$title2
-		);
-	} elseif (($simplehtml != 4) && ($simplehtml != 0)) {
+		$text = style_url_for_mastodon($data["url"]);
+	} elseif (($simplehtml != 4) AND ($simplehtml != 0)) {
 		$text = sprintf('<a href="%s" target="_blank">%s</a><br>', $data["url"], $data["title"]);
 	} else {
 		$text = sprintf('<span class="type-%s">', $data["type"]);
@@ -175,9 +160,9 @@ function cleancss($input) {
 }
 
 /**
- * @brief Converts [url] BBCodes in a format that looks fine on Mastodon.
+ * @brief Converts [url] BBCodes in a format that looks fine on Mastodon. (callback function)
  * @param array $match Array with the matching values
- * @return string replaced value
+ * @return string reformatted link including HTML codes
  */
 function bb_style_url($match) {
         $url = $match[1];
@@ -191,8 +176,18 @@ function bb_style_url($match) {
                 return $match[0];
         }
 
+	return style_url_for_mastodon($url);
+}
+
+/**
+ * @brief Converts [url] BBCodes in a format that looks fine on Mastodon.
+ * @param string $url URL that is about to be reformatted
+ * @return string reformatted link including HTML codes
+ */
+function style_url_for_mastodon($url) {
         $styled_url = $url;
 
+        $parts = parse_url($url);
         $scheme = $parts['scheme'].'://';
         $styled_url = str_replace($scheme, '', $styled_url);
 
