@@ -177,9 +177,13 @@ function cleancss($input) {
 function bb_style_url($match) {
         $url = $match[1];
 
+	if (isset($match[2]) AND ($match[1] != $match[2])) {
+		return $match[0];
+	}
+
         $parts = parse_url($url);
         if (!isset($parts['scheme'])) {
-                return $url;
+                return $match[0];
         }
 
         $styled_url = $url;
@@ -994,6 +998,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 
 	if ($simplehtml == 7) {
 		$Text = preg_replace_callback("/\[url\]([$URLSearchString]*)\[\/url\]/ism", 'bb_style_url', $Text);
+		$Text = preg_replace_callback("/\[url\=([$URLSearchString]*)\]([$URLSearchString]*)\[\/url\]/ism", 'bb_style_url', $Text);
 	}
 
 	$Text = preg_replace("/\[url\]([$URLSearchString]*)\[\/url\]/ism", '<a href="$1" target="_blank">$1</a>', $Text);
