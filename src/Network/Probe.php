@@ -714,16 +714,16 @@ class Probe {
 		}
 
 		$prof_data = array();
-		$prof_data["addr"] = $data["addr"];
-		$prof_data["nick"] = $data["nick"];
+		$prof_data["addr"]         = $data["addr"];
+		$prof_data["nick"]         = $data["nick"];
 		$prof_data["dfrn-request"] = $data["request"];
 		$prof_data["dfrn-confirm"] = $data["confirm"];
-		$prof_data["dfrn-notify"] = $data["notify"];
-		$prof_data["dfrn-poll"] = $data["poll"];
-		$prof_data["dfrn-poco"] = $data["poco"];
-		$prof_data["photo"] = $data["photo"];
-		$prof_data["fn"] = $data["name"];
-		$prof_data["key"] = $data["pubkey"];
+		$prof_data["dfrn-notify"]  = $data["notify"];
+		$prof_data["dfrn-poll"]    = $data["poll"];
+		$prof_data["dfrn-poco"]    = $data["poco"];
+		$prof_data["photo"]        = $data["photo"];
+		$prof_data["fn"]           = $data["name"];
+		$prof_data["key"]          = $data["pubkey"];
 
 		logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
@@ -978,7 +978,7 @@ class Probe {
 
 			// We have to overwrite the detected value for "notify" since Hubzilla doesn't send it
 			$data["notify"] = $data["baseurl"] . "/receive/users/" . $data["guid"];
-			$data["batch"] = $data["baseurl"] . "/receive/public";
+			$data["batch"]  = $data["baseurl"] . "/receive/public";
 		} else {
 			return false;
 		}
@@ -1314,18 +1314,17 @@ class Probe {
 			return false;
 		}
 
-		$data = array();
-
-		$data["addr"] = $uri;
-		$data["network"] = NETWORK_MAIL;
-		$data["name"] = substr($uri, 0, strpos($uri, '@'));
-		$data["nick"] = $data["name"];
-		$data["photo"] = avatar_img($uri);
-
 		$phost = substr($uri, strpos($uri, '@') + 1);
-		$data["url"] = 'http://'.$phost."/".$data["nick"];
-		$data["notify"] = 'smtp '.random_string();
-		$data["poll"] = 'email '.random_string();
+
+		$data = array();
+		$data["addr"]    = $uri;
+		$data["network"] = NETWORK_MAIL;
+		$data["name"]    = substr($uri, 0, strpos($uri, '@'));
+		$data["nick"]    = $data["name"];
+		$data["photo"]   = avatar_img($uri);
+		$data["url"]     = 'http://'.$phost."/".$data["nick"];
+		$data["notify"]  = 'smtp '.random_string();
+		$data["poll"]    = 'email '.random_string();
 
 		$x = email_msg_meta($mbox, $msgs[0]);
 		if (stristr($x[0]->from, $uri)) {
