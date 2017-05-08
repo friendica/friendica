@@ -109,11 +109,13 @@ class Probe {
 				continue;
 			}
 
-			if (($attributes["rel"] == "lrdd") AND
-				($attributes["type"] == "application/xrd+xml")) {
+			if (($attributes["rel"] == "lrdd")
+				AND ($attributes["type"] == "application/xrd+xml")
+			) {
 				$xrd_data["lrdd-xml"] = $attributes["template"];
-			} elseif (($attributes["rel"] == "lrdd") AND
-				($attributes["type"] == "application/json")) {
+			} elseif (($attributes["rel"] == "lrdd")
+				AND ($attributes["type"] == "application/json")
+			) {
 				$xrd_data["lrdd-json"] = $attributes["template"];
 			} elseif ($attributes["rel"] == "lrdd") {
 				$xrd_data["lrdd"] = $attributes["template"];
@@ -330,8 +332,14 @@ class Probe {
 			/// @todo temporary fix - we need a real contact update function that updates only changing fields
 			/// The biggest problem is the avatar picture that could have a reduced image size.
 			/// It should only be updated if the existing picture isn't existing anymore.
-			if (($data['network'] != NETWORK_FEED) AND ($mode == PROBE_NORMAL) AND
-				$data["name"] AND $data["nick"] AND $data["url"] AND $data["addr"] AND $data["poll"]) {
+			if (($data['network'] != NETWORK_FEED)
+				AND ($mode == PROBE_NORMAL)
+				AND $data["name"]
+				AND $data["nick"]
+				AND $data["url"]
+				AND $data["addr"]
+				AND $data["poll"]
+			) {
 				q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `url` = '%s', `addr` = '%s',
 						`notify` = '%s', `poll` = '%s', `alias` = '%s', `success_update` = '%s'
 					WHERE `nurl` = '%s' AND NOT `self` AND `uid` = 0",
@@ -694,10 +702,14 @@ class Probe {
 		$noscrape = str_replace(array("/hcard/", "/profile/"), "/noscrape/", $profile);
 		$data = self::pollNoscrape($noscrape, $data);
 
-		if (!isset($data["notify"]) OR !isset($data["confirm"]) OR
-			!isset($data["request"]) OR !isset($data["poll"]) OR
-			!isset($data["poco"]) OR !isset($data["name"]) OR
-			!isset($data["photo"])) {
+		if (!isset($data["notify"])
+			OR !isset($data["confirm"])
+			OR !isset($data["request"])
+			OR !isset($data["poll"])
+			OR !isset($data["poco"])
+			OR !isset($data["name"])
+			OR !isset($data["photo"])
+		) {
 			$data = self::pollHcard($profile, $data, true);
 		}
 
@@ -764,8 +776,13 @@ class Probe {
 		$noscrape = str_replace("/hcard/", "/noscrape/", $hcard);
 		$data = self::pollNoscrape($noscrape, $data);
 
-		if (isset($data["notify"]) AND isset($data["confirm"]) AND isset($data["request"]) AND
-			isset($data["poll"]) AND isset($data["name"]) AND isset($data["photo"])) {
+		if (isset($data["notify"])
+			AND isset($data["confirm"])
+			AND isset($data["request"])
+			AND isset($data["poll"])
+			AND isset($data["name"])
+			AND isset($data["photo"])
+		) {
 			return $data;
 		}
 
@@ -948,8 +965,12 @@ class Probe {
 			return false;
 		}
 
-		if (isset($data["url"]) AND isset($data["guid"]) AND isset($data["baseurl"]) AND
-			isset($data["pubkey"]) AND ($hcard != "")) {
+		if (isset($data["url"])
+			AND isset($data["guid"])
+			AND isset($data["baseurl"])
+			AND isset($data["pubkey"])
+			AND ($hcard != "")
+		) {
 			$data["network"] = NETWORK_DIASPORA;
 
 			// The Diaspora handle must always be lowercase
@@ -987,8 +1008,10 @@ class Probe {
 		}
 		$pubkey = "";
 		foreach ($webfinger["links"] as $link) {
-			if (($link["rel"] == "http://webfinger.net/rel/profile-page") AND
-				($link["type"] == "text/html") AND ($link["href"] != "")) {
+			if (($link["rel"] == "http://webfinger.net/rel/profile-page")
+				AND ($link["type"] == "text/html")
+				AND ($link["href"] != "")
+			) {
 				$data["url"] = $link["href"];
 			} elseif (($link["rel"] == "salmon") AND ($link["href"] != "")) {
 				$data["notify"] = $link["href"];
@@ -1021,8 +1044,10 @@ class Probe {
 			}
 		}
 
-		if (isset($data["notify"]) AND isset($data["pubkey"]) AND
-			isset($data["poll"]) AND isset($data["url"])) {
+		if (isset($data["notify"]) AND isset($data["pubkey"])
+			AND isset($data["poll"])
+			AND isset($data["url"])
+		) {
 			$data["network"] = NETWORK_OSTATUS;
 		} else {
 			return false;
@@ -1115,8 +1140,10 @@ class Probe {
 
 		$data = array();
 		foreach ($webfinger["links"] as $link) {
-			if (($link["rel"] == "http://webfinger.net/rel/profile-page") AND
-				($link["type"] == "text/html") AND ($link["href"] != "")) {
+			if (($link["rel"] == "http://webfinger.net/rel/profile-page")
+				AND ($link["type"] == "text/html")
+				AND ($link["href"] != "")
+			) {
 				$data["url"] = $link["href"];
 			} elseif (($link["rel"] == "activity-inbox") AND ($link["href"] != "")) {
 				$data["notify"] = $link["href"];
@@ -1126,8 +1153,10 @@ class Probe {
 				$data["dialback"] = $link["href"];
 			}
 		}
-		if (isset($data["poll"]) AND isset($data["notify"]) AND
-			isset($data["dialback"]) AND isset($data["url"])) {
+		if (isset($data["poll"]) AND isset($data["notify"])
+			AND isset($data["dialback"])
+			AND isset($data["url"])
+		) {
 			// by now we use these fields only for the network type detection
 			// So we unset all data that isn't used at the moment
 			unset($data["dialback"]);
@@ -1308,8 +1337,8 @@ class Probe {
 			foreach ($adr as $feadr) {
 				if ((strcasecmp($feadr->mailbox, $data["name"]) == 0)
 					&&(strcasecmp($feadr->host, $phost) == 0)
-					&& (strlen($feadr->personal))) {
-
+					&& (strlen($feadr->personal))
+				) {
 					$personal = imap_mime_header_decode($feadr->personal);
 					$data["name"] = "";
 					foreach ($personal as $perspart) {
@@ -1351,11 +1380,11 @@ class Probe {
 		$parts = array_merge($base_parts, $avatar_parts);
 
 		// And put them together again
-		$scheme   = isset($parts['scheme']) ? $parts['scheme'] . '://' : '';
-		$host     = isset($parts['host']) ? $parts['host'] : '';
-		$port     = isset($parts['port']) ? ':' . $parts['port'] : '';
-		$path     = isset($parts['path']) ? $parts['path'] : '';
-		$query    = isset($parts['query']) ? '?' . $parts['query'] : '';
+		$scheme   = isset($parts['scheme'])   ? $parts['scheme'] . '://' : '';
+		$host     = isset($parts['host'])     ? $parts['host']           : '';
+		$port     = isset($parts['port'])     ? ':' . $parts['port']     : '';
+		$path     = isset($parts['path'])     ? $parts['path']           : '';
+		$query    = isset($parts['query'])    ? '?' . $parts['query']    : '';
 		$fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
 
 		$fixed = $scheme.$host.$port.$path.$query.$fragment;
