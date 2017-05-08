@@ -338,6 +338,21 @@ $(document).ready(function(){
 			$(document.body).trigger("sticky_kit:recalc");
 		});
 	}
+
+	/*
+	 * Add or remove "aside-out" class to body tag
+	 * when the mobile aside is shown or hidden.
+	 * The class is used in css to disable scroll in page when the aside
+	 * is shown.
+	 */
+	$("aside")
+		.on("shown.bs.offcanvas", function() {
+			$("body").addClass("aside-out");
+		})
+		.on("hidden.bs.offcanvas", function() {
+			$("body").removeClass("aside-out");
+		});
+
 });
 
 function openClose(theID) {

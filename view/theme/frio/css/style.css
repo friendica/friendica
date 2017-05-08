@@ -127,6 +127,8 @@ code {
         opacity: 1;
     }
 
+    /* prevent page scroll when the aside is opened **/
+    body.aside-out { overflow: hidden; }
 }
 /*
 * standard page elements
