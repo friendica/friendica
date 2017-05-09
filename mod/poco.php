@@ -4,14 +4,12 @@
 // https://web.archive.org/web/20160405005550/http://portablecontacts.net/draft-spec.html
 
 use Friendica\App;
+use Friendica\Core\Config;
 
 function poco_init(App $a) {
-	require_once 'include/bbcode.php';
-	require_once 'include/socgraph.php';
-
 	$system_mode = false;
 
-	if (intval(get_config('system', 'block_public')) || (get_config('system', 'block_local_dir'))) {
+	if (intval(Config::get('system', 'block_public')) || (Config::get('system', 'block_local_dir'))) {
 		http_status_exit(401);
 	}
 
@@ -32,6 +30,7 @@ function poco_init(App $a) {
 	$global = false;
 
 	if ($a->argc > 1 && $a->argv[1] === '@server') {
+		require_once 'include/socgraph.php';
 		// List of all servers that this server knows
 		$ret = poco_serverlist();
 		header('Content-type: application/json');
@@ -57,15 +56,15 @@ function poco_init(App $a) {
 	}
 
 	if (! $system_mode AND ! $global) {
-		$contacts = q("SELECT `user`.*,`profile`.`hide-friends` from user left join profile on `user`.`uid` = `profile`.`uid`
+		$users = q("SELECT `user`.*,`profile`.`hide-friends` from user left join profile on `user`.`uid` = `profile`.`uid`
 			where `user`.`nickname` = '%s' and `profile`.`is-default` = 1 limit 1",
 			dbesc($user)
 		);
-		if (! dbm::is_result($contacts) || $contacts[0]['hidewall'] || $contacts[0]['hide-friends']) {
+		if (! dbm::is_result($users) || $users[0]['hidewall'] || $users[0]['hide-friends']) {
 			http_status_exit(404);
 		}
 
-		$user = $contacts[0];
+		$user = $users[0];
 	}
 
 	if ($justme) {
@@ -241,6 +240,7 @@ function poco_init(App $a) {
 				}
 				$about = Cache::get("about:" . $contact['updated'] . ":" . $contact['nurl']);
 				if (is_null($about)) {
+					require_once 'include/bbcode.php';
 					$about = bbcode($contact['about'], false, false);
 					Cache::set("about:" . $contact['updated'] . ":" . $contact['nurl'], $about);
 				}
