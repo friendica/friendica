@@ -7,6 +7,7 @@ use Friendica\App;
 
 function poco_init(App $a) {
 	require_once 'include/bbcode.php';
+	require_once 'include/socgraph.php';
 
 	$system_mode = false;
 
