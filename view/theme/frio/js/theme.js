@@ -332,9 +332,9 @@ $(document).ready(function(){
 			offset_top: 100, // px, header + tab bar + spacing
 			recalc_every: 10
 		});
-		// recalculate sticky aside on clicks.
+		// recalculate sticky aside on clicks on <a> elements
 		// this handle height changes on expanding submenus
-		$("aside").on("click", function(){
+		$("aside").on("click", "a", function(){
 			$(document.body).trigger("sticky_kit:recalc");
 		});
 	}
