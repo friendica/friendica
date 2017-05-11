@@ -9,6 +9,11 @@ namespace Friendica;
 
 use Friendica\Core\Config;
 
+use xml;
+
+use DomXPath;
+use DOMDocument;
+
 require_once("include/network.php");
 require_once("include/Photo.php");
 require_once("include/oembed.php");
@@ -223,22 +228,22 @@ class ParseUrl {
 
 		$body = mb_convert_encoding($body, 'HTML-ENTITIES', "UTF-8");
 
-		$doc = new \DOMDocument();
+		$doc = new DOMDocument();
 		@$doc->loadHTML($body);
 
-		\xml::deleteNode($doc, "style");
-		\xml::deleteNode($doc, "script");
-		\xml::deleteNode($doc, "option");
-		\xml::deleteNode($doc, "h1");
-		\xml::deleteNode($doc, "h2");
-		\xml::deleteNode($doc, "h3");
-		\xml::deleteNode($doc, "h4");
-		\xml::deleteNode($doc, "h5");
-		\xml::deleteNode($doc, "h6");
-		\xml::deleteNode($doc, "ol");
-		\xml::deleteNode($doc, "ul");
+		xml::deleteNode($doc, "style");
+		xml::deleteNode($doc, "script");
+		xml::deleteNode($doc, "option");
+		xml::deleteNode($doc, "h1");
+		xml::deleteNode($doc, "h2");
+		xml::deleteNode($doc, "h3");
+		xml::deleteNode($doc, "h4");
+		xml::deleteNode($doc, "h5");
+		xml::deleteNode($doc, "h6");
+		xml::deleteNode($doc, "ol");
+		xml::deleteNode($doc, "ul");
 
-		$xpath = new \DomXPath($doc);
+		$xpath = new DomXPath($doc);
 
 		$list = $xpath->query("//meta[@content]");
 		foreach ($list as $node) {

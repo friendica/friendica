@@ -11,6 +11,9 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Network\Probe;
 
+use DomXPath;
+use DOMDocument;
+
 require_once 'include/datetime.php';
 require_once 'include/probe.php';
 require_once 'include/network.php';
@@ -892,9 +895,9 @@ function poco_fetch_nodeinfo($server_url) {
 function poco_detect_server_type($body) {
 	$server = false;
 
-	$doc = new \DOMDocument();
+	$doc = new DOMDocument();
 	@$doc->loadHTML($body);
-	$xpath = new \DomXPath($doc);
+	$xpath = new DomXPath($doc);
 
 	$list = $xpath->query("//meta[@name]");
 

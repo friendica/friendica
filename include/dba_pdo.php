@@ -1,8 +1,12 @@
 <?php
 
+use DDDBL;
+
+use Exception;
+
 require_once('include/datetime.php');
 
-$objDDDBLResultHandler = new \DDDBL\DataObjectPool('Result-Handler');
+$objDDDBLResultHandler = new DDDBL\DataObjectPool('Result-Handler');
 
 /**
   * create handler, which returns just the PDOStatement object
@@ -10,11 +14,11 @@ $objDDDBLResultHandler = new \DDDBL\DataObjectPool('Result-Handler');
   * big result-sets
   *
   **/
-$cloPDOStatementResultHandler = function(\DDDBL\Queue $objQueue) {
+$cloPDOStatementResultHandler = function(DDDBL\Queue $objQueue) {
 
   $objPDO = $objQueue->getState()->get('PDOStatement');
   $objQueue->getState()->update(array('result' => $objPDO));
-  
+
   # delete handler which closes the PDOStatement-cursor
   # this will be done manual if using this handler
   $objQueue->deleteHandler(QUEUE_CLOSE_CURSOR_POSITION);
@@ -29,12 +33,12 @@ $objDDDBLResultHandler->add('PDOStatement', array('HANDLER' => $cloPDOStatementR
  *
  * For debugging, insert 'dbg(1);' anywhere in the program flow.
  * dbg(0); will turn it off. Logging is performed at LOGGER_DATA level.
- * When logging, all binary info is converted to text and html entities are escaped so that 
+ * When logging, all binary info is converted to text and html entities are escaped so that
  * the debugging stream is safe to view within both terminals and web pages.
  *
  */
- 
-if (! class_exists('dba')) { 
+
+if (! class_exists('dba')) {
 class dba {
 
 	private $debug = 0;
@@ -45,9 +49,9 @@ class dba {
 
 	function __construct($server,$user,$pass,$db,$install = false) {
 		$a = get_app();
-    
+
     # work around, to store the database - configuration in DDDBL
-    $objDataObjectPool = new \DDDBL\DataObjectPool('Database-Definition');
+    $objDataObjectPool = new DDDBL\DataObjectPool('Database-Definition');
     $objDataObjectPool->add('DEFAULT', array('CONNECTION' => "mysql:host=$server;dbname=$db",
                                              'USER'       => $user,
                                              'PASS'       => $pass,
@@ -78,13 +82,13 @@ class dba {
 		}
 
     # etablish connection to database and store PDO object
-    \DDDBL\connect();
-    $this->db = \DDDBL\getDB();
-    
-    if (\DDDBL\isConnected()) {
+    DDDBL\connect();
+    $this->db = DDDBL\getDB();
+
+    if (DDDBL\isConnected()) {
       $this->connected = true;
     }
-  
+
 		if (! $this->connected) {
 			$this->db = null;
 			if (! $install)
@@ -102,12 +106,12 @@ class dba {
 		$a = get_app();
 
     $strHandler = (true === $onlyquery) ? 'PDOStatement' : 'MULTI';
-    
+
     $strQueryAlias = md5($sql);
     $strSQLType    = strtoupper(strstr($sql, ' ', true));
-    
-    $objPreparedQueryPool = new \DDDBL\DataObjectPool('Query-Definition');
-    
+
+    $objPreparedQueryPool = new DDDBL\DataObjectPool('Query-Definition');
+
     # check if query do not exists till now, if so create its definition
     if (!$objPreparedQueryPool->exists($strQueryAlias))
       $objPreparedQueryPool->add($strQueryAlias, array('QUERY'   => $sql,
@@ -121,14 +125,14 @@ class dba {
 		$stamp1 = microtime(true);
 
     try {
-      $r = \DDDBL\get($strQueryAlias);
-      
+      $r = DDDBL\get($strQueryAlias);
+
       # bad workaround to emulate the bizzare behavior of mysql_query
       if (in_array($strSQLType, array('INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'SET')))
         $result = true;
       $intErrorCode = false;
-        
-    } catch (\Exception $objException) {
+
+    } catch (Exception $objException) {
       $result = false;
       $intErrorCode = $objPreparedQueryPool->get($strQueryAlias)->get('PDOStatement')->errorCode();
     }
@@ -166,7 +170,7 @@ class dba {
 				$mesg = 'true';
 			else {
         # this needs fixing, but is a bug itself
-				#$mesg = mysql_num_rows($result) . ' results' . EOL; 
+				#$mesg = mysql_num_rows($result) . ' results' . EOL;
 			}
 
 			$str =  'SQL = ' . printable($sql) . EOL . 'SQL returned ' . $mesg
@@ -190,13 +194,13 @@ class dba {
 
 		if (isset($result) AND (($result === true) || ($result === false)))
 			return $result;
-    
+
 		if ($onlyquery) {
 			$this->result = $r;       # this will store an PDOStatement Object in result
       $this->result->execute(); # execute the Statement, to get its result
 			return true;
 		}
-    
+
 		//$a->save_timestamp($stamp1, "database");
 
 		if ($this->debug)
@@ -212,7 +216,7 @@ class dba {
     return $this->result->fetch();
 
 	}
-  
+
 	public function qclose() {
 		if ($this->result)
       return $this->result->closeCursor();
@@ -228,13 +232,13 @@ class dba {
       # this workaround is needed, because quote creates "'" and the beginning and the end
       # of the string, which is correct. but until now the queries set this delimiter manually,
       # so we must remove them from here and wait until everything uses prepared statements
-      return mb_substr($strQuoted, 1, mb_strlen($strQuoted) - 2); 
+      return mb_substr($strQuoted, 1, mb_strlen($strQuoted) - 2);
 		}
 	}
 
 	function __destruct() {
-		if ($this->db) 
-		  \DDDBL\disconnect();
+		if ($this->db)
+		  DDDBL\disconnect();
 	}
 }}
 
@@ -248,14 +252,14 @@ function printable($s) {
 }}
 
 // Procedural functions
-if (! function_exists('dbg')) { 
+if (! function_exists('dbg')) {
 function dbg($state) {
 	global $db;
 	if ($db)
 	$db->dbg($state);
 }}
 
-if (! function_exists('dbesc')) { 
+if (! function_exists('dbesc')) {
 function dbesc($str) {
 	global $db;
 	if ($db && $db->connected)
@@ -271,7 +275,7 @@ function dbesc($str) {
 // Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
 //                   'user', 1);
 
-if (! function_exists('q')) { 
+if (! function_exists('q')) {
 function q($sql) {
 
 	global $db;
@@ -288,12 +292,12 @@ function q($sql) {
 
 	/**
 	 *
-	 * This will happen occasionally trying to store the 
-	 * session data after abnormal program termination 
+	 * This will happen occasionally trying to store the
+	 * session data after abnormal program termination
 	 *
 	 */
 	logger('dba: no database: ' . print_r($args,true));
-	return false; 
+	return false;
 
 }}
 
@@ -303,7 +307,7 @@ function q($sql) {
  *
  */
 
-if (! function_exists('dbq')) { 
+if (! function_exists('dbq')) {
 function dbq($sql) {
 
 	global $db;
@@ -315,10 +319,10 @@ function dbq($sql) {
 }}
 
 
-// Caller is responsible for ensuring that any integer arguments to 
+// Caller is responsible for ensuring that any integer arguments to
 // dbesc_array are actually integers and not malformed strings containing
-// SQL injection vectors. All integer array elements should be specifically 
-// cast to int to avoid trouble. 
+// SQL injection vectors. All integer array elements should be specifically
+// cast to int to avoid trouble.
 
 
 if (! function_exists('dbesc_array_cb')) {

@@ -11,6 +11,13 @@ namespace Friendica\Network;
 use Friendica\App;
 use Friendica\Core\Config;
 
+use dbm;
+use Cache;
+use xml;
+
+use DomXPath;
+use DOMDocument;
+
 require_once 'include/feed.php';
 require_once 'include/email.php';
 require_once 'include/network.php';
@@ -92,7 +99,7 @@ class Probe {
 			return false;
 		}
 
-		$links = \xml::element_to_array($xrd);
+		$links = xml::element_to_array($xrd);
 		if (!isset($links["xrd"]["link"])) {
 			return false;
 		}
@@ -275,7 +282,7 @@ class Probe {
 	public static function uri($uri, $network = "", $uid = 0, $cache = true) {
 
 		if ($cache) {
-			$result = \Cache::get("probe_url:".$network.":".$uri);
+			$result = Cache::get("probe_url:".$network.":".$uri);
 			if (!is_null($result)) {
 				return $result;
 			}
@@ -327,7 +334,7 @@ class Probe {
 
 		// Only store into the cache if the value seems to be valid
 		if (!in_array($data['network'], array(NETWORK_PHANTOM, NETWORK_MAIL))) {
-			\Cache::set("probe_url:".$network.":".$uri, $data, CACHE_DAY);
+			Cache::set("probe_url:".$network.":".$uri, $data, CACHE_DAY);
 
 			/// @todo temporary fix - we need a real contact update function that updates only changing fields
 			/// The biggest problem is the avatar picture that could have a reduced image size.
@@ -543,7 +550,7 @@ class Probe {
 			return $webfinger;
 		}
 
-		$xrd_arr = \xml::element_to_array($xrd);
+		$xrd_arr = xml::element_to_array($xrd);
 		if (!isset($xrd_arr["xrd"]["link"])) {
 			return false;
 		}
@@ -811,12 +818,12 @@ class Probe {
 			return false;
 		}
 
-		$doc = new \DOMDocument();
+		$doc = new DOMDocument();
 		if (!@$doc->loadHTML($content)) {
 			return false;
 		}
 
-		$xpath = new \DomXPath($doc);
+		$xpath = new DomXPath($doc);
 
 		$vcards = $xpath->query("//div[contains(concat(' ', @class, ' '), ' vcard ')]");
 		if (!is_object($vcards)) {
@@ -1099,12 +1106,12 @@ class Probe {
 	 */
 	private function pumpioProfileData($profile_link) {
 
-		$doc = new \DOMDocument();
+		$doc = new DOMDocument();
 		if (!@$doc->loadHTMLFile($profile_link)) {
 			return false;
 		}
 
-		$xpath = new \DomXPath($doc);
+		$xpath = new DomXPath($doc);
 
 		$data = array();
 
@@ -1186,13 +1193,13 @@ class Probe {
 	 * @return string feed link
 	 */
 	private function getFeedLink($url) {
-		$doc = new \DOMDocument();
+		$doc = new DOMDocument();
 
 		if (!@$doc->loadHTMLFile($url)) {
 			return false;
 		}
 
-		$xpath = new \DomXPath($doc);
+		$xpath = new DomXPath($doc);
 
 		//$feeds = $xpath->query("/html/head/link[@type='application/rss+xml']");
 		$feeds = $xpath->query("/html/head/link[@type='application/rss+xml' and @rel='alternate']");
@@ -1298,7 +1305,7 @@ class Probe {
 
 		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-		if (\dbm::is_result($x) && \dbm::is_result($r)) {
+		if (dbm::is_result($x) && dbm::is_result($r)) {
 			$mailbox = construct_mailbox_name($r[0]);
 			$password = '';
 			openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
