@@ -22,7 +22,7 @@ class dba {
 	public  $connected = false;
 	public  $error = false;
 	private $_server_info = '';
-	private $in_transaction = false;
+	private static $in_transaction = false;
 	private static $dbo;
 	private static $relation = array();
 
