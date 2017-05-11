@@ -729,8 +729,8 @@ class App {
 	 *
 	 * @return string
 	 */
-	function callstack() {
-		$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 6);
+	function callstack($depth = 4) {
+		$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $depth + 2);
 
 		// We remove the first two items from the list since they contain data that we don't need.
 		array_shift($trace);

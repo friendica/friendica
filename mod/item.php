@@ -809,8 +809,7 @@ function item_post(App $a) {
 		$post_id = 0;
 	}
 
-	q("COMMIT");
-	q("START TRANSACTION;");
+	dba::transaction();
 
 	$r = q("INSERT INTO `item` (`guid`, `extid`, `uid`,`type`,`wall`,`gravity`, `network`, `contact-id`,
 					`owner-name`,`owner-link`,`owner-avatar`, `owner-id`,
@@ -900,7 +899,7 @@ function item_post(App $a) {
 	}
 
 	if ($post_id == 0) {
-		q("COMMIT");
+		dba::commit();
 		logger('mod_item: unable to retrieve post that was just stored.');
 		notice(t('System error. Post not saved.') . EOL);
 		goaway($return_path);
@@ -1026,7 +1025,7 @@ function item_post(App $a) {
 		update_thread($parent, true);
 	}
 
-	q("COMMIT");
+	dba::commit();
 
 	create_tags_from_item($post_id);
 	create_files_from_item($post_id);

@@ -22,6 +22,7 @@ class dba {
 	public  $connected = false;
 	public  $error = false;
 	private $_server_info = '';
+	private $in_transaction = false;
 	private static $dbo;
 	private static $relation = array();
 
@@ -602,7 +603,8 @@ class dba {
 		}
 
 		if (self::$dbo->errorno != 0) {
-			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".self::replace_parameters($sql, $args));
+			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
+				$a->callstack(8))."\n".self::replace_parameters($sql, $args);
 		}
 
 		$a->save_timestamp($stamp1, 'database');
@@ -780,6 +782,48 @@ class dba {
 	}
 
 	/**
+	 * @brief Starts a transaction
+	 *
+	 * @return boolean Was the command executed successfully?
+	 */
+	static public function transaction() {
+		if (!self::e('COMMIT')) {
+			return false;
+		}
+		if (!self::e('START TRANSACTION')) {
+			return false;
+		}
+		self::$in_transaction = true;
+		return true;
+	}
+
+	/**
+	 * @brief Does a commit
+	 *
+	 * @return boolean Was the command executed successfully?
+	 */
+	static public function commit() {
+		if (!self::e('COMMIT')) {
+			return false;
+		}
+		self::$in_transaction = false;
+		return true;
+	}
+
+	/**
+	 * @brief Does a rollback
+	 *
+	 * @return boolean Was the command executed successfully?
+	 */
+	static public function rollback() {
+		if (!self::e('ROLLBACK')) {
+			return false;
+		}
+		self::$in_transaction = false;
+		return true;
+	}
+
+	/**
 	 * @brief Build the array with the table relations
 	 *
 	 * The array is build from the database definitions in dbstructure.php
@@ -805,12 +849,12 @@ class dba {
 	 *
 	 * @param string $table Table name
 	 * @param array $param parameter array
-	 * @param boolean $in_commit Internal use: Only do a commit after the last delete
+	 * @param boolean $in_process Internal use: Only do a commit after the last delete
 	 * @param array $callstack Internal use: prevent endless loops
 	 *
-	 * @return boolean|array was the delete successfull? When $in_commit is set: deletion data
+	 * @return boolean|array was the delete successfull? When $in_process is set: deletion data
 	 */
-	static public function delete($table, $param, $in_commit = false, &$callstack = array()) {
+	static public function delete($table, $param, $in_process = false, &$callstack = array()) {
 
 		$commands = array();
 
@@ -872,10 +916,11 @@ class dba {
 			}
 		}
 
-		if (!$in_commit) {
+		if (!$in_process) {
 			// Now we finalize the process
-			self::p("COMMIT");
-			self::p("START TRANSACTION");
+			if (!self::$in_transaction) {
+				self::transaction();
+			}
 
 			$compacted = array();
 			$counter = array();
@@ -887,7 +932,9 @@ class dba {
 					logger(dba::replace_parameters($sql, $command['param']), LOGGER_DATA);
 
 					if (!self::e($sql, $command['param'])) {
-						self::p("ROLLBACK");
+						if (!self::$in_transaction) {
+							self::rollback();
+						}
 						return false;
 					}
 				} else {
@@ -915,13 +962,17 @@ class dba {
 						logger(dba::replace_parameters($sql, $field_values), LOGGER_DATA);
 
 						if (!self::e($sql, $field_values)) {
-							self::p("ROLLBACK");
+							if (!self::$in_transaction) {
+								self::rollback();
+							}
 							return false;
 						}
 					}
 				}
 			}
-			self::p("COMMIT");
+			if (!self::$in_transaction) {
+				self::commit();
+			}
 			return true;
 		}
 

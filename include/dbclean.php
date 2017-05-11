@@ -50,11 +50,13 @@ function remove_orphans($stage = 0) {
 		if ($count > 0) {
 			logger("found global item orphans: ".$count);
 			while ($orphan = dba::fetch($r)) {
-				q("DELETE FROM `item` WHERE `id` = %d", intval($orphan["id"]));
+				dba::delete('item', array('id' => $orphan["id"]));
 			}
+		} else {
+			logger("No global item orphans found");
 		}
 		dba::close($r);
-		logger("Done deleting old global item entries from item table without user copy");
+		logger("Done deleting ".$count." old global item entries from item table without user copy");
 	}
 
 	if (($stage == 2) OR ($stage == 0)) {
@@ -64,11 +66,13 @@ function remove_orphans($stage = 0) {
 		if ($count > 0) {
 			logger("found item orphans without parents: ".$count);
 			while ($orphan = dba::fetch($r)) {
-				q("DELETE FROM `item` WHERE `id` = %d", intval($orphan["id"]));
+				dba::delete('item', array('id' => $orphan["id"]));
 			}
+		} else {
+			logger("No item orphans without parents found");
 		}
 		dba::close($r);
-		logger("Done deleting items without parents");
+		logger("Done deleting ".$count." items without parents");
 	}
 
 	if (($stage == 3) OR ($stage == 0)) {
@@ -78,11 +82,14 @@ function remove_orphans($stage = 0) {
 		if ($count > 0) {
 			logger("found thread orphans: ".$count);
 			while ($orphan = dba::fetch($r)) {
-				q("DELETE FROM `thread` WHERE `iid` = %d", intval($orphan["iid"]));
+				dba::delete('thread', array('iid' => $orphan["iid"]));
 			}
+		} else {
+			logger("No thread orphans found");
 		}
+
 		dba::close($r);
-		logger("Done deleting orphaned data from thread table");
+		logger("Done deleting ".$count." orphaned data from thread table");
 	}
 
 	if (($stage == 4) OR ($stage == 0)) {
@@ -92,11 +99,13 @@ function remove_orphans($stage = 0) {
 		if ($count > 0) {
 			logger("found notify orphans: ".$count);
 			while ($orphan = dba::fetch($r)) {
-				q("DELETE FROM `notify` WHERE `iid` = %d", intval($orphan["iid"]));
+				dba::delete('notify', array('iid' => $orphan["iid"]));
 			}
+		} else {
+			logger("No notify orphans found");
 		}
 		dba::close($r);
-		logger("Done deleting orphaned data from notify table");
+		logger("Done deleting ".$count." orphaned data from notify table");
 	}
 
 	if (($stage == 5) OR ($stage == 0)) {
@@ -106,11 +115,13 @@ function remove_orphans($stage = 0) {
 		if ($count > 0) {
 			logger("found notify-threads orphans: ".$count);
 			while ($orphan = dba::fetch($r)) {
-				q("DELETE FROM `notify-threads` WHERE `id` = %d", intval($orphan["id"]));
+				dba::delete('notify-threads', array('id' => $orphan["id"]));
 			}
+		} else {
+			logger("No notify-threads orphans found");
 		}
 		dba::close($r);
-		logger("Done deleting orphaned data from notify-threads table");
+		logger("Done deleting ".$count." orphaned data from notify-threads table");
 	}
 
 
@@ -121,11 +132,13 @@ function remove_orphans($stage = 0) {
 		if ($count > 0) {
 			logger("found sign orphans: ".$count);
 			while ($orphan = dba::fetch($r)) {
-				q("DELETE FROM `sign` WHERE `iid` = %d", intval($orphan["iid"]));
+				dba::delete('sign', array('iid' => $orphan["iid"]));
 			}
+		} else {
+			logger("No sign orphans found");
 		}
 		dba::close($r);
-		logger("Done deleting orphaned data from sign table");
+		logger("Done deleting ".$count." orphaned data from sign table");
 	}
 
 
@@ -136,11 +149,13 @@ function remove_orphans($stage = 0) {
 		if ($count > 0) {
 			logger("found term orphans: ".$count);
 			while ($orphan = dba::fetch($r)) {
-				q("DELETE FROM `term` WHERE `oid` = %d", intval($orphan["oid"]));
+				dba::delete('term', array('oid' => $orphan["oid"]));
 			}
+		} else {
+			logger("No term orphans found");
 		}
 		dba::close($r);
-		logger("Done deleting orphaned data from term table");
+		logger("Done deleting ".$count." orphaned data from term table");
 	}
 
 	// Call it again if not all entries were purged
