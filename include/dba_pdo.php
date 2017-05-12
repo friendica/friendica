@@ -1,12 +1,11 @@
 <?php
 
-use DDDBL;
-
-use Exception;
+use DDDBL\DataObjectPool;
+use DDDBL\Queue;
 
 require_once('include/datetime.php');
 
-$objDDDBLResultHandler = new DDDBL\DataObjectPool('Result-Handler');
+$objDDDBLResultHandler = new DataObjectPool('Result-Handler');
 
 /**
   * create handler, which returns just the PDOStatement object
@@ -14,7 +13,7 @@ $objDDDBLResultHandler = new DDDBL\DataObjectPool('Result-Handler');
   * big result-sets
   *
   **/
-$cloPDOStatementResultHandler = function(DDDBL\Queue $objQueue) {
+$cloPDOStatementResultHandler = function(Queue $objQueue) {
 
   $objPDO = $objQueue->getState()->get('PDOStatement');
   $objQueue->getState()->update(array('result' => $objPDO));
@@ -51,7 +50,7 @@ class dba {
 		$a = get_app();
 
     # work around, to store the database - configuration in DDDBL
-    $objDataObjectPool = new DDDBL\DataObjectPool('Database-Definition');
+    $objDataObjectPool = new DataObjectPool('Database-Definition');
     $objDataObjectPool->add('DEFAULT', array('CONNECTION' => "mysql:host=$server;dbname=$db",
                                              'USER'       => $user,
                                              'PASS'       => $pass,
@@ -110,7 +109,7 @@ class dba {
     $strQueryAlias = md5($sql);
     $strSQLType    = strtoupper(strstr($sql, ' ', true));
 
-    $objPreparedQueryPool = new DDDBL\DataObjectPool('Query-Definition');
+    $objPreparedQueryPool = new DataObjectPool('Query-Definition');
 
     # check if query do not exists till now, if so create its definition
     if (!$objPreparedQueryPool->exists($strQueryAlias))
