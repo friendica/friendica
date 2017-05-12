@@ -1077,14 +1077,10 @@ function proc_run($cmd) {
 	array_shift($argv);
 
 	$parameters = json_encode($argv);
-	$found = q("SELECT `id` FROM `workerqueue` WHERE `parameter` = '%s'", dbesc($parameters));
+	$found = dba::select('workerqueue', array('id'), array('parameter' => $parameters), array('limit' => 1));
 
 	if (!dbm::is_result($found)) {
-		q("INSERT INTO `workerqueue` (`parameter`, `created`, `priority`)
-			VALUES ('%s', '%s', %d)",
-			dbesc($parameters),
-			dbesc(datetime_convert()),
-			intval($priority));
+		dba::insert('workerqueue', array('parameter' => $parameters, 'created' => datetime_convert(), 'priority' => $priority));
 	}
 
 	// Should we quit and wait for the poller to be called as a cronjob?
