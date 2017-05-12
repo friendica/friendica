@@ -1377,10 +1377,7 @@ function tag_deliver($uid, $item_id) {
 			// mmh.. no mention.. community page or private group... no wall.. no origin.. top-post (not a comment)
 			// delete it!
 			logger("tag_deliver: no-mention top-level post to communuty or private group. delete.");
-			q("DELETE FROM item WHERE id = %d and uid = %d",
-				intval($item_id),
-				intval($uid)
-			);
+			dba::delete('item', array('id' => $item_id));
 			return true;
 		}
 		return;
@@ -2235,23 +2232,6 @@ function drop_item($id, $interactive = true) {
 			);
 			// ignore the result
 		}
-
-
-		// clean up item_id and sign meta-data tables
-
-		/*
-		/// @TODO Old code - caused very long queries and warning entries in the mysql logfiles:
-
-		$r = q("DELETE FROM item_id where iid in (select id from item where parent = %d and uid = %d)",
-			intval($item['id']),
-			intval($item['uid'])
-		);
-
-		$r = q("DELETE FROM sign where iid in (select id from item where parent = %d and uid = %d)",
-			intval($item['id']),
-			intval($item['uid'])
-		);
-		*/
 
 		// The new code splits the queries since the mysql optimizer really has bad problems with subqueries
 
