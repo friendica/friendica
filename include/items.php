@@ -1022,7 +1022,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		logger('Duplicated post occurred. uri = ' . $arr['uri'] . ' uid = ' . $arr['uid']);
 
 		// Yes, we could do a rollback here - but we are having many users with MyISAM.
-		q("DELETE FROM `item` WHERE `id` = %d", intval($current_post));
+		dba::delete('item', array('id' => $current_post));
 		dba::commit();
 		return 0;
 	} elseif ($r[0]["entries"] == 0) {
