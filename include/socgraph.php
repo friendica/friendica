@@ -11,9 +11,6 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Network\Probe;
 
-use DomXPath;
-use DOMDocument;
-
 require_once 'include/datetime.php';
 require_once 'include/probe.php';
 require_once 'include/network.php';
