@@ -501,6 +501,20 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		}
 	}
 
+	if ($notify) {
+		$guid_prefix = "";
+	} elseif ((trim($arr['guid']) == "") AND (trim($arr['plink']) != "")) {
+		$arr['guid'] = uri_to_guid($arr['plink']);
+	} elseif ((trim($arr['guid']) == "") AND (trim($arr['uri']) != "")) {
+		$arr['guid'] = uri_to_guid($arr['uri']);
+	} else {
+		$parsed = parse_url($arr["author-link"]);
+		$guid_prefix = hash("crc32", $parsed["host"]);
+	}
+
+	$arr['guid']          = ((x($arr, 'guid'))          ? notags(trim($arr['guid']))          : get_guid(32, $guid_prefix));
+	$arr['uri']           = ((x($arr, 'uri'))           ? notags(trim($arr['uri']))           : item_new_uri($a->get_hostname(), $uid, $arr['guid']));
+
 	// Store conversation data
 	$arr = store_conversation($arr);
 
@@ -585,20 +599,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 
 	item_add_language_opt($arr);
 
-	if ($notify) {
-		$guid_prefix = "";
-	} elseif ((trim($arr['guid']) == "") AND (trim($arr['plink']) != "")) {
-		$arr['guid'] = uri_to_guid($arr['plink']);
-	} elseif ((trim($arr['guid']) == "") AND (trim($arr['uri']) != "")) {
-		$arr['guid'] = uri_to_guid($arr['uri']);
-	} else {
-		$parsed = parse_url($arr["author-link"]);
-		$guid_prefix = hash("crc32", $parsed["host"]);
-	}
-
 	$arr['wall']          = ((x($arr, 'wall'))          ? intval($arr['wall'])                : 0);
-	$arr['guid']          = ((x($arr, 'guid'))          ? notags(trim($arr['guid']))          : get_guid(32, $guid_prefix));
-	$arr['uri']           = ((x($arr, 'uri'))           ? notags(trim($arr['uri']))           : item_new_uri($a->get_hostname(), $uid, $arr['guid']));
 	$arr['extid']         = ((x($arr, 'extid'))         ? notags(trim($arr['extid']))         : '');
 	$arr['author-name']   = ((x($arr, 'author-name'))   ? trim($arr['author-name'])   : '');
 	$arr['author-link']   = ((x($arr, 'author-link'))   ? notags(trim($arr['author-link']))   : '');

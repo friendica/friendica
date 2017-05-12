@@ -18,13 +18,11 @@ function dbclean_run(&$argv, &$argc) {
 	}
 
 	if ($stage == 0) {
-		proc_run(PRIORITY_LOW, 'include/dbclean.php', 1);
-		proc_run(PRIORITY_LOW, 'include/dbclean.php', 2);
-		proc_run(PRIORITY_LOW, 'include/dbclean.php', 3);
-		proc_run(PRIORITY_LOW, 'include/dbclean.php', 4);
-		proc_run(PRIORITY_LOW, 'include/dbclean.php', 5);
-		proc_run(PRIORITY_LOW, 'include/dbclean.php', 6);
-		proc_run(PRIORITY_LOW, 'include/dbclean.php', 7);
+		for ($i = 1; $i <= 7; $i++) {
+			if (!Config::get('system', 'finished-dbclean-'.$i)) {
+				proc_run(PRIORITY_LOW, 'include/dbclean.php', $i);
+			}
+		}
 	} else {
 		remove_orphans($stage);
 	}
@@ -54,6 +52,9 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No global item orphans found");
+
+			// We will eventually set this value when we found a good way to delete these items in another way.
+			// Config::set('system', 'finished-dbclean-1', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." old global item entries from item table without user copy");
@@ -68,6 +69,7 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No item orphans without parents found");
+			Config::set('system', 'finished-dbclean-2', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." items without parents");
@@ -82,6 +84,7 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No thread orphans found");
+			Config::set('system', 'finished-dbclean-3', true);
 		}
 
 		dba::close($r);
@@ -97,6 +100,7 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No notify orphans found");
+			Config::set('system', 'finished-dbclean-4', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from notify table");
@@ -111,6 +115,7 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No notify-threads orphans found");
+			Config::set('system', 'finished-dbclean-5', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from notify-threads table");
@@ -125,6 +130,7 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No sign orphans found");
+			Config::set('system', 'finished-dbclean-6', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from sign table");
@@ -139,6 +145,7 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No term orphans found");
+			Config::set('system', 'finished-dbclean-7', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from term table");

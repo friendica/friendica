@@ -122,12 +122,8 @@ function poller_execute($queue) {
 		return false;
 	}
 
-	$upd = q("UPDATE `workerqueue` SET `executed` = '%s', `pid` = %d WHERE `id` = %d AND `pid` = 0",
-		dbesc(datetime_convert()),
-		intval($mypid),
-		intval($queue["id"]));
-
-	if (!$upd) {
+	if (!dba::update('workerqueue', array('executed' => datetime_convert(), 'pid' => $mypid),
+			array('id' => $queue["id"], 'pid' => 0))) {
 		logger("Couldn't update queue entry ".$queue["id"]." - skip this execution", LOGGER_DEBUG);
 		dba::commit();
 		return true;
@@ -157,7 +153,7 @@ function poller_execute($queue) {
 
 	if (!validate_include($include)) {
 		logger("Include file ".$argv[0]." is not valid!");
-		q("DELETE FROM `workerqueue` WHERE `id` = %d", intval($queue["id"]));
+		dba::delete('workerqueue', array('id' => $queue["id"]));
 		return true;
 	}
 
@@ -169,7 +165,7 @@ function poller_execute($queue) {
 
 		poller_exec_function($queue, $funcname, $argv);
 
-		q("DELETE FROM `workerqueue` WHERE `id` = %d", intval($queue["id"]));
+		dba::delete('workerqueue', array('id' => $queue["id"]));
 	} else {
 		logger("Function ".$funcname." does not exist");
 	}
@@ -377,8 +373,8 @@ function poller_kill_stale_workers() {
 
 	foreach ($r AS $pid) {
 		if (!posix_kill($pid["pid"], 0)) {
-			q("UPDATE `workerqueue` SET `executed` = '%s', `pid` = 0 WHERE `pid` = %d",
-				dbesc(NULL_DATE), intval($pid["pid"]));
+			dba::update('workerqueue', array('executed' => NULL_DATE, 'pid' => 0),
+					array('pid' => $pid["pid"]));
 		} else {
 			// Kill long running processes
 
@@ -403,12 +399,9 @@ function poller_kill_stale_workers() {
 				// We killed the stale process.
 				// To avoid a blocking situation we reschedule the process at the beginning of the queue.
 				// Additionally we are lowering the priority.
-				q("UPDATE `workerqueue` SET `executed` = '%s', `created` = '%s',
-							`priority` = %d, `pid` = 0 WHERE `pid` = %d",
-					dbesc(NULL_DATE),
-					dbesc(datetime_convert()),
-					intval(PRIORITY_NEGLIGIBLE),
-					intval($pid["pid"]));
+				dba::update('workerqueue',
+						array('executed' => NULL_DATE, 'created' => datetime_convert(), 'priority' => PRIORITY_NEGLIGIBLE, 'pid' => 0),
+						array('pid' => $pid["pid"]));
 			} else {
 				logger("Worker process ".$pid["pid"]." (".implode(" ", $argv).") now runs for ".round($duration)." of ".$max_duration." allowed minutes. That's okay.", LOGGER_DEBUG);
 			}
