@@ -10,8 +10,13 @@ function expire_run(&$argv, &$argc){
 	require_once('include/Contact.php');
 
 	// physically remove anything that has been deleted for more than two months
-
-	$r = q("DELETE FROM `item` WHERE `deleted` = 1 AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
+	$r = dba::p("SELECT `id` FROM `item` WHERE `deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
+	if (dbm::is_result($r)) {
+		while ($row = dba::fetch($r)) {
+			dba::delete('item', array('id' => $row['id']));
+		}
+		dba::close($r);
+	}
 
 	// make this optional as it could have a performance impact on large sites
 
