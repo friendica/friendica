@@ -226,9 +226,7 @@ function create_user($arr) {
 	);
 	if ((dbm::is_result($r)) && (count($r) > 1) && $newuid) {
 		$result['message'] .= t('Nickname is already registered. Please choose another.') . EOL;
-		q("DELETE FROM `user` WHERE `uid` = %d",
-			intval($newuid)
-		);
+		dba::delete('user', array('uid' => $newuid));
 		return $result;
 	}
 
@@ -248,8 +246,7 @@ function create_user($arr) {
 		if ($r === false) {
 			$result['message'] .=  t('An error occurred creating your default profile. Please try again.') . EOL;
 			// Start fresh next time.
-			$r = q("DELETE FROM `user` WHERE `uid` = %d",
-				intval($newuid));
+			dba::delete('user', array('uid' => $newuid));
 			return $result;
 		}
 

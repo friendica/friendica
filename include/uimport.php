@@ -62,13 +62,7 @@ function db_import_assoc($table, $arr) {
 }
 
 function import_cleanup($newuid) {
-	q("DELETE FROM `user` WHERE uid = %d", $newuid);
-	q("DELETE FROM `contact` WHERE uid = %d", $newuid);
-	q("DELETE FROM `profile` WHERE uid = %d", $newuid);
-	q("DELETE FROM `photo` WHERE uid = %d", $newuid);
-	q("DELETE FROM `group` WHERE uid = %d", $newuid);
-	q("DELETE FROM `group_member` WHERE uid = %d", $newuid);
-	q("DELETE FROM `pconfig` WHERE uid = %d", $newuid);
+	dba::delete('user', array('uid' => $newuid));
 }
 
 /**

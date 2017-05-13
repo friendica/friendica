@@ -253,9 +253,7 @@ function delete_thread($itemid, $itemuri = "") {
 				intval($item["uid"])
 			);
 		if (!dbm::is_result($r)) {
-			$r = q("DELETE FROM `item` WHERE `uri` = '%s' AND `uid` = 0",
-				dbesc($itemuri)
-			);
+			dba::delete('item', array('uri' => $itemuri, 'uid' => 0));
 			logger("delete_thread: Deleted shadow for item ".$itemuri." - ".print_r($result, true), LOGGER_DEBUG);
 		}
 	}

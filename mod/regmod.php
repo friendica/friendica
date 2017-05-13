@@ -74,27 +74,18 @@ function user_deny($hash) {
 		dbesc($hash)
 	);
 
-	if(! dbm::is_result($register))
+	if (!dbm::is_result($register)) {
 		return false;
+	}
 
 	$user = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 		intval($register[0]['uid'])
 	);
 
-	$r = q("DELETE FROM `user` WHERE `uid` = %d",
-		intval($register[0]['uid'])
-	);
-	$r = q("DELETE FROM `contact` WHERE `uid` = %d",
-		intval($register[0]['uid'])
-	);
-	$r = q("DELETE FROM `profile` WHERE `uid` = %d",
-		intval($register[0]['uid'])
-	);
+	dba::delete('user', array('uid' => $register[0]['uid']));
+	dba::delete('register', array('hash' => $register[0]['hash']));
 
-	$r = q("DELETE FROM `register` WHERE `hash` = '%s'",
-		dbesc($register[0]['hash'])
-	);
-	notice( sprintf(t('Registration revoked for %s'), $user[0]['username']) . EOL);
+	notice(sprintf(t('Registration revoked for %s'), $user[0]['username']) . EOL);
 	return true;
 
 }

@@ -53,11 +53,14 @@ function remove_orphans($stage = 0) {
 		} else {
 			logger("No global item orphans found");
 
-			// We will eventually set this value when we found a good way to delete these items in another way.
-			// Config::set('system', 'finished-dbclean-1', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." old global item entries from item table without user copy");
+
+		// We will eventually set this value when we found a good way to delete these items in another way.
+		// if ($count < $limit) {
+		//	Config::set('system', 'finished-dbclean-1', true);
+		// }
 	} elseif ($stage == 2) {
 		logger("Deleting items without parents");
 		$r = dba::p("SELECT `id` FROM `item` WHERE NOT EXISTS (SELECT `id` FROM `item` AS `i` WHERE `item`.`parent` = `i`.`id`) LIMIT ".intval($limit));
@@ -69,10 +72,13 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No item orphans without parents found");
-			Config::set('system', 'finished-dbclean-2', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." items without parents");
+
+		if ($count < $limit) {
+			Config::set('system', 'finished-dbclean-2', true);
+		}
 	} elseif ($stage == 3) {
 		logger("Deleting orphaned data from thread table");
 		$r = dba::p("SELECT `iid` FROM `thread` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `thread`.`iid`) LIMIT ".intval($limit));
@@ -84,11 +90,13 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No thread orphans found");
-			Config::set('system', 'finished-dbclean-3', true);
 		}
-
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from thread table");
+
+		if ($count < $limit) {
+			Config::set('system', 'finished-dbclean-3', true);
+		}
 	} elseif ($stage == 4) {
 		logger("Deleting orphaned data from notify table");
 		$r = dba::p("SELECT `iid` FROM `notify` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `notify`.`iid`) LIMIT ".intval($limit));
@@ -100,10 +108,13 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No notify orphans found");
-			Config::set('system', 'finished-dbclean-4', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from notify table");
+
+		if ($count < $limit) {
+			Config::set('system', 'finished-dbclean-4', true);
+		}
 	} elseif ($stage == 5) {
 		logger("Deleting orphaned data from notify-threads table");
 		$r = dba::p("SELECT `id` FROM `notify-threads` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `notify-threads`.`master-parent-item`) LIMIT ".intval($limit));
@@ -115,10 +126,13 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No notify-threads orphans found");
-			Config::set('system', 'finished-dbclean-5', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from notify-threads table");
+
+		if ($count < $limit) {
+			Config::set('system', 'finished-dbclean-5', true);
+		}
 	} elseif ($stage == 6) {
 		logger("Deleting orphaned data from sign table");
 		$r = dba::p("SELECT `iid` FROM `sign` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `sign`.`iid`) LIMIT ".intval($limit));
@@ -130,10 +144,13 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No sign orphans found");
-			Config::set('system', 'finished-dbclean-6', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from sign table");
+
+		if ($count < $limit) {
+			Config::set('system', 'finished-dbclean-6', true);
+		}
 	} elseif ($stage == 7) {
 		logger("Deleting orphaned data from term table");
 		$r = dba::p("SELECT `oid` FROM `term` WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `term`.`oid`) LIMIT ".intval($limit));
@@ -145,10 +162,13 @@ function remove_orphans($stage = 0) {
 			}
 		} else {
 			logger("No term orphans found");
-			Config::set('system', 'finished-dbclean-7', true);
 		}
 		dba::close($r);
 		logger("Done deleting ".$count." orphaned data from term table");
+
+		if ($count < $limit) {
+			Config::set('system', 'finished-dbclean-7', true);
+		}
 	}
 
 	// Call it again if not all entries were purged

@@ -23,29 +23,7 @@ function user_remove($uid) {
 		$r[0]['nickname']
 	);
 
-	/// @todo Should be done in a background job since this likely will run into a time out
-	// don't delete yet, will be done later when contacts have deleted my stuff
-	// q("DELETE FROM `contact` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `gcign` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `group` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `group_member` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `intro` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `event` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `item` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `item_id` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `mail` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `mailacct` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `manage` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `notify` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `photo` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `attach` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `profile` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `profile_check` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `pconfig` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `search` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `spam` WHERE `uid` = %d", intval($uid));
-	// don't delete yet, will be done later when contacts have deleted my stuff
-	// q("DELETE FROM `user` WHERE `uid` = %d", intval($uid));
+	// The user and related data will be deleted in "cron_expire_and_remove_users" (cronjobs.php)
 	q("UPDATE `user` SET `account_removed` = 1, `account_expires_on` = UTC_TIMESTAMP() WHERE `uid` = %d", intval($uid));
 	proc_run(PRIORITY_HIGH, "include/notifier.php", "removeme", $uid);
 
