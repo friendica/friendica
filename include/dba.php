@@ -845,7 +845,7 @@ class dba {
 	}
 
 	/**
-	 * @brief Insert a row into a table
+	 * @brief Delete a row from a table
 	 *
 	 * @param string $table Table name
 	 * @param array $param parameter array
@@ -918,7 +918,9 @@ class dba {
 
 		if (!$in_process) {
 			// Now we finalize the process
-			if (!self::$in_transaction) {
+			$do_transaction = !self::$in_transaction;
+
+			if ($do_transaction) {
 				self::transaction();
 			}
 
@@ -932,7 +934,7 @@ class dba {
 					logger(dba::replace_parameters($sql, $command['param']), LOGGER_DATA);
 
 					if (!self::e($sql, $command['param'])) {
-						if (!self::$in_transaction) {
+						if ($do_transaction) {
 							self::rollback();
 						}
 						return false;
@@ -962,7 +964,7 @@ class dba {
 						logger(dba::replace_parameters($sql, $field_values), LOGGER_DATA);
 
 						if (!self::e($sql, $field_values)) {
-							if (!self::$in_transaction) {
+							if ($do_transaction) {
 								self::rollback();
 							}
 							return false;
@@ -970,7 +972,7 @@ class dba {
 					}
 				}
 			}
-			if (!self::$in_transaction) {
+			if ($do_transaction) {
 				self::commit();
 			}
 			return true;
