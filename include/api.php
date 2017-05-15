@@ -456,10 +456,13 @@ $called_api = null;
 	 * 		Contact url or False if contact id is unknown
 	 */
 	function api_unique_id_to_url($id) {
-		$r = q("SELECT `url` FROM `contact` WHERE `uid` = 0 AND `id` = %d LIMIT 1",
-			intval($id));
+		$r = dba::select('contact', array('url'), array('uid' => 0, 'id' => $id), array('limit' => 1));
 
-		return (dbm::is_result($r) && $r[0]["url"]);
+		if (dbm::is_result($r)) {
+			return $r["url"];
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -3027,8 +3030,9 @@ $called_api = null;
 			api_best_nickname($r);
 
 			$recipient = api_get_user($a, $r[0]['nurl']);
-		} else
+		} else {
 			$recipient = api_get_user($a, $_POST['user_id']);
+		}
 
 		$replyto = '';
 		$sub     = '';
