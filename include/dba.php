@@ -521,6 +521,16 @@ class dba {
 			logger('Parameter mismatch. Query "'.$sql.'" - Parameters '.print_r($args, true), LOGGER_DEBUG);
 		}
 
+		// beautify the SQL query - useful for "SHOW PROCESSLIST"
+		// This is safe because we bind the parameters later.
+		// The parameter values aren't part of the SQL.
+		$search = array("\n", "\r", "  ");
+		$replace = array(' ', ' ', ' ');
+		do {
+			$oldsql = $sql;
+			$sql = str_replace($search, $replace, $sql);
+		} while ($oldsql != $sql);
+
 		$sql = self::$dbo->any_value_fallback($sql);
 
 		if (x($a->config,'system') && x($a->config['system'], 'db_callstack')) {
@@ -708,6 +718,9 @@ class dba {
 	 * @return int Number of rows
 	 */
 	static public function num_rows($stmt) {
+		if (!is_object($stmt)) {
+			return 0;
+		}
 		switch (self::$dbo->driver) {
 			case 'pdo':
 				return $stmt->rowCount();
