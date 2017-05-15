@@ -460,6 +460,27 @@ class dba {
 	}
 
 	/**
+	 * @brief beautifies the query - seful for "SHOW PROCESSLIST"
+	 *
+	 * This is safe when we bind the parameters later.
+	 * The parameter values aren't part of the SQL.
+	 *
+	 * @param string $sql An SQL string without the values
+	 * @return string The input SQL string modified if necessary.
+	 */
+	public function clean_query($sql) {
+		$search = array("\t", "\n", "\r", "  ");
+		$replace = array(' ', ' ', ' ', ' ');
+		do {
+			$oldsql = $sql;
+			$sql = str_replace($search, $replace, $sql);
+		} while ($oldsql != $sql);
+
+		return $sql;
+	}
+
+
+	/**
 	 * @brief Replaces the ? placeholders with the parameters in the $args array
 	 *
 	 * @param string $sql SQL query
@@ -521,16 +542,7 @@ class dba {
 			logger('Parameter mismatch. Query "'.$sql.'" - Parameters '.print_r($args, true), LOGGER_DEBUG);
 		}
 
-		// beautify the SQL query - useful for "SHOW PROCESSLIST"
-		// This is safe because we bind the parameters later.
-		// The parameter values aren't part of the SQL.
-		$search = array("\n", "\r", "  ");
-		$replace = array(' ', ' ', ' ');
-		do {
-			$oldsql = $sql;
-			$sql = str_replace($search, $replace, $sql);
-		} while ($oldsql != $sql);
-
+		$sql = self::$dbo->clean_query($sql);
 		$sql = self::$dbo->any_value_fallback($sql);
 
 		if (x($a->config,'system') && x($a->config['system'], 'db_callstack')) {
@@ -1213,6 +1225,7 @@ function q($sql) {
 	unset($args[0]);
 
 	if ($db && $db->connected) {
+		$sql = $db->clean_query($sql);
 		$sql = $db->any_value_fallback($sql);
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		//logger("dba: q: $stmt", LOGGER_ALL);
@@ -1250,6 +1263,7 @@ function qu($sql) {
 	unset($args[0]);
 
 	if ($db && $db->connected) {
+		$sql = $db->clean_query($sql);
 		$sql = $db->any_value_fallback($sql);
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		if ($stmt === false)
