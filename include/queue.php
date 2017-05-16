@@ -29,28 +29,10 @@ function queue_run(&$argv, &$argc){
 		// Handling the pubsubhubbub requests
 		proc_run(PRIORITY_HIGH,'include/pubsubpublish.php');
 
-		$interval = ((get_config('system','delivery_interval') === false) ? 2 : intval(get_config('system','delivery_interval')));
-
-		// If we are using the worker we don't need a delivery interval
-		/// @TODO To much get_config() here
-		if (get_config("system", "worker")) {
-			$interval = false;
-		}
-
-		$r = q("select * from deliverq where 1");
-		if ($r) {
-			foreach ($r as $rr) {
-				logger('queue: deliverq');
-				proc_run(PRIORITY_HIGH,'include/delivery.php',$rr['cmd'],$rr['item'],$rr['contact']);
-				if ($interval) {
-					time_sleep_until(microtime(true) + (float) $interval);
-				}
-			}
-		}
-
 		$r = q("SELECT `queue`.*, `contact`.`name`, `contact`.`uid` FROM `queue`
 			INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id`
 			WHERE `queue`.`created` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
+
 		if (dbm::is_result($r)) {
 			foreach ($r as $rr) {
 				logger('Removing expired queue item for ' . $rr['name'] . ', uid=' . $rr['uid']);
