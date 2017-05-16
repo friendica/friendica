@@ -307,7 +307,7 @@ function _contact_update_profile($contact_id) {
 	);
 
 	// Update the entry in the contact table
-	update_contact_avatar($data['photo'], local_user(), $contact_id);
+	update_contact_avatar($data['photo'], local_user(), $contact_id, true);
 
 	// Update the entry in the gcontact table
 	update_gcontact_from_probe($data["url"]);
