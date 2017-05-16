@@ -460,7 +460,7 @@ class dba {
 	}
 
 	/**
-	 * @brief beautifies the query - seful for "SHOW PROCESSLIST"
+	 * @brief beautifies the query - useful for "SHOW PROCESSLIST"
 	 *
 	 * This is safe when we bind the parameters later.
 	 * The parameter values aren't part of the SQL.
