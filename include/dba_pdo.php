@@ -279,14 +279,13 @@ function dbesc($str) {
 		return(str_replace("'","\\'",$str));
 }}
 
-
-
-// Function: q($sql,$args);
-// Description: execute SQL query with printf style args.
-// Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
-//                   'user', 1);
-
 if (! function_exists('q')) {
+/**
+ * Function: q($sql,$args);
+ * Description: execute SQL query with printf style args.
+ * Example: $r = q("SELECT * FROM `%s` WHERE `uid` = %d",
+ *   'user', 1);
+ */
 function q($sql) {
 
 	global $db;
@@ -296,8 +295,9 @@ function q($sql) {
 	if ($db && $db->connected) {
 		$stmt = @vsprintf($sql,$args); // Disabled warnings
 		//logger("dba: q: $stmt", LOGGER_ALL);
-		if ($stmt === false)
+		if ($stmt === false) {
 			logger('dba: vsprintf error: ' . print_r(debug_backtrace(),true), LOGGER_DEBUG);
+		}
 		return $db->q($stmt);
 	}
 
