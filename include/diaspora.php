@@ -887,7 +887,7 @@ class Diaspora {
 			$cid = get_contact($handle, $uid);
 
 			if ($cid > 0) {
-				/// @TODO Contact-retrival should be encapsulated into an "entity" class like `Contact`
+				/// @TODO Contact retrieval should be encapsulated into an "entity" class like `Contact`
 				$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1", intval($cid));
 
 				if (dbm::is_result($r)) {
