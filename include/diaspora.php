@@ -881,8 +881,8 @@ class Diaspora {
 			return $r[0];
 		} else {
 			/*
-			 * Not found yet? Then use another function for it that will
-			 * possibly create a contact entry.
+			 * We haven't found it?
+			 * We use another function for it that will possibly create a contact entry.
 			 */
 			$cid = get_contact($handle, $uid);
 
@@ -923,7 +923,7 @@ class Diaspora {
 	private static function post_allow($importer, $contact, $is_comment = false) {
 
 		/*
-		 * perhaps we were already sharing with this person. Now they're sharing with us.
+		 * Perhaps we were already sharing with this person. Now they're sharing with us.
 		 * That makes us friends.
 		 * Normally this should have handled by getting a request - but this could get lost
 		 */
@@ -937,11 +937,11 @@ class Diaspora {
 			logger("defining user ".$contact["nick"]." as friend");
 		}
 
-		// Is this contact wanted?
+		// We don't seem to like that person
 		if ($contact["blocked"] || $contact["readonly"] || $contact["archive"]) {
 			// Maybe blocked, don't accept.
 			return false;
-		// Is this person being followed?
+		// We are following this person?
 		} elseif (($contact["rel"] == CONTACT_IS_SHARING) || ($contact["rel"] == CONTACT_IS_FRIEND)) {
 			// Yes, then it is fine.
 			return true;
