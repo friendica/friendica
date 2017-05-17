@@ -29,25 +29,6 @@ function queue_run(&$argv, &$argc) {
 		// Handling the pubsubhubbub requests
 		proc_run(PRIORITY_HIGH,'include/pubsubpublish.php');
 
-		$interval = ((get_config('system','delivery_interval') === false) ? 2 : intval(get_config('system','delivery_interval')));
-
-		// If we are using the worker we don't need a delivery interval
-		/// @TODO To much get_config() here
-		if (get_config("system", "worker")) {
-			$interval = false;
-		}
-
-		$r = q("select * from deliverq where 1");
-		if ($r) {
-			foreach ($r as $rr) {
-				logger('queue: deliverq');
-				proc_run(PRIORITY_HIGH,'include/delivery.php',$rr['cmd'],$rr['item'],$rr['contact']);
-				if ($interval) {
-					time_sleep_until(microtime(true) + (float) $interval);
-				}
-			}
-		}
-
 		$r = q("SELECT `queue`.*, `contact`.`name`, `contact`.`uid` FROM `queue`
 			INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id`
 			WHERE `queue`.`created` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
@@ -60,9 +41,10 @@ function queue_run(&$argv, &$argc) {
 			q("DELETE FROM `queue` WHERE `created` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
 		}
 
-		// For the first 12 hours we'll try to deliver every 15 minutes
-		// After that, we'll only attempt delivery once per hour.
-
+		/*
+		 * For the first 12 hours we'll try to deliver every 15 minutes
+		 * After that, we'll only attempt delivery once per hour.
+		 */
 		$r = q("SELECT `id` FROM `queue` WHERE ((`created` > UTC_TIMESTAMP() - INTERVAL 12 HOUR && `last` < UTC_TIMESTAMP() - INTERVAL 15 MINUTE) OR (`last` < UTC_TIMESTAMP() - INTERVAL 1 HOUR)) ORDER BY `cid`, `created`");
 
 		call_hooks('queue_predeliver', $a, $r);
