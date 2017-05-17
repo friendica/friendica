@@ -62,14 +62,14 @@ function receive_post(App $a) {
 
 	logger('mod-diaspora: dispatching', LOGGER_DEBUG);
 
-	$ret = 0;
+	$ret = true;
 	if ($public) {
 		Diaspora::dispatch_public($msg);
 	} else {
 		$ret = Diaspora::dispatch($importer, $msg);
 	}
 
-	http_status_exit(($ret) ? $ret : 200);
+	http_status_exit(($ret) ? 200 : 500);
 	// NOTREACHED
 }
 
