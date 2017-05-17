@@ -145,7 +145,10 @@ class dba {
 
 		$a->save_timestamp($stamp1, "database");
 
-		/// @TODO really check $a->config for 'system'? it is very generic and should be there
+		/*
+		 * Check if the configuration group 'system' and db_log is there. The
+		 * extra first check needs to be done to avoid endless loop.
+		 */
 		if (x($a->config, 'system') && x($a->config['system'], 'db_log') && ($duration > $a->config["system"]["db_loglimit"])) {
 			$duration = round($duration, 3);
 			$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
