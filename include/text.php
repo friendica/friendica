@@ -17,7 +17,7 @@ if (! function_exists('replace_macros')) {
  * @param array $r key value pairs (search => replace)
  * @return string substituted string
  */
-function replace_macros($s,$r) {
+function replace_macros($s, $r) {
 
 	$stamp1 = microtime(true);
 
@@ -26,12 +26,12 @@ function replace_macros($s,$r) {
 	// pass $baseurl to all templates
 	$r['$baseurl'] = App::get_baseurl();
 
-
 	$t = $a->template_engine();
 	try {
-		$output = $t->replace_macros($s,$r);
+		$output = $t->replace_macros($s, $r);
 	} catch (Exception $e) {
-		echo "<pre><b>".__function__."</b>: ".$e->getMessage()."</pre>"; killme();
+		echo "<pre><b>" . __FUNCTION__ . "</b>: " . $e->getMessage() . "</pre>";
+		killme();
 	}
 
 	$a->save_timestamp($stamp1, "rendering");
@@ -47,10 +47,10 @@ define('RANDOM_STRING_HEX',  0x00 );
 define('RANDOM_STRING_TEXT', 0x01 );
 
 if (! function_exists('random_string')) {
-function random_string($size = 64,$type = RANDOM_STRING_HEX) {
+function random_string($size = 64, $type = RANDOM_STRING_HEX) {
 	// generate a bit of entropy and run it through the whirlpool
-	$s = hash('whirlpool', (string) rand() . uniqid(rand(),true) . (string) rand(),(($type == RANDOM_STRING_TEXT) ? true : false));
-	$s = (($type == RANDOM_STRING_TEXT) ? str_replace("\n","",base64url_encode($s,true)) : $s);
+	$s = hash('whirlpool', (string) rand() . uniqid(rand(),true) . (string) rand(), (($type == RANDOM_STRING_TEXT) ? true : false));
+	$s = (($type == RANDOM_STRING_TEXT) ? str_replace("\n", "", base64url_encode($s,true)) : $s);
 	return(substr($s,0,$size));
 }}
 
@@ -73,8 +73,7 @@ if (! function_exists('notags')) {
  * @return string Filtered string
  */
 function notags($string) {
-
-	return(str_replace(array("<",">"), array('[',']'), $string));
+	return str_replace(array("<", ">"), array('[', ']'), $string);
 
 //  High-bit filter no longer used
 //	return(str_replace(array("<",">","\xBA","\xBC","\xBE"), array('[',']','','',''), $string));
@@ -90,8 +89,7 @@ if (! function_exists('escape_tags')) {
  * @return string
  */
 function escape_tags($string) {
-
-	return(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false));
+	return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
 }}
 
 
@@ -107,12 +105,14 @@ if (! function_exists('autoname')) {
  */
 function autoname($len) {
 
-	if ($len <= 0)
+	if ($len <= 0) {
 		return '';
+	}
 
 	$vowels = array('a','a','ai','au','e','e','e','ee','ea','i','ie','o','ou','u');
-	if (mt_rand(0,5) == 4)
+	if (mt_rand(0, 5) == 4) {
 		$vowels[] = 'y';
+	}
 
 	$cons = array(
 			'b','bl','br',
@@ -144,10 +144,11 @@ function autoname($len) {
 				'kh', 'kl','kr','mn','pl','pr','rh','tr','qu','wh');
 
 	$start = mt_rand(0,2);
-	if ($start == 0)
+	if ($start == 0) {
 		$table = $vowels;
-	else
+	} else {
 		$table = $cons;
+	}
 
 	$word = '';
 
@@ -155,23 +156,25 @@ function autoname($len) {
 		$r = mt_rand(0,count($table) - 1);
 		$word .= $table[$r];
 
-		if ($table == $vowels)
+		if ($table == $vowels) {
 			$table = array_merge($cons,$midcons);
-		else
+		} else {
 			$table = $vowels;
+		}
 
 	}
 
 	$word = substr($word,0,$len);
 
 	foreach ($noend as $noe) {
-		if ((strlen($word) > 2) && (substr($word,-2) == $noe)) {
-			$word = substr($word,0,-1);
+		if ((strlen($word) > 2) && (substr($word, -2) == $noe)) {
+			$word = substr($word, 0, -1);
 			break;
 		}
 	}
-	if (substr($word,-1) == 'q')
-		$word = substr($word,0,-1);
+	if (substr($word, -1) == 'q') {
+		$word = substr($word, 0, -1);
+	}
 	return $word;
 }}
 
@@ -186,6 +189,7 @@ if (! function_exists('xmlify')) {
  * @return string Escaped text.
  */
 function xmlify($str) {
+	/// @TODO deprecated code found?
 /*	$buffer = '';
 
 	$len = mb_strlen($str);
@@ -239,6 +243,7 @@ if (! function_exists('unxmlify')) {
  * @return string unescaped text
  */
 function unxmlify($s) {
+	/// @TODO deprecated code found?
 //	$ret = str_replace('&amp;','&', $s);
 //	$ret = str_replace(array('&lt;','&gt;','&quot;','&apos;'),array('<','>','"',"'"),$ret);
 	/*$ret = mb_ereg_replace('&amp;', '&', $s);
@@ -258,14 +263,15 @@ if (! function_exists('hex2bin')) {
  * @return number
  */
 function hex2bin($s) {
-	if (! (is_string($s) && strlen($s)))
+	if (! (is_string($s) && strlen($s))) {
 		return '';
-
-	if (! ctype_xdigit($s)) {
-		return($s);
 	}
 
-	return(pack("H*",$s));
+	if (! ctype_xdigit($s)) {
+		return $s;
+	}
+
+	return pack("H*",$s);
 }}
 
 
@@ -421,9 +427,10 @@ function expand_acl($s) {
 	if (strlen($s)) {
 		$t = str_replace('<','',$s);
 		$a = explode('>',$t);
-		foreach ($a as $aa) {
-			if (intval($aa))
+		foreach($a as $aa) {
+			if (intval($aa)) {
 				$ret[] = intval($aa);
+			}
 		}
 	}
 	return $ret;
@@ -476,14 +483,14 @@ if (! function_exists('item_new_uri')) {
  * @param int $uid
  * @return string
  */
-function item_new_uri($hostname,$uid, $guid = "") {
+function item_new_uri($hostname, $uid, $guid = "") {
 
 	do {
 		$dups = false;
 
-		if ($guid == "")
+		if ($guid == "") {
 			$hash = get_guid(32);
-		else {
+		} else {
 			$hash = $guid;
 			$guid = "";
 		}
@@ -492,9 +499,11 @@ function item_new_uri($hostname,$uid, $guid = "") {
 
 		$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($uri));
-		if (dbm::is_result($r))
+		if (dbm::is_result($r)) {
 			$dups = true;
+		}
 	} while ($dups == true);
+
 	return $uri;
 }}
 
@@ -516,9 +525,12 @@ function photo_new_resource() {
 		$r = q("SELECT `id` FROM `photo` WHERE `resource-id` = '%s' LIMIT 1",
 			dbesc($resource)
 		);
-		if (dbm::is_result($r))
+
+		if (dbm::is_result($r)) {
 			$found = true;
+		}
 	} while ($found == true);
+
 	return $resource;
 }}
 
@@ -536,8 +548,9 @@ if (! function_exists('load_view_file')) {
  */
 function load_view_file($s) {
 	global $lang, $a;
-	if (! isset($lang))
+	if (! isset($lang)) {
 		$lang = 'en';
+	}
 	$b = basename($s);
 	$d = dirname($s);
 	if (file_exists("$d/$lang/$b")) {
@@ -576,11 +589,13 @@ function get_intltext_template($s) {
 
 	$a = get_app();
 	$engine = '';
-	if ($a->theme['template_engine'] === 'smarty3')
+	if ($a->theme['template_engine'] === 'smarty3') {
 		$engine = "/smarty3";
+	}
 
-	if (! isset($lang))
+	if (! isset($lang)) {
 		$lang = 'en';
+	}
 
 	if (file_exists("view/lang/$lang$engine/$s")) {
 		$stamp1 = microtime(true);
@@ -616,7 +631,8 @@ function get_markup_template($s, $root = '') {
 	try {
 		$template = $t->get_template_file($s, $root);
 	} catch (Exception $e) {
-		echo "<pre><b>".__function__."</b>: ".$e->getMessage()."</pre>"; killme();
+		echo "<pre><b>" . __FUNCTION__ . "</b>: " . $e->getMessage() . "</pre>";
+		killme();
 	}
 
 	$a->save_timestamp($stamp1, "file");
@@ -636,17 +652,19 @@ function get_template_file($a, $filename, $root = '') {
 	$theme = current_theme();
 
 	// Make sure $root ends with a slash /
-	if ($root !== '' && $root[strlen($root)-1] !== '/')
+	if ($root !== '' && $root[strlen($root) - 1] !== '/') {
 		$root = $root . '/';
+	}
 
-	if (file_exists("{$root}view/theme/$theme/$filename"))
+	if (file_exists("{$root}view/theme/$theme/$filename")) {
 		$template_file = "{$root}view/theme/$theme/$filename";
-	elseif (x($a->theme_info,"extends") && file_exists("{$root}view/theme/{$a->theme_info["extends"]}/$filename"))
-		$template_file = "{$root}view/theme/{$a->theme_info["extends"]}/$filename";
-	elseif (file_exists("{$root}/$filename"))
+	} elseif (x($a->theme_info, "extends") && file_exists("{$root}view/theme/{$a->theme_info[\"extends\"]}/$filename")) {
+		$template_file = "{$root}view/theme/{$a->theme_info[\"extends\"]}/$filename";
+	} elseif (file_exists("{$root}/$filename")) {
 		$template_file = "{$root}/$filename";
-	else
+	} else {
 		$template_file = "{$root}view/$filename";
+	}
 
 	return $template_file;
 }}
@@ -672,11 +690,9 @@ if (! function_exists('attribute_contains')) {
  * @param string $s string to search
  * @return boolean True if found, False otherwise
  */
-function attribute_contains($attr,$s) {
+function attribute_contains($attr, $s) {
 	$a = explode(' ', $attr);
-	if (count($a) && in_array($s,$a))
-		return true;
-	return false;
+	return (count($a) && in_array($s,$a));
 }}
 
 if (! function_exists('logger')) {
@@ -830,9 +846,7 @@ if (! function_exists('activity_match')) {
  * @return boolean
  */
 function activity_match($haystack,$needle) {
-	if (($haystack === $needle) || ((basename($needle) === $haystack) && strstr($needle,NAMESPACE_ACTIVITY_SCHEMA)))
-		return true;
-	return false;
+	return (($haystack === $needle) || ((basename($needle) === $haystack) && strstr($needle, NAMESPACE_ACTIVITY_SCHEMA)));
 }}
 
 
@@ -917,7 +931,7 @@ if (! function_exists('qp')) {
  * @return string
  */
 function qp($s) {
-return str_replace ("%","=",rawurlencode($s));
+	return str_replace("%", "=", rawurlencode($s));
 }}
 
 if (! function_exists('contact_block')) {
@@ -933,13 +947,16 @@ function contact_block() {
 	$a = get_app();
 
 	$shown = get_pconfig($a->profile['uid'],'system','display_friend_count');
-	if ($shown === false)
+	if ($shown === false) {
 		$shown = 24;
-	if ($shown == 0)
+	}
+	if ($shown == 0) {
 		return;
+	}
 
-	if ((! is_array($a->profile)) || ($a->profile['hide-friends']))
+	if ((! is_array($a->profile)) || ($a->profile['hide-friends'])) {
 		return $o;
+	}
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked`
 				AND NOT `pending` AND NOT `hidden` AND NOT `archive`
@@ -954,8 +971,7 @@ function contact_block() {
 	}
 	if (! $total) {
 		$contacts = t('No contacts');
-		$micropro = Null;
-
+		$micropro = null;
 	} else {
 		// Splitting the query in two parts makes it much faster
 		$r = q("SELECT `id` FROM `contact`
@@ -1024,8 +1040,9 @@ function contact_block() {
 function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 
 	// Use the contact URL if no address is available
-	if ($contact["addr"] == "")
+	if ($contact["addr"] == "") {
 		$contact["addr"] = $contact["url"];
+	}
 
 	$url = $contact['url'];
 	$sparkle = '';
@@ -1038,14 +1055,15 @@ function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 			$redir = true;
 			$url = $redirect_url;
 			$sparkle = ' sparkle';
-		}
-		else
+		} else {
 			$url = zrl($url);
+		}
 	}
 
 	// If there is some js available we don't need the url
-	if (x($contact,'click'))
+	if (x($contact, 'click')) {
 		$url = '';
+	}
 
 	return replace_macros(get_markup_template(($textmode)?'micropro_txt.tpl':'micropro_img.tpl'),array(
 		'$click' => (($contact['click']) ? $contact['click'] : ''),
@@ -1071,7 +1089,7 @@ if (! function_exists('search')) {
  * @param string $url search url
  * @param boolean $savedsearch show save search button
  */
-function search($s,$id='search-box',$url='search',$save = false, $aside = true) {
+function search($s, $id = 'search-box', $url = 'search', $save = false, $aside = true) {
 	$a = get_app();
 
 	$values = array(
@@ -1090,8 +1108,9 @@ function search($s,$id='search-box',$url='search',$save = false, $aside = true) 
 					t("Tags"),
 					t("Contacts"));
 
-		if (get_config('system','poco_local_search'))
+		if (get_config('system','poco_local_search')) {
 			$values['$searchoption'][] = t("Forums");
+		}
 	}
 
 	return replace_macros(get_markup_template('searchbox.tpl'), $values);
@@ -1106,13 +1125,10 @@ if (! function_exists('valid_email')) {
  */
 function valid_email($x){
 
-	// Removed because Fabio told me so.
+	/// @TODO Removed because Fabio told me so.
 	//if (get_config('system','disable_email_validation'))
 	//	return true;
-
-	if (preg_match('/^[_a-zA-Z0-9\-\+]+(\.[_a-zA-Z0-9\-\+]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/',$x))
-		return true;
-	return false;
+	return preg_match('/^[_a-zA-Z0-9\-\+]+(\.[_a-zA-Z0-9\-\+]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/', $x);
 }}
 
 
@@ -1125,7 +1141,7 @@ if (! function_exists('linkify')) {
 function linkify($s) {
 	$s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="_blank">$1</a>', $s);
 	$s = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$s);
-	return($s);
+	return $s;
 }}
 
 
@@ -1215,8 +1231,8 @@ if (! function_exists('normalise_link')) {
  * @return string
  */
 function normalise_link($url) {
-	$ret = str_replace(array('https:','//www.'), array('http:','//'), $url);
-	return(rtrim($ret,'/'));
+	$ret = str_replace(array('https:', '//www.'), array('http:', '//'), $url);
+	return rtrim($ret,'/');
 }}
 
 
@@ -1234,9 +1250,7 @@ if (! function_exists('link_compare')) {
  *
  */
 function link_compare($a,$b) {
-	if (strcasecmp(normalise_link($a),normalise_link($b)) === 0)
-		return true;
-	return false;
+	return (strcasecmp(normalise_link($a), normalise_link($b)) === 0);
 }}
 
 /**
@@ -1318,8 +1332,9 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 
 		foreach ($taglist as $tag) {
 
-			if ($tag["url"] == "")
+			if ($tag["url"] == "") {
 				$tag["url"] = $searchpath.strtolower($tag["term"]);
+			}
 
 			if ($tag["type"] == TERM_HASHTAG) {
 				$hashtags[] = "#<a href=\"".$tag["url"]."\" target=\"_blank\">".$tag["term"]."</a>";
@@ -1433,7 +1448,7 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 	$s = $s . $as;
 
 	// map
-	if (strpos($s,'<div class="map">') !== false && $item['coord']) {
+	if (strpos($s, '<div class="map">') !== false && $item['coord']) {
 		$x = generate_map(trim($item['coord']));
 		if ($x) {
 			$s = preg_replace('/\<div class\=\"map\"\>/','$0' . $x,$s);
@@ -1445,37 +1460,36 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 	$spoilersearch = '<blockquote class="spoiler">';
 
 	// Remove line breaks before the spoiler
-	while ((strpos($s, "\n".$spoilersearch) !== false))
-		$s = str_replace("\n".$spoilersearch, $spoilersearch, $s);
-	while ((strpos($s, "<br />".$spoilersearch) !== false))
-		$s = str_replace("<br />".$spoilersearch, $spoilersearch, $s);
+	while ((strpos($s, "\n" . $spoilersearch) !== false)) {
+		$s = str_replace("\n" . $spoilersearch, $spoilersearch, $s);
+	}
+	while ((strpos($s, "<br />" . $spoilersearch) !== false)) {
+		$s = str_replace("<br />" . $spoilersearch, $spoilersearch, $s);
+	}
 
 	while ((strpos($s, $spoilersearch) !== false)) {
-
 		$pos = strpos($s, $spoilersearch);
 		$rnd = random_string(8);
-		$spoilerreplace = '<br /> <span id="spoiler-wrap-'.$rnd.'" class="spoiler-wrap fakelink" onclick="openClose(\'spoiler-'.$rnd.'\');">'.sprintf(t('Click to open/close')).'</span>'.
-					'<blockquote class="spoiler" id="spoiler-'.$rnd.'" style="display: none;">';
-		$s = substr($s, 0, $pos).$spoilerreplace.substr($s, $pos+strlen($spoilersearch));
+		$spoilerreplace = '<br /> <span id="spoiler-wrap-' . $rnd . '" class="spoiler-wrap fakelink" onclick="openClose(\'spoiler-' . $rnd . '\');">' . sprintf(t('Click to open/close')) . '</span>'.
+					'<blockquote class="spoiler" id="spoiler-' . $rnd . '" style="display: none;">';
+		$s = substr($s, 0, $pos) . $spoilerreplace . substr($s, $pos + strlen($spoilersearch));
 	}
 
 	// Look for quote with author
 	$authorsearch = '<blockquote class="author">';
 
 	while ((strpos($s, $authorsearch) !== false)) {
-
 		$pos = strpos($s, $authorsearch);
 		$rnd = random_string(8);
-		$authorreplace = '<br /> <span id="author-wrap-'.$rnd.'" class="author-wrap fakelink" onclick="openClose(\'author-'.$rnd.'\');">'.sprintf(t('Click to open/close')).'</span>'.
-					'<blockquote class="author" id="author-'.$rnd.'" style="display: block;">';
-		$s = substr($s, 0, $pos).$authorreplace.substr($s, $pos+strlen($authorsearch));
+		$authorreplace = '<br /> <span id="author-wrap-' . $rnd . '" class="author-wrap fakelink" onclick="openClose(\'author-' . $rnd . '\');">' . sprintf(t('Click to open/close')) . '</span>'.
+					'<blockquote class="author" id="author-' . $rnd . '" style="display: block;">';
+		$s = substr($s, 0, $pos) . $authorreplace . substr($s, $pos + strlen($authorsearch));
 	}
 
 	// replace friendica image url size with theme preference
-	if (x($a->theme_info,'item_image_size')){
-	    $ps = $a->theme_info['item_image_size'];
-
-	    $s = preg_replace('|(<img[^>]+src="[^"]+/photo/[0-9a-f]+)-[0-9]|',"$1-".$ps, $s);
+	if (x($a->theme_info, 'item_image_size')){
+		$ps = $a->theme_info['item_image_size'];
+		$s = preg_replace('|(<img[^>]+src="[^"]+/photo/[0-9a-f]+)-[0-9]|', "$1-" . $ps, $s);
 	}
 
 	$prep_arr = array('item' => $item, 'html' => $s);
@@ -1494,12 +1508,13 @@ if (! function_exists('prepare_text')) {
  */
 function prepare_text($text) {
 
-	require_once('include/bbcode.php');
+	require_once 'include/bbcode.php';
 
-	if (stristr($text,'[nosmile]'))
+	if (stristr($text, '[nosmile]')) {
 		$s = bbcode($text);
-	else
+	} else {
 		$s = Smilies::replace(bbcode($text));
+	}
 
 	return trim($s);
 }}
@@ -1553,8 +1568,10 @@ function get_cats_and_terms($item) {
 			$first = false;
 		}
 	}
-	if (count($categories)) $categories[count($categories)-1]['last'] = true;
 
+	if (count($categories)) {
+		$categories[count($categories) - 1]['last'] = true;
+	}
 
 	if (local_user() == $item['uid']) {
 		$matches = false; $first = true;
@@ -1564,7 +1581,7 @@ function get_cats_and_terms($item) {
 				$folders[] = array(
 					'name' => xmlify(file_tag_decode($mtch[1])),
 					'url' =>  "#",
-					'removeurl' => ((local_user() == $item['uid'])?'filerm/' . $item['id'] . '?f=&term=' . xmlify(file_tag_decode($mtch[1])):""),
+					'removeurl' => ((local_user() == $item['uid']) ? 'filerm/' . $item['id'] . '?f=&term=' . xmlify(file_tag_decode($mtch[1])) : ""),
 					'first' => $first,
 					'last' => false
 				);
@@ -1573,7 +1590,9 @@ function get_cats_and_terms($item) {
 		}
 	}
 
-	if (count($folders)) $folders[count($folders)-1]['last'] = true;
+	if (count($folders)) {
+		$folders[count($folders) - 1]['last'] = true;
+	}
 
 	return array($categories, $folders);
 }
@@ -1589,26 +1608,27 @@ function get_plink($item) {
 
 	if ($a->user['nickname'] != "") {
 		$ret = array(
-				//'href' => "display/".$a->user['nickname']."/".$item['id'],
-				'href' => "display/".$item['guid'],
-				'orig' => "display/".$item['guid'],
+				//'href' => "display/" . $a->user['nickname'] . "/" . $item['id'],
+				'href' => "display/" . $item['guid'],
+				'orig' => "display/" . $item['guid'],
 				'title' => t('View on separate page'),
 				'orig_title' => t('view on separate page'),
 			);
 
-		if (x($item,'plink')) {
+		if (x($item, 'plink')) {
 			$ret["href"] = $a->remove_baseurl($item['plink']);
 			$ret["title"] = t('link to source');
 		}
 
-	} elseif (x($item,'plink') && ($item['private'] != 1))
+	} elseif (x($item, 'plink') && ($item['private'] != 1)) {
 		$ret = array(
 				'href' => $item['plink'],
 				'orig' => $item['plink'],
 				'title' => t('link to source'),
 			);
-	else
+	} else {
 		$ret = array();
+	}
 
 	//if (x($item,'plink') && ($item['private'] != 1))
 
@@ -1651,9 +1671,11 @@ function generate_user_guid() {
 		$x = q("SELECT `uid` FROM `user` WHERE `guid` = '%s' LIMIT 1",
 			dbesc($guid)
 		);
-		if (! count($x))
+		if (! dbm::is_result($x)) {
 			$found = false;
+		}
 	} while ($found == true );
+
 	return $guid;
 }
 
@@ -1665,10 +1687,11 @@ function generate_user_guid() {
  */
 function base64url_encode($s, $strip_padding = false) {
 
-	$s = strtr(base64_encode($s),'+/','-_');
+	$s = strtr(base64_encode($s), '+/', '-_');
 
-	if ($strip_padding)
+	if ($strip_padding) {
 		$s = str_replace('=','',$s);
+	}
 
 	return $s;
 }
@@ -1816,8 +1839,11 @@ function html2bb_video($s) {
  * @return array
  */
 function array_xmlify($val){
-	if (is_bool($val)) return $val?"true":"false";
-	if (is_array($val)) return array_map('array_xmlify', $val);
+	if (is_bool($val)) {
+		return $val?"true":"false";
+	} elseif (is_array($val)) {
+		return array_map('array_xmlify', $val);
+	}
 	return xmlify((string) $val);
 }
 
@@ -1830,8 +1856,9 @@ function array_xmlify($val){
  * @return string
  */
 function reltoabs($text, $base) {
-	if (empty($base))
-	    return $text;
+	if (empty($base)) {
+		return $text;
+	}
 
 	$base = rtrim($base,'/');
 
@@ -1867,14 +1894,16 @@ function reltoabs($text, $base) {
  * @return string
  */
 function item_post_type($item) {
-	if (intval($item['event-id']))
+	if (intval($item['event-id'])) {
 		return t('event');
-	if (strlen($item['resource-id']))
+	} elseif (strlen($item['resource-id'])) {
 		return t('photo');
-	if (strlen($item['verb']) && $item['verb'] !== ACTIVITY_POST)
+	} elseif (strlen($item['verb']) && $item['verb'] !== ACTIVITY_POST) {
 		return t('activity');
-	if ($item['id'] != $item['parent'])
+	} elseif ($item['id'] != $item['parent']) {
 		return t('comment');
+	}
+
 	return t('post');
 }
 
@@ -2114,7 +2143,7 @@ function undo_post_tagging($s) {
 }
 
 function protect_sprintf($s) {
-	return(str_replace('%','%%',$s));
+	return str_replace('%', '%%', $s);
 }
 
 
@@ -2122,7 +2151,7 @@ function is_a_date_arg($s) {
 	$i = intval($s);
 	if ($i > 1900) {
 		$y = date('Y');
-		if ($i <= $y+1 && strpos($s,'-') == 4) {
+		if ($i <= $y + 1 && strpos($s, '-') == 4) {
 			$m = intval(substr($s,5));
 			if ($m > 0 && $m <= 12)
 				return true;
@@ -2211,9 +2240,11 @@ function text_highlight($s, $lang) {
 	$s = trim(html_entity_decode($s, ENT_COMPAT));
 	$s = str_replace('    ', "\t", $s);
 
-	// The highlighter library insists on an opening php tag for php code blocks. If
-	// it isn't present, nothing is highlighted. So we're going to see if it's present.
-	// If not, we'll add it, and then quietly remove it after we get the processed output back.
+	/*
+	 * The highlighter library insists on an opening php tag for php code blocks. If
+	 * it isn't present, nothing is highlighted. So we're going to see if it's present.
+	 * If not, we'll add it, and then quietly remove it after we get the processed output back.
+	 */
 	if ($lang === 'php' && strpos($s, '<?php') !== 0) {
 		$s = '<?php' . "\n" . $s;
 		$tag_added = true;
