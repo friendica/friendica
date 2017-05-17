@@ -2006,7 +2006,6 @@ function get_gcontact_id($contact) {
 		return false;
 	}
 
-	/// @TODO backward-compatibility or old-lost code?
 	if ($contact["network"] == NETWORK_STATUSNET) {
 		$contact["network"] = NETWORK_OSTATUS;
 	}
@@ -2139,7 +2138,6 @@ function update_gcontact($contact) {
 
 	$fields["hide"] = $r[0]["hide"];
 
-	/// @TODO backward-compatibility or old-lost code?
 	if ($contact["network"] == NETWORK_STATUSNET) {
 		$contact["network"] = NETWORK_OSTATUS;
 	}
