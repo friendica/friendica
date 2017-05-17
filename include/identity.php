@@ -415,9 +415,7 @@ function profile_sidebar($profile, $block = 0) {
 	else
 		$p["address"] = bbcode($p["location"]);
 
-	if (isset($p["contact_photo"])) {
-		$p["photo"] = proxy_url($p["contact_photo"], false, PROXY_SIZE_SMALL);
-	} elseif (isset($p["photo"])) {
+	if (isset($p["photo"])) {
 		$p["photo"] = proxy_url($p["photo"], false, PROXY_SIZE_SMALL);
 	}
 	if ($a->theme['template_engine'] === 'internal')
