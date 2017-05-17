@@ -949,7 +949,7 @@ class Diaspora {
 		} elseif (($contact["rel"] == CONTACT_IS_FOLLOWER) && ($importer["page-flags"] == PAGE_COMMUNITY)) {
 			// That's good
 			return true;
-		// Is the message a comment for global users?
+		// Is the message a global user or a comment?
 		} elseif (($importer["uid"] == 0) || $is_comment) {
 			// Messages for the global users and comments are always accepted
 			return true;
