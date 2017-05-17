@@ -442,10 +442,11 @@ if (! function_exists('sanitise_acl')) {
  * @param string $item
  */
 function sanitise_acl(&$item) {
-	if (intval($item))
+	if (intval($item)) {
 		$item = '<' . intval(notags(trim($item))) . '>';
-	else
+	} else {
 		unset($item);
+	}
 }}
 
 
@@ -461,10 +462,11 @@ if (! function_exists('perms2str')) {
  */
 function perms2str($p) {
 	$ret = '';
-	if (is_array($p))
+	if (is_array($p)) {
 		$tmp = $p;
-	else
+	} else {
 		$tmp = explode(',',$p);
+	}
 
 	if (is_array($tmp)) {
 		array_walk($tmp,'sanitise_acl');
@@ -668,11 +670,6 @@ function get_template_file($a, $filename, $root = '') {
 
 	return $template_file;
 }}
-
-
-
-
-
 
 
 if (! function_exists('attribute_contains')) {
@@ -1416,8 +1413,7 @@ function prepare_body(&$item,$attach = false, $preview = false) {
 					if ($filetype) {
 						$filesubtype = strtolower(substr( $mime, strpos($mime,'/') + 1 ));
 						$filesubtype = str_replace('.', '-', $filesubtype);
-					}
-					else {
+					} else {
 						$filetype = 'unkn';
 						$filesubtype = 'unkn';
 					}
