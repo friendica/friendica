@@ -61,17 +61,17 @@ table.bbcodes > * > tr > th {
   <td><span style="color:  red;">red</span></td>
 </tr>
 <tr>
-  <td>[url=http://www.friendica.com]Friendica[/url]</td>
-  <td><a href="http://www.friendica.com" target="external-link">Friendica</a></td>
+  <td>[url=http://friendi.ca]Friendica[/url]</td>
+  <td><a href="http://friendi.ca" target="external-link">Friendica</a></td>
 </tr>
 <tr>
-  <td>[img]http://friendica.com/sites/default/files/friendika-32.png[/img]</td>
-  <td><img src="http://friendica.com/sites/default/files/friendika-32.png" alt="Immagine/foto"></td>
+  <td>[img]https://raw.githubusercontent.com/friendica/friendica/develop/images/friendica-32.jpg[/img]</td>
+  <td><img src="https://raw.githubusercontent.com/friendica/friendica/develop/images/friendica-32.jpg" alt="Immagine/foto"></td>
 </tr>
 <tr>
-  <td>[img=64x32]http://friendica.com/sites/default/files/friendika-32.png[/img]<br>
+  <td>[img=64x32]https://raw.githubusercontent.com/friendica/friendica/develop/images/friendica-32.jpg[/img]<br>
 <br>Note: provided height is simply discarded.</td>
-  <td><img src="http://friendica.com/sites/default/files/friendika-32.png" style="width: 64px;"></td>
+  <td><img src="https://raw.githubusercontent.com/friendica/friendica/develop/images/friendica-32.jpg" style="width: 64px;"></td>
 </tr>
 <tr>
   <td>[size=xx-small]small text[/size]</td>
@@ -82,7 +82,7 @@ table.bbcodes > * > tr > th {
   <td><span style="font-size: xx-large;">big text</span></td>
 </tr>
 <tr>
-  <td>[size=20]exact size[/size] (size can be any number, in pixel)</td>
+  <td>[size=20]exact size[/size] (size can be any number, in pixels)</td>
   <td><span style="font-size: 20px;">exact size</span></td>
 </tr>
 <tr>
@@ -99,23 +99,23 @@ table.bbcodes > * > tr > th {
   <th>Result</th>
 </tr>
 <tr>
-  <td>[url]http://friendica.com[/url]</td>
-  <td><a href="http://friendica.com">http://friendica.com</a></td>
+  <td>[url]http://friendi.ca[/url]</td>
+  <td><a href="http://friendi.ca">http://friendi.ca</a></td>
 </tr>
 <tr>
-  <td>[url=http://friendica.com]Friendica[/url]</td>
-  <td><a href="http://friendica.com">Friendica</a></td>
+  <td>[url=http://friendi.ca]Friendica[/url]</td>
+  <td><a href="http://friendi.ca">Friendica</a></td>
 </tr>
 <tr>
-  <td>[bookmark]http://friendica.com[/bookmark]<br><br>
-#^[url]http://friendica.com[/url]</td>
-  <td><span class="oembed link"><h4>Friendica: <a href="http://friendica.com" rel="oembed"></a><a href="http://friendica.com" target="_blank">http://friendica.com</a></h4></span></td>
+  <td>[bookmark]http://friendi.ca[/bookmark]<br><br>
+#^[url]http://friendi.ca[/url]</td>
+  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca" target="_blank">http://friendi.ca</a></h4></span></td>
 </tr>
 <tr>
-  <td>[bookmark=http://friendica.com]Bookmark[/bookmark]<br><br>
-#^[url=http://friendica.com]Bookmark[/url]<br><br>
-#[url=http://friendica.com]^[/url][url=http://friendica.com]Bookmark[/url]</td>
-  <td><span class="oembed link"><h4>Friendica: <a href="http://friendica.com" rel="oembed"></a><a href="http://friendica.com" target="_blank">Bookmark</a></h4></span></td>
+  <td>[bookmark=http://friendi.ca]Bookmark[/bookmark]<br><br>
+#^[url=http://friendi.ca]Bookmark[/url]<br><br>
+#[url=http://friendi.ca]^[/url][url=http://friendi.ca]Bookmark[/url]</td>
+  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca" target="_blank">Bookmark</a></h4></span></td>
 </tr>
 <tr>
   <td>[url=/posts/f16d77b0630f0134740c0cc47a0ea02a]Diaspora post with GUID[/url]</td>
@@ -490,7 +490,7 @@ Page title with a link to *url* will be shown.</td>
 
 ## Map
 
-This require "openstreetmap" or "Google Maps" addon version 1.3 or newer.
+This requires "openstreetmap" or "Google Maps" addon version 1.3 or newer.
 If the addon isn't activated, the raw coordinates are shown instead.
 
 <table class="bbcodes">
@@ -514,10 +514,10 @@ If the addon isn't activated, the raw coordinates are shown instead.
 
 ## Abstract for longer posts
 
-If you want to spread your post to several third party networks you can have the problem that these networks have a length limitation like on Twitter.
+If you want to spread your post to several third party networks you may have the problem that these networks have a length limitation like on Twitter.
 
-Friendica is using a semi intelligent mechanism to generate a fitting abstract.
-But it can be interesting to define a custom abstract that will only be displayed on the external network.
+Friendica uses a semi-intelligent mechanism to generate a fitting abstract.
+But it can be useful to define a custom abstract that will only be displayed on the external network.
 This is done with the [abstract]-element.
 <table class="bbcodes">
 <tr>
@@ -566,7 +566,7 @@ Instead you have to name the explicit network:
 <tr>
   <td>
 [abstract]These days I had a strange encounter...[/abstract]<br>
-[abstract=goog]Helly my dear Google+ followers. You have to read my newest blog post![/abstract]<br>
+[abstract=goog]Hello my dear Google+ followers. You have to read my newest blog post![/abstract]<br>
 [abstract=face]Hello my Facebook friends. These days happened something really cool.[/abstract]<br>
 While taking pictures in the woods I had a really strange encounter...</td>
   <td>Google and Facebook will show the respective abstracts while the other networks will show the default one.<br>
@@ -574,7 +574,7 @@ While taking pictures in the woods I had a really strange encounter...</td>
 </tr>
 </table>
 
-The [abstract] element isn't working with connectors where we post the HTML like Tumblr, Wordpress or Pump.io.
+The [abstract] element is not working with connectors where we post HTML directly, like Tumblr, Wordpress or Pump.io.
 For the native connections--that is to e.g. Friendica, Hubzilla, Diaspora or GNU Social--the full posting is used and the contacts instance will display the posting as desired.
 
 ## Special

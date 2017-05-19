@@ -3,7 +3,7 @@ Chats
 
 * [Home](help)
 
-There are two possibilities to use a chat on your friendica site
+There are two possibilities to use chat on your friendica site
 
 * IRC Chat
 * Jappix
@@ -14,13 +14,13 @@ IRC-Chat Plugin
 After activating the plugin, you can find the chat at [yoursite.com/irc](../irc).
 Note: you can use this chat without any login at your site so that everyone could use it.
 
-If you follow the link, you will see the login page of the IR chat.
+If you follow the link, you will see the login page of the IRC chat.
 Now choose a nickname and a chatroom.
-You can choose every name for the room, even something like #superchatwhosenameisonlyknownbyme.
-At last, solve the captchas and click the connect button.
+You can choose any name you like for the room, even something like #superchatwhosenameisonlyknownbyme.
+Finally, solve the captchas and click the connect button.
 
 The following window shows some text while connecting.
-This text isn't importend for you, just wait for the next window.
+This text isn't important, just wait for the next window.
 The first line shows your name and your current IP address.
 The right part of the window shows all users.
 The lower part of the window contains an input field.

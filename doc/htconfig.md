@@ -25,7 +25,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **allowed_link_protocols** (Array) - Allowed protocols in links URLs, add at your own risk. http is always allowed.
 * **birthday_input_format** - Default value is "ymd".
 * **block_local_dir** (Boolean) - Blocks the access to the directory of the local users.
-* **auth_cookie_lifetime** (Integer) - Number of days that should pass without any activity from a before before the users who choosed "Remember me" when logging in from that browser is considered logged out. Defaults to 7.
+* **auth_cookie_lifetime** (Integer) - Number of days that should pass without any activity before a user who chose "Remember me" when logging in is considered logged out. Defaults to 7.
 * **curl_range_bytes** - Maximum number of bytes that should be fetched. Default is 0, which mean "no limit".
 * **db_log** - Name of a logfile to log slow database queries
 * **db_loglimit** - If a database call lasts longer than this value it is logged
@@ -41,13 +41,14 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **directory** - The path to global directory. If not set then "http://dir.friendi.ca" is used.
 * **disable_email_validation** (Boolean) - Disables the check if a mail address is in a valid format and can be resolved via DNS.
 * **disable_url_validation** (Boolean) - Disables the DNS lookup of an URL.
+* **dlogfile - location of the developer log file
 * **event_input_format** - Default value is "ymd".
 * **frontend_worker_timeout** - Value in minutes after we think that a frontend task was killed by the webserver. Default value is 10.
 * **ignore_cache** (Boolean) - For development only. Disables the item cache.
 * **like_no_comment** (Boolean) - Don't update the "commented" value of an item when it is liked.
 * **local_block** (Boolean) - Used in conjunction with "block_public".
-* **local_search** (Boolean) - Blocks the search for not logged in users to prevent crawlers from blocking your system.
-* **max_connections** - The poller process isn't started when the maximum level of the possible database connections are used. When the system can't detect the maximum numbers of connection then this value can be used.
+* **local_search** (Boolean) - Blocks search for users who are not logged in to prevent crawlers from blocking your system.
+* **max_connections** - The maximum number of database connections which can be in use before the poller process is deferred to it's next interval.  When the system can't detect the maximum numbers of connection then this value can be used.
 * **max_connections_level** - The maximum level of connections that are allowed to let the poller start. It is a percentage value. Default value is 75.
 * **max_contact_queue** - Default value is 500.
 * **max_batch_queue** - Default value is 1000.

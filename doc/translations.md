@@ -6,7 +6,7 @@ Friendica translations
 Translation Process
 -------------------
 
-The strings used in the UI of Friendica is translated at [Transifex] [1] and then included in the git repository at github.
+The strings used in the UI of Friendica are translated at [Transifex] [1] and then included in the git repository at github.
 If you want to help with translation for any language, be it correcting terms or translating friendica to a currently not supported language, please register an account at transifex.com and contact the friendica translation team there.
 
 Translating friendica is simple.
@@ -22,7 +22,7 @@ If you want to help translating, please concentrate on the core messages.po file
 We will only include translations with a sufficient translated messages.po file.
 Translations of addons will only be included, when the core file is included as well.
 
-If you want to get your work into the source tree yourself, feel free to do so and contact us with and question that arises.
+If you want to get your work into the source tree yourself, feel free to do so and contact us with and questions that arise.
 The process is simple and friendica ships with all the tools necessary.
 
 The location of the translated files in the source tree is

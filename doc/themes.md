@@ -3,7 +3,7 @@
 * [Home](help)
 
 To change the look of friendica you have to touch the themes.
-The current default theme is [duepunto zero](https://github.com/friendica/friendica/tree/master/view/theme/duepuntozero) but there are numerous others.
+The current default theme is [Vier](https://github.com/friendica/friendica/tree/master/view/theme/vier) but there are numerous others.
 Have a look at [friendica-themes.com](http://friendica-themes.com) for an overview of the existing themes.
 In case none of them suits your needs, there are several ways to change a theme.
 If you need help theming, there is a forum @[ftdevs@friendica.eu](https://friendica.eu/profile/ftdevs) where you can ask theme specific questions and present your themes.
@@ -69,7 +69,7 @@ Many themes are more *theme families* then only one theme.
 *duepunto zero* and *vier* allow easily to add new theme variation.
 We will go through the process of creating a new variation for *duepunto zero*.
 The same  (well almost, some names change) procedure applies to the *vier* theme.
-And similar steps are needed for *quattro* but this theme is using [lessc](http://lesscss.org/#docs) to maintaine the CSS files..
+And similar steps are needed for *quattro* but this theme is using [lessc](http://lesscss.org/#docs) to maintain the CSS files..
 
 In
 
@@ -159,7 +159,7 @@ If you think your color variation could be benifical for other friendica users a
 
 ### Inheritation
 
-Say, you like the duepuntozero but you want to have the content of the outer columns  left and right exchanged.
+Say, you like the duepuntozero but you want to have the content of the outer columns left and right exchanged.
 That would be not a color variation as shown above.
 Instead we will create a new theme, duepuntozero_lr, inherit the properties of duepuntozero and make small changes to the underlying php files.
 
@@ -202,7 +202,7 @@ That done, you can select it in the settings like any other activated theme.
 ## Creating a Theme from Scratch
 
 Keep patient.
-Basically what you have to do is identifying which template you have to change so it looks more like what you want.
+Basically what you have to do is identify which template you have to change so it looks more like what you want.
 Adopt the CSS of the theme accordingly.
 And iterate the process until you have the theme the way you want it.
 
@@ -243,11 +243,11 @@ For example, have a look at the theme.php of the *quattro* theme:
      */
 
 You see the definition of the themes name, it's version and the initial author of the theme.
-These three information should be listed.
-If the original author is not anymore working on the theme, but a maintainer has taken over, the maintainer should be listed as well.
+These three pieces of information should be listed.
+If the original author is no longer working on the theme, but a maintainer has taken over, the maintainer should be listed as well.
 The information from the theme header will be displayed in the admin panelö.
 
-Next crucial part of the theme.php file is a definition of an init function.
+The next crucial part of the theme.php file is a definition of an init function.
 The name of the function is <theme-name>_init.
 So in the case of quattro it is
 
@@ -256,7 +256,7 @@ So in the case of quattro it is
       set_template_engine($a, 'smarty3');
     }
 
-Here we have set the basic theme information, in this case they are empthy.
+Here we have set the basic theme information, in this case they are empty.
 But the array needs to be set.
 And we have set the template engine that should be used by friendica for this theme.
 At the moment you should use the *smarty3* engine.

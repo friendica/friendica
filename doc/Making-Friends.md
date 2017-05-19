@@ -9,7 +9,7 @@ How do you do it?
 
 The Directories
 ---
-Friendica has two different kinds of "addressbook":
+Friendica has two different kinds of "address book":
 The directory of the Friendica server you are registered on and the global directory that collects account information across all Friendica instances.
 
 The first thing you can do is look at the **Directory**.

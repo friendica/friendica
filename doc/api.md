@@ -3,7 +3,7 @@ Friendica API
 
 * [Home](help)
 
-The Friendica API aims to be compatible to the [GNU Social API](http://wiki.gnusocial.de/gnusocial:api) and the [Twitter API](https://dev.twitter.com/rest/public).
+The Friendica API aims to be compatible with the [GNU Social API](http://wiki.gnusocial.de/gnusocial:api) and the [Twitter API](https://dev.twitter.com/rest/public).
 
 Please refer to the linked documentation for further information.
 
@@ -43,13 +43,13 @@ In this document, endpoints which requires auth are marked with "AUTH" after end
 * network: network of the user
 
 #### Errors
-When an error occour in API call, an HTTP error code is returned, with an error message
+When an error occurs in API call, an HTTP error code is returned, with an error message
 Usually:
-- 400 Bad Request: if parameter are missing or items can't be found
-- 403 Forbidden: if authenticated user is missing
-- 405 Method Not Allowed: if API was called with invalid method, eg. GET when API require POST
-- 501 Not Implemented: if requested API doesn't exists
-- 500 Internal Server Error: on other error contitions
+- 400 Bad Request: if parameters are missing or items can't be found
+- 403 Forbidden: if the authenticated user is missing
+- 405 Method Not Allowed: if API was called with an invalid method, eg. GET when API require POST
+- 501 Not Implemented: if the requested API doesn't exist
+- 500 Internal Server Error: on other error conditions
 
 Error body is
 
@@ -89,7 +89,7 @@ Unofficial Twitter command. It shows all direct answers (excluding the original 
 * id: id of the post
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
@@ -103,7 +103,7 @@ Unofficial Twitter command. It shows all direct answers (excluding the original 
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * getText: Defines the format of the status field. Can be "html" or "plain"
 * include_entities: "true" shows entities for pictures and links (Default: false)
@@ -117,7 +117,7 @@ Unofficial Twitter command. It shows all direct answers (excluding the original 
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * getText: Defines the format of the status field. Can be "html" or "plain"
 * friendica_verbose: "true" enables different error returns (default: "false")
@@ -128,7 +128,7 @@ Shows all direct messages of a conversation
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * getText: Defines the format of the status field. Can be "html" or "plain"
 * uri: URI of the conversation
@@ -139,7 +139,7 @@ Shows all direct messages of a conversation
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * getText: Defines the format of the status field. Can be "html" or "plain"
 * include_entities: "true" shows entities for pictures and links (Default: false)
@@ -182,7 +182,7 @@ HTTP 400 BadRequest
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
@@ -208,26 +208,26 @@ Set this values will result in an empty array.
 ---
 ### followers/ids (*; AUTH)
 #### Parameters
-* stringify_ids: Should the id numbers be sent as text (true) or number (false)? (default: false)
+* stringify_ids: Send id numbers as text (true) or integers (false)? (default: false)
 
 #### Unsupported parameters
 * user_id
 * screen_name
 * cursor
 
-Friendica doesn't allow showing followers of other users.
+Friendica doesn't allow showing the followers of other users.
 
 ---
 ### friends/ids (*; AUTH)
 #### Parameters
-* stringify_ids: Should the id numbers be sent as text (true) or number (false)? (default: false)
+* stringify_ids: Send the id numbers as text (true) or integers (false)? (default: false)
 
 #### Unsupported parameters
 * user_id
 * screen_name
 * cursor
 
-Friendica doesn't allow showing friends of other users.
+Friendica doesn't allow showing the friends of other users.
 
 ---
 ### help/test (*)
@@ -283,7 +283,7 @@ Friendica doesn't allow showing friends of other users.
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * exclude_replies: don't show replies (default: false)
 * conversation_id: Shows all statuses of a given conversation.
@@ -299,7 +299,7 @@ Friendica doesn't allow showing friends of other users.
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * exclude_replies: don't show replies (default: false)
 * conversation_id: Shows all statuses of a given conversation.
@@ -315,7 +315,7 @@ Friendica doesn't allow showing friends of other users.
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
@@ -329,7 +329,7 @@ Friendica doesn't allow showing friends of other users.
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * exclude_replies: don't show replies (default: false)
 * conversation_id: Shows all statuses of a given conversation.
@@ -343,7 +343,7 @@ Friendica doesn't allow showing friends of other users.
 #### Parameters
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
@@ -403,7 +403,7 @@ Friendica doesn't allow showing friends of other users.
 * screen_name: screen name (for technical reasons, this value is not unique!)
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * exclude_replies: don't show replies (default: false)
 * conversation_id: Shows all statuses of a given conversation.
@@ -426,7 +426,7 @@ It shows all direct answers (excluding the original post) to a given id.
 * id: id of the post
 * count: Items per page (default: 20)
 * page: page number
-* since_id: minimal id
+* since_id: minimum id
 * max_id: maximum id
 * include_entities: "true" shows entities for pictures and links (Default: false)
 
@@ -481,9 +481,9 @@ On success:
 On error:
 * 403 FORBIDDEN: if not authenticated
 * 400 BADREQUEST: "no media data submitted", "profile_id not available"
-* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server", 
-			"image size exceeds Friendica Config setting (uploaded size: x)", 
-			"unable to process image data", 
+* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server",
+			"image size exceeds Friendica Config setting (uploaded size: x)",
+			"unable to process image data",
 			"image upload failed"
 
 
@@ -640,7 +640,7 @@ If the note is linked to an item, the item is returned, just like one of the "st
 
 If the note is not linked to an item, a success status is returned:
 
-* "success" (json) | "&lt;status&gt;success&lt;/status&gt;" (xml)
+* "success" (json) | <status>success</status>;" (xml)
 
 
 ---
@@ -671,8 +671,8 @@ json
 ```
 	{
 		"id": "photo id"
-		"created": "date(YYYY-MM-GG HH:MM:SS)",
-		"edited": "date(YYYY-MM-GG HH:MM:SS)",
+		"created": "date(YYYY-MM-DD HH:MM:SS)",
+		"edited": "date(YYYY-MM-DD HH:MM:SS)",
 		"title": "photo title",
 		"desc": "photo description",
 		"album": "album name",
@@ -695,8 +695,8 @@ xml
 ```
 	<photo>
 		<id>photo id</id>
-		<created>date(YYYY-MM-GG HH:MM:SS)</created>
-		<edited>date(YYYY-MM-GG HH:MM:SS)</edited>
+		<created>date(YYYY-MM-DD HH:MM:SS)</created>
+		<edited>date(YYYY-MM-DD HH:MM:SS)</edited>
 		<title>photo title</title>
 		<desc>photo description</desc>
 		<album>album name</album>
@@ -792,14 +792,14 @@ On error:
 * desc (optional): description for the photo, updated when photo_id is specified
 * album: name of the album to be deleted (always necessary)
 * album_new (optional): can be used to change the album of a single photo if photo_id is specified
-* allow_cid/allow_gid/deny_cid/deny_gid (optional): on create: empty string or omitting = public photo, specify in format '```<x><y><z>```' for private photo; 
-			on update: keys need to be present with empty values for setting a private photo now to public
+* allow_cid/allow_gid/deny_cid/deny_gid (optional): on create: empty string or omitting = public photo, specify in format '```<x><y><z>```' for private photo;
+			on update: keys need to be present with empty values for changing a private photo to public
 
-both calls point to one function for creating AND updating photos. 
-Saves data for the scales 0-2 to database (see above for scale description). 
-Call adds non-visible entries to items table to enable authenticated contacts to comment/like the photo. 
+both calls point to one function for creating AND updating photos.
+Saves data for the scales 0-2 to database (see above for scale description).
+Call adds non-visible entries to items table to enable authenticated contacts to comment/like the photo.
 Client should pay attention to the fact that updated access rights are not transferred to the contacts. i.e. public photos remain publicly visible if they have been commented/liked before setting visibility back to a limited group.
-Currently it is best way to inform user that updating rights is not the best way, offer a solution to add photo as a new photo with the new rights. 
+Currently it is best to inform user that updating rights is not the right way to do this, and offer a solution to add photo as a new photo with the new rights instead.
 
 #### Return values
 
@@ -812,12 +812,12 @@ On success:
 On error:
 * 403 FORBIDDEN: if not authenticated
 * 400 BADREQUEST: "no albumname specified", "no media data submitted", "photo not available", "acl data invalid"
-* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server", 
-			"image size exceeds Friendica Config setting (uploaded size: x)", 
-			"unable to process image data", 
-			"image upload failed", 
-			"unknown error - uploading photo failed, see Friendica log for more information", 
-			"unknown error - update photo entry in database failed", 
+* 500 INTERNALSERVERERROR: "image size exceeds PHP config settings, file was rejected by server",
+			"image size exceeds Friendica Config setting (uploaded size: x)",
+			"unable to process image data",
+			"image upload failed",
+			"unknown error - uploading photo failed, see Friendica log for more information",
+			"unknown error - update photo entry in database failed",
 			"unknown error - this error on uploading or updating a photo should never happen"
 
 
@@ -883,9 +883,9 @@ On success: Array of:
 * friendica_owner: user data of the authenticated user
 * profiles: array of the profile data
 
-On error: 
-HTTP 403 Forbidden: when no authentication provided
-HTTP 400 Bad Request: if given profile_id is not in db or not assigned to authenticated user
+On error:
+HTTP 403 Forbidden: when no authentication was provided
+HTTP 400 Bad Request: if given profile_id is not in the database or is not assigned to the authenticated user
 
 General description of profile data in API returns:
 * profile_id
@@ -913,7 +913,7 @@ The following API calls are implemented in GNU Social but not in Friendica: (inc
 * blocks/create
 * blocks/destroy
 
-The following API calls from the Twitter API aren't implemented neither in Friendica nor in GNU Social:
+The following API calls from the Twitter API are not implemented in either Friendica or GNU Social:
 
 * statuses/mentions_timeline
 * statuses/retweets/:id
@@ -990,7 +990,6 @@ The following API calls from the Twitter API aren't implemented neither in Frien
 
 ## Usage Examples
 ### BASH / cURL
-Betamax has documentated some example API usage from a [bash script](https://en.wikipedia.org/wiki/Bash_(Unix_shell) employing [curl](https://en.wikipedia.org/wiki/CURL) (see [his posting](https://betamax65.de/display/betamax65/43539)).
 
 /usr/bin/curl -u USER:PASS https://YOUR.FRIENDICA.TLD/api/statuses/update.xml -d source="some source id" -d status="the status you want to post"
 
