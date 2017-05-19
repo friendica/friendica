@@ -3744,8 +3744,7 @@ $called_api = null;
 			proc_run(PRIORITY_LOW, "include/directory.php", $url);
 		}
 
-		require_once 'include/profile_update.php';
-		profile_change();
+		proc_run(PRIORITY_LOW, 'include/profile_update.php', api_user());
 
 		// output for client
 		if ($data) {

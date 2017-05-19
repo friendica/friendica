@@ -504,8 +504,7 @@ function profiles_post(App $a) {
 				proc_run(PRIORITY_LOW, "include/directory.php", $url);
 			}
 
-			require_once 'include/profile_update.php';
-			profile_change();
+			proc_run(PRIORITY_LOW, 'include/profile_update.php', local_user());
 
 			// Update the global contact for the user
 			update_gcontact_for_user(local_user());
