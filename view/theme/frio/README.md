@@ -13,7 +13,7 @@ I conentrated on 3 topics:
 * if you update the theme you should disable and enable the theme again from the admin panel (to apply possible new hooks)
 
 **Note:**
-While Frio is doing its job very well in the most cases, there is still some work to do. So some templates are still missing and will be added in future versions.
+While Frio is doing its job very well in most cases, there still is some work to do. Some templates are still missing and will be added in future versions.
 
 Some insights into my motivation for starting coding this theme:
 This theme should be the start of a discussion in the friendica community (users and developers) about UI/UX in friendica.
