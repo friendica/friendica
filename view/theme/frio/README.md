@@ -13,11 +13,11 @@ I conentrated on 3 topics:
 * if you update the theme you should disable and enable the theme again from the admin panel (to apply possible new hooks)
 
 **Note:**
-This theme is marked as experimental. While it is doing its job very well in the most cases there still much work to do to get it marked as stable. So some important templates are still missing and will be added in future versions.
+While Frio is doing its job very well in the most cases, there still some work to do. So some templates are still missing and will be added in future versions.
 
 Some insights into my motivation for starting coding this theme:
 This theme should be the start of a discussion in the friendica community (users and developers) about UI/UX in friendica.
-What frameworks do we want to use? How should default friendica look like? And how do we want to use friendica? What do we need in the core code (At the present time some stuff in this is done with ugly javascript hacks and own php code)?
+What frameworks do we want to use? How should default friendica look like? And how do we want to use friendica? What do we need in the core code (At the present time some stuff this is done with ugly javascript hacks and own php code)?
 
 Coding a theme is much work but you will get a really good insight of the limitations of friendica and can start a discussion about doing things differently.
 So join the discussion at the friendica forums ;-)
