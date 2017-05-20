@@ -17,9 +17,14 @@ function dbclean_run(&$argv, &$argc) {
 		$stage = 0;
 	}
 
+	// Get the expire days for step 8 and 9
+	$days = Config::get('system', 'dbclean-expire-days', 0);
+
 	if ($stage == 0) {
-		for ($i = 1; $i <= 7; $i++) {
-			if (!Config::get('system', 'finished-dbclean-'.$i, false)) {
+		for ($i = 1; $i <= 9; $i++) {
+			// Execute the background script for a step when it isn't finished.
+			// Execute step 8 and 9 only when $days is defined.
+			if (!Config::get('system', 'finished-dbclean-'.$i, false) AND (($i < 8) OR ($days > 0))) {
 				proc_run(PRIORITY_LOW, 'include/dbclean.php', $i);
 			}
 		}
@@ -38,6 +43,9 @@ function remove_orphans($stage = 0) {
 
 	// We split the deletion in many small tasks
 	$limit = 1000;
+
+	// Get the expire days for step 8 and 9
+	$days = Config::get('system', 'dbclean-expire-days', 0);
 
 	if ($stage == 1) {
 		$last_id = Config::get('system', 'dbclean-last-id-1', 0);
@@ -61,11 +69,6 @@ function remove_orphans($stage = 0) {
 		logger("Done deleting ".$count." old global item entries from item table without user copy. Last ID: ".$last_id);
 
 		Config::set('system', 'dbclean-last-id-1', $last_id);
-
-		// We will eventually set this value when we found a good way to delete these items in another way.
-		// if ($count < $limit) {
-		//	Config::set('system', 'finished-dbclean-1', true);
-		// }
 	} elseif ($stage == 2) {
 		$last_id = Config::get('system', 'dbclean-last-id-2', 0);
 
@@ -216,11 +219,71 @@ function remove_orphans($stage = 0) {
 		if ($count < $limit) {
 			Config::set('system', 'finished-dbclean-7', true);
 		}
+	} elseif ($stage == 8) {
+		if ($days <= 0) {
+			return;
+		}
+
+		$last_id = Config::get('system', 'dbclean-last-id-8', 0);
+
+		logger("Deleting expired threads. Last ID: ".$last_id);
+		$r = dba::p("SELECT `thread`.`iid` FROM `thread`
+                                INNER JOIN `contact` ON `thread`.`contact-id` = `contact`.`id` AND NOT `notify_new_posts`
+                                WHERE `thread`.`received` < UTC_TIMESTAMP() - INTERVAL ? DAY
+                                        AND NOT `thread`.`mention` AND NOT `thread`.`starred`
+                                        AND NOT `thread`.`wall` AND NOT `thread`.`origin`
+                                        AND `thread`.`uid` != 0 AND `thread`.`iid` >= ?
+                                        AND NOT `thread`.`iid` IN (SELECT `parent` FROM `item`
+                                                        WHERE (`item`.`starred` OR (`item`.`resource-id` != '')
+                                                                OR (`item`.`file` != '') OR (`item`.`event-id` != '')
+                                                                OR (`item`.`attach` != '') OR `item`.`wall` OR `item`.`origin`)
+                                                                AND `item`.`parent` = `thread`.`iid`)
+                                ORDER BY `thread`.`iid` LIMIT 1000", $days, $last_id);
+		$count = dba::num_rows($r);
+		if ($count > 0) {
+			logger("found expired threads: ".$count);
+			while ($thread = dba::fetch($r)) {
+				$last_id = $thread["iid"];
+				dba::delete('thread', array('iid' => $thread["iid"]));
+			}
+		} else {
+			logger("No expired threads found");
+		}
+		dba::close($r);
+		logger("Done deleting ".$count." expired threads. Last ID: ".$last_id);
+
+		Config::set('system', 'dbclean-last-id-8', $last_id);
+	} elseif ($stage == 9) {
+		if ($days <= 0) {
+			return;
+		}
+
+		$last_id = Config::get('system', 'dbclean-last-id-9', 0);
+		$till_id = Config::get('system', 'dbclean-last-id-8', 0);
+
+		logger("Deleting old global item entries from expired threads from ID ".$last_id." to ID ".$till_id);
+		$r = dba::p("SELECT `id` FROM `item` WHERE `uid` = 0 AND
+					NOT EXISTS (SELECT `guid` FROM `item` AS `i` WHERE `item`.`guid` = `i`.`guid` AND `i`.`uid` != 0) AND
+					`received` < UTC_TIMESTAMP() - INTERVAL 90 DAY AND `id` >= ? AND `id` <= ?
+				ORDER BY `id` LIMIT ".intval($limit), $last_id, $till_id);
+		$count = dba::num_rows($r);
+		if ($count > 0) {
+			logger("found global item entries from expired threads: ".$count);
+			while ($orphan = dba::fetch($r)) {
+				$last_id = $orphan["id"];
+				dba::delete('item', array('id' => $orphan["id"]));
+			}
+		} else {
+			logger("No global item entries from expired threads");
+		}
+		dba::close($r);
+		logger("Done deleting ".$count." old global item entries from expired threads. Last ID: ".$last_id);
+
+		Config::set('system', 'dbclean-last-id-9', $last_id);
 	}
 
 	// Call it again if not all entries were purged
 	if (($stage != 0) AND ($count > 0)) {
 		proc_run(PRIORITY_MEDIUM, 'include/dbclean.php');
 	}
-
 }

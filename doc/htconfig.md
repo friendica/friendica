@@ -35,6 +35,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **db_loglimit_index_high** - Number of index rows to be logged anyway (for any index)
 * **db_log_index_blacklist** - Blacklist of indexes that shouldn't be watched
 * **dbclean** (Boolean) - Enable the automatic database cleanup process
+* **dbclean-expire-days** (Integer) - Days after which remote items will be deleted. Own items, and marked or filed items are kept.
 * **default_service_class** -
 * **delivery_batch_count** - Number of deliveries per process. Default value is 1. (Disabled when using the worker)
 * **diaspora_test** (Boolean) - For development only. Disables the message transfer.
