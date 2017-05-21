@@ -3,7 +3,7 @@
  */
 
 
-function insertFormatting(BBcode,id) {
+function insertFormatting(BBcode, id) {
 	var tmpStr = $("#comment-edit-text-" + id).val();
 	if (tmpStr == '') {
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
@@ -11,7 +11,7 @@ function insertFormatting(BBcode,id) {
 		openMenu("comment-edit-submit-wrapper-" + id);
 	}
 
-	textarea = document.getElementById("comment-edit-text-" +id);
+	textarea = document.getElementById("comment-edit-text-" + id);
 	if (document.selection) {
 		textarea.focus();
 		selected = document.selection.createRange();
@@ -62,7 +62,7 @@ function commentExpand(id) {
 	return true;
 }
 
-function commentClose(obj,id) {
+function commentClose(obj, id) {
 	if (obj.value == '') {
 		$("#comment-edit-text-" + id).removeClass("comment-edit-text-full");
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-empty");
@@ -74,10 +74,9 @@ function commentClose(obj,id) {
 }
 
 function showHideCommentBox(id) {
-	if( $('#comment-edit-form-' + id).is(':visible')) {
+	if ($('#comment-edit-form-' + id).is(':visible')) {
 		$('#comment-edit-form-' + id).hide();
-	}
-	else {
+	} else {
 		$('#comment-edit-form-' + id).show();
 	}
 }
@@ -86,8 +85,8 @@ function commentOpenUI(obj, id) {
 	$("#comment-edit-text-" + id).addClass("comment-edit-text-full").removeClass("comment-edit-text-empty");
 	// Choose an arbitrary tab index that's greater than what we're using in jot (3 of them)
 	// The submit button gets tabindex + 1
-	$("#comment-edit-text-" + id).attr('tabindex','9');
-	$("#comment-edit-submit-" + id).attr('tabindex','10');
+	$("#comment-edit-text-" + id).attr('tabindex', '9');
+	$("#comment-edit-submit-" + id).attr('tabindex', '10');
 	$("#comment-edit-submit-wrapper-" + id).show();
 	// initialize autosize for this comment
 	autosize($("#comment-edit-text-" + id + ".text-autosize"));
@@ -120,7 +119,7 @@ function jotTextCloseUI(obj) {
 	}
 }
 
-function commentOpen(obj,id) {
+function commentOpen(obj, id) {
 	if (obj.value == '') {
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
 		$("#comment-edit-text-" + id).removeClass("comment-edit-text-empty");
@@ -131,7 +130,7 @@ function commentOpen(obj,id) {
 	return false;
 }
 
-function commentInsert(obj,id) {
+function commentInsert(obj, id) {
 	var tmpStr = $("#comment-edit-text-" + id).val();
 	if (tmpStr == '') {
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
@@ -139,14 +138,14 @@ function commentInsert(obj,id) {
 		openMenu("comment-edit-submit-wrapper-" + id);
 	}
 	var ins = $(obj).html();
-	ins = ins.replace('&lt;','<');
-	ins = ins.replace('&gt;','>');
-	ins = ins.replace('&amp;','&');
-	ins = ins.replace('&quot;','"');
+	ins = ins.replace('&lt;', '<');
+	ins = ins.replace('&gt;', '>');
+	ins = ins.replace('&amp;', '&');
+	ins = ins.replace('&quot;', '"');
 	$("#comment-edit-text-" + id).val(tmpStr + ins);
 }
 
-function qCommentInsert(obj,id) {
+function qCommentInsert(obj, id) {
 	var tmpStr = $("#comment-edit-text-" + id).val();
 	if (tmpStr == '') {
 		$("#comment-edit-text-" + id).addClass("comment-edit-text-full");
@@ -154,15 +153,17 @@ function qCommentInsert(obj,id) {
 		openMenu("comment-edit-submit-wrapper-" + id);
 	}
 	var ins = $(obj).val();
-	ins = ins.replace('&lt;','<');
-	ins = ins.replace('&gt;','>');
-	ins = ins.replace('&amp;','&');
-	ins = ins.replace('&quot;','"');
+	ins = ins.replace('&lt;', '<');
+	ins = ins.replace('&gt;', '>');
+	ins = ins.replace('&amp;', '&');
+	ins = ins.replace('&quot;', '"');
 	$("#comment-edit-text-" + id).val(tmpStr + ins);
 	$(obj).val('');
 }
 
-function confirmDelete() { return confirm(aStr.delitem); }
+function confirmDelete() {
+	return confirm(aStr.delitem);
+}
 
 /**
  * Hide and removes an item element from the DOM after the deletion url is
