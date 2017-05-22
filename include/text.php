@@ -425,9 +425,9 @@ function expand_acl($s) {
 	$ret = array();
 
 	if (strlen($s)) {
-		$t = str_replace('<','',$s);
-		$a = explode('>',$t);
-		foreach($a as $aa) {
+		$t = str_replace('<', '', $s);
+		$a = explode('>', $t);
+		foreach ($a as $aa) {
 			if (intval($aa)) {
 				$ret[] = intval($aa);
 			}
@@ -469,8 +469,8 @@ function perms2str($p) {
 	}
 
 	if (is_array($tmp)) {
-		array_walk($tmp,'sanitise_acl');
-		$ret = implode('',$tmp);
+		array_walk($tmp, 'sanitise_acl');
+		$ret = implode('', $tmp);
 	}
 	return $ret;
 }}
@@ -1246,7 +1246,7 @@ if (! function_exists('link_compare')) {
  * @return boolean True if the URLs match, otherwise False
  *
  */
-function link_compare($a,$b) {
+function link_compare($a, $b) {
 	return (strcasecmp(normalise_link($a), normalise_link($b)) === 0);
 }}
 
@@ -1312,14 +1312,14 @@ if (! function_exists('prepare_body')) {
  * @hook prepare_body ('item'=>item array, 'html'=>body string) after first bbcode to html
  * @hook prepare_body_final ('item'=>item array, 'html'=>body string) after attach icons and blockquote special case handling (spoiler, author)
  */
-function prepare_body(&$item,$attach = false, $preview = false) {
+function prepare_body(&$item, $attach = false, $preview = false) {
 
 	$a = get_app();
 	call_hooks('prepare_body_init', $item);
 
-	$searchpath = z_root()."/search?tag=";
+	$searchpath = z_root() . "/search?tag=";
 
-	$tags=array();
+	$tags = array();
 	$hashtags = array();
 	$mentions = array();
 
@@ -1550,8 +1550,9 @@ function get_cats_and_terms($item) {
 	$categories = array();
 	$folders = array();
 
-	$matches = false; $first = true;
-	$cnt = preg_match_all('/<(.*?)>/',$item['file'],$matches,PREG_SET_ORDER);
+	$matches = false;
+	$first = true;
+	$cnt = preg_match_all('/<(.*?)>/', $item['file'], $matches, PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
 			$categories[] = array(
@@ -1570,8 +1571,9 @@ function get_cats_and_terms($item) {
 	}
 
 	if (local_user() == $item['uid']) {
-		$matches = false; $first = true;
-		$cnt = preg_match_all('/\[(.*?)\]/',$item['file'],$matches,PREG_SET_ORDER);
+		$matches = false;
+		$first = true;
+		$cnt = preg_match_all('/\[(.*?)\]/', $item['file'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
 				$folders[] = array(
@@ -1626,9 +1628,7 @@ function get_plink($item) {
 		$ret = array();
 	}
 
-	//if (x($item,'plink') && ($item['private'] != 1))
-
-	return($ret);
+	return $ret;
 }}
 
 if (! function_exists('unamp')) {
@@ -1913,15 +1913,16 @@ function file_tag_encode($s) {
 }
 
 function file_tag_decode($s) {
-	return str_replace(array('%3c','%3e','%5b','%5d'),array('<','>','[',']'),$s);
+	return str_replace(array('%3c', '%3e', '%5b', '%5d'), array('<', '>', '[', ']'), $s);
 }
 
 function file_tag_file_query($table,$s,$type = 'file') {
 
-	if ($type == 'file')
-		$str = preg_quote( '[' . str_replace('%','%%',file_tag_encode($s)) . ']' );
-	else
-		$str = preg_quote( '<' . str_replace('%','%%',file_tag_encode($s)) . '>' );
+	if ($type == 'file') {
+		$str = preg_quote( '[' . str_replace('%', '%%', file_tag_encode($s)) . ']' );
+	} else {
+		$str = preg_quote( '<' . str_replace('%', '%%', file_tag_encode($s)) . '>' );
+	}
 	return " AND " . (($table) ? dbesc($table) . '.' : '') . "file regexp '" . dbesc($str) . "' ";
 }
 
@@ -1953,10 +1954,9 @@ function file_tag_file_to_list($file,$type = 'file') {
 	$matches = false;
 	$list = '';
 	if ($type == 'file') {
-		$cnt = preg_match_all('/\[(.*?)\]/',$file,$matches,PREG_SET_ORDER);
-	}
-	else {
-		$cnt = preg_match_all('/<(.*?)>/',$file,$matches,PREG_SET_ORDER);
+		$cnt = preg_match_all('/\[(.*?)\]/', $file, $matches, PREG_SET_ORDER);
+	} else {
+		$cnt = preg_match_all('/<(.*?)>/', $file, $matches, PREG_SET_ORDER);
 	}
 	if ($cnt) {
 		foreach ($matches as $mtch) {
@@ -1969,7 +1969,7 @@ function file_tag_file_to_list($file,$type = 'file') {
 	return $list;
 }
 
-function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
+function file_tag_update_pconfig($uid, $file_old, $file_new, $type = 'file') {
 	// $file_old - categories previously associated with an item
 	// $file_new - new list of categories for an item
 
@@ -2021,10 +2021,6 @@ function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
 				intval($termtype),
 				intval($uid));
 
-			//$r = q("select file from item where uid = %d " . file_tag_file_query('item',$tag,$type),
-			//	intval($uid)
-			//);
-
 			if (dbm::is_result($r)) {
 				unset($deleted_tags[$key]);
 			}
@@ -2034,19 +2030,19 @@ function file_tag_update_pconfig($uid,$file_old,$file_new,$type = 'file') {
 		}
 
 		if ($saved != $filetags_updated) {
-			set_pconfig($uid,'system','filetags', $filetags_updated);
+			set_pconfig($uid, 'system', 'filetags', $filetags_updated);
 		}
 		return true;
 	}
 	else
 		if (strlen($file_new)) {
-			set_pconfig($uid,'system','filetags', $file_new);
+			set_pconfig($uid, 'system', 'filetags', $file_new);
 		}
 		return true;
 }
 
-function file_tag_save_file($uid,$item,$file) {
-	require_once("include/files.php");
+function file_tag_save_file($uid, $item, $file) {
+	require_once "include/files.php";
 
 	$result = false;
 	if (! intval($uid))
@@ -2056,25 +2052,27 @@ function file_tag_save_file($uid,$item,$file) {
 		intval($uid)
 	);
 	if (dbm::is_result($r)) {
-		if (! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']'))
+		if (! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']')) {
 			q("UPDATE `item` SET `file` = '%s' WHERE `id` = %d AND `uid` = %d",
 				dbesc($r[0]['file'] . '[' . file_tag_encode($file) . ']'),
 				intval($item),
 				intval($uid)
 			);
+		}
 
 		create_files_from_item($item);
 
 		$saved = get_pconfig($uid,'system','filetags');
-		if ((! strlen($saved)) || (! stristr($saved,'[' . file_tag_encode($file) . ']')))
-			set_pconfig($uid,'system','filetags',$saved . '[' . file_tag_encode($file) . ']');
+		if ((! strlen($saved)) || (! stristr($saved, '[' . file_tag_encode($file) . ']'))) {
+			set_pconfig($uid, 'system', 'filetags', $saved . '[' . file_tag_encode($file) . ']');
+		}
 		info( t('Item filed') );
 	}
 	return true;
 }
 
-function file_tag_unsave_file($uid,$item,$file,$cat = false) {
-	require_once("include/files.php");
+function file_tag_unsave_file($uid, $item, $file, $cat = false) {
+	require_once "include/files.php";
 
 	$result = false;
 	if (! intval($uid))
@@ -2111,25 +2109,22 @@ function file_tag_unsave_file($uid,$item,$file,$cat = false) {
 		intval($termtype),
 		intval($uid));
 
-	//$r = q("select file from item where uid = %d and deleted = 0 " . file_tag_file_query('item',$file,(($cat) ? 'category' : 'file')),
-	//);
-
 	if (! dbm::is_result($r)) {
 		$saved = get_pconfig($uid,'system','filetags');
-		set_pconfig($uid,'system','filetags',str_replace($pattern,'',$saved));
+		set_pconfig($uid, 'system', 'filetags', str_replace($pattern, '', $saved));
 	}
 
 	return true;
 }
 
 function normalise_openid($s) {
-	return trim(str_replace(array('http://','https://'),array('',''),$s),'/');
+	return trim(str_replace(array('http://', 'https://'), array('', ''), $s), '/');
 }
 
 
 function undo_post_tagging($s) {
 	$matches = null;
-	$cnt = preg_match_all('/([!#@])\[url=(.*?)\](.*?)\[\/url\]/ism',$s,$matches,PREG_SET_ORDER);
+	$cnt = preg_match_all('/([!#@])\[url=(.*?)\](.*?)\[\/url\]/ism', $s, $matches, PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
 			$s = str_replace($mtch[0], $mtch[1] . $mtch[3],$s);
@@ -2170,7 +2165,7 @@ function deindent($text, $chr = "[\t ]", $count = NULL) {
 		preg_match("|^" . $chr . "*|", $lines[$k], $m);
 		$count = strlen($m[0]);
 	}
-	for ($k=0; $k < count($lines); $k++) {
+	for ($k = 0; $k < count($lines); $k++) {
 		$lines[$k] = preg_replace("|^" . $chr . "{" . $count . "}|", "", $lines[$k]);
 	}
 
@@ -2200,11 +2195,12 @@ function formatBytes($bytes, $precision = 2) {
  */
 function format_network_name($network, $url = 0) {
 	if ($network != "") {
-		require_once('include/contact_selectors.php');
-		if ($url != "")
+		require_once 'include/contact_selectors.php';
+		if ($url != "") {
 			$network_name = '<a href="'.$url.'">'.network_to_name($network, $url)."</a>";
-		else
+		} else {
 			$network_name = network_to_name($network);
+		}
 
 		return $network_name;
 	}
