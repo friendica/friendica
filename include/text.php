@@ -1352,8 +1352,9 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 	$update = (!local_user() and !remote_user() and ($item["uid"] == 0));
 
 	// Or update it if the current viewer is the intented viewer
-	if (($item["uid"] == local_user()) AND ($item["uid"] != 0))
+	if (($item["uid"] == local_user()) AND ($item["uid"] != 0)) {
 		$update = true;
+	}
 
 	put_item_in_cache($item, $update);
 	$s = $item["rendered-html"];
@@ -1371,7 +1372,7 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 
 	$as = '';
 	$vhead = false;
-	$arr = explode('[/attach],',$item['attach']);
+	$arr = explode('[/attach],', $item['attach']);
 	if (count($arr)) {
 		$as .= '<div class="body-attach">';
 		foreach ($arr as $r) {
@@ -1382,10 +1383,11 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 				foreach ($matches as $mtch) {
 					$mime = $mtch[3];
 
-					if ((local_user() == $item['uid']) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN))
+					if ((local_user() == $item['uid']) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN)) {
 						$the_url = 'redir/' . $item['contact-id'] . '?f=1&url=' . $mtch[1];
-					else
+					} else {
 						$the_url = $mtch[1];
+					}
 
 					if (strpos($mime, 'video') !== false) {
 						if (!$vhead) {
@@ -1400,11 +1402,11 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 
 						$id = end(explode('/', $the_url));
 						$as .= replace_macros(get_markup_template('video_top.tpl'), array(
-							'$video'	=> array(
-								'id'       => $id,
-								'title' 	=> t('View Video'),
-								'src'     	=> $the_url,
-								'mime'		=> $mime,
+							'$video' => array(
+								'id'     => $id,
+								'title'  => t('View Video'),
+								'src'    => $the_url,
+								'mime'   => $mime,
 							),
 						));
 					}
@@ -1444,7 +1446,7 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 	$s = $s . $as;
 
 	// map
-	if (strpos($s, '<div class="map">') !== false && $item['coord']) {
+	if (strpos($s, '<div class="map">') !== false && x($item, 'coord')) {
 		$x = generate_map(trim($item['coord']));
 		if ($x) {
 			$s = preg_replace('/\<div class\=\"map\"\>/','$0' . $x,$s);
@@ -1934,14 +1936,13 @@ function file_tag_list_to_file($list,$type = 'file') {
 		if ($type == 'file') {
 			$lbracket = '[';
 			$rbracket = ']';
-		}
-		else {
+		} else {
 			$lbracket = '<';
 			$rbracket = '>';
 		}
 
 		foreach ($list_array as $item) {
-		  if (strlen($item)) {
+			if (strlen($item)) {
 				$tag_list .= $lbracket . file_tag_encode(trim($item))  . $rbracket;
 			}
 		}
@@ -1960,8 +1961,9 @@ function file_tag_file_to_list($file,$type = 'file') {
 	}
 	if ($cnt) {
 		foreach ($matches as $mtch) {
-			if (strlen($list))
+			if (strlen($list)) {
 				$list .= ',';
+			}
 			$list .= file_tag_decode($mtch[1]);
 		}
 	}
