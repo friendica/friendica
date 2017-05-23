@@ -1,8 +1,7 @@
 <?php
 
 use Friendica\App;
-
-require_once 'include/probe.php';
+use Friendica\Network\Probe;
 
 function probe_content(App $a) {
 
@@ -22,7 +21,7 @@ function probe_content(App $a) {
 
 	if (x($_GET, 'addr')) {
 		$addr = trim($_GET['addr']);
-		$res = probe_url($addr);
+		$res = Probe::uri($addr, "", 0, false);
 		$o .= '<pre>';
 		$o .= str_replace("\n", '<br />', print_r($res, true));
 		$o .= '</pre>';
