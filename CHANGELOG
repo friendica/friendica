@@ -2,7 +2,12 @@ Version 3.5.2 (2017-05-XX)
   Friendica Core:
     
   Friendica Addons:
-    
+    Translations updated (RU) [pztrm]
+    Pledgie addon was updated to remove cert problems [tobiasd]
+    Securemail now uses openpgp-php and phpseclib [fabrixxm]
+    Superblock Configuration [tobiasd]
+    Twitter Connector updated to use with new deletion method [heluecht]
+
   Closed Issues:
     1626, 1720, 2432, 2792, 2833, 2364, 2448, 2496, 2690, 2752, 2775,
     2803, 2956, 2957, 2961, 2971, 2995, 2999, 3011, 3053, 3107, 3114,
