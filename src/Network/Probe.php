@@ -79,6 +79,8 @@ class Probe {
 		$xrd_timeout = Config::get('system', 'xrd_timeout', 20);
 		$redirects = 0;
 
+		logger("Probing for ".$host, LOGGER_DEBUG);
+
 		$ret = z_fetch_url($ssl_url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
@@ -101,6 +103,7 @@ class Probe {
 
 		$links = xml::element_to_array($xrd);
 		if (!isset($links["xrd"]["link"])) {
+			logger("No xrd data found for ".$host, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -214,6 +217,7 @@ class Probe {
 		}
 
 		if (!$lrdd) {
+			logger("No lrdd data found for ".$uri, LOGGER_DEBUG);
 			return array();
 		}
 
@@ -249,6 +253,7 @@ class Probe {
 		}
 
 		if (!is_array($webfinger["links"])) {
+			logger("No webfinger links found for ".$uri, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -435,6 +440,7 @@ class Probe {
 			$addr = $uri;
 
 		} else {
+			logger("Uri ".$uri." was not detectable", LOGGER_DEBUG);
 			return false;
 		}
 
@@ -544,6 +550,7 @@ class Probe {
 			$webfinger = json_decode($data, true);
 
 			if (!isset($webfinger["links"])) {
+				logger("No json webfinger links for ".$url, LOGGER_DEBUG);
 				return false;
 			}
 
@@ -552,6 +559,7 @@ class Probe {
 
 		$xrd_arr = xml::element_to_array($xrd);
 		if (!isset($xrd_arr["xrd"]["link"])) {
+			logger("No XML webfinger links for ".$url, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -599,11 +607,13 @@ class Probe {
 		}
 		$content = $ret['body'];
 		if (!$content) {
+			logger("Empty body for ".$noscrape_url, LOGGER_DEBUG);
 			return false;
 		}
 
 		$json = json_decode($content, true);
 		if (!is_array($json)) {
+			logger("No json data for ".$noscrape_url, LOGGER_DEBUG);
 			return false;
 		}
 
