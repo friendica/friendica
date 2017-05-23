@@ -653,6 +653,9 @@ class ostatus {
 			$item_id = self::completion($conversation, $importer["uid"], $item, $self);
 
 			if (!$item_id) {
+				// Store the conversation data. This is normally done in "item_store"
+				// but since something went wrong, we want to be sure to save the data.
+				store_conversation($item);
 				logger("Error storing item", LOGGER_DEBUG);
 				continue;
 			}
@@ -847,6 +850,30 @@ class ostatus {
 	}
 
 	/**
+	 * @brief Fetches a shared object from a given conversation object
+	 *
+	 * Sometimes GNU Social seems to fail when returning shared objects.
+	 * Then they don't contains all needed data.
+	 * We then try to find this object in the conversation
+	 *
+	 * @param string $id Message id
+	 * @param object $conversation Conversation object
+	 *
+	 * @return object The shared object
+	 */
+	private function shared_object($id, $conversation) {
+		if (!is_array($conversation->items)) {
+			return false;
+		}
+		foreach ($conversation->items AS $single_conv) {
+			if ($single_conv->id == $id) {
+				return $single_conv;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * @brief Fetches actor details of a given actor and user id
 	 *
 	 * @param string $actor The actor url
@@ -916,8 +943,6 @@ class ostatus {
 			($item["verb"] == ACTIVITY_LIKE) OR ($conversation_url == "")) {
 			$item_stored = item_store($item, $all_threads);
 			return $item_stored;
-		} elseif (count($item) > 0) {
-			$item = store_conversation($item);
 		}
 
 		// Get the parent
@@ -927,14 +952,6 @@ class ostatus {
 				STRAIGHT_JOIN `item` ON `item`.`parent` = `thritem`.`parent`
 				WHERE `term`.`uid` = %d AND `term`.`otype` = %d AND `term`.`type` = %d AND `term`.`url` = '%s'",
 				intval($uid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($conversation_url));
-
-/*		2016-10-23: The old query will be kept until we are sure that the query above is a good and fast replacement
-
-		$parents = q("SELECT `id`, `parent`, `uri`, `contact-id`, `type`, `verb`, `visible` FROM `item` WHERE `id` IN
-				(SELECT `parent` FROM `item` WHERE `id` IN
-					(SELECT `oid` FROM `term` WHERE `uid` = %d AND `otype` = %d AND `type` = %d AND `url` = '%s'))",
-				intval($uid), intval(TERM_OBJ_POST), intval(TERM_CONVERSATION), dbesc($conversation_url));
-*/
 		if ($parents)
 			$parent = $parents[0];
 		elseif (count($item) > 0) {
@@ -1211,42 +1228,52 @@ class ostatus {
 				if (is_array($single_conv->object))
 					$single_conv->object = $single_conv->object[0];
 
-				logger("Found reshared item ".$single_conv->object->id);
-
-				// $single_conv->object->context->conversation;
-
-				if (isset($single_conv->object->object->id))
-					$arr["uri"] = $single_conv->object->object->id;
-				else
-					$arr["uri"] = $single_conv->object->id;
-
-				if (isset($single_conv->object->object->url))
-					$plink = self::convert_href($single_conv->object->object->url);
-				else
-					$plink = self::convert_href($single_conv->object->url);
-
-				if (isset($single_conv->object->object->content))
-					$arr["body"] = add_page_info_to_body(html2bbcode($single_conv->object->object->content));
-				else
-					$arr["body"] = add_page_info_to_body(html2bbcode($single_conv->object->content));
-
-				$arr["plink"] = $plink;
-
-				$arr["created"] = $single_conv->object->published;
-				$arr["edited"] = $single_conv->object->published;
-
-				$arr["author-name"] = $single_conv->object->actor->displayName;
-				if ($arr["owner-name"] == '') {
-					$arr["author-name"] = $single_conv->object->actor->contact->displayName;
+				// Sometimes GNU Social doesn't returns a complete object
+				if (!isset($single_conv->object->actor->url)) {
+					$object = self::shared_object($single_conv->object->id, $conversation);
+					if (is_object($object)) {
+						$single_conv->object = $object;
+					}
 				}
-				$arr["author-link"] = $single_conv->object->actor->url;
-				$arr["author-avatar"] = Probe::fixAvatar($single_conv->object->actor->image->url, $arr["author-link"]);
 
-				$arr["app"] = $single_conv->object->provider->displayName."#";
-				//$arr["verb"] = $single_conv->object->verb;
+				if (isset($single_conv->object->actor->url)) {
+					logger("Found reshared item ".$single_conv->object->id);
 
-				$arr["location"] = $single_conv->object->location->displayName;
-				$arr["coord"] = trim($single_conv->object->location->lat." ".$single_conv->object->location->lon);
+					// $single_conv->object->context->conversation;
+
+					if (isset($single_conv->object->object->id)) {
+						$arr["uri"] = $single_conv->object->object->id;
+					} else {
+						$arr["uri"] = $single_conv->object->id;
+					}
+					if (isset($single_conv->object->object->url)) {
+						$plink = self::convert_href($single_conv->object->object->url);
+					} else {
+						$plink = self::convert_href($single_conv->object->url);
+					}
+					if (isset($single_conv->object->object->content)) {
+						$arr["body"] = add_page_info_to_body(html2bbcode($single_conv->object->object->content));
+					} else {
+						$arr["body"] = add_page_info_to_body(html2bbcode($single_conv->object->content));
+					}
+					$arr["plink"] = $plink;
+
+					$arr["created"] = $single_conv->object->published;
+					$arr["edited"] = $single_conv->object->published;
+
+					$arr["author-name"] = $single_conv->object->actor->displayName;
+					if ($arr["owner-name"] == '') {
+						$arr["author-name"] = $single_conv->object->actor->contact->displayName;
+					}
+					$arr["author-link"] = $single_conv->object->actor->url;
+					$arr["author-avatar"] = Probe::fixAvatar($single_conv->object->actor->image->url, $arr["author-link"]);
+
+					$arr["app"] = $single_conv->object->provider->displayName."#";
+					//$arr["verb"] = $single_conv->object->verb;
+
+					$arr["location"] = $single_conv->object->location->displayName;
+					$arr["coord"] = trim($single_conv->object->location->lat." ".$single_conv->object->location->lon);
+				}
 			}
 
 			if ($arr["location"] == "")
@@ -1257,24 +1284,17 @@ class ostatus {
 
 			// Copy fields from given item array
 			if (isset($item["uri"]) AND (($item["uri"] == $arr["uri"]) OR ($item["uri"] ==  $single_conv->id))) {
-				$copy_fields = array("owner-name", "owner-link", "owner-avatar", "author-name", "author-link", "author-avatar",
-							"gravity", "body", "object-type", "object", "verb", "created", "edited", "coord", "tag",
-							"title", "attach", "app", "type", "location", "contact-id", "uri");
-				foreach ($copy_fields AS $field)
-					if (isset($item[$field]))
-						$arr[$field] = $item[$field];
-
+				logger('Use stored item array for item with URI '.$item["uri"], LOGGER_DEBUG);
+				$newitem = item_store($item);
+				$item = array();
+				$item_stored = $newitem;
+			} else {
+				$newitem = item_store($arr);
 			}
 
-			$newitem = item_store($arr);
 			if (!$newitem) {
 				logger("Item wasn't stored ".print_r($arr, true), LOGGER_DEBUG);
 				continue;
-			}
-
-			if (isset($item["uri"]) AND ($item["uri"] == $arr["uri"])) {
-				$item = array();
-				$item_stored = $newitem;
 			}
 
 			logger('Stored new item '.$plink.' for parent '.$arr["parent-uri"].' under id '.$newitem, LOGGER_DEBUG);
