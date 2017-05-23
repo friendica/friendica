@@ -155,6 +155,12 @@ class ParseUrl {
 			@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		}
 
+		$range = intval(Config::get('system', 'curl_range_bytes', 0));
+
+		if ($range > 0) {
+			curl_setopt($ch, CURLOPT_RANGE, '0-' . $range);
+		}
+
 		$header = curl_exec($ch);
 		$curl_info = @curl_getinfo($ch);
 		curl_close($ch);
