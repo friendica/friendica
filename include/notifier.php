@@ -58,7 +58,7 @@ function notifier_run(&$argv, &$argc){
 	// Inherit the priority
 	$queue = dba::select('workerqueue', array('priority'), array('pid' => getmypid()), array('limit' => 1));
 	if (dbm::is_result($queue)) {
-		$priority = $queue['priority'];
+		$priority = (int)$queue['priority'];
 		logger('inherited priority: '.$priority);
 	} else {
 		// Normally this shouldn't happen.
