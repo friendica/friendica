@@ -55,6 +55,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **max_batch_queue** - Default value is 1000.
 * **max_processes_backend** - Maximum number of concurrent database processes for background tasks. Default value is 5.
 * **max_processes_frontend** - Maximum number of concurrent database processes for foreground tasks. Default value is 20.
+* **min_poll_interval** - minimal distance in minutes between two polls for a contact. Default is 1. Reasonable values are between 1 and 59.
 * **memcache** (Boolean) - Use memcache. To use memcache the PECL extension "memcache" has to be installed and activated.
 * **memcache_host** - Hostname of the memcache daemon. Default is '127.0.0.1'.
 * **memcache_port** - Portnumber of the memcache daemon. Default is 11211.

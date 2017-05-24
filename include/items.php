@@ -2290,15 +2290,12 @@ function drop_item($id, $interactive = true) {
 			}
 		}
 
-		// send the notification upstream/downstream when it is one of our posts
-		// We don't have to do this for foreign posts
-		/// @todo Check if we still can delete foreign comments on our own post
-		if ($item['wall'] OR $item['origin']) {
-			$drop_id = intval($item['id']);
-			$priority = ($interactive ? PRIORITY_HIGH : PRIORITY_LOW);
+		// send the notification upstream/downstream
+		// The priority depends on how the deletion is done.
+		$drop_id = intval($item['id']);
+		$priority = ($interactive ? PRIORITY_HIGH : PRIORITY_LOW);
 
-			proc_run($priority, "include/notifier.php", "drop", $drop_id);
-		}
+		proc_run($priority, "include/notifier.php", "drop", $drop_id);
 
 		if (! $interactive) {
 			return $owner;
