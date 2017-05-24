@@ -2076,7 +2076,7 @@ function item_expire($uid, $days, $network = "", $force = false) {
 		drop_item($item['id'], false);
 	}
 
-	proc_run(PRIORITY_HIGH, "include/notifier.php", "expire", $uid);
+	proc_run(PRIORITY_LOW, "include/notifier.php", "expire", $uid);
 
 }
 
@@ -2099,7 +2099,7 @@ function drop_items($items) {
 	// multiple threads may have been deleted, send an expire notification
 
 	if ($uid) {
-		proc_run(PRIORITY_HIGH, "include/notifier.php", "expire", $uid);
+		proc_run(PRIORITY_LOW, "include/notifier.php", "expire", $uid);
 	}
 }
 
@@ -2290,11 +2290,15 @@ function drop_item($id, $interactive = true) {
 			}
 		}
 
-		$drop_id = intval($item['id']);
+		// send the notification upstream/downstream when it is one of our posts
+		// We don't have to do this for foreign posts
+		/// @todo Check if we still can delete foreign comments on our own post
+		if ($item['wall'] OR $item['origin']) {
+			$drop_id = intval($item['id']);
+			$priority = ($interactive ? PRIORITY_HIGH : PRIORITY_LOW);
 
-		// send the notification upstream/downstream as the case may be
-
-		proc_run(PRIORITY_HIGH, "include/notifier.php", "drop", $drop_id);
+			proc_run($priority, "include/notifier.php", "drop", $drop_id);
+		}
 
 		if (! $interactive) {
 			return $owner;

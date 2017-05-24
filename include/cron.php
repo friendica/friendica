@@ -195,7 +195,7 @@ function cron_poll_contacts($argc, $argv) {
 				$contact['priority'] = (($poll_interval !== false) ? intval($poll_interval) : 3);
 			}
 
-			if ($contact['priority'] AND !$force) {
+			if (($contact['priority'] >= 0) AND !$force) {
 				$update = false;
 
 				$t = $contact['last-update'];
@@ -225,8 +225,13 @@ function cron_poll_contacts($argc, $argv) {
 						}
 						break;
 					case 1:
-					default:
 						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + 1 hour")) {
+							$update = true;
+						}
+						break;
+					case 0:
+					default:
+						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + 15 minute")) {
 							$update = true;
 						}
 						break;
