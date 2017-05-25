@@ -603,7 +603,7 @@ function notifier_run(&$argv, &$argc){
 		}
 
 		// Handling the pubsubhubbub requests
-		proc_run($priority, 'include/pubsubpublish.php');
+		proc_run(PRIORITY_HIGH, 'include/pubsubpublish.php');
 	}
 
 	logger('notifier: calling hooks', LOGGER_DEBUG);
