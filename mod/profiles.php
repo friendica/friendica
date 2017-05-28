@@ -4,6 +4,7 @@ use Friendica\App;
 use Friendica\Network\Probe;
 
 require_once 'include/Contact.php';
+require_once 'include/socgraph.php';
 
 function profiles_init(App $a) {
 
