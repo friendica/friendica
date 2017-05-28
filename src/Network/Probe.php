@@ -83,6 +83,7 @@ class Probe {
 
 		$ret = z_fetch_url($ssl_url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			logger("Probing timeout for ".$ssl_url, LOGGER_DEBUG);
 			return false;
 		}
 		$xml = $ret['body'];
@@ -92,12 +93,14 @@ class Probe {
 		if (!is_object($xrd)) {
 			$ret = z_fetch_url($url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
 			if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+				logger("Probing timeout for ".$url, LOGGER_DEBUG);
 				return false;
 			}
 			$xml = $ret['body'];
 			$xrd = parse_xml_string($xml, false);
 		}
 		if (!is_object($xrd)) {
+			logger("No xrd object found for ".$host, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -132,6 +135,8 @@ class Probe {
 		}
 
 		self::$baseurl = "http://".$host;
+
+		logger("Probing successful for ".$host, LOGGER_DEBUG);
 
 		return $xrd_data;
 	}
@@ -404,6 +409,7 @@ class Probe {
 				$lrdd = self::xrd($host);
 			}
 			if (!$lrdd) {
+				logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
 				return self::feed($uri);
 			}
 			$nick = array_pop($path_parts);
@@ -435,6 +441,7 @@ class Probe {
 			$lrdd = self::xrd($host);
 
 			if (!$lrdd) {
+				logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
 				return self::mail($uri, $uid);
 			}
 			$addr = $uri;
