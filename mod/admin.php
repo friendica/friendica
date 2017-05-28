@@ -545,11 +545,16 @@ function admin_page_summary(App $a) {
 		$showwarning = true;
 		$warningtext[] = sprintf(t('Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php include/dbstructure.php toinnodb</tt> of your Friendica installation for an automatic conversion.<br />'), 'https://dev.mysql.com/doc/refman/5.7/en/converting-tables-to-innodb.html');
 	}
-	// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
-	if ((version_compare($db->server_info(), '5.7.4') >= 0) AND
-		!(strpos($db->server_info(), 'MariaDB') !== false)) {
-		$warningtext[] = t('You are using a MySQL version which does not support all features that Friendica uses. You should consider switching to MariaDB.');
+
+	if (Config::get('system', 'dbupdate', DB_UPDATE_NOT_CHECKED) == DB_UPDATE_NOT_CHECKED) {
+		require_once("include/dbstructure.php");
+		update_structure(false, true);
 	}
+	if (Config::get('system', 'dbupdate') == DB_UPDATE_FAILED) {
+		$showwarning = true;
+		$warningtext[] = t('The database update failed. Please run "php include/dbstructure.php update" from the command line and have a look at the errors that might appear.');
+	}
+
 	$r = q("SELECT `page-flags`, COUNT(`uid`) AS `count` FROM `user` GROUP BY `page-flags`");
 	$accounts = array(
 		array(t('Normal Account'), 0),

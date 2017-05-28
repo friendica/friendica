@@ -8,7 +8,11 @@ require_once "include/text.php";
 
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
-/**
+const DB_UPDATE_NOT_CHECKED = 0; // Database check wasn't executed before
+const DB_UPDATE_SUCCESSFUL = 1;  // Database check was successful
+const DB_UPDATE_FAILED = 2;      // Database check failed
+
+/*
  * Converts all tables from MyISAM to InnoDB
  */
 function convert_to_innodb() {
@@ -22,7 +26,7 @@ function convert_to_innodb() {
 		return;
 	}
 
-	foreach ($r AS $table) {
+	foreach ($r as $table) {
 		$sql = sprintf("ALTER TABLE `%s` engine=InnoDB;", dbesc($table['TABLE_NAME']));
 		echo $sql."\n";
 
@@ -77,9 +81,6 @@ function update_fail($update_id, $error_message) {
 		));
 	}
 
-
-
-
 	/*
 	 @TODO deprecated code?
 	$email_tpl = get_intltext_template("update_fail_eml.tpl");
@@ -121,7 +122,7 @@ function table_structure($table) {
 	$indexdata = array();
 
 	if (dbm::is_result($indexes))
-		foreach ($indexes AS $index) {
+		foreach ($indexes as $index) {
 			if ($index['Key_name'] != 'PRIMARY' && $index['Non_unique'] == '0' && !isset($indexdata[$index["Key_name"]])) {
 				$indexdata[$index["Key_name"]] = array('UNIQUE');
 			}
@@ -137,7 +138,7 @@ function table_structure($table) {
 			$indexdata[$index["Key_name"]][] = $column;
 		}
 	if (dbm::is_result($structures)) {
-		foreach ($structures AS $field) {
+		foreach ($structures as $field) {
 			$fielddata[$field["Field"]]["type"] = $field["Type"];
 			if ($field["Null"] == "NO") {
 				$fielddata[$field["Field"]]["not null"] = true;
@@ -157,7 +158,7 @@ function table_structure($table) {
 		}
 	}
 	if (dbm::is_result($full_columns)) {
-		foreach ($full_columns AS $column) {
+		foreach ($full_columns as $column) {
 			$fielddata[$column["Field"]]["Collation"] = $column["Collation"];
 		}
 	}
@@ -167,10 +168,10 @@ function table_structure($table) {
 
 function print_structure($database) {
 	echo "-- ------------------------------------------\n";
-	echo "-- ".FRIENDICA_PLATFORM." ".FRIENDICA_VERSION." (".FRIENDICA_CODENAME,")\n";
-	echo "-- DB_UPDATE_VERSION ".DB_UPDATE_VERSION."\n";
+	echo "-- " . FRIENDICA_PLATFORM . " " . FRIENDICA_VERSION . " (" . FRIENDICA_CODENAME, ")\n";
+	echo "-- DB_UPDATE_VERSION " . DB_UPDATE_VERSION . "\n";
 	echo "-- ------------------------------------------\n\n\n";
-	foreach ($database AS $name => $structure) {
+	foreach ($database as $name => $structure) {
 		echo "--\n";
 		echo "-- TABLE $name\n";
 		echo "--\n";
@@ -192,10 +193,10 @@ function print_update_error($db, $message) {
 	echo sprintf(t("\nError %d occurred during database update:\n%s\n"),
 		$db->errorno, $db->error);
 
-	return t('Errors encountered performing database changes: ').$message.EOL;
+	return t('Errors encountered performing database changes: ') . $message . EOL;
 }
 
-function update_structure($verbose, $action, $tables=null, $definition=null) {
+function update_structure($verbose, $action, $tables = null, $definition = null) {
 	global $a, $db;
 
 	if ($action) {
@@ -215,7 +216,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 	}
 
 	if (dbm::is_result($tables)) {
-		foreach ($tables AS $table) {
+		foreach ($tables as $table) {
 			$table = current($table);
 
 			logger(sprintf('updating structure for table %s ...', $table), LOGGER_DEBUG);
@@ -237,7 +238,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 	}
 
 	// Compare it
-	foreach ($definition AS $name => $structure) {
+	foreach ($definition as $name => $structure) {
 		$is_new_table = False;
 		$group_by = "";
 		$sql3 = "";
@@ -251,7 +252,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 			$is_unique = false;
 			$temp_name = $name;
 
-			foreach ($structure["indexes"] AS $indexname => $fieldnames) {
+			foreach ($structure["indexes"] as $indexname => $fieldnames) {
 				if (isset($database[$name]["indexes"][$indexname])) {
 					$current_index_definition = implode(",",$database[$name]["indexes"][$indexname]);
 				} else {
@@ -290,7 +291,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 				}
 			}
 			// Compare the field structure field by field
-			foreach ($structure["fields"] AS $fieldname => $parameters) {
+			foreach ($structure["fields"] as $fieldname => $parameters) {
 				if (!isset($database[$name]["fields"][$fieldname])) {
 					$sql2=db_add_table_field($fieldname, $parameters);
 					if ($sql3 == "") {
@@ -331,7 +332,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		 * Don't create keys if table is new
 		 */
 		if (!$is_new_table) {
-			foreach ($structure["indexes"] AS $indexname => $fieldnames) {
+			foreach ($structure["indexes"] as $indexname => $fieldnames) {
 				if (isset($database[$name]["indexes"][$indexname])) {
 					$current_index_definition = implode(",",$database[$name]["indexes"][$indexname]);
 				} else {
@@ -373,7 +374,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 
 			// Now have a look at the field collations
 			// Compare the field structure field by field
-			foreach ($structure["fields"] AS $fieldname => $parameters) {
+			foreach ($structure["fields"] as $fieldname => $parameters) {
 				// Compare the field definition
 				$field_definition = $database[$name]["fields"][$fieldname];
 
@@ -402,7 +403,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 
 			$field_list = '';
 			if ($is_unique && $ignore == '') {
-				foreach ($structure['fields'] AS $fieldname => $parameters) {
+				foreach ($structure['fields'] as $fieldname => $parameters) {
 					$field_list .= 'ANY_VALUE(`' . $fieldname . '`),';
 				}
 				$field_list = rtrim($field_list, ',');
@@ -447,7 +448,7 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 					}
 				}
 
-				$r = @$db->q($sql3);
+				$r = $db->q($sql3);
 				if (!dbm::is_result($r)) {
 					$errors .= print_update_error($db, $sql3);
 				}
@@ -481,6 +482,12 @@ function update_structure($verbose, $action, $tables=null, $definition=null) {
 		Config::set('system', 'maintenance_reason', '');
 	}
 
+	if ($errors) {
+		Config::set('system', 'dbupdate', DB_UPDATE_FAILED);
+	} else {
+		Config::set('system', 'dbupdate', DB_UPDATE_SUCCESSFUL);
+	}
+
 	return $errors;
 }
 
@@ -491,8 +498,9 @@ function db_field_command($parameters, $create = true) {
 		$fieldstruct .= " COLLATE ".$parameters["Collation"];
 	}
 
-	if ($parameters["not null"])
+	if ($parameters["not null"]) {
 		$fieldstruct .= " NOT NULL";
+	}
 
 	if (isset($parameters["default"])) {
 		if (strpos(strtolower($parameters["type"]),"int")!==false) {
@@ -501,11 +509,15 @@ function db_field_command($parameters, $create = true) {
 			$fieldstruct .= " DEFAULT '".$parameters["default"]."'";
 		}
 	}
-	if ($parameters["extra"] != "")
+	if ($parameters["extra"] != "") {
 		$fieldstruct .= " ".$parameters["extra"];
+	}
 
-	/*if (($parameters["primary"] != "") AND $create)
-		$fieldstruct .= " PRIMARY KEY";*/
+	/*
+	if (($parameters["primary"] != "") AND $create) {
+		$fieldstruct .= " PRIMARY KEY";
+	}
+	*/
 
 	return($fieldstruct);
 }
@@ -519,7 +531,7 @@ function db_create_table($name, $fields, $verbose, $action, $indexes=null) {
 
 	$sql_rows = array();
 	$primary_keys = array();
-	foreach ($fields AS $fieldname => $field) {
+	foreach ($fields as $fieldname => $field) {
 		$sql_rows[] = "`".dbesc($fieldname)."` ".db_field_command($field);
 		if (x($field,'primary') and $field['primary']!='') {
 			$primary_keys[] = $fieldname;
@@ -527,7 +539,7 @@ function db_create_table($name, $fields, $verbose, $action, $indexes=null) {
 	}
 
 	if (!is_null($indexes)) {
-		foreach ($indexes AS $indexname => $fieldnames) {
+		foreach ($indexes as $indexname => $fieldnames) {
 			$sql_index = db_create_index($indexname, $fieldnames, "");
 			if (!is_null($sql_index)) $sql_rows[] = $sql_index;
 		}
@@ -536,11 +548,14 @@ function db_create_table($name, $fields, $verbose, $action, $indexes=null) {
 	$sql = implode(",\n\t", $sql_rows);
 
 	$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", dbesc($name)).$sql."\n) DEFAULT COLLATE utf8mb4_general_ci";
-	if ($verbose)
-		echo $sql.";\n";
 
-	if ($action)
-		$r = @$db->q($sql);
+	if ($verbose) {
+		echo $sql.";\n";
+	}
+
+	if ($action) {
+		$r = $db->q($sql);
+	}
 
 	return $r;
 }
@@ -574,7 +589,7 @@ function db_create_index($indexname, $fieldnames, $method="ADD") {
 	}
 
 	$names = "";
-	foreach ($fieldnames AS $fieldname) {
+	foreach ($fieldnames as $fieldname) {
 		if ($names != "")
 			$names .= ",";
 
@@ -603,9 +618,10 @@ function db_group_by($indexname, $fieldnames) {
 	array_shift($fieldnames);
 
 	$names = "";
-	foreach ($fieldnames AS $fieldname) {
-		if ($names != "")
+	foreach ($fieldnames as $fieldname) {
+		if ($names != "") {
 			$names .= ",";
+		}
 
 		if (preg_match('|(.+)\((\d+)\)|', $fieldname, $matches)) {
 			$names .= "`".dbesc($matches[1])."`";
