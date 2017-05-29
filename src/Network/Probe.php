@@ -59,6 +59,28 @@ class Probe {
 	}
 
 	/**
+	 * @brief Check if the hostname belongs to the own server
+	 *
+	 * @param string $host The hostname that is to be checked
+	 *
+	 * @return bool Does the testes hostname belongs to the own server?
+	 */
+	private function ownHost($host) {
+		$own_host = get_app()->get_hostname();
+
+		$parts = parse_url($host);
+
+		if (!isset($parts['scheme'])) {
+			$parts = parse_url('http://'.$host);
+		}
+
+		if (!isset($parts['host'])) {
+			return false;
+		}
+		return $parts['host'] == $own_host;
+	}
+
+	/**
 	 * @brief Probes for XRD data
 	 *
 	 * @param string $host The host part of an url
@@ -82,7 +104,7 @@ class Probe {
 		logger("Probing for ".$host, LOGGER_DEBUG);
 
 		$ret = z_fetch_url($ssl_url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (($ret['errno'] == CURLE_OPERATION_TIMEDOUT) AND !self::ownHost($ssl_url)) {
 			logger("Probing timeout for ".$ssl_url, LOGGER_DEBUG);
 			return false;
 		}

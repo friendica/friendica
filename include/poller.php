@@ -419,8 +419,6 @@ function poller_too_much_workers() {
 
 	$maxqueues = $queues;
 
-	$active = poller_active_workers();
-
 	// Decrease the number of workers at higher load
 	$load = current_load();
 	if ($load) {
@@ -432,6 +430,33 @@ function poller_too_much_workers() {
 		$exponent = 3;
 		$slope = $maxworkers / pow($maxsysload, $exponent);
 		$queues = ceil($slope * pow(max(0, $maxsysload - $load), $exponent));
+
+		$active = 0;
+
+		// Create a list of queue entries grouped by their priority
+		$listitem = array();
+
+		// Adding all processes with no workerqueue entry
+		$processes = dba::p("SELECT COUNT(*) AS `running` FROM `process` WHERE NOT EXISTS (SELECT id FROM `workerqueue` WHERE `workerqueue`.`pid` = `process`.`pid`)");
+		if ($process = dba::fetch($processes)) {
+			$listitem[0] = "0:".$process["running"];
+			$active += $process["running"];
+		}
+		dba::close($processes);
+
+		// Now adding all processes with workerqueue entries
+		$entries = dba::p("SELECT COUNT(*) AS `entries`, `priority` FROM `workerqueue` GROUP BY `priority`");
+		while ($entry = dba::fetch($entries)) {
+			$processes = dba::p("SELECT COUNT(*) AS `running` FROM `process` LEFT JOIN `workerqueue` ON `workerqueue`.`pid` = `process`.`pid` WHERE `priority` = ?", $entry["priority"]);
+			if ($process = dba::fetch($processes)) {
+				$listitem[$entry["priority"]] = $entry["priority"].":".$process["running"]."/".$entry["entries"];
+				$active += $process["running"];
+			}
+			dba::close($processes);
+		}
+		dba::close($entries);
+
+		$processlist = implode(', ', $listitem);
 
 		$s = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `executed` <= '%s'", dbesc(NULL_DATE));
 		$entries = $s[0]["total"];
@@ -450,27 +475,6 @@ function poller_too_much_workers() {
 			}
 		}
 
-		// Create a list of queue entries grouped by their priority
-		$running = array(PRIORITY_CRITICAL => 0,
-				PRIORITY_HIGH => 0,
-				PRIORITY_MEDIUM => 0,
-				PRIORITY_LOW => 0,
-				PRIORITY_NEGLIGIBLE => 0);
-
-		$r = q("SELECT COUNT(*) AS `running`, `priority` FROM `process` INNER JOIN `workerqueue` ON `workerqueue`.`pid` = `process`.`pid` GROUP BY `priority`");
-		if (dbm::is_result($r))
-			foreach ($r AS $process)
-				$running[$process["priority"]] = $process["running"];
-
-		$processlist = "";
-		$r = q("SELECT COUNT(*) AS `entries`, `priority` FROM `workerqueue` GROUP BY `priority`");
-		if (dbm::is_result($r))
-			foreach ($r as $entry) {
-				if ($processlist != "")
-					$processlist .= ", ";
-				$processlist .= $entry["priority"].":".$running[$entry["priority"]]."/".$entry["entries"];
-			}
-
 		logger("Load: ".$load."/".$maxsysload." - processes: ".$active."/".$entries." (".$processlist.") - maximum: ".$queues."/".$maxqueues, LOGGER_DEBUG);
 
 		// Are there fewer workers running as possible? Then fork a new one.
@@ -480,6 +484,8 @@ function poller_too_much_workers() {
 			$a = get_app();
 			$a->proc_run($args);
 		}
+	} else {
+		$active = poller_active_workers();
 	}
 
 	return($active >= $queues);
