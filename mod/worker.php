@@ -41,10 +41,14 @@ function worker_init($a){
 		// But since it doesn't destroy anything, we just try to get more execution time in any way.
 		set_time_limit(0);
 
-		poller_execute($r[0]);
+		if (poller_claim_process($r[0])) {
+			poller_execute($r[0]);
+		}
 	}
 
 	call_worker();
+
+	poller_unclaim_process();
 
 	$a->end_process();
 
