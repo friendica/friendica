@@ -720,10 +720,12 @@ class NotificationsManager {
 			$sql_extra = " AND `ignore` = 0 ";
 
 		/// @todo Fetch contact details by "get_contact_details_by_url" instead of queries to contact, fcontact and gcontact
-		$r = q("SELECT `intro`.`id` AS `intro_id`, `intro`.*, `contact`.*, `fcontact`.`name` AS `fname`,`fcontact`.`url` AS `furl`,`fcontact`.`photo` AS `fphoto`,`fcontact`.`request` AS `frequest`,
+		$r = q("SELECT `intro`.`id` AS `intro_id`, `intro`.*, `contact`.*,
+				`fcontact`.`name` AS `fname`, `fcontact`.`url` AS `furl`,
+				`fcontact`.`photo` AS `fphoto`, `fcontact`.`request` AS `frequest`,
 				`gcontact`.`location` AS `glocation`, `gcontact`.`about` AS `gabout`,
 				`gcontact`.`keywords` AS `gkeywords`, `gcontact`.`gender` AS `ggender`,
-				`gcontact`.`network` AS `gnetwork`
+				`gcontact`.`network` AS `gnetwork`, `gcontact`.`addr` AS `gaddr`
 			FROM `intro`
 				LEFT JOIN `contact` ON `contact`.`id` = `intro`.`contact-id`
 				LEFT JOIN `gcontact` ON `gcontact`.`nurl` = `contact`.`nurl`
@@ -786,11 +788,7 @@ class NotificationsManager {
 			// Normal connection requests
 			} else {
 
-				// Probe the contact url to get missing data
-				$ret = probe_url($it["url"]);
-
-				if ($it['gnetwork'] == "")
-					$it['gnetwork'] = $ret["network"];
+				$it = $this->getMissingIntroData($it);
 
 				// Don't show these data until you are connected. Diaspora is doing the same.
 				if ($it['gnetwork'] === NETWORK_DIASPORA) {
@@ -815,7 +813,7 @@ class NotificationsManager {
 					'post_newfriend' => (intval(get_pconfig(local_user(),'system','post_newfriend')) ? '1' : 0),
 					'url' => $it['url'],
 					'zrl' => zrl($it['url']),
-					'addr' => $ret['addr'],
+					'addr' => $it['gaddr'],
 					'network' => $it['gnetwork'],
 					'knowyou' => $it['knowyou'],
 					'note' => $it['note'],
@@ -823,6 +821,40 @@ class NotificationsManager {
 			}
 
 			$arr[] = $intro;
+		}
+
+		return $arr;
+	}
+
+	/**
+	 * @brief Check for missing contact data and try to fetch the data from 
+	 *     from other sources
+	 * 
+	 * @param array $arr The input array with the intro data
+	 * 
+	 * @return array The array with the intro data
+	 */
+	private function getMissingIntroData($arr) {
+		// If the network and the addr isn't available from the gcontact
+		// table entry, take the one of the contact table entry
+		if ($arr['gnetwork'] == "") {
+			$arr['gnetwork'] = $arr['network'];
+		}
+		if ($arr['gaddr'] == "") {
+			$arr['gaddr'] = $arr['addr'];
+		}
+
+		// If the network and addr is still not available try to probe
+		// the contact url to fetch the missing data
+		if ($arr['gnetwork'] == "" || $arr['gaddr'] == "") {
+			$ret = probe_url($arr["url"]);
+		}
+
+		if ($arr['gnetwork'] == "") {
+			$arr['gnetwork'] = $ret['network'];
+		}
+		if ($arr['gaddr'] == "") {
+			$arr['gaddr'] = $ret['addr'];
 		}
 
 		return $arr;
