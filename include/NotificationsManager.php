@@ -4,6 +4,9 @@
  * @brief Methods for read and write notifications from/to database
  *  or for formatting notifications
  */
+
+use Friendica\Network\Probe;
+
 require_once 'include/html2plain.php';
 require_once 'include/probe.php';
 require_once 'include/datetime.php';
@@ -847,7 +850,7 @@ class NotificationsManager {
 		// If the network and addr is still not available try to probe
 		// the contact url to fetch the missing data
 		if ($arr['gnetwork'] == "" || $arr['gaddr'] == "") {
-			$ret = probe_url($arr["url"]);
+			$ret = Probe::uri($arr["url"]);
 		}
 
 		if ($arr['gnetwork'] == "") {
