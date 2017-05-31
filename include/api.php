@@ -2290,9 +2290,9 @@ $called_api = null;
 		}
 
 		// feeds without body should contain the link 
-+		if (($item['network'] == NETWORK_FEED) && (strlen($item['body']) == 0)) { 
-+			$statushtml .= bbcode($item['plink']); 
-+		} 
+		if (($item['network'] == NETWORK_FEED) && (strlen($item['body']) == 0)) { 
+			$statushtml .= bbcode($item['plink']); 
+		} 
 		
 		$entities = api_get_entitities($statustext, $body);
 
