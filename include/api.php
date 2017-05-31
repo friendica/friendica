@@ -2289,6 +2289,11 @@ $called_api = null;
 			$statushtml = "<h4>" . bbcode($item['title']) . "</h4>\n" . $statushtml;
 		}
 
+		// feeds without body should contain the link 
++		if (($item['network'] == NETWORK_FEED) && (strlen($item['body']) == 0)) { 
++			$statushtml .= bbcode($item['plink']); 
++		} 
+		
 		$entities = api_get_entitities($statustext, $body);
 
 		return array(
