@@ -123,13 +123,13 @@ class Probe {
 		}
 		if (!is_object($xrd)) {
 			logger("No xrd object found for ".$host, LOGGER_DEBUG);
-			return false;
+			return array();
 		}
 
 		$links = xml::element_to_array($xrd);
 		if (!isset($links["xrd"]["link"])) {
 			logger("No xrd data found for ".$host, LOGGER_DEBUG);
-			return false;
+			return array();
 		}
 
 		$xrd_data = array();
@@ -221,6 +221,10 @@ class Probe {
 
 		$lrdd = self::xrd($uri);
 		$webfinger = null;
+
+		if (is_bool($lrdd)) {
+			return array();
+		}
 
 		if (!$lrdd) {
 			$parts = @parse_url($uri);
@@ -424,6 +428,10 @@ class Probe {
 			}
 			$lrdd = self::xrd($host);
 
+			if (is_bool($lrdd)) {
+				return array();
+			}
+
 			$path_parts = explode("/", trim($parts["path"], "/"));
 
 			while (!$lrdd AND (sizeof($path_parts) > 1)) {
@@ -461,6 +469,10 @@ class Probe {
 				return array("network" => NETWORK_TWITTER);
 			}
 			$lrdd = self::xrd($host);
+
+			if (is_bool($lrdd)) {
+				return array();
+			}
 
 			if (!$lrdd) {
 				logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
