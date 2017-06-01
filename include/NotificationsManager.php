@@ -850,13 +850,13 @@ class NotificationsManager {
 		// get the missing data data from other sources
 		if ($arr['gnetwork'] == "" || $arr['gaddr'] == "") {
 			$ret = get_contact_details_by_url($arr['url']);
-		}
 
-		if ($arr['gnetwork'] == "") {
-			$arr['gnetwork'] = $ret['network'];
-		}
-		if ($arr['gaddr'] == "") {
-			$arr['gaddr'] = $ret['addr'];
+			if ($arr['gnetwork'] == "" && $ret['network'] != "") {
+				$arr['gnetwork'] = $ret['network'];
+			}
+			if ($arr['gaddr'] == "" && $ret['addr'] != "") {
+				$arr['gaddr'] = $ret['addr'];
+			}
 		}
 
 		return $arr;
