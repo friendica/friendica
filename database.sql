@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 3.5.2-dev (Asparagus)
--- DB_UPDATE_VERSION 1221
+-- Friendica 3.5.2-rc (Asparagus)
+-- DB_UPDATE_VERSION 1226
 -- ------------------------------------------
 
 
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 --
 CREATE TABLE IF NOT EXISTS `conv` (
 	`id` int(10) unsigned NOT NULL auto_increment,
-	`guid` varchar(64) NOT NULL DEFAULT '',
+	`guid` varchar(255) NOT NULL DEFAULT '',
 	`recips` text,
 	`uid` int(11) NOT NULL DEFAULT 0,
 	`creator` varchar(255) NOT NULL DEFAULT '',
@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS `fcontact` (
 	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `addr` (`addr`(32)),
-	 INDEX `url` (`url`)
+	 UNIQUE INDEX `url` (`url`(190))
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
@@ -355,7 +355,7 @@ CREATE TABLE IF NOT EXISTS `gcontact` (
 	`generation` tinyint(3) NOT NULL DEFAULT 0,
 	`server_url` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
-	 INDEX `nurl` (`nurl`(64)),
+	 UNIQUE INDEX `nurl` (`nurl`(190)),
 	 INDEX `name` (`name`(64)),
 	 INDEX `nick` (`nick`(32)),
 	 INDEX `addr` (`addr`(64)),
@@ -425,7 +425,7 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`last_contact` datetime DEFAULT '0001-01-01 00:00:00',
 	`last_failure` datetime DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
-	 INDEX `nurl` (`nurl`(32))
+	 UNIQUE INDEX `nurl` (`nurl`(190))
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
@@ -544,6 +544,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `uid_parenturi` (`uid`,`parent-uri`(190)),
 	 INDEX `uid_contactid_created` (`uid`,`contact-id`,`created`),
 	 INDEX `authorid_created` (`author-id`,`created`),
+	 INDEX `ownerid` (`owner-id`),
 	 INDEX `uid_uri` (`uid`,`uri`(190)),
 	 INDEX `resource-id` (`resource-id`),
 	 INDEX `contactid_allowcid_allowpid_denycid_denygid` (`contact-id`,`allow_cid`(10),`allow_gid`(10),`deny_cid`(10),`deny_gid`(10)),
@@ -589,7 +590,7 @@ CREATE TABLE IF NOT EXISTS `locks` (
 CREATE TABLE IF NOT EXISTS `mail` (
 	`id` int(10) unsigned NOT NULL auto_increment,
 	`uid` int(10) unsigned NOT NULL DEFAULT 0,
-	`guid` varchar(64) NOT NULL DEFAULT '',
+	`guid` varchar(255) NOT NULL DEFAULT '',
 	`from-name` varchar(255) NOT NULL DEFAULT '',
 	`from-photo` varchar(255) NOT NULL DEFAULT '',
 	`from-url` varchar(255) NOT NULL DEFAULT '',
@@ -608,7 +609,8 @@ CREATE TABLE IF NOT EXISTS `mail` (
 	 INDEX `uid_seen` (`uid`,`seen`),
 	 INDEX `convid` (`convid`),
 	 INDEX `uri` (`uri`(64)),
-	 INDEX `parent-uri` (`parent-uri`(64))
+	 INDEX `parent-uri` (`parent-uri`(64)),
+	 INDEX `contactid` (`contact-id`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
@@ -746,6 +748,7 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	`deny_cid` mediumtext,
 	`deny_gid` mediumtext,
 	 PRIMARY KEY(`id`),
+	 INDEX `contactid` (`contact-id`),
 	 INDEX `uid_contactid` (`uid`,`contact-id`),
 	 INDEX `uid_profile` (`uid`,`profile`),
 	 INDEX `uid_album_scale_created` (`uid`,`album`(32),`scale`,`created`),
@@ -1019,6 +1022,9 @@ CREATE TABLE IF NOT EXISTS `thread` (
 	 INDEX `uid_network_created` (`uid`,`network`,`created`),
 	 INDEX `uid_contactid_commented` (`uid`,`contact-id`,`commented`),
 	 INDEX `uid_contactid_created` (`uid`,`contact-id`,`created`),
+	 INDEX `contactid` (`contact-id`),
+	 INDEX `ownerid` (`owner-id`),
+	 INDEX `authorid` (`author-id`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_commented` (`uid`,`commented`),
 	 INDEX `uid_wall_created` (`uid`,`wall`,`created`)
@@ -1108,6 +1114,7 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`pid` int(11) NOT NULL DEFAULT 0,
 	`executed` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
-	 PRIMARY KEY(`id`)
+	 PRIMARY KEY(`id`),
+	 INDEX `priority_created` (`priority`,`created`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 

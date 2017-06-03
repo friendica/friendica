@@ -900,12 +900,12 @@ class App {
 			return;
 		}
 
-		// If the last worker fork was less than 10 seconds before then don't fork another one.
+		// If the last worker fork was less than 2 seconds before then don't fork another one.
 		// This should prevent the forking of masses of workers.
 		$cachekey = 'app:proc_run:started';
 		$result = Cache::get($cachekey);
 
-		if (!is_null($result) AND ( time() - $result) < 10) {
+		if (!is_null($result) AND ( time() - $result) < 2) {
 			return;
 		}
 

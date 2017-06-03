@@ -9,6 +9,7 @@ require_once('include/group.php');
 require_once('mod/proxy.php');
 require_once('include/xml.php');
 require_once('include/cache.php');
+require_once('include/enotify.php');
 
 /**
  * @brief Outputs the counts and the lists of various notifications
