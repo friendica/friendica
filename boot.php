@@ -1375,7 +1375,7 @@ function get_server() {
 	$server = get_config("system", "directory");
 
 	if ($server == "") {
-		$server = "http://dir.friendi.ca";
+		$server = "http://dir.friendica.social";
 	}
 
 	return($server);

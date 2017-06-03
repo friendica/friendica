@@ -14,7 +14,7 @@ Especially don't do that with undocumented values.
 The header of the section describes the category, the value is the parameter.
 Example: To set the directory value please add this line to your .htconfig.php:
 
-    $a->config['system']['directory'] = 'http://dir.friendi.ca';
+    $a->config['system']['directory'] = 'http://dir.friendica.social';
 
 ## jabber ##
 * **debug** (Boolean) - Enable debug level for the jabber account synchronisation.
@@ -39,7 +39,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **default_service_class** -
 * **delivery_batch_count** - Number of deliveries per process. Default value is 1. (Disabled when using the worker)
 * **diaspora_test** (Boolean) - For development only. Disables the message transfer.
-* **directory** - The path to global directory. If not set then "http://dir.friendi.ca" is used.
+* **directory** - The path to global directory. If not set then "http://dir.friendica.social" is used.
 * **disable_email_validation** (Boolean) - Disables the check if a mail address is in a valid format and can be resolved via DNS.
 * **disable_url_validation** (Boolean) - Disables the DNS lookup of an URL.
 * **dlogfile - location of the developer log file
