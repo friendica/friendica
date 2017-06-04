@@ -110,7 +110,7 @@ function poller_run($argv, $argc){
 		}
 
 		// Quit the poller once every hour
-		if (time() > ($starttime + 360)) {
+		if (time() > ($starttime + 3600)) {
 			logger('Process lifetime reachted, quitting.', LOGGER_DEBUG);
 			return;
 		}
