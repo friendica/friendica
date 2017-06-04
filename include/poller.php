@@ -2,6 +2,7 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Util\Lock;
 
 if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
@@ -20,16 +21,12 @@ require_once "boot.php";
 function poller_run($argv, $argc){
 	global $a, $db;
 
-	if (is_null($a)) {
-		$a = new App(dirname(__DIR__));
-	}
+	$a = new App(dirname(__DIR__));
 
-	if (is_null($db)) {
-		@include ".htconfig.php";
-		require_once "include/dba.php";
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-	};
+	@include ".htconfig.php";
+	require_once "include/dba.php";
+	$db = new dba($db_host, $db_user, $db_pass, $db_data);
+	unset($db_host, $db_user, $db_pass, $db_data);
 
 	Config::load();
 
@@ -41,6 +38,10 @@ function poller_run($argv, $argc){
 	$a->set_baseurl(Config::get('system', 'url'));
 
 	load_hooks();
+
+	if (($argc <= 1) || ($argv[1] != "no_cron")) {
+		poller_run_cron();
+	}
 
 	$a->start_process();
 
@@ -56,11 +57,16 @@ function poller_run($argv, $argc){
 		return;
 	}
 
+<<<<<<< HEAD
 	if (($argc <= 1) OR ($argv[1] != "no_cron")) {
 		poller_run_cron();
+=======
+	if ($a->max_processes_reached()) {
+		return;
+>>>>>>> Lock now can use the memcache as well
 	}
 
-	if ($a->max_processes_reached()) {
+	if (!Lock::set('poller_worker')) {
 		return;
 	}
 
@@ -69,6 +75,8 @@ function poller_run($argv, $argc){
 		poller_kill_stale_workers();
 		return;
 	}
+
+	Lock::remove('poller_worker');
 
 	$starttime = time();
 
@@ -84,11 +92,17 @@ function poller_run($argv, $argc){
 			return;
 		}
 
+		if (!Lock::set('poller_worker')) {
+			return;
+		}
+
 		// Count active workers and compare them with a maximum value that depends on the load
 		if (poller_too_much_workers()) {
 			logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
 			return;
 		}
+
+		Lock::remove('poller_worker');
 
 		if (!poller_execute($r[0])) {
 			logger('Process execution failed, quitting.', LOGGER_DEBUG);
@@ -725,6 +739,8 @@ function poller_run_cron() {
 
 if (array_search(__file__,get_included_files())===0){
 	poller_run($_SERVER["argv"],$_SERVER["argc"]);
+
+	Lock::removeAll();
 
 	poller_unclaim_process();
 
