@@ -16,11 +16,16 @@ use dbm;
  */
 class Lock {
 
-
-// Provide some ability to lock a PHP function so that multiple processes
-// can't run the function concurrently
-
-	public static function set($fn_name, $wait_sec = 2, $timeout = 30) {
+	/**
+	 * @brief Sets a lock for a given name
+	 *
+	 * @param string $fn_name Name of the lock
+	 * @param integer $timeout Seconds until we give up
+	 * @param integer $wait_sec Time between to lock attempts
+	 *
+	 * @return boolean Was the lock successful?
+	 */
+	public static function set($fn_name, $timeout = 30, $wait_sec = 2) {
 		if ($wait_sec == 0) {
 			$wait_sec = 2;
 		}
@@ -29,34 +34,46 @@ class Lock {
 		$start = time();
 
 		do {
-			dba:p("LOCK TABLE `locks` WRITE");
-			$lock = dba::select('locks', array('locked'), array('name' => $fn_name), array('limit' => 1));
+			dba::p("LOCK TABLE `locks` WRITE");
+			$lock = dba::select('locks', array('locked', 'pid'), array('name' => $fn_name), array('limit' => 1));
 
-			if ((dbm::is_result($lock)) AND !$lock['locked']) {
-				dba::update('locks', array('locked' => true), array('name' => $fn_name));
-				$got_lock = true;
+			if (dbm::is_result($lock)) {
+				if ($lock['locked']) {
+					// When the process id isn't used anymore, we can safely claim the lock for us.
+					if (!posix_kill($lock['pid'], 0)) {
+						$lock['locked'] = false;
+					}
+					// We want to lock something that was already locked by us? So we got the lock.
+					if ($lock['pid'] == getmypid()) {
+						$got_lock = true;
+					}
+				}
+				if (!$lock['locked']) {
+					dba::update('locks', array('locked' => true, 'pid' => getmypid()), array('name' => $fn_name));
+					$got_lock = true;
+				}
 			} elseif (!dbm::is_result($lock)) {
-				dbm::insert('locks', array('name' => $fn_name, 'locked' => true));
+				dba::insert('locks', array('name' => $fn_name, 'locked' => true, 'pid' => getmypid()));
 				$got_lock = true;
 			}
 
-			dbm::p("UNLOCK TABLES");
+			dba::p("UNLOCK TABLES");
 
 			if (!$got_lock) {
 				sleep($wait_sec);
 			}
 		} while (!$got_lock AND ((time() - $start) < $timeout));
 
-		logger('lock_function: function ' . $fn_name . ' with blocking = ' . $block . ' got_lock = ' . $got_lock . ' time = ' . (time() - $start), LOGGER_DEBUG);
-
 		return $got_lock;
 	}
 
+	/**
+	 * @brief Removes a lock if it was set by us
+	 *
+	 * @param string $fn_name Name of the lock
+	 */
 	public static function remove($fn_name) {
-		dba::update('locks', array('locked' => false), array('name' => $fn_name));
-
-		logger('unlock_function: released lock for function ' . $fn_name, LOGGER_DEBUG);
-
+		dba::update('locks', array('locked' => false, 'pid' => 0), array('name' => $fn_name, 'pid' => getmypid()));
 		return;
 	}
 }
