@@ -48,20 +48,16 @@ class Lock {
 	 *
 	 * @param string $fn_name Name of the lock
 	 * @param integer $timeout Seconds until we give up
-	 * @param integer $wait_sec Time between to lock attempts
 	 *
 	 * @return boolean Was the lock successful?
 	 */
-	public static function set($fn_name, $timeout = 30, $wait_sec = 2) {
-		if ($wait_sec == 0) {
-			$wait_sec = 2;
-		}
-
+	public static function set($fn_name, $timeout = 120) {
 		$got_lock = false;
 		$start = time();
 
 		$memcache = self::memcache();
 		if (is_object($memcache)) {
+			$wait_sec = 1;
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
 
 			do {
@@ -87,6 +83,9 @@ class Lock {
 
 			return $got_lock;
 		}
+
+		$wait_sec = 2;
+
 		do {
 			dba::lock('locks');
 			$lock = dba::select('locks', array('locked', 'pid'), array('name' => $fn_name), array('limit' => 1));

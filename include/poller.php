@@ -46,37 +46,35 @@ function poller_run($argv, $argc){
 	$a->start_process();
 
 	if ($a->min_memory_reached()) {
+		logger('Pre check: Memory limit reached, quitting.', LOGGER_DEBUG);
 		return;
 	}
 
 	if (poller_max_connections_reached()) {
+		logger('Pre check: maximum connections reached, quitting.', LOGGER_DEBUG);
 		return;
 	}
 
 	if ($a->maxload_reached()) {
+		logger('Pre check: maximum load reached, quitting.', LOGGER_DEBUG);
 		return;
 	}
 
-<<<<<<< HEAD
-	if (($argc <= 1) OR ($argv[1] != "no_cron")) {
-		poller_run_cron();
-=======
 	if ($a->max_processes_reached()) {
 		return;
->>>>>>> Lock now can use the memcache as well
 	}
 
 	if (!Lock::set('poller_worker')) {
+		logger('Pre check: maximum processes reached, quitting.', LOGGER_DEBUG);
 		return;
 	}
 
 	// Checking the number of workers
 	if (poller_too_much_workers()) {
 		poller_kill_stale_workers();
+		logger('Pre check: Active worker limit reached, quitting.', LOGGER_DEBUG);
 		return;
 	}
-
-	Lock::remove('poller_worker');
 
 	$starttime = time();
 
@@ -93,7 +91,9 @@ function poller_run($argv, $argc){
 		}
 
 		if (!Lock::set('poller_worker')) {
-			return;
+			logger('Cannot get a lock, retrying.', LOGGER_DEBUG);
+			poller_unclaim_process();
+			continue;
 		}
 
 		// Count active workers and compare them with a maximum value that depends on the load
@@ -110,7 +110,7 @@ function poller_run($argv, $argc){
 		}
 
 		// Quit the poller once every hour
-		if (time() > ($starttime + 3600)) {
+		if (time() > ($starttime + 360)) {
 			logger('Process lifetime reachted, quitting.', LOGGER_DEBUG);
 			return;
 		}
@@ -740,7 +740,7 @@ function poller_run_cron() {
 if (array_search(__file__,get_included_files())===0){
 	poller_run($_SERVER["argv"],$_SERVER["argc"]);
 
-	Lock::removeAll();
+	Lock::remove('poller_worker');
 
 	poller_unclaim_process();
 
