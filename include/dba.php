@@ -807,6 +807,28 @@ class dba {
 	}
 
 	/**
+	 * @brief Locks a table for exclusive write access
+	 *
+	 * This function can be extended in the future to accept a table array as well.
+	 *
+	 * @param string $table Table name
+	 *
+	 * @return boolean was the lock successful?
+	 */
+	static public function lock($table) {
+		return self::e("LOCK TABLES `".self::$dbo->escape($table)."` WRITE");
+	}
+
+	/**
+	 * @brief Unlocks all locked tables
+	 *
+	 * @return boolean was the unlock successful?
+	 */
+	static public function unlock() {
+		return self::e("UNLOCK TABLES");
+	}
+
+	/**
 	 * @brief Starts a transaction
 	 *
 	 * @return boolean Was the command executed successfully?

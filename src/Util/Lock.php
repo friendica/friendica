@@ -34,7 +34,7 @@ class Lock {
 		$start = time();
 
 		do {
-			dba::p("LOCK TABLE `locks` WRITE");
+			dba::lock('locks');
 			$lock = dba::select('locks', array('locked', 'pid'), array('name' => $fn_name), array('limit' => 1));
 
 			if (dbm::is_result($lock)) {
@@ -57,7 +57,7 @@ class Lock {
 				$got_lock = true;
 			}
 
-			dba::p("UNLOCK TABLES");
+			dba::unlock();
 
 			if (!$got_lock) {
 				sleep($wait_sec);
