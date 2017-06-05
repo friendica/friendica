@@ -94,20 +94,15 @@ function poller_run($argv, $argc){
 			continue;
 		}
 
-		// To avoid the quitting of multiple pollers we serialize the next check
-		if (!Lock::set('poller_worker')) {
-			logger('Cannot get a lock, retrying.', LOGGER_DEBUG);
-			poller_unclaim_process();
-			continue;
+		// To avoid the quitting of multiple pollers only one poller at a time will execute the check
+		if (Lock::set('poller_worker', 0)) {
+			// Count active workers and compare them with a maximum value that depends on the load
+			if (poller_too_much_workers()) {
+				logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
+				return;
+			}
+			Lock::remove('poller_worker');
 		}
-
-		// Count active workers and compare them with a maximum value that depends on the load
-		if (poller_too_much_workers()) {
-			logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
-			return;
-		}
-
-		Lock::remove('poller_worker');
 
 		// Check free memory
 		if ($a->min_memory_reached()) {

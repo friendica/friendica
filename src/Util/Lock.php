@@ -79,7 +79,7 @@ class Lock {
 				if (!$got_lock) {
 					usleep($wait_sec * 1000000);
 				}
-			} while (!$got_lock AND ((time(true) - $start) < $timeout));
+			} while (!$got_lock AND ((time() - $start) < $timeout));
 
 			return $got_lock;
 		}
