@@ -816,7 +816,15 @@ class dba {
 	 * @return boolean was the lock successful?
 	 */
 	static public function lock($table) {
-		return self::e("LOCK TABLES `".self::$dbo->escape($table)."` WRITE");
+		// See here: https://dev.mysql.com/doc/refman/5.7/en/lock-tables-and-transactions.html
+		self::e("SET autocommit=0");
+		$success = self::e("LOCK TABLES `".self::$dbo->escape($table)."` WRITE");
+		if (!$success) {
+			self::e("SET autocommit=1");
+		} else {
+			self::$in_transaction = true;
+		}
+		return $success;
 	}
 
 	/**
@@ -825,7 +833,12 @@ class dba {
 	 * @return boolean was the unlock successful?
 	 */
 	static public function unlock() {
-		return self::e("UNLOCK TABLES");
+		// See here: https://dev.mysql.com/doc/refman/5.7/en/lock-tables-and-transactions.html
+		self::e("COMMIT");
+		$success = self::e("UNLOCK TABLES");
+		self::e("SET autocommit=1");
+		self::$in_transaction = false;
+		return $success;
 	}
 
 	/**

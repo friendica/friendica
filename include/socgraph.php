@@ -2023,7 +2023,8 @@ function get_gcontact_id($contact) {
 		$contact["url"] = clean_contact_url($contact["url"]);
 	}
 
-	$r = q("SELECT `id`, `last_contact`, `last_failure`, `network` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 2",
+	dba::lock('gcontact');
+	$r = q("SELECT `id`, `last_contact`, `last_failure`, `network` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
 		dbesc(normalise_link($contact["url"])));
 
 	if (dbm::is_result($r)) {
@@ -2064,16 +2065,11 @@ function get_gcontact_id($contact) {
 			$doprobing = in_array($r[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""));
 		}
 	}
+	dba::unlock();
 
 	if ($doprobing) {
 		logger("Last Contact: ". $last_contact_str." - Last Failure: ".$last_failure_str." - Checking: ".$contact["url"], LOGGER_DEBUG);
 		proc_run(PRIORITY_LOW, 'include/gprobe.php', bin2hex($contact["url"]));
-	}
-
-	if ((dbm::is_result($r)) AND (count($r) > 1) AND ($gcontact_id > 0) AND ($contact["url"] != "")) {
-		q("DELETE FROM `gcontact` WHERE `nurl` = '%s' AND `id` != %d",
-			dbesc(normalise_link($contact["url"])),
-			intval($gcontact_id));
 	}
 
 	return $gcontact_id;

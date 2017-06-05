@@ -57,7 +57,7 @@ class Lock {
 
 		$memcache = self::memcache();
 		if (is_object($memcache)) {
-			$wait_sec = 1;
+			$wait_sec = 0.2;
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
 
 			do {
@@ -77,9 +77,9 @@ class Lock {
 					$got_lock = true;
 				}
 				if (!$got_lock) {
-					sleep($wait_sec);
+					usleep($wait_sec * 1000000);
 				}
-			} while (!$got_lock AND ((time() - $start) < $timeout));
+			} while (!$got_lock AND ((time(true) - $start) < $timeout));
 
 			return $got_lock;
 		}
