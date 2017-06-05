@@ -758,11 +758,11 @@ function poller_run_cron() {
 if (array_search(__file__,get_included_files())===0){
 	poller_run($_SERVER["argv"],$_SERVER["argc"]);
 
-	Lock::remove('poller_worker');
-
 	poller_unclaim_process();
 
 	get_app()->end_process();
+
+	Lock::remove('poller_worker');
 
 	killme();
 }
