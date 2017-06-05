@@ -246,10 +246,11 @@ function cron_poll_contacts($argc, $argv) {
 			logger("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact["nick"] . " " . $contact["name"]);
 
 			if (($contact['network'] == NETWORK_FEED) AND ($contact['priority'] <= 3)) {
-				proc_run(PRIORITY_MEDIUM, 'include/onepoll.php', intval($contact['id']));
+				$priority = PRIORITY_MEDIUM;
 			} else {
-				proc_run(PRIORITY_LOW, 'include/onepoll.php', intval($contact['id']));
+				$priority = PRIORITY_LOW;
 			}
+			proc_run(array('priority' => $priority, 'dont_fork' => true), 'include/onepoll.php', intval($contact['id']));
 		}
 	}
 }

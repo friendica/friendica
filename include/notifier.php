@@ -498,7 +498,7 @@ function notifier_run(&$argv, &$argc){
 			}
 			logger("Deliver ".$target_item["guid"]." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
-			proc_run($priority, 'include/delivery.php', $cmd, $item_id, $contact['id']);
+			proc_run(array('priority' => $priority, 'dont_fork' => true), 'include/delivery.php', $cmd, $item_id, $contact['id']);
 		}
 	}
 
@@ -563,7 +563,7 @@ function notifier_run(&$argv, &$argc){
 
 				if ((! $mail) && (! $fsuggest) && (! $followup)) {
 					logger('notifier: delivery agent: '.$rr['name'].' '.$rr['id'].' '.$rr['network'].' '.$target_item["guid"]);
-					proc_run($priority, 'include/delivery.php', $cmd, $item_id, $rr['id']);
+					proc_run(array('priority' => $priority, 'dont_fork' => true), 'include/delivery.php', $cmd, $item_id, $rr['id']);
 				}
 			}
 		}
@@ -603,7 +603,7 @@ function notifier_run(&$argv, &$argc){
 		}
 
 		// Handling the pubsubhubbub requests
-		proc_run(PRIORITY_HIGH, 'include/pubsubpublish.php');
+		proc_run(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), 'include/pubsubpublish.php');
 	}
 
 	logger('notifier: calling hooks', LOGGER_DEBUG);
