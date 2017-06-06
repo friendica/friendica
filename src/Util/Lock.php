@@ -18,30 +18,30 @@ use dbm;
  */
 class Lock {
        /**
-         * @brief Check for memcache and open a connection if configured
-         *
-         * @return object|boolean The memcache object - or "false" if not successful
-         */
-        public static function memcache() {
-                if (!function_exists('memcache_connect')) {
-                        return false;
-                }
+	 * @brief Check for memcache and open a connection if configured
+	 *
+	 * @return object|boolean The memcache object - or "false" if not successful
+	 */
+	private static function connect_memcache() {
+		if (!function_exists('memcache_connect')) {
+			return false;
+		}
 
-                if (!Config::get('system', 'memcache')) {
-                        return false;
-                }
+		if (!Config::get('system', 'memcache')) {
+			return false;
+		}
 
-                $memcache_host = Config::get('system', 'memcache_host', '127.0.0.1');
-                $memcache_port = Config::get('system', 'memcache_port', 11211);
+		$memcache_host = Config::get('system', 'memcache_host', '127.0.0.1');
+		$memcache_port = Config::get('system', 'memcache_port', 11211);
 
-                $memcache = new Memcache;
+		$memcache = new Memcache;
 
-                if (!$memcache->connect($memcache_host, $memcache_port)) {
-                        return false;
-                }
+		if (!$memcache->connect($memcache_host, $memcache_port)) {
+			return false;
+		}
 
-                return $memcache;
-        }
+		return $memcache;
+	}
 
 	/**
 	 * @brief Sets a lock for a given name
@@ -55,7 +55,7 @@ class Lock {
 		$got_lock = false;
 		$start = time();
 
-		$memcache = self::memcache();
+		$memcache = self::connect_memcache();
 		if (is_object($memcache)) {
 			$wait_sec = 0.2;
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
@@ -126,7 +126,7 @@ class Lock {
 	 * @param string $fn_name Name of the lock
 	 */
 	public static function remove($fn_name) {
-		$memcache = self::memcache();
+		$memcache = self::connect_memcache();
 		if (is_object($memcache)) {
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
 			$lock = $memcache->get($cachekey);
@@ -147,7 +147,7 @@ class Lock {
 	 * @brief Removes all lock that were set by us
 	 */
 	public static function removeAll() {
-		$memcache = self::memcache();
+		$memcache = self::connect_memcache();
 		if (is_object($memcache)) {
 			// We cannot delete all cache entries, but this doesn't matter with memcache
 			return;
