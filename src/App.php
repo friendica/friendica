@@ -797,6 +797,8 @@ class App {
 	 * @return bool Is the limit reached?
 	 */
 	function max_processes_reached() {
+		// Deactivated, needs more investigating if this check really makes sense
+		return false;
 
 		if ($this->is_backend()) {
 			$process = 'backend';
