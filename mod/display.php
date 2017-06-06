@@ -209,9 +209,6 @@ function display_content(App $a, $update = 0) {
 
 	$o = '';
 
-	$a->page['htmlhead'] .= replace_macros(get_markup_template('display-head.tpl'), array());
-
-
 	if ($update) {
 		$nick = $_REQUEST['nick'];
 	} else {
@@ -280,6 +277,10 @@ function display_content(App $a, $update = 0) {
 		notice(t('Item not found.').EOL);
 		return;
 	}
+
+	$alternate = App::get_baseurl().'/display/'.$nick.'/'.$item_id.'.atom';
+	$a->page['htmlhead'] .= replace_macros(get_markup_template('display-head.tpl'),
+				array('$alternate' => $alternate));
 
 
 	$groups = array();

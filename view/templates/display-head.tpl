@@ -1,4 +1,4 @@
-
+<link href='{{$alternate}}' rel='alternate' type='application/atom+xml'>
 <script>
 $(document).ready(function() {
 	$(".comment-edit-wrapper textarea").editor_autocomplete(baseurl+"/acl");
@@ -6,4 +6,3 @@ $(document).ready(function() {
 	$(".wall-item-comment-wrapper textarea").editor_autocomplete(baseurl+"/acl");
 });
 </script>
-
