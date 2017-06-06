@@ -580,7 +580,7 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`id` int(11) NOT NULL auto_increment,
 	`name` varchar(128) NOT NULL DEFAULT '',
 	`locked` tinyint(1) NOT NULL DEFAULT 0,
-	`created` datetime DEFAULT '0001-01-01 00:00:00',
+	`pid` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 

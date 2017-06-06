@@ -467,8 +467,7 @@ function poller_too_much_workers() {
 			dba::close($processes);
 		}
 		dba::close($entries);
-
-		$processlist = implode(', ', $listitem);
+		$processlist = ' ('.implode(', ', $listitem).')';
 
 		$s = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `executed` <= '%s'", dbesc(NULL_DATE));
 		$entries = $s[0]["total"];
@@ -487,7 +486,7 @@ function poller_too_much_workers() {
 			}
 		}
 
-		logger("Load: ".$load."/".$maxsysload." - processes: ".$active."/".$entries." (".$processlist.") - maximum: ".$queues."/".$maxqueues, LOGGER_DEBUG);
+		logger("Load: ".$load."/".$maxsysload." - processes: ".$active."/".$entries.$processlist." - maximum: ".$queues."/".$maxqueues, LOGGER_DEBUG);
 
 		// Are there fewer workers running as possible? Then fork a new one.
 		if (!Config::get("system", "worker_dont_fork") AND ($queues > ($active + 1)) AND ($entries > 1)) {
