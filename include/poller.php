@@ -101,13 +101,13 @@ function poller_run($argv, $argc){
 				logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
 				return;
 			}
-			Lock::remove('poller_worker');
-		}
 
-		// Check free memory
-		if ($a->min_memory_reached()) {
-			logger('Memory limit reached, quitting.', LOGGER_DEBUG);
-			return;
+			// Check free memory
+			if ($a->min_memory_reached()) {
+				logger('Memory limit reached, quitting.', LOGGER_DEBUG);
+				return;
+			}
+			Lock::remove('poller_worker');
 		}
 
 		// finally the work will be done
