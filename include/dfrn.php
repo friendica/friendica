@@ -285,6 +285,65 @@ class dfrn {
 	}
 
 	/**
+	 * @brief Generate an atom entry for a given item id
+	 *
+	 * @param int $item_id The item id
+	 *
+	 * @return string DFRN feed entry
+	 */
+	public static function itemFeed($item_id) {
+		$r = q("SELECT `item`.*, `item`.`id` AS `item_id`,
+			`contact`.`name`, `contact`.`network`, `contact`.`photo`, `contact`.`url`,
+			`contact`.`name-date`, `contact`.`uri-date`, `contact`.`avatar-date`,
+			`contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
+			`sign`.`signed_text`, `sign`.`signature`, `sign`.`signer`
+			FROM `item`
+			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
+				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
+			LEFT JOIN `sign` ON `sign`.`iid` = `item`.`id`
+			WHERE `item`.`id` = %d AND `item`.`visible` AND NOT `item`.`moderated` AND `item`.`parent` != 0
+			AND `item`.`wall` AND NOT `item`.`private`",
+			intval($item_id)
+		);
+
+		if (!dbm::is_result($r)) {
+			killme();
+		}
+
+		$item = $r[0];
+
+		$r = q("SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`, `user`.`account-type`
+			FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
+			WHERE `contact`.`self` AND `user`.`uid` = %d LIMIT 1",
+			intval($item['uid'])
+		);
+
+		if (!dbm::is_result($r)) {
+			killme();
+		}
+
+		$owner = $r[0];
+
+		$doc = new DOMDocument('1.0', 'utf-8');
+		$doc->formatOutput = true;
+
+		$alternatelink = $owner['url'];
+
+		$author = "dfrn:owner";
+		//$author = "author";
+
+		$root = self::add_header($doc, $owner, $author, $alternatelink, true);
+
+		$type = 'html';
+
+		$entry = self::entry($doc, $type, $item, $owner, true);
+		$root->appendChild($entry);
+
+		$atom = trim($doc->saveXML());
+		return $atom;
+	}
+
+	/**
 	 * @brief Create XML text for DFRN mails
 	 *
 	 * @param array $item message elements
