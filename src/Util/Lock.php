@@ -76,7 +76,7 @@ class Lock {
 					$memcache->set($cachekey, getmypid(), MEMCACHE_COMPRESSED, 300);
 					$got_lock = true;
 				}
-				if (!$got_lock) {
+				if (!$got_lock AND ($timeout > 0)) {
 					usleep($wait_sec * 1000000);
 				}
 			} while (!$got_lock AND ((time() - $start) < $timeout));
@@ -112,7 +112,7 @@ class Lock {
 
 			dba::unlock();
 
-			if (!$got_lock) {
+			if (!$got_lock AND ($timeout > 0)) {
 				sleep($wait_sec);
 			}
 		} while (!$got_lock AND ((time() - $start) < $timeout));
