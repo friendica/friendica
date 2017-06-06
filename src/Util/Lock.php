@@ -22,7 +22,7 @@ class Lock {
 	 *
 	 * @return object|boolean The memcache object - or "false" if not successful
 	 */
-	private static function connect_memcache() {
+	private static function connectMemcache() {
 		if (!function_exists('memcache_connect')) {
 			return false;
 		}
@@ -55,7 +55,7 @@ class Lock {
 		$got_lock = false;
 		$start = time();
 
-		$memcache = self::connect_memcache();
+		$memcache = self::connectMemcache();
 		if (is_object($memcache)) {
 			$wait_sec = 0.2;
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
@@ -126,7 +126,7 @@ class Lock {
 	 * @param string $fn_name Name of the lock
 	 */
 	public static function remove($fn_name) {
-		$memcache = self::connect_memcache();
+		$memcache = self::connectMemcache();
 		if (is_object($memcache)) {
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
 			$lock = $memcache->get($cachekey);
@@ -147,7 +147,7 @@ class Lock {
 	 * @brief Removes all lock that were set by us
 	 */
 	public static function removeAll() {
-		$memcache = self::connect_memcache();
+		$memcache = self::connectMemcache();
 		if (is_object($memcache)) {
 			// We cannot delete all cache entries, but this doesn't matter with memcache
 			return;
