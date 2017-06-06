@@ -1411,31 +1411,24 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 						));
 					}
 
-					$filetype = strtolower(substr( $mime, 0, strpos($mime,'/') ));
+					$filetype = strtolower(substr($mime, 0, strpos($mime, '/')));
 					if ($filetype) {
-						$filesubtype = strtolower(substr( $mime, strpos($mime,'/') + 1 ));
+						$filesubtype = strtolower(substr($mime, strpos($mime, '/') + 1));
 						$filesubtype = str_replace('.', '-', $filesubtype);
 					} else {
+						/// @TODO Opps, shortened 'unkn'? Let's write full 'unknown' here, if possible
 						$filetype = 'unkn';
 						$filesubtype = 'unkn';
 					}
 
-					$icon = '<div class="attachtype icon s22 type-' . $filetype . ' subtype-' . $filesubtype . '"></div>';
-					/*$icontype = strtolower(substr($mtch[3],0,strpos($mtch[3],'/')));
-					switch($icontype) {
-						case 'video':
-						case 'audio':
-						case 'image':
-						case 'text':
-							$icon = '<div class="attachtype icon s22 type-' . $icontype . '"></div>';
-							break;
-						default:
-							$icon = '<div class="attachtype icon s22 type-unkn"></div>';
-							break;
-					}*/
-
 					$title = ((strlen(trim($mtch[4]))) ? escape_tags(trim($mtch[4])) : escape_tags($mtch[1]));
 					$title .= ' ' . $mtch[2] . ' ' . t('bytes');
+
+					if (($filetype == 'image') && ($item['network'] == NETWORK_OSTATUS)) {
+						$icon = '<img src="' . $the_url . '" alt="" title="' . $title . '">';
+					} else {
+						$icon = '<div class="attachtype icon s22 type-' . $filetype . ' subtype-' . $filesubtype . '"></div>';
+					}
 
 					$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" >' . $icon . '</a>';
 				}
