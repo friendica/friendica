@@ -27,7 +27,7 @@ function queue_run(&$argv, &$argc) {
 		logger('queue: start');
 
 		// Handling the pubsubhubbub requests
-		proc_run(PRIORITY_HIGH,'include/pubsubpublish.php');
+		proc_run(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), 'include/pubsubpublish.php');
 
 		$r = q("SELECT `queue`.*, `contact`.`name`, `contact`.`uid` FROM `queue`
 			INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id`
@@ -52,7 +52,7 @@ function queue_run(&$argv, &$argc) {
 		if (dbm::is_result($r)) {
 			foreach ($r as $q_item) {
 				logger('Call queue for id '.$q_item['id']);
-				proc_run(PRIORITY_LOW, "include/queue.php", $q_item['id']);
+				proc_run(array('priority' => PRIORITY_LOW, 'dont_fork' => true), "include/queue.php", $q_item['id']);
 			}
 		}
 		return;
