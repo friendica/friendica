@@ -2,6 +2,8 @@
 
 use Friendica\App;
 
+require_once('include/dfrn.php');
+
 function display_init(App $a) {
 
 	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
@@ -13,7 +15,6 @@ function display_init(App $a) {
 
 	if ($a->argc == 3) {
 		if (substr($a->argv[2], -5) == '.atom') {
-			require_once('include/dfrn.php');
 			$item_id = substr($a->argv[2], 0, -5);
 			$xml = dfrn::itemFeed($item_id);
 			header("Content-type: application/atom+xml");
