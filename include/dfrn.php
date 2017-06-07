@@ -329,10 +329,7 @@ class dfrn {
 
 		$alternatelink = $owner['url'];
 
-		$author = "dfrn:owner";
-		//$author = "author";
-
-		$root = self::add_header($doc, $owner, $author, $alternatelink, true);
+		$root = self::add_header($doc, $owner, 'dfrn:owner', $alternatelink, true);
 
 		$type = 'html';
 
