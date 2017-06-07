@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-28 11:09+0200\n"
+"POT-Creation-Date: 2017-06-07 20:21+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -383,93 +383,18 @@ msgid "add"
 msgstr ""
 
 #: include/ForumManager.php:116 include/text.php:1094 include/nav.php:133
-#: view/theme/vier/theme.php:256
+#: view/theme/vier/theme.php:248
 msgid "Forums"
 msgstr ""
 
-#: include/ForumManager.php:118 view/theme/vier/theme.php:258
+#: include/ForumManager.php:118 view/theme/vier/theme.php:250
 msgid "External link to forum"
 msgstr ""
 
 #: include/ForumManager.php:121 include/contact_widgets.php:271
 #: include/items.php:2432 mod/content.php:625 object/Item.php:417
-#: view/theme/vier/theme.php:261 src/App.php:506
+#: view/theme/vier/theme.php:253 src/App.php:506
 msgid "show more"
-msgstr ""
-
-#: include/NotificationsManager.php:153
-msgid "System"
-msgstr ""
-
-#: include/NotificationsManager.php:160 include/nav.php:160 mod/admin.php:518
-#: view/theme/frio/theme.php:255
-msgid "Network"
-msgstr ""
-
-#: include/NotificationsManager.php:167 mod/network.php:835
-#: mod/profiles.php:699
-msgid "Personal"
-msgstr ""
-
-#: include/NotificationsManager.php:174 include/nav.php:107
-#: include/nav.php:163
-msgid "Home"
-msgstr ""
-
-#: include/NotificationsManager.php:181 include/nav.php:168
-msgid "Introductions"
-msgstr ""
-
-#: include/NotificationsManager.php:239 include/NotificationsManager.php:251
-#, php-format
-msgid "%s commented on %s's post"
-msgstr ""
-
-#: include/NotificationsManager.php:250
-#, php-format
-msgid "%s created a new post"
-msgstr ""
-
-#: include/NotificationsManager.php:265
-#, php-format
-msgid "%s liked %s's post"
-msgstr ""
-
-#: include/NotificationsManager.php:278
-#, php-format
-msgid "%s disliked %s's post"
-msgstr ""
-
-#: include/NotificationsManager.php:291
-#, php-format
-msgid "%s is attending %s's event"
-msgstr ""
-
-#: include/NotificationsManager.php:304
-#, php-format
-msgid "%s is not attending %s's event"
-msgstr ""
-
-#: include/NotificationsManager.php:317
-#, php-format
-msgid "%s may attend %s's event"
-msgstr ""
-
-#: include/NotificationsManager.php:334
-#, php-format
-msgid "%s is now friends with %s"
-msgstr ""
-
-#: include/NotificationsManager.php:770
-msgid "Friend Suggestion"
-msgstr ""
-
-#: include/NotificationsManager.php:803
-msgid "Friend/Connect Request"
-msgstr ""
-
-#: include/NotificationsManager.php:803
-msgid "New Follower"
 msgstr ""
 
 #: include/acl_selectors.php:355
@@ -600,11 +525,11 @@ msgid "Find"
 msgstr ""
 
 #: include/contact_widgets.php:37 mod/suggest.php:116
-#: view/theme/vier/theme.php:203
+#: view/theme/vier/theme.php:195
 msgid "Friend Suggestions"
 msgstr ""
 
-#: include/contact_widgets.php:38 view/theme/vier/theme.php:202
+#: include/contact_widgets.php:38 view/theme/vier/theme.php:194
 msgid "Similar Interests"
 msgstr ""
 
@@ -612,7 +537,7 @@ msgstr ""
 msgid "Random Profile"
 msgstr ""
 
-#: include/contact_widgets.php:40 view/theme/vier/theme.php:204
+#: include/contact_widgets.php:40 view/theme/vier/theme.php:196
 msgid "Invite Friends"
 msgstr ""
 
@@ -927,8 +852,7 @@ msgstr ""
 msgid "Tag term:"
 msgstr ""
 
-#: include/conversation.php:1229 include/conversation.php:1245
-#: mod/filer.php:31
+#: include/conversation.php:1229 include/conversation.php:1245 mod/filer.php:31
 msgid "Save to Folder:"
 msgstr ""
 
@@ -1030,8 +954,8 @@ msgstr ""
 
 #: include/conversation.php:1318 include/items.php:2165 mod/editpost.php:140
 #: mod/fbrowser.php:102 mod/fbrowser.php:137 mod/follow.php:126
-#: mod/message.php:211 mod/photos.php:247 mod/photos.php:339
-#: mod/suggest.php:34 mod/tagrm.php:13 mod/tagrm.php:98 mod/videos.php:134
+#: mod/message.php:211 mod/photos.php:247 mod/photos.php:339 mod/suggest.php:34
+#: mod/tagrm.php:13 mod/tagrm.php:98 mod/videos.php:134
 #: mod/dfrn_request.php:894 mod/contacts.php:458 mod/settings.php:683
 #: mod/settings.php:709
 msgid "Cancel"
@@ -1535,8 +1459,7 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: include/text.php:1082 mod/editpost.php:101 mod/filer.php:32
-#: mod/notes.php:64
+#: include/text.php:1082 mod/editpost.php:101 mod/filer.php:32 mod/notes.php:64
 msgid "Save"
 msgstr ""
 
@@ -1725,22 +1648,6 @@ msgstr ""
 msgid "Item filed"
 msgstr ""
 
-#: include/Contact.php:437
-msgid "Drop Contact"
-msgstr ""
-
-#: include/Contact.php:819
-msgid "Organisation"
-msgstr ""
-
-#: include/Contact.php:822
-msgid "News"
-msgstr ""
-
-#: include/Contact.php:825
-msgid "Forum"
-msgstr ""
-
 #: include/bbcode.php:419 include/bbcode.php:1178 include/bbcode.php:1179
 msgid "Image/photo"
 msgstr ""
@@ -1764,6 +1671,22 @@ msgstr ""
 
 #: include/bbcode.php:1313
 msgid "Invalid link protocol"
+msgstr ""
+
+#: include/Contact.php:437
+msgid "Drop Contact"
+msgstr ""
+
+#: include/Contact.php:819
+msgid "Organisation"
+msgstr ""
+
+#: include/Contact.php:822
+msgid "News"
+msgstr ""
+
+#: include/Contact.php:825
+msgid "Forum"
 msgstr ""
 
 #: include/enotify.php:27
@@ -2076,7 +1999,7 @@ msgstr ""
 msgid "Clear notifications"
 msgstr ""
 
-#: include/nav.php:80 view/theme/frio/theme.php:245 boot.php:862
+#: include/nav.php:80 view/theme/frio/theme.php:245 boot.php:869
 msgid "Logout"
 msgstr ""
 
@@ -2139,7 +2062,7 @@ msgstr ""
 msgid "Your personal notes"
 msgstr ""
 
-#: include/nav.php:97 mod/bookmarklet.php:14 boot.php:863
+#: include/nav.php:97 mod/bookmarklet.php:14 boot.php:870
 msgid "Login"
 msgstr ""
 
@@ -2147,11 +2070,15 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
+#: include/nav.php:107 include/nav.php:163 include/NotificationsManager.php:176
+msgid "Home"
+msgstr ""
+
 #: include/nav.php:107
 msgid "Home Page"
 msgstr ""
 
-#: include/nav.php:111 mod/register.php:291 boot.php:839
+#: include/nav.php:111 mod/register.php:291 boot.php:846
 msgid "Register"
 msgstr ""
 
@@ -2159,7 +2086,7 @@ msgstr ""
 msgid "Create an account"
 msgstr ""
 
-#: include/nav.php:117 mod/help.php:50 view/theme/vier/theme.php:299
+#: include/nav.php:117 mod/help.php:50 view/theme/vier/theme.php:291
 msgid "Help"
 msgstr ""
 
@@ -2212,6 +2139,11 @@ msgstr ""
 msgid "Information about this friendica instance"
 msgstr ""
 
+#: include/nav.php:160 include/NotificationsManager.php:162 mod/admin.php:518
+#: view/theme/frio/theme.php:255
+msgid "Network"
+msgstr ""
+
 #: include/nav.php:160 view/theme/frio/theme.php:255
 msgid "Conversations from your friends"
 msgstr ""
@@ -2222,6 +2154,10 @@ msgstr ""
 
 #: include/nav.php:161
 msgid "Load Network page with no filters"
+msgstr ""
+
+#: include/nav.php:168 include/NotificationsManager.php:183
+msgid "Introductions"
 msgstr ""
 
 #: include/nav.php:168
@@ -2444,11 +2380,11 @@ msgid "Friends"
 msgstr ""
 
 #: include/user.php:306 include/user.php:314 include/user.php:322
-#: include/api.php:3697 mod/photos.php:73 mod/photos.php:189
-#: mod/photos.php:776 mod/photos.php:1258 mod/photos.php:1279
-#: mod/photos.php:1865 mod/profile_photo.php:74 mod/profile_photo.php:82
-#: mod/profile_photo.php:90 mod/profile_photo.php:214
-#: mod/profile_photo.php:309 mod/profile_photo.php:319
+#: include/api.php:3702 mod/photos.php:73 mod/photos.php:189 mod/photos.php:776
+#: mod/photos.php:1258 mod/photos.php:1279 mod/photos.php:1865
+#: mod/profile_photo.php:74 mod/profile_photo.php:82 mod/profile_photo.php:90
+#: mod/profile_photo.php:214 mod/profile_photo.php:309
+#: mod/profile_photo.php:319
 msgid "Profile Photos"
 msgstr ""
 
@@ -2516,6 +2452,308 @@ msgstr ""
 msgid "Registration details for %s"
 msgstr ""
 
+#: include/dba_pdo.php:76 include/dba.php:57
+#, php-format
+msgid "Cannot locate DNS info for database server '%s'"
+msgstr ""
+
+#: include/plugin.php:532 include/plugin.php:534
+msgid "Click here to upgrade."
+msgstr ""
+
+#: include/plugin.php:541
+msgid "This action exceeds the limits set by your subscription plan."
+msgstr ""
+
+#: include/plugin.php:546
+msgid "This action is not available under your subscription plan."
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Male"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Female"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Currently Male"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Currently Female"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Mostly Male"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Mostly Female"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Transgender"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Intersex"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Transsexual"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Hermaphrodite"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Neuter"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Non-specific"
+msgstr ""
+
+#: include/profile_selectors.php:6
+msgid "Other"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Males"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Females"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Gay"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Lesbian"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "No Preference"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Bisexual"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Autosexual"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Abstinent"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Virgin"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Deviant"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Fetish"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Oodles"
+msgstr ""
+
+#: include/profile_selectors.php:23
+msgid "Nonsexual"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Single"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Lonely"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Available"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Unavailable"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Has crush"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Infatuated"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Dating"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Unfaithful"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Sex Addict"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Friends/Benefits"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Casual"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Engaged"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Married"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Imaginarily married"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Partners"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Cohabiting"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Common law"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Happy"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Not looking"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Swinger"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Betrayed"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Separated"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Unstable"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Divorced"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Imaginarily divorced"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Widowed"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Uncertain"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "It's complicated"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Don't care"
+msgstr ""
+
+#: include/profile_selectors.php:42
+msgid "Ask me"
+msgstr ""
+
+#: include/NotificationsManager.php:155
+msgid "System"
+msgstr ""
+
+#: include/NotificationsManager.php:169 mod/network.php:835
+#: mod/profiles.php:699
+msgid "Personal"
+msgstr ""
+
+#: include/NotificationsManager.php:241 include/NotificationsManager.php:253
+#, php-format
+msgid "%s commented on %s's post"
+msgstr ""
+
+#: include/NotificationsManager.php:252
+#, php-format
+msgid "%s created a new post"
+msgstr ""
+
+#: include/NotificationsManager.php:267
+#, php-format
+msgid "%s liked %s's post"
+msgstr ""
+
+#: include/NotificationsManager.php:280
+#, php-format
+msgid "%s disliked %s's post"
+msgstr ""
+
+#: include/NotificationsManager.php:293
+#, php-format
+msgid "%s is attending %s's event"
+msgstr ""
+
+#: include/NotificationsManager.php:306
+#, php-format
+msgid "%s is not attending %s's event"
+msgstr ""
+
+#: include/NotificationsManager.php:319
+#, php-format
+msgid "%s may attend %s's event"
+msgstr ""
+
+#: include/NotificationsManager.php:336
+#, php-format
+msgid "%s is now friends with %s"
+msgstr ""
+
+#: include/NotificationsManager.php:774
+msgid "Friend Suggestion"
+msgstr ""
+
+#: include/NotificationsManager.php:803
+msgid "Friend/Connect Request"
+msgstr ""
+
+#: include/NotificationsManager.php:803
+msgid "New Follower"
+msgstr ""
+
 #: include/api.php:1102
 #, php-format
 msgid "Daily posting limit of %d posts reached. The post was rejected."
@@ -2529,11 +2767,6 @@ msgstr ""
 #: include/api.php:1144
 #, php-format
 msgid "Monthly posting limit of %d posts reached. The post was rejected."
-msgstr ""
-
-#: include/dba.php:57 include/dba_pdo.php:75
-#, php-format
-msgid "Cannot locate DNS info for database server '%s'"
 msgstr ""
 
 #: include/dbstructure.php:25
@@ -2832,19 +3065,18 @@ msgstr ""
 #: include/items.php:2309 mod/allfriends.php:14 mod/api.php:28 mod/api.php:33
 #: mod/attach.php:35 mod/cal.php:301 mod/common.php:20 mod/crepair.php:105
 #: mod/delegate.php:14 mod/dfrn_confirm.php:63 mod/dirfind.php:15
-#: mod/display.php:482 mod/editpost.php:12 mod/events.php:188
-#: mod/follow.php:13 mod/follow.php:76 mod/follow.php:160 mod/fsuggest.php:80
-#: mod/group.php:20 mod/invite.php:17 mod/invite.php:105 mod/manage.php:103
-#: mod/message.php:48 mod/message.php:173 mod/mood.php:116 mod/network.php:7
-#: mod/nogroup.php:29 mod/notes.php:25 mod/notifications.php:73
-#: mod/ostatus_subscribe.php:11 mod/photos.php:168 mod/photos.php:1111
-#: mod/poke.php:155 mod/register.php:44 mod/repair_ostatus.php:11
-#: mod/suggest.php:60 mod/viewcontacts.php:49 mod/wall_attach.php:69
-#: mod/wall_attach.php:72 mod/wall_upload.php:101 mod/wall_upload.php:104
-#: mod/wallmessage.php:11 mod/wallmessage.php:35 mod/wallmessage.php:75
-#: mod/wallmessage.php:99 mod/item.php:197 mod/item.php:209 mod/regmod.php:106
-#: mod/uimport.php:26 mod/contacts.php:363 mod/profile_photo.php:19
-#: mod/profile_photo.php:179 mod/profile_photo.php:190
+#: mod/display.php:482 mod/editpost.php:12 mod/events.php:188 mod/follow.php:13
+#: mod/follow.php:76 mod/follow.php:160 mod/fsuggest.php:80 mod/group.php:20
+#: mod/invite.php:17 mod/invite.php:105 mod/manage.php:103 mod/message.php:48
+#: mod/message.php:173 mod/mood.php:116 mod/network.php:7 mod/nogroup.php:29
+#: mod/notes.php:25 mod/notifications.php:73 mod/ostatus_subscribe.php:11
+#: mod/photos.php:168 mod/photos.php:1111 mod/poke.php:155 mod/register.php:44
+#: mod/repair_ostatus.php:11 mod/suggest.php:60 mod/viewcontacts.php:49
+#: mod/wall_attach.php:69 mod/wall_attach.php:72 mod/wall_upload.php:101
+#: mod/wall_upload.php:104 mod/wallmessage.php:11 mod/wallmessage.php:35
+#: mod/wallmessage.php:75 mod/wallmessage.php:99 mod/item.php:197
+#: mod/item.php:209 mod/regmod.php:106 mod/uimport.php:26 mod/contacts.php:363
+#: mod/profile_photo.php:19 mod/profile_photo.php:179 mod/profile_photo.php:190
 #: mod/profile_photo.php:203 mod/profiles.php:172 mod/profiles.php:610
 #: mod/settings.php:24 mod/settings.php:132 mod/settings.php:669 index.php:410
 msgid "Permission denied."
@@ -2870,242 +3102,6 @@ msgstr ""
 
 #: include/ostatus.php:1967
 msgid "stopped following"
-msgstr ""
-
-#: include/plugin.php:531 include/plugin.php:533
-msgid "Click here to upgrade."
-msgstr ""
-
-#: include/plugin.php:539
-msgid "This action exceeds the limits set by your subscription plan."
-msgstr ""
-
-#: include/plugin.php:544
-msgid "This action is not available under your subscription plan."
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Male"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Female"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Currently Male"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Currently Female"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Mostly Male"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Mostly Female"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Transgender"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Intersex"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Transsexual"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Hermaphrodite"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Neuter"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Non-specific"
-msgstr ""
-
-#: include/profile_selectors.php:6
-msgid "Other"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Males"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Females"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Gay"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Lesbian"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "No Preference"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Bisexual"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Autosexual"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Abstinent"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Virgin"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Deviant"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Fetish"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Oodles"
-msgstr ""
-
-#: include/profile_selectors.php:23
-msgid "Nonsexual"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Single"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Lonely"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Available"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Unavailable"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Has crush"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Infatuated"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Dating"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Unfaithful"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Sex Addict"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Friends/Benefits"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Casual"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Engaged"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Married"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Imaginarily married"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Partners"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Cohabiting"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Common law"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Happy"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Not looking"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Swinger"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Betrayed"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Separated"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Unstable"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Divorced"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Imaginarily divorced"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Widowed"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Uncertain"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "It's complicated"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Don't care"
-msgstr ""
-
-#: include/profile_selectors.php:42
-msgid "Ask me"
 msgstr ""
 
 #: mod/allfriends.php:48
@@ -3337,13 +3333,12 @@ msgstr ""
 #: mod/content.php:729 mod/crepair.php:159 mod/events.php:508
 #: mod/fsuggest.php:109 mod/install.php:244 mod/install.php:284
 #: mod/invite.php:144 mod/localtime.php:46 mod/manage.php:156
-#: mod/message.php:340 mod/message.php:523 mod/mood.php:139
-#: mod/photos.php:1143 mod/photos.php:1273 mod/photos.php:1599
-#: mod/photos.php:1648 mod/photos.php:1690 mod/photos.php:1770
-#: mod/poke.php:204 mod/contacts.php:588 mod/profiles.php:684
-#: object/Item.php:702 view/theme/duepuntozero/config.php:64
-#: view/theme/frio/config.php:67 view/theme/quattro/config.php:70
-#: view/theme/vier/config.php:113
+#: mod/message.php:340 mod/message.php:523 mod/mood.php:139 mod/photos.php:1143
+#: mod/photos.php:1273 mod/photos.php:1599 mod/photos.php:1648
+#: mod/photos.php:1690 mod/photos.php:1770 mod/poke.php:204
+#: mod/contacts.php:588 mod/profiles.php:684 object/Item.php:702
+#: view/theme/duepuntozero/config.php:64 view/theme/frio/config.php:67
+#: view/theme/quattro/config.php:70 view/theme/vier/config.php:113
 msgid "Submit"
 msgstr ""
 
@@ -3518,9 +3513,8 @@ msgid ""
 "entries from this contact."
 msgstr ""
 
-#: mod/crepair.php:170 mod/admin.php:1496 mod/admin.php:1509
-#: mod/admin.php:1522 mod/admin.php:1538 mod/settings.php:684
-#: mod/settings.php:710
+#: mod/crepair.php:170 mod/admin.php:1496 mod/admin.php:1509 mod/admin.php:1522
+#: mod/admin.php:1538 mod/settings.php:684 mod/settings.php:710
 msgid "Name"
 msgstr ""
 
@@ -3676,7 +3670,7 @@ msgstr ""
 msgid "%1$s welcomes %2$s"
 msgstr ""
 
-#: mod/directory.php:195 view/theme/vier/theme.php:201
+#: mod/directory.php:195 view/theme/vier/theme.php:193
 msgid "Global Directory"
 msgstr ""
 
@@ -4510,7 +4504,7 @@ msgid ""
 "Password reset failed."
 msgstr ""
 
-#: mod/lostpass.php:112 boot.php:877
+#: mod/lostpass.php:112 boot.php:884
 msgid "Password Reset"
 msgstr ""
 
@@ -4578,7 +4572,7 @@ msgid ""
 "your email for further instructions."
 msgstr ""
 
-#: mod/lostpass.php:163 boot.php:865
+#: mod/lostpass.php:163 boot.php:872
 msgid "Nickname or Email: "
 msgstr ""
 
@@ -4983,14 +4977,12 @@ msgstr ""
 msgid "Invalid request identifier."
 msgstr ""
 
-#: mod/notifications.php:46 mod/notifications.php:182
-#: mod/notifications.php:229
+#: mod/notifications.php:46 mod/notifications.php:182 mod/notifications.php:229
 msgid "Discard"
 msgstr ""
 
-#: mod/notifications.php:62 mod/notifications.php:181
-#: mod/notifications.php:265 mod/contacts.php:617 mod/contacts.php:817
-#: mod/contacts.php:1002
+#: mod/notifications.php:62 mod/notifications.php:181 mod/notifications.php:265
+#: mod/contacts.php:617 mod/contacts.php:817 mod/contacts.php:1002
 msgid "Ignore"
 msgstr ""
 
@@ -5359,18 +5351,6 @@ msgstr ""
 
 #: mod/photos.php:1893 mod/videos.php:395
 msgid "View Album"
-msgstr ""
-
-#: mod/ping.php:273
-msgid "{0} wants to be your friend"
-msgstr ""
-
-#: mod/ping.php:288
-msgid "{0} sent you a message"
-msgstr ""
-
-#: mod/ping.php:303
-msgid "{0} requested registration"
 msgstr ""
 
 #: mod/poke.php:197
@@ -7649,6 +7629,18 @@ msgstr ""
 msgid "Delete contact"
 msgstr ""
 
+#: mod/ping.php:274
+msgid "{0} wants to be your friend"
+msgstr ""
+
+#: mod/ping.php:289
+msgid "{0} sent you a message"
+msgstr ""
+
+#: mod/ping.php:304
+msgid "{0} requested registration"
+msgstr ""
+
 #: mod/profile_photo.php:44
 msgid "Image uploaded but image cropping failed."
 msgstr ""
@@ -8379,7 +8371,7 @@ msgid "Personal Page"
 msgstr ""
 
 #: mod/settings.php:1121
-msgid "This account is a regular personal profile"
+msgid "Account for a personal profile."
 msgstr ""
 
 #: mod/settings.php:1124
@@ -8387,7 +8379,9 @@ msgid "Organisation Page"
 msgstr ""
 
 #: mod/settings.php:1125
-msgid "This account is a profile for an organisation"
+msgid ""
+"Account for an organisation that automatically approves contact requests as "
+"\"Followers\"."
 msgstr ""
 
 #: mod/settings.php:1128
@@ -8395,7 +8389,9 @@ msgid "News Page"
 msgstr ""
 
 #: mod/settings.php:1129
-msgid "This account is a news account/reflector"
+msgid ""
+"Account for a news reflector that automatically approves contact requests as "
+"\"Followers\"."
 msgstr ""
 
 #: mod/settings.php:1132
@@ -8403,8 +8399,7 @@ msgid "Community Forum"
 msgstr ""
 
 #: mod/settings.php:1133
-msgid ""
-"This account is a community forum where people can discuss with each other"
+msgid "Account for community discussions."
 msgstr ""
 
 #: mod/settings.php:1136
@@ -8412,7 +8407,9 @@ msgid "Normal Account Page"
 msgstr ""
 
 #: mod/settings.php:1137
-msgid "This account is a normal personal profile"
+msgid ""
+"Account for a regular personal profile that requires manual approval of "
+"\"Friends\" and \"Followers\"."
 msgstr ""
 
 #: mod/settings.php:1140
@@ -8420,7 +8417,9 @@ msgid "Soapbox Page"
 msgstr ""
 
 #: mod/settings.php:1141
-msgid "Automatically approve all connection/friend requests as read-only fans"
+msgid ""
+"Account for a public profile that automatically approves contact requests as "
+"\"Followers\"."
 msgstr ""
 
 #: mod/settings.php:1144
@@ -8428,7 +8427,7 @@ msgid "Public Forum"
 msgstr ""
 
 #: mod/settings.php:1145
-msgid "Automatically approve all contact requests"
+msgid "Automatically approves all contact requests."
 msgstr ""
 
 #: mod/settings.php:1148
@@ -8436,7 +8435,9 @@ msgid "Automatic Friend Page"
 msgstr ""
 
 #: mod/settings.php:1149
-msgid "Automatically approve all connection/friend requests as friends"
+msgid ""
+"Account for a popular profile that automatically approves contact requests "
+"as \"Friends\"."
 msgstr ""
 
 #: mod/settings.php:1152
@@ -8444,7 +8445,7 @@ msgid "Private Forum [Experimental]"
 msgstr ""
 
 #: mod/settings.php:1153
-msgid "Private forum - approved members only"
+msgid "Requires manual approval of contact requests."
 msgstr ""
 
 #: mod/settings.php:1164
@@ -8544,10 +8545,6 @@ msgstr ""
 
 #: mod/settings.php:1278
 msgid "Password Settings"
-msgstr ""
-
-#: mod/settings.php:1280
-msgid "Leave password fields blank unless changing"
 msgstr ""
 
 #: mod/settings.php:1281
@@ -8870,7 +8867,7 @@ msgstr ""
 msgid "Community Pages"
 msgstr ""
 
-#: view/theme/vier/config.php:118 view/theme/vier/theme.php:151
+#: view/theme/vier/config.php:118 view/theme/vier/theme.php:143
 msgid "Community Profiles"
 msgstr ""
 
@@ -8878,23 +8875,23 @@ msgstr ""
 msgid "Help or @NewHere ?"
 msgstr ""
 
-#: view/theme/vier/config.php:120 view/theme/vier/theme.php:392
+#: view/theme/vier/config.php:120 view/theme/vier/theme.php:384
 msgid "Connect Services"
 msgstr ""
 
-#: view/theme/vier/config.php:121 view/theme/vier/theme.php:199
+#: view/theme/vier/config.php:121 view/theme/vier/theme.php:191
 msgid "Find Friends"
 msgstr ""
 
-#: view/theme/vier/config.php:122 view/theme/vier/theme.php:181
+#: view/theme/vier/config.php:122 view/theme/vier/theme.php:173
 msgid "Last users"
 msgstr ""
 
-#: view/theme/vier/theme.php:200
+#: view/theme/vier/theme.php:192
 msgid "Local Directory"
 msgstr ""
 
-#: view/theme/vier/theme.php:292
+#: view/theme/vier/theme.php:284
 msgid "Quick Start"
 msgstr ""
 
@@ -8910,43 +8907,43 @@ msgstr ""
 msgid "toggle mobile"
 msgstr ""
 
-#: boot.php:726
+#: boot.php:733
 #, php-format
 msgid "Update %s failed. See error logs."
 msgstr ""
 
-#: boot.php:838
+#: boot.php:845
 msgid "Create a New Account"
 msgstr ""
 
-#: boot.php:866
+#: boot.php:873
 msgid "Password: "
 msgstr ""
 
-#: boot.php:867
+#: boot.php:874
 msgid "Remember me"
 msgstr ""
 
-#: boot.php:870
+#: boot.php:877
 msgid "Or login using OpenID: "
 msgstr ""
 
-#: boot.php:876
+#: boot.php:883
 msgid "Forgot your password?"
 msgstr ""
 
-#: boot.php:879
+#: boot.php:886
 msgid "Website Terms of Service"
 msgstr ""
 
-#: boot.php:880
+#: boot.php:887
 msgid "terms of service"
 msgstr ""
 
-#: boot.php:882
+#: boot.php:889
 msgid "Website Privacy Policy"
 msgstr ""
 
-#: boot.php:883
+#: boot.php:890
 msgid "privacy policy"
 msgstr ""
