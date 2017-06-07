@@ -389,6 +389,13 @@ function populate_acl($user = null, $show_jotnets = false) {
 
 function construct_acl_data(App $a, $user) {
 
+	$arr = array('user' => $user);
+	call_hooks('construct_acl_data', $arr);
+
+	if (isset($arr['cancel'])) {
+		return;
+	}
+
 	// Get group and contact information for html ACL selector
 	$acl_data = acl_lookup($a, 'html');
 
