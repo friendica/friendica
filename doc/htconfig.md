@@ -123,4 +123,4 @@ If you want to have a more personalized closing line for the notification emails
 The configuration variables db_host, db_user, db_pass and db_data are holding your credentials for the database connection.
 If you need to specify a port to access the database, you can do so by appending ":portnumber" to the db_host variable.
 
-		$db_host = 'your.mysqlhost.com:123456';
+    $db_host = 'your.mysqlhost.com:123456';
