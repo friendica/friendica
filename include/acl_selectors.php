@@ -389,7 +389,7 @@ function populate_acl($user = null, $show_jotnets = false) {
 
 function construct_acl_data(App $a, $user) {
 	// This function is now deactivated. It seems as if the generated data isn't used anywhere.
-	// We will remove the function completely before the release of 3.5.3 when there won't be any issues.
+	/// @todo Remove this function and all function calls before releasing Friendica 3.5.3
 	return;
 
 	// Get group and contact information for html ACL selector
