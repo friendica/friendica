@@ -356,7 +356,7 @@ function update_1035() {
 
 function update_1036() {
 
-	$r = dbq("SELECT * FROM `contact` WHERE `network` = 'dfrn' && `photo` LIKE '%include/photo%' ");
+	$r = dbq("SELECT * FROM `contact` WHERE `network` = 'dfrn' AND `photo` LIKE '%include/photo%' ");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			q("UPDATE `contact` SET `photo` = '%s', `thumb` = '%s', `micro` = '%s' WHERE `id` = %d",
