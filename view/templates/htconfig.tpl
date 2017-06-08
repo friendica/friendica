@@ -1,14 +1,16 @@
 <?php
 
 /* ********************************************************************
- *  The following configuration has to be within the .htconfig file
- *  and will not be overruled by decisions made in the admin panel.
+ *  The following configuration has to be within the .htconfig.php
+ *  file and will not be overruled by decisions made in the admin panel.
  *
  *  See below for variables that may be overruled by the admin panel.
  * ********************************************************************/
 
 // Set the following for your MySQL installation
-// Copy or rename this file to .htconfig.php
+//
+// If you need to specify a port for reacing the database, you can do so by
+// adding ":portnumber" after "your.mysqlhost.com" in the $db_host config.
 
 $db_host = '{{$dbhost}}';
 $db_user = '{{$dbuser}}';

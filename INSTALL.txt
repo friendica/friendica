@@ -71,9 +71,14 @@ write or create files in your web directory, create an empty file called
 .htconfig.php and make it writable by the web server.
 
 5. Visit your website with a web browser and follow the instructions. Please 
-note any error messages and correct these before continuing. If you are using
-SSL with a known signature authority (recommended), use the https: link to your
-website. If you are using a self-signed cert or no cert, use the http: link. 
+note any error messages and correct these before continuing.
+
+If you are using SSL with a known signature authority (recommended), use the
+https: link to your website. If you are using a self-signed cert or no cert,
+use the http: link.
+
+If you need to specify a port for the connection to the database, you can do
+so in the host name setting for the database.
 
 6. *If* the automated installation fails for any reason, check the following:
 

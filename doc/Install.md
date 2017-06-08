@@ -82,6 +82,8 @@ Restart mysql and you should be fine.
 Point your web browser to the new site and follow the instructions.
 Please note any error messages and correct these before continuing.
 
+If you need to specify a port for the connection to the database, you can do so in the host name setting for the database.
+
 *If* the automated installation fails for any reason, check the following:
 
 * Does ".htconfig.php" exist? If not, edit htconfig.php and change the system settings. Rename to .htconfig.php
