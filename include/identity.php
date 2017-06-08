@@ -380,7 +380,7 @@ function profile_sidebar($profile, $block = 0) {
 	if (!$block) {
 		$contact_block = contact_block();
 
-		if (is_array($a->profile) AND !$a->profile['hide-friends']) {
+		if (is_array($a->profile) && !$a->profile['hide-friends']) {
 			$r = q("SELECT `gcontact`.`updated` FROM `contact` INNER JOIN `gcontact` WHERE `gcontact`.`nurl` = `contact`.`nurl` AND `self` AND `uid` = %d LIMIT 1",
 				intval($a->profile['uid']));
 			if (dbm::is_result($r))

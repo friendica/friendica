@@ -306,13 +306,13 @@ function notifier_run(&$argv, &$argc){
 			$recipients = array($parent['contact-id']);
 			$recipients_followup  = array($parent['contact-id']);
 
-			//if (!$target_item['private'] AND $target_item['wall'] AND
-			if (!$target_item['private'] AND
+			//if (!$target_item['private'] && $target_item['wall'] &&
+			if (!$target_item['private'] &&
 				(strlen($target_item['allow_cid'].$target_item['allow_gid'].
 					$target_item['deny_cid'].$target_item['deny_gid']) == 0))
 				$push_notify = true;
 
-			if (($thr_parent AND ($thr_parent[0]['network'] == NETWORK_OSTATUS)) OR ($parent['network'] == NETWORK_OSTATUS)) {
+			if (($thr_parent && ($thr_parent[0]['network'] == NETWORK_OSTATUS)) || ($parent['network'] == NETWORK_OSTATUS)) {
 
 				$push_notify = true;
 
@@ -396,7 +396,7 @@ function notifier_run(&$argv, &$argc){
 
 		// If the thread parent is OStatus then do some magic to distribute the messages.
 		// We have not only to look at the parent, since it could be a Friendica thread.
-		if (($thr_parent AND ($thr_parent[0]['network'] == NETWORK_OSTATUS)) OR ($parent['network'] == NETWORK_OSTATUS)) {
+		if (($thr_parent && ($thr_parent[0]['network'] == NETWORK_OSTATUS)) || ($parent['network'] == NETWORK_OSTATUS)) {
 
 			$diaspora_delivery = false;
 
@@ -573,7 +573,7 @@ function notifier_run(&$argv, &$argc){
 	}
 
 	// Notify PuSH subscribers (Used for OStatus distribution of regular posts)
-	if ($push_notify AND strlen($hub)) {
+	if ($push_notify && strlen($hub)) {
 		$hubs = explode(',', $hub);
 		if (count($hubs)) {
 			foreach ($hubs as $h) {

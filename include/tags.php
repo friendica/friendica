@@ -31,7 +31,7 @@ function create_tags_from_item($itemid) {
 
 	$tags = "";
 	foreach ($taglist as $tag)
-		if ((substr(trim($tag), 0, 1) == "#") OR (substr(trim($tag), 0, 1) == "@"))
+		if ((substr(trim($tag), 0, 1) == "#") || (substr(trim($tag), 0, 1) == "@"))
 			$tags .= " ".trim($tag);
 		else
 			$tags .= " #".trim($tag);
@@ -91,7 +91,7 @@ function create_tags_from_item($itemid) {
 			dbesc($link), dbesc($message["guid"]), dbesc($message["created"]), dbesc($message["received"]), intval($global));
 
 		// Search for mentions
-		if ((substr($tag, 0, 1) == '@') AND (strpos($link, $profile_base_friendica) OR strpos($link, $profile_base_diaspora))) {
+		if ((substr($tag, 0, 1) == '@') && (strpos($link, $profile_base_friendica) || strpos($link, $profile_base_diaspora))) {
 			$users = q("SELECT `uid` FROM `contact` WHERE self AND (`url` = '%s' OR `nurl` = '%s')", $link, $link);
 			foreach ($users AS $user) {
 				if ($user["uid"] == $message["uid"]) {

@@ -97,7 +97,7 @@ function search_content(App $a) {
 		return;
 	}
 
-	if(get_config('system','local_search') AND !local_user()) {
+	if(get_config('system','local_search') && !local_user()) {
 		http_status_exit(403,
 				array("title" => t("Public access denied."),
 					"description" => t("Only logged in users are permitted to perform a search.")));
@@ -106,7 +106,7 @@ function search_content(App $a) {
 		//return;
 	}
 
-	if (get_config('system','permit_crawling') AND !local_user()) {
+	if (get_config('system','permit_crawling') && !local_user()) {
 		// Default values:
 		// 10 requests are "free", after the 11th only a call per minute is allowed
 
@@ -122,7 +122,7 @@ function search_content(App $a) {
 		$result = Cache::get("remote_search:".$remote);
 		if (!is_null($result)) {
 			$resultdata = json_decode($result);
-			if (($resultdata->time > (time() - $crawl_permit_period)) AND ($resultdata->accesses > $free_crawls)) {
+			if (($resultdata->time > (time() - $crawl_permit_period)) && ($resultdata->accesses > $free_crawls)) {
 				http_status_exit(429,
 						array("title" => t("Too Many Requests"),
 							"description" => t("Only one search per minute is permitted for not logged in users.")));

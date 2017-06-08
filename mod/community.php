@@ -68,14 +68,14 @@ function community_content(App $a, $update = 0) {
 				}
 				$previousauthor = $item["author-link"];
 
-				if (($numposts < $maxpostperauthor) AND (sizeof($s) < $a->pager['itemspage'])) {
+				if (($numposts < $maxpostperauthor) && (sizeof($s) < $a->pager['itemspage'])) {
 					$s[] = $item;
 				}
 			}
 			if ((sizeof($s) < $a->pager['itemspage'])) {
 				$r = community_getitems($a->pager['start'] + ($count * $a->pager['itemspage']), $a->pager['itemspage']);
 			}
-		} while ((sizeof($s) < $a->pager['itemspage']) AND (++$count < 50) AND (sizeof($r) > 0));
+		} while ((sizeof($s) < $a->pager['itemspage']) && (++$count < 50) && (sizeof($r) > 0));
 	} else {
 		$s = $r;
 	}

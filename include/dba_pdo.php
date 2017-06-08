@@ -190,14 +190,14 @@ class dba {
 		 * regardless of any logging that may or may nor be in effect.
 		 * These usually indicate SQL syntax errors that need to be resolved.
 		 */
-		if (isset($result) AND ($result === false)) {
+		if (isset($result) && ($result === false)) {
 			logger('dba: ' . printable($sql) . ' returned false.' . "\n" . $this->error);
 			if (file_exists('dbfail.out')) {
 				file_put_contents('dbfail.out', datetime_convert() . "\n" . printable($sql) . ' returned false' . "\n" . $this->error . "\n", FILE_APPEND);
 			}
 		}
 
-		if (isset($result) AND (($result === true) || ($result === false))) {
+		if (isset($result) && (($result === true) || ($result === false))) {
 			return $result;
 		}
 

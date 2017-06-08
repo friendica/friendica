@@ -416,7 +416,7 @@ class Diaspora {
 		$fields = $postdata['fields'];
 
 		// Is it a an action (comment, like, ...) for our own post?
-		if (isset($fields->parent_guid) AND !$postdata["relayed"]) {
+		if (isset($fields->parent_guid) && !$postdata["relayed"]) {
 			$guid = notags(unxmlify($fields->parent_guid));
 			$importer = self::importer_for_guid($guid);
 			if (is_array($importer)) {
@@ -612,9 +612,9 @@ class Diaspora {
 				}
 			}
 
-			if (($fieldname == "author_signature") AND ($entry != ""))
+			if (($fieldname == "author_signature") && ($entry != ""))
 				$author_signature = base64_decode($entry);
-			elseif (($fieldname == "parent_author_signature") AND ($entry != ""))
+			elseif (($fieldname == "parent_author_signature") && ($entry != ""))
 				$parent_author_signature = base64_decode($entry);
 			elseif (!in_array($fieldname, array("author_signature", "parent_author_signature", "target_author_signature"))) {
 				if ($signed_data != "") {
@@ -624,7 +624,7 @@ class Diaspora {
 
 				$signed_data .= $entry;
 			}
-			if (!in_array($fieldname, array("parent_author_signature", "target_author_signature")) OR
+			if (!in_array($fieldname, array("parent_author_signature", "target_author_signature")) ||
 				($orig_type == "relayable_retraction"))
 				xml::copy($entry, $fields, $fieldname);
 		}
@@ -714,13 +714,13 @@ class Diaspora {
 				$update = true;
 		}
 
-		if (!$person OR $update) {
+		if (!$person || $update) {
 			logger("create or refresh", LOGGER_DEBUG);
 			$r = probe_url($handle, PROBE_DIASPORA);
 
 			// Note that Friendica contacts will return a "Diaspora person"
 			// if Diaspora connectivity is enabled on their server
-			if ($r AND ($r["network"] === NETWORK_DIASPORA)) {
+			if ($r && ($r["network"] === NETWORK_DIASPORA)) {
 				self::add_fcontact($r, $update);
 				$person = $r;
 			}
@@ -1151,7 +1151,7 @@ class Diaspora {
 		// Fetch the author - for the old and the new Diaspora version
 		if ($source_xml->post->status_message->diaspora_handle)
 			$author = (string)$source_xml->post->status_message->diaspora_handle;
-		elseif ($source_xml->author AND ($source_xml->getName() == "status_message"))
+		elseif ($source_xml->author && ($source_xml->getName() == "status_message"))
 			$author = (string)$source_xml->author;
 
 		// If this isn't a "status_message" then quit
@@ -1471,7 +1471,7 @@ class Diaspora {
 		}
 
 		// If we are the origin of the parent we store the original data and notify our followers
-		if ($message_id AND $parent_item["origin"]) {
+		if ($message_id && $parent_item["origin"]) {
 
 			// Formerly we stored the signed text, the signature and the author in different fields.
 			// We now store the raw data so that we are more flexible.
@@ -1775,7 +1775,7 @@ class Diaspora {
 		}
 
 		// If we are the origin of the parent we store the original data and notify our followers
-		if ($message_id AND $parent_item["origin"]) {
+		if ($message_id && $parent_item["origin"]) {
 
 			// Formerly we stored the signed text, the signature and the author in different fields.
 			// We now store the raw data so that we are more flexible.
@@ -2124,7 +2124,7 @@ class Diaspora {
 		// perhaps we were already sharing with this person. Now they're sharing with us.
 		// That makes us friends.
 		if ($contact) {
-			if ($following AND $sharing) {
+			if ($following && $sharing) {
 				logger("Author ".$author." (Contact ".$contact["id"].") wants to have a bidirectional conection.", LOGGER_DEBUG);
 				self::receive_request_make_friend($importer, $contact);
 
@@ -2147,17 +2147,17 @@ class Diaspora {
 			}
 		}
 
-		if (!$following AND $sharing AND in_array($importer["page-flags"], array(PAGE_SOAPBOX, PAGE_NORMAL))) {
+		if (!$following && $sharing && in_array($importer["page-flags"], array(PAGE_SOAPBOX, PAGE_NORMAL))) {
 			logger("Author ".$author." wants to share with us - but doesn't want to listen. Request is ignored.", LOGGER_DEBUG);
 			return false;
-		} elseif (!$following AND !$sharing) {
+		} elseif (!$following && !$sharing) {
 			logger("Author ".$author." doesn't want anything - and we don't know the author. Request is ignored.", LOGGER_DEBUG);
 			return false;
-		} elseif (!$following AND $sharing) {
+		} elseif (!$following && $sharing) {
 			logger("Author ".$author." wants to share with us.", LOGGER_DEBUG);
-		} elseif ($following AND $sharing) {
+		} elseif ($following && $sharing) {
 			logger("Author ".$author." wants to have a bidirectional conection.", LOGGER_DEBUG);
-		} elseif ($following AND !$sharing) {
+		} elseif ($following && !$sharing) {
 			logger("Author ".$author." wants to listen to us.", LOGGER_DEBUG);
 		}
 
@@ -2235,9 +2235,9 @@ class Diaspora {
 			// but if our page-type is PAGE_COMMUNITY or PAGE_SOAPBOX
 			// we are going to change the relationship and make them a follower.
 
-			if (($importer["page-flags"] == PAGE_FREELOVE) AND $sharing AND $following)
+			if (($importer["page-flags"] == PAGE_FREELOVE) && $sharing && $following)
 				$new_relation = CONTACT_IS_FRIEND;
-			elseif (($importer["page-flags"] == PAGE_FREELOVE) AND $sharing)
+			elseif (($importer["page-flags"] == PAGE_FREELOVE) && $sharing)
 				$new_relation = CONTACT_IS_SHARING;
 			else
 				$new_relation = CONTACT_IS_FOLLOWER;
@@ -2460,7 +2460,7 @@ class Diaspora {
 			intval($r[0]["parent"]));
 
 		// Only delete it if the parent author really fits
-		if (!link_compare($p[0]["author-link"], $contact["url"]) AND !link_compare($r[0]["author-link"], $contact["url"])) {
+		if (!link_compare($p[0]["author-link"], $contact["url"]) && !link_compare($r[0]["author-link"], $contact["url"])) {
 			logger("Thread author ".$p[0]["author-link"]." and item author ".$r[0]["author-link"]." don't fit to expected contact ".$contact["url"], LOGGER_DEBUG);
 			return false;
 		}
@@ -2497,7 +2497,7 @@ class Diaspora {
 		$target_type = notags(unxmlify($data->target_type));
 
 		$contact = self::contact_by_handle($importer["uid"], $sender);
-		if (!$contact AND (in_array($target_type, array("Contact", "Person")))) {
+		if (!$contact && (in_array($target_type, array("Contact", "Person")))) {
 			logger("cannot find contact for sender: ".$sender." and user ".$importer["uid"]);
 			return false;
 		}
@@ -2625,7 +2625,7 @@ class Diaspora {
 			$datarray["location"] = $address["address"];
 		}
 
-		if (isset($address["lat"]) AND isset($address["lng"])) {
+		if (isset($address["lat"]) && isset($address["lng"])) {
 			$datarray["coord"] = $address["lat"]." ".$address["lng"];
 		}
 
@@ -2938,7 +2938,7 @@ class Diaspora {
 				// The message could not be delivered. We mark the contact as "dead"
 				mark_for_death($contact);
 			}
-		} elseif (($return_code >= 200) AND ($return_code <= 299)) {
+		} elseif (($return_code >= 200) && ($return_code <= 299)) {
 			// We successfully delivered a message, the contact is alive
 			unmark_for_death($contact);
 		}
@@ -3048,7 +3048,7 @@ class Diaspora {
 
 		// Skip if it isn't a pure repeated messages
 		// Does it start with a share?
-		if ((strpos($body, "[share") > 0) AND $complete)
+		if ((strpos($body, "[share") > 0) && $complete)
 			return(false);
 
 		// Does it end with a share?
@@ -3096,7 +3096,7 @@ class Diaspora {
 		$ret= array();
 
 		$ret["root_handle"] = preg_replace("=https?://(.*)/u/(.*)=ism", "$2@$1", $profile);
-		if (($ret["root_handle"] == $profile) OR ($ret["root_handle"] == ""))
+		if (($ret["root_handle"] == $profile) || ($ret["root_handle"] == ""))
 			return(false);
 
 		$link = "";
@@ -3109,7 +3109,7 @@ class Diaspora {
 			$link = $matches[1];
 
 		$ret["root_guid"] = preg_replace("=https?://(.*)/posts/(.*)=ism", "$2", $link);
-		if (($ret["root_guid"] == $link) OR (trim($ret["root_guid"]) == ""))
+		if (($ret["root_guid"] == $link) || (trim($ret["root_guid"]) == ""))
 			return(false);
 
 		return($ret);
@@ -3169,7 +3169,7 @@ class Diaspora {
 		if ($event['start']) {
 			$eventdata['start'] = datetime_convert($eventdata['timezone'], "UTC", $event['start'], $mask);
 		}
-		if ($event['finish'] AND !$event['nofinish']) {
+		if ($event['finish'] && !$event['nofinish']) {
 			$eventdata['end'] = datetime_convert($eventdata['timezone'], "UTC", $event['finish'], $mask);
 		}
 		if ($event['summary']) {
@@ -3215,7 +3215,7 @@ class Diaspora {
 		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
 
 		// Detect a share element and do a reshare
-		if (!$item['private'] AND ($ret = self::is_reshare($item["body"]))) {
+		if (!$item['private'] && ($ret = self::is_reshare($item["body"]))) {
 			$message = array("root_diaspora_id" => $ret["root_handle"],
 					"root_guid" => $ret["root_guid"],
 					"guid" => $item["guid"],
@@ -3265,7 +3265,7 @@ class Diaspora {
 					"provider_display_name" => $item["app"]);
 
 			// Diaspora rejects messages when they contain a location without "lat" or "lng"
-			if (!isset($location["lat"]) OR !isset($location["lng"])) {
+			if (!isset($location["lat"]) || !isset($location["lng"])) {
 				unset($message["location"]);
 			}
 
@@ -3540,7 +3540,7 @@ class Diaspora {
 
 		// Old way - is used by the internal Friendica functions
 		/// @todo Change all signatur storing functions to the new format
-		if ($signature['signed_text'] AND $signature['signature'] AND $signature['signer'])
+		if ($signature['signed_text'] && $signature['signature'] && $signature['signer'])
 			$message = self::message_from_signature($item, $signature);
 		else {// New way
 			$msg = json_decode($signature['signed_text'], true);
@@ -3592,7 +3592,7 @@ class Diaspora {
 			$target_type = "StatusMessage";
 		}
 
-		if ($relay AND ($item["uri"] !== $item["parent-uri"]))
+		if ($relay && ($item["uri"] !== $item["parent-uri"]))
 			$signature = "parent_author_signature";
 		else
 			$signature = "target_author_signature";
@@ -3772,7 +3772,7 @@ class Diaspora {
 	public static function store_like_signature($contact, $post_id) {
 
 		// Is the contact the owner? Then fetch the private key
-		if (!$contact['self'] OR ($contact['uid'] == 0)) {
+		if (!$contact['self'] || ($contact['uid'] == 0)) {
 			logger("No owner post, so not storing signature", LOGGER_DEBUG);
 			return false;
 		}

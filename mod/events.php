@@ -436,7 +436,7 @@ function events_content(App $a) {
 			$sh_checked = (($orig_event['allow_cid'] === '<' . local_user() . '>' && (! $orig_event['allow_gid']) && (! $orig_event['deny_cid']) && (! $orig_event['deny_gid'])) ? '' : ' checked="checked" ');
 		}
 
-		if ($cid OR ($mode !== 'new')) {
+		if ($cid || ($mode !== 'new')) {
 			$sh_checked .= ' disabled="disabled" ';
 		}
 

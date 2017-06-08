@@ -65,7 +65,7 @@ function ref_session_write($id, $data) {
 
 	$memcache = cache::memcache();
 	$a = get_app();
-	if (is_object($memcache) AND is_object($a)) {
+	if (is_object($memcache) && is_object($a)) {
 		$memcache->set($a->get_hostname().":session:".$id, $data, MEMCACHE_COMPRESSED, $expire);
 		return true;
 	}

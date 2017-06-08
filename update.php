@@ -1652,7 +1652,7 @@ function update_1180() {
 
 function update_1188() {
 
-	if (strlen(get_config('system','directory_submit_url')) AND
+	if (strlen(get_config('system','directory_submit_url')) &&
 		!strlen(get_config('system','directory'))) {
 		set_config('system','directory', dirname(get_config('system','directory_submit_url')));
 		del_config('system','directory_submit_url');

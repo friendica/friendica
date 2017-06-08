@@ -29,7 +29,7 @@ if (isset($_COOKIE["Friendica"])) {
 			new_cookie($authcookiedays*24*60*60, $r[0]);
 
 			// Do the authentification if not done by now
-			if (!isset($_SESSION) OR !isset($_SESSION['authenticated'])) {
+			if (!isset($_SESSION) || !isset($_SESSION['authenticated'])) {
 				authenticate_success($r[0]);
 
 				if (get_config('system','paranoia'))

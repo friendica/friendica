@@ -41,19 +41,19 @@ function update_gcontact_run(&$argv, &$argc) {
 		return;
 	}
 
-	if (($data["name"] == "") AND ($r[0]['name'] != "")) {
+	if (($data["name"] == "") && ($r[0]['name'] != "")) {
 		$data["name"] = $r[0]['name'];
 	}
 
-	if (($data["nick"] == "") AND ($r[0]['nick'] != "")) {
+	if (($data["nick"] == "") && ($r[0]['nick'] != "")) {
 		$data["nick"] = $r[0]['nick'];
 	}
 
-	if (($data["addr"] == "") AND ($r[0]['addr'] != "")) {
+	if (($data["addr"] == "") && ($r[0]['addr'] != "")) {
 		$data["addr"] = $r[0]['addr'];
 	}
 
-	if (($data["photo"] == "") AND ($r[0]['photo'] != "")) {
+	if (($data["photo"] == "") && ($r[0]['photo'] != "")) {
 		$data["photo"] = $r[0]['photo'];
 	}
 

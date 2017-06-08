@@ -45,12 +45,12 @@ function add_shadow_thread($itemid) {
 	$item = $items[0];
 
 	// is it already a copy?
-	if (($itemid == 0) OR ($item['uid'] == 0)) {
+	if (($itemid == 0) || ($item['uid'] == 0)) {
 		return;
 	}
 
 	// Is it a visible public post?
-	if (!$item["visible"] OR $item["deleted"] OR $item["moderated"] OR $item["private"]) {
+	if (!$item["visible"] || $item["deleted"] || $item["moderated"] || $item["private"]) {
 		return;
 	}
 
@@ -86,8 +86,8 @@ function add_shadow_thread($itemid) {
 
 	$item = q("SELECT * FROM `item` WHERE `id` = %d", intval($itemid));
 
-	if (count($item) AND ($item[0]["allow_cid"] == '')  AND ($item[0]["allow_gid"] == '') AND
-		($item[0]["deny_cid"] == '') AND ($item[0]["deny_gid"] == '')) {
+	if (count($item) && ($item[0]["allow_cid"] == '')  && ($item[0]["allow_gid"] == '') &&
+		($item[0]["deny_cid"] == '') && ($item[0]["deny_gid"] == '')) {
 
 		$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = 0 LIMIT 1",
 			dbesc($item['uri']));

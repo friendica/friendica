@@ -108,7 +108,7 @@ function oembed_fetch_url($embedurl, $no_rich_type = false){
 	$j->embedurl = $embedurl;
 
 	// If fetching information doesn't work, then improve via internal functions
-	if (($j->type == "error") OR ($no_rich_type AND ($j->type == "rich"))) {
+	if (($j->type == "error") || ($no_rich_type && ($j->type == "rich"))) {
 		$data = ParseUrl::getSiteinfoCached($embedurl, true, false);
 		$j->type = $data["type"];
 
@@ -194,7 +194,7 @@ function oembed_format_object($j){
 			if (isset($j->author_name)) {
 				$ret.=" (".$j->author_name.")";
 			}
-		} elseif (isset($j->provider_name) OR isset($j->author_name)) {
+		} elseif (isset($j->provider_name) || isset($j->author_name)) {
 			$embedlink = "";
 			if (isset($j->provider_name)) {
 				$embedlink .= $j->provider_name;

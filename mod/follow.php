@@ -37,14 +37,14 @@ function follow_content(App $a) {
 
 	$ret = probe_url($url);
 
-	if (($ret["network"] == NETWORK_DIASPORA) AND !get_config('system','diaspora_enabled')) {
+	if (($ret["network"] == NETWORK_DIASPORA) && !get_config('system','diaspora_enabled')) {
 		notice( t("Diaspora support isn't enabled. Contact can't be added.") . EOL);
 		$submit = "";
 		//goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
-	if (($ret["network"] == NETWORK_OSTATUS) AND get_config('system','ostatus_disabled')) {
+	if (($ret["network"] == NETWORK_OSTATUS) && get_config('system','ostatus_disabled')) {
 		notice( t("OStatus support is disabled. Contact can't be added.") . EOL);
 		$submit = "";
 		//goaway($_SESSION['return_url']);

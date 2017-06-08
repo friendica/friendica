@@ -186,7 +186,7 @@ function z_fetch_url($url, $binary = false, &$redirects = 0, $opts = array()) {
 
 		$newurl = $curl_info['redirect_url'];
 
-		if (($new_location_info['path'] == '') AND ( $new_location_info['host'] != '')) {
+		if (($new_location_info['path'] == '') && ( $new_location_info['host'] != '')) {
 			$newurl = $new_location_info['scheme'] . '://' . $new_location_info['host'] . $old_location_info['path'];
 		}
 
@@ -819,8 +819,8 @@ function original_url($url, $depth = 1, $fetchbody = false) {
 	if ($http_code == 0)
 		return($url);
 
-	if ((($curl_info['http_code'] == "301") OR ($curl_info['http_code'] == "302"))
-		AND (($curl_info['redirect_url'] != "") OR ($curl_info['location'] != ""))) {
+	if ((($curl_info['http_code'] == "301") || ($curl_info['http_code'] == "302"))
+		&& (($curl_info['redirect_url'] != "") || ($curl_info['location'] != ""))) {
 		if ($curl_info['redirect_url'] != "")
 			return(original_url($curl_info['redirect_url'], ++$depth, $fetchbody));
 		else
@@ -836,7 +836,7 @@ function original_url($url, $depth = 1, $fetchbody = false) {
 		return($url);
 
 	// if it isn't a HTML file then exit
-	if (($curl_info["content_type"] != "") AND !strstr(strtolower($curl_info["content_type"]),"html"))
+	if (($curl_info["content_type"] != "") && !strstr(strtolower($curl_info["content_type"]),"html"))
 		return($url);
 
 	$stamp1 = microtime(true);
@@ -930,7 +930,7 @@ function json_return_and_die($x) {
  */
 function matching_url($url1, $url2) {
 
-	if (($url1 == "") OR ($url2 == ""))
+	if (($url1 == "") || ($url2 == ""))
 		return "";
 
 	$url1 = normalise_link($url1);
@@ -939,7 +939,7 @@ function matching_url($url1, $url2) {
 	$parts1 = parse_url($url1);
 	$parts2 = parse_url($url2);
 
-	if (!isset($parts1["host"]) OR !isset($parts2["host"]))
+	if (!isset($parts1["host"]) || !isset($parts2["host"]))
 		return "";
 
 	if ($parts1["scheme"] != $parts2["scheme"])
@@ -968,7 +968,7 @@ function matching_url($url1, $url2) {
 		if ($path1 == $path2)
 			$path .= $path1."/";
 
-	} while (($path1 == $path2) AND ($i++ <= count($pathparts1)));
+	} while (($path1 == $path2) && ($i++ <= count($pathparts1)));
 
 	$match .= $path;
 

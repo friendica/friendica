@@ -159,16 +159,16 @@ function add_page_info_data($data) {
 
 	// It maybe is a rich content, but if it does have everything that a link has,
 	// then treat it that way
-	if (($data["type"] == "rich") AND is_string($data["title"]) AND
-		is_string($data["text"]) AND (sizeof($data["images"]) > 0)) {
+	if (($data["type"] == "rich") && is_string($data["title"]) &&
+		is_string($data["text"]) && (sizeof($data["images"]) > 0)) {
 		$data["type"] = "link";
 	}
 
-	if ((($data["type"] != "link") AND ($data["type"] != "video") AND ($data["type"] != "photo")) OR ($data["title"] == $data["url"])) {
+	if ((($data["type"] != "link") && ($data["type"] != "video") && ($data["type"] != "photo")) || ($data["title"] == $data["url"])) {
 		return "";
 	}
 
-	if ($no_photos AND ($data["type"] == "photo")) {
+	if ($no_photos && ($data["type"] == "photo")) {
 		return "";
 	}
 
@@ -204,7 +204,7 @@ function add_page_info_data($data) {
 		$preview = str_replace(array("[", "]"), array("&#91;", "&#93;"), htmlentities($data["images"][0]["src"], ENT_QUOTES, 'UTF-8', false));
 		// if the preview picture is larger than 500 pixels then show it in a larger mode
 		// But only, if the picture isn't higher than large (To prevent huge posts)
-		if (($data["images"][0]["width"] >= 500) AND ($data["images"][0]["width"] >= $data["images"][0]["height"])) {
+		if (($data["images"][0]["width"] >= 500) && ($data["images"][0]["width"] >= $data["images"][0]["height"])) {
 			$text .= " image='".$preview."'";
 		} else {
 			$text .= " preview='".$preview."'";
@@ -214,7 +214,7 @@ function add_page_info_data($data) {
 	$text .= "]".$data["text"]."[/attachment]";
 
 	$hashtags = "";
-	if (isset($data["keywords"]) AND count($data["keywords"])) {
+	if (isset($data["keywords"]) && count($data["keywords"])) {
 		$hashtags = "\n";
 		foreach ($data["keywords"] AS $keyword) {
 			/// @todo make a positive list of allowed characters
@@ -237,11 +237,11 @@ function query_page_info($url, $no_photos = false, $photo = "", $keywords = fals
 
 	logger('fetch page info for ' . $url . ' ' . print_r($data, true), LOGGER_DEBUG);
 
-	if (!$keywords AND isset($data["keywords"])) {
+	if (!$keywords && isset($data["keywords"])) {
 		unset($data["keywords"]);
 	}
 
-	if (($keyword_blacklist != "") AND isset($data["keywords"])) {
+	if (($keyword_blacklist != "") && isset($data["keywords"])) {
 		$list = explode(", ", $keyword_blacklist);
 		foreach ($list AS $keyword) {
 			$keyword = trim($keyword);
@@ -259,7 +259,7 @@ function add_page_keywords($url, $no_photos = false, $photo = "", $keywords = fa
 	$data = query_page_info($url, $no_photos, $photo, $keywords, $keyword_blacklist);
 
 	$tags = "";
-	if (isset($data["keywords"]) AND count($data["keywords"])) {
+	if (isset($data["keywords"]) && count($data["keywords"])) {
 		foreach ($data["keywords"] AS $keyword) {
 			$hashtag = str_replace(array(" ", "+", "/", ".", "#", "'"),
 				array("", "", "", "", "", ""), $keyword);
@@ -301,7 +301,7 @@ function add_page_info_to_body($body, $texturl = false, $no_photos = false) {
 	}
 
 	// Convert urls without bbcode elements
-	if (!$matches AND $texturl) {
+	if (!$matches && $texturl) {
 		preg_match("/([^\]\='".'"'."]|^)(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", " ".$body, $matches);
 
 		// Yeah, a hack. I really hate regular expressions :)
@@ -315,21 +315,21 @@ function add_page_info_to_body($body, $texturl = false, $no_photos = false) {
 	}
 
 	// Remove the link from the body if the link is attached at the end of the post
-	if (isset($footer) AND (trim($footer) != "") AND (strpos($footer, $matches[1]))) {
+	if (isset($footer) && (trim($footer) != "") && (strpos($footer, $matches[1]))) {
 		$removedlink = trim(str_replace($matches[1], "", $body));
-		if (($removedlink == "") OR strstr($body, $removedlink)) {
+		if (($removedlink == "") || strstr($body, $removedlink)) {
 			$body = $removedlink;
 		}
 
 		$url = str_replace(array('/', '.'), array('\/', '\.'), $matches[1]);
 		$removedlink = preg_replace("/\[url\=" . $url . "\](.*?)\[\/url\]/ism", '', $body);
-		if (($removedlink == "") OR strstr($body, $removedlink)) {
+		if (($removedlink == "") || strstr($body, $removedlink)) {
 			$body = $removedlink;
 		}
 	}
 
 	// Add the page information to the bottom
-	if (isset($footer) AND (trim($footer) != "")) {
+	if (isset($footer) && (trim($footer) != "")) {
 		$body .= $footer;
 	}
 
@@ -421,10 +421,10 @@ function store_conversation($arr) {
 	if (in_array($arr['network'], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
 		$conversation = array('item-uri' => $arr['uri'], 'received' => dbm::date());
 
-		if (isset($arr['parent-uri']) AND ($arr['parent-uri'] != $arr['uri'])) {
+		if (isset($arr['parent-uri']) && ($arr['parent-uri'] != $arr['uri'])) {
 			$conversation['reply-to-uri'] = $arr['parent-uri'];
 		}
-		if (isset($arr['thr-parent']) AND ($arr['thr-parent'] != $arr['uri'])) {
+		if (isset($arr['thr-parent']) && ($arr['thr-parent'] != $arr['uri'])) {
 			$conversation['reply-to-uri'] = $arr['thr-parent'];
 		}
 
@@ -453,7 +453,7 @@ function store_conversation($arr) {
 				unset($old_conv['source']);
 			}
 			// Update structure data all the time but the source only when its from a better protocol.
-			if (($old_conv['protocol'] < $conversation['protocol']) AND ($old_conv['protocol'] != 0)) {
+			if (($old_conv['protocol'] < $conversation['protocol']) && ($old_conv['protocol'] != 0)) {
 				unset($conversation['protocol']);
 				unset($conversation['source']);
 			}
@@ -503,9 +503,9 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 
 	if ($notify) {
 		$guid_prefix = "";
-	} elseif ((trim($arr['guid']) == "") AND (trim($arr['plink']) != "")) {
+	} elseif ((trim($arr['guid']) == "") && (trim($arr['plink']) != "")) {
 		$arr['guid'] = uri_to_guid($arr['plink']);
-	} elseif ((trim($arr['guid']) == "") AND (trim($arr['uri']) != "")) {
+	} elseif ((trim($arr['guid']) == "") && (trim($arr['uri']) != "")) {
 		$arr['guid'] = uri_to_guid($arr['uri']);
 	} else {
 		$parsed = parse_url($arr["author-link"]);
@@ -653,7 +653,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		$arr['edited'] = datetime_convert();
 	}
 
-	if (($arr['author-link'] == "") AND ($arr['owner-link'] == "")) {
+	if (($arr['author-link'] == "") && ($arr['owner-link'] == "")) {
 		logger("Both author-link and owner-link are empty. Called by: " . App::callstack(), LOGGER_DEBUG);
 	}
 
@@ -832,7 +832,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 				$a = get_app();
 				$self = normalise_link(App::get_baseurl() . '/profile/' . $u[0]['nickname']);
 				logger("item_store: 'myself' is ".$self." for parent ".$parent_id." checking against ".$arr['author-link']." and ".$arr['owner-link'], LOGGER_DEBUG);
-				if ((normalise_link($arr['author-link']) == $self) OR (normalise_link($arr['owner-link']) == $self)) {
+				if ((normalise_link($arr['author-link']) == $self) || (normalise_link($arr['owner-link']) == $self)) {
 					q("UPDATE `thread` SET `mention` = 1 WHERE `iid` = %d", intval($parent_id));
 					logger("item_store: tagged thread ".$parent_id." as mention for user ".$self, LOGGER_DEBUG);
 				}
@@ -1051,7 +1051,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 
 	// update the commented timestamp on the parent
 	// Only update "commented" if it is really a comment
-	if (($arr['verb'] == ACTIVITY_POST) OR !get_config("system", "like_no_comment")) {
+	if (($arr['verb'] == ACTIVITY_POST) || !get_config("system", "like_no_comment")) {
 		q("UPDATE `item` SET `commented` = '%s', `changed` = '%s' WHERE `id` = %d",
 			dbesc(datetime_convert()),
 			dbesc(datetime_convert()),
@@ -1089,7 +1089,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	 * current post can be deleted if is for a community page and no mention are
 	 * in it.
 	 */
-	if (!$deleted AND !$dontcache) {
+	if (!$deleted && !$dontcache) {
 
 		$r = q('SELECT * FROM `item` WHERE `id` = %d', intval($current_post));
 		if ((dbm::is_result($r)) && (count($r) == 1)) {
@@ -1156,10 +1156,10 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
  */
 function item_set_last_item($arr) {
 
-	$update = (!$arr['private'] AND (($arr["author-link"] === $arr["owner-link"]) OR ($arr["parent-uri"] === $arr["uri"])));
+	$update = (!$arr['private'] && (($arr["author-link"] === $arr["owner-link"]) || ($arr["parent-uri"] === $arr["uri"])));
 
 	// Is it a forum? Then we don't care about the rules from above
-	if (!$update AND ($arr["network"] == NETWORK_DFRN) AND ($arr["parent-uri"] === $arr["uri"])) {
+	if (!$update && ($arr["network"] == NETWORK_DFRN) && ($arr["parent-uri"] === $arr["uri"])) {
 		$isforum = q("SELECT `forum` FROM `contact` WHERE `id` = %d AND `forum`",
 				intval($arr['contact-id']));
 		if (dbm::is_result($isforum)) {
@@ -1600,7 +1600,7 @@ function item_is_remote_self($contact, &$datarray) {
 		return false;
 	}
 
-	if (($contact['network'] != NETWORK_FEED) AND $datarray['private']) {
+	if (($contact['network'] != NETWORK_FEED) && $datarray['private']) {
 		return false;
 	}
 
@@ -1701,7 +1701,7 @@ function new_follower($importer, $contact, $datarray, $item, $sharing = false) {
 			intval($importer['uid'])
 		);
 
-		if (dbm::is_result($r) AND !in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
+		if (dbm::is_result($r) && !in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
 
 			// create notification
 			$hash = random_string();
@@ -1741,7 +1741,7 @@ function new_follower($importer, $contact, $datarray, $item, $sharing = false) {
 				));
 
 			}
-		} elseif (dbm::is_result($r) AND in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
+		} elseif (dbm::is_result($r) && in_array($r[0]['page-flags'], array(PAGE_SOAPBOX, PAGE_FREELOVE))) {
 			$r = q("UPDATE `contact` SET `pending` = 0 WHERE `uid` = %d AND `url` = '%s' AND `pending` LIMIT 1",
 					intval($importer['uid']),
 					dbesc($url)
@@ -1803,7 +1803,7 @@ function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
 
 	logger('subscribe_to_hub: ' . $hubmode . ' ' . $contact['name'] . ' to hub ' . $url . ' endpoint: '  . $push_url . ' with verifier ' . $verify_token);
 
-	if (!strlen($contact['hub-verify']) OR ($contact['hub-verify'] != $verify_token)) {
+	if (!strlen($contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
 		$r = q("UPDATE `contact` SET `hub-verify` = '%s' WHERE `id` = %d",
 			dbesc($verify_token),
 			intval($contact['id'])

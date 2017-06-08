@@ -24,7 +24,7 @@ function dbclean_run(&$argv, &$argc) {
 		for ($i = 1; $i <= 9; $i++) {
 			// Execute the background script for a step when it isn't finished.
 			// Execute step 8 and 9 only when $days is defined.
-			if (!Config::get('system', 'finished-dbclean-'.$i, false) AND (($i < 8) OR ($days > 0))) {
+			if (!Config::get('system', 'finished-dbclean-'.$i, false) && (($i < 8) || ($days > 0))) {
 				proc_run(PRIORITY_LOW, 'include/dbclean.php', $i);
 			}
 		}
@@ -296,7 +296,7 @@ function remove_orphans($stage = 0) {
 	}
 
 	// Call it again if not all entries were purged
-	if (($stage != 0) AND ($count > 0)) {
+	if (($stage != 0) && ($count > 0)) {
 		proc_run(PRIORITY_MEDIUM, 'include/dbclean.php');
 	}
 }

@@ -80,7 +80,7 @@ function poller_run($argv, $argc){
 	}
 
 	// Now we start additional cron processes if we should do so
-	if (($argc <= 1) OR ($argv[1] != "no_cron")) {
+	if (($argc <= 1) || ($argv[1] != "no_cron")) {
 		poller_run_cron();
 	}
 
@@ -472,7 +472,7 @@ function poller_too_much_workers() {
 		$s = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `executed` <= '%s'", dbesc(NULL_DATE));
 		$entries = $s[0]["total"];
 
-		if (Config::get("system", "worker_fastlane", false) AND ($queues > 0) AND ($entries > 0) AND ($active >= $queues)) {
+		if (Config::get("system", "worker_fastlane", false) && ($queues > 0) && ($entries > 0) && ($active >= $queues)) {
 			$s = q("SELECT `priority` FROM `workerqueue` WHERE `executed` <= '%s' ORDER BY `priority` LIMIT 1", dbesc(NULL_DATE));
 			$top_priority = $s[0]["priority"];
 
@@ -480,7 +480,7 @@ function poller_too_much_workers() {
 				intval($top_priority), dbesc(NULL_DATE));
 			$high_running = dbm::is_result($s);
 
-			if (!$high_running AND ($top_priority > PRIORITY_UNDEFINED) AND ($top_priority < PRIORITY_NEGLIGIBLE)) {
+			if (!$high_running && ($top_priority > PRIORITY_UNDEFINED) && ($top_priority < PRIORITY_NEGLIGIBLE)) {
 				logger("There are jobs with priority ".$top_priority." waiting but none is executed. Open a fastlane.", LOGGER_DEBUG);
 				$queues = $active + 1;
 			}
@@ -489,7 +489,7 @@ function poller_too_much_workers() {
 		logger("Load: ".$load."/".$maxsysload." - processes: ".$active."/".$entries.$processlist." - maximum: ".$queues."/".$maxqueues, LOGGER_DEBUG);
 
 		// Are there fewer workers running as possible? Then fork a new one.
-		if (!Config::get("system", "worker_dont_fork") AND ($queues > ($active + 1)) AND ($entries > 1)) {
+		if (!Config::get("system", "worker_dont_fork") && ($queues > ($active + 1)) && ($entries > 1)) {
 			logger("Active workers: ".$active."/".$queues." Fork a new worker.", LOGGER_DEBUG);
 			$args = array("include/poller.php", "no_cron");
 			$a = get_app();
@@ -637,7 +637,7 @@ function poller_claim_process($queue) {
 	if (!$id) {
 		logger("Queue item ".$queue["id"]." vanished - skip this execution", LOGGER_DEBUG);
 		return false;
-	} elseif ((strtotime($id[0]["executed"]) <= 0) OR ($id[0]["pid"] == 0)) {
+	} elseif ((strtotime($id[0]["executed"]) <= 0) || ($id[0]["pid"] == 0)) {
 		logger("Entry for queue item ".$queue["id"]." wasn't stored - skip this execution", LOGGER_DEBUG);
 		return false;
 	} elseif ($id[0]["pid"] != $mypid) {

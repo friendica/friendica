@@ -483,7 +483,7 @@ $called_api = null;
 		logger("api_get_user: Fetching user data for user ".$contact_id, LOGGER_DEBUG);
 
 		// Searching for contact URL
-		if (!is_null($contact_id) AND (intval($contact_id) == 0)) {
+		if (!is_null($contact_id) && (intval($contact_id) == 0)) {
 			$user = dbesc(normalise_link($contact_id));
 			$url = $user;
 			$extra_query = "AND `contact`.`nurl` = '%s' ";
@@ -493,7 +493,7 @@ $called_api = null;
 		}
 
 		// Searching for contact id with uid = 0
-		if (!is_null($contact_id) AND (intval($contact_id) != 0)) {
+		if (!is_null($contact_id) && (intval($contact_id) != 0)) {
 			$user = dbesc(api_unique_id_to_url($contact_id));
 
 			if ($user == "") {
@@ -538,7 +538,7 @@ $called_api = null;
 			}
 		}
 
-		if (is_null($user) AND ($a->argc > (count($called_api) - 1)) AND (count($called_api) > 0)) {
+		if (is_null($user) && ($a->argc > (count($called_api) - 1)) && (count($called_api) > 0)) {
 			$argid = count($called_api);
 			list($user, $null) = explode(".", $a->argv[$argid]);
 			if (is_numeric($user)) {
@@ -600,7 +600,7 @@ $called_api = null;
 				$network_name = network_to_name($r[0]['network'], $r[0]['url']);
 
 				// If no nick where given, extract it from the address
-				if (($r[0]['nick'] == "") OR ($r[0]['name'] == $r[0]['nick'])) {
+				if (($r[0]['nick'] == "") || ($r[0]['name'] == $r[0]['nick'])) {
 					$r[0]['nick'] = api_get_nick($r[0]["url"]);
 				}
 
@@ -716,7 +716,7 @@ $called_api = null;
 		$starred = 0;
 
 		// Add a nick if it isn't present there
-		if (($uinfo[0]['nick'] == "") OR ($uinfo[0]['name'] == $uinfo[0]['nick'])) {
+		if (($uinfo[0]['nick'] == "") || ($uinfo[0]['name'] == $uinfo[0]['nick'])) {
 			$uinfo[0]['nick'] = api_get_nick($uinfo[0]["url"]);
 		}
 
@@ -749,7 +749,7 @@ $called_api = null;
 			'contributors_enabled' => false,
 			'is_translator' => false,
 			'is_translation_enabled' => false,
-			'following' => (($uinfo[0]['rel'] == CONTACT_IS_FOLLOWER) OR ($uinfo[0]['rel'] == CONTACT_IS_FRIEND)),
+			'following' => (($uinfo[0]['rel'] == CONTACT_IS_FOLLOWER) || ($uinfo[0]['rel'] == CONTACT_IS_FRIEND)),
 			'follow_request_sent' => false,
 			'statusnet_blocking' => false,
 			'notifications' => false,
@@ -777,10 +777,10 @@ $called_api = null;
 
 		$status_user = api_get_user($a, $item["author-link"]);
 
-		$status_user["protected"] = (($item["allow_cid"] != "") OR
-						($item["allow_gid"] != "") OR
-						($item["deny_cid"] != "") OR
-						($item["deny_gid"] != "") OR
+		$status_user["protected"] = (($item["allow_cid"] != "") ||
+						($item["allow_gid"] != "") ||
+						($item["deny_cid"] != "") ||
+						($item["deny_gid"] != "") ||
 						$item["private"]);
 
 		if ($item['thr-parent'] == $item['uri']) {
@@ -1305,9 +1305,9 @@ $called_api = null;
 				$status_info["entities"] = $converted["entities"];
 			}
 
-			if (($lastwall['item_network'] != "") AND ($status["source"] == 'web')) {
+			if (($lastwall['item_network'] != "") && ($status["source"] == 'web')) {
 				$status_info["source"] = network_to_name($lastwall['item_network'], $user_info['url']);
-			} elseif (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $status_info["source"])) {
+			} elseif (($lastwall['item_network'] != "") && (network_to_name($lastwall['item_network'], $user_info['url']) != $status_info["source"])) {
 				$status_info["source"] = trim($status_info["source"].' ('.network_to_name($lastwall['item_network'], $user_info['url']).')');
 			}
 
@@ -1393,11 +1393,11 @@ $called_api = null;
 				$user_info["status"]["entities"] = $converted["entities"];
 			}
 
-			if (($lastwall['item_network'] != "") AND ($user_info["status"]["source"] == 'web')) {
+			if (($lastwall['item_network'] != "") && ($user_info["status"]["source"] == 'web')) {
 				$user_info["status"]["source"] = network_to_name($lastwall['item_network'], $user_info['url']);
 			}
 
-			if (($lastwall['item_network'] != "") AND (network_to_name($lastwall['item_network'], $user_info['url']) != $user_info["status"]["source"])) {
+			if (($lastwall['item_network'] != "") && (network_to_name($lastwall['item_network'], $user_info['url']) != $user_info["status"]["source"])) {
 				$user_info["status"]["source"] = trim($user_info["status"]["source"] . ' (' . network_to_name($lastwall['item_network'], $user_info['url']) . ')');
 			}
 
@@ -2289,11 +2289,11 @@ $called_api = null;
 			$statushtml = "<h4>" . bbcode($item['title']) . "</h4>\n" . $statushtml;
 		}
 
-		// feeds without body should contain the link 
-		if (($item['network'] == NETWORK_FEED) && (strlen($item['body']) == 0)) { 
-			$statushtml .= bbcode($item['plink']); 
-		} 
-		
+		// feeds without body should contain the link
+		if (($item['network'] == NETWORK_FEED) && (strlen($item['body']) == 0)) {
+			$statushtml .= bbcode($item['plink']);
+		}
+
 		$entities = api_get_entitities($statustext, $body);
 
 		return array(
@@ -2402,8 +2402,8 @@ $called_api = null;
 		$offset = 0;
 		//foreach ($urls[1] AS $id=>$url) {
 		foreach ($ordered_urls AS $url) {
-			if ((substr($url["title"], 0, 7) != "http://") AND (substr($url["title"], 0, 8) != "https://") AND
-				!strpos($url["title"], "http://") AND !strpos($url["title"], "https://"))
+			if ((substr($url["title"], 0, 7) != "http://") && (substr($url["title"], 0, 8) != "https://") &&
+				!strpos($url["title"], "http://") && !strpos($url["title"], "https://"))
 				$display_url = $url["title"];
 			else {
 				$display_url = str_replace(array("http://www.", "https://www."), array("", ""), $url["url"]);
@@ -2455,7 +2455,7 @@ $called_api = null;
 						$scale = scale_image($image[0], $image[1], 150);
 						$sizes["thumb"] = array("w" => $scale["width"], "h" => $scale["height"], "resize" => "fit");
 
-						if (($image[0] > 150) OR ($image[1] > 150)) {
+						if (($image[0] > 150) || ($image[1] > 150)) {
 							$scale = scale_image($image[0], $image[1], 340);
 							$sizes["small"] = array("w" => $scale["width"], "h" => $scale["height"], "resize" => "fit");
 						}
@@ -2463,7 +2463,7 @@ $called_api = null;
 						$scale = scale_image($image[0], $image[1], 600);
 						$sizes["medium"] = array("w" => $scale["width"], "h" => $scale["height"], "resize" => "fit");
 
-						if (($image[0] > 600) OR ($image[1] > 600)) {
+						if (($image[0] > 600) || ($image[1] > 600)) {
 							$scale = scale_image($image[0], $image[1], 1024);
 							$sizes["large"] = array("w" => $scale["width"], "h" => $scale["height"], "resize" => "fit");
 						}
@@ -2668,7 +2668,7 @@ $called_api = null;
 			list($status_user, $owner_user) = api_item_get_user($a, $item);
 
 			// Look if the posts are matching if they should be filtered by user id
-			if ($filter_user AND ($status_user["id"] != $user_info["id"])) {
+			if ($filter_user && ($status_user["id"] != $user_info["id"])) {
 				continue;
 			}
 
@@ -2712,9 +2712,9 @@ $called_api = null;
 				$status["entities"] = $converted["entities"];
 			}
 
-			if (($item['item_network'] != "") AND ($status["source"] == 'web')) {
+			if (($item['item_network'] != "") && ($status["source"] == 'web')) {
 				$status["source"] = network_to_name($item['item_network'], $user_info['url']);
-			} elseif (($item['item_network'] != "") AND (network_to_name($item['item_network'], $user_info['url']) != $status["source"])) {
+			} elseif (($item['item_network'] != "") && (network_to_name($item['item_network'], $user_info['url']) != $status["source"])) {
 				$status["source"] = trim($status["source"].' ('.network_to_name($item['item_network'], $user_info['url']).')');
 			}
 
@@ -2723,7 +2723,7 @@ $called_api = null;
 			// It doesn't work reliable with the link if its a feed
 			//$IsRetweet = ($item['owner-link'] != $item['author-link']);
 			//if ($IsRetweet)
-			//	$IsRetweet = (($item['owner-name'] != $item['author-name']) OR ($item['owner-avatar'] != $item['author-avatar']));
+			//	$IsRetweet = (($item['owner-name'] != $item['author-name']) || ($item['owner-avatar'] != $item['author-avatar']));
 
 
 			if ($item["id"] == $item["parent"]) {
@@ -3022,7 +3022,7 @@ $called_api = null;
 
 		if (api_user() === false) throw new ForbiddenException();
 
-		if (!x($_POST, "text") OR (!x($_POST,"screen_name") AND !x($_POST,"user_id"))) return;
+		if (!x($_POST, "text") || (!x($_POST,"screen_name") && !x($_POST,"user_id"))) return;
 
 		$sender = api_get_user($a);
 
@@ -4334,7 +4334,7 @@ $called_api = null;
 		$in_reply_to['user_id_str'] = NULL;
 		$in_reply_to['screen_name'] = NULL;
 
-		if (($item['thr-parent'] != $item['uri']) AND (intval($item['parent']) != intval($item['id']))) {
+		if (($item['thr-parent'] != $item['uri']) && (intval($item['parent']) != intval($item['id']))) {
 			$r = q("SELECT `id` FROM `item` WHERE `uid` = %d AND `uri` = '%s' LIMIT 1",
 				intval($item['uid']),
 				dbesc($item['thr-parent']));
@@ -4415,7 +4415,7 @@ $called_api = null;
 		if (isset($data["text"]))
 			$body = $data["text"];
 
-		if (($body == "") AND (isset($data["title"])))
+		if (($body == "") && (isset($data["title"])))
 			$body = $data["title"];
 
 		if (isset($data["url"]))

@@ -15,7 +15,7 @@ function update_network_content(App $a) {
 	echo "<!DOCTYPE html><html><body>\r\n";
 	echo "<section>";
 
-	if (!get_pconfig($profile_uid, "system", "no_auto_update") OR ($_GET["force"] == 1)) {
+	if (!get_pconfig($profile_uid, "system", "no_auto_update") || ($_GET["force"] == 1)) {
 		$text = network_content($a, $profile_uid);
 	} else {
 		$text = "";

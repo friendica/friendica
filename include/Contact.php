@@ -262,33 +262,33 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 		$profile = $default;
 	}
 
-	if (($profile["photo"] == "") AND isset($default["photo"])) {
+	if (($profile["photo"] == "") && isset($default["photo"])) {
 		$profile["photo"] = $default["photo"];
 	}
 
-	if (($profile["name"] == "") AND isset($default["name"])) {
+	if (($profile["name"] == "") && isset($default["name"])) {
 		$profile["name"] = $default["name"];
 	}
 
-	if (($profile["network"] == "") AND isset($default["network"])) {
+	if (($profile["network"] == "") && isset($default["network"])) {
 		$profile["network"] = $default["network"];
 	}
 
-	if (($profile["thumb"] == "") AND isset($profile["photo"])) {
+	if (($profile["thumb"] == "") && isset($profile["photo"])) {
 		$profile["thumb"] = $profile["photo"];
 	}
 
-	if (($profile["micro"] == "") AND isset($profile["thumb"])) {
+	if (($profile["micro"] == "") && isset($profile["thumb"])) {
 		$profile["micro"] = $profile["thumb"];
 	}
 
-	if ((($profile["addr"] == "") OR ($profile["name"] == "")) AND ($profile["gid"] != 0) AND
+	if ((($profile["addr"] == "") || ($profile["name"] == "")) && ($profile["gid"] != 0) &&
 		in_array($profile["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
 		proc_run(PRIORITY_LOW, "include/update_gcontact.php", $profile["gid"]);
 	}
 
 	// Show contact details of Diaspora contacts only if connected
-	if (($profile["cid"] == 0) AND ($profile["network"] == NETWORK_DIASPORA)) {
+	if (($profile["cid"] == 0) && ($profile["network"] == NETWORK_DIASPORA)) {
 		$profile["location"] = "";
 		$profile["about"] = "";
 		$profile["gender"] = "";
@@ -559,7 +559,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		// Update the contact every 7 days
 		$update_photo = ($contacts[0]['avatar-date'] < datetime_convert('','','now -7 days'));
 
-		if (!$update_photo OR $no_update) {
+		if (!$update_photo || $no_update) {
 			return $contact_id;
 		}
 	} elseif ($uid != 0) {
@@ -636,7 +636,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		}
 	}
 
-	if (count($contacts) > 1 AND $uid == 0 AND $contact_id != 0 AND $url != "") {
+	if (count($contacts) > 1 && $uid == 0 && $contact_id != 0 && $url != "") {
 		q("DELETE FROM `contact` WHERE `nurl` = '%s' AND `id` != %d AND NOT `self`",
 			dbesc(normalise_link($url)),
 			intval($contact_id));
@@ -654,9 +654,9 @@ function get_contact($url, $uid = 0, $no_update = false) {
 	}
 
 	// Only update if there had something been changed
-	if ($data["addr"] != $contacts[0]["addr"] OR
-		$data["alias"] != $contacts[0]["alias"] OR
-		$data["name"] != $contacts[0]["name"] OR
+	if ($data["addr"] != $contacts[0]["addr"] ||
+		$data["alias"] != $contacts[0]["alias"] ||
+		$data["name"] != $contacts[0]["name"] ||
 		$data["nick"] != $contacts[0]["nick"]) {
 		q("UPDATE `contact` SET `addr` = '%s', `alias` = '%s', `name` = '%s', `nick` = '%s',
 			`name-date` = '%s', `uri-date` = '%s' WHERE `id` = %d",
@@ -769,16 +769,18 @@ function formatted_location($profile) {
 	if ($profile['locality'])
 		$location .= $profile['locality'];
 
-	if ($profile['region'] AND ($profile['locality'] != $profile['region'])) {
-		if ($location)
+	if ($profile['region'] && ($profile['locality'] != $profile['region'])) {
+		if ($location) {
 			$location .= ', ';
+		}
 
 		$location .= $profile['region'];
 	}
 
 	if ($profile['country-name']) {
-		if ($location)
+		if ($location) {
 			$location .= ', ';
+		}
 
 		$location .= $profile['country-name'];
 	}
@@ -803,18 +805,21 @@ function account_type($contact) {
 		|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_PRVGROUP))
 		|| (isset($contact['forum']) && intval($contact['forum']))
 		|| (isset($contact['prv']) && intval($contact['prv']))
-		|| (isset($contact['community']) && intval($contact['community'])))
+		|| (isset($contact['community']) && intval($contact['community']))) {
 		$type = ACCOUNT_TYPE_COMMUNITY;
-	else
+	} else {
 		$type = ACCOUNT_TYPE_PERSON;
+	}
 
 	// The "contact-type" (contact table) and "account-type" (user table) are more general then the chaos from above.
-	if (isset($contact["contact-type"]))
+	if (isset($contact["contact-type"])) {
 		$type = $contact["contact-type"];
-	if (isset($contact["account-type"]))
+	}
+	if (isset($contact["account-type"])) {
 		$type = $contact["account-type"];
+	}
 
-	switch($type) {
+	switch ($type) {
 		case ACCOUNT_TYPE_ORGANISATION:
 			$account_type = t("Organisation");
 			break;

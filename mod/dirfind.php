@@ -37,7 +37,7 @@ function dirfind_content(App $a, $prefix = "") {
 	if (strpos($search,'@') === 0) {
 		$search = substr($search,1);
 		$header = sprintf( t('People Search - %s'), $search);
-		if ((valid_email($search) AND validate_email($search)) OR
+		if ((valid_email($search) && validate_email($search)) ||
 			(substr(normalise_link($search), 0, 7) == "http://")) {
 			$user_data = probe_url($search);
 			$discover_user = (in_array($user_data["network"], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA)));
@@ -75,7 +75,7 @@ function dirfind_content(App $a, $prefix = "") {
 			$j->results[] = $objresult;
 
 			// Add the contact to the global contacts if it isn't already in our system
-			if (($contact["cid"] == 0) AND ($contact["zid"] == 0) AND ($contact["gid"] == 0)) {
+			if (($contact["cid"] == 0) && ($contact["zid"] == 0) && ($contact["gid"] == 0)) {
 				update_gcontact($user_data);
 			}
 		} elseif ($local) {

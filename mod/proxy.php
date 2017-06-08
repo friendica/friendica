@@ -48,15 +48,15 @@ function proxy_init(App $a) {
 	$basepath = $a->get_basepath();
 
 	// If the cache path isn't there, try to create it
-	if (!is_dir($basepath . '/proxy') AND is_writable($basepath)) {
+	if (!is_dir($basepath . '/proxy') && is_writable($basepath)) {
 		mkdir($basepath . '/proxy');
 	}
 
 	// Checking if caching into a folder in the webroot is activated and working
-	$direct_cache = (is_dir($basepath . '/proxy') AND is_writable($basepath . '/proxy'));
+	$direct_cache = (is_dir($basepath . '/proxy') && is_writable($basepath . '/proxy'));
 
 	// Look for filename in the arguments
-	if ((isset($a->argv[1]) OR isset($a->argv[2]) OR isset($a->argv[3])) AND !isset($_REQUEST['url'])) {
+	if ((isset($a->argv[1]) || isset($a->argv[2]) || isset($a->argv[3])) && !isset($_REQUEST['url'])) {
 		if (isset($a->argv[3])) {
 			$url = $a->argv[3];
 		} elseif (isset($a->argv[2])) {
@@ -65,7 +65,7 @@ function proxy_init(App $a) {
 			$url = $a->argv[1];
 		}
 
-		if (isset($a->argv[3]) AND ($a->argv[3] == 'thumb')) {
+		if (isset($a->argv[3]) && ($a->argv[3] == 'thumb')) {
 			$size = 200;
 		}
 
@@ -112,7 +112,7 @@ function proxy_init(App $a) {
 		$urlhash = 'pic:' . sha1($_REQUEST['url']);
 
 		$cachefile = get_cachefile(hash('md5', $_REQUEST['url']));
-		if ($cachefile != '' AND file_exists($cachefile)) {
+		if ($cachefile != '' && file_exists($cachefile)) {
 			$img_str = file_get_contents($cachefile);
 			$mime = image_type_to_mime_type(exif_imagetype($cachefile));
 
@@ -140,7 +140,7 @@ function proxy_init(App $a) {
 	$valid = true;
 	$r = array();
 
-	if (!$direct_cache AND ($cachefile == '')) {
+	if (!$direct_cache && ($cachefile == '')) {
 		$r = qu("SELECT * FROM `photo` WHERE `resource-id` = '%s' LIMIT 1", $urlhash);
 		if (dbm::is_result($r)) {
 			$img_str = $r[0]['data'];
@@ -163,7 +163,7 @@ function proxy_init(App $a) {
 		unlink($tempfile);
 
 		// If there is an error then return a blank image
-		if ((substr($a->get_curl_code(), 0, 1) == '4') OR (!$img_str)) {
+		if ((substr($a->get_curl_code(), 0, 1) == '4') || (!$img_str)) {
 			$img_str = file_get_contents('images/blank.png');
 			$mime = 'image/png';
 			$cachefile = ''; // Clear the cachefile so that the dummy isn't stored
@@ -173,7 +173,7 @@ function proxy_init(App $a) {
 				$img->scaleImage(10);
 				$img_str = $img->imageString();
 			}
-		} elseif ($mime != 'image/jpeg' AND !$direct_cache AND $cachefile == '') {
+		} elseif ($mime != 'image/jpeg' && !$direct_cache && $cachefile == '') {
 			$image = @imagecreatefromstring($img_str);
 
 			if ($image === FALSE) {
@@ -199,7 +199,7 @@ function proxy_init(App $a) {
 
 		} else {
 			$img = new Photo($img_str, $mime);
-			if ($img->is_valid() AND !$direct_cache AND ($cachefile == '')) {
+			if ($img->is_valid() && !$direct_cache && ($cachefile == '')) {
 				$img->store(0, 0, $urlhash, $_REQUEST['url'], '', 100);
 			}
 		}
@@ -219,7 +219,7 @@ function proxy_init(App $a) {
 	// If there is a real existing directory then put the cache file there
 	// advantage: real file access is really fast
 	// Otherwise write in cachefile
-	if ($valid AND $direct_cache) {
+	if ($valid && $direct_cache) {
 		file_put_contents($basepath . '/proxy/' . proxy_url($_REQUEST['url'], true), $img_str_orig);
 		if ($sizetype != '') {
 			file_put_contents($basepath . '/proxy/' . proxy_url($_REQUEST['url'], true) . $sizetype, $img_str);
@@ -282,7 +282,7 @@ function proxy_url($url, $writemode = false, $size = '') {
 	$shortpath = hash('md5', $url);
 	$longpath = substr($shortpath, 0, 2);
 
-	if (is_dir($basepath) AND $writemode AND !is_dir($basepath . '/' . $longpath)) {
+	if (is_dir($basepath) && $writemode && !is_dir($basepath . '/' . $longpath)) {
 		mkdir($basepath . '/' . $longpath);
 		chmod($basepath . '/' . $longpath, 0777);
 	}
@@ -306,7 +306,7 @@ function proxy_url($url, $writemode = false, $size = '') {
 
 	// Too long files aren't supported by Apache
 	// Writemode in combination with long files shouldn't be possible
-	if ((strlen($proxypath) > 250) AND $writemode) {
+	if ((strlen($proxypath) > 250) && $writemode) {
 		return $shortpath;
 	} elseif (strlen($proxypath) > 250) {
 		return App::get_baseurl() . '/proxy/' . $shortpath . '?url=' . urlencode($url);
@@ -360,7 +360,7 @@ function proxy_parse_query($url) {
 function proxy_img_cb($matches) {
 	// if the picture seems to be from another picture cache then take the original source
 	$queryvar = proxy_parse_query($matches[2]);
-	if (($queryvar['url'] != '') AND (substr($queryvar['url'], 0, 4) == 'http')) {
+	if (($queryvar['url'] != '') && (substr($queryvar['url'], 0, 4) == 'http')) {
 		$matches[2] = urldecode($queryvar['url']);
 	}
 

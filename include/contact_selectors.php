@@ -100,7 +100,7 @@ function network_to_name($s, $profile = "") {
 
 	$networkname = str_replace($search, $replace, $s);
 
-	if ((in_array($s, array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) AND ($profile != "")) {
+	if ((in_array($s, array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) && ($profile != "")) {
 		$r = q("SELECT `gserver`.`platform` FROM `gcontact`
 				INNER JOIN `gserver` ON `gserver`.`nurl` = `gcontact`.`server_url`
 				WHERE `gcontact`.`nurl` = '%s' AND `platform` != ''",

@@ -151,7 +151,7 @@ class Config {
 
 		$stored = self::get($family, $key, null, true);
 
-		if (($stored === $dbvalue) AND self::$in_db[$family][$key]) {
+		if (($stored === $dbvalue) && self::$in_db[$family][$key]) {
 			return true;
 		}
 
@@ -167,7 +167,7 @@ class Config {
 		// manage array value
 		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
 
-		if (is_null($stored) OR !self::$in_db[$family][$key]) {
+		if (is_null($stored) || !self::$in_db[$family][$key]) {
 			$ret = q("INSERT INTO `config` (`cat`, `k`, `v`) VALUES ('%s', '%s', '%s') ON DUPLICATE KEY UPDATE `v` = '%s'",
 				dbesc($family),
 				dbesc($key),

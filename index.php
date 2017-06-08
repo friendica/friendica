@@ -59,15 +59,15 @@ if (!$install) {
 
 	Config::load();
 
-	if ($a->max_processes_reached() OR $a->maxload_reached()) {
+	if ($a->max_processes_reached() || $a->maxload_reached()) {
 		header($_SERVER["SERVER_PROTOCOL"] . ' 503 Service Temporarily Unavailable');
 		header('Retry-After: 120');
 		header('Refresh: 120; url=' . App::get_baseurl() . "/" . $a->query_string);
 		die("System is currently unavailable. Please try again later");
 	}
 
-	if (get_config('system', 'force_ssl') AND ($a->get_scheme() == "http") AND
-		(intval(get_config('system', 'ssl_policy')) == SSL_POLICY_FULL) AND
+	if (get_config('system', 'force_ssl') && ($a->get_scheme() == "http") &&
+		(intval(get_config('system', 'ssl_policy')) == SSL_POLICY_FULL) &&
 		(substr(App::get_baseurl(), 0, 8) == "https://")) {
 		header("HTTP/1.1 302 Moved Temporarily");
 		header("Location: " . App::get_baseurl() . "/" . $a->query_string);
@@ -128,7 +128,7 @@ if ((x($_SESSION,'language')) && ($_SESSION['language'] !== $lang)) {
 if ((x($_GET,'zrl')) && (!$install && !$maintenance)) {
 	// Only continue when the given profile link seems valid
 	// Valid profile links contain a path with "/profile/" and no query parameters
-	if ((parse_url($_GET['zrl'], PHP_URL_QUERY) == "") AND
+	if ((parse_url($_GET['zrl'], PHP_URL_QUERY) == "") &&
 		strstr(parse_url($_GET['zrl'], PHP_URL_PATH), "/profile/")) {
 		$_SESSION['my_url'] = $_GET['zrl'];
 		$a->query_string = preg_replace('/[\?&]zrl=(.*?)([\?&]|$)/is','',$a->query_string);
@@ -245,7 +245,7 @@ if (strlen($a->module)) {
 	}
 
 	// Compatibility with the Firefox App
-	if (($a->module == "users") AND ($a->cmd == "users/sign_in")) {
+	if (($a->module == "users") && ($a->cmd == "users/sign_in")) {
 		$a->module = "login";
 	}
 
@@ -450,7 +450,7 @@ if (!$a->theme['stylesheet']) {
 $a->page['htmlhead'] = str_replace('{{$stylesheet}}',$stylesheet,$a->page['htmlhead']);
 //$a->page['htmlhead'] = replace_macros($a->page['htmlhead'], array('$stylesheet' => $stylesheet));
 
-if (isset($_GET["mode"]) AND (($_GET["mode"] == "raw") OR ($_GET["mode"] == "minimal"))) {
+if (isset($_GET["mode"]) && (($_GET["mode"] == "raw") || ($_GET["mode"] == "minimal"))) {
 	$doc = new DOMDocument();
 
 	$target = new DOMDocument();
@@ -473,7 +473,7 @@ if (isset($_GET["mode"]) AND (($_GET["mode"] == "raw") OR ($_GET["mode"] == "min
 	}
 }
 
-if (isset($_GET["mode"]) AND ($_GET["mode"] == "raw")) {
+if (isset($_GET["mode"]) && ($_GET["mode"] == "raw")) {
 
 	header("Content-type: text/html; charset=utf-8");
 

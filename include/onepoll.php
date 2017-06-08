@@ -68,7 +68,7 @@ function onepoll_run(&$argv, &$argc){
 	$contact = $contacts[0];
 
 	// load current friends if possible.
-	if (($contact['poco'] != "") AND ($contact['success_update'] > $contact['failure_update'])) {
+	if (($contact['poco'] != "") && ($contact['success_update'] > $contact['failure_update'])) {
 		$r = q("SELECT count(*) as total from glink
 			where `cid` = %d and updated > UTC_TIMESTAMP() - INTERVAL 1 DAY",
 			intval($contact['id'])
@@ -395,7 +395,7 @@ function onepoll_run(&$argv, &$argc){
 							logger("Mail: Seen before ".$msg_uid." for ".$mailconf[0]['user']." UID: ".$importer_uid." URI: ".$datarray['uri'],LOGGER_DEBUG);
 
 							// Only delete when mails aren't automatically moved or deleted
-							if (($mailconf[0]['action'] != 1) AND ($mailconf[0]['action'] != 3))
+							if (($mailconf[0]['action'] != 1) && ($mailconf[0]['action'] != 3))
 								if ($meta->deleted && ! $r[0]['deleted']) {
 									q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `id` = %d",
 										dbesc(datetime_convert()),

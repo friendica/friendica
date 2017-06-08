@@ -712,7 +712,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 					$profile_link = zrl($profile_link);
 				}
 
-				if (!x($item, 'author-thumb') OR ($item['author-thumb'] == "")) {
+				if (!x($item, 'author-thumb') || ($item['author-thumb'] == "")) {
 					$author_contact = get_contact_details_by_url($item['author-link'], $profile_owner);
 					if ($author_contact["thumb"]) {
 						$item['author-thumb'] = $author_contact["thumb"];
@@ -721,7 +721,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 					}
 				}
 
-				if (!isset($item['owner-thumb']) OR ($item['owner-thumb'] == "")) {
+				if (!isset($item['owner-thumb']) || ($item['owner-thumb'] == "")) {
 					$owner_contact = get_contact_details_by_url($item['owner-link'], $profile_owner);
 					if ($owner_contact["thumb"]) {
 						$item['owner-thumb'] = $owner_contact["thumb"];
@@ -1013,7 +1013,7 @@ function item_photo_menu($item) {
 			$menu[t("Poke")] = $poke_link;
 		}
 
-		if ((($cid == 0) OR ($rel == CONTACT_IS_FOLLOWER)) AND
+		if ((($cid == 0) || ($rel == CONTACT_IS_FOLLOWER)) &&
 			in_array($item['network'], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA))) {
 			$menu[t('Connect/Follow')] = 'follow?url=' . urlencode($item['author-link']);
 		}

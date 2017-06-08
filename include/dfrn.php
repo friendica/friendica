@@ -245,7 +245,7 @@ class dfrn {
 		/// @TODO This hook can't work anymore
 		//	call_hooks('atom_feed', $atom);
 
-		if (!dbm::is_result($items) OR $onlyheader) {
+		if (!dbm::is_result($items) || $onlyheader) {
 			$atom = trim($doc->saveXML());
 
 			call_hooks('atom_feed_end', $atom);
@@ -564,7 +564,7 @@ class dfrn {
 
 		$attributes = array();
 
-		if (!$public OR !$hidewall) {
+		if (!$public || !$hidewall) {
 			$attributes = array("dfrn:updated" => $namdate);
 		}
 
@@ -575,7 +575,7 @@ class dfrn {
 		$attributes = array("rel" => "photo", "type" => "image/jpeg",
 					"media:width" => 175, "media:height" => 175, "href" => $owner['photo']);
 
-		if (!$public OR !$hidewall) {
+		if (!$public || !$hidewall) {
 			$attributes["dfrn:updated"] = $picdate;
 		}
 
@@ -977,7 +977,7 @@ class dfrn {
 
 		if (count($tags)) {
 			foreach ($tags as $t) {
-				if (($type != 'html') OR ($t[0] != "@")) {
+				if (($type != 'html') || ($t[0] != "@")) {
 					xml::add_element($doc, $entry, "category", "", array("scheme" => "X-DFRN:".$t[0].":".$t[1], "term" => $t[2]));
 				}
 			}
@@ -996,7 +996,7 @@ class dfrn {
 				intval($owner["uid"]),
 				dbesc(normalise_link($mention)));
 
-			if (dbm::is_result($r) AND ($r[0]["forum"] OR $r[0]["prv"])) {
+			if (dbm::is_result($r) && ($r[0]["forum"] || $r[0]["prv"])) {
 				xml::add_element($doc, $entry, "link", "", array("rel" => "mentioned",
 											"ostatus:object-type" => ACTIVITY_OBJ_GROUP,
 											"href" => $mention));
@@ -1379,7 +1379,7 @@ class dfrn {
 					$contact["avatar-date"] = $attributes->textContent;
 				}
 			}
-			if (($width > 0) AND ($href != "")) {
+			if (($width > 0) && ($href != "")) {
 				$avatarlist[$width] = $href;
 			}
 		}
@@ -1388,7 +1388,7 @@ class dfrn {
 			$author["avatar"] = current($avatarlist);
 		}
 
-		if (dbm::is_result($r) AND !$onlyfetch) {
+		if (dbm::is_result($r) && !$onlyfetch) {
 			logger("Check if contact details for contact " . $r[0]["id"] . " (" . $r[0]["nick"] . ") have to be updated.", LOGGER_DEBUG);
 
 			$poco = array("url" => $contact["url"]);
@@ -1830,7 +1830,7 @@ class dfrn {
 		$relocate["poll"] = $xpath->query("dfrn:poll/text()", $relocation)->item(0)->nodeValue;
 		$relocate["sitepubkey"] = $xpath->query("dfrn:sitepubkey/text()", $relocation)->item(0)->nodeValue;
 
-		if (($relocate["avatar"] == "") AND ($relocate["photo"] != "")) {
+		if (($relocate["avatar"] == "") && ($relocate["photo"] != "")) {
 			$relocate["avatar"] = $relocate["photo"];
 		}
 
@@ -1978,7 +1978,7 @@ class dfrn {
 		}
 
 		// update last-child if it changes
-		if ($item["last-child"] AND ($item["last-child"] != $current["last-child"])) {
+		if ($item["last-child"] && ($item["last-child"] != $current["last-child"])) {
 			$r = q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 				dbesc(datetime_convert()),
 				dbesc($item["parent-uri"]),
@@ -2262,7 +2262,7 @@ class dfrn {
 					$title = $attributes->textContent;
 				}
 			}
-			if (($rel != "") AND ($href != "")) {
+			if (($rel != "") && ($href != "")) {
 				switch ($rel) {
 					case "alternate":
 						$item["plink"] = $href;
@@ -2310,7 +2310,7 @@ class dfrn {
 		);
 
 		// Is there an existing item?
-		if (dbm::is_result($current) AND edited_timestamp_is_newer($current[0], $item) AND
+		if (dbm::is_result($current) && edited_timestamp_is_newer($current[0], $item) &&
 			(datetime_convert("UTC","UTC",$item["edited"]) < $current[0]["edited"])) {
 			logger("Item ".$item["uri"]." already existed.", LOGGER_DEBUG);
 			return;
@@ -2384,7 +2384,7 @@ class dfrn {
 		}
 
 		$notice_info = $xpath->query("statusnet:notice_info", $entry);
-		if ($notice_info AND ($notice_info->length > 0)) {
+		if ($notice_info && ($notice_info->length > 0)) {
 			foreach ($notice_info->item(0)->attributes AS $attributes) {
 				if ($attributes->name == "source") {
 					$item["app"] = strip_tags($attributes->textContent);
@@ -2434,9 +2434,9 @@ class dfrn {
 					}
 				}
 
-				if (($term != "") AND ($scheme != "")) {
+				if (($term != "") && ($scheme != "")) {
 					$parts = explode(":", $scheme);
-					if ((count($parts) >= 4) AND (array_shift($parts) == "X-DFRN")) {
+					if ((count($parts) >= 4) && (array_shift($parts) == "X-DFRN")) {
 						$termhash = array_shift($parts);
 						$termurl = implode(":", $parts);
 
@@ -2496,7 +2496,7 @@ class dfrn {
 				$item["contact-id"] = $owner["contact-id"];
 			}
 
-			if (($item["network"] != $owner["network"]) AND ($owner["network"] != "")) {
+			if (($item["network"] != $owner["network"]) && ($owner["network"] != "")) {
 				$item["network"] = $owner["network"];
 			}
 
@@ -2504,7 +2504,7 @@ class dfrn {
 				$item["contact-id"] = $author["contact-id"];
 			}
 
-			if (($item["network"] != $author["network"]) AND ($author["network"] != "")) {
+			if (($item["network"] != $author["network"]) && ($author["network"] != "")) {
 				$item["network"] = $author["network"];
 			}
 
@@ -2604,7 +2604,7 @@ class dfrn {
 					);
 				}
 
-				if ($posted_id AND $parent AND ($entrytype == DFRN_REPLY_RC)) {
+				if ($posted_id && $parent && ($entrytype == DFRN_REPLY_RC)) {
 					logger("Notifying followers about comment ".$posted_id, LOGGER_DEBUG);
 					proc_run(PRIORITY_HIGH, "include/notifier.php", "comment-import", $posted_id);
 				}
@@ -2669,7 +2669,7 @@ class dfrn {
 			$when = datetime_convert("UTC", "UTC", "now", "Y-m-d H:i:s");
 		}
 
-		if (!$uri OR !$importer["id"]) {
+		if (!$uri || !$importer["id"]) {
 			return false;
 		}
 

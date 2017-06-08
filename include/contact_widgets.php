@@ -51,7 +51,7 @@ function unavailable_networks() {
 		$networks[] = NETWORK_APPNET;
 	}
 
-	if (!plugin_enabled("fbpost") AND !plugin_enabled("facebook")) {
+	if (!plugin_enabled("fbpost") && !plugin_enabled("facebook")) {
 		$networks[] = NETWORK_FACEBOOK;
 	}
 

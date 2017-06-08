@@ -68,7 +68,7 @@ class Lock {
 
 					// When the process id isn't used anymore, we can safely claim the lock for us.
 					// Or we do want to lock something that was already locked by us.
-					if (!posix_kill($pid, 0) OR ($pid == getmypid())) {
+					if (!posix_kill($pid, 0) || ($pid == getmypid())) {
 						$lock = false;
 					}
 				}
@@ -76,10 +76,10 @@ class Lock {
 					$memcache->set($cachekey, getmypid(), MEMCACHE_COMPRESSED, 300);
 					$got_lock = true;
 				}
-				if (!$got_lock AND ($timeout > 0)) {
+				if (!$got_lock && ($timeout > 0)) {
 					usleep($wait_sec * 1000000);
 				}
-			} while (!$got_lock AND ((time() - $start) < $timeout));
+			} while (!$got_lock && ((time() - $start) < $timeout));
 
 			return $got_lock;
 		}
@@ -112,10 +112,10 @@ class Lock {
 
 			dba::unlock();
 
-			if (!$got_lock AND ($timeout > 0)) {
+			if (!$got_lock && ($timeout > 0)) {
 				sleep($wait_sec);
 			}
-		} while (!$got_lock AND ((time() - $start) < $timeout));
+		} while (!$got_lock && ((time() - $start) < $timeout));
 
 		return $got_lock;
 	}

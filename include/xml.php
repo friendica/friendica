@@ -51,7 +51,7 @@ class xml {
 		}
 
 		foreach ($array as $key => $value) {
-			if (!isset($element) AND isset($xml)) {
+			if (!isset($element) && isset($xml)) {
 				$element = $xml;
 			}
 
@@ -67,7 +67,7 @@ class xml {
 			}
 
 			$element_parts = explode(":", $key);
-			if ((count($element_parts) > 1) AND isset($namespaces[$element_parts[0]])) {
+			if ((count($element_parts) > 1) && isset($namespaces[$element_parts[0]])) {
 				$namespace = $namespaces[$element_parts[0]];
 			} elseif (isset($namespaces[""])) {
 				$namespace = $namespaces[""];
@@ -76,18 +76,18 @@ class xml {
 			}
 
 			// Remove undefined namespaces from the key
-			if ((count($element_parts) > 1) AND is_null($namespace)) {
+			if ((count($element_parts) > 1) && is_null($namespace)) {
 				$key = $element_parts[1];
 			}
 
 			if (substr($key, 0, 11) == "@attributes") {
-				if (!isset($element) OR !is_array($value)) {
+				if (!isset($element) || !is_array($value)) {
 					continue;
 				}
 
 				foreach ($value as $attr_key => $attr_value) {
 					$element_parts = explode(":", $attr_key);
-					if ((count($element_parts) > 1) AND isset($namespaces[$element_parts[0]])) {
+					if ((count($element_parts) > 1) && isset($namespaces[$element_parts[0]])) {
 						$namespace = $namespaces[$element_parts[0]];
 					} else {
 						$namespace = NULL;
@@ -399,7 +399,7 @@ class xml {
 
 	/**
 	 * @brief Delete a node in a XML object
-	 * 
+	 *
 	 * @param object $doc XML document
 	 * @param string $node Node name
 	 */

@@ -406,7 +406,7 @@ class App {
 				$this->hostname = Config::get('config', 'hostname');
 			}
 
-			if (!isset($this->hostname) OR ( $this->hostname == '')) {
+			if (!isset($this->hostname) || ( $this->hostname == '')) {
 				$this->hostname = $hostname;
 			}
 		}
@@ -850,7 +850,7 @@ class App {
 			$meminfo[$key] = (int) ($meminfo[$key] / 1024);
 		}
 
-		if (!isset($meminfo['MemAvailable']) OR ! isset($meminfo['MemFree'])) {
+		if (!isset($meminfo['MemAvailable']) || ! isset($meminfo['MemFree'])) {
 			return false;
 		}
 
@@ -907,7 +907,7 @@ class App {
 		$cachekey = 'app:proc_run:started';
 		$result = Cache::get($cachekey);
 
-		if (!is_null($result) AND ( time() - $result) < 2) {
+		if (!is_null($result) && ( time() - $result) < 2) {
 			return;
 		}
 
@@ -949,7 +949,7 @@ class App {
 	 * @return string system username
 	 */
 	static function systemuser() {
-		if (!function_exists('posix_getpwuid') OR ! function_exists('posix_geteuid')) {
+		if (!function_exists('posix_getpwuid') || ! function_exists('posix_geteuid')) {
 			return '';
 		}
 
@@ -980,7 +980,7 @@ class App {
 			logger('Path "' . $directory . '" is not a directory for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}
-		if ($check_writable AND !is_writable($directory)) {
+		if ($check_writable && !is_writable($directory)) {
 			logger('Path "' . $directory . '" is not writable for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}

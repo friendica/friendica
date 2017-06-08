@@ -293,7 +293,7 @@ function paginate_data(App $a, $count = null) {
 	$stripped = trim($stripped, '/');
 	$pagenum = $a->pager['page'];
 
-	if (($a->page_offset != '') AND !preg_match('/[?&].offset=/', $stripped)) {
+	if (($a->page_offset != '') && !preg_match('/[?&].offset=/', $stripped)) {
 		$stripped .= '&offset=' . urlencode($a->page_offset);
 	}
 
@@ -1276,8 +1276,8 @@ function redir_private_images($a, &$item)
 
 function put_item_in_cache(&$item, $update = false) {
 
-	if (($item["rendered-hash"] != hash("md5", $item["body"])) OR ($item["rendered-hash"] == "") OR
-		($item["rendered-html"] == "") OR get_config("system", "ignore_cache")) {
+	if (($item["rendered-hash"] != hash("md5", $item["body"])) || ($item["rendered-hash"] == "") ||
+		($item["rendered-html"] == "") || get_config("system", "ignore_cache")) {
 
 		// The function "redir_private_images" changes the body.
 		// I'm not sure if we should store it permanently, so we save the old value.
@@ -1290,7 +1290,7 @@ function put_item_in_cache(&$item, $update = false) {
 		$item["rendered-hash"] = hash("md5", $item["body"]);
 		$item["body"] = $body;
 
-		if ($update AND ($item["id"] != 0)) {
+		if ($update && ($item["id"] != 0)) {
 			q("UPDATE `item` SET `rendered-html` = '%s', `rendered-hash` = '%s' WHERE `id` = %d",
 				dbesc($item["rendered-html"]), dbesc($item["rendered-hash"]), intval($item["id"]));
 		}
@@ -1352,7 +1352,7 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 	$update = (!local_user() and !remote_user() and ($item["uid"] == 0));
 
 	// Or update it if the current viewer is the intented viewer
-	if (($item["uid"] == local_user()) AND ($item["uid"] != 0)) {
+	if (($item["uid"] == local_user()) && ($item["uid"] != 0)) {
 		$update = true;
 	}
 

@@ -339,7 +339,7 @@ function delivery_run(&$argv, &$argc){
 
 						// If we are setup as a soapbox we aren't accepting top level posts from this person
 
-						if (($x[0]['page-flags'] == PAGE_SOAPBOX) AND $top_level) {
+						if (($x[0]['page-flags'] == PAGE_SOAPBOX) && $top_level) {
 							break;
 						}
 						logger('mod-delivery: local delivery');
@@ -462,14 +462,14 @@ function delivery_run(&$argv, &$argc){
 								dbesc($it['parent-uri']),
 								intval($uid));
 
-							if (dbm::is_result($r) AND ($r[0]['title'] != '')) {
+							if (dbm::is_result($r) && ($r[0]['title'] != '')) {
 								$subject = $r[0]['title'];
 							} else {
 								$r = q("SELECT `title` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d LIMIT 1",
 									dbesc($it['parent-uri']),
 									intval($uid));
 
-								if (dbm::is_result($r) AND ($r[0]['title'] != ''))
+								if (dbm::is_result($r) && ($r[0]['title'] != ''))
 									$subject = $r[0]['title'];
 							}
 						}

@@ -17,7 +17,7 @@ function noscrape_init(App $a) {
 
 	profile_load($a,$which,$profile);
 
-	if (!$a->profile['net-publish'] OR $a->profile['hidewall']) {
+	if (!$a->profile['net-publish'] || $a->profile['hidewall']) {
 		header('Content-type: application/json; charset=utf-8');
 		$json_info = array("hide" => true);
 		echo json_encode($json_info);
@@ -42,7 +42,7 @@ function noscrape_init(App $a) {
 		'tags'     => $keywords
 	);
 
-	if (is_array($a->profile) AND !$a->profile['hide-friends']) {
+	if (is_array($a->profile) && !$a->profile['hide-friends']) {
 		$r = q("SELECT `gcontact`.`updated` FROM `contact` INNER JOIN `gcontact` WHERE `gcontact`.`nurl` = `contact`.`nurl` AND `self` AND `uid` = %d LIMIT 1",
 			intval($a->profile['uid']));
 		if (dbm::is_result($r)) {

@@ -46,7 +46,7 @@ if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MA
 	$cached_etag = str_replace(array('"', "-gzip"), array('', ''),
 				stripslashes($_SERVER['HTTP_IF_NONE_MATCH']));
 
-	if (($cached_modified == $modified) AND ($cached_etag == $etag)) {
+	if (($cached_modified == $modified) && ($cached_etag == $etag)) {
 		header('HTTP/1.1 304 Not Modified');
 		exit();
 	}

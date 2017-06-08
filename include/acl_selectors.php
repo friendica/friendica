@@ -209,7 +209,7 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 
 	$tabindex = ($tabindex > 0 ? "tabindex=\"$tabindex\"" : "");
 
-	if ($privmail AND $preselected) {
+	if ($privmail && $preselected) {
 		$sql_extra .= " AND `id` IN (".implode(",", $preselected).")";
 		$hidepreselected = ' style="display: none;"';
 	} else {
@@ -261,7 +261,7 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 
 	$o .= "</select>\r\n";
 
-	if ($privmail AND $preselected) {
+	if ($privmail && $preselected) {
 		$o .= implode(", ", $receiverlist);
 	}
 

@@ -22,7 +22,7 @@ function group_add($uid,$name) {
 					intval($uid),
 					dbesc($name)
 				);
-				notice( t('A deleted group with this name was revived. Existing item permissions <strong>may</strong> apply to this group and any future members. If this is not what you intended, please create another group with a different name.') . EOL); 
+				notice( t('A deleted group with this name was revived. Existing item permissions <strong>may</strong> apply to this group and any future members. If this is not what you intended, please create another group with a different name.') . EOL);
 			}
 			return true;
 		}
@@ -320,7 +320,7 @@ function expand_groups($a,$check_dead = false, $use_gcontact = false) {
 	if (dbm::is_result($r))
 		foreach ($r as $rr)
 			$ret[] = $rr['contact-id'];
-	if ($check_dead AND !$use_gcontact) {
+	if ($check_dead && !$use_gcontact) {
 		require_once('include/acl_selectors.php');
 		$ret = prune_deadguys($ret);
 	}

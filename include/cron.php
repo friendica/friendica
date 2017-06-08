@@ -186,7 +186,7 @@ function cron_poll_contacts($argc, $argv) {
 				$contact['priority'] = 2;
 			}
 
-			if ($contact['subhub'] AND in_array($contact['network'], array(NETWORK_DFRN, NETWORK_ZOT, NETWORK_OSTATUS))) {
+			if ($contact['subhub'] && in_array($contact['network'], array(NETWORK_DFRN, NETWORK_ZOT, NETWORK_OSTATUS))) {
 				/*
 				 * We should be getting everything via a hub. But just to be sure, let's check once a day.
 				 * (You can make this more or less frequent if desired by setting 'pushpoll_frequency' appropriately)
@@ -197,7 +197,7 @@ function cron_poll_contacts($argc, $argv) {
 				$contact['priority'] = (($poll_interval !== false) ? intval($poll_interval) : 3);
 			}
 
-			if (($contact['priority'] >= 0) AND !$force) {
+			if (($contact['priority'] >= 0) && !$force) {
 				$update = false;
 
 				$t = $contact['last-update'];
@@ -245,7 +245,7 @@ function cron_poll_contacts($argc, $argv) {
 
 			logger("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact["nick"] . " " . $contact["name"]);
 
-			if (($contact['network'] == NETWORK_FEED) AND ($contact['priority'] <= 3)) {
+			if (($contact['network'] == NETWORK_FEED) && ($contact['priority'] <= 3)) {
 				$priority = PRIORITY_MEDIUM;
 			} else {
 				$priority = PRIORITY_LOW;

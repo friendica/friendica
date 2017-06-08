@@ -993,7 +993,7 @@ function notice($s) {
 function info($s) {
 	$a = get_app();
 
-	if (local_user() AND get_pconfig(local_user(), 'system', 'ignore_info')) {
+	if (local_user() && get_pconfig(local_user(), 'system', 'ignore_info')) {
 		return;
 	}
 
@@ -1063,7 +1063,7 @@ function proc_run($cmd) {
 	$arr = array('args' => $args, 'run_cmd' => true);
 
 	call_hooks("proc_run", $arr);
-	if (!$arr['run_cmd'] OR ! count($args)) {
+	if (!$arr['run_cmd'] || ! count($args)) {
 		return;
 	}
 
@@ -1407,7 +1407,7 @@ function clear_cache($basepath = "", $path = "") {
 		$path = $basepath;
 	}
 
-	if (($path == "") OR (!is_dir($path))) {
+	if (($path == "") || (!is_dir($path))) {
 		return;
 	}
 
@@ -1444,7 +1444,7 @@ function get_itemcachepath() {
 	}
 
 	$itemcache = get_config('system', 'itemcache');
-	if (($itemcache != "") AND App::directory_usable($itemcache)) {
+	if (($itemcache != "") && App::directory_usable($itemcache)) {
 		return $itemcache;
 	}
 
@@ -1471,7 +1471,7 @@ function get_itemcachepath() {
  */
 function get_spoolpath() {
 	$spoolpath = get_config('system', 'spoolpath');
-	if (($spoolpath != "") AND App::directory_usable($spoolpath)) {
+	if (($spoolpath != "") && App::directory_usable($spoolpath)) {
 		// We have a spool path and it is usable
 		return $spoolpath;
 	}
@@ -1506,7 +1506,7 @@ function get_temppath() {
 
 	$temppath = get_config("system", "temppath");
 
-	if (($temppath != "") AND App::directory_usable($temppath)) {
+	if (($temppath != "") && App::directory_usable($temppath)) {
 		// We have a temp path and it is usable
 		return $temppath;
 	}
@@ -1515,7 +1515,7 @@ function get_temppath() {
 	$temppath = sys_get_temp_dir();
 
 	// Check if it is usable
-	if (($temppath != "") AND App::directory_usable($temppath)) {
+	if (($temppath != "") && App::directory_usable($temppath)) {
 		// To avoid any interferences with other systems we create our own directory
 		$new_temppath = $temppath . "/" . $a->get_hostname();
 		if (!is_dir($new_temppath)) {
@@ -1638,7 +1638,7 @@ function argv($x) {
 function infinite_scroll_data($module) {
 
 	if (get_pconfig(local_user(), 'system', 'infinite_scroll')
-		AND ($module == "network") AND ($_GET["mode"] != "minimal")) {
+		&& ($module == "network") && ($_GET["mode"] != "minimal")) {
 
 		// get the page number
 		if (is_string($_GET["page"])) {
@@ -1651,12 +1651,12 @@ function infinite_scroll_data($module) {
 
 		// try to get the uri from which we load the content
 		foreach ($_GET AS $param => $value) {
-			if (($param != "page") AND ($param != "q")) {
+			if (($param != "page") && ($param != "q")) {
 				$reload_uri .= "&" . $param . "=" . urlencode($value);
 			}
 		}
 
-		if (($a->page_offset != "") AND ! strstr($reload_uri, "&offset=")) {
+		if (($a->page_offset != "") && ! strstr($reload_uri, "&offset=")) {
 			$reload_uri .= "&offset=" . urlencode($a->page_offset);
 		}
 

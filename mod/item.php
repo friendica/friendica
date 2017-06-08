@@ -139,8 +139,8 @@ function item_post(App $a) {
 
 			// If the contact id doesn't fit with the contact, then set the contact to null
 			$thrparent = q("SELECT `author-link`, `network` FROM `item` WHERE `uri` = '%s' LIMIT 1", dbesc($thr_parent));
-			if (dbm::is_result($thrparent) AND ($thrparent[0]["network"] === NETWORK_OSTATUS)
-				AND (normalise_link($parent_contact["url"]) != normalise_link($thrparent[0]["author-link"]))) {
+			if (dbm::is_result($thrparent) && ($thrparent[0]["network"] === NETWORK_OSTATUS)
+				&& (normalise_link($parent_contact["url"]) != normalise_link($thrparent[0]["author-link"]))) {
 				$parent_contact = get_contact_details_by_url($thrparent[0]["author-link"]);
 
 				if (!isset($parent_contact["nick"])) {
@@ -175,7 +175,7 @@ function item_post(App $a) {
 	$object      = ((x($_REQUEST, 'object'))      ? $_REQUEST['object']              : '');
 
 	// Check for multiple posts with the same message id (when the post was created via API)
-	if (($message_id != '') AND ($profile_uid != 0)) {
+	if (($message_id != '') && ($profile_uid != 0)) {
 		$r = q("SELECT * FROM `item` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
 			dbesc($message_id),
 			intval($profile_uid)
@@ -309,8 +309,8 @@ function item_post(App $a) {
 
 			// for non native networks use the network of the original post as network of the item
 			if (($parent_item['network'] != NETWORK_DIASPORA)
-				AND ($parent_item['network'] != NETWORK_OSTATUS)
-				AND ($network == "")) {
+				&& ($parent_item['network'] != NETWORK_OSTATUS)
+				&& ($network == "")) {
 				$network = $parent_item['network'];
 			}
 
@@ -504,7 +504,7 @@ function item_post(App $a) {
 
 	$bookmark = 0;
 	$data = get_attachment_data($body);
-	if (preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $body, $match, PREG_SET_ORDER) OR isset($data["type"])) {
+	if (preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $body, $match, PREG_SET_ORDER) || isset($data["type"])) {
 		$objecttype = ACTIVITY_OBJ_BOOKMARK;
 		$bookmark = 1;
 	}
@@ -543,7 +543,7 @@ function item_post(App $a) {
 	 * add a statusnet style reply tag if the original post was from there
 	 * and we are replying, and there isn't one already
 	 */
-	if ($parent AND ($parent_contact['network'] == NETWORK_OSTATUS)) {
+	if ($parent && ($parent_contact['network'] == NETWORK_OSTATUS)) {
 		$contact = '@[url=' . $parent_contact['url'] . ']' . $parent_contact['nick'] . '[/url]';
 
 		if (!in_array($contact, $tags)) {
@@ -1226,7 +1226,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 
 			// select someone by attag or nick and the name passed in the current network
-			if(!dbm::is_result($r) AND ($network != ""))
+			if(!dbm::is_result($r) && ($network != ""))
 				$r = q("SELECT `id`, `url`, `nick`, `name`, `alias`, `network` FROM `contact` WHERE `attag` = '%s' OR `nick` = '%s' AND `network` = '%s' AND `uid` = %d ORDER BY `attag` DESC LIMIT 1",
 						dbesc($name),
 						dbesc($name),
@@ -1235,7 +1235,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 				);
 
 			//select someone from this user's contacts by name in the current network
-			if (!dbm::is_result($r) AND ($network != "")) {
+			if (!dbm::is_result($r) && ($network != "")) {
 				$r = q("SELECT `id`, `url`, `nick`, `name`, `alias`, `network` FROM `contact` WHERE `name` = '%s' AND `network` = '%s' AND `uid` = %d LIMIT 1",
 						dbesc($name),
 						dbesc($network),
@@ -1262,7 +1262,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 		}
 
 		if (dbm::is_result($r)) {
-			if (strlen($inform) AND (isset($r[0]["notify"]) OR isset($r[0]["id"]))) {
+			if (strlen($inform) && (isset($r[0]["notify"]) || isset($r[0]["id"]))) {
 				$inform .= ',';
 			}
 
@@ -1275,14 +1275,14 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			$profile = $r[0]["url"];
 			$alias   = $r[0]["alias"];
 			$newname = $r[0]["nick"];
-			if (($newname == "") OR (($r[0]["network"] != NETWORK_OSTATUS) AND ($r[0]["network"] != NETWORK_TWITTER)
-				AND ($r[0]["network"] != NETWORK_STATUSNET) AND ($r[0]["network"] != NETWORK_APPNET))) {
+			if (($newname == "") || (($r[0]["network"] != NETWORK_OSTATUS) && ($r[0]["network"] != NETWORK_TWITTER)
+				&& ($r[0]["network"] != NETWORK_STATUSNET) && ($r[0]["network"] != NETWORK_APPNET))) {
 				$newname = $r[0]["name"];
 			}
 		}
 
 		//if there is an url for this persons profile
-		if (isset($profile) AND ($newname != "")) {
+		if (isset($profile) && ($newname != "")) {
 
 			$replaced = true;
 			// create profile link

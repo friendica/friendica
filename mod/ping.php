@@ -330,10 +330,10 @@ function ping_init(App $a)
 
 		if (dbm::is_result($notifs)) {
 			// Are the nofications called from the regular process or via the friendica app?
-			$regularnotifications = (intval($_GET['uid']) AND intval($_GET['_']));
+			$regularnotifications = (intval($_GET['uid']) && intval($_GET['_']));
 
 			foreach ($notifs as $notif) {
-				if ($a->is_friendica_app() OR !$regularnotifications) {
+				if ($a->is_friendica_app() || !$regularnotifications) {
 					$notif['message'] = str_replace("{0}", $notif['name'], $notif['message']);
 				}
 
@@ -434,7 +434,7 @@ function ping_get_notifications($uid)
 			intval($offset)
 		);
 
-		if (!$r AND !$seen) {
+		if (!$r && !$seen) {
 			$seen = true;
 			$seensql = "";
 			$order = "DESC";
@@ -474,12 +474,12 @@ function ping_get_notifications($uid)
 
 			$notification["href"] = App::get_baseurl() . "/notify/view/" . $notification["id"];
 
-			if ($notification["visible"] AND !$notification["spam"] AND
-				!$notification["deleted"] AND !is_array($result[$notification["parent"]])) {
+			if ($notification["visible"] && !$notification["spam"] &&
+				!$notification["deleted"] && !is_array($result[$notification["parent"]])) {
 				$result[$notification["parent"]] = $notification;
 			}
 		}
-	} while ((count($result) < 50) AND !$quit);
+	} while ((count($result) < 50) && !$quit);
 
 	return($result);
 }

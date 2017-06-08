@@ -13,7 +13,7 @@ function spool_post_run($argv, $argc) {
 
 	$path = get_spoolpath();
 
-	if (($path != '') AND is_writable($path)){
+	if (($path != '') && is_writable($path)){
 		if ($dh = opendir($path)) {
 			while (($file = readdir($dh)) !== false) {
 
@@ -30,7 +30,7 @@ function spool_post_run($argv, $argc) {
 				}
 
 				// We can't read or write the file? So we don't care about it.
-				if (!is_writable($fullfile) OR !is_readable($fullfile)) {
+				if (!is_writable($fullfile) || !is_readable($fullfile)) {
 					continue;
 				}
 
@@ -42,7 +42,7 @@ function spool_post_run($argv, $argc) {
 				}
 
 				// Skip if it doesn't seem to be an item array
-				if (!isset($arr['uid']) AND !isset($arr['uri']) AND !isset($arr['network'])) {
+				if (!isset($arr['uid']) && !isset($arr['uri']) && !isset($arr['network'])) {
 					continue;
 				}
 

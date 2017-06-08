@@ -55,7 +55,7 @@ function poco_init(App $a) {
 		$cid = intval($a->argv[4]);
 	}
 
-	if (! $system_mode AND ! $global) {
+	if (! $system_mode && ! $global) {
 		$users = q("SELECT `user`.*,`profile`.`hide-friends` from user left join profile on `user`.`uid` = `profile`.`uid`
 			where `user`.`nickname` = '%s' and `profile`.`is-default` = 1 limit 1",
 			dbesc($user)
@@ -157,7 +157,7 @@ function poco_init(App $a) {
 	if (x($_GET, 'filtered')) {
 		$ret['filtered'] = false;
 	}
-	if (x($_GET, 'updatedSince') AND ! $global) {
+	if (x($_GET, 'updatedSince') && ! $global) {
 		$ret['updatedSince'] = false;
 	}
 	$ret['startIndex']   = (int) $startIndex;
@@ -207,21 +207,21 @@ function poco_init(App $a) {
 					}
 				}
 
-				if (($contact['about'] == "") AND isset($contact['pabout'])) {
+				if (($contact['about'] == "") && isset($contact['pabout'])) {
 					$contact['about'] = $contact['pabout'];
 				}
 				if ($contact['location'] == "") {
 					if (isset($contact['plocation'])) {
 						$contact['location'] = $contact['plocation'];
 					}
-					if (isset($contact['pregion']) AND ( $contact['pregion'] != "")) {
+					if (isset($contact['pregion']) && ( $contact['pregion'] != "")) {
 						if ($contact['location'] != "") {
 							$contact['location'] .= ", ";
 						}
 						$contact['location'] .= $contact['pregion'];
 					}
 
-					if (isset($contact['pcountry']) AND ( $contact['pcountry'] != "")) {
+					if (isset($contact['pcountry']) && ( $contact['pcountry'] != "")) {
 						if ($contact['location'] != "") {
 							$contact['location'] .= ", ";
 						}
@@ -229,10 +229,10 @@ function poco_init(App $a) {
 					}
 				}
 
-				if (($contact['gender'] == "") AND isset($contact['pgender'])) {
+				if (($contact['gender'] == "") && isset($contact['pgender'])) {
 					$contact['gender'] = $contact['pgender'];
 				}
-				if (($contact['keywords'] == "") AND isset($contact['pub_keywords'])) {
+				if (($contact['keywords'] == "") && isset($contact['pub_keywords'])) {
 					$contact['keywords'] = $contact['pub_keywords'];
 				}
 				if (isset($contact['account-type'])) {
@@ -306,7 +306,7 @@ function poco_init(App $a) {
 					if ($entry['network'] == NETWORK_STATUSNET) {
 						$entry['network'] = NETWORK_OSTATUS;
 					}
-					if (($entry['network'] == "") AND ($contact['self'])) {
+					if (($entry['network'] == "") && ($contact['self'])) {
 						$entry['network'] = NETWORK_DFRN;
 					}
 				}

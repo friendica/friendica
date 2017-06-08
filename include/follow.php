@@ -30,10 +30,10 @@ function update_contact($id) {
 
 	// make sure to not overwrite existing values with blank entries
 	foreach ($ret AS $key => $val) {
-		if (isset($r[0][$key]) AND ($r[0][$key] != "") AND ($val == ""))
+		if (isset($r[0][$key]) && ($r[0][$key] != "") && ($val == ""))
 			$ret[$key] = $r[0][$key];
 
-		if (isset($r[0][$key]) AND ($ret[$key] != $r[0][$key]))
+		if (isset($r[0][$key]) && ($ret[$key] != $r[0][$key]))
 			$update = true;
 	}
 

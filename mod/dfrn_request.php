@@ -626,7 +626,7 @@ function dfrn_request_post(App $a) {
 			);
 			// NOTREACHED
 			// END $network === NETWORK_DFRN
-		} elseif (($network != NETWORK_PHANTOM) AND ($url != "")) {
+		} elseif (($network != NETWORK_PHANTOM) && ($url != "")) {
 
 			/*
 			 *
@@ -693,7 +693,7 @@ function dfrn_request_content(App $a) {
 		$confirm_key = (x($_GET,'confirm_key') ? $_GET['confirm_key'] : "");
 
 		// Checking fastlane for validity
-		if (x($_SESSION, "fastlane") AND (normalise_link($_SESSION["fastlane"]) == normalise_link($dfrn_url))) {
+		if (x($_SESSION, "fastlane") && (normalise_link($_SESSION["fastlane"]) == normalise_link($dfrn_url))) {
 			$_POST["dfrn_url"] = $dfrn_url;
 			$_POST["confirm_key"] = $confirm_key;
 			$_POST["localconfirm"] = 1;
@@ -813,9 +813,9 @@ function dfrn_request_content(App $a) {
 
 		// At first look if an address was provided
 		// Otherwise take the local address
-		if (x($_GET,'addr') AND ($_GET['addr'] != "")) {
+		if (x($_GET,'addr') && ($_GET['addr'] != "")) {
 			$myaddr = hex2bin($_GET['addr']);
-		} elseif (x($_GET,'address') AND ($_GET['address'] != "")) {
+		} elseif (x($_GET,'address') && ($_GET['address'] != "")) {
 			$myaddr = $_GET['address'];
 		} elseif (local_user()) {
 			if (strlen($a->path)) {

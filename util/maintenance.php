@@ -24,7 +24,7 @@ if ($argc > 1) {
 
 Config::set('system', 'maintenance', $maint_mode);
 
-if ($maint_mode AND ($argc > 2)) {
+if ($maint_mode && ($argc > 2)) {
 	$reason_arr = $argv;
 	array_shift($reason_arr);
 	array_shift($reason_arr);

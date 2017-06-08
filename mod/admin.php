@@ -770,7 +770,7 @@ function admin_page_site_post(App $a) {
 	$worker_frontend	=	((x($_POST,'worker_frontend'))		? True						: False);
 
 	// Has the directory url changed? If yes, then resubmit the existing profiles there
-	if ($global_directory != Config::get('system', 'directory') AND ($global_directory != '')) {
+	if ($global_directory != Config::get('system', 'directory') && ($global_directory != '')) {
 		Config::set('system', 'directory', $global_directory);
 		proc_run(PRIORITY_LOW, 'include/directory.php');
 	}
@@ -936,7 +936,7 @@ function admin_page_site(App $a) {
 	/* Installed langs */
 	$lang_choices = get_available_languages();
 
-	if (strlen(get_config('system','directory_submit_url')) AND
+	if (strlen(get_config('system','directory_submit_url')) &&
 		!strlen(get_config('system','directory'))) {
 			set_config('system','directory', dirname(get_config('system','directory_submit_url')));
 			del_config('system','directory_submit_url');
@@ -958,7 +958,7 @@ function admin_page_site(App $a) {
 			$f = basename($file);
 
 			// Only show allowed themes here
-			if (($allowed_theme_list != '') AND !strstr($allowed_theme_list, $f)) {
+			if (($allowed_theme_list != '') && !strstr($allowed_theme_list, $f)) {
 				continue;
 			}
 
@@ -1183,7 +1183,7 @@ function admin_page_dbsync(App $a) {
 		goaway('admin/dbsync');
 	}
 
-	if (($a->argc > 2) AND (intval($a->argv[2]) OR ($a->argv[2] === 'check'))) {
+	if (($a->argc > 2) && (intval($a->argv[2]) || ($a->argv[2] === 'check'))) {
 		require_once("include/dbstructure.php");
 		$retval = update_structure(false, true);
 		if (!$retval) {
@@ -1663,7 +1663,7 @@ function admin_page_plugins(App $a) {
 				$show_plugin = true;
 
 				// If the addon is unsupported, then only show it, when it is enabled
-				if ((strtolower($info["status"]) == "unsupported") AND !in_array($id,  $a->plugins)) {
+				if ((strtolower($info["status"]) == "unsupported") && !in_array($id,  $a->plugins)) {
 					$show_plugin = false;
 				}
 
@@ -1801,7 +1801,7 @@ function admin_page_themes(App $a) {
 			$is_supported = 1-(intval(file_exists($file.'/unsupported')));
 			$is_allowed = intval(in_array($f,$allowed_themes));
 
-			if ($is_allowed OR $is_supported OR get_config("system", "show_unsupported_themes")) {
+			if ($is_allowed || $is_supported || get_config("system", "show_unsupported_themes")) {
 				$themes[] = array('name' => $f, 'experimental' => $is_experimental, 'supported' => $is_supported, 'allowed' => $is_allowed);
 			}
 		}

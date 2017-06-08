@@ -158,7 +158,7 @@ class Item extends BaseObject {
 			$profile_link = zrl($profile_link);
 		}
 
-		if (!isset($item['author-thumb']) OR ($item['author-thumb'] == "")) {
+		if (!isset($item['author-thumb']) || ($item['author-thumb'] == "")) {
 			$author_contact = get_contact_details_by_url($item['author-link'], $conv->get_profile_owner());
 			if ($author_contact["thumb"]) {
 				$item['author-thumb'] = $author_contact["thumb"];
@@ -167,7 +167,7 @@ class Item extends BaseObject {
 			}
 		}
 
-		if (!isset($item['owner-thumb']) OR ($item['owner-thumb'] == "")) {
+		if (!isset($item['owner-thumb']) || ($item['owner-thumb'] == "")) {
 			$owner_contact = get_contact_details_by_url($item['owner-link'], $conv->get_profile_owner());
 			if ($owner_contact["thumb"]) {
 				$item['owner-thumb'] = $owner_contact["thumb"];
@@ -307,28 +307,28 @@ class Item extends BaseObject {
 		// Disable features that aren't available in several networks
 
 		/// @todo Add NETWORK_DIASPORA when it will pass this information
-		if (!in_array($item["item_network"], array(NETWORK_DFRN)) AND isset($buttons["dislike"])) {
+		if (!in_array($item["item_network"], array(NETWORK_DFRN)) && isset($buttons["dislike"])) {
 			unset($buttons["dislike"],$isevent);
 			$tagger = '';
 		}
 
-		if (($item["item_network"] == NETWORK_FEED) AND isset($buttons["like"])) {
+		if (($item["item_network"] == NETWORK_FEED) && isset($buttons["like"])) {
 			unset($buttons["like"]);
 		}
 
-		if (($item["item_network"] == NETWORK_MAIL) AND isset($buttons["like"])) {
+		if (($item["item_network"] == NETWORK_MAIL) && isset($buttons["like"])) {
 			unset($buttons["like"]);
 		}
 
  		// Diaspora isn't able to do likes on comments - but Hubzilla does
 		/// @todo When Diaspora will pass this information we will remove these lines
-		if (($item["item_network"] == NETWORK_DIASPORA) AND ($indent == 'comment') AND
-			!Diaspora::is_redmatrix($item["owner-link"]) AND isset($buttons["like"])) {
+		if (($item["item_network"] == NETWORK_DIASPORA) && ($indent == 'comment') &&
+			!Diaspora::is_redmatrix($item["owner-link"]) && isset($buttons["like"])) {
 			unset($buttons["like"]);
 		}
 
 		// Facebook can like comments - but it isn't programmed in the connector yet.
-		if (($item["item_network"] == NETWORK_FACEBOOK) AND ($indent == 'comment') AND isset($buttons["like"])) {
+		if (($item["item_network"] == NETWORK_FACEBOOK) && ($indent == 'comment') && isset($buttons["like"])) {
 			unset($buttons["like"]);
 		}
 
@@ -733,7 +733,7 @@ class Item extends BaseObject {
 
 		if($this->is_toplevel()) {
 			if($conv->get_mode() !== 'profile') {
-				if($this->get_data_value('wall') AND !$this->get_data_value('self')) {
+				if($this->get_data_value('wall') && !$this->get_data_value('self')) {
 					// On the network page, I am the owner. On the display page it will be the profile owner.
 					// This will have been stored in $a->page_contact by our calling page.
 					// Put this person as the wall owner of the wall-to-wall notice.

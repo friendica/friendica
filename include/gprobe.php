@@ -47,7 +47,7 @@ function gprobe_run(&$argv, &$argc){
 	}
 	if (dbm::is_result($r)) {
 		// Check for accessibility and do a poco discovery
-		if (poco_last_updated($r[0]['url'], true) AND ($r[0]["network"] == NETWORK_DFRN))
+		if (poco_last_updated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN))
 			poco_load(0,0,$r[0]['id'], str_replace('/profile/','/poco/',$r[0]['url']));
 	}
 

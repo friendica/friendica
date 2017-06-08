@@ -54,7 +54,7 @@ function get_old_attachment_data($body) {
 
 				$picturedata = get_photo_info($matches[1]);
 
-				if (($picturedata[0] >= 500) AND ($picturedata[0] >= $picturedata[1]))
+				if (($picturedata[0] >= 500) && ($picturedata[0] >= $picturedata[1]))
 					$post["image"] = $matches[1];
 				else
 					$post["preview"] = $matches[1];
@@ -64,8 +64,8 @@ function get_old_attachment_data($body) {
 				$post["url"] = $matches[1];
 				$post["title"] = $matches[2];
 			}
-			if (($post["url"] == "") AND (in_array($post["type"], array("link", "video")))
-				AND preg_match("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", $attacheddata, $matches)) {
+			if (($post["url"] == "") && (in_array($post["type"], array("link", "video")))
+				&& preg_match("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", $attacheddata, $matches)) {
 				$post["url"] = $matches[1];
 			}
 
@@ -204,7 +204,7 @@ function get_attached_data($body) {
 				// Workaround:
 				// Sometimes photo posts to the own album are not detected at the start.
 				// So we seem to cannot use the cache for these cases. That's strange.
-				if (($data["type"] != "photo") AND strstr($pictures[0][1], "/photos/"))
+				if (($data["type"] != "photo") && strstr($pictures[0][1], "/photos/"))
 					$data = ParseUrl::getSiteinfo($pictures[0][1], true);
 
 				if ($data["type"] == "photo") {
@@ -256,7 +256,7 @@ function get_attached_data($body) {
 			$post["type"] = "text";
 			$post["text"] = trim($body);
 		}
-	} elseif (isset($post["url"]) AND ($post["type"] == "video")) {
+	} elseif (isset($post["url"]) && ($post["type"] == "video")) {
 		$data = ParseUrl::getSiteinfoCached($post["url"], true);
 
 		if (isset($data["images"][0]))
@@ -278,7 +278,7 @@ function shortenmsg($msg, $limit, $twitter = false) {
 		if (iconv_strlen(trim($msg."\n".$line), "UTF-8") <= $limit)
 			$msg = trim($msg."\n".$line);
 		// Is the new message empty by now or is it a reshared message?
-		elseif (($msg == "") OR (($row == 1) AND (substr($msg, 0, 4) == $recycle)))
+		elseif (($msg == "") || (($row == 1) && (substr($msg, 0, 4) == $recycle)))
 			$msg = iconv_substr(iconv_substr(trim($msg."\n".$line), 0, $limit, "UTF-8"), 0, -3, "UTF-8").$ellipsis;
 		else
 			break;
@@ -315,7 +315,7 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 	//$post = get_attached_data($b["body"]);
 	$post = get_attached_data($body);
 
-	if (($b["title"] != "") AND ($post["text"] != ""))
+	if (($b["title"] != "") && ($post["text"] != ""))
 		$post["text"] = trim($b["title"]."\n\n".$post["text"]);
 	elseif ($b["title"] != "")
 		$post["text"] = trim($b["title"]);
@@ -329,7 +329,7 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 
 		// If we post to a network with no limit we only fetch
 		// an abstract exactly for this network
-		if (($limit == 0) AND ($abstract == $default_abstract))
+		if (($limit == 0) && ($abstract == $default_abstract))
 			$abstract = "";
 
 	} else // Try to guess the correct target network
@@ -373,25 +373,25 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 		elseif ($post["type"] == "photo")
 			$link = $post["image"];
 
-		if (($msg == "") AND isset($post["title"]))
+		if (($msg == "") && isset($post["title"]))
 			$msg = trim($post["title"]);
 
-		if (($msg == "") AND isset($post["description"]))
+		if (($msg == "") && isset($post["description"]))
 			$msg = trim($post["description"]);
 
 		// If the link is already contained in the post, then it neeedn't to be added again
 		// But: if the link is beyond the limit, then it has to be added.
-		if (($link != "") AND strstr($msg, $link)) {
+		if (($link != "") && strstr($msg, $link)) {
 			$pos = strpos($msg, $link);
 
 			// Will the text be shortened in the link?
 			// Or is the link the last item in the post?
-			if (($limit > 0) AND ($pos < $limit) AND (($pos + 23 > $limit) OR ($pos + strlen($link) == strlen($msg))))
+			if (($limit > 0) && ($pos < $limit) && (($pos + 23 > $limit) || ($pos + strlen($link) == strlen($msg))))
 				$msg = trim(str_replace($link, "", $msg));
-			elseif (($limit == 0) OR ($pos < $limit)) {
+			elseif (($limit == 0) || ($pos < $limit)) {
 				// The limit has to be increased since it will be shortened - but not now
 				// Only do it with Twitter (htmlmode = 8)
-				if (($limit > 0) AND (strlen($link) > 23) AND ($htmlmode == 8))
+				if (($limit > 0) && (strlen($link) > 23) && ($htmlmode == 8))
 					$limit = $limit - 23 + strlen($link);
 
 				$link = "";
@@ -414,7 +414,7 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 
 		if (iconv_strlen($msg, "UTF-8") > $limit) {
 
-			if (($post["type"] == "text") AND isset($post["url"]))
+			if (($post["type"] == "text") && isset($post["url"]))
 				$post["url"] = $b["plink"];
 			elseif (!isset($post["url"])) {
 				$limit = $limit - 23;

@@ -84,7 +84,7 @@ function queue_run(&$argv, &$argc) {
 
 	$dead = Cache::get($cachekey_deadguy.$c[0]['notify']);
 
-	if (!is_null($dead) AND $dead) {
+	if (!is_null($dead) && $dead) {
 		logger('queue: skipping known dead url: '.$c[0]['notify']);
 		update_queue_time($q_item['id']);
 		return;
@@ -102,7 +102,7 @@ function queue_run(&$argv, &$argc) {
 			Cache::set($cachekey_server.$server, $vital, CACHE_QUARTER_HOUR);
 		}
 
-		if (!is_null($vital) AND !$vital) {
+		if (!is_null($vital) && !$vital) {
 			logger('queue: skipping dead server: '.$server);
 			update_queue_time($q_item['id']);
 			return;

@@ -398,7 +398,7 @@ function network_content(App $a, $update = 0) {
 	}
 	set_pconfig(local_user(), 'network.view', 'net.selected', ($nets ? $nets : 'all'));
 
-	if(!$update AND !$rawmode) {
+	if(!$update && !$rawmode) {
 		$tabs = network_tabs($a);
 		$o .= $tabs;
 
@@ -459,7 +459,7 @@ function network_content(App $a, $update = 0) {
 	$sql_table = "`thread`";
 	$sql_parent = "`iid`";
 
-	if ($nouveau OR strlen($file) OR $update) {
+	if ($nouveau || strlen($file) || $update) {
 		$sql_table = "`item`";
 		$sql_parent = "`parent`";
 		$sql_post_table = " INNER JOIN `thread` ON `thread`.`iid` = `item`.`parent`";

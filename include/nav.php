@@ -121,7 +121,7 @@ function nav_info(App $a)
 		$nav['apps'] = array('apps', t('Apps'), '', t('Addon applications, utilities, games'));
 	}
 
-	if (local_user() OR !get_config('system', 'local_search')) {
+	if (local_user() || !get_config('system', 'local_search')) {
 		$nav['search'] = array('search', t('Search'), '', t('Search site content'));
 
 		$nav['searchoption'] = array(

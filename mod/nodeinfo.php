@@ -25,12 +25,12 @@ function nodeinfo_init(App $a) {
 		killme();
 	}
 
-	if (($a->argc != 2) OR ($a->argv[1] != '1.0')) {
+	if (($a->argc != 2) || ($a->argv[1] != '1.0')) {
 		http_status_exit(404);
 		killme();
 	}
 
-	$smtp = (function_exists('imap_open') AND !Config::get('system', 'imap_disabled') AND !Config::get('system', 'dfrn_only'));
+	$smtp = (function_exists('imap_open') && !Config::get('system', 'imap_disabled') && !Config::get('system', 'dfrn_only'));
 
 	$nodeinfo = array();
 	$nodeinfo['version'] = '1.0';
@@ -74,7 +74,7 @@ function nodeinfo_init(App $a) {
 		if (plugin_enabled('appnet')) {
 			$nodeinfo['services']['inbound'][] = 'appnet';
 		}
-		if (plugin_enabled('appnet') OR plugin_enabled('buffer')) {
+		if (plugin_enabled('appnet') || plugin_enabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'appnet';
 		}
 		if (plugin_enabled('blogger')) {
@@ -83,7 +83,7 @@ function nodeinfo_init(App $a) {
 		if (plugin_enabled('dwpost')) {
 			$nodeinfo['services']['outbound'][] = 'dreamwidth';
 		}
-		if (plugin_enabled('fbpost') OR plugin_enabled('buffer')) {
+		if (plugin_enabled('fbpost') || plugin_enabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'facebook';
 		}
 		if (plugin_enabled('statusnet')) {
@@ -91,7 +91,7 @@ function nodeinfo_init(App $a) {
 			$nodeinfo['services']['outbound'][] = 'gnusocial';
 		}
 
-		if (plugin_enabled('gpluspost') OR plugin_enabled('buffer')) {
+		if (plugin_enabled('gpluspost') || plugin_enabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'google';
 		}
 		if (plugin_enabled('ijpost')) {
@@ -123,7 +123,7 @@ function nodeinfo_init(App $a) {
 		if (plugin_enabled('tumblr')) {
 			$nodeinfo['services']['outbound'][] = 'tumblr';
 		}
-		if (plugin_enabled('twitter') OR plugin_enabled('buffer')) {
+		if (plugin_enabled('twitter') || plugin_enabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'twitter';
 		}
 		if (plugin_enabled('wppost')) {
@@ -203,11 +203,11 @@ function nodeinfo_cron() {
 			$month = time() - (30 * 24 * 60 * 60);
 
 			foreach ($users AS $user) {
-				if ((strtotime($user['login_date']) > $halfyear) OR
+				if ((strtotime($user['login_date']) > $halfyear) ||
 					(strtotime($user['last-item']) > $halfyear)) {
 					++$active_users_halfyear;
 				}
-				if ((strtotime($user['login_date']) > $month) OR
+				if ((strtotime($user['login_date']) > $month) ||
 					(strtotime($user['last-item']) > $month)) {
 					++$active_users_monthly;
 				}

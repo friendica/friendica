@@ -119,7 +119,7 @@ function photo_init(App $a) {
 				intval($resolution)
 			);
 
-			$public = (dbm::is_result($r)) AND ($r[0]['allow_cid'] == '') AND ($r[0]['allow_gid'] == '') AND ($r[0]['deny_cid']  == '') AND ($r[0]['deny_gid']  == '');
+			$public = (dbm::is_result($r)) && ($r[0]['allow_cid'] == '') && ($r[0]['allow_gid'] == '') && ($r[0]['deny_cid']  == '') && ($r[0]['deny_gid']  == '');
 
 			if (dbm::is_result($r)) {
 				$resolution = $r[0]['scale'];

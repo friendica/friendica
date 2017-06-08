@@ -138,7 +138,7 @@ class PConfig {
 
 		$stored = self::get($uid, $family, $key, null, true);
 
-		if (($stored === $dbvalue) AND self::$in_db[$uid][$family][$key]) {
+		if (($stored === $dbvalue) && self::$in_db[$uid][$family][$key]) {
 			return true;
 		}
 
@@ -147,7 +147,7 @@ class PConfig {
 		// manage array value
 		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
 
-		if (is_null($stored) OR !self::$in_db[$uid][$family][$key]) {
+		if (is_null($stored) || !self::$in_db[$uid][$family][$key]) {
 			$ret = q("INSERT INTO `pconfig` (`uid`, `cat`, `k`, `v`) VALUES (%d, '%s', '%s', '%s') ON DUPLICATE KEY UPDATE `v` = '%s'",
 				intval($uid),
 				dbesc($family),
