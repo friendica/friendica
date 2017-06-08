@@ -64,6 +64,7 @@ Here's a few primers if you are new to Friendica or to the PSR-2 coding standard
  * By default, strings are enclosed in single quotes, but feel free to use double quotes if it makes more sense (SQL queries, adding tabs and line feeds).
  * Operators are wrapped by spaces, e.g. `$var === true`, `$var = 1 + 2` and `'string' . $concat . 'enation'`
  * Braces are mandatory in conditions
+ * Boolean operators are `&&` and `||` for PHP conditions, `AND` and `OR` for SQL queries
  * No closing PHP tag
  * No trailing spaces
 
