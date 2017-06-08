@@ -671,7 +671,6 @@ function poller_claim_process($queue) {
 
 	$success = dba::update('workerqueue', array('executed' => datetime_convert(), 'pid' => $mypid),
 			array('id' => $queue["id"], 'pid' => 0));
-	//dba::unlock();
 
 	if (!$success) {
 		logger("Couldn't update queue entry ".$queue["id"]." - skip this execution", LOGGER_DEBUG);
