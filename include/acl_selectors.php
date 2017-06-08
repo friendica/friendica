@@ -388,13 +388,9 @@ function populate_acl($user = null, $show_jotnets = false) {
 }
 
 function construct_acl_data(App $a, $user) {
-
-	$arr = array('user' => $user);
-	call_hooks('construct_acl_data', $arr);
-
-	if (isset($arr['cancel'])) {
-		return;
-	}
+	// This function is now deactivated. It seems as if the generated data isn't used anywhere.
+	// We will remove the function completely before the release of 3.5.3 when there won't be any issues.
+	return;
 
 	// Get group and contact information for html ACL selector
 	$acl_data = acl_lookup($a, 'html');

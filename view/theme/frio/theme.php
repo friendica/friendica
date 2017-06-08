@@ -48,7 +48,6 @@ function frio_install() {
 	register_hook('contact_photo_menu', 'view/theme/frio/theme.php', 'frio_contact_photo_menu');
 	register_hook('nav_info', 'view/theme/frio/theme.php', 'frio_remote_nav');
 	register_hook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
-	register_hook('construct_acl_data', 'view/theme/frio/theme.php', 'frio_construct_acl_data');
 
 	logger("installed theme frio");
 }
@@ -59,7 +58,6 @@ function frio_uninstall() {
 	unregister_hook('contact_photo_menu', 'view/theme/frio/theme.php', 'frio_contact_photo_menu');
 	unregister_hook('nav_info', 'view/theme/frio/theme.php', 'frio_remote_nav');
 	unregister_hook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
-	unregister_hook('construct_acl_data', 'view/theme/frio/theme.php', 'frio_construct_acl_data');
 
 	logger("uninstalled theme frio");
 }
@@ -322,16 +320,4 @@ function frio_acl_lookup(App $a, &$results) {
 		$results["items"] = $contacts;
 		$results["tot"] = $total;
 	}
-}
-
-/**
- * @brief: Deactivate the old style acl selector
- *
- * We don't need the old one for Frio. Deactivating makes page loading much faster
- *
- * @param App $a The app data @TODO Unused
- * @param array $arr We use this array to stop processing. See construct_acl_data in include/acl_selectors.php
- */
-function frio_construct_acl_data(App $a, &$arr) {
-	$arr['cancel'] = true;
 }
