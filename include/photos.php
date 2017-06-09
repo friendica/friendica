@@ -12,7 +12,7 @@ function getGps($exifCoord, $hemi) {
 	$minutes = count($exifCoord) > 1 ? gps2Num($exifCoord[1]) : 0;
 	$seconds = count($exifCoord) > 2 ? gps2Num($exifCoord[2]) : 0;
 
-	$flip = ($hemi == 'W' or $hemi == 'S') ? -1 : 1;
+	$flip = ($hemi == 'W' || $hemi == 'S') ? -1 : 1;
 
 	return floatval($flip * ($degrees + ($minutes / 60) + ($seconds / 3600)));
 }

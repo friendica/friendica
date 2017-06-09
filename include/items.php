@@ -143,7 +143,7 @@ function title_is_body($title, $body) {
 		$body = substr($body, 0, strlen($title));
 	}
 
-	if (($title != $body) and (substr($title, -3) == "...")) {
+	if (($title != $body) && (substr($title, -3) == "...")) {
 		$pos = strrpos($title, "...");
 		if ($pos > 0) {
 			$title = substr($title, 0, $pos);
@@ -1282,7 +1282,7 @@ function get_item_id($guid, $uid = 0) {
 	// Does the given user have this item?
 	if ($uid) {
 		$r = q("SELECT `item`.`id`, `user`.`nickname` FROM `item` INNER JOIN `user` ON `user`.`uid` = `item`.`uid`
-			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
+			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 AND `item`.`moderated` = 0
 				AND `item`.`guid` = '%s' AND `item`.`uid` = %d", dbesc($guid), intval($uid));
 		if (dbm::is_result($r)) {
 			$id = $r[0]["id"];
@@ -1293,7 +1293,7 @@ function get_item_id($guid, $uid = 0) {
 	// Or is it anywhere on the server?
 	if ($nick == "") {
 		$r = q("SELECT `item`.`id`, `user`.`nickname` FROM `item` INNER JOIN `user` ON `user`.`uid` = `item`.`uid`
-			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 and `item`.`moderated` = 0
+			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 AND `item`.`moderated` = 0
 				AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''
 				AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
 				AND `item`.`private` = 0 AND `item`.`wall` = 1

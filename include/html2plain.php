@@ -23,7 +23,7 @@ function breaklines($line, $level, $wraplength = 75)
 		if ($pos == 0)
 			$pos = strpos($line, ' ');
 
-		if (($pos > 0) and strlen($line) > $wraplen) {
+		if (($pos > 0) && strlen($line) > $wraplen) {
 			$newline = trim(substr($line, 0, $pos));
 			if ($level > 0)
                 		$newline = str_repeat(">", $level).' '.$newline;
@@ -32,7 +32,7 @@ function breaklines($line, $level, $wraplength = 75)
 			$line = substr($line, $pos+1);
 		}
 
-	} while ((strlen($line) > $wraplen) and !($oldline == $line));
+	} while ((strlen($line) > $wraplen) && !($oldline == $line));
 
 	if ($level > 0)
 		$line = str_repeat(">", $level).' '.$line;
@@ -70,7 +70,7 @@ function quotelevel($message, $wraplength = 75)
 			$line = substr($line, 0, $pos).substr($line, $pos+8);
 		}
 
-		if (!$startquote or ($line != ''))
+		if (!$startquote || ($line != ''))
 			$newlines[] = breaklines($line, $currlevel, $wraplength);
 	}
 	return(implode($newlines, "\n"));
@@ -92,13 +92,13 @@ function collecturls($message) {
 			if (strpos($treffer[1], $listitem) !== false)
 				$ignore = true;
 
-		if ((strpos($treffer[1], "//twitter.com/") !== false) and (strpos($treffer[1], "/status/") !== false))
+		if ((strpos($treffer[1], "//twitter.com/") !== false) && (strpos($treffer[1], "/status/") !== false))
 				$ignore = false;
 
-		if ((strpos($treffer[1], "//plus.google.com/") !== false) and (strpos($treffer[1], "/posts") !== false))
+		if ((strpos($treffer[1], "//plus.google.com/") !== false) && (strpos($treffer[1], "/posts") !== false))
 				$ignore = false;
 
-		if ((strpos($treffer[1], "//plus.google.com/") !== false) and (strpos($treffer[1], "/photos") !== false))
+		if ((strpos($treffer[1], "//plus.google.com/") !== false) && (strpos($treffer[1], "/photos") !== false))
 				$ignore = false;
 
 		if (!$ignore)

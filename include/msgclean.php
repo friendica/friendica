@@ -124,7 +124,7 @@ function removesig($message)
 
 	// Sollte sich der Signaturtrenner innerhalb eines Quotes befinden
 	// wird keine Signaturtrennung ausgefuehrt
-	if (($sigpos < $quotepos) and ($sigpos != 0))
+	if (($sigpos < $quotepos) && ($sigpos != 0))
 		return(array('body' => $message, 'sig' => ''));
 
 	/// @TODO Regexp umstellen, so dass auf 1 oder kein Leerzeichen
@@ -135,7 +135,7 @@ function removesig($message)
 
 	preg_match($pattern, $message, $result);
 
-	if (($result[1] != '') and ($result[2] != '')) {
+	if (($result[1] != '') && ($result[2] != '')) {
 		$cleaned = trim($result[1])."\n";
 		$sig = trim($result[2]);
 		//	'[hr][size=x-small][color=darkblue]'.trim($result[2]).'[/color][/size]';
@@ -157,8 +157,8 @@ function removelinebreak($message)
 	foreach ($arrbody as $i => $line) {
 		$currquotelevel = 0;
 		$currline = $line;
-		while ((strlen($currline)>0) and ((substr($currline, 0, 1) == '>')
- 			or (substr($currline, 0, 1) == ' '))) {
+		while ((strlen($currline)>0) && ((substr($currline, 0, 1) == '>')
+ 			|| (substr($currline, 0, 1) == ' '))) {
 			if (substr($currline, 0, 1) == '>')
 				$currquotelevel++;
 
@@ -167,8 +167,8 @@ function removelinebreak($message)
 
 		$quotelevel = 0;
 		$nextline = trim($arrbody[$i+1]);
-		while ((strlen($nextline)>0) and ((substr($nextline, 0, 1) == '>')
- 			or (substr($nextline, 0, 1) == ' '))) {
+		while ((strlen($nextline)>0) && ((substr($nextline, 0, 1) == '>')
+ 			|| (substr($nextline, 0, 1) == ' '))) {
 			if (substr($nextline, 0, 1) == '>')
 				$quotelevel++;
 
@@ -178,21 +178,21 @@ function removelinebreak($message)
 		$len = strlen($line);
 		$firstword = strpos($nextline.' ', ' ');
 
-		$specialchars = ((substr(trim($nextline), 0, 1) == '-') or
-				(substr(trim($nextline), 0, 1) == '=') or
-				(substr(trim($nextline), 0, 1) == '*') or
-				(substr(trim($nextline), 0, 1) == '·') or
-				(substr(trim($nextline), 0, 4) == '[url') or
-				(substr(trim($nextline), 0, 5) == '[size') or
-				(substr(trim($nextline), 0, 7) == 'http://') or
+		$specialchars = ((substr(trim($nextline), 0, 1) == '-') ||
+				(substr(trim($nextline), 0, 1) == '=') ||
+				(substr(trim($nextline), 0, 1) == '*') ||
+				(substr(trim($nextline), 0, 1) == '·') ||
+				(substr(trim($nextline), 0, 4) == '[url') ||
+				(substr(trim($nextline), 0, 5) == '[size') ||
+				(substr(trim($nextline), 0, 7) == 'http://') ||
 				(substr(trim($nextline), 0, 8) == 'https://'));
 
 		if (!$specialchars)
-			$specialchars = ((substr(rtrim($line), -1) == '-') or
-					(substr(rtrim($line), -1) == '=') or
-					(substr(rtrim($line), -1) == '*') or
-					(substr(rtrim($line), -1) == '·') or
-					(substr(rtrim($line), -6) == '[/url]') or
+			$specialchars = ((substr(rtrim($line), -1) == '-') ||
+					(substr(rtrim($line), -1) == '=') ||
+					(substr(rtrim($line), -1) == '*') ||
+					(substr(rtrim($line), -1) == '·') ||
+					(substr(rtrim($line), -6) == '[/url]') ||
 					(substr(rtrim($line), -7) == '[/size]'));
 
 		//if ($specialchars)
@@ -202,8 +202,8 @@ function removelinebreak($message)
 			if (substr($lines[$lineno], -1) != ' ')
 			$lines[$lineno] .= ' ';
 
-			while ((strlen($line)>0) and ((substr($line, 0, 1) == '>')
- 			or (substr($line, 0, 1) == ' '))) {
+			while ((strlen($line)>0) && ((substr($line, 0, 1) == '>')
+ 			|| (substr($line, 0, 1) == ' '))) {
 
 				$line = ltrim(substr($line, 1));
 			}
@@ -213,10 +213,10 @@ function removelinebreak($message)
 		//	$lines[$lineno] = $quotelevel.'-'.$len.'-'.$firstword.'-';
 
 		$lines[$lineno] .= $line;
-		//if ((($len + $firstword < 68) and (substr($line, -1, 1) != ' '))
-		//	or ($quotelevel != $currquotelevel) or $specialchars)
+		//if ((($len + $firstword < 68) && (substr($line, -1, 1) != ' '))
+		//	|| ($quotelevel != $currquotelevel) || $specialchars)
 		if (((substr($line, -1, 1) != ' '))
-			or ($quotelevel != $currquotelevel))
+			|| ($quotelevel != $currquotelevel))
 			$lineno++;
 	}
 	return(implode("\n", $lines));

@@ -1424,10 +1424,10 @@ function clear_cache($basepath = "", $path = "") {
 		if ($dh = opendir($path)) {
 			while (($file = readdir($dh)) !== false) {
 				$fullpath = $path . "/" . $file;
-				if ((filetype($fullpath) == "dir") and ($file != ".") and ($file != "..")) {
+				if ((filetype($fullpath) == "dir") && ($file != ".") && ($file != "..")) {
 					clear_cache($basepath, $fullpath);
 				}
-				if ((filetype($fullpath) == "file") and (filectime($fullpath) < (time() - $cachetime))) {
+				if ((filetype($fullpath) == "file") && (filectime($fullpath) < (time() - $cachetime))) {
 					unlink($fullpath);
 				}
 			}

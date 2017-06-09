@@ -115,7 +115,7 @@ function notification($params) {
 			dbesc($params['link']),
 			intval($params['uid'])
 		);
-		if ($p and count($p)) {
+		if ($p && count($p)) {
 			pop_lang();
 			return;
 		}

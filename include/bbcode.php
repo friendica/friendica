@@ -147,7 +147,7 @@ function cleancss($input) {
 	for ($i = 0; $i < strlen($input); $i++) {
 		$char = substr($input, $i, 1);
 
-		if (($char >= "a") and ($char <= "z")) {
+		if (($char >= "a") && ($char <= "z")) {
 			$cleaned .= $char;
 		}
 
@@ -1128,7 +1128,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 	// Check for [spoiler] text
 	// handle nested quotes
 	$endlessloop = 0;
-	while ((strpos($Text, "[/spoiler]") !== false) and (strpos($Text, "[spoiler]") !== false) and (++$endlessloop < 20)) {
+	while ((strpos($Text, "[/spoiler]") !== false) && (strpos($Text, "[spoiler]") !== false) && (++$endlessloop < 20)) {
 		$Text = preg_replace("/\[spoiler\](.*?)\[\/spoiler\]/ism", "$SpoilerLayout", $Text);
 	}
 
@@ -1138,7 +1138,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 
 	// handle nested quotes
 	$endlessloop = 0;
-	while ((strpos($Text, "[/spoiler]")!== false)  and (strpos($Text, "[spoiler=") !== false) and (++$endlessloop < 20)) {
+	while ((strpos($Text, "[/spoiler]")!== false)  && (strpos($Text, "[spoiler=") !== false) && (++$endlessloop < 20)) {
 		$Text = preg_replace("/\[spoiler=[\"\']*(.*?)[\"\']*\](.*?)\[\/spoiler\]/ism",
 				     "<br /><strong class=".'"spoiler"'.">" . $t_wrote . "</strong><blockquote class=".'"spoiler"'.">$2</blockquote>",
 				     $Text);
@@ -1150,7 +1150,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 	// Check for [quote] text
 	// handle nested quotes
 	$endlessloop = 0;
-	while ((strpos($Text, "[/quote]") !== false) and (strpos($Text, "[quote]") !== false) and (++$endlessloop < 20)) {
+	while ((strpos($Text, "[/quote]") !== false) && (strpos($Text, "[quote]") !== false) && (++$endlessloop < 20)) {
 		$Text = preg_replace("/\[quote\](.*?)\[\/quote\]/ism", "$QuoteLayout", $Text);
 	}
 
@@ -1160,7 +1160,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 
 	// handle nested quotes
 	$endlessloop = 0;
-	while ((strpos($Text, "[/quote]")!== false)  and (strpos($Text, "[quote=") !== false) and (++$endlessloop < 20)) {
+	while ((strpos($Text, "[/quote]")!== false)  && (strpos($Text, "[quote=") !== false) && (++$endlessloop < 20)) {
 		$Text = preg_replace("/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
 				     "<br /><strong class=".'"author"'.">" . $t_wrote . "</strong><blockquote>$2</blockquote>",
 				     $Text);

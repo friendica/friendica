@@ -949,7 +949,7 @@ function settings_content(App $a) {
 				$is_experimental = file_exists('view/theme/' . $th . '/experimental');
 				$unsupported = file_exists('view/theme/' . $th . '/unsupported');
 				$is_mobile = file_exists('view/theme/' . $th . '/mobile');
-				if (!$is_experimental or ($is_experimental && (get_config('experimentals','exp_themes')==1 or get_config('experimentals','exp_themes')===false))){
+				if (!$is_experimental || ($is_experimental && (get_config('experimentals','exp_themes')==1 || get_config('experimentals','exp_themes')===false))){
 					$theme_name = (($is_experimental) ?  sprintf("%s - \x28Experimental\x29", $f) : $f);
 					if ($is_mobile) {
 						$mobile_themes[$f]=$theme_name;

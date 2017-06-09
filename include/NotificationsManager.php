@@ -512,7 +512,7 @@ class NotificationsManager {
 		$myurl = substr($myurl,strpos($myurl,'://')+3);
 		$myurl = str_replace(array('www.','.'),array('','\\.'),$myurl);
 		$diasp_url = str_replace('/profile/','/u/',$myurl);
-		$sql_extra = sprintf(" AND ( `item`.`author-link` regexp '%s' or `item`.`tag` regexp '%s' or `item`.`tag` regexp '%s' ) ",
+		$sql_extra = sprintf(" AND ( `item`.`author-link` regexp '%s' OR `item`.`tag` regexp '%s' OR `item`.`tag` regexp '%s' ) ",
 			dbesc($myurl . '$'),
 			dbesc($myurl . '\\]'),
 			dbesc($diasp_url . '\\]')
@@ -829,11 +829,11 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Check for missing contact data and try to fetch the data from 
+	 * @brief Check for missing contact data and try to fetch the data from
 	 *     from other sources
-	 * 
+	 *
 	 * @param array $arr The input array with the intro data
-	 * 
+	 *
 	 * @return array The array with the intro data
 	 */
 	private function getMissingIntroData($arr) {

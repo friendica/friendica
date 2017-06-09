@@ -21,7 +21,7 @@ function vier_init(App $a) {
 
 	set_template_engine($a, 'smarty3');
 
-	if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname'] or $a->argv[0] === "network" && local_user()) {
+	if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname'] || $a->argv[0] === "network" && local_user()) {
 		vier_community_info();
 
 		$a->page['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";

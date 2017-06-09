@@ -108,7 +108,7 @@ function send_message($recipient=0, $body='', $subject='', $replyto=''){
 	);
 
 
-	$r = q("SELECT * FROM `mail` WHERE `uri` = '%s' and `uid` = %d LIMIT 1",
+	$r = q("SELECT * FROM `mail` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
 		dbesc($uri),
 		intval(local_user())
 	);

@@ -152,7 +152,7 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 	if ($p->parameters)
 		foreach ($p->parameters as $x)
 			$params[strtolower($x->attribute)] = $x->value;
-	if (isset($p->dparameters) and $p->dparameters)
+	if (isset($p->dparameters) && $p->dparameters)
 		foreach ($p->dparameters as $x)
 			$params[strtolower($x->attribute)] = $x->value;
 
@@ -160,7 +160,7 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 	// Any part with a filename is an attachment,
 	// so an attached text file (type 0) is not mistaken as the message.
 
-	if ((isset($params['filename']) and $params['filename']) || (isset($params['name']) and $params['name'])) {
+	if ((isset($params['filename']) && $params['filename']) || (isset($params['name']) && $params['name'])) {
 		// filename may be given as 'Filename' or 'Name' or both
 		$filename = ($params['filename'])? $params['filename'] : $params['name'];
 		// filename may be encoded, so see imap_mime_header_decode()
@@ -191,7 +191,7 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 //	}
 
 	// SUBPART RECURSION
-	if (isset($p->parts) and $p->parts) {
+	if (isset($p->parts) && $p->parts) {
 		$x = "";
 		foreach ($p->parts as $partno0=>$p2) {
 			$x .=  email_get_part($mbox,$uid,$p2,$partno . '.' . ($partno0+1), $subtype);  // 1.2, 1.2.1, etc.

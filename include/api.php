@@ -2178,7 +2178,7 @@ $called_api = null;
 				`contact`.`id` AS `cid`
 				FROM `item`, `contact`
 				WHERE `item`.`uid` = %d
-				AND `item`.`visible` = 1 and `item`.`moderated` = 0 AND `item`.`deleted` = 0
+				AND `item`.`visible` = 1 AND `item`.`moderated` = 0 AND `item`.`deleted` = 0
 				AND `item`.`starred` = 1
 				AND `contact`.`id` = `item`.`contact-id`
 				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
@@ -2263,13 +2263,13 @@ $called_api = null;
 
 		$statustitle = trim($item['title']);
 
-		if (($statustitle != '') and (strpos($statusbody, $statustitle) !== false)) {
+		if (($statustitle != '') && (strpos($statusbody, $statustitle) !== false)) {
 			$statustext = trim($statusbody);
 		} else {
 			$statustext = trim($statustitle."\n\n".$statusbody);
 		}
 
-		if (($item["network"] == NETWORK_FEED) and (strlen($statustext)> 1000)) {
+		if (($item["network"] == NETWORK_FEED) && (strlen($statustext)> 1000)) {
 			$statustext = substr($statustext, 0, 1000)."... \n".$item["plink"];
 		}
 
@@ -3982,7 +3982,7 @@ $called_api = null;
 	}
 
 	function prepare_photo_data($type, $scale, $photo_id) {
-		$scale_sql = ($scale === false ? "" : sprintf("and scale=%d", intval($scale)));
+		$scale_sql = ($scale === false ? "" : sprintf("AND scale=%d", intval($scale)));
 		$data_sql = ($scale === false ? "" : "data, ");
 
 		// added allow_cid, allow_gid, deny_cid, deny_gid to output as string like stored in database

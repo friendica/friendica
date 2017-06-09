@@ -10,7 +10,7 @@ function convertquote($body, $reply)
 		$quoteline = $arrbody[$i];
 
 		while ((strlen($quoteline)>0) and ((substr($quoteline, 0, 1) == '>')
-			or (substr($quoteline, 0, 1) == ' '))) {
+			|| (substr($quoteline, 0, 1) == ' '))) {
 			if (substr($quoteline, 0, 1) == '>')
 				$quotelevel++;
 

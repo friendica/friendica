@@ -89,7 +89,7 @@ class exAuth {
 
 		// Open the logfile if the logfile name is defined
 		if ($this->sLogFile != '')
-			$this->rLogFile = fopen($this->sLogFile, "a") or die("Error opening log file: ". $this->sLogFile);
+			$this->rLogFile = fopen($this->sLogFile, "a") || die("Error opening log file: ". $this->sLogFile);
 
 		$this->writeLog("[exAuth] start");
 

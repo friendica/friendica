@@ -83,10 +83,10 @@ function discover_poco_run(&$argv, &$argc) {
 		update_suggestions();
 	} elseif (($mode == 2) && get_config('system','poco_completion')) {
 		discover_users();
-	} elseif (($mode == 1) && ($search != "") and get_config('system','poco_local_search')) {
+	} elseif (($mode == 1) && ($search != "") && get_config('system','poco_local_search')) {
 		discover_directory($search);
 		gs_search_user($search);
-	} elseif (($mode == 0) && ($search == "") and (get_config('system','poco_discovery') > 0)) {
+	} elseif (($mode == 0) && ($search == "") && (get_config('system','poco_discovery') > 0)) {
 		// Query Friendica and Hubzilla servers for their users
 		poco_discover();
 

@@ -93,7 +93,7 @@ print "\nLoading base message.po...";
 // load base messages.po and extract msgids
 $base_msgids = array();
 $norm_base_msgids = array();
-$base_f = file("util/messages.po") or die("No base messages.po\n");
+$base_f = file("util/messages.po") || die("No base messages.po\n");
 $_f = 0; $_mid = ""; $_mids = array();
 foreach( $base_f as $l) {
 	$l = trim($l);

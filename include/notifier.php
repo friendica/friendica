@@ -163,7 +163,7 @@ function notifier_run(&$argv, &$argc){
 		$recipients_relocate = q("SELECT * FROM contact WHERE uid = %d  AND self = 0 AND network = '%s'" , intval($uid), NETWORK_DFRN);
 	} else {
 		// find ancestors
-		$r = q("SELECT * FROM `item` WHERE `id` = %d and visible = 1 and moderated = 0 LIMIT 1",
+		$r = q("SELECT * FROM `item` WHERE `id` = %d AND visible = 1 AND moderated = 0 LIMIT 1",
 			intval($item_id)
 		);
 
@@ -177,7 +177,7 @@ function notifier_run(&$argv, &$argc){
 		$updated = $r[0]['edited'];
 
 		$items = q("SELECT `item`.*, `sign`.`signed_text`,`sign`.`signature`,`sign`.`signer`
-			FROM `item` LEFT JOIN `sign` ON `sign`.`iid` = `item`.`id` WHERE `parent` = %d and visible = 1 and moderated = 0 ORDER BY `id` ASC",
+			FROM `item` LEFT JOIN `sign` ON `sign`.`iid` = `item`.`id` WHERE `parent` = %d AND visible = 1 AND moderated = 0 ORDER BY `id` ASC",
 			intval($parent_id)
 		);
 
