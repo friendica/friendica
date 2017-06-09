@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-08 22:07+0700\n"
+"POT-Creation-Date: 2017-06-09 16:42+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -668,7 +668,7 @@ msgstr ""
 
 #: include/conversation.php:749 mod/content.php:455 mod/content.php:761
 #: mod/photos.php:1731 mod/contacts.php:819 mod/contacts.php:1018
-#: mod/settings.php:745 mod/admin.php:1514 object/Item.php:138
+#: mod/admin.php:1514 mod/settings.php:745 object/Item.php:138
 msgid "Delete"
 msgstr ""
 
@@ -2216,8 +2216,8 @@ msgstr ""
 msgid "Delegate Page Management"
 msgstr ""
 
-#: include/nav.php:188 mod/newmember.php:15 mod/settings.php:113
-#: mod/admin.php:1624 mod/admin.php:1900 view/theme/frio/theme.php:258
+#: include/nav.php:188 mod/newmember.php:15 mod/admin.php:1624
+#: mod/admin.php:1900 mod/settings.php:113 view/theme/frio/theme.php:258
 msgid "Settings"
 msgstr ""
 
@@ -3513,8 +3513,8 @@ msgid ""
 "entries from this contact."
 msgstr ""
 
-#: mod/crepair.php:170 mod/settings.php:684 mod/settings.php:710
-#: mod/admin.php:1496 mod/admin.php:1509 mod/admin.php:1522 mod/admin.php:1538
+#: mod/crepair.php:170 mod/admin.php:1496 mod/admin.php:1509 mod/admin.php:1522
+#: mod/admin.php:1538 mod/settings.php:684 mod/settings.php:710
 msgid "Name"
 msgstr ""
 
@@ -6610,756 +6610,6 @@ msgstr ""
 msgid "Edit/Manage Profiles"
 msgstr ""
 
-#: mod/settings.php:45 mod/admin.php:1496
-msgid "Account"
-msgstr ""
-
-#: mod/settings.php:54 mod/admin.php:170
-msgid "Additional features"
-msgstr ""
-
-#: mod/settings.php:62
-msgid "Display"
-msgstr ""
-
-#: mod/settings.php:69 mod/settings.php:891
-msgid "Social Networks"
-msgstr ""
-
-#: mod/settings.php:76 mod/admin.php:168 mod/admin.php:1622 mod/admin.php:1685
-msgid "Plugins"
-msgstr ""
-
-#: mod/settings.php:90
-msgid "Connected apps"
-msgstr ""
-
-#: mod/settings.php:104
-msgid "Remove account"
-msgstr ""
-
-#: mod/settings.php:159
-msgid "Missing some important data!"
-msgstr ""
-
-#: mod/settings.php:273
-msgid "Failed to connect with email account using the settings provided."
-msgstr ""
-
-#: mod/settings.php:278
-msgid "Email settings updated."
-msgstr ""
-
-#: mod/settings.php:293
-msgid "Features updated"
-msgstr ""
-
-#: mod/settings.php:363
-msgid "Relocate message has been send to your contacts"
-msgstr ""
-
-#: mod/settings.php:382
-msgid "Empty passwords are not allowed. Password unchanged."
-msgstr ""
-
-#: mod/settings.php:390
-msgid "Wrong password."
-msgstr ""
-
-#: mod/settings.php:401
-msgid "Password changed."
-msgstr ""
-
-#: mod/settings.php:403
-msgid "Password update failed. Please try again."
-msgstr ""
-
-#: mod/settings.php:483
-msgid " Please use a shorter name."
-msgstr ""
-
-#: mod/settings.php:485
-msgid " Name too short."
-msgstr ""
-
-#: mod/settings.php:494
-msgid "Wrong Password"
-msgstr ""
-
-#: mod/settings.php:499
-msgid " Not valid email."
-msgstr ""
-
-#: mod/settings.php:505
-msgid " Cannot change to that email."
-msgstr ""
-
-#: mod/settings.php:561
-msgid "Private forum has no privacy permissions. Using default privacy group."
-msgstr ""
-
-#: mod/settings.php:565
-msgid "Private forum has no privacy permissions and no default privacy group."
-msgstr ""
-
-#: mod/settings.php:605
-msgid "Settings updated."
-msgstr ""
-
-#: mod/settings.php:681 mod/settings.php:707 mod/settings.php:743
-msgid "Add application"
-msgstr ""
-
-#: mod/settings.php:682 mod/settings.php:793 mod/settings.php:842
-#: mod/settings.php:909 mod/settings.php:1006 mod/settings.php:1272
-#: mod/admin.php:1061 mod/admin.php:1686 mod/admin.php:1949 mod/admin.php:2023
-#: mod/admin.php:2176
-msgid "Save Settings"
-msgstr ""
-
-#: mod/settings.php:685 mod/settings.php:711
-msgid "Consumer Key"
-msgstr ""
-
-#: mod/settings.php:686 mod/settings.php:712
-msgid "Consumer Secret"
-msgstr ""
-
-#: mod/settings.php:687 mod/settings.php:713
-msgid "Redirect"
-msgstr ""
-
-#: mod/settings.php:688 mod/settings.php:714
-msgid "Icon url"
-msgstr ""
-
-#: mod/settings.php:699
-msgid "You can't edit this application."
-msgstr ""
-
-#: mod/settings.php:742
-msgid "Connected Apps"
-msgstr ""
-
-#: mod/settings.php:746
-msgid "Client key starts with"
-msgstr ""
-
-#: mod/settings.php:747
-msgid "No name"
-msgstr ""
-
-#: mod/settings.php:748
-msgid "Remove authorization"
-msgstr ""
-
-#: mod/settings.php:760
-msgid "No Plugin settings configured"
-msgstr ""
-
-#: mod/settings.php:769
-msgid "Plugin Settings"
-msgstr ""
-
-#: mod/settings.php:783 mod/admin.php:2165 mod/admin.php:2166
-msgid "Off"
-msgstr ""
-
-#: mod/settings.php:783 mod/admin.php:2165 mod/admin.php:2166
-msgid "On"
-msgstr ""
-
-#: mod/settings.php:791
-msgid "Additional Features"
-msgstr ""
-
-#: mod/settings.php:801 mod/settings.php:805
-msgid "General Social Media Settings"
-msgstr ""
-
-#: mod/settings.php:811
-msgid "Disable intelligent shortening"
-msgstr ""
-
-#: mod/settings.php:813
-msgid ""
-"Normally the system tries to find the best link to add to shortened posts. "
-"If this option is enabled then every shortened post will always point to the "
-"original friendica post."
-msgstr ""
-
-#: mod/settings.php:819
-msgid "Automatically follow any GNU Social (OStatus) followers/mentioners"
-msgstr ""
-
-#: mod/settings.php:821
-msgid ""
-"If you receive a message from an unknown OStatus user, this option decides "
-"what to do. If it is checked, a new contact will be created for every "
-"unknown user."
-msgstr ""
-
-#: mod/settings.php:827
-msgid "Default group for OStatus contacts"
-msgstr ""
-
-#: mod/settings.php:835
-msgid "Your legacy GNU Social account"
-msgstr ""
-
-#: mod/settings.php:837
-msgid ""
-"If you enter your old GNU Social/Statusnet account name here (in the format "
-"user@domain.tld), your contacts will be added automatically. The field will "
-"be emptied when done."
-msgstr ""
-
-#: mod/settings.php:840
-msgid "Repair OStatus subscriptions"
-msgstr ""
-
-#: mod/settings.php:849 mod/settings.php:850
-#, php-format
-msgid "Built-in support for %s connectivity is %s"
-msgstr ""
-
-#: mod/settings.php:849 mod/settings.php:850
-msgid "enabled"
-msgstr ""
-
-#: mod/settings.php:849 mod/settings.php:850
-msgid "disabled"
-msgstr ""
-
-#: mod/settings.php:850
-msgid "GNU Social (OStatus)"
-msgstr ""
-
-#: mod/settings.php:884
-msgid "Email access is disabled on this site."
-msgstr ""
-
-#: mod/settings.php:896
-msgid "Email/Mailbox Setup"
-msgstr ""
-
-#: mod/settings.php:897
-msgid ""
-"If you wish to communicate with email contacts using this service "
-"(optional), please specify how to connect to your mailbox."
-msgstr ""
-
-#: mod/settings.php:898
-msgid "Last successful email check:"
-msgstr ""
-
-#: mod/settings.php:900
-msgid "IMAP server name:"
-msgstr ""
-
-#: mod/settings.php:901
-msgid "IMAP port:"
-msgstr ""
-
-#: mod/settings.php:902
-msgid "Security:"
-msgstr ""
-
-#: mod/settings.php:902 mod/settings.php:907
-msgid "None"
-msgstr ""
-
-#: mod/settings.php:903
-msgid "Email login name:"
-msgstr ""
-
-#: mod/settings.php:904
-msgid "Email password:"
-msgstr ""
-
-#: mod/settings.php:905
-msgid "Reply-to address:"
-msgstr ""
-
-#: mod/settings.php:906
-msgid "Send public posts to all email contacts:"
-msgstr ""
-
-#: mod/settings.php:907
-msgid "Action after import:"
-msgstr ""
-
-#: mod/settings.php:907
-msgid "Move to folder"
-msgstr ""
-
-#: mod/settings.php:908
-msgid "Move to folder:"
-msgstr ""
-
-#: mod/settings.php:944 mod/admin.php:948
-msgid "No special theme for mobile devices"
-msgstr ""
-
-#: mod/settings.php:1004
-msgid "Display Settings"
-msgstr ""
-
-#: mod/settings.php:1010 mod/settings.php:1033
-msgid "Display Theme:"
-msgstr ""
-
-#: mod/settings.php:1011
-msgid "Mobile Theme:"
-msgstr ""
-
-#: mod/settings.php:1012
-msgid "Suppress warning of insecure networks"
-msgstr ""
-
-#: mod/settings.php:1012
-msgid ""
-"Should the system suppress the warning that the current group contains "
-"members of networks that can't receive non public postings."
-msgstr ""
-
-#: mod/settings.php:1013
-msgid "Update browser every xx seconds"
-msgstr ""
-
-#: mod/settings.php:1013
-msgid "Minimum of 10 seconds. Enter -1 to disable it."
-msgstr ""
-
-#: mod/settings.php:1014
-msgid "Number of items to display per page:"
-msgstr ""
-
-#: mod/settings.php:1014 mod/settings.php:1015
-msgid "Maximum of 100 items"
-msgstr ""
-
-#: mod/settings.php:1015
-msgid "Number of items to display per page when viewed from mobile device:"
-msgstr ""
-
-#: mod/settings.php:1016
-msgid "Don't show emoticons"
-msgstr ""
-
-#: mod/settings.php:1017
-msgid "Calendar"
-msgstr ""
-
-#: mod/settings.php:1018
-msgid "Beginning of week:"
-msgstr ""
-
-#: mod/settings.php:1019
-msgid "Don't show notices"
-msgstr ""
-
-#: mod/settings.php:1020
-msgid "Infinite scroll"
-msgstr ""
-
-#: mod/settings.php:1021
-msgid "Automatic updates only at the top of the network page"
-msgstr ""
-
-#: mod/settings.php:1022
-msgid "Bandwith Saver Mode"
-msgstr ""
-
-#: mod/settings.php:1022
-msgid ""
-"When enabled, embedded content is not displayed on automatic updates, they "
-"only show on page reload."
-msgstr ""
-
-#: mod/settings.php:1024
-msgid "General Theme Settings"
-msgstr ""
-
-#: mod/settings.php:1025
-msgid "Custom Theme Settings"
-msgstr ""
-
-#: mod/settings.php:1026
-msgid "Content Settings"
-msgstr ""
-
-#: mod/settings.php:1027 view/theme/duepuntozero/config.php:66
-#: view/theme/frio/config.php:69 view/theme/quattro/config.php:72
-#: view/theme/vier/config.php:115
-msgid "Theme settings"
-msgstr ""
-
-#: mod/settings.php:1111
-msgid "Account Types"
-msgstr ""
-
-#: mod/settings.php:1112
-msgid "Personal Page Subtypes"
-msgstr ""
-
-#: mod/settings.php:1113
-msgid "Community Forum Subtypes"
-msgstr ""
-
-#: mod/settings.php:1120
-msgid "Personal Page"
-msgstr ""
-
-#: mod/settings.php:1121
-msgid "Account for a personal profile."
-msgstr ""
-
-#: mod/settings.php:1124
-msgid "Organisation Page"
-msgstr ""
-
-#: mod/settings.php:1125
-msgid ""
-"Account for an organisation that automatically approves contact requests as "
-"\"Followers\"."
-msgstr ""
-
-#: mod/settings.php:1128
-msgid "News Page"
-msgstr ""
-
-#: mod/settings.php:1129
-msgid ""
-"Account for a news reflector that automatically approves contact requests as "
-"\"Followers\"."
-msgstr ""
-
-#: mod/settings.php:1132
-msgid "Community Forum"
-msgstr ""
-
-#: mod/settings.php:1133
-msgid "Account for community discussions."
-msgstr ""
-
-#: mod/settings.php:1136
-msgid "Normal Account Page"
-msgstr ""
-
-#: mod/settings.php:1137
-msgid ""
-"Account for a regular personal profile that requires manual approval of "
-"\"Friends\" and \"Followers\"."
-msgstr ""
-
-#: mod/settings.php:1140
-msgid "Soapbox Page"
-msgstr ""
-
-#: mod/settings.php:1141
-msgid ""
-"Account for a public profile that automatically approves contact requests as "
-"\"Followers\"."
-msgstr ""
-
-#: mod/settings.php:1144
-msgid "Public Forum"
-msgstr ""
-
-#: mod/settings.php:1145
-msgid "Automatically approves all contact requests."
-msgstr ""
-
-#: mod/settings.php:1148
-msgid "Automatic Friend Page"
-msgstr ""
-
-#: mod/settings.php:1149
-msgid ""
-"Account for a popular profile that automatically approves contact requests "
-"as \"Friends\"."
-msgstr ""
-
-#: mod/settings.php:1152
-msgid "Private Forum [Experimental]"
-msgstr ""
-
-#: mod/settings.php:1153
-msgid "Requires manual approval of contact requests."
-msgstr ""
-
-#: mod/settings.php:1164
-msgid "OpenID:"
-msgstr ""
-
-#: mod/settings.php:1164
-msgid "(Optional) Allow this OpenID to login to this account."
-msgstr ""
-
-#: mod/settings.php:1172
-msgid "Publish your default profile in your local site directory?"
-msgstr ""
-
-#: mod/settings.php:1172
-msgid "Your profile may be visible in public."
-msgstr ""
-
-#: mod/settings.php:1178
-msgid "Publish your default profile in the global social directory?"
-msgstr ""
-
-#: mod/settings.php:1185
-msgid "Hide your contact/friend list from viewers of your default profile?"
-msgstr ""
-
-#: mod/settings.php:1189
-msgid ""
-"If enabled, posting public messages to Diaspora and other networks isn't "
-"possible."
-msgstr ""
-
-#: mod/settings.php:1194
-msgid "Allow friends to post to your profile page?"
-msgstr ""
-
-#: mod/settings.php:1199
-msgid "Allow friends to tag your posts?"
-msgstr ""
-
-#: mod/settings.php:1204
-msgid "Allow us to suggest you as a potential friend to new members?"
-msgstr ""
-
-#: mod/settings.php:1209
-msgid "Permit unknown people to send you private mail?"
-msgstr ""
-
-#: mod/settings.php:1217
-msgid "Profile is <strong>not published</strong>."
-msgstr ""
-
-#: mod/settings.php:1225
-#, php-format
-msgid "Your Identity Address is <strong>'%s'</strong> or '%s'."
-msgstr ""
-
-#: mod/settings.php:1232
-msgid "Automatically expire posts after this many days:"
-msgstr ""
-
-#: mod/settings.php:1232
-msgid "If empty, posts will not expire. Expired posts will be deleted"
-msgstr ""
-
-#: mod/settings.php:1233
-msgid "Advanced expiration settings"
-msgstr ""
-
-#: mod/settings.php:1234
-msgid "Advanced Expiration"
-msgstr ""
-
-#: mod/settings.php:1235
-msgid "Expire posts:"
-msgstr ""
-
-#: mod/settings.php:1236
-msgid "Expire personal notes:"
-msgstr ""
-
-#: mod/settings.php:1237
-msgid "Expire starred posts:"
-msgstr ""
-
-#: mod/settings.php:1238
-msgid "Expire photos:"
-msgstr ""
-
-#: mod/settings.php:1239
-msgid "Only expire posts by others:"
-msgstr ""
-
-#: mod/settings.php:1270
-msgid "Account Settings"
-msgstr ""
-
-#: mod/settings.php:1278
-msgid "Password Settings"
-msgstr ""
-
-#: mod/settings.php:1281
-msgid "Current Password:"
-msgstr ""
-
-#: mod/settings.php:1281 mod/settings.php:1282
-msgid "Your current password to confirm the changes"
-msgstr ""
-
-#: mod/settings.php:1282
-msgid "Password:"
-msgstr ""
-
-#: mod/settings.php:1286
-msgid "Basic Settings"
-msgstr ""
-
-#: mod/settings.php:1288
-msgid "Email Address:"
-msgstr ""
-
-#: mod/settings.php:1289
-msgid "Your Timezone:"
-msgstr ""
-
-#: mod/settings.php:1290
-msgid "Your Language:"
-msgstr ""
-
-#: mod/settings.php:1290
-msgid ""
-"Set the language we use to show you friendica interface and to send you "
-"emails"
-msgstr ""
-
-#: mod/settings.php:1291
-msgid "Default Post Location:"
-msgstr ""
-
-#: mod/settings.php:1292
-msgid "Use Browser Location:"
-msgstr ""
-
-#: mod/settings.php:1295
-msgid "Security and Privacy Settings"
-msgstr ""
-
-#: mod/settings.php:1297
-msgid "Maximum Friend Requests/Day:"
-msgstr ""
-
-#: mod/settings.php:1297 mod/settings.php:1327
-msgid "(to prevent spam abuse)"
-msgstr ""
-
-#: mod/settings.php:1298
-msgid "Default Post Permissions"
-msgstr ""
-
-#: mod/settings.php:1299
-msgid "(click to open/close)"
-msgstr ""
-
-#: mod/settings.php:1310
-msgid "Default Private Post"
-msgstr ""
-
-#: mod/settings.php:1311
-msgid "Default Public Post"
-msgstr ""
-
-#: mod/settings.php:1315
-msgid "Default Permissions for New Posts"
-msgstr ""
-
-#: mod/settings.php:1327
-msgid "Maximum private messages per day from unknown people:"
-msgstr ""
-
-#: mod/settings.php:1330
-msgid "Notification Settings"
-msgstr ""
-
-#: mod/settings.php:1331
-msgid "By default post a status message when:"
-msgstr ""
-
-#: mod/settings.php:1332
-msgid "accepting a friend request"
-msgstr ""
-
-#: mod/settings.php:1333
-msgid "joining a forum/community"
-msgstr ""
-
-#: mod/settings.php:1334
-msgid "making an <em>interesting</em> profile change"
-msgstr ""
-
-#: mod/settings.php:1335
-msgid "Send a notification email when:"
-msgstr ""
-
-#: mod/settings.php:1336
-msgid "You receive an introduction"
-msgstr ""
-
-#: mod/settings.php:1337
-msgid "Your introductions are confirmed"
-msgstr ""
-
-#: mod/settings.php:1338
-msgid "Someone writes on your profile wall"
-msgstr ""
-
-#: mod/settings.php:1339
-msgid "Someone writes a followup comment"
-msgstr ""
-
-#: mod/settings.php:1340
-msgid "You receive a private message"
-msgstr ""
-
-#: mod/settings.php:1341
-msgid "You receive a friend suggestion"
-msgstr ""
-
-#: mod/settings.php:1342
-msgid "You are tagged in a post"
-msgstr ""
-
-#: mod/settings.php:1343
-msgid "You are poked/prodded/etc. in a post"
-msgstr ""
-
-#: mod/settings.php:1345
-msgid "Activate desktop notifications"
-msgstr ""
-
-#: mod/settings.php:1345
-msgid "Show desktop popup on new notifications"
-msgstr ""
-
-#: mod/settings.php:1347
-msgid "Text-only notification emails"
-msgstr ""
-
-#: mod/settings.php:1349
-msgid "Send text only notification emails, without the html part"
-msgstr ""
-
-#: mod/settings.php:1351
-msgid "Advanced Account/Page Type Settings"
-msgstr ""
-
-#: mod/settings.php:1352
-msgid "Change the behaviour of this account for special situations"
-msgstr ""
-
-#: mod/settings.php:1355
-msgid "Relocate"
-msgstr ""
-
-#: mod/settings.php:1356
-msgid ""
-"If you have moved this profile from another server, and some of your "
-"contacts don't receive your updates, try pushing this button."
-msgstr ""
-
-#: mod/settings.php:1357
-msgid "Resend relocate message to contacts"
-msgstr ""
-
 #: mod/admin.php:97
 msgid "Theme settings updated."
 msgstr ""
@@ -7372,8 +6622,16 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+#: mod/admin.php:168 mod/admin.php:1622 mod/admin.php:1685 mod/settings.php:76
+msgid "Plugins"
+msgstr ""
+
 #: mod/admin.php:169 mod/admin.php:1898 mod/admin.php:1948
 msgid "Themes"
+msgstr ""
+
+#: mod/admin.php:170 mod/settings.php:54
+msgid "Additional features"
 msgstr ""
 
 #: mod/admin.php:171
@@ -7624,6 +6882,10 @@ msgstr ""
 msgid "Site settings updated."
 msgstr ""
 
+#: mod/admin.php:948 mod/settings.php:944
+msgid "No special theme for mobile devices"
+msgstr ""
+
 #: mod/admin.php:977
 msgid "No community page"
 msgstr ""
@@ -7690,6 +6952,13 @@ msgstr ""
 
 #: mod/admin.php:1039
 msgid "Self-signed certificate, use SSL for local links only (discouraged)"
+msgstr ""
+
+#: mod/admin.php:1061 mod/admin.php:1686 mod/admin.php:1949 mod/admin.php:2023
+#: mod/admin.php:2176 mod/settings.php:682 mod/settings.php:793
+#: mod/settings.php:842 mod/settings.php:909 mod/settings.php:1006
+#: mod/settings.php:1272
+msgid "Save Settings"
 msgstr ""
 
 #: mod/admin.php:1063
@@ -8520,6 +7789,10 @@ msgstr ""
 msgid "Last item"
 msgstr ""
 
+#: mod/admin.php:1496 mod/settings.php:45
+msgid "Account"
+msgstr ""
+
 #: mod/admin.php:1505
 msgid "Add User"
 msgstr ""
@@ -8710,6 +7983,14 @@ msgid ""
 "'display_errors' is to enable these options, set to '0' to disable them."
 msgstr ""
 
+#: mod/admin.php:2165 mod/admin.php:2166 mod/settings.php:783
+msgid "Off"
+msgstr ""
+
+#: mod/admin.php:2165 mod/admin.php:2166 mod/settings.php:783
+msgid "On"
+msgstr ""
+
 #: mod/admin.php:2166
 #, php-format
 msgid "Lock feature %s"
@@ -8717,6 +7998,729 @@ msgstr ""
 
 #: mod/admin.php:2174
 msgid "Manage Additional Features"
+msgstr ""
+
+#: mod/settings.php:62
+msgid "Display"
+msgstr ""
+
+#: mod/settings.php:69 mod/settings.php:891
+msgid "Social Networks"
+msgstr ""
+
+#: mod/settings.php:90
+msgid "Connected apps"
+msgstr ""
+
+#: mod/settings.php:104
+msgid "Remove account"
+msgstr ""
+
+#: mod/settings.php:159
+msgid "Missing some important data!"
+msgstr ""
+
+#: mod/settings.php:273
+msgid "Failed to connect with email account using the settings provided."
+msgstr ""
+
+#: mod/settings.php:278
+msgid "Email settings updated."
+msgstr ""
+
+#: mod/settings.php:293
+msgid "Features updated"
+msgstr ""
+
+#: mod/settings.php:363
+msgid "Relocate message has been send to your contacts"
+msgstr ""
+
+#: mod/settings.php:382
+msgid "Empty passwords are not allowed. Password unchanged."
+msgstr ""
+
+#: mod/settings.php:390
+msgid "Wrong password."
+msgstr ""
+
+#: mod/settings.php:401
+msgid "Password changed."
+msgstr ""
+
+#: mod/settings.php:403
+msgid "Password update failed. Please try again."
+msgstr ""
+
+#: mod/settings.php:483
+msgid " Please use a shorter name."
+msgstr ""
+
+#: mod/settings.php:485
+msgid " Name too short."
+msgstr ""
+
+#: mod/settings.php:494
+msgid "Wrong Password"
+msgstr ""
+
+#: mod/settings.php:499
+msgid " Not valid email."
+msgstr ""
+
+#: mod/settings.php:505
+msgid " Cannot change to that email."
+msgstr ""
+
+#: mod/settings.php:561
+msgid "Private forum has no privacy permissions. Using default privacy group."
+msgstr ""
+
+#: mod/settings.php:565
+msgid "Private forum has no privacy permissions and no default privacy group."
+msgstr ""
+
+#: mod/settings.php:605
+msgid "Settings updated."
+msgstr ""
+
+#: mod/settings.php:681 mod/settings.php:707 mod/settings.php:743
+msgid "Add application"
+msgstr ""
+
+#: mod/settings.php:685 mod/settings.php:711
+msgid "Consumer Key"
+msgstr ""
+
+#: mod/settings.php:686 mod/settings.php:712
+msgid "Consumer Secret"
+msgstr ""
+
+#: mod/settings.php:687 mod/settings.php:713
+msgid "Redirect"
+msgstr ""
+
+#: mod/settings.php:688 mod/settings.php:714
+msgid "Icon url"
+msgstr ""
+
+#: mod/settings.php:699
+msgid "You can't edit this application."
+msgstr ""
+
+#: mod/settings.php:742
+msgid "Connected Apps"
+msgstr ""
+
+#: mod/settings.php:746
+msgid "Client key starts with"
+msgstr ""
+
+#: mod/settings.php:747
+msgid "No name"
+msgstr ""
+
+#: mod/settings.php:748
+msgid "Remove authorization"
+msgstr ""
+
+#: mod/settings.php:760
+msgid "No Plugin settings configured"
+msgstr ""
+
+#: mod/settings.php:769
+msgid "Plugin Settings"
+msgstr ""
+
+#: mod/settings.php:791
+msgid "Additional Features"
+msgstr ""
+
+#: mod/settings.php:801 mod/settings.php:805
+msgid "General Social Media Settings"
+msgstr ""
+
+#: mod/settings.php:811
+msgid "Disable intelligent shortening"
+msgstr ""
+
+#: mod/settings.php:813
+msgid ""
+"Normally the system tries to find the best link to add to shortened posts. "
+"If this option is enabled then every shortened post will always point to the "
+"original friendica post."
+msgstr ""
+
+#: mod/settings.php:819
+msgid "Automatically follow any GNU Social (OStatus) followers/mentioners"
+msgstr ""
+
+#: mod/settings.php:821
+msgid ""
+"If you receive a message from an unknown OStatus user, this option decides "
+"what to do. If it is checked, a new contact will be created for every "
+"unknown user."
+msgstr ""
+
+#: mod/settings.php:827
+msgid "Default group for OStatus contacts"
+msgstr ""
+
+#: mod/settings.php:835
+msgid "Your legacy GNU Social account"
+msgstr ""
+
+#: mod/settings.php:837
+msgid ""
+"If you enter your old GNU Social/Statusnet account name here (in the format "
+"user@domain.tld), your contacts will be added automatically. The field will "
+"be emptied when done."
+msgstr ""
+
+#: mod/settings.php:840
+msgid "Repair OStatus subscriptions"
+msgstr ""
+
+#: mod/settings.php:849 mod/settings.php:850
+#, php-format
+msgid "Built-in support for %s connectivity is %s"
+msgstr ""
+
+#: mod/settings.php:849 mod/settings.php:850
+msgid "enabled"
+msgstr ""
+
+#: mod/settings.php:849 mod/settings.php:850
+msgid "disabled"
+msgstr ""
+
+#: mod/settings.php:850
+msgid "GNU Social (OStatus)"
+msgstr ""
+
+#: mod/settings.php:884
+msgid "Email access is disabled on this site."
+msgstr ""
+
+#: mod/settings.php:896
+msgid "Email/Mailbox Setup"
+msgstr ""
+
+#: mod/settings.php:897
+msgid ""
+"If you wish to communicate with email contacts using this service "
+"(optional), please specify how to connect to your mailbox."
+msgstr ""
+
+#: mod/settings.php:898
+msgid "Last successful email check:"
+msgstr ""
+
+#: mod/settings.php:900
+msgid "IMAP server name:"
+msgstr ""
+
+#: mod/settings.php:901
+msgid "IMAP port:"
+msgstr ""
+
+#: mod/settings.php:902
+msgid "Security:"
+msgstr ""
+
+#: mod/settings.php:902 mod/settings.php:907
+msgid "None"
+msgstr ""
+
+#: mod/settings.php:903
+msgid "Email login name:"
+msgstr ""
+
+#: mod/settings.php:904
+msgid "Email password:"
+msgstr ""
+
+#: mod/settings.php:905
+msgid "Reply-to address:"
+msgstr ""
+
+#: mod/settings.php:906
+msgid "Send public posts to all email contacts:"
+msgstr ""
+
+#: mod/settings.php:907
+msgid "Action after import:"
+msgstr ""
+
+#: mod/settings.php:907
+msgid "Move to folder"
+msgstr ""
+
+#: mod/settings.php:908
+msgid "Move to folder:"
+msgstr ""
+
+#: mod/settings.php:1004
+msgid "Display Settings"
+msgstr ""
+
+#: mod/settings.php:1010 mod/settings.php:1033
+msgid "Display Theme:"
+msgstr ""
+
+#: mod/settings.php:1011
+msgid "Mobile Theme:"
+msgstr ""
+
+#: mod/settings.php:1012
+msgid "Suppress warning of insecure networks"
+msgstr ""
+
+#: mod/settings.php:1012
+msgid ""
+"Should the system suppress the warning that the current group contains "
+"members of networks that can't receive non public postings."
+msgstr ""
+
+#: mod/settings.php:1013
+msgid "Update browser every xx seconds"
+msgstr ""
+
+#: mod/settings.php:1013
+msgid "Minimum of 10 seconds. Enter -1 to disable it."
+msgstr ""
+
+#: mod/settings.php:1014
+msgid "Number of items to display per page:"
+msgstr ""
+
+#: mod/settings.php:1014 mod/settings.php:1015
+msgid "Maximum of 100 items"
+msgstr ""
+
+#: mod/settings.php:1015
+msgid "Number of items to display per page when viewed from mobile device:"
+msgstr ""
+
+#: mod/settings.php:1016
+msgid "Don't show emoticons"
+msgstr ""
+
+#: mod/settings.php:1017
+msgid "Calendar"
+msgstr ""
+
+#: mod/settings.php:1018
+msgid "Beginning of week:"
+msgstr ""
+
+#: mod/settings.php:1019
+msgid "Don't show notices"
+msgstr ""
+
+#: mod/settings.php:1020
+msgid "Infinite scroll"
+msgstr ""
+
+#: mod/settings.php:1021
+msgid "Automatic updates only at the top of the network page"
+msgstr ""
+
+#: mod/settings.php:1022
+msgid "Bandwith Saver Mode"
+msgstr ""
+
+#: mod/settings.php:1022
+msgid ""
+"When enabled, embedded content is not displayed on automatic updates, they "
+"only show on page reload."
+msgstr ""
+
+#: mod/settings.php:1024
+msgid "General Theme Settings"
+msgstr ""
+
+#: mod/settings.php:1025
+msgid "Custom Theme Settings"
+msgstr ""
+
+#: mod/settings.php:1026
+msgid "Content Settings"
+msgstr ""
+
+#: mod/settings.php:1027 view/theme/duepuntozero/config.php:66
+#: view/theme/frio/config.php:69 view/theme/quattro/config.php:72
+#: view/theme/vier/config.php:115
+msgid "Theme settings"
+msgstr ""
+
+#: mod/settings.php:1111
+msgid "Account Types"
+msgstr ""
+
+#: mod/settings.php:1112
+msgid "Personal Page Subtypes"
+msgstr ""
+
+#: mod/settings.php:1113
+msgid "Community Forum Subtypes"
+msgstr ""
+
+#: mod/settings.php:1120
+msgid "Personal Page"
+msgstr ""
+
+#: mod/settings.php:1121
+msgid "Account for a personal profile."
+msgstr ""
+
+#: mod/settings.php:1124
+msgid "Organisation Page"
+msgstr ""
+
+#: mod/settings.php:1125
+msgid ""
+"Account for an organisation that automatically approves contact requests as "
+"\"Followers\"."
+msgstr ""
+
+#: mod/settings.php:1128
+msgid "News Page"
+msgstr ""
+
+#: mod/settings.php:1129
+msgid ""
+"Account for a news reflector that automatically approves contact requests as "
+"\"Followers\"."
+msgstr ""
+
+#: mod/settings.php:1132
+msgid "Community Forum"
+msgstr ""
+
+#: mod/settings.php:1133
+msgid "Account for community discussions."
+msgstr ""
+
+#: mod/settings.php:1136
+msgid "Normal Account Page"
+msgstr ""
+
+#: mod/settings.php:1137
+msgid ""
+"Account for a regular personal profile that requires manual approval of "
+"\"Friends\" and \"Followers\"."
+msgstr ""
+
+#: mod/settings.php:1140
+msgid "Soapbox Page"
+msgstr ""
+
+#: mod/settings.php:1141
+msgid ""
+"Account for a public profile that automatically approves contact requests as "
+"\"Followers\"."
+msgstr ""
+
+#: mod/settings.php:1144
+msgid "Public Forum"
+msgstr ""
+
+#: mod/settings.php:1145
+msgid "Automatically approves all contact requests."
+msgstr ""
+
+#: mod/settings.php:1148
+msgid "Automatic Friend Page"
+msgstr ""
+
+#: mod/settings.php:1149
+msgid ""
+"Account for a popular profile that automatically approves contact requests "
+"as \"Friends\"."
+msgstr ""
+
+#: mod/settings.php:1152
+msgid "Private Forum [Experimental]"
+msgstr ""
+
+#: mod/settings.php:1153
+msgid "Requires manual approval of contact requests."
+msgstr ""
+
+#: mod/settings.php:1164
+msgid "OpenID:"
+msgstr ""
+
+#: mod/settings.php:1164
+msgid "(Optional) Allow this OpenID to login to this account."
+msgstr ""
+
+#: mod/settings.php:1172
+msgid "Publish your default profile in your local site directory?"
+msgstr ""
+
+#: mod/settings.php:1172
+msgid "Your profile may be visible in public."
+msgstr ""
+
+#: mod/settings.php:1178
+msgid "Publish your default profile in the global social directory?"
+msgstr ""
+
+#: mod/settings.php:1185
+msgid "Hide your contact/friend list from viewers of your default profile?"
+msgstr ""
+
+#: mod/settings.php:1189
+msgid ""
+"If enabled, posting public messages to Diaspora and other networks isn't "
+"possible."
+msgstr ""
+
+#: mod/settings.php:1194
+msgid "Allow friends to post to your profile page?"
+msgstr ""
+
+#: mod/settings.php:1199
+msgid "Allow friends to tag your posts?"
+msgstr ""
+
+#: mod/settings.php:1204
+msgid "Allow us to suggest you as a potential friend to new members?"
+msgstr ""
+
+#: mod/settings.php:1209
+msgid "Permit unknown people to send you private mail?"
+msgstr ""
+
+#: mod/settings.php:1217
+msgid "Profile is <strong>not published</strong>."
+msgstr ""
+
+#: mod/settings.php:1225
+#, php-format
+msgid "Your Identity Address is <strong>'%s'</strong> or '%s'."
+msgstr ""
+
+#: mod/settings.php:1232
+msgid "Automatically expire posts after this many days:"
+msgstr ""
+
+#: mod/settings.php:1232
+msgid "If empty, posts will not expire. Expired posts will be deleted"
+msgstr ""
+
+#: mod/settings.php:1233
+msgid "Advanced expiration settings"
+msgstr ""
+
+#: mod/settings.php:1234
+msgid "Advanced Expiration"
+msgstr ""
+
+#: mod/settings.php:1235
+msgid "Expire posts:"
+msgstr ""
+
+#: mod/settings.php:1236
+msgid "Expire personal notes:"
+msgstr ""
+
+#: mod/settings.php:1237
+msgid "Expire starred posts:"
+msgstr ""
+
+#: mod/settings.php:1238
+msgid "Expire photos:"
+msgstr ""
+
+#: mod/settings.php:1239
+msgid "Only expire posts by others:"
+msgstr ""
+
+#: mod/settings.php:1270
+msgid "Account Settings"
+msgstr ""
+
+#: mod/settings.php:1278
+msgid "Password Settings"
+msgstr ""
+
+#: mod/settings.php:1280
+msgid "Leave password fields blank unless changing"
+msgstr ""
+
+#: mod/settings.php:1281
+msgid "Current Password:"
+msgstr ""
+
+#: mod/settings.php:1281 mod/settings.php:1282
+msgid "Your current password to confirm the changes"
+msgstr ""
+
+#: mod/settings.php:1282
+msgid "Password:"
+msgstr ""
+
+#: mod/settings.php:1286
+msgid "Basic Settings"
+msgstr ""
+
+#: mod/settings.php:1288
+msgid "Email Address:"
+msgstr ""
+
+#: mod/settings.php:1289
+msgid "Your Timezone:"
+msgstr ""
+
+#: mod/settings.php:1290
+msgid "Your Language:"
+msgstr ""
+
+#: mod/settings.php:1290
+msgid ""
+"Set the language we use to show you friendica interface and to send you "
+"emails"
+msgstr ""
+
+#: mod/settings.php:1291
+msgid "Default Post Location:"
+msgstr ""
+
+#: mod/settings.php:1292
+msgid "Use Browser Location:"
+msgstr ""
+
+#: mod/settings.php:1295
+msgid "Security and Privacy Settings"
+msgstr ""
+
+#: mod/settings.php:1297
+msgid "Maximum Friend Requests/Day:"
+msgstr ""
+
+#: mod/settings.php:1297 mod/settings.php:1327
+msgid "(to prevent spam abuse)"
+msgstr ""
+
+#: mod/settings.php:1298
+msgid "Default Post Permissions"
+msgstr ""
+
+#: mod/settings.php:1299
+msgid "(click to open/close)"
+msgstr ""
+
+#: mod/settings.php:1310
+msgid "Default Private Post"
+msgstr ""
+
+#: mod/settings.php:1311
+msgid "Default Public Post"
+msgstr ""
+
+#: mod/settings.php:1315
+msgid "Default Permissions for New Posts"
+msgstr ""
+
+#: mod/settings.php:1327
+msgid "Maximum private messages per day from unknown people:"
+msgstr ""
+
+#: mod/settings.php:1330
+msgid "Notification Settings"
+msgstr ""
+
+#: mod/settings.php:1331
+msgid "By default post a status message when:"
+msgstr ""
+
+#: mod/settings.php:1332
+msgid "accepting a friend request"
+msgstr ""
+
+#: mod/settings.php:1333
+msgid "joining a forum/community"
+msgstr ""
+
+#: mod/settings.php:1334
+msgid "making an <em>interesting</em> profile change"
+msgstr ""
+
+#: mod/settings.php:1335
+msgid "Send a notification email when:"
+msgstr ""
+
+#: mod/settings.php:1336
+msgid "You receive an introduction"
+msgstr ""
+
+#: mod/settings.php:1337
+msgid "Your introductions are confirmed"
+msgstr ""
+
+#: mod/settings.php:1338
+msgid "Someone writes on your profile wall"
+msgstr ""
+
+#: mod/settings.php:1339
+msgid "Someone writes a followup comment"
+msgstr ""
+
+#: mod/settings.php:1340
+msgid "You receive a private message"
+msgstr ""
+
+#: mod/settings.php:1341
+msgid "You receive a friend suggestion"
+msgstr ""
+
+#: mod/settings.php:1342
+msgid "You are tagged in a post"
+msgstr ""
+
+#: mod/settings.php:1343
+msgid "You are poked/prodded/etc. in a post"
+msgstr ""
+
+#: mod/settings.php:1345
+msgid "Activate desktop notifications"
+msgstr ""
+
+#: mod/settings.php:1345
+msgid "Show desktop popup on new notifications"
+msgstr ""
+
+#: mod/settings.php:1347
+msgid "Text-only notification emails"
+msgstr ""
+
+#: mod/settings.php:1349
+msgid "Send text only notification emails, without the html part"
+msgstr ""
+
+#: mod/settings.php:1351
+msgid "Advanced Account/Page Type Settings"
+msgstr ""
+
+#: mod/settings.php:1352
+msgid "Change the behaviour of this account for special situations"
+msgstr ""
+
+#: mod/settings.php:1355
+msgid "Relocate"
+msgstr ""
+
+#: mod/settings.php:1356
+msgid ""
+"If you have moved this profile from another server, and some of your "
+"contacts don't receive your updates, try pushing this button."
+msgstr ""
+
+#: mod/settings.php:1357
+msgid "Resend relocate message to contacts"
 msgstr ""
 
 #: object/Item.php:356
