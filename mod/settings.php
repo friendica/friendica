@@ -1277,7 +1277,7 @@ function settings_content(App $a) {
 
 		'$h_pass' 	=> t('Password Settings'),
 		'$password1'=> array('password', t('New Password:'), '', ''),
-		'$password2'=> array('confirm', t('Confirm:'), '', ''),
+		'$password2'=> array('confirm', t('Confirm:'), '', 'Leave password fields blank unless changing'),
 		'$password3'=> array('opassword', t('Current Password:'), '', t('Your current password to confirm the changes')),
 		'$password4'=> array('mpassword', t('Password:'), '', t('Your current password to confirm the changes')),
 		'$oid_enable' => (! get_config('system','no_openid')),
