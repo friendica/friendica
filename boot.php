@@ -1069,12 +1069,16 @@ function proc_run($cmd) {
 
 	$priority = PRIORITY_MEDIUM;
 	$dont_fork = get_config("system", "worker_dont_fork");
+	$created = datetime_convert();
 
 	if (is_int($run_parameter)) {
 		$priority = $run_parameter;
 	} elseif (is_array($run_parameter)) {
 		if (isset($run_parameter['priority'])) {
 			$priority = $run_parameter['priority'];
+		}
+		if (isset($run_parameter['created'])) {
+			$created = $run_parameter['created'];
 		}
 		if (isset($run_parameter['dont_fork'])) {
 			$dont_fork = $run_parameter['dont_fork'];
@@ -1088,7 +1092,7 @@ function proc_run($cmd) {
 	$found = dba::select('workerqueue', array('id'), array('parameter' => $parameters), array('limit' => 1));
 
 	if (!dbm::is_result($found)) {
-		dba::insert('workerqueue', array('parameter' => $parameters, 'created' => datetime_convert(), 'priority' => $priority));
+		dba::insert('workerqueue', array('parameter' => $parameters, 'created' => $created, 'priority' => $priority));
 	}
 
 	// Should we quit and wait for the poller to be called as a cronjob?

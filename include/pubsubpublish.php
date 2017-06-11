@@ -11,13 +11,24 @@ function pubsubpublish_run(&$argv, &$argc){
 	if ($argc > 1) {
 		$pubsubpublish_id = intval($argv[1]);
 	} else {
+		// Inherit the creation time
+		$queue = dba::select('workerqueue', array('created'), array('pid' => getmypid()), array('limit' => 1));
+		if (dbm::is_result($queue)) {
+			$process_created = $queue['created'];
+		} else {
+			// Normally this shouldn't happen.
+			$process_created = datetime_convert();
+			logger('no inherited priority! Something is wrong.');
+		}
+
 		// We'll push to each subscriber that has push > 0,
 		// i.e. there has been an update (set in notifier.php).
 		$r = q("SELECT `id`, `callback_url` FROM `push_subscriber` WHERE `push` > 0");
 
 		foreach ($r as $rr) {
 			logger("Publish feed to ".$rr["callback_url"], LOGGER_DEBUG);
-			proc_run(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), 'include/pubsubpublish.php', $rr["id"]);
+			proc_run(array('priority' => PRIORITY_HIGH, 'created' => $process_created, 'dont_fork' => true),
+					'include/pubsubpublish.php', $rr["id"]);
 		}
 	}
 

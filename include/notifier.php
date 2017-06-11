@@ -56,13 +56,15 @@ function notifier_run(&$argv, &$argc){
 	}
 
 	// Inherit the priority
-	$queue = dba::select('workerqueue', array('priority'), array('pid' => getmypid()), array('limit' => 1));
+	$queue = dba::select('workerqueue', array('priority', 'created'), array('pid' => getmypid()), array('limit' => 1));
 	if (dbm::is_result($queue)) {
 		$priority = (int)$queue['priority'];
+		$process_created = $queue['created'];
 		logger('inherited priority: '.$priority);
 	} else {
 		// Normally this shouldn't happen.
 		$priority = PRIORITY_HIGH;
+		$process_created = datetime_convert();
 		logger('no inherited priority! Something is wrong.');
 	}
 
@@ -498,7 +500,8 @@ function notifier_run(&$argv, &$argc){
 			}
 			logger("Deliver ".$target_item["guid"]." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
-			proc_run(array('priority' => $priority, 'dont_fork' => true), 'include/delivery.php', $cmd, $item_id, $contact['id']);
+			proc_run(array('priority' => $priority, 'created' => $process_created, 'dont_fork' => true),
+					'include/delivery.php', $cmd, $item_id, $contact['id']);
 		}
 	}
 
@@ -563,7 +566,8 @@ function notifier_run(&$argv, &$argc){
 
 				if ((! $mail) && (! $fsuggest) && (! $followup)) {
 					logger('notifier: delivery agent: '.$rr['name'].' '.$rr['id'].' '.$rr['network'].' '.$target_item["guid"]);
-					proc_run(array('priority' => $priority, 'dont_fork' => true), 'include/delivery.php', $cmd, $item_id, $rr['id']);
+					proc_run(array('priority' => $priority, 'created' => $process_created, 'dont_fork' => true),
+							'include/delivery.php', $cmd, $item_id, $rr['id']);
 				}
 			}
 		}
@@ -603,7 +607,8 @@ function notifier_run(&$argv, &$argc){
 		}
 
 		// Handling the pubsubhubbub requests
-		proc_run(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), 'include/pubsubpublish.php');
+		proc_run(array('priority' => PRIORITY_HIGH, 'created' => $process_created, 'dont_fork' => true),
+				'include/pubsubpublish.php');
 	}
 
 	logger('notifier: calling hooks', LOGGER_DEBUG);
