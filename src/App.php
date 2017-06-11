@@ -100,6 +100,7 @@ class App {
 	 */
 	public $template_engine_instance = array();
 	public $process_id;
+	public $queue;
 	private $ldelim = array(
 		'internal' => '',
 		'smarty3' => '{{'

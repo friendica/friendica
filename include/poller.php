@@ -89,6 +89,9 @@ function poller_run($argv, $argc){
 	// We fetch the next queue entry that is about to be executed
 	while ($r = poller_worker_process()) {
 
+		// Assure that the priority is an integer value
+		$r[0]['priority'] = (int)$r[0]['priority'];
+
 		// If we got that queue entry we claim it for us
 		if (!poller_claim_process($r[0])) {
 			dba::unlock();
@@ -260,10 +263,12 @@ function poller_exec_function($queue, $funcname, $argv) {
 	// But preserve the old one for the worker
 	$old_process_id = $a->process_id;
 	$a->process_id = uniqid("wrk", true);
+	$a->queue = $queue;
 
 	$funcname($argv, $argc);
 
 	$a->process_id = $old_process_id;
+	unset($a->queue);
 
 	$duration = number_format(microtime(true) - $stamp, 3);
 
