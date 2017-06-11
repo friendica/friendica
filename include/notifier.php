@@ -488,7 +488,7 @@ function notifier_run(&$argv, &$argc){
 			logger("Deliver ".$target_item["guid"]." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
 			proc_run(array('priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true),
-					'include/delivery.php', $cmd, $item_id, $contact['id']);
+					'include/delivery.php', $cmd, $item_id, (int)$contact['id']);
 		}
 	}
 
@@ -554,7 +554,7 @@ function notifier_run(&$argv, &$argc){
 				if ((! $mail) && (! $fsuggest) && (! $followup)) {
 					logger('notifier: delivery agent: '.$rr['name'].' '.$rr['id'].' '.$rr['network'].' '.$target_item["guid"]);
 					proc_run(array('priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true),
-							'include/delivery.php', $cmd, $item_id, $rr['id']);
+							'include/delivery.php', $cmd, $item_id, (int)$rr['id']);
 				}
 			}
 		}
