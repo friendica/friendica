@@ -20,6 +20,7 @@ function pubsubpublish_run(&$argv, &$argc){
 			logger("Publish feed to ".$rr["callback_url"], LOGGER_DEBUG);
 			proc_run(array('priority' => PRIORITY_HIGH, 'created' => $a->queue['created'], 'dont_fork' => true),
 					'include/pubsubpublish.php', (int)$rr["id"]);
+			logger("Publish feed to ".$rr["callback_url"].' - done', LOGGER_DEBUG);
 		}
 	}
 
