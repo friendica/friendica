@@ -51,7 +51,6 @@ function poller_run($argv, $argc){
 	// Kill stale processes every 5 minutes
 	$last_cleanup = Config::get('system', 'poller_last_cleaned', 0);
 	if (time() > ($last_cleanup + 300)) {
-		logger('CLEAN: '.time().' > '.($last_cleanup + 300).' - '.$last_cleanup);
 		Config::set('system', 'poller_last_cleaned', time());
 		poller_kill_stale_workers();
 	}
