@@ -48,13 +48,12 @@ function poller_run($argv, $argc){
 	// We now start the process. This is done after the load check since this could increase the load.
 	$a->start_process();
 
-	// At first we check the number of workers and quit if there are too much of them
-	// This is done at the top to avoid that too much code is executed without a need to do so,
-	// since the poller mostly quits here.
-	if (poller_too_much_workers()) {
+	// Kill stale processes every 5 minutes
+	$last_cleanup = Config::get('system', 'poller_last_cleaned', 0);
+	if (time() > ($last_cleanup + 300)) {
+		logger('CLEAN: '.time().' > '.($last_cleanup + 300).' - '.$last_cleanup);
+		Config::set('system', 'poller_last_cleaned', time());
 		poller_kill_stale_workers();
-		logger('Pre check: Active worker limit reached, quitting.', LOGGER_DEBUG);
-		return;
 	}
 
 	// Do we have too few memory?

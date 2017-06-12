@@ -22,6 +22,7 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'a
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Util\Lock;
 
 require_once 'include/config.php';
 require_once 'include/network.php';
@@ -1100,8 +1101,16 @@ function proc_run($cmd) {
 		return;
 	}
 
+	// If there is a lock then we don't have to check for too much worker
+	if (!Lock::set('poller_worker', 0)) {
+		return;
+	}
+
 	// If there are already enough workers running, don't fork another one
-	if (poller_too_much_workers()) {
+	$quit = poller_too_much_workers();
+	Lock::remove('poller_worker');
+
+	if ($quit) {
 		return;
 	}
 
