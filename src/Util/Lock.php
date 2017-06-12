@@ -57,7 +57,6 @@ class Lock {
 
 		$memcache = self::connectMemcache();
 		if (is_object($memcache)) {
-			$wait_sec = 0.2;
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
 
 			do {
@@ -82,14 +81,12 @@ class Lock {
 				dba::unlock();
 
 				if (!$got_lock && ($timeout > 0)) {
-					usleep($wait_sec * 1000000);
+					usleep(rand(10000, 200000));
 				}
 			} while (!$got_lock && ((time() - $start) < $timeout));
 
 			return $got_lock;
 		}
-
-		$wait_sec = 2;
 
 		do {
 			dba::lock('locks');
@@ -118,7 +115,7 @@ class Lock {
 			dba::unlock();
 
 			if (!$got_lock && ($timeout > 0)) {
-				sleep($wait_sec);
+				usleep(rand(100000, 2000000));
 			}
 		} while (!$got_lock && ((time() - $start) < $timeout));
 
