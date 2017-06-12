@@ -92,7 +92,7 @@ function poller_run($argv, $argc){
 
 		// If we got that queue entry we claim it for us
 		if (!poller_claim_process($r[0])) {
-			dba::unlock();
+			Lock::remove('poller_fetch_worker');
 			continue;
 		} else {
 			// Fetch all workerqueue data while the table is still locked
@@ -100,7 +100,7 @@ function poller_run($argv, $argc){
 			$entries = poller_total_entries();
 			$top_priority = poller_highest_priority();
 			$high_running = poller_process_with_priority_active($top_priority);
-			dba::unlock();
+			Lock::remove('poller_fetch_worker');
 		}
 
 		// To avoid the quitting of multiple pollers only one poller at a time will execute the check
@@ -621,9 +621,11 @@ function poller_worker_process() {
 	// Check if we should pass some low priority process
 	$highest_priority = 0;
 
-	if (poller_passing_slow($highest_priority)) {
-		dba::lock('workerqueue');
+	if (!Lock::set('poller_fetch_worker')) {
+		return false;
+	}
 
+	if (poller_passing_slow($highest_priority)) {
 		// Are there waiting processes with a higher priority than the currently highest?
 		$r = q("SELECT * FROM `workerqueue`
 				WHERE `executed` <= '%s' AND `priority` < %d
@@ -643,8 +645,6 @@ function poller_worker_process() {
 		if (dbm::is_result($r)) {
 			return $r;
 		}
-	} else {
-		dba::lock('workerqueue');
 	}
 
 	// If there is no result (or we shouldn't pass lower processes) we check without priority limit
@@ -654,7 +654,7 @@ function poller_worker_process() {
 
 	// We only unlock the tables here, when we got no data
 	if (!dbm::is_result($r)) {
-		dba::unlock();
+		Lock::remove('poller_fetch_worker');
 	}
 
 	return $r;
@@ -805,6 +805,7 @@ if (array_search(__file__,get_included_files())===0){
 	get_app()->end_process();
 
 	Lock::remove('poller_worker');
+	Lock::remove('poller_fetch_worker');
 
 	killme();
 }

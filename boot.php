@@ -1089,16 +1089,12 @@ function proc_run($cmd) {
 	$argv = $args;
 	array_shift($argv);
 
-	dba::lock('workerqueue');
-
 	$parameters = json_encode($argv);
 	$found = dba::select('workerqueue', array('id'), array('parameter' => $parameters), array('limit' => 1));
 
 	if (!dbm::is_result($found)) {
 		dba::insert('workerqueue', array('parameter' => $parameters, 'created' => $created, 'priority' => $priority));
 	}
-
-	dba::unlock();
 
 	// Should we quit and wait for the poller to be called as a cronjob?
 	if ($dont_fork) {
