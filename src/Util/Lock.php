@@ -61,6 +61,8 @@ class Lock {
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;
 
 			do {
+				// We only lock to be sure that nothing happens at exactly the same time
+				dba::lock('locks');
 				$lock = $memcache->get($cachekey);
 
 				if (!is_bool($lock)) {
@@ -76,6 +78,9 @@ class Lock {
 					$memcache->set($cachekey, getmypid(), MEMCACHE_COMPRESSED, 300);
 					$got_lock = true;
 				}
+
+				dba::unlock();
+
 				if (!$got_lock && ($timeout > 0)) {
 					usleep($wait_sec * 1000000);
 				}
