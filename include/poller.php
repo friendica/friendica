@@ -617,36 +617,33 @@ function find_worker_processes() {
 
 	if (poller_passing_slow($highest_priority)) {
 		// Are there waiting processes with a higher priority than the currently highest?
-		$result = dba::p("UPDATE `workerqueue` SET `executed` = ?, `pid` = ?
+		$result = dba::e("UPDATE `workerqueue` SET `executed` = ?, `pid` = ?
 					WHERE `executed` <= ? AND `priority` < ?
 					ORDER BY `priority`, `created` LIMIT 5",
 				datetime_convert(), getmypid(), NULL_DATE, $highest_priority);
-		if (dbm::is_result($result)) {
-			$found = (dba::num_rows($result) > 0);
+		if ($result) {
+			$found = (dba::affected_rows() > 0);
 		}
-		dba::close($result);
 
 		if (!$found) {
 			// Give slower processes some processing time
-			$result = dba::p("UPDATE `workerqueue` SET `executed` = ?, `pid` = ?
+			$result = dba::e("UPDATE `workerqueue` SET `executed` = ?, `pid` = ?
 						WHERE `executed` <= ? AND `priority` > ?
 						ORDER BY `priority`, `created` LIMIT 1",
 					datetime_convert(), getmypid(), NULL_DATE, $highest_priority);
-			if (dbm::is_result($result)) {
-				$found = (dba::num_rows($result) > 0);
+			if ($result) {
+				$found = (dba::affected_rows() > 0);
 			}
-			dba::close($result);
 		}
 	}
 
 	// If there is no result (or we shouldn't pass lower processes) we check without priority limit
 	if (!$found) {
-		$result = dba::p("UPDATE `workerqueue` SET `executed` = ?, `pid` = ? WHERE `executed` <= ? ORDER BY `priority`, `created` LIMIT 5",
+		$result = dba::e("UPDATE `workerqueue` SET `executed` = ?, `pid` = ? WHERE `executed` <= ? ORDER BY `priority`, `created` LIMIT 5",
 				datetime_convert(), getmypid(), NULL_DATE);
-		if (dbm::is_result($result)) {
-			$found = (dba::num_rows($result) > 0);
+		if ($result) {
+			$found = (dba::affected_rows() > 0);
 		}
-		dba::close($result);
 	}
 	return $found;
 }

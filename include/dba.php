@@ -21,6 +21,8 @@ class dba {
 	private $driver;
 	public  $connected = false;
 	public  $error = false;
+	public  $errorno = 0;
+	public  $affected_rows = 0;
 	private $_server_info = '';
 	private static $in_transaction = false;
 	private static $dbo;
@@ -551,6 +553,7 @@ class dba {
 
 		self::$dbo->error = '';
 		self::$dbo->errorno = 0;
+		self::$dbo->affected_rows = 0;
 
 		switch (self::$dbo->driver) {
 			case 'pdo':
@@ -573,6 +576,7 @@ class dba {
 					$retval = false;
 				} else {
 					$retval = $stmt;
+					self::$dbo->affected_rows = $retval->rowCount();
 				}
 				break;
 			case 'mysqli':
@@ -612,6 +616,7 @@ class dba {
 				} else {
 					$stmt->store_result();
 					$retval = $stmt;
+					self::$dbo->affected_rows = $retval->affected_rows;
 				}
 				break;
 			case 'mysql':
@@ -620,6 +625,8 @@ class dba {
 				if (mysql_errno(self::$dbo->db)) {
 					self::$dbo->error = mysql_error(self::$dbo->db);
 					self::$dbo->errorno = mysql_errno(self::$dbo->db);
+				} else {
+					self::$dbo->affected_rows = mysql_affected_rows($retval);
 				}
 				break;
 		}
@@ -752,6 +759,15 @@ class dba {
 		self::close($stmt);
 
 		return $retval;
+	}
+
+	/**
+	 * @brief Returns the number of affected rows of the last statement
+	 *
+	 * @return int Number of rows
+	 */
+	static public function affected_rows() {
+		return self::$dbo->affected_rows;
 	}
 
 	/**
