@@ -199,10 +199,7 @@ function poller_execute($queue) {
 
 	if (!validate_include($include)) {
 		logger("Include file ".$argv[0]." is not valid!");
-		$timeout = 10;
-		while (!dba::delete('workerqueue', array('id' => $queue["id"])) && (--$timeout > 0)) {
-			sleep(1);
-		}
+		dba::delete('workerqueue', array('id' => $queue["id"]));
 		return true;
 	}
 
@@ -212,11 +209,7 @@ function poller_execute($queue) {
 
 	if (function_exists($funcname)) {
 		poller_exec_function($queue, $funcname, $argv);
-		$timeout = 10;
-		while (!dba::delete('workerqueue', array('id' => $queue["id"])) && (--$timeout > 0)) {
-			logger('Delete ID '.$queue["id"], LOGGER_DEBUG);
-			sleep(1);
-		}
+		dba::delete('workerqueue', array('id' => $queue["id"]));
 	} else {
 		logger("Function ".$funcname." does not exist");
 	}

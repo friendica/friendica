@@ -625,8 +625,21 @@ class dba {
 		}
 
 		if (self::$dbo->errorno != 0) {
-			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
-				$a->callstack(8))."\n".self::replace_parameters($sql, $args);
+			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+			$called_from = array_shift($trace);
+
+			// We are having an own error logging in the function "p"
+			if ($called_from['function'] != 'p') {
+				// We have to preserve the error code, somewhere in the logging it get lost
+				$error = self::$dbo->error;
+				$errorno = self::$dbo->errorno;
+
+				logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
+					$a->callstack(8))."\n".self::replace_parameters($sql, $args);
+
+				self::$dbo->error = $error;
+				self::$dbo->errorno = $errorno;
+			}
 		}
 
 		$a->save_timestamp($stamp1, 'database');
@@ -662,17 +675,35 @@ class dba {
 
 		$args = func_get_args();
 
-		$stmt = call_user_func_array('self::p', $args);
+		// In a case of a deadlock we are repeating the query 10 times
+		$timeout = 10;
 
-		if (is_bool($stmt)) {
-			$retval = $stmt;
-		} elseif (is_object($stmt)) {
-			$retval = true;
-		} else {
-			$retval = false;
+		do {
+			$stmt = call_user_func_array('self::p', $args);
+
+			if (is_bool($stmt)) {
+				$retval = $stmt;
+			} elseif (is_object($stmt)) {
+				$retval = true;
+			} else {
+				$retval = false;
+			}
+
+			self::close($stmt);
+
+		} while ((self::$dbo->errorno = 1213) && (--$timeout > 0));
+
+		if (self::$dbo->errorno != 0) {
+			// We have to preserve the error code, somewhere in the logging it get lost
+			$error = self::$dbo->error;
+			$errorno = self::$dbo->errorno;
+
+			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
+				$a->callstack(8))."\n".self::replace_parameters($sql, $args);
+
+			self::$dbo->error = $error;
+			self::$dbo->errorno = $errorno;
 		}
-
-		self::close($stmt);
 
 		$a->save_timestamp($stamp, "database_write");
 
