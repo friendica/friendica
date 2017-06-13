@@ -101,26 +101,26 @@ function poller_run($argv, $argc){
 				logger('Process execution failed, quitting.', LOGGER_DEBUG);
 				return;
 			}
-
-			// To avoid the quitting of multiple pollers only one poller at a time will execute the check
-			if (Lock::set('poller_worker', 0)) {
-				// Count active workers and compare them with a maximum value that depends on the load
-				if (poller_too_much_workers()) {
-					logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
-					return;
-				}
-
-				// Check free memory
-				if ($a->min_memory_reached()) {
-					logger('Memory limit reached, quitting.', LOGGER_DEBUG);
-					return;
-				}
-				Lock::remove('poller_worker');
-			}
 		}
 
-		// Quit the poller once every hour
-		if (time() > ($starttime + 3600)) {
+		// To avoid the quitting of multiple pollers only one poller at a time will execute the check
+		if (Lock::set('poller_worker', 0)) {
+			// Count active workers and compare them with a maximum value that depends on the load
+			if (poller_too_much_workers()) {
+				logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
+				return;
+			}
+
+			// Check free memory
+			if ($a->min_memory_reached()) {
+				logger('Memory limit reached, quitting.', LOGGER_DEBUG);
+				return;
+			}
+			Lock::remove('poller_worker');
+		}
+
+		// Quit the poller once every 5 minutes
+		if (time() > ($starttime + 300)) {
 			logger('Process lifetime reached, quitting.', LOGGER_DEBUG);
 			return;
 		}
@@ -615,7 +615,7 @@ function find_worker_processes() {
 		// Are there waiting processes with a higher priority than the currently highest?
 		$result = dba::p("UPDATE `workerqueue` SET `executed` = ?, `pid` = ?
 					WHERE `executed` <= ? AND `priority` < ?
-					ORDER BY `priority`, `created` LIMIT 1",
+					ORDER BY `priority`, `created` LIMIT 5",
 				datetime_convert(), getmypid(), NULL_DATE, $highest_priority);
 		if (dbm::is_result($result)) {
 			$found = (dba::num_rows($result) > 0);
@@ -637,7 +637,7 @@ function find_worker_processes() {
 
 	// If there is no result (or we shouldn't pass lower processes) we check without priority limit
 	if (!$found) {
-		$result = dba::p("UPDATE `workerqueue` SET `executed` = ?, `pid` = ? WHERE `executed` <= ? ORDER BY `priority`, `created` LIMIT 1",
+		$result = dba::p("UPDATE `workerqueue` SET `executed` = ?, `pid` = ? WHERE `executed` <= ? ORDER BY `priority`, `created` LIMIT 5",
 				datetime_convert(), getmypid(), NULL_DATE);
 		if (dbm::is_result($result)) {
 			$found = (dba::num_rows($result) > 0);
