@@ -675,8 +675,8 @@ class dba {
 
 		$args = func_get_args();
 
-		// In a case of a deadlock we are repeating the query 10 times
-		$timeout = 10;
+		// In a case of a deadlock we are repeating the query 20 times
+		$timeout = 20;
 
 		do {
 			$stmt = call_user_func_array('self::p', $args);
