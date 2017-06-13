@@ -657,10 +657,7 @@ function poller_worker_process() {
 
 	$stamp = (float)microtime(true);
 
-	$timeout = 10;
-	do {
-		$found = find_worker_processes();
-	} while (!$found && (poller_total_entries() > 0) && (--$timeout > 0));
+	$found = find_worker_processes();
 
 	logger('Duration: '.number_format(microtime(true) - $stamp, 3), LOGGER_DEBUG);
 
