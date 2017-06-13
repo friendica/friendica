@@ -1139,7 +1139,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	check_item_notification($current_post, $uid);
 
 	if ($notify) {
-		proc_run(PRIORITY_HIGH, "include/notifier.php", $notify_type, $current_post);
+		proc_run(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), "include/notifier.php", $notify_type, $current_post);
 	}
 
 	return $current_post;
@@ -1430,7 +1430,7 @@ function tag_deliver($uid, $item_id) {
 	);
 	update_thread($item_id);
 
-	proc_run(PRIORITY_HIGH,'include/notifier.php', 'tgroup', $item_id);
+	proc_run(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), 'include/notifier.php', 'tgroup', $item_id);
 
 }
 
@@ -2076,7 +2076,7 @@ function item_expire($uid, $days, $network = "", $force = false) {
 		drop_item($item['id'], false);
 	}
 
-	proc_run(PRIORITY_LOW, "include/notifier.php", "expire", $uid);
+	proc_run(array('priority' => PRIORITY_LOW, 'dont_fork' => true), "include/notifier.php", "expire", $uid);
 
 }
 
@@ -2099,7 +2099,7 @@ function drop_items($items) {
 	// multiple threads may have been deleted, send an expire notification
 
 	if ($uid) {
-		proc_run(PRIORITY_LOW, "include/notifier.php", "expire", $uid);
+		proc_run(array('priority' => PRIORITY_LOW, 'dont_fork' => true), "include/notifier.php", "expire", $uid);
 	}
 }
 
@@ -2295,7 +2295,7 @@ function drop_item($id, $interactive = true) {
 		$drop_id = intval($item['id']);
 		$priority = ($interactive ? PRIORITY_HIGH : PRIORITY_LOW);
 
-		proc_run($priority, "include/notifier.php", "drop", $drop_id);
+		proc_run(array('priority' => $priority, 'dont_fork' => true), "include/notifier.php", "drop", $drop_id);
 
 		if (! $interactive) {
 			return $owner;
