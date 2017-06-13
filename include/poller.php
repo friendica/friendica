@@ -135,7 +135,11 @@ function poller_run($argv, $argc){
  */
 function poller_total_entries() {
 	$s = q("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `executed` <= '%s'", dbesc(NULL_DATE));
-	return $s[0]["total"];
+	if (dbm::is_result($s)) {
+		return $s[0]["total"];
+	} else {
+		return 0;
+	}
 }
 
 /**
@@ -145,7 +149,11 @@ function poller_total_entries() {
  */
 function poller_highest_priority() {
 	$s = q("SELECT `priority` FROM `workerqueue` WHERE `executed` <= '%s' ORDER BY `priority` LIMIT 1", dbesc(NULL_DATE));
-	return $s[0]["priority"];
+	if (dbm::is_result($s)) {
+		return $s[0]["priority"];
+	} else {
+		return 0;
+	}
 }
 
 /**
@@ -463,10 +471,6 @@ function poller_kill_stale_workers() {
 
 /**
  * @brief Checks if the number of active workers exceeds the given limits
- *
- * @param integer $entries The number of not executed entries in the worker queue
- * @param integer $top_priority The highest not executed priority in the worker queue
- * @param boolean $high_running Is a process with priority "$top_priority" running?
  *
  * @return bool Are there too much workers running?
  */
