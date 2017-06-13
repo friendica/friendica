@@ -691,7 +691,7 @@ class dba {
 
 			self::close($stmt);
 
-		} while ((self::$dbo->errorno = 1213) && (--$timeout > 0));
+		} while ((self::$dbo->errorno == 1213) && (--$timeout > 0));
 
 		if (self::$dbo->errorno != 0) {
 			// We have to preserve the error code, somewhere in the logging it get lost
