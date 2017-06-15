@@ -2509,7 +2509,8 @@ class Diaspora {
 		switch ($target_type) {
 			case "Comment":
 			case "Like":
-			case "Post": // "Post" will be supported in a future version
+			case "Post":
+				return self::item_retraction($importer, $contact, $data);
 			case "Reshare":
 			case "StatusMessage":
 				return self::item_retraction($importer, $contact, $data);
@@ -3032,9 +3033,11 @@ class Diaspora {
 	 */
 	public static function send_unshare($owner,$contact) {
 
-		$message = array("post_guid" => $owner["guid"],
-				"diaspora_handle" => self::my_handle($owner),
-				"type" => "Person");
+		self::$new = true;
+
+		$message = array("author" => self::my_handle($owner),
+				"target_guid" => $owner["guid"],
+				"target_type" => "Person");
 
 		logger("Send unshare ".print_r($message, true), LOGGER_DEBUG);
 
@@ -3597,28 +3600,16 @@ class Diaspora {
 	 */
 	public static function send_retraction($item, $owner, $contact, $public_batch = false, $relay = false) {
 
+		self::$new = true;
+
 		$itemaddr = self::handle_from_contact($item["contact-id"], $item["gcontact-id"]);
 
-		// Check whether the retraction is for a top-level post or whether it's a relayable
-		if ($item["uri"] !== $item["parent-uri"]) {
-			$msg_type = "relayable_retraction";
-			$target_type = (($item["verb"] === ACTIVITY_LIKE) ? "Like" : "Comment");
-		} else {
-			$msg_type = "signed_retraction";
-			$target_type = "StatusMessage";
-		}
+		$msg_type = "retraction";
+		$target_type = "Post";
 
-		if ($relay && ($item["uri"] !== $item["parent-uri"]))
-			$signature = "parent_author_signature";
-		else
-			$signature = "target_author_signature";
-
-		$signed_text = $item["guid"].";".$target_type;
-
-		$message = array("target_guid" => $item['guid'],
-				"target_type" => $target_type,
-				"sender_handle" => $itemaddr,
-				$signature => base64_encode(rsa_sign($signed_text,$owner['uprvkey'],'sha256')));
+		$message = array("author" => $itemaddr,
+				"target_guid" => $item['guid'],
+				"target_type" => $target_type);
 
 		logger("Got message ".print_r($message, true), LOGGER_DEBUG);
 
