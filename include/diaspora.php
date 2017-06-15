@@ -2510,7 +2510,6 @@ class Diaspora {
 			case "Comment":
 			case "Like":
 			case "Post":
-				return self::item_retraction($importer, $contact, $data);
 			case "Reshare":
 			case "StatusMessage":
 				return self::item_retraction($importer, $contact, $data);
@@ -3653,18 +3652,12 @@ class Diaspora {
 		$body = bb2diaspora($item["body"]);
 		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
 
-		$signed_text = $item["guid"].";".$cnv["guid"].";".$body.";".$created.";".$myaddr.";".$cnv['guid'];
-		$sig = base64_encode(rsa_sign($signed_text, $owner["uprvkey"], "sha256"));
-
 		$msg = array(
 			"author" => $myaddr,
 			"guid" => $item["guid"],
 			"conversation_guid" => $cnv["guid"],
 			"text" => $body,
 			"created_at" => $created,
-			//"parent_guid" => $cnv["guid"],
-			//"parent_author_signature" => $sig,
-			//"author_signature" => $sig,
 		);
 
 		if ($item["reply"]) {
