@@ -29,6 +29,8 @@ require_once 'include/cache.php';
  */
 class Diaspora {
 
+	private static $new = false;
+
 	/**
 	 * @brief Return a list of relay servers
 	 *
@@ -2957,7 +2959,11 @@ class Diaspora {
 	 */
 	public static function build_post_xml($type, $message) {
 
-		$data = array("XML" => array("post" => array($type => $message)));
+		if (!self::$new) {
+			$data = array("XML" => array("post" => array($type => $message)));
+		} else {
+			$data = array($type => $message);
+		}
 		return xml::from_array($data, $xml);
 	}
 
@@ -3201,6 +3207,8 @@ class Diaspora {
 	 */
 	public static function build_status($item, $owner) {
 
+		self::$new = true;
+
 		$cachekey = "diaspora:build_status:".$item['guid'];
 
 		$result = Cache::get($cachekey);
@@ -3214,15 +3222,17 @@ class Diaspora {
 
 		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
 
+		//self::$new = Config::get('system', 'new_diaspora', null, true);
+
 		// Detect a share element and do a reshare
 		if (!$item['private'] && ($ret = self::is_reshare($item["body"]))) {
-			$message = array("root_diaspora_id" => $ret["root_handle"],
-					"root_guid" => $ret["root_guid"],
+			$message = array("author" => $myaddr,
 					"guid" => $item["guid"],
-					"diaspora_handle" => $myaddr,
-					"public" => $public,
 					"created_at" => $created,
-					"provider_display_name" => $item["app"]);
+					"root_author" => $ret["root_handle"],
+					"root_guid" => $ret["root_guid"],
+					"provider_display_name" => $item["app"],
+					"public" => $public);
 
 			$type = "reshare";
 		} else {
@@ -3256,13 +3266,13 @@ class Diaspora {
 				$location["lng"] = $coord[1];
 			}
 
-			$message = array("raw_message" => $body,
-					"location" => $location,
+			$message = array("author" => $myaddr,
 					"guid" => $item["guid"],
-					"diaspora_handle" => $myaddr,
-					"public" => $public,
 					"created_at" => $created,
-					"provider_display_name" => $item["app"]);
+					"public" => $public,
+					"text" => $body,
+					"provider_display_name" => $item["app"],
+					"location" => $location);
 
 			// Diaspora rejects messages when they contain a location without "lat" or "lng"
 			if (!isset($location["lat"]) || !isset($location["lng"])) {
@@ -3275,7 +3285,7 @@ class Diaspora {
 					$message['event'] = $event;
 
 					/// @todo Once Diaspora supports it, we will remove the body
-					// $message['raw_message'] = '';
+					// $message['text'] = '';
 				}
 			}
 
@@ -3316,6 +3326,8 @@ class Diaspora {
 	 */
 	private static function construct_like($item, $owner) {
 
+		self::$new = true;
+
 		$p = q("SELECT `guid`, `uri`, `parent-uri` FROM `item` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($item["thr-parent"]));
 		if (!dbm::is_result($p))
@@ -3330,12 +3342,12 @@ class Diaspora {
 			$positive = "false";
 		}
 
-		return(array("positive" => $positive,
+		return(array("author" => self::my_handle($owner),
 				"guid" => $item["guid"],
-				"target_type" => $target_type,
 				"parent_guid" => $parent["guid"],
-				"author_signature" => "",
-				"diaspora_handle" => self::my_handle($owner)));
+				"parent_type" => $target_type,
+				"positive" => $positive,
+				"author_signature" => ""));
 	}
 
 	/**
@@ -3347,6 +3359,8 @@ class Diaspora {
 	 * @return array The data for an "EventParticipation"
 	 */
 	private static function construct_attend($item, $owner) {
+
+		self::$new = true;
 
 		$p = q("SELECT `guid`, `uri`, `parent-uri` FROM `item` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($item["thr-parent"]));
@@ -3387,6 +3401,8 @@ class Diaspora {
 	 */
 	private static function construct_comment($item, $owner) {
 
+		self::$new = true;
+
 		$cachekey = "diaspora:construct_comment:".$item['guid'];
 
 		$result = Cache::get($cachekey);
@@ -3407,12 +3423,12 @@ class Diaspora {
 		$text = html_entity_decode(bb2diaspora($item["body"]));
 		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
 
-		$comment = array("guid" => $item["guid"],
+		$comment = array("author" => self::my_handle($owner),
+				"guid" => $item["guid"],
+				"created_at" => $created,
 				"parent_guid" => $parent["guid"],
-				"author_signature" => "",
 				"text" => $text,
-				/// @todo Currently disabled until Diaspora supports it: "created_at" => $created,
-				"diaspora_handle" => self::my_handle($owner));
+				"author_signature" => "");
 
 		// Send the thread parent guid only if it is a threaded comment
 		if ($item['thr-parent'] != $item['parent-uri']) {
@@ -3620,6 +3636,8 @@ class Diaspora {
 	 */
 	public static function send_mail($item, $owner, $contact) {
 
+		self::$new = true;
+
 		$myaddr = self::my_handle($owner);
 
 		$r = q("SELECT * FROM `conv` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -3634,11 +3652,11 @@ class Diaspora {
 		$cnv = $r[0];
 
 		$conv = array(
+			"author" => $cnv["creator"],
 			"guid" => $cnv["guid"],
 			"subject" => $cnv["subject"],
 			"created_at" => datetime_convert("UTC", "UTC", $cnv['created'], 'Y-m-d\TH:i:s\Z'),
-			"diaspora_handle" => $cnv["creator"],
-			"participant_handles" => $cnv["recips"]
+			"participants" => $cnv["recips"]
 		);
 
 		$body = bb2diaspora($item["body"]);
@@ -3648,26 +3666,27 @@ class Diaspora {
 		$sig = base64_encode(rsa_sign($signed_text, $owner["uprvkey"], "sha256"));
 
 		$msg = array(
+			"author" => $myaddr,
 			"guid" => $item["guid"],
-			"parent_guid" => $cnv["guid"],
-			"parent_author_signature" => $sig,
-			"author_signature" => $sig,
+			"conversation_guid" => $cnv["guid"],
 			"text" => $body,
 			"created_at" => $created,
-			"diaspora_handle" => $myaddr,
-			"conversation_guid" => $cnv["guid"]
+			//"parent_guid" => $cnv["guid"],
+			//"parent_author_signature" => $sig,
+			//"author_signature" => $sig,
 		);
 
 		if ($item["reply"]) {
 			$message = $msg;
 			$type = "message";
 		} else {
-			$message = array("guid" => $cnv["guid"],
+			$message = array(
+					"author" => $cnv["creator"],
+					"guid" => $cnv["guid"],
 					"subject" => $cnv["subject"],
 					"created_at" => datetime_convert("UTC", "UTC", $cnv['created'], 'Y-m-d\TH:i:s\Z'),
-					"message" => $msg,
-					"diaspora_handle" => $cnv["creator"],
-					"participant_handles" => $cnv["recips"]);
+					"participants" => $cnv["recips"],
+					"message" => $msg);
 
 			$type = "conversation";
 		}
