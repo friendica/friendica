@@ -3009,9 +3009,15 @@ class Diaspora {
 	 *
 	 * @return int The result of the transmission
 	 */
-	public static function send_share($owner,$contact) {
+	public static function send_share($owner, $contact) {
 
 		/// @todo support the different possible combinations of "following" and "sharing"
+/*
+				if (in_array($contact["rel"], array(CONTACT_IS_FRIEND, CONTACT_IS_FOLLOWER))) {
+				$new_relation = CONTACT_IS_FRIEND;
+				$new_relation = CONTACT_IS_SHARING;
+				$new_relation = CONTACT_IS_FOLLOWER;
+*/
 		$message = array("author" => self::my_handle($owner),
 				"recipient" => $contact["addr"],
 				"following" => "true",
@@ -3030,15 +3036,16 @@ class Diaspora {
 	 *
 	 * @return int The result of the transmission
 	 */
-	public static function send_unshare($owner,$contact) {
+	public static function send_unshare($owner, $contact) {
 
 		$message = array("author" => self::my_handle($owner),
-				"target_guid" => $owner["guid"],
-				"target_type" => "Person");
+				"recipient" => $contact["addr"],
+				"following" => "false",
+				"sharing" => "false");
 
 		logger("Send unshare ".print_r($message, true), LOGGER_DEBUG);
 
-		return self::build_and_transmit($owner, $contact, "retraction", $message);
+		return self::build_and_transmit($owner, $contact, "contact", $message);
 	}
 
 	/**
