@@ -29,8 +29,6 @@ require_once 'include/cache.php';
  */
 class Diaspora {
 
-	private static $new = false;
-
 	/**
 	 * @brief Return a list of relay servers
 	 *
@@ -2851,6 +2849,8 @@ class Diaspora {
 	 */
 	private static function build_message($msg, $user, $contact, $prvkey, $pubkey, $public = false) {
 
+		//$new = Config::get('system', 'new_diaspora', null, true);
+
 		if ($public)
 			$magic_env =  self::build_public_message($msg,$user,$contact,$prvkey,$pubkey);
 		else
@@ -2959,11 +2959,8 @@ class Diaspora {
 	 */
 	public static function build_post_xml($type, $message) {
 
-		if (!self::$new) {
-			$data = array("XML" => array("post" => array($type => $message)));
-		} else {
-			$data = array($type => $message);
-		}
+		$data = array($type => $message);
+
 		return xml::from_array($data, $xml);
 	}
 
@@ -3014,12 +3011,15 @@ class Diaspora {
 	 */
 	public static function send_share($owner,$contact) {
 
-		$message = array("sender_handle" => self::my_handle($owner),
-				"recipient_handle" => $contact["addr"]);
+		/// @todo support the different possible combinations of "following" and "sharing"
+		$message = array("author" => self::my_handle($owner),
+				"recipient" => $contact["addr"],
+				"following" => "true",
+				"sharing" => "true");
 
 		logger("Send share ".print_r($message, true), LOGGER_DEBUG);
 
-		return self::build_and_transmit($owner, $contact, "request", $message);
+		return self::build_and_transmit($owner, $contact, "contact", $message);
 	}
 
 	/**
@@ -3031,8 +3031,6 @@ class Diaspora {
 	 * @return int The result of the transmission
 	 */
 	public static function send_unshare($owner,$contact) {
-
-		self::$new = true;
 
 		$message = array("author" => self::my_handle($owner),
 				"target_guid" => $owner["guid"],
@@ -3209,8 +3207,6 @@ class Diaspora {
 	 */
 	public static function build_status($item, $owner) {
 
-		self::$new = true;
-
 		$cachekey = "diaspora:build_status:".$item['guid'];
 
 		$result = Cache::get($cachekey);
@@ -3223,8 +3219,6 @@ class Diaspora {
 		$public = (($item["private"]) ? "false" : "true");
 
 		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
-
-		//self::$new = Config::get('system', 'new_diaspora', null, true);
 
 		// Detect a share element and do a reshare
 		if (!$item['private'] && ($ret = self::is_reshare($item["body"]))) {
@@ -3328,8 +3322,6 @@ class Diaspora {
 	 */
 	private static function construct_like($item, $owner) {
 
-		self::$new = true;
-
 		$p = q("SELECT `guid`, `uri`, `parent-uri` FROM `item` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($item["thr-parent"]));
 		if (!dbm::is_result($p))
@@ -3361,8 +3353,6 @@ class Diaspora {
 	 * @return array The data for an "EventParticipation"
 	 */
 	private static function construct_attend($item, $owner) {
-
-		self::$new = true;
 
 		$p = q("SELECT `guid`, `uri`, `parent-uri` FROM `item` WHERE `uri` = '%s' LIMIT 1",
 			dbesc($item["thr-parent"]));
@@ -3402,8 +3392,6 @@ class Diaspora {
 	 * @return array The data for a comment
 	 */
 	private static function construct_comment($item, $owner) {
-
-		self::$new = true;
 
 		$cachekey = "diaspora:construct_comment:".$item['guid'];
 
@@ -3487,19 +3475,17 @@ class Diaspora {
 		$signed_parts = explode(";", $signature['signed_text']);
 
 		if ($item["deleted"])
-			$message = array("parent_author_signature" => "",
+			$message = array("author" => $signature['signer'],
 					"target_guid" => $signed_parts[0],
-					"target_type" => $signed_parts[1],
-					"sender_handle" => $signature['signer'],
-					"target_author_signature" => $signature['signature']);
+					"target_type" => $signed_parts[1]);
 		elseif ($item['verb'] === ACTIVITY_LIKE)
-			$message = array("positive" => $signed_parts[0],
+			$message = array("author" => $signed_parts[4],
 					"guid" => $signed_parts[1],
-					"target_type" => $signed_parts[2],
 					"parent_guid" => $signed_parts[3],
-					"parent_author_signature" => "",
+					"parent_type" => $signed_parts[2],
+					"positive" => $signed_parts[0],
 					"author_signature" => $signature['signature'],
-					"diaspora_handle" => $signed_parts[4]);
+					"parent_author_signature" => "");
 		else {
 			// Remove the comment guid
 			$guid = array_shift($signed_parts);
@@ -3513,12 +3499,12 @@ class Diaspora {
 			// Glue the parts together
 			$text = implode(";", $signed_parts);
 
-			$message = array("guid" => $guid,
+			$message = array("author" => $handle,
+					"guid" => $guid,
 					"parent_guid" => $parent_guid,
-					"parent_author_signature" => "",
-					"author_signature" => $signature['signature'],
 					"text" => implode(";", $signed_parts),
-					"diaspora_handle" => $handle);
+					"author_signature" => $signature['signature'],
+					"parent_author_signature" => "");
 		}
 		return $message;
 	}
@@ -3567,10 +3553,12 @@ class Diaspora {
 			if (is_array($msg)) {
 				foreach ($msg AS $field => $data) {
 					if (!$item["deleted"]) {
-						if ($field == "author")
-							$field = "diaspora_handle";
-						if ($field == "parent_type")
-							$field = "target_type";
+						if ($field == "diaspora_handle") {
+							$field = "author";
+						}
+						if ($field == "target_type") {
+							$field = "parent_type";
+						}
 					}
 
 					$message[$field] = $data;
@@ -3599,8 +3587,6 @@ class Diaspora {
 	 */
 	public static function send_retraction($item, $owner, $contact, $public_batch = false, $relay = false) {
 
-		self::$new = true;
-
 		$itemaddr = self::handle_from_contact($item["contact-id"], $item["gcontact-id"]);
 
 		$msg_type = "retraction";
@@ -3625,8 +3611,6 @@ class Diaspora {
 	 * @return int The result of the transmission
 	 */
 	public static function send_mail($item, $owner, $contact) {
-
-		self::$new = true;
 
 		$myaddr = self::my_handle($owner);
 
@@ -3745,7 +3729,7 @@ class Diaspora {
 			$tags = trim($tags);
 		}
 
-		$message = array("diaspora_handle" => $handle,
+		$message = array("author" => $handle,
 				"first_name" => $first,
 				"last_name" => $last,
 				"image_url" => $large,
@@ -3756,6 +3740,7 @@ class Diaspora {
 				"bio" => $about,
 				"location" => $location,
 				"searchable" => $searchable,
+				"nsfw" => "false",
 				"tag_string" => $tags);
 
 		foreach ($recips as $recip) {
