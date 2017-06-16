@@ -2667,15 +2667,54 @@ class Diaspora {
 		return $nick."@".substr(App::get_baseurl(), strpos(App::get_baseurl(),"://") + 3);
 	}
 
+
 	/**
-	 * @brief Creates the envelope for the "fetch" endpoint
+	 * @brief Creates the data for a private message in the new format
+	 *
+	 * @param string $msg The message that is to be transmitted
+	 * @param array $user The record of the sender
+	 * @param array $contact Target of the communication
+	 * @param string $prvkey The private key of the sender
+	 * @param string $pubkey The public key of the receiver
+	 *
+	 * @return string The encrypted data
+	 */
+	public static function encode_private_data($msg, $user, $contact, $prvkey, $pubkey) {
+
+		logger("Message: ".$msg, LOGGER_DATA);
+
+		// without a public key nothing will work
+		if (!$pubkey) {
+			logger("pubkey missing: contact id: ".$contact["id"]);
+			return false;
+		}
+
+		$aes_key = openssl_random_pseudo_bytes(32);
+		$b_aes_key = base64_encode($aes_key);
+		$iv = openssl_random_pseudo_bytes(16);
+		$b_iv = base64_encode($iv);
+
+		$ciphertext = self::aes_encrypt($aes_key, $iv, $msg);
+
+		$json = json_encode(array("iv" => $b_iv, "key" => $b_aes_key));
+
+		$encrypted_key_bundle = "";
+		openssl_public_encrypt($json, $encrypted_key_bundle, $pubkey);
+
+		$json_object = json_encode(array("aes_key" => base64_encode($encrypted_key_bundle),
+						"encrypted_magic_envelope" => base64_encode($ciphertext)));
+
+		return $json_object;
+	}
+
+	/**
+	 * @brief Creates the envelope for the "fetch" endpoint and for the new format
 	 *
 	 * @param string $msg The message that is to be transmitted
 	 * @param array $user The record of the sender
 	 *
 	 * @return string The envelope
 	 */
-
 	public static function build_magic_envelope($msg, $user) {
 
 		$b64url_data = base64url_encode($msg);
@@ -2849,13 +2888,22 @@ class Diaspora {
 	 */
 	private static function build_message($msg, $user, $contact, $prvkey, $pubkey, $public = false) {
 
-		//$new = Config::get('system', 'new_diaspora', null, true);
+		$new = Config::get('system', 'new_diaspora', null, true);
 
-		if ($public)
-			$magic_env =  self::build_public_message($msg,$user,$contact,$prvkey,$pubkey);
-		else
-			$magic_env =  self::build_private_message($msg,$user,$contact,$prvkey,$pubkey);
+		if ($new) {
+			if ($public) {
+				$msg = Diaspora::encode_private_data($msg, $user, $contact, $prvkey, $pubkey);
+			}
 
+			$slap = Diaspora::build_magic_envelope($msg, $user);
+			return $slap;
+		}
+
+		if ($public) {
+			$magic_env =  self::build_public_message($msg, $user, $contact, $prvkey, $pubkey);
+		} else {
+			$magic_env =  self::build_private_message($msg, $user, $contact, $prvkey, $pubkey);
+		}
 		// The data that will be transmitted is double encoded via "urlencode", strange ...
 		$slap = "xml=".urlencode(urlencode($magic_env));
 		return $slap;
@@ -3011,13 +3059,27 @@ class Diaspora {
 	 */
 	public static function send_share($owner, $contact) {
 
-		/// @todo support the different possible combinations of "following" and "sharing"
-/*
-				if (in_array($contact["rel"], array(CONTACT_IS_FRIEND, CONTACT_IS_FOLLOWER))) {
-				$new_relation = CONTACT_IS_FRIEND;
-				$new_relation = CONTACT_IS_SHARING;
-				$new_relation = CONTACT_IS_FOLLOWER;
-*/
+		/**
+		 * @todo support the different possible combinations of "following" and "sharing"
+		 * Currently, Diaspora only interprets the "sharing" field
+		 *
+		 * Before switching this code productive, we have to check all "send_share" calls if "rel" is set correctly
+		 */
+
+		/*
+		switch ($contact["rel"]) {
+			case CONTACT_IS_FRIEND:
+				$following = true;
+				$sharing = true;
+			case CONTACT_IS_SHARING:
+				$following = false;
+				$sharing = true;
+			case CONTACT_IS_FOLLOWER:
+				$following = true;
+				$sharing = false;
+		}
+		*/
+
 		$message = array("author" => self::my_handle($owner),
 				"recipient" => $contact["addr"],
 				"following" => "true",
