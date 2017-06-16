@@ -4,8 +4,8 @@
  * @brief The implementation of the diaspora protocol
  *
  * The new protocol is described here: http://diaspora.github.io/diaspora_federation/index.html
- * Currently this implementation here interprets the old and the new protocol and sends the old one.
- * This will change in the future.
+ * This implementation here interprets the old and the new protocol and sends the new one.
+ * In the future we will remove most stuff from "valid_posting" and interpret only the new protocol.
  */
 
 use Friendica\App;
@@ -2891,7 +2891,7 @@ class Diaspora {
 		$new = Config::get('system', 'new_diaspora', null, true);
 
 		if ($new) {
-			if ($public) {
+			if (!$public) {
 				$msg = Diaspora::encode_private_data($msg, $user, $contact, $prvkey, $pubkey);
 			}
 
