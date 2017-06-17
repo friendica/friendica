@@ -2725,7 +2725,12 @@ class Diaspora {
 		$encoding = "base64url";
 		$alg = "RSA-SHA256";
 		$signable_data = $data.".".base64url_encode($type).".".base64url_encode($encoding).".".base64url_encode($alg);
-		$signature = rsa_sign($signable_data, $user["prvkey"]);
+
+		// Fallback if the private key wasn't transmitted in the expected field
+		if ($user['uprvkey'] == "")
+			$user['uprvkey'] = $user['prvkey'];
+
+		$signature = rsa_sign($signable_data, $user["uprvkey"]);
 		$sig = base64url_encode($signature);
 
 		$xmldata = array("me:env" => array("me:data" => $data,
@@ -2738,140 +2743,6 @@ class Diaspora {
 		$namespaces = array("me" => "http://salmon-protocol.org/ns/magic-env");
 
 		return xml::from_array($xmldata, $xml, false, $namespaces);
-	}
-
-	/**
-	 * @brief Creates the envelope for a public message
-	 *
-	 * @param string $msg The message that is to be transmitted
-	 * @param array $user The record of the sender
-	 * @param array $contact Target of the communication
-	 * @param string $prvkey The private key of the sender
-	 * @param string $pubkey The public key of the receiver
-	 *
-	 * @return string The envelope
-	 */
-	private static function build_public_message($msg, $user, $contact, $prvkey, $pubkey) {
-
-		logger("Message: ".$msg, LOGGER_DATA);
-
-		$handle = self::my_handle($user);
-
-		$b64url_data = base64url_encode($msg);
-
-		$data = str_replace(array("\n", "\r", " ", "\t"), array("", "", "", ""), $b64url_data);
-
-		$type = "application/xml";
-		$encoding = "base64url";
-		$alg = "RSA-SHA256";
-
-		$signable_data = $data.".".base64url_encode($type).".".base64url_encode($encoding).".".base64url_encode($alg);
-
-		$signature = rsa_sign($signable_data,$prvkey);
-		$sig = base64url_encode($signature);
-
-		$xmldata = array("diaspora" => array("header" => array("author_id" => $handle),
-							"me:env" => array("me:encoding" => $encoding,
-							"me:alg" => $alg,
-							"me:data" => $data,
-							"@attributes" => array("type" => $type),
-							"me:sig" => $sig)));
-
-		$namespaces = array("" => "https://joindiaspora.com/protocol",
-				"me" => "http://salmon-protocol.org/ns/magic-env");
-
-		$magic_env = xml::from_array($xmldata, $xml, false, $namespaces);
-
-		logger("magic_env: ".$magic_env, LOGGER_DATA);
-		return $magic_env;
-	}
-
-	/**
-	 * @brief Creates the envelope for a private message
-	 *
-	 * @param string $msg The message that is to be transmitted
-	 * @param array $user The record of the sender
-	 * @param array $contact Target of the communication
-	 * @param string $prvkey The private key of the sender
-	 * @param string $pubkey The public key of the receiver
-	 *
-	 * @return string The envelope
-	 */
-	private static function build_private_message($msg, $user, $contact, $prvkey, $pubkey) {
-
-		logger("Message: ".$msg, LOGGER_DATA);
-
-		// without a public key nothing will work
-
-		if (!$pubkey) {
-			logger("pubkey missing: contact id: ".$contact["id"]);
-			return false;
-		}
-
-		$inner_aes_key = openssl_random_pseudo_bytes(32);
-		$b_inner_aes_key = base64_encode($inner_aes_key);
-		$inner_iv = openssl_random_pseudo_bytes(16);
-		$b_inner_iv = base64_encode($inner_iv);
-
-		$outer_aes_key = openssl_random_pseudo_bytes(32);
-		$b_outer_aes_key = base64_encode($outer_aes_key);
-		$outer_iv = openssl_random_pseudo_bytes(16);
-		$b_outer_iv = base64_encode($outer_iv);
-
-		$handle = self::my_handle($user);
-
-		$inner_encrypted = self::aes_encrypt($inner_aes_key, $inner_iv, $msg);
-
-		$b64_data = base64_encode($inner_encrypted);
-
-
-		$b64url_data = base64url_encode($b64_data);
-		$data = str_replace(array("\n", "\r", " ", "\t"), array("", "", "", ""), $b64url_data);
-
-		$type = "application/xml";
-		$encoding = "base64url";
-		$alg = "RSA-SHA256";
-
-		$signable_data = $data.".".base64url_encode($type).".".base64url_encode($encoding).".".base64url_encode($alg);
-
-		$signature = rsa_sign($signable_data,$prvkey);
-		$sig = base64url_encode($signature);
-
-		$xmldata = array("decrypted_header" => array("iv" => $b_inner_iv,
-							"aes_key" => $b_inner_aes_key,
-							"author_id" => $handle));
-
-		$decrypted_header = xml::from_array($xmldata, $xml, true);
-
-		$ciphertext = self::aes_encrypt($outer_aes_key, $outer_iv, $decrypted_header);
-
-		$outer_json = json_encode(array("iv" => $b_outer_iv, "key" => $b_outer_aes_key));
-
-		$encrypted_outer_key_bundle = "";
-		openssl_public_encrypt($outer_json, $encrypted_outer_key_bundle, $pubkey);
-
-		$b64_encrypted_outer_key_bundle = base64_encode($encrypted_outer_key_bundle);
-
-		logger("outer_bundle: ".$b64_encrypted_outer_key_bundle." key: ".$pubkey, LOGGER_DATA);
-
-		$encrypted_header_json_object = json_encode(array("aes_key" => base64_encode($encrypted_outer_key_bundle),
-								"ciphertext" => base64_encode($ciphertext)));
-		$cipher_json = base64_encode($encrypted_header_json_object);
-
-		$xmldata = array("diaspora" => array("encrypted_header" => $cipher_json,
-						"me:env" => array("me:encoding" => $encoding,
-								"me:alg" => $alg,
-								"me:data" => $data,
-								"@attributes" => array("type" => $type),
-								"me:sig" => $sig)));
-
-		$namespaces = array("" => "https://joindiaspora.com/protocol",
-				"me" => "http://salmon-protocol.org/ns/magic-env");
-
-		$magic_env = xml::from_array($xmldata, $xml, false, $namespaces);
-
-		logger("magic_env: ".$magic_env, LOGGER_DATA);
-		return $magic_env;
 	}
 
 	/**
@@ -2888,25 +2759,15 @@ class Diaspora {
 	 */
 	private static function build_message($msg, $user, $contact, $prvkey, $pubkey, $public = false) {
 
-		$new = Config::get('system', 'new_diaspora', null, true);
+		// The message is put into an envelope with the sender's signature
+		$envelope = self::build_magic_envelope($msg, $user);
 
-		if ($new) {
-			if (!$public) {
-				$msg = Diaspora::encode_private_data($msg, $user, $contact, $prvkey, $pubkey);
-			}
-
-			$slap = Diaspora::build_magic_envelope($msg, $user);
-			return $slap;
+		// Private messages are put into a second envelope, encrypted with the receivers public key
+		if (!$public) {
+			$envelope = self::encode_private_data($envelope, $user, $contact, $prvkey, $pubkey);
 		}
 
-		if ($public) {
-			$magic_env =  self::build_public_message($msg, $user, $contact, $prvkey, $pubkey);
-		} else {
-			$magic_env =  self::build_private_message($msg, $user, $contact, $prvkey, $pubkey);
-		}
-		// The data that will be transmitted is double encoded via "urlencode", strange ...
-		$slap = "xml=".urlencode(urlencode($magic_env));
-		return $slap;
+		return $envelope;
 	}
 
 	/**
@@ -2932,14 +2793,14 @@ class Diaspora {
 	 *
 	 * @param array $owner the array of the item owner
 	 * @param array $contact Target of the communication
-	 * @param string $slap The message that is to be transmitted
+	 * @param string $envelope The message that is to be transmitted
 	 * @param bool $public_batch Is it a public post?
 	 * @param bool $queue_run Is the transmission called from the queue?
 	 * @param string $guid message guid
 	 *
 	 * @return int Result of the transmission
 	 */
-	public static function transmit($owner, $contact, $slap, $public_batch, $queue_run=false, $guid = "") {
+	public static function transmit($owner, $contact, $envelope, $public_batch, $queue_run=false, $guid = "") {
 
 		$a = get_app();
 
@@ -2960,7 +2821,9 @@ class Diaspora {
 			$return_code = 0;
 		} else {
 			if (!intval(get_config("system", "diaspora_test"))) {
-				post_url($dest_url."/", $slap);
+				$content_type = (($public_batch) ? "application/magic-envelope+xml" : "application/json");
+
+				post_url($dest_url."/", $envelope, array("Content-Type: ".$content_type));
 				$return_code = $a->get_curl_code();
 			} else {
 				logger("test_mode");
@@ -2976,14 +2839,14 @@ class Diaspora {
 			$r = q("SELECT `id` FROM `queue` WHERE `cid` = %d AND `network` = '%s' AND `content` = '%s' AND `batch` = %d LIMIT 1",
 				intval($contact["id"]),
 				dbesc(NETWORK_DIASPORA),
-				dbesc($slap),
+				dbesc($envelope),
 				intval($public_batch)
 			);
 			if ($r) {
 				logger("add_to_queue ignored - identical item already in queue");
 			} else {
 				// queue message for redelivery
-				add_to_queue($contact["id"], NETWORK_DIASPORA, $slap, $public_batch);
+				add_to_queue($contact["id"], NETWORK_DIASPORA, $envelope, $public_batch);
 
 				// The message could not be delivered. We mark the contact as "dead"
 				mark_for_death($contact);
@@ -3036,13 +2899,13 @@ class Diaspora {
 		if ($owner['uprvkey'] == "")
 			$owner['uprvkey'] = $owner['prvkey'];
 
-		$slap = self::build_message($msg, $owner, $contact, $owner['uprvkey'], $contact['pubkey'], $public_batch);
+		$envelope = self::build_message($msg, $owner, $contact, $owner['uprvkey'], $contact['pubkey'], $public_batch);
 
 		if ($spool) {
-			add_to_queue($contact['id'], NETWORK_DIASPORA, $slap, $public_batch);
+			add_to_queue($contact['id'], NETWORK_DIASPORA, $envelope, $public_batch);
 			return true;
 		} else
-			$return_code = self::transmit($owner, $contact, $slap, $public_batch, false, $guid);
+			$return_code = self::transmit($owner, $contact, $envelope, $public_batch, false, $guid);
 
 		logger("guid: ".$item["guid"]." result ".$return_code, LOGGER_DEBUG);
 
