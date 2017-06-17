@@ -558,11 +558,11 @@ function admin_page_summary(App $a) {
 	$r = q("SELECT `page-flags`, COUNT(`uid`) AS `count` FROM `user` GROUP BY `page-flags`");
 	$accounts = array(
 		array(t('Normal Account'), 0),
-		array(t('Soapbox Account'), 0),
-		array(t('Community/Celebrity Account'), 0),
+		array(t('Automatic Follower Account'), 0),
+		array(t('Public Forum Account'), 0),
 		array(t('Automatic Friend Account'), 0),
 		array(t('Blog Account'), 0),
-		array(t('Private Forum'), 0)
+		array(t('Private Forum Account'), 0)
 	);
 
 	$users=0;
@@ -1451,8 +1451,8 @@ function admin_page_users(App $a) {
 	$_setup_users = function ($e) use ($adminlist) {
 		$accounts = array(
 			t('Normal Account'),
-			t('Soapbox Account'),
-			t('Community/Celebrity Account'),
+			t('Automatic Follower Account'),
+			t('Public Forum Account'),
 						t('Automatic Friend Account')
 		);
 		$e['page-flags'] = $accounts[$e['page-flags']];
