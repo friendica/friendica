@@ -42,7 +42,7 @@ define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
 define ( 'FRIENDICA_VERSION',      '3.5.3-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
-define ( 'DB_UPDATE_VERSION',      1229      );
+define ( 'DB_UPDATE_VERSION',      1230      );
 
 /**
  * @brief Constant with a HTML line break.

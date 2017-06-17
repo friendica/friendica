@@ -82,6 +82,9 @@ function cron_run(&$argv, &$argc){
 		proc_run(PRIORITY_MEDIUM, 'include/dbclean.php');
 
 		proc_run(PRIORITY_LOW, "include/cronjobs.php", "update_photo_albums");
+
+		// Delete all done workerqueue entries
+		dba::delete('workerqueue', array('done' => true));
 	}
 
 	// Poll contacts

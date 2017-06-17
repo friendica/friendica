@@ -1748,6 +1748,7 @@ function db_definition() {
 					"created" => array("type" => "datetime", "not null" => "1", "default" => NULL_DATE),
 					"pid" => array("type" => "int(11)", "not null" => "1", "default" => "0"),
 					"executed" => array("type" => "datetime", "not null" => "1", "default" => NULL_DATE),
+					"done" => array("type" => "tinyint(1)", "not null" => "1", "default" => "0"),
 					),
 			"indexes" => array(
 					"PRIMARY" => array("id"),

@@ -17,9 +17,12 @@ function display_init(App $a) {
 		if (substr($a->argv[2], -5) == '.atom') {
 			$item_id = substr($a->argv[2], 0, -5);
 			$xml = dfrn::itemFeed($item_id);
+			if ($xml == '') {
+				http_status_exit(500);
+			}
 			header("Content-type: application/atom+xml");
 			echo $xml;
-			http_status_exit(($xml) ? 200 : 500);
+			killme();
 		}
 	}
 
