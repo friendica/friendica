@@ -524,7 +524,7 @@ function poller_too_much_workers() {
 			dba::close($processes);
 
 			// Now adding all processes with workerqueue entries
-			$entries = dba::p("SELECT COUNT(*) AS `entries`, `priority` FROM `workerqueue` AND NOT `done` GROUP BY `priority`");
+			$entries = dba::p("SELECT COUNT(*) AS `entries`, `priority` FROM `workerqueue` WHERE NOT `done` GROUP BY `priority`");
 			while ($entry = dba::fetch($entries)) {
 				$processes = dba::p("SELECT COUNT(*) AS `running` FROM `process` INNER JOIN `workerqueue` ON `workerqueue`.`pid` = `process`.`pid` AND NOT `done` WHERE `priority` = ?", $entry["priority"]);
 				if ($process = dba::fetch($processes)) {
