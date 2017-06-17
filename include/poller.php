@@ -284,7 +284,7 @@ function poller_exec_function($queue, $funcname, $argv) {
 
 	$poller_up_start = microtime(true);
 
-	/** With these values we can analyze how effective the worker is.
+	/* With these values we can analyze how effective the worker is.
 	 * The database and rest time should be low since this is the unproductive time.
 	 * The execution time is the productive time.
 	 * By changing parameters like the maximum number of workers we can check the effectivness.
