@@ -235,7 +235,7 @@ function can_write_wall(App $a, $owner) {
 }
 
 
-function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
+function permissions_sql($owner_id, $remote_verified = false, $groups = null) {
 
 	$local_user = local_user();
 	$remote_user = remote_user();
@@ -245,7 +245,6 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 	 *
 	 * default permissions - anonymous user
 	 */
-
 	$sql = " AND allow_cid = ''
 			 AND allow_gid = ''
 			 AND deny_cid  = ''
@@ -258,17 +257,14 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 
 	if (($local_user) && ($local_user == $owner_id)) {
 		$sql = '';
-	}
-
-	/**
-	 * Authenticated visitor. Unless pre-verified,
-	 * check that the contact belongs to this $owner_id
-	 * and load the groups the visitor belongs to.
-	 * If pre-verified, the caller is expected to have already
-	 * done this and passed the groups into this function.
-	 */
-
-	elseif ($remote_user) {
+	} elseif ($remote_user) {
+		/*
+		 * Authenticated visitor. Unless pre-verified,
+		 * check that the contact belongs to this $owner_id
+		 * and load the groups the visitor belongs to.
+		 * If pre-verified, the caller is expected to have already
+		 * done this and passed the groups into this function.
+		 */
 
 		if (! $remote_verified) {
 			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
@@ -289,7 +285,9 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 					$gs .= '|<' . intval($g) . '>';
 			}
 
-			/*$sql = sprintf(
+			/*
+			 * @TODO old-lost code found?
+			$sql = sprintf(
 				" AND ( allow_cid = '' OR allow_cid REGEXP '<%d>' )
 				  AND ( deny_cid  = '' OR  NOT deny_cid REGEXP '<%d>' )
 				  AND ( allow_gid = '' OR allow_gid REGEXP '%s' )
@@ -299,7 +297,8 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 				intval($remote_user),
 				dbesc($gs),
 				dbesc($gs)
-			);*/
+			);
+			*/
 			$sql = sprintf(
 				" AND ( NOT (deny_cid REGEXP '<%d>' OR deny_gid REGEXP '%s')
 				  AND ( allow_cid REGEXP '<%d>' OR allow_gid REGEXP '%s' OR ( allow_cid = '' AND allow_gid = '') )
@@ -316,7 +315,7 @@ function permissions_sql($owner_id,$remote_verified = false,$groups = null) {
 }
 
 
-function item_permissions_sql($owner_id,$remote_verified = false,$groups = null) {
+function item_permissions_sql($owner_id, $remote_verified = false, $groups = null) {
 
 	$local_user = local_user();
 	$remote_user = remote_user();
@@ -326,7 +325,6 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 	 *
 	 * default permissions - anonymous user
 	 */
-
 	$sql = " AND `item`.allow_cid = ''
 			 AND `item`.allow_gid = ''
 			 AND `item`.deny_cid  = ''
@@ -337,21 +335,16 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 	/**
 	 * Profile owner - everything is visible
 	 */
-
 	if ($local_user && ($local_user == $owner_id)) {
 		$sql = '';
-	}
-
-	/**
-	 * Authenticated visitor. Unless pre-verified,
-	 * check that the contact belongs to this $owner_id
-	 * and load the groups the visitor belongs to.
-	 * If pre-verified, the caller is expected to have already
-	 * done this and passed the groups into this function.
-	 */
-
-	elseif ($remote_user) {
-
+	} elseif ($remote_user) {
+		/*
+		 * Authenticated visitor. Unless pre-verified,
+		 * check that the contact belongs to this $owner_id
+		 * and load the groups the visitor belongs to.
+		 * If pre-verified, the caller is expected to have already
+		 * done this and passed the groups into this function.
+		 */
 		if (! $remote_verified) {
 			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
 				intval($remote_user),
@@ -367,8 +360,9 @@ function item_permissions_sql($owner_id,$remote_verified = false,$groups = null)
 			$gs = '<<>>'; // should be impossible to match
 
 			if (is_array($groups) && count($groups)) {
-				foreach ($groups as $g)
+				foreach ($groups as $g) {
 					$gs .= '|<' . intval($g) . '>';
+				}
 			}
 
 			$sql = sprintf(
@@ -419,7 +413,11 @@ function get_form_security_token($typename = '') {
 }
 
 function check_form_security_token($typename = '', $formname = 'form_security_token') {
-	if (!x($_REQUEST, $formname)) return false;
+	if (!x($_REQUEST, $formname)) {
+		return false;
+	}
+
+	/// @TODO Careful, not secured!
 	$hash = $_REQUEST[$formname];
 
 	$max_livetime = 10800; // 3 hours
@@ -427,7 +425,9 @@ function check_form_security_token($typename = '', $formname = 'form_security_to
 	$a = get_app();
 
 	$x = explode('.', $hash);
-	if (time() > (IntVal($x[0]) + $max_livetime)) return false;
+	if (time() > (IntVal($x[0]) + $max_livetime)) {
+		return false;
+	}
 
 	$sec_hash = hash('whirlpool', $a->user['guid'] . $a->user['prvkey'] . session_id() . $x[0] . $typename);
 
@@ -448,7 +448,7 @@ function check_form_security_token_redirectOnErr($err_redirect, $typename = '', 
 }
 function check_form_security_token_ForbiddenOnErr($typename = '', $formname = 'form_security_token') {
 	if (!check_form_security_token($typename, $formname)) {
-	    $a = get_app();
+		$a = get_app();
 		logger('check_form_security_token failed: user ' . $a->user['guid'] . ' - form element ' . $typename);
 		logger('check_form_security_token failed: _REQUEST data: ' . print_r($_REQUEST, true), LOGGER_DATA);
 		header('HTTP/1.1 403 Forbidden');

@@ -63,12 +63,14 @@ function poco_load_worker($cid, $uid, $zcid, $url) {
 				$uid = $r[0]['uid'];
 			}
 		}
-		if (! $uid)
+		if (! $uid) {
 			return;
+		}
 	}
 
-	if (! $url)
+	if (! $url) {
 		return;
+	}
 
 	$url = $url . (($uid) ? '/@me/@all?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation' : '?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation') ;
 
@@ -80,15 +82,17 @@ function poco_load_worker($cid, $uid, $zcid, $url) {
 
 	logger('poco_load: return code: ' . $a->get_curl_code(), LOGGER_DEBUG);
 
-	if (($a->get_curl_code() > 299) || (! $s))
+	if (($a->get_curl_code() > 299) || (! $s)) {
 		return;
+	}
 
 	$j = json_decode($s);
 
 	logger('poco_load: json: ' . print_r($j,true),LOGGER_DATA);
 
-	if (! isset($j->entry))
+	if (! isset($j->entry)) {
 		return;
+	}
 
 	$total = 0;
 	foreach ($j->entry as $entry) {
@@ -160,8 +164,9 @@ function poco_load_worker($cid, $uid, $zcid, $url) {
 			}
 		}
 
-		if (isset($entry->contactType) && ($entry->contactType >= 0))
+		if (isset($entry->contactType) && ($entry->contactType >= 0)) {
 			$contact_type = $entry->contactType;
+		}
 
 		$gcontact = array("url" => $profile_url,
 				"name" => $name,
@@ -267,7 +272,7 @@ function sanitize_gcontact($gcontact) {
 		dbesc(normalise_link($gcontact['url']))
 	);
 
-	if (count($x)) {
+	if (dbm::is_result($x)) {
 		if (!isset($gcontact['network']) && ($x[0]["network"] != NETWORK_STATUSNET)) {
 			$gcontact['network'] = $x[0]["network"];
 		}
@@ -299,7 +304,7 @@ function sanitize_gcontact($gcontact) {
 		if ($alternate && ($gcontact['network'] == NETWORK_OSTATUS)) {
 			// Delete the old entry - if it exists
 			$r = q("SELECT `id` FROM `gcontact` WHERE `nurl` = '%s'", dbesc(normalise_link($orig_profile)));
-			if ($r) {
+			if (dbm::is_result($r)) {
 				q("DELETE FROM `gcontact` WHERE `nurl` = '%s'", dbesc(normalise_link($orig_profile)));
 				q("DELETE FROM `glink` WHERE `gcid` = %d", intval($r[0]["id"]));
 			}
@@ -353,6 +358,7 @@ function link_gcontact($gcid, $uid = 0, $cid = 0, $zcid = 0) {
 		intval($gcid),
 		intval($zcid)
 	);
+
 	if (!dbm::is_result($r)) {
 		q("INSERT INTO `glink` (`cid`, `uid`, `gcid`, `zcid`, `updated`) VALUES (%d, %d, %d, %d, '%s') ",
 			intval($cid),
@@ -696,48 +702,55 @@ function poco_last_updated($profile, $force = false) {
 function poco_do_update($created, $updated, $last_failure,  $last_contact) {
 	$now = strtotime(datetime_convert());
 
-	if ($updated > $last_contact)
+	if ($updated > $last_contact) {
 		$contact_time = strtotime($updated);
-	else
+	} else {
 		$contact_time = strtotime($last_contact);
+	}
 
 	$failure_time = strtotime($last_failure);
 	$created_time = strtotime($created);
 
 	// If there is no "created" time then use the current time
-	if ($created_time <= 0)
+	if ($created_time <= 0) {
 		$created_time = $now;
+	}
 
 	// If the last contact was less than 24 hours then don't update
-	if (($now - $contact_time) < (60 * 60 * 24))
+	if (($now - $contact_time) < (60 * 60 * 24)) {
 		return false;
+	}
 
 	// If the last failure was less than 24 hours then don't update
-	if (($now - $failure_time) < (60 * 60 * 24))
+	if (($now - $failure_time) < (60 * 60 * 24)) {
 		return false;
+	}
 
 	// If the last contact was less than a week ago and the last failure is older than a week then don't update
 	//if ((($now - $contact_time) < (60 * 60 * 24 * 7)) && ($contact_time > $failure_time))
 	//	return false;
 
 	// If the last contact time was more than a week ago and the contact was created more than a week ago, then only try once a week
-	if ((($now - $contact_time) > (60 * 60 * 24 * 7)) && (($now - $created_time) > (60 * 60 * 24 * 7)) && (($now - $failure_time) < (60 * 60 * 24 * 7)))
+	if ((($now - $contact_time) > (60 * 60 * 24 * 7)) && (($now - $created_time) > (60 * 60 * 24 * 7)) && (($now - $failure_time) < (60 * 60 * 24 * 7))) {
 		return false;
+	}
 
 	// If the last contact time was more than a month ago and the contact was created more than a month ago, then only try once a month
-	if ((($now - $contact_time) > (60 * 60 * 24 * 30)) && (($now - $created_time) > (60 * 60 * 24 * 30)) && (($now - $failure_time) < (60 * 60 * 24 * 30)))
+	if ((($now - $contact_time) > (60 * 60 * 24 * 30)) && (($now - $created_time) > (60 * 60 * 24 * 30)) && (($now - $failure_time) < (60 * 60 * 24 * 30))) {
 		return false;
+	}
 
 	return true;
 }
 
 function poco_to_boolean($val) {
-	if (($val == "true") || ($val == 1))
-		return(true);
-	if (($val == "false") || ($val == 0))
-		return(false);
+	if (($val == "true") || ($val == 1)) {
+		return true;
+	} elseif (($val == "false") || ($val == 0)) {
+		return false;
+	}
 
-	return ($val);
+	return $val;
 }
 
 /**
@@ -928,13 +941,11 @@ function poco_detect_server_type($body) {
 					$attr[$attribute->name] = $attribute->value;
 				}
 			}
-			if ($attr['property'] == 'generator') {
-				if (in_array($attr['content'], array("hubzilla", "BlaBlaNet"))) {
-					$server = array();
-					$server["platform"] = $attr['content'];
-					$server["version"] = "";
-					$server["network"] = NETWORK_DIASPORA;
-				}
+			if ($attr['property'] == 'generator' && in_array($attr['content'], array("hubzilla", "BlaBlaNet"))) {
+				$server = array();
+				$server["platform"] = $attr['content'];
+				$server["version"] = "";
+				$server["network"] = NETWORK_DIASPORA;
 			}
 		}
 	}
@@ -953,8 +964,9 @@ function poco_check_server($server_url, $network = "", $force = false) {
 	$server_url = trim($server_url, "/");
 	$server_url = str_replace("/index.php", "", $server_url);
 
-	if ($server_url == "")
+	if ($server_url == "") {
 		return false;
+	}
 
 	$servers = q("SELECT * FROM `gserver` WHERE `nurl` = '%s'", dbesc(normalise_link($server_url)));
 	if (dbm::is_result($servers)) {
@@ -966,8 +978,9 @@ function poco_check_server($server_url, $network = "", $force = false) {
 		$poco = $servers[0]["poco"];
 		$noscrape = $servers[0]["noscrape"];
 
-		if ($network == "")
+		if ($network == "") {
 			$network = $servers[0]["network"];
+		}
 
 		$last_contact = $servers[0]["last_contact"];
 		$last_failure = $servers[0]["last_failure"];
@@ -1304,7 +1317,7 @@ function poco_check_server($server_url, $network = "", $force = false) {
 
 	if (($last_contact <= $last_failure) && !$failure) {
 		logger("Server ".$server_url." seems to be alive, but last contact wasn't set - could be a bug", LOGGER_DEBUG);
-	} else if (($last_contact >= $last_failure) && $failure) {
+	} elseif (($last_contact >= $last_failure) && $failure) {
 		logger("Server ".$server_url." seems to be dead, but last failure wasn't set - could be a bug", LOGGER_DEBUG);
 	}
 
@@ -1351,12 +1364,12 @@ function poco_check_server($server_url, $network = "", $force = false) {
 				dbesc(datetime_convert())
 		);
 	}
-	logger("End discovery for server ".$server_url, LOGGER_DEBUG);
+	logger("End discovery for server " . $server_url, LOGGER_DEBUG);
 
 	return !$failure;
 }
 
-function count_common_friends($uid,$cid) {
+function count_common_friends($uid, $cid) {
 
 	$r = q("SELECT count(*) as `total`
 		FROM `glink` INNER JOIN `gcontact` on `glink`.`gcid` = `gcontact`.`id`
@@ -1369,15 +1382,16 @@ function count_common_friends($uid,$cid) {
 		intval($cid)
 	);
 
-//	logger("count_common_friends: $uid $cid {$r[0]['total']}");
-	if (dbm::is_result($r))
+	// logger("count_common_friends: $uid $cid {$r[0]['total']}");
+	if (dbm::is_result($r)) {
 		return $r[0]['total'];
+	}
 	return 0;
 
 }
 
 
-function common_friends($uid,$cid,$start = 0,$limit=9999,$shuffle = false) {
+function common_friends($uid, $cid, $start = 0, $limit = 9999, $shuffle = false) {
 
 	if ($shuffle) {
 		$sql_extra = " order by rand() ";
@@ -1408,7 +1422,7 @@ function common_friends($uid,$cid,$start = 0,$limit=9999,$shuffle = false) {
 }
 
 
-function count_common_friends_zcid($uid,$zcid) {
+function count_common_friends_zcid($uid, $zcid) {
 
 	$r = q("SELECT count(*) as `total`
 		FROM `glink` INNER JOIN `gcontact` on `glink`.`gcid` = `gcontact`.`id`
@@ -1418,18 +1432,20 @@ function count_common_friends_zcid($uid,$zcid) {
 		intval($uid)
 	);
 
-	if (dbm::is_result($r))
+	if (dbm::is_result($r)) {
 		return $r[0]['total'];
+	}
 	return 0;
 
 }
 
-function common_friends_zcid($uid,$zcid,$start = 0, $limit = 9999,$shuffle = false) {
+function common_friends_zcid($uid, $zcid, $start = 0, $limit = 9999, $shuffle = false) {
 
-	if ($shuffle)
+	if ($shuffle) {
 		$sql_extra = " order by rand() ";
-	else
+	} else {
 		$sql_extra = " order by `gcontact`.`name` asc ";
+	}
 
 	$r = q("SELECT `gcontact`.*
 		FROM `glink` INNER JOIN `gcontact` on `glink`.`gcid` = `gcontact`.`id`
@@ -1448,7 +1464,7 @@ function common_friends_zcid($uid,$zcid,$start = 0, $limit = 9999,$shuffle = fal
 }
 
 
-function count_all_friends($uid,$cid) {
+function count_all_friends($uid, $cid) {
 
 	$r = q("SELECT count(*) as `total`
 		FROM `glink` INNER JOIN `gcontact` on `glink`.`gcid` = `gcontact`.`id`
@@ -1466,7 +1482,7 @@ function count_all_friends($uid,$cid) {
 }
 
 
-function all_friends($uid,$cid,$start = 0, $limit = 80) {
+function all_friends($uid, $cid, $start = 0, $limit = 80) {
 
 	$r = q("SELECT `gcontact`.*, `contact`.`id` AS `cid`
 		FROM `glink`
@@ -1494,12 +1510,14 @@ function suggestion_query($uid, $start = 0, $limit = 80) {
 		return array();
 	}
 
-// Uncommented because the result of the queries are to big to store it in the cache.
-// We need to decide if we want to change the db column type or if we want to delete it.
-//	$list = Cache::get("suggestion_query:".$uid.":".$start.":".$limit);
-//	if (!is_null($list)) {
-//		return $list;
-//	}
+	/*
+	 * Uncommented because the result of the queries are to big to store it in the cache.
+	 * We need to decide if we want to change the db column type or if we want to delete it.
+	 */
+	//$list = Cache::get("suggestion_query:".$uid.":".$start.":".$limit);
+	//if (!is_null($list)) {
+	//	return $list;
+	//}
 
 	$network = array(NETWORK_DFRN);
 
@@ -1536,9 +1554,11 @@ function suggestion_query($uid, $start = 0, $limit = 80) {
 	);
 
 	if (dbm::is_result($r) && count($r) >= ($limit -1)) {
-// Uncommented because the result of the queries are to big to store it in the cache.
-// We need to decide if we want to change the db column type or if we want to delete it.
-//		Cache::set("suggestion_query:".$uid.":".$start.":".$limit, $r, CACHE_FIVE_MINUTES);
+		/*
+		 * Uncommented because the result of the queries are to big to store it in the cache.
+		 * We need to decide if we want to change the db column type or if we want to delete it.
+		 */
+		//Cache::set("suggestion_query:".$uid.":".$start.":".$limit, $r, CACHE_FIVE_MINUTES);
 
 		return $r;
 	}
@@ -1574,9 +1594,11 @@ function suggestion_query($uid, $start = 0, $limit = 80) {
 		array_pop($list);
 	}
 
-// Uncommented because the result of the queries are to big to store it in the cache.
-// We need to decide if we want to change the db column type or if we want to delete it.
-//	Cache::set("suggestion_query:".$uid.":".$start.":".$limit, $list, CACHE_FIVE_MINUTES);
+	/*
+	 * Uncommented because the result of the queries are to big to store it in the cache.
+	 * We need to decide if we want to change the db column type or if we want to delete it.
+	 */
+	//Cache::set("suggestion_query:".$uid.":".$start.":".$limit, $list, CACHE_FIVE_MINUTES);
 	return $list;
 }
 
@@ -1587,7 +1609,7 @@ function update_suggestions() {
 	$done = array();
 
 	/// @TODO Check if it is really neccessary to poll the own server
-	poco_load(0,0,0,App::get_baseurl() . '/poco');
+	poco_load(0, 0, 0, App::get_baseurl() . '/poco');
 
 	$done[] = App::get_baseurl() . '/poco';
 
@@ -2273,10 +2295,11 @@ function update_gcontact_for_user($uid) {
 						"country-name" => $r[0]["country-name"]));
 
 	// The "addr" field was added in 3.4.3 so it can be empty for older users
-	if ($r[0]["addr"] != "")
+	if ($r[0]["addr"] != "") {
 		$addr = $r[0]["nickname"].'@'.str_replace(array("http://", "https://"), "", App::get_baseurl());
-	else
+	} else {
 		$addr = $r[0]["addr"];
+	}
 
 	$gcontact = array("name" => $r[0]["name"], "location" => $location, "about" => $r[0]["about"],
 			"gender" => $r[0]["gender"], "keywords" => $r[0]["pub_keywords"],
@@ -2304,25 +2327,29 @@ function gs_fetch_users($server) {
 	$url = $server."/main/statistics";
 
 	$result = z_fetch_url($url);
-	if (!$result["success"])
+	if (!$result["success"]) {
 		return false;
+	}
 
 	$statistics = json_decode($result["body"]);
 
 	if (is_object($statistics->config)) {
-		if ($statistics->config->instance_with_ssl)
+		if ($statistics->config->instance_with_ssl) {
 			$server = "https://";
-		else
+		} else {
 			$server = "http://";
+		}
 
 		$server .= $statistics->config->instance_address;
 
 		$hostname = $statistics->config->instance_address;
 	} else {
-		if ($statistics->instance_with_ssl)
+		/// @TODO is_object() above means here no object, still $statistics is being used as object
+		if ($statistics->instance_with_ssl) {
 			$server = "https://";
-		else
+		} else {
 			$server = "http://";
+		}
 
 		$server .= $statistics->instance_address;
 
