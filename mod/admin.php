@@ -579,7 +579,7 @@ function admin_page_summary(App $a) {
 	$r = qu("SELECT COUNT(*) AS `total` FROM `queue` WHERE 1");
 	$queue = (($r) ? $r[0]['total'] : 0);
 
-	$r = qu("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE 1");
+	$r = qu("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE NOT `done`");
 	$workerqueue = (($r) ? $r[0]['total'] : 0);
 
 	// We can do better, but this is a quick queue status
