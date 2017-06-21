@@ -2124,6 +2124,10 @@ function drop_item($id, $interactive = true) {
 
 	$item = $r[0];
 
+	if ($item['deleted']) {
+		return 0;
+	}
+
 	$owner = $item['uid'];
 
 	$contact_id = 0;

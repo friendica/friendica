@@ -519,8 +519,8 @@ function notifier_run(&$argv, &$argc){
 			}
 
 			$r1 = q("SELECT `batch`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`name`) AS `name`, ANY_VALUE(`network`) AS `network`
-				FROM `contact` WHERE `network` = '%s'
-				AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch` ORDER BY rand()",
+				FROM `contact` WHERE `network` = '%s' AND `batch` != ''
+				AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch`",
 				dbesc(NETWORK_DIASPORA),
 				intval($owner['uid']),
 				intval(CONTACT_IS_SHARING)
@@ -528,8 +528,7 @@ function notifier_run(&$argv, &$argc){
 		}
 
 		$r2 = q("SELECT `id`, `name`,`network` FROM `contact`
-			WHERE `network` in ( '%s', '%s')  AND `uid` = %d AND NOT `blocked` AND NOT `pending` AND NOT `archive`
-			AND `rel` != %d order by rand() ",
+			WHERE `network` in ('%s', '%s') AND `uid` = %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `rel` != %d",
 			dbesc(NETWORK_DFRN),
 			dbesc(NETWORK_MAIL2),
 			intval($owner['uid']),

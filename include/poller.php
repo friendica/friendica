@@ -683,7 +683,7 @@ function poller_worker_process() {
 	$poller_db_duration += (microtime(true) - $stamp);
 
 	if ($found) {
-		$r = q("SELECT * FROM `workerqueue` WHERE `pid` = %d", intval(getmypid()));
+		$r = q("SELECT * FROM `workerqueue` WHERE `pid` = %d AND NOT `done`", intval(getmypid()));
 	}
 	return $r;
 }
