@@ -37,7 +37,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-09 16:42+0700\n"
-"PO-Revision-Date: 2017-06-18 04:37+0000\n"
+"PO-Revision-Date: 2017-06-20 07:43+0000\n"
 "Last-Translator: Andy H3 <andy@hubup.pro>\n"
 "Language-Team: German (http://www.transifex.com/Friendica/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr ""
 
 #: include/contact_selectors.php:32
 msgid "Unknown | Not categorised"
-msgstr "Unbekannt | Nicht kategorisiert"
+msgstr "Unbekannt | Nicht kategorisiertomatu"
 
 #: include/contact_selectors.php:33
 msgid "Block immediately"
@@ -8456,7 +8456,7 @@ msgstr "Öffentliches Forum"
 
 #: mod/settings.php:1145
 msgid "Automatically approves all contact requests."
-msgstr "Akzeptiert automatisch alle Kontaktanfragen."
+msgstr "Bestätigt alle Kontaktanfragen automatisch."
 
 #: mod/settings.php:1148
 msgid "Automatic Friend Page"

@@ -5,7 +5,7 @@ function string_plural_select_de($n){
 	return ($n != 1);;
 }}
 ;
-$a->strings["Unknown | Not categorised"] = "Unbekannt | Nicht kategorisiert";
+$a->strings["Unknown | Not categorised"] = "Unbekannt | Nicht kategorisiertomatu";
 $a->strings["Block immediately"] = "Sofort blockieren";
 $a->strings["Shady, spammer, self-marketer"] = "Zwielichtig, Spammer, Selbstdarsteller";
 $a->strings["Known to me, but no opinion"] = "Ist mir bekannt, hab aber keine Meinung";
@@ -1931,7 +1931,7 @@ $a->strings["Account for a regular personal profile that requires manual approva
 $a->strings["Soapbox Page"] = "Marktschreier-Konto";
 $a->strings["Account for a public profile that automatically approves contact requests as \"Followers\"."] = "Konto für ein öffentliches Profil, das Kontaktanfragen automatisch als \"Follower\" annimmt.";
 $a->strings["Public Forum"] = "Öffentliches Forum";
-$a->strings["Automatically approves all contact requests."] = "Akzeptiert automatisch alle Kontaktanfragen.";
+$a->strings["Automatically approves all contact requests."] = "Bestätigt alle Kontaktanfragen automatisch.";
 $a->strings["Automatic Friend Page"] = "Automatische Freunde Seite";
 $a->strings["Account for a popular profile that automatically approves contact requests as \"Friends\"."] = "Konto für ein gefragtes Profil, das Kontaktanfragen automatisch als \"Friend\" annimmt.";
 $a->strings["Private Forum [Experimental]"] = "Privates Forum [Versuchsstadium]";
