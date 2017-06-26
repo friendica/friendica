@@ -37,7 +37,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-09 16:42+0700\n"
-"PO-Revision-Date: 2017-06-20 07:43+0000\n"
+"PO-Revision-Date: 2017-06-26 10:14+0000\n"
 "Last-Translator: Andy H3 <andy@hubup.pro>\n"
 "Language-Team: German (http://www.transifex.com/Friendica/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr ""
 
 #: include/contact_selectors.php:32
 msgid "Unknown | Not categorised"
-msgstr "Unbekannt | Nicht kategorisiertomatu"
+msgstr "Unbekannt | Nicht kategorisiert"
 
 #: include/contact_selectors.php:33
 msgid "Block immediately"
