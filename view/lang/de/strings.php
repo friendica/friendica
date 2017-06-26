@@ -5,7 +5,7 @@ function string_plural_select_de($n){
 	return ($n != 1);;
 }}
 ;
-$a->strings["Unknown | Not categorised"] = "Unbekannt | Nicht kategorisiertomatu";
+$a->strings["Unknown | Not categorised"] = "Unbekannt | Nicht kategorisiert";
 $a->strings["Block immediately"] = "Sofort blockieren";
 $a->strings["Shady, spammer, self-marketer"] = "Zwielichtig, Spammer, Selbstdarsteller";
 $a->strings["Known to me, but no opinion"] = "Ist mir bekannt, hab aber keine Meinung";
