@@ -95,9 +95,11 @@ Ein ['Tipp für neue Mitglieder'](newmember)-Link zeigt sich in den ersten beide
 
 **Persönliche Daten exportieren**
 
-Du kannst eine Kopie Deiner persönlichen Daten in einer XML-Datei exportieren. 
+Du kannst eine Kopie Deiner persönlichen Daten in einer JSON-Datei exportieren.
 Gehe hierzu in Deinen Einstellungen auf "Persönliche Daten exportieren".
 
+Dies ist z.B. dann nützlich wenn du mit deinem Account auf einen anderen Friendica Knoten umziehen möchstest.
+Ein Grund hierfür könnte sein, dass der Server auf dem dieser Friendica Knoten läuft dauerhaft wegen eines Hardware Problems ausfällt. 
 
 **Schau Dir ebenfalls folgende Seiten an**
 

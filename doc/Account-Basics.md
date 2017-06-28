@@ -89,7 +89,10 @@ A ['Tips for New Members'](newmember) link will show up on your network and home
 Retrieving Personal Data
 ---
 
-You can export a copy of your personal data in XML format from the "Export personal data" link at the top of your settings page.
+You can export a copy of your personal data in JSON format from the "Export personal data" link at the top of your settings page.
+
+You need this file to relocate your Friendica account to another node.
+This might be necessary, e.g. if your node suffers a severe hardware problem and is not recoverable.
 
 See Also
 ---
