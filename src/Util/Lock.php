@@ -157,8 +157,7 @@ class Lock {
 	 */
 	public static function remove($fn_name) {
 		if (function_exists('sem_get') && self::$semaphore[$fn_name]) {
-			sem_release(self::$semaphore[$fn_name]);
-			return;
+			return @sem_release(self::$semaphore[$fn_name]);
 		}
 
 		$memcache = self::connectMemcache();
