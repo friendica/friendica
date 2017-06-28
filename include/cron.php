@@ -84,7 +84,7 @@ function cron_run(&$argv, &$argc){
 		proc_run(PRIORITY_LOW, "include/cronjobs.php", "update_photo_albums");
 
 		// Delete all done workerqueue entries
-		dba::delete('workerqueue', array('done' => true));
+		dba::e('DELETE FROM `workerqueue` WHERE `done` AND `executed` < UTC_TIMESTAMP() - INTERVAL 12 HOUR');
 	}
 
 	// Poll contacts

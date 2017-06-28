@@ -1,6 +1,6 @@
 <?php
 
-define('UPDATE_VERSION' , 1230);
+define('UPDATE_VERSION' , 1231);
 
 /**
  *
@@ -1728,4 +1728,9 @@ function update_1190() {
 function update_1202() {
 	$r = q("UPDATE `user` SET `account-type` = %d WHERE `page-flags` IN (%d, %d)",
 		dbesc(ACCOUNT_TYPE_COMMUNITY), dbesc(PAGE_COMMUNITY), dbesc(PAGE_PRVGROUP));
+}
+
+function update_1230() {
+	// For this special case we have to use the old update routine
+	$r = q("ALTER TABLE `workerqueue` ADD `done2` tinyint(1) NOT NULL DEFAULT 0");
 }

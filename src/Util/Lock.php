@@ -17,6 +17,8 @@ use dbm;
  * @brief This class contain Functions for preventing parallel execution of functions
  */
 class Lock {
+	private static $semaphore = array();
+
        /**
 	 * @brief Check for memcache and open a connection if configured
 	 *
@@ -44,6 +46,25 @@ class Lock {
 	}
 
 	/**
+	 * @brief Creates a semaphore key
+	 *
+	 * @param string $fn_name Name of the lock
+	 *
+	 * @return ressource the semaphore key
+	 */
+	private static function semaphore_key($fn_name) {
+		$temp = get_temppath();
+
+		$file = $temp.'/'.$fn_name.'.sem';
+
+		if (!file_exists($file)) {
+			file_put_contents($file, $function);
+		}
+
+		return ftok($file, 'f');
+	}
+
+	/**
 	 * @brief Sets a lock for a given name
 	 *
 	 * @param string $fn_name Name of the lock
@@ -54,6 +75,13 @@ class Lock {
 	public static function set($fn_name, $timeout = 120) {
 		$got_lock = false;
 		$start = time();
+
+		if (function_exists('sem_get')) {
+			self::$semaphore[$fn_name] = sem_get(self::semaphore_key($fn_name));
+			if (self::$semaphore[$fn_name]) {
+				return sem_acquire(self::$semaphore[$fn_name], ($timeout == 0));
+			}
+		}
 
 		$memcache = self::connectMemcache();
 		if (is_object($memcache)) {
@@ -128,6 +156,11 @@ class Lock {
 	 * @param string $fn_name Name of the lock
 	 */
 	public static function remove($fn_name) {
+		if (function_exists('sem_get') && self::$semaphore[$fn_name]) {
+			sem_release(self::$semaphore[$fn_name]);
+			return;
+		}
+
 		$memcache = self::connectMemcache();
 		if (is_object($memcache)) {
 			$cachekey = get_app()->get_hostname().";lock:".$fn_name;

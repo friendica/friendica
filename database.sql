@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 3.5.3dev (Asparagus)
--- DB_UPDATE_VERSION 1228
+-- Friendica 3.5.3-dev (Asparagus)
+-- DB_UPDATE_VERSION 1231
 -- ------------------------------------------
 
 
@@ -1114,9 +1114,11 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`pid` int(11) NOT NULL DEFAULT 0,
 	`executed` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`done` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 INDEX `pid` (`pid`),
-	 INDEX `parameter` (`parameter`(192)),
-	 INDEX `priority_created` (`priority`,`created`)
+	 INDEX `parameter` (`parameter`(64)),
+	 INDEX `priority_created` (`priority`,`created`),
+	 INDEX `executed` (`executed`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
