@@ -144,3 +144,11 @@ The addon tree has to be updated separately like so:
 
     cd mywebsite/addon
     git pull
+
+###Set up a backup plan
+Bad things will happen.
+Be them a hardware failure, a currupted database or whatever you can think of.
+So once the installation of your Friendica node is done, you should make yoursef a backup plan.
+
+The most important file is the `.htconfig.php` file in the base directory.
+As it stores all your data, you should also have a recent dump of your Friendica database at hand, should you have to recover your node.

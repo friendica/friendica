@@ -140,7 +140,17 @@ $a->config['system']['addon'] = 'js_upload,poormancron';
 
 and save your changes.
 
-9. (Optional) Reverse-proxying and HTTPS
+9. (Optional) Set up a backup plan
+
+Bad things will happen. Be them a hardware failure, a currupted database
+or whatever you can think of. So once the installation of your Friendica
+node is done, you should make yoursef a backup plan.
+
+The most important file is the `.htconfig.php` file in the base directory.
+As it stores all your data, you should also have a recent dump of your
+Friendica database at hand, should you have to recover your node.
+
+10. (Optional) Reverse-proxying and HTTPS
 
 Friendica looks for some well-known HTTP headers indicating a reverse-proxy
 terminating an HTTPS connection. While the standard from RFC 7239 specifies

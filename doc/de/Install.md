@@ -108,3 +108,11 @@ Du kannst auch weitere Addons/Plugins ergänzen. Ändere den Eintrag folgenderma
 `$a->config['system']['addon'] = 'js_upload,poormancron';`
 
 und speichere deine Änderungen.
+
+###Erstelle einen Backup Plan
+Es werden schlimme Dinge geschehen.
+Sei es nun ein Hardwareversage oder eine korrumpierte Datenbank.
+Deshalb solltest du dir nachdem die Installation deines Friendica Knotens abgeschlossen ist einen Backup Plan erstellen.
+
+Die wichtigste Datei ist die `.htconfig.php` im Stammverzeichnis deiner Friendica Installation.
+Und da alle Daten in der Datenbank gespeichert werden, solltest du einen nicht all zu alten Dump der Friendica Datenbank zur Hand haben, solltest du deinen Knoten wieder herstellen müssen.
