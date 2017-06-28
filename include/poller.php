@@ -839,8 +839,5 @@ if (array_search(__file__,get_included_files())===0){
 
 	get_app()->end_process();
 
-	Lock::remove('poller_worker');
-	Lock::remove('poller_worker_process');
-
 	killme();
 }
