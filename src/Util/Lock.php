@@ -156,8 +156,14 @@ class Lock {
 	 * @param string $fn_name Name of the lock
 	 */
 	public static function remove($fn_name) {
-		if (function_exists('sem_get') && self::$semaphore[$fn_name]) {
-			return @sem_release(self::$semaphore[$fn_name]);
+		if (function_exists('sem_get')) {
+			if (empty(self::$semaphore[$fn_name])) {
+				return false;
+			} else {
+				$rid = self::$semaphore[$fn_name];
+				self::$semaphore[$fn_name] = 0;
+				return @sem_release($rid);
+			}
 		}
 
 		$memcache = self::connectMemcache();
