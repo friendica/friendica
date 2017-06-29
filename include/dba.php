@@ -627,6 +627,12 @@ class dba {
 					self::$dbo->errorno = mysql_errno(self::$dbo->db);
 				} else {
 					self::$dbo->affected_rows = mysql_affected_rows($retval);
+
+					// Due to missing mysql_* support this here wasn't tested at all
+					// See here: http://php.net/manual/en/function.mysql-num-rows.php
+					if (self::$dbo->affected_rows <= 0) {
+						self::$dbo->affected_rows = mysql_num_rows($retval);
+					}
 				}
 				break;
 		}
@@ -1038,7 +1044,7 @@ class dba {
 					$sql = "DELETE FROM `".$command['table']."` WHERE `".
 						implode("` = ? AND `", array_keys($command['param']))."` = ?";
 
-					logger(dba::replace_parameters($sql, $command['param']), LOGGER_DATA);
+					logger(self::replace_parameters($sql, $command['param']), LOGGER_DATA);
 
 					if (!self::e($sql, $command['param'])) {
 						if ($do_transaction) {
@@ -1068,7 +1074,7 @@ class dba {
 						$sql = "DELETE FROM `".$table."` WHERE `".$field."` IN (".
 							substr(str_repeat("?, ", count($field_values)), 0, -2).");";
 
-						logger(dba::replace_parameters($sql, $field_values), LOGGER_DATA);
+						logger(self::replace_parameters($sql, $field_values), LOGGER_DATA);
 
 						if (!self::e($sql, $field_values)) {
 							if ($do_transaction) {
