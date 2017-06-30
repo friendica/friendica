@@ -140,11 +140,11 @@ $a->config['system']['addon'] = 'js_upload,poormancron';
 
 and save your changes.
 
-9. (Optional) Set up a backup plan
+9. (Recommended) Set up a backup plan
 
-Bad things will happen. Be them a hardware failure, a currupted database
-or whatever you can think of. So once the installation of your Friendica
-node is done, you should make yoursef a backup plan.
+Bad things will happen. Let there be them a hardware failure, a currupted
+database or whatever you can think of. So once the installation of your
+Friendica node is done, you should make yoursef a backup plan.
 
 The most important file is the `.htconfig.php` file in the base directory.
 As it stores all your data, you should also have a recent dump of your
