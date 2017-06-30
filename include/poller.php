@@ -118,6 +118,7 @@ function poller_run($argv, $argc){
 
 		// To avoid the quitting of multiple pollers only one poller at a time will execute the check
 		if (Lock::set('poller_worker', 0)) {
+			$stamp = (float)microtime(true);
 			// Count active workers and compare them with a maximum value that depends on the load
 			if (poller_too_much_workers()) {
 				logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
@@ -130,6 +131,7 @@ function poller_run($argv, $argc){
 				return;
 			}
 			Lock::remove('poller_worker');
+			$poller_db_duration += (microtime(true) - $stamp);
 		}
 
 		// Quit the poller once every 5 minutes
@@ -190,7 +192,7 @@ function poller_process_with_priority_active($priority) {
  * @return boolean "true" if further processing should be stopped
  */
 function poller_execute($queue) {
-	global $poller_db_duration;
+	global $poller_db_duration, $poller_last_update;
 
 	$a = get_app();
 
@@ -230,6 +232,19 @@ function poller_execute($queue) {
 	$funcname = str_replace(".php", "", basename($argv[0]))."_run";
 
 	if (function_exists($funcname)) {
+
+		// We constantly update the "executed" date every minute to avoid being killed to soon
+		if (!isset($poller_last_update)) {
+			$poller_last_update = strtotime($queue["executed"]);
+		}
+
+		$age = (time() - $poller_last_update) / 60;
+		$poller_last_update = time();
+
+		if ($age > 1) {
+			dba::update('workerqueue', array('executed' => datetime_convert()), array('pid' => $mypid, 'done' => false));
+		}
+
 		poller_exec_function($queue, $funcname, $argv);
 
 		$stamp = (float)microtime(true);
@@ -655,18 +670,16 @@ function poller_passing_slow(&$highest_priority) {
  *
  * @return boolean Have we found something?
  */
-function find_worker_processes($mypid = 0) {
+function find_worker_processes() {
 
-	if ($mypid == 0) {
-		$mypid = getmypid();
-	}
+	$mypid = getmypid();
 
 	// Check if we should pass some low priority process
 	$highest_priority = 0;
 	$found = false;
 
 	// The higher the number of parallel workers, the more we prefetch to prevent concurring access
-	$limit = Config::get("system", "worker_queues", 4) * 2;
+	$limit = Config::get("system", "worker_queues", 4);
 	$limit = Config::get('system', 'worker_fetch_limit', $limit);
 
 	if (poller_passing_slow($highest_priority)) {
