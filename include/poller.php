@@ -233,7 +233,7 @@ function poller_execute($queue) {
 
 	if (function_exists($funcname)) {
 
-		// We constantly update the "executed" date every minute to avoid being killed to soon
+		// We constantly update the "executed" date every minute to avoid being killed too soon
 		if (!isset($poller_last_update)) {
 			$poller_last_update = strtotime($queue["executed"]);
 		}
@@ -475,7 +475,7 @@ function poller_max_connections_reached() {
  *
  */
 function poller_kill_stale_workers() {
-	$entries = dba::p("SELECT `pid`, `executed`, `priority`, `parameter` FROM `workerqueue` WHERE `executed` > ? AND NOT `done` AND `pid` != 0", NULL_DATE);
+	$entries = dba::p("SELECT `pid`, `executed`, `priority`, `parameter` FROM `workerqueue` WHERE `executed` > ? AND NOT `done` AND `pid` != 0 ORDER BY `priority`, `created`", NULL_DATE);
 
 	while ($entry = dba::fetch($entries)) {
 		if (!posix_kill($entry["pid"], 0)) {
