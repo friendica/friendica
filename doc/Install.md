@@ -147,7 +147,7 @@ The addon tree has to be updated separately like so:
 
 ###Set up a backup plan
 Bad things will happen.
-Let there be a hardware failure, a currupted database or whatever you can think of.
+Let there be a hardware failure, a corrupted database or whatever you can think of.
 So once the installation of your Friendica node is done, you should make yoursef a backup plan.
 
 The most important file is the `.htconfig.php` file in the base directory.
