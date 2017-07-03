@@ -92,12 +92,12 @@ function search_post(App $a) {
 
 function search_content(App $a) {
 
-	if((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
-		notice( t('Public access denied.') . EOL);
+	if (get_config('system','block_public') && !local_user() && !remote_user()) {
+		notice(t('Public access denied.') . EOL);
 		return;
 	}
 
-	if(get_config('system','local_search') && !local_user()) {
+	if (get_config('system','local_search') && !local_user() && !remote_user()) {
 		http_status_exit(403,
 				array("title" => t("Public access denied."),
 					"description" => t("Only logged in users are permitted to perform a search.")));
@@ -106,7 +106,7 @@ function search_content(App $a) {
 		//return;
 	}
 
-	if (get_config('system','permit_crawling') && !local_user()) {
+	if (get_config('system','permit_crawling') && !local_user() && !remote_user()) {
 		// Default values:
 		// 10 requests are "free", after the 11th only a call per minute is allowed
 
