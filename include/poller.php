@@ -475,12 +475,12 @@ function poller_max_connections_reached() {
  *
  */
 function poller_kill_stale_workers() {
-	$entries = dba::p("SELECT `pid`, `executed`, `priority`, `parameter` FROM `workerqueue` WHERE `executed` > ? AND NOT `done` AND `pid` != 0 ORDER BY `priority`, `created`", NULL_DATE);
+	$entries = dba::p("SELECT `id`, `pid`, `executed`, `priority`, `parameter` FROM `workerqueue` WHERE `executed` > ? AND NOT `done` AND `pid` != 0 ORDER BY `priority`, `created`", NULL_DATE);
 
 	while ($entry = dba::fetch($entries)) {
 		if (!posix_kill($entry["pid"], 0)) {
 			dba::update('workerqueue', array('executed' => NULL_DATE, 'pid' => 0),
-					array('pid' => $entry["pid"], 'done' => false));
+					array('id' => $entry["id"]));
 		} else {
 			// Kill long running processes
 			// Check if the priority is in a valid range
@@ -513,7 +513,7 @@ function poller_kill_stale_workers() {
 				}
 				dba::update('workerqueue',
 						array('executed' => NULL_DATE, 'created' => datetime_convert(), 'priority' => $new_priority, 'pid' => 0),
-						array('pid' => $entry["pid"], 'done' => false));
+						array('id' => $entry["id"]));
 			} else {
 				logger("Worker process ".$entry["pid"]." (".implode(" ", $argv).") now runs for ".round($duration)." of ".$max_duration." allowed minutes. That's okay.", LOGGER_DEBUG);
 			}
