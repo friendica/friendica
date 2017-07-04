@@ -2051,7 +2051,7 @@ function item_expire($uid, $days, $network = "", $force = false) {
 	$expire_photos = get_pconfig($uid, 'expire', 'photos');
 	$expire_photos = (($expire_photos === false) ? 0 : intval($expire_photos)); // default if not set: 0
 
-	logger('expire: # items=' . count($r). "; expire items: $expire_items, expire notes: $expire_notes, expire starred: $expire_starred, expire photos: $expire_photos");
+	logger('User '.$uid.': expire: # items=' . count($r). "; expire items: $expire_items, expire notes: $expire_notes, expire starred: $expire_starred, expire photos: $expire_photos");
 
 	foreach ($r as $item) {
 
