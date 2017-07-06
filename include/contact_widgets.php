@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Core\Config;
 
 function follow_widget($value = "") {
 
@@ -18,6 +19,7 @@ function findpeople_widget() {
 	require_once 'include/Contact.php';
 
 	$a = get_app();
+    $global_dir = Config::get('system', 'directory');
 
 	if (get_config('system', 'invitation_only')) {
 		$x = get_pconfig(local_user(), 'system', 'invites_remaining');
@@ -38,7 +40,8 @@ function findpeople_widget() {
 		'$similar' => t('Similar Interests'),
 		'$random' => t('Random Profile'),
 		'$inv' => t('Invite Friends'),
-		'$directory' => t('View Global Directory')
+		'$directory' => t('View Global Directory'),
+        '$global_dir' => $global_dir
 	));
 
 }

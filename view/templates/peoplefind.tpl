@@ -7,7 +7,7 @@
 	</form>
 	<div class="side-link" id="side-match-link"><a href="match" >{{$similar}}</a></div>
 	<div class="side-link" id="side-suggest-link"><a href="suggest" >{{$suggest}}</a></div>
-	<div class="side-link" id="side-directory-link"><a href="directory" >{{$directory}}</a></div>
+	<div class="side-link" id="side-directory-link"><a href={{$global_dir}} target="extlink" >{{$directory}}</a></div>
 	<div class="side-link" id="side-random-profile-link" ><a href="randprof" target="extlink" >{{$random}}</a></div>
 	{{if $inv}} 
 	<div class="side-link" id="side-invite-link" ><a href="invite" >{{$inv}}</a></div>
