@@ -19,7 +19,7 @@ function findpeople_widget() {
 	require_once 'include/Contact.php';
 
 	$a = get_app();
-    $global_dir = Config::get('system', 'directory');
+	$global_dir = Config::get('system', 'directory');
 
 	if (get_config('system', 'invitation_only')) {
 		$x = get_pconfig(local_user(), 'system', 'invites_remaining');
@@ -41,7 +41,7 @@ function findpeople_widget() {
 		'$random' => t('Random Profile'),
 		'$inv' => t('Invite Friends'),
 		'$directory' => t('View Global Directory'),
-        '$global_dir' => $global_dir
+		'$global_dir' => $global_dir
 	));
 
 }
