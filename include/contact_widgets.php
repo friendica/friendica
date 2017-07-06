@@ -37,7 +37,8 @@ function findpeople_widget() {
 		'$suggest' => t('Friend Suggestions'),
 		'$similar' => t('Similar Interests'),
 		'$random' => t('Random Profile'),
-		'$inv' => t('Invite Friends')
+		'$inv' => t('Invite Friends'),
+        'directory' => t('View Global Directory')
 	));
 
 }

@@ -54,3 +54,6 @@ venv/
 
 #ignore git projects in vendor
 vendor/**/.git
+
+#ignore config files from JetBrains
+/.idea

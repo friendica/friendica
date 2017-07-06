@@ -3057,7 +3057,8 @@ margin-left: 0px;
 #side-invite-link,
 #side-random-profile-link,
 #side-suggest-link,
-#side-match-link {
+#side-match-link,
+#side-directory-link {
 	width: 80%;
 	padding: 10px;
 	margin: auto;
@@ -3079,7 +3080,8 @@ margin-left: 0px;
 #side-invite-link:hover,
 #side-random-profile-link:hover,
 #side-suggest-link:hover,
-#side-match-link:hover {
+#side-match-link:hover,
+#side-directory-link:hover {
 	color: #efefef;
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1873a2), color-stop(1, #6da6c4) );
 	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
@@ -3098,7 +3100,8 @@ margin-left: 0px;
 #side-invite-link:active,
 #side-random-profile-link:active,
 #side-suggest-link:active,
-#side-match-link:active {
+#side-match-link:active,
+#side-directory-link:active {
 	background-color: #1873a2;
 	position: relative;
 	top: 1px;
@@ -3107,7 +3110,8 @@ margin-left: 0px;
 #side-invite-link a,
 #side-random-profile-link a,
 #side-suggest-link a,
-#side-match-link a {
+#side-match-link a,
+#side-directory-link a {
 	color: #efefef;
 }
 
