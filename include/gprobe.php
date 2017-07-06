@@ -10,7 +10,7 @@ function gprobe_run(&$argv, &$argc){
 	if ($argc != 2) {
 		return;
 	}
-	$url = hex2bin($argv[1]);
+	$url = $argv[1];
 
 	$r = q("SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
 		dbesc(normalise_link($url))

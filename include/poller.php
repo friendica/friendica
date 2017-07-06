@@ -93,9 +93,11 @@ function poller_run($argv, $argc){
 	$starttime = time();
 
 	// We fetch the next queue entry that is about to be executed
-	while ($r = poller_worker_process()) {
+	while ($r = poller_worker_process($passing_slow)) {
 
-		$refetched = false;
+		// When we are processing jobs with a lower priority, we don't refetch new jobs
+		// Otherwise fast jobs could wait behind slow ones and could be blocked.
+		$refetched = $passing_slow;
 
 		foreach ($r AS $entry) {
 			// Assure that the priority is an integer value
@@ -110,7 +112,7 @@ function poller_run($argv, $argc){
 			// If possible we will fetch new jobs for this worker
 			if (!$refetched && Lock::set('poller_worker_process', 0)) {
 				$stamp = (float)microtime(true);
-				$refetched = find_worker_processes();
+				$refetched = find_worker_processes($passing_slow);
 				$poller_db_duration += (microtime(true) - $stamp);
 				Lock::remove('poller_worker_process');
 			}
@@ -671,19 +673,31 @@ function poller_passing_slow(&$highest_priority) {
 /**
  * @brief Find and claim the next worker process for us
  *
+ * @param boolean $passing_slow Returns if we had passed low priority processes
  * @return boolean Have we found something?
  */
-function find_worker_processes() {
+function find_worker_processes(&$passing_slow) {
 
 	$mypid = getmypid();
 
 	// Check if we should pass some low priority process
 	$highest_priority = 0;
 	$found = false;
+	$passing_slow = false;
 
 	// The higher the number of parallel workers, the more we prefetch to prevent concurring access
-	$limit = Config::get("system", "worker_queues", 4);
-	$limit = Config::get('system', 'worker_fetch_limit', $limit);
+	// We decrease the limit with the number of entries left in the queue
+	$worker_queues = Config::get("system", "worker_queues", 4);
+	$queue_length = Config::get('system', 'worker_fetch_limit', $worker_queues);
+	$lower_job_limit = $worker_queues * $queue_length * 2;
+	$jobs = poller_total_entries();
+
+	// Now do some magic
+	$exponent = 2;
+	$slope = $queue_length / pow($lower_job_limit, $exponent);
+	$limit = min($queue_length, ceil($slope * pow($jobs, $exponent)));
+
+	logger('Total: '.$jobs.' - Maximum: '.$queue_length.' - jobs per queue: '.$limit, LOGGER_DEBUG);
 
 	if (poller_passing_slow($highest_priority)) {
 		// Are there waiting processes with a higher priority than the currently highest?
@@ -712,6 +726,7 @@ function find_worker_processes() {
 			dba::close($result);
 
 			$found = (count($ids) > 0);
+			$passing_slow = $found;
 		}
 	}
 
@@ -739,9 +754,10 @@ function find_worker_processes() {
 /**
  * @brief Returns the next worker process
  *
+ * @param boolean $passing_slow Returns if we had passed low priority processes
  * @return string SQL statement
  */
-function poller_worker_process() {
+function poller_worker_process(&$passing_slow) {
 	global $poller_db_duration, $poller_lock_duration;
 
 	$stamp = (float)microtime(true);
@@ -760,7 +776,7 @@ function poller_worker_process() {
 	$poller_lock_duration = (microtime(true) - $stamp);
 
 	$stamp = (float)microtime(true);
-	$found = find_worker_processes();
+	$found = find_worker_processes($passing_slow);
 	$poller_db_duration += (microtime(true) - $stamp);
 
 	Lock::remove('poller_worker_process');

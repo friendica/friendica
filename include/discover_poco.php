@@ -47,13 +47,12 @@ function discover_poco_run(&$argv, &$argc) {
 	logger('start '.$search);
 
 	if ($mode == 8) {
-		$profile_url = base64_decode($argv[2]);
-		if ($profile_url != "") {
-			poco_last_updated($profile_url, true);
+		if ($argv[2] != "") {
+			poco_last_updated($argv[2], true);
 		}
 	} elseif ($mode == 7) {
 		if ($argc == 6) {
-			$url = base64_decode($argv[5]);
+			$url = $argv[5];
 		} else {
 			$url = '';
 		}
@@ -63,7 +62,7 @@ function discover_poco_run(&$argv, &$argc) {
 	} elseif ($mode == 5) {
 		update_server();
 	} elseif ($mode == 4) {
-		$server_url = base64_decode($argv[2]);
+		$server_url = $argv[2];
 		if ($server_url == "") {
 			return;
 		}
@@ -119,7 +118,7 @@ function update_server() {
 		}
 		logger('Update server status for server '.$server["url"], LOGGER_DEBUG);
 
-		proc_run(PRIORITY_LOW, "include/discover_poco.php", "server", base64_encode($server["url"]));
+		proc_run(PRIORITY_LOW, "include/discover_poco.php", "server", $server["url"]);
 
 		if (++$updated > 250) {
 			return;
@@ -178,7 +177,7 @@ function discover_users() {
 
 		if ((($server_url == "") && ($user["network"] == NETWORK_FEED)) || $force_update || poco_check_server($server_url, $user["network"])) {
 			logger('Check profile '.$user["url"]);
-			proc_run(PRIORITY_LOW, "include/discover_poco.php", "check_profile", base64_encode($user["url"]));
+			proc_run(PRIORITY_LOW, "include/discover_poco.php", "check_profile", $user["url"]);
 
 			if (++$checked > 100) {
 				return;

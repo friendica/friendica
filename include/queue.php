@@ -52,7 +52,7 @@ function queue_run(&$argv, &$argc) {
 		if (dbm::is_result($r)) {
 			foreach ($r as $q_item) {
 				logger('Call queue for id '.$q_item['id']);
-				proc_run(array('priority' => PRIORITY_LOW, 'dont_fork' => true), "include/queue.php", $q_item['id']);
+				proc_run(array('priority' => PRIORITY_LOW, 'dont_fork' => true), "include/queue.php", (int)$q_item['id']);
 			}
 		}
 		return;
