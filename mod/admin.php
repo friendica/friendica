@@ -113,6 +113,9 @@ function admin_post(App $a) {
 			case 'blocklist':
 				admin_page_blocklist_post($a);
 				break;
+			case 'deleteitem':
+				admin_page_deleteitem_post($a);
+				break;
 		}
 	}
 
@@ -172,6 +175,7 @@ function admin_content(App $a) {
 		'queue'	 =>	array("admin/queue/", t('Inspect Queue'), "queue"),
 		'blocklist' => array("admin/blocklist/", t('Server Blocklist'), "blocklist"),
 		'federation' => array("admin/federation/", t('Federation Statistics'), "federation"),
+		'deleteitem' => array("admin/deleteitem/", t('Delete Item'), 'deleteitem'),
 	);
 
 	/* get plugins admin page */
@@ -243,6 +247,9 @@ function admin_content(App $a) {
 				break;
 			case 'blocklist':
 				$o = admin_page_blocklist($a);
+				break;
+			case 'deleteitem':
+				$o = admin_page_deleteitem($a);
 				break;
 			default:
 				notice(t("Item not found."));
@@ -345,6 +352,69 @@ function admin_page_blocklist_post(App $a) {
 	}
 	goaway('admin/blocklist');
 
+	return; // NOTREACHED
+}
+
+/**
+ * @brief Subpage where the admin can delete a item from their node given the GUID
+ *
+ * This subpage of the admin panel offers the nodes admin to delete an item frim
+ * the node, given the GUID or the display URL such as http://example.com/display/123456.
+ * The idem will then be marked as deleted in the database and processed accordingly.
+ * 
+ * @param App $a
+ * @return string
+ */
+function admin_page_deleteitem(App $a) {
+	$t = get_markup_template("admin_deleteitem.tpl");
+
+	return replace_macros($t, array(
+		'$title' => t('Administration'),
+		'$page' => t('Delete Item'),
+		'$submit' => t('Delete this Item'),
+		'$intro1' => t('On this page you can delete an item from your node. If the item is a top level posting, the entire thread will be deleted.'),
+		'$intro2' => t('You need to know the GUID of the item. You can find it e.g. by looking at the display URL. The last part of http://example.com/display/123456 is the GUID, here 123456.'),
+		'$deleteitemguid' => array('deleteitemguid', t("GUID"), '', t("The GUID of the item you want to delete."), 'required', 'autofocus'),
+		'$baseurl' => App::get_baseurl(),
+		'$form_security_token'	=> get_form_security_token("admin_deleteitem")
+	));
+}
+/**
+ * @brief Process send data from Admin Delete Item Page
+ *
+ * The GUID passed through the form should be only the GUID. But we also parse
+ * URLs like the full /display URL to make the process more easy for the admin.
+ *
+ * @param App $a
+ */
+function admin_page_deleteitem_post(App $a) {
+	if (!x($_POST['page_deleteitem_submit'])) {
+		return;
+	}
+
+	check_form_security_token_redirectOnErr('/admin/deleteitem/', 'admin_deleteitem');
+	if (x($_POST['page_deleteitem_submit'])) {
+		$guid = trim(notags($_POST['deleteitemguid']));
+		// The GUID should not include a "/", so if there is one, we got an URL
+		// and the last part of it is most likely the GUID.
+		if (strpos($guid, '/')) {
+			$guid = substr($guid, strrpos($guid, '/')+1);
+		}
+		// Now that we have the GUID, get the ID and the PARENT ID of the posting
+		// to determine if it is a top level posting or a comment. If it is a top
+		// level posting, we also need to delete the corresponding thread.
+		dba::update('item', array('deleted' => true), array('guid' => (int)$guid));
+		$r = qu("SELECT id, parent FROM item WHERE guid='%s'",$guid);
+		if (dbm::is_result($r)) {
+			$rr = $r[0];
+			if ($rr['id'] == $rr['parent']) {
+				dba::update('thread', array('deleted' => true), array('iid' => (int)$rr['id']));
+			}
+		}
+	}
+
+	info(t('Item marked for deletion.').EOL);
+	goaway('admin/deleteitem');
 	return; // NOTREACHED
 }
 
