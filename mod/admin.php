@@ -356,11 +356,11 @@ function admin_page_blocklist_post(App $a) {
 }
 
 /**
- * @brief Subpage where the admin can delete a item from their node given the GUID
+ * @brief Subpage where the admin can delete an item from their node given the GUID
  *
- * This subpage of the admin panel offers the nodes admin to delete an item frim
+ * This subpage of the admin panel offers the nodes admin to delete an item from
  * the node, given the GUID or the display URL such as http://example.com/display/123456.
- * The idem will then be marked as deleted in the database and processed accordingly.
+ * The item will then be marked as deleted in the database and processed accordingly.
  * 
  * @param App $a
  * @return string
