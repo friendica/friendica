@@ -160,9 +160,9 @@ class Lock {
 			if (empty(self::$semaphore[$fn_name])) {
 				return false;
 			} else {
-				$rid = self::$semaphore[$fn_name];
+				$success = @sem_release(self::$semaphore[$fn_name]);
 				self::$semaphore[$fn_name] = 0;
-				return @sem_release($rid);
+				return $success;
 			}
 		}
 
