@@ -657,8 +657,10 @@ function advanced_profile(App $a) {
 			$profile['birthday'] = array( t('Birthday:'), $val);
 
 		}
-
-		if ($age = age($a->profile['dob'], $a->profile['timezone'],'')) {
+		if ($a->profile['dob']
+			&& $a->profile['dob'] > '0001-01-01'
+			&& $age = age($a->profile['dob'], $a->profile['timezone'], '')
+		) {
 			$profile['age'] = array( t('Age:'), $age );
 		}
 
