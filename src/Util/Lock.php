@@ -161,7 +161,7 @@ class Lock {
 				return false;
 			} else {
 				$success = @sem_release(self::$semaphore[$fn_name]);
-				self::$semaphore[$fn_name] = 0;
+				unset(self::$semaphore[$fn_name]);
 				return $success;
 			}
 		}
