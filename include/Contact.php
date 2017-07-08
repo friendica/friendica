@@ -637,7 +637,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
 	}
 
 	if (count($contacts) > 1 && $uid == 0 && $contact_id != 0 && $url != "") {
-		q("DELETE FROM `contact` WHERE `nurl` = '%s' AND `id` != %d AND NOT `self`",
+		q("DELETE FROM `contact` WHERE `nurl` = '%s' AND `uid` = 0 AND `id` != %d AND NOT `self`",
 			dbesc(normalise_link($url)),
 			intval($contact_id));
 	}
