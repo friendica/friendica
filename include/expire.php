@@ -11,7 +11,23 @@ function expire_run(&$argv, &$argc){
 
 	load_hooks();
 
-	if (($argc == 2) && (intval($argv[1]) > 0)) {
+	if (($argc == 2) && ($argv[1] == 'delete')) {
+		logger('Delete expired items', LOGGER_DEBUG);
+		// physically remove anything that has been deleted for more than two months
+		$r = dba::p("SELECT `id` FROM `item` WHERE `deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
+		while ($row = dba::fetch($r)) {
+			dba::delete('item', array('id' => $row['id']));
+		}
+		dba::close($r);
+
+		logger('Delete expired items - done', LOGGER_DEBUG);
+
+		// make this optional as it could have a performance impact on large sites
+		if (intval(get_config('system', 'optimize_items'))) {
+			q("OPTIMIZE TABLE `item`");
+		}
+		return;
+	} elseif (($argc == 2) && (intval($argv[1]) > 0)) {
 		$user = dba::select('user', array('uid', 'username', 'expire'), array('uid' => $argv[1]), array('limit' => 1));
 		if (dbm::is_result($user)) {
 			logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - interval: '.$user['expire'], LOGGER_DEBUG);
@@ -29,19 +45,10 @@ function expire_run(&$argv, &$argc){
 		return;
 	}
 
-	// physically remove anything that has been deleted for more than two months
-	$r = dba::p("SELECT `id` FROM `item` WHERE `deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
-	while ($row = dba::fetch($r)) {
-		dba::delete('item', array('id' => $row['id']));
-	}
-	dba::close($r);
-
-	// make this optional as it could have a performance impact on large sites
-	if (intval(get_config('system', 'optimize_items'))) {
-		q("OPTIMIZE TABLE `item`");
-	}
-
 	logger('expire: start');
+
+	proc_run(array('priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true),
+			'include/expire.php', 'delete');
 
 	$r = dba::p("SELECT `uid`, `username` FROM `user` WHERE `expire` != 0");
 	while ($row = dba::fetch($r)) {
