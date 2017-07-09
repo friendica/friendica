@@ -1958,7 +1958,7 @@ class dfrn {
 				return false;
 			}
 
-			$r = q("UPDATE `item` SET `title` = '%s', `body` = '%s', `tag` = '%s', `edited` = '%s', `changed` = '%s' WHERE `uri` = '%s' AND `uid` = %d",
+			$r = q("UPDATE `item` SET `title` = '%s', `body` = '%s', `tag` = '%s', `edited` = '%s', `changed` = '%s' WHERE `uri` = '%s' AND `uid` IN (0, %d)",
 				dbesc($item["title"]),
 				dbesc($item["body"]),
 				dbesc($item["tag"]),
@@ -1979,12 +1979,12 @@ class dfrn {
 
 		// update last-child if it changes
 		if ($item["last-child"] && ($item["last-child"] != $current["last-child"])) {
-			$r = q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
+			$r = q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` IN (0, %d)",
 				dbesc(datetime_convert()),
 				dbesc($item["parent-uri"]),
 				intval($importer["importer_uid"])
 			);
-			$r = q("UPDATE `item` SET `last-child` = %d , `changed` = '%s' WHERE `uri` = '%s' AND `uid` = %d",
+			$r = q("UPDATE `item` SET `last-child` = %d , `changed` = '%s' WHERE `uri` = '%s' AND `uid` IN (0, %d)",
 				intval($item["last-child"]),
 				dbesc(datetime_convert()),
 				dbesc($item["uri"]),
@@ -2744,7 +2744,7 @@ class dfrn {
 			if ($entrytype == DFRN_TOP_LEVEL) {
 				$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s',
 						`body` = '', `title` = ''
-					WHERE `parent-uri` = '%s' AND `uid` = %d",
+					WHERE `parent-uri` = '%s' AND `uid` IN (0, %d)",
 						dbesc($when),
 						dbesc(datetime_convert()),
 						dbesc($uri),
@@ -2756,7 +2756,7 @@ class dfrn {
 			} else {
 				$r = q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s',
 						`body` = '', `title` = ''
-					WHERE `uri` = '%s' AND `uid` = %d",
+					WHERE `uri` = '%s' AND `uid` IN (0, %d)",
 						dbesc($when),
 						dbesc(datetime_convert()),
 						dbesc($uri),
@@ -2767,7 +2767,7 @@ class dfrn {
 				update_thread_uri($uri, $importer["importer_uid"]);
 				if ($item["last-child"]) {
 					// ensure that last-child is set in case the comment that had it just got wiped.
-					q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d ",
+					q("UPDATE `item` SET `last-child` = 0, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` IN (0, %d)",
 						dbesc(datetime_convert()),
 						dbesc($item["parent-uri"]),
 						intval($item["uid"])
