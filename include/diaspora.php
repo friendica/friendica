@@ -1529,6 +1529,8 @@ class Diaspora {
 
 		$person = self::person_by_handle($msg_author);
 
+		dba::lock('mail');
+
 		$r = q("SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
 			dbesc($msg_guid),
 			intval($importer["uid"])
@@ -1555,6 +1557,8 @@ class Diaspora {
 			dbesc($author.":".$guid),
 			dbesc($msg_created_at)
 		);
+
+		dba::unlock();
 
 		q("UPDATE `conv` SET `updated` = '%s' WHERE `id` = %d",
 			dbesc(datetime_convert()),
@@ -1832,6 +1836,12 @@ class Diaspora {
 			return false;
 		}
 
+		$body = diaspora2bb($text);
+
+		$body = self::replace_people_guid($body, $person["url"]);
+
+		dba::lock('mail');
+
 		$r = q("SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
 			dbesc($guid),
 			intval($importer["uid"])
@@ -1840,10 +1850,6 @@ class Diaspora {
 			logger("duplicate message already delivered.", LOGGER_DEBUG);
 			return false;
 		}
-
-		$body = diaspora2bb($text);
-
-		$body = self::replace_people_guid($body, $person["url"]);
 
 		q("INSERT INTO `mail` (`uid`, `guid`, `convid`, `from-name`,`from-photo`,`from-url`,`contact-id`,`title`,`body`,`seen`,`reply`,`uri`,`parent-uri`,`created`)
 				VALUES ( %d, '%s', %d, '%s', '%s', '%s', %d, '%s', '%s', %d, %d, '%s','%s','%s')",
@@ -1862,6 +1868,8 @@ class Diaspora {
 			dbesc($author.":".$conversation["guid"]),
 			dbesc($created_at)
 		);
+
+		dba::unlock();
 
 		q("UPDATE `conv` SET `updated` = '%s' WHERE `id` = %d",
 			dbesc(datetime_convert()),

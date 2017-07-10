@@ -827,6 +827,12 @@ class Probe {
 			}
 		}
 
+		foreach ($webfinger["aliases"] as $alias) {
+			if (substr($alias, 0, 5) == 'acct:') {
+				$data["addr"] = substr($alias, 5);
+			}
+		}
+
 		if (!isset($data["network"]) || ($hcard_url == "")) {
 			return false;
 		}
