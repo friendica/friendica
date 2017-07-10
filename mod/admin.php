@@ -11,6 +11,7 @@ use Friendica\Core\Config;
 
 require_once("include/enotify.php");
 require_once("include/text.php");
+require_once('include/items.php');
 
 /**
  * @brief Process send data from the admin panels subpages
@@ -393,6 +394,7 @@ function admin_page_deleteitem_post(App $a) {
 	}
 
 	check_form_security_token_redirectOnErr('/admin/deleteitem/', 'admin_deleteitem');
+
 	if (x($_POST['page_deleteitem_submit'])) {
 		$guid = trim(notags($_POST['deleteitemguid']));
 		// The GUID should not include a "/", so if there is one, we got an URL
@@ -400,17 +402,14 @@ function admin_page_deleteitem_post(App $a) {
 		if (strpos($guid, '/')) {
 			$guid = substr($guid, strrpos($guid, '/')+1);
 		}
-		// Now that we have the GUID, get the ID and the PARENT ID of the posting
-		// to determine if it is a top level posting or a comment. If it is a top
-		// level posting, we also need to delete the corresponding thread.
-		dba::update('item', array('deleted' => true), array('guid' => (int)$guid));
-		$r = qu("SELECT id, parent FROM item WHERE guid='%s'",$guid);
-		if (dbm::is_result($r)) {
-			$rr = $r[0];
-			if ($rr['id'] == $rr['parent']) {
-				dba::update('thread', array('deleted' => true), array('iid' => (int)$rr['id']));
-			}
+		// Now that we have the GUID get all IDs of the associated entries in the
+		// item table of the DB and drop those items, which will also delete the
+		// associated threads.
+		$r = dba::select('item', array('id'), array('guid'=>$guid));
+		while ($row = dba::fetch($r)) {
+			drop_item($row['id'], false);
 		}
+		dba::close($r);
 	}
 
 	info(t('Item marked for deletion.').EOL);
