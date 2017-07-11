@@ -827,9 +827,11 @@ class Probe {
 			}
 		}
 
-		foreach ($webfinger["aliases"] as $alias) {
-			if (substr($alias, 0, 5) == 'acct:') {
-				$data["addr"] = substr($alias, 5);
+		if (is_array($webfinger["aliases"])) {
+			foreach ($webfinger["aliases"] as $alias) {
+				if (substr($alias, 0, 5) == 'acct:') {
+					$data["addr"] = substr($alias, 5);
+				}
 			}
 		}
 
