@@ -517,7 +517,7 @@ function contacts_not_grouped($uid,$start = 0,$count = 0) {
  * @return integer Contact ID
  */
 function get_contact($url, $uid = 0, $no_update = false) {
-	logger("Get contact data for url ".$url." and user ".$uid." - ".App::callstack(), LOGGER_DEBUG);;
+	logger("Get contact data for url ".$url." and user ".$uid." - ".App::callstack(), LOGGER_DEBUG);
 
 	$data = array();
 	$contact_id = 0;
@@ -527,39 +527,28 @@ function get_contact($url, $uid = 0, $no_update = false) {
 	}
 
 	// We first try the nurl (http://server.tld/nick), most common case
-	$contacts = q("SELECT `id`, `avatar-date` FROM `contact`
-					WHERE `nurl` = '%s'
-					AND `uid` = %d",
-			dbesc(normalise_link($url)),
-			intval($uid));
-
+	$contact = dba::select('contact', array('id', 'avatar-date'), array('nurl' => normalise_link($url), 'uid' => $uid), array('limit' => 1));
 
 	// Then the addr (nick@server.tld)
-	if (! dbm::is_result($contacts)) {
-		$contacts = q("SELECT `id`, `avatar-date` FROM `contact`
-					WHERE `addr` = '%s'
-					AND `uid` = %d",
-			dbesc($url),
-			intval($uid));
+	if (!dbm::is_result($contact)) {
+		$contact = dba::select('contact', array('id', 'avatar-date'), array('addr' => $url, 'uid' => $uid), array('limit' => 1));
 	}
 
 	// Then the alias (which could be anything)
-	if (! dbm::is_result($contacts)) {
-		$contacts = q("SELECT `id`, `avatar-date` FROM `contact`
-					WHERE `alias` IN ('%s', '%s')
-					AND `uid` = %d",
-			dbesc($url),
-			dbesc(normalise_link($url)),
-			intval($uid));
+	if (!dbm::is_result($contact)) {
+		$r = dba::p("SELECT `id`, `avatar-date` FROM `contact` WHERE `alias` IN (?, ?) AND `uid` = ? LIMIT 1",
+				$url, normalise_link($url), $uid);
+		$contact = dba::fetch($r);
+		dba::close($r);
 	}
 
-	if (dbm::is_result($contacts)) {
-		$contact_id = $contacts[0]["id"];
+	if (dbm::is_result($contact)) {
+		$contact_id = $contact["id"];
 
 		// Update the contact every 7 days
-		$update_photo = ($contacts[0]['avatar-date'] < datetime_convert('','','now -7 days'));
+		$update_contact = ($contact['avatar-date'] < datetime_convert('','','now -7 days'));
 
-		if (!$update_photo || $no_update) {
+		if (!$update_contact || $no_update) {
 			return $contact_id;
 		}
 	} elseif ($uid != 0) {
@@ -576,45 +565,28 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		}
 
 		// Get data from the gcontact table
-		$gcontacts = q("SELECT `name`, `nick`, `url`, `photo`, `addr`, `alias`, `network` FROM `gcontact` WHERE `nurl` = '%s'",
-			 dbesc(normalise_link($url)));
+		$gcontacts = dba::select('gcontact', array('name', 'nick', 'url', 'photo', 'addr', 'alias', 'network'),
+						array('nurl' => normalise_link($url)), array('limit' => 1));
 		if (!$gcontacts) {
 			return 0;
 		}
 
-		$data = $gcontacts[0];
+		$data = $gcontacts;
 	}
 
 	$url = $data["url"];
 
 	if (!$contact_id) {
-		q("INSERT INTO `contact` (`uid`, `created`, `url`, `nurl`, `addr`, `alias`, `notify`, `poll`,
-					`name`, `nick`, `photo`, `network`, `pubkey`, `rel`, `priority`,
-					`batch`, `request`, `confirm`, `poco`, `name-date`, `uri-date`,
-					`writable`, `blocked`, `readonly`, `pending`)
-					VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', 1, 0, 0, 0)",
-			intval($uid),
-			dbesc(datetime_convert()),
-			dbesc($data["url"]),
-			dbesc(normalise_link($data["url"])),
-			dbesc($data["addr"]),
-			dbesc($data["alias"]),
-			dbesc($data["notify"]),
-			dbesc($data["poll"]),
-			dbesc($data["name"]),
-			dbesc($data["nick"]),
-			dbesc($data["photo"]),
-			dbesc($data["network"]),
-			dbesc($data["pubkey"]),
-			intval(CONTACT_IS_SHARING),
-			intval($data["priority"]),
-			dbesc($data["batch"]),
-			dbesc($data["request"]),
-			dbesc($data["confirm"]),
-			dbesc($data["poco"]),
-			dbesc(datetime_convert()),
-			dbesc(datetime_convert())
-		);
+		dba::insert('contact', array('uid' => $uid, 'created' => datetime_convert(), 'url' => $data["url"],
+					'nurl' => normalise_link($data["url"]), 'addr' => $data["addr"],
+					'alias' => $data["alias"], 'notify' => $data["notify"], 'poll' => $data["poll"],
+					'name' => $data["name"], 'nick' => $data["nick"], 'photo' => $data["photo"],
+					'network' => $data["network"], 'pubkey' => $data["pubkey"],
+					'rel' => CONTACT_IS_SHARING, 'priority' => $data["priority"],
+					'batch' => $data["batch"], 'request' => $data["request"], 'confirm' => $data["confirm"],
+					'poco' => $data["poco"], 'name-date' => datetime_convert(),
+					'uri-date' => datetime_convert(), 'avatar-date' => datetime_convert(),
+					'writable' => 1, 'blocked' => 0, 'readonly' => 0, 'pending' => 0));
 
 		$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2",
 				dbesc(normalise_link($data["url"])),
@@ -626,49 +598,45 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		$contact_id = $contacts[0]["id"];
 
 		// Update the newly created contact from data in the gcontact table
-		$gcontacts = q("SELECT `location`, `about`, `keywords`, `gender` FROM `gcontact` WHERE `nurl` = '%s'",
-			 dbesc(normalise_link($data["url"])));
-		if (dbm::is_result($gcontacts)) {
-			logger("Update contact " . $data["url"] . ' from gcontact');
-			q("UPDATE `contact` SET `location` = '%s', `about` = '%s', `keywords` = '%s', `gender` = '%s' WHERE `id` = %d",
-				dbesc($gcontacts[0]["location"]), dbesc($gcontacts[0]["about"]), dbesc($gcontacts[0]["keywords"]),
-				dbesc($gcontacts[0]["gender"]), intval($contact_id));
+		$gcontact = dba::select('gcontact', array('location', 'about', 'keywords', 'gender'),
+					array('nurl' => normalise_link($data["url"])), array('limit' => 1));
+		if (dbm::is_result($gcontact)) {
+			dba::update('contact', $gcontact, array('id' => $contact_id));
 		}
-	}
 
-	if (count($contacts) > 1 && $uid == 0 && $contact_id != 0 && $url != "") {
-		q("DELETE FROM `contact` WHERE `nurl` = '%s' AND `uid` = 0 AND `id` != %d AND NOT `self`",
-			dbesc(normalise_link($url)),
-			intval($contact_id));
+		if (count($contacts) > 1 && $uid == 0 && $contact_id != 0 && $data["url"] != "") {
+			dba::e("DELETE FROM `contact` WHERE `nurl` = ? AND `uid` = 0 AND `id` != ? AND NOT `self`",
+				normalise_link($data["url"]), $contact_id);
+		}
 	}
 
 	require_once "Photo.php";
 
 	update_contact_avatar($data["photo"], $uid, $contact_id);
 
-	$contacts = q("SELECT `addr`, `alias`, `name`, `nick` FROM `contact` WHERE `id` = %d", intval($contact_id));
+	$contact = dba::select('contact', array('addr', 'alias', 'name', 'nick', 'avatar-date'),
+				array('id' => $contact_id), array('limit' => 1));
 
 	// This condition should always be true
-	if (!dbm::is_result($contacts)) {
+	if (!dbm::is_result($contact)) {
 		return $contact_id;
 	}
 
-	// Only update if there had something been changed
-	if ($data["addr"] != $contacts[0]["addr"] ||
-		$data["alias"] != $contacts[0]["alias"] ||
-		$data["name"] != $contacts[0]["name"] ||
-		$data["nick"] != $contacts[0]["nick"]) {
-		q("UPDATE `contact` SET `addr` = '%s', `alias` = '%s', `name` = '%s', `nick` = '%s',
-			`name-date` = '%s', `uri-date` = '%s' WHERE `id` = %d",
-			dbesc($data["addr"]),
-			dbesc($data["alias"]),
-			dbesc($data["name"]),
-			dbesc($data["nick"]),
-			dbesc(datetime_convert()),
-			dbesc(datetime_convert()),
-			intval($contact_id)
-		);
+	$updated = array('addr' => $data['addr'],
+			'alias' => $data['alias'],
+			'name' => $data['name'],
+			'nick' => $data['nick']);
+
+	if (($data["addr"] != $contact["addr"]) || ($data["alias"] != $contact["alias"])) {
+		$updated['uri-date'] = datetime_convert();
 	}
+	if (($data["name"] != $contact["name"]) || ($data["nick"] != $contact["nick"])) {
+		$updated['name-date'] = datetime_convert();
+	}
+
+	$updated['avatar-date'] = datetime_convert();
+
+	dba::update('contact', $updated, array('id' => $contact_id), $contact);
 
 	return $contact_id;
 }
