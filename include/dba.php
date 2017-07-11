@@ -647,8 +647,11 @@ class dba {
 				$error = self::$dbo->error;
 				$errorno = self::$dbo->errorno;
 
+				$sql = $args[0];
+				array_shift($args);
+
 				logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
-					$a->callstack(8))."\n".self::replace_parameters($sql, $args);
+					$a->callstack(8)."\n".self::replace_parameters($sql, $args));
 
 				self::$dbo->error = $error;
 				self::$dbo->errorno = $errorno;
@@ -711,8 +714,11 @@ class dba {
 			$error = self::$dbo->error;
 			$errorno = self::$dbo->errorno;
 
+			$sql = $args[0];
+			array_shift($args);
+
 			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
-				$a->callstack(8))."\n".self::replace_parameters($sql, $args);
+				$a->callstack(8)."\n".self::replace_parameters($sql, $args));
 
 			self::$dbo->error = $error;
 			self::$dbo->errorno = $errorno;

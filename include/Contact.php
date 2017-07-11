@@ -577,16 +577,23 @@ function get_contact($url, $uid = 0, $no_update = false) {
 	$url = $data["url"];
 
 	if (!$contact_id) {
+		if (!isset($data['priority'])) {
+			$data['priority'] = 0;
+		}
+		if (!isset($data['batch'])) {
+			$data['batch'] = '';
+		}
 		dba::insert('contact', array('uid' => $uid, 'created' => datetime_convert(), 'url' => $data["url"],
 					'nurl' => normalise_link($data["url"]), 'addr' => $data["addr"],
 					'alias' => $data["alias"], 'notify' => $data["notify"], 'poll' => $data["poll"],
 					'name' => $data["name"], 'nick' => $data["nick"], 'photo' => $data["photo"],
 					'network' => $data["network"], 'pubkey' => $data["pubkey"],
 					'rel' => CONTACT_IS_SHARING, 'priority' => $data["priority"],
-					'batch' => $data["batch"], 'request' => $data["request"], 'confirm' => $data["confirm"],
-					'poco' => $data["poco"], 'name-date' => datetime_convert(),
-					'uri-date' => datetime_convert(), 'avatar-date' => datetime_convert(),
-					'writable' => 1, 'blocked' => 0, 'readonly' => 0, 'pending' => 0));
+					'batch' => $data["batch"], 'request' => $data["request"],
+					'confirm' => $data["confirm"], 'poco' => $data["poco"],
+					'name-date' => datetime_convert(), 'uri-date' => datetime_convert(),
+					'avatar-date' => datetime_convert(), 'writable' => 1, 'blocked' => 0,
+					'readonly' => 0, 'pending' => 0));
 
 		$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2",
 				dbesc(normalise_link($data["url"])),
