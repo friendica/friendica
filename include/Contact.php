@@ -567,26 +567,20 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		// Get data from the gcontact table
 		$gcontacts = dba::select('gcontact', array('name', 'nick', 'url', 'photo', 'addr', 'alias', 'network'),
 						array('nurl' => normalise_link($url)), array('limit' => 1));
-		if (!$gcontacts) {
+		if (!dbm::is_result($gcontacts)) {
 			return 0;
 		}
 
-		$data = $gcontacts;
+		$data = array_merge($data, $gcontacts);
 	}
 
 	$url = $data["url"];
-
 	if (!$contact_id) {
-		if (!isset($data['priority'])) {
-			$data['priority'] = 0;
-		}
-		if (!isset($data['batch'])) {
-			$data['batch'] = '';
-		}
 		dba::insert('contact', array('uid' => $uid, 'created' => datetime_convert(), 'url' => $data["url"],
 					'nurl' => normalise_link($data["url"]), 'addr' => $data["addr"],
 					'alias' => $data["alias"], 'notify' => $data["notify"], 'poll' => $data["poll"],
 					'name' => $data["name"], 'nick' => $data["nick"], 'photo' => $data["photo"],
+					'keywords' => $data["keywords"], 'location' => $data["location"], 'about' => $data["about"],
 					'network' => $data["network"], 'pubkey' => $data["pubkey"],
 					'rel' => CONTACT_IS_SHARING, 'priority' => $data["priority"],
 					'batch' => $data["batch"], 'request' => $data["request"],
@@ -608,6 +602,16 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		$gcontact = dba::select('gcontact', array('location', 'about', 'keywords', 'gender'),
 					array('nurl' => normalise_link($data["url"])), array('limit' => 1));
 		if (dbm::is_result($gcontact)) {
+			// Only use the information when the probing hadn't fetched these values
+			if ($data['keywords'] != '') {
+				unset($gcontact['keywords']);
+			}
+			if ($data['location'] != '') {
+				unset($gcontact['location']);
+			}
+			if ($data['about'] != '') {
+				unset($gcontact['about']);
+			}
 			dba::update('contact', $gcontact, array('id' => $contact_id));
 		}
 
