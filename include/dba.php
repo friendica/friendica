@@ -638,20 +638,22 @@ class dba {
 		}
 
 		if (self::$dbo->errorno != 0) {
-			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-			$called_from = array_shift($trace);
+			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
-			// We are having an own error logging in the function "p"
-			if ($called_from['function'] != 'p') {
+			if (isset($trace[2])) {
+				$called_from = $trace[2];
+			} else {
+				// We use just something that is defined to avoid warnings
+				$called_from = $trace[0];
+			}
+			// We are having an own error logging in the function "e"
+			if ($called_from['function'] != 'e') {
 				// We have to preserve the error code, somewhere in the logging it get lost
 				$error = self::$dbo->error;
 				$errorno = self::$dbo->errorno;
 
-				$sql = $args[0];
-				array_shift($args);
-
 				logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
-					$a->callstack(8)."\n".self::replace_parameters($sql, $args));
+					$a->callstack(8)."\n".self::replace_parameters($sql, $params));
 
 				self::$dbo->error = $error;
 				self::$dbo->errorno = $errorno;
@@ -714,11 +716,17 @@ class dba {
 			$error = self::$dbo->error;
 			$errorno = self::$dbo->errorno;
 
-			$sql = $args[0];
 			array_shift($args);
 
+			// When the second function parameter is an array then use this as the parameter array
+			if ((count($args) > 0) && (is_array($args[0]))) {
+				$params = $args[0];
+			} else {
+				$params = $args;
+			}
+
 			logger('DB Error '.self::$dbo->errorno.': '.self::$dbo->error."\n".
-				$a->callstack(8)."\n".self::replace_parameters($sql, $args));
+				$a->callstack(8)."\n".self::replace_parameters($sql, $params));
 
 			self::$dbo->error = $error;
 			self::$dbo->errorno = $errorno;
