@@ -625,7 +625,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
 
 	update_contact_avatar($data["photo"], $uid, $contact_id);
 
-	$contact = dba::select('contact', array('addr', 'alias', 'name', 'nick', 'avatar-date'),
+	$contact = dba::select('contact', array('addr', 'alias', 'name', 'nick', 'keywords', 'location', 'about', 'avatar-date'),
 				array('id' => $contact_id), array('limit' => 1));
 
 	// This condition should always be true
@@ -637,6 +637,16 @@ function get_contact($url, $uid = 0, $no_update = false) {
 			'alias' => $data['alias'],
 			'name' => $data['name'],
 			'nick' => $data['nick']);
+
+	if ($data['keywords'] != '') {
+		$updated['keywords'] = $data['keywords'];
+	}
+	if ($data['location'] != '') {
+		$updated['location'] = $data['location'];
+	}
+	if ($data['about'] != '') {
+		$updated['about'] = $data['about'];
+	}
 
 	if (($data["addr"] != $contact["addr"]) || ($data["alias"] != $contact["alias"])) {
 		$updated['uri-date'] = datetime_convert();
