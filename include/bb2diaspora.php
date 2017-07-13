@@ -188,7 +188,7 @@ function bb2diaspora($Text, $preserve_nl = false, $fordiaspora = true) {
 	$Text = $converter->convert($Text);
 
 	// unmask the special chars back to HTML
-	$Text = str_replace(array('&_lt_;', '&_gt_;', '&_amp_;'), array('&lt;', '&gt;', '&amp;'), $Text);
+	$Text = str_replace(array('&\_lt\_;', '&\_gt\_;', '&\_amp\_;'), array('&lt;', '&gt;', '&amp;'), $Text);
 
 	$a->save_timestamp($stamp1, "parser");
 
