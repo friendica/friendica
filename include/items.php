@@ -6,6 +6,7 @@
 
 use Friendica\App;
 use Friendica\ParseUrl;
+use Friendica\Util\Lock;
 
 require_once 'include/bbcode.php';
 require_once 'include/oembed.php';
@@ -444,6 +445,15 @@ function store_conversation($arr) {
 			$conversation['source'] = $arr['source'];
 		}
 
+		if (!Lock::set('store_conversation')) {
+			// When using semaphores, this case never can't happen
+			unset($arr['conversation-uri']);
+			unset($arr['conversation-href']);
+			unset($arr['protocol']);
+			unset($arr['source']);
+			return $arr;
+		}
+
 		$old_conv = dba::fetch_first("SELECT `item-uri`, `reply-to-uri`, `conversation-uri`, `conversation-href`, `protocol`, `source`
 				FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
 		if (dbm::is_result($old_conv)) {
@@ -465,6 +475,7 @@ function store_conversation($arr) {
 				logger('Conversation: insert for '.$conversation['item-uri'].' (protocol '.$conversation['protocol'].') failed', LOGGER_DEBUG);
 			}
 		}
+		Lock::remove('store_conversation');
 	}
 
 	unset($arr['conversation-uri']);
@@ -2317,7 +2328,7 @@ function drop_item($id, $interactive = true) {
 
 }
 
-
+/// @todo: This query seems to be really slow
 function first_post_date($uid, $wall = false) {
 	$r = q("SELECT `id`, `created` FROM `item`
 		WHERE `uid` = %d AND `wall` = %d AND `deleted` = 0 AND `visible` = 1 AND `moderated` = 0
