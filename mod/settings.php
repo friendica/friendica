@@ -1018,7 +1018,7 @@ function settings_content(App $a) {
 			'$first_day_of_week'	=> array('first_day_of_week', t('Beginning of week:'), $first_day_of_week, '', $weekdays, false),
 			'$noinfo'	=> array('noinfo', t("Don't show notices"), $noinfo, ''),
 			'$infinite_scroll'	=> array('infinite_scroll', t("Infinite scroll"), $infinite_scroll, ''),
-			'$no_auto_update'	=> array('no_auto_update', t("Automatic updates only at the top of the network page"), $no_auto_update, 'When disabled, the network page is updated all the time, which could be confusing while reading.'),
+			'$no_auto_update'	=> array('no_auto_update', t("Automatic updates only at the top of the network page"), $no_auto_update, t('When disabled, the network page is updated all the time, which could be confusing while reading.')),
 			'$bandwidth_saver' => array('bandwidth_saver', t('Bandwith Saver Mode'), $bandwidth_saver, t('When enabled, embedded content is not displayed on automatic updates, they only show on page reload.')),
 
 			'$d_tset' => t('General Theme Settings'),
