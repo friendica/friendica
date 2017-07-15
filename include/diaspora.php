@@ -3729,7 +3729,7 @@ class Diaspora {
 		 * This will break Diaspora compatibility with Friendica versions prior to 3.5.
 		 */
 		q("INSERT INTO `sign` (`iid`,`signed_text`) VALUES (%d,'%s')",
-			intval($message_id),
+			intval($post_id),
 			dbesc(json_encode($message))
 		);
 

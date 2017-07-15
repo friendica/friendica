@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 3.5.3-dev (Asparagus)
--- DB_UPDATE_VERSION 1231
+-- DB_UPDATE_VERSION 1233
 -- ------------------------------------------
 
 
@@ -944,7 +944,7 @@ CREATE TABLE IF NOT EXISTS `sign` (
 	`signature` text,
 	`signer` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
-	 INDEX `iid` (`iid`)
+	 UNIQUE INDEX `iid` (`iid`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
