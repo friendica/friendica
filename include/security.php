@@ -257,8 +257,6 @@ function permissions_sql($owner_id, $remote_verified = false, $groups = null) {
 
 	if (($local_user) && ($local_user == $owner_id)) {
 		$sql = '';
-	}
-
 	/**
 	 * Authenticated visitor. Unless pre-verified,
 	 * check that the contact belongs to this $owner_id
@@ -266,7 +264,6 @@ function permissions_sql($owner_id, $remote_verified = false, $groups = null) {
 	 * If pre-verified, the caller is expected to have already
 	 * done this and passed the groups into this function.
 	 */
-
 	} elseif ($remote_user) {
 		if (! $remote_verified) {
 			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
