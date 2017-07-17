@@ -1374,7 +1374,6 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 	$vhead = false;
 	$arr = explode('[/attach],', $item['attach']);
 	if (count($arr)) {
-		$as .= '<div class="body-attach">';
 		foreach ($arr as $r) {
 			$matches = false;
 			$icon = '';
@@ -1435,9 +1434,10 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 				}
 			}
 		}
-		$as .= '<div class="clear"></div></div>';
 	}
-	$s = $s . $as;
+	if ($as != '') {
+		$s .= '<div class="body-attach">'.$as.'<div class="clear"></div></div>';
+	}
 
 	// map
 	if (strpos($s, '<div class="map">') !== false && x($item, 'coord')) {
