@@ -1426,11 +1426,12 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 
 					if (($filetype == 'image') && ($item['network'] == NETWORK_OSTATUS)) {
 						$icon = '<img class="attached" src="'.$the_url.'" alt="" title="'.$title.'">';
+						$s .= '<br><a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attached" target="_blank" >' . $icon . '</a>';
 					} else {
 						$icon = '<div class="attachtype icon s22 type-' . $filetype . ' subtype-' . $filesubtype . '"></div>';
+						$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" >' . $icon . '</a>';
 					}
 
-					$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" >' . $icon . '</a>';
 				}
 			}
 		}
