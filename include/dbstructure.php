@@ -52,7 +52,7 @@ function update_fail($update_id, $error_message) {
 
 	// No valid result?
 	if (!dbm::is_result($adminlist)) {
-		logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_WARNING);
+		logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_DEBUG);
 
 		// Don't continue
 		return;

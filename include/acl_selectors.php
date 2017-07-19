@@ -544,8 +544,9 @@ function acl_lookup(App $a, $out_type = 'json') {
 		}
 	}
 
-	if ($type == '') {
+	$r = array();
 
+	if ($type == '') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			AND NOT (`network` IN ('%s', '%s'))
@@ -584,6 +585,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 	} elseif ($type == 'x') {
 		// autocomplete for global contact search (e.g. navbar search)
 		$r = navbar_complete($a);
+
 		/// @TODO $r is again a query result?
 		$contacts = array();
 		if ($r) {
