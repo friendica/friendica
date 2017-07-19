@@ -112,7 +112,7 @@ class dfrn {
 		);
 
 		if (! dbm::is_result($r)) {
-			logger(sprintf('No contact found for nickname=%d', $owner_nick), LOGGER_WARNING);
+			logger(sprintf('No contact found for nickname=%d', $owner_nick), LOGGER_DEBUG);
 			killme();
 		}
 
@@ -148,7 +148,7 @@ class dfrn {
 			);
 
 			if (! dbm::is_result($r)) {
-				logger(sprintf('No contact found for uid=%d', $owner_id), LOGGER_WARNING);
+				logger(sprintf('No contact found for uid=%d', $owner_id), LOGGER_DEBUG);
 				killme();
 			}
 
@@ -428,8 +428,8 @@ class dfrn {
 				WHERE `profile` = 1 AND `uid` = %d ORDER BY scale;", $uid);
 
 		if (!dbm::is_result($rp)) {
-			logger(sprintf('No photos looking for profile uid=%d', $uid), LOGGER_WARNING);
-			killme();
+			logger(sprintf('No photos looking for profile uid=%d', $uid), LOGGER_DEBUG);
+			return;
 		}
 
 		$photos = array();
@@ -1240,9 +1240,9 @@ class dfrn {
 
 
 			if ($dfrn_version >= 2.1) {
-				if (($contact['duplex'] && strlen($contact['pubkey'])) {
+				if (($contact['duplex'] && strlen($contact['pubkey']))
 					|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
-					|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey'])))
+					|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))) {
 
 					openssl_public_encrypt($key,$postvars['key'],$contact['pubkey']);
 				} else {
