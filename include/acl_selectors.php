@@ -447,25 +447,32 @@ function acl_lookup(App $a, $out_type = 'json') {
 		if (! $type) {
 			$type = 'm';
 		}
-		$search = $_REQUEST['query'];
+		// Assigned already above ^^^ $search = $_REQUEST['query'];
 	}
 
-	logger("Searching for ".$search." - type ".$type, LOGGER_DEBUG);
+	logger("Searching for " . $search . " - type " . $type, LOGGER_DEBUG);
+
+	// Init variables
+	$sql_extra = $sql_extra2 = "";
 
 	if ($search != "") {
-		$sql_extra = "AND `name` LIKE '%%".dbesc($search)."%%'";
-		$sql_extra2 = "AND (`attag` LIKE '%%".dbesc($search)."%%' OR `name` LIKE '%%".dbesc($search)."%%' OR `nick` LIKE '%%".dbesc($search)."%%')";
-	} else {
-		/// @TODO Avoid these needless else blocks by putting variable-initialization atop of if()
-		$sql_extra = $sql_extra2 = "";
+		$sql_extra = "AND `name` LIKE '%%" . dbesc($search) . "%%'";
+		$sql_extra2 = "AND (`attag` LIKE '%%" . dbesc($search) . "%%' OR `name` LIKE '%%" . dbesc($search) . "%%' OR `nick` LIKE '%%" . dbesc($search) . "%%')";
 	}
+
+	// Init result array
+	$r = array();
 
 	// count groups and contacts
 	if ($type == '' || $type == 'g') {
-		$r = q("SELECT COUNT(*) AS g FROM `group` WHERE `deleted` = 0 AND `uid` = %d $sql_extra",
+		$r = q("SELECT COUNT(*) AS `g` FROM `group` WHERE `deleted` = 0 AND `uid` = %d $sql_extra",
 			intval(local_user())
 		);
-		$group_count = (int)$r[0]['g'];
+
+		// Always check if there is a result
+		if (dbm::is_result($r)) {
+			$group_count = (int)$r[0]['g'];
+		}
 	}
 
 	$sql_extra2 .= " ".unavailable_networks();
@@ -478,6 +485,8 @@ function acl_lookup(App $a, $out_type = 'json') {
 				AND `notify` != '' $sql_extra2" ,
 			intval(local_user())
 		);
+
+		// Always check if there is a result
 		if (dbm::is_result($r)) {
 			$contact_count = (int)$r[0]['c'];
 		}
@@ -492,10 +501,11 @@ function acl_lookup(App $a, $out_type = 'json') {
 			dbesc(NETWORK_ZOT),
 			dbesc(NETWORK_DIASPORA)
 		);
+
+		// Always check if there is a result
 		if (dbm::is_result($r)) {
 			$contact_count = (int)$r[0]['c'];
 		}
-
 	} elseif ($type == 'a') {
 		// autocomplete for Contacts
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
@@ -503,6 +513,8 @@ function acl_lookup(App $a, $out_type = 'json') {
 				AND NOT `pending` $sql_extra2" ,
 			intval(local_user())
 		);
+
+		// Always check if there is a result
 		if (dbm::is_result($r)) {
 			$contact_count = (int)$r[0]['c'];
 		}
@@ -530,21 +542,22 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval($count)
 		);
 
-		foreach ($r as $g) {
-//		logger('acl: group: ' . $g['name'] . ' members: ' . $g['uids']);
-			$groups[] = array(
-				"type"  => "g",
-				"photo" => "images/twopeople.png",
-				"name"  => htmlentities($g['name']),
-				"id"	=> intval($g['id']),
-				"uids"  => array_map("intval", explode(",",$g['uids'])),
-				"link"  => '',
-				"forum" => '0'
-			);
+		// Always check if there is a result
+		if (dbm::is_result($r)) {
+			foreach ($r as $g) {
+				//logger('acl: group: ' . $g['name'] . ' members: ' . $g['uids']);
+				$groups[] = array(
+					"type"  => "g",
+					"photo" => "images/twopeople.png",
+					"name"  => htmlentities($g['name']),
+					"id"	=> intval($g['id']),
+					"uids"  => array_map("intval", explode(",",$g['uids'])),
+					"link"  => '',
+					"forum" => '0'
+				);
+			}
 		}
 	}
-
-	$r = array();
 
 	if ($type == '') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
@@ -583,12 +596,12 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval(local_user())
 		);
 	} elseif ($type == 'x') {
+		$contacts = array();
+
 		// autocomplete for global contact search (e.g. navbar search)
 		$r = navbar_complete($a);
 
-		/// @TODO $r is again a query result?
-		$contacts = array();
-		if ($r) {
+		if (dbm::is_result($r)) {
 			foreach ($r as $g) {
 				$contacts[] = array(
 					'photo'   => proxy_url($g['photo'], false, PROXY_SIZE_MICRO),
@@ -720,16 +733,16 @@ function acl_lookup(App $a, $out_type = 'json') {
  */
 function navbar_complete(App $a) {
 
-//	logger('navbar_complete');
+	// logger(__METHOD__);
 
-	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
+	if ((get_config('system', 'block_public')) && (! local_user()) && (! remote_user())) {
 		return;
 	}
 
 	// check if searching in the local global contact table is enabled
-	$localsearch = get_config('system','poco_local_search');
+	$localsearch = get_config('system', 'poco_local_search');
 
-	$search = $prefix.notags(trim($_REQUEST['search']));
+	$search = $prefix . notags(trim($_REQUEST['search']));
 	$mode = $_REQUEST['smode'];
 
 	// don't search if search term has less than 2 characters
@@ -737,8 +750,8 @@ function navbar_complete(App $a) {
 		return array();
 	}
 
-	if (substr($search,0,1) === '@') {
-		$search = substr($search,1);
+	if (substr($search, 0, 1) === '@') {
+		$search = substr($search, 1);
 	}
 
 	if ($localsearch) {
