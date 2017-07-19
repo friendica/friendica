@@ -569,9 +569,9 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	$r = q("SELECT expire FROM user WHERE uid = %d", intval($uid));
 	if (dbm::is_result($r)) {
 		$expire_interval = $r[0]['expire'];
-		if ($expire_interval>0) {
-			$expire_date =  new DateTime( '- '.$expire_interval.' days', new DateTimeZone('UTC'));
-			$created_date = new DateTime($arr['created'], new DateTimeZone('UTC'));
+		if ($expire_interval > 0) {
+			$expire_date = datetime_convert('UTC', 'UTC', '- '.$expire_interval.' days');
+			$created_date = datetime_convert('UTC', 'UTC', $arr['created']);
 			if ($created_date < $expire_date) {
 				logger('item-store: item created ('.$arr['created'].') before expiration time ('.$expire_date->format(DateTime::W3C).'). ignored. ' . print_r($arr,true), LOGGER_DEBUG);
 				return 0;
@@ -653,6 +653,11 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	$arr['event-id']      = ((x($arr, 'event-id'))      ? intval($arr['event-id'])            : 0 );
 	$arr['inform']        = ((x($arr, 'inform'))        ? trim($arr['inform'])                : '');
 	$arr['file']          = ((x($arr, 'file'))          ? trim($arr['file'])                  : '');
+
+	// When there is no content then we don't post it
+	if ($arr['body'].$arr['title'] == '') {
+		return 0;
+	}
 
 	// Items cannot be stored before they happen ...
 	if ($arr['created'] > datetime_convert()) {
