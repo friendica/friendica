@@ -3,8 +3,8 @@
 use Friendica\App;
 use Friendica\Core\Config;
 
-require_once('include/security.php');
-require_once('include/datetime.php');
+require_once 'include/security.php';
+require_once 'include/datetime.php';
 
 // When the "Friendica" cookie is set, take the value to authenticate and renew the cookie.
 if (isset($_COOKIE["Friendica"])) {
@@ -15,7 +15,7 @@ if (isset($_COOKIE["Friendica"])) {
 			intval($data->uid)
 		);
 
-		if ($r) {
+		if (dbm::is_result($r)) {
 			if ($data->hash != cookie_hash($r[0])) {
 				logger("Hash for user ".$data->uid." doesn't fit.");
 				nuke_session();
@@ -32,8 +32,9 @@ if (isset($_COOKIE["Friendica"])) {
 			if (!isset($_SESSION) || !isset($_SESSION['authenticated'])) {
 				authenticate_success($r[0]);
 
-				if (get_config('system','paranoia'))
+				if (get_config('system', 'paranoia')) {
 					$_SESSION['addr'] = $data->ip;
+				}
 			}
 		}
 	}
@@ -42,18 +43,18 @@ if (isset($_COOKIE["Friendica"])) {
 
 // login/logout
 
-if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params') || ($_POST['auth-params'] !== 'login'))) {
+if (isset($_SESSION) && x($_SESSION, 'authenticated') && (!x($_POST, 'auth-params') || ($_POST['auth-params'] !== 'login'))) {
 
-	if ((x($_POST,'auth-params') && ($_POST['auth-params'] === 'logout')) || ($a->module === 'logout')) {
+	if ((x($_POST, 'auth-params') && ($_POST['auth-params'] === 'logout')) || ($a->module === 'logout')) {
 
 		// process logout request
 		call_hooks("logging_out");
 		nuke_session();
-		info(t('Logged out.').EOL);
+		info(t('Logged out.') . EOL);
 		goaway(z_root());
 	}
 
-	if (x($_SESSION,'visitor_id') && !x($_SESSION,'uid')) {
+	if (x($_SESSION, 'visitor_id') && !x($_SESSION, 'uid')) {
 		$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 			intval($_SESSION['visitor_id'])
 		);
@@ -62,15 +63,15 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 		}
 	}
 
-	if (x($_SESSION,'uid')) {
+	if (x($_SESSION, 'uid')) {
 
 		// already logged in user returning
+		$check = get_config('system', 'paranoia');
 
-		$check = get_config('system','paranoia');
 		// extra paranoia - if the IP changed, log them out
 		if ($check && ($_SESSION['addr'] != $_SERVER['REMOTE_ADDR'])) {
 			logger('Session address changed. Paranoid setting in effect, blocking session. '.
-				$_SESSION['addr'].' != '.$_SERVER['REMOTE_ADDR']);
+				$_SESSION['addr'] . ' != '.$_SERVER['REMOTE_ADDR']);
 			nuke_session();
 			goaway(z_root());
 		}
@@ -89,11 +90,11 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 		// stays logged in for a long time, e.g. with "Remember Me"
 		$login_refresh = false;
 		if (!x($_SESSION['last_login_date'])) {
-			$_SESSION['last_login_date'] = datetime_convert('UTC','UTC');
+			$_SESSION['last_login_date'] = datetime_convert('UTC', 'UTC');
 		}
-		if (strcmp(datetime_convert('UTC','UTC','now - 12 hours'), $_SESSION['last_login_date']) > 0) {
+		if (strcmp(datetime_convert('UTC', 'UTC', 'now - 12 hours'), $_SESSION['last_login_date']) > 0) {
 
-			$_SESSION['last_login_date'] = datetime_convert('UTC','UTC');
+			$_SESSION['last_login_date'] = datetime_convert('UTC', 'UTC');
 			$login_refresh = true;
 		}
 		authenticate_success($r[0], false, false, $login_refresh);
@@ -102,15 +103,15 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 
 	session_unset();
 
-	if (x($_POST,'password') && strlen($_POST['password']))
+	if (x($_POST, 'password') && strlen($_POST['password'])) {
 		$encrypted = hash('whirlpool',trim($_POST['password']));
-	else {
-		if ((x($_POST,'openid_url')) && strlen($_POST['openid_url']) ||
-		   (x($_POST,'username')) && strlen($_POST['username'])) {
+	} else {
+		if ((x($_POST, 'openid_url')) && strlen($_POST['openid_url']) ||
+			(x($_POST, 'username')) && strlen($_POST['username'])) {
 
-			$noid = get_config('system','no_openid');
+			$noid = get_config('system', 'no_openid');
 
-			$openid_url = trim((strlen($_POST['openid_url'])?$_POST['openid_url']:$_POST['username']));
+			$openid_url = trim((strlen($_POST['openid_url']) ? $_POST['openid_url'] : $_POST['username']));
 
 			// validate_url alters the calling parameter
 
@@ -118,9 +119,9 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 
 			// if it's an email address or doesn't resolve to a URL, fail.
 
-			if ($noid || strpos($temp_string,'@') || !validate_url($temp_string)) {
+			if ($noid || strpos($temp_string, '@') || !validate_url($temp_string)) {
 				$a = get_app();
-				notice(t('Login failed.').EOL);
+				notice(t('Login failed.') . EOL);
 				goaway(z_root());
 				// NOTREACHED
 			}
@@ -142,7 +143,7 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 		}
 	}
 
-	if (x($_POST,'auth-params') && $_POST['auth-params'] === 'login') {
+	if (x($_POST, 'auth-params') && $_POST['auth-params'] === 'login') {
 
 		$record = null;
 
@@ -163,12 +164,10 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 
 		call_hooks('authenticate', $addon_auth);
 
-		if ($addon_auth['authenticated'] && count($addon_auth['user_record']))
+		if ($addon_auth['authenticated'] && count($addon_auth['user_record'])) {
 			$record = $addon_auth['user_record'];
-		else {
-
+		} else {
 			// process normal login request
-
 			$r = q("SELECT `user`.*, `user`.`pubkey` as `upubkey`, `user`.`prvkey` as `uprvkey`
 				FROM `user` WHERE (`email` = '%s' OR `nickname` = '%s')
 				AND `password` = '%s' AND NOT `blocked` AND NOT `account_expired` AND NOT `account_removed` AND `verified` LIMIT 1",
@@ -176,13 +175,15 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 				dbesc(trim($_POST['username'])),
 				dbesc($encrypted)
 			);
-			if (dbm::is_result($r))
+
+			if (dbm::is_result($r)) {
 				$record = $r[0];
+			}
 		}
 
 		if (!$record || !count($record)) {
 			logger('authenticate: failed login attempt: '.notags(trim($_POST['username'])).' from IP '.$_SERVER['REMOTE_ADDR']);
-			notice(t('Login failed.').EOL);
+			notice(t('Login failed.') . EOL);
 			goaway(z_root());
 		}
 
@@ -192,7 +193,7 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 
 		// if we haven't failed up this point, log them in.
 		$_SESSION['remember'] = $_POST['remember'];
-		$_SESSION['last_login_date'] = datetime_convert('UTC','UTC');
+		$_SESSION['last_login_date'] = datetime_convert('UTC', 'UTC');
 		authenticate_success($record, true, true);
 	}
 }
@@ -201,7 +202,6 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
  * @brief Kills the "Friendica" cookie and all session data
  */
 function nuke_session() {
-
 	new_cookie(-3600); // make sure cookie is deleted on browser close, as a security measure
 	session_unset();
 	session_destroy();
