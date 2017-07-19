@@ -212,9 +212,11 @@ function call_hooks($name, &$data = null) {
 
 	$a = get_app();
 
-	if (is_array($a->hooks) && array_key_exists($name, $a->hooks))
-		foreach ($a->hooks[$name] as $hook)
+	if (is_array($a->hooks) && array_key_exists($name, $a->hooks)) {
+		foreach ($a->hooks[$name] as $hook) {
 			call_single_hook($a, $name, $hook, $data);
+		}
+	}
 }
 
 /**
@@ -228,12 +230,13 @@ function call_hooks($name, &$data = null) {
  */
 function call_single_hook($a, $name, $hook, &$data = null) {
 	// Don't run a theme's hook if the user isn't using the theme
-	if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/'.current_theme()) === false) {
+	if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . current_theme()) === false) {
 		return;
 	}
 
 	/// @TODO Check $hook[0] for readability
-	include_once($hook[0]);
+	include_once $hook[0];
+
 	if (function_exists($hook[1])) {
 		$func = $hook[1];
 		$func($a, $data);
