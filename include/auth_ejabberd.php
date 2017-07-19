@@ -235,37 +235,40 @@ class exAuth {
 		$sUser = str_replace(array("%20", "(a)"), array(" ", "@"), $aCommand[1]);
 		$this->writeDebugLog("[debug] doing auth for ".$sUser."@".$aCommand[2]);
 
+		// Init error (none)
+		$error = false;
+
 		// Does the hostname match? So we try directly
 		if ($a->get_hostname() == $aCommand[2]) {
 			$sQuery = "SELECT `uid`, `password` FROM `user` WHERE `nickname`='".dbesc($sUser)."'";
 			$this->writeDebugLog("[debug] using query ". $sQuery);
 			if ($oResult = q($sQuery)) {
 				$uid = $oResult[0]["uid"];
-				$Error = ($oResult[0]["password"] != hash('whirlpool',$aCommand[3]));
+				$error = ($oResult[0]["password"] != hash('whirlpool',$aCommand[3]));
 			} else {
 				$this->writeLog("[MySQL] invalid query: ". $sQuery);
-				$Error = true;
+				$error = true;
 				$uid = -1;
 			}
-			if ($Error) {
+			if ($error) {
 				$oConfig = q("SELECT `v` FROM `pconfig` WHERE `uid` = %d AND `cat` = 'xmpp' AND `k`='password' LIMIT 1;", intval($uid));
 				$this->writeLog("[exAuth] got password ".$oConfig[0]["v"]);
-				$Error = ($aCommand[3] != $oConfig[0]["v"]);
+				$error = ($aCommand[3] != $oConfig[0]["v"]);
 			}
 		} else {
-			$Error = true;
+			$error = true;
 		}
 
 		// If the hostnames doesn't match or there is some failure, we try to check remotely
-		if ($Error) {
-			$Error = !$this->check_credentials($aCommand[2], $aCommand[1], $aCommand[3], true);
+		if ($error) {
+			$error = !$this->check_credentials($aCommand[2], $aCommand[1], $aCommand[3], true);
 		}
 
-		if ($Error) {
-			$this->writeLog("[exAuth] authentification failed for user ".$sUser."@". $aCommand[2]);
+		if ($error) {
+			$this->writeLog("[exAuth] authentification failed for user " . $sUser . "@" . $aCommand[2]);
 			fwrite(STDOUT, pack("nn", 2, 0));
 		} else {
-			$this->writeLog("[exAuth] authentificated user ".$sUser."@".$aCommand[2]);
+			$this->writeLog("[exAuth] authentificated user " . $sUser . "@" . $aCommand[2]);
 			fwrite(STDOUT, pack("nn", 2, 1));
 		}
 	}
@@ -281,9 +284,9 @@ class exAuth {
 	 * @return boolean Are the credentials okay?
 	 */
 	private function check_credentials($host, $user, $password, $ssl) {
-		$this->writeDebugLog("[debug] check credentials for user ".$user." on ".$host);
+		$this->writeDebugLog("[debug] check credentials for user " . $user . " on " . $host);
 
-		$url = ($ssl ? "https":"http")."://".$host."/api/account/verify_credentials.json";
+		$url = ($ssl ? "https" : "http") . "://" . $host . "/api/account/verify_credentials.json";
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -292,14 +295,14 @@ class exAuth {
 		curl_setopt($ch, CURLOPT_HEADER, true);
 		curl_setopt($ch, CURLOPT_NOBODY, true);
 		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-		curl_setopt($ch, CURLOPT_USERPWD, $user.':'.$password);
+		curl_setopt($ch, CURLOPT_USERPWD, $user . ':' . $password);
 
 		$header = curl_exec($ch);
 		$curl_info = @curl_getinfo($ch);
 		$http_code = $curl_info["http_code"];
 		curl_close($ch);
 
-		$this->writeDebugLog("[debug] got HTTP code ".$http_code);
+		$this->writeDebugLog("[debug] got HTTP code " . $http_code);
 
 		return ($http_code == 200);
 	}
@@ -310,8 +313,9 @@ class exAuth {
 	 * @param string $sMessage The logfile message
 	 */
 	private function writeLog($sMessage) {
-		if (is_resource($this->rLogFile))
-			fwrite($this->rLogFile, date("r")." ".$sMessage."\n");
+		if (is_resource($this->rLogFile)) {
+			fwrite($this->rLogFile, date("r") . " " . $sMessage . PHP_EOL);
+		}
 	}
 
 	/**
@@ -320,7 +324,7 @@ class exAuth {
 	 * @param string $sMessage The logfile message
 	 */
 	private function writeDebugLog($sMessage) {
-		if ($this->bDebug)
+		if ($this->bDebug) {
 			$this->writeLog($sMessage);
 	}
 
