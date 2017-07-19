@@ -419,7 +419,6 @@ function events_content(App $a) {
 		if (x($_REQUEST, 'location'))    {$orig_event['location']    = $_REQUEST['location'];}
 		if (x($_REQUEST, 'start'))       {$orig_event['start']       = $_REQUEST['start'];}
 		if (x($_REQUEST, 'finish'))      {$orig_event['finish']      = $_REQUEST['finish'];}
-		if (x($_REQUEST,'finish')) $orig_event['finish'] = $_REQUEST['finish'];
 
 		$n_checked = ((x($orig_event) && $orig_event['nofinish']) ? ' checked="checked" ' : '');
 		$a_checked = ((x($orig_event) && $orig_event['adjust'])   ? ' checked="checked" ' : '');
