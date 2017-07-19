@@ -668,10 +668,6 @@ function advanced_profile(App $a) {
 			$profile['age'] = array( t('Age:'), $age );
 		}
 
-		if ($age = age($a->profile['dob'], $a->profile['timezone'], '')) {
-			$profile['age'] = array( t('Age:'), $age );
-		}
-
 		if ($a->profile['marital']) {
 			$profile['marital'] = array( t('Status:'), $a->profile['marital']);
 		}
