@@ -559,6 +559,9 @@ function acl_lookup(App $a, $out_type = 'json') {
 		}
 	}
 
+	// Initialize target array
+	$contacts = array();
+
 	if ($type == '') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
@@ -596,7 +599,8 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval(local_user())
 		);
 	} elseif ($type == 'x') {
-		$contacts = array();
+		/// @TODO Complexiblity: only when type=x, a JSON is generated. Find those occurences and introduce a new function/method that does the job
+		/// @TODO Get rid of handling $a (App) over, use $a = get_app();
 
 		// autocomplete for global contact search (e.g. navbar search)
 		$r = navbar_complete($a);
