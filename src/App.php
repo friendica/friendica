@@ -327,7 +327,27 @@ class App {
 			$basepath = $_SERVER['PWD'];
 		}
 
-		return $basepath;
+		return self::realpath($basepath);
+	}
+
+	/**
+	 * @brief Returns a normalized file path
+	 *
+	 * This is a wrapper for the "realpath" function.
+	 * That function cannot detect the real path when some folders aren't readable.
+	 * Since this could happen with some hosters we need to handle this.
+	 *
+	 * @param string $path The path that is about to be normalized
+	 * @return string normalized path - when possible
+	 */
+	public static function realpath($path) {
+		$normalized = realpath($path);
+
+		if (!is_bool($normalized)) {
+			return $normalized;
+		} else {
+			return $path;
+		}
 	}
 
 	function get_scheme() {

@@ -974,10 +974,25 @@ function admin_page_site_post(App $a) {
 
 	set_config('system', 'force_ssl', $force_ssl);
 	set_config('system', 'hide_help', $hide_help);
+
+	if ($itemcache != '') {
+		$itemcache = App::realpath($itemcache);
+	}
+
 	set_config('system', 'itemcache', $itemcache);
 	set_config('system', 'itemcache_duration', $itemcache_duration);
 	set_config('system', 'max_comments', $max_comments);
+
+	if ($temppath != '') {
+		$temppath = App::realpath($temppath);
+	}
+
 	set_config('system', 'temppath', $temppath);
+
+	if ($basepath != '') {
+		$basepath = App::realpath($basepath);
+	}
+
 	set_config('system', 'basepath', $basepath);
 	set_config('system', 'proxy_disabled', $proxy_disabled);
 	set_config('system', 'only_tag_search', $only_tag_search);

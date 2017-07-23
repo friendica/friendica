@@ -1159,54 +1159,78 @@ function poco_check_server($server_url, $network = "", $force = false) {
 	}
 
 	if (!$failure) {
-		// Test for Hubzilla, Redmatrix or Friendica
-		$serverret = z_fetch_url($server_url."/api/statusnet/config.json");
+		// Test for Hubzilla and Red
+		$serverret = z_fetch_url($server_url."/siteinfo.json");
 		if ($serverret["success"]) {
 			$data = json_decode($serverret["body"]);
-			if (isset($data->site->server)) {
-				if (isset($data->site->platform)) {
-					$platform = $data->site->platform->PLATFORM_NAME;
-					$version = $data->site->platform->STD_VERSION;
-					$network = NETWORK_DIASPORA;
-				}
-				if (isset($data->site->BlaBlaNet)) {
-					$platform = $data->site->BlaBlaNet->PLATFORM_NAME;
-					$version = $data->site->BlaBlaNet->STD_VERSION;
-					$network = NETWORK_DIASPORA;
-				}
-				if (isset($data->site->hubzilla)) {
-					$platform = $data->site->hubzilla->PLATFORM_NAME;
-					$version = $data->site->hubzilla->RED_VERSION;
-					$network = NETWORK_DIASPORA;
-				}
-				if (isset($data->site->redmatrix)) {
-					if (isset($data->site->redmatrix->PLATFORM_NAME)) {
-						$platform = $data->site->redmatrix->PLATFORM_NAME;
-					} elseif (isset($data->site->redmatrix->RED_PLATFORM)) {
-						$platform = $data->site->redmatrix->RED_PLATFORM;
+			if (isset($data->url)) {
+				$platform = $data->platform;
+				$version = $data->version;
+				$network = NETWORK_DIASPORA;
+			}
+			$site_name = $data->site_name;
+			switch ($data->register_policy) {
+				case "REGISTER_OPEN":
+					$register_policy = REGISTER_OPEN;
+					break;
+				case "REGISTER_APPROVE":
+					$register_policy = REGISTER_APPROVE;
+					break;
+				case "REGISTER_CLOSED":
+				default:
+					$register_policy = REGISTER_CLOSED;
+					break;
+			}
+		} else {
+			// Test for Hubzilla, Redmatrix or Friendica
+			$serverret = z_fetch_url($server_url."/api/statusnet/config.json");
+			if ($serverret["success"]) {
+				$data = json_decode($serverret["body"]);
+				if (isset($data->site->server)) {
+					if (isset($data->site->platform)) {
+						$platform = $data->site->platform->PLATFORM_NAME;
+						$version = $data->site->platform->STD_VERSION;
+						$network = NETWORK_DIASPORA;
+					}
+					if (isset($data->site->BlaBlaNet)) {
+						$platform = $data->site->BlaBlaNet->PLATFORM_NAME;
+						$version = $data->site->BlaBlaNet->STD_VERSION;
+						$network = NETWORK_DIASPORA;
+					}
+					if (isset($data->site->hubzilla)) {
+						$platform = $data->site->hubzilla->PLATFORM_NAME;
+						$version = $data->site->hubzilla->RED_VERSION;
+						$network = NETWORK_DIASPORA;
+					}
+					if (isset($data->site->redmatrix)) {
+						if (isset($data->site->redmatrix->PLATFORM_NAME)) {
+							$platform = $data->site->redmatrix->PLATFORM_NAME;
+						} elseif (isset($data->site->redmatrix->RED_PLATFORM)) {
+							$platform = $data->site->redmatrix->RED_PLATFORM;
+						}
+
+						$version = $data->site->redmatrix->RED_VERSION;
+						$network = NETWORK_DIASPORA;
+					}
+					if (isset($data->site->friendica)) {
+						$platform = $data->site->friendica->FRIENDICA_PLATFORM;
+						$version = $data->site->friendica->FRIENDICA_VERSION;
+						$network = NETWORK_DFRN;
 					}
 
-					$version = $data->site->redmatrix->RED_VERSION;
-					$network = NETWORK_DIASPORA;
-				}
-				if (isset($data->site->friendica)) {
-					$platform = $data->site->friendica->FRIENDICA_PLATFORM;
-					$version = $data->site->friendica->FRIENDICA_VERSION;
-					$network = NETWORK_DFRN;
-				}
+					$site_name = $data->site->name;
 
-				$site_name = $data->site->name;
+					$data->site->closed = poco_to_boolean($data->site->closed);
+					$data->site->private = poco_to_boolean($data->site->private);
+					$data->site->inviteonly = poco_to_boolean($data->site->inviteonly);
 
-				$data->site->closed = poco_to_boolean($data->site->closed);
-				$data->site->private = poco_to_boolean($data->site->private);
-				$data->site->inviteonly = poco_to_boolean($data->site->inviteonly);
-
-				if (!$data->site->closed && !$data->site->private and $data->site->inviteonly) {
-					$register_policy = REGISTER_APPROVE;
-				} elseif (!$data->site->closed && !$data->site->private) {
-					$register_policy = REGISTER_OPEN;
-				} else {
-					$register_policy = REGISTER_CLOSED;
+					if (!$data->site->closed && !$data->site->private and $data->site->inviteonly) {
+						$register_policy = REGISTER_APPROVE;
+					} elseif (!$data->site->closed && !$data->site->private) {
+						$register_policy = REGISTER_OPEN;
+					} else {
+						$register_policy = REGISTER_CLOSED;
+					}
 				}
 			}
 		}

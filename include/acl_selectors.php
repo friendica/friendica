@@ -482,6 +482,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
 				WHERE `uid` = %d AND NOT `self`
 				AND NOT `blocked` AND NOT `pending` AND NOT `archive`
+				AND `success_update` >= `failure_update`
 				AND `notify` != '' $sql_extra2" ,
 			intval(local_user())
 		);
@@ -495,6 +496,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
 				WHERE `uid` = %d AND NOT `self`
 				AND NOT `blocked` AND NOT `pending` AND NOT `archive`
+				AND `success_update` >= `failure_update`
 				AND `network` IN ('%s','%s','%s') $sql_extra2" ,
 			intval(local_user()),
 			dbesc(NETWORK_DFRN),
@@ -557,24 +559,27 @@ function acl_lookup(App $a, $out_type = 'json') {
 				);
 			}
 		}
+		if (count($groups) > 0) {
+			$groups[] = array("separator" => true);
+		}
 	}
 
 	// Initialize target array
 	$contacts = array();
 
 	if ($type == '') {
-		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
+		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv`, (`prv` OR `forum`) AS `frm` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
-			AND NOT (`network` IN ('%s', '%s'))
+			AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s', '%s'))
 			$sql_extra2
-			ORDER BY `name` ASC ",
+			ORDER BY `frm` DESC, `name` ASC ",
 			intval(local_user()),
 			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_STATUSNET)
 		);
 	} elseif ($type == 'c') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
-			AND NOT (`network` IN ('%s'))
+			AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s'))
 			$sql_extra2
 			ORDER BY `name` ASC ",
 			intval(local_user()),
@@ -583,7 +588,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 	} elseif ($type == 'm') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive`
-			AND `network` IN ('%s','%s','%s')
+			AND `success_update` >= `failure_update` AND `network` IN ('%s','%s','%s')
 			$sql_extra2
 			ORDER BY `name` ASC ",
 			intval(local_user()),
@@ -593,7 +598,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 		);
 	} elseif ($type == 'a') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
-			WHERE `uid` = %d AND `pending` = 0
+			WHERE `uid` = %d AND `pending` = 0 AND `success_update` >= `failure_update`
 			$sql_extra2
 			ORDER BY `name` ASC ",
 			intval(local_user())
@@ -628,8 +633,9 @@ function acl_lookup(App $a, $out_type = 'json') {
 
 
 	if (dbm::is_result($r)) {
+		$forums = array();
 		foreach ($r as $g) {
-			$contacts[] = array(
+			$entry = array(
 				'type'    => 'c',
 				'photo'   => proxy_url($g['micro'], false, PROXY_SIZE_MICRO),
 				'name'    => htmlentities($g['name']),
@@ -640,6 +646,15 @@ function acl_lookup(App $a, $out_type = 'json') {
 				'addr'    => htmlentities(($g['addr']) ? $g['addr'] : $g['url']),
 				'forum'   => ((x($g, 'forum') || x($g, 'prv')) ? 1 : 0),
 			);
+			if ($entry['forum']) {
+				$forums[] = $entry;
+			} else {
+				$contacts[] = $entry;
+			}
+		}
+		if (count($forums) > 0) {
+			$forums[] = array("separator" => true);
+			$contacts = array_merge($forums, $contacts);
 		}
 	}
 

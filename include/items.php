@@ -7,6 +7,7 @@
 use Friendica\App;
 use Friendica\ParseUrl;
 use Friendica\Util\Lock;
+use Friendica\Core\Config;
 
 require_once 'include/bbcode.php';
 require_once 'include/oembed.php';
@@ -564,18 +565,22 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		$arr['type']      = 'remote';
 	}
 
-	// check for create  date and expire time
 	$uid = intval($arr['uid']);
-	$r = q("SELECT expire FROM user WHERE uid = %d", intval($uid));
-	if (dbm::is_result($r)) {
-		$expire_interval = $r[0]['expire'];
-		if ($expire_interval > 0) {
-			$expire_date = datetime_convert('UTC', 'UTC', '- '.$expire_interval.' days');
-			$created_date = datetime_convert('UTC', 'UTC', $arr['created']);
-			if ($created_date < $expire_date) {
-				logger('item-store: item created ('.$arr['created'].') before expiration time ('.$expire_date->format(DateTime::W3C).'). ignored. ' . print_r($arr,true), LOGGER_DEBUG);
-				return 0;
-			}
+
+	// check for create date and expire time
+	$expire_interval = Config::get('system', 'dbclean-expire-days', 0);
+
+	$r = dba::select('user', array('expire'), array('uid' => $uid), array("limit" => 1));
+	if (dbm::is_result($r) && ($r['expire'] > 0) && ($r['expire'] < $expire_interval)) {
+		$expire_interval = $r['expire'];
+	}
+
+	if ($expire_interval > 0) {
+		$expire_date = datetime_convert('UTC', 'UTC', '- '.$expire_interval.' days');
+		$created_date = datetime_convert('UTC', 'UTC', $arr['created']);
+		if ($created_date < $expire_date) {
+			logger('item-store: item created ('.$arr['created'].') before expiration time ('.$expire_date->format(DateTime::W3C).'). ignored. ' . print_r($arr,true), LOGGER_DEBUG);
+			return 0;
 		}
 	}
 

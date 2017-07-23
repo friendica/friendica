@@ -286,11 +286,16 @@ ACL.prototype.populate = function(data){
 	var height = Math.ceil(data.tot / this.nw) * 42;
 	this.list_content.height(height);
 	this.data = {};
-	$(data.items).each(function(index, item){
-		html = "<div class='acl-list-item {4} {5} type{2}' title='{6}' id='{2}{3}'>"+this.item_tpl+"</div>";
-		html = html.format(item.photo, item.name, item.type, item.id, (item.forum=='1'?'forum':''), item.network, item.link);
-		if (item.uids!=undefined) this.group_uids[item.id] = item.uids;
-
+	$(data.items).each(function(index, item) {
+		if (item.separator != undefined) {
+			html = "<hr class='clear'>";
+		} else {
+			html = "<div class='acl-list-item {4} {5} type{2}' title='{6}' id='{2}{3}'>"+this.item_tpl+"</div>";
+			html = html.format(item.photo, item.name, item.type, item.id, (item.forum=='1'?'forum':''), item.network, item.link);
+			if (item.uids != undefined) {
+				this.group_uids[item.id] = item.uids;
+			}
+		}
 		this.list_content.append(html);
 		this.data[item.id] = item;
 	}.bind(this));
