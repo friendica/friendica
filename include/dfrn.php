@@ -423,22 +423,29 @@ class dfrn {
 			set_config('system','site_pubkey', $res['pubkey']);
 		}
 
+		// Initialize array so below dfrn::<photo|thumb|micro> won't trigger an E_NOTICE
+		$photos = array(
+			4 => NULL,
+			5 => NULL,
+			6 => NULL,
+		);
+
+		// Look for user's pictures and sort by scale
 		$rp = q("SELECT `resource-id` , `scale`, type FROM `photo`
-				WHERE `profile` = 1 AND `uid` = %d ORDER BY scale;", $uid);
+				WHERE `profile` = 1 AND `uid` = %d ORDER BY `scale`", $uid);
 
-		if (!dbm::is_result($rp)) {
+		if (dbm::is_result($rp)) {
+			$ext = Photo::supportedTypes();
+
+			foreach ($rp as $p) {
+				$photos[$p['scale']] = App::get_baseurl() . '/photo/' . $p['resource-id'] . '-' . $p['scale'] . '.' . $ext[$p['type']];
+			}
+
+			unset($rp, $ext);
+		} else {
 			logger(sprintf('No photos looking for profile uid=%d', $uid), LOGGER_DEBUG);
-			return;
 		}
 
-		$photos = array();
-		$ext = Photo::supportedTypes();
-
-		foreach ($rp as $p) {
-			$photos[$p['scale']] = App::get_baseurl() . '/photo/' . $p['resource-id'] . '-' . $p['scale'] . '.' . $ext[$p['type']];
-		}
-
-		unset($rp, $ext);
 
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
