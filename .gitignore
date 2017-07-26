@@ -57,3 +57,6 @@ vendor/**/.git
 
 #ignore config files from JetBrains
 /.idea
+
+#ignore addons/ directory
+addons/
