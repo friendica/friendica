@@ -222,13 +222,13 @@ function call_hooks($name, &$data = null) {
 /**
  * @brief Calls a single hook.
  *
- * @param ??? $a @TODO App again?
- * @param string $name of the hook to call
+ * @param App $a App instance
+ * @param string $name Name of the hook to call
  * @param array $hook Hook data
  * @param string|array &$data to transmit to the callback handler
  * @todo set proper type-hints
  */
-function call_single_hook($a, $name, $hook, &$data = null) {
+function call_single_hook(App $a, $name, array $hook, &$data = null) {
 	// Don't run a theme's hook if the user isn't using the theme
 	if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . current_theme()) === false) {
 		return;
