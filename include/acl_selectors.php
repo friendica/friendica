@@ -397,11 +397,12 @@ function construct_acl_data(App $a, $user) {
 
 	$user_defaults = get_acl_permissions($user);
 
+	/// @TODO combine this similar code into one (can be done!)
 	if ($acl_data['groups']) {
 		foreach ($acl_data['groups'] as $key => $group) {
 			// Add a "selected" flag to groups that are posted to by default
 			if ($user_defaults['allow_gid'] &&
-					in_array($group['id'], $user_defaults['allow_gid']) && !in_array($group['id'], $user_defaults['deny_gid']) ) {
+				in_array($group['id'], $user_defaults['allow_gid']) && !in_array($group['id'], $user_defaults['deny_gid']) ) {
 				$acl_data['groups'][$key]['selected'] = 1;
 			} else {
 				$acl_data['groups'][$key]['selected'] = 0;
@@ -412,7 +413,7 @@ function construct_acl_data(App $a, $user) {
 		foreach ($acl_data['contacts'] as $key => $contact) {
 			// Add a "selected" flag to groups that are posted to by default
 			if ($user_defaults['allow_cid'] &&
-					in_array($contact['id'], $user_defaults['allow_cid']) && !in_array($contact['id'], $user_defaults['deny_cid']) ) {
+				in_array($contact['id'], $user_defaults['allow_cid']) && !in_array($contact['id'], $user_defaults['deny_cid']) ) {
 				$acl_data['contacts'][$key]['selected'] = 1;
 			} else {
 				$acl_data['contacts'][$key]['selected'] = 0;
@@ -430,12 +431,15 @@ function acl_lookup(App $a, $out_type = 'json') {
 		return '';
 	}
 
-	$start	=	(x($_REQUEST,'start')		? $_REQUEST['start']		: 0);
-	$count	=	(x($_REQUEST,'count')		? $_REQUEST['count']		: 100);
-	$search	 =	(x($_REQUEST,'search')		? $_REQUEST['search']		: "");
-	$type	=	(x($_REQUEST,'type')		? $_REQUEST['type']		: "");
-	$mode	=	(x($_REQUEST,'smode')		? $_REQUEST['smode']		: "");
-	$conv_id =	(x($_REQUEST,'conversation')	? $_REQUEST['conversation']	: null);
+	$start   = (x($_REQUEST, 'start')        ? $_REQUEST['start']        : 0);
+	$count   = (x($_REQUEST, 'count')        ? $_REQUEST['count']        : 100);
+	$search  = (x($_REQUEST, 'search')       ? $_REQUEST['search']       : "");
+	$type    = (x($_REQUEST, 'type')         ? $_REQUEST['type']         : "");
+	$mode    = (x($_REQUEST, 'smode')        ? $_REQUEST['smode']        : "");
+	$conv_id = (x($_REQUEST, 'conversation') ? $_REQUEST['conversation'] : null);
+
+	$group_count = 0;
+	$contact_count = 0;
 
 	// For use with jquery.textcomplete for private mail completion
 
@@ -443,27 +447,32 @@ function acl_lookup(App $a, $out_type = 'json') {
 		if (! $type) {
 			$type = 'm';
 		}
-		$search = $_REQUEST['query'];
+		// Assigned already above ^^^ $search = $_REQUEST['query'];
 	}
 
-	logger("Searching for ".$search." - type ".$type, LOGGER_DEBUG);
+	logger("Searching for " . $search . " - type " . $type, LOGGER_DEBUG);
+
+	// Init variables
+	$sql_extra = $sql_extra2 = "";
 
 	if ($search != "") {
-		$sql_extra = "AND `name` LIKE '%%".dbesc($search)."%%'";
-		$sql_extra2 = "AND (`attag` LIKE '%%".dbesc($search)."%%' OR `name` LIKE '%%".dbesc($search)."%%' OR `nick` LIKE '%%".dbesc($search)."%%')";
-	} else {
-		/// @TODO Avoid these needless else blocks by putting variable-initialization atop of if()
-		$sql_extra = $sql_extra2 = "";
+		$sql_extra = "AND `name` LIKE '%%" . dbesc($search) . "%%'";
+		$sql_extra2 = "AND (`attag` LIKE '%%" . dbesc($search) . "%%' OR `name` LIKE '%%" . dbesc($search) . "%%' OR `nick` LIKE '%%" . dbesc($search) . "%%')";
 	}
+
+	// Init result array
+	$r = array();
 
 	// count groups and contacts
 	if ($type == '' || $type == 'g') {
-		$r = q("SELECT COUNT(*) AS g FROM `group` WHERE `deleted` = 0 AND `uid` = %d $sql_extra",
+		$r = q("SELECT COUNT(*) AS `g` FROM `group` WHERE `deleted` = 0 AND `uid` = %d $sql_extra",
 			intval(local_user())
 		);
-		$group_count = (int)$r[0]['g'];
-	} else {
-		$group_count = 0;
+
+		// Always check if there is a result
+		if (dbm::is_result($r)) {
+			$group_count = (int)$r[0]['g'];
+		}
 	}
 
 	$sql_extra2 .= " ".unavailable_networks();
@@ -477,12 +486,13 @@ function acl_lookup(App $a, $out_type = 'json') {
 				AND `notify` != '' $sql_extra2" ,
 			intval(local_user())
 		);
-		$contact_count = (int)$r[0]['c'];
-	}
-	elseif ($type == 'm') {
 
+		// Always check if there is a result
+		if (dbm::is_result($r)) {
+			$contact_count = (int)$r[0]['c'];
+		}
+	} elseif ($type == 'm') {
 		// autocomplete for Private Messages
-
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
 				WHERE `uid` = %d AND NOT `self`
 				AND NOT `blocked` AND NOT `pending` AND NOT `archive`
@@ -493,22 +503,23 @@ function acl_lookup(App $a, $out_type = 'json') {
 			dbesc(NETWORK_ZOT),
 			dbesc(NETWORK_DIASPORA)
 		);
-		$contact_count = (int)$r[0]['c'];
 
-	}
-	elseif ($type == 'a') {
-
+		// Always check if there is a result
+		if (dbm::is_result($r)) {
+			$contact_count = (int)$r[0]['c'];
+		}
+	} elseif ($type == 'a') {
 		// autocomplete for Contacts
-
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
 				WHERE `uid` = %d AND NOT `self`
 				AND NOT `pending` $sql_extra2" ,
 			intval(local_user())
 		);
-		$contact_count = (int)$r[0]['c'];
 
-	} else {
-		$contact_count = 0;
+		// Always check if there is a result
+		if (dbm::is_result($r)) {
+			$contact_count = (int)$r[0]['c'];
+		}
 	}
 
 
@@ -518,7 +529,6 @@ function acl_lookup(App $a, $out_type = 'json') {
 	$contacts = array();
 
 	if ($type == '' || $type == 'g') {
-
 		/// @todo We should cache this query.
 		// This can be done when we can delete cache entries via wildcard
 		$r = q("SELECT `group`.`id`, `group`.`name`, GROUP_CONCAT(DISTINCT `group_member`.`contact-id` SEPARATOR ',') AS uids
@@ -534,25 +544,30 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval($count)
 		);
 
-		foreach ($r as $g) {
-//		logger('acl: group: ' . $g['name'] . ' members: ' . $g['uids']);
-			$groups[] = array(
-				"type"  => "g",
-				"photo" => "images/twopeople.png",
-				"name"  => htmlentities($g['name']),
-				"id"	=> intval($g['id']),
-				"uids"  => array_map("intval", explode(",",$g['uids'])),
-				"link"  => '',
-				"forum" => '0'
-			);
+		// Always check if there is a result
+		if (dbm::is_result($r)) {
+			foreach ($r as $g) {
+				//logger('acl: group: ' . $g['name'] . ' members: ' . $g['uids']);
+				$groups[] = array(
+					"type"  => "g",
+					"photo" => "images/twopeople.png",
+					"name"  => htmlentities($g['name']),
+					"id"	=> intval($g['id']),
+					"uids"  => array_map("intval", explode(",",$g['uids'])),
+					"link"  => '',
+					"forum" => '0'
+				);
+			}
 		}
 		if (count($groups) > 0) {
 			$groups[] = array("separator" => true);
 		}
 	}
 
-	if ($type == '') {
+	// Initialize target array
+	$contacts = array();
 
+	if ($type == '') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv`, (`prv` OR `forum`) AS `frm` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s', '%s'))
@@ -570,8 +585,7 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval(local_user()),
 			dbesc(NETWORK_STATUSNET)
 		);
-	}
-	elseif ($type == 'm') {
+	} elseif ($type == 'm') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive`
 			AND `success_update` >= `failure_update` AND `network` IN ('%s','%s','%s')
@@ -590,10 +604,13 @@ function acl_lookup(App $a, $out_type = 'json') {
 			intval(local_user())
 		);
 	} elseif ($type == 'x') {
+		/// @TODO Complexiblity: only when type=x, a JSON is generated. Find those occurences and introduce a new function/method that does the job
+		/// @TODO Get rid of handling $a (App) over, use $a = get_app();
+
 		// autocomplete for global contact search (e.g. navbar search)
 		$r = navbar_complete($a);
-		$contacts = array();
-		if ($r) {
+
+		if (dbm::is_result($r)) {
 			foreach ($r as $g) {
 				$contacts[] = array(
 					'photo'   => proxy_url($g['photo'], false, PROXY_SIZE_MICRO),
@@ -612,8 +629,6 @@ function acl_lookup(App $a, $out_type = 'json') {
 		);
 		echo json_encode($o);
 		killme();
-	} else {
-		$r = array();
 	}
 
 
@@ -736,16 +751,16 @@ function acl_lookup(App $a, $out_type = 'json') {
  */
 function navbar_complete(App $a) {
 
-//	logger('navbar_complete');
+	// logger(__METHOD__);
 
-	if ((get_config('system','block_public')) && (! local_user()) && (! remote_user())) {
+	if ((get_config('system', 'block_public')) && (! local_user()) && (! remote_user())) {
 		return;
 	}
 
 	// check if searching in the local global contact table is enabled
-	$localsearch = get_config('system','poco_local_search');
+	$localsearch = get_config('system', 'poco_local_search');
 
-	$search = $prefix.notags(trim($_REQUEST['search']));
+	$search = $prefix . notags(trim($_REQUEST['search']));
 	$mode = $_REQUEST['smode'];
 
 	// don't search if search term has less than 2 characters
@@ -753,8 +768,8 @@ function navbar_complete(App $a) {
 		return array();
 	}
 
-	if (substr($search,0,1) === '@') {
-		$search = substr($search,1);
+	if (substr($search, 0, 1) === '@') {
+		$search = substr($search, 1);
 	}
 
 	if ($localsearch) {

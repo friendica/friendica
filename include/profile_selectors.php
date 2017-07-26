@@ -1,6 +1,5 @@
 <?php
 
-
 function gender_selector($current="",$suffix="") {
 	$o = '';
 	$select = array('', t('Male'), t('Female'), t('Currently Male'), t('Currently Female'), t('Mostly Male'), t('Mostly Female'), t('Transgender'), t('Intersex'), t('Transsexual'), t('Hermaphrodite'), t('Neuter'), t('Non-specific'), t('Other'), t('Undecided'));
@@ -16,7 +15,7 @@ function gender_selector($current="",$suffix="") {
 	}
 	$o .= '</select>';
 	return $o;
-}	
+}
 
 function sexpref_selector($current="",$suffix="") {
 	$o = '';
@@ -34,8 +33,7 @@ function sexpref_selector($current="",$suffix="") {
 	}
 	$o .= '</select>';
 	return $o;
-}	
-
+}
 
 function marital_selector($current="",$suffix="") {
 	$o = '';
@@ -52,4 +50,4 @@ function marital_selector($current="",$suffix="") {
 	}
 	$o .= '</select>';
 	return $o;
-}	
+}

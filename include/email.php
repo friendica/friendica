@@ -1,39 +1,45 @@
 <?php
-require_once('include/html2plain.php');
-require_once('include/msgclean.php');
-require_once('include/quoteconvert.php');
+require_once 'include/html2plain.php';
+require_once 'include/msgclean.php';
+require_once 'include/quoteconvert.php';
 
-function email_connect($mailbox,$username,$password) {
-	if (! function_exists('imap_open'))
+function email_connect($mailbox, $username, $password) {
+	if (! function_exists('imap_open')) {
 		return false;
+	}
 
 	$mbox = @imap_open($mailbox,$username,$password);
 
 	return $mbox;
 }
 
-function email_poll($mbox,$email_addr) {
+function email_poll($mbox, $email_addr) {
 
-	if (! ($mbox && $email_addr))
+	if (! ($mbox && $email_addr)) {
 		return array();
+	}
 
-	$search1 = @imap_search($mbox,'FROM "' . $email_addr . '"', SE_UID);
-	if (! $search1)
+	$search1 = @imap_search($mbox, 'FROM "' . $email_addr . '"', SE_UID);
+	if (! $search1) {
 		$search1 = array();
+	}
 
-	$search2 = @imap_search($mbox,'TO "' . $email_addr . '"', SE_UID);
-	if (! $search2)
+	$search2 = @imap_search($mbox, 'TO "' . $email_addr . '"', SE_UID);
+	if (! $search2) {
 		$search2 = array();
+	}
 
-	$search3 = @imap_search($mbox,'CC "' . $email_addr . '"', SE_UID);
-	if (! $search3)
+	$search3 = @imap_search($mbox, 'CC "' . $email_addr . '"', SE_UID);
+	if (! $search3) {
 		$search3 = array();
+	}
 
 	$search4 = @imap_search($mbox,'BCC "' . $email_addr . '"', SE_UID);
-	if (! $search4)
+	if (! $search4) {
 		$search4 = array();
+	}
 
-	$res = array_unique(array_merge($search1,$search2,$search3,$search4));
+	$res = array_unique(array_merge($search1, $search2, $search3, $search4));
 
 	return $res;
 }
@@ -47,60 +53,63 @@ function construct_mailbox_name($mailacct) {
 }
 
 
-function email_msg_meta($mbox,$uid) {
-	$ret = (($mbox && $uid) ? @imap_fetch_overview($mbox,$uid,FT_UID) : array(array())); // POSSIBLE CLEANUP --> array(array()) is probably redundant now
+function email_msg_meta($mbox, $uid) {
+	/// @TODO POSSIBLE CLEANUP --> array(array()) is probably redundant now
+	$ret = (($mbox && $uid) ? @imap_fetch_overview($mbox, $uid, FT_UID) : array(array()));
 	return ((count($ret)) ? $ret : array());
 }
 
-function email_msg_headers($mbox,$uid) {
-	$raw_header = (($mbox && $uid) ? @imap_fetchheader($mbox,$uid,FT_UID) : '');
-	$raw_header = str_replace("\r",'',$raw_header);
+function email_msg_headers($mbox, $uid) {
+	$raw_header = (($mbox && $uid) ? @imap_fetchheader($mbox, $uid, FT_UID) : '');
+	$raw_header = str_replace("\r", '', $raw_header);
 	$ret = array();
-	$h = explode("\n",$raw_header);
-	if (count($h))
-	foreach ($h as $line ) {
-	    if (preg_match("/^[a-zA-Z]/", $line)) {
-			$key = substr($line,0,strpos($line,':'));
-			$value = substr($line,strpos($line,':')+1);
+	$h = explode("\n", $raw_header);
 
-			$last_entry = strtolower($key);
-			$ret[$last_entry] = trim($value);
+	if (count($h)) {
+		foreach ($h as $line ) {
+			if (preg_match("/^[a-zA-Z]/", $line)) {
+				$key = substr($line,0,strpos($line,':'));
+				$value = substr($line,strpos($line,':')+1);
+
+				$last_entry = strtolower($key);
+				$ret[$last_entry] = trim($value);
+			} else {
+				$ret[$last_entry] .= ' ' . trim($line);
+			}
 		}
-		else {
-			$ret[$last_entry] .= ' ' . trim($line);
-    	}
 	}
 	return $ret;
 }
 
 
-function email_get_msg($mbox,$uid, $reply) {
+function email_get_msg($mbox, $uid, $reply) {
 	$ret = array();
 
-	$struc = (($mbox && $uid) ? @imap_fetchstructure($mbox,$uid,FT_UID) : null);
+	$struc = (($mbox && $uid) ? @imap_fetchstructure($mbox, $uid, FT_UID) : null);
 
-	if (! $struc)
+	if (! $struc) {
 		return $ret;
+	}
 
 	if (! $struc->parts) {
-		$ret['body'] = email_get_part($mbox,$uid,$struc,0, 'html');
+		$ret['body'] = email_get_part($mbox, $uid, $struc, 0, 'html');
 		$html = $ret['body'];
 
-		if (trim($ret['body']) == '')
-			$ret['body'] = email_get_part($mbox,$uid,$struc,0, 'plain');
-		else
+		if (trim($ret['body']) == '') {
+			$ret['body'] = email_get_part($mbox, $uid, $struc, 0, 'plain');
+		} else {
 			$ret['body'] = html2bbcode($ret['body']);
-	}
-	else {
+		}
+	} else {
 		$text = '';
 		$html = '';
 		foreach ($struc->parts as $ptop => $p) {
-			$x = email_get_part($mbox,$uid,$p,$ptop + 1, 'plain');
+			$x = email_get_part($mbox, $uid, $p, $ptop + 1, 'plain');
 			if ($x) {
 				$text .= $x;
 			}
 
-			$x = email_get_part($mbox,$uid,$p,$ptop + 1, 'html');
+			$x = email_get_part($mbox, $uid, $p, $ptop + 1, 'html');
 			if ($x) {
 				$html .= $x;
 			}
@@ -129,32 +138,38 @@ function email_get_msg($mbox,$uid, $reply) {
 // At the moment - only return plain/text.
 // Later we'll repackage inline images as data url's and make the HTML safe
 
-function email_get_part($mbox,$uid,$p,$partno, $subtype) {
+function email_get_part($mbox, $uid, $p, $partno, $subtype) {
 	// $partno = '1', '2', '2.1', '2.1.3', etc for multipart, 0 if simple
-	global $htmlmsg,$plainmsg,$charset,$attachments;
+	/// @TODO TO much globals, require reqwrite to object-based way
+	global $htmlmsg, $plainmsg, $charset, $attachments;
 
 	//echo $partno."\n";
 
 	// DECODE DATA
 	$data = ($partno)
-		? @imap_fetchbody($mbox,$uid,$partno, FT_UID|FT_PEEK)
-	: @imap_body($mbox,$uid,FT_UID|FT_PEEK);
+		? @imap_fetchbody($mbox, $uid, $partno, FT_UID | FT_PEEK)
+	: @imap_body($mbox, $uid, FT_UID | FT_PEEK);
 
 	// Any part may be encoded, even plain text messages, so check everything.
-	if ($p->encoding==4)
+	if ($p->encoding == 4) {
 		$data = quoted_printable_decode($data);
-	elseif ($p->encoding==3)
+	} elseif ($p->encoding == 3) {
 		$data = base64_decode($data);
+	}
 
 	// PARAMETERS
 	// get all parameters, like charset, filenames of attachments, etc.
 	$params = array();
-	if ($p->parameters)
-		foreach ($p->parameters as $x)
+	if ($p->parameters) {
+		foreach ($p->parameters as $x) {
 			$params[strtolower($x->attribute)] = $x->value;
-	if (isset($p->dparameters) && $p->dparameters)
-		foreach ($p->dparameters as $x)
+		}
+	}
+	if (isset($p->dparameters) && $p->dparameters) {
+		foreach ($p->dparameters as $x) {
 			$params[strtolower($x->attribute)] = $x->value;
+		}
+	}
 
 	// ATTACHMENT
 	// Any part with a filename is an attachment,
@@ -162,7 +177,7 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 
 	if ((isset($params['filename']) && $params['filename']) || (isset($params['name']) && $params['name'])) {
 		// filename may be given as 'Filename' or 'Name' or both
-		$filename = ($params['filename'])? $params['filename'] : $params['name'];
+		$filename = ($params['filename']) ? $params['filename'] : $params['name'];
 		// filename may be encoded, so see imap_mime_header_decode()
 		$attachments[$filename] = $data;  // this is a problem if two files have same name
 	}
@@ -174,8 +189,9 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 		if (strtolower($p->subtype)==$subtype) {
 			$data = iconv($params['charset'], 'UTF-8//IGNORE', $data);
 			return (trim($data) ."\n\n");
-		} else
+		} else {
 			$data = '';
+		}
 
  //           $htmlmsg .= $data ."<br><br>";
 		$charset = $params['charset'];  // assume all parts are same charset
@@ -186,15 +202,16 @@ function email_get_part($mbox,$uid,$p,$partno, $subtype) {
 	// but AOL uses type 1 (multipart), which is not handled here.
 	// There are no PHP functions to parse embedded messages,
 	// so this just appends the raw source to the main message.
-//	elseif ($p->type==2 && $data) {
-//		$plainmsg .= $data."\n\n";
-//	}
+	//elseif ($p->type==2 && $data) {
+	//	$plainmsg .= $data."\n\n";
+	//}
 
 	// SUBPART RECURSION
 	if (isset($p->parts) && $p->parts) {
 		$x = "";
-		foreach ($p->parts as $partno0=>$p2) {
-			$x .=  email_get_part($mbox,$uid,$p2,$partno . '.' . ($partno0+1), $subtype);  // 1.2, 1.2.1, etc.
+		foreach ($p->parts as $partno0 => $p2) {
+			$x .=  email_get_part($mbox, $uid, $p2, $partno . '.' . ($partno0 + 1), $subtype);  // 1.2, 1.2.1, etc.
+			/// @TODO maybe old-lost code?
 			//if ($x) {
 			//	return $x;
 			//}
@@ -215,8 +232,9 @@ function email_header_encode($in_str, $charset) {
 		}
 	}
 
-	if (! $need_to_convert)
+	if (! $need_to_convert) {
 		return $in_str;
+	}
 
     if ($out_str && $charset) {
 
@@ -253,6 +271,7 @@ function email_header_encode($in_str, $charset) {
         $out_str = preg_replace("/" . $spacer . "$/", "", $out_str);
         $out_str = $start . $out_str . $end;
     }
+
     return $out_str;
 }
 
@@ -296,17 +315,19 @@ function email_send($addr, $subject, $headers, $item) {
 }
 
 function iri2msgid($iri) {
-	if (!strpos($iri, "@"))
+	if (!strpos($iri, "@")) {
 		$msgid = preg_replace("/urn:(\S+):(\S+)\.(\S+):(\d+):(\S+)/i", "urn!$1!$4!$5@$2.$3", $iri);
-	else
+	} else {
 		$msgid = $iri;
-	return($msgid);
+	}
+	return $msgid;
 }
 
 function msgid2iri($msgid) {
-	if (strpos($msgid, "@"))
+	if (strpos($msgid, "@")) {
 		$iri = preg_replace("/urn!(\S+)!(\d+)!(\S+)@(\S+)\.(\S+)/i", "urn:$1:$4.$5:$2:$3", $msgid);
-	else
+	} else {
 		$iri = $msgid;
-	return($iri);
+	}
+	return $iri;
 }

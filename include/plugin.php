@@ -212,24 +212,31 @@ function call_hooks($name, &$data = null) {
 
 	$a = get_app();
 
-	if (is_array($a->hooks) && array_key_exists($name, $a->hooks))
-		foreach ($a->hooks[$name] as $hook)
+	if (is_array($a->hooks) && array_key_exists($name, $a->hooks)) {
+		foreach ($a->hooks[$name] as $hook) {
 			call_single_hook($a, $name, $hook, $data);
+		}
+	}
 }
 
 /**
  * @brief Calls a single hook.
  *
+ * @param ??? $a @TODO App again?
  * @param string $name of the hook to call
  * @param array $hook Hook data
  * @param string|array &$data to transmit to the callback handler
+ * @todo set proper type-hints
  */
 function call_single_hook($a, $name, $hook, &$data = null) {
 	// Don't run a theme's hook if the user isn't using the theme
-	if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/'.current_theme()) === false)
+	if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . current_theme()) === false) {
 		return;
+	}
 
-	@include_once($hook[0]);
+	/// @TODO Check $hook[0] for readability
+	include_once $hook[0];
+
 	if (function_exists($hook[1])) {
 		$func = $hook[1];
 		$func($a, $data);
@@ -251,8 +258,9 @@ function plugin_is_app($name) {
 
 	if (is_array($a->hooks) && (array_key_exists('app_menu',$a->hooks))) {
 		foreach ($a->hooks['app_menu'] as $hook) {
-			if ($hook[0] == 'addon/'.$name.'/'.$name.'.php')
+			if ($hook[0] == 'addon/' . $name . '/' . $name . '.php') {
 				return true;
+			}
 		}
 	}
 
@@ -288,7 +296,9 @@ function get_plugin_info($plugin){
 		'status' => ""
 	);
 
-	if (!is_file("addon/$plugin/$plugin.php")) return $info;
+	if (!is_file("addon/$plugin/$plugin.php")) {
+		return $info;
+	}
 
 	$stamp1 = microtime(true);
 	$f = file_get_contents("addon/$plugin/$plugin.php");
@@ -296,26 +306,25 @@ function get_plugin_info($plugin){
 
 	$r = preg_match("|/\*.*\*/|msU", $f, $m);
 
-	if ($r){
+	if ($r) {
 		$ll = explode("\n", $m[0]);
-		foreach ( $ll as $l ) {
+		foreach ($ll as $l) {
 			$l = trim($l,"\t\n\r */");
-			if ($l!=""){
-				list($k,$v) = array_map("trim", explode(":",$l,2));
-				$k= strtolower($k);
-				if ($k=="author"){
-					$r=preg_match("|([^<]+)<([^>]+)>|", $v, $m);
+			if ($l != "") {
+				list($k,$v) = array_map("trim", explode(":", $l, 2));
+				$k = strtolower($k);
+				if ($k == "author"){
+					$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);
 					if ($r) {
-						$info['author'][] = array('name'=>$m[1], 'link'=>$m[2]);
+						$info['author'][] = array('name' => $m[1], 'link' => $m[2]);
 					} else {
-						$info['author'][] = array('name'=>$v);
+						$info['author'][] = array('name' => $v);
 					}
 				} else {
 					if (array_key_exists($k,$info)){
-						$info[$k]=$v;
+						$info[$k] = $v;
 					}
 				}
-
 			}
 		}
 
@@ -353,12 +362,17 @@ function get_theme_info($theme){
 		'unsupported' => false
 	);
 
-	if (file_exists("view/theme/$theme/experimental"))
+	if (file_exists("view/theme/$theme/experimental")) {
 		$info['experimental'] = true;
-	if (file_exists("view/theme/$theme/unsupported"))
-		$info['unsupported'] = true;
+	}
 
-	if (!is_file("view/theme/$theme/theme.php")) return $info;
+	if(file_exists("view/theme/$theme/unsupported")) {
+		$info['unsupported'] = true;
+	}
+
+	if (!is_file("view/theme/$theme/theme.php")) {
+		return $info;
+	}
 
 	$a = get_app();
 	$stamp1 = microtime(true);
@@ -367,28 +381,26 @@ function get_theme_info($theme){
 
 	$r = preg_match("|/\*.*\*/|msU", $f, $m);
 
-	if ($r){
+	if ($r) {
 		$ll = explode("\n", $m[0]);
-		foreach ( $ll as $l ) {
+		foreach ($ll as $l) {
 			$l = trim($l,"\t\n\r */");
-			if ($l!=""){
-				list($k,$v) = array_map("trim", explode(":",$l,2));
+			if ($l != "") {
+				list($k, $v) = array_map("trim", explode(":", $l, 2));
 				$k= strtolower($k);
-				if ($k=="author"){
-
-					$r=preg_match("|([^<]+)<([^>]+)>|", $v, $m);
+				if ($k=="author") {
+					$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);
 					if ($r) {
-						$info['author'][] = array('name'=>$m[1], 'link'=>$m[2]);
+						$info['author'][] = array('name' => $m[1], 'link' => $m[2]);
 					} else {
-						$info['author'][] = array('name'=>$v);
+						$info['author'][] = array('name' => $v);
 					}
-				}
-				elseif ($k=="maintainer"){
-					$r=preg_match("|([^<]+)<([^>]+)>|", $v, $m);
+				} elseif ($k=="maintainer"){
+					$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);
 					if ($r) {
-						$info['maintainer'][] = array('name'=>$m[1], 'link'=>$m[2]);
+						$info['maintainer'][] = array('name' => $m[1], 'link' => $m[2]);
 					} else {
-						$info['maintainer'][] = array('name'=>$v);
+						$info['maintainer'][] = array('name' => $v);
 					}
 				} else {
 					if (array_key_exists($k,$info)){
@@ -512,12 +524,15 @@ function service_class_fetch($uid,$property) {
 			$service_class = $r[0]['service_class'];
 		}
 	}
-	if (! x($service_class))
+	/// @TODO maybe miss-use of x() ?
+	if (! x($service_class)) {
 		return false; // everything is allowed
+	}
 
 	$arr = get_config('service_class',$service_class);
-	if (! is_array($arr) || (! count($arr)))
+	if (! is_array($arr) || (! count($arr))) {
 		return false;
+	}
 
 	return((array_key_exists($property,$arr)) ? $arr[$property] : false);
 

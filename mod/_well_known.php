@@ -3,8 +3,8 @@
 use Friendica\App;
 use Friendica\Core\Config;
 
-require_once("mod/hostxrd.php");
-require_once("mod/nodeinfo.php");
+require_once "mod/hostxrd.php";
+require_once "mod/nodeinfo.php";
 
 function _well_known_init(App $a) {
 	if ($a->argc > 1) {
@@ -37,17 +37,18 @@ function wk_social_relay(App $a) {
 	$tags = array();
 
 	if ($scope == SR_SCOPE_TAGS) {
+
 		$server_tags = Config::get('system', 'relay_server_tags');
 		$tagitems = explode(",", $server_tags);
 
-		foreach($tagitems AS $tag) {
+		foreach ($tagitems as $tag) {
 			$tags[trim($tag, "# ")] = trim($tag, "# ");
 		}
 
 		if (Config::get('system', 'relay_user_tags')) {
 			$terms = q("SELECT DISTINCT(`term`) FROM `search`");
 
-			foreach($terms AS $term) {
+			foreach ($terms as $term) {
 				$tag = trim($term["term"], "#");
 				$tags[$tag] = $tag;
 			}
@@ -55,7 +56,7 @@ function wk_social_relay(App $a) {
 	}
 
 	$taglist = array();
-	foreach($tags AS $tag) {
+	foreach ($tags as $tag) {
 		$taglist[] = $tag;
 	}
 
@@ -64,6 +65,6 @@ function wk_social_relay(App $a) {
 			"tags" => $taglist);
 
 	header('Content-type: application/json; charset=utf-8');
-	echo json_encode($relay, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+	echo json_encode($relay, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	exit;
 }
