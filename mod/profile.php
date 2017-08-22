@@ -334,10 +334,10 @@ function profile_content(App $a, $update = 0) {
 
 
 	if ($is_owner) {
-		$unseen = dba::exists('item', array('wall' => true, 'unseen' => 1, 'uid' => local_user()));
+		$unseen = dba::exists('item', array('wall' => 1, 'unseen' => 1, 'uid' => local_user()));
 		if ($unseen) {
 			$r = dba::update('item', array('unseen' => 0),
-					array('wall' => true, 'unseen' => 1, 'uid' => local_user()));
+					array('wall' => 1, 'unseen' => 1, 'uid' => local_user()));
 		}
 	}
 

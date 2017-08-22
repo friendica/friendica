@@ -132,11 +132,11 @@ class Lock {
 					}
 				}
 				if (!$lock['locked']) {
-					dba::update('locks', array('locked' => true, 'pid' => getmypid()), array('name' => $fn_name));
+					dba::update('locks', array('locked' => 1, 'pid' => getmypid()), array('name' => $fn_name));
 					$got_lock = true;
 				}
 			} elseif (!dbm::is_result($lock)) {
-				dba::insert('locks', array('name' => $fn_name, 'locked' => true, 'pid' => getmypid()));
+				dba::insert('locks', array('name' => $fn_name, 'locked' => 1, 'pid' => getmypid()));
 				$got_lock = true;
 			}
 
@@ -179,7 +179,7 @@ class Lock {
 			return;
 		}
 
-		dba::update('locks', array('locked' => false, 'pid' => 0), array('name' => $fn_name, 'pid' => getmypid()));
+		dba::update('locks', array('locked' => 0, 'pid' => 0), array('name' => $fn_name, 'pid' => getmypid()));
 		return;
 	}
 
@@ -193,7 +193,7 @@ class Lock {
 			return;
 		}
 
-		dba::update('locks', array('locked' => false, 'pid' => 0), array('pid' => getmypid()));
+		dba::update('locks', array('locked' => 0, 'pid' => 0), array('pid' => getmypid()));
 		return;
 	}
 }

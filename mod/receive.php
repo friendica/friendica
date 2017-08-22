@@ -28,7 +28,7 @@ function receive_post(App $a) {
 		}
 		$guid = $a->argv[2];
 
-		$importer = dba::select('user', array(), array('guid' => $guid, 'account_expired' => false, 'account_removed' => false), array('limit' => 1));
+		$importer = dba::select('user', array(), array('guid' => $guid, 'account_expired' => 0, 'account_removed' => 0), array('limit' => 1));
 		if (!dbm::is_result($importer)) {
 			http_status_exit(500);
 		}

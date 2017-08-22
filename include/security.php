@@ -90,7 +90,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	}
 
 	$r = dba::select('user', array('uid', 'username', 'nickname'),
-		array('password' => $master_record['password'], 'email' => $master_record['email'], 'account_removed' => false));
+		array('password' => $master_record['password'], 'email' => $master_record['email'], 'account_removed' => 0));
 	if (dbm::is_result($r)) {
 		$a->identities = dba::inArray($r);
 	} else {
@@ -128,7 +128,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 
 		// Set the login date for all identities of the user
 		dba::update('user', array('login_date' => datetime_convert()),
-			array('password' => $master_record['password'], 'email' => $master_record['email'], 'account_removed' => false));
+			array('password' => $master_record['password'], 'email' => $master_record['email'], 'account_removed' => 0));
 	}
 
 	if ($login_initial) {

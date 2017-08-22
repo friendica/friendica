@@ -48,7 +48,7 @@ function install_plugin($plugin) {
 
 		$plugin_admin = (function_exists($plugin."_plugin_admin") ? 1 : 0);
 
-		dba::insert('addon', array('name' => $plugin, 'installed' => true,
+		dba::insert('addon', array('name' => $plugin, 'installed' => 1,
 					'timestamp' => $t, 'plugin_admin' => $plugin_admin));
 
 		// we can add the following with the previous SQL
@@ -56,7 +56,7 @@ function install_plugin($plugin) {
 		// This way the system won't fall over dead during the update.
 
 		if (file_exists('addon/' . $plugin . '/.hidden')) {
-			dba::update('addon', array('hidden' => true), array('name' => $plugin));
+			dba::update('addon', array('hidden' => 1), array('name' => $plugin));
 		}
 		return true;
 	}
@@ -121,7 +121,7 @@ function reload_plugins() {
  * @return boolean
  */
 function plugin_enabled($plugin) {
-	return dba::exists('addon', array('installed' => true, 'name' => $plugin));
+	return dba::exists('addon', array('installed' => 1, 'name' => $plugin));
 }
 
 

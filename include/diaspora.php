@@ -928,7 +928,7 @@ class Diaspora {
 		 * Normally this should have handled by getting a request - but this could get lost
 		 */
 		if ($contact["rel"] == CONTACT_IS_FOLLOWER && in_array($importer["page-flags"], array(PAGE_FREELOVE))) {
-			dba::update('contact', array('rel' => CONTACT_IS_FRIEND, 'writable' => true),
+			dba::update('contact', array('rel' => CONTACT_IS_FRIEND, 'writable' => 1),
 					array('id' => $contact["id"], 'uid' => $contact["uid"]));
 
 			$contact["rel"] = CONTACT_IS_FRIEND;
@@ -2004,7 +2004,7 @@ class Diaspora {
 		$a = get_app();
 
 		if ($contact["rel"] == CONTACT_IS_FOLLOWER && in_array($importer["page-flags"], array(PAGE_FREELOVE))) {
-			dba::update('contact', array('rel' => CONTACT_IS_FRIEND, 'writable' => true),
+			dba::update('contact', array('rel' => CONTACT_IS_FRIEND, 'writable' => 1),
 					array('id' => $contact["id"], 'uid' => $importer["uid"]));
 		}
 		// send notification
@@ -2456,7 +2456,7 @@ class Diaspora {
 		}
 
 		// Currently we don't have a central deletion function that we could use in this case. The function "item_drop" doesn't work for that case
-		dba::update('item', array('deleted' => true, 'title' => '', 'body' => '',
+		dba::update('item', array('deleted' => 1, 'title' => '', 'body' => '',
 					'edited' => datetime_convert(), 'changed' => datetime_convert()),
 				array('id' => $r[0]["id"]));
 

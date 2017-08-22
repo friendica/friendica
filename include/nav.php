@@ -88,7 +88,7 @@ function nav_info(App $a)
 		$nav['usermenu'][] = array('notes/', t('Personal notes'), '', t('Your personal notes'));
 
 		// user info
-		$r = dba::select('contact', array('micro'), array('uid' => $a->user['uid'], 'self' => true), array('limit' => 1));
+		$r = dba::select('contact', array('micro'), array('uid' => $a->user['uid'], 'self' => 1), array('limit' => 1));
 		$userinfo = array(
 			'icon' => (dbm::is_result($r) ? $a->remove_baseurl($r['micro']) : 'images/person-48.jpg'),
 			'name' => $a->user['username'],
