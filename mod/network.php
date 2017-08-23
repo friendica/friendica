@@ -793,10 +793,10 @@ function network_content(App $a, $update = 0) {
 
 
 	if (!$group && !$cid && !$star) {
-		$unseen = dba::exists('item', array('unseen' => true, 'uid' => local_user()));
+		$unseen = dba::exists('item', array('unseen' => 1, 'uid' => local_user()));
 
 		if ($unseen) {
-			$r = dba::update('item', array('unseen' => false), array('uid' => local_user(), 'unseen' => true));
+			$r = dba::update('item', array('unseen' => 0), array('uid' => local_user(), 'unseen' => 1));
 		}
 	} elseif ($update_unseen) {
 		$unseen = q("SELECT `id` FROM `item` ".$update_unseen. " LIMIT 1");

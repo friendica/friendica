@@ -245,7 +245,7 @@ function profile_sidebar($profile, $block = 0) {
 			$profile_url = normalise_link(App::get_baseurl()."/profile/".$profile["nickname"]);
 		}
 
-		$connect = !dba::exists('contact', array('pending' => false, 'uid' => local_user(), 'nurl' => $profile_url));
+		$connect = !dba::exists('contact', array('pending' => 0, 'uid' => local_user(), 'nurl' => $profile_url));
 	}
 
 	if ($connect && ($profile['network'] != NETWORK_DFRN) && !isset($profile['remoteconnect']))

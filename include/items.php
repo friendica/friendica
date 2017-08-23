@@ -844,7 +844,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 				$self = normalise_link(App::get_baseurl() . '/profile/' . $u[0]['nickname']);
 				logger("item_store: 'myself' is ".$self." for parent ".$parent_id." checking against ".$arr['author-link']." and ".$arr['owner-link'], LOGGER_DEBUG);
 				if ((normalise_link($arr['author-link']) == $self) || (normalise_link($arr['owner-link']) == $self)) {
-					dba::update('thread', array('mention' => true), array('iid' => $parent_id));
+					dba::update('thread', array('mention' => 1), array('iid' => $parent_id));
 					logger("item_store: tagged thread ".$parent_id." as mention for user ".$self, LOGGER_DEBUG);
 				}
 			}
@@ -908,7 +908,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		$arr["global"] = true;
 
 		// Set the global flag on all items if this was a global item entry
-		dba::update('item', array('global' => true), array('uri' => $arr["uri"]));
+		dba::update('item', array('global' => 1), array('uri' => $arr["uri"]));
 	} else {
 		$isglobal = q("SELECT `global` FROM `item` WHERE `uid` = 0 AND `uri` = '%s'", dbesc($arr["uri"]));
 
@@ -1636,7 +1636,7 @@ function new_follower($importer, $contact, $datarray, $item, $sharing = false) {
 	if (is_array($contact)) {
 		if (($contact['network'] == NETWORK_OSTATUS && $contact['rel'] == CONTACT_IS_SHARING)
 			|| ($sharing && $contact['rel'] == CONTACT_IS_FOLLOWER)) {
-			$r = dba::update('contact', array('rel' => CONTACT_IS_FRIEND, 'writable' => true),
+			$r = dba::update('contact', array('rel' => CONTACT_IS_FRIEND, 'writable' => 1),
 					array('id' => $contact['id'], 'uid' => $importer['uid']));
 		}
 		// send email notification to owner?
@@ -2134,7 +2134,7 @@ function drop_item($id, $interactive = true) {
 		logger('delete item: ' . $item['id'], LOGGER_DEBUG);
 
 		// delete the item
-		$r = dba::update('item', array('deleted' => true, 'title' => '', 'body' => '',
+		$r = dba::update('item', array('deleted' => 1, 'title' => '', 'body' => '',
 					'edited' => datetime_convert(), 'changed' => datetime_convert()),
 				array('id' => $item['id']));
 
@@ -2220,7 +2220,7 @@ function drop_item($id, $interactive = true) {
 
 		// If it's the parent of a comment thread, kill all the kids
 		if ($item['uri'] == $item['parent-uri']) {
-			$r = dba::update('item', array('deleted' => true, 'title' => '', 'body' => '',
+			$r = dba::update('item', array('deleted' => 1, 'title' => '', 'body' => '',
 					'edited' => datetime_convert(), 'changed' => datetime_convert()),
 				array('parent-uri' => $item['parent-uri'], 'uid' => $item['uid']));
 
@@ -2230,7 +2230,7 @@ function drop_item($id, $interactive = true) {
 			// ignore the result
 		} else {
 			// ensure that last-child is set in case the comment that had it just got wiped.
-			dba::update('item', array('last-child' => false, 'changed' => datetime_convert()),
+			dba::update('item', array('last-child' => 0, 'changed' => datetime_convert()),
 					array('parent-uri' => $item['parent-uri'], 'uid' => $item['uid']));
 
 			// who is the last child now?
@@ -2239,7 +2239,7 @@ function drop_item($id, $interactive = true) {
 				intval($item['uid'])
 			);
 			if (dbm::is_result($r)) {
-				dba::update('item', array('last-child' => true), array('id' => $r[0]['id']));
+				dba::update('item', array('last-child' => 1), array('id' => $r[0]['id']));
 			}
 		}
 

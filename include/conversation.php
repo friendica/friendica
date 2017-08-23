@@ -927,7 +927,7 @@ function best_link_url($item, &$sparkle, $url = '') {
 
 	if (local_user()) {
 		$r = dba::select('contact', array('id'),
-			array('network' => NETWORK_DFRN, 'uid' => local_user(), 'nurl' => normalise_link($clean_url), 'pending' => false),
+			array('network' => NETWORK_DFRN, 'uid' => local_user(), 'nurl' => normalise_link($clean_url), 'pending' => 0),
 			array('limit' => 1));
 		if (dbm::is_result($r)) {
 			$best_url = 'redir/' . $r['id'];

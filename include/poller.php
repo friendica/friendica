@@ -240,14 +240,14 @@ function poller_execute($queue) {
 
 		if ($age > 1) {
 			$stamp = (float)microtime(true);
-			dba::update('workerqueue', array('executed' => datetime_convert()), array('pid' => $mypid, 'done' => false));
+			dba::update('workerqueue', array('executed' => datetime_convert()), array('pid' => $mypid, 'done' => 0));
 			$poller_db_duration += (microtime(true) - $stamp);
 		}
 
 		poller_exec_function($queue, $funcname, $argv);
 
 		$stamp = (float)microtime(true);
-		dba::update('workerqueue', array('done' => true), array('id' => $queue["id"]));
+		dba::update('workerqueue', array('done' => 1), array('id' => $queue["id"]));
 		$poller_db_duration = (microtime(true) - $stamp);
 	} else {
 		logger("Function ".$funcname." does not exist");
@@ -788,7 +788,7 @@ function poller_worker_process(&$passing_slow) {
 function poller_unclaim_process() {
 	$mypid = getmypid();
 
-	dba::update('workerqueue', array('executed' => NULL_DATE, 'pid' => 0), array('pid' => $mypid, 'done' => false));
+	dba::update('workerqueue', array('executed' => NULL_DATE, 'pid' => 0), array('pid' => $mypid, 'done' => 0));
 }
 
 /**
