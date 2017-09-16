@@ -1,11 +1,15 @@
 <?php
-require_once("include/datetime.php");
+
+use Friendica\App;
+
+require_once('include/datetime.php');
 require_once('include/bbcode.php');
 require_once('include/ForumManager.php');
 require_once('include/group.php');
 require_once('mod/proxy.php');
 require_once('include/xml.php');
 require_once('include/cache.php');
+require_once('include/enotify.php');
 
 /**
  * @brief Outputs the counts and the lists of various notifications
@@ -199,7 +203,7 @@ function ping_init(App $a)
 		$cachekey = "ping_init:".local_user();
 		$ev = Cache::get($cachekey);
 		if (is_null($ev)) {
-			$ev = qu("SELECT count(`event`.`id`) AS total, type, start, adjust FROM `event`
+			$ev = qu("SELECT type, start, adjust FROM `event`
 				WHERE `event`.`uid` = %d AND `start` < '%s' AND `finish` > '%s' and `ignore` = 0
 				ORDER BY `start` ASC ",
 				intval(local_user()),
@@ -212,7 +216,7 @@ function ping_init(App $a)
 		}
 
 		if (dbm::is_result($ev)) {
-			$all_events = intval($ev[0]['total']);
+			$all_events = count($ev);
 
 			if ($all_events) {
 				$str_now = datetime_convert('UTC', $a->timezone, 'now', 'Y-m-d');
@@ -305,8 +309,18 @@ function ping_init(App $a)
 
 		// sort notifications by $[]['date']
 		$sort_function = function($a, $b) {
-			$adate = date($a['date']);
-			$bdate = date($b['date']);
+			$adate = strtotime($a['date']);
+			$bdate = strtotime($b['date']);
+
+			// Unseen messages are kept at the top
+			// The value 31536000 means one year. This should be enough :-)
+			if (!$a['seen']) {
+				$adate += 31536000;
+			}
+			if (!$b['seen']) {
+				$bdate += 31536000;
+			}
+
 			if ($adate == $bdate) {
 				return 0;
 			}

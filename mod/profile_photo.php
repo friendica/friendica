@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once("include/Photo.php");
 
 function profile_photo_init(App $a) {
@@ -9,9 +11,7 @@ function profile_photo_init(App $a) {
 	}
 
 	profile_load($a,$a->user['nickname']);
-
 }
-
 
 function profile_photo_post(App $a) {
 
@@ -131,8 +131,7 @@ function profile_photo_post(App $a) {
 					proc_run(PRIORITY_LOW, "include/directory.php", $url);
 				}
 
-				require_once('include/profile_update.php');
-				profile_change();
+				proc_run(PRIORITY_LOW, 'include/profile_update.php', local_user());
 			} else {
 				notice( t('Unable to process image') . EOL);
 			}

@@ -1,54 +1,33 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
-require_once("boot.php");
+function update_gcontact_run(&$argv, &$argc) {
+	global $a;
 
-function update_gcontact_run(&$argv, &$argc){
-	global $a, $db;
-
-	if(is_null($a)) {
-		$a = new App;
-	}
-
-	if(is_null($db)) {
-		@include(".htconfig.php");
-		require_once("include/dba.php");
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-	};
-
-	require_once('include/Scrape.php');
-	require_once("include/socgraph.php");
-
-	Config::load();
-
-	$a->set_baseurl(get_config('system','url'));
-
-	load_hooks();
+	require_once 'include/probe.php';
+	require_once 'include/socgraph.php';
 
 	logger('update_gcontact: start');
 
-	if(($argc > 1) && (intval($argv[1])))
+	if (($argc > 1) && (intval($argv[1]))) {
 		$contact_id = intval($argv[1]);
+	}
 
-	if(!$contact_id) {
+	if (!$contact_id) {
 		logger('update_gcontact: no contact');
 		return;
 	}
 
-	// Don't check this stuff if the function is called by the poller
-	if (App::callstack() != "poller_run")
-		if (App::is_already_running('update_gcontact'.$contact_id, '', 540))
-			return;
-
 	$r = q("SELECT * FROM `gcontact` WHERE `id` = %d", intval($contact_id));
 
-	if (!$r)
+	if (!dbm::is_result($r)) {
 		return;
+	}
 
-	if (!in_array($r[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS)))
+	if (!in_array($r[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
 		return;
+	}
 
 	$data = probe_url($r[0]["url"]);
 
@@ -97,9 +76,4 @@ function update_gcontact_run(&$argv, &$argc){
 				dbesc($data["addr"]),
 				dbesc(normalise_link($data["url"]))
 			);
-}
-
-if (array_search(__file__,get_included_files())===0){
-	update_gcontact_run($_SERVER["argv"],$_SERVER["argc"]);
-	killme();
 }

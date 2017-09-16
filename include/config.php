@@ -1,7 +1,7 @@
 <?php
 /**
  * @file include/config.php
- * 
+ *
  *  @brief (Deprecated) Arbitrary configuration storage
  * Note:
  * Please do not store booleans - convert to 0/1 integer values
@@ -12,8 +12,8 @@
  * configurations need to be fixed as of 10/08/2011.
  */
 
-use \Friendica\Core\Config;
-use \Friendica\Core\PConfig;
+use Friendica\Core\Config;
+use Friendica\Core\PConfig;
 
 /**
  * @brief (Deprecated) Loads all configuration values of family into a cached storage.

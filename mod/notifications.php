@@ -5,6 +5,8 @@
  * @brief The notifications module
  */
 
+use Friendica\App;
+
 require_once("include/NotificationsManager.php");
 require_once("include/contact_selectors.php");
 require_once("include/network.php");
@@ -223,6 +225,12 @@ function notifications_content(App $a) {
 
 					$header .= " (".network_to_name($it['network'], $it['url']).")";
 
+					if ($it['network'] != NETWORK_DIASPORA) {
+						$discard = t('Discard');
+					} else {
+						$discard = '';
+					}
+
 					$notif_content[] = replace_macros($tpl, array(
 						'$header' => htmlentities($header),
 						'$str_notifytype' => t('Notification type: '),
@@ -255,7 +263,7 @@ function notifications_content(App $a) {
 						'$approve' => t('Approve'),
 						'$note' => $it['note'],
 						'$ignore' => t('Ignore'),
-						'$discard' => t('Discard'),
+						'$discard' => $discard,
 
 					));
 					break;
@@ -292,7 +300,7 @@ function notifications_content(App $a) {
 				'$item_link' => $it['link'],
 				'$item_image' => $it['image'],
 				'$item_url' => $it['url'],
-				'$item_text' => htmlentities($it['text']),
+				'$item_text' => $it['text'],
 				'$item_when' => $it['when'],
 				'$item_ago' => $it['ago'],
 				'$item_seen' => $it['seen'],

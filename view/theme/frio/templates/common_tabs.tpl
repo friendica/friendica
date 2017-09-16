@@ -12,13 +12,13 @@
 		</li>
 
 		{{* The extended dropdown menu - this would be shown if the tab menu points
-			dosn't fit in the available space. This is done through flexMenu.js *}}
+			doesn't fit in the available space. This is done through flexMenu.js *}}
 		<li class="pull-right">
 			<ul class="tabs tabs-extended" role="menu">
 				<li role="menuitem" class="dropdown flex-target">
-					<a class="dropdown-toggle" type="button" id="dropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
+					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
 					<i class="fa fa-chevron-down"></i>
-					</a>
+					</button>
 				</li>
 			 </ul>
 		</li>
@@ -45,9 +45,9 @@
 		<li class="pull-right">
 			<ul class="tabs tabs-extended">
 				<li class="dropdown">
-					<a class="dropdown-toggle" type="button" id="dropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
+					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
 						<i class="fa fa-chevron-down"></i>
-					</a>
+					</button>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenuTools">
 						{{foreach $exttabs as $tab}}
 						<li id="{{$tab.id}}" role="menuitem" {{if $tab.sel}} class="{{$tab.sel}}" {{/if}}><a href="{{$tab.url}}" {{if $tab.title}} title="{{$tab.title}}"{{/if}}>{{$tab.label}}</a></li>

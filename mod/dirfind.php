@@ -1,9 +1,13 @@
 <?php
-require_once('include/contact_widgets.php');
-require_once('include/socgraph.php');
-require_once('include/Contact.php');
-require_once('include/contact_selectors.php');
-require_once('mod/contacts.php');
+
+use Friendica\App;
+
+require_once 'include/contact_widgets.php';
+require_once 'include/probe.php';
+require_once 'include/socgraph.php';
+require_once 'include/Contact.php';
+require_once 'include/contact_selectors.php';
+require_once 'mod/contacts.php';
 
 function dirfind_init(App $a) {
 
@@ -20,8 +24,6 @@ function dirfind_init(App $a) {
 
 	$a->page['aside'] .= follow_widget();
 }
-
-
 
 function dirfind_content(App $a, $prefix = "") {
 
@@ -73,9 +75,9 @@ function dirfind_content(App $a, $prefix = "") {
 			$j->results[] = $objresult;
 
 			// Add the contact to the global contacts if it isn't already in our system
-			if (($contact["cid"] == 0) AND ($contact["zid"] == 0) AND ($contact["gid"] == 0))
-				poco_check($user_data["url"], $user_data["name"], $user_data["network"], $user_data["photo"],
-					"", "", "", "", "", datetime_convert(), 0);
+			if (($contact["cid"] == 0) AND ($contact["zid"] == 0) AND ($contact["gid"] == 0)) {
+				update_gcontact($user_data);
+			}
 		} elseif ($local) {
 
 			if ($community)

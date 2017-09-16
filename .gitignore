@@ -51,3 +51,6 @@ nbproject
 
 #ignore things from transifex-client
 venv/
+
+#ignore git projects in vendor
+vendor/**/.git

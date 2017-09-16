@@ -2,20 +2,17 @@
 
 * [Zur Startseite der Hilfe](help)
 
-Wenn du der Administrator einer Friendica Instanz bist, hast du Zugriff auf das so genannte **Admin Panel** in dem du die Friendica Instanz konfigurieren kannst,
+Wenn du der Administrator einer Friendica-Instanz bist, hast du Zugriff auf das so genannte **Admin Panel** in dem du die Friendica-Instanz konfigurieren kannst,
 
 Auf der Startseite des Admin Panels werden die Informationen zu der Instanz zusammengefasst.
-Diese Informationen beinhalten die Anzahl der Nachrichten, die sich aktuell in den Warteschlangen befinden.
-Hierbei ist die erste Zahl die Zahl der Nachrichten die gerade aktiv verteilt werden.
-Diese Zahl sollte sich relativ schnell sinken.
-Die zweite Zahl gibt die Anzahl von Nachrichten an, die nicht zugestellt werden konnten.
+Die erste Zahl gibt die Anzahl von Nachrichten an, die nicht zugestellt werden konnten.
 Die Zustellung wird zu einem späteren Zeitpunkt noch einmal versucht.
 Unter dem Punkt "Warteschlange Inspizieren" kannst du einen schnellen Blick auf die zweite Warteschlange werfen.
-Solltest du für die Hintergrundprozesse die Worker aktiviert haben, wird eine dritte Zahl angezeigt.
-Diese repräsentiert die Anzahl der Aufgaben, die die Worker noch vor sich haben.
+Die zweite Zahl steht für die Anzahl der Aufgaben, die die Worker noch vor sich haben. 
+Die Worker arbeiten Hintergrundprozesse ab. 
 Die Aufgaben der Worker sind priorisiert und werden anhand dieser Prioritäten abgearbeitet.
 
-Des weiteren findest du eine Übersicht über die Accounts auf dem Friendica Knoten, die unter dem Punkt "Nutzer" moderiert werden können.
+Desweiteren findest du eine Übersicht über die Accounts auf dem Friendica Knoten, die unter dem Punkt "Nutzer" moderiert werden können.
 Sowie eine Liste der derzeit aktivierten Addons.
 Diese Liste ist verlinkt, so dass du schnellen Zugriff auf die Informationsseiten der einzelnen Addons hast.
 Abschließend findest du auf der Startseite des Admin Panels die installierte Version von Friendica.
@@ -25,7 +22,7 @@ Die Unterabschnitte des Admin Panels kannst du in der Seitenleiste auswählen.
 
 ## Seite
 
-In diesem Bereich des Admin Panels findest du die Hauptkonfiguration deiner Friendica Instanz.
+In diesem Bereich des Admin Panels findest du die Hauptkonfiguration deiner Friendica-Instanz.
 Er ist in mehrere Unterabschnitte aufgeteilt, wobei die Grundeinstellungen oben auf der Seite zu finden sind.
 
 Da die meisten Konfigurationsoptionen einen Hilfstext im Admin Panel haben, kann und will dieser Artikel nicht alle Einstellungen abdecken.
@@ -129,7 +126,11 @@ Wildcards werden akzeptiert (Wildcard-Unterstützung unter Windows benötigt PHP
 Webb du die Option `Nutzern erlauben das remote_self Flag zu setzen` aktivierst, können alle Nutzer Atom Feeds in den erweiterten Einstellungen des Kontakts als "Entferntes Konto" markieren.
 Dadurch werden automatisch alle Beiträge dieser Feeds für diesen Nutzer gespiegelt und an die Kontakte bei Friendica verteilt.
 
-Als Administrator der Friendica Instanz kannst du diese Einstellungen ansonsten nur direkt in der Datenbank vornehmen.
+Dieses Feature kann z.B. dafür genutzt werden Blogbeiträge zu spiegeln.
+In der Grundeinstellung ist es nicht aktiviert, da es zusätzliche Last auf dem Server verursachen kann.
+Außerdem könnte es durch Nutzer als Spam Verteiler missbraucht werden.
+
+Als Administrator der Friendica-Instanz kannst du diese Einstellungen ansonsten nur direkt in der Datenbank vornehmen.
 Bevor du das tust solltest du sicherstellen, dass du ein Backup der Datenbank hast und genau weißt was die Änderungen an der Datenbank bewirken, die du vornehmen willst.
 
 ### Erweitert
@@ -165,11 +166,24 @@ Das führt dazu, dass du keinerlei Verbindung zu einer selbst unterzeichneten SS
 
 ### Worker
 
+In diesem Abschnitt kann der Hintergrund-Prozess konfiguriert werden.
+Bevor ein neuer *Worker* Prozess gestartet wird, überprüft das System, dass die vorhandenen Resourchen ausrechend sind,
+Aus diesem Grund kann es sein, dass die maximale Zahl der Hintergrungprozesse nicht erreicht wird.
+
+Sollte die PHP Funktion `proc_open` auf dem Server nicht verfügbar sein, kann die Verwendung durch Friendica hier unterbunden werden.
+
+Die Aufgaben die im Hintergrund erledigt werden, haben Prioritäten zugeteilt.
+Um garantieren zu können, das wichtige Prozesse schnellst möglich abgearbeitet werden können, selbst wenn das System gerade stark belastet ist, sollte die *fastlane* aktiviert sein.
+
+Wenn es auf deinem Server nicht möglich ist, einen cron Job zu starten, kannst du den *frontend* Worker einschalten.
+Nachdem dies geschehen ist, kannst du `example.com/worker` (tausche example.com mit dem echten Domainnamen aus) aufrufen werden.
+Dadurch werden dann die Aufgaben aktiviert, die der cron Job sonst aktivieren würde.
+
 ### Umsiedeln
 
 ## Nutzer
 
-In diesem Abschnitt des Admin Panels kannst du die Nutzer deiner Friendica Instanz moderieren.
+In diesem Abschnitt des Admin Panels kannst du die Nutzer deiner Friendica-Instanz moderieren.
 
 Solltest du für **Registrierungsmethode** die Einstellung "Bedarf Zustimmung" gewählt haben, werden hier zu Beginn der Seite neue Registrationen aufgelistet.
 Als Administrator kannst du hier die Registration akzeptieren oder ablehnen.
@@ -188,12 +202,12 @@ Sie müssen in das `/addon` Verzeichnis kopiert werden.
 Auf der Seite wird eine Liste der verfügbaren Erweiterungen angezeigt.
 Neben den Namen der Erweiterungen wird ein Indikator angezeigt, der anzeigt ob das Addon gerade aktiviert ist oder nicht.
 
-Wenn du die Erweiterungen aktualisiert die du auf deiner Friendica Instanz nutzt könnte es sein, dass sie neu geladen werden müssen, damit die Änderungen aktiviert werden.
+Wenn du die Erweiterungen aktualisiert die du auf deiner Friendica-Instanz nutzt könnte es sein, dass sie neu geladen werden müssen, damit die Änderungen aktiviert werden.
 Um diesen Prozess zu vereinfachen gibt es am Anfang der Seite einen Button um alle aktiven Plugins neu zu laden.
 
 ## Themen
 
-Der Bereich zur Kontrolle der auf der Friendica Instanz verfügbaren Themen funktioniert analog zum Plugins Bereich.
+Der Bereich zur Kontrolle der auf der Friendica-Instanz verfügbaren Themen funktioniert analog zum Plugins Bereich.
 Jedes Theme hat eine extra Seite auf der der aktuelle Status, ein Bildschirmfoto des Themes, zusätzliche Informationen und eventuelle Einstellungen des Themes zu finden sind.
 Genau wie Erweiterungen können Themes in der Übersichtsliste oder der Theme-Seite aktiviert bzw. deaktiviert werden.
 Um ein Standardtheme für die Instanz zu wählen, benutze bitte die *Seiten* Bereich des Admin Panels.
@@ -224,6 +238,12 @@ Aber keine Panik!
 Friendica wird die Beiträge nicht für alle Zeiten in der Warteschlange behalten.
 Nach einiger Zeit werden Knoten als inaktiv identifiziert und Nachrichten an Nutzer dieser Knoten aus der Warteschlange gelöscht.
 
+## Server Blockliste
+
+Auf dieser Seite des Admin Panels können Administratoren einer Friendica-Instanz die komplette Kommunikation (eingehend und ausgehend) mit bestimmten Domains unterbinden.
+Für jede dieser Blockierungen muss ein Grund angegeben werden, welcher auf der Informationsseite [friendica](/friendica) angezeigt wird.
+Der Abgleich der Domainnamen ist exakt, Subdomains werden nicht automatisch ebenfalls blockiert.
+
 ## Federation Statistik
 
 Deine Instanz ist ein Teil eines Netzwerks von Servern dezentraler sozialer Netzwerke, der sogenannten **Federation**.
@@ -244,7 +264,7 @@ Wenn du das dennoch tun musste und die Standardeinstellungen des Apache Servers 
 Solltest du einen anderen Webserver verwenden, solltest du sicherstellen, dass der Zugrif zu Dateien mit diesen Endungen nicht möglich ist.
 
 Es gibt fünf Level der Ausführlichkeit mit denen Friendica arbeitet: Normal, Trace, Debug, Data und All.
-Normalerweise solltest du für den Betrieb deiner Friendica Instanz keine Logs benötigen.
+Normalerweise solltest du für den Betrieb deiner Friendica-Instanz keine Logs benötigen.
 Wenn du versuchst einem Problem auf den Grund zu gehen, solltest du das "DEBUG" Level wählen.
 Mit dem "All" Level schreibt Friendica alles in die Logdatei.
 Die Datenmenge der geloggten Daten kann relativ schnell anwachsen, deshalb empfehlen wir das Anlegen von Protokollen nur zu aktivieren wenn es unbedingt nötig ist.

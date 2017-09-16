@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 require_once('view/theme/frio/php/Image.php');
 
 function theme_content(App $a) {

@@ -2,6 +2,7 @@
 /**
  * @brief This class contain functions for the database management
  *
+ * This class contains functions that doesn't need to know if pdo, mysqli or whatever is used.
  */
 class dbm {
 	/**
@@ -47,6 +48,11 @@ class dbm {
 		if (is_bool($array)) {
 			return $array;
 		}
+
+		if (is_object($array)) {
+			return true;
+		}
+
 		return (is_array($array) && count($array) > 0);
 	}
 
@@ -96,19 +102,11 @@ class dbm {
 	public static function date($date = 'now') {
 		$timestamp = strtotime($date);
 
-		// Workaround for 3.5.1
-		if ($timestamp < -62135596800) {
-			return '0000-00-00 00:00:00';
-		}
-
-		// The above will be removed in 3.5.2
-		// The following will then be enabled
 		// Don't allow lower date strings as '0001-01-01 00:00:00'
-		//if ($timestamp < -62135596800) {
-		//	$timestamp = -62135596800;
-		//}
+		if ($timestamp < -62135596800) {
+			$timestamp = -62135596800;
+		}
 
 		return date('Y-m-d H:i:s', $timestamp);
 	}
 }
-?>

@@ -97,13 +97,6 @@ function create_user($arr) {
 	if(mb_strlen($username) < 3)
 		$result['message'] .= t('Name too short.') . EOL;
 
-	// I don't really like having this rule, but it cuts down
-	// on the number of auto-registrations by Russian spammers
-
-	//  Using preg_match was completely unreliable, due to mixed UTF-8 regex support
-	//	$no_utf = get_config('system','no_utf');
-	//	$pat = (($no_utf) ? '/^[a-zA-Z]* [a-zA-Z]*$/' : '/^\p{L}* \p{L}*$/u' );
-
 	// So now we are just looking for a space in the full name.
 
 	$loose_reg = get_config('system','no_regfullname');
@@ -182,17 +175,7 @@ function create_user($arr) {
 	$prvkey = $keys['prvkey'];
 	$pubkey = $keys['pubkey'];
 
-	/**
-	 *
-	 * Create another keypair for signing/verifying
-	 * salmon protocol messages. We have to use a slightly
-	 * less robust key because this won't be using openssl
-	 * but the phpseclib. Since it is PHP interpreted code
-	 * it is not nearly as efficient, and the larger keys
-	 * will take several minutes each to process.
-	 *
-	 */
-
+	// Create another keypair for signing/verifying salmon protocol messages.
 	$sres    = new_keypair(512);
 	$sprvkey = $sres['prvkey'];
 	$spubkey = $sres['pubkey'];
@@ -243,9 +226,7 @@ function create_user($arr) {
 	);
 	if ((dbm::is_result($r)) && (count($r) > 1) && $newuid) {
 		$result['message'] .= t('Nickname is already registered. Please choose another.') . EOL;
-		q("DELETE FROM `user` WHERE `uid` = %d",
-			intval($newuid)
-		);
+		dba::delete('user', array('uid' => $newuid));
 		return $result;
 	}
 
@@ -265,8 +246,7 @@ function create_user($arr) {
 		if ($r === false) {
 			$result['message'] .=  t('An error occurred creating your default profile. Please try again.') . EOL;
 			// Start fresh next time.
-			$r = q("DELETE FROM `user` WHERE `uid` = %d",
-				intval($newuid));
+			dba::delete('user', array('uid' => $newuid));
 			return $result;
 		}
 

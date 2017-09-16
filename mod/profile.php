@@ -1,8 +1,9 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/contact_widgets.php');
 require_once('include/redir.php');
-
 
 function profile_init(App $a) {
 
@@ -149,6 +150,7 @@ function profile_content(App $a, $update = 0) {
 	}
 
 	$is_owner = ((local_user()) && (local_user() == $a->profile['profile_uid']) ? true : false);
+	$last_updated_key = "profile:" . $a->profile['profile_uid'] . ":" . local_user() . ":" . remote_user();
 
 	if ($a->profile['hidewall'] && (! $is_owner) && (! $remote_contact)) {
 		notice( t('Access to this profile has been restricted.') . EOL);
@@ -195,9 +197,9 @@ function profile_content(App $a, $update = 0) {
 				'visitor' => (($is_owner || $commvisitor) ? 'block' : 'none'),
 				'profile_uid' => $a->profile['profile_uid'],
 				'acl_data' => ( $is_owner ? construct_acl_data($a, $a->user) : '' ), // For non-Javascript ACL selector
-		);
+			);
 
-		$o .= status_editor($a,$x);
+			$o .= status_editor($a,$x);
 		}
 	}
 
@@ -209,20 +211,35 @@ function profile_content(App $a, $update = 0) {
 
 
 	if ($update) {
+		$last_updated = (x($_SESSION['last_updated'], $last_updated_key) ? $_SESSION['last_updated'][$last_updated_key] : 0);
 
-		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`
+		// If the page user is the owner of the page we should query for unseen
+		// items. Otherwise use a timestamp of the last succesful update request.
+		if ($is_owner || !$last_updated) {
+			$sql_extra4 = " AND `item`.`unseen`";
+		} else {
+			$gmupdate = gmdate("Y-m-d H:i:s", $last_updated);
+			$sql_extra4 = " AND `item`.`received` > '" . $gmupdate . "'";
+		}
+
+		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`, `item`.`created`
 			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 			WHERE `item`.`uid` = %d AND `item`.`visible` = 1 AND
 			(`item`.`deleted` = 0 OR item.verb = '" . ACTIVITY_LIKE ."'
 			OR item.verb = '" . ACTIVITY_DISLIKE . "' OR item.verb = '" . ACTIVITY_ATTEND . "'
 			OR item.verb = '" . ACTIVITY_ATTENDNO . "' OR item.verb = '" . ACTIVITY_ATTENDMAYBE . "')
-			AND `item`.`moderated` = 0 and `item`.`unseen` = 1
+			AND `item`.`moderated` = 0
 			AND `item`.`wall` = 1
+			$sql_extra4
 			$sql_extra
 			ORDER BY `item`.`created` DESC",
 			intval($a->profile['profile_uid'])
 		);
+
+		if (!dbm::is_result($r)) {
+			return '';
+		}
 
 	} else {
 		$sql_post_table = "";
@@ -249,23 +266,6 @@ function profile_content(App $a, $update = 0) {
 
 		if (!dbm::is_result($r)) {
 			$sql_extra3 = sprintf(" AND `thread`.`contact-id` = %d ", intval(intval($a->profile['contact_id'])));
-		}
-
-		if(get_config('system', 'old_pager')) {
-		    $r = q("SELECT COUNT(*) AS `total`
-			    FROM `thread` INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
-			    $sql_post_table INNER JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
-			    AND `contact`.`blocked` = 0 AND `contact`.`pending` = 0
-			    WHERE `thread`.`uid` = %d AND `thread`.`visible` = 1 AND `thread`.`deleted` = 0
-			    and `thread`.`moderated` = 0
-			    AND `thread`.`wall` = 1
-			    $sql_extra3 $sql_extra $sql_extra2 ",
-			    intval($a->profile['profile_uid'])
-			);
-
-			if (dbm::is_result($r)) {
-				$a->set_pager_total($r[0]['total']);
-			}
 		}
 
 		//  check if we serve a mobile device and get the user settings
@@ -300,10 +300,15 @@ function profile_content(App $a, $update = 0) {
 			ORDER BY `thread`.`created` DESC $pager_sql",
 			intval($a->profile['profile_uid'])
 		);
+
 	}
 
 	$parents_arr = array();
 	$parents_str = '';
+
+	// Set a time stamp for this page. We will make use of it when we
+	// search for new items (update routine)
+	$_SESSION['last_updated'][$last_updated_key] = time();
 
 	if (dbm::is_result($r)) {
 		foreach($r as $rr)
@@ -335,14 +340,10 @@ function profile_content(App $a, $update = 0) {
 		);
 	}
 
-	$o .= conversation($a,$items,'profile',$update);
+	$o .= conversation($a, $items, 'profile', $update);
 
-	if(! $update) {
-		if(!get_config('system', 'old_pager')) {
-			$o .= alt_pager($a,count($items));
-		} else {
-			$o .= paginate($a);
-		}
+	if (!$update) {
+		$o .= alt_pager($a, count($items));
 	}
 
 	return $o;

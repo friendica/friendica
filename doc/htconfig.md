@@ -14,7 +14,7 @@ Especially don't do that with undocumented values.
 The header of the section describes the category, the value is the parameter.
 Example: To set the directory value please add this line to your .htconfig.php:
 
-    $a->config['system']['directory'] = 'http://dir.friendi.ca';
+    $a->config['system']['directory'] = 'http://dir.friendica.social';
 
 ## jabber ##
 * **debug** (Boolean) - Enable debug level for the jabber account synchronisation.
@@ -25,6 +25,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **allowed_link_protocols** (Array) - Allowed protocols in links URLs, add at your own risk. http is always allowed.
 * **birthday_input_format** - Default value is "ymd".
 * **block_local_dir** (Boolean) - Blocks the access to the directory of the local users.
+* **auth_cookie_lifetime** (Integer) - Number of days that should pass without any activity before a user who chose "Remember me" when logging in is considered logged out. Defaults to 7.
 * **curl_range_bytes** - Maximum number of bytes that should be fetched. Default is 0, which mean "no limit".
 * **db_log** - Name of a logfile to log slow database queries
 * **db_loglimit** - If a database call lasts longer than this value it is logged
@@ -37,21 +38,23 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **default_service_class** -
 * **delivery_batch_count** - Number of deliveries per process. Default value is 1. (Disabled when using the worker)
 * **diaspora_test** (Boolean) - For development only. Disables the message transfer.
-* **directory** - The path to global directory. If not set then "http://dir.friendi.ca" is used.
+* **directory** - The path to global directory. If not set then "http://dir.friendica.social" is used.
 * **disable_email_validation** (Boolean) - Disables the check if a mail address is in a valid format and can be resolved via DNS.
 * **disable_url_validation** (Boolean) - Disables the DNS lookup of an URL.
+* **dlogfile - location of the developer log file
 * **event_input_format** - Default value is "ymd".
 * **frontend_worker_timeout** - Value in minutes after we think that a frontend task was killed by the webserver. Default value is 10.
 * **ignore_cache** (Boolean) - For development only. Disables the item cache.
 * **like_no_comment** (Boolean) - Don't update the "commented" value of an item when it is liked.
 * **local_block** (Boolean) - Used in conjunction with "block_public".
-* **local_search** (Boolean) - Blocks the search for not logged in users to prevent crawlers from blocking your system.
-* **max_connections** - The poller process isn't started when the maximum level of the possible database connections are used. When the system can't detect the maximum numbers of connection then this value can be used.
+* **local_search** (Boolean) - Blocks search for users who are not logged in to prevent crawlers from blocking your system.
+* **max_connections** - The maximum number of database connections which can be in use before the poller process is deferred to it's next interval.  When the system can't detect the maximum numbers of connection then this value can be used.
 * **max_connections_level** - The maximum level of connections that are allowed to let the poller start. It is a percentage value. Default value is 75.
 * **max_contact_queue** - Default value is 500.
 * **max_batch_queue** - Default value is 1000.
 * **max_processes_backend** - Maximum number of concurrent database processes for background tasks. Default value is 5.
 * **max_processes_frontend** - Maximum number of concurrent database processes for foreground tasks. Default value is 20.
+* **min_poll_interval** - minimal distance in minutes between two polls for a contact. Default is 1. Reasonable values are between 1 and 59.
 * **memcache** (Boolean) - Use memcache. To use memcache the PECL extension "memcache" has to be installed and activated.
 * **memcache_host** - Hostname of the memcache daemon. Default is '127.0.0.1'.
 * **memcache_port** - Portnumber of the memcache daemon. Default is 11211.

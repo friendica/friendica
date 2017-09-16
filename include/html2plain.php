@@ -49,7 +49,7 @@ function quotelevel($message, $wraplength = 75)
 
 	$newlines = array();
 	$level = 0;
-	foreach($lines as $line) {;
+	foreach ($lines as $line) {;
 		$line = trim($line);
 		$startquote = false;
 		while (strpos("*".$line, '[quote]') > 0) {
@@ -233,4 +233,3 @@ function html2plain($html, $wraplength = 75, $compact = false)
 
 	return(trim($message));
 }
-?>

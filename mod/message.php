@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/acl_selectors.php');
 require_once('include/message.php');
 require_once('include/Smilies.php');
@@ -349,7 +351,7 @@ function message_content(App $a) {
 
 		$o .= $header;
 
-		$r = q("SELECT count(*) AS `total` FROM `mail`
+		$r = q("SELECT count(*) AS `total`, ANY_VALUE(`created`) AS `created` FROM `mail`
 			WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `created` DESC",
 			intval(local_user())
 		);
@@ -528,12 +530,20 @@ function message_content(App $a) {
 }
 
 function get_messages($user, $lstart, $lend) {
-
+	//TODO: rewritte with a sub-query to get the first message of each private thread with certainty
 	return q("SELECT max(`mail`.`created`) AS `mailcreated`, min(`mail`.`seen`) AS `mailseen`,
-		`mail`.* , `contact`.`name`, `contact`.`url`, `contact`.`thumb` , `contact`.`network`,
-		count( * ) as count
+		ANY_VALUE(`mail`.`id`) AS `id`, ANY_VALUE(`mail`.`uid`) AS `uid`, ANY_VALUE(`mail`.`guid`) AS `guid`,
+		ANY_VALUE(`mail`.`from-name`) AS `from-name`, ANY_VALUE(`mail`.`from-photo`) AS `from-photo`,
+		ANY_VALUE(`mail`.`from-url`) AS `from-url`, ANY_VALUE(`mail`.`contact-id`) AS `contact-id`,
+		ANY_VALUE(`mail`.`convid`) AS `convid`, ANY_VALUE(`mail`.`title`) AS `title`, ANY_VALUE(`mail`.`body`) AS `body`,
+		ANY_VALUE(`mail`.`seen`) AS `seen`, ANY_VALUE(`mail`.`reply`) AS `reply`, ANY_VALUE(`mail`.`replied`) AS `replied`,
+		ANY_VALUE(`mail`.`unknown`) AS `unknown`, ANY_VALUE(`mail`.`uri`) AS `uri`,
+		`mail`.`parent-uri`,
+		ANY_VALUE(`mail`.`created`) AS `created`, ANY_VALUE(`contact`.`name`) AS `name`, ANY_VALUE(`contact`.`url`) AS `url`,
+		ANY_VALUE(`contact`.`thumb`) AS `thumb`, ANY_VALUE(`contact`.`network`) AS `network`,
+		count( * ) as `count`
 		FROM `mail` LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
-		WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `mailcreated` DESC  LIMIT %d , %d ",
+		WHERE `mail`.`uid` = %d GROUP BY `parent-uri` ORDER BY `mailcreated` DESC LIMIT %d , %d ",
 		intval($user), intval($lstart), intval($lend)
 	);
 }

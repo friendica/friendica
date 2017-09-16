@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="library/jgrowl/jquery.jgrowl.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="library/datetimepicker/jquery.datetimepicker.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="library/perfect-scrollbar/perfect-scrollbar.min.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="library/Text_Highlighter/sample.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="vendor/pear-pear.php.net/Text_Highlighter/data/Text_Highlighter/Text/sample.css" type="text/css" media="screen" />
 
 <link rel="stylesheet" href="view/theme/frio/frameworks/bootstrap/css/bootstrap.min.css" type="text/css" media="screen"/>
 <link rel="stylesheet" href="view/theme/frio/frameworks/bootstrap/css/bootstrap-theme.min.css" type="text/css" media="screen"/>
@@ -41,6 +41,7 @@
 <link rel="apple-touch-icon" href="{{$touch_icon}}"/>
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="{{$baseurl}}/manifest" />
 <script>
 // Prevents links to switch to Safari in a home screen app - see https://gist.github.com/irae/1042167
 (function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(chref=d.href).replace(e.href,"").indexOf("#")&&(!/^[a-z\+\.\-]+:/i.test(chref)||chref.indexOf(e.protocol+"//"+e.host)===0)&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone");
@@ -81,6 +82,7 @@
 <script type="text/javascript" src="view/theme/frio/frameworks/jsmart/jsmart.custom.js"></script>
 <script type="text/javascript" src="view/theme/frio/frameworks/jquery-scrollspy/jquery-scrollspy.js"></script>
 <script type="text/javascript" src="view/theme/frio/frameworks/autosize/autosize.min.js"></script>
+<script type="text/javascript" src="view/theme/frio/frameworks/sticky-kit/jquery.sticky-kit.min.js"></script>
 
 {{* own js files *}}
 <script type="text/javascript" src="view/theme/frio/js/theme.js"></script>

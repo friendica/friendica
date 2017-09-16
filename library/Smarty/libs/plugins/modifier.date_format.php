@@ -36,7 +36,7 @@ function smarty_modifier_date_format($string, $format = null, $default_date = ''
      * Include the {@link shared.make_timestamp.php} plugin
      */
     require_once(SMARTY_PLUGINS_DIR . 'shared.make_timestamp.php');
-    if ($string != '' && $string != '0000-00-00' && $string != '0000-00-00 00:00:00') {
+    if ($string != '' && $string > '0001-01-01' && $string > NULL_DATE) {
         $timestamp = smarty_make_timestamp($string);
     } elseif ($default_date != '') {
         $timestamp = smarty_make_timestamp($default_date);

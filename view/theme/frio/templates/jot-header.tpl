@@ -280,36 +280,14 @@
 			.modal.show;
 	}
 
-	// the following functions show/hide the specific jot content
-	// in dependence of the selected nav
-	function aclActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").hide();
-		$(".modal-body #profile-jot-acl-wrapper").show();
-	}
-
-
-	function previewActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #profile-jot-acl-wrapper,.modal-body #jot-fbrowser-wrapper").hide();
-		preview_post();
-	}
-
+	// Activate the jot text section in the jot modal
 	function jotActive() {
-		$(".modal-body #profile-jot-acl-wrapper, .modal-body #jot-preview-content, .modal-body #jot-fbrowser-wrapper").hide();
-		$(".modal-body #profile-jot-wrapper").show();
-
-		//make sure jot text does have really the active class (we do this because there are some
-		// other events which trigger jot text
-		toggleJotNav($("#jot-modal .jot-nav #jot-text-lnk"));
+		// Make sure jot text does have really the active class (we do this because there are some
+		// other events which trigger jot text (we need to do this for the desktop and mobile
+		// jot nav
+		var elem = $("#jot-modal .jot-nav #jot-text-lnk");
+		var elemMobile = $("#jot-modal .jot-nav #jot-text-lnk-mobile")
+		toggleJotNav(elem[0]);
+		toggleJotNav(elemMobile[0]);
 	}
-
-	function fbrowserActive() {
-		$(".modal-body #profile-jot-wrapper, .modal-body #jot-preview-content, .modal-body #profile-jot-acl-wrapper").hide();
-
-		$(".modal-body #jot-fbrowser-wrapper").show();
-
-		$(function() {Dialog.showJot();});
-	}
-
-
 </script>
-

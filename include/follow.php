@@ -1,11 +1,14 @@
 <?php
-require_once("include/Scrape.php");
-require_once("include/socgraph.php");
-require_once('include/group.php');
-require_once('include/salmon.php');
-require_once('include/ostatus.php');
-require_once("include/Photo.php");
-require_once('include/diaspora.php');
+
+use Friendica\App;
+
+require_once 'include/probe.php';
+require_once 'include/socgraph.php';
+require_once 'include/group.php';
+require_once 'include/salmon.php';
+require_once 'include/ostatus.php';
+require_once 'include/Photo.php';
+require_once 'include/diaspora.php';
 
 function update_contact($id) {
 	/*
@@ -79,6 +82,11 @@ function new_contact($uid,$url,$interactive = false) {
 
 	if (! allowed_url($url)) {
 		$result['message'] = t('Disallowed profile URL.');
+		return $result;
+	}
+
+	if (blocked_url($url)) {
+		$result['message'] = t('Blocked domain');
 		return $result;
 	}
 

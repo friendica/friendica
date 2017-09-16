@@ -98,4 +98,3 @@ while (true) {
 	// Now sleep for 5 minutes
 	sleep(300);
 }
-?>

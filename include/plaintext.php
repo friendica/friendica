@@ -4,7 +4,8 @@
  * @file include/plaintext.php
  */
 
-use \Friendica\ParseUrl;
+use Friendica\App;
+use Friendica\ParseUrl;
 
 require_once("include/Photo.php");
 require_once("include/bbcode.php");
@@ -431,4 +432,3 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 
 	return($post);
 }
-?>

@@ -6,6 +6,8 @@
  *	of the profile owner
  */
 
+use Friendica\App;
+
 require_once('include/event.php');
 require_once('include/redir.php');
 
@@ -269,8 +271,8 @@ function cal_content(App $a) {
 			'$tabs'		=> $tabs,
 			'$title'	=> t('Events'),
 			'$view'		=> t('View'),
-			'$previous'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth",t('Previous'),'',''),
-			'$next'		=> array(App::get_baseurl()."/events/$nextyear/$nextmonth",t('Next'),'',''),
+			'$previous'	=> array(App::get_baseurl()."/events/$prevyear/$prevmonth", t('Previous'),'',''),
+			'$next'		=> array(App::get_baseurl()."/events/$nextyear/$nextmonth", t('Next'),'',''),
 			'$calendar' => cal($y,$m,$links, ' eventcal'),
 
 			'$events'	=> $events,

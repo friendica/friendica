@@ -17,7 +17,7 @@
 				{{/if}}
 			{{/if}}
 			</div>
-		
+
 		</div>
 
 	{{* The short information which will appended to the second navbar by scrollspy *}}
@@ -61,20 +61,20 @@
 				{{/if}}
 				{{if $wallmessage}}
 				<div id="wallmessage-link-botton">
-					<a id="wallmessage-link" class="btn btn-labeled btn-primary btn-sm" onclick="openWallMessage('{{$wallmessage_link}}')">
+					<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary btn-sm" onclick="openWallMessage('{{$wallmessage_link}}')">
 						<span class=""><i class="fa fa-envelope"></i></span>
 						<span class="">{{$wallmessage}}</span>
-					</a>
+					</button>
 				</div>
 				{{/if}}
-			
+
 		</div>
 
 		<div class="clear"></div>
 
 		{{if $location}}
 			<div class="location detail">
-				<span class="location-label icon"><i class="fa fa-map-marker"></i></span> 
+				<span class="location-label icon"><i class="fa fa-map-marker"></i></span>
 				<span class="adr">
 					{{if $profile.address}}<span class="street-address p-street-address">{{$profile.address}}</span>{{/if}}
 					<span class="city-state-zip">
@@ -89,7 +89,7 @@
 
 		{{if $profile.xmpp}}
 			<div class="xmpp">
-				<span class="xmpp-label icon"><i class="fa fa-comments"></i></span> 
+				<span class="xmpp-label icon"><i class="fa fa-comments"></i></span>
 				<span class="xmpp-data">{{$profile.xmpp}}</span>
 			</div>
 		{{/if}}

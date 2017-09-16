@@ -7,10 +7,10 @@ Table event
 | uid        | user_id of the owner of this data                      | int(11)             | NO   | MUL | 0                   |                 |
 | cid        | contact_id (ID of the contact in contact table)        | int(11)             | NO   |     | 0                   |                 |
 | uri        |                                                        | varchar(255)        | NO   |     |                     |                 |
-| created    |  creation time                                         | datetime            | NO   |     | 0000-00-00 00:00:00 |                 |
-| edited     | last edit time                                         | datetime            | NO   |     | 0000-00-00 00:00:00 |                 |
-| start      | event start time                                       | datetime            | NO   |     | 0000-00-00 00:00:00 |                 |
-| finish     | event end time                                         | datetime            | NO   |     | 0000-00-00 00:00:00 |                 |
+| created    |  creation time                                         | datetime            | NO   |     | 0001-01-01 00:00:00 |                 |
+| edited     | last edit time                                         | datetime            | NO   |     | 0001-01-01 00:00:00 |                 |
+| start      | event start time                                       | datetime            | NO   |     | 0001-01-01 00:00:00 |                 |
+| finish     | event end time                                         | datetime            | NO   |     | 0001-01-01 00:00:00 |                 |
 | summary    |  short description or title of the event               | text                | NO   |     | NULL                |                 |
 | desc       | event description                                      | text                | NO   |     | NULL                |                 |
 | location   | event location                                         | text                | NO   |     | NULL                |                 |

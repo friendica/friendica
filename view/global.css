@@ -273,19 +273,19 @@ img.acpopup-img {
 
 /* plain text editor upload/select popup */
 
-.fbrowser .path a { padding: 5px; }
-.fbrowser .path a:before { content: "/"; padding-right: 5px;}
+.fbrowser .path a, .fbrowser .path .btn-link { padding: 5px; }
+.fbrowser .path a:before, .fbrowser .path .btn-link:before { content: "/"; padding-right: 5px;}
 .fbrowser .folders ul { list-style-type: none; padding-left: 10px;}
 .fbrowser .list { height: auto; overflow-y: hidden; margin: 10px 0px; }
 .fbrowser.image .photo-album-image-wrapper { float: left; }
-.fbrowser.image a img { height: 48px; }
-.fbrowser.image a p { display: none;}
+.fbrowser.image a img, .fbrowser.image .btn-link img { height: 48px; }
+.fbrowser.image a p, .fbrowser.image .btn-link p { display: none;}
 .fbrowser.file .photo-album-image-wrapper { float:none;  white-space: nowrap; }
 .fbrowser.file img { display: inline; }
 .fbrowser.file p  { display: inline; white-space: nowrap; }
 .fbrowser .upload { clear: both; padding-top: 1em;}
 .fbrowser .error { background: #ffeeee; border: 1px solid #994444; color: #994444; padding: 0.5em;}
-.fbrowser .error a.close { float: right; font-weight: bold; }
+.fbrowser .error .close { float: right; font-weight: bold; }
 .fbrowser .error.hidden { display: none; }
 
 a {

@@ -4,26 +4,12 @@
  * @brief Posts items that wer spooled because they couldn't be posted.
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
-require_once("boot.php");
 require_once("include/items.php");
 
 function spool_post_run($argv, $argc) {
-	global $a, $db;
-
-	if (is_null($a)) {
-		$a = new App;
-	}
-
-	if (is_null($db)) {
-		@include(".htconfig.php");
-		require_once("include/dba.php");
-		$db = new dba($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-	}
-
-	Config::load();
+	global $a;
 
 	$path = get_spoolpath();
 
@@ -69,9 +55,3 @@ function spool_post_run($argv, $argc) {
 		}
 	}
 }
-
-if (array_search(__file__, get_included_files()) === 0) {
-	spool_post_run($_SERVER["argv"], $_SERVER["argc"]);
-	killme();
-}
-?>

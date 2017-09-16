@@ -1,6 +1,6 @@
 <?php
 
-define('UPDATE_VERSION' , 1215);
+define('UPDATE_VERSION' , 1227);
 
 /**
  *
@@ -48,8 +48,8 @@ function update_1000() {
 
 	q("ALTER TABLE `intro` ADD `duplex` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `knowyou` ");
 	q("ALTER TABLE `contact` ADD `duplex` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `rel` ");
- 	q("ALTER TABLE `contact` CHANGE `issued-pubkey` `issued-pubkey` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
-	q("ALTER TABLE `contact` ADD `term-date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `avatar-date`");
+ 	q("ALTER TABLE `contact` CHANGE `issued-pubkey` `issued-pubkey` TEXTCHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
+	q("ALTER TABLE `contact` ADD `term-date` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `avatar-date`");
 }
 
 function update_1001() {
@@ -148,7 +148,7 @@ function update_1014() {
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 			$ph = new Photo($rr['data']);
-			if($ph->is_valid()) {
+			if ($ph->is_valid()) {
 				$ph->scaleImage(48);
 				$ph->store($rr['uid'],$rr['contact-id'],$rr['resource-id'],$rr['filename'],$rr['album'],6,(($rr['profile']) ? 1 : 0));
 			}
@@ -242,8 +242,8 @@ function update_1022() {
 }
 
 function update_1023() {
-	q("ALTER TABLE `user` ADD `register_date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `timezone` ,
-	ADD `login_date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `register_date` ");
+	q("ALTER TABLE `user` ADD `register_date` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `timezone` ,
+	ADD `login_date` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `register_date` ");
 }
 
 function update_1024() {
@@ -308,9 +308,9 @@ function update_1030() {
 function update_1031() {
 	// Repair any bad links that slipped into the item table
 	$r = q("SELECT `id`, `object` FROM `item` WHERE `object` != '' ");
-	if($r && dbm::is_result($r)) {
+	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
-			if(strstr($rr['object'],'type=&quot;http')) {
+			if (strstr($rr['object'],'type=&quot;http')) {
 				q("UPDATE `item` SET `object` = '%s' WHERE `id` = %d",
 					dbesc(str_replace('type=&quot;http','href=&quot;http',$rr['object'])),
 					intval($rr['id'])
@@ -326,22 +326,23 @@ function update_1032() {
 
 function update_1033() {
 	q("CREATE TABLE IF NOT EXISTS `cache` (
- 		`k` CHAR( 255 ) NOT NULL PRIMARY KEY ,
- 		`v` TEXT NOT NULL,
- 		`updated` DATETIME NOT NULL
-		) ENGINE = MYISAM DEFAULT CHARSET=utf8 ");
+		`k` CHAR( 255 ) NOT NULL PRIMARY KEY ,
+		`v` TEXT NOT NULL,
+		`updated` DATETIME NOT NULL
+		) DEFAULT CHARSET=utf8 ");
 }
 
 
 function update_1034() {
 
-	// If you have any of these parent-less posts they can cause problems, and
-	// we need to delete them. You can't see them anyway.
-	// Legitimate items will usually get re-created on the next
-	// pull from the hub.
-	// But don't get rid of a post that may have just come in
-	// and may not yet have the parent id set.
-
+	/*
+	 * If you have any of these parent-less posts they can cause problems, and
+	 * we need to delete them. You can't see them anyway.
+	 * Legitimate items will usually get re-created on the next
+	 * pull from the hub.
+	 * But don't get rid of a post that may have just come in
+	 * and may not yet have the parent id set.
+	 */
 	q("DELETE FROM `item` WHERE `parent` = 0 AND `created` < UTC_TIMESTAMP() - INTERVAL 2 MINUTE");
 
 }
@@ -349,7 +350,7 @@ function update_1034() {
 
 function update_1035() {
 
-	q("ALTER TABLE `contact` ADD `success_update` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `last-update` ");
+	q("ALTER TABLE `contact` ADD `success_update` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `last-update` ");
 
 }
 
@@ -443,7 +444,7 @@ function update_1049() {
 	`user` CHAR( 255 ) NOT NULL ,
 	`pass` CHAR( 255 ) NOT NULL ,
 	`reply_to` CHAR( 255 ) NOT NULL ,
-	`last_check` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+	`last_check` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00'
 	) ENGINE = MYISAM ");
 }
 
@@ -454,8 +455,8 @@ function update_1050() {
 	`filetype` CHAR( 64 ) NOT NULL ,
 	`filesize` INT NOT NULL ,
 	`data` LONGBLOB NOT NULL ,
-	`created` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`edited` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`edited` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`allow_cid` MEDIUMTEXT NOT NULL ,
 	`allow_gid` MEDIUMTEXT NOT NULL ,
 	`deny_cid` MEDIUMTEXT NOT NULL ,
@@ -531,7 +532,7 @@ function update_1065() {
 }
 
 function update_1066() {
-	$r = q("ALTER TABLE `item` ADD `received` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `edited` ");
+	$r = q("ALTER TABLE `item` ADD `received` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `edited` ");
 	if($r)
 		q("ALTER TABLE `item` ADD INDEX ( `received` ) ");
 
@@ -673,7 +674,7 @@ function update_1079() {
 }
 
 function update_1080() {
-	q("ALTER TABLE `fcontact` ADD `updated` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'");
+	q("ALTER TABLE `fcontact` ADD `updated` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00'");
 }
 
 function update_1081() {
@@ -728,7 +729,7 @@ function update_1086() {
 }
 
 function update_1087() {
-	q("ALTER TABLE `item` ADD `commented` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `edited` ");
+	q("ALTER TABLE `item` ADD `commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `edited` ");
 
 	$r = q("SELECT `id` FROM `item` WHERE `parent` = `id` ");
 	if (dbm::is_result($r)) {
@@ -747,8 +748,8 @@ function update_1087() {
 
 function update_1088() {
 	q("ALTER TABLE `user` ADD `account_expired` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `expire` ,
-		ADD `account_expires_on` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `account_expired` ,
-		ADD `expire_notification_sent` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `account_expires_on` ");
+		ADD `account_expires_on` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `account_expired` ,
+		ADD `expire_notification_sent` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `account_expires_on` ");
 }
 
 function update_1089() {
@@ -932,8 +933,8 @@ ADD INDEX ( `hidden` ) ");
 
 function update_1109() {
 	q("ALTER TABLE `conv` ADD `creator` CHAR( 255 ) NOT NULL ,
-		ADD `created` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-		ADD `updated` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+		ADD `created` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00',
+		ADD `updated` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00',
 		ADD `subject` MEDIUMTEXT NOT NULL,
 		ADD INDEX ( `created` ), ADD INDEX ( `updated` ) ");
 }
@@ -1112,7 +1113,7 @@ function update_1127() {
 
 
 function update_1128() {
-	q("alter table spam add `date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `term` ");
+	q("alter table spam add `date` DATETIME NOT NULL DEFAULT '0001-01-01 00:00:00' AFTER `term` ");
 }
 
 function update_1129() {
@@ -1262,7 +1263,7 @@ function update_1144() {
 }
 
 function update_1145() {
-	$r = q("alter table profile add howlong datetime not null default '0000-00-00 00:00:00' after `with`");
+	$r = q("alter table profile add howlong datetime not null default '0001-01-01 00:00:00' after `with`");
 	if(! $r)
 		return UPDATE_FAILED ;
 	return UPDATE_SUCCESS ;
@@ -1562,11 +1563,11 @@ function update_1169() {
 		  `iid` int(10) unsigned NOT NULL DEFAULT '0',
 		  `uid` int(10) unsigned NOT NULL DEFAULT '0',
 		  `contact-id` int(11) unsigned NOT NULL DEFAULT '0',
-		  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `edited` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `commented` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `received` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `changed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		  `created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+		  `edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+		  `commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+		  `received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+		  `changed` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 		  `wall` tinyint(1) NOT NULL DEFAULT '0',
 		  `private` tinyint(1) NOT NULL DEFAULT '0',
 		  `pubmail` tinyint(1) NOT NULL DEFAULT '0',
@@ -1671,7 +1672,7 @@ function update_1190() {
 		$plugins = get_config('system','addon');
 		$plugins_arr = array();
 
-		if($plugins) {
+		if ($plugins) {
 			$plugins_arr = explode(",",str_replace(" ", "",$plugins));
 
 			$idx = array_search($plugin, $plugins_arr);

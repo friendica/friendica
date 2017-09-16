@@ -10,7 +10,7 @@ Table profile
 | hide-friends | Hide friend list from viewers of this profile | tinyint(1)   | NO   |     | 0                   |                |
 | name         |                                               | varchar(255) | NO   |     |                     |                |
 | pdesc        | Title or description                          | varchar(255) | NO   |     |                     |                |
-| dob          | Day of birth                                  | varchar(32)  | NO   |     | 0000-00-00          |                |
+| dob          | Day of birth                                  | varchar(32)  | NO   |     | 0001-01-01          |                |
 | address      |                                               | varchar(255) | NO   |     |                     |                |
 | locality     |                                               | varchar(255) | NO   |     |                     |                |
 | region       |                                               | varchar(255) | NO   |     |                     |                |
@@ -20,7 +20,7 @@ Table profile
 | gender       |                                               | varchar(32)  | NO   |     |                     |                |
 | marital      |                                               | varchar(255) | NO   |     |                     |                |
 | with         |                                               | text         | NO   |     | NULL                |                |
-| howlong      |                                               | datetime     | NO   |     | 0000-00-00 00:00:00 |                |
+| howlong      |                                               | datetime     | NO   |     | 0001-01-01 00:00:00 |                |
 | sexual       |                                               | varchar(255) | NO   |     |                     |                |
 | politic      |                                               | varchar(255) | NO   |     |                     |                |
 | religion     |                                               | varchar(255) | NO   |     |                     |                |

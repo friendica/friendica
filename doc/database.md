@@ -14,7 +14,7 @@ Database Tables
 | [config](help/database/db_config)                    | main configuration storage                       |
 | [contact](help/database/db_contact)                  | contact table                                    |
 | [conv](help/database/db_conv)                        | private messages                                 |
-| [deliverq](help/database/db_deliverq)                |                                                  |
+| [conversation](help/database/db_conversation)        | Raw data and structure information for messages  |
 | [event](help/database/db_event)                      | Events                                           |
 | [fcontact](help/database/db_fcontact)                | friend suggestion stuff                          |
 | [ffinder](help/database/db_ffinder)                  | friend suggestion stuff                          |

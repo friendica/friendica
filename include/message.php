@@ -1,17 +1,16 @@
 <?php
 
-	// send a private message
+// send a private message
 
-
-
+use Friendica\App;
 
 function send_message($recipient=0, $body='', $subject='', $replyto=''){
 
 	$a = get_app();
 
-	if(! $recipient) return -1;
+	if (! $recipient) return -1;
 
-	if(! strlen($subject))
+	if (! strlen($subject))
 		$subject = t('[no subject]');
 
 	$me = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 1 LIMIT 1",
@@ -22,7 +21,7 @@ function send_message($recipient=0, $body='', $subject='', $replyto=''){
 			intval(local_user())
 	);
 
-	if(! (count($me) && (count($contact)))) {
+	if (! (count($me) && (count($contact)))) {
 		return -2;
 	}
 
@@ -34,7 +33,7 @@ function send_message($recipient=0, $body='', $subject='', $replyto=''){
 
 	// look for any existing conversation structure
 
-	if(strlen($replyto)) {
+	if (strlen($replyto)) {
 		$reply = true;
 		$r = q("select convid from mail where uid = %d and ( uri = '%s' or `parent-uri` = '%s' ) limit 1",
 			intval(local_user()),
@@ -45,7 +44,7 @@ function send_message($recipient=0, $body='', $subject='', $replyto=''){
 			$convid = $r[0]['convid'];
 	}
 
-	if(! $convid) {
+	if (! $convid) {
 
 		// create a new conversation
 
@@ -78,12 +77,12 @@ function send_message($recipient=0, $body='', $subject='', $replyto=''){
 			$convid = $r[0]['id'];
 	}
 
-	if(! $convid) {
+	if (! $convid) {
 		logger('send message: conversation not found.');
 		return -4;
 	}
 
-	if(! strlen($replyto)) {
+	if (! strlen($replyto)) {
 		$replyto = $convuri;
 	}
 
@@ -175,7 +174,7 @@ function send_wallmessage($recipient='', $body='', $subject='', $replyto=''){
 	$convid = 0;
 	$reply = false;
 
-	require_once('include/Scrape.php');
+	require_once 'include/probe.php';
 
 	$me = probe_url($replyto);
 

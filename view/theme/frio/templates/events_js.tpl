@@ -3,7 +3,7 @@
 	{{include file="section_title.tpl" title=$title}}
 
 	{{* The link to create a new event *}}
-	<div id="new-event-link"><a onclick="addToModal('{{$new_event.0}}')" >{{$new_event.1}}</a></div>
+	<div id="new-event-link"><button type="button" class="btn-link" onclick="addToModal('{{$new_event.0}}')" >{{$new_event.1}}</button></div>
 
 	{{* We create our own fullcallendar header (with title & calendar view *}}
 	<div id="fc-header">
@@ -11,21 +11,21 @@
 			{{* The dropdown to change the callendar view *}}
 			<ul class="nav nav-pills">
 				<li class="dropdown pull-right">
-					<a class="btn btn-link btn-sm dropdown-toggle" type="button" id="event-calendar-views" data-toggle="dropdown" aria-expanded="true">
+					<button type="button" class="btn btn-link btn-sm dropdown-toggle" type="button" id="event-calendar-views" data-toggle="dropdown" aria-expanded="true">
 						<i class="fa fa-angle-down"></i> {{$view}}
-					</a>
+					</button>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="event-calendar-views">
 						<li role="menuitem">
-							<a onclick="changeView('changeView', 'month');$('#events-calendar').fullCalendar('option', {contentHeight: '', aspectRatio: 1});">{{$month}}</a>
+							<button type="button" class="btn-link" onclick="changeView('changeView', 'month');$('#events-calendar').fullCalendar('option', {contentHeight: '', aspectRatio: 1});">{{$month}}</button>
 						</li>
 						<li role="menuitem">
-							<a onclick="changeView('changeView', 'agendaWeek');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$week}}</a>
+							<button type="button" class="btn-link" onclick="changeView('changeView', 'agendaWeek');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$week}}</button>
 						</li>
 						<li role="menuitem">
-							<a onclick="changeView('changeView', 'agendaDay');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$day}}</a>
+							<button type="button" class="btn-link" onclick="changeView('changeView', 'agendaDay');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$day}}</button>
 						</li>
 						<li role="menuitem">
-							<a onclick="changeView('changeView', 'listMonth');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$list}}</a>
+							<button type="button" class="btn-link" onclick="changeView('changeView', 'listMonth');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$list}}</button>
 						</li>
 					</ul>
 				</li>

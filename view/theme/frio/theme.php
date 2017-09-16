@@ -2,10 +2,12 @@
 /*
  * Name: frio
  * Description: Bootstrap V3 theme. The theme is currently under construction, so it is far from finished. For further information have a look at the <a href="https://github.com/friendica/friendica/tree/develop/view/theme/frio/README.md">ReadMe</a>.
- * Version: V.0.7
+ * Version: V.0.8
  * Author: Rabuzarus <https://friendica.kommune4.de/profile/rabuzarus>
  *
  */
+
+use Friendica\App;
 
 $frio = "view/theme/frio";
 
@@ -130,7 +132,7 @@ function frio_item_photo_menu(App $a, &$arr) {
  *  Additionally the profile, status and photo page links  will be changed
  *  to don't open in a new tab if the contact is a friendica contact.
  *
- * @param app $a The app data
+ * @param App $a The app data
  * @param array $args Contains contact data and the original photo_menu
  */
 function frio_contact_photo_menu(App $a, &$args){
@@ -182,7 +184,7 @@ function frio_contact_photo_menu(App $a, &$args){
  *  Some links will point to the local pages because the user would expect
  *  local page (these pages are: search, community, help, apps, directory).
  *
- * @param app $a The App class
+ * @param App $a The App class
  * @param array $nav The original nav menu
  */
 function frio_remote_nav($a,&$nav) {
@@ -240,7 +242,7 @@ function frio_remote_nav($a,&$nav) {
 		}
 
 	if(!local_user() && !empty($server_url)) {
-		$nav['logout'] = Array($server_url . '/logout',t('Logout'), "", t('End this session'));
+		$nav['logout'] = Array($server_url . '/logout', t('Logout'), "", t('End this session'));
 
 		// user menu
 		$nav['usermenu'][] = Array($server_url . '/profile/' . $a->user['nickname'], t('Status'), "", t('Your posts and conversations'));
@@ -271,7 +273,7 @@ function frio_remote_nav($a,&$nav) {
  * @param App $a The app data @TODO Unused
  * @param array $results The array with the originals from acl_lookup()
  */
-function frio_acl_lookup($a, &$results) {
+function frio_acl_lookup(App $a, &$results) {
 	require_once("mod/contacts.php");
 
 	$nets = ((x($_GET,"nets")) ? notags(trim($_GET["nets"])) : "");

@@ -10,13 +10,15 @@
  * Screenshot: <a href="screenshot.png">Screenshot</a>
  */
 
+use Friendica\App;
+
 function smoothly_init(App $a) {
 	set_template_engine($a, 'smarty3');
 
 	$cssFile = null;
 	$ssl_state = null;
 	$baseurl = App::get_baseurl($ssl_state);
-$a->page['htmlhead'] .= <<< EOT
+	$a->page['htmlhead'] .= <<< EOT
 
 <script>
 function insertFormatting(BBcode, id) {
@@ -99,13 +101,12 @@ $(document).ready(function() {
 </script>
 EOT;
 
-    	/** custom css **/
+	/** custom css **/
 	if (!is_null($cssFile)) {
         $a->page['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
 	}
 
-_js_in_foot();
-
+	_js_in_foot();
 }
 
 if (! function_exists('_js_in_foot')) {

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/api.php');
 
 function oauth_get_client($request){
@@ -105,8 +107,6 @@ function api_content(App $a) {
 			'$yes'	=> t('Yes'),
 			'$no'	=> t('No'),
 		));
-
-		//echo "<pre>"; var_dump($app); killme();
 
 		return $o;
 	}

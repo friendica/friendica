@@ -1,4 +1,8 @@
 <?php
+
+use Friendica\App;
+use Friendica\Core\Config;
+
 require_once('include/security.php');
 require_once('include/datetime.php');
 
@@ -19,7 +23,10 @@ if (isset($_COOKIE["Friendica"])) {
 			}
 
 			// Renew the cookie
-			new_cookie(604800, $r[0]);
+			// Expires after 7 days by default,
+			// can be set via system.auth_cookie_lifetime
+			$authcookiedays = Config::get('system', 'auth_cookie_lifetime', 7);
+			new_cookie($authcookiedays*24*60*60, $r[0]);
 
 			// Do the authentification if not done by now
 			if (!isset($_SESSION) OR !isset($_SESSION['authenticated'])) {
@@ -125,6 +132,7 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 				$openid = new LightOpenID;
 				$openid->identity = $openid_url;
 				$_SESSION['openid'] = $openid_url;
+				$_SESSION['remember'] = $_POST['remember'];
 				$openid->returnUrl = App::get_baseurl(true).'/openid';
 				goaway($openid->authUrl());
 			} catch (Exception $e) {
@@ -178,17 +186,12 @@ if (isset($_SESSION) && x($_SESSION,'authenticated') && (!x($_POST,'auth-params'
 			goaway(z_root());
 		}
 
-		// If the user specified to remember the authentication, then set a cookie
-		// that expires after one week (the default is when the browser is closed).
-		// The cookie will be renewed automatically.
-		// The week ensures that sessions will expire after some inactivity.
-		if ($_POST['remember'])
-			new_cookie(604800, $r[0]);
-		else
+		if (! $_POST['remember']) {
 			new_cookie(0); // 0 means delete on browser exit
+		}
 
 		// if we haven't failed up this point, log them in.
-
+		$_SESSION['remember'] = $_POST['remember'];
 		$_SESSION['last_login_date'] = datetime_convert('UTC','UTC');
 		authenticate_success($record, true, true);
 	}
@@ -202,40 +205,4 @@ function nuke_session() {
 	new_cookie(-3600); // make sure cookie is deleted on browser close, as a security measure
 	session_unset();
 	session_destroy();
-}
-
-/**
- * @brief Calculate the hash that is needed for the "Friendica" cookie
- *
- * @param array $user Record from "user" table
- *
- * @return string Hashed data
- */
-function cookie_hash($user) {
-	return(hash("sha256", get_config("system", "site_prvkey").
-				$user["uprvkey"].
-				$user["password"]));
-}
-
-/**
- * @brief Set the "Friendica" cookie
- *
- * @param int $time
- * @param array $user Record from "user" table
- */
-function new_cookie($time, $user = array()) {
-
-	if ($time != 0)
-		$time = $time + time();
-
-	if ($user)
-		$value = json_encode(array("uid" => $user["uid"],
-					"hash" => cookie_hash($user),
-					"ip" => $_SERVER['REMOTE_ADDR']));
-	else
-		$value = "";
-
-	setcookie("Friendica", $value, $time, "/", "",
-		(get_config('system', 'ssl_policy') == SSL_POLICY_FULL), true);
-
 }

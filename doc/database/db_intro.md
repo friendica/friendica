@@ -11,7 +11,7 @@ Table intro
 | duplex     |                  | tinyint(1)       | NO   |     | 0                   |                |
 | note       |                  | text             | NO   |     | NULL                |                |
 | hash       |                  | varchar(255)     | NO   |     |                     |                |
-| datetime   |                  | datetime         | NO   |     | 0000-00-00 00:00:00 |                |
+| datetime   |                  | datetime         | NO   |     | 0001-01-01 00:00:00 |                |
 | blocked    |                  | tinyint(1)       | NO   |     | 1                   |                |
 | ignore     |                  | tinyint(1)       | NO   |     | 0                   |                |
 

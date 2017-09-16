@@ -154,7 +154,7 @@ function removelinebreak($message)
 	$lines = array();
 	$lineno = 0;
 
-	foreach($arrbody as $i => $line) {
+	foreach ($arrbody as $i => $line) {
 		$currquotelevel = 0;
 		$currline = $line;
 		while ((strlen($currline)>0) and ((substr($currline, 0, 1) == '>')
@@ -187,7 +187,7 @@ function removelinebreak($message)
 				(substr(trim($nextline), 0, 7) == 'http://') or
 				(substr(trim($nextline), 0, 8) == 'https://'));
 
-		if (!$specialchars) 
+		if (!$specialchars)
 			$specialchars = ((substr(rtrim($line), -1) == '-') or
 					(substr(rtrim($line), -1) == '=') or
 					(substr(rtrim($line), -1) == '*') or
@@ -222,4 +222,3 @@ function removelinebreak($message)
 	return(implode("\n", $lines));
 
 }
-?>

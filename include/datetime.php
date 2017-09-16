@@ -4,7 +4,7 @@
  * @brief Some functions for date and time related tasks.
  */
 
-use \Friendica\Core\Config;
+use Friendica\Core\Config;
 
 /**
  * @brief Two-level sort for timezones.
@@ -14,20 +14,27 @@ use \Friendica\Core\Config;
  * @return int
  */
 function timezone_cmp($a, $b) {
-	if(strstr($a,'/') && strstr($b,'/')) {
-		if ( t($a) == t($b)) return 0;
+	if (strstr($a, '/') && strstr($b, '/')) {
+		if ( t($a) == t($b)) {
+			return 0;
+		}
 		return ( t($a) < t($b)) ? -1 : 1;
 	}
-	if(strstr($a,'/')) return -1;
-	if(strstr($b,'/')) return  1;
-	if ( t($a) == t($b)) return 0;
+
+	if (strstr($a, '/')) {
+		return -1;
+	} elseif (strstr($b, '/')) {
+		return  1;
+	} elseif ( t($a) == t($b)) {
+		return 0;
+	}
 
 	return ( t($a) < t($b)) ? -1 : 1;
 }
 
 /**
  * @brief Emit a timezone selector grouped (primarily) by continent
- * 
+ *
  * @param string $current Timezone
  * @return string Parsed HTML output
  */
@@ -39,23 +46,24 @@ function select_timezone($current = 'America/Los_Angeles') {
 
 	usort($timezone_identifiers, 'timezone_cmp');
 	$continent = '';
-	foreach($timezone_identifiers as $value) {
+	foreach ($timezone_identifiers as $value) {
 		$ex = explode("/", $value);
-		if(count($ex) > 1) {
-			if($ex[0] != $continent) {
-				if($continent != '')
+		if (count($ex) > 1) {
+			if ($ex[0] != $continent) {
+				if ($continent != '') {
 					$o .= '</optgroup>';
+				}
 				$continent = $ex[0];
 				$o .= '<optgroup label="' . t($continent) . '">';
 			}
-			if(count($ex) > 2)
+			if (count($ex) > 2) {
 				$city = substr($value,strpos($value,'/')+1);
-			else
+			} else {
 				$city = $ex[1];
-		}
-		else {
+			}
+		} else {
 			$city = $ex[0];
-			if($continent != t('Miscellaneous')) {
+			if ($continent != t('Miscellaneous')) {
 				$o .= '</optgroup>';
 				$continent = t('Miscellaneous');
 				$o .= '<optgroup label="' . t($continent) . '">';
@@ -73,17 +81,17 @@ function select_timezone($current = 'America/Los_Angeles') {
 
 /**
  * @brief Generating a Timezone selector
- * 
+ *
  * Return a select using 'field_select_raw' template, with timezones
  * groupped (primarily) by continent
  * arguments follow convetion as other field_* template array:
  * 'name', 'label', $value, 'help'
- * 
+ *
  * @param string $name Name of the selector
  * @param string $label Label for the selector
  * @param string $current Timezone
  * @param string $help Help text
- * 
+ *
  * @return string Parsed HTML
  */
 function field_timezone($name='timezone', $label='', $current = 'America/Los_Angeles', $help){
@@ -106,7 +114,7 @@ function field_timezone($name='timezone', $label='', $current = 'America/Los_Ang
  * @param string $s Some parseable date/time string
  * @param string $fmt Output format recognised from php's DateTime class
  *   http://www.php.net/manual/en/datetime.format.php
- * 
+ *
  * @return string Formatted date according to given format
  */
 function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d H:i:s") {
@@ -114,48 +122,50 @@ function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d 
 	// Defaults to UTC if nothing is set, but throws an exception if set to empty string.
 	// Provide some sane defaults regardless.
 
-	if($from === '')
+	if ($from === '') {
 		$from = 'UTC';
-	if($to === '')
+	}
+	if ($to === '') {
 		$to = 'UTC';
-	if( ($s === '') || (! is_string($s)) )
+	}
+	if ( ($s === '') || (! is_string($s)) ) {
 		$s = 'now';
+	}
 
-	// Slight hackish adjustment so that 'zero' datetime actually returns what is intended
-	// otherwise we end up with -0001-11-30 ...
-	// add 32 days so that we at least get year 00, and then hack around the fact that
-	// months and days always start with 1.
+	/*
+	 * Slight hackish adjustment so that 'zero' datetime actually returns what is intended
+	 * otherwise we end up with -0001-11-30 ...
+	 * add 32 days so that we at least get year 00, and then hack around the fact that
+	 * months and days always start with 1.
+	 */
 
-	if(substr($s,0,10) == '0000-00-00') {
+	if (substr($s,0,10) <= '0001-01-01') {
 		$d = new DateTime($s . ' + 32 days', new DateTimeZone('UTC'));
 		return str_replace('1','0',$d->format($fmt));
 	}
 
 	try {
 		$from_obj = new DateTimeZone($from);
-	}
-	catch(Exception $e) {
+	} catch (Exception $e) {
 		$from_obj = new DateTimeZone('UTC');
 	}
 
 	try {
 		$d = new DateTime($s, $from_obj);
-	}
-	catch(Exception $e) {
+	} catch (Exception $e) {
 		logger('datetime_convert: exception: ' . $e->getMessage());
 		$d = new DateTime('now', $from_obj);
 	}
 
 	try {
 		$to_obj = new DateTimeZone($to);
-	}
-	catch(Exception $e) {
+	} catch (Exception $e) {
 		$to_obj = new DateTimeZone('UTC');
 	}
 
 	$d->setTimeZone($to_obj);
 
-	return($d->format($fmt));
+	return $d->format($fmt);
 }
 
 
@@ -168,13 +178,15 @@ function datetime_convert($from = 'UTC', $to = 'UTC', $s = 'now', $fmt = "Y-m-d 
 function dob($dob) {
 	list($year,$month,$day) = sscanf($dob,'%4d-%2d-%2d');
 
-	$f = get_config('system','birthday_input_format');
-	if(! $f)
+	$f = get_config('system', 'birthday_input_format');
+	if (! $f) {
 		$f = 'ymd';
-	if($dob === '0000-00-00')
+	}
+	if ($dob <= '0001-01-01') {
 		$value = '';
-	else
+	} else {
 		$value = (($year) ? datetime_convert('UTC','UTC',$dob,'Y-m-d') : datetime_convert('UTC','UTC',$dob,'m-d'));
+	}
 
 	$age = ((intval($value)) ? age($value, $a->user["timezone"], $a->user["timezone"]) : "");
 
@@ -189,8 +201,9 @@ function dob($dob) {
 		)
 	));
 
-//	if ($dob && $dob != '0000-00-00')
-//		$o = datesel($f,mktime(0,0,0,0,0,1900),mktime(),mktime(0,0,0,$month,$day,$year),'dob');
+	/// @TODO Old-lost code?
+//	if ($dob && $dob > '0001-01-01')
+//		$o = datesel($f,mktime(0,0,0,0,0,1900),mktime(),mktime(0,0,0,$month,$day,$year), 'dob');
 //	else
 //		$o = datesel($f,mktime(0,0,0,0,0,1900),mktime(),false,'dob');
 
@@ -199,7 +212,7 @@ function dob($dob) {
 
 /**
  * @brief Returns a date selector
- * 
+ *
  * @param string $format
  *  Format string, e.g. 'ymd' or 'mdy'. Not currently supported
  * @param string $min
@@ -210,16 +223,16 @@ function dob($dob) {
  *  Unix timestamp of default date
  * @param string $id
  *  ID and name of datetimepicker (defaults to "datetimepicker")
- * 
+ *
  * @return string Parsed HTML output.
  */
 function datesel($format, $min, $max, $default, $id = 'datepicker') {
-	return datetimesel($format,$min,$max,$default,'',$id,true,false, '','');
+	return datetimesel($format, $min, $max, $default, '', $id, true, false, '', '');
 }
 
 /**
  * @brief Returns a time selector
- * 
+ *
  * @param string $format
  *  Format string, e.g. 'ymd' or 'mdy'. Not currently supported
  * @param $h
@@ -228,11 +241,11 @@ function datesel($format, $min, $max, $default, $id = 'datepicker') {
  *  Already selected minute
  * @param string $id
  *  ID and name of datetimepicker (defaults to "timepicker")
- * 
+ *
  * @return string Parsed HTML output.
  */
-function timesel($format, $h, $m, $id='timepicker') {
-	return datetimesel($format,new DateTime(),new DateTime(),new DateTime("$h:$m"),'',$id,false,true);
+function timesel($format, $h, $m, $id = 'timepicker') {
+	return datetimesel($format, new DateTime(), new DateTime(), new DateTime("$h:$m"), '', $id, false, true);
 }
 
 /**
@@ -257,7 +270,7 @@ function timesel($format, $h, $m, $id='timepicker') {
  * @param $maxfrom
  *  set maximum date from picker with id $maxfrom (none by default)
  * @param bool $required default false
- * 
+ *
  * @return string Parsed HTML output.
  *
  * @todo Once browser support is better this could probably be replaced with
@@ -266,8 +279,10 @@ function timesel($format, $h, $m, $id='timepicker') {
 function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicker', $pickdate = true, $picktime = true, $minfrom = '', $maxfrom = '', $required = false) {
 
 	// First day of the week (0 = Sunday)
-	$firstDay = get_pconfig(local_user(),'system','first_day_of_week');
-	if ($firstDay === false) $firstDay=0;
+	$firstDay = get_pconfig(local_user(), 'system', 'first_day_of_week');
+	if ($firstDay === false) {
+		$firstDay=0;
+	}
 
 	$lang = substr(get_browser_language(), 0, 2);
 
@@ -279,9 +294,15 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 	$o = '';
 	$dateformat = '';
 
-	if($pickdate) $dateformat .= 'Y-m-d';
-	if($pickdate && $picktime) $dateformat .= ' ';
-	if($picktime) $dateformat .= 'H:i';
+	if ($pickdate) {
+		$dateformat .= 'Y-m-d';
+	}
+	if ($pickdate && $picktime) {
+		$dateformat .= ' ';
+	}
+	if ($picktime) {
+		$dateformat .= 'H:i';
+	}
 
 	$minjs = $min ? ",minDate: new Date({$min->getTimestamp()}*1000), yearStart: " . $min->format('Y') : '';
 	$maxjs = $max ? ",maxDate: new Date({$max->getTimestamp()}*1000), yearEnd: " . $max->format('Y') : '';
@@ -290,15 +311,21 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 	$defaultdatejs = $default ? ",defaultDate: new Date({$default->getTimestamp()}*1000)" : '';
 
 	$pickers = '';
-	if(!$pickdate) $pickers .= ',datepicker: false';
-	if(!$picktime) $pickers .= ',timepicker: false';
+	if (!$pickdate) {
+		$pickers .= ', datepicker: false';
+	}
+	if (!$picktime) {
+		$pickers .= ',timepicker: false';
+	}
 
 	$extra_js = '';
-	$pickers .= ",dayOfWeekStart: ".$firstDay.",lang:'".$lang."'";
-	if($minfrom != '')
+	$pickers .= ",dayOfWeekStart: " . $firstDay . ",lang:'" . $lang . "'";
+	if ($minfrom != '') {
 		$extra_js .= "\$('#id_$minfrom').data('xdsoft_datetimepicker').setOptions({onChangeDateTime: function (currentDateTime) { \$('#id_$id').data('xdsoft_datetimepicker').setOptions({minDate: currentDateTime})}})";
-	if($maxfrom != '')
+	}
+	if ($maxfrom != '') {
 		$extra_js .= "\$('#id_$maxfrom').data('xdsoft_datetimepicker').setOptions({onChangeDateTime: function (currentDateTime) { \$('#id_$id').data('xdsoft_datetimepicker').setOptions({maxDate: currentDateTime})}})";
+	}
 
 	$readable_format = $dateformat;
 	$readable_format = str_replace('Y','yyyy',$readable_format);
@@ -308,7 +335,7 @@ function datetimesel($format, $min, $max, $default, $label, $id = 'datetimepicke
 	$readable_format = str_replace('i','MM',$readable_format);
 
 	$tpl = get_markup_template('field_input.tpl');
-	$o .= replace_macros($tpl,array(
+	$o .= replace_macros($tpl, array(
 			'$field' => array($id, $label, $input_text, '', (($required) ? '*' : ''), 'placeholder="' . $readable_format . '"'),
 		));
 
@@ -339,7 +366,7 @@ function relative_date($posted_date, $format = null) {
 
 	$abs = strtotime($localtime);
 
-	if (is_null($posted_date) || $posted_date === '0000-00-00 00:00:00' || $abs === False) {
+	if (is_null($posted_date) || $posted_date <= NULL_DATE || $abs === False) {
 		 return t('never');
 	}
 
@@ -390,25 +417,29 @@ function relative_date($posted_date, $format = null) {
  * @param string $dob Date of Birth
  * @param string $owner_tz (optional) Timezone of the person of interest
  * @param string $viewer_tz (optional) Timezone of the person viewing
- * 
+ *
  * @return int Age in years
  */
-function age($dob,$owner_tz = '',$viewer_tz = '') {
-	if(! intval($dob))
+function age($dob, $owner_tz = '', $viewer_tz = '') {
+	if (! intval($dob)) {
 		return 0;
-	if(! $owner_tz)
+	}
+	if (! $owner_tz) {
 		$owner_tz = date_default_timezone_get();
-	if(! $viewer_tz)
+	}
+	if (! $viewer_tz) {
 		$viewer_tz = date_default_timezone_get();
+	}
 
-	$birthdate = datetime_convert('UTC',$owner_tz,$dob . ' 00:00:00+00:00','Y-m-d');
-	list($year,$month,$day) = explode("-",$birthdate);
-	$year_diff  = datetime_convert('UTC',$viewer_tz,'now','Y') - $year;
-	$curr_month = datetime_convert('UTC',$viewer_tz,'now','m');
-	$curr_day   = datetime_convert('UTC',$viewer_tz,'now','d');
+	$birthdate = datetime_convert('UTC', $owner_tz,$dob . ' 00:00:00+00:00','Y-m-d');
+	list($year, $month, $day) = explode("-", $birthdate);
+	$year_diff  = datetime_convert('UTC',$viewer_tz, 'now', 'Y') - $year;
+	$curr_month = datetime_convert('UTC',$viewer_tz, 'now', 'm');
+	$curr_day   = datetime_convert('UTC',$viewer_tz, 'now', 'd');
 
-	if(($curr_month < $month) || (($curr_month == $month) && ($curr_day < $day)))
+	if (($curr_month < $month) || (($curr_month == $month) && ($curr_day < $day))) {
 		$year_diff--;
+	}
 
 	return $year_diff;
 }
@@ -421,20 +452,20 @@ function age($dob,$owner_tz = '',$viewer_tz = '') {
  *
  * @param int $y Year
  * @param int $m Month (1=January, 12=December)
- * 
+ *
  * @return int Number of days in the given month
  */
-function get_dim($y,$m) {
+function get_dim($y, $m) {
 
 	$dim = array( 0,
 		31, 28, 31, 30, 31, 30,
 		31, 31, 30, 31, 30, 31);
 
-	if($m != 2)
+	if ($m != 2) {
 		return $dim[$m];
-
-	if(((($y % 4) == 0) && (($y % 100) != 0)) || (($y % 400) == 0))
+	} elseif (((($y % 4) == 0) && (($y % 100) != 0)) || (($y % 400) == 0)) {
 		return 29;
+	}
 
 	return $dim[2];
 }
@@ -446,7 +477,7 @@ function get_dim($y,$m) {
  *
  * @param int $y Year
  * @param int $m Month (1=January, 12=December)
- * 
+ *
  * @return string day 0 = Sunday through 6 = Saturday
  */
 function get_first_dim($y,$m) {
@@ -467,29 +498,29 @@ function get_first_dim($y,$m) {
  * @param int $m Month
  * @param bool $links (default false)
  * @param string $class
- * 
+ *
  * @return string
  *
  * @todo Provide (prev,next) links, define class variations for different size calendars
  */
 function cal($y = 0,$m = 0, $links = false, $class='') {
-
-
 	// month table - start at 1 to match human usage.
 
 	$mtab = array(' ',
-		'January','February','March',
-		'April','May','June',
-		'July','August','September',
-		'October','November','December'
+		'January', 'February', 'March',
+		'April'  , 'May'     , 'June',
+		'July'   , 'August'  , 'September',
+		'October', 'November', 'December'
 	);
 
-	$thisyear = datetime_convert('UTC',date_default_timezone_get(),'now','Y');
-	$thismonth = datetime_convert('UTC',date_default_timezone_get(),'now','m');
-	if(! $y)
+	$thisyear = datetime_convert('UTC', date_default_timezone_get(), 'now','Y');
+	$thismonth = datetime_convert('UTC', date_default_timezone_get(), 'now','m');
+	if (! $y) {
 		$y = $thisyear;
-	if(! $m)
+	}
+	if (! $m) {
 		$m = intval($thismonth);
+	}
 
 	$dn = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
 	$f = get_first_dim($y,$m);
@@ -498,29 +529,33 @@ function cal($y = 0,$m = 0, $links = false, $class='') {
 	$dow = 0;
 	$started = false;
 
-	if(($y == $thisyear) && ($m == $thismonth))
-		$tddate = intval(datetime_convert('UTC',date_default_timezone_get(),'now','j'));
+	if (($y == $thisyear) && ($m == $thismonth)) {
+		$tddate = intval(datetime_convert('UTC', date_default_timezone_get(), 'now', 'j'));
+	}
 
 	$str_month = day_translate($mtab[$m]);
 	$o = '<table class="calendar' . $class . '">';
 	$o .= "<caption>$str_month $y</caption><tr>";
-	for($a = 0; $a < 7; $a ++)
-		$o .= '<th>' . mb_substr(day_translate($dn[$a]),0,3,'UTF-8') . '</th>';
+	for ($a = 0; $a < 7; $a ++) {
+		$o .= '<th>' . mb_substr(day_translate($dn[$a]), 0, 3, 'UTF-8') . '</th>';
+	}
 
 	$o .= '</tr><tr>';
 
-	while($d <= $l) {
-		if(($dow == $f) && (! $started))
+	while ($d <= $l) {
+		if (($dow == $f) && (! $started)) {
 			$started = true;
+		}
 
 		$today = (((isset($tddate)) && ($tddate == $d)) ? "class=\"today\" " : '');
 		$o .= "<td $today>";
-		$day = str_replace(' ','&nbsp;',sprintf('%2.2d', $d));
-		if($started) {
-			if(is_array($links) && isset($links[$d]))
+		$day = str_replace(' ', '&nbsp;', sprintf('%2.2d', $d));
+		if ($started) {
+			if (is_array($links) && isset($links[$d])) {
 				$o .=  "<a href=\"{$links[$d]}\">$day</a>";
-			else
+			} else {
 				$o .= $day;
+			}
 
 			$d ++;
 		} else {
@@ -529,14 +564,16 @@ function cal($y = 0,$m = 0, $links = false, $class='') {
 
 		$o .= '</td>';
 		$dow ++;
-		if(($dow == 7) && ($d <= $l)) {
+		if (($dow == 7) && ($d <= $l)) {
 			$dow = 0;
 			$o .= '</tr><tr>';
 		}
 	}
-	if($dow)
-		for($a = $dow; $a < 7; $a ++)
+	if ($dow) {
+		for ($a = $dow; $a < 7; $a ++) {
 			$o .= '<td>&nbsp;</td>';
+		}
+	}
 
 	$o .= '</tr></table>'."\r\n";
 
@@ -553,22 +590,20 @@ function update_contact_birthdays() {
 	// This only handles foreign or alien networks where a birthday has been provided.
 	// In-network birthdays are handled within local_delivery
 
-	$r = q("SELECT * FROM contact WHERE `bd` != '' AND `bd` != '0000-00-00' AND SUBSTRING(`bd`,1,4) != `bdyear` ");
+	$r = q("SELECT * FROM `contact` WHERE `bd` != '' AND `bd` > '0001-01-01' AND SUBSTRING(`bd`, 1, 4) != `bdyear` ");
 	if (dbm::is_result($r)) {
 		foreach ($r as $rr) {
 
 			logger('update_contact_birthday: ' . $rr['bd']);
 
-			$nextbd = datetime_convert('UTC','UTC','now','Y') . substr($rr['bd'],4);
+			$nextbd = datetime_convert('UTC','UTC','now','Y') . substr($rr['bd'], 4);
 
-			/**
-			 *
+			/*
 			 * Add new birthday event for this person
 			 *
 			 * $bdtext is just a readable placeholder in case the event is shared
 			 * with others. We will replace it during presentation to our $importer
 			 * to contain a sparkle link and perhaps a photo.
-			 *
 			 */
 
 			// Check for duplicates
@@ -601,7 +636,6 @@ function update_contact_birthdays() {
 
 
 			// update bdyear
-
 			q("UPDATE `contact` SET `bdyear` = '%s', `bd` = '%s' WHERE `uid` = %d AND `id` = %d",
 				dbesc(substr($nextbd,0,4)),
 				dbesc($nextbd),

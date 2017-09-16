@@ -6,12 +6,10 @@ If you are the admin of a Friendica node, you have access to the so called **Adm
 
 On the front page of the admin panel you will see a summary of information about your node.
 These information include the amount of messages currently being processed in the queues.
-The first number is the number of messages being actively sent.
-This number should decrease quickly.
-The second is the messages which could for various reasons not being delivered.
+The first number is the number of messages which could not been delivered for various reasons.
 They will be resend later.
 You can have a quick glance into that second queus in the "Inspect Queue" section of the admin panel.
-If you have activated the background workers, there is a third number representing the count of jobs queued for the workers.
+The second number represents the current number of jobs for the background workers.
 These worker tasks are prioritised and are done accordingly.
 
 Then you get an overview of the accounts on your node, which can be moderated in the "Users" section of the panel.
@@ -132,8 +130,11 @@ By default, any (valid) email address is allowed in registrations.
 
 #### Allow Users to set remote_self
 
-If you enable the `Allow Users to set remote_self` users can select Atom feeds from their contact list being their *remote self* in die advanced contact settings.
+If you enable the `Allow Users to set remote_self` users can select Atom feeds from their contact list being their *remote self* in the advanced contact settings.
 Which means that postings by the remote self are automatically reposted by Friendica in their names.
+
+This feature can be used to let the user mirror e.g. blog postings into their Friendica postings.
+It is disabled by default, as it causes additional load on the server and may be misused to distribute SPAM.
 
 As admin of the node you can also set this flag directly in the database.
 Before doing so, you should be sure you know what you do and have a backup of the database.
@@ -152,13 +153,6 @@ Value is in seconds.
 Default is 60 seconds.
 Set to 0 for unlimited (not recommended).
 
-#### UTF-8 Regular Expressions
-
-During registrations, full names are checked using UTF-8 regular expressions.
-This requires PHP to have been compiled with a special setting to allow UTF-8 expressions.
-If you are completely unable to register accounts, set no_utf to true.
-The default is set to false (meaning UTF8 regular expressions are supported and working).
-
 #### Verify SSL Certitificates
 
 By default Friendica allows SSL communication between websites that have "self-signed" SSL certificates.
@@ -175,6 +169,19 @@ This will mean you cannot connect (at all) to self-signed SSL sites.
 ### Performance
 
 ### Worker
+
+This section allows you to configure the background process that is triggered by the `cron` job that was created during the installation.
+The process does check the available system resources before creating a new worker for a task.
+Because of this, it may happen that the maximum number of worker processes you allow will not be reached.
+
+If your server setup does not allow you to use the `proc_open` function of PHP, please disable it in this section.
+
+The tasks for the background process have priorities.
+To guarantee that important tasks are executed even though the system has a lot of work to do, it is useful to enable the *fastlane*.
+
+Should you not be able to run a cron job on your server, you can also activate the *frontend* worker.
+If you have done so, you can call `example.com/worker` (replace example.com with your actual domain name) on a regular basis from an external servie.
+This will then trigger the execution of the background process.
 
 ### Relocate
 
@@ -205,7 +212,7 @@ To simplify this process there is a button at the top of the page to reload all 
 ## Themes
 
 The Themes section of the admin panel works similar to the Plugins section but let you control the themes on your Friendica node.
-Each theme has a dedicated suppage showing the current status, some information about the theme and a screen-shot of the Friendica interface using the theme.
+Each theme has a dedicated subpage showing the current status, some information about the theme and a screen-shot of the Friendica interface using the theme.
 Should the theme offer special settings, admins can set a global default value here.
 
 You can activate and deactivate themes on their dedicated sub-pages thus making them available for the users of the node.
@@ -234,6 +241,12 @@ The receiving end might be off-line, there might be a high system load and so on
 
 Don't panic!
 Friendica will not queue messages for all time but will sort out *dead* nodes automatically after a while and remove messages from the queue then.
+
+## Server Blocklist
+
+This page allows to block all communications (inbound and outbound) with a specific domain name.
+Each blocked domain entry requires a reason that will be displayed on the [friendica](/friendica) page.
+Matching is exact, blocking a domain doesn't block subdomains.
 
 ## Federation Statistics
 

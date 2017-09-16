@@ -36,20 +36,25 @@ Friendica Documentation and Resources
 
 **Developer Manual**
 
-* [Where to get started?](help/Developers-Intro)
-* [Help on Github](help/Github)
-* [Help on Vagrant](help/Vagrant)
-* [How to translate Friendica](help/translations)
-* [Bugs and Issues](help/Bugs-and-Issues)
-* [Plugin Development](help/Plugins)
-* [Theme Development](help/themes)
-* [Smarty 3 Templates](help/smarty3-templates)
-* [Protocol Documentation](help/Protocol)
-* [Database schema documantation](help/database)
-* [Class Autoloading](help/autoloader)
-* [Code - Reference(Doxygen generated - sets cookies)](doc/html/)
-* [Twitter/GNU Social API Functions](help/api)
-
+* [Get started](help/Developers-Intro)
+* Set up development environment
+	* [Help on Github](help/Github)
+	* [Help on Vagrant](help/Vagrant)
+	* [Bugs and Issues](help/Bugs-and-Issues)
+* Code structure
+	* [Plugin Development](help/Plugins)
+	* [Theme Development](help/themes)
+	* [Smarty 3 Templates](help/smarty3-templates)
+* How To
+	* [Translate Friendica](help/translations)
+	* [Use Composer](help/Composer)
+	* [Move classes to `src`](help/Developer-How-To-Move-Classes-to-src)
+* Reference
+	* [Twitter/GNU Social API Functions](help/api)
+	* [Code (Doxygen generated - sets cookies)](doc/html/)
+	* [Protocol Documentation](help/Protocol)
+	* [Database schema documantation](help/database)
+	* [Class Autoloading](help/autoloader)
 
 **External Resources**
 

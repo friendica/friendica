@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 3.5.1-rc (Asparagus)
--- DB_UPDATE_VERSION 1215
+-- Friendica 3.5.2-rc (Asparagus)
+-- DB_UPDATE_VERSION 1227
 -- ------------------------------------------
 
 
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `addon` (
 	`plugin_admin` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `name` (`name`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE attach
@@ -30,14 +30,14 @@ CREATE TABLE IF NOT EXISTS `attach` (
 	`filetype` varchar(64) NOT NULL DEFAULT '',
 	`filesize` int(11) NOT NULL DEFAULT 0,
 	`data` longblob NOT NULL,
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`edited` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`allow_cid` mediumtext,
 	`allow_gid` mediumtext,
 	`deny_cid` mediumtext,
 	`deny_gid` mediumtext,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE auth_codes
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `auth_codes` (
 	`expires` int(11) NOT NULL DEFAULT 0,
 	`scope` varchar(250) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE cache
@@ -58,10 +58,10 @@ CREATE TABLE IF NOT EXISTS `cache` (
 	`k` varbinary(255) NOT NULL,
 	`v` mediumtext,
 	`expire_mode` int(11) NOT NULL DEFAULT 0,
-	`updated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`k`),
 	 INDEX `expire_mode_updated` (`expire_mode`,`updated`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE challenge
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `challenge` (
 	`type` varchar(255) NOT NULL DEFAULT '',
 	`last_update` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE clients
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `clients` (
 	`icon` text,
 	`uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`client_id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE config
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `config` (
 	`v` mediumtext,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `cat_k` (`cat`,`k`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE contact
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `config` (
 CREATE TABLE IF NOT EXISTS `contact` (
 	`id` int(11) NOT NULL auto_increment,
 	`uid` int(11) NOT NULL DEFAULT 0,
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`self` tinyint(1) NOT NULL DEFAULT 0,
 	`remote_self` tinyint(1) NOT NULL DEFAULT 0,
 	`rel` tinyint(1) NOT NULL DEFAULT 0,
@@ -145,21 +145,21 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`usehub` tinyint(1) NOT NULL DEFAULT 0,
 	`subhub` tinyint(1) NOT NULL DEFAULT 0,
 	`hub-verify` varchar(255) NOT NULL DEFAULT '',
-	`last-update` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`success_update` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`failure_update` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`name-date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`uri-date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`avatar-date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`term-date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`last-item` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`last-update` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`success_update` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`failure_update` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`name-date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`uri-date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`avatar-date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`term-date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`last-item` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`priority` tinyint(3) NOT NULL DEFAULT 0,
 	`blocked` tinyint(1) NOT NULL DEFAULT 1,
 	`readonly` tinyint(1) NOT NULL DEFAULT 0,
 	`writable` tinyint(1) NOT NULL DEFAULT 0,
 	`forum` tinyint(1) NOT NULL DEFAULT 0,
 	`prv` tinyint(1) NOT NULL DEFAULT 0,
-	`contact-type` int(11) unsigned NOT NULL DEFAULT 0,
+	`contact-type` int(11) NOT NULL DEFAULT 0,
 	`hidden` tinyint(1) NOT NULL DEFAULT 0,
 	`archive` tinyint(1) NOT NULL DEFAULT 0,
 	`pending` tinyint(1) NOT NULL DEFAULT 1,
@@ -169,52 +169,55 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`info` mediumtext,
 	`profile-id` int(11) NOT NULL DEFAULT 0,
 	`bdyear` varchar(4) NOT NULL DEFAULT '',
-	`bd` date NOT NULL DEFAULT '0000-00-00',
+	`bd` date NOT NULL DEFAULT '0001-01-01',
 	`notify_new_posts` tinyint(1) NOT NULL DEFAULT 0,
 	`fetch_further_information` tinyint(1) NOT NULL DEFAULT 0,
 	`ffi_keyword_blacklist` text,
 	 PRIMARY KEY(`id`),
-	 INDEX `uid_name` (`uid`,`name`),
+	 INDEX `uid_name` (`uid`,`name`(190)),
 	 INDEX `self_uid` (`self`,`uid`),
 	 INDEX `alias_uid` (`alias`(32),`uid`),
 	 INDEX `pending_uid` (`pending`,`uid`),
 	 INDEX `blocked_uid` (`blocked`,`uid`),
-	 INDEX `uid_rel_network_poll` (`uid`,`rel`,`network`,`poll`(64),`archive`),
-	 INDEX `uid_network_batch` (`uid`,`network`,`batch`(64)),
+	 INDEX `uid_rel_network_poll` (`uid`,`rel`,`network`(4),`poll`(64),`archive`),
+	 INDEX `uid_network_batch` (`uid`,`network`(4),`batch`(64)),
 	 INDEX `addr_uid` (`addr`(32),`uid`),
 	 INDEX `nurl_uid` (`nurl`(32),`uid`),
 	 INDEX `nick_uid` (`nick`(32),`uid`),
 	 INDEX `dfrn-id` (`dfrn-id`),
 	 INDEX `issued-id` (`issued-id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE conv
 --
 CREATE TABLE IF NOT EXISTS `conv` (
 	`id` int(10) unsigned NOT NULL auto_increment,
-	`guid` varchar(64) NOT NULL DEFAULT '',
+	`guid` varchar(255) NOT NULL DEFAULT '',
 	`recips` text,
 	`uid` int(11) NOT NULL DEFAULT 0,
 	`creator` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`updated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`subject` text,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
--- TABLE deliverq
+-- TABLE conversation
 --
-CREATE TABLE IF NOT EXISTS `deliverq` (
-	`id` int(10) unsigned NOT NULL auto_increment,
-	`cmd` varbinary(32) NOT NULL DEFAULT '',
-	`item` int(11) NOT NULL DEFAULT 0,
-	`contact` int(11) NOT NULL DEFAULT 0,
-	 PRIMARY KEY(`id`),
-	 UNIQUE INDEX `cmd_item_contact` (`cmd`,`item`,`contact`)
-) DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS `conversation` (
+	`item-uri` varbinary(255) NOT NULL,
+	`reply-to-uri` varbinary(255) NOT NULL DEFAULT '',
+	`conversation-uri` varbinary(255) NOT NULL DEFAULT '',
+	`conversation-href` varbinary(255) NOT NULL DEFAULT '',
+	`protocol` tinyint(1) unsigned NOT NULL DEFAULT 0,
+	`source` mediumtext,
+	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	 PRIMARY KEY(`item-uri`),
+	 INDEX `conversation-uri` (`conversation-uri`)
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE event
@@ -225,10 +228,10 @@ CREATE TABLE IF NOT EXISTS `event` (
 	`uid` int(11) NOT NULL DEFAULT 0,
 	`cid` int(11) NOT NULL DEFAULT 0,
 	`uri` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`edited` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`start` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`finish` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`start` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`finish` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`summary` text,
 	`desc` text,
 	`location` text,
@@ -242,7 +245,7 @@ CREATE TABLE IF NOT EXISTS `event` (
 	`deny_gid` mediumtext,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_start` (`uid`,`start`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE fcontact
@@ -264,11 +267,11 @@ CREATE TABLE IF NOT EXISTS `fcontact` (
 	`network` varchar(32) NOT NULL DEFAULT '',
 	`alias` varchar(255) NOT NULL DEFAULT '',
 	`pubkey` text,
-	`updated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `addr` (`addr`(32)),
-	 INDEX `url` (`url`)
-) DEFAULT CHARSET=utf8mb4;
+	 UNIQUE INDEX `url` (`url`(190))
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE ffinder
@@ -279,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `ffinder` (
 	`cid` int(10) unsigned NOT NULL DEFAULT 0,
 	`fid` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE fserver
@@ -291,7 +294,7 @@ CREATE TABLE IF NOT EXISTS `fserver` (
 	`key` text,
 	 PRIMARY KEY(`id`),
 	 INDEX `server` (`server`(32))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE fsuggest
@@ -305,9 +308,9 @@ CREATE TABLE IF NOT EXISTS `fsuggest` (
 	`request` varchar(255) NOT NULL DEFAULT '',
 	`photo` varchar(255) NOT NULL DEFAULT '',
 	`note` text,
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE gcign
@@ -319,7 +322,7 @@ CREATE TABLE IF NOT EXISTS `gcign` (
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `gcid` (`gcid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE gcontact
@@ -332,15 +335,15 @@ CREATE TABLE IF NOT EXISTS `gcontact` (
 	`nurl` varchar(255) NOT NULL DEFAULT '',
 	`photo` varchar(255) NOT NULL DEFAULT '',
 	`connect` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`updated` datetime DEFAULT '0000-00-00 00:00:00',
-	`last_contact` datetime DEFAULT '0000-00-00 00:00:00',
-	`last_failure` datetime DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`updated` datetime DEFAULT '0001-01-01 00:00:00',
+	`last_contact` datetime DEFAULT '0001-01-01 00:00:00',
+	`last_failure` datetime DEFAULT '0001-01-01 00:00:00',
 	`location` varchar(255) NOT NULL DEFAULT '',
 	`about` text,
 	`keywords` text,
 	`gender` varchar(32) NOT NULL DEFAULT '',
-	`birthday` varchar(32) NOT NULL DEFAULT '0000-00-00',
+	`birthday` varchar(32) NOT NULL DEFAULT '0001-01-01',
 	`community` tinyint(1) NOT NULL DEFAULT 0,
 	`contact-type` tinyint(1) NOT NULL DEFAULT -1,
 	`hide` tinyint(1) NOT NULL DEFAULT 0,
@@ -352,13 +355,13 @@ CREATE TABLE IF NOT EXISTS `gcontact` (
 	`generation` tinyint(3) NOT NULL DEFAULT 0,
 	`server_url` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
-	 INDEX `nurl` (`nurl`(64)),
+	 UNIQUE INDEX `nurl` (`nurl`(190)),
 	 INDEX `name` (`name`(64)),
 	 INDEX `nick` (`nick`(32)),
 	 INDEX `addr` (`addr`(64)),
-	 INDEX `hide_network_updated` (`hide`,`network`,`updated`),
+	 INDEX `hide_network_updated` (`hide`,`network`(4),`updated`),
 	 INDEX `updated` (`updated`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE glink
@@ -369,11 +372,11 @@ CREATE TABLE IF NOT EXISTS `glink` (
 	`uid` int(11) NOT NULL DEFAULT 0,
 	`gcid` int(11) NOT NULL DEFAULT 0,
 	`zcid` int(11) NOT NULL DEFAULT 0,
-	`updated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `cid_uid_gcid_zcid` (`cid`,`uid`,`gcid`,`zcid`),
 	 INDEX `gcid` (`gcid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE group
@@ -386,7 +389,7 @@ CREATE TABLE IF NOT EXISTS `group` (
 	`name` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE group_member
@@ -400,7 +403,7 @@ CREATE TABLE IF NOT EXISTS `group_member` (
 	 INDEX `contactid` (`contact-id`),
 	 INDEX `gid_contactid` (`gid`,`contact-id`),
 	 UNIQUE INDEX `uid_gid_contactid` (`uid`,`gid`,`contact-id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE gserver
@@ -417,13 +420,13 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`noscrape` varchar(255) NOT NULL DEFAULT '',
 	`network` varchar(32) NOT NULL DEFAULT '',
 	`platform` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`last_poco_query` datetime DEFAULT '0000-00-00 00:00:00',
-	`last_contact` datetime DEFAULT '0000-00-00 00:00:00',
-	`last_failure` datetime DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`last_poco_query` datetime DEFAULT '0001-01-01 00:00:00',
+	`last_contact` datetime DEFAULT '0001-01-01 00:00:00',
+	`last_failure` datetime DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
-	 INDEX `nurl` (`nurl`(32))
-) DEFAULT CHARSET=utf8mb4;
+	 UNIQUE INDEX `nurl` (`nurl`(190))
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE hook
@@ -436,7 +439,7 @@ CREATE TABLE IF NOT EXISTS `hook` (
 	`priority` int(11) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `hook_file_function` (`hook`(50),`file`(80),`function`(60))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE intro
@@ -450,11 +453,11 @@ CREATE TABLE IF NOT EXISTS `intro` (
 	`duplex` tinyint(1) NOT NULL DEFAULT 0,
 	`note` text,
 	`hash` varchar(255) NOT NULL DEFAULT '',
-	`datetime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`datetime` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`blocked` tinyint(1) NOT NULL DEFAULT 1,
 	`ignore` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE item
@@ -473,11 +476,11 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`parent-uri` varchar(255) NOT NULL DEFAULT '',
 	`extid` varchar(255) NOT NULL DEFAULT '',
 	`thr-parent` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`edited` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`commented` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`received` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`changed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`changed` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`owner-id` int(11) NOT NULL DEFAULT 0,
 	`owner-name` varchar(255) NOT NULL DEFAULT '',
 	`owner-link` varchar(255) NOT NULL DEFAULT '',
@@ -535,23 +538,24 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `uid_contactid_id` (`uid`,`contact-id`,`id`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_unseen_contactid` (`uid`,`unseen`,`contact-id`),
-	 INDEX `uid_network_received` (`uid`,`network`,`received`),
-	 INDEX `uid_network_commented` (`uid`,`network`,`commented`),
-	 INDEX `uid_thrparent` (`uid`,`thr-parent`),
-	 INDEX `uid_parenturi` (`uid`,`parent-uri`),
+	 INDEX `uid_network_received` (`uid`,`network`(4),`received`),
+	 INDEX `uid_network_commented` (`uid`,`network`(4),`commented`),
+	 INDEX `uid_thrparent` (`uid`,`thr-parent`(190)),
+	 INDEX `uid_parenturi` (`uid`,`parent-uri`(190)),
 	 INDEX `uid_contactid_created` (`uid`,`contact-id`,`created`),
 	 INDEX `authorid_created` (`author-id`,`created`),
-	 INDEX `uid_uri` (`uid`,`uri`),
+	 INDEX `ownerid` (`owner-id`),
+	 INDEX `uid_uri` (`uid`,`uri`(190)),
 	 INDEX `resource-id` (`resource-id`),
 	 INDEX `contactid_allowcid_allowpid_denycid_denygid` (`contact-id`,`allow_cid`(10),`allow_gid`(10),`deny_cid`(10),`deny_gid`(10)),
-	 INDEX `uid_type_changed` (`uid`,`type`,`changed`),
-	 INDEX `contactid_verb` (`contact-id`,`verb`),
+	 INDEX `uid_type_changed` (`uid`,`type`(190),`changed`),
+	 INDEX `contactid_verb` (`contact-id`,`verb`(190)),
 	 INDEX `deleted_changed` (`deleted`,`changed`),
 	 INDEX `uid_wall_changed` (`uid`,`wall`,`changed`),
 	 INDEX `uid_eventid` (`uid`,`event-id`),
-	 INDEX `uid_authorlink` (`uid`,`author-link`),
-	 INDEX `uid_ownerlink` (`uid`,`owner-link`)
-) DEFAULT CHARSET=utf8mb4;
+	 INDEX `uid_authorlink` (`uid`,`author-link`(190)),
+	 INDEX `uid_ownerlink` (`uid`,`owner-link`(190))
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE item_id
@@ -567,7 +571,7 @@ CREATE TABLE IF NOT EXISTS `item_id` (
 	 INDEX `sid` (`sid`),
 	 INDEX `service` (`service`(32)),
 	 INDEX `iid` (`iid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE locks
@@ -576,9 +580,9 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`id` int(11) NOT NULL auto_increment,
 	`name` varchar(128) NOT NULL DEFAULT '',
 	`locked` tinyint(1) NOT NULL DEFAULT 0,
-	`created` datetime DEFAULT '0000-00-00 00:00:00',
+	`created` datetime DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE mail
@@ -586,7 +590,7 @@ CREATE TABLE IF NOT EXISTS `locks` (
 CREATE TABLE IF NOT EXISTS `mail` (
 	`id` int(10) unsigned NOT NULL auto_increment,
 	`uid` int(10) unsigned NOT NULL DEFAULT 0,
-	`guid` varchar(64) NOT NULL DEFAULT '',
+	`guid` varchar(255) NOT NULL DEFAULT '',
 	`from-name` varchar(255) NOT NULL DEFAULT '',
 	`from-photo` varchar(255) NOT NULL DEFAULT '',
 	`from-url` varchar(255) NOT NULL DEFAULT '',
@@ -600,13 +604,14 @@ CREATE TABLE IF NOT EXISTS `mail` (
 	`unknown` tinyint(1) NOT NULL DEFAULT 0,
 	`uri` varchar(255) NOT NULL DEFAULT '',
 	`parent-uri` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_seen` (`uid`,`seen`),
 	 INDEX `convid` (`convid`),
 	 INDEX `uri` (`uri`(64)),
-	 INDEX `parent-uri` (`parent-uri`(64))
-) DEFAULT CHARSET=utf8mb4;
+	 INDEX `parent-uri` (`parent-uri`(64)),
+	 INDEX `contactid` (`contact-id`)
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE mailacct
@@ -624,9 +629,9 @@ CREATE TABLE IF NOT EXISTS `mailacct` (
 	`action` int(11) NOT NULL DEFAULT 0,
 	`movetofolder` varchar(255) NOT NULL DEFAULT '',
 	`pubmail` tinyint(1) NOT NULL DEFAULT 0,
-	`last_check` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`last_check` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE manage
@@ -637,7 +642,7 @@ CREATE TABLE IF NOT EXISTS `manage` (
 	`mid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_mid` (`uid`,`mid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE notify
@@ -649,7 +654,7 @@ CREATE TABLE IF NOT EXISTS `notify` (
 	`name` varchar(255) NOT NULL DEFAULT '',
 	`url` varchar(255) NOT NULL DEFAULT '',
 	`photo` varchar(255) NOT NULL DEFAULT '',
-	`date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`msg` mediumtext,
 	`uid` int(11) NOT NULL DEFAULT 0,
 	`link` varchar(255) NOT NULL DEFAULT '',
@@ -664,8 +669,8 @@ CREATE TABLE IF NOT EXISTS `notify` (
 	 INDEX `hash_uid` (`hash`,`uid`),
 	 INDEX `seen_uid_date` (`seen`,`uid`,`date`),
 	 INDEX `uid_date` (`uid`,`date`),
-	 INDEX `uid_type_link` (`uid`,`type`,`link`)
-) DEFAULT CHARSET=utf8mb4;
+	 INDEX `uid_type_link` (`uid`,`type`,`link`(190))
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE notify-threads
@@ -677,7 +682,7 @@ CREATE TABLE IF NOT EXISTS `notify-threads` (
 	`parent-item` int(10) unsigned NOT NULL DEFAULT 0,
 	`receiver-uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE oembed
@@ -685,10 +690,10 @@ CREATE TABLE IF NOT EXISTS `notify-threads` (
 CREATE TABLE IF NOT EXISTS `oembed` (
 	`url` varbinary(255) NOT NULL,
 	`content` mediumtext,
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`url`),
 	 INDEX `created` (`created`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE parsed_url
@@ -698,10 +703,10 @@ CREATE TABLE IF NOT EXISTS `parsed_url` (
 	`guessing` tinyint(1) NOT NULL DEFAULT 0,
 	`oembed` tinyint(1) NOT NULL DEFAULT 0,
 	`content` mediumtext,
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`url`,`guessing`,`oembed`),
 	 INDEX `created` (`created`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE pconfig
@@ -714,7 +719,7 @@ CREATE TABLE IF NOT EXISTS `pconfig` (
 	`v` mediumtext,
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_cat_k` (`uid`,`cat`,`k`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE photo
@@ -725,8 +730,8 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	`contact-id` int(10) unsigned NOT NULL DEFAULT 0,
 	`guid` varchar(64) NOT NULL DEFAULT '',
 	`resource-id` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`edited` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`title` varchar(255) NOT NULL DEFAULT '',
 	`desc` text,
 	`album` varchar(255) NOT NULL DEFAULT '',
@@ -743,12 +748,13 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	`deny_cid` mediumtext,
 	`deny_gid` mediumtext,
 	 PRIMARY KEY(`id`),
+	 INDEX `contactid` (`contact-id`),
 	 INDEX `uid_contactid` (`uid`,`contact-id`),
 	 INDEX `uid_profile` (`uid`,`profile`),
 	 INDEX `uid_album_scale_created` (`uid`,`album`(32),`scale`,`created`),
 	 INDEX `uid_album_resource-id_created` (`uid`,`album`(32),`resource-id`(64),`created`),
 	 INDEX `resource-id` (`resource-id`(64))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE poll
@@ -768,7 +774,7 @@ CREATE TABLE IF NOT EXISTS `poll` (
 	`q9` text,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE poll_result
@@ -780,7 +786,7 @@ CREATE TABLE IF NOT EXISTS `poll_result` (
 	 PRIMARY KEY(`id`),
 	 INDEX `poll_id` (`poll_id`),
 	 INDEX `choice` (`choice`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE process
@@ -788,10 +794,10 @@ CREATE TABLE IF NOT EXISTS `poll_result` (
 CREATE TABLE IF NOT EXISTS `process` (
 	`pid` int(10) unsigned NOT NULL,
 	`command` varbinary(32) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`pid`),
 	 INDEX `command` (`command`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE profile
@@ -804,7 +810,7 @@ CREATE TABLE IF NOT EXISTS `profile` (
 	`hide-friends` tinyint(1) NOT NULL DEFAULT 0,
 	`name` varchar(255) NOT NULL DEFAULT '',
 	`pdesc` varchar(255) NOT NULL DEFAULT '',
-	`dob` varchar(32) NOT NULL DEFAULT '0000-00-00',
+	`dob` varchar(32) NOT NULL DEFAULT '0001-01-01',
 	`address` varchar(255) NOT NULL DEFAULT '',
 	`locality` varchar(255) NOT NULL DEFAULT '',
 	`region` varchar(255) NOT NULL DEFAULT '',
@@ -814,7 +820,7 @@ CREATE TABLE IF NOT EXISTS `profile` (
 	`gender` varchar(32) NOT NULL DEFAULT '',
 	`marital` varchar(255) NOT NULL DEFAULT '',
 	`with` text,
-	`howlong` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`howlong` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`sexual` varchar(255) NOT NULL DEFAULT '',
 	`politic` varchar(255) NOT NULL DEFAULT '',
 	`religion` varchar(255) NOT NULL DEFAULT '',
@@ -841,7 +847,7 @@ CREATE TABLE IF NOT EXISTS `profile` (
 	`net-publish` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_is-default` (`uid`,`is-default`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE profile_check
@@ -854,7 +860,7 @@ CREATE TABLE IF NOT EXISTS `profile_check` (
 	`sec` varchar(255) NOT NULL DEFAULT '',
 	`expire` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE push_subscriber
@@ -866,10 +872,10 @@ CREATE TABLE IF NOT EXISTS `push_subscriber` (
 	`topic` varchar(255) NOT NULL DEFAULT '',
 	`nickname` varchar(255) NOT NULL DEFAULT '',
 	`push` int(11) NOT NULL DEFAULT 0,
-	`last_update` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`last_update` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`secret` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE queue
@@ -878,8 +884,8 @@ CREATE TABLE IF NOT EXISTS `queue` (
 	`id` int(11) NOT NULL auto_increment,
 	`cid` int(11) NOT NULL DEFAULT 0,
 	`network` varchar(32) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`last` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`last` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`content` mediumtext,
 	`batch` tinyint(1) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`),
@@ -888,7 +894,7 @@ CREATE TABLE IF NOT EXISTS `queue` (
 	 INDEX `last` (`last`),
 	 INDEX `network` (`network`),
 	 INDEX `batch` (`batch`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE register
@@ -896,13 +902,13 @@ CREATE TABLE IF NOT EXISTS `queue` (
 CREATE TABLE IF NOT EXISTS `register` (
 	`id` int(11) unsigned NOT NULL auto_increment,
 	`hash` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`uid` int(11) unsigned NOT NULL DEFAULT 0,
 	`password` varchar(255) NOT NULL DEFAULT '',
 	`language` varchar(16) NOT NULL DEFAULT '',
 	`note` text,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE search
@@ -913,7 +919,7 @@ CREATE TABLE IF NOT EXISTS `search` (
 	`term` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE session
@@ -926,7 +932,7 @@ CREATE TABLE IF NOT EXISTS `session` (
 	 PRIMARY KEY(`id`),
 	 INDEX `sid` (`sid`(64)),
 	 INDEX `expire` (`expire`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE sign
@@ -939,7 +945,7 @@ CREATE TABLE IF NOT EXISTS `sign` (
 	`signer` varchar(255) NOT NULL DEFAULT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `iid` (`iid`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE spam
@@ -950,13 +956,13 @@ CREATE TABLE IF NOT EXISTS `spam` (
 	`spam` int(11) NOT NULL DEFAULT 0,
 	`ham` int(11) NOT NULL DEFAULT 0,
 	`term` varchar(255) NOT NULL DEFAULT '',
-	`date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `spam` (`spam`),
 	 INDEX `ham` (`ham`),
 	 INDEX `term` (`term`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE term
@@ -969,17 +975,17 @@ CREATE TABLE IF NOT EXISTS `term` (
 	`term` varchar(255) NOT NULL DEFAULT '',
 	`url` varchar(255) NOT NULL DEFAULT '',
 	`guid` varchar(255) NOT NULL DEFAULT '',
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`received` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`global` tinyint(1) NOT NULL DEFAULT 0,
 	`aid` int(10) unsigned NOT NULL DEFAULT 0,
 	`uid` int(10) unsigned NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`tid`),
-	 INDEX `oid_otype_type_term` (`oid`,`otype`,`type`,`term`),
+	 INDEX `oid_otype_type_term` (`oid`,`otype`,`type`,`term`(32)),
 	 INDEX `uid_otype_type_term_global_created` (`uid`,`otype`,`type`,`term`(32),`global`,`created`),
 	 INDEX `uid_otype_type_url` (`uid`,`otype`,`type`,`url`(64)),
 	 INDEX `guid` (`guid`(64))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE thread
@@ -991,11 +997,11 @@ CREATE TABLE IF NOT EXISTS `thread` (
 	`gcontact-id` int(11) unsigned NOT NULL DEFAULT 0,
 	`owner-id` int(11) unsigned NOT NULL DEFAULT 0,
 	`author-id` int(11) unsigned NOT NULL DEFAULT 0,
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`edited` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`commented` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`received` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`changed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`changed` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`wall` tinyint(1) NOT NULL DEFAULT 0,
 	`private` tinyint(1) NOT NULL DEFAULT 0,
 	`pubmail` tinyint(1) NOT NULL DEFAULT 0,
@@ -1016,10 +1022,13 @@ CREATE TABLE IF NOT EXISTS `thread` (
 	 INDEX `uid_network_created` (`uid`,`network`,`created`),
 	 INDEX `uid_contactid_commented` (`uid`,`contact-id`,`commented`),
 	 INDEX `uid_contactid_created` (`uid`,`contact-id`,`created`),
+	 INDEX `contactid` (`contact-id`),
+	 INDEX `ownerid` (`owner-id`),
+	 INDEX `authorid` (`author-id`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_commented` (`uid`,`commented`),
 	 INDEX `uid_wall_created` (`uid`,`wall`,`created`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE tokens
@@ -1032,7 +1041,7 @@ CREATE TABLE IF NOT EXISTS `tokens` (
 	`scope` varchar(200) NOT NULL DEFAULT '',
 	`uid` int(11) NOT NULL DEFAULT 0,
 	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE user
@@ -1047,8 +1056,8 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`openid` varchar(255) NOT NULL DEFAULT '',
 	`timezone` varchar(128) NOT NULL DEFAULT '',
 	`language` varchar(32) NOT NULL DEFAULT 'en',
-	`register_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`login_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`register_date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`login_date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`default-location` varchar(255) NOT NULL DEFAULT '',
 	`allow_location` tinyint(1) NOT NULL DEFAULT 0,
 	`theme` varchar(255) NOT NULL DEFAULT '',
@@ -1072,8 +1081,8 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`expire` int(11) unsigned NOT NULL DEFAULT 0,
 	`account_removed` tinyint(1) NOT NULL DEFAULT 0,
 	`account_expired` tinyint(1) NOT NULL DEFAULT 0,
-	`account_expires_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	`expire_notification_sent` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`account_expires_on` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`expire_notification_sent` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`service_class` varchar(32) NOT NULL DEFAULT '',
 	`def_gid` int(11) NOT NULL DEFAULT 0,
 	`allow_cid` mediumtext,
@@ -1083,7 +1092,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`openidserver` text,
 	 PRIMARY KEY(`uid`),
 	 INDEX `nickname` (`nickname`(32))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE userd
@@ -1093,7 +1102,7 @@ CREATE TABLE IF NOT EXISTS `userd` (
 	`username` varchar(255) NOT NULL,
 	 PRIMARY KEY(`id`),
 	 INDEX `username` (`username`(32))
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT COLLATE utf8mb4_general_ci;
 
 --
 -- TABLE workerqueue
@@ -1102,9 +1111,11 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 	`id` int(11) NOT NULL auto_increment,
 	`parameter` text,
 	`priority` tinyint(3) unsigned NOT NULL DEFAULT 0,
-	`created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`pid` int(11) NOT NULL DEFAULT 0,
-	`executed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	 PRIMARY KEY(`id`)
-) DEFAULT CHARSET=utf8mb4;
+	`executed` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	 PRIMARY KEY(`id`),
+	 INDEX `pid` (`pid`),
+	 INDEX `priority_created` (`priority`,`created`)
+) DEFAULT COLLATE utf8mb4_general_ci;
 

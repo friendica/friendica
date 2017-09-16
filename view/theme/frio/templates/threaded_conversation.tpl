@@ -19,8 +19,8 @@
 <div id="conversation-end"></div>
 
 {{if $dropping}}
-<a id="item-delete-selected" class="" href="#" title="{{$dropping}}" onclick="deleteCheckedItems();return false;" data-toggle="tooltip">
+<button type="button" id="item-delete-selected" class="btn btn-link" title="{{$dropping}}" onclick="deleteCheckedItems();" data-toggle="tooltip">
 	<i class="fa fa-trash" aria-hidden="true"></i>
-</a>
+</button>
 <img id="item-delete-selected-rotator" class="like-rotator" src="images/rotator.gif" style="display: none;" />
 {{/if}}

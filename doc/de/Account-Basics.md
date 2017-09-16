@@ -9,10 +9,10 @@ Account - Basics
 Nicht alle Friendica-Knoten bieten die Möglichkeit zur Registrierung. 
 Wenn die Registrierung möglich ist, wird ein "Registrieren"-Link unter dem Login-Feld auf der Startseite angezeigt, der zur Registrierungsseite führt. 
 Die Stärke unseres Netzwerks ist, dass die verschiedenen Knoten komplett kompatibel zueinander sind. 
-Wenn der Knoten, den Du besuchst, keine Registrierung anbietet, oder wenn Du glaubst, dass Dir eine andere Seite möglicherweise besser gefällt, dann kannst Du hier eine <a href="http://dir.friendica.com/siteinfo">Liste von öffentlichen Servern (Knoten)</a> finden und den Knoten heraus suchen, der am Besten zu Deinen Anforderungen passt. 
+Wenn der Knoten, den Du besuchst, keine Registrierung anbietet, oder wenn Du glaubst, dass Dir eine andere Seite möglicherweise besser gefällt, dann kannst Du hier eine <a href="https://dir.friendica.social/servers">Liste von öffentlichen Servern (Knoten)</a> finden und den Knoten heraus suchen, der am Besten zu Deinen Anforderungen passt. 
 
 Wenn Du Deinen eigenen Server aufsetzen willst, kannst Du das ebenfalls machen. 
-Besuche <a href="http://friendica.com/download">die Friendica-Webseite</a>, um den Code mit den Installationsanleitungen herunterzuladen. 
+Besuche <a href="http://friendi.ca">die Friendica-Webseite</a>, um den Code mit den Installationsanleitungen herunterzuladen. 
 Es ist ein einfacher Installationsprozess, den jeder mit ein wenig Erfahrungen im Webseiten-Hosting oder mit grundlegenden Linux-Erfahrungen einfach handhaben kann.
 
 

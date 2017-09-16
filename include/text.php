@@ -1,11 +1,12 @@
 <?php
 
+use Friendica\App;
+
 require_once("include/template_processor.php");
 require_once("include/friendica_smarty.php");
 require_once("include/Smilies.php");
 require_once("include/map.php");
 require_once("mod/proxy.php");
-
 
 if(! function_exists('replace_macros')) {
 /**
@@ -268,90 +269,90 @@ function hex2bin($s) {
 }}
 
 
-if(! function_exists('paginate_data')) {
 /**
- * Automatica pagination data.
+ * @brief Paginator function. Pushes relevant links in a pager array structure.
+ *
+ * Links are generated depending on the current page and the total number of items.
+ * Inactive links (like "first" and "prev" on page 1) are given the "disabled" class.
+ * Current page link is given the "active" CSS class
  *
  * @param App $a App instance
- * @param int $count [optional] item count (used with alt pager)
+ * @param int $count [optional] item count (used with minimal pager)
  * @return Array data for pagination template
  */
-function paginate_data(App $a, $count=null) {
-	$stripped = preg_replace('/([&?]page=[0-9]*)/','',$a->query_string);
+function paginate_data(App $a, $count = null) {
+	$stripped = preg_replace('/([&?]page=[0-9]*)/', '', $a->query_string);
 
-	$stripped = str_replace('q=','',$stripped);
-	$stripped = trim($stripped,'/');
+	$stripped = str_replace('q=', '', $stripped);
+	$stripped = trim($stripped, '/');
 	$pagenum = $a->pager['page'];
 
-	if (($a->page_offset != "") AND !preg_match('/[?&].offset=/', $stripped))
-		$stripped .= "&offset=".urlencode($a->page_offset);
-
-	$url = $stripped;
-
-	$data = array();
-	function _l(&$d, $name, $url, $text, $class="") {
-		if (!strpos($url, "?")) {
-			if ($pos = strpos($url, "&"))
-				$url = substr($url, 0, $pos)."?".substr($url, $pos + 1);
-		}
-
-		$d[$name] = array('url'=>$url, 'text'=>$text, 'class'=>$class);
+	if (($a->page_offset != '') AND !preg_match('/[?&].offset=/', $stripped)) {
+		$stripped .= '&offset=' . urlencode($a->page_offset);
 	}
 
-	if (!is_null($count)){
-		// alt pager
-		if($a->pager['page']>1)
-			_l($data,  "prev", $url.'&page='.($a->pager['page'] - 1), t('newer'));
-		if($count>0)
-			_l($data,  "next", $url.'&page='.($a->pager['page'] + 1), t('older'));
+	$url = $stripped;
+	$data = array();
+
+	function _l(&$d, $name, $url, $text, $class = '') {
+		if (strpos($url, '?') === false && ($pos = strpos($url, '&')) !== false) {
+			$url = substr($url, 0, $pos) . '?' . substr($url, $pos + 1);
+		}
+
+		$d[$name] = array('url' => $url, 'text' => $text, 'class' => $class);
+	}
+
+	if (!is_null($count)) {
+		// minimal pager (newer / older)
+		$data['class'] = 'pager';
+		_l($data, 'prev', $url . '&page=' . ($a->pager['page'] - 1), t('newer'), 'previous' . ($a->pager['page'] == 1 ? ' disabled' : ''));
+		_l($data, 'next', $url . '&page=' . ($a->pager['page'] + 1), t('older'), 'next' . ($count <= 0 ? ' disabled' : ''));
 	} else {
-		// full pager
-		if($a->pager['total'] > $a->pager['itemspage']) {
-			if($a->pager['page'] != 1)
-				_l($data,  "prev", $url.'&page='.($a->pager['page'] - 1), t('prev'));
-
-			_l($data, "first", $url."&page=1",  t('first'));
-
+		// full pager (first / prev / 1 / 2 / ... / 14 / 15 / next / last)
+		$data['class'] = 'pagination';
+		if ($a->pager['total'] > $a->pager['itemspage']) {
+			_l($data, 'first', $url . '&page=1',  t('first'), $a->pager['page'] == 1 ? 'disabled' : '');
+			_l($data, 'prev', $url . '&page=' . ($a->pager['page'] - 1), t('prev'), $a->pager['page'] == 1 ? 'disabled' : '');
 
 			$numpages = $a->pager['total'] / $a->pager['itemspage'];
 
 			$numstart = 1;
 			$numstop = $numpages;
 
-			if($numpages > 14) {
-				$numstart = (($pagenum > 7) ? ($pagenum - 7) : 1);
-				$numstop = (($pagenum > ($numpages - 7)) ? $numpages : ($numstart + 14));
+			// Limit the number of displayed page number buttons.
+			if ($numpages > 8) {
+				$numstart = (($pagenum > 4) ? ($pagenum - 4) : 1);
+				$numstop = (($pagenum > ($numpages - 7)) ? $numpages : ($numstart + 8));
 			}
 
 			$pages = array();
 
-			for($i = $numstart; $i <= $numstop; $i++){
-				if($i == $a->pager['page'])
-					_l($pages, $i, "#",  $i, "current");
-				else
-					_l($pages, $i, $url."&page=$i", $i, "n");
+			for ($i = $numstart; $i <= $numstop; $i++) {
+				if ($i == $a->pager['page']) {
+					_l($pages, $i, '#',  $i, 'current active');
+				} else {
+					_l($pages, $i, $url . '&page='. $i, $i, 'n');
+				}
 			}
 
-			if(($a->pager['total'] % $a->pager['itemspage']) != 0) {
-				if($i == $a->pager['page'])
-					_l($pages, $i, "#",  $i, "current");
-				else
-					_l($pages, $i, $url."&page=$i", $i, "n");
+			if (($a->pager['total'] % $a->pager['itemspage']) != 0) {
+				if ($i == $a->pager['page']) {
+					_l($pages, $i, '#',  $i, 'current active');
+				} else {
+					_l($pages, $i, $url . '&page=' . $i, $i, 'n');
+				}
 			}
 
 			$data['pages'] = $pages;
 
 			$lastpage = (($numpages > intval($numpages)) ? intval($numpages)+1 : $numpages);
-			_l($data, "last", $url."&page=$lastpage", t('last'));
-
-			if(($a->pager['total'] - ($a->pager['itemspage'] * $a->pager['page'])) > 0)
-				_l($data, "next", $url."&page=".($a->pager['page'] + 1), t('next'));
-
+			_l($data, 'next', $url . '&page=' . ($a->pager['page'] + 1), t('next'), $a->pager['page'] == $lastpage ? 'disabled' : '');
+			_l($data, 'last', $url . '&page=' . $lastpage, t('last'), $a->pager['page'] == $lastpage ? 'disabled' : '');
 		}
 	}
-	return $data;
 
-}}
+	return $data;
+}
 
 if(! function_exists('paginate')) {
 /**
@@ -753,6 +754,72 @@ function logger($msg, $level = 0) {
 	$a->save_timestamp($stamp1, "file");
 }}
 
+/**
+ * @brief An alternative logger for development.
+ * Works largely as logger() but allows developers
+ * to isolate particular elements they are targetting
+ * personally without background noise
+ *
+ * log levels:
+ * LOGGER_NORMAL (default)
+ * LOGGER_TRACE
+ * LOGGER_DEBUG
+ * LOGGER_DATA
+ * LOGGER_ALL
+ *
+ * @global App $a
+ * @global dba $db
+ * @global array $LOGGER_LEVELS
+ * @param string $msg
+ * @param int $level
+ */
+
+function dlogger($msg, $level = 0) {
+	$a = get_app();
+	global $db;
+
+	// turn off logger in install mode
+	if (
+		$a->module == 'install'
+		|| ! ($db && $db->connected)
+	) {
+		return;
+	}
+
+	$logfile = get_config('system','dlogfile');
+
+	if (! $logfile) {
+		return;
+	}
+
+	if (count($LOGGER_LEVELS) == 0) {
+		foreach (get_defined_constants() as $k => $v) {
+			if (substr($k, 0, 7) == "LOGGER_") {
+				$LOGGER_LEVELS[$v] = substr($k, 7, 7);
+			}
+		}
+	}
+
+	$process_id = session_id();
+
+	if ($process_id == '') {
+		$process_id = get_app()->process_id;
+	}
+
+	$callers = debug_backtrace();
+	$logline = sprintf("%s@\t%s:\t%s:\t%s\t%s\t%s\n",
+			datetime_convert(),
+			$process_id,
+			basename($callers[0]['file']),
+			$callers[0]['line'],
+			$callers[1]['function'],
+			$msg
+		);
+
+	$stamp1 = microtime(true);
+	@file_put_contents($logfile, $logline, FILE_APPEND);
+	$a->save_timestamp($stamp1, "file");
+}
 
 if(! function_exists('activity_match')) {
 /**
@@ -903,10 +970,10 @@ function contact_block() {
 				intval($shown)
 		);
 		if (dbm::is_result($r)) {
-			$contacts = "";
-			foreach ($r AS $contact)
+			$contacts = array();
+			foreach ($r AS $contact) {
 				$contacts[] = $contact["id"];
-
+			}
 			$r = q("SELECT `id`, `uid`, `addr`, `url`, `name`, `thumb`, `network` FROM `contact` WHERE `id` IN (%s)",
 				dbesc(implode(",", $contacts)));
 
@@ -2125,47 +2192,48 @@ function format_network_name($network, $url = 0) {
  * @param string $lang Programming language
  * @return string Formated html
  */
-function text_highlight($s,$lang) {
-	if($lang === 'js')
+function text_highlight($s, $lang) {
+	if ($lang === 'js') {
 		$lang = 'javascript';
-
-	if(! strpos('Text_Highlighter',get_include_path())) {
-		set_include_path(get_include_path() . PATH_SEPARATOR . 'library/Text_Highlighter');
 	}
 
-	require_once('library/Text_Highlighter/Text/Highlighter.php');
-	require_once('library/Text_Highlighter/Text/Highlighter/Renderer/Html.php');
+	// @TODO: Replace Text_Highlighter_Renderer_Html by scrivo/highlight.php
+
+	// Autoload the library to make constants available
+	class_exists('Text_Highlighter_Renderer_Html');
+
 	$options = array(
 		'numbers' => HL_NUMBERS_LI,
 		'tabsize' => 4,
-		);
+	);
 
 	$tag_added = false;
-	$s = trim(html_entity_decode($s,ENT_COMPAT));
-	$s = str_replace("    ","\t",$s);
+	$s = trim(html_entity_decode($s, ENT_COMPAT));
+	$s = str_replace('    ', "\t", $s);
 
 	// The highlighter library insists on an opening php tag for php code blocks. If
 	// it isn't present, nothing is highlighted. So we're going to see if it's present.
 	// If not, we'll add it, and then quietly remove it after we get the processed output back.
 
-	if($lang === 'php') {
-		if(strpos('<?php',$s) !== 0) {
+	if ($lang === 'php') {
+		if (strpos($s, '<?php') !== 0) {
 			$s = '<?php' . "\n" . $s;
 			$tag_added = true;
 		}
 	}
 
-	$renderer = new Text_Highlighter_Renderer_HTML($options);
+	$renderer = new Text_Highlighter_Renderer_Html($options);
 	$hl = Text_Highlighter::factory($lang);
 	$hl->setRenderer($renderer);
 	$o = $hl->highlight($s);
-	$o = str_replace(["    ","\n"],["&nbsp;&nbsp;&nbsp;&nbsp;",''],$o);
+	$o = str_replace("\n", '', $o);
 
-	if($tag_added) {
-		$b = substr($o,0,strpos($o,'<li>'));
-		$e = substr($o,strpos($o,'</li>'));
+
+	if ($tag_added) {
+		$b = substr($o, 0, strpos($o, '<li>'));
+		$e = substr($o, strpos($o, '</li>'));
 		$o = $b . $e;
 	}
 
-	return('<code>' . $o . '</code>');
+	return '<code>' . $o . '</code>';
 }

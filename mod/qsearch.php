@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function qsearch_init(App $a) {
 
 	if (! local_user()) {
@@ -48,4 +50,3 @@ function qsearch_init(App $a) {
 	echo json_encode((object) $results);
 	killme();
 }
-

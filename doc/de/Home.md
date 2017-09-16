@@ -24,7 +24,7 @@ Friendica - Dokumentation und Ressourcen
 	* [Account löschen](help/Remove-Account)
 	* [Bugs und Probleme](help/Bugs-and-Issues)
 	* [Häufig gestellte Fragen (FAQ)](help/FAQ)
- 	
+
 **Dokumentation für Administratoren**
 
 * [Installation](help/Install)
@@ -49,6 +49,8 @@ Friendica - Dokumentation und Ressourcen
 * [Smarty 3 Templates](help/smarty3-templates)
 * [Protokoll Dokumentation](help/Protocol) (EN)
 * [Datenbank-Schema](help/database)
+* [Class Autoloading](help/autoloader) (EN)
+* [Using Composer](help/Composer) (EN)
 * [Code-Referenz (mit doxygen generiert - setzt Cookies)](doc/html/)
 * [Twitter/GNU Social API Functions](help/api) (EN)
 

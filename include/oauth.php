@@ -5,6 +5,8 @@
  *
  */
 
+use Friendica\App;
+
 define('REQUEST_TOKEN_DURATION', 300);
 define('ACCESS_TOKEN_DURATION', 31536000);
 
@@ -61,13 +63,13 @@ class FKOAuthDataStore extends OAuthDataStore {
 		logger(__function__.":".$consumer.", ". $callback);
 		$key = $this->gen_token();
 		$sec = $this->gen_token();
-		
+
 		if ($consumer->key){
 			$k = $consumer->key;
 		} else {
 			$k = $consumer;
 		}
-		
+
 		$r = q("INSERT INTO tokens (id, secret, client_id, scope, expires) VALUES ('%s','%s','%s','%s', UNIX_TIMESTAMP()+%d)",
 				dbesc($key),
 				dbesc($sec),
@@ -80,19 +82,19 @@ class FKOAuthDataStore extends OAuthDataStore {
 
   function new_access_token($token, $consumer, $verifier = null) {
     logger(__function__.":".$token.", ". $consumer.", ". $verifier);
-    
+
     // return a new access token attached to this consumer
     // for the user associated with this token if the request token
     // is authorized
     // should also invalidate the request token
-    
+
     $ret=Null;
-    
+
     // get user for this verifier
     $uverifier = get_config("oauth", $verifier);
     logger(__function__.":".$verifier.",".$uverifier);
     if (is_null($verifier) || ($uverifier!==false)){
-		
+
 		$key = $this->gen_token();
 		$sec = $this->gen_token();
 		$r = q("INSERT INTO tokens (id, secret, client_id, scope, expires, uid) VALUES ('%s','%s','%s','%s', UNIX_TIMESTAMP()+%d, %d)",
@@ -103,13 +105,13 @@ class FKOAuthDataStore extends OAuthDataStore {
 				intval(ACCESS_TOKEN_DURATION),
 				intval($uverifier));
 		if ($r)
-			$ret = new OAuthToken($key,$sec);		
+			$ret = new OAuthToken($key,$sec);
 	}
-		
-		
+
+
 	q("DELETE FROM tokens WHERE id='%s'", $token->key);
-	
-	
+
+
 	if (!is_null($ret) && $uverifier!==false){
 		del_config("oauth", $verifier);
 	/*	$apps = get_pconfig($uverifier, "oauth", "apps");
@@ -117,9 +119,9 @@ class FKOAuthDataStore extends OAuthDataStore {
 		$apps[] = $consumer->key;
 		set_pconfig($uverifier, "oauth", "apps", $apps);*/
 	}
-		
+
     return $ret;
-    
+
   }
 }
 
@@ -155,7 +157,7 @@ class FKOAuth1 extends OAuthServer {
 		//notice( t("Welcome back ") . $record['username'] . EOL);
 		$a->user = $record;
 
-		if(strlen($a->user['timezone'])) {
+		if (strlen($a->user['timezone'])) {
 			date_default_timezone_set($a->user['timezone']);
 			$a->timezone = $a->user['timezone'];
 		}
@@ -172,9 +174,9 @@ class FKOAuth1 extends OAuthServer {
 			intval($_SESSION['uid'])
 		);
 
-		call_hooks('logged_in', $a->user);		
+		call_hooks('logged_in', $a->user);
 	}
-	
+
 }
 /*
 class FKOAuth2 extends OAuth2 {
@@ -190,13 +192,13 @@ class FKOAuth2 extends OAuth2 {
 			dbesc($client_secret),
 			dbesc($redirect_uri)
 		);
-		  
+
 		return $r;
 	}
 
 	protected function checkClientCredentials($client_id, $client_secret = NULL) {
 		$client_secret = $this->db_secret($client_secret);
-		
+
 		$r = q("SELECT pw FROM clients WHERE client_id = '%s'",
 			dbesc($client_id));
 
@@ -218,21 +220,21 @@ class FKOAuth2 extends OAuth2 {
 	protected function getAccessToken($oauth_token) {
 		$r = q("SELECT client_id, expires, scope FROM tokens WHERE id = '%s'",
 				dbesc($oauth_token));
-	
+
 		if (dbm::is_result($r))
 			return $r[0];
 		return null;
 	}
 
 
-	
+
 	protected function setAccessToken($oauth_token, $client_id, $expires, $scope = NULL) {
 		$r = q("INSERT INTO tokens (id, client_id, expires, scope) VALUES ('%s', '%s', %d, '%s')",
 				dbesc($oauth_token),
 				dbesc($client_id),
 				intval($expires),
 				dbesc($scope));
-				
+
 		return $r;
 	}
 
@@ -246,23 +248,23 @@ class FKOAuth2 extends OAuth2 {
 	protected function getAuthCode($code) {
 		$r = q("SELECT id, client_id, redirect_uri, expires, scope FROM auth_codes WHERE id = '%s'",
 				dbesc($code));
-		
+
 		if (dbm::is_result($r))
 			return $r[0];
 		return null;
 	}
 
 	protected function setAuthCode($code, $client_id, $redirect_uri, $expires, $scope = NULL) {
-		$r = q("INSERT INTO auth_codes 
-					(id, client_id, redirect_uri, expires, scope) VALUES 
+		$r = q("INSERT INTO auth_codes
+					(id, client_id, redirect_uri, expires, scope) VALUES
 					('%s', '%s', '%s', %d, '%s')",
 				dbesc($code),
 				dbesc($client_id),
 				dbesc($redirect_uri),
 				intval($expires),
 				dbesc($scope));
-		return $r;	  
-	}	
-	
+		return $r;
+	}
+
 }
 */

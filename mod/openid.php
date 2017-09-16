@@ -1,8 +1,8 @@
 <?php
 
+use Friendica\App;
 
 require_once('library/openid.php');
-
 
 function openid_content(App $a) {
 
@@ -30,7 +30,7 @@ function openid_content(App $a) {
 			//       mod/settings.php in 8367cad so it might have left mixed
 			//       records in the user table
 			//
-			$r = q("SELECT * FROM `user`
+			$r = q("SELECT *, `user`.`pubkey` as `upubkey`, `user`.`prvkey` as `uprvkey` FROM `user`
 				WHERE ( `openid` = '%s' OR `openid` = '%s' )
 				AND `blocked` = 0 AND `account_expired` = 0
 				AND `account_removed` = 0 AND `verified` = 1
@@ -73,10 +73,10 @@ function openid_content(App $a) {
 						$first = notags(trim($v));
 					}
 					if($k === 'namePerson') {
-						$args .= '&username=' . notags(trim($v));
+						$args .= '&username=' . urlencode(notags(trim($v)));
 					}
 					if ($k === 'contact/email') {
-						$args .= '&email=' . notags(trim($v));
+						$args .= '&email=' . urlencode(notags(trim($v)));
 					}
 					if ($k === 'media/image/aspect11') {
 						$photosq = bin2hex(trim($v));
@@ -87,22 +87,22 @@ function openid_content(App $a) {
 				}
 			}
 			if ($nick) {
-				$args .= '&nickname=' . $nick;
+				$args .= '&nickname=' . urlencode($nick);
 			}
 			elseif ($first) {
-				$args .= '&nickname=' . $first;
+				$args .= '&nickname=' . urlencode($first);
 			}
 
 			if ($photosq) {
-				$args .= '&photo=' . $photosq;
+				$args .= '&photo=' . urlencode($photosq);
 			}
 			elseif ($photo) {
-				$args .= '&photo=' . $photo;
+				$args .= '&photo=' . urlencode($photo);
 			}
 
-			$args .= '&openid_url=' . notags(trim($authid));
+			$args .= '&openid_url=' . urlencode(notags(trim($authid)));
 
-			goaway(App::get_baseurl() . '/register' . $args);
+			goaway(App::get_baseurl() . '/register?' . $args);
 
 			// NOTREACHED
 		}

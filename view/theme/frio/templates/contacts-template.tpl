@@ -36,14 +36,14 @@
 		{{* We put the contact batch actions in a dropdown menu *}}
 		<ul class="nav nav-pills preferences">
 			<li class="dropdown pull-right">
-				<a class="btn btn-link btn-sm dropdown-toggle" type="button" id="BatchActionDropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
+				<button type="button" class="btn btn-link btn-sm dropdown-toggle" id="BatchActionDropdownMenuTools" data-toggle="dropdown" aria-expanded="true">
 					<i class="fa fa-angle-down"></i>&nbsp;{{$h_batch_actions}}
-				</a>
+				</button>
 				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="BatchActionDropdownMenuTools">
 				{{foreach $batch_actions as $n=>$l}}
 					<li role="menuitem">
 						{{* call the js batch_submit_handler. Have a look at the buttom of this file *}}
-						<a onclick="batch_submit_handler('{{$n}}', '{{$l}}')">{{$l}}</a>
+						<button type="button" class="btn-link" onclick="batch_submit_handler('{{$n}}', '{{$l}}')">{{$l}}</button>
 					</li>
 				{{/foreach}}
 				</ul>
@@ -75,7 +75,7 @@
      return false;
     }
   });
- 
+
   // add javascript confirm dialog to "drop" links. Plain html url have "?confirm=1" to show confirmation form, we need to remove it
   $(".drop").each(function() {
    $(this).attr('href', $(this).attr('href').replace("confirm=1","") );
@@ -87,7 +87,7 @@
      return false;
     }
    });
-   
+
   });
  });
 

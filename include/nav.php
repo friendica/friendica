@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function nav(App $a) {
 
 	/*
@@ -8,7 +10,7 @@ function nav(App $a) {
 	 *
 	 */
 
-	if(!(x($a->page,'nav')))
+	if (!(x($a->page,'nav')))
 		$a->page['nav'] = '';
 
 	$a->page['htmlhead'] .= replace_macros(get_markup_template('nav_head.tpl'), array());
@@ -86,9 +88,9 @@ function nav_info(App $a)
 		$nav['usermenu'][] = array('notes/', t('Personal notes'), '', t('Your personal notes'));
 
 		// user info
-		$r = q("SELECT `micro` FROM `contact` WHERE `uid` = %d AND `self` = 1", intval($a->user['uid']));
+		$r = dba::select('contact', array('micro'), array('uid' => $a->user['uid'], 'self' => true), array('limit' => 1));
 		$userinfo = array(
-			'icon' => (dbm::is_result($r) ? $a->remove_baseurl($r[0]['micro']) : 'images/person-48.jpg'),
+			'icon' => (dbm::is_result($r) ? $a->remove_baseurl($r['micro']) : 'images/person-48.jpg'),
 			'name' => $a->user['username'],
 		);
 	} else {
@@ -136,7 +138,7 @@ function nav_info(App $a)
 
 	if (strlen(get_config('system', 'singleuser'))) {
 		$gdir = get_config('system', 'directory');
-		if(strlen($gdir)) {
+		if (strlen($gdir)) {
 			$gdirpath = zrl($gdir, true);
 		}
 	} elseif (get_config('system', 'community_page_style') == CP_USERS_ON_SERVER) {

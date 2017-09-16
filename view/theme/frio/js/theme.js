@@ -83,12 +83,12 @@ $(document).ready(function(){
 			}
 		});
 
-		if(checked == true) {
-			$("a#item-delete-selected").fadeTo(400, 1);
-			$("a#item-delete-selected").show();
+		if(checked) {
+			$("#item-delete-selected").fadeTo(400, 1);
+			$("#item-delete-selected").show();
 		} else {
-			$("a#item-delete-selected").fadeTo(400, 0, function(){
-				$("a#item-delete-selected").hide();
+			$("#item-delete-selected").fadeTo(400, 0, function(){
+				$("#item-delete-selected").hide();
 			});
 		}
 	});
@@ -208,11 +208,8 @@ $(document).ready(function(){
 
 	// Dropdown menus with the class "dropdown-head" will display the active tab
 	// as button text
-	$("body").on('click', '.dropdown-head .dropdown-menu li a', function(){
-		$(this).closest(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-		$(this).closest(".dropdown").find('.btn').val($(this).data('value'));
-		$(this).closest("ul").children("li").show();
-		$(this).parent("li").hide();
+	$("body").on('click', '.dropdown-head .dropdown-menu li a, .dropdown-head .dropdown-menu li button', function(){
+		toggleDropdownText(this);
 	});
 
 	/* setup onoff widgets */
@@ -278,6 +275,83 @@ $(document).ready(function(){
 
 	});
 
+	/*
+	 * This event handler hides all comment UI when the user clicks anywhere on the page
+	 * It ensures that we aren't closing the current comment box
+	 *
+	 * We are making an exception for buttons because of a race condition with the
+	 * comment opening button that results in an already closed comment UI.
+	 */
+	$(document).on('click', function(event) {
+		if (event.target.type === 'button') {
+			return true;
+		}
+
+		var $dontclosethis = $(event.target).closest('.wall-item-comment-wrapper').find('.comment-edit-form');
+		$('.wall-item-comment-wrapper .comment-edit-submit-wrapper:visible').each(function() {
+			var $parent = $(this).parent('.comment-edit-form');
+			var itemId = $parent.data('itemId');
+
+			if ($dontclosethis[0] != $parent[0]) {
+				var textarea = $parent.find('textarea').get(0)
+
+				commentCloseUI(textarea, itemId);
+			}
+		});
+	});
+
+	// Customize some elements when the app is used in standalone mode on Android
+	if (window.matchMedia('(display-mode: standalone)').matches) {
+		// Open links to source outside of the webview
+		$('body').on('click', '.plink', function (e) {
+			$(e.target).attr('target', '_blank');
+		});
+	}
+
+	/*
+	 * This event listeners ensures that the textarea size is updated event if the
+	 * value is changed externally (textcomplete, insertFormatting, fbrowser...)
+	 */
+	$(document).on('change', 'textarea', function(event) {
+		autosize.update(event.target);
+	});
+
+	/*
+	 * Sticky aside on page scroll
+	 * We enable the sticky aside only when window is wider than
+	 * 976px - which is the maximum width where the aside is shown in
+	 * mobile style - because on chrome-based browsers (desktop and
+	 * android) the sticky plugin in mobile style causes the browser to
+	 * scroll back to top the main content, making it impossible
+	 * to navigate.
+	 * A side effect is that the sitky aside isn't really responsive,
+	 * since is enabled or not at page loading time.
+	 */
+	if ($(window).width() > 976) {
+		$("aside").stick_in_parent({
+			offset_top: 100, // px, header + tab bar + spacing
+			recalc_every: 10
+		});
+		// recalculate sticky aside on clicks on <a> elements
+		// this handle height changes on expanding submenus
+		$("aside").on("click", "a", function(){
+			$(document.body).trigger("sticky_kit:recalc");
+		});
+	}
+
+	/*
+	 * Add or remove "aside-out" class to body tag
+	 * when the mobile aside is shown or hidden.
+	 * The class is used in css to disable scroll in page when the aside
+	 * is shown.
+	 */
+	$("aside")
+		.on("shown.bs.offcanvas", function() {
+			$("body").addClass("aside-out");
+		})
+		.on("hidden.bs.offcanvas", function() {
+			$("body").removeClass("aside-out");
+		});
 
 });
 
@@ -573,31 +647,38 @@ String.prototype.rtrim = function() {
 	return trimmed;
 };
 
-// Scroll to a specific item and highlight it
-// Note: jquery.color.js is needed
-function scrollToItem(itemID) {
-	if( typeof itemID === "undefined")
+/**
+ * Scroll the screen to the item element whose id is provided, then highlights it
+ *
+ * Note: jquery.color.js is required
+ *
+ * @param {string} elementId The item element id
+ * @returns {undefined}
+ */
+function scrollToItem(elementId) {
+	if (typeof elementId === "undefined") {
 		return;
+	}
 
-	var elm = $('#'+itemID);
+	var $el = $(document.getElementById(elementId));
 	// Test if the Item exists
-	if(!elm.length)
+	if (!$el.length) {
 		return;
+	}
 
 	// Define the colors which are used for highlighting
 	var colWhite = {backgroundColor:'#F5F5F5'};
 	var colShiny = {backgroundColor:'#FFF176'};
 
-	// Get the Item Position (we need to substract 100 to match
-	// correct position
-	var itemPos = $(elm).offset().top - 100;
+	// Get the Item Position (we need to substract 100 to match correct position
+	var itemPos = $el.offset().top - 100;
 
 	// Scroll to the DIV with the ID (GUID)
 	$('html, body').animate({
 		scrollTop: itemPos
 	}, 400, function() {
 		// Highlight post/commenent with ID  (GUID)
-		$(elm).animate(colWhite, 1000).animate(colShiny).animate(colWhite, 600);
+		$el.animate(colWhite, 1000).animate(colShiny).animate(colWhite, 600);
 	});
 }
 
@@ -609,4 +690,89 @@ function htmlToText(htmlString) {
 	text = text.replace(/<[^>]*>/g, '');
 
 	return text;
+}
+
+/**
+ * Sends a /like API call and updates the display of the relevant action button
+ * before the update reloads the item.
+ *
+ * @param {string} ident The id of the relevant item
+ * @param {string} verb The verb of the action
+ * @returns {undefined}
+ */
+function doLikeAction(ident, verb) {
+	unpause();
+
+	if (verb.indexOf('attend') === 0) {
+		$('.item-' + ident + ' .button-event:not(#' + verb + '-' + ident + ')').removeClass('active');
+	}
+	$('#' + verb + '-' + ident).toggleClass('active');
+	$('#like-rotator-' + ident.toString()).show();
+	$.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
+	liking = 1;
+	force_update = true;
+}
+
+// Decodes a hexadecimally encoded binary string
+function hex2bin (s) {
+	//  discuss at: http://locutus.io/php/hex2bin/
+	// original by: Dumitru Uzun (http://duzun.me)
+	//   example 1: hex2bin('44696d61')
+	//   returns 1: 'Dima'
+	//   example 2: hex2bin('00')
+	//   returns 2: '\x00'
+	//   example 3: hex2bin('2f1q')
+	//   returns 3: false
+	var ret = [];
+	var i = 0;
+	var l;
+	s += '';
+
+	for (l = s.length; i < l; i += 2) {
+		var c = parseInt(s.substr(i, 1), 16);
+		var k = parseInt(s.substr(i + 1, 1), 16);
+		if (isNaN(c) || isNaN(k)) {
+			return false;
+		}
+		ret.push((c << 4) | k);
+	}
+	return String.fromCharCode.apply(String, ret);
+}
+
+// Convert binary data into hexadecimal representation
+function bin2hex (s) {
+	// From: http://phpjs.org/functions
+	// +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// +   bugfixed by: Onno Marsman
+	// +   bugfixed by: Linuxworld
+	// +   improved by: ntoniazzi (http://phpjs.org/functions/bin2hex:361#comment_177616)
+	// *     example 1: bin2hex('Kev');
+	// *     returns 1: '4b6576'
+	// *     example 2: bin2hex(String.fromCharCode(0x00));
+	// *     returns 2: '00'
+
+	var i, l, o = "", n;
+
+	s += "";
+
+	for (i = 0, l = s.length; i < l; i++) {
+		n = s.charCodeAt(i).toString(16);
+		o += n.length < 2 ? "0" + n : n;
+	}
+
+	return o;
+}
+
+// Dropdown menus with the class "dropdown-head" will display the active tab
+// as button text
+function toggleDropdownText(elm) {
+		$(elm).closest(".dropdown").find('.btn').html($(elm).text() + ' <span class="caret"></span>');
+		$(elm).closest(".dropdown").find('.btn').val($(elm).data('value'));
+		$(elm).closest("ul").children("li").show();
+		$(elm).parent("li").hide();
+}
+
+// Check if element does have a specific class
+function hasClass(elem, cls) {
+	return (" " + elem.className + " " ).indexOf( " "+cls+" " ) > -1;
 }

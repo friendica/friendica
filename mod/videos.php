@@ -1,10 +1,12 @@
 <?php
+
+use Friendica\App;
+
 require_once('include/items.php');
 require_once('include/acl_selectors.php');
 require_once('include/bbcode.php');
 require_once('include/security.php');
 require_once('include/redir.php');
-
 
 function videos_init(App $a) {
 
@@ -356,7 +358,9 @@ function videos_content(App $a) {
 		$a->set_pager_itemspage(20);
 	}
 
-	$r = q("SELECT hash, `id`, `filename`, filetype FROM `attach`
+	$r = q("SELECT hash, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`created`) AS `created`,
+		ANY_VALUE(`filename`) AS `filename`, ANY_VALUE(`filetype`) as `filetype`
+		FROM `attach`
 		WHERE `uid` = %d AND filetype LIKE '%%video%%'
 		$sql_extra GROUP BY hash ORDER BY `created` DESC LIMIT %d , %d",
 		intval($a->data['user']['uid']),

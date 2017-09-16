@@ -18,7 +18,7 @@ class FriendicaSmarty extends Smarty {
 		// setTemplateDir can be set to an array, which Smarty will parse in order.
 		// The order is thus very important here
 		$template_dirs = array('theme' => "view/theme/$theme/".SMARTY3_TEMPLATE_FOLDER."/");
-		if( x($a->theme_info,"extends") )
+		if ( x($a->theme_info,"extends") )
 			$template_dirs = $template_dirs + array('extends' => "view/theme/".$a->theme_info["extends"]."/".SMARTY3_TEMPLATE_FOLDER."/");
 		$template_dirs = $template_dirs + array('base' => "view/".SMARTY3_TEMPLATE_FOLDER."/");
 		$this->setTemplateDir($template_dirs);
@@ -35,7 +35,7 @@ class FriendicaSmarty extends Smarty {
 	}
 
 	function parsed($template = '') {
-		if($template) {
+		if ($template) {
 			return $this->fetch('string:' . $template);
 		}
 		return $this->fetch('file:' . $this->filename);
@@ -48,7 +48,7 @@ class FriendicaSmartyEngine implements ITemplateEngine {
 	static $name ="smarty3";
 
     public function __construct(){
-		if(!is_writable('view/smarty3/')){
+		if (!is_writable('view/smarty3/')){
 			echo "<b>ERROR:</b> folder <tt>view/smarty3/</tt> must be writable by webserver."; killme();
 		}
 	}
@@ -56,7 +56,7 @@ class FriendicaSmartyEngine implements ITemplateEngine {
 	// ITemplateEngine interface
 	public function replace_macros($s, $r) {
 		$template = '';
-		if(gettype($s) === 'string') {
+		if (gettype($s) === 'string') {
 			$template = $s;
 			$s = new FriendicaSmarty();
 		}
@@ -71,8 +71,8 @@ class FriendicaSmartyEngine implements ITemplateEngine {
 		call_hooks("template_vars", $arr);
 		$r = $arr['vars'];
 
-		foreach($r as $key=>$value) {
-			if($key[0] === '$') {
+		foreach ($r as $key=>$value) {
+			if ($key[0] === '$') {
 				$key = substr($key, 1);
 			}
 			$s->assign($key, $value);

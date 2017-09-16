@@ -3,7 +3,7 @@
 /* ********************************************************************
  *  The following configuration has to be within the .htconfig file
  *  and will not be overruled by decisions made in the admin panel.
- * 
+ *
  *  See below for variables that may be overruled by the admin panel.
  * ********************************************************************/
 
@@ -15,7 +15,7 @@ $db_user = '{{$dbuser}}';
 $db_pass = '{{$dbpass}}';
 $db_data = '{{$dbdata}}';
 
-// Set the database connection charset to UTF8.
+// Set the database connection charset to full Unicode (utf8mb4).
 // Changing this value will likely corrupt the special characters.
 // You have been warned.
 $a->config['system']['db_charset'] = "utf8mb4";
@@ -43,7 +43,7 @@ $a->config['system']['allowed_link_protocols'] = array('ftp', 'ftps', 'mailto', 
  *  Changes made below will only have an effect if the database does
  *  not contain any configuration for the friendica system.
  * *********************************************************************/
- 
+
 // Choose a legal default timezone. If you are unsure, use "America/Los_Angeles".
 // It can be changed later and only applies to timestamps for anonymous viewers.
 
@@ -80,9 +80,8 @@ $a->config['system']['maximagesize'] = 800000;
 $a->config['system']['huburl'] = '[internal]';
 
 // Server-to-server private message encryption (RINO) is allowed by default.
-// Encryption will only be provided if this setting is set to a non zero
-// value and the PHP mcrypt extension is installed on both systems
-// set to 0 to disable, 2 to enable, 1 is deprecated but wont need mcrypt
+// Encryption will only be provided if this setting is set to a non zero value
+// set to 0 to disable, 2 to enable, 1 is deprecated
 
 $a->config['system']['rino_encrypt'] = {{$rino}};
 
@@ -99,4 +98,7 @@ $a->config['system']['no_regfullname'] = true;
 //$a->config['system']['block_local_dir'] = false;
 
 // Location of the global directory
-$a->config['system']['directory'] = 'http://dir.friendi.ca';
+$a->config['system']['directory'] = 'http://dir.friendica.social';
+
+// Authentication cookie lifetime, in days
+$a->config['system']['auth_cookie_lifetime'] = 7;

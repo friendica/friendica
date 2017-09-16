@@ -1,6 +1,6 @@
 
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
-<button class="btn btn-sm btn-main pull-right" id="jotOpen" onclick="jotShow(); return false;"><i class="fa fa-pencil-square-o fa-2x"></i></button>
+<button class="btn btn-sm btn-main pull-right" id="jotOpen" onclick="jotShow();"><i class="fa fa-pencil-square-o fa-2x"></i></button>
 
 
 <div id="jot-content">
@@ -9,26 +9,52 @@
 			{{* Note: We need 2 modal close buttons here to bypass a bug in bootstrap.
 			The second is for mobile view. The first one doesnt work with dropdowns. To get a working close button
 			in with dropdows the close button needs to be inserted after the dropdown. *}}
-			<button type="button" class="close hidden-xs" data-dismiss="modal" style="float: right;">&times;</button>
+			<button type="button" class="close hidden-xs" data-dismiss="modal" aria-label="Close" style="float: right;">&times;</button>
 
-			{{* The Jot navigation menu (text input, permissions, preview, filebrowser) *}}
-			<ul class="nav nav-tabs hidden-xs jot-nav" role="menubar" data-tabs="tabs">
+			{{* The Jot navigation menu for desktop user (text input, permissions, preview, filebrowser) *}}
+			<ul class="nav nav-tabs hidden-xs jot-nav" role="tablist" data-tabs="tabs">
 				{{* Mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
-				<li class="active" role="menuitem"><a id="jot-text-lnk" class="jot-text-lnk" onclick="jotActive(); return false;">{{$message}}</a></li>
-				{{if $acl}}<li role="menuitem"><a id="jot-perms-lnk" class="jot-perms-lnk" onclick="aclActive();return false;">{{$shortpermset}}</a></li>{{/if}}
-				{{if $preview}}<li role="menuitem"><a id="jot-preview-lnk" class="jot-preview-lnk" onclick="previewActive();return false;">{{$preview}}</a></li>{{/if}}
-				<li role="menuitem"><a id="jot-browser-link" onclick="fbrowserActive(); return false;">{{$browser}}</a></li>
+				<li class="active" role="presentation">
+					<a href="#profile-jot-wrapper" class="jot-text-lnk jot-nav-lnk" id="jot-text-lnk" role="tab" aria-controls="profile-jot-wrapper" aria-selected="true">{{$message}}</a>
+				</li>
+				{{if $acl}}
+				<li role="presentation">
+					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk jot-nav-lnk" id="jot-perms-lnk" role="tab" aria-controls="profile-jot-acl-wrapper" aria-selected="false">{{$shortpermset}}</a>
+				</li>
+				{{/if}}
+				{{if $preview}}
+				<li role="presentation">
+					<a href="#jot-preview-content" class="jot-preview-lnk jot-nav-lnk" id="jot-preview-lnk" role="tab" aria-controls="jot-preview-content" aria-selected="false">{{$preview}}</a>
+				</li>
+				{{/if}}
+				<li role="presentation">
+					<a href="#jot-fbrowser-wrapper" class="jot-browser-lnk jot-nav-lnk" id="jot-browser-link" role="tab" aria-controls="jot-fbrowser-wrapper" aria-selected="false">{{$browser}}</a>
+				</li>
 			</ul>
 
+			{{* The Jot navigation menu for small displays (text input, permissions, preview, filebrowser) *}}
 			<div class="dropdown dropdown-head dropdown-mobile-jot jot-nav hidden-lg hidden-md hidden-sm" role="menubar" data-tabs="tabs" style="float: left;">
-				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{$message}}&nbsp;<span class="caret"></span></button>
-				<ul class="dropdown-menu nav nav-pills">
+				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true">{{$message}}&nbsp;<span class="caret"></span></button>
+				<ul class="dropdown-menu nav nav-pills" aria-label="submenu">
 					{{* mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
-					<li role="menuitem" style="display: none;"><a id="jot-text-lnk-mobile" class="jot-text-lnk" onclick="jotActive(); return false;">{{$message}}</a></li>
-					{{if $acl}}<li role="menuitem"><a id="jot-perms-lnk-mobile" class="jot-perms-lnk" onclick="aclActive();return false;">{{$shortpermset}}</a></li>{{/if}}
-					{{if $preview}}<li role="menuitem"><a id="jot-preview-lnk-mobile" class="jot-preview-lnk" onclick="previewActive();return false;">{{$preview}}</a></li>{{/if}}
+					<li role="presentation" style="display: none;">
+						<button class="jot-text-lnk btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-text-lnk-mobile" aria-controls="profile-jot-wrapper" role="menuitem" aria-selected="true">{{$message}}</button>
+					</li>
+					{{if $acl}}
+					<li role="presentation">
+						<button class="jot-perms-lnk btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-perms-lnk-mobile" aria-controls="profile-jot-acl-wrapper" role="menuitem" aria-selected="false">{{$shortpermset}}</button>
+					</li>
+					{{/if}}
+					{{if $preview}}
+					<li role="presentation">
+						<button class="jot-preview-lnk btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-preview-lnk-mobile" aria-controls="jot-preview-content" role="menuitem" aria-selected="false">{{$preview}}</button>
+					</li>
+					{{/if}}
+					<li role="presentation">
+						<button class="jot-browser-lnk-mobile btn-link jot-nav-lnk jot-nav-lnk-mobile" id="jot-browser-lnk-mobile" aria-controls="jot-fbrowser-wrapper" role="menuitem" aria-selected="false">{{$browser}}</button>
+					</li>
 				</ul>
 			</div>
 			<button type="button" class="close hidden-lg hidden-md hidden-sm" data-dismiss="modal" style="float: right;">&times;</button>
@@ -36,7 +62,7 @@
 
 		<div id="jot-modal-body" class="modal-body">
 			<form id="profile-jot-form" action="{{$action}}" method="post">
-				<div id="profile-jot-wrapper">
+				<div id="profile-jot-wrapper" aria-labelledby="jot-text-lnk" role="tabpanel" aria-hidden="false">
 					<div>
 						<!--<div id="profile-jot-desc" class="jothidden pull-right">&nbsp;</div>-->
 					</div>
@@ -66,16 +92,12 @@
 					</div>
 
 					<ul id="profile-jot-submit-wrapper" class="jothidden nav nav-pills">
-						{{* uncomment the button for "wall-immage-upload" because we have integrated it directly in the jot modal
-						<li><a href="#" id="wall-image-upload" title="{{$upload}}"><i class="fa fa-picture-o"></i></a></li>
-						*}}
-						<li><a href="#" onclick="return false;" id="wall-file-upload"  title="{{$attach}}"><i class="fa fa-paperclip"></i></a></li>
-						<li><a id="profile-link"  ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink(); return false;" title="{{$weblink}}"><i class="fa fa-link"></i></a></li>
-						<li><a id="profile-video" onclick="jotVideoURL();return false;" title="{{$video}}"><i class="fa fa-film"></i></a></li>
-						<li><a id="profile-audio" onclick="jotAudioURL();return false;" title="{{$audio}}"><i class="fa fa-music"></i></a></li>
-						<li><a id="profile-location" onclick="jotGetLocation();return false;" title="{{$setloc}}"><i class="fa fa-map-marker"></i></a></li>
+						<li><button type="button" class="btn-link" id="profile-link"  ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink();" title="{{$weblink}}"><i class="fa fa-link"></i></button></li>
+						<li><button type="button" class="btn-link" id="profile-video" onclick="jotVideoURL();" title="{{$video}}"><i class="fa fa-film"></i></button></li>
+						<li><button type="button" class="btn-link" id="profile-audio" onclick="jotAudioURL();" title="{{$audio}}"><i class="fa fa-music"></i></button></li>
+						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" title="{{$setloc}}"><i class="fa fa-map-marker"></i></button></li>
 						<!-- TODO: waiting for a better placement
-						<li><a id="profile-nolocation" onclick="jotClearLocation();return false;" title="{{$noloc}}">{{$shortnoloc}}</a></li>
+						<li><button type="button" class="btn-link" id="profile-nolocation" onclick="jotClearLocation();" title="{{$noloc}}">{{$shortnoloc}}</button></li>
 						-->
 
 						<li class="pull-right"><button class="btn btn-primary" id="jot-submit" type="submit" id="profile-jot-submit" name="submit" ><i class="fa fa-slideshare fa-fw"></i> {{$share}}</button></li>
@@ -90,14 +112,14 @@
 
 				</div>
 
-				<div id="profile-jot-acl-wrapper" style="display: none;">
+				<div id="profile-jot-acl-wrapper" class="minimize" aria-labelledby="jot-perms-lnk" role="tabpanel" aria-hidden="true">
 					{{$acl}}
 				</div>
 
-				<div id="jot-preview-content" style="display:none;"></div>
+				<div id="jot-preview-content" class="minimize" aria-labelledby="jot-preview-lnk" role="tabpanel" aria-hidden="true"></div>
 			</form>
 
-			<div id="jot-fbrowser-wrapper" style="display: none"></div>
+			<div id="jot-fbrowser-wrapper" class="minimize" aria-labelledby="jot-browser-link" role="tabpanel" aria-hidden="true"></div>
 
 			{{if $content}}<script>initEditor();</script>{{/if}}
 		</div>
@@ -124,4 +146,3 @@ can load different content into the jot moadl (e.g. the item edit jot)
 		this.style.height = this.contentWindow.document.body.offsetHeight + 'px';
 	});
 </script>
-

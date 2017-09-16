@@ -1,6 +1,7 @@
 <?php
 
-require_once('include/Probe.php');
+use Friendica\App;
+use Friendica\Network\Probe;
 
 // Included here for completeness, but this is a very dangerous operation.
 // It is the caller's responsibility to confirm the requestor's intent and
@@ -22,29 +23,7 @@ function user_remove($uid) {
 		$r[0]['nickname']
 	);
 
-	/// @todo Should be done in a background job since this likely will run into a time out
-	// don't delete yet, will be done later when contacts have deleted my stuff
-	// q("DELETE FROM `contact` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `gcign` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `group` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `group_member` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `intro` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `event` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `item` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `item_id` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `mail` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `mailacct` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `manage` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `notify` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `photo` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `attach` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `profile` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `profile_check` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `pconfig` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `search` WHERE `uid` = %d", intval($uid));
-	q("DELETE FROM `spam` WHERE `uid` = %d", intval($uid));
-	// don't delete yet, will be done later when contacts have deleted my stuff
-	// q("DELETE FROM `user` WHERE `uid` = %d", intval($uid));
+	// The user and related data will be deleted in "cron_expire_and_remove_users" (cronjobs.php)
 	q("UPDATE `user` SET `account_removed` = 1, `account_expires_on` = UTC_TIMESTAMP() WHERE `uid` = %d", intval($uid));
 	proc_run(PRIORITY_HIGH, "include/notifier.php", "removeme", $uid);
 
@@ -91,11 +70,11 @@ function terminate_friendship($user,$self,$contact) {
 	/// @TODO Get rid of this, include/datetime.php should care about it by itself
 	$a = get_app();
 
-	require_once('include/datetime.php');
+	require_once 'include/datetime.php';
 
 	if ($contact['network'] === NETWORK_OSTATUS) {
 
-		require_once('include/ostatus.php');
+		require_once 'include/ostatus.php';
 
 		// create an unfollow slap
 		$item = array();
@@ -104,14 +83,14 @@ function terminate_friendship($user,$self,$contact) {
 		$slap = ostatus::salmon($item, $user);
 
 		if ((x($contact,'notify')) && (strlen($contact['notify']))) {
-			require_once('include/salmon.php');
+			require_once 'include/salmon.php';
 			slapper($user,$contact['notify'],$slap);
 		}
 	} elseif ($contact['network'] === NETWORK_DIASPORA) {
-		require_once('include/diaspora.php');
+		require_once 'include/diaspora.php';
 		Diaspora::send_unshare($user,$contact);
 	} elseif ($contact['network'] === NETWORK_DFRN) {
-		require_once('include/dfrn.php');
+		require_once 'include/dfrn.php';
 		dfrn::deliver($user,$contact,'placeholder', 1);
 	}
 
@@ -129,7 +108,7 @@ function mark_for_death($contact) {
 	if($contact['archive'])
 		return;
 
-	if($contact['term-date'] == '0000-00-00 00:00:00') {
+	if ($contact['term-date'] <= NULL_DATE) {
 		q("UPDATE `contact` SET `term-date` = '%s' WHERE `id` = %d",
 				dbesc(datetime_convert()),
 				intval($contact['id'])
@@ -187,13 +166,13 @@ function unmark_for_death($contact) {
 
 	// It's a miracle. Our dead contact has inexplicably come back to life.
 	q("UPDATE `contact` SET `term-date` = '%s' WHERE `id` = %d",
-		dbesc('0000-00-00 00:00:00'),
+		dbesc(NULL_DATE),
 		intval($contact['id'])
 	);
 
 	if ($contact['url'] != '') {
 		q("UPDATE `contact` SET `term-date` = '%s' WHERE `nurl` = '%s'",
-			dbesc('0000-00-00 00:00:00'),
+			dbesc(NULL_DATE),
 			dbesc(normalise_link($contact['url']))
 		);
 	}
@@ -213,6 +192,10 @@ function unmark_for_death($contact) {
  */
 function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 	static $cache = array();
+
+	if ($url == '') {
+		return $default;
+	}
 
 	if ($uid == -1) {
 		$uid = local_user();
@@ -256,7 +239,7 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 
 		// "bd" always contains the upcoming birthday of a contact.
 		// "birthday" might contain the birthday including the year of birth.
-		if ($profile["birthday"] != "0000-00-00") {
+		if ($profile["birthday"] > '0001-01-01') {
 			$bd_timestamp = strtotime($profile["birthday"]);
 			$month = date("m", $bd_timestamp);
 			$day = date("d", $bd_timestamp);
@@ -273,7 +256,7 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 				$profile["bd"] = (++$current_year)."-".$month."-".$day;
 			}
 		} else {
-			$profile["bd"] = "0000-00-00";
+			$profile["bd"] = '0001-01-01';
 		}
 	} else {
 		$profile = $default;
@@ -309,7 +292,7 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
 		$profile["location"] = "";
 		$profile["about"] = "";
 		$profile["gender"] = "";
-		$profile["birthday"] = "0000-00-00";
+		$profile["birthday"] = '0001-01-01';
 	}
 
 	$cache[$url][$uid] = $profile;
@@ -329,6 +312,10 @@ function get_contact_details_by_url($url, $uid = -1, $default = array()) {
  */
 function get_contact_details_by_addr($addr, $uid = -1) {
 	static $cache = array();
+
+	if ($addr == '') {
+		return array();
+	}
 
 	if ($uid == -1) {
 		$uid = local_user();
@@ -508,72 +495,99 @@ function contacts_not_grouped($uid,$start = 0,$count = 0) {
 /**
  * @brief Fetch the contact id for a given url and user
  *
+ * First lookup in the contact table to find a record matching either `url`, `nurl`,
+ * `addr` or `alias`.
+ *
+ * If there's no record and we aren't looking for a public contact, we quit.
+ * If there's one, we check that it isn't time to update the picture else we
+ * directly return the found contact id.
+ *
+ * Second, we probe the provided $url wether it's http://server.tld/profile or
+ * nick@server.tld. We quit if we can't get any info back.
+ *
+ * Third, we create the contact record if it doesn't exist
+ *
+ * Fourth, we update the existing record with the new data (avatar, alias, nick)
+ * if there's any updates
+ *
  * @param string $url Contact URL
- * @param integer $uid The user id for the contact
+ * @param integer $uid The user id for the contact (0 = public contact)
  * @param boolean $no_update Don't update the contact
  *
  * @return integer Contact ID
  */
 function get_contact($url, $uid = 0, $no_update = false) {
-	require_once("include/Scrape.php");
-
 	logger("Get contact data for url ".$url." and user ".$uid." - ".App::callstack(), LOGGER_DEBUG);;
 
 	$data = array();
-	$contactid = 0;
+	$contact_id = 0;
 
-	// is it an address in the format user@server.tld?
-	/// @todo use gcontact and/or the addr field for a lookup
-	if (!strstr($url, "http") OR strstr($url, "@")) {
-		$data = probe_url($url);
-		$url = $data["url"];
-		if ($url == "")
-			return 0;
+	if ($url == '') {
+		return 0;
 	}
 
-	$contact = q("SELECT `id`, `avatar-date` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2",
+	// We first try the nurl (http://server.tld/nick), most common case
+	$contacts = q("SELECT `id`, `avatar-date` FROM `contact`
+					WHERE `nurl` = '%s'
+					AND `uid` = %d",
 			dbesc(normalise_link($url)),
 			intval($uid));
 
-	if (!$contact)
-		$contact = q("SELECT `id`, `avatar-date` FROM `contact` WHERE `alias` IN ('%s', '%s') AND `uid` = %d ORDER BY `id` LIMIT 1",
-				dbesc($url),
-				dbesc(normalise_link($url)),
-				intval($uid));
 
-	if ($contact) {
-		$contactid = $contact[0]["id"];
+	// Then the addr (nick@server.tld)
+	if (! dbm::is_result($contacts)) {
+		$contacts = q("SELECT `id`, `avatar-date` FROM `contact`
+					WHERE `addr` = '%s'
+					AND `uid` = %d",
+			dbesc($url),
+			intval($uid));
+	}
+
+	// Then the alias (which could be anything)
+	if (! dbm::is_result($contacts)) {
+		$contacts = q("SELECT `id`, `avatar-date` FROM `contact`
+					WHERE `alias` IN ('%s', '%s')
+					AND `uid` = %d",
+			dbesc($url),
+			dbesc(normalise_link($url)),
+			intval($uid));
+	}
+
+	if (dbm::is_result($contacts)) {
+		$contact_id = $contacts[0]["id"];
 
 		// Update the contact every 7 days
-		$update_photo = ($contact[0]['avatar-date'] < datetime_convert('','','now -7 days'));
-		//$update_photo = ($contact[0]['avatar-date'] < datetime_convert('','','now -12 hours'));
+		$update_photo = ($contacts[0]['avatar-date'] < datetime_convert('','','now -7 days'));
 
 		if (!$update_photo OR $no_update) {
-			return($contactid);
+			return $contact_id;
 		}
-	} elseif ($uid != 0)
+	} elseif ($uid != 0) {
+		// Non-existing user-specific contact, exiting
 		return 0;
+	}
 
-	if (!count($data))
-		$data = probe_url($url);
+	$data = Probe::uri($url);
 
-	// Does this address belongs to a valid network?
-	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA))) {
-		if ($uid != 0)
+	// Last try in gcontact for unsupported networks
+	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_PUMPIO))) {
+		if ($uid != 0) {
 			return 0;
+		}
 
 		// Get data from the gcontact table
-		$r = q("SELECT `name`, `nick`, `url`, `photo`, `addr`, `alias`, `network` FROM `gcontact` WHERE `nurl` = '%s'",
+		$gcontacts = q("SELECT `name`, `nick`, `url`, `photo`, `addr`, `alias`, `network` FROM `gcontact` WHERE `nurl` = '%s'",
 			 dbesc(normalise_link($url)));
-		if (!$r)
+		if (!$gcontacts) {
 			return 0;
+		}
 
-		$data = $r[0];
+		$data = $gcontacts[0];
 	}
 
 	$url = $data["url"];
 
-	if ($contactid == 0) {
+	if (!$contact_id) {
 		q("INSERT INTO `contact` (`uid`, `created`, `url`, `nurl`, `addr`, `alias`, `notify`, `poll`,
 					`name`, `nick`, `photo`, `network`, `pubkey`, `rel`, `priority`,
 					`batch`, `request`, `confirm`, `poco`, `name-date`, `uri-date`,
@@ -602,45 +616,48 @@ function get_contact($url, $uid = 0, $no_update = false) {
 			dbesc(datetime_convert())
 		);
 
-		$contact = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2",
+		$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2",
 				dbesc(normalise_link($data["url"])),
 				intval($uid));
-		if (!$contact)
+		if (!dbm::is_result($contacts)) {
 			return 0;
+		}
 
-		$contactid = $contact[0]["id"];
+		$contact_id = $contacts[0]["id"];
 
 		// Update the newly created contact from data in the gcontact table
-		$r = q("SELECT `location`, `about`, `keywords`, `gender` FROM `gcontact` WHERE `nurl` = '%s'",
+		$gcontacts = q("SELECT `location`, `about`, `keywords`, `gender` FROM `gcontact` WHERE `nurl` = '%s'",
 			 dbesc(normalise_link($data["url"])));
-		if ($r) {
-			logger("Update contact ".$data["url"]);
+		if (dbm::is_result($gcontacts)) {
+			logger("Update contact " . $data["url"] . ' from gcontact');
 			q("UPDATE `contact` SET `location` = '%s', `about` = '%s', `keywords` = '%s', `gender` = '%s' WHERE `id` = %d",
-				dbesc($r["location"]), dbesc($r["about"]), dbesc($r["keywords"]),
-				dbesc($r["gender"]), intval($contactid));
+				dbesc($gcontacts[0]["location"]), dbesc($gcontacts[0]["about"]), dbesc($gcontacts[0]["keywords"]),
+				dbesc($gcontacts[0]["gender"]), intval($contact_id));
 		}
 	}
 
-	if ((count($contact) > 1) AND ($uid == 0) AND ($contactid != 0) AND ($url != ""))
+	if (count($contacts) > 1 AND $uid == 0 AND $contact_id != 0 AND $url != "") {
 		q("DELETE FROM `contact` WHERE `nurl` = '%s' AND `id` != %d AND NOT `self`",
 			dbesc(normalise_link($url)),
-			intval($contactid));
+			intval($contact_id));
+	}
 
-	require_once("Photo.php");
+	require_once "Photo.php";
 
-	update_contact_avatar($data["photo"],$uid,$contactid);
+	update_contact_avatar($data["photo"], $uid, $contact_id);
 
-	$r = q("SELECT `addr`, `alias`, `name`, `nick` FROM `contact`  WHERE `id` = %d", intval($contactid));
+	$contacts = q("SELECT `addr`, `alias`, `name`, `nick` FROM `contact` WHERE `id` = %d", intval($contact_id));
 
 	// This condition should always be true
-	if (!dbm::is_result($r))
-		return $contactid;
+	if (!dbm::is_result($contacts)) {
+		return $contact_id;
+	}
 
 	// Only update if there had something been changed
-	if (($data["addr"] != $r[0]["addr"]) OR
-		($data["alias"] != $r[0]["alias"]) OR
-		($data["name"] != $r[0]["name"]) OR
-		($data["nick"] != $r[0]["nick"]))
+	if ($data["addr"] != $contacts[0]["addr"] OR
+		$data["alias"] != $contacts[0]["alias"] OR
+		$data["name"] != $contacts[0]["name"] OR
+		$data["nick"] != $contacts[0]["nick"]) {
 		q("UPDATE `contact` SET `addr` = '%s', `alias` = '%s', `name` = '%s', `nick` = '%s',
 			`name-date` = '%s', `uri-date` = '%s' WHERE `id` = %d",
 			dbesc($data["addr"]),
@@ -649,10 +666,11 @@ function get_contact($url, $uid = 0, $no_update = false) {
 			dbesc($data["nick"]),
 			dbesc(datetime_convert()),
 			dbesc(datetime_convert()),
-			intval($contactid)
+			intval($contact_id)
 		);
+	}
 
-	return $contactid;
+	return $contact_id;
 }
 
 /**
@@ -665,7 +683,7 @@ function get_contact($url, $uid = 0, $no_update = false) {
  */
 function posts_from_gcontact(App $a, $gcontact_id) {
 
-	require_once('include/conversation.php');
+	require_once 'include/conversation.php';
 
 	// There are no posts with "uid = 0" with connector networks
 	// This speeds up the query a lot
@@ -674,15 +692,6 @@ function posts_from_gcontact(App $a, $gcontact_id) {
 		$sql = "(`item`.`uid` = 0 OR  (`item`.`uid` = %d AND `item`.`private`))";
 	else
 		$sql = "`item`.`uid` = %d";
-
-	if(get_config('system', 'old_pager')) {
-		$r = q("SELECT COUNT(*) AS `total` FROM `item`
-			WHERE `gcontact-id` = %d and $sql",
-			intval($gcontact_id),
-			intval(local_user()));
-
-		$a->set_pager_total($r[0]['total']);
-	}
 
 	$r = q("SELECT `item`.`uri`, `item`.*, `item`.`id` AS `item_id`,
 			`author-name` AS `name`, `owner-avatar` AS `photo`,
@@ -697,13 +706,9 @@ function posts_from_gcontact(App $a, $gcontact_id) {
 		intval($a->pager['itemspage'])
 	);
 
-	$o = conversation($a,$r,'community',false);
+	$o = conversation($a, $r, 'community', false);
 
-	if(!get_config('system', 'old_pager')) {
-		$o .= alt_pager($a,count($r));
-	} else {
-		$o .= paginate($a);
-	}
+	$o .= alt_pager($a, count($r));
 
 	return $o;
 }
@@ -717,7 +722,7 @@ function posts_from_gcontact(App $a, $gcontact_id) {
  */
 function posts_from_contact_url(App $a, $contact_url) {
 
-	require_once('include/conversation.php');
+	require_once 'include/conversation.php';
 
 	// There are no posts with "uid = 0" with connector networks
 	// This speeds up the query a lot
@@ -736,15 +741,6 @@ function posts_from_contact_url(App $a, $contact_url) {
 
 	$author_id = intval($r[0]["author-id"]);
 
-	if (get_config('system', 'old_pager')) {
-		$r = q("SELECT COUNT(*) AS `total` FROM `item`
-			WHERE `author-id` = %d and $sql",
-			intval($author_id),
-			intval(local_user()));
-
-		$a->set_pager_total($r[0]['total']);
-	}
-
 	$r = q(item_query()." AND `item`.`author-id` = %d AND ".$sql.
 		" ORDER BY `item`.`created` DESC LIMIT %d, %d",
 		intval($author_id),
@@ -753,13 +749,9 @@ function posts_from_contact_url(App $a, $contact_url) {
 		intval($a->pager['itemspage'])
 	);
 
-	$o = conversation($a,$r,'community',false);
+	$o = conversation($a, $r, 'community', false);
 
-	if (!get_config('system', 'old_pager')) {
-		$o .= alt_pager($a,count($r));
-	} else {
-		$o .= paginate($a);
-	}
+	$o .= alt_pager($a, count($r));
 
 	return $o;
 }
@@ -839,4 +831,3 @@ function account_type($contact) {
 
 	return $account_type;
 }
-?>

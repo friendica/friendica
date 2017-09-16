@@ -1,6 +1,8 @@
 <?php
 
-require_once('include/Scrape.php');
+use Friendica\App;
+
+require_once 'include/probe.php';
 
 function acctlink_init(App $a) {
 

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/group.php');
 require_once('include/socgraph.php');
 
@@ -635,8 +637,7 @@ function settings_post(App $a) {
 		}
 	}
 
-	require_once('include/profile_update.php');
-	profile_change();
+	proc_run(PRIORITY_LOW, 'include/profile_update.php', local_user());
 
 	// Update the global contact for the user
 	update_gcontact_for_user(local_user());
@@ -779,7 +780,7 @@ function settings_content(App $a) {
 			$arr[$fname] = array();
 			$arr[$fname][0] = $fdata[0];
 			foreach (array_slice($fdata,1) as $f) {
-				$arr[$fname][1][] = array('feature_' .$f[0],$f[1],((intval(feature_enabled(local_user(),$f[0]))) ? "1" : ''),$f[2],array(t('Off'),t('On')));
+				$arr[$fname][1][] = array('feature_' .$f[0],$f[1],((intval(feature_enabled(local_user(),$f[0]))) ? "1" : ''),$f[2],array(t('Off'), t('On')));
 			}
 		}
 
@@ -872,7 +873,7 @@ function settings_content(App $a) {
 		$mail_pubmail      = ((dbm::is_result($r)) ? $r[0]['pubmail'] : 0);
 		$mail_action       = ((dbm::is_result($r)) ? $r[0]['action'] : 0);
 		$mail_movetofolder = ((dbm::is_result($r)) ? $r[0]['movetofolder'] : '');
-		$mail_chk          = ((dbm::is_result($r)) ? $r[0]['last_check'] : '0000-00-00 00:00:00');
+		$mail_chk          = ((dbm::is_result($r)) ? $r[0]['last_check'] : NULL_DATE);
 
 
 		$tpl = get_markup_template("settings_connectors.tpl");
@@ -1164,48 +1165,48 @@ function settings_content(App $a) {
 	}
 
 	$opt_tpl = get_markup_template("field_yesno.tpl");
-	if(get_config('system','publish_all')) {
+	if (get_config('system','publish_all')) {
 		$profile_in_dir = '<input type="hidden" name="profile_in_directory" value="1" />';
 	} else {
-		$profile_in_dir = replace_macros($opt_tpl,array(
-			'$field' 	=> array('profile_in_directory', t('Publish your default profile in your local site directory?'), $profile['publish'], '', array(t('No'),t('Yes'))),
+		$profile_in_dir = replace_macros($opt_tpl, array(
+			'$field' => array('profile_in_directory', t('Publish your default profile in your local site directory?'), $profile['publish'], t("Your profile may be visible in public."), array(t('No'), t('Yes')))
 		));
 	}
 
 	if (strlen(get_config('system','directory'))) {
-		$profile_in_net_dir = replace_macros($opt_tpl,array(
-			'$field' 	=> array('profile_in_netdirectory', t('Publish your default profile in the global social directory?'), $profile['net-publish'], '', array(t('No'),t('Yes'))),
+		$profile_in_net_dir = replace_macros($opt_tpl, array(
+			'$field' => array('profile_in_netdirectory', t('Publish your default profile in the global social directory?'), $profile['net-publish'], '', array(t('No'), t('Yes')))
 		));
 	} else {
 		$profile_in_net_dir = '';
 	}
 
 	$hide_friends = replace_macros($opt_tpl,array(
-			'$field' 	=> array('hide-friends', t('Hide your contact/friend list from viewers of your default profile?'), $profile['hide-friends'], '', array(t('No'),t('Yes'))),
+			'$field' 	=> array('hide-friends', t('Hide your contact/friend list from viewers of your default profile?'), $profile['hide-friends'], '', array(t('No'), t('Yes'))),
 	));
 
 	$hide_wall = replace_macros($opt_tpl,array(
-			'$field' 	=> array('hidewall',  t('Hide your profile details from unknown viewers?'), $a->user['hidewall'], t("If enabled, posting public messages to Diaspora and other networks isn't possible."), array(t('No'),t('Yes'))),
+			'$field' 	=> array('hidewall',  t('Hide your profile details from unknown viewers?'), $a->user['hidewall'], t("If enabled, posting public messages to Diaspora and other networks isn't possible."), array(t('No'), t('Yes'))),
 
 	));
 
 	$blockwall = replace_macros($opt_tpl,array(
-			'$field' 	=> array('blockwall',  t('Allow friends to post to your profile page?'), (intval($a->user['blockwall']) ? '0' : '1'), '', array(t('No'),t('Yes'))),
+			'$field' 	=> array('blockwall',  t('Allow friends to post to your profile page?'), (intval($a->user['blockwall']) ? '0' : '1'), '', array(t('No'), t('Yes'))),
 
 	));
 
 	$blocktags = replace_macros($opt_tpl,array(
-			'$field' 	=> array('blocktags',  t('Allow friends to tag your posts?'), (intval($a->user['blocktags']) ? '0' : '1'), '', array(t('No'),t('Yes'))),
+			'$field' 	=> array('blocktags',  t('Allow friends to tag your posts?'), (intval($a->user['blocktags']) ? '0' : '1'), '', array(t('No'), t('Yes'))),
 
 	));
 
 	$suggestme = replace_macros($opt_tpl,array(
-			'$field' 	=> array('suggestme',  t('Allow us to suggest you as a potential friend to new members?'), $suggestme, '', array(t('No'),t('Yes'))),
+			'$field' 	=> array('suggestme',  t('Allow us to suggest you as a potential friend to new members?'), $suggestme, '', array(t('No'), t('Yes'))),
 
 	));
 
 	$unkmail = replace_macros($opt_tpl,array(
-			'$field' 	=> array('unkmail',  t('Permit unknown people to send you private mail?'), $unkmail, '', array(t('No'),t('Yes'))),
+			'$field' 	=> array('unkmail',  t('Permit unknown people to send you private mail?'), $unkmail, '', array(t('No'), t('Yes'))),
 
 	));
 
@@ -1231,11 +1232,11 @@ function settings_content(App $a) {
 		'days' => array('expire',  t("Automatically expire posts after this many days:"), $expire, t('If empty, posts will not expire. Expired posts will be deleted')),
 		'advanced' => t('Advanced expiration settings'),
 		'label' => t('Advanced Expiration'),
-		'items' => array('expire_items',  t("Expire posts:"), $expire_items, '', array(t('No'),t('Yes'))),
-		'notes' => array('expire_notes',  t("Expire personal notes:"), $expire_notes, '', array(t('No'),t('Yes'))),
-		'starred' => array('expire_starred',  t("Expire starred posts:"), $expire_starred, '', array(t('No'),t('Yes'))),
-		'photos' => array('expire_photos',  t("Expire photos:"), $expire_photos, '', array(t('No'),t('Yes'))),
-		'network_only' => array('expire_network_only',  t("Only expire posts by others:"), $expire_network_only, '', array(t('No'),t('Yes'))),
+		'items' => array('expire_items',  t("Expire posts:"), $expire_items, '', array(t('No'), t('Yes'))),
+		'notes' => array('expire_notes',  t("Expire personal notes:"), $expire_notes, '', array(t('No'), t('Yes'))),
+		'starred' => array('expire_starred',  t("Expire starred posts:"), $expire_starred, '', array(t('No'), t('Yes'))),
+		'photos' => array('expire_photos',  t("Expire photos:"), $expire_photos, '', array(t('No'), t('Yes'))),
+		'network_only' => array('expire_network_only',  t("Only expire posts by others:"), $expire_network_only, '', array(t('No'), t('Yes'))),
 	);
 
 	require_once('include/group.php');
@@ -1293,7 +1294,7 @@ function settings_content(App $a) {
 
 		'$h_prv' 	=> t('Security and Privacy Settings'),
 
-		'$maxreq' 	=> array('maxreq', t('Maximum Friend Requests/Day:'), $maxreq ,t("\x28to prevent spam abuse\x29")),
+		'$maxreq' 	=> array('maxreq', t('Maximum Friend Requests/Day:'), $maxreq , t("\x28to prevent spam abuse\x29")),
 		'$permissions' => t('Default Post Permissions'),
 		'$permdesc' => t("\x28click to open/close\x29"),
 		'$visibility' => $profile['net-publish'],
@@ -1323,7 +1324,7 @@ function settings_content(App $a) {
 		'$hide_friends' => $hide_friends,
 		'$hide_wall' => $hide_wall,
 		'$unkmail' => $unkmail,
-		'$cntunkmail' 	=> array('cntunkmail', t('Maximum private messages per day from unknown people:'), $cntunkmail ,t("\x28to prevent spam abuse\x29")),
+		'$cntunkmail' 	=> array('cntunkmail', t('Maximum private messages per day from unknown people:'), $cntunkmail , t("\x28to prevent spam abuse\x29")),
 
 
 		'$h_not' 	=> t('Notification Settings'),

@@ -37,7 +37,7 @@ local .htaccess file
 		- PHP *command line* access with register_argc_argv set to true in the 
 php.ini file [or see 'poormancron' in section 8]
 
-		- curl, gd (with at least jpeg support), mysql, mbstring, mcrypt, and openssl extensions
+		- curl, gd (with at least jpeg support), mysql, mbstring and openssl extensions
 
 		- some form of email server or email gateway such that PHP mail() works
 

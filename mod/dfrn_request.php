@@ -12,10 +12,12 @@
  *    https://github.com/friendica/friendica/blob/master/spec/dfrn2_contact_request.png
  */
 
-require_once('include/enotify.php');
-require_once('include/Scrape.php');
-require_once('include/Probe.php');
-require_once('include/group.php');
+use Friendica\App;
+use Friendica\Network\Probe;
+
+require_once 'include/enotify.php';
+require_once 'include/probe.php';
+require_once 'include/group.php';
 
 function dfrn_request_init(App $a) {
 
@@ -131,7 +133,7 @@ function dfrn_request_post(App $a) {
 						if (! x($parms,'photo')) {
 							notice( t('Warning: profile location has no profile photo.') . EOL );
 						}
-						$invalid = Probe::valid_dfrn($parms);
+						$invalid = Probe::validDfrn($parms);
 						if ($invalid) {
 							notice( sprintf( tt("%d required parameter was not found at the given location",
 												"%d required parameters were not found at the given location",
@@ -453,7 +455,7 @@ function dfrn_request_post(App $a) {
 			$network = $data["network"];
 
 			// Canonicalise email-style profile locator
-			$url = Probe::webfinger_dfrn($url,$hcard);
+			$url = Probe::webfingerDfrn($url,$hcard);
 
 			if (substr($url,0,5) === 'stat:') {
 
@@ -514,8 +516,11 @@ function dfrn_request_post(App $a) {
 					return; // NOTREACHED
 				}
 
-
-				require_once('include/Scrape.php');
+				if (blocked_url($url)) {
+					notice( t('Blocked domain') . EOL);
+					goaway(App::get_baseurl() . '/' . $a->cmd);
+					return; // NOTREACHED
+				}
 
 				$parms = Probe::profile(($hcard) ? $hcard : $url);
 
@@ -530,7 +535,7 @@ function dfrn_request_post(App $a) {
 					if (! x($parms,'photo')) {
 						notice( t('Warning: profile location has no profile photo.') . EOL );
 					}
-					$invalid = Probe::valid_dfrn($parms);
+					$invalid = Probe::validDfrn($parms);
 					if ($invalid) {
 						notice( sprintf( tt("%d required parameter was not found at the given location",
 											"%d required parameters were not found at the given location",
@@ -760,7 +765,7 @@ function dfrn_request_content(App $a) {
 				}
 
 				if($auto_confirm) {
-					require_once('mod/dfrn_confirm.php');
+					require_once 'mod/dfrn_confirm.php';
 					$handsfree = array(
 						'uid'      => $r[0]['uid'],
 						'node'     => $r[0]['nickname'],
@@ -872,7 +877,7 @@ function dfrn_request_content(App $a) {
 			'$header' => t('Friend/Connection Request'),
 			'$desc' => t('Examples: jojo@demo.friendica.com, http://demo.friendica.com/profile/jojo, testuser@identi.ca'),
 			'$pls_answer' => t('Please answer the following:'),
-			'$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$a->profile['name']), false, '', array(t('No'),t('Yes'))),
+			'$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$a->profile['name']), false, '', array(t('No'), t('Yes'))),
 			/*'$does_know' => sprintf( t('Does %s know you?'),$a->profile['name']),
 			'$yes' => t('Yes'),
 			'$no' => t('No'), */

@@ -1866,6 +1866,9 @@ input#dfrn-url {
 	-webkit-border-radius: 10px;
 }
 
+.pager .disabled {
+	display: none;
+}
 
 .pager_first,
 .pager_last,

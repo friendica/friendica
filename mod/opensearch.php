@@ -1,18 +1,19 @@
 <?php
-    function opensearch_content(App $a) {
 
-		$tpl = get_markup_template('opensearch.tpl');
+use Friendica\App;
 
-		header("Content-type: application/opensearchdescription+xml");
+function opensearch_content(App $a) {
 
-		$o = replace_macros($tpl, array(
-			'$baseurl' => App::get_baseurl(),
-			'$nodename' => $a->get_hostname(),
-		));
+	$tpl = get_markup_template('opensearch.tpl');
 
-		echo $o;
+	header("Content-type: application/opensearchdescription+xml");
 
-		killme();
+	$o = replace_macros($tpl, array(
+		'$baseurl' => App::get_baseurl(),
+		'$nodename' => $a->get_hostname(),
+	));
 
-	}
-?>
+	echo $o;
+
+	killme();
+}

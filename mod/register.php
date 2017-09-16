@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once('include/enotify.php');
 require_once('include/bbcode.php');
 require_once('include/user.php');
@@ -282,7 +284,7 @@ function register_content(App $a) {
 		'$passwords' => $passwords,
 		'$password1' => array('password1', t('New Password:'), '', t('Leave empty for an auto generated password.')),
 		'$password2' => array('confirm', t('Confirm:'), '', ''),
-		'$nickdesc'  => str_replace('$sitename',$a->get_hostname(),t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be \'<strong>nickname@$sitename</strong>\'.')),
+		'$nickdesc'  => str_replace('$sitename',$a->get_hostname(), t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be \'<strong>nickname@$sitename</strong>\'.')),
 		'$nicklabel' => t('Choose a nickname: '),
 		'$photo'     => $photo,
 		'$publish'   => $profile_publish,

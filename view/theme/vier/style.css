@@ -247,6 +247,10 @@ div.pager {
   float: left;
 }
 
+.pager .disabled {
+	display: none;
+}
+
 .hide-comments-outer {
   margin-left: 80px;
   margin-bottom: 5px;

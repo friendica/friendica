@@ -258,5 +258,3 @@ function post_update_1206() {
 	logger("Done", LOGGER_DEBUG);
 	return true;
 }
-
-?>

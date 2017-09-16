@@ -4,6 +4,7 @@
  * General purpose landing page for plugins/addons
  */
 
+use Friendica\App;
 
 function cb_init(App $a) {
 	call_hooks('cb_init');

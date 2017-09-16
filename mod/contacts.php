@@ -1,11 +1,14 @@
 <?php
 
-require_once('include/Contact.php');
-require_once('include/socgraph.php');
-require_once('include/contact_selectors.php');
-require_once('include/Scrape.php');
-require_once('mod/proxy.php');
-require_once('include/Photo.php');
+use Friendica\App;
+use Friendica\Network\Probe;
+
+require_once 'include/Contact.php';
+require_once 'include/socgraph.php';
+require_once 'include/contact_selectors.php';
+require_once 'include/probe.php';
+require_once 'mod/proxy.php';
+require_once 'include/Photo.php';
 
 function contacts_init(App $a) {
 	if (! local_user()) {
@@ -25,8 +28,8 @@ function contacts_init(App $a) {
 		}
 	}
 
-	require_once('include/group.php');
-	require_once('include/contact_widgets.php');
+	require_once 'include/group.php';
+	require_once 'include/contact_widgets.php';
 
 	if ($_GET['nets'] == "all") {
 		$_GET['nets'] = "";
@@ -260,7 +263,7 @@ function _contact_update_profile($contact_id) {
 	if ($uid != local_user())
 		return;
 
-	$data = probe_url($r[0]["url"]);
+	$data = Probe::uri($r[0]["url"], "", 0, false);
 
 	// "Feed" or "Unknown" is mostly a sign of communication problems
 	if ((in_array($data["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) AND ($data["network"] != $r[0]["network"]))
@@ -304,7 +307,7 @@ function _contact_update_profile($contact_id) {
 	);
 
 	// Update the entry in the contact table
-	update_contact_avatar($data['photo'], local_user(), $contact_id);
+	update_contact_avatar($data['photo'], local_user(), $contact_id, true);
 
 	// Update the entry in the gcontact table
 	update_gcontact_from_probe($data["url"]);
@@ -496,7 +499,7 @@ function contacts_content(App $a) {
 			'$baseurl' => App::get_baseurl(true),
 		));
 
-		require_once('include/contact_selectors.php');
+		require_once 'include/contact_selectors.php';
 
 		$tpl = get_markup_template("contact_edit.tpl");
 
@@ -534,13 +537,13 @@ function contacts_content(App $a) {
 
 		$insecure = t('Private communications are not available for this contact.');
 
-		$last_update = (($contact['last-update'] == '0000-00-00 00:00:00')
+		$last_update = (($contact['last-update'] <= NULL_DATE)
 				? t('Never')
 				: datetime_convert('UTC',date_default_timezone_get(),$contact['last-update'],'D, j M Y, g:i A'));
 
-		if($contact['last-update'] !== '0000-00-00 00:00:00')
+		if ($contact['last-update'] > NULL_DATE) {
 			$last_update .= ' ' . (($contact['last-update'] <= $contact['success_update']) ? t("\x28Update was successful\x29") : t("\x28Update was not successful\x29"));
-
+		}
 		$lblsuggest = (($contact['network'] === NETWORK_DFRN) ? t('Suggest friends') : '');
 
 		$poll_enabled = in_array($contact['network'], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_FEED, NETWORK_MAIL, NETWORK_MAIL2));
@@ -558,12 +561,12 @@ function contacts_content(App $a) {
 		// tabs
 		$tab_str = contacts_tab($a, $contact_id, 2);
 
-		$lost_contact = (($contact['archive'] && $contact['term-date'] != '0000-00-00 00:00:00' && $contact['term-date'] < datetime_convert('','','now')) ? t('Communications lost with this contact!') : '');
+		$lost_contact = (($contact['archive'] && $contact['term-date'] > NULL_DATE && $contact['term-date'] < datetime_convert('','','now')) ? t('Communications lost with this contact!') : '');
 
-		if ($contact['network'] == NETWORK_FEED)
+		if ($contact['network'] == NETWORK_FEED) {
 			$fetch_further_information = array('fetch_further_information', t('Fetch further information for feeds'), $contact['fetch_further_information'], t('Fetch further information for feeds'),
 									array('0'=>t('Disabled'), '1'=>t('Fetch information'), '2'=>t('Fetch information and keywords')));
-
+		}
 		if (in_array($contact['network'], array(NETWORK_FEED, NETWORK_MAIL, NETWORK_MAIL2)))
 			$poll_interval = contact_poll_interval($contact['priority'],(! $poll_enabled));
 
@@ -828,7 +831,7 @@ function contacts_content(App $a) {
  *
  * Available Pages are 'Status', 'Profile', 'Contacts' and 'Common Friends'
  *
- * @param app $a
+ * @param App $a
  * @param int $contact_id The ID of the contact
  * @param int $active_tab 1 if tab should be marked as active
  *

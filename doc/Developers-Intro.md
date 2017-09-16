@@ -6,8 +6,7 @@ Where to get started to help improve Friendica?
 Do you want to help us improve Friendica?
 Here we have compiled some hints on how to get started and some tasks to help you choose.
 A project like Friendica is the sum of many different contributions.
-**Very different skills are required to make good software.
-Some of them involve coding, others do not.**
+**Very different skills are required to make good software, not all of them involve coding!**
 We are looking for helpers in all areas, whether you write text or code, whether you spread the word to convince people or design new icons.
 Whether you feel like an expert or like a newbie - join us with your ideas!
 
@@ -46,6 +45,16 @@ We can't promise we have the right skills in the group but we'll try.
 
 Programming
 ---
+
+### Composer
+
+Friendica uses [Composer](https://getcomposer.org) to manage dependencies libraries and the class autoloader both for libraries and namespaced Friendica classes.
+
+It's a command-line tool that downloads required libraries into the `vendor` folder and makes any namespaced class in `src` available through the whole application through `boot.php`.
+
+* [Class autoloading](help/autoloader)
+* [Using Composer](help/Composer)
+* [How To Move Classes to `src`](help/Developer-How-To-Move-Classes-to-src)
 
 ###Coding standards
 
@@ -120,6 +129,7 @@ Ask us to find out whom to talk to about their experiences.
 Do not worry about cross-posting.
 
 ###Client software
+
 As Friendica is using a [Twitter/GNU Social compatible API](help/api) any of the clients for those platforms should work with Friendica as well.
 Furthermore there are several client projects, especially for use with Friendica.
 If you are interested in improving those clients, please contact the developers of the clients directly.

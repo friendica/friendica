@@ -22,7 +22,7 @@ This is the default selection.
 Community Forum/Celebrity Accounts provide the ability for people to become friends/fans of the forum without requiring approval.
 
 The exact setting you would use depends on how you wish to interact with people who join the page.
-The "Soapbox" setting let's the page owner control all communications.
+The "Soapbox" setting lets the page owner control all communications.
 Everything you post will go out to the forum members, but there will be no opportunity for interaction.
 This setting would typically be used for announcements or corporate communications.
 

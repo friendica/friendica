@@ -14,18 +14,20 @@
 				{{* This is the Action menu where contact related actions like 'ignore', 'hide' can be performed *}}
 				<ul id="contact-edit-actions" class="nav nav-pills preferences">
 					<li class="dropdown pull-right">
-						<a class="btn btn-link btn-sm dropdown-toggle" type="button" id="contact-edit-actions-button" data-toggle="dropdown" aria-expanded="true">
+						<button type="button" class="btn btn-link btn-sm dropdown-toggle" id="contact-edit-actions-button" data-toggle="dropdown" aria-expanded="true">
 							<i class="fa fa-angle-down"></i>&nbsp;{{$contact_action_button}}
-						</a>
+						</button>
 
 						<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="contact-edit-actions-button" aria-haspopup="true" id="contact-actions-menu" >
-							{{if $lblsuggest}}<li role="menuitem"><a  href="#" title="{{$contact_actions.suggest.title}}" onclick="window.location.href='{{$contact_actions.suggest.url}}'; return false;">{{$contact_actions.suggest.label}}</a></li>{{/if}}
-							{{if $poll_enabled}}<li role="menuitem"><a  href="#" title="{{$contact_actions.update.title}}" onclick="window.location.href='{{$contact_actions.update.url}}'; return false;">{{$contact_actions.update.label}}</a></li>{{/if}}
+							{{if $lblsuggest}}<li role="menuitem"><a href="{{$contact_actions.suggest.url}}" title="{{$contact_actions.suggest.title}}">{{$contact_actions.suggest.label}}</a></li>{{/if}}
+							{{if $poll_enabled}}<li role="menuitem"><a href="{{$contact_actions.update.url}}" title="{{$contact_actions.update.title}}">{{$contact_actions.update.label}}</a></li>{{/if}}
+							{{if $lblsuggest || $poll_enabled}}
 							<li class="divider"></li>
-							<li role="menuitem"><a  href="#" title="{{$contact_actions.block.title}}" onclick="window.location.href='{{$contact_actions.block.url}}'; return false;">{{$contact_actions.block.label}}</a></li>
-							<li role="menuitem"><a  href="#" title="{{$contact_actions.ignore.title}}" onclick="window.location.href='{{$contact_actions.ignore.url}}'; return false;">{{$contact_actions.ignore.label}}</a></li>
-							<li role="menuitem"><a  href="#" title="{{$contact_actions.archive.title}}" onclick="window.location.href='{{$contact_actions.archive.url}}'; return false;">{{$contact_actions.archive.label}}</a></li>
-							<li role="menuitem"><a  href="#" title="{{$contact_actions.delete.title}}" onclick="addToModal('{{$contact_actions.delete.url}}?confirm=1'); return false;">{{$contact_actions.delete.label}}</a></li>
+							{{/if}}
+							<li role="menuitem"><a href="{{$contact_actions.block.url}}" title="{{$contact_actions.block.title}}">{{$contact_actions.block.label}}</a></li>
+							<li role="menuitem"><a href="{{$contact_actions.ignore.url}}" title="{{$contact_actions.ignore.title}}">{{$contact_actions.ignore.label}}</a></li>
+							<li role="menuitem"><a href="{{$contact_actions.archive.url}}" title="{{$contact_actions.archive.title}}">{{$contact_actions.archive.label}}</a></li>
+							<li role="menuitem"><button type="button" class="btn-link" title="{{$contact_actions.delete.title}}" onclick="addToModal('{{$contact_actions.delete.url}}?confirm=1');">{{$contact_actions.delete.label}}</button></li>
 						</ul>
 					</li>
 				</ul>

@@ -61,17 +61,17 @@ table.bbcodes > * > tr > th {
   <td><span style="color:  red;">rot</span></td>
 </tr>
 <tr>
-  <td>[url=http://www.friendica.com]Friendica[/url]</td>
-  <td><a href="http://www.friendica.com" target="external-link">Friendica</a></td>
+  <td>[url=http://friendi.ca]Friendica[/url]</td>
+  <td><a href="http://friendi.ca" target="external-link">Friendica</a></td>
 </tr>
 <tr>
-  <td>[img]http://friendica.com/sites/default/files/friendika-32.png[/img]</td>
-  <td><img src="http://friendica.com/sites/default/files/friendika-32.png" alt="Immagine/foto"></td>
+  <td>[img]https://raw.githubusercontent.com/friendica/friendica/master/images/friendica-32.jpg[/img]</td>
+  <td><img src="https://raw.githubusercontent.com/friendica/friendica/master/images/friendica-32.jpg" alt="Immagine/foto"></td>
 </tr>
 <tr>
-  <td>[img=64x32]http://friendica.com/sites/default/files/friendika-32.png[/img]<br>
+  <td>[img=64x32]https://raw.githubusercontent.com/friendica/friendica/master/images/friendica-32.jpg[/img]<br>
 <br>Note: provided height is simply discarded.</td>
-  <td><img src="http://friendica.com/sites/default/files/friendika-32.png" style="width: 64px;"></td>
+  <td><img src="https://raw.githubusercontent.com/friendica/friendica/master/images/friendica-32.jpg" style="width: 64px;"></td>
 </tr>
 <tr>
   <td>[size=xx-small]kleiner Text[/size]</td>
@@ -99,23 +99,23 @@ table.bbcodes > * > tr > th {
   <th>Ergebnis</th>
 </tr>
 <tr>
-  <td>[url]http://friendica.com[/url]</td>
-  <td><a href="http://friendica.com">http://friendica.com</a></td>
+  <td>[url]http://friendi.ca[/url]</td>
+  <td><a href="http://friendi.ca">http://friendi.ca</a></td>
 </tr>
 <tr>
-  <td>[url=http://friendica.com]Friendica[/url]</td>
-  <td><a href="http://friendica.com">Friendica</a></td>
+  <td>[url=http://friendi.ca.com]Friendica[/url]</td>
+  <td><a href="http://friendi.ca.com">Friendica</a></td>
 </tr>
 <tr>
-  <td>[bookmark]http://friendica.com[/bookmark]<br><br>
-#^[url]http://friendica.com[/url]</td>
-  <td><span class="oembed link"><h4>Friendica: <a href="http://friendica.com" rel="oembed"></a><a href="http://friendica.com" target="_blank">http://friendica.com</a></h4></span></td>
+  <td>[bookmark]http://friendi.ca[/bookmark]<br><br>
+#^[url]http://friendi.ca[/url]</td>
+  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca" target="_blank">http://friendi.ca</a></h4></span></td>
 </tr>
 <tr>
-  <td>[bookmark=http://friendica.com]Lesezeichen[/bookmark]<br><br>
-#^[url=http://friendica.com]Lesezeichen[/url]<br><br>
-#[url=http://friendica.com]^[/url][url=http://friendica.com]Lesezeichen[/url]</td>
-  <td><span class="oembed link"><h4>Friendica: <a href="http://friendica.com" rel="oembed"></a><a href="http://friendica.com" target="_blank">Lesezeichen</a></h4></span></td>
+  <td>[bookmark=http://friendi.ca]Lesezeichen[/bookmark]<br><br>
+#^[url=http://friendi.ca]Lesezeichen[/url]<br><br>
+#[url=http://friendi.ca]^[/url][url=http://friendi.ca]Lesezeichen[/url]</td>
+  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca" target="_blank">Lesezeichen</a></h4></span></td>
 </tr>
 <tr>
   <td>[url=/posts/f16d77b0630f0134740c0cc47a0ea02a]Diaspora Beitrag mit GUID[/url]</td>

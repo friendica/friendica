@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 function hub_return($valid,$body) {
 
 	if($valid) {

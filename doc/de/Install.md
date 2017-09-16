@@ -24,9 +24,8 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
     - Apache mit einer aktiverten mod-rewrite-Funktion und dem Eintrag "Options All", so dass du die lokale .htaccess-Datei nutzen kannst
     - PHP  5.2+. Je neuer, desto besser. Du benötigst 5.3 für die Authentifizierung untereinander. In einer Windows-Umgebung arbeitet die Version 5.2+ möglicherweise nicht, da die Funktion dns_get_record() erst ab Version 5.3 verfügbar ist.
         - PHP *Kommandozeilen*-Zugang mit register_argc_argv auf "true" gesetzt in der php.ini-Datei
-        - curl, gd, mysql und openssl-Erweiterung
+        - Curl, GD, PDO, MySQLi und OpenSSL-Erweiterung
         - etwas in der Art eines Email-Servers oder eines Gateways wie PHP mail()
-        - mcrypt (optional; wird für die Server-zu-Server Nachrichtenentschlüsselung benötigt)
     - Mysql 5.x
     - die Möglichkeit, wiederkehrende Aufgaben mit cron (Linux/Mac) oder "Scheduled Tasks" einzustellen (Windows) [Beachte: andere Optionen sind in Abschnitt 7 dieser Dokumentation zu finden] 
     - Installation in einer Top-Level-Domain oder Subdomain (ohne eine Verzeichnis/Pfad-Komponente in der URL) wird bevorzugt. Verzeichnispfade sind für diesen Zweck nicht so günstig und wurden auch nicht ausführlich getestet.
@@ -37,7 +36,7 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
     1.1. APT-Pakete
 		- Apache: sudo apt-get install apache2
 		- PHP5: sudo apt-get install php5
-			- PHP5-Zusätzliche Pakete: sudo apt-get install php5-curl php5-gd php5-mysql php5-mcrypt
+			- PHP5-Zusätzliche Pakete: sudo apt-get install php5-curl php5-gd php5-mysql
 		- MySQL: sudo apt-get install mysql-server
 
 2. Entpacke die Friendica-Daten in das Quellverzeichnis (root) des Dokumentenbereichs deines Webservers.

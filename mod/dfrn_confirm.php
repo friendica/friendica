@@ -18,9 +18,11 @@
  *    https://github.com/friendica/friendica/blob/master/spec/dfrn2_contact_confirmation.png
  */
 
-require_once('include/enotify.php');
-require_once('include/group.php');
-require_once('include/Probe.php');
+use Friendica\App;
+use Friendica\Network\Probe;
+
+require_once 'include/enotify.php';
+require_once 'include/group.php';
 
 function dfrn_confirm_post(App $a, $handsfree = null) {
 
@@ -152,7 +154,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			 * worried about key leakage than anybody cracking it.
 			 *
 			 */
-			require_once('include/crypto.php');
+			require_once 'include/crypto.php';
 
 			$res = new_keypair(4096);
 
@@ -185,10 +187,10 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			 *
 			 */
 
-			$src_aes_key = random_string();
+			$src_aes_key = openssl_random_pseudo_bytes(64);
 
 			$result = '';
-			openssl_private_encrypt($dfrn_id,$result,$user[0]['prvkey']);
+			openssl_private_encrypt($dfrn_id, $result, $user[0]['prvkey']);
 
 			$params['dfrn_id'] = bin2hex($result);
 			$params['public_key'] = $public_key;
@@ -317,7 +319,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		 *
 		 */
 
-		require_once('include/Photo.php');
+		require_once 'include/Photo.php';
 
 		update_contact_avatar($contact['photo'],$uid,$contact_id);
 
@@ -433,7 +435,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		if ((isset($new_relation) && $new_relation == CONTACT_IS_FRIEND)) {
 
 			if (($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
-				require_once('include/diaspora.php');
+				require_once 'include/diaspora.php';
 				$ret = Diaspora::send_share($user[0],$r[0]);
 				logger('share returns: ' . $ret);
 			}
@@ -446,7 +448,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 
 			if((dbm::is_result($r)) && ($r[0]['hide-friends'] == 0) && ($activity) && (! $hidden)) {
 
-				require_once('include/items.php');
+				require_once 'include/items.php';
 
 				$self = q("SELECT * FROM `contact` WHERE `self` = 1 AND `uid` = %d LIMIT 1",
 					intval($uid)
@@ -586,17 +588,18 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			dbesc($decrypted_source_url),
 			intval($local_uid)
 		);
-		if(! count($ret)) {
-			if(strstr($decrypted_source_url,'http:'))
+		if (!dbm::is_result($ret)) {
+			if (strstr($decrypted_source_url,'http:')) {
 				$newurl = str_replace('http:','https:',$decrypted_source_url);
-			else
+			} else {
 				$newurl = str_replace('https:','http:',$decrypted_source_url);
+			}
 
 			$ret = q("SELECT * FROM `contact` WHERE `url` = '%s' AND `uid` = %d LIMIT 1",
 				dbesc($newurl),
 				intval($local_uid)
 			);
-			if(! count($ret)) {
+			if (!dbm::is_result($ret)) {
 				// this is either a bogus confirmation (?) or we deleted the original introduction.
 				$message = t('Contact record was not found for you on our site.');
 				xml_status(3,$message);
@@ -611,7 +614,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		$foreign_pubkey = $ret[0]['site-pubkey'];
 		$dfrn_record    = $ret[0]['id'];
 
-		if(! $foreign_pubkey) {
+		if (! $foreign_pubkey) {
 			$message = sprintf( t('Site public key not available in contact record for URL %s.'), $newurl);
 			xml_status(3,$message);
 		}
@@ -619,7 +622,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 		$decrypted_dfrn_id = "";
 		openssl_public_decrypt($dfrn_id,$decrypted_dfrn_id,$foreign_pubkey);
 
-		if(strlen($aes_key)) {
+		if (strlen($aes_key)) {
 			$decrypted_aes_key = "";
 			openssl_private_decrypt($aes_key,$decrypted_aes_key,$my_prvkey);
 			$dfrn_pubkey = openssl_decrypt($public_key,'AES-256-CBC',$decrypted_aes_key);
@@ -669,7 +672,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 			$photo = App::get_baseurl() . '/images/person-175.jpg';
 		}
 
-		require_once("include/Photo.php");
+		require_once 'include/Photo.php';
 
 		update_contact_avatar($photo,$local_uid,$dfrn_record);
 
@@ -749,7 +752,7 @@ function dfrn_confirm_post(App $a, $handsfree = null) {
 
 			if((dbm::is_result($r)) && ($r[0]['hide-friends'] == 0)) {
 
-				require_once('include/items.php');
+				require_once 'include/items.php';
 
 				$self = q("SELECT * FROM `contact` WHERE `self` = 1 AND `uid` = %d LIMIT 1",
 					intval($local_uid)

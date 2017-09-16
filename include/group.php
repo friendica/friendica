@@ -4,9 +4,9 @@
 function group_add($uid,$name) {
 
 	$ret = false;
-	if(x($uid) && x($name)) {
+	if (x($uid) && x($name)) {
 		$r = group_byname($uid,$name); // check for dups
-		if($r !== false) {
+		if ($r !== false) {
 
 			// This could be a problem.
 			// Let's assume we've just created a group which we once deleted
@@ -17,7 +17,7 @@ function group_add($uid,$name) {
 			$z = q("SELECT * FROM `group` WHERE `id` = %d LIMIT 1",
 				intval($r)
 			);
-			if(count($z) && $z[0]['deleted']) {
+			if (count($z) && $z[0]['deleted']) {
 				$r = q("UPDATE `group` SET `deleted` = 0 WHERE `uid` = %d AND `name` = '%s'",
 					intval($uid),
 					dbesc($name)
@@ -39,14 +39,14 @@ function group_add($uid,$name) {
 
 function group_rmv($uid,$name) {
 	$ret = false;
-	if(x($uid) && x($name)) {
+	if (x($uid) && x($name)) {
 		$r = q("SELECT id FROM `group` WHERE `uid` = %d AND `name` = '%s' LIMIT 1",
 			intval($uid),
 			dbesc($name)
 		);
 		if (dbm::is_result($r))
 			$group_id = $r[0]['id'];
-		if(! $group_id)
+		if (! $group_id)
 			return false;
 
 		// remove group from default posting lists
@@ -57,20 +57,20 @@ function group_rmv($uid,$name) {
 			$user_info = $r[0];
 			$change = false;
 
-			if($user_info['def_gid'] == $group_id) {
+			if ($user_info['def_gid'] == $group_id) {
 				$user_info['def_gid'] = 0;
 				$change = true;
 			}
-			if(strpos($user_info['allow_gid'], '<' . $group_id . '>') !== false) {
+			if (strpos($user_info['allow_gid'], '<' . $group_id . '>') !== false) {
 				$user_info['allow_gid'] = str_replace('<' . $group_id . '>', '', $user_info['allow_gid']);
 				$change = true;
 			}
-			if(strpos($user_info['deny_gid'], '<' . $group_id . '>') !== false) {
+			if (strpos($user_info['deny_gid'], '<' . $group_id . '>') !== false) {
 				$user_info['deny_gid'] = str_replace('<' . $group_id . '>', '', $user_info['deny_gid']);
 				$change = true;
 			}
 
-			if($change) {
+			if ($change) {
 				q("UPDATE user SET def_gid = %d, allow_gid = '%s', deny_gid = '%s' WHERE uid = %d",
 				  intval($user_info['def_gid']),
 				  dbesc($user_info['allow_gid']),
@@ -100,7 +100,7 @@ function group_rmv($uid,$name) {
 }
 
 function group_byname($uid,$name) {
-	if((! $uid) || (! strlen($name)))
+	if ((! $uid) || (! strlen($name)))
 		return false;
 	$r = q("SELECT * FROM `group` WHERE `uid` = %d AND `name` = '%s' LIMIT 1",
 		intval($uid),
@@ -113,9 +113,9 @@ function group_byname($uid,$name) {
 
 function group_rmv_member($uid,$name,$member) {
 	$gid = group_byname($uid,$name);
-	if(! $gid)
+	if (! $gid)
 		return false;
-	if(! ( $uid && $gid && $member))
+	if (! ( $uid && $gid && $member))
 		return false;
 	$r = q("DELETE FROM `group_member` WHERE `uid` = %d AND `gid` = %d AND `contact-id` = %d",
 		intval($uid),
@@ -129,9 +129,9 @@ function group_rmv_member($uid,$name,$member) {
 
 
 function group_add_member($uid,$name,$member,$gid = 0) {
-	if(! $gid)
+	if (! $gid)
 		$gid = group_byname($uid,$name);
-	if((! $gid) || (! $uid) || (! $member))
+	if ((! $gid) || (! $uid) || (! $member))
 		return false;
 
 	$r = q("SELECT * FROM `group_member` WHERE `uid` = %d AND `gid` = %d AND `contact-id` = %d LIMIT 1",
@@ -156,7 +156,7 @@ function group_add_member($uid,$name,$member,$gid = 0) {
 
 function group_get_members($gid) {
 	$ret = array();
-	if(intval($gid)) {
+	if (intval($gid)) {
 		$r = q("SELECT `group_member`.`contact-id`, `contact`.* FROM `group_member`
 			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id`
 			WHERE `gid` = %d AND `group_member`.`uid` = %d AND
@@ -173,7 +173,7 @@ function group_get_members($gid) {
 
 function group_public_members($gid) {
 	$ret = 0;
-	if(intval($gid)) {
+	if (intval($gid)) {
 		$r = q("SELECT `contact`.`id` AS `contact-id` FROM `group_member`
 			INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id`
 			WHERE `gid` = %d AND `group_member`.`uid` = %d
@@ -252,7 +252,7 @@ function group_side($every="contacts",$each="group",$editmode = "standard", $gro
 		intval($_SESSION['uid'])
 	);
 	$member_of = array();
-	if($cid) {
+	if ($cid) {
 		$member_of = groups_containing(local_user(),$cid);
 	}
 
@@ -302,7 +302,7 @@ function group_side($every="contacts",$each="group",$editmode = "standard", $gro
 }
 
 function expand_groups($a,$check_dead = false, $use_gcontact = false) {
-	if(! (is_array($a) && count($a)))
+	if (! (is_array($a) && count($a)))
 		return array();
 	$groups = implode(',', $a);
 	$groups = dbesc($groups);
@@ -318,9 +318,9 @@ function expand_groups($a,$check_dead = false, $use_gcontact = false) {
 
 	$ret = array();
 	if (dbm::is_result($r))
-		foreach($r as $rr)
+		foreach ($r as $rr)
 			$ret[] = $rr['contact-id'];
-	if($check_dead AND !$use_gcontact) {
+	if ($check_dead AND !$use_gcontact) {
 		require_once('include/acl_selectors.php');
 		$ret = prune_deadguys($ret);
 	}
@@ -347,8 +347,9 @@ function groups_containing($uid,$c) {
 
 	$ret = array();
 	if (dbm::is_result($r)) {
-		foreach($r as $rr)
+		foreach ($r as $rr) {
 			$ret[] = $rr['gid'];
+		}
 	}
 
 	return $ret;
@@ -399,7 +400,7 @@ function get_default_group($uid, $network = "") {
 		return $default_group;
 
 	$g = q("SELECT `def_gid` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
-	if($g && intval($g[0]["def_gid"]))
+	if ($g && intval($g[0]["def_gid"]))
 		$default_group = $g[0]["def_gid"];
 
 	return $default_group;

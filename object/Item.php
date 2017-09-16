@@ -112,7 +112,7 @@ class Item extends BaseObject {
 
 		$conv = $this->get_conversation();
 
-		$lock = ((($item['private'] == 1) || (($item['uid'] == local_user()) && (strlen($item['allow_cid']) || strlen($item['allow_gid']) 
+		$lock = ((($item['private'] == 1) || (($item['uid'] == local_user()) && (strlen($item['allow_cid']) || strlen($item['allow_gid'])
 			|| strlen($item['deny_cid']) || strlen($item['deny_gid']))))
 			? t('Private Message')
 			: false);
@@ -242,17 +242,14 @@ class Item extends BaseObject {
 					'classundo' => (($item['starred']) ? "" : "hidden"),
 					'starred'   =>  t('starred'),
 				);
-				$r = q("SELECT `ignored` FROM `thread` WHERE `uid` = %d AND `iid` = %d LIMIT 1",
-					intval($item['uid']),
-					intval($item['id'])
-				);
+				$r = dba::select('thread', array('ignored'), array('uid' => $item['uid'], 'iid' => $item['id']), array('limit' => 1));
 				if (dbm::is_result($r)) {
 					$ignore = array(
 						'do'        => t("ignore thread"),
 						'undo'      => t("unignore thread"),
 						'toggle'    => t("toggle ignore status"),
-						'classdo'   => (($r[0]['ignored']) ? "hidden" : ""),
-						'classundo' => (($r[0]['ignored']) ? "" : "hidden"),
+						'classdo'   => (($r['ignored']) ? "hidden" : ""),
+						'classundo' => (($r['ignored']) ? "" : "hidden"),
 						'ignored'   =>  t('ignored'),
 					);
 				}
@@ -286,32 +283,6 @@ class Item extends BaseObject {
 		}
 
 		localize_item($item);
-
-		if ($item["postopts"] and !get_config("system", "suppress_language")) {
-			//$langdata = explode(";", $item["postopts"]);
-			//$langstr = substr($langdata[0], 5)." (".round($langdata[1]*100, 1)."%)";
-			$langstr = "";
-			if (substr($item["postopts"], 0, 5) == "lang=") {
-				$postopts = substr($item["postopts"], 5);
-
-				$languages = explode(":", $postopts);
-
-				if (sizeof($languages) == 1) {
-					$languages = array();
-					$languages[] = $postopts;
-				}
-
-				foreach ($languages as $language) {
-					$langdata = explode(";", $language);
-					if ($langstr != "") {
-						$langstr .= ", ";
-					}
-
-					//$langstr .= $langdata[0]." (".round($langdata[1]*100, 1)."%)";
-					$langstr .= round($langdata[1]*100, 1)."% ".$langdata[0];
-				}
-			}
-		}
 
 		$body = prepare_body($item,true);
 
@@ -420,7 +391,6 @@ class Item extends BaseObject {
 			'previewing'      => ($conv->is_preview() ? ' preview ' : ''),
 			'wait'            => t('Please wait'),
 			'thread_level'    => $thread_level,
-			'postopts'        => $langstr,
 			'edited'          => $edited,
 			'network'         => $item["item_network"],
 			'network_name'    => network_to_name($item['item_network'], $profile_link),
@@ -781,20 +751,20 @@ class Item extends BaseObject {
 					if ((! $owner_linkmatch) && (! $alias_linkmatch) && (! $owner_namematch)) {
 
 						// The author url doesn't match the owner (typically the contact)
-						// and also doesn't match the contact alias. 
-						// The name match is a hack to catch several weird cases where URLs are 
+						// and also doesn't match the contact alias.
+						// The name match is a hack to catch several weird cases where URLs are
 						// all over the park. It can be tricked, but this prevents you from
 						// seeing "Bob Smith to Bob Smith via Wall-to-wall" and you know darn
-						// well that it's the same Bob Smith. 
+						// well that it's the same Bob Smith.
 
-						// But it could be somebody else with the same name. It just isn't highly likely. 
+						// But it could be somebody else with the same name. It just isn't highly likely.
 
 
 						$this->owner_photo = $this->get_data_value('owner-avatar');
 						$this->owner_name = $this->get_data_value('owner-name');
 						$this->wall_to_wall = true;
 						// If it is our contact, use a friendly redirect link
-						if ((link_compare($this->get_data_value('owner-link'),$this->get_data_value('url'))) 
+						if ((link_compare($this->get_data_value('owner-link'),$this->get_data_value('url')))
 							&& ($this->get_data_value('network') === NETWORK_DFRN)) {
 							$this->owner_url = $this->get_redirect_url();
 						} else {
@@ -834,5 +804,3 @@ class Item extends BaseObject {
 	}
 
 }
-/// @TODO These are discouraged and should be removed:
-?>

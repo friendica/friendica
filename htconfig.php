@@ -16,7 +16,7 @@ $db_user = 'mysqlusername';
 $db_pass = 'mysqlpassword';
 $db_data = 'mysqldatabasename';
 
-// Set the database connection charset to UTF8.
+// Set the database connection charset to full Unicode (utf8mb4).
 // Changing this value will likely corrupt the special characters.
 // You have been warned.
 $a->config['system']['db_charset'] = "utf8mb4";
@@ -65,9 +65,8 @@ $a->config['php_path'] = 'php';
 $a->config['system']['huburl'] = '[internal]';
 
 // Server-to-server private message encryption (RINO) is allowed by default.
-// Encryption will only be provided if this setting is set to a non zero
-// value and the PHP mcrypt extension is installed on both systems
-// set to 0 to disable, 2 to enable, 1 is deprecated but wont need mcrypt
+// Encryption will only be provided if this setting is set to a non zero value
+// set to 0 to disable, 2 to enable, 1 is deprecated
 
 $a->config['system']['rino_encrypt'] = 2;
 
@@ -88,7 +87,10 @@ $a->config['system']['no_regfullname'] = true;
 //$a->config['system']['block_local_dir'] = false;
 
 // Location of the global directory
-$a->config['system']['directory'] = 'http://dir.friendi.ca';
+$a->config['system']['directory'] = 'https://dir.friendica.social';
 
 // Allowed protocols in link URLs; HTTP protocols always are accepted
 $a->config['system']['allowed_link_protocols'] = array('ftp', 'ftps', 'mailto', 'cid', 'gopher');
+
+// Authentication cookie lifetime, in days
+$a->config['system']['auth_cookie_lifetime'] = 7;

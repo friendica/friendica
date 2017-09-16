@@ -4,6 +4,8 @@
  * @brief This file contains the Photo class for image processing
  */
 
+use Friendica\App;
+
 require_once("include/photos.php");
 
 class Photo {
@@ -68,7 +70,9 @@ class Photo {
 				$this->image->destroy();
 				return;
 			}
-			imagedestroy($this->image);
+			if (is_resource($this->image)) {
+				imagedestroy($this->image);
+			}
 		}
 	}
 
@@ -324,6 +328,7 @@ class Photo {
 			return;
 		}
 
+		// if script dies at this point check memory_limit setting in php.ini
 		$this->image  = imagerotate($this->image,$degrees,0);
 		$this->width  = imagesx($this->image);
 		$this->height = imagesy($this->image);
@@ -620,7 +625,7 @@ class Photo {
 
 
 
-	public function store($uid, $cid, $rid, $filename, $album, $scale, $profile = 0, $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '') {
+	public function store($uid, $cid, $rid, $filename, $album, $scale, $profile = 0, $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '', $desc = '') {
 
 		$r = q("SELECT `guid` FROM `photo` WHERE `resource-id` = '%s' AND `guid` != '' LIMIT 1",
 			dbesc($rid)
@@ -657,7 +662,8 @@ class Photo {
 				`allow_cid` = '%s',
 				`allow_gid` = '%s',
 				`deny_cid` = '%s',
-				`deny_gid` = '%s'
+				`deny_gid` = '%s',
+				`desc` = '%s'
 				WHERE `id` = %d",
 
 				intval($uid),
@@ -679,12 +685,13 @@ class Photo {
 				dbesc($allow_gid),
 				dbesc($deny_cid),
 				dbesc($deny_gid),
+				dbesc($desc),
 				intval($x[0]['id'])
 			);
 		} else {
 			$r = q("INSERT INTO `photo`
-				(`uid`, `contact-id`, `guid`, `resource-id`, `created`, `edited`, `filename`, type, `album`, `height`, `width`, `datasize`, `data`, `scale`, `profile`, `allow_cid`, `allow_gid`, `deny_cid`, `deny_gid`)
-				VALUES (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, '%s', %d, %d, '%s', '%s', '%s', '%s')",
+				(`uid`, `contact-id`, `guid`, `resource-id`, `created`, `edited`, `filename`, type, `album`, `height`, `width`, `datasize`, `data`, `scale`, `profile`, `allow_cid`, `allow_gid`, `deny_cid`, `deny_gid`, `desc`)
+				VALUES (%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, '%s', %d, %d, '%s', '%s', '%s', '%s', '%s')",
 				intval($uid),
 				intval($cid),
 				dbesc($guid),
@@ -703,7 +710,8 @@ class Photo {
 				dbesc($allow_cid),
 				dbesc($allow_gid),
 				dbesc($deny_cid),
-				dbesc($deny_gid)
+				dbesc($deny_gid),
+				dbesc($desc)
 			);
 		}
 
@@ -770,8 +778,7 @@ function guess_image_type($filename, $fromcurl=false) {
  * @return array Returns array of the different avatar sizes
  */
 function update_contact_avatar($avatar, $uid, $cid, $force = false) {
-
-	$r = q("SELECT `avatar`, `photo`, `thumb`, `micro` FROM `contact` WHERE `id` = %d LIMIT 1", intval($cid));
+	$r = q("SELECT `avatar`, `photo`, `thumb`, `micro`, `nurl` FROM `contact` WHERE `id` = %d LIMIT 1", intval($cid));
 	if (!dbm::is_result($r)) {
 		return false;
 	} else {
@@ -785,6 +792,15 @@ function update_contact_avatar($avatar, $uid, $cid, $force = false) {
 			q("UPDATE `contact` SET `avatar` = '%s', `photo` = '%s', `thumb` = '%s', `micro` = '%s', `avatar-date` = '%s' WHERE `id` = %d",
 				dbesc($avatar), dbesc($photos[0]), dbesc($photos[1]), dbesc($photos[2]),
 				dbesc(datetime_convert()), intval($cid));
+
+			// Update the public contact (contact id = 0)
+			if ($uid != 0) {
+				$pcontact = dba::select('contact', array('id'), array('nurl' => $r[0]['nurl']), array('limit' => 1));
+				if (dbm::is_result($pcontact)) {
+					update_contact_avatar($avatar, 0, $pcontact['id'], $force);
+				}
+			}
+
 			return $photos;
 		}
 	}
@@ -839,9 +855,30 @@ function import_profile_photo($photo, $uid, $cid, $quit_on_error = false) {
 			$photo_failure = true;
 		}
 
-		$photo = App::get_baseurl() . '/photo/' . $hash . '-4.' . $img->getExt();
-		$thumb = App::get_baseurl() . '/photo/' . $hash . '-5.' . $img->getExt();
-		$micro = App::get_baseurl() . '/photo/' . $hash . '-6.' . $img->getExt();
+		$suffix = '?ts='.time();
+
+		$photo = App::get_baseurl() . '/photo/' . $hash . '-4.' . $img->getExt() . $suffix;
+		$thumb = App::get_baseurl() . '/photo/' . $hash . '-5.' . $img->getExt() . $suffix;
+		$micro = App::get_baseurl() . '/photo/' . $hash . '-6.' . $img->getExt() . $suffix;
+
+		// Remove the cached photo
+		$a = get_app();
+		$basepath = $a->get_basepath();
+
+		if (is_dir($basepath."/photo")) {
+			$filename = $basepath.'/photo/'.$hash.'-4.'.$img->getExt();
+			if (file_exists($filename)) {
+				unlink($filename);
+			}
+			$filename = $basepath.'/photo/'.$hash.'-5.'.$img->getExt();
+			if (file_exists($filename)) {
+				unlink($filename);
+			}
+			$filename = $basepath.'/photo/'.$hash.'-6.'.$img->getExt();
+			if (file_exists($filename)) {
+				unlink($filename);
+			}
+		}
 	} else {
 		$photo_failure = true;
 	}

@@ -1,5 +1,7 @@
 <?php
 
+use Friendica\App;
+
 require_once("include/nav.php");
 
 function navigation_content(App $a) {

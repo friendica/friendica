@@ -6,7 +6,7 @@ $uid = get_theme_uid();
 
 $s_colorset = get_config('duepuntozero','colorset');
 $colorset = get_pconfig( $uid, 'duepuntozero', 'colorset');
-if (!x($colorset)) 
+if (!x($colorset))
     $colorset = $s_colorset;
 
 if ($colorset) {
@@ -25,5 +25,3 @@ if ($colorset) {
 }
 
 echo $setcss;
-
-?>

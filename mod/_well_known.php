@@ -1,6 +1,7 @@
 <?php
 
-use \Friendica\Core\Config;
+use Friendica\App;
+use Friendica\Core\Config;
 
 require_once("mod/hostxrd.php");
 require_once("mod/nodeinfo.php");

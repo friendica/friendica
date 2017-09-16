@@ -9,6 +9,8 @@
  * Maintainer: Zach P <techcity@f.shmuz.in>
  */
 
+use Friendica\App;
+
 function frost_mobile_init(App $a) {
 	$a->sourcename = 'Friendica mobile web';
 	$a->videowidth = 250;

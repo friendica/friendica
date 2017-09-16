@@ -32,6 +32,8 @@
  *
  */
 
+use Friendica\App;
+
 if (sizeof($_SERVER["argv"]) == 0)
 	die();
 
@@ -47,8 +49,9 @@ require_once("boot.php");
 
 global $a, $db;
 
-if (is_null($a))
-	$a = new App;
+if (is_null($a)) {
+	$a = new App(dirname(__DIR__));
+}
 
 if (is_null($db)) {
 	@include(".htconfig.php");
@@ -332,4 +335,3 @@ class exAuth {
 			fclose($this->rLogFile);
 	}
 }
-?>

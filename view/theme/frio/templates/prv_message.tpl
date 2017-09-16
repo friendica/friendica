@@ -1,7 +1,7 @@
 
 <div id="prvmail-wrapper">
 <form id="prvmail-form" action="message" method="post" >
-	
+
 	{{* Disable the header. We will see if we will need it
 	<h3>{{$header}}</h3>
 	*}}
@@ -33,43 +33,43 @@
 
 	<ul id="prvmail-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
 				<li>
-					<a class="icon" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="input">
+					<button type="button" class="btn-link icon" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="input">
 						<i class="fa fa-picture-o"></i>
-					</a>
+					</button>
 				</li>
 				<li>
-					<a class="icon bb-url" style="cursor: pointer;" title="{{$edurl|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="input">
+					<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" title="{{$edurl|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="input">
 						<i class="fa fa-link"></i>
-					</a>
+					</button>
 				</li>
 				<li>
-					<a class="icon bb-video" style="cursor: pointer;" title="{{$edvideo|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="input">
+					<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" title="{{$edvideo|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="input">
 						<i class="fa fa-video-camera"></i>
-					</a>
+					</button>
 				</li>
 
 				<li>
-					<a class="icon underline" style="cursor: pointer;" title="{{$eduline|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="input">
+					<button type="button" class="btn-link icon underline" style="cursor: pointer;" title="{{$eduline|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="input">
 						<i class="fa fa-underline"></i>
-					</a>
+					</button>
 				</li>
 				<li>
-					<a class="icon italic" style="cursor: pointer;" title="{{$editalic|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="input">
+					<button type="button" class="btn-link icon italic" style="cursor: pointer;" title="{{$editalic|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="input">
 						<i class="fa fa-italic"></i>
-					</a>
+					</button>
 				</li>
 				<li>
-					<a class="icon bold" style="cursor: pointer;"  title="{{$edbold|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="input">
+					<button type="button" class="btn-link icon bold" style="cursor: pointer;"  title="{{$edbold|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="input">
 						<i class="fa fa-bold"></i>
-					</a>
+					</button>
 				</li>
 				<li>
-					<a class="icon quote" style="cursor: pointer;" title="{{$edquote|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="input">
+					<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="input">
 						<i class="fa fa-quote-left"></i>
-					</a>
+					</button>
 				</li>
 			</ul>
-	
+
 	<div id="prvmail-text-bb-end"></div>
 
 	{{* The submit button *}}

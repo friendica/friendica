@@ -1,7 +1,10 @@
 <?php
+
 /**
  * Theme settings
  */
+
+use Friendica\App;
 
 function theme_content(App $a) {
 	if (!local_user()) {
@@ -70,7 +73,7 @@ function quattro_form(App $a, $align, $color, $tfs, $pfs) {
 		'$align'   => array('quattro_align', t('Alignment'), $align, '', array('left'=>t('Left'), 'center'=>t('Center'))),
 		'$color'   => array('quattro_color', t('Color scheme'), $color, '', $colors),
 		'$pfs'     => array('quattro_pfs', t('Posts font size'), $pfs),
-		'$tfs'     => array('quattro_tfs',t('Textareas font size'), $tfs),
+		'$tfs'     => array('quattro_tfs', t('Textareas font size'), $tfs),
 	));
 	return $o;
 }

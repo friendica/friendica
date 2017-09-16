@@ -7,6 +7,8 @@
  *
  */
 
+use Friendica\App;
+
 require_once('include/email.php');
 
 function invite_post(App $a) {

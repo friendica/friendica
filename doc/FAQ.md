@@ -176,7 +176,7 @@ Depending on the features of the client you might encounter some glitches in usa
 ###Where I can find help?
 
 If you have problems with your Friendica page, you can ask the community at the [Friendica Support Group](https://helpers.pyxis.uberspace.de/profile/helpers).
-If you can't use your default profile you can either use a test account [test server](http://friendica.com/node/31) respectively an account at a public site [list](http://dir.friendica.com/siteinfo) or you can use the Librelist mailing list.
+If you can't use your default profile you can use an account at a public site [list](https://dir.friendica.social/servers) or you can use the Librelist mailing list.
 If you want to use the mailing list, please just send a mail to friendica AT librelist DOT com.
 
 If you are a theme developer, you will find help at this forum: [Friendica Theme Developers](https://friendica.eu/profile/ftdevs).
@@ -188,7 +188,7 @@ Admin
 
 ###Can I configure multiple domains with the same code instance?
 
-No, this function is no longer supported from Friendica 3.3 onwards.
+No, this function is no longer supported as of Friendica 3.3 onwards.
 
 <a name="sources"></a>
 

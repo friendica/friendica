@@ -1,4 +1,7 @@
 <?php
+
+use Friendica\App;
+
 function network_init(App $a) {
 	if (! local_user()) {
 		notice( t('Permission denied.') . EOL);
@@ -6,7 +9,7 @@ function network_init(App $a) {
 	}
 
 	$is_a_date_query = false;
-	if (x($_GET['cid']) && intval($_GET['cid']) != 0) {
+	if (x($_GET, 'cid') && intval($_GET['cid']) != 0) {
 		$cid = $_GET['cid'];
 	}
 
@@ -47,7 +50,7 @@ function network_init(App $a) {
 			$net_baseurl .= '/' . $sel_groups;
 		}
 
-		if($remember_tab) {
+		if ($remember_tab) {
 			// redirect if current selected tab is '/network' and
 			// last selected tab is _not_ '/network?f=&order=comment'.
 			// and this isn't a date query
@@ -73,20 +76,23 @@ function network_init(App $a) {
 
 			$k = array_search('active', $last_sel_tabs);
 
-			$net_baseurl .= $tab_baseurls[$k];
+			if ($k != 3) {
+				$net_baseurl .= $tab_baseurls[$k];
 
-			// parse out tab queries
-			$dest_qa = array();
-			$dest_qs = $tab_args[$k];
-			parse_str( $dest_qs, $dest_qa);
-			$net_args = array_merge($net_args, $dest_qa);
-		}
-		else if($sel_tabs[4] === 'active') {
+				// parse out tab queries
+				$dest_qa = array();
+				$dest_qs = $tab_args[$k];
+				parse_str($dest_qs, $dest_qa);
+				$net_args = array_merge($net_args, $dest_qa);
+			} else {
+				$remember_tab = false;
+			}
+		} elseif ($sel_tabs[4] === 'active') {
 			// The '/new' tab is selected
-			$net_baseurl .= '/new';
+			$remember_group = false;
 		}
 
-		if($remember_net) {
+		if ($remember_net) {
 			$net_args['nets'] = $last_sel_nets;
 		}
 		else if($sel_nets!==false) {
@@ -103,24 +109,27 @@ function network_init(App $a) {
 		}
 	}
 
-	if(x($_GET['nets']) && $_GET['nets'] === 'all')
+	// If nets is set to all, unset it
+	if (x($_GET, 'nets') && $_GET['nets'] === 'all') {
 		unset($_GET['nets']);
+	}
 
 	$group_id = (($a->argc > 1 && is_numeric($a->argv[1])) ? intval($a->argv[1]) : 0);
 
 	set_pconfig(local_user(), 'network.view', 'group.selected', $group_id);
 
-	require_once('include/group.php');
-	require_once('include/contact_widgets.php');
-	require_once('include/items.php');
-	require_once('include/ForumManager.php');
+	require_once 'include/group.php';
+	require_once 'include/contact_widgets.php';
+	require_once 'include/items.php';
+	require_once 'include/ForumManager.php';
 
-	if(! x($a->page,'aside'))
+	if (! x($a->page, 'aside')) {
 		$a->page['aside'] = '';
+	}
 
-	$search = ((x($_GET,'search')) ? escape_tags($_GET['search']) : '');
+	$search = ((x($_GET, 'search')) ? escape_tags($_GET['search']) : '');
 
-	if(x($_GET,'save')) {
+	if (x($_GET, 'save')) {
 		$r = qu("SELECT * FROM `search` WHERE `uid` = %d AND `term` = '%s' LIMIT 1",
 			intval(local_user()),
 			dbesc($search)
@@ -132,7 +141,7 @@ function network_init(App $a) {
 			);
 		}
 	}
-	if(x($_GET,'remove')) {
+	if (x($_GET, 'remove')) {
 		q("DELETE FROM `search` WHERE `uid` = %d AND `term` = '%s'",
 			intval(local_user()),
 			dbesc($search)
@@ -140,7 +149,7 @@ function network_init(App $a) {
 	}
 
 	// search terms header
-	if(x($_GET,'search')) {
+	if (x($_GET, 'search')) {
 		$a->page['content'] .= replace_macros(get_markup_template("section_title.tpl"),array(
 			'$title' => sprintf( t('Results for: %s'), $search)
 		));
@@ -157,8 +166,9 @@ function network_init(App $a) {
 
 function saved_searches($search) {
 
-	if(! feature_enabled(local_user(),'savedsearch'))
+	if (! feature_enabled(local_user(),'savedsearch')) {
 		return '';
+	}
 
 	$a = get_app();
 
@@ -574,11 +584,7 @@ function network_content(App $a, $update = 0) {
 			$sql_order = "`item`.`id`";
 			$order_mode = "id";
 		} else {
-			// Disabled until final decision what to do with this
-			//if (get_config('system','use_fulltext_engine'))
-			//	$sql_extra = sprintf(" AND MATCH (`item`.`body`, `item`.`title`) AGAINST ('%s' in boolean mode) ", dbesc(protect_sprintf($search)));
-			//else
-				$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
+			$sql_extra = sprintf(" AND `item`.`body` REGEXP '%s' ", dbesc(protect_sprintf(preg_quote($search))));
 			$sql_order = "`item`.`id`";
 			$order_mode = "id";
 		}
@@ -599,21 +605,6 @@ function network_content(App $a, $update = 0) {
 		$pager_sql = '';
 
 	} else {
-		if(get_config('system', 'old_pager')) {
-			$r = qu("SELECT COUNT(*) AS `total`
-				FROM $sql_table $sql_post_table INNER JOIN `contact` ON `contact`.`id` = $sql_table.`contact-id`
-				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
-				WHERE $sql_table.`uid` = %d AND $sql_table.`visible` AND NOT $sql_table.`deleted`
-				$sql_extra2 $sql_extra3
-				$sql_extra $sql_nets ",
-				intval($_SESSION['uid'])
-			);
-
-			if (dbm::is_result($r)) {
-				$a->set_pager_total($r[0]['total']);
-			}
-		}
-
 		//  check if we serve a mobile device and get the user settings
 		//  accordingly
 		if ($a->is_mobile) {
@@ -788,15 +779,13 @@ function network_content(App $a, $update = 0) {
 
 	$mode = (($nouveau) ? 'network-new' : 'network');
 
-	$o .= conversation($a,$items,$mode,$update);
+	$o .= conversation($a, $items, $mode, $update);
 
 	if (!$update) {
-		if (get_pconfig(local_user(),'system','infinite_scroll')) {
+		if (get_pconfig(local_user(), 'system', 'infinite_scroll')) {
 			$o .= scroll_loader();
-		} elseif (!get_config('system', 'old_pager')) {
-			$o .= alt_pager($a,count($items));
 		} else {
-			$o .= paginate($a);
+			$o .= alt_pager($a, count($items));
 		}
 	}
 
@@ -806,7 +795,7 @@ function network_content(App $a, $update = 0) {
 /**
  * @brief Get the network tabs menu
  *
- * @param app $a The global App
+ * @param App $a The global App
  * @return string Html of the networktab
  */
 function network_tabs(App $a) {
@@ -852,10 +841,10 @@ function network_tabs(App $a) {
 		);
 	}
 
-	if(feature_enabled(local_user(),'new_tab')) {
+	if (feature_enabled(local_user(),'new_tab')) {
 		$tabs[] = array(
 			'label'	=> t('New'),
-			'url'	=> str_replace('/new', '', $cmd) . ($len_naked_cmd ? '/' : '') . 'new' . ((x($_GET,'cid')) ? '/?f=&cid=' . $_GET['cid'] : ''),
+			'url'	=> 'network/new' . ((x($_GET,'cid')) ? '/?f=&cid=' . $_GET['cid'] : ''),
 			'sel'	=> $new_active,
 			'title'	=> t('Activity Stream - by date'),
 			'id'	=> 'activitiy-by-date-tab',

@@ -1,4 +1,4 @@
-INPUT = README.md index.php boot.php testargs.php update.php mod/ object/ include/ js/ util/ view/ version.inc
+INPUT = README.md index.php boot.php testargs.php update.php mod/ object/ include/ js/ util/ view/ src/ version.inc
 RECURSIVE = YES
 PROJECT_NAME = "Friendica"
 PROJECT_LOGO = images/friendica-64.jpg

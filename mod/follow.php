@@ -1,9 +1,11 @@
 <?php
 
-require_once('include/Scrape.php');
-require_once('include/follow.php');
-require_once('include/Contact.php');
-require_once('include/contact_selectors.php');
+use Friendica\App;
+
+require_once 'include/probe.php';
+require_once 'include/follow.php';
+require_once 'include/Contact.php';
+require_once 'include/contact_selectors.php';
 
 function follow_content(App $a) {
 
@@ -110,7 +112,7 @@ function follow_content(App $a) {
 			//'$photo' => proxy_url($ret["photo"], false, PROXY_SIZE_SMALL),
 			'$desc' => "",
 			'$pls_answer' => t('Please answer the following:'),
-			'$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$ret["name"]), false, '', array(t('No'),t('Yes'))),
+			'$does_know_you' => array('knowyou', sprintf(t('Does %s know you?'),$ret["name"]), false, '', array(t('No'), t('Yes'))),
 			'$add_note' => t('Add a personal note:'),
 			'$page_desc' => "",
 			'$friendica' => "",

@@ -2481,6 +2481,9 @@ footer {
   margin-top: 25px;
   clear: both;
 }
+.pager .disabled {
+	display: none;
+}
 /**
  * ADMIN
  */

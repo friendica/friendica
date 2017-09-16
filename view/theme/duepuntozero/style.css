@@ -1552,6 +1552,9 @@ blockquote.shared_content {
   clear:left;
 }
 
+.pager .disabled {
+	display: none;
+}
 
 .pager_first,
 .pager_last,

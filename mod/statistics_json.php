@@ -1,27 +1,30 @@
 <?php
+
 /**
  * @file mod/statistics_json.php
  */
+
+use Friendica\App;
 
 require_once("include/plugin.php");
 
 function statistics_json_init(App $a) {
 
-        if (!get_config("system", "nodeinfo")) {
-                http_status_exit(404);
-                killme();
-        }
+	if (!get_config("system", "nodeinfo")) {
+		http_status_exit(404);
+		killme();
+	}
 
 	$statistics = array(
-			"name" => $a->config["sitename"],
-			"network" => FRIENDICA_PLATFORM,
-			"version" => FRIENDICA_VERSION."-".DB_UPDATE_VERSION,
-			"registrations_open" => ($a->config['register_policy'] != 0),
-			"total_users" => get_config('nodeinfo','total_users'),
-			"active_users_halfyear" => get_config('nodeinfo','active_users_halfyear'),
-			"active_users_monthly" => get_config('nodeinfo','active_users_monthly'),
-			"local_posts" => get_config('nodeinfo','local_posts')
-			);
+		"name" => $a->config["sitename"],
+		"network" => FRIENDICA_PLATFORM,
+		"version" => FRIENDICA_VERSION . "-" . DB_UPDATE_VERSION,
+		"registrations_open" => ($a->config['register_policy'] != 0),
+		"total_users" => get_config('nodeinfo', 'total_users'),
+		"active_users_halfyear" => get_config('nodeinfo', 'active_users_halfyear'),
+		"active_users_monthly" => get_config('nodeinfo', 'active_users_monthly'),
+		"local_posts" => get_config('nodeinfo', 'local_posts')
+	);
 
 	$statistics["services"] = array();
 	$statistics["services"]["appnet"] = plugin_enabled("appnet");
@@ -53,7 +56,7 @@ function statistics_json_init(App $a) {
 	$statistics["wordpress"] = $statistics["services"]["wordpress"];
 
 	header("Content-Type: application/json");
-	echo json_encode($statistics, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
-	logger("statistics_init: printed ".print_r($statistics, true), LOGGER_DATA);
+	echo json_encode($statistics, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	logger("statistics_init: printed " . print_r($statistics, true), LOGGER_DATA);
 	killme();
 }

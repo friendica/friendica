@@ -11,6 +11,6 @@ Table fsuggest
 | request |             | varchar(255) | NO   |     |                     |                 |
 | photo   |             | varchar(255) | NO   |     |                     |                 |
 | note    |             | text         | NO   |     | NULL                |                 |
-| created |             | datetime     | NO   |     | 0000-00-00 00:00:00 |                 |
+| created |             | datetime     | NO   |     | 0001-01-01 00:00:00 |                 |
 
 Return to [database documentation](help/database)

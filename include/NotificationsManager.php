@@ -4,9 +4,12 @@
  * @brief Methods for read and write notifications from/to database
  *  or for formatting notifications
  */
-require_once('include/html2plain.php');
-require_once("include/datetime.php");
-require_once("include/bbcode.php");
+
+require_once 'include/html2plain.php';
+require_once 'include/probe.php';
+require_once 'include/datetime.php';
+require_once 'include/bbcode.php';
+require_once 'include/Contact.php';
 
 /**
  * @brief Methods for read and write notifications from/to database
@@ -24,7 +27,7 @@ class NotificationsManager {
 	 *
 	 * @param array $notes array of note arrays from db
 	 * @return array Copy of input array with added properties
-	 * 
+	 *
 	 * Set some extra properties to note array from db:
 	 *  - timestamp as int in default TZ
 	 *  - date_rel : relative date string
@@ -143,8 +146,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief List of pages for the Notifications TabBar
-	 * 
-	 * @param app $a The 
+	 *
 	 * @return array with with notifications TabBar data
 	 */
 	public function getTabs() {
@@ -191,7 +193,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief Format the notification query in an usable array
-	 * 
+	 *
 	 * @param array $notifs The array from the db query
 	 * @param string $ident The notifications identifier (e.g. network)
 	 * @return array
@@ -360,7 +362,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of network notifications 
+	 * @brief Total number of network notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -388,13 +390,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get network notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available network notifications
@@ -436,7 +438,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of system notifications 
+	 * @brief Total number of system notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -460,13 +462,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get system notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available system notifications
@@ -502,7 +504,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief Addional SQL query string for the personal notifications
-	 * 
+	 *
 	 * @return string The additional sql query
 	 */
 	private function _personal_sql_extra() {
@@ -520,7 +522,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of personal notifications 
+	 * @brief Total number of personal notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -550,13 +552,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get personal notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available personal notifications
@@ -573,13 +575,13 @@ class NotificationsManager {
 			$sql_seen = " AND `item`.`unseen` = 1 ";
 
 		$r = q("SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, `item`.`unseen`,
-				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`, 
-				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid` 
+				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`,
+				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid`
 			FROM `item` INNER JOIN `item` AS `pitem` ON  `pitem`.`id`=`item`.`parent`
 			WHERE `item`.`visible` = 1
 				$sql_extra
 				$sql_seen
-				AND `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0 
+				AND `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0
 			ORDER BY `item`.`created` DESC LIMIT %d, %d " ,
 				intval(local_user()),
 				intval($start),
@@ -588,7 +590,7 @@ class NotificationsManager {
 
 		if (dbm::is_result($r))
 			$notifs = $this->formatNotifs($r, $ident);
-		
+
 		$arr = array (
 			'notifications' => $notifs,
 			'ident' => $ident,
@@ -599,7 +601,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of home notifications 
+	 * @brief Total number of home notifications
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
@@ -626,13 +628,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get home notifications
-	 * 
+	 *
 	 * @param int|string $seen
 	 *	If 0 only include notifications into the query
 	 *	which aren't marked as "seen"
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available home notifications
@@ -673,7 +675,7 @@ class NotificationsManager {
 	}
 
 	/**
-	 * @brief Total number of introductions 
+	 * @brief Total number of introductions
 	 * @param bool $all
 	 *	If false only include introductions into the query
 	 *	which aren't marked as ignored
@@ -698,13 +700,13 @@ class NotificationsManager {
 
 	/**
 	 * @brief Get introductions
-	 * 
+	 *
 	 * @param bool $all
 	 *	If false only include introductions into the query
 	 *	which aren't marked as ignored
 	 * @param int $start Start the query at this point
 	 * @param int $limit Maximum number of query results
-	 * 
+	 *
 	 * @return array with
 	 *	string 'ident' => Notification identifier
 	 *	int 'total' => Total number of available introductions
@@ -720,10 +722,12 @@ class NotificationsManager {
 			$sql_extra = " AND `ignore` = 0 ";
 
 		/// @todo Fetch contact details by "get_contact_details_by_url" instead of queries to contact, fcontact and gcontact
-		$r = q("SELECT `intro`.`id` AS `intro_id`, `intro`.*, `contact`.*, `fcontact`.`name` AS `fname`,`fcontact`.`url` AS `furl`,`fcontact`.`photo` AS `fphoto`,`fcontact`.`request` AS `frequest`,
+		$r = q("SELECT `intro`.`id` AS `intro_id`, `intro`.*, `contact`.*,
+				`fcontact`.`name` AS `fname`, `fcontact`.`url` AS `furl`,
+				`fcontact`.`photo` AS `fphoto`, `fcontact`.`request` AS `frequest`,
 				`gcontact`.`location` AS `glocation`, `gcontact`.`about` AS `gabout`,
 				`gcontact`.`keywords` AS `gkeywords`, `gcontact`.`gender` AS `ggender`,
-				`gcontact`.`network` AS `gnetwork`
+				`gcontact`.`network` AS `gnetwork`, `gcontact`.`addr` AS `gaddr`
 			FROM `intro`
 				LEFT JOIN `contact` ON `contact`.`id` = `intro`.`contact-id`
 				LEFT JOIN `gcontact` ON `gcontact`.`nurl` = `contact`.`nurl`
@@ -749,7 +753,7 @@ class NotificationsManager {
 
 	/**
 	 * @brief Format the notification query in an usable array
-	 * 
+	 *
 	 * @param array $intros The array from the db query
 	 * @return array with the introductions
 	 */
@@ -786,11 +790,7 @@ class NotificationsManager {
 			// Normal connection requests
 			} else {
 
-				// Probe the contact url to get missing data
-				$ret = probe_url($it["url"]);
-
-				if ($it['gnetwork'] == "")
-					$it['gnetwork'] = $ret["network"];
+				$it = $this->getMissingIntroData($it);
 
 				// Don't show these data until you are connected. Diaspora is doing the same.
 				if($it['gnetwork'] === NETWORK_DIASPORA) {
@@ -815,7 +815,7 @@ class NotificationsManager {
 					'post_newfriend' => (intval(get_pconfig(local_user(),'system','post_newfriend')) ? '1' : 0),
 					'url' => $it['url'],
 					'zrl' => zrl($it['url']),
-					'addr' => $ret['addr'],
+					'addr' => $it['gaddr'],
 					'network' => $it['gnetwork'],
 					'knowyou' => $it['knowyou'],
 					'note' => $it['note'],
@@ -823,6 +823,40 @@ class NotificationsManager {
 			}
 
 			$arr[] = $intro;
+		}
+
+		return $arr;
+	}
+
+	/**
+	 * @brief Check for missing contact data and try to fetch the data from 
+	 *     from other sources
+	 * 
+	 * @param array $arr The input array with the intro data
+	 * 
+	 * @return array The array with the intro data
+	 */
+	private function getMissingIntroData($arr) {
+		// If the network and the addr isn't available from the gcontact
+		// table entry, take the one of the contact table entry
+		if ($arr['gnetwork'] == "") {
+			$arr['gnetwork'] = $arr['network'];
+		}
+		if ($arr['gaddr'] == "") {
+			$arr['gaddr'] = $arr['addr'];
+		}
+
+		// If the network and addr is still not available
+		// get the missing data data from other sources
+		if ($arr['gnetwork'] == "" || $arr['gaddr'] == "") {
+			$ret = get_contact_details_by_url($arr['url']);
+
+			if ($arr['gnetwork'] == "" && $ret['network'] != "") {
+				$arr['gnetwork'] = $ret['network'];
+			}
+			if ($arr['gaddr'] == "" && $ret['addr'] != "") {
+				$arr['gaddr'] = $ret['addr'];
+			}
 		}
 
 		return $arr;
