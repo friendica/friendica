@@ -58,7 +58,7 @@ require_once 'Text/LanguageDetect/ISO639.php';
  * @author    Nicholas Pisarro <infinityminusnine+pear@gmail.com>
  * @copyright 2005 Nicholas Pisarro
  * @license   BSD http://www.opensource.org/licenses/bsd-license.php
- * @version   Release: 1.0.0
+ * @version   Release: @package_version@
  * @link      http://pear.php.net/package/Text_LanguageDetect/
  */
 class Text_LanguageDetect
@@ -90,7 +90,7 @@ class Text_LanguageDetect
      *
      * @var string
      */
-    protected $_data_dir = 'D:\Mes Projets\Friendica\friendica\vendor/pear-pear.php.net/Text_LanguageDetect/data';
+    protected $_data_dir = '@data_dir@';
 
     /**
      * The trigram data for comparison

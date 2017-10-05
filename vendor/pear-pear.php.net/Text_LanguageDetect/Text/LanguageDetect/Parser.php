@@ -27,7 +27,7 @@
  * @author    Nicholas Pisarro <infinityminusnine+pear@gmail.com>
  * @copyright 2006 Nicholas Pisarro
  * @license   BSD http://www.opensource.org/licenses/bsd-license.php
- * @version   Release: 1.0.0
+ * @version   Release: @package_version@
  * @link      http://pear.php.net/package/Text_LanguageDetect/
  */
 class Text_LanguageDetect_Parser extends Text_LanguageDetect
