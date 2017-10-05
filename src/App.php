@@ -211,6 +211,7 @@ class App {
 			get_include_path() . PATH_SEPARATOR
 			. $this->basepath . DIRECTORY_SEPARATOR . 'include' . PATH_SEPARATOR
 			. $this->basepath . DIRECTORY_SEPARATOR . 'library' . PATH_SEPARATOR
+			. $this->basepath . DIRECTORY_SEPARATOR . 'library/langdet' . PATH_SEPARATOR
 			. $this->basepath);
 
 

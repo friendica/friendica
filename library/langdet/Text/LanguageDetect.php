@@ -196,7 +196,7 @@ class Text_LanguageDetect
 
         } elseif ($this->_data_dir != '@' . 'data_dir' . '@') {
             // if the data dir was set by the PEAR installer, use that
-            return $this->_data_dir . '/' . $fname;
+            return $this->_data_dir . '/Text_LanguageDetect/' . $fname;
 
         } else {
             // assume this was just unpacked somewhere

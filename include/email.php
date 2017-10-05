@@ -18,22 +18,27 @@ function email_poll($mbox,$email_addr) {
 		return array();
 
 	$search1 = @imap_search($mbox,'FROM "' . $email_addr . '"', SE_UID);
-	if (! $search1)
+	if (!$search1) {
 		$search1 = array();
+	} else {
+		logger("Found mails from ".$email_addr, LOGGER_DEBUG);
+	}
 
 	$search2 = @imap_search($mbox,'TO "' . $email_addr . '"', SE_UID);
-	if (! $search2)
+	if (!$search2) {
 		$search2 = array();
+	} else {
+		logger("Found mails to ".$email_addr, LOGGER_DEBUG);
+	}
 
 	$search3 = @imap_search($mbox,'CC "' . $email_addr . '"', SE_UID);
-	if (! $search3)
+	if (!$search3) {
 		$search3 = array();
+	} else {
+		logger("Found mails cc ".$email_addr, LOGGER_DEBUG);
+	}
 
-	$search4 = @imap_search($mbox,'BCC "' . $email_addr . '"', SE_UID);
-	if (! $search4)
-		$search4 = array();
-
-	$res = array_unique(array_merge($search1,$search2,$search3,$search4));
+	$res = array_unique(array_merge($search1, $search2, $search3));
 
 	return $res;
 }

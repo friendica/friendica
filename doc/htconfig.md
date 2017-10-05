@@ -6,7 +6,8 @@ Config values that can only be set in .htconfig.php
 There are some config values that haven't found their way into the administration page.
 This has several reasons.
 Maybe they are part of a current development that isn't considered stable and will be added later in the administration page when it is considered safe.
-Or it triggers something that isn't expected to be of public interest. Or it is for testing purposes only.
+Or it triggers something that isn't expected to be of public interest.
+Or it is for testing purposes only.
 
 **Attention:** Please be warned that you shouldn't use one of these values without the knowledge what it could trigger.
 Especially don't do that with undocumented values.
@@ -46,6 +47,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **frontend_worker_timeout** - Value in minutes after we think that a frontend task was killed by the webserver. Default value is 10.
 * **hsts** (Boolean) - Enables the sending of HTTP Strict Transport Security headers
 * **ignore_cache** (Boolean) - For development only. Disables the item cache.
+* **ipv4_resolve** (Boolean) - Resolve IPV4 addresses only. Don't resolve to IPV6. Default value is false.
 * **like_no_comment** (Boolean) - Don't update the "commented" value of an item when it is liked.
 * **local_block** (Boolean) - Used in conjunction with "block_public".
 * **local_search** (Boolean) - Blocks search for users who are not logged in to prevent crawlers from blocking your system.
@@ -70,7 +72,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **paranoia** (Boolean) - Log out users if their IP address changed.
 * **permit_crawling** (Boolean) - Restricts the search for not logged in users to one search per minute.
 * **worker_debug** (Boolean) - If enabled, it prints out the number of running processes split by priority.
-* **worker_fetch_limit** - Number of worker tasks that are fetched in a single query. Default is 5.
+* **worker_fetch_limit** - Number of worker tasks that are fetched in a single query. Default is 1.
 * **profiler** (Boolean) - Enable internal timings to help optimize code. Needed for "rendertime" addon. Default is false.
 * **free_crawls** - Number of "free" searches when "permit_crawling" is activated (Default value is 10)
 * **crawl_permit_period** - Period in seconds between allowed searches when the number of free searches is reached and "permit_crawling" is activated (Default value is 60)
@@ -98,7 +100,7 @@ Example: To set the directory value please add this line to your .htconfig.php:
 
 * **upgrade_link** -
 
-## experimentals ##
+## experimental ##
 
 * **exp_themes** (Boolean) - Show experimental themes as well.
 

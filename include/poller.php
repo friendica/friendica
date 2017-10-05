@@ -32,6 +32,9 @@ function poller_run($argv, $argc){
 
 	Config::load();
 
+	// Check the database structure and possibly fixes it
+	check_db(true);
+
 	// Quit when in maintenance
 	if (Config::get('system', 'maintenance', true)) {
 		return;
@@ -248,7 +251,9 @@ function poller_execute($queue) {
 		poller_exec_function($queue, $funcname, $argv);
 
 		$stamp = (float)microtime(true);
-		dba::update('workerqueue', array('done' => true), array('id' => $queue["id"]));
+		if (dba::update('workerqueue', array('done' => true), array('id' => $queue["id"]))) {
+			Config::set('system', 'last_poller_execution', datetime_convert());
+		}
 		$poller_db_duration = (microtime(true) - $stamp);
 	} else {
 		logger("Function ".$funcname." does not exist");
@@ -690,7 +695,7 @@ function find_worker_processes(&$passing_slow) {
 	// The higher the number of parallel workers, the more we prefetch to prevent concurring access
 	// We decrease the limit with the number of entries left in the queue
 	$worker_queues = Config::get("system", "worker_queues", 4);
-	$queue_length = Config::get('system', 'worker_fetch_limit', $worker_queues);
+	$queue_length = Config::get('system', 'worker_fetch_limit', 1);
 	$lower_job_limit = $worker_queues * $queue_length * 2;
 	$jobs = poller_total_entries();
 
@@ -887,7 +892,7 @@ function poller_run_cron() {
 	poller_kill_stale_workers();
 }
 
-if (array_search(__file__,get_included_files())===0){
+if (array_search(__file__,get_included_files())===0) {
 	poller_run($_SERVER["argv"],$_SERVER["argc"]);
 
 	poller_unclaim_process();

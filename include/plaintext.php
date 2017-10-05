@@ -75,7 +75,6 @@ function get_old_attachment_data($body) {
 
 		}
 	}
-
 	return $post;
 }
 
@@ -180,7 +179,7 @@ function get_attachment_data($body) {
 	return($data);
 }
 
-function get_attached_data($body) {
+function get_attached_data($body, $item = array()) {
 /*
  - text:
  - type: link, video, photo
@@ -191,13 +190,18 @@ function get_attached_data($body) {
  - (thumbnail)
 */
 
+	$has_title = !empty($item['title']);
+	$plink = (!empty($item['plink']) ? $item['plink'] : '');
 	$post = get_attachment_data($body);
 
 	// if nothing is found, it maybe having an image.
 	if (!isset($post["type"])) {
+		// Simplify image codes
+		$body = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $body);
+
 		$URLSearchString = "^\[\]";
 		if (preg_match_all("(\[url=([$URLSearchString]*)\]\s*\[img\]([$URLSearchString]*)\[\/img\]\s*\[\/url\])ism", $body, $pictures,  PREG_SET_ORDER)) {
-			if (count($pictures) == 1) {
+			if ((count($pictures) == 1) && !$has_title) {
 				// Checking, if the link goes to a picture
 				$data = ParseUrl::getSiteinfoCached($pictures[0][1], true);
 
@@ -226,32 +230,55 @@ function get_attached_data($body) {
 						$post["text"] = str_replace($pictures[0][0], "", $body);
 					}
 				}
-			} elseif (count($pictures) > 1) {
+			} elseif (count($pictures) > 0) {
 				$post["type"] = "link";
-				$post["url"] = $b["plink"];
+				$post["url"] = $plink;
 				$post["image"] = $pictures[0][2];
 				$post["text"] = $body;
 			}
 		} elseif (preg_match_all("(\[img\]([$URLSearchString]*)\[\/img\])ism", $body, $pictures,  PREG_SET_ORDER)) {
-			if (count($pictures) == 1) {
+			if ((count($pictures) == 1) && !$has_title) {
 				$post["type"] = "photo";
 				$post["image"] = $pictures[0][1];
 				$post["text"] = str_replace($pictures[0][0], "", $body);
-			} elseif (count($pictures) > 1) {
+			} elseif (count($pictures) > 0) {
 				$post["type"] = "link";
-				$post["url"] = $b["plink"];
+				$post["url"] = $plink;
 				$post["image"] = $pictures[0][1];
 				$post["text"] = $body;
 			}
 		}
 
-		if (preg_match_all("(\[url\]([$URLSearchString]*)\[\/url\])ism", $body, $links,  PREG_SET_ORDER)) {
-			if (count($links) == 1) {
-				$post["type"] = "text";
-				$post["url"] = $links[0][1];
-				$post["text"] = $body;
-			}
+		// Test for the external links
+		preg_match_all("(\[url\]([$URLSearchString]*)\[\/url\])ism", $body, $links1,  PREG_SET_ORDER);
+		preg_match_all("(\[url\=([$URLSearchString]*)\].*?\[\/url\])ism", $body, $links2,  PREG_SET_ORDER);
+
+		$links = array_merge($links1, $links2);
+
+		// If there is only a single one, then use it.
+		// This should cover link posts via API.
+		if ((count($links) == 1) && !isset($post["preview"]) && !$has_title) {
+			$post["type"] = "link";
+			$post["text"] = trim($body);
+			$post["url"] = $links[0][1];
 		}
+
+		// Now count the number of external media links
+		preg_match_all("(\[vimeo\](.*?)\[\/vimeo\])ism", $body, $links1,  PREG_SET_ORDER);
+		preg_match_all("(\[youtube\\](.*?)\[\/youtube\\])ism", $body, $links2,  PREG_SET_ORDER);
+		preg_match_all("(\[video\\](.*?)\[\/video\\])ism", $body, $links3,  PREG_SET_ORDER);
+		preg_match_all("(\[audio\\](.*?)\[\/audio\\])ism", $body, $links4,  PREG_SET_ORDER);
+
+		// Add them to the other external links
+		$links = array_merge($links, $links1, $links2, $links3, $links4);
+
+		// Are there more than one?
+		if (count($links) > 1) {
+			// The post will be the type "text", which means a blog post
+			unset($post["type"]);
+			$post["url"] = $plink;
+		}
+
 		if (!isset($post["type"])) {
 			$post["type"] = "text";
 			$post["text"] = trim($body);
@@ -263,7 +290,7 @@ function get_attached_data($body) {
 			$post["image"] = $data["images"][0]["src"];
 	}
 
-	return($post);
+	return $post;
 }
 
 function shortenmsg($msg, $limit, $twitter = false) {
@@ -313,7 +340,7 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 	// At first look at data that is attached via "type-..." stuff
 	// This will hopefully replaced with a dedicated bbcode later
 	//$post = get_attached_data($b["body"]);
-	$post = get_attached_data($body);
+	$post = get_attached_data($body, $b);
 
 	if (($b["title"] != "") && ($post["text"] != ""))
 		$post["text"] = trim($b["title"]."\n\n".$post["text"]);
@@ -414,16 +441,17 @@ function plaintext(App $a, $b, $limit = 0, $includedlinks = false, $htmlmode = 2
 
 		if (iconv_strlen($msg, "UTF-8") > $limit) {
 
-			if (($post["type"] == "text") && isset($post["url"]))
+			if (($post["type"] == "text") && isset($post["url"])) {
 				$post["url"] = $b["plink"];
-			elseif (!isset($post["url"])) {
+			} elseif (!isset($post["url"])) {
 				$limit = $limit - 23;
 				$post["url"] = $b["plink"];
-			} elseif (strpos($b["body"], "[share") !== false)
+			// Which purpose has this line? It is now uncommented, but left as a reminder
+			//} elseif (strpos($b["body"], "[share") !== false) {
+			//	$post["url"] = $b["plink"];
+			} elseif (get_pconfig($b["uid"], "system", "no_intelligent_shortening")) {
 				$post["url"] = $b["plink"];
-			elseif (get_pconfig($b["uid"], "system", "no_intelligent_shortening"))
-				$post["url"] = $b["plink"];
-
+			}
 			$msg = shortenmsg($msg, $limit);
 		}
 	}

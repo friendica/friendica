@@ -32,7 +32,7 @@ function unfollow_post(App $a) {
 	if (!dbm::is_result($contact)) {
 		notice(t("Contact wasn't found or can't be unfollowed."));
 	} else {
-		if (in_array($contact['network'], array(NETWORK_OSTATUS))) {
+		if (in_array($contact['network'], array(NETWORK_OSTATUS, NETWORK_DIASPORA))) {
 			$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
 				WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 				intval($uid)

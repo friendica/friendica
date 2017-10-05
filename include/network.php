@@ -150,6 +150,10 @@ function z_fetch_url($url, $binary = false, &$redirects = 0, $opts = array()) {
 		}
 	}
 
+	if (Config::get('system', 'ipv4_resolve', false)) {
+		curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+	}
+
 	if ($binary) {
 		@curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 	}
@@ -277,6 +281,10 @@ function post_url($url, $params, $headers = null, &$redirects = 0, $timeout = 0)
 	curl_setopt($ch, CURLOPT_POST, 1);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 	curl_setopt($ch, CURLOPT_USERAGENT, $a->get_useragent());
+
+	if (Config::get('system', 'ipv4_resolve', false)) {
+		curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+	}
 
 	if (intval($timeout)) {
 		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
@@ -620,20 +628,15 @@ function avatar_img($email) {
 }
 
 
-function parse_xml_string($s,$strict = true) {
+function parse_xml_string($s, $strict = true) {
+	// the "strict" parameter is deactivated
+
 	/// @todo Move this function to the xml class
-	if ($strict) {
-		if (! strstr($s,'<?xml'))
-			return false;
-		$s2 = substr($s,strpos($s,'<?xml'));
-	}
-	else
-		$s2 = $s;
 	libxml_use_internal_errors(true);
 
-	$x = @simplexml_load_string($s2);
-	if (! $x) {
-		logger('libxml: parse: error: ' . $s2, LOGGER_DATA);
+	$x = @simplexml_load_string($s);
+	if (!$x) {
+		logger('libxml: parse: error: ' . $s, LOGGER_DATA);
 		foreach (libxml_get_errors() as $err) {
 			logger('libxml: parse: ' . $err->code." at ".$err->line.":".$err->column." : ".$err->message, LOGGER_DATA);
 		}

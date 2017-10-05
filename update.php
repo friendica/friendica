@@ -1729,8 +1729,3 @@ function update_1202() {
 	$r = q("UPDATE `user` SET `account-type` = %d WHERE `page-flags` IN (%d, %d)",
 		dbesc(ACCOUNT_TYPE_COMMUNITY), dbesc(PAGE_COMMUNITY), dbesc(PAGE_PRVGROUP));
 }
-
-function update_1231() {
-	// For this special case we have to use the old update routine
-	$r = q("ALTER TABLE `workerqueue` ADD `done` tinyint(1) NOT NULL DEFAULT 0");
-}

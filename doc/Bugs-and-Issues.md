@@ -10,6 +10,7 @@ You can also contact the [friendica support forum](https://helpers.pyxis.uberspa
 Bugs are rarely limited to one person, and the chances are somebody from another node has encountered the problem too, and will be able to help you.
 
 If you're a technical user, or your site doesn't have a support page, you'll need to use the [Bug Tracker](https://github.com/friendica/friendica/issues).
+This is also used for issues with addons.
 Please perform a search to see if there's already an open bug that matches yours before submitting anything.
 
 Try to provide as much information as you can about the bug, including the **full** text of any error messages or notices, and any steps required to replicate the problem in as much detail as possible.

@@ -36,6 +36,9 @@ This *should* be 'addon/plugin_name/plugin_name.php' in most cases.
 
 $function is a string and is the name of the function which will be executed when the hook is called.
 
+Please also add a README or README.md file to the addon directory.
+It will be displayed in the admin panel and should include some further information in addition to the header information.
+
 Arguments
 ---
 Your hook callback functions will be called with at least one and possibly two arguments

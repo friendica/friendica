@@ -20,7 +20,7 @@
  * @author     Greg Beaver <cellog@php.net>
  * @copyright  1997-2009 The Authors
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    Release: 1.10.5
+ * @version    Release: 1.10.4
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 1.4.0a8
  * @access private
@@ -111,8 +111,8 @@ class PEAR_PackageFile_v2_Validator
               isset($test['dependencies']['required']) &&
               isset($test['dependencies']['required']['pearinstaller']) &&
               isset($test['dependencies']['required']['pearinstaller']['min']) &&
-              '1.10.5' != '@package' . '_version@' &&
-              version_compare('1.10.5',
+              '1.10.4' != '@package' . '_version@' &&
+              version_compare('1.10.4',
                 $test['dependencies']['required']['pearinstaller']['min'], '<')
         ) {
             $this->_pearVersionTooLow($test['dependencies']['required']['pearinstaller']['min']);
@@ -1350,7 +1350,7 @@ class PEAR_PackageFile_v2_Validator
         $this->_stack->push(__FUNCTION__, 'error',
             array('version' => $version),
             'This package.xml requires PEAR version %version% to parse properly, we are ' .
-            'version 1.10.5');
+            'version 1.10.4');
     }
 
     function _invalidTagOrder($oktags, $actual, $root)

@@ -576,6 +576,11 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		// Update the contact every 7 days
 		$update_contact = ($contact['avatar-date'] < datetime_convert('','','now -7 days'));
 
+		// We force the update if the avatar is empty
+		if ($contact['avatar'] == '') {
+			$update_contact = true;
+		}
+
 		if (!$update_contact || $no_update) {
 			return $contact_id;
 		}
@@ -584,10 +589,10 @@ function get_contact($url, $uid = 0, $no_update = false) {
 		return 0;
 	}
 
-	$data = Probe::uri($url);
+	$data = Probe::uri($url, "", $uid);
 
 	// Last try in gcontact for unsupported networks
-	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_PUMPIO))) {
+	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_PUMPIO, NETWORK_MAIL))) {
 		if ($uid != 0) {
 			return 0;
 		}
@@ -747,7 +752,7 @@ function posts_from_contact_url(App $a, $contact_url) {
 		WHERE `contact`.`nurl` = '%s' AND `contact`.`uid` = 0",
 		dbesc(normalise_link($contact_url)));
 	if (in_array($r[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""))) {
-		$sql = "(`item`.`uid` = 0 OR (`item`.`uid` = %d AND `item`.`private`))";
+		$sql = "(`item`.`uid` = 0 OR (`item`.`uid` = %d AND NOT `item`.`global`))";
 	} else {
 		$sql = "`item`.`uid` = %d";
 	}

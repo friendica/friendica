@@ -25,3 +25,5 @@ GNU Social/Diaspora contacts
 ---
 Contacts on GNU Social or Diaspora will be archived, as we can't inform them about your move.
 You should ask them to remove your contact from their lists and re-add you, and you should do the same with their contact.
+
+Support for the Diaspora account moving is scheduled for the 3.6 release of Friendica. 

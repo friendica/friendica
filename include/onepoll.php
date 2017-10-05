@@ -328,7 +328,7 @@ function onepoll_run(&$argv, &$argc){
 		unlink($cookiejar);
 	} elseif ($contact['network'] === NETWORK_MAIL || $contact['network'] === NETWORK_MAIL2) {
 
-		logger("Mail: Fetching", LOGGER_DEBUG);
+		logger("Mail: Fetching for ".$contact['addr'], LOGGER_DEBUG);
 
 		$mail_disabled = ((function_exists('imap_open') && (! get_config('system','imap_disabled'))) ? 0 : 1);
 		if ($mail_disabled)
@@ -363,10 +363,10 @@ function onepoll_run(&$argv, &$argc){
 		}
 		if ($mbox) {
 
-			$msgs = email_poll($mbox,$contact['addr']);
+			$msgs = email_poll($mbox, $contact['addr']);
 
 			if (count($msgs)) {
-				logger("Mail: Parsing ".count($msgs)." mails for ".$mailconf[0]['user'], LOGGER_DEBUG);
+				logger("Mail: Parsing ".count($msgs)." mails from ".$contact['addr']." for ".$mailconf[0]['user'], LOGGER_DEBUG);
 
 				$metas = email_msg_meta($mbox,implode(',',$msgs));
 				if (count($metas) != count($msgs)) {
@@ -498,45 +498,35 @@ function onepoll_run(&$argv, &$argc){
 
 						logger("Mail: Importing ".$msg_uid." for ".$mailconf[0]['user']);
 
-						// some mailing lists have the original author as 'from' - add this sender info to msg body.
 						/// @TODO Adding a gravatar for the original author would be cool
 
-						if (! stristr($meta->from,$contact['addr'])) {
-							$from = imap_mime_header_decode($meta->from);
-							$fromdecoded = "";
-							foreach ($from as $frompart) {
-								if ($frompart->charset != "default") {
-									$fromdecoded .= iconv($frompart->charset, 'UTF-8//IGNORE', $frompart->text);
-								} else {
-									$fromdecoded .= $frompart->text;
-								}
-							}
-
-							$fromarr = imap_rfc822_parse_adrlist($fromdecoded, $a->get_hostname());
-
-							$frommail = $fromarr[0]->mailbox."@".$fromarr[0]->host;
-
-							if (isset($fromarr[0]->personal)) {
-								$fromname = $fromarr[0]->personal;
+						$from = imap_mime_header_decode($meta->from);
+						$fromdecoded = "";
+						foreach ($from as $frompart) {
+							if ($frompart->charset != "default") {
+								$fromdecoded .= iconv($frompart->charset, 'UTF-8//IGNORE', $frompart->text);
 							} else {
-								$fromname = $frommail;
+								$fromdecoded .= $frompart->text;
 							}
-
-							//$datarray['body'] = "[b]".t('From: ') . escape_tags($fromdecoded) . "[/b]\n\n" . $datarray['body'];
-
-							$datarray['author-name'] = $fromname;
-							$datarray['author-link'] = "mailto:".$frommail;
-							$datarray['author-avatar'] = $contact['photo'];
-
-							$datarray['owner-name'] = $contact['name'];
-							$datarray['owner-link'] = "mailto:".$contact['addr'];
-							$datarray['owner-avatar'] = $contact['photo'];
-
-						} else {
-							$datarray['author-name'] = $contact['name'];
-							$datarray['author-link'] = 'mailbox';
-							$datarray['author-avatar'] = $contact['photo'];
 						}
+
+						$fromarr = imap_rfc822_parse_adrlist($fromdecoded, $a->get_hostname());
+
+						$frommail = $fromarr[0]->mailbox."@".$fromarr[0]->host;
+
+						if (isset($fromarr[0]->personal)) {
+							$fromname = $fromarr[0]->personal;
+						} else {
+							$fromname = $frommail;
+						}
+
+						$datarray['author-name'] = $fromname;
+						$datarray['author-link'] = "mailto:".$frommail;
+						$datarray['author-avatar'] = $contact['photo'];
+
+						$datarray['owner-name'] = $contact['name'];
+						$datarray['owner-link'] = "mailto:".$contact['addr'];
+						$datarray['owner-avatar'] = $contact['photo'];
 
 						$datarray['uid'] = $importer_uid;
 						$datarray['contact-id'] = $contact['id'];

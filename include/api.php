@@ -3988,7 +3988,7 @@ $called_api = null;
 				);
 
 		// adds link to the thumbnail scale photo
-		$arr['body'] = '[url=' . System::baseUrl() . '/photos/' . $owner_record[0]['name'] . '/image/' . $hash . ']'
+		$arr['body'] = '[url=' . System::baseUrl() . '/photos/' . $owner_record[0]['nick'] . '/image/' . $hash . ']'
 					. '[img]' . System::baseUrl() . '/photo/' . $hash . '-' . "2" . '.'. $typetoext[$filetype] . '[/img]'
 					. '[/url]';
 

@@ -46,6 +46,60 @@
         ]
     },
     {
+        "name": "mobiledetect/mobiledetectlib",
+        "version": "2.8.25",
+        "version_normalized": "2.8.25.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/serbanghita/Mobile-Detect.git",
+            "reference": "f0896b5c7274d1450023b0b376240be902c3251c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/serbanghita/Mobile-Detect/zipball/f0896b5c7274d1450023b0b376240be902c3251c",
+            "reference": "f0896b5c7274d1450023b0b376240be902c3251c",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.0.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "*"
+        },
+        "time": "2017-03-29T13:59:30+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "Mobile_Detect.php"
+            ],
+            "psr-0": {
+                "Detection": "namespaced/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Serban Ghita",
+                "email": "serbanghita@gmail.com",
+                "homepage": "http://mobiledetect.net",
+                "role": "Developer"
+            }
+        ],
+        "description": "Mobile_Detect is a lightweight PHP class for detecting mobile devices. It uses the User-Agent string combined with specific HTTP headers to detect the mobile environment.",
+        "homepage": "https://github.com/serbanghita/Mobile-Detect",
+        "keywords": [
+            "detect mobile devices",
+            "mobile",
+            "mobile detect",
+            "mobile detector",
+            "php mobile detect"
+        ]
+    },
+    {
         "name": "pear-pear.php.net/Console_Getopt",
         "version": "1.4.1",
         "version_normalized": "1.4.1.0",
@@ -77,6 +131,37 @@
         "description": "This is a PHP implementation of \"getopt\" supporting both\nshort and long options."
     },
     {
+        "name": "pear-pear.php.net/Archive_Tar",
+        "version": "1.4.2",
+        "version_normalized": "1.4.2.0",
+        "dist": {
+            "type": "file",
+            "url": "https://pear.php.net/get/Archive_Tar-1.4.2.tgz",
+            "reference": null,
+            "shasum": null
+        },
+        "require": {
+            "php": ">=5.2.0.0"
+        },
+        "replace": {
+            "pear-pear/archive_tar": "== 1.4.2.0"
+        },
+        "type": "pear-library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                ""
+            ]
+        },
+        "include-path": [
+            "/"
+        ],
+        "license": [
+            "New BSD License"
+        ],
+        "description": "This class provides handling of tar files in PHP.\nIt supports creating, listing, extracting and adding to tar files.\nGzip support is available if PHP has the zlib extension built-in or\nloaded. Bz2 compression is also supported with the bz2 extension loaded."
+    },
+    {
         "name": "pear-pear.php.net/Structures_Graph",
         "version": "1.1.1",
         "version_normalized": "1.1.1.0",
@@ -106,6 +191,38 @@
             "LGPL-3.0+"
         ],
         "description": "Structures_Graph is a package for creating and manipulating graph datastructures. It allows building of directed\nand undirected graphs, with data and metadata stored in nodes. The library provides functions for graph traversing\nas well as for characteristic extraction from the graph topology."
+    },
+    {
+        "name": "pear-pear.php.net/XML_Util",
+        "version": "1.4.2",
+        "version_normalized": "1.4.2.0",
+        "dist": {
+            "type": "file",
+            "url": "https://pear.php.net/get/XML_Util-1.4.2.tgz",
+            "reference": null,
+            "shasum": null
+        },
+        "require": {
+            "ext-pcre": "*",
+            "php": ">=5.4.0.0"
+        },
+        "replace": {
+            "pear-pear/xml_util": "== 1.4.2.0"
+        },
+        "type": "pear-library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                ""
+            ]
+        },
+        "include-path": [
+            "/"
+        ],
+        "license": [
+            "BSD License"
+        ],
+        "description": "Selection of methods that are often needed when working with XML documents.  Functionality includes creating of attribute lists from arrays, creation of tags, validation of XML names and more."
     },
     {
         "name": "pear-pear.php.net/XML_Parser",
@@ -240,129 +357,12 @@
         ]
     },
     {
-        "name": "mobiledetect/mobiledetectlib",
-        "version": "2.8.26",
-        "version_normalized": "2.8.26.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/serbanghita/Mobile-Detect.git",
-            "reference": "a0ed86c9d7c04ae27fa6418b55e3beb04dfe3297"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/serbanghita/Mobile-Detect/zipball/a0ed86c9d7c04ae27fa6418b55e3beb04dfe3297",
-            "reference": "a0ed86c9d7c04ae27fa6418b55e3beb04dfe3297",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.0.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "*"
-        },
-        "time": "2017-08-29T18:23:54+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "Mobile_Detect.php"
-            ],
-            "psr-0": {
-                "Detection": "namespaced/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Serban Ghita",
-                "email": "serbanghita@gmail.com",
-                "homepage": "http://mobiledetect.net",
-                "role": "Developer"
-            }
-        ],
-        "description": "Mobile_Detect is a lightweight PHP class for detecting mobile devices. It uses the User-Agent string combined with specific HTTP headers to detect the mobile environment.",
-        "homepage": "https://github.com/serbanghita/Mobile-Detect",
-        "keywords": [
-            "detect mobile devices",
-            "mobile",
-            "mobile detect",
-            "mobile detector",
-            "php mobile detect"
-        ]
-    },
-    {
-        "name": "pear-pear.php.net/XML_Util",
-        "version": "1.4.3",
-        "version_normalized": "1.4.3.0",
-        "dist": {
-            "type": "file",
-            "url": "https://pear.php.net/get/XML_Util-1.4.3.tgz",
-            "reference": null,
-            "shasum": null
-        },
-        "require": {
-            "ext-pcre": "*",
-            "php": ">=5.4.0.0"
-        },
-        "replace": {
-            "pear-pear/xml_util": "== 1.4.3.0"
-        },
-        "type": "pear-library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                ""
-            ]
-        },
-        "include-path": [
-            "/"
-        ],
-        "license": [
-            "BSD License"
-        ],
-        "description": "Selection of methods that are often needed when working with XML documents.  Functionality includes creating of attribute lists from arrays, creation of tags, validation of XML names and more."
-    },
-    {
-        "name": "pear-pear.php.net/Archive_Tar",
-        "version": "1.4.3",
-        "version_normalized": "1.4.3.0",
-        "dist": {
-            "type": "file",
-            "url": "https://pear.php.net/get/Archive_Tar-1.4.3.tgz",
-            "reference": null,
-            "shasum": null
-        },
-        "require": {
-            "php": ">=5.2.0.0"
-        },
-        "replace": {
-            "pear-pear/archive_tar": "== 1.4.3.0"
-        },
-        "type": "pear-library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                ""
-            ]
-        },
-        "include-path": [
-            "/"
-        ],
-        "license": [
-            "New BSD License"
-        ],
-        "description": "This class provides handling of tar files in PHP.\nIt supports creating, listing, extracting and adding to tar files.\nGzip support is available if PHP has the zlib extension built-in or\nloaded. Bz2 compression is also supported with the bz2 extension loaded."
-    },
-    {
         "name": "pear-pear.php.net/PEAR",
-        "version": "1.10.5",
-        "version_normalized": "1.10.5.0",
+        "version": "1.10.4",
+        "version_normalized": "1.10.4.0",
         "dist": {
             "type": "file",
-            "url": "https://pear.php.net/get/PEAR-1.10.5.tgz",
+            "url": "https://pear.php.net/get/PEAR-1.10.4.tgz",
             "reference": null,
             "shasum": null
         },
@@ -380,7 +380,7 @@
             "pear-pear.php.net/pear_frontend_web": "<=0.4.0.0"
         },
         "replace": {
-            "pear-pear/pear": "== 1.10.5.0"
+            "pear-pear/pear": "== 1.10.4.0"
         },
         "type": "pear-library",
         "installation-source": "dist",
@@ -396,37 +396,5 @@
             "New BSD License"
         ],
         "description": "The PEAR package contains:\n * the PEAR installer, for creating, distributing\n   and installing packages\n * the PEAR_Exception PHP5 error handling mechanism\n * the PEAR_ErrorStack advanced error handling mechanism\n * the PEAR_Error error handling mechanism\n * the OS_Guess class for retrieving info about the OS\n   where PHP is running on\n * the System class for quick handling of common operations\n   with files and directories\n * the PEAR base class\n  Features in a nutshell:\n  * full support for channels\n  * pre-download dependency validation\n  * new package.xml 2.0 format allows tremendous flexibility while maintaining BC\n  * support for optional dependency groups and limited support for sub-packaging\n  * robust dependency support\n  * full dependency validation on uninstall\n  * remote install for hosts with only ftp access - no more problems with\n    restricted host installation\n  * full support for mirroring\n  * support for bundling several packages into a single tarball\n  * support for static dependencies on a url-based package\n  * support for custom file roles and installation tasks"
-    },
-    {
-        "name": "pear-pear.php.net/Text_LanguageDetect",
-        "version": "1.0.0",
-        "version_normalized": "1.0.0.0",
-        "dist": {
-            "type": "file",
-            "url": "https://pear.php.net/get/Text_LanguageDetect-1.0.0.tgz",
-            "reference": null,
-            "shasum": null
-        },
-        "require": {
-            "ext-pcre": "*",
-            "php": ">=5.4.0.0"
-        },
-        "replace": {
-            "pear-pear/text_languagedetect": "== 1.0.0.0"
-        },
-        "type": "pear-library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                ""
-            ]
-        },
-        "include-path": [
-            "/"
-        ],
-        "license": [
-            "BSD"
-        ],
-        "description": "Text_LanguageDetect can identify 52 human languages from text samples and return confidence scores for each."
     }
 ]

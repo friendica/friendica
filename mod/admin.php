@@ -626,6 +626,15 @@ function admin_page_summary(App $a) {
 		$warningtext[] = t('The database update failed. Please run "php include/dbstructure.php update" from the command line and have a look at the errors that might appear.');
 	}
 
+	$last_worker_call = Config::get('system', 'last_poller_execution', false);
+	if (!$last_worker_call) {
+		$showwarning = true;
+		$warningtext[] = t('The worker was never executed. Please check your database structure!');
+	} elseif ((strtotime(datetime_convert()) - strtotime($last_worker_call)) > 60 * 60) {
+		$showwarning = true;
+		$warningtext[] = sprintf(t('The last worker execution was on %s UTC. This is older than one hour. Please check your crontab settings.'), $last_worker_call);
+	}
+
 	$r = q("SELECT `page-flags`, COUNT(`uid`) AS `count` FROM `user` GROUP BY `page-flags`");
 	$accounts = array(
 		array(t('Normal Account'), 0),
@@ -819,7 +828,6 @@ function admin_page_site_post(App $a) {
 	$nodeinfo		=	((x($_POST,'nodeinfo'))			? intval(trim($_POST['nodeinfo']))		: false);
 	$dfrn_only		=	((x($_POST,'dfrn_only'))		? True						: False);
 	$ostatus_disabled	=	!((x($_POST,'ostatus_disabled'))	? True  					: False);
-	$ostatus_poll_interval	=	((x($_POST,'ostatus_poll_interval'))	? intval(trim($_POST['ostatus_poll_interval']))	:  0);
 	$ostatus_full_threads	=	((x($_POST,'ostatus_full_threads'))	? True  					: False);
 	$diaspora_enabled	=	((x($_POST,'diaspora_enabled'))		? True   					: False);
 	$ssl_policy		=	((x($_POST,'ssl_policy'))		? intval($_POST['ssl_policy']) 			: 0);
@@ -928,16 +936,16 @@ function admin_page_site_post(App $a) {
 	set_config('system','language', $language);
 	set_config('system','theme', $theme);
 
-	if ($theme_mobile === '---') {
+	if ($theme_mobile == '---') {
 		del_config('system','mobile-theme');
 	} else {
 		set_config('system','mobile-theme', $theme_mobile);
-		}
-		if ($singleuser === '---') {
-			del_config('system','singleuser');
-		} else {
-			set_config('system','singleuser', $singleuser);
-		}
+	}
+	if ($singleuser == '---') {
+		del_config('system','singleuser');
+	} else {
+		set_config('system','singleuser', $singleuser);
+	}
 	set_config('system', 'maximagesize', $maximagesize);
 	set_config('system', 'max_image_length', $maximagelength);
 	set_config('system', 'jpeg_quality', $jpegimagequality);
@@ -967,7 +975,6 @@ function admin_page_site_post(App $a) {
 	set_config('system', 'curl_timeout', $timeout);
 	set_config('system', 'dfrn_only', $dfrn_only);
 	set_config('system', 'ostatus_disabled', $ostatus_disabled);
-	set_config('system', 'ostatus_poll_interval', $ostatus_poll_interval);
 	set_config('system', 'ostatus_full_threads', $ostatus_full_threads);
 	set_config('system', 'diaspora_enabled', $diaspora_enabled);
 
@@ -1164,11 +1171,11 @@ function admin_page_site(App $a) {
 		'$info'			=> array('info', t('Additional Info'), $info, sprintf(t('For public servers: you can add additional information here that will be listed at %s/siteinfo.'), get_server())),
 		'$language' 		=> array('language', t("System language"), get_config('system','language'), "", $lang_choices),
 		'$theme' 		=> array('theme', t("System theme"), get_config('system','theme'), t("Default system theme - may be over-ridden by user profiles - <a href='#' id='cnftheme'>change theme settings</a>"), $theme_choices),
-		'$theme_mobile' 	=> array('theme_mobile', t("Mobile system theme"), get_config('system','mobile-theme'), t("Theme for mobile devices"), $theme_choices_mobile),
+		'$theme_mobile' 	=> array('theme_mobile', t("Mobile system theme"), Config::get('system', 'mobile-theme', '---'), t("Theme for mobile devices"), $theme_choices_mobile),
 		'$ssl_policy'		=> array('ssl_policy', t("SSL link policy"), (string) intval(get_config('system','ssl_policy')), t("Determines whether generated links should be forced to use SSL"), $ssl_choices),
 		'$force_ssl'		=> array('force_ssl', t("Force SSL"), get_config('system','force_ssl'), t("Force all Non-SSL requests to SSL - Attention: on some systems it could lead to endless loops.")),
 		'$hide_help'		=> array('hide_help', t("Hide help entry from navigation menu"), get_config('system','hide_help'), t("Hides the menu entry for the Help pages from the navigation menu. You can still access it calling /help directly.")),
-		'$singleuser' 		=> array('singleuser', t("Single user instance"), get_config('system','singleuser'), t("Make this instance multi-user or single-user for the named user"), $user_names),
+		'$singleuser' 		=> array('singleuser', t("Single user instance"), Config::get('system', 'singleuser', '---'), t("Make this instance multi-user or single-user for the named user"), $user_names),
 		'$maximagesize'		=> array('maximagesize', t("Maximum image size"), get_config('system','maximagesize'), t("Maximum size in bytes of uploaded images. Default is 0, which means no limits.")),
 		'$maximagelength'	=> array('maximagelength', t("Maximum image length"), get_config('system','max_image_length'), t("Maximum length in pixels of the longest side of uploaded images. Default is -1, which means no limits.")),
 		'$jpegimagequality'	=> array('jpegimagequality', t("JPEG image quality"), get_config('system','jpeg_quality'), t("Uploaded JPEGS will be saved at this quality setting [0-100]. Default is 100, which is full quality.")),
@@ -1194,7 +1201,6 @@ function admin_page_site(App $a) {
 		'$community_page_style' => array('community_page_style', t("Community Page Style"), get_config('system','community_page_style'), t("Type of community page to show. 'Global community' shows every public posting from an open distributed network that arrived on this server."), $community_page_style_choices),
 		'$max_author_posts_community_page' => array('max_author_posts_community_page', t("Posts per user on community page"), get_config('system','max_author_posts_community_page'), t("The maximum number of posts per user on the community page. (Not valid for 'Global Community')")),
 		'$ostatus_disabled' 	=> array('ostatus_disabled', t("Enable OStatus support"), !get_config('system','ostatus_disabled'), t("Provide built-in OStatus \x28StatusNet, GNU Social etc.\x29 compatibility. All communications in OStatus are public, so privacy warnings will be occasionally displayed.")),
-		'$ostatus_poll_interval' => array('ostatus_poll_interval', t("OStatus conversation completion interval"), (string) intval(get_config('system','ostatus_poll_interval')), t("How often shall the poller check for new entries in OStatus conversations? This can be a very ressource task."), $ostatus_poll_choices),
 		'$ostatus_full_threads'	=> array('ostatus_full_threads', t("Only import OStatus threads from our contacts"), get_config('system','ostatus_full_threads'), t("Normally we import every content from our OStatus contacts. With this option we only store threads that are started by a contact that is known on our system.")),
 		'$ostatus_not_able'	=> t("OStatus support can only be enabled if threading is enabled."),
 		'$diaspora_able'	=> $diaspora_able,

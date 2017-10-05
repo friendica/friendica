@@ -1260,6 +1260,24 @@ class dba {
 	}
 
 	/**
+	 * @brief Returns the error number of the last query
+	 *
+	 * @return string Error number (0 if no error)
+	 */
+	public static function errorNo() {
+		return self::$dbo->errorno;
+	}
+
+	/**
+	 * @brief Returns the error message of the last query
+	 *
+	 * @return string Error message ('' if no error)
+	 */
+	public static function errorMessage() {
+		return self::$dbo->error;
+	}
+
+	/**
 	 * @brief Closes the current statement
 	 *
 	 * @param object $stmt statement object

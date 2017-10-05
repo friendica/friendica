@@ -76,7 +76,8 @@ class Lock {
 		$got_lock = false;
 		$start = time();
 
-		if (function_exists('sem_get')) {
+		// The second parameter for "sem_acquire" doesn't exist before 5.6.1
+		if (function_exists('sem_get') && version_compare(PHP_VERSION, '5.6.1', '>=')) {
 			self::$semaphore[$fn_name] = sem_get(self::semaphoreKey($fn_name));
 			if (self::$semaphore[$fn_name]) {
 				return sem_acquire(self::$semaphore[$fn_name], ($timeout == 0));
@@ -156,7 +157,7 @@ class Lock {
 	 * @param string $fn_name Name of the lock
 	 */
 	public static function remove($fn_name) {
-		if (function_exists('sem_get')) {
+		if (function_exists('sem_get') && version_compare(PHP_VERSION, '5.6.1', '>=')) {
 			if (empty(self::$semaphore[$fn_name])) {
 				return false;
 			} else {

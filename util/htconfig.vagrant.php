@@ -4,8 +4,8 @@
 // Copy or rename this file to .htconfig.php
 
 $db_host = 'localhost';
-$db_user = 'root';
-$db_pass = 'root';
+$db_user = 'friendica';
+$db_pass = 'friendica';
 $db_data = 'friendica';
 
 // If you are using a subdirectory of your domain you will need to put the
@@ -33,7 +33,7 @@ $a->config['sitename'] = "My Friend Network";
 
 $a->config['register_policy'] = REGISTER_OPEN;
 $a->config['register_text'] = '';
-$a->config['admin_email'] = 'vagrant@friendica.dev';
+$a->config['admin_email'] = 'admin@friendica.dev';
 
 // Maximum size of an imported message, 0 is unlimited
 
@@ -73,3 +73,5 @@ $a->config['system']['debugging'] = true;
 $a->config['system']['logfile'] = 'logfile.out';
 $a->config['system']['loglevel'] = LOGGER_DEBUG;
 
+// display php errors
+ini_set('display_errors', '1');

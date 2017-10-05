@@ -3,7 +3,8 @@ Friendica Templating Documentation
 
 * [Home](help)
 
-Friendica uses [Smarty 3](http://www.smarty.net/) as PHP templating engine. The main templates are found in
+Friendica uses [Smarty 3](http://www.smarty.net/) as PHP templating engine.
+The main templates are found in
 
 		/view/templates
 
@@ -33,9 +34,10 @@ where the value may as well be an array by its own.
 Form Templates
 --------------
 
-To guarantee a consistent look and feel for input forms, i.e. in the settings sections, there are templates for the basic form fields. They are initialized with an array of data, depending on the tyle of the field.
+To guarantee a consistent look and feel for input forms, i.e. in the settings sections, there are templates for the basic form fields.
+They are initialized with an array of data, depending on the tyle of the field.
 
-All of these take an array for holding the values, eg,. for a one line text input field, which is required and should be used to type email addesses use something along the lines of:
+All of these take an array holding the values, e.g. for a one line text input field, which is required and should be used to type email addesses use something along the lines of:
 
 		'$adminmail' => array('adminmail', t('Site administrator email address'), $adminmail, t('Your account email address must match this in order to use the web admin panel.'), 'required', '', 'email'),
 
@@ -45,7 +47,9 @@ Listed below are the template file names, the general purpose of the template an
 
 ### field_checkbox.tpl
 
-A checkbox. If the checkbox is checked its value is **1**. Field parameter:
+A checkbox.
+If the checkbox is checked its value is **1**.
+Field parameter:
 
 0. Name of the checkbox,
 1. Label for the checkbox,
@@ -54,7 +58,8 @@ A checkbox. If the checkbox is checked its value is **1**. Field parameter:
 
 ### field_combobox.tpl
 
-A combobox, combining a pull down selection and a textual input field. Field parameter:
+A combobox, combining a pull down selection and a textual input field.
+Field parameter:
 
 0. Name of the combobox,
 1. Label for the combobox,
@@ -65,7 +70,8 @@ A combobox, combining a pull down selection and a textual input field. Field par
 
 ### field_custom.tpl
 
-A customizeable template to include a custom element in the form with the usual surroundings, Field parameter:
+A customizeable template to include a custom element in the form with the usual surroundings,
+Field parameter:
 
 0. Name of the field,
 1. Label for the field,
@@ -74,7 +80,8 @@ A customizeable template to include a custom element in the form with the usual 
 
 ### field_input.tpl
 
-A single line input field for textual input. Field parameter:
+A single line input field for textual input.
+Field parameter:
 
 0. Name of the field,
 1. Label for the input box,
@@ -86,7 +93,8 @@ A single line input field for textual input. Field parameter:
 
 ### field_intcheckbox.tpl
 
-A checkbox (see above) but you can define the value of it. Field parameter:
+A checkbox (see above) but you can define the value of it.
+Field parameter:
 
 0. Name of the checkbox,
 1. Label for the checkbox,
@@ -96,7 +104,8 @@ A checkbox (see above) but you can define the value of it. Field parameter:
 
 ### field_openid.tpl
 
-An input box (see above) but prepared for special CSS styling for openID input. Field parameter:
+An input box (see above) but prepared for special CSS styling for openID input.
+Field parameter:
 
 0. Name of the field,
 1. Label for the input box,
@@ -105,7 +114,9 @@ An input box (see above) but prepared for special CSS styling for openID input. 
 
 ### field_password.tpl
 
-A single line input field (see above) for textual input. The characters typed in will not be shown by the browser. Field parameter:
+A single line input field (see above) for textual input.
+The characters typed in will not be shown by the browser.
+Field parameter:
 
 0. Name of the field,
 1. Label for the field,
@@ -116,7 +127,8 @@ A single line input field (see above) for textual input. The characters typed in
 
 ### field_radio.tpl
 
-A radio button. Field parameter:
+A radio button.
+Field parameter:
 
 0. Name of the radio button,
 1. Label for the radio button,
@@ -126,7 +138,8 @@ A radio button. Field parameter:
 
 ### field_richtext.tpl
 
-A multi-line input field for *rich* textual content. Field parameter:
+A multi-line input field for *rich* textual content.
+Field parameter:
 
 0. Name of the input field,
 1. Label for the input box,
@@ -135,7 +148,8 @@ A multi-line input field for *rich* textual content. Field parameter:
 
 ### field_select.tpl
 
-A drop down selection box. Field parameter:
+A drop down selection box.
+Field parameter:
 
 0. Name of the field,
 1. Label of the selection box,
@@ -145,7 +159,8 @@ A drop down selection box. Field parameter:
 
 ### field_select_raw.tpl
 
-A drop down selection box (see above) but you have to prepare the values yourself. Field parameter:
+A drop down selection box (see above) but you have to prepare the values yourself.
+Field parameter:
 
 0. Name of the field,
 1. Label of the selection box,
@@ -155,7 +170,8 @@ A drop down selection box (see above) but you have to prepare the values yoursel
 
 ### field_textarea.tpl
 
-A multi-line input field for (plain) textual content. Field parameter:
+A multi-line input field for (plain) textual content.
+Field parameter:
 
 0. Name of the input field,
 1. Label for the input box,
@@ -164,7 +180,8 @@ A multi-line input field for (plain) textual content. Field parameter:
 
 ### field_yesno.tpl
 
-A button that has two states *yes* or *no*. Field parameter:
+A button that has two states *yes* or *no*.
+Field parameter:
 
 0. Name of the input field,
 1. Label for the button,

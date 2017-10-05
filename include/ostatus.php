@@ -78,6 +78,9 @@ class ostatus {
 
 			if (dbm::is_result($r)) {
 				$found = true;
+				if ($r['blocked']) {
+					$r['id'] = -1;
+				}
 				$contact = $r;
 				$author["contact-id"] = $r["id"];
 				$author["author-link"] = $r["url"];
@@ -90,6 +93,9 @@ class ostatus {
 			$r = dba::select('contact', array(), $condition, array('limit' => 1));
 
 			if (dbm::is_result($r)) {
+				if ($r['blocked']) {
+					$r['id'] = -1;
+				}
 				$contact = $r;
 				$author["contact-id"] = $r["id"];
 				$author["author-link"] = $r["url"];
@@ -128,7 +134,7 @@ class ostatus {
 		$author["owner-avatar"] = $author["author-avatar"];
 
 		// Only update the contacts if it is an OStatus contact
-		if ($r && !$onlyfetch && ($contact["network"] == NETWORK_OSTATUS)) {
+		if ($r && ($r['id'] > 0) && !$onlyfetch && ($contact["network"] == NETWORK_OSTATUS)) {
 
 			// Update contact data
 
@@ -366,6 +372,11 @@ class ostatus {
 		foreach (array_reverse($entrylist) AS $entry) {
 			// fetch the author
 			$authorelement = $xpath->query('/atom:entry/atom:author', $entry);
+
+			if ($authorelement->length == 0) {
+				$authorelement = $xpath->query('atom:author', $entry);
+			}
+
 			if ($authorelement->length > 0) {
 				$author = self::fetchauthor($xpath, $entry, $importer, $contact, $stored);
 			}
@@ -478,6 +489,8 @@ class ostatus {
 						$found = dba::exists('item', array('uid' => $importer["uid"], 'uri' => $item["uri"]));
 						if ($found) {
 							logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already exists.", LOGGER_DEBUG);
+						} elseif ($item['contact-id'] < 0) {
+							logger("Item with uri ".$item["uri"]." is from a blocked contact.", LOGGER_DEBUG);
 						} else {
 							// We are having duplicated entries. Hopefully this solves it.
 							if (Lock::set('ostatus_process_item_store')) {
@@ -674,7 +687,7 @@ class ostatus {
 
 		self::$conv_list[$conversation] = true;
 
-		$conversation_data = z_fetch_url($conversation, false, $redirects, array('accept_content' => 'application/atom+xml'));
+		$conversation_data = z_fetch_url($conversation, false, $redirects, array('accept_content' => 'application/atom+xml, text/html'));
 
 		if (!$conversation_data['success']) {
 			return;
@@ -855,7 +868,7 @@ class ostatus {
 		}
 
 		$stored = false;
-		$related_data = z_fetch_url($related, false, $redirects, array('accept_content' => 'application/atom+xml'));
+		$related_data = z_fetch_url($related, false, $redirects, array('accept_content' => 'application/atom+xml, text/html'));
 
 		if (!$related_data['success']) {
 			return;

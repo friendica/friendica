@@ -85,7 +85,6 @@
 
 	{{if $thread_allow.2}}
 		{{include file="field_checkbox.tpl" field=$ostatus_disabled}}
-		{{include file="field_select.tpl" field=$ostatus_poll_interval}}
 		{{include file="field_checkbox.tpl" field=$ostatus_full_threads}}
 	{{else}}
 		<div class='field checkbox' id='div_id_{{$ostatus_disabled.0}}'>

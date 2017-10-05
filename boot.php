@@ -41,7 +41,7 @@ require_once 'include/poller.php';
 
 define ( 'FRIENDICA_PLATFORM',     'Friendica');
 define ( 'FRIENDICA_CODENAME',     'Asparagus');
-define ( 'FRIENDICA_VERSION',      '3.5.3-dev' );
+define ( 'FRIENDICA_VERSION',      '3.6-dev' );
 define ( 'DFRN_PROTOCOL_VERSION',  '2.23'    );
 define ( 'DB_UPDATE_VERSION',      1234      );
 
@@ -591,7 +591,12 @@ function is_ajax() {
 	return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 }
 
-function check_db() {
+/**
+ * @brief Function to check if request was an AJAX (xmlhttprequest) request.
+ *
+ * @param $via_worker boolean Is the check run via the poller?
+ */
+function check_db($via_worker) {
 
 	$build = get_config('system', 'build');
 	if (!x($build)) {
@@ -599,7 +604,10 @@ function check_db() {
 		$build = DB_UPDATE_VERSION;
 	}
 	if ($build != DB_UPDATE_VERSION) {
-		proc_run(PRIORITY_CRITICAL, 'include/dbupdate.php');
+		// When we cannot execute the database update via the worker, we will do it directly
+		if (!proc_run(PRIORITY_CRITICAL, 'include/dbupdate.php') && $via_worker) {
+			update_db(get_app());
+		}
 	}
 }
 
@@ -1024,6 +1032,8 @@ function get_max_import_size() {
  *
  * @hooks 'proc_run'
  * 	array $arr
+ *
+ * @return boolean "false" if proc_run couldn't be executed
  */
 function proc_run($cmd) {
 
@@ -1033,7 +1043,7 @@ function proc_run($cmd) {
 
 	$args = array();
 	if (!count($proc_args)) {
-		return;
+		return false;
 	}
 
 	// Preserve the first parameter
@@ -1059,7 +1069,7 @@ function proc_run($cmd) {
 
 	call_hooks("proc_run", $arr);
 	if (!$arr['run_cmd'] || ! count($args)) {
-		return;
+		return true;
 	}
 
 	$priority = PRIORITY_MEDIUM;
@@ -1086,18 +1096,23 @@ function proc_run($cmd) {
 	$parameters = json_encode($argv);
 	$found = dba::exists('workerqueue', array('parameter' => $parameters, 'done' => false));
 
+	// Quit if there was a database error - a precaution for the update process to 3.5.3
+	if (dba::errorNo() != 0) {
+		return false;
+	}
+
 	if (!$found) {
 		dba::insert('workerqueue', array('parameter' => $parameters, 'created' => $created, 'priority' => $priority));
 	}
 
 	// Should we quit and wait for the poller to be called as a cronjob?
 	if ($dont_fork) {
-		return;
+		return true;
 	}
 
 	// If there is a lock then we don't have to check for too much worker
 	if (!Lock::set('poller_worker', 0)) {
-		return;
+		return true;
 	}
 
 	// If there are already enough workers running, don't fork another one
@@ -1105,13 +1120,15 @@ function proc_run($cmd) {
 	Lock::remove('poller_worker');
 
 	if ($quit) {
-		return;
+		return true;
 	}
 
 	// Now call the poller to execute the jobs that we just added to the queue
 	$args = array("include/poller.php", "no_cron");
 
 	$a->proc_run($args);
+
+	return true;
 }
 
 function current_theme() {

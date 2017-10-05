@@ -240,6 +240,11 @@ function delete_thread_uri($itemuri, $uid) {
 function delete_thread($itemid, $itemuri = "") {
 	$item = q("SELECT `uid` FROM `thread` WHERE `iid` = %d", intval($itemid));
 
+	if (!dbm::is_result($item)) {
+		logger('No thread found for id '.$itemid, LOGGER_DEBUG);
+		return;
+	}
+
 	// Using dba::delete at this time could delete the associated item entries
 	$result = q("DELETE FROM `thread` WHERE `iid` = %d", intval($itemid));
 

@@ -60,7 +60,7 @@ GNU Social Plugin for Friendica
 
 ###Configuration
 
-When the addon is activated the user has to aquire the following in order to connect to the GNU Social account of choice.
+When the addon is activated the user has to acquire the following in order to connect to the GNU Social account of choice.
 
 * The base URL for the GNU Social API, for quitter.se this is https://quitter.se/api/
 * OAuth Consumer key & secret
@@ -86,7 +86,3 @@ Follow the Sign in with GNU Social button, allow access and then copy the securi
 Friendica will then try to acquire the final OAuth credentials from the API. 
 
 If successful, the addon settings will allow you to select to post your public messages to your GNU Social account (have a look behind the little lock symbol beneath the status "editor" on your Home or Network pages).
-
-###More documentation
-
-Find the author's documentation here: [http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/StatusNet_Plugin](http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/StatusNet_Plugin)

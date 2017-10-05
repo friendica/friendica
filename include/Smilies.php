@@ -3,6 +3,14 @@
 /**
  * @file include/Smilies.php
  * @brief This file contains the Smilies class which contains functions to handle smiles
+ *
+ * @todo Use the shortcodes from here:
+ * https://github.com/iamcal/emoji-data/blob/master/emoji_pretty.json?raw=true
+ * https://raw.githubusercontent.com/emojione/emojione/master/extras/alpha-codes/eac.json?raw=true
+ * https://github.com/johannhof/emoji-helper/blob/master/data/emoji.json?raw=true
+ *
+ * Have also a look here:
+ * https://www.webpagefx.com/tools/emoji-cheat-sheet/
  */
 
 use Friendica\App;

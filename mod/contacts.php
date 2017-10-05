@@ -348,7 +348,16 @@ function _contact_archive($contact_id, $orig_record) {
 function _contact_drop($contact_id, $orig_record) {
 	$a = get_app();
 
-	terminate_friendship($a->user,$a->contact,$orig_record);
+	$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
+		WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
+		intval($a->user['uid'])
+	);
+	if (!dbm::is_result($r)) {
+		return;
+	}
+
+	$self = ""; // Unused parameter
+	terminate_friendship($r[0], $self, $orig_record);
 	contact_remove($orig_record['id']);
 }
 

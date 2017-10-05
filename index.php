@@ -196,7 +196,7 @@ if ($install && $a->module!="view") {
 	$a->module = 'maintenance';
 } else {
 	check_url($a);
-	check_db();
+	check_db(false);
 	check_plugins($a);
 }
 

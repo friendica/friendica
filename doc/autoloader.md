@@ -38,7 +38,8 @@ The class `ItemsManager` has been declared in the `Friendica` namespace.
 Namespaces are useful to keep classes separated and avoid names conflicts (could be that a library you want to use also defines a class named `ItemsManager`, but as long as it is in another namespace, you don't have any problem)
 
 Let's say now that you need to load some items in a view, maybe in a fictional `mod/network.php`.
-In order for the Composer autoloader to work, it must first be included. In Friendica this is already done at the top of `boot.php`, with `require_once('vendor/autoload.php');`.
+In order for the Composer autoloader to work, it must first be included.
+In Friendica this is already done at the top of `boot.php`, with `require_once('vendor/autoload.php');`.
 
 The code will be something like:
 
@@ -58,7 +59,8 @@ function network_content(App $a) {
 That's a quite simple example, but look: no `require()`!
 If you need to use a class, you can simply use it and you don't need to do anything else.
 
-Going further: now we have a bunch of `*Manager` classes that cause some code duplication, let's define a `BaseManager` class, where we move all common code between all managers:
+Going further: now we have a bunch of `*Manager` classes that cause some code duplication.
+Let's define a `BaseManager` class, where we move all common code between all managers:
 
 ```php
 // src/BaseManager.php

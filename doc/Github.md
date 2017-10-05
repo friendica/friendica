@@ -66,5 +66,8 @@ Don't assume that a simple fix won't break anything else.
 If possible get an experienced Friendica developer to review the code.
 Don't hesitate to ask us in case of doubt.
 
+3. Check your code for typos.
+There is a PHP script in the *util* directory called *typos.php* for this.
+
 Check out how to work with [our Vagrant](help/Vagrant) to save a lot of setup time!
 

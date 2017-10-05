@@ -3,8 +3,8 @@ Install an ejabberd with synchronized credentials
 
 * [Home](help)
 
-[Ejabberd](https://www.ejabberd.im/) is a chat server that uses XMPP as messaging protocol that you can use with a large amount of clients. In conjunction 
-with the "xmpp" addon it can be used for a web based chat solution for your users.
+[Ejabberd](https://www.ejabberd.im/) is a chat server that uses XMPP as messaging protocol that you can use with a large amount of clients.
+In conjunction with the "xmpp" addon it can be used for a web based chat solution for your users.
 
 Installation
 ------------

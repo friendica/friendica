@@ -364,9 +364,13 @@ function item_add_language_opt(&$arr) {
 		$postopts = "";
 	}
 
+	require_once('library/langdet/Text/LanguageDetect.php');
+
 	$naked_body = preg_replace('/\[(.+?)\]/','', $arr['body']);
-	$LanguageDetect = new Text_LanguageDetect();
-	$lng = $LanguageDetect->detect($naked_body, 3);
+	$l = new Text_LanguageDetect();
+	//$lng = $l->detectConfidence($naked_body);
+	//$arr['postopts'] = (($lng['language']) ? 'lang=' . $lng['language'] . ';' . $lng['confidence'] : '');
+	$lng = $l->detect($naked_body, 3);
 
 	if (sizeof($lng) > 0) {
 		if ($postopts != "") $postopts .= '&'; // arbitrary separator, to be reviewed
@@ -393,15 +397,24 @@ function uri_to_guid($uri, $host = "") {
 	// We have to avoid that different routines could accidentally create the same value
 	$parsed = parse_url($uri);
 
+	// When the hostname isn't given, we take it from the uri
 	if ($host == "") {
-		$host = $parsed["host"];
+		// Is it in the format data@host.tld?
+		if ((count($parsed) == 1) && strstr($uri, '@')) {
+			$mailparts = explode('@', $uri);
+			$host = array_pop($mailparts);
+		} else {
+			$host = $parsed["host"];
+		}
 	}
 
+	// We use a hash of the hostname as prefix for the guid
 	$guid_prefix = hash("crc32", $host);
 
 	// Remove the scheme to make sure that "https" and "http" doesn't make a difference
 	unset($parsed["scheme"]);
 
+	// Glue it together to be able to make a hash from it
 	$host_id = implode("/", $parsed);
 
 	// We could use any hash algorithm since it isn't a security issue

@@ -13,7 +13,8 @@ You will need to be logged in at the time.
 You will be asked for your password to confirm the request.
 If this matches your stored password, your account will immediately be blocked to all probing.
 Unlike some social networks we do **not** hold onto it for a grace period in case you change your mind.
-All your content and user data, etc is instantly removed. For all intents and purposes, the account is gone in moments.  
+All your content and user data, etc is instantly removed.
+For all intents and purposes, the account is gone in moments.  
 
 We then send out an "unfriend" signal to all of your contacts.
 This signal deletes all content on those networks.

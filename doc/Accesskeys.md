@@ -3,6 +3,8 @@ Accesskeys in Friendica
 
 * [Home](help)
 
+For an overview of the modifier key of the different browsers we suggest this [Wikipedia](https://en.wikipedia.org/wiki/Access_key) article.
+
 General
 -------
 * p: profile

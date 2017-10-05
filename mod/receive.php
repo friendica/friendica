@@ -17,11 +17,11 @@ function receive_post(App $a) {
 		http_status_exit(500);
 	}
 
-	$public = false;
-
 	if (($a->argc == 2) && ($a->argv[1] === 'public')) {
 		$public = true;
+		$importer = false;
 	} else {
+		$public = false;
 
 		if ($a->argc != 3 || $a->argv[1] !== 'users') {
 			http_status_exit(500);
@@ -49,8 +49,13 @@ function receive_post(App $a) {
 		logger('mod-diaspora: message is in the new format', LOGGER_DEBUG);
 		$msg = Diaspora::decode_raw($importer, $postdata);
 	} else {
-		logger('mod-diaspora: message is in the old format', LOGGER_DEBUG);
+		logger('mod-diaspora: decode message in the old format', LOGGER_DEBUG);
 		$msg = Diaspora::decode($importer, $xml);
+
+		if ($public && !$msg) {
+			logger('mod-diaspora: decode message in the new format', LOGGER_DEBUG);
+			$msg = Diaspora::decode_raw($importer, $xml);
+		}
 	}
 
 	logger('mod-diaspora: decoded', LOGGER_DEBUG);

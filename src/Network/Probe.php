@@ -306,7 +306,7 @@ class Probe {
 	 *
 	 * @return array uri data
 	 */
-	public static function uri($uri, $network = "", $uid = 0, $cache = true) {
+	public static function uri($uri, $network = "", $uid = -1, $cache = true) {
 
 		if ($cache) {
 			$result = Cache::get("probe_url:".$network.":".$uri);
@@ -315,7 +315,7 @@ class Probe {
 			}
 		}
 
-		if ($uid == 0) {
+		if ($uid == -1) {
 			$uid = local_user();
 		}
 
@@ -1483,25 +1483,27 @@ class Probe {
 			return false;
 		}
 
-		$x = q("SELECT `prvkey` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
+		if ($uid != 0) {
+			$x = q("SELECT `prvkey` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
 
-		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
+			$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-		if (dbm::is_result($x) && dbm::is_result($r)) {
-			$mailbox = construct_mailbox_name($r[0]);
-			$password = '';
-			openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
-			$mbox = email_connect($mailbox, $r[0]['user'], $password);
-			if (!mbox) {
+			if (dbm::is_result($x) && dbm::is_result($r)) {
+				$mailbox = construct_mailbox_name($r[0]);
+				$password = '';
+				openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
+				$mbox = email_connect($mailbox, $r[0]['user'], $password);
+				if (!mbox) {
+					return false;
+				}
+			}
+
+			$msgs = email_poll($mbox, $uri);
+			logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
+
+			if (!count($msgs)) {
 				return false;
 			}
-		}
-
-		$msgs = email_poll($mbox, $uri);
-		logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
-
-		if (!count($msgs)) {
-			return false;
 		}
 
 		$phost = substr($uri, strpos($uri, '@') + 1);
@@ -1512,7 +1514,7 @@ class Probe {
 		$data["name"]    = substr($uri, 0, strpos($uri, '@'));
 		$data["nick"]    = $data["name"];
 		$data["photo"]   = avatar_img($uri);
-		$data["url"]     = 'http://'.$phost."/".$data["nick"];
+		$data["url"]     = 'mailto:'.$uri;
 		$data["notify"]  = 'smtp '.random_string();
 		$data["poll"]    = 'email '.random_string();
 
@@ -1542,7 +1544,9 @@ class Probe {
 				}
 			}
 		}
-		imap_close($mbox);
+		if (!empty($mbox)) {
+			imap_close($mbox);
+		}
 
 		return $data;
 	}
