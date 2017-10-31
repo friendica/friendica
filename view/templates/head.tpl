@@ -2,6 +2,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <base href="{{$baseurl}}/" />
 <meta name="generator" content="{{$generator}}" />
+<meta property="og:image" content="{{$baseurl}}/images/friendica-128.png" />
 <link rel="stylesheet" href="view/global.css" type="text/css" media="all" />
 <link rel="stylesheet" href="library/colorbox/colorbox.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="library/jgrowl/jquery.jgrowl.css" type="text/css" media="screen" />
