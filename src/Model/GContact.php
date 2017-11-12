@@ -2,14 +2,13 @@
 
 /**
  * @file src/Model/GContact.php
- * @brief This file includes the DirSearch class with directory related functions
  */
 namespace Friendica\Model;
 
 use Friendica\Core\Config;
 
 /**
- * @brief This class handels directory related functions
+ * @brief This class handles global contact related functions
  */
 class GContact
 {
