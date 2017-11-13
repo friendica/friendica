@@ -10,7 +10,7 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 
 require_once "include/Contact.php";
 
@@ -48,7 +48,7 @@ function hovercard_content() {
 	}
 
 	// if it's the url containing https it should be converted to http
-	$nurl = normalise_link(GContact::cleanContactUrl($profileurl));
+	$nurl = normalise_link(GlobalContact::cleanContactUrl($profileurl));
 	if($nurl) {
 		// Search for contact data
 		$contact = get_contact_details_by_url($nurl);

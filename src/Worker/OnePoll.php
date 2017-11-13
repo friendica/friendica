@@ -78,7 +78,7 @@ class OnePoll
 			);
 			if (DBM::is_result($r)) {
 				if (!$r[0]['total']) {
-					PortableContact::load($contact['id'], $importer_uid, 0, $contact['poco']);
+					PortableContact::loadWorker($contact['id'], $importer_uid, 0, $contact['poco']);
 				}
 			}
 		}
@@ -86,7 +86,7 @@ class OnePoll
 		/// @TODO Check why we don't poll the Diaspora feed at the moment (some guid problem in the items?)
 		/// @TODO Check whether this is possible with Redmatrix
 		if ($contact["network"] == NETWORK_DIASPORA) {
-			if (PortableContact::doUpdate($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
+			if (PortableContact::updateNeeded($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
 				$last_updated = PortableContact::lastUpdated($contact["url"]);
 				$updated = datetime_convert();
 				if ($last_updated) {

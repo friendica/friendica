@@ -6,8 +6,9 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
+use Friendica\Protocol\PortableContact;
 
 require_once 'include/contact_widgets.php';
 require_once 'include/Contact.php';
@@ -80,7 +81,7 @@ function dirfind_content(App $a, $prefix = "") {
 
 			// Add the contact to the global contacts if it isn't already in our system
 			if (($contact["cid"] == 0) && ($contact["zid"] == 0) && ($contact["gid"] == 0)) {
-				GContact::update($user_data);
+				GlobalContact::update($user_data);
 			}
 		} elseif ($local) {
 			if ($community)
@@ -142,7 +143,7 @@ function dirfind_content(App $a, $prefix = "") {
 			$j->items_page = $perpage;
 			$j->page = $a->pager['page'];
 			foreach ($results AS $result) {
-				if (GContact::alternateOstatusUrl($result["url"])) {
+				if (PortableContact::alternateOStatusUrl($result["url"])) {
 					continue;
 				}
 

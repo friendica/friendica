@@ -8,7 +8,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
 use Friendica\Util\Lock;
 use Friendica\Util\XML;
@@ -225,9 +225,9 @@ class ostatus
 			$contact["generation"] = 2;
 			$contact["hide"] = false; // OStatus contacts are never hidden
 			$contact["photo"] = $author["author-avatar"];
-			$gcid = GContact::update($contact);
+			$gcid = GlobalContact::update($contact);
 
-			GContact::link($gcid, $contact["uid"], $contact["id"]);
+			GlobalContact::link($gcid, $contact["uid"], $contact["id"]);
 		}
 
 		return $author;

@@ -8,7 +8,7 @@ use Friendica\Core\Worker;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 
 require_once 'include/group.php';
 
@@ -653,7 +653,7 @@ function settings_post(App $a) {
 	Worker::add(PRIORITY_LOW, 'profile_update', local_user());
 
 	// Update the global contact for the user
-	GContact::updateForUser(local_user());
+	GlobalContact::updateForUser(local_user());
 
 	//$_SESSION['theme'] = $theme;
 	if ($email_changed && $a->config['register_policy'] == REGISTER_VERIFY) {

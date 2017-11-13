@@ -6,7 +6,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 
@@ -62,7 +62,7 @@ function discover_poco_run(&$argv, &$argc)
 		} else {
 			$url = '';
 		}
-		PortableContact::loadWorker(intval($argv[2]), intval($argv[3]), intval($argv[4]), $url);
+		PortableContact::load(intval($argv[2]), intval($argv[3]), intval($argv[4]), $url);
 	} elseif ($mode == 6) {
 		PortableContact::discoverSingleServer(intval($argv[2]));
 	} elseif ($mode == 5) {
@@ -85,7 +85,7 @@ function discover_poco_run(&$argv, &$argc)
 		}
 		logger($result, LOGGER_DEBUG);
 	} elseif ($mode == 3) {
-		GContact::updateSuggestions();
+		GlobalContact::updateSuggestions();
 	} elseif (($mode == 2) && Config::get('system', 'poco_completion')) {
 		discover_users();
 	} elseif (($mode == 1) && ($search != "") && Config::get('system', 'poco_local_search')) {
@@ -97,7 +97,7 @@ function discover_poco_run(&$argv, &$argc)
 
 		// Query GNU Social servers for their users ("statistics" addon has to be enabled on the GS server)
 		if (!Config::get('system', 'ostatus_disabled')) {
-			GContact::gsDiscover();
+			GlobalContact::gsDiscover();
 		}
 	}
 
@@ -121,7 +121,7 @@ function update_server()
 	$updated = 0;
 
 	foreach ($r as $server) {
-		if (!PortableContact::doUpdate($server["created"], "", $server["last_failure"], $server["last_contact"])) {
+		if (!PortableContact::updateNeeded($server["created"], "", $server["last_failure"], $server["last_contact"])) {
 			continue;
 		}
 		logger('Update server status for server '.$server["url"], LOGGER_DEBUG);
@@ -258,7 +258,7 @@ function discover_directory($search) {
 
 				$data["server_url"] = $data["baseurl"];
 
-				GContact::update($data);
+				GlobalContact::update($data);
 			} else {
 				logger("Profile ".$jj->url." is not responding or no Friendica contact - but network ".$data["network"], LOGGER_DEBUG);
 			}
@@ -299,7 +299,7 @@ function gs_search_user($search) {
 		$contact = Probe::uri($user->site_address."/".$user->name);
 		if ($contact["network"] != NETWORK_PHANTOM) {
 			$contact["about"] = $user->description;
-			GContact::update($contact);
+			GlobalContact::update($contact);
 		}
 	}
 }

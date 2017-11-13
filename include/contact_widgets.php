@@ -7,7 +7,7 @@ use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 
 require_once 'include/contact_selectors.php';
 
@@ -253,18 +253,18 @@ function common_friends_visitor_widget($profile_uid) {
 	}
 
 	if ($cid) {
-		$t = GContact::countCommonFriends($profile_uid, $cid);
+		$t = GlobalContact::countCommonFriends($profile_uid, $cid);
 	} else {
-		$t = GContact::countCommonFriendsZcid($profile_uid, $zcid);
+		$t = GlobalContact::countCommonFriendsZcid($profile_uid, $zcid);
 	}
 	if (! $t) {
 		return;
 	}
 
 	if ($cid) {
-		$r = GContact::commonFriends($profile_uid, $cid, 0, 5, true);
+		$r = GlobalContact::commonFriends($profile_uid, $cid, 0, 5, true);
 	} else {
-		$r = GContact::commonFriendsZcid($profile_uid, $zcid, 0, 5, true);
+		$r = GlobalContact::commonFriendsZcid($profile_uid, $zcid, 0, 5, true);
 	}
 
 	return replace_macros(get_markup_template('remote_friends_common.tpl'), array(

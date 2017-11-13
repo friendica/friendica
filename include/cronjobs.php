@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 
@@ -270,7 +270,7 @@ function cron_repair_database() {
 	$r = q("SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`");
 	if (DBM::is_result($r)) {
 		foreach ($r as $user) {
-			GContact::updateForUser($user["uid"]);
+			GlobalContact::updateForUser($user["uid"]);
 		}
 	}
 

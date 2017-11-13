@@ -5,7 +5,7 @@
 
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 
 /**
  * @brief Calls the post update functions
@@ -73,7 +73,7 @@ function post_update_1192() {
 
 	// Set the "gcontact-id" in the item table and add a new gcontact entry if needed
 	foreach ($item_arr as $item) {
-		$gcontact_id = GContact::getId(
+		$gcontact_id = GlobalContact::getId(
 			array("url" => $item['author-link'], "network" => $item['network'],
 			"photo" => $item['author-avatar'], "name" => $item['author-name'])
 		);

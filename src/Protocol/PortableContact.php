@@ -7,7 +7,7 @@ namespace Friendica\Protocol;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
 
 use dba;
@@ -34,7 +34,7 @@ class PortableContact
 	 * pointing to the same global contact id.
 	 *
 	 */
-	public static function load($cid, $uid = 0, $zcid = 0, $url = null)
+	public static function loadWorker($cid, $uid = 0, $zcid = 0, $url = null)
 	{
 		// Call the function "loadWorker" via the worker
 		Worker::add(PRIORITY_LOW, "discover_poco", "load", (int)$cid, (int)$uid, (int)$zcid, $url);
@@ -49,7 +49,7 @@ class PortableContact
 	 * @param integer $url  POCO address that should be polled
 	 *
 	 */
-	public static function loadWorker($cid, $uid, $zcid, $url)
+	public static function load($cid, $uid, $zcid, $url)
 	{
 		$a = get_app();
 
@@ -182,10 +182,10 @@ class PortableContact
 					"generation" => $generation);
 
 			try {
-				$gcontact = GContact::sanitize($gcontact);
-				$gcid = GContact::update($gcontact);
+				$gcontact = GlobalContact::sanitize($gcontact);
+				$gcid = GlobalContact::update($gcontact);
 
-				GContact::link($gcid, $uid, $cid, $zcid);
+				GlobalContact::link($gcid, $uid, $cid, $zcid);
 			} catch (Exception $e) {
 				logger($e->getMessage(), LOGGER_DEBUG);
 			}
@@ -410,7 +410,7 @@ class PortableContact
 	
 						$contact = array_merge($contact, $noscrape);
 	
-						GContact::update($contact);
+						GlobalContact::update($contact);
 	
 						if (trim($noscrape["updated"]) != "") {
 							q(
@@ -429,10 +429,10 @@ class PortableContact
 		}
 	
 		// If we only can poll the feed, then we only do this once a while
-		if (!$force && !self::doUpdate($gcontacts[0]["created"], $gcontacts[0]["updated"], $gcontacts[0]["last_failure"], $gcontacts[0]["last_contact"])) {
+		if (!$force && !self::updateNeeded($gcontacts[0]["created"], $gcontacts[0]["updated"], $gcontacts[0]["last_failure"], $gcontacts[0]["last_contact"])) {
 			logger("Profile ".$profile." was last updated at ".$gcontacts[0]["updated"]." (cached)", LOGGER_DEBUG);
 	
-			GContact::update($contact);
+			GlobalContact::update($contact);
 			return $gcontacts[0]["updated"];
 		}
 	
@@ -440,7 +440,7 @@ class PortableContact
 	
 		// Is the profile link the alternate OStatus link notation? (http://domain.tld/user/4711)
 		// Then check the other link and delete this one
-		if (($data["network"] == NETWORK_OSTATUS) && GContact::alternateOstatusUrl($profile)
+		if (($data["network"] == NETWORK_OSTATUS) && self::alternateOStatusUrl($profile)
 			&& (normalise_link($profile) == normalise_link($data["alias"]))
 			&& (normalise_link($profile) != normalise_link($data["url"]))
 		) {
@@ -453,8 +453,8 @@ class PortableContact
 			$gcontact["server_url"] = $data["baseurl"];
 	
 			try {
-				$gcontact = GContact::sanitize($gcontact);
-				GContact::update($gcontact);
+				$gcontact = GlobalContact::sanitize($gcontact);
+				GlobalContact::update($gcontact);
 	
 				self::lastUpdated($data["url"], $force);
 			} catch (Exception $e) {
@@ -480,7 +480,7 @@ class PortableContact
 	
 		$contact["server_url"] = $data["baseurl"];
 	
-		GContact::update($contact);
+		GlobalContact::update($contact);
 	
 		$feedret = z_fetch_url($data["poll"]);
 	
@@ -541,7 +541,7 @@ class PortableContact
 		return($last_updated);
 	}
 
-	public static function doUpdate($created, $updated, $last_failure, $last_contact)
+	public static function updateNeeded($created, $updated, $last_failure, $last_contact)
 	{
 		$now = strtotime(datetime_convert());
 	
@@ -839,7 +839,7 @@ class PortableContact
 			$info = $servers[0]["info"];
 			$register_policy = $servers[0]["register_policy"];
 	
-			if (!$force && !self::doUpdate($servers[0]["created"], "", $last_failure, $last_contact)) {
+			if (!$force && !self::updateNeeded($servers[0]["created"], "", $last_failure, $last_contact)) {
 				logger("Use cached data for server ".$server_url, LOGGER_DEBUG);
 				return ($last_contact >= $last_failure);
 			}
@@ -1563,8 +1563,8 @@ class PortableContact
 						"generation" => $generation);
 	
 				try {
-					$gcontact = GContact::sanitize($gcontact);
-					GContact::update($gcontact);
+					$gcontact = GlobalContact::sanitize($gcontact);
+					GlobalContact::update($gcontact);
 				} catch (Exception $e) {
 					logger($e->getMessage(), LOGGER_DEBUG);
 				}
@@ -1596,5 +1596,10 @@ class PortableContact
 		}
 	
 		return $r;
+	}
+
+	public static function alternateOStatusUrl($url)
+	{
+		return preg_match("=https?://.+/user/\d+=ism", $url, $matches);
 	}
 }

@@ -4,7 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 
 require_once 'include/Contact.php';
 require_once 'include/contact_selectors.php';
@@ -86,9 +86,9 @@ function common_content(App $a)
 	}
 
 	if ($cid) {
-		$t = GContact::countCommonFriends($uid, $cid);
+		$t = GlobalContact::countCommonFriends($uid, $cid);
 	} else {
-		$t = GContact::countCommonFriendsZcid($uid, $zcid);
+		$t = GlobalContact::countCommonFriendsZcid($uid, $zcid);
 	}
 
 	if (count($t)) {
@@ -100,9 +100,9 @@ function common_content(App $a)
 
 
 	if ($cid) {
-		$r = GContact::commonFriends($uid, $cid, $a->pager['start'], $a->pager['itemspage']);
+		$r = GlobalContact::commonFriends($uid, $cid, $a->pager['start'], $a->pager['itemspage']);
 	} else {
-		$r = GContact::commonFriendsZcid($uid, $zcid, $a->pager['start'], $a->pager['itemspage']);
+		$r = GlobalContact::commonFriendsZcid($uid, $zcid, $a->pager['start'], $a->pager['itemspage']);
 	}
 
 

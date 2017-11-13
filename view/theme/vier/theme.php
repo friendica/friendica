@@ -14,7 +14,7 @@ use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 
 require_once "include/plugin.php";
 require_once "mod/proxy.php";
@@ -138,7 +138,7 @@ function vier_community_info() {
 
 	// comunity_profiles
 	if ($show_profiles) {
-		$r = GContact::suggestionQuery(local_user(), 0, 9);
+		$r = GlobalContact::suggestionQuery(local_user(), 0, 9);
 
 		$tpl = get_markup_template('ch_directory_item.tpl');
 		if (DBM::is_result($r)) {

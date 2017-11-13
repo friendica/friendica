@@ -5,7 +5,7 @@
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 
@@ -44,7 +44,7 @@ function gprobe_run(&$argv, &$argc)
 		}
 
 		if (!in_array($arr["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
-			GContact::update($arr);
+			GlobalContact::update($arr);
 		}
 
 		$r = q(
@@ -55,7 +55,7 @@ function gprobe_run(&$argv, &$argc)
 	if (DBM::is_result($r)) {
 		// Check for accessibility and do a poco discovery
 		if (PortableContact::lastUpdated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN)) {
-			PortableContact::load(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
+			PortableContact::loadWorker(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
 		}
 	}
 

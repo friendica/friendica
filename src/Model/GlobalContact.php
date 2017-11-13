@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file src/Model/GContact.php
+ * @file src/Model/GlobalContact.php
  */
 namespace Friendica\Model;
 
@@ -14,6 +14,7 @@ use Friendica\Database\DBM;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 use dba;
+use Exception;
 
 require_once 'include/datetime.php';
 require_once 'include/network.php';
@@ -24,7 +25,7 @@ require_once 'include/Photo.php';
 /**
  * @brief This class handles global contact related functions
  */
-class GContact
+class GlobalContact
 {
 	/**
 	 * @brief Search global contact table by nick or name
@@ -123,7 +124,7 @@ class GContact
 			$gcontact['url'] = self::cleanContactUrl($gcontact['url']);
 		}
 	
-		$alternate = self::alternateOstatusUrl($gcontact['url']);
+		$alternate = PortableContact::alternateOStatusUrl($gcontact['url']);
 	
 		// The global contacts should contain the original picture, not the cached one
 		if (($gcontact['generation'] != 1) && stristr(normalise_link($gcontact['photo']), normalise_link(System::baseUrl()."/photo/"))) {
@@ -271,11 +272,6 @@ class GContact
 		}
 	}
 
-	public static function alternateOstatusUrl($url)
-	{
-		return preg_match("=https?://.+/user/\d+=ism", $url, $matches);
-	}
-	
 	public static function countCommonFriends($uid, $cid)
 	{
 		$r = q(
@@ -516,7 +512,7 @@ class GContact
 		$done = array();
 	
 		/// @TODO Check if it is really neccessary to poll the own server
-		PortableContact::load(0, 0, 0, System::baseUrl() . '/poco');
+		PortableContact::loadWorker(0, 0, 0, System::baseUrl() . '/poco');
 	
 		$done[] = System::baseUrl() . '/poco';
 	
@@ -530,7 +526,7 @@ class GContact
 	
 						$url = $entry->url . '/poco';
 						if (! in_array($url, $done)) {
-							PortableContact::load(0, 0, 0, $entry->url . '/poco');
+							PortableContact::loadWorker(0, 0, 0, $entry->url . '/poco');
 						}
 					}
 				}
@@ -548,7 +544,7 @@ class GContact
 			foreach ($r as $rr) {
 				$base = substr($rr['poco'], 0, strrpos($rr['poco'], '/'));
 				if (! in_array($base, $done)) {
-					PortableContact::load(0, 0, 0, $base);
+					PortableContact::loadWorker(0, 0, 0, $base);
 				}
 			}
 		}
@@ -592,7 +588,7 @@ class GContact
 	 */
 	public static function fixAlternateContactAddress(&$contact)
 	{
-		if (($contact["network"] == NETWORK_OSTATUS) && self::alternateOstatusUrl($contact["url"])) {
+		if (($contact["network"] == NETWORK_OSTATUS) && PortableContact::alternateOStatusUrl($contact["url"])) {
 			$data = Probe::uri($contact["url"]);
 			if ($contact["network"] == NETWORK_OSTATUS) {
 				logger("Fix primary url from ".$contact["url"]." to ".$data["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
