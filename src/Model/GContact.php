@@ -12,6 +12,7 @@ use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Network\Probe;
+use dba;
 
 require_once 'include/datetime.php';
 require_once 'include/network.php';
