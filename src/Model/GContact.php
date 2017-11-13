@@ -2416,7 +2416,7 @@ class GContact
 	 *
 	 * @param str $url profile link
 	 */
-	public static function update_gcontact_from_probe($url)
+	public static function updateGContactFromProbe($url)
 	{
 		$data = Probe::uri($url);
 	
