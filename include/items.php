@@ -745,12 +745,12 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		 * On comments the author is the better choice.
 		 */
 		if ($arr['parent-uri'] === $arr['uri']) {
-			$arr["gcontact-id"] = GContact::getGContactId(
+			$arr["gcontact-id"] = GContact::getId(
 				array("url" => $arr['owner-link'], "network" => $arr['network'],
 				"photo" => $arr['owner-avatar'], "name" => $arr['owner-name'])
 			);
 		} else {
-			$arr["gcontact-id"] = GContact::getGContactId(
+			$arr["gcontact-id"] = GContact::getId(
 				array("url" => $arr['author-link'], "network" => $arr['network'],
 				"photo" => $arr['author-avatar'], "name" => $arr['author-name'])
 			);

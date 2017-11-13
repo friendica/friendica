@@ -72,7 +72,7 @@ function post_update_1192() {
 
 	// Set the "gcontact-id" in the item table and add a new gcontact entry if needed
 	foreach ($item_arr as $item) {
-		$gcontact_id = GContact::getGContactId(
+		$gcontact_id = GContact::getId(
 			array("url" => $item['author-link'], "network" => $item['network'],
 			"photo" => $item['author-avatar'], "name" => $item['author-name'])
 		);

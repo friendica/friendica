@@ -11,14 +11,14 @@ function update_gcontact_run(&$argv, &$argc)
 {
 	global $a;
 
-	logger('updateGContact: start');
+	logger('update: start');
 
 	if (($argc > 1) && (intval($argv[1]))) {
 		$contact_id = intval($argv[1]);
 	}
 
 	if (!$contact_id) {
-		logger('updateGContact: no contact');
+		logger('update: no contact');
 		return;
 	}
 

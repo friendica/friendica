@@ -43,7 +43,7 @@ function gprobe_run(&$argv, &$argc)
 		}
 
 		if (!in_array($arr["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
-			GContact::updateGContact($arr);
+			GContact::update($arr);
 		}
 
 		$r = q(

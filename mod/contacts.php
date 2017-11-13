@@ -313,7 +313,7 @@ function _contact_update_profile($contact_id) {
 	update_contact_avatar($data['photo'], local_user(), $contact_id, true);
 
 	// Update the entry in the gcontact table
-	GContact::updateGContactFromProbe($data["url"]);
+	GContact::updateFromProbe($data["url"]);
 }
 
 function _contact_block($contact_id, $orig_record) {

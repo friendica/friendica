@@ -225,9 +225,9 @@ class ostatus
 			$contact["generation"] = 2;
 			$contact["hide"] = false; // OStatus contacts are never hidden
 			$contact["photo"] = $author["author-avatar"];
-			$gcid = GContact::updateGContact($contact);
+			$gcid = GContact::update($contact);
 
-			GContact::linkGContact($gcid, $contact["uid"], $contact["id"]);
+			GContact::link($gcid, $contact["uid"], $contact["id"]);
 		}
 
 		return $author;

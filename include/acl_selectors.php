@@ -798,7 +798,7 @@ function navbar_complete(App $a)
 	}
 
 	if ($localsearch) {
-		$x = GContact::globalSearchByName($search, $mode);
+		$x = GContact::searchByName($search, $mode);
 		return $x;
 	}
 

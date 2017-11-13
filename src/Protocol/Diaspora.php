@@ -2246,9 +2246,9 @@ class Diaspora
 					"addr" => $author, "nick" => $nick, "keywords" => $keywords,
 					"hide" => !$searchable, "nsfw" => $nsfw);
 
-		$gcid = GContact::updateGContact($gcontact);
+		$gcid = GContact::update($gcontact);
 
-		GContact::linkGContact($gcid, $importer["uid"], $contact["id"]);
+		GContact::link($gcid, $importer["uid"], $contact["id"]);
 
 		logger("Profile of contact ".$contact["id"]." stored for user ".$importer["uid"], LOGGER_DEBUG);
 

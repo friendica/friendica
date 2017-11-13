@@ -653,7 +653,7 @@ function settings_post(App $a) {
 	Worker::add(PRIORITY_LOW, 'profile_update', local_user());
 
 	// Update the global contact for the user
-	GContact::updateGContactForUser(local_user());
+	GContact::updateForUser(local_user());
 
 	//$_SESSION['theme'] = $theme;
 	if ($email_changed && $a->config['register_policy'] == REGISTER_VERIFY) {

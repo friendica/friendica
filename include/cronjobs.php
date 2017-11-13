@@ -269,7 +269,7 @@ function cron_repair_database() {
 	$r = q("SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`");
 	if (DBM::is_result($r)) {
 		foreach ($r as $user) {
-			GContact::updateGContactForUser($user["uid"]);
+			GContact::updateForUser($user["uid"]);
 		}
 	}
 

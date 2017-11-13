@@ -252,7 +252,7 @@ function discover_directory($search) {
 
 				$data["server_url"] = $data["baseurl"];
 
-				GContact::updateGContact($data);
+				GContact::update($data);
 			} else {
 				logger("Profile ".$jj->url." is not responding or no Friendica contact - but network ".$data["network"], LOGGER_DEBUG);
 			}
@@ -293,7 +293,7 @@ function gs_search_user($search) {
 		$contact = Probe::uri($user->site_address."/".$user->name);
 		if ($contact["network"] != NETWORK_PHANTOM) {
 			$contact["about"] = $user->description;
-			GContact::updateGContact($contact);
+			GContact::update($contact);
 		}
 	}
 }

@@ -33,7 +33,7 @@ class GContact
 	 *
 	 * @return array with search results
 	 */
-	public static function globalSearchByName($search, $mode = '')
+	public static function searchByName($search, $mode = '')
 	{
 		if ($search) {
 			// check supported networks
@@ -246,10 +246,10 @@ class GContact
 					"generation" => $generation);
 
 			try {
-				$gcontact = self::sanitizeGContact($gcontact);
-				$gcid = self::updateGContact($gcontact);
+				$gcontact = self::sanitize($gcontact);
+				$gcid = self::update($gcontact);
 
-				self::linkGContact($gcid, $uid, $cid, $zcid);
+				self::link($gcid, $uid, $cid, $zcid);
 			} catch (Exception $e) {
 				logger($e->getMessage(), LOGGER_DEBUG);
 			}
@@ -278,7 +278,7 @@ class GContact
 	 *  4: ...
 	 *
 	 */
-	public static function sanitizeGContact($gcontact)
+	public static function sanitize($gcontact)
 	{
 		if ($gcontact['url'] == "") {
 			throw new Exception('URL is empty');
@@ -306,7 +306,7 @@ class GContact
 			$gcontact['url'] = self::cleanContactUrl($gcontact['url']);
 		}
 	
-		$alternate = self::pocoAlternateOstatusUrl($gcontact['url']);
+		$alternate = self::alternateOstatusUrl($gcontact['url']);
 	
 		// The global contacts should contain the original picture, not the cached one
 		if (($gcontact['generation'] != 1) && stristr(normalise_link($gcontact['photo']), normalise_link(System::baseUrl()."/photo/"))) {
@@ -419,7 +419,7 @@ class GContact
 	 * @param integer $zcid Global Contact ID
 	 *
 	 */
-	public static function linkGContact($gcid, $uid = 0, $cid = 0, $zcid = 0)
+	public static function link($gcid, $uid = 0, $cid = 0, $zcid = 0)
 	{
 		if ($gcid <= 0) {
 			return;
@@ -545,7 +545,7 @@ class GContact
 		return $server_url;
 	}
 
-	public static function poco_alternate_ostatus_url($url)
+	public static function alternateOstatusUrl($url)
 	{
 		return(preg_match("=https?://.+/user/\d+=ism", $url, $matches));
 	}
@@ -669,7 +669,7 @@ class GContact
 	
 						$contact = array_merge($contact, $noscrape);
 	
-						self::updateGContact($contact);
+						self::update($contact);
 	
 						if (trim($noscrape["updated"]) != "") {
 							q(
@@ -691,7 +691,7 @@ class GContact
 		if (!$force && !self::pocoDoUpdate($gcontacts[0]["created"], $gcontacts[0]["updated"], $gcontacts[0]["last_failure"], $gcontacts[0]["last_contact"])) {
 			logger("Profile ".$profile." was last updated at ".$gcontacts[0]["updated"]." (cached)", LOGGER_DEBUG);
 	
-			self::updateGContact($contact);
+			self::update($contact);
 			return $gcontacts[0]["updated"];
 		}
 	
@@ -699,7 +699,7 @@ class GContact
 	
 		// Is the profile link the alternate OStatus link notation? (http://domain.tld/user/4711)
 		// Then check the other link and delete this one
-		if (($data["network"] == NETWORK_OSTATUS) && self::pocoAlternateOstatusUrl($profile)
+		if (($data["network"] == NETWORK_OSTATUS) && self::alternateOstatusUrl($profile)
 			&& (normalise_link($profile) == normalise_link($data["alias"]))
 			&& (normalise_link($profile) != normalise_link($data["url"]))
 		) {
@@ -712,8 +712,8 @@ class GContact
 			$gcontact["server_url"] = $data["baseurl"];
 	
 			try {
-				$gcontact = self::sanitizeGContact($gcontact);
-				self::updateGContact($gcontact);
+				$gcontact = self::sanitize($gcontact);
+				self::update($gcontact);
 	
 				self::pocoLastUpdated($data["url"], $force);
 			} catch (Exception $e) {
@@ -739,7 +739,7 @@ class GContact
 	
 		$contact["server_url"] = $data["baseurl"];
 	
-		self::updateGContact($contact);
+		self::update($contact);
 	
 		$feedret = z_fetch_url($data["poll"]);
 	
@@ -2099,8 +2099,8 @@ class GContact
 						"generation" => $generation);
 	
 				try {
-					$gcontact = self::sanitizeGContact($gcontact);
-					self::updateGContact($gcontact);
+					$gcontact = self::sanitize($gcontact);
+					self::update($gcontact);
 				} catch (Exception $e) {
 					logger($e->getMessage(), LOGGER_DEBUG);
 				}
@@ -2149,7 +2149,7 @@ class GContact
 	 */
 	public static function fixAlternateContactAddress(&$contact)
 	{
-		if (($contact["network"] == NETWORK_OSTATUS) && self::pocoAlternateOstatusUrl($contact["url"])) {
+		if (($contact["network"] == NETWORK_OSTATUS) && self::alternateOstatusUrl($contact["url"])) {
 			$data = Probe::uri($contact["url"]);
 			if ($contact["network"] == NETWORK_OSTATUS) {
 				logger("Fix primary url from ".$contact["url"]." to ".$data["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
@@ -2167,7 +2167,7 @@ class GContact
 	 * @param arr $contact contact array
 	 * @return bool|int Returns false if not found, integer if contact was found
 	 */
-	public static function getGContactId($contact)
+	public static function getId($contact)
 	{
 		$gcontact_id = 0;
 		$doprobing = false;
@@ -2257,7 +2257,7 @@ class GContact
 	 * @param arr $contact contact array
 	 * @return bool|int Returns false if not found, integer if contact was found
 	 */
-	public static function updateGContact($contact)
+	public static function update($contact)
 	{
 		// Check for invalid "contact-type" value
 		if (isset($contact['contact-type']) && (intval($contact['contact-type']) < 0)) {
@@ -2266,7 +2266,7 @@ class GContact
 	
 		/// @todo update contact table as well
 	
-		$gcontact_id = self::getGContactId($contact);
+		$gcontact_id = self::getId($contact);
 	
 		if (!$gcontact_id) {
 			return false;
@@ -2416,7 +2416,7 @@ class GContact
 	 *
 	 * @param str $url profile link
 	 */
-	public static function updateGContactFromProbe($url)
+	public static function updateFromProbe($url)
 	{
 		$data = Probe::uri($url);
 	
@@ -2427,7 +2427,7 @@ class GContact
 	
 		$data["server_url"] = $data["baseurl"];
 	
-		self::updateGContact($data);
+		self::update($data);
 	}
 	
 	/**
@@ -2435,7 +2435,7 @@ class GContact
 	 *
 	 * @param int $uid User ID
 	 */
-	public static function updateGContactForUser($uid)
+	public static function updateForUser($uid)
 	{
 		$r = q(
 			"SELECT `profile`.`locality`, `profile`.`region`, `profile`.`country-name`,
@@ -2471,7 +2471,7 @@ class GContact
 				"connect" => $addr, "server_url" => System::baseUrl(),
 				"generation" => 1, "network" => NETWORK_DFRN);
 	
-		self::updateGContact($gcontact);
+		self::update($gcontact);
 	}
 	
 	/**
@@ -2528,7 +2528,7 @@ class GContact
 						"about" => $user->bio,
 						"network" => NETWORK_OSTATUS,
 						"photo" => System::baseUrl()."/images/person-175.jpg");
-				self::getGContactId($contact);
+				self::getId($contact);
 			}
 		}
 	}

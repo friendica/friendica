@@ -80,7 +80,7 @@ function dirfind_content(App $a, $prefix = "") {
 
 			// Add the contact to the global contacts if it isn't already in our system
 			if (($contact["cid"] == 0) && ($contact["zid"] == 0) && ($contact["gid"] == 0)) {
-				GContact::updateGContact($user_data);
+				GContact::update($user_data);
 			}
 		} elseif ($local) {
 			if ($community)
@@ -142,7 +142,7 @@ function dirfind_content(App $a, $prefix = "") {
 			$j->items_page = $perpage;
 			$j->page = $a->pager['page'];
 			foreach ($results AS $result) {
-				if (GContact::pocoAlternateOstatusUrl($result["url"])) {
+				if (GContact::alternateOstatusUrl($result["url"])) {
 					continue;
 				}
 
