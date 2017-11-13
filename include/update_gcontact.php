@@ -36,7 +36,7 @@ function update_gcontact_run(&$argv, &$argc)
 
 	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
 		if ($r[0]["server_url"] != "") {
-			GContact::pocoCheckServer($r[0]["server_url"], $r[0]["network"]);
+			GContact::checkServer($r[0]["server_url"], $r[0]["network"]);
 		}
 
 		q(

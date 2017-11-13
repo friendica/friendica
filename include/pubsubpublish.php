@@ -41,7 +41,7 @@ function handle_pubsubhubbub($id) {
 
 	$rr = $r[0];
 
-	/// @todo Check server status with pocoCheckServer()
+	/// @todo Check server status with GContact::checkServer()
 	// Before this can be done we need a way to safely detect the server url.
 
 	logger("Generate feed of user ".$rr['nickname']." to ".$rr['callback_url']." - last updated ".$rr['last_update'], LOGGER_DEBUG);

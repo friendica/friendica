@@ -53,8 +53,8 @@ function gprobe_run(&$argv, &$argc)
 	}
 	if (DBM::is_result($r)) {
 		// Check for accessibility and do a poco discovery
-		if (GContact::pocoLastUpdated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN)) {
-			GContact::pocoLoad(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
+		if (GContact::lastUpdated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN)) {
+			GContact::load(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
 		}
 	}
 

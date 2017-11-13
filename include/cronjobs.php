@@ -226,7 +226,7 @@ function cron_repair_diaspora(App $a) {
 			return;
 		}
 
-		if (!GContact::pocoReachable($contact["url"])) {
+		if (!GContact::reachable($contact["url"])) {
 			continue;
 		}
 

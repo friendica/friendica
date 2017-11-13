@@ -1,4 +1,7 @@
 <?php
+/**
+ * @file src/Worker/OnePoll.php
+ */
 namespace Friendica\Worker;
 
 use Friendica\Core\Config;
@@ -9,8 +12,10 @@ use dba;
 
 require_once 'include/follow.php';
 
-Class OnePoll {
-	public static function execute($contact_id = 0, $command = '') {
+class OnePoll
+{
+	public static function execute($contact_id = 0, $command = '')
+	{
 		global $a;
 
 		require_once 'include/datetime.php';
@@ -66,13 +71,14 @@ Class OnePoll {
 
 		// load current friends if possible.
 		if (($contact['poco'] != "") && ($contact['success_update'] > $contact['failure_update'])) {
-			$r = q("SELECT count(*) AS total FROM glink
+			$r = q(
+				"SELECT count(*) AS total FROM glink
 				WHERE `cid` = %d AND updated > UTC_TIMESTAMP() - INTERVAL 1 DAY",
 				intval($contact['id'])
 			);
 			if (DBM::is_result($r)) {
 				if (!$r[0]['total']) {
-					pocoLoad($contact['id'], $importer_uid, 0, $contact['poco']);
+					GContact::load($contact['id'], $importer_uid, 0, $contact['poco']);
 				}
 			}
 		}
@@ -80,8 +86,8 @@ Class OnePoll {
 		/// @TODO Check why we don't poll the Diaspora feed at the moment (some guid problem in the items?)
 		/// @TODO Check whether this is possible with Redmatrix
 		if ($contact["network"] == NETWORK_DIASPORA) {
-			if (pocoDoUpdate($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
-				$last_updated = pocoLastUpdated($contact["url"]);
+			if (GContact::doUpdate($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
+				$last_updated = GContact::lastUpdated($contact["url"]);
 				$updated = datetime_convert();
 				if ($last_updated) {
 					$fields = array('last-item' => $last_updated, 'last-update' => $updated, 'success_update' => $updated);
@@ -116,7 +122,7 @@ Class OnePoll {
 
 		// Update the contact entry
 		if (($contact['network'] === NETWORK_OSTATUS) || ($contact['network'] === NETWORK_DIASPORA) || ($contact['network'] === NETWORK_DFRN)) {
-			if (!pocoReachable($contact['url'])) {
+			if (!GContact::reachable($contact['url'])) {
 				logger("Skipping probably dead contact ".$contact['url']);
 				return;
 			}

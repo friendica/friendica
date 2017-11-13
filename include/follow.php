@@ -47,7 +47,8 @@ function update_contact($id)
 	if (!$update)
 		return true;
 
-	q("UPDATE `contact` SET `url` = '%s', `nurl` = '%s', `addr` = '%s', `alias` = '%s', `batch` = '%s', `notify` = '%s', `poll` = '%s', `poco` = '%s' WHERE `id` = %d",
+	q(
+		"UPDATE `contact` SET `url` = '%s', `nurl` = '%s', `addr` = '%s', `alias` = '%s', `batch` = '%s', `notify` = '%s', `poll` = '%s', `poco` = '%s' WHERE `id` = %d",
 		dbesc($ret['url']),
 		dbesc(normalise_link($ret['url'])),
 		dbesc($ret['addr']),
@@ -60,7 +61,7 @@ function update_contact($id)
 	);
 
 	// Update the corresponding gcontact entry
-	GContact::pocoLastUpdated($ret["url"]);
+	GContact::lastUpdated($ret["url"]);
 
 	return true;
 }

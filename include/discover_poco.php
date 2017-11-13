@@ -21,7 +21,7 @@ function discover_poco_run(&$argv, &$argc)
 	- server <poco url>: Searches for the poco server list. "poco url" is base64 encoded.
 	- update_server: Frequently check the first 250 servers for vitality.
 	- update_server_directory: Discover the given server id for their contacts
-	- pocoLoad: Load POCO data from a given POCO address
+	- GContact::load: Load POCO data from a given POCO address
 	- check_profile: Update remote profile data
 	*/
 
@@ -38,7 +38,7 @@ function discover_poco_run(&$argv, &$argc)
 		$mode = 5;
 	} elseif (($argc == 3) && ($argv[1] == "update_server_directory")) {
 		$mode = 6;
-	} elseif (($argc > 5) && ($argv[1] == "pocoLoad")) {
+	} elseif (($argc > 5) && ($argv[1] == "load")) {
 		$mode = 7;
 	} elseif (($argc == 3) && ($argv[1] == "check_profile")) {
 		$mode = 8;
@@ -53,7 +53,7 @@ function discover_poco_run(&$argv, &$argc)
 
 	if ($mode == 8) {
 		if ($argv[2] != "") {
-			GContact::pocoLastUpdated($argv[2], true);
+			GContact::lastUpdated($argv[2], true);
 		}
 	} elseif ($mode == 7) {
 		if ($argc == 6) {
@@ -61,9 +61,9 @@ function discover_poco_run(&$argv, &$argc)
 		} else {
 			$url = '';
 		}
-		GContact::pocoLoadWorker(intval($argv[2]), intval($argv[3]), intval($argv[4]), $url);
+		GContact::loadWorker(intval($argv[2]), intval($argv[3]), intval($argv[4]), $url);
 	} elseif ($mode == 6) {
-		GContact::pocoDiscoverSingleServer(intval($argv[2]));
+		GContact::discoverSingleServer(intval($argv[2]));
 	} elseif ($mode == 5) {
 		update_server();
 	} elseif ($mode == 4) {
@@ -76,7 +76,7 @@ function discover_poco_run(&$argv, &$argc)
 			return;
 		}
 		$result = "Checking server ".$server_url." - ";
-		$ret = GContact::pocoCheckServer($server_url);
+		$ret = GContact::checkServer($server_url);
 		if ($ret) {
 			$result .= "success";
 		} else {
@@ -92,7 +92,7 @@ function discover_poco_run(&$argv, &$argc)
 		gs_search_user($search);
 	} elseif (($mode == 0) && ($search == "") && (Config::get('system', 'poco_discovery') > 0)) {
 		// Query Friendica and Hubzilla servers for their users
-		GContact::pocoDiscover();
+		GContact::discover();
 
 		// Query GNU Social servers for their users ("statistics" addon has to be enabled on the GS server)
 		if (!Config::get('system', 'ostatus_disabled')) {
@@ -120,7 +120,7 @@ function update_server()
 	$updated = 0;
 
 	foreach ($r as $server) {
-		if (!GContact::pocoDoUpdate($server["created"], "", $server["last_failure"], $server["last_contact"])) {
+		if (!GContact::doUpdate($server["created"], "", $server["last_failure"], $server["last_contact"])) {
 			continue;
 		}
 		logger('Update server status for server '.$server["url"], LOGGER_DEBUG);
@@ -133,25 +133,29 @@ function update_server()
 	}
 }
 
-function discover_users() {
+function discover_users()
+{
 	logger("Discover users", LOGGER_DEBUG);
 
 	$starttime = time();
 
-	$users = q("SELECT `url`, `created`, `updated`, `last_failure`, `last_contact`, `server_url`, `network` FROM `gcontact`
-			WHERE `last_contact` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
+	$users = q(
+		"SELECT `url`, `created`, `updated`, `last_failure`, `last_contact`, `server_url`, `network` FROM `gcontact`
+		WHERE `last_contact` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
 				`last_failure` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
 				`network` IN ('%s', '%s', '%s', '%s', '') ORDER BY rand()",
-			dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA),
-			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_FEED));
+		dbesc(NETWORK_DFRN),
+		dbesc(NETWORK_DIASPORA),
+		dbesc(NETWORK_OSTATUS),
+		dbesc(NETWORK_FEED)
+	);
 
 	if (!$users) {
 		return;
 	}
 	$checked = 0;
 
-	foreach ($users AS $user) {
-
+	foreach ($users as $user) {
 		$urlparts = parse_url($user["url"]);
 		if (!isset($urlparts["scheme"])) {
 			q("UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
@@ -167,22 +171,23 @@ function discover_users() {
 					"identi.ca" => NETWORK_PUMPIO,
 					"alpha.app.net" => NETWORK_APPNET);
 
-			q("UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
-				dbesc($networks[$urlparts["host"]]), dbesc(normalise_link($user["url"])));
+			q(
+				"UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
+				dbesc($networks[$urlparts["host"]]), dbesc(normalise_link($user["url"]))
+			);
 			continue;
 		}
 
-		$server_url = Gcontact::pocoDetectServer($user["url"]);
+		$server_url = Gcontact::detectServer($user["url"]);
 		$force_update = false;
 
 		if ($user["server_url"] != "") {
-
 			$force_update = (normalise_link($user["server_url"]) != normalise_link($server_url));
 
 			$server_url = $user["server_url"];
 		}
 
-		if ((($server_url == "") && ($user["network"] == NETWORK_FEED)) || $force_update || GContact::pocoCheckServer($server_url, $user["network"])) {
+		if ((($server_url == "") && ($user["network"] == NETWORK_FEED)) || $force_update || GContact::checkServer($server_url, $user["network"])) {
 			logger('Check profile '.$user["url"]);
 			Worker::add(PRIORITY_LOW, "discover_poco", "check_profile", $user["url"]);
 
@@ -228,13 +233,13 @@ function discover_directory($search) {
 					continue;
 				}
 				// Update the contact
-				GContact::pocoLastUpdated($jj->url);
+				GContact::lastUpdated($jj->url);
 				continue;
 			}
 
-			$server_url = GContact::pocoDetectServer($jj->url);
+			$server_url = GContact::detectServer($jj->url);
 			if ($server_url != '') {
-				if (!GContact::pocoCheckServer($server_url)) {
+				if (!GContact::checkServer($server_url)) {
 					logger("Friendica server ".$server_url." doesn't answer.", LOGGER_DEBUG);
 					continue;
 				}

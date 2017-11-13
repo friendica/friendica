@@ -99,7 +99,7 @@ function queue_run(&$argv, &$argc)
 		return;
 	}
 
-	$server = GContact::pocoDetectServer($c[0]['url']);
+	$server = GContact::detectServer($c[0]['url']);
 
 	if ($server != "") {
 		$vital = Cache::get($cachekey_server.$server);
@@ -107,7 +107,7 @@ function queue_run(&$argv, &$argc)
 		if (is_null($vital)) {
 			logger("Check server ".$server." (".$c[0]["network"].")");
 
-			$vital = GContact::pocoCheckServer($server, $c[0]["network"], true);
+			$vital = GContact::checkServer($server, $c[0]["network"], true);
 			Cache::set($cachekey_server.$server, $vital, CACHE_QUARTER_HOUR);
 		}
 

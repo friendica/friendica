@@ -37,7 +37,7 @@ function poco_init(App $a)
 
 	if ($a->argc > 1 && $a->argv[1] === '@server') {
 		// List of all servers that this server knows
-		$ret = GContact::pocoServerlist();
+		$ret = GContact::serverlist();
 		header('Content-type: application/json');
 		echo json_encode($ret);
 		killme();

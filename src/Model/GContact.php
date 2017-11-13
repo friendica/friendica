@@ -98,10 +98,10 @@ class GContact
 	 * pointing to the same global contact id.
 	 *
 	 */
-	public static function pocoLoad($cid, $uid = 0, $zcid = 0, $url = null)
+	public static function load($cid, $uid = 0, $zcid = 0, $url = null)
 	{
-		// Call the function "pocoLoadWorker" via the worker
-		Worker::add(PRIORITY_LOW, "discover_poco", "pocoLoad", (int)$cid, (int)$uid, (int)$zcid, $url);
+		// Call the function "loadWorker" via the worker
+		Worker::add(PRIORITY_LOW, "discover_poco", "load", (int)$cid, (int)$uid, (int)$zcid, $url);
 	}
 
 	/**
@@ -113,7 +113,7 @@ class GContact
 	 * @param integer $url  POCO address that should be polled
 	 *
 	 */
-	public static function pocoLoadWorker($cid, $uid, $zcid, $url)
+	public static function loadWorker($cid, $uid, $zcid, $url)
 	{
 		$a = get_app();
 
@@ -139,13 +139,13 @@ class GContact
 
 		$url = $url . (($uid) ? '/@me/@all?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation' : '?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation') ;
 
-		logger('pocoLoad: ' . $url, LOGGER_DEBUG);
+		logger('load: ' . $url, LOGGER_DEBUG);
 
 		$s = fetch_url($url);
 
-		logger('pocoLoad: returns ' . $s, LOGGER_DATA);
+		logger('load: returns ' . $s, LOGGER_DATA);
 
-		logger('pocoLoad: return code: ' . $a->get_curl_code(), LOGGER_DEBUG);
+		logger('load: return code: ' . $a->get_curl_code(), LOGGER_DEBUG);
 
 		if (($a->get_curl_code() > 299) || (! $s)) {
 			return;
@@ -153,7 +153,7 @@ class GContact
 
 		$j = json_decode($s);
 
-		logger('pocoLoad: json: ' . print_r($j, true), LOGGER_DATA);
+		logger('load: json: ' . print_r($j, true), LOGGER_DATA);
 
 		if (! isset($j->entry)) {
 			return;
@@ -254,7 +254,7 @@ class GContact
 				logger($e->getMessage(), LOGGER_DEBUG);
 			}
 		}
-		logger("pocoLoad: loaded $total entries", LOGGER_DEBUG);
+		logger("load: loaded $total entries", LOGGER_DEBUG);
 
 		q(
 			"DELETE FROM `glink` WHERE `cid` = %d AND `uid` = %d AND `zcid` = %d AND `updated` < UTC_TIMESTAMP - INTERVAL 2 DAY",
@@ -360,7 +360,7 @@ class GContact
 		}
 	
 		if ((!isset($gcontact['network']) || !isset($gcontact['name']) || !isset($gcontact['addr']) || !isset($gcontact['photo']) || !isset($gcontact['server_url']) || $alternate)
-			&& self::pocoReachable($gcontact['url'], $gcontact['server_url'], $gcontact['network'], false)
+			&& self::reachable($gcontact['url'], $gcontact['server_url'], $gcontact['network'], false)
 		) {
 			$data = Probe::uri($gcontact['url']);
 	
@@ -394,7 +394,7 @@ class GContact
 	
 		if (!isset($gcontact['server_url'])) {
 			// We check the server url to be sure that it is a real one
-			$server_url = self::pocoDetectServer($gcontact['url']);
+			$server_url = self::detectServer($gcontact['url']);
 	
 			// We are now sure that it is a correct URL. So we use it in the future
 			if ($server_url != "") {
@@ -403,7 +403,7 @@ class GContact
 		}
 	
 		// The server URL doesn't seem to be valid, so we don't store it.
-		if (!self::pocoCheckServer($gcontact['server_url'], $gcontact['network'])) {
+		if (!self::checkServer($gcontact['server_url'], $gcontact['network'])) {
 			$gcontact['server_url'] = "";
 		}
 	
@@ -454,20 +454,20 @@ class GContact
 		}
 	}
 
-	public static function pocoReachable($profile, $server = "", $network = "", $force = false)
+	public static function reachable($profile, $server = "", $network = "", $force = false)
 	{
 		if ($server == "") {
-			$server = self::pocoDetectServer($profile);
+			$server = self::detectServer($profile);
 		}
 	
 		if ($server == "") {
 			return true;
 		}
 	
-		return self::pocoCheckServer($server, $network, $force);
+		return self::checkServer($server, $network, $force);
 	}
 
-	public static function pocoDetectServer($profile)
+	public static function detectServer($profile)
 	{
 		// Try to detect the server path based upon some known standard paths
 		$server_url = "";
@@ -550,7 +550,7 @@ class GContact
 		return(preg_match("=https?://.+/user/\d+=ism", $url, $matches));
 	}
 
-	public static function pocoLastUpdated($profile, $force = false)
+	public static function lastUpdated($profile, $force = false)
 	{
 		$gcontacts = q(
 			"SELECT * FROM `gcontact` WHERE `nurl` = '%s'",
@@ -568,7 +568,7 @@ class GContact
 		}
 	
 		if ($force) {
-			$server_url = normalise_link(self::pocoDetectServer($profile));
+			$server_url = normalise_link(self::detectServer($profile));
 		}
 	
 		if (($server_url == '') && ($gcontacts[0]["server_url"] != "")) {
@@ -576,7 +576,7 @@ class GContact
 		}
 	
 		if (!$force && (($server_url == '') || ($gcontacts[0]["server_url"] == $gcontacts[0]["nurl"]))) {
-			$server_url = normalise_link(self::pocoDetectServer($profile));
+			$server_url = normalise_link(self::detectServer($profile));
 		}
 	
 		if (!in_array($gcontacts[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_FEED, NETWORK_OSTATUS, ""))) {
@@ -585,7 +585,7 @@ class GContact
 		}
 	
 		if ($server_url != "") {
-			if (!self::pocoCheckServer($server_url, $gcontacts[0]["network"], $force)) {
+			if (!self::checkServer($server_url, $gcontacts[0]["network"], $force)) {
 				if ($force) {
 					q(
 						"UPDATE `gcontact` SET `last_failure` = '%s' WHERE `nurl` = '%s'",
@@ -688,7 +688,7 @@ class GContact
 		}
 	
 		// If we only can poll the feed, then we only do this once a while
-		if (!$force && !self::pocoDoUpdate($gcontacts[0]["created"], $gcontacts[0]["updated"], $gcontacts[0]["last_failure"], $gcontacts[0]["last_contact"])) {
+		if (!$force && !self::doUpdate($gcontacts[0]["created"], $gcontacts[0]["updated"], $gcontacts[0]["last_failure"], $gcontacts[0]["last_contact"])) {
 			logger("Profile ".$profile." was last updated at ".$gcontacts[0]["updated"]." (cached)", LOGGER_DEBUG);
 	
 			self::update($contact);
@@ -715,7 +715,7 @@ class GContact
 				$gcontact = self::sanitize($gcontact);
 				self::update($gcontact);
 	
-				self::pocoLastUpdated($data["url"], $force);
+				self::lastUpdated($data["url"], $force);
 			} catch (Exception $e) {
 				logger($e->getMessage(), LOGGER_DEBUG);
 			}
@@ -800,7 +800,7 @@ class GContact
 		return($last_updated);
 	}
 
-	public static function pocoDoUpdate($created, $updated, $last_failure, $last_contact)
+	public static function doUpdate($created, $updated, $last_failure, $last_contact)
 	{
 		$now = strtotime(datetime_convert());
 	
@@ -845,7 +845,7 @@ class GContact
 		return true;
 	}
 	
-	public static function pocoToBoolean($val)
+	public static function toBoolean($val)
 	{
 		if (($val == "true") || ($val == 1)) {
 			return true;
@@ -862,7 +862,7 @@ class GContact
 	 * @param object $data POCO data
 	 * @return array Server data
 	 */
-	public static function pocoDetectPocoData($data)
+	public static function detectPocoData($data)
 	{
 		$server = false;
 	
@@ -899,7 +899,7 @@ class GContact
 	 * @param string $server_url address of the server
 	 * @return array Server data
 	 */
-	public static function pocoFetchNodeinfo($server_url)
+	public static function fetchNodeinfo($server_url)
 	{
 		$serverret = z_fetch_url($server_url."/.well-known/nodeinfo");
 		if (!$serverret["success"]) {
@@ -1007,7 +1007,7 @@ class GContact
 	 * @param string $body Front page of the server
 	 * @return array Server data
 	 */
-	public static function pocoDetectServerType($body)
+	public static function detectServerType($body)
 	{
 		$server = false;
 	
@@ -1064,7 +1064,7 @@ class GContact
 		return $server;
 	}
 	
-	public static function pocoCheckServer($server_url, $network = "", $force = false)
+	public static function checkServer($server_url, $network = "", $force = false)
 	{
 		// Unify the server address
 		$server_url = trim($server_url, "/");
@@ -1098,7 +1098,7 @@ class GContact
 			$info = $servers[0]["info"];
 			$register_policy = $servers[0]["register_policy"];
 	
-			if (!$force && !self::pocoDoUpdate($servers[0]["created"], "", $last_failure, $last_contact)) {
+			if (!$force && !self::doUpdate($servers[0]["created"], "", $last_failure, $last_contact)) {
 				logger("Use cached data for server ".$server_url, LOGGER_DEBUG);
 				return ($last_contact >= $last_failure);
 			}
@@ -1180,7 +1180,7 @@ class GContact
 				$data = json_decode($serverret["body"]);
 				if (isset($data->totalResults)) {
 					$poco = $server_url."/poco";
-					$server = self::pocoDetectPocoData($data);
+					$server = self::detectPocoData($data);
 					if ($server) {
 						$platform = $server['platform'];
 						$network = $server['network'];
@@ -1198,7 +1198,7 @@ class GContact
 			if (!$serverret["success"] || ($serverret["body"] == "")) {
 				$failure = true;
 			} else {
-				$server = self::pocoDetectServerType($serverret["body"]);
+				$server = self::detectServerType($serverret["body"]);
 				if ($server) {
 					$platform = $server['platform'];
 					$network = $server['network'];
@@ -1338,9 +1338,9 @@ class GContact
 	
 						$site_name = $data->site->name;
 	
-						$data->site->closed = self::pocoToBoolean($data->site->closed);
-						$data->site->private = self::pocoToBoolean($data->site->private);
-						$data->site->inviteonly = self::pocoToBoolean($data->site->inviteonly);
+						$data->site->closed = self::toBoolean($data->site->closed);
+						$data->site->private = self::toBoolean($data->site->private);
+						$data->site->inviteonly = self::toBoolean($data->site->inviteonly);
 	
 						if (!$data->site->closed && !$data->site->private and $data->site->inviteonly) {
 							$register_policy = REGISTER_APPROVE;
@@ -1388,7 +1388,7 @@ class GContact
 	
 		// Query nodeinfo. Working for (at least) Diaspora and Friendica.
 		if (!$failure) {
-			$server = self::pocoFetchNodeinfo($server_url);
+			$server = self::fetchNodeinfo($server_url);
 			if ($server) {
 				$register_policy = $server['register_policy'];
 	
@@ -1755,7 +1755,7 @@ class GContact
 		$done = array();
 	
 		/// @TODO Check if it is really neccessary to poll the own server
-		self::pocoLoad(0, 0, 0, System::baseUrl() . '/poco');
+		self::load(0, 0, 0, System::baseUrl() . '/poco');
 	
 		$done[] = System::baseUrl() . '/poco';
 	
@@ -1765,11 +1765,11 @@ class GContact
 				$j = json_decode($x);
 				if ($j->entries) {
 					foreach ($j->entries as $entry) {
-						self::pocoCheckServer($entry->url);
+						self::checkServer($entry->url);
 	
 						$url = $entry->url . '/poco';
 						if (! in_array($url, $done)) {
-							self::pocoLoad(0, 0, 0, $entry->url . '/poco');
+							self::load(0, 0, 0, $entry->url . '/poco');
 						}
 					}
 				}
@@ -1787,7 +1787,7 @@ class GContact
 			foreach ($r as $rr) {
 				$base = substr($rr['poco'], 0, strrpos($rr['poco'], '/'));
 				if (! in_array($base, $done)) {
-					self::pocoLoad(0, 0, 0, $base);
+					self::load(0, 0, 0, $base);
 				}
 			}
 		}
@@ -1798,7 +1798,8 @@ class GContact
 	 *
 	 * @param string $poco URL to the POCO endpoint
 	 */
-	public static function pocoFetchServerlist($poco) {
+	public static function fetchServerlist($poco)
+	{
 		$serverret = z_fetch_url($poco."/@server");
 		if (!$serverret["success"]) {
 			return;
@@ -1820,7 +1821,7 @@ class GContact
 		}
 	}
 	
-	public static function pocoDiscoverFederation()
+	public static function discoverFederation()
 	{
 		$last = Config::get('poco', 'last_federation_discovery');
 	
@@ -1867,14 +1868,14 @@ class GContact
 		//		$servers = json_decode($result["body"]);
 	
 		//		foreach($servers->data as $server)
-		//			pocoCheckServer($server->instance_address);
+		//			checkServer($server->instance_address);
 		//	}
 		//}
 	
 		Config::set('poco', 'last_federation_discovery', time());
 	}
 	
-	public static function pocoDiscoverSingleServer($id)
+	public static function discoverSingleServer($id)
 	{
 		$r = q("SELECT `poco`, `nurl`, `url`, `network` FROM `gserver` WHERE `id` = %d", intval($id));
 		if (!DBM::is_result($r)) {
@@ -1884,7 +1885,7 @@ class GContact
 		$server = $r[0];
 	
 		// Discover new servers out there (Works from Friendica version 3.5.2)
-		self::pocoFetchServerlist($server["poco"]);
+		self::fetchServerlist($server["poco"]);
 	
 		// Fetch all users from the other server
 		$url = $server["poco"]."/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation";
@@ -1895,7 +1896,7 @@ class GContact
 		if ($retdata["success"]) {
 			$data = json_decode($retdata["body"]);
 	
-			self::pocoDiscoverServer($data, 2);
+			self::discoverServer($data, 2);
 	
 			if (Config::get('system', 'poco_discovery') > 1) {
 				$timeframe = Config::get('system', 'poco_discovery_since');
@@ -1913,12 +1914,12 @@ class GContact
 				$retdata = z_fetch_url($url);
 				if ($retdata["success"]) {
 					logger("Fetch all global contacts from the server ".$server["nurl"], LOGGER_DEBUG);
-					$success = self::pocoDiscoverServer(json_decode($retdata["body"]));
+					$success = self::discoverServer(json_decode($retdata["body"]));
 				}
 	
 				if (!$success && (Config::get('system', 'poco_discovery') > 2)) {
 					logger("Fetch contacts from users of the server ".$server["nurl"], LOGGER_DEBUG);
-					self::pocoDiscoverServerUsers($data, $server);
+					self::discoverServerUsers($data, $server);
 				}
 			}
 	
@@ -1927,7 +1928,7 @@ class GContact
 			return true;
 		} else {
 			// If the server hadn't replied correctly, then force a sanity check
-			self::pocoCheckServer($server["url"], $server["network"], true);
+			self::checkServer($server["url"], $server["network"], true);
 	
 			// If we couldn't reach the server, we will try it some time later
 			q("UPDATE `gserver` SET `last_poco_query` = '%s' WHERE `nurl` = '%s'", dbesc(datetime_convert()), dbesc($server["nurl"]));
@@ -1936,10 +1937,10 @@ class GContact
 		}
 	}
 	
-	public static function pocoDiscover($complete = false)
+	public static function discover($complete = false)
 	{
 		// Update the server list
-		self::pocoDiscoverFederation();
+		self::discoverFederation();
 	
 		$no_of_queries = 5;
 	
@@ -1953,7 +1954,7 @@ class GContact
 		$r = q("SELECT `id`, `url`, `network` FROM `gserver` WHERE `last_contact` >= `last_failure` AND `poco` != '' AND `last_poco_query` < '%s' ORDER BY RAND()", dbesc($last_update));
 		if (DBM::is_result($r)) {
 			foreach ($r as $server) {
-				if (!self::pocoCheckServer($server["url"], $server["network"])) {
+				if (!self::checkServer($server["url"], $server["network"])) {
 					// The server is not reachable? Okay, then we will try it later
 					q("UPDATE `gserver` SET `last_poco_query` = '%s' WHERE `nurl` = '%s'", dbesc(datetime_convert()), dbesc($server["nurl"]));
 					continue;
@@ -1969,7 +1970,7 @@ class GContact
 		}
 	}
 	
-	public static function pocoDiscoverServerUsers($data, $server)
+	public static function discoverServerUsers($data, $server)
 	{
 		if (!isset($data->entry)) {
 			return;
@@ -1994,13 +1995,13 @@ class GContact
 	
 				$retdata = z_fetch_url($url);
 				if ($retdata["success"]) {
-					self::pocoDiscoverServer(json_decode($retdata["body"]), 3);
+					self::discoverServer(json_decode($retdata["body"]), 3);
 				}
 			}
 		}
 	}
 	
-	public static function pocoDiscoverServer($data, $default_generation = 0)
+	public static function discoverServer($data, $default_generation = 0)
 	{
 		if (!isset($data->entry) || !count($data->entry)) {
 			return false;
@@ -2563,7 +2564,7 @@ class GContact
 	 * @brief Returns a list of all known servers
 	 * @return array List of server urls
 	 */
-	public static function pocoServerlist()
+	public static function serverlist()
 	{
 		$r = q(
 			"SELECT `url`, `site_name` AS `displayName`, `network`, `platform`, `version` FROM `gserver`
