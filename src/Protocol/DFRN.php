@@ -1666,7 +1666,7 @@ class DFRN
 
 			/*
 			 * The generation is a sign for the reliability of the provided data.
-			 * It is used in the socgraph.php to prevent that old contact data
+			 * It is used in the GContact.php to prevent that old contact data
 			 * that was relayed over several servers can overwrite contact
 			 * data that we received directly.
 			 */
