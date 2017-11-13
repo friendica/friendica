@@ -5,6 +5,7 @@
 
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 
 /**
  * @brief Calls the post update functions

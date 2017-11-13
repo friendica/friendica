@@ -5,20 +5,20 @@
 use Friendica\Core\Config;
 use Friendica\Network\Probe;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
+use Friendica\Protocol\PortableContact;
 
 function update_gcontact_run(&$argv, &$argc)
 {
 	global $a;
 
-	logger('update: start');
+	logger('update_gcontact: start');
 
 	if (($argc > 1) && (intval($argv[1]))) {
 		$contact_id = intval($argv[1]);
 	}
 
 	if (!$contact_id) {
-		logger('update: no contact');
+		logger('update_gcontact: no contact');
 		return;
 	}
 
@@ -36,7 +36,7 @@ function update_gcontact_run(&$argv, &$argc)
 
 	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
 		if ($r[0]["server_url"] != "") {
-			GContact::checkServer($r[0]["server_url"], $r[0]["network"]);
+			PortableContact::checkServer($r[0]["server_url"], $r[0]["network"]);
 		}
 
 		q(

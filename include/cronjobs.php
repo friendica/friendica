@@ -8,6 +8,7 @@ use Friendica\Core\Config;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
+use Friendica\Protocol\PortableContact;
 
 function cronjobs_run(&$argv, &$argc)
 {
@@ -226,7 +227,7 @@ function cron_repair_diaspora(App $a) {
 			return;
 		}
 
-		if (!GContact::reachable($contact["url"])) {
+		if (!PortableContact::reachable($contact["url"])) {
 			continue;
 		}
 

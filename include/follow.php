@@ -7,9 +7,9 @@ use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
+use Friendica\Protocol\PortableContact;
 
 require_once 'include/group.php';
 require_once 'include/salmon.php';
@@ -61,7 +61,7 @@ function update_contact($id)
 	);
 
 	// Update the corresponding gcontact entry
-	GContact::lastUpdated($ret["url"]);
+	PortableContact::lastUpdated($ret["url"]);
 
 	return true;
 }

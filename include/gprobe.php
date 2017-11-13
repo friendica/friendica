@@ -7,6 +7,7 @@ use Friendica\Core\Config;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
+use Friendica\Protocol\PortableContact;
 
 require_once 'include/datetime.php';
 
@@ -53,8 +54,8 @@ function gprobe_run(&$argv, &$argc)
 	}
 	if (DBM::is_result($r)) {
 		// Check for accessibility and do a poco discovery
-		if (GContact::lastUpdated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN)) {
-			GContact::load(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
+		if (PortableContact::lastUpdated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN)) {
+			PortableContact::load(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
 		}
 	}
 

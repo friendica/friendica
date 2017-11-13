@@ -6,9 +6,9 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Model\GContact;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\DFRN;
+use Friendica\Protocol\PortableContact;
 
 require_once 'include/queue_fn.php';
 require_once 'include/datetime.php';
@@ -99,7 +99,7 @@ function queue_run(&$argv, &$argc)
 		return;
 	}
 
-	$server = GContact::detectServer($c[0]['url']);
+	$server = PortableContact::detectServer($c[0]['url']);
 
 	if ($server != "") {
 		$vital = Cache::get($cachekey_server.$server);
@@ -107,7 +107,7 @@ function queue_run(&$argv, &$argc)
 		if (is_null($vital)) {
 			logger("Check server ".$server." (".$c[0]["network"].")");
 
-			$vital = GContact::checkServer($server, $c[0]["network"], true);
+			$vital = PortableContact::checkServer($server, $c[0]["network"], true);
 			Cache::set($cachekey_server.$server, $vital, CACHE_QUARTER_HOUR);
 		}
 
