@@ -6,6 +6,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\DFRN;
 
@@ -13,7 +14,6 @@ require_once 'include/queue_fn.php';
 require_once 'include/datetime.php';
 require_once 'include/items.php';
 require_once 'include/bbcode.php';
-require_once 'include/socgraph.php';
 
 function queue_run(&$argv, &$argc)
 {
@@ -99,7 +99,7 @@ function queue_run(&$argv, &$argc)
 		return;
 	}
 
-	$server = poco_detect_server($c[0]['url']);
+	$server = GContact::pocoDetectServer($c[0]['url']);
 
 	if ($server != "") {
 		$vital = Cache::get($cachekey_server.$server);
@@ -107,7 +107,7 @@ function queue_run(&$argv, &$argc)
 		if (is_null($vital)) {
 			logger("Check server ".$server." (".$c[0]["network"].")");
 
-			$vital = poco_check_server($server, $c[0]["network"], true);
+			$vital = GContact::pocoCheckServer($server, $c[0]["network"], true);
 			Cache::set($cachekey_server.$server, $vital, CACHE_QUARTER_HOUR);
 		}
 

@@ -4,10 +4,10 @@ use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 
 require_once 'include/Contact.php';
-require_once 'include/socgraph.php';
 require_once 'include/contact_selectors.php';
 require_once 'mod/proxy.php';
 require_once 'include/Photo.php';
@@ -293,7 +293,7 @@ function _contact_update_profile($contact_id) {
 	if (isset($data["priority"]) && ($data["priority"] != 0))
 		$query = "`priority` = ".intval($data["priority"]);
 
-	foreach($update AS $key => $value) {
+	foreach ($update as $key => $value) {
 		if ($query != "")
 			$query .= ", ";
 
@@ -303,7 +303,8 @@ function _contact_update_profile($contact_id) {
 	if ($query == "")
 		return;
 
-	$r = q("UPDATE `contact` SET $query WHERE `id` = %d AND `uid` = %d",
+	$r = q(
+		"UPDATE `contact` SET $query WHERE `id` = %d AND `uid` = %d",
 		intval($contact_id),
 		intval(local_user())
 	);
@@ -312,7 +313,7 @@ function _contact_update_profile($contact_id) {
 	update_contact_avatar($data['photo'], local_user(), $contact_id, true);
 
 	// Update the entry in the gcontact table
-	update_gcontact_from_probe($data["url"]);
+	GContact::updateGContactFromProbe($data["url"]);
 }
 
 function _contact_block($contact_id, $orig_record) {
@@ -561,13 +562,13 @@ function contacts_content(App $a) {
 
 		$nettype = sprintf( t('Network type: %s'),network_to_name($contact['network'], $contact["url"]));
 
-		//$common = count_common_friends(local_user(),$contact['id']);
+		//$common = GContact::countCommonFriends(local_user(),$contact['id']);
 		//$common_text = (($common) ? sprintf( tt('%d contact in common','%d contacts in common', $common),$common) : '');
 
 		$polling = (($contact['network'] === NETWORK_MAIL | $contact['network'] === NETWORK_FEED) ? 'polling' : '');
 
-		//$x = count_all_friends(local_user(), $contact['id']);
-		//$all_friends = (($x) ? t('View all contacts') : '');
+		//$x = GContact::countAllFriends(local_user(), $contact['id']);
+		//$GContact::allFriends = (($x) ? t('View all contacts') : '');
 
 		// tabs
 		$tab_str = contacts_tab($a, $contact_id, 2);
@@ -878,7 +879,7 @@ function contacts_tab($a, $contact_id, $active_tab) {
 	);
 
 	// Show this tab only if there is visible friend list
-	$x = count_all_friends(local_user(), $contact_id);
+	$x = GContact::countAllFriends(local_user(), $contact_id);
 	if ($x)
 		$tabs[] = array('label'=>t('Contacts'),
 				'url' => "allfriends/".$contact_id,
@@ -888,7 +889,7 @@ function contacts_tab($a, $contact_id, $active_tab) {
 				'accesskey' => 't');
 
 	// Show this tab only if there is visible common friend list
-	$common = count_common_friends(local_user(),$contact_id);
+	$common = GContact::countCommonFriends(local_user(), $contact_id);
 	if ($common)
 		$tabs[] = array('label'=>t('Common Friends'),
 				'url' => "common/loc/".local_user()."/".$contact_id,

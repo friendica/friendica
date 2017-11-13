@@ -1,20 +1,23 @@
 <?php
-
+/**
+ * @file include/follow.php
+ */
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
 
-require_once 'include/socgraph.php';
 require_once 'include/group.php';
 require_once 'include/salmon.php';
 require_once 'include/ostatus.php';
 require_once 'include/Photo.php';
 
-function update_contact($id) {
+function update_contact($id)
+{
 	/*
 	Warning: Never ever fetch the public key via Probe::uri and write it into the contacts.
 	This will reliably kill your communication with Friendica contacts.
@@ -57,7 +60,7 @@ function update_contact($id) {
 	);
 
 	// Update the corresponding gcontact entry
-	poco_last_updated($ret["url"]);
+	GContact::pocoLastUpdated($ret["url"]);
 
 	return true;
 }

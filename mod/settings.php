@@ -1,16 +1,19 @@
 <?php
-
+/**
+ * @file mod/settings.php
+ */
 use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 
-require_once('include/group.php');
-require_once('include/socgraph.php');
+require_once 'include/group.php';
 
-function get_theme_config_file($theme) {
+function get_theme_config_file($theme)
+{
 	$a = get_app();
 	$base_theme = $a->theme_info['extends'];
 
@@ -650,14 +653,12 @@ function settings_post(App $a) {
 	Worker::add(PRIORITY_LOW, 'profile_update', local_user());
 
 	// Update the global contact for the user
-	update_gcontact_for_user(local_user());
+	GContact::updateGContactForUser(local_user());
 
 	//$_SESSION['theme'] = $theme;
 	if ($email_changed && $a->config['register_policy'] == REGISTER_VERIFY) {
-
 		/// @TODO set to un-verified, blocked and redirect to logout
 		/// @TODO Why? Are we verifying people or email addresses?
-
 	}
 
 	goaway('settings');
