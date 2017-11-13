@@ -1,18 +1,20 @@
 <?php
-
+/**
+ * @file mod/profiles.php
+ */
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 
 require_once 'include/Contact.php';
-require_once 'include/socgraph.php';
 
-function profiles_init(App $a) {
-
+function profiles_init(App $a)
+{
 	nav_set_selected('profiles');
 
 	if (! local_user()) {
@@ -20,12 +22,13 @@ function profiles_init(App $a) {
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === "drop") && intval($a->argv[2])) {
-		$r = q("SELECT * FROM `profile` WHERE `id` = %d AND `uid` = %d AND `is-default` = 0 LIMIT 1",
+		$r = q(
+			"SELECT * FROM `profile` WHERE `id` = %d AND `uid` = %d AND `is-default` = 0 LIMIT 1",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
 		if (! DBM::is_result($r)) {
-			notice( t('Profile not found.') . EOL);
+			notice(t('Profile not found.') . EOL);
 			goaway('profiles');
 			return; // NOTREACHED
 		}
@@ -507,7 +510,7 @@ function profiles_post(App $a) {
 			Worker::add(PRIORITY_LOW, 'profile_update', local_user());
 
 			// Update the global contact for the user
-			update_gcontact_for_user(local_user());
+			GContact::updateGContactForUser(local_user());
 		}
 	}
 }

@@ -8,6 +8,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Util\Lock;
 use Friendica\Util\XML;
@@ -19,7 +20,6 @@ require_once 'include/bbcode.php';
 require_once 'include/items.php';
 require_once 'mod/share.php';
 require_once 'include/enotify.php';
-require_once 'include/socgraph.php';
 require_once 'include/Photo.php';
 require_once 'include/follow.php';
 require_once 'include/api.php';
@@ -225,9 +225,9 @@ class ostatus
 			$contact["generation"] = 2;
 			$contact["hide"] = false; // OStatus contacts are never hidden
 			$contact["photo"] = $author["author-avatar"];
-			$gcid = update_gcontact($contact);
+			$gcid = GContact::updateGContact($contact);
 
-			link_gcontact($gcid, $contact["uid"], $contact["id"]);
+			GContact::linkGContact($gcid, $contact["uid"], $contact["id"]);
 		}
 
 		return $author;

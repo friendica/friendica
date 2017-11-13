@@ -1,11 +1,13 @@
 <?php
-
+/**
+ * @file mod/suggest.php
+ */
 use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 
-require_once('include/socgraph.php');
-require_once('include/contact_widgets.php');
+require_once 'include/contact_widgets.php';
 
 function suggest_init(App $a) {
 	if (! local_user()) {
@@ -43,16 +45,11 @@ function suggest_init(App $a) {
 			dba::insert('gcign', array('uid' => local_user(), 'gcid' => $_GET['ignore']));
 		}
 	}
-
 }
 
-
-
-
-
-function suggest_content(App $a) {
-
-	require_once("mod/proxy.php");
+function suggest_content(App $a)
+{
+	require_once "mod/proxy.php";
 
 	$o = '';
 	if (! local_user()) {
@@ -66,7 +63,7 @@ function suggest_content(App $a) {
 	$a->page['aside'] .= follow_widget();
 
 
-	$r = suggestion_query(local_user());
+	$r = GContact::suggestionQuery(local_user());
 
 	if (! DBM::is_result($r)) {
 		$o .= t('No suggestions available. If this is a new site, please try again in 24 hours.');
@@ -76,7 +73,6 @@ function suggest_content(App $a) {
 	require_once 'include/contact_selectors.php';
 
 	foreach ($r as $rr) {
-
 		$connlnk = System::baseUrl() . '/follow/?url=' . (($rr['connect']) ? $rr['connect'] : $rr['url']);
 		$ignlnk = System::baseUrl() . '/suggest?ignore=' . $rr['id'];
 		$photo_menu = array(

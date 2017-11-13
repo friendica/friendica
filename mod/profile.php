@@ -1,16 +1,18 @@
 <?php
-
+/**
+ * @file mod/profile.php
+ */
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 
-require_once('include/contact_widgets.php');
-require_once('include/redir.php');
+require_once 'include/contact_widgets.php';
+require_once 'include/redir.php';
 
-function profile_init(App $a) {
-
+function profile_init(App $a)
+{
 	if(! x($a->page,'aside'))
 		$a->page['aside'] = '';
 

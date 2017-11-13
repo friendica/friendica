@@ -1,8 +1,11 @@
 <?php
-
+/**
+ * @file include/onepoll.php
+ */
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 
 require_once 'include/follow.php';
 
@@ -14,14 +17,14 @@ function RemoveReply($subject) {
 	return $subject;
 }
 
-function onepoll_run(&$argv, &$argc) {
+function onepoll_run(&$argv, &$argc)
+{
 	global $a;
 
 	require_once 'include/datetime.php';
 	require_once 'include/items.php';
 	require_once 'include/Contact.php';
 	require_once 'include/email.php';
-	require_once 'include/socgraph.php';
 	require_once 'include/queue_fn.php';
 
 	logger('onepoll: start');
@@ -75,13 +78,14 @@ function onepoll_run(&$argv, &$argc) {
 
 	// load current friends if possible.
 	if (($contact['poco'] != "") && ($contact['success_update'] > $contact['failure_update'])) {
-		$r = q("SELECT count(*) AS total FROM glink
+		$r = q(
+			"SELECT count(*) AS total FROM glink
 			WHERE `cid` = %d AND updated > UTC_TIMESTAMP() - INTERVAL 1 DAY",
 			intval($contact['id'])
 		);
 		if (DBM::is_result($r)) {
 			if (!$r[0]['total']) {
-				poco_load($contact['id'], $importer_uid, 0, $contact['poco']);
+				GContact::pocoLoad($contact['id'], $importer_uid, 0, $contact['poco']);
 			}
 		}
 	}
@@ -89,8 +93,8 @@ function onepoll_run(&$argv, &$argc) {
 	/// @TODO Check why we don't poll the Diaspora feed at the moment (some guid problem in the items?)
 	/// @TODO Check whether this is possible with Redmatrix
 	if ($contact["network"] == NETWORK_DIASPORA) {
-		if (poco_do_update($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
-			$last_updated = poco_last_updated($contact["url"]);
+		if (GContact::pocoDoUpdate($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
+			$last_updated = GContact::pocoLastUpdated($contact["url"]);
 			$updated = datetime_convert();
 			if ($last_updated) {
 				$fields = array('last-item' => $last_updated, 'last-update' => $updated, 'success_update' => $updated);
@@ -125,7 +129,7 @@ function onepoll_run(&$argv, &$argc) {
 
 	// Update the contact entry
 	if (($contact['network'] === NETWORK_OSTATUS) || ($contact['network'] === NETWORK_DIASPORA) || ($contact['network'] === NETWORK_DFRN)) {
-		if (!poco_reachable($contact['url'])) {
+		if (!GContact::pocoReachable($contact['url'])) {
 			logger("Skipping probably dead contact ".$contact['url']);
 			return;
 		}

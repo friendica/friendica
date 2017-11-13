@@ -12,6 +12,7 @@ use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use Friendica\Protocol\DFRN;
 
 require_once 'include/bbcode.php';
@@ -24,7 +25,6 @@ require_once 'include/files.php';
 require_once 'include/text.php';
 require_once 'include/email.php';
 require_once 'include/threads.php';
-require_once 'include/socgraph.php';
 require_once 'include/plaintext.php';
 require_once 'include/ostatus.php';
 require_once 'include/feed.php';
@@ -745,11 +745,15 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		 * On comments the author is the better choice.
 		 */
 		if ($arr['parent-uri'] === $arr['uri']) {
-			$arr["gcontact-id"] = get_gcontact_id(array("url" => $arr['owner-link'], "network" => $arr['network'],
-								 "photo" => $arr['owner-avatar'], "name" => $arr['owner-name']));
+			$arr["gcontact-id"] = GContact::getGContactId(
+				array("url" => $arr['owner-link'], "network" => $arr['network'],
+				"photo" => $arr['owner-avatar'], "name" => $arr['owner-name'])
+			);
 		} else {
-			$arr["gcontact-id"] = get_gcontact_id(array("url" => $arr['author-link'], "network" => $arr['network'],
-								 "photo" => $arr['author-avatar'], "name" => $arr['author-name']));
+			$arr["gcontact-id"] = GContact::getGContactId(
+				array("url" => $arr['author-link'], "network" => $arr['network'],
+				"photo" => $arr['author-avatar'], "name" => $arr['author-name'])
+			);
 		}
 	}
 

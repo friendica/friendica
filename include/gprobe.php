@@ -1,26 +1,30 @@
 <?php
+/**
+ * @file include/gprobe.php
+ */
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 
-require_once 'include/socgraph.php';
 require_once 'include/datetime.php';
 
-function gprobe_run(&$argv, &$argc){
+function gprobe_run(&$argv, &$argc)
+{
 	if ($argc != 2) {
 		return;
 	}
 	$url = $argv[1];
 
-	$r = q("SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
+	$r = q(
+		"SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
 		dbesc(normalise_link($url))
 	);
 
 	logger("gprobe start for ".normalise_link($url), LOGGER_DEBUG);
 
 	if (!DBM::is_result($r)) {
-
 		// Is it a DDoS attempt?
 		$urlparts = parse_url($url);
 
@@ -39,17 +43,19 @@ function gprobe_run(&$argv, &$argc){
 		}
 
 		if (!in_array($arr["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
-			update_gcontact($arr);
+			GContact::updateGContact($arr);
 		}
 
-		$r = q("SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
+		$r = q(
+			"SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
 			dbesc(normalise_link($url))
 		);
 	}
 	if (DBM::is_result($r)) {
 		// Check for accessibility and do a poco discovery
-		if (poco_last_updated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN))
-			poco_load(0,0,$r[0]['id'], str_replace('/profile/','/poco/',$r[0]['url']));
+		if (GContact::pocoLastUpdated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN)) {
+			GContact::pocoLoad(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
+		}
 	}
 
 	logger("gprobe end for ".normalise_link($url), LOGGER_DEBUG);

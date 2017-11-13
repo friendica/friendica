@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @file mod/poco.php
+ */
 // See here for a documentation for portable contacts:
 // https://web.archive.org/web/20160405005550/http://portablecontacts.net/draft-spec.html
 
@@ -7,8 +9,10 @@ use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 
-function poco_init(App $a) {
+function poco_init(App $a)
+{
 	$system_mode = false;
 
 	if (intval(Config::get('system', 'block_public')) || (Config::get('system', 'block_local_dir'))) {
@@ -32,9 +36,8 @@ function poco_init(App $a) {
 	$global = false;
 
 	if ($a->argc > 1 && $a->argv[1] === '@server') {
-		require_once 'include/socgraph.php';
 		// List of all servers that this server knows
-		$ret = poco_serverlist();
+		$ret = GContact::pocoServerlist();
 		header('Content-type: application/json');
 		echo json_encode($ret);
 		killme();
