@@ -4,6 +4,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
+use Friendica\Model\GContact;
 use dba;
 
 require_once 'include/follow.php';
@@ -16,7 +17,6 @@ Class OnePoll {
 		require_once 'include/items.php';
 		require_once 'include/Contact.php';
 		require_once 'include/email.php';
-		require_once 'include/socgraph.php';
 		require_once 'include/queue_fn.php';
 
 		logger('onepoll: start');
@@ -72,7 +72,7 @@ Class OnePoll {
 			);
 			if (DBM::is_result($r)) {
 				if (!$r[0]['total']) {
-					poco_load($contact['id'], $importer_uid, 0, $contact['poco']);
+					pocoLoad($contact['id'], $importer_uid, 0, $contact['poco']);
 				}
 			}
 		}
@@ -80,8 +80,8 @@ Class OnePoll {
 		/// @TODO Check why we don't poll the Diaspora feed at the moment (some guid problem in the items?)
 		/// @TODO Check whether this is possible with Redmatrix
 		if ($contact["network"] == NETWORK_DIASPORA) {
-			if (poco_do_update($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
-				$last_updated = poco_last_updated($contact["url"]);
+			if (pocoDoUpdate($contact["created"], $contact["last-item"], $contact["failure_update"], $contact["success_update"])) {
+				$last_updated = pocoLastUpdated($contact["url"]);
 				$updated = datetime_convert();
 				if ($last_updated) {
 					$fields = array('last-item' => $last_updated, 'last-update' => $updated, 'success_update' => $updated);
@@ -116,7 +116,7 @@ Class OnePoll {
 
 		// Update the contact entry
 		if (($contact['network'] === NETWORK_OSTATUS) || ($contact['network'] === NETWORK_DIASPORA) || ($contact['network'] === NETWORK_DFRN)) {
-			if (!poco_reachable($contact['url'])) {
+			if (!pocoReachable($contact['url'])) {
 				logger("Skipping probably dead contact ".$contact['url']);
 				return;
 			}
@@ -135,7 +135,8 @@ Class OnePoll {
 			return;
 		}
 
-		$r = q("SELECT `contact`.*, `user`.`page-flags` FROM `contact` INNER JOIN `user` on `contact`.`uid` = `user`.`uid` WHERE `user`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
+		$r = q(
+			"SELECT `contact`.*, `user`.`page-flags` FROM `contact` INNER JOIN `user` on `contact`.`uid` = `user`.`uid` WHERE `user`.`uid` = %d AND `contact`.`self` = 1 LIMIT 1",
 			intval($importer_uid)
 		);
 
@@ -270,11 +271,10 @@ Class OnePoll {
 			$postvars['perm'] = 'rw';
 
 			$xml = post_url($contact['poll'], $postvars);
-
 		} elseif (($contact['network'] === NETWORK_OSTATUS)
 			|| ($contact['network'] === NETWORK_DIASPORA)
-			|| ($contact['network'] === NETWORK_FEED)) {
-
+			|| ($contact['network'] === NETWORK_FEED)
+		) {
 			// Upgrading DB fields from an older Friendica version
 			// Will only do this once per notify-enabled OStatus contact
 			// or if relationship changes
@@ -345,7 +345,7 @@ Class OnePoll {
 				if (count($msgs)) {
 					logger("Mail: Parsing ".count($msgs)." mails from ".$contact['addr']." for ".$mailconf['user'], LOGGER_DEBUG);
 
-					$metas = email_msg_meta($mbox,implode(',', $msgs));
+					$metas = email_msg_meta($mbox, implode(',', $msgs));
 					if (count($metas) != count($msgs)) {
 						logger("onepoll: for " . $mailconf['user'] . " there are ". count($msgs) . " messages but received " . count($metas) . " metas", LOGGER_DEBUG);
 					} else {
@@ -357,8 +357,8 @@ Class OnePoll {
 							$datarray = array();
 							$datarray['verb'] = ACTIVITY_POST;
 							$datarray['object-type'] = ACTIVITY_OBJ_NOTE;
-		//					$meta = email_msg_meta($mbox, $msg_uid);
-		//					$headers = email_msg_headers($mbox, $msg_uid);
+							// $meta = email_msg_meta($mbox, $msg_uid);
+							// $headers = email_msg_headers($mbox, $msg_uid);
 
 							$datarray['uri'] = msgid2iri(trim($meta->message_id, '<>'));
 
@@ -371,11 +371,12 @@ Class OnePoll {
 								logger("Mail: Seen before ".$msg_uid." for ".$mailconf['user']." UID: ".$importer_uid." URI: ".$datarray['uri'],LOGGER_DEBUG);
 
 								// Only delete when mails aren't automatically moved or deleted
-								if (($mailconf['action'] != 1) && ($mailconf['action'] != 3))
+								if (($mailconf['action'] != 1) && ($mailconf['action'] != 3)) {
 									if ($meta->deleted && ! $r['deleted']) {
 										$fields = array('deleted' => true, 'changed' => datetime_convert());
 										dba::update('item', $fields, array('id' => $r['id']));
 									}
+								}
 
 								switch ($mailconf['action']) {
 									case 0:
@@ -416,7 +417,8 @@ Class OnePoll {
 									}
 								}
 								$qstr = implode(',', $refs_arr);
-								$r = q("SELECT `parent-uri` FROM `item` USE INDEX (`uid_uri`) WHERE `uri` IN ($qstr) AND `uid` = %d LIMIT 1",
+								$r = q(
+									"SELECT `parent-uri` FROM `item` USE INDEX (`uid_uri`) WHERE `uri` IN ($qstr) AND `uid` = %d LIMIT 1",
 									intval($importer_uid)
 								);
 								if (DBM::is_result($r)) {
@@ -449,10 +451,12 @@ Class OnePoll {
 
 							// If it seems to be a reply but a header couldn't be found take the last message with matching subject
 							if (empty($datarray['parent-uri']) && $reply) {
-								$r = q("SELECT `parent-uri` FROM `item` WHERE `title` = \"%s\" AND `uid` = %d AND `network` = '%s' ORDER BY `created` DESC LIMIT 1",
+								$r = q(
+									"SELECT `parent-uri` FROM `item` WHERE `title` = \"%s\" AND `uid` = %d AND `network` = '%s' ORDER BY `created` DESC LIMIT 1",
 									dbesc(protect_sprintf($datarray['title'])),
 									intval($importer_uid),
-									dbesc(NETWORK_MAIL));
+									dbesc(NETWORK_MAIL)
+								);
 								if (DBM::is_result($r)) {
 									$datarray['parent-uri'] = $r[0]['parent-uri'];
 								}
@@ -615,7 +619,8 @@ Class OnePoll {
 		return;
 	}
 
-	private static function RemoveReply($subject) {
+	private static function RemoveReply($subject)
+	{
 		while (in_array(strtolower(substr($subject, 0, 3)), array("re:", "aw:"))) {
 			$subject = trim(substr($subject, 4));
 		}
