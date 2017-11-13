@@ -8,7 +8,9 @@ use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
+use Friendica\Network\Probe;
 
+use dba;
 use DOMDocument;
 use DomXPath;
 
