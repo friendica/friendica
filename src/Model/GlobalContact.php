@@ -919,7 +919,7 @@ class GlobalContact
 	 *
 	 * @param str $server Server address
 	 */
-	public static function gsFetchUsers($server)
+	public static function fetchGsUsers($server)
 	{
 		logger("Fetching users from GNU Social server ".$server, LOGGER_DEBUG);
 	
@@ -975,7 +975,7 @@ class GlobalContact
 	 * @brief Asking GNU Social server on a regular base for their user data
 	 *
 	 */
-	public static function gsDiscover()
+	public static function discoverGsUsers()
 	{
 		$requery_days = intval(Config::get("system", "poco_requery_days"));
 	
@@ -992,7 +992,7 @@ class GlobalContact
 		}
 	
 		foreach ($r as $server) {
-			self::gsFetchUsers($server["url"]);
+			self::fetchGsUsers($server["url"]);
 			q("UPDATE `gserver` SET `last_poco_query` = '%s' WHERE `nurl` = '%s'", dbesc(datetime_convert()), dbesc($server["nurl"]));
 		}
 	}

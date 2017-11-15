@@ -98,7 +98,7 @@ function discover_poco_run(&$argv, &$argc)
 
 		// Query GNU Social servers for their users ("statistics" addon has to be enabled on the GS server)
 		if (!Config::get('system', 'ostatus_disabled')) {
-			GlobalContact::gsDiscover();
+			GlobalContact::discoverGsUsers();
 		}
 	}
 
