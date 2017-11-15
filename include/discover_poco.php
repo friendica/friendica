@@ -47,7 +47,8 @@ function discover_poco_run(&$argv, &$argc)
 		$search = "";
 		$mode = 0;
 	} else {
-		die("Unknown or missing parameter ".$argv[1]."\n");
+		logger("Unknown or missing parameter ".$argv[1]."\n");
+		return;
 	}
 
 	logger('start '.$search);
