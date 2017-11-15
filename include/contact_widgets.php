@@ -1,10 +1,13 @@
 <?php
-
+/**
+ * @file include/contact_widgets.php
+ */
 use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
+use Friendica\Model\GlobalContact;
 
 require_once 'include/contact_selectors.php';
 
@@ -238,8 +241,9 @@ function common_friends_visitor_widget($profile_uid) {
 				$cid = $r['id'];
 			} else {
 				$r = dba::select('gcontact', array('id'), array('nurl' => normalise_link(get_my_url())), array('limit' => 1));
-				if (DBM::is_result($r))
+				if (DBM::is_result($r)) {
 					$zcid = $r['id'];
+				}
 			}
 		}
 	}
@@ -248,21 +252,19 @@ function common_friends_visitor_widget($profile_uid) {
 		return;
 	}
 
-	require_once 'include/socgraph.php';
-
 	if ($cid) {
-		$t = count_common_friends($profile_uid, $cid);
+		$t = GlobalContact::countCommonFriends($profile_uid, $cid);
 	} else {
-		$t = count_common_friends_zcid($profile_uid, $zcid);
+		$t = GlobalContact::countCommonFriendsZcid($profile_uid, $zcid);
 	}
 	if (! $t) {
 		return;
 	}
 
 	if ($cid) {
-		$r = common_friends($profile_uid, $cid, 0, 5, true);
+		$r = GlobalContact::commonFriends($profile_uid, $cid, 0, 5, true);
 	} else {
-		$r = common_friends_zcid($profile_uid, $zcid, 0, 5, true);
+		$r = GlobalContact::commonFriendsZcid($profile_uid, $zcid, 0, 5, true);
 	}
 
 	return replace_macros(get_markup_template('remote_friends_common.tpl'), array(

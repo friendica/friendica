@@ -20,6 +20,7 @@ use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
 
@@ -737,7 +738,7 @@ function item_post(App $a) {
 	$datarray['postopts']      = $postopts;
 	$datarray['origin']        = $origin;
 	$datarray['moderated']     = $allow_moderated;
-	$datarray['gcontact-id']   = get_gcontact_id(array("url" => $datarray['author-link'], "network" => $datarray['network'],
+	$datarray['gcontact-id']   = GlobalContact::getId(array("url" => $datarray['author-link'], "network" => $datarray['network'],
 							"photo" => $datarray['author-avatar'], "name" => $datarray['author-name']));
 	$datarray['object']        = $object;
 
@@ -1132,9 +1133,8 @@ function item_content(App $a) {
  *
  * @return boolean true if replaced, false if not replaced
  */
-function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $network = "") {
-	require_once 'include/socgraph.php';
-
+function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $network = "")
+{
 	$replaced = false;
 	$r = null;
 	$tag_type = '@';
@@ -1239,7 +1239,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			if (!DBM::is_result($r)) {
 				$probed = Probe::uri($name);
 				if ($result['network'] != NETWORK_PHANTOM) {
-					update_gcontact($probed);
+					GlobalContact::update($probed);
 					$r = q("SELECT `url`, `name`, `nick`, `network`, `alias`, `notify` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
 						dbesc(normalise_link($probed["url"])));
 				}

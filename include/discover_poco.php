@@ -1,15 +1,19 @@
 <?php
+/**
+ * @file include/discover_poco.php
+ */
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
+use Friendica\Protocol\PortableContact;
 
-require_once 'include/socgraph.php';
 require_once 'include/datetime.php';
 
-function discover_poco_run(&$argv, &$argc) {
-
+function discover_poco_run(&$argv, &$argc)
+{
 	/*
 	This function can be called in these ways:
 	- dirsearch <search pattern>: Searches for "search pattern" in the directory. "search pattern" is url encoded.
@@ -18,7 +22,7 @@ function discover_poco_run(&$argv, &$argc) {
 	- server <poco url>: Searches for the poco server list. "poco url" is base64 encoded.
 	- update_server: Frequently check the first 250 servers for vitality.
 	- update_server_directory: Discover the given server id for their contacts
-	- poco_load: Load POCO data from a given POCO address
+	- PortableContact::load: Load POCO data from a given POCO address
 	- check_profile: Update remote profile data
 	*/
 
@@ -35,7 +39,7 @@ function discover_poco_run(&$argv, &$argc) {
 		$mode = 5;
 	} elseif (($argc == 3) && ($argv[1] == "update_server_directory")) {
 		$mode = 6;
-	} elseif (($argc > 5) && ($argv[1] == "poco_load")) {
+	} elseif (($argc > 5) && ($argv[1] == "load")) {
 		$mode = 7;
 	} elseif (($argc == 3) && ($argv[1] == "check_profile")) {
 		$mode = 8;
@@ -43,14 +47,15 @@ function discover_poco_run(&$argv, &$argc) {
 		$search = "";
 		$mode = 0;
 	} else {
-		die("Unknown or missing parameter ".$argv[1]."\n");
+		logger("Unknown or missing parameter ".$argv[1]."\n");
+		return;
 	}
 
 	logger('start '.$search);
 
 	if ($mode == 8) {
 		if ($argv[2] != "") {
-			poco_last_updated($argv[2], true);
+			PortableContact::lastUpdated($argv[2], true);
 		}
 	} elseif ($mode == 7) {
 		if ($argc == 6) {
@@ -58,9 +63,9 @@ function discover_poco_run(&$argv, &$argc) {
 		} else {
 			$url = '';
 		}
-		poco_load_worker(intval($argv[2]), intval($argv[3]), intval($argv[4]), $url);
+		PortableContact::load(intval($argv[2]), intval($argv[3]), intval($argv[4]), $url);
 	} elseif ($mode == 6) {
-		poco_discover_single_server(intval($argv[2]));
+		PortableContact::discoverSingleServer(intval($argv[2]));
 	} elseif ($mode == 5) {
 		update_server();
 	} elseif ($mode == 4) {
@@ -73,7 +78,7 @@ function discover_poco_run(&$argv, &$argc) {
 			return;
 		}
 		$result = "Checking server ".$server_url." - ";
-		$ret = poco_check_server($server_url);
+		$ret = PortableContact::checkServer($server_url);
 		if ($ret) {
 			$result .= "success";
 		} else {
@@ -81,19 +86,20 @@ function discover_poco_run(&$argv, &$argc) {
 		}
 		logger($result, LOGGER_DEBUG);
 	} elseif ($mode == 3) {
-		update_suggestions();
-	} elseif (($mode == 2) && Config::get('system','poco_completion')) {
+		GlobalContact::updateSuggestions();
+	} elseif (($mode == 2) && Config::get('system', 'poco_completion')) {
 		discover_users();
-	} elseif (($mode == 1) && ($search != "") && Config::get('system','poco_local_search')) {
+	} elseif (($mode == 1) && ($search != "") && Config::get('system', 'poco_local_search')) {
 		discover_directory($search);
 		gs_search_user($search);
-	} elseif (($mode == 0) && ($search == "") && (Config::get('system','poco_discovery') > 0)) {
+	} elseif (($mode == 0) && ($search == "") && (Config::get('system', 'poco_discovery') > 0)) {
 		// Query Friendica and Hubzilla servers for their users
-		poco_discover();
+		PortableContact::discover();
 
 		// Query GNU Social servers for their users ("statistics" addon has to be enabled on the GS server)
-		if (!Config::get('system','ostatus_disabled'))
-			gs_discover();
+		if (!Config::get('system', 'ostatus_disabled')) {
+			GlobalContact::discoverGsUsers();
+		}
 	}
 
 	logger('end '.$search);
@@ -105,7 +111,8 @@ function discover_poco_run(&$argv, &$argc) {
  * @brief Updates the first 250 servers
  *
  */
-function update_server() {
+function update_server()
+{
 	$r = q("SELECT `url`, `created`, `last_failure`, `last_contact` FROM `gserver` ORDER BY rand()");
 
 	if (!DBM::is_result($r)) {
@@ -114,8 +121,8 @@ function update_server() {
 
 	$updated = 0;
 
-	foreach ($r AS $server) {
-		if (!poco_do_update($server["created"], "", $server["last_failure"], $server["last_contact"])) {
+	foreach ($r as $server) {
+		if (!PortableContact::updateNeeded($server["created"], "", $server["last_failure"], $server["last_contact"])) {
 			continue;
 		}
 		logger('Update server status for server '.$server["url"], LOGGER_DEBUG);
@@ -128,25 +135,29 @@ function update_server() {
 	}
 }
 
-function discover_users() {
+function discover_users()
+{
 	logger("Discover users", LOGGER_DEBUG);
 
 	$starttime = time();
 
-	$users = q("SELECT `url`, `created`, `updated`, `last_failure`, `last_contact`, `server_url`, `network` FROM `gcontact`
-			WHERE `last_contact` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
+	$users = q(
+		"SELECT `url`, `created`, `updated`, `last_failure`, `last_contact`, `server_url`, `network` FROM `gcontact`
+		WHERE `last_contact` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
 				`last_failure` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
 				`network` IN ('%s', '%s', '%s', '%s', '') ORDER BY rand()",
-			dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA),
-			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_FEED));
+		dbesc(NETWORK_DFRN),
+		dbesc(NETWORK_DIASPORA),
+		dbesc(NETWORK_OSTATUS),
+		dbesc(NETWORK_FEED)
+	);
 
 	if (!$users) {
 		return;
 	}
 	$checked = 0;
 
-	foreach ($users AS $user) {
-
+	foreach ($users as $user) {
 		$urlparts = parse_url($user["url"]);
 		if (!isset($urlparts["scheme"])) {
 			q("UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
@@ -162,22 +173,23 @@ function discover_users() {
 					"identi.ca" => NETWORK_PUMPIO,
 					"alpha.app.net" => NETWORK_APPNET);
 
-			q("UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
-				dbesc($networks[$urlparts["host"]]), dbesc(normalise_link($user["url"])));
+			q(
+				"UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
+				dbesc($networks[$urlparts["host"]]), dbesc(normalise_link($user["url"]))
+			);
 			continue;
 		}
 
-		$server_url = poco_detect_server($user["url"]);
+		$server_url = PortableContact::detectServer($user["url"]);
 		$force_update = false;
 
 		if ($user["server_url"] != "") {
-
 			$force_update = (normalise_link($user["server_url"]) != normalise_link($server_url));
 
 			$server_url = $user["server_url"];
 		}
 
-		if ((($server_url == "") && ($user["network"] == NETWORK_FEED)) || $force_update || poco_check_server($server_url, $user["network"])) {
+		if ((($server_url == "") && ($user["network"] == NETWORK_FEED)) || $force_update || PortableContact::checkServer($server_url, $user["network"])) {
 			logger('Check profile '.$user["url"]);
 			Worker::add(PRIORITY_LOW, "discover_poco", "check_profile", $user["url"]);
 
@@ -217,18 +229,19 @@ function discover_directory($search) {
 			if (DBM::is_result($exists)) {
 				logger("Profile ".$jj->url." already exists (".$search.")", LOGGER_DEBUG);
 
-				if (($exists[0]["last_contact"] < $exists[0]["last_failure"]) &&
-					($exists[0]["updated"] < $exists[0]["last_failure"])) {
+				if (($exists[0]["last_contact"] < $exists[0]["last_failure"])
+					&& ($exists[0]["updated"] < $exists[0]["last_failure"])
+				) {
 					continue;
 				}
 				// Update the contact
-				poco_last_updated($jj->url);
+				PortableContact::lastUpdated($jj->url);
 				continue;
 			}
 
-			$server_url = poco_detect_server($jj->url);
+			$server_url = PortableContact::detectServer($jj->url);
 			if ($server_url != '') {
-				if (!poco_check_server($server_url)) {
+				if (!PortableContact::checkServer($server_url)) {
 					logger("Friendica server ".$server_url." doesn't answer.", LOGGER_DEBUG);
 					continue;
 				}
@@ -246,7 +259,7 @@ function discover_directory($search) {
 
 				$data["server_url"] = $data["baseurl"];
 
-				update_gcontact($data);
+				GlobalContact::update($data);
 			} else {
 				logger("Profile ".$jj->url." is not responding or no Friendica contact - but network ".$data["network"], LOGGER_DEBUG);
 			}
@@ -283,11 +296,11 @@ function gs_search_user($search) {
 
 	/// @TODO AS is considered as a notation for constants (as they usually being written all upper-case)
 	/// @TODO find all those and convert to all lower-case which is a keyword then
-	foreach ($contacts->data AS $user) {
+	foreach ($contacts->data as $user) {
 		$contact = Probe::uri($user->site_address."/".$user->name);
 		if ($contact["network"] != NETWORK_PHANTOM) {
 			$contact["about"] = $user->description;
-			update_gcontact($contact);
+			GlobalContact::update($contact);
 		}
 	}
 }

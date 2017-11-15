@@ -10,9 +10,9 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Model\GlobalContact;
 
-require_once("include/socgraph.php");
-require_once("include/Contact.php");
+require_once "include/Contact.php";
 
 function hovercard_init(App $a) {
 	// Just for testing purposes
@@ -48,7 +48,7 @@ function hovercard_content() {
 	}
 
 	// if it's the url containing https it should be converted to http
-	$nurl = normalise_link(clean_contact_url($profileurl));
+	$nurl = normalise_link(GlobalContact::cleanContactUrl($profileurl));
 	if($nurl) {
 		// Search for contact data
 		$contact = get_contact_details_by_url($nurl);

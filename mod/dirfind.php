@@ -1,13 +1,16 @@
 <?php
-
+/**
+ * @file mod/dirfind.php
+ */
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
+use Friendica\Protocol\PortableContact;
 
 require_once 'include/contact_widgets.php';
-require_once 'include/socgraph.php';
 require_once 'include/Contact.php';
 require_once 'include/contact_selectors.php';
 require_once 'mod/contacts.php';
@@ -56,7 +59,6 @@ function dirfind_content(App $a, $prefix = "") {
 	$o = '';
 
 	if ($search) {
-
 		if ($discover_user) {
 			$j = new stdClass();
 			$j->total = 1;
@@ -79,10 +81,9 @@ function dirfind_content(App $a, $prefix = "") {
 
 			// Add the contact to the global contacts if it isn't already in our system
 			if (($contact["cid"] == 0) && ($contact["zid"] == 0) && ($contact["gid"] == 0)) {
-				update_gcontact($user_data);
+				GlobalContact::update($user_data);
 			}
 		} elseif ($local) {
-
 			if ($community)
 				$extra_sql = " AND `community`";
 			else
@@ -91,7 +92,7 @@ function dirfind_content(App $a, $prefix = "") {
 			$perpage = 80;
 			$startrec = (($a->pager['page']) * $perpage) - $perpage;
 
-			if (Config::get('system','diaspora_enabled')) {
+			if (Config::get('system', 'diaspora_enabled')) {
 				$diaspora = NETWORK_DIASPORA;
 			} else {
 				$diaspora = NETWORK_DFRN;
@@ -142,7 +143,7 @@ function dirfind_content(App $a, $prefix = "") {
 			$j->items_page = $perpage;
 			$j->page = $a->pager['page'];
 			foreach ($results AS $result) {
-				if (poco_alternate_ostatus_url($result["url"])) {
+				if (PortableContact::alternateOStatusUrl($result["url"])) {
 					continue;
 				}
 

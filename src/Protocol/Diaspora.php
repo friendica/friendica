@@ -16,6 +16,7 @@ use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\GlobalContact;
 use Friendica\Network\Probe;
 use Friendica\Util\XML;
 
@@ -26,7 +27,6 @@ require_once 'include/items.php';
 require_once 'include/bb2diaspora.php';
 require_once 'include/Contact.php';
 require_once 'include/Photo.php';
-require_once 'include/socgraph.php';
 require_once 'include/group.php';
 require_once 'include/datetime.php';
 require_once 'include/queue_fn.php';
@@ -2246,9 +2246,9 @@ class Diaspora
 					"addr" => $author, "nick" => $nick, "keywords" => $keywords,
 					"hide" => !$searchable, "nsfw" => $nsfw);
 
-		$gcid = update_gcontact($gcontact);
+		$gcid = GlobalContact::update($gcontact);
 
-		link_gcontact($gcid, $importer["uid"], $contact["id"]);
+		GlobalContact::link($gcid, $importer["uid"], $contact["id"]);
 
 		logger("Profile of contact ".$contact["id"]." stored for user ".$importer["uid"], LOGGER_DEBUG);
 

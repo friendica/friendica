@@ -1,19 +1,21 @@
 <?php
-
+/**
+ * @file mod/allfriends.php
+ */
 use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Model\GlobalContact;
 
-require_once('include/socgraph.php');
-require_once('include/Contact.php');
-require_once('include/contact_selectors.php');
-require_once('mod/contacts.php');
+require_once 'include/Contact.php';
+require_once 'include/contact_selectors.php';
+require_once 'mod/contacts.php';
 
-function allfriends_content(App $a) {
-
+function allfriends_content(App $a)
+{
 	$o = '';
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -27,7 +29,8 @@ function allfriends_content(App $a) {
 
 	$uid = $a->user['uid'];
 
-	$c = q("SELECT `name`, `url`, `photo` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
+	$c = q(
+		"SELECT `name`, `url`, `photo` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 		intval($cid),
 		intval(local_user())
 	);
@@ -39,12 +42,13 @@ function allfriends_content(App $a) {
 	$a->page['aside'] = "";
 	profile_load($a, "", 0, get_contact_details_by_url($c[0]["url"]));
 
-	$total = count_all_friends(local_user(), $cid);
+	$total = GlobalContact::countAllFriends(local_user(), $cid);
 
-	if(count($total))
+	if (count($total)) {
 		$a->set_pager_total($total);
+	}
 
-	$r = all_friends(local_user(), $cid, $a->pager['start'], $a->pager['itemspage']);
+	$r = GlobalContact::allFriends(local_user(), $cid, $a->pager['start'], $a->pager['itemspage']);
 
 	if (! DBM::is_result($r)) {
 		$o .= t('No friends to display.');
@@ -54,7 +58,6 @@ function allfriends_content(App $a) {
 	$id = 0;
 
 	foreach ($r as $rr) {
-
 		//get further details of the contact
 		$contact_details = get_contact_details_by_url($rr['url'], $uid, $rr);
 

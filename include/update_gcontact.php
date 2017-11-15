@@ -1,13 +1,15 @@
 <?php
-
+/**
+ * @file include/update_gcontact.php
+ */
 use Friendica\Core\Config;
 use Friendica\Network\Probe;
 use Friendica\Database\DBM;
+use Friendica\Protocol\PortableContact;
 
-function update_gcontact_run(&$argv, &$argc) {
+function update_gcontact_run(&$argv, &$argc)
+{
 	global $a;
-
-	require_once 'include/socgraph.php';
 
 	logger('update_gcontact: start');
 
@@ -33,11 +35,15 @@ function update_gcontact_run(&$argv, &$argc) {
 	$data = Probe::uri($r[0]["url"]);
 
 	if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
-		if ($r[0]["server_url"] != "")
-			poco_check_server($r[0]["server_url"], $r[0]["network"]);
+		if ($r[0]["server_url"] != "") {
+			PortableContact::checkServer($r[0]["server_url"], $r[0]["network"]);
+		}
 
-		q("UPDATE `gcontact` SET `last_failure` = '%s' WHERE `id` = %d",
-			dbesc(datetime_convert()), intval($contact_id));
+		q(
+			"UPDATE `gcontact` SET `last_failure` = '%s' WHERE `id` = %d",
+			dbesc(datetime_convert()),
+			intval($contact_id)
+		);
 		return;
 	}
 
@@ -54,27 +60,30 @@ function update_gcontact_run(&$argv, &$argc) {
 		$data["photo"] = $r[0]['photo'];
 
 
-	q("UPDATE `gcontact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `photo` = '%s'
-				WHERE `id` = %d",
-				dbesc($data["name"]),
-				dbesc($data["nick"]),
-				dbesc($data["addr"]),
-				dbesc($data["photo"]),
-				intval($contact_id)
-			);
+	q(
+		"UPDATE `gcontact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `photo` = '%s'
+		WHERE `id` = %d",
+		dbesc($data["name"]),
+		dbesc($data["nick"]),
+		dbesc($data["addr"]),
+		dbesc($data["photo"]),
+		intval($contact_id)
+	);
 
-	q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `photo` = '%s'
-				WHERE `uid` = 0 AND `addr` = '' AND `nurl` = '%s'",
-				dbesc($data["name"]),
-				dbesc($data["nick"]),
-				dbesc($data["addr"]),
-				dbesc($data["photo"]),
-				dbesc(normalise_link($data["url"]))
-			);
+	q(
+		"UPDATE `contact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `photo` = '%s'
+		WHERE `uid` = 0 AND `addr` = '' AND `nurl` = '%s'",
+		dbesc($data["name"]),
+		dbesc($data["nick"]),
+		dbesc($data["addr"]),
+		dbesc($data["photo"]),
+		dbesc(normalise_link($data["url"]))
+	);
 
-	q("UPDATE `contact` SET `addr` = '%s'
-				WHERE `uid` != 0 AND `addr` = '' AND `nurl` = '%s'",
-				dbesc($data["addr"]),
-				dbesc(normalise_link($data["url"]))
-			);
+	q(
+		"UPDATE `contact` SET `addr` = '%s'
+		WHERE `uid` != 0 AND `addr` = '' AND `nurl` = '%s'",
+		dbesc($data["addr"]),
+		dbesc(normalise_link($data["url"]))
+	);
 }
