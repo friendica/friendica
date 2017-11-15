@@ -155,7 +155,6 @@ class GlobalContact
 		}
 	
 		$gcontact['server_url'] = '';
-		$gcontact['network'] = '';
 	
 		$x = q(
 			"SELECT * FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
