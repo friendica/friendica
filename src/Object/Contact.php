@@ -597,7 +597,7 @@ class Contact extends BaseObject
 				'readonly' => 0, 'pending' => 0)
 			);
 
-			$contacts = dba::select('contact', array('id'), array('nurl' => normalise_link($data["url"]), 'uid' => $uid), array('order' => 'id', 'limit' => 2));
+			$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2", dbesc(normalise_link($data["url"])), intval($uid)); 
 			if (!DBM::is_result($contacts)) {
 				return 0;
 			}
@@ -721,7 +721,7 @@ class Contact extends BaseObject
 
 		// There are no posts with "uid = 0" with connector networks
 		// This speeds up the query a lot
-		$r = dba::select('contact', array('network', 'id AS author-id', 'contact-type'), array('contact.nurl' => normalise_link($contact_url), 'contact.uid' => 0));
+		$r = dba::select('contact', array('network', 'id AS author-id', 'contact-type'), array('nurl' => normalise_link($contact_url), 'uid' => 0));
 
 		if (!DBM::is_result($r)) {
 			return '';
