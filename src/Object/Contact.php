@@ -21,29 +21,30 @@ use dba;
 require_once 'boot.php';
 require_once 'include/text.php';
 
+/**
+ * @brief functions for interacting with a contact
+ */
 class Contact extends BaseObject
 {
 	/**
 	 * @brief Marks a contact for removal
 	 *
-	 * @param int $id
+	 * @param int $id contact id
 	 * @return null
 	 */
 	public static function remove($id)
 	{
 		// We want just to make sure that we don't delete our "self" contact
-		$r = q(
-			"SELECT `uid` FROM `contact` WHERE `id` = %d AND NOT `self` LIMIT 1", intval($id)
-		);
+		$condition = array('`id` = ? AND NOT `self`', $id);
+		$r = dba::select('contact', array('uid'), $condition, array('limit' => 1));
+
 		if (!DBM::is_result($r) || !intval($r[0]['uid'])) {
 			return;
 		}
 
 		$archive = PConfig::get($r[0]['uid'], 'system', 'archive_removed_contacts');
 		if ($archive) {
-			q(
-				"UPDATE `contact` SET `archive` = 1, `network` = 'none', `writable` = 0 WHERE id = %d", intval($id)
-			);
+			dba::update('contact', array('archive' => 1, 'network' => 'none', 'writable' => 0), array('id' => $id));
 			return;
 		}
 
@@ -56,7 +57,7 @@ class Contact extends BaseObject
 	/**
 	 * @brief Sends an unfriend message. Does not remove the contact
 	 *
-	 * @param array $user User unfriending
+	 * @param array $user    User unfriending
 	 * @param array $contact Contact unfriended
 	 */
 	public static function terminateFriendship(array $user, array $contact)
@@ -88,7 +89,7 @@ class Contact extends BaseObject
 	 * This provides for the possibility that their database is temporarily messed
 	 * up or some other transient event and that there's a possibility we could recover from it.
 	 *
-	 * @param array $contact
+	 * @param array $contact contact to mark for archival
 	 * @return type
 	 */
 	public static function markForArchival(array $contact)
@@ -99,18 +100,12 @@ class Contact extends BaseObject
 		}
 
 		if ($contact['term-date'] <= NULL_DATE) {
-			q(
-				"UPDATE `contact` SET `term-date` = '%s' WHERE `id` = %d", dbesc(datetime_convert()), intval($contact['id'])
-			);
+			dba::update('contact', array('term-date' => datetime_convert()), array('id' => $contact['id']));
 
 			if ($contact['url'] != '') {
-				q(
-					"UPDATE `contact` SET `term-date` = '%s'
-				WHERE `nurl` = '%s' AND `term-date` <= '1000-00-00'", dbesc(datetime_convert()), dbesc(normalise_link($contact['url']))
-				);
+				dba::update('contact', array('term-date' => datetime_convert()), array('nurl' => normalise_link($contact['url']), 'term-date' <= NULL_DATE));
 			}
 		} else {
-
 			/* @todo
 			 * We really should send a notification to the owner after 2-3 weeks
 			 * so they won't be surprised when the contact vanishes and can take
@@ -120,19 +115,14 @@ class Contact extends BaseObject
 			/// @todo Check for contact vitality via probing
 			$expiry = $contact['term-date'] . ' + 32 days ';
 			if (datetime_convert() > datetime_convert('UTC', 'UTC', $expiry)) {
-
 				/* Relationship is really truly dead. archive them rather than
 				 * delete, though if the owner tries to unarchive them we'll start
 				 * the whole process over again.
 				 */
-				q(
-					"UPDATE `contact` SET `archive` = 1 WHERE `id` = %d", intval($contact['id'])
-				);
+				dba::update('contact', array('archive' => 1), array('id' => $contact['id']));
 
 				if ($contact['url'] != '') {
-					q(
-						"UPDATE `contact` SET `archive` = 1 WHERE `nurl` = '%s'", dbesc(normalise_link($contact['url']))
-					);
+					dba::update('contact', array('archive' => 1), array('nurl' => normalise_link($contact['url'])));
 				}
 			}
 		}
@@ -143,14 +133,13 @@ class Contact extends BaseObject
 	 *
 	 * @see Contact::markForArchival()
 	 *
-	 * @param array $contact
+	 * @param array $contact contact to be unmarked for archival
 	 * @return null
 	 */
 	public static function unmarkForArchival(array $contact)
 	{
-		$r = q(
-			"SELECT `term-date` FROM `contact` WHERE `id` = %d AND (`term-date` > '%s' OR `archive`)", intval($contact['id']), dbesc('1000-00-00 00:00:00')
-		);
+		$condition = array('`id` => ? AND (`term-date` > ? OR `archive`)', $contact[`id`], NULL_DATE);
+		$r = dba::select('contact', array('term-date'), $condition);
 
 		// We don't need to update, we never marked this contact for archival
 		if (!DBM::is_result($r)) {
@@ -172,9 +161,9 @@ class Contact extends BaseObject
 	 * The function looks at several places (contact table and gcontact table) for the contact
 	 * It caches its result for the same script execution to prevent duplicate calls
 	 *
-	 * @param string $url The profile link
-	 * @param int $uid User id
-	 * @param array $default If not data was found take this data as default value
+	 * @param string $url     The profile link
+	 * @param int    $uid     User id
+	 * @param array  $default If not data was found take this data as default value
 	 *
 	 * @return array Contact data
 	 */
@@ -197,47 +186,47 @@ class Contact extends BaseObject
 		$ssl_url = str_replace('http://', 'https://', $url);
 
 		// Fetch contact data from the contact table for the given user
-		$s = dba::p("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-		FROM `contact` WHERE `nurl` = ? AND `uid` = ?", normalise_link($url), $uid);
+		$fields = array('`id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+		`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`');
+		$s = dba::select('contact', $fields, array('nurl' => normalise_link($url), 'uid' => $uid));
 		$r = dba::inArray($s);
 
 		// Fetch contact data from the contact table for the given user, checking with the alias
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-				`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = ?", normalise_link($url), $url, $ssl_url, $uid);
+			$fields = array('`id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`');
+			dba::select('contact', $fields, array('`alias` IN (?, ?, ?) AND `uid` = ?', normalise_link($url), $url, $ssl_url, $uid));
 			$r = dba::inArray($s);
 		}
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically)
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `nurl` = ? AND `uid` = 0", normalise_link($url));
+			$fields = array('`id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`');
+			$s = dba::select('contact', $fields, array('nurl' => normalise_link($url), 'uid' => 0));
 			$r = dba::inArray($s);
 		}
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically) - checked with the alias
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = 0", normalise_link($url), $url, $ssl_url);
+			$fields = array('`id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`');
+			$s = dba::select('contact', $fields, array('`alias` IN (?, ?, ?) AND `uid` = 0', normalise_link($url), $url, $ssl_url));
 			$r = dba::inArray($s);
 		}
 
 		// Fetch the data from the gcontact table
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
-			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
-			FROM `gcontact` WHERE `nurl` = ?", normalise_link($url));
+			$fields = array('0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `` AS `xmpp`,
+			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`');
+			$s = dba::select('gcontact', $fields, array('nurl' => normalise_link($url)));
 			$r = dba::inArray($s);
 		}
 
 		if (DBM::is_result($r)) {
 			// If there is more than one entry we filter out the connector networks
 			if (count($r) > 1) {
-				foreach ($r AS $id => $result) {
+				foreach ($r as $id => $result) {
 					if ($result["network"] == NETWORK_STATUSNET) {
 						unset($r[$id]);
 					}
@@ -291,8 +280,9 @@ class Contact extends BaseObject
 			$profile["micro"] = $profile["thumb"];
 		}
 
-		if ((($profile["addr"] == "") || ($profile["name"] == "")) && ($profile["gid"] != 0) &&
-			in_array($profile["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
+		if ((($profile["addr"] == "") || ($profile["name"] == "")) && ($profile["gid"] != 0)
+			&& in_array($profile["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))
+		) {
 			Worker::add(PRIORITY_LOW, "UpdateGContact", $profile["gid"]);
 		}
 
@@ -315,7 +305,7 @@ class Contact extends BaseObject
 	 * The function looks at several places (contact table and gcontact table) for the contact
 	 *
 	 * @param string $addr The profile link
-	 * @param int $uid User id
+	 * @param int    $uid  User id
 	 *
 	 * @return array Contact data
 	 */
@@ -332,21 +322,23 @@ class Contact extends BaseObject
 		}
 
 		// Fetch contact data from the contact table for the given user
-		$r = q("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-		FROM `contact` WHERE `addr` = '%s' AND `uid` = %d", dbesc($addr), intval($uid));
+		$fields = array('`id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+		`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`');
+		$r = dba::select('contact', $fields, array('addr' => $addr, 'uid' => $uid));
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically)
-		if (!DBM::is_result($r))
-			$r = q("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `addr` = '%s' AND `uid` = 0", dbesc($addr));
+		if (!DBM::is_result($r)) {
+			$fields = array('`id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`');
+			$r = dba::select('contact', $fields, array('addr' => $addr, 'uid' => 0));
+		}
 
 		// Fetch the data from the gcontact table
-		if (!DBM::is_result($r))
-			$r = q("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
-			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
-			FROM `gcontact` WHERE `addr` = '%s'", dbesc($addr));
+		if (!DBM::is_result($r)) {
+			$fields = array('0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `` AS `xmpp`,
+			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`');
+			$r = dba::select('gcontact', $fields, array('addr' => $addr));
+		}
 
 		if (!DBM::is_result($r)) {
 			$data = Probe::uri($addr);
@@ -362,8 +354,8 @@ class Contact extends BaseObject
 	/**
 	 * @brief Returns the data array for the photo menu of a given contact
 	 *
-	 * @param array $contact
-	 * @param int $uid
+	 * @param array $contact contact
+	 * @param int   $uid     optional, default 0
 	 * @return array
 	 */
 	public static function photoMenu(array $contact, $uid = 0)
@@ -386,12 +378,12 @@ class Contact extends BaseObject
 		if ($contact['uid'] != $uid) {
 			if ($uid == 0) {
 				$profile_link = zrl($contact['url']);
-				$menu = Array('profile' => array(t('View Profile'), $profile_link, true));
+				$menu = array('profile' => array(t('View Profile'), $profile_link, true));
 
 				return $menu;
 			}
 
-			$r = q("SELECT * FROM `contact` WHERE `nurl` = '%s' AND `network` = '%s' AND `uid` = %d", dbesc($contact['nurl']), dbesc($contact['network']), intval($uid));
+			$r = dba::select('contact', array(), array('nurl' => $contact['nurl'], 'network' => $contact['network'], 'uid' => $uid));
 			if ($r) {
 				return self::photoMenu($r[0], $uid);
 			} else {
@@ -438,7 +430,7 @@ class Contact extends BaseObject
 		$contact_drop_link = System::baseUrl() . '/contacts/' . $contact['id'] . '/drop?confirm=1';
 
 		/**
-		 * menu array:
+		 * Menu array:
 		 * "name" => [ "Label", "link", (bool)Should the link opened in a new tab? ]
 		 */
 		$menu = array(
@@ -459,7 +451,7 @@ class Contact extends BaseObject
 
 		$menucondensed = array();
 
-		foreach ($menu AS $menuname => $menuitem) {
+		foreach ($menu as $menuname => $menuitem) {
 			if ($menuitem[1] != '') {
 				$menucondensed[$menuname] = $menuitem;
 			}
@@ -469,47 +461,29 @@ class Contact extends BaseObject
 	}
 
 	/**
+	 * @brief Returns ungrouped contact count or list for user
+	 *
 	 * Returns either the total number of ungrouped contacts for the given user
 	 * id or a paginated list of ungrouped contacts.
 	 *
-	 * @brief Returns ungrouped contact count or list for user
+	 * @param int $uid   uid
+	 * @param int $start optional, default 0
+	 * @param int $count optional, default 0
 	 *
-	 * @param int $uid
-	 * @param int $start
-	 * @param int $count
 	 * @return array
 	 */
 	public static function getUngroupedList($uid, $start = 0, $count = 0)
 	{
 		if (!$count) {
-			$r = q(
-				"SELECT COUNT(*) AS `total`
-				 FROM `contact`
-				 WHERE `uid` = %d
-				 AND `self` = 0
-				 AND `id` NOT IN (
-					SELECT DISTINCT(`contact-id`)
-					FROM `group_member`
-					WHERE `uid` = %d
-				) ", intval($uid), intval($uid)
-			);
+			$fields = array('COUNT(*) AS `total`');
+			$condition = array('`uid` = ? AND `self` = 0 AND `id` NOT IN (SELECT DISTINCT(`contact-id`)	FROM `group_member`	WHERE `uid` = ?', $uid, $uid);
+			$r = dba::select('contact', $fields, $condition);
 
 			return $r;
 		}
 
-		$r = q(
-			"SELECT *
-			FROM `contact`
-			WHERE `uid` = %d
-			AND `self` = 0
-			AND `id` NOT IN (
-				SELECT DISTINCT(`contact-id`)
-				FROM `group_member` WHERE `uid` = %d
-			)
-			AND `blocked` = 0
-			AND `pending` = 0
-			LIMIT %d, %d", intval($uid), intval($uid), intval($start), intval($count)
-		);
+		$innerCondition = array('`id` NOT IN (SELECT DISTINCT(`contact-id`) FROM `group_member` WHERE `uid` = ?', $uid);
+		$r = dba::select('contact', array(), array('uid' => $uid, 'self' => 0, $innerCondition, 'blocked' => 0, 'pending' => 0), array('limit ?, ?', $start, $count));
 
 		return $r;
 	}
@@ -532,8 +506,8 @@ class Contact extends BaseObject
 	 * Fourth, we update the existing record with the new data (avatar, alias, nick)
 	 * if there's any updates
 	 *
-	 * @param string $url Contact URL
-	 * @param integer $uid The user id for the contact (0 = public contact)
+	 * @param string  $url       Contact URL
+	 * @param integer $uid       The user id for the contact (0 = public contact)
 	 * @param boolean $no_update Don't update the contact
 	 *
 	 * @return integer Contact ID
@@ -561,7 +535,7 @@ class Contact extends BaseObject
 		if (!DBM::is_result($contact)) {
 			// The link could be provided as http although we stored it as https
 			$ssl_url = str_replace('http://', 'https://', $url);
-			$r = dba::p("SELECT `id`, `avatar-date` FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = ? LIMIT 1", $url, normalise_link($url), $ssl_url, $uid);
+			$r = dba::select('contact', array('id', 'avatar-date'), array('`alias` IN (?, ?, ?) AND `uid` = ?', $url, normalise_link($url), $ssl_url, $uid), array('limit' => 1));
 			$contact = dba::fetch($r);
 			dba::close($r);
 		}
@@ -608,7 +582,8 @@ class Contact extends BaseObject
 
 		$url = $data["url"];
 		if (!$contact_id) {
-			dba::insert('contact', array('uid' => $uid, 'created' => datetime_convert(), 'url' => $data["url"],
+			dba::insert(
+				'contact', array('uid' => $uid, 'created' => datetime_convert(), 'url' => $data["url"],
 				'nurl' => normalise_link($data["url"]), 'addr' => $data["addr"],
 				'alias' => $data["alias"], 'notify' => $data["notify"], 'poll' => $data["poll"],
 				'name' => $data["name"], 'nick' => $data["nick"], 'photo' => $data["photo"],
@@ -619,9 +594,10 @@ class Contact extends BaseObject
 				'confirm' => $data["confirm"], 'poco' => $data["poco"],
 				'name-date' => datetime_convert(), 'uri-date' => datetime_convert(),
 				'avatar-date' => datetime_convert(), 'writable' => 1, 'blocked' => 0,
-				'readonly' => 0, 'pending' => 0));
+				'readonly' => 0, 'pending' => 0)
+			);
 
-			$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2", dbesc(normalise_link($data["url"])), intval($uid));
+			$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2", dbesc(normalise_link($data["url"])), intval($uid)); 
 			if (!DBM::is_result($contacts)) {
 				return 0;
 			}
@@ -735,7 +711,6 @@ class Contact extends BaseObject
 	/**
 	 * @brief Returns posts from a given contact url
 	 *
-	 * @param App $a argv application class
 	 * @param string $contact_url Contact URL
 	 *
 	 * @return string posts in HTML
@@ -746,8 +721,7 @@ class Contact extends BaseObject
 
 		// There are no posts with "uid = 0" with connector networks
 		// This speeds up the query a lot
-		$r = q("SELECT `network`, `id` AS `author-id`, `contact-type` FROM `contact`
-		WHERE `contact`.`nurl` = '%s' AND `contact`.`uid` = 0", dbesc(normalise_link($contact_url)));
+		$r = dba::select('contact', array('network', 'id AS author-id', 'contact-type'), array('nurl' => normalise_link($contact_url), 'uid' => 0));
 
 		if (!DBM::is_result($r)) {
 			return '';
@@ -790,8 +764,7 @@ class Contact extends BaseObject
 		// "page-flags" is a field in the user table,
 		// "forum" and "prv" are used in the contact table. They stand for PAGE_COMMUNITY and PAGE_PRVGROUP.
 		// "community" is used in the gcontact table and is true if the contact is PAGE_COMMUNITY or PAGE_PRVGROUP.
-		if (
-			(isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_COMMUNITY))
+		if ((isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_COMMUNITY))
 			|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_PRVGROUP))
 			|| (isset($contact['forum']) && intval($contact['forum']))
 			|| (isset($contact['prv']) && intval($contact['prv']))
