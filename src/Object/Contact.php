@@ -35,18 +35,16 @@ class Contact extends BaseObject
 	public static function remove($id)
 	{
 		// We want just to make sure that we don't delete our "self" contact
-		$r = q(
-			"SELECT `uid` FROM `contact` WHERE `id` = %d AND NOT `self` LIMIT 1", intval($id)
-		);
+		$condition = array('`id` = ? AND NOT `self`', $id);
+		$r = dba::select('contact', array('uid'), $condition, array('limit' => 1));
+
 		if (!DBM::is_result($r) || !intval($r[0]['uid'])) {
 			return;
 		}
 
 		$archive = PConfig::get($r[0]['uid'], 'system', 'archive_removed_contacts');
 		if ($archive) {
-			q(
-				"UPDATE `contact` SET `archive` = 1, `network` = 'none', `writable` = 0 WHERE id = %d", intval($id)
-			);
+			dba::update('contact', array('archive' => 1, 'network' => 'none', 'writable' => 0), array('id' => $id));
 			return;
 		}
 
@@ -102,15 +100,10 @@ class Contact extends BaseObject
 		}
 
 		if ($contact['term-date'] <= NULL_DATE) {
-			q(
-				"UPDATE `contact` SET `term-date` = '%s' WHERE `id` = %d", dbesc(datetime_convert()), intval($contact['id'])
-			);
+			dba::update('contact', array('term-date' => datetime_convert()), array('id' => $contact['id']));
 
 			if ($contact['url'] != '') {
-				q(
-					"UPDATE `contact` SET `term-date` = '%s'
-				WHERE `nurl` = '%s' AND `term-date` <= '1000-00-00'", dbesc(datetime_convert()), dbesc(normalise_link($contact['url']))
-				);
+				dba::update('contact', array('term-date' => datetime_convert()), array('nurl' => normalise_link($contact['url']), 'term-date' <= NULL_DATE));
 			}
 		} else {
 			/* @todo
@@ -126,14 +119,10 @@ class Contact extends BaseObject
 				 * delete, though if the owner tries to unarchive them we'll start
 				 * the whole process over again.
 				 */
-				q(
-					"UPDATE `contact` SET `archive` = 1 WHERE `id` = %d", intval($contact['id'])
-				);
+				dba::update('contact', array('archive' => 1), array('id' => $contact['id']));
 
 				if ($contact['url'] != '') {
-					q(
-						"UPDATE `contact` SET `archive` = 1 WHERE `nurl` = '%s'", dbesc(normalise_link($contact['url']))
-					);
+					dba::update('contact', array('archive' => 1), array('nurl' => normalise_link($contact['url'])));
 				}
 			}
 		}
@@ -149,9 +138,8 @@ class Contact extends BaseObject
 	 */
 	public static function unmarkForArchival(array $contact)
 	{
-		$r = q(
-			"SELECT `term-date` FROM `contact` WHERE `id` = %d AND (`term-date` > '%s' OR `archive`)", intval($contact['id']), dbesc('1000-00-00 00:00:00')
-		);
+		$condition = array('`id` => ? AND (`term-date` > ? OR `archive`)', $contact[`id`], NULL_DATE);
+		$r = dba::select('contact', array('term-date'), $condition);
 
 		// We don't need to update, we never marked this contact for archival
 		if (!DBM::is_result($r)) {
@@ -393,7 +381,7 @@ class Contact extends BaseObject
 				return $menu;
 			}
 
-			$r = q("SELECT * FROM `contact` WHERE `nurl` = '%s' AND `network` = '%s' AND `uid` = %d", dbesc($contact['nurl']), dbesc($contact['network']), intval($uid));
+			$r = dba::select('contact', array(), array('nurl' => $contact['nurl'], 'network' => $contact['network'], 'uid' => $uid));
 			if ($r) {
 				return self::photoMenu($r[0], $uid);
 			} else {
@@ -485,34 +473,15 @@ class Contact extends BaseObject
 	public static function getUngroupedList($uid, $start = 0, $count = 0)
 	{
 		if (!$count) {
-			$r = q(
-				"SELECT COUNT(*) AS `total`
-				 FROM `contact`
-				 WHERE `uid` = %d
-				 AND `self` = 0
-				 AND `id` NOT IN (
-					SELECT DISTINCT(`contact-id`)
-					FROM `group_member`
-					WHERE `uid` = %d
-				) ", intval($uid), intval($uid)
-			);
+			$fields = array('COUNT(*) AS `total`');
+			$condition = array('`uid` = ? AND `self` = 0 AND `id` NOT IN (SELECT DISTINCT(`contact-id`)	FROM `group_member`	WHERE `uid` = ?', $uid, $uid);
+			$r = dba::select('contact', $fields, $condition);
 
 			return $r;
 		}
 
-		$r = q(
-			"SELECT *
-			FROM `contact`
-			WHERE `uid` = %d
-			AND `self` = 0
-			AND `id` NOT IN (
-				SELECT DISTINCT(`contact-id`)
-				FROM `group_member` WHERE `uid` = %d
-			)
-			AND `blocked` = 0
-			AND `pending` = 0
-			LIMIT %d, %d", intval($uid), intval($uid), intval($start), intval($count)
-		);
+		$innerCondition = array('`id` NOT IN (SELECT DISTINCT(`contact-id`) FROM `group_member` WHERE `uid` = ?', $uid);
+		$r = dba::select('contact', array(), array('uid' => $uid, 'self' => 0, $innerCondition, 'blocked' => 0, 'pending' => 0), array('limit ?, ?', $start, $count));
 
 		return $r;
 	}
@@ -564,7 +533,7 @@ class Contact extends BaseObject
 		if (!DBM::is_result($contact)) {
 			// The link could be provided as http although we stored it as https
 			$ssl_url = str_replace('http://', 'https://', $url);
-			$r = dba::p("SELECT `id`, `avatar-date` FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = ? LIMIT 1", $url, normalise_link($url), $ssl_url, $uid);
+			$r = dba::select('contact', array('id', 'avatar-date'), array('`alias` IN (?, ?, ?) AND `uid` = ?', $url, normalise_link($url), $ssl_url, $uid), array('limit' => 1));
 			$contact = dba::fetch($r);
 			dba::close($r);
 		}
@@ -611,7 +580,8 @@ class Contact extends BaseObject
 
 		$url = $data["url"];
 		if (!$contact_id) {
-			dba::insert('contact', array('uid' => $uid, 'created' => datetime_convert(), 'url' => $data["url"],
+			dba::insert(
+				'contact', array('uid' => $uid, 'created' => datetime_convert(), 'url' => $data["url"],
 				'nurl' => normalise_link($data["url"]), 'addr' => $data["addr"],
 				'alias' => $data["alias"], 'notify' => $data["notify"], 'poll' => $data["poll"],
 				'name' => $data["name"], 'nick' => $data["nick"], 'photo' => $data["photo"],
@@ -622,7 +592,8 @@ class Contact extends BaseObject
 				'confirm' => $data["confirm"], 'poco' => $data["poco"],
 				'name-date' => datetime_convert(), 'uri-date' => datetime_convert(),
 				'avatar-date' => datetime_convert(), 'writable' => 1, 'blocked' => 0,
-				'readonly' => 0, 'pending' => 0));
+				'readonly' => 0, 'pending' => 0)
+			);
 
 			$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2", dbesc(normalise_link($data["url"])), intval($uid));
 			if (!DBM::is_result($contacts)) {
@@ -792,8 +763,7 @@ class Contact extends BaseObject
 		// "page-flags" is a field in the user table,
 		// "forum" and "prv" are used in the contact table. They stand for PAGE_COMMUNITY and PAGE_PRVGROUP.
 		// "community" is used in the gcontact table and is true if the contact is PAGE_COMMUNITY or PAGE_PRVGROUP.
-		if (
-			(isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_COMMUNITY))
+		if ((isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_COMMUNITY))
 			|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_PRVGROUP))
 			|| (isset($contact['forum']) && intval($contact['forum']))
 			|| (isset($contact['prv']) && intval($contact['prv']))
