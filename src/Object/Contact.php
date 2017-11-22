@@ -186,40 +186,40 @@ class Contact extends BaseObject
 		$ssl_url = str_replace('http://', 'https://', $url);
 
 		// Fetch contact data from the contact table for the given user
-		$s = dba::p("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-		FROM `contact` WHERE `nurl` = ? AND `uid` = ?", normalise_link($url), $uid);
+		$fields = array('`id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+		`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`');
+		$s = dba::select('contact', $fields, array('nurl' => normalise_link($url), 'uid' => $uid));
 		$r = dba::inArray($s);
 
 		// Fetch contact data from the contact table for the given user, checking with the alias
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-				`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = ?", normalise_link($url), $url, $ssl_url, $uid);
+			$fields = array('`id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`');
+			dba::select('contact', $fields, array('`alias` IN (?, ?, ?) AND `uid` = ?', normalise_link($url), $url, $ssl_url, $uid));
 			$r = dba::inArray($s);
 		}
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically)
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `nurl` = ? AND `uid` = 0", normalise_link($url));
+			$fields = array('`id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`');
+			$s = dba::select('contact', $fields, array('nurl' => normalise_link($url), 'uid' => 0));
 			$r = dba::inArray($s);
 		}
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically) - checked with the alias
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = 0", normalise_link($url), $url, $ssl_url);
+			$fields = array('`id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`');
+			$s = dba::select('contact', $fields, array('`alias` IN (?, ?, ?) AND `uid` = 0', normalise_link($url), $url, $ssl_url));
 			$r = dba::inArray($s);
 		}
 
 		// Fetch the data from the gcontact table
 		if (!DBM::is_result($r)) {
-			$s = dba::p("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
-			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
-			FROM `gcontact` WHERE `nurl` = ?", normalise_link($url));
+			$fields = array('0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `` AS `xmpp`,
+			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`');
+			$s = dba::select('gcontact', $fields, array('nurl' => normalise_link($url)));
 			$r = dba::inArray($s);
 		}
 
@@ -322,21 +322,23 @@ class Contact extends BaseObject
 		}
 
 		// Fetch contact data from the contact table for the given user
-		$r = q("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-		FROM `contact` WHERE `addr` = '%s' AND `uid` = %d", dbesc($addr), intval($uid));
+		$fields = array('`id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+		`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`');
+		$r = dba::select('contact', $fields, array('addr' => $addr, 'uid' => $uid));
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically)
-		if (!DBM::is_result($r))
-			$r = q("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
-			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `addr` = '%s' AND `uid` = 0", dbesc($addr));
+		if (!DBM::is_result($r)) {
+			$fields = array('`id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
+			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`');
+			$r = dba::select('contact', $fields, array('addr' => $addr, 'uid' => 0));
+		}
 
 		// Fetch the data from the gcontact table
-		if (!DBM::is_result($r))
-			$r = q("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
-			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
-			FROM `gcontact` WHERE `addr` = '%s'", dbesc($addr));
+		if (!DBM::is_result($r)) {
+			$fields = array('0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `` AS `xmpp`,
+			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`');
+			$r = dba::select('gcontact', $fields, array('addr' => $addr));
+		}
 
 		if (!DBM::is_result($r)) {
 			$data = Probe::uri($addr);
@@ -595,7 +597,7 @@ class Contact extends BaseObject
 				'readonly' => 0, 'pending' => 0)
 			);
 
-			$contacts = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d ORDER BY `id` LIMIT 2", dbesc(normalise_link($data["url"])), intval($uid));
+			$contacts = dba::select('contact', array('id'), array('nurl' => normalise_link($data["url"]), 'uid' => $uid), array('order' => 'id', 'limit' => 2));
 			if (!DBM::is_result($contacts)) {
 				return 0;
 			}
@@ -719,8 +721,7 @@ class Contact extends BaseObject
 
 		// There are no posts with "uid = 0" with connector networks
 		// This speeds up the query a lot
-		$r = q("SELECT `network`, `id` AS `author-id`, `contact-type` FROM `contact`
-		WHERE `contact`.`nurl` = '%s' AND `contact`.`uid` = 0", dbesc(normalise_link($contact_url)));
+		$r = dba::select('contact', array('network', 'id AS author-id', 'contact-type'), array('contact.nurl' => normalise_link($contact_url), 'contact.uid' => 0));
 
 		if (!DBM::is_result($r)) {
 			return '';
