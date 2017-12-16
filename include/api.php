@@ -236,6 +236,7 @@ function api_login(App $a)
 	authenticate_success($record);
 
 	$_SESSION["allow_api"] = true;
+	$_SESSION["api_user_id"] = Contact::getIdForURL($_SESSION['my_url'], 0, true);;
 
 	call_hooks('logged_in', $a->user);
 }
@@ -652,7 +653,7 @@ function api_get_user(App $a, $contact_id = null)
 				'statusnet_profile_url' => $r[0]["url"],
 				'uid' => 0,
 				'cid' => Contact::getIdForURL($r[0]["url"], api_user(), true),
-				'self' => 0,
+				'self' => $r[0]["id"] == $_SESSION['api_user_id'] ? 1 : 0,
 				'network' => $r[0]["network"],
 			);
 
