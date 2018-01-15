@@ -1,0 +1,128 @@
+#!/usr/bin/env php
+<?php
+
+namespace vierbergenlars\SemVer\Application\SemVer;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use vierbergenlars\SemVer\version;
+use vierbergenlars\SemVer\expression;
+use vierbergenlars\SemVer\SemVerException;
+
+$version = false;
+$range = array();
+$increment = false;
+
+// Get all arguments
+while (\count($argv) > 0) {
+    $arg = \array_shift($argv);
+    switch ($arg) {
+        case '-v':
+        case '--version':
+            $version[] = \array_shift($argv);
+            break;
+        case '-r':
+        case '--range':
+            $range[] = \array_shift($argv);
+            break;
+        case '-i':
+        case '--increment':
+            $increment = \array_shift($argv);
+            break;
+        case '-?':
+        case '-h':
+        case '--help':
+            help();
+            break;
+    }
+}
+main();
+
+function help() {
+    $e = array(
+        'Usage: semver -v|--version <version> [options]'
+        , ''
+        , '  -r <range>			Test if version satisfies the supplied range.'
+        , '  --range <range>'
+        , '  -i [major|minor|patch|build]	Increment the given version number.'
+        , '  --increment [major|minor|patch|build]'
+        , ''
+        , 'Multiple versions or ranges may be supplied.'
+        , ''
+        , 'Program exits successfully if any valid version satisfies'
+        , 'all supplied ranges, and prints all satisfying versions.'
+        , ''
+        , 'If no versions are valid, or ranges are not satisfied,'
+        , 'then exits failure.'
+        , ''
+        , 'Versions are printed in ascending order, so supplying'
+        , 'multiple versions to the utility will just sort them.'
+    );
+    echo \implode(PHP_EOL, $e);
+    exit;
+}
+
+function main() {
+    global $version, $range, $increment;
+    if ($increment !== false) {
+        increment($version[0], $increment);
+    }
+    if ($version !== false) {
+        filter($version, $range);
+    }
+    help();
+}
+
+function fail($message = '') {
+    fwrite(STDERR, $message);
+    exit(1);
+}
+
+function increment($version, $what) {
+    if (\file_exists($version))
+        $version = \file_get_contents($version);
+    if ($version == '-')
+        $version = \fgets(STDIN);
+    try {
+        $v = new version($version);
+        echo $v->inc($what);
+        exit;
+    } catch (SemVerException $e) {
+        fail($e->getMessage());
+    }
+}
+
+function filter($versions, $ranges) {
+    if (\file_exists($versions[0]))
+        $versions = \file($versions[0], \FILE_IGNORE_NEW_LINES | \FILE_SKIP_EMPTY_LINES);
+    if ($versions[0] == '-') {
+        unset($versions[0]);
+        while ($version = \fgets(\STDIN)) {
+            $versions[] = $version;
+        }
+    }
+    $matching_versions = array();
+    foreach ($versions as $version) {
+        $ok = true;
+        try {
+            $v = new version($version);
+            foreach ($ranges as $range) {
+                if ($v->satisfies(new expression($range)))
+                    continue;
+                $ok = false;
+                break;
+            }
+            if ($ok)
+                $matching_versions[] = $v;
+        } catch (SemVerException $e) {
+
+        }
+    }
+    \usort($matching_versions, '\\vierbergenlars\\SemVer\\version::compare');
+    foreach ($matching_versions as $version) {
+        echo $version . PHP_EOL;
+    }
+    if (\count($matching_versions) == 0)
+        fail();
+    exit;
+}

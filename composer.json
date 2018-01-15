@@ -21,7 +21,8 @@
 		"pear-pear.php.net/Text_Highlighter": "*",
 		"paragonie/random_compat": "^2.0",
 		"smarty/smarty": "^3.1",
-		"michelf/php-markdown": "^1.7"
+		"michelf/php-markdown": "^1.7",
+		"beelab/bowerphp": "^0.5.3"
 	},
 	"repositories": [
         {
