@@ -1,0 +1,11 @@
+{
+    "name": "Friendica",
+    "authors": [
+        "Hypolite Petovan <mrpetovan@gmail.com>",
+        null
+    ],
+    "private": true,
+    "dependencies": {
+        "Chart-js": "*"
+    }
+}
