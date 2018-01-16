@@ -1,16 +1,13 @@
 <?php
-
 /**
  * @file mod/statistics_json.php
  */
-
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 
-require_once("include/plugin.php");
-
-function statistics_json_init(App $a) {
-
+function statistics_json_init(App $a)
+{
 	if (!Config::get("system", "nodeinfo")) {
 		http_status_exit(404);
 		killme();
@@ -28,19 +25,19 @@ function statistics_json_init(App $a) {
 	];
 
 	$statistics["services"] = [];
-	$statistics["services"]["appnet"] = plugin_enabled("appnet");
-	$statistics["services"]["blogger"] = plugin_enabled("blogger");
-	$statistics["services"]["buffer"] = plugin_enabled("buffer");
-	$statistics["services"]["dreamwidth"] = plugin_enabled("dwpost");
-	$statistics["services"]["facebook"] = plugin_enabled("fbpost");
-	$statistics["services"]["gnusocial"] = plugin_enabled("statusnet");
-	$statistics["services"]["googleplus"] = plugin_enabled("gpluspost");
-	$statistics["services"]["libertree"] = plugin_enabled("libertree");
-	$statistics["services"]["livejournal"] = plugin_enabled("ljpost");
-	$statistics["services"]["pumpio"] = plugin_enabled("pumpio");
-	$statistics["services"]["twitter"] = plugin_enabled("twitter");
-	$statistics["services"]["tumblr"] = plugin_enabled("tumblr");
-	$statistics["services"]["wordpress"] = plugin_enabled("wppost");
+	$statistics["services"]["appnet"] = Addon::isEnabled("appnet");
+	$statistics["services"]["blogger"] = Addon::isEnabled("blogger");
+	$statistics["services"]["buffer"] = Addon::isEnabled("buffer");
+	$statistics["services"]["dreamwidth"] = Addon::isEnabled("dwpost");
+	$statistics["services"]["facebook"] = Addon::isEnabled("fbpost");
+	$statistics["services"]["gnusocial"] = Addon::isEnabled("statusnet");
+	$statistics["services"]["googleplus"] = Addon::isEnabled("gpluspost");
+	$statistics["services"]["libertree"] = Addon::isEnabled("libertree");
+	$statistics["services"]["livejournal"] = Addon::isEnabled("ljpost");
+	$statistics["services"]["pumpio"] = Addon::isEnabled("pumpio");
+	$statistics["services"]["twitter"] = Addon::isEnabled("twitter");
+	$statistics["services"]["tumblr"] = Addon::isEnabled("tumblr");
+	$statistics["services"]["wordpress"] = Addon::isEnabled("wppost");
 
 	$statistics["appnet"] = $statistics["services"]["appnet"];
 	$statistics["blogger"] = $statistics["services"]["blogger"];

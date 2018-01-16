@@ -182,13 +182,13 @@ function load_hooks() {
  * @param string $name of the hook to call
  * @param string|array &$data to transmit to the callback handler
  */
-function call_hooks($name, &$data = null)
+function Addon::callHooks($name, &$data = null)
 {
 	$a = get_app();
 
 	if (is_array($a->hooks) && array_key_exists($name, $a->hooks)) {
 		foreach ($a->hooks[$name] as $hook) {
-			call_single_hook($a, $name, $hook, $data);
+			Addon::callSingleHook(($a, $name, $hook, $data);
 		}
 	}
 }
@@ -200,7 +200,7 @@ function call_hooks($name, &$data = null)
  * @param array $hook Hook data
  * @param string|array &$data to transmit to the callback handler
  */
-function call_single_hook($a, $name, $hook, &$data = null) {
+function Addon::callSingleHook(($a, $name, $hook, &$data = null) {
 	// Don't run a theme's hook if the user isn't using the theme
 	if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/'.current_theme()) === false)
 		return;

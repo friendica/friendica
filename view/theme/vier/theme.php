@@ -11,6 +11,7 @@
 
 use Friendica\App;
 use Friendica\Content\ForumManager;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -309,39 +310,38 @@ function vier_community_info() {
 
 	// connectable services
 	if ($show_services) {
-
 		/// @TODO This whole thing is hard-coded, better rewrite to Intercepting Filter Pattern (future-todo)
 		$r = [];
 
-		if (plugin_enabled("appnet")) {
+		if (Addon::isEnabled("appnet")) {
 			$r[] = ["photo" => "images/appnet.png", "name" => "App.net"];
 		}
 
-		if (plugin_enabled("buffer")) {
+		if (Addon::isEnabled("buffer")) {
 			$r[] = ["photo" => "images/buffer.png", "name" => "Buffer"];
 		}
 
-		if (plugin_enabled("blogger")) {
+		if (Addon::isEnabled("blogger")) {
 			$r[] = ["photo" => "images/blogger.png", "name" => "Blogger"];
 		}
 
-		if (plugin_enabled("dwpost")) {
+		if (Addon::isEnabled("dwpost")) {
 			$r[] = ["photo" => "images/dreamwidth.png", "name" => "Dreamwidth"];
 		}
 
-		if (plugin_enabled("fbpost")) {
+		if (Addon::isEnabled("fbpost")) {
 			$r[] = ["photo" => "images/facebook.png", "name" => "Facebook"];
 		}
 
-		if (plugin_enabled("ifttt")) {
+		if (Addon::isEnabled("ifttt")) {
 			$r[] = ["photo" => "addon/ifttt/ifttt.png", "name" => "IFTTT"];
 		}
 
-		if (plugin_enabled("statusnet")) {
+		if (Addon::isEnabled("statusnet")) {
 			$r[] = ["photo" => "images/gnusocial.png", "name" => "GNU Social"];
 		}
 
-		if (plugin_enabled("gpluspost")) {
+		if (Addon::isEnabled("gpluspost")) {
 			$r[] = ["photo" => "images/googleplus.png", "name" => "Google+"];
 		}
 
@@ -350,7 +350,7 @@ function vier_community_info() {
 		//	$r[] = array("photo" => "images/", "name" => "");
 		//}
 
-		if (plugin_enabled("libertree")) {
+		if (Addon::isEnabled("libertree")) {
 			$r[] = ["photo" => "images/libertree.png", "name" => "Libertree"];
 		}
 
@@ -358,19 +358,19 @@ function vier_community_info() {
 		//	$r[] = array("photo" => "images/", "name" => "");
 		//}
 
-		if (plugin_enabled("pumpio")) {
+		if (Addon::isEnabled("pumpio")) {
 			$r[] = ["photo" => "images/pumpio.png", "name" => "pump.io"];
 		}
 
-		if (plugin_enabled("tumblr")) {
+		if (Addon::isEnabled("tumblr")) {
 			$r[] = ["photo" => "images/tumblr.png", "name" => "Tumblr"];
 		}
 
-		if (plugin_enabled("twitter")) {
+		if (Addon::isEnabled("twitter")) {
 			$r[] = ["photo" => "images/twitter.png", "name" => "Twitter"];
 		}
 
-		if (plugin_enabled("wppost")) {
+		if (Addon::isEnabled("wppost")) {
 			$r[] = ["photo" => "images/wordpress.png", "name" => "Wordpress"];
 		}
 

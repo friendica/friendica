@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
+use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\System;
 use Friendica\Core\PConfig;
@@ -138,7 +139,7 @@ function ping_init(App $a)
 
 		if (DBM::is_result($items_unseen)) {
 			$arr = ['items' => $items_unseen];
-			call_hooks('network_ping', $arr);
+			Addon::callHooks('network_ping', $arr);
 
 			foreach ($items_unseen as $item) {
 				if ($item['wall']) {

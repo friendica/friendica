@@ -6,6 +6,7 @@ namespace Friendica\Content;
 
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
@@ -57,7 +58,7 @@ class Nav
 			'$search_hint' => t('@name, !forum, #tags, content')
 		]);
 	
-		call_hooks('page_header', $a->page['nav']);
+		Addon::callHooks('page_header', $a->page['nav']);
 	}
 	
 	/**
@@ -224,7 +225,7 @@ class Nav
 			$banner = '<a href="https://friendi.ca"><img id="logo-img" src="images/friendica-32.png" alt="logo" /></a><span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>';
 		}
 	
-		call_hooks('nav_info', $nav);
+		Addon::callHooks('nav_info', $nav);
 	
 		return [
 			'sitelocation' => $sitelocation,

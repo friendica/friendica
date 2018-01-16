@@ -4,6 +4,7 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -138,7 +139,7 @@ Class Cron {
 
 		$sql_extra = (($manual_id) ? " AND `id` = $manual_id " : "");
 
-		reload_plugins();
+		Addon::reload();
 
 		$d = datetime_convert();
 

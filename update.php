@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @file update.php
+ */
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
@@ -79,19 +82,17 @@ function update_1189() {
 	return UPDATE_SUCCESS;
 }
 
-function update_1191() {
-
-	require_once 'include/plugin.php';
-
+function update_1191()
+{
 	Config::set('system', 'maintenance', 1);
 
-	if (plugin_enabled('forumlist')) {
+	if (Addon::isEnabled('forumlist')) {
 		$plugin = 'forumlist';
-		$plugins = Config::get('system','addon');
+		$plugins = Config::get('system', 'addon');
 		$plugins_arr = [];
 
 		if ($plugins) {
-			$plugins_arr = explode(",",str_replace(" ", "",$plugins));
+			$plugins_arr = explode(",", str_replace(" ", "", $plugins));
 
 			$idx = array_search($plugin, $plugins_arr);
 			if ($idx !== false){

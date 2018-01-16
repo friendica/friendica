@@ -15,6 +15,7 @@
  * information.
  */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -50,7 +51,7 @@ function item_post(App $a) {
 		killme();
 	}
 
-	call_hooks('post_local_start', $_REQUEST);
+	Addon::callHooks('post_local_start', $_REQUEST);
 	// logger('postinput ' . file_get_contents('php://input'));
 	logger('postvars ' . print_r($_REQUEST,true), LOGGER_DATA);
 
@@ -783,7 +784,7 @@ function item_post(App $a) {
 		killme();
 	}
 
-	call_hooks('post_local',$datarray);
+	Addon::callHooks('post_local',$datarray);
 
 	if (x($datarray, 'cancel')) {
 		logger('mod_item: post cancelled by plugin.');
@@ -886,7 +887,7 @@ function item_post(App $a) {
 		}
 	}
 
-	call_hooks('post_local_end', $datarray);
+	Addon::callHooks('post_local_end', $datarray);
 
 	if (strlen($emailcc) && $profile_uid == local_user()) {
 		$erecips = explode(',', $emailcc);

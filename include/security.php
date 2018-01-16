@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -157,7 +158,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	}
 
 	if ($login_initial) {
-		call_hooks('logged_in', $a->user);
+		Addon::callHooks('logged_in', $a->user);
 
 		if (($a->module !== 'home') && isset($_SESSION['return_url'])) {
 			goaway(System::baseUrl() . '/' . $_SESSION['return_url']);
