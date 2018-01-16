@@ -8,6 +8,9 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use dba;
+
+require_once 'include/dba.php';
 
 class Addon
 {
