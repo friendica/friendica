@@ -6,7 +6,18 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
+    'Symfony\\Component\\Process\\' => array($vendorDir . '/symfony/process'),
+    'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
+    'Symfony\\Component\\Filesystem\\' => array($vendorDir . '/symfony/filesystem'),
+    'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
+    'Symfony\\Component\\Debug\\' => array($vendorDir . '/symfony/debug'),
+    'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
+    'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
+    'PackageVersions\\' => array($vendorDir . '/samsonasik/package-versions/src/PackageVersions'),
     'Michelf\\' => array($vendorDir . '/michelf/php-markdown/Michelf'),
     'League\\HTMLToMarkdown\\' => array($vendorDir . '/league/html-to-markdown/src'),
+    'Github\\' => array($vendorDir . '/knplabs/github-api/lib/Github'),
     'Friendica\\' => array($baseDir . '/src'),
+    'Bowerphp\\' => array($vendorDir . '/beelab/bowerphp/src/Bowerphp'),
 );

@@ -399,14 +399,9 @@ a {
   color: #00a700;
 }
 .federation-graph {
-  width: 400px;
-  height: 400px;
-  float: right;
-  margin: 20px;
+  margin: 0 auto;
 }
 .federation-network-graph {
-  width: 240px;
-  height: 240px;
   float: left;
   margin: 20px;
 }
