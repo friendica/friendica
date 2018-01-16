@@ -819,20 +819,20 @@ function check_plugins(App $a)
 		$installed = [];
 	}
 
-	$plugins = Config::get('system', 'addon');
-	$plugins_arr = [];
+	$addons = Config::get('system', 'addon');
+	$addons_arr = [];
 
-	if ($plugins) {
-		$plugins_arr = explode(',', str_replace(' ', '', $plugins));
+	if ($addons) {
+		$addons_arr = explode(',', str_replace(' ', '', $addons));
 	}
 
-	$a->plugins = $plugins_arr;
+	$a->plugins = $addons_arr;
 
 	$installed_arr = [];
 
 	if (count($installed)) {
 		foreach ($installed as $i) {
-			if (!in_array($i['name'], $plugins_arr)) {
+			if (!in_array($i['name'], $addons_arr)) {
 				Addon::uninstall($i['name']);
 			} else {
 				$installed_arr[] = $i['name'];
@@ -840,8 +840,8 @@ function check_plugins(App $a)
 		}
 	}
 
-	if (count($plugins_arr)) {
-		foreach ($plugins_arr as $addon) {
+	if (count($addons_arr)) {
+		foreach ($addons_arr as $addon) {
 			if (!in_array($addon, $installed_arr)) {
 				Addon::install($addon);
 			}
