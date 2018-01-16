@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Core\Config;
@@ -195,7 +196,7 @@ function settings_post(App $a)
 	if (($a->argc > 1) && ($a->argv[1] == 'addon')) {
 		check_form_security_token_redirectOnErr('/settings/addon', 'settings_addon');
 
-		call_hooks('plugin_settings_post', $_POST);
+		Addon::callHooks('plugin_settings_post', $_POST);
 		return;
 	}
 
@@ -277,7 +278,7 @@ function settings_post(App $a)
 			}
 		}
 
-		call_hooks('connector_settings_post', $_POST);
+		Addon::callHooks('connector_settings_post', $_POST);
 		return;
 	}
 
@@ -351,7 +352,7 @@ function settings_post(App $a)
 				intval(local_user())
 		);
 
-		call_hooks('display_settings_post', $_POST);
+		Addon::callHooks('display_settings_post', $_POST);
 		goaway('settings/display');
 		return; // NOTREACHED
 	}
@@ -364,7 +365,7 @@ function settings_post(App $a)
 		goaway('settings');
 	}
 
-	call_hooks('settings_post', $_POST);
+	Addon::callHooks('settings_post', $_POST);
 
 	if (x($_POST, 'password') || x($_POST, 'confirm')) {
 		$newpass = $_POST['password'];
@@ -753,7 +754,7 @@ function settings_content(App $a)
 			$settings_addons = t('No Plugin settings configured');
 		}
 
-		call_hooks('plugin_settings', $settings_addons);
+		Addon::callHooks('plugin_settings', $settings_addons);
 
 
 		$tpl = get_markup_template('settings/addons.tpl');
@@ -799,7 +800,7 @@ function settings_content(App $a)
 		}
 
 		$settings_connectors = '';
-		call_hooks('connector_settings', $settings_connectors);
+		Addon::callHooks('connector_settings', $settings_connectors);
 
 		if (is_site_admin()) {
 			$diasp_enabled = t('Built-in support for %s connectivity is %s', t('Diaspora'), ((Config::get('system', 'diaspora_enabled')) ? t('enabled') : t('disabled')));
@@ -871,7 +872,7 @@ function settings_content(App $a)
 			'$submit' => t('Save Settings'),
 		]);
 
-		call_hooks('display_settings', $o);
+		Addon::callHooks('display_settings', $o);
 		return $o;
 	}
 
@@ -1284,7 +1285,7 @@ function settings_content(App $a)
 
 	]);
 
-	call_hooks('settings_form', $o);
+	Addon::callHooks('settings_form', $o);
 
 	$o .= '</form>' . "\r\n";
 

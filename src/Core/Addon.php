@@ -17,7 +17,7 @@ class Addon
 	 * @param string $plugin name of the addon
 	 * @return boolean
 	 */
-	function uninstall_plugin($plugin)
+	public static function uninstallPlugin($plugin)
 	{
 		logger("Addons: uninstalling " . $plugin);
 		dba::delete('addon', ['name' => $plugin]);
@@ -35,7 +35,7 @@ class Addon
 	 * @param string $plugin name of the addon
 	 * @return bool
 	 */
-	function install_plugin($plugin)
+	public static function installPlugin($plugin)
 	{
 		// silently fail if plugin was removed
 
@@ -71,7 +71,7 @@ class Addon
 	/**
 	 * Reload all updated plugins
 	 */
-	function reload_plugins()
+	public static function reload()
 	{
 		$plugins = Config::get('system', 'addon');
 		if (strlen($plugins)) {
@@ -120,7 +120,7 @@ class Addon
 	 * @param string $plugin
 	 * @return boolean
 	 */
-	function plugin_enabled($plugin)
+	public static function isEnabled($plugin)
 	{
 		return dba::exists('addon', ['installed' => true, 'name' => $plugin]);
 	}
@@ -135,7 +135,7 @@ class Addon
 	 * @param int $priority A priority (defaults to 0)
 	 * @return mixed|bool
 	 */
-	function register_hook($hook, $file, $function, $priority = 0)
+	public static function registerHook($hook, $file, $function, $priority = 0)
 	{
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
 		$exists = dba::exists('hook', $condition);
@@ -156,14 +156,14 @@ class Addon
 	 * @param string $function the name of the function that the hook called
 	 * @return array
 	 */
-	function unregister_hook($hook, $file, $function)
+	public static function unregisterHook($hook, $file, $function)
 	{
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
 		$r = dba::delete('hook', $condition);
 		return $r;
 	}
 
-	function load_hooks()
+	public static function loadHooks()
 	{
 		$a = get_app();
 		$a->hooks = [];
@@ -187,13 +187,13 @@ class Addon
 	 * @param string $name of the hook to call
 	 * @param string|array &$data to transmit to the callback handler
 	 */
-	function call_hooks($name, &$data = null)
+	public static function callHooks($name, &$data = null)
 	{
 		$a = get_app();
 
 		if (is_array($a->hooks) && array_key_exists($name, $a->hooks)) {
 			foreach ($a->hooks[$name] as $hook) {
-				call_single_hook($a, $name, $hook, $data);
+				self::callSingleHook($a, $name, $hook, $data);
 			}
 		}
 	}
@@ -205,7 +205,7 @@ class Addon
 	 * @param array $hook Hook data
 	 * @param string|array &$data to transmit to the callback handler
 	 */
-	function call_single_hook($a, $name, $hook, &$data = null)
+	public static function callSingleHook($a, $name, $hook, &$data = null)
 	{
 		// Don't run a theme's hook if the user isn't using the theme
 		if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/'.current_theme()) === false) {
@@ -223,15 +223,13 @@ class Addon
 		}
 	}
 
-	//check if an app_menu hook exist for plugin $name.
-	//Return true if the plugin is an app
 	/**
 	 * Check if an app_menu hook exists for plugin
 	 *
 	 * @param string $name app name
 	 * @return boolean
 	 */
-	function plugin_is_app($name)
+	public static function isApp($name)
 	{
 		$a = get_app();
 
@@ -261,7 +259,7 @@ class Addon
 	* @param string $plugin the name of the plugin
 	* @return array with the plugin information
 	*/
-	function get_plugin_info($plugin)
+	public static function getPluginInfo($plugin)
 	{
 		$a = get_app();
 
@@ -324,7 +322,7 @@ class Addon
 	 * @param string $theme the name of the theme
 	 * @return array
 	 */
-	function get_theme_info($theme)
+	public static function getThemeInfo($theme)
 	{
 		$info=[
 			'name' => $theme,
@@ -396,7 +394,7 @@ class Addon
 	 * @param sring $theme The name of the theme
 	 * @return string
 	 */
-	function get_theme_screenshot($theme)
+	public static function getThemeScreenshot($theme)
 	{
 		$exts = ['.png','.jpg'];
 		foreach ($exts as $ext) {
@@ -413,7 +411,7 @@ class Addon
 	 *
 	 * @param string $theme theme
 	 */
-	function uninstall_theme($theme)
+	public static function uninstallTheme($theme)
 	{
 		logger("Addons: uninstalling theme " . $theme);
 
@@ -429,7 +427,7 @@ class Addon
 	 *
 	 * @param string $theme theme
 	 */
-	function install_theme($theme)
+	public static function installTheme($theme)
 	{
 		// silently fail if theme was removed
 
@@ -462,7 +460,7 @@ class Addon
 	 * @param string $root Full root path
 	 * @return string Path to the file or empty string if the file isn't found
 	 */
-	function theme_include($file, $root = '')
+	public static function themeInclude($file, $root = '')
 	{
 		$file = basename($file);
 

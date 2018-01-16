@@ -8,6 +8,7 @@ namespace Friendica\Model;
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
+use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
@@ -286,7 +287,7 @@ class Profile
 			$profile['network_name'] = '';
 		}
 
-		call_hooks('profile_sidebar_enter', $profile);
+		Addon::callHooks('profile_sidebar_enter', $profile);
 
 
 		// don't show connect link to yourself
@@ -520,7 +521,7 @@ class Profile
 
 		$arr = ['profile' => &$profile, 'entry' => &$o];
 
-		call_hooks('profile_sidebar', $arr);
+		Addon::callHooks('profile_sidebar', $arr);
 
 		return $o;
 	}
@@ -939,7 +940,7 @@ class Profile
 		}
 
 		$arr = ['is_owner' => $is_owner, 'nickname' => $nickname, 'tab' => $tab, 'tabs' => $tabs];
-		call_hooks('profile_tabs', $arr);
+		Addon::callHooks('profile_tabs', $arr);
 
 		$tpl = get_markup_template('common_tabs.tpl');
 
@@ -976,7 +977,7 @@ class Profile
 
 			Worker::add(PRIORITY_LOW, 'GProbe', $my_url);
 			$arr = ['zrl' => $my_url, 'url' => $a->cmd];
-			call_hooks('zrl_init', $arr);
+			Addon::callHooks('zrl_init', $arr);
 		}
 	}
 

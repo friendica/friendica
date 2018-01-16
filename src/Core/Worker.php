@@ -5,6 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
@@ -1031,7 +1032,7 @@ class Worker
 
 		$arr = ['args' => $args, 'run_cmd' => true];
 
-		call_hooks("proc_run", $arr);
+		Addon::callHooks("proc_run", $arr);
 		if (!$arr['run_cmd'] || !count($args)) {
 			return true;
 		}

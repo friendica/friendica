@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
@@ -94,8 +95,8 @@ function editpost_content(App $a) {
 
 
 
-	call_hooks('jot_tool', $jotplugins);
-	//call_hooks('jot_networks', $jotnets);
+	Addon::callHooks('jot_tool', $jotplugins);
+	//Addon::callHooks('jot_networks', $jotnets);
 
 
 	//$tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));

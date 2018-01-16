@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Name: Frost
  * Description: Like frosted glass
@@ -10,38 +9,41 @@
  */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Object\Image;
 
-function frost_init(App $a) {
+function frost_init(App $a)
+{
 	$a->videowidth = 400;
 	$a->videoheight = 330;
 	$a->set_template_engine('smarty3');
 }
 
-function frost_content_loaded(App $a) {
-
+function frost_content_loaded(App $a)
+{
 	// I could do this in style.php, but by having the CSS in a file the browser will cache it,
 	// making pages load faster
-	if( $a->module === 'home' || $a->module === 'login' || $a->module === 'register' || $a->module === 'lostpass' ) {
+	if ($a->module === 'home' || $a->module === 'login' || $a->module === 'register' || $a->module === 'lostpass') {
 		//$a->page['htmlhead'] = str_replace('$stylesheet', System::baseUrl() . '/view/theme/frost/login-style.css', $a->page['htmlhead']);
 		$a->theme['stylesheet'] = System::baseUrl() . '/view/theme/frost/login-style.css';
 	}
 
-	if ( $a->module === 'login' ) {
+	if ($a->module === 'login') {
 		$a->page['end'] .= '<script type="text/javascript"> $(document).ready(function() { $("#id_" + window.loginName).focus();} );</script>';
 	}
-
 }
 
-function frost_install() {
-	register_hook('prepare_body_final', 'view/theme/frost/theme.php', 'frost_item_photo_links');
+function frost_install()
+{
+	Addon::registerHook('prepare_body_final', 'view/theme/frost/theme.php', 'frost_item_photo_links');
 
 	logger("installed theme frost");
 }
 
-function frost_uninstall() {
-	unregister_hook('bbcode', 'view/theme/frost/theme.php', 'frost_bbcode');
+function frost_uninstall()
+{
+	Addon::unregisterHook('bbcode', 'view/theme/frost/theme.php', 'frost_bbcode');
 
 	logger("uninstalled theme frost");
 }
@@ -52,13 +54,12 @@ function frost_item_photo_links(App $a, &$body_info)
 
 	$occurence = 1;
 	$p = bb_find_open_close($body_info['html'], "<a", ">");
-	while($p !== false && ($occurence++ < 500)) {
+	while ($p !== false && ($occurence++ < 500)) {
 		$link = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
 
 		$matches = [];
 		preg_match("/\/photos\/[\w]+\/image\/([\w]+)/", $link, $matches);
-		if($matches) {
-
+		if ($matches) {
 			// Replace the link for the photo's page with a direct link to the photo itself
 			$newlink = str_replace($matches[0], "/photo/{$matches[1]}", $link);
 
@@ -69,10 +70,8 @@ function frost_item_photo_links(App $a, &$body_info)
 			$newlink = preg_replace("/\/[?&]zrl=([^&\"]+)/", '', $newlink);
 
 			$body_info['html'] = str_replace($link, $newlink, $body_info['html']);
-
 		}
 
 		$p = bb_find_open_close($body_info['html'], "<a", ">", $occurence);
 	}
 }
-

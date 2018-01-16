@@ -8,6 +8,7 @@
  */
 use Friendica\App;
 use Friendica\Content\Widget;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -52,24 +53,24 @@ EOT;
 
 function frio_install()
 {
-	register_hook('prepare_body_final', 'view/theme/frio/theme.php', 'frio_item_photo_links');
-	register_hook('item_photo_menu', 'view/theme/frio/theme.php', 'frio_item_photo_menu');
-	register_hook('contact_photo_menu', 'view/theme/frio/theme.php', 'frio_contact_photo_menu');
-	register_hook('nav_info', 'view/theme/frio/theme.php', 'frio_remote_nav');
-	register_hook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
-	register_hook('display_item', 'view/theme/frio/theme.php', 'frio_display_item');
+	Addon::registerHook('prepare_body_final', 'view/theme/frio/theme.php', 'frio_item_photo_links');
+	Addon::registerHook('item_photo_menu', 'view/theme/frio/theme.php', 'frio_item_photo_menu');
+	Addon::registerHook('contact_photo_menu', 'view/theme/frio/theme.php', 'frio_contact_photo_menu');
+	Addon::registerHook('nav_info', 'view/theme/frio/theme.php', 'frio_remote_nav');
+	Addon::registerHook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
+	Addon::registerHook('display_item', 'view/theme/frio/theme.php', 'frio_display_item');
 
 	logger("installed theme frio");
 }
 
 function frio_uninstall()
 {
-	unregister_hook('prepare_body_final', 'view/theme/frio/theme.php', 'frio_item_photo_links');
-	unregister_hook('item_photo_menu', 'view/theme/frio/theme.php', 'frio_item_photo_menu');
-	unregister_hook('contact_photo_menu', 'view/theme/frio/theme.php', 'frio_contact_photo_menu');
-	unregister_hook('nav_info', 'view/theme/frio/theme.php', 'frio_remote_nav');
-	unregister_hook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
-	unregister_hook('display_item', 'view/theme/frio/theme.php', 'frio_display_item');
+	Addon::unregisterHook('prepare_body_final', 'view/theme/frio/theme.php', 'frio_item_photo_links');
+	Addon::unregisterHook('item_photo_menu', 'view/theme/frio/theme.php', 'frio_item_photo_menu');
+	Addon::unregisterHook('contact_photo_menu', 'view/theme/frio/theme.php', 'frio_contact_photo_menu');
+	Addon::unregisterHook('nav_info', 'view/theme/frio/theme.php', 'frio_remote_nav');
+	Addon::unregisterHook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
+	Addon::unregisterHook('display_item', 'view/theme/frio/theme.php', 'frio_display_item');
 
 	logger("uninstalled theme frio");
 }

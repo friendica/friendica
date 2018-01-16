@@ -15,6 +15,7 @@
  */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -143,7 +144,7 @@ function poke_init(App $a) {
 	}
 
 
-	call_hooks('post_local_end', $arr);
+	Addon::callHooks('post_local_end', $arr);
 
 	Worker::add(PRIORITY_HIGH, "Notifier", "like", $post_id);
 

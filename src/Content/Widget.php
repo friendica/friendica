@@ -6,13 +6,13 @@ namespace Friendica\Content;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
-
 use dba;
 
 require_once 'boot.php';
@@ -74,23 +74,23 @@ class Widget
 	{
 		$networks = array();
 
-		if (!plugin_enabled("appnet")) {
+		if (!Addon::isEnabled("appnet")) {
 			$networks[] = NETWORK_APPNET;
 		}
 
-		if (!plugin_enabled("fbpost") && !plugin_enabled("facebook")) {
+		if (!Addon::isEnabled("fbpost") && !Addon::isEnabled("facebook")) {
 			$networks[] = NETWORK_FACEBOOK;
 		}
 
-		if (!plugin_enabled("statusnet")) {
+		if (!Addon::isEnabled("statusnet")) {
 			$networks[] = NETWORK_STATUSNET;
 		}
 
-		if (!plugin_enabled("pumpio")) {
+		if (!Addon::isEnabled("pumpio")) {
 			$networks[] = NETWORK_PUMPIO;
 		}
 
-		if (!plugin_enabled("twitter")) {
+		if (!Addon::isEnabled("twitter")) {
 			$networks[] = NETWORK_TWITTER;
 		}
 
@@ -102,7 +102,7 @@ class Widget
 			$networks[] = NETWORK_DIASPORA;
 		}
 
-		if (!plugin_enabled("pnut")) {
+		if (!Addon::isEnabled("pnut")) {
 			$networks[] = NETWORK_PNUT;
 		}
 

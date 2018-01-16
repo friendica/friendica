@@ -1,6 +1,9 @@
 <?php
-
+/**
+ * @file mod/manage.php
+ */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 
@@ -91,7 +94,7 @@ function manage_post(App $a) {
 	}
 
 	$ret = [];
-	call_hooks('home_init',$ret);
+	Addon::callHooks('home_init',$ret);
 
 	goaway( System::baseUrl() . "/profile/" . $a->user['nickname'] );
 	// NOTREACHED
