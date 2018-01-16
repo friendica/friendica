@@ -5,7 +5,7 @@
  * @brief: Get info header of the shema
  *
  * This function parses the header of the shemename.php file for inormations like
- * Author, Description and Overwrites. Most of the code comes from the Addon::getPluginInfo()
+ * Author, Description and Overwrites. Most of the code comes from the Addon::getInfo()
  * function. We use this to get the variables which get overwritten through the shema.
  * All color variables which get overwritten through the theme have to be
  * listed (comma seperated) in the shema header under Overwrites:

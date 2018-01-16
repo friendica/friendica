@@ -3,13 +3,13 @@
  * @file mod/pretheme.php
  */
 use Friendica\App;
-use Friendica\Core\Addon;
+use Friendica\Core\Theme;
 
-function pretheme_init(App $a) {
-
+function pretheme_init(App $a)
+{
 	if ($_REQUEST['theme']) {
 		$theme = $_REQUEST['theme'];
-		$info = Addon::getThemeInfo($theme);
+		$info = Theme::getInfo($theme);
 		if ($info) {
 			// unfortunately there will be no translation for this string
 			$desc = $info['description'];
@@ -20,7 +20,7 @@ function pretheme_init(App $a) {
 			$version = '';
 			$credits = '';
 		}
-		echo json_encode(['img' => Addon::getThemeScreenshot($theme), 'desc' => $desc, 'version' => $version, 'credits' => $credits]);
+		echo json_encode(['img' => Theme::getScreenshot($theme), 'desc' => $desc, 'version' => $version, 'credits' => $credits]);
 	}
 
 	killme();

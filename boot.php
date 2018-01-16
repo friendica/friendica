@@ -833,7 +833,7 @@ function check_plugins(App $a)
 	if (count($installed)) {
 		foreach ($installed as $i) {
 			if (!in_array($i['name'], $plugins_arr)) {
-				Addon::uninstallPlugin($i['name']);
+				Addon::uninstall($i['name']);
 			} else {
 				$installed_arr[] = $i['name'];
 			}
@@ -841,9 +841,9 @@ function check_plugins(App $a)
 	}
 
 	if (count($plugins_arr)) {
-		foreach ($plugins_arr as $p) {
-			if (!in_array($p, $installed_arr)) {
-				Addon::installPlugin($p);
+		foreach ($plugins_arr as $addon) {
+			if (!in_array($addon, $installed_arr)) {
+				Addon::install($addon);
 			}
 		}
 	}

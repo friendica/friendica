@@ -11,6 +11,7 @@ use Friendica\Content\Text\Markdown;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
+use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
@@ -1754,7 +1755,7 @@ function admin_page_plugins(App $a)
 			check_form_security_token_redirectOnErr('/admin/plugins', 'admin_themes', 't');
 
 			// Toggle plugin status
-			$idx = array_search($plugin, $a->plugins);
+			$idx = array_search($addon, $a->addons);
 			if ($idx !== false) {
 				unset($a->plugins[$idx]);
 				Addon::uninstallPlugin($plugin);
@@ -1770,7 +1771,7 @@ function admin_page_plugins(App $a)
 		}
 
 		// display plugin details
-		if (in_array($plugin, $a->plugins)) {
+		if (in_array($addon, $a->plugins)) {
 			$status = "on";
 			$action = t("Disable");
 		} else {
@@ -1804,7 +1805,7 @@ function admin_page_plugins(App $a)
 			'$plugin' => $plugin,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => Addon::getPluginInfo($plugin),
+			'$info' => Addon::getInfo($plugin),
 			'$str_author' => t('Author: '),
 			'$str_maintainer' => t('Maintainer: '),
 
@@ -1833,7 +1834,7 @@ function admin_page_plugins(App $a)
 		foreach ($files as $file) {
 			if (is_dir($file)) {
 				list($tmp, $id) = array_map("trim", explode("/", $file));
-				$info = Addon::getPluginInfo($id);
+				$info = Addon::getInfo($id);
 				$show_plugin = true;
 
 				// If the addon is unsupported, then only show it, when it is enabled
@@ -2006,10 +2007,10 @@ function admin_page_themes(App $a)
 			toggle_theme($themes, $theme, $result);
 			$s = rebuild_theme_table($themes);
 			if ($result) {
-				Addon::installTheme($theme);
+				Theme::install($theme);
 				info(sprintf('Theme %s enabled.', $theme));
 			} else {
-				Addon::uninstallTheme($theme);
+				Theme::uninstall($theme);
 				info(sprintf('Theme %s disabled.', $theme));
 			}
 
@@ -2057,7 +2058,7 @@ function admin_page_themes(App $a)
 			$a->page = $orig_page;
 		}
 
-		$screenshot = [Addon::getThemeScreenshot($theme), t('Screenshot')];
+		$screenshot = [Theme::getScreenshot($theme), t('Screenshot')];
 		if (!stristr($screenshot[0], $theme)) {
 			$screenshot = null;
 		}
@@ -2069,10 +2070,10 @@ function admin_page_themes(App $a)
 			'$toggle' => t('Toggle'),
 			'$settings' => t('Settings'),
 			'$baseurl' => System::baseUrl(true),
-			'$plugin' => $theme,
+			'$theme' => $theme,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => Addon::getThemeInfo($theme),
+			'$info' => Theme::getInfo($theme),
 			'$function' => 'themes',
 			'$admin_form' => $admin_form,
 			'$str_author' => t('Author: '),
@@ -2090,8 +2091,8 @@ function admin_page_themes(App $a)
 		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/themes', 'admin_themes', 't');
 		foreach ($themes as $th) {
 			if ($th['allowed']) {
-				Addon::uninstallTheme($th['name']);
-				Addon::installTheme($th['name']);
+				Theme::uninstall($th['name']);
+				Theme::install($th['name']);
 			}
 		}
 		info("Themes reloaded");
@@ -2102,12 +2103,12 @@ function admin_page_themes(App $a)
 	 * List themes
 	 */
 
-	$plugins = [];
+	$theme_list = [];
 	foreach ($themes as $th) {
-		$plugins[] = [$th['name'], (($th['allowed']) ? "on" : "off"), Addon::getThemeInfo($th['name'])];
+		$theme_list[] = [$th['name'], (($th['allowed']) ? "on" : "off"), Theme::getInfo($th['name'])];
 	}
 
-	$t = get_markup_template('admin/plugins.tpl');
+	$t = get_markup_template('admin/addons.tpl');
 	return replace_macros($t, [
 		'$title'               => t('Administration'),
 		'$page'                => t('Themes'),
