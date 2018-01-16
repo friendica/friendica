@@ -16,7 +16,6 @@ use OAuthSignatureMethod_PLAINTEXT;
 use OAuthSignatureMethod_HMAC_SHA1;
 
 require_once "library/OAuth1.php";
-require_once "include/plugin.php";
 
 /**
  * @brief OAuth protocol

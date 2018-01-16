@@ -19,7 +19,6 @@ use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
 
-require_once "include/plugin.php";
 require_once "mod/proxy.php";
 
 function vier_init(App $a) {
