@@ -51,7 +51,7 @@ class Expire
 			foreach ($a->hooks["expire"] as $hook) {
 				if ($hook[1] == $hook_name) {
 					logger("Calling expire hook '" . $hook[1] . "'", LOGGER_DEBUG);
-					Addon::callSingleHook(($a, $hook_name, $hook, $data);
+					Addon::callSingleHook($a, $hook_name, $hook, $data);
 				}
 			}
 			return;
