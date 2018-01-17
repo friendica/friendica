@@ -13,6 +13,7 @@ use Friendica\BaseObject;
 use Friendica\Content\Nav;
 use Friendica\Core\Addon;
 use Friendica\Core\System;
+use Friendica\Core\Theme;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -517,15 +518,15 @@ header('X-Frame-Options: sameorigin');
  * The page templates are located in /view/php/ or in the theme directory.
  */
 if (isset($_GET["mode"])) {
-	$template = theme_include($_GET["mode"] . '.php');
+	$template = Theme::getPathForFile($_GET["mode"] . '.php');
 }
 
 // If there is no page template use the default page template
 if (empty($template)) {
-	$template = theme_include("default.php");
+	$template = Theme::getPathForFile("default.php");
 }
 
-/// @TODO Looks unsafe (remote-inclusion), is maybe not but theme_include() uses file_exists() but does not escape anything
+/// @TODO Looks unsafe (remote-inclusion), is maybe not but Theme::getPathForFile() uses file_exists() but does not escape anything
 require_once $template;
 
 killme();

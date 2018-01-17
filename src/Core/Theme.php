@@ -4,10 +4,9 @@
  */
 namespace Friendica\Core;
 
-use Friendica\App;
-use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+
+require_once 'boot.php';
 
 /**
  * Some functions to handle themes
@@ -30,7 +29,8 @@ class Theme
      * @return array
      */
 
-    function get_theme_info($theme) {
+    public static function getInfo($theme)
+    {
         $info=[
             'name' => $theme,
             'description' => "",
@@ -61,7 +61,7 @@ class Theme
             foreach ( $ll as $l ) {
                 $l = trim($l,"\t\n\r */");
                 if ($l != "") {
-                    list($k,$v) = array_map("trim", explode(":",$l,2));
+                    list($k, $v) = array_map("trim", explode(":", $l, 2));
                     $k= strtolower($k);
                     if ($k == "author") {
 
@@ -79,14 +79,12 @@ class Theme
                             $info['maintainer'][] = ['name'=>$v];
                         }
                     } else {
-                        if (array_key_exists($k,$info)) {
-                            $info[$k]=$v;
+                        if (array_key_exists($k, $info)) {
+                            $info[$k] = $v;
                         }
                     }
-
                 }
             }
-
         }
         return $info;
     }
@@ -99,7 +97,8 @@ class Theme
      * @param sring $theme The name of the theme
      * @return string
      */
-    function get_theme_screenshot($theme) {
+    public static function getScreenshot($theme)
+    {
         $exts = ['.png','.jpg'];
         foreach ($exts as $ext) {
             if (file_exists('view/theme/' . $theme . '/screenshot' . $ext)) {
@@ -110,7 +109,8 @@ class Theme
     }
 
     // install and uninstall theme
-    function uninstall_theme($theme) {
+    public static function uninstall($theme)
+    {
         logger("Addons: uninstalling theme " . $theme);
 
         include_once("view/theme/$theme/theme.php");
@@ -120,7 +120,8 @@ class Theme
         }
     }
 
-    function install_theme($theme) {
+    public static function install($theme)
+    {
         // silently fail if theme was removed
 
         if (! file_exists("view/theme/$theme/theme.php")) {
@@ -153,7 +154,8 @@ class Theme
      * @param string $root Full root path
      * @return string Path to the file or empty string if the file isn't found
      */
-    function theme_include($file, $root = '') {
+    public static function getPathForFile($file, $root = '')
+    {
         $file = basename($file);
 
         // Make sure $root ends with a slash / if it's not blank
