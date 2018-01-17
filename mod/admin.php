@@ -57,7 +57,7 @@ function admin_post(App $a)
 			case 'users':
 				admin_page_users_post($a);
 				break;
-			case 'plugins':
+			case 'addons':
 				if ($a->argc > 2 &&
 					is_file("addon/" . $a->argv[2] . "/" . $a->argv[2] . ".php")) {
 					@include_once("addon/" . $a->argv[2] . "/" . $a->argv[2] . ".php");
@@ -171,7 +171,7 @@ function admin_content(App $a)
 	$aside_sub = [
 		'site'         => ["admin/site/"        , t("Site")                 , "site"],
 		'users'        => ["admin/users/"       , t("Users")                , "users"],
-		'plugins'      => ["admin/plugins/"     , t("Plugins")              , "plugins"],
+		'addons'       => ["admin/plugins/"     , t("Addons")              , "addons"],
 		'themes'       => ["admin/themes/"      , t("Themes")               , "themes"],
 		'features'     => ["admin/features/"    , t("Additional features")  , "features"],
 		'dbsync'       => ["admin/dbsync/"      , t('DB updates')           , "dbsync"],
@@ -182,15 +182,15 @@ function admin_content(App $a)
 		'deleteitem'   => ["admin/deleteitem/"  , t('Delete Item')          , 'deleteitem'],
 	];
 
-	/* get plugins admin page */
+	/* get addons admin page */
 
 	$r = q("SELECT `name` FROM `addon` WHERE `plugin_admin` = 1 ORDER BY `name`");
 	$aside_tools['plugins_admin'] = [];
 	foreach ($r as $h) {
-		$plugin = $h['name'];
-		$aside_tools['plugins_admin'][] = ["admin/plugins/" . $plugin, $plugin, "plugin"];
-		// temp plugins with admin
-		$a->plugins_admin[] = $plugin;
+		$addon = $h['name'];
+		$aside_tools['addons_admin'][] = ["admin/plugins/" . $addon, $addon, "addon"];
+		// temp addons with admin
+		$a->addons_admin[] = $addon;
 	}
 
 	$aside_tools['logs'] = ["admin/logs/", t("Logs"), "logs"];
@@ -203,7 +203,7 @@ function admin_content(App $a)
 		'$admin' => $aside_tools,
 		'$subpages' => $aside_sub,
 		'$admtxt' => t('Admin'),
-		'$plugadmtxt' => t('Plugin Features'),
+		'$plugadmtxt' => t('Addon Features'),
 		'$logtxt' => t('Logs'),
 		'$diagnosticstxt' => t('diagnostics'),
 		'$h_pending' => t('User registrations waiting for confirmation'),
@@ -221,7 +221,7 @@ function admin_content(App $a)
 			case 'users':
 				$o = admin_page_users($a);
 				break;
-			case 'plugins':
+			case 'addons':
 				$o = admin_page_plugins($a);
 				break;
 			case 'themes':
@@ -780,7 +780,7 @@ function admin_page_summary(App $a)
 		'$platform' => FRIENDICA_PLATFORM,
 		'$codename' => FRIENDICA_CODENAME,
 		'$build' => Config::get('system', 'build'),
-		'$plugins' => [t('Active plugins'), $a->plugins],
+		'$addons' => [t('Active addons'), $a->addons],
 		'$showwarning' => $showwarning,
 		'$warningtext' => $warningtext
 	]);
@@ -1724,15 +1724,15 @@ function admin_page_users(App $a)
 }
 
 /**
- * @brief Plugins admin page
+ * @brief Addons admin page
  *
- * This function generates the admin panel page for managing plugins on the
- * friendica node. If a plugin name is given a single page showing the details
+ * This function generates the admin panel page for managing addons on the
+ * friendica node. If a addon name is given a single page showing the details
  * for this addon is generated. If no name is given, a list of available
- * plugins is shown.
+ * addons is shown.
  *
- * The template used for displaying the list of plugins and the details of the
- * plugin are the same as used for the templates.
+ * The template used for displaying the list of addons and the details of the
+ * addon are the same as used for the templates.
  *
  * The returned string returned hulds the HTML code of the page.
  *
@@ -1742,11 +1742,11 @@ function admin_page_users(App $a)
 function admin_page_plugins(App $a)
 {
 	/*
-	 * Single plugin
+	 * Single addon
 	 */
 	if ($a->argc == 3) {
-		$plugin = $a->argv[2];
-		if (!is_file("addon/$plugin/$plugin.php")) {
+		$addon = $a->argv[2];
+		if (!is_file("addon/$addon/$addon.php")) {
 			notice(t("Item not found."));
 			return '';
 		}
@@ -1754,24 +1754,24 @@ function admin_page_plugins(App $a)
 		if (x($_GET, "a") && $_GET['a'] == "t") {
 			check_form_security_token_redirectOnErr('/admin/plugins', 'admin_themes', 't');
 
-			// Toggle plugin status
+			// Toggle addon status
 			$idx = array_search($addon, $a->addons);
 			if ($idx !== false) {
-				unset($a->plugins[$idx]);
-				Addon::uninstall($plugin);
-				info(t("Plugin %s disabled.", $plugin));
+				unset($a->addons[$idx]);
+				Addon::uninstall($addon);
+				info(t("Addon %s disabled.", $addon));
 			} else {
-				$a->plugins[] = $plugin;
-				Addon::install($plugin);
-				info(t("Plugin %s enabled.", $plugin));
+				$a->addons[] = $addon;
+				Addon::install($addon);
+				info(t("Addon %s enabled.", $addon));
 			}
-			Config::set("system", "addon", implode(", ", $a->plugins));
+			Config::set("system", "addon", implode(", ", $a->addons));
 			goaway('admin/plugins');
 			return ''; // NOTREACHED
 		}
 
-		// display plugin details
-		if (in_array($addon, $a->plugins)) {
+		// display addon details
+		if (in_array($addon, $a->addons)) {
 			$status = "on";
 			$action = t("Disable");
 		} else {
@@ -1779,17 +1779,17 @@ function admin_page_plugins(App $a)
 			$action = t("Enable");
 		}
 
-		$readme = Null;
-		if (is_file("addon/$plugin/README.md")) {
-			$readme = Markdown::convert(file_get_contents("addon/$plugin/README.md"), false);
-		} elseif (is_file("addon/$plugin/README")) {
-			$readme = "<pre>" . file_get_contents("addon/$plugin/README") . "</pre>";
+		$readme = null;
+		if (is_file("addon/$addon/README.md")) {
+			$readme = Markdown::convert(file_get_contents("addon/$addon/README.md"), false);
+		} elseif (is_file("addon/$addon/README")) {
+			$readme = "<pre>" . file_get_contents("addon/$addon/README") . "</pre>";
 		}
 
 		$admin_form = "";
-		if (in_array($plugin, $a->plugins_admin)) {
-			@require_once("addon/$plugin/$plugin.php");
-			$func = $plugin . '_plugin_admin';
+		if (in_array($addon, $a->addons_admin)) {
+			@require_once("addon/$addon/$addon.php");
+			$func = $addon . '_plugin_admin';
 			$func($a, $admin_form);
 		}
 
@@ -1797,20 +1797,20 @@ function admin_page_plugins(App $a)
 
 		return replace_macros($t, [
 			'$title' => t('Administration'),
-			'$page' => t('Plugins'),
+			'$page' => t('Addons'),
 			'$toggle' => t('Toggle'),
 			'$settings' => t('Settings'),
 			'$baseurl' => System::baseUrl(true),
 
-			'$plugin' => $plugin,
+			'$addon' => $addon,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => Addon::getInfo($plugin),
+			'$info' => Addon::getInfo($addon),
 			'$str_author' => t('Author: '),
 			'$str_maintainer' => t('Maintainer: '),
 
 			'$admin_form' => $admin_form,
-			'$function' => 'plugins',
+			'$function' => 'addons',
 			'$screenshot' => '',
 			'$readme' => $readme,
 
@@ -1819,36 +1819,36 @@ function admin_page_plugins(App $a)
 	}
 
 	/*
-	 * List plugins
+	 * List addons
 	 */
 	if (x($_GET, "a") && $_GET['a'] == "r") {
 		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/plugins', 'admin_themes', 't');
 		Addon::reload();
-		info("Plugins reloaded");
+		info("Addons reloaded");
 		goaway(System::baseUrl() . '/admin/plugins');
 	}
 
-	$plugins = [];
+	$addons = [];
 	$files = glob("addon/*/");
 	if (is_array($files)) {
 		foreach ($files as $file) {
 			if (is_dir($file)) {
 				list($tmp, $id) = array_map("trim", explode("/", $file));
 				$info = Addon::getInfo($id);
-				$show_plugin = true;
+				$show_addon = true;
 
 				// If the addon is unsupported, then only show it, when it is enabled
-				if ((strtolower($info["status"]) == "unsupported") && !in_array($id, $a->plugins)) {
-					$show_plugin = false;
+				if ((strtolower($info["status"]) == "unsupported") && !in_array($id, $a->addons)) {
+					$show_addon = false;
 				}
 
 				// Override the above szenario, when the admin really wants to see outdated stuff
 				if (Config::get("system", "show_unsupported_addons")) {
-					$show_plugin = true;
+					$show_addon = true;
 				}
 
-				if ($show_plugin) {
-					$plugins[] = [$id, (in_array($id, $a->plugins) ? "on" : "off"), $info];
+				if ($show_addon) {
+					$addons[] = [$id, (in_array($id, $a->addons) ? "on" : "off"), $info];
 				}
 			}
 		}
@@ -1857,14 +1857,14 @@ function admin_page_plugins(App $a)
 	$t = get_markup_template('admin/plugins.tpl');
 	return replace_macros($t, [
 		'$title' => t('Administration'),
-		'$page' => t('Plugins'),
+		'$page' => t('Addons'),
 		'$submit' => t('Save Settings'),
-		'$reload' => t('Reload active plugins'),
+		'$reload' => t('Reload active addons'),
 		'$baseurl' => System::baseUrl(true),
-		'$function' => 'plugins',
-		'$plugins' => $plugins,
-		'$pcount' => count($plugins),
-		'$noplugshint' => t('There are currently no plugins available on your node. You can find the official plugin repository at %1$s and might find other interesting plugins in the open plugin registry at %2$s', 'https://github.com/friendica/friendica-addons', 'http://addons.friendi.ca'),
+		'$function' => 'addons',
+		'$addons' => $addons,
+		'$pcount' => count($addons),
+		'$noplugshint' => t('There are currently no addons available on your node. You can find the official addon repository at %1$s and might find other interesting addons in the open addon registry at %2$s', 'https://github.com/friendica/friendica-addons', 'http://addons.friendi.ca'),
 		'$form_security_token' => get_form_security_token("admin_themes"),
 	]);
 }
@@ -1939,7 +1939,7 @@ function rebuild_theme_table($themes)
  * themes is generated.
  *
  * The template used for displaying the list of themes and the details of the
- * themes are the same as used for the plugins.
+ * themes are the same as used for the addons.
  *
  * The returned string contains the HTML code of the admin panel page.
  *
@@ -2116,7 +2116,7 @@ function admin_page_themes(App $a)
 		'$reload'              => t('Reload active themes'),
 		'$baseurl'             => System::baseUrl(true),
 		'$function'            => 'themes',
-		'$plugins'             => $plugins,
+		'$addons'			   => $addons,
 		'$pcount'              => count($themes),
 		'$noplugshint'         => t('No themes found on the system. They should be placed in %1$s', '<code>/view/themes</code>'),
 		'$experimental'        => t('[Experimental]'),

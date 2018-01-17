@@ -95,7 +95,7 @@ function pop_lang() {
 /**
  * load string translation table for alternate language
  *
- * first plugin strings are loaded, then globals
+ * first addon strings are loaded, then globals
  *
  * @param string $lang language code to load
  */
@@ -103,9 +103,9 @@ function load_translation_table($lang) {
 	$a = get_app();
 
 	$a->strings = [];
-	// load enabled plugins strings
-	$plugins = dba::select('addon', ['name'], ['installed' => true]);
-	while ($p = dba::fetch($plugins)) {
+	// load enabled addons strings
+	$addons = dba::select('addon', ['name'], ['installed' => true]);
+	while ($p = dba::fetch($addons)) {
 		$name = $p['name'];
 		if (file_exists("addon/$name/lang/$lang/strings.php")) {
 			include("addon/$name/lang/$lang/strings.php");

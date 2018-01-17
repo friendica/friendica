@@ -40,7 +40,7 @@ class Addon
 	 */
 	public static function install($addon)
 	{
-		// silently fail if plugin was removed
+		// silently fail if addon was removed
 
 		if (!file_exists('addon/' . $addon . '/' . $addon . '.php')) {
 			return false;
@@ -52,10 +52,10 @@ class Addon
 			$func = $addon . '_install';
 			$func();
 
-			$plugin_admin = (function_exists($addon."_plugin_admin") ? 1 : 0);
+			$addon_admin = (function_exists($addon."_plugin_admin") ? 1 : 0);
 
 			dba::insert('addon', ['name' => $addon, 'installed' => true,
-						'timestamp' => $t, 'plugin_admin' => $plugin_admin]);
+						'timestamp' => $t, 'plugin_admin' => $addon_admin]);
 
 			// we can add the following with the previous SQL
 			// once most site tables have been updated.
@@ -72,7 +72,7 @@ class Addon
 	}
 
 	/**
-	 * Reload all updated plugins
+	 * Reload all updated addons
 	 */
 	public static function reload()
 	{
@@ -97,7 +97,7 @@ class Addon
 						$t = @filemtime($fname);
 						foreach ($installed as $i) {
 							if (($i['name'] == $addon) && ($i['timestamp'] != $t)) {
-								logger('Reloading plugin: ' . $i['name']);
+								logger('Reloading addon: ' . $i['name']);
 								@include_once($fname);
 
 								if (function_exists($addon . '_uninstall')) {
@@ -227,7 +227,7 @@ class Addon
 	}
 
 	/**
-	 * Check if an app_menu hook exists for plugin
+	 * Check if an app_menu hook exists for addon
 	 *
 	 * @param string $name app name
 	 * @return boolean
@@ -248,19 +248,19 @@ class Addon
 	}
 
 	/**
-	 * Parse plugin comment in search of plugin infos.
+	 * Parse addon comment in search of addon infos.
 	 *
 	 * like
 	 * \code
-	 *...* Name: Plugin
-	*   * Description: A plugin which plugs in
+	 *...* Name: addon
+	*   * Description: A addon which plugs in
 	* . * Version: 1.2.3
 	*   * Author: John <profile url>
 	*   * Author: Jane <email>
 	*   *
 	*  *\endcode
-	* @param string $addon the name of the plugin
-	* @return array with the plugin information
+	* @param string $addon the name of the addon
+	* @return array with the addon information
 	*/
 	public static function getInfo($addon)
 	{
