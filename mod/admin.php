@@ -1758,11 +1758,11 @@ function admin_page_plugins(App $a)
 			$idx = array_search($addon, $a->addons);
 			if ($idx !== false) {
 				unset($a->plugins[$idx]);
-				Addon::uninstallPlugin($plugin);
+				Addon::uninstall($plugin);
 				info(t("Plugin %s disabled.", $plugin));
 			} else {
 				$a->plugins[] = $plugin;
-				Addon::installPlugin($plugin);
+				Addon::install($plugin);
 				info(t("Plugin %s enabled.", $plugin));
 			}
 			Config::set("system", "addon", implode(", ", $a->plugins));
