@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -173,7 +174,7 @@ function contacts_post(App $a)
 		return; // NOTREACHED
 	}
 
-	call_hooks('contact_edit_post', $_POST);
+	Addon::callHooks('contact_edit_post', $_POST);
 
 	$profile_id = intval($_POST['profile-assign']);
 	if ($profile_id) {
@@ -662,7 +663,7 @@ function contacts_content(App $a)
 
 		$arr = ['contact' => $contact, 'output' => $o];
 
-		call_hooks('contact_edit', $arr);
+		Addon::callHooks('contact_edit', $arr);
 
 		return $arr['output'];
 	}

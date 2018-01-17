@@ -1,12 +1,14 @@
 <?php
-
+/**
+ * @file src/Module/Logout.php
+ */
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\Core\Addon;
 
 require_once 'boot.php';
 require_once 'include/pgettext.php';
-require_once 'include/plugin.php';
 require_once 'include/security.php';
 
 /**
@@ -21,7 +23,7 @@ class Logout extends BaseModule
 	 */
 	public static function init()
 	{
-		call_hooks("logging_out");
+		Addon::callHooks("logging_out");
 		nuke_session();
 		info(t('Logged out.') . EOL);
 		goaway(self::getApp()->get_baseurl());

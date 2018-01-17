@@ -3,6 +3,7 @@
  * @file include/enotify.php
  */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
@@ -398,7 +399,7 @@ function notification($params)
 		'itemlink'  => $itemlink
 	];
 
-	call_hooks('enotify', $h);
+	Addon::callHooks('enotify', $h);
 
 	$subject   = $h['subject'];
 
@@ -440,7 +441,7 @@ function notification($params)
 		$datarray['otype'] = $params['otype'];
 		$datarray['abort'] = false;
 
-		call_hooks('enotify_store', $datarray);
+		Addon::callHooks('enotify_store', $datarray);
 
 		if ($datarray['abort']) {
 			pop_lang();
@@ -576,7 +577,7 @@ function notification($params)
 		$datarray['subject'] = $subject;
 		$datarray['headers'] = $additional_mail_header;
 
-		call_hooks('enotify_mail', $datarray);
+		Addon::callHooks('enotify_mail', $datarray);
 
 		// check whether sending post content in email notifications is allowed
 		// always true for SYSTEM_EMAIL
@@ -667,7 +668,7 @@ function check_user_notification($itemid) {
  */
 function check_item_notification($itemid, $uid, $defaulttype = "") {
 	$notification_data = ["uid" => $uid, "profiles" => []];
-	call_hooks('check_item_notification', $notification_data);
+	Addon::callHooks('check_item_notification', $notification_data);
 
 	$profiles = $notification_data["profiles"];
 

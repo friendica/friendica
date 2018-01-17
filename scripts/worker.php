@@ -6,6 +6,7 @@
  */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Worker;
 use Friendica\Core\Config;
 
@@ -42,7 +43,7 @@ if (Config::get('system', 'maintenance', true)) {
 
 $a->set_baseurl(Config::get('system', 'url'));
 
-load_hooks();
+Addon::loadHooks();
 
 $spawn = (($_SERVER["argc"] == 2) && ($_SERVER["argv"][1] == "spawn"));
 

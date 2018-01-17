@@ -3,6 +3,7 @@
  * @file mod/xrd.php
  */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Protocol\Salmon;
@@ -109,7 +110,7 @@ function xrd_xml($a, $uri, $alias, $profile_url, $r)
 	);
 
 	$arr = ['user' => $r, 'xml' => $o];
-	call_hooks('personal_xrd', $arr);
+	Addon::callHooks('personal_xrd', $arr);
 
 	echo $arr['xml'];
 	killme();

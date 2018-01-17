@@ -1,8 +1,11 @@
 <?php
-
+/**
+ * @file include/bbcode.php
+ */
 use Friendica\App;
 use Friendica\Content\Smilies;
 use Friendica\Content\OEmbed;
+use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\System;
 use Friendica\Core\Config;
@@ -1400,7 +1403,7 @@ function bbcode($Text, $preserve_nl = false, $tryoembed = true, $simplehtml = fa
 	//$Text = str_replace('<br /><li>', '<li>', $Text);
 	//$Text = str_replace('<br /><ul', '<ul ', $Text);
 
-	call_hooks('bbcode', $Text);
+	Addon::callHooks('bbcode', $Text);
 
 	return trim($Text);
 }

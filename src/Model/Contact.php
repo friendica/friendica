@@ -5,6 +5,7 @@
 namespace Friendica\Model;
 
 use Friendica\BaseObject;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -559,7 +560,7 @@ class Contact extends BaseObject
 
 		$args = ['contact' => $contact, 'menu' => &$menu];
 
-		call_hooks('contact_photo_menu', $args);
+		Addon::callHooks('contact_photo_menu', $args);
 
 		$menucondensed = [];
 
@@ -1146,7 +1147,7 @@ class Contact extends BaseObject
 
 		$arr = ['url' => $url, 'contact' => []];
 
-		call_hooks('follow', $arr);
+		Addon::callHooks('follow', $arr);
 
 		if (x($arr['contact'], 'name')) {
 			$ret = $arr['contact'];

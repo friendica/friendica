@@ -3,14 +3,15 @@
  * @file src/Worker/Directory.php
  * @brief Sends updated profile data to the directory
  */
-
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 
-class Directory {
+class Directory
+{
 	public static function execute($url = '') {
 		$dir = Config::get('system', 'directory');
 
@@ -27,7 +28,7 @@ class Directory {
 
 		$arr = ['url' => $url];
 
-		call_hooks('globaldir_update', $arr);
+		Addon::callHooks('globaldir_update', $arr);
 
 		logger('Updating directory: ' . $arr['url'], LOGGER_DEBUG);
 		if (strlen($arr['url'])) {

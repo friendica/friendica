@@ -2,9 +2,9 @@
 /**
  * @file src/Worker/CronHooks.php
  */
-
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 
@@ -18,7 +18,7 @@ Class CronHooks {
 			foreach ($a->hooks["cron"] as $single_hook) {
 				if ($single_hook[1] == $hook) {
 					logger("Calling cron hook '" . $hook . "'", LOGGER_DEBUG);
-					call_single_hook($a, $hook, $single_hook);
+					Addon::callSingleHook($a, $hook, $single_hook);
 				}
 			}
 			return;

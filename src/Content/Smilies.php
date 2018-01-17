@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file src/Content/Smilies.php
  * @brief This file contains the Smilies class which contains functions to handle smiles
@@ -15,6 +14,7 @@
 namespace Friendica\Content;
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -139,7 +139,7 @@ class Smilies
 		];
 
 		$params = ['texts' => $texts, 'icons' => $icons];
-		call_hooks('smilie', $params);
+		Addon::callHooks('smilie', $params);
 
 		return $params;
 	}

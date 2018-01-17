@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Content\Widget;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -180,7 +181,7 @@ function profile_content(App $a, $update = 0)
 
 		if ($tab === 'profile') {
 			$o .= Profile::getAdvanced($a);
-			call_hooks('profile_advanced', $o);
+			Addon::callHooks('profile_advanced', $o);
 			return $o;
 		}
 

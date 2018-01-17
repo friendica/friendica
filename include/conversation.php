@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -596,7 +597,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 	}
 
 	$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];
-	call_hooks('conversation_start',$cb);
+	Addon::callHooks('conversation_start',$cb);
 
 	$items = $cb['items'];
 
@@ -732,7 +733,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 				}
 
 				$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-				call_hooks('render_location',$locate);
+				Addon::callHooks('render_location',$locate);
 
 				$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_dummy($locate));
 
@@ -821,7 +822,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 				];
 
 				$arr = ['item' => $item, 'output' => $tmp_item];
-				call_hooks('display_item', $arr);
+				Addon::callHooks('display_item', $arr);
 
 				$threads[$threadsid]['id'] = $item['item_id'];
 				$threads[$threadsid]['network'] = $item['item_network'];
@@ -865,7 +866,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false) {
 					continue;
 				}
 
-				call_hooks('display_item', $arr);
+				Addon::callHooks('display_item', $arr);
 
 				$item['pagedrop'] = $page_dropping;
 
@@ -1076,7 +1077,7 @@ function item_photo_menu($item) {
 
 	$args = ['item' => $item, 'menu' => $menu];
 
-	call_hooks('item_photo_menu', $args);
+	Addon::callHooks('item_photo_menu', $args);
 
 	$menu = $args['menu'];
 
@@ -1298,7 +1299,7 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 	]);
 
 	$jotplugins = '';
-	call_hooks('jot_tool', $jotplugins);
+	Addon::callHooks('jot_tool', $jotplugins);
 
 	// Private/public post links for the non-JS ACL form
 	$private_post = 1;

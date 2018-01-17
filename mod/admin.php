@@ -8,8 +8,10 @@
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Text\Markdown;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
+use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
@@ -1753,14 +1755,14 @@ function admin_page_plugins(App $a)
 			check_form_security_token_redirectOnErr('/admin/plugins', 'admin_themes', 't');
 
 			// Toggle plugin status
-			$idx = array_search($plugin, $a->plugins);
+			$idx = array_search($addon, $a->addons);
 			if ($idx !== false) {
 				unset($a->plugins[$idx]);
-				uninstall_plugin($plugin);
+				Addon::uninstall($plugin);
 				info(t("Plugin %s disabled.", $plugin));
 			} else {
 				$a->plugins[] = $plugin;
-				install_plugin($plugin);
+				Addon::install($plugin);
 				info(t("Plugin %s enabled.", $plugin));
 			}
 			Config::set("system", "addon", implode(", ", $a->plugins));
@@ -1769,7 +1771,7 @@ function admin_page_plugins(App $a)
 		}
 
 		// display plugin details
-		if (in_array($plugin, $a->plugins)) {
+		if (in_array($addon, $a->plugins)) {
 			$status = "on";
 			$action = t("Disable");
 		} else {
@@ -1803,7 +1805,7 @@ function admin_page_plugins(App $a)
 			'$plugin' => $plugin,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => get_plugin_info($plugin),
+			'$info' => Addon::getInfo($plugin),
 			'$str_author' => t('Author: '),
 			'$str_maintainer' => t('Maintainer: '),
 
@@ -1821,7 +1823,7 @@ function admin_page_plugins(App $a)
 	 */
 	if (x($_GET, "a") && $_GET['a'] == "r") {
 		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/plugins', 'admin_themes', 't');
-		reload_plugins();
+		Addon::reload();
 		info("Plugins reloaded");
 		goaway(System::baseUrl() . '/admin/plugins');
 	}
@@ -1832,7 +1834,7 @@ function admin_page_plugins(App $a)
 		foreach ($files as $file) {
 			if (is_dir($file)) {
 				list($tmp, $id) = array_map("trim", explode("/", $file));
-				$info = get_plugin_info($id);
+				$info = Addon::getInfo($id);
 				$show_plugin = true;
 
 				// If the addon is unsupported, then only show it, when it is enabled
@@ -2005,10 +2007,10 @@ function admin_page_themes(App $a)
 			toggle_theme($themes, $theme, $result);
 			$s = rebuild_theme_table($themes);
 			if ($result) {
-				install_theme($theme);
+				Theme::install($theme);
 				info(sprintf('Theme %s enabled.', $theme));
 			} else {
-				uninstall_theme($theme);
+				Theme::uninstall($theme);
 				info(sprintf('Theme %s disabled.', $theme));
 			}
 
@@ -2056,7 +2058,7 @@ function admin_page_themes(App $a)
 			$a->page = $orig_page;
 		}
 
-		$screenshot = [get_theme_screenshot($theme), t('Screenshot')];
+		$screenshot = [Theme::getScreenshot($theme), t('Screenshot')];
 		if (!stristr($screenshot[0], $theme)) {
 			$screenshot = null;
 		}
@@ -2068,10 +2070,10 @@ function admin_page_themes(App $a)
 			'$toggle' => t('Toggle'),
 			'$settings' => t('Settings'),
 			'$baseurl' => System::baseUrl(true),
-			'$plugin' => $theme,
+			'$theme' => $theme,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => get_theme_info($theme),
+			'$info' => Theme::getInfo($theme),
 			'$function' => 'themes',
 			'$admin_form' => $admin_form,
 			'$str_author' => t('Author: '),
@@ -2089,8 +2091,8 @@ function admin_page_themes(App $a)
 		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/themes', 'admin_themes', 't');
 		foreach ($themes as $th) {
 			if ($th['allowed']) {
-				uninstall_theme($th['name']);
-				install_theme($th['name']);
+				Theme::uninstall($th['name']);
+				Theme::install($th['name']);
 			}
 		}
 		info("Themes reloaded");
@@ -2101,12 +2103,12 @@ function admin_page_themes(App $a)
 	 * List themes
 	 */
 
-	$plugins = [];
+	$theme_list = [];
 	foreach ($themes as $th) {
-		$plugins[] = [$th['name'], (($th['allowed']) ? "on" : "off"), get_theme_info($th['name'])];
+		$theme_list[] = [$th['name'], (($th['allowed']) ? "on" : "off"), Theme::getInfo($th['name'])];
 	}
 
-	$t = get_markup_template('admin/plugins.tpl');
+	$t = get_markup_template('admin/addons.tpl');
 	return replace_macros($t, [
 		'$title'               => t('Administration'),
 		'$page'                => t('Themes'),

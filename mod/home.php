@@ -1,6 +1,9 @@
 <?php
-
+/**
+ * @file mod/home.php
+ */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Module\Login;
@@ -9,7 +12,7 @@ if(! function_exists('home_init')) {
 function home_init(App $a) {
 
 	$ret = [];
-	call_hooks('home_init',$ret);
+	Addon::callHooks('home_init',$ret);
 
 	if (local_user() && ($a->user['nickname'])) {
 		goaway(System::baseUrl()."/network");
@@ -47,7 +50,7 @@ function home_content(App $a) {
 	$o .= Login::form($a->query_string, $a->config['register_policy'] == REGISTER_CLOSED ? 0 : 1);
 
 
-	call_hooks("home_content",$o);
+	Addon::callHooks("home_content",$o);
 
 	return $o;
 
