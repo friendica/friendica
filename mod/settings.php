@@ -77,7 +77,7 @@ function settings_init(App $a)
 	];
 
 	$tabs[] =	[
-		'label'	=> t('Plugins'),
+		'label'	=> t('Addons'),
 		'url' 	=> 'settings/addon',
 		'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'addon')?'active':''),
 		'accesskey' => 'l',

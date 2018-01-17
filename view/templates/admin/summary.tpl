@@ -34,7 +34,7 @@
 		<dt>{{$plugins.0}}</dt>
 		
 		{{foreach $plugins.1 as $p}}
-			<dd><a href="/admin/plugins/{{$p}}/">{{$p}}</a></dd>
+			<dd><a href="/admin/addons/{{$p}}/">{{$p}}</a></dd>
 		{{/foreach}}
 		
 	</dl>

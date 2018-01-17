@@ -66,7 +66,7 @@ function admin_post(App $a)
 						$func($a);
 					}
 				}
-				$return_path = 'admin/plugins/' . $a->argv[2];
+				$return_path = 'admin/addons/' . $a->argv[2];
 				break;
 			case 'themes':
 				if ($a->argc < 2) {
@@ -171,7 +171,7 @@ function admin_content(App $a)
 	$aside_sub = [
 		'site'         => ["admin/site/"        , t("Site")                 , "site"],
 		'users'        => ["admin/users/"       , t("Users")                , "users"],
-		'addons'       => ["admin/plugins/"     , t("Addons")              , "addons"],
+		'addons'       => ["admin/addons/"     , t("Addons")              , "addons"],
 		'themes'       => ["admin/themes/"      , t("Themes")               , "themes"],
 		'features'     => ["admin/features/"    , t("Additional features")  , "features"],
 		'dbsync'       => ["admin/dbsync/"      , t('DB updates')           , "dbsync"],
@@ -185,10 +185,10 @@ function admin_content(App $a)
 	/* get addons admin page */
 
 	$r = q("SELECT `name` FROM `addon` WHERE `plugin_admin` = 1 ORDER BY `name`");
-	$aside_tools['plugins_admin'] = [];
+	$aside_tools['addons_admin'] = [];
 	foreach ($r as $h) {
 		$addon = $h['name'];
-		$aside_tools['addons_admin'][] = ["admin/plugins/" . $addon, $addon, "addon"];
+		$aside_tools['addons_admin'][] = ["admin/addons/" . $addon, $addon, "addon"];
 		// temp addons with admin
 		$a->addons_admin[] = $addon;
 	}
@@ -222,7 +222,7 @@ function admin_content(App $a)
 				$o = admin_page_users($a);
 				break;
 			case 'addons':
-				$o = admin_page_plugins($a);
+				$o = admin_page_addons($a);
 				break;
 			case 'themes':
 				$o = admin_page_themes($a);
@@ -1739,7 +1739,7 @@ function admin_page_users(App $a)
  * @param App $a
  * @return string
  */
-function admin_page_plugins(App $a)
+function admin_page_addons(App $a)
 {
 	/*
 	 * Single addon
@@ -1752,7 +1752,7 @@ function admin_page_plugins(App $a)
 		}
 
 		if (x($_GET, "a") && $_GET['a'] == "t") {
-			check_form_security_token_redirectOnErr('/admin/plugins', 'admin_themes', 't');
+			check_form_security_token_redirectOnErr('/admin/addons', 'admin_themes', 't');
 
 			// Toggle addon status
 			$idx = array_search($addon, $a->addons);
@@ -1766,7 +1766,7 @@ function admin_page_plugins(App $a)
 				info(t("Addon %s enabled.", $addon));
 			}
 			Config::set("system", "addon", implode(", ", $a->addons));
-			goaway('admin/plugins');
+			goaway('admin/addons');
 			return ''; // NOTREACHED
 		}
 
@@ -1822,10 +1822,10 @@ function admin_page_plugins(App $a)
 	 * List addons
 	 */
 	if (x($_GET, "a") && $_GET['a'] == "r") {
-		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/plugins', 'admin_themes', 't');
+		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/addons', 'admin_themes', 't');
 		Addon::reload();
 		info("Addons reloaded");
-		goaway(System::baseUrl() . '/admin/plugins');
+		goaway(System::baseUrl() . '/admin/addons');
 	}
 
 	$addons = [];

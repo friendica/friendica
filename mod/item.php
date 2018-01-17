@@ -204,7 +204,7 @@ function item_post(App $a) {
 
 	/*
 	 * Now check that it is a page_type of PAGE_BLOG, and that valid personal details
-	 * have been provided, and run any anti-spam plugins
+	 * have been provided, and run any anti-spam addons
 	 */
 	if (!(can_write_wall($profile_uid) || $allow_comment) && !$allow_moderated) {
 		notice(t('Permission denied.') . EOL) ;
@@ -742,7 +742,7 @@ function item_post(App $a) {
 	$datarray['last-child'] = 1;
 
 	/*
-	 * These fields are for the convenience of plugins...
+	 * These fields are for the convenience of addons...
 	 * 'self' if true indicates the owner is posting on their own wall
 	 * If parent is 0 it is a top-level post.
 	 */

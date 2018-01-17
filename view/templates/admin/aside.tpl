@@ -26,9 +26,9 @@
 {{/if}}
 
 
-{{if $admin.plugins_admin}}<h4>{{$plugadmtxt}}</h4>{{/if}}
+{{if $admin.addons_admin}}<h4>{{$plugadmtxt}}</h4>{{/if}}
 <ul class='admin linklist'>
-	{{foreach $admin.plugins_admin as $l}}
+	{{foreach $admin.addons_admin as $l}}
 	<li class='admin link button {{$l.2}}'><a href='{{$l.0}}'>{{$l.1}}</a></li>
 	{{/foreach}}
 </ul>
