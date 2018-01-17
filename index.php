@@ -180,7 +180,7 @@ if (! x($_SESSION, 'last_updated')) {
 /*
  * check_config() is responsible for running update scripts. These automatically
  * update the DB schema whenever we push a new one out. It also checks to see if
- * any plugins have been added or removed and reacts accordingly.
+ * any addons have been added or removed and reacts accordingly.
  */
 
 // in install mode, any url loads install module
@@ -192,7 +192,7 @@ if ($install && $a->module!="view") {
 } else {
 	check_url($a);
 	check_db(false);
-	check_plugins($a);
+	check_addons($a);
 }
 
 Nav::setSelected('nothing');
@@ -228,7 +228,7 @@ if (strlen($a->module)) {
 
 	/**
 	 * We will always have a module name.
-	 * First see if we have a plugin which is masquerading as a module.
+	 * First see if we have an addon which is masquerading as a module.
 	 */
 
 	// Compatibility with the Android Diaspora client
@@ -243,7 +243,7 @@ if (strlen($a->module)) {
 
 	$privateapps = Config::get('config', 'private_addons');
 
-	if (is_array($a->plugins) && in_array($a->module, $a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
+	if (is_array($a->addons) && in_array($a->module, $a->addons) && file_exists("addon/{$a->module}/{$a->module}.php")) {
 		//Check if module is an app and if public access to apps is allowed or not
 		if ((!local_user()) && Addon::isApp($a->module) && $privateapps === "1") {
 			info(t("You must be logged in to use addons. "));

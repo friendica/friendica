@@ -758,10 +758,10 @@ class Post extends BaseObject
 			$qc = $qcomment = null;
 
 			/*
-			 * Hmmm, code depending on the presence of a particular plugin?
+			 * Hmmm, code depending on the presence of a particular addon?
 			 * This should be better if done by a hook
 			 */
-			if (in_array('qcomment', $a->plugins)) {
+			if (in_array('qcomment', $a->addons)) {
 				$qc = ((local_user()) ? PConfig::get(local_user(), 'qcomment', 'words') : null);
 				$qcomment = (($qc) ? explode("\n", $qc) : null);
 			}

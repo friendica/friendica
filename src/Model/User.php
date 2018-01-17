@@ -390,7 +390,7 @@ class User
 			$photo = avatar_img($email);
 		}
 
-		// unless there is no avatar-plugin loaded
+		// unless there is no avatar-addon loaded
 		if (strlen($photo)) {
 			$photo_failure = false;
 
