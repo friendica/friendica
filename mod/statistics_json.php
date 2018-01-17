@@ -8,8 +8,6 @@ use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 
-require_once("include/plugin.php");
-
 function statistics_json_init(App $a) {
 
 	if (!Config::get("system", "nodeinfo")) {
