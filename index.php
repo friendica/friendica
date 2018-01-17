@@ -11,6 +11,7 @@
 use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
@@ -75,8 +76,8 @@ if (!$install) {
 	}
 
 	require_once 'include/session.php';
-	load_hooks();
-	call_hooks('init_1');
+	Addon::loadHooks();
+	Addon::callHooks('init_1');
 
 	$maintenance = Config::get('system', 'maintenance');
 }
@@ -200,7 +201,7 @@ $privateapps = Config::get('config', 'private_addons');
 if ((local_user()) || (! $privateapps === "1")) {
 	$arr = ['app_menu' => $a->apps];
 
-	call_hooks('app_menu', $arr);
+	Addon::callHooks('app_menu', $arr);
 
 	$a->apps = $arr['app_menu'];
 }
@@ -243,7 +244,7 @@ if (strlen($a->module)) {
 
 	if (is_array($a->plugins) && in_array($a->module, $a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
 		//Check if module is an app and if public access to apps is allowed or not
-		if ((!local_user()) && plugin_is_app($a->module) && $privateapps === "1") {
+		if ((!local_user()) && Addon::isApp($a->module) && $privateapps === "1") {
 			info(t("You must be logged in to use addons. "));
 		} else {
 			include_once "addon/{$a->module}/{$a->module}.php";
@@ -317,7 +318,7 @@ if (! x($a->page, 'content')) {
 }
 
 if (!$install && !$maintenance) {
-	call_hooks('page_content_top', $a->page['content']);
+	Addon::callHooks('page_content_top', $a->page['content']);
 }
 
 /**
@@ -329,10 +330,10 @@ if ($a->module_loaded) {
 	$placeholder = '';
 
 	if ($a->module_class) {
-		call_hooks($a->module . '_mod_init', $placeholder);
+		Addon::callHooks($a->module . '_mod_init', $placeholder);
 		call_user_func([$a->module_class, 'init']);
 	} else if (function_exists($a->module . '_init')) {
-		call_hooks($a->module . '_mod_init', $placeholder);
+		Addon::callHooks($a->module . '_mod_init', $placeholder);
 		$func = $a->module . '_init';
 		$func($a);
 	}
@@ -343,7 +344,7 @@ if ($a->module_loaded) {
 	}
 
 	if (! $a->error && $_SERVER['REQUEST_METHOD'] === 'POST') {
-		call_hooks($a->module . '_mod_post', $_POST);
+		Addon::callHooks($a->module . '_mod_post', $_POST);
 		if ($a->module_class) {
 			call_user_func([$a->module_class, 'post']);
 		} else if (function_exists($a->module . '_post')) {
@@ -353,7 +354,7 @@ if ($a->module_loaded) {
 	}
 
 	if (! $a->error) {
-		call_hooks($a->module . '_mod_afterpost', $placeholder);
+		Addon::callHooks($a->module . '_mod_afterpost', $placeholder);
 		if ($a->module_class) {
 			call_user_func([$a->module_class, 'afterpost']);
 		} else if (function_exists($a->module . '_afterpost')) {
@@ -364,7 +365,7 @@ if ($a->module_loaded) {
 
 	if (! $a->error) {
 		$arr = ['content' => $a->page['content']];
-		call_hooks($a->module . '_mod_content', $arr);
+		Addon::callHooks($a->module . '_mod_content', $arr);
 		$a->page['content'] = $arr['content'];
 		if ($a->module_class) {
 			$arr = ['content' => call_user_func([$a->module_class, 'content'])];
@@ -372,7 +373,7 @@ if ($a->module_loaded) {
 			$func = $a->module . '_content';
 			$arr = ['content' => $func($a)];
 		}
-		call_hooks($a->module . '_mod_aftercontent', $arr);
+		Addon::callHooks($a->module . '_mod_aftercontent', $arr);
 		$a->page['content'] .= $arr['content'];
 	}
 
@@ -421,7 +422,7 @@ if (stristr(implode("", $_SESSION['sysmsg']), t('Permission denied'))) {
 /*
  * Report anything which needs to be communicated in the notification area (before the main body)
  */
-call_hooks('page_end', $a->page['content']);
+Addon::callHooks('page_end', $a->page['content']);
 
 /*
  * Add the navigation (menu) template

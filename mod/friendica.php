@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
@@ -121,7 +122,7 @@ function friendica_content(App $a) {
 		$o .= '</tbody></table></div>' . PHP_EOL;
 	}
 
-	call_hooks('about_hook', $o);
+	Addon::callHooks('about_hook', $o);
 
 	return $o;
 }

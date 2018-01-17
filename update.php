@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
@@ -85,7 +86,7 @@ function update_1191() {
 
 	Config::set('system', 'maintenance', 1);
 
-	if (plugin_enabled('forumlist')) {
+	if (Addon::isEnabled('forumlist')) {
 		$plugin = 'forumlist';
 		$plugins = Config::get('system','addon');
 		$plugins_arr = [];
@@ -97,7 +98,7 @@ function update_1191() {
 			if ($idx !== false){
 				unset($plugins_arr[$idx]);
 				//delete forumlist manually from addon and hook table
-				// since uninstall_plugin() don't work here
+				// since Addon::uninstall() don't work here
 				q("DELETE FROM `addon` WHERE `name` = 'forumlist' ");
 				q("DELETE FROM `hook` WHERE `file` = 'addon/forumlist/forumlist.php' ");
 				Config::set('system','addon', implode(", ",$plugins_arr));

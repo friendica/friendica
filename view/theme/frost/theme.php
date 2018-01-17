@@ -10,6 +10,7 @@
  */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Object\Image;
 
@@ -35,13 +36,13 @@ function frost_content_loaded(App $a) {
 }
 
 function frost_install() {
-	register_hook('prepare_body_final', 'view/theme/frost/theme.php', 'frost_item_photo_links');
+	Addon::registerHook('prepare_body_final', 'view/theme/frost/theme.php', 'frost_item_photo_links');
 
 	logger("installed theme frost");
 }
 
 function frost_uninstall() {
-	unregister_hook('bbcode', 'view/theme/frost/theme.php', 'frost_bbcode');
+	Addon::unregisterHook('bbcode', 'view/theme/frost/theme.php', 'frost_bbcode');
 
 	logger("uninstalled theme frost");
 }

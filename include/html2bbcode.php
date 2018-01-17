@@ -8,6 +8,7 @@
  * 					https://github.com/annando/Syncom
  */
 
+use Friendica\Core\Addon;
 use Friendica\Util\XML;
 
 function node2bbcode(&$doc, $oldnode, $attributes, $startbb, $endbb)
@@ -261,7 +262,7 @@ function html2bbcode($message, $basepath = '')
 	$message = preg_replace('=\r *\r=i', "\n", $message);
 	$message = str_replace("\r", "\n", $message);
 
-	call_hooks('html2bbcode', $message);
+	Addon::callHooks('html2bbcode', $message);
 
 	$message = strip_tags($message);
 

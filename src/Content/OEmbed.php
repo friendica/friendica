@@ -6,6 +6,7 @@
 
 namespace Friendica\Content;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\System;
 use Friendica\Core\Config;
@@ -154,7 +155,7 @@ class OEmbed
 			}
 		}
 
-		call_hooks('oembed_fetch_url', $embedurl, $j);
+		Addon::callHooks('oembed_fetch_url', $embedurl, $j);
 
 		return $j;
 	}

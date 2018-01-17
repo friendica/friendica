@@ -10,6 +10,7 @@ namespace Friendica\Protocol;
 
 use Friendica\App;
 use Friendica\Content\OEmbed;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -266,12 +267,12 @@ class DFRN
 		$root = self::addHeader($doc, $owner, $author, $alternatelink, true);
 
 		/// @TODO This hook can't work anymore
-		//	call_hooks('atom_feed', $atom);
+		//	Addon::callHooks('atom_feed', $atom);
 
 		if (!DBM::is_result($items) || $onlyheader) {
 			$atom = trim($doc->saveXML());
 
-			call_hooks('atom_feed_end', $atom);
+			Addon::callHooks('atom_feed_end', $atom);
 
 			return $atom;
 		}
@@ -300,7 +301,7 @@ class DFRN
 
 		$atom = trim($doc->saveXML());
 
-		call_hooks('atom_feed_end', $atom);
+		Addon::callHooks('atom_feed_end', $atom);
 
 		return $atom;
 	}

@@ -7,6 +7,7 @@
 
 namespace Friendica\Model;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -433,7 +434,7 @@ class User
 			}
 		}
 
-		call_hooks('register_account', $uid);
+		Addon::callHooks('register_account', $uid);
 
 		$return['user'] = $user;
 		return $return;
@@ -532,7 +533,7 @@ class User
 
 		$user = dba::selectFirst('user', [], ['uid' => $uid]);
 
-		call_hooks('remove_user', $user);
+		Addon::callHooks('remove_user', $user);
 
 		// save username (actually the nickname as it is guaranteed
 		// unique), so it cannot be re-registered in the future.

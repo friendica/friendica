@@ -6,6 +6,7 @@
 
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
@@ -328,7 +329,7 @@ function event_store($arr) {
 			$item_id = 0;
 		}
 
-		call_hooks("event_updated", $arr['id']);
+		Addon::callHooks("event_updated", $arr['id']);
 
 		return $item_id;
 	} else {
@@ -407,7 +408,7 @@ function event_store($arr) {
 			);
 		}
 
-		call_hooks("event_created", $event['id']);
+		Addon::callHooks("event_created", $event['id']);
 
 		return $item_id;
 	}

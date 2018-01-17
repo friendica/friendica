@@ -1,5 +1,6 @@
 <?php
 
+use Friendica\Core\Addon;
 use Friendica\Render\ITemplateEngine;
 
 require_once "include/plugin.php";
@@ -74,7 +75,7 @@ class FriendicaSmartyEngine implements ITemplateEngine
 			"template" => basename($s->filename),
 			"vars" => $r
 		];
-		call_hooks("template_vars", $arr);
+		Addon::callHooks("template_vars", $arr);
 		$r = $arr['vars'];
 
 		foreach ($r as $key => $value) {
