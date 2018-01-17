@@ -26,12 +26,12 @@ function friendica_init(App $a) {
 			$admin = false;
 		}
 
-		$visible_plugins = [];
-		if (is_array($a->plugins) && count($a->plugins)) {
+		$visible_addons = [];
+		if (is_array($a->addons) && count($a->addons)) {
 			$r = q("SELECT * FROM `addon` WHERE `hidden` = 0");
 			if (DBM::is_result($r)) {
 				foreach($r as $rr) {
-					$visible_plugins[] = $rr['name'];
+					$visible_addons[] = $rr['name'];
 				}
 			}
 		}
@@ -51,7 +51,7 @@ function friendica_init(App $a) {
 		$data = [
 			'version'         => FRIENDICA_VERSION,
 			'url'             => System::baseUrl(),
-			'plugins'         => $visible_plugins,
+			'addons'         => $visible_addons,
 			'locked_features' => $locked_features,
 			'register_policy' =>  $register_policy[$a->config['register_policy']],
 			'admin'           => $admin,
@@ -84,19 +84,19 @@ function friendica_content(App $a) {
 	$o .= t('Suggestions, praise, donations, etc. - please email "Info" at Friendica - dot com');
 	$o .= '</p>' . PHP_EOL;
 
-	$visible_plugins = [];
-	if (is_array($a->plugins) && count($a->plugins)) {
+	$visible_addons = [];
+	if (is_array($a->addons) && count($a->addons)) {
 		$r = q("SELECT * FROM `addon` WHERE `hidden` = 0");
 		if (DBM::is_result($r)) {
 			foreach($r as $rr) {
-				$visible_plugins[] = $rr['name'];
+				$visible_addons[] = $rr['name'];
 			}
 		}
 	}
 
-	if (count($visible_plugins)) {
-		$o .= '<p>' . t('Installed plugins/addons/apps:') . '</p>' . PHP_EOL;
-		$sorted = $visible_plugins;
+	if (count($visible_addons)) {
+		$o .= '<p>' . t('Installed addons/addons/apps:') . '</p>' . PHP_EOL;
+		$sorted = $visible_addons;
 		$s = '';
 		sort($sorted);
 		foreach ($sorted as $p) {
@@ -109,7 +109,7 @@ function friendica_content(App $a) {
 		}
 		$o .= '<div style="margin-left: 25px; margin-right: 25px;">' . $s . '</div>' . PHP_EOL;
 	} else {
-		$o .= '<p>' . t('No installed plugins/addons/apps') . '</p>' . PHP_EOL;
+		$o .= '<p>' . t('No installed addons/addons/apps') . '</p>' . PHP_EOL;
 	}
 
 	$blocklist = Config::get('system', 'blocklist');

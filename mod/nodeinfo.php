@@ -152,22 +152,22 @@ function nodeinfo_cron() {
 
 	$a = get_app();
 
-	// If the plugin 'statistics_json' is enabled then disable it and actrivate nodeinfo.
+	// If the addon 'statistics_json' is enabled then disable it and actrivate nodeinfo.
 	if (Addon::isEnabled('statistics_json')) {
 		Config::set('system', 'nodeinfo', true);
 
-		$plugin = 'statistics_json';
-		$plugins = Config::get('system', 'addon');
-		$plugins_arr = [];
+		$addon = 'statistics_json';
+		$addons = Config::get('system', 'addon');
+		$addons_arr = [];
 
-		if ($plugins) {
-			$plugins_arr = explode(',',str_replace(' ', '',$plugins));
+		if ($addons) {
+			$addons_arr = explode(',',str_replace(' ', '',$addons));
 
-			$idx = array_search($plugin, $plugins_arr);
+			$idx = array_search($addon, $addons_arr);
 			if ($idx !== false) {
-				unset($plugins_arr[$idx]);
-				Addon::uninstall($plugin);
-				Config::set('system', 'addon', implode(', ',$plugins_arr));
+				unset($addons_arr[$idx]);
+				Addon::uninstall($addon);
+				Config::set('system', 'addon', implode(', ',$addons_arr));
 			}
 		}
 	}

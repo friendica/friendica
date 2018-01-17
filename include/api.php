@@ -212,10 +212,10 @@ function api_login(App $a)
 	];
 
 	/*
-		* A plugin indicates successful login by setting 'authenticated' to non-zero value and returning a user record
-		* Plugins should never set 'authenticated' except to indicate success - as hooks may be chained
-		* and later plugins should not interfere with an earlier one that succeeded.
-		*/
+	* An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
+	* Addons should never set 'authenticated' except to indicate success - as hooks may be chained
+	* and later addons should not interfere with an earlier one that succeeded.
+	*/
 	Addon::callHooks('authenticate', $addon_auth);
 
 	if ($addon_auth['authenticated'] && count($addon_auth['user_record'])) {

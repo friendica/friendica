@@ -37,11 +37,11 @@
 	{{/if}}
 </div>
 
-{{if $admin.plugins_admin}}
+{{if $admin.addons_admin}}
 <div class="widget">
 	<h3>{{$plugadmtxt}}</h3>
 	<ul role="menu">
-		{{foreach $admin.plugins_admin as $name => $item}}
+		{{foreach $admin.addons_admin as $name => $item}}
 		<li role="menuitem" class="{{$item.2}}">
 			<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}"{{/if}}>
 				{{$item.1}}

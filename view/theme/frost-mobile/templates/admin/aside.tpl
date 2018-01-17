@@ -4,7 +4,7 @@
 <ul class='admin linklist'>
 	<li class='admin button {{$admin.site.2}}'><a href='{{$admin.site.0}}'>{{$admin.site.1}}</a></li>
 	<li class='admin button {{$admin.users.2}}'><a href='{{$admin.users.0}}'>{{$admin.users.1}}</a><span id='pending-update' title='{{$h_pending}}'></span></li>
-	<li class='admin button {{$admin.plugins.2}}'><a href='{{$admin.plugins.0}}'>{{$admin.plugins.1}}</a></li>
+	<li class='admin button {{$admin.addons.2}}'><a href='{{$admin.addons.0}}'>{{$admin.addons.1}}</a></li>
 	<li class='admin button {{$admin.themes.2}}'><a href='{{$admin.themes.0}}'>{{$admin.themes.1}}</a></li>
 	<li class='admin button {{$admin.dbsync.2}}'><a href='{{$admin.dbsync.0}}'>{{$admin.dbsync.1}}</a></li>
 </ul>
@@ -17,9 +17,9 @@
 {{/if}}
 
 
-{{if $admin.plugins_admin}}<h4>{{$plugadmtxt}}</h4>{{/if}}
+{{if $admin.addons_admin}}<h4>{{$plugadmtxt}}</h4>{{/if}}
 <ul class='admin linklist'>
-	{{foreach $admin.plugins_admin as $l}}
+	{{foreach $admin.addons_admin as $l}}
 	<li class='admin button {{$l.2}}'><a href='{{$l.0}}'>{{$l.1}}</a></li>
 	{{/foreach}}
 </ul>
