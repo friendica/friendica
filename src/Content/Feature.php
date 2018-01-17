@@ -9,8 +9,6 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 
-require_once 'include/plugin.php';
-
 class Feature
 {
 	/**

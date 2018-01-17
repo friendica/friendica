@@ -3,8 +3,6 @@
 use Friendica\Core\Addon;
 use Friendica\Render\ITemplateEngine;
 
-require_once "include/plugin.php";
-
 define('SMARTY3_TEMPLATE_FOLDER', 'templates');
 
 class FriendicaSmarty extends Smarty

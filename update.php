@@ -82,8 +82,6 @@ function update_1189() {
 
 function update_1191() {
 
-	require_once 'include/plugin.php';
-
 	Config::set('system', 'maintenance', 1);
 
 	if (Addon::isEnabled('forumlist')) {
