@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Database\DBM;
 
 function lockview_content(App $a) {
@@ -28,7 +29,7 @@ function lockview_content(App $a) {
 	}
 	$item = $r[0];
 
-	call_hooks('lockview_content', $item);
+	Addon::callHooks('lockview_content', $item);
 
 	if($item['uid'] != local_user()) {
 		echo t('Remote privacy information not available.') . '<br />';

@@ -21,6 +21,7 @@
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
@@ -32,7 +33,6 @@ use Friendica\Database\DBStructure;
 use Friendica\Module\Login;
 
 require_once 'include/network.php';
-require_once 'include/plugin.php';
 require_once 'include/text.php';
 require_once 'include/datetime.php';
 require_once 'include/pgettext.php';
@@ -833,7 +833,7 @@ function check_plugins(App $a)
 	if (count($installed)) {
 		foreach ($installed as $i) {
 			if (!in_array($i['name'], $plugins_arr)) {
-				uninstall_plugin($i['name']);
+				Addon::uninstall($i['name']);
 			} else {
 				$installed_arr[] = $i['name'];
 			}
@@ -843,12 +843,12 @@ function check_plugins(App $a)
 	if (count($plugins_arr)) {
 		foreach ($plugins_arr as $p) {
 			if (!in_array($p, $installed_arr)) {
-				install_plugin($p);
+				Addon::install($p);
 			}
 		}
 	}
 
-	load_hooks();
+	Addon::loadHooks();
 
 	return;
 }

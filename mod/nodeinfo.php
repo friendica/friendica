@@ -6,10 +6,9 @@
 */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
-
-require_once 'include/plugin.php';
 
 function nodeinfo_wellknown(App $a) {
 	$nodeinfo = ['links' => [['rel' => 'http://nodeinfo.diaspora.software/ns/schema/1.0',
@@ -72,48 +71,48 @@ function nodeinfo_init(App $a) {
 		$nodeinfo['usage']['localPosts'] = (int)Config::get('nodeinfo', 'local_posts');
 		$nodeinfo['usage']['localComments'] = (int)Config::get('nodeinfo', 'local_comments');
 
-		if (plugin_enabled('appnet')) {
+		if (Addon::isEnabled('appnet')) {
 			$nodeinfo['services']['inbound'][] = 'appnet';
 		}
-		if (plugin_enabled('appnet') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('appnet') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'appnet';
 		}
-		if (plugin_enabled('blogger')) {
+		if (Addon::isEnabled('blogger')) {
 			$nodeinfo['services']['outbound'][] = 'blogger';
 		}
-		if (plugin_enabled('dwpost')) {
+		if (Addon::isEnabled('dwpost')) {
 			$nodeinfo['services']['outbound'][] = 'dreamwidth';
 		}
-		if (plugin_enabled('fbpost') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('fbpost') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'facebook';
 		}
-		if (plugin_enabled('statusnet')) {
+		if (Addon::isEnabled('statusnet')) {
 			$nodeinfo['services']['inbound'][] = 'gnusocial';
 			$nodeinfo['services']['outbound'][] = 'gnusocial';
 		}
 
-		if (plugin_enabled('gpluspost') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('gpluspost') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'google';
 		}
-		if (plugin_enabled('ijpost')) {
+		if (Addon::isEnabled('ijpost')) {
 			$nodeinfo['services']['outbound'][] = 'insanejournal';
 		}
-		if (plugin_enabled('libertree')) {
+		if (Addon::isEnabled('libertree')) {
 			$nodeinfo['services']['outbound'][] = 'libertree';
 		}
-		if (plugin_enabled('buffer')) {
+		if (Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'linkedin';
 		}
-		if (plugin_enabled('ljpost')) {
+		if (Addon::isEnabled('ljpost')) {
 			$nodeinfo['services']['outbound'][] = 'livejournal';
 		}
-		if (plugin_enabled('buffer')) {
+		if (Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'pinterest';
 		}
-		if (plugin_enabled('posterous')) {
+		if (Addon::isEnabled('posterous')) {
 			$nodeinfo['services']['outbound'][] = 'posterous';
 		}
-		if (plugin_enabled('pumpio')) {
+		if (Addon::isEnabled('pumpio')) {
 			$nodeinfo['services']['inbound'][] = 'pumpio';
 			$nodeinfo['services']['outbound'][] = 'pumpio';
 		}
@@ -121,13 +120,13 @@ function nodeinfo_init(App $a) {
 		if ($smtp) {
 			$nodeinfo['services']['outbound'][] = 'smtp';
 		}
-		if (plugin_enabled('tumblr')) {
+		if (Addon::isEnabled('tumblr')) {
 			$nodeinfo['services']['outbound'][] = 'tumblr';
 		}
-		if (plugin_enabled('twitter') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('twitter') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'twitter';
 		}
-		if (plugin_enabled('wppost')) {
+		if (Addon::isEnabled('wppost')) {
 			$nodeinfo['services']['outbound'][] = 'wordpress';
 		}
 		$nodeinfo['metadata']['protocols'] = $nodeinfo['protocols'];
@@ -137,7 +136,7 @@ function nodeinfo_init(App $a) {
 
 		$nodeinfo['metadata']['services'] = $nodeinfo['services'];
 
-		if (plugin_enabled('twitter')) {
+		if (Addon::isEnabled('twitter')) {
 			$nodeinfo['metadata']['services']['inbound'][] = 'twitter';
 		}
 	}
@@ -154,7 +153,7 @@ function nodeinfo_cron() {
 	$a = get_app();
 
 	// If the plugin 'statistics_json' is enabled then disable it and actrivate nodeinfo.
-	if (plugin_enabled('statistics_json')) {
+	if (Addon::isEnabled('statistics_json')) {
 		Config::set('system', 'nodeinfo', true);
 
 		$plugin = 'statistics_json';
@@ -167,7 +166,7 @@ function nodeinfo_cron() {
 			$idx = array_search($plugin, $plugins_arr);
 			if ($idx !== false) {
 				unset($plugins_arr[$idx]);
-				uninstall_plugin($plugin);
+				Addon::uninstall($plugin);
 				Config::set('system', 'addon', implode(', ',$plugins_arr));
 			}
 		}

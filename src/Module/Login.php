@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
@@ -92,7 +93,7 @@ class Login extends BaseModule
 			 * Plugins should never set 'authenticated' except to indicate success - as hooks may be chained
 			 * and later plugins should not interfere with an earlier one that succeeded.
 			 */
-			call_hooks('authenticate', $addon_auth);
+			Addon::callHooks('authenticate', $addon_auth);
 
 			if ($addon_auth['authenticated'] && count($addon_auth['user_record'])) {
 				$record = $addon_auth['user_record'];
@@ -299,7 +300,7 @@ class Login extends BaseModule
 			]
 		);
 
-		call_hooks('login_hook', $o);
+		Addon::callHooks('login_hook', $o);
 
 		return $o;
 	}

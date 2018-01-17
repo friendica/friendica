@@ -8,6 +8,9 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use dba;
+
+require_once 'include/dba.php';
 
 /**
  * Some functions to handle addons
@@ -17,16 +20,17 @@ class Addon
     /**
      * @brief uninstalls an addon.
      *
-     * @param string $plugin name of the addon
+     * @param string $addon name of the addon
      * @return boolean
      */
-    function uninstall_plugin($plugin) {
-        logger("Addons: uninstalling " . $plugin);
-        dba::delete('addon', ['name' => $plugin]);
+    public static function uninstall($addon)
+    {
+        logger("Addons: uninstalling " . $addon);
+        dba::delete('addon', ['name' => $addon]);
 
-        @include_once('addon/' . $plugin . '/' . $plugin . '.php');
-        if (function_exists($plugin . '_uninstall')) {
-            $func = $plugin . '_uninstall';
+        @include_once('addon/' . $addon . '/' . $addon . '.php');
+        if (function_exists($addon . '_uninstall')) {
+            $func = $addon . '_uninstall';
             $func();
         }
     }
@@ -34,76 +38,79 @@ class Addon
     /**
      * @brief installs an addon.
      *
-     * @param string $plugin name of the addon
+     * @param string $addon name of the addon
      * @return bool
      */
-    function install_plugin($plugin) {
-        // silently fail if plugin was removed
+    public static function install($addon)
+    {
+        // silently fail if addon was removed
 
-        if (!file_exists('addon/' . $plugin . '/' . $plugin . '.php')) {
+        if (!file_exists('addon/' . $addon . '/' . $addon . '.php')) {
             return false;
         }
-        logger("Addons: installing " . $plugin);
-        $t = @filemtime('addon/' . $plugin . '/' . $plugin . '.php');
-        @include_once('addon/' . $plugin . '/' . $plugin . '.php');
-        if (function_exists($plugin . '_install')) {
-            $func = $plugin . '_install';
+        logger("Addons: installing " . $addon);
+        $t = @filemtime('addon/' . $addon . '/' . $addon . '.php');
+        @include_once('addon/' . $addon . '/' . $addon . '.php');
+        if (function_exists($addon . '_install')) {
+            $func = $addon . '_install';
             $func();
 
-            $plugin_admin = (function_exists($plugin."_plugin_admin") ? 1 : 0);
+            $addon_admin = (function_exists($addon."_plugin_admin") ? 1 : 0);
 
-            dba::insert('addon', ['name' => $plugin, 'installed' => true,
-                        'timestamp' => $t, 'plugin_admin' => $plugin_admin]);
+            dba::insert('addon', ['name' => $addon, 'installed' => true,
+                        'timestamp' => $t, 'plugin_admin' => $addon_admin]);
 
             // we can add the following with the previous SQL
             // once most site tables have been updated.
             // This way the system won't fall over dead during the update.
 
-            if (file_exists('addon/' . $plugin . '/.hidden')) {
-                dba::update('addon', ['hidden' => true], ['name' => $plugin]);
+            if (file_exists('addon/' . $addon . '/.hidden')) {
+                dba::update('addon', ['hidden' => true], ['name' => $addon]);
             }
             return true;
         } else {
-            logger("Addons: FAILED installing " . $plugin);
+            logger("Addons: FAILED installing " . $addon);
             return false;
         }
     }
 
-    // reload all updated plugins
+    /**
+     * reload all updated addons
+     */
+    public static function reload()
+    {
+        $addons = Config::get('system', 'addon');
+        if (strlen($addons)) {
 
-    function reload_plugins() {
-        $plugins = Config::get('system', 'addon');
-        if (strlen($plugins)) {
-
-            $r = q("SELECT * FROM `addon` WHERE `installed` = 1");
+            $r = dba::select('addon', [], ['installed' => 1]);
             if (DBM::is_result($r)) {
                 $installed = $r;
             } else {
                 $installed = [];
             }
 
-            $parr = explode(',',$plugins);
+            $addon_list = explode(',', $addons);
 
-            if (count($parr)) {
-                foreach ($parr as $pl) {
+            if (count($addon_list)) {
+                foreach ($addon_list as $addon) {
 
-                    $pl = trim($pl);
+                    $addon = trim($addon);
 
-                    $fname = 'addon/' . $pl . '/' . $pl . '.php';
+                    $fname = 'addon/' . $addon . '/' . $addon . '.php';
 
                     if (file_exists($fname)) {
                         $t = @filemtime($fname);
                         foreach ($installed as $i) {
-                            if (($i['name'] == $pl) && ($i['timestamp'] != $t)) {
-                                logger('Reloading plugin: ' . $i['name']);
+                            if (($i['name'] == $addon) && ($i['timestamp'] != $t)) {
+                                logger('Reloading addon: ' . $i['name']);
                                 @include_once($fname);
 
-                                if (function_exists($pl . '_uninstall')) {
-                                    $func = $pl . '_uninstall';
+                                if (function_exists($addon . '_uninstall')) {
+                                    $func = $addon . '_uninstall';
                                     $func();
                                 }
-                                if (function_exists($pl . '_install')) {
-                                    $func = $pl . '_install';
+                                if (function_exists($addon . '_install')) {
+                                    $func = $addon . '_install';
                                     $func();
                                 }
                                 dba::update('addon', ['timestamp' => $t], ['id' => $i['id']]);
@@ -113,17 +120,17 @@ class Addon
                 }
             }
         }
-
     }
 
     /**
      * @brief check if addon is enabled
      *
-     * @param string $plugin
+     * @param string $addon
      * @return boolean
      */
-    function plugin_enabled($plugin) {
-        return dba::exists('addon', ['installed' => true, 'name' => $plugin]);
+    public static function isEnabled($addon)
+    {
+        return dba::exists('addon', ['installed' => true, 'name' => $addon]);
     }
 
 
@@ -136,7 +143,8 @@ class Addon
      * @param int $priority A priority (defaults to 0)
      * @return mixed|bool
      */
-    function register_hook($hook, $file, $function, $priority=0) {
+    public static function registerHook($hook, $file, $function, $priority = 0)
+    {
         $condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
         $exists = dba::exists('hook', $condition);
         if ($exists) {
@@ -156,14 +164,15 @@ class Addon
      * @param string $function the name of the function that the hook called
      * @return array
      */
-    function unregister_hook($hook, $file, $function) {
+    public static function unregisterHook($hook, $file, $function)
+    {
         $condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
         $r = dba::delete('hook', $condition);
         return $r;
     }
 
 
-    function load_hooks() {
+    public static function loadHooks() {
         $a = get_app();
         $a->hooks = [];
         $r = dba::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
@@ -186,13 +195,13 @@ class Addon
      * @param string $name of the hook to call
      * @param string|array &$data to transmit to the callback handler
      */
-    function call_hooks($name, &$data = null)
+    public static function callHooks($name, &$data = null)
     {
         $a = get_app();
 
         if (is_array($a->hooks) && array_key_exists($name, $a->hooks)) {
             foreach ($a->hooks[$name] as $hook) {
-                call_single_hook($a, $name, $hook, $data);
+                self::callSingleHook($a, $name, $hook, $data);
             }
         }
     }
@@ -204,7 +213,8 @@ class Addon
      * @param array $hook Hook data
      * @param string|array &$data to transmit to the callback handler
      */
-    function call_single_hook($a, $name, $hook, &$data = null) {
+    public static function callSingleHook($a, $name, $hook, &$data = null)
+    {
         // Don't run a theme's hook if the user isn't using the theme
         if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/'.current_theme()) === false)
             return;
@@ -220,9 +230,12 @@ class Addon
         }
     }
 
-    //check if an app_menu hook exist for plugin $name.
-    //Return true if the plugin is an app
-    function plugin_is_app($name) {
+    /**
+     * check if an app_menu hook exist for addon $name.
+     * Return true if the addon is an app
+     */
+    function isApp($name)
+    {
         $a = get_app();
 
         if (is_array($a->hooks) && (array_key_exists('app_menu',$a->hooks))) {
@@ -236,37 +249,39 @@ class Addon
     }
 
     /**
-     * @brief Parse plugin comment in search of plugin infos.
+     * @brief Parse addon comment in search of addon infos.
      *
      * like
      * \code
-     *...* Name: Plugin
-    *   * Description: A plugin which plugs in
+     *...* Name: addon
+    *   * Description: An addon which plugs in
     * . * Version: 1.2.3
     *   * Author: John <profile url>
     *   * Author: Jane <email>
     *   *
     *  *\endcode
-    * @param string $plugin the name of the plugin
-    * @return array with the plugin information
+    * @param string $addon the name of the addon
+    * @return array with the addon information
     */
 
-    function get_plugin_info($plugin) {
+    public static function getInfo($addon) {
 
         $a = get_app();
 
         $info=[
-            'name' => $plugin,
+            'name' => $addon,
             'description' => "",
             'author' => [],
             'version' => "",
             'status' => ""
         ];
 
-        if (!is_file("addon/$plugin/$plugin.php")) return $info;
+        if (!is_file("addon/$addon/$addon.php")) {
+            return $info;
+        }
 
         $stamp1 = microtime(true);
-        $f = file_get_contents("addon/$plugin/$plugin.php");
+        $f = file_get_contents("addon/$addon/$addon.php");
         $a->save_timestamp($stamp1, "file");
 
         $r = preg_match("|/\*.*\*/|msU", $f, $m);
@@ -293,7 +308,6 @@ class Addon
 
                 }
             }
-
         }
         return $info;
     }

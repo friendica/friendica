@@ -8,6 +8,7 @@
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Text\Markdown;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -1756,11 +1757,11 @@ function admin_page_plugins(App $a)
 			$idx = array_search($plugin, $a->plugins);
 			if ($idx !== false) {
 				unset($a->plugins[$idx]);
-				uninstall_plugin($plugin);
+				Addon::uninstall($plugin);
 				info(t("Plugin %s disabled.", $plugin));
 			} else {
 				$a->plugins[] = $plugin;
-				install_plugin($plugin);
+				Addon::install($plugin);
 				info(t("Plugin %s enabled.", $plugin));
 			}
 			Config::set("system", "addon", implode(", ", $a->plugins));
@@ -1803,7 +1804,7 @@ function admin_page_plugins(App $a)
 			'$plugin' => $plugin,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => get_plugin_info($plugin),
+			'$info' => Addon::getInfo($plugin),
 			'$str_author' => t('Author: '),
 			'$str_maintainer' => t('Maintainer: '),
 
@@ -1821,7 +1822,7 @@ function admin_page_plugins(App $a)
 	 */
 	if (x($_GET, "a") && $_GET['a'] == "r") {
 		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/plugins', 'admin_themes', 't');
-		reload_plugins();
+		Addon::reload();
 		info("Plugins reloaded");
 		goaway(System::baseUrl() . '/admin/plugins');
 	}
@@ -1832,7 +1833,7 @@ function admin_page_plugins(App $a)
 		foreach ($files as $file) {
 			if (is_dir($file)) {
 				list($tmp, $id) = array_map("trim", explode("/", $file));
-				$info = get_plugin_info($id);
+				$info = Addon::getInfo($id);
 				$show_plugin = true;
 
 				// If the addon is unsupported, then only show it, when it is enabled
