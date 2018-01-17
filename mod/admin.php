@@ -11,6 +11,7 @@ use Friendica\Content\Text\Markdown;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
+use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
@@ -2006,10 +2007,10 @@ function admin_page_themes(App $a)
 			toggle_theme($themes, $theme, $result);
 			$s = rebuild_theme_table($themes);
 			if ($result) {
-				install_theme($theme);
+				Theme::install($theme);
 				info(sprintf('Theme %s enabled.', $theme));
 			} else {
-				uninstall_theme($theme);
+				Theme::uninstall($theme);
 				info(sprintf('Theme %s disabled.', $theme));
 			}
 
@@ -2057,7 +2058,7 @@ function admin_page_themes(App $a)
 			$a->page = $orig_page;
 		}
 
-		$screenshot = [get_theme_screenshot($theme), t('Screenshot')];
+		$screenshot = [Theme::getScreenshot($theme), t('Screenshot')];
 		if (!stristr($screenshot[0], $theme)) {
 			$screenshot = null;
 		}
@@ -2072,7 +2073,7 @@ function admin_page_themes(App $a)
 			'$plugin' => $theme,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => get_theme_info($theme),
+			'$info' => Theme::getInfo($theme),
 			'$function' => 'themes',
 			'$admin_form' => $admin_form,
 			'$str_author' => t('Author: '),
@@ -2084,14 +2085,13 @@ function admin_page_themes(App $a)
 		]);
 	}
 
-
 	// reload active themes
 	if (x($_GET, "a") && $_GET['a'] == "r") {
 		check_form_security_token_redirectOnErr(System::baseUrl() . '/admin/themes', 'admin_themes', 't');
 		foreach ($themes as $th) {
 			if ($th['allowed']) {
-				uninstall_theme($th['name']);
-				install_theme($th['name']);
+				Theme::uninstall($th['name']);
+				Theme::install($th['name']);
 			}
 		}
 		info("Themes reloaded");
@@ -2104,7 +2104,7 @@ function admin_page_themes(App $a)
 
 	$plugins = [];
 	foreach ($themes as $th) {
-		$plugins[] = [$th['name'], (($th['allowed']) ? "on" : "off"), get_theme_info($th['name'])];
+		$plugins[] = [$th['name'], (($th['allowed']) ? "on" : "off"), Theme::getInfo($th['name'])];
 	}
 
 	$t = get_markup_template('admin/plugins.tpl');
