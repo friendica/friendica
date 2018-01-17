@@ -77,7 +77,7 @@ function settings_init(App $a)
 	];
 
 	$tabs[] =	[
-		'label'	=> t('Plugins'),
+		'label'	=> t('Addons'),
 		'url' 	=> 'settings/addon',
 		'selected'	=> (($a->argc > 1) && ($a->argv[1] === 'addon')?'active':''),
 		'accesskey' => 'l',
@@ -751,7 +751,7 @@ function settings_content(App $a)
 
 		$r = q("SELECT * FROM `hook` WHERE `hook` = 'plugin_settings' ");
 		if (!DBM::is_result($r)) {
-			$settings_addons = t('No Plugin settings configured');
+			$settings_addons = t('No Addon settings configured');
 		}
 
 		Addon::callHooks('plugin_settings', $settings_addons);
@@ -760,7 +760,7 @@ function settings_content(App $a)
 		$tpl = get_markup_template('settings/addons.tpl');
 		$o .= replace_macros($tpl, [
 			'$form_security_token' => get_form_security_token("settings_addon"),
-			'$title'	=> t('Plugin Settings'),
+			'$title'	=> t('Addon Settings'),
 			'$settings_addons' => $settings_addons
 		]);
 		return $o;

@@ -969,7 +969,7 @@ class GContact
 	/**
 	 * @brief Fetches users of given GNU Social server
 	 *
-	 * If the "Statistics" plugin is enabled (See http://gstools.org/ for details) we query user data with this.
+	 * If the "Statistics" addon is enabled (See http://gstools.org/ for details) we query user data with this.
 	 *
 	 * @param string $server Server address
 	 * @return void
