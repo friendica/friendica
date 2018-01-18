@@ -3824,12 +3824,12 @@ margin-left: 0px;
 }
 
 #adminpage
-#pluginslist {
+#addonslist {
 	margin: 0px;
 	padding: 0px;
 }
 
-#adminpage .plugin {
+#adminpage .addon {
 	list-style: none;
 	display: block;
 	clear: left;
@@ -3844,7 +3844,7 @@ margin-left: 0px;
 	margin:10px 10px 10px 0;
 }
 
-#adminpage .toggleplugin {
+#adminpage .toggleaddon {
 	float: left;
 	margin-right: 1em;
 }
