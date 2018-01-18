@@ -5,7 +5,7 @@ Database Tables
 
 | Table                                                | Description                                      |
 |------------------------------------------------------|--------------------------------------------------|
-| [addon](help/database/db_addon)                      | registered plugins                               |
+| [addon](help/database/db_addon)                      | registered addons                               |
 | [attach](help/database/db_attach)                    | file attachments                                 |
 | [auth_codes](help/database/db_auth_codes)            | OAuth usage                                      |
 | [cache](help/database/db_cache)                      | OEmbed cache                                     |
@@ -24,7 +24,7 @@ Database Tables
 | [group](help/database/db_group)                      | privacy groups, group info                       |
 | [group_member](help/database/db_group_member)        | privacy groups, member info                      |
 | [gserver](help/database/db_gserver)                  |                                                  |
-| [hook](help/database/db_hook)                        | plugin hook registry                             |
+| [hook](help/database/db_hook)                        | addon hook registry                             |
 | [intro](help/database/db_intro)                      |                                                  |
 | [item](help/database/db_item)                        | all posts                                        |
 | [locks](help/database/db_locks)                      |                                                  |

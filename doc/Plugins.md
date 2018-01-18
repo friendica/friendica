@@ -1,4 +1,4 @@
-Friendica Addon/Plugin development
+Friendica Addon development
 ==============
 
 * [Home](help)
@@ -7,32 +7,32 @@ Please see the sample addon 'randplace' for a working example of using some of t
 Addons work by intercepting event hooks - which must be registered.
 Modules work by intercepting specific page requests (by URL path).
 
-Plugin names cannot contain spaces or other punctuation and are used as filenames and function names.
+Addon names cannot contain spaces or other punctuation and are used as filenames and function names.
 You may supply a "friendly" name within the comment block.
-Each addon must contain both an install and an uninstall function based on the addon/plugin name.
-For instance "plugin1name_install()".
-These two functions take no arguments and are usually responsible for registering (and unregistering) event hooks that your plugin will require.
-The install and uninstall functions will also be called (i.e. re-installed) if the plugin changes after installation.
+Each addon must contain both an install and an uninstall function based on the addon/addon name.
+For instance "addon1name_install()".
+These two functions take no arguments and are usually responsible for registering (and unregistering) event hooks that your addon will require.
+The install and uninstall functions will also be called (i.e. re-installed) if the addon changes after installation.
 Therefore your uninstall should not destroy data and install should consider that data may already exist.
 Future extensions may provide for "setup" amd "remove".
 
-Plugins should contain a comment block with the four following parameters:
+Addons should contain a comment block with the four following parameters:
 
     /*
-     * Name: My Great Plugin
-     * Description: This is what my plugin does. It's really cool.
+     * Name: My Great Addon
+     * Description: This is what my addon does. It's really cool.
      * Version: 1.0
      * Author: John Q. Public <john@myfriendicasite.com>
      */
 
-Register your plugin hooks during installation.
+Register your addon hooks during installation.
 
     Addon::registerHook($hookname, $file, $function);
 
 $hookname is a string and corresponds to a known Friendica hook.
 
 $file is a pathname relative to the top-level Friendica directory.
-This *should* be 'addon/plugin_name/plugin_name.php' in most cases.
+This *should* be 'addon/addon_name/addon_name.php' in most cases.
 
 $function is a string and is the name of the function which will be executed when the hook is called.
 
@@ -69,39 +69,39 @@ Remember to declare it with '&' if you wish to alter it.
 Modules
 ---
 
-Plugins/addons may also act as "modules" and intercept all page requests for a given URL path.
-In order for a plugin to act as a module it needs to define a function "plugin_name_module()" which takes no arguments and needs not do anything.
+Addons/addons may also act as "modules" and intercept all page requests for a given URL path.
+In order for a addon to act as a module it needs to define a function "addon_name_module()" which takes no arguments and needs not do anything.
 
-If this function exists, you will now receive all page requests for "http://my.web.site/plugin_name" - with any number of URL components as additional arguments.
+If this function exists, you will now receive all page requests for "http://my.web.site/addon_name" - with any number of URL components as additional arguments.
 These are parsed into an array $a->argv, with a corresponding $a->argc indicating the number of URL components.
-So http://my.web.site/plugin/arg1/arg2 would look for a module named "plugin" and pass its module functions the $a App structure (which is available to many components).
+So http://my.web.site/addon/arg1/arg2 would look for a module named "addon" and pass its module functions the $a App structure (which is available to many components).
 This will include:
 
     $a->argc = 3
-    $a->argv = array(0 => 'plugin', 1 => 'arg1', 2 => 'arg2');
+    $a->argv = array(0 => 'addon', 1 => 'arg1', 2 => 'arg2');
 
-Your module functions will often contain the function plugin_name_content(App $a), which defines and returns the page body content.
-They may also contain plugin_name_post(App $a) which is called before the _content function and typically handles the results of POST forms.
-You may also have plugin_name_init(App $a) which is called very early on and often does module initialisation.
+Your module functions will often contain the function addon_name_content(App $a), which defines and returns the page body content.
+They may also contain addon_name_post(App $a) which is called before the _content function and typically handles the results of POST forms.
+You may also have addon_name_init(App $a) which is called very early on and often does module initialisation.
 
 Templates
 ---
 
-If your plugin needs some template, you can use the Friendica template system.
+If your addon needs some template, you can use the Friendica template system.
 Friendica uses [smarty3](http://www.smarty.net/) as a template engine.
 
-Put your tpl files in the *templates/* subfolder of your plugin.
+Put your tpl files in the *templates/* subfolder of your addon.
 
-In your code, like in the function plugin_name_content(), load the template file and execute it passing needed values:
+In your code, like in the function addon_name_content(), load the template file and execute it passing needed values:
 
     # load template file. first argument is the template name,
-    # second is the plugin path relative to friendica top folder
-    $tpl = get_markup_template('mytemplate.tpl', 'addon/plugin_name/');
+    # second is the addon path relative to friendica top folder
+    $tpl = get_markup_template('mytemplate.tpl', 'addon/addon_name/');
 
     # apply template. first argument is the loaded template,
     # second an array of 'name'=>'values' to pass to template
     $output = replace_macros($tpl,array(
-        'title' => 'My beautiful plugin',
+        'title' => 'My beautiful addon',
     ));
 
 See also the wiki page [Quick Template Guide](https://github.com/friendica/friendica/wiki/Quick-Template-Guide).
@@ -151,11 +151,11 @@ $b is an array:
 * called when the Settings pages are submitted
 * $b is the $_POST array
 
-### 'plugin_settings'
+### 'addon_settings'
 * called when generating the HTML for the addon settings page
 * $b is the (string) HTML of the addon settings page before the final '</form>' tag.
 
-### 'plugin_settings_post'
+### 'addon_settings_post'
 * called when the Addon Settings pages are submitted
 * $b is the $_POST array
 
@@ -394,10 +394,6 @@ include/conversation.php:	Addon::callHooks('jot_tool', $jotplugins);
 
 include/conversation.php:	Addon::callHooks('jot_networks', $jotnets);
 
-include/plugin.php:if(! function_exists('call_hooks')) {
-
-include/plugin.php:function Addon::callHooks($name, &$data = null) {
-
 index.php:	Addon::callHooks('init_1');
 
 index.php:Addon::callHooks('app_menu', $arr);
@@ -434,13 +430,13 @@ mod/contacts.php:	Addon::callHooks('contact_edit_post', $_POST);
 
 mod/contacts.php:		Addon::callHooks('contact_edit', $arr);
 
-mod/settings.php:		Addon::callHooks('plugin_settings_post', $_POST);
+mod/settings.php:		Addon::callHooks('addon_settings_post', $_POST);
 
 mod/settings.php:		Addon::callHooks('connector_settings_post', $_POST);
 
 mod/settings.php:	Addon::callHooks('settings_post', $_POST);
 
-mod/settings.php:		Addon::callHooks('plugin_settings', $settings_addons);
+mod/settings.php:		Addon::callHooks('addon_settings', $settings_addons);
 
 mod/settings.php:		Addon::callHooks('connector_settings', $settings_connectors);
 
