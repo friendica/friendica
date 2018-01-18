@@ -5,10 +5,9 @@
  */
 namespace Friendica\Content;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
-
-require_once 'include/plugin.php';
 
 class Feature
 {
@@ -36,7 +35,7 @@ class Feature
 		}
 
 		$arr = ['uid' => $uid, 'feature' => $feature, 'enabled' => $x];
-		call_hooks('isEnabled', $arr);
+		Addon::callHooks('isEnabled', $arr);
 		return($arr['enabled']);
 	}
 
@@ -150,7 +149,7 @@ class Feature
 			}
 		}
 
-		call_hooks('get', $arr);
+		Addon::callHooks('get', $arr);
 		return $arr;
 	}
 }

@@ -104,7 +104,7 @@ Ignorierte Kontakte können weiterhin Beiträge und private Nachrichten von Dir 
 Deren Beiträge und private Nachrichten werden allerdings nicht importiert. 
 Wie bei blockierten Beiträgen siehst Du auch hier weiterhin die Kommentare dieser Person zu anderen Beiträgen Deiner Freunde. 
 
-[Ein Plugin namens "blockem" kann installiert werden, um alle Beiträge einer bestimmten Person in Deinem Stream zu verstecken bzw. zu verkürzen. 
+[Ein Erweiterung namens "blockem" kann installiert werden, um alle Beiträge einer bestimmten Person in Deinem Stream zu verstecken bzw. zu verkürzen. 
 Dabei werden auch Kommentare dieser Person in Beiträgen Deiner Freunde blockiert.]
 
 Ein archivierter Kontakt bedeutet, dass Kommunikation nicht möglich ist und auch nicht versucht wird (das ist z.B. sinnvoll, wenn eine Person zu einem neuen Server gewechselt ist und das alte Profil gelöscht hat). 

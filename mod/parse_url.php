@@ -11,6 +11,7 @@
 */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Util\ParseUrl;
 
 require_once("include/items.php");
@@ -91,7 +92,7 @@ function parse_url_content(App $a) {
 
 	$arr = ["url" => $url, "text" => ""];
 
-	call_hooks("parse_link", $arr);
+	Addon::callHooks("parse_link", $arr);
 
 	if (strlen($arr["text"])) {
 		echo $arr["text"];

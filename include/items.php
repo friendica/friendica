@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
@@ -157,7 +158,7 @@ function title_is_body($title, $body) {
 }
 
 function add_page_info_data($data) {
-	call_hooks('page_info_data', $data);
+	Addon::callHooks('page_info_data', $data);
 
 	// It maybe is a rich content, but if it does have everything that a link has,
 	// then treat it that way
@@ -601,7 +602,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	}
 
 	/// @TODO old-lost code?
-	// Shouldn't happen but we want to make absolutely sure it doesn't leak from a plugin.
+	// Shouldn't happen but we want to make absolutely sure it doesn't leak from an addon.
 	// Deactivated, since the bbcode parser can handle with it - and it destroys posts with some smileys that contain "<"
 	//if ((strpos($arr['body'],'<') !== false) || (strpos($arr['body'],'>') !== false))
 	//	$arr['body'] = strip_tags($arr['body']);
@@ -945,9 +946,9 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	put_item_in_cache($arr);
 
 	if ($notify) {
-		call_hooks('post_local', $arr);
+		Addon::callHooks('post_local', $arr);
 	} else {
-		call_hooks('post_remote', $arr);
+		Addon::callHooks('post_remote', $arr);
 	}
 
 	// This array field is used to trigger some automatic reactions
@@ -955,7 +956,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	unset($arr['api_source']);
 
 	if (x($arr, 'cancel')) {
-		logger('item_store: post cancelled by plugin.');
+		logger('item_store: post cancelled by addon.');
 		return 0;
 	}
 
@@ -1088,9 +1089,9 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		$r = q('SELECT * FROM `item` WHERE `id` = %d', intval($current_post));
 		if ((DBM::is_result($r)) && (count($r) == 1)) {
 			if ($notify) {
-				call_hooks('post_local_end', $r[0]);
+				Addon::callHooks('post_local_end', $r[0]);
 			} else {
-				call_hooks('post_remote_end', $r[0]);
+				Addon::callHooks('post_remote_end', $r[0]);
 			}
 		} else {
 			logger('item_store: new item not found in DB, id ' . $current_post);
@@ -1378,7 +1379,7 @@ function tag_deliver($uid, $item_id)
 
 	$arr = ['item' => $item, 'user' => $u[0], 'contact' => $r[0]];
 
-	call_hooks('tagged', $arr);
+	Addon::callHooks('tagged', $arr);
 
 	if ((! $community_page) && (! $prvgroup)) {
 		return;

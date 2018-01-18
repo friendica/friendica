@@ -1,12 +1,13 @@
 <?php
 
 use Friendica\App;
+use Friendica\Core\Theme;
 
 function pretheme_init(App $a) {
 
 	if ($_REQUEST['theme']) {
 		$theme = $_REQUEST['theme'];
-		$info = get_theme_info($theme);
+		$info = Theme::getInfo($theme);
 		if ($info) {
 			// unfortunately there will be no translation for this string
 			$desc = $info['description'];
@@ -17,7 +18,7 @@ function pretheme_init(App $a) {
 			$version = '';
 			$credits = '';
 		}
-		echo json_encode(['img' => get_theme_screenshot($theme), 'desc' => $desc, 'version' => $version, 'credits' => $credits]);
+		echo json_encode(['img' => Theme::getScreenshot($theme), 'desc' => $desc, 'version' => $version, 'credits' => $credits]);
 	}
 
 	killme();

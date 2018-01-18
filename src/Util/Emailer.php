@@ -4,6 +4,7 @@
  */
 namespace Friendica\Util;
 
+use Friendica\Core\Addon;
 use Friendica\Core\PConfig;
 use Friendica\Protocol\Email;
 
@@ -30,7 +31,7 @@ class Emailer
 	 */
 	public static function send($params)
 	{
-		call_hooks('emailer_send_prepare', $params);
+		Addon::callHooks('emailer_send_prepare', $params);
 
 		$email_textonly = false;
 		if (x($params, "uid")) {
@@ -79,7 +80,7 @@ class Emailer
 			'headers' => $messageHeader
 		];
 		//echo "<pre>"; var_dump($hookdata); killme();
-		call_hooks("emailer_send", $hookdata);
+		Addon::callHooks("emailer_send", $hookdata);
 		$res = mail(
 			$hookdata['to'],							// send to address
 			$hookdata['subject'],						// subject

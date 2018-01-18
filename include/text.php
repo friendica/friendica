@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Content\Smilies;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -969,7 +970,7 @@ function contact_block() {
 
 	$arr = ['contacts' => $r, 'output' => $o];
 
-	call_hooks('contact_block_end', $arr);
+	Addon::callHooks('contact_block_end', $arr);
 	return $o;
 
 }
@@ -1123,7 +1124,7 @@ function get_poke_verbs() {
 		'finger' => ['fingered', t('finger'), t('fingered')],
 		'rebuff' => ['rebuffed', t('rebuff'), t('rebuffed')],
 	];
-	call_hooks('poke_verbs', $arr);
+	Addon::callHooks('poke_verbs', $arr);
 	return $arr;
 }
 
@@ -1255,7 +1256,7 @@ function put_item_in_cache(&$item, $update = false)
 function prepare_body(&$item, $attach = false, $preview = false) {
 
 	$a = get_app();
-	call_hooks('prepare_body_init', $item);
+	Addon::callHooks('prepare_body_init', $item);
 
 	$searchpath = System::baseUrl() . "/search?tag=";
 
@@ -1314,7 +1315,7 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 	$s = $item["rendered-html"];
 
 	$prep_arr = ['item' => $item, 'html' => $s, 'preview' => $preview];
-	call_hooks('prepare_body', $prep_arr);
+	Addon::callHooks('prepare_body', $prep_arr);
 	$s = $prep_arr['html'];
 
 	if (! $attach) {
@@ -1432,7 +1433,7 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 	}
 
 	$prep_arr = ['item' => $item, 'html' => $s];
-	call_hooks('prepare_body_final', $prep_arr);
+	Addon::callHooks('prepare_body_final', $prep_arr);
 
 	return $prep_arr['html'];
 }

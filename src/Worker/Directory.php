@@ -6,6 +6,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -27,7 +28,7 @@ class Directory {
 
 		$arr = ['url' => $url];
 
-		call_hooks('globaldir_update', $arr);
+		Addon::callHooks('globaldir_update', $arr);
 
 		logger('Updating directory: ' . $arr['url'], LOGGER_DEBUG);
 		if (strlen($arr['url'])) {

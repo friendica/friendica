@@ -7,6 +7,7 @@ use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
@@ -388,7 +389,7 @@ function network_content(App $a, $update = 0) {
 
 	/// @TODO Is this really necessary? $a is already available to hooks
 	$arr = ['query' => $a->query_string];
-	call_hooks('network_content_init', $arr);
+	Addon::callHooks('network_content_init', $arr);
 
 	$nouveau = false;
 
@@ -1006,7 +1007,7 @@ function network_tabs(App $a)
 	}
 
 	$arr = ['tabs' => $tabs];
-	call_hooks('network_tabs', $arr);
+	Addon::callHooks('network_tabs', $arr);
 
 	$tpl = get_markup_template('common_tabs.tpl');
 

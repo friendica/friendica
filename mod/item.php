@@ -15,6 +15,7 @@
  * information.
  */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -50,7 +51,7 @@ function item_post(App $a) {
 		killme();
 	}
 
-	call_hooks('post_local_start', $_REQUEST);
+	Addon::callHooks('post_local_start', $_REQUEST);
 	// logger('postinput ' . file_get_contents('php://input'));
 	logger('postvars ' . print_r($_REQUEST,true), LOGGER_DATA);
 
@@ -203,7 +204,7 @@ function item_post(App $a) {
 
 	/*
 	 * Now check that it is a page_type of PAGE_BLOG, and that valid personal details
-	 * have been provided, and run any anti-spam plugins
+	 * have been provided, and run any anti-spam addons
 	 */
 	if (!(can_write_wall($profile_uid) || $allow_comment) && !$allow_moderated) {
 		notice(t('Permission denied.') . EOL) ;
@@ -741,7 +742,7 @@ function item_post(App $a) {
 	$datarray['last-child'] = 1;
 
 	/*
-	 * These fields are for the convenience of plugins...
+	 * These fields are for the convenience of addons...
 	 * 'self' if true indicates the owner is posting on their own wall
 	 * If parent is 0 it is a top-level post.
 	 */
@@ -783,10 +784,10 @@ function item_post(App $a) {
 		killme();
 	}
 
-	call_hooks('post_local',$datarray);
+	Addon::callHooks('post_local',$datarray);
 
 	if (x($datarray, 'cancel')) {
-		logger('mod_item: post cancelled by plugin.');
+		logger('mod_item: post cancelled by addon.');
 		if ($return_path) {
 			goaway($return_path);
 		}
@@ -886,7 +887,7 @@ function item_post(App $a) {
 		}
 	}
 
-	call_hooks('post_local_end', $datarray);
+	Addon::callHooks('post_local_end', $datarray);
 
 	if (strlen($emailcc) && $profile_uid == local_user()) {
 		$erecips = explode(',', $emailcc);

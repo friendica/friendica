@@ -6,6 +6,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -20,7 +21,7 @@ class Expire {
 		require_once 'include/datetime.php';
 		require_once 'include/items.php';
 
-		load_hooks();
+		Addon::loadHooks();
 
 		if ($param == 'delete') {
 			logger('Delete expired items', LOGGER_DEBUG);
@@ -50,7 +51,7 @@ class Expire {
 			foreach ($a->hooks["expire"] as $hook) {
 				if ($hook[1] == $hook_name) {
 					logger("Calling expire hook '" . $hook[1] . "'", LOGGER_DEBUG);
-					call_single_hook($a, $hook_name, $hook, $data);
+					Addon::callSingleHook($a, $hook_name, $hook, $data);
 				}
 			}
 			return;

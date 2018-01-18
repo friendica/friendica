@@ -5,6 +5,7 @@
 namespace Friendica\Network;
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
@@ -15,7 +16,6 @@ use OAuthSignatureMethod_PLAINTEXT;
 use OAuthSignatureMethod_HMAC_SHA1;
 
 require_once "library/OAuth1.php";
-require_once "include/plugin.php";
 
 /**
  * @brief OAuth protocol
@@ -72,6 +72,6 @@ class FKOAuth1 extends OAuthServer
 
 		dba::update('user', ['login_date' => datetime_convert()], ['uid' => $_SESSION['uid']]);
 
-		call_hooks('logged_in', $a->user);
+		Addon::callHooks('logged_in', $a->user);
 	}
 }

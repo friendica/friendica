@@ -22,16 +22,16 @@ If you have many OStatus contacts then completing of conversations can take some
 
 When using MyISAM (default) or InnoDB on MariaDB 10 this speeds up search.
 
-Plugins
+Addons
 --------
 
-Active the following plugins:
+Active the following addons:
 
     rendertime
 
 ###rendertime
 
-This plugin doesn't speed up your system. 
+This addon doesn't speed up your system. 
 It helps to analyze your bottlenecks.
 
 When enabled you see some values at the bottom of every page.

@@ -130,18 +130,18 @@ You should also be sure that $a->config['php_path'] is set correctly, it should
 look like (changing it to the correct PHP location)
 
 $a->config['php_path'] = '/usr/local/php53/bin/php'
-
-Alternative: You may be able to use the 'poormancron' plugin to perform this
+  
+Alternative: You may be able to use the 'poormancron' addon to perform this
 step if you are using a recent Friendica release. 'poormancron' may result in
 perfomance and memory issues and is only suitable for small sites with one or
-two users and a handful of contacts. To do this, edit the file
-".htconfig.php" and look for a line describing your plugins. On a fresh
+two users and a handful of contacts. To do this, edit the file 
+".htconfig.php" and look for a line describing your addons. On a fresh 
 installation, it will look like
 
 $a->config['system']['addon'] = 'js_upload';
 
-This indicates the "js_upload" addon module is enabled. You may add additional
-addons/plugins using this same line in the configuration file. Change it to
+This indicates the "js_upload" addon module is enabled. You may add additional 
+addons using this same line in the configuration file. Change it to 
 read
 
 $a->config['system']['addon'] = 'js_upload,poormancron';

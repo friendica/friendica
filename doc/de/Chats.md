@@ -8,9 +8,9 @@ Du hast derzeit zwei Möglichkeiten, einen Chat auf Deiner Friendica-Seite zu be
 * IRC - Internet Relay Chat
 * Jappix
 
-##IRC Plugin
+##IRC Addon
 
-Sobald das Plugin aktiviert ist, kannst Du den Chat unter [deineSeite.de/irc](../irc) finden.
+Sobald das Addon aktiviert ist, kannst Du den Chat unter [deineSeite.de/irc](../irc) finden.
 Beachte aber, dass dieser Chat auch ohne Anmeldung auf Deiner Seite zugänglich ist und somit auch Fremde diesen Chat mitnutzen können.
 
 Wenn Du dem Link folgst, dann kommst Du zum Anmeldefenster des IR-Chats.
@@ -29,7 +29,7 @@ Weiter Informationen zu IRC findest Du zum Beispiel auf <a href="http://wiki.ubu
 
 ##Jappix Mini
 
-Das Jappix Mini Plugin erlaubt das Erstellen einer Chatbox für Jabber/XMPP-Kontakte.
+Das Jappix Mini Addon erlaubt das Erstellen einer Chatbox für Jabber/XMPP-Kontakte.
 Ein Jabber/XMPP Account sollte vor der Installation bereits vorhanden sein.
 Die ausführliche Anleitung dazu und eine Kontrolle, ob Du nicht sogar schon über Deinen E-Mail Anbieter einen Jabber-Account hast, findest Du unter <a href="http://einfachjabber.de" target="_blank">einfachjabber.de</a>.
 
@@ -53,15 +53,15 @@ oder als normaler Download von hier: https://github.com/friendica/friendica-addo
 
 Entpacke diese Datei (ggf. den entpackten Ordner in „jappixmini“ umbenennen) und lade sowohl den entpackten Ordner komplett als auch die .tgz Datei in den Addon Ordner Deiner Friendica Installation hoch.
 
-Nach dem Upload gehts in den Friendica Adminbereich und dort zu den Plugins.
-Aktiviere das Jappixmini Addon und gehe anschließend über die Plugins Seitenleiste (dort wo auch die Twitter-, Impressums-, GNU Social-, usw. Einstellungen gemacht werden) zu den Jappix Grundeinstellungen.
+Nach dem Upload gehts in den Friendica Adminbereich und dort zu den Addons.
+Aktiviere das Jappixmini Addon und gehe anschließend über die Addons Seitenleiste (dort wo auch die Twitter-, Impressums-, GNU Social-, usw. Einstellungen gemacht werden) zu den Jappix Grundeinstellungen.
 
 Setze hier den Haken zur Aktivierung des BOSH Proxys.
 Weiter gehts in den Einstellungen Deines Friendica Accounts.
 
 2. Einstellungen
 
-Gehe bitte zu den Plugin-Einstellungen in Deinen Konto-Einstellungen (Account Settings).
+Gehe bitte zu den Addon-Einstellungen in Deinen Konto-Einstellungen (Account Settings).
 Scrolle ein Stück hinunter bis zu den Jappix Mini Addon settings.
 
 Aktiviere hier zuerst das Addon.

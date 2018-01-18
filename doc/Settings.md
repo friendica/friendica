@@ -14,7 +14,7 @@ These worker tasks are prioritised and are done accordingly.
 
 Then you get an overview of the accounts on your node, which can be moderated in the "Users" section of the panel.
 As well as an overview of the currently active addons
-The list is linked, so you can have quick access to the plugin settings.
+The list is linked, so you can have quick access to the Addon settings.
 And finally you are informed about the version of Friendica you have installed.
 If you contact the devs with a bug or problem, please also mention the version of your node.
 
@@ -205,7 +205,7 @@ Here the admin can also block/unblock users from accessing the node or delete th
 In the last section of the page admins can create new accounts on the node.
 The password for the new account will be send by email to the choosen email address.
 
-## Plugins
+## Addons
 
 This page is for selecting and configuration of extensions for Friendica which have to be placed into the `/addon` subdirectory of your Friendica installation.
 You are presented with a long list of available addons.
@@ -213,11 +213,11 @@ The name of each addon is linked to a separate page for that addon which offers 
 Also shown is the version of the addon and an indicator if the addon is currently active or not.
 
 When you update your node and the addons they may have to be reloaded.
-To simplify this process there is a button at the top of the page to reload all active plugins.
+To simplify this process there is a button at the top of the page to reload all active Addons.
 
 ## Themes
 
-The Themes section of the admin panel works similar to the Plugins section but let you control the themes on your Friendica node.
+The Themes section of the admin panel works similar to the Addons section but let you control the themes on your Friendica node.
 Each theme has a dedicated subpage showing the current status, some information about the theme and a screen-shot of the Friendica interface using the theme.
 Should the theme offer special settings, admins can set a global default value here.
 
@@ -266,7 +266,7 @@ To do so, they need to know the GUID of the posting.
 This can be found on the `/display` page of the posting, it is the last part of the URL displayed in the browsers navigation bar.
 You can get to the `/display` page by following the *Link to source*.
 
-## Plugin Features
+## Addon Features
 
 Some of the addons you can install for your Friendica node have settings which have to be set by the admin.
 All those addons will be listed in this area of the admin panels side bar with their names.

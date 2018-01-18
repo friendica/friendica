@@ -11,7 +11,9 @@
 use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
+use Friendica\Core\Theme;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -75,8 +77,8 @@ if (!$install) {
 	}
 
 	require_once 'include/session.php';
-	load_hooks();
-	call_hooks('init_1');
+	Addon::loadHooks();
+	Addon::callHooks('init_1');
 
 	$maintenance = Config::get('system', 'maintenance');
 }
@@ -178,7 +180,7 @@ if (! x($_SESSION, 'last_updated')) {
 /*
  * check_config() is responsible for running update scripts. These automatically
  * update the DB schema whenever we push a new one out. It also checks to see if
- * any plugins have been added or removed and reacts accordingly.
+ * any addons have been added or removed and reacts accordingly.
  */
 
 // in install mode, any url loads install module
@@ -190,7 +192,7 @@ if ($install && $a->module!="view") {
 } else {
 	check_url($a);
 	check_db(false);
-	check_plugins($a);
+	check_addons($a);
 }
 
 Nav::setSelected('nothing');
@@ -200,7 +202,7 @@ $privateapps = Config::get('config', 'private_addons');
 if ((local_user()) || (! $privateapps === "1")) {
 	$arr = ['app_menu' => $a->apps];
 
-	call_hooks('app_menu', $arr);
+	Addon::callHooks('app_menu', $arr);
 
 	$a->apps = $arr['app_menu'];
 }
@@ -226,7 +228,7 @@ if (strlen($a->module)) {
 
 	/**
 	 * We will always have a module name.
-	 * First see if we have a plugin which is masquerading as a module.
+	 * First see if we have an addon which is masquerading as a module.
 	 */
 
 	// Compatibility with the Android Diaspora client
@@ -241,9 +243,9 @@ if (strlen($a->module)) {
 
 	$privateapps = Config::get('config', 'private_addons');
 
-	if (is_array($a->plugins) && in_array($a->module, $a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
+	if (is_array($a->addons) && in_array($a->module, $a->addons) && file_exists("addon/{$a->module}/{$a->module}.php")) {
 		//Check if module is an app and if public access to apps is allowed or not
-		if ((!local_user()) && plugin_is_app($a->module) && $privateapps === "1") {
+		if ((!local_user()) && Addon::isApp($a->module) && $privateapps === "1") {
 			info(t("You must be logged in to use addons. "));
 		} else {
 			include_once "addon/{$a->module}/{$a->module}.php";
@@ -317,7 +319,7 @@ if (! x($a->page, 'content')) {
 }
 
 if (!$install && !$maintenance) {
-	call_hooks('page_content_top', $a->page['content']);
+	Addon::callHooks('page_content_top', $a->page['content']);
 }
 
 /**
@@ -329,10 +331,10 @@ if ($a->module_loaded) {
 	$placeholder = '';
 
 	if ($a->module_class) {
-		call_hooks($a->module . '_mod_init', $placeholder);
+		Addon::callHooks($a->module . '_mod_init', $placeholder);
 		call_user_func([$a->module_class, 'init']);
 	} else if (function_exists($a->module . '_init')) {
-		call_hooks($a->module . '_mod_init', $placeholder);
+		Addon::callHooks($a->module . '_mod_init', $placeholder);
 		$func = $a->module . '_init';
 		$func($a);
 	}
@@ -343,7 +345,7 @@ if ($a->module_loaded) {
 	}
 
 	if (! $a->error && $_SERVER['REQUEST_METHOD'] === 'POST') {
-		call_hooks($a->module . '_mod_post', $_POST);
+		Addon::callHooks($a->module . '_mod_post', $_POST);
 		if ($a->module_class) {
 			call_user_func([$a->module_class, 'post']);
 		} else if (function_exists($a->module . '_post')) {
@@ -353,7 +355,7 @@ if ($a->module_loaded) {
 	}
 
 	if (! $a->error) {
-		call_hooks($a->module . '_mod_afterpost', $placeholder);
+		Addon::callHooks($a->module . '_mod_afterpost', $placeholder);
 		if ($a->module_class) {
 			call_user_func([$a->module_class, 'afterpost']);
 		} else if (function_exists($a->module . '_afterpost')) {
@@ -364,7 +366,7 @@ if ($a->module_loaded) {
 
 	if (! $a->error) {
 		$arr = ['content' => $a->page['content']];
-		call_hooks($a->module . '_mod_content', $arr);
+		Addon::callHooks($a->module . '_mod_content', $arr);
 		$a->page['content'] = $arr['content'];
 		if ($a->module_class) {
 			$arr = ['content' => call_user_func([$a->module_class, 'content'])];
@@ -372,7 +374,7 @@ if ($a->module_loaded) {
 			$func = $a->module . '_content';
 			$arr = ['content' => $func($a)];
 		}
-		call_hooks($a->module . '_mod_aftercontent', $arr);
+		Addon::callHooks($a->module . '_mod_aftercontent', $arr);
 		$a->page['content'] .= $arr['content'];
 	}
 
@@ -421,7 +423,7 @@ if (stristr(implode("", $_SESSION['sysmsg']), t('Permission denied'))) {
 /*
  * Report anything which needs to be communicated in the notification area (before the main body)
  */
-call_hooks('page_end', $a->page['content']);
+Addon::callHooks('page_end', $a->page['content']);
 
 /*
  * Add the navigation (menu) template
@@ -516,15 +518,15 @@ header('X-Frame-Options: sameorigin');
  * The page templates are located in /view/php/ or in the theme directory.
  */
 if (isset($_GET["mode"])) {
-	$template = theme_include($_GET["mode"] . '.php');
+	$template = Theme::getPathForFile($_GET["mode"] . '.php');
 }
 
 // If there is no page template use the default page template
 if (empty($template)) {
-	$template = theme_include("default.php");
+	$template = Theme::getPathForFile("default.php");
 }
 
-/// @TODO Looks unsafe (remote-inclusion), is maybe not but theme_include() uses file_exists() but does not escape anything
+/// @TODO Looks unsafe (remote-inclusion), is maybe not but Theme::getPathForFile() uses file_exists() but does not escape anything
 require_once $template;
 
 killme();

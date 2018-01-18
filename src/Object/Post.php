@@ -7,6 +7,7 @@ namespace Friendica\Object;
 use Friendica\BaseObject;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
@@ -213,7 +214,7 @@ class Post extends BaseObject
 		}
 
 		$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-		call_hooks('render_location', $locate);
+		Addon::callHooks('render_location', $locate);
 		$location = ((strlen($locate['html'])) ? $locate['html'] : render_location_dummy($locate));
 
 		// process action responses - e.g. like/dislike/attend/agree/whatever
@@ -404,7 +405,7 @@ class Post extends BaseObject
 		];
 
 		$arr = ['item' => $item, 'output' => $tmp_item];
-		call_hooks('display_item', $arr);
+		Addon::callHooks('display_item', $arr);
 
 		$result = $arr['output'];
 
@@ -757,10 +758,10 @@ class Post extends BaseObject
 			$qc = $qcomment = null;
 
 			/*
-			 * Hmmm, code depending on the presence of a particular plugin?
+			 * Hmmm, code depending on the presence of a particular addon?
 			 * This should be better if done by a hook
 			 */
-			if (in_array('qcomment', $a->plugins)) {
+			if (in_array('qcomment', $a->addons)) {
 				$qc = ((local_user()) ? PConfig::get(local_user(), 'qcomment', 'words') : null);
 				$qcomment = (($qc) ? explode("\n", $qc) : null);
 			}

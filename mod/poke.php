@@ -7,7 +7,7 @@
  * If the required arguments aren't present, we'll display a simple form to choose a recipient and a verb.
  * parent is a special argument which let's you attach this activity as a comment to an existing conversation, which
  * may have started with somebody else poking (etc.) somebody, but this isn't necessary. This can be used in the more pokes
- * plugin version to have entire conversations where Alice poked Bob, Bob fingered Alice, Alice hugged Bob, etc.
+ * addon version to have entire conversations where Alice poked Bob, Bob fingered Alice, Alice hugged Bob, etc.
  *
  * private creates a private conversation with the recipient. Otherwise your profile's default post privacy is used.
  *
@@ -15,6 +15,7 @@
  */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -143,7 +144,7 @@ function poke_init(App $a) {
 	}
 
 
-	call_hooks('post_local_end', $arr);
+	Addon::callHooks('post_local_end', $arr);
 
 	Worker::add(PRIORITY_HIGH, "Notifier", "like", $post_id);
 

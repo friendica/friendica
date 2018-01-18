@@ -3,6 +3,7 @@
  * @file include/network.php
  */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Network\Probe;
@@ -653,7 +654,7 @@ function avatar_img($email)
 	$avatar['url'] = '';
 	$avatar['success'] = false;
 
-	call_hooks('avatar_lookup', $avatar);
+	Addon::callHooks('avatar_lookup', $avatar);
 
 	if (! $avatar['success']) {
 		$avatar['url'] = System::baseUrl() . '/images/person-175.jpg';
