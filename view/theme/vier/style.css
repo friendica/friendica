@@ -71,11 +71,11 @@ img {
 	clear:left;
 }
 
-#adminpage #pluginslist {
+#adminpage #addonslist {
 	margin: 0px; padding: 0px;
 }
 
-#adminpage .plugin {
+#adminpage .addon {
 	list-style: none;
 	display: block;
 	/* border: 1px solid #888888; */
@@ -84,7 +84,7 @@ img {
 	clear: left;
 }
 
-#adminpage .toggleplugin {
+#adminpage .toggleaddon {
 	float:left;
 	margin-right: 1em;
 }
