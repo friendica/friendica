@@ -69,7 +69,7 @@ General
 * o: Account
 * t: Additional features
 * w: Social Networks
-* l: Plugins
+* l: Addons
 * d: Delegations
 * b: Connected apps
 * e: Export personal data

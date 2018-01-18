@@ -28,10 +28,10 @@ Der Nachteil: Du siehst nicht jede Antwort einer OStatus-Unterhaltung. Aus diese
 
 Wenn du MyISAM (Standardeinstellung) oder InnoDB mit MariaDB 10 nutzt, dann beschleunigt dies die Suche.
 
-Plugins
+Addons
 --------
 
-Aktiviere die folgenden Plugins:
+Aktiviere die folgenden Addons:
 
     rendertime
 
@@ -39,7 +39,7 @@ Aktiviere die folgenden Plugins:
 
 **Beschreibung**
 
-Dieses Plugin beschleunigt dein System nicht, aber es hilft dabei, die Flaschenhälse zu ermitteln.
+Dieses Addon beschleunigt dein System nicht, aber es hilft dabei, die Flaschenhälse zu ermitteln.
 
 Wenn es aktiviert ist, dann siehst du Werte wie die folgenden auf jeder deiner Seiten:
 

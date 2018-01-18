@@ -87,7 +87,7 @@ Blocked contacts cannot do this. They cannot communicate with you directly, only
 However we do not import their posts or private messages to you.
 Like blocking, you will still see this person's comments to posts made by your friends.
 
-A plugin called "blockem" can be installed to collapse/hide all posts from a particular person in your stream if you desire complete blocking of an individual, including his/her conversations with your other friends.
+An addon called "blockem" can be installed to collapse/hide all posts from a particular person in your stream if you desire complete blocking of an individual, including his/her conversations with your other friends.
 
 An **archived contact** means that communication is not possible and will not be attempted.
 (Perhaps the person moved to a new site and removed the old profile.)

@@ -1,4 +1,4 @@
-Friendica Addon/Plugin-Entwicklung
+Friendica Addon/Entwicklung
 ==============
 
 * [Zur Startseite der Hilfe](help)
@@ -8,30 +8,30 @@ Das Facebook-Addon bietet ein Beispiel dafür, die "addon"- und "module"-Funktio
 Addons arbeiten, indem sie Event Hooks abfangen.
 Module arbeiten, indem bestimmte Seitenanfragen (durch den URL-Pfad) abgefangen werden.
 
-Plugin-Namen können keine Leerstellen oder andere Interpunktionen enthalten und werden als Datei- und Funktionsnamen genutzt.
+Addon-Namen können keine Leerstellen oder andere Interpunktionen enthalten und werden als Datei- und Funktionsnamen genutzt.
 Du kannst einen lesbaren Namen im Kommentarblock eintragen.
-Jedes Addon muss beides beinhalten - eine Installations- und eine Deinstallationsfunktion, die auf dem Addon-/Plugin-Namen basieren; z.B. "plugin1name_install()".
-Diese beiden Funktionen haben keine Argumente und sind dafür verantwortlich, Event Hooks zu registrieren und abzumelden (unregistering), die dein Plugin benötigt.
-Die Installations- und Deinstallationsfunktionfunktionen werden auch ausgeführt (z.B. neu installiert), wenn sich das Plugin nach der Installation ändert - somit sollte deine Deinstallationsfunktion keine Daten zerstört und deine Installationsfunktion sollte bestehende Daten berücksichtigen.
+Jedes Addon muss beides beinhalten - eine Installations- und eine Deinstallationsfunktion, die auf dem Addon-Namen basieren; z.B. "addon1name_install()".
+Diese beiden Funktionen haben keine Argumente und sind dafür verantwortlich, Event Hooks zu registrieren und abzumelden (unregistering), die dein Addon benötigt.
+Die Installations- und Deinstallationsfunktionfunktionen werden auch ausgeführt (z.B. neu installiert), wenn sich das Addon nach der Installation ändert - somit sollte deine Deinstallationsfunktion keine Daten zerstört und deine Installationsfunktion sollte bestehende Daten berücksichtigen.
 Zukünftige Extensions werden möglicherweise "Setup" und "Entfernen" anbieten.
 
-Plugins sollten einen Kommentarblock mit den folgenden vier Parametern enthalten:
+Addons sollten einen Kommentarblock mit den folgenden vier Parametern enthalten:
 
     /*
-     * Name: My Great Plugin
-     * Description: This is what my plugin does. It's really cool.
+     * Name: My Great Addon
+     * Description: This is what my addon does. It's really cool.
      * Version: 1.0
      * Author: John Q. Public <john@myfriendicasite.com>
      */
 
-Registriere deine Plugin-Hooks während der Installation.
+Registriere deine Addon-Hooks während der Installation.
 
     Addon::registerHook($hookname, $file, $function);
 
 $hookname ist ein String und entspricht einem bekannten Friendica-Hook.
 
 $file steht für den Pfadnamen, der relativ zum Top-Level-Friendicaverzeichnis liegt.
-Das *sollte* "addon/plugin_name/plugin_name.php' sein.
+Das *sollte* "addon/addon_name/addon_name.php' sein.
 
 $function ist ein String und der Name der Funktion, die ausgeführt wird, wenn der Hook aufgerufen wird.
 
@@ -57,19 +57,19 @@ Achte darauf, diese mit "&" zu deklarieren, wenn du sie bearbeiten willst.
 Module
 ---
 
-Plugins/Addons können auch als "Module" agieren und alle Seitenanfragen für eine bestimte URL abfangen.
-Um ein Plugin als Modul zu nutzen, ist es nötig, die Funktion "plugin_name_module()" zu definieren, die keine Argumente benötigt und nichts weiter machen muss.
+Addons können auch als "Module" agieren und alle Seitenanfragen für eine bestimte URL abfangen.
+Um ein Addon als Modul zu nutzen, ist es nötig, die Funktion "addon_name_module()" zu definieren, die keine Argumente benötigt und nichts weiter machen muss.
 
-Wenn diese Funktion existiert, wirst du nun alle Seitenanfragen für "http://example.com/plugin_name" erhalten - mit allen URL-Komponenten als zusätzliche Argumente.
+Wenn diese Funktion existiert, wirst du nun alle Seitenanfragen für "http://example.com/addon_name" erhalten - mit allen URL-Komponenten als zusätzliche Argumente.
 Diese werden in ein Array $a->argv geparst und stimmen mit $a->argc überein, wobei sie die Anzahl der URL-Komponenten abbilden.
-So würde http://example.com/plugin/arg1/arg2 nach einem Modul "plugin" suchen und seiner Modulfunktion die $a-App-Strukur übergeben (dies ist für viele Komponenten verfügbar). Das umfasst:
+So würde http://example.com/addon/arg1/arg2 nach einem Modul "addon" suchen und seiner Modulfunktion die $a-App-Strukur übergeben (dies ist für viele Komponenten verfügbar). Das umfasst:
 
     $a->argc = 3
-    $a->argv = array(0 => 'plugin', 1 => 'arg1', 2 => 'arg2');
+    $a->argv = array(0 => 'addon', 1 => 'arg1', 2 => 'arg2');
 
-Deine Modulfunktionen umfassen oft die Funktion plugin_name_content(App $a), welche den Seiteninhalt definiert und zurückgibt.
-Sie können auch plugin_name_post(App $a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
-Du kannst ebenso plugin_name_init(App $a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
+Deine Modulfunktionen umfassen oft die Funktion addon_name_content(App $a), welche den Seiteninhalt definiert und zurückgibt.
+Sie können auch addon_name_post(App $a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
+Du kannst ebenso addon_name_init(App $a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
 
 
 Derzeitige Hooks
@@ -109,10 +109,10 @@ Derzeitige Hooks
 **'settings_post'** - wird aufgerufen, wenn die Einstellungsseiten geladen werden.
     $b ist der $_POST-Array
 
-**'plugin_settings'** - wird aufgerufen, wenn die HTML-Ausgabe der Addon-Einstellungsseite generiert wird.
+**'addon_settings'** - wird aufgerufen, wenn die HTML-Ausgabe der Addon-Einstellungsseite generiert wird.
     $b ist die HTML-Ausgabe (String) der Addon-Einstellungsseite vor dem finalen "</form>"-Tag.
 
-**'plugin_settings_post'** - wird aufgerufen, wenn die Addon-Einstellungsseite geladen wird.
+**'addon_settings_post'** - wird aufgerufen, wenn die Addon-Einstellungsseite geladen wird.
     $b ist der $_POST-Array
 
 **'profile_post'** - wird aufgerufen, wenn die Profilseite angezeigt wird.
@@ -287,10 +287,6 @@ include/conversation.php:	Addon::callHooks('jot_tool', $jotplugins);
 
 include/conversation.php:	Addon::callHooks('jot_networks', $jotnets);
 
-include/plugin.php:		if(! function_exists('call_hooks')) {
-
-include/plugin.php:function 	Addon::callHooks($name, &$data = null) {
-
 index.php:			Addon::callHooks('init_1');
 
 index.php:			Addon::callHooks('app_menu', $arr);
@@ -327,13 +323,13 @@ mod/contacts.php:		Addon::callHooks('contact_edit_post', $_POST);
 
 mod/contacts.php:		Addon::callHooks('contact_edit', $arr);
 
-mod/settings.php:		Addon::callHooks('plugin_settings_post', $_POST);
+mod/settings.php:		Addon::callHooks('addon_settings_post', $_POST);
 
 mod/settings.php:		Addon::callHooks('connector_settings_post', $_POST);
 
 mod/settings.php:		Addon::callHooks('settings_post', $_POST);
 
-mod/settings.php:		Addon::callHooks('plugin_settings', $settings_addons);
+mod/settings.php:		Addon::callHooks('addon_settings', $settings_addons);
 
 mod/settings.php:		Addon::callHooks('connector_settings', $settings_connectors);
 
