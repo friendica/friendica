@@ -141,7 +141,7 @@ installation, it will look like
 $a->config['system']['addon'] = 'js_upload';
 
 This indicates the "js_upload" addon module is enabled. You may add additional 
-addons/addons using this same line in the configuration file. Change it to 
+addons using this same line in the configuration file. Change it to 
 read
 
 $a->config['system']['addon'] = 'js_upload,poormancron';
