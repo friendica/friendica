@@ -9,7 +9,7 @@ Modules work by intercepting specific page requests (by URL path).
 
 Addon names cannot contain spaces or other punctuation and are used as filenames and function names.
 You may supply a "friendly" name within the comment block.
-Each addon must contain both an install and an uninstall function based on the addon/addon name.
+Each addon must contain both an install and an uninstall function based on the addon name.
 For instance "addon1name_install()".
 These two functions take no arguments and are usually responsible for registering (and unregistering) event hooks that your addon will require.
 The install and uninstall functions will also be called (i.e. re-installed) if the addon changes after installation.
@@ -69,7 +69,7 @@ Remember to declare it with '&' if you wish to alter it.
 Modules
 ---
 
-Addons/addons may also act as "modules" and intercept all page requests for a given URL path.
+Addons may also act as "modules" and intercept all page requests for a given URL path.
 In order for a addon to act as a module it needs to define a function "addon_name_module()" which takes no arguments and needs not do anything.
 
 If this function exists, you will now receive all page requests for "http://my.web.site/addon_name" - with any number of URL components as additional arguments.

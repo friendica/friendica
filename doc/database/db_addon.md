@@ -12,6 +12,6 @@ Table addon
 | plugin_admin  | 1 = has admin config, 0 = has no admin config | tinyint(1) | NO   |     | 0       |                 |
 
 Notes:
-These are addons which have been enabled by the site administrator on the admin/addon page
+These are addons which have been enabled by the site administrator on the addon page
 
 Return to [database documentation](help/database)
