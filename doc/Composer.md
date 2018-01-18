@@ -55,7 +55,7 @@ If you don't need to use any third-party library, then you don't need to use Com
 
 #### Adding a third-party library to Friendica
 
-Does your shiny new [Plugin](help/Plugins) need to rely on a third-party library not required by Friendica yet?
+Does your shiny new [Addon](help/Addons) need to rely on a third-party library not required by Friendica yet?
 First of all, this library should be available on [Packagist](https://packagist.org) so that Composer knows how to fetch it directly just by mentioning its name in `composer.json`.
 
 This file is the configuration of Friendica for Composer. It lists details about the Friendica project, but also a list of required dependencies and their target version.

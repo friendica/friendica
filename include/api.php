@@ -8,6 +8,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Core\NotificationsManager;
@@ -166,7 +167,7 @@ function api_login(App $a)
 		list($consumer, $token) = $oauth1->verify_request(OAuthRequest::from_request());
 		if (!is_null($token)) {
 			$oauth1->loginUser($token->uid);
-			call_hooks('logged_in', $a->user);
+			Addon::callHooks('logged_in', $a->user);
 			return;
 		}
 		echo __FILE__.__LINE__.__FUNCTION__ . "<pre>";
@@ -212,11 +213,11 @@ function api_login(App $a)
 	];
 
 	/*
-		* A plugin indicates successful login by setting 'authenticated' to non-zero value and returning a user record
-		* Plugins should never set 'authenticated' except to indicate success - as hooks may be chained
-		* and later plugins should not interfere with an earlier one that succeeded.
-		*/
-	call_hooks('authenticate', $addon_auth);
+	* An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
+	* Addons should never set 'authenticated' except to indicate success - as hooks may be chained
+	* and later addons should not interfere with an earlier one that succeeded.
+	*/
+	Addon::callHooks('authenticate', $addon_auth);
 
 	if ($addon_auth['authenticated'] && count($addon_auth['user_record'])) {
 		$record = $addon_auth['user_record'];
@@ -239,7 +240,7 @@ function api_login(App $a)
 
 	$_SESSION["allow_api"] = true;
 
-	call_hooks('logged_in', $a->user);
+	Addon::callHooks('logged_in', $a->user);
 }
 
 /**

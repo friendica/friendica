@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\Content\Text\Markdown;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Network\Probe;
@@ -218,7 +219,7 @@ function bb2diaspora($Text, $preserve_nl = false, $fordiaspora = true) {
 		}
 	, $Text);
 
-	call_hooks('bb2diaspora',$Text);
+	Addon::callHooks('bb2diaspora',$Text);
 
 	return $Text;
 }

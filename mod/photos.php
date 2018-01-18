@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
@@ -720,7 +721,7 @@ function photos_post(App $a)
 
 
 	// default post action - upload a photo
-	call_hooks('photo_post_init', $_POST);
+	Addon::callHooks('photo_post_init', $_POST);
 
 	// Determine the album to use
 	$album    = x($_REQUEST, 'album') ? notags(trim($_REQUEST['album'])) : '';
@@ -770,7 +771,7 @@ function photos_post(App $a)
 
 	$ret = ['src' => '', 'filename' => '', 'filesize' => 0, 'type' => ''];
 
-	call_hooks('photo_post_file', $ret);
+	Addon::callHooks('photo_post_file', $ret);
 
 	if (x($ret, 'src') && x($ret, 'filesize')) {
 		$src      = $ret['src'];
@@ -808,7 +809,7 @@ function photos_post(App $a)
 		}
 		@unlink($src);
 		$foo = 0;
-		call_hooks('photo_post_end', $foo);
+		Addon::callHooks('photo_post_end', $foo);
 		return;
 	}
 
@@ -824,7 +825,7 @@ function photos_post(App $a)
 		notice(t('Image exceeds size limit of %s', formatBytes($maximagesize)) . EOL);
 		@unlink($src);
 		$foo = 0;
-		call_hooks('photo_post_end', $foo);
+		Addon::callHooks('photo_post_end', $foo);
 		return;
 	}
 
@@ -832,7 +833,7 @@ function photos_post(App $a)
 		notice(t('Image file is empty.') . EOL);
 		@unlink($src);
 		$foo = 0;
-		call_hooks('photo_post_end', $foo);
+		Addon::callHooks('photo_post_end', $foo);
 		return;
 	}
 
@@ -847,7 +848,7 @@ function photos_post(App $a)
 		notice(t('Unable to process image.') . EOL);
 		@unlink($src);
 		$foo = 0;
-		call_hooks('photo_post_end',$foo);
+		Addon::callHooks('photo_post_end',$foo);
 		killme();
 	}
 
@@ -937,7 +938,7 @@ function photos_post(App $a)
 		Worker::add(PRIORITY_HIGH, "Notifier", 'wall-new', $item_id);
 	}
 
-	call_hooks('photo_post_end', intval($item_id));
+	Addon::callHooks('photo_post_end', intval($item_id));
 
 	// addon uploaders should call "killme()" [e.g. exit] within the photo_post_end hook
 	// if they do not wish to be redirected
@@ -1103,7 +1104,7 @@ function photos_content(App $a)
 				'addon_text' => $uploader,
 				'default_upload' => true];
 
-		call_hooks('photo_upload_form',$ret);
+		Addon::callHooks('photo_upload_form',$ret);
 
 		$default_upload_box = replace_macros(get_markup_template('photos_default_uploader_box.tpl'), []);
 		$default_upload_submit = replace_macros(get_markup_template('photos_default_uploader_submit.tpl'), [

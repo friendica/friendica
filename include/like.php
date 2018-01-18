@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -254,7 +255,7 @@ EOT;
 
 	$new_item['id'] = $new_item_id;
 
-	call_hooks('post_local_end', $new_item);
+	Addon::callHooks('post_local_end', $new_item);
 
 	Worker::add(PRIORITY_HIGH, "Notifier", "like", $new_item_id);
 

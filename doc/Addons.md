@@ -1,4 +1,4 @@
-Friendica Addon/Plugin development
+Friendica Addon development
 ==============
 
 * [Home](help)
@@ -7,32 +7,32 @@ Please see the sample addon 'randplace' for a working example of using some of t
 Addons work by intercepting event hooks - which must be registered.
 Modules work by intercepting specific page requests (by URL path).
 
-Plugin names cannot contain spaces or other punctuation and are used as filenames and function names.
+Addon names cannot contain spaces or other punctuation and are used as filenames and function names.
 You may supply a "friendly" name within the comment block.
-Each addon must contain both an install and an uninstall function based on the addon/plugin name.
-For instance "plugin1name_install()".
-These two functions take no arguments and are usually responsible for registering (and unregistering) event hooks that your plugin will require.
-The install and uninstall functions will also be called (i.e. re-installed) if the plugin changes after installation.
+Each addon must contain both an install and an uninstall function based on the addon name.
+For instance "addon1name_install()".
+These two functions take no arguments and are usually responsible for registering (and unregistering) event hooks that your addon will require.
+The install and uninstall functions will also be called (i.e. re-installed) if the addon changes after installation.
 Therefore your uninstall should not destroy data and install should consider that data may already exist.
 Future extensions may provide for "setup" amd "remove".
 
-Plugins should contain a comment block with the four following parameters:
+Addons should contain a comment block with the four following parameters:
 
     /*
-     * Name: My Great Plugin
-     * Description: This is what my plugin does. It's really cool.
+     * Name: My Great Addon
+     * Description: This is what my addon does. It's really cool.
      * Version: 1.0
      * Author: John Q. Public <john@myfriendicasite.com>
      */
 
-Register your plugin hooks during installation.
+Register your addon hooks during installation.
 
-    register_hook($hookname, $file, $function);
+    Addon::registerHook($hookname, $file, $function);
 
 $hookname is a string and corresponds to a known Friendica hook.
 
 $file is a pathname relative to the top-level Friendica directory.
-This *should* be 'addon/plugin_name/plugin_name.php' in most cases.
+This *should* be 'addon/addon_name/addon_name.php' in most cases.
 
 $function is a string and is the name of the function which will be executed when the hook is called.
 
@@ -69,39 +69,39 @@ Remember to declare it with '&' if you wish to alter it.
 Modules
 ---
 
-Plugins/addons may also act as "modules" and intercept all page requests for a given URL path.
-In order for a plugin to act as a module it needs to define a function "plugin_name_module()" which takes no arguments and needs not do anything.
+Addons may also act as "modules" and intercept all page requests for a given URL path.
+In order for a addon to act as a module it needs to define a function "addon_name_module()" which takes no arguments and needs not do anything.
 
-If this function exists, you will now receive all page requests for "http://my.web.site/plugin_name" - with any number of URL components as additional arguments.
+If this function exists, you will now receive all page requests for "http://my.web.site/addon_name" - with any number of URL components as additional arguments.
 These are parsed into an array $a->argv, with a corresponding $a->argc indicating the number of URL components.
-So http://my.web.site/plugin/arg1/arg2 would look for a module named "plugin" and pass its module functions the $a App structure (which is available to many components).
+So http://my.web.site/addon/arg1/arg2 would look for a module named "addon" and pass its module functions the $a App structure (which is available to many components).
 This will include:
 
     $a->argc = 3
-    $a->argv = array(0 => 'plugin', 1 => 'arg1', 2 => 'arg2');
+    $a->argv = array(0 => 'addon', 1 => 'arg1', 2 => 'arg2');
 
-Your module functions will often contain the function plugin_name_content(App $a), which defines and returns the page body content.
-They may also contain plugin_name_post(App $a) which is called before the _content function and typically handles the results of POST forms.
-You may also have plugin_name_init(App $a) which is called very early on and often does module initialisation.
+Your module functions will often contain the function addon_name_content(App $a), which defines and returns the page body content.
+They may also contain addon_name_post(App $a) which is called before the _content function and typically handles the results of POST forms.
+You may also have addon_name_init(App $a) which is called very early on and often does module initialisation.
 
 Templates
 ---
 
-If your plugin needs some template, you can use the Friendica template system.
+If your addon needs some template, you can use the Friendica template system.
 Friendica uses [smarty3](http://www.smarty.net/) as a template engine.
 
-Put your tpl files in the *templates/* subfolder of your plugin.
+Put your tpl files in the *templates/* subfolder of your addon.
 
-In your code, like in the function plugin_name_content(), load the template file and execute it passing needed values:
+In your code, like in the function addon_name_content(), load the template file and execute it passing needed values:
 
     # load template file. first argument is the template name,
-    # second is the plugin path relative to friendica top folder
-    $tpl = get_markup_template('mytemplate.tpl', 'addon/plugin_name/');
+    # second is the addon path relative to friendica top folder
+    $tpl = get_markup_template('mytemplate.tpl', 'addon/addon_name/');
 
     # apply template. first argument is the loaded template,
     # second an array of 'name'=>'values' to pass to template
     $output = replace_macros($tpl,array(
-        'title' => 'My beautiful plugin',
+        'title' => 'My beautiful addon',
     ));
 
 See also the wiki page [Quick Template Guide](https://github.com/friendica/friendica/wiki/Quick-Template-Guide).
@@ -151,11 +151,11 @@ $b is an array:
 * called when the Settings pages are submitted
 * $b is the $_POST array
 
-### 'plugin_settings'
+### 'addon_settings'
 * called when generating the HTML for the addon settings page
 * $b is the (string) HTML of the addon settings page before the final '</form>' tag.
 
-### 'plugin_settings_post'
+### 'addon_settings_post'
 * called when the Addon Settings pages are submitted
 * $b is the $_POST array
 
@@ -296,182 +296,178 @@ Complete list of hook callbacks
 
 Here is a complete list of all hook callbacks with file locations (as of 14-Feb-2012). Please see the source for details of any hooks not documented above.
 
-boot.php:	call_hooks('login_hook',$o);
+boot.php:	Addon::callHooks('login_hook',$o);
 
-boot.php:	call_hooks('profile_sidebar_enter', $profile);
+boot.php:	Addon::callHooks('profile_sidebar_enter', $profile);
 
-boot.php:	call_hooks('profile_sidebar', $arr);
+boot.php:	Addon::callHooks('profile_sidebar', $arr);
 
-boot.php:	call_hooks("proc_run", $arr);
+boot.php:	Addon::callHooks("proc_run", $arr);
 
-include/contact_selectors.php:	call_hooks('network_to_name', $nets);
+include/contact_selectors.php:	Addon::callHooks('network_to_name', $nets);
 
-include/api.php:				call_hooks('logged_in', $a->user);
+include/api.php:				Addon::callHooks('logged_in', $a->user);
 
-include/api.php:		call_hooks('logged_in', $a->user);
+include/api.php:		Addon::callHooks('logged_in', $a->user);
 
-include/queue.php:		call_hooks('queue_predeliver', $a, $r);
+include/queue.php:		Addon::callHooks('queue_predeliver', $a, $r);
 
-include/queue.php:				call_hooks('queue_deliver', $a, $params);
+include/queue.php:				Addon::callHooks('queue_deliver', $a, $params);
 
-include/text.php:	call_hooks('contact_block_end', $arr);
+include/text.php:	Addon::callHooks('contact_block_end', $arr);
 
-include/text.php:	call_hooks('smilie', $s);
+include/text.php:	Addon::callHooks('smilie', $s);
 
-include/text.php:	call_hooks('prepare_body_init', $item);
+include/text.php:	Addon::callHooks('prepare_body_init', $item);
 
-include/text.php:	call_hooks('prepare_body', $prep_arr);
+include/text.php:	Addon::callHooks('prepare_body', $prep_arr);
 
-include/text.php:	call_hooks('prepare_body_final', $prep_arr);
+include/text.php:	Addon::callHooks('prepare_body_final', $prep_arr);
 
-include/nav.php:	call_hooks('page_header', $a->page['nav']);
+include/nav.php:	Addon::callHooks('page_header', $a->page['nav']);
 
-include/auth.php:		call_hooks('authenticate', $addon_auth);
+include/auth.php:		Addon::callHooks('authenticate', $addon_auth);
 
-include/bbcode.php:	call_hooks('bbcode',$Text);
+include/bbcode.php:	Addon::callHooks('bbcode',$Text);
 
-include/oauth.php:		call_hooks('logged_in', $a->user);
+include/oauth.php:		Addon::callHooks('logged_in', $a->user);
 
-include/acl_selectors.php:	call_hooks($a->module . '_pre_' . $selname, $arr);
+include/acl_selectors.php:	Addon::callHooks($a->module . '_pre_' . $selname, $arr);
 
-include/acl_selectors.php:	call_hooks($a->module . '_post_' . $selname, $o);
+include/acl_selectors.php:	Addon::callHooks($a->module . '_post_' . $selname, $o);
 
-include/acl_selectors.php:	call_hooks('contact_select_options', $x);
+include/acl_selectors.php:	Addon::callHooks('contact_select_options', $x);
 
-include/acl_selectors.php:	call_hooks($a->module . '_pre_' . $selname, $arr);
+include/acl_selectors.php:	Addon::callHooks($a->module . '_pre_' . $selname, $arr);
 
-include/acl_selectors.php:	call_hooks($a->module . '_post_' . $selname, $o);
+include/acl_selectors.php:	Addon::callHooks($a->module . '_post_' . $selname, $o);
 
-include/acl_selectors.php:	call_hooks($a->module . '_pre_' . $selname, $arr);
+include/acl_selectors.php:	Addon::callHooks($a->module . '_pre_' . $selname, $arr);
 
-include/acl_selectors.php:	call_hooks($a->module . '_post_' . $selname, $o);
+include/acl_selectors.php:	Addon::callHooks($a->module . '_post_' . $selname, $o);
 
-include/acl_selectors.php	call_hooks('acl_lookup_end', $results);
+include/acl_selectors.php	Addon::callHooks('acl_lookup_end', $results);
 
-include/notifier.php:		call_hooks('notifier_normal',$target_item);
+include/notifier.php:		Addon::callHooks('notifier_normal',$target_item);
 
-include/notifier.php:	call_hooks('notifier_end',$target_item);
+include/notifier.php:	Addon::callHooks('notifier_end',$target_item);
 
-include/items.php:	call_hooks('atom_feed', $atom);
+include/items.php:	Addon::callHooks('atom_feed', $atom);
 
-include/items.php:		call_hooks('atom_feed_end', $atom);
+include/items.php:		Addon::callHooks('atom_feed_end', $atom);
 
-include/items.php:	call_hooks('atom_feed_end', $atom);
+include/items.php:	Addon::callHooks('atom_feed_end', $atom);
 
-include/items.php:	call_hooks('parse_atom', $arr);
+include/items.php:	Addon::callHooks('parse_atom', $arr);
 
-include/items.php:	call_hooks('post_remote',$arr);
+include/items.php:	Addon::callHooks('post_remote',$arr);
 
-include/items.php:	call_hooks('atom_author', $o);
+include/items.php:	Addon::callHooks('atom_author', $o);
 
-include/items.php:	call_hooks('atom_entry', $o);
+include/items.php:	Addon::callHooks('atom_entry', $o);
 
-include/bb2diaspora.php:	call_hooks('bb2diaspora',$Text);
+include/bb2diaspora.php:	Addon::callHooks('bb2diaspora',$Text);
 
-include/cronhooks.php:	call_hooks('cron', $d);
+include/cronhooks.php:	Addon::callHooks('cron', $d);
 
-include/security.php:		call_hooks('logged_in', $a->user);
+include/security.php:		Addon::callHooks('logged_in', $a->user);
 
-include/html2bbcode.php:	call_hooks('html2bbcode', $text);
+include/html2bbcode.php:	Addon::callHooks('html2bbcode', $text);
 
-include/Contact.php:	call_hooks('remove_user',$r[0]);
+include/Contact.php:	Addon::callHooks('remove_user',$r[0]);
 
-include/Contact.php:	call_hooks('contact_photo_menu', $args);
+include/Contact.php:	Addon::callHooks('contact_photo_menu', $args);
 
-include/conversation.php:	call_hooks('conversation_start',$cb);
+include/conversation.php:	Addon::callHooks('conversation_start',$cb);
 
-include/conversation.php:				call_hooks('render_location',$locate);
+include/conversation.php:				Addon::callHooks('render_location',$locate);
 
-include/conversation.php:				call_hooks('display_item', $arr);
+include/conversation.php:				Addon::callHooks('display_item', $arr);
 
-include/conversation.php:				call_hooks('render_location',$locate);
+include/conversation.php:				Addon::callHooks('render_location',$locate);
 
-include/conversation.php:				call_hooks('display_item', $arr);
+include/conversation.php:				Addon::callHooks('display_item', $arr);
 
-include/conversation.php:	call_hooks('item_photo_menu', $args);
+include/conversation.php:	Addon::callHooks('item_photo_menu', $args);
 
-include/conversation.php:	call_hooks('jot_tool', $jotplugins);
+include/conversation.php:	Addon::callHooks('jot_tool', $jotplugins);
 
-include/conversation.php:	call_hooks('jot_networks', $jotnets);
+include/conversation.php:	Addon::callHooks('jot_networks', $jotnets);
 
-include/plugin.php:if(! function_exists('call_hooks')) {
+index.php:	Addon::callHooks('init_1');
 
-include/plugin.php:function call_hooks($name, &$data = null) {
+index.php:Addon::callHooks('app_menu', $arr);
 
-index.php:	call_hooks('init_1');
+index.php:Addon::callHooks('page_end', $a->page['content']);
 
-index.php:call_hooks('app_menu', $arr);
+mod/photos.php:	Addon::callHooks('photo_post_init', $_POST);
 
-index.php:call_hooks('page_end', $a->page['content']);
+mod/photos.php:	Addon::callHooks('photo_post_file',$ret);
 
-mod/photos.php:	call_hooks('photo_post_init', $_POST);
+mod/photos.php:		Addon::callHooks('photo_post_end',$foo);
 
-mod/photos.php:	call_hooks('photo_post_file',$ret);
+mod/photos.php:		Addon::callHooks('photo_post_end',$foo);
 
-mod/photos.php:		call_hooks('photo_post_end',$foo);
+mod/photos.php:		Addon::callHooks('photo_post_end',$foo);
 
-mod/photos.php:		call_hooks('photo_post_end',$foo);
+mod/photos.php:	Addon::callHooks('photo_post_end',intval($item_id));
 
-mod/photos.php:		call_hooks('photo_post_end',$foo);
+mod/photos.php:		Addon::callHooks('photo_upload_form',$ret);
 
-mod/photos.php:	call_hooks('photo_post_end',intval($item_id));
+mod/friendica.php:	Addon::callHooks('about_hook', $o);
 
-mod/photos.php:		call_hooks('photo_upload_form',$ret);
+mod/editpost.php:	Addon::callHooks('jot_tool', $jotplugins);
 
-mod/friendica.php:	call_hooks('about_hook', $o);
+mod/editpost.php:	Addon::callHooks('jot_networks', $jotnets);
 
-mod/editpost.php:	call_hooks('jot_tool', $jotplugins);
+mod/parse_url.php:	Addon::callHooks('parse_link', $arr);
 
-mod/editpost.php:	call_hooks('jot_networks', $jotnets);
+mod/home.php:	Addon::callHooks('home_init',$ret);
 
-mod/parse_url.php:	call_hooks('parse_link', $arr);
+mod/home.php:	Addon::callHooks("home_content",$o);
 
-mod/home.php:	call_hooks('home_init',$ret);
+mod/contacts.php:	Addon::callHooks('contact_edit_post', $_POST);
 
-mod/home.php:	call_hooks("home_content",$o);
+mod/contacts.php:		Addon::callHooks('contact_edit', $arr);
 
-mod/contacts.php:	call_hooks('contact_edit_post', $_POST);
+mod/settings.php:		Addon::callHooks('addon_settings_post', $_POST);
 
-mod/contacts.php:		call_hooks('contact_edit', $arr);
+mod/settings.php:		Addon::callHooks('connector_settings_post', $_POST);
 
-mod/settings.php:		call_hooks('plugin_settings_post', $_POST);
+mod/settings.php:	Addon::callHooks('settings_post', $_POST);
 
-mod/settings.php:		call_hooks('connector_settings_post', $_POST);
+mod/settings.php:		Addon::callHooks('addon_settings', $settings_addons);
 
-mod/settings.php:	call_hooks('settings_post', $_POST);
+mod/settings.php:		Addon::callHooks('connector_settings', $settings_connectors);
 
-mod/settings.php:		call_hooks('plugin_settings', $settings_addons);
+mod/settings.php:	Addon::callHooks('settings_form',$o);
 
-mod/settings.php:		call_hooks('connector_settings', $settings_connectors);
+mod/register.php:	Addon::callHooks('register_account', $newuid);
 
-mod/settings.php:	call_hooks('settings_form',$o);
+mod/like.php:	Addon::callHooks('post_local_end', $arr);
 
-mod/register.php:	call_hooks('register_account', $newuid);
+mod/xrd.php:	Addon::callHooks('personal_xrd', $arr);
 
-mod/like.php:	call_hooks('post_local_end', $arr);
+mod/item.php:	Addon::callHooks('post_local_start', $_REQUEST);
 
-mod/xrd.php:	call_hooks('personal_xrd', $arr);
+mod/item.php:	Addon::callHooks('post_local',$datarray);
 
-mod/item.php:	call_hooks('post_local_start', $_REQUEST);
+mod/item.php:	Addon::callHooks('post_local_end', $datarray);
 
-mod/item.php:	call_hooks('post_local',$datarray);
+mod/profile.php:			Addon::callHooks('profile_advanced',$o);
 
-mod/item.php:	call_hooks('post_local_end', $datarray);
+mod/profiles.php:	Addon::callHooks('profile_post', $_POST);
 
-mod/profile.php:			call_hooks('profile_advanced',$o);
+mod/profiles.php:		Addon::callHooks('profile_edit', $arr);
 
-mod/profiles.php:	call_hooks('profile_post', $_POST);
+mod/tagger.php:	Addon::callHooks('post_local_end', $arr);
 
-mod/profiles.php:		call_hooks('profile_edit', $arr);
+mod/cb.php:	Addon::callHooks('cb_init');
 
-mod/tagger.php:	call_hooks('post_local_end', $arr);
+mod/cb.php:	Addon::callHooks('cb_post', $_POST);
 
-mod/cb.php:	call_hooks('cb_init');
+mod/cb.php:	Addon::callHooks('cb_afterpost');
 
-mod/cb.php:	call_hooks('cb_post', $_POST);
+mod/cb.php:	Addon::callHooks('cb_content', $o);
 
-mod/cb.php:	call_hooks('cb_afterpost');
-
-mod/cb.php:	call_hooks('cb_content', $o);
-
-mod/directory.php:			call_hooks('directory_item', $arr);
+mod/directory.php:			Addon::callHooks('directory_item', $arr);

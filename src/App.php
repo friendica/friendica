@@ -56,8 +56,8 @@ class App
 	public $hooks;
 	public $timezone;
 	public $interactive = true;
-	public $plugins;
-	public $plugins_admin = [];
+	public $addons;
+	public $addons_admin = [];
 	public $apps = [];
 	public $identities;
 	public $is_mobile = false;

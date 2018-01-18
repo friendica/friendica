@@ -6,6 +6,7 @@
 namespace Friendica\Util;
 
 use Friendica\Content\OEmbed;
+use Friendica\Core\Addon;
 use Friendica\Object\Image;
 use Friendica\Util\XML;
 
@@ -425,7 +426,7 @@ class ParseUrl
 
 		logger("parseurl_getsiteinfo: Siteinfo for ".$url." ".print_r($siteinfo, true), LOGGER_DEBUG);
 
-		call_hooks("getsiteinfo", $siteinfo);
+		Addon::callHooks("getsiteinfo", $siteinfo);
 
 		return($siteinfo);
 	}

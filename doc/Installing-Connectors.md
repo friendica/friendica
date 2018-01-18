@@ -4,28 +4,28 @@ Installing Connectors (Twitter/GNU Social)
 * [Home](help)
 
 
-Friendica uses plugins to provide connectivity to some networks, such as Twitter or App.net. 
+Friendica uses addons to provide connectivity to some networks, such as Twitter or App.net. 
 
-There is also a plugin to post through to an existing account on a GNU Social service.
+There is also a addon to post through to an existing account on a GNU Social service.
 You only need this to post to an already existing GNU Social account, but not to communicate with GNU Social members in general.
 
-All three plugins require an account on the target network.
+All three addons require an account on the target network.
 In addition you (or typically the server administrator) will need to obtain an API key to provide authenticated access to your Friendica server.
 
 Site Configuration
 ---
 
-Plugins must be installed by the site administrator before they can be used.
+Addons must be installed by the site administrator before they can be used.
 This is accomplished through the site administration panel.
 
 Each of the connectors also requires an "API key" from the service you wish to connect with.
-Some plugins allow you to enter this information in the site administration pages, while others may require you to edit your configuration file (.htconfig.php).
+Some addons allow you to enter this information in the site administration pages, while others may require you to edit your configuration file (.htconfig.php).
 The ways to obtain these keys vary between the services, but they all require an existing account on the target service.
 Once installed, these API keys can usually be shared by all site members.
 
-The details of configuring each service follow (much of this information comes directly from the plugin source files):
+The details of configuring each service follow (much of this information comes directly from the addon source files):
 
-Twitter Plugin for Friendica
+Twitter Addon for Friendica
 ---
 
 * Author: Tobias Diekershoff
@@ -33,7 +33,7 @@ Twitter Plugin for Friendica
 * License: 3-clause BSD license
 
 ###Configuration
-To use this plugin you need a OAuth Consumer key pair (key & secret).
+To use this addon you need a OAuth Consumer key pair (key & secret).
 You can get it from [Twitter](https://twitter.com/apps).
 
 Register your Friendica site as "Client" application with "Read & Write" access.
@@ -51,7 +51,7 @@ After this, your users can configure their Twitter account settings from "Settin
 Find the author's documentation here: [http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/Twitter_Plugin](http://diekershoff.homeunix.net/redmine/wiki/friendikaplugin/Twitter_Plugin)
 
 
-GNU Social Plugin for Friendica
+GNU Social Addon for Friendica
 ---
 
 * Author: Tobias Diekershoff

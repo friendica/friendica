@@ -4,6 +4,7 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -553,10 +554,10 @@ class Notifier {
 		logger('notifier: calling hooks', LOGGER_DEBUG);
 
 		if ($normal_mode) {
-			call_hooks('notifier_normal',$target_item);
+			Addon::callHooks('notifier_normal',$target_item);
 		}
 
-		call_hooks('notifier_end',$target_item);
+		Addon::callHooks('notifier_end',$target_item);
 
 		return;
 	}

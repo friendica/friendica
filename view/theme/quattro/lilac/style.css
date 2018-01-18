@@ -64,7 +64,7 @@
 .icon.unlock {
   background-image: url("../../../images/icons/22/unlock.png");
 }
-.icon.plugin {
+.icon.addon {
   background-image: url("../../../images/icons/22/plugin.png");
 }
 .icon.type-unkn {
@@ -143,7 +143,7 @@
 .icon.s10.unlock {
   background-image: url("../../../images/icons/10/unlock.png");
 }
-.icon.s10.plugin {
+.icon.s10.addon {
   background-image: url("../../../images/icons/10/plugin.png");
 }
 .icon.s10.type-unkn {
@@ -222,7 +222,7 @@
 .icon.s16.unlock {
   background-image: url("../../../images/icons/16/unlock.png");
 }
-.icon.s16.plugin {
+.icon.s16.addon {
   background-image: url("../../../images/icons/16/plugin.png");
 }
 .icon.s16.type-unkn {
@@ -301,7 +301,7 @@
 .icon.s22.unlock {
   background-image: url("../../../images/icons/22/unlock.png");
 }
-.icon.s22.plugin {
+.icon.s22.addon {
   background-image: url("../../../images/icons/22/plugin.png");
 }
 .icon.s22.type-unkn {
@@ -380,7 +380,7 @@
 .icon.s48.unlock {
   background-image: url("../../../images/icons/48/unlock.png");
 }
-.icon.s48.plugin {
+.icon.s48.addon {
   background-image: url("../../../images/icons/48/plugin.png");
 }
 .icon.s48.type-unkn {
@@ -2518,11 +2518,11 @@ footer {
   clear: left;
   text-align: right;
 }
-#adminpage #pluginslist {
+#adminpage #addonslist {
   margin: 0;
   padding: 0;
 }
-#adminpage .plugin {
+#adminpage .addon {
   list-style: none;
   display: block;
   border: 1px solid #888888;
@@ -2530,10 +2530,10 @@ footer {
   margin-bottom: 5px;
   clear: left;
 }
-#adminpage .plugin desc {
+#adminpage .addon desc {
   margin-left: 2.5em;
 }
-#adminpage .toggleplugin {
+#adminpage .toggleaddon {
   float: left;
   margin-right: 1em;
 }

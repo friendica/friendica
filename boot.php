@@ -21,6 +21,7 @@
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
@@ -32,7 +33,6 @@ use Friendica\Database\DBStructure;
 use Friendica\Module\Login;
 
 require_once 'include/network.php';
-require_once 'include/plugin.php';
 require_once 'include/text.php';
 require_once 'include/datetime.php';
 require_once 'include/pgettext.php';
@@ -798,19 +798,19 @@ function run_update_function($x)
 }
 
 /**
- * @brief Synchronise plugins:
+ * @brief Synchronise addons:
  *
  * $a->config['system']['addon'] contains a comma-separated list of names
- * of plugins/addons which are used on this system.
+ * of addons which are used on this system.
  * Go through the database list of already installed addons, and if we have
  * an entry, but it isn't in the config list, call the uninstall procedure
  * and mark it uninstalled in the database (for now we'll remove it).
- * Then go through the config list and if we have a plugin that isn't installed,
+ * Then go through the config list and if we have a addon that isn't installed,
  * call the install procedure and add it to the database.
  *
  * @param object $a App
  */
-function check_plugins(App $a)
+function check_addons(App $a)
 {
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
 	if (DBM::is_result($r)) {
@@ -819,36 +819,36 @@ function check_plugins(App $a)
 		$installed = [];
 	}
 
-	$plugins = Config::get('system', 'addon');
-	$plugins_arr = [];
+	$addons = Config::get('system', 'addon');
+	$addons_arr = [];
 
-	if ($plugins) {
-		$plugins_arr = explode(',', str_replace(' ', '', $plugins));
+	if ($addons) {
+		$addons_arr = explode(',', str_replace(' ', '', $addons));
 	}
 
-	$a->plugins = $plugins_arr;
+	$a->addons = $addons_arr;
 
 	$installed_arr = [];
 
 	if (count($installed)) {
 		foreach ($installed as $i) {
-			if (!in_array($i['name'], $plugins_arr)) {
-				uninstall_plugin($i['name']);
+			if (!in_array($i['name'], $addons_arr)) {
+				Addon::uninstall($i['name']);
 			} else {
 				$installed_arr[] = $i['name'];
 			}
 		}
 	}
 
-	if (count($plugins_arr)) {
-		foreach ($plugins_arr as $p) {
+	if (count($addons_arr)) {
+		foreach ($addons_arr as $p) {
 			if (!in_array($p, $installed_arr)) {
-				install_plugin($p);
+				Addon::install($p);
 			}
 		}
 	}
 
-	load_hooks();
+	Addon::loadHooks();
 
 	return;
 }

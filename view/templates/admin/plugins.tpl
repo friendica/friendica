@@ -8,7 +8,7 @@
 		{{else}}
 		<a class="btn" href="{{$baseurl}}/admin/{{$function}}?a=r&amp;t={{$form_security_token}}">{{$reload}}</a>
 		<ul id='pluginslist'>
-		{{foreach $plugins as $p}}
+		{{foreach $addons as $p}}
 			<li class='plugin {{$p.1}}'>
 				<a class='toggleplugin' href='{{$baseurl}}/admin/{{$function}}/{{$p.0}}?a=t&amp;t={{$form_security_token}}' title="{{if $p.1==on}}Disable{{else}}Enable{{/if}}" ><span class='icon {{$p.1}}'></span></a>
 				<a href='{{$baseurl}}/admin/{{$function}}/{{$p.0}}'><span class='name'>{{$p.2.name}}</span></a> - <span class="version">{{$p.2.version}}</span>

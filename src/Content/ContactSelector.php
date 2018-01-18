@@ -4,6 +4,7 @@
  */
 namespace Friendica\Content;
 
+use Friendica\Core\Addon;
 use Friendica\Database\DBM;
 use Friendica\Protocol\Diaspora;
 use dba;
@@ -93,7 +94,7 @@ class ContactSelector
 			NETWORK_APPNET => t('App.net')
 		];
 
-		call_hooks('network_to_name', $nets);
+		Addon::callHooks('network_to_name', $nets);
 
 		$search  = array_keys($nets);
 		$replace = array_values($nets);
@@ -122,7 +123,7 @@ class ContactSelector
 		$o = '';
 		$select = ['', t('Male'), t('Female'), t('Currently Male'), t('Currently Female'), t('Mostly Male'), t('Mostly Female'), t('Transgender'), t('Intersex'), t('Transsexual'), t('Hermaphrodite'), t('Neuter'), t('Non-specific'), t('Other'), t('Undecided')];
 	
-		call_hooks('gender_selector', $select);
+		Addon::callHooks('gender_selector', $select);
 	
 		$o .= "<select name=\"gender$suffix\" id=\"gender-select$suffix\" size=\"1\" >";
 		foreach ($select as $selection) {
@@ -145,7 +146,7 @@ class ContactSelector
 		$select = ['', t('Males'), t('Females'), t('Gay'), t('Lesbian'), t('No Preference'), t('Bisexual'), t('Autosexual'), t('Abstinent'), t('Virgin'), t('Deviant'), t('Fetish'), t('Oodles'), t('Nonsexual')];
 	
 	
-		call_hooks('sexpref_selector', $select);
+		Addon::callHooks('sexpref_selector', $select);
 	
 		$o .= "<select name=\"sexual$suffix\" id=\"sexual-select$suffix\" size=\"1\" >";
 		foreach ($select as $selection) {
@@ -166,7 +167,7 @@ class ContactSelector
 		$o = '';
 		$select = ['', t('Single'), t('Lonely'), t('Available'), t('Unavailable'), t('Has crush'), t('Infatuated'), t('Dating'), t('Unfaithful'), t('Sex Addict'), t('Friends'), t('Friends/Benefits'), t('Casual'), t('Engaged'), t('Married'), t('Imaginarily married'), t('Partners'), t('Cohabiting'), t('Common law'), t('Happy'), t('Not looking'), t('Swinger'), t('Betrayed'), t('Separated'), t('Unstable'), t('Divorced'), t('Imaginarily divorced'), t('Widowed'), t('Uncertain'), t('It\'s complicated'), t('Don\'t care'), t('Ask me')];
 	
-		call_hooks('marital_selector', $select);
+		Addon::callHooks('marital_selector', $select);
 	
 		$o .= '<select name="marital" id="marital-select" size="1" >';
 		foreach ($select as $selection) {
