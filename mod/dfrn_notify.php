@@ -21,8 +21,6 @@ function dfrn_notify_post(App $a) {
 	$dfrn_version = ((x($_POST,'dfrn_version')) ? (float) $_POST['dfrn_version']    : 2.0);
 	$challenge    = ((x($_POST,'challenge'))    ? notags(trim($_POST['challenge'])) : '');
 	$data         = ((x($_POST,'data'))         ? $_POST['data']                    : '');
-	$key          = ((x($_POST,'key'))          ? $_POST['key']                     : '');
-	$rino_remote  = ((x($_POST,'rino'))         ? intval($_POST['rino'])            :  0);
 	$dissolve     = ((x($_POST,'dissolve'))     ? intval($_POST['dissolve'])        :  0);
 	$perm         = ((x($_POST,'perm'))         ? notags(trim($_POST['perm']))      : 'r');
 	$ssl_policy   = ((x($_POST,'ssl_policy'))   ? notags(trim($_POST['ssl_policy'])): 'none');
@@ -104,8 +102,6 @@ function dfrn_notify_post(App $a) {
 
 	$importer = $r[0];
 
-	logger("Remote rino version: ".$rino_remote." for ".$importer["url"], LOGGER_DEBUG);
-
 	if ((($writable != (-1)) && ($writable != $importer['writable'])) || ($importer['forum'] != $forum) || ($importer['prv'] != $prv)) {
 		q("UPDATE `contact` SET `writable` = %d, forum = %d, prv = %d WHERE `id` = %d",
 			intval(($writable == (-1)) ? $importer['writable'] : $writable),
@@ -134,79 +130,6 @@ function dfrn_notify_post(App $a) {
 		xml_status(0, 'relationship dissolved');
 	}
 
-	$rino = Config::get('system', 'rino_encrypt');
-	$rino = intval($rino);
-
-	logger("Local rino version: " .  $rino, LOGGER_DEBUG);
-
-	if (strlen($key)) {
-
-		// if local rino is lower than remote rino, abort: should not happen!
-		// but only for $remote_rino > 1, because old code did't send rino version
-		if ($rino_remote_version > 1 && $rino < $rino_remote) {
-			logger("rino version '$rino_remote' is lower than supported '$rino'");
-			xml_status(0, "rino version '$rino_remote' is lower than supported '$rino'");
-		}
-
-		$rawkey = hex2bin(trim($key));
-		logger('rino: md5 raw key: ' . md5($rawkey));
-		$final_key = '';
-
-		if ($dfrn_version >= 2.1) {
-			if ((($importer['duplex']) && strlen($importer['cprvkey'])) || (! strlen($importer['cpubkey']))) {
-				openssl_private_decrypt($rawkey, $final_key, $importer['cprvkey']);
-			} else {
-				openssl_public_decrypt($rawkey, $final_key, $importer['cpubkey']);
-			}
-		} else {
-			if ((($importer['duplex']) && strlen($importer['cpubkey'])) || (! strlen($importer['cprvkey']))) {
-				openssl_public_decrypt($rawkey, $final_key, $importer['cpubkey']);
-			} else {
-				openssl_private_decrypt($rawkey, $final_key, $importer['cprvkey']);
-			}
-		}
-
-		#logger('rino: received key : ' . $final_key);
-
-		switch($rino_remote) {
-			case 0:
-			case 1:
-				/*
-				 *we got a key. old code send only the key, without RINO version.
-				 * we assume RINO 1 if key and no RINO version
-				 */
-				$data = DFRN::aesDecrypt(hex2bin($data), $final_key);
-				break;
-			case 2:
-				try {
-					$data = \Crypto::decrypt(hex2bin($data), $final_key);
-				} catch (\InvalidCiphertextException $ex) { // VERY IMPORTANT
-					/*
-					 * Either:
-					 *   1. The ciphertext was modified by the attacker,
-					 *   2. The key is wrong, or
-					 *   3. $ciphertext is not a valid ciphertext or was corrupted.
-					 * Assume the worst.
-					 */
-					logger('The ciphertext has been tampered with!');
-					xml_status(0, 'The ciphertext has been tampered with!');
-				} catch (\CryptoTestFailedException $ex) {
-					logger('Cannot safely perform dencryption');
-					xml_status(0, 'CryptoTestFailed');
-				} catch (\CannotPerformOperationException $ex) {
-					logger('Cannot safely perform decryption');
-					xml_status(0, 'Cannot safely perform decryption');
-				}
-				break;
-			default:
-				logger("rino: invalid sent version '$rino_remote'");
-				xml_status(0, "Invalid sent version '$rino_remote'");
-		}
-
-
-		logger('rino: decrypted data: ' . $data, LOGGER_DATA);
-	}
-
 	$ret = DFRN::import($data, $importer);
 	xml_status($ret, 'Processed');
 
@@ -225,7 +148,6 @@ function dfrn_notify_content(App $a) {
 
 		$dfrn_id = notags(trim($_GET['dfrn_id']));
 		$dfrn_version = (float) $_GET['dfrn_version'];
-		$rino_remote = ((x($_GET,'rino')) ? intval($_GET['rino']) : 0);
 		$type = "";
 		$last_update = "";
 
@@ -283,8 +205,6 @@ function dfrn_notify_content(App $a) {
 			$status = 1;
 		}
 
-		logger("Remote rino version: ".$rino_remote." for ".$r[0]["url"], LOGGER_DEBUG);
-
 		$challenge    = '';
 		$encrypted_id = '';
 		$id_str       = $my_id . '.' . mt_rand(1000,9999);
@@ -307,18 +227,6 @@ function dfrn_notify_content(App $a) {
 		$challenge    = bin2hex($challenge);
 		$encrypted_id = bin2hex($encrypted_id);
 
-
-		$rino = Config::get('system', 'rino_encrypt');
-		$rino = intval($rino);
-
-		logger("Local rino version: ". $rino, LOGGER_DEBUG);
-
-		// if requested rino is lower than enabled local rino, lower local rino version
-		// if requested rino is higher than enabled local rino, reply with local rino
-		if ($rino_remote < $rino) {
-			$rino = $rino_remote;
-		}
-
 		if((($r[0]['rel']) && ($r[0]['rel'] != CONTACT_IS_SHARING)) || ($r[0]['page-flags'] == PAGE_COMMUNITY)) {
 			$perm = 'rw';
 		} else {
@@ -331,7 +239,6 @@ function dfrn_notify_content(App $a) {
 			. '<dfrn_notify>' . "\r\n"
 			. "\t" . '<status>' . $status . '</status>' . "\r\n"
 			. "\t" . '<dfrn_version>' . DFRN_PROTOCOL_VERSION . '</dfrn_version>' . "\r\n"
-			. "\t" . '<rino>' . $rino . '</rino>' . "\r\n"
 			. "\t" . '<perm>' . $perm . '</perm>' . "\r\n"
 			. "\t" . '<dfrn_id>' . $encrypted_id . '</dfrn_id>' . "\r\n"
 			. "\t" . '<challenge>' . $challenge . '</challenge>' . "\r\n"

@@ -945,7 +945,6 @@ function admin_page_site_post(App $a)
 	$singleuser		=	((x($_POST,'singleuser'))		? notags(trim($_POST['singleuser']))		: '');
 	$proxy_disabled		=	((x($_POST,'proxy_disabled'))		? True						: False);
 	$only_tag_search	=	((x($_POST,'only_tag_search'))		? True						: False);
-	$rino			=	((x($_POST,'rino'))			? intval($_POST['rino'])			: 0);
 	$check_new_version_url	=	((x($_POST, 'check_new_version_url'))	?	notags(trim($_POST['check_new_version_url']))	: 'none');
 	$worker_queues		=	((x($_POST,'worker_queues'))		? intval($_POST['worker_queues'])		: 4);
 	$worker_dont_fork	=	((x($_POST,'worker_dont_fork'))		? True						: False);
@@ -1109,7 +1108,6 @@ function admin_page_site_post(App $a)
 	Config::set('system', 'worker_dont_fork', $worker_dont_fork);
 	Config::set('system', 'worker_fastlane', $worker_fastlane);
 	Config::set('system', 'frontend_worker', $worker_frontend);
-	Config::set('system', 'rino_encrypt', $rino);
 
 	info(t('Site settings updated.') . EOL);
 	goaway('admin/site');
@@ -1335,8 +1333,6 @@ function admin_page_site(App $a)
 		'$only_tag_search'	=> ['only_tag_search', t("Only search in tags"), Config::get('system','only_tag_search'), t("On large systems the text search can slow down the system extremely.")],
 
 		'$relocate_url'		=> ['relocate_url', t("New base url"), System::baseUrl(), t("Change base url for this server. Sends relocate message to all Friendica and Diaspora* contacts of all users.")],
-
-		'$rino' 		=> ['rino', t("RINO Encryption"), intval(Config::get('system','rino_encrypt')), t("Encryption layer between nodes."), ["Disabled", "RINO1 (deprecated)", "RINO2"]],
 
 		'$worker_queues' 	=> ['worker_queues', t("Maximum number of parallel workers"), Config::get('system','worker_queues'), t("On shared hosters set this to 2. On larger systems, values of 10 are great. Default value is 4.")],
 		'$worker_dont_fork'	=> ['worker_dont_fork', t("Don't use 'proc_open' with the worker"), Config::get('system','worker_dont_fork'), t("Enable this if your system doesn't allow the use of 'proc_open'. This can happen on shared hosters. If this is enabled you should increase the frequency of worker calls in your crontab.")],

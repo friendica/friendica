@@ -47,13 +47,6 @@ $a->config['system']['maximagesize'] = 800000;
 
 $a->config['php_path'] = '/usr/bin/php';
 
-
-// Server-to-server private message encryption (RINO) is allowed by default.
-// Encryption will only be provided if this setting is true and the
-// PHP mcrypt extension is installed on both systems
-
-$a->config['system']['rino_encrypt'] = true;
-
 // default system theme
 
 $a->config['system']['theme'] = 'duepuntozero';
