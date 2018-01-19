@@ -63,7 +63,6 @@ function install_post(App $a) {
 			$timezone = notags(trim($_POST['timezone']));
 			$language = notags(trim($_POST['language']));
 			$adminmail = notags(trim($_POST['adminmail']));
-			$rino = 2;
 
 			// connect to db
 			dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true);
@@ -79,7 +78,6 @@ function install_post(App $a) {
 				'$urlpath' => $urlpath,
 				'$phpath' => $phpath,
 				'$adminmail' => $adminmail,
-				'$rino' => $rino
 			]);
 
 

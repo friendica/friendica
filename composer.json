@@ -18,7 +18,6 @@
 		"ezyang/htmlpurifier": "~4.7.0",
 		"mobiledetect/mobiledetectlib": "2.8.*",
 		"league/html-to-markdown": "~4.4.1",
-		"defuse/php-encryption": "1.*",
 		"pear/Text_LanguageDetect": "1.*",
 		"pear/Text_Highlighter": "dev-master",
 		"paragonie/random_compat": "^2.0",
