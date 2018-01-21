@@ -126,7 +126,7 @@ function dfrn_request_post(App $a)
 					$photo = $parms["photo"];
 
 					// Escape the entire array
-					DBM::esc_array($parms);
+					DBM::escapeArray($parms);
 
 					// Create a contact record on our site for the other person
 					$r = q("INSERT INTO `contact` ( `uid`, `created`,`url`, `nurl`, `addr`, `name`, `nick`, `photo`, `site-pubkey`,
@@ -373,7 +373,7 @@ function dfrn_request_post(App $a)
 				$parms['issued-id'] = $issued_id;
 				$photo = $parms["photo"];
 
-				DBM::esc_array($parms);
+				DBM::escapeArray($parms);
 				$r = q("INSERT INTO `contact` ( `uid`, `created`, `url`, `nurl`, `addr`, `name`, `nick`, `issued-id`, `photo`, `site-pubkey`,
 					`request`, `confirm`, `notify`, `poll`, `poco`, `network`, `blocked`, `pending` )
 					VALUES ( %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d )",
