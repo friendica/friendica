@@ -103,7 +103,7 @@ class Profile
 		if ($profiledata) {
 			$a->page['aside'] .= self::sidebar($profiledata, true, $show_connect);
 
-			if (!DBM::is_result($user)) {
+			if (!DBM::isResult($user)) {
 				return;
 			}
 		}
@@ -204,7 +204,7 @@ class Profile
 			foreach ($_SESSION['remote'] as $visitor) {
 				if ($visitor['uid'] == $uid) {
 					$contact = dba::selectFirst('contact', ['profile-id'], ['id' => $visitor['cid']]);
-					if (DBM::is_result($contact)) {
+					if (DBM::isResult($contact)) {
 						$profile_id = $contact['profile-id'];
 					}
 					break;
@@ -228,7 +228,7 @@ class Profile
 				intval($profile_id)
 			);
 		}
-		if (!DBM::is_result($profile)) {
+		if (!DBM::isResult($profile)) {
 			$profile = dba::fetch_first(
 				"SELECT `contact`.`id` AS `contact_id`, `contact`.`photo` as `contact_photo`,
 					`contact`.`thumb` AS `contact_thumb`, `contact`.`micro` AS `contact_micro`,
@@ -378,7 +378,7 @@ class Profile
 				'entries' => [],
 			];
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				foreach ($r as $rr) {
 					$profile['menu']['entries'][] = [
 						'photo' => $rr['thumb'],
@@ -456,7 +456,7 @@ class Profile
 					"SELECT `gcontact`.`updated` FROM `contact` INNER JOIN `gcontact` WHERE `gcontact`.`nurl` = `contact`.`nurl` AND `self` AND `uid` = %d LIMIT 1",
 					intval($a->profile['uid'])
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$updated = date('c', strtotime($r[0]['updated']));
 				}
 
@@ -471,7 +471,7 @@ class Profile
 					dbesc(NETWORK_DIASPORA),
 					dbesc(NETWORK_OSTATUS)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$contacts = intval($r[0]['total']);
 				}
 			}
@@ -557,12 +557,12 @@ class Profile
 				datetime_convert('UTC', 'UTC', 'now + 6 days'),
 				datetime_convert('UTC', 'UTC', 'now')
 			);
-			if (DBM::is_result($s)) {
+			if (DBM::isResult($s)) {
 				$r = dba::inArray($s);
 				Cache::set($cachekey, $r, CACHE_HOUR);
 			}
 		}
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$total = 0;
 			$now = strtotime('now');
 			$cids = [];
@@ -648,7 +648,7 @@ class Profile
 
 		$r = [];
 
-		if (DBM::is_result($s)) {
+		if (DBM::isResult($s)) {
 			$istoday = false;
 
 			while ($rr = dba::fetch($s)) {

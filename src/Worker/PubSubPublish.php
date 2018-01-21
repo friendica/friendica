@@ -40,7 +40,7 @@ class PubSubPublish {
 		global $a;
 
 		$r = q("SELECT * FROM `push_subscriber` WHERE `id` = %d", intval($id));
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return;
 		}
 

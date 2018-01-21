@@ -30,7 +30,7 @@ function notifications_post(App $a) {
 			intval(local_user())
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$intro_id = $r[0]['id'];
 			$contact_id = $r[0]['contact-id'];
 		}

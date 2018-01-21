@@ -705,7 +705,7 @@ function admin_page_summary(App $a)
 	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1", dbesc(dba::database_name()));
 	$showwarning = false;
 	$warningtext = [];
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$showwarning = true;
 		$warningtext[] = t('Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php scripts/dbstructure.php toinnodb</tt> of your Friendica installation for an automatic conversion.<br />', 'https://dev.mysql.com/doc/refman/5.7/en/converting-tables-to-innodb.html');
 	}
@@ -842,7 +842,7 @@ function admin_page_site_post(App $a)
 			$upds = implode(", ", $upd);
 
 			$r = q("UPDATE %s SET %s;", $table_name, $upds);
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				notice("Failed updating '$table_name': " . dba::errorMessage());
 				goaway('admin/site');
 			}
@@ -1410,7 +1410,7 @@ function admin_page_dbsync(App $a)
 
 	$failed = [];
 	$r = q("SELECT `k`, `v` FROM `config` WHERE `cat` = 'database' ");
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			$upd = intval(substr($rr['k'], 7));
 			if ($upd < 1139 || $rr['v'] === 'success') {
@@ -1557,7 +1557,7 @@ function admin_page_users(App $a)
 	if ($a->argc > 2) {
 		$uid = $a->argv[3];
 		$user = dba::selectFirst('user', ['username', 'blocked'], ['uid' => $uid]);
-		if (DBM::is_result($user)) {
+		if (DBM::isResult($user)) {
 			notice('User not found' . EOL);
 			goaway('admin/users');
 			return ''; // NOTREACHED

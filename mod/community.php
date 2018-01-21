@@ -133,7 +133,7 @@ function community_content(App $a, $update = 0)
 
 	$r = community_getitems($a->pager['start'], $a->pager['itemspage'], $content);
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		info(t('No results.') . EOL);
 		return $o;
 	}

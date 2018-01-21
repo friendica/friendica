@@ -813,7 +813,7 @@ function run_update_function($x)
 function check_addons(App $a)
 {
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$installed = $r;
 	} else {
 		$installed = [];
@@ -1022,7 +1022,7 @@ function current_theme()
 			"select theme from user where uid = %d limit 1",
 			intval($a->profile_uid)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$page_theme = $r[0]['theme'];
 		}
 	}
@@ -1143,7 +1143,7 @@ function feed_birthday($uid, $tz)
 		intval($uid)
 	);
 
-	if (DBM::is_result($p)) {
+	if (DBM::isResult($p)) {
 		$tmp_dob = substr($p[0]['dob'], 5);
 		if (intval($tmp_dob)) {
 			$y = datetime_convert($tz, $tz, 'now', 'Y');

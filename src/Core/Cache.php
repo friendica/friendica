@@ -111,7 +111,7 @@ class Cache
 
 		$cache = dba::selectFirst('cache', ['v'], ['k' => $key]);
 
-		if (DBM::is_result($cache)) {
+		if (DBM::isResult($cache)) {
 			$cached = $cache['v'];
 			$value = @unserialize($cached);
 

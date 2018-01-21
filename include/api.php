@@ -228,7 +228,7 @@ function api_login(App $a)
 		}
 	}
 
-	if (!DBM::is_result($record)) {
+	if (!DBM::isResult($record)) {
 		logger('API_login failure: ' . print_r($_SERVER, true), LOGGER_DEBUG);
 		header('WWW-Authenticate: Basic realm="Friendica"');
 		//header('HTTP/1.0 401 Unauthorized');
@@ -477,7 +477,7 @@ function api_unique_id_to_nurl($id)
 {
 	$r = dba::selectFirst('contact', ['nurl'], ['uid' => 0, 'id' => $id]);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		return $r["nurl"];
 	} else {
 		return false;
@@ -604,14 +604,14 @@ function api_get_user(App $a, $contact_id = null)
 	api_best_nickname($uinfo);
 
 	// if the contact wasn't found, fetch it from the contacts with uid = 0
-	if (!DBM::is_result($uinfo)) {
+	if (!DBM::isResult($uinfo)) {
 		$r = [];
 
 		if ($url != "") {
 			$r = q("SELECT * FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s' LIMIT 1", dbesc(normalise_link($url)));
 		}
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$network_name = ContactSelector::networkToName($r[0]['network'], $r[0]['url']);
 
 			// If no nick where given, extract it from the address
@@ -1168,7 +1168,7 @@ function api_statuses_update($type)
 				dbesc($datefrom)
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$posts_day = $r[0]["posts_day"];
 			} else {
 				$posts_day = 0;
@@ -1192,7 +1192,7 @@ function api_statuses_update($type)
 				dbesc($datefrom)
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$posts_week = $r[0]["posts_week"];
 			} else {
 				$posts_week = 0;
@@ -1216,7 +1216,7 @@ function api_statuses_update($type)
 				dbesc($datefrom)
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$posts_month = $r[0]["posts_month"];
 			} else {
 				$posts_month = 0;
@@ -1248,7 +1248,7 @@ function api_statuses_update($type)
 			intval(requestdata('media_ids')),
 			api_user()
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$phototypes = Image::supportedTypes();
 			$ext = $phototypes[$r[0]['type']];
 			$_REQUEST['body'] .= "\n\n" . '[url=' . System::baseUrl() . '/photos/' . $r[0]['nickname'] . '/image/' . $r[0]['resource-id'] . ']';
@@ -1356,7 +1356,7 @@ function api_status_show($type)
 		dbesc(normalise_link($user_info['url']))
 	);
 
-	if (DBM::is_result($lastwall)) {
+	if (DBM::isResult($lastwall)) {
 		$lastwall = $lastwall[0];
 
 		$in_reply_to = api_in_reply_to($lastwall);
@@ -1457,7 +1457,7 @@ function api_users_show($type)
 		dbesc(normalise_link($user_info['url']))
 	);
 
-	if (DBM::is_result($lastwall)) {
+	if (DBM::isResult($lastwall)) {
 		$lastwall = $lastwall[0];
 
 		$in_reply_to = api_in_reply_to($lastwall);
@@ -1534,11 +1534,11 @@ function api_users_search($type)
 	if (x($_GET, 'q')) {
 		$r = q("SELECT id FROM `contact` WHERE `uid` = 0 AND `name` = '%s'", dbesc($_GET["q"]));
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = q("SELECT `id` FROM `contact` WHERE `uid` = 0 AND `nick` = '%s'", dbesc($_GET["q"]));
 		}
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$k = 0;
 			foreach ($r as $user) {
 				$user_info = api_get_user($a, $user["id"]);
@@ -1993,7 +1993,7 @@ function api_statuses_show($type)
 	);
 
 	/// @TODO How about copying this to above methods which don't check $r ?
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		throw new BadRequestException("There is no status with this id.");
 	}
 
@@ -2051,7 +2051,7 @@ function api_conversation_show($type)
 	logger('API: api_conversation_show: '.$id);
 
 	$r = q("SELECT `parent` FROM `item` WHERE `id` = %d", intval($id));
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$id = $r[0]["parent"];
 	}
 
@@ -2087,7 +2087,7 @@ function api_conversation_show($type)
 		intval($count)
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		throw new BadRequestException("There is no status with this id.");
 	}
 
@@ -2151,7 +2151,7 @@ function api_statuses_repeat($type)
 	);
 
 	/// @TODO other style than above functions!
-	if (DBM::is_result($r) && $r[0]['body'] != "") {
+	if (DBM::isResult($r) && $r[0]['body'] != "") {
 		if (strpos($r[0]['body'], "[/share]") !== false) {
 			$pos = strpos($r[0]['body'], "[share");
 			$post = substr($r[0]['body'], $pos);
@@ -2442,7 +2442,7 @@ function api_favorites_create_destroy($type)
 
 	$item = q("SELECT * FROM `item` WHERE `id`=%d AND `uid`=%d LIMIT 1", $itemid, api_user());
 
-	if (!DBM::is_result($item) || count($item) == 0) {
+	if (!DBM::isResult($item) || count($item) == 0) {
 		throw new BadRequestException("Invalid item.");
 	}
 
@@ -3544,7 +3544,7 @@ function api_ff_ids($type)
 			WHERE `contact`.`uid` = %s AND NOT `contact`.`self`",
 		intval(api_user())
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		return;
 	}
 
@@ -3718,7 +3718,7 @@ function api_direct_messages_destroy($type)
 	);
 
 	// error message if specified id is not in database
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		if ($verbose == "true") {
 			$answer = ['result' => 'error', 'message' => 'message id not in database'];
 			return api_format_data("direct_messages_delete", $type, ['$result' => $answer]);
@@ -3820,7 +3820,7 @@ function api_direct_messages_box($type, $box, $verbose)
 		intval($start),
 		intval($count)
 	);
-	if ($verbose == "true" && !DBM::is_result($r)) {
+	if ($verbose == "true" && !DBM::isResult($r)) {
 		$answer = ['result' => 'error', 'message' => 'no mails available'];
 		return api_format_data("direct_messages_all", $type, ['$result' => $answer]);
 	}
@@ -3973,7 +3973,7 @@ function api_fr_photoalbum_delete($type)
 		intval(api_user()),
 		dbesc($album)
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		throw new BadRequestException("album not available");
 	}
 
@@ -3986,7 +3986,7 @@ function api_fr_photoalbum_delete($type)
 			dbesc($rr['resource-id'])
 		);
 
-		if (!DBM::is_result($photo_item)) {
+		if (!DBM::isResult($photo_item)) {
 			throw new InternalServerErrorException("problem with deleting items occured");
 		}
 		Item::delete($photo_item[0]['id']);
@@ -4032,7 +4032,7 @@ function api_fr_photoalbum_update($type)
 		intval(api_user()),
 		dbesc($album)
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		throw new BadRequestException("album not available");
 	}
 	// now let's update all photos to the albumname
@@ -4076,7 +4076,7 @@ function api_fr_photos_list($type)
 		'image/gif' => 'gif'
 	];
 	$data = ['photo'=>[]];
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			$photo = [];
 			$photo['id'] = $rr['resource-id'];
@@ -4148,7 +4148,7 @@ function api_fr_photo_create_update($type)
 			dbesc($photo_id),
 			dbesc($album)
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			throw new BadRequestException("photo not available");
 		}
 	}
@@ -4272,7 +4272,7 @@ function api_fr_photo_delete($type)
 		intval(api_user()),
 		dbesc($photo_id)
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		throw new BadRequestException("photo not available");
 	}
 	// now we can perform on the deletion of the photo
@@ -4287,7 +4287,7 @@ function api_fr_photo_delete($type)
 			dbesc($photo_id)
 		);
 
-		if (!DBM::is_result($photo_item)) {
+		if (!DBM::isResult($photo_item)) {
 			throw new InternalServerErrorException("problem with deleting items occured");
 		}
 		// function for setting the items to "deleted = 1" which ensures that comments, likes etc. are not shown anymore
@@ -4358,7 +4358,7 @@ function api_account_update_profile_image($type)
 			intval($profileid)
 		);
 		// error message if specified profile id is not in database
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			throw new BadRequestException("profile_id not available");
 		}
 		$is_default_profile = $r['profile'];
@@ -4510,7 +4510,7 @@ function check_acl_input($acl_string)
 			intval($cid),
 			intval(api_user())
 		);
-		$contact_not_found |= !DBM::is_result($contact);
+		$contact_not_found |= !DBM::isResult($contact);
 	}
 	return $contact_not_found;
 }
@@ -4765,7 +4765,7 @@ function prepare_photo_data($type, $scale, $photo_id)
 	];
 
 	// prepare output data for photo
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$data = ['photo' => $r[0]];
 		$data['photo']['id'] = $data['photo']['resource-id'];
 		if ($scale !== false) {
@@ -4873,7 +4873,7 @@ function api_friendica_remoteauth()
 
 	$contact = dba::selectFirst('contact', [], ['uid' => api_user(), 'nurl' => $c_url]);
 
-	if (!DBM::is_result($contact) || ($contact['network'] !== NETWORK_DFRN)) {
+	if (!DBM::isResult($contact) || ($contact['network'] !== NETWORK_DFRN)) {
 		throw new BadRequestException("Unknown contact");
 	}
 
@@ -5030,7 +5030,7 @@ function api_get_nick($profile)
 		dbesc(normalise_link($profile))
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$nick = $r[0]["nick"];
 	}
 
@@ -5040,7 +5040,7 @@ function api_get_nick($profile)
 			dbesc(normalise_link($profile))
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$nick = $r[0]["nick"];
 		}
 	}
@@ -5120,7 +5120,7 @@ function api_in_reply_to($item)
 			dbesc($item['thr-parent'])
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$in_reply_to['status_id'] = intval($r[0]['id']);
 		} else {
 			$in_reply_to['status_id'] = intval($item['parent']);
@@ -5135,7 +5135,7 @@ function api_in_reply_to($item)
 			intval($in_reply_to['status_id'])
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			if ($r[0]['nick'] == "") {
 				$r[0]['nick'] = api_get_nick($r[0]["url"]);
 			}
@@ -5312,7 +5312,7 @@ function api_friendica_group_show($type)
 			intval($gid)
 		);
 		// error message if specified gid is not in database
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			throw new BadRequestException("gid not available");
 		}
 	} else {
@@ -5381,7 +5381,7 @@ function api_friendica_group_delete($type)
 		intval($gid)
 	);
 	// error message if specified gid is not in database
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		throw new BadRequestException('gid not available');
 	}
 
@@ -5393,7 +5393,7 @@ function api_friendica_group_delete($type)
 		dbesc($name)
 	);
 	// error message if specified gid is not in database
-	if (!DBM::is_result($rname)) {
+	if (!DBM::isResult($rname)) {
 		throw new BadRequestException('wrong group name');
 	}
 
@@ -5444,7 +5444,7 @@ function api_friendica_group_create($type)
 		dbesc($name)
 	);
 	// error message if specified group name already exists
-	if (DBM::is_result($rname)) {
+	if (DBM::isResult($rname)) {
 		throw new BadRequestException('group name already exists');
 	}
 
@@ -5455,7 +5455,7 @@ function api_friendica_group_create($type)
 		dbesc($name)
 	);
 	// error message if specified group name already exists
-	if (DBM::is_result($rname)) {
+	if (DBM::isResult($rname)) {
 		$reactivate_group = true;
 	}
 
@@ -5726,7 +5726,7 @@ function api_friendica_direct_messages_setseen($type)
 	);
 
 	// error message if specified id is not in database
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		$answer = ['result' => 'error', 'message' => 'message id not in database'];
 		return api_format_data("direct_messages_setseen", $type, ['$result' => $answer]);
 	}
@@ -5788,7 +5788,7 @@ function api_friendica_direct_messages_search($type)
 	$profile_url = $user_info["url"];
 
 	// message if nothing was found
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		$success = ['success' => false, 'search_results' => 'problem with query'];
 	} elseif (count($r) == 0) {
 		$success = ['success' => false, 'search_results' => 'nothing found'];
@@ -5844,7 +5844,7 @@ function api_friendica_profile_show($type)
 		);
 
 		// error message if specified gid is not in database
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			throw new BadRequestException("profile_id not available");
 		}
 	} else {

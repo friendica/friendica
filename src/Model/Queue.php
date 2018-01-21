@@ -46,7 +46,7 @@ class Queue
 			intval($cid)
 		);
 	
-		$was_delayed = DBM::is_result($r);
+		$was_delayed = DBM::isResult($r);
 	
 		// We set "term-date" to a current date if the communication has problems.
 		// If the communication works again we reset this value.
@@ -54,7 +54,7 @@ class Queue
 			$r = q("SELECT `term-date` FROM `contact` WHERE `id` = %d AND `term-date` <= '1000-01-01' LIMIT 1",
 				intval($cid)
 			);
-			$was_delayed = !DBM::is_result($r);
+			$was_delayed = !DBM::isResult($r);
 		}
 	
 		return $was_delayed;
@@ -84,7 +84,7 @@ class Queue
 			intval($cid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			if ($batch &&  ($r[0]['total'] > $batch_queue)) {
 				logger('add_to_queue: too many queued items for batch server ' . $cid . ' - discarding message');
 				return;

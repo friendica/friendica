@@ -19,7 +19,7 @@ function oauth_get_client($request)
 			WHERE `clients`.`client_id`=`tokens`.`client_id`
 			AND `tokens`.`id`='%s' AND `tokens`.`scope`='request'", dbesc($token));
 
-	if (!DBM::is_result($r))
+	if (!DBM::isResult($r))
 		return null;
 
 	return $r[0];

@@ -171,7 +171,7 @@ Class Cron {
 			dbesc(NETWORK_MAIL)
 		);
 
-		if (!DBM::is_result($contacts)) {
+		if (!DBM::isResult($contacts)) {
 			return;
 		}
 

@@ -35,7 +35,7 @@ function allfriends_content(App $a)
 
 	$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => local_user()]);
 
-	if (!DBM::is_result($contact)) {
+	if (!DBM::isResult($contact)) {
 		return;
 	}
 
@@ -47,7 +47,7 @@ function allfriends_content(App $a)
 	$a->set_pager_total($total);
 
 	$r = GContact::allFriends(local_user(), $cid, $a->pager['start'], $a->pager['itemspage']);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		$o .= t('No friends to display.');
 		return $o;
 	}

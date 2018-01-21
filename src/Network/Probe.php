@@ -1518,7 +1518,7 @@ class Probe
 
 			$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-			if (DBM::is_result($x) && DBM::is_result($r)) {
+			if (DBM::isResult($x) && DBM::isResult($r)) {
 				$mailbox = Email::constructMailboxName($r[0]);
 				$password = '';
 				openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);

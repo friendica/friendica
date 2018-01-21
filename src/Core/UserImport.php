@@ -118,7 +118,7 @@ class UserImport
 			return;
 		}
 
-		if (DBM::is_result($r) > 0) {
+		if (DBM::isResult($r) > 0) {
 			notice(sprintf(t("User '%s' already exists on this server!"), $account['user']['nickname']));
 			return;
 		}
@@ -131,7 +131,7 @@ class UserImport
 			return;
 		}
 
-		if (DBM::is_result($r) > 0) {
+		if (DBM::isResult($r) > 0) {
 			notice(sprintf(t("User '%s' already exists on this server!"), $account['user']['nickname']));
 			return;
 		}

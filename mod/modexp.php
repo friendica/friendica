@@ -15,7 +15,7 @@ function modexp_init(App $a) {
 			dbesc($nick)
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		killme();
 	}
 

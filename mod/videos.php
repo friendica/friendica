@@ -155,7 +155,7 @@ function videos_post(App $a) {
 			dbesc($video_id)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			q("DELETE FROM `attach` WHERE `uid` = %d AND `id` = '%s'",
 				intval(local_user()),
 				dbesc($video_id)
@@ -165,7 +165,7 @@ function videos_post(App $a) {
 				intval(local_user())
 			);
 			//echo "<pre>"; var_dump($i); killme();
-			if (DBM::is_result($i)) {
+			if (DBM::isResult($i)) {
 				q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 					dbesc(datetime_convert()),
 					dbesc(datetime_convert()),
@@ -275,7 +275,7 @@ function videos_content(App $a) {
 					intval($contact_id),
 					intval($owner_uid)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$can_post = true;
 					$contact = $r[0];
 					$remote_contact = true;
@@ -304,7 +304,7 @@ function videos_content(App $a) {
 				intval($contact_id),
 				intval($owner_uid)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$contact = $r[0];
 				$remote_contact = true;
 			}
@@ -364,7 +364,7 @@ function videos_content(App $a) {
 		$sql_extra GROUP BY hash",
 		intval($a->data['user']['uid'])
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->set_pager_total(count($r));
 		$a->set_pager_itemspage(20);
 	}
@@ -382,7 +382,7 @@ function videos_content(App $a) {
 
 
 	$videos = [];
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			$alt_e = $rr['filename'];
 			$name_e = $rr['album'];

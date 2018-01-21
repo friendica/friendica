@@ -46,7 +46,7 @@ class Conversation
 
 			$old_conv = dba::fetch_first("SELECT `item-uri`, `reply-to-uri`, `conversation-uri`, `conversation-href`, `protocol`, `source`
 					FROM `conversation` WHERE `item-uri` = ?", $conversation['item-uri']);
-			if (DBM::is_result($old_conv)) {
+			if (DBM::isResult($old_conv)) {
 				// Don't update when only the source has changed.
 				// Only do this when there had been no source before.
 				if ($old_conv['source'] != '') {

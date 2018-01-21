@@ -53,7 +53,7 @@ class Contact extends BaseObject
 				$gid,
 				local_user()
 			);
-			if (DBM::is_result($stmt)) {
+			if (DBM::isResult($stmt)) {
 				$return = dba::inArray($stmt);
 			}
 		}
@@ -103,7 +103,7 @@ class Contact extends BaseObject
 		}
 
 		$user = dba::selectFirst('user', ['uid', 'username', 'nickname'], ['uid' => $uid]);
-		if (!DBM::is_result($user)) {
+		if (!DBM::isResult($user)) {
 			return false;
 		}
 
@@ -145,7 +145,7 @@ class Contact extends BaseObject
 	{
 		// We want just to make sure that we don't delete our "self" contact
 		$contact = dba::selectFirst('contact', ['uid'], ['id' => $id, 'self' => false]);
-		if (!DBM::is_result($contact) || !intval($contact['uid'])) {
+		if (!DBM::isResult($contact) || !intval($contact['uid'])) {
 			return;
 		}
 
@@ -299,7 +299,7 @@ class Contact extends BaseObject
 		$r = dba::inArray($s);
 
 		// Fetch contact data from the contact table for the given user, checking with the alias
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$s = dba::p("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 				`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
 			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = ?", normalise_link($url), $url, $ssl_url, $uid);
@@ -307,7 +307,7 @@ class Contact extends BaseObject
 		}
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically)
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$s = dba::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
 			FROM `contact` WHERE `nurl` = ? AND `uid` = 0", normalise_link($url));
@@ -315,7 +315,7 @@ class Contact extends BaseObject
 		}
 
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically) - checked with the alias
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$s = dba::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
 			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = 0", normalise_link($url), $url, $ssl_url);
@@ -323,14 +323,14 @@ class Contact extends BaseObject
 		}
 
 		// Fetch the data from the gcontact table
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$s = dba::p("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
 			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
 			FROM `gcontact` WHERE `nurl` = ?", normalise_link($url));
 			$r = dba::inArray($s);
 		}
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			// If there is more than one entry we filter out the connector networks
 			if (count($r) > 1) {
 				foreach ($r as $id => $result) {
@@ -436,7 +436,7 @@ class Contact extends BaseObject
 			intval($uid)
 		);
 		// Fetch the data from the contact table with "uid=0" (which is filled automatically)
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = q("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 				`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
 				FROM `contact` WHERE `addr` = '%s' AND `uid` = 0",
@@ -445,7 +445,7 @@ class Contact extends BaseObject
 		}
 
 		// Fetch the data from the gcontact table
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = q("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
 				`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, `community` AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
 				FROM `gcontact` WHERE `addr` = '%s'",
@@ -453,7 +453,7 @@ class Contact extends BaseObject
 			);
 		}
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$data = Probe::uri($addr);
 
 			$profile = self::getDetailsByURL($data['url'], $uid);
@@ -498,7 +498,7 @@ class Contact extends BaseObject
 
 			// Look for our own contact if the uid doesn't match and isn't public
 			$contact_own = dba::selectFirst('contact', [], ['nurl' => $contact['nurl'], 'network' => $contact['network'], 'uid' => $uid]);
-			if (DBM::is_result($contact_own)) {
+			if (DBM::isResult($contact_own)) {
 				return self::photoMenu($contact_own, $uid);
 			} else {
 				$profile_link = Profile::zrl($contact['url']);
@@ -669,19 +669,19 @@ class Contact extends BaseObject
 		$contact = dba::selectFirst('contact', ['id', 'avatar-date'], ['nurl' => normalise_link($url), 'uid' => $uid]);
 
 		// Then the addr (nick@server.tld)
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			$contact = dba::selectFirst('contact', ['id', 'avatar-date'], ['addr' => $url, 'uid' => $uid]);
 		}
 
 		// Then the alias (which could be anything)
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			// The link could be provided as http although we stored it as https
 			$ssl_url = str_replace('http://', 'https://', $url);
 			$condition = ['`alias` IN (?, ?, ?) AND `uid` = ?', $url, normalise_link($url), $ssl_url, $uid];
 			$contact = dba::selectFirst('contact', ['id', 'avatar', 'avatar-date'], $condition);
 		}
 
-		if (DBM::is_result($contact)) {
+		if (DBM::isResult($contact)) {
 			$contact_id = $contact["id"];
 
 			// Update the contact every 7 days
@@ -710,7 +710,7 @@ class Contact extends BaseObject
 
 			// Get data from the gcontact table
 			$gcontact = dba::selectFirst('gcontact', ['name', 'nick', 'url', 'photo', 'addr', 'alias', 'network'], ['nurl' => normalise_link($url)]);
-			if (!DBM::is_result($gcontact)) {
+			if (!DBM::isResult($gcontact)) {
 				return 0;
 			}
 
@@ -757,7 +757,7 @@ class Contact extends BaseObject
 
 			$s = dba::select('contact', ['id'], ['nurl' => normalise_link($data["url"]), 'uid' => $uid], ['order' => ['id'], 'limit' => 2]);
 			$contacts = dba::inArray($s);
-			if (!DBM::is_result($contacts)) {
+			if (!DBM::isResult($contacts)) {
 				return 0;
 			}
 
@@ -765,7 +765,7 @@ class Contact extends BaseObject
 
 			// Update the newly created contact from data in the gcontact table
 			$gcontact = dba::selectFirst('gcontact', ['location', 'about', 'keywords', 'gender'], ['nurl' => normalise_link($data["url"])]);
-			if (DBM::is_result($gcontact)) {
+			if (DBM::isResult($gcontact)) {
 				// Only use the information when the probing hadn't fetched these values
 				if ($data['keywords'] != '') {
 					unset($gcontact['keywords']);
@@ -791,7 +791,7 @@ class Contact extends BaseObject
 		$contact = dba::selectFirst('contact', $fields, ['id' => $contact_id]);
 
 		// This condition should always be true
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			return $contact_id;
 		}
 
@@ -847,7 +847,7 @@ class Contact extends BaseObject
 		}
 
 		$blocked = dba::selectFirst('contact', ['blocked'], ['id' => $cid]);
-		if (!DBM::is_result($blocked)) {
+		if (!DBM::isResult($blocked)) {
 			return false;
 		}
 		return (bool) $blocked['blocked'];
@@ -867,7 +867,7 @@ class Contact extends BaseObject
 		}
 
 		$hidden = dba::selectFirst('contact', ['hidden'], ['id' => $cid]);
-		if (!DBM::is_result($hidden)) {
+		if (!DBM::isResult($hidden)) {
 			return false;
 		}
 		return (bool) $hidden['hidden'];
@@ -893,7 +893,7 @@ class Contact extends BaseObject
 			dbesc(normalise_link($contact_url))
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return '';
 		}
 
@@ -1011,7 +1011,7 @@ class Contact extends BaseObject
 	public static function updateAvatar($avatar, $uid, $cid, $force = false)
 	{
 		$contact = dba::selectFirst('contact', ['avatar', 'photo', 'thumb', 'micro', 'nurl'], ['id' => $cid]);
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			return false;
 		} else {
 			$data = [$contact["photo"], $contact["thumb"], $contact["micro"]];
@@ -1030,7 +1030,7 @@ class Contact extends BaseObject
 				// Update the public contact (contact id = 0)
 				if ($uid != 0) {
 					$pcontact = dba::selectFirst('contact', ['id'], ['nurl' => $contact['nurl']]);
-					if (DBM::is_result($pcontact)) {
+					if (DBM::isResult($pcontact)) {
 						self::updateAvatar($avatar, 0, $pcontact['id'], $force);
 					}
 				}
@@ -1055,7 +1055,7 @@ class Contact extends BaseObject
 
 		$fields = ['url', 'nurl', 'addr', 'alias', 'batch', 'notify', 'poll', 'poco', 'network'];
 		$contact = dba::selectFirst('contact', $fields, ['id' => $id]);
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			return false;
 		}
 
@@ -1233,7 +1233,7 @@ class Contact extends BaseObject
 			dbesc($ret['network'])
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` = '%s' LIMIT 1",
 				intval($uid),
 				dbesc(normalise_link($url)),
@@ -1241,7 +1241,7 @@ class Contact extends BaseObject
 			);
 		}
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			// update contact
 			$new_relation = (($r[0]['rel'] == CONTACT_IS_FOLLOWER) ? CONTACT_IS_FRIEND : CONTACT_IS_SHARING);
 
@@ -1278,7 +1278,7 @@ class Contact extends BaseObject
 		}
 
 		$contact = dba::selectFirst('contact', [], ['url' => $ret['url'], 'network' => $ret['network'], 'uid' => $uid]);
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			$result['message'] .= t('Unable to retrieve contact information.') . EOL;
 			return $result;
 		}
@@ -1300,7 +1300,7 @@ class Contact extends BaseObject
 			intval($uid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			if (($contact['network'] == NETWORK_OSTATUS) && (strlen($contact['notify']))) {
 				// create a follow slap
 				$item = [];

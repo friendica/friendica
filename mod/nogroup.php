@@ -29,11 +29,11 @@ function nogroup_content(App $a)
 	}
 
 	$r = Contact::getUngroupedList(local_user());
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->set_pager_total($r[0]['total']);
 	}
 	$r = Contact::getUngroupedList(local_user(), $a->pager['start'], $a->pager['itemspage']);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			$contact_details = Contact::getDetailsByURL($rr['url'], local_user(), $rr);
 

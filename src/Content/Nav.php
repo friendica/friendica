@@ -107,7 +107,7 @@ class Nav
 			// user info
 			$contact = dba::selectFirst('contact', ['micro'], ['uid' => $a->user['uid'], 'self' => true]);
 			$userinfo = [
-				'icon' => (DBM::is_result($contact) ? $a->remove_baseurl($contact['micro']) : 'images/person-48.jpg'),
+				'icon' => (DBM::isResult($contact) ? $a->remove_baseurl($contact['micro']) : 'images/person-48.jpg'),
 				'name' => $a->user['username'],
 			];
 		} else {

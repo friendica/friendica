@@ -61,7 +61,7 @@ function poke_init(App $a) {
 		intval($uid)
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		logger('poke: no contact ' . $contact_id);
 		return;
 	}
@@ -75,7 +75,7 @@ function poke_init(App $a) {
 			intval($parent),
 			intval($uid)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$parent_uri = $r[0]['uri'];
 			$private    = $r[0]['private'];
 			$allow_cid  = $r[0]['allow_cid'];
@@ -167,7 +167,7 @@ function poke_content(App $a) {
 			intval($_GET['c']),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$name = $r[0]['name'];
 			$id = $r[0]['id'];
 		}

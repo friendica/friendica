@@ -47,13 +47,13 @@ function display_init(App $a)
 						`author-avatar`, `network`, `body`, `uid`, `owner-link`
 				FROM `item` WHERE `visible` AND NOT `deleted` AND NOT `moderated`
 					AND `guid` = ? AND `uid` = ? LIMIT 1", $a->argv[1], local_user());
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$nick = $a->user["nickname"];
 			}
 		}
 
 		// Is it an item with uid=0?
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = dba::fetch_first("SELECT `id`, `parent`, `author-name`, `author-link`,
 						`author-avatar`, `network`, `body`, `uid`, `owner-link`
 				FROM `item` WHERE `visible` AND NOT `deleted` AND NOT `moderated`
@@ -61,7 +61,7 @@ function display_init(App $a)
 					AND `guid` = ? LIMIT 1", $a->argv[1]);
 		}
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$a->error = 404;
 			notice(t('Item not found.') . EOL);
 			return;
@@ -74,7 +74,7 @@ function display_init(App $a)
 				AND `id` = ? LIMIT 1", $a->argv[2]);
 	}
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		if (strstr($_SERVER['HTTP_ACCEPT'], 'application/atom+xml')) {
 			logger('Directly serving XML for id '.$r["id"], LOGGER_DEBUG);
 			displayShowFeed($r["id"], false);
@@ -97,7 +97,7 @@ function display_init(App $a)
 					WHERE `user`.`nickname` = ? AND `profile`.`is-default` AND `contact`.`self` LIMIT 1",
 					$nickname
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$profiledata = $r;
 				}
 				$profiledata["network"] = NETWORK_DFRN;
@@ -219,7 +219,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 				$r = dba::fetch_first("SELECT `id`, `parent` FROM `item`
 					WHERE `item`.`visible` AND NOT `item`.`deleted` AND NOT `item`.`moderated`
 						AND `guid` = ? AND `uid` = ?", $a->argv[1], local_user());
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$item_id = $r["id"];
 					$item_parent = $r["parent"];
 				}
@@ -230,7 +230,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 					WHERE `item`.`visible` AND NOT `item`.`deleted` AND NOT `item`.`moderated`
 						AND NOT `item`.`private` AND `item`.`uid` = 0
 						AND `item`.`guid` = ?", $a->argv[1]);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$item_id = $r["id"];
 					$item_parent = $r["parent"];
 				}
@@ -281,7 +281,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 			$contact_id,
 			$a->profile['uid']
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$contact = $r;
 			$remote_contact = true;
 		}
@@ -295,7 +295,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	}
 
 	$r = dba::fetch_first("SELECT * FROM `contact` WHERE `uid` = ? AND `self` LIMIT 1", $a->profile['uid']);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->page_contact = $r;
 	}
 	$is_owner = (local_user() && (in_array($a->profile['profile_uid'], [local_user(), 0])) ? true : false);
@@ -341,7 +341,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 		$item_id
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		notice(t('Item not found.') . EOL);
 		return $o;
 	}
@@ -350,7 +350,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 
 	if (local_user() && (local_user() == $a->profile['uid'])) {
 		$unseen = dba::selectFirst('item', ['id'], ['parent' => $s[0]['parent'], 'unseen' => true]);
-		if (DBM::is_result($unseen)) {
+		if (DBM::isResult($unseen)) {
 			dba::update('item', ['unseen' => false], ['parent' => $s[0]['parent'], 'unseen' => true]);
 		}
 	}

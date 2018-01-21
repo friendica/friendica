@@ -125,7 +125,7 @@ function localize_item(&$item) {
 			WHERE `item`.`contact-id`=`contact`.`id`
 			AND `item`.`uri`='%s'",
 			dbesc($item['parent-uri']));
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return;
 		}
 		$obj = $r[0];
@@ -262,7 +262,7 @@ function localize_item(&$item) {
 			AND `item`.`uri`='%s'",
 			dbesc($item['parent-uri']));
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return;
 		}
 
@@ -318,7 +318,7 @@ function localize_item(&$item) {
 					intval($item['uid'])
 			);
 
-			if (DBM::is_result($r) && $r[0]['plink']) {
+			if (DBM::isResult($r) && $r[0]['plink']) {
 				$target = $r[0];
 				$Bname = $target['author-name'];
 				$Blink = $target['author-link'];
@@ -976,7 +976,7 @@ function best_link_url($item, &$sparkle, $url = '') {
 			'pending' => false
 		];
 		$contact = dba::selectFirst('contact', ['id'], $condition);
-		if (DBM::is_result($contact)) {
+		if (DBM::isResult($contact)) {
 			$best_url = 'redir/' . $contact['id'];
 			$sparkle = true;
 			if ($url != '') {
@@ -1027,7 +1027,7 @@ function item_photo_menu($item) {
 	$rel = 0;
 	$condition = ['uid' => local_user(), 'nurl' => normalise_link($item['author-link'])];
 	$contact = dba::selectFirst('contact', ['id', 'network', 'rel'], $condition);
-	if (DBM::is_result($contact)) {
+	if (DBM::isResult($contact)) {
 		$cid = $contact['id'];
 		$network = $contact['network'];
 		$rel = $contact['rel'];

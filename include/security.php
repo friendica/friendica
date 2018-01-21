@@ -98,14 +98,14 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		$r = dba::fetch_first("SELECT * FROM `user` WHERE `uid` = ? LIMIT 1",
 			intval($_SESSION['submanage'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$master_record = $r;
 		}
 	}
 
 	$r = dba::select('user', ['uid', 'username', 'nickname'],
 		['password' => $master_record['password'], 'email' => $master_record['email'], 'account_removed' => false]);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->identities = dba::inArray($r);
 	} else {
 		$a->identities = [];
@@ -117,7 +117,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		WHERE `user`.`account_removed` = 0 AND `manage`.`uid` = ?",
 		$master_record['uid']
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->identities = array_merge($a->identities, dba::inArray($r));
 	}
 
@@ -129,7 +129,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	}
 
 	$r = dba::fetch_first("SELECT * FROM `contact` WHERE `uid` = ? AND `self` LIMIT 1", $_SESSION['uid']);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->contact = $r;
 		$a->cid = $r['id'];
 		$_SESSION['cid'] = $a->cid;
@@ -215,7 +215,7 @@ function can_write_wall($owner)
 				intval(PAGE_COMMUNITY)
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$verified = 2;
 				return true;
 			} else {
@@ -262,7 +262,7 @@ function permissions_sql($owner_id, $remote_verified = false, $groups = null)
 				intval($remote_user),
 				intval($owner_id)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$remote_verified = true;
 				$groups = Group::getIdsByContactId($remote_user);
 			}
@@ -324,7 +324,7 @@ function item_permissions_sql($owner_id, $remote_verified = false, $groups = nul
 				intval($remote_user),
 				intval($owner_id)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$remote_verified = true;
 				$groups = Group::getIdsByContactId($remote_user);
 			}

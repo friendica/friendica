@@ -29,7 +29,7 @@ function profiles_init(App $a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			notice( t('Profile not found.') . EOL);
 			goaway('profiles');
 			return; // NOTREACHED
@@ -48,7 +48,7 @@ function profiles_init(App $a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			info(t('Profile deleted.').EOL);
 		}
 
@@ -63,7 +63,7 @@ function profiles_init(App $a) {
 		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
 			intval(local_user()));
 
-		$num_profiles = (DBM::is_result($r0) ? count($r0) : 0);
+		$num_profiles = (DBM::isResult($r0) ? count($r0) : 0);
 
 		$name = t('Profile-') . ($num_profiles + 1);
 
@@ -85,7 +85,7 @@ function profiles_init(App $a) {
 		);
 
 		info( t('New profile created.') . EOL);
-		if (DBM::is_result($r3) && count($r3) == 1) {
+		if (DBM::isResult($r3) && count($r3) == 1) {
 			goaway('profiles/' . $r3[0]['id']);
 		}
 
@@ -99,14 +99,14 @@ function profiles_init(App $a) {
 		$r0 = q("SELECT `id` FROM `profile` WHERE `uid` = %d",
 			intval(local_user()));
 
-		$num_profiles = (DBM::is_result($r0) ? count($r0) : 0);
+		$num_profiles = (DBM::isResult($r0) ? count($r0) : 0);
 
 		$name = t('Profile-') . ($num_profiles + 1);
 		$r1 = q("SELECT * FROM `profile` WHERE `uid` = %d AND `id` = %d LIMIT 1",
 			intval(local_user()),
 			intval($a->argv[2])
 		);
-		if(! DBM::is_result($r1)) {
+		if(! DBM::isResult($r1)) {
 			notice( t('Profile unavailable to clone.') . EOL);
 			killme();
 			return;
@@ -124,7 +124,7 @@ function profiles_init(App $a) {
 			dbesc($name)
 		);
 		info( t('New profile created.') . EOL);
-		if ((DBM::is_result($r3)) && (count($r3) == 1)) {
+		if ((DBM::isResult($r3)) && (count($r3) == 1)) {
 			goaway('profiles/'.$r3[0]['id']);
 		}
 
@@ -139,7 +139,7 @@ function profiles_init(App $a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			notice( t('Profile not found.') . EOL);
 			killme();
 			return;
@@ -186,7 +186,7 @@ function profiles_post(App $a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (! DBM::is_result($orig)) {
+		if (! DBM::isResult($orig)) {
 			notice( t('Profile not found.') . EOL);
 			return;
 		}
@@ -280,13 +280,13 @@ function profiles_post(App $a) {
 						dbesc($newname),
 						intval(local_user())
 					);
-					if (! DBM::is_result($r)) {
+					if (! DBM::isResult($r)) {
 						$r = q("SELECT * FROM `contact` WHERE `nick` = '%s' AND `uid` = %d LIMIT 1",
 							dbesc($lookup),
 							intval(local_user())
 						);
 					}
-					if (DBM::is_result($r)) {
+					if (DBM::isResult($r)) {
 						$prf = $r[0]['url'];
 						$newname = $r[0]['name'];
 					}
@@ -539,7 +539,7 @@ function profile_activity($changed, $value) {
 		intval(local_user())
 	);
 
-	if (! DBM::is_result($self)) {
+	if (! DBM::isResult($self)) {
 		return;
 	}
 
@@ -621,7 +621,7 @@ function profiles_content(App $a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			notice( t('Profile not found.') . EOL);
 			return;
 		}
@@ -753,7 +753,7 @@ function profiles_content(App $a) {
 			$r = q("SELECT * FROM `profile` WHERE `uid` = %d AND `is-default`=1",
 				local_user()
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				//Go to the default profile.
 				goaway('profiles/' . $r[0]['id']);
 			}
@@ -762,7 +762,7 @@ function profiles_content(App $a) {
 		$r = q("SELECT * FROM `profile` WHERE `uid` = %d",
 			local_user());
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 
 			$tpl = get_markup_template('profile_entry.tpl');
 

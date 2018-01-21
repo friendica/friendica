@@ -46,7 +46,7 @@ function dfrn_notify_post(App $a) {
 		dbesc($dfrn_id),
 		dbesc($challenge)
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		logger('dfrn_notify: could not match challenge to dfrn_id ' . $dfrn_id . ' challenge=' . $challenge);
 		xml_status(3, 'Could not match challenge');
 	}
@@ -94,7 +94,7 @@ function dfrn_notify_post(App $a) {
 		dbesc($a->argv[1])
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		logger('dfrn_notify: contact not found for dfrn_id ' . $dfrn_id);
 		xml_status(3, 'Contact not found');
 		//NOTREACHED
@@ -253,7 +253,7 @@ function dfrn_notify_content(App $a) {
 				dbesc($a->argv[1])
 		);
 
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			$status = 1;
 		}
 

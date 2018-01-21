@@ -98,7 +98,7 @@ class Config
 		}
 
 		$config = dba::selectFirst('config', ['v'], ['cat' => $family, 'k' => $key]);
-		if (DBM::is_result($config)) {
+		if (DBM::isResult($config)) {
 			// manage array value
 			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $config['v']) ? unserialize($config['v']) : $config['v']);
 

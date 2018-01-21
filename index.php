@@ -114,7 +114,7 @@ if (x($_SESSION, 'authenticated') && !x($_SESSION, 'language')) {
 	// we haven't loaded user data yet, but we need user language
 	$user = dba::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
 	$_SESSION['language'] = $lang;
-	if (DBM::is_result($user)) {
+	if (DBM::isResult($user)) {
 		$_SESSION['language'] = $user['language'];
 	}
 }

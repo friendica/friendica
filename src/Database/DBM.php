@@ -56,7 +56,7 @@ class DBM
 	 *
 	 * @return boolean Whether $array is a filled array or an object with rows
 	 */
-	public static function is_result($array)
+	public static function isResult($array)
 	{
 		// It could be a return value from an update statement
 		if (is_bool($array)) {

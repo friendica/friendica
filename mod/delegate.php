@@ -27,7 +27,7 @@ function delegate_content(App $a)
 		$user_id = $a->argv[2];
 
 		$user = dba::selectFirst('user', ['nickname'], ['uid' => $user_id]);
-		if (DBM::is_result($user)) {
+		if (DBM::isResult($user)) {
 			$condition = [
 				'uid' => local_user(),
 				'nurl' => normalise_link(System::baseUrl() . '/profile/' . $user['nickname'])
@@ -55,7 +55,7 @@ function delegate_content(App $a)
 		dbesc($a->user['email']),
 		dbesc($a->user['password'])
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$full_managers = $r;
 	}
 
@@ -64,7 +64,7 @@ function delegate_content(App $a)
 	$r = q("SELECT * FROM `user` WHERE `uid` IN (SELECT `uid` FROM `manage` WHERE `mid` = %d)",
 		intval(local_user())
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$delegates = $r;
 	}
 
@@ -89,7 +89,7 @@ function delegate_content(App $a)
 		intval(local_user()),
 		dbesc(NETWORK_DFRN)
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		notice(t('No potential page delegates located.') . EOL);
 		return;
 	}
@@ -105,7 +105,7 @@ function delegate_content(App $a)
 
 	// get user records for all potential page delegates who are not already delegates or managers
 	$r = q("SELECT `uid`, `username`, `nickname` FROM `user` WHERE `nickname` IN ($nicks)");
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			if (!in_array($rr['uid'], $uids)) {
 				$potentials[] = $rr;

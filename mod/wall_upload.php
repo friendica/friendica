@@ -33,7 +33,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 				dbesc($nick)
 			);
 
-			if (! DBM::is_result($r)) {
+			if (! DBM::isResult($r)) {
 				if ($r_json) {
 					echo json_encode(['error'=>t('Invalid request.')]);
 					killme();
@@ -89,7 +89,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 					intval($contact_id),
 					intval($page_owner_uid)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$can_post = true;
 					$visitor = $contact_id;
 				}

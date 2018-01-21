@@ -24,7 +24,7 @@ function subthread_content(App $a) {
 		dbesc($item_id)
 	);
 
-	if(! $item_id || (! DBM::is_result($r))) {
+	if(! $item_id || (! DBM::isResult($r))) {
 		logger('subthread: no item ' . $item_id);
 		return;
 	}
@@ -45,7 +45,7 @@ function subthread_content(App $a) {
 			intval($item['contact-id']),
 			intval($item['uid'])
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			return;
 		}
 		if (! $r[0]['self']) {
@@ -59,7 +59,7 @@ function subthread_content(App $a) {
 		WHERE `contact`.`self` = 1 AND `contact`.`uid` = %d LIMIT 1",
 		intval($owner_uid)
 	);
-	if (DBM::is_result($r))
+	if (DBM::isResult($r))
 		$owner = $r[0];
 
 	if (! $owner) {
@@ -80,7 +80,7 @@ function subthread_content(App $a) {
 			intval($_SESSION['visitor_id']),
 			intval($owner_uid)
 		);
-		if (DBM::is_result($r))
+		if (DBM::isResult($r))
 			$contact = $r[0];
 	}
 	if (! $contact) {

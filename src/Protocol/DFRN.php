@@ -132,7 +132,7 @@ class DFRN
 			dbesc($owner_nick)
 		);
 
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			killme();
 		}
 
@@ -167,7 +167,7 @@ class DFRN
 				intval($owner_id)
 			);
 
-			if (! DBM::is_result($r)) {
+			if (! DBM::isResult($r)) {
 				killme();
 			}
 
@@ -272,7 +272,7 @@ class DFRN
 		/// @TODO This hook can't work anymore
 		//	Addon::callHooks('atom_feed', $atom);
 
-		if (!DBM::is_result($items) || $onlyheader) {
+		if (!DBM::isResult($items) || $onlyheader) {
 			$atom = trim($doc->saveXML());
 
 			Addon::callHooks('atom_feed_end', $atom);
@@ -341,7 +341,7 @@ class DFRN
 			intval($item_id)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			killme();
 		}
 
@@ -609,7 +609,7 @@ class DFRN
 				WHERE (`hidewall` OR NOT `net-publish`) AND `user`.`uid` = %d",
 			intval($owner['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$hidewall = true;
 		} else {
 			$hidewall = false;
@@ -668,7 +668,7 @@ class DFRN
 				WHERE `profile`.`is-default` AND NOT `user`.`hidewall` AND `user`.`uid` = %d",
 			intval($owner['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$profile = $r[0];
 
 			XML::addElement($doc, $author, "poco:displayName", $profile["name"]);
@@ -959,7 +959,7 @@ class DFRN
 
 		if (isset($parent_item)) {
 			$r = dba::fetch_first("SELECT `conversation-uri`, `conversation-href` FROM `conversation` WHERE `item-uri` = ?", $item['parent-uri']);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				if ($r['conversation-uri'] != '') {
 					$conversation_uri = $r['conversation-uri'];
 				}
@@ -1082,7 +1082,7 @@ class DFRN
 				dbesc(normalise_link($mention))
 			);
 
-			if (DBM::is_result($r) && ($r[0]["forum"] || $r[0]["prv"])) {
+			if (DBM::isResult($r) && ($r[0]["forum"] || $r[0]["prv"])) {
 				XML::addElement(
 					$doc,
 					$entry,
@@ -1387,7 +1387,7 @@ class DFRN
 			dbesc("birthday")
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return;
 		}
 
@@ -1439,7 +1439,7 @@ class DFRN
 			dbesc(NETWORK_STATUSNET)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$contact = $r[0];
 			$author["contact-id"] = $r[0]["id"];
 			$author["network"] = $r[0]["network"];
@@ -1481,7 +1481,7 @@ class DFRN
 			$author["avatar"] = current($avatarlist);
 		}
 
-		if (DBM::is_result($r) && !$onlyfetch) {
+		if (DBM::isResult($r) && !$onlyfetch) {
 			logger("Check if contact details for contact " . $r[0]["id"] . " (" . $r[0]["nick"] . ") have to be updated.", LOGGER_DEBUG);
 
 			$poco = ["url" => $contact["url"]];
@@ -1813,7 +1813,7 @@ class DFRN
 		 *
 		 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
 		 */
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return false;
 		}
 
@@ -1826,7 +1826,7 @@ class DFRN
 			dbesc($suggest["name"]),
 			dbesc($suggest["request"])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$fid = $r[0]["id"];
 
 			// OK, we do. Do we already have an introduction for this person ?
@@ -1843,7 +1843,7 @@ class DFRN
 			 *
 			 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
 			 */
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				return false;
 			}
 		}
@@ -1867,7 +1867,7 @@ class DFRN
 		 * If no record in fcontact is found, below INSERT statement will not
 		 * link an introduction to it.
 		 */
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			// database record did not get created. Quietly give up.
 			killme();
 		}
@@ -1953,7 +1953,7 @@ class DFRN
 			intval($importer["importer_uid"])
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			logger("Query failed to execute, no result returned in " . __FUNCTION__);
 			return false;
 		}
@@ -2036,7 +2036,7 @@ class DFRN
 				intval($importer["importer_uid"])
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$x = q(
 					"UPDATE `item` SET `%s` = '%s' WHERE `%s` = '%s' AND `uid` = %d",
 					$n,
@@ -2132,7 +2132,7 @@ class DFRN
 				LIMIT 1",
 				dbesc($item["parent-uri"])
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$r = q(
 					"SELECT `item`.`forum_mode`, `item`.`wall` FROM `item`
 					INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
@@ -2145,7 +2145,7 @@ class DFRN
 					dbesc($r[0]["parent-uri"]),
 					intval($importer["importer_uid"])
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$is_a_remote_action = true;
 				}
 			}
@@ -2289,7 +2289,7 @@ class DFRN
 					dbesc($item["verb"]),
 					dbesc($item["parent-uri"])
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					return false;
 				}
 
@@ -2300,7 +2300,7 @@ class DFRN
 					dbesc($item["verb"]),
 					dbesc($item["parent-uri"])
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					return false;
 				}
 			} else {
@@ -2318,7 +2318,7 @@ class DFRN
 						intval($importer["importer_uid"])
 					);
 
-					if (!DBM::is_result($r)) {
+					if (!DBM::isResult($r)) {
 						logger("Query failed to execute, no result returned in " . __FUNCTION__);
 						return false;
 					}
@@ -2416,7 +2416,7 @@ class DFRN
 		);
 
 		// Is there an existing item?
-		if (DBM::is_result($current) && edited_timestamp_is_newer($current[0], $item)
+		if (DBM::isResult($current) && edited_timestamp_is_newer($current[0], $item)
 			&& (datetime_convert("UTC", "UTC", $item["edited"]) < $current[0]["edited"])
 		) {
 			logger("Item ".$item["uri"]." already existed.", LOGGER_DEBUG);
@@ -2641,7 +2641,7 @@ class DFRN
 						dbesc($item["uri"]),
 						intval($importer["uid"])
 					);
-					if (DBM::is_result($r)) {
+					if (DBM::isResult($r)) {
 						$ev["id"] = $r[0]["id"];
 					}
 
@@ -2658,7 +2658,7 @@ class DFRN
 		}
 
 		// Update content if 'updated' changes
-		if (DBM::is_result($current)) {
+		if (DBM::isResult($current)) {
 			if (self::updateContent($r[0], $item, $importer, $entrytype)) {
 				logger("Item ".$item["uri"]." was updated.", LOGGER_DEBUG);
 			} else {
@@ -2681,7 +2681,7 @@ class DFRN
 					intval($posted_id),
 					intval($importer["importer_uid"])
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$parent = $r[0]["parent"];
 					$parent_uri = $r[0]["parent-uri"];
 				}
@@ -2765,7 +2765,7 @@ class DFRN
 			intval($importer["uid"]),
 			intval($importer["id"])
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			logger("Item with uri " . $uri . " from contact " . $importer["id"] . " for user " . $importer["uid"] . " wasn't found.", LOGGER_DEBUG);
 			return;
 		} else {
@@ -2794,7 +2794,7 @@ class DFRN
 						dbesc($xt->id),
 						intval($importer["importer_uid"])
 					);
-					if (DBM::is_result($i)) {
+					if (DBM::isResult($i)) {
 						// For tags, the owner cannot remove the tag on the author's copy of the post.
 
 						$owner_remove = (($item["contact-id"] == $i[0]["contact-id"]) ? true: false);
@@ -3024,7 +3024,7 @@ class DFRN
 				dbesc($baseurl),
 				dbesc($nurl)
 			);
-			if ((! DBM::is_result($r)) || $r[0]['id'] == remote_user()) {
+			if ((! DBM::isResult($r)) || $r[0]['id'] == remote_user()) {
 				return;
 			}
 
@@ -3035,7 +3035,7 @@ class DFRN
 				intval(local_user()),
 				dbesc($baseurl)
 			);
-			if (! DBM::is_result($r)) {
+			if (! DBM::isResult($r)) {
 				return;
 			}
 

@@ -51,7 +51,7 @@ function group_post(App $a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			notice(t('Group not found.') . EOL);
 			goaway(System::baseUrl() . '/contacts');
 			return; // NOTREACHED
@@ -118,7 +118,7 @@ function group_content(App $a) {
 
 			$result = null;
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$result = Group::removeByName(local_user(), $r[0]['name']);
 			}
 
@@ -139,7 +139,7 @@ function group_content(App $a) {
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$change = intval($a->argv[2]);
 		}
 	}
@@ -153,7 +153,7 @@ function group_content(App $a) {
 			intval(local_user())
 		);
 
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			notice(t('Group not found.') . EOL);
 			goaway(System::baseUrl() . '/contacts');
 		}
@@ -242,7 +242,7 @@ function group_content(App $a) {
 		intval(local_user())
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		// Format the data of the contacts who aren't in the contact group
 		foreach ($r as $member) {
 			if (! in_array($member['id'], $preselected)) {

@@ -190,7 +190,7 @@ function post_update_1198() {
 				(`thread`.`uid` IN (SELECT `uid` from `user`) OR `thread`.`uid` = 0)");
 
 		logger("Updated threads", LOGGER_DEBUG);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			Config::set("system", "post_update_version", 1198);
 			logger("Done", LOGGER_DEBUG);
 			return true;
@@ -248,7 +248,7 @@ function post_update_1206() {
 		FROM `user`
 		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`");
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		return false;
 	}
 	foreach ($r AS $user) {

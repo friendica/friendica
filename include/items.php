@@ -394,7 +394,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	$expire_interval = Config::get('system', 'dbclean-expire-days', 0);
 
 	$user = dba::selectFirst('user', ['expire'], ['uid' => $uid]);
-	if (DBM::is_result($user) && ($user['expire'] > 0) && (($user['expire'] < $expire_interval) || ($expire_interval == 0))) {
+	if (DBM::isResult($user) && ($user['expire'] > 0) && (($user['expire'] < $expire_interval) || ($expire_interval == 0))) {
 		$expire_interval = $user['expire'];
 	}
 
@@ -420,7 +420,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 				dbesc(NETWORK_DFRN),
 				dbesc(NETWORK_OSTATUS)
 			);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			// We only log the entries with a different user id than 0. Otherwise we would have too many false positives
 			if ($uid != 0) {
 				logger("Item with uri ".$arr['uri']." already existed for user ".$uid." with id ".$r[0]["id"]." target network ".$r[0]["network"]." - new network: ".$arr['network']);
@@ -510,21 +510,21 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 			intval($arr['uid'])
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = q("SELECT `network` FROM `gcontact` WHERE `network` IN ('%s', '%s', '%s') AND `nurl` = '%s' LIMIT 1",
 				dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS),
 				dbesc(normalise_link($arr['author-link']))
 			);
 		}
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = q("SELECT `network` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($arr['contact-id']),
 				intval($arr['uid'])
 			);
 		}
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$arr['network'] = $r[0]["network"];
 		}
 
@@ -555,7 +555,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		if ($arr["contact-id"] == 0) {
 			$r = q("SELECT `id` FROM `contact` WHERE `self` AND `uid` = %d", intval($uid));
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$arr["contact-id"] = $r[0]["id"];
 			}
 		}
@@ -602,7 +602,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		$r = q("SELECT `guid` FROM `item` WHERE `guid` = '%s' AND `network` = '%s' AND `uid` = '%d' LIMIT 1",
 			dbesc($arr['guid']), dbesc($arr['network']), intval($arr['uid']));
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			logger('found item with guid '.$arr['guid'].' for user '.$arr['uid'].' on network '.$arr['network'], LOGGER_DEBUG);
 			return 0;
 		}
@@ -631,7 +631,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 			intval($arr['uid'])
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 
 			// is the new message multi-level threaded?
 			// even though we don't support it now, preserve the info
@@ -646,7 +646,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 					intval($arr['uid'])
 				);
 
-				if (DBM::is_result($z)) {
+				if (DBM::isResult($z)) {
 					$r = $z;
 				}
 			}
@@ -681,7 +681,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 			// If its a post from myself then tag the thread as "mention"
 			logger("item_store: Checking if parent ".$parent_id." has to be tagged as mention for user ".$arr['uid'], LOGGER_DEBUG);
 			$u = q("SELECT `nickname` FROM `user` WHERE `uid` = %d", intval($arr['uid']));
-			if (DBM::is_result($u)) {
+			if (DBM::isResult($u)) {
 				$self = normalise_link(System::baseUrl() . '/profile/' . $u[0]['nickname']);
 				logger("item_store: 'myself' is ".$self." for parent ".$parent_id." checking against ".$arr['author-link']." and ".$arr['owner-link'], LOGGER_DEBUG);
 				if ((normalise_link($arr['author-link']) == $self) || (normalise_link($arr['owner-link']) == $self)) {
@@ -714,7 +714,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		dbesc(NETWORK_DFRN),
 		intval($arr['uid'])
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		logger('duplicated item with the same uri found. '.print_r($arr,true));
 		return 0;
 	}
@@ -725,7 +725,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 			dbesc($arr['guid']),
 			intval($arr['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			logger('duplicated item with the same guid found. '.print_r($arr,true));
 			return 0;
 		}
@@ -738,7 +738,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 			intval($arr['contact-id']),
 			intval($arr['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			logger('duplicated item with the same body found. '.print_r($arr,true));
 			return 0;
 		}
@@ -753,7 +753,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	} else {
 		$isglobal = q("SELECT `global` FROM `item` WHERE `uid` = 0 AND `uri` = '%s'", dbesc($arr["uri"]));
 
-		$arr["global"] = (DBM::is_result($isglobal) && count($isglobal) > 0);
+		$arr["global"] = (DBM::isResult($isglobal) && count($isglobal) > 0);
 	}
 
 	// ACL settings
@@ -795,7 +795,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	 */
 	if ($arr["uid"] == 0) {
 		$r = q("SELECT `id` FROM `item` WHERE `uri` = '%s' AND `uid` = 0 LIMIT 1", dbesc(trim($arr['uri'])));
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			logger('Global item already stored. URI: '.$arr['uri'].' on network '.$arr['network'], LOGGER_DEBUG);
 			return 0;
 		}
@@ -807,7 +807,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	$r = dba::insert('item', $arr);
 
 	// When the item was successfully stored we fetch the ID of the item.
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$current_post = dba::lastInsertId();
 	} else {
 		// This can happen - for example - if there are locking timeouts.
@@ -848,7 +848,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 		dbesc($arr['network'])
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		// This shouldn't happen, since COUNT always works when the database connection is there.
 		logger("We couldn't count the stored entries. Very strange ...");
 		dba::rollback();
@@ -915,7 +915,7 @@ function item_store($arr, $force_parent = false, $notify = false, $dontcache = f
 	if (!$deleted && !$dontcache) {
 
 		$r = q('SELECT * FROM `item` WHERE `id` = %d', intval($current_post));
-		if ((DBM::is_result($r)) && (count($r) == 1)) {
+		if ((DBM::isResult($r)) && (count($r) == 1)) {
 			if ($notify) {
 				Addon::callHooks('post_local_end', $r[0]);
 			} else {
@@ -1027,7 +1027,7 @@ function item_body_set_hashtags(&$item) {
 /// @TODO move to src/Model/Item.php
 function get_item_guid($id) {
 	$r = q("SELECT `guid` FROM `item` WHERE `id` = %d LIMIT 1", intval($id));
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		return $r[0]["guid"];
 	} else {
 		/// @TODO This else-block can be elimited again
@@ -1050,7 +1050,7 @@ function get_item_id($guid, $uid = 0) {
 		$r = q("SELECT `item`.`id`, `user`.`nickname` FROM `item` INNER JOIN `user` ON `user`.`uid` = `item`.`uid`
 			WHERE `item`.`visible` = 1 AND `item`.`deleted` = 0 AND `item`.`moderated` = 0
 				AND `item`.`guid` = '%s' AND `item`.`uid` = %d", dbesc($guid), intval($uid));
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$id = $r[0]["id"];
 			$nick = $r[0]["nickname"];
 		}
@@ -1064,7 +1064,7 @@ function get_item_id($guid, $uid = 0) {
 				AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''
 				AND `item`.`private` = 0 AND `item`.`wall` = 1
 				AND `item`.`guid` = '%s'", dbesc($guid));
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$id = $r[0]["id"];
 			$nick = $r[0]["nickname"];
 		}
@@ -1100,7 +1100,7 @@ function tag_deliver($uid, $item_id)
 	$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 		intval($uid)
 	);
-	if (! DBM::is_result($u)) {
+	if (! DBM::isResult($u)) {
 		return;
 	}
 
@@ -1111,7 +1111,7 @@ function tag_deliver($uid, $item_id)
 		intval($item_id),
 		intval($uid)
 	);
-	if (! DBM::is_result($i)) {
+	if (! DBM::isResult($i)) {
 		return;
 	}
 
@@ -1168,7 +1168,7 @@ function tag_deliver($uid, $item_id)
 	$c = q("SELECT `name`, `url`, `thumb` FROM `contact` WHERE `self` = 1 AND `uid` = %d LIMIT 1",
 		intval($u[0]['uid'])
 	);
-	if (! DBM::is_result($c)) {
+	if (! DBM::isResult($c)) {
 		return;
 	}
 
@@ -1212,7 +1212,7 @@ function tgroup_check($uid, $item) {
 	$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 		intval($uid)
 	);
-	if (! DBM::is_result($u)) {
+	if (! DBM::isResult($u)) {
 		return false;
 	}
 
@@ -1333,7 +1333,7 @@ function consume_feed($xml, $importer, &$contact, &$hub, $datedir = 0, $pass = 0
 			WHERE `contact`.`id` = %d AND `user`.`uid` = %d",
 			dbesc($contact["id"]), dbesc($importer["uid"])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			logger("Now import the DFRN feed");
 			DFRN::import($xml, $r[0], true);
 			return;
@@ -1374,7 +1374,7 @@ function item_is_remote_self($contact, &$datarray) {
 	if ($contact['remote_self'] == 2) {
 		$r = q("SELECT `id`,`url`,`name`,`thumb` FROM `contact` WHERE `uid` = %d AND `self`",
 			intval($contact['uid']));
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$datarray['contact-id'] = $r[0]["id"];
 
 			$datarray['owner-name'] = $r[0]["name"];
@@ -1463,7 +1463,7 @@ function new_follower($importer, $contact, $datarray, $item, $sharing = false) {
 				intval($importer['uid']),
 				dbesc($url)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$contact_record = $r[0];
 			Contact::updateAvatar($photo, $importer["uid"], $contact_record["id"], true);
 		}
@@ -1472,7 +1472,7 @@ function new_follower($importer, $contact, $datarray, $item, $sharing = false) {
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($importer['uid'])
 		);
-		if (DBM::is_result($r) && !in_array($r[0]['page-flags'], [PAGE_SOAPBOX, PAGE_FREELOVE, PAGE_COMMUNITY])) {
+		if (DBM::isResult($r) && !in_array($r[0]['page-flags'], [PAGE_SOAPBOX, PAGE_FREELOVE, PAGE_COMMUNITY])) {
 			// create notification
 			$hash = random_string();
 
@@ -1503,7 +1503,7 @@ function new_follower($importer, $contact, $datarray, $item, $sharing = false) {
 				]);
 
 			}
-		} elseif (DBM::is_result($r) && in_array($r[0]['page-flags'], [PAGE_SOAPBOX, PAGE_FREELOVE, PAGE_COMMUNITY])) {
+		} elseif (DBM::isResult($r) && in_array($r[0]['page-flags'], [PAGE_SOAPBOX, PAGE_FREELOVE, PAGE_COMMUNITY])) {
 			q("UPDATE `contact` SET `pending` = 0 WHERE `uid` = %d AND `url` = '%s' AND `pending` LIMIT 1",
 					intval($importer['uid']),
 					dbesc($url)
@@ -1549,7 +1549,7 @@ function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
 	 * through the direct Diaspora protocol. If we try and use
 	 * the feed, we'll get duplicates. So don't.
 	 */
-	if ((! DBM::is_result($r)) || $contact['network'] === NETWORK_DIASPORA) {
+	if ((! DBM::isResult($r)) || $contact['network'] === NETWORK_DIASPORA) {
 		return;
 	}
 
@@ -1620,7 +1620,7 @@ function fix_private_photos($s, $uid, $item = null, $cid = 0)
 					intval($res),
 					intval($uid)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					/*
 					 * Check to see if we should replace this photo link with an embedded image
 					 * 1. No need to do so if the photo is public
@@ -1796,7 +1796,7 @@ function item_expire($uid, $days, $network = "", $force = false) {
 		intval($days)
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		return;
 	}
 
@@ -1866,7 +1866,7 @@ function drop_item($id) {
 		intval($id)
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		notice(t('Item not found.') . EOL);
 		goaway(System::baseUrl() . '/' . $_SESSION['return_url']);
 	}
@@ -1942,7 +1942,7 @@ function first_post_date($uid, $wall = false) {
 		intval($uid),
 		intval($wall ? 1 : 0)
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		// logger('first_post_date: ' . $r[0]['id'] . ' ' . $r[0]['created'], LOGGER_DATA);
 		return substr(datetime_convert('',date_default_timezone_get(), $r[0]['created']),0,10);
 	}
@@ -2007,7 +2007,7 @@ function posted_date_widget($url, $uid, $wall) {
 
 	$ret = list_post_dates($uid, $wall);
 
-	if (! DBM::is_result($ret)) {
+	if (! DBM::isResult($ret)) {
 		return $o;
 	}
 

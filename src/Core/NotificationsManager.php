@@ -98,7 +98,7 @@ class NotificationsManager extends BaseObject
 			intval(local_user())
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $this->_set_extra($r);
 		}
 
@@ -118,7 +118,7 @@ class NotificationsManager extends BaseObject
 			intval($id),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $this->_set_extra($r)[0];
 		}
 		return null;
@@ -226,7 +226,7 @@ class NotificationsManager extends BaseObject
 		$notif = [];
 		$arr = [];
 
-		if (DBM::is_result($notifs)) {
+		if (DBM::isResult($notifs)) {
 			foreach ($notifs as $it) {
 				// Because we use different db tables for the notification query
 				// we have sometimes $it['unseen'] and sometimes $it['seen].
@@ -396,7 +396,7 @@ class NotificationsManager extends BaseObject
 				$sql_seen",
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -440,7 +440,7 @@ class NotificationsManager extends BaseObject
 			intval($start),
 			intval($limit)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$notifs = $this->formatNotifs($r, $ident);
 		}
 
@@ -472,7 +472,7 @@ class NotificationsManager extends BaseObject
 			"SELECT COUNT(*) AS `total` FROM `notify` WHERE `uid` = %d $sql_seen",
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -510,7 +510,7 @@ class NotificationsManager extends BaseObject
 			intval($start),
 			intval($limit)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$notifs = $this->formatNotifs($r, $ident);
 		}
 
@@ -569,7 +569,7 @@ class NotificationsManager extends BaseObject
 				AND `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0 ",
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -615,7 +615,7 @@ class NotificationsManager extends BaseObject
 			intval($start),
 			intval($limit)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$notifs = $this->formatNotifs($r, $ident);
 		}
 
@@ -650,7 +650,7 @@ class NotificationsManager extends BaseObject
 				$sql_seen",
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -694,7 +694,7 @@ class NotificationsManager extends BaseObject
 			intval($start),
 			intval($limit)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$notifs = $this->formatNotifs($r, $ident);
 		}
 
@@ -728,7 +728,7 @@ class NotificationsManager extends BaseObject
 			intval($_SESSION['uid'])
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -777,7 +777,7 @@ class NotificationsManager extends BaseObject
 			intval($start),
 			intval($limit)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$notifs = $this->formatIntros($r);
 		}
 

@@ -25,7 +25,7 @@ function search_saved_searches() {
 		intval(local_user())
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$saved = [];
 		foreach ($r as $rr) {
 			$saved[] = [
@@ -63,7 +63,7 @@ function search_init(App $a) {
 				intval(local_user()),
 				dbesc($search)
 			);
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				dba::insert('search', ['uid' => local_user(), 'term' => $search]);
 			}
 		}
@@ -219,7 +219,7 @@ function search_content(App $a) {
 				intval($a->pager['start']), intval($a->pager['itemspage']));
 	}
 
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		info( t('No results.') . EOL);
 		return $o;
 	}

@@ -500,7 +500,7 @@ function photo_new_resource() {
 			dbesc($resource)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$found = true;
 		}
 	} while ($found == true);
@@ -923,7 +923,7 @@ function contact_block() {
 			dbesc(NETWORK_OSTATUS),
 			dbesc(NETWORK_DIASPORA)
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$total = intval($r[0]['total']);
 	}
 	if (!$total) {
@@ -942,7 +942,7 @@ function contact_block() {
 				dbesc(NETWORK_DIASPORA),
 				intval($shown)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$contacts = [];
 			foreach ($r AS $contact) {
 				$contacts[] = $contact["id"];
@@ -950,7 +950,7 @@ function contact_block() {
 			$r = q("SELECT `id`, `uid`, `addr`, `url`, `name`, `thumb`, `network` FROM `contact` WHERE `id` IN (%s)",
 				dbesc(implode(",", $contacts)));
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$contacts = sprintf(tt('%d Contact','%d Contacts', $total),$total);
 				$micropro = [];
 				foreach ($r as $rr) {
@@ -1606,7 +1606,7 @@ function generate_user_guid() {
 		$x = q("SELECT `uid` FROM `user` WHERE `guid` = '%s' LIMIT 1",
 			dbesc($guid)
 		);
-		if (! DBM::is_result($x)) {
+		if (! DBM::isResult($x)) {
 			$found = false;
 		}
 	} while ($found == true);
@@ -1893,7 +1893,7 @@ function file_tag_update_pconfig($uid, $file_old, $file_new, $type = 'file') {
 				intval($termtype),
 				intval($uid));
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				unset($deleted_tags[$key]);
 			} else {
 				$filetags_updated = str_replace($lbracket . file_tag_encode($tag) . $rbracket,'',$filetags_updated);
@@ -1920,7 +1920,7 @@ function file_tag_save_file($uid, $item, $file)
 		intval($item),
 		intval($uid)
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		if (! stristr($r[0]['file'],'[' . file_tag_encode($file) . ']')) {
 			q("UPDATE `item` SET `file` = '%s' WHERE `id` = %d AND `uid` = %d",
 				dbesc($r[0]['file'] . '[' . file_tag_encode($file) . ']'),
@@ -1958,7 +1958,7 @@ function file_tag_unsave_file($uid, $item, $file, $cat = false)
 		intval($item),
 		intval($uid)
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		return false;
 	}
 
@@ -1976,7 +1976,7 @@ function file_tag_unsave_file($uid, $item, $file, $cat = false)
 		intval($termtype),
 		intval($uid)
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		$saved = PConfig::get($uid, 'system', 'filetags');
 		PConfig::set($uid, 'system', 'filetags', str_replace($pattern, '', $saved));
 	}

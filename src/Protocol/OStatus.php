@@ -75,7 +75,7 @@ class OStatus
 					$importer["uid"], $aliaslink, NETWORK_STATUSNET];
 			$r = dba::selectFirst('contact', [], $condition);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$found = true;
 				if ($r['blocked']) {
 					$r['id'] = -1;
@@ -94,7 +94,7 @@ class OStatus
 					normalise_link($author["author-link"]), normalise_link($aliaslink), NETWORK_STATUSNET];
 			$r = dba::selectFirst('contact', [], $condition);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$found = true;
 				if ($r['blocked']) {
 					$r['id'] = -1;
@@ -109,7 +109,7 @@ class OStatus
 					$importer["uid"], $addr, NETWORK_STATUSNET];
 			$r = dba::selectFirst('contact', [], $condition);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$found = true;
 				if ($r['blocked']) {
 					$r['id'] = -1;
@@ -544,7 +544,7 @@ class OStatus
 	{
 		$condition = ['uid' => $item['uid'], 'author-link' => $item['author-link'], 'uri' => $item['uri']];
 		$deleted = dba::selectFirst('item', ['id', 'parent-uri'], $condition);
-		if (!DBM::is_result($deleted)) {
+		if (!DBM::isResult($deleted)) {
 			logger('Item from '.$item['author-link'].' with uri '.$item['uri'].' for user '.$item['uid']." wasn't found. We don't delete it. ");
 			return;
 		}
@@ -898,7 +898,7 @@ class OStatus
 	{
 		$condition = ['`item-uri` = ? AND `protocol` IN (?, ?)', $related_uri, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON];
 		$conversation = dba::selectFirst('conversation', ['source', 'protocol'], $condition);
-		if (DBM::is_result($conversation)) {
+		if (DBM::isResult($conversation)) {
 			$stored = true;
 			$xml = $conversation['source'];
 			if (self::process($xml, $importer, $contact, $hub, $stored, false)) {
@@ -978,7 +978,7 @@ class OStatus
 		if ($xml == '') {
 			$condition = ['item-uri' => $related_uri, 'protocol' => PROTOCOL_SPLITTED_CONV];
 			$conversation = dba::selectFirst('conversation', ['source'], $condition);
-			if (DBM::is_result($conversation)) {
+			if (DBM::isResult($conversation)) {
 				$stored = true;
 				logger('Got cached XML from conversation for URI '.$related_uri, LOGGER_DEBUG);
 				$xml = $conversation['source'];
@@ -1392,7 +1392,7 @@ class OStatus
 	private static function addAuthor($doc, $owner)
 	{
 		$r = q("SELECT `homepage`, `publish` FROM `profile` WHERE `uid` = %d AND `is-default` LIMIT 1", intval($owner["uid"]));
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$profile = $r[0];
 		}
 		$author = $doc->createElement("author");
@@ -1555,24 +1555,24 @@ class OStatus
 			dbesc(normalise_link($url)),
 			intval($owner["uid"])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$contact = $r[0];
 			$contact["uid"] = -1;
 		}
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$r = q(
 				"SELECT * FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
 				dbesc(normalise_link($url))
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$contact = $r[0];
 				$contact["uid"] = -1;
 				$contact["success_update"] = $contact["updated"];
 			}
 		}
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$contact = owner;
 		}
 
@@ -1619,7 +1619,7 @@ class OStatus
 			dbesc(NETWORK_DIASPORA),
 			dbesc(NETWORK_OSTATUS)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$repeated_item = $r[0];
 		} else {
 			return false;
@@ -1780,7 +1780,7 @@ class OStatus
 			dbesc(normalise_link($contact["url"]))
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$connect_id = $r[0]['id'];
 		} else {
 			$connect_id = 0;
@@ -1973,7 +1973,7 @@ class OStatus
 
 			if (isset($parent_item)) {
 				$r = dba::fetch_first("SELECT `conversation-uri`, `conversation-href` FROM `conversation` WHERE `item-uri` = ?", $parent_item);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					if ($r['conversation-uri'] != '') {
 						$conversation_uri = $r['conversation-uri'];
 					}
@@ -2115,7 +2115,7 @@ class OStatus
 				WHERE `contact`.`self` AND `user`.`nickname` = ? LIMIT 1",
 			$owner_nick
 		);
-		if (!DBM::is_result($owner)) {
+		if (!DBM::isResult($owner)) {
 			return;
 		}
 

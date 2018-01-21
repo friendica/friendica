@@ -109,7 +109,7 @@ function dirfind_content(App $a, $prefix = "") {
 
 			$search2 = "%".$search."%";
 
-			/// @TODO These 2 SELECTs are not checked on validity with DBM::is_result()
+			/// @TODO These 2 SELECTs are not checked on validity with DBM::isResult()
 			$count = q("SELECT count(*) AS `total` FROM `gcontact`
 					LEFT JOIN `contact` ON `contact`.`nurl` = `gcontact`.`nurl`
 						AND `contact`.`network` = `gcontact`.`network`

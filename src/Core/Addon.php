@@ -82,7 +82,7 @@ class Addon
 		$addons = Config::get('system', 'addon');
 		if (strlen($addons)) {
 			$r = dba::select('addon', [], ['installed' => 1]);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$installed = $r;
 			} else {
 				$installed = [];

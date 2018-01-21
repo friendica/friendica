@@ -26,7 +26,7 @@ function viewsrc_content(App $a) {
 		dbesc($item_id)
 	);
 
-	if (DBM::is_result($r))
+	if (DBM::isResult($r))
 		if(is_ajax()) {
 			echo str_replace("\n",'<br />',$r[0]['body']);
 			killme();

@@ -148,7 +148,7 @@ function proxy_init(App $a) {
 	$photo = null;
 	if (!$direct_cache && ($cachefile == '')) {
 		$photo = dba::selectFirst('photo', ['data', 'desc'], ['resource-id' => $urlhash]);
-		if (DBM::is_result($photo)) {
+		if (DBM::isResult($photo)) {
 			$img_str = $photo['data'];
 			$mime = $photo['desc'];
 			if ($mime == '') {
@@ -157,7 +157,7 @@ function proxy_init(App $a) {
 		}
 	}
 
-	if (!DBM::is_result($photo)) {
+	if (!DBM::isResult($photo)) {
 		// It shouldn't happen but it does - spaces in URL
 		$_REQUEST['url'] = str_replace(' ', '+', $_REQUEST['url']);
 		$redirects = 0;

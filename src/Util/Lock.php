@@ -128,7 +128,7 @@ class Lock
 			dba::lock('locks');
 			$lock = dba::selectFirst('locks', ['locked', 'pid'], ['name' => $fn_name]);
 
-			if (DBM::is_result($lock)) {
+			if (DBM::isResult($lock)) {
 				if ($lock['locked']) {
 					// When the process id isn't used anymore, we can safely claim the lock for us.
 					if (!posix_kill($lock['pid'], 0)) {
@@ -143,7 +143,7 @@ class Lock
 					dba::update('locks', ['locked' => true, 'pid' => getmypid()], ['name' => $fn_name]);
 					$got_lock = true;
 				}
-			} elseif (!DBM::is_result($lock)) {
+			} elseif (!DBM::isResult($lock)) {
 				dba::insert('locks', ['name' => $fn_name, 'locked' => true, 'pid' => getmypid()]);
 				$got_lock = true;
 			}

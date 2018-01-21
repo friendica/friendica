@@ -21,7 +21,7 @@ function poco_init(App $a) {
 	}
 	if (! x($user)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");
-		if (! DBM::is_result($c)) {
+		if (! DBM::isResult($c)) {
 			http_status_exit(401);
 		}
 		$system_mode = true;
@@ -62,7 +62,7 @@ function poco_init(App $a) {
 			where `user`.`nickname` = '%s' and `profile`.`is-default` = 1 limit 1",
 			dbesc($user)
 		);
-		if (! DBM::is_result($users) || $users[0]['hidewall'] || $users[0]['hide-friends']) {
+		if (! DBM::isResult($users) || $users[0]['hidewall'] || $users[0]['hide-friends']) {
 			http_status_exit(404);
 		}
 
@@ -102,7 +102,7 @@ function poco_init(App $a) {
 			dbesc(NETWORK_STATUSNET)
 		);
 	}
-	if (DBM::is_result($contacts)) {
+	if (DBM::isResult($contacts)) {
 		$totalResults = intval($contacts[0]['total']);
 	} else {
 		$totalResults = 0;
@@ -197,7 +197,7 @@ function poco_init(App $a) {
 	}
 
 	if (is_array($contacts)) {
-		if (DBM::is_result($contacts)) {
+		if (DBM::isResult($contacts)) {
 			foreach ($contacts as $contact) {
 				if (! isset($contact['generation'])) {
 					if ($global) {

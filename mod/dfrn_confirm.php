@@ -66,7 +66,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		}
 
 		$user = dba::selectFirst('user', [], ['uid' => $uid]);
-		if (!DBM::is_result($user)) {
+		if (!DBM::isResult($user)) {
 			notice(t('Profile not found.') . EOL);
 			return;
 		}
@@ -122,7 +122,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			intval($cid),
 			intval($uid)
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			logger('Contact not found in DB.');
 			notice(t('Contact not found.') . EOL);
 			notice(t('This may occasionally happen if contact was requested by both persons and it has already been approved.') . EOL);
@@ -387,15 +387,15 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			);
 		}
 
-		/// @TODO is DBM::is_result() working here?
-		if (!DBM::is_result($r)) {
+		/// @TODO is DBM::isResult() working here?
+		if (!DBM::isResult($r)) {
 			notice(t('Unable to set contact photo.') . EOL);
 		}
 
 		// reload contact info
 		$contact = dba::selectFirst('contact', [], ['id' => $contact_id]);
 		if ((isset($new_relation) && $new_relation == CONTACT_IS_FRIEND)) {
-			if (DBM::is_result($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
+			if (DBM::isResult($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
 				$ret = Diaspora::sendShare($user, $contact);
 				logger('share returns: ' . $ret);
 			}
@@ -404,7 +404,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$profile = dba::selectFirst('profile', ['hide-friends'], ['is-default' => true, 'uid' => $uid]);
 			if (x($profile, 'hide-friends') === 0 && $activity && !$hidden) {
 				$self = dba::selectFirst('contact', [], ['self' => true, 'uid' => $uid]);
-				if (DBM::is_result($self)) {
+				if (DBM::isResult($self)) {
 					$arr = [];
 					$arr['guid'] = get_guid(32);
 					$arr['uri'] = $arr['parent-uri'] = item_new_uri($a->get_hostname(), $uid);
@@ -490,7 +490,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		// Find our user's account
 		$user = dba::selectFirst('user', [], ['nickname' => $node]);
-		if (!DBM::is_result($user)) {
+		if (!DBM::isResult($user)) {
 			$message = t('No user record found for \'%s\' ', $node);
 			xml_status(3, $message); // failure
 			// NOTREACHED
@@ -518,7 +518,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		}
 
 		$contact = dba::selectFirst('contact', [], ['url' => $decrypted_source_url, 'uid' => $local_uid]);
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			if (strstr($decrypted_source_url, 'http:')) {
 				$newurl = str_replace('http:', 'https:', $decrypted_source_url);
 			} else {
@@ -526,7 +526,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			}
 
 			$contact = dba::selectFirst('contact', [], ['url' => $newurl, 'uid' => $local_uid]);
-			if (!DBM::is_result($contact)) {
+			if (!DBM::isResult($contact)) {
 				// this is either a bogus confirmation (?) or we deleted the original introduction.
 				$message = t('Contact record was not found for you on our site.');
 				xml_status(3, $message);
@@ -568,7 +568,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			dbesc($dfrn_pubkey),
 			intval($dfrn_record)
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			$message = t('Unable to set your contact credentials on our system.');
 			xml_status(3, $message);
 		}
@@ -584,7 +584,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		// We're good but now we have to scrape the profile photo and send notifications.
 		$contact = dba::selectFirst('contact', ['photo'], ['id' => $dfrn_record]);
-		if (DBM::is_result($contact)) {
+		if (DBM::isResult($contact)) {
 			$photo = $contact['photo'];
 		} else {
 			$photo = System::baseUrl() . '/images/person-175.jpg';
@@ -623,7 +623,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			dbesc(NETWORK_DFRN),
 			intval($dfrn_record)
 		);
-		if (!DBM::is_result($r)) {	// indicates schema is messed up or total db failure
+		if (!DBM::isResult($r)) {	// indicates schema is messed up or total db failure
 			$message = t('Unable to update your contact profile details on our system');
 			xml_status(3, $message);
 		}
@@ -641,7 +641,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			LIMIT 1",
 			intval($dfrn_record)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$combined = $r[0];
 
 			if ($combined['notify-flags'] & NOTIFY_CONFIRM) {
@@ -668,7 +668,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$profile = dba::selectFirst('profile', ['hide-friends'], ['is-default' => true, 'uid' => $local_uid]);
 			if (x($profile, 'hide-friends') === 0) {
 				$self = dba::selectFirst('contact', [], ['self' => true, 'uid' => $local_uid]);
-				if (DBM::is_result($self)) {
+				if (DBM::isResult($self)) {
 					$arr = [];
 					$arr['uri'] = $arr['parent-uri'] = item_new_uri($a->get_hostname(), $local_uid);
 					$arr['uid'] = $local_uid;

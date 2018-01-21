@@ -39,7 +39,7 @@ function profile_photo_post(App $a) {
 				intval($_REQUEST['profile']),
 				intval(local_user())
 			);
-			if (DBM::is_result($r) && (! intval($r[0]['is-default'])))
+			if (DBM::isResult($r) && (! intval($r[0]['is-default'])))
 				$is_default_profile = 0;
 		}
 
@@ -70,7 +70,7 @@ function profile_photo_post(App $a) {
 			dbesc(local_user()),
 			intval($scale));
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 
 			$base_image = $r[0];
 
@@ -205,7 +205,7 @@ function profile_photo_content(App $a) {
 			intval(local_user()),
 			dbesc($resource_id)
 			);
-		if (!DBM::is_result($r)){
+		if (!DBM::isResult($r)){
 			notice( t('Permission denied.') . EOL );
 			return;
 		}

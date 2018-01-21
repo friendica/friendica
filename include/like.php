@@ -74,7 +74,7 @@ function do_like($item_id, $verb) {
 		dbesc($item_id)
 	);
 
-	if (!$item_id || !DBM::is_result($items)) {
+	if (!$item_id || !DBM::isResult($items)) {
 		logger('like: unknown item ' . $item_id);
 		return false;
 	}
@@ -97,7 +97,7 @@ function do_like($item_id, $verb) {
 		AND `contact`.`uid` = %d",
 		intval($uid)
 	);
-	if (DBM::is_result($owners)) {
+	if (DBM::isResult($owners)) {
 		$owner_self_contact = $owners[0];
 	} else {
 		logger('like: unknown owner ' . $uid);
@@ -110,7 +110,7 @@ function do_like($item_id, $verb) {
 	$contacts = q("SELECT * FROM `contact` WHERE `id` = %d",
 		intval($author_id)
 	);
-	if (DBM::is_result($contacts)) {
+	if (DBM::isResult($contacts)) {
 		$author_contact = $contacts[0];
 	} else {
 		logger('like: unknown author ' . $author_id);
@@ -127,7 +127,7 @@ function do_like($item_id, $verb) {
 		$contacts = q("SELECT * FROM `contact` WHERE `id` = %d",
 			intval($item_contact_id)
 		);
-		if (DBM::is_result($contacts)) {
+		if (DBM::isResult($contacts)) {
 			$item_contact = $contacts[0];
 		} else {
 			logger('like: unknown item contact ' . $item_contact_id);
@@ -157,7 +157,7 @@ function do_like($item_id, $verb) {
 	);
 
 	// If it exists, mark it as deleted
-	if (DBM::is_result($existing_like)) {
+	if (DBM::isResult($existing_like)) {
 		$like_item = $existing_like[0];
 
 		// Already voted, undo it

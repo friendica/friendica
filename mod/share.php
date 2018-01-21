@@ -14,7 +14,7 @@ function share_init(App $a) {
 		WHERE `item`.`id` = %d LIMIT 1",
 		intval($post_id)
 	);
-	if (!DBM::is_result($r) || ($r[0]['private'] == 1)) {
+	if (!DBM::isResult($r) || ($r[0]['private'] == 1)) {
 		killme();
 	}
 	if (strpos($r[0]['body'], "[/share]") !== false) {

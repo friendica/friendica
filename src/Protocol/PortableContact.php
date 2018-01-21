@@ -67,7 +67,7 @@ class PortableContact
 		if ($cid) {
 			if (!$url || !$uid) {
 				$contact = dba::selectFirst('contact', ['poco', 'uid'], ['id' => $cid]);
-				if (DBM::is_result($contact)) {
+				if (DBM::isResult($contact)) {
 					$url = $contact['poco'];
 					$uid = $contact['uid'];
 				}
@@ -282,7 +282,7 @@ class PortableContact
 			dbesc(normalise_link($server_url))
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $server_url;
 		}
 
@@ -307,7 +307,7 @@ class PortableContact
 			dbesc(normalise_link($profile))
 		);
 
-		if (!DBM::is_result($gcontacts)) {
+		if (!DBM::isResult($gcontacts)) {
 			return false;
 		}
 
@@ -814,7 +814,7 @@ class PortableContact
 		}
 
 		$gserver = dba::selectFirst('gserver', [], ['nurl' => normalise_link($server_url)]);
-		if (DBM::is_result($gserver)) {
+		if (DBM::isResult($gserver)) {
 			if ($gserver["created"] <= NULL_DATE) {
 				$fields = ['created' => datetime_convert()];
 				$condition = ['nurl' => normalise_link($server_url)];
@@ -876,7 +876,7 @@ class PortableContact
 
 		// Quit if there is a timeout.
 		// But we want to make sure to only quit if we are mostly sure that this server url fits.
-		if (DBM::is_result($gserver) && ($orig_server_url == $server_url) &&
+		if (DBM::isResult($gserver) && ($orig_server_url == $server_url) &&
 			($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
 			dba::update('gserver', ['last_failure' => datetime_convert()], ['nurl' => normalise_link($server_url)]);
@@ -1280,7 +1280,7 @@ class PortableContact
 			dbesc(NETWORK_OSTATUS)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return false;
 		}
 
@@ -1308,7 +1308,7 @@ class PortableContact
 			$server_url = str_replace("/index.php", "", $server->url);
 
 			$r = q("SELECT `nurl` FROM `gserver` WHERE `nurl` = '%s'", dbesc(normalise_link($server_url)));
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				logger("Call server check for server ".$server_url, LOGGER_DEBUG);
 				Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", $server_url);
 			}
@@ -1375,7 +1375,7 @@ class PortableContact
 	public static function discoverSingleServer($id)
 	{
 		$r = q("SELECT `poco`, `nurl`, `url`, `network` FROM `gserver` WHERE `id` = %d", intval($id));
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return false;
 		}
 
@@ -1451,7 +1451,7 @@ class PortableContact
 		$last_update = date("c", time() - (60 * 60 * 24 * $requery_days));
 
 		$r = q("SELECT `id`, `url`, `network` FROM `gserver` WHERE `last_contact` >= `last_failure` AND `poco` != '' AND `last_poco_query` < '%s' ORDER BY RAND()", dbesc($last_update));
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			foreach ($r as $server) {
 				if (!self::checkServer($server["url"], $server["network"])) {
 					// The server is not reachable? Okay, then we will try it later

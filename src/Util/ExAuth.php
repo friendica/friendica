@@ -227,7 +227,7 @@ class ExAuth
 			$this->writeLog(LOG_INFO, 'internal auth for ' . $sUser . '@' . $aCommand[2]);
 
 			$aUser = dba::selectFirst('user', ['uid', 'password'], ['nickname' => $sUser]);
-			if (DBM::is_result($aUser)) {
+			if (DBM::isResult($aUser)) {
 				$uid = $aUser['uid'];
 				$success = User::authenticate($aUser, $aCommand[3]);
 				$Error = $success === false;

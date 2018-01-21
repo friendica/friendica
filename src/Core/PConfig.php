@@ -42,7 +42,7 @@ class PConfig
 		$a = get_app();
 
 		$r = dba::select('pconfig', ['v', 'k'], ['cat' => $family, 'uid' => $uid]);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			while ($rr = dba::fetch($r)) {
 				$k = $rr['k'];
 				$a->config[$uid][$family][$k] = $rr['v'];
@@ -91,7 +91,7 @@ class PConfig
 		}
 
 		$pconfig = dba::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $family, 'k' => $key]);
-		if (DBM::is_result($pconfig)) {
+		if (DBM::isResult($pconfig)) {
 			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $pconfig['v']) ? unserialize($pconfig['v']) : $pconfig['v']);
 			$a->config[$uid][$family][$key] = $val;
 			self::$in_db[$uid][$family][$key] = true;

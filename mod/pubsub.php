@@ -50,7 +50,7 @@ function pubsub_init(App $a) {
 		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 			dbesc($nick)
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			logger('pubsub: local account not found: ' . $nick);
 			hub_return(false, '');
 		}
@@ -65,7 +65,7 @@ function pubsub_init(App $a) {
 			intval($contact_id),
 			intval($owner['uid'])
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			logger('pubsub: contact '.$contact_id.' not found.');
 			hub_return(false, '');
 		}
@@ -120,7 +120,7 @@ function pubsub_post(App $a) {
 	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 		dbesc($nick)
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		hub_post_return();
 	}
 
@@ -135,7 +135,7 @@ function pubsub_post(App $a) {
 		dbesc(NETWORK_FEED)
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		logger('pubsub: no contact record for "'.$nick.' ('.$contact_id.')" - ignored. '.$xml);
 		hub_post_return();
 	}

@@ -22,7 +22,7 @@ function redir_init(App $a) {
 				intval(local_user())
 			);
 
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				goaway(System::baseUrl());
 			}
 			if ($r[0]['network'] !== NETWORK_DFRN) {
@@ -37,7 +37,7 @@ function redir_init(App $a) {
 				intval(local_user())
 			);
 
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				goaway(System::baseUrl());
 			}
 			if ($r[0]['network'] !== NETWORK_DFRN) {

@@ -24,7 +24,7 @@ function tagrm_post(App $a) {
 		intval(local_user())
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		goaway(System::baseUrl() . '/' . $_SESSION['photo_return']);
 	}
 
@@ -73,7 +73,7 @@ function tagrm_content(App $a) {
 		intval(local_user())
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		goaway(System::baseUrl() . '/' . $_SESSION['photo_return']);
 	}
 

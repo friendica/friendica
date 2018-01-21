@@ -40,7 +40,7 @@ class Group extends BaseObject
 				// access lists. What we're doing here is reviving the dead group, but old content which
 				// was restricted to this group may now be seen by the new group members.
 				$group = dba::selectFirst('group', ['deleted'], ['id' => $gid]);
-				if (DBM::is_result($group) && $group['deleted']) {
+				if (DBM::isResult($group) && $group['deleted']) {
 					dba::update('group', ['deleted' => 0], ['gid' => $gid]);
 					notice(t('A deleted group with this name was revived. Existing item permissions <strong>may</strong> apply to this group and any future members. If this is not what you intended, please create another group with a different name.') . EOL);
 				}
@@ -121,7 +121,7 @@ class Group extends BaseObject
 		}
 
 		$group = dba::selectFirst('group', ['id'], ['uid' => $uid, 'name' => $name]);
-		if (DBM::is_result($group)) {
+		if (DBM::isResult($group)) {
 			return $group['id'];
 		}
 
@@ -140,13 +140,13 @@ class Group extends BaseObject
 		}
 
 		$group = dba::selectFirst('group', ['uid'], ['gid' => $gid]);
-		if (!DBM::is_result($group)) {
+		if (!DBM::isResult($group)) {
 			return false;
 		}
 
 		// remove group from default posting lists
 		$user = dba::selectFirst('user', ['def_gid', 'allow_gid', 'deny_gid'], ['uid' => $group['uid']]);
-		if (DBM::is_result($user)) {
+		if (DBM::isResult($user)) {
 			$change = false;
 
 			if ($user['def_gid'] == $gid) {

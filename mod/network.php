@@ -585,7 +585,7 @@ function networkThreadedView(App $a, $update = 0) {
 			// If $cid belongs to a communitity forum or a privat goup,.add a mention to the status editor
 			$condition = ["`id` = ? AND (`forum` OR `prv`)", $cid];
 			$contact = dba::selectFirst('contact', ['addr', 'nick'], $condition);
-			if (DBM::is_result($contact)) {
+			if (DBM::isResult($contact)) {
 				if ($contact["addr"] != '') {
 					$content = "!".$contact["addr"];
 				} else {
@@ -637,7 +637,7 @@ function networkThreadedView(App $a, $update = 0) {
 
 	if ($gid) {
 		$group = dba::selectFirst('group', ['name'], ['id' => $gid, 'uid' => $_SESSION['uid']]);
-		if (!DBM::is_result($group)) {
+		if (!DBM::isResult($group)) {
 			if ($update) {
 				killme();
 			}
@@ -653,7 +653,7 @@ function networkThreadedView(App $a, $update = 0) {
 
 			$contact_str = implode(',',$contacts);
 			$self = dba::selectFirst('contact', ['id'], ['uid' => $_SESSION['uid'], 'self' => true]);
-			if (DBM::is_result($self)) {
+			if (DBM::isResult($self)) {
 				$contact_str_self = $self["id"];
 			}
 
@@ -674,7 +674,7 @@ function networkThreadedView(App $a, $update = 0) {
 				'forum', 'prv', 'contact-type', 'addr', 'thumb', 'location'];
 		$condition = ["`id` = ? AND (NOT `blocked` OR `pending`)", $cid];
 		$contact = dba::selectFirst('contact', $fields, $condition);
-		if (DBM::is_result($contact)) {
+		if (DBM::isResult($contact)) {
 			$sql_extra = " AND ".$sql_table.".`contact-id` = ".intval($cid);
 
 			$entries[0] = [
@@ -815,7 +815,7 @@ function networkThreadedView(App $a, $update = 0) {
 	if (Config::get('system', 'comment_public') && in_array($nets, ['', NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])
 		&& (strlen($sql_extra . $sql_extra2 . $sql_extra3) == 0)) {
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$top_limit = current($r)['order_date'];
 			$bottom_limit = end($r)['order_date'];
 		} else {
@@ -858,7 +858,7 @@ function networkThreadedView(App $a, $update = 0) {
 	$date_offset = "";
 
 	$items = [];
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			if (!in_array($rr['item_id'], $parents_arr)) {
 				$parents_arr[] = $rr['item_id'];
@@ -881,7 +881,7 @@ function networkThreadedView(App $a, $update = 0) {
 				$parents
 			);
 
-			if (DBM::is_result($thread_items)) {
+			if (DBM::isResult($thread_items)) {
 				$items = array_merge($items, dba::inArray($thread_items));
 			}
 		}

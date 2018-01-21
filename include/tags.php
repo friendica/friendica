@@ -203,7 +203,7 @@ function tagadelic($uid, $count = 0, $owner_id = 0, $flags = '', $type = TERM_HA
 		$type,
 		TERM_OBJ_POST
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		return [];
 	}
 

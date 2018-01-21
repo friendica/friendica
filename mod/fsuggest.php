@@ -22,7 +22,7 @@ function fsuggest_post(App $a) {
 		intval($contact_id),
 		intval(local_user())
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		notice( t('Contact not found.') . EOL);
 		return;
 	}
@@ -39,7 +39,7 @@ function fsuggest_post(App $a) {
 			intval($new_contact),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 
 			$x = q("INSERT INTO `fsuggest` ( `uid`,`cid`,`name`,`url`,`request`,`photo`,`note`,`created`)
 				VALUES ( %d, %d, '%s','%s','%s','%s','%s','%s')",
@@ -56,7 +56,7 @@ function fsuggest_post(App $a) {
 				dbesc($hash),
 				intval(local_user())
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$fsuggest_id = $r[0]['id'];
 				q("UPDATE `fsuggest` SET `note` = '%s' WHERE `id` = %d AND `uid` = %d",
 					dbesc($note),
@@ -96,7 +96,7 @@ function fsuggest_content(App $a)
 		intval($contact_id),
 		intval(local_user())
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		notice(t('Contact not found.') . EOL);
 		return;
 	}

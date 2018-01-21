@@ -127,7 +127,7 @@ class Notifier {
 						INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 						WHERE `item`.`id` = ? AND `visible` AND NOT `moderated`", $item_id);
 
-			if (!DBM::is_result($target_item) || !intval($target_item['parent'])) {
+			if (!DBM::isResult($target_item) || !intval($target_item['parent'])) {
 				return;
 			}
 
@@ -241,7 +241,7 @@ class Notifier {
 				$fields = ['forum', 'prv'];
 				$condition = ['id' => $target_item['contact-id']];
 				$contact = dba::selectFirst('contact', $fields, $condition);
-				if (!DBM::is_result($contact)) {
+				if (!DBM::isResult($contact)) {
 					// Should never happen
 					return false;
 				}
@@ -278,7 +278,7 @@ class Notifier {
 							intval($uid),
 							dbesc(NETWORK_DFRN)
 						);
-						if (DBM::is_result($r)) {
+						if (DBM::isResult($r)) {
 							foreach ($r as $rr) {
 								$recipients_followup[] = $rr['id'];
 							}
@@ -365,7 +365,7 @@ class Notifier {
 				$r = q("SELECT `url`, `notify` FROM `contact` WHERE `nurl`='%s' AND `uid` IN (0, %d) AND `notify` != ''",
 					dbesc(normalise_link($thr_parent[0]['author-link'])),
 					intval($uid));
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$probed_contact = $r[0];
 				} else {
 					$probed_contact = Probe::uri($thr_parent[0]['author-link']);
@@ -380,7 +380,7 @@ class Notifier {
 				$r = q("SELECT `url`, `notify` FROM `contact` WHERE `nurl`='%s' AND `uid` IN (0, %d) AND `notify` != ''",
 					dbesc(normalise_link($thr_parent[0]['owner-link'])),
 					intval($uid));
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$probed_contact = $r[0];
 				} else {
 					$probed_contact = Probe::uri($thr_parent[0]['owner-link']);
@@ -426,7 +426,7 @@ class Notifier {
 					intval($uid),
 					dbesc(NETWORK_MAIL)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					foreach ($r as $rr) {
 						$recipients[] = $rr['id'];
 					}
@@ -450,7 +450,7 @@ class Notifier {
 
 		// delivery loop
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			foreach ($r as $contact) {
 				if ($contact['self']) {
 					continue;
@@ -512,7 +512,7 @@ class Notifier {
 
 			$r = array_merge($r2, $r1, $r0);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				logger('pubdeliver '.$target_item["guid"].': '.print_r($r,true), LOGGER_DEBUG);
 
 				foreach ($r as $rr) {

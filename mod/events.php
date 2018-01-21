@@ -346,7 +346,7 @@ function events_content(App $a) {
 
 		$links = [];
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$r = sort_by_date($r);
 			foreach ($r as $rr) {
 				$j = (($rr['adjust']) ? datetime_convert('UTC', date_default_timezone_get(), $rr['start'], 'j') : datetime_convert('UTC', 'UTC', $rr['start'], 'j'));
@@ -359,7 +359,7 @@ function events_content(App $a) {
 		$events = [];
 
 		// transform the event in a usable array
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$r = sort_by_date($r);
 			$events = process_events($r);
 		}
@@ -417,7 +417,7 @@ function events_content(App $a) {
 			intval($event_id),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$orig_event = $r[0];
 		}
 	}
@@ -547,7 +547,7 @@ function events_content(App $a) {
 		$ev = event_by_id(local_user(), $params);
 
 		// Delete only real events (no birthdays)
-		if (DBM::is_result($ev) && $ev[0]['type'] == 'event') {
+		if (DBM::isResult($ev) && $ev[0]['type'] == 'event') {
 			$del = Item::delete($ev[0]['itemid']);
 		}
 

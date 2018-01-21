@@ -42,7 +42,7 @@ function openid_content(App $a) {
 				dbesc($authid), dbesc(normalise_openid($authid))
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 
 				// successful OpenID login
 

@@ -34,7 +34,7 @@ function ref_session_read($id)
 	}
 
 	$session = dba::selectFirst('session', ['data'], ['sid' => $id]);
-	if (DBM::is_result($session)) {
+	if (DBM::isResult($session)) {
 		$session_exists = true;
 		return $session['data'];
 	} else {

@@ -76,7 +76,7 @@ class Delivery {
 							INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 							WHERE `item`.`id` = ? AND `visible` AND NOT `moderated`", $item_id);
 
-			if (!DBM::is_result($target_item) || !intval($target_item['parent'])) {
+			if (!DBM::isResult($target_item) || !intval($target_item['parent'])) {
 				return;
 			}
 
@@ -185,7 +185,7 @@ class Delivery {
 			intval($contact_id)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$contact = $r[0];
 		}
 		if ($contact['self']) {
@@ -365,7 +365,7 @@ class Delivery {
 						$r = q("SELECT * FROM `item` WHERE `id` = %d LIMIT 1",
 							intval($item_id)
 						);
-						if (DBM::is_result($r)) {
+						if (DBM::isResult($r)) {
 							$it = $r[0];
 						}
 					}
@@ -426,14 +426,14 @@ class Delivery {
 								dbesc($it['parent-uri']),
 								intval($uid));
 
-							if (DBM::is_result($r) && ($r[0]['title'] != '')) {
+							if (DBM::isResult($r) && ($r[0]['title'] != '')) {
 								$subject = $r[0]['title'];
 							} else {
 								$r = q("SELECT `title` FROM `item` WHERE `parent-uri` = '%s' AND `uid` = %d LIMIT 1",
 									dbesc($it['parent-uri']),
 									intval($uid));
 
-								if (DBM::is_result($r) && ($r[0]['title'] != '')) {
+								if (DBM::isResult($r) && ($r[0]['title'] != '')) {
 									$subject = $r[0]['title'];
 								}
 							}

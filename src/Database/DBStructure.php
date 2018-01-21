@@ -26,7 +26,7 @@ class DBStructure {
 		$r = q("SELECT `TABLE_NAME` FROM `information_schema`.`tables` WHERE `engine` = 'MyISAM' AND `table_schema` = '%s'",
 			dbesc(dba::database_name()));
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			echo t('There are no tables on MyISAM.')."\n";
 			return;
 		}
@@ -36,7 +36,7 @@ class DBStructure {
 			echo $sql."\n";
 
 			$result = dba::e($sql);
-			if (!DBM::is_result($result)) {
+			if (!DBM::isResult($result)) {
 				self::printUpdateError($sql);
 			}
 		}
@@ -58,7 +58,7 @@ class DBStructure {
 		);
 
 		// No valid result?
-		if (!DBM::is_result($adminlist)) {
+		if (!DBM::isResult($adminlist)) {
 			logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_NORMAL);
 
 			// Don't continue
@@ -102,7 +102,7 @@ class DBStructure {
 
 		$table_status = q("SHOW TABLE STATUS WHERE `name` = '%s'", $table);
 
-		if (DBM::is_result($table_status)) {
+		if (DBM::isResult($table_status)) {
 			$table_status = $table_status[0];
 		} else {
 			$table_status = [];
@@ -111,7 +111,7 @@ class DBStructure {
 		$fielddata = [];
 		$indexdata = [];
 
-		if (DBM::is_result($indexes)) {
+		if (DBM::isResult($indexes)) {
 			foreach ($indexes AS $index) {
 				if ($index['Key_name'] != 'PRIMARY' && $index['Non_unique'] == '0' && !isset($indexdata[$index["Key_name"]])) {
 					$indexdata[$index["Key_name"]] = ['UNIQUE'];
@@ -126,7 +126,7 @@ class DBStructure {
 				$indexdata[$index["Key_name"]][] = $column;
 			}
 		}
-		if (DBM::is_result($structures)) {
+		if (DBM::isResult($structures)) {
 			foreach ($structures AS $field) {
 				// Replace the default size values so that we don't have to define them
 				$search = ['tinyint(1)', 'tinyint(4)', 'smallint(5) unsigned', 'smallint(6)', 'mediumint(9)', 'bigint(20)', 'int(11)'];
@@ -151,7 +151,7 @@ class DBStructure {
 				}
 			}
 		}
-		if (DBM::is_result($full_columns)) {
+		if (DBM::isResult($full_columns)) {
 			foreach ($full_columns AS $column) {
 				$fielddata[$column["Field"]]["Collation"] = $column["Collation"];
 				$fielddata[$column["Field"]]["comment"] = $column["Comment"];
@@ -218,7 +218,7 @@ class DBStructure {
 			$tables = q("SHOW TABLES");
 		}
 
-		if (DBM::is_result($tables)) {
+		if (DBM::isResult($tables)) {
 			foreach ($tables AS $table) {
 				$table = current($table);
 
@@ -247,7 +247,7 @@ class DBStructure {
 			$sql3 = "";
 			if (!isset($database[$name])) {
 				$r = self::createTable($name, $structure["fields"], $verbose, $action, $structure['indexes']);
-				if (!DBM::is_result($r)) {
+				if (!DBM::isResult($r)) {
 					$errors .= self::printUpdateError($name);
 				}
 				$is_new_table = True;
@@ -462,13 +462,13 @@ class DBStructure {
 							dba::e("SET session old_alter_table=1;");
 						} else {
 							dba::e("DROP TABLE IF EXISTS `".$temp_name."`;");
-							if (!DBM::is_result($r)) {
+							if (!DBM::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
 
 							$r = dba::e("CREATE TABLE `".$temp_name."` LIKE `".$name."`;");
-							if (!DBM::is_result($r)) {
+							if (!DBM::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
@@ -476,7 +476,7 @@ class DBStructure {
 					}
 
 					$r = dba::e($sql3);
-					if (!DBM::is_result($r)) {
+					if (!DBM::isResult($r)) {
 						$errors .= self::printUpdateError($sql3);
 					}
 					if ($is_unique && ($temp_name != $name)) {
@@ -484,17 +484,17 @@ class DBStructure {
 							dba::e("SET session old_alter_table=0;");
 						} else {
 							$r = dba::e("INSERT INTO `".$temp_name."` SELECT ".$field_list." FROM `".$name."`".$group_by.";");
-							if (!DBM::is_result($r)) {
+							if (!DBM::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
 							$r = dba::e("DROP TABLE `".$name."`;");
-							if (!DBM::is_result($r)) {
+							if (!DBM::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
 							$r = dba::e("RENAME TABLE `".$temp_name."` TO `".$name."`;");
-							if (!DBM::is_result($r)) {
+							if (!DBM::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}

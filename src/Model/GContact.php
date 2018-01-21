@@ -111,7 +111,7 @@ class GContact
 			intval($zcid)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			q(
 				"INSERT INTO `glink` (`cid`, `uid`, `gcid`, `zcid`, `updated`) VALUES (%d, %d, %d, %d, '%s') ",
 				intval($cid),
@@ -185,7 +185,7 @@ class GContact
 				dbesc(normalise_link($gcontact['url'])),
 				dbesc(NETWORK_STATUSNET)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$gcontact['network'] = $r[0]["network"];
 			}
 
@@ -196,7 +196,7 @@ class GContact
 					dbesc(normalise_link($gcontact['url'])),
 					dbesc(NETWORK_STATUSNET)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$gcontact['network'] = $r[0]["network"];
 				}
 			}
@@ -210,7 +210,7 @@ class GContact
 			dbesc(normalise_link($gcontact['url']))
 		);
 
-		if (DBM::is_result($x)) {
+		if (DBM::isResult($x)) {
 			if (!isset($gcontact['network']) && ($x[0]["network"] != NETWORK_STATUSNET)) {
 				$gcontact['network'] = $x[0]["network"];
 			}
@@ -243,7 +243,7 @@ class GContact
 			if ($alternate && ($gcontact['network'] == NETWORK_OSTATUS)) {
 				// Delete the old entry - if it exists
 				$r = q("SELECT `id` FROM `gcontact` WHERE `nurl` = '%s'", dbesc(normalise_link($orig_profile)));
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					q("DELETE FROM `gcontact` WHERE `nurl` = '%s'", dbesc(normalise_link($orig_profile)));
 					q("DELETE FROM `glink` WHERE `gcid` = %d", intval($r[0]["id"]));
 				}
@@ -297,7 +297,7 @@ class GContact
 		);
 
 		// logger("countCommonFriends: $uid $cid {$r[0]['total']}");
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 		return 0;
@@ -319,7 +319,7 @@ class GContact
 			intval($uid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -360,7 +360,7 @@ class GContact
 			intval($limit)
 		);
 
-		/// @TODO Check all calling-findings of this function if they properly use DBM::is_result()
+		/// @TODO Check all calling-findings of this function if they properly use DBM::isResult()
 		return $r;
 	}
 
@@ -392,7 +392,7 @@ class GContact
 			intval($limit)
 		);
 
-		/// @TODO Check all calling-findings of this function if they properly use DBM::is_result()
+		/// @TODO Check all calling-findings of this function if they properly use DBM::isResult()
 		return $r;
 	}
 
@@ -412,7 +412,7 @@ class GContact
 			intval($uid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -443,7 +443,7 @@ class GContact
 			intval($limit)
 		);
 
-		/// @TODO Check all calling-findings of this function if they properly use DBM::is_result()
+		/// @TODO Check all calling-findings of this function if they properly use DBM::isResult()
 		return $r;
 	}
 
@@ -503,7 +503,7 @@ class GContact
 			intval($limit)
 		);
 
-		if (DBM::is_result($r) && count($r) >= ($limit -1)) {
+		if (DBM::isResult($r) && count($r) >= ($limit -1)) {
 			/*
 			* Uncommented because the result of the queries are to big to store it in the cache.
 			* We need to decide if we want to change the db column type or if we want to delete it.
@@ -591,7 +591,7 @@ class GContact
 			dbesc(NETWORK_DIASPORA)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			foreach ($r as $rr) {
 				$base = substr($rr['poco'], 0, strrpos($rr['poco'], '/'));
 				if (! in_array($base, $done)) {
@@ -693,7 +693,7 @@ class GContact
 			dbesc(normalise_link($contact["url"]))
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$gcontact_id = $r[0]["id"];
 
 			// Update every 90 days
@@ -728,7 +728,7 @@ class GContact
 				dbesc(normalise_link($contact["url"]))
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$gcontact_id = $r[0]["id"];
 
 				$doprobing = in_array($r[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""]);
@@ -876,7 +876,7 @@ class GContact
 			// This is used for the shadow copies of public items.
 
 			$public_contact = dba::selectFirst('contact', ['id'], ['nurl' => normalise_link($contact["url"]), 'uid' => 0]);
-			if (DBM::is_result($public_contact)) {
+			if (DBM::isResult($public_contact)) {
 				logger("Update public contact ".$public_contact["id"], LOGGER_DEBUG);
 
 				Contact::updateAvatar($contact["photo"], 0, $public_contact["id"]);
@@ -1042,7 +1042,7 @@ class GContact
 			dbesc($last_update)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return;
 		}
 
@@ -1065,7 +1065,7 @@ class GContact
 			dbesc(NETWORK_DFRN)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return dirname($r[0]['url']);
 		}
 

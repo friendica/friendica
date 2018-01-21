@@ -42,7 +42,7 @@ class Queue
 				WHERE `queue`.`created` < UTC_TIMESTAMP() - INTERVAL 3 DAY"
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				foreach ($r as $rr) {
 					logger('Removing expired queue item for ' . $rr['name'] . ', uid=' . $rr['uid']);
 					logger('Expired queue data: ' . $rr['content'], LOGGER_DATA);
@@ -58,7 +58,7 @@ class Queue
 
 			Addon::callHooks('queue_predeliver', $r);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				foreach ($r as $q_item) {
 					logger('Call queue for id ' . $q_item['id']);
 					Worker::add(['priority' => PRIORITY_LOW, 'dont_fork' => true], "Queue", (int) $q_item['id']);
@@ -70,12 +70,12 @@ class Queue
 
 		// delivering
 		$q_item = dba::selectFirst('queue', [], ['id' => $queue_id]);
-		if (!DBM::is_result($q_item)) {
+		if (!DBM::isResult($q_item)) {
 			return;
 		}
 
 		$contact = dba::selectFirst('contact', [], ['id' => $q_item['cid']]);
-		if (!DBM::is_result($contact)) {
+		if (!DBM::isResult($contact)) {
 			QueueModel::removeItem($q_item['id']);
 			return;
 		}
@@ -108,7 +108,7 @@ class Queue
 		}
 
 		$user = dba::selectFirst('user', [], ['uid' => $contact['uid']]);
-		if (!DBM::is_result($user)) {
+		if (!DBM::isResult($user)) {
 			QueueModel::removeItem($q_item['id']);
 			return;
 		}

@@ -84,7 +84,7 @@ function dfrn_request_post(App $a)
 					dbesc(normalise_link($dfrn_url))
 				);
 
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					if (strlen($r[0]['dfrn-id'])) {
 						// We don't need to be here. It has already happened.
 						notice(t("This introduction has already been accepted.") . EOL);
@@ -163,7 +163,7 @@ function dfrn_request_post(App $a)
 					dbesc($dfrn_url),
 					$parms['key'] // this was already escaped
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					Group::addMember(User::getDefaultGroup($uid, $r[0]["network"]), $r[0]['id']);
 
 					if (isset($photo)) {
@@ -240,7 +240,7 @@ function dfrn_request_post(App $a)
 				dbesc(datetime_convert('UTC', 'UTC', 'now - 24 hours')),
 				intval($uid)
 			);
-			if (DBM::is_result($r) && count($r) > $maxreq) {
+			if (DBM::isResult($r) && count($r) > $maxreq) {
 				notice(sprintf(t('%s has received too many connection requests today.'), $a->profile['name']) . EOL);
 				notice(t('Spam protection measures have been invoked.') . EOL);
 				notice(t('Friends are advised to please try again in 24 hours.') . EOL);
@@ -256,7 +256,7 @@ function dfrn_request_post(App $a)
 			WHERE `intro`.`blocked` = 1 AND `contact`.`self` = 0
 			AND `intro`.`datetime` < UTC_TIMESTAMP() - INTERVAL 30 MINUTE "
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			foreach ($r as $rr) {
 				if (!$rr['rel']) {
 					q("DELETE FROM `contact` WHERE `id` = %d AND NOT `self`",
@@ -307,7 +307,7 @@ function dfrn_request_post(App $a)
 				dbesc($url)
 			);
 
-			if (DBM::is_result($ret)) {
+			if (DBM::isResult($ret)) {
 				if (strlen($ret[0]['issued-id'])) {
 					notice(t('You have already introduced yourself here.') . EOL);
 					return;
@@ -405,7 +405,7 @@ function dfrn_request_post(App $a)
 						$parms['url'],
 						$parms['issued-id']
 					);
-					if (DBM::is_result($r)) {
+					if (DBM::isResult($r)) {
 						$contact_record = $r[0];
 						Contact::updateAvatar($photo, $uid, $contact_record["id"], true);
 					}
@@ -539,7 +539,7 @@ function dfrn_request_content(App $a)
 			dbesc($_GET['confirm_key'])
 		);
 
-		if (DBM::is_result($intro)) {
+		if (DBM::isResult($intro)) {
 			$r = q("SELECT `contact`.*, `user`.* FROM `contact` LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
 				WHERE `contact`.`id` = %d LIMIT 1",
 				intval($intro[0]['contact-id'])
@@ -547,7 +547,7 @@ function dfrn_request_content(App $a)
 
 			$auto_confirm = false;
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				if ($r[0]['page-flags'] != PAGE_NORMAL && $r[0]['page-flags'] != PAGE_PRVGROUP) {
 					$auto_confirm = true;
 				}

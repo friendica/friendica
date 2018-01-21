@@ -37,7 +37,7 @@ function salmon_post(App $a) {
 	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",
 		dbesc($nick)
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		http_status_exit(500);
 	}
 
@@ -161,7 +161,7 @@ function salmon_post(App $a) {
 		dbesc(normalise_link($author_link)),
 		intval($importer['uid'])
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		logger('mod-salmon: Author unknown to us.');
 		if(PConfig::get($importer['uid'],'system','ostatus_autofriend')) {
 			$result = Contact::createFromProbe($importer['uid'], $author_link);
@@ -180,8 +180,7 @@ function salmon_post(App $a) {
 	// Have we ignored the person?
 	// If so we can not accept this post.
 
-	//if((DBM::is_result($r)) && (($r[0]['readonly']) || ($r[0]['rel'] == CONTACT_IS_FOLLOWER) || ($r[0]['blocked']))) {
-	if (DBM::is_result($r) && $r[0]['blocked']) {
+	if (DBM::isResult($r) && $r[0]['blocked']) {
 		logger('mod-salmon: Ignoring this author.');
 		http_status_exit(202);
 		// NOTREACHED
@@ -190,7 +189,7 @@ function salmon_post(App $a) {
 	// Placeholder for hub discovery.
 	$hub = '';
 
-	$contact_rec = ((DBM::is_result($r)) ? $r[0] : null);
+	$contact_rec = ((DBM::isResult($r)) ? $r[0] : null);
 
 	OStatus::import($data, $importer, $contact_rec, $hub);
 

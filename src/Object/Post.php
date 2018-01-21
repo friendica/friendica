@@ -266,7 +266,7 @@ class Post extends BaseObject
 				];
 
 				$thread = dba::selectFirst('thread', ['ignored'], ['uid' => $item['uid'], 'iid' => $item['id']]);
-				if (DBM::is_result($thread)) {
+				if (DBM::isResult($thread)) {
 					$ignore = [
 						'do'        => t("ignore thread"),
 						'undo'      => t("unignore thread"),

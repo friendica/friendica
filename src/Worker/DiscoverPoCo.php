@@ -118,7 +118,7 @@ class DiscoverPoCo {
 	private static function updateServer() {
 		$r = q("SELECT `url`, `created`, `last_failure`, `last_contact` FROM `gserver` ORDER BY rand()");
 
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return;
 		}
 
@@ -224,7 +224,7 @@ class DiscoverPoCo {
 			foreach ($j->results as $jj) {
 				// Check if the contact already exists
 				$exists = q("SELECT `id`, `last_contact`, `last_failure`, `updated` FROM `gcontact` WHERE `nurl` = '%s'", normalise_link($jj->url));
-				if (DBM::is_result($exists)) {
+				if (DBM::isResult($exists)) {
 					logger("Profile ".$jj->url." already exists (".$search.")", LOGGER_DEBUG);
 
 					if (($exists[0]["last_contact"] < $exists[0]["last_failure"]) &&

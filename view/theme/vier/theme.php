@@ -143,7 +143,7 @@ function vier_community_info() {
 		$r = GContact::suggestionQuery(local_user(), 0, 9);
 
 		$tpl = get_markup_template('ch_directory_item.tpl');
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 
 			$aside['$comunity_profiles_title'] = t('Community Profiles');
 			$aside['$comunity_profiles_items'] = [];
@@ -173,7 +173,7 @@ function vier_community_info() {
 				WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $order LIMIT %d , %d ",
 				0, 9);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 
 			$aside['$lastusers_title'] = t('Last users');
 			$aside['$lastusers_items'] = [];
@@ -380,7 +380,7 @@ function vier_community_info() {
 
 		$tpl = get_markup_template('ch_connectors.tpl');
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 
 			$con_services = [];
 			$con_services['title'] = ["", t('Connect Services'), "", ""];

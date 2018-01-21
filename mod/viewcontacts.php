@@ -24,7 +24,7 @@ function viewcontacts_init(App $a) {
 			dbesc($nick)
 		);
 
-		if (! DBM::is_result($r)) {
+		if (! DBM::isResult($r)) {
 			return;
 		}
 
@@ -64,7 +64,7 @@ function viewcontacts_content(App $a) {
 		dbesc(NETWORK_DIASPORA),
 		dbesc(NETWORK_OSTATUS)
 	);
-	if (DBM::is_result($r))
+	if (DBM::isResult($r))
 		$a->set_pager_total($r[0]['total']);
 
 	$r = q("SELECT * FROM `contact`
@@ -79,7 +79,7 @@ function viewcontacts_content(App $a) {
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		info(t('No contacts.').EOL);
 		return $o;
 	}

@@ -43,7 +43,7 @@ function photos_init(App $a) {
 			dbesc($nick)
 		);
 
-		if (!DBM::is_result($user)) {
+		if (!DBM::isResult($user)) {
 			return;
 		}
 
@@ -158,7 +158,7 @@ function photos_post(App $a)
 					intval($contact_id),
 					intval($page_owner_uid)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$can_post = true;
 					$visitor = $contact_id;
 				}
@@ -176,7 +176,7 @@ function photos_post(App $a)
 		intval($page_owner_uid)
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::isResult($r)) {
 		notice( t('Contact information unavailable') . EOL);
 		logger('photos_post: unable to locate contact record for page owner. uid=' . $page_owner_uid);
 		killme();
@@ -196,7 +196,7 @@ function photos_post(App $a)
 			dbesc($album),
 			intval($page_owner_uid)
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			notice( t('Album not found.') . EOL);
 			goaway($_SESSION['photo_return']);
 			return; // NOTREACHED
@@ -263,7 +263,7 @@ function photos_post(App $a)
 					dbesc($album)
 				);
 			}
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				foreach ($r as $rr) {
 					$res[] = "'" . dbesc($rr['rid']) . "'" ;
 				}
@@ -283,7 +283,7 @@ function photos_post(App $a)
 			$r = q("SELECT `id`, `parent-uri`, `visible` FROM `item` WHERE `resource-id` IN ( $str_res ) AND `uid` = %d",
 				intval($page_owner_uid)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				foreach ($r as $rr) {
 					q("UPDATE `item` SET `deleted` = 1, `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 						dbesc(datetime_convert()),
@@ -348,7 +348,7 @@ function photos_post(App $a)
 				dbesc($a->argv[2])
 			);
 		}
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			q("DELETE FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'",
 				intval($page_owner_uid),
 				dbesc($r[0]['resource-id'])
@@ -357,7 +357,7 @@ function photos_post(App $a)
 				dbesc($r[0]['resource-id']),
 				intval($page_owner_uid)
 			);
-			if (DBM::is_result($i)) {
+			if (DBM::isResult($i)) {
 				q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
 					dbesc(datetime_convert()),
 					dbesc(datetime_convert()),
@@ -408,7 +408,7 @@ function photos_post(App $a)
 				dbesc($resource_id),
 				intval($page_owner_uid)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$Image = new Image($r[0]['data'], $r[0]['type']);
 				if ($Image->isValid()) {
 					$rotate_deg = ( (intval($_POST['rotate']) == 1) ? 270 : 90 );
@@ -460,7 +460,7 @@ function photos_post(App $a)
 			dbesc($resource_id),
 			intval($page_owner_uid)
 		);
-		if (DBM::is_result($p)) {
+		if (DBM::isResult($p)) {
 			$ext = $phototypes[$p[0]['type']];
 			$r = q("UPDATE `photo` SET `desc` = '%s', `album` = '%s', `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s' WHERE `resource-id` = '%s' AND `uid` = %d",
 				dbesc($desc),
@@ -527,7 +527,7 @@ function photos_post(App $a)
 				intval($page_owner_uid)
 			);
 		}
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$old_tag    = $r[0]['tag'];
 			$old_inform = $r[0]['inform'];
 		}
@@ -590,7 +590,7 @@ function photos_post(App $a)
 										intval($page_owner_uid)
 								);
 
-								if (!DBM::is_result($r)) {
+								if (!DBM::isResult($r)) {
 									//select someone by attag or nick and the name passed in
 									$r = q("SELECT * FROM `contact` WHERE `attag` = '%s' OR `nick` = '%s' AND `uid` = %d ORDER BY `attag` DESC LIMIT 1",
 											dbesc($name),
@@ -600,7 +600,7 @@ function photos_post(App $a)
 								}
 							}
 
-							if (DBM::is_result($r)) {
+							if (DBM::isResult($r)) {
 								$newname = $r[0]['name'];
 								$profile = $r[0]['url'];
 								$notify = 'cid:' . $r[0]['id'];
@@ -749,7 +749,7 @@ function photos_post(App $a)
 		dbesc($album),
 		intval($page_owner_uid)
 	);
-	if (!DBM::is_result($r) || ($album == t('Profile Photos'))) {
+	if (!DBM::isResult($r) || ($album == t('Profile Photos'))) {
 		$visible = 1;
 	} else {
 		$visible = 0;
@@ -1022,7 +1022,7 @@ function photos_content(App $a)
 					intval($contact_id),
 					intval($owner_uid)
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$can_post = true;
 					$contact = $r[0];
 					$remote_contact = true;
@@ -1051,7 +1051,7 @@ function photos_content(App $a)
 				intval($contact_id),
 				intval($owner_uid)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$contact = $r[0];
 				$remote_contact = true;
 			}
@@ -1151,7 +1151,7 @@ function photos_content(App $a)
 			intval($owner_uid),
 			dbesc($album)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$a->set_pager_total(count($r));
 			$a->set_pager_itemspage(20);
 		}
@@ -1207,7 +1207,7 @@ function photos_content(App $a)
 
 		$photos = [];
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			// "Twist" is only used for the duepunto theme with style "slackr"
 			$twist = false;
 			foreach ($r as $rr) {
@@ -1257,13 +1257,13 @@ function photos_content(App $a)
 			dbesc($datum)
 		);
 
-		if (!DBM::is_result($ph)) {
+		if (!DBM::isResult($ph)) {
 			$ph = q("SELECT `id` FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'
 				LIMIT 1",
 				intval($owner_uid),
 				dbesc($datum)
 			);
-			if (DBM::is_result($ph)) {
+			if (DBM::isResult($ph)) {
 				notice(t('Permission denied. Access to this item may be restricted.'));
 			} else {
 				notice(t('Photo not available') . EOL );
@@ -1291,7 +1291,7 @@ function photos_content(App $a)
 				intval($owner_uid)
 			);
 
-			if (DBM::is_result($prvnxt)) {
+			if (DBM::isResult($prvnxt)) {
 				foreach ($prvnxt as $z => $entry) {
 					if ($entry['resource-id'] == $ph[0]['resource-id']) {
 						$prv = $z - 1;
@@ -1383,7 +1383,7 @@ function photos_content(App $a)
 		$map = null;
 		$link_item = [];
 
-		if (DBM::is_result($linked_items)) {
+		if (DBM::isResult($linked_items)) {
 			$link_item = $linked_items[0];
 
 			$r = q("SELECT COUNT(*) AS `total`
@@ -1398,7 +1398,7 @@ function photos_content(App $a)
 
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$a->set_pager_total($r[0]['total']);
 			}
 
@@ -1510,7 +1510,7 @@ function photos_content(App $a)
 				]);
 			}
 
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				if (($can_post || can_write_wall($owner_uid))) {
 					$comments .= replace_macros($cmnt_tpl, [
 						'$return_path' => '',
@@ -1538,7 +1538,7 @@ function photos_content(App $a)
 			];
 
 			// display comments
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				foreach ($r as $item) {
 					builtin_activity_puller($item, $conv_responses);
 				}
@@ -1693,7 +1693,7 @@ function photos_content(App $a)
 		dbesc('Contact Photos'),
 		dbesc( t('Contact Photos'))
 	);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->set_pager_total(count($r));
 		$a->set_pager_itemspage(20);
 	}
@@ -1711,7 +1711,7 @@ function photos_content(App $a)
 	);
 
 	$photos = [];
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		// "Twist" is only used for the duepunto theme with style "slackr"
 		$twist = false;
 		foreach ($r as $rr) {

@@ -22,7 +22,7 @@ function ignored_init(App $a) {
 		intval(local_user()),
 		intval($message_id)
 	);
-	if (! DBM::is_result($r)) {
+	if (! DBM::isResult($r)) {
 		killme();
 	}
 

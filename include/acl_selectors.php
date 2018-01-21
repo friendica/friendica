@@ -35,7 +35,7 @@ function group_select($selname,$selclass,$preselected = false,$size = 4) {
 
 	Addon::callHooks($a->module . '_pre_' . $selname, $arr);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			if ((is_array($preselected)) && in_array($rr['id'], $preselected)) {
 				$selected = " selected=\"selected\" ";
@@ -157,7 +157,7 @@ function contact_selector($selname, $selclass, $options, $preselected = false)
 
 	Addon::callHooks($a->module . '_pre_' . $selname, $arr);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			if ((is_array($preselected)) && in_array($rr['id'], $preselected)) {
 				$selected = " selected=\"selected\" ";
@@ -237,7 +237,7 @@ function contact_select($selname, $selclass, $preselected = false, $size = 4, $p
 
 	$receiverlist = [];
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach ($r as $rr) {
 			if ((is_array($preselected)) && in_array($rr['id'], $preselected)) {
 				$selected = " selected=\"selected\" ";
@@ -284,7 +284,7 @@ function prune_deadguys($arr) {
 
 	$r = q("SELECT `id` FROM `contact` WHERE `id` IN ( " . $str . ") AND `blocked` = 0 AND `pending` = 0 AND `archive` = 0 ");
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$ret = [];
 		foreach ($r as $rr) {
 			$ret[] = intval($rr['id']);
@@ -340,7 +340,7 @@ function populate_acl($user = null, $show_jotnets = false) {
 			$r = q("SELECT `pubmail` FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1",
 				intval(local_user())
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$mail_enabled = true;
 				if (intval($r[0]['pubmail'])) {
 					$pubmail_enabled = true;
@@ -583,7 +583,7 @@ function acl_lookup(App $a, $out_type = 'json')
 		$r = [];
 	}
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$forums = [];
 		foreach ($r as $g) {
 			$entry = [
@@ -637,7 +637,7 @@ function acl_lookup(App $a, $out_type = 'json')
 				dbesc($search),
 				implode("', '", $known_contacts)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			foreach ($r as $row) {
 				$contact = Contact::getDetailsByURL($row['author-link']);
 

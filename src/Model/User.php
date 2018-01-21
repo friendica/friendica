@@ -58,7 +58,7 @@ class User
 			LIMIT 1",
 			$uid
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return false;
 		}
 		return $r;
@@ -86,7 +86,7 @@ class User
 
 		$user = dba::selectFirst('user', ['def_gid'], ['uid' => $uid]);
 
-		if (DBM::is_result($user)) {
+		if (DBM::isResult($user)) {
 			$default_group = $user["def_gid"];
 		}
 
@@ -138,8 +138,12 @@ class User
 			$user = $user_info;
 		}
 
-		if (!DBM::is_result($user) || !isset($user['uid']) || !isset($user['password'])) {
-			return false;
+		if (!DBM::isResult($user)
+			|| !isset($user['uid'])
+			|| !isset($user['password'])
+			|| !isset($user['legacy_password'])
+		) {
+			throw new Exception('Not enough information to authenticate');
 		}
 
 		$password_hashed = self::hashPassword($password);

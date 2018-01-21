@@ -90,7 +90,7 @@ function notes_content(App $a, $update = false) {
 
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$a->set_pager_total($r[0]['total']);
 		$a->set_pager_itemspage(40);
 	}
@@ -110,7 +110,7 @@ function notes_content(App $a, $update = false) {
 	$parents_arr = [];
 	$parents_str = '';
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		foreach($r as $rr)
 			$parents_arr[] = $rr['item_id'];
 		$parents_str = implode(', ', $parents_arr);
@@ -124,7 +124,7 @@ function notes_content(App $a, $update = false) {
 			dbesc($parents_str)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$items = conv_sort($r,"`commented`");
 
 			$o .= conversation($a,$items,'notes',$update);

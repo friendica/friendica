@@ -24,7 +24,7 @@ function add_thread($itemid, $onlyshadow = false) {
 function update_thread_uri($itemuri, $uid) {
 	$messages = q("SELECT `id` FROM `item` WHERE uri ='%s' AND uid=%d", dbesc($itemuri), intval($uid));
 
-	if (DBM::is_result($messages)) {
+	if (DBM::isResult($messages)) {
 		foreach ($messages as $message) {
 			update_thread($message["id"]);
 		}
@@ -35,7 +35,7 @@ function update_thread($itemid, $setmention = false) {
 	$items = q("SELECT `uid`, `guid`, `title`, `body`, `created`, `edited`, `commented`, `received`, `changed`, `wall`, `private`, `pubmail`, `moderated`, `visible`, `spam`, `starred`, `bookmark`, `contact-id`, `gcontact-id`,
 			`deleted`, `origin`, `forum_mode`, `network`, `rendered-html`, `rendered-hash` FROM `item` WHERE `id` = %d AND (`parent` = %d OR `parent` = 0) LIMIT 1", intval($itemid), intval($itemid));
 
-	if (!DBM::is_result($items)) {
+	if (!DBM::isResult($items)) {
 		return;
 	}
 
@@ -63,7 +63,7 @@ function update_thread($itemid, $setmention = false) {
 	// Updating a shadow item entry
 	$items = q("SELECT `id` FROM `item` WHERE `guid` = '%s' AND `uid` = 0 LIMIT 1", dbesc($item["guid"]));
 
-	if (!DBM::is_result($items)) {
+	if (!DBM::isResult($items)) {
 		return;
 	}
 
@@ -80,7 +80,7 @@ function update_thread($itemid, $setmention = false) {
 function delete_thread_uri($itemuri, $uid) {
 	$messages = q("SELECT `id` FROM `item` WHERE uri ='%s' AND uid=%d", dbesc($itemuri), intval($uid));
 
-	if (DBM::is_result($messages)) {
+	if (DBM::isResult($messages)) {
 		foreach ($messages as $message) {
 			delete_thread($message["id"], $itemuri);
 		}
@@ -90,7 +90,7 @@ function delete_thread_uri($itemuri, $uid) {
 function delete_thread($itemid, $itemuri = "") {
 	$item = q("SELECT `uid` FROM `thread` WHERE `iid` = %d", intval($itemid));
 
-	if (!DBM::is_result($item)) {
+	if (!DBM::isResult($item)) {
 		logger('No thread found for id '.$itemid, LOGGER_DEBUG);
 		return;
 	}
@@ -105,7 +105,7 @@ function delete_thread($itemid, $itemuri = "") {
 				dbesc($itemuri),
 				intval($item["uid"])
 			);
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			dba::delete('item', ['uri' => $itemuri, 'uid' => 0]);
 			logger("delete_thread: Deleted shadow for item ".$itemuri, LOGGER_DEBUG);
 		}

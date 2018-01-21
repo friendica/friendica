@@ -81,7 +81,7 @@ function photo_init(App $a)
 			intval($resolution),
 			intval($uid)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$data = $r[0]['data'];
 			$mimetype = $r[0]['type'];
 		}
@@ -108,7 +108,7 @@ function photo_init(App $a)
 			dbesc($photo),
 			intval($resolution)
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$sql_extra = permissions_sql($r[0]['uid']);
 
 			// Now we'll see if we can access the photo
@@ -116,7 +116,7 @@ function photo_init(App $a)
 				dbesc($photo),
 				intval($resolution)
 			);
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$resolution = $r[0]['scale'];
 				$data = $r[0]['data'];
 				$mimetype = $r[0]['type'];

@@ -99,7 +99,7 @@ function item_post(App $a) {
 		}
 
 		// if this isn't the real parent of the conversation, find it
-		if (DBM::is_result($parent_item)) {
+		if (DBM::isResult($parent_item)) {
 
 			// The URI and the contact is taken from the direct parent which needn't to be the top parent
 			$thr_parent_uri = $parent_item['uri'];
@@ -110,7 +110,7 @@ function item_post(App $a) {
 			}
 		}
 
-		if (!DBM::is_result($parent_item)) {
+		if (!DBM::isResult($parent_item)) {
 			notice(t('Unable to locate original post.') . EOL);
 			if (x($_REQUEST, 'return')) {
 				goaway($return_path);
@@ -174,7 +174,7 @@ function item_post(App $a) {
 	}
 
 	$user = dba::selectFirst('user', [], ['uid' => $profile_uid]);
-	if (!DBM::is_result($user) && !$orig_post) {
+	if (!DBM::isResult($user) && !$orig_post) {
 		return;
 	}
 
@@ -315,7 +315,7 @@ function item_post(App $a) {
 		}
 	}
 
-	if (DBM::is_result($author)) {
+	if (DBM::isResult($author)) {
 		$contact_id = $author['id'];
 	}
 
@@ -543,7 +543,7 @@ function item_post(App $a) {
 		foreach ($match[2] as $mtch) {
 			$fields = ['id', 'filename', 'filesize', 'filetype'];
 			$attachment = dba::selectFirst('attach', $fields, ['id' => $mtch]);
-			if (DBM::is_result($attachment)) {
+			if (DBM::isResult($attachment)) {
 				if (strlen($attachments)) {
 					$attachments .= ',';
 				}
@@ -652,7 +652,7 @@ function item_post(App $a) {
 	$datarray['protocol'] = PROTOCOL_DFRN;
 
 	$r = dba::fetch_first("SELECT `conversation-uri`, `conversation-href` FROM `conversation` WHERE `item-uri` = ?", $datarray['parent-uri']);
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		if ($r['conversation-uri'] != '') {
 			$datarray['conversation-uri'] = $r['conversation-uri'];
 		}
@@ -738,7 +738,7 @@ function item_post(App $a) {
 
 	$datarray = dba::selectFirst('item', [], ['id' => $post_id]);
 
-	if (!DBM::is_result($datarray)) {
+	if (!DBM::isResult($datarray)) {
 		logger("Item with id ".$post_id." couldn't be fetched.");
 		goaway($return_path);
 	}
@@ -929,11 +929,11 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 
 				$r = q("SELECT `alias`, `name` FROM `contact` WHERE `nurl` = '%s' AND `alias` != '' AND `uid` = 0",
 					normalise_link($matches[1]));
-				if (!DBM::is_result($r)) {
+				if (!DBM::isResult($r)) {
 					$r = q("SELECT `alias`, `name` FROM `gcontact` WHERE `nurl` = '%s' AND `alias` != ''",
 						normalise_link($matches[1]));
 				}
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					$data = $r[0];
 				} else {
 					$data = Probe::uri($matches[1]);
@@ -976,7 +976,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			);
 
 			// Then check in the contact table for the url
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				$r = q("SELECT `id`, `url`, `nick`, `name`, `alias`, `network`, `notify`, `forum`, `prv` FROM `contact`
 					WHERE `nurl` = '%s' AND `uid` = %d AND
 						(`network` != '%s' OR (`notify` != '' AND `alias` != ''))
@@ -988,7 +988,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 
 			// Then check in the global contacts for the address
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				$r = q("SELECT `url`, `nick`, `name`, `alias`, `network`, `notify` FROM `gcontact`
 					WHERE `addr` = '%s' AND (`network` != '%s' OR (`notify` != '' AND `alias` != ''))
 					LIMIT 1",
@@ -998,7 +998,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 
 			// Then check in the global contacts for the url
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				$r = q("SELECT `url`, `nick`, `name`, `alias`, `network`, `notify` FROM `gcontact`
 					WHERE `nurl` = '%s' AND (`network` != '%s' OR (`notify` != '' AND `alias` != ''))
 					LIMIT 1",
@@ -1007,7 +1007,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 				);
 			}
 
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				$probed = Probe::uri($name);
 				if ($result['network'] != NETWORK_PHANTOM) {
 					GContact::update($probed);
@@ -1028,7 +1028,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 
 			// select someone by attag or nick and the name passed in the current network
-			if (!DBM::is_result($r) && ($network != ""))
+			if (!DBM::isResult($r) && ($network != ""))
 				$r = q("SELECT `id`, `url`, `nick`, `name`, `alias`, `network` FROM `contact` WHERE `attag` = '%s' OR `nick` = '%s' AND `network` = '%s' AND `uid` = %d ORDER BY `attag` DESC LIMIT 1",
 						dbesc($name),
 						dbesc($name),
@@ -1037,7 +1037,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 				);
 
 			//select someone from this user's contacts by name in the current network
-			if (!DBM::is_result($r) && ($network != "")) {
+			if (!DBM::isResult($r) && ($network != "")) {
 				$r = q("SELECT `id`, `url`, `nick`, `name`, `alias`, `network` FROM `contact` WHERE `name` = '%s' AND `network` = '%s' AND `uid` = %d LIMIT 1",
 						dbesc($name),
 						dbesc($network),
@@ -1046,7 +1046,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 
 			// select someone by attag or nick and the name passed in
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				$r = q("SELECT `id`, `url`, `nick`, `name`, `alias`, `network` FROM `contact` WHERE `attag` = '%s' OR `nick` = '%s' AND `uid` = %d ORDER BY `attag` DESC LIMIT 1",
 						dbesc($name),
 						dbesc($name),
@@ -1055,7 +1055,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 
 			// select someone from this user's contacts by name
-			if (!DBM::is_result($r)) {
+			if (!DBM::isResult($r)) {
 				$r = q("SELECT `id`, `url`, `nick`, `name`, `alias`, `network` FROM `contact` WHERE `name` = '%s' AND `uid` = %d LIMIT 1",
 						dbesc($name),
 						intval($profile_uid)
@@ -1063,7 +1063,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 		}
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			if (strlen($inform) && (isset($r[0]["notify"]) || isset($r[0]["id"]))) {
 				$inform .= ',';
 			}

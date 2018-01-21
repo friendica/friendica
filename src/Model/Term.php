@@ -17,7 +17,7 @@ class Term
 	public static function createFromItem($itemid)
 	{
 		$message = dba::selectFirst('item', ['uid', 'deleted', 'file'], ['id' => $itemid]);
-		if (!\Friendica\Database\DBM::is_result($message)) {
+		if (!\Friendica\Database\DBM::isResult($message)) {
 			return;
 		}
 

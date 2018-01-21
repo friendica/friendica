@@ -77,7 +77,7 @@ class Item
 		// locate item to be deleted
 		$fields = ['id', 'uid', 'parent', 'parent-uri', 'origin', 'deleted', 'file', 'resource-id', 'event-id', 'attach'];
 		$item = dba::selectFirst('item', $fields, ['id' => $item_id]);
-		if (!DBM::is_result($item)) {
+		if (!DBM::isResult($item)) {
 			return false;
 		}
 
@@ -86,7 +86,7 @@ class Item
 		}
 
 		$parent = dba::selectFirst('item', ['origin'], ['id' => $item['parent']]);
-		if (!DBM::is_result($parent)) {
+		if (!DBM::isResult($parent)) {
 			$parent = ['origin' => false];
 		}
 
@@ -172,7 +172,7 @@ class Item
 		$condition = ["`id` = ? AND (`parent` = ? OR `parent` = 0)", $itemid, $itemid];
 		$item = dba::selectFirst('item', $fields, $condition);
 
-		if (!DBM::is_result($item)) {
+		if (!DBM::isResult($item)) {
 			return;
 		}
 
@@ -216,7 +216,7 @@ class Item
 
 		$item = dba::selectFirst('item', [], ['id' => $itemid]);
 
-		if (DBM::is_result($item) && ($item["allow_cid"] == '')  && ($item["allow_gid"] == '') &&
+		if (DBM::isResult($item) && ($item["allow_cid"] == '')  && ($item["allow_gid"] == '') &&
 			($item["deny_cid"] == '') && ($item["deny_gid"] == '')) {
 
 			if (!dba::exists('item', ['uri' => $item['uri'], 'uid' => 0])) {
@@ -250,7 +250,7 @@ class Item
 	public static function addShadowPost($itemid)
 	{
 		$item = dba::selectFirst('item', [], ['id' => $itemid]);
-		if (!DBM::is_result($item)) {
+		if (!DBM::isResult($item)) {
 			return;
 		}
 
@@ -402,7 +402,7 @@ class Item
 		if (!$update && ($arr["network"] == NETWORK_DFRN) && ($arr["parent-uri"] === $arr["uri"])) {
 			$isforum = q("SELECT `forum` FROM `contact` WHERE `id` = %d AND `forum`",
 					intval($arr['contact-id']));
-			if (DBM::is_result($isforum)) {
+			if (DBM::isResult($isforum)) {
 				$update = true;
 			}
 		}

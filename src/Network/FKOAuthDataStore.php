@@ -47,7 +47,7 @@ class FKOAuthDataStore extends OAuthDataStore
 		$s = dba::select('clients', ['client_id', 'pw', 'redirect_uri'], ['client_id' => $consumer_key]);
 		$r = dba::inArray($s);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			return new \OAuthConsumer($r[0]['client_id'], $r[0]['pw'], $r[0]['redirect_uri']);
 		}
 
@@ -67,7 +67,7 @@ class FKOAuthDataStore extends OAuthDataStore
 		$s = dba::select('tokens', ['id', 'secret', 'scope', 'expires', 'uid'], ['client_id' => $consumer->key, 'scope' => $token_type, 'id' => $token]);
 		$r = dba::inArray($s);
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$ot = new \OAuthToken($r[0]['id'], $r[0]['secret']);
 			$ot->scope = $r[0]['scope'];
 			$ot->expires = $r[0]['expires'];
@@ -88,7 +88,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	public function lookup_nonce($consumer, $token, $nonce, $timestamp)
 	{
 		$token = dba::selectFirst('tokens', ['id', 'secret'], ['client_id' => $consumer->key, 'id' => $nonce, 'expires' => $timestamp]);
-		if (DBM::is_result($token)) {
+		if (DBM::isResult($token)) {
 			return new \OAuthToken($token['id'], $token['secret']);
 		}
 

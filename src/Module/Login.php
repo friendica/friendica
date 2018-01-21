@@ -151,7 +151,7 @@ class Login extends BaseModule
 						'verified'        => true,
 					]
 				);
-				if (DBM::is_result($user)) {
+				if (DBM::isResult($user)) {
 					if ($data->hash != cookie_hash($user)) {
 						logger("Hash for user " . $data->uid . " doesn't fit.");
 						nuke_session();
@@ -181,7 +181,7 @@ class Login extends BaseModule
 				$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 					intval($_SESSION['visitor_id'])
 				);
-				if (DBM::is_result($r)) {
+				if (DBM::isResult($r)) {
 					self::getApp()->contact = $r[0];
 				}
 			}
@@ -206,7 +206,7 @@ class Login extends BaseModule
 						'verified'        => true,
 					]
 				);
-				if (!DBM::is_result($user)) {
+				if (!DBM::isResult($user)) {
 					nuke_session();
 					goaway(self::getApp()->get_baseurl());
 				}

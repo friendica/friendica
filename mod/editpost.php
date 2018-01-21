@@ -32,7 +32,7 @@ function editpost_content(App $a) {
 		intval(local_user())
 	);
 
-	if (! DBM::is_result($itm)) {
+	if (! DBM::isResult($itm)) {
 		notice( t('Item not found') . EOL);
 		return;
 	}
@@ -77,7 +77,7 @@ function editpost_content(App $a) {
 		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1",
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$mail_enabled = true;
 			if(intval($r[0]['pubmail']))
 				$pubmail_enabled = true;

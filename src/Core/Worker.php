@@ -150,7 +150,7 @@ class Worker
 	private static function totalEntries()
 	{
 		$s = dba::fetch_first("SELECT COUNT(*) AS `total` FROM `workerqueue` WHERE `executed` <= ? AND NOT `done`", NULL_DATE);
-		if (DBM::is_result($s)) {
+		if (DBM::isResult($s)) {
 			return $s["total"];
 		} else {
 			return 0;
@@ -166,7 +166,7 @@ class Worker
 	{
 		$condition = ["`executed` <= ? AND NOT `done`", NULL_DATE];
 		$workerqueue = dba::selectFirst('workerqueue', ['priority'], $condition, ['order' => ['priority']]);
-		if (DBM::is_result($workerqueue)) {
+		if (DBM::isResult($workerqueue)) {
 			return $workerqueue["priority"];
 		} else {
 			return 0;
@@ -458,7 +458,7 @@ class Worker
 		if ($max == 0) {
 			// the maximum number of possible user connections can be a system variable
 			$r = dba::fetch_first("SHOW VARIABLES WHERE `variable_name` = 'max_user_connections'");
-			if (DBM::is_result($r)) {
+			if (DBM::isResult($r)) {
 				$max = $r["Value"];
 			}
 			// Or it can be granted. This overrides the system variable
@@ -494,7 +494,7 @@ class Worker
 		// We will now check for the system values.
 		// This limit could be reached although the user limits are fine.
 		$r = dba::fetch_first("SHOW VARIABLES WHERE `variable_name` = 'max_connections'");
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return false;
 		}
 		$max = intval($r["Value"]);
@@ -502,7 +502,7 @@ class Worker
 			return false;
 		}
 		$r = dba::fetch_first("SHOW STATUS WHERE `variable_name` = 'Threads_connected'");
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return false;
 		}
 		$used = intval($r["Value"]);
@@ -704,7 +704,7 @@ class Worker
 		);
 
 		// No active processes at all? Fine
-		if (!DBM::is_result($r)) {
+		if (!DBM::isResult($r)) {
 			return false;
 		}
 		$priorities = [];
@@ -841,7 +841,7 @@ class Worker
 
 		// There can already be jobs for us in the queue.
 		$r = dba::select('workerqueue', [], ['pid' => getmypid(), 'done' => false]);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			self::$db_duration += (microtime(true) - $stamp);
 			return dba::inArray($r);
 		}

@@ -33,7 +33,7 @@ function cal_init(App $a)
 	if ($a->argc > 1) {
 		$nick = $a->argv[1];
 		$user = dba::selectFirst('user', [], ['nickname' => $nick, 'blocked' => false]);
-		if (!DBM::is_result($user)) {
+		if (!DBM::isResult($user)) {
 			return;
 		}
 
@@ -127,7 +127,7 @@ function cal_content(App $a)
 			intval($contact_id),
 			intval($a->profile['profile_uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$remote_contact = true;
 		}
 	}
@@ -225,7 +225,7 @@ function cal_content(App $a)
 
 		$links = [];
 
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$r = sort_by_date($r);
 			foreach ($r as $rr) {
 				$j = (($rr['adjust']) ? datetime_convert('UTC', date_default_timezone_get(), $rr['start'], 'j') : datetime_convert('UTC', 'UTC', $rr['start'], 'j'));

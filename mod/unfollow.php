@@ -29,7 +29,7 @@ function unfollow_post(App $a)
 			normalise_link($url), $url, NETWORK_STATUSNET];
 	$contact = dba::selectFirst('contact', [], $condition);
 
-	if (!DBM::is_result($contact)) {
+	if (!DBM::isResult($contact)) {
 		notice(t("Contact wasn't found or can't be unfollowed."));
 	} else {
 		if (in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA])) {
@@ -37,7 +37,7 @@ function unfollow_post(App $a)
 				WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 				intval($uid)
 			);
- 			if (DBM::is_result($r)) {
+ 			if (DBM::isResult($r)) {
 				Contact::terminateFriendship($r[0], $contact);
 			}
 		}
@@ -68,7 +68,7 @@ function unfollow_content(App $a) {
 			normalise_link($url), $url, NETWORK_STATUSNET];
 	$contact = dba::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
 
-	if (!DBM::is_result($contact)) {
+	if (!DBM::isResult($contact)) {
 		notice(t("You aren't a friend of this contact.").EOL);
 		$submit = "";
 		// NOTREACHED

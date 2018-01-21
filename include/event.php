@@ -259,7 +259,7 @@ function event_store($arr) {
 		);
 	}
 
-	if (DBM::is_result($c)) {
+	if (DBM::isResult($c)) {
 		$contact = $c[0];
 	}
 
@@ -271,14 +271,14 @@ function event_store($arr) {
 			intval($arr['id']),
 			intval($arr['uid'])
 		);
-		if ((! DBM::is_result($r)) || ($r[0]['edited'] === $arr['edited'])) {
+		if ((! DBM::isResult($r)) || ($r[0]['edited'] === $arr['edited'])) {
 
 			// Nothing has changed. Grab the item id to return.
 			$r = q("SELECT * FROM `item` WHERE `event-id` = %d AND `uid` = %d LIMIT 1",
 				intval($arr['id']),
 				intval($arr['uid'])
 			);
-			return ((DBM::is_result($r)) ? $r[0]['id'] : 0);
+			return ((DBM::isResult($r)) ? $r[0]['id'] : 0);
 		}
 
 		// The event changed. Update it.
@@ -311,7 +311,7 @@ function event_store($arr) {
 			intval($arr['id']),
 			intval($arr['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$object = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($arr['uri']) . '</id>';
 			$object .= '<content>' . xmlify(format_event_bbcode($arr)) . '</content>';
 			$object .= '</object>' . "\n";
@@ -361,7 +361,7 @@ function event_store($arr) {
 			dbesc($arr['uri']),
 			intval($arr['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBM::isResult($r)) {
 			$event = $r[0];
 		}
 
@@ -529,7 +529,7 @@ function event_by_id($owner_uid = 0, $event_params, $sql_extra = '') {
 		intval($event_params["event_id"])
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		return event_remove_duplicates($r);
 	}
 }
@@ -573,7 +573,7 @@ function events_by_date($owner_uid = 0, $event_params, $sql_extra = '') {
 			dbesc($event_params["adjust_finish"])
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		return event_remove_duplicates($r);
 	}
 }
@@ -793,7 +793,7 @@ function events_by_uid($uid = 0, $sql_extra = '') {
 		);
 	}
 
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		return $r;
 	}
 }
@@ -817,7 +817,7 @@ function event_export($uid, $format = 'ical') {
 	// We are allowed to show events.
 	// Get the timezone the user is in.
 	$r = q("SELECT `timezone` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
-	if (DBM::is_result($r)) {
+	if (DBM::isResult($r)) {
 		$timezone = $r[0]['timezone'];
 	}
 
