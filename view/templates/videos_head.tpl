@@ -1,6 +1,6 @@
-<link href="library/video-js/video-js.css" rel="stylesheet">
-<script src="library/video-js/video.js"></script>
+<link href="{{$baseurl}}/vendor/asset/video.js/dist/video-js/video-js.min.css" rel="stylesheet">
+<script src="{{$baseurl}}/vendor/asset/video.js/dist/video-js/video.js"></script>
 <script>
-   videojs.options.flash.swf = "{{$baseurl}}/library/video-js/video-js.swf"
+   videojs.options.flash.swf = "{{$baseurl}}/{{$baseurl}}/vendor/asset/video.js/dist/video-js/video-js.swf"
 </script>
 
