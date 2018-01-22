@@ -1,2 +1,2 @@
-<link href="library/video-js/video-js.css" rel="stylesheet">
+<link href="{{$baseurl}}/vendor/asset/video.js/dist/video-js/video-js.min.css" rel="stylesheet">
 

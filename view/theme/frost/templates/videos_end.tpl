@@ -1,5 +1,4 @@
-<script src="library/video-js/video.js"></script>
+<script src="{{$baseurl}}/vendor/asset/video.js/dist/video-js/video.js"></script>
 <script>
-   videojs.options.flash.swf = "{{$baseurl}}/library/video-js/video-js.swf"
+   videojs.options.flash.swf = "{{$baseurl}}/vendor/asset/video.js/dist/video-js/video-js.swf"
 </script>
-

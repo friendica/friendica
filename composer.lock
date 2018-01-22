@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7fcbb730be98076fe8318b03c858f41c",
+    "content-hash": "342caf5272470d21c2dd3f1984014b04",
     "packages": [
         {
             "name": "bower-asset/Chart-js",
@@ -452,6 +452,142 @@
                 "ui"
             ],
             "time": "2016-05-10T22:22:39+00:00"
+        },
+        {
+            "name": "npm-asset/video.js",
+            "version": "4.11.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/video.js/-/video.js-4.11.4.tgz",
+                "reference": null,
+                "shasum": "b7834854aacb48613317be0afe128f0ded99f5c6"
+            },
+            "require": {
+                "npm-asset/videojs-swf": "4.5.3"
+            },
+            "require-dev": {
+                "npm-asset/calcdeps": "~0.1.7",
+                "npm-asset/chg": "~0.1.8",
+                "npm-asset/contribflow": "~0.2.0",
+                "npm-asset/github": "~0.1.14",
+                "npm-asset/grunt": ">=0.4.4,<0.5.0",
+                "npm-asset/grunt-banner": "~0.2.0",
+                "npm-asset/grunt-cli": "~0.1.0",
+                "npm-asset/grunt-contrib-clean": "~0.4.0-alpha1",
+                "npm-asset/grunt-contrib-connect": "~0.7.1",
+                "npm-asset/grunt-contrib-copy": "~0.3.2",
+                "npm-asset/grunt-contrib-cssmin": "~0.6.0",
+                "npm-asset/grunt-contrib-jshint": "~0.4.3",
+                "npm-asset/grunt-contrib-less": "~0.6.4",
+                "npm-asset/grunt-contrib-qunit": "~0.2.1",
+                "npm-asset/grunt-contrib-watch": "~0.1.4",
+                "npm-asset/grunt-karma": ">=0.8.3,<0.9.0",
+                "npm-asset/grunt-s3": "~0.2.0-alpha1",
+                "npm-asset/grunt-tagrelease": "~0.3.3",
+                "npm-asset/grunt-version": "~0.3.0",
+                "npm-asset/grunt-videojs-languages": "0.0.4",
+                "npm-asset/grunt-zip": "0.10.2",
+                "npm-asset/karma": ">=0.12.14,<0.13.0",
+                "npm-asset/karma-chrome-launcher": ">=0.1.3,<0.2.0",
+                "npm-asset/karma-firefox-launcher": ">=0.1.3,<0.2.0",
+                "npm-asset/karma-ie-launcher": ">=0.1.5,<0.2.0",
+                "npm-asset/karma-opera-launcher": "~0.1.0",
+                "npm-asset/karma-phantomjs-launcher": ">=0.1.4,<0.2.0",
+                "npm-asset/karma-qunit": ">=0.1.2,<0.2.0",
+                "npm-asset/karma-safari-launcher": ">=0.1.1,<0.2.0",
+                "npm-asset/karma-sauce-launcher": ">=0.2.8,<0.3.0",
+                "npm-asset/karma-sinon": ">=1.0.3,<2.0.0",
+                "npm-asset/mocha": "~1.8.1",
+                "npm-asset/open": "0.0.4",
+                "npm-asset/qunitjs": "~1.14.0",
+                "npm-asset/semver": "~1.1.4",
+                "npm-asset/sinon": "~1.9.1",
+                "npm-asset/uglify-js": "~2.3.6",
+                "npm-asset/videojs-doc-generator": "0.0.1"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/videojs/video.js/issues"
+                },
+                "npm-asset-main": "./dist/video-js/video.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "https://github.com/videojs/video.js.git"
+                },
+                "npm-asset-scripts": {
+                    "test": "grunt test"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Steve Heffernan"
+                }
+            ],
+            "description": "An HTML5 and Flash video player with a common API and skin for both.",
+            "homepage": "http://videojs.com",
+            "keywords": [
+                "flash",
+                "html5",
+                "player",
+                "video",
+                "videojs"
+            ],
+            "time": "2015-01-23T18:53:18+00:00"
+        },
+        {
+            "name": "npm-asset/videojs-swf",
+            "version": "4.5.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/videojs-swf/-/videojs-swf-4.5.3.tgz",
+                "reference": null,
+                "shasum": "978b1e06b1f5b23c3cd5ca50453fffb00d2d8a82"
+            },
+            "require-dev": {
+                "npm-asset/async": "~0.2.9",
+                "npm-asset/chg": "~0.1.5",
+                "npm-asset/flex-sdk": "4.6.0-patch0",
+                "npm-asset/grunt": "~0.4.0",
+                "npm-asset/grunt-bumpup": "~0.5.0",
+                "npm-asset/grunt-cli": "~0.1.0",
+                "npm-asset/grunt-connect": "~0.2.0",
+                "npm-asset/grunt-contrib-jshint": "~0.4.3",
+                "npm-asset/grunt-contrib-qunit": "~0.2.1",
+                "npm-asset/grunt-contrib-watch": "~0.1.4",
+                "npm-asset/grunt-npm": "~0.0.2",
+                "npm-asset/grunt-prompt": "~0.1.2",
+                "npm-asset/grunt-shell": "~0.6.1",
+                "npm-asset/grunt-tagrelease": "~0.3.1",
+                "npm-asset/qunitjs": "~1.12.0",
+                "npm-asset/video.js": ">=4.9.0,<5.0.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/videojs/video-js-swf/issues"
+                },
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "https://github.com/videojs/video-js-swf.git"
+                },
+                "npm-asset-scripts": []
+            },
+            "authors": [
+                {
+                    "name": "Brightcove"
+                }
+            ],
+            "description": "The Flash-fallback video player for video.js (http://videojs.com)",
+            "homepage": "http://videojs.com",
+            "keywords": [
+                "flash",
+                "player",
+                "video"
+            ],
+            "time": "2015-01-22T21:25:29+00:00"
         },
         {
             "name": "paragonie/random_compat",

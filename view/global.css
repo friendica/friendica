@@ -138,6 +138,11 @@ span.connector {
   transition: height .75s;
 }
 
+.video-js {
+	/* Enforce a dynamic 16:9 ratio for video.js embed */
+	padding-bottom: 56.25% !important;
+}
+
 /* Shared Messages */
 .shared_header {
   min-height: 32px;
