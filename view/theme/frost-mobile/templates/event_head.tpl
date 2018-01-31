@@ -1,6 +1,5 @@
 
 <link rel="stylesheet" type="text/css" href="{{$baseurl}}/vendor/asset/fullcalendar/dist/fullcalendar.min.css" />
-<link rel="stylesheet" type="text/css" href="{{$baseurl}}/vendor/asset/fullcalendar/dist/fullcalendar.print.min.css" />
 
 <script language="javascript" type="text/javascript">
 window.aclType = 'event_head';
