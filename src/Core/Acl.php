@@ -153,17 +153,12 @@ class Acl extends BaseObject
 	 *
 	 * @param string $selname     Name attribute of the select input tag
 	 * @param string $selclass    Class attribute of the select input tag
-	 * @param array  $preselected Contact ID that should be already selected
+	 * @param array  $preselected Contact IDs that should be already selected
 	 * @param int    $size        Length of the select box
-	 * @param bool   $privmail
-	 * @param bool   $celeb
-	 * @param bool   $privatenet
 	 * @param int    $tabindex    Select input tag tabindex attribute
 	 * @return string
 	 */
-	public static function getMessageContactSelectHTML(
-	$selname, $selclass, array $preselected = [], $size = 4, $privmail = false, $celeb = false, $privatenet = false,
-		$tabindex = null)
+	public static function getMessageContactSelectHTML($selname, $selclass, array $preselected = [], $size = 4, $tabindex = null)
 	{
 		$a = self::getApp();
 
@@ -171,34 +166,18 @@ class Acl extends BaseObject
 
 		// When used for private messages, we limit correspondence to mutual DFRN/Friendica friends and the selector
 		// to one recipient. By default our selector allows multiple selects amongst all contacts.
-
-		$sql_extra = '';
-
-		if ($privmail || $celeb) {
-			$sql_extra .= sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
-		}
-
-		if ($privmail) {
-			$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ", NETWORK_DFRN, NETWORK_DIASPORA);
-		} elseif ($privatenet) {
-			$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s', '%s', '%s') ", NETWORK_DFRN, NETWORK_MAIL, NETWORK_FACEBOOK,
-				NETWORK_DIASPORA);
-		}
+		$sql_extra = sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
+		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ", NETWORK_DFRN, NETWORK_DIASPORA);
 
 		$tabindex_attr = !empty($tabindex) ? ' tabindex="' . intval($tabindex) . '"' : '';
 
-		if ($privmail && $preselected) {
+		$hidepreselected = '';
+		if ($preselected) {
 			$sql_extra .= " AND `id` IN (" . implode(",", $preselected) . ")";
 			$hidepreselected = ' style="display: none;"';
-		} else {
-			$hidepreselected = '';
 		}
 
-		if ($privmail) {
-			$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"$size\"$tabindex_attr$hidepreselected>\r\n";
-		} else {
-			$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"$size\"$tabindex_attr>\r\n";
-		}
+		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"$size\"$tabindex_attr$hidepreselected>\r\n";
 
 		$stmt = dba::p("SELECT `id`, `name`, `url`, `network` FROM `contact`
 			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
@@ -211,7 +190,6 @@ class Acl extends BaseObject
 		$arr = ['contact' => $contacts, 'entry' => $o];
 
 		// e.g. 'network_pre_contact_deny', 'profile_pre_contact_allow'
-
 		Addon::callHooks($a->module . '_pre_' . $selname, $arr);
 
 		$receiverlist = [];
@@ -224,11 +202,7 @@ class Acl extends BaseObject
 					$selected = '';
 				}
 
-				if ($privmail) {
-					$trimmed = Protocol::formatMention($contact['url'], $contact['name']);
-				} else {
-					$trimmed = mb_substr($contact['name'], 0, 20);
-				}
+				$trimmed = Protocol::formatMention($contact['url'], $contact['name']);
 
 				$receiverlist[] = $trimmed;
 
@@ -238,7 +212,7 @@ class Acl extends BaseObject
 
 		$o .= '</select>' . PHP_EOL;
 
-		if ($privmail && $preselected) {
+		if ($preselected) {
 			$o .= implode(', ', $receiverlist);
 		}
 
