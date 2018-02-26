@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Acl;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -1084,7 +1085,7 @@ function photos_content(App $a)
 
 		$tpl = get_markup_template('photos_upload.tpl');
 
-		$aclselect_e = ($visitor ? '' : populate_acl($a->user));
+		$aclselect_e = ($visitor ? '' : Acl::getFullSelectorHTML($a->user));
 
 		$o .= replace_macros($tpl,[
 			'$pagename' => L10n::t('Upload Photos'),
@@ -1425,7 +1426,7 @@ function photos_content(App $a)
 
 			$album_e = $ph[0]['album'];
 			$caption_e = $ph[0]['desc'];
-			$aclselect_e = populate_acl($ph[0]);
+			$aclselect_e = Acl::getFullSelectorHTML($ph[0]);
 
 			$edit = replace_macros($edit_tpl, [
 				'$id' => $ph[0]['id'],

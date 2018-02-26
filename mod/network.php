@@ -429,7 +429,7 @@ function networkFlatView(App $a, $update = 0)
 			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
 			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
 			'default_perms' => Acl::getDefaultUserPermissions($a->user),
-			'acl' => populate_acl($a->user, true),
+			'acl' => Acl::getFullSelectorHTML($a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -578,7 +578,7 @@ function networkThreadedView(App $a, $update = 0)
 			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
 			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
 			'default_perms' => Acl::getDefaultUserPermissions($a->user),
-			'acl' => populate_acl((($gid || $cid || $nets) ? $def_acl : $a->user), true),
+			'acl' => Acl::getFullSelectorHTML((($gid || $cid || $nets) ? $def_acl : $a->user), true),
 			'bang' => (($gid || $cid || $nets) ? '!' : ''),
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
