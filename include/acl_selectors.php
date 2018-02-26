@@ -9,10 +9,6 @@ use Friendica\Model\Contact;
 
 require_once "mod/proxy.php";
 
-function get_acl_permissions($user = null) {
-	return Acl::getDefaultUserPermissions($user);
-}
-
 function populate_acl($user = null, $show_jotnets = false) {
 	return Acl::getFullSelectorHTML($user, $show_jotnets);
 }
