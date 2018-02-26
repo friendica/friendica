@@ -27,7 +27,6 @@ use Friendica\Util\Map;
 use Friendica\Util\Temporal;
 
 require_once 'include/items.php';
-require_once 'include/acl_selectors.php';
 require_once 'include/security.php';
 
 function photos_init(App $a) {

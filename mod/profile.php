@@ -119,7 +119,6 @@ function profile_content(App $a, $update = 0)
 
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
-	require_once 'include/acl_selectors.php';
 	require_once 'include/items.php';
 
 	$groups = [];

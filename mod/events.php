@@ -479,8 +479,6 @@ function events_content(App $a) {
 		$fhour   = ((x($orig_event)) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'H') : '00');
 		$fminute = ((x($orig_event)) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'i') : '00');
 
-		require_once 'include/acl_selectors.php' ;
-
 		$perms = Acl::getDefaultUserPermissions($orig_event);
 
 		if ($mode === 'new' || $mode === 'copy') {

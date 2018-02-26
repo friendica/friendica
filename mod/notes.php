@@ -33,7 +33,6 @@ function notes_content(App $a, $update = false)
 
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
-	require_once 'include/acl_selectors.php';
 	$groups = [];
 
 

@@ -146,7 +146,6 @@ function group_content(App $a) {
 	}
 
 	if (($a->argc > 1) && (intval($a->argv[1]))) {
-		require_once 'include/acl_selectors.php';
 		require_once 'mod/contacts.php';
 
 		$r = q("SELECT * FROM `group` WHERE `id` = %d AND `uid` = %d AND `deleted` = 0 LIMIT 1",

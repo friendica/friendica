@@ -16,7 +16,6 @@ use Friendica\Model\Mail;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
-require_once 'include/acl_selectors.php';
 require_once 'include/conversation.php';
 
 function message_init(App $a)

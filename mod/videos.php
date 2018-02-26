@@ -19,7 +19,6 @@ use Friendica\Protocol\DFRN;
 use Friendica\Util\DateTimeFormat;
 
 require_once 'include/items.php';
-require_once 'include/acl_selectors.php';
 require_once 'include/security.php';
 
 function videos_init(App $a) {

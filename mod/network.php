@@ -25,7 +25,6 @@ use Friendica\Util\DateTimeFormat;
 
 require_once 'include/conversation.php';
 require_once 'include/items.php';
-require_once 'include/acl_selectors.php';
 
 function network_init(App $a)
 {

@@ -9,7 +9,6 @@ use Friendica\Core\Addon;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 
-require_once 'include/acl_selectors.php';
 require_once 'include/dba.php';
 require_once 'mod/proxy.php';
 

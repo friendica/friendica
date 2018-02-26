@@ -289,7 +289,6 @@ class Group extends BaseObject
 		}
 
 		if ($check_dead && !$use_gcontact) {
-			require_once 'include/acl_selectors.php';
 			Contact::pruneUnavailable($return);
 		}
 		return $return;

@@ -1000,8 +1000,6 @@ function settings_content(App $a)
 	 * ACCOUNT SETTINGS
 	 */
 
-	require_once('include/acl_selectors.php');
-
 	$profile = dba::selectFirst('profile', [], ['is-default' => true, 'uid' => local_user()]);
 	if (!DBM::is_result($profile)) {
 		notice(L10n::t('Unable to find your profile. Please contact your admin.') . EOL);

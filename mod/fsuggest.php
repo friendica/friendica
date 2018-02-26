@@ -76,8 +76,6 @@ function fsuggest_post(App $a)
 
 function fsuggest_content(App $a)
 {
-	require_once 'include/acl_selectors.php';
-
 	if (! local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
