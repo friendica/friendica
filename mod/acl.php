@@ -18,14 +18,14 @@ function acl_content(App $a)
 		return '';
 	}
 
-	$start = defaults($_REQUEST, 'start', 0);
-	$count = defaults($_REQUEST, 'count', 100);
-	$search = defaults($_REQUEST, 'search', '');
-	$type = defaults($_REQUEST, 'type', '');
+	$start   = defaults($_REQUEST, 'start'       , 0);
+	$count   = defaults($_REQUEST, 'count'       , 100);
+	$search  = defaults($_REQUEST, 'search'      , '');
+	$type    = defaults($_REQUEST, 'type'        , '');
 	$conv_id = defaults($_REQUEST, 'conversation', null);
 
 	// For use with jquery.textcomplete for private mail completion
-	if (x($_REQUEST, 'query')) {
+	if (!empty($_REQUEST['query'])) {
 		if (!$type) {
 			$type = 'm';
 		}
@@ -43,17 +43,17 @@ function acl_content(App $a)
 	}
 
 	// count groups and contacts
+	$group_count = 0;
 	if ($type == '' || $type == 'g') {
 		$r = q("SELECT COUNT(*) AS g FROM `group` WHERE `deleted` = 0 AND `uid` = %d $sql_extra",
 			intval(local_user())
 		);
 		$group_count = (int) $r[0]['g'];
-	} else {
-		$group_count = 0;
 	}
 
 	$sql_extra2 .= ' ' . Widget::unavailableNetworks();
 
+	$contact_count = 0;
 	if ($type == '' || $type == 'c') {
 		// autocomplete for editor mentions
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
@@ -95,8 +95,6 @@ function acl_content(App $a)
 			intval(local_user())
 		);
 		$contact_count = (int) $r[0]['c'];
-	} else {
-		$contact_count = 0;
 	}
 
 	$tot = $group_count + $contact_count;
@@ -122,12 +120,12 @@ function acl_content(App $a)
 
 		foreach ($r as $g) {
 			$groups[] = [
-				'type' => 'g',
+				'type'  => 'g',
 				'photo' => 'images/twopeople.png',
-				'name' => htmlentities($g['name']),
-				'id' => intval($g['id']),
-				'uids' => array_map('intval', explode(',', $g['uids'])),
-				'link' => '',
+				'name'  => htmlentities($g['name']),
+				'id'    => intval($g['id']),
+				'uids'  => array_map('intval', explode(',', $g['uids'])),
+				'link'  => '',
 				'forum' => '0'
 			];
 		}
@@ -136,50 +134,51 @@ function acl_content(App $a)
 		}
 	}
 
+	$r = [];
 	if ($type == '') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv`, (`prv` OR `forum`) AS `frm` FROM `contact`
-			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
-			AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s', '%s'))
-			$sql_extra2
-			ORDER BY `name` ASC ",
+				WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
+				AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s', '%s'))
+				$sql_extra2
+				ORDER BY `name` ASC ",
 			intval(local_user()),
 			dbesc(NETWORK_OSTATUS),
 			dbesc(NETWORK_STATUSNET)
 		);
 	} elseif ($type == 'c') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
-			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
-			AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s'))
-			$sql_extra2
-			ORDER BY `name` ASC ",
+				WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
+				AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s'))
+				$sql_extra2
+				ORDER BY `name` ASC ",
 			intval(local_user()),
 			dbesc(NETWORK_STATUSNET)
 		);
 	} elseif ($type == 'f') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
-			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
-			AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s'))
-			AND (`forum` OR `prv`)
-			$sql_extra2
-			ORDER BY `name` ASC ",
+				WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
+				AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s'))
+				AND (`forum` OR `prv`)
+				$sql_extra2
+				ORDER BY `name` ASC ",
 			intval(local_user()),
 			dbesc(NETWORK_STATUSNET)
 		);
 	} elseif ($type == 'm') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr` FROM `contact`
-			WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive`
-			AND `success_update` >= `failure_update` AND `network` IN ('%s', '%s')
-			$sql_extra2
-			ORDER BY `name` ASC ",
+				WHERE `uid` = %d AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive`
+				AND `success_update` >= `failure_update` AND `network` IN ('%s', '%s')
+				$sql_extra2
+				ORDER BY `name` ASC ",
 			intval(local_user()),
 			dbesc(NETWORK_DFRN),
 			dbesc(NETWORK_DIASPORA)
 		);
 	} elseif ($type == 'a') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
-			WHERE `uid` = %d AND `pending` = 0 AND `success_update` >= `failure_update`
-			$sql_extra2
-			ORDER BY `name` ASC ",
+				WHERE `uid` = %d AND `pending` = 0 AND `success_update` >= `failure_update`
+				$sql_extra2
+				ORDER BY `name` ASC ",
 			intval(local_user())
 		);
 	} elseif ($type == 'x') {
@@ -194,10 +193,10 @@ function acl_content(App $a)
 			$contacts[] = [
 				'photo'   => proxy_url($g['photo'], false, PROXY_SIZE_MICRO),
 				'name'    => $g['name'],
-				'nick'    => (x($g['addr']) ? $g['addr'] : $g['url']),
+				'nick'    => defaults($g, 'addr', $g['url']),
 				'network' => $g['network'],
 				'link'    => $g['url'],
-				'forum'   => (x($g['community']) ? 1 : 0),
+				'forum'   => !empty($g['community']) ? 1 : 0,
 			];
 		}
 		$o = [
@@ -206,9 +205,7 @@ function acl_content(App $a)
 			'items' => $contacts,
 		];
 		echo json_encode($o);
-		killme();
-	} else {
-		$r = [];
+		exit;
 	}
 
 	if (DBM::is_result($r)) {
@@ -221,9 +218,9 @@ function acl_content(App $a)
 				'id'      => intval($g['id']),
 				'network' => $g['network'],
 				'link'    => $g['url'],
-				'nick'    => htmlentities(($g['attag']) ? $g['attag'] : $g['nick']),
-				'addr'    => htmlentities(($g['addr']) ? $g['addr'] : $g['url']),
-				'forum'   => ((x($g, 'forum') || x($g, 'prv')) ? 1 : 0),
+				'nick'    => htmlentities(defaults($g, 'attag', $g['nick'])),
+				'addr'    => htmlentities(defaults($g, 'addr', $g['url'])),
+				'forum'   => !empty($g['forum']) || !empty($g['prv']) ? 1 : 0,
 			];
 			if ($entry['forum']) {
 				$forums[] = $entry;
@@ -269,15 +266,15 @@ function acl_content(App $a)
 
 				if (count($contact) > 0) {
 					$unknown_contacts[] = [
-						'type' => 'c',
-						'photo' => proxy_url($contact['micro'], false, PROXY_SIZE_MICRO),
-						'name' => htmlentities($contact['name']),
-						'id' => intval($contact['cid']),
+						'type'    => 'c',
+						'photo'   => proxy_url($contact['micro'], false, PROXY_SIZE_MICRO),
+						'name'    => htmlentities($contact['name']),
+						'id'      => intval($contact['cid']),
 						'network' => $contact['network'],
-						'link' => $contact['url'],
-						'nick' => htmlentities($contact['nick'] ?: $contact['addr']),
-						'addr' => htmlentities(($contact['addr']) ? $contact['addr'] : $contact['url']),
-						'forum' => $contact['forum']
+						'link'    => $contact['url'],
+						'nick'    => htmlentities(defaults($contact, 'nick', $contact['addr'])),
+						'addr'    => htmlentities(defaults($contact, 'addr', $contact['url'])),
+						'forum'   => $contact['forum']
 					];
 				}
 			}
@@ -301,13 +298,12 @@ function acl_content(App $a)
 	Addon::callHooks('acl_lookup_end', $results);
 
 	$o = [
-		'tot' => $results['tot'],
+		'tot'   => $results['tot'],
 		'start' => $results['start'],
 		'count' => $results['count'],
 		'items' => $results['items'],
 	];
 
 	echo json_encode($o);
-
-	killme();
+	exit;
 }
