@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Core\Acl;
 use Friendica\Core\L10n;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -105,11 +106,10 @@ function fsuggest_content(App $a)
 
 	$o .= '<form id="fsuggest-form" action="fsuggest/' . $contact_id . '" method="post" >';
 
-	$o .= contact_selector(
+	$o .= Acl::getSuggestContactSelectHTML(
 		'suggest',
 		'suggest-select',
-		['size' => 4, 'exclude' => $contact_id, 'networks' => 'DFRN_ONLY', 'single' => true],
-		false
+		['size' => 4, 'exclude' => $contact_id, 'networks' => 'DFRN_ONLY', 'single' => true]
 	);
 
 

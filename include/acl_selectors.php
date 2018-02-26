@@ -9,11 +9,6 @@ use Friendica\Model\Contact;
 
 require_once "mod/proxy.php";
 
-function contact_selector($selname, $selclass, $options, $preselected = false)
-{
-	return Acl::getSuggestContactSelectHTML($selname, $selclass, $options, defaults($preselected, []));
-}
-
 function contact_select($selname, $selclass, $preselected = false, $size = 4, $privmail = false, $celeb = false, $privatenet = false, $tabindex = null) {
 	return Acl::getMessageContactSelectHTML($selname, $selclass, defaults($preselected, []), $size, $privmail, $celeb, $privatenet, $tabindex);
 }
