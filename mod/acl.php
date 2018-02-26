@@ -4,6 +4,7 @@
 
 use Friendica\App;
 use Friendica\Content\Widget;
+use Friendica\Core\Acl;
 use Friendica\Core\Addon;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
@@ -184,7 +185,11 @@ function acl_content(App $a)
 		);
 	} elseif ($type == 'x') {
 		// autocomplete for global contact search (e.g. navbar search)
-		$r = navbar_complete($a);
+		$search = notags(trim($_REQUEST['search']));
+		$mode = $_REQUEST['smode'];
+
+		$r = Acl::contactAutocomplete($search, $mode);
+
 		$contacts = [];
 		foreach ($r as $g) {
 			$contacts[] = [
