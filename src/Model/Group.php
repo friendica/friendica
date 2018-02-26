@@ -4,8 +4,8 @@
  */
 namespace Friendica\Model;
 
-use Friendica\Core\L10n;
 use Friendica\BaseObject;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use dba;
 
@@ -290,7 +290,7 @@ class Group extends BaseObject
 
 		if ($check_dead && !$use_gcontact) {
 			require_once 'include/acl_selectors.php';
-			$return = prune_deadguys($return);
+			Contact::pruneUnavailable($return);
 		}
 		return $return;
 	}

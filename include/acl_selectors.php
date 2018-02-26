@@ -9,11 +9,6 @@ use Friendica\Model\Contact;
 
 require_once "mod/proxy.php";
 
-function prune_deadguys($arr) {
-	Contact::pruneUnavailable($arr);
-	return $arr;
-}
-
 function get_acl_permissions($user = null) {
 	return Acl::getDefaultUserPermissions($user);
 }
