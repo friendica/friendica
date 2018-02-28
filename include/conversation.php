@@ -21,8 +21,6 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
 
-require_once "include/acl_selectors.php";
-
 function item_extract_images($body) {
 
 	$saved_image = [];

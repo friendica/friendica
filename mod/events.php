@@ -6,6 +6,7 @@
 
 use Friendica\App;
 use Friendica\Content\Nav;
+use Friendica\Core\Acl;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -478,12 +479,10 @@ function events_content(App $a) {
 		$fhour   = ((x($orig_event)) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'H') : '00');
 		$fminute = ((x($orig_event)) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'i') : '00');
 
-		require_once 'include/acl_selectors.php' ;
-
-		$perms = get_acl_permissions($orig_event);
+		$perms = Acl::getDefaultUserPermissions($orig_event);
 
 		if ($mode === 'new' || $mode === 'copy') {
-			$acl = (($cid) ? '' : populate_acl(((x($orig_event)) ? $orig_event : $a->user)));
+			$acl = (($cid) ? '' : Acl::getFullSelectorHTML(((x($orig_event)) ? $orig_event : $a->user)));
 		}
 
 		// If we copy an old event, we need to remove the ID and URI

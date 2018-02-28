@@ -2,8 +2,10 @@
 /**
  * @file mod/community.php
  */
+
 use Friendica\App;
 use Friendica\Content\Nav;
+use Friendica\Core\Acl;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
@@ -104,7 +106,7 @@ function community_content(App $a, $update = 0)
 				'default_location' => $a->user['default-location'],
 				'nickname' => $a->user['nickname'],
 				'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-				'acl' => populate_acl($a->user, true),
+				'acl' => Acl::getFullSelectorHTML($a->user, true),
 				'bang' => '',
 				'visitor' => 'block',
 				'profile_uid' => local_user(),

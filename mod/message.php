@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Content\Smilies;
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Acl;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
@@ -15,7 +16,6 @@ use Friendica\Model\Mail;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
-require_once 'include/acl_selectors.php';
 require_once 'include/conversation.php';
 
 function message_init(App $a)
@@ -236,14 +236,14 @@ function message_content(App $a)
 				$preid = $r[0]['id'];
 				$preselect = [$preid];
 			} else {
-				$preselect = false;
+				$preselect = [];
 			}
 		}
 
 		$prefill = $preselect ? $prename : '';
 
 		// the ugly select box
-		$select = contact_select('messageto', 'message-to-select', $preselect, 4, true, false, false, 10);
+		$select = Acl::getMessageContactSelectHTML('messageto', 'message-to-select', $preselect, 4, 10);
 
 		$tpl = get_markup_template('prv_message.tpl');
 		$o .= replace_macros($tpl, [

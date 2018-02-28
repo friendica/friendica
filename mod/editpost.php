@@ -10,8 +10,6 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 
-require_once 'include/acl_selectors.php';
-
 function editpost_content(App $a) {
 
 	$o = '';

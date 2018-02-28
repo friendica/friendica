@@ -1517,4 +1517,27 @@ class Contact extends BaseObject
 			}
 		}
 	}
+
+	/**
+	 * Remove the unavailable contact ids from the provided list
+	 *
+	 * @param array $contact_ids Contact id list
+	 */
+	public static function pruneUnavailable(array &$contact_ids)
+	{
+		if (empty($contact_ids)) {
+			return;
+		}
+
+		$str = dbesc(implode(',', $contact_ids));
+
+		$stmt = dba::p("SELECT `id` FROM `contact` WHERE `id` IN ( " . $str . ") AND `blocked` = 0 AND `pending` = 0 AND `archive` = 0");
+
+		$return = [];
+		while($contact = dba::fetch($stmt)) {
+			$return[] = $contact['id'];
+		}
+
+		$contact_ids = $return;
+	}
 }

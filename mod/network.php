@@ -9,6 +9,7 @@ use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
+use Friendica\Core\Acl;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -24,7 +25,6 @@ use Friendica\Util\DateTimeFormat;
 
 require_once 'include/conversation.php';
 require_once 'include/items.php';
-require_once 'include/acl_selectors.php';
 
 function network_init(App $a)
 {
@@ -427,8 +427,8 @@ function networkFlatView(App $a, $update = 0)
 			'lockstate' => (((is_array($a->user) &&
 			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
 			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
-			'default_perms' => get_acl_permissions($a->user),
-			'acl' => populate_acl($a->user, true),
+			'default_perms' => Acl::getDefaultUserPermissions($a->user),
+			'acl' => Acl::getFullSelectorHTML($a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -576,8 +576,8 @@ function networkThreadedView(App $a, $update, $parent)
 			'lockstate' => ((($gid) || ($cid) || ($nets) || (is_array($a->user) &&
 			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
 			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
-			'default_perms' => get_acl_permissions($a->user),
-			'acl' => populate_acl((($gid || $cid || $nets) ? $def_acl : $a->user), true),
+			'default_perms' => Acl::getDefaultUserPermissions($a->user),
+			'acl' => Acl::getFullSelectorHTML((($gid || $cid || $nets) ? $def_acl : $a->user), true),
 			'bang' => (($gid || $cid || $nets) ? '!' : ''),
 			'visitor' => 'block',
 			'profile_uid' => local_user(),

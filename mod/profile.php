@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
+use Friendica\Core\Acl;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -118,7 +119,6 @@ function profile_content(App $a, $update = 0)
 
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
-	require_once 'include/acl_selectors.php';
 	require_once 'include/items.php';
 
 	$groups = [];
@@ -213,7 +213,7 @@ function profile_content(App $a, $update = 0)
 						|| strlen($a->user['deny_cid'])
 						|| strlen($a->user['deny_gid'])
 					) ? 'lock' : 'unlock',
-				'acl' => $is_owner ? populate_acl($a->user, true) : '',
+				'acl' => $is_owner ? Acl::getFullSelectorHTML($a->user, true) : '',
 				'bang' => '',
 				'visitor' => $is_owner || $commvisitor ? 'block' : 'none',
 				'profile_uid' => $a->profile['profile_uid'],
