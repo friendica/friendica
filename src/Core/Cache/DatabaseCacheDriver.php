@@ -16,7 +16,7 @@ class DatabaseCacheDriver implements ICacheDriver
 {
 	public function get($key)
 	{
-		$cache = dba::selectFirst('cache', ['v'], ['`k` = ? AND `expires` >= NOW()`', $key]);
+		$cache = dba::selectFirst('cache', ['v'], ['`k` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow()]);
 
 		if (DBM::is_result($cache)) {
 			$cached = $cache['v'];
