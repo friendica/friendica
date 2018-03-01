@@ -5,8 +5,8 @@
  */
 namespace Friendica\Core;
 
+use Friendica\Core\Session\CacheSessionHandler;
 use Friendica\Core\Session\DatabaseSessionHandler;
-use Friendica\Core\Session\MemcacheSessionHandler;
 
 /**
  * High-level Session service class
@@ -28,10 +28,10 @@ class Session
 			ini_set('session.cookie_secure', 1);
 		}
 
-		if (!Config::get('system', 'disable_database_session')) {
-			$memcache = Cache::memcache();
-			if (is_object($memcache)) {
-				$SessionHandler = new MemcacheSessionHandler($memcache);
+		$session_handler = Config::get('system', 'session_handler', 'database');
+		if ($session_handler != 'native') {
+			if ($session_handler == 'cache' && Config::get('system', 'cache_driver', 'database') != 'database') {
+				$SessionHandler = new CacheSessionHandler();
 			} else {
 				$SessionHandler = new DatabaseSessionHandler();
 			}

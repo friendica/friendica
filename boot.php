@@ -39,7 +39,7 @@ define('FRIENDICA_PLATFORM',     'Friendica');
 define('FRIENDICA_CODENAME',     'Asparagus');
 define('FRIENDICA_VERSION',      '3.6-dev');
 define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1255);
+define('DB_UPDATE_VERSION',      1256);
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /**
