@@ -120,22 +120,6 @@ define('LOGGER_ALL',             4);
 /* @}*/
 
 /**
- * @name Cache
- *
- * Cache levels
- * @{
- */
-define('CACHE_MONTH',            0);
-define('CACHE_WEEK',             1);
-define('CACHE_DAY',              2);
-define('CACHE_HOUR',             3);
-define('CACHE_HALF_HOUR',        4);
-define('CACHE_QUARTER_HOUR',     5);
-define('CACHE_FIVE_MINUTES',     6);
-define('CACHE_MINUTE',           7);
-/* @}*/
-
-/**
  * @name Register
  *
  * Registration policies
