@@ -30,37 +30,35 @@ class Config
 	private static $in_db;
 
 	/**
-	 * @brief Loads all configuration values of family into a cached storage.
+	 * @brief Loads all configuration values into a cached storage.
 	 *
 	 * All configuration values of the system are stored in global cache
 	 * which is available under the global variable $a->config
 	 *
-	 * @param string $family The category of the configuration value
-	 *
 	 * @return void
 	 */
-	public static function load($family = "config")
+	public static function load()
 	{
-		// We don't preload "system" anymore.
-		// This reduces the number of database reads a lot.
-		if ($family === 'system') {
-			return;
-		}
-
 		$a = get_app();
 
-		$r = dba::select('config', ['v', 'k'], ['cat' => $family]);
-		while ($rr = dba::fetch($r)) {
-			$k = $rr['k'];
-			if ($family === 'config') {
-				$a->config[$k] = $rr['v'];
+		self::$cache = $a->config;
+
+		$configs = dba::select('config', ['cat', 'v', 'k']);
+		$time = microtime(true);
+		while ($config = dba::fetch($configs)) {
+			$k = $config['k'];
+			$cat = $config['cat'];
+
+			if ($cat === 'config') {
+				$a->config[$k] = $config['v'];
 			} else {
-				$a->config[$family][$k] = $rr['v'];
-				self::$cache[$family][$k] = $rr['v'];
-				self::$in_db[$family][$k] = true;
+				$a->config[$cat][$k] = $config['v'];
+				self::$cache[$cat][$k] = $config['v'];
+				self::$in_db[$cat][$k] = true;
 			}
 		}
-		dba::close($r);
+		$a->save_timestamp($time, 'database');
+		dba::close($configs);
 	}
 
 	/**
