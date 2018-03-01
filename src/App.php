@@ -148,6 +148,8 @@ class App
 		$this->performance['start'] = microtime(true);
 		$this->performance['database'] = 0;
 		$this->performance['database_write'] = 0;
+		$this->performance['cache'] = 0;
+		$this->performance['cache_write'] = 0;
 		$this->performance['network'] = 0;
 		$this->performance['file'] = 0;
 		$this->performance['rendering'] = 0;
@@ -157,6 +159,8 @@ class App
 
 		$this->callstack['database'] = [];
 		$this->callstack['database_write'] = [];
+		$this->callstack['cache'] = [];
+		$this->callstack['cache_write'] = [];
 		$this->callstack['network'] = [];
 		$this->callstack['file'] = [];
 		$this->callstack['rendering'] = [];
