@@ -35,8 +35,6 @@ if ($a->module !== 'install') {
 			PConfig::set($uid, 'frio', 'css_modified', time());
 		}
 	} else {
-		Config::load('frio');
-
 		// Load frios system config.
 		$schema           = Config::get("frio", "schema");
 		$nav_bg           = Config::get("frio", "nav_bg");

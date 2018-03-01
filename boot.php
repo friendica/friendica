@@ -722,8 +722,6 @@ function update_db()
 		$stored = intval($build);
 		$current = intval(DB_UPDATE_VERSION);
 		if ($stored < $current) {
-			Config::load('database');
-
 			// Compare the current structure with the defined structure
 			$t = Config::get('database', 'dbupdate_' . DB_UPDATE_VERSION);
 			if (!is_null($t)) {
