@@ -317,12 +317,16 @@ function api_call(App $a)
 					/// @TODO round() really everywhere?
 					logger(
 						parse_url($a->query_string, PHP_URL_PATH) . ": " . sprintf(
-							"Database: %s/%s, Network: %s, I/O: %s, Other: %s, Total: %s",
+							"Database: %s/%s, Cache %s/%s, Network: %s, I/O: %s, Other: %s, Total: %s",
 							round($a->performance["database"] - $a->performance["database_write"], 3),
 							round($a->performance["database_write"], 3),
+							round($a->performance["cache"], 3),
+							round($a->performance["cache_write"], 3),
 							round($a->performance["network"], 2),
 							round($a->performance["file"], 2),
-							round($duration - ($a->performance["database"] + $a->performance["network"]	+ $a->performance["file"]), 2),
+							round($duration - ($a->performance["database"]
+								+ $a->performance["cache"] + $a->performance["cache_write"]
+								+ $a->performance["network"] + $a->performance["file"]), 2),
 							round($duration, 2)
 						),
 						LOGGER_DEBUG
@@ -338,6 +342,21 @@ function api_call(App $a)
 						}
 						$o .= "\nDatabase Write:\n";
 						foreach ($a->callstack["database_write"] as $func => $time) {
+							$time = round($time, 3);
+							if ($time > 0) {
+								$o .= $func . ": " . $time . "\n";
+							}
+						}
+
+						$o = "Cache Read:\n";
+						foreach ($a->callstack["cache"] as $func => $time) {
+							$time = round($time, 3);
+							if ($time > 0) {
+								$o .= $func . ": " . $time . "\n";
+							}
+						}
+						$o .= "\nCache Write:\n";
+						foreach ($a->callstack["cache_write"] as $func => $time) {
 							$time = round($time, 3);
 							if ($time > 0) {
 								$o .= $func . ": " . $time . "\n";
