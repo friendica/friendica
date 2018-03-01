@@ -10,7 +10,7 @@ use Friendica\Core\Config;
 /**
  * @brief Class for storing data for a short time
  */
-class Cache
+class Cache extends \Friendica\BaseObject
 {
 	const MONTH        = 0;
 	const WEEK         = 1;
@@ -108,7 +108,13 @@ class Cache
 	 */
 	public static function get($key)
 	{
-		return self::getDriver()->get($key);
+		$time = microtime(true);
+
+		$return = self::getDriver()->get($key);
+
+		self::getApp()->save_timestamp($time, 'cache');
+
+		return $return;
 	}
 
 	/**
@@ -124,7 +130,13 @@ class Cache
 	 */
 	public static function set($key, $value, $duration = self::MONTH)
 	{
-		return self::getDriver()->set($key, $value, $duration);
+		$time = microtime(true);
+
+		$return = self::getDriver()->set($key, $value, $duration);
+
+		self::getApp()->save_timestamp($time, 'cache_write');
+
+		return $return;
 	}
 
 	/**
