@@ -325,6 +325,8 @@ class Worker
 			$a->performance["start"] = microtime(true);
 			$a->performance["database"] = 0;
 			$a->performance["database_write"] = 0;
+			$a->performance["cache"] = 0;
+			$a->performance["cache_write"] = 0;
 			$a->performance["network"] = 0;
 			$a->performance["file"] = 0;
 			$a->performance["rendering"] = 0;
@@ -409,6 +411,24 @@ class Worker
 						}
 					}
 				}
+				if (isset($a->callstack["dache"])) {
+					$o .= "\nCache Read:\n";
+					foreach ($a->callstack["dache"] as $func => $time) {
+						$time = round($time, 3);
+						if ($time > 0) {
+							$o .= $func.": ".$time."\n";
+						}
+					}
+				}
+				if (isset($a->callstack["dache_write"])) {
+					$o .= "\nCache Write:\n";
+					foreach ($a->callstack["dache_write"] as $func => $time) {
+						$time = round($time, 3);
+						if ($time > 0) {
+							$o .= $func.": ".$time."\n";
+						}
+					}
+				}
 				if (isset($a->callstack["network"])) {
 					$o .= "\nNetwork:\n";
 					foreach ($a->callstack["network"] as $func => $time) {
@@ -422,12 +442,16 @@ class Worker
 
 			logger(
 				"ID ".$queue["id"].": ".$funcname.": ".sprintf(
-					"DB: %s/%s, Net: %s, I/O: %s, Other: %s, Total: %s".$o,
+					"DB: %s/%s, Cache: %s/%s, Net: %s, I/O: %s, Other: %s, Total: %s".$o,
 					number_format($a->performance["database"] - $a->performance["database_write"], 2),
 					number_format($a->performance["database_write"], 2),
+					number_format($a->performance["cache"], 2),
+					number_format($a->performance["cache_write"], 2),
 					number_format($a->performance["network"], 2),
 					number_format($a->performance["file"], 2),
-					number_format($duration - ($a->performance["database"] + $a->performance["network"] + $a->performance["file"]), 2),
+					number_format($duration - ($a->performance["database"]
+						+ $a->performance["cache"] + $a->performance["cache_write"]
+						+ $a->performance["network"] + $a->performance["file"]), 2),
 					number_format($duration, 2)
 				),
 				LOGGER_DEBUG

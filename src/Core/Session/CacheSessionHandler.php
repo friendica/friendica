@@ -3,34 +3,20 @@
 namespace Friendica\Core\Session;
 
 use Friendica\BaseObject;
+use Friendica\Core\Cache;
 use Friendica\Core\Session;
 use SessionHandlerInterface;
-use Memcache;
 
 require_once 'boot.php';
 require_once 'include/text.php';
 
 /**
- * SessionHandler using Memcache
+ * SessionHandler using Friendica Cache
  *
  * @author Hypolite Petovan <mrpetovan@gmail.com>
  */
-class MemcacheSessionHandler extends BaseObject implements SessionHandlerInterface
+class CacheSessionHandler extends BaseObject implements SessionHandlerInterface
 {
-	/**
-	 * @var Memcache
-	 */
-	private $memcache = null;
-
-	/**
-	 *
-	 * @param Memcache $memcache
-	 */
-	public function __construct(Memcache $memcache)
-	{
-		$this->memcache = $memcache;
-	}
-
 	public function open($save_path, $session_name)
 	{
 		return true;
@@ -42,8 +28,8 @@ class MemcacheSessionHandler extends BaseObject implements SessionHandlerInterfa
 			return '';
 		}
 
-		$data = $this->memcache->get(self::getApp()->get_hostname() . ":session:" . $session_id);
-		if (!is_bool($data)) {
+		$data = Cache::get('session:' . $session_id);
+		if (!empty($data)) {
 			Session::$exists = true;
 			return $data;
 		}
@@ -72,14 +58,7 @@ class MemcacheSessionHandler extends BaseObject implements SessionHandlerInterfa
 			return true;
 		}
 
-		$expire = time() + Session::$expire;
-
-		$this->memcache->set(
-			self::getApp()->get_hostname() . ":session:" . $session_id,
-			$session_data,
-			MEMCACHE_COMPRESSED,
-			$expire
-		);
+		Cache::set('session:' . $session_id, $session_data, Session::$expire);
 
 		return true;
 	}
@@ -91,7 +70,7 @@ class MemcacheSessionHandler extends BaseObject implements SessionHandlerInterfa
 
 	public function destroy($id)
 	{
-		$this->memcache->delete(self::getApp()->get_hostname() . ":session:" . $id);
+		Cache::delete('session:' . $id);
 		return true;
 	}
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @file_tag_unsave_file boot.php
+ * @file boot.php
  * This file defines some global constants and includes the central App class.
  */
 
@@ -21,6 +21,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'a
 
 use Friendica\App;
 use Friendica\Core\Addon;
+use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
@@ -39,7 +40,7 @@ define('FRIENDICA_PLATFORM',     'Friendica');
 define('FRIENDICA_CODENAME',     'Asparagus');
 define('FRIENDICA_VERSION',      '3.6-dev');
 define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1255);
+define('DB_UPDATE_VERSION',      1256);
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /**
@@ -121,18 +122,20 @@ define('LOGGER_ALL',             4);
 
 /**
  * @name Cache
+ * @deprecated since version 3.6
+ * @see Cache
  *
  * Cache levels
  * @{
  */
-define('CACHE_MONTH',            0);
-define('CACHE_WEEK',             1);
-define('CACHE_DAY',              2);
-define('CACHE_HOUR',             3);
-define('CACHE_HALF_HOUR',        4);
-define('CACHE_QUARTER_HOUR',     5);
-define('CACHE_FIVE_MINUTES',     6);
-define('CACHE_MINUTE',           7);
+define('CACHE_MONTH',            Cache::MONTH);
+define('CACHE_WEEK',             Cache::WEEK);
+define('CACHE_DAY',              Cache::DAY);
+define('CACHE_HOUR',             Cache::HOUR);
+define('CACHE_HALF_HOUR',        Cache::HALF_HOUR);
+define('CACHE_QUARTER_HOUR',     Cache::QUARTER_HOUR);
+define('CACHE_FIVE_MINUTES',     Cache::FIVE_MINUTES);
+define('CACHE_MINUTE',           Cache::MINUTE);
 /* @}*/
 
 /**
