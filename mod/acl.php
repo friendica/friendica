@@ -32,7 +32,7 @@ function acl_content(App $a)
 		$search = $_REQUEST['query'];
 	}
 
-	logger('Searching for ' . $search . ' - type ' . $type, LOGGER_DEBUG);
+	logger("Searching for ".$search." - type ".$type." conversation ".$conv_id, LOGGER_DEBUG);
 
 	if ($search != '') {
 		$sql_extra = "AND `name` LIKE '%%" . dbesc($search) . "%%'";
@@ -239,6 +239,12 @@ function acl_content(App $a)
 	$items = array_merge($groups, $contacts);
 
 	if ($conv_id) {
+		// In multi threaded posts the conv_id is not the parent of the whole thread
+		$parent_item = dba::selectFirst('item', ['parent'], ['id' => $conv_id]);
+		if (DBM::is_result($parent_item)) {
+			$conv_id = $parent_item['parent'];
+		}
+
 		/*
 		 * if $conv_id is set, get unknown contacts in thread
 		 * but first get known contacts url to filter them out
