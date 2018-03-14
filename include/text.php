@@ -1169,13 +1169,24 @@ function redir_private_images($a, &$item)
 	}
 }
 
+function body_with_cw($item)
+{
+	// Add the content warning
+	if (!empty($item['content-warning'])) {
+		$body = $item['content-warning'] . '[spoiler]' . $item["body"] . '[/spoiler]';
+	} else {
+		$body = $item["body"];
+	}
+	return $body;
+}
+
 function put_item_in_cache(&$item, $update = false)
 {
 	$rendered_hash = defaults($item, 'rendered-hash', '');
 
 	if ($rendered_hash == ''
 		|| $item["rendered-html"] == ""
-		|| $rendered_hash != hash("md5", $item["body"])
+		|| $rendered_hash != hash("md5", body_with_cw($item))
 		|| Config::get("system", "ignore_cache")
 	) {
 		// The function "redir_private_images" changes the body.
@@ -1183,9 +1194,7 @@ function put_item_in_cache(&$item, $update = false)
 		$body = $item["body"];
 
 		// Add the content warning
-		if (!empty($item['content-warning'])) {
-			$item["body"] = $item['content-warning'] . '[spoiler]' . $item["body"] . '[/spoiler]';
-		}
+		$item["body"] = body_with_cw($item);
 
 		$a = get_app();
 		redir_private_images($a, $item);
