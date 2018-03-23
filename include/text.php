@@ -14,6 +14,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Render\FriendicaSmarty;
@@ -21,7 +22,6 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
 
 require_once "mod/proxy.php";
-require_once "include/event.php";
 require_once "include/conversation.php";
 
 /**
@@ -1235,7 +1235,7 @@ function prepare_body(&$item, $attach = false, $preview = false) {
 	// In order to provide theme developers more possibilities, event items
 	// are treated differently.
 	if ($item['object-type'] === ACTIVITY_OBJ_EVENT && isset($item['event-id'])) {
-		$ev = format_event_item($item);
+		$ev = Event::getItemHTML($item);
 		return $ev;
 	}
 

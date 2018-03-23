@@ -9,18 +9,18 @@
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
+use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Event;
 use Friendica\Model\Group;
 use Friendica\Model\Profile;
 use Friendica\Protocol\DFRN;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
-
-require_once 'include/event.php';
 
 function cal_init(App $a)
 {
@@ -64,7 +64,7 @@ function cal_init(App $a)
 			'$pdesc' => (($profile['pdesc'] != "") ? $profile['pdesc'] : ""),
 		]);
 
-		$cal_widget = widget_events();
+		$cal_widget = Widget\CalendarExport::getHTML();
 
 		if (!x($a->page, 'aside')) {
 			$a->page['aside'] = '';
@@ -82,7 +82,7 @@ function cal_content(App $a)
 	Nav::setSelected('events');
 
 	// get the translation strings for the callendar
-	$i18n = get_event_strings();
+	$i18n = Event::getStrings();
 
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl, [
@@ -212,25 +212,25 @@ function cal_content(App $a)
 
 		// put the event parametes in an array so we can better transmit them
 		$event_params = [
-			'event_id' => (x($_GET, 'id') ? $_GET["id"] : 0),
-			'start' => $start,
-			'finish' => $finish,
-			'adjust_start' => $adjust_start,
+			'event_id'      => intval(defaults($_GET, 'id', 0)),
+			'start'         => $start,
+			'finish'        => $finish,
+			'adjust_start'  => $adjust_start,
 			'adjust_finish' => $adjust_finish,
-			'ignored' => $ignored,
+			'ignore'        => $ignored,
 		];
 
 		// get events by id or by date
-		if (x($_GET, 'id')) {
-			$r = event_by_id($owner_uid, $event_params, $sql_extra);
+		if ($event_params['event_id']) {
+			$r = Event::getListById($owner_uid, $event_params['event-id'], $sql_extra);
 		} else {
-			$r = events_by_date($owner_uid, $event_params, $sql_extra);
+			$r = Event::getListByDate($owner_uid, $event_params, $sql_extra);
 		}
 
 		$links = [];
 
 		if (DBM::is_result($r)) {
-			$r = sort_by_date($r);
+			$r = Event::sortByDate($r);
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (!x($links, $j)) {
@@ -240,7 +240,7 @@ function cal_content(App $a)
 		}
 
 		// transform the event in a usable array
-		$events = process_events($r);
+		$events = Event::prepareListForTemplate($r);
 
 		if ($a->argv[2] === 'json') {
 			echo json_encode($events);
@@ -306,7 +306,7 @@ function cal_content(App $a)
 		}
 
 		// Get the export data by uid
-		$evexport = event_export($owner_uid, $format);
+		$evexport = Event::exportListByUserId($owner_uid, $format);
 
 		if (!$evexport["success"]) {
 			if ($evexport["content"]) {

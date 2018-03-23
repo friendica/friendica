@@ -29,7 +29,6 @@ use Text_LanguageDetect;
 require_once 'boot.php';
 require_once 'include/items.php';
 require_once 'include/text.php';
-require_once 'include/event.php';
 
 class Item extends BaseObject
 {
@@ -98,7 +97,7 @@ class Item extends BaseObject
 	 * @param integer $item_id Item ID that should be delete
 	 * @param integer $priority Priority for the notification
 	 *
-	 * @return $boolean success
+	 * @return boolean success
 	 */
 	public static function deleteById($item_id, $priority = PRIORITY_HIGH)
 	{
@@ -153,7 +152,7 @@ class Item extends BaseObject
 
 		// If item is a link to an event, delete the event.
 		if (intval($item['event-id'])) {
-			event_delete($item['event-id']);
+			Event::delete($item['event-id']);
 		}
 
 		// If item has attachments, drop them

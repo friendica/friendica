@@ -19,11 +19,11 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Event;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
-use Friendica\Model\Term;
 use Friendica\Model\User;
 use Friendica\Object\Image;
 use Friendica\Protocol\OStatus;
@@ -41,7 +41,6 @@ require_once 'boot.php';
 require_once 'include/dba.php';
 require_once "include/enotify.php";
 require_once "include/items.php";
-require_once "include/event.php";
 require_once "include/text.php";
 
 /**
@@ -2614,7 +2613,7 @@ class DFRN
 			// Is it an event?
 			if ($item["object-type"] == ACTIVITY_OBJ_EVENT) {
 				logger("Item ".$item["uri"]." seems to contain an event.", LOGGER_DEBUG);
-				$ev = bbtoevent($item["body"]);
+				$ev = Event::fromBBCode($item["body"]);
 				if ((x($ev, "desc") || x($ev, "summary")) && x($ev, "start")) {
 					logger("Event in item ".$item["uri"]." was found.", LOGGER_DEBUG);
 					$ev["cid"]     = $importer["id"];
@@ -2633,7 +2632,7 @@ class DFRN
 						$ev["id"] = $r[0]["id"];
 					}
 
-					$event_id = event_store($ev);
+					$event_id = Event::store($ev);
 					logger("Event ".$event_id." was stored", LOGGER_DEBUG);
 					return;
 				}

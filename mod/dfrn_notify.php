@@ -14,7 +14,6 @@ use Friendica\Model\Contact;
 use Friendica\Protocol\DFRN;
 
 require_once 'include/items.php';
-require_once 'include/event.php';
 
 function dfrn_notify_post(App $a) {
 	logger(__function__, LOGGER_TRACE);
