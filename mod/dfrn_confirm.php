@@ -192,11 +192,11 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 			$my_url = System::baseUrl() . '/profile/' . $user['nickname'];
 
-			openssl_public_encrypt($my_url, $params['source_url'], $site_pubkey);
+			openssl_public_encrypt($my_url, $params['source_url'], $site_pubkey, OPENSSL_PKCS1_OAEP_PADDING);
 			$params['source_url'] = bin2hex($params['source_url']);
 
 			if ($aes_allow && function_exists('openssl_encrypt')) {
-				openssl_public_encrypt($src_aes_key, $params['aes_key'], $site_pubkey);
+				openssl_public_encrypt($src_aes_key, $params['aes_key'], $site_pubkey, OPENSSL_PKCS1_OAEP_PADDING);
 				$params['aes_key'] = bin2hex($params['aes_key']);
 				$params['public_key'] = bin2hex(openssl_encrypt($public_key, 'AES-256-CBC', $src_aes_key));
 			}
@@ -512,7 +512,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		// verify everything
 
 		$decrypted_source_url = "";
-		openssl_private_decrypt($source_url, $decrypted_source_url, $my_prvkey);
+		Crypto::opensslPrivateDecrypt($source_url, $decrypted_source_url, $my_prvkey);
 
 
 		if (!strlen($decrypted_source_url)) {
@@ -555,7 +555,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		if (strlen($aes_key)) {
 			$decrypted_aes_key = "";
-			openssl_private_decrypt($aes_key, $decrypted_aes_key, $my_prvkey);
+			Crypto::opensslPrivateDecrypt($aes_key, $decrypted_aes_key, $my_prvkey);
 			$dfrn_pubkey = openssl_decrypt($public_key, 'AES-256-CBC', $decrypted_aes_key);
 		} else {
 			$dfrn_pubkey = $public_key;

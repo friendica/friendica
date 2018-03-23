@@ -3,6 +3,7 @@
 /**
  * @file mod/dfrn_poll.php
  */
+
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -11,6 +12,7 @@ use Friendica\Database\DBM;
 use Friendica\Module\Login;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\OStatus;
+use Friendica\Util\Crypto;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
 
@@ -169,8 +171,8 @@ function dfrn_poll_init(App $a)
 			$final_dfrn_id = '';
 
 			if (($contact['duplex']) && strlen($contact['prvkey'])) {
-				openssl_private_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
-				openssl_private_decrypt($challenge, $decoded_challenge, $contact['prvkey']);
+				Crypto::opensslPrivateDecrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
+				Crypto::opensslPrivateDecrypt($challenge, $decoded_challenge, $contact['prvkey']);
 			} else {
 				openssl_public_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['pubkey']);
 				openssl_public_decrypt($challenge, $decoded_challenge, $contact['pubkey']);
@@ -261,8 +263,8 @@ function dfrn_poll_post(App $a)
 			$final_dfrn_id = '';
 
 			if ($contact['duplex'] && strlen($contact['prvkey'])) {
-				openssl_private_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
-				openssl_private_decrypt($challenge, $decoded_challenge, $contact['prvkey']);
+				Crypto::opensslPrivateDecrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
+				Crypto::opensslPrivateDecrypt($challenge, $decoded_challenge, $contact['prvkey']);
 			} else {
 				openssl_public_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['pubkey']);
 				openssl_public_decrypt($challenge, $decoded_challenge, $contact['pubkey']);
@@ -465,8 +467,8 @@ function dfrn_poll_content(App $a)
 			$id_str = $my_id . '.' . mt_rand(1000, 9999);
 
 			if (($r[0]['duplex'] && strlen($r[0]['pubkey'])) || !strlen($r[0]['prvkey'])) {
-				openssl_public_encrypt($hash, $challenge, $r[0]['pubkey']);
-				openssl_public_encrypt($id_str, $encrypted_id, $r[0]['pubkey']);
+				openssl_public_encrypt($hash, $challenge, $r[0]['pubkey'], OPENSSL_PKCS1_OAEP_PADDING);
+				openssl_public_encrypt($id_str, $encrypted_id, $r[0]['pubkey'], OPENSSL_PKCS1_OAEP_PADDING);
 			} else {
 				openssl_private_encrypt($hash, $challenge, $r[0]['prvkey']);
 				openssl_private_encrypt($id_str, $encrypted_id, $r[0]['prvkey']);

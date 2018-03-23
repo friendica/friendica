@@ -9,10 +9,9 @@ namespace Friendica\Network;
  * @brief Functions for probing URL
  */
 
-use Friendica\App;
-use Friendica\Core\System;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
 use Friendica\Protocol\Email;
@@ -20,10 +19,9 @@ use Friendica\Protocol\Feed;
 use Friendica\Util\Crypto;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
-
 use dba;
-use DOMXPath;
 use DOMDocument;
+use DOMXPath;
 
 require_once 'include/dba.php';
 
@@ -1013,7 +1011,7 @@ class Probe
 			return false;
 		}
 
-		$xpath = new DomXPath($doc);
+		$xpath = new DOMXPath($doc);
 
 		$vcards = $xpath->query("//div[contains(concat(' ', @class, ' '), ' vcard ')]");
 		if (!is_object($vcards)) {
@@ -1327,7 +1325,7 @@ class Probe
 			return false;
 		}
 
-		$xpath = new DomXPath($doc);
+		$xpath = new DOMXPath($doc);
 
 		$data = [];
 
@@ -1439,7 +1437,7 @@ class Probe
 			return false;
 		}
 
-		$xpath = new DomXPath($doc);
+		$xpath = new DOMXPath($doc);
 
 		//$feeds = $xpath->query("/html/head/link[@type='application/rss+xml']");
 		$feeds = $xpath->query("/html/head/link[@type='application/rss+xml' and @rel='alternate']");
@@ -1553,7 +1551,7 @@ class Probe
 		if (DBM::is_result($x) && DBM::is_result($r)) {
 			$mailbox = Email::constructMailboxName($r[0]);
 			$password = '';
-			openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
+			Crypto::opensslPrivateDecrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
 			$mbox = Email::connect($mailbox, $r[0]['user'], $password);
 			if (!$mbox) {
 				return false;

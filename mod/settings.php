@@ -18,6 +18,7 @@ use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
 use Friendica\Protocol\Email;
+use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Temporal;
@@ -244,7 +245,7 @@ function settings_post(App $a)
 				}
 				if (strlen($mail_pass)) {
 					$pass = '';
-					openssl_public_encrypt($mail_pass, $pass, $a->user['pubkey']);
+					openssl_public_encrypt($mail_pass, $pass, $a->user['pubkey'], OPENSSL_PKCS1_OAEP_PADDING);
 					dba::update('mailacct', ['pass' => bin2hex($pass)], ['uid' => local_user()]);
 				}
 				$r = q("UPDATE `mailacct` SET `server` = '%s', `port` = %d, `ssltype` = '%s', `user` = '%s',
@@ -270,7 +271,7 @@ function settings_post(App $a)
 
 					if (strlen($eacct['server'])) {
 						$dcrpass = '';
-						openssl_private_decrypt(hex2bin($eacct['pass']), $dcrpass, $a->user['prvkey']);
+						Crypto::opensslPrivateDecrypt(hex2bin($eacct['pass']), $dcrpass, $a->user['prvkey']);
 						$mbox = Email::connect($mb, $mail_user, $dcrpass);
 						unset($dcrpass);
 						if (!$mbox) {
