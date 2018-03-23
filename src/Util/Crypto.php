@@ -13,6 +13,54 @@ use ASNValue;
  */
 class Crypto
 {
+	const RSA_PAD_DEFAULT = 16777216;
+
+	/**
+	 * PKCS1 padding-agnostic OpenSSL private decrypt.
+	 *
+	 * If the padding parameter is omitted, it will perform two decrypt operations with both padding modes.
+	 *
+	 * @param string $ciphertext
+	 * @param string $privateKey
+	 * @param int    $padding_mode
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function opensslPrivateDecrypt($ciphertext, $privateKey, $padding_mode = self::RSA_PAD_DEFAULT)
+	{
+		switch ($padding_mode) {
+			case self::RSA_PAD_DEFAULT:
+				// Decrypt twice
+				$oaep = '';
+				$pkcs1 = '';
+				openssl_private_decrypt($ciphertext, $oaep, $privateKey, OPENSSL_PKCS1_OAEP_PADDING);
+				openssl_private_decrypt($ciphertext, $pkcs1, $privateKey, OPENSSL_PKCS1_PADDING);
+				/* Because the incorrect one will be false, we can coerce to string and concatenate
+				  since FALSE converts to "" (empty string) and not bother implementing a constant-time
+				  conditional swap function. */
+				$plaintext = (string) $oaep . (string) $pkcs1;
+				if (empty($plaintext)) {
+					throw new Exception('Invalid padding');
+				}
+
+				break;
+			case OPENSSL_PKCS1_PADDING:
+				trigger_error('PKCS1v1.5 padding is deprecated due to it being a security disaster.', E_USER_DEPRECATED);
+			// break statement intentionally omitted
+			case OPENSSL_PKCS1_OAEP_PADDING:
+				$plaintext = '';
+				openssl_private_decrypt($ciphertext, $plaintext, $privateKey, $padding_mode);
+				if (empty($plaintext)) {
+					throw new Exception('Invalid padding');
+				}
+
+				break;
+			default:
+				throw new Exception('Invalid padding mode');
+		}
+		return $plaintext;
+	}
+
 	// supported algorithms are 'sha256', 'sha1'
 	/**
 	 * @param string $data data

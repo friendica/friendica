@@ -12,6 +12,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Protocol\DFRN;
+use Friendica\Util\Crypto;
 
 require_once 'include/items.php';
 require_once 'include/event.php';
@@ -161,7 +162,7 @@ function dfrn_notify_post(App $a) {
 
 		if ($dfrn_version >= 2.1) {
 			if ((($importer['duplex']) && strlen($importer['cprvkey'])) || (! strlen($importer['cpubkey']))) {
-				openssl_private_decrypt($rawkey, $final_key, $importer['cprvkey']);
+				Crypto::opensslPrivateDecrypt($rawkey, $final_key, $importer['cprvkey']);
 			} else {
 				openssl_public_decrypt($rawkey, $final_key, $importer['cpubkey']);
 			}
@@ -169,7 +170,7 @@ function dfrn_notify_post(App $a) {
 			if ((($importer['duplex']) && strlen($importer['cpubkey'])) || (! strlen($importer['cprvkey']))) {
 				openssl_public_decrypt($rawkey, $final_key, $importer['cpubkey']);
 			} else {
-				openssl_private_decrypt($rawkey, $final_key, $importer['cprvkey']);
+				Crypto::opensslPrivateDecrypt($rawkey, $final_key, $importer['cprvkey']);
 			}
 		}
 
@@ -278,8 +279,8 @@ function dfrn_notify_content(App $a) {
 			openssl_private_encrypt($hash, $challenge, $prv_key);
 			openssl_private_encrypt($id_str, $encrypted_id, $prv_key);
 		} elseif (strlen($pub_key)) {
-			openssl_public_encrypt($hash, $challenge, $pub_key);
-			openssl_public_encrypt($id_str, $encrypted_id, $pub_key);
+			openssl_public_encrypt($hash, $challenge, $pub_key, OPENSSL_PKCS1_OAEP_PADDING);
+			openssl_public_encrypt($id_str, $encrypted_id, $pub_key, OPENSSL_PKCS1_OAEP_PADDING);
 		} else {
 			/// @TODO these kind of else-blocks are making the code harder to understand
 			$status = 1;

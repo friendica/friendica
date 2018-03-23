@@ -23,7 +23,6 @@ use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
-use Friendica\Model\Term;
 use Friendica\Model\User;
 use Friendica\Object\Image;
 use Friendica\Protocol\OStatus;
@@ -1254,8 +1253,8 @@ class DFRN
 			openssl_public_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['pubkey']);
 			openssl_public_decrypt($challenge, $postvars['challenge'], $contact['pubkey']);
 		} else {
-			openssl_private_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
-			openssl_private_decrypt($challenge, $postvars['challenge'], $contact['prvkey']);
+			Crypto::opensslPrivateDecrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
+			Crypto::opensslPrivateDecrypt($challenge, $postvars['challenge'], $contact['prvkey']);
 		}
 
 		$final_dfrn_id = substr($final_dfrn_id, 0, strpos($final_dfrn_id, '.'));
@@ -1313,7 +1312,7 @@ class DFRN
 					|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
 					|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))
 				) {
-					openssl_public_encrypt($key, $postvars['key'], $contact['pubkey']);
+					openssl_public_encrypt($key, $postvars['key'], $contact['pubkey'], OPENSSL_PKCS1_OAEP_PADDING);
 				} else {
 					openssl_private_encrypt($key, $postvars['key'], $contact['prvkey']);
 				}
@@ -1321,7 +1320,7 @@ class DFRN
 				if (($contact['duplex'] && strlen($contact['prvkey'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
 					openssl_private_encrypt($key, $postvars['key'], $contact['prvkey']);
 				} else {
-					openssl_public_encrypt($key, $postvars['key'], $contact['pubkey']);
+					openssl_public_encrypt($key, $postvars['key'], $contact['pubkey'], OPENSSL_PKCS1_OAEP_PADDING);
 				}
 			}
 

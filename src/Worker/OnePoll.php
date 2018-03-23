@@ -12,6 +12,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\PortableContact;
+use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
@@ -258,8 +259,8 @@ class OnePoll
 			$final_dfrn_id = '';
 
 			if ($contact['duplex'] && strlen($contact['prvkey'])) {
-				openssl_private_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
-				openssl_private_decrypt($challenge, $postvars['challenge'], $contact['prvkey']);
+				Crypto::opensslPrivateDecrypt($sent_dfrn_id, $final_dfrn_id, $contact['prvkey']);
+				Crypto::opensslPrivateDecrypt($challenge, $postvars['challenge'], $contact['prvkey']);
 			} else {
 				openssl_public_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['pubkey']);
 				openssl_public_decrypt($challenge, $postvars['challenge'], $contact['pubkey']);
@@ -350,7 +351,7 @@ class OnePoll
 			if (DBM::is_result($user) && DBM::is_result($mailconf)) {
 				$mailbox = Email::constructMailboxName($mailconf);
 				$password = '';
-				openssl_private_decrypt(hex2bin($mailconf['pass']), $password, $user['prvkey']);
+				Crypto::opensslPrivateDecrypt(hex2bin($mailconf['pass']), $password, $user['prvkey']);
 				$mbox = Email::connect($mailbox, $mailconf['user'], $password);
 				unset($password);
 				logger("Mail: Connect to " . $mailconf['user']);

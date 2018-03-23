@@ -292,7 +292,7 @@ class Diaspora
 			$ciphertext = base64_decode($data->encrypted_magic_envelope);
 
 			$outer_key_bundle = '';
-			@openssl_private_decrypt($encrypted_aes_key_bundle, $outer_key_bundle, $importer['prvkey']);
+			@Crypto::opensslPrivateDecrypt($encrypted_aes_key_bundle, $outer_key_bundle, $importer['prvkey']);
 			$j_outer_key_bundle = json_decode($outer_key_bundle);
 
 			if (!is_object($j_outer_key_bundle)) {
@@ -395,7 +395,7 @@ class Diaspora
 			$ciphertext = base64_decode($encrypted_header->ciphertext);
 
 			$outer_key_bundle = '';
-			openssl_private_decrypt($encrypted_aes_key_bundle, $outer_key_bundle, $importer['prvkey']);
+			Crypto::opensslPrivateDecrypt($encrypted_aes_key_bundle, $outer_key_bundle, $importer['prvkey']);
 
 			$j_outer_key_bundle = json_decode($outer_key_bundle);
 
