@@ -1,5 +1,5 @@
 -- ------------------------------------------
--- Friendica 3.6-rc (Asparagus)
+-- Friendica 3.6 (The Tazmans Flax-Lily)
 -- DB_UPDATE_VERSION 1256
 -- ------------------------------------------
 
