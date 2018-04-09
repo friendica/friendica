@@ -6163,14 +6163,14 @@ function api_friendica_profile_show($type)
 
 		// select all users from contact table, loop and prepare standard return for user data
 		$users = [];
-		$r = q(
+		$nurls = q(
 			"SELECT `id`, `nurl` FROM `contact` WHERE `uid`= %d AND `profile-id` = %d",
 			intval(api_user()),
 			intval($rr['profile_id'])
 		);
 
-		foreach ($r as $rr) {
-			$user = api_get_user($a, $rr['nurl']);
+		foreach ($nurls as $nurl) {
+			$user = api_get_user($a, $nurl['nurl']);
 			($type == "xml") ? $users[$k++ . ":user"] = $user : $users[] = $user;
 		}
 		$profile['users'] = $users;
