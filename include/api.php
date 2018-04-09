@@ -5476,6 +5476,7 @@ function api_friendica_group_show($type)
 	}
 
 	// loop through all groups and retrieve all members for adding data in the user array
+	$grps = [];
 	foreach ($r as $rr) {
 		$members = Contact::getByGroupId($rr['id']);
 		$users = [];
