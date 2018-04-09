@@ -1,6 +1,9 @@
 <?php
-
+/**
+ * @file mod/removeme.php
+ */
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Model\User;
 
@@ -26,7 +29,7 @@ function removeme_post(App $a)
 		return;
 	}
 
-	if (User::authenticate($a->user['uid'], trim($_POST['qxz_password']))) {
+	if (User::authenticate($a->user, trim($_POST['qxz_password']))) {
 		User::remove($a->user['uid']);
 		// NOTREACHED
 	}
@@ -46,13 +49,13 @@ function removeme_content(App $a)
 	$_SESSION['remove_account_verify'] = $hash;
 
 	$tpl = get_markup_template('removeme.tpl');
-	$o .= replace_macros($tpl, [
+	$o = replace_macros($tpl, [
 		'$basedir' => System::baseUrl(),
 		'$hash' => $hash,
-		'$title' => t('Remove My Account'),
-		'$desc' => t('This will completely remove your account. Once this has been done it is not recoverable.'),
-		'$passwd' => t('Please enter your password for verification:'),
-		'$submit' => t('Remove My Account')
+		'$title' => L10n::t('Remove My Account'),
+		'$desc' => L10n::t('This will completely remove your account. Once this has been done it is not recoverable.'),
+		'$passwd' => L10n::t('Please enter your password for verification:'),
+		'$submit' => L10n::t('Remove My Account')
 	]);
 
 	return $o;

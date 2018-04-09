@@ -6,19 +6,20 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 
-function viewcontacts_init(App $a) {
-
-	if((Config::get('system','block_public')) && (! local_user()) && (! remote_user())) {
+function viewcontacts_init(App $a)
+{
+	if ((Config::get('system', 'block_public')) && (! local_user()) && (! remote_user())) {
 		return;
 	}
 
 	Nav::setSelected('home');
 
-	if($a->argc > 1) {
+	if ($a->argc > 1) {
 		$nick = $a->argv[1];
 		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `blocked` = 0 LIMIT 1",
 			dbesc($nick)
@@ -36,22 +37,24 @@ function viewcontacts_init(App $a) {
 	}
 }
 
-
-function viewcontacts_content(App $a) {
+function viewcontacts_content(App $a)
+{
 	require_once("mod/proxy.php");
 
-	if((Config::get('system','block_public')) && (! local_user()) && (! remote_user())) {
-		notice( t('Public access denied.') . EOL);
+	if ((Config::get('system', 'block_public')) && (! local_user()) && (! remote_user())) {
+		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
+
+	$is_owner = $a->profile['profile_uid'] == local_user();
 
 	$o = "";
 
 	// tabs
 	$o .= Profile::getTabs($a, $is_owner, $a->data['user']['nickname']);
 
-	if(((! count($a->profile)) || ($a->profile['hide-friends']))) {
-		notice( t('Permission denied.') . EOL);
+	if (((! count($a->profile)) || ($a->profile['hide-friends']))) {
+		notice(L10n::t('Permission denied.') . EOL);
 		return $o;
 	}
 
@@ -64,8 +67,9 @@ function viewcontacts_content(App $a) {
 		dbesc(NETWORK_DIASPORA),
 		dbesc(NETWORK_OSTATUS)
 	);
-	if (DBM::is_result($r))
+	if (DBM::is_result($r)) {
 		$a->set_pager_total($r[0]['total']);
+	}
 
 	$r = q("SELECT * FROM `contact`
 		WHERE `uid` = %d AND NOT `blocked` AND NOT `pending`
@@ -80,7 +84,7 @@ function viewcontacts_content(App $a) {
 		intval($a->pager['itemspage'])
 	);
 	if (!DBM::is_result($r)) {
-		info(t('No contacts.').EOL);
+		info(L10n::t('No contacts.').EOL);
 		return $o;
 	}
 
@@ -95,22 +99,20 @@ function viewcontacts_content(App $a) {
 		$url = $rr['url'];
 
 		// route DFRN profiles through the redirect
-
-		$is_owner = ((local_user() && ($a->profile['profile_uid'] == local_user())) ? true : false);
-
-		if($is_owner && ($rr['network'] === NETWORK_DFRN) && ($rr['rel']))
+		if ($is_owner && ($rr['network'] === NETWORK_DFRN) && ($rr['rel'])) {
 			$url = 'redir/' . $rr['id'];
-		else
+		} else {
 			$url = Profile::zrl($url);
+		}
 
 		$contact_details = Contact::getDetailsByURL($rr['url'], $a->profile['uid'], $rr);
 
 		$contacts[] = [
 			'id' => $rr['id'],
-			'img_hover' => sprintf( t('Visit %s\'s profile [%s]'), $contact_details['name'], $rr['url']),
+			'img_hover' => L10n::t('Visit %s\'s profile [%s]', $contact_details['name'], $rr['url']),
 			'photo_menu' => Contact::photoMenu($rr),
 			'thumb' => proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
-			'name' => htmlentities(substr($contact_details['name'],0,20)),
+			'name' => htmlentities(substr($contact_details['name'], 0, 20)),
 			'username' => htmlentities($contact_details['name']),
 			'details'       => $contact_details['location'],
 			'tags'          => $contact_details['keywords'],
@@ -126,7 +128,7 @@ function viewcontacts_content(App $a) {
 
 	$tpl = get_markup_template("viewcontact_template.tpl");
 	$o .= replace_macros($tpl, [
-		'$title' => t('Contacts'),
+		'$title' => L10n::t('Contacts'),
 		'$contacts' => $contacts,
 		'$paginate' => paginate($a),
 	]);

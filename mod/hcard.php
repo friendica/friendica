@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Model\Profile;
 
@@ -14,7 +15,7 @@ function hcard_init(App $a)
 	if ($a->argc > 1) {
 		$which = $a->argv[1];
 	} else {
-		notice(t('No profile') . EOL);
+		notice(L10n::t('No profile') . EOL);
 		$a->error = 404;
 		return;
 	}

@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Widget;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
@@ -32,12 +33,12 @@ function suggest_init(App $a) {
 
 			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
 				'$method' => 'get',
-				'$message' => t('Do you really want to delete this suggestion?'),
+				'$message' => L10n::t('Do you really want to delete this suggestion?'),
 				'$extra_inputs' => $inputs,
-				'$confirm' => t('Yes'),
+				'$confirm' => L10n::t('Yes'),
 				'$confirm_url' => $query['base'],
 				'$confirm_name' => 'confirmed',
-				'$cancel' => t('Cancel'),
+				'$cancel' => L10n::t('Cancel'),
 			]);
 			$a->error = 1; // Set $a->error so the other module functions don't execute
 			return;
@@ -56,7 +57,7 @@ function suggest_content(App $a) {
 
 	$o = '';
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -69,7 +70,7 @@ function suggest_content(App $a) {
 	$r = GContact::suggestionQuery(local_user());
 
 	if (! DBM::is_result($r)) {
-		$o .= t('No suggestions available. If this is a new site, please try again in 24 hours.');
+		$o .= L10n::t('No suggestions available. If this is a new site, please try again in 24 hours.');
 		return $o;
 	}
 
@@ -78,9 +79,9 @@ function suggest_content(App $a) {
 		$connlnk = System::baseUrl() . '/follow/?url=' . (($rr['connect']) ? $rr['connect'] : $rr['url']);
 		$ignlnk = System::baseUrl() . '/suggest?ignore=' . $rr['id'];
 		$photo_menu = [
-			'profile' => [t("View Profile"), Profile::zrl($rr["url"])],
-			'follow' => [t("Connect/Follow"), $connlnk],
-			'hide' => [t('Ignore/Hide'), $ignlnk]
+			'profile' => [L10n::t("View Profile"), Profile::zrl($rr["url"])],
+			'follow' => [L10n::t("Connect/Follow"), $connlnk],
+			'hide' => [L10n::t('Ignore/Hide'), $ignlnk]
 		];
 
 		$contact_details = Contact::getDetailsByURL($rr["url"], local_user(), $rr);
@@ -97,10 +98,10 @@ function suggest_content(App $a) {
 			'account_type'  => Contact::getAccountType($contact_details),
 			'ignlnk' => $ignlnk,
 			'ignid' => $rr['id'],
-			'conntxt' => t('Connect'),
+			'conntxt' => L10n::t('Connect'),
 			'connlnk' => $connlnk,
 			'photo_menu' => $photo_menu,
-			'ignore' => t('Ignore/Hide'),
+			'ignore' => L10n::t('Ignore/Hide'),
 			'network' => ContactSelector::networkToName($rr['network'], $rr['url']),
 			'id' => ++$id,
 		];
@@ -110,7 +111,7 @@ function suggest_content(App $a) {
 	$tpl = get_markup_template('viewcontact_template.tpl');
 
 	$o .= replace_macros($tpl,[
-		'$title' => t('Friend Suggestions'),
+		'$title' => L10n::t('Friend Suggestions'),
 		'$contacts' => $entries,
 	]);
 

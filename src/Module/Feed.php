@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\Core\System;
 use Friendica\Protocol\OStatus;
 
 /**
@@ -31,7 +32,7 @@ class Feed extends BaseModule
 		$nocache     = x($_GET, 'nocache') && local_user();
 
 		if ($a->argc < 2) {
-			http_status_exit(400);
+			System::httpExit(400);
 		}
 
 		$type = null;

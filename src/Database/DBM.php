@@ -5,6 +5,7 @@
 namespace Friendica\Database;
 
 use dba;
+use Friendica\Util\DateTimeFormat;
 
 require_once 'include/dba.php';
 
@@ -113,19 +114,13 @@ class DBM
 	/**
 	 * Checks Converts any date string into a SQL compatible date string
 	 *
+	 * @deprecated since version 3.6
 	 * @param string $date a date string in any format
 	 *
 	 * @return string SQL style date string
 	 */
 	public static function date($date = 'now')
 	{
-		$timestamp = strtotime($date);
-
-		// Don't allow lower date strings as '0001-01-01 00:00:00'
-		if ($timestamp < -62135596800) {
-			$timestamp = -62135596800;
-		}
-
-		return date('Y-m-d H:i:s', (int)$timestamp);
+		return DateTimeFormat::utc($date);
 	}
 }

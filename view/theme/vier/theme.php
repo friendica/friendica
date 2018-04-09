@@ -12,6 +12,7 @@
 use Friendica\App;
 use Friendica\Content\ForumManager;
 use Friendica\Core\Addon;
+use Friendica\Core\L10n;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -21,8 +22,8 @@ use Friendica\Model\Profile;
 
 require_once "mod/proxy.php";
 
-function vier_init(App $a) {
-
+function vier_init(App $a)
+{
 	$a->theme_events_in_profile = false;
 
 	$a->set_template_engine('smarty3');
@@ -84,7 +85,7 @@ function cmtBbClose(id) {
 </script>
 EOT;
 
-	if ($a->is_mobile || $a->is_tablet){
+	if ($a->is_mobile || $a->is_tablet) {
 		$a->page['htmlhead'] .= <<< EOT
 <script>
 	$(document).ready(function() {
@@ -108,7 +109,8 @@ EOT;
 	}
 }
 
-function get_vier_config($key, $default = false, $admin = false) {
+function get_vier_config($key, $default = false, $admin = false)
+{
 	if (local_user() && !$admin) {
 		$result = PConfig::get(local_user(), "vier", $key);
 		if (!is_null($result)) {
@@ -124,7 +126,8 @@ function get_vier_config($key, $default = false, $admin = false) {
 	return $default;
 }
 
-function vier_community_info() {
+function vier_community_info()
+{
 	$a = get_app();
 
 	$show_pages      = get_vier_config("show_pages", 1);
@@ -135,7 +138,7 @@ function vier_community_info() {
 	$show_lastusers  = get_vier_config("show_lastusers", 1);
 
 	// get_baseurl
-	$url = System::baseUrl($ssl_state);
+	$url = System::baseUrl();
 	$aside['$url'] = $url;
 
 	// comunity_profiles
@@ -144,12 +147,11 @@ function vier_community_info() {
 
 		$tpl = get_markup_template('ch_directory_item.tpl');
 		if (DBM::is_result($r)) {
-
-			$aside['$comunity_profiles_title'] = t('Community Profiles');
+			$aside['$comunity_profiles_title'] = L10n::t('Community Profiles');
 			$aside['$comunity_profiles_items'] = [];
 
 			foreach ($r as $rr) {
-				$entry = replace_macros($tpl,[
+				$entry = replace_macros($tpl, [
 					'$id' => $rr['id'],
 					//'$profile_link' => Profile::zrl($rr['url']),
 					'$profile_link' => 'follow/?url='.urlencode($rr['url']),
@@ -171,16 +173,17 @@ function vier_community_info() {
 		$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`
 				FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
 				WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $order LIMIT %d , %d ",
-				0, 9);
+			0,
+			9
+		);
 
 		if (DBM::is_result($r)) {
-
-			$aside['$lastusers_title'] = t('Last users');
+			$aside['$lastusers_title'] = L10n::t('Last users');
 			$aside['$lastusers_items'] = [];
 
 			foreach ($r as $rr) {
 				$profile_link = 'profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['profile_uid']);
-				$entry = replace_macros($tpl,[
+				$entry = replace_macros($tpl, [
 					'$id' => $rr['id'],
 					'$profile_link' => $profile_link,
 					'$photo' => $a->remove_baseurl($rr['thumb']),
@@ -193,12 +196,12 @@ function vier_community_info() {
 	//right_aside FIND FRIENDS
 	if ($show_friends && local_user()) {
 		$nv = [];
-		$nv['title'] = ["", t('Find Friends'), "", ""];
-		$nv['directory'] = ['directory', t('Local Directory'), "", ""];
-		$nv['global_directory'] = [get_server(), t('Global Directory'), "", ""];
-		$nv['match'] = ['match', t('Similar Interests'), "", ""];
-		$nv['suggest'] = ['suggest', t('Friend Suggestions'), "", ""];
-		$nv['invite'] = ['invite', t('Invite Friends'), "", ""];
+		$nv['title'] = ["", L10n::t('Find Friends'), "", ""];
+		$nv['directory'] = ['directory', L10n::t('Local Directory'), "", ""];
+		$nv['global_directory'] = [get_server(), L10n::t('Global Directory'), "", ""];
+		$nv['match'] = ['match', L10n::t('Similar Interests'), "", ""];
+		$nv['suggest'] = ['suggest', L10n::t('Friend Suggestions'), "", ""];
+		$nv['invite'] = ['invite', L10n::t('Invite Friends'), "", ""];
 
 		$nv['search'] = '<form name="simple_bar" method="get" action="dirfind">
 						<span class="sbox_l"></span>
@@ -212,6 +215,7 @@ function vier_community_info() {
 
 	//Community_Pages at right_aside
 	if ($show_pages && local_user()) {
+		$cid = null;
 		if (x($_GET, 'cid') && intval($_GET['cid']) != 0) {
 			$cid = $_GET['cid'];
 		}
@@ -244,15 +248,15 @@ function vier_community_info() {
 
 			$tpl = get_markup_template('widget_forumlist_right.tpl');
 
-			$page .= replace_macros(
+			$page = replace_macros(
 				$tpl,
 				[
-					'$title'          => t('Forums'),
+					'$title'          => L10n::t('Forums'),
 					'$forums'         => $entries,
-					'$link_desc'      => t('External link to forum'),
+					'$link_desc'      => L10n::t('External link to forum'),
 					'$total'          => $total,
 					'$visible_forums' => $visible_forums,
-					'$showmore'       => t('show more')]
+					'$showmore'       => L10n::t('show more')]
 			);
 
 			$aside['$page'] = $page;
@@ -266,13 +270,14 @@ function vier_community_info() {
 
 		$helperlist = Config::get("vier", "helperlist");
 
-		$helpers = explode(",",$helperlist);
+		$helpers = explode(",", $helperlist);
 
 		if ($helpers) {
 			$query = "";
-			foreach ($helpers AS $index=>$helper) {
-				if ($query != "")
+			foreach ($helpers as $index => $helper) {
+				if ($query != "") {
 					$query .= ",";
+				}
 
 				$query .= "'".dbesc(normalise_link(trim($helper)))."'";
 			}
@@ -280,22 +285,22 @@ function vier_community_info() {
 			$r = q("SELECT `url`, `name` FROM `gcontact` WHERE `nurl` IN (%s)", $query);
 		}
 
-		foreach ($r AS $index => $helper)
+		foreach ($r as $index => $helper) {
 			$r[$index]["url"] = Profile::zrl($helper["url"]);
+		}
 
-		$r[] = ["url" => "help/Quick-Start-guide", "name" => t("Quick Start")];
+		$r[] = ["url" => "help/Quick-Start-guide", "name" => L10n::t("Quick Start")];
 
 		$tpl = get_markup_template('ch_helpers.tpl');
 
 		if ($r) {
-
 			$helpers = [];
-			$helpers['title'] = ["", t('Help'), "", ""];
+			$helpers['title'] = ["", L10n::t('Help'), "", ""];
 
 			$aside['$helpers_items'] = [];
 
 			foreach ($r as $rr) {
-				$entry = replace_macros($tpl,[
+				$entry = replace_macros($tpl, [
 					'$url' => $rr['url'],
 					'$title' => $rr['name'],
 				]);
@@ -309,7 +314,6 @@ function vier_community_info() {
 
 	// connectable services
 	if ($show_services) {
-
 		/// @TODO This whole thing is hard-coded, better rewrite to Intercepting Filter Pattern (future-todo)
 		$r = [];
 
@@ -374,20 +378,19 @@ function vier_community_info() {
 			$r[] = ["photo" => "images/wordpress.png", "name" => "Wordpress"];
 		}
 
-		if (function_exists("imap_open") && !Config::get("system","imap_disabled") && !Config::get("system","dfrn_only")) {
+		if (function_exists("imap_open") && !Config::get("system", "imap_disabled") && !Config::get("system", "dfrn_only")) {
 			$r[] = ["photo" => "images/mail.png", "name" => "E-Mail"];
 		}
 
 		$tpl = get_markup_template('ch_connectors.tpl');
 
 		if (DBM::is_result($r)) {
-
 			$con_services = [];
-			$con_services['title'] = ["", t('Connect Services'), "", ""];
+			$con_services['title'] = ["", L10n::t('Connect Services'), "", ""];
 			$aside['$con_services'] = $con_services;
 
 			foreach ($r as $rr) {
-				$entry = replace_macros($tpl,[
+				$entry = replace_macros($tpl, [
 					'$url' => $url,
 					'$photo' => $rr['photo'],
 					'$alt_text' => $rr['name'],
@@ -395,7 +398,6 @@ function vier_community_info() {
 				$aside['$connector_items'][] = $entry;
 			}
 		}
-
 	}
 	//end connectable services
 

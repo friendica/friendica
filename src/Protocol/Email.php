@@ -4,7 +4,7 @@
  */
 namespace Friendica\Protocol;
 
-require_once 'include/html2plain.php';
+use Friendica\Content\Text\HTML;
 
 /**
  * @brief Email class
@@ -111,7 +111,7 @@ class Email
 			if (trim($ret['body']) == '') {
 				$ret['body'] = self::messageGetPart($mbox, $uid, $struc, 0, 'plain');
 			} else {
-				$ret['body'] = html2bbcode($ret['body']);
+				$ret['body'] = HTML::toBBCode($ret['body']);
 			}
 		} else {
 			$text = '';
@@ -128,7 +128,7 @@ class Email
 				}
 			}
 			if (trim($html) != '') {
-				$ret['body'] = html2bbcode($html);
+				$ret['body'] = HTML::toBBCode($html);
 			} else {
 				$ret['body'] = $text;
 			}
@@ -328,7 +328,7 @@ class Email
 		$body .= "Content-Transfer-Encoding: 8bit\n";
 		$body .= "Content-Type: text/plain; charset=utf-8; format=flowed\n\n";
 
-		$body .= html2plain($html)."\n";
+		$body .= HTML::toPlaintext($html)."\n";
 
 		$body .= "--=_".$part."\n";
 		$body .= "Content-Transfer-Encoding: 8bit\n";
@@ -617,12 +617,7 @@ class Email
 			$currline = $arrbody[$i];
 
 			while ($previousquote < $quotelevel) {
-				if ($sender != '') {
-					$quote = "[quote title=$sender]";
-					$sender = '';
-				} else
-					$quote = "[quote]";
-
+				$quote = "[quote]";
 				$arrbody[$i] = $quote.$arrbody[$i];
 				$previousquote++;
 			}

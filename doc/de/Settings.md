@@ -54,6 +54,20 @@ Das `vier` Theme z.B. unterstützt kleine Anzeigen und benötigt kein zusätzlic
 
 ### Registrierung
 
+#### Registrierungsmethode
+
+Diese Einstellung regelt die Art der Registrierung.
+Dabei kannst du zwischen den folgenden Optionen wählen:
+
+* **Offen**: Jeder kann ein neues Nutzerkonto anlegen und es sofort benutzen.
+* **Bedarf der Zustimmung**: Jeder kann ein Nutzerkonto anlegen. Dieses muss allerdings durch den Admin freigeschaltet werden, bevor es verwendet werden kann.
+* **Geschlossen**: Es können keine weiteren Nutzerkonten angelegt werden.
+
+##### Einladungen 
+
+Zusätzlich zu den oben genannten Möglichkeiten, kann die Registrierung eines neuen Nutzerkontos an eine Einladung durch einen bestehenden Nutzer gekoppelt werden.
+Hierzu muss in der [.htconfig.php](/help/htconfig) Datei die Option `invitation_only` aktiviert und als Registrierungsmethode entweder *Offen* oder *Bedarf der Zustimmung* gewählt werden.
+
 #### Namen auf Vollständigkeit überprüfen
 
 Es kann vorkommen, dass viele Spammer versuchen, sich auf deiner Seite zu registrieren. 
@@ -107,6 +121,15 @@ Beachte: das ist speziell für Seiten, die beabsichtigen, von anderen Friendica-
 Unautorisierte Personen haben ebenfalls nicht die Möglichkeit, Freundschaftsanfragen von Seitennutzern zu beantworten. 
 Die Standardeinstellung ist deaktiviert. 
 Verfügbar in Version 2.2 und höher.
+
+#### Für Besucher verfügbare Gemeinschaftsseiten
+
+Die Gemeinschaftsseiten zeigen all öffentlichen Beiträge.
+Es gibt zwei Gemeinschaftsseiten, eine lokale auf der die Beiträge der Nutzer des Knotens gesammelt werden und eine globale auf der alle bekannten Beiträge aus dem gesamten Netzwerk erscheinen.
+Mit dieser Einstellung kann geregelt werden, welche dieser beiden Seiten Besucher aufrufen können.
+Angemeldete Nutzer des Knotens können grundsätzlich beide Seiten verwenden.
+
+**Hinweis**: Einige Einstellungen, wie z.B. das Verbergen von Kontakten auf der Profilseite, können die Sichtbarkeit der Beiträge auf der Gemeinschaftsseiten beeinflussen.
 
 #### Erlaubte Domains für Kontakte
 

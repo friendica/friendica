@@ -2,9 +2,12 @@
 /**
  * @file mod/community.php
  */
+
 use Friendica\App;
 use Friendica\Content\Nav;
+use Friendica\Core\ACL;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
 
@@ -21,7 +24,7 @@ function community_content(App $a, $update = 0)
 	$o = '';
 
 	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
-		notice(t('Public access denied.') . EOL);
+		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
 
@@ -30,7 +33,7 @@ function community_content(App $a, $update = 0)
 	if ($a->argc > 1) {
 		$content = $a->argv[1];
 	} else {
-		if (!empty(Config::get('system','singleuser'))) {
+		if (!empty(Config::get('system', 'singleuser'))) {
 			// On single user systems only the global page does make sense
 			$content = 'global';
 		} else {
@@ -40,7 +43,7 @@ function community_content(App $a, $update = 0)
 	}
 
 	if (!in_array($content, ['local', 'global'])) {
-		notice(t('Community option not available.') . EOL);
+		notice(L10n::t('Community option not available.') . EOL);
 		return;
 	}
 
@@ -57,24 +60,23 @@ function community_content(App $a, $update = 0)
 		}
 
 		if (!$available) {
-			notice(t('Not available.') . EOL);
+			notice(L10n::t('Not available.') . EOL);
 			return;
 		}
 	}
 
-	require_once 'include/bbcode.php';
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
 
 	if (!$update) {
 		$tabs = [];
 
-		if ((local_user() || in_array($page_style, [CP_USERS_AND_GLOBAL, CP_USERS_ON_SERVER])) && empty(Config::get('system','singleuser'))) {
+		if ((local_user() || in_array($page_style, [CP_USERS_AND_GLOBAL, CP_USERS_ON_SERVER])) && empty(Config::get('system', 'singleuser'))) {
 			$tabs[] = [
-				'label' => t('Community'),
+				'label' => L10n::t('Local Community'),
 				'url' => 'community/local',
 				'sel' => $content == 'local' ? 'active' : '',
-				'title' => t('Posts from local users on this server'),
+				'title' => L10n::t('Posts from local users on this server'),
 				'id' => 'community-local-tab',
 				'accesskey' => 'l'
 			];
@@ -82,10 +84,10 @@ function community_content(App $a, $update = 0)
 
 		if (local_user() || in_array($page_style, [CP_USERS_AND_GLOBAL, CP_GLOBAL_COMMUNITY])) {
 			$tabs[] = [
-				'label' => t('Global Timeline'),
+				'label' => L10n::t('Global Community'),
 				'url' => 'community/global',
 				'sel' => $content == 'global' ? 'active' : '',
-				'title' => t('Posts from users of the federated network'),
+				'title' => L10n::t('Posts from users of the whole federated network'),
 				'id' => 'community-global-tab',
 				'accesskey' => 'g'
 			];
@@ -104,7 +106,7 @@ function community_content(App $a, $update = 0)
 				'default_location' => $a->user['default-location'],
 				'nickname' => $a->user['nickname'],
 				'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-				'acl' => populate_acl($a->user, true),
+				'acl' => ACL::getFullSelectorHTML($a->user, true),
 				'bang' => '',
 				'visitor' => 'block',
 				'profile_uid' => local_user(),
@@ -113,28 +115,25 @@ function community_content(App $a, $update = 0)
 		}
 	}
 
-	if (Config::get('system', 'comment_public')) {
-		// check if we serve a mobile device and get the user settings
-		// accordingly
-		if ($a->is_mobile) {
-			$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network', 20);
-		} else {
-			$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network', 40);
-		}
-
-		// now that we have the user settings, see if the theme forces
-		// a maximum item number which is lower then the user choice
-		if (($a->force_max_items > 0) && ($a->force_max_items < $itemspage_network)) {
-			$itemspage_network = $a->force_max_items;
-		}
-
-		$a->set_pager_itemspage($itemspage_network);
+	// check if we serve a mobile device and get the user settings accordingly
+	if ($a->is_mobile) {
+		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network', 20);
+	} else {
+		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network', 40);
 	}
+
+	// now that we have the user settings, see if the theme forces
+	// a maximum item number which is lower then the user choice
+	if (($a->force_max_items > 0) && ($a->force_max_items < $itemspage_network)) {
+		$itemspage_network = $a->force_max_items;
+	}
+
+	$a->set_pager_itemspage($itemspage_network);
 
 	$r = community_getitems($a->pager['start'], $a->pager['itemspage'], $content);
 
 	if (!DBM::is_result($r)) {
-		info(t('No results.') . EOL);
+		info(L10n::t('No results.') . EOL);
 		return $o;
 	}
 
@@ -178,31 +177,27 @@ function community_content(App $a, $update = 0)
 		'$content' => $o,
 		'$header' => '',
 		'$show_global_community_hint' => ($content == 'global') && Config::get('system', 'show_global_community_hint'),
-		'$global_community_hint' => t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
+		'$global_community_hint' => L10n::t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
 	]);
 }
 
 function community_getitems($start, $itemspage, $content)
 {
 	if ($content == 'local') {
-		$r = dba::p("SELECT " . item_fieldlists() . " FROM `thread`
+		$r = dba::p("SELECT `item`.`uri`, `item`.`author-link` FROM `thread`
 			INNER JOIN `user` ON `user`.`uid` = `thread`.`uid` AND NOT `user`.`hidewall`
 			INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
-			AND `item`.`allow_cid` = ''  AND `item`.`allow_gid` = ''
-			AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = ''" .
-			item_joins() . " AND `contact`.`self`
 			WHERE `thread`.`visible` AND NOT `thread`.`deleted` AND NOT `thread`.`moderated`
-			AND NOT `thread`.`private` AND `thread`.`wall`
+			AND NOT `thread`.`private` AND `thread`.`wall` AND `thread`.`origin`
 			ORDER BY `thread`.`commented` DESC LIMIT " . intval($start) . ", " . intval($itemspage)
 		);
 		return dba::inArray($r);
 	} elseif ($content == 'global') {
-		$r = dba::p("SELECT " . item_fieldlists() . " FROM `thread`
-			INNER JOIN `item` ON `item`.`id` = `thread`.`iid` " . item_joins() .
-				"WHERE `thread`.`uid` = 0 AND `verb` = ?
-			ORDER BY `thread`.`commented` DESC LIMIT " . intval($start) . ", " . intval($itemspage),
-			ACTIVITY_POST
-		);
+		$r = dba::p("SELECT `uri` FROM `thread`
+				INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
+		                INNER JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id`
+				WHERE `thread`.`uid` = 0 AND NOT `author`.`hidden` AND NOT `author`.`blocked`
+				ORDER BY `thread`.`commented` DESC LIMIT " . intval($start) . ", " . intval($itemspage));
 		return dba::inArray($r);
 	}
 

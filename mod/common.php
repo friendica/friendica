@@ -4,11 +4,11 @@
  */
 use Friendica\App;
 use Friendica\Content\ContactSelector;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
-use dba;
 
 require_once 'include/dba.php';
 require_once 'mod/contacts.php';
@@ -23,7 +23,7 @@ function common_content(App $a)
 	$zcid = 0;
 
 	if (!local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -88,7 +88,7 @@ function common_content(App $a)
 	if ($t > 0) {
 		$a->set_pager_total($t);
 	} else {
-		notice(t('No contacts in common.') . EOL);
+		notice(L10n::t('No contacts in common.') . EOL);
 		return $o;
 	}
 
@@ -137,7 +137,7 @@ function common_content(App $a)
 	if ($cmd === 'loc' && $cid && local_user() == $uid) {
 		$tab_str = contacts_tab($a, $cid, 4);
 	} else {
-		$title = t('Common Friends');
+		$title = L10n::t('Common Friends');
 	}
 
 	$tpl = get_markup_template('viewcontact_template.tpl');

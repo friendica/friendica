@@ -9,6 +9,7 @@ use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
+use Friendica\Util\Network;
 
 function nodeinfo_wellknown(App $a) {
 	$nodeinfo = ['links' => [['rel' => 'http://nodeinfo.diaspora.software/ns/schema/1.0',
@@ -21,12 +22,12 @@ function nodeinfo_wellknown(App $a) {
 
 function nodeinfo_init(App $a) {
 	if (!Config::get('system', 'nodeinfo')) {
-		http_status_exit(404);
+		System::httpExit(404);
 		killme();
 	}
 
 	if (($a->argc != 2) || ($a->argv[1] != '1.0')) {
-		http_status_exit(404);
+		System::httpExit(404);
 		killme();
 	}
 
@@ -246,7 +247,7 @@ function nodeinfo_cron() {
 	// Now trying to register
 	$url = 'http://the-federation.info/register/'.$a->get_hostname();
         logger('registering url: '.$url, LOGGER_DEBUG);
-	$ret = fetch_url($url);
+	$ret = Network::fetchUrl($url);
         logger('registering answer: '.$ret, LOGGER_DEBUG);
 
         logger('cron_end');

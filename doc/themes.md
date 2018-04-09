@@ -6,7 +6,6 @@ To change the look of friendica you have to touch the themes.
 The current default theme is [Vier](https://github.com/friendica/friendica/tree/master/view/theme/vier) but there are numerous others.
 Have a look at [friendica-themes.com](http://friendica-themes.com) for an overview of the existing themes.
 In case none of them suits your needs, there are several ways to change a theme.
-If you need help theming, there is a forum @[ftdevs@friendica.eu](https://friendica.eu/profile/ftdevs) where you can ask theme specific questions and present your themes.
 
 So, how to work on the UI of friendica.
 
@@ -65,11 +64,11 @@ they will be overwritten by files in
 
 ### Theme Variations
 
-Many themes are more *theme families* then only one theme.
+Many themes are more *theme families* than only one theme.
 *duepunto zero* and *vier* allow easily to add new theme variation.
 We will go through the process of creating a new variation for *duepunto zero*.
 The same  (well almost, some names change) procedure applies to the *vier* theme.
-And similar steps are needed for *quattro* but this theme is using [lessc](http://lesscss.org/#docs) to maintain the CSS files..
+And similar steps are needed for *quattro* but this theme is using [lesscss](http://lesscss.org/#docs) to maintain the CSS files..
 
 In
 
@@ -88,12 +87,12 @@ The template (theme_settings.tpl)
     </div>
 
 defines a formular consisting of a [select](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select) pull-down which contains all aviable variants and s submit button.
-See the documentation about [SMARTY3 templates](/help/snarty3-templates.md) for a summary of friendica specific blocks other then the select element.
+See the documentation about [SMARTY3 templates](/help/snarty3-templates.md) for a summary of friendica specific blocks other than the select element.
 But we don't really need to change anything at the template itself.
 
 The template alone wont work though.
 You make friendica aware of its existance and tell it how to use the template file, by defining a config.php file.
-It needs to define at lest the following functions
+It needs to define at least the following functions
 
 * theme_content
 * theme_post
@@ -109,17 +108,17 @@ The _post functions handle the processing of the send form, in this case they sa
 To make your own variation appear in the menu, all you need to do is to create a new CSS file in the deriv directoy and include it in the array in the config.php:
 
     $colorset = array(
-        'default'=>t('default'),
-        'greenzero'=>t('greenzero'),
-        'purplezero'=>t('purplezero'),
-        'easterbunny'=>t('easterbunny'),
-        'darkzero'=>t('darkzero'),
-        'comix'=>t('comix'),
-        'slackr'=>t('slackr'),
+        'default'=>L10n::t('default'),
+        'greenzero'=>L10n::t('greenzero'),
+        'purplezero'=>L10n::t('purplezero'),
+        'easterbunny'=>L10n::t('easterbunny'),
+        'darkzero'=>L10n::t('darkzero'),
+        'comix'=>L10n::t('comix'),
+        'slackr'=>L10n::t('slackr'),
     );
 
 the 1st part of the line is the name of the CSS file (without the .css) the 2nd part is the common name of the variant.
-Calling the t() function with the common name makes the string translateable.
+Calling the L10n::t() function with the common name makes the string translateable.
 The selected 1st part will be saved in the database by the theme_post function.
 
     function theme_post(App $a){
@@ -206,7 +205,7 @@ Basically what you have to do is identify which template you have to change so i
 Adopt the CSS of the theme accordingly.
 And iterate the process until you have the theme the way you want it.
 
-*Use the source Luke.* and don't hesitate to ask in @[ftdevs](https://friendica.eu/profile/ftdevs) or @[helpers](https://forum.friendi.ca/profile/helpers).
+*Use the source Luke.* and don't hesitate to ask in @[developers](https://forum.friendi.ca/profile/developers) or @[helpers](https://forum.friendi.ca/profile/helpers).
 
 ## Special Files
 
@@ -230,7 +229,7 @@ Supported formats are PNG and JPEG.
 ### theme.php
 
 This is the main definition file of the theme.
-In the header of that file, some meta information are stored.
+In the header of that file, some meta information is stored.
 For example, have a look at the theme.php of the *quattro* theme:
 
     <?php
@@ -242,10 +241,10 @@ For example, have a look at the theme.php of the *quattro* theme:
      * Maintainer: Tobias <https://f.diekershoff.de/profile/tobias>
      */
 
-You see the definition of the themes name, it's version and the initial author of the theme.
+You see the definition of the theme's name, it's version and the initial author of the theme.
 These three pieces of information should be listed.
 If the original author is no longer working on the theme, but a maintainer has taken over, the maintainer should be listed as well.
-The information from the theme header will be displayed in the admin panelö.
+The information from the theme header will be displayed in the admin panel.
 
 The next crucial part of the theme.php file is a definition of an init function.
 The name of the function is <theme-name>_init.

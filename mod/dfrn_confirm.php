@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file mod/dfrn_confirm.php
  * @brief Module: dfrn_confirm
@@ -20,16 +19,21 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
+use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\Crypto;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
+use Friendica\Util\XML;
 
 require_once 'include/enotify.php';
 require_once 'include/items.php';
@@ -61,13 +65,13 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 	if (!x($_POST, 'source_url')) {
 		$uid = defaults($handsfree, 'uid', local_user());
 		if (!$uid) {
-			notice(t('Permission denied.') . EOL);
+			notice(L10n::t('Permission denied.') . EOL);
 			return;
 		}
 
 		$user = dba::selectFirst('user', [], ['uid' => $uid]);
 		if (!DBM::is_result($user)) {
-			notice(t('Profile not found.') . EOL);
+			notice(L10n::t('Profile not found.') . EOL);
 			return;
 		}
 
@@ -124,8 +128,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		);
 		if (!DBM::is_result($r)) {
 			logger('Contact not found in DB.');
-			notice(t('Contact not found.') . EOL);
-			notice(t('This may occasionally happen if contact was requested by both persons and it has already been approved.') . EOL);
+			notice(L10n::t('Contact not found.') . EOL);
+			notice(L10n::t('This may occasionally happen if contact was requested by both persons and it has already been approved.') . EOL);
 			return;
 		}
 
@@ -220,7 +224,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			 *
 			 */
 
-			$res = post_url($dfrn_confirm, $params, null, $redirects, 120);
+			$res = Network::post($dfrn_confirm, $params, null, $redirects, 120);
 
 			logger(' Confirm: received data: ' . $res, LOGGER_DATA);
 
@@ -235,28 +239,28 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				// We shouldn't proceed, because the xml parser might choke,
 				// and $status is going to be zero, which indicates success.
 				// We can hardly call this a success.
-				notice(t('Response from remote site was not understood.') . EOL);
+				notice(L10n::t('Response from remote site was not understood.') . EOL);
 				return;
 			}
 
 			if (strlen($leading_junk) && Config::get('system', 'debugging')) {
 				// This might be more common. Mixed error text and some XML.
 				// If we're configured for debugging, show the text. Proceed in either case.
-				notice(t('Unexpected response from remote site: ') . EOL . $leading_junk . EOL);
+				notice(L10n::t('Unexpected response from remote site: ') . EOL . $leading_junk . EOL);
 			}
 
 			if (stristr($res, "<status") === false) {
 				// wrong xml! stop here!
-				notice(t('Unexpected response from remote site: ') . EOL . htmlspecialchars($res) . EOL);
+				notice(L10n::t('Unexpected response from remote site: ') . EOL . htmlspecialchars($res) . EOL);
 				return;
 			}
 
-			$xml = parse_xml_string($res);
+			$xml = XML::parseString($res);
 			$status = (int) $xml->status;
 			$message = unxmlify($xml->message);   // human readable text of what may have gone wrong.
 			switch ($status) {
 				case 0:
-					info(t("Confirmation completed successfully.") . EOL);
+					info(L10n::t("Confirmation completed successfully.") . EOL);
 					break;
 				case 1:
 					// birthday paradox - generate new dfrn-id and fall through.
@@ -268,15 +272,15 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 					);
 
 				case 2:
-					notice(t("Temporary failure. Please wait and try again.") . EOL);
+					notice(L10n::t("Temporary failure. Please wait and try again.") . EOL);
 					break;
 				case 3:
-					notice(t("Introduction failed or was revoked.") . EOL);
+					notice(L10n::t("Introduction failed or was revoked.") . EOL);
 					break;
 			}
 
 			if (strlen($message)) {
-				notice(t('Remote site reported: ') . $message . EOL);
+				notice(L10n::t('Remote site reported: ') . $message . EOL);
 			}
 
 			if (($status == 0) && ($intro_id)) {
@@ -323,8 +327,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				`network` = '%s' WHERE `id` = %d
 			",
 				intval($new_relation),
-				dbesc(datetime_convert()),
-				dbesc(datetime_convert()),
+				dbesc(DateTimeFormat::utcNow()),
+				dbesc(DateTimeFormat::utcNow()),
 				intval($duplex),
 				intval($hidden),
 				dbesc(NETWORK_DFRN),
@@ -374,8 +378,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				`rel` = %d
 				WHERE `id` = %d
 			",
-				dbesc(datetime_convert()),
-				dbesc(datetime_convert()),
+				dbesc(DateTimeFormat::utcNow()),
+				dbesc(DateTimeFormat::utcNow()),
 				dbesc($addr),
 				dbesc($notify),
 				dbesc($poll),
@@ -389,7 +393,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		/// @TODO is DBM::is_result() working here?
 		if (!DBM::is_result($r)) {
-			notice(t('Unable to set contact photo.') . EOL);
+			notice(L10n::t('Unable to set contact photo.') . EOL);
 		}
 
 		// reload contact info
@@ -424,7 +428,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 					$arr['verb'] = ACTIVITY_FRIEND;
 					$arr['object-type'] = ACTIVITY_OBJ_PERSON;
-					$arr['body'] = t('%1$s is now friends with %2$s', $A, $B) . "\n\n\n" . $BPhoto;
+					$arr['body'] = L10n::t('%1$s is now friends with %2$s', $A, $B) . "\n\n\n" . $BPhoto;
 
 					$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $contact['name'] . '</title>'
 						. '<id>' . $contact['url'] . '/' . $contact['name'] . '</id>';
@@ -437,7 +441,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 					$arr['deny_cid']  = $user['deny_cid'];
 					$arr['deny_gid']  = $user['deny_gid'];
 
-					$i = item_store($arr);
+					$i = Item::insert($arr);
 					if ($i) {
 						Worker::add(PRIORITY_HIGH, "Notifier", "activity", $i);
 					}
@@ -491,8 +495,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		// Find our user's account
 		$user = dba::selectFirst('user', [], ['nickname' => $node]);
 		if (!DBM::is_result($user)) {
-			$message = t('No user record found for \'%s\' ', $node);
-			xml_status(3, $message); // failure
+			$message = L10n::t('No user record found for \'%s\' ', $node);
+			System::xmlExit(3, $message); // failure
 			// NOTREACHED
 		}
 
@@ -501,8 +505,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 
 		if (!strstr($my_prvkey, 'PRIVATE KEY')) {
-			$message = t('Our site encryption key is apparently messed up.');
-			xml_status(3, $message);
+			$message = L10n::t('Our site encryption key is apparently messed up.');
+			System::xmlExit(3, $message);
 		}
 
 		// verify everything
@@ -512,8 +516,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 
 		if (!strlen($decrypted_source_url)) {
-			$message = t('Empty site URL was provided or URL could not be decrypted by us.');
-			xml_status(3, $message);
+			$message = L10n::t('Empty site URL was provided or URL could not be decrypted by us.');
+			System::xmlExit(3, $message);
 			// NOTREACHED
 		}
 
@@ -528,8 +532,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$contact = dba::selectFirst('contact', [], ['url' => $newurl, 'uid' => $local_uid]);
 			if (!DBM::is_result($contact)) {
 				// this is either a bogus confirmation (?) or we deleted the original introduction.
-				$message = t('Contact record was not found for you on our site.');
-				xml_status(3, $message);
+				$message = L10n::t('Contact record was not found for you on our site.');
+				System::xmlExit(3, $message);
 				return; // NOTREACHED
 			}
 		}
@@ -542,8 +546,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		$dfrn_record = $contact['id'];
 
 		if (!$foreign_pubkey) {
-			$message = t('Site public key not available in contact record for URL %s.', $decrypted_source_url);
-			xml_status(3, $message);
+			$message = L10n::t('Site public key not available in contact record for URL %s.', $decrypted_source_url);
+			System::xmlExit(3, $message);
 		}
 
 		$decrypted_dfrn_id = "";
@@ -558,8 +562,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		}
 
 		if (dba::exists('contact', ['dfrn-id' => $decrypted_dfrn_id])) {
-			$message = t('The ID provided by your system is a duplicate on our system. It should work if you try again.');
-			xml_status(1, $message); // Birthday paradox - duplicate dfrn-id
+			$message = L10n::t('The ID provided by your system is a duplicate on our system. It should work if you try again.');
+			System::xmlExit(1, $message); // Birthday paradox - duplicate dfrn-id
 			// NOTREACHED
 		}
 
@@ -569,8 +573,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			intval($dfrn_record)
 		);
 		if (!DBM::is_result($r)) {
-			$message = t('Unable to set your contact credentials on our system.');
-			xml_status(3, $message);
+			$message = L10n::t('Unable to set your contact credentials on our system.');
+			System::xmlExit(3, $message);
 		}
 
 		// It's possible that the other person also requested friendship.
@@ -615,8 +619,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			`network` = '%s' WHERE `id` = %d
 		",
 			intval($new_relation),
-			dbesc(datetime_convert()),
-			dbesc(datetime_convert()),
+			dbesc(DateTimeFormat::utcNow()),
+			dbesc(DateTimeFormat::utcNow()),
 			intval($duplex),
 			intval($forum),
 			intval($prv),
@@ -624,8 +628,8 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			intval($dfrn_record)
 		);
 		if (!DBM::is_result($r)) {	// indicates schema is messed up or total db failure
-			$message = t('Unable to update your contact profile details on our system');
-			xml_status(3, $message);
+			$message = L10n::t('Unable to update your contact profile details on our system');
+			System::xmlExit(3, $message);
 		}
 
 		// Otherwise everything seems to have worked and we are almost done. Yay!
@@ -654,7 +658,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 					'to_email'     => $combined['email'],
 					'uid'          => $combined['uid'],
 					'link'         => System::baseUrl() . '/contacts/' . $dfrn_record,
-					'source_name'  => ((strlen(stripslashes($combined['name']))) ? stripslashes($combined['name']) : t('[Name Withheld]')),
+					'source_name'  => ((strlen(stripslashes($combined['name']))) ? stripslashes($combined['name']) : L10n::t('[Name Withheld]')),
 					'source_link'  => $combined['url'],
 					'source_photo' => $combined['photo'],
 					'verb'         => ($mutual?ACTIVITY_FRIEND:ACTIVITY_FOLLOW),
@@ -687,7 +691,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 					$arr['verb'] = ACTIVITY_JOIN;
 					$arr['object-type'] = ACTIVITY_OBJ_GROUP;
-					$arr['body'] = t('%1$s has joined %2$s', $A, $B) . "\n\n\n" . $BPhoto;
+					$arr['body'] = L10n::t('%1$s has joined %2$s', $A, $B) . "\n\n\n" . $BPhoto;
 					$arr['object'] = '<object><type>' . ACTIVITY_OBJ_GROUP . '</type><title>' . $combined['name'] . '</title>'
 						. '<id>' . $combined['url'] . '/' . $combined['name'] . '</id>';
 					$arr['object'] .= '<link>' . xmlify('<link rel="alternate" type="text/html" href="' . $combined['url'] . '" />' . "\n");
@@ -699,14 +703,14 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 					$arr['deny_cid']  = $user['deny_cid'];
 					$arr['deny_gid']  = $user['deny_gid'];
 
-					$i = item_store($arr);
+					$i = Item::insert($arr);
 					if ($i) {
 						Worker::add(PRIORITY_HIGH, "Notifier", "activity", $i);
 					}
 				}
 			}
 		}
-		xml_status(0); // Success
+		System::xmlExit(0); // Success
 		return; // NOTREACHED
 		////////////////////// End of this scenario ///////////////////////////////////////////////
 	}

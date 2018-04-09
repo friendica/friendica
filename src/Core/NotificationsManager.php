@@ -1,24 +1,25 @@
 <?php
-
 /**
  * @file src/Core/NotificationsManager.php
  * @brief Methods for read and write notifications from/to database
  *  or for formatting notifications
  */
-
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\HTML;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Temporal;
+use Friendica\Util\XML;
 
 require_once 'include/dba.php';
-require_once 'include/html2plain.php';
-require_once 'include/datetime.php';
-require_once 'include/bbcode.php';
 
 /**
  * @brief Methods for read and write notifications from/to database
@@ -42,11 +43,11 @@ class NotificationsManager extends BaseObject
 	{
 		$rets = [];
 		foreach ($notes as $n) {
-			$local_time = datetime_convert('UTC', date_default_timezone_get(), $n['date']);
+			$local_time = DateTimeFormat::local($n['date']);
 			$n['timestamp'] = strtotime($local_time);
-			$n['date_rel'] = relative_date($n['date']);
-			$n['msg_html'] = bbcode($n['msg'], false, false, false, false);
-			$n['msg_plain'] = explode("\n", trim(html2plain($n['msg_html'], 0)))[0];
+			$n['date_rel'] = Temporal::getRelativeDate($n['date']);
+			$n['msg_html'] = BBCode::convert($n['msg'], false);
+			$n['msg_plain'] = explode("\n", trim(HTML::toPlaintext($n['msg_html'], 0)))[0];
 
 			$rets[] = $n;
 		}
@@ -134,7 +135,7 @@ class NotificationsManager extends BaseObject
 	public function setSeen($note, $seen = true)
 	{
 		return q(
-			"UPDATE `notify` SET `seen` = %d WHERE ( `link` = '%s' OR ( `parent` != 0 AND `parent` = %d AND `otype` = '%s' )) AND `uid` = %d",
+			"UPDATE `notify` SET `seen` = %d WHERE (`link` = '%s' OR (`parent` != 0 AND `parent` = %d AND `otype` = '%s')) AND `uid` = %d",
 			intval($seen),
 			dbesc($note['link']),
 			intval($note['parent']),
@@ -167,35 +168,35 @@ class NotificationsManager extends BaseObject
 	{
 		$tabs = [
 			[
-				'label' => t('System'),
+				'label' => L10n::t('System'),
 				'url'   => 'notifications/system',
 				'sel'   => ((self::getApp()->argv[1] == 'system') ? 'active' : ''),
 				'id'    => 'system-tab',
 				'accesskey' => 'y',
 			],
 			[
-				'label' => t('Network'),
+				'label' => L10n::t('Network'),
 				'url'   => 'notifications/network',
 				'sel'   => ((self::getApp()->argv[1] == 'network') ? 'active' : ''),
 				'id'    => 'network-tab',
 				'accesskey' => 'w',
 			],
 			[
-				'label' => t('Personal'),
+				'label' => L10n::t('Personal'),
 				'url'   => 'notifications/personal',
 				'sel'   => ((self::getApp()->argv[1] == 'personal') ? 'active' : ''),
 				'id'    => 'personal-tab',
 				'accesskey' => 'r',
 			],
 			[
-				'label' => t('Home'),
+				'label' => L10n::t('Home'),
 				'url'   => 'notifications/home',
 				'sel'   => ((self::getApp()->argv[1] == 'home') ? 'active' : ''),
 				'id'    => 'home-tab',
 				'accesskey' => 'h',
 			],
 			[
-				'label' => t('Introductions'),
+				'label' => L10n::t('Introductions'),
 				'url'   => 'notifications/intros',
 				'sel'   => ((self::getApp()->argv[1] == 'intros') ? 'active' : ''),
 				'id'    => 'intro-tab',
@@ -242,9 +243,9 @@ class NotificationsManager extends BaseObject
 						$default_item_link = System::baseUrl(true) . '/notify/view/' . $it['id'];
 						$default_item_image = proxy_url($it['photo'], false, PROXY_SIZE_MICRO);
 						$default_item_url = $it['url'];
-						$default_item_text = strip_tags(bbcode($it['msg']));
-						$default_item_when = datetime_convert('UTC', date_default_timezone_get(), $it['date'], 'r');
-						$default_item_ago = relative_date($it['date']);
+						$default_item_text = strip_tags(BBCode::convert($it['msg']));
+						$default_item_when = DateTimeFormat::local($it['date'], 'r');
+						$default_item_ago = Temporal::getRelativeDate($it['date']);
 						break;
 
 					case 'home':
@@ -252,9 +253,9 @@ class NotificationsManager extends BaseObject
 						$default_item_link = System::baseUrl(true) . '/display/' . $it['pguid'];
 						$default_item_image = proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO);
 						$default_item_url = $it['author-link'];
-						$default_item_text = sprintf(t("%s commented on %s's post"), $it['author-name'], $it['pname']);
-						$default_item_when = datetime_convert('UTC', date_default_timezone_get(), $it['created'], 'r');
-						$default_item_ago = relative_date($it['created']);
+						$default_item_text = L10n::t("%s commented on %s's post", $it['author-name'], $it['pname']);
+						$default_item_when = DateTimeFormat::local($it['created'], 'r');
+						$default_item_ago = Temporal::getRelativeDate($it['created']);
 						break;
 
 					default:
@@ -263,10 +264,10 @@ class NotificationsManager extends BaseObject
 						$default_item_image = proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO);
 						$default_item_url = $it['author-link'];
 						$default_item_text = (($it['id'] == $it['parent'])
-									? sprintf(t("%s created a new post"), $it['author-name'])
-									: sprintf(t("%s commented on %s's post"), $it['author-name'], $it['pname']));
-						$default_item_when = datetime_convert('UTC', date_default_timezone_get(), $it['created'], 'r');
-						$default_item_ago = relative_date($it['created']);
+									? L10n::t("%s created a new post", $it['author-name'])
+									: L10n::t("%s commented on %s's post", $it['author-name'], $it['pname']));
+						$default_item_when = DateTimeFormat::local($it['created'], 'r');
+						$default_item_ago = Temporal::getRelativeDate($it['created']);
 				}
 
 				// Transform the different types of notification in an usable array
@@ -277,7 +278,7 @@ class NotificationsManager extends BaseObject
 							'link' => System::baseUrl(true) . '/display/' . $it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
 							'url' => $it['author-link'],
-							'text' => sprintf(t("%s liked %s's post"), $it['author-name'], $it['pname']),
+							'text' => L10n::t("%s liked %s's post", $it['author-name'], $it['pname']),
 							'when' => $default_item_when,
 							'ago' => $default_item_ago,
 							'seen' => $it['seen']
@@ -290,7 +291,7 @@ class NotificationsManager extends BaseObject
 							'link' => System::baseUrl(true) . '/display/' . $it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
 							'url' => $it['author-link'],
-							'text' => sprintf(t("%s disliked %s's post"), $it['author-name'], $it['pname']),
+							'text' => L10n::t("%s disliked %s's post", $it['author-name'], $it['pname']),
 							'when' => $default_item_when,
 							'ago' => $default_item_ago,
 							'seen' => $it['seen']
@@ -303,7 +304,7 @@ class NotificationsManager extends BaseObject
 							'link' => System::baseUrl(true) . '/display/' . $it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
 							'url' => $it['author-link'],
-							'text' => sprintf(t("%s is attending %s's event"), $it['author-name'], $it['pname']),
+							'text' => L10n::t("%s is attending %s's event", $it['author-name'], $it['pname']),
 							'when' => $default_item_when,
 							'ago' => $default_item_ago,
 							'seen' => $it['seen']
@@ -316,7 +317,7 @@ class NotificationsManager extends BaseObject
 							'link' => System::baseUrl(true) . '/display/' . $it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
 							'url' => $it['author-link'],
-							'text' => sprintf(t("%s is not attending %s's event"), $it['author-name'], $it['pname']),
+							'text' => L10n::t("%s is not attending %s's event", $it['author-name'], $it['pname']),
 							'when' => $default_item_when,
 							'ago' => $default_item_ago,
 							'seen' => $it['seen']
@@ -329,7 +330,7 @@ class NotificationsManager extends BaseObject
 							'link' => System::baseUrl(true) . '/display/' . $it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
 							'url' => $it['author-link'],
-							'text' => sprintf(t("%s may attend %s's event"), $it['author-name'], $it['pname']),
+							'text' => L10n::t("%s may attend %s's event", $it['author-name'], $it['pname']),
 							'when' => $default_item_when,
 							'ago' => $default_item_ago,
 							'seen' => $it['seen']
@@ -338,7 +339,7 @@ class NotificationsManager extends BaseObject
 
 					case ACTIVITY_FRIEND:
 						$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
-						$obj = parse_xml_string($xmlhead . $it['object']);
+						$obj = XML::parseString($xmlhead . $it['object']);
 						$it['fname'] = $obj->title;
 
 						$notif = [
@@ -346,7 +347,7 @@ class NotificationsManager extends BaseObject
 							'link' => System::baseUrl(true) . '/display/' . $it['pguid'],
 							'image' => proxy_url($it['author-avatar'], false, PROXY_SIZE_MICRO),
 							'url' => $it['author-link'],
-							'text' => sprintf(t("%s is now friends with %s"), $it['author-name'], $it['fname']),
+							'text' => L10n::t("%s is now friends with %s", $it['author-name'], $it['fname']),
 							'when' => $default_item_when,
 							'ago' => $default_item_ago,
 							'seen' => $it['seen']
@@ -383,16 +384,18 @@ class NotificationsManager extends BaseObject
 	private function networkTotal($seen = 0)
 	{
 		$sql_seen = "";
+		$index_hint = "";
 
 		if ($seen === 0) {
-			$sql_seen = " AND `item`.`unseen` = 1 ";
+			$sql_seen = " AND `item`.`unseen` ";
+			$index_hint = "USE INDEX (`uid_unseen_contactid`)";
 		}
 
 		$r = q(
 			"SELECT COUNT(*) AS `total`
-				FROM `item` INNER JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
-				WHERE `item`.`visible` = 1 AND `pitem`.`parent` != 0 AND
-				 `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0
+				FROM `item` $index_hint STRAIGHT_JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
+				WHERE `item`.`visible` AND `pitem`.`parent` != 0 AND
+				NOT `item`.`deleted` AND `item`.`uid` = %d AND NOT `item`.`wall`
 				$sql_seen",
 			intval(local_user())
 		);
@@ -422,18 +425,20 @@ class NotificationsManager extends BaseObject
 		$total = $this->networkTotal($seen);
 		$notifs = [];
 		$sql_seen = "";
+		$index_hint = "";
 
 		if ($seen === 0) {
-			$sql_seen = " AND `item`.`unseen` = 1 ";
+			$sql_seen = " AND `item`.`unseen` ";
+			$index_hint = "USE INDEX (`uid_unseen_contactid`)";
 		}
 
 		$r = q(
 			"SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, `item`.`unseen`,
 				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`,
 				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid`
-			FROM `item` INNER JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
-			WHERE `item`.`visible` = 1 AND `pitem`.`parent` != 0 AND
-				 `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0
+			FROM `item` $index_hint STRAIGHT_JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
+			WHERE `item`.`visible` AND `pitem`.`parent` != 0 AND
+				NOT `item`.`deleted` AND `item`.`uid` = %d AND NOT `item`.`wall`
 				$sql_seen
 			ORDER BY `item`.`created` DESC LIMIT %d, %d ",
 			intval(local_user()),
@@ -465,7 +470,7 @@ class NotificationsManager extends BaseObject
 		$sql_seen = "";
 
 		if ($seen === 0) {
-			$sql_seen = " AND `seen` = 0 ";
+			$sql_seen = " AND NOT `seen` ";
 		}
 
 		$r = q(
@@ -500,7 +505,7 @@ class NotificationsManager extends BaseObject
 		$sql_seen = "";
 
 		if ($seen === 0) {
-			$sql_seen = " AND `seen` = 0 ";
+			$sql_seen = " AND NOT `seen` ";
 		}
 
 		$r = q(
@@ -535,7 +540,7 @@ class NotificationsManager extends BaseObject
 		$myurl = str_replace(['www.', '.'], ['', '\\.'], $myurl);
 		$diasp_url = str_replace('/profile/', '/u/', $myurl);
 		$sql_extra = sprintf(
-			" AND ( `item`.`author-link` regexp '%s' OR `item`.`tag` regexp '%s' OR `item`.`tag` regexp '%s' ) ",
+			" AND (`item`.`author-link` REGEXP '%s' OR `item`.`tag` REGEXP '%s' OR `item`.`tag` REGEXP '%s') ",
 			dbesc($myurl . '$'),
 			dbesc($myurl . '\\]'),
 			dbesc($diasp_url . '\\]')
@@ -554,19 +559,21 @@ class NotificationsManager extends BaseObject
 	private function personalTotal($seen = 0)
 	{
 		$sql_seen = "";
+		$index_hint = "";
 		$sql_extra = $this->personalSqlExtra();
 
 		if ($seen === 0) {
-			$sql_seen = " AND `item`.`unseen` = 1 ";
+			$sql_seen = " AND `item`.`unseen` ";
+			$index_hint = "USE INDEX (`uid_unseen_contactid`)";
 		}
 
 		$r = q(
 			"SELECT COUNT(*) AS `total`
-				FROM `item` INNER JOIN `item` AS `pitem` ON  `pitem`.`id`=`item`.`parent`
-				WHERE `item`.`visible` = 1
+				FROM `item` $index_hint
+				WHERE `item`.`visible`
 				$sql_extra
 				$sql_seen
-				AND `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0 ",
+				AND NOT `item`.`deleted` AND `item`.`uid` = %d AND NOT `item`.`wall`",
 			intval(local_user())
 		);
 		if (DBM::is_result($r)) {
@@ -596,20 +603,22 @@ class NotificationsManager extends BaseObject
 		$sql_extra = $this->personalSqlExtra();
 		$notifs = [];
 		$sql_seen = "";
+		$index_hint = "";
 
 		if ($seen === 0) {
-			$sql_seen = " AND `item`.`unseen` = 1 ";
+			$sql_seen = " AND `item`.`unseen` ";
+			$index_hint = "USE INDEX (`uid_unseen_contactid`)";
 		}
 
 		$r = q(
 			"SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, `item`.`unseen`,
 				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`,
 				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid`
-			FROM `item` INNER JOIN `item` AS `pitem` ON  `pitem`.`id`=`item`.`parent`
-			WHERE `item`.`visible` = 1
+			FROM `item` $index_hint STRAIGHT_JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
+			WHERE `item`.`visible`
 				$sql_extra
 				$sql_seen
-				AND `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 0
+				AND NOT `item`.`deleted` AND `item`.`uid` = %d AND NOT `item`.`wall`
 			ORDER BY `item`.`created` DESC LIMIT %d, %d ",
 			intval(local_user()),
 			intval($start),
@@ -638,13 +647,15 @@ class NotificationsManager extends BaseObject
 	private function homeTotal($seen = 0)
 	{
 		$sql_seen = "";
+		$index_hint = "";
 
 		if ($seen === 0) {
-			$sql_seen = " AND `item`.`unseen` = 1 ";
+			$sql_seen = " AND `item`.`unseen` ";
+			$index_hint = "USE INDEX (`uid_unseen_contactid`)";
 		}
 
 		$r = q(
-			"SELECT COUNT(*) AS `total` FROM `item`
+			"SELECT COUNT(*) AS `total` FROM `item` $index_hint
 				WHERE `item`.`visible` = 1 AND
 				 `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 1
 				$sql_seen",
@@ -676,18 +687,20 @@ class NotificationsManager extends BaseObject
 		$total = $this->homeTotal($seen);
 		$notifs = [];
 		$sql_seen = "";
+		$index_hint = "";
 
 		if ($seen === 0) {
-			$sql_seen = " AND `item`.`unseen` = 1 ";
+			$sql_seen = " AND `item`.`unseen` ";
+			$index_hint = "USE INDEX (`uid_unseen_contactid`)";
 		}
 
 		$r = q(
 			"SELECT `item`.`id`,`item`.`parent`, `item`.`verb`, `item`.`author-name`, `item`.`unseen`,
 				`item`.`author-link`, `item`.`author-avatar`, `item`.`created`, `item`.`object` AS `object`,
 				`pitem`.`author-name` AS `pname`, `pitem`.`author-link` AS `plink`, `pitem`.`guid` AS `pguid`
-			FROM `item` INNER JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
-			WHERE `item`.`visible` = 1 AND
-				 `item`.`deleted` = 0 AND `item`.`uid` = %d AND `item`.`wall` = 1
+			FROM `item` $index_hint STRAIGHT_JOIN `item` AS `pitem` ON `pitem`.`id`=`item`.`parent`
+			WHERE `item`.`visible` AND
+				NOT `item`.`deleted` AND `item`.`uid` = %d AND `item`.`wall`
 				$sql_seen
 			ORDER BY `item`.`created` DESC LIMIT %d, %d ",
 			intval(local_user()),
@@ -809,7 +822,7 @@ class NotificationsManager extends BaseObject
 
 				$intro = [
 					'label' => 'friend_suggestion',
-					'notify_type' => t('Friend Suggestion'),
+					'notify_type' => L10n::t('Friend Suggestion'),
 					'intro_id' => $it['intro_id'],
 					'madeby' => $it['name'],
 					'contact_id' => $it['contact-id'],
@@ -835,15 +848,15 @@ class NotificationsManager extends BaseObject
 				}
 				$intro = [
 					'label' => (($it['network'] !== NETWORK_OSTATUS) ? 'friend_request' : 'follower'),
-					'notify_type' => (($it['network'] !== NETWORK_OSTATUS) ? t('Friend/Connect Request') : t('New Follower')),
+					'notify_type' => (($it['network'] !== NETWORK_OSTATUS) ? L10n::t('Friend/Connect Request') : L10n::t('New Follower')),
 					'dfrn_id' => $it['issued-id'],
 					'uid' => $_SESSION['uid'],
 					'intro_id' => $it['intro_id'],
 					'contact_id' => $it['contact-id'],
 					'photo' => ((x($it, 'photo')) ? proxy_url($it['photo'], false, PROXY_SIZE_SMALL) : "images/person-175.jpg"),
 					'name' => $it['name'],
-					'location' => bbcode($it['glocation'], false, false),
-					'about' => bbcode($it['gabout'], false, false),
+					'location' => BBCode::convert($it['glocation'], false),
+					'about' => BBCode::convert($it['gabout'], false),
 					'keywords' => $it['gkeywords'],
 					'gender' => $it['ggender'],
 					'hidden' => $it['hidden'] == 1,

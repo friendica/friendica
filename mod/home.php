@@ -1,8 +1,11 @@
 <?php
-
+/**
+ * @file mod/home.php
+ */
 use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Module\Login;
 
@@ -33,7 +36,7 @@ function home_content(App $a) {
 	}
 
 	$customhome = false;
-	$defaultheader = '<h1>'.((x($a->config,'sitename')) ? sprintf(t("Welcome to %s"), $a->config['sitename']) : "").'</h1>';
+	$defaultheader = '<h1>'.((x($a->config,'sitename')) ? L10n::t("Welcome to %s", $a->config['sitename']) : "").'</h1>';
 
 	$homefilepath = $a->basepath . "/home.html";
 	$cssfilepath = $a->basepath . "/home.css";

@@ -28,7 +28,8 @@ Requirements
 * Apache with mod-rewrite enabled and "Options All" so you can use a local .htaccess file
 * PHP 5.6+ (PHP 7 is recommended for performance)
 * PHP *command line* access with register_argc_argv set to true in the php.ini file
-* Curl, GD, PDO, MySQLi, hash, xml and OpenSSL extensions
+* Curl, GD, PDO, MySQLi, hash, xml, zip and OpenSSL extensions
+* The POSIX module of PHP needs to be activated (e.g. [RHEL, CentOS](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) have disabled it)
 * some form of email server or email gateway such that PHP mail() works
 * Mysql 5.5.3+ or an equivalant alternative for MySQL (MariaDB, Percona Server etc.)
 * the ability to schedule jobs with cron (Linux/Mac) or Scheduled Tasks (Windows) (Note: other options are presented in Section 7 of this document.)
@@ -38,7 +39,7 @@ Requirements
 Installation procedure
 ---
 
-###Get Friendica
+### Get Friendica
 
 Unpack the Friendica files into the root of your web server document area.
 If you are able to do so, we recommend using git to clone the source repository rather than to use a packaged tar or zip file.
@@ -47,7 +48,7 @@ The Linux commands to clone the repository into a directory "mywebsite" would be
 
     git clone https://github.com/friendica/friendica.git mywebsite
     cd mywebsite
-    util/composer.phar install
+    bin/composer.phar install
 
 Make sure the folder *view/smarty3* exists and is writable by the webserver user
 
@@ -64,7 +65,7 @@ Clone the addon repository (separately):
 
 If you copy the directory tree to your webserver, make sure that you also copy .htaccess - as "dot" files are often hidden and aren't normally copied.
 
-###Create a database
+### Create a database
 
 Create an empty database and note the access details (hostname, username, password, database name).
 
@@ -79,7 +80,7 @@ In this case find the [mysqld] section in your my.cnf file and add the line :
 Restart mysql and you should be fine.
 
 
-###Run the installer
+### Run the installer
 
 Point your web browser to the new site and follow the instructions.
 Please note any error messages and correct these before continuing.
@@ -96,19 +97,19 @@ Registration errors should all be recoverable automatically.
 If you get any *critical* failure at this point, it generally indicates the database was not installed correctly.
 You might wish to move/rename .htconfig.php to another name and empty (called 'dropping') the database tables, so that you can start fresh.
 
-###Set up the worker
+### Set up the worker
 
 Set up a cron job or scheduled task to run the worker once every 5-10 minutes in order to perform background processing.
 Example:
 
-    cd /base/directory; /path/to/php scripts/worker.php
+    cd /base/directory; /path/to/php bin/worker.php
 
 Change "/base/directory", and "/path/to/php" as appropriate for your situation.
 
 If you are using a Linux server, run "crontab -e" and add a line like the
 one shown, substituting for your unique paths and settings:
 
-    */10 * * * * cd /home/myname/mywebsite; /usr/bin/php scripts/worker.php
+    */10 * * * * cd /home/myname/mywebsite; /usr/bin/php bin/worker.php
 
 You can generally find the location of PHP by executing "which php".
 If you run into trouble with this section please contact your hosting provider for assistance.
@@ -118,7 +119,8 @@ If it is not possible to set up a cron job then please activate the "frontend wo
 
 Once you have installed Friendica and created an admin account as part of the process, you can access the admin panel of your installation and do most of the server wide configuration from there
 
-###Set up a backup plan
+### Set up a backup plan
+
 Bad things will happen.
 Let there be a hardware failure, a corrupted database or whatever you can think of.
 So once the installation of your Friendica node is done, you should make yourself a backup plan.

@@ -6,6 +6,7 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Protocol\Diaspora;
 
@@ -18,7 +19,7 @@ function receive_post(App $a)
 	$enabled = intval(Config::get('system', 'diaspora_enabled'));
 	if (!$enabled) {
 		logger('mod-diaspora: disabled');
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 
 	if (($a->argc == 2) && ($a->argv[1] === 'public')) {
@@ -28,13 +29,13 @@ function receive_post(App $a)
 		$public = false;
 
 		if ($a->argc != 3 || $a->argv[1] !== 'users') {
-			http_status_exit(500);
+			System::httpExit(500);
 		}
 		$guid = $a->argv[2];
 
 		$importer = dba::selectFirst('user', [], ['guid' => $guid, 'account_expired' => false, 'account_removed' => false]);
 		if (!DBM::is_result($importer)) {
-			http_status_exit(500);
+			System::httpExit(500);
 		}
 	}
 
@@ -47,7 +48,7 @@ function receive_post(App $a)
 	if (!$xml) {
 		$postdata = file_get_contents("php://input");
 		if ($postdata == '') {
-			http_status_exit(500);
+			System::httpExit(500);
 		}
 
 		logger('mod-diaspora: message is in the new format', LOGGER_DEBUG);
@@ -67,7 +68,7 @@ function receive_post(App $a)
 	logger('mod-diaspora: decoded msg: ' . print_r($msg, true), LOGGER_DATA);
 
 	if (!is_array($msg)) {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 
 	logger('mod-diaspora: dispatching', LOGGER_DEBUG);
@@ -79,6 +80,6 @@ function receive_post(App $a)
 		$ret = Diaspora::dispatch($importer, $msg);
 	}
 
-	http_status_exit(($ret) ? 200 : 500);
+	System::httpExit(($ret) ? 200 : 500);
 	// NOTREACHED
 }

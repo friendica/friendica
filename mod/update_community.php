@@ -3,9 +3,10 @@
 // See update_profile.php for documentation
 
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 
-require_once("mod/community.php");
+require_once 'mod/community.php';
 
 function update_community_content(App $a) {
 	header("Content-type: text/html");
@@ -23,7 +24,7 @@ function update_community_content(App $a) {
 	$text = preg_replace($pattern, $replace, $text);
 
 	if (PConfig::get(local_user(), "system", "bandwith_saver")) {
-		$replace = "<br />".t("[Embedded content - reload page to view]")."<br />";
+		$replace = "<br />".L10n::t("[Embedded content - reload page to view]")."<br />";
 		$pattern = "/<\s*audio[^>]*>(.*?)<\s*\/\s*audio>/i";
 		$text = preg_replace($pattern, $replace, $text);
 		$pattern = "/<\s*video[^>]*>(.*?)<\s*\/\s*video>/i";

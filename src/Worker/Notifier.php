@@ -18,10 +18,7 @@ use Friendica\Protocol\Salmon;
 use dba;
 
 require_once 'include/dba.php';
-require_once 'include/html2plain.php';
-require_once 'include/datetime.php';
 require_once 'include/items.php';
-require_once 'include/bbcode.php';
 
 /*
  * This file was at one time responsible for doing all deliveries, but this caused
@@ -68,6 +65,7 @@ class Notifier {
 		$url_recipients = [];
 
 		$normal_mode = true;
+		$recipients_relocate = [];
 
 		if ($cmd === 'mail') {
 			$normal_mode = false;
@@ -179,6 +177,10 @@ class Notifier {
 		// fill this in with a single salmon slap if applicable
 		$slap = '';
 
+		$followup = false;
+		$recipients_followup = [];
+		$conversants = [];
+		$sql_extra = '';
 		if (! ($mail || $fsuggest || $relocate)) {
 
 			$slap = OStatus::salmon($target_item, $owner);
@@ -321,8 +323,6 @@ class Notifier {
 				if ((intval($parent['forum_mode']) == 1) && !$top_level && ($cmd !== 'uplink')) {
 					Worker::add($a->queue['priority'], 'Notifier', 'uplink', $item_id);
 				}
-
-				$conversants = [];
 
 				foreach ($items as $item) {
 					$recipients[] = $item['contact-id'];
@@ -485,7 +485,7 @@ class Notifier {
 
 			if ($diaspora_delivery) {
 				if (!$followup) {
-					$r0 = Diaspora::relayList();
+					$r0 = Diaspora::relayList($item_id);
 				}
 
 				$r1 = q("SELECT `batch`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`name`) AS `name`, ANY_VALUE(`network`) AS `network`
@@ -520,7 +520,7 @@ class Notifier {
 					// except for Diaspora batch jobs
 					// Don't deliver to folks who have already been delivered to
 
-					if (($rr['network'] !== NETWORK_DIASPORA) && (in_array($rr['id'],$conversants))) {
+					if (($rr['network'] !== NETWORK_DIASPORA) && (in_array($rr['id'], $conversants))) {
 						logger('notifier: already delivered id=' . $rr['id']);
 						continue;
 					}
@@ -554,7 +554,7 @@ class Notifier {
 		logger('notifier: calling hooks', LOGGER_DEBUG);
 
 		if ($normal_mode) {
-			Addon::callHooks('notifier_normal',$target_item);
+			Addon::forkHooks($a->queue['priority'], 'notifier_normal', $target_item);
 		}
 
 		Addon::callHooks('notifier_end',$target_item);

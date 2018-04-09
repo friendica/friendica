@@ -6,6 +6,7 @@ namespace Friendica\Protocol;
 
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
+use Friendica\Util\Network;
 use Friendica\Util\XML;
 
 /**
@@ -50,7 +51,7 @@ class Salmon
 						$ret[$x] = substr($ret[$x], 5);
 					}
 				} elseif (normalise_link($ret[$x]) == 'http://') {
-					$ret[$x] = fetch_url($ret[$x]);
+					$ret[$x] = Network::fetchUrl($ret[$x]);
 				}
 			}
 		}
@@ -132,7 +133,7 @@ class Salmon
 		$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 		// slap them
-		post_url($url, $salmon, [
+		Network::post($url, $salmon, [
 			'Content-type: application/magic-envelope+xml',
 			'Content-length: ' . strlen($salmon)
 		]);
@@ -158,7 +159,7 @@ class Salmon
 			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 			// slap them
-			post_url($url, $salmon, [
+			Network::post($url, $salmon, [
 				'Content-type: application/magic-envelope+xml',
 				'Content-length: ' . strlen($salmon)
 			]);
@@ -181,10 +182,9 @@ class Salmon
 			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 			// slap them
-			post_url($url, $salmon, [
+			Network::post($url, $salmon, [
 				'Content-type: application/magic-envelope+xml',
-				'Content-length: ' . strlen($salmon)]
-			);
+				'Content-length: ' . strlen($salmon)]);
 			$return_code = $a->get_curl_code();
 		}
 

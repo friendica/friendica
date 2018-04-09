@@ -2,11 +2,15 @@
 /**
  * @file mod/install.php
  */
+
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
 use Friendica\Object\Image;
+use Friendica\Util\Network;
+use Friendica\Util\Temporal;
 
 $install_wizard_pass = 1;
 
@@ -107,29 +111,29 @@ function install_content(App $a) {
 	global $install_wizard_pass;
 	$o = '';
 	$wizard_status = "";
-	$install_title = t('Friendica Communications Server - Setup');
+	$install_title = L10n::t('Friendica Communications Server - Setup');
 
 
 
 	if (x($a->data, 'db_conn_failed')) {
 		$install_wizard_pass = 2;
-		$wizard_status = t('Could not connect to database.');
+		$wizard_status = L10n::t('Could not connect to database.');
 	}
 	if (x($a->data, 'db_create_failed')) {
 		$install_wizard_pass = 2;
-		$wizard_status = t('Could not create table.');
+		$wizard_status = L10n::t('Could not create table.');
 	}
 
 	$db_return_text = "";
 	if (x($a->data, 'db_installed')) {
 		$txt = '<p style="font-size: 130%;">';
-		$txt .= t('Your Friendica site database has been installed.') . EOL;
+		$txt .= L10n::t('Your Friendica site database has been installed.') . EOL;
 		$db_return_text .= $txt;
 	}
 
 	if (x($a->data, 'db_failed')) {
-		$txt = t('You may need to import the file "database.sql" manually using phpmyadmin or mysql.') . EOL;
-		$txt .= t('Please see the file "INSTALL.txt".') . EOL ."<hr>";
+		$txt = L10n::t('You may need to import the file "database.sql" manually using phpmyadmin or mysql.') . EOL;
+		$txt .= L10n::t('Please see the file "INSTALL.txt".') . EOL ."<hr>";
 		$txt .= "<pre>".$a->data['db_failed'] . "</pre>". EOL;
 		$db_return_text .= $txt;
 	}
@@ -141,7 +145,7 @@ function install_content(App $a) {
 			return replace_macros($tpl, [
 				'$title' => $install_title,
 				'$pass' => '',
-				'$status' => t('Database already in use.'),
+				'$status' => L10n::t('Database already in use.'),
 				'$text' => '',
 			]);
 		}
@@ -198,12 +202,12 @@ function install_content(App $a) {
 			$tpl = get_markup_template('install_checks.tpl');
 			$o .= replace_macros($tpl, [
 				'$title' => $install_title,
-				'$pass' => t('System check'),
+				'$pass' => L10n::t('System check'),
 				'$checks' => $checks,
 				'$passed' => $checkspassed,
-				'$see_install' => t('Please see the file "INSTALL.txt".'),
-				'$next' => t('Next'),
-				'$reload' => t('Check again'),
+				'$see_install' => L10n::t('Please see the file "INSTALL.txt".'),
+				'$next' => L10n::t('Next'),
+				'$reload' => L10n::t('Check again'),
 				'$phpath' => $phpath,
 				'$baseurl' => System::baseUrl(),
 			]);
@@ -218,38 +222,38 @@ function install_content(App $a) {
 			$dbdata = notags(trim($_POST['dbdata']));
 			$phpath = notags(trim($_POST['phpath']));
 
+			$adminmail = notags(trim($_POST['adminmail']));
 
 			$tpl = get_markup_template('install_db.tpl');
 			$o .= replace_macros($tpl, [
 				'$title' => $install_title,
-				'$pass' => t('Database connection'),
-				'$info_01' => t('In order to install Friendica we need to know how to connect to your database.'),
-				'$info_02' => t('Please contact your hosting provider or site administrator if you have questions about these settings.'),
-				'$info_03' => t('The database you specify below should already exist. If it does not, please create it before continuing.'),
+				'$pass' => L10n::t('Database connection'),
+				'$info_01' => L10n::t('In order to install Friendica we need to know how to connect to your database.'),
+				'$info_02' => L10n::t('Please contact your hosting provider or site administrator if you have questions about these settings.'),
+				'$info_03' => L10n::t('The database you specify below should already exist. If it does not, please create it before continuing.'),
 
 				'$status' => $wizard_status,
 
-				'$dbhost' => ['dbhost', t('Database Server Name'), $dbhost, '', 'required'],
-				'$dbuser' => ['dbuser', t('Database Login Name'), $dbuser, '', 'required', 'autofocus'],
-				'$dbpass' => ['dbpass', t('Database Login Password'), $dbpass, t("For security reasons the password must not be empty"), 'required'],
-				'$dbdata' => ['dbdata', t('Database Name'), $dbdata, '', 'required'],
-				'$adminmail' => ['adminmail', t('Site administrator email address'), $adminmail, t('Your account email address must match this in order to use the web admin panel.'), 'required', 'autofocus', 'email'],
+				'$dbhost' => ['dbhost', L10n::t('Database Server Name'), $dbhost, '', 'required'],
+				'$dbuser' => ['dbuser', L10n::t('Database Login Name'), $dbuser, '', 'required', 'autofocus'],
+				'$dbpass' => ['dbpass', L10n::t('Database Login Password'), $dbpass, L10n::t("For security reasons the password must not be empty"), 'required'],
+				'$dbdata' => ['dbdata', L10n::t('Database Name'), $dbdata, '', 'required'],
+				'$adminmail' => ['adminmail', L10n::t('Site administrator email address'), $adminmail, L10n::t('Your account email address must match this in order to use the web admin panel.'), 'required', 'autofocus', 'email'],
 
 
 
-				'$lbl_10' => t('Please select a default timezone for your website'),
+				'$lbl_10' => L10n::t('Please select a default timezone for your website'),
 
 				'$baseurl' => System::baseUrl(),
 
 				'$phpath' => $phpath,
 
-				'$submit' => t('Submit'),
+				'$submit' => L10n::t('Submit'),
 
 			]);
 			return $o;
 		}; break;
 		case 3: { // Site settings
-			require_once('include/datetime.php');
 			$dbhost = ((x($_POST, 'dbhost')) ? notags(trim($_POST['dbhost'])) : 'localhost');
 			$dbuser = notags(trim($_POST['dbuser']));
 			$dbpass = notags(trim($_POST['dbpass']));
@@ -259,12 +263,12 @@ function install_content(App $a) {
 			$adminmail = notags(trim($_POST['adminmail']));
 			$timezone = ((x($_POST, 'timezone')) ? ($_POST['timezone']) : 'America/Los_Angeles');
 			/* Installed langs */
-			$lang_choices = get_available_languages();
+			$lang_choices = L10n::getAvailableLanguages();
 
 			$tpl = get_markup_template('install_settings.tpl');
 			$o .= replace_macros($tpl, [
 				'$title' => $install_title,
-				'$pass' => t('Site settings'),
+				'$pass' => L10n::t('Site settings'),
 
 				'$status' => $wizard_status,
 
@@ -274,16 +278,16 @@ function install_content(App $a) {
 				'$dbdata' => $dbdata,
 				'$phpath' => $phpath,
 
-				'$adminmail' => ['adminmail', t('Site administrator email address'), $adminmail, t('Your account email address must match this in order to use the web admin panel.'), 'required', 'autofocus', 'email'],
+				'$adminmail' => ['adminmail', L10n::t('Site administrator email address'), $adminmail, L10n::t('Your account email address must match this in order to use the web admin panel.'), 'required', 'autofocus', 'email'],
 
 
-				'$timezone' => field_timezone('timezone', t('Please select a default timezone for your website'), $timezone, ''),
-				'$language' => ['language', t('System Language:'), 'en', t('Set the default language for your Friendica installation interface and to send emails.'), $lang_choices],
+				'$timezone' => Temporal::getTimezoneField('timezone', L10n::t('Please select a default timezone for your website'), $timezone, ''),
+				'$language' => ['language', L10n::t('System Language:'), 'en', L10n::t('Set the default language for your Friendica installation interface and to send emails.'), $lang_choices],
 				'$baseurl' => System::baseUrl(),
 
 
 
-				'$submit' => t('Submit'),
+				'$submit' => L10n::t('Submit'),
 
 			]);
 			return $o;
@@ -318,17 +322,17 @@ function check_php(&$phpath, &$checks) {
 	}
 	$help = "";
 	if (!$passed) {
-		$help .= t('Could not find a command line version of PHP in the web server PATH.'). EOL;
-		$help .= t("If you don't have a command line version of PHP installed on your server, you will not be able to run the background processing. See <a href='https://github.com/friendica/friendica/blob/master/doc/Install.md#set-up-the-worker'>'Setup the worker'</a>") . EOL;
+		$help .= L10n::t('Could not find a command line version of PHP in the web server PATH.'). EOL;
+		$help .= L10n::t("If you don't have a command line version of PHP installed on your server, you will not be able to run the background processing. See <a href='https://github.com/friendica/friendica/blob/master/doc/Install.md#set-up-the-worker'>'Setup the worker'</a>") . EOL;
 		$help .= EOL . EOL;
 		$tpl = get_markup_template('field_input.tpl');
 		$help .= replace_macros($tpl, [
-			'$field' => ['phpath', t('PHP executable path'), $phpath, t('Enter full path to php executable. You can leave this blank to continue the installation.')],
+			'$field' => ['phpath', L10n::t('PHP executable path'), $phpath, L10n::t('Enter full path to php executable. You can leave this blank to continue the installation.')],
 		]);
 		$phpath = "";
 	}
 
-	check_add($checks, t('Command line PHP').($passed?" (<tt>$phpath</tt>)":""), $passed, false, $help);
+	check_add($checks, L10n::t('Command line PHP').($passed?" (<tt>$phpath</tt>)":""), $passed, false, $help);
 
 	if ($passed) {
 		$cmd = "$phpath -v";
@@ -337,10 +341,10 @@ function check_php(&$phpath, &$checks) {
 		list($result) = explode("\n", $result);
 		$help = "";
 		if (!$passed2) {
-			$help .= t('PHP executable is not the php cli binary (could be cgi-fgci version)'). EOL;
-			$help .= t('Found PHP version: ')."<tt>$result</tt>";
+			$help .= L10n::t("PHP executable is not the php cli binary \x28could be cgi-fgci version\x29"). EOL;
+			$help .= L10n::t('Found PHP version: ')."<tt>$result</tt>";
 		}
-		check_add($checks, t('PHP cli binary'), $passed2, true, $help);
+		check_add($checks, L10n::t('PHP cli binary'), $passed2, true, $help);
 	}
 
 
@@ -351,10 +355,10 @@ function check_php(&$phpath, &$checks) {
 		$passed3 = $result == $str;
 		$help = "";
 		if (!$passed3) {
-			$help .= t('The command line version of PHP on your system does not have "register_argc_argv" enabled.'). EOL;
-			$help .= t('This is required for message delivery to work.');
+			$help .= L10n::t('The command line version of PHP on your system does not have "register_argc_argv" enabled.'). EOL;
+			$help .= L10n::t('This is required for message delivery to work.');
 		}
-		check_add($checks, t('PHP register_argc_argv'), $passed3, true, $help);
+		check_add($checks, L10n::t('PHP register_argc_argv'), $passed3, true, $help);
 	}
 
 
@@ -377,59 +381,64 @@ function check_keys(&$checks) {
 	// Get private key
 
 	if (! $res) {
-		$help .= t('Error: the "openssl_pkey_new" function on this system is not able to generate encryption keys'). EOL;
-		$help .= t('If running under Windows, please see "http://www.php.net/manual/en/openssl.installation.php".');
+		$help .= L10n::t('Error: the "openssl_pkey_new" function on this system is not able to generate encryption keys'). EOL;
+		$help .= L10n::t('If running under Windows, please see "http://www.php.net/manual/en/openssl.installation.php".');
 	}
-	check_add($checks, t('Generate encryption keys'), $res, true, $help);
+	check_add($checks, L10n::t('Generate encryption keys'), $res, true, $help);
 
 }
 
 
 function check_funcs(&$checks) {
 	$ck_funcs = [];
-	check_add($ck_funcs, t('libCurl PHP module'), true, true, "");
-	check_add($ck_funcs, t('GD graphics PHP module'), true, true, "");
-	check_add($ck_funcs, t('OpenSSL PHP module'), true, true, "");
-	check_add($ck_funcs, t('PDO or MySQLi PHP module'), true, true, "");
-	check_add($ck_funcs, t('mb_string PHP module'), true, true, "");
-	check_add($ck_funcs, t('XML PHP module'), true, true, "");
-	check_add($ck_funcs, t('iconv module'), true, true, "");
+	check_add($ck_funcs, L10n::t('libCurl PHP module'), true, true, "");
+	check_add($ck_funcs, L10n::t('GD graphics PHP module'), true, true, "");
+	check_add($ck_funcs, L10n::t('OpenSSL PHP module'), true, true, "");
+	check_add($ck_funcs, L10n::t('PDO or MySQLi PHP module'), true, true, "");
+	check_add($ck_funcs, L10n::t('mb_string PHP module'), true, true, "");
+	check_add($ck_funcs, L10n::t('XML PHP module'), true, true, "");
+	check_add($ck_funcs, L10n::t('iconv PHP module'), true, true, "");
+	check_add($ck_funcs, L10n::t('POSIX PHP module'), true, true, "");
 
 	if (function_exists('apache_get_modules')) {
 		if (! in_array('mod_rewrite',apache_get_modules())) {
-			check_add($ck_funcs, t('Apache mod_rewrite module'), false, true, t('Error: Apache webserver mod-rewrite module is required but not installed.'));
+			check_add($ck_funcs, L10n::t('Apache mod_rewrite module'), false, true, L10n::t('Error: Apache webserver mod-rewrite module is required but not installed.'));
 		} else {
-			check_add($ck_funcs, t('Apache mod_rewrite module'), true, true, "");
+			check_add($ck_funcs, L10n::t('Apache mod_rewrite module'), true, true, "");
 		}
 	}
 
 	if (! function_exists('curl_init')) {
 		$ck_funcs[0]['status'] = false;
-		$ck_funcs[0]['help'] = t('Error: libCURL PHP module required but not installed.');
+		$ck_funcs[0]['help'] = L10n::t('Error: libCURL PHP module required but not installed.');
 	}
 	if (! function_exists('imagecreatefromjpeg')) {
 		$ck_funcs[1]['status'] = false;
-		$ck_funcs[1]['help'] = t('Error: GD graphics PHP module with JPEG support required but not installed.');
+		$ck_funcs[1]['help'] = L10n::t('Error: GD graphics PHP module with JPEG support required but not installed.');
 	}
 	if (! function_exists('openssl_public_encrypt')) {
 		$ck_funcs[2]['status'] = false;
-		$ck_funcs[2]['help'] = t('Error: openssl PHP module required but not installed.');
+		$ck_funcs[2]['help'] = L10n::t('Error: openssl PHP module required but not installed.');
 	}
 	if (! function_exists('mysqli_connect') && !class_exists('pdo')) {
 		$ck_funcs[3]['status'] = false;
-		$ck_funcs[3]['help'] = t('Error: PDO or MySQLi PHP module required but not installed.');
+		$ck_funcs[3]['help'] = L10n::t('Error: PDO or MySQLi PHP module required but not installed.');
 	}
 	if (!function_exists('mysqli_connect') && class_exists('pdo') && !in_array('mysql', PDO::getAvailableDrivers())) {
 		$ck_funcs[3]['status'] = false;
-		$ck_funcs[3]['help'] = t('Error: The MySQL driver for PDO is not installed.');
+		$ck_funcs[3]['help'] = L10n::t('Error: The MySQL driver for PDO is not installed.');
 	}
 	if (! function_exists('mb_strlen')) {
 		$ck_funcs[4]['status'] = false;
-		$ck_funcs[4]['help'] = t('Error: mb_string PHP module required but not installed.');
+		$ck_funcs[4]['help'] = L10n::t('Error: mb_string PHP module required but not installed.');
 	}
 	if (! function_exists('iconv_strlen')) {
+		$ck_funcs[6]['status'] = false;
+		$ck_funcs[6]['help'] = L10n::t('Error: iconv PHP module required but not installed.');
+	}
+	if (! function_exists('posix_kill')) {
 		$ck_funcs[7]['status'] = false;
-		$ck_funcs[7]['help'] = t('Error: iconv PHP module required but not installed.');
+		$ck_funcs[7]['help'] = L10n::t('Error: POSIX PHP module required but not installed.');
 	}
 
 	$checks = array_merge($checks, $ck_funcs);
@@ -438,8 +447,8 @@ function check_funcs(&$checks) {
 	try {
 		$xml = new DOMDocument();
 	} catch (Exception $e) {
-		$ck_funcs[6]['status'] = false;
-		$ck_funcs[6]['help'] = t('Error, XML PHP module required but not installed.');
+		$ck_funcs[5]['status'] = false;
+		$ck_funcs[5]['help'] = L10n::t('Error, XML PHP module required but not installed.');
 	}
 }
 
@@ -451,13 +460,13 @@ function check_htconfig(&$checks) {
 		(!file_exists('.htconfig.php') && !is_writable('.'))) {
 
 		$status = false;
-		$help = t('The web installer needs to be able to create a file called ".htconfig.php" in the top folder of your web server and it is unable to do so.') .EOL;
-		$help .= t('This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can.').EOL;
-		$help .= t('At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder.').EOL;
-		$help .= t('You can alternatively skip this procedure and perform a manual installation. Please see the file "INSTALL.txt" for instructions.').EOL;
+		$help = L10n::t('The web installer needs to be able to create a file called ".htconfig.php" in the top folder of your web server and it is unable to do so.') .EOL;
+		$help .= L10n::t('This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can.').EOL;
+		$help .= L10n::t('At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder.').EOL;
+		$help .= L10n::t('You can alternatively skip this procedure and perform a manual installation. Please see the file "INSTALL.txt" for instructions.').EOL;
 	}
 
-	check_add($checks, t('.htconfig.php is writable'), $status, false, $help);
+	check_add($checks, L10n::t('.htconfig.php is writable'), $status, false, $help);
 
 }
 
@@ -467,13 +476,13 @@ function check_smarty3(&$checks) {
 	if (!is_writable('view/smarty3')) {
 
 		$status = false;
-		$help = t('Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering.') .EOL;
-		$help .= t('In order to store these compiled templates, the web server needs to have write access to the directory view/smarty3/ under the Friendica top level folder.').EOL;
-		$help .= t('Please ensure that the user that your web server runs as (e.g. www-data) has write access to this folder.').EOL;
-		$help .= t('Note: as a security measure, you should give the web server write access to view/smarty3/ only--not the template files (.tpl) that it contains.').EOL;
+		$help = L10n::t('Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering.') .EOL;
+		$help .= L10n::t('In order to store these compiled templates, the web server needs to have write access to the directory view/smarty3/ under the Friendica top level folder.').EOL;
+		$help .= L10n::t("Please ensure that the user that your web server runs as \x28e.g. www-data\x29 has write access to this folder.").EOL;
+		$help .= L10n::t("Note: as a security measure, you should give the web server write access to view/smarty3/ only--not the template files \x28.tpl\x29 that it contains.").EOL;
 	}
 
-	check_add($checks, t('view/smarty3 is writable'), $status, true, $help);
+	check_add($checks, L10n::t('view/smarty3 is writable'), $status, true, $help);
 
 }
 
@@ -481,17 +490,17 @@ function check_htaccess(&$checks) {
 	$status = true;
 	$help = "";
 	if (function_exists('curl_init')) {
-		$test = fetch_url(System::baseUrl()."/install/testrewrite");
+		$test = Network::fetchUrl(System::baseUrl()."/install/testrewrite");
 
 		if ($test != "ok") {
-			$test = fetch_url(normalise_link(System::baseUrl()."/install/testrewrite"));
+			$test = Network::fetchUrl(normalise_link(System::baseUrl()."/install/testrewrite"));
 		}
 
 		if ($test != "ok") {
 			$status = false;
-			$help = t('Url rewrite in .htaccess is not working. Check your server configuration.');
+			$help = L10n::t('Url rewrite in .htaccess is not working. Check your server configuration.');
 		}
-		check_add($checks, t('Url rewrite is working'), $status, true, $help);
+		check_add($checks, L10n::t('Url rewrite is working'), $status, true, $help);
 	} else {
 		// cannot check modrewrite if libcurl is not installed
 		/// @TODO Maybe issue warning here?
@@ -510,18 +519,18 @@ function check_imagik(&$checks) {
 		}
 	}
 	if ($imagick == false) {
-		check_add($checks, t('ImageMagick PHP extension is not installed'), $imagick, false, "");
+		check_add($checks, L10n::t('ImageMagick PHP extension is not installed'), $imagick, false, "");
 	} else {
-		check_add($checks, t('ImageMagick PHP extension is installed'), $imagick, false, "");
+		check_add($checks, L10n::t('ImageMagick PHP extension is installed'), $imagick, false, "");
 		if ($imagick) {
-			check_add($checks, t('ImageMagick supports GIF'), $gif, false, "");
+			check_add($checks, L10n::t('ImageMagick supports GIF'), $gif, false, "");
 		}
 	}
 }
 
 function manual_config(App $a) {
 	$data = htmlentities($a->data['txt'],ENT_COMPAT, 'UTF-8');
-	$o = t('The database configuration file ".htconfig.php" could not be written. Please use the enclosed text to create a configuration file in your web server root.');
+	$o = L10n::t('The database configuration file ".htconfig.php" could not be written. Please use the enclosed text to create a configuration file in your web server root.');
 	$o .= "<textarea rows=\"24\" cols=\"80\" >$data</textarea>";
 	return $o;
 }
@@ -536,7 +545,7 @@ function load_database_rem($v, $i) {
 }
 
 function load_database() {
-	$errors = DBStructure::update(false, true);
+	$errors = DBStructure::update(false, true, true);
 
 	return $errors;
 }
@@ -544,10 +553,10 @@ function load_database() {
 function what_next() {
 	$baseurl = System::baseUrl();
 	return
-		t('<h1>What next</h1>')
-		."<p>".t('IMPORTANT: You will need to [manually] setup a scheduled task for the worker.')
-		.t('Please see the file "INSTALL.txt".')
+		L10n::t('<h1>What next</h1>')
+		."<p>".L10n::t('IMPORTANT: You will need to [manually] setup a scheduled task for the worker.')
+		.L10n::t('Please see the file "INSTALL.txt".')
 		."</p><p>"
-		.t("Go to your new Friendica node <a href='$baseurl/register'>registration page</a> and register as new user. Remember to use the same email you have entered as administrator email. This will allow you to enter the site admin panel.")
+		.L10n::t('Go to your new Friendica node <a href="%s/register">registration page</a> and register as new user. Remember to use the same email you have entered as administrator email. This will allow you to enter the site admin panel.', $baseurl)
 		."</p>";
 }

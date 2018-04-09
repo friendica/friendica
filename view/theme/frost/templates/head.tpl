@@ -2,13 +2,13 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <base href="{{$baseurl}}/" />
 <meta name="generator" content="{{$generator}}" />
-<link rel="stylesheet" href="{{$baseurl}}/vendor/asset/jquery-colorbox/example5/colorbox.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="{{$baseurl}}/library/jgrowl/jquery.jgrowl.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="{{$baseurl}}/library/datetimepicker/jquery.datetimepicker.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="{{$baseurl}}/view/asset/jquery-colorbox/example5/colorbox.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="{{$baseurl}}/view/asset/jgrowl/jquery.jgrowl.min.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="{{$baseurl}}/view/asset/jquery-datetimepicker/build/jquery.datetimepicker.min.css" type="text/css" media="screen" />
 
 <link rel="stylesheet" type="text/css" href="{{$stylesheet}}" media="all" />
 
-<script type="text/javascript" src="{{$baseurl}}/vendor/asset/jquery/dist/jquery.min.js" ></script>
+<script type="text/javascript" src="{{$baseurl}}/view/asset/jquery/dist/jquery.min.js" ></script>
 
 <link rel="shortcut icon" href="{{$baseurl}}/images/friendica-32.png" />
 <link rel="search"

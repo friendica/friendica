@@ -1,7 +1,10 @@
 <?php
-
+/**
+ * @file mod/uexport.php
+ */
 use Friendica\App;
 use Friendica\Core\Addon;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 
@@ -38,15 +41,15 @@ function uexport_content(App $a) {
 	 * list of array( 'link url', 'link text', 'help text' )
 	 */
 	$options = [
-		['uexport/account', t('Export account'), t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')],
-		['uexport/backup', t('Export all'), t('Export your accout info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)')],
+		['uexport/account', L10n::t('Export account'), L10n::t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')],
+		['uexport/backup', L10n::t('Export all'), L10n::t("Export your accout info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account \x28photos are not exported\x29")],
 	];
 	Addon::callHooks('uexport_options', $options);
 
 	$tpl = get_markup_template("uexport.tpl");
 	return replace_macros($tpl, [
 		'$baseurl' => System::baseUrl(),
-		'$title' => t('Export personal data'),
+		'$title' => L10n::t('Export personal data'),
 		'$options' => $options
 	]);
 }
@@ -138,6 +141,7 @@ function uexport_all(App $a) {
 	uexport_account($a);
 	echo "\n";
 
+	$total = 0;
 	$r = q("SELECT count(*) as `total` FROM `item` WHERE `uid` = %d ",
 		intval(local_user())
 	);

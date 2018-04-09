@@ -53,7 +53,8 @@ nbproject
 venv/
 
 #ignore Composer dependencies
-vendor
+/vendor
+/view/asset
 
 #ignore config files from JetBrains
 /.idea

@@ -74,18 +74,20 @@
 		<div class="wall-item-links">
 		</div>
 		<div class="wall-item-tags">
+		{{if !$item.suppress_tags}}
 			{{foreach $item.hashtags as $tag}}
-				<span class='tag'>{{$tag}}</span>
+				<span class="tag">{{$tag}}</span>
 			{{/foreach}}
   			{{foreach $item.mentions as $tag}}
-				<span class='mention'>{{$tag}}</span>
+				<span class="mention">{{$tag}}</span>
 			{{/foreach}}
-               {{foreach $item.folders as $cat}}
-                    <span class='folder p-category'>{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
-               {{/foreach}}
-                {{foreach $item.categories as $cat}}
-                    <span class='category p-category'>{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
-                {{/foreach}}
+		{{/if}}
+			{{foreach $item.folders as $cat}}
+				<span class="folder p-category">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+			{{/foreach}}
+			{{foreach $item.categories as $cat}}
+				<span class="category p-category">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+			{{/foreach}}
 		</div>
 	</div>
 	<div class="wall-item-bottom">

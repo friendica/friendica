@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="{{$baseurl}}/view/theme/frio/frameworks/jRange/jquery.range.css" type="text/css" media="screen" />
 <script src="{{$baseurl}}/view/theme/quattro/jquery.tools.min.js"></script>
 <script src="{{$baseurl}}/view/theme/frio/frameworks/jRange/jquery.range.js"></script>
-<script type="text/javascript" src="{{$baseurl}}/js/ajaxupload.js" ></script>
+<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js" ></script>
 
 {{include file="field_select.tpl" field=$schema}}
 

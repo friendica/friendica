@@ -33,7 +33,7 @@ $a->config['sitename'] = "My Friend Network";
 
 $a->config['register_policy'] = REGISTER_OPEN;
 $a->config['register_text'] = '';
-$a->config['admin_email'] = 'admin@friendica.dev';
+$a->config['admin_email'] = 'admin@friendica.local';
 
 // Maximum size of an imported message, 0 is unlimited
 

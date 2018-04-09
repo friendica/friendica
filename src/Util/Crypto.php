@@ -8,9 +8,6 @@ use Friendica\Core\Config;
 use ASN_BASE;
 use ASNValue;
 
-require_once 'library/ASNValue.class.php';
-require_once 'library/asn1.php';
-
 /**
  * @brief Crypto class
  */

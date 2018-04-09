@@ -4,6 +4,7 @@ This file is part of the Diaspora protocol. It is used for fetching single publi
 */
 
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\XML;
@@ -12,7 +13,7 @@ function fetch_init(App $a)
 {
 
 	if (($a->argc != 3) || (!in_array($a->argv[1], ["post", "status_message", "reshare"]))) {
-		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"].' 404 '.L10n::t('Not Found'));
 		killme();
 	}
 
@@ -48,7 +49,7 @@ function fetch_init(App $a)
 			}
 		}
 
-		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"].' 404 '.L10n::t('Not Found'));
 		killme();
 	}
 
@@ -61,7 +62,7 @@ function fetch_init(App $a)
 	);
 
 	if (!$r) {
-		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"].' 404 '.L10n::t('Not Found'));
 		killme();
 	}
 	$user = $r[0];

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file mod/wall_upload.php
  * @brief Module for uploading a picture to the profile wall
@@ -10,6 +9,7 @@
  */
 
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
@@ -35,7 +35,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 
 			if (! DBM::is_result($r)) {
 				if ($r_json) {
-					echo json_encode(['error'=>t('Invalid request.')]);
+					echo json_encode(['error'=>L10n::t('Invalid request.')]);
 					killme();
 				}
 				return;
@@ -51,7 +51,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 		}
 	} else {
 		if ($r_json) {
-			echo json_encode(['error'=>t('Invalid request.')]);
+			echo json_encode(['error'=>L10n::t('Invalid request.')]);
 			killme();
 		}
 		return;
@@ -100,21 +100,24 @@ function wall_upload_post(App $a, $desktopmode = true) {
 
 	if (! $can_post) {
 		if ($r_json) {
-			echo json_encode(['error'=>t('Permission denied.')]);
+			echo json_encode(['error'=>L10n::t('Permission denied.')]);
 			killme();
 		}
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		killme();
 	}
 
 	if (! x($_FILES, 'userfile') && ! x($_FILES, 'media')) {
 		if ($r_json) {
-			echo json_encode(['error'=>t('Invalid request.')]);
+			echo json_encode(['error'=>L10n::t('Invalid request.')]);
 		}
 		killme();
 	}
 
-	$src = "";
+	$src = '';
+	$filename = '';
+	$filesize = 0;
+	$filetype = '';
 	if (x($_FILES, 'userfile')) {
 		$src      = $_FILES['userfile']['tmp_name'];
 		$filename = basename($_FILES['userfile']['name']);
@@ -149,10 +152,10 @@ function wall_upload_post(App $a, $desktopmode = true) {
 
 	if ($src=="") {
 		if ($r_json) {
-			echo json_encode(['error'=>t('Invalid request.')]);
+			echo json_encode(['error'=>L10n::t('Invalid request.')]);
 			killme();
 		}
-		notice(t('Invalid request.').EOL);
+		notice(L10n::t('Invalid request.').EOL);
 		killme();
 	}
 
@@ -180,7 +183,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	$maximagesize = Config::get('system', 'maximagesize');
 
 	if (($maximagesize) && ($filesize > $maximagesize)) {
-		$msg = sprintf(t('Image exceeds size limit of %s'), formatBytes($maximagesize));
+		$msg = L10n::t('Image exceeds size limit of %s', formatBytes($maximagesize));
 		if ($r_json) {
 			echo json_encode(['error'=>$msg]);
 		} else {
@@ -194,7 +197,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	$Image = new Image($imagedata, $filetype);
 
 	if (! $Image->isValid()) {
-		$msg = t('Unable to process image.');
+		$msg = L10n::t('Unable to process image.');
 		if ($r_json) {
 			echo json_encode(['error'=>$msg]);
 		} else {
@@ -219,13 +222,13 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	$width = $Image->getWidth();
 	$height = $Image->getHeight();
 
-	$hash = photo_new_resource();
+	$hash = Photo::newResource();
 
 	$smallest = 0;
 
 	// If we don't have an album name use the Wall Photos album
 	if (! strlen($album)) {
-		$album = t('Wall Photos');
+		$album = L10n::t('Wall Photos');
 	}
 
 	$defperm = '<' . $default_cid . '>';
@@ -233,7 +236,7 @@ function wall_upload_post(App $a, $desktopmode = true) {
 	$r = Photo::store($Image, $page_owner_uid, $visitor, $hash, $filename, $album, 0, 0, $defperm);
 
 	if (! $r) {
-		$msg = t('Image upload failed.');
+		$msg = L10n::t('Image upload failed.');
 		if ($r_json) {
 			echo json_encode(['error'=>$msg]);
 		} else {

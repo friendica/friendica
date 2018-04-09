@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Widget;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Model\Contact;
@@ -13,13 +14,15 @@ use Friendica\Model\GContact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
+use Friendica\Util\Network;
+use Friendica\Database\DBM;
 
 require_once 'mod/contacts.php';
 
 function dirfind_init(App $a) {
 
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL );
+		notice(L10n::t('Permission denied.') . EOL );
 		return;
 	}
 
@@ -43,8 +46,8 @@ function dirfind_content(App $a, $prefix = "") {
 
 	if (strpos($search,'@') === 0) {
 		$search = substr($search,1);
-		$header = sprintf( t('People Search - %s'), $search);
-		if ((valid_email($search) && validate_email($search)) ||
+		$header = L10n::t('People Search - %s', $search);
+		if ((valid_email($search) && Network::isEmailDomainValid($search)) ||
 			(substr(normalise_link($search), 0, 7) == "http://")) {
 			$user_data = Probe::uri($search);
 			$discover_user = (in_array($user_data["network"], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA]));
@@ -54,7 +57,7 @@ function dirfind_content(App $a, $prefix = "") {
 	if (strpos($search,'!') === 0) {
 		$search = substr($search,1);
 		$community = true;
-		$header = sprintf( t('Forum Search - %s'), $search);
+		$header = L10n::t('Forum Search - %s', $search);
 	}
 
 	$o = '';
@@ -111,32 +114,22 @@ function dirfind_content(App $a, $prefix = "") {
 
 			/// @TODO These 2 SELECTs are not checked on validity with DBM::is_result()
 			$count = q("SELECT count(*) AS `total` FROM `gcontact`
-					LEFT JOIN `contact` ON `contact`.`nurl` = `gcontact`.`nurl`
-						AND `contact`.`network` = `gcontact`.`network`
-						AND `contact`.`uid` = %d AND NOT `contact`.`blocked`
-						AND NOT `contact`.`pending` AND `contact`.`rel` IN ('%s', '%s')
-					WHERE (`contact`.`id` > 0 OR (NOT `gcontact`.`hide` AND `gcontact`.`network` IN ('%s', '%s', '%s') AND
-					((`gcontact`.`last_contact` >= `gcontact`.`last_failure`) OR (`gcontact`.`updated` >= `gcontact`.`last_failure`)))) AND
-					(`gcontact`.`url` LIKE '%s' OR `gcontact`.`name` LIKE '%s' OR `gcontact`.`location` LIKE '%s' OR
-						`gcontact`.`addr` LIKE '%s' OR `gcontact`.`about` LIKE '%s' OR `gcontact`.`keywords` LIKE '%s') $extra_sql",
-					intval(local_user()), dbesc(CONTACT_IS_SHARING), dbesc(CONTACT_IS_FRIEND),
+					WHERE NOT `hide` AND `network` IN ('%s', '%s', '%s') AND
+						((`last_contact` >= `last_failure`) OR (`updated` >= `last_failure`)) AND
+						(`url` LIKE '%s' OR `name` LIKE '%s' OR `location` LIKE '%s' OR
+						`addr` LIKE '%s' OR `about` LIKE '%s' OR `keywords` LIKE '%s') $extra_sql",
 					dbesc(NETWORK_DFRN), dbesc($ostatus), dbesc($diaspora),
 					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)),
 					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)));
 
-			$results = q("SELECT `contact`.`id` AS `cid`, `gcontact`.`url`, `gcontact`.`name`, `gcontact`.`photo`, `gcontact`.`network`, `gcontact`.`keywords`, `gcontact`.`addr`
+			$results = q("SELECT `nurl`
 					FROM `gcontact`
-					LEFT JOIN `contact` ON `contact`.`nurl` = `gcontact`.`nurl`
-						AND `contact`.`network` = `gcontact`.`network`
-						AND `contact`.`uid` = %d AND NOT `contact`.`blocked`
-						AND NOT `contact`.`pending` AND `contact`.`rel` IN ('%s', '%s')
-					WHERE (`contact`.`id` > 0 OR (NOT `gcontact`.`hide` AND `gcontact`.`network` IN ('%s', '%s', '%s') AND
-					((`gcontact`.`last_contact` >= `gcontact`.`last_failure`) OR (`gcontact`.`updated` >= `gcontact`.`last_failure`)))) AND
-					(`gcontact`.`url` LIKE '%s' OR `gcontact`.`name` LIKE '%s' OR `gcontact`.`location` LIKE '%s' OR
-						`gcontact`.`addr` LIKE '%s' OR `gcontact`.`about` LIKE '%s' OR `gcontact`.`keywords` LIKE '%s') $extra_sql
-						GROUP BY `gcontact`.`nurl`
-						ORDER BY `gcontact`.`updated` DESC LIMIT %d, %d",
-					intval(local_user()), dbesc(CONTACT_IS_SHARING), dbesc(CONTACT_IS_FRIEND),
+					WHERE NOT `hide` AND `network` IN ('%s', '%s', '%s') AND
+						((`last_contact` >= `last_failure`) OR (`updated` >= `last_failure`)) AND
+						(`url` LIKE '%s' OR `name` LIKE '%s' OR `location` LIKE '%s' OR
+						`addr` LIKE '%s' OR `about` LIKE '%s' OR `keywords` LIKE '%s') $extra_sql
+						GROUP BY `nurl`
+						ORDER BY `updated` DESC LIMIT %d, %d",
 					dbesc(NETWORK_DFRN), dbesc($ostatus), dbesc($diaspora),
 					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)),
 					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)),
@@ -146,14 +139,21 @@ function dirfind_content(App $a, $prefix = "") {
 			$j->items_page = $perpage;
 			$j->page = $a->pager['page'];
 			foreach ($results AS $result) {
-				if (PortableContact::alternateOStatusUrl($result["url"])) {
+				if (PortableContact::alternateOStatusUrl($result["nurl"])) {
 					continue;
 				}
 
-				$result = Contact::getDetailsByURL($result["url"], local_user(), $result);
+				$urlparts = parse_url($result["nurl"]);
+
+				// Ignore results that look strange.
+				// For historic reasons the gcontact table does contain some garbage.
+				if (!empty($urlparts['query']) || !empty($urlparts['fragment'])) {
+					continue;
+				}
+
+				$result = Contact::getDetailsByURL($result["nurl"], local_user());
 
 				if ($result["name"] == "") {
-					$urlparts = parse_url($result["url"]);
 					$result["name"] = end(explode("/", $urlparts["path"]));
 				}
 
@@ -176,7 +176,7 @@ function dirfind_content(App $a, $prefix = "") {
 			$p = (($a->pager['page'] != 1) ? '&p=' . $a->pager['page'] : '');
 
 			if(strlen(Config::get('system','directory')))
-				$x = fetch_url(get_server().'/lsearch?f=' . $p .  '&search=' . urlencode($search));
+				$x = Network::fetchUrl(get_server().'/lsearch?f=' . $p .  '&search=' . urlencode($search));
 
 			$j = json_decode($x);
 		}
@@ -202,21 +202,20 @@ function dirfind_content(App $a, $prefix = "") {
 				if ($jj->cid > 0) {
 					$connlnk = "";
 					$conntxt = "";
-					$contact = q("SELECT * FROM `contact` WHERE `id` = %d",
-							intval($jj->cid));
-					if ($contact) {
-						$photo_menu = Contact::photoMenu($contact[0]);
-						$details = _contact_detail_for_template($contact[0]);
+					$contact = dba::selectFirst('contact', [], ['id' => $jj->cid]);
+					if (DBM::is_result($contact)) {
+						$photo_menu = Contact::photoMenu($contact);
+						$details = _contact_detail_for_template($contact);
 						$alt_text = $details['alt_text'];
 					} else {
 						$photo_menu = [];
 					}
 				} else {
 					$connlnk = System::baseUrl().'/follow/?url='.(($jj->connect) ? $jj->connect : $jj->url);
-					$conntxt = t('Connect');
+					$conntxt = L10n::t('Connect');
 					$photo_menu = [
-						'profile' => [t("View Profile"), Profile::zrl($jj->url)],
-						'follow' => [t("Connect/Follow"), $connlnk]
+						'profile' => [L10n::t("View Profile"), Profile::zrl($jj->url)],
+						'follow' => [L10n::t("Connect/Follow"), $connlnk]
 					];
 				}
 
@@ -224,7 +223,7 @@ function dirfind_content(App $a, $prefix = "") {
 
 				$entry = [
 					'alt_text' => $alt_text,
-					'url' => Profile::zrl($jj->url),
+					'url' => Profile::magicLink($jj->url),
 					'itemurl' => $itemurl,
 					'name' => htmlentities($jj->name),
 					'thumb' => proxy_url($jj->photo, false, PROXY_SIZE_THUMB),
@@ -251,7 +250,7 @@ function dirfind_content(App $a, $prefix = "") {
 		]);
 
 		} else {
-			info( t('No matches') . EOL);
+			info(L10n::t('No matches') . EOL);
 		}
 
 	}

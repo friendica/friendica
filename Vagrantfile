@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
   # Create a hostname, don't forget to put it to the `hosts` file
   # This will point to the server's default virtual host
   # TO DO: Make this work with virtualhost along-side xip.io URL
-  config.vm.hostname = "friendica-xenial.dev"
+  config.vm.hostname = "friendica.local"
 
   # Create a static IP
   config.vm.network :private_network, ip: server_ip
@@ -36,8 +36,8 @@ Vagrant.configure(2) do |config|
     vb.memory = server_memory
   end
 
-  # Enable provisioning with a shell script. 
-  config.vm.provision "shell", path: "./util/vagrant_provision.sh"
+  # Enable provisioning with a shell script.
+  config.vm.provision "shell", path: "./bin/dev/vagrant_provision.sh"
     # run: "always"
     # run: "once"
 end

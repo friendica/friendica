@@ -60,9 +60,11 @@
 			<div class="wall-item-title-end"></div>
 			<div class="wall-item-body" id="wall-item-body-{{$item.id}}" ><span class="e-content">{{$item.body}}</span>
 				<div class="body-tag">
+				{{if !$item.suppress_tags}}
 					{{foreach $item.tags as $tag}}
-					<span class='tag'>{{$tag}}</span>
+					<span class="tag">{{$tag}}</span>
 					{{/foreach}}
+				{{/if}}
 				</div>
 
 				{{if $item.has_cats}}

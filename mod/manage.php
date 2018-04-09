@@ -1,11 +1,14 @@
 <?php
-
+/**
+ * @file mod/manage.php
+ */
 use Friendica\App;
 use Friendica\Core\Addon;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 
-require_once("include/text.php");
+require_once "include/text.php";
 
 function manage_post(App $a) {
 
@@ -32,8 +35,8 @@ function manage_post(App $a) {
 
 	$submanage = $r;
 
-	$identity = ((x($_POST['identity'])) ? intval($_POST['identity']) : 0);
-	if (! $identity) {
+	$identity = (x($_POST['identity']) ? intval($_POST['identity']) : 0);
+	if (!$identity) {
 		return;
 	}
 
@@ -54,14 +57,36 @@ function manage_post(App $a) {
 			intval($limited_id)
 		);
 	} else {
-		$r = q("SELECT * FROM `user` WHERE `uid` = %d AND `email` = '%s' AND `password` = '%s' LIMIT 1",
+		// Check if the target user is one of our children
+		$r = q("SELECT * FROM `user` WHERE `uid` = %d AND `parent-uid` = %d LIMIT 1",
 			intval($identity),
-			dbesc($orig_record['email']),
-			dbesc($orig_record['password'])
+			dbesc($orig_record['uid'])
 		);
+
+		// Check if the target user is one of our siblings
+		if (!DBM::is_result($r) && ($orig_record['parent-uid'] != 0)) {
+			$r = q("SELECT * FROM `user` WHERE `uid` = %d AND `parent-uid` = %d LIMIT 1",
+				intval($identity),
+				dbesc($orig_record['parent-uid'])
+			);
+		}
+
+		// Check if it's our parent
+		if (!DBM::is_result($r) && ($orig_record['parent-uid'] != 0) && ($orig_record['parent-uid'] == $identity)) {
+			$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
+				intval($identity)
+			);
+		}
+
+		// Finally check if it's out own user
+		if (!DBM::is_result($r) && ($orig_record['uid'] != 0) && ($orig_record['uid'] == $identity)) {
+			$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
+				intval($identity)
+			);
+		}
 	}
 
-	if (! DBM::is_result($r)) {
+	if (!DBM::is_result($r)) {
 		return;
 	}
 
@@ -103,7 +128,7 @@ function manage_post(App $a) {
 function manage_content(App $a) {
 
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -152,11 +177,11 @@ function manage_content(App $a) {
 	}
 
 	$o = replace_macros(get_markup_template('manage.tpl'), [
-		'$title' => t('Manage Identities and/or Pages'),
-		'$desc' => t('Toggle between different identities or community/group pages which share your account details or which you have been granted "manage" permissions'),
-		'$choose' => t('Select an identity to manage: '),
+		'$title' => L10n::t('Manage Identities and/or Pages'),
+		'$desc' => L10n::t('Toggle between different identities or community/group pages which share your account details or which you have been granted "manage" permissions'),
+		'$choose' => L10n::t('Select an identity to manage: '),
 		'$identities' => $identities,
-		'$submit' => t('Submit'),
+		'$submit' => L10n::t('Submit'),
 	]);
 
 	return $o;

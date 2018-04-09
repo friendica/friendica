@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file src/Protocol/FKOAuthDataStore.php
+ * @file src/Network/FKOAuthDataStore.php
  * OAuth server
  * Based on oauth2-php <http://code.google.com/p/oauth2-php/>
  *
@@ -9,19 +9,17 @@
 
 namespace Friendica\Network;
 
-use Friendica\App;
 use Friendica\Core\Config;
-use Friendica\Core\System;
 use Friendica\Database\DBM;
 use dba;
+use OAuthConsumer;
 use OAuthDataStore;
+use OAuthToken;
 
 define('REQUEST_TOKEN_DURATION', 300);
 define('ACCESS_TOKEN_DURATION', 31536000);
 
 require_once 'include/dba.php';
-
-require_once "library/OAuth1.php";
 
 /**
  * @brief OAuthDataStore class
@@ -48,7 +46,7 @@ class FKOAuthDataStore extends OAuthDataStore
 		$r = dba::inArray($s);
 
 		if (DBM::is_result($r)) {
-			return new \OAuthConsumer($r[0]['client_id'], $r[0]['pw'], $r[0]['redirect_uri']);
+			return new OAuthConsumer($r[0]['client_id'], $r[0]['pw'], $r[0]['redirect_uri']);
 		}
 
 		return null;
@@ -68,7 +66,7 @@ class FKOAuthDataStore extends OAuthDataStore
 		$r = dba::inArray($s);
 
 		if (DBM::is_result($r)) {
-			$ot = new \OAuthToken($r[0]['id'], $r[0]['secret']);
+			$ot = new OAuthToken($r[0]['id'], $r[0]['secret']);
 			$ot->scope = $r[0]['scope'];
 			$ot->expires = $r[0]['expires'];
 			$ot->uid = $r[0]['uid'];
@@ -89,7 +87,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	{
 		$token = dba::selectFirst('tokens', ['id', 'secret'], ['client_id' => $consumer->key, 'id' => $nonce, 'expires' => $timestamp]);
 		if (DBM::is_result($token)) {
-			return new \OAuthToken($token['id'], $token['secret']);
+			return new OAuthToken($token['id'], $token['secret']);
 		}
 
 		return null;
@@ -126,7 +124,7 @@ class FKOAuthDataStore extends OAuthDataStore
 			return null;
 		}
 
-		return new \OAuthToken($key, $sec);
+		return new OAuthToken($key, $sec);
 	}
 
 	/**
@@ -165,7 +163,7 @@ class FKOAuthDataStore extends OAuthDataStore
 			);
 
 			if ($r) {
-				$ret = new \OAuthToken($key, $sec);
+				$ret = new OAuthToken($key, $sec);
 			}
 		}
 

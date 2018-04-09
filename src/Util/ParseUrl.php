@@ -8,6 +8,7 @@ namespace Friendica\Util;
 use Friendica\Content\OEmbed;
 use Friendica\Core\Addon;
 use Friendica\Object\Image;
+use Friendica\Util\Network;
 use Friendica\Util\XML;
 
 use dba;
@@ -15,7 +16,6 @@ use DOMXPath;
 use DOMDocument;
 
 require_once 'include/dba.php';
-require_once "include/network.php";
 
 /**
  * @brief Class with methods for extracting certain content from an url
@@ -50,19 +50,11 @@ class ParseUrl
 			return false;
 		}
 
-		$r = q(
-			"SELECT * FROM `parsed_url` WHERE `url` = '%s' AND `guessing` = %d AND `oembed` = %d",
-			dbesc(normalise_link($url)),
-			intval(!$no_guessing),
-			intval($do_oembed)
+		$parsed_url = dba::selectFirst('parsed_url', ['content'],
+			['url' => normalise_link($url), 'guessing' => !$no_guessing, 'oembed' => $do_oembed]
 		);
-
-		if ($r) {
-			$data = $r[0]["content"];
-		}
-
-		if (!is_null($data)) {
-			$data = unserialize($data);
+		if (!empty($parsed_url['content'])) {
+			$data = unserialize($parsed_url['content']);
 			return $data;
 		}
 
@@ -73,7 +65,8 @@ class ParseUrl
 			[
 				'url' => normalise_link($url), 'guessing' => !$no_guessing,
 				'oembed' => $do_oembed, 'content' => serialize($data),
-				'created' => datetime_convert()],
+				'created' => DateTimeFormat::utcNow()
+			],
 			true
 		);
 
@@ -140,12 +133,12 @@ class ParseUrl
 		$url = trim($url, "'");
 		$url = trim($url, '"');
 
-		$url = strip_tracking_query_params($url);
+		$url = Network::stripTrackingQueryParams($url);
 
 		$siteinfo["url"] = $url;
 		$siteinfo["type"] = "link";
 
-		$data = z_fetch_url($url);
+		$data = Network::curl($url);
 		if (!$data['success']) {
 			return($siteinfo);
 		}

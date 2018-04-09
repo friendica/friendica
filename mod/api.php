@@ -1,11 +1,14 @@
 <?php
-
+/**
+ * @file mod/api.php
+ */
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use Friendica\Module\Login;
 
-require_once('include/api.php');
+require_once 'include/api.php';
 
 function oauth_get_client($request)
 {
@@ -19,8 +22,9 @@ function oauth_get_client($request)
 			WHERE `clients`.`client_id`=`tokens`.`client_id`
 			AND `tokens`.`id`='%s' AND `tokens`.`scope`='request'", dbesc($token));
 
-	if (!DBM::is_result($r))
+	if (!DBM::is_result($r)) {
 		return null;
+	}
 
 	return $r[0];
 }
@@ -28,12 +32,12 @@ function oauth_get_client($request)
 function api_post(App $a)
 {
 	if (!local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
 	if (count($a->user) && x($a->user, 'uid') && $a->user['uid'] != local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 }
@@ -78,8 +82,8 @@ function api_content(App $a)
 
 			$tpl = get_markup_template("oauth_authorize_done.tpl");
 			$o = replace_macros($tpl, [
-				'$title' => t('Authorize application connection'),
-				'$info' => t('Return to your app and insert this Securty Code:'),
+				'$title' => L10n::t('Authorize application connection'),
+				'$info' => L10n::t('Return to your app and insert this Securty Code:'),
 				'$code' => $verifier,
 			]);
 
@@ -88,7 +92,7 @@ function api_content(App $a)
 
 		if (!local_user()) {
 			/// @TODO We need login form to redirect to this page
-			notice(t('Please login to continue.') . EOL);
+			notice(L10n::t('Please login to continue.') . EOL);
 			return Login::form($a->query_string, false, $request->get_parameters());
 		}
 		//FKOAuth1::loginUser(4);
@@ -100,11 +104,11 @@ function api_content(App $a)
 
 		$tpl = get_markup_template('oauth_authorize.tpl');
 		$o = replace_macros($tpl, [
-			'$title' => t('Authorize application connection'),
+			'$title' => L10n::t('Authorize application connection'),
 			'$app' => $app,
-			'$authorize' => t('Do you want to authorize this application to access your posts and contacts, and/or create new posts for you?'),
-			'$yes' => t('Yes'),
-			'$no' => t('No'),
+			'$authorize' => L10n::t('Do you want to authorize this application to access your posts and contacts, and/or create new posts for you?'),
+			'$yes' => L10n::t('Yes'),
+			'$no' => L10n::t('No'),
 		]);
 
 		return $o;

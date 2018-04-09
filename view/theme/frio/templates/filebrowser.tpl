@@ -4,7 +4,7 @@
 <style>
 	#buglink_wrapper{display:none;} /* hide buglink. only in this page */
 </style>
-{{*<script type="text/javascript" src="{{$baseurl}}/js/ajaxupload.js" ></script>*}}
+{{*<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js" ></script>*}}
 {{*<script type="text/javascript" src="view/theme/frio/js/filebrowser.js"></script>*}}
 
 <div class="fbrowser {{$type}}">
@@ -58,7 +58,7 @@
 		</div>
 
 		<div class="upload">
-			<button id="upload-{{$type}}">{{"Upload"|t}}</button>
+			<button id="upload-{{$type}}">{{$upload}}</button>
 		</div>
 	</div>
 

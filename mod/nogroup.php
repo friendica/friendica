@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Content\ContactSelector;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -24,7 +25,7 @@ function nogroup_init(App $a)
 function nogroup_content(App $a)
 {
 	if (! local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return '';
 	}
 
@@ -38,8 +39,8 @@ function nogroup_content(App $a)
 			$contact_details = Contact::getDetailsByURL($rr['url'], local_user(), $rr);
 
 			$contacts[] = [
-				'img_hover' => t('Visit %s\'s profile [%s]', $contact_details['name'], $rr['url']),
-				'edit_hover' => t('Edit contact'),
+				'img_hover' => L10n::t('Visit %s\'s profile [%s]', $contact_details['name'], $rr['url']),
+				'edit_hover' => L10n::t('Edit contact'),
 				'photo_menu' => Contact::photoMenu($rr),
 				'id' => $rr['id'],
 				'thumb' => proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
@@ -59,7 +60,7 @@ function nogroup_content(App $a)
 	$o = replace_macros(
 		$tpl,
 		[
-		'$header' => t('Contacts who are not members of a group'),
+		'$header' => L10n::t('Contacts who are not members of a group'),
 		'$contacts' => $contacts,
 		'$paginate' => paginate($a)]
 	);

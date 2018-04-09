@@ -6,11 +6,10 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
+use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
-
-require_once "include/network.php";
 
 function notifications_post(App $a) {
 
@@ -35,7 +34,7 @@ function notifications_post(App $a) {
 			$contact_id = $r[0]['contact-id'];
 		}
 		else {
-			notice( t('Invalid request identifier.') . EOL);
+			notice(L10n::t('Invalid request identifier.') . EOL);
 			return;
 		}
 
@@ -44,7 +43,7 @@ function notifications_post(App $a) {
 
 		$fid = $r[0]['fid'];
 
-		if($_POST['submit'] == t('Discard')) {
+		if($_POST['submit'] == L10n::t('Discard')) {
 			$r = q("DELETE FROM `intro` WHERE `id` = %d",
 				intval($intro_id)
 			);
@@ -60,7 +59,7 @@ function notifications_post(App $a) {
 			}
 			goaway('notifications/intros');
 		}
-		if($_POST['submit'] == t('Ignore')) {
+		if($_POST['submit'] == L10n::t('Ignore')) {
 			$r = q("UPDATE `intro` SET `ignore` = 1 WHERE `id` = %d",
 				intval($intro_id));
 			goaway('notifications/intros');
@@ -71,7 +70,7 @@ function notifications_post(App $a) {
 function notifications_content(App $a) {
 
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -96,7 +95,7 @@ function notifications_content(App $a) {
 	// Get introductions
 	if ((($a->argc > 1) && ($a->argv[1] == 'intros')) || (($a->argc == 1))) {
 		Nav::setSelected('introductions');
-		$notif_header = t('Notifications');
+		$notif_header = L10n::t('Notifications');
 
 		$all = (($a->argc > 2) && ($a->argv[2] == 'all'));
 
@@ -105,25 +104,25 @@ function notifications_content(App $a) {
 	// Get the network notifications
 	} else if (($a->argc > 1) && ($a->argv[1] == 'network')) {
 
-		$notif_header = t('Network Notifications');
+		$notif_header = L10n::t('Network Notifications');
 		$notifs = $nm->networkNotifs($show, $startrec, $perpage);
 
 	// Get the system notifications
 	} else if (($a->argc > 1) && ($a->argv[1] == 'system')) {
 
-		$notif_header = t('System Notifications');
+		$notif_header = L10n::t('System Notifications');
 		$notifs = $nm->systemNotifs($show, $startrec, $perpage);
 
 	// Get the personal notifications
 	} else if (($a->argc > 1) && ($a->argv[1] == 'personal')) {
 
-		$notif_header = t('Personal Notifications');
+		$notif_header = L10n::t('Personal Notifications');
 		$notifs = $nm->personalNotifs($show, $startrec, $perpage);
 
 	// Get the home notifications
 	} else if (($a->argc > 1) && ($a->argv[1] == 'home')) {
 
-		$notif_header = t('Home Notifications');
+		$notif_header = L10n::t('Home Notifications');
 		$notifs = $nm->homeNotifs($show, $startrec, $perpage);
 
 	}
@@ -138,8 +137,9 @@ function notifications_content(App $a) {
 	$notifs['page'] = $a->pager['page'];
 
 	// Json output
-	if(intval($json) === 1)
-		json_return_and_die($notifs);
+	if (intval($json) === 1) {
+		System::jsonExit($notifs);
+	}
 
 	$notif_tpl = get_markup_template('notifications.tpl');
 
@@ -152,7 +152,7 @@ function notifications_content(App $a) {
 		// The link to switch between ignored and normal connection requests
 		$notif_show_lnk = [
 			'href' => (!$all ? 'notifications/intros/all' : 'notifications/intros' ),
-			'text' => (!$all ? t('Show Ignored Requests') : t('Hide Ignored Requests'))
+			'text' => (!$all ? L10n::t('Show Ignored Requests') : L10n::t('Hide Ignored Requests'))
 		];
 
 		// Loop through all introduction notifications.This creates an array with the output html for each
@@ -164,23 +164,23 @@ function notifications_content(App $a) {
 			switch ($it['label']) {
 				case 'friend_suggestion':
 					$notif_content[] = replace_macros($sugg, [
-						'$str_notifytype' => t('Notification type: '),
+						'$str_notifytype' => L10n::t('Notification type: '),
 						'$notify_type' => $it['notify_type'],
 						'$intro_id' => $it['intro_id'],
-						'$madeby' => sprintf( t('suggested by %s'),$it['madeby']),
+						'$madeby' => L10n::t('suggested by %s', $it['madeby']),
 						'$contact_id' => $it['contact-id'],
 						'$photo' => $it['photo'],
 						'$fullname' => $it['name'],
 						'$url' => $it['url'],
-						'$hidden' => ['hidden', t('Hide this contact from others'), ($it['hidden'] == 1), ''],
-						'$activity' => ['activity', t('Post a new friend activity'), $it['post_newfriend'], t('if applicable')],
+						'$hidden' => ['hidden', L10n::t('Hide this contact from others'), ($it['hidden'] == 1), ''],
+						'$activity' => ['activity', L10n::t('Post a new friend activity'), $it['post_newfriend'], L10n::t('if applicable')],
 
 						'$knowyou' => $it['knowyou'],
-						'$approve' => t('Approve'),
+						'$approve' => L10n::t('Approve'),
 						'$note' => $it['note'],
 						'$request' => $it['request'],
-						'$ignore' => t('Ignore'),
-						'$discard' => t('Discard'),
+						'$ignore' => L10n::t('Ignore'),
+						'$discard' => L10n::t('Discard'),
 					]);
 					break;
 
@@ -195,16 +195,16 @@ function notifications_content(App $a) {
 
 					if($it['network'] === NETWORK_DFRN || $it['network'] === NETWORK_DIASPORA) {
 						if($it['network'] === NETWORK_DFRN) {
-							$lbl_knowyou = t('Claims to be known to you: ');
-							$knowyou = (($it['knowyou']) ? t('yes') : t('no'));
-							$helptext = t('Shall your connection be bidirectional or not?');
-							$helptext2 = sprintf(t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.'), $it['name'], $it['name']);
-							$helptext3 = sprintf(t('Accepting %s as a subscriber allows them to subscribe to your posts, but you will not receive updates from them in your news feed.'), $it['name']);
+							$lbl_knowyou = L10n::t('Claims to be known to you: ');
+							$knowyou = (($it['knowyou']) ? L10n::t('yes') : L10n::t('no'));
+							$helptext = L10n::t('Shall your connection be bidirectional or not?');
+							$helptext2 = L10n::t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.', $it['name'], $it['name']);
+							$helptext3 = L10n::t('Accepting %s as a subscriber allows them to subscribe to your posts, but you will not receive updates from them in your news feed.', $it['name']);
 						} else {
 							$knowyou = '';
-							$helptext = t('Shall your connection be bidirectional or not?');
-							$helptext2 = sprintf(t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.'), $it['name'], $it['name']);
-							$helptext3 = sprintf(t('Accepting %s as a sharer allows them to subscribe to your posts, but you will not receive updates from them in your news feed.'), $it['name']);
+							$helptext = L10n::t('Shall your connection be bidirectional or not?');
+							$helptext2 = L10n::t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.', $it['name'], $it['name']);
+							$helptext3 = L10n::t('Accepting %s as a sharer allows them to subscribe to your posts, but you will not receive updates from them in your news feed.', $it['name']);
 						}
 					}
 
@@ -215,8 +215,8 @@ function notifications_content(App $a) {
 						'$approve_as1' => $helptext,
 						'$approve_as2' => $helptext2,
 						'$approve_as3' => $helptext3,
-						'$as_friend' => t('Friend'),
-						'$as_fan' => (($it['network'] == NETWORK_DIASPORA) ? t('Sharer') : t('Subscriber'))
+						'$as_friend' => L10n::t('Friend'),
+						'$as_fan' => (($it['network'] == NETWORK_DIASPORA) ? L10n::t('Sharer') : L10n::t('Subscriber'))
 					]);
 
 					$header = $it["name"];
@@ -227,14 +227,14 @@ function notifications_content(App $a) {
 					$header .= " (".ContactSelector::networkToName($it['network'], $it['url']).")";
 
 					if ($it['network'] != NETWORK_DIASPORA) {
-						$discard = t('Discard');
+						$discard = L10n::t('Discard');
 					} else {
 						$discard = '';
 					}
 
 					$notif_content[] = replace_macros($tpl, [
 						'$header' => htmlentities($header),
-						'$str_notifytype' => t('Notification type: '),
+						'$str_notifytype' => L10n::t('Notification type: '),
 						'$notify_type' => $it['notify_type'],
 						'$dfrn_text' => $dfrn_text,
 						'$dfrn_id' => $it['dfrn_id'],
@@ -244,26 +244,26 @@ function notifications_content(App $a) {
 						'$photo' => $it['photo'],
 						'$fullname' => $it['name'],
 						'$location' => $it['location'],
-						'$lbl_location' => t('Location:'),
+						'$lbl_location' => L10n::t('Location:'),
 						'$about' => $it['about'],
-						'$lbl_about' => t('About:'),
+						'$lbl_about' => L10n::t('About:'),
 						'$keywords' => $it['keywords'],
-						'$lbl_keywords' => t('Tags:'),
+						'$lbl_keywords' => L10n::t('Tags:'),
 						'$gender' => $it['gender'],
-						'$lbl_gender' => t('Gender:'),
-						'$hidden' => ['hidden', t('Hide this contact from others'), ($it['hidden'] == 1), ''],
-						'$activity' => ['activity', t('Post a new friend activity'), $it['post_newfriend'], t('if applicable')],
+						'$lbl_gender' => L10n::t('Gender:'),
+						'$hidden' => ['hidden', L10n::t('Hide this contact from others'), ($it['hidden'] == 1), ''],
+						'$activity' => ['activity', L10n::t('Post a new friend activity'), $it['post_newfriend'], L10n::t('if applicable')],
 						'$url' => $it['url'],
 						'$zrl' => $it['zrl'],
-						'$lbl_url' => t('Profile URL'),
+						'$lbl_url' => L10n::t('Profile URL'),
 						'$addr' => $it['addr'],
 						'$lbl_knowyou' => $lbl_knowyou,
-						'$lbl_network' => t('Network:'),
+						'$lbl_network' => L10n::t('Network:'),
 						'$network' => ContactSelector::networkToName($it['network'], $it['url']),
 						'$knowyou' => $knowyou,
-						'$approve' => t('Approve'),
+						'$approve' => L10n::t('Approve'),
 						'$note' => $it['note'],
-						'$ignore' => t('Ignore'),
+						'$ignore' => L10n::t('Ignore'),
 						'$discard' => $discard,
 
 					]);
@@ -272,7 +272,7 @@ function notifications_content(App $a) {
 		}
 
 		if($notifs['total'] == 0)
-			info( t('No introductions.') . EOL);
+			info(L10n::t('No introductions.') . EOL);
 
 	// Normal notifications (no introductions)
 	} else {
@@ -310,16 +310,17 @@ function notifications_content(App $a) {
 
 		// It doesn't make sense to show the Show unread / Show all link visible if the user is on the
 		// "Show all" page and there are no notifications. So we will hide it.
-		if($show == 0 || intval($show) && $notifs['total'] > 0) {
+		if ($show == 0 || intval($show) && $notifs['total'] > 0) {
 			$notif_show_lnk = [
 				'href' => ($show ? 'notifications/'.$notifs['ident'] : 'notifications/'.$notifs['ident'].'?show=all' ),
-				'text' => ($show ? t('Show unread') : t('Show all')),
+				'text' => ($show ? L10n::t('Show unread') : L10n::t('Show all')),
 			];
 		}
 
 		// Output if there aren't any notifications available
-		if($notifs['total'] == 0)
-			$notif_nocontent = sprintf( t('No more %s notifications.'), $notifs['ident']);
+		if ($notifs['total'] == 0) {
+			$notif_nocontent = L10n::t('No more %s notifications.', $notifs['ident']);
+		}
 	}
 
 	$o .= replace_macros($notif_tpl, [

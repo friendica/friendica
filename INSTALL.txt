@@ -37,9 +37,11 @@ local .htaccess file
 		- PHP *command line* access with register_argc_argv set to true in the
 php.ini file [or see 'poormancron' in section 8]
 
-		- curl, gd (with at least jpeg support), mysql, mbstring, xml and openssl extensions
+		- curl, gd (with at least jpeg support), mysql, mbstring, xml, zip and openssl extensions
 
 		- some form of email server or email gateway such that PHP mail() works
+
+		- The POSIX module of PHP needs to be activated (e.g. RHEL, CentOS have disabled it)
 
 	- Mysql 5.5.3+ or an equivalant alternative for MySQL (MariaDB, Percona Server etc.)
 
@@ -66,7 +68,7 @@ OR
 
 	git clone https://github.com/friendica/friendica [web server folder]
 	cd [web server folder]
-	php util/composer.phar install
+	php bin/composer.phar install
 
 3. Create an empty database and note the access details (hostname, username,
 password, database name).
@@ -113,14 +115,14 @@ tables, so that you can start fresh.
 8. Set up a cron job or scheduled task to run the worker once every 5-10
 minutes to pick up the recent "public" postings of your friends. Example:
 
-	cd /base/directory; /path/to/php scripts/worker.php
+	cd /base/directory; /path/to/php bin/worker.php
 
 Change "/base/directory", and "/path/to/php" as appropriate for your situation.
 
 If you are using a Linux server, run "crontab -e" and add a line like the
 one shown, substituting for your unique paths and settings:
 
-*/10 * * * *	cd /home/myname/mywebsite; /usr/bin/php scripts/worker.php
+*/10 * * * *	cd /home/myname/mywebsite; /usr/bin/php bin/worker.php
 
 You can generally find the location of PHP by executing "which php". If you
 have troubles with this section please contact your hosting provider for
@@ -129,24 +131,16 @@ assistance. Friendica will not work correctly if you cannot perform this step.
 You should also be sure that $a->config['php_path'] is set correctly, it should
 look like (changing it to the correct PHP location)
 
-$a->config['php_path'] = '/usr/local/php53/bin/php'
-  
-Alternative: You may be able to use the 'poormancron' addon to perform this
-step if you are using a recent Friendica release. 'poormancron' may result in
-perfomance and memory issues and is only suitable for small sites with one or
-two users and a handful of contacts. To do this, edit the file 
-".htconfig.php" and look for a line describing your addons. On a fresh 
-installation, it will look like
+$a->config['php_path'] = '/usr/local/php56/bin/php'
 
-$a->config['system']['addon'] = 'js_upload';
+Alternative: If you cannot use a cron job as described above, you can use
+the frontend worker and an external cron service to trigger the execution
+of the worker script. You can enable the frontend worker after the installation
+from the admin panel of your node and call
 
-This indicates the "js_upload" addon module is enabled. You may add additional 
-addons using this same line in the configuration file. Change it to 
-read
+		 https://example.com/worker
 
-$a->config['system']['addon'] = 'js_upload,poormancron';
-
-and save your changes.
+with the service of your choice.
 
 9. (Recommended) Set up a backup plan
 
@@ -293,14 +287,14 @@ cron by using something like
 
  */10 * * * * cd /var/www/friendica/friendica/ && sudo -u www-data /usr/bin/php
 -d suhosin.executor.func.blacklist=none -d suhosin.executor.eval.blacklist=none
--f scripts/worker.php
+-f bin/worker.php
 
 This worked well for simple test cases, but the friendica-cron still failed with
 a fatal error:
 suhosin[22962]: ALERT - function within blacklist called: proc_open() (attacker
 'REMOTE_ADDR not set', file '/var/www/friendica/friendica/boot.php', line 1341)
 
-After a while I noticed, that scripts/worker.php calls further php script via
+After a while I noticed, that bin/worker.php calls further php script via
 proc_open. These scripts themselves also use proc_open and fail, because they
 are NOT called with -d suhosin.executor.func.blacklist=none.
 

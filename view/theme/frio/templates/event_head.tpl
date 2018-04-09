@@ -1,9 +1,9 @@
 
-<link rel='stylesheet' type='text/css' href='{{$baseurl}}/library/fullcalendar/fullcalendar.css' />
-<link rel='stylesheet' type='text/css' href='view/theme/frio/css/mod_events.css' />
-<script type="text/javascript" src="{{$baseurl}}/library/moment/moment.min.js"></script>
-<script type="text/javascript" src="{{$baseurl}}/library/moment/locales.min.js"></script>
-<script type="text/javascript" src="{{$baseurl}}/library/fullcalendar/fullcalendar.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.print.min.css" media="print" />
+<link rel="stylesheet" type="text/css" href="view/theme/frio/css/mod_events.css" />
+<script type="text/javascript" src="{{$baseurl}}/view/asset/moment/min/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.min.js"></script>
 <script type="text/javascript" src="view/theme/frio/js/mod_events.js"></script>
 
 <script type="text/javascript">

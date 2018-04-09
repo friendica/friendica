@@ -1,9 +1,10 @@
 <?php
+
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
-
-require_once('include/datetime.php');
+use Friendica\Util\DateTimeFormat;
 
 /**
  * @class MySQL database class
@@ -12,7 +13,7 @@ require_once('include/datetime.php');
  */
 
 class dba {
-	public static $connected = true;
+	public static $connected = false;
 
 	private static $_server_info = '';
 	private static $db;
@@ -47,17 +48,13 @@ class dba {
 		$db = trim($db);
 
 		if (!(strlen($server) && strlen($user))) {
-			self::$connected = false;
-			self::$db = null;
 			return false;
 		}
 
 		if ($install) {
 			if (strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
 				if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
-					self::$error = sprintf(t('Cannot locate DNS info for database server \'%s\''), $server);
-					self::$connected = false;
-					self::$db = null;
+					self::$error = L10n::t('Cannot locate DNS info for database server \'%s\'', $server);
 					return false;
 				}
 			}
@@ -78,7 +75,6 @@ class dba {
 				self::$db = @new PDO($connect, $user, $pass);
 				self::$connected = true;
 			} catch (PDOException $e) {
-				self::$connected = false;
 			}
 		}
 
@@ -97,13 +93,10 @@ class dba {
 		// No suitable SQL driver was found.
 		if (!self::$connected) {
 			self::$db = null;
-			if (!$install) {
-				System::unavailable();
-			}
 		}
 		$a->save_timestamp($stamp1, "network");
 
-		return true;
+		return self::$connected;
 	}
 
 	/**
@@ -144,7 +137,7 @@ class dba {
 	 *
 	 * @param string $query The database query that will be analyzed
 	 */
-	private static function log_index($query) {
+	private static function logIndex($query) {
 		$a = get_app();
 
 		if (empty($a->config["system"]["db_log_index"])) {
@@ -187,7 +180,7 @@ class dba {
 
 			if ($log) {
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-				@file_put_contents($a->config["system"]["db_log_index"], datetime_convert()."\t".
+				@file_put_contents($a->config["system"]["db_log_index"], DateTimeFormat::utcNow()."\t".
 						$row['key']."\t".$row['rows']."\t".$row['Extra']."\t".
 						basename($backtrace[1]["file"])."\t".
 						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
@@ -271,7 +264,7 @@ class dba {
 	 * @param array $args The parameters that are to replace the ? placeholders
 	 * @return string The replaced SQL query
 	 */
-	private static function replace_parameters($sql, $args) {
+	private static function replaceParameters($sql, $args) {
 		$offset = 0;
 		foreach ($args AS $param => $value) {
 			if (is_int($args[$param]) || is_float($args[$param])) {
@@ -412,7 +405,7 @@ class dba {
 
 				// The fallback routine is called as well when there are no arguments
 				if (!$can_be_prepared || (count($args) == 0)) {
-					$retval = self::$db->query(self::replace_parameters($sql, $args));
+					$retval = self::$db->query(self::replaceParameters($sql, $args));
 					if (self::$db->errno) {
 						self::$error = self::$db->error;
 						self::$errorno = self::$db->errno;
@@ -475,7 +468,7 @@ class dba {
 			$errorno = self::$errorno;
 
 			logger('DB Error '.self::$errorno.': '.self::$error."\n".
-				System::callstack(8)."\n".self::replace_parameters($sql, $params));
+				System::callstack(8)."\n".self::replaceParameters($sql, $params));
 
 			self::$error = $error;
 			self::$errorno = $errorno;
@@ -492,10 +485,10 @@ class dba {
 				$duration = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-				@file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
+				@file_put_contents($a->config["system"]["db_log"], DateTimeFormat::utcNow()."\t".$duration."\t".
 						basename($backtrace[1]["file"])."\t".
 						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
-						substr(self::replace_parameters($sql, $args), 0, 2000)."\n", FILE_APPEND);
+						substr(self::replaceParameters($sql, $args), 0, 2000)."\n", FILE_APPEND);
 			}
 		}
 		return $retval;
@@ -540,7 +533,7 @@ class dba {
 			$errorno = self::$errorno;
 
 			logger('DB Error '.self::$errorno.': '.self::$error."\n".
-				System::callstack(8)."\n".self::replace_parameters($sql, $params));
+				System::callstack(8)."\n".self::replaceParameters($sql, $params));
 
 			self::$error = $error;
 			self::$errorno = $errorno;
@@ -566,10 +559,10 @@ class dba {
 
 		$fields = [];
 
-		$array_element = each($condition);
-		$array_key = $array_element['key'];
-		if (!is_int($array_key)) {
-			$fields = [$array_key];
+		reset($condition);
+		$first_key = key($condition);
+		if (!is_int($first_key)) {
+			$fields = [$first_key];
 		}
 
 		$stmt = self::select($table, $fields, $condition, ['limit' => 1]);
@@ -663,16 +656,24 @@ class dba {
 	 * @return array current row
 	 */
 	public static function fetch($stmt) {
+		$a = get_app();
+
+		$stamp1 = microtime(true);
+
+		$columns = [];
+
 		if (!is_object($stmt)) {
 			return false;
 		}
 
 		switch (self::$driver) {
 			case 'pdo':
-				return $stmt->fetch(PDO::FETCH_ASSOC);
+				$columns = $stmt->fetch(PDO::FETCH_ASSOC);
+				break;
 			case 'mysqli':
 				if (get_class($stmt) == 'mysqli_result') {
-					return $stmt->fetch_assoc();
+					$columns = $stmt->fetch_assoc();
+					break;
 				}
 
 				// This code works, but is slow
@@ -697,12 +698,14 @@ class dba {
 				$result = $stmt->result_metadata();
 				$fields = $result->fetch_fields();
 
-				$columns = [];
 				foreach ($cols_num AS $param => $col) {
 					$columns[$fields[$param]->name] = $col;
 				}
-				return $columns;
 		}
+
+		$a->save_timestamp($stamp1, 'database');
+
+		return $columns;
 	}
 
 	/**
@@ -835,7 +838,7 @@ class dba {
 	 *
 	 * This process must only be started once, since the value is cached.
 	 */
-	private static function build_relation_data() {
+	private static function buildRelationData() {
 		$definition = DBStructure::definition();
 
 		foreach ($definition AS $table => $structure) {
@@ -884,7 +887,7 @@ class dba {
 
 		// To speed up the whole process we cache the table relations
 		if (count(self::$relation) == 0) {
-			self::build_relation_data();
+			self::buildRelationData();
 		}
 
 		// Is there a relation entry for the table?
@@ -939,17 +942,14 @@ class dba {
 
 			foreach ($commands AS $command) {
 				$conditions = $command['conditions'];
-				$array_element = each($conditions);
-				$array_key = $array_element['key'];
-				if (is_int($array_key)) {
-					$condition_string = " WHERE " . array_shift($conditions);
-				} else {
-					$condition_string = " WHERE `" . implode("` = ? AND `", array_keys($conditions)) . "` = ?";
-				}
+				reset($conditions);
+				$first_key = key($conditions);
 
-				if ((count($command['conditions']) > 1) || is_int($array_key)) {
+				$condition_string = self::buildCondition($conditions);
+
+				if ((count($command['conditions']) > 1) || is_int($first_key)) {
 					$sql = "DELETE FROM `" . $command['table'] . "`" . $condition_string;
-					logger(self::replace_parameters($sql, $conditions), LOGGER_DATA);
+					logger(self::replaceParameters($sql, $conditions), LOGGER_DATA);
 
 					if (!self::e($sql, $conditions)) {
 						if ($do_transaction) {
@@ -979,7 +979,7 @@ class dba {
 						$sql = "DELETE FROM `" . $table . "` WHERE `" . $field . "` IN (" .
 							substr(str_repeat("?, ", count($field_values)), 0, -2) . ");";
 
-						logger(self::replace_parameters($sql, $field_values), LOGGER_DATA);
+						logger(self::replaceParameters($sql, $field_values), LOGGER_DATA);
 
 						if (!self::e($sql, $field_values)) {
 							if ($do_transaction) {
@@ -1036,13 +1036,7 @@ class dba {
 
 		$table = self::escape($table);
 
-		$array_element = each($condition);
-		$array_key = $array_element['key'];
-		if (is_int($array_key)) {
-			$condition_string = " WHERE ".array_shift($condition);
-		} else {
-			$condition_string = " WHERE `".implode("` = ? AND `", array_keys($condition))."` = ?";
-		}
+		$condition_string = self::buildCondition($condition);
 
 		if (is_bool($old_fields)) {
 			$do_insert = $old_fields;
@@ -1137,6 +1131,8 @@ class dba {
 			return false;
 		}
 
+		$table = self::escape($table);
+
 		if (count($fields) > 0) {
 			$select_fields = "`" . implode("`, `", array_values($fields)) . "`";
 		} else {
@@ -1228,12 +1224,28 @@ class dba {
 	{
 		$condition_string = '';
 		if (count($condition) > 0) {
-			$array_element = each($condition);
-			$array_key = $array_element['key'];
-			if (is_int($array_key)) {
+			reset($condition);
+			$first_key = key($condition);
+			if (is_int($first_key)) {
 				$condition_string = " WHERE ".array_shift($condition);
 			} else {
-				$condition_string = " WHERE `".implode("` = ? AND `", array_keys($condition))."` = ?";
+				$new_values = [];
+				$condition_string = "";
+				foreach ($condition as $field => $value) {
+					if ($condition_string != "") {
+						$condition_string .= " AND ";
+					}
+					if (is_array($value)) {
+						$new_values = array_merge($new_values, array_values($value));
+						$placeholders = substr(str_repeat("?, ", count($value)), 0, -2);
+						$condition_string .= "`" . $field . "` IN (" . $placeholders . ")";
+					} else {
+						$new_values[$field] = $value;
+						$condition_string .= "`" . $field . "` = ?";
+					}
+				}
+				$condition_string = " WHERE " . $condition_string;
+				$condition = $new_values;
 			}
 		}
 
@@ -1286,17 +1298,27 @@ class dba {
 	 * @return boolean was the close successful?
 	 */
 	public static function close($stmt) {
+		$a = get_app();
+
+		$stamp1 = microtime(true);
+
 		if (!is_object($stmt)) {
 			return false;
 		}
 
 		switch (self::$driver) {
 			case 'pdo':
-				return $stmt->closeCursor();
+				$ret = $stmt->closeCursor();
+				break;
 			case 'mysqli':
 				$stmt->free_result();
-				return $stmt->close();
+				$ret = $stmt->close();
+				break;
 		}
+
+		$a->save_timestamp($stamp1, 'database');
+
+		return $ret;
 	}
 }
 

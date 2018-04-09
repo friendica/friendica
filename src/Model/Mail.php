@@ -1,17 +1,19 @@
 <?php
+
 /**
  * @file src/Model/Mail.php
  */
 namespace Friendica\Model;
 
-use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Network\Probe;
+use Friendica\Util\DateTimeFormat;
 use dba;
 
 require_once 'include/dba.php';
-require_once 'include/datetime.php';
 
 /**
  * Class to handle private messages
@@ -35,7 +37,7 @@ class Mail
 		}
 
 		if (!strlen($subject)) {
-			$subject = t('[no subject]');
+			$subject = L10n::t('[no subject]');
 		}
 
 		$me = dba::selectFirst('contact', [], ['uid' => local_user(), 'self' => true]);
@@ -65,6 +67,7 @@ class Mail
 			}
 		}
 
+		$convuri = '';
 		if (!$convid) {
 			// create a new conversation
 			$recip_host = substr($contact['url'], strpos($contact['url'], '://') + 3);
@@ -79,7 +82,7 @@ class Mail
 			$handles = $recip_handle . ';' . $sender_handle;
 
 			$fields = ['uid' => local_user(), 'guid' => $conv_guid, 'creator' => $sender_handle,
-				'created' => datetime_convert(), 'updated' => datetime_convert(),
+				'created' => DateTimeFormat::utcNow(), 'updated' => DateTimeFormat::utcNow(),
 				'subject' => $subject, 'recips' => $handles];
 			if (dba::insert('conv', $fields)) {
 				$convid = dba::lastInsertId();
@@ -113,7 +116,7 @@ class Mail
 				'replied' => 0,
 				'uri' => $uri,
 				'parent-uri' => $replyto,
-				'created' => datetime_convert()
+				'created' => DateTimeFormat::utcNow()
 			]
 		);
 
@@ -168,7 +171,7 @@ class Mail
 		}
 
 		if (!strlen($subject)) {
-			$subject = t('[no subject]');
+			$subject = L10n::t('[no subject]');
 		}
 
 		$guid = get_guid(32);
@@ -193,12 +196,12 @@ class Mail
 
 		$convid = null;
 		$fields = ['uid' => $recipient['uid'], 'guid' => $conv_guid, 'creator' => $sender_handle,
-			'created' => datetime_convert(), 'updated' => datetime_convert(),
+			'created' => DateTimeFormat::utcNow(), 'updated' => DateTimeFormat::utcNow(),
 			'subject' => $subject, 'recips' => $handles];
 		if (dba::insert('conv', $fields)) {
 			$convid = dba::lastInsertId();
 		}
-		
+
 		if (!$convid) {
 			logger('send message: conversation not found.');
 			return -4;
@@ -221,7 +224,7 @@ class Mail
 				'replied' => 0,
 				'uri' => $uri,
 				'parent-uri' => $replyto,
-				'created' => datetime_convert(),
+				'created' => DateTimeFormat::utcNow(),
 				'unknown' => 1
 			]
 		);

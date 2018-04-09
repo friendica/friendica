@@ -2,6 +2,11 @@
 
 // If automatic system installation fails:
 
+
+die('The configuration you did manually contains some mistakes. Please have a look at your .htconfig.php file.');
+// If you are doing the configuration manually, please remove the line above
+
+
 // Copy or rename this file to .htconfig.php
 
 // Why .htconfig.php? Because it contains sensitive information which could

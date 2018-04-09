@@ -4,22 +4,20 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\App;
-use Friendica\Core\System;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\Queue;
 use Friendica\Model\User;
-use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\DFRN;
+use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
 use dba;
 
-require_once 'include/html2plain.php';
-require_once 'include/datetime.php';
 require_once 'include/items.php';
-require_once 'include/bbcode.php';
 
 /// @todo This is some ugly code that needs to be split into several methods
 
@@ -34,10 +32,11 @@ class Delivery {
 		$relocate = false;
 		$top_level = false;
 		$recipients = [];
-		$url_recipients = [];
 		$followup = false;
 
 		$normal_mode = true;
+
+		$item = null;
 
 		$recipients[] = $contact_id;
 
@@ -132,7 +131,8 @@ class Delivery {
 			return;
 		}
 
-		$walltowall = (($top_level && ($owner['id'] != $items[0]['contact-id'])) ? true : false);
+		// We don't treat Forum posts as "wall-to-wall" to be able to post them via Diaspora
+		$walltowall = $top_level && ($owner['id'] != $items[0]['contact-id']) & ($owner['account-type'] != ACCOUNT_TYPE_COMMUNITY);
 
 		$public_message = true;
 
@@ -181,16 +181,14 @@ class Delivery {
 
 		}
 
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `blocked` = 0 AND `pending` = 0",
-			intval($contact_id)
+		// We don't deliver our items to blocked or pending contacts, and not to ourselves either
+		$contact = dba::selectFirst('contact', [],
+			['id' => $contact_id, 'blocked' => false, 'pending' => false, 'self' => false]
 		);
-
-		if (DBM::is_result($r)) {
-			$contact = $r[0];
-		}
-		if ($contact['self']) {
+		if (!DBM::is_result($contact)) {
 			return;
 		}
+
 		$deliver_status = 0;
 
 		// Transmit via Diaspora if not possible via Friendica
@@ -206,7 +204,7 @@ class Delivery {
 				logger('notifier: '.$target_item["guid"].' dfrndelivery: '.$contact['name']);
 
 				if ($mail) {
-					$item['body'] = fix_private_photos($item['body'],$owner['uid'],null,$message[0]['contact-id']);
+					$item['body'] = Item::fixPrivatePhotos($item['body'], $owner['uid'], null, $item['contact-id']);
 					$atom = DFRN::mail($item, $owner);
 				} elseif ($fsuggest) {
 					$atom = DFRN::fsuggest($item, $owner);
@@ -237,13 +235,14 @@ class Delivery {
 							return;
 						}
 
-						$item_contact = get_item_contact($item,$icontacts);
+						$item_contact = self::getItemContact($item,$icontacts);
 						if (!$item_contact) {
 							return;
 						}
 
 						if ($normal_mode) {
-							if ($item_id == $item['id'] || $item['id'] == $item['parent']) {
+							// Only add the parent when we don't delete other items.
+							if ($item_id == $item['id'] || (($item['id'] == $item['parent']) && ($cmd != 'drop'))) {
 								$item["entry:comment-allow"] = true;
 								$item["entry:cid"] = (($top_level) ? $contact['id'] : 0);
 								$msgitems[] = $item;
@@ -298,7 +297,7 @@ class Delivery {
 						}
 
 						$ssl_policy = Config::get('system','ssl_policy');
-						fix_contact_ssl_policy($x[0],$ssl_policy);
+						$x[0] = Contact::updateSslPolicy($x[0], $ssl_policy);
 
 						// If we are setup as a soapbox we aren't accepting top level posts from this person
 
@@ -314,20 +313,22 @@ class Delivery {
 				if (!Queue::wasDelayed($contact['id'])) {
 					$deliver_status = DFRN::deliver($owner, $contact, $atom);
 				} else {
-					$deliver_status = (-1);
+					$deliver_status = -1;
 				}
 
 				logger('notifier: dfrn_delivery to '.$contact["url"].' with guid '.$target_item["guid"].' returns '.$deliver_status);
 
 				if ($deliver_status < 0) {
 					logger('notifier: delivery failed: queuing message');
-					Queue::add($contact['id'], NETWORK_DFRN, $atom);
+					Queue::add($contact['id'], NETWORK_DFRN, $atom, false, $target_item['guid']);
+				}
 
-					// The message could not be delivered. We mark the contact as "dead"
-					Contact::markForArchival($contact);
-				} else {
+				if (($deliver_status >= 200) && ($deliver_status <= 299)) {
 					// We successfully delivered a message, the contact is alive
 					Contact::unmarkForArchival($contact);
+				} else {
+					// The message could not be delivered. We mark the contact as "dead"
+					Contact::markForArchival($contact);
 				}
 
 				break;
@@ -388,7 +389,7 @@ class Delivery {
 						$reply_to = $r1[0]['reply_to'];
 					}
 
-					$subject  = (($it['title']) ? Email::encodeHeader($it['title'],'UTF-8') : t("\x28no subject\x29")) ;
+					$subject  = (($it['title']) ? Email::encodeHeader($it['title'],'UTF-8') : L10n::t("\x28no subject\x29")) ;
 
 					// only expose our real email address to true friends
 
@@ -400,7 +401,7 @@ class Delivery {
 							$headers  = 'From: '.Email::encodeHeader($local_user[0]['username'],'UTF-8').' <'.$local_user[0]['email'].'>'."\n";
 						}
 					} else {
-						$headers  = 'From: '. Email::encodeHeader($local_user[0]['username'],'UTF-8') .' <'. t('noreply') .'@'.$a->get_hostname() .'>'. "\n";
+						$headers  = 'From: '. Email::encodeHeader($local_user[0]['username'],'UTF-8') .' <'. L10n::t('noreply') .'@'.$a->get_hostname() .'>'. "\n";
 					}
 
 					//if ($reply_to)
@@ -503,5 +504,18 @@ class Delivery {
 		}
 
 		return;
+	}
+
+	private static function getItemContact($item, $contacts)
+	{
+		if (!count($contacts) || !is_array($item)) {
+			return false;
+		}
+		foreach ($contacts as $contact) {
+			if ($contact['id'] == $item['contact-id']) {
+				return $contact;
+			}
+		}
+		return false;
 	}
 }

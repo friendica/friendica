@@ -2,20 +2,23 @@
 /**
  * @file mod/videos.php
  */
+
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
+use Friendica\Model\Item;
 use Friendica\Model\Profile;
+use Friendica\Model\Term;
 use Friendica\Protocol\DFRN;
+use Friendica\Util\DateTimeFormat;
 
 require_once 'include/items.php';
-require_once 'include/acl_selectors.php';
-require_once 'include/bbcode.php';
 require_once 'include/security.php';
 
 function videos_init(App $a) {
@@ -71,7 +74,7 @@ function videos_init(App $a) {
 
 			if($albums_visible) {
 				$o .= '<div id="sidebar-photos-albums" class="widget">';
-				$o .= '<h3>' . '<a href="' . System::baseUrl() . '/photos/' . $a->data['user']['nickname'] . '">' . t('Photo Albums') . '</a></h3>';
+				$o .= '<h3>' . '<a href="' . System::baseUrl() . '/photos/' . $a->data['user']['nickname'] . '">' . L10n::t('Photo Albums') . '</a></h3>';
 
 				$o .= '<ul>';
 				foreach($albums as $album) {
@@ -79,14 +82,14 @@ function videos_init(App $a) {
 					// don't show contact photos. We once translated this name, but then you could still access it under
 					// a different language setting. Now we store the name in English and check in English (and translated for legacy albums).
 
-					if((! strlen($album['album'])) || ($album['album'] === 'Contact Photos') || ($album['album'] === t('Contact Photos')))
+					if((! strlen($album['album'])) || ($album['album'] === 'Contact Photos') || ($album['album'] === L10n::t('Contact Photos')))
 						continue;
 					$o .= '<li>' . '<a href="photos/' . $a->argv[1] . '/album/' . bin2hex($album['album']) . '" >' . $album['album'] . '</a></li>';
 				}
 				$o .= '</ul>';
 			}
 			if(local_user() && $a->data['user']['uid'] == local_user()) {
-				$o .= '<div id="photo-albums-upload-link"><a href="' . System::baseUrl() . '/photos/' . $a->data['user']['nickname'] . '/upload" >' .t('Upload New Photos') . '</a></div>';
+				$o .= '<div id="photo-albums-upload-link"><a href="' . System::baseUrl() . '/photos/' . $a->data['user']['nickname'] . '/upload" >' .L10n::t('Upload New Photos') . '</a></div>';
 			}
 
 			$o .= '</div>';
@@ -133,15 +136,15 @@ function videos_post(App $a) {
 			$drop_url = $a->query_string;
 			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
 				'$method' => 'post',
-				'$message' => t('Do you really want to delete this video?'),
+				'$message' => L10n::t('Do you really want to delete this video?'),
 				'$extra_inputs' => [
 					['name'=>'id', 'value'=> $_POST['id']],
 					['name'=>'delete', 'value'=>'x']
 				],
-				'$confirm' => t('Delete Video'),
+				'$confirm' => L10n::t('Delete Video'),
 				'$confirm_url' => $drop_url,
 				'$confirm_name' => 'confirm', // Needed so that confirmation will bring us back into this if statement
-				'$cancel' => t('Cancel'),
+				'$cancel' => L10n::t('Cancel'),
 
 			]);
 			$a->error = 1; // Set $a->error so the other module functions don't execute
@@ -160,27 +163,13 @@ function videos_post(App $a) {
 				intval(local_user()),
 				dbesc($video_id)
 			);
-			$i = q("SELECT * FROM `item` WHERE `attach` like '%%attach/%s%%' AND `uid` = %d LIMIT 1",
+			$i = q("SELECT `id` FROM `item` WHERE `attach` like '%%attach/%s%%' AND `uid` = %d LIMIT 1",
 				dbesc($video_id),
 				intval(local_user())
 			);
-			//echo "<pre>"; var_dump($i); killme();
+
 			if (DBM::is_result($i)) {
-				q("UPDATE `item` SET `deleted` = 1, `edited` = '%s', `changed` = '%s' WHERE `parent-uri` = '%s' AND `uid` = %d",
-					dbesc(datetime_convert()),
-					dbesc(datetime_convert()),
-					dbesc($i[0]['uri']),
-					intval(local_user())
-				);
-				create_tags_from_itemuri($i[0]['uri'], local_user());
-				delete_thread_uri($i[0]['uri'], local_user());
-
-				$url = System::baseUrl();
-				$drop_id = intval($i[0]['id']);
-
-				if ($i[0]['visible']) {
-					Worker::add(PRIORITY_HIGH, "Notifier", "drop", $drop_id);
-				}
+				Item::deleteById($i[0]['id']);
 			}
 		}
 
@@ -207,17 +196,15 @@ function videos_content(App $a) {
 
 
 	if((Config::get('system','block_public')) && (! local_user()) && (! remote_user())) {
-		notice( t('Public access denied.') . EOL);
+		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
 
-
-	require_once('include/bbcode.php');
 	require_once('include/security.php');
 	require_once('include/conversation.php');
 
 	if(! x($a->data,'user')) {
-		notice( t('No videos selected') . EOL );
+		notice(L10n::t('No videos selected') . EOL );
 		return;
 	}
 
@@ -319,7 +306,7 @@ function videos_content(App $a) {
 	}
 
 	if($a->data['user']['hidewall'] && (local_user() != $owner_uid) && (! $remote_contact)) {
-		notice( t('Access to this item is restricted.') . EOL);
+		notice(L10n::t('Access to this item is restricted.') . EOL);
 		return;
 	}
 
@@ -390,14 +377,14 @@ function videos_content(App $a) {
 			$videos[] = [
 				'id'       => $rr['id'],
 				'link'     => System::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/video/' . $rr['resource-id'],
-				'title'    => t('View Video'),
+				'title'    => L10n::t('View Video'),
 				'src'      => System::baseUrl() . '/attach/' . $rr['id'] . '?attachment=0',
 				'alt'      => $alt_e,
 				'mime'     => $rr['filetype'],
 				'album' => [
 					'link'  => System::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
 					'name'  => $name_e,
-					'alt'   => t('View Album'),
+					'alt'   => L10n::t('View Album'),
 				],
 
 			];
@@ -406,9 +393,9 @@ function videos_content(App $a) {
 
 	$tpl = get_markup_template('videos_recent.tpl');
 	$o .= replace_macros($tpl, [
-		'$title'      => t('Recent Videos'),
+		'$title'      => L10n::t('Recent Videos'),
 		'$can_post'   => $can_post,
-		'$upload'     => [t('Upload New Videos'), System::baseUrl().'/videos/'.$a->data['user']['nickname'].'/upload'],
+		'$upload'     => [L10n::t('Upload New Videos'), System::baseUrl().'/videos/'.$a->data['user']['nickname'].'/upload'],
 		'$videos'     => $videos,
 		'$delete_url' => (($can_post)?System::baseUrl().'/videos/'.$a->data['user']['nickname']:False)
 	]);

@@ -4,8 +4,8 @@
 <style>
 	#buglink_wrapper{display:none;} /* hide buglink. only in this page */
 </style>
-<script type="text/javascript" src="{{$baseurl}}/js/ajaxupload.js" ></script>
-<script type="text/javascript" src="{{$baseurl}}/js/filebrowser.js"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js" ></script>
+<script type="text/javascript" src="{{$baseurl}}/view/js/filebrowser.js"></script>
 <script>
 	$(function() {
 		FileBrowser.init("{{$nickname}}", "{{$type}}");
@@ -40,7 +40,7 @@
 	</div>
 
 	<div class="upload">
-		<button id="upload-{{$type}}"><img id="profile-rotator" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait|escape:'html'}}" style="display: none;" /> {{"Upload"|t}}</button>
+		<button id="upload-{{$type}}"><img id="profile-rotator" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait|escape:'html'}}" style="display: none;" /> {{$upload}}</button>
 	</div>
 </div>
 

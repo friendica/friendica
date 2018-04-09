@@ -93,9 +93,9 @@ text { font:12px Dialog; }
 <text x="149" y="2112" style="font:13px Open Sans">- create a contact for Karen in the contact table with </text>
 <text x="149" y="2135" style="font:13px Open Sans">the scraped data with blocked = 1 and pending = 1 </text>
 <text x="149" y="2158" style="font:13px Open Sans">(Karens pubkey becomes the contact site-pubkey)</text>
-<text x="149" y="2204" style="font:13px Open Sans">- fetch_url($dfrn_request . '?confirm_key=' . </text>
+<text x="149" y="2204" style="font:13px Open Sans">- Network::fetchUrl($dfrn_request . '?confirm_key=' . </text>
 <text x="149" y="2227" style="font:13px Open Sans">$confirm_key);</text>
-<text x="149" y="2273" style="font:13px Open Sans">- fetch_url(http://karenhomepage.com/dfrn_request?</text>
+<text x="149" y="2273" style="font:13px Open Sans">- Network::fetchUrl(http://karenhomepage.com/dfrn_request?</text>
 <text x="149" y="2296" style="font:13px Open Sans">confirm_key=”ABC123”)</text>
 <clipPath id="clip13"><path d="M1061,2027 L1238,2027 L1238,2069 L1061,2069 L1061,2027 Z" /></clipPath>
 <path d="M1070,2028 C1065.5820313,2028 1062,2031.5820313 1062,2036 L1062,2059 C1062,2063.4179688 1065.5820313,2067 1070,2067 L1228,2067 C1232.4179688,2067 1236,2063.4179688 1236,2059 L1236,2036 C1236,2031.5820313 1232.4179688,2028 1228,2028 Z" style="fill:rgb(127,127,127);stroke:none" clip-path="url(#clip13)" />

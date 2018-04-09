@@ -15,6 +15,7 @@
 		<h3 class="connector">{{$general_settings}}</h3>
 	</span>
 
+	{{include file="field_checkbox.tpl" field=$disable_cw}}
 	{{include file="field_checkbox.tpl" field=$no_intelligent_shortening}}
 	{{include file="field_checkbox.tpl" field=$ostatus_autofriend}}
 	{{$default_group}}
@@ -22,7 +23,7 @@
 
 	<p><a href="{{$repair_ostatus_url}}">{{$repair_ostatus_text}}</a></p>
 
-	<div class="settings-submit-wrapper" ><input type="submit" name="general-submit" class="settings-submit" value="{{$submit}}" /></div>
+	<div class="settings-submit-wrapper" ><input type="submit" id="general-submit" name="general-submit" class="settings-submit" value="{{$submit}}" /></div>
 </div>
 <div class="clear"></div>
 

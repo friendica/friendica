@@ -4,12 +4,12 @@
  */
 use Friendica\App;
 use Friendica\Content\ContactSelector;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
-use dba;
 
 require_once 'include/dba.php';
 require_once 'mod/contacts.php';
@@ -18,7 +18,7 @@ function allfriends_content(App $a)
 {
 	$o = '';
 	if (!local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -48,7 +48,7 @@ function allfriends_content(App $a)
 
 	$r = GContact::allFriends(local_user(), $cid, $a->pager['start'], $a->pager['itemspage']);
 	if (!DBM::is_result($r)) {
-		$o .= t('No friends to display.');
+		$o .= L10n::t('No friends to display.');
 		return $o;
 	}
 
@@ -70,8 +70,8 @@ function allfriends_content(App $a)
 		} else {
 			$connlnk = System::baseUrl() . '/follow/?url=' . $rr['url'];
 			$photo_menu = [
-				'profile' => [t("View Profile"), Profile::zrl($rr['url'])],
-				'follow' => [t("Connect/Follow"), $connlnk]
+				'profile' => [L10n::t("View Profile"), Profile::zrl($rr['url'])],
+				'follow' => [L10n::t("Connect/Follow"), $connlnk]
 			];
 		}
 
@@ -87,7 +87,7 @@ function allfriends_content(App $a)
 			'account_type' => Contact::getAccountType($contact_details),
 			'network'      => ContactSelector::networkToName($contact_details['network'], $contact_details['url']),
 			'photo_menu'   => $photo_menu,
-			'conntxt'      => t('Connect'),
+			'conntxt'      => L10n::t('Connect'),
 			'connlnk'      => $connlnk,
 			'id'           => ++$id,
 		];
@@ -99,7 +99,7 @@ function allfriends_content(App $a)
 	$tpl = get_markup_template('viewcontact_template.tpl');
 
 	$o .= replace_macros($tpl, [
-		//'$title' => sprintf( t('Friends of %s'), htmlentities($c[0]['name'])),
+		//'$title' => L10n::t('Friends of %s', htmlentities($c[0]['name'])),
 		'$tab_str' => $tab_str,
 		'$contacts' => $entries,
 		'$paginate' => paginate($a),

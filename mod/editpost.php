@@ -6,24 +6,23 @@ use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
-
-require_once('include/acl_selectors.php');
 
 function editpost_content(App $a) {
 
 	$o = '';
 
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
 	$post_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 
 	if (! $post_id) {
-		notice( t('Item not found') . EOL);
+		notice(L10n::t('Item not found') . EOL);
 		return;
 	}
 
@@ -33,18 +32,20 @@ function editpost_content(App $a) {
 	);
 
 	if (! DBM::is_result($itm)) {
-		notice( t('Item not found') . EOL);
+		notice(L10n::t('Item not found') . EOL);
 		return;
 	}
 
+	$geotag = '';
+
 	$o .= replace_macros(get_markup_template("section_title.tpl"),[
-		'$title' => t('Edit post')
+		'$title' => L10n::t('Edit post')
 	]);
 
 	$tpl = get_markup_template('jot-header.tpl');
 	$a->page['htmlhead'] .= replace_macros($tpl, [
 		'$baseurl' => System::baseUrl(),
-		'$ispublic' => '&nbsp;', // t('Visible to <strong>everybody</strong>'),
+		'$ispublic' => '&nbsp;', // L10n::t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
 		'$nickname' => $a->user['nickname']
 	]);
@@ -52,7 +53,7 @@ function editpost_content(App $a) {
 	$tpl = get_markup_template('jot-end.tpl');
 	$a->page['end'] .= replace_macros($tpl, [
 		'$baseurl' => System::baseUrl(),
-		'$ispublic' => '&nbsp;', // t('Visible to <strong>everybody</strong>'),
+		'$ispublic' => '&nbsp;', // L10n::t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
 		'$nickname' => $a->user['nickname']
 	]);
@@ -60,10 +61,11 @@ function editpost_content(App $a) {
 
 	$tpl = get_markup_template("jot.tpl");
 
-	if(($group) || (is_array($a->user) && ((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) || (strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid'])))))
+	if (strlen($itm['allow_cid']) || strlen($itm['allow_gid']) || strlen($itm['deny_cid']) || strlen($itm['deny_gid'])) {
 		$lockstate = 'lock';
-	else
+	} else {
 		$lockstate = 'unlock';
+	}
 
 	$jotplugins = '';
 	$jotnets = '';
@@ -90,7 +92,7 @@ function editpost_content(App $a) {
 /*	if($mail_enabled) {
        $selected = (($pubmail_enabled) ? ' checked="checked" ' : '');
 		$jotnets .= '<div class="profile-jot-net"><input type="checkbox" name="pubmail_enable"' . $selected . ' value="1" /> '
-          	. t("Post to Email") . '</div>';
+          	. L10n::t("Post to Email") . '</div>';
 	}*/
 
 
@@ -105,23 +107,23 @@ function editpost_content(App $a) {
 		'$is_edit' => true,
 		'$return_path' => $_SESSION['return_url'],
 		'$action' => 'item',
-		'$share' => t('Save'),
-		'$upload' => t('Upload photo'),
-		'$shortupload' => t('upload photo'),
-		'$attach' => t('Attach file'),
-		'$shortattach' => t('attach file'),
-		'$weblink' => t('Insert web link'),
-		'$shortweblink' => t('web link'),
-		'$video' => t('Insert video link'),
-		'$shortvideo' => t('video link'),
-		'$audio' => t('Insert audio link'),
-		'$shortaudio' => t('audio link'),
-		'$setloc' => t('Set your location'),
-		'$shortsetloc' => t('set location'),
-		'$noloc' => t('Clear browser location'),
-		'$shortnoloc' => t('clear location'),
-		'$wait' => t('Please wait'),
-		'$permset' => t('Permission settings'),
+		'$share' => L10n::t('Save'),
+		'$upload' => L10n::t('Upload photo'),
+		'$shortupload' => L10n::t('upload photo'),
+		'$attach' => L10n::t('Attach file'),
+		'$shortattach' => L10n::t('attach file'),
+		'$weblink' => L10n::t('Insert web link'),
+		'$shortweblink' => L10n::t('web link'),
+		'$video' => L10n::t('Insert video link'),
+		'$shortvideo' => L10n::t('video link'),
+		'$audio' => L10n::t('Insert audio link'),
+		'$shortaudio' => L10n::t('audio link'),
+		'$setloc' => L10n::t('Set your location'),
+		'$shortsetloc' => L10n::t('set location'),
+		'$noloc' => L10n::t('Clear browser location'),
+		'$shortnoloc' => L10n::t('clear location'),
+		'$wait' => L10n::t('Please wait'),
+		'$permset' => L10n::t('Permission settings'),
 		'$ptyp' => $itm[0]['type'],
 		'$content' => undo_post_tagging($itm[0]['body']),
 		'$post_id' => $post_id,
@@ -129,32 +131,29 @@ function editpost_content(App $a) {
 		'$defloc' => $a->user['default-location'],
 		'$visitor' => 'none',
 		'$pvisit' => 'none',
-		'$emailcc' => t('CC: email addresses'),
-		'$public' => t('Public post'),
+		'$emailcc' => L10n::t('CC: email addresses'),
+		'$public' => L10n::t('Public post'),
 		'$jotnets' => $jotnets,
 		'$title' => htmlspecialchars($itm[0]['title']),
-		'$placeholdertitle' => t('Set title'),
+		'$placeholdertitle' => L10n::t('Set title'),
 		'$category' => file_tag_file_to_list($itm[0]['file'], 'category'),
-		'$placeholdercategory' => (Feature::isEnabled(local_user(),'categories') ? t('Categories (comma-separated list)') : ''),
-		'$emtitle' => t('Example: bob@example.com, mary@example.com'),
+		'$placeholdercategory' => (Feature::isEnabled(local_user(),'categories') ? L10n::t("Categories \x28comma-separated list\x29") : ''),
+		'$emtitle' => L10n::t('Example: bob@example.com, mary@example.com'),
 		'$lockstate' => $lockstate,
 		'$acl' => '', // populate_acl((($group) ? $group_acl : $a->user)),
-		'$bang' => (($group) ? '!' : ''),
+		'$bang' => ($lockstate === 'lock' ? '!' : ''),
 		'$profile_uid' => $_SESSION['uid'],
-		'$preview' => t('Preview'),
+		'$preview' => L10n::t('Preview'),
 		'$jotplugins' => $jotplugins,
-		'$sourceapp' => t($a->sourcename),
-		'$cancel' => t('Cancel'),
+		'$sourceapp' => L10n::t($a->sourcename),
+		'$cancel' => L10n::t('Cancel'),
 		'$rand_num' => random_digits(12),
 
 		//jot nav tab (used in some themes)
-		'$message' => t('Message'),
-		'$browser' => t('Browser'),
-		'$shortpermset' => t('permissions'),
+		'$message' => L10n::t('Message'),
+		'$browser' => L10n::t('Browser'),
+		'$shortpermset' => L10n::t('permissions'),
 	]);
 
 	return $o;
-
 }
-
-

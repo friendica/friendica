@@ -5,18 +5,22 @@
  * 	This calendar is for profile visitors and contains only the events
  * 	of the profile owner
  */
+
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
+use Friendica\Content\Widget;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Event;
 use Friendica\Model\Group;
 use Friendica\Model\Profile;
 use Friendica\Protocol\DFRN;
-
-require_once 'include/event.php';
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Temporal;
 
 function cal_init(App $a)
 {
@@ -60,7 +64,7 @@ function cal_init(App $a)
 			'$pdesc' => (($profile['pdesc'] != "") ? $profile['pdesc'] : ""),
 		]);
 
-		$cal_widget = widget_events();
+		$cal_widget = Widget\CalendarExport::getHTML();
 
 		if (!x($a->page, 'aside')) {
 			$a->page['aside'] = '';
@@ -78,7 +82,7 @@ function cal_content(App $a)
 	Nav::setSelected('events');
 
 	// get the translation strings for the callendar
-	$i18n = get_event_strings();
+	$i18n = Event::getStrings();
 
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl, [
@@ -135,7 +139,7 @@ function cal_content(App $a)
 	$is_owner = local_user() == $a->profile['profile_uid'];
 
 	if ($a->profile['hidewall'] && (!$is_owner) && (!$remote_contact)) {
-		notice(t('Access to this profile has been restricted.') . EOL);
+		notice(L10n::t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
 
@@ -149,8 +153,8 @@ function cal_content(App $a)
 
 	// The view mode part is similiar to /mod/events.php
 	if ($mode == 'view') {
-		$thisyear = datetime_convert('UTC', date_default_timezone_get(), 'now', 'Y');
-		$thismonth = datetime_convert('UTC', date_default_timezone_get(), 'now', 'm');
+		$thisyear = DateTimeFormat::localNow('Y');
+		$thismonth = DateTimeFormat::localNow('m');
 		if (!$y) {
 			$y = intval($thisyear);
 		}
@@ -185,7 +189,7 @@ function cal_content(App $a)
 			$prevyear --;
 		}
 
-		$dim = get_dim($y, $m);
+		$dim = Temporal::getDaysInMonth($y, $m);
 		$start = sprintf('%d-%d-%d %d:%d:%d', $y, $m, 1, 0, 0, 0);
 		$finish = sprintf('%d-%d-%d %d:%d:%d', $y, $m, $dim, 23, 59, 59);
 
@@ -200,35 +204,35 @@ function cal_content(App $a)
 			}
 		}
 
-		$start = datetime_convert('UTC', 'UTC', $start);
-		$finish = datetime_convert('UTC', 'UTC', $finish);
+		$start = DateTimeFormat::utc($start);
+		$finish = DateTimeFormat::utc($finish);
 
-		$adjust_start = datetime_convert('UTC', date_default_timezone_get(), $start);
-		$adjust_finish = datetime_convert('UTC', date_default_timezone_get(), $finish);
+		$adjust_start = DateTimeFormat::local($start);
+		$adjust_finish = DateTimeFormat::local($finish);
 
 		// put the event parametes in an array so we can better transmit them
 		$event_params = [
-			'event_id' => (x($_GET, 'id') ? $_GET["id"] : 0),
-			'start' => $start,
-			'finish' => $finish,
-			'adjust_start' => $adjust_start,
+			'event_id'      => intval(defaults($_GET, 'id', 0)),
+			'start'         => $start,
+			'finish'        => $finish,
+			'adjust_start'  => $adjust_start,
 			'adjust_finish' => $adjust_finish,
-			'ignored' => $ignored,
+			'ignore'        => $ignored,
 		];
 
 		// get events by id or by date
-		if (x($_GET, 'id')) {
-			$r = event_by_id($owner_uid, $event_params, $sql_extra);
+		if ($event_params['event_id']) {
+			$r = Event::getListById($owner_uid, $event_params['event-id'], $sql_extra);
 		} else {
-			$r = events_by_date($owner_uid, $event_params, $sql_extra);
+			$r = Event::getListByDate($owner_uid, $event_params, $sql_extra);
 		}
 
 		$links = [];
 
 		if (DBM::is_result($r)) {
-			$r = sort_by_date($r);
+			$r = Event::sortByDate($r);
 			foreach ($r as $rr) {
-				$j = (($rr['adjust']) ? datetime_convert('UTC', date_default_timezone_get(), $rr['start'], 'j') : datetime_convert('UTC', 'UTC', $rr['start'], 'j'));
+				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (!x($links, $j)) {
 					$links[$j] = System::baseUrl() . '/' . $a->cmd . '#link-' . $j;
 				}
@@ -236,7 +240,7 @@ function cal_content(App $a)
 		}
 
 		// transform the event in a usable array
-		$events = process_events($r);
+		$events = Event::prepareListForTemplate($r);
 
 		if ($a->argv[2] === 'json') {
 			echo json_encode($events);
@@ -267,17 +271,17 @@ function cal_content(App $a)
 		$o = replace_macros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$tabs' => $tabs,
-			'$title' => t('Events'),
-			'$view' => t('View'),
-			'$previous' => [System::baseUrl() . "/events/$prevyear/$prevmonth", t('Previous'), '', ''],
-			'$next' => [System::baseUrl() . "/events/$nextyear/$nextmonth", t('Next'), '', ''],
-			'$calendar' => cal($y, $m, $links, ' eventcal'),
+			'$title' => L10n::t('Events'),
+			'$view' => L10n::t('View'),
+			'$previous' => [System::baseUrl() . "/events/$prevyear/$prevmonth", L10n::t('Previous'), '', ''],
+			'$next' => [System::baseUrl() . "/events/$nextyear/$nextmonth", L10n::t('Next'), '', ''],
+			'$calendar' => Temporal::getCalendarTable($y, $m, $links, ' eventcal'),
 			'$events' => $events,
-			"today" => t("today"),
-			"month" => t("month"),
-			"week" => t("week"),
-			"day" => t("day"),
-			"list" => t("list"),
+			"today" => L10n::t("today"),
+			"month" => L10n::t("month"),
+			"week" => L10n::t("week"),
+			"day" => L10n::t("day"),
+			"list" => L10n::t("list"),
 		]);
 
 		if (x($_GET, 'id')) {
@@ -290,25 +294,25 @@ function cal_content(App $a)
 
 	if ($mode == 'export') {
 		if (!(intval($owner_uid))) {
-			notice(t('User not found'));
+			notice(L10n::t('User not found'));
 			return;
 		}
 
 		// Test permissions
 		// Respect the export feature setting for all other /cal pages if it's not the own profile
 		if (((local_user() !== intval($owner_uid))) && !Feature::isEnabled($owner_uid, "export_calendar")) {
-			notice(t('Permission denied.') . EOL);
+			notice(L10n::t('Permission denied.') . EOL);
 			goaway('cal/' . $nick);
 		}
 
 		// Get the export data by uid
-		$evexport = event_export($owner_uid, $format);
+		$evexport = Event::exportListByUserId($owner_uid, $format);
 
 		if (!$evexport["success"]) {
 			if ($evexport["content"]) {
-				notice(t('This calendar format is not supported'));
+				notice(L10n::t('This calendar format is not supported'));
 			} else {
-				notice(t('No exportable data found'));
+				notice(L10n::t('No exportable data found'));
 			}
 
 			// If it the own calendar return to the events page
@@ -325,7 +329,7 @@ function cal_content(App $a)
 		// If nothing went wrong we can echo the export content
 		if ($evexport["success"]) {
 			header('Content-type: text/calendar');
-			header('content-disposition: attachment; filename="' . t('calendar') . '-' . $nick . '.' . $evexport["extension"] . '"');
+			header('content-disposition: attachment; filename="' . L10n::t('calendar') . '-' . $nick . '.' . $evexport["extension"] . '"');
 			echo $evexport["content"];
 			killme();
 		}

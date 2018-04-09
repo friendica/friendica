@@ -1,14 +1,14 @@
 <?php
-
 /**
  * @file src/Model/User.php
  * @brief This file includes the User class with user related database functions
  */
-
 namespace Friendica\Model;
 
+use DivineOmega\PasswordExposed\PasswordStatus;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -18,15 +18,16 @@ use Friendica\Model\Group;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
 use Friendica\Util\Crypto;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 use dba;
 use Exception;
+use LightOpenID;
+use function password_exposed;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
 require_once 'include/enotify.php';
-require_once 'include/network.php';
-require_once 'library/openid.php';
-require_once 'include/pgettext.php';
 require_once 'include/text.php';
 /**
  * @brief This class handles User related functions
@@ -95,56 +96,36 @@ class User
 
 
 	/**
+	 * Authenticate a user with a clear text password
+	 *
 	 * @brief Authenticate a user with a clear text password
-	 *
-	 * User info can be any of the following:
-	 * - User DB object
-	 * - User Id
-	 * - User email or username or nickname
-	 * - User array with at least the uid and the hashed password
-	 *
 	 * @param mixed $user_info
 	 * @param string $password
-	 * @return boolean
+	 * @return int|boolean
+	 * @deprecated since version 3.6
+	 * @see User::getIdFromPasswordAuthentication()
 	 */
 	public static function authenticate($user_info, $password)
 	{
-		if (is_object($user_info)) {
-			$user = (array) $user_info;
-		} elseif (is_int($user_info)) {
-			$user = dba::selectFirst('user', ['uid', 'password', 'legacy_password'],
-				[
-					'uid' => $user_info,
-					'blocked' => 0,
-					'account_expired' => 0,
-					'account_removed' => 0,
-					'verified' => 1
-				]
-			);
-		} elseif (is_string($user_info)) {
-			$user = dba::fetch_first('SELECT `uid`, `password`, `legacy_password`
-				FROM `user`
-				WHERE (`email` = ? OR `username` = ? OR `nickname` = ?)
-				AND `blocked` = 0
-				AND `account_expired` = 0
-				AND `account_removed` = 0
-				AND `verified` = 1
-				LIMIT 1',
-				$user_info,
-				$user_info,
-				$user_info
-			);
-		} else {
-			$user = $user_info;
+		try {
+			return self::getIdFromPasswordAuthentication($user_info, $password);
+		} catch (Exception $ex) {
+			return false;
 		}
+	}
 
-		if (!DBM::is_result($user)
-			|| !isset($user['uid'])
-			|| !isset($user['password'])
-			|| !isset($user['legacy_password'])
-		) {
-			throw new Exception('Not enough information to authenticate');
-		}
+	/**
+	 * Returns the user id associated with a successful password authentication
+	 *
+	 * @brief Authenticate a user with a clear text password
+	 * @param mixed $user_info
+	 * @param string $password
+	 * @return int User Id if authentication is successful
+	 * @throws Exception
+	 */
+	public static function getIdFromPasswordAuthentication($user_info, $password)
+	{
+		$user = self::getAuthenticationInfo($user_info);
 
 		if ($user['legacy_password']) {
 			if (password_verify(self::hashPasswordLegacy($password), $user['password'])) {
@@ -160,7 +141,71 @@ class User
 			return $user['uid'];
 		}
 
-		return false;
+		throw new Exception(L10n::t('Login failed'));
+	}
+
+	/**
+	 * Returns authentication info from various parameters types
+	 *
+	 * User info can be any of the following:
+	 * - User DB object
+	 * - User Id
+	 * - User email or username or nickname
+	 * - User array with at least the uid and the hashed password
+	 *
+	 * @param mixed $user_info
+	 * @return array
+	 * @throws Exception
+	 */
+	private static function getAuthenticationInfo($user_info)
+	{
+		$user = null;
+
+		if (is_object($user_info) || is_array($user_info)) {
+			if (is_object($user_info)) {
+				$user = (array) $user_info;
+			} else {
+				$user = $user_info;
+			}
+
+			if (!isset($user['uid'])
+				|| !isset($user['password'])
+				|| !isset($user['legacy_password'])
+			) {
+				throw new Exception(L10n::t('Not enough information to authenticate'));
+			}
+		} elseif (is_int($user_info) || is_string($user_info)) {
+			if (is_int($user_info)) {
+				$user = dba::selectFirst('user', ['uid', 'password', 'legacy_password'],
+					[
+						'uid' => $user_info,
+						'blocked' => 0,
+						'account_expired' => 0,
+						'account_removed' => 0,
+						'verified' => 1
+					]
+				);
+			} else {
+				$user = dba::fetch_first('SELECT `uid`, `password`, `legacy_password`
+					FROM `user`
+					WHERE (`email` = ? OR `username` = ? OR `nickname` = ?)
+					AND `blocked` = 0
+					AND `account_expired` = 0
+					AND `account_removed` = 0
+					AND `verified` = 1
+					LIMIT 1',
+					$user_info,
+					$user_info,
+					$user_info
+				);
+			}
+
+			if (!DBM::is_result($user)) {
+				throw new Exception(L10n::t('User not found'));
+			}
+		}
+
+		return $user;
 	}
 
 	/**
@@ -171,6 +216,17 @@ class User
 	public static function generateNewPassword()
 	{
 		return autoname(6) . mt_rand(100, 9999);
+	}
+
+	/**
+	 * Checks if the provided plaintext password has been exposed or not
+	 *
+	 * @param string $password
+	 * @return bool
+	 */
+	public static function isPasswordExposed($password)
+	{
+		return password_exposed($password) === PasswordStatus::EXPOSED;
 	}
 
 	/**
@@ -266,30 +322,30 @@ class User
 		$netpublish = strlen(Config::get('system', 'directory')) ? $publish : 0;
 
 		if ($password1 != $confirm) {
-			throw new Exception(t('Passwords do not match. Password unchanged.'));
+			throw new Exception(L10n::t('Passwords do not match. Password unchanged.'));
 		} elseif ($password1 != '') {
 			$password = $password1;
 		}
 
 		if ($using_invites) {
 			if (!$invite_id) {
-				throw new Exception(t('An invitation is required.'));
+				throw new Exception(L10n::t('An invitation is required.'));
 			}
 
 			if (!dba::exists('register', ['hash' => $invite_id])) {
-				throw new Exception(t('Invitation could not be verified.'));
+				throw new Exception(L10n::t('Invitation could not be verified.'));
 			}
 		}
 
 		if (!x($username) || !x($email) || !x($nickname)) {
 			if ($openid_url) {
-				if (!validate_url($openid_url)) {
-					throw new Exception(t('Invalid OpenID url'));
+				if (!Network::isUrlValid($openid_url)) {
+					throw new Exception(L10n::t('Invalid OpenID url'));
 				}
 				$_SESSION['register'] = 1;
 				$_SESSION['openid'] = $openid_url;
 
-				$openid = new \LightOpenID;
+				$openid = new LightOpenID;
 				$openid->identity = $openid_url;
 				$openid->returnUrl = System::baseUrl() . '/openid';
 				$openid->required = ['namePerson/friendly', 'contact/email', 'namePerson'];
@@ -297,16 +353,16 @@ class User
 				try {
 					$authurl = $openid->authUrl();
 				} catch (Exception $e) {
-					throw new Exception(t('We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID.') . EOL . EOL . t('The error message was:') . $e->getMessage(), 0, $e);
+					throw new Exception(L10n::t('We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID.') . EOL . EOL . L10n::t('The error message was:') . $e->getMessage(), 0, $e);
 				}
 				goaway($authurl);
 				// NOTREACHED
 			}
 
-			throw new Exception(t('Please enter the required information.'));
+			throw new Exception(L10n::t('Please enter the required information.'));
 		}
 
-		if (!validate_url($openid_url)) {
+		if (!Network::isUrlValid($openid_url)) {
 			$openid_url = '';
 		}
 
@@ -316,10 +372,10 @@ class User
 		$username = preg_replace('/ +/', ' ', $username);
 
 		if (mb_strlen($username) > 48) {
-			throw new Exception(t('Please use a shorter name.'));
+			throw new Exception(L10n::t('Please use a shorter name.'));
 		}
 		if (mb_strlen($username) < 3) {
-			throw new Exception(t('Name too short.'));
+			throw new Exception(L10n::t('Name too short.'));
 		}
 
 		// So now we are just looking for a space in the full name.
@@ -327,20 +383,20 @@ class User
 		if (!$loose_reg) {
 			$username = mb_convert_case($username, MB_CASE_TITLE, 'UTF-8');
 			if (!strpos($username, ' ')) {
-				throw new Exception(t("That doesn't appear to be your full \x28First Last\x29 name."));
+				throw new Exception(L10n::t("That doesn't appear to be your full \x28First Last\x29 name."));
 			}
 		}
 
-		if (!allowed_email($email)) {
-			throw new Exception(t('Your email domain is not among those allowed on this site.'));
+		if (!Network::isEmailDomainAllowed($email)) {
+			throw new Exception(L10n::t('Your email domain is not among those allowed on this site.'));
 		}
 
-		if (!valid_email($email) || !validate_email($email)) {
-			throw new Exception(t('Not a valid email address.'));
+		if (!valid_email($email) || !Network::isEmailDomainValid($email)) {
+			throw new Exception(L10n::t('Not a valid email address.'));
 		}
 
-		if (dba::exists('user', ['email' => $email])) {
-			throw new Exception(t('Cannot use that email.'));
+		if (Config::get('system', 'block_extended_register', false) && dba::exists('user', ['email' => $email])) {
+			throw new Exception(L10n::t('Cannot use that email.'));
 		}
 
 		// Disallow somebody creating an account using openid that uses the admin email address,
@@ -348,21 +404,21 @@ class User
 		if (x($a->config, 'admin_email') && strlen($openid_url)) {
 			$adminlist = explode(',', str_replace(' ', '', strtolower($a->config['admin_email'])));
 			if (in_array(strtolower($email), $adminlist)) {
-				throw new Exception(t('Cannot use that email.'));
+				throw new Exception(L10n::t('Cannot use that email.'));
 			}
 		}
 
 		$nickname = $data['nickname'] = strtolower($nickname);
 
 		if (!preg_match('/^[a-z0-9][a-z0-9\_]*$/', $nickname)) {
-			throw new Exception(t('Your "nickname" can only contain "a-z", "0-9" and "_".'));
+			throw new Exception(L10n::t('Your nickname can only contain a-z, 0-9 and _.'));
 		}
 
 		// Check existing and deleted accounts for this nickname.
 		if (dba::exists('user', ['nickname' => $nickname])
 			|| dba::exists('userd', ['username' => $nickname])
 		) {
-			throw new Exception(t('Nickname is already registered. Please choose another.'));
+			throw new Exception(L10n::t('Nickname is already registered. Please choose another.'));
 		}
 
 		$new_password = strlen($password) ? $password : User::generateNewPassword();
@@ -372,7 +428,7 @@ class User
 
 		$keys = Crypto::newKeypair(4096);
 		if ($keys === false) {
-			throw new Exception(t('SERIOUS ERROR: Generation of security keys failed.'));
+			throw new Exception(L10n::t('SERIOUS ERROR: Generation of security keys failed.'));
 		}
 
 		$prvkey = $keys['prvkey'];
@@ -397,7 +453,7 @@ class User
 			'verified' => $verified,
 			'blocked'  => $blocked,
 			'timezone' => 'UTC',
-			'register_date' => datetime_convert(),
+			'register_date' => DateTimeFormat::utcNow(),
 			'default-location' => ''
 		]);
 
@@ -405,11 +461,11 @@ class User
 			$uid = dba::lastInsertId();
 			$user = dba::selectFirst('user', [], ['uid' => $uid]);
 		} else {
-			throw new Exception(t('An error occurred during registration. Please try again.'));
+			throw new Exception(L10n::t('An error occurred during registration. Please try again.'));
 		}
 
 		if (!$uid) {
-			throw new Exception(t('An error occurred during registration. Please try again.'));
+			throw new Exception(L10n::t('An error occurred during registration. Please try again.'));
 		}
 
 		// if somebody clicked submit twice very quickly, they could end up with two accounts
@@ -418,7 +474,7 @@ class User
 		if ($user_count > 1) {
 			dba::delete('user', ['uid' => $uid]);
 
-			throw new Exception(t('Nickname is already registered. Please choose another.'));
+			throw new Exception(L10n::t('Nickname is already registered. Please choose another.'));
 		}
 
 		$insert_result = dba::insert('profile', [
@@ -429,28 +485,28 @@ class User
 			'publish' => $publish,
 			'is-default' => 1,
 			'net-publish' => $netpublish,
-			'profile-name' => t('default')
+			'profile-name' => L10n::t('default')
 		]);
 		if (!$insert_result) {
 			dba::delete('user', ['uid' => $uid]);
 
-			throw new Exception(t('An error occurred creating your default profile. Please try again.'));
+			throw new Exception(L10n::t('An error occurred creating your default profile. Please try again.'));
 		}
 
 		// Create the self contact
 		if (!Contact::createSelfFromUserId($uid)) {
 			dba::delete('user', ['uid' => $uid]);
 
-			throw new Exception(t('An error occurred creating your self contact. Please try again.'));
+			throw new Exception(L10n::t('An error occurred creating your self contact. Please try again.'));
 		}
 
 		// Create a group with no members. This allows somebody to use it
 		// right away as a default group for new contacts.
-		$def_gid = Group::create($uid, t('Friends'));
+		$def_gid = Group::create($uid, L10n::t('Friends'));
 		if (!$def_gid) {
 			dba::delete('user', ['uid' => $uid]);
 
-			throw new Exception(t('An error occurred creating your default contact group. Please try again.'));
+			throw new Exception(L10n::t('An error occurred creating your default contact group. Please try again.'));
 		}
 
 		$fields = ['def_gid' => $def_gid];
@@ -462,7 +518,7 @@ class User
 
 		// if we have no OpenID photo try to look up an avatar
 		if (!strlen($photo)) {
-			$photo = avatar_img($email);
+			$photo = Network::lookupAvatarByEmail($email);
 		}
 
 		// unless there is no avatar-addon loaded
@@ -470,7 +526,7 @@ class User
 			$photo_failure = false;
 
 			$filename = basename($photo);
-			$img_str = fetch_url($photo, true);
+			$img_str = Network::fetchUrl($photo, true);
 			// guess mimetype from headers or filename
 			$type = Image::guessType($photo, true);
 
@@ -478,9 +534,9 @@ class User
 			if ($Image->isValid()) {
 				$Image->scaleToSquare(175);
 
-				$hash = photo_new_resource();
+				$hash = Photo::newResource();
 
-				$r = Photo::store($Image, $uid, 0, $hash, $filename, t('Profile Photos'), 4);
+				$r = Photo::store($Image, $uid, 0, $hash, $filename, L10n::t('Profile Photos'), 4);
 
 				if ($r === false) {
 					$photo_failure = true;
@@ -488,7 +544,7 @@ class User
 
 				$Image->scaleDown(80);
 
-				$r = Photo::store($Image, $uid, 0, $hash, $filename, t('Profile Photos'), 5);
+				$r = Photo::store($Image, $uid, 0, $hash, $filename, L10n::t('Profile Photos'), 5);
 
 				if ($r === false) {
 					$photo_failure = true;
@@ -496,7 +552,7 @@ class User
 
 				$Image->scaleDown(48);
 
-				$r = Photo::store($Image, $uid, 0, $hash, $filename, t('Profile Photos'), 6);
+				$r = Photo::store($Image, $uid, 0, $hash, $filename, L10n::t('Profile Photos'), 6);
 
 				if ($r === false) {
 					$photo_failure = true;
@@ -524,7 +580,7 @@ class User
 	 */
 	public static function sendRegisterPendingEmail($email, $sitename, $username)
 	{
-		$body = deindent(t('
+		$body = deindent(L10n::t('
 			Dear %1$s,
 				Thank you for registering at %2$s. Your account is pending for approval by the administrator.
 		'));
@@ -534,7 +590,7 @@ class User
 		return notification([
 			'type' => SYSTEM_EMAIL,
 			'to_email' => $email,
-			'subject'=> sprintf( t('Registration at %s'), $sitename),
+			'subject'=> L10n::t('Registration at %s', $sitename),
 			'body' => $body]);
 	}
 
@@ -552,15 +608,16 @@ class User
 	 */
 	public static function sendRegisterOpenEmail($email, $sitename, $siteurl, $username, $password)
 	{
-		$preamble = deindent(t('
+		$preamble = deindent(L10n::t('
 			Dear %1$s,
 				Thank you for registering at %2$s. Your account has been created.
 		'));
-		$body = deindent(t('
+		$body = deindent(L10n::t('
 			The login details are as follows:
-				Site Location:	%3$s
-				Login Name:	%1$s
-				Password:	%5$s
+
+			Site Location:	%3$s
+			Login Name:		%1$s
+			Password:		%5$s
 
 			You may change your password from your account "Settings" page after logging
 			in.
@@ -568,10 +625,10 @@ class User
 			Please take a few moments to review the other account settings on that page.
 
 			You may also wish to add some basic information to your default profile
-			(on the "Profiles" page) so that other people can easily find you.
+			' . "\x28" . 'on the "Profiles" page' . "\x29" . ' so that other people can easily find you.
 
 			We recommend setting your full name, adding a profile photo,
-			adding some profile "keywords" (very useful in making new friends) - and
+			adding some profile "keywords" ' . "\x28" . 'very useful in making new friends' . "\x29" . ' - and
 			perhaps what country you live in; if you do not wish to be more specific
 			than that.
 
@@ -579,6 +636,7 @@ class User
 			If you are new and do not know anybody here, they may help
 			you to make some new and interesting friends.
 
+			If you ever want to delete your account, you can do so at %3$s/removeme
 
 			Thank you and welcome to %2$s.'));
 
@@ -588,7 +646,7 @@ class User
 		return notification([
 			'type' => SYSTEM_EMAIL,
 			'to_email' => $email,
-			'subject'=> sprintf( t('Registration details for %s'), $sitename),
+			'subject'=> L10n::t('Registration details for %s', $sitename),
 			'preamble'=> $preamble,
 			'body' => $body]);
 	}
@@ -614,7 +672,7 @@ class User
 		dba::insert('userd', ['username' => $user['nickname']]);
 
 		// The user and related data will be deleted in "cron_expire_and_remove_users" (cronjobs.php)
-		dba::update('user', ['account_removed' => true, 'account_expires_on' => datetime_convert()], ['uid' => $uid]);
+		dba::update('user', ['account_removed' => true, 'account_expires_on' => DateTimeFormat::utcNow()], ['uid' => $uid]);
 		Worker::add(PRIORITY_HIGH, "Notifier", "removeme", $uid);
 
 		// Send an update to the directory

@@ -16,6 +16,7 @@ Andrej Stieben
 André Alves
 André Lohan
 Andy H3
+Andy Hee
 AndyHee
 Anthronaut
 Arian - Cazare Muncitori
@@ -75,6 +76,7 @@ Frederico Gonçalves Guimarães
 Gerhard Seeber
 gerhard6380
 Gert Cauwenberg
+GLComo
 greeneyedred
 Gregory Smith
 Haakon Meland Eriksen
@@ -91,7 +93,6 @@ Jak
 Jakob
 Jens Tautenhahn
 jensp
-Jeroen S
 jeroenpraat
 Johannes Schwab
 John Brazil
@@ -169,6 +170,7 @@ Silke Meyer
 Simon L'nu
 Simó Albert i Beltran
 soko1
+St John Karp
 Stanislav N.
 StefOfficiel
 Sveinn í Felli
@@ -178,6 +180,7 @@ szymon.filip
 Sérgio Lima
 Taekus
 Tazman DeVille
+Thecross
 Thomas
 Thomas Willingham
 thorsten23
@@ -206,3 +209,4 @@ zotlabs
 zottel
 Zvi ben Yaakov (a.k.a rdc)
 Михаил
+朱陈锬

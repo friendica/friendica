@@ -7,11 +7,12 @@
 use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\System;
 
 function statistics_json_init(App $a) {
 
 	if (!Config::get("system", "nodeinfo")) {
-		http_status_exit(404);
+		System::httpExit(404);
 		killme();
 	}
 

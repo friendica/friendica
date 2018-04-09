@@ -8,9 +8,11 @@ namespace Friendica\Object;
 use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Photo;
+use Friendica\Util\Network;
 use Exception;
 use Imagick;
 use ImagickPixel;
@@ -769,10 +771,14 @@ class Image
 	{
 		$data = [];
 
+		if (empty($url)) {
+			return $data;
+		}
+
 		$data = Cache::get($url);
 
 		if (is_null($data) || !$data || !is_array($data)) {
-			$img_str = fetch_url($url, true, $redirects, 4);
+			$img_str = Network::fetchUrl($url, true, $redirects, 4);
 			$filesize = strlen($img_str);
 
 			if (function_exists("getimagesizefromstring")) {
@@ -935,7 +941,7 @@ class Image
 		$width = $Image->getWidth();
 		$height = $Image->getHeight();
 
-		$hash = photo_new_resource();
+		$hash = Photo::newResource();
 
 		$smallest = 0;
 
@@ -944,7 +950,7 @@ class Image
 		$defperm = "";
 		$visitor = 0;
 
-		$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, t('Wall Photos'), 0, 0, $defperm);
+		$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, L10n::t('Wall Photos'), 0, 0, $defperm);
 
 		if (!$r) {
 			logger("Picture couldn't be stored", LOGGER_DEBUG);
@@ -960,7 +966,7 @@ class Image
 
 		if ($width > 640 || $height > 640) {
 			$Image->scaleDown(640);
-			$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, t('Wall Photos'), 1, 0, $defperm);
+			$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, L10n::t('Wall Photos'), 1, 0, $defperm);
 			if ($r) {
 				$image["medium"] = System::baseUrl()."/photo/{$hash}-1.".$Image->getExt();
 			}
@@ -968,7 +974,7 @@ class Image
 
 		if ($width > 320 || $height > 320) {
 			$Image->scaleDown(320);
-			$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, t('Wall Photos'), 2, 0, $defperm);
+			$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, L10n::t('Wall Photos'), 2, 0, $defperm);
 			if ($r) {
 				$image["small"] = System::baseUrl()."/photo/{$hash}-2.".$Image->getExt();
 			}
@@ -993,7 +999,7 @@ class Image
 			$min = 160;
 			$Image->crop(160, $x, $y, $min, $min);
 
-			$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, t('Wall Photos'), 3, 0, $defperm);
+			$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, L10n::t('Wall Photos'), 3, 0, $defperm);
 			if ($r) {
 				$image["thumb"] = System::baseUrl()."/photo/{$hash}-3.".$Image->getExt();
 			}

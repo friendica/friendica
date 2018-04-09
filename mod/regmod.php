@@ -1,7 +1,10 @@
 <?php
-
+/**
+ * @file mod/regmod.php
+ */
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -50,19 +53,19 @@ function user_allow($hash)
 		}
 	}
 
-	push_lang($register[0]['language']);
+	L10n::pushLang($register[0]['language']);
 
-	User::sendRegisterOpenEmail(
+	$res = User::sendRegisterOpenEmail(
 		$user[0]['email'],
 		$a->config['sitename'],
 		System::baseUrl(),
 		$user[0]['username'],
 		$register[0]['password']);
 
-	pop_lang();
+	L10n::popLang();
 
 	if ($res) {
-		info(t('Account approved.') . EOL);
+		info(L10n::t('Account approved.') . EOL);
 		return true;
 	}
 }
@@ -87,7 +90,7 @@ function user_deny($hash)
 	dba::delete('user', ['uid' => $register[0]['uid']]);
 	dba::delete('register', ['hash' => $register[0]['hash']]);
 
-	notice(sprintf(t('Registration revoked for %s'), $user[0]['username']) . EOL);
+	notice(L10n::t('Registration revoked for %s', $user[0]['username']) . EOL);
 	return true;
 }
 
@@ -96,13 +99,13 @@ function regmod_content(App $a)
 	global $lang;
 
 	if (!local_user()) {
-		info(t('Please login.') . EOL);
-		$o .= '<br /><br />' . Login::form($a->query_string, $a->config['register_policy'] == REGISTER_CLOSED ? 0 : 1);
+		info(L10n::t('Please login.') . EOL);
+		$o = '<br /><br />' . Login::form($a->query_string, $a->config['register_policy'] == REGISTER_CLOSED ? 0 : 1);
 		return $o;
 	}
 
 	if ((!is_site_admin()) || (x($_SESSION, 'submanage') && intval($_SESSION['submanage']))) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return '';
 	}
 

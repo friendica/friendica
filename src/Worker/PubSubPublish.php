@@ -11,6 +11,7 @@ use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Protocol\OStatus;
+use Friendica\Util\Network;
 
 require_once 'include/items.php';
 
@@ -68,7 +69,7 @@ class PubSubPublish {
 
 		logger('POST '.print_r($headers, true)."\n".$params, LOGGER_DEBUG);
 
-		post_url($rr['callback_url'], $params, $headers);
+		Network::post($rr['callback_url'], $params, $headers);
 		$ret = $a->get_curl_code();
 
 		if ($ret >= 200 && $ret <= 299) {

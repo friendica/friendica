@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
@@ -83,9 +84,9 @@ function crepair_post(App $a)
 	}
 
 	if ($r) {
-		info(t('Contact settings applied.') . EOL);
+		info(L10n::t('Contact settings applied.') . EOL);
 	} else {
-		notice(t('Contact update failed.') . EOL);
+		notice(L10n::t('Contact update failed.') . EOL);
 	}
 
 	return;
@@ -94,7 +95,7 @@ function crepair_post(App $a)
 function crepair_content(App $a)
 {
 	if (!local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -106,12 +107,12 @@ function crepair_content(App $a)
 	}
 
 	if (!DBM::is_result($contact)) {
-		notice(t('Contact not found.') . EOL);
+		notice(L10n::t('Contact not found.') . EOL);
 		return;
 	}
 
-	$warning = t('<strong>WARNING: This is highly advanced</strong> and if you enter incorrect information your communications with this contact may stop working.');
-	$info = t('Please use your browser \'Back\' button <strong>now</strong> if you are uncertain what to do on this page.');
+	$warning = L10n::t('<strong>WARNING: This is highly advanced</strong> and if you enter incorrect information your communications with this contact may stop working.');
+	$info = L10n::t('Please use your browser \'Back\' button <strong>now</strong> if you are uncertain what to do on this page.');
 
 	$returnaddr = "contacts/$cid";
 
@@ -125,9 +126,9 @@ function crepair_content(App $a)
 	}
 
 	if ($contact['network'] == NETWORK_FEED) {
-		$remote_self_options = ['0' => t('No mirroring'), '1' => t('Mirror as forwarded posting'), '2' => t('Mirror as my own posting')];
+		$remote_self_options = ['0' => L10n::t('No mirroring'), '1' => L10n::t('Mirror as forwarded posting'), '2' => L10n::t('Mirror as my own posting')];
 	} else {
-		$remote_self_options = ['0' => t('No mirroring'), '2' => t('Mirror as my own posting')];
+		$remote_self_options = ['0' => L10n::t('No mirroring'), '2' => L10n::t('Mirror as my own posting')];
 	}
 
 	$update_profile = in_array($contact['network'], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS]);
@@ -140,29 +141,29 @@ function crepair_content(App $a)
 		'$warning'        => $warning,
 		'$info'           => $info,
 		'$returnaddr'     => $returnaddr,
-		'$return'         => t('Return to contact editor'),
+		'$return'         => L10n::t('Return to contact editor'),
 		'$update_profile' => $update_profile,
-		'$udprofilenow'   => t('Refetch contact data'),
+		'$udprofilenow'   => L10n::t('Refetch contact data'),
 		'$contact_id'     => $contact['id'],
-		'$lbl_submit'     => t('Submit'),
-		'$label_remote_self' => t('Remote Self'),
+		'$lbl_submit'     => L10n::t('Submit'),
+		'$label_remote_self' => L10n::t('Remote Self'),
 		'$allow_remote_self' => $allow_remote_self,
 		'$remote_self' => ['remote_self',
-			t('Mirror postings from this contact'),
+			L10n::t('Mirror postings from this contact'),
 			$contact['remote_self'],
-			t('Mark this contact as remote_self, this will cause friendica to repost new entries from this contact.'),
+			L10n::t('Mark this contact as remote_self, this will cause friendica to repost new entries from this contact.'),
 			$remote_self_options
 		],
 
-		'$name'		=> ['name', t('Name') , htmlentities($contact['name'])],
-		'$nick'		=> ['nick', t('Account Nickname'), htmlentities($contact['nick'])],
-		'$attag'	=> ['attag', t('@Tagname - overrides Name/Nickname'), $contact['attag']],
-		'$url'		=> ['url', t('Account URL'), $contact['url']],
-		'$request'	=> ['request', t('Friend Request URL'), $contact['request']],
-		'confirm'	=> ['confirm', t('Friend Confirm URL'), $contact['confirm']],
-		'notify'	=> ['notify', t('Notification Endpoint URL'), $contact['notify']],
-		'poll'		=> ['poll', t('Poll/Feed URL'), $contact['poll']],
-		'photo'		=> ['photo', t('New photo from this URL'), ''],
+		'$name'		=> ['name', L10n::t('Name') , htmlentities($contact['name'])],
+		'$nick'		=> ['nick', L10n::t('Account Nickname'), htmlentities($contact['nick'])],
+		'$attag'	=> ['attag', L10n::t('@Tagname - overrides Name/Nickname'), $contact['attag']],
+		'$url'		=> ['url', L10n::t('Account URL'), $contact['url']],
+		'$request'	=> ['request', L10n::t('Friend Request URL'), $contact['request']],
+		'confirm'	=> ['confirm', L10n::t('Friend Confirm URL'), $contact['confirm']],
+		'notify'	=> ['notify', L10n::t('Notification Endpoint URL'), $contact['notify']],
+		'poll'		=> ['poll', L10n::t('Poll/Feed URL'), $contact['poll']],
+		'photo'		=> ['photo', L10n::t('New photo from this URL'), ''],
 	]);
 
 	return $o;

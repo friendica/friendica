@@ -21,7 +21,7 @@ You can get the latest changes at any time with
 
     cd path/to/friendica
     git pull
-    util/composer.phar install
+    bin/composer.phar install
 
 The addon tree has to be updated separately like so:
 

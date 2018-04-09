@@ -32,7 +32,7 @@ function get_schema_info($schema){
 		'description' => "",
 		'author' => [],
 		'version' => "",
-		'overwrites' => ""
+		'overwrites' => []
 	];
 
 	if (!is_file($themepath . "schema/" . $schema . ".php")) return $info;

@@ -6,13 +6,10 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Cache;
-use Friendica\Core\Config;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
-
-require_once 'include/datetime.php';
 
 class GProbe {
 	public static function execute($url = '')

@@ -3,6 +3,7 @@
  * @file mod/unfollow.php
  */
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
@@ -11,7 +12,7 @@ use Friendica\Model\Profile;
 function unfollow_post(App $a)
 {
 	if (!local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
@@ -30,30 +31,30 @@ function unfollow_post(App $a)
 	$contact = dba::selectFirst('contact', [], $condition);
 
 	if (!DBM::is_result($contact)) {
-		notice(t("Contact wasn't found or can't be unfollowed."));
+		notice(L10n::t("Contact wasn't found or can't be unfollowed."));
 	} else {
-		if (in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA])) {
+		if (in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_DFRN])) {
 			$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
 				WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 				intval($uid)
 			);
- 			if (DBM::is_result($r)) {
+			if (DBM::is_result($r)) {
 				Contact::terminateFriendship($r[0], $contact);
 			}
 		}
 		dba::update('contact', ['rel' => CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
 
-		info(t('Contact unfollowed').EOL);
+		info(L10n::t('Contact unfollowed').EOL);
 		goaway(System::baseUrl().'/contacts/'.$contact['id']);
 	}
 	goaway($return_url);
 	// NOTREACHED
 }
 
-function unfollow_content(App $a) {
-
+function unfollow_content(App $a)
+{
 	if (! local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
@@ -61,7 +62,7 @@ function unfollow_content(App $a) {
 	$uid = local_user();
 	$url = notags(trim($_REQUEST['url']));
 
-	$submit = t('Submit Request');
+	$submit = L10n::t('Submit Request');
 
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
 			local_user(), CONTACT_IS_FRIEND, normalise_link($url),
@@ -69,13 +70,13 @@ function unfollow_content(App $a) {
 	$contact = dba::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
 
 	if (!DBM::is_result($contact)) {
-		notice(t("You aren't a friend of this contact.").EOL);
+		notice(L10n::t("You aren't a friend of this contact.").EOL);
 		$submit = "";
 		// NOTREACHED
 	}
 
-	if (!in_array($contact['network'], [NETWORK_DIASPORA, NETWORK_OSTATUS])) {
-		notice(t("Unfollowing is currently not supported by your network.").EOL);
+	if (!in_array($contact['network'], [NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_DFRN])) {
+		notice(L10n::t("Unfollowing is currently not supported by your network.").EOL);
 		$submit = "";
 		// NOTREACHED
 	}
@@ -86,7 +87,7 @@ function unfollow_content(App $a) {
 	$r = q("SELECT `url` FROM `contact` WHERE `uid` = %d AND `self` LIMIT 1", intval($uid));
 
 	if (!$r) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
@@ -96,9 +97,9 @@ function unfollow_content(App $a) {
 	// Makes the connection request for friendica contacts easier
 	$_SESSION["fastlane"] = $contact["url"];
 
-	$header = t("Disconnect/Unfollow");
+	$header = L10n::t("Disconnect/Unfollow");
 
-	$o  = replace_macros($tpl,[
+	$o  = replace_macros($tpl, [
 			'$header' => htmlentities($header),
 			'$desc' => "",
 			'$pls_answer' => "",
@@ -109,16 +110,16 @@ function unfollow_content(App $a) {
 			'$statusnet' => "",
 			'$diaspora' => "",
 			'$diasnote' => "",
-			'$your_address' => t('Your Identity Address:'),
+			'$your_address' => L10n::t('Your Identity Address:'),
 			'$invite_desc' => "",
 			'$emailnet' => "",
 			'$submit' => $submit,
-			'$cancel' => t('Cancel'),
+			'$cancel' => L10n::t('Cancel'),
 			'$nickname' => "",
 			'$name' => $contact["name"],
 			'$url' => $contact["url"],
 			'$zrl' => Profile::zrl($contact["url"]),
-			'$url_label' => t("Profile URL"),
+			'$url_label' => L10n::t("Profile URL"),
 			'$myaddr' => $myaddr,
 			'$request' => $request,
 			'$keywords' => "",
@@ -128,7 +129,7 @@ function unfollow_content(App $a) {
 	$a->page['aside'] = "";
 	Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
 
-	$o .= replace_macros(get_markup_template('section_title.tpl'), ['$title' => t('Status Messages and Posts')]);
+	$o .= replace_macros(get_markup_template('section_title.tpl'), ['$title' => L10n::t('Status Messages and Posts')]);
 
 	// Show last public posts
 	$o .= Contact::getPostsFromUrl($contact["url"]);

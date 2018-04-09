@@ -3,19 +3,22 @@
 /**
  * @file src/Content/OEmbed.php
  */
-
 namespace Friendica\Content;
 
 use Friendica\Core\Addon;
 use Friendica\Core\Cache;
-use Friendica\Core\System;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use dba;
 use DOMDocument;
-use DOMXPath;
 use DOMNode;
+use DOMText;
+use DOMXPath;
 use Exception;
 
 require_once 'include/dba.php';
@@ -78,7 +81,7 @@ class OEmbed
 			if (!in_array($ext, $noexts)) {
 				// try oembed autodiscovery
 				$redirects = 0;
-				$html_text = fetch_url($embedurl, false, $redirects, 15, "text/*");
+				$html_text = Network::fetchUrl($embedurl, false, $redirects, 15, "text/*");
 				if ($html_text) {
 					$dom = @DOMDocument::loadHTML($html_text);
 					if ($dom) {
@@ -86,13 +89,13 @@ class OEmbed
 						$entries = $xpath->query("//link[@type='application/json+oembed']");
 						foreach ($entries as $e) {
 							$href = $e->getAttributeNode("href")->nodeValue;
-							$txt = fetch_url($href . '&maxwidth=' . $a->videowidth);
+							$txt = Network::fetchUrl($href . '&maxwidth=' . $a->videowidth);
 							break;
 						}
 						$entries = $xpath->query("//link[@type='text/json+oembed']");
 						foreach ($entries as $e) {
 							$href = $e->getAttributeNode("href")->nodeValue;
-							$txt = fetch_url($href . '&maxwidth=' . $a->videowidth);
+							$txt = Network::fetchUrl($href . '&maxwidth=' . $a->videowidth);
 							break;
 						}
 					}
@@ -110,7 +113,7 @@ class OEmbed
 						'url' => normalise_link($embedurl),
 						'maxwidth' => $a->videowidth,
 						'content' => $txt,
-						'created' => datetime_convert()
+						'created' => DateTimeFormat::utcNow()
 					], true);
 				}
 
@@ -247,7 +250,7 @@ class OEmbed
 	{
 		$stopoembed = Config::get("system", "no_oembed");
 		if ($stopoembed == true) {
-			return preg_replace("/\[embed\](.+?)\[\/embed\]/is", "<!-- oembed $1 --><i>" . t('Embedding disabled') . " : $1</i><!-- /oembed $1 -->", $text);
+			return preg_replace("/\[embed\](.+?)\[\/embed\]/is", "<!-- oembed $1 --><i>" . L10n::t('Embedding disabled') . " : $1</i><!-- /oembed $1 -->", $text);
 		}
 		return preg_replace_callback("/\[embed\](.+?)\[\/embed\]/is", ['self', 'replaceCallback'], $text);
 	}
@@ -312,7 +315,7 @@ class OEmbed
 
 		$allowed = explode(',', $str_allowed);
 
-		return allowed_domain($domain, $allowed);
+		return Network::isDomainAllowed($domain, $allowed);
 	}
 
 	public static function getHTML($url, $title = null)
@@ -367,7 +370,7 @@ class OEmbed
 		$width = '100%';
 
 		$src = System::baseUrl() . '/oembed/' . base64url_encode($src);
-		return '<iframe onload="resizeIframe(this);" class="embed_rich" height="' . $height . '" width="' . $width . '" src="' . $src . '" allowfullscreen scrolling="no" frameborder="no">' . t('Embedded content') . '</iframe>';
+		return '<iframe onload="resizeIframe(this);" class="embed_rich" height="' . $height . '" width="' . $width . '" src="' . $src . '" allowfullscreen scrolling="no" frameborder="no">' . L10n::t('Embedded content') . '</iframe>';
 	}
 
 	/**

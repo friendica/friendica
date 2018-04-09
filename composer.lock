@@ -4,8 +4,41 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7fcbb730be98076fe8318b03c858f41c",
+    "content-hash": "12b8df66213734281765cb6e2c5a786e",
     "packages": [
+        {
+            "name": "asika/simple-console",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/asika32764/php-simple-console.git",
+                "reference": "0b624c1a999849dc6481a47182e58d593bf65068"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/asika32764/php-simple-console/zipball/0b624c1a999849dc6481a47182e58d593bf65068",
+                "reference": "0b624c1a999849dc6481a47182e58d593bf65068",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Asika\\SimpleConsole\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Simon Asika",
+                    "email": "asika32764@gmail.com"
+                }
+            ],
+            "description": "One file console framework to help you write build scripts.",
+            "time": "2018-03-08T12:05:40+00:00"
+        },
         {
             "name": "bower-asset/Chart-js",
             "version": "v2.7.1",
@@ -68,6 +101,85 @@
             ],
             "description": "Base64 encoding and decoding",
             "time": "2017-03-25T21:16:21+00:00"
+        },
+        {
+            "name": "bower-asset/perfect-scrollbar",
+            "version": "0.6.16",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/utatti/perfect-scrollbar-bower.git",
+                "reference": "3049129e5dbb403295ce8507a461cdd0f200938c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/utatti/perfect-scrollbar-bower/zipball/3049129e5dbb403295ce8507a461cdd0f200938c",
+                "reference": "3049129e5dbb403295ce8507a461cdd0f200938c",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "css/perfect-scrollbar.css",
+                    "js/perfect-scrollbar.js"
+                ],
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "bower_components"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Minimalistic but perfect custom scrollbar plugin",
+            "time": "2017-01-10T01:04:09+00:00"
+        },
+        {
+            "name": "divineomega/password_exposed",
+            "version": "v2.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DivineOmega/password_exposed.git",
+                "reference": "c928bf722eb02398df11076add60df070cb55581"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DivineOmega/password_exposed/zipball/c928bf722eb02398df11076add60df070cb55581",
+                "reference": "c928bf722eb02398df11076add60df070cb55581",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "paragonie/certainty": "^1",
+                "php": ">=5.6",
+                "rapidwebltd/rw-file-cache-psr-6": "^1.0"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "^1.7",
+                "phpunit/phpunit": "^5.7",
+                "satooshi/php-coveralls": "^2.0",
+                "vimeo/psalm": "^1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DivineOmega\\PasswordExposed\\": "src/"
+                },
+                "files": [
+                    "src/PasswordExposedFunction.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Jordan Hall",
+                    "email": "jordan@hall05.co.uk"
+                }
+            ],
+            "description": "This PHP package provides a `password_exposed` helper function, that uses the haveibeenpwned.com API to check if a password has been exposed in a data breach.",
+            "time": "2018-04-02T18:16:36+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -173,6 +285,187 @@
             "time": "2017-10-20T06:53:56+00:00"
         },
         {
+            "name": "guzzlehttp/guzzle",
+            "version": "6.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/guzzle.git",
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f4db5a78a5ea468d4831de7f0bf9d9415e348699",
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/promises": "^1.0",
+                "guzzlehttp/psr7": "^1.4",
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "phpunit/phpunit": "^4.0 || ^5.0",
+                "psr/log": "^1.0"
+            },
+            "suggest": {
+                "psr/log": "Required for using the Log middleware"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "6.2-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/functions_include.php"
+                ],
+                "psr-4": {
+                    "GuzzleHttp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Guzzle is a PHP HTTP client library",
+            "homepage": "http://guzzlephp.org/",
+            "keywords": [
+                "client",
+                "curl",
+                "framework",
+                "http",
+                "http client",
+                "rest",
+                "web service"
+            ],
+            "time": "2017-06-22T18:50:49+00:00"
+        },
+        {
+            "name": "guzzlehttp/promises",
+            "version": "v1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/promises.git",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Promise\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Guzzle promises library",
+            "keywords": [
+                "promise"
+            ],
+            "time": "2016-12-20T10:07:11+00:00"
+        },
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/psr7.git",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "psr/http-message": "~1.0"
+            },
+            "provide": {
+                "psr/http-message-implementation": "1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Psr7\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                },
+                {
+                    "name": "Tobias Schultze",
+                    "homepage": "https://github.com/Tobion"
+                }
+            ],
+            "description": "PSR-7 message implementation that also provides common utility methods",
+            "keywords": [
+                "http",
+                "message",
+                "request",
+                "response",
+                "stream",
+                "uri",
+                "url"
+            ],
+            "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
             "name": "league/html-to-markdown",
             "version": "4.4.1",
             "source": {
@@ -235,6 +528,39 @@
                 "markdown"
             ],
             "time": "2017-03-16T00:45:59+00:00"
+        },
+        {
+            "name": "lightopenid/lightopenid",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Mewp/lightopenid.git",
+                "reference": "9d42dc24e4dd34121c98a6491bc3ef7933a68a19"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mewp/lightopenid/zipball/9d42dc24e4dd34121c98a6491bc3ef7933a68a19",
+                "reference": "9d42dc24e4dd34121c98a6491bc3ef7933a68a19",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.3"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "./"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "homepage": "http://code.google.com/p/lightopenid/",
+            "keywords": [
+                "OpenId"
+            ],
+            "time": "2013-10-27T16:25:49+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -335,13 +661,260 @@
             "time": "2017-12-18T10:38:51+00:00"
         },
         {
-            "name": "npm-asset/jquery",
-            "version": "1.12.4",
+            "name": "npm-asset/cropperjs",
+            "version": "1.2.2",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/jquery/-/jquery-1.12.4.tgz",
+                "url": "https://registry.npmjs.org/cropperjs/-/cropperjs-1.2.2.tgz",
                 "reference": null,
-                "shasum": "01e1dfba290fe73deba77ceeacb0f9ba2fec9e0c"
+                "shasum": "30dc7a7ce872155b23a33bd10ad4c76c0d613f55"
+            },
+            "require-dev": {
+                "npm-asset/babel-core": ">=6.26.0,<7.0.0",
+                "npm-asset/babel-plugin-external-helpers": ">=6.22.0,<7.0.0",
+                "npm-asset/babel-preset-env": ">=1.6.1,<2.0.0",
+                "npm-asset/cpy-cli": ">=1.0.1,<2.0.0",
+                "npm-asset/cssnano": ">=3.10.0,<4.0.0",
+                "npm-asset/del-cli": ">=1.1.0,<2.0.0",
+                "npm-asset/eslint": ">=4.14.0,<5.0.0",
+                "npm-asset/eslint-config-airbnb-base": ">=12.1.0,<13.0.0",
+                "npm-asset/eslint-plugin-import": ">=2.8.0,<3.0.0",
+                "npm-asset/node-qunit-phantomjs": ">=2.0.0,<3.0.0",
+                "npm-asset/npm-run-all": ">=4.1.2,<5.0.0",
+                "npm-asset/postcss-cli": ">=4.1.1,<5.0.0",
+                "npm-asset/postcss-cssnext": ">=3.0.2,<4.0.0",
+                "npm-asset/postcss-header": ">=1.0.0,<2.0.0",
+                "npm-asset/postcss-url": ">=7.3.0,<8.0.0",
+                "npm-asset/rollup": ">=0.53.3,<0.54.0",
+                "npm-asset/rollup-plugin-babel": ">=3.0.3,<4.0.0",
+                "npm-asset/rollup-watch": ">=4.3.1,<5.0.0",
+                "npm-asset/stylefmt": ">=6.0.0,<7.0.0",
+                "npm-asset/uglify-js": ">=3.3.4,<4.0.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/fengyuanchen/cropperjs/issues"
+                },
+                "npm-asset-files": [
+                    "src",
+                    "dist"
+                ],
+                "npm-asset-main": "dist/cropper.common.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/fengyuanchen/cropperjs.git"
+                },
+                "npm-asset-scripts": {
+                    "build": "npm run build:css && npm run build:js",
+                    "build:css": "postcss src/css/cropper.css -o dist/cropper.css --no-map",
+                    "build:js": "rollup -c",
+                    "clear": "del-cli dist",
+                    "compress": "npm run compress:css && npm run compress:js",
+                    "compress:css": "postcss dist/cropper.css -u cssnano -o dist/cropper.min.css --no-map",
+                    "compress:js": "uglifyjs dist/cropper.js -o dist/cropper.min.js -c -m --comments /^!/",
+                    "copy": "cpy dist/cropper.css docs/css",
+                    "lint": "eslint src/js --fix",
+                    "release": "npm run clear && npm run lint && npm run build && npm run compress && npm run copy && npm test",
+                    "start": "npm-run-all --parallel watch:*",
+                    "test": "node-qunit-phantomjs test/index.html --timeout 10",
+                    "watch:css": "postcss src/css/cropper.css -o docs/css/cropper.css -m -w",
+                    "watch:js": "rollup -c -m -w"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chen Fengyuan",
+                    "url": "http://chenfengyuan.com"
+                }
+            ],
+            "description": "JavaScript image cropper.",
+            "homepage": "https://fengyuanchen.github.io/cropperjs",
+            "keywords": [
+                "crop",
+                "cropper",
+                "cropper.js",
+                "cropperjs",
+                "cropping",
+                "css",
+                "development",
+                "front-end",
+                "html",
+                "image",
+                "javascript",
+                "move",
+                "rotate",
+                "scale",
+                "web",
+                "zoom"
+            ],
+            "time": "2018-01-03T13:39:39+00:00"
+        },
+        {
+            "name": "npm-asset/fullcalendar",
+            "version": "3.8.2",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/fullcalendar/-/fullcalendar-3.8.2.tgz",
+                "reference": null,
+                "shasum": "ef7dc77b89134bbe6163e51136f7a1f8bfc1d807"
+            },
+            "require": {
+                "npm-asset/jquery": ">=2,<4.0",
+                "npm-asset/moment": ">=2.9.0,<3.0.0"
+            },
+            "require-dev": {
+                "npm-asset/awesome-typescript-loader": ">=3.3.0,<4.0.0",
+                "npm-asset/bootstrap": ">=3.3.7,<4.0.0",
+                "npm-asset/components-jqueryui": "dev-github:components/jqueryui",
+                "npm-asset/css-loader": ">=0.28.7,<0.29.0",
+                "npm-asset/del": ">=2.2.1,<3.0.0",
+                "npm-asset/dts-generator": ">=2.1.0,<3.0.0",
+                "npm-asset/eslint": ">=4.13.1,<5.0.0",
+                "npm-asset/eslint-config-standard": ">=11.0.0-beta.0,<12.0.0",
+                "npm-asset/eslint-plugin-import": ">=2.8.0,<3.0.0",
+                "npm-asset/eslint-plugin-node": ">=5.2.1,<6.0.0",
+                "npm-asset/eslint-plugin-promise": ">=3.6.0,<4.0.0",
+                "npm-asset/eslint-plugin-standard": ">=3.0.1,<4.0.0",
+                "npm-asset/extract-text-webpack-plugin": ">=3.0.2,<4.0.0",
+                "npm-asset/glob": ">=7.1.2,<8.0.0",
+                "npm-asset/gulp": ">=3.9.1,<4.0.0",
+                "npm-asset/gulp-cssmin": ">=0.1.7,<0.2.0",
+                "npm-asset/gulp-eslint": ">=4.0.0,<5.0.0",
+                "npm-asset/gulp-filter": ">=4.0.0,<5.0.0",
+                "npm-asset/gulp-modify-file": ">=1.0.0,<2.0.0",
+                "npm-asset/gulp-rename": ">=1.2.2,<2.0.0",
+                "npm-asset/gulp-shell": ">=0.6.5,<0.7.0",
+                "npm-asset/gulp-tslint": ">=8.1.2,<9.0.0",
+                "npm-asset/gulp-uglify": ">=2.0.0,<3.0.0",
+                "npm-asset/gulp-util": ">=3.0.7,<4.0.0",
+                "npm-asset/gulp-watch": ">=4.3.11,<5.0.0",
+                "npm-asset/gulp-zip": ">=3.2.0,<4.0.0",
+                "npm-asset/jasmine-core": "2.5.2",
+                "npm-asset/jasmine-fixture": ">=2.0.0,<3.0.0",
+                "npm-asset/jasmine-jquery": ">=2.1.1,<3.0.0",
+                "npm-asset/jquery-mockjax": ">=2.2.0,<3.0.0",
+                "npm-asset/jquery-simulate": "dev-github:jquery/jquery-simulate",
+                "npm-asset/karma": ">=0.13.22,<0.14.0",
+                "npm-asset/karma-jasmine": ">=1.0.2,<2.0.0",
+                "npm-asset/karma-phantomjs-launcher": ">=1.0.0,<2.0.0",
+                "npm-asset/karma-sourcemap-loader": ">=0.3.7,<0.4.0",
+                "npm-asset/karma-verbose-reporter": "0.0.6",
+                "npm-asset/moment-timezone": ">=0.5.5,<0.6.0",
+                "npm-asset/native-promise-only": ">=0.8.1,<0.9.0",
+                "npm-asset/node-sass": ">=4.7.2,<5.0.0",
+                "npm-asset/phantomjs-prebuilt": ">=2.1.7,<3.0.0",
+                "npm-asset/sass-loader": ">=6.0.6,<7.0.0",
+                "npm-asset/tslib": ">=1.8.0,<2.0.0",
+                "npm-asset/tslint": ">=5.8.0,<6.0.0",
+                "npm-asset/tslint-config-standard": ">=7.0.0,<8.0.0",
+                "npm-asset/types--jquery": "2.0.47",
+                "npm-asset/typescript": ">=2.6.2,<3.0.0",
+                "npm-asset/webpack": ">=3.8.1,<4.0.0",
+                "npm-asset/webpack-stream": ">=4.0.0,<5.0.0",
+                "npm-asset/yargs": ">=4.8.1,<5.0.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://fullcalendar.io/wiki/Reporting-Bugs/"
+                },
+                "npm-asset-files": [
+                    "dist/*.js",
+                    "dist/*.css",
+                    "dist/*.d.ts",
+                    "dist/locale/*.js",
+                    "README.*",
+                    "LICENSE.*",
+                    "CHANGELOG.*",
+                    "CONTRIBUTING.*"
+                ],
+                "npm-asset-main": "dist/fullcalendar.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/fullcalendar/fullcalendar.git"
+                },
+                "npm-asset-scripts": {
+                    "clean": "gulp clean",
+                    "dist": "gulp dist",
+                    "lint": "gulp lint",
+                    "test": "gulp test:single"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adam Shaw",
+                    "email": "arshaw@arshaw.com",
+                    "url": "http://arshaw.com/"
+                }
+            ],
+            "description": "Full-sized drag & drop event calendar",
+            "homepage": "https://fullcalendar.io/",
+            "keywords": [
+                "calendar",
+                "event",
+                "full-sized",
+                "jquery-plugin"
+            ],
+            "time": "2018-01-30T23:49:01+00:00"
+        },
+        {
+            "name": "npm-asset/jgrowl",
+            "version": "1.4.6",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/jgrowl/-/jgrowl-1.4.6.tgz",
+                "reference": null,
+                "shasum": "2736e332aaee73ccf0a14a5f0066391a0a13f4a3"
+            },
+            "require-dev": {
+                "npm-asset/grunt": "~0.4.2",
+                "npm-asset/grunt-contrib-cssmin": "~0.9.0",
+                "npm-asset/grunt-contrib-jshint": "~0.6.3",
+                "npm-asset/grunt-contrib-less": "~0.11.0",
+                "npm-asset/grunt-contrib-uglify": "~0.4.0",
+                "npm-asset/grunt-contrib-watch": "~0.6.1"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/stanlemon/jGrowl/issues"
+                },
+                "npm-asset-main": "jquery.jgrowl.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+ssh://git@github.com/stanlemon/jGrowl.git"
+                },
+                "npm-asset-scripts": []
+            },
+            "authors": [
+                {
+                    "name": "Stan Lemon",
+                    "email": "stosh1985@gmail.com",
+                    "url": "http://stanlemon.net"
+                }
+            ],
+            "description": "jGrowl is a jQuery plugin that raises unobtrusive messages within the browser, similar to the way that OS X's Growl Framework works. The idea is simple, deliver notifications to the end user in a noticeable way that doesn't obstruct the work flow and yet ",
+            "homepage": "https://github.com/stanlemon/jGrowl#readme",
+            "time": "2017-07-21T02:36:34+00:00"
+        },
+        {
+            "name": "npm-asset/jquery",
+            "version": "2.2.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/jquery/-/jquery-2.2.4.tgz",
+                "reference": null,
+                "shasum": "2c89d6889b5eac522a7eea32c14521559c6cbf02"
             },
             "require-dev": {
                 "npm-asset/commitplease": "2.0.0",
@@ -360,11 +933,10 @@
                 "npm-asset/gzip-js": "0.3.2",
                 "npm-asset/jsdom": "5.6.1",
                 "npm-asset/load-grunt-tasks": "1.0.0",
-                "npm-asset/npm": "2.1.12",
                 "npm-asset/qunit-assert-step": "1.0.3",
                 "npm-asset/qunitjs": "1.17.1",
                 "npm-asset/requirejs": "2.1.17",
-                "npm-asset/sinon": "1.12.2",
+                "npm-asset/sinon": "1.10.3",
                 "npm-asset/sizzle": "2.2.1",
                 "npm-asset/strip-json-comments": "1.0.3",
                 "npm-asset/testswarm": "1.1.0",
@@ -393,7 +965,7 @@
             "authors": [
                 {
                     "name": "jQuery Foundation and other contributors",
-                    "url": "https://github.com/jquery/jquery/blob/1.12-stable/AUTHORS.txt"
+                    "url": "https://github.com/jquery/jquery/blob/2.2.4/AUTHORS.txt"
                 }
             ],
             "description": "JavaScript library for DOM operations",
@@ -404,7 +976,7 @@
                 "jquery",
                 "library"
             ],
-            "time": "2016-05-20T17:19:07+00:00"
+            "time": "2016-05-20T17:26:07+00:00"
         },
         {
             "name": "npm-asset/jquery-colorbox",
@@ -454,6 +1026,397 @@
             "time": "2016-05-10T22:22:39+00:00"
         },
         {
+            "name": "npm-asset/jquery-datetimepicker",
+            "version": "2.5.17",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/jquery-datetimepicker/-/jquery-datetimepicker-2.5.17.tgz",
+                "reference": null,
+                "shasum": "8857a631f248081d4072563bde40fa8c17e407b1"
+            },
+            "require": {
+                "npm-asset/jquery": ">=1.7.2",
+                "npm-asset/jquery-mousewheel": ">=3.1.13",
+                "npm-asset/php-date-formatter": ">=1.3.4,<2.0.0"
+            },
+            "require-dev": {
+                "npm-asset/concat": "dev-github:azer/concat",
+                "npm-asset/concat-cli": ">=4.0.0,<5.0.0",
+                "npm-asset/uglifycss": ">=0.0.27,<0.0.28",
+                "npm-asset/uglifyjs": ">=2.4.10,<3.0.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/xdan/datetimepicker/issues"
+                },
+                "npm-asset-main": "build/jquery.datetimepicker.full.min.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/xdan/datetimepicker.git"
+                },
+                "npm-asset-scripts": {
+                    "test": "echo \"Error: no test specified\" && exit 1",
+                    "concat": "concat-cli -f node_modules/php-date-formatter/js/php-date-formatter.min.js jquery.datetimepicker.js node_modules/jquery-mousewheel/jquery.mousewheel.js -o build/jquery.datetimepicker.full.js",
+                    "minify": "uglifyjs jquery.datetimepicker.js -c -m -o build/jquery.datetimepicker.min.js && uglifycss jquery.datetimepicker.css > build/jquery.datetimepicker.min.css",
+                    "minifyconcat": "uglifyjs build/jquery.datetimepicker.full.js -c -m -o build/jquery.datetimepicker.full.min.js",
+                    "github": "git add --all  && git commit -m \"New version %npm_package_version% \" && git tag %npm_package_version% && git push --tags origin HEAD:master && npm publish",
+                    "build": "npm run minify && npm run concat && npm run minifyconcat",
+                    "public": "npm version patch --no-git-tag-version && npm run build && npm run github"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chupurnov",
+                    "email": "chupurnov@gmail.com",
+                    "url": "http://xdsoft.net/"
+                }
+            ],
+            "description": "jQuery Plugin DateTimePicker it is DatePicker and TimePicker in one",
+            "homepage": "https://github.com/xdan/datetimepicker",
+            "keywords": [
+                "calendar",
+                "date",
+                "datepicker",
+                "datetime",
+                "jquery-plugin",
+                "time",
+                "timepicker"
+            ],
+            "time": "2018-01-23T05:56:50+00:00"
+        },
+        {
+            "name": "npm-asset/jquery-mousewheel",
+            "version": "3.1.13",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/jquery-mousewheel/-/jquery-mousewheel-3.1.13.tgz",
+                "reference": null,
+                "shasum": "06f0335f16e353a695e7206bf50503cb523a6ee5"
+            },
+            "require-dev": {
+                "npm-asset/grunt": "~0.4.1",
+                "npm-asset/grunt-contrib-connect": "~0.5.0",
+                "npm-asset/grunt-contrib-jshint": "~0.7.1",
+                "npm-asset/grunt-contrib-uglify": "~0.2.7"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/jquery/jquery-mousewheel/issues"
+                },
+                "npm-asset-files": [
+                    "ChangeLog.md",
+                    "jquery.mousewheel.js",
+                    "README.md",
+                    "LICENSE.txt"
+                ],
+                "npm-asset-main": "./jquery.mousewheel.js",
+                "npm-asset-directories": {
+                    "test": "test"
+                },
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "https://github.com/jquery/jquery-mousewheel.git"
+                },
+                "npm-asset-scripts": []
+            },
+            "authors": [
+                {
+                    "name": "jQuery Foundation and other contributors",
+                    "url": "https://github.com/jquery/jquery-mousewheel/blob/master/AUTHORS.txt"
+                }
+            ],
+            "description": "A jQuery plugin that adds cross-browser mouse wheel support.",
+            "homepage": "https://github.com/jquery/jquery-mousewheel",
+            "keywords": [
+                "browser",
+                "event",
+                "jquery",
+                "jquery-plugin",
+                "mouse",
+                "mousewheel",
+                "wheel"
+            ],
+            "time": "2015-07-15T18:05:23+00:00"
+        },
+        {
+            "name": "npm-asset/moment",
+            "version": "2.20.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/moment/-/moment-2.20.1.tgz",
+                "reference": null,
+                "shasum": "d6eb1a46cbcc14a2b2f9434112c1ff8907f313fd"
+            },
+            "require-dev": {
+                "npm-asset/benchmark": "dev-default|*",
+                "npm-asset/coveralls": ">=2.11.2,<3.0.0",
+                "npm-asset/es6-promise": "dev-default|*",
+                "npm-asset/grunt": "~0.4",
+                "npm-asset/grunt-benchmark": "dev-default|*",
+                "npm-asset/grunt-cli": "dev-default|*",
+                "npm-asset/grunt-contrib-clean": "dev-default|*",
+                "npm-asset/grunt-contrib-concat": "dev-default|*",
+                "npm-asset/grunt-contrib-copy": "dev-default|*",
+                "npm-asset/grunt-contrib-jshint": "dev-default|*",
+                "npm-asset/grunt-contrib-uglify": "dev-default|*",
+                "npm-asset/grunt-contrib-watch": "dev-default|*",
+                "npm-asset/grunt-env": "dev-default|*",
+                "npm-asset/grunt-exec": "dev-default|*",
+                "npm-asset/grunt-jscs": "dev-default|*",
+                "npm-asset/grunt-karma": "dev-default|*",
+                "npm-asset/grunt-nuget": "dev-default|*",
+                "npm-asset/grunt-string-replace": "dev-default|*",
+                "npm-asset/karma": "dev-default|*",
+                "npm-asset/karma-chrome-launcher": "dev-default|*",
+                "npm-asset/karma-firefox-launcher": "dev-default|*",
+                "npm-asset/karma-qunit": "dev-default|*",
+                "npm-asset/karma-sauce-launcher": "dev-default|*",
+                "npm-asset/load-grunt-tasks": "dev-default|*",
+                "npm-asset/nyc": ">=2.1.4,<3.0.0",
+                "npm-asset/qunit": ">=0.7.5,<0.8.0",
+                "npm-asset/qunit-cli": ">=0.1.4,<0.2.0",
+                "npm-asset/rollup": "dev-default|*",
+                "npm-asset/spacejam": "dev-default|*",
+                "npm-asset/typescript": ">=1.8.10,<2.0.0",
+                "npm-asset/uglify-js": "dev-default|*"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/moment/moment/issues"
+                },
+                "npm-asset-main": "./moment.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/moment/moment.git"
+                },
+                "npm-asset-scripts": {
+                    "typescript-test": "tsc --project typing-tests",
+                    "test": "grunt test",
+                    "coverage": "nyc npm test && nyc report",
+                    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
+                },
+                "npm-asset-engines": {
+                    "node": "*"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Iskren Ivov Chernev",
+                    "email": "iskren.chernev@gmail.com",
+                    "url": "https://github.com/ichernev"
+                },
+                {
+                    "name": "Tim Wood",
+                    "email": "washwithcare@gmail.com",
+                    "url": "http://timwoodcreates.com/"
+                },
+                {
+                    "name": "Rocky Meza",
+                    "url": "http://rockymeza.com"
+                },
+                {
+                    "name": "Matt Johnson",
+                    "email": "mj1856@hotmail.com",
+                    "url": "http://codeofmatt.com"
+                },
+                {
+                    "name": "Isaac Cambron",
+                    "email": "isaac@isaaccambron.com",
+                    "url": "http://isaaccambron.com"
+                },
+                {
+                    "name": "Andre Polykanine",
+                    "email": "andre@oire.org",
+                    "url": "https://github.com/oire"
+                }
+            ],
+            "description": "Parse, validate, manipulate, and display dates",
+            "homepage": "http://momentjs.com",
+            "keywords": [
+                "date",
+                "ender",
+                "format",
+                "i18n",
+                "l10n",
+                "moment",
+                "parse",
+                "time",
+                "validate"
+            ],
+            "time": "2017-12-19T04:44:18+00:00"
+        },
+        {
+            "name": "npm-asset/php-date-formatter",
+            "version": "1.3.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/php-date-formatter/-/php-date-formatter-1.3.4.tgz",
+                "reference": null,
+                "shasum": "09a15ae0766ba0beb1900c27c1ec319ef2e4563e"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/kartik-v/php-date-formatter/issues"
+                },
+                "npm-asset-main": "js/php-date-formatter.js",
+                "npm-asset-directories": {
+                    "example": "examples"
+                },
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/kartik-v/php-date-formatter.git"
+                },
+                "npm-asset-scripts": []
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com"
+                }
+            ],
+            "description": "A Javascript datetime formatting and manipulation library using PHP date-time formats.",
+            "homepage": "https://github.com/kartik-v/php-date-formatter",
+            "time": "2016-02-18T15:15:55+00:00"
+        },
+        {
+            "name": "paragonie/certainty",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/certainty.git",
+                "reference": "a2d14f5b0b85c58329dee248d77d34e7e1202a32"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/certainty/zipball/a2d14f5b0b85c58329dee248d77d34e7e1202a32",
+                "reference": "a2d14f5b0b85c58329dee248d77d34e7e1202a32",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6",
+                "paragonie/constant_time_encoding": "^1|^2",
+                "paragonie/sodium_compat": "^1.6",
+                "php": "^5.6|^7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5|^6",
+                "vimeo/psalm": "^1"
+            },
+            "bin": [
+                "bin/certainty-cert-symlink"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ParagonIE\\Certainty\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "ISC"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com",
+                    "homepage": "https://paragonie.com"
+                }
+            ],
+            "description": "Up-to-date, verifiable repository for Certificate Authorities",
+            "keywords": [
+                "CA-Cert",
+                "Ed25519",
+                "Public-Key Infractructure",
+                "ca",
+                "ca-cert.pem",
+                "cacert",
+                "cacert.pem",
+                "certificate authority",
+                "pki",
+                "ssl",
+                "tls"
+            ],
+            "time": "2018-03-12T18:34:23+00:00"
+        },
+        {
+            "name": "paragonie/constant_time_encoding",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/constant_time_encoding.git",
+                "reference": "6111a38faf6fdebc14e36652d22036f379ba58d3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/6111a38faf6fdebc14e36652d22036f379ba58d3",
+                "reference": "6111a38faf6fdebc14e36652d22036f379ba58d3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3|^7"
+            },
+            "require-dev": {
+                "paragonie/random_compat": "^1|^2",
+                "phpunit/phpunit": "4.*|5.*",
+                "vimeo/psalm": "^1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ParagonIE\\ConstantTime\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com",
+                    "homepage": "https://paragonie.com",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Steve 'Sc00bz' Thomas",
+                    "email": "steve@tobtu.com",
+                    "homepage": "https://www.tobtu.com",
+                    "role": "Original Developer"
+                }
+            ],
+            "description": "Constant-time Implementations of RFC 4648 Encoding (Base-64, Base-32, Base-16)",
+            "keywords": [
+                "base16",
+                "base32",
+                "base32_decode",
+                "base32_encode",
+                "base64",
+                "base64_decode",
+                "base64_encode",
+                "bin2hex",
+                "encoding",
+                "hex",
+                "hex2bin",
+                "rfc4648"
+            ],
+            "time": "2018-03-10T19:46:06+00:00"
+        },
+        {
             "name": "paragonie/random_compat",
             "version": "v2.0.11",
             "source": {
@@ -500,6 +1463,88 @@
                 "random"
             ],
             "time": "2017-09-27T21:40:39+00:00"
+        },
+        {
+            "name": "paragonie/sodium_compat",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/sodium_compat.git",
+                "reference": "1f6e5682eff4a5a6a394b14331a1904f1740e432"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/1f6e5682eff4a5a6a394b14331a1904f1740e432",
+                "reference": "1f6e5682eff4a5a6a394b14331a1904f1740e432",
+                "shasum": ""
+            },
+            "require": {
+                "paragonie/random_compat": "^1|^2",
+                "php": "^5.2.4|^5.3|^5.4|^5.5|^5.6|^7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^3|^4|^5"
+            },
+            "suggest": {
+                "ext-libsodium": "PHP < 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security.",
+                "ext-sodium": "PHP >= 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security."
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "autoload.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "ISC"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com"
+                },
+                {
+                    "name": "Frank Denis",
+                    "email": "jedisct1@pureftpd.org"
+                }
+            ],
+            "description": "Pure PHP implementation of libsodium; uses the PHP extension if it exists",
+            "keywords": [
+                "Authentication",
+                "BLAKE2b",
+                "ChaCha20",
+                "ChaCha20-Poly1305",
+                "Chapoly",
+                "Curve25519",
+                "Ed25519",
+                "EdDSA",
+                "Edwards-curve Digital Signature Algorithm",
+                "Elliptic Curve Diffie-Hellman",
+                "Poly1305",
+                "Pure-PHP cryptography",
+                "RFC 7748",
+                "RFC 8032",
+                "Salpoly",
+                "Salsa20",
+                "X25519",
+                "XChaCha20-Poly1305",
+                "XSalsa20-Poly1305",
+                "Xchacha20",
+                "Xsalsa20",
+                "aead",
+                "cryptography",
+                "ecdh",
+                "elliptic curve",
+                "elliptic curve cryptography",
+                "encryption",
+                "libsodium",
+                "php",
+                "public-key cryptography",
+                "secret-key cryptography",
+                "side-channel resistant"
+            ],
+            "time": "2018-02-15T05:50:20+00:00"
         },
         {
             "name": "pear/console_getopt",
@@ -653,16 +1698,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Text_Highlighter.git",
-                "reference": "4178158d6fef4729bb08654fce8796a123ad0abd"
+                "reference": "2ccac2d9eaf55dc08bbbdb7136c93fb399d0f855"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Text_Highlighter/zipball/4178158d6fef4729bb08654fce8796a123ad0abd",
-                "reference": "4178158d6fef4729bb08654fce8796a123ad0abd",
+                "url": "https://api.github.com/repos/pear/Text_Highlighter/zipball/2ccac2d9eaf55dc08bbbdb7136c93fb399d0f855",
+                "reference": "2ccac2d9eaf55dc08bbbdb7136c93fb399d0f855",
                 "shasum": ""
             },
             "require": {
-                "pear/pear-core-minimal": "@stable",
+                "pear/pear-core-minimal": "~1.10.0",
                 "php": ">=5.4.0"
             },
             "require-dev": {
@@ -678,7 +1723,7 @@
                 "./"
             ],
             "license": [
-                "PHP License"
+                "PHP-3.01"
             ],
             "authors": [
                 {
@@ -697,7 +1742,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Text_Highlighter",
                 "source": "https://github.com/pear/Text_Highlighter"
             },
-            "time": "2017-03-07T21:20:30+00:00"
+            "time": "2018-01-27T08:24:15+00:00"
         },
         {
             "name": "pear/text_languagedetect",
@@ -742,6 +1787,190 @@
             "description": "Identify human languages from text samples",
             "homepage": "http://pear.php.net/package/Text_LanguageDetect",
             "time": "2017-03-02T16:14:08+00:00"
+        },
+        {
+            "name": "psr/cache",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/cache.git",
+                "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/cache/zipball/d11b50ad223250cf17b86e38383413f5a6764bf8",
+                "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Cache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for caching libraries",
+            "keywords": [
+                "cache",
+                "psr",
+                "psr-6"
+            ],
+            "time": "2016-08-06T20:24:11+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2016-08-06T14:39:51+00:00"
+        },
+        {
+            "name": "rapidwebltd/rw-file-cache",
+            "version": "v1.2.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rapidwebltd/RW-File-Cache.git",
+                "reference": "4a1d5aaefa6ffafec8e2d60787f12bcd9890977e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rapidwebltd/RW-File-Cache/zipball/4a1d5aaefa6ffafec8e2d60787f12bcd9890977e",
+                "reference": "4a1d5aaefa6ffafec8e2d60787f12bcd9890977e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "rapidweb\\RWFileCache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-only"
+            ],
+            "description": "RW File Cache is a PHP File-based Caching Library. Its syntax is designed to closely resemble the PHP memcache extension.",
+            "homepage": "https://github.com/rapidwebltd/RW-File-Cache",
+            "keywords": [
+                "cache",
+                "caching",
+                "caching library",
+                "file cache",
+                "library",
+                "php"
+            ],
+            "time": "2018-01-23T17:20:58+00:00"
+        },
+        {
+            "name": "rapidwebltd/rw-file-cache-psr-6",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rapidwebltd/RW-File-Cache-PSR-6.git",
+                "reference": "b74ea201d4c964f0e6db0fb036d1ab28a570df66"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rapidwebltd/RW-File-Cache-PSR-6/zipball/b74ea201d4c964f0e6db0fb036d1ab28a570df66",
+                "reference": "b74ea201d4c964f0e6db0fb036d1ab28a570df66",
+                "shasum": ""
+            },
+            "require": {
+                "psr/cache": "^1.0",
+                "rapidwebltd/rw-file-cache": "^1.2.3"
+            },
+            "require-dev": {
+                "cache/integration-tests": "^0.16.0",
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "rapidweb\\RWFileCachePSR6\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Jordan Hall",
+                    "email": "jordan.hall@rapidweb.biz"
+                }
+            ],
+            "description": "PSR-6 adapter for RW File Cache",
+            "time": "2018-01-30T19:13:45+00:00"
         },
         {
             "name": "smarty/smarty",
@@ -801,6 +2030,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "lightopenid/lightopenid": 20,
         "pear/text_highlighter": 20
     },
     "prefer-stable": false,

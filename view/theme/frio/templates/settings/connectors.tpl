@@ -20,6 +20,7 @@
 				<div id="content-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="content-settings">
 					<div class="section-content-wrapper">
 
+						{{include file="field_checkbox.tpl" field=$disable_cw}}
 						{{include file="field_checkbox.tpl" field=$no_intelligent_shortening}}
 						{{include file="field_checkbox.tpl" field=$ostatus_autofriend}}
 						{{$default_group}}
@@ -28,7 +29,7 @@
 						<p><a href="{{$repair_ostatus_url}}">{{$repair_ostatus_text}}</a></p>
 
 						<div class="form-group pull-right settings-submit-wrapper" >
-							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit|escape:'html'}}">{{$submit}}</button>
+							<button type="submit" id="general-submit" name="general-submit" class="btn btn-primary" value="{{$submit|escape:'html'}}">{{$submit}}</button>
 						</div>
 						<div class="clear"></div>
 					</div>

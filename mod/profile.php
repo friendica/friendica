@@ -2,18 +2,23 @@
 /**
  * @file mod/profile.php
  */
+
 use Friendica\App;
-use Friendica\Content\Widget;
 use Friendica\Content\Nav;
+use Friendica\Content\Widget;
+use Friendica\Core\ACL;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Group;
+use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
 use Friendica\Protocol\DFRN;
+use Friendica\Util\DateTimeFormat;
 
 function profile_init(App $a)
 {
@@ -29,7 +34,7 @@ function profile_init(App $a)
 			goaway(System::baseUrl() . '/profile/' . $r[0]['nickname']);
 		} else {
 			logger('profile error: mod_profile ' . $a->query_string, LOGGER_DEBUG);
-			notice(t('Requested profile is not available.') . EOL);
+			notice(L10n::t('Requested profile is not available.') . EOL);
 			$a->error = 404;
 			return;
 		}
@@ -70,9 +75,9 @@ function profile_init(App $a)
 	}
 
 	$a->page['htmlhead'] .= '<meta name="dfrn-global-visibility" content="' . ($a->profile['net-publish'] ? 'true' : 'false') . '" />' . "\r\n";
-	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/" title="' . t('%s\'s posts', $a->profile['username']) . '"/>' . "\r\n";
-	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/comments" title="' . t('%s\'s comments', $a->profile['username']) . '"/>' . "\r\n";
-	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/activity" title="' . t('%s\'s timeline', $a->profile['username']) . '"/>' . "\r\n";
+	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/" title="' . L10n::t('%s\'s posts', $a->profile['username']) . '"/>' . "\r\n";
+	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/comments" title="' . L10n::t('%s\'s comments', $a->profile['username']) . '"/>' . "\r\n";
+	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/activity" title="' . L10n::t('%s\'s timeline', $a->profile['username']) . '"/>' . "\r\n";
 	$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $a->get_hostname() . ($a->path ? '/' . $a->path : ''));
 	$a->page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . System::baseUrl() . '/xrd/?uri=' . $uri . '" />' . "\r\n";
 	header('Link: <' . System::baseUrl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
@@ -112,10 +117,8 @@ function profile_content(App $a, $update = 0)
 		return Login::form();
 	}
 
-	require_once 'include/bbcode.php';
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
-	require_once 'include/acl_selectors.php';
 	require_once 'include/items.php';
 
 	$groups = [];
@@ -167,7 +170,7 @@ function profile_content(App $a, $update = 0)
 	$last_updated_key = "profile:" . $a->profile['profile_uid'] . ":" . local_user() . ":" . remote_user();
 
 	if (x($a->profile, 'hidewall') && !$is_owner && !$remote_contact) {
-		notice(t('Access to this profile has been restricted.') . EOL);
+		notice(L10n::t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
 
@@ -188,7 +191,7 @@ function profile_content(App $a, $update = 0)
 		$o .= Widget::commonFriendsVisitor($a->profile['profile_uid']);
 
 		if (x($_SESSION, 'new_member') && $is_owner) {
-			$o .= '<a href="newmember" id="newmember-tips" style="font-size: 1.2em;"><b>' . t('Tips for New Members') . '</b></a>' . EOL;
+			$o .= '<a href="newmember" id="newmember-tips" style="font-size: 1.2em;"><b>' . L10n::t('Tips for New Members') . '</b></a>' . EOL;
 		}
 
 		$commpage = $a->profile['page-flags'] == PAGE_COMMUNITY;
@@ -196,7 +199,7 @@ function profile_content(App $a, $update = 0)
 
 		$a->page['aside'] .= posted_date_widget(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], $a->profile['profile_uid'], true);
 		$a->page['aside'] .= Widget::categories(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], (x($category) ? xmlify($category) : ''));
-		$a->page['aside'] .= tagcloud_wall_widget();
+		$a->page['aside'] .= Widget::tagCloud();
 
 		if (can_write_wall($a->profile['profile_uid'])) {
 			$x = [
@@ -210,7 +213,7 @@ function profile_content(App $a, $update = 0)
 						|| strlen($a->user['deny_cid'])
 						|| strlen($a->user['deny_gid'])
 					) ? 'lock' : 'unlock',
-				'acl' => $is_owner ? populate_acl($a->user, true) : '',
+				'acl' => $is_owner ? ACL::getFullSelectorHTML($a->user, true) : '',
 				'bang' => '',
 				'visitor' => $is_owner || $commvisitor ? 'block' : 'none',
 				'profile_uid' => $a->profile['profile_uid'],
@@ -233,7 +236,7 @@ function profile_content(App $a, $update = 0)
 		if ($is_owner || !$last_updated) {
 			$sql_extra4 = " AND `item`.`unseen`";
 		} else {
-			$gmupdate = gmdate("Y-m-d H:i:s", $last_updated);
+			$gmupdate = gmdate(DateTimeFormat::MYSQL, $last_updated);
 			$sql_extra4 = " AND `item`.`received` > '" . $gmupdate . "'";
 		}
 
@@ -269,10 +272,10 @@ function profile_content(App $a, $update = 0)
 		}
 
 		if ($datequery) {
-			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` <= '%s' ", dbesc(datetime_convert(date_default_timezone_get(), '', $datequery))));
+			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` <= '%s' ", dbesc(DateTimeFormat::convert($datequery, 'UTC', date_default_timezone_get()))));
 		}
 		if ($datequery2) {
-			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` >= '%s' ", dbesc(datetime_convert(date_default_timezone_get(), '', $datequery2))));
+			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` >= '%s' ", dbesc(DateTimeFormat::convert($datequery2, 'UTC', date_default_timezone_get()))));
 		}
 
 		// Belongs the profile page to a forum?
@@ -349,14 +352,14 @@ function profile_content(App $a, $update = 0)
 
 	if ($is_owner && !$update && !Config::get('theme', 'hide_eventlist')) {
 		$o .= Profile::getBirthdays();
-		$o .= Profile::getEvents();
+		$o .= Profile::getEventsReminderHTML();
 	}
 
 
 	if ($is_owner) {
 		$unseen = dba::exists('item', ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 		if ($unseen) {
-			$r = dba::update('item', ['unseen' => false],
+			$r = Item::update(['unseen' => false],
 					['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 		}
 	}

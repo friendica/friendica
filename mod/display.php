@@ -2,8 +2,14 @@
 /**
  * @file mod/display.php
  */
+
 use Friendica\App;
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\HTML;
+use Friendica\Core\ACL;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
@@ -63,7 +69,7 @@ function display_init(App $a)
 
 		if (!DBM::is_result($r)) {
 			$a->error = 404;
-			notice(t('Item not found.') . EOL);
+			notice(L10n::t('Item not found.') . EOL);
 			return;
 		}
 	} elseif (($a->argc == 3) && ($nick == 'feed-item')) {
@@ -170,7 +176,7 @@ function display_fetchauthor($a, $item) {
 			$profiledata["photo"] = $matches[1];
 		}
 		$profiledata["nickname"] = $profiledata["name"];
-		$profiledata["network"] = GetProfileUsername($profiledata["url"], "", false, true);
+		$profiledata["network"] = Protocol::matchByProfileUrl($profiledata["url"]);
 
 		$profiledata["address"] = "";
 		$profiledata["about"] = "";
@@ -194,20 +200,23 @@ function display_fetchauthor($a, $item) {
 
 function display_content(App $a, $update = false, $update_uid = 0) {
 	if (Config::get('system','block_public') && !local_user() && !remote_user()) {
-		notice(t('Public access denied.') . EOL);
+		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
 
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
-	require_once 'include/acl_selectors.php';
 
 	$o = '';
 
 	if ($update) {
 		$item_id = $_REQUEST['item_id'];
 		$item = dba::selectFirst('item', ['uid', 'parent'], ['id' => $item_id]);
-		$a->profile = ['uid' => intval($item['uid']), 'profile_uid' => intval($item['uid'])];
+		if ($item['uid'] != 0) {
+			$a->profile = ['uid' => intval($item['uid']), 'profile_uid' => intval($item['uid'])];
+		} else {
+			$a->profile = ['uid' => intval($update_uid), 'profile_uid' => intval($update_uid)];
+		}
 		$item_parent = $item['parent'];
 	} else {
 		$item_id = (($a->argc > 2) ? $a->argv[2] : 0);
@@ -240,7 +249,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 
 	if (!$item_id) {
 		$a->error = 404;
-		notice(t('Item not found.').EOL);
+		notice(L10n::t('Item not found.').EOL);
 		return;
 	}
 
@@ -301,7 +310,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	$is_owner = (local_user() && (in_array($a->profile['profile_uid'], [local_user(), 0])) ? true : false);
 
 	if (x($a->profile, 'hidewall') && !$is_owner && !$remote_contact) {
-		notice(t('Access to this profile has been restricted.') . EOL);
+		notice(L10n::t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
 
@@ -313,7 +322,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
 			'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-			'acl' => populate_acl($a->user, true),
+			'acl' => ACL::getFullSelectorHTML($a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -342,7 +351,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	);
 
 	if (!DBM::is_result($r)) {
-		notice(t('Item not found.') . EOL);
+		notice(L10n::t('Item not found.') . EOL);
 		return $o;
 	}
 
@@ -363,10 +372,8 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	$o .= conversation($a, $items, 'display', $update_uid);
 
 	// Preparing the meta header
-	require_once 'include/bbcode.php';
-	require_once 'include/html2plain.php';
-	$description = trim(html2plain(bbcode($s[0]["body"], false, false), 0, true));
-	$title = trim(html2plain(bbcode($s[0]["title"], false, false), 0, true));
+	$description = trim(HTML::toPlaintext(BBCode::convert($s[0]["body"], false), 0, true));
+	$title = trim(HTML::toPlaintext(BBCode::convert($s[0]["title"], false), 0, true));
 	$author_name = $s[0]["author-name"];
 
 	$image = $a->remove_baseurl($s[0]["author-thumb"]);
@@ -422,7 +429,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 function displayShowFeed($item_id, $conversation) {
 	$xml = DFRN::itemFeed($item_id, $conversation);
 	if ($xml == '') {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 	header("Content-type: application/atom+xml");
 	echo $xml;

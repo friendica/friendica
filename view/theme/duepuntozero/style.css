@@ -726,6 +726,9 @@ input#dfrn-url {
 	height:175px;
 	padding: 12px;
 }
+#profile-photo-wrapper.crop-preview img {
+	padding: 0;
+}
 
 #profile-edit-profile-name-label,
 #profile-edit-name-label,

@@ -1,11 +1,16 @@
 <?php
+/**
+ * @file mod/bookmarklet.php
+ */
 
 use Friendica\App;
+use Friendica\Core\ACL;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Module\Login;
 
-require_once('include/conversation.php');
-require_once('include/items.php');
+require_once 'include/conversation.php';
+require_once 'include/items.php';
 
 function bookmarklet_init()
 {
@@ -15,7 +20,7 @@ function bookmarklet_init()
 function bookmarklet_content(App $a)
 {
 	if (!local_user()) {
-		$o = '<h2>' . t('Login') . '</h2>';
+		$o = '<h2>' . L10n::t('Login') . '</h2>';
 		$o .= Login::form($a->query_string, $a->config['register_policy'] == REGISTER_CLOSED ? false : true);
 		return $o;
 	}
@@ -32,8 +37,8 @@ function bookmarklet_content(App $a)
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
 			'lockstate' => ((is_array($a->user) && ((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) || (strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid'])))) ? 'lock' : 'unlock'),
-			'default_perms' => get_acl_permissions($a->user),
-			'acl' => populate_acl($a->user, true),
+			'default_perms' => ACL::getDefaultUserPermissions($a->user),
+			'acl' => ACL::getFullSelectorHTML($a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -43,7 +48,7 @@ function bookmarklet_content(App $a)
 		$o = status_editor($a, $x, 0, false);
 		$o .= "<script>window.resizeTo(800,550);</script>";
 	} else {
-		$o = '<h2>' . t('The post was created') . '</h2>';
+		$o = '<h2>' . L10n::t('The post was created') . '</h2>';
 		$o .= "<script>window.close()</script>";
 	}
 

@@ -14,23 +14,23 @@
  * All of these become an "item" which is our basic unit of
  * information.
  */
+
 use Friendica\App;
+use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
-use Friendica\Model\GContact;
 use Friendica\Model\Item;
-use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Emailer;
 
 require_once 'include/enotify.php';
-require_once 'include/tags.php';
-require_once 'include/threads.php';
 require_once 'include/text.php';
 require_once 'include/items.php';
 
@@ -111,7 +111,7 @@ function item_post(App $a) {
 		}
 
 		if (!DBM::is_result($parent_item)) {
-			notice(t('Unable to locate original post.') . EOL);
+			notice(L10n::t('Unable to locate original post.') . EOL);
 			if (x($_REQUEST, 'return')) {
 				goaway($return_path);
 			}
@@ -157,7 +157,7 @@ function item_post(App $a) {
 
 	// Now check that valid personal details have been provided
 	if (!can_write_wall($profile_uid) && !$allow_comment) {
-		notice(t('Permission denied.') . EOL) ;
+		notice(L10n::t('Permission denied.') . EOL) ;
 		if (x($_REQUEST, 'return')) {
 			goaway($return_path);
 		}
@@ -229,7 +229,7 @@ function item_post(App $a) {
 		$verb              = notags(trim($_REQUEST['verb']));
 		$emailcc           = notags(trim($_REQUEST['emailcc']));
 		$body              = escape_tags(trim($_REQUEST['body']));
-		$network           = notags(trim($_REQUEST['network']));
+		$network           = notags(trim(defaults($_REQUEST, 'network', NETWORK_DFRN)));
 		$guid              = get_guid(32);
 
 		$postopts = defaults($_REQUEST, 'postopts', '');
@@ -271,7 +271,7 @@ function item_post(App $a) {
 			if ($preview) {
 				killme();
 			}
-			info(t('Empty post discarded.') . EOL);
+			info(L10n::t('Empty post discarded.') . EOL);
 			if (x($_REQUEST, 'return')) {
 				goaway($return_path);
 			}
@@ -468,7 +468,7 @@ function item_post(App $a) {
 
 				$fields = ['allow_cid' => $str_contact_allow, 'allow_gid' => $str_group_allow,
 						'deny_cid' => $str_contact_deny, 'deny_gid' => $str_group_deny];
-				$condition = ['resource-id' => $image_uri, 'uid' => $profile_uid, 'album' => t('Wall Photos')];
+				$condition = ['resource-id' => $image_uri, 'uid' => $profile_uid, 'album' => L10n::t('Wall Photos')];
 				dba::update('photo', $fields, $condition);
 			}
 		}
@@ -505,7 +505,7 @@ function item_post(App $a) {
 	// embedded bookmark or attachment in post? set bookmark flag
 
 	$bookmark = 0;
-	$data = get_attachment_data($body);
+	$data = BBCode::getAttachmentData($body);
 	if (preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $body, $match, PREG_SET_ORDER) || isset($data["type"])) {
 		$objecttype = ACTIVITY_OBJ_BOOKMARK;
 		$bookmark = 1;
@@ -517,13 +517,12 @@ function item_post(App $a) {
 	// Fold multi-line [code] sequences
 	$body = preg_replace('/\[\/code\]\s*\[code\]/ism', "\n", $body);
 
-	$body = scale_external_images($body, false);
+	$body = BBCode::scaleExternalImages($body, false);
 
 	// Setting the object type if not defined before
 	if (!$objecttype) {
 		$objecttype = ACTIVITY_OBJ_NOTE; // Default value
-		require_once 'include/plaintext.php';
-		$objectdata = get_attached_data($body);
+		$objectdata = BBCode::getAttachedData($body);
 
 		if ($objectdata["type"] == "link") {
 			$objecttype = ACTIVITY_OBJ_BOOKMARK;
@@ -594,16 +593,16 @@ function item_post(App $a) {
 	$datarray['owner-name']    = $contact_record['name'];
 	$datarray['owner-link']    = $contact_record['url'];
 	$datarray['owner-avatar']  = $contact_record['thumb'];
-	$datarray['owner-id']      = Contact::getIdForURL($datarray['owner-link'], 0);
+	$datarray['owner-id']      = Contact::getIdForURL($datarray['owner-link']);
 	$datarray['author-name']   = $author['name'];
 	$datarray['author-link']   = $author['url'];
 	$datarray['author-avatar'] = $author['thumb'];
-	$datarray['author-id']     = Contact::getIdForURL($datarray['author-link'], 0);
-	$datarray['created']       = datetime_convert();
-	$datarray['edited']        = datetime_convert();
-	$datarray['commented']     = datetime_convert();
-	$datarray['received']      = datetime_convert();
-	$datarray['changed']       = datetime_convert();
+	$datarray['author-id']     = Contact::getIdForURL($datarray['author-link']);
+	$datarray['created']       = DateTimeFormat::utcNow();
+	$datarray['edited']        = DateTimeFormat::utcNow();
+	$datarray['commented']     = DateTimeFormat::utcNow();
+	$datarray['received']      = DateTimeFormat::utcNow();
+	$datarray['changed']       = DateTimeFormat::utcNow();
 	$datarray['extid']         = $extid;
 	$datarray['guid']          = $guid;
 	$datarray['uri']           = $uri;
@@ -632,8 +631,6 @@ function item_post(App $a) {
 	$datarray['postopts']      = $postopts;
 	$datarray['origin']        = $origin;
 	$datarray['moderated']     = false;
-	$datarray['gcontact-id']   = GContact::getId(["url" => $datarray['author-link'], "network" => $datarray['network'],
-							"photo" => $datarray['author-avatar'], "name" => $datarray['author-name']]);
 	$datarray['object']        = $object;
 
 	/*
@@ -707,8 +704,8 @@ function item_post(App $a) {
 			'file' => $datarray['file'],
 			'rendered-html' => $datarray['rendered-html'],
 			'rendered-hash' => $datarray['rendered-hash'],
-			'edited' => datetime_convert(),
-			'changed' => datetime_convert()];
+			'edited' => DateTimeFormat::utcNow(),
+			'changed' => DateTimeFormat::utcNow()];
 
 		Item::update($fields, ['id' => $post_id]);
 
@@ -728,7 +725,7 @@ function item_post(App $a) {
 	unset($datarray['self']);
 	unset($datarray['api_source']);
 
-	$post_id = item_store($datarray);
+	$post_id = Item::insert($datarray);
 
 	if (!$post_id) {
 		logger("Item wasn't stored.");
@@ -799,19 +796,18 @@ function item_post(App $a) {
 				if (!strlen($addr)) {
 					continue;
 				}
-				$disclaimer = '<hr />' . sprintf(t('This message was sent to you by %s, a member of the Friendica social network.'), $a->user['username'])
+				$disclaimer = '<hr />' . L10n::t('This message was sent to you by %s, a member of the Friendica social network.', $a->user['username'])
 					. '<br />';
-				$disclaimer .= sprintf(t('You may visit them online at %s'), System::baseUrl() . '/profile/' . $a->user['nickname']) . EOL;
-				$disclaimer .= t('Please contact the sender by replying to this post if you do not wish to receive these messages.') . EOL;
+				$disclaimer .= L10n::t('You may visit them online at %s', System::baseUrl() . '/profile/' . $a->user['nickname']) . EOL;
+				$disclaimer .= L10n::t('Please contact the sender by replying to this post if you do not wish to receive these messages.') . EOL;
 				if (!$datarray['title']=='') {
 					$subject = Email::encodeHeader($datarray['title'], 'UTF-8');
 				} else {
-					$subject = Email::encodeHeader('[Friendica]' . ' ' . sprintf(t('%s posted an update.'), $a->user['username']), 'UTF-8');
+					$subject = Email::encodeHeader('[Friendica]' . ' ' . L10n::t('%s posted an update.', $a->user['username']), 'UTF-8');
 				}
 				$link = '<a href="' . System::baseUrl() . '/profile/' . $a->user['nickname'] . '"><img src="' . $author['thumb'] . '" alt="' . $a->user['username'] . '" /></a><br /><br />';
 				$html    = prepare_body($datarray);
 				$message = '<html><body>' . $link . $html . $disclaimer . '</body></html>';
-				include_once 'include/html2plain.php';
 				$params =  [
 					'fromName' => $a->user['username'],
 					'fromEmail' => $a->user['email'],
@@ -819,7 +815,7 @@ function item_post(App $a) {
 					'replyTo' => $a->user['email'],
 					'messageSubject' => $subject,
 					'htmlVersion' => $message,
-					'textVersion' => html2plain($html.$disclaimer)
+					'textVersion' => Friendica\Content\Text\HTML::toPlaintext($html.$disclaimer)
 				];
 				Emailer::send($params);
 			}
@@ -876,7 +872,7 @@ function item_content(App $a) {
 	$o = '';
 	if (($a->argc == 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
 		if (is_ajax()) {
-			$o = Item::delete($a->argv[2]);
+			$o = Item::deleteById($a->argv[2]);
 		} else {
 			$o = drop_item($a->argv[2]);
 		}
@@ -1045,5 +1041,5 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 		}
 	}
 
-	return ['replaced' => $replaced, 'contact' => $r[0]];
+	return ['replaced' => $replaced, 'contact' => $contact];
 }

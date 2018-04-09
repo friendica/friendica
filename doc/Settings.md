@@ -57,6 +57,21 @@ The `vier` theme for instance is mobile friendly.
 
 ### Registration
 
+#### Register policy
+
+With this drop down selector you can set the nodes registration policy.
+You can chose between the following modes:
+
+* **open**: Everybody can register a new account and start using it right away.
+* **requires approval**: Everybody can register a new account, but the admin has to approve it before it can be used.
+* **closed**: No new registrations are possible.
+
+##### Invitation based registry
+
+Additionally to the setting in the admin panel, you can devide if registrations are only possible using an invitation code or not.
+To enable invitation based registration, you have to set the `invitation_only` setting in the [.htconfig.php](/help/htconfig) file.
+If you want to use this method, the registration policy has to be set to either *open* or *requires approval*.
+
 #### Check Full Names
 
 You may find a lot of spammers trying to register on your site.
@@ -110,6 +125,14 @@ Note: this is specifically for sites that desire to be "standalone" and do not w
 Unauthorised persons will also not be able to request friendship with site members.
 Default is false.
 Available in version 2.2 or greater.
+
+#### Community pages for Visitors
+
+The community pages show all public postings, separated by their origin being local or the entire network.
+With this setting you can select which community pages will be shown to visitors of your Friendica node.
+Your local users will always have access to both pages.
+
+**Note**: Several settings, like users hiding their contacts from the public will prevent the postings to show up on the global community page.
 
 #### Allowed Friend Domains
 

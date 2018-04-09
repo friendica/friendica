@@ -15,6 +15,11 @@ General
 * f: notifications
 * u: user menu (in themes "vier" and "quattro")
 
+/community
+--------
+* l: Local community
+* g: Global community
+
 /profile
 --------
 * m: Status Messages and Posts

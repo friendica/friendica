@@ -1,14 +1,15 @@
 <?php
-
+/**
+ * @file mod/starred.php
+ */
 use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Model\Item;
 
 function starred_init(App $a) {
-
-	require_once("include/threads.php");
-
 	$starred = 0;
+	$message_id = null;
 
 	if (! local_user()) {
 		killme();
@@ -32,13 +33,7 @@ function starred_init(App $a) {
 		$starred = 1;
 	}
 
-	$r = q("UPDATE `item` SET `starred` = %d WHERE `uid` = %d AND `id` = %d",
-		intval($starred),
-		intval(local_user()),
-		intval($message_id)
-	);
-
-	update_thread($message_id);
+	Item::update(['starred' => $starred], ['id' => $message_id]);
 
 	// See if we've been passed a return path to redirect to
 	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');

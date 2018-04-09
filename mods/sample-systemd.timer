@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Friendica Poller every n minutes
+
+[Timer]
+OnBootSec=120
+OnUnitActiveSec=120
+
+[Install]
+WantedBy=timers.target

@@ -2,20 +2,23 @@
 /**
  * @file include/ping.php
  */
+
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
+use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache;
-use Friendica\Core\System;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Temporal;
 use Friendica\Util\XML;
 
-require_once 'include/datetime.php';
-require_once 'include/bbcode.php';
 require_once 'mod/proxy.php';
 require_once 'include/enotify.php';
 
@@ -222,8 +225,8 @@ function ping_init(App $a)
 				WHERE `event`.`uid` = %d AND `start` < '%s' AND `finish` > '%s' and `ignore` = 0
 				ORDER BY `start` ASC ",
 				intval(local_user()),
-				dbesc(datetime_convert('UTC', 'UTC', 'now + 7 days')),
-				dbesc(datetime_convert('UTC', 'UTC', 'now'))
+				dbesc(DateTimeFormat::utc('now + 7 days')),
+				dbesc(DateTimeFormat::utcNow())
 			);
 			if (DBM::is_result($ev)) {
 				Cache::set($cachekey, $ev, CACHE_HOUR);
@@ -234,7 +237,7 @@ function ping_init(App $a)
 			$all_events = count($ev);
 
 			if ($all_events) {
-				$str_now = datetime_convert('UTC', $a->timezone, 'now', 'Y-m-d');
+				$str_now = DateTimeFormat::timezoneNow($a->timezone, 'Y-m-d');
 				foreach ($ev as $x) {
 					$bd = false;
 					if ($x['type'] === 'birthday') {
@@ -243,7 +246,7 @@ function ping_init(App $a)
 					} else {
 						$events ++;
 					}
-					if (datetime_convert('UTC', ((intval($x['adjust'])) ? $a->timezone : 'UTC'), $x['start'], 'Y-m-d') === $str_now) {
+					if (DateTimeFormat::convert($x['start'], ((intval($x['adjust'])) ? $a->timezone : 'UTC'), 'UTC', 'Y-m-d') === $str_now) {
 						$all_events_today ++;
 						if ($bd) {
 							$birthdays_today ++;
@@ -286,7 +289,7 @@ function ping_init(App $a)
 					'photo'   => $intro['photo'],
 					'date'    => $intro['datetime'],
 					'seen'    => false,
-					'message' => t('{0} wants to be your friend'),
+					'message' => L10n::t('{0} wants to be your friend'),
 				];
 				$notifs[] = $notif;
 			}
@@ -301,7 +304,7 @@ function ping_init(App $a)
 					'photo'   => $mail['from-photo'],
 					'date'    => $mail['created'],
 					'seen'    => false,
-					'message' => t('{0} sent you a message'),
+					'message' => L10n::t('{0} sent you a message'),
 				];
 				$notifs[] = $notif;
 			}
@@ -316,7 +319,7 @@ function ping_init(App $a)
 					'photo'   => $reg['micro'],
 					'date'    => $reg['created'],
 					'seen'    => false,
-					'message' => t('{0} requested registration'),
+					'message' => L10n::t('{0} requested registration'),
 				];
 				$notifs[] = $notif;
 			}
@@ -359,7 +362,7 @@ function ping_init(App $a)
 					$notif['photo'] = proxy_url($notif['photo'], false, PROXY_SIZE_MICRO);
 				}
 
-				$local_time = datetime_convert('UTC', date_default_timezone_get(), $notif['date']);
+				$local_time = DateTimeFormat::local($notif['date']);
 
 				$notifications[] = [
 					'id'        => $notif['id'],
@@ -367,7 +370,7 @@ function ping_init(App $a)
 					'name'      => $notif['name'],
 					'url'       => $notif['url'],
 					'photo'     => $notif['photo'],
-					'date'      => relative_date($notif['date']),
+					'date'      => Temporal::getRelativeDate($notif['date']),
 					'message'   => $notif['message'],
 					'seen'      => $notif['seen'],
 					'timestamp' => strtotime($local_time)
@@ -478,8 +481,8 @@ function ping_get_notifications($uid)
 				$notification["name"] = $notification["name_cache"];
 				$notification["message"] = $notification["msg_cache"];
 			} else {
-				$notification["name"] = strip_tags(bbcode($notification["name"]));
-				$notification["message"] = format_notification_message($notification["name"], strip_tags(bbcode($notification["msg"])));
+				$notification["name"] = strip_tags(BBCode::convert($notification["name"]));
+				$notification["message"] = format_notification_message($notification["name"], strip_tags(BBCode::convert($notification["msg"])));
 
 				q(
 					"UPDATE `notify` SET `name_cache` = '%s', `msg_cache` = '%s' WHERE `id` = %d",
@@ -568,8 +571,8 @@ function ping_format_xml_data($data, $sysnotify, $notifs, $sysmsgs, $sysmsgs_inf
 	$forums = [];
 	if (count($forums_unseen)) {
 		foreach ($forums_unseen as $key => $item) {
-			$forums[$count . ':forum'] = $item['count'];
-			$forums[$count . ':@attributes'] = ['id' => $item['id']];
+			$forums[$key . ':forum'] = $item['count'];
+			$forums[$key . ':@attributes'] = ['id' => $item['id']];
 		}
 		$data['forums'] = $forums;
 	}

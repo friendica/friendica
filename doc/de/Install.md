@@ -24,8 +24,9 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
     - Apache mit einer aktiverten mod-rewrite-Funktion und dem Eintrag "Options All", so dass du die lokale .htaccess-Datei nutzen kannst
     - PHP  5.6+. Je neuer, desto besser.
         - PHP *Kommandozeilen*-Zugang mit register_argc_argv auf "true" gesetzt in der php.ini-Datei
-        - Curl, GD, PDO, MySQLi, xml und OpenSSL-Erweiterung
+        - Curl, GD, PDO, MySQLi, xml, zip und OpenSSL-Erweiterung
         - etwas in der Art eines Email-Servers oder eines Gateways wie PHP mail()
+        - Das POSIX Modul muss aktiviert sein ([CentOS, RHEL](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) haben dies z.B. deaktiviert)
     - Mysql 5.5.3+
     - die Möglichkeit, wiederkehrende Aufgaben mit cron (Linux/Mac) oder "Scheduled Tasks" einzustellen (Windows) [Beachte: andere Optionen sind in Abschnitt 7 dieser Dokumentation zu finden]
     - Installation in einer Top-Level-Domain oder Subdomain (ohne eine Verzeichnis/Pfad-Komponente in der URL) wird bevorzugt. Verzeichnispfade sind für diesen Zweck nicht so günstig und wurden auch nicht ausführlich getestet.
@@ -49,7 +50,7 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
 
         `cd meinewebseite`
         `git pull`
-        `util/composer.phar install`
+        `bin/composer.phar install`
 
     - Addons installieren
         - zunächst solltest du **in** deinem Webseitenordner sein
@@ -86,13 +87,13 @@ Wenn du irgendwelche **kritischen** Fehler zu diesen Zeitpunkt erhalten solltest
 
 7. Erstelle einen Cron job oder einen regelmäßigen Task, um den Poller alle 5-10 Minuten im Hintergrund ablaufen zu lassen. Beispiel:
 
-    `cd /base/directory; /path/to/php scripts/worker.php`
+    `cd /base/directory; /path/to/php bin/worker.php`
 
 Ändere "/base/directory" und "/path/to/php" auf deine Systemvorgaben.
 
 Wenn du einen Linux-Server nutzt, benutze den Befehl "crontab -e" und ergänze eine Zeile wie die Folgende; angepasst an dein System
 
-`*/10 * * * * cd /home/myname/mywebsite; /usr/bin/php scripts/worker.php`
+`*/10 * * * * cd /home/myname/mywebsite; /usr/bin/php bin/worker.php`
 
 Du kannst den PHP-Pfad finden, indem du den Befehl „which php“ ausführst.
 Wenn du Schwierigkeiten mit diesem Schritt hast, kannst du deinen Hosting-Anbieter kontaktieren.

@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
@@ -24,15 +25,17 @@ function profperm_init(App $a)
 function profperm_content(App $a) {
 
 	if (! local_user()) {
-		notice( t('Permission denied') . EOL);
+		notice(L10n::t('Permission denied') . EOL);
 		return;
 	}
 
 
 	if($a->argc < 2) {
-		notice( t('Invalid profile identifier.') . EOL );
+		notice(L10n::t('Invalid profile identifier.') . EOL );
 		return;
 	}
+
+	$o = '';
 
 	// Switch to text mod interface if we have more than 'n' contacts or group members
 
@@ -59,7 +62,7 @@ function profperm_content(App $a) {
 			intval(local_user())
 		);
 		if (! DBM::is_result($r)) {
-			notice( t('Invalid profile identifier.') . EOL );
+			notice(L10n::t('Invalid profile identifier.') . EOL );
 			return;
 		}
 		$profile = $r[0];
@@ -105,11 +108,11 @@ function profperm_content(App $a) {
 					$ingroup[] = $member['id'];
 		}
 
-		$o .= '<h2>' . t('Profile Visibility Editor') . '</h2>';
+		$o .= '<h2>' . L10n::t('Profile Visibility Editor') . '</h2>';
 
-		$o .= '<h3>' . t('Profile') . ' \'' . $profile['profile-name'] . '\'</h3>';
+		$o .= '<h3>' . L10n::t('Profile') . ' \'' . $profile['profile-name'] . '\'</h3>';
 
-		$o .= '<div id="prof-edit-desc">' . t('Click on a contact to add or remove.') . '</div>';
+		$o .= '<div id="prof-edit-desc">' . L10n::t('Click on a contact to add or remove.') . '</div>';
 
 	}
 
@@ -118,7 +121,7 @@ function profperm_content(App $a) {
 		$o = '';
 
 	$o .= '<div id="prof-members-title">';
-	$o .= '<h3>' . t('Visible To') . '</h3>';
+	$o .= '<h3>' . L10n::t('Visible To') . '</h3>';
 	$o .= '</div>';
 	$o .= '<div id="prof-members">';
 
@@ -134,7 +137,7 @@ function profperm_content(App $a) {
 	$o .= '<hr id="prof-separator" />';
 
 	$o .= '<div id="prof-all-contcts-title">';
-	$o .= '<h3>' . t("All Contacts \x28with secure profile access\x29") . '</h3>';
+	$o .= '<h3>' . L10n::t("All Contacts \x28with secure profile access\x29") . '</h3>';
 	$o .= '</div>';
 	$o .= '<div id="prof-all-contacts">';
 
@@ -164,4 +167,3 @@ function profperm_content(App $a) {
 	return $o;
 
 }
-

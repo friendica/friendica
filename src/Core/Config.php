@@ -8,26 +8,33 @@
  */
 namespace Friendica\Core;
 
-use Friendica\Database\DBM;
-use dba;
+use Friendica\BaseObject;
+use Friendica\Core\Config;
 
 require_once 'include/dba.php';
 
 /**
- * @brief Arbitrary sytem configuration storage
+ * @brief Arbitrary system configuration storage
  *
  * Note:
  * If we ever would decide to return exactly the variable type as entered,
  * we will have fun with the additional features. :-)
- *
- * The config class always returns strings but in the default features
- * we use a "false" to determine if the config value isn't set.
- *
  */
-class Config
+class Config extends BaseObject
 {
-	private static $cache;
-	private static $in_db;
+	/**
+	 * @var Friendica\Core\Config\IConfigAdapter
+	 */
+	private static $adapter = null;
+
+	public static function init()
+	{
+		if (self::getApp()->getConfigValue('system', 'config_adapter') == 'preload') {
+			self::$adapter = new Config\PreloadConfigAdapter();
+		} else {
+			self::$adapter = new Config\JITConfigAdapter();
+		}
+	}
 
 	/**
 	 * @brief Loads all configuration values of family into a cached storage.
@@ -41,26 +48,11 @@ class Config
 	 */
 	public static function load($family = "config")
 	{
-		// We don't preload "system" anymore.
-		// This reduces the number of database reads a lot.
-		if ($family === 'system') {
-			return;
+		if (empty(self::$adapter)) {
+			self::init();
 		}
 
-		$a = get_app();
-
-		$r = dba::select('config', ['v', 'k'], ['cat' => $family]);
-		while ($rr = dba::fetch($r)) {
-			$k = $rr['k'];
-			if ($family === 'config') {
-				$a->config[$k] = $rr['v'];
-			} else {
-				$a->config[$family][$k] = $rr['v'];
-				self::$cache[$family][$k] = $rr['v'];
-				self::$in_db[$family][$k] = true;
-			}
-		}
-		dba::close($r);
+		self::$adapter->load($family);
 	}
 
 	/**
@@ -84,40 +76,11 @@ class Config
 	 */
 	public static function get($family, $key, $default_value = null, $refresh = false)
 	{
-		$a = get_app();
-
-		if (!$refresh) {
-			// Do we have the cached value? Then return it
-			if (isset(self::$cache[$family][$key])) {
-				if (self::$cache[$family][$key] === '!<unset>!') {
-					return $default_value;
-				} else {
-					return self::$cache[$family][$key];
-				}
-			}
+		if (empty(self::$adapter)) {
+			self::init();
 		}
 
-		$config = dba::selectFirst('config', ['v'], ['cat' => $family, 'k' => $key]);
-		if (DBM::is_result($config)) {
-			// manage array value
-			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $config['v']) ? unserialize($config['v']) : $config['v']);
-
-			// Assign the value from the database to the cache
-			self::$cache[$family][$key] = $val;
-			self::$in_db[$family][$key] = true;
-			return $val;
-		} elseif (isset($a->config[$family][$key])) {
-			// Assign the value (mostly) from the .htconfig.php to the cache
-			self::$cache[$family][$key] = $a->config[$family][$key];
-			self::$in_db[$family][$key] = false;
-
-			return $a->config[$family][$key];
-		}
-
-		self::$cache[$family][$key] = '!<unset>!';
-		self::$in_db[$family][$key] = false;
-
-		return $default_value;
+		return self::$adapter->get($family, $key, $default_value, $refresh);
 	}
 
 	/**
@@ -136,38 +99,11 @@ class Config
 	 */
 	public static function set($family, $key, $value)
 	{
-		$a = get_app();
-
-		// We store our setting values in a string variable.
-		// So we have to do the conversion here so that the compare below works.
-		// The exception are array values.
-		$dbvalue = (!is_array($value) ? (string)$value : $value);
-
-		$stored = self::get($family, $key, null, true);
-
-		if (($stored === $dbvalue) && self::$in_db[$family][$key]) {
-			return true;
+		if (empty(self::$adapter)) {
+			self::init();
 		}
 
-		if ($family === 'config') {
-			$a->config[$key] = $dbvalue;
-		} elseif ($family != 'system') {
-			$a->config[$family][$key] = $dbvalue;
-		}
-
-		// Assign the just added value to the cache
-		self::$cache[$family][$key] = $dbvalue;
-
-		// manage array value
-		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
-
-		$ret = dba::update('config', ['v' => $dbvalue], ['cat' => $family, 'k' => $key], true);
-
-		if ($ret) {
-			self::$in_db[$family][$key] = true;
-			return $value;
-		}
-		return $ret;
+		return self::$adapter->set($family, $key, $value);
 	}
 
 	/**
@@ -183,13 +119,10 @@ class Config
 	 */
 	public static function delete($family, $key)
 	{
-		if (isset(self::$cache[$family][$key])) {
-			unset(self::$cache[$family][$key]);
-			unset(self::$in_db[$family][$key]);
+		if (empty(self::$adapter)) {
+			self::init();
 		}
 
-		$ret = dba::delete('config', ['cat' => $family, 'k' => $key]);
-
-		return $ret;
+		return self::$adapter->delete($family, $key);
 	}
 }

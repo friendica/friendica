@@ -8,10 +8,14 @@ use Friendica\BaseObject;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Core\Addon;
+use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Temporal;
 use dba;
 
 require_once 'include/dba.php';
@@ -84,8 +88,7 @@ class Post extends BaseObject
 				}
 
 				// You can always comment on Diaspora and OStatus items
-				// The empty network can happen with your local (self) contact
-				if (in_array($item['network'], ['', NETWORK_OSTATUS, NETWORK_DIASPORA]) && (local_user() == $item['uid'])) {
+				if (in_array($item['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA]) && (local_user() == $item['uid'])) {
 					$item['writable'] = true;
 				}
 
@@ -122,9 +125,9 @@ class Post extends BaseObject
 		// only if the difference is more than 1 second.
 		if (strtotime($item['edited']) - strtotime($item['created']) > 1) {
 			$edited = [
-				'label'    => t('This entry was edited'),
-				'date'     => datetime_convert('UTC', date_default_timezone_get(), $item['edited'], 'r'),
-				'relative' => relative_date($item['edited'])
+				'label'    => L10n::t('This entry was edited'),
+				'date'     => DateTimeFormat::local($item['edited'], 'r'),
+				'relative' => Temporal::getRelativeDate($item['edited'])
 			];
 		}
 		$commentww = '';
@@ -143,15 +146,15 @@ class Post extends BaseObject
 
 		$lock = ((($item['private'] == 1) || (($item['uid'] == local_user()) && (strlen($item['allow_cid']) || strlen($item['allow_gid'])
 			|| strlen($item['deny_cid']) || strlen($item['deny_gid']))))
-			? t('Private Message')
+			? L10n::t('Private Message')
 			: false);
 		$shareable = in_array($conv->getProfileOwner(), [0, local_user()]) && $item['private'] != 1;
 
 		if (local_user() && link_compare($a->contact['url'], $item['author-link'])) {
 			if ($item["event-id"] != 0) {
-				$edpost = ["events/event/" . $item['event-id'], t("Edit")];
+				$edpost = ["events/event/" . $item['event-id'], L10n::t("Edit")];
 			} else {
-				$edpost = ["editpost/" . $item['id'], t("Edit")];
+				$edpost = ["editpost/" . $item['id'], L10n::t("Edit")];
 			}
 			$dropping = in_array($item['uid'], [0, local_user()]);
 		} else {
@@ -172,11 +175,11 @@ class Post extends BaseObject
 		$drop = [
 			'dropping' => $dropping,
 			'pagedrop' => ((Feature::isEnabled($conv->getProfileOwner(), 'multi_delete')) ? $item['pagedrop'] : ''),
-			'select'   => t('Select'),
-			'delete'   => t('Delete'),
+			'select'   => L10n::t('Select'),
+			'delete'   => L10n::t('Delete'),
 		];
 
-		$filer = (($conv->getProfileOwner() == local_user() && ($item['uid'] != 0)) ? t("save to folder") : false);
+		$filer = (($conv->getProfileOwner() == local_user() && ($item['uid'] != 0)) ? L10n::t("save to folder") : false);
 
 		$diff_author = !link_compare($item['url'], $item['author-link']);
 		$profile_name = htmlentities(((strlen($item['author-name'])) && $diff_author) ? $item['author-name'] : $item['name']);
@@ -229,7 +232,7 @@ class Post extends BaseObject
 			$response_verbs[] = 'attendmaybe';
 			if ($conv->isWritable()) {
 				$isevent = true;
-				$attend = [t('I will attend'), t('I will not attend'), t('I might attend')];
+				$attend = [L10n::t('I will attend'), L10n::t('I will not attend'), L10n::t('I might attend')];
 			}
 		}
 
@@ -257,29 +260,29 @@ class Post extends BaseObject
 				$isstarred = (($item['starred']) ? "starred" : "unstarred");
 
 				$star = [
-					'do'        => t("add star"),
-					'undo'      => t("remove star"),
-					'toggle'    => t("toggle star status"),
+					'do'        => L10n::t("add star"),
+					'undo'      => L10n::t("remove star"),
+					'toggle'    => L10n::t("toggle star status"),
 					'classdo'   => $item['starred'] ? "hidden" : "",
 					'classundo' => $item['starred'] ? "" : "hidden",
-					'starred'   => t('starred'),
+					'starred'   => L10n::t('starred'),
 				];
 
 				$thread = dba::selectFirst('thread', ['ignored'], ['uid' => $item['uid'], 'iid' => $item['id']]);
 				if (DBM::is_result($thread)) {
 					$ignore = [
-						'do'        => t("ignore thread"),
-						'undo'      => t("unignore thread"),
-						'toggle'    => t("toggle ignore status"),
+						'do'        => L10n::t("ignore thread"),
+						'undo'      => L10n::t("unignore thread"),
+						'toggle'    => L10n::t("toggle ignore status"),
 						'classdo'   => $thread['ignored'] ? "hidden" : "",
 						'classundo' => $thread['ignored'] ? "" : "hidden",
-						'ignored'   => t('ignored'),
+						'ignored'   => L10n::t('ignored'),
 					];
 				}
 
 				if (Feature::isEnabled($conv->getProfileOwner(), 'commtag')) {
 					$tagger = [
-						'add'   => t("add tag"),
+						'add'   => L10n::t("add tag"),
 						'class' => "",
 					];
 				}
@@ -290,23 +293,17 @@ class Post extends BaseObject
 
 		if ($conv->isWritable()) {
 			$buttons = [
-				'like'    => [t("I like this \x28toggle\x29"), t("like")],
-				'dislike' => Feature::isEnabled($conv->getProfileOwner(), 'dislike') ? [t("I don't like this \x28toggle\x29"), t("dislike")] : '',
+				'like'    => [L10n::t("I like this \x28toggle\x29"), L10n::t("like")],
+				'dislike' => Feature::isEnabled($conv->getProfileOwner(), 'dislike') ? [L10n::t("I don't like this \x28toggle\x29"), L10n::t("dislike")] : '',
 			];
 			if ($shareable) {
-				$buttons['share'] = [t('Share this'), t('share')];
-			}
-
-			// If a contact isn't writable, we cannot send a like or dislike to it
-			if (!$item['writable']) {
-				unset($buttons["like"]);
-				unset($buttons["dislike"]);
+				$buttons['share'] = [L10n::t('Share this'), L10n::t('share')];
 			}
 		}
 
 		$comment = $this->getCommentBox($indent);
 
-		if (strcmp(datetime_convert('UTC', 'UTC', $item['created']), datetime_convert('UTC', 'UTC', 'now - 12 hours')) > 0) {
+		if (strcmp(DateTimeFormat::utc($item['created']), DateTimeFormat::utc('now - 12 hours')) > 0) {
 			$shiny = 'shiny';
 		}
 
@@ -319,7 +316,13 @@ class Post extends BaseObject
 		$body_e       = $body;
 		$text_e       = strip_tags($body);
 		$name_e       = $profile_name;
-		$title_e      = $item['title'];
+
+		if (!empty($item['content-warning']) && PConfig::get(local_user(), 'system', 'disable_cw', false)) {
+			$title_e = ucfirst($item['content-warning']);
+		} else {
+			$title_e = $item['title'];
+		}
+
 		$location_e   = $location;
 		$owner_name_e = $this->getOwnerName();
 
@@ -341,11 +344,12 @@ class Post extends BaseObject
 		$tmp_item = [
 			'template'        => $this->getTemplate(),
 			'type'            => implode("", array_slice(explode("/", $item['verb']), -1)),
+			'suppress_tags'   => Config::get('system', 'suppress_tags'),
 			'tags'            => $item['tags'],
 			'hashtags'        => $item['hashtags'],
 			'mentions'        => $item['mentions'],
-			'txt_cats'        => t('Categories:'),
-			'txt_folders'     => t('Filed under:'),
+			'txt_cats'        => L10n::t('Categories:'),
+			'txt_folders'     => L10n::t('Filed under:'),
 			'has_cats'        => ((count($categories)) ? 'true' : ''),
 			'has_folders'     => ((count($folders)) ? 'true' : ''),
 			'categories'      => $categories,
@@ -356,12 +360,12 @@ class Post extends BaseObject
 			'guid'            => urlencode($item['guid']),
 			'isevent'         => $isevent,
 			'attend'          => $attend,
-			'linktitle'       => t('View %s\'s profile @ %s', $profile_name, defaults($item, 'author-link', $item['url'])),
-			'olinktitle'      => t('View %s\'s profile @ %s', htmlentities($this->getOwnerName()), defaults($item, 'owner-link', $item['url'])),
-			'to'              => t('to'),
-			'via'             => t('via'),
-			'wall'            => t('Wall-to-Wall'),
-			'vwall'           => t('via Wall-To-Wall:'),
+			'linktitle'       => L10n::t('View %s\'s profile @ %s', $profile_name, defaults($item, 'author-link', $item['url'])),
+			'olinktitle'      => L10n::t('View %s\'s profile @ %s', htmlentities($this->getOwnerName()), defaults($item, 'owner-link', $item['url'])),
+			'to'              => L10n::t('to'),
+			'via'             => L10n::t('via'),
+			'wall'            => L10n::t('Wall-to-Wall'),
+			'vwall'           => L10n::t('via Wall-To-Wall:'),
 			'profile_url'     => $profile_link,
 			'item_photo_menu' => item_photo_menu($item),
 			'name'            => $name_e,
@@ -369,10 +373,10 @@ class Post extends BaseObject
 			'osparkle'        => $osparkle,
 			'sparkle'         => $sparkle,
 			'title'           => $title_e,
-			'localtime'       => datetime_convert('UTC', date_default_timezone_get(), $item['created'], 'r'),
-			'ago'             => $item['app'] ? t('%s from %s', relative_date($item['created']), $item['app']) : relative_date($item['created']),
+			'localtime'       => DateTimeFormat::local($item['created'], 'r'),
+			'ago'             => $item['app'] ? L10n::t('%s from %s', Temporal::getRelativeDate($item['created']), $item['app']) : Temporal::getRelativeDate($item['created']),
 			'app'             => $item['app'],
-			'created'         => relative_date($item['created']),
+			'created'         => Temporal::getRelativeDate($item['created']),
 			'lock'            => $lock,
 			'location'        => $location_e,
 			'indent'          => $indent,
@@ -392,10 +396,10 @@ class Post extends BaseObject
 			'like'            => $responses['like']['output'],
 			'dislike'         => $responses['dislike']['output'],
 			'responses'       => $responses,
-			'switchcomment'   => t('Comment'),
+			'switchcomment'   => L10n::t('Comment'),
 			'comment'         => $comment,
 			'previewing'      => $conv->isPreview() ? ' preview ' : '',
-			'wait'            => t('Please wait'),
+			'wait'            => L10n::t('Please wait'),
 			'thread_level'    => $thread_level,
 			'edited'          => $edited,
 			'network'         => $item["item_network"],
@@ -420,10 +424,10 @@ class Post extends BaseObject
 			// Collapse
 			if (($nb_children > 2) || ($thread_level > 1)) {
 				$result['children'][0]['comment_firstcollapsed'] = true;
-				$result['children'][0]['num_comments'] = tt('%d comment', '%d comments', $total_children);
+				$result['children'][0]['num_comments'] = L10n::tt('%d comment', '%d comments', $total_children);
 				$result['children'][0]['hidden_comments_num'] = $total_children;
-				$result['children'][0]['hidden_comments_text'] = tt('comment', 'comments', $total_children);
-				$result['children'][0]['hide_text'] = t('show more');
+				$result['children'][0]['hidden_comments_text'] = L10n::tt('comment', 'comments', $total_children);
+				$result['children'][0]['hide_text'] = L10n::t('show more');
 				if ($thread_level > 1) {
 					$result['children'][$nb_children - 1]['comment_lastcollapsed'] = true;
 				} else {
@@ -434,7 +438,7 @@ class Post extends BaseObject
 
 		if ($this->isToplevel()) {
 			$result['total_comments_num'] = "$total_children";
-			$result['total_comments_text'] = tt('comment', 'comments', $total_children);
+			$result['total_comments_text'] = L10n::tt('comment', 'comments', $total_children);
 		}
 
 		$result['private'] = $item['private'];
@@ -786,21 +790,21 @@ class Post extends BaseObject
 				'$qcomment'    => $qcomment,
 				'$profile_uid' => $uid,
 				'$mylink'      => $a->remove_baseurl($a->contact['url']),
-				'$mytitle'     => t('This is you'),
+				'$mytitle'     => L10n::t('This is you'),
 				'$myphoto'     => $a->remove_baseurl($a->contact['thumb']),
-				'$comment'     => t('Comment'),
-				'$submit'      => t('Submit'),
-				'$edbold'      => t('Bold'),
-				'$editalic'    => t('Italic'),
-				'$eduline'     => t('Underline'),
-				'$edquote'     => t('Quote'),
-				'$edcode'      => t('Code'),
-				'$edimg'       => t('Image'),
-				'$edurl'       => t('Link'),
-				'$edvideo'     => t('Video'),
-				'$preview'     => ((Feature::isEnabled($conv->getProfileOwner(), 'preview')) ? t('Preview') : ''),
+				'$comment'     => L10n::t('Comment'),
+				'$submit'      => L10n::t('Submit'),
+				'$edbold'      => L10n::t('Bold'),
+				'$editalic'    => L10n::t('Italic'),
+				'$eduline'     => L10n::t('Underline'),
+				'$edquote'     => L10n::t('Quote'),
+				'$edcode'      => L10n::t('Code'),
+				'$edimg'       => L10n::t('Image'),
+				'$edurl'       => L10n::t('Link'),
+				'$edvideo'     => L10n::t('Video'),
+				'$preview'     => ((Feature::isEnabled($conv->getProfileOwner(), 'preview')) ? L10n::t('Preview') : ''),
 				'$indent'      => $indent,
-				'$sourceapp'   => t($a->sourcename),
+				'$sourceapp'   => L10n::t($a->sourcename),
 				'$ww'          => $conv->getMode() === 'network' ? $ww : '',
 				'$rand_num'    => random_digits(12)
 			]);

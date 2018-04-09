@@ -6,15 +6,17 @@
  * Author: Rabuzarus <https://friendica.kommune4.de/profile/rabuzarus>
  *
  */
+
 use Friendica\App;
+use Friendica\Content\Text\Plaintext;
 use Friendica\Content\Widget;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
-use Friendica\Object\Image;
 
 $frio = "view/theme/frio";
 
@@ -89,10 +91,8 @@ function frio_uninstall()
  */
 function frio_item_photo_links(App $a, &$body_info)
 {
-	$phototypes = Image::supportedTypes();
-	$occurence = 1;
-	$p = bb_find_open_close($body_info['html'], "<a", ">");
-
+	$occurence = 0;
+	$p = Plaintext::getBoundariesPosition($body_info['html'], "<a", ">");
 	while ($p !== false && ($occurence++ < 500)) {
 		$link = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
 		$matches = [];
@@ -111,7 +111,7 @@ function frio_item_photo_links(App $a, &$body_info)
 			$body_info['html'] = str_replace($link, $newlink, $body_info['html']);
 		}
 
-		$p = bb_find_open_close($body_info['html'], "<a", ">", $occurence);
+		$p = Plaintext::getBoundariesPosition($body_info['html'], "<a", ">", $occurence);
 	}
 }
 
@@ -217,6 +217,7 @@ function frio_remote_nav($a, &$nav)
 	// And construct a webbie (e.g. mickey@friendica.domain.com for the search in gcontact
 	// We use the webbie for search in gcontact because we don't know if gcontact table stores
 	// the right value if its http or https protocol
+	$webbie = '';
 	if (count($url_parts)) {
 		$server_url = $url_parts[1] . $url_parts[2];
 		$webbie = $url_parts[4] . '@' . $url_parts[2];
@@ -234,12 +235,12 @@ function frio_remote_nav($a, &$nav)
 		$r[0]['name'] = $a->user['username'];
 	} elseif (!local_user() && remote_user()) {
 		$r = q("SELECT `name`, `nick`, `micro` AS `photo` FROM `contact` WHERE `id` = %d", intval(remote_user()));
-		$nav['remote'] = t("Guest");
+		$nav['remote'] = L10n::t("Guest");
 	} elseif (Profile::getMyURL()) {
 		$r = q("SELECT `name`, `nick`, `photo` FROM `gcontact`
 				WHERE `addr` = '%s' AND `network` = 'dfrn'",
 			dbesc($webbie));
-		$nav['remote'] = t("Visitor");
+		$nav['remote'] = L10n::t("Visitor");
 	} else {
 		$r = false;
 	}
@@ -252,21 +253,21 @@ function frio_remote_nav($a, &$nav)
 	}
 
 	if (!local_user() && !empty($server_url)) {
-		$nav['logout'] = [$server_url . '/logout', t('Logout'), "", t('End this session')];
+		$nav['logout'] = [$server_url . '/logout', L10n::t('Logout'), "", L10n::t('End this session')];
 
 		// user menu
-		$nav['usermenu'][] = [$server_url . '/profile/' . $a->user['nickname'], t('Status'), "", t('Your posts and conversations')];
-		$nav['usermenu'][] = [$server_url . '/profile/' . $a->user['nickname'] . '?tab=profile', t('Profile'), "", t('Your profile page')];
-		$nav['usermenu'][] = [$server_url . '/photos/' . $a->user['nickname'], t('Photos'), "", t('Your photos')];
-		$nav['usermenu'][] = [$server_url . '/videos/' . $a->user['nickname'], t('Videos'), "", t('Your videos')];
-		$nav['usermenu'][] = [$server_url . '/events/', t('Events'), "", t('Your events')];
+		$nav['usermenu'][] = [$server_url . '/profile/' . $a->user['nickname'], L10n::t('Status'), "", L10n::t('Your posts and conversations')];
+		$nav['usermenu'][] = [$server_url . '/profile/' . $a->user['nickname'] . '?tab=profile', L10n::t('Profile'), "", L10n::t('Your profile page')];
+		$nav['usermenu'][] = [$server_url . '/photos/' . $a->user['nickname'], L10n::t('Photos'), "", L10n::t('Your photos')];
+		$nav['usermenu'][] = [$server_url . '/videos/' . $a->user['nickname'], L10n::t('Videos'), "", L10n::t('Your videos')];
+		$nav['usermenu'][] = [$server_url . '/events/', L10n::t('Events'), "", L10n::t('Your events')];
 
 		// navbar links
-		$nav['network'] = [$server_url . '/network', t('Network'), "", t('Conversations from your friends')];
-		$nav['events'] = [$server_url . '/events', t('Events'), "", t('Events and Calendar')];
-		$nav['messages'] = [$server_url . '/message', t('Messages'), "", t('Private mail')];
-		$nav['settings'] = [$server_url . '/settings', t('Settings'), "", t('Account settings')];
-		$nav['contacts'] = [$server_url . '/contacts', t('Contacts'), "", t('Manage/edit friends and contacts')];
+		$nav['network'] = [$server_url . '/network', L10n::t('Network'), "", L10n::t('Conversations from your friends')];
+		$nav['events'] = [$server_url . '/events', L10n::t('Events'), "", L10n::t('Events and Calendar')];
+		$nav['messages'] = [$server_url . '/message', L10n::t('Messages'), "", L10n::t('Private mail')];
+		$nav['settings'] = [$server_url . '/settings', L10n::t('Settings'), "", L10n::t('Account settings')];
+		$nav['contacts'] = [$server_url . '/contacts', L10n::t('Contacts'), "", L10n::t('Manage/edit friends and contacts')];
 		$nav['sitename'] = $a->config['sitename'];
 	}
 }
@@ -296,14 +297,9 @@ function frio_acl_lookup(App $a, &$results)
 		return;
 	}
 
-	$searching = false;
+	$sql_extra = '';
 	if ($results["search"]) {
 		$search_txt = dbesc(protect_sprintf(preg_quote($results["search"])));
-		$searching = true;
-	}
-	
-	$sql_extra = '';
-	if ($searching) {
 		$sql_extra .= " AND (`attag` LIKE '%%" . dbesc($search_txt) . "%%' OR `name` LIKE '%%" . dbesc($search_txt) . "%%' OR `nick` LIKE '%%" . dbesc($search_txt) . "%%') ";
 	}
 
@@ -311,6 +307,7 @@ function frio_acl_lookup(App $a, &$results)
 		$sql_extra .= sprintf(" AND network = '%s' ", dbesc($nets));
 	}
 
+	$total = 0;
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 		WHERE `uid` = %d AND NOT `self` AND NOT `pending` $sql_extra ", intval($_SESSION['uid']));
 	if (DBM::is_result($r)) {
@@ -352,7 +349,7 @@ function frio_display_item(App $a, &$arr)
 	if (local_user() == $arr['item']['uid'] && $arr['item']['parent'] == $arr['item']['id'] && !$arr['item']['self']) {
 		$subthread = [
 			'menu'   => 'follow_thread',
-			'title'  => t('Follow Thread'),
+			'title'  => L10n::t('Follow Thread'),
 			'action' => 'dosubthread(' . $arr['item']['id'] . '); return false;',
 			'href'   => '#'
 		];

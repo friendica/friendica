@@ -3,18 +3,21 @@
  * @file mod/events.php
  * @brief The events module
  */
+
 use Friendica\App;
 use Friendica\Content\Nav;
-use Friendica\Core\Config;
+use Friendica\Content\Widget\CalendarExport;
+use Friendica\Core\ACL;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Model\Profile;
+use Friendica\Model\Event;
 use Friendica\Model\Item;
+use Friendica\Model\Profile;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Temporal;
 
-require_once 'include/bbcode.php';
-require_once 'include/datetime.php';
-require_once 'include/event.php';
 require_once 'include/items.php';
 
 function events_init(App $a) {
@@ -22,21 +25,21 @@ function events_init(App $a) {
 		return;
 	}
 
-	if ($a->argc > 1) {
-		// If it's a json request abort here because we don't
-		// need the widget data
-		if ($a->argv[1] === 'json') {
-			return;
-		}
-
-		$cal_widget = widget_events();
-
-		if (! x($a->page,'aside')) {
-			$a->page['aside'] = '';
-		}
-
-		$a->page['aside'] .= $cal_widget;
+	// If it's a json request abort here because we don't
+	// need the widget data
+	if ($a->argc > 1 && $a->argv[1] === 'json') {
+		return;
 	}
+
+	if (empty($a->page['aside'])) {
+		$a->page['aside'] = '';
+	}
+
+	$a->data['user'] = $_SESSION['user'];
+
+	$cal_widget = CalendarExport::getHTML();
+
+	$a->page['aside'] .= $cal_widget;
 
 	return;
 }
@@ -74,14 +77,14 @@ function events_post(App $a) {
 	}
 
 	if ($adjust) {
-		$start = datetime_convert(date_default_timezone_get(), 'UTC', $start);
+		$start = DateTimeFormat::convert($start, 'UTC', date_default_timezone_get());
 		if (! $nofinish) {
-			$finish = datetime_convert(date_default_timezone_get(), 'UTC', $finish);
+			$finish = DateTimeFormat::convert($finish, 'UTC', date_default_timezone_get());
 		}
 	} else {
-		$start = datetime_convert('UTC', 'UTC', $start);
+		$start = DateTimeFormat::utc($start);
 		if (! $nofinish) {
-			$finish = datetime_convert('UTC', 'UTC', $finish);
+			$finish = DateTimeFormat::utc($finish);
 		}
 	}
 
@@ -99,18 +102,18 @@ function events_post(App $a) {
 	$onerror_url = System::baseUrl() . "/events/" . $action . "?summary=$summary&description=$desc&location=$location&start=$start_text&finish=$finish_text&adjust=$adjust&nofinish=$nofinish";
 
 	if (strcmp($finish, $start) < 0 && !$nofinish) {
-		notice(t('Event can not end before it has started.') . EOL);
+		notice(L10n::t('Event can not end before it has started.') . EOL);
 		if (intval($_REQUEST['preview'])) {
-			echo t('Event can not end before it has started.');
+			echo L10n::t('Event can not end before it has started.');
 			killme();
 		}
 		goaway($onerror_url);
 	}
 
 	if ((! $summary) || ($start === NULL_DATE)) {
-		notice(t('Event title and start time are required.') . EOL);
+		notice(L10n::t('Event title and start time are required.') . EOL);
 		if (intval($_REQUEST['preview'])) {
-			echo t('Event title and start time are required.');
+			echo L10n::t('Event title and start time are required.');
 			killme();
 		}
 		goaway($onerror_url);
@@ -153,7 +156,6 @@ function events_post(App $a) {
 
 
 	$datarray = [];
-	$datarray['guid']      = get_guid(32);
 	$datarray['start']     = $start;
 	$datarray['finish']    = $finish;
 	$datarray['summary']   = $summary;
@@ -168,18 +170,16 @@ function events_post(App $a) {
 	$datarray['allow_gid'] = $str_group_allow;
 	$datarray['deny_cid']  = $str_contact_deny;
 	$datarray['deny_gid']  = $str_group_deny;
-	$datarray['private']   = (($private_event) ? 1 : 0);
+	$datarray['private']   = $private_event;
 	$datarray['id']        = $event_id;
-	$datarray['created']   = $created;
-	$datarray['edited']    = $edited;
 
 	if (intval($_REQUEST['preview'])) {
-		$html = format_event_html($datarray);
+		$html = Event::getHTML($datarray);
 		echo $html;
 		killme();
 	}
 
-	$item_id = event_store($datarray);
+	$item_id = Event::store($datarray);
 
 	if (! $cid) {
 		Worker::add(PRIORITY_HIGH, "Notifier", "event", $item_id);
@@ -191,7 +191,7 @@ function events_post(App $a) {
 function events_content(App $a) {
 
 	if (! local_user()) {
-		notice(t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -220,7 +220,7 @@ function events_content(App $a) {
 	}
 
 	// get the translation strings for the callendar
-	$i18n = get_event_strings();
+	$i18n = Event::getStrings();
 
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl, [
@@ -274,8 +274,8 @@ function events_content(App $a) {
 	// The view mode part is similiar to /mod/cal.php
 	if ($mode == 'view') {
 
-		$thisyear  = datetime_convert('UTC', date_default_timezone_get(), 'now', 'Y');
-		$thismonth = datetime_convert('UTC', date_default_timezone_get(), 'now', 'm');
+		$thisyear  = DateTimeFormat::localNow('Y');
+		$thismonth = DateTimeFormat::localNow('m');
 		if (! $y) {
 			$y = intval($thisyear);
 		}
@@ -308,7 +308,7 @@ function events_content(App $a) {
 			$prevyear --;
 		}
 
-		$dim    = get_dim($y, $m);
+		$dim    = Temporal::getDaysInMonth($y, $m);
 		$start  = sprintf('%d-%d-%d %d:%d:%d', $y, $m, 1, 0, 0, 0);
 		$finish = sprintf('%d-%d-%d %d:%d:%d', $y, $m, $dim, 23, 59, 59);
 
@@ -321,35 +321,35 @@ function events_content(App $a) {
 			}
 		}
 
-		$start  = datetime_convert('UTC', 'UTC', $start);
-		$finish = datetime_convert('UTC', 'UTC', $finish);
+		$start  = DateTimeFormat::utc($start);
+		$finish = DateTimeFormat::utc($finish);
 
-		$adjust_start  = datetime_convert('UTC', date_default_timezone_get(), $start);
-		$adjust_finish = datetime_convert('UTC', date_default_timezone_get(), $finish);
+		$adjust_start  = DateTimeFormat::local($start);
+		$adjust_finish = DateTimeFormat::local($finish);
 
 		// put the event parametes in an array so we can better transmit them
 		$event_params = [
-			'event_id'      => (x($_GET, 'id') ? $_GET['id'] : 0),
+			'event_id'      => intval(defaults($_GET, 'id', 0)),
 			'start'         => $start,
 			'finish'        => $finish,
 			'adjust_start'  => $adjust_start,
 			'adjust_finish' => $adjust_finish,
-			'ignored'       => $ignored,
+			'ignore'        => $ignored,
 		];
 
 		// get events by id or by date
-		if (x($_GET, 'id')) {
-			$r = event_by_id(local_user(), $event_params);
+		if ($event_params['event_id']) {
+			$r = Event::getListById(local_user(), $event_params['event_id']);
 		} else {
-			$r = events_by_date(local_user(), $event_params);
+			$r = Event::getListByDate(local_user(), $event_params);
 		}
 
 		$links = [];
 
 		if (DBM::is_result($r)) {
-			$r = sort_by_date($r);
+			$r = Event::sortByDate($r);
 			foreach ($r as $rr) {
-				$j = (($rr['adjust']) ? datetime_convert('UTC', date_default_timezone_get(), $rr['start'], 'j') : datetime_convert('UTC', 'UTC', $rr['start'], 'j'));
+				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (! x($links,$j)) {
 					$links[$j] = System::baseUrl() . '/' . $a->cmd . '#link-' . $j;
 				}
@@ -360,8 +360,8 @@ function events_content(App $a) {
 
 		// transform the event in a usable array
 		if (DBM::is_result($r)) {
-			$r = sort_by_date($r);
-			$events = process_events($r);
+			$r = Event::sortByDate($r);
+			$events = Event::prepareListForTemplate($r);
 		}
 
 		if ($a->argc > 1 && $a->argv[1] === 'json'){
@@ -370,7 +370,7 @@ function events_content(App $a) {
 		}
 
 		if (x($_GET, 'id')) {
-			$tpl =  get_markup_template("event.tpl");
+			$tpl = get_markup_template("event.tpl");
 		} else {
 			$tpl = get_markup_template("events_js.tpl");
 		}
@@ -388,20 +388,20 @@ function events_content(App $a) {
 		$o = replace_macros($tpl, [
 			'$baseurl'   => System::baseUrl(),
 			'$tabs'      => $tabs,
-			'$title'     => t('Events'),
-			'$view'      => t('View'),
-			'$new_event' => [System::baseUrl() . '/events/new', t('Create New Event'), '', ''],
-			'$previous'  => [System::baseUrl() . '/events/$prevyear/$prevmonth', t('Previous'), '', ''],
-			'$next'      => [System::baseUrl() . '/events/$nextyear/$nextmonth', t('Next'), '', ''],
-			'$calendar'  => cal($y, $m, $links, ' eventcal'),
+			'$title'     => L10n::t('Events'),
+			'$view'      => L10n::t('View'),
+			'$new_event' => [System::baseUrl() . '/events/new', L10n::t('Create New Event'), '', ''],
+			'$previous'  => [System::baseUrl() . '/events/$prevyear/$prevmonth', L10n::t('Previous'), '', ''],
+			'$next'      => [System::baseUrl() . '/events/$nextyear/$nextmonth', L10n::t('Next'), '', ''],
+			'$calendar'  => Temporal::getCalendarTable($y, $m, $links, ' eventcal'),
 
 			'$events'    => $events,
 
-			'$today' => t('today'),
-			'$month' => t('month'),
-			'$week'  => t('week'),
-			'$day'   => t('day'),
-			'$list'  => t('list'),
+			'$today' => L10n::t('today'),
+			'$month' => L10n::t('month'),
+			'$week'  => L10n::t('week'),
+			'$day'   => L10n::t('day'),
+			'$list'  => L10n::t('list'),
 		]);
 
 		if (x($_GET, 'id')) {
@@ -463,26 +463,24 @@ function events_content(App $a) {
 			$tz = (($orig_event['adjust']) ? date_default_timezone_get() : 'UTC');
 		}
 
-		$syear  = datetime_convert('UTC', $tz, $sdt, 'Y');
-		$smonth = datetime_convert('UTC', $tz, $sdt, 'm');
-		$sday   = datetime_convert('UTC', $tz, $sdt, 'd');
+		$syear  = DateTimeFormat::convert($sdt, $tz, 'UTC', 'Y');
+		$smonth = DateTimeFormat::convert($sdt, $tz, 'UTC', 'm');
+		$sday   = DateTimeFormat::convert($sdt, $tz, 'UTC', 'd');
 
-		$shour   = ((x($orig_event)) ? datetime_convert('UTC', $tz, $sdt, 'H') : 0);
-		$sminute = ((x($orig_event)) ? datetime_convert('UTC', $tz, $sdt, 'i') : 0);
+		$shour   = ((x($orig_event)) ? DateTimeFormat::convert($sdt, $tz, 'UTC', 'H') : '00');
+		$sminute = ((x($orig_event)) ? DateTimeFormat::convert($sdt, $tz, 'UTC', 'i') : '00');
 
-		$fyear  = datetime_convert('UTC', $tz, $fdt, 'Y');
-		$fmonth = datetime_convert('UTC', $tz, $fdt, 'm');
-		$fday   = datetime_convert('UTC', $tz, $fdt, 'd');
+		$fyear  = DateTimeFormat::convert($fdt, $tz, 'UTC', 'Y');
+		$fmonth = DateTimeFormat::convert($fdt, $tz, 'UTC', 'm');
+		$fday   = DateTimeFormat::convert($fdt, $tz, 'UTC', 'd');
 
-		$fhour   = ((x($orig_event)) ? datetime_convert('UTC', $tz, $fdt, 'H') : 0);
-		$fminute = ((x($orig_event)) ? datetime_convert('UTC', $tz, $fdt, 'i') : 0);
+		$fhour   = ((x($orig_event)) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'H') : '00');
+		$fminute = ((x($orig_event)) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'i') : '00');
 
-		require_once 'include/acl_selectors.php' ;
-
-		$perms = get_acl_permissions($orig_event);
+		$perms = ACL::getDefaultUserPermissions($orig_event);
 
 		if ($mode === 'new' || $mode === 'copy') {
-			$acl = (($cid) ? '' : populate_acl(((x($orig_event)) ? $orig_event : $a->user)));
+			$acl = (($cid) ? '' : ACL::getFullSelectorHTML(((x($orig_event)) ? $orig_event : $a->user)));
 		}
 
 		// If we copy an old event, we need to remove the ID and URI
@@ -505,34 +503,34 @@ function events_content(App $a) {
 			'$deny_cid'  => json_encode($perms['deny_cid']),
 			'$deny_gid'  => json_encode($perms['deny_gid']),
 
-			'$title' => t('Event details'),
-			'$desc' => t('Starting date and Title are required.'),
-			'$s_text' => t('Event Starts:') . ' <span class="required" title="' . t('Required') . '">*</span>',
-			'$s_dsel' => datetimesel(new DateTime(), DateTime::createFromFormat('Y', $syear+5), DateTime::createFromFormat('Y-m-d H:i', "$syear-$smonth-$sday $shour:$sminute"), t('Event Starts:'), 'start_text', true, true, '', '', true),
-			'$n_text' => t('Finish date/time is not known or not relevant'),
+			'$title' => L10n::t('Event details'),
+			'$desc' => L10n::t('Starting date and Title are required.'),
+			'$s_text' => L10n::t('Event Starts:') . ' <span class="required" title="' . L10n::t('Required') . '">*</span>',
+			'$s_dsel' => Temporal::getDateTimeField(new DateTime(), DateTime::createFromFormat('Y', $syear+5), DateTime::createFromFormat('Y-m-d H:i', "$syear-$smonth-$sday $shour:$sminute"), L10n::t('Event Starts:'), 'start_text', true, true, '', '', true),
+			'$n_text' => L10n::t('Finish date/time is not known or not relevant'),
 			'$n_checked' => $n_checked,
-			'$f_text' => t('Event Finishes:'),
-			'$f_dsel' => datetimesel(new DateTime(), DateTime::createFromFormat('Y', $fyear+5), DateTime::createFromFormat('Y-m-d H:i', "$fyear-$fmonth-$fday $fhour:$fminute"), t('Event Finishes:'), 'finish_text', true, true, 'start_text'),
-			'$a_text' => t('Adjust for viewer timezone'),
+			'$f_text' => L10n::t('Event Finishes:'),
+			'$f_dsel' => Temporal::getDateTimeField(new DateTime(), DateTime::createFromFormat('Y', $fyear+5), DateTime::createFromFormat('Y-m-d H:i', "$fyear-$fmonth-$fday $fhour:$fminute"), L10n::t('Event Finishes:'), 'finish_text', true, true, 'start_text'),
+			'$a_text' => L10n::t('Adjust for viewer timezone'),
 			'$a_checked' => $a_checked,
-			'$d_text' => t('Description:'),
+			'$d_text' => L10n::t('Description:'),
 			'$d_orig' => $d_orig,
-			'$l_text' => t('Location:'),
+			'$l_text' => L10n::t('Location:'),
 			'$l_orig' => $l_orig,
-			'$t_text' => t('Title:') . ' <span class="required" title="' . t('Required') . '">*</span>',
+			'$t_text' => L10n::t('Title:') . ' <span class="required" title="' . L10n::t('Required') . '">*</span>',
 			'$t_orig' => $t_orig,
-			'$summary' => ['summary', t('Title:'), $t_orig, '', '*'],
-			'$sh_text' => t('Share this event'),
-			'$share' => ['share', t('Share this event'), $sh_checked, '', $sh_disabled],
+			'$summary' => ['summary', L10n::t('Title:'), $t_orig, '', '*'],
+			'$sh_text' => L10n::t('Share this event'),
+			'$share' => ['share', L10n::t('Share this event'), $sh_checked, '', $sh_disabled],
 			'$sh_checked' => $sh_checked,
-			'$nofinish' => ['nofinish', t('Finish date/time is not known or not relevant'), $n_checked],
-			'$adjust' => ['adjust', t('Adjust for viewer timezone'), $a_checked],
-			'$preview' => t('Preview'),
+			'$nofinish' => ['nofinish', L10n::t('Finish date/time is not known or not relevant'), $n_checked],
+			'$adjust' => ['adjust', L10n::t('Adjust for viewer timezone'), $a_checked],
+			'$preview' => L10n::t('Preview'),
 			'$acl' => $acl,
-			'$submit' => t('Submit'),
-			'$basic' => t('Basic'),
-			'$advanced' => t('Advanced'),
-			'$permissions' => t('Permissions'),
+			'$submit' => L10n::t('Submit'),
+			'$basic' => L10n::t('Basic'),
+			'$advanced' => L10n::t('Advanced'),
+			'$permissions' => L10n::t('Permissions'),
 
 		]);
 
@@ -543,18 +541,17 @@ function events_content(App $a) {
 	if ($mode === 'drop' && $event_id) {
 		$del = 0;
 
-		$params = ['event_id' => ($event_id)];
-		$ev = event_by_id(local_user(), $params);
+		$ev = Event::getListById(local_user(), $event_id);
 
 		// Delete only real events (no birthdays)
 		if (DBM::is_result($ev) && $ev[0]['type'] == 'event') {
-			$del = Item::delete($ev[0]['itemid']);
+			$del = Item::deleteById($ev[0]['itemid']);
 		}
 
 		if ($del == 0) {
-			notice(t('Failed to remove event' ) . EOL);
+			notice(L10n::t('Failed to remove event') . EOL);
 		} else {
-			info(t('Event removed') . EOL);
+			info(L10n::t('Event removed') . EOL);
 		}
 
 		goaway(System::baseUrl() . '/events');

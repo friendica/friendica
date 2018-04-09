@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file src/Model/Photo.php
  * @brief This file contains the Photo class for database interface
@@ -7,10 +8,12 @@ namespace Friendica\Model;
 
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
-use Friendica\Core\PConfig;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Object\Image;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 use dba;
 
 require_once 'include/dba.php';
@@ -52,8 +55,8 @@ class Photo
 			'contact-id' => $cid,
 			'guid' => $guid,
 			'resource-id' => $rid,
-			'created' => datetime_convert(),
-			'edited' => datetime_convert(),
+			'created' => DateTimeFormat::utcNow(),
+			'edited' => DateTimeFormat::utcNow(),
 			'filename' => basename($filename),
 			'type' => $Image->getType(),
 			'album' => $album,
@@ -88,19 +91,22 @@ class Photo
 	 */
 	public static function importProfilePhoto($image_url, $uid, $cid, $quit_on_error = false)
 	{
+		$thumb = '';
+		$micro = '';
+
 		$photo = dba::selectFirst(
 			'photo', ['resource-id'], ['uid' => $uid, 'contact-id' => $cid, 'scale' => 4, 'album' => 'Contact Photos']
 		);
 		if (x($photo['resource-id'])) {
 			$hash = $photo['resource-id'];
 		} else {
-			$hash = photo_new_resource();
+			$hash = self::newResource();
 		}
 
 		$photo_failure = false;
 
 		$filename = basename($image_url);
-		$img_str = fetch_url($image_url, true);
+		$img_str = Network::fetchUrl($image_url, true);
 
 		if ($quit_on_error && ($img_str == "")) {
 			return false;
@@ -235,7 +241,7 @@ class Photo
 					GROUP BY `album` ORDER BY `created` DESC",
 					intval($uid),
 					dbesc('Contact Photos'),
-					dbesc(t('Contact Photos'))
+					dbesc(L10n::t('Contact Photos'))
 				);
 			} else {
 				// This query doesn't do the count and is much faster
@@ -244,7 +250,7 @@ class Photo
 					WHERE `uid` = %d  AND `album` != '%s' AND `album` != '%s' $sql_extra",
 					intval($uid),
 					dbesc('Contact Photos'),
-					dbesc(t('Contact Photos'))
+					dbesc(L10n::t('Contact Photos'))
 				);
 			}
 			Cache::set($key, $albums, CACHE_DAY);
@@ -260,5 +266,15 @@ class Photo
 	{
 		$key = "photo_albums:".$uid.":".local_user().":".remote_user();
 		Cache::set($key, null, CACHE_DAY);
+	}
+
+	/**
+	 * Generate a unique photo ID.
+	 *
+	 * @return string
+	 */
+	public static function newResource()
+	{
+		return get_guid(32, false);
 	}
 }

@@ -12,9 +12,11 @@ use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Nav;
 use Friendica\Core\Addon;
+use Friendica\Core\Config;
+use Friendica\Core\L10n;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
-use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
@@ -22,9 +24,7 @@ use Friendica\Module\Login;
 
 require_once 'boot.php';
 
-if (empty($a)) {
-	$a = new App(__DIR__);
-}
+$a = new App(__DIR__);
 BaseObject::setApp($a);
 
 // We assume that the index.php is called by a frontend process
@@ -51,8 +51,12 @@ if (!$install) {
 require_once "include/dba.php";
 
 if (!$install) {
-	dba::connect($db_host, $db_user, $db_pass, $db_data, $install);
+	$result = dba::connect($db_host, $db_user, $db_pass, $db_data);
 	unset($db_host, $db_user, $db_pass, $db_data);
+
+	if (!$result) {
+		System::unavailable();
+	}
 
 	/**
 	 * Load configs from db. Overwrite configs from .htconfig.php
@@ -70,22 +74,23 @@ if (!$install) {
 	if (Config::get('system', 'force_ssl') && ($a->get_scheme() == "http")
 		&& (intval(Config::get('system', 'ssl_policy')) == SSL_POLICY_FULL)
 		&& (substr(System::baseUrl(), 0, 8) == "https://")
-	) {
+		&& ($_SERVER['REQUEST_METHOD'] == 'GET')) {
 		header("HTTP/1.1 302 Moved Temporarily");
 		header("Location: " . System::baseUrl() . "/" . $a->query_string);
 		exit();
 	}
 
-	require_once 'include/session.php';
+	Config::init();
+	Session::init();
 	Addon::loadHooks();
 	Addon::callHooks('init_1');
 
 	$maintenance = Config::get('system', 'maintenance');
 }
 
-$lang = get_browser_language();
+$lang = L10n::getBrowserLanguage();
 
-load_translation_table($lang);
+L10n::loadTranslationTable($lang);
 
 /**
  * Important stuff we always need to do.
@@ -121,7 +126,7 @@ if (x($_SESSION, 'authenticated') && !x($_SESSION, 'language')) {
 
 if ((x($_SESSION, 'language')) && ($_SESSION['language'] !== $lang)) {
 	$lang = $_SESSION['language'];
-	load_translation_table($lang);
+	L10n::loadTranslationTable($lang);
 }
 
 if ((x($_GET, 'zrl')) && (!$install && !$maintenance)) {
@@ -164,19 +169,10 @@ if (! x($_SESSION, 'authenticated')) {
 $a->page['htmlhead'] = '';
 $a->page['end'] = '';
 
+$_SESSION['sysmsg']       = defaults($_SESSION, 'sysmsg'      , []);
+$_SESSION['sysmsg_info']  = defaults($_SESSION, 'sysmsg_info' , []);
+$_SESSION['last_updated'] = defaults($_SESSION, 'last_updated', []);
 
-if (! x($_SESSION, 'sysmsg')) {
-	$_SESSION['sysmsg'] = [];
-}
-
-if (! x($_SESSION, 'sysmsg_info')) {
-	$_SESSION['sysmsg_info'] = [];
-}
-
-// Array for informations about last received items
-if (! x($_SESSION, 'last_updated')) {
-	$_SESSION['last_updated'] = [];
-}
 /*
  * check_config() is responsible for running update scripts. These automatically
  * update the DB schema whenever we push a new one out. It also checks to see if
@@ -246,7 +242,7 @@ if (strlen($a->module)) {
 	if (is_array($a->addons) && in_array($a->module, $a->addons) && file_exists("addon/{$a->module}/{$a->module}.php")) {
 		//Check if module is an app and if public access to apps is allowed or not
 		if ((!local_user()) && Addon::isApp($a->module) && $privateapps === "1") {
-			info(t("You must be logged in to use addons. "));
+			info(L10n::t("You must be logged in to use addons. "));
 		} else {
 			include_once "addon/{$a->module}/{$a->module}.php";
 			if (function_exists($a->module . '_module')) {
@@ -293,12 +289,12 @@ if (strlen($a->module)) {
 		}
 
 		logger('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
-		header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . L10n::t('Not Found'));
 		$tpl = get_markup_template("404.tpl");
 		$a->page['content'] = replace_macros(
 			$tpl,
 			[
-			'$message' =>  t('Page not found.')]
+			'$message' =>  L10n::t('Page not found.')]
 		);
 	}
 }
@@ -416,8 +412,8 @@ if (isset($homebase)) {
  * now that we've been through the module content, see if the page reported
  * a permission problem and if so, a 403 response would seem to be in order.
  */
-if (stristr(implode("", $_SESSION['sysmsg']), t('Permission denied'))) {
-	header($_SERVER["SERVER_PROTOCOL"] . ' 403 ' . t('Permission denied.'));
+if (stristr(implode("", $_SESSION['sysmsg']), L10n::t('Permission denied'))) {
+	header($_SERVER["SERVER_PROTOCOL"] . ' 403 ' . L10n::t('Permission denied.'));
 }
 
 /*
@@ -445,7 +441,7 @@ if ($a->is_mobile || $a->is_tablet) {
 		get_markup_template("toggle_mobile_footer.tpl"),
 		[
 			'$toggle_link' => $link,
-			'$toggle_text' => t('toggle mobile')]
+			'$toggle_text' => L10n::t('toggle mobile')]
 	);
 }
 
@@ -473,7 +469,7 @@ if (isset($_GET["mode"]) && (($_GET["mode"] == "raw") || ($_GET["mode"] == "mini
 	/// @TODO one day, kill those error-surpressing @ stuff, or PHP should ban it
 	@$doc->loadHTML($content);
 
-	$xpath = new DomXPath($doc);
+	$xpath = new DOMXPath($doc);
 
 	$list = $xpath->query("//*[contains(@id,'tread-wrapper-')]");  /* */
 

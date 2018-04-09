@@ -1,10 +1,10 @@
 <?php
-
 /**
  * @file mod/smilies.php
  */
 use Friendica\App;
 use Friendica\Content\Smilies;
+use Friendica\Core\System;
 
 /**
  * @param object $a App
@@ -18,7 +18,7 @@ function smilies_content(App $a)
 		for ($i = 0; $i < count($tmp['texts']); $i++) {
 			$results[] = ['text' => $tmp['texts'][$i], 'icon' => $tmp['icons'][$i]];
 		}
-		json_return_and_die($results);
+		System::jsonExit($results);
 	} else {
 		return Smilies::replace('', true);
 	}

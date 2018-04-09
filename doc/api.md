@@ -294,6 +294,85 @@ Friendica doesn't allow showing the friends of other users.
 
 ---
 
+### lists/ownerships (*; AUTH)
+
+#### Parameters
+
+* list_id: ID of the list
+* count: Items per page
+* page: Page number
+* since_id: Minimum ID
+* max_id: Maximum ID
+
+#### Unsupported parameters
+
+* slug
+* owner_screen_name
+* owner_id
+* include_entities
+* include_rts
+
+---
+
+### lists/destroy (POST; AUTH)
+
+#### Parameters
+
+* list_id: ID of the list
+
+#### Unsupported parameters
+
+* owner_screen_name
+* owner_id
+* slug
+
+---
+
+### lists/create (POST; AUTH)
+
+#### Parameters
+
+* name: name of the list
+
+#### Unsupported parameters
+
+* mode
+* description
+
+---
+
+### lists/update (POST; AUTH)
+
+#### Parameters
+
+* list_id: ID of the list
+* name: name of the list
+
+#### Unsupported parameters
+
+* slug
+* name
+* mode
+* description
+* owner_screen_name
+* owner_id
+
+---
+
+### lists/statuses (*; AUTH)
+
+#### Parameters
+
+* user_id: ID of the user for whom to return results.
+
+#### Unsupported parameters
+
+* screen_name
+* count
+* cursor
+
+---
+
 ### media/upload (POST,PUT; AUTH)
 
 #### Parameters
@@ -1237,7 +1316,6 @@ The following API calls from the Twitter API are not implemented in either Frien
 * users/suggestions/:slug/members
 * favorites/list
 * lists/list
-* lists/statuses
 * lists/members/destroy
 * lists/memberships
 * lists/subscribers
@@ -1248,13 +1326,9 @@ The following API calls from the Twitter API are not implemented in either Frien
 * lists/members/show
 * lists/members
 * lists/members/create
-* lists/destroy
-* lists/update
-* lists/create
 * lists/show
 * lists/subscriptions
 * lists/members/destroy_all
-* lists/ownerships
 * saved_searches/show/:id
 * saved_searches/create
 * saved_searches/destroy/:id

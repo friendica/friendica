@@ -94,7 +94,7 @@ Please remove all the `require_once` mentions of the former file, as they will p
 
 ## Miscellaneous tips
 
-When you are done with moving the class, please run `php util/typo.php` from the Friendica base directory to check for obvious mistakes.
+When you are done with moving the class, please run `php bin/console.php typo` from the Friendica base directory to check for obvious mistakes.
 Howevever, this tool isn't bullet-proof, and a staging install of Friendica is recommended to test your class move without impairing your production server if you host one.
 
 Most of Friendica processes are run in the background, so make sure to turn on your debug log to check for errors that wouldn't show up while simply browsing Friendica.

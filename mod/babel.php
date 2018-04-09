@@ -1,11 +1,10 @@
 <?php
+/**
+ * @file mod/babel.php
+ */
 
-use Friendica\Content\Text\Markdown;
-
-require_once 'include/bbcode.php';
-require_once 'include/bb2diaspora.php';
-require_once 'include/html2bbcode.php';
-require_once 'include/pgettext.php';
+use Friendica\Content\Text;
+use Friendica\Core\L10n;
 
 function visible_lf($s)
 {
@@ -14,65 +13,104 @@ function visible_lf($s)
 
 function babel_content()
 {
-	$o = '<h1>Babel Diagnostic</h1>';
+	$results = [];
+	if (!empty($_REQUEST['text'])) {
+		switch (defaults($_REQUEST, 'type', 'bbcode')) {
+			case 'bbcode':
+				$bbcode = trim($_REQUEST['text']);
+				$results[] = [
+					'title' => L10n::t('Source input'),
+					'content' => visible_lf($bbcode)
+				];
 
-	$o .= '<form action="babel" method="post">';
-	$o .= t('Source (bbcode) text:') . EOL;
-	$o .= '<textarea name="text" cols="80" rows="10">' . htmlspecialchars($_REQUEST['text']) . '</textarea>' . EOL;
-	$o .= '<input type="submit" name="submit" value="Submit" /></form>';
+				$html = Text\BBCode::convert($bbcode);
+				$results[] = [
+					'title' => L10n::t("BBCode::convert \x28raw HTML\x29"),
+					'content' => htmlspecialchars($html)
+				];
 
-	$o .= '<br /><br />';
+				$results[] = [
+					'title' => L10n::t('BBCode::convert'),
+					'content' => $html
+				];
 
-	$o .= '<form action="babel" method="post">';
-	$o .= t('Source (Diaspora) text to convert to BBcode:') . EOL;
-	$o .= '<textarea name="d2bbtext" cols="80" rows="10">' . htmlspecialchars($_REQUEST['d2bbtext']) . '</textarea>' . EOL;
-	$o .= '<input type="submit" name="submit" value="Submit" /></form>';
+				$bbcode2 = Text\HTML::toBBCode($html);
+				$results[] = [
+					'title' => L10n::t('BBCode::convert => HTML::toBBCode'),
+					'content' => visible_lf($bbcode2)
+				];
 
-	$o .= '<br /><br />';
+				$markdown = Text\BBCode::toMarkdown($bbcode);
+				$results[] = [
+					'title' => L10n::t('BBCode::toMarkdown'),
+					'content' => visible_lf($markdown)
+				];
 
-	if (x($_REQUEST, 'text')) {
-		$text = trim($_REQUEST['text']);
-		$o .= '<h2>' . t('Source input: ') . '</h2>' . EOL . EOL;
-		$o .= visible_lf($text) . EOL . EOL;
+				$html2 = Text\Markdown::convert($markdown);
+				$results[] = [
+					'title' => L10n::t('BBCode::toMarkdown => Markdown::convert'),
+					'content' => $html2
+				];
 
-		$html = bbcode($text);
-		$o .= '<h2>' . t('bbcode (raw HTML): ') . '</h2>' . EOL . EOL;
-		$o .= htmlspecialchars($html) . EOL . EOL;
+				$bbcode3 = Text\Markdown::toBBCode($markdown);
+				$results[] = [
+					'title' => L10n::t('BBCode::toMarkdown => Markdown::toBBCode'),
+					'content' => visible_lf($bbcode3)
+				];
 
-		//$html = bbcode($text);
-		$o .= '<h2>' . t('bbcode: ') . '</h2>' . EOL . EOL;
-		$o .= $html . EOL . EOL;
+				$bbcode4 = Text\HTML::toBBCode($html2);
+				$results[] = [
+					'title' => L10n::t('BBCode::toMarkdown =>  Markdown::convert => HTML::toBBCode'),
+					'content' => visible_lf($bbcode4)
+				];
+				break;
+			case 'markdown':
+				$markdown = trim($_REQUEST['text']);
+				$results[] = [
+					'title' => L10n::t('Source input \x28Diaspora format\x29'),
+					'content' => '<pre>' . $markdown . '</pre>'
+				];
 
-		$bbcode = html2bbcode($html);
-		$o .= '<h2>' . t('bbcode => html2bbcode: ') . '</h2>' . EOL . EOL;
-		$o .= visible_lf($bbcode) . EOL . EOL;
+				$bbcode = Text\Markdown::toBBCode($markdown);
+				$results[] = [
+					'title' => L10n::t('Markdown::toBBCode'),
+					'content' => '<pre>' . $bbcode . '</pre>'
+				];
+				break;
+			case 'html' :
+				$html = trim($_REQUEST['text']);
+				$results[] = [
+					'title' => L10n::t("Raw HTML input"),
+					'content' => htmlspecialchars($html)
+				];
 
-		$diaspora = bb2diaspora($text);
-		$o .= '<h2>' . t('bb2diaspora: ') . '</h2>' . EOL . EOL;
-		$o .= visible_lf($diaspora) . EOL . EOL;
+				$results[] = [
+					'title' => L10n::t('HTML Input'),
+					'content' => $html
+				];
 
-		$html = Markdown::convert($diaspora);
-		$o .= '<h2>' . t('bb2diaspora => Markdown: ') . '</h2>' . EOL . EOL;
-		$o .= $html . EOL . EOL;
+				$bbcode = Text\HTML::toBBCode($html);
+				$results[] = [
+					'title' => L10n::t('HTML::toBBCode'),
+					'content' => visible_lf($bbcode)
+				];
 
-		$bbcode = diaspora2bb($diaspora);
-		$o .= '<h2>' . t('bb2diaspora => diaspora2bb: ') . '</h2>' . EOL . EOL;
-		$o .= visible_lf($bbcode) . EOL . EOL;
-
-		$bbcode = html2bbcode($html);
-		$o .= '<h2>' . t('bbcode => html2bbcode: ') . '</h2>' . EOL . EOL;
-		$o .= visible_lf($bbcode) . EOL . EOL;
+				$text = Text\HTML::toPlaintext($html);
+				$results[] = [
+					'title' => L10n::t('HTML::toPlaintext'),
+					'content' => '<pre>' . $text . '</pre>'
+				];
+		}
 	}
 
-	if (x($_REQUEST, 'd2bbtext')) {
-		$d2bbtext = trim($_REQUEST['d2bbtext']);
-		$o .= '<h2>' . t('Source input (Diaspora format): ') . '</h2>' . EOL . EOL;
-		$o .= '<pre>' . $d2bbtext . '</pre>' . EOL . EOL;
-
-		$bb = diaspora2bb($d2bbtext);
-		$o .= '<h2>' . t('diaspora2bb: ') . '</h2>' . EOL . EOL;
-		$o .= '<pre>' . $bb . '</pre>' . EOL . EOL;
-	}
+	$tpl = get_markup_template('babel.tpl');
+	$o = replace_macros($tpl, [
+		'$text'          => ['text', L10n::t('Source text'), defaults($_REQUEST, 'text', ''), ''],
+		'$type_bbcode'   => ['type', L10n::t('BBCode'), 'bbcode', '', defaults($_REQUEST, 'type', 'bbcode') == 'bbcode'],
+		'$type_markdown' => ['type', L10n::t('Markdown'), 'markdown', '', defaults($_REQUEST, 'type', 'bbcode') == 'markdown'],
+		'$type_html'     => ['type', L10n::t('HTML'), 'html', '', defaults($_REQUEST, 'type', 'bbcode') == 'html'],
+		'$results'       => $results
+	]);
 
 	return $o;
 }

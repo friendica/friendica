@@ -752,6 +752,7 @@ function doLikeAction(ident, verb) {
 	$.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
 	liking = 1;
 	force_update = true;
+	update_item = ident.toString();
 }
 
 // Decodes a hexadecimally encoded binary string

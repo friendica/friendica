@@ -1,19 +1,17 @@
 <?php
 /**
- * @file src/Core/PConfig.php
+ * User Configuration Class
+ *
+ * @file include/Core/PConfig.php
+ *
+ * @brief Contains the class with methods for user configuration
  */
 namespace Friendica\Core;
 
-use Friendica\Database\DBM;
-use dba;
+use Friendica\BaseObject;
+use Friendica\Core\Config;
 
 require_once 'include/dba.php';
-
-/**
- * @file include/Core/PConfig.php
- * @brief contains the class with methods for the management
- * of the user configuration
- */
 
 /**
  * @brief Management of user configuration storage
@@ -22,9 +20,23 @@ require_once 'include/dba.php';
  * The PConfig::get() functions return boolean false for keys that are unset,
  * and this could lead to subtle bugs.
  */
-class PConfig
+class PConfig extends BaseObject
 {
-	private static $in_db;
+	/**
+	 * @var Friendica\Core\Config\IPConfigAdapter
+	 */
+	private static $adapter = null;
+
+	public static function init($uid)
+	{
+		$a = self::getApp();
+
+		if (isset($a->config['system']['config_adapter']) && $a->config['system']['config_adapter'] == 'preload') {
+			self::$adapter = new Config\PreloadPConfigAdapter($uid);
+		} else {
+			self::$adapter = new Config\JITPConfigAdapter($uid);
+		}
+	}
 
 	/**
 	 * @brief Loads all configuration values of a user's config family into a cached storage.
@@ -39,20 +51,11 @@ class PConfig
 	 */
 	public static function load($uid, $family)
 	{
-		$a = get_app();
-
-		$r = dba::select('pconfig', ['v', 'k'], ['cat' => $family, 'uid' => $uid]);
-		if (DBM::is_result($r)) {
-			while ($rr = dba::fetch($r)) {
-				$k = $rr['k'];
-				$a->config[$uid][$family][$k] = $rr['v'];
-				self::$in_db[$uid][$family][$k] = true;
-			}
-		} else if ($family != 'config') {
-			// Negative caching
-			$a->config[$uid][$family] = "!<unset>!";
+		if (empty(self::$adapter)) {
+			self::init($uid);
 		}
-		dba::close($r);
+
+		self::$adapter->load($uid, $family);
 	}
 
 	/**
@@ -72,37 +75,11 @@ class PConfig
 	 */
 	public static function get($uid, $family, $key, $default_value = null, $refresh = false)
 	{
-		$a = get_app();
-
-		if (!$refresh) {
-			// Looking if the whole family isn't set
-			if (isset($a->config[$uid][$family])) {
-				if ($a->config[$uid][$family] === '!<unset>!') {
-					return $default_value;
-				}
-			}
-
-			if (isset($a->config[$uid][$family][$key])) {
-				if ($a->config[$uid][$family][$key] === '!<unset>!') {
-					return $default_value;
-				}
-				return $a->config[$uid][$family][$key];
-			}
+		if (empty(self::$adapter)) {
+			self::init($uid);
 		}
 
-		$pconfig = dba::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $family, 'k' => $key]);
-		if (DBM::is_result($pconfig)) {
-			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $pconfig['v']) ? unserialize($pconfig['v']) : $pconfig['v']);
-			$a->config[$uid][$family][$key] = $val;
-			self::$in_db[$uid][$family][$key] = true;
-
-			return $val;
-		} else {
-			$a->config[$uid][$family][$key] = '!<unset>!';
-			self::$in_db[$uid][$family][$key] = false;
-
-			return $default_value;
-		}
+		return self::$adapter->get($uid, $family, $key, $default_value, $refresh);
 	}
 
 	/**
@@ -122,31 +99,11 @@ class PConfig
 	 */
 	public static function set($uid, $family, $key, $value)
 	{
-		$a = get_app();
-
-		// We store our setting values in a string variable.
-		// So we have to do the conversion here so that the compare below works.
-		// The exception are array values.
-		$dbvalue = (!is_array($value) ? (string)$value : $value);
-
-		$stored = self::get($uid, $family, $key, null, true);
-
-		if (($stored === $dbvalue) && self::$in_db[$uid][$family][$key]) {
-			return true;
+		if (empty(self::$adapter)) {
+			self::init($uid);
 		}
 
-		$a->config[$uid][$family][$key] = $dbvalue;
-
-		// manage array value
-		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
-
-		$ret = dba::update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $family, 'k' => $key], true);
-
-		if ($ret) {
-			self::$in_db[$uid][$family][$key] = true;
-			return $value;
-		}
-		return $ret;
+		return self::$adapter->set($uid, $family, $key, $value);
 	}
 
 	/**
@@ -163,15 +120,10 @@ class PConfig
 	 */
 	public static function delete($uid, $family, $key)
 	{
-		$a = get_app();
-
-		if (x($a->config[$uid][$family], $key)) {
-			unset($a->config[$uid][$family][$key]);
-			unset(self::$in_db[$uid][$family][$key]);
+		if (empty(self::$adapter)) {
+			self::init($uid);
 		}
 
-		$ret = dba::delete('pconfig', ['uid' => $uid, 'cat' => $family, 'k' => $key]);
-
-		return $ret;
+		return self::$adapter->delete($uid, $family, $key);
 	}
 }

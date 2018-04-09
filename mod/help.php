@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\Markdown;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 
 if (!function_exists('load_doc_file')) {
@@ -44,22 +45,22 @@ function help_content(App $a) {
 		$title = basename($path);
 		$filename = $path;
 		$text = load_doc_file('doc/' . $path . '.md');
-		$a->page['title'] = t('Help:') . ' ' . str_replace('-', ' ', notags($title));
+		$a->page['title'] = L10n::t('Help:') . ' ' . str_replace('-', ' ', notags($title));
 	}
 	$home = load_doc_file('doc/Home.md');
 	if (!$text) {
 		$text = $home;
 		$filename = "Home";
-		$a->page['title'] = t('Help');
+		$a->page['title'] = L10n::t('Help');
 	} else {
 		$a->page['aside'] = Markdown::convert($home, false);
 	}
 
 	if (!strlen($text)) {
-		header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . L10n::t('Not Found'));
 		$tpl = get_markup_template("404.tpl");
 		return replace_macros($tpl, [
-					'$message' => t('Page not found.')
+					'$message' => L10n::t('Page not found.')
 				]);
 	}
 

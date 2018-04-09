@@ -1,9 +1,12 @@
 <?php
-
+/**
+ * @file src/App.php
+ */
 namespace Friendica;
 
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 
@@ -145,6 +148,8 @@ class App
 		$this->performance['start'] = microtime(true);
 		$this->performance['database'] = 0;
 		$this->performance['database_write'] = 0;
+		$this->performance['cache'] = 0;
+		$this->performance['cache_write'] = 0;
 		$this->performance['network'] = 0;
 		$this->performance['file'] = 0;
 		$this->performance['rendering'] = 0;
@@ -154,6 +159,8 @@ class App
 
 		$this->callstack['database'] = [];
 		$this->callstack['database_write'] = [];
+		$this->callstack['cache'] = [];
+		$this->callstack['cache_write'] = [];
 		$this->callstack['network'] = [];
 		$this->callstack['file'] = [];
 		$this->callstack['rendering'] = [];
@@ -204,12 +211,6 @@ class App
 			. $this->basepath . DIRECTORY_SEPARATOR . 'include' . PATH_SEPARATOR
 			. $this->basepath . DIRECTORY_SEPARATOR . 'library' . PATH_SEPARATOR
 			. $this->basepath);
-
-
-		if (is_array($_SERVER['argv']) && $_SERVER['argc'] > 1 && substr(end($_SERVER['argv']), 0, 4) == 'http') {
-			$this->set_baseurl(array_pop($_SERVER['argv']));
-			$_SERVER['argc'] --;
-		}
 
 		if ((x($_SERVER, 'QUERY_STRING')) && substr($_SERVER['QUERY_STRING'], 0, 9) === 'pagename=') {
 			$this->query_string = substr($_SERVER['QUERY_STRING'], 9);
@@ -285,12 +286,7 @@ class App
 		$this->is_friendica_app = ($_SERVER['HTTP_USER_AGENT'] == 'Apache-HttpClient/UNAVAILABLE (java 1.4)');
 
 		// Register template engines
-		$dc = get_declared_classes();
-		foreach ($dc as $k) {
-			if (in_array('Friendica\Render\ITemplateEngine', class_implements($k))) {
-				$this->register_template_engine($k);
-			}
-		}
+		$this->register_template_engine('Friendica\Render\FriendicaSmartyEngine');
 
 		self::$a = $this;
 	}
@@ -512,9 +508,9 @@ class App
 			'$baseurl'         => $this->get_baseurl(),
 			'$local_user'      => local_user(),
 			'$generator'       => 'Friendica' . ' ' . FRIENDICA_VERSION,
-			'$delitem'         => t('Delete this item?'),
-			'$showmore'        => t('show more'),
-			'$showfewer'       => t('show fewer'),
+			'$delitem'         => L10n::t('Delete this item?'),
+			'$showmore'        => L10n::t('show more'),
+			'$showfewer'       => L10n::t('show fewer'),
 			'$update_interval' => $interval,
 			'$shortcut_icon'   => $shortcut_icon,
 			'$touch_icon'      => $touch_icon,
@@ -599,7 +595,7 @@ class App
 			$this->template_engines[$name] = $class;
 		} else {
 			echo "template engine <tt>$class</tt> cannot be registered without a name.\n";
-			killme();
+			die();
 		}
 	}
 
@@ -866,9 +862,6 @@ class App
 
 		array_unshift($args, ((x($this->config, 'php_path')) && (strlen($this->config['php_path'])) ? $this->config['php_path'] : 'php'));
 
-		// add baseurl to args. cli scripts can't construct it
-		$args[] = $this->get_baseurl();
-
 		for ($x = 0; $x < count($args); $x ++) {
 			$args[$x] = escapeshellarg($args[$x]);
 		}
@@ -941,5 +934,137 @@ class App
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param string $cat     Config category
+	 * @param string $k       Config key
+	 * @param mixed  $default Default value if it isn't set
+	 */
+	public function getConfigValue($cat, $k, $default = null)
+	{
+		$return = $default;
+
+		if ($cat === 'config') {
+			if (isset($this->config[$k])) {
+				$return = $this->config[$k];
+			}
+		} else {
+			if (isset($this->config[$cat][$k])) {
+				$return = $this->config[$cat][$k];
+			}
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Sets a value in the config cache. Accepts raw output from the config table
+	 *
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 * @param mixed  $v   Value to set
+	 */
+	public function setConfigValue($cat, $k, $v)
+	{
+		// Only arrays are serialized in database, so we have to unserialize sparingly
+		$value = is_string($v) && preg_match("|^a:[0-9]+:{.*}$|s", $v) ? unserialize($v) : $v;
+
+		if ($cat === 'config') {
+			$this->config[$k] = $value;
+		} else {
+			$this->config[$cat][$k] = $value;
+		}
+	}
+
+	/**
+	 * Deletes a value from the config cache
+	 *
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 */
+	public function deleteConfigValue($cat, $k)
+	{
+		if ($cat === 'config') {
+			if (isset($this->config[$k])) {
+				unset($this->config[$k]);
+			}
+		} else {
+			if (isset($this->config[$cat][$k])) {
+				unset($this->config[$cat][$k]);
+			}
+		}
+	}
+
+
+	/**
+	 * Retrieves a value from the user config cache
+	 *
+	 * @param int    $uid     User Id
+	 * @param string $cat     Config category
+	 * @param string $k       Config key
+	 * @param mixed  $default Default value if key isn't set
+	 */
+	public function getPConfigValue($uid, $cat, $k, $default = null)
+	{
+		$return = $default;
+
+		if (isset($this->config[$uid][$cat][$k])) {
+			$return = $this->config[$uid][$cat][$k];
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Sets a value in the user config cache
+	 *
+	 * Accepts raw output from the pconfig table
+	 *
+	 * @param int    $uid User Id
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 * @param mixed  $v   Value to set
+	 */
+	public function setPConfigValue($uid, $cat, $k, $v)
+	{
+		// Only arrays are serialized in database, so we have to unserialize sparingly
+		$value = is_string($v) && preg_match("|^a:[0-9]+:{.*}$|s", $v) ? unserialize($v) : $v;
+
+		$this->config[$uid][$cat][$k] = $value;
+	}
+
+	/**
+	 * Deletes a value from the user config cache
+	 *
+	 * @param int    $uid User Id
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 */
+	public function deletePConfigValue($uid, $cat, $k)
+	{
+		if (isset($this->config[$uid][$cat][$k])) {
+			unset($this->config[$uid][$cat][$k]);
+		}
+	}
+
+	/**
+	 * Generates the site's default sender email address
+	 *
+	 * @return string
+	 */
+	public function getSenderEmailAddress()
+	{
+		$sender_email = Config::get('config', 'sender_email');
+		if (empty($sender_email)) {
+			$hostname = $this->get_hostname();
+			if (strpos($hostname, ':')) {
+				$hostname = substr($hostname, 0, strpos($hostname, ':'));
+			}
+
+			$sender_email = L10n::t('noreply') . '@' . $hostname;
+		}
+
+		return $sender_email;
 	}
 }

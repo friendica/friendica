@@ -7,32 +7,36 @@
  * This implementation here interprets the old and the new protocol and sends the new one.
  * In the future we will remove most stuff from "validPosting" and interpret only the new protocol.
  */
+
 namespace Friendica\Protocol;
 
-use Friendica\App;
-use Friendica\Core\System;
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\Markdown;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
+use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\Queue;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 use Friendica\Util\XML;
-
+use Friendica\Util\Map;
 use dba;
 use SimpleXMLElement;
 
 require_once 'include/dba.php';
 require_once 'include/items.php';
-require_once 'include/bb2diaspora.php';
-require_once 'include/datetime.php';
 
 /**
  * @brief This class contain functions to create and send Diaspora XML files
@@ -43,60 +47,127 @@ class Diaspora
 	/**
 	 * @brief Return a list of relay servers
 	 *
-	 * This is an experimental Diaspora feature.
+	 * The list contains not only the official relays but also servers that we serve directly
 	 *
+	 * @param integer $item_id   The id of the item that is sent
 	 * @return array of relay servers
 	 */
-	public static function relayList()
+	public static function relayList($item_id)
 	{
+		$serverlist = [];
+
+		// Fetching relay servers
 		$serverdata = Config::get("system", "relay_server");
-		if ($serverdata == "") {
-			return [];
-		}
-
-		$relay = [];
-
-		$servers = explode(",", $serverdata);
-
-		foreach ($servers as $server) {
-			$server = trim($server);
-			$addr = "relay@".str_replace("http://", "", normalise_link($server));
-			$batch = $server."/receive/public";
-
-			$relais = q(
-				"SELECT `batch`, `id`, `name`,`network` FROM `contact` WHERE `uid` = 0 AND `batch` = '%s' AND `addr` = '%s' AND `nurl` = '%s' LIMIT 1",
-				dbesc($batch),
-				dbesc($addr),
-				dbesc(normalise_link($server))
-			);
-
-			if (!$relais) {
-				$r = q(
-					"INSERT INTO `contact` (`uid`, `created`, `name`, `nick`, `addr`, `url`, `nurl`, `batch`, `network`, `rel`, `blocked`, `pending`, `writable`, `name-date`, `uri-date`, `avatar-date`)
-					VALUES (0, '%s', '%s', 'relay', '%s', '%s', '%s', '%s', '%s', %d, 0, 0, 1, '%s', '%s', '%s')",
-					datetime_convert(),
-					dbesc($addr),
-					dbesc($addr),
-					dbesc($server),
-					dbesc(normalise_link($server)),
-					dbesc($batch),
-					dbesc(NETWORK_DIASPORA),
-					intval(CONTACT_IS_FOLLOWER),
-					dbesc(datetime_convert()),
-					dbesc(datetime_convert()),
-					dbesc(datetime_convert())
-				);
-
-				$relais = q("SELECT `batch`, `id`, `name`,`network` FROM `contact` WHERE `uid` = 0 AND `batch` = '%s' LIMIT 1", dbesc($batch));
-				if ($relais) {
-					$relay[] = $relais[0];
-				}
-			} else {
-				$relay[] = $relais[0];
+		if ($serverdata != "") {
+			$servers = explode(",", $serverdata);
+			foreach ($servers as $server) {
+				$serverlist[$server] = trim($server);
 			}
 		}
 
-		return $relay;
+		if (Config::get("system", "relay_directly", false)) {
+			// Servers that want to get all content
+			$servers = dba::select('gserver', ['url'], ['relay-subscribe' => true, 'relay-scope' => 'all']);
+			while ($server = dba::fetch($servers)) {
+				$serverlist[$server['url']] = $server['url'];
+			}
+
+			// All tags of the current post
+			$condition = ['otype' => TERM_OBJ_POST, 'type' => TERM_HASHTAG, 'oid' => $item_id];
+			$tags = dba::select('term', ['term'], $condition);
+			$taglist = [];
+			while ($tag = dba::fetch($tags)) {
+				$taglist[] = $tag['term'];
+			}
+
+			// All servers who wants content with this tag
+			$tagserverlist = [];
+			if (!empty($taglist)) {
+				$tagserver = dba::select('gserver-tag', ['gserver-id'], ['tag' => $taglist]);
+				while ($server = dba::fetch($tagserver)) {
+					$tagserverlist[] = $server['gserver-id'];
+				}
+			}
+
+			// All adresses with the given id
+			if (!empty($tagserverlist)) {
+				$servers = dba::select('gserver', ['url'], ['relay-subscribe' => true, 'relay-scope' => 'tags', 'id' => $tagserverlist]);
+				while ($server = dba::fetch($servers)) {
+					$serverlist[$server['url']] = $server['url'];
+				}
+			}
+		}
+
+		// Now we are collecting all relay contacts
+		$contacts = [];
+		foreach ($serverlist as $server_url) {
+			// We don't send messages to ourselves
+			if (!link_compare($server_url, System::baseUrl())) {
+				$cid = self::getRelayContactId($server_url);
+				if (!is_bool($cid)) {
+					$contacts[] = $cid;
+				}
+			}
+		}
+
+		return $contacts;
+	}
+
+	/**
+	 * @brief Return a contact for a given server address or creates a dummy entry
+	 *
+	 * @param string $server_url The url of the server
+	 * @return array with the contact
+	 */
+	private static function getRelayContactId($server_url)
+	{
+		$batch = $server_url . '/receive/public';
+
+		$fields = ['batch', 'id', 'name', 'network', 'archive', 'blocked'];
+
+		// Fetch the relay contact
+		$condition = ['uid' => 0, 'network' => NETWORK_DIASPORA, 'batch' => $batch,
+			'contact-type' => ACCOUNT_TYPE_RELAY];
+		$contact = dba::selectFirst('contact', $fields, $condition);
+
+		// If there is nothing found, we check if there is some unmarked relay
+		// This code segment can be removed before the release 2018-05
+		if (!DBM::is_result($contact)) {
+			$condition = ['uid' => 0, 'network' => NETWORK_DIASPORA, 'batch' => $batch,
+				'name' => 'relay', 'nick' => 'relay', 'url' => $server_url];
+			$contact = dba::selectFirst('contact', $fields, $condition);
+
+			if (DBM::is_result($contact)) {
+				// Mark the relay account as a relay account
+				$fields = ['contact-type' => ACCOUNT_TYPE_RELAY];
+				dba::update('contact', $fields, ['id' => $contact['id']]);
+			}
+		}
+		if (DBM::is_result($contact)) {
+			if ($contact['archive'] || $contact['blocked']) {
+				return false;
+			}
+			return $contact;
+		} else {
+			$fields = ['uid' => 0, 'created' => DateTimeFormat::utcNow(),
+				'name' => 'relay', 'nick' => 'relay',
+				'url' => $server_url, 'nurl' => normalise_link($server_url),
+				'batch' => $batch, 'network' => NETWORK_DIASPORA,
+				'rel' => CONTACT_IS_FOLLOWER, 'blocked' => false,
+				'contact-type' => ACCOUNT_TYPE_RELAY,
+				'pending' => false, 'writable' => true];
+			dba::insert('contact', $fields);
+
+			$fields = ['batch', 'id', 'name', 'network'];
+			$contact = dba::selectFirst('contact', $fields, $condition);
+			if (DBM::is_result($contact)) {
+				return $contact;
+			}
+
+		}
+
+		// It should never happen that we arrive here
+		return [];
 	}
 
 	/**
@@ -185,7 +256,7 @@ class Diaspora
 	 */
 	private static function verifyMagicEnvelope($envelope)
 	{
-		$basedom = parse_xml_string($envelope);
+		$basedom = XML::parseString($envelope);
 
 		if (!is_object($basedom)) {
 			logger("Envelope is no XML file");
@@ -219,11 +290,20 @@ class Diaspora
 
 		$signable_data = $msg.".".base64url_encode($type).".".base64url_encode($encoding).".".base64url_encode($alg);
 
+		if ($handle == '') {
+			logger('No author could be decoded. Discarding. Message: ' . $envelope);
+			return false;
+		}
+
 		$key = self::key($handle);
+		if ($key == '') {
+			logger("Couldn't get a key for handle " . $handle . ". Discarding.");
+			return false;
+		}
 
 		$verify = Crypto::rsaVerify($signable_data, $sig, $key);
 		if (!$verify) {
-			logger('Message did not verify. Discarding.');
+			logger('Message from ' . $handle . ' did not verify. Discarding.');
 			return false;
 		}
 
@@ -284,7 +364,7 @@ class Diaspora
 
 			if (!is_object($j_outer_key_bundle)) {
 				logger('Outer Salmon did not verify. Discarding.');
-				http_status_exit(400);
+				System::httpExit(400);
 			}
 
 			$outer_iv = base64_decode($j_outer_key_bundle->iv);
@@ -295,11 +375,11 @@ class Diaspora
 			$xml = $raw;
 		}
 
-		$basedom = parse_xml_string($xml);
+		$basedom = XML::parseString($xml);
 
 		if (!is_object($basedom)) {
 			logger('Received data does not seem to be an XML. Discarding. '.$xml);
-			http_status_exit(400);
+			System::httpExit(400);
 		}
 
 		$base = $basedom->children(NAMESPACE_SALMON_ME);
@@ -319,12 +399,21 @@ class Diaspora
 		// Get the senders' public key
 		$key_id = $base->sig[0]->attributes()->key_id[0];
 		$author_addr = base64_decode($key_id);
+		if ($author_addr == '') {
+			logger('No author could be decoded. Discarding. Message: ' . $xml);
+			System::httpExit(400);
+		}
+
 		$key = self::key($author_addr);
+		if ($key == '') {
+			logger("Couldn't get a key for handle " . $author_addr . ". Discarding.");
+			System::httpExit(400);
+		}
 
 		$verify = Crypto::rsaVerify($signed_data, $signature, $key);
 		if (!$verify) {
 			logger('Message did not verify. Discarding.');
-			http_status_exit(400);
+			System::httpExit(400);
 		}
 
 		return ['message' => (string)base64url_decode($base->data),
@@ -346,13 +435,16 @@ class Diaspora
 	public static function decode($importer, $xml)
 	{
 		$public = false;
-		$basedom = parse_xml_string($xml);
+		$basedom = XML::parseString($xml);
 
 		if (!is_object($basedom)) {
 			logger("XML is not parseable.");
 			return false;
 		}
 		$children = $basedom->children('https://joindiaspora.com/protocol');
+
+		$inner_aes_key = null;
+		$inner_iv = null;
 
 		if ($children->header) {
 			$public = true;
@@ -380,7 +472,7 @@ class Diaspora
 			$decrypted = self::aesDecrypt($outer_key, $outer_iv, $ciphertext);
 
 			logger('decrypted: '.$decrypted, LOGGER_DEBUG);
-			$idom = parse_xml_string($decrypted);
+			$idom = XML::parseString($decrypted);
 
 			$inner_iv = base64_decode($idom->iv);
 			$inner_aes_key = base64_decode($idom->aes_key);
@@ -392,6 +484,7 @@ class Diaspora
 
 		// figure out where in the DOM tree our data is hiding
 
+		$base = null;
 		if ($dom->provenance->data) {
 			$base = $dom->provenance;
 		} elseif ($dom->env->data) {
@@ -402,7 +495,7 @@ class Diaspora
 
 		if (!$base) {
 			logger('unable to locate salmon data in xml');
-			http_status_exit(400);
+			System::httpExit(400);
 		}
 
 
@@ -440,7 +533,7 @@ class Diaspora
 
 		if (!$author_link) {
 			logger('Could not retrieve author URI.');
-			http_status_exit(400);
+			System::httpExit(400);
 		}
 		// Once we have the author URI, go to the web and try to find their public key
 		// (first this will look it up locally if it is in the fcontact cache)
@@ -451,14 +544,14 @@ class Diaspora
 
 		if (!$key) {
 			logger('Could not retrieve author key.');
-			http_status_exit(400);
+			System::httpExit(400);
 		}
 
 		$verify = Crypto::rsaVerify($signed_data, $signature, $key);
 
 		if (!$verify) {
 			logger('Message did not verify. Discarding.');
-			http_status_exit(400);
+			System::httpExit(400);
 		}
 
 		logger('Message verified.');
@@ -630,14 +723,12 @@ class Diaspora
 	 */
 	private static function validPosting($msg)
 	{
-		$data = parse_xml_string($msg["message"]);
+		$data = XML::parseString($msg["message"]);
 
 		if (!is_object($data)) {
 			logger("No valid XML ".$msg["message"], LOGGER_DEBUG);
 			return false;
 		}
-
-		$first_child = $data->getName();
 
 		// Is this the new or the old version?
 		if ($data->getName() == "XML") {
@@ -667,6 +758,8 @@ class Diaspora
 		$fields = new SimpleXMLElement("<".$type."/>");
 
 		$signed_data = "";
+		$author_signature = null;
+		$parent_author_signature = null;
 
 		foreach ($element->children() as $fieldname => $entry) {
 			if ($oldXML) {
@@ -795,14 +888,11 @@ class Diaspora
 	 */
 	public static function personByHandle($handle)
 	{
-		$r = q(
-			"SELECT * FROM `fcontact` WHERE `network` = '%s' AND `addr` = '%s' LIMIT 1",
-			dbesc(NETWORK_DIASPORA),
-			dbesc($handle)
-		);
-		if ($r) {
-			$person = $r[0];
-			logger("In cache " . print_r($r, true), LOGGER_DEBUG);
+		$update = false;
+
+		$person = dba::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+		if (DBM::is_result($person)) {
+			logger("In cache " . print_r($person, true), LOGGER_DEBUG);
 
 			// update record occasionally so it doesn't get stale
 			$d = strtotime($person["updated"]." +00:00");
@@ -815,7 +905,7 @@ class Diaspora
 			}
 		}
 
-		if (!$person || $update) {
+		if (!DBM::is_result($person) || $update) {
 			logger("create or refresh", LOGGER_DEBUG);
 			$r = Probe::uri($handle, NETWORK_DIASPORA);
 
@@ -823,9 +913,15 @@ class Diaspora
 			// if Diaspora connectivity is enabled on their server
 			if ($r && ($r["network"] === NETWORK_DIASPORA)) {
 				self::addFContact($r, $update);
-				$person = $r;
+
+				// Fetch the updated or added contact
+				$person = dba::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+				if (!DBM::is_result($person)) {
+					$person = $r;
+				}
 			}
 		}
+
 		return $person;
 	}
 
@@ -868,7 +964,7 @@ class Diaspora
 				dbesc($arr["confirm"]),
 				dbesc($arr["alias"]),
 				dbesc($arr["pubkey"]),
-				dbesc(datetime_convert()),
+				dbesc(DateTimeFormat::utcNow()),
 				dbesc($arr["url"]),
 				dbesc($arr["network"])
 			);
@@ -891,7 +987,7 @@ class Diaspora
 				dbesc($arr["network"]),
 				dbesc($arr["alias"]),
 				dbesc($arr["pubkey"]),
-				dbesc(datetime_convert())
+				dbesc(DateTimeFormat::utcNow())
 			);
 		}
 
@@ -899,23 +995,23 @@ class Diaspora
 	}
 
 	/**
-	 * @brief get a handle (user@domain.tld) from a given contact id or gcontact id
+	 * @brief get a handle (user@domain.tld) from a given contact id
 	 *
 	 * @param int $contact_id  The id in the contact table
-	 * @param int $gcontact_id The id in the gcontact table
+	 * @param int $pcontact_id The id in the contact table (Used for the public contact)
 	 *
 	 * @return string the handle
 	 */
-	public static function handleFromContact($contact_id, $gcontact_id = 0)
+	private static function handleFromContact($contact_id, $pcontact_id = 0)
 	{
 		$handle = false;
 
-		logger("contact id is ".$contact_id." - gcontact id is ".$gcontact_id, LOGGER_DEBUG);
+		logger("contact id is ".$contact_id." - pcontact id is ".$pcontact_id, LOGGER_DEBUG);
 
-		if ($gcontact_id != 0) {
+		if ($pcontact_id != 0) {
 			$r = q(
-				"SELECT `addr` FROM `gcontact` WHERE `id` = %d AND `addr` != ''",
-				intval($gcontact_id)
+				"SELECT `addr` FROM `contact` WHERE `id` = %d AND `addr` != ''",
+				intval($pcontact_id)
 			);
 
 			if (DBM::is_result($r)) {
@@ -1056,7 +1152,7 @@ class Diaspora
 		//}
 
 		// We don't seem to like that person
-		if ($contact["blocked"] || $contact["readonly"] || $contact["archive"]) {
+		if ($contact["blocked"] || $contact["readonly"]) {
 			// Maybe blocked, don't accept.
 			return false;
 			// We are following this person?
@@ -1256,7 +1352,7 @@ class Diaspora
 
 		logger("Fetch post from ".$source_url, LOGGER_DEBUG);
 
-		$envelope = fetch_url($source_url);
+		$envelope = Network::fetchUrl($source_url);
 		if ($envelope) {
 			logger("Envelope was fetched.", LOGGER_DEBUG);
 			$x = self::verifyMagicEnvelope($envelope);
@@ -1274,13 +1370,13 @@ class Diaspora
 			$source_url = $server."/p/".urlencode($guid).".xml";
 			logger("Fetch post from ".$source_url, LOGGER_DEBUG);
 
-			$x = fetch_url($source_url);
+			$x = Network::fetchUrl($source_url);
 			if (!$x) {
 				return false;
 			}
 		}
 
-		$source_xml = parse_xml_string($x);
+		$source_xml = XML::parseString($x);
 
 		if (!is_object($source_xml)) {
 			return false;
@@ -1373,26 +1469,23 @@ class Diaspora
 	/**
 	 * @brief returns contact details
 	 *
-	 * @param array $contact The default contact if the person isn't found
-	 * @param array $person  The record of the person
-	 * @param int   $uid     The user id
+	 * @param array $def_contact The default contact if the person isn't found
+	 * @param array $person      The record of the person
+	 * @param int   $uid         The user id
 	 *
 	 * @return array
 	 *      'cid' => contact id
 	 *      'network' => network type
 	 */
-	private static function authorContactByUrl($contact, $person, $uid)
+	private static function authorContactByUrl($def_contact, $person, $uid)
 	{
-		$r = q(
-			"SELECT `id`, `network`, `url` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d LIMIT 1",
-			dbesc(normalise_link($person["url"])),
-			intval($uid)
-		);
-		if ($r) {
-			$cid = $r[0]["id"];
-			$network = $r[0]["network"];
-		} else {
+		$condition = ['nurl' => normalise_link($person["url"]), 'uid' => $uid];
+		$contact = dba::selectFirst('contact', ['id', 'network'], $condition);
+		if (DBM::is_result($contact)) {
 			$cid = $contact["id"];
+			$network = $contact["network"];
+		} else {
+			$cid = $def_contact["id"];
 			$network = NETWORK_DIASPORA;
 		}
 
@@ -1651,9 +1744,9 @@ class Diaspora
 		$text = unxmlify($data->text);
 
 		if (isset($data->created_at)) {
-			$created_at = datetime_convert("UTC", "UTC", notags(unxmlify($data->created_at)));
+			$created_at = DateTimeFormat::utc(notags(unxmlify($data->created_at)));
 		} else {
-			$created_at = datetime_convert();
+			$created_at = DateTimeFormat::utcNow();
 		}
 
 		if (isset($data->thread_parent_guid)) {
@@ -1723,13 +1816,13 @@ class Diaspora
 
 		$datarray["plink"] = self::plink($author, $guid, $parent_item['guid']);
 
-		$body = diaspora2bb($text);
+		$body = Markdown::toBBCode($text);
 
 		$datarray["body"] = self::replacePeopleGuid($body, $person["url"]);
 
 		self::fetchGuid($datarray);
 
-		$message_id = item_store($datarray);
+		$message_id = Item::insert($datarray);
 
 		if ($message_id <= 0) {
 			return false;
@@ -1783,14 +1876,14 @@ class Diaspora
 		$msg_guid = notags(unxmlify($mesg->guid));
 		$msg_conversation_guid = notags(unxmlify($mesg->conversation_guid));
 		$msg_text = unxmlify($mesg->text);
-		$msg_created_at = datetime_convert("UTC", "UTC", notags(unxmlify($mesg->created_at)));
+		$msg_created_at = DateTimeFormat::utc(notags(unxmlify($mesg->created_at)));
 
 		if ($msg_conversation_guid != $guid) {
 			logger("message conversation guid does not belong to the current conversation.");
 			return false;
 		}
 
-		$body = diaspora2bb($msg_text);
+		$body = Markdown::toBBCode($msg_text);
 		$message_uri = $msg_author.":".$msg_guid;
 
 		$person = self::personByHandle($msg_author);
@@ -1828,7 +1921,7 @@ class Diaspora
 
 		dba::unlock();
 
-		dba::update('conv', ['updated' => datetime_convert()], ['id' => $conversation["id"]]);
+		dba::update('conv', ['updated' => DateTimeFormat::utcNow()], ['id' => $conversation["id"]]);
 
 		notification(
 			[
@@ -1862,7 +1955,7 @@ class Diaspora
 		$author = notags(unxmlify($data->author));
 		$guid = notags(unxmlify($data->guid));
 		$subject = notags(unxmlify($data->subject));
-		$created_at = datetime_convert("UTC", "UTC", notags(unxmlify($data->created_at)));
+		$created_at = DateTimeFormat::utc(notags(unxmlify($data->created_at)));
 		$participants = notags(unxmlify($data->participants));
 
 		$messages = $data->message;
@@ -1894,7 +1987,7 @@ class Diaspora
 				dbesc($guid),
 				dbesc($author),
 				dbesc($created_at),
-				dbesc(datetime_convert()),
+				dbesc(DateTimeFormat::utcNow()),
 				dbesc($subject),
 				dbesc($participants)
 			);
@@ -1933,11 +2026,11 @@ class Diaspora
 	 */
 	private static function constructLikeBody($contact, $parent_item, $guid)
 	{
-		$bodyverb = t('%1$s likes %2$s\'s %3$s');
+		$bodyverb = L10n::t('%1$s likes %2$s\'s %3$s');
 
 		$ulink = "[url=".$contact["url"]."]".$contact["name"]."[/url]";
 		$alink = "[url=".$parent_item["author-link"]."]".$parent_item["author-name"]."[/url]";
-		$plink = "[url=".System::baseUrl()."/display/".urlencode($guid)."]".t("status")."[/url]";
+		$plink = "[url=".System::baseUrl()."/display/".urlencode($guid)."]".L10n::t("status")."[/url]";
 
 		return sprintf($bodyverb, $ulink, $alink, $plink);
 	}
@@ -2050,7 +2143,7 @@ class Diaspora
 
 		$datarray["body"] = self::constructLikeBody($contact, $parent_item, $guid);
 
-		$message_id = item_store($datarray);
+		$message_id = Item::insert($datarray);
 
 		if ($message_id <= 0) {
 			return false;
@@ -2095,7 +2188,7 @@ class Diaspora
 		$guid = notags(unxmlify($data->guid));
 		$conversation_guid = notags(unxmlify($data->conversation_guid));
 		$text = unxmlify($data->text);
-		$created_at = datetime_convert("UTC", "UTC", notags(unxmlify($data->created_at)));
+		$created_at = DateTimeFormat::utc(notags(unxmlify($data->created_at)));
 
 		$contact = self::allowedContactByHandle($importer, $author, true);
 		if (!$contact) {
@@ -2124,7 +2217,7 @@ class Diaspora
 			return false;
 		}
 
-		$body = diaspora2bb($text);
+		$body = Markdown::toBBCode($text);
 
 		$body = self::replacePeopleGuid($body, $person["url"]);
 
@@ -2161,7 +2254,7 @@ class Diaspora
 
 		dba::unlock();
 
-		dba::update('conv', ['updated' => datetime_convert()], ['id' => $conversation["id"]]);
+		dba::update('conv', ['updated' => DateTimeFormat::utcNow()], ['id' => $conversation["id"]]);
 		return true;
 	}
 
@@ -2205,7 +2298,10 @@ class Diaspora
 		}
 
 		logger('Received participation for ID: '.$item['id'].' - Contact: '.$contact_id.' - Server: '.$server, LOGGER_DEBUG);
-		dba::insert('participation', ['iid' => $item['id'], 'cid' => $contact_id, 'fid' => $person['id'], 'server' => $server]);
+
+		if (!dba::exists('participation', ['iid' => $item['id'], 'server' => $server])) {
+			dba::insert('participation', ['iid' => $item['id'], 'cid' => $contact_id, 'fid' => $person['id'], 'server' => $server]);
+		}
 
 		// Send all existing comments and likes to the requesting server
 		$comments = dba::p("SELECT `item`.`id`, `item`.`verb`, `contact`.`self`
@@ -2276,8 +2372,8 @@ class Diaspora
 		$image_url = unxmlify($data->image_url);
 		$birthday = unxmlify($data->birthday);
 		$gender = unxmlify($data->gender);
-		$about = diaspora2bb(unxmlify($data->bio));
-		$location = diaspora2bb(unxmlify($data->location));
+		$about = Markdown::toBBCode(unxmlify($data->bio));
+		$location = Markdown::toBBCode(unxmlify($data->location));
 		$searchable = (unxmlify($data->searchable) == "true");
 		$nsfw = (unxmlify($data->nsfw) == "true");
 		$tags = unxmlify($data->tag_string);
@@ -2312,7 +2408,7 @@ class Diaspora
 		$birthday = str_replace("1000", "1901", $birthday);
 
 		if ($birthday != "") {
-			$birthday = datetime_convert("UTC", "UTC", $birthday, "Y-m-d");
+			$birthday = DateTimeFormat::utc($birthday, "Y-m-d");
 		}
 
 		// this is to prevent multiple birthday notifications in a single year
@@ -2328,7 +2424,7 @@ class Diaspora
 			dbesc($name),
 			dbesc($nick),
 			dbesc($author),
-			dbesc(datetime_convert()),
+			dbesc(DateTimeFormat::utcNow()),
 			dbesc($birthday),
 			dbesc($location),
 			dbesc($about),
@@ -2405,7 +2501,7 @@ class Diaspora
 				$A = "[url=".$self[0]["url"]."]".$self[0]["name"]."[/url]";
 				$B = "[url=".$contact["url"]."]".$contact["name"]."[/url]";
 				$BPhoto = "[url=".$contact["url"]."][img]".$contact["thumb"]."[/img][/url]";
-				$arr["body"] = sprintf(t('%1$s is now friends with %2$s'), $A, $B)."\n\n\n".$BPhoto;
+				$arr["body"] = L10n::t('%1$s is now friends with %2$s', $A, $B)."\n\n\n".$BPhoto;
 
 				$arr["object"] = self::constructNewFriendObject($contact);
 
@@ -2416,7 +2512,7 @@ class Diaspora
 				$arr["deny_cid"]  = $user["deny_cid"];
 				$arr["deny_gid"]  = $user["deny_gid"];
 
-				$i = item_store($arr);
+				$i = Item::insert($arr);
 				if ($i) {
 					Worker::add(PRIORITY_HIGH, "Notifier", "activity", $i);
 				}
@@ -2500,7 +2596,7 @@ class Diaspora
 				return true;
 			} else {
 				logger("Author ".$author." doesn't want to follow us anymore.", LOGGER_DEBUG);
-				lose_follower($importer, $contact);
+				Contact::removeFollower($importer, $contact);
 				return true;
 			}
 		}
@@ -2534,7 +2630,7 @@ class Diaspora
 			intval($importer["uid"]),
 			dbesc($ret["network"]),
 			dbesc($ret["addr"]),
-			datetime_convert(),
+			DateTimeFormat::utcNow(),
 			dbesc($ret["url"]),
 			dbesc(normalise_link($ret["url"])),
 			dbesc($batch),
@@ -2575,9 +2671,9 @@ class Diaspora
 				intval($contact_record["id"]),
 				0,
 				0,
-				dbesc(t("Sharing notification from Diaspora network")),
+				dbesc(L10n::t("Sharing notification from Diaspora network")),
 				dbesc($hash),
-				dbesc(datetime_convert())
+				dbesc(DateTimeFormat::utcNow())
 			);
 		} else {
 			// automatic friend approval
@@ -2608,8 +2704,8 @@ class Diaspora
 				WHERE `id` = %d
 				",
 				intval($new_relation),
-				dbesc(datetime_convert()),
-				dbesc(datetime_convert()),
+				dbesc(DateTimeFormat::utcNow()),
+				dbesc(DateTimeFormat::utcNow()),
 				intval($contact_record["id"])
 			);
 
@@ -2654,7 +2750,7 @@ class Diaspora
 			if (self::isReshare($r[0]["body"], true)) {
 				$r = [];
 			} elseif (self::isReshare($r[0]["body"], false) || strstr($r[0]["body"], "[share")) {
-				$r[0]["body"] = diaspora2bb(bb2diaspora($r[0]["body"]));
+				$r[0]["body"] = Markdown::toBBCode(BBCode::toMarkdown($r[0]["body"]));
 
 				$r[0]["body"] = self::replacePeopleGuid($r[0]["body"], $r[0]["author-link"]);
 
@@ -2689,7 +2785,7 @@ class Diaspora
 				if (DBM::is_result($r)) {
 					// If it is a reshared post from another network then reformat to avoid display problems with two share elements
 					if (self::isReshare($r[0]["body"], false)) {
-						$r[0]["body"] = diaspora2bb(bb2diaspora($r[0]["body"]));
+						$r[0]["body"] = Markdown::toBBCode(BBCode::toMarkdown($r[0]["body"]));
 						$r[0]["body"] = self::replacePeopleGuid($r[0]["body"], $r[0]["author-link"]);
 					}
 
@@ -2713,7 +2809,7 @@ class Diaspora
 	{
 		$author = notags(unxmlify($data->author));
 		$guid = notags(unxmlify($data->guid));
-		$created_at = datetime_convert("UTC", "UTC", notags(unxmlify($data->created_at)));
+		$created_at = DateTimeFormat::utc(notags(unxmlify($data->created_at)));
 		$root_author = notags(unxmlify($data->root_author));
 		$root_guid = notags(unxmlify($data->root_guid));
 		/// @todo handle unprocessed property "provider_display_name"
@@ -2779,7 +2875,7 @@ class Diaspora
 		$datarray["object-type"] = $original_item["object-type"];
 
 		self::fetchGuid($datarray);
-		$message_id = item_store($datarray);
+		$message_id = Item::insert($datarray);
 
 		self::sendParticipation($contact, $datarray);
 
@@ -2841,23 +2937,7 @@ class Diaspora
 				continue;
 			}
 
-			// Currently we don't have a central deletion function that we could use in this case.
-			// The function "item_drop" doesn't work for that case
-			dba::update(
-				'item',
-				[
-					'deleted' => true,
-					'title' => '',
-					'body' => '',
-					'edited' => datetime_convert(),
-					'changed' => datetime_convert()],
-				['id' => $item["id"]]
-			);
-
-			// Delete the thread - if it is a starting post and not a comment
-			if ($target_type != 'Comment') {
-				delete_thread($item["id"], $item["parent-uri"]);
-			}
+			Item::deleteById($item["id"]);
 
 			logger("Deleted target ".$target_guid." (".$item["id"].") from user ".$item["uid"]." parent: ".$item["parent"], LOGGER_DEBUG);
 
@@ -2927,7 +3007,7 @@ class Diaspora
 	{
 		$author = notags(unxmlify($data->author));
 		$guid = notags(unxmlify($data->guid));
-		$created_at = datetime_convert("UTC", "UTC", notags(unxmlify($data->created_at)));
+		$created_at = DateTimeFormat::utc(notags(unxmlify($data->created_at)));
 		$public = notags(unxmlify($data->public));
 		$text = unxmlify($data->text);
 		$provider_display_name = notags(unxmlify($data->provider_display_name));
@@ -2949,7 +3029,7 @@ class Diaspora
 			}
 		}
 
-		$body = diaspora2bb($text);
+		$body = Markdown::toBBCode($text);
 
 		$datarray = [];
 
@@ -3019,7 +3099,7 @@ class Diaspora
 		}
 
 		self::fetchGuid($datarray);
-		$message_id = item_store($datarray);
+		$message_id = Item::insert($datarray);
 
 		self::sendParticipation($contact, $datarray);
 
@@ -3152,7 +3232,7 @@ class Diaspora
 	 *
 	 * @return string The message that will be transmitted to other servers
 	 */
-	private static function buildMessage($msg, $user, $contact, $prvkey, $pubkey, $public = false)
+	public static function buildMessage($msg, $user, $contact, $prvkey, $pubkey, $public = false)
 	{
 		// The message is put into an envelope with the sender's signature
 		$envelope = self::buildMagicEnvelope($msg, $user);
@@ -3196,7 +3276,7 @@ class Diaspora
 	 *
 	 * @return int Result of the transmission
 	 */
-	public static function transmit($owner, $contact, $envelope, $public_batch, $queue_run = false, $guid = "")
+	public static function transmit($owner, $contact, $envelope, $public_batch, $queue_run = false, $guid = "", $no_queue = false)
 	{
 		$a = get_app();
 
@@ -3206,13 +3286,16 @@ class Diaspora
 		}
 
 		$logid = random_string(4);
+
 		$dest_url = ($public_batch ? $contact["batch"] : $contact["notify"]);
 
-		// Fetch the fcontact entry when there is missing data
-		// Will possibly happen when data is transmitted to a DFRN contact
-		if (empty($dest_url) && !empty($contact['addr'])) {
+		// We always try to use the data from the fcontact table.
+		// This is important for transmitting data to Friendica servers.
+		if (!empty($contact['addr'])) {
 			$fcontact = self::personByHandle($contact['addr']);
-			$dest_url = ($public_batch ? $fcontact["batch"] : $fcontact["notify"]);
+			if (!empty($fcontact)) {
+				$dest_url = ($public_batch ? $fcontact["batch"] : $fcontact["notify"]);
+			}
 		}
 
 		if (!$dest_url) {
@@ -3228,7 +3311,7 @@ class Diaspora
 			if (!intval(Config::get("system", "diaspora_test"))) {
 				$content_type = (($public_batch) ? "application/magic-envelope+xml" : "application/json");
 
-				post_url($dest_url."/", $envelope, ["Content-Type: ".$content_type]);
+				Network::post($dest_url."/", $envelope, ["Content-Type: ".$content_type]);
 				$return_code = $a->get_curl_code();
 			} else {
 				logger("test_mode");
@@ -3239,30 +3322,20 @@ class Diaspora
 		logger("transmit: ".$logid."-".$guid." returns: ".$return_code);
 
 		if (!$return_code || (($return_code == 503) && (stristr($a->get_curl_headers(), "retry-after")))) {
-			logger("queue message");
-
-			$r = q(
-				"SELECT `id` FROM `queue` WHERE `cid` = %d AND `network` = '%s' AND `content` = '%s' AND `batch` = %d LIMIT 1",
-				intval($contact["id"]),
-				dbesc(NETWORK_DIASPORA),
-				dbesc($envelope),
-				intval($public_batch)
-			);
-			if ($r) {
-				logger("add_to_queue ignored - identical item already in queue");
-			} else {
+			if (!$no_queue && ($contact['contact-type'] != ACCOUNT_TYPE_RELAY)) {
+				logger("queue message");
 				// queue message for redelivery
-				Queue::add($contact["id"], NETWORK_DIASPORA, $envelope, $public_batch);
-
-				// The message could not be delivered. We mark the contact as "dead"
-				Contact::markForArchival($contact);
+				Queue::add($contact["id"], NETWORK_DIASPORA, $envelope, $public_batch, $guid);
 			}
+
+			// The message could not be delivered. We mark the contact as "dead"
+			Contact::markForArchival($contact);
 		} elseif (($return_code >= 200) && ($return_code <= 299)) {
 			// We successfully delivered a message, the contact is alive
 			Contact::unmarkForArchival($contact);
 		}
 
-		return(($return_code) ? $return_code : (-1));
+		return $return_code ? $return_code : -1;
 	}
 
 
@@ -3309,7 +3382,7 @@ class Diaspora
 		$envelope = self::buildMessage($msg, $owner, $contact, $owner['uprvkey'], $contact['pubkey'], $public_batch);
 
 		if ($spool) {
-			Queue::add($contact['id'], NETWORK_DIASPORA, $envelope, $public_batch);
+			Queue::add($contact['id'], NETWORK_DIASPORA, $envelope, $public_batch, $guid);
 			return true;
 		} else {
 			$return_code = self::transmit($owner, $contact, $envelope, $public_batch, false, $guid);
@@ -3590,7 +3663,7 @@ class Diaspora
 			$eventdata['guid'] = $event['guid'];
 		}
 
-		$mask = 'Y-m-d\TH:i:s\Z';
+		$mask = DateTimeFormat::ATOM;
 
 		/// @todo - establish "all day" events in Friendica
 		$eventdata["all_day"] = "false";
@@ -3604,22 +3677,30 @@ class Diaspora
 		}
 
 		if ($event['start']) {
-			$eventdata['start'] = datetime_convert($eventdata['timezone'], "UTC", $event['start'], $mask);
+			$eventdata['start'] = DateTimeFormat::convert($event['start'], "UTC", $eventdata['timezone'], $mask);
 		}
 		if ($event['finish'] && !$event['nofinish']) {
-			$eventdata['end'] = datetime_convert($eventdata['timezone'], "UTC", $event['finish'], $mask);
+			$eventdata['end'] = DateTimeFormat::convert($event['finish'], "UTC", $eventdata['timezone'], $mask);
 		}
 		if ($event['summary']) {
-			$eventdata['summary'] = html_entity_decode(bb2diaspora($event['summary']));
+			$eventdata['summary'] = html_entity_decode(BBCode::toMarkdown($event['summary']));
 		}
 		if ($event['desc']) {
-			$eventdata['description'] = html_entity_decode(bb2diaspora($event['desc']));
+			$eventdata['description'] = html_entity_decode(BBCode::toMarkdown($event['desc']));
 		}
 		if ($event['location']) {
+			$event['location'] = preg_replace("/\[map\](.*?)\[\/map\]/ism", '$1', $event['location']);
+			$coord = Map::getCoordinates($event['location']);
+
 			$location = [];
-			$location["address"] = html_entity_decode(bb2diaspora($event['location']));
-			$location["lat"] = 0;
-			$location["lng"] = 0;
+			$location["address"] = html_entity_decode(BBCode::toMarkdown($event['location']));
+			if (!empty($coord['lat']) && !empty($coord['lon'])) {
+				$location["lat"] = $coord['lat'];
+				$location["lng"] = $coord['lon'];
+			} else {
+				$location["lat"] = 0;
+				$location["lng"] = 0;
+			}
 			$eventdata['location'] = $location;
 		}
 
@@ -3649,7 +3730,7 @@ class Diaspora
 
 		$public = (($item["private"]) ? "false" : "true");
 
-		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
+		$created = DateTimeFormat::utc($item["created"], DateTimeFormat::ATOM);
 
 		// Detect a share element and do a reshare
 		if (!$item['private'] && ($ret = self::isReshare($item["body"]))) {
@@ -3667,7 +3748,7 @@ class Diaspora
 			$body = $item["body"];
 
 			// convert to markdown
-			$body = html_entity_decode(bb2diaspora($body));
+			$body = html_entity_decode(BBCode::toMarkdown($body));
 
 			// Adding the title
 			if (strlen($title)) {
@@ -3677,7 +3758,7 @@ class Diaspora
 			if ($item["attach"]) {
 				$cnt = preg_match_all('/href=\"(.*?)\"(.*?)title=\"(.*?)\"/ism', $item["attach"], $matches, PREG_SET_ORDER);
 				if (cnt) {
-					$body .= "\n".t("Attachments:")."\n";
+					$body .= "\n".L10n::t("Attachments:")."\n";
 					foreach ($matches as $mtch) {
 						$body .= "[".$mtch[3]."](".$mtch[1].")\n";
 					}
@@ -3713,7 +3794,13 @@ class Diaspora
 				if (count($event)) {
 					$message['event'] = $event;
 
-					/// @todo Once Diaspora supports it, we will remove the body
+					if (!empty($event['location']['address']) &&
+						!empty($event['location']['lat']) &&
+						!empty($event['location']['lng'])) {
+						$message['location'] = $event['location'];
+					}
+
+					/// @todo Once Diaspora supports it, we will remove the body and the location hack above
 					// $message['text'] = '';
 				}
 			}
@@ -3766,6 +3853,7 @@ class Diaspora
 		$parent = $p[0];
 
 		$target_type = ($parent["uri"] === $parent["parent-uri"] ? "Post" : "Comment");
+		$positive = null;
 		if ($item['verb'] === ACTIVITY_LIKE) {
 			$positive = "true";
 		} elseif ($item['verb'] === ACTIVITY_DISLIKE) {
@@ -3851,8 +3939,8 @@ class Diaspora
 
 		$parent = $p[0];
 
-		$text = html_entity_decode(bb2diaspora($item["body"]));
-		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
+		$text = html_entity_decode(BBCode::toMarkdown($item["body"]));
+		$created = DateTimeFormat::utc($item["created"], DateTimeFormat::ATOM);
 
 		$comment = ["author" => self::myHandle($owner),
 				"guid" => $item["guid"],
@@ -4033,7 +4121,7 @@ class Diaspora
 	 */
 	public static function sendRetraction($item, $owner, $contact, $public_batch = false, $relay = false)
 	{
-		$itemaddr = self::handleFromContact($item["contact-id"], $item["gcontact-id"]);
+		$itemaddr = self::handleFromContact($item["contact-id"], $item["author-id"]);
 
 		$msg_type = "retraction";
 
@@ -4083,12 +4171,12 @@ class Diaspora
 			"author" => $cnv["creator"],
 			"guid" => $cnv["guid"],
 			"subject" => $cnv["subject"],
-			"created_at" => datetime_convert("UTC", "UTC", $cnv['created'], 'Y-m-d\TH:i:s\Z'),
+			"created_at" => DateTimeFormat::utc($cnv['created'], DateTimeFormat::ATOM),
 			"participants" => $cnv["recips"]
 		];
 
-		$body = bb2diaspora($item["body"]);
-		$created = datetime_convert("UTC", "UTC", $item["created"], 'Y-m-d\TH:i:s\Z');
+		$body = BBCode::toMarkdown($item["body"]);
+		$created = DateTimeFormat::utc($item["created"], DateTimeFormat::ATOM);
 
 		$msg = [
 			"author" => $myaddr,
@@ -4106,7 +4194,7 @@ class Diaspora
 					"author" => $cnv["creator"],
 					"guid" => $cnv["guid"],
 					"subject" => $cnv["subject"],
-					"created_at" => datetime_convert("UTC", "UTC", $cnv['created'], 'Y-m-d\TH:i:s\Z'),
+					"created_at" => DateTimeFormat::utc($cnv['created'], DateTimeFormat::ATOM),
 					"participants" => $cnv["recips"],
 					"message" => $msg];
 
@@ -4206,6 +4294,10 @@ class Diaspora
 		$small = System::baseUrl().'/photo/custom/50/'  .$profile['uid'].'.jpg';
 		$searchable = (($profile['publish'] && $profile['net-publish']) ? 'true' : 'false');
 
+		$dob = null;
+		$about = null;
+		$location = null;
+		$tags = null;
 		if ($searchable === 'true') {
 			$dob = '';
 
@@ -4214,11 +4306,11 @@ class Diaspora
 				if ($year < 1004) {
 					$year = 1004;
 				}
-				$dob = datetime_convert('UTC', 'UTC', $year . '-' . $month . '-'. $day, 'Y-m-d');
+				$dob = DateTimeFormat::utc($year . '-' . $month . '-'. $day, 'Y-m-d');
 			}
 
 			$about = $profile['about'];
-			$about = strip_tags(bbcode($about));
+			$about = strip_tags(BBCode::convert($about));
 
 			$location = Profile::formatLocation($profile);
 			$tags = '';

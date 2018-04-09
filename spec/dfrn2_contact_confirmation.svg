@@ -69,7 +69,7 @@ text { font:12px Dialog; }
 <text x="29" y="1664" style="font:13px Open Sans">getting transmitted (if $aes_allow -&gt; encrypt the the public key)</text>
 <text x="29" y="1710" style="font:13px Open Sans">	-&gt; add duplex state and page-flags to the params</text>
 <text x="29" y="1756" style="font:13px Open Sans">  -&gt; send params to Bobs dfrn_confirm page ($res = </text>
-<text x="29" y="1779" style="font:13px Open Sans">post_url($dfrn_confirm,$params);</text>
+<text x="29" y="1779" style="font:13px Open Sans">Network::post($dfrn_confirm,$params);</text>
 <clipPath id="clip11"><path d="M1041,1319 L1619,1319 L1619,1913 L1041,1913 L1041,1319 Z" /></clipPath>
 <path d="M1050,1320 C1045.5820313,1320 1042,1323.5820313 1042,1328 L1042,1903 C1042,1907.4179688 1045.5820313,1911 1050,1911 L1609,1911 C1613.4179688,1911 1617,1907.4179688 1617,1903 L1617,1328 C1617,1323.5820313 1613.4179688,1320 1609,1320 Z" style="fill:rgb(255,255,3);stroke:none" clip-path="url(#clip11)" />
 <text x="1055" y="1342" style="font:13px Open Sans">dfrn_confirm_post()</text>

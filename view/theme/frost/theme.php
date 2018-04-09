@@ -10,9 +10,9 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Addon;
 use Friendica\Core\System;
-use Friendica\Object\Image;
 
 function frost_init(App $a) {
 	$a->videowidth = 400;
@@ -49,10 +49,8 @@ function frost_uninstall() {
 
 function frost_item_photo_links(App $a, &$body_info)
 {
-	$phototypes = Image::supportedTypes();
-
-	$occurence = 1;
-	$p = bb_find_open_close($body_info['html'], "<a", ">");
+	$occurence = 0;
+	$p = Plaintext::getBoundariesPosition($body_info['html'], '<a', '>');
 	while($p !== false && ($occurence++ < 500)) {
 		$link = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
 
@@ -73,7 +71,7 @@ function frost_item_photo_links(App $a, &$body_info)
 
 		}
 
-		$p = bb_find_open_close($body_info['html'], "<a", ">", $occurence);
+		$p = Plaintext::getBoundariesPosition($body_info['html'], '<a', '>', $occurence);
 	}
 }
 

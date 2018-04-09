@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Core\PConfig;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Protocol\OStatus;
@@ -12,24 +13,13 @@ use Friendica\Util\Crypto;
 
 require_once 'include/items.php';
 
-function salmon_return($val) {
+function salmon_post(App $a, $xml = '') {
 
-	if($val >= 400)
-		$err = 'Error';
-	if($val >= 200 && $val < 300)
-		$err = 'OK';
+	if (empty($xml)) {
+		$xml = file_get_contents('php://input');
+	}
 
-	logger('mod-salmon returns ' . $val);
-	header($_SERVER["SERVER_PROTOCOL"] . ' ' . $val . ' ' . $err);
-	killme();
-
-}
-
-function salmon_post(App $a) {
-
-	$xml = file_get_contents('php://input');
-
-	logger('mod-salmon: new salmon ' . $xml, LOGGER_DATA);
+	logger('new salmon ' . $xml, LOGGER_DATA);
 
 	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
 	$mentions   = (($a->argc > 2 && $a->argv[2] === 'mention') ? true : false);
@@ -38,7 +28,7 @@ function salmon_post(App $a) {
 		dbesc($nick)
 	);
 	if (! DBM::is_result($r)) {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 
 	$importer = $r[0];
@@ -47,8 +37,9 @@ function salmon_post(App $a) {
 
 	$dom = simplexml_load_string($xml,'SimpleXMLElement',0,NAMESPACE_SALMON_ME);
 
-	// figure out where in the DOM tree our data is hiding
+	$base = null;
 
+	// figure out where in the DOM tree our data is hiding
 	if($dom->provenance->data)
 		$base = $dom->provenance;
 	elseif($dom->env->data)
@@ -57,8 +48,8 @@ function salmon_post(App $a) {
 		$base = $dom;
 
 	if(! $base) {
-		logger('mod-salmon: unable to locate salmon data in xml ');
-		http_status_exit(400);
+		logger('unable to locate salmon data in xml ');
+		System::httpExit(400);
 	}
 
 	// Stash the signature away for now. We have to find their key or it won't be good for anything.
@@ -95,19 +86,19 @@ function salmon_post(App $a) {
 	$author_link = $author["author-link"];
 
 	if(! $author_link) {
-		logger('mod-salmon: Could not retrieve author URI.');
-		http_status_exit(400);
+		logger('Could not retrieve author URI.');
+		System::httpExit(400);
 	}
 
 	// Once we have the author URI, go to the web and try to find their public key
 
-	logger('mod-salmon: Fetching key for ' . $author_link);
+	logger('Fetching key for ' . $author_link);
 
 	$key = Salmon::getKey($author_link, $keyhash);
 
 	if(! $key) {
-		logger('mod-salmon: Could not retrieve author key.');
-		http_status_exit(400);
+		logger('Could not retrieve author key.');
+		System::httpExit(400);
 	}
 
 	$key_info = explode('.',$key);
@@ -115,7 +106,7 @@ function salmon_post(App $a) {
 	$m = base64url_decode($key_info[1]);
 	$e = base64url_decode($key_info[2]);
 
-	logger('mod-salmon: key details: ' . print_r($key_info,true), LOGGER_DEBUG);
+	logger('key details: ' . print_r($key_info,true), LOGGER_DEBUG);
 
 	$pubkey = Crypto::meToPem($m, $e);
 
@@ -126,23 +117,23 @@ function salmon_post(App $a) {
 	$mode = 1;
 
 	if (! $verify) {
-		logger('mod-salmon: message did not verify using protocol. Trying compliant format.');
+		logger('message did not verify using protocol. Trying compliant format.');
 		$verify = Crypto::rsaVerify($compliant_format, $signature, $pubkey);
 		$mode = 2;
 	}
 
 	if (! $verify) {
-		logger('mod-salmon: message did not verify using padding. Trying old statusnet format.');
+		logger('message did not verify using padding. Trying old statusnet format.');
 		$verify = Crypto::rsaVerify($stnet_signed_data, $signature, $pubkey);
 		$mode = 3;
 	}
 
 	if (! $verify) {
-		logger('mod-salmon: Message did not verify. Discarding.');
-		http_status_exit(400);
+		logger('Message did not verify. Discarding.');
+		System::httpExit(400);
 	}
 
-	logger('mod-salmon: Message verified with mode '.$mode);
+	logger('Message verified with mode '.$mode);
 
 
 	/*
@@ -162,7 +153,7 @@ function salmon_post(App $a) {
 		intval($importer['uid'])
 	);
 	if (! DBM::is_result($r)) {
-		logger('mod-salmon: Author unknown to us.');
+		logger('Author ' . $author_link . ' unknown to user ' . $importer['uid'] . '.');
 		if(PConfig::get($importer['uid'],'system','ostatus_autofriend')) {
 			$result = Contact::createFromProbe($importer['uid'], $author_link);
 			if($result['success']) {
@@ -182,8 +173,8 @@ function salmon_post(App $a) {
 
 	//if((DBM::is_result($r)) && (($r[0]['readonly']) || ($r[0]['rel'] == CONTACT_IS_FOLLOWER) || ($r[0]['blocked']))) {
 	if (DBM::is_result($r) && $r[0]['blocked']) {
-		logger('mod-salmon: Ignoring this author.');
-		http_status_exit(202);
+		logger('Ignoring this author.');
+		System::httpExit(202);
 		// NOTREACHED
 	}
 
@@ -194,5 +185,5 @@ function salmon_post(App $a) {
 
 	OStatus::import($data, $importer, $contact_rec, $hub);
 
-	http_status_exit(200);
+	System::httpExit(200);
 }

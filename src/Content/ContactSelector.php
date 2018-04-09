@@ -5,6 +5,7 @@
 namespace Friendica\Content;
 
 use Friendica\Core\Addon;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use Friendica\Protocol\Diaspora;
 use dba;
@@ -26,7 +27,7 @@ class ContactSelector
 
 		$o .= "<select id=\"contact-profile-selector\" class=\"form-control\" $disabled name=\"profile-assign\" >\r\n";
 
-		$s = dba::select('profile', ['id', 'profile-name', 'is-default'], ['uid' => $$_SESSION['uid']]);
+		$s = dba::select('profile', ['id', 'profile-name', 'is-default'], ['uid' => $_SESSION['uid']]);
 		$r = dba::inArray($s);
 
 		if (DBM::is_result($r)) {
@@ -51,12 +52,12 @@ class ContactSelector
 		$o .= "<select id=\"contact-poll-interval\" name=\"poll\" $dis />" . "\r\n";
 
 		$rep = [
-			0 => t('Frequently'),
-			1 => t('Hourly'),
-			2 => t('Twice daily'),
-			3 => t('Daily'),
-			4 => t('Weekly'),
-			5 => t('Monthly')
+			0 => L10n::t('Frequently'),
+			1 => L10n::t('Hourly'),
+			2 => L10n::t('Twice daily'),
+			3 => L10n::t('Daily'),
+			4 => L10n::t('Weekly'),
+			5 => L10n::t('Monthly')
 		];
 
 		foreach ($rep as $k => $v) {
@@ -75,23 +76,23 @@ class ContactSelector
 	public static function networkToName($s, $profile = "")
 	{
 		$nets = [
-			NETWORK_DFRN     => t('Friendica'),
-			NETWORK_OSTATUS  => t('OStatus'),
-			NETWORK_FEED     => t('RSS/Atom'),
-			NETWORK_MAIL     => t('Email'),
-			NETWORK_DIASPORA => t('Diaspora'),
-			NETWORK_FACEBOOK => t('Facebook'),
-			NETWORK_ZOT      => t('Zot!'),
-			NETWORK_LINKEDIN => t('LinkedIn'),
-			NETWORK_XMPP     => t('XMPP/IM'),
-			NETWORK_MYSPACE  => t('MySpace'),
-			NETWORK_GPLUS    => t('Google+'),
-			NETWORK_PUMPIO   => t('pump.io'),
-			NETWORK_TWITTER  => t('Twitter'),
-			NETWORK_DIASPORA2 => t('Diaspora Connector'),
-			NETWORK_STATUSNET => t('GNU Social Connector'),
-			NETWORK_PNUT      => t('pnut'),
-			NETWORK_APPNET => t('App.net')
+			NETWORK_DFRN     => L10n::t('Friendica'),
+			NETWORK_OSTATUS  => L10n::t('OStatus'),
+			NETWORK_FEED     => L10n::t('RSS/Atom'),
+			NETWORK_MAIL     => L10n::t('Email'),
+			NETWORK_DIASPORA => L10n::t('Diaspora'),
+			NETWORK_FACEBOOK => L10n::t('Facebook'),
+			NETWORK_ZOT      => L10n::t('Zot!'),
+			NETWORK_LINKEDIN => L10n::t('LinkedIn'),
+			NETWORK_XMPP     => L10n::t('XMPP/IM'),
+			NETWORK_MYSPACE  => L10n::t('MySpace'),
+			NETWORK_GPLUS    => L10n::t('Google+'),
+			NETWORK_PUMPIO   => L10n::t('pump.io'),
+			NETWORK_TWITTER  => L10n::t('Twitter'),
+			NETWORK_DIASPORA2 => L10n::t('Diaspora Connector'),
+			NETWORK_STATUSNET => L10n::t('GNU Social Connector'),
+			NETWORK_PNUT      => L10n::t('pnut'),
+			NETWORK_APPNET => L10n::t('App.net')
 		];
 
 		Addon::callHooks('network_to_name', $nets);
@@ -121,10 +122,10 @@ class ContactSelector
 	public static function gender($current = "", $suffix = "")
 	{
 		$o = '';
-		$select = ['', t('Male'), t('Female'), t('Currently Male'), t('Currently Female'), t('Mostly Male'), t('Mostly Female'), t('Transgender'), t('Intersex'), t('Transsexual'), t('Hermaphrodite'), t('Neuter'), t('Non-specific'), t('Other'), t('Undecided')];
-	
+		$select = ['', L10n::t('Male'), L10n::t('Female'), L10n::t('Currently Male'), L10n::t('Currently Female'), L10n::t('Mostly Male'), L10n::t('Mostly Female'), L10n::t('Transgender'), L10n::t('Intersex'), L10n::t('Transsexual'), L10n::t('Hermaphrodite'), L10n::t('Neuter'), L10n::t('Non-specific'), L10n::t('Other'), L10n::t('Undecided')];
+
 		Addon::callHooks('gender_selector', $select);
-	
+
 		$o .= "<select name=\"gender$suffix\" id=\"gender-select$suffix\" size=\"1\" >";
 		foreach ($select as $selection) {
 			if ($selection !== 'NOTRANSLATION') {
@@ -135,7 +136,7 @@ class ContactSelector
 		$o .= '</select>';
 		return $o;
 	}
-	
+
 	/**
 	 * @param string $current optional, default empty
 	 * @param string $suffix  optionsl, default empty
@@ -143,11 +144,11 @@ class ContactSelector
 	public static function sexualPreference($current = "", $suffix = "")
 	{
 		$o = '';
-		$select = ['', t('Males'), t('Females'), t('Gay'), t('Lesbian'), t('No Preference'), t('Bisexual'), t('Autosexual'), t('Abstinent'), t('Virgin'), t('Deviant'), t('Fetish'), t('Oodles'), t('Nonsexual')];
-	
-	
+		$select = ['', L10n::t('Males'), L10n::t('Females'), L10n::t('Gay'), L10n::t('Lesbian'), L10n::t('No Preference'), L10n::t('Bisexual'), L10n::t('Autosexual'), L10n::t('Abstinent'), L10n::t('Virgin'), L10n::t('Deviant'), L10n::t('Fetish'), L10n::t('Oodles'), L10n::t('Nonsexual')];
+
+
 		Addon::callHooks('sexpref_selector', $select);
-	
+
 		$o .= "<select name=\"sexual$suffix\" id=\"sexual-select$suffix\" size=\"1\" >";
 		foreach ($select as $selection) {
 			if ($selection !== 'NOTRANSLATION') {
@@ -158,17 +159,17 @@ class ContactSelector
 		$o .= '</select>';
 		return $o;
 	}
-	
+
 	/**
 	 * @param string $current optional, default empty
 	 */
 	public static function maritalStatus($current = "")
 	{
 		$o = '';
-		$select = ['', t('Single'), t('Lonely'), t('Available'), t('Unavailable'), t('Has crush'), t('Infatuated'), t('Dating'), t('Unfaithful'), t('Sex Addict'), t('Friends'), t('Friends/Benefits'), t('Casual'), t('Engaged'), t('Married'), t('Imaginarily married'), t('Partners'), t('Cohabiting'), t('Common law'), t('Happy'), t('Not looking'), t('Swinger'), t('Betrayed'), t('Separated'), t('Unstable'), t('Divorced'), t('Imaginarily divorced'), t('Widowed'), t('Uncertain'), t('It\'s complicated'), t('Don\'t care'), t('Ask me')];
-	
+		$select = ['', L10n::t('Single'), L10n::t('Lonely'), L10n::t('Available'), L10n::t('Unavailable'), L10n::t('Has crush'), L10n::t('Infatuated'), L10n::t('Dating'), L10n::t('Unfaithful'), L10n::t('Sex Addict'), L10n::t('Friends'), L10n::t('Friends/Benefits'), L10n::t('Casual'), L10n::t('Engaged'), L10n::t('Married'), L10n::t('Imaginarily married'), L10n::t('Partners'), L10n::t('Cohabiting'), L10n::t('Common law'), L10n::t('Happy'), L10n::t('Not looking'), L10n::t('Swinger'), L10n::t('Betrayed'), L10n::t('Separated'), L10n::t('Unstable'), L10n::t('Divorced'), L10n::t('Imaginarily divorced'), L10n::t('Widowed'), L10n::t('Uncertain'), L10n::t('It\'s complicated'), L10n::t('Don\'t care'), L10n::t('Ask me')];
+
 		Addon::callHooks('marital_selector', $select);
-	
+
 		$o .= '<select name="marital" id="marital-select" size="1" >';
 		foreach ($select as $selection) {
 			if ($selection !== 'NOTRANSLATION') {

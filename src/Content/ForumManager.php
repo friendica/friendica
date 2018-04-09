@@ -7,6 +7,7 @@ namespace Friendica\Content;
 
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use dba;
@@ -121,12 +122,12 @@ class ForumManager
 			$o .= replace_macros(
 				$tpl,
 				[
-					'$title'	=> t('Forums'),
+					'$title'	=> L10n::t('Forums'),
 					'$forums'	=> $entries,
-					'$link_desc'	=> t('External link to forum'),
+					'$link_desc'	=> L10n::t('External link to forum'),
 					'$total'	=> $total,
 					'$visible_forums' => $visible_forums,
-					'$showmore'	=> t('show more')]
+					'$showmore'	=> L10n::t('show more')]
 			);
 		}
 

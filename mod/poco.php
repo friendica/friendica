@@ -3,17 +3,21 @@
 // See here for a documentation for portable contacts:
 // https://web.archive.org/web/20160405005550/http://portablecontacts.net/draft-spec.html
 
+
 use Friendica\App;
+use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Protocol\PortableContact;
+use Friendica\Util\DateTimeFormat;
 
 function poco_init(App $a) {
 	$system_mode = false;
 
 	if (intval(Config::get('system', 'block_public')) || (Config::get('system', 'block_local_dir'))) {
-		http_status_exit(401);
+		System::httpExit(401);
 	}
 
 	if ($a->argc > 1) {
@@ -22,7 +26,7 @@ function poco_init(App $a) {
 	if (! x($user)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");
 		if (! DBM::is_result($c)) {
-			http_status_exit(401);
+			System::httpExit(401);
 		}
 		$system_mode = true;
 	}
@@ -42,7 +46,7 @@ function poco_init(App $a) {
 	if ($a->argc > 1 && $a->argv[1] === '@global') {
 		// List of all profiles that this server recently had data from
 		$global = true;
-		$update_limit = date("Y-m-d H:i:s", time() - 30 * 86400);
+		$update_limit = date(DateTimeFormat::MYSQL, time() - 30 * 86400);
 	}
 	if ($a->argc > 2 && $a->argv[2] === '@me') {
 		$justme = true;
@@ -63,7 +67,7 @@ function poco_init(App $a) {
 			dbesc($user)
 		);
 		if (! DBM::is_result($users) || $users[0]['hidewall'] || $users[0]['hide-friends']) {
-			http_status_exit(404);
+			System::httpExit(404);
 		}
 
 		$user = $users[0];
@@ -79,7 +83,7 @@ function poco_init(App $a) {
 		$sql_extra = sprintf(" AND `contact`.`id` = %d ", intval($cid));
 	}
 	if (x($_GET, 'updatedSince')) {
-		$update_limit = date("Y-m-d H:i:s", strtotime($_GET['updatedSince']));
+		$update_limit = date(DateTimeFormat::MYSQL, strtotime($_GET['updatedSince']));
 	}
 	if ($global) {
 		$contacts = q("SELECT count(*) AS `total` FROM `gcontact` WHERE `updated` >= '%s' AND `updated` >= `last_failure` AND NOT `hide` AND `network` IN ('%s', '%s', '%s')",
@@ -242,8 +246,7 @@ function poco_init(App $a) {
 				}
 				$about = Cache::get("about:" . $contact['updated'] . ":" . $contact['nurl']);
 				if (is_null($about)) {
-					require_once 'include/bbcode.php';
-					$about = bbcode($contact['about'], false, false);
+					$about = BBCode::convert($contact['about'], false);
 					Cache::set("about:" . $contact['updated'] . ":" . $contact['nurl'], $about);
 				}
 
@@ -357,7 +360,7 @@ function poco_init(App $a) {
 			$ret['entry'][] = [];
 		}
 	} else {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 	logger("End of poco", LOGGER_DEBUG);
 
@@ -371,6 +374,6 @@ function poco_init(App $a) {
 		echo json_encode($ret);
 		killme();
 	} else {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 }

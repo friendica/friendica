@@ -52,6 +52,7 @@ class XML
 			}
 		}
 
+		$element = null;
 		foreach ($array as $key => $value) {
 			if (!isset($element) && isset($xml)) {
 				$element = $xml;
@@ -185,12 +186,13 @@ class XML
 			return(null);
 		}
 
+		$xml_element_copy = '';
 		if (!is_string($xml_element)
 			&& !is_array($xml_element)
 			&& (get_class($xml_element) == 'SimpleXMLElement')
 		) {
-				$xml_element_copy = $xml_element;
-				$xml_element = get_object_vars($xml_element);
+			$xml_element_copy = $xml_element;
+			$xml_element = get_object_vars($xml_element);
 		}
 
 		if (is_array($xml_element)) {
@@ -412,5 +414,21 @@ class XML
 		foreach ($list as $child) {
 			$child->parentNode->removeChild($child);
 		}
+	}
+
+	public static function parseString($s, $strict = true)
+	{
+		// the "strict" parameter is deactivated
+		libxml_use_internal_errors(true);
+
+		$x = @simplexml_load_string($s);
+		if (!$x) {
+			logger('libxml: parse: error: ' . $s, LOGGER_DATA);
+			foreach (libxml_get_errors() as $err) {
+				logger('libxml: parse: ' . $err->code." at ".$err->line.":".$err->column." : ".$err->message, LOGGER_DATA);
+			}
+			libxml_clear_errors();
+		}
+		return $x;
 	}
 }

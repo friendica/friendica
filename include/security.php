@@ -1,12 +1,16 @@
 <?php
+/**
+ * @file include/security.php
+ */
 
-use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Group;
+use Friendica\Util\DateTimeFormat;
 
 /**
  * @brief Calculate the hash that is needed for the "Friendica" cookie
@@ -74,10 +78,10 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		if ($a->user['login_date'] <= NULL_DATE) {
 			$_SESSION['return_url'] = 'profile_photo/new';
 			$a->module = 'profile_photo';
-			info(t("Welcome ") . $a->user['username'] . EOL);
-			info(t('Please upload a profile photo.') . EOL);
+			info(L10n::t("Welcome ") . $a->user['username'] . EOL);
+			info(L10n::t('Please upload a profile photo.') . EOL);
 		} else {
-			info(t("Welcome back ") . $a->user['username'] . EOL);
+			info(L10n::t("Welcome back ") . $a->user['username'] . EOL);
 		}
 	}
 
@@ -103,12 +107,35 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		}
 	}
 
-	$r = dba::select('user', ['uid', 'username', 'nickname'],
-		['password' => $master_record['password'], 'email' => $master_record['email'], 'account_removed' => false]);
-	if (DBM::is_result($r)) {
-		$a->identities = dba::inArray($r);
+	if ($master_record['parent-uid'] == 0) {
+		// First add our own entry
+		$a->identities = [['uid' => $master_record['uid'],
+				'username' => $master_record['username'],
+				'nickname' => $master_record['nickname']]];
+
+		// Then add all the children
+		$r = dba::select('user', ['uid', 'username', 'nickname'],
+			['parent-uid' => $master_record['uid'], 'account_removed' => false]);
+		if (DBM::is_result($r)) {
+			$a->identities = array_merge($a->identities, dba::inArray($r));
+		}
 	} else {
+		// Just ensure that the array is always defined
 		$a->identities = [];
+
+		// First entry is our parent
+		$r = dba::select('user', ['uid', 'username', 'nickname'],
+			['uid' => $master_record['parent-uid'], 'account_removed' => false]);
+		if (DBM::is_result($r)) {
+			$a->identities = dba::inArray($r);
+		}
+
+		// Then add all siblings
+		$r = dba::select('user', ['uid', 'username', 'nickname'],
+			['parent-uid' => $master_record['parent-uid'], 'account_removed' => false]);
+		if (DBM::is_result($r)) {
+			$a->identities = array_merge($a->identities, dba::inArray($r));
+		}
 	}
 
 	$r = dba::p("SELECT `user`.`uid`, `user`.`username`, `user`.`nickname`
@@ -138,11 +165,11 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	header('X-Account-Management-Status: active; name="' . $a->user['username'] . '"; id="' . $a->user['nickname'] . '"');
 
 	if ($login_initial || $login_refresh) {
-		dba::update('user', ['login_date' => datetime_convert()], ['uid' => $_SESSION['uid']]);
+		dba::update('user', ['login_date' => DateTimeFormat::utcNow()], ['uid' => $_SESSION['uid']]);
 
 		// Set the login date for all identities of the user
-		dba::update('user', ['login_date' => datetime_convert()],
-			['password' => $master_record['password'], 'email' => $master_record['email'], 'account_removed' => false]);
+		dba::update('user', ['login_date' => DateTimeFormat::utcNow()],
+			['parent-uid' => $master_record['uid'], 'account_removed' => false]);
 	}
 
 	if ($login_initial) {
@@ -401,7 +428,7 @@ function check_form_security_token($typename = '', $formname = 'form_security_to
 
 function check_form_security_std_err_msg()
 {
-	return t('The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it.') . EOL;
+	return L10n::t("The form security token was not correct. This probably happened because the form has been opened for too long \x28>3 hours\x29 before submitting it.") . EOL;
 }
 
 function check_form_security_token_redirectOnErr($err_redirect, $typename = '', $formname = 'form_security_token')

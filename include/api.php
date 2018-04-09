@@ -5,22 +5,26 @@
  * @file include/api.php
  * @todo Automatically detect if incoming data is HTML or BBCode
  */
+
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Addon;
-use Friendica\Core\System;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
 use Friendica\Core\PConfig;
+use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
+use Friendica\Model\Item;
 use Friendica\Model\Mail;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
-use Friendica\Model\Item;
 use Friendica\Network\FKOAuth1;
 use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\BadRequestException;
@@ -29,24 +33,20 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\MethodNotAllowedException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Network\HTTPException\NotImplementedException;
-use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Network\HTTPException\TooManyRequestsException;
+use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 use Friendica\Util\XML;
 
-require_once 'include/bbcode.php';
-require_once 'include/datetime.php';
 require_once 'include/conversation.php';
-require_once 'include/html2plain.php';
 require_once 'mod/share.php';
 require_once 'mod/item.php';
 require_once 'include/security.php';
-require_once 'include/html2bbcode.php';
 require_once 'mod/wall_upload.php';
 require_once 'mod/proxy.php';
-require_once 'include/like.php';
-require_once 'include/plaintext.php';
 
 define('API_METHOD_ANY', '*');
 define('API_METHOD_GET', 'GET');
@@ -108,7 +108,7 @@ function api_source()
 function api_date($str)
 {
 	// Wed May 23 06:01:13 +0000 2007
-	return datetime_convert('UTC', 'UTC', $str, "D M d H:i:s +0000 Y");
+	return DateTimeFormat::utc($str, "D M d H:i:s +0000 Y");
 }
 
 /**
@@ -316,12 +316,16 @@ function api_call(App $a)
 					/// @TODO round() really everywhere?
 					logger(
 						parse_url($a->query_string, PHP_URL_PATH) . ": " . sprintf(
-							"Database: %s/%s, Network: %s, I/O: %s, Other: %s, Total: %s",
+							"Database: %s/%s, Cache %s/%s, Network: %s, I/O: %s, Other: %s, Total: %s",
 							round($a->performance["database"] - $a->performance["database_write"], 3),
 							round($a->performance["database_write"], 3),
+							round($a->performance["cache"], 3),
+							round($a->performance["cache_write"], 3),
 							round($a->performance["network"], 2),
 							round($a->performance["file"], 2),
-							round($duration - ($a->performance["database"] + $a->performance["network"]	+ $a->performance["file"]), 2),
+							round($duration - ($a->performance["database"]
+								+ $a->performance["cache"] + $a->performance["cache_write"]
+								+ $a->performance["network"] + $a->performance["file"]), 2),
 							round($duration, 2)
 						),
 						LOGGER_DEBUG
@@ -337,6 +341,21 @@ function api_call(App $a)
 						}
 						$o .= "\nDatabase Write:\n";
 						foreach ($a->callstack["database_write"] as $func => $time) {
+							$time = round($time, 3);
+							if ($time > 0) {
+								$o .= $func . ": " . $time . "\n";
+							}
+						}
+
+						$o = "Cache Read:\n";
+						foreach ($a->callstack["cache"] as $func => $time) {
+							$time = round($time, 3);
+							if ($time > 0) {
+								$o .= $func . ": " . $time . "\n";
+							}
+						}
+						$o .= "\nCache Write:\n";
+						foreach ($a->callstack["cache_write"] as $func => $time) {
 							$time = round($time, 3);
 							if ($time > 0) {
 								$o .= $func . ": " . $time . "\n";
@@ -457,7 +476,7 @@ function api_rss_extra(App $a, $arr, $user_info)
 		'self'         => System::baseUrl() . "/" . $a->query_string,
 		'base'         => System::baseUrl(),
 		'updated'      => api_date(null),
-		'atom_updated' => datetime_convert('UTC', 'UTC', 'now', ATOM_TIME),
+		'atom_updated' => DateTimeFormat::utcNow(DateTimeFormat::ATOM),
 		'language'     => $user_info['language'],
 		'logo'         => System::baseUrl() . "/images/friendica-32.png",
 	];
@@ -628,6 +647,8 @@ function api_get_user(App $a, $contact_id = null)
 				'description' => $r[0]["about"],
 				'profile_image_url' => $r[0]["micro"],
 				'profile_image_url_https' => $r[0]["micro"],
+				'profile_image_url_profile_size' => $r[0]["thumb"],
+				'profile_image_url_large' => $r[0]["photo"],
 				'url' => $r[0]["url"],
 				'protected' => false,
 				'followers_count' => 0,
@@ -763,6 +784,8 @@ function api_get_user(App $a, $contact_id = null)
 		'description' => $description,
 		'profile_image_url' => $uinfo[0]['micro'],
 		'profile_image_url_https' => $uinfo[0]['micro'],
+		'profile_image_url_profile_size' => $uinfo[0]["thumb"],
+		'profile_image_url_large' => $uinfo[0]["photo"],
 		'url' => $uinfo[0]['url'],
 		'protected' => false,
 		'followers_count' => intval($countfollowers),
@@ -1076,7 +1099,7 @@ function api_statuses_mediap($type)
 		$purifier = new HTMLPurifier($config);
 		$txt = $purifier->purify($txt);
 	}
-	$txt = html2bbcode($txt);
+	$txt = HTML::toBBCode($txt);
 
 	$a->argv[1]=$user_info['screen_name']; //should be set to username?
 
@@ -1127,7 +1150,7 @@ function api_statuses_update($type)
 			$purifier = new HTMLPurifier($config);
 			$txt = $purifier->purify($txt);
 
-			$_REQUEST['body'] = html2bbcode($txt);
+			$_REQUEST['body'] = HTML::toBBCode($txt);
 		}
 	} else {
 		$_REQUEST['body'] = requestdata('status');
@@ -1159,7 +1182,7 @@ function api_statuses_update($type)
 		// Check for throttling (maximum posts per day, week and month)
 		$throttle_day = Config::get('system', 'throttle_limit_day');
 		if ($throttle_day > 0) {
-			$datefrom = date("Y-m-d H:i:s", time() - 24*60*60);
+			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60);
 
 			$r = q(
 				"SELECT COUNT(*) AS `posts_day` FROM `item` WHERE `uid`=%d AND `wall`
@@ -1176,14 +1199,14 @@ function api_statuses_update($type)
 
 			if ($posts_day > $throttle_day) {
 				logger('Daily posting limit reached for user '.api_user(), LOGGER_DEBUG);
-				// die(api_error($type, sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day)));
-				throw new TooManyRequestsException(sprintf(t("Daily posting limit of %d posts reached. The post was rejected."), $throttle_day));
+				// die(api_error($type, L10n::t("Daily posting limit of %d posts reached. The post was rejected.", $throttle_day));
+				throw new TooManyRequestsException(L10n::tt("Daily posting limit of %d post reached. The post was rejected.", "Daily posting limit of %d posts reached. The post was rejected.", $throttle_day));
 			}
 		}
 
 		$throttle_week = Config::get('system', 'throttle_limit_week');
 		if ($throttle_week > 0) {
-			$datefrom = date("Y-m-d H:i:s", time() - 24*60*60*7);
+			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*7);
 
 			$r = q(
 				"SELECT COUNT(*) AS `posts_week` FROM `item` WHERE `uid`=%d AND `wall`
@@ -1200,14 +1223,14 @@ function api_statuses_update($type)
 
 			if ($posts_week > $throttle_week) {
 				logger('Weekly posting limit reached for user '.api_user(), LOGGER_DEBUG);
-				// die(api_error($type, sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week)));
-				throw new TooManyRequestsException(sprintf(t("Weekly posting limit of %d posts reached. The post was rejected."), $throttle_week));
+				// die(api_error($type, L10n::t("Weekly posting limit of %d posts reached. The post was rejected.", $throttle_week)));
+				throw new TooManyRequestsException(L10n::tt("Weekly posting limit of %d post reached. The post was rejected.", "Weekly posting limit of %d posts reached. The post was rejected.", $throttle_week));
 			}
 		}
 
 		$throttle_month = Config::get('system', 'throttle_limit_month');
 		if ($throttle_month > 0) {
-			$datefrom = date("Y-m-d H:i:s", time() - 24*60*60*30);
+			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*30);
 
 			$r = q(
 				"SELECT COUNT(*) AS `posts_month` FROM `item` WHERE `uid`=%d AND `wall`
@@ -1224,8 +1247,8 @@ function api_statuses_update($type)
 
 			if ($posts_month > $throttle_month) {
 				logger('Monthly posting limit reached for user '.api_user(), LOGGER_DEBUG);
-				// die(api_error($type, sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month)));
-				throw new TooManyRequestsException(sprintf(t("Monthly posting limit of %d posts reached. The post was rejected."), $throttle_month));
+				// die(api_error($type, L10n::t("Monthly posting limit of %d posts reached. The post was rejected.", $throttle_month));
+				throw new TooManyRequestsException(L10n::t("Monthly posting limit of %d post reached. The post was rejected.", "Monthly posting limit of %d posts reached. The post was rejected.", $throttle_month));
 			}
 		}
 
@@ -1608,6 +1631,7 @@ api_register_func('api/users/lookup', 'api_users_lookup', true);
 function api_search($type)
 {
 	$data = [];
+	$sql_extra = '';
 
 	if (!x($_REQUEST, 'q')) {
 		throw new BadRequestException("q parameter is required.");
@@ -1678,7 +1702,7 @@ function api_statuses_home_timeline($type)
 	unset($_GET["screen_name"]);
 
 	$user_info = api_get_user($a);
-	// get last newtork messages
+	// get last network messages
 
 	// params
 	$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
@@ -1774,7 +1798,7 @@ function api_statuses_public_timeline($type)
 	}
 
 	$user_info = api_get_user($a);
-	// get last newtork messages
+	// get last network messages
 
 	// params
 	$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
@@ -1789,6 +1813,7 @@ function api_statuses_public_timeline($type)
 	$conversation_id = (x($_REQUEST, 'conversation_id') ? $_REQUEST['conversation_id'] : 0);
 
 	$start = $page * $count;
+	$sql_extra = '';
 
 	if ($exclude_replies && !$conversation_id) {
 		if ($max_id > 0) {
@@ -2145,7 +2170,6 @@ function api_statuses_repeat($type)
 		WHERE `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
 		AND NOT `item`.`private` AND `item`.`allow_cid` = '' AND `item`.`allow_gid` = ''
 		AND `item`.`deny_cid` = '' AND `item`.`deny_gid` = ''
-		$sql_extra
 		AND `item`.`id`=%d",
 		intval($id)
 	);
@@ -2216,7 +2240,7 @@ function api_statuses_destroy($type)
 
 	$ret = api_statuses_show($type);
 
-	Item::delete($id);
+	Item::deleteById($id);
 
 	return $ret;
 }
@@ -2246,7 +2270,7 @@ function api_statuses_mentions($type)
 	unset($_GET["screen_name"]);
 
 	$user_info = api_get_user($a);
-	// get last newtork messages
+	// get last network messages
 
 
 	// params
@@ -2265,8 +2289,10 @@ function api_statuses_mentions($type)
 	$myurl = substr($myurl, strpos($myurl, '://') + 3);
 	$myurl = str_replace('www.', '', $myurl);
 
+	$sql_extra = '';
+
 	if ($max_id > 0) {
-		$sql_extra = ' AND `item`.`id` <= ' . intval($max_id);
+		$sql_extra .= ' AND `item`.`id` <= ' . intval($max_id);
 	}
 
 	$r = q(
@@ -2457,9 +2483,7 @@ function api_favorites_create_destroy($type)
 			throw new BadRequestException("Invalid action ".$action);
 	}
 
-	$r = q("UPDATE item SET starred=%d WHERE id=%d AND uid=%d", $item[0]['starred'], $itemid, api_user());
-
-	q("UPDATE thread SET starred=%d WHERE iid=%d AND uid=%d", $item[0]['starred'], $itemid, api_user());
+	$r = Item::update(['starred' => $item[0]['starred']], ['id' => $itemid]);
 
 	if ($r === false) {
 		throw new InternalServerErrorException("DB error");
@@ -2601,13 +2625,12 @@ function api_format_messages($item, $recipient, $sender)
 	if (x($_GET, 'getText')) {
 		$ret['title'] = $item['title'];
 		if ($_GET['getText'] == 'html') {
-			$ret['text'] = bbcode($item['body'], false, false);
+			$ret['text'] = BBCode::convert($item['body'], false);
 		} elseif ($_GET['getText'] == 'plain') {
-			//$ret['text'] = html2plain(bbcode($item['body'], false, false, true), 0);
-			$ret['text'] = trim(html2plain(bbcode(api_clean_plain_items($item['body']), false, false, 2, true), 0));
+			$ret['text'] = trim(HTML::toPlaintext(BBCode::convert(api_clean_plain_items($item['body']), false, 2, true), 0));
 		}
 	} else {
-		$ret['text'] = $item['title'] . "\n" . html2plain(bbcode(api_clean_plain_items($item['body']), false, false, 2, true), 0);
+		$ret['text'] = $item['title'] . "\n" . HTML::toPlaintext(BBCode::convert(api_clean_plain_items($item['body']), false, 2, true), 0);
 	}
 	if (x($_GET, 'getUserObjects') && $_GET['getUserObjects'] == 'false') {
 		unset($ret['sender']);
@@ -2629,8 +2652,8 @@ function api_convert_item($item)
 	$attachments = api_get_attachments($body);
 
 	// Workaround for ostatus messages where the title is identically to the body
-	$html = bbcode(api_clean_plain_items($body), false, false, 2, true);
-	$statusbody = trim(html2plain($html, 0));
+	$html = BBCode::convert(api_clean_plain_items($body), false, 2, true);
+	$statusbody = trim(HTML::toPlaintext($html, 0));
 
 	// handle data: images
 	$statusbody = api_format_items_embeded_images($item, $statusbody);
@@ -2647,7 +2670,7 @@ function api_convert_item($item)
 		$statustext = substr($statustext, 0, 1000)."... \n".$item["plink"];
 	}
 
-	$statushtml = trim(bbcode($body, false, false));
+	$statushtml = BBCode::convert(api_clean_attachments($body), false);
 
 	// Workaround for clients with limited HTML parser functionality
 	$search = ["<br>", "<blockquote>", "</blockquote>",
@@ -2661,7 +2684,7 @@ function api_convert_item($item)
 	$statushtml = str_replace($search, $replace, $statushtml);
 
 	if ($item['title'] != "") {
-		$statushtml = "<br><h4>" . bbcode($item['title']) . "</h4><br>" . $statushtml;
+		$statushtml = "<br><h4>" . BBCode::convert($item['title']) . "</h4><br>" . $statushtml;
 	}
 
 	do {
@@ -2679,7 +2702,7 @@ function api_convert_item($item)
 
 	// feeds without body should contain the link
 	if (($item['network'] == NETWORK_FEED) && (strlen($item['body']) == 0)) {
-		$statushtml .= bbcode($item['plink']);
+		$statushtml .= BBCode::convert($item['plink']);
 	}
 
 	$entities = api_get_entitities($statustext, $body);
@@ -2751,7 +2774,7 @@ function api_get_entitities(&$text, $bbcode)
 		return [];
 	}
 
-	$bbcode = bb_CleanPictureLinks($bbcode);
+	$bbcode = BBCode::cleanPictureLinks($bbcode);
 
 	// Change pure links in text to bbcode uris
 	$bbcode = preg_replace("/([^\]\='".'"'."]|^)(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2]$2[/url]', $bbcode);
@@ -2934,7 +2957,7 @@ function api_contactlink_to_array($txt)
 		];
 	} else {
 		$res = [
-			'name' => $text,
+			'name' => $txt,
 			'url' => ""
 		];
 	}
@@ -3050,18 +3073,18 @@ function api_format_items_profiles($profile_row)
 		'religion'         => $profile_row['religion'],
 		'public_keywords'  => $profile_row['pub_keywords'],
 		'private_keywords' => $profile_row['prv_keywords'],
-		'likes'            => bbcode(api_clean_plain_items($profile_row['likes'])    , false, false, 2, false),
-		'dislikes'         => bbcode(api_clean_plain_items($profile_row['dislikes']) , false, false, 2, false),
-		'about'            => bbcode(api_clean_plain_items($profile_row['about'])    , false, false, 2, false),
-		'music'            => bbcode(api_clean_plain_items($profile_row['music'])    , false, false, 2, false),
-		'book'             => bbcode(api_clean_plain_items($profile_row['book'])     , false, false, 2, false),
-		'tv'               => bbcode(api_clean_plain_items($profile_row['tv'])       , false, false, 2, false),
-		'film'             => bbcode(api_clean_plain_items($profile_row['film'])     , false, false, 2, false),
-		'interest'         => bbcode(api_clean_plain_items($profile_row['interest']) , false, false, 2, false),
-		'romance'          => bbcode(api_clean_plain_items($profile_row['romance'])  , false, false, 2, false),
-		'work'             => bbcode(api_clean_plain_items($profile_row['work'])     , false, false, 2, false),
-		'education'        => bbcode(api_clean_plain_items($profile_row['education']), false, false, 2, false),
-		'social_networks'  => bbcode(api_clean_plain_items($profile_row['contact'])  , false, false, 2, false),
+		'likes'            => BBCode::convert(api_clean_plain_items($profile_row['likes'])    , false, 2),
+		'dislikes'         => BBCode::convert(api_clean_plain_items($profile_row['dislikes']) , false, 2),
+		'about'            => BBCode::convert(api_clean_plain_items($profile_row['about'])    , false, 2),
+		'music'            => BBCode::convert(api_clean_plain_items($profile_row['music'])    , false, 2),
+		'book'             => BBCode::convert(api_clean_plain_items($profile_row['book'])     , false, 2),
+		'tv'               => BBCode::convert(api_clean_plain_items($profile_row['tv'])       , false, 2),
+		'film'             => BBCode::convert(api_clean_plain_items($profile_row['film'])     , false, 2),
+		'interest'         => BBCode::convert(api_clean_plain_items($profile_row['interest']) , false, 2),
+		'romance'          => BBCode::convert(api_clean_plain_items($profile_row['romance'])  , false, 2),
+		'work'             => BBCode::convert(api_clean_plain_items($profile_row['work'])     , false, 2),
+		'education'        => BBCode::convert(api_clean_plain_items($profile_row['education']), false, 2),
+		'social_networks'  => BBCode::convert(api_clean_plain_items($profile_row['contact'])  , false, 2),
 		'homepage'         => $profile_row['homepage'],
 		'users'            => null
 	];
@@ -3204,7 +3227,7 @@ function api_account_rate_limit_status($type)
 				'@attributes' => ["type" => "integer"],
 				'hourly-limit' => '150',
 				'@attributes2' => ["type" => "integer"],
-				'reset-time' => datetime_convert('UTC', 'UTC', 'now + 1 hour', ATOM_TIME),
+				'reset-time' => DateTimeFormat::utc('now + 1 hour', DateTimeFormat::ATOM),
 				'@attributes3' => ["type" => "datetime"],
 				'reset_time_in_seconds' => strtotime('now + 1 hour'),
 				'@attributes4' => ["type" => "integer"],
@@ -3214,7 +3237,7 @@ function api_account_rate_limit_status($type)
 				'reset_time_in_seconds' => strtotime('now + 1 hour'),
 				'remaining_hits' => '150',
 				'hourly_limit' => '150',
-				'reset_time' => api_date(datetime_convert('UTC', 'UTC', 'now + 1 hour', ATOM_TIME)),
+				'reset_time' => api_date(DateTimeFormat::utc('now + 1 hour', DateTimeFormat::ATOM)),
 			];
 	}
 
@@ -3246,22 +3269,6 @@ function api_help_test($type)
 api_register_func('api/help/test', 'api_help_test', false);
 
 /**
- *
- * @param string $type Return type (atom, rss, xml, json)
- *
- * @return array|string
- */
-function api_lists($type)
-{
-	$ret = [];
-	/// @TODO $ret is not filled here?
-	return api_format_data('lists', $type, ["lists_list" => $ret]);
-}
-
-/// @TODO move to top of file or somewhere better
-api_register_func('api/lists', 'api_lists', true);
-
-/**
  * Returns all lists the user subscribes to.
  *
  * @param string $type Return type (atom, rss, xml, json)
@@ -3278,6 +3285,139 @@ function api_lists_list($type)
 
 /// @TODO move to top of file or somewhere better
 api_register_func('api/lists/list', 'api_lists_list', true);
+api_register_func('api/lists/subscriptions', 'api_lists_list', true);
+
+/**
+ * Returns all groups the user owns.
+ *
+ * @param string $type Return type (atom, rss, xml, json)
+ *
+ * @return array|string
+ * @see https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships
+ */
+function api_lists_ownerships($type)
+{
+	$a = get_app();
+
+	if (api_user() === false) {
+		throw new ForbiddenException();
+	}
+
+	// params
+	$user_info = api_get_user($a);
+	$uid = $user_info['uid'];
+
+	$groups = dba::select('group', [], ['deleted' => 0, 'uid' => $uid]);
+
+	// loop through all groups
+	$lists = [];
+	foreach ($groups as $group) {
+		if ($group['visible']) {
+			$mode = 'public';
+		} else {
+			$mode = 'private';
+		}
+		$lists[] = [
+			'name' => $group['name'],
+			'id' => intval($group['id']),
+			'id_str' => (string) $group['id'],
+			'user' => $user_info,
+			'mode' => $mode
+		];
+	}
+	return api_format_data("lists", $type, ['lists' => ['lists' => $lists]]);
+}
+
+/// @TODO move to top of file or somewhere better
+api_register_func('api/lists/ownerships', 'api_lists_ownerships', true);
+
+/**
+ * Returns recent statuses from users in the specified group.
+ *
+ * @param string $type Return type (atom, rss, xml, json)
+ *
+ * @return array|string
+ * @see https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships
+ */
+function api_lists_statuses($type)
+{
+	$a = get_app();
+
+	if (api_user() === false) {
+		throw new ForbiddenException();
+	}
+
+	unset($_REQUEST["user_id"]);
+	unset($_GET["user_id"]);
+
+	unset($_REQUEST["screen_name"]);
+	unset($_GET["screen_name"]);
+
+	$user_info = api_get_user($a);
+	if (empty($_REQUEST['list_id'])) {
+		throw new BadRequestException('list_id not specified');
+	}
+
+	// params
+	$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
+	$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] - 1 : 0);
+	if ($page < 0) {
+		$page = 0;
+	}
+	$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
+	$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
+	$exclude_replies = (x($_REQUEST, 'exclude_replies') ? 1 : 0);
+	$conversation_id = (x($_REQUEST, 'conversation_id') ? $_REQUEST['conversation_id'] : 0);
+
+	$start = $page * $count;
+
+	$sql_extra = '';
+	if ($max_id > 0) {
+		$sql_extra .= ' AND `item`.`id` <= ' . intval($max_id);
+	}
+	if ($exclude_replies > 0) {
+		$sql_extra .= ' AND `item`.`parent` = `item`.`id`';
+	}
+	if ($conversation_id > 0) {
+		$sql_extra .= ' AND `item`.`parent` = ' . intval($conversation_id);
+	}
+
+	$statuses = dba::p(
+		"SELECT `item`.*, `item`.`id` AS `item_id`, `item`.`network` AS `item_network`,
+		`contact`.`name`, `contact`.`photo`, `contact`.`url`, `contact`.`rel`,
+		`contact`.`network`, `contact`.`thumb`, `contact`.`dfrn-id`, `contact`.`self`,
+		`contact`.`id` AS `cid`, `group_member`.`gid`
+		FROM `item`
+		STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` = `item`.`uid`
+			AND (NOT `contact`.`blocked` OR `contact`.`pending`)
+		STRAIGHT_JOIN `group_member` ON `group_member`.`contact-id` = `item`.`contact-id`
+		WHERE `item`.`uid` = ? AND `verb` = ?
+		AND `item`.`visible` AND NOT `item`.`moderated` AND NOT `item`.`deleted`
+		$sql_extra
+		AND `item`.`id`>?
+		AND `group_member`.`gid` = ?
+		ORDER BY `item`.`id` DESC LIMIT ".intval($start)." ,".intval($count),
+		api_user(),
+		ACTIVITY_POST,
+		$since_id,
+		$_REQUEST['list_id']
+	);
+
+	$items = api_format_items(dba::inArray($statuses), $user_info, false, $type);
+
+	$data = ['status' => $items];
+	switch ($type) {
+		case "atom":
+		case "rss":
+			$data = api_rss_extra($a, $data, $user_info);
+			break;
+	}
+
+	return api_format_data("statuses", $type, $data);
+}
+
+/// @TODO move to top of file or somewhere better
+api_register_func('api/lists/statuses', 'api_lists_statuses', true);
 
 /**
  * Considers friends and followers lists to be private and won't return
@@ -3534,6 +3674,8 @@ function api_ff_ids($type)
 		throw new ForbiddenException();
 	}
 
+	$a = get_app();
+
 	api_get_user($a);
 
 	$stringify_ids = defaults($_REQUEST, 'stringify_ids', false);
@@ -3660,7 +3802,7 @@ function api_direct_messages_new($type)
 	switch ($type) {
 		case "atom":
 		case "rss":
-			$data = api_rss_extra($a, $data, $user_info);
+			$data = api_rss_extra($a, $data, $sender);
 	}
 
 	return api_format_data("direct-messages", $type, $data);
@@ -3791,6 +3933,8 @@ function api_direct_messages_box($type, $box, $verbose)
 
 	// pagination
 	$start = $page * $count;
+
+	$sql_extra = "";
 
 	// filters
 	if ($box=="sentbox") {
@@ -3989,7 +4133,7 @@ function api_fr_photoalbum_delete($type)
 		if (!DBM::is_result($photo_item)) {
 			throw new InternalServerErrorException("problem with deleting items occured");
 		}
-		Item::delete($photo_item[0]['id']);
+		Item::deleteById($photo_item[0]['id']);
 	}
 
 	// now let's delete all photos from the album
@@ -4213,7 +4357,7 @@ function api_fr_photo_create_update($type)
 			$result = q(
 				"UPDATE `photo` SET %s, `edited`='%s' WHERE `uid` = %d AND `resource-id` = '%s' AND `album` = '%s'",
 				$sql_extra,
-				datetime_convert(),   // update edited timestamp
+				DateTimeFormat::utcNow(),   // update edited timestamp
 				intval(api_user()),
 				dbesc($photo_id),
 				dbesc($album)
@@ -4292,7 +4436,7 @@ function api_fr_photo_delete($type)
 		}
 		// function for setting the items to "deleted = 1" which ensures that comments, likes etc. are not shown anymore
 		// to the user and the contacts of the users (drop_items() do all the necessary magic to avoid orphans in database and federate deletion)
-		Item::delete($photo_item[0]['id']);
+		Item::deleteById($photo_item[0]['id']);
 
 		$answer = ['result' => 'deleted', 'message' => 'photo with id `' . $photo_id . '` has been deleted from server.'];
 		return api_format_data("photo_delete", $type, ['$result' => $answer]);
@@ -4374,7 +4518,7 @@ function api_account_update_profile_image($type)
 		$media = $_FILES['media'];
 	}
 	// save new profile image
-	$data = save_media_to_database("profileimage", $media, $type, t('Profile Photos'), "", "", "", "", "", $is_default_profile);
+	$data = save_media_to_database("profileimage", $media, $type, L10n::t('Profile Photos'), "", "", "", "", "", $is_default_profile);
 
 	// get filetype
 	if (is_array($media['type'])) {
@@ -4417,7 +4561,7 @@ function api_account_update_profile_image($type)
 
 	q(
 		"UPDATE `contact` SET `avatar-date` = '%s' WHERE `self` = 1 AND `uid` = %d",
-		dbesc(datetime_convert()),
+		dbesc(DateTimeFormat::utcNow()),
 		intval(local_user())
 	);
 
@@ -4609,7 +4753,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 	$height = $Image->getHeight();
 
 	// create a new resource-id if not already provided
-	$hash = ($photo_id == null) ? photo_new_resource() : $photo_id;
+	$hash = ($photo_id == null) ? Photo::newResource() : $photo_id;
 
 	if ($mediatype == "photo") {
 		// upload normal image (scales 0, 1, 2)
@@ -4729,7 +4873,7 @@ function post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $f
 				. '[/url]';
 
 	// do the magic for storing the item in the database and trigger the federation to other contacts
-	item_store($arr);
+	Item::insert($arr);
 }
 
 /**
@@ -4907,7 +5051,7 @@ function api_friendica_remoteauth()
 	goaway(
 		$contact['poll'] . '?dfrn_id=' . $dfrn_id
 		. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
-		. '&type=profile&sec=' . $sec . $dest . $quiet
+		. '&type=profile&sec=' . $sec . $dest
 	);
 }
 api_register_func('api/friendica/remoteauth', 'api_friendica_remoteauth', true);
@@ -5072,7 +5216,7 @@ function api_get_nick($profile)
 		if ($StatusnetHost != $profile) {
 			$StatusnetUser = preg_replace("=https?://(.*)/user/(.*)=ism", "$2", $profile);
 			if ($StatusnetUser != $profile) {
-				$UserData = fetch_url("http://".$StatusnetHost."/api/users/show.json?user_id=".$StatusnetUser);
+				$UserData = Network::fetchUrl("http://".$StatusnetHost."/api/users/show.json?user_id=".$StatusnetUser);
 				$user = json_decode($UserData);
 				if ($user) {
 					$nick = $user->screen_name;
@@ -5171,7 +5315,7 @@ function api_clean_plain_items($Text)
 {
 	$include_entities = strtolower(x($_REQUEST, 'include_entities') ? $_REQUEST['include_entities'] : "false");
 
-	$Text = bb_CleanPictureLinks($Text);
+	$Text = BBCode::cleanPictureLinks($Text);
 	$URLSearchString = "^\[\]";
 
 	$Text = preg_replace("/([!#@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $Text);
@@ -5195,7 +5339,7 @@ function api_clean_plain_items($Text)
  */
 function api_clean_attachments($body)
 {
-	$data = get_attachment_data($body);
+	$data = BBCode::getAttachmentData($body);
 
 	if (!$data) {
 		return $body;
@@ -5226,7 +5370,7 @@ function api_best_nickname(&$contacts)
 {
 	$best_contact = [];
 
-	if (count($contact) == 0) {
+	if (count($contacts) == 0) {
 		return;
 	}
 
@@ -5409,15 +5553,15 @@ function api_friendica_group_delete($type)
 }
 api_register_func('api/friendica/group_delete', 'api_friendica_group_delete', true, API_METHOD_DELETE);
 
-
 /**
- * Create the specified group with the posted array of contacts.
+ * Delete a group.
  *
  * @param string $type Return type (atom, rss, xml, json)
  *
  * @return array|string
+ * @see https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-destroy
  */
-function api_friendica_group_create($type)
+function api_lists_destroy($type)
 {
 	$a = get_app();
 
@@ -5427,11 +5571,45 @@ function api_friendica_group_create($type)
 
 	// params
 	$user_info = api_get_user($a);
-	$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
+	$gid = (x($_REQUEST, 'list_id') ? $_REQUEST['list_id'] : 0);
 	$uid = $user_info['uid'];
-	$json = json_decode($_POST['json'], true);
-	$users = $json['user'];
 
+	// error if no gid specified
+	if ($gid == 0) {
+		throw new BadRequestException('gid not specified');
+	}
+
+	// get data of the specified group id
+	$group = dba::selectFirst('group', [], ['uid' => $uid, 'id' => $gid]);
+	// error message if specified gid is not in database
+	if (!$group) {
+		throw new BadRequestException('gid not available');
+	}
+
+	if (Group::remove($gid)) {
+		$list = [
+			'name' => $group['name'],
+			'id' => intval($gid),
+			'id_str' => (string) $gid,
+			'user' => $user_info
+		];
+
+		return api_format_data("lists", $type, ['lists' => $list]);
+	}
+}
+api_register_func('api/lists/destroy', 'api_lists_destroy', true, API_METHOD_DELETE);
+
+/**
+ * Add a new group to the database.
+ *
+ * @param  string $name  Group name
+ * @param  int	  $uid   User ID
+ * @param  array  $users List of users to add to the group
+ *
+ * @return array
+ */
+function group_create($name, $uid, $users = [])
+{
 	// error if no name specified
 	if ($name == "") {
 		throw new BadRequestException('group name not specified');
@@ -5488,11 +5666,72 @@ function api_friendica_group_create($type)
 
 	// return success message incl. missing users in array
 	$status = ($erroraddinguser ? "missing user" : ($reactivate_group ? "reactivated" : "ok"));
-	$success = ['success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers];
+
+	return ['success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers];
+}
+
+/**
+ * Create the specified group with the posted array of contacts.
+ *
+ * @param string $type Return type (atom, rss, xml, json)
+ *
+ * @return array|string
+ */
+function api_friendica_group_create($type)
+{
+	$a = get_app();
+
+	if (api_user() === false) {
+		throw new ForbiddenException();
+	}
+
+	// params
+	$user_info = api_get_user($a);
+	$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
+	$uid = $user_info['uid'];
+	$json = json_decode($_POST['json'], true);
+	$users = $json['user'];
+
+	$success = group_create($name, $uid, $users);
+
 	return api_format_data("group_create", $type, ['result' => $success]);
 }
 api_register_func('api/friendica/group_create', 'api_friendica_group_create', true, API_METHOD_POST);
 
+/**
+ * Create a new group.
+ *
+ * @param string $type Return type (atom, rss, xml, json)
+ *
+ * @return array|string
+ * @see https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-create
+ */
+function api_lists_create($type)
+{
+	$a = get_app();
+
+	if (api_user() === false) {
+		throw new ForbiddenException();
+	}
+
+	// params
+	$user_info = api_get_user($a);
+	$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
+	$uid = $user_info['uid'];
+
+	$success = group_create($name, $uid);
+	if ($success['success']) {
+		$grp = [
+			'name' => $success['name'],
+			'id' => intval($success['gid']),
+			'id_str' => (string) $success['gid'],
+			'user' => $user_info
+		];
+
+		return api_format_data("lists", $type, ['lists'=>$grp]);
+	}
+}
+api_register_func('api/lists/create', 'api_lists_create', true, API_METHOD_POST);
 
 /**
  * Update the specified group with the posted array of contacts.
@@ -5568,6 +5807,56 @@ function api_friendica_group_update($type)
 api_register_func('api/friendica/group_update', 'api_friendica_group_update', true, API_METHOD_POST);
 
 /**
+ * Update information about a group.
+ *
+ * @param string $type Return type (atom, rss, xml, json)
+ *
+ * @return array|string
+ * @see https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-update
+ */
+function api_lists_update($type)
+{
+	$a = get_app();
+
+	if (api_user() === false) {
+		throw new ForbiddenException();
+	}
+
+	// params
+	$user_info = api_get_user($a);
+	$gid = (x($_REQUEST, 'list_id') ? $_REQUEST['list_id'] : 0);
+	$name = (x($_REQUEST, 'name') ? $_REQUEST['name'] : "");
+	$uid = $user_info['uid'];
+
+	// error if no gid specified
+	if ($gid == 0) {
+		throw new BadRequestException('gid not specified');
+	}
+
+	// get data of the specified group id
+	$group = dba::selectFirst('group', [], ['uid' => $uid, 'id' => $gid]);
+	// error message if specified gid is not in database
+	if (!$group) {
+		throw new BadRequestException('gid not available');
+	}
+
+	if (Group::update($gid, $name)) {
+		$list = [
+			'name' => $name,
+			'id' => intval($gid),
+			'id_str' => (string) $gid,
+			'user' => $user_info
+		];
+
+		return api_format_data("lists", $type, ['lists' => $list]);
+	}
+
+	return api_format_data("group_update", $type, ['result' => $success]);
+}
+
+api_register_func('api/lists/update', 'api_lists_update', true, API_METHOD_POST);
+
+/**
  *
  * @param string $type Return type (atom, rss, xml, json)
  *
@@ -5585,7 +5874,7 @@ function api_friendica_activity($type)
 
 	$id = (x($_REQUEST, 'id') ? $_REQUEST['id'] : 0);
 
-	$res = do_like($id, $verb);
+	$res = Item::performLike($id, $verb);
 
 	if ($res) {
 		if ($type == "xml") {
@@ -5755,11 +6044,12 @@ api_register_func('api/friendica/direct_messages_setseen', 'api_friendica_direct
  * @brief search for direct_messages containing a searchstring through api
  *
  * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
+ * @param string $box
  * @return string (success: success=true if found and search_result contains found messages,
  *                          success=false if nothing was found, search_result='nothing found',
  * 		   error: result=error with error message)
  */
-function api_friendica_direct_messages_search($type)
+function api_friendica_direct_messages_search($type, $box = "")
 {
 	$a = get_app();
 
@@ -5907,10 +6197,12 @@ function api_saved_searches_list($type)
 	$result = [];
 	while ($term = $terms->fetch()) {
 		$result[] = [
-			'name' => $term['term'],
-			'query' => $term['term'],
+			'created_at' => api_date(time()),
+			'id' => intval($term['id']),
 			'id_str' => $term['id'],
-			'id' => intval($term['id'])
+			'name' => $term['term'],
+			'position' => null,
+			'query' => $term['term']
 		];
 	}
 

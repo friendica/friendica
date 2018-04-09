@@ -6,9 +6,11 @@
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\UserImport;
 
-function uimport_post(App $a) {
+function uimport_post(App $a)
+{
 	switch ($a->config['register_policy']) {
 		case REGISTER_OPEN:
 			$blocked = 0;
@@ -23,7 +25,7 @@ function uimport_post(App $a) {
 		default:
 		case REGISTER_CLOSED:
 			if ((!x($_SESSION, 'authenticated') && (!x($_SESSION, 'administrator')))) {
-				notice(t('Permission denied.') . EOL);
+				notice(L10n::t('Permission denied.') . EOL);
 				return;
 			}
 			$blocked = 1;
@@ -50,7 +52,7 @@ function uimport_content(App $a) {
 		$r = q("select count(*) as total from user where register_date > UTC_TIMESTAMP - INTERVAL 1 day");
 		if ($r && $r[0]['total'] >= $max_dailies) {
 			logger('max daily registrations exceeded.');
-			notice(t('This site has exceeded the number of allowed daily account registrations. Please try again tomorrow.') . EOL);
+			notice(L10n::t('This site has exceeded the number of allowed daily account registrations. Please try again tomorrow.') . EOL);
 			return;
 		}
 	}
@@ -65,13 +67,13 @@ function uimport_content(App $a) {
 
 	$tpl = get_markup_template("uimport.tpl");
 	return replace_macros($tpl, [
-		'$regbutt' => t('Import'),
+		'$regbutt' => L10n::t('Import'),
 		'$import' => [
-			'title' => t("Move account"),
-			'intro' => t("You can import an account from another Friendica server."),
-			'instruct' => t("You need to export your account from the old server and upload it here. We will recreate your old account here with all your contacts. We will try also to inform your friends that you moved here."),
-			'warn' => t("This feature is experimental. We can't import contacts from the OStatus network (GNU Social/Statusnet) or from Diaspora"),
-			'field' => ['accountfile', t('Account file'), '<input id="id_accountfile" name="accountfile" type="file">', t('To export your account, go to "Settings->Export your personal data" and select "Export account"')],
+			'title' => L10n::t("Move account"),
+			'intro' => L10n::t("You can import an account from another Friendica server."),
+			'instruct' => L10n::t("You need to export your account from the old server and upload it here. We will recreate your old account here with all your contacts. We will try also to inform your friends that you moved here."),
+			'warn' => L10n::t("This feature is experimental. We can't import contacts from the OStatus network \x28GNU Social/Statusnet\x29 or from Diaspora"),
+			'field' => ['accountfile', L10n::t('Account file'), '<input id="id_accountfile" name="accountfile" type="file">', L10n::t('To export your account, go to "Settings->Export your personal data" and select "Export account"')],
 		],
 	]);
 }
