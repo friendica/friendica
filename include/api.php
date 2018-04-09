@@ -4534,6 +4534,8 @@ function api_account_update_profile_image($type)
 		$fileext = "jpg";
 	} elseif ($filetype == "image/png") {
 		$fileext = "png";
+	} else {
+		throw new InternalServerErrorException('Unsupported filetype');
 	}
 	// change specified profile or all profiles to the new resource-id
 	if ($is_default_profile) {
