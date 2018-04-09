@@ -990,6 +990,7 @@ function api_format_data($root_element, $type, $data)
 			$ret = api_create_xml($data, $root_element);
 			break;
 		case "json":
+		default:
 			$ret = $data;
 			break;
 	}
