@@ -5350,7 +5350,7 @@ function api_clean_attachments($body)
 {
 	$data = BBCode::getAttachmentData($body);
 
-	if (!$data) {
+	if (empty($data)) {
 		return $body;
 	}
 	$body = "";
