@@ -5860,8 +5860,6 @@ function api_lists_update($type)
 
 		return api_format_data("lists", $type, ['lists' => $list]);
 	}
-
-	return api_format_data("group_update", $type, ['result' => $success]);
 }
 
 api_register_func('api/lists/update', 'api_lists_update', true, API_METHOD_POST);
