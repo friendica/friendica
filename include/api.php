@@ -4812,7 +4812,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 		logger("photo upload: new profile image upload ended", LOGGER_DEBUG);
 	}
 
-	if ($r) {
+	if (isset($r) && $r) {
 		// create entry in 'item'-table on new uploads to enable users to comment/like/dislike the photo
 		if ($photo_id == null && $mediatype == "photo") {
 			post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $filetype, $visibility);
