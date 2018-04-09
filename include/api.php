@@ -5675,7 +5675,7 @@ function group_create($name, $uid, $users = [])
 	}
 
 	// return success message incl. missing users in array
-	$status = ($erroraddinguser ? "missing user" : ($reactivate_group ? "reactivated" : "ok"));
+	$status = ($erroraddinguser ? "missing user" : ((isset($reactivate_group) && $reactivate_group) ? "reactivated" : "ok"));
 
 	return ['success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers];
 }
