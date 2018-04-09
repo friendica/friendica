@@ -5783,7 +5783,7 @@ function api_friendica_group_update($type)
 		foreach ($users as $user) {
 			$found = ($user['cid'] == $cid ? true : false);
 		}
-		if (!$found) {
+		if (!isset($found) || !$found) {
 			Group::removeMemberByName($uid, $name, $cid);
 		}
 	}
