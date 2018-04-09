@@ -1437,15 +1437,15 @@ function api_status_show($type)
 		// "uid" and "self" are only needed for some internal stuff, so remove it from here
 		unset($status_info["user"]["uid"]);
 		unset($status_info["user"]["self"]);
+
+		logger('status_info: '.print_r($status_info, true), LOGGER_DEBUG);
+
+		if ($type == "raw") {
+			return $status_info;
+		}
+
+		return api_format_data("statuses", $type, ['status' => $status_info]);
 	}
-
-	logger('status_info: '.print_r($status_info, true), LOGGER_DEBUG);
-
-	if ($type == "raw") {
-		return $status_info;
-	}
-
-	return api_format_data("statuses", $type, ['status' => $status_info]);
 }
 
 /**
