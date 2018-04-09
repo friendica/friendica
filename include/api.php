@@ -223,7 +223,7 @@ function api_login(App $a)
 		$record = $addon_auth['user_record'];
 	} else {
 		$user_id = User::authenticate(trim($user), trim($password));
-		if ($user_id) {
+		if ($user_id !== false) {
 			$record = dba::selectFirst('user', [], ['uid' => $user_id]);
 		}
 	}
