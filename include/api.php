@@ -529,7 +529,7 @@ function api_get_user(App $a, $contact_id = null)
 
 	// Searching for contact id with uid = 0
 	if (!is_null($contact_id) && (intval($contact_id) != 0)) {
-		$user = dbesc(api_unique_id_to_nurl($contact_id));
+		$user = dbesc(api_unique_id_to_nurl(intval($contact_id)));
 
 		if ($user == "") {
 			throw new BadRequestException("User not found.");
@@ -575,7 +575,7 @@ function api_get_user(App $a, $contact_id = null)
 		$argid = count($called_api);
 		list($user, $null) = explode(".", $a->argv[$argid]);
 		if (is_numeric($user)) {
-			$user = dbesc(api_unique_id_to_nurl($user));
+			$user = dbesc(api_unique_id_to_nurl(intval($user)));
 
 			if ($user == "") {
 				return false;
