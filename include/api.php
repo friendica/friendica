@@ -387,9 +387,7 @@ function api_call(App $a)
 						break;
 					case "json":
 						header("Content-Type: application/json");
-						foreach ($return as $rr) {
-							$json = json_encode($rr);
-						}
+						$json = json_encode(end($return));
 						if (x($_GET, 'callback')) {
 							$json = $_GET['callback'] . "(" . $json . ")";
 						}
