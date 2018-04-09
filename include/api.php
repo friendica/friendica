@@ -6155,6 +6155,7 @@ function api_friendica_profile_show($type)
 	}
 	// loop through all returned profiles and retrieve data and users
 	$k = 0;
+	$profiles = [];
 	foreach ($r as $rr) {
 		$profile = api_format_items_profiles($rr);
 
