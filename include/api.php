@@ -1428,7 +1428,7 @@ function api_status_show($type)
 			$status_info["entities"] = $converted["entities"];
 		}
 
-		if (($lastwall['item_network'] != "") && ($status["source"] == 'web')) {
+		if (($lastwall['item_network'] != "") && ($status_info["source"] == 'web')) {
 			$status_info["source"] = ContactSelector::networkToName($lastwall['item_network'], $user_info['url']);
 		} elseif (($lastwall['item_network'] != "") && (ContactSelector::networkToName($lastwall['item_network'], $user_info['url']) != $status_info["source"])) {
 			$status_info["source"] = trim($status_info["source"].' ('.ContactSelector::networkToName($lastwall['item_network'], $user_info['url']).')');
