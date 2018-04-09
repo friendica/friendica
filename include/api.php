@@ -3979,7 +3979,9 @@ function api_direct_messages_box($type, $box, $verbose)
 			$sender = $user_info;
 		}
 
-		$ret[] = api_format_messages($item, $recipient, $sender);
+		if (isset($recipient) && isset($sender)) {
+			$ret[] = api_format_messages($item, $recipient, $sender);
+		}
 	}
 
 
@@ -6100,7 +6102,9 @@ function api_friendica_direct_messages_search($type, $box = "")
 				$sender = $user_info;
 			}
 
-			$ret[] = api_format_messages($item, $recipient, $sender);
+			if (isset($recipient) && isset($sender)) {
+				$ret[] = api_format_messages($item, $recipient, $sender);
+			}
 		}
 		$success = ['success' => true, 'search_results' => $ret];
 	}
