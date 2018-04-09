@@ -618,7 +618,9 @@ function api_get_user(App $a, $contact_id = null)
 	);
 
 	// Selecting the id by priority, friendica first
-	api_best_nickname($uinfo);
+	if (is_array($uinfo)) {
+		api_best_nickname($uinfo);
+	}
 
 	// if the contact wasn't found, fetch it from the contacts with uid = 0
 	if (!DBM::is_result($uinfo)) {
