@@ -12,11 +12,11 @@ $a->strings["The form security token was not correct. This probably happened bec
 $a->strings["Cannot locate DNS info for database server '%s'"] = "Kann die DNS Informationen für den Datenbankserver '%s' nicht ermitteln.";
 $a->strings["Daily posting limit of %d post reached. The post was rejected."] = [
 	0 => "Das tägliche Limit von %d Beitrag wurde erreicht. Die Nachricht wurde verworfen.",
-	1 => "Das tägliche Limit von %d Beiträgen wurde erreicht. Die Nachricht wurde verworfen.",
+	1 => "Das tägliche Limit von %d Beiträgen wurde erreicht. Der Beitrag wurde verworfen.",
 ];
 $a->strings["Weekly posting limit of %d post reached. The post was rejected."] = [
 	0 => "Das wöchentliche Limit von %d Beitrag wurde erreicht. Die Nachricht wurde verworfen.",
-	1 => "Das wöchentliche Limit von %d Beiträgen wurde erreicht. Die Nachricht wurde verworfen.",
+	1 => "Das wöchentliche Limit von %d Beiträgen wurde erreicht. Der Beitrag wurde verworfen.",
 ];
 $a->strings["Monthly posting limit of %d post reached. The post was rejected."] = "Das monatliche Limit von %d Beiträgen wurde erreicht. Der Beitrag wurde verworfen.";
 $a->strings["Profile Photos"] = "Profilbilder";
@@ -24,20 +24,20 @@ $a->strings["Friendica Notification"] = "Friendica-Benachrichtigung";
 $a->strings["Thank You,"] = "Danke,";
 $a->strings["%s Administrator"] = "der Administrator von %s";
 $a->strings["%1\$s, %2\$s Administrator"] = "%1\$s, %2\$s Administrator";
-$a->strings["noreply"] = "noreply";
-$a->strings["[Friendica:Notify] New mail received at %s"] = "[Friendica-Meldung] Neue Nachricht erhalten von %s";
-$a->strings["%1\$s sent you a new private message at %2\$s."] = "%1\$s hat Dir eine neue private Nachricht auf %2\$s geschickt.";
+$a->strings["noreply"] = "keine Antwort";
+$a->strings["[Friendica:Notify] New mail received at %s"] = "[Friendica-Meldung] Neue Email erhalten um %s";
+$a->strings["%1\$s sent you a new private message at %2\$s."] = "%1\$s hat Dir eine neue private Nachricht um %2\$s geschickt.";
 $a->strings["a private message"] = "eine private Nachricht";
 $a->strings["%1\$s sent you %2\$s."] = "%1\$s schickte Dir %2\$s.";
 $a->strings["Please visit %s to view and/or reply to your private messages."] = "Bitte besuche %s, um Deine privaten Nachrichten anzusehen und/oder zu beantworten.";
 $a->strings["%1\$s commented on [url=%2\$s]a %3\$s[/url]"] = "%1\$s kommentierte [url=%2\$s]a %3\$s[/url]";
 $a->strings["%1\$s commented on [url=%2\$s]%3\$s's %4\$s[/url]"] = "%1\$s kommentierte [url=%2\$s]%3\$ss %4\$s[/url]";
-$a->strings["%1\$s commented on [url=%2\$s]your %3\$s[/url]"] = "%1\$s kommentierte [url=%2\$s]Deinen %3\$s[/url]";
+$a->strings["%1\$s commented on [url=%2\$s]your %3\$s[/url]"] = "%1\$s kommentierte [url=%2\$s]deinen %3\$s[/url]";
 $a->strings["[Friendica:Notify] Comment to conversation #%1\$d by %2\$s"] = "[Friendica-Meldung] Kommentar zum Beitrag #%1\$d von %2\$s";
 $a->strings["%s commented on an item/conversation you have been following."] = "%s hat einen Beitrag kommentiert, dem Du folgst.";
 $a->strings["Please visit %s to view and/or reply to the conversation."] = "Bitte besuche %s, um die Konversation anzusehen und/oder zu kommentieren.";
 $a->strings["[Friendica:Notify] %s posted to your profile wall"] = "[Friendica-Meldung] %s hat auf Deine Pinnwand geschrieben";
-$a->strings["%1\$s posted to your profile wall at %2\$s"] = "%1\$s schrieb auf %2\$s auf Deine Pinnwand";
+$a->strings["%1\$s posted to your profile wall at %2\$s"] = "%1\$s schrieb um %2\$s auf Deine Pinnwand";
 $a->strings["%1\$s posted to [url=%2\$s]your wall[/url]"] = "%1\$s hat etwas auf [url=%2\$s]Deiner Pinnwand[/url] gepostet";
 $a->strings["[Friendica:Notify] %s tagged you"] = "[Friendica-Meldung] %s hat Dich erwähnt";
 $a->strings["%1\$s tagged you at %2\$s"] = "%1\$s erwähnte Dich auf %2\$s";
@@ -1150,7 +1150,7 @@ $a->strings["Import your profile to this friendica instance"] = "Importiere Dein
 $a->strings["Theme settings updated."] = "Themeneinstellungen aktualisiert.";
 $a->strings["Information"] = "Information";
 $a->strings["Overview"] = "Übersicht";
-$a->strings["Federation Statistics"] = "Federation Statistik";
+$a->strings["Federation Statistics"] = "Föderation Statistik";
 $a->strings["Configuration"] = "Konfiguration";
 $a->strings["Site"] = "Seite";
 $a->strings["Users"] = "Nutzer";
