@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-06 16:58+0200\n"
-"PO-Revision-Date: 2018-04-09 16:48+0000\n"
+"PO-Revision-Date: 2018-04-10 18:27+0000\n"
 "Last-Translator: Kris\n"
 "Language-Team: Finnish (Finland) (http://www.transifex.com/Friendica/friendica/language/fi_FI/)\n"
 "MIME-Version: 1.0\n"
@@ -3997,15 +3997,15 @@ msgstr "Kontaktia ei voitu lisätä."
 
 #: mod/follow.php:73
 msgid "You already added this contact."
-msgstr ""
+msgstr "Olet jo lisännyt tämän kontaktin."
 
 #: mod/follow.php:83
 msgid "Diaspora support isn't enabled. Contact can't be added."
-msgstr ""
+msgstr "Diaspora -tuki ei ole käytössä. Kontaktia ei voi lisätä."
 
 #: mod/follow.php:90
 msgid "OStatus support is disabled. Contact can't be added."
-msgstr ""
+msgstr "OStatus -tuki ei ole käytössä. Kontaktia ei voi lisätä."
 
 #: mod/follow.php:97
 msgid "The network type couldn't be detected. Contact can't be added."
