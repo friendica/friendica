@@ -2880,6 +2880,9 @@ section.help-content-wrapper li {
     line-height: 1.6;
     font-size: 0.96em;
 }
+.col-lg-3 {
+    background-color: white;
+}
 
 /*Admin Page*/
 #adminpage #frio_background_image .image-select {
