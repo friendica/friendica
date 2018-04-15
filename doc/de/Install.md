@@ -78,7 +78,7 @@ Friendica benötigt die Berechtigungen um neue Felder in dieser Datenbank zu ert
 
 5. *Wenn* die automatisierte Installation aus irgendeinem Grund fehlschlägt, dann prüfe das Folgende:
 
-    - ".htconfig.php" existiert ... wenn nicht, bearbeite die „htconfig.php“ und ändere die Systemeinstellungen. Benenne sie um in „.htconfig.php"
+    - "config/.htconfig.php" existiert ... wenn nicht, bearbeite die „config/htconfig.php“ und ändere die Systemeinstellungen. Benenne sie um in „.htconfig.php"
 “
     - die Datenbank beinhaltet Daten. ... wenn nicht, importiere den Inhalt der Datei "database.sql" mit phpmyadmin oder per mysql-Kommandozeile.
 
@@ -106,5 +106,5 @@ Es werden schlimme Dinge geschehen.
 Sei es nun ein Hardwareversage oder eine korrumpierte Datenbank.
 Deshalb solltest du dir nachdem die Installation deines Friendica Knotens abgeschlossen ist einen Backup Plan erstellen.
 
-Die wichtigste Datei ist die `.htconfig.php` im Stammverzeichnis deiner Friendica Installation.
+Die wichtigste Datei ist die `.htconfig.php` im `config/`-Verzeicnhis deiner Friendica Installation.
 Und da alle Daten in der Datenbank gespeichert werden, solltest du einen nicht all zu alten Dump der Friendica Datenbank zur Hand haben, solltest du deinen Knoten wieder herstellen müssen.

@@ -739,9 +739,9 @@ $a->strings["Error: GD graphics PHP module with JPEG support required but not in
 $a->strings["Error: openssl PHP module required but not installed."] = "";
 $a->strings["Error: mysqli PHP module required but not installed."] = "";
 $a->strings["Error: mb_string PHP module required but not installed."] = "";
-$a->strings["The web installer needs to be able to create a file called \".htconfig.php\" in the top folder of your web server and it is unable to do so."] = "";
+$a->strings["The web installer needs to be able to create a file called \".htconfig.php\" in the \"config/\" folder of your web server and it is unable to do so."] = "";
 $a->strings["This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can."] = "";
-$a->strings["At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder."] = "";
+$a->strings["At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica \"config/\" folder."] = "";
 $a->strings["You can alternatively skip this procedure and perform a manual installation. Please see the file \"INSTALL.txt\" for instructions."] = "";
 $a->strings[".htconfig.php is writable"] = "";
 $a->strings["Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering."] = "";
@@ -751,7 +751,7 @@ $a->strings["Note: as a security measure, you should give the web server write a
 $a->strings["view/smarty3 is writable"] = "";
 $a->strings["Url rewrite in .htaccess is not working. Check your server configuration."] = "";
 $a->strings["Url rewrite is working"] = "";
-$a->strings["The database configuration file \".htconfig.php\" could not be written. Please use the enclosed text to create a configuration file in your web server root."] = "";
+$a->strings["The database configuration file \".htconfig.php\" could not be written. Please use the enclosed text to create a configuration file in your web server \"config/\" directory."] = "";
 $a->strings["<h1>What next</h1>"] = "";
 $a->strings["IMPORTANT: You will need to [manually] setup a scheduled task for the poller."] = "";
 $a->strings["Number of daily wall messages for %s exceeded. Message failed."] = "";

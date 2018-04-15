@@ -38,7 +38,7 @@ if (substr($directory, 0, 1) != "/") {
 }
 $directory = realpath($directory."/..");
 
-@include($directory."/.htconfig.php");
+@include($directory."/config/.htconfig.php");
 
 if (!isset($pidfile)) {
 	die('Please specify a pid file in the variable $pidfile in the .htconfig.php. For example:'."\n".

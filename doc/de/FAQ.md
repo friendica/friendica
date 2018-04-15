@@ -199,7 +199,7 @@ Admin
 
 Ja, das ist möglich.
 Es ist allerdings nicht möglich, eine Datenbank durch zwei Domains zu nutzen.
-Solange Du Deine .htconfig.php allerdings so einrichtest, dass das System nicht versucht, eine Installation durchzuführen, kannst Du die richtige Config-Datei in include/$hostname/.htconfig.php hinterlegen.
+Solange Du Deine .htconfig.php allerdings so einrichtest, dass das System nicht versucht, eine Installation durchzuführen, kannst Du die richtige Config-Datei in include/$hostname/config/.htconfig.php hinterlegen.
 Alle Cache-Aspekte und der Zugriffsschutz können pro Instanz konfiguriert werden.
 
 <a name="sources"></a>

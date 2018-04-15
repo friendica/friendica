@@ -77,7 +77,7 @@ password, database name).
     - Please check the additional notes if running on MySQ 5.7.17 or newer
 
 4. If you know in advance that it will be impossible for the web server to
-write or create files in your web directory, create an empty file called
+write or create files in your web directory, create an empty file in config/ called
 .htconfig.php and make it writable by the web server.
 
 5. Visit your website with a web browser and follow the instructions. Please
@@ -92,8 +92,8 @@ so in the host name setting for the database.
 
 6. *If* the automated installation fails for any reason, check the following:
 
-	- ".htconfig.php" exists
-		If not, edit htconfig.php and change system settings. Rename
+	- "config/.htconfig.php" exists
+		If not, edit config/htconfig.php and change system settings. Rename
 to .htconfig.php
 	-  Database is populated.
 		If not, import the contents of "database.sql" with phpmyadmin
@@ -148,7 +148,7 @@ Bad things will happen. Let there be a hardware failure, a corrupted
 database or whatever you can think of. So once the installation of your
 Friendica node is done, you should make yoursef a backup plan.
 
-The most important file is the `.htconfig.php` file in the base directory.
+The most important file is the `.htconfig.php` file in the `config/` directory.
 As it stores all your data, you should also have a recent dump of your
 Friendica database at hand, should you have to recover your node.
 
@@ -252,14 +252,14 @@ due to permissions issues:
 	create an empty file with that name and give it world-write permission.
 For Linux:
 
-% touch .htconfig.php
-% chmod 777 .htconfig.php
+% touch config/.htconfig.php
+% chmod 777 config/.htconfig.php
 
 Retry the installation. As soon as the database has been created,
 
 ******* this is important *********
 
-% chmod 755 .htconfig.php
+% chmod 755 config/.htconfig.php
 
 #####################################################################
 - Some configurations with "suhosin" security are configured without

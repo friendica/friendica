@@ -87,7 +87,7 @@ function install_post(App $a) {
 			]);
 
 
-			$result = file_put_contents('.htconfig.php', $txt);
+			$result = file_put_contents('config/.htconfig.php', $txt);
 			if (! $result) {
 				$a->data['txt'] = $txt;
 			}
@@ -456,17 +456,17 @@ function check_funcs(&$checks) {
 function check_htconfig(&$checks) {
 	$status = true;
 	$help = "";
-	if ((file_exists('.htconfig.php') && !is_writable('.htconfig.php')) ||
-		(!file_exists('.htconfig.php') && !is_writable('.'))) {
+	if ((file_exists('config/.htconfig.php') && !is_writable('.htconfig.php')) ||
+		(!file_exists('config/.htconfig.php') && !is_writable('.'))) {
 
 		$status = false;
-		$help = L10n::t('The web installer needs to be able to create a file called ".htconfig.php" in the top folder of your web server and it is unable to do so.') .EOL;
+		$help = L10n::t('The web installer needs to be able to create a file called ".htconfig.php" in the "config/" folder of your web server and it is unable to do so.') .EOL;
 		$help .= L10n::t('This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can.').EOL;
-		$help .= L10n::t('At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top folder.').EOL;
+		$help .= L10n::t('At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica "config/" folder.').EOL;
 		$help .= L10n::t('You can alternatively skip this procedure and perform a manual installation. Please see the file "INSTALL.txt" for instructions.').EOL;
 	}
 
-	check_add($checks, L10n::t('.htconfig.php is writable'), $status, false, $help);
+	check_add($checks, L10n::t('config/.htconfig.php is writable'), $status, false, $help);
 
 }
 
@@ -530,7 +530,7 @@ function check_imagik(&$checks) {
 
 function manual_config(App $a) {
 	$data = htmlentities($a->data['txt'],ENT_COMPAT, 'UTF-8');
-	$o = L10n::t('The database configuration file ".htconfig.php" could not be written. Please use the enclosed text to create a configuration file in your web server root.');
+	$o = L10n::t('The database configuration file ".htconfig.php" could not be written. Please use the enclosed text to create a configuration file in your web server "config/".');
 	$o .= "<textarea rows=\"24\" cols=\"80\" >$data</textarea>";
 	return $o;
 }

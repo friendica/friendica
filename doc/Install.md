@@ -89,7 +89,7 @@ If you need to specify a port for the connection to the database, you can do so 
 
 *If* the automated installation fails for any reason, check the following:
 
-* Does ".htconfig.php" exist? If not, edit htconfig.php and change the system settings. Rename to .htconfig.php
+* Does ".htconfig.php" in "config/" exist? If not, edit htconfig.php and change the system settings. Rename to .htconfig.php
 * Is the database is populated? If not, import the contents of "database.sql" with phpmyadmin or mysql command line.
 
 At this point visit your website again, and register your personal account.
@@ -125,5 +125,5 @@ Bad things will happen.
 Let there be a hardware failure, a corrupted database or whatever you can think of.
 So once the installation of your Friendica node is done, you should make yourself a backup plan.
 
-The most important file is the `.htconfig.php` file in the base directory.
+The most important file is the `.htconfig.php` file in the `config/` directory.
 As it stores all your data, you should also have a recent dump of your Friendica database at hand, should you have to recover your node.

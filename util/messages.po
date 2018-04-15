@@ -3539,7 +3539,7 @@ msgstr ""
 #: mod/install.php:463
 msgid ""
 "The web installer needs to be able to create a file called \".htconfig.php\" "
-"in the top folder of your web server and it is unable to do so."
+"in the \"config/\" folder of your web server and it is unable to do so."
 msgstr ""
 
 #: mod/install.php:464
@@ -3551,7 +3551,7 @@ msgstr ""
 #: mod/install.php:465
 msgid ""
 "At the end of this procedure, we will give you a text to save in a file "
-"named .htconfig.php in your Friendica top folder."
+"named .htconfig.php in your Friendica config/ folder."
 msgstr ""
 
 #: mod/install.php:466
@@ -3618,7 +3618,7 @@ msgstr ""
 msgid ""
 "The database configuration file \".htconfig.php\" could not be written. "
 "Please use the enclosed text to create a configuration file in your web "
-"server root."
+"server \"config/\" directory."
 msgstr ""
 
 #: mod/install.php:556

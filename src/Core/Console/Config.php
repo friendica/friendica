@@ -92,7 +92,7 @@ HELP;
 			throw new CommandArgsException('Too many arguments');
 		}
 
-		require_once '.htconfig.php';
+		require_once 'config/.htconfig.php';
 		$result = dba::connect($db_host, $db_user, $db_pass, $db_data);
 		unset($db_host, $db_user, $db_pass, $db_data);
 

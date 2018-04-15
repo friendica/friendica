@@ -3580,7 +3580,7 @@ msgstr "Fehler: XML PHP Modul erforderlich aber nicht installiert."
 #: mod/install.php:463
 msgid ""
 "The web installer needs to be able to create a file called \".htconfig.php\""
-" in the top folder of your web server and it is unable to do so."
+" in the \"config/\" folder of your web server and it is unable to do so."
 msgstr "Der Installationswizard muss in der Lage sein, eine Datei im Stammverzeichnis Deines Webservers anzulegen, ist allerdings derzeit nicht in der Lage, dies zu tun."
 
 #: mod/install.php:464
@@ -3592,8 +3592,8 @@ msgstr "In den meisten Fällen ist dies ein Problem mit den Schreibrechten. Der 
 #: mod/install.php:465
 msgid ""
 "At the end of this procedure, we will give you a text to save in a file "
-"named .htconfig.php in your Friendica top folder."
-msgstr "Nachdem Du alles ausgefüllt hast, erhältst Du einen Text, den Du in eine Datei namens .htconfig.php in Deinem Friendica-Wurzelverzeichnis kopieren musst."
+"named .htconfig.php in your Friendica config/ folder."
+msgstr "Nachdem Du alles ausgefüllt hast, erhältst Du einen Text, den Du in eine Datei namens .htconfig.php in Deinem Friendica-Config-Verzeichnis (config/) kopieren musst."
 
 #: mod/install.php:466
 msgid ""
@@ -3659,8 +3659,8 @@ msgstr "ImageMagick unterstützt GIF"
 msgid ""
 "The database configuration file \".htconfig.php\" could not be written. "
 "Please use the enclosed text to create a configuration file in your web "
-"server root."
-msgstr "Die Konfigurationsdatei \".htconfig.php\" konnte nicht angelegt werden. Bitte verwende den angefügten Text, um die Datei im Stammverzeichnis Deiner Friendica-Installation zu erzeugen."
+"server \"config/\" directory."
+msgstr "Die Konfigurationsdatei \".htconfig.php\" konnte nicht angelegt werden. Bitte verwende den angefügten Text, um die Datei im \"config/\"-Verzeichnis Deiner Friendica-Installation zu erzeugen."
 
 #: mod/install.php:556
 msgid "<h1>What next</h1>"

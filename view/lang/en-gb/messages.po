@@ -3686,7 +3686,7 @@ msgstr "Error, XML PHP module required but not installed."
 msgid ""
 "The web installer needs to be able to create a file called \".htconfig.php\""
 " in the top folder of your web server and it is unable to do so."
-msgstr "The web installer needs to be able to create a file called \".htconfig.php\" in the top-level directory of your web server, but it is unable to do so."
+msgstr "The web installer needs to be able to create a file called \".htconfig.php\" in the \"config/\" directory of your web server, but it is unable to do so."
 
 #: mod/install.php:459
 msgid ""
@@ -3697,8 +3697,8 @@ msgstr "This is most often a permission setting issue, as the web server may not
 #: mod/install.php:460
 msgid ""
 "At the end of this procedure, we will give you a text to save in a file "
-"named .htconfig.php in your Friendica top folder."
-msgstr "At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top-level directory."
+"named .htconfig.php in your Friendica \"config/\" folder."
+msgstr "At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica \"config/\" directory."
 
 #: mod/install.php:461
 msgid ""
@@ -3765,7 +3765,7 @@ msgid ""
 "The database configuration file \".htconfig.php\" could not be written. "
 "Please use the enclosed text to create a configuration file in your web "
 "server root."
-msgstr "The database configuration file \".htconfig.php\" could not be written. Please use the enclosed text to create a configuration file in your web server root."
+msgstr "The database configuration file \".htconfig.php\" could not be written. Please use the enclosed text to create a configuration file in your web server \"config/\" directory."
 
 #: mod/install.php:551
 msgid "<h1>What next</h1>"

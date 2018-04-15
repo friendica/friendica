@@ -37,11 +37,11 @@ $a->backend = false;
  * installation mode.
  */
 
-$install = ((file_exists('.htconfig.php') && filesize('.htconfig.php')) ? false : true);
+$install = ((file_exists('config/.htconfig.php') && filesize('config/.htconfig.php')) ? false : true);
 
 // Only load config if found, don't surpress errors
 if (!$install) {
-	include ".htconfig.php";
+	include "config/.htconfig.php";
 }
 
 /**
