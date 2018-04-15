@@ -70,7 +70,7 @@ function install_post(App $a) {
             // connect to db
             dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true);
 
-            Setup::setup($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+            Setup::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
 
 			return;
 		break;
@@ -142,17 +142,7 @@ function install_content(App $a) {
                 $phpath = notags(trim($_POST['phpath']));
             }
 
-		    $checks = Setup::check($phpath);
-
-            function check_passed($v, $c) {
-                if ($c['required']) {
-                    $v = $v && $c['status'];
-                }
-                return $v;
-            }
-			$checkspassed = array_reduce($checks, "check_passed", true);
-
-
+		    list($checks, $checkspassed) = Setup::check($phpath);
 
 			$tpl = get_markup_template('install_checks.tpl');
 			$o .= replace_macros($tpl, [

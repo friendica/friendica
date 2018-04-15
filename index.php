@@ -182,7 +182,11 @@ $_SESSION['last_updated'] = defaults($_SESSION, 'last_updated', []);
 // in install mode, any url loads install module
 // but we need "view" module for stylesheet
 if ($install && $a->module!="view") {
-	$a->module = 'install';
+    $oldmodule = $a->module;
+    $a->module = 'install';
+    if (autoconfig()) {
+        $a->module = $oldmodule;
+    }
 } elseif ($maintenance && $a->module!="view") {
 	$a->module = 'maintenance';
 } else {

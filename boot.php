@@ -33,6 +33,7 @@ use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
+use Friendica\Module\Setup;
 use Friendica\Util\DateTimeFormat;
 
 require_once 'include/text.php';
@@ -1583,4 +1584,42 @@ function infinite_scroll_data($module)
 
 		return $arr;
 	}
+}
+
+/**
+ * @brief checks if there is a autoconfig.php file in the config folder and setup friendica in case of
+ *
+ * In an automatic setup, autoconfig.php could be created under the "config/" folder with default values
+ * for the mysql instance. At the end, this file should get deleted.
+ *
+ * @return true if the autoconfig was succesfully, otherwise false
+ */
+function autoconfig()
+{
+    $autoconfig = ((file_exists('config/autoconfig.php') && filesize('config/autoconfig.php')) ? true : false);
+
+    if (!$autoconfig) {
+        return false;
+    }
+
+    require_once 'config/autoconfig.php';
+
+    if (!$autoconfig_enabled) {
+        return false;
+    }
+
+    list($checks, $checkspassed) = Setup::check(null);
+
+    if (!$checkspassed) {
+        return false;
+    }
+
+    // connect to db
+    if (!dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true)) {
+        return false;
+    }
+
+    Setup::install(get_app()->get_path(), $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+
+    return true;
 }

@@ -40,12 +40,21 @@ class Setup extends BaseObject
 
         self::check_php($phpath, $checks);
 
-        self::check_htaccess($checks);
+        //self::check_htaccess($checks);
 
-        return $checks;
+        $checkspassed = array_reduce($checks,
+            function ($v, $c) {
+                if ($c['require']) {
+                    $v = $v && $c['status'];
+                }
+                return $v;
+            },
+            true);
+
+        return array($checks, $checkspassed);
     }
 
-    public static function setup($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino = 1)
+    public static function install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino = 1)
     {
         $tpl = get_markup_template('htconfig.tpl');
         $txt = replace_macros($tpl,[
@@ -74,7 +83,6 @@ class Setup extends BaseObject
         } else {
             self::getApp()->data['db_installed'] = true;
         }
-
     }
 
     /**
