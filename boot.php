@@ -1596,30 +1596,30 @@ function infinite_scroll_data($module)
  */
 function autoconfig()
 {
-    $autoconfig = ((file_exists('config/autoconfig.php') && filesize('config/autoconfig.php')) ? true : false);
+	$autoconfig = ((file_exists('config/autoconfig.php') && filesize('config/autoconfig.php')) ? true : false);
 
-    if (!$autoconfig) {
-        return false;
-    }
+	if (!$autoconfig) {
+		return false;
+	}
 
-    require_once 'config/autoconfig.php';
+	require_once 'config/autoconfig.php';
 
-    if (!$autoconfig_enabled) {
-        return false;
-    }
+	if (!$autoconfig_enabled) {
+		return false;
+	}
 
-    list($checks, $checkspassed) = Setup::check(null);
+	list($checks, $checkspassed) = Setup::check(null);
 
-    if (!$checkspassed) {
-        return false;
-    }
+	if (!$checkspassed) {
+		return false;
+	}
 
-    // connect to db
-    if (!dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true)) {
-        return false;
-    }
+	// connect to db
+	if (!dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true)) {
+		return false;
+	}
 
-    Setup::install(get_app()->get_path(), $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+	Setup::install(get_app()->get_path(), $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
 
-    return true;
+	return true;
 }

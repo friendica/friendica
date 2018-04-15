@@ -67,10 +67,10 @@ function install_post(App $a) {
 			$adminmail = notags(trim($_POST['adminmail']));
 			$rino = 1;
 
-            // connect to db
-            dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true);
+			// connect to db
+			dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true);
 
-            Setup::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+			Setup::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
 
 			return;
 		break;
@@ -138,11 +138,11 @@ function install_content(App $a) {
 	switch ($install_wizard_pass) {
 		case 1: { // System check
 
-            if (x($_POST, 'phpath')) {
-                $phpath = notags(trim($_POST['phpath']));
-            }
+			if (x($_POST, 'phpath')) {
+				$phpath = notags(trim($_POST['phpath']));
+			}
 
-		    list($checks, $checkspassed) = Setup::check($phpath);
+			list($checks, $checkspassed) = Setup::check($phpath);
 
 			$tpl = get_markup_template('install_checks.tpl');
 			$o .= replace_macros($tpl, [
