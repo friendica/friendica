@@ -12,16 +12,8 @@ use Friendica\Util\Network;
 use Exception;
 use DOMDocument;
 
-
 /**
- * @file include/Core/Install.php
- *
- * @brief Contains the class with setup relevant stuff
- */
-
-
-/**
- * @brief Install methods
+ * @brief Contains the class with setup relevant stuff *
  */
 class Install extends BaseObject
 {

@@ -118,3 +118,8 @@ When strings are added or modified in source, you could run
 If you already translated Friendica using strings.php, you could import your old
 translation to messages.po. Run:
 $ php bin/console.php php2po view/lang/<language>/strings.php
+
+
+Autoconfig
+
+The autoconfig.php is located in this folder as an example file for the automatic installation.

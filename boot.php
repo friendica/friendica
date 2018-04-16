@@ -1587,15 +1587,21 @@ function infinite_scroll_data($module)
 }
 
 /**
- * @brief checks if there is a autoconfig.php file in the config folder and setup friendica in case of
+ * @brief checks if there is a autoconfig.php file in the config folder and automatically installs friendica in case of
  *
  * In an automatic setup, autoconfig.php could be created under the "config/" folder with default values
  * for the mysql instance. At the end, this file should get deleted.
  *
- * @return true if the autoconfig was succesfully, otherwise false
+ * @return true if the auto-install was succesfully, otherwise false
  */
-function autoinstall()
+function run_auto_install()
 {
+	$old_htconfig = ((file_exists('.htconfig.php') && filesize('.htconfig.php')) ? true : false);
+
+	if ($old_htconfig) {
+		return rename('.htconfig.php', 'config/.htconfig.php');
+	}
+
 	$autoconfig = ((file_exists('config/autoconfig.php') && filesize('config/autoconfig.php')) ? true : false);
 
 	if (!$autoconfig) {

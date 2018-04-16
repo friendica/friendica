@@ -74,7 +74,11 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
 
 Friendica benötigt die Berechtigungen um neue Felder in dieser Datenbank zu ertellen (create) und zu löschen (delete).
 
-4. Besuche deine Webseite mit deinem Browser und befolge die Anleitung. Bitte beachte jeden Fehler und korrigiere diese, bevor du fortfährst.
+4. Besuche deine Webseite mit deinem Browser.
+ 
+    - Falls eine `config/autoconfig.php` existiert, wird friendica automatisch installiert.
+    
+    - Ansonsten befolge die Anleitung. Bitte beachte jeden Fehler und korrigiere diese, bevor du fortfährst.
 
 5. *Wenn* die automatisierte Installation aus irgendeinem Grund fehlschlägt, dann prüfe das Folgende:
 

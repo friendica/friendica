@@ -97,6 +97,12 @@ Registration errors should all be recoverable automatically.
 If you get any *critical* failure at this point, it generally indicates the database was not installed correctly.
 You might wish to move/rename .htconfig.php to another name and empty (called 'dropping') the database tables, so that you can start fresh.
 
+#### Automatic Installation
+
+In case you want to automatically install friendica, you have to create a `autoconfig.php` file inside the `config/` directory.
+
+You can find an example of this file at "util/autoconfig.php".
+
 ### Set up the worker
 
 Set up a cron job or scheduled task to run the worker once every 5-10 minutes in order to perform background processing.
