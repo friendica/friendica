@@ -2,7 +2,7 @@
 /**
  * @file src/Core/System.php
  */
-namespace Friendica\Module;
+namespace Friendica\Core;
 
 use Friendica\BaseObject;
 use Friendica\Core\System;
@@ -13,34 +13,34 @@ use Friendica\Util\Network;
 
 
 /**
- * @file include/Module/Setup.php
+ * @file include/Core/Install.php
  *
  * @brief Contains the class with setup relevant stuff
  */
 
 
 /**
- * @brief Setup methods
+ * @brief Install methods
  */
-class Setup extends BaseObject
+class Install extends BaseObject
 {
 	public static function check($phpath)
 	{
 		$checks = [];
 
-		self::check_funcs($checks);
+		self::checkFunctions($checks);
 
-		self::check_imagik($checks);
+		self::checkImagik($checks);
 
-		self::check_htconfig($checks);
+		self::checkHtConfig($checks);
 
-		self::check_smarty3($checks);
+		self::checkSmarty3($checks);
 
-		self::check_keys($checks);
+		self::checkKeys($checks);
 
-		self::check_php($phpath, $checks);
+		self::checkPHP($phpath, $checks);
 
-		//self::check_htaccess($checks);
+		self::checkHtAccess($checks);
 
 		$checkspassed = array_reduce($checks,
 			function ($v, $c) {
@@ -76,7 +76,7 @@ class Setup extends BaseObject
 			self::getApp()->data['txt'] = $txt;
 		}
 
-		$errors = self::load_database();
+		$errors = self::loadDatabase();
 
 		if ($errors) {
 			self::getApp()->data['db_failed'] = $errors;
@@ -92,7 +92,7 @@ class Setup extends BaseObject
 	 * required : boolean
 	 * help		: string optional
 	 */
-	private static function check_add(&$checks, $title, $status, $required, $help) {
+	private static function addCheck(&$checks, $title, $status, $required, $help) {
 		$checks[] = [
 			'title' => $title,
 			'status' => $status,
@@ -101,7 +101,7 @@ class Setup extends BaseObject
 		];
 	}
 
-	private static function check_php(&$phpath, &$checks) {
+	private static function checkPHP(&$phpath, &$checks) {
 		$passed = $passed2 = $passed3 = false;
 		if (strlen($phpath)) {
 			$passed = file_exists($phpath);
@@ -121,7 +121,7 @@ class Setup extends BaseObject
 			$phpath = "";
 		}
 
-		self::check_add($checks, L10n::t('Command line PHP').($passed?" (<tt>$phpath</tt>)":""), $passed, false, $help);
+		self::addCheck($checks, L10n::t('Command line PHP').($passed?" (<tt>$phpath</tt>)":""), $passed, false, $help);
 
 		if ($passed) {
 			$cmd = "$phpath -v";
@@ -133,7 +133,7 @@ class Setup extends BaseObject
 				$help .= L10n::t("PHP executable is not the php cli binary \x28could be cgi-fgci version\x29"). EOL;
 				$help .= L10n::t('Found PHP version: ')."<tt>$result</tt>";
 			}
-			self::check_add($checks, L10n::t('PHP cli binary'), $passed2, true, $help);
+			self::addCheck($checks, L10n::t('PHP cli binary'), $passed2, true, $help);
 		}
 
 
@@ -147,13 +147,13 @@ class Setup extends BaseObject
 				$help .= L10n::t('The command line version of PHP on your system does not have "register_argc_argv" enabled.'). EOL;
 				$help .= L10n::t('This is required for message delivery to work.');
 			}
-			self::check_add($checks, L10n::t('PHP register_argc_argv'), $passed3, true, $help);
+			self::addCheck($checks, L10n::t('PHP register_argc_argv'), $passed3, true, $help);
 		}
 
 
 	}
 
-	private static function check_keys(&$checks) {
+	private static function checkKeys(&$checks) {
 
 		$help = '';
 
@@ -173,27 +173,27 @@ class Setup extends BaseObject
 			$help .= L10n::t('Error: the "openssl_pkey_new" function on this system is not able to generate encryption keys'). EOL;
 			$help .= L10n::t('If running under Windows, please see "http://www.php.net/manual/en/openssl.installation.php".');
 		}
-		self::check_add($checks, L10n::t('Generate encryption keys'), $res, true, $help);
+		self::addCheck($checks, L10n::t('Generate encryption keys'), $res, true, $help);
 
 	}
 
 
-	private static function check_funcs(&$checks) {
+	private static function checkFunctions(&$checks) {
 		$ck_funcs = [];
-		self::check_add($ck_funcs, L10n::t('libCurl PHP module'), true, true, "");
-		self::check_add($ck_funcs, L10n::t('GD graphics PHP module'), true, true, "");
-		self::check_add($ck_funcs, L10n::t('OpenSSL PHP module'), true, true, "");
-		self::check_add($ck_funcs, L10n::t('PDO or MySQLi PHP module'), true, true, "");
-		self::check_add($ck_funcs, L10n::t('mb_string PHP module'), true, true, "");
-		self::check_add($ck_funcs, L10n::t('XML PHP module'), true, true, "");
-		self::check_add($ck_funcs, L10n::t('iconv PHP module'), true, true, "");
-		self::check_add($ck_funcs, L10n::t('POSIX PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('libCurl PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('GD graphics PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('OpenSSL PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('PDO or MySQLi PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('mb_string PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('XML PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('iconv PHP module'), true, true, "");
+		self::addCheck($ck_funcs, L10n::t('POSIX PHP module'), true, true, "");
 
 		if (function_exists('apache_get_modules')) {
 			if (! in_array('mod_rewrite',apache_get_modules())) {
-				self::check_add($ck_funcs, L10n::t('Apache mod_rewrite module'), false, true, L10n::t('Error: Apache webserver mod-rewrite module is required but not installed.'));
+				self::addCheck($ck_funcs, L10n::t('Apache mod_rewrite module'), false, true, L10n::t('Error: Apache webserver mod-rewrite module is required but not installed.'));
 			} else {
-				self::check_add($ck_funcs, L10n::t('Apache mod_rewrite module'), true, true, "");
+				self::addCheck($ck_funcs, L10n::t('Apache mod_rewrite module'), true, true, "");
 			}
 		}
 
@@ -243,7 +243,7 @@ class Setup extends BaseObject
 	}
 
 
-	private static function check_htconfig(&$checks) {
+	private static function checkHtConfig(&$checks) {
 		$status = true;
 		$help = "";
 		if ((file_exists('config/.htconfig.php') && !is_writable('.htconfig.php')) ||
@@ -256,11 +256,11 @@ class Setup extends BaseObject
 			$help .= L10n::t('You can alternatively skip this procedure and perform a manual installation. Please see the file "INSTALL.txt" for instructions.').EOL;
 		}
 
-		self::check_add($checks, L10n::t('config/.htconfig.php is writable'), $status, false, $help);
+		self::addCheck($checks, L10n::t('config/.htconfig.php is writable'), $status, false, $help);
 
 	}
 
-	private static function check_smarty3(&$checks) {
+	private static function checkSmarty3(&$checks) {
 		$status = true;
 		$help = "";
 		if (!is_writable('view/smarty3')) {
@@ -272,11 +272,11 @@ class Setup extends BaseObject
 			$help .= L10n::t("Note: as a security measure, you should give the web server write access to view/smarty3/ only--not the template files \x28.tpl\x29 that it contains.").EOL;
 		}
 
-		self::check_add($checks, L10n::t('view/smarty3 is writable'), $status, true, $help);
+		self::addCheck($checks, L10n::t('view/smarty3 is writable'), $status, true, $help);
 
 	}
 
-	private static function check_htaccess(&$checks) {
+	private static function checkHtAccess(&$checks) {
 		$status = true;
 		$help = "";
 		if (function_exists('curl_init')) {
@@ -290,14 +290,14 @@ class Setup extends BaseObject
 				$status = false;
 				$help = L10n::t('Url rewrite in .htaccess is not working. Check your server configuration.');
 			}
-			self::check_add($checks, L10n::t('Url rewrite is working'), $status, true, $help);
+			self::addCheck($checks, L10n::t('Url rewrite is working'), $status, true, $help);
 		} else {
 			// cannot check modrewrite if libcurl is not installed
 			/// @TODO Maybe issue warning here?
 		}
 	}
 
-	private static function check_imagik(&$checks) {
+	private static function checkImagik(&$checks) {
 		$imagick = false;
 		$gif = false;
 
@@ -309,16 +309,16 @@ class Setup extends BaseObject
 			}
 		}
 		if ($imagick == false) {
-			self::check_add($checks, L10n::t('ImageMagick PHP extension is not installed'), $imagick, false, "");
+			self::addCheck($checks, L10n::t('ImageMagick PHP extension is not installed'), $imagick, false, "");
 		} else {
-			self::check_add($checks, L10n::t('ImageMagick PHP extension is installed'), $imagick, false, "");
+			self::addCheck($checks, L10n::t('ImageMagick PHP extension is installed'), $imagick, false, "");
 			if ($imagick) {
-				self::check_add($checks, L10n::t('ImageMagick supports GIF'), $gif, false, "");
+				self::addCheck($checks, L10n::t('ImageMagick supports GIF'), $gif, false, "");
 			}
 		}
 	}
 
-	private static function load_database() {
+	private static function loadDatabase() {
 		$errors = DBStructure::update(false, true, true);
 
 		return $errors;

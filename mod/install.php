@@ -5,10 +5,10 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
+use Friendica\Core\Install;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Util\Temporal;
-use Friendica\Module\Setup;
 
 $install_wizard_pass = 1;
 
@@ -70,7 +70,7 @@ function install_post(App $a) {
 			// connect to db
 			dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true);
 
-			Setup::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+			Install::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
 
 			return;
 		break;
@@ -142,7 +142,7 @@ function install_content(App $a) {
 				$phpath = notags(trim($_POST['phpath']));
 			}
 
-			list($checks, $checkspassed) = Setup::check($phpath);
+			list($checks, $checkspassed) = Install::check($phpath);
 
 			$tpl = get_markup_template('install_checks.tpl');
 			$o .= replace_macros($tpl, [

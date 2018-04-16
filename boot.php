@@ -27,13 +27,13 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
+use Friendica\Core\Install;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
-use Friendica\Module\Setup;
 use Friendica\Util\DateTimeFormat;
 
 require_once 'include/text.php';
@@ -1608,7 +1608,7 @@ function autoconfig()
 		return false;
 	}
 
-	list($checks, $checkspassed) = Setup::check(null);
+	list($checks, $checkspassed) = Install::check(null);
 
 	if (!$checkspassed) {
 		return false;
@@ -1619,7 +1619,7 @@ function autoconfig()
 		return false;
 	}
 
-	Setup::install(get_app()->get_path(), $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+	Install::install(get_app()->get_path(), $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
 
 	return true;
 }
