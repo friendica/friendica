@@ -184,7 +184,7 @@ $_SESSION['last_updated'] = defaults($_SESSION, 'last_updated', []);
 if ($install && $a->module!="view") {
 	$oldmodule = $a->module;
 	$a->module = 'install';
-	if (autoconfig()) {
+	if (autoinstall()) {
 		$a->module = $oldmodule;
 	}
 } elseif ($maintenance && $a->module!="view") {

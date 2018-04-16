@@ -1,15 +1,16 @@
 <?php
 /**
- * @file src/Core/System.php
+ * @file src/Core/Install.php
  */
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
-use Friendica\Core\System;
-use Friendica\Core\L10n;
 use Friendica\Database\DBStructure;
 use Friendica\Object\Image;
 use Friendica\Util\Network;
+
+use Exception;
+use DOMDocument;
 
 
 /**
@@ -233,13 +234,12 @@ class Install extends BaseObject
 		$checks = array_merge($checks, $ck_funcs);
 
 		// check for XML DOM Documents being able to be generated
-//		// todo XML Check currently not working
-//		try {
-//			$xml = new DOMDocument();
-//		} catch (Exception $e) {
-//			$ck_funcs[5]['status'] = false;
-//			$ck_funcs[5]['help'] = L10n::t('Error, XML PHP module required but not installed.');
-//		}
+		try {
+			$xml = new DOMDocument();
+		} catch (Exception $e) {
+			$ck_funcs[5]['status'] = false;
+			$ck_funcs[5]['help'] = L10n::t('Error, XML PHP module required but not installed.');
+		}
 	}
 
 

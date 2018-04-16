@@ -1594,7 +1594,7 @@ function infinite_scroll_data($module)
  *
  * @return true if the autoconfig was succesfully, otherwise false
  */
-function autoconfig()
+function autoinstall()
 {
 	$autoconfig = ((file_exists('config/autoconfig.php') && filesize('config/autoconfig.php')) ? true : false);
 
@@ -1620,6 +1620,9 @@ function autoconfig()
 	}
 
 	Install::install(get_app()->get_path(), $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+
+	unlink('config/autoconfig.php');
+	unset($dbhost, $dbuser, $dbpass, $dbdata);
 
 	return true;
 }
