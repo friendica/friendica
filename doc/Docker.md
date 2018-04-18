@@ -14,7 +14,7 @@ With the autoinstall function of Friendica, you can automatically create Docker 
 Docker automatically creates writable [containers](https://docs.docker.com/get-started/part2/) for Friendica, which means that the data doesn't persist when that container no longer exists.
 Therefore, you have to manage your data with the help of [mountpoints](https://docs.docker.com/storage/).
 
-The goal of the auto-install feature is that the configuration of your data is stored inside your mountpoint, so if you delete the container (or lose your Docker environment because of failures) you don't have to worry about your configuration. It is saved with your data.   
+The goal of the auto-install feature is to use the configuration file stored inside your mountpoint to install Friendica, so if you delete the container (or lose your Docker environment because of failures) you won't have to start the install from scratch.   
 
 ###1. Preparation
 
