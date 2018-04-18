@@ -13,7 +13,7 @@ use Exception;
 use DOMDocument;
 
 /**
- * @brief Contains the class with setup relevant stuff *
+ * @brief Contains the class with install relevant stuff *
  */
 class Install extends BaseObject
 {

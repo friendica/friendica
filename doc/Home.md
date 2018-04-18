@@ -56,6 +56,7 @@ Friendica Documentation and Resources
 	* [Protocol Documentation](help/Protocol)
 	* [Database schema documantation](help/database)
 	* [Class Autoloading](help/autoloader)
+	* [Docker Deployment](help/Docker)
 
 **External Resources**
 

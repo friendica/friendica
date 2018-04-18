@@ -42,7 +42,7 @@ define('FRIENDICA_PLATFORM',     'Friendica');
 define('FRIENDICA_CODENAME',     'The Tazmans Flax-lily');
 define('FRIENDICA_VERSION',      '2018-05-dev');
 define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1259);
+define('DB_UPDATE_VERSION',      1260);
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /**
@@ -1587,7 +1587,7 @@ function infinite_scroll_data($module)
 }
 
 /**
- * @brief checks if there is a autoconfig.php file in the config folder and automatically installs friendica in case of
+ * @brief checks if there is a autoconfig.php file in the config folder and automatically installs friendica if applicable
  *
  * In an automatic setup, autoconfig.php could be created under the "config/" folder with default values
  * for the mysql instance. At the end, this file should get deleted.
