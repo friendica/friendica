@@ -37,7 +37,8 @@ The following parameters are currently supported:
 - adminmail (optional)
 - rino (optional)
 
-There is an example file at `util/autoconfig.php`. It uses environment variables for the initial loading. 
+There is an example file at `util/autoconfig.php`.
+It uses environment variables for the initial loading. 
 
 ###2. Installation
 
