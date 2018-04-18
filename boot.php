@@ -1596,11 +1596,6 @@ function infinite_scroll_data($module)
  */
 function run_auto_install()
 {
-	$old_htconfig = ((file_exists('.htconfig.php') && filesize('.htconfig.php')) ? true : false);
-
-	if ($old_htconfig) {
-		return rename('.htconfig.php', 'config/.htconfig.php');
-	}
 
 	$autoconfig = ((file_exists('config/autoconfig.php') && filesize('config/autoconfig.php')) ? true : false);
 
