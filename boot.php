@@ -1621,14 +1621,14 @@ function run_auto_install()
 	}
 
 	// connect to db
-	if (!dba::connect($dbhost, $dbuser, $dbpass, $dbdata, true)) {
+	if (!dba::connect($db_host, $db_user, $db_pass, $db_data, true)) {
 		return false;
 	}
 
-	Install::install(get_app()->get_path(), $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+	Install::install(get_app()->get_path(), $db_host, $db_user, $db_pass, $db_data, $phpath, $timezone, $language, $adminmail, $rino);
 
 	unlink('config/autoconfig.php');
-	unset($dbhost, $dbuser, $dbpass, $dbdata);
+	unset($db_host, $db_user, $db_pass, $db_data);
 
 	return true;
 }
