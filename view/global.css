@@ -202,7 +202,15 @@ blockquote.shared_content {
 }
 
 #profile-photo-wrapper {
+  clear: both;
   overflow: hidden;
+}
+
+#newmember-tips {
+  font-size: 1.2em;
+  float: right;
+  margin-top: -32px;
+  padding-right: 10px;
 }
 
 /* headers */

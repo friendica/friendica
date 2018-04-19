@@ -55,19 +55,24 @@ class Widget
 			}
 		}
 
-		return replace_macros(get_markup_template('peoplefind.tpl'), array(
-			'$findpeople' => L10n::t('Find People'),
-			'$desc' => L10n::t('Enter name or interest'),
-			'$label' => L10n::t('Connect/Follow'),
-			'$hint' => L10n::t('Examples: Robert Morgenstein, Fishing'),
-			'$findthem' => L10n::t('Find'),
-			'$suggest' => L10n::t('Friend Suggestions'),
-			'$similar' => L10n::t('Similar Interests'),
-			'$random' => L10n::t('Random Profile'),
-			'$inv' => L10n::t('Invite Friends'),
-			'$directory' => L10n::t('View Global Directory'),
-			'$global_dir' => $global_dir
-		));
+		$nv = [];
+		$nv['findpeople'] = L10n::t('Find People');
+		$nv['desc'] = L10n::t('Enter name or interest');
+		$nv['label'] = L10n::t('Connect/Follow');
+		$nv['hint'] = L10n::t('Examples: Robert Morgenstein, Fishing');
+		$nv['findthem'] = L10n::t('Find');
+		$nv['suggest'] = L10n::t('Friend Suggestions');
+		$nv['similar'] = L10n::t('Similar Interests');
+		$nv['random'] = L10n::t('Random Profile');
+		$nv['inv'] = L10n::t('Invite Friends');
+		$nv['directory'] = L10n::t('Global Directory');
+		$nv['global_dir'] = $global_dir;
+		$nv['local_directory'] = L10n::t('Local Directory');
+
+		$aside = [];
+		$aside['$nv'] = $nv;
+
+		return replace_macros(get_markup_template('peoplefind.tpl'), $aside);
 	}
 
 	/**
