@@ -206,6 +206,13 @@ blockquote.shared_content {
   overflow: hidden;
 }
 
+#newmember-tips {
+  font-size: 1.2em;
+  float: right;
+  margin-top: -32px;
+  padding-right: 10px;
+}
+
 /* headers */
 h1, h2, h3, h4, h5, h6 {
   margin: 5px 0px 5px 0px;
