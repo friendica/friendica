@@ -1153,9 +1153,9 @@ aside #profiles-menu {
   left: 10px;
 }
 
-aside #search-text, aside #side-follow-url, aside #side-peoplefind-url, right_aside input {
-  width: 140px;
-  height: 17px;
+aside #search-text, aside #side-follow-url, aside #side-peoplefind-url, right_aside #side-peoplefind-url { 
+  width: 65%;
+  float: left;
   padding-left: 10px;
   /*border-top-left-radius: 15px;
   border-top-right-radius: 15px;
@@ -1165,6 +1165,15 @@ aside #search-text, aside #side-follow-url, aside #side-peoplefind-url, right_as
   -moz-border-top-colors: #999;
   -moz-border-left-colors: #999;
   -moz-border-right-colors: #dbdbdb;*/
+}
+
+aside #side-peoplefind-submit, right_aside #side-peoplefind-submit {
+  width: 25%;
+  float: right;
+}
+
+#side-match-link {
+  clear: both;
 }
 
 aside h4, right_aside h4 {

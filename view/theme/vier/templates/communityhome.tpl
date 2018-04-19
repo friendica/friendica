@@ -39,17 +39,7 @@
 {{/if}}
 
 {{if $nv}}
-<div id="right_friends" class="widget">
-<h3>{{$nv.title.1}}</h3>
-<ul role="menu">
-<li class="tool" role="menuitem"><a class="{{$nv.directory.2}}" href="{{$nv.directory.0}}" title="{{$nv.directory.3}}" >{{$nv.directory.1}}</a></li>
-<li class="tool" role="menuitem"><a class="{{$nv.global_directory.2}}" href="{{$nv.global_directory.0}}" target="blank" title="{{$nv.global_directory.3}}" >{{$nv.global_directory.1}}</a></li>
-<li class="tool" role="menuitem"><a class="{{$nv.match.2}}" href="{{$nv.match.0}}" title="{{$nv.match.3}}" >{{$nv.match.1}}</a></li>
-<li class="tool" role="menuitem"><a class="{{$nv.suggest.2}}" href="{{$nv.suggest.0}}" title="{{$nv.suggest.3}}" >{{$nv.suggest.1}}</a></li>
-<li class="tool" role="menuitem"><a class="{{$nv.invite.2}}" href="{{$nv.invite.0}}" title="{{$nv.invite.3}}" >{{$nv.invite.1}}</a></li>
-</ul>
-{{$nv.search}}
-</div>
+{{include file='peoplefind.tpl' nv=$nv}}
 {{/if}}
 
 {{if $lastusers_title}}
