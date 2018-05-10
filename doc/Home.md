@@ -27,6 +27,7 @@ Friendica Documentation and Resources
 **Admin Manual**
 
 * [Install](help/Install)
+* [Update](help/Update)
 * [Settings & Admin Panel](help/Settings)
 * [Installing Connectors (Twitter/GNU Social)](help/Installing-Connectors)
 * [Install an ejabberd server (XMPP chat) with synchronized credentials](help/install-ejabberd)
@@ -42,7 +43,7 @@ Friendica Documentation and Resources
 	* [Help on Vagrant](help/Vagrant)
 	* [Bugs and Issues](help/Bugs-and-Issues)
 * Code structure
-	* [Plugin Development](help/Plugins)
+	* [Addon Development](help/Addons)
 	* [Theme Development](help/themes)
 	* [Smarty 3 Templates](help/smarty3-templates)
 * How To
@@ -59,7 +60,12 @@ Friendica Documentation and Resources
 **External Resources**
 
 * [Main Website](https://friendi.ca)
-* [Mailing List Archive](http://librelist.com/browser/friendica/)
+* Ways to get Support
+  * [Friendica Support Forum](https://forum.friendi.ca/~helpers)
+  * [Mailing List Archive](http://mailman.friendi.ca/mailman/listinfo/support-friendi.ca) you can subscribe to the list by sending an email to ``support-request(at)friendi.ca?subject=subscribe``
+  * XMPP/Jabber MUC: support(at)forum.friendi.ca
+  * IRC: #friendica at irc.freenode.net
+  * Matrix: #friendi.ca or #friendica at matrix.org
 
 **About**
 

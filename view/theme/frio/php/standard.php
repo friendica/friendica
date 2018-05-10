@@ -16,7 +16,7 @@
 	<?php $frio = "view/theme/frio"; ?>
 	<?php if(x($page,'htmlhead')) echo $page['htmlhead']; ?>
 </head>
-<body id=\"top\">";
+<body id="top">
 <?php if($_SERVER['REQUEST_URI'] == "/"){header('Location: /login');} ?>
 <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 <?php

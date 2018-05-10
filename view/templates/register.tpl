@@ -64,6 +64,10 @@
 
 	{{$publish}}
 
+	{{if $showtoslink}}
+	<p><a href="{{$baseurl}}/tos">{{$tostext}}</a></p>
+	{{/if}}
+
 	<div id="register-submit-wrapper">
 		<input type="submit" name="submit" id="register-submit-button" value="{{$regbutt|escape:'html'}}" />
 	</div>

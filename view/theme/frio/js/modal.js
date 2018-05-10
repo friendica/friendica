@@ -152,6 +152,7 @@ Dialog._load = function(url) {
 	var jsbrowser = function() {
 		FileBrowser.init(nickname, type, hash);
 	};
+	loadScript("view/js/ajaxupload.js");
 	loadScript("view/theme/frio/js/filebrowser.js", jsbrowser);
 };
 
@@ -206,6 +207,10 @@ function addToModal(url) {
 				//Get first element with the class "heading"
 				//and use it as title.
 				loadModalTitle();
+
+				// We need to initialize autosize again for new
+				// modal conent.
+				autosize($('.modal .text-autosize'));
 			}
 		});
 }

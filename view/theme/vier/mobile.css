@@ -91,6 +91,13 @@ nav ul {
     width: 100% !important; height: 110px !important;
   }
 
+  #login-extra-links, #login-form {
+    /* width: 341px; */
+    width: 100%;
+  }
+  #id_remember_label {
+    width: unset;
+  }
 }
 
 @media screen and (max-width: 480px) {

@@ -21,7 +21,7 @@ require_once 'include/dba.php';
  */
 class Lock
 {
-	private static $semaphore = array();
+	private static $semaphore = [];
 
 	/**
 	 * @brief Check for memcache and open a connection if configured
@@ -126,7 +126,7 @@ class Lock
 
 		do {
 			dba::lock('locks');
-			$lock = dba::select('locks', array('locked', 'pid'), array('name' => $fn_name), array('limit' => 1));
+			$lock = dba::selectFirst('locks', ['locked', 'pid'], ['name' => $fn_name]);
 
 			if (DBM::is_result($lock)) {
 				if ($lock['locked']) {
@@ -140,11 +140,11 @@ class Lock
 					}
 				}
 				if (!$lock['locked']) {
-					dba::update('locks', array('locked' => true, 'pid' => getmypid()), array('name' => $fn_name));
+					dba::update('locks', ['locked' => true, 'pid' => getmypid()], ['name' => $fn_name]);
 					$got_lock = true;
 				}
 			} elseif (!DBM::is_result($lock)) {
-				dba::insert('locks', array('name' => $fn_name, 'locked' => true, 'pid' => getmypid()));
+				dba::insert('locks', ['name' => $fn_name, 'locked' => true, 'pid' => getmypid()]);
 				$got_lock = true;
 			}
 
@@ -189,7 +189,7 @@ class Lock
 			return;
 		}
 
-		dba::update('locks', array('locked' => false, 'pid' => 0), array('name' => $fn_name, 'pid' => getmypid()));
+		dba::update('locks', ['locked' => false, 'pid' => 0], ['name' => $fn_name, 'pid' => getmypid()]);
 		return;
 	}
 
@@ -205,7 +205,7 @@ class Lock
 			return;
 		}
 
-		dba::update('locks', array('locked' => false, 'pid' => 0), array('pid' => getmypid()));
+		dba::update('locks', ['locked' => false, 'pid' => 0], ['pid' => getmypid()]);
 		return;
 	}
 }

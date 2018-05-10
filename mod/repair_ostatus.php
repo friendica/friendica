@@ -1,19 +1,21 @@
 <?php
-
+/**
+ * @file mod/repair_ostatus.php
+ */
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
-
-require_once 'include/follow.php';
+use Friendica\Model\Contact;
 
 function repair_ostatus_content(App $a) {
 
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
-	$o = "<h2>".t("Resubscribing to OStatus contacts")."</h2>";
+	$o = "<h2>".L10n::t("Resubscribing to OStatus contacts")."</h2>";
 
 	$uid = local_user();
 
@@ -29,7 +31,7 @@ function repair_ostatus_content(App $a) {
                 intval(CONTACT_IS_SHARING));
 
 	if (!$r)
-		return($o.t("Error"));
+		return($o.L10n::t("Error"));
 
 	$total = $r[0]["total"];
 
@@ -43,15 +45,15 @@ function repair_ostatus_content(App $a) {
                 intval(CONTACT_IS_SHARING), $counter++);
 
 	if (!$r) {
-		$o .= t("Done");
+		$o .= L10n::t("Done");
 		return $o;
 	}
 
 	$o .= "<p>".$counter."/".$total.": ".$r[0]["url"]."</p>";
 
-	$o .= "<p>".t("Keep this window open until done.")."</p>";
+	$o .= "<p>".L10n::t("Keep this window open until done.")."</p>";
 
-	$result = new_contact($uid,$r[0]["url"],true);
+	$result = Contact::createFromProbe($uid, $r[0]["url"], true);
 
 	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="1; URL='.System::baseUrl().'/repair_ostatus?counter='.$counter.'">';
 

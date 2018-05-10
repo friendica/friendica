@@ -30,9 +30,11 @@
 		<div class="wall-item-links">
 		</div>
 		<div class="wall-item-tags">
+		{{if !$item.suppress_tags}}
 			{{foreach $item.tags as $tag}}
-				<span class='tag'>{{$tag}}</span>
+				<span class="tag">{{$tag}}</span>
 			{{/foreach}}
+		{{/if}}
 		</div>
 	</div>
 	<div class="wall-item-bottom">

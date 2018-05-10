@@ -13,14 +13,14 @@
  * Installation:
  *
  * 	- Change it's owner to whichever user is running the server, ie. ejabberd
- * 	  $ chown ejabberd:ejabberd /path/to/friendica/scripts/auth_ejabberd.php
+ * 	  $ chown ejabberd:ejabberd /path/to/friendica/bin/auth_ejabberd.php
  *
  * 	- Change the access mode so it is readable only to the user ejabberd and has exec
- * 	  $ chmod 700 /path/to/friendica/scripts/auth_ejabberd.php
+ * 	  $ chmod 700 /path/to/friendica/bin/auth_ejabberd.php
  *
  * 	- Edit your ejabberd.cfg file, comment out your auth_method and add:
  * 	  {auth_method, external}.
- * 	  {extauth_program, "/path/to/friendica/script/auth_ejabberd.php"}.
+ * 	  {extauth_program, "/path/to/friendica/bin/auth_ejabberd.php"}.
  *
  * 	- Restart your ejabberd service, you should be able to login with your friendica auth info
  *
@@ -38,9 +38,9 @@ use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
+use Friendica\Util\Network;
 use dba;
 
-require_once 'include/dba.php';
 require_once 'include/dba.php';
 
 class ExAuth
@@ -140,7 +140,7 @@ class ExAuth
 		$this->setHost($aCommand[2]);
 
 		// Now we check if the given user is valid
-		$sUser = str_replace(array('%20', '(a)'), array(' ', '@'), $aCommand[1]);
+		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
 		if ($a->get_hostname() == $aCommand[2]) {
@@ -181,7 +181,7 @@ class ExAuth
 
 		$url = ($ssl ? 'https' : 'http') . '://' . $host . '/noscrape/' . $user;
 
-		$data = z_fetch_url($url);
+		$data = Network::curl($url);
 
 		if (!is_array($data)) {
 			return false;
@@ -220,16 +220,17 @@ class ExAuth
 		$this->setHost($aCommand[2]);
 
 		// We now check if the password match
-		$sUser = str_replace(array('%20', '(a)'), array(' ', '@'), $aCommand[1]);
+		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
 		if ($a->get_hostname() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal auth for ' . $sUser . '@' . $aCommand[2]);
 
-			$aUser = dba::select('user', ['uid', 'password'], ['nickname' => $sUser], ['limit' => 1]);
+			$aUser = dba::selectFirst('user', ['uid', 'password', 'legacy_password'], ['nickname' => $sUser]);
 			if (DBM::is_result($aUser)) {
-				$uid = User::authenticate($aUser, $aCommand[3]);
-				$Error = $uid === false;
+				$uid = $aUser['uid'];
+				$success = User::authenticate($aUser, $aCommand[3]);
+				$Error = $success === false;
 			} else {
 				$this->writeLog(LOG_WARNING, 'user not found: ' . $sUser);
 				$Error = true;

@@ -16,7 +16,6 @@ Whether you feel like an expert or like a newbie - join us with your ideas!
 The discussion of Friendica development takes place in the following Friendica forums:
 
 * The main [forum for Friendica development](https://forum.friendi.ca/profile/developers)
-* The [forum for Friendica theme development](https://friendica.eu/profile/ftdevs)
 
 ## Help other users
 
@@ -48,6 +47,23 @@ Friendica uses [Composer](https://getcomposer.org) to manage dependencies librar
 
 It's a command-line tool that downloads required libraries into the `vendor` folder and makes any namespaced class in `src` available through the whole application through `boot.php`.
 
+If you want to have git automatically update the dependencies with composer, you can use the `post-merge` [git-hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) with a script similar to this one:
+
+    #/usr/bin/env bash
+    # MIT © Sindre Sorhus - sindresorhus.com
+    # forked by Gianluca Guarini
+    # phponly by Ivo Bathke ;)
+    # modified for Friendica by Tobias Diekershoff
+    changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)"
+    check_run() {
+		    echo "$changed_files" | grep --quiet "$1" && eval "$2"
+    }
+    # `composer install` if the `composer.lock` file gets changed
+    # to update all the php dependencies
+    check_run composer.lock "bin/composer.phar install --no-dev"
+
+just place it into `.git/hooks/post-merge` and make it executable.
+
 * [Class autoloading](help/autoloader)
 * [Using Composer](help/Composer)
 * [How To Move Classes to `src`](help/Developer-How-To-Move-Classes-to-src)
@@ -64,6 +80,7 @@ Here's a few primers if you are new to Friendica or to the PSR-2 coding standard
 * Boolean operators are `&&` and `||` for PHP conditions, `AND` and `OR` for SQL queries
 * No closing PHP tag
 * No trailing spaces
+* Array declarations use the new square brackets syntax
 
 Don't worry, you don't have to know by heart the PSR-2 coding standards to start contributing to Friendica.
 There are a few tools you can use to check or fix your files before you commit.
@@ -76,7 +93,7 @@ This tool checks your files against a variety of coding standards, including PSR
 You can simply install it through PEAR: `pear install PHP_CodeSniffer`
 Once it is installed and available in your PATH, here's the command to run before committing your work:
 
-	$> phpcs --standard=PSR2 <file or directory>
+	$> phpcs --standard=ruleset.xml <file or directory>
 
 The output is a list of all the coding standards violations that you should fix before committing your work.
 Additionally, `phpcs` integrates with a few IDEs (Eclipse, Netbeans, PHPStorm...) so that you don't have to fiddle with the command line.
@@ -87,7 +104,7 @@ If you're getting a massive list of standards violations when running `phpcs`, i
 Thankfully, PHP Code Sniffer is shipped with an automatic code fixer that can take care of the tedious task for you.
 Here's the command to automatically fix the files you created/modified:
 
-	$> phpcbf --standard=PSR2 <file or directory>
+	$> phpcbf --standard=ruleset.xml <file or directory>
 
 If the command-line tools `diff` and `patch` are unavailabe for you, `phpcbf` can use slightly slower PHP equivalents by using the `--no-patch` argument.
 
@@ -111,7 +128,7 @@ Have a look at our [issue tracker](https://github.com/friendica/friendica) on gi
 * Try to reproduce a bug that needs more inquiries and write down what you find out.
 * If a bug looks fixed, ask the bug reporters for feedback to find out if the bug can be closed.
 * Fix a bug if you can. Please make the pull request against the *develop* branch of the repository.
-* There is a *Junior Job* label for issues we think might be a good point to start with.
+* There is a *[Junior Job](https://github.com/friendica/friendica/issues?q=is%3Aopen+is%3Aissue+label%3A"Junior+Jobs")* label for issues we think might be a good point to start with.
 	But you don't have to limit yourself to those issues.
 
 ### Web interface
@@ -123,7 +140,7 @@ If you want to get involved here:
 * Look at the first steps that were made (e.g. the clean theme).
 	Ask us to find out whom to talk to about their experiences.
 * Talk to design people if you know any.
-* Let us know about your plans [in the dev forum](https://forum.friendi.ca/profile/developers) or the [theme developer forum](https://friendica.eu/profile/ftdevs).
+* Let us know about your plans [in the dev forum](https://forum.friendi.ca/profile/developers)
 	Do not worry about cross-posting.
 
 ### Client software
@@ -132,7 +149,7 @@ As Friendica is using a [Twitter/GNU Social compatible API](help/api) any of the
 Furthermore there are several client projects, especially for use with Friendica.
 If you are interested in improving those clients, please contact the developers of the clients directly.
 
-* Android / CynogenMod: **Friendica for Android** [src](https://github.com/max-weller/friendica-for-android), [homepage](http://friendica.android.max-weller.de/) - abandoned
+* Android / LinageOS: **Friendiqa** [src](https://github.com/LubuWest/Friendiqa) developed by [Marco R](https://freunde.ma-nic.de/profile/marco)
 * iOS: *currently no client*
 * SailfishOS: **Friendiy** [src](https://kirgroup.com/projects/fabrixxm/harbour-friendly) - developed by [Fabio](https://kirgroup.com/profile/fabrixxm/?tab=profile)
 * Windows: **Friendica Mobile** for Windows versions [before 8.1](http://windowsphone.com/s?appid=e3257730-c9cf-4935-9620-5261e3505c67) and [Windows 10](https://www.microsoft.com/store/apps/9nblggh0fhmn) - developed by [Gerhard Seeber](http://mozartweg.dyndns.org/friendica/profile/gerhard/?tab=profile)

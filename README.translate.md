@@ -27,17 +27,18 @@ The location of the translated files in the source tree is
     /view/lang/LNG-CODE/
 where LNG-CODE is the language code used, e.g. de for German or fr for French.
 The translated strings come as a "message.po" file from transifex which needs to be translated into the PHP file friendica uses.
-To do so, place the file in the directory mentioned above and use the "po2php" utility from the util directory of your friendica installation.
+To do so, place the file in the directory mentioned above and use the "po2php" command from the console.
+*Please note that the console tool has to be called from the base directory of your Friendica installation.*
 
 Assuming you want to convert the German localization which is placed in view/lang/de/message.po you would do the following.
 
     1. Navigate at the command prompt to the base directory of your
        friendica installation
 
-    2. Execute the po2php script, which will place the translation
+    2. Execute the po2php command, which will place the translation
        in the strings.php file that is used by friendica.
 
-       $> php util/po2php.php view/lang/de/messages.po
+       $> php bin/console.php po2php view/lang/de/messages.po
 
        The output of the script will be placed at view/lang/de/strings.php where
        friendica is expecting it, so you can test your translation immediately.
@@ -62,7 +63,7 @@ Otherwise your work might get lost, when the translation from Transifex is inclu
 Utilities
 ---------
 
-Additional to the po2php script there are some more utilities for translation in the "util" directory of the friendica source tree.
+Additional to the po2php command there are some more utilities for translation in the console.
 If you only want to translate friendica into another language you wont need any of these tools most likely but it gives you an idea how the translation process of friendica works.
 
 For further information see the utils/README file.
@@ -90,9 +91,9 @@ To update the translation files after you have translated strings of e.g. Espera
 
     $> tx pull -l eo
 
-And then use the `po2php` utility described above to convert the `messages.po` file to the `strings.php` file Friendica is loading.
+And then use the `po2php` command described above to convert the `messages.po` file to the `strings.php` file Friendica is loading.
 
-    $> php util/po2php.php view/lang/eo/messages.po
+    $> php bin/console.php po2php view/lang/eo/messages.po
 
 Afterwards, just commit the two changed files to a feature branch of your Friendica repository, push the changes to github and open a pull request for your changes.
 

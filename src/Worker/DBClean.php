@@ -69,21 +69,30 @@ class DBClean {
 
 		// Get the expire days for step 8 and 9
 		$days = Config::get('system', 'dbclean-expire-days', 0);
+		$days_unclaimed = Config::get('system', 'dbclean-expire-unclaimed', 90);
+
+		if ($days_unclaimed == 0) {
+			$days_unclaimed = $days;
+		}
 
 		if ($stage == 1) {
+			if ($days_unclaimed <= 0) {
+				return;
+			}
+
 			$last_id = Config::get('system', 'dbclean-last-id-1', 0);
 
 			logger("Deleting old global item entries from item table without user copy. Last ID: ".$last_id);
 			$r = dba::p("SELECT `id` FROM `item` WHERE `uid` = 0 AND
 						NOT EXISTS (SELECT `guid` FROM `item` AS `i` WHERE `item`.`guid` = `i`.`guid` AND `i`.`uid` != 0) AND
-						`received` < UTC_TIMESTAMP() - INTERVAL 90 DAY AND `id` >= ?
-					ORDER BY `id` LIMIT ".intval($limit), $last_id);
+						`received` < UTC_TIMESTAMP() - INTERVAL ? DAY AND `id` >= ?
+					ORDER BY `id` LIMIT ".intval($limit), $days_unclaimed, $last_id);
 			$count = dba::num_rows($r);
 			if ($count > 0) {
 				logger("found global item orphans: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["id"];
-					dba::delete('item', array('id' => $orphan["id"]));
+					dba::delete('item', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 1, $last_id);
 			} else {
@@ -105,7 +114,7 @@ class DBClean {
 				logger("found item orphans without parents: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["id"];
-					dba::delete('item', array('id' => $orphan["id"]));
+					dba::delete('item', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 2, $last_id);
 			} else {
@@ -131,7 +140,7 @@ class DBClean {
 				logger("found thread orphans: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["iid"];
-					dba::delete('thread', array('iid' => $orphan["iid"]));
+					dba::delete('thread', ['iid' => $orphan["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 3, $last_id);
 			} else {
@@ -157,7 +166,7 @@ class DBClean {
 				logger("found notify orphans: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["id"];
-					dba::delete('notify', array('iid' => $orphan["iid"]));
+					dba::delete('notify', ['iid' => $orphan["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 4, $last_id);
 			} else {
@@ -183,7 +192,7 @@ class DBClean {
 				logger("found notify-threads orphans: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["id"];
-					dba::delete('notify-threads', array('id' => $orphan["id"]));
+					dba::delete('notify-threads', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 5, $last_id);
 			} else {
@@ -209,7 +218,7 @@ class DBClean {
 				logger("found sign orphans: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["id"];
-					dba::delete('sign', array('iid' => $orphan["iid"]));
+					dba::delete('sign', ['iid' => $orphan["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 6, $last_id);
 			} else {
@@ -235,7 +244,7 @@ class DBClean {
 				logger("found term orphans: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["tid"];
-					dba::delete('term', array('oid' => $orphan["oid"]));
+					dba::delete('term', ['oid' => $orphan["oid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 7, $last_id);
 			} else {
@@ -274,7 +283,7 @@ class DBClean {
 				logger("found expired threads: ".$count);
 				while ($thread = dba::fetch($r)) {
 					$last_id = $thread["iid"];
-					dba::delete('thread', array('iid' => $thread["iid"]));
+					dba::delete('thread', ['iid' => $thread["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 8, $last_id);
 			} else {
@@ -302,7 +311,7 @@ class DBClean {
 				logger("found global item entries from expired threads: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["id"];
-					dba::delete('item', array('id' => $orphan["id"]));
+					dba::delete('item', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 9, $last_id);
 			} else {
@@ -324,7 +333,7 @@ class DBClean {
 				logger("found old conversations: ".$count);
 				while ($orphan = dba::fetch($r)) {
 					$last_id = $orphan["received"];
-					dba::delete('conversation', array('item-uri' => $orphan["item-uri"]));
+					dba::delete('conversation', ['item-uri' => $orphan["item-uri"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 10, $last_id);
 			} else {

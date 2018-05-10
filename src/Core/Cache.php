@@ -4,81 +4,59 @@
  */
 namespace Friendica\Core;
 
+use Friendica\Core\Cache;
 use Friendica\Core\Config;
-use Friendica\Core\PConfig;
-use Friendica\Database\DBM;
-use dba;
-
-require_once 'include/dba.php';
 
 /**
  * @brief Class for storing data for a short time
  */
-class Cache
+class Cache extends \Friendica\BaseObject
 {
+	const MONTH        = 2592000;
+	const WEEK         = 604800;
+	const DAY          = 86400;
+	const HOUR         = 3600;
+	const HALF_HOUR    = 1800;
+	const QUARTER_HOUR = 900;
+	const FIVE_MINUTES = 300;
+	const MINUTE       = 60;
+
 	/**
-	 * @brief Check for memcache and open a connection if configured
-	 *
-	 * @return object|boolean The memcache object - or "false" if not successful
+	 * @var Cache\ICacheDriver
 	 */
-	public static function memcache()
+	static $driver = null;
+
+	public static function init()
 	{
-		if (!function_exists('memcache_connect')) {
-			return false;
+		switch(Config::get('system', 'cache_driver', 'database')) {
+			case 'memcache':
+				$memcache_host = Config::get('system', 'memcache_host', '127.0.0.1');
+				$memcache_port = Config::get('system', 'memcache_port', 11211);
+
+				self::$driver = new Cache\MemcacheCacheDriver($memcache_host, $memcache_port);
+				break;
+			case 'memcached':
+				$memcached_hosts = Config::get('system', 'memcached_hosts', [['127.0.0.1', 11211]]);
+
+				self::$driver = new Cache\MemcachedCacheDriver($memcached_hosts);
+				break;
+			default:
+				self::$driver = new Cache\DatabaseCacheDriver();
 		}
-
-		if (!Config::get('system', 'memcache')) {
-			return false;
-		}
-
-		$memcache_host = Config::get('system', 'memcache_host', '127.0.0.1');
-		$memcache_port = Config::get('system', 'memcache_port', 11211);
-
-		$memcache = new \Memcache;
-
-		if (!$memcache->connect($memcache_host, $memcache_port)) {
-			return false;
-		}
-
-		return $memcache;
 	}
 
 	/**
-	 * @brief Return the duration for a given cache level
+	 * Returns the current cache driver
 	 *
-	 * @param integer $level Cache level
-	 *
-	 * @return integer The cache duration in seconds
+	 * @return Cache\ICacheDriver
 	 */
-	private static function duration($level)
+	private static function getDriver()
 	{
-		switch ($level) {
-			case CACHE_MONTH:
-				$seconds = 2592000;
-				break;
-			case CACHE_WEEK:
-				$seconds = 604800;
-				break;
-			case CACHE_DAY:
-				$seconds = 86400;
-				break;
-			case CACHE_HOUR:
-				$seconds = 3600;
-				break;
-			case CACHE_HALF_HOUR:
-				$seconds = 1800;
-				break;
-			case CACHE_QUARTER_HOUR:
-				$seconds = 900;
-				break;
-			case CACHE_FIVE_MINUTES:
-				$seconds = 300;
-				break;
-			case CACHE_MINUTE:
-				$seconds = 60;
-				break;
+		if (self::$driver === null) {
+			self::init();
 		}
-		return $seconds;
+
+		return self::$driver;
 	}
 
 	/**
@@ -90,40 +68,13 @@ class Cache
 	 */
 	public static function get($key)
 	{
-		$memcache = self::memcache();
-		if (is_object($memcache)) {
-			// We fetch with the hostname as key to avoid problems with other applications
-			$cached = $memcache->get(get_app()->get_hostname().":".$key);
-			$value = @unserialize($cached);
+		$time = microtime(true);
 
-			// Only return a value if the serialized value is valid.
-			// We also check if the db entry is a serialized
-			// boolean 'false' value (which we want to return).
-			if ($cached === serialize(false) || $value !== false) {
-				return $value;
-			}
+		$return = self::getDriver()->get($key);
 
-			return null;
-		}
+		self::getApp()->save_timestamp($time, 'cache');
 
-		// Frequently clear cache
-		self::clear();
-
-		$r = dba::select('cache', array('v'), array('k' => $key), array('limit' => 1));
-
-		if (DBM::is_result($r)) {
-			$cached = $r['v'];
-			$value = @unserialize($cached);
-
-			// Only return a value if the serialized value is valid.
-			// We also check if the db entry is a serialized
-			// boolean 'false' value (which we want to return).
-			if ($cached === serialize(false) || $value !== false) {
-				return $value;
-			}
-		}
-
-		return null;
+		return $return;
 	}
 
 	/**
@@ -135,20 +86,35 @@ class Cache
 	 * @param mixed   $value    The value that is about to be stored
 	 * @param integer $duration The cache lifespan
 	 *
-	 * @return void
+	 * @return bool
 	 */
-	public static function set($key, $value, $duration = CACHE_MONTH)
+	public static function set($key, $value, $duration = self::MONTH)
 	{
-		// Do we have an installed memcache? Use it instead.
-		$memcache = self::memcache();
-		if (is_object($memcache)) {
-			// We store with the hostname as key to avoid problems with other applications
-			$memcache->set(get_app()->get_hostname().":".$key, serialize($value), MEMCACHE_COMPRESSED, self::duration($duration));
-			return;
-		}
-		$fields = array('v' => serialize($value), 'expire_mode' => $duration, 'updated' => datetime_convert());
-		$condition = array('k' => $key);
-		dba::update('cache', $fields, $condition, true);
+		$time = microtime(true);
+
+		$return = self::getDriver()->set($key, $value, $duration);
+
+		self::getApp()->save_timestamp($time, 'cache_write');
+
+		return $return;
+	}
+
+	/**
+	 * @brief Delete a value from the cache
+	 *
+	 * @param string $key The key to the cached data
+	 *
+	 * @return bool
+	 */
+	public static function delete($key)
+	{
+		$time = microtime(true);
+
+		$return = self::getDriver()->delete($key);
+
+		self::getApp()->save_timestamp($time, 'cache_write');
+
+		return $return;
 	}
 
 	/**
@@ -158,76 +124,8 @@ class Cache
 	 *
 	 * @return void
 	 */
-	public static function clear($max_level = CACHE_MONTH)
+	public static function clear()
 	{
-		// Clear long lasting cache entries only once a day
-		if (Config::get("system", "cache_cleared_day") < time() - self::duration(CACHE_DAY)) {
-			if ($max_level == CACHE_MONTH) {
-				$condition = array("`updated` < ? AND `expire_mode` = ?",
-						datetime_convert('UTC', 'UTC', "now - 30 days"),
-						CACHE_MONTH);
-				dba::delete('cache', $condition);
-			}
-
-			if ($max_level <= CACHE_WEEK) {
-				$condition = array("`updated` < ? AND `expire_mode` = ?",
-						datetime_convert('UTC', 'UTC', "now - 7 days"),
-						CACHE_WEEK);
-				dba::delete('cache', $condition);
-			}
-
-			if ($max_level <= CACHE_DAY) {
-				$condition = array("`updated` < ? AND `expire_mode` = ?",
-						datetime_convert('UTC', 'UTC', "now - 1 days"),
-						CACHE_DAY);
-				dba::delete('cache', $condition);
-			}
-			Config::set("system", "cache_cleared_day", time());
-		}
-
-		if (($max_level <= CACHE_HOUR) && (Config::get("system", "cache_cleared_hour")) < time() - self::duration(CACHE_HOUR)) {
-			$condition = array("`updated` < ? AND `expire_mode` = ?",
-					datetime_convert('UTC', 'UTC', "now - 1 hours"),
-					CACHE_HOUR);
-			dba::delete('cache', $condition);
-
-			Config::set("system", "cache_cleared_hour", time());
-		}
-
-		if (($max_level <= CACHE_HALF_HOUR) && (Config::get("system", "cache_cleared_half_hour")) < time() - self::duration(CACHE_HALF_HOUR)) {
-			$condition = array("`updated` < ? AND `expire_mode` = ?",
-					datetime_convert('UTC', 'UTC', "now - 30 minutes"),
-					CACHE_HALF_HOUR);
-			dba::delete('cache', $condition);
-
-			Config::set("system", "cache_cleared_half_hour", time());
-		}
-
-		if (($max_level <= CACHE_QUARTER_HOUR) && (Config::get("system", "cache_cleared_quarter_hour")) < time() - self::duration(CACHE_QUARTER_HOUR)) {
-			$condition = array("`updated` < ? AND `expire_mode` = ?",
-					datetime_convert('UTC', 'UTC', "now - 15 minutes"),
-					CACHE_QUARTER_HOUR);
-			dba::delete('cache', $condition);
-
-			Config::set("system", "cache_cleared_quarter_hour", time());
-		}
-
-		if (($max_level <= CACHE_FIVE_MINUTES) && (Config::get("system", "cache_cleared_five_minute")) < time() - self::duration(CACHE_FIVE_MINUTES)) {
-			$condition = array("`updated` < ? AND `expire_mode` = ?",
-					datetime_convert('UTC', 'UTC', "now - 5 minutes"),
-					CACHE_FIVE_MINUTES);
-			dba::delete('cache', $condition);
-
-			Config::set("system", "cache_cleared_five_minute", time());
-		}
-
-		if (($max_level <= CACHE_MINUTE) && (Config::get("system", "cache_cleared_minute")) < time() - self::duration(CACHE_MINUTE)) {
-			$condition = array("`updated` < ? AND `expire_mode` = ?",
-					datetime_convert('UTC', 'UTC', "now - 1 minutes"),
-					CACHE_MINUTE);
-			dba::delete('cache', $condition);
-
-			Config::set("system", "cache_cleared_minute", time());
-		}
+		return self::getDriver()->clear();
 	}
 }

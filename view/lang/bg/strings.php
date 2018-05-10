@@ -9,10 +9,10 @@ $a->strings["Add New Contact"] = "Добавяне на нов контакт";
 $a->strings["Enter address or web location"] = "Въведете местоположение на адрес или уеб";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Пример: bob@example.com, http://example.com/barbara";
 $a->strings["Connect"] = "Свързване! ";
-$a->strings["%d invitation available"] = array(
+$a->strings["%d invitation available"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Find People"] = "Намерете хора,";
 $a->strings["Enter name or interest"] = "Въведете името или интерес";
 $a->strings["Connect/Follow"] = "Свържете се / последваща";
@@ -27,10 +27,10 @@ $a->strings["All Networks"] = "Всички мрежи";
 $a->strings["Saved Folders"] = "Записани папки";
 $a->strings["Everything"] = "Всичко";
 $a->strings["Categories"] = "Категории";
-$a->strings["%d contact in common"] = array(
+$a->strings["%d contact in common"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["show more"] = "покажи още";
 $a->strings["Forums"] = "";
 $a->strings["External link to forum"] = "";
@@ -47,10 +47,10 @@ $a->strings["Hermaphrodite"] = "Хермафродит";
 $a->strings["Neuter"] = "Среден род";
 $a->strings["Non-specific"] = "Неспецифичен";
 $a->strings["Other"] = "Друг";
-$a->strings["Undecided"] = array(
+$a->strings["Undecided"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Males"] = "Мъжките";
 $a->strings["Females"] = "Женските";
 $a->strings["Gay"] = "Хомосексуалист";
@@ -169,10 +169,10 @@ $a->strings["Error! Cannot check nickname"] = "";
 $a->strings["User '%s' already exists on this server!"] = "";
 $a->strings["User creation error"] = "Грешка при създаване на потребителя";
 $a->strings["User profile creation error"] = "Грешка при създаване профила на потребителя";
-$a->strings["%d contact not imported"] = array(
+$a->strings["%d contact not imported"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Done. You can now login with your username and password"] = "";
 $a->strings["Miscellaneous"] = "Разни";
 $a->strings["Birthday:"] = "Дата на раждане:";
@@ -432,10 +432,10 @@ $a->strings["post/item"] = "длъжност / позиция";
 $a->strings["%1\$s marked %2\$s's %3\$s as favorite"] = "%1\$s маркираната %2\$s - %3\$s като предпочитано";
 $a->strings["Likes"] = "Харесвания";
 $a->strings["Dislikes"] = "Нехаресвания";
-$a->strings["Attending"] = array(
+$a->strings["Attending"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Not attending"] = "";
 $a->strings["Might attend"] = "";
 $a->strings["Select"] = "избор";
@@ -502,18 +502,18 @@ $a->strings["Private post"] = "";
 $a->strings["Message"] = "Съобщение";
 $a->strings["Browser"] = "";
 $a->strings["View all"] = "";
-$a->strings["Like"] = array(
+$a->strings["Like"] = [
 	0 => "",
 	1 => "",
-);
-$a->strings["Dislike"] = array(
+];
+$a->strings["Dislike"] = [
 	0 => "",
 	1 => "",
-);
-$a->strings["Not Attending"] = array(
+];
+$a->strings["Not Attending"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["%s\\'s birthday"] = "";
 $a->strings["General Features"] = "";
 $a->strings["Multiple Profiles"] = "";
@@ -651,10 +651,10 @@ $a->strings["next"] = "следващ";
 $a->strings["Loading more entries..."] = "";
 $a->strings["The end"] = "";
 $a->strings["No contacts"] = "Няма контакти";
-$a->strings["%d Contact"] = array(
+$a->strings["%d Contact"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["View Contacts"] = "Вижте Контакти";
 $a->strings["Save"] = "Запази";
 $a->strings["poke"] = "";
@@ -695,10 +695,10 @@ $a->strings["Click to open/close"] = "Кликнете за отваряне / �
 $a->strings["View on separate page"] = "";
 $a->strings["view on separate page"] = "";
 $a->strings["activity"] = "дейност";
-$a->strings["comment"] = array(
+$a->strings["comment"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["post"] = "след";
 $a->strings["Item filed"] = "Т. подава";
 $a->strings["Passwords do not match. Password unchanged."] = "Паролите не съвпадат. Парола непроменен.";
@@ -794,10 +794,10 @@ $a->strings["%s : Not a valid email address."] = "%s не е валиден им
 $a->strings["Please join us on Friendica"] = "Моля, присъединете се към нас на Friendica";
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "";
 $a->strings["%s : Message delivery failed."] = "%s : Съобщение доставка не успя.";
-$a->strings["%d message sent."] = array(
+$a->strings["%d message sent."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["You have no more invitations available"] = "Имате няма повече покани";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Посетете %s за списък на публичните сайтове, които можете да се присъедините. Friendica членове на други сайтове могат да се свързват един с друг, както и с членовете на много други социални мрежи.";
 $a->strings["To accept this invitation, please visit and register at %s or any other public Friendica website."] = "За да приемете тази покана, моля, посетете и се регистрира в %s или друга публична уебсайт Friendica.";
@@ -949,10 +949,10 @@ $a->strings["Unknown sender - %s"] = "Непознат подател %s";
 $a->strings["You and %s"] = "Вие и %s";
 $a->strings["%s and You"] = "%s";
 $a->strings["D, d M Y - g:i A"] = "D, D MY - Г: А";
-$a->strings["%d message"] = array(
+$a->strings["%d message"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Manage Identities and/or Pages"] = "Управление на идентичността и / или страници";
 $a->strings["Toggle between different identities or community/group pages which share your account details or which you have been granted \"manage\" permissions"] = "Превключвате между различните идентичности или общността / групата страници, които споделят данните на акаунта ви, или които сте получили \"управление\" разрешения";
 $a->strings["Select an identity to manage: "] = "Изберете идентичност, за да управлява: ";
@@ -981,10 +981,10 @@ $a->strings["New photo from this URL"] = "Нова снимка от този а
 $a->strings["No such group"] = "Няма такава група";
 $a->strings["Group: %s"] = "";
 $a->strings["This entry was edited"] = "Записът е редактиран";
-$a->strings["%d comment"] = array(
+$a->strings["%d comment"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Private Message"] = "Лично съобщение";
 $a->strings["I like this (toggle)"] = "Харесва ми това (смяна)";
 $a->strings["like"] = "харесвам";
@@ -1687,14 +1687,14 @@ $a->strings["Mark success (if update was manually applied)"] = "Марк усп�
 $a->strings["Attempt to execute this update step automatically"] = "Опита да изпълни тази стъпка се обновяват автоматично";
 $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up an account for you."] = "";
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
-$a->strings["%s user blocked/unblocked"] = array(
+$a->strings["%s user blocked/unblocked"] = [
 	0 => "",
 	1 => "",
-);
-$a->strings["%s user deleted"] = array(
+];
+$a->strings["%s user deleted"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["User '%s' deleted"] = "Потребителят \" %s \"Изтрити";
 $a->strings["User '%s' unblocked"] = "Потребителят \" %s \"отблокирани";
 $a->strings["User '%s' blocked"] = "Потребителят \" %s \"блокиран";
@@ -1748,10 +1748,10 @@ $a->strings["PHP logging"] = "";
 $a->strings["To enable logging of PHP errors and warnings you can add the following to the .htconfig.php file of your installation. The filename set in the 'error_log' line is relative to the friendica top-level directory and must be writeable by the web server. The option '1' for 'log_errors' and 'display_errors' is to enable these options, set to '0' to disable them."] = "";
 $a->strings["Lock feature %s"] = "";
 $a->strings["Manage Additional Features"] = "";
-$a->strings["%d contact edited."] = array(
+$a->strings["%d contact edited."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Could not access contact record."] = "Не може да бъде достъп до запис за контакт.";
 $a->strings["Could not locate selected profile."] = "Не може да намери избрания профил.";
 $a->strings["Contact updated."] = "Свържете се актуализират.";
@@ -1848,10 +1848,10 @@ $a->strings["This introduction has already been accepted."] = "Това въве
 $a->strings["Profile location is not valid or does not contain profile information."] = "Профил местоположение не е валиден или не съдържа информация на профила.";
 $a->strings["Warning: profile location has no identifiable owner name."] = "Внимание: профила място има няма установен име на собственика.";
 $a->strings["Warning: profile location has no profile photo."] = "Внимание: профила местоположение не е снимката на профила.";
-$a->strings["%d required parameter was not found at the given location"] = array(
+$a->strings["%d required parameter was not found at the given location"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Introduction complete."] = "Въведение завърши.";
 $a->strings["Unrecoverable protocol error."] = "Невъзстановима протокол грешка.";
 $a->strings["Profile unavailable."] = "Профил недостъпни.";
@@ -1971,10 +1971,10 @@ $a->strings["This message was sent to you by %s, a member of the Friendica socia
 $a->strings["You may visit them online at %s"] = "Можете да ги посетите онлайн на адрес %s";
 $a->strings["Please contact the sender by replying to this post if you do not wish to receive these messages."] = "Моля, свържете се с подателя, като отговори на този пост, ако не желаете да получавате тези съобщения.";
 $a->strings["%s posted an update."] = "%s е публикувал актуализация.";
-$a->strings["Warning: This group contains %s member from a network that doesn't allow non public messages."] = array(
+$a->strings["Warning: This group contains %s member from a network that doesn't allow non public messages."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Messages in this group won't be send to these receivers."] = "";
 $a->strings["Private messages to this person are at risk of public disclosure."] = "Лични съобщения до това лице, са изложени на риск от публичното оповестяване.";
 $a->strings["Invalid contact."] = "Невалиден свържете.";

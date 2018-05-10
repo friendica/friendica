@@ -28,18 +28,18 @@ Der Nachteil: Du siehst nicht jede Antwort einer OStatus-Unterhaltung. Aus diese
 
 Wenn du MyISAM (Standardeinstellung) oder InnoDB mit MariaDB 10 nutzt, dann beschleunigt dies die Suche.
 
-Plugins
+Addons
 --------
 
-Aktiviere die folgenden Plugins:
+Aktiviere die folgenden Addons:
 
     rendertime
 
-###rendertime
+### rendertime
 
 **Beschreibung**
 
-Dieses Plugin beschleunigt dein System nicht, aber es hilft dabei, die Flaschenhälse zu ermitteln.
+Dieses Addon beschleunigt dein System nicht, aber es hilft dabei, die Flaschenhälse zu ermitteln.
 
 Wenn es aktiviert ist, dann siehst du Werte wie die folgenden auf jeder deiner Seiten:
 
@@ -60,7 +60,7 @@ Webserver
 
 Wenn du einen Apache-Webserver nutzt, aktiviere bitte die folgenden Module:
 
-###Cache-Control
+### Cache-Control
 
 **Beschreibung**
 
@@ -74,7 +74,7 @@ ExpiresActive on ExpiresDefault "access plus 1 week"
 
 Weitere Informationen findest du hier: http://httpd.apache.org/docs/2.2/mod/mod_expires.html.
 
-###Compress content
+### Compress content
 
 **Beschreibung**
 
@@ -85,7 +85,7 @@ Aktiviere das Modul "mod_deflate" durch die Eingabe "a2enmod deflate" als root.
 Weitere Informationen findest du hier: http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
 
 
-###PHP
+### PHP
 
 **FCGI**
 
@@ -93,7 +93,7 @@ Wenn du Apache nutzt, dann denk darüber nach, FCGI zu nutzen.
 Wenn du eine Debian-basierte Distribution nutzt, dann wirst du die Pakete "php5-cgi" und "libapache2-mod-fcgid" benötigen.
 Nutze externe Dokumente, um eine detailiertere Erklärung für die Einrichtung eines Systems auf FCGI-Basis zu erhalten.
 
-###Database
+### Database
 
 Es gibt Skripte wie [tuning-primer.sh](http://www.day32.com/MySQL/) und [mysqltuner.pl](http://mysqltuner.pl), die den Datenbankserver analysieren und Hinweise darauf geben, welche Werte verändert werden könnten.
 

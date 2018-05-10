@@ -37,11 +37,11 @@ Don't blame me too much for ugly code and hacks. Fix it ;-)
 **Theme - Settings**
 ![Theme - Settings](https://github.com/rabuzarus/frio/blob/master/img/screenshots/screenshot-settings.png)
 
-**Red schema**
-![Red schema](https://github.com/rabuzarus/frio/blob/master/img/screenshots/screenshot-schema-red.png)
+**Red scheme**
+![Red scheme](https://github.com/rabuzarus/frio/blob/master/img/screenshots/screenshot-scheme-red.png)
 
-**Love Music schema**
-![Love Music schema](https://github.com/rabuzarus/frio/blob/master/img/screenshots/screenshot-schema-love-music.png)
+**Love Music scheme**
+![Love Music scheme](https://github.com/rabuzarus/frio/blob/master/img/screenshots/screenshot-scheme-love-music.png)
 
 **frio on mobile**
 

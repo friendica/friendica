@@ -3,29 +3,29 @@ Konnektoren installieren (Twitter/GNU Social)
 
 * [Zur Startseite der Hilfe](help)
 
-Friendica nutzt Plugins, um die Verbindung zu anderen Netzwerken wie Twitter oder App.net zu gewährleisten.
+Friendica nutzt Erweiterung, um die Verbindung zu anderen Netzwerken wie Twitter oder App.net zu gewährleisten.
 
-Es gibt außerdem ein Plugin, um über einen bestehenden GNU Social-Account diesen Service zu nutzen. 
-Du brauchst dieses Plugin aber nicht, um mit GNU Social-Mitgliedern von Friendica aus zu kommunizieren - es sei denn, du wünschst es, über einen existierenden Account einen Beitrag zu schreiben. 
+Es gibt außerdem ein Erweiterung, um über einen bestehenden GNU Social-Account diesen Service zu nutzen. 
+Du brauchst dieses Erweiterung aber nicht, um mit GNU Social-Mitgliedern von Friendica aus zu kommunizieren - es sei denn, du wünschst es, über einen existierenden Account einen Beitrag zu schreiben. 
 
-Alle drei Plugins benötigen einen Account im gewünschten Netzwerk. 
+Alle drei Erweiterung benötigen einen Account im gewünschten Netzwerk. 
 Zusätzlich musst du (bzw. der Administrator der Seite) einen API-Schlüssel holen, um einen authentifizierten Zugriff zu deinem Friendica-Server herstellen zu lassen.
 
 
 **Seitenkonfiguration**
 
-Plugins müssen vom Administrator installiert werden, bevor sie genutzt werden können. 
+Erweiterung müssen vom Administrator installiert werden, bevor sie genutzt werden können. 
 Dieses kann über das Administrationsmenü erstellt werden.
 
 Jeder der Konnektoren benötigt zudem einen API-Schlüssel vom Service, der verbunden werden soll. 
-Einige Plugins erlaube es, diese Informationen auf den Administrationsseiten einzustellen, wohingegen andere eine direkte Bearbeitung der Konfigurationsdatei ".htconfig.php" erfordern. 
+Einige Erweiterung erlaube es, diese Informationen auf den Administrationsseiten einzustellen, wohingegen andere eine direkte Bearbeitung der Konfigurationsdatei ".htconfig.php" erfordern. 
 Der Weg, um diese Schlüssel zu erhalten, variiert stark, jedoch brauchen fast alle einen bestehenden Account im gewünschten Service. 
 Einmal installiert, können diese Schlüssel von allen Seitennutzern genutzt werden.
 
-Im Folgenden findest du die Einstellungen für die verschiedenen Services (viele dieser Informationen kommen direkt aus den Quelldateien der Plugins):
+Im Folgenden findest du die Einstellungen für die verschiedenen Services (viele dieser Informationen kommen direkt aus den Quelldateien der Erweiterung):
 
 
-**Twitter Plugin für Friendica**
+**Twitter Erweiterung für Friendica**
 
 * Author: Tobias Diekershoff
 * tobias.diekershoff@gmx.net
@@ -33,7 +33,7 @@ Im Folgenden findest du die Einstellungen für die verschiedenen Services (viele
 * License:3-clause BSD license
 
 Konfiguration:
-Um dieses Plugin zu nutzen, benötigst du einen OAuth Consumer-Schlüsselpaar (Schlüssel und Geheimnis), das du auf der Seite [https://twitter.com/apps](https://twitter.com/apps) erhalten kannst
+Um dieses Erweiterung zu nutzen, benötigst du einen OAuth Consumer-Schlüsselpaar (Schlüssel und Geheimnis), das du auf der Seite [https://twitter.com/apps](https://twitter.com/apps) erhalten kannst
 
 Registriere deine Friendica-Seite als "Client"-Anwendung mit "Read&Write"-Zugriff. Wir benötigen "Twitter als Login" nicht. Sobald du deine Anwendung installiert hast, erhältst du das Schlüsselpaar für deine Seite.
 
@@ -47,7 +47,7 @@ $a->config['twitter']['consumersecret'] = 'your consumer_secret here';
 Anschließend kann der Nutzer deiner Seite die Twitter-Einstellungen selbst eintragen: "Einstellungen -> Connector Einstellungen".
 
 
-**GNU Social Plugin für Friendica**
+**GNU Social Erweiterung für Friendica**
 
 * Author: Tobias Diekershoff
 * tobias.diekershoff@gmx.net

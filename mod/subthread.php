@@ -1,12 +1,16 @@
 <?php
-
+/**
+ * @file mod/subthread.php
+ */
 use Friendica\App;
+use Friendica\Core\Addon;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Model\Item;
 
-require_once('include/security.php');
-require_once('include/bbcode.php');
-require_once('include/items.php');
+require_once 'include/security.php';
+require_once 'include/items.php';
 
 function subthread_content(App $a) {
 
@@ -32,7 +36,7 @@ function subthread_content(App $a) {
 
 	$owner_uid = $item['uid'];
 
-	if(! can_write_wall($a,$owner_uid)) {
+	if(! can_write_wall($owner_uid)) {
 		return;
 	}
 
@@ -52,6 +56,7 @@ function subthread_content(App $a) {
 		}
 	}
 
+	$owner = null;
 	// this represents the post owner on this system.
 
 	$r = q("SELECT `contact`.*, `user`.`nickname` FROM `contact` LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
@@ -70,6 +75,7 @@ function subthread_content(App $a) {
 		$remote_owner = $owner;
 
 
+	$contact = null;
 	// This represents the person posting
 
 	if ((local_user()) && (local_user() == $owner_uid)) {
@@ -88,7 +94,7 @@ function subthread_content(App $a) {
 
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
 
-	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
+	$post_type = (($item['resource-id']) ? L10n::t('photo') : L10n::t('status'));
 	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE );
 	$link = xmlify('<link rel="alternate" type="text/html" href="' . System::baseUrl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 	$body = $item['body'];
@@ -104,13 +110,13 @@ function subthread_content(App $a) {
 		<content>$body</content>
 	</object>
 EOT;
-	$bodyverb = t('%1$s is following %2$s\'s %3$s');
+	$bodyverb = L10n::t('%1$s is following %2$s\'s %3$s');
 
 	if (! isset($bodyverb)) {
 		return;
 	}
 
-	$arr = array();
+	$arr = [];
 
 	$arr['guid'] = get_guid(32);
 	$arr['uri'] = $uri;
@@ -144,20 +150,16 @@ EOT;
 	$arr['deny_gid'] = $item['deny_gid'];
 	$arr['visible'] = 1;
 	$arr['unseen'] = 1;
-	$arr['last-child'] = 0;
 
-	$post_id = item_store($arr);
+	$post_id = Item::insert($arr);
 
-	if (! $item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
-			intval($item['id']),
-			intval($owner_uid)
-		);
+	if (!$item['visible']) {
+		Item::update(['visible' => true], ['id' => $item['id']]);
 	}
 
 	$arr['id'] = $post_id;
 
-	call_hooks('post_local_end', $arr);
+	Addon::callHooks('post_local_end', $arr);
 
 	killme();
 

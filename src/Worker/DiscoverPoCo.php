@@ -11,8 +11,9 @@ use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
-
-require_once 'include/datetime.php';
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
+use dba;
 
 class DiscoverPoCo {
 	/// @todo Clean up this mess of a parameter hell and split it in several classes
@@ -30,6 +31,8 @@ class DiscoverPoCo {
 		- check_profile: Update remote profile data
 		*/
 
+		$search = "";
+		$mode = 0;
 		if ($command == "dirsearch") {
 			$search = urldecode($param1);
 			$mode = 1;
@@ -47,10 +50,7 @@ class DiscoverPoCo {
 			$mode = 7;
 		} elseif ($command == "check_profile") {
 			$mode = 8;
-		} elseif ($command == '') {
-			$search = "";
-			$mode = 0;
-		} else {
+		} elseif ($command !== "") {
 			logger("Unknown or missing parameter ".$command."\n");
 			return;
 		}
@@ -159,21 +159,21 @@ class DiscoverPoCo {
 
 			$urlparts = parse_url($user["url"]);
 			if (!isset($urlparts["scheme"])) {
-				q("UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
-					dbesc(NETWORK_PHANTOM), dbesc(normalise_link($user["url"])));
+				dba::update('gcontact', ['network' => NETWORK_PHANTOM],
+					['nurl' => normalise_link($user["url"])]);
 				continue;
 			 }
 
-			if (in_array($urlparts["host"], array("www.facebook.com", "facebook.com", "twitter.com",
-								"identi.ca", "alpha.app.net"))) {
-				$networks = array("www.facebook.com" => NETWORK_FACEBOOK,
+			if (in_array($urlparts["host"], ["www.facebook.com", "facebook.com", "twitter.com",
+								"identi.ca", "alpha.app.net"])) {
+				$networks = ["www.facebook.com" => NETWORK_FACEBOOK,
 						"facebook.com" => NETWORK_FACEBOOK,
 						"twitter.com" => NETWORK_TWITTER,
 						"identi.ca" => NETWORK_PUMPIO,
-						"alpha.app.net" => NETWORK_APPNET);
+						"alpha.app.net" => NETWORK_APPNET];
 
-				q("UPDATE `gcontact` SET `network` = '%s' WHERE `nurl` = '%s'",
-					dbesc($networks[$urlparts["host"]]), dbesc(normalise_link($user["url"])));
+				dba::update('gcontact', ['network' => $networks[$urlparts["host"]]],
+					['nurl' => normalise_link($user["url"])]);
 				continue;
 			}
 
@@ -195,8 +195,8 @@ class DiscoverPoCo {
 					return;
 				}
 			} else {
-				q("UPDATE `gcontact` SET `last_failure` = '%s' WHERE `nurl` = '%s'",
-					dbesc(datetime_convert()), dbesc(normalise_link($user["url"])));
+				dba::update('gcontact', ['last_failure' => DateTimeFormat::utcNow()],
+					['nurl' => normalise_link($user["url"])]);
 			}
 
 			// Quit the loop after 3 minutes
@@ -217,7 +217,7 @@ class DiscoverPoCo {
 			}
 		}
 
-		$x = fetch_url(get_server()."/lsearch?p=1&n=500&search=".urlencode($search));
+		$x = Network::fetchUrl(get_server()."/lsearch?p=1&n=500&search=".urlencode($search));
 		$j = json_decode($x);
 
 		if (count($j->results)) {
@@ -280,7 +280,7 @@ class DiscoverPoCo {
 
 		$url = "http://gstools.org/api/users_search/".urlencode($search);
 
-		$result = z_fetch_url($url);
+		$result = Network::curl($url);
 		if (!$result["success"]) {
 			return false;
 		}

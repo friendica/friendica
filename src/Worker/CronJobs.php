@@ -1,23 +1,23 @@
 <?php
-
 /**
  * @file src/worker/CronJobs.php
  */
-
 namespace Friendica\Worker;
 
 use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
+use Friendica\Database\PostUpdate;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
+use Friendica\Model\Photo;
+use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 use dba;
 
 require_once 'include/dba.php';
-require_once 'include/post_update.php';
 require_once 'mod/nodeinfo.php';
 
 class CronJobs
@@ -26,10 +26,7 @@ class CronJobs
 	{
 		global $a;
 
-		require_once 'include/datetime.php';
-		require_once 'include/post_update.php';
 		require_once 'mod/nodeinfo.php';
-		require_once 'include/photos.php';
 
 		// No parameter set? So return
 		if ($command == '') {
@@ -39,9 +36,9 @@ class CronJobs
 		logger("Starting cronjob " . $command, LOGGER_DEBUG);
 
 		// Call possible post update functions
-		// see include/post_update.php for more details
+		// see src/Database/PostUpdate.php for more details
 		if ($command == 'post_update') {
-			post_update();
+			PostUpdate::update();
 			return;
 		}
 
@@ -58,7 +55,7 @@ class CronJobs
 		}
 
 		if ($command == 'update_contact_birthdays') {
-			update_contact_birthdays();
+			Contact::updateBirthdays();
 			return;
 		}
 
@@ -100,8 +97,8 @@ class CronJobs
 			return;
 		}
 
-		foreach ($r AS $user) {
-			photo_albums($user['uid'], true);
+		foreach ($r as $user) {
+			Photo::clearAlbumCache($user['uid']);
 		}
 	}
 
@@ -110,17 +107,20 @@ class CronJobs
 	 */
 	private static function expireAndRemoveUsers()
 	{
-		// expire any expired accounts
-		q("UPDATE user SET `account_expired` = 1 where `account_expired` = 0
-			AND `account_expires_on` > '%s'
-			AND `account_expires_on` < UTC_TIMESTAMP()", dbesc(NULL_DATE));
+		// expire any expired regular accounts. Don't expire forums.
+		$condition = ["NOT `account_expired` AND `account_expires_on` > ? AND `account_expires_on` < UTC_TIMESTAMP() AND `page-flags` = 0", NULL_DATE];
+		dba::update('user', ['account_expired' => true], $condition);
+
+		// Remove any freshly expired account
+		$users = dba::select('user', ['uid'], ['account_expired' => true, 'account_removed' => false]);
+		while ($user = dba::fetch($users)) {
+			User::remove($user['uid']);
+		}
 
 		// delete user records for recently removed accounts
-		$r = q("SELECT * FROM `user` WHERE `account_removed` AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
-		if (DBM::is_result($r)) {
-			foreach ($r as $user) {
-				dba::delete('user', array('uid' => $user['uid']));
-			}
+		$users = dba::select('user', ['uid'], ["`account_removed` AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY"]);
+		while ($user = dba::fetch($users)) {
+			dba::delete('user', ['uid' => $user['uid']]);
 		}
 	}
 
@@ -164,15 +164,15 @@ class CronJobs
 			if (!$cachetime) {
 				$cachetime = PROXY_DEFAULT_TIME;
 			}
-			$condition = array('`uid` = 0 AND `resource-id` LIKE "pic:%" AND `created` < NOW() - INTERVAL ? SECOND', $cachetime);
+			$condition = ['`uid` = 0 AND `resource-id` LIKE "pic:%" AND `created` < NOW() - INTERVAL ? SECOND', $cachetime];
 			dba::delete('photo', $condition);
 		}
 
 		// Delete the cached OEmbed entries that are older than three month
-		dba::delete('oembed', array("`created` < NOW() - INTERVAL 3 MONTH"));
+		dba::delete('oembed', ["`created` < NOW() - INTERVAL 3 MONTH"]);
 
 		// Delete the cached "parse_url" entries that are older than three month
-		dba::delete('parsed_url', array("`created` < NOW() - INTERVAL 3 MONTH"));
+		dba::delete('parsed_url', ["`created` < NOW() - INTERVAL 3 MONTH"]);
 
 		// Maximum table size in megabyte
 		$max_tablesize = intval(Config::get('system', 'optimize_max_tablesize')) * 1000000;

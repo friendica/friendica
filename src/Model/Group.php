@@ -1,12 +1,11 @@
 <?php
-
 /**
  * @file src/Model/Group.php
  */
-
 namespace Friendica\Model;
 
 use Friendica\BaseObject;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use dba;
 
@@ -39,10 +38,10 @@ class Group extends BaseObject
 				// all the old members are gone, but the group remains so we don't break any security
 				// access lists. What we're doing here is reviving the dead group, but old content which
 				// was restricted to this group may now be seen by the new group members.
-				$group = dba::select('group', ['deleted'], ['id' => $gid], ['limit' => 1]);
+				$group = dba::selectFirst('group', ['deleted'], ['id' => $gid]);
 				if (DBM::is_result($group) && $group['deleted']) {
-					dba::update('group', ['deleted' => 0], ['gid' => $gid]);
-					notice(t('A deleted group with this name was revived. Existing item permissions <strong>may</strong> apply to this group and any future members. If this is not what you intended, please create another group with a different name.') . EOL);
+					dba::update('group', ['deleted' => 0], ['id' => $gid]);
+					notice(L10n::t('A deleted group with this name was revived. Existing item permissions <strong>may</strong> apply to this group and any future members. If this is not what you intended, please create another group with a different name.') . EOL);
 				}
 				return true;
 			}
@@ -56,12 +55,25 @@ class Group extends BaseObject
 	}
 
 	/**
+	 * Update group information.
+	 *
+	 * @param  int	  $id   Group ID
+	 * @param  string $name Group name
+	 *
+	 * @return bool Was the update successful?
+	 */
+	public static function update($id, $name)
+	{
+		return dba::update('group', ['name' => $name], ['id' => $id]);
+	}
+
+	/**
 	 * @brief Get a list of group ids a contact belongs to
 	 *
 	 * @param int $cid
 	 * @return array
 	 */
-	private static function getIdsByContactId($cid)
+	public static function getIdsByContactId($cid)
 	{
 		$condition = ['contact-id' => $cid];
 		$stmt = dba::select('group_member', ['gid'], $condition);
@@ -120,7 +132,7 @@ class Group extends BaseObject
 			return false;
 		}
 
-		$group = dba::select('group', ['id'], ['uid' => $uid, 'name' => $name], ['limit' => 1]);
+		$group = dba::selectFirst('group', ['id'], ['uid' => $uid, 'name' => $name]);
 		if (DBM::is_result($group)) {
 			return $group['id'];
 		}
@@ -139,13 +151,13 @@ class Group extends BaseObject
 			return false;
 		}
 
-		$group = dba::select('group', ['uid'], ['gid' => $gid], ['limit' => 1]);
+		$group = dba::selectFirst('group', ['uid'], ['id' => $gid]);
 		if (!DBM::is_result($group)) {
 			return false;
 		}
 
 		// remove group from default posting lists
-		$user = dba::select('user', ['def_gid', 'allow_gid', 'deny_gid'], ['uid' => $group['uid']], ['limit' => 1]);
+		$user = dba::selectFirst('user', ['def_gid', 'allow_gid', 'deny_gid'], ['uid' => $group['uid']]);
 		if (DBM::is_result($user)) {
 			$change = false;
 
@@ -290,8 +302,7 @@ class Group extends BaseObject
 		}
 
 		if ($check_dead && !$use_gcontact) {
-			require_once 'include/acl_selectors.php';
-			$return = prune_deadguys($return);
+			Contact::pruneUnavailable($return);
 		}
 		return $return;
 	}
@@ -327,13 +338,13 @@ class Group extends BaseObject
 		logger('groups: ' . print_r($display_groups, true));
 
 		if ($label == '') {
-			$label = t('Default privacy group for new contacts');
+			$label = L10n::t('Default privacy group for new contacts');
 		}
 
-		$o = replace_macros(get_markup_template('group_selection.tpl'), array(
+		$o = replace_macros(get_markup_template('group_selection.tpl'), [
 			'$label' => $label,
 			'$groups' => $display_groups
-		));
+		]);
 		return $o;
 	}
 
@@ -360,7 +371,7 @@ class Group extends BaseObject
 
 		$display_groups = [
 			[
-				'text' => t('Everybody'),
+				'text' => L10n::t('Everybody'),
 				'id' => 0,
 				'selected' => (($group_id == 0) ? 'group-selected' : ''),
 				'href' => $every,
@@ -369,7 +380,7 @@ class Group extends BaseObject
 
 		$stmt = dba::select('group', [], ['deleted' => 0, 'uid' => local_user()], ['order' => ['name']]);
 
-		$member_of = array();
+		$member_of = [];
 		if ($cid) {
 			$member_of = self::getIdsByContactId($cid);
 		}
@@ -380,7 +391,7 @@ class Group extends BaseObject
 			if ($editmode == 'full') {
 				$groupedit = [
 					'href' => 'group/' . $group['id'],
-					'title' => t('edit'),
+					'title' => L10n::t('edit'),
 				];
 			} else {
 				$groupedit = null;
@@ -399,16 +410,16 @@ class Group extends BaseObject
 
 		$tpl = get_markup_template('group_side.tpl');
 		$o = replace_macros($tpl, [
-			'$add' => t('add'),
-			'$title' => t('Groups'),
+			'$add' => L10n::t('add'),
+			'$title' => L10n::t('Groups'),
 			'$groups' => $display_groups,
 			'newgroup' => $editmode == 'extended' || $editmode == 'full' ? 1 : '',
 			'grouppage' => 'group/',
-			'$edittext' => t('Edit group'),
-			'$ungrouped' => $every === 'contacts' ? t('Contacts not in any group') : '',
-			'$createtext' => t('Create a new group'),
-			'$creategroup' => t('Group Name: '),
-			'$editgroupstext' => t('Edit groups'),
+			'$edittext' => L10n::t('Edit group'),
+			'$ungrouped' => $every === 'contacts' ? L10n::t('Contacts not in any group') : '',
+			'$createtext' => L10n::t('Create a new group'),
+			'$creategroup' => L10n::t('Group Name: '),
+			'$editgroupstext' => L10n::t('Edit groups'),
 			'$form_security_token' => get_form_security_token('group_edit'),
 		]);
 

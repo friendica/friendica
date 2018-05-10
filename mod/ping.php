@@ -2,19 +2,23 @@
 /**
  * @file include/ping.php
  */
+
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
+use Friendica\Content\Text\BBCode;
+use Friendica\Core\Addon;
 use Friendica\Core\Cache;
-use Friendica\Core\System;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Temporal;
 use Friendica\Util\XML;
 
-require_once 'include/datetime.php';
-require_once 'include/bbcode.php';
 require_once 'mod/proxy.php';
 require_once 'include/enotify.php';
 
@@ -60,15 +64,15 @@ function ping_init(App $a)
 		$format = 'json';
 	}
 
-	$tags          = array();
-	$comments      = array();
-	$likes         = array();
-	$dislikes      = array();
-	$friends       = array();
-	$posts         = array();
-	$regs          = array();
-	$mails         = array();
-	$notifications = array();
+	$tags          = [];
+	$comments      = [];
+	$likes         = [];
+	$dislikes      = [];
+	$friends       = [];
+	$posts         = [];
+	$regs          = [];
+	$mails         = [];
+	$notifications = [];
 
 	$intro_count    = 0;
 	$mail_count     = 0;
@@ -76,8 +80,8 @@ function ping_init(App $a)
 	$network_count  = 0;
 	$register_count = 0;
 	$sysnotify_count = 0;
-	$groups_unseen  = array();
-	$forums_unseen  = array();
+	$groups_unseen  = [];
+	$forums_unseen  = [];
 
 	$all_events       = 0;
 	$all_events_today = 0;
@@ -86,7 +90,7 @@ function ping_init(App $a)
 	$birthdays        = 0;
 	$birthdays_today  = 0;
 
-	$data = array();
+	$data = [];
 	$data['intro']    = $intro_count;
 	$data['mail']     = $mail_count;
 	$data['net']      = $network_count;
@@ -103,7 +107,7 @@ function ping_init(App $a)
 	if (local_user()) {
 		// Different login session than the page that is calling us.
 		if (intval($_GET['uid']) && intval($_GET['uid']) != local_user()) {
-			$data = array('result' => array('invalid' => 1));
+			$data = ['result' => ['invalid' => 1]];
 
 			if ($format == 'json') {
 				if (isset($_GET['callback'])) {
@@ -137,8 +141,8 @@ function ping_init(App $a)
 		);
 
 		if (DBM::is_result($items_unseen)) {
-			$arr = array('items' => $items_unseen);
-			call_hooks('network_ping', $arr);
+			$arr = ['items' => $items_unseen];
+			Addon::callHooks('network_ping', $arr);
 
 			foreach ($items_unseen as $item) {
 				if ($item['wall']) {
@@ -164,8 +168,8 @@ function ping_init(App $a)
 
 			if (intval(Feature::isEnabled(local_user(), 'forumlist_widget'))) {
 				$forum_counts = ForumManager::countUnseenItems();
-				if (DBM::is_result($forums_counts)) {
-					foreach ($forums_counts as $forum_count) {
+				if (DBM::is_result($forum_counts)) {
+					foreach ($forum_counts as $forum_count) {
 						if ($forum_count['count'] > 0) {
 							$forums_unseen[] = $forum_count;
 						}
@@ -221,8 +225,8 @@ function ping_init(App $a)
 				WHERE `event`.`uid` = %d AND `start` < '%s' AND `finish` > '%s' and `ignore` = 0
 				ORDER BY `start` ASC ",
 				intval(local_user()),
-				dbesc(datetime_convert('UTC', 'UTC', 'now + 7 days')),
-				dbesc(datetime_convert('UTC', 'UTC', 'now'))
+				dbesc(DateTimeFormat::utc('now + 7 days')),
+				dbesc(DateTimeFormat::utcNow())
 			);
 			if (DBM::is_result($ev)) {
 				Cache::set($cachekey, $ev, CACHE_HOUR);
@@ -233,7 +237,7 @@ function ping_init(App $a)
 			$all_events = count($ev);
 
 			if ($all_events) {
-				$str_now = datetime_convert('UTC', $a->timezone, 'now', 'Y-m-d');
+				$str_now = DateTimeFormat::timezoneNow($a->timezone, 'Y-m-d');
 				foreach ($ev as $x) {
 					$bd = false;
 					if ($x['type'] === 'birthday') {
@@ -242,7 +246,7 @@ function ping_init(App $a)
 					} else {
 						$events ++;
 					}
-					if (datetime_convert('UTC', ((intval($x['adjust'])) ? $a->timezone : 'UTC'), $x['start'], 'Y-m-d') === $str_now) {
+					if (DateTimeFormat::convert($x['start'], ((intval($x['adjust'])) ? $a->timezone : 'UTC'), 'UTC', 'Y-m-d') === $str_now) {
 						$all_events_today ++;
 						if ($bd) {
 							$birthdays_today ++;
@@ -278,45 +282,45 @@ function ping_init(App $a)
 		// merge all notification types in one array
 		if (DBM::is_result($intros)) {
 			foreach ($intros as $intro) {
-				$notif = array(
+				$notif = [
 					'href'    => System::baseUrl() . '/notifications/intros/' . $intro['id'],
 					'name'    => $intro['name'],
 					'url'     => $intro['url'],
 					'photo'   => $intro['photo'],
 					'date'    => $intro['datetime'],
 					'seen'    => false,
-					'message' => t('{0} wants to be your friend'),
-				);
+					'message' => L10n::t('{0} wants to be your friend'),
+				];
 				$notifs[] = $notif;
 			}
 		}
 
 		if (DBM::is_result($mails)) {
 			foreach ($mails as $mail) {
-				$notif = array(
+				$notif = [
 					'href'    => System::baseUrl() . '/message/' . $mail['id'],
 					'name'    => $mail['from-name'],
 					'url'     => $mail['from-url'],
 					'photo'   => $mail['from-photo'],
 					'date'    => $mail['created'],
 					'seen'    => false,
-					'message' => t('{0} sent you a message'),
-				);
+					'message' => L10n::t('{0} sent you a message'),
+				];
 				$notifs[] = $notif;
 			}
 		}
 
 		if (DBM::is_result($regs)) {
 			foreach ($regs as $reg) {
-				$notif = array(
+				$notif = [
 					'href'    => System::baseUrl() . '/admin/users/',
 					'name'    => $reg['name'],
 					'url'     => $reg['url'],
 					'photo'   => $reg['micro'],
 					'date'    => $reg['created'],
 					'seen'    => false,
-					'message' => t('{0} requested registration'),
-				);
+					'message' => L10n::t('{0} requested registration'),
+				];
 				$notifs[] = $notif;
 			}
 		}
@@ -358,25 +362,25 @@ function ping_init(App $a)
 					$notif['photo'] = proxy_url($notif['photo'], false, PROXY_SIZE_MICRO);
 				}
 
-				$local_time = datetime_convert('UTC', date_default_timezone_get(), $notif['date']);
+				$local_time = DateTimeFormat::local($notif['date']);
 
-				$notifications[] = array(
+				$notifications[] = [
 					'id'        => $notif['id'],
 					'href'      => $notif['href'],
 					'name'      => $notif['name'],
 					'url'       => $notif['url'],
 					'photo'     => $notif['photo'],
-					'date'      => relative_date($notif['date']),
+					'date'      => Temporal::getRelativeDate($notif['date']),
 					'message'   => $notif['message'],
 					'seen'      => $notif['seen'],
 					'timestamp' => strtotime($local_time)
-				);
+				];
 			}
 		}
 	}
 
-	$sysmsgs = array();
-	$sysmsgs_info = array();
+	$sysmsgs = [];
+	$sysmsgs_info = [];
 
 	if (x($_SESSION, 'sysmsg')) {
 		$sysmsgs = $_SESSION['sysmsg'];
@@ -393,12 +397,12 @@ function ping_init(App $a)
 		$data['forums'] = $forums_unseen;
 		$data['notify'] = $sysnotify_count + $intro_count + $mail_count + $register_count;
 		$data['notifications'] = $notifications;
-		$data['sysmsgs'] = array(
+		$data['sysmsgs'] = [
 			'notice' => $sysmsgs,
 			'info' => $sysmsgs_info
-		);
+		];
 
-		$json_payload = json_encode(array("result" => $data));
+		$json_payload = json_encode(["result" => $data]);
 
 		if (isset($_GET['callback'])) {
 			// JSONP support
@@ -413,7 +417,7 @@ function ping_init(App $a)
 		$data = ping_format_xml_data($data, $sysnotify_count, $notifications, $sysmsgs, $sysmsgs_info, $groups_unseen, $forums_unseen);
 
 		header("Content-type: text/xml");
-		echo XML::fromArray(array("result" => $data), $xml);
+		echo XML::fromArray(["result" => $data], $xml);
 	}
 
 	killme();
@@ -427,7 +431,7 @@ function ping_init(App $a)
  */
 function ping_get_notifications($uid)
 {
-	$result  = array();
+	$result  = [];
 	$offset  = 0;
 	$seen    = false;
 	$seensql = "NOT";
@@ -477,8 +481,8 @@ function ping_get_notifications($uid)
 				$notification["name"] = $notification["name_cache"];
 				$notification["message"] = $notification["msg_cache"];
 			} else {
-				$notification["name"] = strip_tags(bbcode($notification["name"]));
-				$notification["message"] = format_notification_message($notification["name"], strip_tags(bbcode($notification["msg"])));
+				$notification["name"] = strip_tags(BBCode::convert($notification["name"]));
+				$notification["message"] = format_notification_message($notification["name"], strip_tags(BBCode::convert($notification["msg"])));
 
 				q(
 					"UPDATE `notify` SET `name_cache` = '%s', `msg_cache` = '%s' WHERE `id` = %d",
@@ -490,8 +494,10 @@ function ping_get_notifications($uid)
 
 			$notification["href"] = System::baseUrl() . "/notify/view/" . $notification["id"];
 
-			if ($notification["visible"] && !$notification["spam"]
-				&& !$notification["deleted"] && !is_array($result[$notification["parent"]])
+			if ($notification["visible"]
+				&& !$notification["spam"]
+				&& !$notification["deleted"]
+				&& !(x($result, $notification["parent"]) && is_array($result[$notification["parent"]]))
 			) {
 				// Should we condense the notifications or show them all?
 				if (PConfig::get(local_user(), 'system', 'detailed_notif')) {
@@ -521,11 +527,11 @@ function ping_get_notifications($uid)
  */
 function ping_format_xml_data($data, $sysnotify, $notifs, $sysmsgs, $sysmsgs_info, $groups_unseen, $forums_unseen)
 {
-	$notifications = array();
+	$notifications = [];
 	foreach ($notifs as $key => $notif) {
 		$notifications[$key . ':note'] = $notif['message'];
 
-		$notifications[$key . ':@attributes'] = array(
+		$notifications[$key . ':@attributes'] = [
 			'id'        => $notif['id'],
 			'href'      => $notif['href'],
 			'name'      => $notif['name'],
@@ -534,10 +540,10 @@ function ping_format_xml_data($data, $sysnotify, $notifs, $sysmsgs, $sysmsgs_inf
 			'date'      => $notif['date'],
 			'seen'      => $notif['seen'],
 			'timestamp' => $notif['timestamp']
-		);
+		];
 	}
 
-	$sysmsg = array();
+	$sysmsg = [];
 	foreach ($sysmsgs as $key => $m) {
 		$sysmsg[$key . ':notice'] = $m;
 	}
@@ -546,27 +552,27 @@ function ping_format_xml_data($data, $sysnotify, $notifs, $sysmsgs, $sysmsgs_inf
 	}
 
 	$data['notif'] = $notifications;
-	$data['@attributes'] = array('count' => $sysnotify_count + $data['intro'] + $data['mail'] + $data['register']);
+	$data['@attributes'] = ['count' => $sysnotify_count + $data['intro'] + $data['mail'] + $data['register']];
 	$data['sysmsgs'] = $sysmsg;
 
 	if ($data['register'] == 0) {
 		unset($data['register']);
 	}
 
-	$groups = array();
+	$groups = [];
 	if (count($groups_unseen)) {
 		foreach ($groups_unseen as $key => $item) {
 			$groups[$key . ':group'] = $item['count'];
-			$groups[$key . ':@attributes'] = array('id' => $item['id']);
+			$groups[$key . ':@attributes'] = ['id' => $item['id']];
 		}
 		$data['groups'] = $groups;
 	}
 
-	$forums = array();
+	$forums = [];
 	if (count($forums_unseen)) {
 		foreach ($forums_unseen as $key => $item) {
-			$forums[$count . ':forum'] = $item['count'];
-			$forums[$count . ':@attributes'] = array('id' => $item['id']);
+			$forums[$key . ':forum'] = $item['count'];
+			$forums[$key . ':@attributes'] = ['id' => $item['id']];
 		}
 		$data['forums'] = $forums;
 	}

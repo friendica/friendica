@@ -1,0 +1,20 @@
+
+#admin-users.adminpage > h1 { padding: 0 15px; }
+#admin-users.adminpage .panel-collapse { margin-left: -15px; margin-right: -15px; }
+
+#admin-users #users th:first-of-type { width: 1em; }
+#admin-users #users th:nth-of-type(2) { width: 40px; }
+#admin-users #users th:last-of-type { width: 1em; }
+#admin-users .admin-settings-footer-elements { padding-left: 8px; padding-right: 8px; }
+
+#admin-users #deleted th:first-of-type { width: 40px; }
+
+#admin-users #users img.avatar-nano, #deleted img.avatar-nano { height: 24px; width: 24px; }
+.opened .caret { transform: rotate(180deg); }
+tr.details td,
+tr.details th {
+    border-top: 0!important;
+}
+
+.adminpage td > .checkbox { margin: 0; }
+.adminpage td { word-break: break-all; }

@@ -1,11 +1,13 @@
 <?php
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Model\Photo;
-use Friendica\Object\Image;
+use Friendica\Model\User;
+
+require_once 'include/dba.php';
 
 /**
  *
@@ -81,26 +83,24 @@ function update_1189() {
 
 function update_1191() {
 
-	require_once 'include/plugin.php';
-
 	Config::set('system', 'maintenance', 1);
 
-	if (plugin_enabled('forumlist')) {
-		$plugin = 'forumlist';
-		$plugins = Config::get('system','addon');
-		$plugins_arr = array();
+	if (Addon::isEnabled('forumlist')) {
+		$addon = 'forumlist';
+		$addons = Config::get('system', 'addon');
+		$addons_arr = [];
 
-		if ($plugins) {
-			$plugins_arr = explode(",",str_replace(" ", "",$plugins));
+		if ($addons) {
+			$addons_arr = explode(",",str_replace(" ", "", $addons));
 
-			$idx = array_search($plugin, $plugins_arr);
+			$idx = array_search($addon, $addons_arr);
 			if ($idx !== false){
-				unset($plugins_arr[$idx]);
+				unset($addons_arr[$idx]);
 				//delete forumlist manually from addon and hook table
-				// since uninstall_plugin() don't work here
+				// since Addon::uninstall() don't work here
 				q("DELETE FROM `addon` WHERE `name` = 'forumlist' ");
 				q("DELETE FROM `hook` WHERE `file` = 'addon/forumlist/forumlist.php' ");
-				Config::set('system','addon', implode(", ",$plugins_arr));
+				Config::set('system','addon', implode(", ", $addons_arr));
 			}
 		}
 	}
@@ -146,4 +146,41 @@ function update_1191() {
 function update_1203() {
 	$r = q("UPDATE `user` SET `account-type` = %d WHERE `page-flags` IN (%d, %d)",
 		dbesc(ACCOUNT_TYPE_COMMUNITY), dbesc(PAGE_COMMUNITY), dbesc(PAGE_PRVGROUP));
+}
+
+function update_1244() {
+	// Sets legacy_password for all legacy hashes
+	dba::update('user', ['legacy_password' => true], ['SUBSTR(password, 1, 4) != "$2y$"']);
+
+	// All legacy hashes are re-hashed using the new secure hashing function
+	$stmt = dba::select('user', ['uid', 'password'], ['legacy_password' => true]);
+	while($user = dba::fetch($stmt)) {
+		dba::update('user', ['password' => User::hashPassword($user['password'])], ['uid' => $user['uid']]);
+	}
+
+	// Logged in users are forcibly logged out
+	dba::delete('session', ['1 = 1']);
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1245() {
+	$rino = Config::get('system', 'rino_encrypt');
+
+	if (!$rino) {
+		return UPDATE_SUCCESS;
+	}
+
+	Config::set('system', 'rino_encrypt', 1);
+
+	return UPDATE_SUCCESS;
+}
+
+function update_1247() {
+	// Removing hooks with the old name
+	dba::e("DELETE FROM `hook`
+WHERE `hook` LIKE 'plugin_%'");
+
+	// Make sure we install the new renamed ones
+	Addon::reload();
 }

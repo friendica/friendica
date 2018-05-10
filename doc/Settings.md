@@ -14,7 +14,7 @@ These worker tasks are prioritised and are done accordingly.
 
 Then you get an overview of the accounts on your node, which can be moderated in the "Users" section of the panel.
 As well as an overview of the currently active addons
-The list is linked, so you can have quick access to the plugin settings.
+The list is linked, so you can have quick access to the Addon settings.
 And finally you are informed about the version of Friendica you have installed.
 If you contact the devs with a bug or problem, please also mention the version of your node.
 
@@ -56,6 +56,21 @@ Which may or may not be neccessary depending of the mobile friendlyness of the d
 The `vier` theme for instance is mobile friendly.
 
 ### Registration
+
+#### Register policy
+
+With this drop down selector you can set the nodes registration policy.
+You can chose between the following modes:
+
+* **open**: Everybody can register a new account and start using it right away.
+* **requires approval**: Everybody can register a new account, but the admin has to approve it before it can be used.
+* **closed**: No new registrations are possible.
+
+##### Invitation based registry
+
+Additionally to the setting in the admin panel, you can devide if registrations are only possible using an invitation code or not.
+To enable invitation based registration, you have to set the `invitation_only` setting in the [.htconfig.php](/help/htconfig) file.
+If you want to use this method, the registration policy has to be set to either *open* or *requires approval*.
 
 #### Check Full Names
 
@@ -110,6 +125,14 @@ Note: this is specifically for sites that desire to be "standalone" and do not w
 Unauthorised persons will also not be able to request friendship with site members.
 Default is false.
 Available in version 2.2 or greater.
+
+#### Community pages for Visitors
+
+The community pages show all public postings, separated by their origin being local or the entire network.
+With this setting you can select which community pages will be shown to visitors of your Friendica node.
+Your local users will always have access to both pages.
+
+**Note**: Several settings, like users hiding their contacts from the public will prevent the postings to show up on the global community page.
 
 #### Allowed Friend Domains
 
@@ -205,7 +228,7 @@ Here the admin can also block/unblock users from accessing the node or delete th
 In the last section of the page admins can create new accounts on the node.
 The password for the new account will be send by email to the choosen email address.
 
-## Plugins
+## Addons
 
 This page is for selecting and configuration of extensions for Friendica which have to be placed into the `/addon` subdirectory of your Friendica installation.
 You are presented with a long list of available addons.
@@ -213,11 +236,11 @@ The name of each addon is linked to a separate page for that addon which offers 
 Also shown is the version of the addon and an indicator if the addon is currently active or not.
 
 When you update your node and the addons they may have to be reloaded.
-To simplify this process there is a button at the top of the page to reload all active plugins.
+To simplify this process there is a button at the top of the page to reload all active Addons.
 
 ## Themes
 
-The Themes section of the admin panel works similar to the Plugins section but let you control the themes on your Friendica node.
+The Themes section of the admin panel works similar to the Addons section but let you control the themes on your Friendica node.
 Each theme has a dedicated subpage showing the current status, some information about the theme and a screen-shot of the Friendica interface using the theme.
 Should the theme offer special settings, admins can set a global default value here.
 
@@ -266,7 +289,7 @@ To do so, they need to know the GUID of the posting.
 This can be found on the `/display` page of the posting, it is the last part of the URL displayed in the browsers navigation bar.
 You can get to the `/display` page by following the *Link to source*.
 
-## Plugin Features
+## Addon Features
 
 Some of the addons you can install for your Friendica node have settings which have to be set by the admin.
 All those addons will be listed in this area of the admin panels side bar with their names.

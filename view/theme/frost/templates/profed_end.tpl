@@ -1,5 +1,5 @@
 
-<script type="text/javascript" src="js/country.js" ></script>
+<script type="text/javascript" src="view/js/country.js" ></script>
 
 <script language="javascript" type="text/javascript">
 Fill_Country('{{$country_name}}');

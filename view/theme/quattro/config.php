@@ -1,11 +1,11 @@
 <?php
-
 /**
  * Theme settings
  */
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 
@@ -55,11 +55,11 @@ function theme_admin_post(App $a) {
 
 /// @TODO $a is no longer used here
 function quattro_form(App $a, $align, $color, $tfs, $pfs) {
-	$colors = array(
+	$colors = [
 		"dark"  => "Quattro",
 		"lilac" => "Lilac",
 		"green" => "Green",
-	);
+	];
 
 	if ($tfs === false) {
 		$tfs = "20";
@@ -69,14 +69,14 @@ function quattro_form(App $a, $align, $color, $tfs, $pfs) {
 	}
 
 	$t = get_markup_template("theme_settings.tpl" );
-	$o .= replace_macros($t, array(
-		'$submit'  => t('Submit'),
+	$o = replace_macros($t, [
+		'$submit'  => L10n::t('Submit'),
 		'$baseurl' => System::baseUrl(),
-		'$title'   => t("Theme settings"),
-		'$align'   => array('quattro_align', t('Alignment'), $align, '', array('left'=>t('Left'), 'center'=>t('Center'))),
-		'$color'   => array('quattro_color', t('Color scheme'), $color, '', $colors),
-		'$pfs'     => array('quattro_pfs', t('Posts font size'), $pfs),
-		'$tfs'     => array('quattro_tfs', t('Textareas font size'), $tfs),
-	));
+		'$title'   => L10n::t("Theme settings"),
+		'$align'   => ['quattro_align', L10n::t('Alignment'), $align, '', ['left' => L10n::t('Left'), 'center' => L10n::t('Center')]],
+		'$color'   => ['quattro_color', L10n::t('Color scheme'), $color, '', $colors],
+		'$pfs'     => ['quattro_pfs', L10n::t('Posts font size'), $pfs],
+		'$tfs'     => ['quattro_tfs', L10n::t('Textareas font size'), $tfs],
+	]);
 	return $o;
 }

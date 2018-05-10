@@ -4,9 +4,11 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Util\DateTimeFormat;
 use dba;
 
 require_once 'include/dba.php';
@@ -14,8 +16,6 @@ require_once 'include/dba.php';
 Class Cron {
 	public static function execute($parameter = '', $generation = 0) {
 		global $a;
-
-		require_once 'include/datetime.php';
 
 		// Poll contacts with specific parameters
 		if (!empty($parameter)) {
@@ -39,6 +39,9 @@ Class Cron {
 		}
 
 		logger('cron: start');
+
+		// Fork the cron jobs in separate parts to avoid problems when one of them is crashing
+		Addon::forkHooks($a->queue['priority'], "cron");
 
 		// run queue delivery process in the background
 		Worker::add(PRIORITY_NEGLIGIBLE, "Queue");
@@ -69,7 +72,7 @@ Class Cron {
 
 		// once daily run birthday_updates and then expire in background
 		$d1 = Config::get('system', 'last_expire_day');
-		$d2 = intval(datetime_convert('UTC', 'UTC', 'now', 'd'));
+		$d2 = intval(DateTimeFormat::utcNow('d'));
 
 		if ($d2 != intval($d1)) {
 
@@ -88,7 +91,7 @@ Class Cron {
 			Worker::add(PRIORITY_LOW, "CronJobs", "update_photo_albums");
 
 			// Delete all done workerqueue entries
-			dba::delete('workerqueue', array('`done` AND `executed` < UTC_TIMESTAMP() - INTERVAL 12 HOUR'));
+			dba::delete('workerqueue', ['`done` AND `executed` < UTC_TIMESTAMP() - INTERVAL 12 HOUR']);
 
 			// check upstream version?
 			Worker::add(PRIORITY_LOW, 'CheckVersion');
@@ -138,9 +141,9 @@ Class Cron {
 
 		$sql_extra = (($manual_id) ? " AND `id` = $manual_id " : "");
 
-		reload_plugins();
+		Addon::reload();
 
-		$d = datetime_convert();
+		$d = DateTimeFormat::utcNow();
 
 		// Only poll from those with suitable relationships,
 		// and which have a polling address and ignore Diaspora since
@@ -181,11 +184,11 @@ Class Cron {
 			}
 
 			// Friendica and OStatus are checked once a day
-			if (in_array($contact['network'], array(NETWORK_DFRN, NETWORK_OSTATUS))) {
+			if (in_array($contact['network'], [NETWORK_DFRN, NETWORK_OSTATUS])) {
 				$contact['priority'] = 2;
 			}
 
-			if ($contact['subhub'] && in_array($contact['network'], array(NETWORK_DFRN, NETWORK_OSTATUS))) {
+			if ($contact['subhub'] && in_array($contact['network'], [NETWORK_DFRN, NETWORK_OSTATUS])) {
 				/*
 				 * We should be getting everything via a hub. But just to be sure, let's check once a day.
 				 * (You can make this more or less frequent if desired by setting 'pushpoll_frequency' appropriately)
@@ -216,33 +219,33 @@ Class Cron {
 				 */
 				switch ($contact['priority']) {
 					case 5:
-						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + 1 month")) {
+						if (DateTimeFormat::utcNow() > DateTimeFormat::utc($t . " + 1 month")) {
 							$update = true;
 						}
 						break;
 					case 4:
-						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + 1 week")) {
+						if (DateTimeFormat::utcNow() > DateTimeFormat::utc($t . " + 1 week")) {
 							$update = true;
 						}
 						break;
 					case 3:
-						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + 1 day")) {
+						if (DateTimeFormat::utcNow() > DateTimeFormat::utc($t . " + 1 day")) {
 							$update = true;
 						}
 						break;
 					case 2:
-						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + 12 hour")) {
+						if (DateTimeFormat::utcNow() > DateTimeFormat::utc($t . " + 12 hour")) {
 							$update = true;
 						}
 						break;
 					case 1:
-						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + 1 hour")) {
+						if (DateTimeFormat::utcNow() > DateTimeFormat::utc($t . " + 1 hour")) {
 							$update = true;
 						}
 						break;
 					case 0:
 					default:
-						if (datetime_convert('UTC', 'UTC', 'now') > datetime_convert('UTC', 'UTC', $t . " + ".$min_poll_interval." minute")) {
+						if (DateTimeFormat::utcNow() > DateTimeFormat::utc($t . " + ".$min_poll_interval." minute")) {
 							$update = true;
 						}
 						break;
@@ -262,7 +265,7 @@ Class Cron {
 
 			logger("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact['priority'] . " " . $contact["nick"] . " " . $contact["name"]);
 
-			Worker::add(array('priority' => $priority, 'dont_fork' => true), 'OnePoll', (int)$contact['id']);
+			Worker::add(['priority' => $priority, 'dont_fork' => true], 'OnePoll', (int)$contact['id']);
 		}
 	}
 }

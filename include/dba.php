@@ -1,9 +1,11 @@
 <?php
+
+use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
-
-require_once('include/datetime.php');
+use Friendica\Util\DateTimeFormat;
 
 /**
  * @class MySQL database class
@@ -12,7 +14,7 @@ require_once('include/datetime.php');
  */
 
 class dba {
-	public static $connected = true;
+	public static $connected = false;
 
 	private static $_server_info = '';
 	private static $db;
@@ -21,9 +23,9 @@ class dba {
 	private static $errorno = 0;
 	private static $affected_rows = 0;
 	private static $in_transaction = false;
-	private static $relation = array();
+	private static $relation = [];
 
-	public static function connect($serveraddr, $user, $pass, $db, $install = false) {
+	public static function connect($serveraddr, $user, $pass, $db) {
 		if (!is_null(self::$db)) {
 			return true;
 		}
@@ -47,17 +49,14 @@ class dba {
 		$db = trim($db);
 
 		if (!(strlen($server) && strlen($user))) {
-			self::$connected = false;
-			self::$db = null;
 			return false;
 		}
 
-		if ($install) {
-			if (strlen($server) && ($server !== 'localhost') && ($server !== '127.0.0.1')) {
-				if (! dns_get_record($server, DNS_A + DNS_CNAME + DNS_PTR)) {
-					self::$error = sprintf(t('Cannot locate DNS info for database server \'%s\''), $server);
-					self::$connected = false;
-					self::$db = null;
+		if ($a->mode == App::MODE_INSTALL) {
+			// server has to be a non-empty string that is not 'localhost' and not an IP
+			if (strlen($server) && ($server !== 'localhost') && filter_var($server, FILTER_VALIDATE_IP) === false) {
+				if (! dns_get_record($server, DNS_A + DNS_CNAME)) {
+					self::$error = L10n::t('Cannot locate DNS info for database server \'%s\'', $server);
 					return false;
 				}
 			}
@@ -78,7 +77,6 @@ class dba {
 				self::$db = @new PDO($connect, $user, $pass);
 				self::$connected = true;
 			} catch (PDOException $e) {
-				self::$connected = false;
 			}
 		}
 
@@ -96,14 +94,12 @@ class dba {
 
 		// No suitable SQL driver was found.
 		if (!self::$connected) {
+			self::$driver = null;
 			self::$db = null;
-			if (!$install) {
-				System::unavailable();
-			}
 		}
 		$a->save_timestamp($stamp1, "network");
 
-		return true;
+		return self::$connected;
 	}
 
 	/**
@@ -144,7 +140,7 @@ class dba {
 	 *
 	 * @param string $query The database query that will be analyzed
 	 */
-	private static function log_index($query) {
+	private static function logIndex($query) {
 		$a = get_app();
 
 		if (empty($a->config["system"]["db_log_index"])) {
@@ -157,7 +153,7 @@ class dba {
 		}
 
 		// Only do the explain on "select", "update" and "delete"
-		if (!in_array(strtolower(substr($query, 0, 6)), array("select", "update", "delete"))) {
+		if (!in_array(strtolower(substr($query, 0, 6)), ["select", "update", "delete"])) {
 			return;
 		}
 
@@ -187,7 +183,7 @@ class dba {
 
 			if ($log) {
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-				@file_put_contents($a->config["system"]["db_log_index"], datetime_convert()."\t".
+				@file_put_contents($a->config["system"]["db_log_index"], DateTimeFormat::utcNow()."\t".
 						$row['key']."\t".$row['rows']."\t".$row['Extra']."\t".
 						basename($backtrace[1]["file"])."\t".
 						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
@@ -253,8 +249,8 @@ class dba {
 	 * @return string The input SQL string modified if necessary.
 	 */
 	public static function clean_query($sql) {
-		$search = array("\t", "\n", "\r", "  ");
-		$replace = array(' ', ' ', ' ', ' ');
+		$search = ["\t", "\n", "\r", "  "];
+		$replace = [' ', ' ', ' ', ' '];
 		do {
 			$oldsql = $sql;
 			$sql = str_replace($search, $replace, $sql);
@@ -271,7 +267,7 @@ class dba {
 	 * @param array $args The parameters that are to replace the ? placeholders
 	 * @return string The replaced SQL query
 	 */
-	private static function replace_parameters($sql, $args) {
+	private static function replaceParameters($sql, $args) {
 		$offset = 0;
 		foreach ($args AS $param => $value) {
 			if (is_int($args[$param]) || is_float($args[$param])) {
@@ -313,7 +309,7 @@ class dba {
 	 * For all regular queries please use dba::select or dba::exists
 	 *
 	 * @param string $sql SQL statement
-	 * @return object statement object
+	 * @return bool|object statement object
 	 */
 	public static function p($sql) {
 		$a = get_app();
@@ -324,7 +320,7 @@ class dba {
 
 		// Renumber the array keys to be sure that they fit
 		$i = 0;
-		$args = array();
+		$args = [];
 		foreach ($params AS $param) {
 			// Avoid problems with some MySQL servers and boolean values. See issue #3645
 			if (is_bool($param)) {
@@ -408,11 +404,11 @@ class dba {
 				// There are SQL statements that cannot be executed with a prepared statement
 				$parts = explode(' ', $orig_sql);
 				$command = strtolower($parts[0]);
-				$can_be_prepared = in_array($command, array('select', 'update', 'insert', 'delete'));
+				$can_be_prepared = in_array($command, ['select', 'update', 'insert', 'delete']);
 
 				// The fallback routine is called as well when there are no arguments
 				if (!$can_be_prepared || (count($args) == 0)) {
-					$retval = self::$db->query(self::replace_parameters($sql, $args));
+					$retval = self::$db->query(self::replaceParameters($sql, $args));
 					if (self::$db->errno) {
 						self::$error = self::$db->error;
 						self::$errorno = self::$db->errno;
@@ -437,7 +433,7 @@ class dba {
 				}
 
 				$params = '';
-				$values = array();
+				$values = [];
 				foreach ($args AS $param => $value) {
 					if (is_int($args[$param])) {
 						$params .= 'i';
@@ -453,7 +449,7 @@ class dba {
 
 				if (count($values) > 0) {
 					array_unshift($values, $params);
-					call_user_func_array(array($stmt, 'bind_param'), $values);
+					call_user_func_array([$stmt, 'bind_param'], $values);
 				}
 
 				if (!$stmt->execute()) {
@@ -475,7 +471,7 @@ class dba {
 			$errorno = self::$errorno;
 
 			logger('DB Error '.self::$errorno.': '.self::$error."\n".
-				System::callstack(8)."\n".self::replace_parameters($sql, $params));
+				System::callstack(8)."\n".self::replaceParameters($sql, $params));
 
 			self::$error = $error;
 			self::$errorno = $errorno;
@@ -492,10 +488,10 @@ class dba {
 				$duration = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-				@file_put_contents($a->config["system"]["db_log"], datetime_convert()."\t".$duration."\t".
+				@file_put_contents($a->config["system"]["db_log"], DateTimeFormat::utcNow()."\t".$duration."\t".
 						basename($backtrace[1]["file"])."\t".
 						$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t".
-						substr(self::replace_parameters($sql, $args), 0, 2000)."\n", FILE_APPEND);
+						substr(self::replaceParameters($sql, $args), 0, 2000)."\n", FILE_APPEND);
 			}
 		}
 		return $retval;
@@ -540,7 +536,7 @@ class dba {
 			$errorno = self::$errorno;
 
 			logger('DB Error '.self::$errorno.': '.self::$error."\n".
-				System::callstack(8)."\n".self::replace_parameters($sql, $params));
+				System::callstack(8)."\n".self::replaceParameters($sql, $params));
 
 			self::$error = $error;
 			self::$errorno = $errorno;
@@ -564,15 +560,15 @@ class dba {
 			return false;
 		}
 
-		$fields = array();
+		$fields = [];
 
-		$array_element = each($condition);
-		$array_key = $array_element['key'];
-		if (!is_int($array_key)) {
-			$fields = array($array_key);
+		reset($condition);
+		$first_key = key($condition);
+		if (!is_int($first_key)) {
+			$fields = [$first_key];
 		}
 
-		$stmt = self::select($table, $fields, $condition, array('limit' => 1, 'only_query' => true));
+		$stmt = self::select($table, $fields, $condition, ['limit' => 1]);
 
 		if (is_bool($stmt)) {
 			$retval = $stmt;
@@ -586,10 +582,11 @@ class dba {
 	}
 
 	/**
+	 * Fetches the first row
+	 *
+	 * Please use dba::selectFirst or dba::exists whenever this is possible.
+	 *
 	 * @brief Fetches the first row
-	 *
-	 * Please use dba::select or dba::exists whenever this is possible.
-	 *
 	 * @param string $sql SQL statement
 	 * @return array first row of query
 	 */
@@ -639,7 +636,7 @@ class dba {
 	/**
 	 * @brief Returns the number of rows of a statement
 	 *
-	 * @param object Statement object
+	 * @param PDOStatement|mysqli_result|mysqli_stmt Statement object
 	 * @return int Number of rows
 	 */
 	public static function num_rows($stmt) {
@@ -658,33 +655,41 @@ class dba {
 	/**
 	 * @brief Fetch a single row
 	 *
-	 * @param object $stmt statement object
+	 * @param mixed $stmt statement object
 	 * @return array current row
 	 */
 	public static function fetch($stmt) {
+		$a = get_app();
+
+		$stamp1 = microtime(true);
+
+		$columns = [];
+
 		if (!is_object($stmt)) {
 			return false;
 		}
 
 		switch (self::$driver) {
 			case 'pdo':
-				return $stmt->fetch(PDO::FETCH_ASSOC);
+				$columns = $stmt->fetch(PDO::FETCH_ASSOC);
+				break;
 			case 'mysqli':
 				if (get_class($stmt) == 'mysqli_result') {
-					return $stmt->fetch_assoc();
+					$columns = $stmt->fetch_assoc();
+					break;
 				}
 
 				// This code works, but is slow
 
 				// Bind the result to a result array
-				$cols = array();
+				$cols = [];
 
-				$cols_num = array();
+				$cols_num = [];
 				for ($x = 0; $x < $stmt->field_count; $x++) {
 					$cols[] = &$cols_num[$x];
 				}
 
-				call_user_func_array(array($stmt, 'bind_result'), $cols);
+				call_user_func_array([$stmt, 'bind_result'], $cols);
 
 				if (!$stmt->fetch()) {
 					return false;
@@ -696,12 +701,14 @@ class dba {
 				$result = $stmt->result_metadata();
 				$fields = $result->fetch_fields();
 
-				$columns = array();
 				foreach ($cols_num AS $param => $col) {
 					$columns[$fields[$param]->name] = $col;
 				}
-				return $columns;
 		}
+
+		$a->save_timestamp($stamp1, 'database');
+
+		return $columns;
 	}
 
 	/**
@@ -834,7 +841,7 @@ class dba {
 	 *
 	 * This process must only be started once, since the value is cached.
 	 */
-	private static function build_relation_data() {
+	private static function buildRelationData() {
 		$definition = DBStructure::definition();
 
 		foreach ($definition AS $table => $structure) {
@@ -851,24 +858,27 @@ class dba {
 	/**
 	 * @brief Delete a row from a table
 	 *
-	 * @param string $table Table name
-	 * @param array $param parameter array
-	 * @param boolean $in_process Internal use: Only do a commit after the last delete
-	 * @param array $callstack Internal use: prevent endless loops
+	 * @param string  $table       Table name
+	 * @param array   $conditions  Field condition(s)
+	 * @param array   $options
+	 *                - cascade: If true we delete records in other tables that depend on the one we're deleting through
+	 *                           relations (default: true)
+	 * @param boolean $in_process  Internal use: Only do a commit after the last delete
+	 * @param array   $callstack   Internal use: prevent endless loops
 	 *
-	 * @return boolean|array was the delete successfull? When $in_process is set: deletion data
+	 * @return boolean|array was the delete successful? When $in_process is set: deletion data
 	 */
-	public static function delete($table, $param, $in_process = false, &$callstack = array()) {
-
-		if (empty($table) || empty($param)) {
-			logger('Table and condition have to be set');
+	public static function delete($table, array $conditions, array $options = [], $in_process = false, array &$callstack = [])
+	{
+		if (empty($table) || empty($conditions)) {
+			logger('Table and conditions have to be set');
 			return false;
 		}
 
-		$commands = array();
+		$commands = [];
 
 		// Create a key for the loop prevention
-		$key = $table.':'.implode(':', array_keys($param)).':'.implode(':', $param);
+		$key = $table . ':' . implode(':', array_keys($conditions)) . ':' . implode(':', $conditions);
 
 		// We quit when this key already exists in the callstack.
 		if (isset($callstack[$key])) {
@@ -879,42 +889,44 @@ class dba {
 
 		$table = self::escape($table);
 
-		$commands[$key] = array('table' => $table, 'param' => $param);
+		$commands[$key] = ['table' => $table, 'conditions' => $conditions];
+
+		$cascade = defaults($options, 'cascade', true);
 
 		// To speed up the whole process we cache the table relations
-		if (count(self::$relation) == 0) {
-			self::build_relation_data();
+		if ($cascade && count(self::$relation) == 0) {
+			self::buildRelationData();
 		}
 
 		// Is there a relation entry for the table?
-		if (isset(self::$relation[$table])) {
+		if ($cascade && isset(self::$relation[$table])) {
 			// We only allow a simple "one field" relation.
 			$field = array_keys(self::$relation[$table])[0];
 			$rel_def = array_values(self::$relation[$table])[0];
 
 			// Create a key for preventing double queries
-			$qkey = $field.'-'.$table.':'.implode(':', array_keys($param)).':'.implode(':', $param);
+			$qkey = $field . '-' . $table . ':' . implode(':', array_keys($conditions)) . ':' . implode(':', $conditions);
 
 			// When the search field is the relation field, we don't need to fetch the rows
 			// This is useful when the leading record is already deleted in the frontend but the rest is done in the backend
-			if ((count($param) == 1) && ($field == array_keys($param)[0])) {
+			if ((count($conditions) == 1) && ($field == array_keys($conditions)[0])) {
 				foreach ($rel_def AS $rel_table => $rel_fields) {
 					foreach ($rel_fields AS $rel_field) {
-						$retval = self::delete($rel_table, array($rel_field => array_values($param)[0]), true, $callstack);
+						$retval = self::delete($rel_table, [$rel_field => array_values($conditions)[0]], $options, true, $callstack);
 						$commands = array_merge($commands, $retval);
 					}
 				}
-			// We quit when this key already exists in the callstack.
+				// We quit when this key already exists in the callstack.
 			} elseif (!isset($callstack[$qkey])) {
 
 				$callstack[$qkey] = true;
 
 				// Fetch all rows that are to be deleted
-				$data = self::select($table, array($field), $param);
+				$data = self::select($table, [$field], $conditions);
 
 				while ($row = self::fetch($data)) {
 					// Now we accumulate the delete commands
-					$retval = self::delete($table, array($field => $row[$field]), true, $callstack);
+					$retval = self::delete($table, [$field => $row[$field]], $options, true, $callstack);
 					$commands = array_merge($commands, $retval);
 				}
 
@@ -933,24 +945,21 @@ class dba {
 				self::transaction();
 			}
 
-			$compacted = array();
-			$counter = array();
+			$compacted = [];
+			$counter = [];
 
 			foreach ($commands AS $command) {
-				$condition = $command['param'];
-				$array_element = each($condition);
-				$array_key = $array_element['key'];
-				if (is_int($array_key)) {
-					$condition_string = " WHERE ".array_shift($condition);
-				} else {
-					$condition_string = " WHERE `".implode("` = ? AND `", array_keys($condition))."` = ?";
-				}
+				$conditions = $command['conditions'];
+				reset($conditions);
+				$first_key = key($conditions);
 
-				if ((count($command['param']) > 1) || is_int($array_key)) {
-					$sql = "DELETE FROM `".$command['table']."`".$condition_string;
-					logger(self::replace_parameters($sql, $condition), LOGGER_DATA);
+				$condition_string = self::buildCondition($conditions);
 
-					if (!self::e($sql, $condition)) {
+				if ((count($command['conditions']) > 1) || is_int($first_key)) {
+					$sql = "DELETE FROM `" . $command['table'] . "`" . $condition_string;
+					logger(self::replaceParameters($sql, $conditions), LOGGER_DATA);
+
+					if (!self::e($sql, $conditions)) {
 						if ($do_transaction) {
 							self::rollback();
 						}
@@ -958,27 +967,27 @@ class dba {
 					}
 				} else {
 					$key_table = $command['table'];
-					$key_param = array_keys($command['param'])[0];
-					$value = array_values($command['param'])[0];
+					$key_condition = array_keys($command['conditions'])[0];
+					$value = array_values($command['conditions'])[0];
 
 					// Split the SQL queries in chunks of 100 values
 					// We do the $i stuff here to make the code better readable
-					$i = $counter[$key_table][$key_param];
-					if (count($compacted[$key_table][$key_param][$i]) > 100) {
+					$i = $counter[$key_table][$key_condition];
+					if (isset($compacted[$key_table][$key_condition][$i]) && count($compacted[$key_table][$key_condition][$i]) > 100) {
 						++$i;
 					}
 
-					$compacted[$key_table][$key_param][$i][$value] = $value;
-					$counter[$key_table][$key_param] = $i;
+					$compacted[$key_table][$key_condition][$i][$value] = $value;
+					$counter[$key_table][$key_condition] = $i;
 				}
 			}
 			foreach ($compacted AS $table => $values) {
 				foreach ($values AS $field => $field_value_list) {
 					foreach ($field_value_list AS $field_values) {
-						$sql = "DELETE FROM `".$table."` WHERE `".$field."` IN (".
-							substr(str_repeat("?, ", count($field_values)), 0, -2).");";
+						$sql = "DELETE FROM `" . $table . "` WHERE `" . $field . "` IN (" .
+							substr(str_repeat("?, ", count($field_values)), 0, -2) . ");";
 
-						logger(self::replace_parameters($sql, $field_values), LOGGER_DATA);
+						logger(self::replaceParameters($sql, $field_values), LOGGER_DATA);
 
 						if (!self::e($sql, $field_values)) {
 							if ($do_transaction) {
@@ -1026,7 +1035,7 @@ class dba {
 	 *
 	 * @return boolean was the update successfull?
 	 */
-	public static function update($table, $fields, $condition, $old_fields = array()) {
+	public static function update($table, $fields, $condition, $old_fields = []) {
 
 		if (empty($table) || empty($fields) || empty($condition)) {
 			logger('Table, fields and condition have to be set');
@@ -1035,25 +1044,19 @@ class dba {
 
 		$table = self::escape($table);
 
-		$array_element = each($condition);
-		$array_key = $array_element['key'];
-		if (is_int($array_key)) {
-			$condition_string = " WHERE ".array_shift($condition);
-		} else {
-			$condition_string = " WHERE `".implode("` = ? AND `", array_keys($condition))."` = ?";
-		}
+		$condition_string = self::buildCondition($condition);
 
 		if (is_bool($old_fields)) {
 			$do_insert = $old_fields;
 
-			$old_fields = self::select($table, array(), $condition, array('limit' => 1));
+			$old_fields = self::selectFirst($table, [], $condition);
 
 			if (is_bool($old_fields)) {
 				if ($do_insert) {
 					$values = array_merge($condition, $fields);
 					return self::insert($table, $values, $do_insert);
 				}
-				$old_fields = array();
+				$old_fields = [];
 			}
 		}
 
@@ -1084,14 +1087,39 @@ class dba {
 	}
 
 	/**
+	 * Retrieve a single record from a table and returns it in an associative array
+	 *
+	 * @brief Retrieve a single record from a table
+	 * @param string $table
+	 * @param array  $fields
+	 * @param array  $condition
+	 * @param array  $params
+	 * @return bool|array
+	 * @see dba::select
+	 */
+	public static function selectFirst($table, array $fields = [], array $condition = [], $params = [])
+	{
+		$params['limit'] = 1;
+		$result = self::select($table, $fields, $condition, $params);
+
+		if (is_bool($result)) {
+			return $result;
+		} else {
+			$row = self::fetch($result);
+			self::close($result);
+			return $row;
+		}
+	}
+
+	/**
 	 * @brief Select rows from a table
 	 *
-	 * @param string $table Table name
-	 * @param array $fields array of selected fields
-	 * @param array $condition array of fields for condition
-	 * @param array $params array of several parameters
+	 * @param string $table     Table name
+	 * @param array  $fields    Array of selected fields, empty for all
+	 * @param array  $condition Array of fields for condition
+	 * @param array  $params    Array of several parameters
 	 *
-	 * @return boolean|object If "limit" is equal "1" only a single row is returned, else a query object is returned
+	 * @return boolean|object
 	 *
 	 * Example:
 	 * $table = "item";
@@ -1101,7 +1129,7 @@ class dba {
 	 * or:
 	 * $condition = array("`uid` = ? AND `network` IN (?, ?)", 1, 'dfrn', 'dspr');
 	 *
-	 * $params = array("order" => array("id", "received" => true), "limit" => 1);
+	 * $params = array("order" => array("id", "received" => true), "limit" => 10);
 	 *
 	 * $data = dba::select($table, $fields, $condition, $params);
 	 */
@@ -1111,54 +1139,43 @@ class dba {
 			return false;
 		}
 
+		$table = self::escape($table);
+
 		if (count($fields) > 0) {
-			$select_fields = "`".implode("`, `", array_values($fields))."`";
+			$select_fields = "`" . implode("`, `", array_values($fields)) . "`";
 		} else {
 			$select_fields = "*";
 		}
 
 		$condition_string = self::buildCondition($condition);
 
-		$param_string = '';
-		$single_row = false;
-
+		$order_string = '';
 		if (isset($params['order'])) {
-			$param_string .= " ORDER BY ";
+			$order_string = " ORDER BY ";
 			foreach ($params['order'] AS $fields => $order) {
 				if (!is_int($fields)) {
-					$param_string .= "`".$fields."` ".($order ? "DESC" : "ASC").", ";
+					$order_string .= "`" . $fields . "` " . ($order ? "DESC" : "ASC") . ", ";
 				} else {
-					$param_string .= "`".$order."`, ";
+					$order_string .= "`" . $order . "`, ";
 				}
 			}
-			$param_string = substr($param_string, 0, -2);
+			$order_string = substr($order_string, 0, -2);
 		}
 
+		$limit_string = '';
 		if (isset($params['limit']) && is_int($params['limit'])) {
-			$param_string .= " LIMIT ".$params['limit'];
-			$single_row = ($params['limit'] == 1);
+			$limit_string = " LIMIT " . $params['limit'];
 		}
 
 		if (isset($params['limit']) && is_array($params['limit'])) {
-			$param_string .= " LIMIT ".intval($params['limit'][0]).", ".intval($params['limit'][1]);
-			$single_row = ($params['limit'][1] == 1);
+			$limit_string = " LIMIT " . intval($params['limit'][0]) . ", " . intval($params['limit'][1]);
 		}
 
-		if (isset($params['only_query']) && $params['only_query']) {
-			$single_row = !$params['only_query'];
-		}
-
-		$sql = "SELECT ".$select_fields." FROM `".$table."`".$condition_string.$param_string;
+		$sql = "SELECT " . $select_fields . " FROM `" . $table . "`" . $condition_string . $order_string . $limit_string;
 
 		$result = self::p($sql, $condition);
 
-		if (is_bool($result) || !$single_row) {
-			return $result;
-		} else {
-			$row = self::fetch($result);
-			self::close($result);
-			return $row;
-		}
+		return $result;
 	}
 
 	/**
@@ -1215,12 +1232,28 @@ class dba {
 	{
 		$condition_string = '';
 		if (count($condition) > 0) {
-			$array_element = each($condition);
-			$array_key = $array_element['key'];
-			if (is_int($array_key)) {
+			reset($condition);
+			$first_key = key($condition);
+			if (is_int($first_key)) {
 				$condition_string = " WHERE ".array_shift($condition);
 			} else {
-				$condition_string = " WHERE `".implode("` = ? AND `", array_keys($condition))."` = ?";
+				$new_values = [];
+				$condition_string = "";
+				foreach ($condition as $field => $value) {
+					if ($condition_string != "") {
+						$condition_string .= " AND ";
+					}
+					if (is_array($value)) {
+						$new_values = array_merge($new_values, array_values($value));
+						$placeholders = substr(str_repeat("?, ", count($value)), 0, -2);
+						$condition_string .= "`" . $field . "` IN (" . $placeholders . ")";
+					} else {
+						$new_values[$field] = $value;
+						$condition_string .= "`" . $field . "` = ?";
+					}
+				}
+				$condition_string = " WHERE " . $condition_string;
+				$condition = $new_values;
 			}
 		}
 
@@ -1238,7 +1271,7 @@ class dba {
 			return $stmt;
 		}
 
-		$data = array();
+		$data = [];
 		while ($row = self::fetch($stmt)) {
 			$data[] = $row;
 		}
@@ -1270,20 +1303,30 @@ class dba {
 	 * @brief Closes the current statement
 	 *
 	 * @param object $stmt statement object
-	 * @return boolean was the close successfull?
+	 * @return boolean was the close successful?
 	 */
 	public static function close($stmt) {
+		$a = get_app();
+
+		$stamp1 = microtime(true);
+
 		if (!is_object($stmt)) {
 			return false;
 		}
 
 		switch (self::$driver) {
 			case 'pdo':
-				return $stmt->closeCursor();
+				$ret = $stmt->closeCursor();
+				break;
 			case 'mysqli':
 				$stmt->free_result();
-				return $stmt->close();
+				$ret = $stmt->close();
+				break;
 		}
+
+		$a->save_timestamp($stamp1, 'database');
+
+		return $ret;
 	}
 }
 
@@ -1303,7 +1346,7 @@ function dbesc($str) {
  * dba::delete, dba::update, dba::p, dba::e
  *
  * @param $args Query parameters (1 to N parameters of different types)
- * @return array Query array
+ * @return array|bool Query array
  */
 function q($sql) {
 	$args = func_get_args();

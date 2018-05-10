@@ -20,7 +20,7 @@ class BaseObject
 	 *
 	 * Same as get_app from boot.php
 	 *
-	 * @return object
+	 * @return App
 	 */
 	public static function getApp()
 	{

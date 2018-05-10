@@ -1,10 +1,10 @@
 <?php
 
 ;
-$a->strings["%d contact edited."] = array(
+$a->strings["%d contact edited."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Could not access contact record."] = "";
 $a->strings["Could not locate selected profile."] = "";
 $a->strings["Contact updated."] = "";
@@ -29,10 +29,10 @@ $a->strings["(Update was successful)"] = "";
 $a->strings["(Update was not successful)"] = "";
 $a->strings["Suggest friends"] = "";
 $a->strings["Network type: %s"] = "";
-$a->strings["%d contact in common"] = array(
+$a->strings["%d contact in common"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["View all contacts"] = "";
 $a->strings["Unblock"] = "";
 $a->strings["Block"] = "";
@@ -347,10 +347,10 @@ $a->strings["You and %s"] = "";
 $a->strings["%s and You"] = "";
 $a->strings["Delete conversation"] = "";
 $a->strings["D, d M Y - g:i A"] = "";
-$a->strings["%d message"] = array(
+$a->strings["%d message"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Message not available."] = "";
 $a->strings["Delete message"] = "";
 $a->strings["No secure communications available. You <strong>may</strong> be able to respond from the sender's profile page."] = "";
@@ -386,12 +386,12 @@ $a->strings["Contacts who are not members of a group"] = "";
 $a->strings["Theme settings updated."] = "";
 $a->strings["Site"] = "";
 $a->strings["Users"] = "";
-$a->strings["Plugins"] = "";
+$a->strings["Addons"] = "";
 $a->strings["Themes"] = "";
 $a->strings["DB updates"] = "";
 $a->strings["Logs"] = "";
 $a->strings["Admin"] = "";
-$a->strings["Plugin Features"] = "";
+$a->strings["Addon Features"] = "";
 $a->strings["User registrations waiting for confirmation"] = "";
 $a->strings["Normal Account"] = "";
 $a->strings["Soapbox Account"] = "";
@@ -405,7 +405,7 @@ $a->strings["Summary"] = "";
 $a->strings["Registered users"] = "";
 $a->strings["Pending registrations"] = "";
 $a->strings["Version"] = "";
-$a->strings["Active plugins"] = "";
+$a->strings["Active addons"] = "";
 $a->strings["Can not parse base url. Must have at least <scheme>://<domain>"] = "";
 $a->strings["Site settings updated."] = "";
 $a->strings["No special theme for mobile devices"] = "";
@@ -546,14 +546,14 @@ $a->strings["Attempt to execute this update step automatically"] = "";
 $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up an account for you."] = "";
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "";
-$a->strings["%s user blocked/unblocked"] = array(
+$a->strings["%s user blocked/unblocked"] = [
 	0 => "",
 	1 => "",
-);
-$a->strings["%s user deleted"] = array(
+];
+$a->strings["%s user deleted"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["User '%s' deleted"] = "";
 $a->strings["User '%s' unblocked"] = "";
 $a->strings["User '%s' blocked"] = "";
@@ -579,8 +579,8 @@ $a->strings["Name of the new user."] = "";
 $a->strings["Nickname"] = "";
 $a->strings["Nickname of the new user."] = "";
 $a->strings["Email address of the new user."] = "";
-$a->strings["Plugin %s disabled."] = "";
-$a->strings["Plugin %s enabled."] = "";
+$a->strings["Addon %s disabled."] = "";
+$a->strings["Addon %s enabled."] = "";
 $a->strings["Disable"] = "";
 $a->strings["Enable"] = "";
 $a->strings["Toggle"] = "";
@@ -616,10 +616,10 @@ $a->strings["Shared Links"] = "";
 $a->strings["Interesting Links"] = "";
 $a->strings["Starred"] = "";
 $a->strings["Favourite Posts"] = "";
-$a->strings["Warning: This group contains %s member from an insecure network."] = array(
+$a->strings["Warning: This group contains %s member from an insecure network."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Private messages to this group are at risk of public disclosure."] = "";
 $a->strings["No such group"] = "";
 $a->strings["Group is empty"] = "";
@@ -653,14 +653,14 @@ $a->strings["Select"] = "";
 $a->strings["View %s's profile @ %s"] = "";
 $a->strings["%s from %s"] = "";
 $a->strings["View in context"] = "";
-$a->strings["%d comment"] = array(
+$a->strings["%d comment"] = [
 	0 => "",
 	1 => "",
-);
-$a->strings["comment"] = array(
+];
+$a->strings["comment"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["show more"] = "";
 $a->strings["Private Message"] = "";
 $a->strings["I like this (toggle)"] = "";
@@ -812,8 +812,8 @@ $a->strings["Connected Apps"] = "";
 $a->strings["Client key starts with"] = "";
 $a->strings["No name"] = "";
 $a->strings["Remove authorization"] = "";
-$a->strings["No Plugin settings configured"] = "";
-$a->strings["Plugin Settings"] = "";
+$a->strings["No Addon settings configured"] = "";
+$a->strings["Addon Settings"] = "";
 $a->strings["Off"] = "";
 $a->strings["On"] = "";
 $a->strings["Additional Features"] = "";
@@ -935,10 +935,10 @@ $a->strings["This introduction has already been accepted."] = "";
 $a->strings["Profile location is not valid or does not contain profile information."] = "";
 $a->strings["Warning: profile location has no identifiable owner name."] = "";
 $a->strings["Warning: profile location has no profile photo."] = "";
-$a->strings["%d required parameter was not found at the given location"] = array(
+$a->strings["%d required parameter was not found at the given location"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Introduction complete."] = "";
 $a->strings["Unrecoverable protocol error."] = "";
 $a->strings["Profile unavailable."] = "";
@@ -1128,8 +1128,8 @@ $a->strings["running at web location"] = "";
 $a->strings["Please visit <a href=\"http://friendica.com\">Friendica.com</a> to learn more about the Friendica project."] = "";
 $a->strings["Bug reports and issues: please visit"] = "";
 $a->strings["Suggestions, praise, donations, etc. - please email \"Info\" at Friendica - dot com"] = "";
-$a->strings["Installed plugins/addons/apps:"] = "";
-$a->strings["No installed plugins/addons/apps"] = "";
+$a->strings["Installed addons/apps:"] = "";
+$a->strings["No installed addons/apps"] = "";
 $a->strings["Authorize application connection"] = "";
 $a->strings["Return to your app and insert this Securty Code:"] = "";
 $a->strings["Please login to continue."] = "";
@@ -1154,10 +1154,10 @@ $a->strings["%s : Not a valid email address."] = "";
 $a->strings["Please join us on Friendica"] = "";
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "";
 $a->strings["%s : Message delivery failed."] = "";
-$a->strings["%d message sent."] = array(
+$a->strings["%d message sent."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["You have no more invitations available"] = "";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "";
 $a->strings["To accept this invitation, please visit and register at %s or any other public Friendica website."] = "";
@@ -1277,10 +1277,10 @@ $a->strings["The error message was:"] = "";
 $a->strings["Add New Contact"] = "";
 $a->strings["Enter address or web location"] = "";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "";
-$a->strings["%d invitation available"] = array(
+$a->strings["%d invitation available"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Find People"] = "";
 $a->strings["Enter name or interest"] = "";
 $a->strings["Connect/Follow"] = "";
@@ -1426,10 +1426,10 @@ $a->strings["first"] = "";
 $a->strings["last"] = "";
 $a->strings["next"] = "";
 $a->strings["No contacts"] = "";
-$a->strings["%d Contact"] = array(
+$a->strings["%d Contact"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["poke"] = "";
 $a->strings["ping"] = "";
 $a->strings["pinged"] = "";
@@ -1729,10 +1729,10 @@ $a->strings["Error! Cannot check nickname"] = "";
 $a->strings["User '%s' already exists on this server!"] = "";
 $a->strings["User creation error"] = "";
 $a->strings["User profile creation error"] = "";
-$a->strings["%d contact not imported"] = array(
+$a->strings["%d contact not imported"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Done. You can now login with your username and password"] = "";
 $a->strings["toggle mobile"] = "";
 $a->strings["Theme settings"] = "";

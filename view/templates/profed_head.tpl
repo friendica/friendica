@@ -1,1 +1,1 @@
-<script type="text/javascript" src="js/country.js" ></script>
+<script type="text/javascript" src="view/js/country.js" ></script>

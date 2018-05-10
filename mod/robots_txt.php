@@ -15,11 +15,11 @@ use Friendica\App;
  */
 function robots_txt_init(App $a)
 {
-	$allDisalloweds = array(
+	$allDisalloweds = [
 		'/settings/',
 		'/admin/',
 		'/message/',
-	);
+	];
 
 	header('Content-Type: text/plain');
 	echo 'User-agent: *' . PHP_EOL;

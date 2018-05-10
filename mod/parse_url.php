@@ -11,7 +11,9 @@
 */
 
 use Friendica\App;
-use Friendica\ParseUrl;
+use Friendica\Core\Addon;
+use Friendica\Util\Network;
+use Friendica\Util\ParseUrl;
 
 require_once("include/items.php");
 
@@ -59,10 +61,10 @@ function parse_url_content(App $a) {
 	// the URL with the corresponding BBCode media tag
 	$redirects = 0;
 	// Fetch the header of the URL
-	$result = z_fetch_url($url, false, $redirects, array("novalidate" => true, "nobody" => true));
+	$result = Network::curl($url, false, $redirects, ["novalidate" => true, "nobody" => true]);
 	if($result["success"]) {
 		// Convert the header fields into an array
-		$hdrs = array();
+		$hdrs = [];
 		$h = explode("\n", $result["header"]);
 		foreach ($h as $l) {
 			list($k,$v) = array_map("trim", explode(":", trim($l), 2));
@@ -89,9 +91,9 @@ function parse_url_content(App $a) {
 
 	$template = "[bookmark=%s]%s[/bookmark]%s";
 
-	$arr = array("url" => $url, "text" => "");
+	$arr = ["url" => $url, "text" => ""];
 
-	call_hooks("parse_link", $arr);
+	Addon::callHooks("parse_link", $arr);
 
 	if (strlen($arr["text"])) {
 		echo $arr["text"];
@@ -102,7 +104,7 @@ function parse_url_content(App $a) {
 	// need to parse the url for content.
 	if ($url && $title && $text) {
 
-		$title = str_replace(array("\r","\n"),array("",""),$title);
+		$title = str_replace(["\r","\n"],["",""],$title);
 
 		$text = "[quote]" . trim($text) . "[/quote]" . $br;
 

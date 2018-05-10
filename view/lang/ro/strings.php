@@ -5,11 +5,11 @@ function string_plural_select_ro($n){
 	return ($n==1?0:((($n%100>19)||(($n%100==0)&&($n!=0)))?2:1));;
 }}
 ;
-$a->strings["%d contact edited."] = array(
+$a->strings["%d contact edited."] = [
 	0 => "%d contact editat.",
 	1 => "%d contacte editate.",
 	2 => "%d de contacte editate.",
-);
+];
 $a->strings["Could not access contact record."] = "Nu se poate accesa registrul contactului.";
 $a->strings["Could not locate selected profile."] = "Nu se poate localiza profilul selectat.";
 $a->strings["Contact updated."] = "Contact actualizat.";
@@ -34,11 +34,11 @@ $a->strings["(Update was successful)"] = "(Actualizare a reuşit)";
 $a->strings["(Update was not successful)"] = "(Actualizare nu a reuşit)";
 $a->strings["Suggest friends"] = "Sugeraţi prieteni";
 $a->strings["Network type: %s"] = "Tipul rețelei: %s";
-$a->strings["%d contact in common"] = array(
+$a->strings["%d contact in common"] = [
 	0 => "%d contact în comun",
 	1 => "%d contacte în comun",
 	2 => "%d de contacte în comun",
-);
+];
 $a->strings["View all contacts"] = "Vezi toate contactele";
 $a->strings["Unblock"] = "Deblochează";
 $a->strings["Block"] = "Blochează";
@@ -353,11 +353,11 @@ $a->strings["You and %s"] = "Tu şi  %s";
 $a->strings["%s and You"] = "%s şi dvs";
 $a->strings["Delete conversation"] = "Ștergeți conversaţia";
 $a->strings["D, d M Y - g:i A"] = "D, d M Y - g:i A";
-$a->strings["%d message"] = array(
+$a->strings["%d message"] = [
 	0 => "%d mesaj",
 	1 => "%d mesaje",
 	2 => "%d mesaje",
-);
+];
 $a->strings["Message not available."] = "Mesaj nedisponibil";
 $a->strings["Delete message"] = "Şterge mesaj";
 $a->strings["No secure communications available. You <strong>may</strong> be able to respond from the sender's profile page."] = "Nici-o comunicaţie securizată disponibilă. <strong>Veți putea</strong> răspunde din pagina de profil a expeditorului.";
@@ -570,16 +570,16 @@ $a->strings["Attempt to execute this update step automatically"] = "Se încearc�
 $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up an account for you."] = "";
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
 $a->strings["Registration details for %s"] = "Detaliile de înregistrare pentru %s";
-$a->strings["%s user blocked/unblocked"] = array(
+$a->strings["%s user blocked/unblocked"] = [
 	0 => "%s utilizator blocat/deblocat",
 	1 => "%s utilizatori blocați/deblocați",
 	2 => "%s de utilizatori blocați/deblocați",
-);
-$a->strings["%s user deleted"] = array(
+];
+$a->strings["%s user deleted"] = [
 	0 => "%s utilizator şters",
 	1 => "%s utilizatori şterşi",
 	2 => "%s utilizatori şterşi",
-);
+];
 $a->strings["User '%s' deleted"] = "Utilizator %s şters";
 $a->strings["User '%s' unblocked"] = "Utilizator %s deblocat";
 $a->strings["User '%s' blocked"] = "Utilizator %s blocat";
@@ -642,11 +642,11 @@ $a->strings["Shared Links"] = "Linkuri partajate";
 $a->strings["Interesting Links"] = "Legături Interesante";
 $a->strings["Starred"] = "Cu steluță";
 $a->strings["Favourite Posts"] = "Postări Favorite";
-$a->strings["Warning: This group contains %s member from an insecure network."] = array(
+$a->strings["Warning: This group contains %s member from an insecure network."] = [
 	0 => "Atenție: Acest grup conţine %s membru dintr-o reţea nesigură.",
 	1 => "Atenție: Acest grup conţine %s membrii dintr-o reţea nesigură.",
 	2 => "Atenție: Acest grup conţine %s de membrii dintr-o reţea nesigură.",
-);
+];
 $a->strings["Private messages to this group are at risk of public disclosure."] = "Mesajele private către acest grup sunt supuse riscului de divulgare publică.";
 $a->strings["No such group"] = "Membrii";
 $a->strings["Group is empty"] = "Grupul este gol";
@@ -680,16 +680,16 @@ $a->strings["Select"] = "Select";
 $a->strings["View %s's profile @ %s"] = "Vizualizaţi profilul %s @ %s";
 $a->strings["%s from %s"] = "%s de la %s";
 $a->strings["View in context"] = "Vizualizare în context";
-$a->strings["%d comment"] = array(
+$a->strings["%d comment"] = [
 	0 => "%d comentariu",
 	1 => "%d comentarii",
 	2 => "%d comentarii",
-);
-$a->strings["comment"] = array(
+];
+$a->strings["comment"] = [
 	0 => "comentariu",
 	1 => "comentarii",
 	2 => "comentarii",
-);
+];
 $a->strings["show more"] = "mai mult";
 $a->strings["Private Message"] = " Mesaj Privat";
 $a->strings["I like this (toggle)"] = "I like asta (toggle)";
@@ -964,11 +964,11 @@ $a->strings["This introduction has already been accepted."] = "Această introduc
 $a->strings["Profile location is not valid or does not contain profile information."] = "Locaţia profilului nu este validă sau nu conţine informaţii de profil.";
 $a->strings["Warning: profile location has no identifiable owner name."] = "Atenţie: locaţia profilului nu are un nume de deţinător identificabil.";
 $a->strings["Warning: profile location has no profile photo."] = "Atenţie: locaţia profilului nu are fotografie de profil.";
-$a->strings["%d required parameter was not found at the given location"] = array(
+$a->strings["%d required parameter was not found at the given location"] = [
 	0 => "%d parametru necesar nu a fost găsit în locaţia specificată",
 	1 => "%d parametrii necesari nu au fost găsiţi în locaţia specificată",
 	2 => "%d de parametrii necesari nu au fost găsiţi în locaţia specificată",
-);
+];
 $a->strings["Introduction complete."] = "Prezentare completă.";
 $a->strings["Unrecoverable protocol error."] = "Eroare de protocol nerecuperabilă.";
 $a->strings["Profile unavailable."] = "Profil nedisponibil.";
@@ -1184,11 +1184,11 @@ $a->strings["%s : Not a valid email address."] = "%s : Nu este o adresă vaildă
 $a->strings["Please join us on Friendica"] = "Vă rugăm să veniți alături de noi pe Friendica";
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "Limita invitațiilor a fost depăşită. Vă rugăm să vă contactați administratorul de sistem.";
 $a->strings["%s : Message delivery failed."] = "%s : Livrarea mesajului a eşuat.";
-$a->strings["%d message sent."] = array(
+$a->strings["%d message sent."] = [
 	0 => "%d mesaj trimis.",
 	1 => "%d mesaje trimise.",
 	2 => "%d de mesaje trimise.",
-);
+];
 $a->strings["You have no more invitations available"] = "Nu mai aveți invitaţii disponibile";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Vizitaţi %s pentru o lista de site-uri publice la care puteţi alătura. Membrii Friendica de pe alte site-uri se pot conecta cu toții între ei, precum şi cu membri ai multor alte reţele sociale.";
 $a->strings["To accept this invitation, please visit and register at %s or any other public Friendica website."] = "Pentru a accepta această invitaţie, vă rugăm să vizitaţi şi să vă înregistraţi pe %s sau orice alt site public Friendica.";
@@ -1307,11 +1307,11 @@ $a->strings["The error message was:"] = "Mesajul de eroare a fost:";
 $a->strings["Add New Contact"] = "Add Contact Nou";
 $a->strings["Enter address or web location"] = "Introduceţi adresa sau locaţia web";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Exemplu: bob@example.com, http://example.com/barbara";
-$a->strings["%d invitation available"] = array(
+$a->strings["%d invitation available"] = [
 	0 => "%d invitație disponibilă",
 	1 => "%d invitații disponibile",
 	2 => "%d de invitații disponibile",
-);
+];
 $a->strings["Find People"] = "Căutați Persoane";
 $a->strings["Enter name or interest"] = "Introduceţi numele sau interesul";
 $a->strings["Connect/Follow"] = "Conectare/Urmărire";
@@ -1457,11 +1457,11 @@ $a->strings["first"] = "prima";
 $a->strings["last"] = "ultima";
 $a->strings["next"] = "următor";
 $a->strings["No contacts"] = "Nici-un contact";
-$a->strings["%d Contact"] = array(
+$a->strings["%d Contact"] = [
 	0 => "%d Contact",
 	1 => "%d Contacte",
 	2 => "%d de Contacte",
-);
+];
 $a->strings["poke"] = "abordare";
 $a->strings["ping"] = "ping";
 $a->strings["pinged"] = "i s-a trimis ping";
@@ -1762,11 +1762,11 @@ $a->strings["Error! Cannot check nickname"] = "Eroare! Nu pot verifica pseudonim
 $a->strings["User '%s' already exists on this server!"] = "Utilizatorul '%s' există deja pe acest server!";
 $a->strings["User creation error"] = "Eroare la crearea utilizatorului";
 $a->strings["User profile creation error"] = "Eroare la crearea profilului utilizatorului";
-$a->strings["%d contact not imported"] = array(
+$a->strings["%d contact not imported"] = [
 	0 => "%d contact neimportat",
 	1 => "%d contacte neimportate",
 	2 => "%d de contacte neimportate",
-);
+];
 $a->strings["Done. You can now login with your username and password"] = "Realizat. Vă puteţi conecta acum cu parola şi numele dumneavoastră de utilizator";
 $a->strings["toggle mobile"] = "comutare mobil";
 $a->strings["Theme settings"] = "Configurări Temă";

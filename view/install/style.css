@@ -32,6 +32,9 @@ td.help {
 td.help blockquote {
 	margin-left: 60px;
 }
+.error_header {
+	margin-left: 60px;
+}
 input[type="submit"] {
 	margin: 2em 0;
 }

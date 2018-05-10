@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file src/Protocol/FKOAuthDataStore.php
+ * @file src/Network/FKOAuthDataStore.php
  * OAuth server
  * Based on oauth2-php <http://code.google.com/p/oauth2-php/>
  *
@@ -9,20 +9,17 @@
 
 namespace Friendica\Network;
 
-use Friendica\App;
 use Friendica\Core\Config;
-use Friendica\Core\System;
 use Friendica\Database\DBM;
 use dba;
+use OAuthConsumer;
 use OAuthDataStore;
+use OAuthToken;
 
 define('REQUEST_TOKEN_DURATION', 300);
 define('ACCESS_TOKEN_DURATION', 31536000);
 
 require_once 'include/dba.php';
-
-require_once "library/OAuth1.php";
-require_once "library/oauth2-php/lib/OAuth2.inc";
 
 /**
  * @brief OAuthDataStore class
@@ -45,11 +42,11 @@ class FKOAuthDataStore extends OAuthDataStore
 	{
 		logger(__function__ . ":" . $consumer_key);
 
-		$s = dba::select('clients', array('client_id', 'pw', 'redirect_uri'), array('client_id' => $consumer_key));
+		$s = dba::select('clients', ['client_id', 'pw', 'redirect_uri'], ['client_id' => $consumer_key]);
 		$r = dba::inArray($s);
 
 		if (DBM::is_result($r)) {
-			return new \OAuthConsumer($r[0]['client_id'], $r[0]['pw'], $r[0]['redirect_uri']);
+			return new OAuthConsumer($r[0]['client_id'], $r[0]['pw'], $r[0]['redirect_uri']);
 		}
 
 		return null;
@@ -65,11 +62,11 @@ class FKOAuthDataStore extends OAuthDataStore
 	{
 		logger(__function__ . ":" . $consumer . ", " . $token_type . ", " . $token);
 
-		$s = dba::select('tokens', array('id', 'secret', 'scope', 'expires', 'uid'), array('client_id' => $consumer->key, 'scope' => $token_type, 'id' => $token));
+		$s = dba::select('tokens', ['id', 'secret', 'scope', 'expires', 'uid'], ['client_id' => $consumer->key, 'scope' => $token_type, 'id' => $token]);
 		$r = dba::inArray($s);
 
 		if (DBM::is_result($r)) {
-			$ot = new \OAuthToken($r[0]['id'], $r[0]['secret']);
+			$ot = new OAuthToken($r[0]['id'], $r[0]['secret']);
 			$ot->scope = $r[0]['scope'];
 			$ot->expires = $r[0]['expires'];
 			$ot->uid = $r[0]['uid'];
@@ -88,10 +85,9 @@ class FKOAuthDataStore extends OAuthDataStore
 	 */
 	public function lookup_nonce($consumer, $token, $nonce, $timestamp)
 	{
-		$r = dba::select('tokens', ['id', 'secret'], ['client_id' => $consumer->key, 'id' => $nonce, 'expires' => $timestamp], ['limit' => 1]);
-
-		if (DBM::is_result($r)) {
-			return new \OAuthToken($r['id'], $r['secret']);
+		$token = dba::selectFirst('tokens', ['id', 'secret'], ['client_id' => $consumer->key, 'id' => $nonce, 'expires' => $timestamp]);
+		if (DBM::is_result($token)) {
+			return new OAuthToken($token['id'], $token['secret']);
 		}
 
 		return null;
@@ -116,19 +112,19 @@ class FKOAuthDataStore extends OAuthDataStore
 
 		$r = dba::insert(
 			'tokens',
-			array(
+			[
 				'id' => $key,
 				'secret' => $sec,
 				'client_id' => $k,
 				'scope' => 'request',
-				'expires' => time() + REQUEST_TOKEN_DURATION)
+				'expires' => time() + REQUEST_TOKEN_DURATION]
 		);
 
 		if (!$r) {
 			return null;
 		}
 
-		return new \OAuthToken($key, $sec);
+		return new OAuthToken($key, $sec);
 	}
 
 	/**
@@ -157,21 +153,21 @@ class FKOAuthDataStore extends OAuthDataStore
 			$sec = self::genToken();
 			$r = dba::insert(
 				'tokens',
-				array(
+				[
 					'id' => $key,
 					'secret' => $sec,
 					'client_id' => $consumer->key,
 					'scope' => 'access',
 					'expires' => time() + ACCESS_TOKEN_DURATION,
-					'uid' => $uverifier)
+					'uid' => $uverifier]
 			);
 
 			if ($r) {
-				$ret = new \OAuthToken($key, $sec);
+				$ret = new OAuthToken($key, $sec);
 			}
 		}
 
-		dba::delete('tokens', array('id' => $token->key));
+		dba::delete('tokens', ['id' => $token->key]);
 
 		if (!is_null($ret) && !is_null($uverifier)) {
 			Config::delete("oauth", $verifier);

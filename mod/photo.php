@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file mod/photo.php
  */
@@ -8,7 +9,8 @@ use Friendica\Object\Image;
 
 require_once 'include/security.php';
 
-function photo_init(App $a) {
+function photo_init(App $a)
+{
 	global $_SERVER;
 
 	$prvcachecontrol = false;
@@ -37,8 +39,8 @@ function photo_init(App $a) {
 	if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
 		header('HTTP/1.1 304 Not Modified');
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
-		header('Etag: '.$_SERVER['HTTP_IF_NONE_MATCH']);
-	 	header("Expires: " . gmdate("D, d M Y H:i:s", time() + (31536000)) . " GMT");
+		header('Etag: ' . $_SERVER['HTTP_IF_NONE_MATCH']);
+		header("Expires: " . gmdate("D, d M Y H:i:s", time() + (31536000)) . " GMT");
 		header("Cache-Control: max-age=31536000");
 		if (function_exists('header_remove')) {
 			header_remove('Last-Modified');
@@ -49,15 +51,11 @@ function photo_init(App $a) {
 	}
 
 	$default = 'images/person-175.jpg';
+	$public = true;
 
 	if (isset($type)) {
-
-		/**
-		 * Profile photos
-		 */
-
+		// Profile photos
 		switch ($type) {
-
 			case 'profile':
 			case 'custom':
 				$resolution = 4;
@@ -73,10 +71,10 @@ function photo_init(App $a) {
 				break;
 		}
 
-		$uid = str_replace(array('.jpg', '.png', '.gif'), array('', '', ''), $person);
+		$uid = str_replace(['.jpg', '.png', '.gif'], ['', '', ''], $person);
 
 		foreach (Image::supportedTypes() AS $m => $e) {
-			$uid = str_replace('.'.$e, '', $uid);
+			$uid = str_replace('.' . $e, '', $uid);
 		}
 
 		$r = q("SELECT * FROM `photo` WHERE `scale` = %d AND `uid` = %d AND `profile` = 1 LIMIT 1",
@@ -92,16 +90,12 @@ function photo_init(App $a) {
 			$mimetype = 'image/jpeg';
 		}
 	} else {
-
-		/**
-		 * Other photos
-		 */
-
+		// Other photos
 		$resolution = 0;
-		$photo = str_replace(array('.jpg', '.png', '.gif'), array('', '', ''), $photo);
+		$photo = str_replace(['.jpg', '.png', '.gif'], ['', '', ''], $photo);
 
 		foreach (Image::supportedTypes() AS $m => $e) {
-			$photo = str_replace('.'.$e, '', $photo);
+			$photo = str_replace('.' . $e, '', $photo);
 		}
 
 		if (substr($photo, -2, 1) == '-') {
@@ -115,22 +109,18 @@ function photo_init(App $a) {
 			intval($resolution)
 		);
 		if (DBM::is_result($r)) {
-
 			$sql_extra = permissions_sql($r[0]['uid']);
 
 			// Now we'll see if we can access the photo
-
 			$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `scale` <= %d $sql_extra ORDER BY scale DESC LIMIT 1",
 				dbesc($photo),
 				intval($resolution)
 			);
-
-			$public = (DBM::is_result($r)) && ($r[0]['allow_cid'] == '') && ($r[0]['allow_gid'] == '') && ($r[0]['deny_cid']  == '') && ($r[0]['deny_gid']  == '');
-
 			if (DBM::is_result($r)) {
 				$resolution = $r[0]['scale'];
 				$data = $r[0]['data'];
 				$mimetype = $r[0]['type'];
+				$public = $r[0]['allow_cid'] == '' && $r[0]['allow_gid'] == '' && $r[0]['deny_cid'] == '' && $r[0]['deny_gid'] == '';
 			} else {
 				// The picure exists. We already checked with the first query.
 				// obviously, this is not an authorized viev!
@@ -145,7 +135,6 @@ function photo_init(App $a) {
 	if (empty($data)) {
 		if (isset($resolution)) {
 			switch ($resolution) {
-
 				case 4:
 					$data = file_get_contents('images/person-175.jpg');
 					$mimetype = 'image/jpeg';
@@ -167,7 +156,7 @@ function photo_init(App $a) {
 	}
 
 	// Resize only if its not a GIF and it is supported by the library
-	if (($mimetype != "image/gif") && in_array($mimetype, Image::supportedTypes())) {
+	if ($mimetype != "image/gif" && in_array($mimetype, Image::supportedTypes())) {
 		$Image = new Image($data, $mimetype);
 		if ($Image->isValid()) {
 			if (isset($customres) && $customres > 0 && $customres < 500) {
@@ -183,36 +172,33 @@ function photo_init(App $a) {
 		header_remove('pragma');
 	}
 
-	header("Content-type: ".$mimetype);
+	header("Content-type: " . $mimetype);
 
 	if ($prvcachecontrol) {
-
 		// it is a private photo that they have no permission to view.
 		// tell the browser not to cache it, in case they authenticate
 		// and subsequently have permission to see it
-
 		header("Cache-Control: no-store, no-cache, must-revalidate");
-
 	} else {
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
-		header('Etag: "'.md5($data).'"');
-	 	header("Expires: " . gmdate("D, d M Y H:i:s", time() + (31536000)) . " GMT");
+		header('Etag: "' . md5($data) . '"');
+		header("Expires: " . gmdate("D, d M Y H:i:s", time() + (31536000)) . " GMT");
 		header("Cache-Control: max-age=31536000");
 	}
 	echo $data;
 
 	// If the photo is public and there is an existing photo directory store the photo there
-	if ($public and ($file != "")) {
+	if ($public and $file != '') {
 		// If the photo path isn't there, try to create it
 		$basepath = $a->get_basepath();
-		if (!is_dir($basepath."/photo")) {
+		if (!is_dir($basepath . "/photo")) {
 			if (is_writable($basepath)) {
-				mkdir($basepath."/photo");
+				mkdir($basepath . "/photo");
 			}
 		}
 
-		if (is_dir($basepath."/photo")) {
-			file_put_contents($basepath."/photo/".$file, $data);
+		if (is_dir($basepath . "/photo")) {
+			file_put_contents($basepath . "/photo/" . $file, $data);
 		}
 	}
 

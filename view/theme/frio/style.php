@@ -1,29 +1,33 @@
 <?php
-require_once 'view/theme/frio/php/PHPColors/Color.php';
-
+/**
+ * @file view/theme/frio/style.php
+ */
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
+use Friendica\Model\Profile;
 
-$schemecss = "";
+require_once 'view/theme/frio/php/PHPColors/Color.php';
+
+$schemecss = '';
 $schemecssfile = false;
 $scheme_modified = 0;
 
-if (! $a->install) {
+if ($a->module !== 'install') {
 	// Get the UID of the profile owner.
-	$uid = get_theme_uid();
+	$uid = Profile::getThemeUid();
 	if ($uid) {
 		PConfig::load($uid, 'frio');
 
 		// Load the profile owners pconfig.
-		$schema           = PConfig::get($uid, "frio", "schema");
-		$nav_bg           = PConfig::get($uid, "frio", "nav_bg");
-		$nav_icon_color   = PConfig::get($uid, "frio", "nav_icon_color");
-		$link_color       = PConfig::get($uid, "frio", "link_color");
-		$bgcolor          = PConfig::get($uid, "frio", "background_color");
-		$contentbg_transp = PConfig::get($uid, "frio", "contentbg_transp");
-		$background_image = PConfig::get($uid, "frio", "background_image");
-		$bg_image_option  = PConfig::get($uid, "frio", "bg_image_option");
-		$modified         = PConfig::get($uid, "frio", "css_modified");
+		$scheme           = PConfig::get($uid, 'frio', 'scheme', PConfig::get($uid, 'frio', 'schema'));
+		$nav_bg           = PConfig::get($uid, 'frio', 'nav_bg');
+		$nav_icon_color   = PConfig::get($uid, 'frio', 'nav_icon_color');
+		$link_color       = PConfig::get($uid, 'frio', 'link_color');
+		$background_color = PConfig::get($uid, 'frio', 'background_color');
+		$contentbg_transp = PConfig::get($uid, 'frio', 'contentbg_transp');
+		$background_image = PConfig::get($uid, 'frio', 'background_image');
+		$bg_image_option  = PConfig::get($uid, 'frio', 'bg_image_option');
+		$modified         = PConfig::get($uid, 'frio', 'css_modified');
 
 		// There is maybe the case that the user did never modify the theme settings.
 		// In this case we store the present time.
@@ -34,15 +38,17 @@ if (! $a->install) {
 		Config::load('frio');
 
 		// Load frios system config.
-		$schema           = Config::get("frio", "schema");
-		$nav_bg           = Config::get("frio", "nav_bg");
-		$nav_icon_color   = Config::get("frio", "nav_icon_color");
-		$link_color       = Config::get("frio", "link_color");
-		$bgcolor          = Config::get("frio", "background_color");
-		$contentbg_transp = Config::get("frio", "contentbg_transp");
-		$background_image = Config::get("frio", "background_image");
-		$bg_image_option  = Config::get("frio", "bg_image_option");
-		$modified         = Config::get("frio", "css_modified");
+		$scheme           = Config::get('frio', 'scheme', Config::get('frio', 'schema'));
+		$nav_bg           = Config::get('frio', 'nav_bg');
+		$nav_icon_color   = Config::get('frio', 'nav_icon_color');
+		$link_color       = Config::get('frio', 'link_color');
+		$background_color = Config::get('frio', 'background_color');
+		$contentbg_transp = Config::get('frio', 'contentbg_transp');
+		$background_image = Config::get('frio', 'background_image');
+		$bg_image_option  = Config::get('frio', 'bg_image_option');
+		$login_bg_image   = Config::get('frio', 'login_bg_image');
+		$login_bg_color   = Config::get('frio', 'login_bg_color');
+		$modified         = Config::get('frio', 'css_modified');
 
 		// There is maybe the case that the user did never modify the theme settings.
 		// In this case we store the present time.
@@ -53,57 +59,64 @@ if (! $a->install) {
 }
 
 // Now load the scheme.  If a value is changed above, we'll keep the settings
-// If not, we'll keep those defined by the schema
-// Setting $schema to '' wasn't working for some reason, so we'll check it's
+// If not, we'll keep those defined by the scheme
+// Setting $scheme to '' wasn't working for some reason, so we'll check it's
 // not --- like the mobile theme does instead.
-// Allow layouts to over-ride the schema.
-if ($_REQUEST['schema']) {
-	$schema = $_REQUEST['schema'];
+// Allow layouts to over-ride the scheme.
+if (x($_REQUEST, 'scheme')) {
+	$scheme = $_REQUEST['scheme'];
 }
 
 // Sanitize the data.
-$schema = !empty($schema) ? basename($schema) : "";
+$scheme = !empty($scheme) ? basename($scheme) : '';
 
 
-if (($schema) && ($schema != '---')) {
-	if (file_exists('view/theme/frio/schema/' . $schema . '.php')) {
-		$schemefile = 'view/theme/frio/schema/' . $schema . '.php';
+if (($scheme) && ($scheme != '---')) {
+	if (file_exists('view/theme/frio/scheme/' . $scheme . '.php')) {
+		$schemefile = 'view/theme/frio/scheme/' . $scheme . '.php';
 		require_once $schemefile;
 	}
-	if (file_exists('view/theme/frio/schema/' . $schema . '.css')) {
-		$schemecssfile = 'view/theme/frio/schema/' . $schema . '.css';
+	if (file_exists('view/theme/frio/scheme/' . $scheme . '.css')) {
+		$schemecssfile = 'view/theme/frio/scheme/' . $scheme . '.css';
 	}
 }
 
-// If we haven't got a schema, load the default.  We shouldn't touch this - we
+// If we haven't got a scheme, load the default.  We shouldn't touch this - we
 // should leave it for admins to define for themselves.
-// default.php and default.css MUST be symlinks to existing schema files.
-if (! $schema) {
-	if(file_exists('view/theme/frio/schema/default.php')) {
-		$schemefile = 'view/theme/frio/schema/default.php';
+// default.php and default.css MUST be symlinks to existing scheme files.
+if (!$scheme) {
+	if (file_exists('view/theme/frio/scheme/default.php')) {
+		$schemefile = 'view/theme/frio/scheme/default.php';
 		require_once $schemefile;
 	}
-	if(file_exists('view/theme/frio/schema/default.css')) {
-		$schemecssfile = 'view/theme/frio/schema/default.css';
+	if (file_exists('view/theme/frio/scheme/default.css')) {
+		$schemecssfile = 'view/theme/frio/scheme/default.css';
 	}
 }
 
 //Set some defaults - we have to do this after pulling owner settings, and we have to check for each setting
 //individually.  If we don't, we'll have problems if a user has set one, but not all options.
-$nav_bg           = (empty($nav_bg)           ? "#708fa0"      : $nav_bg);
-$nav_icon_color   = (empty($nav_icon_color)   ? "#fff"         : $nav_icon_color);
-$link_color       = (empty($link_color)       ? "#6fdbe8"      : $link_color);
-$bgcolor          = (empty($bgcolor)          ? "#ededed"      : $bgcolor);
+$nav_bg           = (empty($nav_bg)           ? '#708fa0'      : $nav_bg);
+$nav_icon_color   = (empty($nav_icon_color)   ? '#fff'         : $nav_icon_color);
+$link_color       = (empty($link_color)       ? '#6fdbe8'      : $link_color);
+$background_color = (empty($background_color) ? '#ededed'      : $background_color);
 // The background image can not be empty. So we use a dummy jpg if no image was set.
 $background_image = (empty($background_image) ? 'img/none.jpg' : $background_image);
-$modified         = (empty($modified)         ? time()         :$modified);
+$modified         = (empty($modified)         ? time()         : $modified);
 
-$contentbg_transp = ((isset($contentbg_transp) && $contentbg_transp != "") ? $contentbg_transp : 100);
+
+// set a default login bg image if no custom image and no custom bg color are set.
+if (empty($login_bg_image) && empty($login_bg_color)) {
+	$login_bg_image = 'img/login_bg.jpg';
+}
+$login_bg_color   = (empty($login_bg_color)   ? '#ededed'      : $login_bg_color);
+
+$contentbg_transp = ((isset($contentbg_transp) && $contentbg_transp != '') ? $contentbg_transp : 100);
 
 // Calculate some colors in dependance of existing colors.
 // Some colors are calculated to don't have too many selection
 // fields in the theme settings.
-if (! $menu_background_hover_color) {
+if (!isset($menu_background_hover_color)) {
 	$mbhc = new Color($nav_bg);
 	$mcolor = $mbhc->getHex();
 
@@ -115,7 +128,7 @@ if (! $menu_background_hover_color) {
 		$menu_background_hover_color = '#' . $mbhc->lighten(5);
 	}
 }
-if (! $nav_icon_hover_color) {
+if (!isset($nav_icon_hover_color)) {
 	$nihc = new Color($nav_bg);
 
 	if ($nihc->isLight()) {
@@ -124,7 +137,7 @@ if (! $nav_icon_hover_color) {
 		$nav_icon_hover_color = '#' . $nihc->lighten(10);
 	}
 }
-if (! $link_hover_color) {
+if (!isset($link_hover_color)) {
 	$lhc = new Color($link_color);
 	$lcolor = $lhc->getHex();
 
@@ -133,33 +146,41 @@ if (! $link_hover_color) {
 	} else {
 		$link_hover_color = '#' . $lhc->lighten(5);
 	}
-
 }
 
 // Convert $bg_image_options into css.
+if (!isset($bg_image_option)) {
+	$bg_image_option = null;
+}
+
 switch ($bg_image_option) {
-	case "stretch":
-		$background_size_img = "100%";
+	case 'stretch':
+		$background_size_img = '100%';
+		$background_repeat = 'no-repeat';
 		break;
-	case "cover":
-		$background_size_img ="cover";
+	case 'cover':
+		$background_size_img = 'cover';
+		$background_repeat = 'no-repeat';
 		break;
-	case "repeat":
-		$background_size_img = "auto";
+	case 'repeat':
+		$background_size_img = 'auto';
+		$background_repeat = 'repeat';
 		break;
-	case "contain":
-		$background_size_img = "contain";
+	case 'contain':
+		$background_size_img = 'contain';
+		$background_repeat = 'repeat';
 		break;
 
 	default:
-		$background_size_img = "auto";
+		$background_size_img = 'auto';
+		$background_repeat = 'no-repeat';
 		break;
 }
 
 // Convert transparency level from percentage to opacity value.
 $contentbg_transp = $contentbg_transp / 100;
 
-$options = array (
+$options = [
 	'$nav_bg'                      => $nav_bg,
 	'$nav_icon_color'              => $nav_icon_color,
 	'$nav_icon_hover_color'        => $nav_icon_hover_color,
@@ -168,11 +189,14 @@ $options = array (
 	'$menu_background_hover_color' => $menu_background_hover_color,
 	'$btn_primary_color'           => $nav_icon_color,
 	'$btn_primary_hover_color'     => $menu_background_hover_color,
-	'$bgcolor'                     => $bgcolor,
+	'$background_color'            => $background_color,
 	'$contentbg_transp'            => $contentbg_transp,
 	'$background_image'            => $background_image,
 	'$background_size_img'         => $background_size_img,
-);
+	'$background_repeat'           => $background_repeat,
+	'$login_bg_image'              => $login_bg_image,
+	'$login_bg_color'              => $login_bg_color
+];
 
 $css_tpl = file_get_contents('view/theme/frio/css/style.css');
 
@@ -196,13 +220,13 @@ $etag = md5($css);
 
 // Set a header for caching.
 header('Cache-Control: public');
-header('ETag: "'.$etag.'"');
-header('Last-Modified: '.$modified);
+header('ETag: "' . $etag . '"');
+header('Last-Modified: ' . $modified);
 
 // Only send the CSS file if it was changed.
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
 	$cached_modified = gmdate('r', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
-	$cached_etag = str_replace(array('"', "-gzip"), array('', ''),
+	$cached_etag = str_replace(['"', '-gzip'], ['', ''],
 				stripslashes($_SERVER['HTTP_IF_NONE_MATCH']));
 
 	if (($cached_modified == $modified) && ($cached_etag == $etag)) {

@@ -3,15 +3,18 @@
  * @file include/common.php
  */
 use Friendica\App;
+use Friendica\Content\ContactSelector;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
+use Friendica\Model\Profile;
 
-require_once 'include/contact_selectors.php';
+require_once 'include/dba.php';
 require_once 'mod/contacts.php';
 
-function common_content(App $a) {
-
+function common_content(App $a)
+{
 	$o = '';
 
 	$cmd = $a->argv[1];
@@ -19,8 +22,8 @@ function common_content(App $a) {
 	$cid = intval($a->argv[3]);
 	$zcid = 0;
 
-	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+	if (!local_user()) {
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
@@ -28,54 +31,46 @@ function common_content(App $a) {
 		return;
 	}
 
-	if (! $uid) {
+	if (!$uid) {
 		return;
 	}
 
 	if ($cmd === 'loc' && $cid) {
-		$c = q("SELECT `name`, `url`, `photo` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($cid),
-			intval($uid)
-		);
-		/// @TODO Handle $c with DBM::is_result()
-		$a->page['aside'] = "";
-		profile_load($a, "", 0, Contact::getDetailsByURL($c[0]["url"]));
-	} else {
-		$c = q("SELECT `name`, `url`, `photo` FROM `contact` WHERE `self` = 1 AND `uid` = %d LIMIT 1",
-			intval($uid)
-		);
-		/// @TODO Handle $c with DBM::is_result()
+		$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => $uid]);
 
-		$vcard_widget .= replace_macros(get_markup_template("vcard-widget.tpl"),array(
-			'$name' => htmlentities($c[0]['name']),
-			'$photo' => $c[0]['photo'],
-			'url' => 'contacts/' . $cid
-		));
-
-		if (! x($a->page,'aside')) {
-			$a->page['aside'] = '';
+		if (DBM::is_result($contact)) {
+			$a->page['aside'] = "";
+			Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
 		}
-		$a->page['aside'] .= $vcard_widget;
+	} else {
+		$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['self' => true, 'uid' => $uid]);
+
+		if (DBM::is_result($contact)) {
+			$vcard_widget = replace_macros(get_markup_template("vcard-widget.tpl"), [
+				'$name' => htmlentities($contact['name']),
+				'$photo' => $contact['photo'],
+				'url' => 'contacts/' . $cid
+			]);
+
+			if (!x($a->page, 'aside')) {
+				$a->page['aside'] = '';
+			}
+			$a->page['aside'] .= $vcard_widget;
+		}
 	}
 
-	if (! DBM::is_result($c)) {
+	if (!DBM::is_result($contact)) {
 		return;
 	}
 
-	if(! $cid) {
-		if(get_my_url()) {
-			$r = q("SELECT `id` FROM `contact` WHERE `nurl` = '%s' AND `uid` = %d LIMIT 1",
-				dbesc(normalise_link(get_my_url())),
-				intval($profile_uid)
-			);
-			if (DBM::is_result($r))
-				$cid = $r[0]['id'];
-			else {
-				$r = q("SELECT `id` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
-					dbesc(normalise_link(get_my_url()))
-				);
-				if (DBM::is_result($r))
-					$zcid = $r[0]['id'];
+	if (!$cid && Profile::getMyURL()) {
+		$contact = dba::selectFirst('contact', ['id'], ['nurl' => normalise_link(Profile::getMyURL()), 'uid' => $uid]);
+		if (DBM::is_result($contact)) {
+			$cid = $contact['id'];
+		} else {
+			$gcontact = dba::selectFirst('gcontact', ['id'], ['nurl' => normalise_link(Profile::getMyURL())]);
+			if (DBM::is_result($gcontact)) {
+				$zcid = $gcontact['id'];
 			}
 		}
 	}
@@ -90,13 +85,12 @@ function common_content(App $a) {
 		$t = GContact::countCommonFriendsZcid($uid, $zcid);
 	}
 
-	if (count($t)) {
+	if ($t > 0) {
 		$a->set_pager_total($t);
 	} else {
-		notice(t('No contacts in common.') . EOL);
+		notice(L10n::t('No contacts in common.') . EOL);
 		return $o;
 	}
-
 
 	if ($cid) {
 		$r = GContact::commonFriends($uid, $cid, $a->pager['start'], $a->pager['itemspage']);
@@ -104,15 +98,14 @@ function common_content(App $a) {
 		$r = GContact::commonFriendsZcid($uid, $zcid, $a->pager['start'], $a->pager['itemspage']);
 	}
 
-
-	if (! DBM::is_result($r)) {
+	if (!DBM::is_result($r)) {
 		return $o;
 	}
 
 	$id = 0;
 
+	$entries = [];
 	foreach ($r as $rr) {
-
 		//get further details of the contact
 		$contact_details = Contact::getDetailsByURL($rr['url'], $uid);
 
@@ -120,12 +113,11 @@ function common_content(App $a) {
 		/// @TODO Adding '/" here avoids E_NOTICE on missing constants
 		$rr['id'] = $rr['cid'];
 
-		$photo_menu = '';
 		$photo_menu = Contact::photoMenu($rr);
 
-		$entry = array(
+		$entry = [
 			'url'          => $rr['url'],
-			'itemurl'      => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
+			'itemurl'      => defaults($contact_details, 'addr', $rr['url']),
 			'name'         => $contact_details['name'],
 			'thumb'        => proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
 			'img_hover'    => htmlentities($contact_details['name']),
@@ -133,27 +125,29 @@ function common_content(App $a) {
 			'tags'         => $contact_details['keywords'],
 			'about'        => $contact_details['about'],
 			'account_type' => Contact::getAccountType($contact_details),
-			'network'      => network_to_name($contact_details['network'], $contact_details['url']),
+			'network'      => ContactSelector::networkToName($contact_details['network'], $contact_details['url']),
 			'photo_menu'   => $photo_menu,
 			'id'           => ++$id,
-		);
+		];
 		$entries[] = $entry;
 	}
 
-	if ($cmd === 'loc' && $cid && $uid == local_user()) {
+	$title = '';
+	$tab_str = '';
+	if ($cmd === 'loc' && $cid && local_user() == $uid) {
 		$tab_str = contacts_tab($a, $cid, 4);
 	} else {
-		$title = t('Common Friends');
+		$title = L10n::t('Common Friends');
 	}
 
 	$tpl = get_markup_template('viewcontact_template.tpl');
 
-	$o .= replace_macros($tpl,array(
+	$o .= replace_macros($tpl, [
 		'$title'    => $title,
 		'$tab_str'  => $tab_str,
 		'$contacts' => $entries,
 		'$paginate' => paginate($a),
-	));
+	]);
 
 	return $o;
 }

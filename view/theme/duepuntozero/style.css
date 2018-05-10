@@ -726,6 +726,9 @@ input#dfrn-url {
 	height:175px;
 	padding: 12px;
 }
+#profile-photo-wrapper.crop-preview img {
+	padding: 0;
+}
 
 #profile-edit-profile-name-label,
 #profile-edit-name-label,
@@ -1123,7 +1126,7 @@ input#dfrn-url {
 	/* add ellipsis on text overflow               */
 	/* this work on safari, opera, ie, chrome.     */
 	/* firefox users have to wait support or we    */
-	/* can use a jquery plugin http://bit.ly/zJskg */
+	/* can use a jquery addon http://bit.ly/zJskg */
 	text-overflow: ellipsis;
 	-o-text-overflow: ellipsis;
 	width: 100%;
@@ -2550,7 +2553,7 @@ aside input[type='text'] {
 }
 
 
-#plugin-settings-link, #account-settings-link {
+#addon-settings-link, #account-settings-link {
 	margin-bottom: 10px;
 }
 
@@ -3082,10 +3085,10 @@ aside input[type='text'] {
 	text-align: right;
 }
 
-#adminpage #pluginslist {
+#adminpage #addonslist {
 	margin: 0px; padding: 0px;
 }
-#adminpage .plugin {
+#adminpage .addon {
 	list-style: none;
 	display: block;
 	border: 1px solid #888888;
@@ -3093,8 +3096,8 @@ aside input[type='text'] {
 	margin-bottom: 5px;
 	clear: left;
 }
-#adminpage .plugin .desc { margin-left: 2.5em;}
-#adminpage .toggleplugin {
+#adminpage .addon .desc { margin-left: 2.5em;}
+#adminpage .toggleaddon {
 	float:left;
 	margin-right: 1em;
 }
@@ -3552,10 +3555,6 @@ div.jGrowl div.info {
   float: left;
   margin: 0px 10px 10px 0px;
   position: relative;
-}
-.videos .video-top-wrapper .video-js {
-  width: 300px!important;
-  height: 232px!important;
 }
 .videos .video-top-wrapper .video-delete {
   position: absolute;

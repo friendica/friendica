@@ -1,76 +1,86 @@
 
 Friendica Installation
 
-We've tried very hard to ensure that Friendica will run on commodity hosting 
-platforms - such as those used to host Wordpress blogs and Drupal websites. 
-But be aware that Friendica is more than a simple web application. It is a 
-complex communications system which more closely resembles an email server 
+We've tried very hard to ensure that Friendica will run on commodity hosting
+platforms - such as those used to host Wordpress blogs and Drupal websites.
+But be aware that Friendica is more than a simple web application. It is a
+complex communications system which more closely resembles an email server
 than a web server. For reliability and performance, messages are delivered in
 the background and are queued for later delivery when sites are down. This
 kind of functionality requires a bit more of the host system than the typical
-blog. Not every PHP/MySQL hosting provider will be able to support Friendica. 
-Many will. But please review the requirements and confirm these with your 
+blog. Not every PHP/MySQL hosting provider will be able to support Friendica.
+Many will. But please review the requirements and confirm these with your
 hosting provider prior to installation.
 
 Before you begin: Choose a domain name or subdomain name for your server.
 Put some thought into this - because changing it is currently not-supported.
 Things will break, and some of your friends may have difficulty communicating
 with you. We plan to address this limitation in a future release. Also decide
-if you wish to connect with members of the Diaspora network, as this will 
+if you wish to connect with members of the Diaspora network, as this will
 impact the installation requirements.
 
 Decide if you will use SSL and obtain an SSL cert. Communications with the
-Diaspora network MAY require both SSL AND an SSL cert signed by a CA which is 
+Diaspora network MAY require both SSL AND an SSL cert signed by a CA which is
 recognised by the major browsers. Friendica will work with self-signed certs
 but Diaspora communication may not. For best results, install your cert PRIOR
-to installing Friendica and when visiting your site for the initial 
-installation in step 5, please use the https: link. (Use the http: or non-SSL 
-link if your cert is self-signed). 
- 
+to installing Friendica and when visiting your site for the initial
+installation in step 5, please use the https: link. (Use the http: or non-SSL
+link if your cert is self-signed).
+
 
 1. Requirements
-	- Apache with mod-rewrite enabled and "Options All" so you can use a 
+	- Apache with mod-rewrite enabled and "Options All" so you can use a
 local .htaccess file
 
-	- PHP 5.4+.
+	- PHP 5.6+ (PHP 7 recommended for performance).
 
-		- PHP *command line* access with register_argc_argv set to true in the 
+		- PHP *command line* access with register_argc_argv set to true in the
 php.ini file [or see 'poormancron' in section 8]
 
-		- curl, gd (with at least jpeg support), mysql, mbstring, xml and openssl extensions
+		- curl, gd (with at least jpeg support), mysql, mbstring, xml, zip and openssl extensions
 
 		- some form of email server or email gateway such that PHP mail() works
+
+		- The POSIX module of PHP needs to be activated (e.g. RHEL, CentOS have disabled it)
 
 	- Mysql 5.5.3+ or an equivalant alternative for MySQL (MariaDB, Percona Server etc.)
 
 	- ability to schedule jobs with cron (Linux/Mac) or Scheduled Tasks
 (Windows) [Note: other options are presented in Section 8 of this document]
 
-	- Installation into a top-level domain or sub-domain (without a 
+	- Installation into a top-level domain or sub-domain (without a
 directory/path component in the URL) is preferred. This is REQUIRED if
 you wish to communicate with the Diaspora network.
 
 
-	- For alternative server configurations (such as Nginx server and MariaDB 
+	- For alternative server configurations (such as Nginx server and MariaDB
 	database engine), refer to the wiki at https://github.com/friendica/friendica/wiki
 
 2. Unpack the Friendica files into the root of your web server document area.
 
 	- If you copy the directory tree to your webserver, make sure
-	that you also copy .htaccess - as "dot" files are often hidden 
+	that you also copy .htaccess - as "dot" files are often hidden
 	and aren't normally copied.
 
-3. Create an empty database and note the access details (hostname, username, 
+OR
+
+2b. Clone the friendica/friendica GitHub repository and import dependencies
+
+	git clone https://github.com/friendica/friendica [web server folder]
+	cd [web server folder]
+	php bin/composer.phar install
+
+3. Create an empty database and note the access details (hostname, username,
 password, database name).
 
     - Friendica needs the permission to create and delete fields and tables in its own database.
     - Please check the additional notes if running on MySQ 5.7.17 or newer
 
-4. If you know in advance that it will be impossible for the web server to 
-write or create files in your web directory, create an empty file called 
+4. If you know in advance that it will be impossible for the web server to
+write or create files in your web directory, create an empty file called
 .htconfig.php and make it writable by the web server.
 
-5. Visit your website with a web browser and follow the instructions. Please 
+5. Visit your website with a web browser and follow the instructions. Please
 note any error messages and correct these before continuing.
 
 If you are using SSL with a known signature authority (recommended), use the
@@ -82,19 +92,19 @@ so in the host name setting for the database.
 
 6. *If* the automated installation fails for any reason, check the following:
 
-	- ".htconfig.php" exists 
-		If not, edit htconfig.php and change system settings. Rename 
+	- ".htconfig.php" exists
+		If not, edit htconfig.php and change system settings. Rename
 to .htconfig.php
 	-  Database is populated.
-		If not, import the contents of "database.sql" with phpmyadmin 
+		If not, import the contents of "database.sql" with phpmyadmin
 or mysql command line
 
-7. At this point visit your website again, and register your personal account. 
-Registration errors should all be recoverable automatically. 
+7. At this point visit your website again, and register your personal account.
+Registration errors should all be recoverable automatically.
 If you get any *critical* failure at this point, it generally indicates the
-database was not installed correctly. You might wish to move/rename 
-.htconfig.php to another name and empty (called 'dropping') the database 
-tables, so that you can start fresh.  
+database was not installed correctly. You might wish to move/rename
+.htconfig.php to another name and empty (called 'dropping') the database
+tables, so that you can start fresh.
 
 ****************************************************************************
 ****************************************************************************
@@ -102,43 +112,35 @@ tables, so that you can start fresh.
 ****************************************************************************
 ****************************************************************************
 
-8. Set up a cron job or scheduled task to run the worker once every 5-10 
+8. Set up a cron job or scheduled task to run the worker once every 5-10
 minutes to pick up the recent "public" postings of your friends. Example:
 
-	cd /base/directory; /path/to/php scripts/worker.php
+	cd /base/directory; /path/to/php bin/worker.php
 
 Change "/base/directory", and "/path/to/php" as appropriate for your situation.
 
-If you are using a Linux server, run "crontab -e" and add a line like the 
+If you are using a Linux server, run "crontab -e" and add a line like the
 one shown, substituting for your unique paths and settings:
 
-*/10 * * * *	cd /home/myname/mywebsite; /usr/bin/php scripts/worker.php
+*/10 * * * *	cd /home/myname/mywebsite; /usr/bin/php bin/worker.php
 
-You can generally find the location of PHP by executing "which php". If you 
-have troubles with this section please contact your hosting provider for 
+You can generally find the location of PHP by executing "which php". If you
+have troubles with this section please contact your hosting provider for
 assistance. Friendica will not work correctly if you cannot perform this step.
 
 You should also be sure that $a->config['php_path'] is set correctly, it should
 look like (changing it to the correct PHP location)
 
-$a->config['php_path'] = '/usr/local/php53/bin/php'
-  
-Alternative: You may be able to use the 'poormancron' plugin to perform this
-step if you are using a recent Friendica release. 'poormancron' may result in
-perfomance and memory issues and is only suitable for small sites with one or
-two users and a handful of contacts. To do this, edit the file 
-".htconfig.php" and look for a line describing your plugins. On a fresh 
-installation, it will look like
+$a->config['php_path'] = '/usr/local/php56/bin/php'
 
-$a->config['system']['addon'] = 'js_upload';
+Alternative: If you cannot use a cron job as described above, you can use
+the frontend worker and an external cron service to trigger the execution
+of the worker script. You can enable the frontend worker after the installation
+from the admin panel of your node and call
 
-This indicates the "js_upload" addon module is enabled. You may add additional 
-addons/plugins using this same line in the configuration file. Change it to 
-read
+		 https://example.com/worker
 
-$a->config['system']['addon'] = 'js_upload,poormancron';
-
-and save your changes.
+with the service of your choice.
 
 9. (Recommended) Set up a backup plan
 
@@ -177,40 +179,40 @@ It is however preferable to use the standard approach if configuring a new serve
 
 
 #####################################################################
-- If you get the message 
+- If you get the message
 	"System is currently unavailable. Please try again later"
 #####################################################################
-	
-	Check your database settings. It usually means your database could not 
+
+	Check your database settings. It usually means your database could not
 be opened or accessed. If the database resides on the same machine, check that
-the database server name is "localhost". 
+the database server name is "localhost".
 
 #####################################################################
 - 500 Internal Error
 #####################################################################
 
-	This could be the result of one of our Apache directives not being 
+	This could be the result of one of our Apache directives not being
 supported by your version of Apache. Examine your apache server logs.
-	You might remove the line "Options -Indexes" from the .htaccess file if 
+	You might remove the line "Options -Indexes" from the .htaccess file if
 you are using a Windows server as this has been known to cause problems.
-Also check your file permissions. Your website and all contents must generally 
+Also check your file permissions. Your website and all contents must generally
 be world-readable.
 
 	It is likely that your web server reported the source of the problem in
-its error log files. Please review these system error logs to determine what 
+its error log files. Please review these system error logs to determine what
 caused the problem. Often this will need to be resolved with your hosting
-provider or (if self-hosted) your web server configuration. 
+provider or (if self-hosted) your web server configuration.
 
 #####################################################################
 - 400 and 4xx "File not found" errors
 #####################################################################
 
-	First check your file permissions. Your website and all contents must 
+	First check your file permissions. Your website and all contents must
 generally be world-readable.
 
 	Ensure that mod-rewite is installed and working, and that your
 .htaccess file is being used. To verify the latter, create a file test.out
-containing the word "test" in the top directory of Friendica, make it world 
+containing the word "test" in the top directory of Friendica, make it world
 readable and point your web browser to
 
 http://yoursitenamehere.com/test.out
@@ -221,12 +223,12 @@ http://yoursitenamehere.com/test.out
 your .htaccess file to be used (there are rules in this file to block access
 to any file with .out at the end, as these are typically used for system logs).
 
-	Make certain the .htaccess file exists and is readable by everybody, then 
-look for the existence of "AllowOverride None" in the Apache server 
-configuration for your site. This will need to be changed to 
-"AllowOverride All".  
+	Make certain the .htaccess file exists and is readable by everybody, then
+look for the existence of "AllowOverride None" in the Apache server
+configuration for your site. This will need to be changed to
+"AllowOverride All".
 
-	If you do not see the word "test", your .htaccess is working, but it is 
+	If you do not see the word "test", your .htaccess is working, but it is
 likely that mod-rewrite is not installed in your web server or is not working.
 
 	On most flavour of Linux,
@@ -234,16 +236,16 @@ likely that mod-rewrite is not installed in your web server or is not working.
 % a2enmod rewrite
 % /etc/init.d/apache2 restart
 
-	Consult your hosting provider, experts on your particular Linux 
-distribution or (if Windows) the provider of your Apache server software if 
-you need to change either of these and can not figure out how. There is 
-a lot of help available on the web. Google "mod-rewrite" along with the 
-name of your operating system distribution or Apache package (if using 
+	Consult your hosting provider, experts on your particular Linux
+distribution or (if Windows) the provider of your Apache server software if
+you need to change either of these and can not figure out how. There is
+a lot of help available on the web. Google "mod-rewrite" along with the
+name of your operating system distribution or Apache package (if using
 Windows).
 
-  
+
 #####################################################################
-- If you are unable to write the file .htconfig.php during installation 
+- If you are unable to write the file .htconfig.php during installation
 due to permissions issues:
 #####################################################################
 
@@ -253,7 +255,7 @@ For Linux:
 % touch .htconfig.php
 % chmod 777 .htconfig.php
 
-Retry the installation. As soon as the database has been created, 
+Retry the installation. As soon as the database has been created,
 
 ******* this is important *********
 
@@ -285,14 +287,14 @@ cron by using something like
 
  */10 * * * * cd /var/www/friendica/friendica/ && sudo -u www-data /usr/bin/php
 -d suhosin.executor.func.blacklist=none -d suhosin.executor.eval.blacklist=none
--f scripts/worker.php
+-f bin/worker.php
 
 This worked well for simple test cases, but the friendica-cron still failed with
 a fatal error:
 suhosin[22962]: ALERT - function within blacklist called: proc_open() (attacker
 'REMOTE_ADDR not set', file '/var/www/friendica/friendica/boot.php', line 1341)
 
-After a while I noticed, that scripts/worker.php calls further php script via
+After a while I noticed, that bin/worker.php calls further php script via
 proc_open. These scripts themselves also use proc_open and fail, because they
 are NOT called with -d suhosin.executor.func.blacklist=none.
 
@@ -312,15 +314,15 @@ Unable to create all mysql tables on MySQL 5.7.17 or newer
 #######################################################################
 
 If the setup fails to create all the database tables and/or manual
-creation from the command line fails, with this error: 
+creation from the command line fails, with this error:
 
-ERROR 1067 (42000) at line XX: Invalid default value for 'created' 
+ERROR 1067 (42000) at line XX: Invalid default value for 'created'
 
-You need to adjust your my.cnf and add the following setting under 
-the [mysqld] section : 
+You need to adjust your my.cnf and add the following setting under
+the [mysqld] section :
 
 sql_mode = '';
 
-After that, restart mysql and try again. 
+After that, restart mysql and try again.
 
 

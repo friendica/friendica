@@ -17,7 +17,7 @@ require_once 'include/text.php';
  */
 class Thread extends BaseObject
 {
-	private $parents = array();
+	private $parents = [];
 	private $mode = null;
 	private $writable = false;
 	private $profile_owner = 0;
@@ -60,11 +60,15 @@ class Thread extends BaseObject
 				break;
 			case 'profile':
 				$this->profile_owner = $a->profile['profile_uid'];
-				$this->writable = can_write_wall($a, $this->profile_owner);
+				$this->writable = can_write_wall($this->profile_owner);
 				break;
 			case 'display':
 				$this->profile_owner = $a->profile['uid'];
-				$this->writable = can_write_wall($a, $this->profile_owner) || $writable;
+				$this->writable = can_write_wall($this->profile_owner) || $writable;
+				break;
+			case 'community':
+				$this->profile_owner = 0;
+				$this->writable = $writable;
 				break;
 			default:
 				logger('[ERROR] Conversation::setMode : Unhandled mode ('. $mode .').', LOGGER_DEBUG);
@@ -168,7 +172,7 @@ class Thread extends BaseObject
 	public function getTemplateData($conv_responses)
 	{
 		$a = self::getApp();
-		$result = array();
+		$result = [];
 		$i = 0;
 
 		foreach ($this->parents as $item) {

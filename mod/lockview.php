@@ -1,6 +1,10 @@
 <?php
-
+/**
+ * @file mod/lockview.php
+ */
 use Friendica\App;
+use Friendica\Core\Addon;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
 
 function lockview_content(App $a) {
@@ -16,7 +20,7 @@ function lockview_content(App $a) {
 	if(! $item_id)
 		killme();
 
-	if (!in_array($type, array('item','photo','event')))
+	if (!in_array($type, ['item','photo','event']))
 		killme();
 
 	$r = q("SELECT * FROM `%s` WHERE `id` = %d LIMIT 1",
@@ -28,10 +32,10 @@ function lockview_content(App $a) {
 	}
 	$item = $r[0];
 
-	call_hooks('lockview_content', $item);
+	Addon::callHooks('lockview_content', $item);
 
 	if($item['uid'] != local_user()) {
-		echo t('Remote privacy information not available.') . '<br />';
+		echo L10n::t('Remote privacy information not available.') . '<br />';
 		killme();
 	}
 
@@ -39,7 +43,7 @@ function lockview_content(App $a) {
 	if(($item['private'] == 1) && (! strlen($item['allow_cid'])) && (! strlen($item['allow_gid']))
 		&& (! strlen($item['deny_cid'])) && (! strlen($item['deny_gid']))) {
 
-		echo t('Remote privacy information not available.') . '<br />';
+		echo L10n::t('Remote privacy information not available.') . '<br />';
 		killme();
 	}
 
@@ -48,8 +52,8 @@ function lockview_content(App $a) {
 	$deny_users = expand_acl($item['deny_cid']);
 	$deny_groups = expand_acl($item['deny_gid']);
 
-	$o = t('Visible to:') . '<br />';
-	$l = array();
+	$o = L10n::t('Visible to:') . '<br />';
+	$l = [];
 
 	if(count($allowed_groups)) {
 		$r = q("SELECT `name` FROM `group` WHERE `id` IN ( %s )",

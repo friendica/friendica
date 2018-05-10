@@ -10,32 +10,29 @@
 
 use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Core\System;
+use Friendica\Content\Nav;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
+use Friendica\Core\Session;
+use Friendica\Core\System;
+use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\Profile;
+use Friendica\Module\Login;
 
 require_once 'boot.php';
 
-if (empty($a)) {
-	$a = new App(__DIR__);
-}
+$a = new App(__DIR__);
 BaseObject::setApp($a);
 
 // We assume that the index.php is called by a frontend process
 // The value is set to "true" by default in boot.php
 $a->backend = false;
 
-/**
- * Load the configuration file which contains our DB credentials.
- * Ignore errors. If the file doesn't exist or is empty, we are running in
- * installation mode.
- */
-
-$install = ((file_exists('.htconfig.php') && filesize('.htconfig.php')) ? false : true);
-
-// Only load config if found, don't surpress errors
-if (!$install) {
+// Only load config if found, don't suppress errors
+if (!$a->mode == App::MODE_INSTALL) {
 	include ".htconfig.php";
 }
 
@@ -45,9 +42,13 @@ if (!$install) {
 
 require_once "include/dba.php";
 
-if (!$install) {
-	dba::connect($db_host, $db_user, $db_pass, $db_data, $install);
+if (!$a->mode == App::MODE_INSTALL) {
+	$result = dba::connect($db_host, $db_user, $db_pass, $db_data);
 	unset($db_host, $db_user, $db_pass, $db_data);
+
+	if (!$result) {
+		System::unavailable();
+	}
 
 	/**
 	 * Load configs from db. Overwrite configs from .htconfig.php
@@ -65,22 +66,23 @@ if (!$install) {
 	if (Config::get('system', 'force_ssl') && ($a->get_scheme() == "http")
 		&& (intval(Config::get('system', 'ssl_policy')) == SSL_POLICY_FULL)
 		&& (substr(System::baseUrl(), 0, 8) == "https://")
-	) {
+		&& ($_SERVER['REQUEST_METHOD'] == 'GET')) {
 		header("HTTP/1.1 302 Moved Temporarily");
 		header("Location: " . System::baseUrl() . "/" . $a->query_string);
 		exit();
 	}
 
-	require_once 'include/session.php';
-	load_hooks();
-	call_hooks('init_1');
+	Config::init();
+	Session::init();
+	Addon::loadHooks();
+	Addon::callHooks('init_1');
 
-	$maintenance = Config::get('system', 'maintenance');
+	$a->checkMaintenanceMode();
 }
 
-$lang = get_browser_language();
+$lang = L10n::getBrowserLanguage();
 
-load_translation_table($lang);
+L10n::loadTranslationTable($lang);
 
 /**
  * Important stuff we always need to do.
@@ -97,6 +99,7 @@ if (!$a->is_backend()) {
 	session_start();
 	$a->save_timestamp($stamp1, "parser");
 } else {
+	$_SESSION = [];
 	Worker::executeIfIdle();
 }
 
@@ -105,20 +108,20 @@ if (!$a->is_backend()) {
  * We have to do it here because the session was just now opened.
  */
 if (x($_SESSION, 'authenticated') && !x($_SESSION, 'language')) {
-	// we didn't loaded user data yet, but we need user language
-	$r = dba::select('user', array('language'), array('uid' => $_SESSION['uid']), array('limit' => 1));
+	// we haven't loaded user data yet, but we need user language
+	$user = dba::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
 	$_SESSION['language'] = $lang;
-	if (DBM::is_result($r)) {
-		$_SESSION['language'] = $r['language'];
+	if (DBM::is_result($user)) {
+		$_SESSION['language'] = $user['language'];
 	}
 }
 
 if ((x($_SESSION, 'language')) && ($_SESSION['language'] !== $lang)) {
 	$lang = $_SESSION['language'];
-	load_translation_table($lang);
+	L10n::loadTranslationTable($lang);
 }
 
-if ((x($_GET, 'zrl')) && (!$install && !$maintenance)) {
+if ((x($_GET, 'zrl')) && $a->mode == App::MODE_NORMAL) {
 	// Only continue when the given profile link seems valid
 	// Valid profile links contain a path with "/profile/" and no query parameters
 	if ((parse_url($_GET['zrl'], PHP_URL_QUERY) == "")
@@ -126,7 +129,7 @@ if ((x($_GET, 'zrl')) && (!$install && !$maintenance)) {
 	) {
 		$_SESSION['my_url'] = $_GET['zrl'];
 		$a->query_string = preg_replace('/[\?&]zrl=(.*?)([\?&]|$)/is', '', $a->query_string);
-		zrl_init($a);
+		Profile::zrlInit($a);
 	} else {
 		// Someone came with an invalid parameter, maybe as a DDoS attempt
 		// We simply stop processing here
@@ -148,9 +151,7 @@ if ((x($_GET, 'zrl')) && (!$install && !$maintenance)) {
 
 // header('Link: <' . System::baseUrl() . '/amcd>; rel="acct-mgmt";');
 
-if (x($_COOKIE["Friendica"]) || (x($_SESSION, 'authenticated')) || (x($_POST, 'auth-params')) || ($a->module === 'login')) {
-	require "include/auth.php";
-}
+Login::sessionAuth();
 
 if (! x($_SESSION, 'authenticated')) {
 	header('X-Account-Management-Status: none');
@@ -160,45 +161,36 @@ if (! x($_SESSION, 'authenticated')) {
 $a->page['htmlhead'] = '';
 $a->page['end'] = '';
 
+$_SESSION['sysmsg']       = defaults($_SESSION, 'sysmsg'      , []);
+$_SESSION['sysmsg_info']  = defaults($_SESSION, 'sysmsg_info' , []);
+$_SESSION['last_updated'] = defaults($_SESSION, 'last_updated', []);
 
-if (! x($_SESSION, 'sysmsg')) {
-	$_SESSION['sysmsg'] = array();
-}
-
-if (! x($_SESSION, 'sysmsg_info')) {
-	$_SESSION['sysmsg_info'] = array();
-}
-
-// Array for informations about last received items
-if (! x($_SESSION, 'last_updated')) {
-	$_SESSION['last_updated'] = array();
-}
 /*
  * check_config() is responsible for running update scripts. These automatically
  * update the DB schema whenever we push a new one out. It also checks to see if
- * any plugins have been added or removed and reacts accordingly.
+ * any addons have been added or removed and reacts accordingly.
  */
 
 // in install mode, any url loads install module
 // but we need "view" module for stylesheet
-if ($install && $a->module!="view") {
+if ($a->mode == App::MODE_INSTALL && $a->module!="view") {
 	$a->module = 'install';
-} elseif ($maintenance && $a->module!="view") {
+} elseif ($a->mode == App::MODE_MAINTENANCE && $a->module!="view") {
 	$a->module = 'maintenance';
 } else {
 	check_url($a);
 	check_db(false);
-	check_plugins($a);
+	check_addons($a);
 }
 
-nav_set_selected('nothing');
+Nav::setSelected('nothing');
 
 //Don't populate apps_menu if apps are private
 $privateapps = Config::get('config', 'private_addons');
 if ((local_user()) || (! $privateapps === "1")) {
-	$arr = array('app_menu' => $a->apps);
+	$arr = ['app_menu' => $a->apps];
 
-	call_hooks('app_menu', $arr);
+	Addon::callHooks('app_menu', $arr);
 
 	$a->apps = $arr['app_menu'];
 }
@@ -224,12 +216,40 @@ if (strlen($a->module)) {
 
 	/**
 	 * We will always have a module name.
-	 * First see if we have a plugin which is masquerading as a module.
+	 * First see if we have an addon which is masquerading as a module.
 	 */
 
 	// Compatibility with the Android Diaspora client
-	if ($a->module == "stream") {
-		$a->module = "network";
+	if ($a->module == 'stream') {
+		goaway('network?f=&order=post');
+	}
+
+	if ($a->module == 'conversations') {
+		goaway('message');
+	}
+
+	if ($a->module == 'commented') {
+		goaway('network?f=&order=comment');
+	}
+
+	if ($a->module == 'liked') {
+		goaway('network?f=&order=comment');
+	}
+
+	if ($a->module == 'activity') {
+		goaway('network/?f=&conv=1');
+	}
+
+	if (($a->module == 'status_messages') && ($a->cmd == 'status_messages/new')) {
+		goaway('bookmarklet');
+	}
+
+	if (($a->module == 'user') && ($a->cmd == 'user/edit')) {
+		goaway('settings');
+	}
+
+	if (($a->module == 'tag_followings') && ($a->cmd == 'tag_followings/manage')) {
+		goaway('search');
 	}
 
 	// Compatibility with the Firefox App
@@ -239,10 +259,10 @@ if (strlen($a->module)) {
 
 	$privateapps = Config::get('config', 'private_addons');
 
-	if (is_array($a->plugins) && in_array($a->module, $a->plugins) && file_exists("addon/{$a->module}/{$a->module}.php")) {
+	if (is_array($a->addons) && in_array($a->module, $a->addons) && file_exists("addon/{$a->module}/{$a->module}.php")) {
 		//Check if module is an app and if public access to apps is allowed or not
-		if ((!local_user()) && plugin_is_app($a->module) && $privateapps === "1") {
-			info(t("You must be logged in to use addons. "));
+		if ((!local_user()) && Addon::isApp($a->module) && $privateapps === "1") {
+			info(L10n::t("You must be logged in to use addons. "));
 		} else {
 			include_once "addon/{$a->module}/{$a->module}.php";
 			if (function_exists($a->module . '_module')) {
@@ -289,12 +309,12 @@ if (strlen($a->module)) {
 		}
 
 		logger('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
-		header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . L10n::t('Not Found'));
 		$tpl = get_markup_template("404.tpl");
 		$a->page['content'] = replace_macros(
 			$tpl,
-			array(
-			'$message' =>  t('Page not found.'))
+			[
+			'$message' =>  L10n::t('Page not found.')]
 		);
 	}
 }
@@ -302,7 +322,7 @@ if (strlen($a->module)) {
 /**
  * Load current theme info
  */
-$theme_info_file = "view/theme/".current_theme()."/theme.php";
+$theme_info_file = 'view/theme/' . $a->getCurrentTheme() . '/theme.php';
 if (file_exists($theme_info_file)) {
 	require_once $theme_info_file;
 }
@@ -314,8 +334,8 @@ if (! x($a->page, 'content')) {
 	$a->page['content'] = '';
 }
 
-if (!$install && !$maintenance) {
-	call_hooks('page_content_top', $a->page['content']);
+if ($a->mode == App::MODE_NORMAL) {
+	Addon::callHooks('page_content_top', $a->page['content']);
 }
 
 /**
@@ -327,21 +347,21 @@ if ($a->module_loaded) {
 	$placeholder = '';
 
 	if ($a->module_class) {
-		call_hooks($a->module . '_mod_init', $placeholder);
+		Addon::callHooks($a->module . '_mod_init', $placeholder);
 		call_user_func([$a->module_class, 'init']);
 	} else if (function_exists($a->module . '_init')) {
-		call_hooks($a->module . '_mod_init', $placeholder);
+		Addon::callHooks($a->module . '_mod_init', $placeholder);
 		$func = $a->module . '_init';
 		$func($a);
 	}
 
-	if (function_exists(str_replace('-', '_', current_theme()) . '_init')) {
-		$func = str_replace('-', '_', current_theme()) . '_init';
+	if (function_exists(str_replace('-', '_', $a->getCurrentTheme()) . '_init')) {
+		$func = str_replace('-', '_', $a->getCurrentTheme()) . '_init';
 		$func($a);
 	}
 
 	if (! $a->error && $_SERVER['REQUEST_METHOD'] === 'POST') {
-		call_hooks($a->module . '_mod_post', $_POST);
+		Addon::callHooks($a->module . '_mod_post', $_POST);
 		if ($a->module_class) {
 			call_user_func([$a->module_class, 'post']);
 		} else if (function_exists($a->module . '_post')) {
@@ -351,7 +371,7 @@ if ($a->module_loaded) {
 	}
 
 	if (! $a->error) {
-		call_hooks($a->module . '_mod_afterpost', $placeholder);
+		Addon::callHooks($a->module . '_mod_afterpost', $placeholder);
 		if ($a->module_class) {
 			call_user_func([$a->module_class, 'afterpost']);
 		} else if (function_exists($a->module . '_afterpost')) {
@@ -361,21 +381,21 @@ if ($a->module_loaded) {
 	}
 
 	if (! $a->error) {
-		$arr = array('content' => $a->page['content']);
-		call_hooks($a->module . '_mod_content', $arr);
+		$arr = ['content' => $a->page['content']];
+		Addon::callHooks($a->module . '_mod_content', $arr);
 		$a->page['content'] = $arr['content'];
 		if ($a->module_class) {
-			$arr = array('content' => call_user_func([$a->module_class, 'content']));
+			$arr = ['content' => call_user_func([$a->module_class, 'content'])];
 		} else if (function_exists($a->module . '_content')) {
 			$func = $a->module . '_content';
-			$arr = array('content' => $func($a));
+			$arr = ['content' => $func($a)];
 		}
-		call_hooks($a->module . '_mod_aftercontent', $arr);
+		Addon::callHooks($a->module . '_mod_aftercontent', $arr);
 		$a->page['content'] .= $arr['content'];
 	}
 
-	if (function_exists(str_replace('-', '_', current_theme()) . '_content_loaded')) {
-		$func = str_replace('-', '_', current_theme()) . '_content_loaded';
+	if (function_exists(str_replace('-', '_', $a->getCurrentTheme()) . '_content_loaded')) {
+		$func = str_replace('-', '_', $a->getCurrentTheme()) . '_content_loaded';
 		$func($a);
 	}
 }
@@ -412,20 +432,20 @@ if (isset($homebase)) {
  * now that we've been through the module content, see if the page reported
  * a permission problem and if so, a 403 response would seem to be in order.
  */
-if (stristr(implode("", $_SESSION['sysmsg']), t('Permission denied'))) {
-	header($_SERVER["SERVER_PROTOCOL"] . ' 403 ' . t('Permission denied.'));
+if (stristr(implode("", $_SESSION['sysmsg']), L10n::t('Permission denied'))) {
+	header($_SERVER["SERVER_PROTOCOL"] . ' 403 ' . L10n::t('Permission denied.'));
 }
 
 /*
  * Report anything which needs to be communicated in the notification area (before the main body)
  */
-call_hooks('page_end', $a->page['content']);
+Addon::callHooks('page_end', $a->page['content']);
 
 /*
  * Add the navigation (menu) template
  */
 if ($a->module != 'install' && $a->module != 'maintenance') {
-	nav($a);
+	Nav::build($a);
 }
 
 /*
@@ -439,9 +459,9 @@ if ($a->is_mobile || $a->is_tablet) {
 	}
 	$a->page['footer'] = replace_macros(
 		get_markup_template("toggle_mobile_footer.tpl"),
-		array(
+		[
 			'$toggle_link' => $link,
-			'$toggle_text' => t('toggle mobile'))
+			'$toggle_text' => L10n::t('toggle mobile')]
 	);
 }
 
@@ -450,7 +470,7 @@ if ($a->is_mobile || $a->is_tablet) {
  */
 
 if (!$a->theme['stylesheet']) {
-	$stylesheet = current_theme_url();
+	$stylesheet = $a->getCurrentThemeStylesheetPath();
 } else {
 	$stylesheet = $a->theme['stylesheet'];
 }
@@ -469,7 +489,7 @@ if (isset($_GET["mode"]) && (($_GET["mode"] == "raw") || ($_GET["mode"] == "mini
 	/// @TODO one day, kill those error-surpressing @ stuff, or PHP should ban it
 	@$doc->loadHTML($content);
 
-	$xpath = new DomXPath($doc);
+	$xpath = new DOMXPath($doc);
 
 	$list = $xpath->query("//*[contains(@id,'tread-wrapper-')]");  /* */
 
@@ -514,15 +534,15 @@ header('X-Frame-Options: sameorigin');
  * The page templates are located in /view/php/ or in the theme directory.
  */
 if (isset($_GET["mode"])) {
-	$template = theme_include($_GET["mode"] . '.php');
+	$template = Theme::getPathForFile($_GET["mode"] . '.php');
 }
 
 // If there is no page template use the default page template
 if (empty($template)) {
-	$template = theme_include("default.php");
+	$template = Theme::getPathForFile("default.php");
 }
 
-/// @TODO Looks unsafe (remote-inclusion), is maybe not but theme_include() uses file_exists() but does not escape anything
+/// @TODO Looks unsafe (remote-inclusion), is maybe not but Theme::getPathForFile() uses file_exists() but does not escape anything
 require_once $template;
 
 killme();

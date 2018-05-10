@@ -17,6 +17,8 @@ use Friendica\Database\DBM;
 use Friendica\Model\Profile;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
+use Friendica\Util\Crypto;
+use Friendica\Util\Network;
 use Friendica\Util\XML;
 
 use dba;
@@ -24,8 +26,6 @@ use DOMXPath;
 use DOMDocument;
 
 require_once 'include/dba.php';
-require_once 'include/network.php';
-require_once "include/crypto.php";
 
 /**
  * @brief This class contain functions for probing URL
@@ -44,12 +44,12 @@ class Probe
 	 */
 	private static function rearrangeData($data)
 	{
-		$fields = array("name", "nick", "guid", "url", "addr", "alias",
+		$fields = ["name", "nick", "guid", "url", "addr", "alias",
 				"photo", "community", "keywords", "location", "about",
 				"batch", "notify", "poll", "request", "confirm", "poco",
-				"priority", "network", "pubkey", "baseurl");
+				"priority", "network", "pubkey", "baseurl"];
 
-		$newdata = array();
+		$newdata = [];
 		foreach ($fields as $field) {
 			if (isset($data[$field])) {
 				$newdata[$field] = $data[$field];
@@ -90,6 +90,9 @@ class Probe
 	/**
 	 * @brief Probes for webfinger path via "host-meta"
 	 *
+	 * We have to check if the servers in the future still will offer this.
+	 * It seems as if it was dropped from the standard.
+	 *
 	 * @param string $host The host part of an url
 	 *
 	 * @return array with template and type of the webfinger template for JSON or XML
@@ -107,35 +110,35 @@ class Probe
 
 		logger("Probing for ".$host, LOGGER_DEBUG);
 
-		$ret = z_fetch_url($ssl_url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
+		$ret = Network::curl($ssl_url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 		if ($ret['success']) {
 			$xml = $ret['body'];
-			$xrd = parse_xml_string($xml, false);
+			$xrd = XML::parseString($xml, false);
 			$host_url = 'https://'.$host;
 		}
 
 		if (!is_object($xrd)) {
-			$ret = z_fetch_url($url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml'));
+			$ret = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 			if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 				logger("Probing timeout for ".$url, LOGGER_DEBUG);
 				return false;
 			}
 			$xml = $ret['body'];
-			$xrd = parse_xml_string($xml, false);
+			$xrd = XML::parseString($xml, false);
 			$host_url = 'http://'.$host;
 		}
 		if (!is_object($xrd)) {
 			logger("No xrd object found for ".$host, LOGGER_DEBUG);
-			return array();
+			return [];
 		}
 
 		$links = XML::elementToArray($xrd);
 		if (!isset($links["xrd"]["link"])) {
 			logger("No xrd data found for ".$host, LOGGER_DEBUG);
-			return array();
+			return [];
 		}
 
-		$lrdd = array();
+		$lrdd = [];
 		// The following webfinger path is defined in RFC 7033 https://tools.ietf.org/html/rfc7033
 		// Problem is that Hubzilla currently doesn't provide all data in the JSON webfinger
 		// compared to the XML webfinger. So this is commented out by now.
@@ -209,7 +212,7 @@ class Probe
 	/**
 	 * @brief Check an URI for LRDD data
 	 *
-	 * this is a replacement for the "lrdd" function in include/network.php.
+	 * this is a replacement for the "lrdd" function.
 	 * It isn't used in this class and has some redundancies in the code.
 	 * When time comes we can check the existing calls for "lrdd" if we can rework them.
 	 *
@@ -223,13 +226,13 @@ class Probe
 		$webfinger = null;
 
 		if (is_bool($lrdd)) {
-			return array();
+			return [];
 		}
 
 		if (!$lrdd) {
 			$parts = @parse_url($uri);
 			if (!$parts) {
-				return array();
+				return [];
 			}
 
 			$host = $parts["host"];
@@ -249,7 +252,7 @@ class Probe
 
 		if (!$lrdd) {
 			logger("No lrdd data found for ".$uri, LOGGER_DEBUG);
-			return array();
+			return [];
 		}
 
 		foreach ($lrdd as $type => $template) {
@@ -284,17 +287,17 @@ class Probe
 			return false;
 		}
 
-		$data = array();
+		$data = [];
 
 		foreach ($webfinger["links"] as $link) {
-			$data[] = array("@attributes" => $link);
+			$data[] = ["@attributes" => $link];
 		}
 
 		if (is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
-				$data[] = array("@attributes" =>
-							array("rel" => "alias",
-								"href" => $alias));
+				$data[] = ["@attributes" =>
+							["rel" => "alias",
+								"href" => $alias]];
 			}
 		}
 
@@ -330,8 +333,8 @@ class Probe
 			$data["url"] = $uri;
 		}
 
-		if ($data["photo"] != "") {
-			$data["baseurl"] = matching_url(normalise_link($data["baseurl"]), normalise_link($data["photo"]));
+		if (x($data, "photo")) {
+			$data["baseurl"] = Network::getUrlMatch(normalise_link($data["baseurl"]), normalise_link($data["photo"]));
 		} else {
 			$data["photo"] = System::baseUrl().'/images/person-175.jpg';
 		}
@@ -341,7 +344,7 @@ class Probe
 				$data["name"] = $data["nick"];
 			}
 
-			if ($data["name"] == "") {
+			if (!x($data, "name")) {
 				$data["name"] = $data["url"];
 			}
 		}
@@ -365,7 +368,7 @@ class Probe
 		$data = self::rearrangeData($data);
 
 		// Only store into the cache if the value seems to be valid
-		if (!in_array($data['network'], array(NETWORK_PHANTOM, NETWORK_MAIL))) {
+		if (!in_array($data['network'], [NETWORK_PHANTOM, NETWORK_MAIL])) {
 			Cache::set("Probe::uri:".$network.":".$uri, $data, CACHE_DAY);
 
 			/// @todo temporary fix - we need a real contact update function that updates only changing fields
@@ -380,7 +383,7 @@ class Probe
 				&& $data["addr"]
 				&& $data["poll"]
 			) {
-				$fields = array('name' => $data['name'],
+				$fields = ['name' => $data['name'],
 						'nick' => $data['nick'],
 						'url' => $data['url'],
 						'addr' => $data['addr'],
@@ -390,9 +393,9 @@ class Probe
 						'about' => $data['about'],
 						'notify' => $data['notify'],
 						'network' => $data['network'],
-						'server_url' => $data['baseurl']);
+						'server_url' => $data['baseurl']];
 
-				$fieldnames = array();
+				$fieldnames = [];
 
 				foreach ($fields as $key => $val) {
 					if (empty($val)) {
@@ -404,13 +407,13 @@ class Probe
 
 				$fields['updated'] = DBM::date();
 
-				$condition = array('nurl' => normalise_link($data["url"]));
+				$condition = ['nurl' => normalise_link($data["url"])];
 
-				$old_fields = dba::select('gcontact', $fieldnames, $condition, array('limit' => 1));
+				$old_fields = dba::selectFirst('gcontact', $fieldnames, $condition);
 
 				dba::update('gcontact', $fields, $condition, $old_fields);
 
-				$fields = array('name' => $data['name'],
+				$fields = ['name' => $data['name'],
 						'nick' => $data['nick'],
 						'url' => $data['url'],
 						'addr' => $data['addr'],
@@ -425,9 +428,9 @@ class Probe
 						'confirm' => $data['confirm'],
 						'poco' => $data['poco'],
 						'network' => $data['network'],
-						'success_update' => DBM::date());
+						'success_update' => DBM::date()];
 
-				$fieldnames = array();
+				$fieldnames = [];
 
 				foreach ($fields as $key => $val) {
 					if (empty($val)) {
@@ -437,9 +440,16 @@ class Probe
 					}
 				}
 
-				$condition = array('nurl' => normalise_link($data["url"]), 'self' => false, 'uid' => 0);
+				$condition = ['nurl' => normalise_link($data["url"]), 'self' => false, 'uid' => 0];
 
-				$old_fields = dba::select('contact', $fieldnames, $condition, array('limit' => 1));
+				$old_fields = dba::selectFirst('contact', $fieldnames, $condition);
+
+				// When the contact doesn't exist, the value "true" will trigger an insert
+				if (!$old_fields) {
+					$old_fields = true;
+					$fields['blocked'] = false;
+					$fields['pending'] = false;
+				}
 
 				dba::update('contact', $fields, $condition, $old_fields);
 			}
@@ -537,12 +547,12 @@ class Probe
 			}
 
 			if ($host == 'twitter.com') {
-				return array("network" => NETWORK_TWITTER);
+				return ["network" => NETWORK_TWITTER];
 			}
 			$lrdd = self::hostMeta($host);
 
 			if (is_bool($lrdd)) {
-				return array();
+				return [];
 			}
 
 			$path_parts = explode("/", trim($parts["path"], "/"));
@@ -578,12 +588,12 @@ class Probe
 			$nick = substr($uri, 0, strpos($uri, '@'));
 
 			if (strpos($uri, '@twitter.com')) {
-				return array("network" => NETWORK_TWITTER);
+				return ["network" => NETWORK_TWITTER];
 			}
 			$lrdd = self::hostMeta($host);
 
 			if (is_bool($lrdd)) {
-				return array();
+				return [];
 			}
 
 			if (!$lrdd) {
@@ -639,7 +649,7 @@ class Probe
 
 		logger("Probing ".$uri, LOGGER_DEBUG);
 
-		if (in_array($network, array("", NETWORK_DFRN))) {
+		if (in_array($network, ["", NETWORK_DFRN])) {
 			$result = self::dfrn($webfinger);
 		}
 		if ((!$result && ($network == "")) || ($network == NETWORK_DIASPORA)) {
@@ -649,7 +659,7 @@ class Probe
 			$result = self::ostatus($webfinger);
 		}
 		if ((!$result && ($network == "")) || ($network == NETWORK_PUMPIO)) {
-			$result = self::pumpio($webfinger);
+			$result = self::pumpio($webfinger, $addr);
 		}
 		if ((!$result && ($network == "")) || ($network == NETWORK_FEED)) {
 			$result = self::feed($uri);
@@ -673,7 +683,6 @@ class Probe
 				$result["baseurl"] = substr($result["url"], 0, $pos).$host;
 			}
 		}
-
 		return $result;
 	}
 
@@ -692,7 +701,7 @@ class Probe
 		$xrd_timeout = Config::get('system', 'xrd_timeout', 20);
 		$redirects = 0;
 
-		$ret = z_fetch_url($url, false, $redirects, array('timeout' => $xrd_timeout, 'accept_content' => $type));
+		$ret = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => $type]);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
 		}
@@ -708,7 +717,7 @@ class Probe
 		}
 
 		// If it is not JSON, maybe it is XML
-		$xrd = parse_xml_string($data, false);
+		$xrd = XML::parseString($data, false);
 		if (!is_object($xrd)) {
 			logger("No webfinger data retrievable for ".$url, LOGGER_DEBUG);
 			return false;
@@ -720,7 +729,7 @@ class Probe
 			return false;
 		}
 
-		$webfinger = array();
+		$webfinger = [];
 
 		if (!empty($xrd_arr["xrd"]["subject"])) {
 			$webfinger["subject"] = $xrd_arr["xrd"]["subject"];
@@ -730,7 +739,7 @@ class Probe
 			$webfinger["aliases"] = $xrd_arr["xrd"]["alias"];
 		}
 
-		$webfinger["links"] = array();
+		$webfinger["links"] = [];
 
 		foreach ($xrd_arr["xrd"]["link"] as $value => $data) {
 			if (!empty($data["@attributes"])) {
@@ -759,7 +768,7 @@ class Probe
 	 */
 	private static function pollNoscrape($noscrape_url, $data)
 	{
-		$ret = z_fetch_url($noscrape_url);
+		$ret = Network::curl($noscrape_url);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
 		}
@@ -875,12 +884,12 @@ class Probe
 	 */
 	public static function profile($profile_link)
 	{
-		$data = array();
+		$data = [];
 
 		logger("Check profile ".$profile_link, LOGGER_DEBUG);
 
 		// Fetch data via noscrape - this is faster
-		$noscrape_url = str_replace(array("/hcard/", "/profile/"), "/noscrape/", $profile_link);
+		$noscrape_url = str_replace(["/hcard/", "/profile/"], "/noscrape/", $profile_link);
 		$data = self::pollNoscrape($noscrape_url, $data);
 
 		if (!isset($data["notify"])
@@ -894,7 +903,7 @@ class Probe
 			$data = self::pollHcard($profile_link, $data, true);
 		}
 
-		$prof_data = array();
+		$prof_data = [];
 		$prof_data["addr"]         = $data["addr"];
 		$prof_data["nick"]         = $data["nick"];
 		$prof_data["dfrn-request"] = $data["request"];
@@ -921,7 +930,7 @@ class Probe
 	private static function dfrn($webfinger)
 	{
 		$hcard_url = "";
-		$data = array();
+		$data = [];
 		foreach ($webfinger["links"] as $link) {
 			if (($link["rel"] == NAMESPACE_DFRN) && ($link["href"] != "")) {
 				$data["network"] = NETWORK_DFRN;
@@ -944,7 +953,7 @@ class Probe
 
 				//if (strstr($data["pubkey"], 'RSA ') || ($link["type"] == "RSA"))
 				if (strstr($data["pubkey"], 'RSA ')) {
-					$data["pubkey"] = rsatopem($data["pubkey"]);
+					$data["pubkey"] = Crypto::rsaToPem($data["pubkey"]);
 				}
 			}
 		}
@@ -957,6 +966,10 @@ class Probe
 					$data["addr"] = substr($alias, 5);
 				}
 			}
+		}
+
+		if (substr($webfinger["subject"], 0, 5) == "acct:") {
+			$data["addr"] = substr($webfinger["subject"], 5);
 		}
 
 		if (!isset($data["network"]) || ($hcard_url == "")) {
@@ -993,7 +1006,7 @@ class Probe
 	 */
 	private static function pollHcard($hcard_url, $data, $dfrn = false)
 	{
-		$ret = z_fetch_url($hcard_url);
+		$ret = Network::curl($hcard_url);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
 		}
@@ -1043,7 +1056,7 @@ class Probe
 			if ($search->length > 0) {
 				$data["pubkey"] = $search->item(0)->nodeValue;
 				if (strstr($data["pubkey"], 'RSA ')) {
-					$data["pubkey"] = rsatopem($data["pubkey"]);
+					$data["pubkey"] = Crypto::rsaToPem($data["pubkey"]);
 				}
 			}
 
@@ -1053,10 +1066,10 @@ class Probe
 			}
 		}
 
-		$avatar = array();
+		$avatar = [];
 		$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
 		foreach ($photos as $photo) {
-			$attr = array();
+			$attr = [];
 			foreach ($photo->attributes as $attribute) {
 				$attr[$attribute->name] = trim($attribute->value);
 			}
@@ -1083,7 +1096,7 @@ class Probe
 			if ($search->length > 0) {
 				foreach ($search as $link) {
 					//$data["request"] = $search->item(0)->nodeValue;
-					$attr = array();
+					$attr = [];
 					foreach ($link->attributes as $attribute) {
 						$attr[$attribute->name] = trim($attribute->value);
 					}
@@ -1112,7 +1125,7 @@ class Probe
 	private static function diaspora($webfinger)
 	{
 		$hcard_url = "";
-		$data = array();
+		$data = [];
 		foreach ($webfinger["links"] as $link) {
 			if (($link["rel"] == "http://microformats.org/profile/hcard") && ($link["href"] != "")) {
 				$hcard_url = $link["href"];
@@ -1133,7 +1146,7 @@ class Probe
 
 				//if (strstr($data["pubkey"], 'RSA ') || ($link["type"] == "RSA"))
 				if (strstr($data["pubkey"], 'RSA ')) {
-					$data["pubkey"] = rsatopem($data["pubkey"]);
+					$data["pubkey"] = Crypto::rsaToPem($data["pubkey"]);
 				}
 			}
 		}
@@ -1194,7 +1207,7 @@ class Probe
 	 */
 	private static function ostatus($webfinger, $short = false)
 	{
-		$data = array();
+		$data = [];
 
 		if (is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
@@ -1232,7 +1245,7 @@ class Probe
 							$pubkey = substr($pubkey, 5);
 						}
 					} elseif (normalise_link($pubkey) == 'http://') {
-						$ret = z_fetch_url($pubkey);
+						$ret = Network::curl($pubkey);
 						if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 							return false;
 						}
@@ -1244,7 +1257,7 @@ class Probe
 					if (sizeof($key) >= 3) {
 						$m = base64url_decode($key[1]);
 						$e = base64url_decode($key[2]);
-						$data["pubkey"] = metopem($m, $e);
+						$data["pubkey"] = Crypto::meToPem($m, $e);
 					}
 				}
 			}
@@ -1264,7 +1277,7 @@ class Probe
 		}
 
 		// Fetch all additional data from the feed
-		$ret = z_fetch_url($data["poll"]);
+		$ret = Network::curl($data["poll"]);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
 		}
@@ -1323,16 +1336,35 @@ class Probe
 
 		$xpath = new DomXPath($doc);
 
-		$data = array();
+		$data = [];
 
-		// This is ugly - but pump.io doesn't seem to know a better way for it
-		$data["name"] = trim($xpath->query("//h1[@class='media-header']")->item(0)->nodeValue);
-		$pos = strpos($data["name"], chr(10));
-		if ($pos) {
-			$data["name"] = trim(substr($data["name"], 0, $pos));
+		$data["name"] = $xpath->query("//span[contains(@class, 'p-name')]")->item(0)->nodeValue;
+
+		if ($data["name"] == '') {
+			// This is ugly - but pump.io doesn't seem to know a better way for it
+			$data["name"] = trim($xpath->query("//h1[@class='media-header']")->item(0)->nodeValue);
+			$pos = strpos($data["name"], chr(10));
+			if ($pos) {
+				$data["name"] = trim(substr($data["name"], 0, $pos));
+			}
 		}
 
-		$avatar = $xpath->query("//img[@class='img-rounded media-object']")->item(0);
+		$data["location"] = $xpath->query("//p[contains(@class, 'p-locality')]")->item(0)->nodeValue;
+
+		if ($data["location"] == '') {
+			$data["location"] = $xpath->query("//p[contains(@class, 'location')]")->item(0)->nodeValue;
+		}
+
+		$data["about"] = $xpath->query("//p[contains(@class, 'p-note')]")->item(0)->nodeValue;
+
+		if ($data["about"] == '') {
+			$data["about"] = $xpath->query("//p[contains(@class, 'summary')]")->item(0)->nodeValue;
+		}
+
+		$avatar = $xpath->query("//img[contains(@class, 'u-photo')]")->item(0);
+		if (!$avatar) {
+			$avatar = $xpath->query("//img[@class='img-rounded media-object']")->item(0);
+		}
 		if ($avatar) {
 			foreach ($avatar->attributes as $attribute) {
 				if ($attribute->name == "src") {
@@ -1340,9 +1372,6 @@ class Probe
 				}
 			}
 		}
-
-		$data["location"] = $xpath->query("//p[@class='location']")->item(0)->nodeValue;
-		$data["about"] = $xpath->query("//p[@class='summary']")->item(0)->nodeValue;
 
 		return $data;
 	}
@@ -1354,9 +1383,9 @@ class Probe
 	 *
 	 * @return array pump.io data
 	 */
-	private static function pumpio($webfinger)
+	private static function pumpio($webfinger, $addr)
 	{
-		$data = array();
+		$data = [];
 		foreach ($webfinger["links"] as $link) {
 			if (($link["rel"] == "http://webfinger.net/rel/profile-page")
 				&& ($link["type"] == "text/html")
@@ -1392,6 +1421,13 @@ class Probe
 
 		$data = array_merge($data, $profile_data);
 
+		if (($addr != '') && ($data['name'] != '')) {
+			$name = trim(str_replace($addr, '', $data['name']));
+			if ($name != '') {
+				$data['name'] = $name;
+			}
+		}
+
 		return $data;
 	}
 
@@ -1425,7 +1461,7 @@ class Probe
 		$feed_url = "";
 
 		foreach ($feeds as $feed) {
-			$attr = array();
+			$attr = [];
 			foreach ($feed->attributes as $attribute) {
 				$attr[$attribute->name] = trim($attribute->value);
 			}
@@ -1448,7 +1484,7 @@ class Probe
 	 */
 	private static function feed($url, $probe = true)
 	{
-		$ret = z_fetch_url($url);
+		$ret = Network::curl($url);
 		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 			return false;
 		}
@@ -1509,41 +1545,43 @@ class Probe
 	 */
 	private static function mail($uri, $uid)
 	{
-		if (!validate_email($uri)) {
+		if (!Network::isEmailDomainValid($uri)) {
 			return false;
 		}
 
-		if ($uid != 0) {
-			$x = q("SELECT `prvkey` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
+		if ($uid == 0) {
+			return false;
+		}
 
-			$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
+		$x = q("SELECT `prvkey` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
 
-			if (DBM::is_result($x) && DBM::is_result($r)) {
-				$mailbox = Email::constructMailboxName($r[0]);
-				$password = '';
-				openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
-				$mbox = Email::connect($mailbox, $r[0]['user'], $password);
-				if (!mbox) {
-					return false;
-				}
-			}
+		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-			$msgs = Email::poll($mbox, $uri);
-			logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
-
-			if (!count($msgs)) {
+		if (DBM::is_result($x) && DBM::is_result($r)) {
+			$mailbox = Email::constructMailboxName($r[0]);
+			$password = '';
+			openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
+			$mbox = Email::connect($mailbox, $r[0]['user'], $password);
+			if (!$mbox) {
 				return false;
 			}
 		}
 
+		$msgs = Email::poll($mbox, $uri);
+		logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
+
+		if (!count($msgs)) {
+			return false;
+		}
+
 		$phost = substr($uri, strpos($uri, '@') + 1);
 
-		$data = array();
+		$data = [];
 		$data["addr"]    = $uri;
 		$data["network"] = NETWORK_MAIL;
 		$data["name"]    = substr($uri, 0, strpos($uri, '@'));
 		$data["nick"]    = $data["name"];
-		$data["photo"]   = avatar_img($uri);
+		$data["photo"]   = Network::lookupAvatarByEmail($uri);
 		$data["url"]     = 'mailto:'.$uri;
 		$data["notify"]  = 'smtp '.random_string();
 		$data["poll"]    = 'email '.random_string();

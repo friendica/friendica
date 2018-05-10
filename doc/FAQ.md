@@ -21,17 +21,16 @@ Admins
 * **[Where can I find the source code of friendica, addons and themes?](help/FAQ#sources)**
 * **[I've changed the my email address now the admin panel is gone?](help/FAQ#adminaccount1)**
 * **[Can there be more then just one admin for a node?](help/FAQ#adminaccount2)**
+* **[The Database structure seems not to be updated. What can I do?](help/FAQ#dbupdate)**
 
 User
 --------
-*****
 <a name="ssl"></a>
-
 ### Why do I get warnings about SSL certificates?
 
 SSL (Secure Socket Layer) is a technology to encrypt data transfer between computers.
 Sometimes your browser warns you about a missing or invalid certificate.
-These warnings can have three reasons: 
+These warnings can have three reasons:
 
 1. The server you are connected to doesn't offer SSL encryption.
 2. The server has a self-signed certificate (not recommended).
@@ -40,7 +39,6 @@ These warnings can have three reasons:
 We recommend to talk to the admin(s) of the affected friendica server. (Admins, please see the respective section of the [admin manual](help/SSL).)
 
 <a name="upload"></a>
-
 ### How can I upload images, files, links, videos and sound files to posts?
 
 You can upload images from your computer using the [editor](help/Text_editor).
@@ -51,8 +49,8 @@ Generally, you can attach any kind of file to a post.
 This is possible by using the "paper-clip"-symbol in the editor.
 These files will be linked to your post and can be downloaded by your contacts.
 But it's not possible to get a preview for these items.
-Because of this, this upload method is only recommended for office or zipped files. 
-If you want to share content from Dropbox, Owncloud or any other [filehoster](http://en.wikipedia.org/wiki/Comparison_of_file_hosting_services), use the "link"-button (chain-symbol). 
+Because of this, this upload method is only recommended for office or zipped files.
+If you want to share content from Dropbox, Owncloud or any other [filehoster](http://en.wikipedia.org/wiki/Comparison_of_file_hosting_services), use the "link"-button (chain-symbol).
 
 When you're adding URLs of other webpages with the "link"-button, Friendica tries to create a small preview.
 If this doesn't work, try to add the link by typing: [url=http://example.com]*self-chosen name*[/url].
@@ -60,9 +58,9 @@ If this doesn't work, try to add the link by typing: [url=http://example.com]*se
 You can also add video and audio files to posts.
 However, instead of a direct upload you have to use one of the following methods:
 
-1. Add the video or audio link of a hoster (Youtube, Vimeo, Soundcloud and anyone else with oembed/opengraph-support). Videos will be shown with a preview image you can click on to start. SoundCloud directly inserts a player to your post. 
+1. Add the video or audio link of a hoster (Youtube, Vimeo, Soundcloud and anyone else with oembed/opengraph-support). Videos will be shown with a preview image you can click on to start. SoundCloud directly inserts a player to your post.
 
-2. If you have your own server, you can upload multimedia files via FTP and insert the URL. 
+2. If you have your own server, you can upload multimedia files via FTP and insert the URL.
 
 Friendica uses HTML5 for embedding content.
 Therefore, the supported files are dependent on your browser and operating system.
@@ -70,15 +68,14 @@ Some supported filetypes are WebM, MP4, MP3 and OGG.
 See Wikipedia for more of them ([video](http://en.wikipedia.org/wiki/HTML5_video), [audio](http://en.wikipedia.org/wiki/HTML5_audio)).
 
 <a name="avatars"></a>
-
 ### Is it possible to have different avatars per profile?
 
-Yes. On your Edit/Manage Profiles page, you will find a "change profile photo" link.
+Yes.
+On your Edit/Manage Profiles page, you will find a "change profile photo" link.
 Clicking this will take you to a page where you can upload a photograph and select which profile it will be associated with.
 To avoid privacy leakage, we only display the photograph associated with your default profile as the avatar in your posts.
 
 <a name="contacts"></a>
-
 ### What is the difference between blocked|ignored|archived|hidden contacts?
 
 We prevent direct communication with **blocked contacts**.
@@ -91,7 +88,7 @@ Blocked contacts cannot do this. They cannot communicate with you directly, only
 However we do not import their posts or private messages to you.
 Like blocking, you will still see this person's comments to posts made by your friends.
 
-A plugin called "blockem" can be installed to collapse/hide all posts from a particular person in your stream if you desire complete blocking of an individual, including his/her conversations with your other friends.
+An addon called "blockem" can be installed to collapse/hide all posts from a particular person in your stream if you desire complete blocking of an individual, including his/her conversations with your other friends.
 
 An **archived contact** means that communication is not possible and will not be attempted.
 (Perhaps the person moved to a new site and removed the old profile.)
@@ -101,7 +98,6 @@ A **hidden contact** will not be displayed in any "friend list" (except to you).
 However a hidden contact will appear normally in conversations and this may expose his/her hidden status to anybody who can see the conversation.
 
 <a name="removed"></a>
-
 ### What happens when an account is removed? Is it truly deleted?
 
 If you delete your account, we will immediately remove all your content on **your** server.
@@ -114,43 +110,34 @@ We can block it in several ways so that it appears empty and all profile informa
 After that, your account is deleted.
 
 <a name="hashtag"></a>
-
 ### Can I follow a hashtag?
 
-No. The act of 'following' a hashtags is an interesting technology, but presents a few issues.
-
-1. Posts would have to be copied to all sites on the network that are "listening" to that hashtag. This would increase the storage demands to the detriment of small sites. It would make the use of shared hosting practically impossible.
-
-2. Making spam easy (tag spam is a serious issue on Twitter for instance)
-
-3. It creates a natural bias towards large sites which hold more tagged content - if your network uses tagging instead of other conversation federation mechanisms such as groups/forums.
-
-Instead, we offer other mechanisms for wide-area conversations while retaining a 'level playing ground' for both large and small sites, such as forums and community pages and shared tags.
+Yes. Simply add the hash tag to your saved searches.
+The posts will appear on your network page.
+For technical reasons, your answers to such posts won't appear on the "personal" tab in the network page and the whole thread isn't accessible via the API.
 
 <a name="rss"></a>
-
 ### How to create a RSS feed of the stream?
 
 If you want to share your public page via rss you can use one of the following links:
 
-RSS feed of your posts
+#### RSS feed of your posts
 
-	basic-url.com/**dfrn_poll/profilename  
+	basic-url.com//feed/[nickname]/posts
 
-	Example: Friendica Support 
-	
-	https://forum.friendi.ca/dfrn_poll/helpers
+Example: Friendica Support
 
-RSS feed of the conversations at your site
+	https://forum.friendi.ca/feed/helpers/posts
 
-	basic-url.com/dfrn_poll/profilename/converse
-	
-	Example: Friendica Support 
-	
-	https://forum.friendi.ca/dfrn_poll/helpers/converse
+#### RSS feed of the conversations at your site
+
+	basic-url.com/feed/profilename/comments
+
+Example: Friendica Support
+
+	https://forum.friendi.ca/feed/helpers/comments
 
 <a name="clients"></a>
-
 ### Are there any clients for friendica I can use?
 
 Friendica is using a [Twitter/GNU Social compatible API](help/api), which means you can use any Twitter/GNU Social client for your plattform as long as you can change the API path in its settings.
@@ -179,22 +166,25 @@ Depending on the features of the client you might encounter some glitches in usa
 ### Where I can find help?
 
 If you have problems with your Friendica page, you can ask the community at the [Friendica Support Group](https://forum.friendi.ca/profile/helpers).
-If you can't use your default profile you can use an account at a public site [list](https://dir.friendica.social/servers) or you can use the Librelist mailing list.
-If you want to use the mailing list, please just send a mail to friendica AT librelist DOT com.
+If you can't use your default profile you can use an account at a public site [list](https://dir.friendica.social/servers).
 
-If you are a theme developer, you will find help at this forum: [Friendica Theme Developers](https://friendica.eu/profile/ftdevs).
+In case you do not want to set up another account on Friendica, you can also use one of the following channels to reach out for help:
+
+  * [Friendica Support Forum](https://forum.friendi.ca/~helpers)
+  * [Mailing List Archive](http://mailman.friendi.ca/mailman/listinfo/support-friendi.ca) you can subscribe to the list by sending an email to ``support-request(at)friendi.ca?subject=subscribe``
+  * XMPP/Jabber MUC: support(at)forum.friendi.ca
+  * IRC: #friendica at irc.freenode.net
+  * Matrix: #friendi.ca or #friendica at matrix.org
 
 Admin
 --------
-*****
-<a name="multiple"></a>
 
+<a name="multiple"></a>
 ### Can I configure multiple domains with the same code instance?
 
 No, this function is no longer supported as of Friendica 3.3 onwards.
 
 <a name="sources"></a>
-
 ### Where can I find the source code of friendica, addons and themes?
 
 You can find the main respository [here](https://github.com/friendica/friendica).
@@ -202,7 +192,7 @@ There you will always find the current stable version of friendica.
 
 Addons are listed at [this page](https://github.com/friendica/friendica-addons).
 
-If you are searching for new themes, you can find them at [Friendica-Themes.com](http://friendica-themes.com/) 
+If you are searching for new themes, you can find them at [Friendica-Themes.com](http://friendica-themes.com/)
 
 <a name="adminaccount1"></a>
 ### I've changed my email address now the admin panel is gone?
@@ -212,5 +202,19 @@ Have a look into your <tt>.htconfig.php</tt> and fix your email address there.
 <a name="adminaccount2"></a>
 ### Can there be more then one admin for a node?
 
-Yes. You just have to list more then one email address in the
-<tt>.htconfig.php</tt> file. The listed emails need to be separated by a comma.
+Yes.
+You just have to list more then one email address in the
+<tt>.htconfig.php</tt> file.
+The listed emails need to be separated by a comma.
+
+<a name="dbupdate">
+### The Database structure seems not to be updated. What can I do?
+
+Please have a look at the Admin panel under [DB updates](/admin/dbsync/) and follow the link to *check database structure*.
+This will start a background process to check if the structure is up to the current definition.
+
+You can manually execute the structure update from the CLI in the base directory of your Friendica installation by running the following command:
+
+    bin/console dbstructure update
+
+if there occur any errors, please contact the [support forum](https://forum.friendi.ca/profile/helpers).

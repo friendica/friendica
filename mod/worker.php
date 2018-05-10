@@ -4,11 +4,10 @@
  * @brief Module for running the worker as frontend process
  */
 
-use Friendica\Core\Worker;
 use Friendica\Core\Config;
-use Friendica\Core\PConfig;
+use Friendica\Core\Worker;
 
-function worker_init($a){
+function worker_init(){
 
 	if (!Config::get("system", "frontend_worker")) {
 		return;
@@ -29,7 +28,7 @@ function worker_init($a){
 		return;
 	}
 
-	$a->start_process();
+	Worker::startProcess();
 
 	logger("Front end worker started: ".getmypid());
 
@@ -50,7 +49,7 @@ function worker_init($a){
 
 	Worker::unclaimProcess();
 
-	$a->end_process();
+	Worker::endProcess();
 
 	logger("Front end worker ended: ".getmypid());
 

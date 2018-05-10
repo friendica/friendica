@@ -164,6 +164,11 @@
 									<button type="submit" name="submit" class="btn btn-primary" value="{{$submit|escape:'html'}}">{{$submit}}</button>
 								</div>
 								<div class="clear"></div>
+								{{if $reason}}
+								<h4>{{$lbl_info2}}</h4>
+								<p>{{$reason}}</p>
+								<div class="clear"></div>
+								{{/if}}
 							</div>
 						</div>
 					</div>

@@ -6,9 +6,11 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\Item;
 use dba;
 
 require_once 'include/dba.php';
@@ -17,17 +19,16 @@ class Expire {
 	public static function execute($param = '', $hook_name = '') {
 		global $a;
 
-		require_once 'include/datetime.php';
 		require_once 'include/items.php';
 
-		load_hooks();
+		Addon::loadHooks();
 
 		if ($param == 'delete') {
 			logger('Delete expired items', LOGGER_DEBUG);
 			// physically remove anything that has been deleted for more than two months
 			$r = dba::p("SELECT `id` FROM `item` WHERE `deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
 			while ($row = dba::fetch($r)) {
-				dba::delete('item', array('id' => $row['id']));
+				dba::delete('item', ['id' => $row['id']]);
 			}
 			dba::close($r);
 
@@ -39,10 +40,10 @@ class Expire {
 			}
 			return;
 		} elseif (intval($param) > 0) {
-			$user = dba::select('user', array('uid', 'username', 'expire'), array('uid' => $param), array('limit' => 1));
+			$user = dba::selectFirst('user', ['uid', 'username', 'expire'], ['uid' => $param]);
 			if (DBM::is_result($user)) {
 				logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - interval: '.$user['expire'], LOGGER_DEBUG);
-				item_expire($user['uid'], $user['expire']);
+				Item::expire($user['uid'], $user['expire']);
 				logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - done ', LOGGER_DEBUG);
 			}
 			return;
@@ -50,7 +51,7 @@ class Expire {
 			foreach ($a->hooks["expire"] as $hook) {
 				if ($hook[1] == $hook_name) {
 					logger("Calling expire hook '" . $hook[1] . "'", LOGGER_DEBUG);
-					call_single_hook($a, $hook_name, $hook, $data);
+					Addon::callSingleHook($a, $hook_name, $hook, $data);
 				}
 			}
 			return;
@@ -58,13 +59,13 @@ class Expire {
 
 		logger('expire: start');
 
-		Worker::add(array('priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true),
+		Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 				'Expire', 'delete');
 
 		$r = dba::p("SELECT `uid`, `username` FROM `user` WHERE `expire` != 0");
 		while ($row = dba::fetch($r)) {
 			logger('Calling expiry for user '.$row['uid'].' ('.$row['username'].')', LOGGER_DEBUG);
-			Worker::add(array('priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true),
+			Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 					'Expire', (int)$row['uid']);
 		}
 		dba::close($r);
@@ -74,7 +75,7 @@ class Expire {
 		if (is_array($a->hooks) && array_key_exists('expire', $a->hooks)) {
 			foreach ($a->hooks['expire'] as $hook) {
 				logger("Calling expire hook for '" . $hook[1] . "'", LOGGER_DEBUG);
-				Worker::add(array('priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true),
+				Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 						'Expire', 'hook', $hook[1]);
 			}
 		}

@@ -23,7 +23,7 @@ class XML
 	 *
 	 * @return string The created XML
 	 */
-	public static function fromArray($array, &$xml, $remove_header = false, $namespaces = array(), $root = true)
+	public static function fromArray($array, &$xml, $remove_header = false, $namespaces = [], $root = true)
 	{
 		if ($root) {
 			foreach ($array as $key => $value) {
@@ -52,6 +52,7 @@ class XML
 			}
 		}
 
+		$element = null;
 		foreach ($array as $key => $value) {
 			if (!isset($element) && isset($xml)) {
 				$element = $xml;
@@ -140,7 +141,7 @@ class XML
 	 *
 	 * @return object XML element object
 	 */
-	public static function createElement($doc, $element, $value = "", $attributes = array())
+	public static function createElement($doc, $element, $value = "", $attributes = [])
 	{
 		$element = $doc->createElement($element, xmlify($value));
 
@@ -162,7 +163,7 @@ class XML
 	 * @param array  $attributes array containing the attributes
 	 * @return void
 	 */
-	public static function addElement($doc, $parent, $element, $value = "", $attributes = array())
+	public static function addElement($doc, $parent, $element, $value = "", $attributes = [])
 	{
 		$element = self::createElement($doc, $element, $value, $attributes);
 		$parent->appendChild($element);
@@ -185,16 +186,17 @@ class XML
 			return(null);
 		}
 
+		$xml_element_copy = '';
 		if (!is_string($xml_element)
 			&& !is_array($xml_element)
 			&& (get_class($xml_element) == 'SimpleXMLElement')
 		) {
-				$xml_element_copy = $xml_element;
-				$xml_element = get_object_vars($xml_element);
+			$xml_element_copy = $xml_element;
+			$xml_element = get_object_vars($xml_element);
 		}
 
 		if (is_array($xml_element)) {
-			$result_array = array();
+			$result_array = [];
 			if (count($xml_element) <= 0) {
 				return (trim(strval($xml_element_copy)));
 			}
@@ -207,9 +209,9 @@ class XML
 
 			if ($recursion_depth == 0) {
 				$temp_array = $result_array;
-				$result_array = array(
+				$result_array = [
 					strtolower($xml_element_copy->getName()) => $temp_array,
-				);
+				];
 			}
 
 			return ($result_array);
@@ -242,12 +244,12 @@ class XML
 	public static function toArray($contents, $namespaces = true, $get_attributes = 1, $priority = 'attribute')
 	{
 		if (!$contents) {
-			return array();
+			return [];
 		}
 
 		if (!function_exists('xml_parser_create')) {
 			logger('Xml::toArray: parser function missing');
-			return array();
+			return [];
 		}
 
 
@@ -262,7 +264,7 @@ class XML
 
 		if (! $parser) {
 			logger('Xml::toArray: xml_parser_create: no resource');
-			return array();
+			return [];
 		}
 
 		xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, "UTF-8");
@@ -282,15 +284,15 @@ class XML
 		}
 
 		//Initializations
-		$xml_array = array();
-		$parents = array();
-		$opened_tags = array();
-		$arr = array();
+		$xml_array = [];
+		$parents = [];
+		$opened_tags = [];
+		$arr = [];
 
 		$current = &$xml_array; // Reference
 
 		// Go through the tags.
-		$repeated_tag_index = array(); // Multiple tags with same name will be turned into an array
+		$repeated_tag_index = []; // Multiple tags with same name will be turned into an array
 		foreach ($xml_values as $data) {
 			$tag        = $data['tag'];
 			$type       = $data['type'];
@@ -298,8 +300,8 @@ class XML
 			$attributes = isset($data['attributes']) ? $data['attributes'] : null;
 			$value      = isset($data['value']) ? $data['value'] : null;
 
-			$result = array();
-			$attributes_data = array();
+			$result = [];
+			$attributes_data = [];
 
 			if (isset($value)) {
 				if ($priority == 'tag') {
@@ -344,7 +346,7 @@ class XML
 						$current[$tag][$repeated_tag_index[$tag.'_'.$level]] = $result;
 						$repeated_tag_index[$tag.'_'.$level]++;
 					} else { // This section will make the value an array if multiple tags with the same name appear together
-						$current[$tag] = array($current[$tag], $result); // This will combine the existing item and the new item together to make an array
+						$current[$tag] = [$current[$tag], $result]; // This will combine the existing item and the new item together to make an array
 						$repeated_tag_index[$tag.'_'.$level] = 2;
 
 						if (isset($current[$tag.'_attr'])) { // The attribute of the last(0th) tag must be moved as well
@@ -374,7 +376,7 @@ class XML
 						}
 						$repeated_tag_index[$tag.'_'.$level]++;
 					} else { // If it is not an array...
-						$current[$tag] = array($current[$tag], $result); //...Make it an array using using the existing value and the new value
+						$current[$tag] = [$current[$tag], $result]; //...Make it an array using using the existing value and the new value
 						$repeated_tag_index[$tag.'_'.$level] = 1;
 						if ($priority == 'tag' and $get_attributes) {
 							if (isset($current[$tag.'_attr'])) { // The attribute of the last(0th) tag must be moved as well
@@ -412,5 +414,21 @@ class XML
 		foreach ($list as $child) {
 			$child->parentNode->removeChild($child);
 		}
+	}
+
+	public static function parseString($s, $strict = true)
+	{
+		// the "strict" parameter is deactivated
+		libxml_use_internal_errors(true);
+
+		$x = @simplexml_load_string($s);
+		if (!$x) {
+			logger('libxml: parse: error: ' . $s, LOGGER_DATA);
+			foreach (libxml_get_errors() as $err) {
+				logger('libxml: parse: ' . $err->code." at ".$err->line.":".$err->column." : ".$err->message, LOGGER_DATA);
+			}
+			libxml_clear_errors();
+		}
+		return $x;
 	}
 }

@@ -30,9 +30,9 @@
 		
 			{{if $nav.network}}<li><a id="nav-network-link" class="nav-commlink {{$nav.network.2}}" href="{{$nav.network.0}}">{{$nav.network.1}}</a></li>{{/if}}
 		
-				{{if $nav.community}}
-				<li><a id="nav-community-link" class="nav-commlink {{$nav.community.2}}" href="{{$nav.community.0}}">{{$nav.community.1}}</a></li>
-				{{/if}}
+			{{if $nav.community}}
+			<li><a id="nav-community-link" class="nav-commlink {{$nav.community.2}}" href="{{$nav.community.0}}">{{$nav.community.1}}</a></li>
+			{{/if}}
 
 			<li><a id="nav-search-link" class="nav-link {{$nav.search.2}}" href="{{$nav.search.0}}">{{$nav.search.1}}</a></li>
 			<li><a id="nav-directory-link" class="nav-link {{$nav.directory.2}}" href="{{$nav.directory.0}}">{{$nav.directory.1}}</a></li>

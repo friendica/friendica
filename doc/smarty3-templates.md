@@ -39,7 +39,7 @@ They are initialized with an array of data, depending on the tyle of the field.
 
 All of these take an array holding the values, e.g. for a one line text input field, which is required and should be used to type email addesses use something along the lines of:
 
-		'$adminmail' => array('adminmail', t('Site administrator email address'), $adminmail, t('Your account email address must match this in order to use the web admin panel.'), 'required', '', 'email'),
+		'$adminmail' => array('adminmail', L10n::t('Site administrator email address'), $adminmail, L10n::t('Your account email address must match this in order to use the web admin panel.'), 'required', '', 'email'),
 
 To evaluate the input value, you can then use the $_POST array, more precisely the $_POST['adminemail'] variable.
 

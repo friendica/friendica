@@ -6,6 +6,13 @@
  <dd>{{$profile.fullname.1}}</dd>
 </dl>
 
+{{if $profile.membersince}}
+<dl id="aprofile-membersince" class="aprofile">
+ <dt>{{$profile.membersince.0}}</dt>
+ <dd>{{$profile.membersince.1}}</dd>
+</dl>
+{{/if}}
+
 {{if $profile.gender}}
 <dl id="aprofile-gender" class="aprofile">
  <dt>{{$profile.gender.0}}</dt>

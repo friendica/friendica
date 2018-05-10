@@ -28,7 +28,7 @@ a.btn, a.btn:hover {
 }
 
 .overline {
-	text-decoration: overline;
+  text-decoration: overline;
 }
 
 /* List of social Networks */
@@ -201,6 +201,18 @@ blockquote.shared_content {
   content: ' »';
 }
 
+#profile-photo-wrapper {
+  clear: both;
+  overflow: hidden;
+}
+
+#newmember-tips {
+  font-size: 1.2em;
+  float: right;
+  margin-top: -32px;
+  padding-right: 10px;
+}
+
 /* headers */
 h1, h2, h3, h4, h5, h6 {
   margin: 5px 0px 5px 0px;
@@ -237,8 +249,22 @@ span.oembed, h4 {
   margin: 0px 0px 0px 0px;
 }
 
-code { display: block; background-color: #eee; color: #666; padding:1em; font-size: 0.8em; font-family: monospace; }
-key { display: inline; background-color: #eee; color: #666; padding:0.2em; font-size: 0.8em; font-family: monospace; }
+code {
+  display: block;
+  background-color: #eee;
+  color: #666;
+  padding: 1em;
+  font-size: 0.85em;
+  font-family: monospace;
+}
+key {
+  display: inline;
+  background-color: #eee;
+  color: #666;
+  padding: 0.2em;
+  font-size: 0.85em;
+  font-family: monospace;
+}
 
 /* fields help text */
 .field .field_help {
@@ -399,14 +425,10 @@ a {
   color: #00a700;
 }
 .federation-graph {
-  width: 400px;
-  height: 400px;
+  margin: 0 auto;
   float: right;
-  margin: 20px;
 }
 .federation-network-graph {
-  width: 240px;
-  height: 240px;
   float: left;
   margin: 20px;
 }
@@ -440,6 +462,22 @@ td.federation-data {
 
 #forum-widget-collapse {
   opacity: 0.3;
+}
+
+/* help widget */
+aside .help-aside-wrapper ul {
+  padding-left: 1em;
+}
+
+aside .help-aside-wrapper h1 {
+  font-size:2em
+}
+
+.md_warning {
+  padding: 1em;
+  border: #ff0000 solid 2px;
+  background-color: #f9a3a3;
+  color: #ffffff;
 }
 
 #forum-widget-collapse:hover {
@@ -501,19 +539,19 @@ td.federation-data {
 
 /* admin pending user notes */
 td.pendingnote {
-	padding-left: 20px;
-	padding-right: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 td.pendingnote > p > span {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 /* warning message */
 .warning-message {
-	padding: 10px;
-	margin: 5px;
-	border-left: 5px solid #f00;
-	font-weight: bold;
+  padding: 10px;
+  margin: 5px;
+  border-left: 5px solid #f00;
+  font-weight: bold;
 }
 
 /* src/href attributes filter error display */

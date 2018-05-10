@@ -1,19 +1,30 @@
 <?php
+/**
+ * @file mod/display.php
+ */
 
 use Friendica\App;
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\HTML;
+use Friendica\Core\ACL;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Group;
+use Friendica\Model\Profile;
 use Friendica\Protocol\DFRN;
 
-function display_init(App $a) {
-	if (Config::get('system','block_public') && !local_user() && !remote_user()) {
+function display_init(App $a)
+{
+	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
 		return;
 	}
 
 	$nick = (($a->argc > 1) ? $a->argv[1] : '');
-	$profiledata = array();
+	$profiledata = [];
 
 	if ($a->argc == 3) {
 		if (substr($a->argv[2], -5) == '.atom') {
@@ -58,7 +69,7 @@ function display_init(App $a) {
 
 		if (!DBM::is_result($r)) {
 			$a->error = 404;
-			notice(t('Item not found.') . EOL);
+			notice(L10n::t('Item not found.') . EOL);
 			return;
 		}
 	} elseif (($a->argc == 3) && ($nick == 'feed-item')) {
@@ -97,16 +108,16 @@ function display_init(App $a) {
 				}
 				$profiledata["network"] = NETWORK_DFRN;
 			} else {
-				$profiledata = array();
+				$profiledata = [];
 			}
 		}
 	}
 
-	profile_load($a, $nick, 0, $profiledata);
+	Profile::load($a, $nick, 0, $profiledata);
 }
 
 function display_fetchauthor($a, $item) {
-	$profiledata = array();
+	$profiledata = [];
 	$profiledata["uid"] = -1;
 	$profiledata["nickname"] = $item["author-name"];
 	$profiledata["name"] = $item["author-name"];
@@ -165,7 +176,7 @@ function display_fetchauthor($a, $item) {
 			$profiledata["photo"] = $matches[1];
 		}
 		$profiledata["nickname"] = $profiledata["name"];
-		$profiledata["network"] = GetProfileUsername($profiledata["url"], "", false, true);
+		$profiledata["network"] = Protocol::matchByProfileUrl($profiledata["url"]);
 
 		$profiledata["address"] = "";
 		$profiledata["about"] = "";
@@ -176,7 +187,7 @@ function display_fetchauthor($a, $item) {
 	$profiledata["photo"] = System::removedBaseUrl($profiledata["photo"]);
 
 	if (local_user()) {
-		if (in_array($profiledata["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
+		if (in_array($profiledata["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
 			$profiledata["remoteconnect"] = System::baseUrl()."/follow?url=".urlencode($profiledata["url"]);
 		}
 	} elseif ($profiledata["network"] == NETWORK_DFRN) {
@@ -189,20 +200,24 @@ function display_fetchauthor($a, $item) {
 
 function display_content(App $a, $update = false, $update_uid = 0) {
 	if (Config::get('system','block_public') && !local_user() && !remote_user()) {
-		notice(t('Public access denied.') . EOL);
+		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
 
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
-	require_once 'include/acl_selectors.php';
 
 	$o = '';
 
 	if ($update) {
 		$item_id = $_REQUEST['item_id'];
-		$item = dba::select('item', ['uid'], ['id' => $item_id], ['limit' => 1]);
-		$a->profile = array('uid' => intval($item['uid']), 'profile_uid' => intval($item['uid']));
+		$item = dba::selectFirst('item', ['uid', 'parent'], ['id' => $item_id]);
+		if ($item['uid'] != 0) {
+			$a->profile = ['uid' => intval($item['uid']), 'profile_uid' => intval($item['uid'])];
+		} else {
+			$a->profile = ['uid' => intval($update_uid), 'profile_uid' => intval($update_uid)];
+		}
+		$item_parent = $item['parent'];
 	} else {
 		$item_id = (($a->argc > 2) ? $a->argv[2] : 0);
 
@@ -234,12 +249,12 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 
 	if (!$item_id) {
 		$a->error = 404;
-		notice(t('Item not found.').EOL);
+		notice(L10n::t('Item not found.').EOL);
 		return;
 	}
 
 	// We are displaying an "alternate" link if that post was public. See issue 2864
-	$is_public = dba::exists('item', array('id' => $item_id, 'private' => false));
+	$is_public = dba::exists('item', ['id' => $item_id, 'private' => false]);
 	if ($is_public) {
 		// For the atom feed the nickname doesn't matter at all, we only need the item id.
 		$alternate = System::baseUrl().'/display/feed-item/'.$item_id.'.atom';
@@ -250,17 +265,17 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	}
 
 	$a->page['htmlhead'] .= replace_macros(get_markup_template('display-head.tpl'),
-				array('$alternate' => $alternate,
-					'$conversation' => $conversation));
+				['$alternate' => $alternate,
+					'$conversation' => $conversation]);
 
-	$groups = array();
+	$groups = [];
 
 	$contact = null;
 	$remote_contact = false;
 
 	$contact_id = 0;
 
-	if (is_array($_SESSION['remote'])) {
+	if (x($_SESSION, 'remote') && is_array($_SESSION['remote'])) {
 		foreach ($_SESSION['remote'] as $v) {
 			if ($v['uid'] == $a->profile['uid']) {
 				$contact_id = $v['cid'];
@@ -270,7 +285,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	}
 
 	if ($contact_id) {
-		$groups = init_groups_visitor($contact_id);
+		$groups = Group::getIdsByContactId($contact_id);
 		$r = dba::fetch_first("SELECT * FROM `contact` WHERE `id` = ? AND `uid` = ? LIMIT 1",
 			$contact_id,
 			$a->profile['uid']
@@ -294,26 +309,25 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	}
 	$is_owner = (local_user() && (in_array($a->profile['profile_uid'], [local_user(), 0])) ? true : false);
 
-	if ($a->profile['hidewall'] && !$is_owner && !$remote_contact) {
-		notice(t('Access to this profile has been restricted.') . EOL);
+	if (x($a->profile, 'hidewall') && !$is_owner && !$remote_contact) {
+		notice(L10n::t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
 
 	// We need the editor here to be able to reshare an item.
 	if ($is_owner) {
-		$x = array(
+		$x = [
 			'is_owner' => true,
 			'allow_location' => $a->user['allow_location'],
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
 			'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-			'acl' => populate_acl($a->user, true),
+			'acl' => ACL::getFullSelectorHTML($a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
-			'acl_data' => construct_acl_data($a, $a->user), // For non-Javascript ACL selector
-		);
-		$o .= status_editor($a,$x,0,true);
+		];
+		$o .= status_editor($a, $x, 0, true);
 	}
 
 	$sql_extra = item_permissions_sql($a->profile['uid'], $remote_contact, $groups);
@@ -337,16 +351,16 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	);
 
 	if (!DBM::is_result($r)) {
-		notice(t('Item not found.') . EOL);
+		notice(L10n::t('Item not found.') . EOL);
 		return $o;
 	}
 
 	$s = dba::inArray($r);
 
 	if (local_user() && (local_user() == $a->profile['uid'])) {
-		$unseen = dba::select('item', array('id'), array('parent' => $s[0]['parent'], 'unseen' => true), array('limit' => 1));
+		$unseen = dba::selectFirst('item', ['id'], ['parent' => $s[0]['parent'], 'unseen' => true]);
 		if (DBM::is_result($unseen)) {
-			dba::update('item', array('unseen' => false), array('parent' => $s[0]['parent'], 'unseen' => true));
+			dba::update('item', ['unseen' => false], ['parent' => $s[0]['parent'], 'unseen' => true]);
 		}
 	}
 
@@ -358,10 +372,8 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	$o .= conversation($a, $items, 'display', $update_uid);
 
 	// Preparing the meta header
-	require_once 'include/bbcode.php';
-	require_once 'include/html2plain.php';
-	$description = trim(html2plain(bbcode($s[0]["body"], false, false), 0, true));
-	$title = trim(html2plain(bbcode($s[0]["title"], false, false), 0, true));
+	$description = trim(HTML::toPlaintext(BBCode::convert($s[0]["body"], false), 0, true));
+	$title = trim(HTML::toPlaintext(BBCode::convert($s[0]["title"], false), 0, true));
 	$author_name = $s[0]["author-name"];
 
 	$image = $a->remove_baseurl($s[0]["author-thumb"]);
@@ -417,7 +429,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 function displayShowFeed($item_id, $conversation) {
 	$xml = DFRN::itemFeed($item_id, $conversation);
 	if ($xml == '') {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 	header("Content-type: application/atom+xml");
 	echo $xml;

@@ -1,5 +1,7 @@
 /* Modifications by https://horche.demkontinuum.de/profile/hoergen */
 
+/* General */
+
 body { background-color: whitesmoke; }
 
 h1 {
@@ -10,7 +12,6 @@ h1 {
 h2 {
   font-size: 16px;
   color: blue;
-  background-color: #EEEEEE;
   border-radius:5px;
 }
 
@@ -24,9 +25,15 @@ h4 {  font-size: 14px;}
 h5 {
   font-size: 16px;
   color: black;
-  background-color: #cfcece;
-  border-radius:5px;
 }
+
+
+/* login */
+
+#id_remember { width:50%; #id_remember { width:50%; }}
+
+
+/* Left Column*/
 
 nav {
   background: #fff;
@@ -175,10 +182,6 @@ nav a:hover .icon {
   color: #000;
 }
 
-ul.menu-popup {
-  border: 0px solid #FFF;
-  margin-top: 0px;
-}
 
 header #banner a, header #banner a:active, header #banner a:visited, header #banner a:link, header #banner a:hover {
   color: #737373;
@@ -289,6 +292,10 @@ div.pager, ul.tabs {
 
 
 /* Post content */
+.mention {
+  font-weight: bold;
+}
+
 .wall-item-content blockquote {
   border-left: 0px;
   margin-top: 10px;
@@ -449,6 +456,7 @@ div.pager, ul.tabs {
 
 .fc-content, .fc-widget {
   background-color: #a7ecff; 
+  font-size:10px;
   color: black;
   text-decoration: normal;
 }
@@ -467,10 +475,11 @@ div.pager, ul.tabs {
 
 .fc-day-grid-event .fc-time {
   font-weight: normal;
-  font-size: 10px;
 }
 
-.fc-title, fc-time { text-decoration: normal; }
+.fc-title, .fc-time { 
+  text-decoration: normal; 
+}
 
 .fc-unthemed .fc-today { background: #f9ff97; }
 
@@ -546,8 +555,9 @@ select{
 .settings-heading {
   font-size: 18px;
   font-weight: bold;
-  background-color: #cfcece;
+  background-color: whitesmoke;
   border-radius: 5px;
+  border-bottom: 1px solid black;
 }
 
 .setings-contend-block {
@@ -580,6 +590,21 @@ select{
   font-size:20px;
   font-weight:bold;
   background-color: whitesmoke;
+}
+
+textarea {
+  padding:2px 2px; 
+  background:white; 
+  border:1px solid darkgrey;
+  cursor:text;
+  -webkit-border-radius: 5px;
+  border-radius: 5px; 
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+}
+
+textarea:focus {
+  background-color:#eef3ff;
 }
 
 #adminpage textarea {
@@ -624,7 +649,7 @@ td.checkbox, td.tools{
 }
 
 
-/* Settings - Plugin */
+/* Settings - Addon */
 
 .settings-block.fakelink h3{
   font-size:16px;
@@ -658,13 +683,23 @@ td.checkbox, td.tools{
 
 
 /* popup */
-
-ul.menu-popup {
-  width: 16em;
+.contact-menu {
+  position: absolute;
+  top: 15px;
+  left: 35px;
+  width: 24em;
+  margin-top: 0px;
+  font-size: 12px; 
+  border: 0px solid lightgrey;
 }
 
-ul.menu-popup a {
-  padding: 0 0 0 5px;
+ul.menu-popup {
+  width: 20em;
+  margin-top: 0px;
+  padding: 0px;
+  font-size: 12px; 
+  line-height:10px;
+  border: 0px solid lightgrey;
 }
 
 
@@ -708,3 +743,27 @@ input[type=text], input[type=password], input[type=email], input[type=url] {
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus {
   background-color:#eef3ff;
 }
+
+
+/* Rights and Privacy Setting */
+
+#profile-jot-email {
+  width:650px;
+}
+
+
+/* Contact Page */
+
+.contact-photo-menu  {
+  position: relative;
+  left: 60px;
+  top: -90px;
+  width: 16em;
+  padding-top:0px;
+  padding-bottom:0px;
+  border: 0px solid #FFF;
+  margin-top: 0px;
+  font-size: 12px; 
+  line-height: 10px;
+}
+

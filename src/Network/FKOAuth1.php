@@ -1,21 +1,19 @@
 <?php
 /**
- * @file src/Protocol/OAuth1.php
+ * @file src/Network/FKOAuth1.php
  */
 namespace Friendica\Network;
 
-use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Network\FKOAuthDataStore;
+use Friendica\Util\DateTimeFormat;
 use dba;
 use OAuthServer;
-use OAuthSignatureMethod_PLAINTEXT;
 use OAuthSignatureMethod_HMAC_SHA1;
-
-require_once "library/OAuth1.php";
-require_once "include/plugin.php";
+use OAuthSignatureMethod_PLAINTEXT;
 
 /**
  * @brief OAuth protocol
@@ -40,7 +38,7 @@ class FKOAuth1 extends OAuthServer
 	{
 		logger("FKOAuth1::loginUser $uid");
 		$a = get_app();
-		$record = dba::select('user', array(), array('uid' => $uid, 'blocked' => 0, 'account_expired' => 0, 'account_removed' => 0, 'verified' => 1), array('limit' => 1));
+		$record = dba::selectFirst('user', [], ['uid' => $uid, 'blocked' => 0, 'account_expired' => 0, 'account_removed' => 0, 'verified' => 1]);
 
 		if (!DBM::is_result($record)) {
 			logger('FKOAuth1::loginUser failure: ' . print_r($_SERVER, true), LOGGER_DEBUG);
@@ -63,16 +61,15 @@ class FKOAuth1 extends OAuthServer
 			$a->timezone = $a->user['timezone'];
 		}
 
-		$r = dba::select('contact', array(), array('uid' => $_SESSION['uid'], 'self' => 1), array('limit' => 1));
-		
-		if (DBM::is_result($r)) {
-			$a->contact = $r;
-			$a->cid = $r['id'];
+		$contact = dba::selectFirst('contact', [], ['uid' => $_SESSION['uid'], 'self' => 1]);
+		if (DBM::is_result($contact)) {
+			$a->contact = $contact;
+			$a->cid = $contact['id'];
 			$_SESSION['cid'] = $a->cid;
 		}
 
-		dba::update('user', ['login_date' => datetime_convert()], ['uid' => $_SESSION['uid']]);
+		dba::update('user', ['login_date' => DateTimeFormat::utcNow()], ['uid' => $_SESSION['uid']]);
 
-		call_hooks('logged_in', $a->user);
+		Addon::callHooks('logged_in', $a->user);
 	}
 }

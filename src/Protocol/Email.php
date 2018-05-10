@@ -4,7 +4,7 @@
  */
 namespace Friendica\Protocol;
 
-require_once 'include/html2plain.php';
+use Friendica\Content\Text\HTML;
 
 /**
  * @brief Email class
@@ -36,26 +36,26 @@ class Email
 	public static function poll($mbox, $email_addr)
 	{
 		if (!$mbox || !$email_addr) {
-			return array();
+			return [];
 		}
 
 		$search1 = @imap_search($mbox, 'FROM "' . $email_addr . '"', SE_UID);
 		if (!$search1) {
-			$search1 = array();
+			$search1 = [];
 		} else {
 			logger("Found mails from ".$email_addr, LOGGER_DEBUG);
 		}
 
 		$search2 = @imap_search($mbox, 'TO "' . $email_addr . '"', SE_UID);
 		if (!$search2) {
-			$search2 = array();
+			$search2 = [];
 		} else {
 			logger("Found mails to ".$email_addr, LOGGER_DEBUG);
 		}
 
 		$search3 = @imap_search($mbox, 'CC "' . $email_addr . '"', SE_UID);
 		if (!$search3) {
-			$search3 = array();
+			$search3 = [];
 		} else {
 			logger("Found mails cc ".$email_addr, LOGGER_DEBUG);
 		}
@@ -66,8 +66,8 @@ class Email
 	}
 
 	/**
-	 * @param array $mailacct mail account
-	 * @return object
+	 * @param array   $mailacct mail account
+	 * @return string
 	 */
 	public static function constructMailboxName($mailacct)
 	{
@@ -84,8 +84,8 @@ class Email
 	 */
 	public static function messageMeta($mbox, $uid)
 	{
-		$ret = (($mbox && $uid) ? @imap_fetch_overview($mbox, $uid, FT_UID) : array(array())); // POSSIBLE CLEANUP --> array(array()) is probably redundant now
-		return (count($ret)) ? $ret : array();
+		$ret = (($mbox && $uid) ? @imap_fetch_overview($mbox, $uid, FT_UID) : [[]]); // POSSIBLE CLEANUP --> array(array()) is probably redundant now
+		return (count($ret)) ? $ret : [];
 	}
 
 	/**
@@ -96,7 +96,7 @@ class Email
 	 */
 	public static function getMessage($mbox, $uid, $reply)
 	{
-		$ret = array();
+		$ret = [];
 
 		$struc = (($mbox && $uid) ? @imap_fetchstructure($mbox, $uid, FT_UID) : null);
 
@@ -111,7 +111,7 @@ class Email
 			if (trim($ret['body']) == '') {
 				$ret['body'] = self::messageGetPart($mbox, $uid, $struc, 0, 'plain');
 			} else {
-				$ret['body'] = html2bbcode($ret['body']);
+				$ret['body'] = HTML::toBBCode($ret['body']);
 			}
 		} else {
 			$text = '';
@@ -128,7 +128,7 @@ class Email
 				}
 			}
 			if (trim($html) != '') {
-				$ret['body'] = html2bbcode($html);
+				$ret['body'] = HTML::toBBCode($html);
 			} else {
 				$ret['body'] = $text;
 			}
@@ -179,7 +179,7 @@ class Email
 
 		// PARAMETERS
 		// get all parameters, like charset, filenames of attachments, etc.
-		$params = array();
+		$params = [];
 		if ($p->parameters) {
 			foreach ($p->parameters as $x) {
 				$params[strtolower($x->attribute)] = $x->value;
@@ -328,7 +328,7 @@ class Email
 		$body .= "Content-Transfer-Encoding: 8bit\n";
 		$body .= "Content-Type: text/plain; charset=utf-8; format=flowed\n\n";
 
-		$body .= html2plain($html)."\n";
+		$body .= HTML::toPlaintext($html)."\n";
 
 		$body .= "--=_".$part."\n";
 		$body .= "Content-Transfer-Encoding: 8bit\n";
@@ -388,7 +388,7 @@ class Email
 
 	private static function unifyAttributionLine($message)
 	{
-		$quotestr = array('quote', 'spoiler');
+		$quotestr = ['quote', 'spoiler'];
 		foreach ($quotestr as $quote) {
 			$message = self::saveReplace('/----- Original Message -----\s.*?From: "([^<"].*?)" <(.*?)>\s.*?To: (.*?)\s*?Cc: (.*?)\s*?Sent: (.*?)\s.*?Subject: ([^\n].*)\s*\['.$quote.'\]/i', "[".$quote."='$1']\n", $message);
 			$message = self::saveReplace('/----- Original Message -----\s.*?From: "([^<"].*?)" <(.*?)>\s.*?To: (.*?)\s*?Sent: (.*?)\s.*?Subject: ([^\n].*)\s*\['.$quote.'\]/i', "[".$quote."='$1']\n", $message);
@@ -473,7 +473,7 @@ class Email
 
 		$cleaned = trim($result[1].$result[2].$result[3]);
 
-		$cleaned = str_replace(array("\n- --\n", "\n- -"), array("\n-- \n", "\n-"), $cleaned);
+		$cleaned = str_replace(["\n- --\n", "\n- -"], ["\n-- \n", "\n-"], $cleaned);
 
 		if ($cleaned == '') {
 			$cleaned = $message;
@@ -496,7 +496,7 @@ class Email
 
 		// When the signature separator is inside a quote, we don't separate
 		if (($sigpos < $quotepos) && ($sigpos != 0)) {
-			return array('body' => $message, 'sig' => '');
+			return ['body' => $message, 'sig' => ''];
 		}
 
 		$pattern = '/(.*)[\r\n]-- [\r\n](.*)/is';
@@ -511,14 +511,14 @@ class Email
 			$sig = '';
 		}
 
-		return array('body' => $cleaned, 'sig' => $sig);
+		return ['body' => $cleaned, 'sig' => $sig];
 	}
 
 	private static function removeLinebreak($message)
 	{
 		$arrbody = explode("\n", trim($message));
 
-		$lines = array();
+		$lines = [];
 		$lineno = 0;
 
 		foreach ($arrbody as $i => $line) {
@@ -589,7 +589,7 @@ class Email
 	{
 		// Convert Quotes
 		$arrbody = explode("\n", trim($body));
-		$arrlevel = array();
+		$arrlevel = [];
 
 		for ($i = 0; $i < count($arrbody); $i++) {
 			$quotelevel = 0;
@@ -609,7 +609,7 @@ class Email
 
 		$quotelevel = 0;
 		$previousquote = 0;
-		$arrbodyquoted = array();
+		$arrbodyquoted = [];
 
 		for ($i = 0; $i < count($arrbody); $i++) {
 			$previousquote = $quotelevel;
@@ -617,12 +617,7 @@ class Email
 			$currline = $arrbody[$i];
 
 			while ($previousquote < $quotelevel) {
-				if ($sender != '') {
-					$quote = "[quote title=$sender]";
-					$sender = '';
-				} else
-					$quote = "[quote]";
-
+				$quote = "[quote]";
 				$arrbody[$i] = $quote.$arrbody[$i];
 				$previousquote++;
 			}
@@ -662,7 +657,7 @@ class Email
 			$message = str_replace("[/quote][quote]", "", $message);
 		} while ($message != $oldmessage);
 
-		$quotes = array();
+		$quotes = [];
 
 		$startquotes = 0;
 

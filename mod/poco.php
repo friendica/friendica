@@ -3,17 +3,21 @@
 // See here for a documentation for portable contacts:
 // https://web.archive.org/web/20160405005550/http://portablecontacts.net/draft-spec.html
 
+
 use Friendica\App;
+use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Protocol\PortableContact;
+use Friendica\Util\DateTimeFormat;
 
 function poco_init(App $a) {
 	$system_mode = false;
 
 	if (intval(Config::get('system', 'block_public')) || (Config::get('system', 'block_local_dir'))) {
-		http_status_exit(401);
+		System::httpExit(401);
 	}
 
 	if ($a->argc > 1) {
@@ -22,7 +26,7 @@ function poco_init(App $a) {
 	if (! x($user)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");
 		if (! DBM::is_result($c)) {
-			http_status_exit(401);
+			System::httpExit(401);
 		}
 		$system_mode = true;
 	}
@@ -42,7 +46,7 @@ function poco_init(App $a) {
 	if ($a->argc > 1 && $a->argv[1] === '@global') {
 		// List of all profiles that this server recently had data from
 		$global = true;
-		$update_limit = date("Y-m-d H:i:s", time() - 30 * 86400);
+		$update_limit = date(DateTimeFormat::MYSQL, time() - 30 * 86400);
 	}
 	if ($a->argc > 2 && $a->argv[2] === '@me') {
 		$justme = true;
@@ -63,7 +67,7 @@ function poco_init(App $a) {
 			dbesc($user)
 		);
 		if (! DBM::is_result($users) || $users[0]['hidewall'] || $users[0]['hide-friends']) {
-			http_status_exit(404);
+			System::httpExit(404);
 		}
 
 		$user = $users[0];
@@ -79,7 +83,7 @@ function poco_init(App $a) {
 		$sql_extra = sprintf(" AND `contact`.`id` = %d ", intval($cid));
 	}
 	if (x($_GET, 'updatedSince')) {
-		$update_limit = date("Y-m-d H:i:s", strtotime($_GET['updatedSince']));
+		$update_limit = date(DateTimeFormat::MYSQL, strtotime($_GET['updatedSince']));
 	}
 	if ($global) {
 		$contacts = q("SELECT count(*) AS `total` FROM `gcontact` WHERE `updated` >= '%s' AND `updated` >= `last_failure` AND NOT `hide` AND `network` IN ('%s', '%s', '%s')",
@@ -152,7 +156,7 @@ function poco_init(App $a) {
 	}
 	logger("Query done", LOGGER_DEBUG);
 
-	$ret = array();
+	$ret = [];
 	if (x($_GET, 'sorted')) {
 		$ret['sorted'] = false;
 	}
@@ -165,10 +169,10 @@ function poco_init(App $a) {
 	$ret['startIndex']   = (int) $startIndex;
 	$ret['itemsPerPage'] = (int) $itemsPerPage;
 	$ret['totalResults'] = (int) $totalResults;
-	$ret['entry']        = array();
+	$ret['entry']        = [];
 
 
-	$fields_ret = array(
+	$fields_ret = [
 		'id' => false,
 		'displayName' => false,
 		'urls' => false,
@@ -183,7 +187,7 @@ function poco_init(App $a) {
 		'address' => false,
 		'contactType' => false,
 		'generation' => false
-	);
+	];
 
 	if ((! x($_GET, 'fields')) || ($_GET['fields'] === '@all')) {
 		foreach ($fields_ret as $k => $v) {
@@ -242,8 +246,7 @@ function poco_init(App $a) {
 				}
 				$about = Cache::get("about:" . $contact['updated'] . ":" . $contact['nurl']);
 				if (is_null($about)) {
-					require_once 'include/bbcode.php';
-					$about = bbcode($contact['about'], false, false);
+					$about = BBCode::convert($contact['about'], false);
 					Cache::set("about:" . $contact['updated'] . ":" . $contact['nurl'], $about);
 				}
 
@@ -254,7 +257,7 @@ function poco_init(App $a) {
 					$contact['gender'] = "";
 				}
 
-				$entry = array();
+				$entry = [];
 				if ($fields_ret['id']) {
 					$entry['id'] = (int)$contact['id'];
 				}
@@ -274,9 +277,9 @@ function poco_init(App $a) {
 					$entry['generation'] = (int)$contact['generation'];
 				}
 				if ($fields_ret['urls']) {
-					$entry['urls'] = array(array('value' => $contact['url'], 'type' => 'profile'));
+					$entry['urls'] = [['value' => $contact['url'], 'type' => 'profile']];
 					if ($contact['addr'] && ($contact['network'] !== NETWORK_MAIL)) {
-						$entry['urls'][] = array('value' => 'acct:' . $contact['addr'], 'type' => 'webfinger');
+						$entry['urls'][] = ['value' => 'acct:' . $contact['addr'], 'type' => 'webfinger'];
 					}
 				}
 				if ($fields_ret['preferredUsername']) {
@@ -301,7 +304,7 @@ function poco_init(App $a) {
 					$entry['updated'] = date("c", strtotime($entry['updated']));
 				}
 				if ($fields_ret['photos']) {
-					$entry['photos'] = array(array('value' => $contact['photo'], 'type' => 'profile'));
+					$entry['photos'] = [['value' => $contact['photo'], 'type' => 'profile']];
 				}
 				if ($fields_ret['network']) {
 					$entry['network'] = $contact['network'];
@@ -316,7 +319,7 @@ function poco_init(App $a) {
 					$tags = str_replace(",", " ", $contact['keywords']);
 					$tags = explode(" ", $tags);
 
-					$cleaned = array();
+					$cleaned = [];
 					foreach ($tags as $tag) {
 						$tag = trim(strtolower($tag));
 						if ($tag != "") {
@@ -324,10 +327,10 @@ function poco_init(App $a) {
 						}
 					}
 
-					$entry['tags'] = array($cleaned);
+					$entry['tags'] = [$cleaned];
 				}
 				if ($fields_ret['address']) {
-					$entry['address'] = array();
+					$entry['address'] = [];
 
 					// Deactivated. It just reveals too much data. (Although its from the default profile)
 					//if (isset($rr['paddress']))
@@ -354,16 +357,16 @@ function poco_init(App $a) {
 				$ret['entry'][] = $entry;
 			}
 		} else {
-			$ret['entry'][] = array();
+			$ret['entry'][] = [];
 		}
 	} else {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 	logger("End of poco", LOGGER_DEBUG);
 
 	if ($format === 'xml') {
 		header('Content-type: text/xml');
-		echo replace_macros(get_markup_template('poco_xml.tpl'), array_xmlify(array('$response' => $ret)));
+		echo replace_macros(get_markup_template('poco_xml.tpl'), array_xmlify(['$response' => $ret]));
 		killme();
 	}
 	if ($format === 'json') {
@@ -371,6 +374,6 @@ function poco_init(App $a) {
 		echo json_encode($ret);
 		killme();
 	} else {
-		http_status_exit(500);
+		System::httpExit(500);
 	}
 }

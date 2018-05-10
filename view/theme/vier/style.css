@@ -71,11 +71,11 @@ img {
 	clear:left;
 }
 
-#adminpage #pluginslist {
+#adminpage #addonslist {
 	margin: 0px; padding: 0px;
 }
 
-#adminpage .plugin {
+#adminpage .addon {
 	list-style: none;
 	display: block;
 	/* border: 1px solid #888888; */
@@ -84,7 +84,7 @@ img {
 	clear: left;
 }
 
-#adminpage .toggleplugin {
+#adminpage .toggleaddon {
 	float:left;
 	margin-right: 1em;
 }
@@ -1153,9 +1153,9 @@ aside #profiles-menu {
   left: 10px;
 }
 
-aside #search-text, aside #side-follow-url, aside #side-peoplefind-url, right_aside input {
-  width: 140px;
-  height: 17px;
+aside #search-text, aside #side-follow-url, aside #side-peoplefind-url, right_aside #side-peoplefind-url { 
+  width: 65%;
+  float: left;
   padding-left: 10px;
   /*border-top-left-radius: 15px;
   border-top-right-radius: 15px;
@@ -1165,6 +1165,14 @@ aside #search-text, aside #side-follow-url, aside #side-peoplefind-url, right_as
   -moz-border-top-colors: #999;
   -moz-border-left-colors: #999;
   -moz-border-right-colors: #dbdbdb;*/
+}
+
+aside #side-peoplefind-submit, right_aside #side-peoplefind-submit {
+  float: left;
+}
+
+#side-match-link {
+  clear: both;
 }
 
 aside h4, right_aside h4 {
@@ -2413,8 +2421,58 @@ aside #div_id_remember label {
  float:  inherit;
 }
 
+#login-group {
+  overflow: hidden;
+}
+
+#login-head {
+  position: unset;
+  width: unset;
+  height: unset;
+  margin-bottom: 10px;
+}
+
+div #wrapper_username {
+  padding: 0px;
+}
+
+div #wrapper_password {
+  padding: 0px;
+  margin-bottom: 0px;
+}
+
+#div_id_remember {
+  float: left;
+  width: unset;
+}
+
+#remember_tip {
+  display: none;
+}
+
+#login-submit-wrapper {
+  float: right;
+}
+
+#login-form {
+  margin-top: 20px;
+}
+
+#login-extra-links, #login-form {
+  /* width: 341px; */
+  width: 341px;
+  clear: both;
+  border-top: 3px solid white;
+  padding-top: 20px;
+}
+
 aside div #login-submit-button {
   margin-left:0px;
+}
+
+#login-lost-password-link {
+  margin-bottom: 10px;
+  float: right;
 }
 
 aside #register-link, aside #lost-password-link {
@@ -3322,10 +3380,6 @@ img.photo-album-photo {
   margin: 0px 10px 10px 0px;
   position: relative;
 }
-.videos .video-top-wrapper .video-js {
-  width: 300px!important;
-  height: 232px!important;
-}
 .videos .video-top-wrapper .video-delete {
   position: absolute;
   opacity: 0;
@@ -3336,7 +3390,10 @@ img.photo-album-photo {
 .videos .video-top-wrapper:hover .video-delete {
   opacity: 1;
 }
-
+/* invite page */
+#invite-wrapper textarea {
+  width: 100%;
+}
 /* upload/select popup */
   fbrowser.image .photo-album-image-wrapper { margin-left: 10px; }
   #message-preview { margin-top: 15px; }

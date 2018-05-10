@@ -78,6 +78,8 @@
 	<h3>{{$corporate}}</h3>
 	{{include file="field_input.tpl" field=$allowed_sites}}
 	{{include file="field_input.tpl" field=$allowed_email}}
+	{{include file="field_checkbox.tpl" field=$no_oembed_rich_content}}
+	{{include file="field_input.tpl" field=$allowed_oembed}}
 	{{include file="field_checkbox.tpl" field=$block_public}}
 	{{include file="field_checkbox.tpl" field=$force_publish}}
 	{{include file="field_select.tpl" field=$community_page_style}}
@@ -135,6 +137,9 @@
 	{{include file="field_input.tpl" field=$itemcache_duration}}
 	{{include file="field_input.tpl" field=$max_comments}}
 	{{include file="field_checkbox.tpl" field=$proxy_disabled}}
+	{{include file="field_checkbox.tpl" field=$dbclean}}
+	{{include file="field_input.tpl" field=$dbclean_expire_days}}
+	{{include file="field_input.tpl" field=$dbclean_unclaimed}}
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	<h3>{{$worker_title}}</h3>
@@ -144,6 +149,15 @@
 	{{include file="field_checkbox.tpl" field=$worker_dont_fork}}
 	{{include file="field_checkbox.tpl" field=$worker_fastlane}}
 	{{include file="field_checkbox.tpl" field=$worker_frontend}}
+
+	<h3>{{$relay_title}}</h3>
+	{{include file="field_checkbox.tpl" field=$relay_subscribe}}
+	{{include file="field_input.tpl" field=$relay_server}}
+	{{include file="field_checkbox.tpl" field=$relay_directly}}
+	{{include file="field_select.tpl" field=$relay_scope}}
+	{{include file="field_input.tpl" field=$relay_server_tags}}
+	{{include file="field_checkbox.tpl" field=$relay_user_tags}}
+
 	<div class="submit"><input type="submit" name="page_site" value="{{$submit|escape:'html'}}" /></div>
 
 	</form>

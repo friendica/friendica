@@ -33,7 +33,7 @@ $a->config['sitename'] = "My Friend Network";
 
 $a->config['register_policy'] = REGISTER_OPEN;
 $a->config['register_text'] = '';
-$a->config['admin_email'] = 'admin@friendica.dev';
+$a->config['admin_email'] = 'admin@friendica.local';
 
 // Maximum size of an imported message, 0 is unlimited
 
@@ -49,10 +49,9 @@ $a->config['php_path'] = '/usr/bin/php';
 
 
 // Server-to-server private message encryption (RINO) is allowed by default.
-// Encryption will only be provided if this setting is true and the
-// PHP mcrypt extension is installed on both systems
+// set to 0 to disable, 1 to enable
 
-$a->config['system']['rino_encrypt'] = true;
+$a->config['system']['rino_encrypt'] = 1;
 
 // default system theme
 
@@ -66,7 +65,7 @@ $a->config['system']['no_regfullname'] = true;
 //$a->config['system']['block_local_dir'] = false;
 
 // Location of the global directory
-$a->config['system']['directory'] = 'http://dir.friendica.social';
+$a->config['system']['directory'] = 'https://dir.friendica.social';
 
 // turn on friendica's log
 $a->config['system']['debugging'] = true;

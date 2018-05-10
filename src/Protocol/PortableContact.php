@@ -9,21 +9,22 @@
 
 namespace Friendica\Protocol;
 
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
+use Friendica\Protocol\Diaspora;
 use dba;
 use DOMDocument;
 use DOMXPath;
 use Exception;
 
 require_once 'include/dba.php';
-require_once 'include/datetime.php';
-require_once 'include/network.php';
-require_once 'include/html2bbcode.php';
 
 class PortableContact
 {
@@ -66,10 +67,10 @@ class PortableContact
 
 		if ($cid) {
 			if (!$url || !$uid) {
-				$r = dba::select('contact', ['poco', 'uid'], ['id' => $cid], ['limit' => 1]);
-				if (DBM::is_result($r)) {
-					$url = $r['poco'];
-					$uid = $r['uid'];
+				$contact = dba::selectFirst('contact', ['poco', 'uid'], ['id' => $cid]);
+				if (DBM::is_result($contact)) {
+					$url = $contact['poco'];
+					$uid = $contact['uid'];
 				}
 			}
 			if (!$uid) {
@@ -85,7 +86,7 @@ class PortableContact
 
 		logger('load: ' . $url, LOGGER_DEBUG);
 
-		$s = fetch_url($url);
+		$s = Network::fetchUrl($url);
 
 		logger('load: returns ' . $s, LOGGER_DATA);
 
@@ -143,7 +144,7 @@ class PortableContact
 			}
 
 			if (isset($entry->updated)) {
-				$updated = date("Y-m-d H:i:s", strtotime($entry->updated));
+				$updated = date(DateTimeFormat::MYSQL, strtotime($entry->updated));
 			}
 
 			if (isset($entry->network)) {
@@ -155,7 +156,7 @@ class PortableContact
 			}
 
 			if (isset($entry->aboutMe)) {
-				$about = html2bbcode($entry->aboutMe);
+				$about = HTML::toBBCode($entry->aboutMe);
 			}
 
 			if (isset($entry->gender)) {
@@ -176,7 +177,7 @@ class PortableContact
 				$contact_type = $entry->contactType;
 			}
 
-			$gcontact = array("url" => $profile_url,
+			$gcontact = ["url" => $profile_url,
 					"name" => $name,
 					"network" => $network,
 					"photo" => $profile_photo,
@@ -187,7 +188,7 @@ class PortableContact
 					"connect" => $connect_url,
 					"updated" => $updated,
 					"contact-type" => $contact_type,
-					"generation" => $generation);
+					"generation" => $generation];
 
 			try {
 				$gcontact = GContact::sanitize($gcontact);
@@ -287,7 +288,7 @@ class PortableContact
 		}
 
 		// Fetch the host-meta to check if this really is a server
-		$serverret = z_fetch_url($server_url."/.well-known/host-meta");
+		$serverret = Network::curl($server_url."/.well-known/host-meta");
 		if (!$serverret["success"]) {
 			return "";
 		}
@@ -311,12 +312,13 @@ class PortableContact
 			return false;
 		}
 
-		$contact = array("url" => $profile);
+		$contact = ["url" => $profile];
 
 		if ($gcontacts[0]["created"] <= NULL_DATE) {
-			$contact['created'] = datetime_convert();
+			$contact['created'] = DateTimeFormat::utcNow();
 		}
 
+		$server_url = '';
 		if ($force) {
 			$server_url = normalise_link(self::detectServer($profile));
 		}
@@ -329,7 +331,7 @@ class PortableContact
 			$server_url = normalise_link(self::detectServer($profile));
 		}
 
-		if (!in_array($gcontacts[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_FEED, NETWORK_OSTATUS, ""))) {
+		if (!in_array($gcontacts[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_FEED, NETWORK_OSTATUS, ""])) {
 			logger("Profile ".$profile.": Network type ".$gcontacts[0]["network"]." can't be checked", LOGGER_DEBUG);
 			return false;
 		}
@@ -337,7 +339,7 @@ class PortableContact
 		if ($server_url != "") {
 			if (!self::checkServer($server_url, $gcontacts[0]["network"], $force)) {
 				if ($force) {
-					$fields = ['last_failure' => datetime_convert()];
+					$fields = ['last_failure' => DateTimeFormat::utcNow()];
 					dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 				}
 
@@ -347,7 +349,7 @@ class PortableContact
 			$contact['server_url'] = $server_url;
 		}
 
-		if (in_array($gcontacts[0]["network"], array("", NETWORK_FEED))) {
+		if (in_array($gcontacts[0]["network"], ["", NETWORK_FEED])) {
 			$server = q(
 				"SELECT `network` FROM `gserver` WHERE `nurl` = '%s' AND `network` != ''",
 				dbesc(normalise_link($server_url))
@@ -366,7 +368,7 @@ class PortableContact
 			$server = q("SELECT `noscrape`, `network` FROM `gserver` WHERE `nurl` = '%s' AND `noscrape` != ''", dbesc(normalise_link($server_url)));
 
 			if ($server) {
-				$noscraperet = z_fetch_url($server[0]["noscrape"]."/".$gcontacts[0]["nick"]);
+				$noscraperet = Network::curl($server[0]["noscrape"]."/".$gcontacts[0]["nick"]);
 
 				if ($noscraperet["success"] && ($noscraperet["body"] != "")) {
 					$noscrape = json_decode($noscraperet["body"], true);
@@ -411,14 +413,14 @@ class PortableContact
 
 						// Set the date of the last contact
 						/// @todo By now the function "update_gcontact" doesn't work with this field
-						//$contact["last_contact"] = datetime_convert();
+						//$contact["last_contact"] = DateTimeFormat::utcNow();
 
 						$contact = array_merge($contact, $noscrape);
 
 						GContact::update($contact);
 
 						if (trim($noscrape["updated"]) != "") {
-							$fields = ['last_contact' => datetime_convert()];
+							$fields = ['last_contact' => DateTimeFormat::utcNow()];
 							dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 							logger("Profile ".$profile." was last updated at ".$noscrape["updated"]." (noscrape)", LOGGER_DEBUG);
@@ -466,8 +468,8 @@ class PortableContact
 			return false;
 		}
 
-		if (($data["poll"] == "") || (in_array($data["network"], array(NETWORK_FEED, NETWORK_PHANTOM)))) {
-			$fields = ['last_failure' => datetime_convert()];
+		if (($data["poll"] == "") || (in_array($data["network"], [NETWORK_FEED, NETWORK_PHANTOM]))) {
+			$fields = ['last_failure' => DateTimeFormat::utcNow()];
 			dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 			logger("Profile ".$profile." wasn't reachable (profile)", LOGGER_DEBUG);
@@ -480,10 +482,10 @@ class PortableContact
 
 		GContact::update($contact);
 
-		$feedret = z_fetch_url($data["poll"]);
+		$feedret = Network::curl($data["poll"]);
 
 		if (!$feedret["success"]) {
-			$fields = ['last_failure' => datetime_convert()];
+			$fields = ['last_failure' => DateTimeFormat::utcNow()];
 			dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 			logger("Profile ".$profile." wasn't reachable (no feed)", LOGGER_DEBUG);
@@ -501,14 +503,16 @@ class PortableContact
 		$last_updated = "";
 
 		foreach ($entries as $entry) {
-			$published = $xpath->query('atom:published/text()', $entry)->item(0)->nodeValue;
-			$updated = $xpath->query('atom:updated/text()', $entry)->item(0)->nodeValue;
+			$published = DateTimeFormat::utc($xpath->query('atom:published/text()', $entry)->item(0)->nodeValue);
+			$updated   = DateTimeFormat::utc($xpath->query('atom:updated/text()'  , $entry)->item(0)->nodeValue);
 
-			if ($last_updated < $published)
+			if ($last_updated < $published) {
 				$last_updated = $published;
+			}
 
-			if ($last_updated < $updated)
+			if ($last_updated < $updated) {
 				$last_updated = $updated;
+			}
 		}
 
 		// Maybe there aren't any entries. Then check if it is a valid feed
@@ -517,7 +521,8 @@ class PortableContact
 				$last_updated = NULL_DATE;
 			}
 		}
-		$fields = ['updated' => DBM::date($last_updated), 'last_contact' => DBM::date()];
+
+		$fields = ['updated' => $last_updated, 'last_contact' => DateTimeFormat::utcNow()];
 		dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 		if (($gcontacts[0]["generation"] == 0)) {
@@ -527,12 +532,12 @@ class PortableContact
 
 		logger("Profile ".$profile." was last updated at ".$last_updated, LOGGER_DEBUG);
 
-		return($last_updated);
+		return $last_updated;
 	}
 
 	public static function updateNeeded($created, $updated, $last_failure, $last_contact)
 	{
-		$now = strtotime(datetime_convert());
+		$now = strtotime(DateTimeFormat::utcNow());
 
 		if ($updated > $last_contact) {
 			$contact_time = strtotime($updated);
@@ -614,7 +619,7 @@ class PortableContact
 
 		foreach ($data->entry[0]->urls as $url) {
 			if ($url->type == 'zot') {
-				$server = array();
+				$server = [];
 				$server["platform"] = 'Hubzilla';
 				$server["network"] = NETWORK_DIASPORA;
 				return $server;
@@ -631,7 +636,7 @@ class PortableContact
 	 */
 	private static function fetchNodeinfo($server_url)
 	{
-		$serverret = z_fetch_url($server_url."/.well-known/nodeinfo");
+		$serverret = Network::curl($server_url."/.well-known/nodeinfo");
 		if (!$serverret["success"]) {
 			return false;
 		}
@@ -646,35 +651,56 @@ class PortableContact
 			return false;
 		}
 
-		$nodeinfo_url = '';
+		$nodeinfo1_url = '';
+		$nodeinfo2_url = '';
 
 		foreach ($nodeinfo->links as $link) {
 			if ($link->rel == 'http://nodeinfo.diaspora.software/ns/schema/1.0') {
-				$nodeinfo_url = $link->href;
+				$nodeinfo1_url = $link->href;
+			}
+			if ($link->rel == 'http://nodeinfo.diaspora.software/ns/schema/2.0') {
+				$nodeinfo2_url = $link->href;
 			}
 		}
 
-		if ($nodeinfo_url == '') {
+		if ($nodeinfo1_url . $nodeinfo2_url == '') {
 			return false;
+		}
+
+		$server = [];
+
+		// When the nodeinfo url isn't on the same host, then there is obviously something wrong
+		if (!empty($nodeinfo2_url) && (parse_url($server_url, PHP_URL_HOST) == parse_url($nodeinfo2_url, PHP_URL_HOST))) {
+			$server = self::parseNodeinfo2($nodeinfo2_url);
 		}
 
 		// When the nodeinfo url isn't on the same host, then there is obviously something wrong
-		if (parse_url($server_url, PHP_URL_HOST) != parse_url($nodeinfo_url, PHP_URL_HOST)) {
-			return false;
+		if (empty($server) && !empty($nodeinfo1_url) && (parse_url($server_url, PHP_URL_HOST) == parse_url($nodeinfo1_url, PHP_URL_HOST))) {
+			$server = self::parseNodeinfo1($nodeinfo1_url);
 		}
 
-		$serverret = z_fetch_url($nodeinfo_url);
+		return $server;
+	}
+
+	/**
+	 * @brief Parses Nodeinfo 1
+	 *
+	 * @param string $nodeinfo_url address of the nodeinfo path
+	 * @return array Server data
+	 */
+	private static function parseNodeinfo1($nodeinfo_url)
+	{
+		$serverret = Network::curl($nodeinfo_url);
 		if (!$serverret["success"]) {
 			return false;
 		}
 
 		$nodeinfo = json_decode($serverret['body']);
-
 		if (!is_object($nodeinfo)) {
 			return false;
 		}
 
-		$server = array();
+		$server = [];
 
 		$server['register_policy'] = REGISTER_CLOSED;
 
@@ -741,6 +767,90 @@ class PortableContact
 	}
 
 	/**
+	 * @brief Parses Nodeinfo 2
+	 *
+	 * @param string $nodeinfo_url address of the nodeinfo path
+	 * @return array Server data
+	 */
+	private static function parseNodeinfo2($nodeinfo_url)
+	{
+		$serverret = Network::curl($nodeinfo_url);
+		if (!$serverret["success"]) {
+			return false;
+		}
+
+		$nodeinfo = json_decode($serverret['body']);
+		if (!is_object($nodeinfo)) {
+			return false;
+		}
+
+		$server = [];
+
+		$server['register_policy'] = REGISTER_CLOSED;
+
+		if (is_bool($nodeinfo->openRegistrations) && $nodeinfo->openRegistrations) {
+			$server['register_policy'] = REGISTER_OPEN;
+		}
+
+		if (is_object($nodeinfo->software)) {
+			if (isset($nodeinfo->software->name)) {
+				$server['platform'] = $nodeinfo->software->name;
+			}
+
+			if (isset($nodeinfo->software->version)) {
+				$server['version'] = $nodeinfo->software->version;
+				// Version numbers on Nodeinfo are presented with additional info, e.g.:
+				// 0.6.3.0-p1702cc1c, 0.6.99.0-p1b9ab160 or 3.4.3-2-1191.
+				$server['version'] = preg_replace("=(.+)-(.{4,})=ism", "$1", $server['version']);
+			}
+		}
+
+		if (is_object($nodeinfo->metadata)) {
+			if (isset($nodeinfo->metadata->nodeName)) {
+				$server['site_name'] = $nodeinfo->metadata->nodeName;
+			}
+		}
+
+		if (!empty($nodeinfo->usage->users->total)) {
+			$server['registered-users'] = $nodeinfo->usage->users->total;
+		}
+
+		$diaspora = false;
+		$friendica = false;
+		$gnusocial = false;
+
+		if (is_array($nodeinfo->protocols)) {
+			foreach ($nodeinfo->protocols as $protocol) {
+				if ($protocol == 'diaspora') {
+					$diaspora = true;
+				}
+				if ($protocol == 'friendica') {
+					$friendica = true;
+				}
+				if ($protocol == 'gnusocial') {
+					$gnusocial = true;
+				}
+			}
+		}
+
+		if ($gnusocial) {
+			$server['network'] = NETWORK_OSTATUS;
+		}
+		if ($diaspora) {
+			$server['network'] = NETWORK_DIASPORA;
+		}
+		if ($friendica) {
+			$server['network'] = NETWORK_DFRN;
+		}
+
+		if (!$server) {
+			return false;
+		}
+
+		return $server;
+	}
+
+	/**
 	 * @brief Detect server type (Hubzilla or Friendica) via the front page body
 	 *
 	 * @param string $body Front page of the server
@@ -757,7 +867,7 @@ class PortableContact
 		$list = $xpath->query("//meta[@name]");
 
 		foreach ($list as $node) {
-			$attr = array();
+			$attr = [];
 			if ($node->attributes->length) {
 				foreach ($node->attributes as $attribute) {
 					$attr[$attribute->name] = $attribute->value;
@@ -766,8 +876,8 @@ class PortableContact
 			if ($attr['name'] == 'generator') {
 				$version_part = explode(" ", $attr['content']);
 				if (count($version_part) == 2) {
-					if (in_array($version_part[0], array("Friendika", "Friendica"))) {
-						$server = array();
+					if (in_array($version_part[0], ["Friendika", "Friendica"])) {
+						$server = [];
 						$server["platform"] = $version_part[0];
 						$server["version"] = $version_part[1];
 						$server["network"] = NETWORK_DFRN;
@@ -780,14 +890,14 @@ class PortableContact
 			$list = $xpath->query("//meta[@property]");
 
 			foreach ($list as $node) {
-				$attr = array();
+				$attr = [];
 				if ($node->attributes->length) {
 					foreach ($node->attributes as $attribute) {
 						$attr[$attribute->name] = $attribute->value;
 					}
 				}
-				if ($attr['property'] == 'generator' && in_array($attr['content'], array("hubzilla", "BlaBlaNet"))) {
-					$server = array();
+				if ($attr['property'] == 'generator' && in_array($attr['content'], ["hubzilla", "BlaBlaNet"])) {
+					$server = [];
 					$server["platform"] = $attr['content'];
 					$server["version"] = "";
 					$server["network"] = NETWORK_DIASPORA;
@@ -813,30 +923,39 @@ class PortableContact
 			return false;
 		}
 
-		$servers = dba::select('gserver', [], ['nurl' => normalise_link($server_url)], ['limit' => 1]);
-		if (DBM::is_result($servers)) {
-			if ($servers["created"] <= NULL_DATE) {
-				$fields = ['created' => datetime_convert()];
+		$gserver = dba::selectFirst('gserver', [], ['nurl' => normalise_link($server_url)]);
+		if (DBM::is_result($gserver)) {
+			if ($gserver["created"] <= NULL_DATE) {
+				$fields = ['created' => DateTimeFormat::utcNow()];
 				$condition = ['nurl' => normalise_link($server_url)];
 				dba::update('gserver', $fields, $condition);
 			}
-			$poco = $servers["poco"];
-			$noscrape = $servers["noscrape"];
+			$poco = $gserver["poco"];
+			$noscrape = $gserver["noscrape"];
 
 			if ($network == "") {
-				$network = $servers["network"];
+				$network = $gserver["network"];
 			}
 
-			$last_contact = $servers["last_contact"];
-			$last_failure = $servers["last_failure"];
-			$version = $servers["version"];
-			$platform = $servers["platform"];
-			$site_name = $servers["site_name"];
-			$info = $servers["info"];
-			$register_policy = $servers["register_policy"];
-			$registered_users = $servers["registered-users"];
+			$last_contact = $gserver["last_contact"];
+			$last_failure = $gserver["last_failure"];
+			$version = $gserver["version"];
+			$platform = $gserver["platform"];
+			$site_name = $gserver["site_name"];
+			$info = $gserver["info"];
+			$register_policy = $gserver["register_policy"];
+			$registered_users = $gserver["registered-users"];
 
-			if (!$force && !self::updateNeeded($servers["created"], "", $last_failure, $last_contact)) {
+			// See discussion under https://forum.friendi.ca/display/0b6b25a8135aabc37a5a0f5684081633
+			// It can happen that a zero date is in the database, but storing it again is forbidden.
+			if ($last_contact < NULL_DATE) {
+				$last_contact = NULL_DATE;
+			}
+			if ($last_failure < NULL_DATE) {
+				$last_failure = NULL_DATE;
+			}
+
+			if (!$force && !self::updateNeeded($gserver["created"], "", $last_failure, $last_contact)) {
 				logger("Use cached data for server ".$server_url, LOGGER_DEBUG);
 				return ($last_contact >= $last_failure);
 			}
@@ -853,7 +972,7 @@ class PortableContact
 			$last_contact = NULL_DATE;
 			$last_failure = NULL_DATE;
 		}
-		logger("Server ".$server_url." is outdated or unknown. Start discovery. Force: ".$force." Created: ".$servers["created"]." Failure: ".$last_failure." Contact: ".$last_contact, LOGGER_DEBUG);
+		logger("Server ".$server_url." is outdated or unknown. Start discovery. Force: ".$force." Created: ".$gserver["created"]." Failure: ".$last_failure." Contact: ".$last_contact, LOGGER_DEBUG);
 
 		$failure = false;
 		$possible_failure = false;
@@ -863,7 +982,7 @@ class PortableContact
 		// Mastodon uses the "@" for user profiles.
 		// But this can be misunderstood.
 		if (parse_url($server_url, PHP_URL_USER) != '') {
-			dba::update('gserver', array('last_failure' => datetime_convert()), array('nurl' => normalise_link($server_url)));
+			dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 			return false;
 		}
 
@@ -872,14 +991,14 @@ class PortableContact
 		$server_url = str_replace("http://", "https://", $server_url);
 
 		// We set the timeout to 20 seconds since this operation should be done in no time if the server was vital
-		$serverret = z_fetch_url($server_url."/.well-known/host-meta", false, $redirects, array('timeout' => 20));
+		$serverret = Network::curl($server_url."/.well-known/host-meta", false, $redirects, ['timeout' => 20]);
 
 		// Quit if there is a timeout.
 		// But we want to make sure to only quit if we are mostly sure that this server url fits.
-		if (DBM::is_result($servers) && ($orig_server_url == $server_url) &&
+		if (DBM::is_result($gserver) && ($orig_server_url == $server_url) &&
 			($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
-			dba::update('gserver', array('last_failure' => datetime_convert()), array('nurl' => normalise_link($server_url)));
+			dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 			return false;
 		}
 
@@ -889,12 +1008,12 @@ class PortableContact
 			$server_url = str_replace("https://", "http://", $server_url);
 
 			// We set the timeout to 20 seconds since this operation should be done in no time if the server was vital
-			$serverret = z_fetch_url($server_url."/.well-known/host-meta", false, $redirects, array('timeout' => 20));
+			$serverret = Network::curl($server_url."/.well-known/host-meta", false, $redirects, ['timeout' => 20]);
 
 			// Quit if there is a timeout
 			if ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT) {
 				logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
-				dba::update('gserver', array('last_failure' => datetime_convert()), array('nurl' => normalise_link($server_url)));
+				dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 				return false;
 			}
 
@@ -903,7 +1022,7 @@ class PortableContact
 
 		if (!$serverret["success"] || ($serverret["body"] == "") || (sizeof($xmlobj) == 0) || !is_object($xmlobj)) {
 			// Workaround for bad configured servers (known nginx problem)
-			if (!in_array($serverret["debug"]["http_code"], array("403", "404"))) {
+			if (!in_array($serverret["debug"]["http_code"], ["403", "404"])) {
 				$failure = true;
 			}
 			$possible_failure = true;
@@ -925,7 +1044,7 @@ class PortableContact
 
 		// Look for poco
 		if (!$failure) {
-			$serverret = z_fetch_url($server_url."/poco");
+			$serverret = Network::curl($server_url."/poco");
 			if ($serverret["success"]) {
 				$data = json_decode($serverret["body"]);
 				if (isset($data->totalResults)) {
@@ -951,7 +1070,7 @@ class PortableContact
 
 		if (!$failure) {
 			// Test for Diaspora, Hubzilla, Mastodon or older Friendica servers
-			$serverret = z_fetch_url($server_url);
+			$serverret = Network::curl($server_url);
 
 			if (!$serverret["success"] || ($serverret["body"] == "")) {
 				$failure = true;
@@ -990,7 +1109,7 @@ class PortableContact
 			// Test for Statusnet
 			// Will also return data for Friendica and GNU Social - but it will be overwritten later
 			// The "not implemented" is a special treatment for really, really old Friendica versions
-			$serverret = z_fetch_url($server_url."/api/statusnet/version.json");
+			$serverret = Network::curl($server_url."/api/statusnet/version.json");
 			if ($serverret["success"] && ($serverret["body"] != '{"error":"not implemented"}') &&
 				($serverret["body"] != '') && (strlen($serverret["body"]) < 30)) {
 				$platform = "StatusNet";
@@ -1001,7 +1120,7 @@ class PortableContact
 			}
 
 			// Test for GNU Social
-			$serverret = z_fetch_url($server_url."/api/gnusocial/version.json");
+			$serverret = Network::curl($server_url."/api/gnusocial/version.json");
 			if ($serverret["success"] && ($serverret["body"] != '{"error":"not implemented"}') &&
 				($serverret["body"] != '') && (strlen($serverret["body"]) < 30)) {
 				$platform = "GNU Social";
@@ -1013,7 +1132,7 @@ class PortableContact
 
 			// Test for Mastodon
 			$orig_version = $version;
-			$serverret = z_fetch_url($server_url."/api/v1/instance");
+			$serverret = Network::curl($server_url."/api/v1/instance");
 			if ($serverret["success"] && ($serverret["body"] != '')) {
 				$data = json_decode($serverret["body"]);
 
@@ -1036,7 +1155,7 @@ class PortableContact
 
 		if (!$failure) {
 			// Test for Hubzilla and Red
-			$serverret = z_fetch_url($server_url."/siteinfo.json");
+			$serverret = Network::curl($server_url."/siteinfo.json");
 			if ($serverret["success"]) {
 				$data = json_decode($serverret["body"]);
 				if (isset($data->url)) {
@@ -1064,7 +1183,7 @@ class PortableContact
 				}
 			} else {
 				// Test for Hubzilla, Redmatrix or Friendica
-				$serverret = z_fetch_url($server_url."/api/statusnet/config.json");
+				$serverret = Network::curl($server_url."/api/statusnet/config.json");
 				if ($serverret["success"]) {
 					$data = json_decode($serverret["body"]);
 					if (isset($data->site->server)) {
@@ -1119,7 +1238,7 @@ class PortableContact
 
 		// Query statistics.json. Optional package for Diaspora, Friendica and Redmatrix
 		if (!$failure) {
-			$serverret = z_fetch_url($server_url."/statistics.json");
+			$serverret = Network::curl($server_url."/statistics.json");
 			if ($serverret["success"]) {
 				$data = json_decode($serverret["body"]);
 
@@ -1180,11 +1299,11 @@ class PortableContact
 
 		// Check for noscrape
 		// Friendica servers could be detected as OStatus servers
-		if (!$failure && in_array($network, array(NETWORK_DFRN, NETWORK_OSTATUS))) {
-			$serverret = z_fetch_url($server_url."/friendica/json");
+		if (!$failure && in_array($network, [NETWORK_DFRN, NETWORK_OSTATUS])) {
+			$serverret = Network::curl($server_url."/friendica/json");
 
 			if (!$serverret["success"]) {
-				$serverret = z_fetch_url($server_url."/friendika/json");
+				$serverret = Network::curl($server_url."/friendika/json");
 			}
 
 			if ($serverret["success"]) {
@@ -1193,7 +1312,7 @@ class PortableContact
 				if (isset($data->version)) {
 					$network = NETWORK_DFRN;
 
-					$noscrape = $data->no_scrape_url;
+					$noscrape = defaults($data->no_scrape_url, '');
 					$version = $data->version;
 					$site_name = $data->site_name;
 					$info = $data->info;
@@ -1226,9 +1345,9 @@ class PortableContact
 
 		if ($failure) {
 			$last_contact = $orig_last_contact;
-			$last_failure = datetime_convert();
+			$last_failure = DateTimeFormat::utcNow();
 		} else {
-			$last_contact = datetime_convert();
+			$last_contact = DateTimeFormat::utcNow();
 			$last_failure = $orig_last_failure;
 		}
 
@@ -1239,7 +1358,7 @@ class PortableContact
 		}
 
 		// Check again if the server exists
-		$found = dba::exists('gserver', array('nurl' => normalise_link($server_url)));
+		$found = dba::exists('gserver', ['nurl' => normalise_link($server_url)]);
 
 		$version = strip_tags($version);
 		$site_name = strip_tags($site_name);
@@ -1256,12 +1375,75 @@ class PortableContact
 			dba::update('gserver', $fields, ['nurl' => normalise_link($server_url)]);
 		} elseif (!$failure) {
 			$fields['nurl'] = normalise_link($server_url);
-			$fields['created'] = datetime_convert();
+			$fields['created'] = DateTimeFormat::utcNow();
 			dba::insert('gserver', $fields);
 		}
+
+		if (!$failure && in_array($fields['network'], [NETWORK_DFRN, NETWORK_DIASPORA])) {
+			self::discoverRelay($server_url);
+		}
+
 		logger("End discovery for server " . $server_url, LOGGER_DEBUG);
 
 		return !$failure;
+	}
+
+	/**
+	 * @brief Fetch relay data from a given server url
+	 *
+	 * @param string $server_url address of the server
+	 */
+	private static function discoverRelay($server_url)
+	{
+		logger("Discover relay data for server " . $server_url, LOGGER_DEBUG);
+
+		$serverret = Network::curl($server_url."/.well-known/x-social-relay");
+		if (!$serverret["success"]) {
+			return;
+		}
+
+		$data = json_decode($serverret['body']);
+		if (!is_object($data)) {
+			return;
+		}
+
+		$gserver = dba::selectFirst('gserver', ['id', 'relay-subscribe', 'relay-scope'], ['nurl' => normalise_link($server_url)]);
+		if (!DBM::is_result($gserver)) {
+			return;
+		}
+
+		if (($gserver['relay-subscribe'] != $data->subscribe) || ($gserver['relay-scope'] != $data->scope)) {
+			$fields = ['relay-subscribe' => $data->subscribe, 'relay-scope' => $data->scope];
+			dba::update('gserver', $fields, ['id' => $gserver['id']]);
+		}
+
+		dba::delete('gserver-tag', ['gserver-id' => $gserver['id']]);
+		if ($data->scope == 'tags') {
+			// Avoid duplicates
+			$tags = [];
+			foreach ($data->tags as $tag) {
+				$tag = mb_strtolower($tag);
+				$tags[$tag] = $tag;
+			}
+
+			foreach ($tags as $tag) {
+				dba::insert('gserver-tag', ['gserver-id' => $gserver['id'], 'tag' => $tag]);
+			}
+		}
+
+		// Create or update the relay contact
+		$fields = [];
+		if (isset($data->protocols)) {
+			if (isset($data->protocols->diaspora)) {
+				$fields['network'] = NETWORK_DIASPORA;
+				$fields['batch'] = $data->protocols->diaspora;
+			}
+			if (isset($data->protocols->dfrn)) {
+				$fields['network'] = NETWORK_DFRN;
+				$fields['batch'] = $data->protocols->dfrn;
+			}
+		}
+		Diaspora::setRelayContact($server_url, $fields);
 	}
 
 	/**
@@ -1294,7 +1476,7 @@ class PortableContact
 	 */
 	private static function fetchServerlist($poco)
 	{
-		$serverret = z_fetch_url($poco."/@server");
+		$serverret = Network::curl($poco."/@server");
 		if (!$serverret["success"]) {
 			return;
 		}
@@ -1327,7 +1509,7 @@ class PortableContact
 		}
 
 		// Discover Friendica, Hubzilla and Diaspora servers
-		$serverdata = fetch_url("http://the-federation.info/pods.json");
+		$serverdata = Network::fetchUrl("http://the-federation.info/pods.json");
 
 		if ($serverdata) {
 			$servers = json_decode($serverdata);
@@ -1342,11 +1524,11 @@ class PortableContact
 			$accesstoken = Config::get('system', 'instances_social_key');
 			if (!empty($accesstoken)) {
 				$api = 'https://instances.social/api/1.0/instances/list?count=0';
-				$header = array('Authorization: Bearer '.$accesstoken);
-				$serverdata = z_fetch_url($api, false, $redirects, ['headers' => $header]);
+				$header = ['Authorization: Bearer '.$accesstoken];
+				$serverdata = Network::curl($api, false, $redirects, ['headers' => $header]);
 				if ($serverdata['success']) {
-				        $servers = json_decode($serverdata['body']);
-				        foreach ($servers->instances as $server) {
+					$servers = json_decode($serverdata['body']);
+					foreach ($servers->instances as $server) {
 						$url = (is_null($server->https_score) ? 'http' : 'https').'://'.$server->name;
 						Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", $url);
 					}
@@ -1360,7 +1542,7 @@ class PortableContact
 		//if (!Config::get('system','ostatus_disabled')) {
 		//	$serverdata = "http://gstools.org/api/get_open_instances/";
 
-		//	$result = z_fetch_url($serverdata);
+		//	$result = Network::curl($serverdata);
 		//	if ($result["success"]) {
 		//		$servers = json_decode($result["body"]);
 
@@ -1389,7 +1571,7 @@ class PortableContact
 
 		logger("Fetch all users from the server ".$server["url"], LOGGER_DEBUG);
 
-		$retdata = z_fetch_url($url);
+		$retdata = Network::curl($url);
 		if ($retdata["success"]) {
 			$data = json_decode($retdata["body"]);
 
@@ -1401,14 +1583,14 @@ class PortableContact
 					$timeframe = 30;
 				}
 
-				$updatedSince = date("Y-m-d H:i:s", time() - $timeframe * 86400);
+				$updatedSince = date(DateTimeFormat::MYSQL, time() - $timeframe * 86400);
 
 				// Fetch all global contacts from the other server (Not working with Redmatrix and Friendica versions before 3.3)
 				$url = $server["poco"]."/@global?updatedSince=".$updatedSince."&fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation";
 
 				$success = false;
 
-				$retdata = z_fetch_url($url);
+				$retdata = Network::curl($url);
 				if ($retdata["success"]) {
 					logger("Fetch all global contacts from the server ".$server["nurl"], LOGGER_DEBUG);
 					$success = self::discoverServer(json_decode($retdata["body"]));
@@ -1420,7 +1602,7 @@ class PortableContact
 				}
 			}
 
-			$fields = ['last_poco_query' => datetime_convert()];
+			$fields = ['last_poco_query' => DateTimeFormat::utcNow()];
 			dba::update('gserver', $fields, ['nurl' => $server["nurl"]]);
 
 			return true;
@@ -1429,7 +1611,7 @@ class PortableContact
 			self::checkServer($server["url"], $server["network"], true);
 
 			// If we couldn't reach the server, we will try it some time later
-			$fields = ['last_poco_query' => datetime_convert()];
+			$fields = ['last_poco_query' => DateTimeFormat::utcNow()];
 			dba::update('gserver', $fields, ['nurl' => $server["nurl"]]);
 
 			return false;
@@ -1455,7 +1637,7 @@ class PortableContact
 			foreach ($r as $server) {
 				if (!self::checkServer($server["url"], $server["network"])) {
 					// The server is not reachable? Okay, then we will try it later
-					$fields = ['last_poco_query' => datetime_convert()];
+					$fields = ['last_poco_query' => DateTimeFormat::utcNow()];
 					dba::update('gserver', $fields, ['nurl' => $server["nurl"]]);
 					continue;
 				}
@@ -1493,7 +1675,7 @@ class PortableContact
 				// Fetch all contacts from a given user from the other server
 				$url = $server["poco"]."/".$username."/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation";
 
-				$retdata = z_fetch_url($url);
+				$retdata = Network::curl($url);
 				if ($retdata["success"]) {
 					self::discoverServer(json_decode($retdata["body"]), 3);
 				}
@@ -1548,7 +1730,7 @@ class PortableContact
 			}
 
 			if (isset($entry->updated)) {
-				$updated = date("Y-m-d H:i:s", strtotime($entry->updated));
+				$updated = date(DateTimeFormat::MYSQL, strtotime($entry->updated));
 			}
 
 			if (isset($entry->network)) {
@@ -1560,7 +1742,7 @@ class PortableContact
 			}
 
 			if (isset($entry->aboutMe)) {
-				$about = html2bbcode($entry->aboutMe);
+				$about = HTML::toBBCode($entry->aboutMe);
 			}
 
 			if (isset($entry->gender)) {
@@ -1586,7 +1768,7 @@ class PortableContact
 
 				logger("Store profile ".$profile_url, LOGGER_DEBUG);
 
-				$gcontact = array("url" => $profile_url,
+				$gcontact = ["url" => $profile_url,
 						"name" => $name,
 						"network" => $network,
 						"photo" => $profile_photo,
@@ -1597,7 +1779,7 @@ class PortableContact
 						"connect" => $connect_url,
 						"updated" => $updated,
 						"contact-type" => $contact_type,
-						"generation" => $generation);
+						"generation" => $generation];
 
 				try {
 					$gcontact = GContact::sanitize($gcontact);

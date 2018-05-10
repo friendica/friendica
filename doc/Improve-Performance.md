@@ -22,16 +22,16 @@ If you have many OStatus contacts then completing of conversations can take some
 
 When using MyISAM (default) or InnoDB on MariaDB 10 this speeds up search.
 
-Plugins
+Addons
 --------
 
-Active the following plugins:
+Active the following addons:
 
     rendertime
 
-###rendertime
+### rendertime
 
-This plugin doesn't speed up your system. 
+This addon doesn't speed up your system. 
 It helps to analyze your bottlenecks.
 
 When enabled you see some values at the bottom of every page.
@@ -52,7 +52,7 @@ Apache Webserver
 
 The following Apache modules are recommended:
 
-###Cache-Control
+### Cache-Control
 
 This module tells the client to cache the content of static files so that they aren't fetched with every request.
 Enable the module "mod_expires" by typing in "a2enmod expires" as root.
@@ -62,7 +62,7 @@ Please add the following lines to your site configuration in the "directory" con
 
 Also see the Apache [2.2](http://httpd.apache.org/docs/2.2/mod/mod_expires.html) / [2.4](https://httpd.apache.org/docs/2.4/mod/mod_expires.html) documentation.
 
-###Compress content
+### Compress content
 
 This module compresses the traffic between the web server and the client.
 Enable the module "mod_deflate" by typing in "a2enmod deflate" as root.
@@ -72,14 +72,14 @@ Also see the Apache [2.2](http://httpd.apache.org/docs/2.2/mod/mod_deflate.html)
 PHP
 --------
 
-###FCGI
+### FCGI
 
 When using Apache think about using FCGI.
 In a Debian-based distribution you will need to install the packages named "php5-cgi" and "libapache2-mod-fcgid".
 
 Please refer to external documentation for a more detailed explanation how to set up a system based upon FCGI.
 
-###Database
+### Database
 
 There are scripts like [tuning-primer.sh](http://www.day32.com/MySQL/) and [mysqltuner.pl](http://mysqltuner.pl) that analyze your database server and give hints on values that could be changed.
 

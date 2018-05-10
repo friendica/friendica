@@ -1,14 +1,19 @@
 <?php
-
+/**
+ * @file mod/home.php
+ */
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Module\Login;
 
 if(! function_exists('home_init')) {
 function home_init(App $a) {
 
-	$ret = array();
-	call_hooks('home_init',$ret);
+	$ret = [];
+	Addon::callHooks('home_init',$ret);
 
 	if (local_user() && ($a->user['nickname'])) {
 		goaway(System::baseUrl()."/network");
@@ -23,8 +28,6 @@ function home_init(App $a) {
 if(! function_exists('home_content')) {
 function home_content(App $a) {
 
-	$o = '';
-
 	if (x($_SESSION,'theme')) {
 		unset($_SESSION['theme']);
 	}
@@ -32,21 +35,31 @@ function home_content(App $a) {
 		unset($_SESSION['mobile-theme']);
 	}
 
-	/// @TODO No absolute path used, maybe risky (security)
-	if (file_exists('home.html')) {
-		if (file_exists('home.css')) {
+	$customhome = false;
+	$defaultheader = '<h1>'.((x($a->config,'sitename')) ? L10n::t("Welcome to %s", $a->config['sitename']) : "").'</h1>';
+
+	$homefilepath = $a->basepath . "/home.html";
+	$cssfilepath = $a->basepath . "/home.css";
+	if (file_exists($homefilepath)) {
+		$customhome = $homefilepath;
+		if (file_exists($cssfilepath)) {
 			$a->page['htmlhead'] .= '<link rel="stylesheet" type="text/css" href="'.System::baseUrl().'/home.css'.'" media="all" />';
 		}
+	} 
 
-		$o .= file_get_contents('home.html');
-	} else {
-		$o .= '<h1>'.((x($a->config,'sitename')) ? sprintf(t("Welcome to %s"), $a->config['sitename']) : "").'</h1>';
-	}
+	$login = Login::form($a->query_string, $a->config['register_policy'] == REGISTER_CLOSED ? 0 : 1);
+
+	$content = '';
+	Addon::callHooks("home_content",$content);
 
 
-	$o .= login(($a->config['register_policy'] == REGISTER_CLOSED) ? 0 : 1);
-
-	call_hooks("home_content",$o);
+	$tpl = get_markup_template('home.tpl');
+	return replace_macros($tpl, [
+		'$defaultheader' => $defaultheader,
+		'$customhome' => $customhome,
+		'$login' => $login,
+		'$content' => $content
+	]);
 
 	return $o;
 

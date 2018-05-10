@@ -6,13 +6,10 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Cache;
-use Friendica\Core\Config;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
-
-require_once 'include/datetime.php';
 
 class GProbe {
 	public static function execute($url = '')
@@ -34,7 +31,7 @@ class GProbe {
 
 			$result = Cache::get("gprobe:".$urlparts["host"]);
 			if (!is_null($result)) {
-				if (in_array($result["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
+				if (in_array($result["network"], [NETWORK_FEED, NETWORK_PHANTOM])) {
 					logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
 					return;
 				}
@@ -46,7 +43,7 @@ class GProbe {
 				Cache::set("gprobe:".$urlparts["host"], $arr);
 			}
 
-			if (!in_array($arr["network"], array(NETWORK_FEED, NETWORK_PHANTOM))) {
+			if (!in_array($arr["network"], [NETWORK_FEED, NETWORK_PHANTOM])) {
 				GContact::update($arr);
 			}
 

@@ -1,4 +1,0 @@
-#!/bin/sh
-
-/usr/local/bin/php package.php make
-/usr/local/bin/pear package

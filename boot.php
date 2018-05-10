@@ -1,7 +1,6 @@
 <?php
-
-/** @file boot.php
- *
+/**
+ * @file boot.php
  * This file defines some global constants and includes the central App class.
  */
 
@@ -21,28 +20,28 @@
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use Friendica\App;
-use Friendica\Core\System;
+use Friendica\BaseObject;
+use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
+use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Model\Contact;
 use Friendica\Database\DBStructure;
+use Friendica\Model\Contact;
+use Friendica\Model\Conversation;
+use Friendica\Util\DateTimeFormat;
 
-require_once 'include/network.php';
-require_once 'include/plugin.php';
 require_once 'include/text.php';
-require_once 'include/datetime.php';
-require_once 'include/pgettext.php';
-require_once 'include/nav.php';
-require_once 'include/identity.php';
 
 define('FRIENDICA_PLATFORM',     'Friendica');
-define('FRIENDICA_CODENAME',     'Asparagus');
-define('FRIENDICA_VERSION',      '3.6-dev');
+define('FRIENDICA_CODENAME',     'The Tazmans Flax-lily');
+define('FRIENDICA_VERSION',      '2018-05-dev');
 define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1238);
+define('DB_UPDATE_VERSION',      1259);
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /**
@@ -60,7 +59,6 @@ const DB_UPDATE_FAILED = 2;      // Database check failed
  * This can be used in HTML and JavaScript where needed a line break.
  */
 define('EOL',                    "<br />\r\n");
-define('ATOM_TIME',              'Y-m-d\TH:i:s\Z');
 
 /**
  * @brief Image storage quality.
@@ -125,18 +123,20 @@ define('LOGGER_ALL',             4);
 
 /**
  * @name Cache
+ * @deprecated since version 3.6
+ * @see Cache
  *
  * Cache levels
  * @{
  */
-define('CACHE_MONTH',            0);
-define('CACHE_WEEK',             1);
-define('CACHE_DAY',              2);
-define('CACHE_HOUR',             3);
-define('CACHE_HALF_HOUR',        4);
-define('CACHE_QUARTER_HOUR',     5);
-define('CACHE_FIVE_MINUTES',     6);
-define('CACHE_MINUTE',           7);
+define('CACHE_MONTH',            Cache::MONTH);
+define('CACHE_WEEK',             Cache::WEEK);
+define('CACHE_DAY',              Cache::DAY);
+define('CACHE_HOUR',             Cache::HOUR);
+define('CACHE_HALF_HOUR',        Cache::HALF_HOUR);
+define('CACHE_QUARTER_HOUR',     Cache::QUARTER_HOUR);
+define('CACHE_FIVE_MINUTES',     Cache::FIVE_MINUTES);
+define('CACHE_MINUTE',           Cache::MINUTE);
 /* @}*/
 
 /**
@@ -212,12 +212,16 @@ define('PAGE_PRVGROUP',          5);
  *
  * ACCOUNT_TYPE_COMMUNITY - the account is community forum
  *	Associated page types: PAGE_COMMUNITY, PAGE_PRVGROUP
+ *
+ * ACCOUNT_TYPE_RELAY - the account is a relay
+ *      This will only be assigned to contacts, not to user accounts
  * @{
  */
 define('ACCOUNT_TYPE_PERSON',      0);
 define('ACCOUNT_TYPE_ORGANISATION', 1);
 define('ACCOUNT_TYPE_NEWS',        2);
 define('ACCOUNT_TYPE_COMMUNITY',   3);
+define('ACCOUNT_TYPE_RELAY',       4);
 /**
  * @}
  */
@@ -228,56 +232,62 @@ define('ACCOUNT_TYPE_COMMUNITY',   3);
  * Type of the community page
  * @{
  */
-define('CP_NO_COMMUNITY_PAGE',   -1);
-define('CP_USERS_ON_SERVER',     0);
-define('CP_GLOBAL_COMMUNITY',    1);
+define('CP_NO_INTERNAL_COMMUNITY', -2);
+define('CP_NO_COMMUNITY_PAGE',     -1);
+define('CP_USERS_ON_SERVER',        0);
+define('CP_GLOBAL_COMMUNITY',       1);
+define('CP_USERS_AND_GLOBAL',       2);
 /**
  * @}
  */
 
 /**
  * @name Protocols
+ * @deprecated since version 3.6
+ * @see Conversation
  *
  * Different protocols that we are storing
  * @{
  */
-define('PROTOCOL_UNKNOWN',         0);
-define('PROTOCOL_DFRN',            1);
-define('PROTOCOL_DIASPORA',        2);
-define('PROTOCOL_OSTATUS_SALMON',  3);
-define('PROTOCOL_OSTATUS_FEED',    4); // Deprecated
-define('PROTOCOL_GS_CONVERSATION', 5); // Deprecated
-define('PROTOCOL_SPLITTED_CONV',   6);
+define('PROTOCOL_UNKNOWN'        , Conversation::PROTOCOL_UNKNOWN);
+define('PROTOCOL_DFRN'           , Conversation::PROTOCOL_DFRN);
+define('PROTOCOL_DIASPORA'       , Conversation::PROTOCOL_DIASPORA);
+define('PROTOCOL_OSTATUS_SALMON' , Conversation::PROTOCOL_OSTATUS_SALMON);
+define('PROTOCOL_OSTATUS_FEED'   , Conversation::PROTOCOL_OSTATUS_FEED);    // Deprecated
+define('PROTOCOL_GS_CONVERSATION', Conversation::PROTOCOL_GS_CONVERSATION); // Deprecated
+define('PROTOCOL_SPLITTED_CONV'  , Conversation::PROTOCOL_SPLITTED_CONV);
 /**
  * @}
  */
 
 /**
- * @name Network
+ * @name Network constants
+ * @deprecated since version 3.6
+ * @see Protocol
  *
  * Network and protocol family types
  * @{
  */
-define('NETWORK_DFRN',             'dfrn');    // Friendica, Mistpark, other DFRN implementations
-define('NETWORK_ZOT',              'zot!');    // Zot! - Currently unsupported
-define('NETWORK_OSTATUS',          'stat');    // GNU-social, Pleroma, Mastodon, other OStatus implementations
-define('NETWORK_FEED',             'feed');    // RSS/Atom feeds with no known "post/notify" protocol
-define('NETWORK_DIASPORA',         'dspr');    // Diaspora
-define('NETWORK_MAIL',             'mail');    // IMAP/POP
-define('NETWORK_FACEBOOK',         'face');    // Facebook API
-define('NETWORK_LINKEDIN',         'lnkd');    // LinkedIn
-define('NETWORK_XMPP',             'xmpp');    // XMPP - Currently unsupported
-define('NETWORK_MYSPACE',          'mysp');    // MySpace - Currently unsupported
-define('NETWORK_GPLUS',            'goog');    // Google+
-define('NETWORK_PUMPIO',           'pump');    // pump.io
-define('NETWORK_TWITTER',          'twit');    // Twitter
-define('NETWORK_DIASPORA2',        'dspc');    // Diaspora connector
-define('NETWORK_STATUSNET',        'stac');    // Statusnet connector
-define('NETWORK_APPNET',           'apdn');    // app.net - Dead protocol
-define('NETWORK_NEWS',             'nntp');    // Network News Transfer Protocol - Currently unsupported
-define('NETWORK_ICALENDAR',        'ical');    // iCalendar - Currently unsupported
-define('NETWORK_PNUT',             'pnut');    // pnut.io - Currently unsupported
-define('NETWORK_PHANTOM',          'unkn');    // Place holder
+define('NETWORK_DFRN'     , Protocol::DFRN);      // Friendica, Mistpark, other DFRN implementations
+define('NETWORK_ZOT'      , Protocol::ZOT);       // Zot! - Currently unsupported
+define('NETWORK_OSTATUS'  , Protocol::OSTATUS);   // GNU-social, Pleroma, Mastodon, other OStatus implementations
+define('NETWORK_FEED'     , Protocol::FEED);      // RSS/Atom feeds with no known "post/notify" protocol
+define('NETWORK_DIASPORA' , Protocol::DIASPORA);  // Diaspora
+define('NETWORK_MAIL'     , Protocol::MAIL);      // IMAP/POP
+define('NETWORK_FACEBOOK' , Protocol::FACEBOOK);  // Facebook API
+define('NETWORK_LINKEDIN' , Protocol::LINKEDIN);  // LinkedIn
+define('NETWORK_XMPP'     , Protocol::XMPP);      // XMPP - Currently unsupported
+define('NETWORK_MYSPACE'  , Protocol::MYSPACE);   // MySpace - Currently unsupported
+define('NETWORK_GPLUS'    , Protocol::GPLUS);     // Google+
+define('NETWORK_PUMPIO'   , Protocol::PUMPIO);    // pump.io
+define('NETWORK_TWITTER'  , Protocol::TWITTER);   // Twitter
+define('NETWORK_DIASPORA2', Protocol::DIASPORA2); // Diaspora connector
+define('NETWORK_STATUSNET', Protocol::STATUSNET); // Statusnet connector
+define('NETWORK_APPNET'   , Protocol::APPNET);    // app.net - Dead protocol
+define('NETWORK_NEWS'     , Protocol::NEWS);      // Network News Transfer Protocol - Currently unsupported
+define('NETWORK_ICALENDAR', Protocol::ICALENDAR); // iCalendar - Currently unsupported
+define('NETWORK_PNUT'     , Protocol::PNUT);      // pnut.io - Currently unsupported
+define('NETWORK_PHANTOM'  , Protocol::PHANTOM);   // Place holder
 /**
  * @}
  */
@@ -287,7 +297,7 @@ define('NETWORK_PHANTOM',          'unkn');    // Place holder
  * and existing allocations MUST NEVER BE CHANGED
  * OR RE-ASSIGNED! You may only add to them.
  */
-$netgroup_ids = array(
+$netgroup_ids = [
 	NETWORK_DFRN     => (-1),
 	NETWORK_ZOT      => (-2),
 	NETWORK_OSTATUS  => (-3),
@@ -309,7 +319,7 @@ $netgroup_ids = array(
 	NETWORK_PNUT      => (-20),
 
 	NETWORK_PHANTOM  => (-127),
-);
+];
 
 /**
  * Maximum number of "people who like (or don't like) this"  that we will list by name
@@ -503,7 +513,7 @@ function startup()
 	ini_set('pcre.backtrack_limit', 500000);
 
 	if (get_magic_quotes_gpc()) {
-		$process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
+		$process = [&$_GET, &$_POST, &$_COOKIE, &$_REQUEST];
 		while (list($key, $val) = each($process)) {
 			foreach ($val as $k => $v) {
 				unset($process[$key][$k]);
@@ -532,6 +542,7 @@ function get_app()
 
 	if (empty($a)) {
 		$a = new App(dirname(__DIR__));
+		BaseObject::setApp($a);
 	}
 
 	return $a;
@@ -570,6 +581,48 @@ function x($s, $k = null)
 		}
 		return false;
 	}
+}
+
+/**
+ * Return the provided variable value if it exists and is truthy or the provided
+ * default value instead.
+ *
+ * Works with initialized variables and potentially uninitialized array keys
+ *
+ * Usages:
+ * - defaults($var, $default)
+ * - defaults($array, 'key', $default)
+ *
+ * @brief Returns a defaut value if the provided variable or array key is falsy
+ * @see x()
+ * @return mixed
+ */
+function defaults() {
+	$args = func_get_args();
+
+	if (count($args) < 2) {
+		throw new BadFunctionCallException('defaults() requires at least 2 parameters');
+	}
+	if (count($args) > 3) {
+		throw new BadFunctionCallException('defaults() cannot use more than 3 parameters');
+	}
+	if (count($args) === 3 && is_null($args[1])) {
+		throw new BadFunctionCallException('defaults($arr, $key, $def) $key is null');
+	}
+
+	$default = array_pop($args);
+
+	if (call_user_func_array('x', $args)) {
+		if (count($args) === 1) {
+			$return = $args[0];
+		} else {
+			$return = $args[0][$args[1]];
+		}
+	} else {
+		$return = $default;
+	}
+
+	return $return;
 }
 
 /**
@@ -620,8 +673,8 @@ function check_db($via_worker)
 	$build = Config::get('system', 'build');
 
 	if (empty($build)) {
-		Config::set('system', 'build', DB_UPDATE_VERSION);
-		$build = DB_UPDATE_VERSION;
+		Config::set('system', 'build', DB_UPDATE_VERSION - 1);
+		$build = DB_UPDATE_VERSION - 1;
 	}
 
 	// We don't support upgrading from very old versions anymore
@@ -629,10 +682,10 @@ function check_db($via_worker)
 		die('You try to update from a version prior to database version 1170. The direct upgrade path is not supported. Please update to version 3.5.4 before updating to this version.');
 	}
 
-	if ($build != DB_UPDATE_VERSION) {
+	if ($build < DB_UPDATE_VERSION) {
 		// When we cannot execute the database update via the worker, we will do it directly
 		if (!Worker::add(PRIORITY_CRITICAL, 'DBUpdate') && $via_worker) {
-			update_db(get_app());
+			update_db();
 		}
 	}
 }
@@ -653,11 +706,8 @@ function check_url(App $a)
 	// and www.example.com vs example.com.
 	// We will only change the url to an ip address if there is no existing setting
 
-	if (empty($url)) {
-		$url = Config::set('system', 'url', System::baseUrl());
-	}
-	if ((!link_compare($url, System::baseUrl())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $a->get_hostname))) {
-		$url = Config::set('system', 'url', System::baseUrl());
+	if (empty($url) || (!link_compare($url, System::baseUrl())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $a->get_hostname))) {
+		Config::set('system', 'url', System::baseUrl());
 	}
 
 	return;
@@ -667,13 +717,13 @@ function check_url(App $a)
  * @brief Automatic database updates
  * @param object $a App
  */
-function update_db(App $a)
+function update_db()
 {
 	$build = Config::get('system', 'build');
 
-	if (empty($build)) {
-		Config::set('system', 'build', DB_UPDATE_VERSION);
-		$build = DB_UPDATE_VERSION;
+	if (empty($build) || ($build > DB_UPDATE_VERSION)) {
+		$build = DB_UPDATE_VERSION - 1;
+		Config::set('system', 'build', $build);
 	}
 
 	if ($build != DB_UPDATE_VERSION) {
@@ -743,83 +793,84 @@ function run_update_function($x)
 			//send the administrator an e-mail
 			DBStructure::updateFail(
 				$x,
-				sprintf(t('Update %s failed. See error logs.'), $x)
+				L10n::t('Update %s failed. See error logs.', $x)
 			);
 			return false;
 		} else {
 			Config::set('database', 'update_' . $x, 'success');
-			Config::set('system', 'build', $x + 1);
+			Config::set('system', 'build', $x);
 			return true;
 		}
 	} else {
 		Config::set('database', 'update_' . $x, 'success');
-		Config::set('system', 'build', $x + 1);
+		Config::set('system', 'build', $x);
 		return true;
 	}
-	return true;
 }
 
 /**
- * @brief Synchronise plugins:
+ * @brief Synchronise addons:
  *
  * $a->config['system']['addon'] contains a comma-separated list of names
- * of plugins/addons which are used on this system.
+ * of addons which are used on this system.
  * Go through the database list of already installed addons, and if we have
  * an entry, but it isn't in the config list, call the uninstall procedure
  * and mark it uninstalled in the database (for now we'll remove it).
- * Then go through the config list and if we have a plugin that isn't installed,
+ * Then go through the config list and if we have a addon that isn't installed,
  * call the install procedure and add it to the database.
  *
  * @param object $a App
  */
-function check_plugins(App $a)
+function check_addons(App $a)
 {
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
 	if (DBM::is_result($r)) {
 		$installed = $r;
 	} else {
-		$installed = array();
+		$installed = [];
 	}
 
-	$plugins = Config::get('system', 'addon');
-	$plugins_arr = array();
+	$addons = Config::get('system', 'addon');
+	$addons_arr = [];
 
-	if ($plugins) {
-		$plugins_arr = explode(',', str_replace(' ', '', $plugins));
+	if ($addons) {
+		$addons_arr = explode(',', str_replace(' ', '', $addons));
 	}
 
-	$a->plugins = $plugins_arr;
+	$a->addons = $addons_arr;
 
-	$installed_arr = array();
+	$installed_arr = [];
 
 	if (count($installed)) {
 		foreach ($installed as $i) {
-			if (!in_array($i['name'], $plugins_arr)) {
-				uninstall_plugin($i['name']);
+			if (!in_array($i['name'], $addons_arr)) {
+				Addon::uninstall($i['name']);
 			} else {
 				$installed_arr[] = $i['name'];
 			}
 		}
 	}
 
-	if (count($plugins_arr)) {
-		foreach ($plugins_arr as $p) {
+	if (count($addons_arr)) {
+		foreach ($addons_arr as $p) {
 			if (!in_array($p, $installed_arr)) {
-				install_plugin($p);
+				Addon::install($p);
 			}
 		}
 	}
 
-	load_hooks();
+	Addon::loadHooks();
 
 	return;
 }
 
-function get_guid($size = 16, $prefix = "")
+function get_guid($size = 16, $prefix = '')
 {
-	if ($prefix == "") {
+	if (is_bool($prefix) && !$prefix) {
+		$prefix = '';
+	} elseif ($prefix == '') {
 		$a = get_app();
-		$prefix = hash("crc32", $a->get_hostname());
+		$prefix = hash('crc32', $a->get_hostname());
 	}
 
 	while (strlen($prefix) < ($size - 13)) {
@@ -828,112 +879,34 @@ function get_guid($size = 16, $prefix = "")
 
 	if ($size >= 24) {
 		$prefix = substr($prefix, 0, $size - 22);
-		return(str_replace(".", "", uniqid($prefix, true)));
+		return str_replace('.', '', uniqid($prefix, true));
 	} else {
 		$prefix = substr($prefix, 0, max($size - 13, 0));
-		return(uniqid($prefix));
+		return uniqid($prefix);
 	}
-}
-
-/**
- * @brief Wrapper for adding a login box.
- *
- * @param bool $register If $register == true provide a registration link.
- *						 This will most always depend on the value of $a->config['register_policy'].
- * @param bool $hiddens  optional
- *
- * @return string Returns the complete html for inserting into the page
- *
- * @hooks 'login_hook'
- *	string $o
- */
-function login($register = false, $hiddens = false)
-{
-	$a = get_app();
-	$o = "";
-	$reg = false;
-	if ($register) {
-		$reg = array(
-			'title' => t('Create a New Account'),
-			'desc' => t('Register')
-		);
-	}
-
-	$noid = Config::get('system', 'no_openid');
-
-	$dest_url = $a->query_string;
-
-	if (local_user()) {
-		$tpl = get_markup_template("logout.tpl");
-	} else {
-		$a->page['htmlhead'] .= replace_macros(
-			get_markup_template("login_head.tpl"),
-			array(
-			'$baseurl' => $a->get_baseurl(true)
-			)
-		);
-
-		$tpl = get_markup_template("login.tpl");
-		$_SESSION['return_url'] = $a->query_string;
-		$a->module = 'login';
-	}
-
-	$o .= replace_macros(
-		$tpl,
-		array(
-		'$dest_url'     => $dest_url,
-		'$logout'       => t('Logout'),
-		'$login'        => t('Login'),
-
-		'$lname'        => array('username', t('Nickname or Email: ') , '', ''),
-		'$lpassword'    => array('password', t('Password: '), '', ''),
-		'$lremember'    => array('remember', t('Remember me'), 0,  ''),
-
-		'$openid'       => !$noid,
-		'$lopenid'      => array('openid_url', t('Or login using OpenID: '),'',''),
-
-		'$hiddens'      => $hiddens,
-
-		'$register'     => $reg,
-
-		'$lostpass'     => t('Forgot your password?'),
-		'$lostlink'     => t('Password Reset'),
-
-		'$tostitle'     => t('Website Terms of Service'),
-		'$toslink'      => t('terms of service'),
-
-		'$privacytitle' => t('Website Privacy Policy'),
-		'$privacylink'  => t('privacy policy'),
-		)
-	);
-
-	call_hooks('login_hook', $o);
-
-	return $o;
 }
 
 /**
  * @brief Used to end the current process, after saving session state.
+ * @deprecated
  */
 function killme()
 {
-	if (!get_app()->is_backend()) {
-		session_write_close();
-	}
-
 	exit();
 }
 
 /**
  * @brief Redirect to another URL and terminate this process.
  */
-function goaway($s)
+function goaway($path)
 {
-	if (!strstr(normalise_link($s), "http://")) {
-		$s = System::baseUrl() . "/" . $s;
+	if (strstr(normalise_link($path), 'http://')) {
+		$url = $path;
+	} else {
+		$url = System::baseUrl() . '/' . ltrim($path, '/');
 	}
 
-	header("Location: $s");
+	header("Location: $url");
 	killme();
 }
 
@@ -962,10 +935,10 @@ function public_contact()
 	if (!$public_contact_id && x($_SESSION, 'authenticated')) {
 		if (x($_SESSION, 'my_address')) {
 			// Local user
-			$public_contact_id = intval(Contact::getIdForURL($_SESSION['my_address'], 0));
+			$public_contact_id = intval(Contact::getIdForURL($_SESSION['my_address'], 0, true));
 		} elseif (x($_SESSION, 'visitor_home')) {
 			// Remote user
-			$public_contact_id = intval(Contact::getIdForURL($_SESSION['visitor_home'], 0));
+			$public_contact_id = intval(Contact::getIdForURL($_SESSION['visitor_home'], 0, true));
 		}
 	} elseif (!x($_SESSION, 'authenticated')) {
 		$public_contact_id = false;
@@ -981,10 +954,12 @@ function public_contact()
  */
 function remote_user()
 {
-	// You cannot be both local and remote
-	if (local_user()) {
-		return false;
-	}
+	// You cannot be both local and remote.
+	// Unncommented by rabuzarus because remote authentication to local
+	// profiles wasn't possible anymore (2018-04-12).
+//	if (local_user()) {
+//		return false;
+//	}
 	if (x($_SESSION, 'authenticated') && x($_SESSION, 'visitor_id')) {
 		return intval($_SESSION['visitor_id']);
 	}
@@ -1002,7 +977,7 @@ function notice($s)
 {
 	$a = get_app();
 	if (!x($_SESSION, 'sysmsg')) {
-		$_SESSION['sysmsg'] = array();
+		$_SESSION['sysmsg'] = [];
 	}
 	if ($a->interactive) {
 		$_SESSION['sysmsg'][] = $s;
@@ -1025,7 +1000,7 @@ function info($s)
 	}
 
 	if (!x($_SESSION, 'sysmsg_info')) {
-		$_SESSION['sysmsg_info'] = array();
+		$_SESSION['sysmsg_info'] = [];
 	}
 	if ($a->interactive) {
 		$_SESSION['sysmsg_info'][] = $s;
@@ -1041,117 +1016,6 @@ function get_max_import_size()
 {
 	$a = get_app();
 	return (x($a->config, 'max_import_size') ? $a->config['max_import_size'] : 0);
-}
-
-
-function current_theme()
-{
-	$app_base_themes = array('duepuntozero', 'dispy', 'quattro');
-
-	$a = get_app();
-
-	$page_theme = null;
-
-	// Find the theme that belongs to the user whose stuff we are looking at
-
-	if ($a->profile_uid && ($a->profile_uid != local_user())) {
-		$r = q(
-			"select theme from user where uid = %d limit 1",
-			intval($a->profile_uid)
-		);
-		if (DBM::is_result($r)) {
-			$page_theme = $r[0]['theme'];
-		}
-	}
-
-	// Allow folks to over-rule user themes and always use their own on their own site.
-	// This works only if the user is on the same server
-
-	if ($page_theme && local_user() && (local_user() != $a->profile_uid)) {
-		if (PConfig::get(local_user(), 'system', 'always_my_theme')) {
-			$page_theme = null;
-		}
-	}
-
-//		$mobile_detect = new Mobile_Detect();
-//		$is_mobile = $mobile_detect->isMobile() || $mobile_detect->isTablet();
-	$is_mobile = $a->is_mobile || $a->is_tablet;
-
-	$standard_system_theme = Config::get('system', 'theme', '');
-	$standard_theme_name = ((isset($_SESSION) && x($_SESSION, 'theme')) ? $_SESSION['theme'] : $standard_system_theme);
-
-	if ($is_mobile) {
-		if (isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
-			$system_theme = $standard_system_theme;
-			$theme_name = $standard_theme_name;
-		} else {
-			$system_theme = Config::get('system', 'mobile-theme', '');
-			if ($system_theme == '') {
-				$system_theme = $standard_system_theme;
-			}
-			$theme_name = ((isset($_SESSION) && x($_SESSION, 'mobile-theme')) ? $_SESSION['mobile-theme'] : $system_theme);
-
-			if ($theme_name === '---') {
-				// user has selected to have the mobile theme be the same as the normal one
-				$system_theme = $standard_system_theme;
-				$theme_name = $standard_theme_name;
-
-				if ($page_theme) {
-					$theme_name = $page_theme;
-				}
-			}
-		}
-	} else {
-		$system_theme = $standard_system_theme;
-		$theme_name = $standard_theme_name;
-
-		if ($page_theme) {
-			$theme_name = $page_theme;
-		}
-	}
-
-	if ($theme_name
-		&& (file_exists('view/theme/' . $theme_name . '/style.css')
-		|| file_exists('view/theme/' . $theme_name . '/style.php'))
-	) {
-		return($theme_name);
-	}
-
-	foreach ($app_base_themes as $t) {
-		if (file_exists('view/theme/' . $t . '/style.css')
-			|| file_exists('view/theme/' . $t . '/style.php')
-		) {
-			return($t);
-		}
-	}
-
-	$fallback = array_merge(glob('view/theme/*/style.css'), glob('view/theme/*/style.php'));
-	if (count($fallback)) {
-		return (str_replace('view/theme/', '', substr($fallback[0], 0, -10)));
-	}
-
-	/// @TODO No final return statement?
-}
-
-/**
- * @brief Return full URL to theme which is currently in effect.
- *
- * Provide a sane default if nothing is chosen or the specified theme does not exist.
- *
- * @return string
- */
-function current_theme_url()
-{
-	$a = get_app();
-
-	$t = current_theme();
-
-	$opts = (($a->profile_uid) ? '?f=&puid=' . $a->profile_uid : '');
-	if (file_exists('view/theme/' . $t . '/style.php')) {
-		return('view/theme/' . $t . '/style.pcss' . $opts);
-	}
-
-	return('view/theme/' . $t . '/style.css');
 }
 
 function feed_birthday($uid, $tz)
@@ -1186,14 +1050,14 @@ function feed_birthday($uid, $tz)
 	if (DBM::is_result($p)) {
 		$tmp_dob = substr($p[0]['dob'], 5);
 		if (intval($tmp_dob)) {
-			$y = datetime_convert($tz, $tz, 'now', 'Y');
+			$y = DateTimeFormat::timezoneNow($tz, 'Y');
 			$bd = $y . '-' . $tmp_dob . ' 00:00';
 			$t_dob = strtotime($bd);
-			$now = strtotime(datetime_convert($tz, $tz, 'now'));
+			$now = strtotime(DateTimeFormat::timezoneNow($tz));
 			if ($t_dob < $now) {
 				$bd = $y + 1 . '-' . $tmp_dob . ' 00:00';
 			}
-			$birthday = datetime_convert($tz, 'UTC', $bd, ATOM_TIME);
+			$birthday = DateTimeFormat::convert($bd, 'UTC', $tz, DateTimeFormat::ATOM);
 		}
 	}
 
@@ -1277,10 +1141,10 @@ function explode_querystring($query)
 		$args = array_values($args);
 	}
 
-	return array(
+	return [
 		'base' => $base,
 		'args' => $args,
-	);
+	];
 }
 
 /**
@@ -1320,7 +1184,7 @@ function get_server()
 	$server = Config::get("system", "directory");
 
 	if ($server == "") {
-		$server = "http://dir.friendica.social";
+		$server = "https://dir.friendica.social";
 	}
 
 	return($server);
@@ -1590,14 +1454,11 @@ function argv($x)
 function infinite_scroll_data($module)
 {
 	if (PConfig::get(local_user(), 'system', 'infinite_scroll')
-		&& ($module == "network") && ($_GET["mode"] != "minimal")
+		&& $module == 'network'
+		&& defaults($_GET, 'mode', '') != 'minimal'
 	) {
 		// get the page number
-		if (is_string($_GET["page"])) {
-			$pageno = $_GET["page"];
-		} else {
-			$pageno = 1;
-		}
+		$pageno = defaults($_GET, 'page', 1);
 
 		$reload_uri = "";
 
@@ -1608,11 +1469,12 @@ function infinite_scroll_data($module)
 			}
 		}
 
-		if (($a->page_offset != "") && ! strstr($reload_uri, "&offset=")) {
+		$a = get_app();
+		if ($a->page_offset != "" && !strstr($reload_uri, "&offset=")) {
 			$reload_uri .= "&offset=" . urlencode($a->page_offset);
 		}
 
-		$arr = array("pageno" => $pageno, "reload_uri" => $reload_uri);
+		$arr = ["pageno" => $pageno, "reload_uri" => $reload_uri];
 
 		return $arr;
 	}

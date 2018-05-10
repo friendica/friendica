@@ -165,7 +165,7 @@ line
 code</code></td>
 </tr>
 <tr>
-  <td>[code=php]function text_highlight($s,$lang)[/code]</td>
+  <td>[code=php]function text_highlight($s,$lang)[/code]<sup><a href="#supported-code">1</a></sup></td>
   <td><code><div class="hl-main"><ol class="hl-main"><li><span class="hl-code">&nbsp;</span><span class="hl-reserved">function</span><span class="hl-code"> </span><span class="hl-identifier">text_highlight</span><span class="hl-brackets">(</span><span class="hl-var">$s</span><span class="hl-code">,</span><span class="hl-var">$lang</span><span class="hl-brackets">)</span></li></ol></div></code></td>
 </tr>
 <tr>
@@ -207,6 +207,27 @@ code</code></td>
   <td><hr></td>
 </tr>
 </table>
+
+<a name="supported-code">1</a>: Supported language parameter values for code highlighting:
+- abap
+- avrc
+- cpp
+- css
+- diff
+- dtd
+- html
+- java
+- javascript
+- js
+- mysql
+- perl
+- php
+- python
+- ruby
+- sh
+- sql
+- vbscript
+- xml
 
 ### Titles
 

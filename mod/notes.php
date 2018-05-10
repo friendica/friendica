@@ -1,10 +1,15 @@
 <?php
-
+/**
+ * @file mod/notes.php
+ */
 use Friendica\App;
+use Friendica\Content\Nav;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
+use Friendica\Model\Profile;
 
-function notes_init(App $a) {
-
+function notes_init(App $a)
+{
 	if (! local_user()) {
 		return;
 	}
@@ -13,25 +18,22 @@ function notes_init(App $a) {
 
 	$which = $a->user['nickname'];
 
-	nav_set_selected('home');
+	Nav::setSelected('home');
 
-//	profile_load($a,$which,$profile);
-
+	//Profile::load($a, $which, $profile);
 }
 
 
-function notes_content(App $a, $update = false) {
-
+function notes_content(App $a, $update = false)
+{
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
-	require_once("include/bbcode.php");
-	require_once('include/security.php');
-	require_once('include/conversation.php');
-	require_once('include/acl_selectors.php');
-	$groups = array();
+	require_once 'include/security.php';
+	require_once 'include/conversation.php';
+	$groups = [];
 
 
 	$o = '';
@@ -44,15 +46,15 @@ function notes_content(App $a, $update = false) {
 	$is_owner = true;
 
 	$o ="";
-	$o .= profile_tabs($a,True);
+	$o .= Profile::getTabs($a, true);
 
-	if(! $update) {
-		$o .= '<h3>' . t('Personal Notes') . '</h3>';
+	if (!$update) {
+		$o .= '<h3>' . L10n::t('Personal Notes') . '</h3>';
 
 		$commpage = false;
 		$commvisitor = false;
 
-		$x = array(
+		$x = [
 			'is_owner' => $is_owner,
 			'allow_location' => (($a->user['allow_location']) ? true : false),
 			'default_location' => $a->user['default-location'],
@@ -62,12 +64,11 @@ function notes_content(App $a, $update = false) {
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
-			'button' => t('Save'),
+			'button' => L10n::t('Save'),
 			'acl_data' => '',
-		);
+		];
 
-		$o .= status_editor($a,$x,$a->contact['id']);
-
+		$o .= status_editor($a, $x, $a->contact['id']);
 	}
 
 	// Construct permissions
@@ -81,9 +82,9 @@ function notes_content(App $a, $update = false) {
 		WHERE %s AND `item`.`uid` = %d AND `item`.`type` = 'note'
 		AND `contact`.`self` AND `item`.`id` = `item`.`parent` AND NOT `item`.`wall`
 		$sql_extra ",
-		item_joins(), item_condition(),
+		item_joins(),
+		item_condition(),
 		intval(local_user())
-
 	);
 
 	if (DBM::is_result($r)) {
@@ -96,37 +97,40 @@ function notes_content(App $a, $update = false) {
 		AND `item`.`id` = `item`.`parent` AND NOT `item`.`wall`
 		$sql_extra
 		ORDER BY `item`.`created` DESC LIMIT %d ,%d ",
-		item_joins(), item_condition(),
+		item_joins(),
+		item_condition(),
 		intval(local_user()),
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 
 	);
 
-	$parents_arr = array();
+	$parents_arr = [];
 	$parents_str = '';
 
 	if (DBM::is_result($r)) {
-		foreach($r as $rr)
+		foreach ($r as $rr) {
 			$parents_arr[] = $rr['item_id'];
+		}
 		$parents_str = implode(', ', $parents_arr);
 
 		$r = q("SELECT %s FROM `item` %s
 			WHERE %s AND `item`.`uid` = %d AND `item`.`parent` IN (%s)
 			$sql_extra
 			ORDER BY `parent` DESC, `gravity` ASC, `item`.`id` ASC ",
-			item_fieldlists(), item_joins(), item_condition(),
+			item_fieldlists(),
+			item_joins(),
+			item_condition(),
 			intval(local_user()),
 			dbesc($parents_str)
 		);
 
 		if (DBM::is_result($r)) {
-			$items = conv_sort($r,"`commented`");
+			$items = conv_sort($r, "`commented`");
 
-			$o .= conversation($a,$items,'notes',$update);
+			$o .= conversation($a, $items, 'notes', $update);
 		}
 	}
-
 
 	$o .= paginate($a);
 	return $o;

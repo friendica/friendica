@@ -33,38 +33,38 @@
 			{{/if}}
 			<ul class="comment-edit-bb-{{$id}} comment-icon-list nav nav-pills pull-right">
 				<li>
-					<button type="button" class="btn-link icon" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}">
+					<button type="button" class="btn-link icon bb-img" style="cursor: pointer;" aria-label="{{$edimg}}" title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}">
 						<i class="fa fa-picture-o"></i>
 					</button>
 				</li>
 				<li>
-					<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" title="{{$edurl}}" onclick="insertFormatting('url',{{$id}});">
+					<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormatting('url',{{$id}});">
 						<i class="fa fa-link"></i>
 					</button>
 				</li>
 				<li>
-					<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" title="{{$edvideo}}" onclick="insertFormatting('video',{{$id}});">
+					<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" aria-label="{{$edvideo}}" title="{{$edvideo}}" onclick="insertFormatting('video',{{$id}});">
 						<i class="fa fa-video-camera"></i>
 					</button>
 				</li>
 
 				<li>
-					<button type="button" class="btn-link icon underline" style="cursor: pointer;" title="{{$eduline}}" onclick="insertFormatting('u',{{$id}});">
+					<button type="button" class="btn-link icon underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormatting('u',{{$id}});">
 						<i class="fa fa-underline"></i>
 					</button>
 				</li>
 				<li>
-					<button type="button" class="btn-link icon italic" style="cursor: pointer;" title="{{$editalic}}" onclick="insertFormatting('i',{{$id}});">
+					<button type="button" class="btn-link icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormatting('i',{{$id}});">
 						<i class="fa fa-italic"></i>
 					</button>
 				</li>
 				<li>
-					<button type="button" class="btn-link icon bold" style="cursor: pointer;"  title="{{$edbold}}" onclick="insertFormatting('b',{{$id}});">
+					<button type="button" class="btn-link icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormatting('b',{{$id}});">
 						<i class="fa fa-bold"></i>
 					</button>
 				</li>
 				<li>
-					<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote}}" onclick="insertFormatting('quote',{{$id}});">
+					<button type="button" class="btn-link icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormatting('quote',{{$id}});">
 						<i class="fa fa-quote-left"></i>
 					</button>
 				</li>

@@ -1,13 +1,17 @@
 <?php
-
+/**
+ * @file mod/tagger.php
+ */
 use Friendica\App;
+use Friendica\Core\Addon;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\Item;
 
-require_once('include/security.php');
-require_once('include/bbcode.php');
-require_once('include/items.php');
+require_once 'include/security.php';
+require_once 'include/items.php';
 
 function tagger_content(App $a) {
 
@@ -17,7 +21,7 @@ function tagger_content(App $a) {
 
 	$term = notags(trim($_GET['term']));
 	// no commas allowed
-	$term = str_replace(array(',',' '),array('','_'),$term);
+	$term = str_replace([',',' '],['','_'],$term);
 
 	if(! $term)
 		return;
@@ -39,6 +43,8 @@ function tagger_content(App $a) {
 	$item = $r[0];
 
 	$owner_uid = $item['uid'];
+	$owner_nick = '';
+	$blocktags = 0;
 
 	$r = q("select `nickname`,`blocktags` from user where uid = %d limit 1",
 		intval($owner_uid)
@@ -63,11 +69,16 @@ function tagger_content(App $a) {
 
 	$uri = item_new_uri($a->get_hostname(),$owner_uid);
 	$xterm = xmlify($term);
-	$post_type = (($item['resource-id']) ? t('photo') : t('status'));
+	$post_type = (($item['resource-id']) ? L10n::t('photo') : L10n::t('status'));
 	$targettype = (($item['resource-id']) ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE );
 
-	$link = xmlify('<link rel="alternate" type="text/html" href="'
-		. System::baseUrl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
+	if ($owner_nick) {
+		$href = System::baseUrl() . '/display/' . $owner_nick . '/' . $item['id'];
+	} else {
+		$href = System::baseUrl() . '/display/' . $item['guid'];
+	}
+
+	$link = xmlify('<link rel="alternate" type="text/html" href="'. $href . '" />' . "\n") ;
 
 	$body = xmlify($item['body']);
 
@@ -96,7 +107,7 @@ EOT;
 	</object>
 EOT;
 
-	$bodyverb = t('%1$s tagged %2$s\'s %3$s with %4$s');
+	$bodyverb = L10n::t('%1$s tagged %2$s\'s %3$s with %4$s');
 
 	if (! isset($bodyverb)) {
 		return;
@@ -104,7 +115,7 @@ EOT;
 
 	$termlink = html_entity_decode('&#x2317;') . '[url=' . System::baseUrl() . '/search?tag=' . urlencode($term) . ']'. $term . '[/url]';
 
-	$arr = array();
+	$arr = [];
 
 	$arr['guid'] = get_guid(32);
 	$arr['uri'] = $uri;
@@ -139,35 +150,20 @@ EOT;
 	$arr['deny_gid'] = $item['deny_gid'];
 	$arr['visible'] = 1;
 	$arr['unseen'] = 1;
-	$arr['last-child'] = 1;
 	$arr['origin'] = 1;
 
-	$post_id = item_store($arr);
+	$post_id = Item::insert($arr);
 
-//	q("UPDATE `item` set plink = '%s' where id = %d",
-//		dbesc(System::baseUrl() . '/display/' . $owner_nick . '/' . $post_id),
-//		intval($post_id)
-//	);
-
-
-	if(! $item['visible']) {
-		$r = q("UPDATE `item` SET `visible` = 1 WHERE `id` = %d AND `uid` = %d",
-			intval($item['id']),
-			intval($owner_uid)
-		);
+	if (!$item['visible']) {
+		Item::update(['visible' => true], ['id' => $item['id']]);
 	}
 
-	$term_objtype = (($item['resource-id']) ? TERM_OBJ_PHOTO : TERM_OBJ_POST );
+	$term_objtype = ($item['resource-id'] ? TERM_OBJ_PHOTO : TERM_OBJ_POST);
         $t = q("SELECT count(tid) as tcount FROM term WHERE oid=%d AND term='%s'",
                 intval($item['id']),
                 dbesc($term)
         );
 	if((! $blocktags) && $t[0]['tcount']==0 ) {
-		/*q("update item set tag = '%s' where id = %d",
-			dbesc($item['tag'] . (strlen($item['tag']) ? ',' : '') . '#[url=' . System::baseUrl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
-			intval($item['id'])
-		);*/
-
 		q("INSERT INTO term (oid, otype, type, term, url, uid) VALUE (%d, %d, %d, '%s', '%s', %d)",
 		   intval($item['id']),
 		   $term_objtype,
@@ -201,26 +197,16 @@ EOT;
 	                   intval($owner_uid)
 	                );
 		}
-
-		/*if(count($x) && !$x[0]['blocktags'] && (! stristr($r[0]['tag'], ']' . $term . '['))) {
-			q("update item set tag = '%s' where id = %d",
-				dbesc($r[0]['tag'] . (strlen($r[0]['tag']) ? ',' : '') . '#[url=' . System::baseUrl() . '/search?tag=' . $term . ']'. $term . '[/url]'),
-				intval($r[0]['id'])
-			);
-		}*/
-
 	}
 
 
 	$arr['id'] = $post_id;
 
-	call_hooks('post_local_end', $arr);
+	Addon::callHooks('post_local_end', $arr);
 
 	Worker::add(PRIORITY_HIGH, "Notifier", "tag", $post_id);
 
 	killme();
 
 	return; // NOTREACHED
-
-
 }

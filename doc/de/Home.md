@@ -28,8 +28,9 @@ Friendica - Dokumentation und Ressourcen
 **Dokumentation für Administratoren**
 
 * [Installation](help/Install)
+* [Update](help/Update) (EN)
 * [Konfigurationen & Admin-Panel](help/Settings)
-* [Plugins](help/Plugins)
+* [Addons](help/Addons)
 * [Konnektoren (Connectors) installieren (Twitter/GNU Social)](help/Installing-Connectors)
 * [Installation eines ejabberd Servers (XMPP-Chat) mit synchronisierten Anmeldedaten](help/install-ejabberd) (EN)
 * [Betreibe deine Seite mit einem SSL-Zertifikat](help/SSL)
@@ -44,7 +45,7 @@ Friendica - Dokumentation und Ressourcen
 * [Help on Vagrant](help/Vagrant)
 * [How to translate Friendica](help/translations) (EN)
 * [Bugs and Issues](help/Bugs-and-Issues)
-* [Plugin Development](help/Plugins)
+* [Addon Development](help/Addons)
 * [Theme Development](help/themes)
 * [Smarty 3 Templates](help/smarty3-templates)
 * [Protokoll Dokumentation](help/Protocol) (EN)
@@ -58,8 +59,13 @@ Friendica - Dokumentation und Ressourcen
 **Externe Ressourcen**
 
 * [Haupt-Webseite](https://friendi.ca)
-* [Mailing Liste](http://librelist.com/browser/friendica/)
 * [Deutsches Friendica-Wiki](http://wiki.toktan.org/doku.php)
+* Support Kanäle
+  * [Friendica Support Forum](https://forum.friendi.ca/~helpers)
+  * [Mailing Listen Archiv](http://mailman.friendi.ca/mailman/listinfo/support-friendi.ca) zum Abonnieren der Liste eine E-Mail an ``support-request(at)friendi.ca?subject=subscribe`` senden
+  * XMPP/Jabber MUC: support(at)forum.friendi.ca
+  * IRC: #friendica auf irc.freenode.net
+  * Matrix: #friendi.ca oder #friendica auf matrix.org
 
 **Über diese Seite**
 

@@ -9,11 +9,11 @@
 	<div class="media-body">
 		{{* The intro actions like approve, ignore, discard intro*}}
 		<div class="intro-actions pull-right nav-pills preferences">
-			<button class="btn-link intro-action-link" onclick="addElmToModal('#intro-approve-wrapper-{{$contact_id}}');" title="{{$approve|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-check" aria-hidden="true"></i></button>
+			<button class="btn-link intro-action-link" onclick="addElmToModal('#intro-approve-wrapper-{{$contact_id}}');" aria-label="{{$approve|escape:'html'}}" title="{{$approve|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-check" aria-hidden="true"></i></button>
 
 			<form class="intro-form" action="notifications/{{$intro_id}}" method="post">
-				<button class="btn-link intro-submit-ignore intro-action-link" type="submit" name="submit" value="{{$ignore|escape:'html'}}" title="{{$ignore|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-ban" aria-hidden="true"></i></button>
-				{{if $discard}}<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="{{$discard|escape:'html'}}" title="{{$discard|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-trash-o" aria-hidden="true"></i></button>{{/if}}
+				<button class="btn-link intro-submit-ignore intro-action-link" type="submit" name="submit" value="{{$ignore|escape:'html'}}" aria-label="{{$ignore|escape:'html'}}" title="{{$ignore|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-ban" aria-hidden="true"></i></button>
+				{{if $discard}}<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="{{$discard|escape:'html'}}" aria-label="{{$discard|escape:'html'}}" title="{{$discard|escape:'html'}}" data-toggle="tooltip"><i class="fa fa-trash-o" aria-hidden="true"></i></button>{{/if}}
 			</form>
 		</div>
 		<div class='intro-enty-name'><h4 class="media-heading"><a href="{{$zrl}}">{{$fullname}}</a></h4></div>

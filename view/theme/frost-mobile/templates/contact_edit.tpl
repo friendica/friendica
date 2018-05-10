@@ -81,6 +81,15 @@
 <h4>{{$lbl_vis1}}</h4>
 <p>{{$lbl_vis2}}</p> 
 </div>
+
+{{if $reason}}
+	<div id="contact-info-wrapper">
+		<h4>{{$lbl_info2}}</h4>
+		<p>{{$reason}}</p>
+	</div>
+	<div id="contact-info-end"></div>
+{{/if}}
+
 {{$profile_select}}
 <div id="contact-edit-profile-select-end"></div>
 

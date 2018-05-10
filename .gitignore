@@ -9,6 +9,7 @@ include/jquery-1.4.2.min.js
 favicon.*
 home.html
 addon
+*.orig
 *~
 robots.txt
 
@@ -52,8 +53,9 @@ nbproject
 #ignore things from transifex-client
 venv/
 
-#ignore git projects in vendor
-vendor/**/.git
+#ignore Composer dependencies
+/vendor
+/view/asset
 
 #ignore config files from JetBrains
 /.idea

@@ -4,29 +4,31 @@
  */
 namespace Friendica\Protocol;
 
-use Friendica\App;
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Conversation;
 use Friendica\Model\GContact;
+use Friendica\Model\Item;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Lock;
+use Friendica\Util\Network;
 use Friendica\Util\XML;
 use dba;
 use DOMDocument;
 use DOMXPath;
 
 require_once 'include/dba.php';
-require_once 'include/threads.php';
-require_once 'include/html2bbcode.php';
-require_once 'include/bbcode.php';
 require_once 'include/items.php';
 require_once 'mod/share.php';
 require_once 'include/enotify.php';
-require_once 'include/follow.php';
 require_once 'include/api.php';
 require_once 'mod/proxy.php';
 
@@ -36,7 +38,7 @@ require_once 'mod/proxy.php';
 class OStatus
 {
 	private static $itemlist;
-	private static $conv_list = array();
+	private static $conv_list = [];
 
 	/**
 	 * @brief Fetches author data
@@ -51,7 +53,7 @@ class OStatus
 	 */
 	private static function fetchAuthor($xpath, $context, $importer, &$contact, $onlyfetch)
 	{
-		$author = array();
+		$author = [];
 		$author["author-link"] = $xpath->evaluate('atom:author/atom:uri/text()', $context)->item(0)->nodeValue;
 		$author["author-name"] = $xpath->evaluate('atom:author/atom:name/text()', $context)->item(0)->nodeValue;
 		$addr = $xpath->evaluate('atom:author/atom:email/text()', $context)->item(0)->nodeValue;
@@ -68,58 +70,40 @@ class OStatus
 		}
 		$author["contact-id"] = $contact["id"];
 
-		$found = false;
-
+		$contact = null;
 		if ($aliaslink != '') {
-			$condition = array("`uid` = ? AND `alias` = ? AND `network` != ?",
-					$importer["uid"], $aliaslink, NETWORK_STATUSNET);
-			$r = dba::select('contact', array(), $condition, array('limit' => 1));
-
-			if (DBM::is_result($r)) {
-				$found = true;
-				if ($r['blocked']) {
-					$r['id'] = -1;
-				}
-				$contact = $r;
-				$author["contact-id"] = $r["id"];
-			}
+			$condition = ["`uid` = ? AND `alias` = ? AND `network` != ? AND `rel` IN (?, ?)",
+					$importer["uid"], $aliaslink, NETWORK_STATUSNET,
+					CONTACT_IS_SHARING, CONTACT_IS_FRIEND];
+			$contact = dba::selectFirst('contact', [], $condition);
 		}
 
-		if (!$found && ($author["author-link"] != "")) {
+		if (!DBM::is_result($contact) && $author["author-link"] != '') {
 			if ($aliaslink == "") {
 				$aliaslink = $author["author-link"];
 			}
 
-			$condition = array("`uid` = ? AND `nurl` IN (?, ?) AND `network` != ?", $importer["uid"],
-					normalise_link($author["author-link"]), normalise_link($aliaslink), NETWORK_STATUSNET);
-			$r = dba::select('contact', array(), $condition, array('limit' => 1));
-
-			if (DBM::is_result($r)) {
-				$found = true;
-				if ($r['blocked']) {
-					$r['id'] = -1;
-				}
-				$contact = $r;
-				$author["contact-id"] = $r["id"];
-			}
+			$condition = ["`uid` = ? AND `nurl` IN (?, ?) AND `network` != ? AND `rel` IN (?, ?)",
+					$importer["uid"], normalise_link($author["author-link"]), normalise_link($aliaslink),
+					NETWORK_STATUSNET, CONTACT_IS_SHARING, CONTACT_IS_FRIEND];
+			$contact = dba::selectFirst('contact', [], $condition);
 		}
 
-		if (!$found && ($addr != "")) {
-			$condition = array("`uid` = ? AND `addr` = ? AND `network` != ?",
-					$importer["uid"], $addr, NETWORK_STATUSNET);
-			$r = dba::select('contact', array(), $condition, array('limit' => 1));
-
-			if (DBM::is_result($r)) {
-				$found = true;
-				if ($r['blocked']) {
-					$r['id'] = -1;
-				}
-				$contact = $r;
-				$author["contact-id"] = $r["id"];
-			}
+		if (!DBM::is_result($contact) && ($addr != '')) {
+			$condition = ["`uid` = ? AND `addr` = ? AND `network` != ? AND `rel` IN (?, ?)",
+					$importer["uid"], $addr, NETWORK_STATUSNET,
+					CONTACT_IS_SHARING, CONTACT_IS_FRIEND];
+			$contact = dba::selectFirst('contact', [], $condition);
 		}
 
-		$avatarlist = array();
+		if (DBM::is_result($contact)) {
+			if ($contact['blocked']) {
+				$contact['id'] = -1;
+			}
+			$author["contact-id"] = $contact["id"];
+		}
+
+		$avatarlist = [];
 		$avatars = $xpath->query("atom:author/atom:link[@rel='avatar']", $context);
 		foreach ($avatars as $avatar) {
 			$href = "";
@@ -151,7 +135,7 @@ class OStatus
 		$author["owner-avatar"] = $author["author-avatar"];
 
 		// Only update the contacts if it is an OStatus contact
-		if ($r && ($r['id'] > 0) && !$onlyfetch && ($contact["network"] == NETWORK_OSTATUS)) {
+		if (DBM::is_result($contact) && ($contact['id'] > 0) && !$onlyfetch && ($contact["network"] == NETWORK_OSTATUS)) {
 
 			// Update contact data
 			$current = $contact;
@@ -187,7 +171,7 @@ class OStatus
 
 			$value = $xpath->evaluate('atom:author/poco:note/text()', $context)->item(0)->nodeValue;
 			if ($value != "") {
-				$contact["about"] = html2bbcode($value);
+				$contact["about"] = HTML::toBBCode($value);
 			}
 
 			$value = $xpath->evaluate('atom:author/poco:address/poco:formatted/text()', $context)->item(0)->nodeValue;
@@ -195,9 +179,9 @@ class OStatus
 				$contact["location"] = $value;
 			}
 
-			$contact['name-date'] = datetime_convert();
+			$contact['name-date'] = DateTimeFormat::utcNow();
 
-			dba::update('contact', $contact, array('id' => $contact["id"]), $current);
+			dba::update('contact', $contact, ['id' => $contact["id"]], $current);
 
 			if (!empty($author["author-avatar"]) && ($author["author-avatar"] != $current['avatar'])) {
 				logger("Update profile picture for contact ".$contact["id"], LOGGER_DEBUG);
@@ -205,20 +189,20 @@ class OStatus
 			}
 
 			// Ensure that we are having this contact (with uid=0)
-			$cid = Contact::getIdForURL($aliaslink, 0);
+			$cid = Contact::getIdForURL($aliaslink, 0, true);
 
 			if ($cid) {
-				$fields = array('url', 'nurl', 'name', 'nick', 'alias', 'about', 'location');
-				$old_contact = dba::select('contact', $fields, array('id' => $cid), array('limit' => 1));
+				$fields = ['url', 'nurl', 'name', 'nick', 'alias', 'about', 'location'];
+				$old_contact = dba::selectFirst('contact', $fields, ['id' => $cid]);
 
 				// Update it with the current values
-				$fields = array('url' => $author["author-link"], 'name' => $contact["name"],
+				$fields = ['url' => $author["author-link"], 'name' => $contact["name"],
 						'nurl' => normalise_link($author["author-link"]),
 						'nick' => $contact["nick"], 'alias' => $contact["alias"],
 						'about' => $contact["about"], 'location' => $contact["location"],
-						'success_update' => datetime_convert(), 'last-update' => datetime_convert());
+						'success_update' => DateTimeFormat::utcNow(), 'last-update' => DateTimeFormat::utcNow()];
 
-				dba::update('contact', $fields, array('id' => $cid), $old_contact);
+				dba::update('contact', $fields, ['id' => $cid], $old_contact);
 
 				// Update the avatar
 				Contact::updateAvatar($author["author-avatar"], 0, $cid);
@@ -262,13 +246,12 @@ class OStatus
 		$xpath->registerNamespace('ostatus', NAMESPACE_OSTATUS);
 		$xpath->registerNamespace('statusnet', NAMESPACE_STATUSNET);
 
-		$entries = $xpath->query('/atom:entry');
+		$contact = ["id" => 0];
 
-		foreach ($entries as $entry) {
-			// fetch the author
-			$author = self::fetchAuthor($xpath, $entry, $importer, $contact, true);
-			return $author;
-		}
+		// Fetch the first author
+		$authordata = $xpath->query('//author')->item(0);
+		$author = self::fetchAuthor($xpath, $authordata, $importer, $contact, true);
+		return $author;
 	}
 
 	/**
@@ -280,7 +263,7 @@ class OStatus
 	 */
 	private static function readAttributes($element)
 	{
-		$attribute = array();
+		$attribute = [];
 
 		foreach ($element->attributes as $attributes) {
 			$attribute[$attributes->name] = $attributes->textContent;
@@ -318,8 +301,8 @@ class OStatus
 	private static function process($xml, $importer, &$contact, &$hub, $stored = false, $initialize = true)
 	{
 		if ($initialize) {
-			self::$itemlist = array();
-			self::$conv_list = array();
+			self::$itemlist = [];
+			self::$conv_list = [];
 		}
 
 		logger("Import OStatus message", LOGGER_DEBUG);
@@ -351,7 +334,7 @@ class OStatus
 			}
 		}
 
-		$header = array();
+		$header = [];
 		$header["uid"] = $importer["uid"];
 		$header["network"] = NETWORK_OSTATUS;
 		$header["type"] = "remote";
@@ -388,7 +371,7 @@ class OStatus
 		$entry = $xpath->query('/atom:entry');
 
 		// Reverse the order of the entries
-		$entrylist = array();
+		$entrylist = [];
 
 		foreach ($entries as $entry) {
 			$entrylist[] = $entry;
@@ -420,19 +403,19 @@ class OStatus
 			$item["verb"] = $xpath->query('activity:verb/text()', $entry)->item(0)->nodeValue;
 
 			// Delete a message
-			if (in_array($item["verb"], array('qvitter-delete-notice', ACTIVITY_DELETE, 'delete'))) {
+			if (in_array($item["verb"], ['qvitter-delete-notice', ACTIVITY_DELETE, 'delete'])) {
 				self::deleteNotice($item);
 				continue;
 			}
 
-			if (in_array($item["verb"], array(NAMESPACE_OSTATUS."/unfavorite", ACTIVITY_UNFAVORITE))) {
+			if (in_array($item["verb"], [NAMESPACE_OSTATUS."/unfavorite", ACTIVITY_UNFAVORITE])) {
 				// Ignore "Unfavorite" message
 				logger("Ignore unfavorite message ".print_r($item, true), LOGGER_DEBUG);
 				continue;
 			}
 
 			// Deletions come with the same uri, so we check for duplicates after processing deletions
-			if (dba::exists('item', array('uid' => $importer["uid"], 'uri' => $item["uri"]))) {
+			if (dba::exists('item', ['uid' => $importer["uid"], 'uri' => $item["uri"]])) {
 				logger('Post with URI '.$item["uri"].' already existed for user '.$importer["uid"].'.', LOGGER_DEBUG);
 				continue;
 			} else {
@@ -452,12 +435,12 @@ class OStatus
 			}
 
 			if ($item["verb"] == ACTIVITY_FOLLOW) {
-				new_follower($importer, $contact, $item, $nickname);
+				Contact::addRelationship($importer, $contact, $item, $nickname);
 				continue;
 			}
 
 			if ($item["verb"] == NAMESPACE_OSTATUS."/unfollow") {
-				lose_follower($importer, $contact, $item, $dummy);
+				Contact::removeFollower($importer, $contact, $item, $dummy);
 				continue;
 			}
 
@@ -471,7 +454,7 @@ class OStatus
 			}
 
 			// http://activitystrea.ms/schema/1.0/rsvp-yes
-			if (!in_array($item["verb"], array(ACTIVITY_POST, ACTIVITY_LIKE, ACTIVITY_SHARE))) {
+			if (!in_array($item["verb"], [ACTIVITY_POST, ACTIVITY_LIKE, ACTIVITY_SHARE])) {
 				logger("Unhandled verb ".$item["verb"]." ".print_r($item, true), LOGGER_DEBUG);
 			}
 
@@ -484,20 +467,31 @@ class OStatus
 					if (!$valid) {
 						// If not, then it depends on this setting
 						$valid = !Config::get('system', 'ostatus_full_threads');
+						if ($valid) {
+							logger("Item with uri ".self::$itemlist[0]['uri']." will be imported due to the system settings.", LOGGER_DEBUG);
+						}
+					} else {
+						logger("Item with uri ".self::$itemlist[0]['uri']." belongs to a contact (".self::$itemlist[0]['contact-id']."). It will be imported.", LOGGER_DEBUG);
 					}
 					if ($valid) {
 						// Never post a thread when the only interaction by our contact was a like
 						$valid = false;
-						$verbs = array(ACTIVITY_POST, ACTIVITY_SHARE);
+						$verbs = [ACTIVITY_POST, ACTIVITY_SHARE];
 						foreach (self::$itemlist as $item) {
 							if (!empty($item['contact-id']) && in_array($item['verb'], $verbs)) {
 								$valid = true;
 							}
 						}
+						if ($valid) {
+							logger("Item with uri ".self::$itemlist[0]['uri']." will be imported since the thread contains posts or shares.", LOGGER_DEBUG);
+						}
 					}
 				} else {
 					// But we will only import complete threads
-					$valid = dba::exists('item', array('uid' => $importer["uid"], 'uri' => self::$itemlist[0]['parent-uri']));
+					$valid = dba::exists('item', ['uid' => $importer["uid"], 'uri' => self::$itemlist[0]['parent-uri']]);
+					if ($valid) {
+						logger("Item with uri ".self::$itemlist[0]["uri"]." belongs to parent ".self::$itemlist[0]['parent-uri']." of user ".$importer["uid"].". It will be imported.", LOGGER_DEBUG);
+					}
 				}
 
 				if ($valid) {
@@ -511,25 +505,25 @@ class OStatus
 						}
 					}
 					foreach (self::$itemlist as $item) {
-						$found = dba::exists('item', array('uid' => $importer["uid"], 'uri' => $item["uri"]));
+						$found = dba::exists('item', ['uid' => $importer["uid"], 'uri' => $item["uri"]]);
 						if ($found) {
 							logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already exists.", LOGGER_DEBUG);
 						} elseif ($item['contact-id'] < 0) {
 							logger("Item with uri ".$item["uri"]." is from a blocked contact.", LOGGER_DEBUG);
 						} else {
 							// We are having duplicated entries. Hopefully this solves it.
-							if (Lock::set('ostatus_process_item_store')) {
-								$ret = item_store($item);
-								Lock::remove('ostatus_process_item_store');
+							if (Lock::set('ostatus_process_item_insert')) {
+								$ret = Item::insert($item);
+								Lock::remove('ostatus_process_item_insert');
 								logger("Item with uri ".$item["uri"]." for user ".$importer["uid"].' stored. Return value: '.$ret);
 							} else {
-								$ret = item_store($item);
+								$ret = Item::insert($item);
 								logger("We couldn't lock - but tried to store the item anyway. Return value is ".$ret);
 							}
 						}
 					}
 				}
-				self::$itemlist = array();
+				self::$itemlist = [];
 			}
 			logger('Processing done for post with URI '.$item["uri"].' for user '.$importer["uid"].'.', LOGGER_DEBUG);
 		}
@@ -542,23 +536,14 @@ class OStatus
 	 */
 	private static function deleteNotice($item)
 	{
-		$condition = array('uid' => $item['uid'], 'author-link' => $item['author-link'], 'uri' => $item['uri']);
-		$deleted = dba::select('item', array('id', 'parent-uri'), $condition, array('limit' => 1));
+		$condition = ['uid' => $item['uid'], 'author-link' => $item['author-link'], 'uri' => $item['uri']];
+		$deleted = dba::selectFirst('item', ['id', 'parent-uri'], $condition);
 		if (!DBM::is_result($deleted)) {
 			logger('Item from '.$item['author-link'].' with uri '.$item['uri'].' for user '.$item['uid']." wasn't found. We don't delete it. ");
 			return;
 		}
 
-		// Currently we don't have a central deletion function that we could use in this case
-		// The function "item_drop" doesn't work for that case
-		dba::update(
-			'item',
-			array('deleted' => true, 'title' => '', 'body' => '',
-					'edited' => datetime_convert(), 'changed' => datetime_convert()),
-			array('id' => $deleted["id"])
-		);
-
-		delete_thread($deleted["id"], $deleted["parent-uri"]);
+		Item::deleteById($deleted["id"]);
 
 		logger('Deleted item with uri '.$item['uri'].' for user '.$item['uid']);
 	}
@@ -574,7 +559,7 @@ class OStatus
 	 */
 	private static function processPost($xpath, $entry, &$item, $importer)
 	{
-		$item["body"] = html2bbcode($xpath->query('atom:content/text()', $entry)->item(0)->nodeValue);
+		$item["body"] = HTML::toBBCode($xpath->query('atom:content/text()', $entry)->item(0)->nodeValue);
 		$item["object-type"] = $xpath->query('activity:object-type/text()', $entry)->item(0)->nodeValue;
 		if (($item["object-type"] == ACTIVITY_OBJ_BOOKMARK) || ($item["object-type"] == ACTIVITY_OBJ_EVENT)) {
 			$item["title"] = $xpath->query('atom:title/text()', $entry)->item(0)->nodeValue;
@@ -675,8 +660,9 @@ class OStatus
 		// Mastodon Content Warning
 		if (($item["verb"] == ACTIVITY_POST) && $xpath->evaluate('boolean(atom:summary)', $entry)) {
 			$clear_text = $xpath->query('atom:summary/text()', $entry)->item(0)->nodeValue;
-
-			$item["body"] = html2bbcode($clear_text) . '[spoiler]' . $item["body"] . '[/spoiler]';
+			if (!empty($clear_text)) {
+				$item['content-warning'] = HTML::toBBCode($clear_text);
+			}
 		}
 
 		if (($self != '') && empty($item['protocol'])) {
@@ -687,9 +673,11 @@ class OStatus
 			self::fetchConversation($item['conversation-href'], $item['conversation-uri']);
 		}
 
-		if (isset($item["parent-uri"]) && ($related != '')) {
-			if (!dba::exists('item', array('uid' => $importer["uid"], 'uri' => $item['parent-uri']))) {
-				self::fetchRelated($related, $item["parent-uri"], $importer);
+		if (isset($item["parent-uri"])) {
+			if (!dba::exists('item', ['uid' => $importer["uid"], 'uri' => $item['parent-uri']])) {
+				if ($related != '') {
+					self::fetchRelated($related, $item["parent-uri"], $importer);
+				}
 			} else {
 				logger('Reply with URI '.$item["uri"].' already existed for user '.$importer["uid"].'.', LOGGER_DEBUG);
 			}
@@ -701,7 +689,7 @@ class OStatus
 		}
 
 		if (($item['author-link'] != '') && !empty($item['protocol'])) {
-			$item = store_conversation($item);
+			$item = Conversation::insert($item);
 		}
 
 		self::$itemlist[] = $item;
@@ -723,7 +711,7 @@ class OStatus
 
 		self::$conv_list[$conversation] = true;
 
-		$conversation_data = z_fetch_url($conversation, false, $redirects, array('accept_content' => 'application/atom+xml, text/html'));
+		$conversation_data = Network::curl($conversation, false, $redirects, ['accept_content' => 'application/atom+xml, text/html']);
 
 		if (!$conversation_data['success']) {
 			return;
@@ -744,6 +732,7 @@ class OStatus
 
 			$links = $xpath->query('//link');
 			if ($links) {
+				$file = '';
 				foreach ($links as $link) {
 					$attribute = self::readAttributes($link);
 					if (($attribute['rel'] == 'alternate') && ($attribute['type'] == 'application/atom+xml')) {
@@ -751,7 +740,7 @@ class OStatus
 					}
 				}
 				if ($file != '') {
-					$conversation_atom = z_fetch_url($attribute['href']);
+					$conversation_atom = Network::curl($attribute['href']);
 
 					if ($conversation_atom['success']) {
 						$xml = $conversation_atom['body'];
@@ -793,7 +782,7 @@ class OStatus
 			$doc2->preserveWhiteSpace = false;
 			$doc2->formatOutput = true;
 
-			$conv_data = array();
+			$conv_data = [];
 
 			$conv_data['protocol'] = PROTOCOL_SPLITTED_CONV;
 			$conv_data['network'] = NETWORK_OSTATUS;
@@ -837,14 +826,14 @@ class OStatus
 
 			$conv_data['source'] = $doc2->saveXML();
 
-			$condition = array('item-uri' => $conv_data['uri'],'protocol' => PROTOCOL_OSTATUS_FEED);
+			$condition = ['item-uri' => $conv_data['uri'],'protocol' => PROTOCOL_OSTATUS_FEED];
 			if (dba::exists('conversation', $condition)) {
 				logger('Delete deprecated entry for URI '.$conv_data['uri'], LOGGER_DEBUG);
-				dba::delete('conversation', array('item-uri' => $conv_data['uri']));
+				dba::delete('conversation', ['item-uri' => $conv_data['uri']]);
 			}
 
 			logger('Store conversation data for uri '.$conv_data['uri'], LOGGER_DEBUG);
-			store_conversation($conv_data);
+			Conversation::insert($conv_data);
 		}
 	}
 
@@ -861,13 +850,13 @@ class OStatus
 	 */
 	private static function fetchSelf($self, &$item)
 	{
-		$condition = array('`item-uri` = ? AND `protocol` IN (?, ?)', $self, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON);
+		$condition = ['`item-uri` = ? AND `protocol` IN (?, ?)', $self, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON];
 		if (dba::exists('conversation', $condition)) {
 			logger('Conversation '.$item['uri'].' is already stored.', LOGGER_DEBUG);
 			return;
 		}
 
-		$self_data = z_fetch_url($self);
+		$self_data = Network::curl($self);
 
 		if (!$self_data['success']) {
 			return;
@@ -896,8 +885,8 @@ class OStatus
 	 */
 	private static function fetchRelated($related, $related_uri, $importer)
 	{
-		$condition = array('`item-uri` = ? AND `protocol` IN (?, ?)', $related_uri, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON);
-		$conversation = dba::select('conversation', array('source', 'protocol'), $condition,  array('limit' => 1));
+		$condition = ['`item-uri` = ? AND `protocol` IN (?, ?)', $related_uri, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON];
+		$conversation = dba::selectFirst('conversation', ['source', 'protocol'], $condition);
 		if (DBM::is_result($conversation)) {
 			$stored = true;
 			$xml = $conversation['source'];
@@ -907,12 +896,12 @@ class OStatus
 			}
 			if ($conversation['protocol'] == PROTOCOL_OSTATUS_SALMON) {
 				logger('Delete invalid cached XML for URI '.$related_uri, LOGGER_DEBUG);
-				dba::delete('conversation', array('item-uri' => $related_uri));
+				dba::delete('conversation', ['item-uri' => $related_uri]);
 			}
 		}
 
 		$stored = false;
-		$related_data = z_fetch_url($related, false, $redirects, array('accept_content' => 'application/atom+xml, text/html'));
+		$related_data = Network::curl($related, false, $redirects, ['accept_content' => 'application/atom+xml, text/html']);
 
 		if (!$related_data['success']) {
 			return;
@@ -943,7 +932,7 @@ class OStatus
 					}
 				}
 				if ($atom_file != '') {
-					$related_atom = z_fetch_url($atom_file);
+					$related_atom = Network::curl($atom_file);
 
 					if ($related_atom['success']) {
 						logger('Fetched XML for URI '.$related_uri, LOGGER_DEBUG);
@@ -955,7 +944,7 @@ class OStatus
 
 		// Workaround for older GNU Social servers
 		if (($xml == '') && strstr($related, '/notice/')) {
-			$related_atom = z_fetch_url(str_replace('/notice/', '/api/statuses/show/', $related).'.atom');
+			$related_atom = Network::curl(str_replace('/notice/', '/api/statuses/show/', $related).'.atom');
 
 			if ($related_atom['success']) {
 				logger('GNU Social workaround to fetch XML for URI '.$related_uri, LOGGER_DEBUG);
@@ -966,7 +955,7 @@ class OStatus
 		// Even more worse workaround for GNU Social ;-)
 		if ($xml == '') {
 			$related_guess = OStatus::convertHref($related_uri);
-			$related_atom = z_fetch_url(str_replace('/notice/', '/api/statuses/show/', $related_guess).'.atom');
+			$related_atom = Network::curl(str_replace('/notice/', '/api/statuses/show/', $related_guess).'.atom');
 
 			if ($related_atom['success']) {
 				logger('GNU Social workaround 2 to fetch XML for URI '.$related_uri, LOGGER_DEBUG);
@@ -976,8 +965,8 @@ class OStatus
 
 		// Finally we take the data that we fetched from "ostatus:conversation"
 		if ($xml == '') {
-			$condition = array('item-uri' => $related_uri, 'protocol' => PROTOCOL_SPLITTED_CONV);
-			$conversation = dba::select('conversation', array('source'), $condition,  array('limit' => 1));
+			$condition = ['item-uri' => $related_uri, 'protocol' => PROTOCOL_SPLITTED_CONV];
+			$conversation = dba::selectFirst('conversation', ['source'], $condition);
 			if (DBM::is_result($conversation)) {
 				$stored = true;
 				logger('Got cached XML from conversation for URI '.$related_uri, LOGGER_DEBUG);
@@ -1008,10 +997,10 @@ class OStatus
 		$activityobjects = $xpath->query('activity:object', $entry)->item(0);
 
 		if (!is_object($activityobjects)) {
-			return array();
+			return [];
 		}
 
-		$link_data = array();
+		$link_data = [];
 
 		$orig_uri = $xpath->query('atom:id/text()', $activityobjects)->item(0)->nodeValue;
 
@@ -1030,7 +1019,7 @@ class OStatus
 		$item["author-link"] = $orig_author["author-link"];
 		$item["author-avatar"] = $orig_author["author-avatar"];
 
-		$item["body"] = html2bbcode($orig_body);
+		$item["body"] = HTML::toBBCode($orig_body);
 		$item["created"] = $orig_created;
 		$item["edited"] = $orig_edited;
 
@@ -1062,7 +1051,7 @@ class OStatus
 	 */
 	private static function processLinks($links, &$item)
 	{
-		$link_data = array('add_body' => '', 'self' => '');
+		$link_data = ['add_body' => '', 'self' => ''];
 
 		foreach ($links as $link) {
 			$attribute = self::readAttributes($link);
@@ -1204,7 +1193,7 @@ class OStatus
 	 */
 	private static function formatPicturePost($body)
 	{
-		$siteinfo = get_attached_data($body);
+		$siteinfo = BBCode::getAttachedData($body);
 
 		if (($siteinfo["type"] == "photo")) {
 			if (isset($siteinfo["preview"])) {
@@ -1217,8 +1206,8 @@ class OStatus
 			$preview = proxy_url($preview, false, PROXY_SIZE_SMALL);
 
 			// Is it a local picture? Then make it smaller here
-			$preview = str_replace(array("-0.jpg", "-0.png"), array("-2.jpg", "-2.png"), $preview);
-			$preview = str_replace(array("-1.jpg", "-1.png"), array("-2.jpg", "-2.png"), $preview);
+			$preview = str_replace(["-0.jpg", "-0.png"], ["-2.jpg", "-2.png"], $preview);
+			$preview = str_replace(["-1.jpg", "-1.png"], ["-2.jpg", "-2.png"], $preview);
 
 			if (isset($siteinfo["url"])) {
 				$url = $siteinfo["url"];
@@ -1235,12 +1224,13 @@ class OStatus
 	/**
 	 * @brief Adds the header elements to the XML document
 	 *
-	 * @param object $doc   XML document
-	 * @param array  $owner Contact data of the poster
+	 * @param object $doc    XML document
+	 * @param array  $owner  Contact data of the poster
+	 * @param string $filter The related feed filter (activity, posts or comments)
 	 *
 	 * @return object header root element
 	 */
-	private static function addHeader($doc, $owner)
+	private static function addHeader($doc, $owner, $filter)
 	{
 		$a = get_app();
 
@@ -1256,18 +1246,25 @@ class OStatus
 		$root->setAttribute("xmlns:statusnet", NAMESPACE_STATUSNET);
 		$root->setAttribute("xmlns:mastodon", NAMESPACE_MASTODON);
 
-		$attributes = array("uri" => "https://friendi.ca", "version" => FRIENDICA_VERSION."-".DB_UPDATE_VERSION);
+		$title = '';
+		switch ($filter) {
+			case 'activity': $title = L10n::t('%s\'s timeline', $owner['name']); break;
+			case 'posts'   : $title = L10n::t('%s\'s posts'   , $owner['name']); break;
+			case 'comments': $title = L10n::t('%s\'s comments', $owner['name']); break;
+		}
+
+		$attributes = ["uri" => "https://friendi.ca", "version" => FRIENDICA_VERSION . "-" . DB_UPDATE_VERSION];
 		XML::addElement($doc, $root, "generator", FRIENDICA_PLATFORM, $attributes);
-		XML::addElement($doc, $root, "id", System::baseUrl()."/profile/".$owner["nick"]);
-		XML::addElement($doc, $root, "title", sprintf("%s timeline", $owner["name"]));
+		XML::addElement($doc, $root, "id", System::baseUrl() . "/profile/" . $owner["nick"]);
+		XML::addElement($doc, $root, "title", $title);
 		XML::addElement($doc, $root, "subtitle", sprintf("Updates from %s on %s", $owner["name"], $a->config["sitename"]));
 		XML::addElement($doc, $root, "logo", $owner["photo"]);
-		XML::addElement($doc, $root, "updated", datetime_convert("UTC", "UTC", "now", ATOM_TIME));
+		XML::addElement($doc, $root, "updated", DateTimeFormat::utcNow(DateTimeFormat::ATOM));
 
 		$author = self::addAuthor($doc, $owner);
 		$root->appendChild($author);
 
-		$attributes = array("href" => $owner["url"], "rel" => "alternate", "type" => "text/html");
+		$attributes = ["href" => $owner["url"], "rel" => "alternate", "type" => "text/html"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
 		/// @TODO We have to find out what this is
@@ -1278,18 +1275,25 @@ class OStatus
 
 		self::hublinks($doc, $root, $owner["nick"]);
 
-		$attributes = array("href" => System::baseUrl()."/salmon/".$owner["nick"], "rel" => "salmon");
+		$attributes = ["href" => System::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "salmon"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
-		$attributes = array("href" => System::baseUrl()."/salmon/".$owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-replies");
+		$attributes = ["href" => System::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-replies"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
-		$attributes = array("href" => System::baseUrl()."/salmon/".$owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-mention");
+		$attributes = ["href" => System::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-mention"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
-		$attributes = array("href" => System::baseUrl()."/api/statuses/user_timeline/".$owner["nick"].".atom",
-				"rel" => "self", "type" => "application/atom+xml");
+		$attributes = ["href" => System::baseUrl() . "/api/statuses/user_timeline/" . $owner["nick"] . ".atom",
+			"rel" => "self", "type" => "application/atom+xml"];
 		XML::addElement($doc, $root, "link", "", $attributes);
+
+		if ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY) {
+			$condition = ['uid' => $owner['uid'], 'self' => false, 'pending' => false,
+					'archive' => false, 'hidden' => false, 'blocked' => false];
+			$members = dba::count('contact', $condition);
+			XML::addElement($doc, $root, "statusnet:group_info", "", ["member_count" => $members]);
+		}
 
 		return $root;
 	}
@@ -1305,11 +1309,11 @@ class OStatus
 	public static function hublinks($doc, $root, $nick)
 	{
 		$h = System::baseUrl() . '/pubsubhubbub/'.$nick;
-		XML::addElement($doc, $root, "link", "", array("href" => $h, "rel" => "hub"));
+		XML::addElement($doc, $root, "link", "", ["href" => $h, "rel" => "hub"]);
 	}
 
 	/**
-	 * @brief Adds attachement data to the XML document
+	 * @brief Adds attachment data to the XML document
 	 *
 	 * @param object $doc  XML document
 	 * @param object $root XML root element where the hub links are added
@@ -1319,23 +1323,25 @@ class OStatus
 	private static function getAttachment($doc, $root, $item)
 	{
 		$o = "";
-		$siteinfo = get_attached_data($item["body"]);
+		$siteinfo = BBCode::getAttachedData($item["body"]);
 
 		switch ($siteinfo["type"]) {
 			case 'photo':
 				$imgdata = Image::getInfoFromURL($siteinfo["image"]);
-				$attributes = array("rel" => "enclosure",
-						"href" => $siteinfo["image"],
-						"type" => $imgdata["mime"],
-						"length" => intval($imgdata["size"]));
-				XML::addElement($doc, $root, "link", "", $attributes);
+				if ($imgdata) {
+					$attributes = ["rel" => "enclosure",
+							"href" => $siteinfo["image"],
+							"type" => $imgdata["mime"],
+							"length" => intval($imgdata["size"])];
+					XML::addElement($doc, $root, "link", "", $attributes);
+				}
 				break;
 			case 'video':
-				$attributes = array("rel" => "enclosure",
+				$attributes = ["rel" => "enclosure",
 						"href" => $siteinfo["url"],
 						"type" => "text/html; charset=UTF-8",
 						"length" => "",
-						"title" => $siteinfo["title"]);
+						"title" => $siteinfo["title"]];
 				XML::addElement($doc, $root, "link", "", $attributes);
 				break;
 			default:
@@ -1344,12 +1350,14 @@ class OStatus
 
 		if (!Config::get('system', 'ostatus_not_attach_preview') && ($siteinfo["type"] != "photo") && isset($siteinfo["image"])) {
 			$imgdata = Image::getInfoFromURL($siteinfo["image"]);
-			$attributes = array("rel" => "enclosure",
-					"href" => $siteinfo["image"],
-					"type" => $imgdata["mime"],
-					"length" => intval($imgdata["size"]));
+			if ($imgdata) {
+				$attributes = ["rel" => "enclosure",
+						"href" => $siteinfo["image"],
+						"type" => $imgdata["mime"],
+						"length" => intval($imgdata["size"])];
 
-			XML::addElement($doc, $root, "link", "", $attributes);
+				XML::addElement($doc, $root, "link", "", $attributes);
+			}
 		}
 
 		$arr = explode('[/attach],', $item['attach']);
@@ -1358,9 +1366,9 @@ class OStatus
 				$matches = false;
 				$cnt = preg_match('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\" title=\"(.*?)\"|', $r, $matches);
 				if ($cnt) {
-					$attributes = array("rel" => "enclosure",
+					$attributes = ["rel" => "enclosure",
 							"href" => $matches[1],
-							"type" => $matches[3]);
+							"type" => $matches[3]];
 
 					if (intval($matches[2])) {
 						$attributes["length"] = intval($matches[2]);
@@ -1382,67 +1390,73 @@ class OStatus
 	 *
 	 * @return object author element
 	 */
-	private static function addAuthor($doc, $owner)
+	private static function addAuthor($doc, $owner, $show_profile = true)
 	{
-		$r = q("SELECT `homepage`, `publish` FROM `profile` WHERE `uid` = %d AND `is-default` LIMIT 1", intval($owner["uid"]));
-		if (DBM::is_result($r)) {
-			$profile = $r[0];
-		}
+		$profile = dba::selectFirst('profile', ['homepage', 'publish'], ['uid' => $owner['uid'], 'is-default' => true]);
 		$author = $doc->createElement("author");
 		XML::addElement($doc, $author, "id", $owner["url"]);
-		XML::addElement($doc, $author, "activity:object-type", ACTIVITY_OBJ_PERSON);
+		if ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY) {
+			XML::addElement($doc, $author, "activity:object-type", ACTIVITY_OBJ_GROUP);
+		} else {
+			XML::addElement($doc, $author, "activity:object-type", ACTIVITY_OBJ_PERSON);
+		}
 		XML::addElement($doc, $author, "uri", $owner["url"]);
 		XML::addElement($doc, $author, "name", $owner["nick"]);
 		XML::addElement($doc, $author, "email", $owner["addr"]);
-		XML::addElement($doc, $author, "summary", bbcode($owner["about"], false, false, 7));
+		if ($show_profile) {
+			XML::addElement($doc, $author, "summary", BBCode::convert($owner["about"], false, 7));
+		}
 
-		$attributes = array("rel" => "alternate", "type" => "text/html", "href" => $owner["url"]);
+		$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $owner["url"]];
 		XML::addElement($doc, $author, "link", "", $attributes);
 
-		$attributes = array(
+		$attributes = [
 				"rel" => "avatar",
 				"type" => "image/jpeg", // To-Do?
 				"media:width" => 175,
 				"media:height" => 175,
-				"href" => $owner["photo"]);
+				"href" => $owner["photo"]];
 		XML::addElement($doc, $author, "link", "", $attributes);
 
 		if (isset($owner["thumb"])) {
-			$attributes = array(
+			$attributes = [
 					"rel" => "avatar",
 					"type" => "image/jpeg", // To-Do?
 					"media:width" => 80,
 					"media:height" => 80,
-					"href" => $owner["thumb"]);
+					"href" => $owner["thumb"]];
 			XML::addElement($doc, $author, "link", "", $attributes);
 		}
 
 		XML::addElement($doc, $author, "poco:preferredUsername", $owner["nick"]);
 		XML::addElement($doc, $author, "poco:displayName", $owner["name"]);
-		XML::addElement($doc, $author, "poco:note", bbcode($owner["about"], false, false, 7));
+		if ($show_profile) {
+			XML::addElement($doc, $author, "poco:note", BBCode::convert($owner["about"], false, 7));
 
-		if (trim($owner["location"]) != "") {
-			$element = $doc->createElement("poco:address");
-			XML::addElement($doc, $element, "poco:formatted", $owner["location"]);
-			$author->appendChild($element);
+			if (trim($owner["location"]) != "") {
+				$element = $doc->createElement("poco:address");
+				XML::addElement($doc, $element, "poco:formatted", $owner["location"]);
+				$author->appendChild($element);
+			}
 		}
 
-		if (trim($profile["homepage"]) != "") {
-			$urls = $doc->createElement("poco:urls");
-			XML::addElement($doc, $urls, "poco:type", "homepage");
-			XML::addElement($doc, $urls, "poco:value", $profile["homepage"]);
-			XML::addElement($doc, $urls, "poco:primary", "true");
-			$author->appendChild($urls);
+		if (DBM::is_result($profile) && !$show_profile) {
+			if (trim($profile["homepage"]) != "") {
+				$urls = $doc->createElement("poco:urls");
+				XML::addElement($doc, $urls, "poco:type", "homepage");
+				XML::addElement($doc, $urls, "poco:value", $profile["homepage"]);
+				XML::addElement($doc, $urls, "poco:primary", "true");
+				$author->appendChild($urls);
+			}
+
+			XML::addElement($doc, $author, "followers", "", ["url" => System::baseUrl()."/viewcontacts/".$owner["nick"]]);
+			XML::addElement($doc, $author, "statusnet:profile_info", "", ["local_id" => $owner["uid"]]);
+
+			if ($profile["publish"]) {
+				XML::addElement($doc, $author, "mastodon:scope", "public");
+			}
 		}
 
-		if (count($profile)) {
-			XML::addElement($doc, $author, "followers", "", array("url" => System::baseUrl()."/viewcontacts/".$owner["nick"]));
-			XML::addElement($doc, $author, "statusnet:profile_info", "", array("local_id" => $owner["uid"]));
-		}
-
-		if ($profile["publish"]) {
-			XML::addElement($doc, $author, "mastodon:scope", "public");
-		}
 		return $author;
 	}
 
@@ -1477,7 +1491,7 @@ class OStatus
 	 */
 	private static function constructObjecttype($item)
 	{
-		if (in_array($item['object-type'], array(ACTIVITY_OBJ_NOTE, ACTIVITY_OBJ_COMMENT)))
+		if (in_array($item['object-type'], [ACTIVITY_OBJ_NOTE, ACTIVITY_OBJ_COMMENT]))
 			return $item['object-type'];
 		return ACTIVITY_OBJ_NOTE;
 	}
@@ -1494,6 +1508,8 @@ class OStatus
 	 */
 	private static function entry($doc, $item, $owner, $toplevel = false)
 	{
+		$xml = null;
+
 		$repeated_guid = self::getResharedGuid($item);
 		if ($repeated_guid != "") {
 			$xml = self::reshareEntry($doc, $item, $owner, $repeated_guid, $toplevel);
@@ -1505,7 +1521,7 @@ class OStatus
 
 		if ($item["verb"] == ACTIVITY_LIKE) {
 			return self::likeEntry($doc, $item, $owner, $toplevel);
-		} elseif (in_array($item["verb"], array(ACTIVITY_FOLLOW, NAMESPACE_OSTATUS."/unfollow"))) {
+		} elseif (in_array($item["verb"], [ACTIVITY_FOLLOW, NAMESPACE_OSTATUS."/unfollow"])) {
 			return self::followEntry($doc, $item, $owner, $toplevel);
 		} else {
 			return self::noteEntry($doc, $item, $owner, $toplevel);
@@ -1525,10 +1541,10 @@ class OStatus
 		$source = $doc->createElement("source");
 		XML::addElement($doc, $source, "id", $contact["poll"]);
 		XML::addElement($doc, $source, "title", $contact["name"]);
-		XML::addElement($doc, $source, "link", "", array("rel" => "alternate", "type" => "text/html", "href" => $contact["alias"]));
-		XML::addElement($doc, $source, "link", "", array("rel" => "self", "type" => "application/atom+xml", "href" => $contact["poll"]));
+		XML::addElement($doc, $source, "link", "", ["rel" => "alternate", "type" => "text/html", "href" => $contact["alias"]]);
+		XML::addElement($doc, $source, "link", "", ["rel" => "self", "type" => "application/atom+xml", "href" => $contact["poll"]]);
 		XML::addElement($doc, $source, "icon", $contact["photo"]);
-		XML::addElement($doc, $source, "updated", datetime_convert("UTC", "UTC", $contact["success_update"]."+00:00", ATOM_TIME));
+		XML::addElement($doc, $source, "updated", DateTimeFormat::utc($contact["success_update"]."+00:00", DateTimeFormat::ATOM));
 
 		return $source;
 	}
@@ -1602,7 +1618,7 @@ class OStatus
 			logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
 		}
 
-		$title = self::entryHeader($doc, $entry, $owner, $toplevel);
+		$title = self::entryHeader($doc, $entry, $owner, $item, $toplevel);
 
 		$r = q(
 			"SELECT * FROM `item` WHERE `uid` = %d AND `guid` = '%s' AND NOT `private` AND `network` IN ('%s', '%s', '%s') LIMIT 1",
@@ -1631,7 +1647,7 @@ class OStatus
 
 		self::entryContent($doc, $as_object, $repeated_item, $owner, "", "", false);
 
-		$author = self::addAuthor($doc, $contact);
+		$author = self::addAuthor($doc, $contact, false);
 		$as_object->appendChild($author);
 
 		$as_object2 = $doc->createElement("activity:object");
@@ -1673,7 +1689,7 @@ class OStatus
 			logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
 		}
 
-		$title = self::entryHeader($doc, $entry, $owner, $toplevel);
+		$title = self::entryHeader($doc, $entry, $owner, $item, $toplevel);
 
 		$verb = NAMESPACE_ACTIVITY_SCHEMA."favorite";
 		self::entryContent($doc, $entry, $item, $owner, "Favorite", $verb, false);
@@ -1720,15 +1736,15 @@ class OStatus
 		XML::addElement($doc, $object, "id", $contact["alias"]);
 		XML::addElement($doc, $object, "title", $contact["nick"]);
 
-		$attributes = array("rel" => "alternate", "type" => "text/html", "href" => $contact["url"]);
+		$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $contact["url"]];
 		XML::addElement($doc, $object, "link", "", $attributes);
 
-		$attributes = array(
+		$attributes = [
 				"rel" => "avatar",
 				"type" => "image/jpeg", // To-Do?
 				"media:width" => 175,
 				"media:height" => 175,
-				"href" => $contact["photo"]);
+				"href" => $contact["photo"]];
 		XML::addElement($doc, $object, "link", "", $attributes);
 
 		XML::addElement($doc, $object, "poco:preferredUsername", $contact["nick"]);
@@ -1780,12 +1796,12 @@ class OStatus
 		}
 
 		if ($item['verb'] == ACTIVITY_FOLLOW) {
-			$message = t('%s is now following %s.');
-			$title = t('following');
+			$message = L10n::t('%s is now following %s.');
+			$title = L10n::t('following');
 			$action = "subscription";
 		} else {
-			$message = t('%s stopped following %s.');
-			$title = t('stopped following');
+			$message = L10n::t('%s stopped following %s.');
+			$title = L10n::t('stopped following');
 			$action = "unfollow";
 		}
 
@@ -1796,7 +1812,7 @@ class OStatus
 
 		$item["body"] = sprintf($message, $owner["nick"], $contact["nick"]);
 
-		self::entryHeader($doc, $entry, $owner, $toplevel);
+		self::entryHeader($doc, $entry, $owner, $item, $toplevel);
 
 		self::entryContent($doc, $entry, $item, $owner, $title);
 
@@ -1824,7 +1840,7 @@ class OStatus
 			logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
 		}
 
-		$title = self::entryHeader($doc, $entry, $owner, $toplevel);
+		$title = self::entryHeader($doc, $entry, $owner, $item, $toplevel);
 
 		XML::addElement($doc, $entry, "activity:object-type", ACTIVITY_OBJ_NOTE);
 
@@ -1845,12 +1861,18 @@ class OStatus
 	 *
 	 * @return string The title for the element
 	 */
-	private static function entryHeader($doc, &$entry, $owner, $toplevel)
+	private static function entryHeader($doc, &$entry, $owner, $item, $toplevel)
 	{
 		/// @todo Check if this title stuff is really needed (I guess not)
 		if (!$toplevel) {
 			$entry = $doc->createElement("entry");
 			$title = sprintf("New note by %s", $owner["nick"]);
+
+			if ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY) {
+				$contact = self::contactEntry($item['author-link'], $owner);
+				$author = self::addAuthor($doc, $contact, false);
+				$entry->appendChild($author);
+			}
 		} else {
 			$entry = $doc->createElementNS(NAMESPACE_ATOM1, "entry");
 
@@ -1898,22 +1920,22 @@ class OStatus
 			$body = "[b]".$item['title']."[/b]\n\n".$body;
 		}
 
-		$body = bbcode($body, false, false, 7);
+		$body = BBCode::convert($body, false, 7);
 
-		XML::addElement($doc, $entry, "content", $body, array("type" => "html"));
+		XML::addElement($doc, $entry, "content", $body, ["type" => "html"]);
 
-		XML::addElement($doc, $entry, "link", "", array("rel" => "alternate", "type" => "text/html",
-								"href" => System::baseUrl()."/display/".$item["guid"])
+		XML::addElement($doc, $entry, "link", "", ["rel" => "alternate", "type" => "text/html",
+								"href" => System::baseUrl()."/display/".$item["guid"]]
 		);
 
 		if ($complete && ($item["id"] > 0)) {
-			XML::addElement($doc, $entry, "status_net", "", array("notice_id" => $item["id"]));
+			XML::addElement($doc, $entry, "status_net", "", ["notice_id" => $item["id"]]);
 		}
 
 		XML::addElement($doc, $entry, "activity:verb", $verb);
 
-		XML::addElement($doc, $entry, "published", datetime_convert("UTC", "UTC", $item["created"]."+00:00", ATOM_TIME));
-		XML::addElement($doc, $entry, "updated", datetime_convert("UTC", "UTC", $item["edited"]."+00:00", ATOM_TIME));
+		XML::addElement($doc, $entry, "published", DateTimeFormat::utc($item["created"]."+00:00", DateTimeFormat::ATOM));
+		XML::addElement($doc, $entry, "updated", DateTimeFormat::utc($item["edited"]."+00:00", DateTimeFormat::ATOM));
 	}
 
 	/**
@@ -1928,7 +1950,7 @@ class OStatus
 	 */
 	private static function entryFooter($doc, $entry, $item, $owner, $complete = true)
 	{
-		$mentioned = array();
+		$mentioned = [];
 
 		if (($item['parent'] != $item['id']) || ($item['parent-uri'] !== $item['uri']) || (($item['thr-parent'] !== '') && ($item['thr-parent'] !== $item['uri']))) {
 			$parent = q("SELECT `guid`, `author-link`, `owner-link` FROM `item` WHERE `id` = %d", intval($item["parent"]));
@@ -1949,14 +1971,14 @@ class OStatus
 				$parent_plink = System::baseUrl()."/display/".$parent[0]["guid"];
 			}
 
-			$attributes = array(
+			$attributes = [
 					"ref" => $parent_item,
-					"href" => $parent_plink);
+					"href" => $parent_plink];
 			XML::addElement($doc, $entry, "thr:in-reply-to", "", $attributes);
 
-			$attributes = array(
+			$attributes = [
 					"rel" => "related",
-					"href" => $parent_plink);
+					"href" => $parent_plink];
 			XML::addElement($doc, $entry, "link", "", $attributes);
 		}
 
@@ -1976,17 +1998,17 @@ class OStatus
 				}
 			}
 
-			XML::addElement($doc, $entry, "link", "", array("rel" => "ostatus:conversation", "href" => $conversation_href));
+			XML::addElement($doc, $entry, "link", "", ["rel" => "ostatus:conversation", "href" => $conversation_href]);
 
-			$attributes = array(
+			$attributes = [
 					"href" => $conversation_href,
 					"local_id" => $item["parent"],
-					"ref" => $conversation_uri);
+					"ref" => $conversation_uri];
 
 			XML::addElement($doc, $entry, "ostatus:conversation", $conversation_uri, $attributes);
 		}
 
-		$tags = item_getfeedtags($item);
+		$tags = item::getFeedTags($item);
 
 		if (count($tags)) {
 			foreach ($tags as $t) {
@@ -1997,7 +2019,7 @@ class OStatus
 		}
 
 		// Make sure that mentions are accepted (GNU Social has problems with mixing HTTP and HTTPS)
-		$newmentions = array();
+		$newmentions = [];
 		foreach ($mentioned as $mention) {
 			$newmentions[str_replace("http://", "https://", $mention)] = str_replace("http://", "https://", $mention);
 			$newmentions[str_replace("https://", "http://", $mention)] = str_replace("https://", "http://", $mention);
@@ -2005,41 +2027,45 @@ class OStatus
 		$mentioned = $newmentions;
 
 		foreach ($mentioned as $mention) {
-			$r = q(
-				"SELECT `forum`, `prv` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
-				intval($owner["uid"]),
-				dbesc(normalise_link($mention))
-			);
-			if ($r[0]["forum"] || $r[0]["prv"]) {
+			$condition = ['uid' => $owner['uid'], 'nurl' => normalise_link($mention)];
+			$contact = dba::selectFirst('contact', ['forum', 'prv', 'self', 'contact-type'], $condition);
+			if ($contact["forum"] || $contact["prv"] || ($owner['contact-type'] == ACCOUNT_TYPE_COMMUNITY) ||
+				($contact['self'] && ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY))) {
 				XML::addElement($doc, $entry, "link", "",
-					array(
+					[
 						"rel" => "mentioned",
 						"ostatus:object-type" => ACTIVITY_OBJ_GROUP,
-						"href" => $mention)
+						"href" => $mention]
 				);
 			} else {
 				XML::addElement($doc, $entry, "link", "",
-					array(
+					[
 						"rel" => "mentioned",
 						"ostatus:object-type" => ACTIVITY_OBJ_PERSON,
-						"href" => $mention)
+						"href" => $mention]
 				);
 			}
 		}
 
+		if ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY) {
+			XML::addElement($doc, $entry, "link", "", ["rel" => "mentioned",
+									"ostatus:object-type" => "http://activitystrea.ms/schema/1.0/group",
+									"href" => $owner['url']]);
+		}
+
 		if (!$item["private"]) {
-			XML::addElement($doc, $entry, "link", "", array("rel" => "ostatus:attention",
-									"href" => "http://activityschema.org/collection/public"));
-			XML::addElement($doc, $entry, "link", "", array("rel" => "mentioned",
+			XML::addElement($doc, $entry, "link", "", ["rel" => "ostatus:attention",
+									"href" => "http://activityschema.org/collection/public"]);
+			XML::addElement($doc, $entry, "link", "", ["rel" => "mentioned",
 									"ostatus:object-type" => "http://activitystrea.ms/schema/1.0/collection",
-									"href" => "http://activityschema.org/collection/public"));
+									"href" => "http://activityschema.org/collection/public"]);
 			XML::addElement($doc, $entry, "mastodon:scope", "public");
 		}
 
 		if (count($tags)) {
 			foreach ($tags as $t) {
 				if ($t[0] != "@") {
-					XML::addElement($doc, $entry, "category", "", array("term" => $t[2]));
+					XML::addElement($doc, $entry, "category", "", ["term" => $t[2]]);
 				}
 			}
 		}
@@ -2052,7 +2078,7 @@ class OStatus
 				$app = "web";
 			}
 
-			$attributes = array("local_id" => $item["id"], "source" => $app);
+			$attributes = ["local_id" => $item["id"], "source" => $app];
 
 			if (isset($parent["id"])) {
 				$attributes["repeat_of"] = $parent["id"];
@@ -2067,66 +2093,94 @@ class OStatus
 	}
 
 	/**
+	 * Creates the XML feed for a given nickname
+	 *
+	 * Supported filters:
+	 * - activity (default): all the public posts
+	 * - posts: all the public top-level posts
+	 * - comments: all the public replies
+	 *
+	 * Updates the provided last_update parameter if the result comes from the
+	 * cache or it is empty
+	 *
 	 * @brief Creates the XML feed for a given nickname
 	 *
-	 * @param object  $a           The application class
 	 * @param string  $owner_nick  Nickname of the feed owner
 	 * @param string  $last_update Date of the last update
 	 * @param integer $max_items   Number of maximum items to fetch
+	 * @param string  $filter      Feed items filter (activity, posts or comments)
+	 * @param boolean $nocache     Wether to bypass caching
 	 *
 	 * @return string XML feed
 	 */
-	public static function feed(App $a, $owner_nick, &$last_update, $max_items = 300)
+	public static function feed($owner_nick, &$last_update, $max_items = 300, $filter = 'activity', $nocache = false)
 	{
 		$stamp = microtime(true);
 
-		$cachekey = "ostatus:feed:".$owner_nick.":".$last_update;
+		$cachekey = "ostatus:feed:" . $owner_nick . ":" . $filter . ":" . $last_update;
 
 		$previous_created = $last_update;
 
 		$result = Cache::get($cachekey);
-		if (!is_null($result)) {
-			logger('Feed duration: '.number_format(microtime(true) - $stamp, 3).' - '.$owner_nick.' - '.$previous_created.' (cached)', LOGGER_DEBUG);
+		if (!$nocache && !is_null($result)) {
+			logger('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created . ' (cached)', LOGGER_DEBUG);
 			$last_update = $result['last_update'];
 			return $result['feed'];
 		}
 
-		$r = q(
-			"SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`
+		$owner = dba::fetch_first(
+			"SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`, `user`.`account-type`
 				FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
-				WHERE `contact`.`self` AND `user`.`nickname` = '%s' LIMIT 1",
-			dbesc($owner_nick)
+				WHERE `contact`.`self` AND `user`.`nickname` = ? LIMIT 1",
+			$owner_nick
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBM::is_result($owner)) {
 			return;
 		}
-
-		$owner = $r[0];
 
 		if (!strlen($last_update)) {
 			$last_update = 'now -30 days';
 		}
 
-		$check_date = datetime_convert('UTC', 'UTC', $last_update, 'Y-m-d H:i:s');
-		$authorid = Contact::getIdForURL($owner["url"], 0);
+		$check_date = DateTimeFormat::utc($last_update);
+		$authorid = Contact::getIdForURL($owner["url"], 0, true);
+
+		$sql_extra = '';
+		if ($filter === 'posts') {
+			$sql_extra .= ' AND `item`.`id` = `item`.`parent` ';
+		}
+
+		if ($filter === 'comments') {
+			$sql_extra .= sprintf(" AND `item`.`object-type` = '%s' ", dbesc(ACTIVITY_OBJ_COMMENT));
+		}
+
+		if ($owner['account-type'] != ACCOUNT_TYPE_COMMUNITY) {
+			$sql_extra .= sprintf(" AND `item`.`contact-id` = %d AND `item`.`author-id` = %d ", intval($owner["id"]), intval($authorid));
+		}
 
 		$items = q(
 			"SELECT `item`.*, `item`.`id` AS `item_id` FROM `item` USE INDEX (`uid_contactid_created`)
 				STRAIGHT_JOIN `thread` ON `thread`.`iid` = `item`.`parent`
-				WHERE `item`.`uid` = %d AND `item`.`contact-id` = %d AND
-					`item`.`author-id` = %d AND `item`.`created` > '%s' AND
-					NOT `item`.`deleted` AND NOT `item`.`private` AND
-					`thread`.`network` IN ('%s', '%s')
+				WHERE `item`.`uid` = %d
+				AND `item`.`created` > '%s'
+				AND NOT `item`.`deleted`
+				AND NOT `item`.`private`
+				AND `item`.`visible`
+				AND `item`.`wall`
+				AND `thread`.`network` IN ('%s', '%s')
+				$sql_extra
 				ORDER BY `item`.`created` DESC LIMIT %d",
-			intval($owner["uid"]), intval($owner["id"]),
-			intval($authorid), dbesc($check_date),
-			dbesc(NETWORK_OSTATUS), dbesc(NETWORK_DFRN), intval($max_items)
+			intval($owner["uid"]),
+			dbesc($check_date),
+			dbesc(NETWORK_OSTATUS),
+			dbesc(NETWORK_DFRN),
+			intval($max_items)
 		);
 
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
 
-		$root = self::addHeader($doc, $owner);
+		$root = self::addHeader($doc, $owner, $filter);
 
 		foreach ($items as $item) {
 			if (Config::get('system', 'ostatus_debug')) {
@@ -2142,10 +2196,10 @@ class OStatus
 
 		$feeddata = trim($doc->saveXML());
 
-		$msg = array('feed' => $feeddata, 'last_update' => $last_update);
+		$msg = ['feed' => $feeddata, 'last_update' => $last_update];
 		Cache::set($cachekey, $msg, CACHE_QUARTER_HOUR);
 
-		logger('Feed duration: '.number_format(microtime(true) - $stamp, 3).' - '.$owner_nick.' - '.$previous_created, LOGGER_DEBUG);
+		logger('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created, LOGGER_DEBUG);
 
 		return $feeddata;
 	}

@@ -13,9 +13,9 @@ Or it is for testing purposes only.
 Especially don't do that with undocumented values.
 
 The header of the section describes the category, the value is the parameter.
-Example: To set the directory value please add this line to your .htconfig.php:
+Example: To set the automatic database cleanup process add this line to your .htconfig.php:
 
-    $a->config['system']['directory'] = 'http://dir.friendica.social';
+    $a->config['system']['always_show_preview'] = true;
 
 ## jabber ##
 * **debug** (Boolean) - Enable debug level for the jabber account synchronisation.
@@ -25,9 +25,10 @@ Example: To set the directory value please add this line to your .htconfig.php:
 
 * **allowed_link_protocols** (Array) - Allowed protocols in links URLs, add at your own risk. http is always allowed.
 * **always_show_preview** (Boolean) - Only show small preview picures. Default value is false.
-* **birthday_input_format** - Default value is "ymd".
-* **block_local_dir** (Boolean) - Blocks the access to the directory of the local users.
+* **archival_days** (Integer) - Number of days that we try to deliver content before we archive a contact. Defaults to 32.
 * **auth_cookie_lifetime** (Integer) - Number of days that should pass without any activity before a user who chose "Remember me" when logging in is considered logged out. Defaults to 7.
+* **block_local_dir** (Boolean) - Blocks the access to the directory of the local users.
+* **config_adapter** (jit|preload) - Allow to switch the configuration adapter to improve performances at the cost of memory consumption. Default value is "jit"
 * **curl_range_bytes** - Maximum number of bytes that should be fetched. Default is 0, which mean "no limit".
 * **db_log** - Name of a logfile to log slow database queries
 * **db_loglimit** - If a database call lasts longer than this value it is logged
@@ -36,19 +37,18 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **db_loglimit_index** - Number of index rows needed to be logged for indexes on the watchlist
 * **db_loglimit_index_high** - Number of index rows to be logged anyway (for any index)
 * **db_log_index_blacklist** - Blacklist of indexes that shouldn't be watched
-* **dbclean** (Boolean) - Enable the automatic database cleanup process
-* **dbclean-expire-days** (Integer) - Days after which remote items will be deleted. Own items, and marked or filed items are kept.
 * **diaspora_test** (Boolean) - For development only. Disables the message transfer.
-* **directory** - The path to global directory. If not set then "http://dir.friendica.social" is used.
 * **disable_email_validation** (Boolean) - Disables the check if a mail address is in a valid format and can be resolved via DNS.
 * **disable_url_validation** (Boolean) - Disables the DNS lookup of an URL.
+* **disable_password_exposed** (Boolean) - Disable the exposition check against the remote haveibeenpwned API on password change. Default value is false.
 * **dlogfile - location of the developer log file
-* **event_input_format** - Default value is "ymd".
+* **dlogip - restricts develop log writes to requests originating from this IP address
 * **frontend_worker_timeout** - Value in minutes after we think that a frontend task was killed by the webserver. Default value is 10.
 * **hsts** (Boolean) - Enables the sending of HTTP Strict Transport Security headers
 * **ignore_cache** (Boolean) - For development only. Disables the item cache.
 * **instances_social_key** - Key to the API of https://instances.social which retrieves data about mastodon servers. See https://instances.social/api/token to get an API key.
 * **ipv4_resolve** (Boolean) - Resolve IPV4 addresses only. Don't resolve to IPV6. Default value is false.
+* **invitation_only** (Boolean) -  If set true registration is only possible after a current member of the node has send an invitation. Default is false.
 * **like_no_comment** (Boolean) - Don't update the "commented" value of an item when it is liked.
 * **local_block** (Boolean) - Used in conjunction with "block_public".
 * **local_search** (Boolean) - Blocks search for users who are not logged in to prevent crawlers from blocking your system.
@@ -60,18 +60,20 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **max_processes_backend** - Maximum number of concurrent database processes for background tasks. Default value is 5.
 * **max_processes_frontend** - Maximum number of concurrent database processes for foreground tasks. Default value is 20.
 * **min_poll_interval** - minimal distance in minutes between two polls for a contact. Default is 1. Reasonable values are between 1 and 59.
-* **memcache** (Boolean) - Use memcache. To use memcache the PECL extension "memcache" has to be installed and activated.
-* **memcache_host** - Hostname of the memcache daemon. Default is '127.0.0.1'.
-* **memcache_port** - Portnumber of the memcache daemon. Default is 11211.
+* **session_handler** (database|cache|native) - Whether to use Cache to store session data or to use PHP native session storage. Default value is `database`.
+* **cache_driver** (database|memcache|memcached) - Whether to use Memcache or Memcached to store temporary cache. Default value is `database`.
+* **memcache_host** - Host name of the memcache daemon. Default is '127.0.0.1'.
+* **memcache_port** - Port number of the memcache daemon. Default is 11211.
+* **memcached_hosts** - Array of Memcached servers info `[host, port(, weight)]`. Default value is `[['127.0.0.1', 11211]]`.
 * **no_count** (Boolean) - Don't do count calculations (currently only when showing albums)
 * **no_oembed** (Boolean) - Don't use OEmbed to fetch more information about a link.
-* **no_oembed_rich_content** (Boolean) - Don't show the rich content (e.g. embedded PDF).
 * **no_smilies** (Boolean) - Don't show smilies.
 * **no_view_full_size** (Boolean) - Don't add the link "View full size" under a resized image.
 * **optimize_items** (Boolean) - Triggers an SQL command to optimize the item table before expiring items.
 * **ostatus_poll_timeframe** - Defines how old an item can be to try to complete the conversation with it.
 * **paranoia** (Boolean) - Log out users if their IP address changed.
 * **permit_crawling** (Boolean) - Restricts the search for not logged in users to one search per minute.
+* **queue_no_dead_check** (Boolean) - Ignore if the target contact or server seems to be dead during queue delivery.
 * **worker_debug** (Boolean) - If enabled, it prints out the number of running processes split by priority.
 * **worker_fetch_limit** - Number of worker tasks that are fetched in a single query. Default is 1.
 * **profiler** (Boolean) - Enable internal timings to help optimize code. Needed for "rendertime" addon. Default is false.
@@ -82,11 +84,6 @@ Example: To set the directory value please add this line to your .htconfig.php:
 * **proxy_cache_time** - Time after which the cache is cleared. Default value is one day.
 * **pushpoll_frequency** -
 * **qsearch_limit** - Default value is 100.
-* **relay_server** - Experimental Diaspora feature. Address of the relay server where public posts should be send to. For example https://podrelay.net
-* **relay_subscribe** (Boolean) - Enables the receiving of public posts from the relay. They will be included in the search and on the community page when it is set up to show all public items.
-* **relay_scope** - Can be "all" or "tags". "all" means that every public post should be received. "tags" means that only posts with selected tags should be received.
-* **relay_server_tags** - Comma separated list of tags for the "tags" subscription (see "relay_scrope")
-* **relay_user_tags** (Boolean) - If enabled, the tags from the saved searches will used for the "tags" subscription in addition to the "relay_server_tags".
 * **remove_multiplicated_lines** (Boolean) - If enabled, multiple linefeeds in items are stripped to a single one.
 * **show_unsupported_addons** (Boolean) - Show all addons including the unsupported ones.
 * **show_unsupported_themes** (Boolean) - Show all themes including the unsupported ones.

@@ -71,7 +71,7 @@ Every time a user tries to access any Friendica page by any mean (manual address
 
 With Apache, enable the modules rewrite and ssl (with a shared hosting provider, this should be enabled already):
 
-	sudo a2enmod rewrite ssl
+        sudo a2enmod rewrite ssl
 
 Add the following lines to the .htaccess file in the root folder of your Friendica instance (thanks to [url=https://github.com/AlfredSK]AlfredSK[/url]):
 

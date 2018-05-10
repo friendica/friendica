@@ -1,6 +1,6 @@
 Utilities
 
-typo.php  - is a crude syntax checker to avoid checking in files with simple
+php bin/console.php typo - is a crude syntax checker to avoid checking in files with simple
 typos. It basically just loads each of our project files at once. Run from
 cmdline and see if any parsing errors are reported.
 
@@ -8,11 +8,11 @@ cmdline and see if any parsing errors are reported.
 
 Internationalisation
 
-extract.php - extracts translatable strings from our project files. It
+php bin/console.php extract - extracts translatable strings from our project files. It
 currently doesn't pick up strings in other libraries we might be using such as
 the HTML parsers.
 
-In order for extract to do its job, every use of the t() translation function
+In order for extract to do its job, every use of the L10n::t() translation function
 must be preceded by one space. The string also can not contain parentheses. If
 parens are required in a string which requires translation, please use hex escapes.
 
@@ -61,7 +61,7 @@ e.g.
 
 Plural
 
-The tt() function supports plural form. Script extract.php write this in
+The L10n::tt() function supports plural form. The extract command writes this in
 strings.php as an array, one string for every plural form language supports:
 
 $a->string["%d message sent"] = Array(
@@ -72,17 +72,17 @@ $a->string["%d message sent"] = Array(
 The function string_plural_select($n) defined in strings.php, return the string
 index to use, related to the numbers of item (value of $n).
 
-This is modelled after ngettext function of GNU gettext.
+This is modeled after ngettext function of GNU gettext.
 More info at http://www.gnu.org/software/hello/manual/gettext/Plural-forms.html
 
 
 Xgettext and .po workflow
 
-1. Run util/run_xgettext.sh script (on *unix sistems, with GNU xgettext installed)
-	This script runs xgettext on source tree, extracting strings from t() and tt()
+1. Run bin/run_xgettext.sh script (on *unix sistems, with GNU xgettext installed)
+	This script runs xgettext on source tree, extracting strings from L10n::t() and L10n::tt()
 	functions, and creates a util/messages.po file.
 
-	$ cd util; ./run_xgettext.sh
+	$ cd bin; ./run_xgettext.sh
 
 2. copy util/messages.po to view/lang/<language>/messages.po
 	Replace <language> with the language you are working on - e.g. 'es', 'fr', 'de', etc.
@@ -107,20 +107,14 @@ Xgettext and .po workflow
 	of the many .po editors out there, like QtLinguist
 
 5. run
-	$ php util/po2php.php view/lang/<language>/messages.po
+	$ php bin/console.php po2php view/lang/<language>/messages.po
  	to create the strings.php file
 
 When strings are added or modified in source, you could run
-	$ cd util; ./run_xgettext.sh ../view/lang/<language>/messages.po
+	$ cd bin; ./run_xgettext.sh ../view/lang/<language>/messages.po
 	to extract strings from source files and join them with the existing .po file:
 	new strings are added, the existing are not overwritten.
 
 If you already translated Friendica using strings.php, you could import your old
 translation to messages.po. Run:
-$ php util/php2po.php view/lang/<language>/strings.php
-
-
-You may also use the util/string_translator.php web interface to translate the string file, but it is disabled for website security reasons. The web server will need write permission to your language directories and the "Deny ..." line in util/.htaccess will need to be modified or commented to use the utility.
-
-
-
+$ php bin/console.php php2po view/lang/<language>/strings.php

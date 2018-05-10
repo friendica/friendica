@@ -2,7 +2,8 @@
 
 use Friendica\App;
 
-function amcd_content(App $a) {
+function amcd_content()
+{
 	echo <<< JSON
 {
   "version":1,

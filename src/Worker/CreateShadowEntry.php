@@ -8,7 +8,7 @@
 
 namespace Friendica\Worker;
 
-require_once("include/threads.php");
+use Friendica\Model\Item;
 
 class CreateShadowEntry {
 	public static function execute($message_id = 0) {
@@ -16,6 +16,6 @@ class CreateShadowEntry {
 			return;
 		}
 
-		add_shadow_entry($message_id);
+		Item::addShadowPost($message_id);
 	}
 }

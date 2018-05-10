@@ -3,12 +3,14 @@
  * @file mod/suggest.php
  */
 use Friendica\App;
+use Friendica\Content\ContactSelector;
+use Friendica\Content\Widget;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
-
-require_once 'include/contact_widgets.php';
+use Friendica\Model\Profile;
 
 function suggest_init(App $a) {
 	if (! local_user()) {
@@ -21,37 +23,33 @@ function suggest_init(App $a) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
 			$query = explode_querystring($a->query_string);
-			$inputs = array();
+			$inputs = [];
 			foreach ($query['args'] as $arg) {
 				if (strpos($arg, 'confirm=') === false) {
 					$arg_parts = explode('=', $arg);
-					$inputs[] = array('name' => $arg_parts[0], 'value' => $arg_parts[1]);
+					$inputs[] = ['name' => $arg_parts[0], 'value' => $arg_parts[1]];
 				}
 			}
 
-			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), array(
+			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
 				'$method' => 'get',
-				'$message' => t('Do you really want to delete this suggestion?'),
+				'$message' => L10n::t('Do you really want to delete this suggestion?'),
 				'$extra_inputs' => $inputs,
-				'$confirm' => t('Yes'),
+				'$confirm' => L10n::t('Yes'),
 				'$confirm_url' => $query['base'],
 				'$confirm_name' => 'confirmed',
-				'$cancel' => t('Cancel'),
-			));
+				'$cancel' => L10n::t('Cancel'),
+			]);
 			$a->error = 1; // Set $a->error so the other module functions don't execute
 			return;
 		}
 		// Now check how the user responded to the confirmation query
 		if (!$_REQUEST['canceled']) {
-			dba::insert('gcign', array('uid' => local_user(), 'gcid' => $_GET['ignore']));
+			dba::insert('gcign', ['uid' => local_user(), 'gcid' => $_GET['ignore']]);
 		}
 	}
 
 }
-
-
-
-
 
 function suggest_content(App $a) {
 
@@ -59,39 +57,37 @@ function suggest_content(App $a) {
 
 	$o = '';
 	if (! local_user()) {
-		notice( t('Permission denied.') . EOL);
+		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
 	$_SESSION['return_url'] = System::baseUrl() . '/' . $a->cmd;
 
-	$a->page['aside'] .= findpeople_widget();
-	$a->page['aside'] .= follow_widget();
+	$a->page['aside'] .= Widget::findPeople();
+	$a->page['aside'] .= Widget::follow();
 
 
 	$r = GContact::suggestionQuery(local_user());
 
 	if (! DBM::is_result($r)) {
-		$o .= t('No suggestions available. If this is a new site, please try again in 24 hours.');
+		$o .= L10n::t('No suggestions available. If this is a new site, please try again in 24 hours.');
 		return $o;
 	}
-
-	require_once 'include/contact_selectors.php';
 
 	foreach ($r as $rr) {
 
 		$connlnk = System::baseUrl() . '/follow/?url=' . (($rr['connect']) ? $rr['connect'] : $rr['url']);
 		$ignlnk = System::baseUrl() . '/suggest?ignore=' . $rr['id'];
-		$photo_menu = array(
-			'profile' => array(t("View Profile"), zrl($rr["url"])),
-			'follow' => array(t("Connect/Follow"), $connlnk),
-			'hide' => array(t('Ignore/Hide'), $ignlnk)
-		);
+		$photo_menu = [
+			'profile' => [L10n::t("View Profile"), Profile::zrl($rr["url"])],
+			'follow' => [L10n::t("Connect/Follow"), $connlnk],
+			'hide' => [L10n::t('Ignore/Hide'), $ignlnk]
+		];
 
 		$contact_details = Contact::getDetailsByURL($rr["url"], local_user(), $rr);
 
-		$entry = array(
-			'url' => zrl($rr['url']),
+		$entry = [
+			'url' => Profile::zrl($rr['url']),
 			'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
 			'img_hover' => $rr['url'],
 			'name' => $contact_details['name'],
@@ -102,22 +98,22 @@ function suggest_content(App $a) {
 			'account_type'  => Contact::getAccountType($contact_details),
 			'ignlnk' => $ignlnk,
 			'ignid' => $rr['id'],
-			'conntxt' => t('Connect'),
+			'conntxt' => L10n::t('Connect'),
 			'connlnk' => $connlnk,
 			'photo_menu' => $photo_menu,
-			'ignore' => t('Ignore/Hide'),
-			'network' => network_to_name($rr['network'], $rr['url']),
+			'ignore' => L10n::t('Ignore/Hide'),
+			'network' => ContactSelector::networkToName($rr['network'], $rr['url']),
 			'id' => ++$id,
-		);
+		];
 		$entries[] = $entry;
 	}
 
 	$tpl = get_markup_template('viewcontact_template.tpl');
 
-	$o .= replace_macros($tpl,array(
-		'$title' => t('Friend Suggestions'),
+	$o .= replace_macros($tpl,[
+		'$title' => L10n::t('Friend Suggestions'),
 		'$contacts' => $entries,
-	));
+	]);
 
 	return $o;
 }

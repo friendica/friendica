@@ -6,6 +6,9 @@ namespace Friendica;
  * All modules in Friendica should extend BaseModule, although not all modules
  * need to extend all the methods described here
  *
+ * The filename of the module in src/Module needs to match the class name
+ * exactly to make the module available.
+ *
  * @author Hypolite Petovan mrpetovan@gmail.com
  */
 abstract class BaseModule extends BaseObject

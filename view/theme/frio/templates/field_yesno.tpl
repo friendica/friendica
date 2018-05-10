@@ -14,6 +14,8 @@
 				<span class="toggle-handle btn btn-default btn-xs"></span>
 			</div>
 		</div>
+		{{if $field.3}}
 		<span class="help-block" id="{{$field.0}}_tip" role="tooltip">{{$field.3}}</span>
+		{{/if}}
 	</div>
 	<div class="clear"></div>

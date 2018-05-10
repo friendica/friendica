@@ -1,5 +1,5 @@
 <FilesMatch "\.tpl">
-  <IfModule authz_host_module> 
+  <IfModule authz_host_module>
     #Apache 2.4
     Require all denied
   </IfModule>
@@ -8,3 +8,18 @@
     Deny from all
   </IfModule>
 </FilesMatch>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/gif       "access plus 1 year"
+  ExpiresByType image/jpeg      "access plus 1 year"
+  ExpiresByType image/png       "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType text/css        "access plus 1 month"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(gif|jpe?g|png|js|css)$">
+    Header set Cache-Control "public"
+  </FilesMatch>
+</IfModule>

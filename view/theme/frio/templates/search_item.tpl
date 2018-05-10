@@ -141,23 +141,25 @@
 				<div class="wall-item-links">
 				</div>
 				<div class="wall-item-tags">
-					{{foreach $item.hashtags as $tag}}
-						<span class="tag label btn-info sm">{{$tag}} <i class="fa fa-bolt" aria-hidden="true"></i></span>
-					{{/foreach}}
+			{{if !$item.suppress_tags}}
+				{{foreach $item.hashtags as $tag}}
+					<span class="tag label btn-info sm">{{$tag}} <i class="fa fa-bolt" aria-hidden="true"></i></span>
+				{{/foreach}}
 
-					{{foreach $item.mentions as $tag}}
-						<span class="mention label btn-warning sm">{{$tag}} <i class="fa fa-user" aria-hidden="true"></i></span>
-					{{/foreach}}
+				{{foreach $item.mentions as $tag}}
+					<span class="mention label btn-warning sm">{{$tag}} <i class="fa fa-user" aria-hidden="true"></i></span>
+				{{/foreach}}
+			{{/if}}
 
-					{{foreach $item.folders as $cat}}
-						<span class="folder label btn-danger sm">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
-					{{/foreach}}
+				{{foreach $item.folders as $cat}}
+					<span class="folder label btn-danger sm">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+				{{/foreach}}
 
-					{{foreach $item.categories as $cat}}
-						<span class="category label btn-success sm">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
-					{{/foreach}}
+				{{foreach $item.categories as $cat}}
+					<span class="category label btn-success sm">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+				{{/foreach}}
 				</div>
-					{{if $item.edited}}<div class="itemedited text-muted">{{$item.edited['label']}} (<span title="{{$item.edited['date']}}">{{$item.edited['relative']}}</span>)</div>{{/if}}
+				{{if $item.edited}}<div class="itemedited text-muted">{{$item.edited['label']}} (<span title="{{$item.edited['date']}}">{{$item.edited['relative']}}</span>)</div>{{/if}}
 			</div>
 			<!-- ./TODO -->
 

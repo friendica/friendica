@@ -1,49 +1,53 @@
 <?php
-
+/**
+ * @file mod/noscrape.php
+ */
 use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Model\Profile;
 
-function noscrape_init(App $a) {
-
-	if($a->argc > 1)
+function noscrape_init(App $a)
+{
+	if ($a->argc > 1) {
 		$which = $a->argv[1];
-	else
+	} else {
 		killme();
+	}
 
 	$profile = 0;
-	if((local_user()) && ($a->argc > 2) && ($a->argv[2] === 'view')) {
+	if ((local_user()) && ($a->argc > 2) && ($a->argv[2] === 'view')) {
 		$which = $a->user['nickname'];
 		$profile = $a->argv[1];
 	}
 
-	profile_load($a,$which,$profile);
+	Profile::load($a, $which, $profile);
 
-	if (!$a->profile['net-publish'] || $a->profile['hidewall']) {
-		header('Content-type: application/json; charset=utf-8');
-		$json_info = array("hide" => true);
-		echo json_encode($json_info);
-		exit;
-	}
-
-	$keywords = ((x($a->profile,'pub_keywords')) ? $a->profile['pub_keywords'] : '');
-	$keywords = str_replace(array('#',',',' ',',,'),array('',' ',',',','),$keywords);
-	$keywords = explode(',', $keywords);
-
-	$r = q("SELECT `photo` FROM `contact` WHERE `self` AND `uid` = %d",
-		intval($a->profile['uid']));
-
-	$json_info = array(
-		'fn'       => $a->profile['name'],
+	$json_info = [
 		'addr'     => $a->profile['addr'],
 		'nick'     => $which,
 		'guid'     => $a->profile['guid'],
 		'key'      => $a->profile['pubkey'],
 		'homepage' => System::baseUrl()."/profile/{$which}",
-		'comm'     => (x($a->profile,'page-flags')) && ($a->profile['page-flags'] == PAGE_COMMUNITY),
-		'photo'    => $r[0]["photo"],
-		'tags'     => $keywords
-	);
+		'comm'     => ($a->profile['account-type'] == ACCOUNT_TYPE_COMMUNITY),
+	];
+
+	if (!$a->profile['net-publish'] || $a->profile['hidewall']) {
+		header('Content-type: application/json; charset=utf-8');
+		$json_info["hide"] = true;
+		echo json_encode($json_info);
+		exit;
+	}
+
+	$keywords = ((x($a->profile, 'pub_keywords')) ? $a->profile['pub_keywords'] : '');
+	$keywords = str_replace(['#',',',' ',',,'], ['',' ',',',','], $keywords);
+	$keywords = explode(',', $keywords);
+
+	$contactPhoto = dba::selectFirst('contact', ['photo'], ['self' => true, 'uid' => $a->profile['uid']]);
+
+	$json_info['fn'] = $a->profile['name'];
+	$json_info['photo'] = $contactPhoto["photo"];
+	$json_info['tags'] = $keywords;
 
 	if (is_array($a->profile) && !$a->profile['hide-friends']) {
 		/// @todo What should this value tell us?
@@ -67,14 +71,14 @@ function noscrape_init(App $a) {
 
 	// We display the last activity (post or login), reduced to year and week number
 	$last_active = 0;
-	$condition = array('uid' => $a->profile['uid'], 'self' => true);
-	$contact = dba::select('contact', array('last-item'), $condition, array('limit' => 1));
+	$condition = ['uid' => $a->profile['uid'], 'self' => true];
+	$contact = dba::selectFirst('contact', ['last-item'], $condition);
 	if (DBM::is_result($contact)) {
 		$last_active = strtotime($contact['last-item']);
 	}
 
-	$condition = array('uid' => $a->profile['uid']);
-	$user = dba::select('user', array('login_date'), $condition, array('limit' => 1));
+	$condition = ['uid' => $a->profile['uid']];
+	$user = dba::selectFirst('user', ['login_date'], $condition);
 	if (DBM::is_result($user)) {
 		if ($last_active < strtotime($user['login_date'])) {
 			$last_active = strtotime($user['login_date']);
@@ -83,14 +87,14 @@ function noscrape_init(App $a) {
 	$json_info["last-activity"] = date("o-W", $last_active);
 
 	//These are optional fields.
-	$profile_fields = array('pdesc', 'locality', 'region', 'postal-code', 'country-name', 'gender', 'marital', 'about');
+	$profile_fields = ['pdesc', 'locality', 'region', 'postal-code', 'country-name', 'gender', 'marital', 'about'];
 	foreach ($profile_fields as $field) {
 		if (!empty($a->profile[$field])) {
 			$json_info["$field"] = $a->profile[$field];
 		}
 	}
 
-	$dfrn_pages = array('request', 'confirm', 'notify', 'poll');
+	$dfrn_pages = ['request', 'confirm', 'notify', 'poll'];
 	foreach ($dfrn_pages as $dfrn) {
 		$json_info["dfrn-{$dfrn}"] = System::baseUrl()."/dfrn_{$dfrn}/{$which}";
 	}
@@ -99,5 +103,4 @@ function noscrape_init(App $a) {
 	header('Content-type: application/json; charset=utf-8');
 	echo json_encode($json_info);
 	exit;
-
 }

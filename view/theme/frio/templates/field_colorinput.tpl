@@ -6,6 +6,8 @@
 		{{if $field.4}}<span class="required">{{$field.4}}</span>{{/if}}
 		<span class="input-group-addon"><i></i></span>
 	</div>
-	<span id="{{$field.0}}_tip" class="help-block" role="tooltip">{{$field.3}}</span>
+	{{if $field.3}}
+	<span class="help-block" id="{{$field.0}}_tip" role="tooltip">{{$field.3}}</span>
+	{{/if}}
 	<div id="end_{{$field.0}}" class="field_end"></div>
 </div>

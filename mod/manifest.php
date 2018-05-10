@@ -15,11 +15,11 @@ function manifest_content(App $a) {
 		$touch_icon = 'images/friendica-128.png';
 	}
 
-	$o = replace_macros($tpl, array(
+	$o = replace_macros($tpl, [
 		'$baseurl' => System::baseUrl(),
 		'$touch_icon' => $touch_icon,
 		'$title' => Config::get('config', 'sitename', 'Friendica'),
-	));
+	]);
 
 	echo $o;
 

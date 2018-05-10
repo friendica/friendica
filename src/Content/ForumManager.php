@@ -7,6 +7,7 @@ namespace Friendica\Content;
 
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use dba;
@@ -35,7 +36,7 @@ class ForumManager
 	 */
 	public static function getList($uid, $lastitem, $showhidden = true, $showprivate = false)
 	{
-		$forumlist = array();
+		$forumlist = [];
 
 		$order = (($showhidden) ? '' : ' AND NOT `hidden` ');
 		$order .= (($lastitem) ? ' ORDER BY `last-item` DESC ' : ' ORDER BY `name` ASC ');
@@ -48,7 +49,7 @@ class ForumManager
 			"SELECT `contact`.`id`, `contact`.`url`, `contact`.`name`, `contact`.`micro`, `contact`.`thumb`
 			FROM `contact`
 				WHERE `network`= 'dfrn' AND $select AND `uid` = ?
-				AND NOT `blocked` AND NOT `hidden` AND NOT `pending` AND NOT `archive`
+				AND NOT `blocked` AND NOT `pending` AND NOT `archive`
 				AND `success_update` > `failure_update`
 			$order ",
 			$uid
@@ -59,13 +60,13 @@ class ForumManager
 		}
 
 		while ($contact = dba::fetch($contacts)) {
-			$forumlist[] = array(
+			$forumlist[] = [
 				'url'	=> $contact['url'],
 				'name'	=> $contact['name'],
 				'id'	=> $contact['id'],
 				'micro' => $contact['micro'],
 				'thumb' => $contact['thumb'],
-			);
+			];
 		}
 		dba::close($contacts);
 
@@ -104,7 +105,7 @@ class ForumManager
 			foreach ($contacts as $contact) {
 				$selected = (($cid == $contact['id']) ? ' forum-selected' : '');
 
-				$entry = array(
+				$entry = [
 					'url' => 'network?f=&cid=' . $contact['id'],
 					'external_url' => 'redir/' . $contact['id'],
 					'name' => $contact['name'],
@@ -112,7 +113,7 @@ class ForumManager
 					'selected' 	=> $selected,
 					'micro' => System::removedBaseUrl(proxy_url($contact['micro'], false, PROXY_SIZE_MICRO)),
 					'id' => ++$id,
-				);
+				];
 				$entries[] = $entry;
 			}
 
@@ -120,13 +121,13 @@ class ForumManager
 
 			$o .= replace_macros(
 				$tpl,
-				array(
-					'$title'	=> t('Forums'),
+				[
+					'$title'	=> L10n::t('Forums'),
 					'$forums'	=> $entries,
-					'$link_desc'	=> t('External link to forum'),
+					'$link_desc'	=> L10n::t('External link to forum'),
 					'$total'	=> $total,
 					'$visible_forums' => $visible_forums,
-					'$showmore'	=> t('show more'))
+					'$showmore'	=> L10n::t('show more')]
 			);
 		}
 

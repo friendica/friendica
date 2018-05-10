@@ -16,7 +16,13 @@
 	{{/if}}
 	</td><td>{{if $check.required}}(required){{/if}}</td></tr>
 	{{if $check.help}}
-	<tr><td class="help" colspan="3"><blockquote>{{$check.help}}</blockquote></td></tr>
+	<tr><td class="help" colspan="3">
+		<blockquote>{{$check.help}}</blockquote>
+		{{if $check.error_msg}}
+		<div class="error_header"><b>{{$check.error_msg.head}}</br><a href="{{$check.error_msg.url}}">{{$check.error_msg.url}}</a></b></div>
+		<blockquote>{{$check.error_msg.msg}}</blockquote>
+		{{/if}}
+	</td></tr>
 	{{/if}}
 {{/foreach}}
 </table>

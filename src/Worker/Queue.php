@@ -4,21 +4,20 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
-use Friendica\Protocol\Diaspora;
+use Friendica\Model\Queue as QueueModel;
 use Friendica\Protocol\DFRN;
+use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\PortableContact;
 use Friendica\Protocol\Salmon;
 use dba;
 
 require_once 'include/dba.php';
-require_once 'include/queue_fn.php';
-require_once 'include/datetime.php';
 require_once 'include/items.php';
-require_once 'include/bbcode.php';
 
 class Queue
 {
@@ -29,93 +28,78 @@ class Queue
 		$cachekey_deadguy = 'queue_run:deadguy:';
 		$cachekey_server = 'queue_run:server:';
 
+		$no_dead_check = Config::get('system', 'queue_no_dead_check', false);
+
 		if (!$queue_id) {
-			logger('queue: start');
+			logger('filling queue jobs - start');
 
 			// Handling the pubsubhubbub requests
-			Worker::add(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), 'PubSubPublish');
+			Worker::add(['priority' => PRIORITY_HIGH, 'dont_fork' => true], 'PubSubPublish');
 
-			$r = q(
-				"SELECT `queue`.*, `contact`.`name`, `contact`.`uid` FROM `queue`
-				INNER JOIN `contact` ON `queue`.`cid` = `contact`.`id`
-				WHERE `queue`.`created` < UTC_TIMESTAMP() - INTERVAL 3 DAY"
-			);
+			$r = dba::inArray(dba::p("SELECT `id` FROM `queue` WHERE `next` < UTC_TIMESTAMP() ORDER BY `batch`, `cid`"));
 
-			if (DBM::is_result($r)) {
-				foreach ($r as $rr) {
-					logger('Removing expired queue item for ' . $rr['name'] . ', uid=' . $rr['uid']);
-					logger('Expired queue data: ' . $rr['content'], LOGGER_DATA);
-				}
-				q("DELETE FROM `queue` WHERE `created` < UTC_TIMESTAMP() - INTERVAL 3 DAY");
-			}
-
-			/*
-			 * For the first 12 hours we'll try to deliver every 15 minutes
-			 * After that, we'll only attempt delivery once per hour.
-			 */
-			$r = q("SELECT `id` FROM `queue` WHERE ((`created` > UTC_TIMESTAMP() - INTERVAL 12 HOUR AND `last` < UTC_TIMESTAMP() - INTERVAL 15 MINUTE) OR (`last` < UTC_TIMESTAMP() - INTERVAL 1 HOUR)) ORDER BY `cid`, `created`");
-
-			call_hooks('queue_predeliver', $r);
+			Addon::callHooks('queue_predeliver', $r);
 
 			if (DBM::is_result($r)) {
 				foreach ($r as $q_item) {
 					logger('Call queue for id ' . $q_item['id']);
-					Worker::add(array('priority' => PRIORITY_LOW, 'dont_fork' => true), "Queue", (int) $q_item['id']);
+					Worker::add(['priority' => PRIORITY_LOW, 'dont_fork' => true], "Queue", (int) $q_item['id']);
 				}
 			}
+			logger('filling queue jobs - end');
 			return;
 		}
 
 
 		// delivering
-
-		$r = q(
-			"SELECT * FROM `queue` WHERE `id` = %d LIMIT 1",
-			intval($queue_id)
-		);
-
-		if (!DBM::is_result($r)) {
+		$q_item = dba::selectFirst('queue', [], ['id' => $queue_id]);
+		if (!DBM::is_result($q_item)) {
 			return;
 		}
 
-		$q_item = $r[0];
-
-		$contact = dba::select('contact', [], ['id' => $q_item['cid']], ['limit' => 1]);
+		$contact = dba::selectFirst('contact', [], ['id' => $q_item['cid']]);
 		if (!DBM::is_result($contact)) {
-			remove_queue_item($q_item['id']);
+			QueueModel::removeItem($q_item['id']);
+			return;
+		}
+
+		if (empty($contact['notify']) || $contact['archive']) {
+			QueueModel::removeItem($q_item['id']);
 			return;
 		}
 
 		$dead = Cache::get($cachekey_deadguy . $contact['notify']);
 
-		if (!is_null($dead) && $dead) {
+		if (!is_null($dead) && $dead && !$no_dead_check) {
 			logger('queue: skipping known dead url: ' . $contact['notify']);
-			update_queue_time($q_item['id']);
+			QueueModel::updateTime($q_item['id']);
 			return;
 		}
 
-		$server = PortableContact::detectServer($contact['url']);
+		if (!$no_dead_check) {
+			$server = PortableContact::detectServer($contact['url']);
 
-		if ($server != "") {
-			$vital = Cache::get($cachekey_server . $server);
+			if ($server != "") {
+				$vital = Cache::get($cachekey_server . $server);
 
-			if (is_null($vital)) {
-				logger("Check server " . $server . " (" . $contact["network"] . ")");
+				if (is_null($vital)) {
+					logger("Check server " . $server . " (" . $contact["network"] . ")");
 
-				$vital = PortableContact::checkServer($server, $contact["network"], true);
-				Cache::set($cachekey_server . $server, $vital, CACHE_QUARTER_HOUR);
-			}
+					$vital = PortableContact::checkServer($server, $contact["network"], true);
+					Cache::set($cachekey_server . $server, $vital, CACHE_MINUTE);
+				}
 
-			if (!is_null($vital) && !$vital) {
-				logger('queue: skipping dead server: ' . $server);
-				update_queue_time($q_item['id']);
-				return;
+				if (!is_null($vital) && !$vital) {
+					logger('queue: skipping dead server: ' . $server);
+					QueueModel::updateTime($q_item['id']);
+					return;
+				}
 			}
 		}
 
-		$user = dba::select('user', [], ['uid' => $contact['uid']], ['limit' => 1]);
+		$user = dba::selectFirst('user', [], ['uid' => $contact['uid']]);
 		if (!DBM::is_result($user)) {
-			remove_queue_item($q_item['id']);
+			QueueModel::removeItem($q_item['id']);
 			return;
 		}
 
@@ -130,52 +114,49 @@ class Queue
 				logger('queue: dfrndelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
 				$deliver_status = DFRN::deliver($owner, $contact, $data);
 
-				if ($deliver_status == (-1)) {
-					update_queue_time($q_item['id']);
-					Cache::set($cachekey_deadguy . $contact['notify'], true, CACHE_QUARTER_HOUR);
+				if (($deliver_status >= 200) && ($deliver_status <= 299)) {
+					QueueModel::removeItem($q_item['id']);
 				} else {
-					remove_queue_item($q_item['id']);
+					QueueModel::updateTime($q_item['id']);
+					Cache::set($cachekey_deadguy . $contact['notify'], true, CACHE_MINUTE);
 				}
 				break;
 			case NETWORK_OSTATUS:
-				if ($contact['notify']) {
-					logger('queue: slapdelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
-					$deliver_status = Salmon::slapper($owner, $contact['notify'], $data);
+				logger('queue: slapdelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
+				$deliver_status = Salmon::slapper($owner, $contact['notify'], $data);
 
-					if ($deliver_status == (-1)) {
-						update_queue_time($q_item['id']);
-						Cache::set($cachekey_deadguy . $contact['notify'], true, CACHE_QUARTER_HOUR);
-					} else {
-						remove_queue_item($q_item['id']);
-					}
+				if ($deliver_status == -1) {
+					QueueModel::updateTime($q_item['id']);
+					Cache::set($cachekey_deadguy . $contact['notify'], true, CACHE_MINUTE);
+				} else {
+					QueueModel::removeItem($q_item['id']);
 				}
 				break;
 			case NETWORK_DIASPORA:
-				if ($contact['notify']) {
-					logger('queue: diaspora_delivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
-					$deliver_status = Diaspora::transmit($owner, $contact, $data, $public, true);
+				logger('queue: diaspora_delivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
+				$deliver_status = Diaspora::transmit($owner, $contact, $data, $public, true, 'Queue:' . $q_item['id'], true);
 
-					if ($deliver_status == (-1)) {
-						update_queue_time($q_item['id']);
-						Cache::set($cachekey_deadguy . $contact['notify'], true, CACHE_QUARTER_HOUR);
-					} else {
-						remove_queue_item($q_item['id']);
-					}
+				if ((($deliver_status >= 200) && ($deliver_status <= 299)) ||
+					($contact['contact-type'] == ACCOUNT_TYPE_RELAY)) {
+					QueueModel::removeItem($q_item['id']);
+				} else {
+					QueueModel::updateTime($q_item['id']);
+					Cache::set($cachekey_deadguy . $contact['notify'], true, CACHE_MINUTE);
 				}
 				break;
 
 			default:
-				$params = array('owner' => $owner, 'contact' => $contact, 'queue' => $q_item, 'result' => false);
-				call_hooks('queue_deliver', $params);
+				$params = ['owner' => $owner, 'contact' => $contact, 'queue' => $q_item, 'result' => false];
+				Addon::callHooks('queue_deliver', $params);
 
 				if ($params['result']) {
-					remove_queue_item($q_item['id']);
+					QueueModel::removeItem($q_item['id']);
 				} else {
-					update_queue_time($q_item['id']);
+					QueueModel::updateTime($q_item['id']);
 				}
 				break;
 		}
-		logger('Deliver status ' . (int) $deliver_status . ' for item ' . $q_item['id'] . ' to ' . $contact['name'] . ' <' . $contact['url'] . '>');
+		logger('Deliver status ' . (int)$deliver_status . ' for item ' . $q_item['id'] . ' to ' . $contact['name'] . ' <' . $contact['url'] . '>');
 
 		return;
 	}

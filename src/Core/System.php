@@ -4,7 +4,8 @@
  */
 namespace Friendica\Core;
 
-use Friendica\App;
+use Friendica\BaseObject;
+use Friendica\Util\XML;
 
 /**
  * @file include/Core/System.php
@@ -16,23 +17,8 @@ use Friendica\App;
 /**
  * @brief System methods
  */
-class System
+class System extends BaseObject
 {
-	private static $a;
-
-	/**
-	 * @brief Initializes the static class variable
-	 * @return void
-	 */
-	private static function init()
-	{
-		global $a;
-
-		if (!is_object(self::$a)) {
-			self::$a = $a;
-		}
-	}
-
 	/**
 	 * @brief Retrieves the Friendica instance base URL
 	 *
@@ -41,8 +27,7 @@ class System
 	 */
 	public static function baseUrl($ssl = false)
 	{
-		self::init();
-		return self::$a->get_baseurl($ssl);
+		return self::getApp()->get_baseurl($ssl);
 	}
 
 	/**
@@ -54,8 +39,7 @@ class System
 	 */
 	public static function removedBaseUrl($orig_url)
 	{
-		self::init();
-		return self::$a->remove_baseurl($orig_url);
+		return self::getApp()->remove_baseurl($orig_url);
 	}
 
 	/**
@@ -71,17 +55,17 @@ class System
 		array_shift($trace);
 		array_shift($trace);
 
-		$callstack = array();
+		$callstack = [];
 		$counter = 0;
-		$previous = array('class' => '', 'function' => '');
+		$previous = ['class' => '', 'function' => ''];
 
 		// The ignore list contains all functions that are only wrapper functions
-		$ignore = array('get_config', 'get_pconfig', 'set_config', 'set_pconfig', 'fetch_url', 'probe_url');
+		$ignore = ['fetchUrl', 'call_user_func_array'];
 
 		while ($func = array_pop($trace)) {
 			if (!empty($func['class'])) {
-				// Don't show multiple calls from the same function (mostly used for "dba" class)
-				if (($previous['class'] != $func['class']) && ($previous['function'] != 'q')) {
+				// Don't show multiple calls from the "dba" class to show the essential parts of the callstack
+				if ((($previous['class'] != $func['class']) || ($func['class'] != 'dba')) && ($previous['function'] != 'q')) {
 					$classparts = explode("\\", $func['class']);
 					$callstack[] = array_pop($classparts).'::'.$func['function'];
 					$previous = $func;
@@ -92,7 +76,7 @@ class System
 			}
 		}
 
-		$callstack2 = array();
+		$callstack2 = [];
 		while ((count($callstack2) < $depth) && (count($callstack) > 0)) {
 			$callstack2[] = array_pop($callstack);
 		}
@@ -111,6 +95,86 @@ echo <<< EOT
 </html>
 EOT;
 
+		killme();
+	}
+
+	/**
+	 * Generic XML return
+	 * Outputs a basic dfrn XML status structure to STDOUT, with a <status> variable
+	 * of $st and an optional text <message> of $message and terminates the current process.
+	 */
+	public static function xmlExit($st, $message = '')
+	{
+		$result = ['status' => $st];
+
+		if ($message != '') {
+			$result['message'] = $message;
+		}
+
+		if ($st) {
+			logger('xml_status returning non_zero: ' . $st . " message=" . $message);
+		}
+
+		header("Content-type: text/xml");
+
+		$xmldata = ["result" => $result];
+
+		echo XML::fromArray($xmldata, $xml);
+
+		killme();
+	}
+
+	/**
+	 * @brief Send HTTP status header and exit.
+	 *
+	 * @param integer $val         HTTP status result value
+	 * @param array   $description optional message
+	 *                             'title' => header title
+	 *                             'description' => optional message
+	 */
+	public static function httpExit($val, $description = [])
+	{
+		$err = '';
+		if ($val >= 400) {
+			$err = 'Error';
+			if (!isset($description["title"])) {
+				$description["title"] = $err." ".$val;
+			}
+		}
+
+		if ($val >= 200 && $val < 300) {
+			$err = 'OK';
+		}
+
+		logger('http_status_exit ' . $val);
+		header($_SERVER["SERVER_PROTOCOL"] . ' ' . $val . ' ' . $err);
+
+		if (isset($description["title"])) {
+			$tpl = get_markup_template('http_status.tpl');
+			echo replace_macros(
+				$tpl,
+				[
+					'$title' => $description["title"],
+					'$description' => $description["description"]]
+			);
+		}
+
+		killme();
+	}
+
+	/**
+	 * @brief Encodes content to json
+	 *
+	 * This function encodes an array to json format
+	 * and adds an application/json HTTP header to the output.
+	 * After finishing the process is getting killed.
+	 *
+	 * @param array $x The input content
+	 */
+	public static function jsonExit($x)
+	{
+		header("content-type: application/json");
+		echo json_encode($x);
 		killme();
 	}
 

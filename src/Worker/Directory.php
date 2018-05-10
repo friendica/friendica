@@ -6,12 +6,16 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Util\Network;
 
-class Directory {
-	public static function execute($url = '') {
+class Directory
+{
+	public static function execute($url = '')
+	{
 		$dir = Config::get('system', 'directory');
 
 		if (!strlen($dir)) {
@@ -25,13 +29,13 @@ class Directory {
 
 		$dir .= "/submit";
 
-		$arr = array('url' => $url);
+		$arr = ['url' => $url];
 
-		call_hooks('globaldir_update', $arr);
+		Addon::callHooks('globaldir_update', $arr);
 
 		logger('Updating directory: ' . $arr['url'], LOGGER_DEBUG);
 		if (strlen($arr['url'])) {
-			fetch_url($dir . '?url=' . bin2hex($arr['url']));
+			Network::fetchUrl($dir . '?url=' . bin2hex($arr['url']));
 		}
 
 		return;

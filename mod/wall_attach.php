@@ -1,11 +1,14 @@
 <?php
+/**
+ * @file mod/wall_attach.php
+ */
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Database\DBM;
-
-require_once('include/attach.php');
-require_once('include/datetime.php');
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Mimetype;
 
 function wall_attach_post(App $a) {
 
@@ -18,7 +21,7 @@ function wall_attach_post(App $a) {
 		);
 		if (! DBM::is_result($r)) {
 			if ($r_json) {
-				echo json_encode(array('error'=>t('Invalid request.')));
+				echo json_encode(['error'=>L10n::t('Invalid request.')]);
 				killme();
 			}
 			return;
@@ -26,7 +29,7 @@ function wall_attach_post(App $a) {
 
 	} else {
 		if ($r_json) {
-			echo json_encode(array('error'=>t('Invalid request.')));
+			echo json_encode(['error'=>L10n::t('Invalid request.')]);
 			killme();
 		}
 		return;
@@ -68,16 +71,16 @@ function wall_attach_post(App $a) {
 	}
 	if(! $can_post) {
 		if ($r_json) {
-			echo json_encode(array('error'=>t('Permission denied.')));
+			echo json_encode(['error'=>L10n::t('Permission denied.')]);
 			killme();
 		}
-		notice( t('Permission denied.') . EOL );
+		notice(L10n::t('Permission denied.') . EOL );
 		killme();
 	}
 
 	if(! x($_FILES,'userfile')) {
 		if ($r_json) {
-			echo json_encode(array('error'=>t('Invalid request.')));
+			echo json_encode(['error'=>L10n::t('Invalid request.')]);
 		}
 		killme();
 	}
@@ -95,9 +98,9 @@ function wall_attach_post(App $a) {
 	 */
 
 	if($filesize <=0) {
-		$msg = t('Sorry, maybe your upload is bigger than the PHP configuration allows') . EOL .(t('Or - did you try to upload an empty file?'));
+		$msg = L10n::t('Sorry, maybe your upload is bigger than the PHP configuration allows') . EOL .(L10n::t('Or - did you try to upload an empty file?'));
 		if ($r_json) {
-			echo json_encode(array('error'=>$msg));
+			echo json_encode(['error'=>$msg]);
 		} else {
 			notice( $msg. EOL );
 		}
@@ -106,9 +109,9 @@ function wall_attach_post(App $a) {
 	}
 
 	if(($maxfilesize) && ($filesize > $maxfilesize)) {
-		$msg = sprintf(t('File exceeds size limit of %s'), formatBytes($maxfilesize));
+		$msg = L10n::t('File exceeds size limit of %s', formatBytes($maxfilesize));
 		if ($r_json) {
-			echo json_encode(array('error'=>$msg));
+			echo json_encode(['error'=>$msg]);
 		} else {
 			echo  $msg. EOL ;
 		}
@@ -117,22 +120,22 @@ function wall_attach_post(App $a) {
 	}
 
 	$filedata = @file_get_contents($src);
-	$mimetype = z_mime_content_type($filename);
+	$mimetype = Mimetype::getContentType($filename);
 	$hash = get_guid(64);
-	$created = datetime_convert();
+	$created = DateTimeFormat::utcNow();
 
-	$fields = array('uid' => $page_owner_uid, 'hash' => $hash, 'filename' => $filename, 'filetype' => $mimetype,
+	$fields = ['uid' => $page_owner_uid, 'hash' => $hash, 'filename' => $filename, 'filetype' => $mimetype,
 		'filesize' => $filesize, 'data' => $filedata, 'created' => $created, 'edited' => $created,
-		'allow_cid' => '<' . $page_owner_cid . '>', 'allow_gid' => '','deny_cid' => '', 'deny_gid' => '');
+		'allow_cid' => '<' . $page_owner_cid . '>', 'allow_gid' => '','deny_cid' => '', 'deny_gid' => ''];
 
 	$r = dba::insert('attach', $fields);
 
 	@unlink($src);
 
 	if(! $r) {
-		$msg =  t('File upload failed.');
+		$msg =  L10n::t('File upload failed.');
 		if ($r_json) {
-			echo json_encode(array('error'=>$msg));
+			echo json_encode(['error'=>$msg]);
 		} else {
 			echo  $msg. EOL ;
 		}
@@ -146,9 +149,9 @@ function wall_attach_post(App $a) {
 	);
 
 	if (! DBM::is_result($r)) {
-		$msg = t('File upload failed.');
+		$msg = L10n::t('File upload failed.');
 		if ($r_json) {
-			echo json_encode(array('error'=>$msg));
+			echo json_encode(['error'=>$msg]);
 		} else {
 			echo  $msg. EOL ;
 		}
@@ -156,7 +159,7 @@ function wall_attach_post(App $a) {
 	}
 
 	if ($r_json) {
-		echo json_encode(array('ok'=>true));
+		echo json_encode(['ok'=>true]);
 		killme();
 	}
 

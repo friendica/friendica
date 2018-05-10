@@ -446,8 +446,16 @@ function justifyPhotosAjax() {
 	$('#photo-album-contents').justifiedGallery('norewind').on('jg.complete', function(e){ justifiedGalleryActive = false; });
 }
 
+// Load a js script to the html head.
 function loadScript(url, callback) {
-	// Adding the script tag to the head as suggested before
+	// Check if the script is already in the html head.
+	var oscript = $('head script[src="' + url + '"]');
+
+	// Delete the old script from head.
+	if (oscript.length > 0) {
+		oscript.remove();
+	}
+	// Adding the script tag to the head as suggested before.
 	var head = document.getElementsByTagName('head')[0];
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
@@ -458,7 +466,7 @@ function loadScript(url, callback) {
 	script.onreadystatechange = callback;
 	script.onload = callback;
 
-	// Fire the loading
+	// Fire the loading.
 	head.appendChild(script);
 }
 
@@ -752,6 +760,7 @@ function doLikeAction(ident, verb) {
 	$.get('like/' + ident.toString() + '?verb=' + verb, NavUpdate );
 	liking = 1;
 	force_update = true;
+	update_item = ident.toString();
 }
 
 // Decodes a hexadecimally encoded binary string

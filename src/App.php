@@ -1,21 +1,21 @@
 <?php
-
+/**
+ * @file src/App.php
+ */
 namespace Friendica;
 
-use Friendica\Core\System;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
-use Friendica\Database\DBM;
-
-use dba;
+use Friendica\Core\System;
 
 use Detection\MobileDetect;
 
 use Exception;
 
 require_once 'boot.php';
-require_once 'include/dba.php';
+require_once 'include/text.php';
 
 /**
  *
@@ -30,13 +30,18 @@ require_once 'include/dba.php';
  * before we spit the page out.
  *
  */
-class App {
+class App
+{
+	const MODE_NORMAL = 0;
+	const MODE_INSTALL = 1;
+	const MODE_MAINTENANCE = 2;
 
 	public $module_loaded = false;
 	public $module_class = null;
 	public $query_string;
 	public $config;
 	public $page;
+	public $page_offset;
 	public $profile;
 	public $profile_uid;
 	public $user;
@@ -45,12 +50,13 @@ class App {
 	public $contacts;
 	public $page_contact;
 	public $content;
-	public $data = array();
+	public $data = [];
 	public $error = false;
 	public $cmd;
 	public $argv;
 	public $argc;
 	public $module;
+	public $mode = App::MODE_NORMAL;
 	public $pager;
 	public $strings;
 	public $basepath;
@@ -58,15 +64,16 @@ class App {
 	public $hooks;
 	public $timezone;
 	public $interactive = true;
-	public $plugins;
-	public $apps = array();
+	public $addons;
+	public $addons_admin = [];
+	public $apps = [];
 	public $identities;
 	public $is_mobile = false;
 	public $is_tablet = false;
 	public $is_friendica_app;
-	public $performance = array();
-	public $callstack = array();
-	public $theme_info = array();
+	public $performance = [];
+	public $callstack = [];
+	public $theme_info = [];
 	public $backend = true;
 	public $nav_sel;
 	public $category;
@@ -85,42 +92,39 @@ class App {
 	 * Mostly unimplemented yet. Only options 'template_engine' and
 	 * beyond are used.
 	 */
-	public $theme = array(
+	public $theme = [
 		'sourcename' => '',
 		'videowidth' => 425,
 		'videoheight' => 350,
 		'force_max_items' => 0,
 		'stylesheet' => '',
 		'template_engine' => 'smarty3',
-	);
+	];
 
 	/**
 	 * @brief An array of registered template engines ('name'=>'class name')
 	 */
-	public $template_engines = array();
+	public $template_engines = [];
 
 	/**
 	 * @brief An array of instanced template engines ('name'=>'instance')
 	 */
-	public $template_engine_instance = array();
+	public $template_engine_instance = [];
 	public $process_id;
 	public $queue;
-	private $ldelim = array(
+	private $ldelim = [
 		'internal' => '',
 		'smarty3' => '{{'
-	);
-	private $rdelim = array(
+	];
+	private $rdelim = [
 		'internal' => '',
 		'smarty3' => '}}'
-	);
+	];
 	private $scheme;
 	private $hostname;
-	private $db;
 	private $curl_code;
 	private $curl_content_type;
 	private $curl_headers;
-	private $cached_profile_image;
-	private $cached_profile_picdate;
 	private static $a;
 
 	/**
@@ -128,20 +132,18 @@ class App {
 	 *
 	 * @param string $basepath Path to the app base folder
 	 */
-	function __construct($basepath) {
-
+	public function __construct($basepath)
+	{
 		global $default_timezone;
 
-		$hostname = '';
-
-		if (! static::directory_usable($basepath, false)) {
+		if (!static::directory_usable($basepath, false)) {
 			throw new Exception('Basepath ' . $basepath . ' isn\'t usable.');
 		}
 
 		$this->basepath = rtrim($basepath, DIRECTORY_SEPARATOR);
 
-		if (file_exists($this->basepath.DIRECTORY_SEPARATOR.'.htpreconfig.php')) {
-			include $this->basepath.DIRECTORY_SEPARATOR.'.htpreconfig.php';
+		if (file_exists($this->basepath . DIRECTORY_SEPARATOR . '.htpreconfig.php')) {
+			include $this->basepath . DIRECTORY_SEPARATOR . '.htpreconfig.php';
 		}
 
 		$this->timezone = ((x($default_timezone)) ? $default_timezone : 'UTC');
@@ -151,6 +153,8 @@ class App {
 		$this->performance['start'] = microtime(true);
 		$this->performance['database'] = 0;
 		$this->performance['database_write'] = 0;
+		$this->performance['cache'] = 0;
+		$this->performance['cache_write'] = 0;
 		$this->performance['network'] = 0;
 		$this->performance['file'] = 0;
 		$this->performance['rendering'] = 0;
@@ -158,16 +162,18 @@ class App {
 		$this->performance['marktime'] = 0;
 		$this->performance['markstart'] = microtime(true);
 
-		$this->callstack['database'] = array();
-		$this->callstack['database_write'] = array();
-		$this->callstack['network'] = array();
-		$this->callstack['file'] = array();
-		$this->callstack['rendering'] = array();
-		$this->callstack['parser'] = array();
+		$this->callstack['database'] = [];
+		$this->callstack['database_write'] = [];
+		$this->callstack['cache'] = [];
+		$this->callstack['cache_write'] = [];
+		$this->callstack['network'] = [];
+		$this->callstack['file'] = [];
+		$this->callstack['rendering'] = [];
+		$this->callstack['parser'] = [];
 
-		$this->config = array();
-		$this->page = array();
-		$this->pager = array();
+		$this->config = [];
+		$this->page = [];
+		$this->pager = [];
 
 		$this->query_string = '';
 
@@ -205,21 +211,11 @@ class App {
 			}
 		}
 
-		if ($hostname != '') {
-			$this->hostname = $hostname;
-		}
-
 		set_include_path(
 			get_include_path() . PATH_SEPARATOR
 			. $this->basepath . DIRECTORY_SEPARATOR . 'include' . PATH_SEPARATOR
 			. $this->basepath . DIRECTORY_SEPARATOR . 'library' . PATH_SEPARATOR
 			. $this->basepath);
-
-
-		if (is_array($_SERVER['argv']) && $_SERVER['argc'] > 1 && substr(end($_SERVER['argv']), 0, 4) == 'http') {
-			$this->set_baseurl(array_pop($_SERVER['argv']));
-			$_SERVER['argc'] --;
-		}
 
 		if ((x($_SERVER, 'QUERY_STRING')) && substr($_SERVER['QUERY_STRING'], 0, 9) === 'pagename=') {
 			$this->query_string = substr($_SERVER['QUERY_STRING'], 9);
@@ -272,7 +268,7 @@ class App {
 			$this->module = str_replace('-', '_', $this->module);
 		} else {
 			$this->argc = 1;
-			$this->argv = array('home');
+			$this->argv = ['home'];
 			$this->module = 'home';
 		}
 
@@ -295,12 +291,15 @@ class App {
 		$this->is_friendica_app = ($_SERVER['HTTP_USER_AGENT'] == 'Apache-HttpClient/UNAVAILABLE (java 1.4)');
 
 		// Register template engines
-		$dc = get_declared_classes();
-		foreach ($dc as $k) {
-			if (in_array('Friendica\Render\ITemplateEngine', class_implements($k))) {
-				$this->register_template_engine($k);
-			}
-		}
+		$this->register_template_engine('Friendica\Render\FriendicaSmartyEngine');
+
+		/**
+		 * Load the configuration file which contains our DB credentials.
+		 * Ignore errors. If the file doesn't exist or is empty, we are running in
+		 * installation mode.	 *
+		 */
+		$this->mode = ((file_exists('.htconfig.php') && filesize('.htconfig.php')) ? App::MODE_NORMAL : App::MODE_INSTALL);
+
 
 		self::$a = $this;
 	}
@@ -313,18 +312,19 @@ class App {
 	 *
 	 * @return string
 	 */
-	public function get_basepath() {
+	public function get_basepath()
+	{
 		$basepath = $this->basepath;
 
-		if (! $basepath) {
+		if (!$basepath) {
 			$basepath = Config::get('system', 'basepath');
 		}
 
-		if (! $basepath && x($_SERVER, 'DOCUMENT_ROOT')) {
+		if (!$basepath && x($_SERVER, 'DOCUMENT_ROOT')) {
 			$basepath = $_SERVER['DOCUMENT_ROOT'];
 		}
 
-		if (! $basepath && x($_SERVER, 'PWD')) {
+		if (!$basepath && x($_SERVER, 'PWD')) {
 			$basepath = $_SERVER['PWD'];
 		}
 
@@ -341,7 +341,8 @@ class App {
 	 * @param string $path The path that is about to be normalized
 	 * @return string normalized path - when possible
 	 */
-	public static function realpath($path) {
+	public static function realpath($path)
+	{
 		$normalized = realpath($path);
 
 		if (!is_bool($normalized)) {
@@ -351,7 +352,8 @@ class App {
 		}
 	}
 
-	function get_scheme() {
+	public function get_scheme()
+	{
 		return $this->scheme;
 	}
 
@@ -369,7 +371,8 @@ class App {
 	 * @param bool $ssl Whether to append http or https under SSL_POLICY_SELFSIGN
 	 * @return string Friendica server base URL
 	 */
-	function get_baseurl($ssl = false) {
+	public function get_baseurl($ssl = false)
+	{
 		$scheme = $this->scheme;
 
 		if (Config::get('system', 'ssl_policy') == SSL_POLICY_FULL) {
@@ -397,14 +400,15 @@ class App {
 	/**
 	 * @brief Initializes the baseurl components
 	 *
-	 * Clears the baseurl cache to prevent inconstistencies
+	 * Clears the baseurl cache to prevent inconsistencies
 	 *
 	 * @param string $url
 	 */
-	function set_baseurl($url) {
+	public function set_baseurl($url)
+	{
 		$parsed = @parse_url($url);
 
-		if ($parsed) {
+		if (x($parsed)) {
 			$this->scheme = $parsed['scheme'];
 
 			$hostname = $parsed['host'];
@@ -415,8 +419,8 @@ class App {
 				$this->path = trim($parsed['path'], '\\/');
 			}
 
-			if (file_exists($this->basepath.DIRECTORY_SEPARATOR.'.htpreconfig.php')) {
-				include $this->basepath.DIRECTORY_SEPARATOR.'.htpreconfig.php';
+			if (file_exists($this->basepath . DIRECTORY_SEPARATOR . '.htpreconfig.php')) {
+				include $this->basepath . DIRECTORY_SEPARATOR . '.htpreconfig.php';
 			}
 
 			if (Config::get('config', 'hostname') != '') {
@@ -429,7 +433,8 @@ class App {
 		}
 	}
 
-	function get_hostname() {
+	public function get_hostname()
+	{
 		if (Config::get('config', 'hostname') != '') {
 			$this->hostname = Config::get('config', 'hostname');
 		}
@@ -437,33 +442,30 @@ class App {
 		return $this->hostname;
 	}
 
-	function set_hostname($h) {
-		$this->hostname = $h;
-	}
-
-	function set_path($p) {
-		$this->path = trim(trim($p), '/');
-	}
-
-	function get_path() {
+	public function get_path()
+	{
 		return $this->path;
 	}
 
-	function set_pager_total($n) {
+	public function set_pager_total($n)
+	{
 		$this->pager['total'] = intval($n);
 	}
 
-	function set_pager_itemspage($n) {
+	public function set_pager_itemspage($n)
+	{
 		$this->pager['itemspage'] = ((intval($n) > 0) ? intval($n) : 0);
 		$this->pager['start'] = ($this->pager['page'] * $this->pager['itemspage']) - $this->pager['itemspage'];
 	}
 
-	function set_pager_page($n) {
+	public function set_pager_page($n)
+	{
 		$this->pager['page'] = $n;
 		$this->pager['start'] = ($this->pager['page'] * $this->pager['itemspage']) - $this->pager['itemspage'];
 	}
 
-	function init_pagehead() {
+	public function init_pagehead()
+	{
 		$interval = ((local_user()) ? PConfig::get(local_user(), 'system', 'update_interval') : 40000);
 
 		// If the update is 'deactivated' set it to the highest integer number (~24 days)
@@ -515,68 +517,71 @@ class App {
 		$invinite_scroll = infinite_scroll_data($this->module);
 
 		$tpl = get_markup_template('head.tpl');
-		$this->page['htmlhead'] = replace_macros($tpl, array(
-				'$baseurl' => $this->get_baseurl(),
-				'$local_user' => local_user(),
-				'$generator' => 'Friendica' . ' ' . FRIENDICA_VERSION,
-				'$delitem' => t('Delete this item?'),
-				'$showmore' => t('show more'),
-				'$showfewer' => t('show fewer'),
-				'$update_interval' => $interval,
-				'$shortcut_icon' => $shortcut_icon,
-				'$touch_icon' => $touch_icon,
-				'$stylesheet' => $stylesheet,
-				'$infinite_scroll' => $invinite_scroll,
-			)) . $this->page['htmlhead'];
+		$this->page['htmlhead'] = replace_macros($tpl, [
+			'$baseurl'         => $this->get_baseurl(),
+			'$local_user'      => local_user(),
+			'$generator'       => 'Friendica' . ' ' . FRIENDICA_VERSION,
+			'$delitem'         => L10n::t('Delete this item?'),
+			'$showmore'        => L10n::t('show more'),
+			'$showfewer'       => L10n::t('show fewer'),
+			'$update_interval' => $interval,
+			'$shortcut_icon'   => $shortcut_icon,
+			'$touch_icon'      => $touch_icon,
+			'$stylesheet'      => $stylesheet,
+			'$infinite_scroll' => $invinite_scroll,
+		]) . $this->page['htmlhead'];
 	}
 
-	function init_page_end() {
+	public function init_page_end()
+	{
 		if (!isset($this->page['end'])) {
 			$this->page['end'] = '';
 		}
 		$tpl = get_markup_template('end.tpl');
-		$this->page['end'] = replace_macros($tpl, array(
-				'$baseurl' => $this->get_baseurl()
-			)) . $this->page['end'];
+		$this->page['end'] = replace_macros($tpl, [
+			'$baseurl' => $this->get_baseurl()
+		]) . $this->page['end'];
 	}
 
-	function set_curl_code($code) {
+	public function set_curl_code($code)
+	{
 		$this->curl_code = $code;
 	}
 
-	function get_curl_code() {
+	public function get_curl_code()
+	{
 		return $this->curl_code;
 	}
 
-	function set_curl_content_type($content_type) {
+	public function set_curl_content_type($content_type)
+	{
 		$this->curl_content_type = $content_type;
 	}
 
-	function get_curl_content_type() {
+	public function get_curl_content_type()
+	{
 		return $this->curl_content_type;
 	}
 
-	function set_curl_headers($headers) {
+	public function set_curl_headers($headers)
+	{
 		$this->curl_headers = $headers;
 	}
 
-	function get_curl_headers() {
+	public function get_curl_headers()
+	{
 		return $this->curl_headers;
 	}
 
-	function get_cached_avatar_image($avatar_image) {
-		return $avatar_image;
-	}
-
 	/**
-	 * @brief Removes the baseurl from an url. This avoids some mixed content problems.
+	 * @brief Removes the base url from an url. This avoids some mixed content problems.
 	 *
 	 * @param string $orig_url
 	 *
 	 * @return string The cleaned url
 	 */
-	function remove_baseurl($orig_url) {
-
+	public function remove_baseurl($orig_url)
+	{
 		// Remove the hostname from the url if it is an internal link
 		$nurl = normalise_link($orig_url);
 		$base = normalise_link($this->get_baseurl());
@@ -593,23 +598,18 @@ class App {
 	/**
 	 * @brief Register template engine class
 	 *
-	 * If $name is '', is used class static property $class::$name
-	 *
 	 * @param string $class
-	 * @param string $name
 	 */
-	function register_template_engine($class, $name = '') {
-		/// @TODO Really === and not just == ?
-		if ($name === '') {
-			$v = get_class_vars($class);
-			if (x($v, 'name'))
-				$name = $v['name'];
-		}
-		if ($name === '') {
+	private function register_template_engine($class)
+	{
+		$v = get_class_vars($class);
+		if (x($v, 'name')) {
+			$name = $v['name'];
+			$this->template_engines[$name] = $class;
+		} else {
 			echo "template engine <tt>$class</tt> cannot be registered without a name.\n";
-			killme();
+			die();
 		}
-		$this->template_engines[$name] = $class;
 	}
 
 	/**
@@ -618,18 +618,13 @@ class App {
 	 * If $name is not defined, return engine defined by theme,
 	 * or default
 	 *
-	 * @param string $name Template engine name
 	 * @return object Template Engine instance
 	 */
-	function template_engine($name = '') {
-		/// @TODO really type-check included?
-		if ($name !== '') {
-			$template_engine = $name;
-		} else {
-			$template_engine = 'smarty3';
-			if (x($this->theme, 'template_engine')) {
-				$template_engine = $this->theme['template_engine'];
-			}
+	public function template_engine()
+	{
+		$template_engine = 'smarty3';
+		if (x($this->theme, 'template_engine')) {
+			$template_engine = $this->theme['template_engine'];
 		}
 
 		if (isset($this->template_engines[$template_engine])) {
@@ -652,23 +647,28 @@ class App {
 	 *
 	 * @return string
 	 */
-	function get_template_engine() {
+	public function get_template_engine()
+	{
 		return $this->theme['template_engine'];
 	}
 
-	function set_template_engine($engine = 'smarty3') {
+	public function set_template_engine($engine = 'smarty3')
+	{
 		$this->theme['template_engine'] = $engine;
 	}
 
-	function get_template_ldelim($engine = 'smarty3') {
+	public function get_template_ldelim($engine = 'smarty3')
+	{
 		return $this->ldelim[$engine];
 	}
 
-	function get_template_rdelim($engine = 'smarty3') {
+	public function get_template_rdelim($engine = 'smarty3')
+	{
 		return $this->rdelim[$engine];
 	}
 
-	function save_timestamp($stamp, $value) {
+	public function save_timestamp($stamp, $value)
+	{
 		if (!isset($this->config['system']['profiler']) || !$this->config['system']['profiler']) {
 			return;
 		}
@@ -693,50 +693,8 @@ class App {
 		$this->callstack[$value][$callstack] += (float) $duration;
 	}
 
-	/**
-	 * @brief Log active processes into the "process" table
-	 */
-	function start_process() {
-		$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-		$command = basename($trace[0]['file']);
-
-		$this->remove_inactive_processes();
-
-		dba::transaction();
-
-		$r = q('SELECT `pid` FROM `process` WHERE `pid` = %d', intval(getmypid()));
-		if (!DBM::is_result($r)) {
-			dba::insert('process', array('pid' => getmypid(), 'command' => $command, 'created' => datetime_convert()));
-		}
-		dba::commit();
-	}
-
-	/**
-	 * @brief Remove inactive processes
-	 */
-	function remove_inactive_processes() {
-		dba::transaction();
-
-		$r = q('SELECT `pid` FROM `process`');
-		if (DBM::is_result($r)) {
-			foreach ($r AS $process) {
-				if (!posix_kill($process['pid'], 0)) {
-					dba::delete('process', array('pid' => $process['pid']));
-				}
-			}
-		}
-		dba::commit();
-	}
-
-	/**
-	 * @brief Remove the active process from the "process" table
-	 */
-	function end_process() {
-		dba::delete('process', array('pid' => getmypid()));
-	}
-
-	function get_useragent() {
+	public function get_useragent()
+	{
 		return
 			FRIENDICA_PLATFORM . " '" .
 			FRIENDICA_CODENAME . "' " .
@@ -745,7 +703,8 @@ class App {
 			$this->get_baseurl();
 	}
 
-	function is_friendica_app() {
+	public function is_friendica_app()
+	{
 		return $this->is_friendica_app;
 	}
 
@@ -757,27 +716,29 @@ class App {
 	 *
 	 * @return bool Is it a known backend?
 	 */
-	function is_backend() {
-		static $backends = array();
-		$backends[] = '_well_known';
-		$backends[] = 'api';
-		$backends[] = 'dfrn_notify';
-		$backends[] = 'fetch';
-		$backends[] = 'hcard';
-		$backends[] = 'hostxrd';
-		$backends[] = 'nodeinfo';
-		$backends[] = 'noscrape';
-		$backends[] = 'p';
-		$backends[] = 'poco';
-		$backends[] = 'post';
-		$backends[] = 'proxy';
-		$backends[] = 'pubsub';
-		$backends[] = 'pubsubhubbub';
-		$backends[] = 'receive';
-		$backends[] = 'rsd_xml';
-		$backends[] = 'salmon';
-		$backends[] = 'statistics_json';
-		$backends[] = 'xrd';
+	public function is_backend()
+	{
+		static $backends = [
+			'_well_known',
+			'api',
+			'dfrn_notify',
+			'fetch',
+			'hcard',
+			'hostxrd',
+			'nodeinfo',
+			'noscrape',
+			'p',
+			'poco',
+			'post',
+			'proxy',
+			'pubsub',
+			'pubsubhubbub',
+			'receive',
+			'rsd_xml',
+			'salmon',
+			'statistics_json',
+			'xrd',
+		];
 
 		// Check if current module is in backend or backend flag is set
 		return (in_array($this->module, $backends) || $this->backend);
@@ -788,10 +749,14 @@ class App {
 	 *
 	 * @return bool Is the limit reached?
 	 */
-	function max_processes_reached() {
+	public function max_processes_reached()
+	{
 		// Deactivated, needs more investigating if this check really makes sense
 		return false;
 
+		/*
+		 * Commented out to suppress static analyzer issues
+		 *
 		if ($this->is_backend()) {
 			$process = 'backend';
 			$max_processes = Config::get('system', 'max_processes_backend');
@@ -816,6 +781,7 @@ class App {
 			}
 		}
 		return false;
+		 */
 	}
 
 	/**
@@ -823,7 +789,8 @@ class App {
 	 *
 	 * @return bool Is the memory limit reached?
 	 */
-	public function min_memory_reached() {
+	public function min_memory_reached()
+	{
 		$min_memory = Config::get('system', 'min_memory', 0);
 		if ($min_memory == 0) {
 			return false;
@@ -835,14 +802,14 @@ class App {
 
 		$memdata = explode("\n", file_get_contents('/proc/meminfo'));
 
-		$meminfo = array();
+		$meminfo = [];
 		foreach ($memdata as $line) {
 			list($key, $val) = explode(':', $line);
 			$meminfo[$key] = (int) trim(str_replace('kB', '', $val));
 			$meminfo[$key] = (int) ($meminfo[$key] / 1024);
 		}
 
-		if (!isset($meminfo['MemAvailable']) || ! isset($meminfo['MemFree'])) {
+		if (!isset($meminfo['MemAvailable']) || !isset($meminfo['MemFree'])) {
 			return false;
 		}
 
@@ -862,8 +829,8 @@ class App {
 	 *
 	 * @return bool Is the load reached?
 	 */
-	function maxload_reached() {
-
+	public function maxload_reached()
+	{
 		if ($this->is_backend()) {
 			$process = 'backend';
 			$maxsysload = intval(Config::get('system', 'maxloadavg'));
@@ -888,8 +855,8 @@ class App {
 		return false;
 	}
 
-	function proc_run($args) {
-
+	public function proc_run($args)
+	{
 		if (!function_exists('proc_open')) {
 			return;
 		}
@@ -908,23 +875,20 @@ class App {
 
 		array_unshift($args, ((x($this->config, 'php_path')) && (strlen($this->config['php_path'])) ? $this->config['php_path'] : 'php'));
 
-		// add baseurl to args. cli scripts can't construct it
-		$args[] = $this->get_baseurl();
-
 		for ($x = 0; $x < count($args); $x ++) {
 			$args[$x] = escapeshellarg($args[$x]);
 		}
 
-		$cmdline = implode($args, ' ');
+		$cmdline = implode(' ', $args);
 
 		if ($this->min_memory_reached()) {
 			return;
 		}
 
 		if (Config::get('system', 'proc_windows')) {
-			$resource = proc_open('cmd /c start /b ' . $cmdline, array(), $foo, $this->get_basepath());
+			$resource = proc_open('cmd /c start /b ' . $cmdline, [], $foo, $this->get_basepath());
 		} else {
-			$resource = proc_open($cmdline . ' &', array(), $foo, $this->get_basepath());
+			$resource = proc_open($cmdline . ' &', [], $foo, $this->get_basepath());
 		}
 		if (!is_resource($resource)) {
 			logger('We got no resource for command ' . $cmdline, LOGGER_DEBUG);
@@ -940,8 +904,9 @@ class App {
 	 *
 	 * @return string system username
 	 */
-	static function systemuser() {
-		if (!function_exists('posix_getpwuid') || ! function_exists('posix_geteuid')) {
+	private static function systemuser()
+	{
+		if (!function_exists('posix_getpwuid') || !function_exists('posix_geteuid')) {
 			return '';
 		}
 
@@ -954,7 +919,8 @@ class App {
 	 *
 	 * @return boolean the directory is usable
 	 */
-	static function directory_usable($directory, $check_writable = true) {
+	public static function directory_usable($directory, $check_writable = true)
+	{
 		if ($directory == '') {
 			logger('Directory is empty. This shouldn\'t happen.', LOGGER_DEBUG);
 			return false;
@@ -964,18 +930,250 @@ class App {
 			logger('Path "' . $directory . '" does not exist for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}
+
 		if (is_file($directory)) {
 			logger('Path "' . $directory . '" is a file for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}
+
 		if (!is_dir($directory)) {
 			logger('Path "' . $directory . '" is not a directory for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}
+
 		if ($check_writable && !is_writable($directory)) {
 			logger('Path "' . $directory . '" is not writable for user ' . self::systemuser(), LOGGER_DEBUG);
 			return false;
 		}
+
 		return true;
+	}
+
+	/**
+	 * @param string $cat     Config category
+	 * @param string $k       Config key
+	 * @param mixed  $default Default value if it isn't set
+	 */
+	public function getConfigValue($cat, $k, $default = null)
+	{
+		$return = $default;
+
+		if ($cat === 'config') {
+			if (isset($this->config[$k])) {
+				$return = $this->config[$k];
+			}
+		} else {
+			if (isset($this->config[$cat][$k])) {
+				$return = $this->config[$cat][$k];
+			}
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Sets a value in the config cache. Accepts raw output from the config table
+	 *
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 * @param mixed  $v   Value to set
+	 */
+	public function setConfigValue($cat, $k, $v)
+	{
+		// Only arrays are serialized in database, so we have to unserialize sparingly
+		$value = is_string($v) && preg_match("|^a:[0-9]+:{.*}$|s", $v) ? unserialize($v) : $v;
+
+		if ($cat === 'config') {
+			$this->config[$k] = $value;
+		} else {
+			$this->config[$cat][$k] = $value;
+		}
+	}
+
+	/**
+	 * Deletes a value from the config cache
+	 *
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 */
+	public function deleteConfigValue($cat, $k)
+	{
+		if ($cat === 'config') {
+			if (isset($this->config[$k])) {
+				unset($this->config[$k]);
+			}
+		} else {
+			if (isset($this->config[$cat][$k])) {
+				unset($this->config[$cat][$k]);
+			}
+		}
+	}
+
+
+	/**
+	 * Retrieves a value from the user config cache
+	 *
+	 * @param int    $uid     User Id
+	 * @param string $cat     Config category
+	 * @param string $k       Config key
+	 * @param mixed  $default Default value if key isn't set
+	 */
+	public function getPConfigValue($uid, $cat, $k, $default = null)
+	{
+		$return = $default;
+
+		if (isset($this->config[$uid][$cat][$k])) {
+			$return = $this->config[$uid][$cat][$k];
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Sets a value in the user config cache
+	 *
+	 * Accepts raw output from the pconfig table
+	 *
+	 * @param int    $uid User Id
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 * @param mixed  $v   Value to set
+	 */
+	public function setPConfigValue($uid, $cat, $k, $v)
+	{
+		// Only arrays are serialized in database, so we have to unserialize sparingly
+		$value = is_string($v) && preg_match("|^a:[0-9]+:{.*}$|s", $v) ? unserialize($v) : $v;
+
+		$this->config[$uid][$cat][$k] = $value;
+	}
+
+	/**
+	 * Deletes a value from the user config cache
+	 *
+	 * @param int    $uid User Id
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 */
+	public function deletePConfigValue($uid, $cat, $k)
+	{
+		if (isset($this->config[$uid][$cat][$k])) {
+			unset($this->config[$uid][$cat][$k]);
+		}
+	}
+
+	/**
+	 * Generates the site's default sender email address
+	 *
+	 * @return string
+	 */
+	public function getSenderEmailAddress()
+	{
+		$sender_email = Config::get('config', 'sender_email');
+		if (empty($sender_email)) {
+			$hostname = $this->get_hostname();
+			if (strpos($hostname, ':')) {
+				$hostname = substr($hostname, 0, strpos($hostname, ':'));
+			}
+
+			$sender_email = 'noreply@' . $hostname;
+		}
+
+		return $sender_email;
+	}
+
+	/**
+	 * @note Checks, if the App is in the Maintenance-Mode
+	 *
+	 * @return boolean
+	 */
+	public function checkMaintenanceMode()
+	{
+		if (Config::get('system', 'maintenance')) {
+			$this->mode = App::MODE_MAINTENANCE;
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the current theme name.
+	 *
+	 * @return string
+	 */
+	public function getCurrentTheme()
+	{
+		if (!$this->current_theme) {
+			$this->computeCurrentTheme();
+		}
+
+		return $this->current_theme;
+	}
+
+	/**
+	 * Computes the current theme name based on the node settings, the user settings and the device type
+	 *
+	 * @throws Exception
+	 */
+	private function computeCurrentTheme()
+	{
+		$system_theme = Config::get('system', 'theme');
+		if (!$system_theme) {
+			throw new Exception(L10n::t('No system theme config value set.'));
+		}
+
+		// Sane default
+		$this->current_theme = $system_theme;
+
+		$allowed_themes = explode(',', Config::get('system', 'allowed_themes', $system_theme));
+
+		$page_theme = null;
+		// Find the theme that belongs to the user whose stuff we are looking at
+		if ($this->profile_uid && ($this->profile_uid != local_user())) {
+			// Allow folks to override user themes and always use their own on their own site.
+			// This works only if the user is on the same server
+			$user = dba::selectFirst('user', ['theme'], ['uid' => $this->profile_uid]);
+			if (DBM::is_result($user) && !PConfig::get(local_user(), 'system', 'always_my_theme')) {
+				$page_theme = $user['theme'];
+			}
+		}
+
+		$user_theme = defaults($_SESSION, 'theme', $system_theme);
+		// Specific mobile theme override
+		if (($this->is_mobile || $this->is_tablet) && defaults($_SESSION, 'show-mobile', true)) {
+			$system_mobile_theme = Config::get('system', 'mobile-theme');
+			$user_mobile_theme = defaults($_SESSION, 'mobile-theme', $system_mobile_theme);
+
+			// --- means same mobile theme as desktop
+			if (!empty($user_mobile_theme) && $user_mobile_theme !== '---') {
+				$user_theme = $user_mobile_theme;
+			}
+		}
+
+		if ($page_theme) {
+			$theme_name = $page_theme;
+		} else {
+			$theme_name = $user_theme;
+		}
+
+		if ($theme_name
+			&& in_array($theme_name, $allowed_themes)
+			&& (file_exists('view/theme/' . $theme_name . '/style.css')
+			|| file_exists('view/theme/' . $theme_name . '/style.php'))
+		) {
+			$this->current_theme = $theme_name;
+		}
+	}
+
+	/**
+	 * @brief Return full URL to theme which is currently in effect.
+	 *
+	 * Provide a sane default if nothing is chosen or the specified theme does not exist.
+	 *
+	 * @return string
+	 */
+	public function getCurrentThemeStylesheetPath()
+	{
+		return Core\Theme::getStylesheetPath($this->getCurrentTheme());
 	}
 }

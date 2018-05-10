@@ -15,6 +15,7 @@
 namespace Friendica\Content;
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -61,7 +62,7 @@ class Smilies
 	 */
 	public static function getList()
 	{
-		$texts =  array(
+		$texts =  [
 			'&lt;3',
 			'&lt;/3',
 			'&lt;\\3',
@@ -98,9 +99,9 @@ class Smilies
 			'red#',
 			'red#matrix'
 
-		);
+		];
 
-		$icons = array(
+		$icons = [
 		'<img class="smiley" src="' . System::baseUrl() . '/images/smiley-heart.gif" alt="&lt;3" title="&lt;3" />',
 		'<img class="smiley" src="' . System::baseUrl() . '/images/smiley-brokenheart.gif" alt="&lt;/3" title="&lt;/3" />',
 		'<img class="smiley" src="' . System::baseUrl() . '/images/smiley-brokenheart.gif" alt="&lt;\\3" title="&lt;\\3" />',
@@ -136,10 +137,10 @@ class Smilies
 		'<a href="https://friendi.ca">~friendica <img class="smiley" src="' . System::baseUrl() . '/images/friendica-16.png" alt="~friendica" title="~friendica" /></a>',
 		'<a href="http://redmatrix.me/">red<img class="smiley" src="' . System::baseUrl() . '/images/rm-16.png" alt="red#" title="red#" />matrix</a>',
 		'<a href="http://redmatrix.me/">red<img class="smiley" src="' . System::baseUrl() . '/images/rm-16.png" alt="red#matrix" title="red#matrix" />matrix</a>'
-		);
+		];
 
-		$params = array('texts' => $texts, 'icons' => $icons);
-		call_hooks('smilie', $params);
+		$params = ['texts' => $texts, 'icons' => $icons];
+		Addon::callHooks('smilie', $params);
 
 		return $params;
 	}
@@ -175,7 +176,7 @@ class Smilies
 		$params = self::getList();
 
 		if ($no_images) {
-			$cleaned = array('texts' => array(), 'icons' => array());
+			$cleaned = ['texts' => [], 'icons' => []];
 			$icons = $params['icons'];
 			foreach ($icons as $key => $icon) {
 				if (!strstr($icon, '<img ')) {

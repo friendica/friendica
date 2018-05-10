@@ -6,14 +6,14 @@
 */
 
 use Friendica\App;
+use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Core\Config;
-
-require_once 'include/plugin.php';
+use Friendica\Util\Network;
 
 function nodeinfo_wellknown(App $a) {
-	$nodeinfo = array('links' => array(array('rel' => 'http://nodeinfo.diaspora.software/ns/schema/1.0',
-					'href' => System::baseUrl().'/nodeinfo/1.0')));
+	$nodeinfo = ['links' => [['rel' => 'http://nodeinfo.diaspora.software/ns/schema/1.0',
+					'href' => System::baseUrl().'/nodeinfo/1.0']]];
 
 	header('Content-type: application/json; charset=utf-8');
 	echo json_encode($nodeinfo, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
@@ -22,24 +22,24 @@ function nodeinfo_wellknown(App $a) {
 
 function nodeinfo_init(App $a) {
 	if (!Config::get('system', 'nodeinfo')) {
-		http_status_exit(404);
+		System::httpExit(404);
 		killme();
 	}
 
 	if (($a->argc != 2) || ($a->argv[1] != '1.0')) {
-		http_status_exit(404);
+		System::httpExit(404);
 		killme();
 	}
 
 	$smtp = (function_exists('imap_open') && !Config::get('system', 'imap_disabled') && !Config::get('system', 'dfrn_only'));
 
-	$nodeinfo = array();
+	$nodeinfo = [];
 	$nodeinfo['version'] = '1.0';
-	$nodeinfo['software'] = array('name' => 'friendica', 'version' => FRIENDICA_VERSION.'-'.DB_UPDATE_VERSION);
+	$nodeinfo['software'] = ['name' => 'friendica', 'version' => FRIENDICA_VERSION.'-'.DB_UPDATE_VERSION];
 
-	$nodeinfo['protocols'] = array();
-	$nodeinfo['protocols']['inbound'] = array();
-	$nodeinfo['protocols']['outbound'] = array();
+	$nodeinfo['protocols'] = [];
+	$nodeinfo['protocols']['inbound'] = [];
+	$nodeinfo['protocols']['outbound'] = [];
 
 	if (Config::get('system', 'diaspora_enabled')) {
 		$nodeinfo['protocols']['inbound'][] = 'diaspora';
@@ -54,66 +54,66 @@ function nodeinfo_init(App $a) {
 		$nodeinfo['protocols']['outbound'][] = 'gnusocial';
 	}
 
-	$nodeinfo['services'] = array();
-	$nodeinfo['services']['inbound'] = array();
-	$nodeinfo['services']['outbound'] = array();
+	$nodeinfo['services'] = [];
+	$nodeinfo['services']['inbound'] = [];
+	$nodeinfo['services']['outbound'] = [];
 
-	$nodeinfo['usage'] = array();
+	$nodeinfo['usage'] = [];
 
 	$nodeinfo['openRegistrations'] = ($a->config['register_policy'] != 0);
 
-	$nodeinfo['metadata'] = array('nodeName' => $a->config['sitename']);
+	$nodeinfo['metadata'] = ['nodeName' => $a->config['sitename']];
 
 	if (Config::get('system', 'nodeinfo')) {
 
-		$nodeinfo['usage']['users'] = array('total' => (int)Config::get('nodeinfo', 'total_users'),
+		$nodeinfo['usage']['users'] = ['total' => (int)Config::get('nodeinfo', 'total_users'),
 					'activeHalfyear' => (int)Config::get('nodeinfo', 'active_users_halfyear'),
-					'activeMonth' => (int)Config::get('nodeinfo', 'active_users_monthly'));
+					'activeMonth' => (int)Config::get('nodeinfo', 'active_users_monthly')];
 		$nodeinfo['usage']['localPosts'] = (int)Config::get('nodeinfo', 'local_posts');
 		$nodeinfo['usage']['localComments'] = (int)Config::get('nodeinfo', 'local_comments');
 
-		if (plugin_enabled('appnet')) {
+		if (Addon::isEnabled('appnet')) {
 			$nodeinfo['services']['inbound'][] = 'appnet';
 		}
-		if (plugin_enabled('appnet') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('appnet') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'appnet';
 		}
-		if (plugin_enabled('blogger')) {
+		if (Addon::isEnabled('blogger')) {
 			$nodeinfo['services']['outbound'][] = 'blogger';
 		}
-		if (plugin_enabled('dwpost')) {
+		if (Addon::isEnabled('dwpost')) {
 			$nodeinfo['services']['outbound'][] = 'dreamwidth';
 		}
-		if (plugin_enabled('fbpost') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('fbpost') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'facebook';
 		}
-		if (plugin_enabled('statusnet')) {
+		if (Addon::isEnabled('statusnet')) {
 			$nodeinfo['services']['inbound'][] = 'gnusocial';
 			$nodeinfo['services']['outbound'][] = 'gnusocial';
 		}
 
-		if (plugin_enabled('gpluspost') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('gpluspost') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'google';
 		}
-		if (plugin_enabled('ijpost')) {
+		if (Addon::isEnabled('ijpost')) {
 			$nodeinfo['services']['outbound'][] = 'insanejournal';
 		}
-		if (plugin_enabled('libertree')) {
+		if (Addon::isEnabled('libertree')) {
 			$nodeinfo['services']['outbound'][] = 'libertree';
 		}
-		if (plugin_enabled('buffer')) {
+		if (Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'linkedin';
 		}
-		if (plugin_enabled('ljpost')) {
+		if (Addon::isEnabled('ljpost')) {
 			$nodeinfo['services']['outbound'][] = 'livejournal';
 		}
-		if (plugin_enabled('buffer')) {
+		if (Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'pinterest';
 		}
-		if (plugin_enabled('posterous')) {
+		if (Addon::isEnabled('posterous')) {
 			$nodeinfo['services']['outbound'][] = 'posterous';
 		}
-		if (plugin_enabled('pumpio')) {
+		if (Addon::isEnabled('pumpio')) {
 			$nodeinfo['services']['inbound'][] = 'pumpio';
 			$nodeinfo['services']['outbound'][] = 'pumpio';
 		}
@@ -121,13 +121,13 @@ function nodeinfo_init(App $a) {
 		if ($smtp) {
 			$nodeinfo['services']['outbound'][] = 'smtp';
 		}
-		if (plugin_enabled('tumblr')) {
+		if (Addon::isEnabled('tumblr')) {
 			$nodeinfo['services']['outbound'][] = 'tumblr';
 		}
-		if (plugin_enabled('twitter') || plugin_enabled('buffer')) {
+		if (Addon::isEnabled('twitter') || Addon::isEnabled('buffer')) {
 			$nodeinfo['services']['outbound'][] = 'twitter';
 		}
-		if (plugin_enabled('wppost')) {
+		if (Addon::isEnabled('wppost')) {
 			$nodeinfo['services']['outbound'][] = 'wordpress';
 		}
 		$nodeinfo['metadata']['protocols'] = $nodeinfo['protocols'];
@@ -137,7 +137,7 @@ function nodeinfo_init(App $a) {
 
 		$nodeinfo['metadata']['services'] = $nodeinfo['services'];
 
-		if (plugin_enabled('twitter')) {
+		if (Addon::isEnabled('twitter')) {
 			$nodeinfo['metadata']['services']['inbound'][] = 'twitter';
 		}
 	}
@@ -153,22 +153,22 @@ function nodeinfo_cron() {
 
 	$a = get_app();
 
-	// If the plugin 'statistics_json' is enabled then disable it and actrivate nodeinfo.
-	if (plugin_enabled('statistics_json')) {
+	// If the addon 'statistics_json' is enabled then disable it and actrivate nodeinfo.
+	if (Addon::isEnabled('statistics_json')) {
 		Config::set('system', 'nodeinfo', true);
 
-		$plugin = 'statistics_json';
-		$plugins = Config::get('system', 'addon');
-		$plugins_arr = array();
+		$addon = 'statistics_json';
+		$addons = Config::get('system', 'addon');
+		$addons_arr = [];
 
-		if ($plugins) {
-			$plugins_arr = explode(',',str_replace(' ', '',$plugins));
+		if ($addons) {
+			$addons_arr = explode(',',str_replace(' ', '',$addons));
 
-			$idx = array_search($plugin, $plugins_arr);
+			$idx = array_search($addon, $addons_arr);
 			if ($idx !== false) {
-				unset($plugins_arr[$idx]);
-				uninstall_plugin($plugin);
-				Config::set('system', 'addon', implode(', ',$plugins_arr));
+				unset($addons_arr[$idx]);
+				Addon::uninstall($addon);
+				Config::set('system', 'addon', implode(', ',$addons_arr));
 			}
 		}
 	}
@@ -247,7 +247,7 @@ function nodeinfo_cron() {
 	// Now trying to register
 	$url = 'http://the-federation.info/register/'.$a->get_hostname();
         logger('registering url: '.$url, LOGGER_DEBUG);
-	$ret = fetch_url($url);
+	$ret = Network::fetchUrl($url);
         logger('registering answer: '.$ret, LOGGER_DEBUG);
 
         logger('cron_end');

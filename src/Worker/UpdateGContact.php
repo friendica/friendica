@@ -1,16 +1,20 @@
 <?php
+
 /**
  * @file src/Worker/UpdateGcontact.php
  */
+
 namespace Friendica\Worker;
 
-use Friendica\Core\Config;
 use Friendica\Database\DBM;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
+use Friendica\Util\DateTimeFormat;
 
-class UpdateGContact {
-	public static function execute($contact_id) {
+class UpdateGContact
+{
+	public static function execute($contact_id)
+	{
 		global $a;
 
 		logger('update_gcontact: start');
@@ -26,32 +30,37 @@ class UpdateGContact {
 			return;
 		}
 
-		if (!in_array($r[0]["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
+		if (!in_array($r[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
 			return;
 		}
 
 		$data = Probe::uri($r[0]["url"]);
 
-		if (!in_array($data["network"], array(NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS))) {
-			if ($r[0]["server_url"] != "")
+		if (!in_array($data["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
+			if ($r[0]["server_url"] != "") {
 				PortableContact::checkServer($r[0]["server_url"], $r[0]["network"]);
+			}
 
 			q("UPDATE `gcontact` SET `last_failure` = '%s' WHERE `id` = %d",
-				dbesc(datetime_convert()), intval($contact_id));
+				dbesc(DateTimeFormat::utcNow()), intval($contact_id));
 			return;
 		}
 
-		if (($data["name"] == "") && ($r[0]['name'] != ""))
+		if (($data["name"] == "") && ($r[0]['name'] != "")) {
 			$data["name"] = $r[0]['name'];
+		}
 
-		if (($data["nick"] == "") && ($r[0]['nick'] != ""))
+		if (($data["nick"] == "") && ($r[0]['nick'] != "")) {
 			$data["nick"] = $r[0]['nick'];
+		}
 
-		if (($data["addr"] == "") && ($r[0]['addr'] != ""))
+		if (($data["addr"] == "") && ($r[0]['addr'] != "")) {
 			$data["addr"] = $r[0]['addr'];
+		}
 
-		if (($data["photo"] == "") && ($r[0]['photo'] != ""))
+		if (($data["photo"] == "") && ($r[0]['photo'] != "")) {
 			$data["photo"] = $r[0]['photo'];
+		}
 
 
 		q("UPDATE `gcontact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `photo` = '%s'
@@ -60,8 +69,8 @@ class UpdateGContact {
 					dbesc($data["nick"]),
 					dbesc($data["addr"]),
 					dbesc($data["photo"]),
-					intval($contact_id)
-				);
+			intval($contact_id)
+		);
 
 		q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `photo` = '%s'
 					WHERE `uid` = 0 AND `addr` = '' AND `nurl` = '%s'",
@@ -70,12 +79,12 @@ class UpdateGContact {
 					dbesc($data["addr"]),
 					dbesc($data["photo"]),
 					dbesc(normalise_link($data["url"]))
-				);
+		);
 
 		q("UPDATE `contact` SET `addr` = '%s'
 					WHERE `uid` != 0 AND `addr` = '' AND `nurl` = '%s'",
 					dbesc($data["addr"]),
 					dbesc(normalise_link($data["url"]))
-				);
+		);
 	}
 }

@@ -54,6 +54,20 @@ Das `vier` Theme z.B. unterstützt kleine Anzeigen und benötigt kein zusätzlic
 
 ### Registrierung
 
+#### Registrierungsmethode
+
+Diese Einstellung regelt die Art der Registrierung.
+Dabei kannst du zwischen den folgenden Optionen wählen:
+
+* **Offen**: Jeder kann ein neues Nutzerkonto anlegen und es sofort benutzen.
+* **Bedarf der Zustimmung**: Jeder kann ein Nutzerkonto anlegen. Dieses muss allerdings durch den Admin freigeschaltet werden, bevor es verwendet werden kann.
+* **Geschlossen**: Es können keine weiteren Nutzerkonten angelegt werden.
+
+##### Einladungen 
+
+Zusätzlich zu den oben genannten Möglichkeiten, kann die Registrierung eines neuen Nutzerkontos an eine Einladung durch einen bestehenden Nutzer gekoppelt werden.
+Hierzu muss in der [.htconfig.php](/help/htconfig) Datei die Option `invitation_only` aktiviert und als Registrierungsmethode entweder *Offen* oder *Bedarf der Zustimmung* gewählt werden.
+
 #### Namen auf Vollständigkeit überprüfen
 
 Es kann vorkommen, dass viele Spammer versuchen, sich auf deiner Seite zu registrieren. 
@@ -107,6 +121,15 @@ Beachte: das ist speziell für Seiten, die beabsichtigen, von anderen Friendica-
 Unautorisierte Personen haben ebenfalls nicht die Möglichkeit, Freundschaftsanfragen von Seitennutzern zu beantworten. 
 Die Standardeinstellung ist deaktiviert. 
 Verfügbar in Version 2.2 und höher.
+
+#### Für Besucher verfügbare Gemeinschaftsseiten
+
+Die Gemeinschaftsseiten zeigen all öffentlichen Beiträge.
+Es gibt zwei Gemeinschaftsseiten, eine lokale auf der die Beiträge der Nutzer des Knotens gesammelt werden und eine globale auf der alle bekannten Beiträge aus dem gesamten Netzwerk erscheinen.
+Mit dieser Einstellung kann geregelt werden, welche dieser beiden Seiten Besucher aufrufen können.
+Angemeldete Nutzer des Knotens können grundsätzlich beide Seiten verwenden.
+
+**Hinweis**: Einige Einstellungen, wie z.B. das Verbergen von Kontakten auf der Profilseite, können die Sichtbarkeit der Beiträge auf der Gemeinschaftsseiten beeinflussen.
 
 #### Erlaubte Domains für Kontakte
 
@@ -195,7 +218,7 @@ An dieser Stelle kannst du existierende Accounts vom Zugriff auf die Instanz blo
 Im letzten Bereich auf der Seite kannst du als Administrator neue Accounts anlegen.
 Das Passwort für so eingerichtete Accounts werden per E-Mail an die Nutzer geschickt.
 
-## Plugins
+## Addons
 
 Dieser Bereich des Admin Panels dient der Auswahl und Konfiguration der Erweiterungen von Friendica.
 Sie müssen in das `/addon` Verzeichnis kopiert werden.
@@ -203,11 +226,11 @@ Auf der Seite wird eine Liste der verfügbaren Erweiterungen angezeigt.
 Neben den Namen der Erweiterungen wird ein Indikator angezeigt, der anzeigt ob das Addon gerade aktiviert ist oder nicht.
 
 Wenn du die Erweiterungen aktualisiert die du auf deiner Friendica-Instanz nutzt könnte es sein, dass sie neu geladen werden müssen, damit die Änderungen aktiviert werden.
-Um diesen Prozess zu vereinfachen gibt es am Anfang der Seite einen Button um alle aktiven Plugins neu zu laden.
+Um diesen Prozess zu vereinfachen gibt es am Anfang der Seite einen Button um alle aktiven Addons neu zu laden.
 
 ## Themen
 
-Der Bereich zur Kontrolle der auf der Friendica-Instanz verfügbaren Themen funktioniert analog zum Plugins Bereich.
+Der Bereich zur Kontrolle der auf der Friendica-Instanz verfügbaren Themen funktioniert analog zum Addons Bereich.
 Jedes Theme hat eine extra Seite auf der der aktuelle Status, ein Bildschirmfoto des Themes, zusätzliche Informationen und eventuelle Einstellungen des Themes zu finden sind.
 Genau wie Erweiterungen können Themes in der Übersichtsliste oder der Theme-Seite aktiviert bzw. deaktiviert werden.
 Um ein Standardtheme für die Instanz zu wählen, benutze bitte die *Seiten* Bereich des Admin Panels.
@@ -256,7 +279,7 @@ Dazu muss man nur die GUID des Beitrags kennen.
 Diese kann u.a. in der Adresse der `/display`-Seite gefunden werden, wenn man dem *Link zum Originalbeitrag* folgt.
 Hier ist die GUID der letzte Teil der URL in der Adresszeile des Browsers.
 
-## Plugin Features
+## Addon Features
 
 Einige der Erweiterungen von Friendica benötigen global gültige Einstellungen, die der Administrator vornehmen muss.
 Diese Erweiterungen sind hier aufgelistet, damit du die Einstellungen schneller findest.

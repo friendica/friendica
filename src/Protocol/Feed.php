@@ -8,12 +8,15 @@ namespace Friendica\Protocol;
 
 use Friendica\Database\DBM;
 use Friendica\Core\System;
+use Friendica\Model\Item;
+use Friendica\Util\Network;
+use Friendica\Content\Text\HTML;
+
 use dba;
 use DOMDocument;
 use DOMXPath;
 
 require_once 'include/dba.php';
-require_once 'include/html2bbcode.php';
 require_once 'include/items.php';
 
 /**
@@ -65,7 +68,8 @@ class Feed {
 		$xpath->registerNamespace('media', "http://search.yahoo.com/mrss/");
 		$xpath->registerNamespace('poco', NAMESPACE_POCO);
 
-		$author = array();
+		$author = [];
+		$entries = null;
 
 		// Is it RDF?
 		if ($xpath->query('/rdf:RDF/rss:channel')->length > 0) {
@@ -82,9 +86,9 @@ class Feed {
 		if ($xpath->query('/atom:feed')->length > 0) {
 			$alternate = $xpath->query("atom:link[@rel='alternate']")->item(0)->attributes;
 			if (is_object($alternate)) {
-				foreach ($alternate AS $attributes) {
-					if ($attributes->name == "href") {
-						$author["author-link"] = $attributes->textContent;
+				foreach ($alternate AS $attribute) {
+					if ($attribute->name == "href") {
+						$author["author-link"] = $attribute->textContent;
 					}
 				}
 			}
@@ -95,9 +99,9 @@ class Feed {
 			if ($author["author-link"] == "") {
 				$self = $xpath->query("atom:link[@rel='self']")->item(0)->attributes;
 				if (is_object($self)) {
-					foreach ($self AS $attributes) {
-						if ($attributes->name == "href") {
-							$author["author-link"] = $attributes->textContent;
+					foreach ($self AS $attribute) {
+						if ($attribute->name == "href") {
+							$author["author-link"] = $attribute->textContent;
 						}
 					}
 				}
@@ -137,9 +141,9 @@ class Feed {
 				}
 				$avatar = $xpath->evaluate("atom:author/atom:link[@rel='avatar']")->item(0)->attributes;
 				if (is_object($avatar)) {
-					foreach ($avatar AS $attributes) {
-						if ($attributes->name == "href") {
-							$author["author-avatar"] = $attributes->textContent;
+					foreach ($avatar AS $attribute) {
+						if ($attribute->name == "href") {
+							$author["author-avatar"] = $attribute->textContent;
 						}
 					}
 				}
@@ -185,7 +189,7 @@ class Feed {
 			$author["owner-avatar"] = $contact["thumb"];
 		}
 
-		$header = array();
+		$header = [];
 		$header["uid"] = $importer["uid"];
 		$header["network"] = NETWORK_FEED;
 		$header["type"] = "remote";
@@ -198,24 +202,16 @@ class Feed {
 
 		$header["contact-id"] = $contact["id"];
 
-		if (!strlen($contact["notify"])) {
-			// one way feed - no remote comment ability
-			$header["last-child"] = 0;
-		}
-
 		if (!is_object($entries)) {
 			logger("There are no entries in this feed.", LOGGER_DEBUG);
 			return;
 		}
 
-		$items = array();
+		$items = [];
+		// Importing older entries first
+		for($i = $entries->length - 1; $i >= 0;--$i) {
+			$entry = $entries->item($i);
 
-		$entrylist = array();
-
-		foreach ($entries AS $entry) {
-			$entrylist[] = $entry;
-		}
-		foreach (array_reverse($entrylist) AS $entry) {
 			$item = array_merge($header, $author);
 
 			$alternate = $xpath->query("atom:link[@rel='alternate']", $entry)->item(0)->attributes;
@@ -223,9 +219,9 @@ class Feed {
 				$alternate = $xpath->query("atom:link", $entry)->item(0)->attributes;
 			}
 			if (is_object($alternate)) {
-				foreach ($alternate AS $attributes) {
-					if ($attributes->name == "href") {
-						$item["plink"] = $attributes->textContent;
+				foreach ($alternate AS $attribute) {
+					if ($attribute->name == "href") {
+						$item["plink"] = $attribute->textContent;
 					}
 				}
 			}
@@ -247,14 +243,14 @@ class Feed {
 
 			$orig_plink = $item["plink"];
 
-			$item["plink"] = original_url($item["plink"]);
+			$item["plink"] = Network::finalUrl($item["plink"]);
 
 			$item["parent-uri"] = $item["uri"];
 
 			if (!$simulate) {
 				$condition = ["`uid` = ? AND `uri` = ? AND `network` IN (?, ?)",
 					$importer["uid"], $item["uri"], NETWORK_FEED, NETWORK_DFRN];
-				$previous = dba::select('item', ['id'], $condition, ['limit' => 1]);
+				$previous = dba::selectFirst('item', ['id'], $condition);
 				if (DBM::is_result($previous)) {
 					logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$previous["id"], LOGGER_DEBUG);
 					continue;
@@ -309,29 +305,29 @@ class Feed {
 			// <category>Ausland</category>
 			// <media:thumbnail width="152" height="76" url="http://www.taz.de/picture/667875/192/14388767.jpg"/>
 
-			$attachments = array();
+			$attachments = [];
 
-			$enclosures = $xpath->query("enclosure", $entry);
+			$enclosures = $xpath->query("enclosure|atom:link[@rel='enclosure']", $entry);
 			foreach ($enclosures AS $enclosure) {
 				$href = "";
 				$length = "";
 				$type = "";
 				$title = "";
 
-				foreach ($enclosure->attributes AS $attributes) {
-					if ($attributes->name == "url") {
-						$href = $attributes->textContent;
-					} elseif ($attributes->name == "length") {
-						$length = $attributes->textContent;
-					} elseif ($attributes->name == "type") {
-						$type = $attributes->textContent;
+				foreach ($enclosure->attributes AS $attribute) {
+					if (in_array($attribute->name, ["url", "href"])) {
+						$href = $attribute->textContent;
+					} elseif ($attribute->name == "length") {
+						$length = $attribute->textContent;
+					} elseif ($attribute->name == "type") {
+						$type = $attribute->textContent;
 					}
 				}
 				if (strlen($item["attach"])) {
 					$item["attach"] .= ',';
 				}
 
-				$attachments[] = array("link" => $href, "type" => $type, "length" => $length);
+				$attachments[] = ["link" => $href, "type" => $type, "length" => $length];
 
 				$item["attach"] .= '[attach]href="'.$href.'" length="'.$length.'" type="'.$type.'"[/attach]';
 			}
@@ -362,19 +358,18 @@ class Feed {
 
 			// remove the content of the title if it is identically to the body
 			// This helps with auto generated titles e.g. from tumblr
-			if (title_is_body($item["title"], $body)) {
+			if (self::titleIsBody($item["title"], $body)) {
 				$item["title"] = "";
 			}
-			$item["body"] = html2bbcode($body, $basepath);
+			$item["body"] = HTML::toBBCode($body, $basepath);
 
 			if (($item["body"] == '') && ($item["title"] != '')) {
 				$item["body"] = $item["title"];
 				$item["title"] = '';
 			}
 
+			$preview = '';
 			if (!empty($contact["fetch_further_information"]) && ($contact["fetch_further_information"] < 3)) {
-				$preview = "";
-
 				// Handle enclosures and treat them as preview picture
 				foreach ($attachments AS $attachment) {
 					if ($attachment["type"] == "image/jpeg") {
@@ -405,7 +400,7 @@ class Feed {
 				// We always strip the title since it will be added in the page information
 				$item["title"] = "";
 				$item["body"] = $item["body"].add_page_info($item["plink"], false, $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_blacklist"]);
-				$item["tag"] = add_page_keywords($item["plink"], false, $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_blacklist"]);
+				$item["tag"] = add_page_keywords($item["plink"], $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_blacklist"]);
 				$item["object-type"] = ACTIVITY_OBJ_BOOKMARK;
 				unset($item["attach"]);
 			} else {
@@ -413,11 +408,13 @@ class Feed {
 					if (!empty($tags)) {
 						$item["tag"] = $tags;
 					} else {
-						$item["tag"] = add_page_keywords($item["plink"], false, $preview, true, $contact["ffi_keyword_blacklist"]);
+						// @todo $preview is never set in this case, is it intended? - @MrPetovan 2018-02-13
+						$item["tag"] = add_page_keywords($item["plink"], $preview, true, $contact["ffi_keyword_blacklist"]);
 					}
 					$item["body"] .= "\n".$item['tag'];
 				}
-				if (!strstr($item["body"], '[url') && ($item['plink'] != '')) {
+				// Add the link to the original feed entry if not present in feed
+				if (($item['plink'] != '') && !strstr($item["body"], $item['plink'])) {
 					$item["body"] .= "[hr][url]".$item['plink']."[/url]";
 				}
 			}
@@ -425,17 +422,17 @@ class Feed {
 			if (!$simulate) {
 				logger("Stored feed: ".print_r($item, true), LOGGER_DEBUG);
 
-				$notify = item_is_remote_self($contact, $item);
+				$notify = Item::isRemoteSelf($contact, $item);
 
 				// Distributed items should have a well formatted URI.
 				// Additionally we have to avoid conflicts with identical URI between imported feeds and these items.
 				if ($notify) {
-					$item['guid'] = uri_to_guid($orig_plink, $a->get_hostname());
+					$item['guid'] = Item::guidFromUri($orig_plink, $a->get_hostname());
 					unset($item['uri']);
 					unset($item['parent-uri']);
 				}
 
-				$id = item_store($item, false, $notify);
+				$id = Item::insert($item, false, $notify);
 
 				logger("Feed for contact ".$contact["url"]." stored under id ".$id);
 			} else {
@@ -447,7 +444,33 @@ class Feed {
 		}
 
 		if ($simulate) {
-			return array("header" => $author, "items" => $items);
+			return ["header" => $author, "items" => $items];
 		}
+	}
+
+	private static function titleIsBody($title, $body)
+	{
+		$title = strip_tags($title);
+		$title = trim($title);
+		$title = html_entity_decode($title, ENT_QUOTES, 'UTF-8');
+		$title = str_replace(["\n", "\r", "\t", " "], ["", "", "", ""], $title);
+
+		$body = strip_tags($body);
+		$body = trim($body);
+		$body = html_entity_decode($body, ENT_QUOTES, 'UTF-8');
+		$body = str_replace(["\n", "\r", "\t", " "], ["", "", "", ""], $body);
+
+		if (strlen($title) < strlen($body)) {
+			$body = substr($body, 0, strlen($title));
+		}
+
+		if (($title != $body) && (substr($title, -3) == "...")) {
+			$pos = strrpos($title, "...");
+			if ($pos > 0) {
+				$title = substr($title, 0, $pos);
+				$body = substr($body, 0, $pos);
+			}
+		}
+		return ($title == $body);
 	}
 }

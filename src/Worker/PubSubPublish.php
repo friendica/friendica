@@ -11,6 +11,8 @@ use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Protocol\OStatus;
+use Friendica\Util\Network;
+use dba;
 
 require_once 'include/items.php';
 
@@ -26,7 +28,7 @@ class PubSubPublish {
 
 			foreach ($r as $rr) {
 				logger("Publish feed to ".$rr["callback_url"], LOGGER_DEBUG);
-				Worker::add(array('priority' => PRIORITY_HIGH, 'created' => $a->queue['created'], 'dont_fork' => true),
+				Worker::add(['priority' => PRIORITY_HIGH, 'created' => $a->queue['created'], 'dont_fork' => true],
 						'PubSubPublish', (int)$rr["id"]);
 			}
 		}
@@ -52,7 +54,7 @@ class PubSubPublish {
 		logger("Generate feed of user ".$rr['nickname']." to ".$rr['callback_url']." - last updated ".$rr['last_update'], LOGGER_DEBUG);
 
 		$last_update = $rr['last_update'];
-		$params = OStatus::feed($a, $rr['nickname'], $last_update);
+		$params = OStatus::feed($rr['nickname'], $last_update);
 
 		if (!$params) {
 			return;
@@ -60,24 +62,23 @@ class PubSubPublish {
 
 		$hmac_sig = hash_hmac("sha1", $params, $rr['secret']);
 
-		$headers = array("Content-type: application/atom+xml",
+		$headers = ["Content-type: application/atom+xml",
 				sprintf("Link: <%s>;rel=hub,<%s>;rel=self",
 					System::baseUrl().'/pubsubhubbub/'.$rr['nickname'],
 					$rr['topic']),
-				"X-Hub-Signature: sha1=".$hmac_sig);
+				"X-Hub-Signature: sha1=".$hmac_sig];
 
-		logger('POST '.print_r($headers, true)."\n".$params, LOGGER_DEBUG);
+		logger('POST '.print_r($headers, true)."\n".$params, LOGGER_DATA);
 
-		post_url($rr['callback_url'], $params, $headers);
+		Network::post($rr['callback_url'], $params, $headers);
 		$ret = $a->get_curl_code();
 
 		if ($ret >= 200 && $ret <= 299) {
 			logger('successfully pushed to '.$rr['callback_url']);
 
 			// set last_update to the "created" date of the last item, and reset push=0
-			q("UPDATE `push_subscriber` SET `push` = 0, last_update = '%s' WHERE id = %d",
-				dbesc($last_update),
-				intval($rr['id']));
+			$fields = ['push' => 0, 'last_update' => $last_update];
+			dba::update('push_subscriber', $fields, ['id' => $rr['id']]);
 
 		} else {
 			logger('error when pushing to '.$rr['callback_url'].' HTTP: '.$ret);
@@ -89,9 +90,7 @@ class PubSubPublish {
 			if ($new_push > 30) // OK, let's give up
 				$new_push = 0;
 
-			q("UPDATE `push_subscriber` SET `push` = %d WHERE id = %d",
-				$new_push,
-				intval($rr['id']));
+			dba::update('push_subscriber', ['push' => $new_push], ['id' => $rr['id']]);
 		}
 	}
 }

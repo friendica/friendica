@@ -231,7 +231,6 @@ var FileBrowser = {
 		$(".fbrowser .fbswitcher [data-mode=" + FileBrowser.type + "]").addClass("active");
 		// We need to add the AjaxUpload to the button
 		FileBrowser.uploadButtons();
-		
 	},
 
 	// Load new content (e.g. change photo album)

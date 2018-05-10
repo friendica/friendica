@@ -24,9 +24,10 @@ and open the template in the editor.
 
 body {
     padding-top: 110px;
-    background-color: $bgcolor;
+    background-color: $background_color;
     background-image: url("$background_image");
     background-size: $background_size_img;
+    background-repeat: $background_repeat;
     background-attachment: fixed;
     color: #777;
     /*color: #555;*/
@@ -73,7 +74,7 @@ aside hr,
 section hr {
     border-color: rgba(238, 238, 238, $contentbg_transp);
 }
-iframe, img {
+iframe, img, video {
     max-width: 100%;
 }
 blockquote {
@@ -98,7 +99,6 @@ blockquote {
 code {
     white-space: pre-wrap;
 }
-.help-content-wrapper code, .help-aside-wrapper code {display: inline}
 
 /**
  * mobile aside
@@ -1055,6 +1055,25 @@ aside > #datebrowse-sidebar .posted-date-selector-months > ul > li:hover{
     padding-left: 27px;
 }
 
+/* help page widget */
+aside > .help-content-wrapper code, .help-aside-wrapper code {
+    display: inline
+}
+aside > .help-aside-wrapper p strong:first-child {
+    display: block;
+    margin: 1em 0 0em;
+}
+aside > .help-aside-wrapper h1 {
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0;
+    padding: 20px 0 10px;
+}
+aside > .help-aside-wrapper h2 {
+    font-weight: bold;
+    font-size: 14px;
+}
+
 /* vcard / h-card */
 aside .vcard #profile-photo-wrapper{
     margin: 0;
@@ -1086,6 +1105,9 @@ color: rgba(255,255,255,.85);
 }
 aside .vcard #profile-photo-wrapper:hover .tool .action {
     opacity: 1;
+}
+aside .vcard #profile-photo-wrapper.crop-preview {
+    padding: 0;
 }
 aside .vcard .profile-header {
     margin-bottom: 20px;
@@ -1771,7 +1793,7 @@ code > .hl-main {
     text-decoration: underline;
 }
 .wall-item-actions .separator {
-	margin: 0 .3em;
+    margin: 0 .3em;
 }
 
 /* wall item hover effects */
@@ -2112,9 +2134,10 @@ ul.dropdown-menu li:hover {
 .allfriends-content-wrapper, .match-content-wrapper, .dirfind-content-wrapper,
 .directory-content-wrapper, .manage-content-wrapper, .notes-content-wrapper,
 .message-content-wrapper, .apps-content-wrapper, .photos-content-wrapper,
-.admin-content-wrapper, .viewcontacts-content-wrapper, .dfrn_request-content-wrapper,
+#adminpage, .delegate-content-wrapper, .uexport-content-wrapper,
+.viewcontacts-content-wrapper, .dfrn_request-content-wrapper,
 .friendica-content-wrapper, .credits-content-wrapper, .nogroup-content-wrapper,
-.profperm-content-wrapper {
+.profperm-content-wrapper, .invite-content-wrapper {
     min-height: calc(100vh - 150px);
     padding: 15px;
     padding-bottom: 20px;
@@ -2133,6 +2156,11 @@ ul.dropdown-menu li:hover {
 
 .section-title-wrapper {
     overflow: hidden;
+}
+/* Home and Login Page */
+body.mod-home .navbar #nav-login,
+body.mod-login .navbar #nav-login {
+    display: none;
 }
 /* Profile-page */
 #profile-content-standard,
@@ -2280,6 +2308,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 .group-actions a {
     font-size: 18px;
 }
+
+.contact-group-actions .fa-times-circle { color: #D00000;}
+.contact-group-actions .fa-plus-circle { color: #008000;}
+
 #group-edit-wrapper {
     display: none;
 }
@@ -2397,10 +2429,13 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
     height: 48px;
     width: 48px;
 }
-
 #prvmail-end {
     clear:both;
 }
+#modal #prvmail-text-edit-bb .bb-img {
+    display: none;
+}
+
 /* photos */
 .photo-album-actions {
     margin-bottom: 10px;
@@ -2638,7 +2673,8 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
     margin-left: -15px;
     margin-right: -15px;
 }
-.panel-group-settings > .panel {
+.panel-group-settings > .panel,
+.panel-group-settings > form > .panel {
     padding-left: 15px;
     padding-right: 15px;
 }
@@ -2671,6 +2707,53 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 .group {
     margin-left: 20px;
+}
+
+/* Emulates Bootstrap display */
+.settings-block {
+    margin: 0 -15px 5px;
+    color: #333;
+    background-color: rgba(255,255,255,0.95);
+    border-radius: 4px;
+    padding: 10px 15px;
+    box-shadow: 0 0 3px #dadada;
+    -webkit-box-shadow: 0 0 3px #dadada;
+    -moz-box-shadow: 0 0 3px #dadada;
+}
+
+.settings-block.fakelink, .settings-block > .fakelink {
+    padding: 10px 25px;
+    display: block;
+}
+.settings-block > .fakelink {
+    margin: -10px -15px 10px -15px;
+    border-radius: 4px 4px 0 0;
+}
+
+.settings-block.fakelink:hover, .settings-block > .fakelink:hover {
+    color: $link_hover_color;
+}
+.settings-block.fakelink > h3, .settings-block > .fakelink > h3 {
+    margin: 0;
+    padding: 0;
+    color: $link_color;
+    font-size: 18px;
+}
+
+.fakelink > h3:before {
+    padding-right: 10px;
+}
+.settings-block.fakelink > h3:before {
+    font-family: FontAwesome;
+    content: "\f0da"; /* Right Plain Pointer */
+}
+.settings-block > .fakelink > h3:before {
+    font-family: FontAwesome;
+    content: "\f0d7"; /* Bottom Plain Pointer */
+}
+
+h3.connector {
+    line-height: 40px;
 }
 
 /* Intro Notifications */
@@ -2828,6 +2911,69 @@ section.help-content-wrapper li {
 }
 #adminpage #frio_background_image.input-group {
     display: block;
+}
+#admin-summary-wrapper {
+    padding-top: 10px;
+}
+#adminpage ul#pluginslist, li.plugin {
+    padding-top: 10px;
+}
+#adminpage li .icon {
+    display: inline-block;
+    vertical-align: text-top;
+    position: relative;
+    padding-left: 5px;
+}
+#adminpage li .icon:before {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    width: 17px;
+    height: 17px;
+    left: 0;
+    margin-left: -20px;
+    margin-top: 2px;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    background-color: #fff;
+    -webkit-transition: border 0.15s ease-in-out, color 0.15s ease-in-out;
+    -o-transition: border 0.15s ease-in-out, color 0.15s ease-in-out;
+    transition: border 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+#adminpage li .icon.on:after {
+    font-family: "FontAwesome";
+    content: "\f00c";
+    display: inline-block;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 0;
+    top: 0;
+    margin-left: -20px;
+    margin-top: 2px;
+    padding-left: 3px;
+    padding-top: 1px;
+    font-size: 11px;
+    color: #555555;
+}
+#adminpage .plugin .desc {
+    padding-left: 10px;
+}
+.adminpage .admin-settings-action-link,
+.adminpage .admin-settings-action-link:hover {
+    color: #555;
+}
+.adminpage .admin-settings-action-link:hover {
+    opacity: 1;
+}
+.adminpage .admin-settings-action-link {
+    opacity: 0.8;
+}
+#admin-users tr.blocked {
+    background-color: #f8efc0;
+}
+.adminpage .table-hover > tbody > tr:hover + tr.details {
+    background-color: #f5f5f5;
 }
 
 /* Register Page*/
@@ -3004,4 +3150,124 @@ body .tread-wrapper .hovercard:hover .hover-card-content a {
 section .profile-match-wrapper {
     float: left;
 }
+
+/**
+ * Login page
+ */
+#login-submit-wrapper {
+    float: right;
+}
+#lost-password-link { flex-grow: 2; }
+#login-lost-password-link {
+    margin-bottom: 10px;
+    float: right;
+}
+#div_id_remember {
+    float: left;
+}
+#id_password_wrapper {
+    margin-bottom: unset;
+}
+#login_openid {
+    clear: both;
+}
+#register-link {
+    color: white;
+    background: #8ad0a1;
+    width: 100%;
+}
+#login-end {
+    clear: both;
+}
+
+.mod-home.is-not-singleuser,
+.mod-login {
+    background-color: $login_bg_color;
+    background-image: linear-gradient(to right, rgba(0,0,0, 0.7) , rgba(0,0,0, 0.4)), url($login_bg_image);
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    padding-top: 0;
+}
+.mod-home.is-not-singleuser nav.navbar,
+.mod-login nav.navbar { background-color: transparent }
+.mod-home.is-not-singleuser #topbar-second,
+.mod-login #topbar-second {
+    background-color: transparent;
+    box-shadow: unset;
+    border: 0
+}
+.mod-home.is-not-singleuser .login-content,
+.mod-login .login-content {
+    color: #eee;
+    margin-top: 2.5%;
+}
+
+.mod-home.is-not-singleuser .login-form > #login-extra-links {
+    margin-top: 4em;
+}
+
+.mod-home.is-not-singleuser .login-form > #login-form label,
+.mod-login #content #login-form label {
+    color: #eee;
+}
+
+.mod-home.is-not-singleuser .login-panel-content,
+.mod-login .login-panel-content {
+    background-color: rgba(255,255,255,.85);
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .mod-home.is-not-singleuser #content,
+    .mod-login #content {
+        margin-top: 100px!important;
+    }
+
+    .mod-home.is-not-singleuser .login-form > #login-form,
+    .mod-home.is-not-singleuser .login-form > #login-extra-links,
+    .mod-login #content #login-form {
+        background-color: #fff;
+        padding: 1em;
+        position: relative;
+    }
+    .mod-home.is-not-singleuser .login-form > #login-extra-links {
+        margin-top: unset;
+        background-color: white;
+    }
+
+    .mod-home.is-not-singleuser .login-form > #login-form label,
+    .mod-login #content #login-form label {
+        color: #444;
+    }
+
+    .mod-home.is-not-singleuser .login-form::before,
+    .mod-login #content #login-form::before {
+        display: block;
+        position: absolute;
+        content: " ";
+        background-color: rgba(255,255,255,0.1);
+        width:90%;
+        height: 110%;
+        top: -5%;
+        left: 5%;
+        z-index: -1;
+    }
+
+    .mod-home.is-not-singleuser .login-form::after,
+    .mod-login #content #login-form::after {
+        display: block;
+        position: absolute;
+        content: " ";
+        background-color: rgba(255,255,255,0.2);
+        width:80%;
+        height: 120%;
+        top: -10%;
+        left: 10%;
+        z-index: -1;
+    }
+
+}
+
+
 

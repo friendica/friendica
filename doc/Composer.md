@@ -12,7 +12,7 @@ It's a command-line tool that downloads required libraries into the `vendor` fol
 
 ## How to use Composer
 
-If you don't have Composer installed on your system, Friendica ships with a copy of it at `util/composer.phar`.
+If you don't have Composer installed on your system, Friendica ships with a copy of it at `bin/composer.phar`.
 For the purpose of this help, all examples will use this path to run Composer commands, however feel free to replace them with your own way of calling Composer.
 Composer requires PHP CLI and the following examples assume it's available system-wide.
 
@@ -30,7 +30,7 @@ Here are the typical commands you will have to run to do so:
 ````
 ~> git clone https://github.com/friendica/friendica.git friendica
 ~/friendica> cd friendica
-~/friendica> util/composer.phar install
+~/friendica> bin/composer.phar install
 ````
 
 That's it! Composer will take care of fetching all the required libraries in the `vendor` folder and build the autoloader to make those libraries available to Friendica.
@@ -42,7 +42,7 @@ Updating Friendica to the current stable or the latest develop version is easy w
 ````
 ~> cd friendica
 ~/friendica> git pull
-~/friendica> util/composer.phar install
+~/friendica> bin/composer.phar install
 ````
 
 And that's it. If any library used by Friendica has been upgraded, Composer will fetch the version currently used by Friendica and refresh the autoloader to ensure the best performances.
@@ -55,7 +55,7 @@ If you don't need to use any third-party library, then you don't need to use Com
 
 #### Adding a third-party library to Friendica
 
-Does your shiny new [Plugin](help/Plugins) need to rely on a third-party library not required by Friendica yet?
+Does your shiny new [Addon](help/Addons) need to rely on a third-party library not required by Friendica yet?
 First of all, this library should be available on [Packagist](https://packagist.org) so that Composer knows how to fetch it directly just by mentioning its name in `composer.json`.
 
 This file is the configuration of Friendica for Composer. It lists details about the Friendica project, but also a list of required dependencies and their target version.
@@ -87,13 +87,13 @@ Or you can specify the exact version of the library if you code requires it, and
 
 To add a library, just add its Packagist identifier to the `require` list and set a target version string.
 
-Then you should run `util/composer.phar update` to add it to your local `vendor` folder and update the `composer.lock` file that specifies the current versions of the dependencies.
+Then you should run `bin/composer.phar update` to add it to your local `vendor` folder and update the `composer.lock` file that specifies the current versions of the dependencies.
 
 #### Updating an existing dependency
 
 If a package needs to be updated, whether to the next minor version or to the next major version provided you changed the adequate code in Friendica, simply edit `composer.json` to update the target version string of the relevant library.
 
-Then you should run `util/composer.phar update` to update it in your local `vendor` folder and update the `composer.lock` file that specifies the current versions of the dependencies.
+Then you should run `bin/composer.phar update` to update it in your local `vendor` folder and update the `composer.lock` file that specifies the current versions of the dependencies.
 
 Please note that you should commit both `composer.json` and `composer.lock` with your work every time you make a change to the former.
 
@@ -111,7 +111,7 @@ This is because `sudo` doesn't always change the `HOME` environment variable, wh
 However, you can temporarily change environment variable for the execution of a single command.
 For Composer, this would be:
 ````
-$> COMPOSER_HOME=/var/tmp/composer sudo -u [web user] util/composer.phar [mode]
+$> COMPOSER_HOME=/var/tmp/composer sudo -u [web user] bin/composer.phar [mode]
 ````
 
 ## Related

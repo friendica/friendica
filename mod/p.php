@@ -4,20 +4,21 @@ This file is part of the Diaspora protocol. It is used for fetching single publi
 */
 
 use Friendica\App;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Protocol\Diaspora;
 
 function p_init($a){
 	if ($a->argc != 2) {
-		header($_SERVER["SERVER_PROTOCOL"].' 510 '.t('Not Extended'));
+		header($_SERVER["SERVER_PROTOCOL"].' 510 '.L10n::t('Not Extended'));
 		killme();
 	}
 
 	$guid = $a->argv[1];
 
 	if (strtolower(substr($guid, -4)) != ".xml") {
-		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"].' 404 '.L10n::t('Not Found'));
 		killme();
 	}
 
@@ -44,7 +45,7 @@ function p_init($a){
 			}
 		}
 
-		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"].' 404 '.L10n::t('Not Found'));
 		killme();
 	}
 
@@ -53,7 +54,7 @@ function p_init($a){
 		INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`
 		WHERE `user`.`uid` = %d", intval($item[0]["uid"]));
 	if (!DBM::is_result($r)) {
-		header($_SERVER["SERVER_PROTOCOL"].' 404 '.t('Not Found'));
+		header($_SERVER["SERVER_PROTOCOL"].' 404 '.L10n::t('Not Found'));
 		killme();
 	}
 	$user = $r[0];

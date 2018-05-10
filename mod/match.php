@@ -3,13 +3,16 @@
  * @file mod/match.php
  */
 use Friendica\App;
+use Friendica\Content\Widget;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Profile;
+use Friendica\Util\Network;
 
 require_once 'include/text.php';
-require_once 'include/contact_widgets.php';
 require_once 'mod/proxy.php';
 
 /**
@@ -29,8 +32,8 @@ function match_content(App $a)
 		return;
 	}
 
-	$a->page['aside'] .= findpeople_widget();
-	$a->page['aside'] .= follow_widget();
+	$a->page['aside'] .= Widget::findPeople();
+	$a->page['aside'] .= Widget::follow();
 
 	$_SESSION['return_url'] = System::baseUrl() . '/' . $a->cmd;
 
@@ -42,11 +45,11 @@ function match_content(App $a)
 		return;
 	}
 	if (! $r[0]['pub_keywords'] && (! $r[0]['prv_keywords'])) {
-		notice(t('No keywords to match. Please add keywords to your default profile.') . EOL);
+		notice(L10n::t('No keywords to match. Please add keywords to your default profile.') . EOL);
 		return;
 	}
 
-	$params = array();
+	$params = [];
 	$tags = trim($r[0]['pub_keywords'] . ' ' . $r[0]['prv_keywords']);
 
 	if ($tags) {
@@ -56,9 +59,9 @@ function match_content(App $a)
 		}
 
 		if (strlen(Config::get('system', 'directory'))) {
-			$x = post_url(get_server().'/msearch', $params);
+			$x = Network::post(get_server().'/msearch', $params);
 		} else {
-			$x = post_url(System::baseUrl() . '/msearch', $params);
+			$x = Network::post(System::baseUrl() . '/msearch', $params);
 		}
 
 		$j = json_decode($x);
@@ -82,15 +85,15 @@ function match_content(App $a)
 				if (!count($match)) {
 					$jj->photo = str_replace("http:///photo/", get_server()."/photo/", $jj->photo);
 					$connlnk = System::baseUrl() . '/follow/?url=' . $jj->url;
-					$photo_menu = array(
-						'profile' => array(t("View Profile"), zrl($jj->url)),
-						'follow' => array(t("Connect/Follow"), $connlnk)
-					);
+					$photo_menu = [
+						'profile' => [L10n::t("View Profile"), Profile::zrl($jj->url)],
+						'follow' => [L10n::t("Connect/Follow"), $connlnk]
+					];
 
 					$contact_details = Contact::getDetailsByURL($jj->url, local_user());
 
-					$entry = array(
-						'url' => zrl($jj->url),
+					$entry = [
+						'url' => Profile::zrl($jj->url),
 						'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $jj->url),
 						'name' => $jj->name,
 						'details'       => $contact_details['location'],
@@ -98,13 +101,13 @@ function match_content(App $a)
 						'about'         => $contact_details['about'],
 						'account_type'  => Contact::getAccountType($contact_details),
 						'thumb' => proxy_url($jj->photo, false, PROXY_SIZE_THUMB),
-						'inttxt' => ' ' . t('is interested in:'),
-						'conntxt' => t('Connect'),
+						'inttxt' => ' ' . L10n::t('is interested in:'),
+						'conntxt' => L10n::t('Connect'),
 						'connlnk' => $connlnk,
 						'img_hover' => $jj->tags,
 						'photo_menu' => $photo_menu,
 						'id' => ++$id,
-					);
+					];
 					$entries[] = $entry;
 				}
 			}
@@ -113,13 +116,13 @@ function match_content(App $a)
 
 			$o .= replace_macros(
 				$tpl,
-				array(
-				'$title' => t('Profile Match'),
+				[
+				'$title' => L10n::t('Profile Match'),
 				'$contacts' => $entries,
-				'$paginate' => paginate($a))
+				'$paginate' => paginate($a)]
 			);
 		} else {
-			info(t('No matches') . EOL);
+			info(L10n::t('No matches') . EOL);
 		}
 	}
 

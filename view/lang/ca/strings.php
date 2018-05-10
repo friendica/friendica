@@ -9,10 +9,10 @@ $a->strings["Add New Contact"] = "Afegir Nou Contacte";
 $a->strings["Enter address or web location"] = "Introdueixi adreça o ubicació web";
 $a->strings["Example: bob@example.com, http://example.com/barbara"] = "Exemple: bob@example.com, http://example.com/barbara";
 $a->strings["Connect"] = "Connexió";
-$a->strings["%d invitation available"] = array(
+$a->strings["%d invitation available"] = [
 	0 => "%d invitació disponible",
 	1 => "%d invitacions disponibles",
-);
+];
 $a->strings["Find People"] = "Trobar Gent";
 $a->strings["Enter name or interest"] = "Introdueixi nom o aficions";
 $a->strings["Connect/Follow"] = "Connectar/Seguir";
@@ -27,10 +27,10 @@ $a->strings["All Networks"] = "totes les Xarxes";
 $a->strings["Saved Folders"] = "Carpetes Guardades";
 $a->strings["Everything"] = "Tot";
 $a->strings["Categories"] = "Categories";
-$a->strings["%d contact in common"] = array(
+$a->strings["%d contact in common"] = [
 	0 => "%d contacte en comú",
 	1 => "%d contactes en comú",
-);
+];
 $a->strings["show more"] = "Mostrar més";
 $a->strings["Forums"] = "";
 $a->strings["External link to forum"] = "";
@@ -47,10 +47,10 @@ $a->strings["Hermaphrodite"] = "Hermafrodita";
 $a->strings["Neuter"] = "Neutre";
 $a->strings["Non-specific"] = "No específicat";
 $a->strings["Other"] = "Altres";
-$a->strings["Undecided"] = array(
+$a->strings["Undecided"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Males"] = "Home";
 $a->strings["Females"] = "Dona";
 $a->strings["Gay"] = "Gay";
@@ -169,10 +169,10 @@ $a->strings["Error! Cannot check nickname"] = "Error! No puc comprobar l'Àlies"
 $a->strings["User '%s' already exists on this server!"] = "El usuari %s' ja existeix en aquest servidor!";
 $a->strings["User creation error"] = "Error en la creació de l'usuari";
 $a->strings["User profile creation error"] = "Error en la creació del perfil d'usuari";
-$a->strings["%d contact not imported"] = array(
+$a->strings["%d contact not imported"] = [
 	0 => "%d contacte no importat",
 	1 => "%d contactes no importats",
-);
+];
 $a->strings["Done. You can now login with your username and password"] = "Fet. Ja pots identificar-te amb el teu nom d'usuari i contrasenya";
 $a->strings["Miscellaneous"] = "Miscel·lania";
 $a->strings["Birthday:"] = "Aniversari:";
@@ -432,10 +432,10 @@ $a->strings["post/item"] = "anunci/element";
 $a->strings["%1\$s marked %2\$s's %3\$s as favorite"] = "%1\$s marcat %2\$s's %3\$s com favorit";
 $a->strings["Likes"] = "Agrada";
 $a->strings["Dislikes"] = "No agrada";
-$a->strings["Attending"] = array(
+$a->strings["Attending"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Not attending"] = "";
 $a->strings["Might attend"] = "";
 $a->strings["Select"] = "Selecionar";
@@ -502,18 +502,18 @@ $a->strings["Private post"] = "Enviament Privat";
 $a->strings["Message"] = "Missatge";
 $a->strings["Browser"] = "";
 $a->strings["View all"] = "";
-$a->strings["Like"] = array(
+$a->strings["Like"] = [
 	0 => "",
 	1 => "",
-);
-$a->strings["Dislike"] = array(
+];
+$a->strings["Dislike"] = [
 	0 => "",
 	1 => "",
-);
-$a->strings["Not Attending"] = array(
+];
+$a->strings["Not Attending"] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["%s\\'s birthday"] = "";
 $a->strings["General Features"] = "Característiques Generals";
 $a->strings["Multiple Profiles"] = "Perfils Múltiples";
@@ -651,10 +651,10 @@ $a->strings["next"] = "següent";
 $a->strings["Loading more entries..."] = "";
 $a->strings["The end"] = "";
 $a->strings["No contacts"] = "Sense contactes";
-$a->strings["%d Contact"] = array(
+$a->strings["%d Contact"] = [
 	0 => "%d Contacte",
 	1 => "%d Contactes",
-);
+];
 $a->strings["View Contacts"] = "Veure Contactes";
 $a->strings["Save"] = "Guardar";
 $a->strings["poke"] = "atia";
@@ -695,10 +695,10 @@ $a->strings["Click to open/close"] = "Clicar per a obrir/tancar";
 $a->strings["View on separate page"] = "";
 $a->strings["view on separate page"] = "";
 $a->strings["activity"] = "activitat";
-$a->strings["comment"] = array(
+$a->strings["comment"] = [
 	0 => "",
 	1 => "comentari",
-);
+];
 $a->strings["post"] = "missatge";
 $a->strings["Item filed"] = "Element arxivat";
 $a->strings["Passwords do not match. Password unchanged."] = "Les contrasenyes no coincideixen. Contrasenya no canviada.";
@@ -794,10 +794,10 @@ $a->strings["%s : Not a valid email address."] = "%s : No es una adreça de corr
 $a->strings["Please join us on Friendica"] = "Per favor, uneixi's a nosaltres en Friendica";
 $a->strings["Invitation limit exceeded. Please contact your site administrator."] = "Limit d'invitacions excedit. Per favor, Contacti amb l'administrador del lloc.";
 $a->strings["%s : Message delivery failed."] = "%s : Ha fallat l'entrega del missatge.";
-$a->strings["%d message sent."] = array(
+$a->strings["%d message sent."] = [
 	0 => "%d missatge enviat",
 	1 => "%d missatges enviats.",
-);
+];
 $a->strings["You have no more invitations available"] = "No te més invitacions disponibles";
 $a->strings["Visit %s for a list of public sites that you can join. Friendica members on other sites can all connect with each other, as well as with members of many other social networks."] = "Visita %s per a una llista de llocs públics on unir-te. Els membres de Friendica d'altres llocs poden connectar-se de forma total, així com amb membres de moltes altres xarxes socials.";
 $a->strings["To accept this invitation, please visit and register at %s or any other public Friendica website."] = "Per acceptar aquesta invitació, per favor visita i registra't a %s o en qualsevol altre pàgina web pública Friendica.";
@@ -949,10 +949,10 @@ $a->strings["Unknown sender - %s"] = "remitent desconegut - %s";
 $a->strings["You and %s"] = "Tu i %s";
 $a->strings["%s and You"] = "%s i Tu";
 $a->strings["D, d M Y - g:i A"] = "D, d M Y - g:i A";
-$a->strings["%d message"] = array(
+$a->strings["%d message"] = [
 	0 => "%d missatge",
 	1 => "%d missatges",
-);
+];
 $a->strings["Manage Identities and/or Pages"] = "Administrar Identitats i/o  Pàgines";
 $a->strings["Toggle between different identities or community/group pages which share your account details or which you have been granted \"manage\" permissions"] = "Alternar entre les diferents identitats o les pàgines de comunitats/grups que comparteixen les dades del seu compte o que se li ha concedit els permisos de \"administrar\"";
 $a->strings["Select an identity to manage: "] = "Seleccionar identitat a administrar:";
@@ -981,10 +981,10 @@ $a->strings["New photo from this URL"] = "Nova foto d'aquesta URL";
 $a->strings["No such group"] = "Cap grup com";
 $a->strings["Group: %s"] = "";
 $a->strings["This entry was edited"] = "L'entrada fou editada";
-$a->strings["%d comment"] = array(
+$a->strings["%d comment"] = [
 	0 => "%d comentari",
 	1 => "%d comentaris",
-);
+];
 $a->strings["Private Message"] = "Missatge Privat";
 $a->strings["I like this (toggle)"] = "M'agrada això (canviar)";
 $a->strings["like"] = "Agrada";
@@ -1687,14 +1687,14 @@ $a->strings["Mark success (if update was manually applied)"] = "Marcat am èxit 
 $a->strings["Attempt to execute this update step automatically"] = "Intentant executar aquest pas d'actualització automàticament";
 $a->strings["\n\t\t\tDear %1\$s,\n\t\t\t\tthe administrator of %2\$s has set up an account for you."] = "";
 $a->strings["\n\t\t\tThe login details are as follows:\n\n\t\t\tSite Location:\t%1\$s\n\t\t\tLogin Name:\t\t%2\$s\n\t\t\tPassword:\t\t%3\$s\n\n\t\t\tYou may change your password from your account \"Settings\" page after logging\n\t\t\tin.\n\n\t\t\tPlease take a few moments to review the other account settings on that page.\n\n\t\t\tYou may also wish to add some basic information to your default profile\n\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n\n\t\t\tWe recommend setting your full name, adding a profile photo,\n\t\t\tadding some profile \"keywords\" (very useful in making new friends) - and\n\t\t\tperhaps what country you live in; if you do not wish to be more specific\n\t\t\tthan that.\n\n\t\t\tWe fully respect your right to privacy, and none of these items are necessary.\n\t\t\tIf you are new and do not know anybody here, they may help\n\t\t\tyou to make some new and interesting friends.\n\n\t\t\tThank you and welcome to %4\$s."] = "";
-$a->strings["%s user blocked/unblocked"] = array(
+$a->strings["%s user blocked/unblocked"] = [
 	0 => "%s usuari bloquejar/desbloquejar",
 	1 => "%s usuaris bloquejar/desbloquejar",
-);
-$a->strings["%s user deleted"] = array(
+];
+$a->strings["%s user deleted"] = [
 	0 => "%s usuari esborrat",
 	1 => "%s usuaris esborrats",
-);
+];
 $a->strings["User '%s' deleted"] = "Usuari %s' esborrat";
 $a->strings["User '%s' unblocked"] = "Usuari %s' desbloquejat";
 $a->strings["User '%s' blocked"] = "L'usuari '%s' és bloquejat";
@@ -1748,10 +1748,10 @@ $a->strings["PHP logging"] = "";
 $a->strings["To enable logging of PHP errors and warnings you can add the following to the .htconfig.php file of your installation. The filename set in the 'error_log' line is relative to the friendica top-level directory and must be writeable by the web server. The option '1' for 'log_errors' and 'display_errors' is to enable these options, set to '0' to disable them."] = "";
 $a->strings["Lock feature %s"] = "";
 $a->strings["Manage Additional Features"] = "";
-$a->strings["%d contact edited."] = array(
+$a->strings["%d contact edited."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Could not access contact record."] = "No puc accedir al registre del contacte.";
 $a->strings["Could not locate selected profile."] = "No puc localitzar el perfil seleccionat.";
 $a->strings["Contact updated."] = "Contacte actualitzat.";
@@ -1848,10 +1848,10 @@ $a->strings["This introduction has already been accepted."] = "Aquesta presentac
 $a->strings["Profile location is not valid or does not contain profile information."] = "El perfil de situació no és vàlid o no contè informació de perfil";
 $a->strings["Warning: profile location has no identifiable owner name."] = "Atenció: El perfil de situació no te nom de propietari identificable.";
 $a->strings["Warning: profile location has no profile photo."] = "Atenció: El perfil de situació no te foto de perfil";
-$a->strings["%d required parameter was not found at the given location"] = array(
+$a->strings["%d required parameter was not found at the given location"] = [
 	0 => "%d el paràmetre requerit no es va trobar al lloc indicat",
 	1 => "%d els paràmetres requerits no es van trobar allloc indicat",
-);
+];
 $a->strings["Introduction complete."] = "Completada la presentació.";
 $a->strings["Unrecoverable protocol error."] = "Error de protocol irrecuperable.";
 $a->strings["Profile unavailable."] = "Perfil no disponible";
@@ -1971,10 +1971,10 @@ $a->strings["This message was sent to you by %s, a member of the Friendica socia
 $a->strings["You may visit them online at %s"] = "El pot visitar en línia a %s";
 $a->strings["Please contact the sender by replying to this post if you do not wish to receive these messages."] = "Si us plau, poseu-vos en contacte amb el remitent responent a aquest missatge si no voleu rebre aquests missatges.";
 $a->strings["%s posted an update."] = "%s ha publicat una actualització.";
-$a->strings["Warning: This group contains %s member from a network that doesn't allow non public messages."] = array(
+$a->strings["Warning: This group contains %s member from a network that doesn't allow non public messages."] = [
 	0 => "",
 	1 => "",
-);
+];
 $a->strings["Messages in this group won't be send to these receivers."] = "";
 $a->strings["Private messages to this person are at risk of public disclosure."] = "Els missatges privats a aquesta persona es troben en risc de divulgació pública.";
 $a->strings["Invalid contact."] = "Contacte no vàlid.";

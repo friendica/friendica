@@ -10,6 +10,8 @@ use Friendica\Core\System;
 use Friendica\Database\DBM;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
+use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 
 define('PROXY_DEFAULT_TIME', 86400); // 1 Day
 
@@ -104,7 +106,7 @@ function proxy_init(App $a) {
 			$url = substr($url, 0, $pos + 1);
 		}
 
-		$url = str_replace(array('.jpg', '.jpeg', '.gif', '.png'), array('','','',''), $url);
+		$url = str_replace(['.jpg', '.jpeg', '.gif', '.png'], ['','','',''], $url);
 
 		$url = base64_decode(strtr($url, '-_', '+/'), true);
 
@@ -145,24 +147,23 @@ function proxy_init(App $a) {
 	}
 
 	$valid = true;
-	$r = array();
-
+	$photo = null;
 	if (!$direct_cache && ($cachefile == '')) {
-		$r = dba::select('photo', array('data', 'desc'), array('resource-id' => $urlhash), array('limit' => 1));
-		if (DBM::is_result($r)) {
-			$img_str = $r['data'];
-			$mime = $r['desc'];
+		$photo = dba::selectFirst('photo', ['data', 'desc'], ['resource-id' => $urlhash]);
+		if (DBM::is_result($photo)) {
+			$img_str = $photo['data'];
+			$mime = $photo['desc'];
 			if ($mime == '') {
 				$mime = 'image/jpeg';
 			}
 		}
 	}
 
-	if (!DBM::is_result($r)) {
+	if (!DBM::is_result($photo)) {
 		// It shouldn't happen but it does - spaces in URL
 		$_REQUEST['url'] = str_replace(' ', '+', $_REQUEST['url']);
 		$redirects = 0;
-		$img_str = fetch_url($_REQUEST['url'], true, $redirects, 10);
+		$img_str = Network::fetchUrl($_REQUEST['url'], true, $redirects, 10);
 
 		$tempfile = tempnam(get_temppath(), 'cache');
 		file_put_contents($tempfile, $img_str);
@@ -187,10 +188,10 @@ function proxy_init(App $a) {
 				die();
 			}
 
-			$fields = array('uid' => 0, 'contact-id' => 0, 'guid' => get_guid(), 'resource-id' => $urlhash, 'created' => datetime_convert(), 'edited' => datetime_convert(),
+			$fields = ['uid' => 0, 'contact-id' => 0, 'guid' => get_guid(), 'resource-id' => $urlhash, 'created' => DateTimeFormat::utcNow(), 'edited' => DateTimeFormat::utcNow(),
 				'filename' => basename($_REQUEST['url']), 'type' => '', 'album' => '', 'height' => imagesy($image), 'width' => imagesx($image),
 				'datasize' => 0, 'data' => $img_str, 'scale' => 100, 'profile' => 0,
-				'allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '', 'desc' => $mime);
+				'allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '', 'desc' => $mime];
 			dba::insert('photo', $fields);
 		} else {
 			$Image = new Image($img_str, $mime);
@@ -287,7 +288,7 @@ function proxy_url($url, $writemode = false, $size = '') {
 	// Extract the URL extension
 	$extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
 
-	$extensions = array('jpg', 'jpeg', 'gif', 'png');
+	$extensions = ['jpg', 'jpeg', 'gif', 'png'];
 	if (in_array($extension, $extensions)) {
 		$shortpath .= '.' . $extension;
 		$longpath .= '.' . $extension;
@@ -341,7 +342,7 @@ function proxy_parse_query($url) {
 	$query = parse_url($url, PHP_URL_QUERY);
 	$query = html_entity_decode($query);
 	$query_list = explode('&', $query);
-	$arr = array();
+	$arr = [];
 
 	foreach ($query_list as $key_value) {
 		$key_value_list = explode('=', $key_value);

@@ -2,6 +2,11 @@
 
 // If automatic system installation fails:
 
+
+die('The configuration you did manually contains some mistakes. Please have a look at your .htconfig.php file.');
+// If you are doing the configuration manually, please remove the line above
+
+
 // Copy or rename this file to .htconfig.php
 
 // Why .htconfig.php? Because it contains sensitive information which could
@@ -15,6 +20,18 @@ $db_host = 'your.mysqlhost.com';
 $db_user = 'mysqlusername';
 $db_pass = 'mysqlpassword';
 $db_data = 'mysqldatabasename';
+
+// Use environment variables for mysql if they are set beforehand
+if (!empty(getenv('MYSQL_HOST'))
+	&& !empty(getenv('MYSQL_PORT'))
+	&& !empty(getenv('MYSQL_USERNAME'))
+	&& !empty(getenv('MYSQL_PASSWORD'))
+	&& !empty(getenv('MYSQL_DATABASE'))) {
+	$db_host = getenv('MYSQL_HOST') . ':' . getenv('MYSQL_PORT');
+	$db_user = getenv('MYSQL_USERNAME');
+	$db_pass = getenv('MYSQL_PASSWORD');
+	$db_data = getenv('MYSQL_DATABASE');
+}
 
 // Set the database connection charset to full Unicode (utf8mb4).
 // Changing this value will likely corrupt the special characters.
@@ -61,10 +78,9 @@ $a->config['system']['maximagesize'] = 800000;
 $a->config['php_path'] = 'php';
 
 // Server-to-server private message encryption (RINO) is allowed by default.
-// Encryption will only be provided if this setting is set to a non zero value
-// set to 0 to disable, 2 to enable, 1 is deprecated
+// set to 0 to disable, 1 to enable
 
-$a->config['system']['rino_encrypt'] = 2;
+$a->config['system']['rino_encrypt'] = 1;
 
 // allowed themes (change this from admin panel after installation)
 
@@ -86,7 +102,7 @@ $a->config['system']['no_regfullname'] = true;
 $a->config['system']['directory'] = 'https://dir.friendica.social';
 
 // Allowed protocols in link URLs; HTTP protocols always are accepted
-$a->config['system']['allowed_link_protocols'] = array('ftp', 'ftps', 'mailto', 'cid', 'gopher');
+$a->config['system']['allowed_link_protocols'] = ['ftp', 'ftps', 'mailto', 'cid', 'gopher'];
 
 // Authentication cookie lifetime, in days
 $a->config['system']['auth_cookie_lifetime'] = 7;

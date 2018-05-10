@@ -4,11 +4,13 @@
  */
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Content\Nav;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
+use Friendica\Core\System;
 use Friendica\Database\DBM;
 
-require_once "include/bbcode.php";
 require_once 'include/security.php';
 require_once 'include/conversation.php';
 require_once 'mod/dirfind.php';
@@ -16,6 +18,7 @@ require_once 'mod/dirfind.php';
 function search_saved_searches() {
 
 	$o = '';
+	$search = ((x($_GET,'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
 
 	if (! Feature::isEnabled(local_user(),'savedsearch'))
 		return $o;
@@ -25,26 +28,26 @@ function search_saved_searches() {
 	);
 
 	if (DBM::is_result($r)) {
-		$saved = array();
+		$saved = [];
 		foreach ($r as $rr) {
-			$saved[] = array(
+			$saved[] = [
 				'id'		=> $rr['id'],
 				'term'		=> $rr['term'],
 				'encodedterm'	=> urlencode($rr['term']),
-				'delete'	=> t('Remove term'),
+				'delete'	=> L10n::t('Remove term'),
 				'selected'	=> ($search==$rr['term']),
-			);
+			];
 		}
 
 
 		$tpl = get_markup_template("saved_searches_aside.tpl");
 
-		$o .= replace_macros($tpl, array(
-			'$title'	=> t('Saved Searches'),
+		$o .= replace_macros($tpl, [
+			'$title'	=> L10n::t('Saved Searches'),
 			'$add'		=> '',
 			'$searchbox'	=> '',
 			'$saved' 	=> $saved,
-		));
+		]);
 	}
 
 	return $o;
@@ -63,11 +66,11 @@ function search_init(App $a) {
 				dbesc($search)
 			);
 			if (!DBM::is_result($r)) {
-				dba::insert('search', array('uid' => local_user(), 'term' => $search));
+				dba::insert('search', ['uid' => local_user(), 'term' => $search]);
 			}
 		}
 		if (x($_GET,'remove') && $search) {
-			dba::delete('search', array('uid' => local_user(), 'term' => $search));
+			dba::delete('search', ['uid' => local_user(), 'term' => $search]);
 		}
 
 		$a->page['aside'] .= search_saved_searches();
@@ -92,16 +95,16 @@ function search_post(App $a) {
 function search_content(App $a) {
 
 	if (Config::get('system','block_public') && !local_user() && !remote_user()) {
-		notice(t('Public access denied.') . EOL);
+		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
 
 	if (Config::get('system','local_search') && !local_user() && !remote_user()) {
-		http_status_exit(403,
-				array("title" => t("Public access denied."),
-					"description" => t("Only logged in users are permitted to perform a search.")));
+		System::httpExit(403,
+				["title" => L10n::t("Public access denied."),
+					"description" => L10n::t("Only logged in users are permitted to perform a search.")]);
 		killme();
-		//notice(t('Public access denied.').EOL);
+		//notice(L10n::t('Public access denied.').EOL);
 		//return;
 	}
 
@@ -122,18 +125,19 @@ function search_content(App $a) {
 		if (!is_null($result)) {
 			$resultdata = json_decode($result);
 			if (($resultdata->time > (time() - $crawl_permit_period)) && ($resultdata->accesses > $free_crawls)) {
-				http_status_exit(429,
-						array("title" => t("Too Many Requests"),
-							"description" => t("Only one search per minute is permitted for not logged in users.")));
+				System::httpExit(429,
+						["title" => L10n::t("Too Many Requests"),
+							"description" => L10n::t("Only one search per minute is permitted for not logged in users.")]);
 				killme();
 			}
-			Cache::set("remote_search:".$remote, json_encode(array("time" => time(), "accesses" => $resultdata->accesses + 1)), CACHE_HOUR);
+			Cache::set("remote_search:".$remote, json_encode(["time" => time(), "accesses" => $resultdata->accesses + 1]), CACHE_HOUR);
 		} else
-			Cache::set("remote_search:".$remote, json_encode(array("time" => time(), "accesses" => 1)), CACHE_HOUR);
+			Cache::set("remote_search:".$remote, json_encode(["time" => time(), "accesses" => 1]), CACHE_HOUR);
 	}
 
-	nav_set_selected('search');
+	Nav::setSelected('search');
 
+	$search = '';
 	if (x($a->data,'search'))
 		$search = notags(trim($a->data['search']));
 	else
@@ -142,16 +146,16 @@ function search_content(App $a) {
 	$tag = false;
 	if (x($_GET,'tag')) {
 		$tag = true;
-		$search = ((x($_GET,'tag')) ? notags(trim(rawurldecode($_GET['tag']))) : '');
+		$search = (x($_GET,'tag') ? '#' . notags(trim(rawurldecode($_GET['tag']))) : '');
 	}
 
 	// contruct a wrapper for the search header
-	$o .= replace_macros(get_markup_template("content_wrapper.tpl"),array(
+	$o = replace_macros(get_markup_template("content_wrapper.tpl"),[
 		'name' => "search-header",
-		'$title' => t("Search"),
+		'$title' => L10n::t("Search"),
 		'$title_size' => 3,
 		'$content' => search($search,'search-box','search',((local_user()) ? true : false), false)
-	));
+	]);
 
 	if (strpos($search,'#') === 0) {
 		$tag = true;
@@ -196,11 +200,13 @@ function search_content(App $a) {
 		$r = q("SELECT %s
 			FROM `term`
 				STRAIGHT_JOIN `item` ON `item`.`id`=`term`.`oid` %s
-			WHERE %s AND (`term`.`uid` = 0 OR (`term`.`uid` = %d AND NOT `term`.`global`)) AND `term`.`otype` = %d AND `term`.`type` = %d AND `term`.`term` = '%s'
+			WHERE %s AND (`term`.`uid` = 0 OR (`term`.`uid` = %d AND NOT `term`.`global`))
+				AND `term`.`otype` = %d AND `term`.`type` = %d AND `term`.`term` = '%s' AND `item`.`verb` = '%s'
+				AND NOT `author`.`blocked` AND NOT `author`.`hidden`
 			ORDER BY term.created DESC LIMIT %d , %d ",
 				item_fieldlists(), item_joins(), item_condition(),
 				intval(local_user()),
-				intval(TERM_OBJ_POST), intval(TERM_HASHTAG), dbesc(protect_sprintf($search)),
+				intval(TERM_OBJ_POST), intval(TERM_HASHTAG), dbesc(protect_sprintf($search)), dbesc(ACTIVITY_POST),
 				intval($a->pager['start']), intval($a->pager['itemspage']));
 	} else {
 		logger("Start fulltext search for '".$search."'", LOGGER_DEBUG);
@@ -210,6 +216,7 @@ function search_content(App $a) {
 		$r = q("SELECT %s
 			FROM `item` %s
 			WHERE %s AND (`item`.`uid` = 0 OR (`item`.`uid` = %s AND NOT `item`.`global`))
+				AND NOT `author`.`blocked` AND NOT `author`.`hidden`
 				$sql_extra
 			GROUP BY `item`.`uri`, `item`.`id` ORDER BY `item`.`id` DESC LIMIT %d , %d",
 				item_fieldlists(), item_joins(), item_condition(),
@@ -218,19 +225,20 @@ function search_content(App $a) {
 	}
 
 	if (! DBM::is_result($r)) {
-		info( t('No results.') . EOL);
+		info(L10n::t('No results.') . EOL);
 		return $o;
 	}
 
 
-	if ($tag)
-		$title = sprintf( t('Items tagged with: %s'), $search);
-	else
-		$title = sprintf( t('Results for: %s'), $search);
+	if ($tag) {
+		$title = L10n::t('Items tagged with: %s', $search);
+	} else {
+		$title = L10n::t('Results for: %s', $search);
+	}
 
-	$o .= replace_macros(get_markup_template("section_title.tpl"),array(
+	$o .= replace_macros(get_markup_template("section_title.tpl"),[
 		'$title' => $title
-	));
+	]);
 
 	logger("Start Conversation for '".$search."'", LOGGER_DEBUG);
 	$o .= conversation($a,$r,'search',false);
