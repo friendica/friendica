@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-09 15:04+0200\n"
-"PO-Revision-Date: 2018-05-11 17:25+0000\n"
+"PO-Revision-Date: 2018-05-12 12:34+0000\n"
 "Last-Translator: Kris\n"
 "Language-Team: Finnish (Finland) (http://www.transifex.com/Friendica/friendica/language/fi_FI/)\n"
 "MIME-Version: 1.0\n"
@@ -5505,7 +5505,7 @@ msgstr "Nykyinen salasana:"
 
 #: mod/settings.php:1201 mod/settings.php:1202
 msgid "Your current password to confirm the changes"
-msgstr ""
+msgstr "Syötä nykyinen salasanasi vahvistaaksesi muutokset"
 
 #: mod/settings.php:1202
 msgid "Password:"
@@ -6804,7 +6804,7 @@ msgstr "Piilota tunnistelista julkaisun lopussa."
 
 #: mod/admin.php:1437
 msgid "Clean database"
-msgstr ""
+msgstr "Siivoa tietokanta"
 
 #: mod/admin.php:1437
 msgid ""
@@ -7690,7 +7690,7 @@ msgstr "Pika-aloitus"
 
 #: src/Core/UserImport.php:104
 msgid "Error decoding account file"
-msgstr ""
+msgstr "Tilitiedoston tulkinnassa tapahtui virhe"
 
 #: src/Core/UserImport.php:110
 msgid "Error! No version data in file! This is not a Friendica account file?"
@@ -8879,7 +8879,7 @@ msgstr "Tietokannan muokkauksessa tapahtui virheitä:"
 #: src/Database/DBStructure.php:210
 #, php-format
 msgid "%s: Database update"
-msgstr ""
+msgstr "%s: Tietokantapäivitys"
 
 #: src/Database/DBStructure.php:460
 #, php-format

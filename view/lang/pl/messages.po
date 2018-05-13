@@ -39,7 +39,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-09 15:04+0200\n"
-"PO-Revision-Date: 2018-05-11 21:45+0000\n"
+"PO-Revision-Date: 2018-05-12 17:21+0000\n"
 "Last-Translator: Waldemar Stoczkowski <waldemar.stoczkowski@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/Friendica/friendica/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -8999,11 +8999,11 @@ msgstr "Usuń wydarzenie"
 
 #: src/Model/Event.php:815
 msgid "D g:i A"
-msgstr ""
+msgstr "D g:m AM/PM"
 
 #: src/Model/Event.php:816
 msgid "g:i A"
-msgstr ""
+msgstr "g:m AM/PM"
 
 #: src/Model/Event.php:901 src/Model/Event.php:903
 msgid "Show map"
