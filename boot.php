@@ -39,9 +39,9 @@ require_once 'include/text.php';
 
 define('FRIENDICA_PLATFORM',     'Friendica');
 define('FRIENDICA_CODENAME',     'The Tazmans Flax-lily');
-define('FRIENDICA_VERSION',      '2018-05-dev');
+define('FRIENDICA_VERSION',      '2018.05-rc');
 define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1259);
+define('DB_UPDATE_VERSION',      1261);
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /**

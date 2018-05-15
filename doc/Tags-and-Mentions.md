@@ -23,16 +23,19 @@ You can tag a person on a different network or one that is **not in your social 
 
 Unless their system blocks unsolicited "mentions", the person tagged will likely receive a "Mention" post/activity or become a direct participant in the conversation in the case of public posts.
 Friendica blocks incoming “mentions” from people with no relationship to you.
-The exception is an ongiong conversation started from a contact of both you and the 3rd person or a conversation in a forum where you are a member of.
+The exception is an ongoing conversation started from a contact of both you and the 3rd person or a conversation in a forum where you are a member of.
 This is a spam prevention measure.
 
 Remote mentions are delivered using the OStatus protocol.
-This protocol is used by Friendica and GNU Social and several other systems, but is not currently implemented in Diaspora. 
+This protocol is used by Friendica and GNU Social and several other systems like Mastodon, but is not currently implemented in Diaspora. 
 As the OStatus protocol allows this Friendica user can be @-mentioned by users from platforms using this protocol in conversations if the "Enable OStatus support" is activated on the Friendica node.
 These @-mentions wont be blocked, even if there is no relationship between the sender and the receiver of the message.
 
 Friendica makes no distinction between people and forums for the purpose of tagging.
-(Some other networks use !forum to indicate a forum.)
+You can use @-mentions for forums like for other accounts to tag the forum.
+If you want to post something exclusively to a forum (e.g. the support forum) please use the bang-notation instead of  the @tag.
+So !helpers will be an exclusive posting to the support forum if you are connected with the forum.
+If you select a forum from the ACL a !-mention will be added automatically to your posting.
 
 If you sort your contacts into groups, you cannot @-mention these groups.
 But you can select the group in the access control when creating a new posting, to allow (or disallow) a certain group of people to see the posting.
@@ -40,11 +43,14 @@ See [Groups and Privacy](help/Groups-and-Privacy) for more details about groupin
 
 **Topical Tags**
 
-Topical tags are indicated by preceding the tag name with the  # character. This will create a link in the post to a generalised site search for the term provided. For example, #cars will provide a search link for all posts mentioning 'cars' on your site. Topical tags are generally a minimum of three characters in length.  Shorter search terms are not likely to yield any search results, although this depends on the database configuration. The same rules apply as with names that spaces within tags are represented by the underscore character. It is therefore not possible to create a tag whose target contains an underscore.
+Topical tags are indicated by preceding the tag name with the  # character.
+This will create a link in the post to a generalised site search for the term provided.
+For example, #cars will provide a search link for all posts mentioning 'cars' on your site.
+Topical tags are generally a minimum of three characters in length.
+Shorter search terms are not likely to yield any search results, although this depends on the database configuration.
+The same rules apply as with names that spaces within tags are represented by the underscore character.
+It is therefore not possible to create a tag whose target contains an underscore.
 
-Topical tags are also not linked if they are purely numeric, e.g. #1. If you wish to use a numerica hashtag, please add some descriptive text such as #2012-elections. 
- 
-
-
- 
+Topical tags are also not linked if they are purely numeric, e.g. #1.
+If you wish to use a numerica hashtag, please add some descriptive text such as #2012-elections. 
 

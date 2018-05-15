@@ -207,7 +207,7 @@ class DBStructure
 	public static function update($verbose, $action, $install = false, array $tables = null, array $definition = null) {
 		if ($action && !$install) {
 			Config::set('system', 'maintenance', 1);
-			Config::set('system', 'maintenance_reason', L10n::t(': Database update', DBM::date().' '.date('e')));
+			Config::set('system', 'maintenance_reason', L10n::t('%s: Database update', DBM::date().' '.date('e')));
 		}
 
 		$errors = '';

@@ -120,7 +120,8 @@ class PostUpdate
 		logger("Start", LOGGER_DEBUG);
 
 		// Check if the first step is done (Setting "author-id" and "owner-id" in the item table)
-		$r = dba::select('item', ['author-link', 'owner-link', 'uid'], ['author-id' => 0, 'owner-id' => 0], ['limit' => 1000]);
+		$fields = ['author-link', 'author-name', 'author-avatar', 'owner-link', 'owner-name', 'owner-avatar', 'network', 'uid'];
+		$r = dba::select('item', $fields, ['author-id' => 0, 'owner-id' => 0], ['limit' => 1000]);
 		if (!$r) {
 			// Are there unfinished entries in the thread table?
 			$r = q("SELECT COUNT(*) AS `total` FROM `thread`
@@ -162,8 +163,13 @@ class PostUpdate
 
 		// Set the "author-id" and "owner-id" in the item table and add a new public contact entry if needed
 		foreach ($item_arr as $item) {
-			$author_id = Contact::getIdForURL($item["author-link"]);
-			$owner_id = Contact::getIdForURL($item["owner-link"]);
+			$default = ['url' => $item['author-link'], 'name' => $item['author-name'],
+				'photo' => $item['author-avatar'], 'network' => $item['network']];
+			$author_id = Contact::getIdForURL($item["author-link"], 0, false, $default);
+
+			$default = ['url' => $item['owner-link'], 'name' => $item['owner-name'],
+				'photo' => $item['owner-avatar'], 'network' => $item['network']];
+			$owner_id = Contact::getIdForURL($item["owner-link"], 0, false, $default);
 
 			if ($author_id == 0) {
 				$author_id = -1;

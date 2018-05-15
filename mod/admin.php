@@ -1341,14 +1341,10 @@ function admin_page_site(App $a)
 	}
 	$diaspora_able = ($a->get_path() == "");
 
-	$optimize_max_tablesize = Config::get('system', 'optimize_max_tablesize', 100);
+	$optimize_max_tablesize = Config::get('system', 'optimize_max_tablesize', -1);
 
-	if ($optimize_max_tablesize < -1) {
+	if ($optimize_max_tablesize <= 0) {
 		$optimize_max_tablesize = -1;
-	}
-
-	if ($optimize_max_tablesize == 0) {
-		$optimize_max_tablesize = 100;
 	}
 
 	$t = get_markup_template('admin/site.tpl');
@@ -1421,7 +1417,7 @@ function admin_page_site(App $a)
 		'$maxloadavg'		=> ['maxloadavg', L10n::t("Maximum Load Average"), Config::get('system', 'maxloadavg', 50), L10n::t("Maximum system load before delivery and poll processes are deferred - default 50.")],
 		'$maxloadavg_frontend'	=> ['maxloadavg_frontend', L10n::t("Maximum Load Average \x28Frontend\x29"), Config::get('system', 'maxloadavg_frontend', 50), L10n::t("Maximum system load before the frontend quits service - default 50.")],
 		'$min_memory'		=> ['min_memory', L10n::t("Minimal Memory"), Config::get('system', 'min_memory', 0), L10n::t("Minimal free memory in MB for the worker. Needs access to /proc/meminfo - default 0 \x28deactivated\x29.")],
-		'$optimize_max_tablesize'=> ['optimize_max_tablesize', L10n::t("Maximum table size for optimization"), $optimize_max_tablesize, L10n::t("Maximum table size \x28in MB\x29 for the automatic optimization - default 100 MB. Enter -1 to disable it.")],
+		'$optimize_max_tablesize'=> ['optimize_max_tablesize', L10n::t("Maximum table size for optimization"), $optimize_max_tablesize, L10n::t("Maximum table size \x28in MB\x29 for the automatic optimization. Enter -1 to disable it.")],
 		'$optimize_fragmentation'=> ['optimize_fragmentation', L10n::t("Minimum level of fragmentation"), Config::get('system', 'optimize_fragmentation', 30), L10n::t("Minimum fragmenation level to start the automatic optimization - default value is 30%.")],
 
 		'$poco_completion'	=> ['poco_completion', L10n::t("Periodical check of global contacts"), Config::get('system','poco_completion'), L10n::t("If enabled, the global contacts are checked periodically for missing or outdated data and the vitality of the contacts and servers.")],

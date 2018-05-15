@@ -34,6 +34,7 @@ Friendica Documentation and Resources
 * [Using SSL with Friendica](help/SSL)
 * [Config values that can only be set in .htconfig.php](help/htconfig)
 * [Improve Performance](help/Improve-Performance)
+* [Administration Tools](help/tools)
 
 **Developer Manual**
 

@@ -73,8 +73,8 @@ function wk_social_relay()
 		'subscribe' => $subscribe,
 		'scope' => $scope,
 		'tags' => $taglist,
-		'protocols' => ['diaspora' => System::baseUrl() . '/receive/public',
-			'dfrn' => System::baseUrl() . '/dfrn_notify']
+		'protocols' => ['diaspora' => ['receive' => System::baseUrl() . '/receive/public'],
+			'dfrn' => ['receive' => System::baseUrl() . '/dfrn_notify']]
 	];
 
 	header('Content-type: application/json; charset=utf-8');

@@ -239,7 +239,7 @@ class GContact
 
 			if ($alternate && ($gcontact['network'] == NETWORK_OSTATUS)) {
 				// Delete the old entry - if it exists
-				if (dba::exists('item', ['nurl' => normalise_link($orig_profile)])) {
+				if (dba::exists('gcontact', ['nurl' => normalise_link($orig_profile)])) {
 					dba::delete('gcontact', ['nurl' => normalise_link($orig_profile)]);
 				}
 			}

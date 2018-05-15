@@ -344,10 +344,10 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 		}
 	}
 
-	$r = dba::p(item_query()."AND `item`.`parent` = (SELECT `parent` FROM `item` WHERE `id` = ?)
-		$sql_extra
-		ORDER BY `parent` DESC, `gravity` ASC, `id` ASC",
-		$item_id
+	$r = dba::p(item_query()."AND `item`.`parent-uri` = (SELECT `parent-uri` FROM `item` WHERE `id` = ?)
+		AND `item`.`uid` IN (0, ?) $sql_extra
+		ORDER BY `item`.`uid` ASC, `parent` DESC, `gravity` ASC, `id` ASC",
+		$item_id, local_user()
 	);
 
 	if (!DBM::is_result($r)) {

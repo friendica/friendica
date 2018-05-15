@@ -6,6 +6,7 @@ use Asika\SimpleConsole\Console;
 use dba;
 use Friendica\App;
 use Friendica\Core\Install;
+use Friendica\Core\Theme;
 
 require_once 'mod/install.php';
 require_once 'include/dba.php';
@@ -89,6 +90,15 @@ HELP;
 		}
 
 		$this->out(" Complete!\n\n");
+
+		// Install theme
+		$this->out("Installing theme\n");
+		if (!empty($a->config['system']['theme'])) {
+			Theme::install($a->config['system']['theme']);
+			$this->out(" Complete\n\n");
+		} else {
+			$this->out(" Theme setting is empty. Please check the file htconfig.php\n\n");
+		}
 
 		// Copy config file
 		$this->out("Saving config file...\n");

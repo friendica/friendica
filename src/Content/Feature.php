@@ -92,8 +92,8 @@ class Feature
 
 			// Network sidebar widgets
 			'widgets' => [
-				L10n::t('Network Sidebar Widgets'),
-				['archives',         L10n::t('Search by Date'), L10n::t('Ability to select posts by date ranges'), false, Config::get('feature_lock', 'archives', false)],
+				L10n::t('Network Sidebar'),
+				['archives',         L10n::t('Archives'), L10n::t('Ability to select posts by date ranges'), false, Config::get('feature_lock', 'archives', false)],
 				['forumlist_widget', L10n::t('List Forums'),    L10n::t('Enable widget to display the forums your are connected with'), true, Config::get('feature_lock', 'forumlist_widget', false)],
 				['groups',           L10n::t('Group Filter'),   L10n::t('Enable widget to display Network posts only from selected group'), false, Config::get('feature_lock', 'groups', false)],
 				['networks',         L10n::t('Network Filter'), L10n::t('Enable widget to display Network posts only from selected network'), false, Config::get('feature_lock', 'networks', false)],

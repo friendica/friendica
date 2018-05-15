@@ -36,6 +36,7 @@ Friendica - Dokumentation und Ressourcen
 * [Betreibe deine Seite mit einem SSL-Zertifikat](help/SSL)
 * [Konfigurationswerte, die nur in der .htconfig.php gesetzt werden können](help/htconfig) (EN)
 * [Performance verbessern](help/Improve-Performance)
+* [Administration Werkzeuge](help/tools) (EN)
 
 **Dokumentation für Entwickler**
 

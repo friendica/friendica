@@ -473,7 +473,7 @@ function item_joins() {
 	return sprintf("STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 		AND NOT `contact`.`blocked`
 		AND ((NOT `contact`.`readonly` AND NOT `contact`.`pending` AND (`contact`.`rel` IN (%s, %s)))
-		OR `contact`.`self` OR (`item`.`id` != `item`.`parent`))
+		OR `contact`.`self` OR (`item`.`id` != `item`.`parent`) OR `contact`.`uid` = 0)
 		INNER JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id` AND NOT `author`.`blocked`
 		INNER JOIN `contact` AS `owner` ON `owner`.`id`=`item`.`owner-id` AND NOT `owner`.`blocked`
 		LEFT JOIN `event` ON `event-id` = `event`.`id`",
@@ -900,37 +900,12 @@ function conversation_add_children($parents, $block_authors, $order) {
 	$block_sql = $block_authors ? "AND NOT `author`.`hidden` AND NOT `author`.`blocked`" : "";
 
 	foreach ($parents AS $parent) {
-		$thread_items = dba::p(item_query()." AND `item`.`uid` = ?
-			AND `item`.`parent-uri` = ? $block_sql
-			ORDER BY `item`.`commented` DESC" . $limit,
-			local_user(),
-			$parent['uri']
-		);
+		$thread_items = dba::p(item_query()."AND `item`.`parent-uri` = ?
+			AND `item`.`uid` IN (0, ?) $block_sql
+			ORDER BY `item`.`uid` ASC, `item`.`commented` DESC" . $limit,
+			$parent['uri'], local_user());
+
 		$comments = dba::inArray($thread_items);
-
-		// Check if the original item is in the result.
-		// When commenting from the community page there can be incomplete threads
-		if (count($comments) > 0) {
-			$parent_found = false;
-			foreach ($comments as $comment) {
-				if ($comment['uri'] == $comment['parent-uri']) {
-					$parent_found = true;
-					break;
-				}
-			}
-			if (!$parent_found) {
-				$comments = [];
-			}
-		}
-
-		if (count($comments) == 0) {
-			$thread_items = dba::p(item_query()." AND `item`.`uid` = 0
-				AND `item`.`parent-uri` = ?
-				ORDER BY `item`.`commented` DESC LIMIT ".intval($max_comments + 1),
-				$parent['uri']
-			);
-			$comments = dba::inArray($thread_items);
-		}
 
 		if (count($comments) != 0) {
 			$items = array_merge($items, $comments);

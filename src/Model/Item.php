@@ -52,17 +52,24 @@ class Item extends BaseObject
 			return false;
 		}
 
+		// To ensure the data integrity we do it in an transaction
+		dba::transaction();
+
+		// We cannot simply expand the condition to check for origin entries
+		// The condition needn't to be a simple array but could be a complex condition.
+		// And we have to execute this query before the update to ensure to fetch the same data.
+		$items = dba::select('item', ['id', 'origin'], $condition);
+
 		$success = dba::update('item', $fields, $condition);
 
 		if (!$success) {
+			dba::close($items);
+			dba::rollback();
 			return false;
 		}
 
 		$rows = dba::affected_rows();
 
-		// We cannot simply expand the condition to check for origin entries
-		// The condition needn't to be a simple array but could be a complex condition.
-		$items = dba::select('item', ['id', 'origin'], $condition);
 		while ($item = dba::fetch($items)) {
 			Term::insertFromTagFieldByItemId($item['id']);
 			Term::insertFromFileFieldByItemId($item['id']);
@@ -74,6 +81,8 @@ class Item extends BaseObject
 			}
 		}
 
+		dba::close($items);
+		dba::commit();
 		return $rows;
 	}
 
@@ -479,14 +488,20 @@ class Item extends BaseObject
 		// The contact-id should be set before "self::insert" was called - but there seems to be issues sometimes
 		$item["contact-id"] = self::contactId($item);
 
-		$item['author-id'] = defaults($item, 'author-id', Contact::getIdForURL($item["author-link"]));
+		$default = ['url' => $item['author-link'], 'name' => $item['author-name'],
+			'photo' => $item['author-avatar'], 'network' => $item['network']];
+
+		$item['author-id'] = defaults($item, 'author-id', Contact::getIdForURL($item["author-link"], 0, false, $default));
 
 		if (Contact::isBlocked($item["author-id"])) {
 			logger('Contact '.$item["author-id"].' is blocked, item '.$item["uri"].' will not be stored');
 			return 0;
 		}
 
-		$item['owner-id'] = defaults($item, 'owner-id', Contact::getIdForURL($item["owner-link"]));
+		$default = ['url' => $item['owner-link'], 'name' => $item['owner-name'],
+			'photo' => $item['owner-avatar'], 'network' => $item['network']];
+
+		$item['owner-id'] = defaults($item, 'owner-id', Contact::getIdForURL($item["owner-link"], 0, false, $default));
 
 		if (Contact::isBlocked($item["owner-id"])) {
 			logger('Contact '.$item["owner-id"].' is blocked, item '.$item["uri"].' will not be stored');
@@ -2008,7 +2023,7 @@ EOT;
 	{
 		$fields = ['uid', 'guid', 'title', 'body', 'created', 'edited', 'commented', 'received', 'changed',
 			'wall', 'private', 'pubmail', 'moderated', 'visible', 'spam', 'starred', 'bookmark', 'contact-id',
-			'deleted', 'origin', 'forum_mode', 'network', 'rendered-html', 'rendered-hash'];
+			'deleted', 'origin', 'forum_mode', 'network', 'author-id', 'owner-id', 'rendered-html', 'rendered-hash'];
 		$condition = ["`id` = ? AND (`parent` = ? OR `parent` = 0)", $itemid, $itemid];
 
 		$item = dba::selectFirst('item', $fields, $condition);
@@ -2032,7 +2047,7 @@ EOT;
 
 		$result = dba::update('thread', $fields, ['iid' => $itemid]);
 
-		logger("Update thread for item ".$itemid." - guid ".$item["guid"]." - ".(int)$result." ".print_r($item, true), LOGGER_DEBUG);
+		logger("Update thread for item ".$itemid." - guid ".$item["guid"]." - ".(int)$result, LOGGER_DEBUG);
 
 		// Updating a shadow item entry
 		$items = dba::selectFirst('item', ['id'], ['guid' => $item['guid'], 'uid' => 0]);

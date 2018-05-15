@@ -176,7 +176,7 @@ class Post extends BaseObject
 			'dropping' => $dropping,
 			'pagedrop' => ((Feature::isEnabled($conv->getProfileOwner(), 'multi_delete')) ? $item['pagedrop'] : ''),
 			'select'   => L10n::t('Select'),
-			'delete'   => L10n::t('Delete'),
+			'delete'   => L10n::t('Remove from your stream'),
 		];
 
 		$filer = (($conv->getProfileOwner() == local_user() && ($item['uid'] != 0)) ? L10n::t("save to folder") : false);
@@ -199,22 +199,12 @@ class Post extends BaseObject
 			$profile_link = Profile::zrl($profile_link);
 		}
 
-		if (!isset($item['author-thumb']) || ($item['author-thumb'] == "")) {
-			$author_contact = Contact::getDetailsByURL($item['author-link'], $conv->getProfileOwner());
-			if ($author_contact["thumb"]) {
-				$item['author-thumb'] = $author_contact["thumb"];
-			} else {
-				$item['author-thumb'] = $item['author-avatar'];
-			}
+		if (($item['network'] == NETWORK_FEED) || empty($item['author-thumb'])) {
+			$item['author-thumb'] = $item['author-avatar'];
 		}
 
-		if (!isset($item['owner-thumb']) || ($item['owner-thumb'] == "")) {
-			$owner_contact = Contact::getDetailsByURL($item['owner-link'], $conv->getProfileOwner());
-			if ($owner_contact["thumb"]) {
-				$item['owner-thumb'] = $owner_contact["thumb"];
-			} else {
-				$item['owner-thumb'] = $item['owner-avatar'];
-			}
+		if (($item['network'] == NETWORK_FEED) || empty($item['owner-thumb'])) {
+			$item['owner-thumb'] = $item['owner-avatar'];
 		}
 
 		$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];

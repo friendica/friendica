@@ -20,7 +20,7 @@ use Friendica\Protocol\Feed;
 use Friendica\Util\Crypto;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
-
+use Friendica\Util\DateTimeFormat;
 use dba;
 use DOMXPath;
 use DOMDocument;
@@ -357,11 +357,11 @@ class Probe
 			}
 		}
 
-		if (self::$baseurl != "") {
+		if (!empty(self::$baseurl)) {
 			$data["baseurl"] = self::$baseurl;
 		}
 
-		if (!isset($data["network"])) {
+		if (empty($data["network"])) {
 			$data["network"] = NETWORK_PHANTOM;
 		}
 
@@ -395,6 +395,12 @@ class Probe
 						'network' => $data['network'],
 						'server_url' => $data['baseurl']];
 
+				// This doesn't cover the case when a community isn't a community anymore
+				if (!empty($data['community']) && $data['community']) {
+					$fields['community'] = $data['community'];
+					$fields['contact-type'] = ACCOUNT_TYPE_COMMUNITY;
+				}
+
 				$fieldnames = [];
 
 				foreach ($fields as $key => $val) {
@@ -410,6 +416,17 @@ class Probe
 				$condition = ['nurl' => normalise_link($data["url"])];
 
 				$old_fields = dba::selectFirst('gcontact', $fieldnames, $condition);
+
+				// When the gcontact doesn't exist, the value "true" will trigger an insert.
+				// In difference to the public contacts we want to have every contact
+				// in the world in our global contacts.
+				if (!$old_fields) {
+					$old_fields = true;
+
+					// These values have to be set only on insert
+					$fields['photo'] = $data['photo'];
+					$fields['created'] = DateTimeFormat::utcNow();
+				}
 
 				dba::update('gcontact', $fields, $condition, $old_fields);
 
@@ -428,7 +445,10 @@ class Probe
 						'confirm' => $data['confirm'],
 						'poco' => $data['poco'],
 						'network' => $data['network'],
-						'success_update' => DBM::date()];
+						'pubkey' => $data['pubkey'],
+						'priority' => $data['priority'],
+						'writable' => true,
+						'rel' => CONTACT_IS_SHARING];
 
 				$fieldnames = [];
 
@@ -442,14 +462,15 @@ class Probe
 
 				$condition = ['nurl' => normalise_link($data["url"]), 'self' => false, 'uid' => 0];
 
+				// "$old_fields" will return a "false" when the contact doesn't exist.
+				// This won't trigger an insert. This is intended, since we only need
+				// public contacts for everyone we store items from.
+				// We don't need to store every contact on the planet.
 				$old_fields = dba::selectFirst('contact', $fieldnames, $condition);
 
-				// When the contact doesn't exist, the value "true" will trigger an insert
-				if (!$old_fields) {
-					$old_fields = true;
-					$fields['blocked'] = false;
-					$fields['pending'] = false;
-				}
+				$fields['name-date'] = DateTimeFormat::utcNow();
+				$fields['uri-date'] = DateTimeFormat::utcNow();
+				$fields['success_update'] = DateTimeFormat::utcNow();
 
 				dba::update('contact', $fields, $condition, $old_fields);
 			}

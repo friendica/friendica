@@ -920,7 +920,7 @@ class Diaspora
 			// Note that Friendica contacts will return a "Diaspora person"
 			// if Diaspora connectivity is enabled on their server
 			if ($r && ($r["network"] === NETWORK_DIASPORA)) {
-				self::addFContact($r, $update);
+				self::updateFContact($r);
 
 				// Fetch the updated or added contact
 				$person = dba::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
@@ -936,70 +936,21 @@ class Diaspora
 	/**
 	 * @brief Updates the fcontact table
 	 *
-	 * @param array $arr    The fcontact data
-	 * @param bool  $update Update or insert?
-	 *
-	 * @return string The id of the fcontact entry
+	 * @param array $arr The fcontact data
 	 */
-	private static function addFContact($arr, $update = false)
+	private static function updateFContact($arr)
 	{
-		if ($update) {
-			$r = q(
-				"UPDATE `fcontact` SET
-					`name` = '%s',
-					`photo` = '%s',
-					`request` = '%s',
-					`nick` = '%s',
-					`addr` = '%s',
-					`guid` = '%s',
-					`batch` = '%s',
-					`notify` = '%s',
-					`poll` = '%s',
-					`confirm` = '%s',
-					`alias` = '%s',
-					`pubkey` = '%s',
-					`updated` = '%s'
-				WHERE `url` = '%s' AND `network` = '%s'",
-				dbesc($arr["name"]),
-				dbesc($arr["photo"]),
-				dbesc($arr["request"]),
-				dbesc($arr["nick"]),
-				dbesc(strtolower($arr["addr"])),
-				dbesc($arr["guid"]),
-				dbesc($arr["batch"]),
-				dbesc($arr["notify"]),
-				dbesc($arr["poll"]),
-				dbesc($arr["confirm"]),
-				dbesc($arr["alias"]),
-				dbesc($arr["pubkey"]),
-				dbesc(DateTimeFormat::utcNow()),
-				dbesc($arr["url"]),
-				dbesc($arr["network"])
-			);
-		} else {
-			$r = q(
-				"INSERT INTO `fcontact` (`url`,`name`,`photo`,`request`,`nick`,`addr`, `guid`,
-					`batch`, `notify`,`poll`,`confirm`,`network`,`alias`,`pubkey`,`updated`)
-				VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
-				dbesc($arr["url"]),
-				dbesc($arr["name"]),
-				dbesc($arr["photo"]),
-				dbesc($arr["request"]),
-				dbesc($arr["nick"]),
-				dbesc($arr["addr"]),
-				dbesc($arr["guid"]),
-				dbesc($arr["batch"]),
-				dbesc($arr["notify"]),
-				dbesc($arr["poll"]),
-				dbesc($arr["confirm"]),
-				dbesc($arr["network"]),
-				dbesc($arr["alias"]),
-				dbesc($arr["pubkey"]),
-				dbesc(DateTimeFormat::utcNow())
-			);
-		}
+		$fields = ['name' => $arr["name"], 'photo' => $arr["photo"],
+			'request' => $arr["request"], 'nick' => $arr["nick"],
+			'addr' => strtolower($arr["addr"]), 'guid' => $arr["guid"],
+			'batch' => $arr["batch"], 'notify' => $arr["notify"],
+			'poll' => $arr["poll"], 'confirm' => $arr["confirm"],
+			'alias' => $arr["alias"], 'pubkey' => $arr["pubkey"],
+			'updated' => DateTimeFormat::utcNow()];
 
-		return $r;
+		$condition = ['url' => $arr["url"], 'network' => $arr["network"]];
+
+		dba::update('fcontact', $fields, $condition, true);
 	}
 
 	/**
@@ -2398,21 +2349,17 @@ class Diaspora
 			$birthday = $contact["bd"];
 		}
 
-		$r = q(
-			"UPDATE `contact` SET `name` = '%s', `nick` = '%s', `addr` = '%s', `name-date` = '%s', `bd` = '%s',
-				`location` = '%s', `about` = '%s', `keywords` = '%s', `gender` = '%s' WHERE `id` = %d AND `uid` = %d",
-			dbesc($name),
-			dbesc($nick),
-			dbesc($author),
-			dbesc(DateTimeFormat::utcNow()),
-			dbesc($birthday),
-			dbesc($location),
-			dbesc($about),
-			dbesc($keywords),
-			dbesc($gender),
-			intval($contact["id"]),
-			intval($importer["uid"])
-		);
+		$fields = ['name' => $name, 'location' => $location,
+			'name-date' => DateTimeFormat::utcNow(),
+			'about' => $about, 'gender' => $gender,
+			'addr' => $author, 'nick' => $nick,
+			'keywords' => $keywords];
+
+		if (!empty($birthday)) {
+			$fields['bd'] = $birthday;
+		}
+
+		dba::update('contact', $fields, ['id' => $contact['id']]);
 
 		$gcontact = ["url" => $contact["url"], "network" => NETWORK_DIASPORA, "generation" => 2,
 					"photo" => $image_url, "name" => $name, "location" => $location,
@@ -3568,6 +3515,10 @@ class Diaspora
 				$ret["root_handle"] = self::handleFromContact($item["contact-id"]);
 				$ret["root_guid"] = $guid;
 				return $ret;
+			} elseif ($complete) {
+				// We are resharing something that isn't a DFRN or Diaspora post.
+				// So we have to return "false" on "$complete" to not trigger a reshare.
+				return false;
 			}
 		} elseif (($guid == "") && $complete) {
 			return false;
