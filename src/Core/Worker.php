@@ -1127,6 +1127,6 @@ class Worker
 		if (!function_exists('fastcgi_finish_request')) {
 			fastcgi_finish_request();
 		}
-		killme();
+		exit();
 	}
 }
