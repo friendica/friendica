@@ -51,7 +51,7 @@ $spawn = (($_SERVER["argc"] == 2) && ($_SERVER["argv"][1] == "spawn"));
 
 if ($spawn) {
 	Worker::spawnWorker();
-	killme();
+	Worker::killWorker();
 }
 
 $run_cron = (($_SERVER["argc"] <= 1) || ($_SERVER["argv"][1] != "no_cron"));
@@ -62,5 +62,4 @@ Worker::unclaimProcess();
 
 Worker::endProcess();
 
-killme();
-
+Worker::killWorker();

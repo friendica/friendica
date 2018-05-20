@@ -1120,4 +1120,13 @@ class Worker
 	{
 		return Process::deleteByPid();
 	}
+
+	public static function killWorker()
+	{
+		session_write_close();
+		if (!function_exists('fastcgi_finish_request')) {
+			fastcgi_finish_request();
+		}
+		killme();
+	}
 }
