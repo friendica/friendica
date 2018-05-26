@@ -162,7 +162,7 @@ function autoname($len) {
 
 	$word = '';
 
-	for ($x = 0; $x < $len; $x ++) {
+	for ($x = 0; $x < $len+2; $x ++) {
 		$r = mt_rand(0,count($table) - 1);
 		$word .= $table[$r];
 
@@ -174,8 +174,6 @@ function autoname($len) {
 
 	}
 
-	$word = substr($word,0,$len);
-
 	foreach ($noend as $noe) {
 		if ((strlen($word) > 2) && (substr($word, -2) == $noe)) {
 			$word = substr($word, 0, -1);
@@ -186,6 +184,9 @@ function autoname($len) {
 	if (substr($word, -1) == 'q') {
 		$word = substr($word, 0, -1);
 	}
+	
+	$word = substr($word,0,$len);
+	
 	return $word;
 }
 
