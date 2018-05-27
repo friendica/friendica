@@ -345,7 +345,7 @@ function networkConversation($a, $items, $mode, $update, $ordering = '')
 	// Set this so that the conversation function can find out contact info for our wall-wall items
 	$a->page_contact = $a->contact;
 
-	$o = conversation($a, $items, $mode, $update, false, $ordering);
+	$o = conversation($a, $items, $mode, $update, false, $ordering, local_user());
 
 	if (!$update) {
 		if (PConfig::get(local_user(), 'system', 'infinite_scroll')) {
@@ -456,7 +456,7 @@ function networkFlatView(App $a, $update = 0)
 	$items = q("SELECT %s FROM `item` $sql_post_table %s
 		WHERE %s AND `item`.`uid` = %d
 		ORDER BY `item`.`id` DESC $pager_sql ",
-		item_fieldlists(), item_joins(), item_condition(),
+		item_fieldlists(), item_joins($_SESSION['uid']), item_condition(),
 		intval($_SESSION['uid'])
 	);
 
@@ -774,12 +774,15 @@ function networkThreadedView(App $a, $update, $parent)
 				AND (`item`.`parent-uri` != `item`.`uri`
 					OR `contact`.`uid` = `item`.`uid` AND `contact`.`self`
 					OR `contact`.`rel` IN (%d, %d) AND NOT `contact`.`readonly`)
+			LEFT JOIN `user-item` ON `user-item`.`iid` = `item`.`id` AND `user-item`.`uid` = %d
 			WHERE `item`.`uid` = %d AND `item`.`visible` AND NOT `item`.`deleted`
+			AND (`user-item`.`hidden` IS NULL OR NOT `user-item`.`hidden`)
 			AND NOT `item`.`moderated` AND $sql_extra4
 			$sql_extra3 $sql_extra $sql_range $sql_nets
 			ORDER BY `order_date` DESC LIMIT 100",
 			intval(CONTACT_IS_SHARING),
 			intval(CONTACT_IS_FRIEND),
+			intval(local_user()),
 			intval(local_user())
 		);
 	} else {
@@ -791,12 +794,15 @@ function networkThreadedView(App $a, $update, $parent)
 				AND (`item`.`parent-uri` != `item`.`uri`
 					OR `contact`.`uid` = `item`.`uid` AND `contact`.`self`
 					OR `contact`.`rel` IN (%d, %d) AND NOT `contact`.`readonly`)
+			LEFT JOIN `user-item` ON `user-item`.`iid` = `item`.`id` AND `user-item`.`uid` = %d
 			WHERE `thread`.`uid` = %d AND `thread`.`visible` AND NOT `thread`.`deleted`
 			AND NOT `thread`.`moderated`
+			AND (`user-item`.`hidden` IS NULL OR NOT `user-item`.`hidden`)
 			$sql_extra2 $sql_extra3 $sql_range $sql_extra $sql_nets
 			ORDER BY `order_date` DESC $pager_sql",
 			intval(CONTACT_IS_SHARING),
 			intval(CONTACT_IS_FRIEND),
+			intval(local_user()),
 			intval(local_user())
 		);
 	}

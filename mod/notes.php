@@ -82,7 +82,7 @@ function notes_content(App $a, $update = false)
 		WHERE %s AND `item`.`uid` = %d AND `item`.`type` = 'note'
 		AND `contact`.`self` AND `item`.`id` = `item`.`parent` AND NOT `item`.`wall`
 		$sql_extra ",
-		item_joins(),
+		item_joins(local_user()),
 		item_condition(),
 		intval(local_user())
 	);
@@ -97,7 +97,7 @@ function notes_content(App $a, $update = false)
 		AND `item`.`id` = `item`.`parent` AND NOT `item`.`wall`
 		$sql_extra
 		ORDER BY `item`.`created` DESC LIMIT %d ,%d ",
-		item_joins(),
+		item_joins(local_user()),
 		item_condition(),
 		intval(local_user()),
 		intval($a->pager['start']),
@@ -119,7 +119,7 @@ function notes_content(App $a, $update = false)
 			$sql_extra
 			ORDER BY `parent` DESC, `gravity` ASC, `item`.`id` ASC ",
 			item_fieldlists(),
-			item_joins(),
+			item_joins(local_user()),
 			item_condition(),
 			intval(local_user()),
 			dbesc($parents_str)

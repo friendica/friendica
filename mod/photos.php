@@ -289,7 +289,7 @@ function photos_post(App $a)
 			);
 			if (DBM::is_result($r)) {
 				foreach ($r as $rr) {
-					Item::deleteById($rr['id']);
+					Item::deleteById($rr['id'], PRIORITY_HIGH, $page_owner_uid);
 				}
 			}
 
@@ -349,7 +349,7 @@ function photos_post(App $a)
 				intval($page_owner_uid)
 			);
 			if (DBM::is_result($i)) {
-				Item::deleteById($i[0]['id']);
+				Item::deleteById($i[0]['id'], PRIORITY_HIGH, $page_owner_uid);
 
 				// Update the photo albums cache
 				Photo::clearAlbumCache($page_owner_uid);

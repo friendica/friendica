@@ -1049,7 +1049,7 @@ class Contact extends BaseObject
 
 		$contact = ($r[0]["contact-type"] == ACCOUNT_TYPE_COMMUNITY ? 'owner-id' : 'author-id');
 
-		$r = q(item_query() . " AND `item`.`" . $contact . "` = %d AND " . $sql .
+		$r = q(item_query(local_user()) . " AND `item`.`" . $contact . "` = %d AND " . $sql .
 			" AND `item`.`verb` = '%s' ORDER BY `item`.`created` DESC LIMIT %d, %d",
 			intval($author_id), intval(local_user()), dbesc(ACTIVITY_POST),
 			intval($a->pager['start']), intval($a->pager['itemspage'])

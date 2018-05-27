@@ -92,12 +92,13 @@ class Item extends BaseObject
 	 *
 	 * @param array $condition The condition for finding the item entries
 	 * @param integer $priority Priority for the notification
+	 * @param integer $uid User who wants to delete the item
 	 */
-	public static function delete($condition, $priority = PRIORITY_HIGH)
+	public static function delete($condition, $priority = PRIORITY_HIGH, $uid = 0)
 	{
 		$items = dba::select('item', ['id'], $condition);
 		while ($item = dba::fetch($items)) {
-			self::deleteById($item['id'], $priority);
+			self::deleteById($item['id'], $priority, $uid);
 		}
 		dba::close($items);
 	}
@@ -107,10 +108,11 @@ class Item extends BaseObject
 	 *
 	 * @param integer $item_id Item ID that should be delete
 	 * @param integer $priority Priority for the notification
+	 * @param integer $uid User who wants to delete the item
 	 *
 	 * @return boolean success
 	 */
-	public static function deleteById($item_id, $priority = PRIORITY_HIGH)
+	public static function deleteById($item_id, $priority = PRIORITY_HIGH, $uid = 0)
 	{
 		// locate item to be deleted
 		$fields = ['id', 'uri', 'uid', 'parent', 'parent-uri', 'origin',
@@ -130,6 +132,12 @@ class Item extends BaseObject
 		$parent = dba::selectFirst('item', ['origin'], ['id' => $item['parent']]);
 		if (!DBM::is_result($parent)) {
 			$parent = ['origin' => false];
+		}
+
+		// "Deleting" global items just means hiding them
+		if (($item['uid'] == 0) && ($uid != 0)) {
+			dba::update('user-item', ['hidden' => true], ['iid' => $item_id, 'uid' => $uid], true);
+			return true;
 		}
 
 		// clean up categories and tags so they don't end up as orphans
@@ -201,6 +209,13 @@ class Item extends BaseObject
 
 			// send the notification upstream/downstream
 			Worker::add(['priority' => $priority, 'dont_fork' => true], "Notifier", "drop", intval($item['id']));
+		} elseif ($item['uid'] != 0) {
+
+			// When we delete just our local user copy of an item, we have to set a marker to hide it
+			$global_item = dba::selectFirst('item', ['id'], ['uri' => $item['uri'], 'uid' => 0, 'deleted' => false]);
+			if (DBM::is_result($global_item)) {
+				dba::update('user-item', ['hidden' => true], ['iid' => $global_item['id'], 'uid' => $item['uid']], true);
+			}
 		}
 
 		logger('Item with ID ' . $item_id . " has been deleted.", LOGGER_DEBUG);

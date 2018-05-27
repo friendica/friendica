@@ -346,7 +346,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 		return '';
 	}
 
-	$r = dba::p(item_query()."AND `item`.`parent-uri` = (SELECT `parent-uri` FROM `item` WHERE `id` = ?)
+	$r = dba::p(item_query(local_user())."AND `item`.`parent-uri` = (SELECT `parent-uri` FROM `item` WHERE `id` = ?)
 		AND `item`.`uid` IN (0, ?) $sql_extra
 		ORDER BY `item`.`uid` ASC, `parent` DESC, `gravity` ASC, `id` ASC",
 		$item_id, local_user()
@@ -369,7 +369,7 @@ function display_content(App $a, $update = false, $update_uid = 0) {
 	if (!$update) {
 		$o .= "<script> var netargs = '?f=&item_id=" . $item_id . "'; </script>";
 	}
-	$o .= conversation($a, $items, 'display', $update_uid);
+	$o .= conversation($a, $items, 'display', $update_uid, false, 'commented', local_user());
 
 	// Preparing the meta header
 	$description = trim(HTML::toPlaintext(BBCode::convert($s[0]["body"], false), 0, true));

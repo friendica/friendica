@@ -339,7 +339,7 @@ function profile_content(App $a, $update = 0)
 
 		$parents_str = implode(', ', $parents_arr);
 
-		$items = q(item_query() . " AND `item`.`uid` = %d
+		$items = q(item_query($a->profile['profile_uid']) . " AND `item`.`uid` = %d
 			AND `item`.`parent` IN (%s)
 			$sql_extra ",
 			intval($a->profile['profile_uid']),
@@ -365,7 +365,7 @@ function profile_content(App $a, $update = 0)
 		}
 	}
 
-	$o .= conversation($a, $items, 'profile', $update);
+	$o .= conversation($a, $items, 'profile', $update, false, 'commented', local_user());
 
 	if (!$update) {
 		$o .= alt_pager($a, count($items));

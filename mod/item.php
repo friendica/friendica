@@ -877,7 +877,7 @@ function item_content(App $a) {
 	$o = '';
 	if (($a->argc == 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
 		if (is_ajax()) {
-			$o = Item::deleteById($a->argv[2]);
+			$o = Item::deleteById($a->argv[2], PRIORITY_HIGH, local_user());
 		} else {
 			$o = drop_item($a->argv[2]);
 		}

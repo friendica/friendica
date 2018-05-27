@@ -204,7 +204,7 @@ function search_content(App $a) {
 				AND `term`.`otype` = %d AND `term`.`type` = %d AND `term`.`term` = '%s' AND `item`.`verb` = '%s'
 				AND NOT `author`.`blocked` AND NOT `author`.`hidden`
 			ORDER BY term.created DESC LIMIT %d , %d ",
-				item_fieldlists(), item_joins(), item_condition(),
+				item_fieldlists(), item_joins(local_user()), item_condition(),
 				intval(local_user()),
 				intval(TERM_OBJ_POST), intval(TERM_HASHTAG), dbesc(protect_sprintf($search)), dbesc(ACTIVITY_POST),
 				intval($a->pager['start']), intval($a->pager['itemspage']));
@@ -219,7 +219,7 @@ function search_content(App $a) {
 				AND NOT `author`.`blocked` AND NOT `author`.`hidden`
 				$sql_extra
 			GROUP BY `item`.`uri`, `item`.`id` ORDER BY `item`.`id` DESC LIMIT %d , %d",
-				item_fieldlists(), item_joins(), item_condition(),
+				item_fieldlists(), item_joins(local_user()), item_condition(),
 				intval(local_user()),
 				intval($a->pager['start']), intval($a->pager['itemspage']));
 	}
@@ -241,7 +241,7 @@ function search_content(App $a) {
 	]);
 
 	logger("Start Conversation for '".$search."'", LOGGER_DEBUG);
-	$o .= conversation($a,$r,'search',false);
+	$o .= conversation($a, $r, 'search', false, false, 'commented', local_user());
 
 	$o .= alt_pager($a,count($r));
 

@@ -171,7 +171,7 @@ function community_content(App $a, $update = 0)
 		$s = $r;
 	}
 
-	$o .= conversation($a, $s, 'community', $update);
+	$o .= conversation($a, $s, 'community', $update, false, 'commented', local_user());
 
 	if (!$update) {
 		$o .= alt_pager($a, count($r));

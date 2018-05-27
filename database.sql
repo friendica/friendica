@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.05-rc (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1265
+-- DB_UPDATE_VERSION 1266
 -- ------------------------------------------
 
 
@@ -1074,6 +1074,16 @@ CREATE TABLE IF NOT EXISTS `userd` (
 	`username` varchar(255) NOT NULL COMMENT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `username` (`username`(32))
+) DEFAULT COLLATE utf8mb4_general_ci;
+
+--
+-- TABLE user-item
+--
+CREATE TABLE IF NOT EXISTS `user-item` (
+	`iid` int unsigned NOT NULL DEFAULT 0 COMMENT 'Item id',
+	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'User id',
+	`hidden` boolean NOT NULL DEFAULT '0' COMMENT 'Hidden marker',
+	 PRIMARY KEY(`uid`,`iid`)
 ) DEFAULT COLLATE utf8mb4_general_ci;
 
 --

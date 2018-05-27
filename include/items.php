@@ -321,7 +321,7 @@ function drop_items($items) {
 
 	if (count($items)) {
 		foreach ($items as $item) {
-			$owner = Item::deleteById($item);
+			$owner = Item::deleteById($item, PRIORITY_HIGH, local_user());
 			if ($owner && !$uid)
 				$uid = $owner;
 		}
@@ -393,7 +393,7 @@ function drop_item($id) {
 		}
 
 		// delete the item
-		Item::deleteById($item['id']);
+		Item::deleteById($item['id'], PRIORITY_HIGH, local_user());
 
 		goaway(System::baseUrl() . '/' . $_SESSION['return_url']);
 		//NOTREACHED

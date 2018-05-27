@@ -545,7 +545,7 @@ function events_content(App $a) {
 
 		// Delete only real events (no birthdays)
 		if (DBM::is_result($ev) && $ev[0]['type'] == 'event') {
-			$del = Item::deleteById($ev[0]['itemid']);
+			$del = Item::deleteById($ev[0]['itemid'], PRIORITY_HIGH, local_user());
 		}
 
 		if ($del == 0) {

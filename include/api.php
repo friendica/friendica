@@ -1663,7 +1663,7 @@ function api_search($type)
 
 	$r = dba::p(
 		"SELECT ".item_fieldlists()."
-		FROM `item` ".item_joins()."
+		FROM `item` ".item_joins(api_user())."
 		WHERE ".item_condition()." AND (`item`.`uid` = 0 OR (`item`.`uid` = ? AND NOT `item`.`global`))
 		AND `item`.`body` LIKE CONCAT('%',?,'%')
 		$sql_extra
@@ -1827,7 +1827,7 @@ function api_statuses_public_timeline($type)
 			"SELECT " . item_fieldlists() . "
 			FROM `thread`
 			STRAIGHT_JOIN `item` ON `item`.`id` = `thread`.`iid`
-			" . item_joins() . "
+			" . item_joins(api_user()) . "
 			STRAIGHT_JOIN `user` ON `user`.`uid` = `thread`.`uid`
 				AND NOT `user`.`hidewall`
 			AND `verb` = ?
@@ -1856,7 +1856,7 @@ function api_statuses_public_timeline($type)
 		$r = dba::p(
 			"SELECT " . item_fieldlists() . "
 			FROM `item`
-			" . item_joins() . "
+			" . item_joins(api_user()) . "
 			STRAIGHT_JOIN `user` ON `user`.`uid` = `item`.`uid`
 				AND NOT `user`.`hidewall`
 			AND `verb` = ?
@@ -1930,7 +1930,7 @@ function api_statuses_networkpublic_timeline($type)
 		"SELECT " . item_fieldlists() . "
 		FROM `thread`
 		STRAIGHT_JOIN `item` ON `item`.`id` = `thread`.`iid`
-		" . item_joins() . "
+		" . item_joins(api_user()) . "
 		WHERE `thread`.`uid` = 0
 		AND `verb` = ?
 		AND NOT `thread`.`private`
@@ -2256,7 +2256,7 @@ function api_statuses_destroy($type)
 
 	$ret = api_statuses_show($type);
 
-	Item::deleteById($id);
+	Item::deleteById($id, PRIORITY_HIGH, api_user());
 
 	return $ret;
 }
@@ -4148,7 +4148,7 @@ function api_fr_photoalbum_delete($type)
 		if (!DBM::is_result($photo_item)) {
 			throw new InternalServerErrorException("problem with deleting items occured");
 		}
-		Item::deleteById($photo_item[0]['id']);
+		Item::deleteById($photo_item[0]['id'], PRIORITY_HIGH, api_user());
 	}
 
 	// now let's delete all photos from the album
@@ -4441,7 +4441,7 @@ function api_fr_photo_delete($type)
 		}
 		// function for setting the items to "deleted = 1" which ensures that comments, likes etc. are not shown anymore
 		// to the user and the contacts of the users (drop_items() do all the necessary magic to avoid orphans in database and federate deletion)
-		Item::deleteById($photo_item[0]['id']);
+		Item::deleteById($photo_item[0]['id'], PRIORITY_HIGH, api_user());
 
 		$answer = ['result' => 'deleted', 'message' => 'photo with id `' . $photo_id . '` has been deleted from server.'];
 		return api_format_data("photo_delete", $type, ['$result' => $answer]);
