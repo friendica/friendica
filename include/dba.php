@@ -14,6 +14,8 @@ use Friendica\Util\DateTimeFormat;
  */
 
 class dba {
+	const RETRY_CONNECTIONS = 5;
+
 	public static $connected = false;
 
 	private static $_server_info = '';
@@ -202,19 +204,30 @@ class dba {
 
 	public static function connected() {
 		$connected = false;
+		$retry = 1;
 
-		switch (self::$driver) {
-			case 'pdo':
-				$r = dba::p("SELECT 1");
-				if (DBM::is_result($r)) {
-					$row = dba::inArray($r);
-					$connected = ($row[0]['1'] == '1');
-				}
+		while($retry <= self::RETRY_CONNECTIONS) {
+			switch (self::$driver) {
+				case 'pdo':
+					$r = dba::p("SELECT 1");
+					if (DBM::is_result($r)) {
+						$row = dba::inArray($r);
+						$connected = ($row[0]['1'] == '1');
+					}
+					break;
+				case 'mysqli':
+					$connected = self::$db->ping();
+					break;
+			}
+
+			if (!$connected) {
+				logger('Connection lost (Retry ' . $retry . ' / ' . self::RETRY_CONNECTIONS . ')');
+				$retry++;
+			} else {
 				break;
-			case 'mysqli':
-				$connected = self::$db->ping();
-				break;
+			}
 		}
+
 		return $connected;
 	}
 
