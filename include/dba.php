@@ -14,7 +14,7 @@ use Friendica\Util\DateTimeFormat;
  */
 
 class dba {
-	const RETRY_CONNECTIONS = 5;
+	const CONNECTION_RETRIES = 5;
 
 	public static $connected = false;
 
@@ -206,7 +206,7 @@ class dba {
 		$connected = false;
 		$retry = 1;
 
-		while($retry <= self::RETRY_CONNECTIONS) {
+		while($retry <= self::CONNECTION_RETRIES) {
 			switch (self::$driver) {
 				case 'pdo':
 					$r = dba::p("SELECT 1");
@@ -221,7 +221,7 @@ class dba {
 			}
 
 			if (!$connected) {
-				logger('Connection lost (Retry ' . $retry . ' / ' . self::RETRY_CONNECTIONS . ')');
+				logger('Connection lost (Retry ' . $retry . ' / ' . self::CONNECTION_RETRIES . ')');
 				$retry++;
 			} else {
 				break;
