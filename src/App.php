@@ -976,6 +976,7 @@ class App
 		if ($cat === 'config') {
 			$this->config[$k] = $value;
 		} else {
+			$this->setConfigRecursively([$cat]);
 			$this->config[$cat][$k] = $value;
 		}
 	}
@@ -1033,7 +1034,7 @@ class App
 	{
 		// Only arrays are serialized in database, so we have to unserialize sparingly
 		$value = is_string($v) && preg_match("|^a:[0-9]+:{.*}$|s", $v) ? unserialize($v) : $v;
-
+		$this->setConfigRecursively([$uid, $cat]);
 		$this->config[$uid][$cat][$k] = $value;
 	}
 
@@ -1050,6 +1051,19 @@ class App
 			unset($this->config[$uid][$cat][$k]);
 		}
 	}
+
+  /**
+	 * Create config keys recursively
+	 *
+	 * @param array  $keys  List of keys to nest
+	 */
+	 private function setConfigRecursively($keys) {
+		 $arr = &$this->config;
+		 foreach($keys as $k) {
+			 if (!isset($arr[$k])) $arr[$k] = [];
+			 $arr = &$arr[$k];
+		 }
+	 }
 
 	/**
 	 * Generates the site's default sender email address
