@@ -2,22 +2,6 @@
 var batchConfirmed = false;
 
 $(document).ready(function() {
-	// Add contact_filter autocompletion to the search field.
-	$("#contacts-search").contact_filter(baseurl + '/acl', 'r', true);
-
-	// Hide the viewcontact_wrapper if there is an input in the search field
-	// We are doing this to let the the contact_filter replace the original
-	// shown contacts.
-	$("#contacts-search").keyup(function(){
-		var elText = $(this).val();
-		if (elText.length !== 0) {
-			$("#viewcontact_wrapper").hide();
-			$("ul.textcomplete-dropdown").addClass("show media-list");
-		} else {
-			$("#viewcontact_wrapper").show();
-			$("ul.textcomplete-dropdown").removeClass("show");
-		}
-	});
 	// Initiale autosize for the textareas.
 	autosize($("textarea.text-autosize"));
 
@@ -40,7 +24,7 @@ $(document).ready(function() {
  *
  * @param {string} name The name of the batch action.
  * @param {string} value If it isn't empty the action will be posted.
- * 
+ *
  * @return {void}
  */
 function batch_submit_handler(name, value) {
