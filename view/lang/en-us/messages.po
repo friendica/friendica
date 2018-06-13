@@ -268,7 +268,7 @@ msgid ""
 "communication - such as private messaging and some profile interactions. If "
 "this is a celebrity or community page, these settings were applied "
 "automatically."
-msgstr "'%1$s' has chosen to accept you as fan, which restricts some forms of communication - such as private messaging and some profile interactions. If this is a celebrity or community page, these settings were applied automatically."
+msgstr "'%1$s' has chosen to accept you as a fan, which restricts some forms of communication - such as private messaging and some profile interactions. If this is a celebrity or community page, these settings were applied automatically."
 
 #: include/enotify.php:348
 #, php-format
@@ -337,21 +337,21 @@ msgstr "Cannot locate DNS info for database server '%s'"
 #, php-format
 msgid "Daily posting limit of %d post reached. The post was rejected."
 msgid_plural "Daily posting limit of %d posts reached. The post was rejected."
-msgstr[0] "Daily posting limit of %d post are reached. The post was rejected."
-msgstr[1] "Daily posting limit of %d posts are reached. This post was rejected."
+msgstr[0] "Daily posting limit of %d post reached. The post was rejected."
+msgstr[1] "Daily posting limit of %d posts reached. This post was rejected."
 
 #: include/api.php:1226
 #, php-format
 msgid "Weekly posting limit of %d post reached. The post was rejected."
 msgid_plural ""
 "Weekly posting limit of %d posts reached. The post was rejected."
-msgstr[0] "Weekly posting limit of %d post are reached. The post was rejected."
-msgstr[1] "Weekly posting limit of %d posts are reached. This post was rejected."
+msgstr[0] "Weekly posting limit of %d post reached. The post was rejected."
+msgstr[1] "Weekly posting limit of %d posts reached. This post was rejected."
 
 #: include/api.php:1250
 #, php-format
 msgid "Monthly posting limit of %d post reached. The post was rejected."
-msgstr "Monthly posting limit of %d posts are reached. This post was rejected."
+msgstr "Monthly posting limit of %d posts reached. This post was rejected."
 
 #: include/api.php:4522 mod/photos.php:88 mod/photos.php:194
 #: mod/photos.php:722 mod/photos.php:1149 mod/photos.php:1166
@@ -560,12 +560,12 @@ msgstr "%s attends."
 #: include/conversation.php:1160
 #, php-format
 msgid "%s doesn't attend."
-msgstr "%s doesn't attend."
+msgstr "%s won't attend."
 
 #: include/conversation.php:1163
 #, php-format
 msgid "%s attends maybe."
-msgstr "%s may attend."
+msgstr "%s might attend."
 
 #: include/conversation.php:1174
 msgid "and"
@@ -609,7 +609,7 @@ msgstr "%s attend."
 #: include/conversation.php:1201
 #, php-format
 msgid "<span  %1$s>%2$d people</span> don't attend"
-msgstr "<span  %1$s>%2$d people</span> don't attend"
+msgstr "<span  %1$s>%2$d people</span> won't attend"
 
 #: include/conversation.php:1202
 #, php-format
@@ -619,12 +619,12 @@ msgstr "%s don't attend."
 #: include/conversation.php:1205
 #, php-format
 msgid "<span  %1$s>%2$d people</span> attend maybe"
-msgstr "<span  %1$s>%2$d people</span> attend maybe"
+msgstr "<span  %1$s>%2$d people</span> might attend"
 
 #: include/conversation.php:1206
 #, php-format
 msgid "%s attend maybe."
-msgstr "%s may be attending."
+msgstr "%s might attend."
 
 #: include/conversation.php:1236 include/conversation.php:1252
 msgid "Visible to <strong>everybody</strong>"
@@ -1744,7 +1744,7 @@ msgstr "Public access denied."
 
 #: mod/probe.php:14 mod/webfinger.php:17
 msgid "Only logged in users are permitted to perform a probing."
-msgstr "Only logged in users are permitted to perform a probing."
+msgstr "Only logged in users are permitted to use the Probe feature."
 
 #: mod/profperm.php:28 mod/group.php:83 index.php:435
 msgid "Permission denied"
@@ -1801,7 +1801,7 @@ msgstr "Too many requests"
 
 #: mod/search.php:130
 msgid "Only one search per minute is permitted for not logged in users."
-msgstr "Only one search per minute is permitted for not logged in users."
+msgstr "Only one search per minute is permitted for non-logged-in users."
 
 #: mod/search.php:228 mod/community.php:141
 msgid "No results."
@@ -1857,7 +1857,7 @@ msgid ""
 "Export your accout info, contacts and all your items as json. Could be a "
 "very big file, and could take a lot of time. Use this to make a full backup "
 "of your account (photos are not exported)"
-msgstr "Export your account info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)"
+msgstr "Export your account info, contacts, and all your items as JSON. This could be a very big file, and could take a lot of time. Use this to make a full backup of your account. Photos are not exported."
 
 #: mod/uexport.php:52 mod/settings.php:108
 msgid "Export personal data"
@@ -2040,7 +2040,7 @@ msgstr "%1$s was tagged in %2$s by %3$s"
 
 #: mod/photos.php:769
 msgid "Image upload didn't complete, please try again"
-msgstr "Image upload didn't complete, please try again"
+msgstr "Image upload didn't complete. Please try again."
 
 #: mod/photos.php:772
 msgid "Image file is missing"
@@ -2050,7 +2050,7 @@ msgstr "Image file is missing"
 msgid ""
 "Server can't accept new file upload at this time, please contact your "
 "administrator"
-msgstr "Server can't accept new file upload at this time, please contact your administrator"
+msgstr "Server can't accept new file uploads at this time. Please contact your administrator."
 
 #: mod/photos.php:803
 msgid "Image file is empty."
@@ -2397,7 +2397,7 @@ msgid ""
 "Fetch information like preview pictures, title and teaser from the feed "
 "item. You can activate this if the feed doesn't contain much text. Keywords "
 "are taken from the meta header in the feed item and are posted as hash tags."
-msgstr "Fetch information like preview pictures, title and teaser from the feed item. You can activate this if the feed doesn't contain much text. Keywords are taken from the meta header in the feed item and are posted as hash tags."
+msgstr "Fetch information like preview pictures, title, and teaser from the feed item. You can activate this if the feed doesn't contain much text. Keywords are taken from the meta header in the feed item and are posted as hash tags."
 
 #: mod/contacts.php:572 mod/admin.php:1288 mod/admin.php:1450
 #: mod/admin.php:1460
@@ -2487,7 +2487,7 @@ msgstr "Block"
 
 #: mod/contacts.php:638 mod/contacts.php:828 mod/contacts.php:1019
 msgid "Unignore"
-msgstr "Unignore"
+msgstr "Un-Ignore"
 
 #: mod/contacts.php:638 mod/contacts.php:828 mod/contacts.php:1019
 #: mod/notifications.php:62 mod/notifications.php:181
@@ -2536,7 +2536,7 @@ msgstr "Blacklisted keywords"
 msgid ""
 "Comma separated list of keywords that should not be converted to hashtags, "
 "when \"Fetch information and keywords\" is selected"
-msgstr "Comma separated list of keywords that should not be converted to hashtags, when \"Fetch information and keywords\" is selected"
+msgstr "Comma-separated list of keywords that should not be converted to hashtags, when \"Fetch information and keywords\" is selected"
 
 #: mod/contacts.php:656 mod/unfollow.php:122 mod/follow.php:166
 #: mod/admin.php:494 mod/admin.php:504 mod/notifications.php:256
@@ -2651,7 +2651,7 @@ msgstr "Archive"
 
 #: mod/contacts.php:829 mod/contacts.php:1027
 msgid "Unarchive"
-msgstr "Unarchive"
+msgstr "Un-Archive"
 
 #: mod/contacts.php:832
 msgid "Batch Actions"
@@ -3059,7 +3059,7 @@ msgid ""
 "\n"
 "\t\tYour password will not be changed unless we can verify that you\n"
 "\t\tissued this request."
-msgstr "\n\t\tDear %1$s,\n\t\t\tA request was received at \"%2$s\" to reset your account password\n\t\tTo confirm this request, please select the verification link\n\t\tbelow or paste it into your web browser's address bar.\n\n\t\tIf you did NOT request this change, please DO NOT follow the link\n\t\tprovided; ignore or delete this email, as the request will expire shortly.\n\n\t\tYour password will not be changed unless we can verify that you\n\t\tissued this request."
+msgstr "\n\t\tDear %1$s,\n\t\t\tA request was received at \"%2$s\" to reset your account password.\n\t\tTo confirm this request, please select the verification link\n\t\tbelow or paste it into your web browser's address bar.\n\n\t\tIf you did NOT request this change, please DO NOT follow the link\n\t\tprovided; ignore or delete this email, as the request will expire shortly.\n\n\t\tYour password will not be changed unless we can verify that you\n\t\tissued this request."
 
 #: mod/lostpass.php:56
 #, php-format
@@ -3380,7 +3380,7 @@ msgid ""
 "web that is owned and controlled by its members. They can also connect with "
 "many traditional social networks. See %s for a list of alternate Friendica "
 "sites you can join."
-msgstr "Friendica sites are all inter-connect to create a large privacy-enhanced social web that is owned and controlled by its members. They can also connect with many traditional social networks. See %s for a list of alternate Friendica sites you can join."
+msgstr "Friendica sites are all inter-connected to create a large privacy-enhanced social web that is owned and controlled by its members. They can also connect with many traditional social networks. See %s for a list of alternate Friendica sites you can join."
 
 #: mod/invite.php:137
 msgid ""
@@ -3393,7 +3393,7 @@ msgid ""
 "Friendica sites all inter-connect to create a huge privacy-enhanced social "
 "web that is owned and controlled by its members. They can also connect with "
 "many traditional social networks."
-msgstr "Friendica sites are all inter-connect to create a huge privacy-enhanced social web that is owned and controlled by its members. Each site can also connect with many traditional social networks."
+msgstr "Friendica sites are all inter-connected to create a huge privacy-enhanced social web that is owned and controlled by its members. Each site can also connect with many traditional social networks."
 
 #: mod/invite.php:140
 #, php-format
@@ -3441,12 +3441,12 @@ msgid ""
 msgid_plural ""
 "Warning: This group contains %s members from a network that doesn't allow "
 "non public messages."
-msgstr[0] "Warning: This group contains %s member from a network that doesn't allow non public messages."
-msgstr[1] "Warning: This group contains %s members from a network that doesn't allow non public messages."
+msgstr[0] "Warning: This group contains %s member from a network that doesn't allow non-public messages."
+msgstr[1] "Warning: This group contains %s members from a network that doesn't allow non-public messages."
 
 #: mod/network.php:550
 msgid "Messages in this group won't be send to these receivers."
-msgstr "Messages in this group won't be send to these receivers."
+msgstr "Messages in this group won't be sent to these receivers."
 
 #: mod/network.php:618
 msgid "No such group"
@@ -3530,7 +3530,7 @@ msgstr "Contact update failed."
 msgid ""
 "<strong>WARNING: This is highly advanced</strong> and if you enter incorrect"
 " information your communications with this contact may stop working."
-msgstr "<strong>Warning: These are highly advanced settings.</strong> If you enter incorrect information your communications with this contact may not working."
+msgstr "<strong>Warning: These are highly advanced settings.</strong> If you enter incorrect information your communications with this contact might not work."
 
 #: mod/crepair.php:115
 msgid ""
@@ -4033,7 +4033,7 @@ msgstr "Display Terms of Service"
 msgid ""
 "Enable the Terms of Service page. If this is enabled a link to the terms "
 "will be added to the registration form and the general information page."
-msgstr "Enable the Terms of Service page. If this is enabled a link to the terms will be added to the registration form and the general information page."
+msgstr "Enable the Terms of Service page. If this is enabled, a link to the terms will be added to the registration form and to the general information page."
 
 #: mod/admin.php:306
 msgid "Display Privacy Statement"
@@ -4044,7 +4044,7 @@ msgstr "Display Privacy Statement"
 msgid ""
 "Show some informations regarding the needed information to operate the node "
 "according e.g. to <a href=\"%s\" target=\"_blank\">EU-GDPR</a>."
-msgstr "Show some informations regarding the needed information to operate the node according e.g. to <a href=\"%s\" target=\"_blank\">EU-GDPR</a>."
+msgstr "Show some information needed, for example, to comply with <a href=\"%s\" target=\"_blank\">EU-GDPR</a>."
 
 #: mod/admin.php:307
 msgid "Privacy Statement Preview"
@@ -4082,14 +4082,14 @@ msgid ""
 "network that are not allowed to interact with your node. For all entered "
 "domains you should also give a reason why you have blocked the remote "
 "server."
-msgstr "This page can be used to define a black list of servers from the federated network that are not allowed to interact with your node. For all entered domains you should also give a reason why you have blocked the remote server."
+msgstr "This page can be used to define a blacklist of servers from the federated network that are not allowed to interact with your node. For all entered domains, you should also give a reason why you have blocked the remote server."
 
 #: mod/admin.php:368
 msgid ""
 "The list of blocked servers will be made publically available on the "
 "/friendica page so that your users and people investigating communication "
 "problems can find the reason easily."
-msgstr "The list of blocked servers will publicly available on the Friendica page so that your users and people investigating communication problems can readily find the reason."
+msgstr "The list of blocked servers will be available publicly on the Friendica page so that your users and people investigating communication problems can find the reason."
 
 #: mod/admin.php:369
 msgid "Add new entry to block list"
@@ -4244,7 +4244,7 @@ msgid ""
 "This page offers you some numbers to the known part of the federated social "
 "network your Friendica node is part of. These numbers are not complete but "
 "only reflect the part of the network your node is aware of."
-msgstr "This page offers you the amount of known part of the federated social network your Friendica node is part of. These numbers are not complete and only reflect the part of the network your node is aware of."
+msgstr "This page offers statistics about the federated social network, of which your Friendica node is one part. These numbers do not represent the entire network, but merely the parts that are connected to your node."
 
 #: mod/admin.php:716
 msgid ""
@@ -4257,7 +4257,7 @@ msgstr "The <em>Auto Discovered Contact Directory</em> feature is not enabled; e
 msgid ""
 "Currently this node is aware of %d nodes with %d registered users from the "
 "following platforms:"
-msgstr "Currently this node is aware of %d nodes with %d registered users from the following platforms:"
+msgstr "Currently, this node is aware of %d nodes with %d registered users from the following platforms:"
 
 #: mod/admin.php:759
 msgid "ID"
@@ -4289,7 +4289,7 @@ msgid ""
 "This page lists the content of the queue for outgoing postings. These are "
 "postings the initial delivery failed for. They will be resend later and "
 "eventually deleted if the delivery fails permanently."
-msgstr "This page lists the content of the queue for outgoing postings. These are postings the initial delivery failed for. They will be resend later and eventually deleted if the delivery fails permanently."
+msgstr "This page lists the content of the queue for outgoing postings. These are postings for which the initial delivery failed. They will be resent later, and eventually deleted if the delivery fails permanently."
 
 #: mod/admin.php:789
 #, php-format
@@ -4300,7 +4300,7 @@ msgid ""
 "converting the table engines. You may also use the command <tt>php "
 "bin/console.php dbstructure toinnodb</tt> of your Friendica installation for"
 " an automatic conversion.<br />"
-msgstr "Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href=\"%s\">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />"
+msgstr "Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB-only features in the future, you should change this! See <a href=\"%s\">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />"
 
 #: mod/admin.php:796
 #, php-format
@@ -4429,7 +4429,7 @@ msgstr "Half a year"
 
 #: mod/admin.php:1298
 msgid "One year"
-msgstr "One a year"
+msgstr "One year"
 
 #: mod/admin.php:1303
 msgid "Multi user instance"
@@ -4642,7 +4642,7 @@ msgstr "JPEG image quality"
 msgid ""
 "Uploaded JPEGS will be saved at this quality setting [0-100]. Default is "
 "100, which is full quality."
-msgstr "Uploaded JPEGS will be saved at this quality setting [0-100]. Default is 100, which is the original quality level."
+msgstr "Uploaded JPEGs will be saved at this quality setting [0-100]. Default is 100, which is the original quality level."
 
 #: mod/admin.php:1389
 msgid "Register policy"
@@ -4868,7 +4868,7 @@ msgid ""
 "Normally we import every content from our OStatus contacts. With this option"
 " we only store threads that are started by a contact that is known on our "
 "system."
-msgstr "Normally we import every content from our OStatus contacts. With this option we only store threads that are started by a contact that is known on our system."
+msgstr "Normally we import all content from our OStatus contacts. With this option we only store threads that are started by a contact that is known on our system."
 
 #: mod/admin.php:1412
 msgid "OStatus support can only be enabled if threading is enabled."
@@ -4988,7 +4988,7 @@ msgstr "Days between enquiry"
 
 #: mod/admin.php:1428
 msgid "Number of days after which a server is requeried for his contacts."
-msgstr "Number of days after which a server is required check contacts."
+msgstr "Number of days after which a server is rechecked for contacts."
 
 #: mod/admin.php:1429
 msgid "Discover contacts from other servers"
@@ -5063,7 +5063,7 @@ msgstr "Clean database"
 msgid ""
 "Remove old remote items, orphaned database records and old content from some"
 " other helper tables."
-msgstr "Remove old remote items, orphaned database records and old content from some other helper tables."
+msgstr "Remove old remote items, orphaned database records, and old content from some other helper tables."
 
 #: mod/admin.php:1438
 msgid "Lifespan of remote items"
@@ -5074,7 +5074,7 @@ msgid ""
 "When the database cleanup is enabled, this defines the days after which "
 "remote items will be deleted. Own items, and marked or filed items are "
 "always kept. 0 disables this behaviour."
-msgstr "When the database cleanup is enabled, this defines the days after which remote items will be deleted. Own items, and marked or filed items are always kept. 0 disables this behaviour."
+msgstr "When the database cleanup is enabled, this defines the days after which remote items will be deleted. Own items, and marked or filed items, are always kept. 0 disables this behaviour."
 
 #: mod/admin.php:1439
 msgid "Lifespan of unclaimed items"
@@ -5094,7 +5094,7 @@ msgstr "Path to item cache"
 
 #: mod/admin.php:1440
 msgid "The item caches buffers generated bbcode and external images."
-msgstr "The item caches buffers generated bbcode and external images."
+msgstr "The item cache retains expanded bbcode and external images."
 
 #: mod/admin.php:1441
 msgid "Cache duration in seconds"
@@ -5108,7 +5108,7 @@ msgstr "How long should cache files be held? (Default 86400 seconds - one day;  
 
 #: mod/admin.php:1442
 msgid "Maximum numbers of comments per post"
-msgstr "Maximum numbers of comments per post"
+msgstr "Maximum number of comments per post"
 
 #: mod/admin.php:1442
 msgid "How much comments should be shown for each post? Default value is 100."
@@ -5122,7 +5122,7 @@ msgstr "Temp path"
 msgid ""
 "If you have a restricted system where the webserver can't access the system "
 "temp path, enter another path here."
-msgstr "Enter a different tmp path, if your system restricts the webserver's access to the system temp path."
+msgstr "Enter a different temp path if your system restricts the webserver's access to the system temp path."
 
 #: mod/admin.php:1444
 msgid "Base path to installation"
@@ -5151,7 +5151,7 @@ msgstr "Only search in tags"
 
 #: mod/admin.php:1446
 msgid "On large systems the text search can slow down the system extremely."
-msgstr "On large systems the text search can slow down the system significantly."
+msgstr "On large systems, the text search can slow down the system significantly."
 
 #: mod/admin.php:1448
 msgid "New base url"
@@ -5161,7 +5161,7 @@ msgstr "New base URL"
 msgid ""
 "Change base url for this server. Sends relocate message to all Friendica and"
 " Diaspora* contacts of all users."
-msgstr "Change base url for this server. Sends relocate message to all Friendica and Diaspora* contacts of all users."
+msgstr "Change base URL for this server. Sends a relocate message to all Friendica and Diaspora* contacts for all users."
 
 #: mod/admin.php:1450
 msgid "RINO Encryption"
@@ -5183,7 +5183,7 @@ msgstr "Maximum number of parallel workers"
 msgid ""
 "On shared hosters set this to 2. On larger systems, values of 10 are great. "
 "Default value is 4."
-msgstr "On shared hosts set this to 2. On larger systems, values of 10 are great. Default value is 4."
+msgstr "On shared hosts, set this to 2. On larger systems, values of 10 are great. Default value is 4."
 
 #: mod/admin.php:1453
 msgid "Don't use 'proc_open' with the worker"
@@ -5194,7 +5194,7 @@ msgid ""
 "Enable this if your system doesn't allow the use of 'proc_open'. This can "
 "happen on shared hosters. If this is enabled you should increase the "
 "frequency of worker calls in your crontab."
-msgstr "Enable this if your system doesn't allow the use of 'proc_open'. This can happen on shared hosters. If this is enabled you should increase the frequency of worker calls in your crontab."
+msgstr "Enable this if your system doesn't allow the use of 'proc_open'. This can happen on shared hosters. If this is enabled, you should increase the frequency of worker calls in your crontab."
 
 #: mod/admin.php:1454
 msgid "Enable fastlane"
@@ -5218,7 +5218,7 @@ msgid ""
 "might want to call %s/worker on a regular basis via an external cron job. "
 "You should only enable this option if you cannot utilize cron/scheduled jobs"
 " on your server."
-msgstr "When enabled the Worker process is triggered when backend access is performed \\x28e.g. messages being delivered\\x29. On smaller sites you might want to call %s/worker on a regular basis via an external cron job. You should only enable this option if you cannot utilize cron/scheduled jobs on your server."
+msgstr "When enabled, the Worker process is triggered when backend access is performed \\x28e.g. messages being delivered\\x29. On smaller sites, you might want to call %s/worker on a regular basis via an external cron job. You should only enable this option if you cannot utilize cron/scheduled jobs on your server."
 
 #: mod/admin.php:1457
 msgid "Subscribe to relay"
@@ -5228,7 +5228,7 @@ msgstr "Subscribe to relay"
 msgid ""
 "Enables the receiving of public posts from the relay. They will be included "
 "in the search, subscribed tags and on the global community page."
-msgstr "Receive public posts from the specified relay. Post will be included in searches, subscribed tags and on the global community page."
+msgstr "Receive public posts from the specified relay. Post will be included in searches, subscribed tags, and on the global community page."
 
 #: mod/admin.php:1458
 msgid "Relay server"
@@ -5238,7 +5238,7 @@ msgstr "Relay server"
 msgid ""
 "Address of the relay server where public posts should be send to. For "
 "example https://relay.diasp.org"
-msgstr "Address of the relay server where public posts should be send to. For example https://relay.diasp.org"
+msgstr "Address of the relay server where public posts should be sent. For example https://relay.diasp.org"
 
 #: mod/admin.php:1459
 msgid "Direct relay transfer"
@@ -5274,7 +5274,7 @@ msgstr "Server tags"
 
 #: mod/admin.php:1461
 msgid "Comma separated list of tags for the 'tags' subscription."
-msgstr "Comma separated tags for subscription."
+msgstr "Comma-separated tags for subscription."
 
 #: mod/admin.php:1462
 msgid "Allow user tags"
@@ -5298,12 +5298,12 @@ msgstr "Database structure update %s was successfully applied."
 #: mod/admin.php:1500
 #, php-format
 msgid "Executing of database structure update %s failed with error: %s"
-msgstr "Executing of database structure update %s failed with error: %s"
+msgstr "Execution of database structure update %s failed with error: %s"
 
 #: mod/admin.php:1513
 #, php-format
 msgid "Executing %s failed with error: %s"
-msgstr "Executing %s failed with error: %s"
+msgstr "Execution of %s failed with error: %s"
 
 #: mod/admin.php:1515
 #, php-format
@@ -5528,7 +5528,7 @@ msgstr "Deleted since"
 msgid ""
 "Selected users will be deleted!\\n\\nEverything these users had posted on "
 "this site will be permanently deleted!\\n\\nAre you sure?"
-msgstr "Selected users will be deleted!\\n\\nEverything these users has posted on this site will be permanently deleted!\\n\\nAre you sure?"
+msgstr "Selected users will be deleted!\\n\\nEverything these users have posted on this site will be permanently deleted!\\n\\nAre you sure?"
 
 #: mod/admin.php:1841
 msgid ""
@@ -5747,7 +5747,7 @@ msgstr "Our site encryption key is apparently messed up."
 
 #: mod/dfrn_confirm.php:471
 msgid "Empty site URL was provided or URL could not be decrypted by us."
-msgstr "An empty URL was provided or the URL could not be decrypted by us."
+msgstr "An empty URL was provided, or the URL could not be decrypted by us."
 
 #: mod/dfrn_confirm.php:487
 msgid "Contact record was not found for you on our site."
@@ -6020,7 +6020,7 @@ msgstr "Shall your connection be in both directions or not?"
 msgid ""
 "Accepting %s as a friend allows %s to subscribe to your posts, and you will "
 "also receive updates from them in your news feed."
-msgstr "Accepting %s as a friend allows %s to subscribe to your posts; you will also receive updates from them in your news feed."
+msgstr "Accepting %s as a friend allows %s to subscribe to your posts. You will also receive updates from them in your news feed."
 
 #: mod/notifications.php:201
 #, php-format
@@ -6418,7 +6418,7 @@ msgstr "Registration successful. Please check your email for further instruction
 msgid ""
 "Failed to send email message. Here your accout details:<br> login: %s<br> "
 "password: %s<br><br>You can change your password after login."
-msgstr "Failed to send email message. Here your account details:<br> login: %s<br> password: %s<br><br>You can change your password after login."
+msgstr "Failed to send email message. Here are your account details:<br> login: %s<br> password: %s<br><br>You can change your password after login."
 
 #: mod/register.php:111
 msgid "Registration successful."
@@ -6458,7 +6458,7 @@ msgstr "Note for the admin"
 
 #: mod/register.php:262
 msgid "Leave a message for the admin, why you want to join this node"
-msgstr "Leave a message for the admin, why you want to join this node."
+msgstr "Leave a message for the admin. Why do you want to join this node?"
 
 #: mod/register.php:263
 msgid "Membership on this site is by invitation only."
@@ -6476,7 +6476,7 @@ msgstr "Your full name: "
 msgid ""
 "Your Email Address: (Initial information will be send there, so this has to "
 "be an existing address.)"
-msgstr "Your Email Address: (Initial information will be send there; so this must be an existing address.)"
+msgstr "Your Email Address: (Initial information will be sent there, so this must be an existing address.)"
 
 #: mod/register.php:276 mod/settings.php:1190
 msgid "New Password:"
@@ -6517,7 +6517,7 @@ msgstr "User deleted their account"
 msgid ""
 "On your Friendica node an user deleted their account. Please ensure that "
 "their data is removed from the backups."
-msgstr "On your Friendica node a user deleted their account. Please ensure that their data is removed from the backups."
+msgstr "A user deleted his or her account on your Friendica node. Please ensure these data are removed from the backups."
 
 #: mod/removeme.php:46
 #, php-format
@@ -6580,7 +6580,7 @@ msgstr "Features updated"
 
 #: mod/settings.php:372
 msgid "Relocate message has been send to your contacts"
-msgstr "Relocate message has been send to your contacts"
+msgstr "Relocate message has been sent to your contacts"
 
 #: mod/settings.php:384 src/Model/User.php:339
 msgid "Passwords do not match. Password unchanged."
@@ -6870,7 +6870,7 @@ msgstr "Suppress warning of insecure networks"
 msgid ""
 "Should the system suppress the warning that the current group contains "
 "members of networks that can't receive non public postings."
-msgstr "Suppresses warnings if groups contains members whose networks cannot receive non-public postings."
+msgstr "Suppresses warnings if groups contain members whose networks cannot receive non-public postings."
 
 #: mod/settings.php:960
 msgid "Update browser every xx seconds"
@@ -7229,7 +7229,7 @@ msgstr "Maximum friend requests per day:"
 
 #: mod/settings.php:1208 mod/settings.php:1237
 msgid "(to prevent spam abuse)"
-msgstr "May prevent spam or abuse registrations"
+msgstr "May prevent spam and abusive registrations"
 
 #: mod/settings.php:1209
 msgid "Default Post Permissions"
@@ -7327,7 +7327,7 @@ msgstr "Advanced account types"
 
 #: mod/settings.php:1262
 msgid "Change the behaviour of this account for special situations"
-msgstr "Change behaviour of this account for special situations"
+msgstr "Change behavior of this account for special situations"
 
 #: mod/settings.php:1265
 msgid "Relocate"
@@ -7421,7 +7421,7 @@ msgstr "Note"
 
 #: view/theme/frio/config.php:114
 msgid "Check image permissions if all users are allowed to see the image"
-msgstr "Check image permissions that all everyone is allowed to see the image"
+msgstr "Check image permissions that everyone is allowed to see the image"
 
 #: view/theme/frio/config.php:121
 msgid "Select color scheme"
@@ -7928,7 +7928,7 @@ msgstr "This is most often a permission setting issue, as the web server may not
 msgid ""
 "At the end of this procedure, we will give you a text to save in a file "
 "named .htconfig.php in your Friendica top folder."
-msgstr "At the end of this procedure, we will give you a text to save in a file named .htconfig.php in your Friendica top-level directory."
+msgstr "At the end of this procedure, we will give you the text to save in a file named .htconfig.php in your Friendica top-level directory."
 
 #: src/Core/Install.php:323
 msgid ""
@@ -7957,7 +7957,7 @@ msgstr "In order to store these compiled templates, the web server needs to have
 msgid ""
 "Please ensure that the user that your web server runs as (e.g. www-data) has"
 " write access to this folder."
-msgstr "Please ensure the user (e.g. www-data) that your web server runs as has write access to this directory."
+msgstr "Please ensure the user that your web server runs as (e.g. www-data) can write to this directory."
 
 #: src/Core/Install.php:347
 msgid ""
@@ -8483,7 +8483,7 @@ msgstr "Photo location"
 msgid ""
 "Photo metadata is normally stripped. This extracts the location (if present)"
 " prior to stripping metadata and links it to a map."
-msgstr "Photo metadata is normally removed. This extracts the location (if present) prior to removing metadata and links it to a map."
+msgstr "Photo metadata is normally removed. This saves the geo tag (if present) and links it to a map prior to removing other metadata."
 
 #: src/Content/Feature.php:83
 msgid "Export Public Calendar"
@@ -8528,7 +8528,7 @@ msgstr "List forums"
 
 #: src/Content/Feature.php:97
 msgid "Enable widget to display the forums your are connected with"
-msgstr "Enable widget to display the forums your are connected with"
+msgstr "Enable widget to display the forums you are connected with"
 
 #: src/Content/Feature.php:98
 msgid "Group Filter"
@@ -8596,7 +8596,7 @@ msgstr "Edit sent posts"
 
 #: src/Content/Feature.php:115
 msgid "Edit and correct posts and comments after sending"
-msgstr "Ability to editing posts and comments after sending"
+msgstr "Ability to edit posts and comments after sending"
 
 #: src/Content/Feature.php:116
 msgid "Tagging"
@@ -8752,7 +8752,7 @@ msgstr "See all notifications"
 
 #: src/Content/Nav.php:193
 msgid "Mark all system notifications seen"
-msgstr "Mark all system notifications seen"
+msgstr "Mark notifications as seen"
 
 #: src/Content/Nav.php:197
 msgid "Inbox"
