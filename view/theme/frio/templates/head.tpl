@@ -68,6 +68,12 @@
 <script type="text/javascript" src="view/asset/perfect-scrollbar/js/perfect-scrollbar.jquery.min.js"></script>
 <script type="text/javascript" src="view/js/acl.js"></script>
 <script type="text/javascript" src="view/asset/base64/base64.min.js"></script>
+<script type="text/javascript" src="view/js/addon-hooks.js"></script>
+{{if is_array($addon_hooks)}}
+{{foreach $addon_hooks as $addon_hook}}
+<script type="text/javascript" src="addon/{{$addon_hook}}/{{$addon_hook}}.js"></script>
+{{/foreach}}
+{{/if}}
 <script type="text/javascript" src="view/js/main.js"></script>
 
 <script type="text/javascript" src="view/theme/frio/frameworks/bootstrap/js/bootstrap.min.js"></script>
