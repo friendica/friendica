@@ -531,6 +531,7 @@ class App
 			'$touch_icon'      => $touch_icon,
 			'$stylesheet'      => $stylesheet,
 			'$infinite_scroll' => $invinite_scroll,
+			'$block_public'    => intval(Config::get('system', 'block_public')),
 		]) . $this->page['htmlhead'];
 	}
 
