@@ -92,7 +92,6 @@
 {{* own js files *}}
 <script type="text/javascript" src="view/theme/frio/js/theme.js"></script>
 <script type="text/javascript" src="view/theme/frio/js/modal.js"></script>
-<script type="text/javascript" src="view/theme/frio/js/hovercard.js"></script>
 <script type="text/javascript" src="view/theme/frio/js/textedit.js"></script>
 
 <script type="text/javascript">
