@@ -34,7 +34,7 @@ function notification($params)
 	$siteurl = System::baseUrl(true);
 	$thanks = L10n::t('Thank You,');
 	$sitename = $a->config['sitename'];
-	if (!x($a->config['admin_name'])) {
+	if (empty($a->config['admin_name'])) {
 		$site_admin = L10n::t('%s Administrator', $sitename);
 	} else {
 		$site_admin = L10n::t('%1$s, %2$s Administrator', $a->config['admin_name'], $sitename);
@@ -93,6 +93,8 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_MAIL) {
+		$itemlink = $siteurl.'/message/'.$params['item']['id'];
+
 		$subject = L10n::t('[Friendica:Notify] New mail received at %s', $sitename);
 
 		$preamble = L10n::t('%1$s sent you a new private message at %2$s.', $params['source_name'], $sitename);
@@ -101,7 +103,6 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to view and/or reply to your private messages.');
 		$tsitelink = sprintf($sitelink, $siteurl.'/message/'.$params['item']['id']);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'/message/'.$params['item']['id'].'">'.$sitename.'</a>');
-		$itemlink = $siteurl.'/message/'.$params['item']['id'];
 	}
 
 	if ($params['type'] == NOTIFY_COMMENT) {
@@ -130,10 +131,11 @@ function notification($params)
 		$item = null;
 
 		if ($params['otype'] === 'item' && $parent_id) {
-			$item = Item::selectFirstForUser($params['uid'], [], ['id' => $parent_id]);
+			$item = Item::selectFirstForUser($params['uid'], Item::ITEM_FIELDLIST, ['id' => $parent_id]);
 		}
 
 		$item_post_type = item_post_type($item);
+		$itemlink = $item['plink'];
 
 		// "a post"
 		$dest_str = L10n::t('%1$s commented on [url=%2$s]a %3$s[/url]',
@@ -607,7 +609,7 @@ function notification($params)
 			'$source_name'  => $datarray['source_name'],
 			'$source_link'  => $datarray['source_link'],
 			'$source_photo' => $datarray['source_photo'],
-			'$username'     => $datarray['to_name'],
+			'$username'     => $datarray['username'],
 			'$hsitelink'    => $datarray['hsitelink'],
 			'$hitemlink'    => $datarray['hitemlink'],
 			'$thanks'       => $datarray['thanks'],
@@ -628,7 +630,7 @@ function notification($params)
 			'$source_name'  => $datarray['source_name'],
 			'$source_link'  => $datarray['source_link'],
 			'$source_photo' => $datarray['source_photo'],
-			'$username'     => $datarray['to_name'],
+			'$username'     => $datarray['username'],
 			'$tsitelink'    => $datarray['tsitelink'],
 			'$titemlink'    => $datarray['titemlink'],
 			'$thanks'       => $datarray['thanks'],

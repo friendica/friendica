@@ -349,7 +349,10 @@ function localize_item(&$item)
 	// add sparkle links to appropriate permalinks
 	$author = ['uid' => 0, 'id' => $item['author-id'],
 		'network' => $item['author-network'], 'url' => $item['author-link']];
-	$item['plink'] = Contact::magicLinkbyContact($author, $item['plink']);
+
+	if (!empty($item['plink'])) {
+		$item['plink'] = Contact::magicLinkbyContact($author, $item['plink']);
+	}
 }
 
 /**
@@ -482,7 +485,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 		$profile_owner = $a->profile['uid'];
 		if (!$update) {
 			$live_update_div = '<div id="live-display"></div>' . "\r\n"
-				. "<script> var profile_uid = " . $_SESSION['uid'] . ";"
+				. "<script> var profile_uid = " . defaults($_SESSION, 'uid', 0) . ";"
 				. " var profile_page = 1; </script>";
 		}
 	} elseif ($mode === 'community') {

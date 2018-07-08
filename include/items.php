@@ -33,6 +33,8 @@ function add_page_info_data($data, $no_photos = false) {
 		$data["type"] = "link";
 	}
 
+	$data["title"] = defaults($data, "title", "");
+
 	if ((($data["type"] != "link") && ($data["type"] != "video") && ($data["type"] != "photo")) || ($data["title"] == $data["url"])) {
 		return "";
 	}
@@ -47,19 +49,19 @@ function add_page_info_data($data, $no_photos = false) {
 
 	$text = "[attachment type='".$data["type"]."'";
 
-	if ($data["text"] == "") {
+	if (empty($data["text"])) {
 		$data["text"] = $data["title"];
 	}
 
-	if ($data["text"] == "") {
+	if (empty($data["text"])) {
 		$data["text"] = $data["url"];
 	}
 
-	if ($data["url"] != "") {
+	if (!empty($data["url"])) {
 		$text .= " url='".$data["url"]."'";
 	}
 
-	if ($data["title"] != "") {
+	if (!empty($data["title"])) {
 		$text .= " title='".$data["title"]."'";
 	}
 

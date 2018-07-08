@@ -567,6 +567,8 @@ class BBCode extends BaseObject
 					throw new Exception('OEmbed is disabled for this attachment.');
 				}
 			} catch (Exception $e) {
+				$data["title"] = defaults($data, 'title', $data['url']);
+
 				if ($simplehtml != 4) {
 					$return = sprintf('<div class="type-%s">', $data["type"]);
 				}

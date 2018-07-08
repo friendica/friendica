@@ -69,6 +69,8 @@ class OStatus
 				}
 			}
 		}
+		$author["author-id"] = Contact::getIdForURL($author["author-link"]);
+
 		$author["contact-id"] = $contact["id"];
 
 		$contact = null;
@@ -325,12 +327,15 @@ class OStatus
 		$xpath->registerNamespace('statusnet', NAMESPACE_STATUSNET);
 
 		$hub = "";
-		$hub_attributes = $xpath->query("/atom:feed/atom:link[@rel='hub']")->item(0)->attributes;
-		if (is_object($hub_attributes)) {
-			foreach ($hub_attributes as $hub_attribute) {
-				if ($hub_attribute->name == "href") {
-					$hub = $hub_attribute->textContent;
-					logger("Found hub ".$hub, LOGGER_DEBUG);
+		$hub_items = $xpath->query("/atom:feed/atom:link[@rel='hub']")->item(0);
+		if (is_object($hub_items)) {
+			$hub_attributes = $hub_items->attributes;
+			if (is_object($hub_attributes)) {
+				foreach ($hub_attributes as $hub_attribute) {
+					if ($hub_attribute->name == "href") {
+						$hub = $hub_attribute->textContent;
+						logger("Found hub ".$hub, LOGGER_DEBUG);
+					}
 				}
 			}
 		}
@@ -390,7 +395,7 @@ class OStatus
 				$author = self::fetchAuthor($xpath, $entry, $importer, $contact, $stored);
 			}
 
-			$value = XML::getFirstNodeValue($xpath, 'atom:author/poco:preferredUsername/text()', $context);
+			$value = XML::getFirstNodeValue($xpath, 'atom:author/poco:preferredUsername/text()', $entry);
 			if ($value != "") {
 				$nickname = $value;
 			} else {
@@ -611,9 +616,12 @@ class OStatus
 				foreach ($category->attributes as $attributes) {
 					if ($attributes->name == "term") {
 						$term = $attributes->textContent;
-						if (strlen($item["tag"])) {
+						if (!empty($item["tag"])) {
 							$item["tag"] .= ',';
+						} else {
+							$item["tag"] = '';
 						}
+
 						$item["tag"] .= "#[url=".System::baseUrl()."/search?tag=".$term."]".$term."[/url]";
 					}
 				}
@@ -1055,7 +1063,7 @@ class OStatus
 		foreach ($links as $link) {
 			$attribute = self::readAttributes($link);
 
-			if (($attribute['rel'] != "") && ($attribute['href'] != "")) {
+			if (!empty($attribute['rel']) && !empty($attribute['href'])) {
 				switch ($attribute['rel']) {
 					case "alternate":
 						$item["plink"] = $attribute['href'];
@@ -1972,10 +1980,10 @@ class OStatus
 			if (isset($parent_item)) {
 				$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $parent_item]);
 				if (DBM::is_result($conversation)) {
-					if ($r['conversation-uri'] != '') {
+					if ($conversation['conversation-uri'] != '') {
 						$conversation_uri = $conversation['conversation-uri'];
 					}
-					if ($r['conversation-href'] != '') {
+					if ($conversation['conversation-href'] != '') {
 						$conversation_href = $conversation['conversation-href'];
 					}
 				}

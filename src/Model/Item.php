@@ -1329,12 +1329,7 @@ class Item extends BaseObject
 		if ($item['network'] == NETWORK_PHANTOM) {
 			logger('Missing network. Called by: '.System::callstack(), LOGGER_DEBUG);
 
-			$contact = Contact::getDetailsByURL($item['author-link'], $item['uid']);
-			if (!empty($contact['network'])) {
-				$item['network'] = $contact["network"];
-			} else {
-				$item['network'] = NETWORK_DFRN;
-			}
+			$item['network'] = NETWORK_DFRN;
 			logger("Set network to " . $item["network"] . " for " . $item["uri"], LOGGER_DEBUG);
 		}
 
@@ -2940,6 +2935,7 @@ class Item extends BaseObject
 			'type'          => 'activity',
 			'wall'          => $item['wall'],
 			'origin'        => 1,
+			'network'       => NETWORK_DFRN,
 			'gravity'       => GRAVITY_ACTIVITY,
 			'parent'        => $item['id'],
 			'parent-uri'    => $item['uri'],
