@@ -833,7 +833,7 @@ function networkThreadedView(App $a, $update, $parent)
 			$top_limit = DateTimeFormat::utcNow();
 		}
 
-		$items = dba::p("SELECT `item`.`parent-uri` AS `uri`, 0 AS `item_id`, `item`.$ordering AS `order_date` FROM `item`
+		$items = dba::p("SELECT `item`.`parent-uri` AS `uri`, 0 AS `item_id`, `item`.$ordering AS `order_date`, `author`.`url` AS `author-link` FROM `item`
 			STRAIGHT_JOIN (SELECT `oid` FROM `term` WHERE `term` IN
 				(SELECT SUBSTR(`term`, 2) FROM `search` WHERE `uid` = ? AND `term` LIKE '#%') AND `otype` = ? AND `type` = ? AND `uid` = 0) AS `term`
 			ON `item`.`id` = `term`.`oid`

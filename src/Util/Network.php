@@ -890,8 +890,8 @@ class Network
 		$i = 0;
 		$path = "";
 		do {
-			$path1 = $pathparts1[$i];
-			$path2 = $pathparts2[$i];
+			$path1 = defaults($pathparts1, $i, '');
+			$path2 = defaults($pathparts2, $i, '');
 
 			if ($path1 == $path2) {
 				$path .= $path1."/";

@@ -363,7 +363,7 @@ class ParseUrl
 									"height" => $photodata[1]];
 				}
 			}
-		} elseif ($siteinfo["image"] != "") {
+		} elseif (!empty($siteinfo["image"])) {
 			$src = self::completeUrl($siteinfo["image"], $url);
 
 			unset($siteinfo["image"]);

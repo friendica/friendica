@@ -1055,7 +1055,7 @@ class Probe
 			// We have to discard the guid from the hcard in favour of the guid from lrdd
 			// Reason: Hubzilla doesn't use the value "uid" in the hcard like Diaspora does.
 			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' uid ')]", $vcard); // */
-			if (($search->length > 0) && ($data["guid"] == "")) {
+			if (($search->length > 0) && empty($data["guid"])) {
 				$data["guid"] = $search->item(0)->nodeValue;
 			}
 

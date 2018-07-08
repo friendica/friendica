@@ -475,27 +475,27 @@ class Contact extends BaseObject
 			$profile = $default;
 		}
 
-		if (($profile["photo"] == "") && isset($default["photo"])) {
+		if (empty($profile["photo"]) && isset($default["photo"])) {
 			$profile["photo"] = $default["photo"];
 		}
 
-		if (($profile["name"] == "") && isset($default["name"])) {
+		if (empty($profile["name"]) && isset($default["name"])) {
 			$profile["name"] = $default["name"];
 		}
 
-		if (($profile["network"] == "") && isset($default["network"])) {
+		if (empty($profile["network"]) && isset($default["network"])) {
 			$profile["network"] = $default["network"];
 		}
 
-		if (($profile["thumb"] == "") && isset($profile["photo"])) {
+		if (empty($profile["thumb"]) && isset($profile["photo"])) {
 			$profile["thumb"] = $profile["photo"];
 		}
 
-		if (($profile["micro"] == "") && isset($profile["thumb"])) {
+		if (empty($profile["micro"]) && isset($profile["thumb"])) {
 			$profile["micro"] = $profile["thumb"];
 		}
 
-		if ((($profile["addr"] == "") || ($profile["name"] == "")) && ($profile["gid"] != 0)
+		if ((empty($profile["addr"]) || empty($profile["name"])) && ($profile["gid"] != 0)
 			&& in_array($profile["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])
 		) {
 			Worker::add(PRIORITY_LOW, "UpdateGContact", $profile["gid"]);
