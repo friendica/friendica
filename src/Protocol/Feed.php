@@ -324,8 +324,10 @@ class Feed {
 						$type = $attribute->textContent;
 					}
 				}
-				if (strlen($item["attach"])) {
+				if (!empty($item["attach"])) {
 					$item["attach"] .= ',';
+				} else {
+					$item["attach"] = '';
 				}
 
 				$attachments[] = ["link" => $href, "type" => $type, "length" => $length];

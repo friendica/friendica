@@ -1562,8 +1562,12 @@ class Contact extends BaseObject
 
 			$contact_record = [
 				'id' => dba::lastInsertId(),
-				'network' => NETWORK_OSTATUS
+				'network' => NETWORK_OSTATUS,
+				'name' => $name,
+				'url' => $url,
+				'photo' => $photo
 			];
+
 			Contact::updateAvatar($photo, $importer["uid"], $contact_record["id"], true);
 
 			/// @TODO Encapsulate this into a function/method

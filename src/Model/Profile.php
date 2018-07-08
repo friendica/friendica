@@ -44,7 +44,7 @@ class Profile
 			$location .= $profile['locality'];
 		}
 
-		if (!empty($profile['region']) && ($profile['locality'] != $profile['region'])) {
+		if (!empty($profile['region']) && (defaults($profile, 'locality', '') != $profile['region'])) {
 			if ($location) {
 				$location .= ', ';
 			}

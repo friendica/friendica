@@ -259,6 +259,7 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_INTRO) {
+		$itemlink = $params['link'];
 		$subject = L10n::t('[Friendica:Notify] Introduction received');
 
 		$preamble = L10n::t('You\'ve received an introduction from \'%1$s\' at %2$s', $params['source_name'], $sitename);
@@ -272,7 +273,6 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to approve or reject the introduction.');
 		$tsitelink = sprintf($sitelink, $siteurl);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-		$itemlink =  $params['link'];
 
 		switch ($params['verb']) {
 			case ACTIVITY_FRIEND:
@@ -574,7 +574,7 @@ function notification($params)
 		$datarray['sitename'] = $sitename;
 		$datarray['siteurl'] = $siteurl;
 		$datarray['type'] = $params['type'];
-		$datarray['parent'] = $params['parent'];
+		$datarray['parent'] = $parent_id;
 		$datarray['source_name'] = $params['source_name'];
 		$datarray['source_link'] = $params['source_link'];
 		$datarray['source_photo'] = $params['source_photo'];
