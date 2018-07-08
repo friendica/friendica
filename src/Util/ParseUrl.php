@@ -251,9 +251,9 @@ class ParseUrl
 				}
 			}
 
-			$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
+			if (!empty($attr["content"])) {
+				$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
 
-			if ($attr["content"] != "") {
 				switch (strtolower($attr["name"])) {
 					case "fulltitle":
 						$siteinfo["title"] = trim($attr["content"]);
@@ -363,7 +363,7 @@ class ParseUrl
 									"height" => $photodata[1]];
 				}
 			}
-		} elseif ($siteinfo["image"] != "") {
+		} elseif (!empty($siteinfo["image"])) {
 			$src = self::completeUrl($siteinfo["image"], $url);
 
 			unset($siteinfo["image"]);

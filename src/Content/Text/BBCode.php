@@ -549,7 +549,7 @@ class BBCode extends BaseObject
 			$data["title"] = str_replace(["http://", "https://"], "", $data["title"]);
 		}
 
-		if (((strpos($data["text"], "[img=") !== false) || (strpos($data["text"], "[img]") !== false) || Config::get('system', 'always_show_preview')) && ($data["image"] != "")) {
+		if (((strpos($data["text"], "[img=") !== false) || (strpos($data["text"], "[img]") !== false) || Config::get('system', 'always_show_preview')) && !empty($data["image"])) {
 			$data["preview"] = $data["image"];
 			$data["image"] = "";
 		}
@@ -567,6 +567,8 @@ class BBCode extends BaseObject
 					throw new Exception('OEmbed is disabled for this attachment.');
 				}
 			} catch (Exception $e) {
+				$data["title"] = defaults($data, 'title', $data['url']);
+
 				if ($simplehtml != 4) {
 					$return = sprintf('<div class="type-%s">', $data["type"]);
 				}

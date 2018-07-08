@@ -118,7 +118,7 @@ function message_content(App $a)
 		}
 
 		// Check if we should do HTML-based delete confirmation
-		if ($_REQUEST['confirm']) {
+		if (!empty($_REQUEST['confirm'])) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
 			$query = explode_querystring($a->query_string);
@@ -143,7 +143,7 @@ function message_content(App $a)
 		}
 
 		// Now check how the user responded to the confirmation query
-		if ($_REQUEST['canceled']) {
+		if (!empty($_REQUEST['canceled'])) {
 			goaway($_SESSION['return_url']);
 		}
 
@@ -308,8 +308,10 @@ function message_content(App $a)
 				WHERE `mail`.`uid` = %d $sql_extra ORDER BY `mail`.`created` ASC",
 				intval(local_user())
 			);
+		} else {
+			$messages = false;
 		}
-		if (!count($messages)) {
+		if (!DBM::is_result($messages)) {
 			notice(L10n::t('Message not available.') . EOL);
 			return $o;
 		}

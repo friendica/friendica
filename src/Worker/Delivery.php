@@ -61,7 +61,7 @@ class Delivery extends BaseObject
 
 			$condition = ['id' => [$item_id, $parent_id], 'visible' => true, 'moderated' => false];
 			$params = ['order' => ['id']];
-			$itemdata = Item::select(Item::ITEM_FIELDLIST, $condition, $params);
+			$itemdata = Item::select([], $condition, $params);
 
 			$items = [];
 			while ($item = Item::fetch($itemdata)) {

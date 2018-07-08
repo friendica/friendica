@@ -156,7 +156,7 @@ class ASN_BASE {
 				if (($length & ASN_LONG_LEN)==ASN_LONG_LEN){
 					$tempLength = 0;
 					for ($x=0; $x<($length & (ASN_LONG_LEN-1)); $x++){
-						$tempLength = ord($string[$p++]) + ($tempLength * 256);
+						$tempLength = @ord($string[$p++]) + ($tempLength * 256);
 					}
 					$length = $tempLength;
 				}

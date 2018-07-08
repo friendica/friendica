@@ -643,13 +643,20 @@ function logger($msg, $level = 0) {
 	}
 
 	$callers = debug_backtrace();
+
+	if (count($callers) > 1) {
+		$function = $callers[1]['function'];
+	} else {
+		$function = '';
+	}
+
 	$logline = sprintf("%s@%s\t[%s]:%s:%s:%s\t%s\n",
 			DateTimeFormat::utcNow(DateTimeFormat::ATOM),
 			$process_id,
 			$LOGGER_LEVELS[$level],
 			basename($callers[0]['file']),
 			$callers[0]['line'],
-			$callers[1]['function'],
+			$function,
 			$msg
 		);
 
@@ -1710,11 +1717,11 @@ function reltoabs($text, $base) {
  * @return string
  */
 function item_post_type($item) {
-	if (intval($item['event-id'])) {
+	if (!empty($item['event-id'])) {
 		return L10n::t('event');
-	} elseif (strlen($item['resource-id'])) {
+	} elseif (!empty($item['resource-id'])) {
 		return L10n::t('photo');
-	} elseif (strlen($item['verb']) && $item['verb'] !== ACTIVITY_POST) {
+	} elseif (!empty($item['verb']) && $item['verb'] !== ACTIVITY_POST) {
 		return L10n::t('activity');
 	} elseif ($item['id'] != $item['parent']) {
 		return L10n::t('comment');

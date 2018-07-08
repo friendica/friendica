@@ -169,7 +169,8 @@ function api_login(App $a)
 	$oauth1 = new FKOAuth1();
 	// login with oauth
 	try {
-		list($consumer, $token) = $oauth1->verify_request(OAuthRequest::from_request());
+		$request = OAuthRequest::from_request();
+		list($consumer, $token) = $oauth1->verify_request($request);
 		if (!is_null($token)) {
 			$oauth1->loginUser($token->uid);
 			Addon::callHooks('logged_in', $a->user);

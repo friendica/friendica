@@ -219,10 +219,10 @@ function item_post(App $a) {
 			$str_contact_deny  = $user['deny_cid'];
 		} else {
 			// use the posted permissions
-			$str_group_allow   = perms2str($_REQUEST['group_allow']);
-			$str_contact_allow = perms2str($_REQUEST['contact_allow']);
-			$str_group_deny    = perms2str($_REQUEST['group_deny']);
-			$str_contact_deny  = perms2str($_REQUEST['contact_deny']);
+			$str_group_allow   = perms2str(defaults($_REQUEST, 'group_allow', ''));
+			$str_contact_allow = perms2str(defaults($_REQUEST, 'contact_allow', ''));
+			$str_group_deny    = perms2str(defaults($_REQUEST, 'group_deny', ''));
+			$str_contact_deny  = perms2str(defaults($_REQUEST, 'contact_deny', ''));
 		}
 
 		$title             =      notags(trim(defaults($_REQUEST, 'title'   , '')));
@@ -245,7 +245,6 @@ function item_post(App $a) {
 		// If this is a comment, set the permissions from the parent.
 
 		if ($parent_item) {
-
 			// for non native networks use the network of the original post as network of the item
 			if (($parent_item['network'] != NETWORK_DIASPORA)
 				&& ($parent_item['network'] != NETWORK_OSTATUS)
@@ -651,16 +650,18 @@ function item_post(App $a) {
 
 	$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $datarray['parent-uri']]);
 	if (DBM::is_result($conversation)) {
-		if ($r['conversation-uri'] != '') {
+		if ($conversation['conversation-uri'] != '') {
 			$datarray['conversation-uri'] = $conversation['conversation-uri'];
 		}
-		if ($r['conversation-href'] != '') {
+		if ($conversation['conversation-href'] != '') {
 			$datarray['conversation-href'] = $conversation['conversation-href'];
 		}
 	}
 
 	if ($orig_post) {
 		$datarray['edit'] = true;
+	} else {
+		$datarray['edit'] = false;
 	}
 
 	// Check for hashtags in the body and repair or add hashtag links
@@ -674,6 +675,9 @@ function item_post(App $a) {
 		// We set the datarray ID to -1 because in preview mode the dataray
 		// doesn't have an ID.
 		$datarray["id"] = -1;
+		$datarray["item_id"] = -1;
+		$datarray["author-network"] = NETWORK_DFRN;
+
 		$o = conversation($a,[array_merge($contact_record,$datarray)],'search', false, true);
 		logger('preview: ' . $o);
 		echo json_encode(['preview' => $o]);

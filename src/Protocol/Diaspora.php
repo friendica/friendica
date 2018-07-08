@@ -3352,12 +3352,12 @@ class Diaspora
 
 		$guid = "";
 		preg_match("/guid='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$guid = $matches[1];
 		}
 
 		preg_match('/guid="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$guid = $matches[1];
 		}
 
@@ -3382,12 +3382,12 @@ class Diaspora
 
 		$profile = "";
 		preg_match("/profile='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$profile = $matches[1];
 		}
 
 		preg_match('/profile="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$profile = $matches[1];
 		}
 

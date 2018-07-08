@@ -731,8 +731,11 @@ class Image
 			$headers=[];
 			$h = explode("\n", $a->get_curl_headers());
 			foreach ($h as $l) {
-				list($k,$v) = array_map("trim", explode(":", trim($l), 2));
-				$headers[$k] = $v;
+				$data = array_map("trim", explode(":", trim($l), 2));
+				if (count($data) > 1) {
+					list($k,$v) = $data;
+					$headers[$k] = $v;
+				}
 			}
 			if (array_key_exists('Content-Type', $headers))
 				$type = $headers['Content-Type'];

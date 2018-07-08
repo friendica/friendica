@@ -265,6 +265,8 @@ function dfrn_dispatch_private($user, $postdata)
 	// Set the user id. This is important if this is a public contact
 	$importer['importer_uid']  = $user['uid'];
 
+	$importer = array_merge($importer, $user);
+
 	logger('Importing post from ' . $msg['author'] . ' to ' . $user['nickname'] . ' with the private envelope.', LOGGER_DEBUG);
 
 	// Now we should be able to import it

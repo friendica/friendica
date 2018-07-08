@@ -1055,7 +1055,7 @@ class Probe
 			// We have to discard the guid from the hcard in favour of the guid from lrdd
 			// Reason: Hubzilla doesn't use the value "uid" in the hcard like Diaspora does.
 			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' uid ')]", $vcard); // */
-			if (($search->length > 0) && ($data["guid"] == "")) {
+			if (($search->length > 0) && empty($data["guid"])) {
 				$data["guid"] = $search->item(0)->nodeValue;
 			}
 
@@ -1304,32 +1304,35 @@ class Probe
 			return false;
 		}
 		$feed = $ret['body'];
+		$dummy1 = null;
+		$dummy2 = null;
+		$dummy2 = null;
 		$feed_data = Feed::import($feed, $dummy1, $dummy2, $dummy3, true);
 		if (!$feed_data) {
 			return false;
 		}
 
-		if ($feed_data["header"]["author-name"] != "") {
+		if (!empty($feed_data["header"]["author-name"])) {
 			$data["name"] = $feed_data["header"]["author-name"];
 		}
-		if ($feed_data["header"]["author-nick"] != "") {
+		if (!empty($feed_data["header"]["author-nick"])) {
 			$data["nick"] = $feed_data["header"]["author-nick"];
 		}
-		if ($feed_data["header"]["author-avatar"] != "") {
+		if (!empty($feed_data["header"]["author-avatar"])) {
 			$data["photo"] = self::fixAvatar($feed_data["header"]["author-avatar"], $data["url"]);
 		}
-		if ($feed_data["header"]["author-id"] != "") {
+		if (!empty($feed_data["header"]["author-id"])) {
 			$data["alias"] = $feed_data["header"]["author-id"];
 		}
-		if ($feed_data["header"]["author-location"] != "") {
+		if (!empty($feed_data["header"]["author-location"])) {
 			$data["location"] = $feed_data["header"]["author-location"];
 		}
-		if ($feed_data["header"]["author-about"] != "") {
+		if (!empty($feed_data["header"]["author-about"])) {
 			$data["about"] = $feed_data["header"]["author-about"];
 		}
 		// OStatus has serious issues when the the url doesn't fit (ssl vs. non ssl)
 		// So we take the value that we just fetched, although the other one worked as well
-		if ($feed_data["header"]["author-link"] != "") {
+		if (!empty($feed_data["header"]["author-link"])) {
 			$data["url"] = $feed_data["header"]["author-link"];
 		}
 

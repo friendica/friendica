@@ -475,34 +475,34 @@ class Contact extends BaseObject
 			$profile = $default;
 		}
 
-		if (($profile["photo"] == "") && isset($default["photo"])) {
+		if (empty($profile["photo"]) && isset($default["photo"])) {
 			$profile["photo"] = $default["photo"];
 		}
 
-		if (($profile["name"] == "") && isset($default["name"])) {
+		if (empty($profile["name"]) && isset($default["name"])) {
 			$profile["name"] = $default["name"];
 		}
 
-		if (($profile["network"] == "") && isset($default["network"])) {
+		if (empty($profile["network"]) && isset($default["network"])) {
 			$profile["network"] = $default["network"];
 		}
 
-		if (($profile["thumb"] == "") && isset($profile["photo"])) {
+		if (empty($profile["thumb"]) && isset($profile["photo"])) {
 			$profile["thumb"] = $profile["photo"];
 		}
 
-		if (($profile["micro"] == "") && isset($profile["thumb"])) {
+		if (empty($profile["micro"]) && isset($profile["thumb"])) {
 			$profile["micro"] = $profile["thumb"];
 		}
 
-		if ((($profile["addr"] == "") || ($profile["name"] == "")) && ($profile["gid"] != 0)
+		if ((empty($profile["addr"]) || empty($profile["name"])) && (defaults($profile, "gid", 0) != 0)
 			&& in_array($profile["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])
 		) {
 			Worker::add(PRIORITY_LOW, "UpdateGContact", $profile["gid"]);
 		}
 
 		// Show contact details of Diaspora contacts only if connected
-		if (($profile["cid"] == 0) && ($profile["network"] == NETWORK_DIASPORA)) {
+		if ((defaults($profile, "cid", 0) == 0) && (defaults($profile, "network", "") == NETWORK_DIASPORA)) {
 			$profile["location"] = "";
 			$profile["about"] = "";
 			$profile["gender"] = "";
@@ -1562,8 +1562,12 @@ class Contact extends BaseObject
 
 			$contact_record = [
 				'id' => dba::lastInsertId(),
-				'network' => NETWORK_OSTATUS
+				'network' => NETWORK_OSTATUS,
+				'name' => $name,
+				'url' => $url,
+				'photo' => $photo
 			];
+
 			Contact::updateAvatar($photo, $importer["uid"], $contact_record["id"], true);
 
 			/// @TODO Encapsulate this into a function/method

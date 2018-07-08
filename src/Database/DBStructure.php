@@ -409,7 +409,7 @@ class DBStructure
 				// Compare the field structure field by field
 				foreach ($structure["fields"] AS $fieldname => $parameters) {
 					// Compare the field definition
-					$field_definition = $database[$name]["fields"][$fieldname];
+					$field_definition = defaults($database[$name]["fields"], $fieldname, ['Collation' => '']);
 
 					// Define the default collation if not given
 					if (!isset($parameters['Collation']) && !empty($field_definition['Collation'])) {

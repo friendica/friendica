@@ -12,14 +12,14 @@ function xrd_init(App $a)
 {
 	if ($a->argv[0] == 'xrd') {
 		$uri = urldecode(notags(trim($_GET['uri'])));
-		if ($_SERVER['HTTP_ACCEPT'] == 'application/jrd+json') {
+		if (defaults($_SERVER, 'HTTP_ACCEPT', '') == 'application/jrd+json') {
 			$mode = 'json';
 		} else {
 			$mode = 'xml';
 		}
 	} else {
 		$uri = urldecode(notags(trim($_GET['resource'])));
-		if ($_SERVER['HTTP_ACCEPT'] == 'application/xrd+xml') {
+		if (defaults($_SERVER, 'HTTP_ACCEPT', '') == 'application/xrd+xml') {
 			$mode = 'xml';
 		} else {
 			$mode = 'json';

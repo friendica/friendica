@@ -23,9 +23,9 @@ function poco_init(App $a) {
 	if ($a->argc > 1) {
 		$user = notags(trim($a->argv[1]));
 	}
-	if (! x($user)) {
+	if (empty($user)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");
-		if (! DBM::is_result($c)) {
+		if (!DBM::is_result($c)) {
 			System::httpExit(401);
 		}
 		$system_mode = true;
