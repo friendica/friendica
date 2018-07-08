@@ -549,7 +549,7 @@ class BBCode extends BaseObject
 			$data["title"] = str_replace(["http://", "https://"], "", $data["title"]);
 		}
 
-		if (((strpos($data["text"], "[img=") !== false) || (strpos($data["text"], "[img]") !== false) || Config::get('system', 'always_show_preview')) && ($data["image"] != "")) {
+		if (((strpos($data["text"], "[img=") !== false) || (strpos($data["text"], "[img]") !== false) || Config::get('system', 'always_show_preview')) && !empty($data["image"])) {
 			$data["preview"] = $data["image"];
 			$data["image"] = "";
 		}
