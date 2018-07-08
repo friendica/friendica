@@ -596,6 +596,7 @@ function networkThreadedView(App $a, $update, $parent)
 	$sql_extra3 = '';
 	$sql_table = '`thread`';
 	$sql_parent = '`iid`';
+	$sql_order = '';
 
 	if ($update) {
 		$sql_table = '`item`';
