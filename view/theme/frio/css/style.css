@@ -1017,7 +1017,7 @@ aside .widget li,
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 20px;
-    padding-right: 20px;
+    padding-right: 10px;
 }
 aside .widget li:hover,
 aside .widget li.selected,
@@ -1216,13 +1216,29 @@ aside #follow-sidebar .form-group-search .form-button-search {
     padding: 2px 8px;
 }
 
+div#sidebar-group-header h3 {
+    float: left;
+}
+
+div#sidebar-group-list {
+    clear: both;
+}
+
+.group-new-form {
+    clear: both;
+}
+
+.group-edit-tool {
+    color: #555;
+}
 aside #group-sidebar .group-edit-tool,
 aside #saved-search-list .savedsearchdrop {
     opacity: 0.1;
     transition: all 0.25s ease-in-out;
 }
-aside #group-sidebar .sidebar-group-li:hover .group-edit-tool,
+aside #group-sidebar .group-edit-tool:hover,
 aside #saved-search-list .saved-search-li:hover .savedsearchdrop {
+    color: #555;
     opacity: 0.8;
     transition: all 0.25s ease-in-out;
 }
@@ -2304,7 +2320,7 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 
 /* group edit page */
 .group-actions {
-    margin-top: 20px;
+    margin-top: 4px;
     margin-bottom: 10px;
     font-size: 30px;
 }
@@ -2317,7 +2333,11 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 .contact-group-actions .fa-plus-circle { color: #008000;}
 
 #group-edit-wrapper {
+    margin-top: 14px;
     display: none;
+}
+#group-edit-header {
+    display: block;
 }
 #group-update-wrapper .contact-photo-overlay {
     display: none;
@@ -2327,7 +2347,7 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
     margin-top: -10px;
     display: flex;
 }
-#group-update-wrapper .viewcontact_wrapper .contact-action-link {
+#group-update-wrapper .viewcontact_wrapper .contact-group-link {
     opacity: 0.8;
     font-size: 20px;
     line-height: 50px;
