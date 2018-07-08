@@ -94,7 +94,8 @@ function group_content(App $a) {
 	$tpl = get_markup_template('group_edit.tpl');
 
 	$context = [
-			'$submit' => L10n::t('Save Group'),
+		'$submit' => L10n::t('Save Group'),
+		'$submit_filter' => L10n::t('Filter'),
 	];
 
 	if (($a->argc == 2) && ($a->argv[1] === 'new')) {

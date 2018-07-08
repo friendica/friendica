@@ -43,26 +43,16 @@
 
 	{{* The search input field to search for contacts *}}
 	<div id="contacts-search-wrapper">
-		<div id="contacts-search-form" class="navbar-form" role="search">
+		<form id="contacts-search-form" class="navbar-form" role="search" method="get" >
 			<div class="row">
-				<div class="col-md-2"></div>
-				<div class="col-md-8 ">
-					<div class="form-group form-group-search">
-						<input type="text"
-							name="filter"
-							id="contacts-search"
-							class="search-input form-control form-search"
-							onkeyup="filterList(); return false;"
-							onfocus="this.select(); return false;"
-						/>
-					</div>
+				<div class="form-group form-group-search">
+					<input type="text" name="search" id="contacts-search" class="search-input form-control form-search" onfocus="this.select();" onkeyup="filterList(); return false;" />
+					<button class="btn btn-default btn-sm form-button-search" onclick="filterList(); return false;">{{$submit_filter}}</button>
 				</div>
-				<div class="col-md-2"></div>
 			</div>
-		</div>
+		</form>
 	</div>
 
-	<hr>
 	<div id="contacts-search-end"></div>
 
 	{{if $groupeditor}}
