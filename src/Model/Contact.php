@@ -718,25 +718,33 @@ class Contact extends BaseObject
 			return $r;
 		}
 
-		$r = q(
-			"SELECT *
-			FROM `contact`
-			WHERE `uid` = %d
-			AND NOT `self`
-			AND NOT `blocked`
-			AND NOT `pending`
-			AND `id` NOT IN (
-				SELECT DISTINCT(`contact-id`)
-				FROM `group_member`
-				INNER JOIN `group` ON `group`.`id` = `group_member`.`gid`
-				WHERE `group`.`uid` = %d
-			)
-			LIMIT %d, %d",
+		$select = "SELECT *
+			   FROM `contact`
+			   WHERE `uid` = %d
+			   AND NOT `self`
+			   AND NOT `blocked`
+			   AND NOT `pending`
+			   AND `id` NOT IN (
+			   	SELECT DISTINCT(`contact-id`)
+			   	FROM `group_member`
+			   	INNER JOIN `group` ON `group`.`id` = `group_member`.`gid`
+			   	WHERE `group`.`uid` = %d
+			   )";
+
+		$start = intval($start);
+		if (start >= 0) {
+		$r = q($select."LIMIT %d, %d",
 			intval($uid),
 			intval($uid),
 			intval($start),
 			intval($count)
 		);
+		} else {
+		$r = q($select,
+			intval($uid),
+			intval($uid)
+		);
+		}
 
 		return $r;
 	}

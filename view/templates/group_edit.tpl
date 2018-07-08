@@ -2,6 +2,7 @@
 <h2>{{$title}}</h2>
 
 
+{{if $editable == 1}}
 <div id="group-edit-wrapper" >
 	<form action="group/{{$gid}}" id="group-edit-form" method="post" >
 		<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
@@ -14,6 +15,7 @@
 		<div id="group-edit-select-end" ></div>
 	</form>
 </div>
+{{/if}}
 
 
 {{if $groupeditor}}
