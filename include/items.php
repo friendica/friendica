@@ -429,7 +429,7 @@ function list_post_dates($uid, $wall) {
 		$start_month = DateTimeFormat::utc($dstart, 'Y-m-d');
 		$end_month = DateTimeFormat::utc($dend, 'Y-m-d');
 		$str = day_translate(DateTimeFormat::utc($dnow, 'F'));
-		if (!$ret[$dyear]) {
+		if (empty($ret[$dyear])) {
 			$ret[$dyear] = [];
 		}
 		$ret[$dyear][] = [$str, $end_month, $start_month];
