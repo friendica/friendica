@@ -45,7 +45,7 @@ class Feed {
 		} else {
 			logger("Test Atom/RSS feed", LOGGER_DEBUG);
 		}
-		if ($xml == "") {
+		if (empty($xml)) {
 			logger('XML is empty.', LOGGER_DEBUG);
 			return;
 		}
@@ -77,7 +77,7 @@ class Feed {
 			$author["author-link"] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:link/text()');
 			$author["author-name"] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:title/text()');
 
-			if ($author["author-name"] == "") {
+			if (empty($author["author-name"])) {
 				$author["author-name"] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:description/text()');
 			}
 			$entries = $xpath->query('/rdf:RDF/rss:item');
@@ -112,10 +112,10 @@ class Feed {
 
 			$author["author-name"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:title/text()');
 
-			if ($author["author-name"] == "") {
+			if (empty($author["author-name"])) {
 				$author["author-name"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:subtitle/text()');
 			}
-			if ($author["author-name"] == "") {
+			if (empty($author["author-name"])) {
 				$author["author-name"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:author/atom:name/text()');
 			}
 			$value = XML::getFirstNodeValue($xpath, 'atom:author/poco:displayName/text()');
@@ -161,10 +161,10 @@ class Feed {
 			$author["author-name"] = XML::getFirstNodeValue($xpath, '/rss/channel/title/text()');
 			$author["author-avatar"] = XML::getFirstNodeValue($xpath, '/rss/channel/image/url/text()');
 
-			if ($author["author-name"] == "") {
+			if (empty($author["author-name"])) {
 				$author["author-name"] = XML::getFirstNodeValue($xpath, '/rss/channel/copyright/text()');
 			}
-			if ($author["author-name"] == "") {
+			if (empty($author["author-name"])) {
 				$author["author-name"] = XML::getFirstNodeValue($xpath, '/rss/channel/description/text()');
 			}
 			$author["edited"] = $author["created"] = XML::getFirstNodeValue($xpath, '/rss/channel/pubDate/text()');
@@ -177,7 +177,7 @@ class Feed {
 		if (!$simulate) {
 			$author["author-link"] = $contact["url"];
 
-			if ($author["author-name"] == "") {
+			if (empty($author["author-name"])) {
 				$author["author-name"] = $contact["name"];
 			}
 			$author["author-avatar"] = $contact["thumb"];
@@ -232,10 +232,10 @@ class Feed {
 
 			$item["uri"] = XML::getFirstNodeValue($xpath, 'atom:id/text()', $entry);
 
-			if ($item["uri"] == "") {
+			if (empty($item["uri"])) {
 				$item["uri"] = XML::getFirstNodeValue($xpath, 'guid/text()', $entry);
 			}
-			if ($item["uri"] == "") {
+			if (empty($item["uri"])) {
 				$item["uri"] = $item["plink"];
 			}
 
@@ -257,23 +257,23 @@ class Feed {
 
 			$item["title"] = XML::getFirstNodeValue($xpath, 'atom:title/text()', $entry);
 
-			if ($item["title"] == "") {
+			if (empty($item["title"])) {
 				$item["title"] = XML::getFirstNodeValue($xpath, 'title/text()', $entry);
 			}
-			if ($item["title"] == "") {
+			if (empty($item["title"])) {
 				$item["title"] = XML::getFirstNodeValue($xpath, 'rss:title/text()', $entry);
 			}
 			$published = XML::getFirstNodeValue($xpath, 'atom:published/text()', $entry);
 
-			if ($published == "") {
+			if (empty($published)) {
 				$published = XML::getFirstNodeValue($xpath, 'pubDate/text()', $entry);
 			}
-			if ($published == "") {
+			if (empty($published)) {
 				$published = XML::getFirstNodeValue($xpath, 'dc:date/text()', $entry);
 			}
 			$updated = XML::getFirstNodeValue($xpath, 'atom:updated/text()', $entry);
 
-			if ($updated == "") {
+			if (empty($updated)) {
 				$updated = $published;
 			}
 			if ($published != "") {
@@ -284,10 +284,10 @@ class Feed {
 			}
 			$creator = XML::getFirstNodeValue($xpath, 'author/text()', $entry);
 
-			if ($creator == "") {
+			if (empty($creator)) {
 				$creator = XML::getFirstNodeValue($xpath, 'atom:author/atom:name/text()', $entry);
 			}
-			if ($creator == "") {
+			if (empty($creator)) {
 				$creator = XML::getFirstNodeValue($xpath, 'dc:creator/text()', $entry);
 			}
 			if ($creator != "") {
@@ -346,13 +346,13 @@ class Feed {
 
 			$body = trim(XML::getFirstNodeValue($xpath, 'atom:content/text()', $entry));
 
-			if ($body == "") {
+			if (empty($body)) {
 				$body = trim(XML::getFirstNodeValue($xpath, 'content:encoded/text()', $entry));
 			}
-			if ($body == "") {
+			if (empty($body)) {
 				$body = trim(XML::getFirstNodeValue($xpath, 'description/text()', $entry));
 			}
-			if ($body == "") {
+			if (empty($body)) {
 				$body = trim(XML::getFirstNodeValue($xpath, 'atom:summary/text()', $entry));
 			}
 

@@ -787,11 +787,11 @@ class GContact
 
 		// Bugfix: We had an error in the storing of keywords which lead to the "0"
 		// This value is still transmitted via poco.
-		if ($contact["keywords"] == "0") {
+		if (!empty($contact["keywords"]) && ($contact["keywords"] == "0")) {
 			unset($contact["keywords"]);
 		}
 
-		if ($public_contact[0]["keywords"] == "0") {
+		if (!empty($public_contact[0]["keywords"]) && ($public_contact[0]["keywords"] == "0")) {
 			$public_contact[0]["keywords"] = "";
 		}
 
