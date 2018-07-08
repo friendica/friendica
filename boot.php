@@ -888,7 +888,7 @@ function goaway($path)
  */
 function local_user()
 {
-	if (x($_SESSION, 'authenticated') && x($_SESSION, 'uid')) {
+	if (!empty($_SESSION['authenticated']) && !empty($_SESSION['uid'])) {
 		return intval($_SESSION['uid']);
 	}
 	return false;
