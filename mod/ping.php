@@ -278,6 +278,7 @@ function ping_init(App $a)
 		if (DBM::is_result($intros)) {
 			foreach ($intros as $intro) {
 				$notif = [
+					'id'      => 0,
 					'href'    => System::baseUrl() . '/notifications/intros/' . $intro['id'],
 					'name'    => $intro['name'],
 					'url'     => $intro['url'],
@@ -293,6 +294,7 @@ function ping_init(App $a)
 		if (DBM::is_result($mails)) {
 			foreach ($mails as $mail) {
 				$notif = [
+					'id'      => 0,
 					'href'    => System::baseUrl() . '/message/' . $mail['id'],
 					'name'    => $mail['from-name'],
 					'url'     => $mail['from-url'],
@@ -308,6 +310,7 @@ function ping_init(App $a)
 		if (DBM::is_result($regs)) {
 			foreach ($regs as $reg) {
 				$notif = [
+					'id'      => 0,
 					'href'    => System::baseUrl() . '/admin/users/',
 					'name'    => $reg['name'],
 					'url'     => $reg['url'],
