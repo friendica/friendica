@@ -191,10 +191,6 @@ function profile_content(App $a, $update = 0)
 
 		$o .= Widget::commonFriendsVisitor($a->profile['profile_uid']);
 
-		if (x($_SESSION, 'new_member') && $is_owner) {
-			$o .= '<div id="newmember-tips"><a href="newmember"><b>' . L10n::t('Tips for New Members') . '</b></a></div>';
-		}
-
 		$commpage = $a->profile['page-flags'] == PAGE_COMMUNITY;
 		$commvisitor = $commpage && $remote_contact;
 

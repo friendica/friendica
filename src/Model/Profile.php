@@ -947,6 +947,16 @@ class Profile
 			];
 		}
 
+		if (x($_SESSION, 'new_member') && $is_owner) {
+			$tabs[] = [
+				'label' => L10n::t('Tips for New Members'),
+				'url'   => System::baseUrl() . '/newmember',
+				'sel'   => false,
+				'title' => L10n::t('Tips for New Members'),
+				'id'    => 'newmember-tab',
+			];
+		}
+
 		if (!$is_owner && empty($a->profile['hide-friends'])) {
 			$tabs[] = [
 				'label' => L10n::t('Contacts'),
