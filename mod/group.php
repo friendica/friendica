@@ -264,11 +264,12 @@ function group_content(App $a) {
 	}
 
 	if ($nogroup) {
-		$r = Contact::getUngroupedList(local_user(), -1);
+		$r = Contact::getUngroupedList(local_user());
 	} else {
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND NOT `blocked` AND NOT `pending` AND NOT `self` ORDER BY `name` ASC",
 			intval(local_user())
 		);
+		$context['$desc'] = L10n::t('Click on a contact to add or remove.');
 	}
 
 	if (DBM::is_result($r)) {
@@ -295,7 +296,6 @@ function group_content(App $a) {
 	}
 
 	$context['$groupeditor'] = $groupeditor;
-	$context['$desc'] = L10n::t('Click on a contact to add or remove.');
 
 	// If there are to many contacts we could provide an alternative view mode
 	$total = count($groupeditor['members']) + count($groupeditor['contacts']);

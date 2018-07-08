@@ -696,29 +696,9 @@ class Contact extends BaseObject
 	 *
 	 * @return array
 	 */
-	public static function getUngroupedList($uid, $start = 0, $count = 0)
+	public static function getUngroupedList($uid)
 	{
-		if (!$count) {
-			$r = q(
-				"SELECT COUNT(*) AS `total`
-				 FROM `contact`
-				 WHERE `uid` = %d
-				 AND NOT `self`
-				 AND NOT `blocked`
-				 AND NOT `pending`
-				 AND `id` NOT IN (
-					SELECT DISTINCT(`contact-id`)
-					FROM `group_member`
-					WHERE `uid` = %d
-				)",
-				intval($uid),
-				intval($uid)
-			);
-
-			return $r;
-		}
-
-		$select = "SELECT *
+		return q("SELECT *
 			   FROM `contact`
 			   WHERE `uid` = %d
 			   AND NOT `self`
@@ -729,24 +709,7 @@ class Contact extends BaseObject
 			   	FROM `group_member`
 			   	INNER JOIN `group` ON `group`.`id` = `group_member`.`gid`
 			   	WHERE `group`.`uid` = %d
-			   )";
-
-		$start = intval($start);
-		if (start >= 0) {
-		$r = q($select."LIMIT %d, %d",
-			intval($uid),
-			intval($uid),
-			intval($start),
-			intval($count)
-		);
-		} else {
-		$r = q($select,
-			intval($uid),
-			intval($uid)
-		);
-		}
-
-		return $r;
+			   )", intval($uid), intval($uid));
 	}
 
 	/**

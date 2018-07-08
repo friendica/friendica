@@ -23,4 +23,4 @@
 		{{include file="groupeditor.tpl"}}
 	</div>
 {{/if}}
-{{if $desc}}<div id="group-edit-desc">{{$desc}}</div>{{/if}}
+{{if $desc}}<div class="clear" id="group-edit-desc">{{$desc}}</div>{{/if}}
