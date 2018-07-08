@@ -1891,6 +1891,8 @@ class Item extends BaseObject
 			return;
 		}
 
+		$origin = $item['origin'];
+
 		unset($item['id']);
 		unset($item['parent']);
 		unset($item['mention']);
@@ -1913,7 +1915,7 @@ class Item extends BaseObject
 			$parents = self::select(['uid', 'origin'], ["`uri` = ? AND `uid` != 0", $item['parent-uri']]);
 			while ($parent = dba::fetch($parents)) {
 				$users[$parent['uid']] = $parent['uid'];
-				if ($parent['origin'] && !$item['origin']) {
+				if ($parent['origin'] && !$origin) {
 					$origin_uid = $parent['uid'];
 				}
 			}

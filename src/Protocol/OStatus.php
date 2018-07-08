@@ -61,9 +61,9 @@ class OStatus
 
 		$aliaslink = $author["author-link"];
 
-		$alternate = $xpath->query("atom:author/atom:link[@rel='alternate']", $context)->item(0)->attributes;
-		if (is_object($alternate)) {
-			foreach ($alternate as $attributes) {
+		$alternate_item = $xpath->query("atom:author/atom:link[@rel='alternate']", $context)->item(0);
+		if (is_object($alternate_item)) {
+			foreach ($alternate_item->attributes as $attributes) {
 				if (($attributes->name == "href") && ($attributes->textContent != "")) {
 					$author["author-link"] = $attributes->textContent;
 				}
@@ -1105,7 +1105,7 @@ class OStatus
 						}
 						break;
 					case "self":
-						if ($item["plink"] == '') {
+						if (empty($item["plink"])) {
 							$item["plink"] = $attribute['href'];
 						}
 						$link_data['self'] = $attribute['href'];
@@ -1635,6 +1635,7 @@ class OStatus
 		}
 
 		$contact = self::contactEntry($repeated_item['author-link'], $owner);
+		$contact['account-type'] = $contact['contact-type'];
 
 		$title = $owner["nick"]." repeated a notice by ".$contact["nick"];
 
