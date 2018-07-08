@@ -972,6 +972,10 @@ nav.navbar a, nav.navbar .btn-link {
     padding: 2px 10px;
 }
 
+#newmember-tab > a {
+  font-size: 1.2em;
+  font-weight: 800;
+}
 
 /*
  * Aside

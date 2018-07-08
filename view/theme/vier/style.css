@@ -2340,6 +2340,11 @@ ul.tabs li .active, span.pager_current a {
   text-decoration: none;
 }
 
+#newmember-tab > a {
+  font-size: 1.2em;
+  font-weight: 800;
+}
+
 /**
  * Form fields
  */
