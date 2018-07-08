@@ -85,7 +85,7 @@ class Feed {
 
 		// Is it Atom?
 		if ($xpath->query('/atom:feed')->length > 0) {
-			$alternate = $xpath->query("atom:link[@rel='alternate']")->item(0)->attributes;
+			$alternate = XML::getFirstAttributes($xpath, "atom:link[@rel='alternate']");
 			if (is_object($alternate)) {
 				foreach ($alternate AS $attribute) {
 					if ($attribute->name == "href") {
@@ -95,7 +95,7 @@ class Feed {
 			}
 
 			if (empty($author["author-link"])) {
-				$self = $xpath->query("atom:link[@rel='self']")->item(0)->attributes;
+				$self = XML::getFirstAttributes($xpath, "atom:link[@rel='self']");
 				if (is_object($self)) {
 					foreach ($self AS $attribute) {
 						if ($attribute->name == "href") {
@@ -137,7 +137,7 @@ class Feed {
 				if ($value != "") {
 					$author["author-about"] = $value;
 				}
-				$avatar = $xpath->evaluate("atom:author/atom:link[@rel='avatar']")->item(0)->attributes;
+				$avatar = XML::getFirstAttributes($xpath, "atom:author/atom:link[@rel='avatar']");
 				if (is_object($avatar)) {
 					foreach ($avatar AS $attribute) {
 						if ($attribute->name == "href") {
@@ -212,9 +212,9 @@ class Feed {
 
 			$item = array_merge($header, $author);
 
-			$alternate = $xpath->query("atom:link[@rel='alternate']", $entry)->item(0)->attributes;
+			$alternate = XML::getFirstAttributes($xpath, "atom:link[@rel='alternate']", $entry);
 			if (!is_object($alternate)) {
-				$alternate = $xpath->query("atom:link", $entry)->item(0)->attributes;
+				$alternate = XML::getFirstAttributes($xpath, "atom:link", $entry);
 			}
 			if (is_object($alternate)) {
 				foreach ($alternate AS $attribute) {
@@ -223,10 +223,10 @@ class Feed {
 					}
 				}
 			}
-			if ($item["plink"] == "") {
+			if (empty($item["plink"])) {
 				$item["plink"] = XML::getFirstNodeValue($xpath, 'link/text()', $entry);
 			}
-			if ($item["plink"] == "") {
+			if (empty($item["plink"])) {
 				$item["plink"] = XML::getFirstNodeValue($xpath, 'rss:link/text()', $entry);
 			}
 

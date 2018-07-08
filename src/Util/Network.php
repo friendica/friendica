@@ -101,7 +101,7 @@ class Network
 		$a = get_app();
 
 		$parts = parse_url($url);
-		$path_parts = explode('/', $parts['path']);
+		$path_parts = explode('/', defaults($parts, 'path', ''));
 		foreach ($path_parts as $part) {
 		        if (strlen($part) <> mb_strlen($part)) {
 				$parts2[] = rawurlencode($part);
