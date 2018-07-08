@@ -94,10 +94,7 @@ class Feed {
 				}
 			}
 
-			if ($author["author-link"] == "") {
-				$author["author-link"] = $author["author-id"];
-			}
-			if ($author["author-link"] == "") {
+			if (empty($author["author-link"])) {
 				$self = $xpath->query("atom:link[@rel='self']")->item(0)->attributes;
 				if (is_object($self)) {
 					foreach ($self AS $attribute) {
@@ -108,7 +105,7 @@ class Feed {
 				}
 			}
 
-			if ($author["author-link"] == "") {
+			if (empty($author["author-link"])) {
 				$author["author-link"] = $xpath->evaluate('/atom:feed/atom:id/text()')->item(0)->nodeValue;
 			}
 			$author["author-avatar"] = $xpath->evaluate('/atom:feed/atom:logo/text()')->item(0)->nodeValue;

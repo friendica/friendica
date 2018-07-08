@@ -1016,9 +1016,9 @@ class OStatus
 			$link_data = self::processLinks($links, $item);
 		}
 
-		$orig_body = $xpath->query('atom:content/text()', $activityobjects)->item(0)->nodeValue;
-		$orig_created = $xpath->query('atom:published/text()', $activityobjects)->item(0)->nodeValue;
-		$orig_edited = $xpath->query('atom:updated/text()', $activityobjects)->item(0)->nodeValue;
+		$orig_body = XML::getFirstNodeValue($xpath, 'atom:content/text()', $activityobjects);
+		$orig_created = XML::getFirstNodeValue($xpath, 'atom:published/text()', $activityobjects);
+		$orig_edited = XML::getFirstNodeValue($xpath, 'atom:updated/text()', $activityobjects);
 
 		$orig_author = self::fetchAuthor($xpath, $activityobjects, $importer, $dummy, false);
 
@@ -1032,9 +1032,9 @@ class OStatus
 
 		$item["uri"] = $orig_uri;
 
-		$item["verb"] = $xpath->query('activity:verb/text()', $activityobjects)->item(0)->nodeValue;
+		$item["verb"] = XML::getFirstNodeValue($xpath, 'activity:verb/text()', $activityobjects);
 
-		$item["object-type"] = $xpath->query('activity:object-type/text()', $activityobjects)->item(0)->nodeValue;
+		$item["object-type"] = XML::getFirstNodeValue($xpath, 'activity:object-type/text()', $activityobjects);
 
 		$inreplyto = $xpath->query('thr:in-reply-to', $activityobjects);
 		if (is_object($inreplyto->item(0))) {
