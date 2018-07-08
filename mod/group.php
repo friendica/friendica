@@ -16,7 +16,7 @@ use Friendica\Model\Group;
 
 function group_init(App $a) {
 	if (local_user()) {
-		$a->page['aside'] = Group::sidebarWidget('contacts', 'group', 'extended', (($a->argc > 1) ? intval($a->argv[1]) : 0));
+		$a->page['aside'] = Group::sidebarWidget('contacts', 'group', 'extended', (($a->argc > 1) ? $a->argv[1] : ''));
 	}
 }
 

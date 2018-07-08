@@ -46,7 +46,7 @@
 				</li>
 			{{/foreach}}
 
-			{{if $ungrouped}}<li class="sidebar-group-li" id="sidebar-ungrouped"><a href="nogroup">{{$ungrouped}}</a></li>{{/if}}
+			{{if $ungrouped}}<li class="{{if $ungrouped_selected}}selected{{/if}} sidebar-group-li" id="sidebar-ungrouped"><a href="nogroup">{{$ungrouped}}</a></li>{{/if}}
 		</ul>
 	</div>
 
