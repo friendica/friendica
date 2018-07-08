@@ -123,7 +123,7 @@ class Feed {
 				$author["author-name"] = $value;
 			}
 			if ($simulate) {
-				$author["author-id"] = $xpath->evaluate('/atom:feed/atom:author/atom:uri/text()')->item(0)->nodeValue;
+				$author["author-link"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:author/atom:uri/text()');
 
 				$value = XML::getFirstNodeValue($xpath, 'atom:author/poco:preferredUsername/text()');
 				if ($value != "") {
@@ -156,20 +156,20 @@ class Feed {
 
 		// Is it RSS?
 		if ($xpath->query('/rss/channel')->length > 0) {
-			$author["author-link"] = $xpath->evaluate('/rss/channel/link/text()')->item(0)->nodeValue;
+			$author["author-link"] = XML::getFirstNodeValue($xpath, '/rss/channel/link/text()');
 
-			$author["author-name"] = $xpath->evaluate('/rss/channel/title/text()')->item(0)->nodeValue;
-			$author["author-avatar"] = $xpath->evaluate('/rss/channel/image/url/text()')->item(0)->nodeValue;
+			$author["author-name"] = XML::getFirstNodeValue($xpath, '/rss/channel/title/text()');
+			$author["author-avatar"] = XML::getFirstNodeValue($xpath, '/rss/channel/image/url/text()');
 
 			if ($author["author-name"] == "") {
-				$author["author-name"] = $xpath->evaluate('/rss/channel/copyright/text()')->item(0)->nodeValue;
+				$author["author-name"] = XML::getFirstNodeValue($xpath, '/rss/channel/copyright/text()');
 			}
 			if ($author["author-name"] == "") {
-				$author["author-name"] = $xpath->evaluate('/rss/channel/description/text()')->item(0)->nodeValue;
+				$author["author-name"] = XML::getFirstNodeValue($xpath, '/rss/channel/description/text()');
 			}
-			$author["edited"] = $author["created"] = $xpath->query('/rss/channel/pubDate/text()')->item(0)->nodeValue;
+			$author["edited"] = $author["created"] = XML::getFirstNodeValue($xpath, '/rss/channel/pubDate/text()');
 
-			$author["app"] = $xpath->evaluate('/rss/channel/generator/text()')->item(0)->nodeValue;
+			$author["app"] = XML::getFirstNodeValue($xpath, '/rss/channel/generator/text()');
 
 			$entries = $xpath->query('/rss/channel/item');
 		}
@@ -344,16 +344,16 @@ class Feed {
 				$tags .= $taglink;
 			}
 
-			$body = trim($xpath->evaluate('atom:content/text()', $entry)->item(0)->nodeValue);
+			$body = trim(XML::getFirstNodeValue($xpath, 'atom:content/text()', $entry));
 
 			if ($body == "") {
-				$body = trim($xpath->evaluate('content:encoded/text()', $entry)->item(0)->nodeValue);
+				$body = trim(XML::getFirstNodeValue($xpath, 'content:encoded/text()', $entry));
 			}
 			if ($body == "") {
-				$body = trim($xpath->evaluate('description/text()', $entry)->item(0)->nodeValue);
+				$body = trim(XML::getFirstNodeValue($xpath, 'description/text()', $entry));
 			}
 			if ($body == "") {
-				$body = trim($xpath->evaluate('atom:summary/text()', $entry)->item(0)->nodeValue);
+				$body = trim(XML::getFirstNodeValue($xpath, 'atom:summary/text()', $entry));
 			}
 
 			// remove the content of the title if it is identically to the body
