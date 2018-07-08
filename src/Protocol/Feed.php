@@ -74,11 +74,11 @@ class Feed {
 
 		// Is it RDF?
 		if ($xpath->query('/rdf:RDF/rss:channel')->length > 0) {
-			$author["author-link"] = $xpath->evaluate('/rdf:RDF/rss:channel/rss:link/text()')->item(0)->nodeValue;
-			$author["author-name"] = $xpath->evaluate('/rdf:RDF/rss:channel/rss:title/text()')->item(0)->nodeValue;
+			$author["author-link"] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:link/text()');
+			$author["author-name"] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:title/text()');
 
 			if ($author["author-name"] == "") {
-				$author["author-name"] = $xpath->evaluate('/rdf:RDF/rss:channel/rss:description/text()')->item(0)->nodeValue;
+				$author["author-name"] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:description/text()');
 			}
 			$entries = $xpath->query('/rdf:RDF/rss:item');
 		}
@@ -106,26 +106,26 @@ class Feed {
 			}
 
 			if (empty($author["author-link"])) {
-				$author["author-link"] = $xpath->evaluate('/atom:feed/atom:id/text()')->item(0)->nodeValue;
+				$author["author-link"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:id/text()');
 			}
-			$author["author-avatar"] = $xpath->evaluate('/atom:feed/atom:logo/text()')->item(0)->nodeValue;
+			$author["author-avatar"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:logo/text()');
 
-			$author["author-name"] = $xpath->evaluate('/atom:feed/atom:title/text()')->item(0)->nodeValue;
+			$author["author-name"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:title/text()');
 
 			if ($author["author-name"] == "") {
-				$author["author-name"] = $xpath->evaluate('/atom:feed/atom:subtitle/text()')->item(0)->nodeValue;
+				$author["author-name"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:subtitle/text()');
 			}
 			if ($author["author-name"] == "") {
-				$author["author-name"] = $xpath->evaluate('/atom:feed/atom:author/atom:name/text()')->item(0)->nodeValue;
+				$author["author-name"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:author/atom:name/text()');
 			}
-			$value = $xpath->evaluate('atom:author/poco:displayName/text()')->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, 'atom:author/poco:displayName/text()');
 			if ($value != "") {
 				$author["author-name"] = $value;
 			}
 			if ($simulate) {
 				$author["author-id"] = $xpath->evaluate('/atom:feed/atom:author/atom:uri/text()')->item(0)->nodeValue;
 
-				$value = $xpath->evaluate('atom:author/poco:preferredUsername/text()')->item(0)->nodeValue;
+				$value = XML::getFirstNodeValue($xpath, 'atom:author/poco:preferredUsername/text()');
 				if ($value != "") {
 					$author["author-nick"] = $value;
 				}

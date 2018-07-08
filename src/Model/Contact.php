@@ -495,14 +495,14 @@ class Contact extends BaseObject
 			$profile["micro"] = $profile["thumb"];
 		}
 
-		if ((empty($profile["addr"]) || empty($profile["name"])) && ($profile["gid"] != 0)
+		if ((empty($profile["addr"]) || empty($profile["name"])) && (defaults($profile, "gid", 0) != 0)
 			&& in_array($profile["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])
 		) {
 			Worker::add(PRIORITY_LOW, "UpdateGContact", $profile["gid"]);
 		}
 
 		// Show contact details of Diaspora contacts only if connected
-		if (($profile["cid"] == 0) && ($profile["network"] == NETWORK_DIASPORA)) {
+		if ((defaults($profile, "cid", 0) == 0) && (defaults($profile, "network", "") == NETWORK_DIASPORA)) {
 			$profile["location"] = "";
 			$profile["about"] = "";
 			$profile["gender"] = "";
