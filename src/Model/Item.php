@@ -2446,7 +2446,7 @@ class Item extends BaseObject
 		}
 
 		// Prevent the forwarding of posts that are forwarded
-		if ($datarray["extid"] == NETWORK_DFRN) {
+		if (!empty($datarray["extid"]) && ($datarray["extid"] == NETWORK_DFRN)) {
 			logger('Already forwarded', LOGGER_DEBUG);
 			return false;
 		}
