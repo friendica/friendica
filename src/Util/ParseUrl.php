@@ -159,19 +159,21 @@ class ParseUrl
 		if ($do_oembed) {
 			$oembed_data = OEmbed::fetchURL($url);
 
-			if (!in_array($oembed_data->type, ["error", "rich", ""])) {
-				$siteinfo["type"] = $oembed_data->type;
-			}
+			if (!empty($oembed_data->type)) {
+				if (!in_array($oembed_data->type, ["error", "rich", ""])) {
+					$siteinfo["type"] = $oembed_data->type;
+				}
 
-			if (($oembed_data->type == "link") && ($siteinfo["type"] != "photo")) {
-				if (isset($oembed_data->title)) {
-					$siteinfo["title"] = trim($oembed_data->title);
-				}
-				if (isset($oembed_data->description)) {
-					$siteinfo["text"] = trim($oembed_data->description);
-				}
-				if (isset($oembed_data->thumbnail_url)) {
-					$siteinfo["image"] = $oembed_data->thumbnail_url;
+				if (($oembed_data->type == "link") && ($siteinfo["type"] != "photo")) {
+					if (isset($oembed_data->title)) {
+						$siteinfo["title"] = trim($oembed_data->title);
+					}
+					if (isset($oembed_data->description)) {
+						$siteinfo["text"] = trim($oembed_data->description);
+					}
+					if (isset($oembed_data->thumbnail_url)) {
+						$siteinfo["image"] = $oembed_data->thumbnail_url;
+					}
 				}
 			}
 		}

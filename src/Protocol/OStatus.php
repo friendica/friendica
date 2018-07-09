@@ -133,9 +133,7 @@ class OStatus
 			$author["author-name"] = $displayname;
 		}
 
-		$author["owner-name"] = $author["author-name"];
-		$author["owner-link"] = $author["author-link"];
-		$author["owner-avatar"] = $author["author-avatar"];
+		$author["owner-id"] = $author["author-id"];
 
 		// Only update the contacts if it is an OStatus contact
 		if (DBM::is_result($contact) && ($contact['id'] > 0) && !$onlyfetch && ($contact["network"] == NETWORK_OSTATUS)) {
@@ -1024,7 +1022,7 @@ class OStatus
 
 		$item["author-name"] = $orig_author["author-name"];
 		$item["author-link"] = $orig_author["author-link"];
-		$item["author-avatar"] = $orig_author["author-avatar"];
+		$item["author-id"] = $orig_author["author-id"];
 
 		$item["body"] = HTML::toBBCode($orig_body);
 		$item["created"] = $orig_created;
@@ -1085,13 +1083,15 @@ class OStatus
 						if ($filetype == 'image') {
 							$link_data['add_body'] .= "\n[img]".$attribute['href'].'[/img]';
 						} else {
-							if (strlen($item["attach"])) {
+							if (!empty($item["attach"])) {
 								$item["attach"] .= ',';
+							} else {
+								$item["attach"] = '';
 							}
 							if (!isset($attribute['length'])) {
 								$attribute['length'] = "0";
 							}
-							$item["attach"] .= '[attach]href="'.$attribute['href'].'" length="'.$attribute['length'].'" type="'.$attribute['type'].'" title="'.$attribute['title'].'"[/attach]';
+							$item["attach"] .= '[attach]href="'.$attribute['href'].'" length="'.$attribute['length'].'" type="'.$attribute['type'].'" title="'.defaults($attribute, 'title', '').'"[/attach]';
 						}
 						break;
 					case "related":

@@ -1287,7 +1287,8 @@ function prepare_body(array &$item, $attach = false, $is_preview = false)
 				]);
 			}
 
-			$id = end(explode('/', $the_url));
+			$url_parts = explode('/', $the_url);
+			$id = end($url_parts);
 			$as .= replace_macros(get_markup_template('video_top.tpl'), [
 				'$video' => [
 					'id'     => $id,
