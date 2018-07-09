@@ -106,7 +106,7 @@ class Queue
 
 		$data   = $q_item['content'];
 		$public = $q_item['batch'];
-		$owner  = $user;
+		$owner  = User::getOwnerDataById($user['uid']);
 
 		$deliver_status = 0;
 
