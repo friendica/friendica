@@ -947,7 +947,7 @@ class Profile
 			];
 		}
 
-		if (x($_SESSION, 'new_member') && $is_owner) {
+		if (!empty($_SESSION['new_member']) && $is_owner) {
 			$tabs[] = [
 				'label' => L10n::t('Tips for New Members'),
 				'url'   => System::baseUrl() . '/newmember',
