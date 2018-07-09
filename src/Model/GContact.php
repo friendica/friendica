@@ -1006,8 +1006,7 @@ class GContact
 			$server .= $statistics->config->instance_address;
 
 			$hostname = $statistics->config->instance_address;
-		} else {
-			/// @TODO is_object() above means here no object, still $statistics is being used as object
+		} elseif (!empty($statistics)) {
 			if ($statistics->instance_with_ssl) {
 				$server = "https://";
 			} else {
@@ -1019,7 +1018,7 @@ class GContact
 			$hostname = $statistics->instance_address;
 		}
 
-		if (is_object($statistics->users)) {
+		if (!empty($statistics->users)) {
 			foreach ($statistics->users as $nick => $user) {
 				$profile_url = $server."/".$user->nickname;
 
