@@ -2743,9 +2743,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 
 /* Emulates Bootstrap display */
-.help-block {
-    font-size: 12px;
-}
 .settings-block {
     margin: 0 -15px 5px;
     color: #333;
