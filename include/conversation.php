@@ -634,8 +634,8 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 
 				$tmp_item = [
 					'template' => $tpl,
-					'id' => (($preview) ? 'P0' : $item['item_id']),
-					'guid' => (($preview) ? 'Q0' : $item['guid']),
+					'id' => ($preview ? 'P0' : $item['id']),
+					'guid' => ($preview ? 'Q0' : $item['guid']),
 					'network' => $item['network'],
 					'network_name' => ContactSelector::networkToName($item['network'], $profile_link),
 					'linktitle' => L10n::t('View %s\'s profile @ %s', $profile_name, $item['author-link']),
@@ -682,7 +682,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 				$arr = ['item' => $item, 'output' => $tmp_item];
 				Addon::callHooks('display_item', $arr);
 
-				$threads[$threadsid]['id'] = $item['item_id'];
+				$threads[$threadsid]['id'] = $item['id'];
 				$threads[$threadsid]['network'] = $item['network'];
 				$threads[$threadsid]['items'] = [$arr['output']];
 

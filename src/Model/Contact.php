@@ -596,7 +596,7 @@ class Contact extends BaseObject
 			$uid = local_user();
 		}
 
-		if ($contact['uid'] != $uid) {
+		if (empty($contact['uid']) || ($contact['uid'] != $uid)) {
 			if ($uid == 0) {
 				$profile_link = self::magicLink($contact['url']);
 				$menu = ['profile' => [L10n::t('View Profile'), $profile_link, true]];
