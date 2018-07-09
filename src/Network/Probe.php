@@ -980,7 +980,7 @@ class Probe
 			}
 		}
 
-		if (is_array($webfinger["aliases"])) {
+		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
 				if (normalise_link($alias) != normalise_link($data["url"]) && ! strstr($alias, "@")) {
 					$data["alias"] = $alias;
@@ -1049,6 +1049,10 @@ class Probe
 			return false;
 		}
 
+		if (!isset($data["baseurl"])) {
+			$data["baseurl"] = "";
+		}
+
 		if ($vcards->length > 0) {
 			$vcard = $vcards->item(0);
 
@@ -1086,6 +1090,8 @@ class Probe
 			if ($search->length > 0) {
 				$data["baseurl"] = trim($search->item(0)->nodeValue, "/");
 			}
+		} else {
+			$vcard = '';
 		}
 
 		$avatar = [];
@@ -1177,7 +1183,7 @@ class Probe
 			return false;
 		}
 
-		if (is_array($webfinger["aliases"])) {
+		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
 				if (normalise_link($alias) != normalise_link($data["url"]) && ! strstr($alias, "@")) {
 					$data["alias"] = $alias;
@@ -1207,7 +1213,9 @@ class Probe
 			$data["network"] = NETWORK_DIASPORA;
 
 			// The Diaspora handle must always be lowercase
-			$data["addr"] = strtolower($data["addr"]);
+			if (!empty($data["addr"])) {
+				$data["addr"] = strtolower($data["addr"]);
+			}
 
 			// We have to overwrite the detected value for "notify" since Hubzilla doesn't send it
 			$data["notify"] = $data["baseurl"] . "/receive/users/" . $data["guid"];

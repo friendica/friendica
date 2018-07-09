@@ -1154,7 +1154,12 @@ class App
 			}
 		}
 
-		$user_theme = defaults($_SESSION, 'theme', $system_theme);
+		if (!empty($_SESSION)) {
+			$user_theme = defaults($_SESSION, 'theme', $system_theme);
+		} else {
+			$user_theme = $system_theme;
+		}
+
 		// Specific mobile theme override
 		if (($this->is_mobile || $this->is_tablet) && defaults($_SESSION, 'show-mobile', true)) {
 			$system_mobile_theme = Config::get('system', 'mobile-theme');

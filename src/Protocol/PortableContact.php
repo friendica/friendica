@@ -419,7 +419,7 @@ class PortableContact
 
 						GContact::update($contact);
 
-						if (trim($noscrape["updated"]) != "") {
+						if (!empty($noscrape["updated"])) {
 							$fields = ['last_contact' => DateTimeFormat::utcNow()];
 							dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
@@ -1027,7 +1027,7 @@ class PortableContact
 
 		if (!$serverret["success"] || ($serverret["body"] == "") || empty($xmlobj) || !is_object($xmlobj)) {
 			// Workaround for bad configured servers (known nginx problem)
-			if (!in_array($serverret["debug"]["http_code"], ["403", "404"])) {
+			if (!empty($serverret["debug"]) && !in_array($serverret["debug"]["http_code"], ["403", "404"])) {
 				$failure = true;
 			}
 			$possible_failure = true;

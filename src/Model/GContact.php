@@ -996,7 +996,7 @@ class GContact
 
 		$statistics = json_decode($result["body"]);
 
-		if (is_object($statistics->config)) {
+		if (!empty($statistics->config)) {
 			if ($statistics->config->instance_with_ssl) {
 				$server = "https://";
 			} else {
