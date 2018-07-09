@@ -1257,8 +1257,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_media_upload() function without an authenticated user.
 	 * @return void
 	 *
-	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
-	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiMediaUploadWithoutAuthenticatedUser()
@@ -1271,9 +1271,9 @@ class ApiTest extends DatabaseTest
 	 * Test the api_media_upload() function with an invalid uploaded media.
 	 * @return void
 	 *
-	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @expectedException \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \Friendica\Network\HTTPException\ForbiddenException
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiMediaUploadWithMedia()
 	{
