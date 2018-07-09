@@ -373,7 +373,7 @@ class Group extends BaseObject
 			[
 				'text' => L10n::t('Everybody'),
 				'id' => 0,
-				'selected' => (($group_id === '') ? 'group-selected' : ''),
+				'selected' => (($group_id === 'everyone') ? 'group-selected' : ''),
 				'href' => $every,
 			]
 		];
