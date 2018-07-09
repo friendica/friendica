@@ -212,6 +212,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$item_parent_uri = $item['parent-uri'];
 	} else {
 		$item_id = (($a->argc > 2) ? $a->argv[2] : 0);
+		$item_parent = $item_id;
 
 		if ($a->argc == 2) {
 			$item_parent = 0;

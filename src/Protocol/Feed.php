@@ -123,7 +123,7 @@ class Feed {
 				$author["author-name"] = $value;
 			}
 			if ($simulate) {
-				$author["author-link"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:author/atom:uri/text()');
+				$author["author-id"] = XML::getFirstNodeValue($xpath, '/atom:feed/atom:author/atom:uri/text()');
 
 				$value = XML::getFirstNodeValue($xpath, 'atom:author/poco:preferredUsername/text()');
 				if ($value != "") {

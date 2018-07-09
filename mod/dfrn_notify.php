@@ -335,7 +335,8 @@ function dfrn_notify_content(App $a) {
 		);
 
 		if (!DBM::is_result($r)) {
-			$status = 1;
+			logger('No user data found for ' . $a->argv[1] . ' - SQL: ' . $sql_extra);
+			killme();
 		}
 
 		logger("Remote rino version: ".$rino_remote." for ".$r[0]["url"], LOGGER_DATA);

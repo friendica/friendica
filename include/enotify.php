@@ -244,6 +244,7 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_TAGSHARE) {
+		$itemlink =  $params['link'];
 		$subject = L10n::t('[Friendica:Notify] %s tagged your post', $params['source_name']);
 
 		$preamble = L10n::t('%1$s tagged your post at %2$s', $params['source_name'], $sitename);
@@ -255,7 +256,6 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to view and/or reply to the conversation.');
 		$tsitelink = sprintf($sitelink, $siteurl);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-		$itemlink =  $params['link'];
 	}
 
 	if ($params['type'] == NOTIFY_INTRO) {
@@ -302,6 +302,7 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_SUGGEST) {
+		$itemlink =  $params['link'];
 		$subject = L10n::t('[Friendica:Notify] Friend suggestion received');
 
 		$preamble = L10n::t('You\'ve received a friend suggestion from \'%1$s\' at %2$s', $params['source_name'], $sitename);
@@ -318,11 +319,11 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to approve or reject the suggestion.');
 		$tsitelink = sprintf($sitelink, $siteurl);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-		$itemlink =  $params['link'];
 	}
 
 	if ($params['type'] == NOTIFY_CONFIRM) {
 		if ($params['verb'] == ACTIVITY_FRIEND) { // mutual connection
+			$itemlink =  $params['link'];
 			$subject = L10n::t('[Friendica:Notify] Connection accepted');
 
 			$preamble = L10n::t('\'%1$s\' has accepted your connection request at %2$s', $params['source_name'], $sitename);
@@ -336,8 +337,8 @@ function notification($params)
 			$sitelink = L10n::t('Please visit %s if you wish to make any changes to this relationship.');
 			$tsitelink = sprintf($sitelink, $siteurl);
 			$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-			$itemlink =  $params['link'];
 		} else { // ACTIVITY_FOLLOW
+			$itemlink =  $params['link'];
 			$subject = L10n::t('[Friendica:Notify] Connection accepted');
 
 			$preamble = L10n::t('\'%1$s\' has accepted your connection request at %2$s', $params['source_name'], $sitename);
@@ -353,13 +354,13 @@ function notification($params)
 			$sitelink = L10n::t('Please visit %s  if you wish to make any changes to this relationship.');
 			$tsitelink = sprintf($sitelink, $siteurl);
 			$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-			$itemlink =  $params['link'];
 		}
 	}
 
 	if ($params['type'] == NOTIFY_SYSTEM) {
 		switch($params['event']) {
 			case "SYSTEM_REGISTER_REQUEST":
+				$itemlink =  $params['link'];
 				$subject = L10n::t('[Friendica System Notify]') . ' ' . L10n::t('registration request');
 
 				$preamble = L10n::t('You\'ve received a registration request from \'%1$s\' at %2$s', $params['source_name'], $sitename);
@@ -377,7 +378,6 @@ function notification($params)
 				$sitelink = L10n::t('Please visit %s to approve or reject the request.');
 				$tsitelink = sprintf($sitelink, $params['link']);
 				$hsitelink = sprintf($sitelink, '<a href="'.$params['link'].'">'.$sitename.'</a><br><br>');
-				$itemlink =  $params['link'];
 				break;
 			case "SYSTEM_DB_UPDATE_FAIL":
 				break;

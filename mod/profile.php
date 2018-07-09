@@ -286,6 +286,8 @@ function profile_content(App $a, $update = 0)
 
 		if (!DBM::is_result($r)) {
 			$sql_extra3 = sprintf(" AND `thread`.`contact-id` = %d ", intval(intval($a->profile['contact_id'])));
+		} else {
+			$sql_extra3 = "";
 		}
 
 		//  check if we serve a mobile device and get the user settings

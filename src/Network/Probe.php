@@ -697,6 +697,14 @@ class Probe
 			}
 		}
 
+		if (empty($result["network"])) {
+			$result["network"] = NETWORK_PHANTOM;
+		}
+
+		if (empty($result["url"])) {
+			$result["url"] = $uri;
+		}
+
 		logger($uri." is ".$result["network"], LOGGER_DEBUG);
 
 		if (empty($result["baseurl"])) {

@@ -540,7 +540,7 @@ class BBCode extends BaseObject
 	private static function convertAttachment($return, $simplehtml = false, $tryoembed = true)
 	{
 		$data = self::getAttachmentData($return);
-		if (!$data) {
+		if (empty($data) || empty($data["url"])) {
 			return $return;
 		}
 

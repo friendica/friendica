@@ -444,6 +444,7 @@ class OStatus
 			}
 
 			if ($item["verb"] == NAMESPACE_OSTATUS."/unfollow") {
+				$dummy = null;
 				Contact::removeFollower($importer, $contact, $item, $dummy);
 				continue;
 			}

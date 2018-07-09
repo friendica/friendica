@@ -39,7 +39,9 @@ function photo_init(App $a)
 	if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
 		header('HTTP/1.1 304 Not Modified');
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
-		header('Etag: ' . $_SERVER['HTTP_IF_NONE_MATCH']);
+		if (!empty($_SERVER['HTTP_IF_NONE_MATCH'])) {
+			header('Etag: ' . $_SERVER['HTTP_IF_NONE_MATCH']);
+		}
 		header("Expires: " . gmdate("D, d M Y H:i:s", time() + (31536000)) . " GMT");
 		header("Cache-Control: max-age=31536000");
 		if (function_exists('header_remove')) {
