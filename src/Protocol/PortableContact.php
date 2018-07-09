@@ -1174,17 +1174,19 @@ class PortableContact
 				if (!empty($data->channels_total)) {
 					$registered_users = $data->channels_total;
 				}
-				switch ($data->register_policy) {
-					case "REGISTER_OPEN":
-						$register_policy = REGISTER_OPEN;
-						break;
-					case "REGISTER_APPROVE":
-						$register_policy = REGISTER_APPROVE;
-						break;
-					case "REGISTER_CLOSED":
-					default:
-						$register_policy = REGISTER_CLOSED;
-						break;
+				if (!empty($data->register_policy)) {
+					switch ($data->register_policy) {
+						case "REGISTER_OPEN":
+							$register_policy = REGISTER_OPEN;
+							break;
+						case "REGISTER_APPROVE":
+							$register_policy = REGISTER_APPROVE;
+							break;
+						case "REGISTER_CLOSED":
+						default:
+							$register_policy = REGISTER_CLOSED;
+							break;
+					}
 				}
 			} else {
 				// Test for Hubzilla, Redmatrix or Friendica
@@ -1266,7 +1268,7 @@ class PortableContact
 					$network = NETWORK_DIASPORA;
 				}
 
-				if ($data->registrations_open) {
+				if (!empty($data->registrations_open) && $data->registrations_open) {
 					$register_policy = REGISTER_OPEN;
 				} else {
 					$register_policy = REGISTER_CLOSED;

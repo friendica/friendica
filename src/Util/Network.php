@@ -250,7 +250,7 @@ class Network
 
 			$newurl = $curl_info['redirect_url'];
 
-			if (($new_location_info['path'] == '') && ($new_location_info['host'] != '')) {
+			if (empty($new_location_info['path']) && !empty($new_location_info['host'])) {
 				$newurl = $new_location_info['scheme'] . '://' . $new_location_info['host'] . $old_location_info['path'];
 			}
 
