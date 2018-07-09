@@ -77,6 +77,11 @@ class DFRN
 		}
 
 		foreach ($items as $item) {
+			// These values aren't sent when sending from the queue.
+			/// @todo Check if we can set these values from the queue or if they are needed at all.
+			$item["entry:comment-allow"] = defaults($item, "entry:comment-allow", true);
+			$item["entry:cid"] = defaults($item, "entry:cid", 0);
+
 			$entry = self::entry($doc, "text", $item, $owner, $item["entry:comment-allow"], $item["entry:cid"]);
 			$root->appendChild($entry);
 		}
