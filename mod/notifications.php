@@ -79,6 +79,7 @@ function notifications_content(App $a)
 	// Get the nav tabs for the notification pages
 	$tabs = $nm->getTabs();
 	$notif_content = [];
+	$notif_nocontent = '';
 
 	// Notification results per page
 	$perpage = 20;
@@ -184,7 +185,11 @@ function notifications_content(App $a)
 					$dfrn_tpl = get_markup_template('netfriend.tpl');
 
 					$knowyou   = '';
+					$lbl_knowyou = '';
 					$dfrn_text = '';
+					$helptext = '';
+					$helptext2 = '';
+					$helptext3 = '';
 
 					if ($it['network'] === NETWORK_DFRN || $it['network'] === NETWORK_DIASPORA) {
 						if ($it['network'] === NETWORK_DFRN) {
