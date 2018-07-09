@@ -1090,26 +1090,26 @@ class Probe
 			if ($search->length > 0) {
 				$data["baseurl"] = trim($search->item(0)->nodeValue, "/");
 			}
-		} else {
-			$vcard = '';
 		}
 
 		$avatar = [];
-		$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
-		foreach ($photos as $photo) {
-			$attr = [];
-			foreach ($photo->attributes as $attribute) {
-				$attr[$attribute->name] = trim($attribute->value);
-			}
+		if (!empty($vcard)) {
+			$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
+			foreach ($photos as $photo) {
+				$attr = [];
+				foreach ($photo->attributes as $attribute) {
+					$attr[$attribute->name] = trim($attribute->value);
+				}
 
-			if (isset($attr["src"]) && isset($attr["width"])) {
-				$avatar[$attr["width"]] = $attr["src"];
-			}
+				if (isset($attr["src"]) && isset($attr["width"])) {
+					$avatar[$attr["width"]] = $attr["src"];
+				}
 
-			// We don't have a width. So we just take everything that we got.
-			// This is a Hubzilla workaround which doesn't send a width.
-			if ((sizeof($avatar) == 0) && !empty($attr["src"])) {
-				$avatar[] = $attr["src"];
+				// We don't have a width. So we just take everything that we got.
+				// This is a Hubzilla workaround which doesn't send a width.
+				if ((sizeof($avatar) == 0) && !empty($attr["src"])) {
+					$avatar[] = $attr["src"];
+				}
 			}
 		}
 
