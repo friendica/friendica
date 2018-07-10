@@ -1646,6 +1646,11 @@ section #jotOpen {
     z-index: 1000;
 }
 
+/* Space between content and head */
+#wall-spacer {
+	height: 10px;
+}
+
 /* wall items content */
 .wall-item-content {
     word-break: break-word;
