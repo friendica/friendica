@@ -2551,6 +2551,9 @@ footer {
 #adminpage .selectall {
   text-align: right;
 }
+.settings-block {
+  border-bottom: 1px solid #cccccc;
+}
 /* edit buttons for comments */
 .icon.dim {
   opacity: 0.3;
