@@ -4,8 +4,8 @@ namespace Friendica\Core\Cache;
 
 use Friendica\Core\Cache;
 
-use \Exception;
-use \Redis;
+use Exception;
+use Redis;
 
 /**
  * Redis Cache Driver. This driver is based on Memcache driver

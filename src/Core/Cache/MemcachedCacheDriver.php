@@ -4,7 +4,7 @@ namespace Friendica\Core\Cache;
 
 use Friendica\Core\Cache;
 
-use \Exception;
+use Exception;
 
 /**
  * Memcached Cache Driver
