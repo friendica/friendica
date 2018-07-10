@@ -96,4 +96,9 @@ aside .widget, .form-control, .panel, .nav-container, .wall-item-content, .e-con
     margin-bottom: 0px;
     border:0px;
     padding:0px;
+	color:black;
+}
+
+.wall-spacer {
+    height: 0px;
 }
