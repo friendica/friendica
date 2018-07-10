@@ -24,6 +24,8 @@ use Friendica\Util\Network;
 use Friendica\Util\Temporal;
 use dba;
 
+use \InvalidArgumentException;
+
 require_once 'include/dba.php';
 require_once 'mod/proxy.php';
 
@@ -88,9 +90,15 @@ class Profile
 	 * @param int     $profile      int
 	 * @param array   $profiledata  array
 	 * @param boolean $show_connect Show connect link
+	 * @throws InvalidArgumentException Thrown when a parameter is invalid
 	 */
-	public static function load(App $a, $nickname, $profile = 0, $profiledata = [], $show_connect = true)
+	public static function load(App $a, $nickname, $profile = 0, array $profiledata = [], $show_connect = true)
 	{
+		if (empty($nickname)) {
+			// Nickname cannot be empty, indicating bad parameter value
+			throw new InvalidArgumentException(sprintf('nickname[]=%s is empty.', gettype($nickname)));
+		}
+
 		$user = dba::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
 
 		if (!DBM::is_result($user) && empty($profiledata)) {
@@ -100,11 +108,15 @@ class Profile
 			return;
 		}
 
-		if (empty($a->page['aside'])) {
+		// Not found in page array?
+		if (!isset($a->page['aside'])) {
+			// Then initialize it
+			/// @TODO Ugly workaround, find the root cause of this
 			$a->page['aside'] = '';
 		}
 
-		if ($profiledata) {
+		if (count($profiledata) > 0) {
+			// Add profile data to sidebar
 			$a->page['aside'] .= self::sidebar($profiledata, true, $show_connect);
 
 			if (!DBM::is_result($user)) {

@@ -677,7 +677,7 @@ function check_url(App $a)
 	// and www.example.com vs example.com.
 	// We will only change the url to an ip address if there is no existing setting
 
-	if (empty($url) || (!link_compare($url, System::baseUrl())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $a->get_hostname))) {
+	if (empty($url) || (!link_compare($url, System::baseUrl())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $a->get_hostname()))) {
 		Config::set('system', 'url', System::baseUrl());
 	}
 
