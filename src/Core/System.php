@@ -203,6 +203,18 @@ EOT;
 		}
 	}
 
+	/**
+	 * Generates a process identifier for the logging
+	 *
+	 * @param string $prefix A given prefix
+	 *
+	 * @return string a generated process identifier
+	 */
+	public static function processID($prefix)
+	{
+		return uniqid($prefix . ':' . str_pad(getmypid() . ':', 8, '0') . ':');
+	}
+
 	/// @todo Move the following functions from boot.php
 	/*
 	function killme()

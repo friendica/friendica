@@ -193,7 +193,7 @@ class App
 
 		$this->query_string = '';
 
-		$this->process_id = uniqid('log', true);
+		$this->process_id = System::processID('log');
 
 		set_time_limit(0);
 

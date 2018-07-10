@@ -141,7 +141,7 @@ class Worker
 		if (Config::get('system', 'worker_daemon_mode', false)) {
 			self::IPCSetJobState(false);
 		}
-		logger("Couldn't select a workerqueue entry, quitting.", LOGGER_DEBUG);
+		logger("Couldn't select a workerqueue entry, quitting process " . getmypid() . ".", LOGGER_DEBUG);
 	}
 
 	/**
@@ -309,7 +309,7 @@ class Worker
 
 		$argc = count($argv);
 
-		$new_process_id = uniqid("wrk", true);
+		$new_process_id = System::processID("wrk");
 
 		logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]." - Process PID: ".$new_process_id);
 
