@@ -206,12 +206,16 @@ class OStatus
 				dba::update('contact', $fields, ['id' => $cid], $old_contact);
 
 				// Update the avatar
-				Contact::updateAvatar($author["author-avatar"], 0, $cid);
+				if (!empty($author["author-avatar"])) {
+					Contact::updateAvatar($author["author-avatar"], 0, $cid);
+				}
 			}
 
 			$contact["generation"] = 2;
 			$contact["hide"] = false; // OStatus contacts are never hidden
-			$contact["photo"] = $author["author-avatar"];
+			if (!empty($author["author-avatar"])) {
+				$contact["photo"] = $author["author-avatar"];
+			}
 			$gcid = GContact::update($contact);
 
 			GContact::link($gcid, $contact["uid"], $contact["id"]);

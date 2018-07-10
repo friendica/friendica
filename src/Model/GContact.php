@@ -1026,9 +1026,13 @@ class GContact
 						"name" => $user->fullname,
 						"addr" => $user->nickname."@".$hostname,
 						"nick" => $user->nickname,
-						"about" => $user->bio,
 						"network" => NETWORK_OSTATUS,
 						"photo" => System::baseUrl()."/images/person-175.jpg"];
+
+				if (isset($user->bio)) {
+					$contact["about"] = $user->bio;
+				}
+
 				self::getId($contact);
 			}
 		}

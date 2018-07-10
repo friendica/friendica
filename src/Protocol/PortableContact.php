@@ -120,7 +120,9 @@ class PortableContact
 			$contact_type = -1;
 			$generation = 0;
 
-			$name = $entry->displayName;
+			if (!empty($entry->displayName)) {
+				$name = $entry->displayName;
+			}
 
 			if (isset($entry->urls)) {
 				foreach ($entry->urls as $url) {
@@ -1319,7 +1321,9 @@ class PortableContact
 				if (isset($data->version)) {
 					$network = NETWORK_DFRN;
 
-					$noscrape = defaults($data->no_scrape_url, '');
+					if (!empty($data->no_scrape_url)) {
+						$noscrape = $data->no_scrape_url;
+					}
 					$version = $data->version;
 					$site_name = $data->site_name;
 					$info = $data->info;

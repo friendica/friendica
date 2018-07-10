@@ -185,7 +185,7 @@ function dirfind_content(App $a, $prefix = "") {
 			$a->set_pager_itemspage($j->items_page);
 		}
 
-		if (count($j->results)) {
+		if (!empty($j->results)) {
 
 			$id = 0;
 

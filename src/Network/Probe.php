@@ -1547,26 +1547,26 @@ class Probe
 			return self::feed($feed_url, false);
 		}
 
-		if ($feed_data["header"]["author-name"] != "") {
+		if (!empty($feed_data["header"]["author-name"])) {
 			$data["name"] = $feed_data["header"]["author-name"];
 		}
 
-		if ($feed_data["header"]["author-nick"] != "") {
+		if (!empty($feed_data["header"]["author-nick"])) {
 			$data["nick"] = $feed_data["header"]["author-nick"];
 		}
 
-		if ($feed_data["header"]["author-avatar"] != "") {
+		if (!empty($feed_data["header"]["author-avatar"])) {
 			$data["photo"] = $feed_data["header"]["author-avatar"];
 		}
 
-		if ($feed_data["header"]["author-id"] != "") {
+		if (!empty($feed_data["header"]["author-id"])) {
 			$data["alias"] = $feed_data["header"]["author-id"];
 		}
 
 		$data["url"] = $url;
 		$data["poll"] = $url;
 
-		if ($feed_data["header"]["author-link"] != "") {
+		if (!empty($feed_data["header"]["author-link"])) {
 			$data["baseurl"] = $feed_data["header"]["author-link"];
 		} else {
 			$data["baseurl"] = $data["url"];
