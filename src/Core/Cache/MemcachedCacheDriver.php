@@ -5,6 +5,7 @@ namespace Friendica\Core\Cache;
 use Friendica\Core\Cache;
 
 use Exception;
+use Memcached;
 
 /**
  * Memcached Cache Driver
@@ -23,11 +24,11 @@ class MemcachedCacheDriver extends AbstractCacheDriver implements IMemoryCacheDr
 
 	public function __construct(array $memcached_hosts)
 	{
-		if (!class_exists('\Memcached', false)) {
+		if (!class_exists('Memcached', false)) {
 			throw new Exception('Memcached class isn\'t available');
 		}
 
-		$this->memcached = new \Memcached();
+		$this->memcached = new Memcached();
 
 		$this->memcached->addServers($memcached_hosts);
 
@@ -44,7 +45,7 @@ class MemcachedCacheDriver extends AbstractCacheDriver implements IMemoryCacheDr
 		// We fetch with the hostname as key to avoid problems with other applications
 		$value = $this->memcached->get($cachekey);
 
-		if ($this->memcached->getResultCode() === \Memcached::RES_SUCCESS) {
+		if ($this->memcached->getResultCode() === Memcached::RES_SUCCESS) {
 			$return = $value;
 		}
 
