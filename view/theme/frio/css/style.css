@@ -2949,7 +2949,7 @@ section.help-content-wrapper li {
     padding-top: 10px;
 }
 #adminpage ul#pluginslist, li.plugin {
-    padding-top: 10px;
+    list-style: none;
 }
 #adminpage li .icon {
     display: inline-block;
@@ -3007,6 +3007,14 @@ section.help-content-wrapper li {
 }
 .adminpage .table-hover > tbody > tr:hover + tr.details {
     background-color: #f5f5f5;
+}
+.offset-anchor::before {
+    display: block; 
+    content: " "; 
+    margin-top: -100px; 
+    height: 100px;
+    visibility: hidden; 
+    pointer-events: none;
 }
 
 /* Register Page*/
