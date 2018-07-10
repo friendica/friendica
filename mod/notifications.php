@@ -79,6 +79,7 @@ function notifications_content(App $a)
 	// Get the nav tabs for the notification pages
 	$tabs = $nm->getTabs();
 	$notif_content = [];
+	$notif_nocontent = "";
 
 	// Notification results per page
 	$perpage = 20;
