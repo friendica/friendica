@@ -1712,40 +1712,44 @@ msgstr ""
 msgid "Export personal data"
 msgstr ""
 
-#: src/Model/Event.php:401 include/text.php:1098
-msgid "March"
+#: mod/wallmessage.php:49 mod/wallmessage.php:112
+#, php-format
+msgid "Number of daily wall messages for %s exceeded. Message failed."
 msgstr ""
 
-#: src/Model/Event.php:402 include/text.php:1098
-msgid "April"
+#: mod/wallmessage.php:57 mod/message.php:73
+msgid "No recipient selected."
 msgstr ""
 
-#: src/Model/Event.php:404 include/text.php:1098
-msgid "June"
+#: mod/wallmessage.php:60
+msgid "Unable to check your home location."
 msgstr ""
 
-#: src/Model/Event.php:405 include/text.php:1098
-msgid "July"
+#: mod/wallmessage.php:63 mod/message.php:80
+msgid "Message could not be sent."
 msgstr ""
 
-#: src/Model/Event.php:406 include/text.php:1098
-msgid "August"
+#: mod/wallmessage.php:66 mod/message.php:83
+msgid "Message collection failure."
 msgstr ""
 
-#: src/Model/Event.php:407 include/text.php:1098
-msgid "September"
+#: mod/wallmessage.php:69 mod/message.php:86
+msgid "Message sent."
 msgstr ""
 
-#: src/Model/Event.php:408 include/text.php:1098
-msgid "October"
+#: mod/wallmessage.php:86 mod/wallmessage.php:95
+msgid "No recipient."
 msgstr ""
 
 #: mod/wallmessage.php:132 mod/message.php:233
 msgid "Send Private Message"
 msgstr ""
 
-#: src/Model/Event.php:410 include/text.php:1098
-msgid "December"
+#: mod/wallmessage.php:133
+#, php-format
+msgid ""
+"If you wish for %s to respond, please check that the privacy settings on "
+"your site allow private mail from unknown senders."
 msgstr ""
 
 #: mod/wallmessage.php:134 mod/message.php:234 mod/message.php:401
@@ -4311,8 +4315,8 @@ msgstr ""
 
 #: mod/admin.php:305
 msgid ""
-"Remove old remote items, orphaned database records and old content from some "
-"other helper tables."
+"Enable the Terms of Service page. If this is enabled a link to the terms "
+"will be added to the registration form and the general information page."
 msgstr ""
 
 #: mod/admin.php:306
@@ -4322,9 +4326,8 @@ msgstr ""
 #: mod/admin.php:306
 #, php-format
 msgid ""
-"When the database cleanup is enabled, this defines the days after which "
-"remote items will be deleted. Own items, and marked or filed items are "
-"always kept. 0 disables this behaviour."
+"Show some informations regarding the needed information to operate the node "
+"according e.g. to <a href=\"%s\" target=\"_blank\">EU-GDPR</a>."
 msgstr ""
 
 #: mod/admin.php:307
@@ -4358,6 +4361,12 @@ msgid "Check to delete this entry from the blocklist"
 msgstr ""
 
 #: mod/admin.php:367
+msgid ""
+"This page can be used to define a black list of servers from the federated "
+"network that are not allowed to interact with your node. For all entered "
+"domains you should also give a reason why you have blocked the remote server."
+msgstr ""
+
 #: mod/admin.php:368
 msgid ""
 "The list of blocked servers will be made publically available on the /"
@@ -4491,148 +4500,9 @@ msgid "Delete this Item"
 msgstr ""
 
 #: mod/admin.php:527
-#: mod/admin.php:1446
-msgid "Maximum numbers of comments per post"
-msgstr ""
-
-#: mod/admin.php:1446
-msgid "How much comments should be shown for each post? Default value is 100."
-msgstr ""
-
-#: mod/admin.php:1447
-msgid "Temp path"
-msgstr ""
-
-#: mod/admin.php:1447
 msgid ""
-"If you have a restricted system where the webserver can't access the system "
-"temp path, enter another path here."
-msgstr ""
-
-#: mod/admin.php:1448
-msgid "Base path to installation"
-msgstr ""
-
-#: mod/admin.php:1448
-msgid ""
-"If the system cannot detect the correct path to your installation, enter the "
-"correct path here. This setting should only be set if you are using a "
-"restricted system and symbolic links to your webroot."
-msgstr ""
-
-#: mod/admin.php:1449
-msgid "Disable picture proxy"
-msgstr ""
-
-#: mod/admin.php:1449
-msgid ""
-"The picture proxy increases performance and privacy. It shouldn't be used on "
-"systems with very low bandwith."
-msgstr ""
-
-#: mod/admin.php:1450
-msgid "Only search in tags"
-msgstr ""
-
-#: mod/admin.php:1450
-msgid "On large systems the text search can slow down the system extremely."
-msgstr ""
-
-#: mod/admin.php:1452
-msgid "New base url"
-msgstr ""
-
-#: mod/admin.php:1452
-msgid ""
-"Change base url for this server. Sends relocate message to all Friendica and "
-"Diaspora* contacts of all users."
-msgstr ""
-
-#: mod/admin.php:1454
-msgid "RINO Encryption"
-msgstr ""
-
-#: mod/admin.php:1454
-msgid "Encryption layer between nodes."
-msgstr ""
-
-#: mod/admin.php:1454 addons/mailstream/mailstream.php:382
-#: addons/advancedcontentfilter/advancedcontentfilter.php:213
-msgid "Enabled"
-msgstr ""
-
-#: mod/admin.php:1456
-msgid "Maximum number of parallel workers"
-msgstr ""
-
-#: mod/admin.php:1456
-msgid ""
-"On shared hosters set this to 2. On larger systems, values of 10 are great. "
-"Default value is 4."
-msgstr ""
-
-#: mod/admin.php:1457
-msgid "Don't use 'proc_open' with the worker"
-msgstr ""
-
-#: mod/admin.php:1457
-msgid ""
-"Enable this if your system doesn't allow the use of 'proc_open'. This can "
-"happen on shared hosters. If this is enabled you should increase the "
-"frequency of worker calls in your crontab."
-msgstr ""
-
-#: mod/admin.php:1458
-msgid "Enable fastlane"
-msgstr ""
-
-#: mod/admin.php:1458
-msgid ""
-"When enabed, the fastlane mechanism starts an additional worker if processes "
-"with higher priority are blocked by processes of lower priority."
-msgstr ""
-
-#: mod/admin.php:1459
-msgid "Enable frontend worker"
-msgstr ""
-
-#: mod/admin.php:1459
-#, php-format
-msgid ""
-"When enabled the Worker process is triggered when backend access is "
-"performed \\x28e.g. messages being delivered\\x29. On smaller sites you "
-"might want to call %s/worker on a regular basis via an external cron job. "
-"You should only enable this option if you cannot utilize cron/scheduled jobs "
-"on your server."
-msgstr ""
-
-#: mod/admin.php:1461
-msgid "Subscribe to relay"
-msgstr ""
-
-#: mod/admin.php:1461
-msgid ""
-"Enables the receiving of public posts from the relay. They will be included "
-"in the search, subscribed tags and on the global community page."
-msgstr ""
-
-#: mod/admin.php:1462
-msgid "Relay server"
-msgstr ""
-
-#: mod/admin.php:1462
-msgid ""
-"Address of the relay server where public posts should be send to. For "
-"example https://relay.diasp.org"
-msgstr ""
-
-#: mod/admin.php:1463
-msgid "Direct relay transfer"
-msgstr ""
-
-#: mod/admin.php:1463
-msgid ""
-"Enables the direct transfer to other servers without using the relay servers"
+"On this page you can delete an item from your node. If the item is a top "
+"level posting, the entire thread will be deleted."
 msgstr ""
 
 #: mod/admin.php:528
@@ -4674,8 +4544,8 @@ msgstr ""
 #: mod/admin.php:723
 #, php-format
 msgid ""
-"If enabled, the tags from the saved searches will used for the 'tags' "
-"subscription in addition to the 'relay_server_tags'."
+"Currently this node is aware of %d nodes with %d registered users from the "
+"following platforms:"
 msgstr ""
 
 #: mod/admin.php:754
@@ -4712,7 +4582,13 @@ msgstr ""
 
 #: mod/admin.php:784
 #, php-format
-msgid "There was no additional update function %s that needed to be called."
+msgid ""
+"Your DB still runs with MyISAM tables. You should change the engine type to "
+"InnoDB. As Friendica will use InnoDB only features in the future, you should "
+"change this! See <a href=\"%s\">here</a> for a guide that may be helpful "
+"converting the table engines. You may also use the command <tt>php bin/"
+"console.php dbstructure toinnodb</tt> of your Friendica installation for an "
+"automatic conversion.<br />"
 msgstr ""
 
 #: mod/admin.php:791
@@ -4736,7 +4612,8 @@ msgstr ""
 #: mod/admin.php:810
 #, php-format
 msgid ""
-"This does not include updates prior to 1139, which did not return a status."
+"The last worker execution was on %s UTC. This is older than one hour. Please "
+"check your crontab settings."
 msgstr ""
 
 #: mod/admin.php:815
@@ -4791,28 +4668,28 @@ msgstr ""
 msgid "Can not parse base url. Must have at least <scheme>://<domain>"
 msgstr ""
 
-#: mod/admin.php:1821
-msgid "Type"
+#: mod/admin.php:1220
+msgid "Site settings updated."
 msgstr ""
 
-#: mod/admin.php:1828
-msgid "Add User"
+#: mod/admin.php:1276
+msgid "No community page for local users"
 msgstr ""
 
-#: mod/admin.php:1830
-msgid "User registrations waiting for confirm"
+#: mod/admin.php:1277
+msgid "No community page"
 msgstr ""
 
-#: mod/admin.php:1831
-msgid "User waiting for permanent deletion"
+#: mod/admin.php:1278
+msgid "Public postings from users of this site"
 msgstr ""
 
-#: mod/admin.php:1832
-msgid "Request date"
+#: mod/admin.php:1279
+msgid "Public postings from the federated network"
 msgstr ""
 
-#: mod/admin.php:1833
-msgid "No registrations."
+#: mod/admin.php:1280
+msgid "Public postings from local users and the federated network"
 msgstr ""
 
 #: mod/admin.php:1284 mod/admin.php:1449 mod/admin.php:1459
@@ -4820,36 +4697,32 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: mod/admin.php:1836
-msgid "Deny"
+#: mod/admin.php:1286
+msgid "Users, Global Contacts"
 msgstr ""
 
-#: mod/admin.php:1840
-msgid "Site admin"
+#: mod/admin.php:1287
+msgid "Users, Global Contacts/fallback"
 msgstr ""
 
-#: mod/admin.php:1841
-msgid "Account expired"
+#: mod/admin.php:1291
+msgid "One month"
 msgstr ""
 
-#: mod/admin.php:1844
-msgid "New User"
+#: mod/admin.php:1292
+msgid "Three months"
 msgstr ""
 
-#: mod/admin.php:1845
-msgid "Deleted since"
+#: mod/admin.php:1293
+msgid "Half a year"
 msgstr ""
 
-#: mod/admin.php:1850
-msgid ""
-"Selected users will be deleted!\\n\\nEverything these users had posted on "
-"this site will be permanently deleted!\\n\\nAre you sure?"
+#: mod/admin.php:1294
+msgid "One year"
 msgstr ""
 
-#: mod/admin.php:1851
-msgid ""
-"The user {0} will be deleted!\\n\\nEverything this user has posted on this "
-"site will be permanently deleted!\\n\\nAre you sure?"
+#: mod/admin.php:1299
+msgid "Multi user instance"
 msgstr ""
 
 #: mod/admin.php:1325
@@ -4969,11 +4842,8 @@ msgstr ""
 #: mod/admin.php:1376
 #, php-format
 msgid ""
-"To enable logging of PHP errors and warnings you can add the following to "
-"the .htconfig.php file of your installation. The filename set in the "
-"'error_log' line is relative to the friendica top-level directory and must "
-"be writeable by the web server. The option '1' for 'log_errors' and "
-"'display_errors' is to enable these options, set to '0' to disable them."
+"For public servers: you can add additional information here that will be "
+"listed at %s/servers."
 msgstr ""
 
 #: mod/admin.php:1377
@@ -5105,8 +4975,8 @@ msgstr ""
 
 #: mod/admin.php:1392
 msgid ""
-"Shift-reload the page or clear browser cache if the new photo does not "
-"display immediately."
+"Comma separated list of domains which are allowed to establish friendships "
+"with this site. Wildcards are accepted. Empty to allow any domains"
 msgstr ""
 
 #: mod/admin.php:1393
@@ -5353,9 +5223,8 @@ msgstr ""
 
 #: mod/admin.php:1420
 msgid ""
-"Friendica is a community project, that would not be possible without the "
-"help of many people. Here is a list of those who have contributed to the "
-"code or the translation of Friendica. Thank you all!"
+"Maximum system load before delivery and poll processes are deferred - "
+"default 50."
 msgstr ""
 
 #: mod/admin.php:1421
@@ -5420,8 +5289,12 @@ msgstr ""
 
 #: mod/admin.php:1428
 msgid ""
-"No secure communications available. You <strong>may</strong> be able to "
-"respond from the sender's profile page."
+"Periodically query other servers for contacts. You can choose between "
+"'users': the users on the remote system, 'Global Contacts': active contacts "
+"that are known on the system. The fallback is meant for Redmatrix servers "
+"and older friendica servers, where global contacts weren't available. The "
+"fallback increases the server load, so the recommened setting is 'Users, "
+"Global Contacts'."
 msgstr ""
 
 #: mod/admin.php:1429
@@ -5481,9 +5354,8 @@ msgstr ""
 
 #: mod/admin.php:1436
 msgid ""
-"Visit %s for a list of public sites that you can join. Friendica members on "
-"other sites can all connect with each other, as well as with members of many "
-"other social networks."
+"Remove old remote items, orphaned database records and old content from some "
+"other helper tables."
 msgstr ""
 
 #: mod/admin.php:1437
@@ -5492,10 +5364,9 @@ msgstr ""
 
 #: mod/admin.php:1437
 msgid ""
-"Friendica sites all inter-connect to create a huge privacy-enhanced social "
-"web that is owned and controlled by its members. They can also connect with "
-"many traditional social networks. See %s for a list of alternate Friendica "
-"sites you can join."
+"When the database cleanup is enabled, this defines the days after which "
+"remote items will be deleted. Own items, and marked or filed items are "
+"always kept. 0 disables this behaviour."
 msgstr ""
 
 #: mod/admin.php:1438
@@ -5504,9 +5375,10 @@ msgstr ""
 
 #: mod/admin.php:1438
 msgid ""
-"Friendica sites all inter-connect to create a huge privacy-enhanced social "
-"web that is owned and controlled by its members. They can also connect with "
-"many traditional social networks."
+"When the database cleanup is enabled, this defines the days after which "
+"unclaimed remote items (mostly content from the relay) will be deleted. "
+"Default value is 90 days. Defaults to the general lifespan value of remote "
+"items if set to 0."
 msgstr ""
 
 #: mod/admin.php:1439
@@ -5541,8 +5413,8 @@ msgstr ""
 
 #: mod/admin.php:1442
 msgid ""
-"For more information about the Friendica project and why we feel it is "
-"important, please visit http://friendi.ca"
+"If you have a restricted system where the webserver can't access the system "
+"temp path, enter another path here."
 msgstr ""
 
 #: mod/admin.php:1443
@@ -5668,8 +5540,7 @@ msgstr ""
 
 #: mod/admin.php:1458
 msgid ""
-"Remote subscription can't be done for your network. Please subscribe "
-"directly on your system."
+"Enables the direct transfer to other servers without using the relay servers"
 msgstr ""
 
 #: mod/admin.php:1459
@@ -5678,8 +5549,8 @@ msgstr ""
 
 #: mod/admin.php:1459
 msgid ""
-"Incorrect identity currently logged in. Please login to <strong>this</"
-"strong> profile."
+"Can be 'all' or 'tags'. 'all' means that every public post should be "
+"received. 'tags' means that only posts with selected tags should be received."
 msgstr ""
 
 #: mod/admin.php:1459
@@ -5704,8 +5575,8 @@ msgstr ""
 
 #: mod/admin.php:1461
 msgid ""
-"If you are not yet a member of the free social web, <a href=\"%s\">follow "
-"this link to find a public Friendica site and join us today</a>."
+"If enabled, the tags from the saved searches will used for the 'tags' "
+"subscription in addition to the 'relay_server_tags'."
 msgstr ""
 
 #: mod/admin.php:1489
@@ -5729,9 +5600,7 @@ msgstr ""
 
 #: mod/admin.php:1517
 #, php-format
-msgid ""
-" - please do not use this form.  Instead, enter %s into your Diaspora search "
-"bar."
+msgid "Update %s was successfully applied."
 msgstr ""
 
 #: mod/admin.php:1520
@@ -5780,24 +5649,60 @@ msgstr ""
 #: mod/admin.php:1597
 #, php-format
 msgid ""
-"Friendica provides this service for sharing events with other networks and "
-"friends in unknown timezones."
+"\n"
+"\t\t\tThe login details are as follows:\n"
+"\n"
+"\t\t\tSite Location:\t%1$s\n"
+"\t\t\tLogin Name:\t\t%2$s\n"
+"\t\t\tPassword:\t\t%3$s\n"
+"\n"
+"\t\t\tYou may change your password from your account \"Settings\" page after "
+"logging\n"
+"\t\t\tin.\n"
+"\n"
+"\t\t\tPlease take a few moments to review the other account settings on that "
+"page.\n"
+"\n"
+"\t\t\tYou may also wish to add some basic information to your default "
+"profile\n"
+"\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n"
+"\n"
+"\t\t\tWe recommend setting your full name, adding a profile photo,\n"
+"\t\t\tadding some profile \"keywords\" (very useful in making new friends) - "
+"and\n"
+"\t\t\tperhaps what country you live in; if you do not wish to be more "
+"specific\n"
+"\t\t\tthan that.\n"
+"\n"
+"\t\t\tWe fully respect your right to privacy, and none of these items are "
+"necessary.\n"
+"\t\t\tIf you are new and do not know anybody here, they may help\n"
+"\t\t\tyou to make some new and interesting friends.\n"
+"\n"
+"\t\t\tIf you ever want to delete your account, you can do so at %1$s/"
+"removeme\n"
+"\n"
+"\t\t\tThank you and welcome to %4$s."
 msgstr ""
 
 #: mod/admin.php:1631 src/Model/User.php:673
 #, php-format
-msgid "UTC time: %s"
+msgid "Registration details for %s"
 msgstr ""
 
 #: mod/admin.php:1641
 #, php-format
-msgid "Current timezone: %s"
-msgstr ""
+msgid "%s user blocked/unblocked"
+msgid_plural "%s users blocked/unblocked"
+msgstr[0] ""
+msgstr[1] ""
 
 #: mod/admin.php:1647
 #, php-format
-msgid "Converted localtime: %s"
-msgstr ""
+msgid "%s user deleted"
+msgid_plural "%s users deleted"
+msgstr[0] ""
+msgstr[1] ""
 
 #: mod/admin.php:1694
 #, php-format
@@ -5895,8 +5800,8 @@ msgstr ""
 
 #: mod/admin.php:1846
 msgid ""
-"Mark this contact as remote_self, this will cause friendica to repost new "
-"entries from this contact."
+"The user {0} will be deleted!\\n\\nEverything this user has posted on this "
+"site will be permanently deleted!\\n\\nAre you sure?"
 msgstr ""
 
 #: mod/admin.php:1856
@@ -5951,7 +5856,10 @@ msgstr ""
 
 #: mod/admin.php:2005
 #, php-format
-msgid "%1$s tagged %2$s's %3$s with %4$s"
+msgid ""
+"There are currently no addons available on your node. You can find the "
+"official addon repository at %1$s and might find other interesting addons in "
+"the open addon registry at %2$s"
 msgstr ""
 
 #: mod/admin.php:2125
@@ -7788,246 +7696,232 @@ msgstr ""
 msgid "The contact entries have been archived"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:278
-msgid "Globally Available GNU Social OAuthKeys"
+#: src/Core/Install.php:157
+msgid "Could not find a command line version of PHP in the web server PATH."
 msgstr ""
 
-#: addons/statusnet/statusnet.php:279
+#: src/Core/Install.php:158
 msgid ""
-"There are preconfigured OAuth key pairs for some GNU Social servers "
-"available. If you are using one of them, please use these credentials. If "
-"not feel free to connect to any other GNU Social instance (see below)."
+"If you don't have a command line version of PHP installed on your server, "
+"you will not be able to run the background processing. See <a href='https://"
+"github.com/friendica/friendica/blob/master/doc/Install.md#set-up-the-"
+"worker'>'Setup the worker'</a>"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:287
-msgid "Provide your own OAuth Credentials"
+#: src/Core/Install.php:162
+msgid "PHP executable path"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:288
+#: src/Core/Install.php:162
 msgid ""
-"No consumer key pair for GNU Social found. Register your Friendica Account "
-"as an desktop client on your GNU Social account, copy the consumer key pair "
-"here and enter the API base root.<br />Before you register your own OAuth "
-"key pair ask the administrator if there is already a key pair for this "
-"Friendica installation at your favorited GNU Social installation."
+"Enter full path to php executable. You can leave this blank to continue the "
+"installation."
 msgstr ""
 
-#: addons/statusnet/statusnet.php:290
-msgid "OAuth Consumer Key"
+#: src/Core/Install.php:167
+msgid "Command line PHP"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:293
-msgid "OAuth Consumer Secret"
+#: src/Core/Install.php:176
+msgid "PHP executable is not the php cli binary (could be cgi-fgci version)"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:296 addons/statusnet/statusnet.php:652
-#: addons/statusnet/statusnet.php:664
-msgid "Base API Path (remember the trailing /)"
+#: src/Core/Install.php:177
+msgid "Found PHP version: "
 msgstr ""
 
-#: addons/statusnet/statusnet.php:321
+#: src/Core/Install.php:179
+msgid "PHP cli binary"
+msgstr ""
+
+#: src/Core/Install.php:189
 msgid ""
-"To connect to your GNU Social account click the button below to get a "
-"security code from GNU Social which you have to copy into the input box "
-"below and submit the form. Only your <strong>public</strong> posts will be "
-"posted to GNU Social."
+"The command line version of PHP on your system does not have "
+"\"register_argc_argv\" enabled."
 msgstr ""
 
-#: addons/statusnet/statusnet.php:322
-msgid "Log in with GNU Social"
+#: src/Core/Install.php:190
+msgid "This is required for message delivery to work."
 msgstr ""
 
-#: addons/statusnet/statusnet.php:324
-msgid "Copy the security code from GNU Social here"
+#: src/Core/Install.php:192
+msgid "PHP register_argc_argv"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:330
-msgid "Cancel Connection Process"
-msgstr ""
-
-#: addons/statusnet/statusnet.php:332
-msgid "Current GNU Social API is"
-msgstr ""
-
-#: addons/statusnet/statusnet.php:333
-msgid "Cancel GNU Social Connection"
-msgstr ""
-
-#: addons/statusnet/statusnet.php:344 addons/twitter/twitter.php:335
-msgid "Currently connected to: "
-msgstr ""
-
-#: addons/statusnet/statusnet.php:345
+#: src/Core/Install.php:220
 msgid ""
-"If enabled all your <strong>public</strong> postings can be posted to the "
-"associated GNU Social account. You can choose to do so by default (here) or "
-"for every posting separately in the posting options when writing the entry."
+"Error: the \"openssl_pkey_new\" function on this system is not able to "
+"generate encryption keys"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:347
+#: src/Core/Install.php:221
 msgid ""
-"<strong>Note</strong>: Due your privacy settings (<em>Hide your profile "
-"details from unknown viewers?</em>) the link potentially included in public "
-"postings relayed to GNU Social will lead the visitor to a blank page "
-"informing the visitor that the access to your profile has been restricted."
+"If running under Windows, please see \"http://www.php.net/manual/en/openssl."
+"installation.php\"."
 msgstr ""
 
-#: addons/statusnet/statusnet.php:350
-msgid "Allow posting to GNU Social"
+#: src/Core/Install.php:223
+msgid "Generate encryption keys"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:353
-msgid "Send public postings to GNU Social by default"
+#: src/Core/Install.php:244
+msgid "libCurl PHP module"
 msgstr ""
 
-#: addons/statusnet/statusnet.php:357
+#: src/Core/Install.php:245
+msgid "GD graphics PHP module"
+msgstr ""
+
+#: src/Core/Install.php:246
+msgid "OpenSSL PHP module"
+msgstr ""
+
+#: src/Core/Install.php:247
+msgid "PDO or MySQLi PHP module"
+msgstr ""
+
+#: src/Core/Install.php:248
+msgid "mb_string PHP module"
+msgstr ""
+
+#: src/Core/Install.php:249
+msgid "XML PHP module"
+msgstr ""
+
+#: src/Core/Install.php:250
+msgid "iconv PHP module"
+msgstr ""
+
+#: src/Core/Install.php:251
+msgid "POSIX PHP module"
+msgstr ""
+
+#: src/Core/Install.php:255 src/Core/Install.php:257
+msgid "Apache mod_rewrite module"
+msgstr ""
+
+#: src/Core/Install.php:255
 msgid ""
-"Mirror all posts from GNU Social that are no replies or repeated messages"
+"Error: Apache webserver mod-rewrite module is required but not installed."
 msgstr ""
 
-#: addons/statusnet/statusnet.php:368
-msgid "Full Timeline"
+#: src/Core/Install.php:263
+msgid "Error: libCURL PHP module required but not installed."
 msgstr ""
 
-#: addons/statusnet/statusnet.php:369
-msgid "Only Mentions"
-msgstr ""
-
-#: addons/statusnet/statusnet.php:378
-msgid "Clear OAuth configuration"
-msgstr ""
-
-#: addons/twitter/twitter.php:194
-msgid "Post to Twitter"
-msgstr ""
-
-#: addons/twitter/twitter.php:235
+#: src/Core/Install.php:267
 msgid ""
-"You submitted an empty PIN, please Sign In with Twitter again to get a new "
-"one."
+"Error: GD graphics PHP module with JPEG support required but not installed."
 msgstr ""
 
-#: addons/twitter/twitter.php:262
-msgid "Twitter settings updated."
+#: src/Core/Install.php:271
+msgid "Error: openssl PHP module required but not installed."
 msgstr ""
 
-#: addons/twitter/twitter.php:292 addons/twitter/twitter.php:296
-msgid "Twitter Import/Export/Mirror"
+#: src/Core/Install.php:275
+msgid "Error: PDO or MySQLi PHP module required but not installed."
 msgstr ""
 
-#: addons/twitter/twitter.php:303
+#: src/Core/Install.php:279
+msgid "Error: The MySQL driver for PDO is not installed."
+msgstr ""
+
+#: src/Core/Install.php:283
+msgid "Error: mb_string PHP module required but not installed."
+msgstr ""
+
+#: src/Core/Install.php:287
+msgid "Error: iconv PHP module required but not installed."
+msgstr ""
+
+#: src/Core/Install.php:291
+msgid "Error: POSIX PHP module required but not installed."
+msgstr ""
+
+#: src/Core/Install.php:301
+msgid "Error, XML PHP module required but not installed."
+msgstr ""
+
+#: src/Core/Install.php:320
 msgid ""
-"No consumer key pair for Twitter found. Please contact your site "
-"administrator."
+"The web installer needs to be able to create a file called \".htconfig.php\" "
+"in the top folder of your web server and it is unable to do so."
 msgstr ""
 
-#: addons/twitter/twitter.php:315
+#: src/Core/Install.php:321
 msgid ""
-"At this Friendica instance the Twitter addon was enabled but you have not "
-"yet connected your account to your Twitter account. To do so click the "
-"button below to get a PIN from Twitter which you have to copy into the input "
-"box below and submit the form. Only your <strong>public</strong> posts will "
-"be posted to Twitter."
+"This is most often a permission setting, as the web server may not be able "
+"to write files in your folder - even if you can."
 msgstr ""
 
-#: addons/twitter/twitter.php:316
-msgid "Log in with Twitter"
-msgstr ""
-
-#: addons/twitter/twitter.php:318
-msgid "Copy the PIN from Twitter here"
-msgstr ""
-
-#: addons/twitter/twitter.php:336
-msgid "Disconnect"
-msgstr ""
-
-#: addons/twitter/twitter.php:346
-msgid "Allow posting to Twitter"
-msgstr ""
-
-#: addons/twitter/twitter.php:346
+#: src/Core/Install.php:322
 msgid ""
-"If enabled all your <strong>public</strong> postings can be posted to the "
-"associated Twitter account. You can choose to do so by default (here) or for "
-"every posting separately in the posting options when writing the entry."
+"At the end of this procedure, we will give you a text to save in a file "
+"named .htconfig.php in your Friendica top folder."
 msgstr ""
 
-#: addons/twitter/twitter.php:349
+#: src/Core/Install.php:323
 msgid ""
-"<strong>Note</strong>: Due to your privacy settings (<em>Hide your profile "
-"details from unknown viewers?</em>) the link potentially included in public "
-"postings relayed to Twitter will lead the visitor to a blank page informing "
-"the visitor that the access to your profile has been restricted."
+"You can alternatively skip this procedure and perform a manual installation. "
+"Please see the file \"INSTALL.txt\" for instructions."
 msgstr ""
 
-#: addons/twitter/twitter.php:352
-msgid "Send public postings to Twitter by default"
+#: src/Core/Install.php:326
+msgid ".htconfig.php is writable"
 msgstr ""
 
-#: addons/twitter/twitter.php:355
-msgid "Mirror all posts from twitter that are no replies"
-msgstr ""
-
-#: addons/twitter/twitter.php:361
-msgid "Automatically create contacts"
-msgstr ""
-
-#: addons/twitter/twitter.php:613
-msgid "Twitter post failed. Queued for retry."
-msgstr ""
-
-#: addons/twitter/twitter.php:637
-msgid "Consumer key"
-msgstr ""
-
-#: addons/twitter/twitter.php:638
-msgid "Consumer secret"
-msgstr ""
-
-#: addons/openstreetmap/openstreetmap.php:172
-msgid "View Larger"
-msgstr ""
-
-#: addons/openstreetmap/openstreetmap.php:200
-msgid "Tile Server URL"
-msgstr ""
-
-#: addons/openstreetmap/openstreetmap.php:200
+#: src/Core/Install.php:344
 msgid ""
-"A list of <a href=\"http://wiki.openstreetmap.org/wiki/TMS\" target=\"_blank"
-"\">public tile servers</a>"
+"Friendica uses the Smarty3 template engine to render its web views. Smarty3 "
+"compiles templates to PHP to speed up rendering."
 msgstr ""
 
-#: addons/openstreetmap/openstreetmap.php:201
-msgid "Nominatim (reverse geocoding) Server URL"
-msgstr ""
-
-#: addons/openstreetmap/openstreetmap.php:201
+#: src/Core/Install.php:345
 msgid ""
-"A list of <a href=\"http://wiki.openstreetmap.org/wiki/Nominatim\" target="
-"\"_blank\">Nominatim servers</a>"
+"In order to store these compiled templates, the web server needs to have "
+"write access to the directory view/smarty3/ under the Friendica top level "
+"folder."
 msgstr ""
 
-#: addons/openstreetmap/openstreetmap.php:202
-msgid "Default zoom"
-msgstr ""
-
-#: addons/openstreetmap/openstreetmap.php:202
+#: src/Core/Install.php:346
 msgid ""
-"The default zoom level. (1:world, 18:highest, also depends on tile server)"
+"Please ensure that the user that your web server runs as (e.g. www-data) has "
+"write access to this folder."
 msgstr ""
 
-#: addons/openstreetmap/openstreetmap.php:203
-msgid "Include marker on map"
+#: src/Core/Install.php:347
+msgid ""
+"Note: as a security measure, you should give the web server write access to "
+"view/smarty3/ only--not the template files (.tpl) that it contains."
 msgstr ""
 
-#: addons/openstreetmap/openstreetmap.php:203
-msgid "Include a marker on the map."
+#: src/Core/Install.php:350
+msgid "view/smarty3 is writable"
 msgstr ""
 
-#: addons/notimeline/notimeline.php:32
-msgid "No Timeline settings updated."
+#: src/Core/Install.php:375
+msgid ""
+"Url rewrite in .htaccess is not working. Check your server configuration."
+msgstr ""
+
+#: src/Core/Install.php:377
+msgid "Error message from Curl when fetching"
+msgstr ""
+
+#: src/Core/Install.php:381
+msgid "Url rewrite is working"
+msgstr ""
+
+#: src/Core/Install.php:408
+msgid "ImageMagick PHP extension is not installed"
+msgstr ""
+
+#: src/Core/Install.php:410
+msgid "ImageMagick PHP extension is installed"
+msgstr ""
+
+#: src/Core/Install.php:412
+msgid "ImageMagick supports GIF"
 msgstr ""
 
 #: src/Core/NotificationsManager.php:173
