@@ -313,7 +313,7 @@ class Addon
 			$ll = explode("\n", $m[0]);
 			foreach ($ll as $l) {
 				$l = trim($l, "\t\n\r */");
-				if ($l != "") {
+				if ($l != "" && strpos($l,":")>0) {
 					list($type, $v) = array_map("trim", explode(":", $l, 2));
 					$type = strtolower($type);
 					if ($type == "author" || $type == "maintainer") {

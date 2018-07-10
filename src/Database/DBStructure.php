@@ -366,7 +366,8 @@ class DBStructure
 				}
 
 				if (isset($database[$name]["table_status"]["Comment"])) {
-					if ($database[$name]["table_status"]["Comment"] != $structure['comment']) {
+					if (!isset($strcture["comment"])) $structure["comment"] = "";
+					if ($database[$name]["table_status"]["Comment"] != $structure["comment"]) {
 						$sql2 = "COMMENT = '".dbesc($structure['comment'])."'";
 
 						if ($sql3 == "") {
