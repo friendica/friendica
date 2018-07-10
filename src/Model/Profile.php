@@ -24,7 +24,7 @@ use Friendica\Util\Network;
 use Friendica\Util\Temporal;
 use dba;
 
-use \InvalidArgumentException;
+use InvalidArgumentException;
 
 require_once 'include/dba.php';
 require_once 'mod/proxy.php';
@@ -106,13 +106,6 @@ class Profile
 			notice(L10n::t('Requested account is not available.') . EOL);
 			$a->error = 404;
 			return;
-		}
-
-		// Not found in page array?
-		if (!isset($a->page['aside'])) {
-			// Then initialize it
-			/// @TODO Ugly workaround, find the root cause of this
-			$a->page['aside'] = '';
 		}
 
 		if (count($profiledata) > 0) {
