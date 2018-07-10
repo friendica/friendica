@@ -1647,7 +1647,7 @@ section #jotOpen {
 }
 
 /* Space between content and head */
-#wall-spacer {
+.wall-spacer {
 	height: 10px;
 }
 
