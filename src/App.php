@@ -174,7 +174,21 @@ class App
 		$this->callstack['parser'] = [];
 
 		$this->config = [];
-		$this->page = [];
+
+		$this->page = [
+			'aside' => '',
+			'bottom' => '',
+			'content' => '',
+			'end' => '',
+			'footer' => '',
+			'htmlhead' => '',
+			'nav' => '',
+			'page_title' => '',
+			'right_aside' => '',
+			'template' => '',
+			'title' => ''
+		];
+
 		$this->pager = [];
 
 		$this->query_string = '';
