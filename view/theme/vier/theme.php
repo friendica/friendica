@@ -29,12 +29,10 @@ function vier_init(App $a)
 
 	$a->set_template_engine('smarty3');
 
-	if (!empty($a->argv[0])) {
-		if ($a->argv[0] . defaults($a->argv, 1, '') === "profile".$a->user['nickname'] || $a->argv[0] === "network" && local_user()) {
-			vier_community_info();
+	if (!empty($a->argv[0]) && $a->argv[0] . defaults($a->argv, 1, '') === "profile".$a->user['nickname'] || $a->argv[0] === "network" && local_user()) {
+		vier_community_info();
 
-			$a->page['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
-		}
+		$a->page['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
 	}
 
 	if ($a->is_mobile || $a->is_tablet) {
