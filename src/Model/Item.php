@@ -726,21 +726,21 @@ class Item extends BaseObject
 
 		$author_owner_fields = ['author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link'];
 		foreach ($author_owner_fields as $field) {
-			if (isset($fields[$field])) {
+			if (array_key_exists($field, $fields)) {
 				$fields[$field] = null;
 			}
 		}
 
 		if (array_key_exists('tag', $fields)) {
 			$tags = $fields['tag'];
-			unset($fields['tag']);
+			$fields['tag'] = null;
 		} else {
 			$tags = '';
 		}
 
 		if (array_key_exists('file', $fields)) {
 			$files = $fields['file'];
-			unset($fields['file']);
+			$fields['file'] = null;
 		} else {
 			$files = '';
 		}
