@@ -321,9 +321,9 @@ class ParseUrl
 				}
 			}
 
-			$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
+			if (!empty($attr["content"])) {
+				$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
 
-			if ($attr["content"] != "") {
 				switch (strtolower($attr["property"])) {
 					case "og:image":
 						$siteinfo["image"] = $attr["content"];

@@ -998,7 +998,7 @@ class Probe
 			}
 		}
 
-		if (substr($webfinger["subject"], 0, 5) == "acct:") {
+		if (!empty($webfinger["subject"]) && (substr($webfinger["subject"], 0, 5) == "acct:")) {
 			$data["addr"] = substr($webfinger["subject"], 5);
 		}
 
@@ -1247,7 +1247,7 @@ class Probe
 	{
 		$data = [];
 
-		if (is_array($webfinger["aliases"])) {
+		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
 				if (strstr($alias, "@") && !strstr(normalise_link($alias), "http://")) {
 					$data["addr"] = str_replace('acct:', '', $alias);
@@ -1255,7 +1255,7 @@ class Probe
 			}
 		}
 
-		if (is_string($webfinger["subject"]) && strstr($webfinger["subject"], "@")
+		if (!empty($webfinger["subject"]) && strstr($webfinger["subject"], "@")
 			&& !strstr(normalise_link($webfinger["subject"]), "http://")
 		) {
 			$data["addr"] = str_replace('acct:', '', $webfinger["subject"]);
