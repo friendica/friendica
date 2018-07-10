@@ -1500,7 +1500,11 @@ class Item extends BaseObject
 		put_item_in_cache($item);
 
 		if ($notify) {
+			$item['edit'] = false;
+			$item['parent'] = $parent_id;
 			Addon::callHooks('post_local', $item);
+			unset($item['edit']);
+			unset($item['parent']);
 		} else {
 			Addon::callHooks('post_remote', $item);
 		}
