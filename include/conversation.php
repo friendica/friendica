@@ -405,7 +405,7 @@ function visible_activity($item) {
  * that are based on unique features of the calling module.
  *
  */
-function conversation(App $a, $items, $mode, $update, $preview = false, $order = 'commented', $uid = 0) {
+function conversation(App $a, array $items, $mode, $update, $preview = false, $order = 'commented', $uid = 0) {
 	require_once 'mod/proxy.php';
 
 	$ssl_state = ((local_user()) ? true : false);
@@ -768,7 +768,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
  *
  * @return array items with parents and comments
  */
-function conversation_add_children($parents, $block_authors, $order, $uid) {
+function conversation_add_children(array $parents, $block_authors, $order, $uid) {
 	$max_comments = Config::get('system', 'max_comments', 100);
 
 	$params = ['order' => ['uid', 'commented' => true]];
