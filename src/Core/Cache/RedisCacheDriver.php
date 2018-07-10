@@ -4,6 +4,9 @@ namespace Friendica\Core\Cache;
 
 use Friendica\Core\Cache;
 
+use \Exception;
+use \Redis;
+
 /**
  * Redis Cache Driver. This driver is based on Memcache driver
  *
@@ -13,20 +16,20 @@ use Friendica\Core\Cache;
 class RedisCacheDriver extends AbstractCacheDriver implements IMemoryCacheDriver
 {
 	/**
-	 * @var \Redis
+	 * @var Redis
 	 */
 	private $redis;
 
 	public function __construct($redis_host, $redis_port)
 	{
 		if (!class_exists('Redis', false)) {
-			throw new \Exception('Redis class isn\'t available');
+			throw new Exception('Redis class isn\'t available');
 		}
 
-		$this->redis = new \Redis();
+		$this->redis = new Redis();
 
 		if (!$this->redis->connect($redis_host, $redis_port)) {
-			throw new \Exception('Expected Redis server at ' . $redis_host . ':' . $redis_port . ' isn\'t available');
+			throw new Exception('Expected Redis server at ' . $redis_host . ':' . $redis_port . ' isn\'t available');
 		}
 	}
 
