@@ -48,7 +48,7 @@ class SystemTest extends TestCase
 	/**
 	 * @expectedException InternalServerErrorException
 	 */
-	function testProcessIdLongPrefix() {
+	function testProcessIdToLongPrefix() {
 		System::processID('testtesttesttesttesttesttesttesttesttesttesttesttesttest');
 	}
 }
