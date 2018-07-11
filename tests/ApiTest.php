@@ -8,9 +8,7 @@ namespace Friendica\Test;
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
-use Friendica\Network\BadRequestException;
 use Friendica\Network\HTTPException;
-use Friendica\Render\FriendicaSmarty;
 
 /**
  * Tests for the API functions.
@@ -20,9 +18,35 @@ use Friendica\Render\FriendicaSmarty;
  */
 class ApiTest extends DatabaseTest
 {
+	/**
+	 * @var \Friendica\App
+	 */
+	private $app;
+
+	/**
+	 * @var array
+	 */
+	private $selfUser;
+
+	/**
+	 * @var array
+	 */
+	private $friendUser;
+
+	/**
+	 * @var array
+	 */
+	private $otherUser;
+
+	/**
+	 * @var int
+	 */
+	private $wrongUserId;
 
 	/**
 	 * Create variables used by tests.
+	 *
+	 * @throws \Exception Couldn't create app
 	 */
 	protected function setUp()
 	{
@@ -242,7 +266,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_login() function without any login.
 	 * @return void
 	 * @runInSeparateProcess
-	 * @expectedException Friendica\Network\HTTPException\UnauthorizedException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\UnauthorizedException
 	 */
 	public function testApiLoginWithoutLogin()
 	{
@@ -253,7 +278,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_login() function with a bad login.
 	 * @return void
 	 * @runInSeparateProcess
-	 * @expectedException Friendica\Network\HTTPException\UnauthorizedException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\UnauthorizedException
 	 */
 	public function testApiLoginWithBadLogin()
 	{
@@ -283,6 +309,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_login() function with a correct login.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\UnauthorizedException
 	 */
 	public function testApiLoginWithCorrectLogin()
 	{
@@ -295,7 +323,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_login() function with a remote user.
 	 * @return void
 	 * @runInSeparateProcess
-	 * @expectedException Friendica\Network\HTTPException\UnauthorizedException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\UnauthorizedException
 	 */
 	public function testApiLoginWithRemoteUser()
 	{
@@ -687,6 +716,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUser()
 	{
@@ -701,6 +732,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with a Frio schema.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithFrioSchema()
 	{
@@ -716,6 +749,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with a custom Frio schema.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithCustomFrioSchema()
 	{
@@ -734,6 +769,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with an empty Frio schema.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithEmptyFrioSchema()
 	{
@@ -749,6 +786,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with an user that is not allowed to use the API.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithoutApiUser()
 	{
@@ -762,6 +801,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with an user ID in a GET parameter.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithGetId()
 	{
@@ -773,7 +814,7 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with a wrong user ID in a GET parameter.
 	 * @return void
 	 * @runInSeparateProcess
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithWrongGetId()
 	{
@@ -785,6 +826,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with an user name in a GET parameter.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithGetName()
 	{
@@ -796,6 +839,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with a profile URL in a GET parameter.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithGetUrl()
 	{
@@ -807,6 +852,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with an user ID in the API path.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithNumericCalledApi()
 	{
@@ -820,6 +867,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with the $called_api global variable.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithCalledApi()
 	{
@@ -832,6 +881,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with a valid user.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithCorrectUser()
 	{
@@ -842,7 +893,7 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with a wrong user ID.
 	 * @return void
 	 * @runInSeparateProcess
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithWrongUser()
 	{
@@ -853,6 +904,8 @@ class ApiTest extends DatabaseTest
 	 * Test the api_get_user() function with a 0 user ID.
 	 * @return void
 	 * @runInSeparateProcess
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiGetUserWithZeroUser()
 	{
@@ -1017,6 +1070,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_account_verify_credentials() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiAccountVerifyCredentials()
 	{
@@ -1026,7 +1081,7 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_account_verify_credentials() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiAccountVerifyCredentialsWithoutAuthenticatedUser()
 	{
@@ -1066,6 +1121,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_mediap() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesMediap()
 	{
@@ -1091,7 +1148,7 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_mediap() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesMediapWithoutAuthenticatedUser()
 	{
@@ -1102,6 +1159,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_update() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\TooManyRequestsException
 	 */
 	public function testApiStatusesUpdate()
 	{
@@ -1128,6 +1188,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_update() function with an HTML status.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\TooManyRequestsException
 	 */
 	public function testApiStatusesUpdateWithHtml()
 	{
@@ -1140,7 +1203,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_update() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\TooManyRequestsException
 	 */
 	public function testApiStatusesUpdateWithoutAuthenticatedUser()
 	{
@@ -1178,7 +1243,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_media_upload() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiMediaUpload()
 	{
@@ -1188,7 +1256,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_media_upload() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiMediaUploadWithoutAuthenticatedUser()
 	{
@@ -1199,7 +1270,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_media_upload() function with an invalid uploaded media.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\InternalServerErrorException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiMediaUploadWithMedia()
 	{
@@ -1214,6 +1288,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_media_upload() function with an valid uploaded media.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiMediaUploadWithValidMedia()
 	{
@@ -1295,6 +1373,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_users_search() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiUsersSearch()
 	{
@@ -1306,6 +1386,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_users_search() function with an XML result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiUsersSearchWithXml()
 	{
@@ -1317,7 +1399,7 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_users_search() function without a GET q parameter.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiUsersSearchWithoutQuery()
 	{
@@ -1327,7 +1409,7 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_users_lookup() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\NotFoundException
+	 * @expectedException \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiUsersLookup()
 	{
@@ -1337,6 +1419,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_users_lookup() function with an user ID.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiUsersLookupWithUserId()
 	{
@@ -1348,6 +1432,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_search() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiSearch()
 	{
@@ -1363,6 +1449,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_search() function a count parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiSearchWithCount()
 	{
@@ -1378,6 +1466,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_search() function with an rpp parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiSearchWithRpp()
 	{
@@ -1394,7 +1484,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_search() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiSearchWithUnallowedUser()
 	{
@@ -1406,7 +1498,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_search() function without any GET query parameter.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiSearchWithoutQuery()
 	{
@@ -1416,6 +1509,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_home_timeline() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesHomeTimeline()
 	{
@@ -1432,6 +1527,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_home_timeline() function with a negative page parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesHomeTimelineWithNegativePage()
 	{
@@ -1446,7 +1543,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_home_timeline() with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesHomeTimelineWithUnallowedUser()
 	{
@@ -1458,6 +1556,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_home_timeline() function with an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesHomeTimelineWithRss()
 	{
@@ -1468,6 +1568,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_public_timeline() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesPublicTimeline()
 	{
@@ -1483,6 +1585,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_public_timeline() function with the exclude_replies parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesPublicTimelineWithExcludeReplies()
 	{
@@ -1498,6 +1602,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_public_timeline() function with a negative page parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesPublicTimelineWithNegativePage()
 	{
@@ -1512,7 +1618,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_public_timeline() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesPublicTimelineWithUnallowedUser()
 	{
@@ -1524,6 +1631,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_public_timeline() function with an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesPublicTimelineWithRss()
 	{
@@ -1534,6 +1643,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_networkpublic_timeline() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesNetworkpublicTimeline()
 	{
@@ -1548,6 +1659,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_networkpublic_timeline() function with a negative page parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesNetworkpublicTimelineWithNegativePage()
 	{
@@ -1562,7 +1675,7 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_networkpublic_timeline() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesNetworkpublicTimelineWithUnallowedUser()
 	{
@@ -1574,6 +1687,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_networkpublic_timeline() function with an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesNetworkpublicTimelineWithRss()
 	{
@@ -1584,7 +1699,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_show() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesShow()
 	{
@@ -1594,6 +1711,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_show() function with an ID.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesShowWithId()
 	{
@@ -1605,6 +1725,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_show() function with the conversation parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesShowWithConversation()
 	{
@@ -1620,7 +1743,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_show() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiStatusesShowWithUnallowedUser()
 	{
@@ -1632,7 +1757,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_conversation_show() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiConversationShow()
 	{
@@ -1642,6 +1769,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_conversation_show() function with an ID.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiConversationShowWithId()
 	{
@@ -1658,7 +1788,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_conversation_show() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiConversationShowWithUnallowedUser()
 	{
@@ -1670,7 +1802,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_repeat() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesRepeat()
 	{
@@ -1680,7 +1813,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_repeat() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesRepeatWithoutAuthenticatedUser()
 	{
@@ -1691,6 +1825,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_repeat() function with an ID.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesRepeatWithId()
 	{
@@ -1707,7 +1843,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_destroy() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesDestroy()
 	{
@@ -1717,7 +1855,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_destroy() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesDestroyWithoutAuthenticatedUser()
 	{
@@ -1728,6 +1867,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_destroy() function with an ID.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesDestroyWithId()
 	{
@@ -1739,6 +1880,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_mentions() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesMentions()
 	{
@@ -1752,6 +1895,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_mentions() function with a negative page parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesMentionsWithNegativePage()
 	{
@@ -1763,7 +1908,7 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_mentions() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesMentionsWithUnallowedUser()
 	{
@@ -1775,6 +1920,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_mentions() function with an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesMentionsWithRss()
 	{
@@ -1785,6 +1932,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_user_timeline() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesUserTimeline()
 	{
@@ -1801,6 +1950,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_user_timeline() function with a negative page parameter.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesUserTimelineWithNegativePage()
 	{
@@ -1815,6 +1966,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_user_timeline() function with an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesUserTimelineWithRss()
 	{
@@ -1825,7 +1978,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_user_timeline() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesUserTimelineWithUnallowedUser()
 	{
@@ -1837,7 +1991,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites_create_destroy() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavoritesCreateDestroy()
 	{
@@ -1849,7 +2006,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites_create_destroy() function with an invalid ID.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavoritesCreateDestroyWithInvalidId()
 	{
@@ -1861,7 +2021,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites_create_destroy() function with an invalid action.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavoritesCreateDestroyWithInvalidAction()
 	{
@@ -1874,6 +2037,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites_create_destroy() function with the create action.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateAction()
 	{
@@ -1887,6 +2054,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites_create_destroy() function with the create action and an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateActionAndRss()
 	{
@@ -1900,6 +2071,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites_create_destroy() function with the destroy action.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction()
 	{
@@ -1913,7 +2088,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites_create_destroy() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFavoritesCreateDestroyWithoutAuthenticatedUser()
 	{
@@ -1926,6 +2104,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavorites()
 	{
@@ -1940,6 +2120,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites() function with an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavoritesWithRss()
 	{
@@ -1950,7 +2132,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_favorites() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFavoritesWithUnallowedUser()
 	{
@@ -2427,6 +2610,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_lists_ownerships() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiListsOwnerships()
 	{
@@ -2439,7 +2624,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_lists_ownerships() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiListsOwnershipsWithoutAuthenticatedUser()
 	{
@@ -2449,8 +2635,10 @@ class ApiTest extends DatabaseTest
 
 	/**
 	 * Test the api_lists_statuses() function.
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
 	 * @return void
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiListsStatuses()
 	{
@@ -2460,6 +2648,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_lists_statuses() function with a list ID.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiListsStatusesWithListId()
 	{
@@ -2475,6 +2666,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_lists_statuses() function with a list ID and a RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiListsStatusesWithListIdAndRss()
 	{
@@ -2486,7 +2680,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_lists_statuses() function with an unallowed user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiListsStatusesWithUnallowedUser()
 	{
@@ -2498,6 +2694,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_f() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesFWithFriends()
 	{
@@ -2509,6 +2707,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_f() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesFWithFollowers()
 	{
@@ -2519,6 +2719,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_f() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesFWithBlocks()
 	{
@@ -2529,6 +2731,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_f() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesFWithIncoming()
 	{
@@ -2539,6 +2743,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_statuses_f() function an undefined cursor GET variable.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiStatusesFWithUndefinedCursor()
 	{
@@ -2658,6 +2864,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_ff_ids() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFfIds()
 	{
@@ -2677,7 +2885,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_ff_ids() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFfIdsWithoutAuthenticatedUser()
 	{
@@ -2708,6 +2917,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_new() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiDirectMessagesNew()
 	{
@@ -2718,7 +2930,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_new() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiDirectMessagesNewWithoutAuthenticatedUser()
 	{
@@ -2729,6 +2943,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_new() function with an user ID.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiDirectMessagesNewWithUserId()
 	{
@@ -2741,6 +2958,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_new() function with a screen name.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiDirectMessagesNewWithScreenName()
 	{
@@ -2756,6 +2976,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_new() function with a title.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiDirectMessagesNewWithTitle()
 	{
@@ -2773,6 +2996,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_new() function with an RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
 	public function testApiDirectMessagesNewWithRss()
 	{
@@ -2785,7 +3011,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_destroy() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesDestroy()
 	{
@@ -2795,6 +3023,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_destroy() function with the friendica_verbose GET param.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesDestroyWithVerbose()
 	{
@@ -2814,7 +3045,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_destroy() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiDirectMessagesDestroyWithoutAuthenticatedUser()
 	{
@@ -2825,7 +3058,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_destroy() function with a non-zero ID.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesDestroyWithId()
 	{
@@ -2836,6 +3071,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_destroy() with a non-zero ID and the friendica_verbose GET param.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesDestroyWithIdAndVerbose()
 	{
@@ -2866,6 +3104,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_box() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesBoxWithSentbox()
 	{
@@ -2878,6 +3118,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_box() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesBoxWithConversation()
 	{
@@ -2888,6 +3130,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_box() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesBoxWithAll()
 	{
@@ -2898,6 +3142,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_box() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesBoxWithInbox()
 	{
@@ -2908,6 +3154,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_box() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesBoxWithVerbose()
 	{
@@ -2926,6 +3174,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_box() function with a RSS result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesBoxWithRss()
 	{
@@ -2936,7 +3186,7 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_direct_messages_box() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiDirectMessagesBoxWithUnallowedUser()
 	{
@@ -3006,7 +3256,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photoalbum_delete() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoalbumDelete()
 	{
@@ -3016,7 +3269,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photoalbum_delete() function with an album name.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoalbumDeleteWithAlbum()
 	{
@@ -3036,7 +3292,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photoalbum_delete() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoalbumUpdate()
 	{
@@ -3046,7 +3305,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photoalbum_delete() function with an album name.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoalbumUpdateWithAlbum()
 	{
@@ -3057,7 +3319,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photoalbum_delete() function with an album name.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoalbumUpdateWithAlbumAndNewAlbum()
 	{
@@ -3069,7 +3334,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photoalbum_update() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoalbumUpdateWithoutAuthenticatedUser()
 	{
@@ -3089,6 +3357,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photos_list() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFrPhotosList()
 	{
@@ -3099,7 +3369,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photos_list() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFrPhotosListWithoutAuthenticatedUser()
 	{
@@ -3110,7 +3381,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_create_update() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoCreateUpdate()
 	{
@@ -3120,7 +3394,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_create_update() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoCreateUpdateWithoutAuthenticatedUser()
 	{
@@ -3131,7 +3408,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_create_update() function with an album name.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoCreateUpdateWithAlbum()
 	{
@@ -3160,7 +3440,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_delete() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoDelete()
 	{
@@ -3170,7 +3453,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_delete() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoDeleteWithoutAuthenticatedUser()
 	{
@@ -3181,7 +3467,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_delete() function with a photo ID.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiFrPhotoDeleteWithPhotoId()
 	{
@@ -3201,7 +3490,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_detail() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFrPhotoDetail()
 	{
@@ -3211,7 +3502,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_detail() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFrPhotoDetailWithoutAuthenticatedUser()
 	{
@@ -3222,7 +3515,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_fr_photo_detail() function with a photo ID.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\NotFoundException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\NotFoundException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFrPhotoDetailWithPhotoId()
 	{
@@ -3242,7 +3538,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_account_update_profile_image() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiAccountUpdateProfileImage()
 	{
@@ -3252,7 +3551,10 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_account_update_profile_image() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function testApiAccountUpdateProfileImageWithoutAuthenticatedUser()
 	{
@@ -3263,7 +3565,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_account_update_profile_image() function with an uploaded file.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiAccountUpdateProfileImageWithUpload()
 	{
@@ -3340,7 +3643,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_remoteauth() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaRemoteauth()
 	{
@@ -3350,7 +3654,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_remoteauth() function with an URL.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaRemoteauthWithUrl()
 	{
@@ -3362,6 +3667,8 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_remoteauth() function with a correct URL.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaRemoteauthWithCorrectUrl()
 	{
@@ -3558,7 +3865,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_notification() function.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFriendicaNotification()
 	{
@@ -3568,7 +3877,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_notification() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaNotificationWithoutAuthenticatedUser()
 	{
@@ -3579,6 +3890,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_notification() function with an argument count.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaNotificationWithArgumentCount()
 	{
@@ -3591,6 +3905,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_notification() function with an XML result.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaNotificationWithXmlResult()
 	{
@@ -3630,6 +3947,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_profile_show() function.
 	 * @return void
+	 *
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaProfileShow()
 	{
@@ -3656,7 +3976,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_profile_show() function with a wrong profile ID.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\BadRequestException
+	 * @throws \Friendica\Network\HTTPException\ForbiddenException
 	 */
 	public function testApiFriendicaProfileShowWithWrongProfileId()
 	{
@@ -3667,7 +3989,9 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_friendica_profile_show() function without an authenticated user.
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 *
+	 * @expectedException \Friendica\Network\HTTPException\ForbiddenException
+	 * @throws \Friendica\Network\HTTPException\BadRequestException
 	 */
 	public function testApiFriendicaProfileShowWithoutAuthenticatedUser()
 	{

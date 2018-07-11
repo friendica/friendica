@@ -14,6 +14,10 @@ use PHPUnit\Framework\TestCase;
  */
 class BaseObjectTest extends TestCase
 {
+	/**
+	 * @var \Friendica\BaseObject
+	 */
+	private $baseObject;
 
 	/**
 	 * Create variables used in tests.
@@ -35,11 +39,13 @@ class BaseObjectTest extends TestCase
 	/**
 	 * Test the setApp() function.
 	 * @return void
+	 *
+	 * @throws \Exception couldn't create app
 	 */
 	public function testSetApp()
 	{
 		$app = new App(__DIR__.'/../');
-		$this->assertNull($this->baseObject->setApp($app));
+		$this->baseObject->setApp($app);
 		$this->assertEquals($app, $this->baseObject->getApp());
 	}
 }
