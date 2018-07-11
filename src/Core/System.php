@@ -204,7 +204,7 @@ EOT;
 				return str_replace('.', '', uniqid($prefix, true));
 			} else {
 				if ($size <= (strlen($prefix) + 5)) {
-					throw new InternalServerErrorException('Prefix size for GUID is to long.');
+					throw new InternalServerErrorException('Prefix size for GUID is too long.');
 				}
 				return substr(str_replace('.', '', uniqid($prefix, true)), 0, $size);
 			}
@@ -214,7 +214,7 @@ EOT;
 				return uniqid($prefix);
 			} else {
 				if ($size <= (strlen($prefix) + 5)) {
-					throw new InternalServerErrorException('Prefix size for GUID is to long.');
+					throw new InternalServerErrorException('Prefix size for GUID is too long.');
 				}
 				return substr(uniqid($prefix), 0, $size);
 			}
@@ -232,7 +232,7 @@ EOT;
 	 */
 	public static function processID($prefix)
 	{
-		return self::createGUID(24,$prefix . ':' . str_pad(getmypid() . ':', 8, '0') . ':', true);
+		return self::createGUID(24, $prefix . ':' . str_pad(getmypid() . ':', 8, '0') . ':', true);
 	}
 
 	/// @todo Move the following functions from boot.php
