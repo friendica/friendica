@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1276
+-- DB_UPDATE_VERSION 1277
 -- ------------------------------------------
 
 
@@ -455,6 +455,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`id` int unsigned NOT NULL auto_increment,
 	`guid` varchar(255) NOT NULL DEFAULT '' COMMENT 'A unique identifier for this item',
 	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-320 hash from uri',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Owner id which owns this copy of the item',
 	`contact-id` int unsigned NOT NULL DEFAULT 0 COMMENT 'contact.id',
 	`type` varchar(20) NOT NULL DEFAULT '' COMMENT '',
@@ -550,7 +551,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 CREATE TABLE IF NOT EXISTS `item-activity` (
 	`id` int unsigned NOT NULL auto_increment,
 	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'SHA-1 and RIPEMD-160 hash from uri',
+	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-320 hash from uri',
 	`activity` smallint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uri-hash` (`uri-hash`),
@@ -563,7 +564,7 @@ CREATE TABLE IF NOT EXISTS `item-activity` (
 CREATE TABLE IF NOT EXISTS `item-content` (
 	`id` int unsigned NOT NULL auto_increment,
 	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`uri-plink-hash` char(80) NOT NULL DEFAULT '' COMMENT 'SHA-1 hash from uri and plink',
+	`uri-plink-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-320 hash from uri',
 	`title` varchar(255) NOT NULL DEFAULT '' COMMENT 'item title',
 	`content-warning` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`body` mediumtext COMMENT 'item body content',
@@ -591,8 +592,8 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`name` varchar(128) NOT NULL DEFAULT '' COMMENT '',
 	`locked` boolean NOT NULL DEFAULT '0' COMMENT '',
-	`expires` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of lock expiration',
 	`pid` int unsigned NOT NULL DEFAULT 0 COMMENT 'Process ID',
+	`expires` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of cache expiration',
 	 PRIMARY KEY(`id`),
 	 INDEX `name_expires` (`name`,`expires`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';

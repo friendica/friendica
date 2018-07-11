@@ -536,26 +536,26 @@ class DBStructure
 	private static function FieldCommand($parameters, $create = true) {
 		$fieldstruct = $parameters["type"];
 
-		if (!empty($parameters["Collation"])) {
+		if (isset($parameters["Collation"])) {
 			$fieldstruct .= " COLLATE ".$parameters["Collation"];
 		}
 
-		if (!empty($parameters["not null"])) {
+		if (isset($parameters["not null"])) {
 			$fieldstruct .= " NOT NULL";
 		}
 
-		if (!empty($parameters["default"])) {
+		if (isset($parameters["default"])) {
 			if (strpos(strtolower($parameters["type"]),"int")!==false) {
 				$fieldstruct .= " DEFAULT ".$parameters["default"];
 			} else {
 				$fieldstruct .= " DEFAULT '".$parameters["default"]."'";
 			}
 		}
-		if (!empty($parameters["extra"])) {
+		if (isset($parameters["extra"])) {
 			$fieldstruct .= " ".$parameters["extra"];
 		}
 
-		if (!empty($parameters["comment"])) {
+		if (isset($parameters["comment"])) {
 			$fieldstruct .= " COMMENT '".dbesc($parameters["comment"])."'";
 		}
 
@@ -588,11 +588,11 @@ class DBStructure
 			}
 		}
 
-		if (!empty($structure["engine"])) {
+		if (isset($structure["engine"])) {
 			$engine = " ENGINE=" . $structure["engine"];
 		}
 
-		if (!empty($structure["comment"])) {
+		if (isset($structure["comment"])) {
 			$comment = " COMMENT='" . dbesc($structure["comment"]) . "'";
 		}
 
@@ -1158,6 +1158,7 @@ class DBStructure
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
 						"guid" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "A unique identifier for this item"],
 						"uri" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+						"uri-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-320 hash from uri"],
 						"uid" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "relation" => ["user" => "uid"], "comment" => "Owner id which owns this copy of the item"],
 						"contact-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "relation" => ["contact" => "id"], "comment" => "contact.id"],
 						"type" => ["type" => "varchar(20)", "not null" => "1", "default" => "", "comment" => ""],
@@ -1254,7 +1255,7 @@ class DBStructure
 				"fields" => [
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
 						"uri" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
-						"uri-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "SHA-1 and RIPEMD-160 hash from uri"],
+						"uri-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-320 hash from uri"],
 						"activity" => ["type" => "smallint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						],
 				"indexes" => [
@@ -1268,7 +1269,7 @@ class DBStructure
 				"fields" => [
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
 						"uri" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
-						"uri-plink-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "SHA-1 hash from uri and plink"],
+						"uri-plink-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-320 hash from uri"],
 						"title" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "item title"],
 						"content-warning" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 						"body" => ["type" => "mediumtext", "comment" => "item body content"],

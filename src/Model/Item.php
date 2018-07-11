@@ -710,7 +710,7 @@ class Item extends BaseObject
 		// We cannot simply expand the condition to check for origin entries
 		// The condition needn't to be a simple array but could be a complex condition.
 		// And we have to execute this query before the update to ensure to fetch the same data.
-		$items = dba::select('item', ['id', 'origin', 'uri', 'plink', 'iaid', 'icid', 'tag', 'file'], $condition);
+		$items = dba::select('item', ['id', 'origin', 'uri', 'uri-hash', 'plink', 'iaid', 'icid', 'tag', 'file'], $condition);
 
 		$content_fields = [];
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
@@ -759,6 +759,10 @@ class Item extends BaseObject
 		$rows = dba::affected_rows();
 
 		while ($item = dba::fetch($items)) {
+			if (empty($item['uri-hash']) && !empty($item['uri'])) {
+				dba::update('item', ['uri-hash' => hash('ripemd320', $item['uri'])], ['id' => $item['id']]);
+			}
+
 			if (!empty($item['plink'])) {
 				$content_fields['plink'] = $item['plink'];
 			}
@@ -1137,6 +1141,7 @@ class Item extends BaseObject
 
 		$item['guid'] = self::guid($item, $notify);
 		$item['uri'] = notags(trim(defaults($item, 'uri', self::newURI($item['uid'], $item['guid']))));
+		$item['uri-hash'] = hash('ripemd320', $item['uri']);
 
 		// Store conversation data
 		$item = Conversation::insert($item);
@@ -1718,7 +1723,7 @@ class Item extends BaseObject
 		}
 
 		$fields = ['uri' => $item['uri'], 'activity' => $activity_index,
-			'uri-hash' => hash('sha1', $item['uri']) . hash('ripemd160', $item['uri'])];
+			'uri-hash' => hash('ripemd320', $item['uri'])];
 
 		$saved_item = $item;
 
@@ -1761,7 +1766,7 @@ class Item extends BaseObject
 	private static function insertContent(&$item)
 	{
 		$fields = ['uri' => $item['uri'], 'plink' => $item['plink'],
-			'uri-plink-hash' => hash('sha1', $item['plink']).hash('sha1', $item['uri'])];
+			'uri-plink-hash' => hash('ripemd320', $item['uri'])];
 
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			if (isset($item[$field])) {
@@ -1829,7 +1834,7 @@ class Item extends BaseObject
 		}
 
 		$fields = ['activity' => $activity_index,
-			'uri-hash' => hash('sha1', $condition['uri']) . hash('ripemd160', $condition['uri'])];
+			'uri-hash' => hash('ripemd320', $condition['uri'])];
 
 		logger('Update activity for URI ' . $condition['uri']);
 
@@ -1861,7 +1866,7 @@ class Item extends BaseObject
 		}
 
 		if (!empty($item['plink'])) {
-			$fields['uri-plink-hash'] = hash('sha1', $item['plink']) . hash('sha1', $condition['uri']);
+			$fields['uri-plink-hash'] = hash('ripemd320', $condition['uri']);
 		} else {
 			// Ensure that we don't delete the plink
 			unset($fields['plink']);
