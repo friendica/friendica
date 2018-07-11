@@ -305,6 +305,33 @@ class User
 	}
 
 	/**
+	 * @brief Checks if a nickname is in the list of the forbidden nicknames
+	 *
+	 * Check if a nickname is forbidden from registration on the node by the
+	 * admin. Forbidden nicknames (e.g. role namess) can be configured in the
+	 * admin panel.
+	 *
+	 * @param string $nickname The nickname that should be checked
+	 * @return boolean True is the nickname is blocked on the node
+	 */
+	public static function isNicknameBlocked($nickname)
+	{
+		$forbidden_nicknames = Config::get('system', 'forbidden_nicknames', '');
+		// if the config variable is empty return false
+		if (!x($forbidden_nicknames)) {
+			return false;
+		}
+		// check if the nickname is in the list of blocked nicknames
+		$forbidden = explode(',', $forbidden_nicknames);
+		$forbidden = array_map('trim', $forbidden);
+		if (in_array(strtolower($nickname), $forbidden)) {
+			return true;
+		}
+		// else return false
+		return false;
+	}
+
+	/**
 	 * @brief Catch-all user creation function
 	 *
 	 * Creates a user from the provided data array, either form fields or OpenID.
@@ -416,6 +443,9 @@ class User
 
 		if (!valid_email($email) || !Network::isEmailDomainValid($email)) {
 			throw new Exception(L10n::t('Not a valid email address.'));
+		}
+		if (self::isNicknameBlocked($nickname)) {
+			throw new Exception(L10n::t('The nickname was blocked from registration by the nodes admin.'));
 		}
 
 		if (Config::get('system', 'block_extended_register', false) && dba::exists('user', ['email' => $email])) {

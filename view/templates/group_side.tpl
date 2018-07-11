@@ -36,7 +36,7 @@
 	<div id="sidebar-edit-groups"><a href="{{$grouppage}}">{{$editgroupstext}}</a></div>
 	{{/if}}
 
-	{{if $ungrouped}}<div id="sidebar-ungrouped"><a href="nogroup">{{$ungrouped}}</a></div>{{/if}}
+	{{if $ungrouped}}<div id="sidebar-ungrouped"><a class="{{if $ungrouped_selected}}group-selected{{/if}}" href="nogroup">{{$ungrouped}}</a></div>{{/if}}
 </div>
 
 

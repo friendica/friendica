@@ -125,28 +125,36 @@ function wall_upload_post(App $a, $desktopmode = true)
 		$filetype = $_FILES['userfile']['type'];
 
 	} elseif (x($_FILES, 'media')) {
-		if (is_array($_FILES['media']['tmp_name'])) {
-			$src = $_FILES['media']['tmp_name'][0];
-		} else {
-			$src = $_FILES['media']['tmp_name'];
+		if (!empty($_FILES['media']['tmp_name'])) {
+			if (is_array($_FILES['media']['tmp_name'])) {
+				$src = $_FILES['media']['tmp_name'][0];
+			} else {
+				$src = $_FILES['media']['tmp_name'];
+			}
 		}
 
-		if (is_array($_FILES['media']['name'])) {
-			$filename = basename($_FILES['media']['name'][0]);
-		} else {
-			$filename = basename($_FILES['media']['name']);
+		if (!empty($_FILES['media']['name'])) {
+			if (is_array($_FILES['media']['name'])) {
+				$filename = basename($_FILES['media']['name'][0]);
+			} else {
+				$filename = basename($_FILES['media']['name']);
+			}
 		}
 
-		if (is_array($_FILES['media']['size'])) {
-			$filesize = intval($_FILES['media']['size'][0]);
-		} else {
-			$filesize = intval($_FILES['media']['size']);
+		if (!empty($_FILES['media']['size'])) {
+			if (is_array($_FILES['media']['size'])) {
+				$filesize = intval($_FILES['media']['size'][0]);
+			} else {
+				$filesize = intval($_FILES['media']['size']);
+			}
 		}
 
-		if (is_array($_FILES['media']['type'])) {
-			$filetype = $_FILES['media']['type'][0];
-		} else {
-			$filetype = $_FILES['media']['type'];
+		if (!empty($_FILES['media']['type'])) {
+			if (is_array($_FILES['media']['type'])) {
+				$filetype = $_FILES['media']['type'][0];
+			} else {
+				$filetype = $_FILES['media']['type'];
+			}
 		}
 	}
 

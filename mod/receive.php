@@ -43,9 +43,7 @@ function receive_post(App $a)
 
 	logger('mod-diaspora: receiving post', LOGGER_DEBUG);
 
-	$xml = urldecode($_POST['xml']);
-
-	if (!$xml) {
+	if (empty($_POST['xml'])) {
 		$postdata = file_get_contents("php://input");
 		if ($postdata == '') {
 			System::httpExit(500);
@@ -54,6 +52,8 @@ function receive_post(App $a)
 		logger('mod-diaspora: message is in the new format', LOGGER_DEBUG);
 		$msg = Diaspora::decodeRaw($importer, $postdata);
 	} else {
+		$xml = urldecode($_POST['xml']);
+
 		logger('mod-diaspora: decode message in the old format', LOGGER_DEBUG);
 		$msg = Diaspora::decode($importer, $xml);
 

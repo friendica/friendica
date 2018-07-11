@@ -87,7 +87,7 @@ function contacts_init(App $a)
 		$findpeople_widget = Widget::findPeople();
 	}
 
-	$groups_widget = Group::sidebarWidget('contacts', 'group', 'full', 0, $contact_id);
+	$groups_widget = Group::sidebarWidget('contacts', 'group', 'full', 'everyone', $contact_id);
 
 	$a->page['aside'] .= replace_macros(get_markup_template("contacts-widget-sidebar.tpl"), [
 		'$vcard_widget' => $vcard_widget,

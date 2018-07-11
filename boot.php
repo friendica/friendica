@@ -41,7 +41,7 @@ define('FRIENDICA_PLATFORM',     'Friendica');
 define('FRIENDICA_CODENAME',     'The Tazmans Flax-lily');
 define('FRIENDICA_VERSION',      '2018.08-dev');
 define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1272);
+define('DB_UPDATE_VERSION',      1276);
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /**
@@ -499,36 +499,6 @@ if (!defined("SIGTERM")) {
 if (!defined('CURLE_OPERATION_TIMEDOUT')) {
 	define('CURLE_OPERATION_TIMEDOUT', CURLE_OPERATION_TIMEOUTED);
 }
-/**
- * Reverse the effect of magic_quotes_gpc if it is enabled.
- * Please disable magic_quotes_gpc so we don't have to do this.
- * See http://php.net/manual/en/security.magicquotes.disabling.php
- */
-function startup()
-{
-	error_reporting(E_ERROR | E_WARNING | E_PARSE);
-
-	set_time_limit(0);
-
-	// This has to be quite large to deal with embedded private photos
-	ini_set('pcre.backtrack_limit', 500000);
-
-	if (get_magic_quotes_gpc()) {
-		$process = [&$_GET, &$_POST, &$_COOKIE, &$_REQUEST];
-		while (list($key, $val) = each($process)) {
-			foreach ($val as $k => $v) {
-				unset($process[$key][$k]);
-				if (is_array($v)) {
-					$process[$key][stripslashes($k)] = $v;
-					$process[] = &$process[$key][stripslashes($k)];
-				} else {
-					$process[$key][stripslashes($k)] = stripslashes($v);
-				}
-			}
-		}
-		unset($process);
-	}
-}
 
 /**
  * @brief Retrieve the App structure
@@ -865,28 +835,6 @@ function check_addons(App $a)
 	return;
 }
 
-function get_guid($size = 16, $prefix = '')
-{
-	if (is_bool($prefix) && !$prefix) {
-		$prefix = '';
-	} elseif ($prefix == '') {
-		$a = get_app();
-		$prefix = hash('crc32', $a->get_hostname());
-	}
-
-	while (strlen($prefix) < ($size - 13)) {
-		$prefix .= mt_rand();
-	}
-
-	if ($size >= 24) {
-		$prefix = substr($prefix, 0, $size - 22);
-		return str_replace('.', '', uniqid($prefix, true));
-	} else {
-		$prefix = substr($prefix, 0, max($size - 13, 0));
-		return uniqid($prefix);
-	}
-}
-
 /**
  * @brief Used to end the current process, after saving session state.
  * @deprecated
@@ -918,7 +866,7 @@ function goaway($path)
  */
 function local_user()
 {
-	if (x($_SESSION, 'authenticated') && x($_SESSION, 'uid')) {
+	if (!empty($_SESSION['authenticated']) && !empty($_SESSION['uid'])) {
 		return intval($_SESSION['uid']);
 	}
 	return false;
@@ -961,6 +909,11 @@ function remote_user()
 //	if (local_user()) {
 //		return false;
 //	}
+
+	if (empty($_SESSION)) {
+		return false;
+	}
+
 	if (x($_SESSION, 'authenticated') && x($_SESSION, 'visitor_id')) {
 		return intval($_SESSION['visitor_id']);
 	}

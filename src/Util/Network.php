@@ -101,7 +101,7 @@ class Network
 		$a = get_app();
 
 		$parts = parse_url($url);
-		$path_parts = explode('/', $parts['path']);
+		$path_parts = explode('/', defaults($parts, 'path', ''));
 		foreach ($path_parts as $part) {
 		        if (strlen($part) <> mb_strlen($part)) {
 				$parts2[] = rawurlencode($part);
@@ -250,7 +250,7 @@ class Network
 
 			$newurl = $curl_info['redirect_url'];
 
-			if (($new_location_info['path'] == '') && ($new_location_info['host'] != '')) {
+			if (empty($new_location_info['path']) && !empty($new_location_info['host'])) {
 				$newurl = $new_location_info['scheme'] . '://' . $new_location_info['host'] . $old_location_info['path'];
 			}
 
@@ -410,7 +410,7 @@ class Network
 			$matches = [];
 			$new_location_info = @parse_url($curl_info['redirect_url']);
 			$old_location_info = @parse_url($curl_info['url']);
-	
+
 			preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
 			$newurl = trim(array_pop($matches));
 
@@ -654,7 +654,7 @@ class Network
 	public static function stripTrackingQueryParams($url)
 	{
 		$urldata = parse_url($url);
-		if (is_string($urldata["query"])) {
+		if (!empty($urldata["query"])) {
 			$query = $urldata["query"];
 			parse_str($query, $querydata);
 
@@ -838,12 +838,33 @@ class Network
 			return "";
 		}
 
+		if (empty($parts1["scheme"])) {
+			$parts1["scheme"] = '';
+		}
+		if (empty($parts2["scheme"])) {
+			$parts2["scheme"] = '';
+		}
+
 		if ($parts1["scheme"] != $parts2["scheme"]) {
 			return "";
 		}
 
+		if (empty($parts1["host"])) {
+			$parts1["host"] = '';
+		}
+		if (empty($parts2["host"])) {
+			$parts2["host"] = '';
+		}
+
 		if ($parts1["host"] != $parts2["host"]) {
 			return "";
+		}
+
+		if (empty($parts1["port"])) {
+			$parts1["port"] = '';
+		}
+		if (empty($parts2["port"])) {
+			$parts2["port"] = '';
 		}
 
 		if ($parts1["port"] != $parts2["port"]) {
@@ -856,14 +877,21 @@ class Network
 			$match .= ":".$parts1["port"];
 		}
 
+		if (empty($parts1["path"])) {
+			$parts1["path"] = '';
+		}
+		if (empty($parts2["path"])) {
+			$parts2["path"] = '';
+		}
+
 		$pathparts1 = explode("/", $parts1["path"]);
 		$pathparts2 = explode("/", $parts2["path"]);
 
 		$i = 0;
 		$path = "";
 		do {
-			$path1 = $pathparts1[$i];
-			$path2 = $pathparts2[$i];
+			$path1 = defaults($pathparts1, $i, '');
+			$path2 = defaults($pathparts2, $i, '');
 
 			if ($path1 == $path2) {
 				$path .= $path1."/";

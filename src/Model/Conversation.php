@@ -61,7 +61,7 @@ class Conversation
 					unset($old_conv['source']);
 				}
 				// Update structure data all the time but the source only when its from a better protocol.
-				if (($old_conv['protocol'] < $conversation['protocol']) && ($old_conv['protocol'] != 0)) {
+				if (isset($conversation['protocol']) && isset($conversation['source']) && ($old_conv['protocol'] < $conversation['protocol']) && ($old_conv['protocol'] != 0)) {
 					unset($conversation['protocol']);
 					unset($conversation['source']);
 				}

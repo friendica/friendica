@@ -74,6 +74,11 @@ function search_init(App $a) {
 			dba::delete('search', ['uid' => local_user(), 'term' => $search]);
 		}
 
+		/// @todo Check if there is a case at all that "aside" is prefilled here
+		if (!isset($a->page['aside'])) {
+			$a->page['aside'] = '';
+		}
+
 		$a->page['aside'] .= search_saved_searches();
 
 	} else {

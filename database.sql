@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1272
+-- DB_UPDATE_VERSION 1276
 -- ------------------------------------------
 
 
@@ -478,6 +478,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`author-link` varchar(255) NOT NULL DEFAULT '' COMMENT 'Link to the profile page of the author of this item',
 	`author-avatar` varchar(255) NOT NULL DEFAULT '' COMMENT 'Link to the avatar picture of the author of this item',
 	`icid` int unsigned COMMENT 'Id of the item-content table entry that contains the whole item content',
+	`iaid` int unsigned COMMENT 'Id of the item-activity table entry that contains the activity data',
 	`title` varchar(255) NOT NULL DEFAULT '' COMMENT 'item title',
 	`content-warning` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`body` mediumtext COMMENT 'item body content',
@@ -536,14 +537,25 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `ownerid` (`owner-id`),
 	 INDEX `uid_uri` (`uid`,`uri`(190)),
 	 INDEX `resource-id` (`resource-id`),
-	 INDEX `contactid_allowcid_allowpid_denycid_denygid` (`contact-id`,`allow_cid`(10),`allow_gid`(10),`deny_cid`(10),`deny_gid`(10)),
-	 INDEX `uid_type_changed` (`uid`,`type`,`changed`),
-	 INDEX `contactid_verb` (`contact-id`,`verb`),
 	 INDEX `deleted_changed` (`deleted`,`changed`),
 	 INDEX `uid_wall_changed` (`uid`,`wall`,`changed`),
 	 INDEX `uid_eventid` (`uid`,`event-id`),
-	 INDEX `icid` (`icid`)
+	 INDEX `icid` (`icid`),
+	 INDEX `iaid` (`iaid`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Structure for all posts';
+
+--
+-- TABLE item-activity
+--
+CREATE TABLE IF NOT EXISTS `item-activity` (
+	`id` int unsigned NOT NULL auto_increment,
+	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'SHA-1 and RIPEMD-160 hash from uri',
+	`activity` smallint unsigned NOT NULL DEFAULT 0 COMMENT '',
+	 PRIMARY KEY(`id`),
+	 UNIQUE INDEX `uri-hash` (`uri-hash`),
+	 INDEX `uri` (`uri`(191))
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Activities for items';
 
 --
 -- TABLE item-content
@@ -557,6 +569,7 @@ CREATE TABLE IF NOT EXISTS `item-content` (
 	`body` mediumtext COMMENT 'item body content',
 	`location` varchar(255) NOT NULL DEFAULT '' COMMENT 'text location where this item originated',
 	`coord` varchar(255) NOT NULL DEFAULT '' COMMENT 'longitude/latitude pair representing location where this item originated',
+	`language` text COMMENT 'Language information about this post',
 	`app` varchar(255) NOT NULL DEFAULT '' COMMENT 'application which generated this item',
 	`rendered-hash` varchar(32) NOT NULL DEFAULT '' COMMENT '',
 	`rendered-html` mediumtext COMMENT 'item.body converted to html',
@@ -578,8 +591,10 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`name` varchar(128) NOT NULL DEFAULT '' COMMENT '',
 	`locked` boolean NOT NULL DEFAULT '0' COMMENT '',
+	`expires` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of lock expiration',
 	`pid` int unsigned NOT NULL DEFAULT 0 COMMENT 'Process ID',
-	 PRIMARY KEY(`id`)
+	 PRIMARY KEY(`id`),
+	 INDEX `name_expires` (`name`,`expires`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
 
 --
@@ -986,7 +1001,6 @@ CREATE TABLE IF NOT EXISTS `term` (
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	`global` boolean NOT NULL DEFAULT '0' COMMENT '',
-	`aid` int unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'User id',
 	 PRIMARY KEY(`tid`),
 	 INDEX `oid_otype_type_term` (`oid`,`otype`,`type`,`term`(32)),

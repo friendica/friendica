@@ -40,11 +40,11 @@ class Profile
 	{
 		$location = '';
 
-		if ($profile['locality']) {
+		if (!empty($profile['locality'])) {
 			$location .= $profile['locality'];
 		}
 
-		if ($profile['region'] && ($profile['locality'] != $profile['region'])) {
+		if (!empty($profile['region']) && (defaults($profile, 'locality', '') != $profile['region'])) {
 			if ($location) {
 				$location .= ', ';
 			}
@@ -52,7 +52,7 @@ class Profile
 			$location .= $profile['region'];
 		}
 
-		if ($profile['country-name']) {
+		if (!empty($profile['country-name'])) {
 			if ($location) {
 				$location .= ', ';
 			}
@@ -112,7 +112,7 @@ class Profile
 			}
 		}
 
-		$pdata = self::getByNickname($nickname, $user[0]['uid'], $profile);
+		$pdata = self::getByNickname($nickname, $user['uid'], $profile);
 
 		if (empty($pdata) && empty($profiledata)) {
 			logger('profile error: ' . $a->query_string, LOGGER_DEBUG);
@@ -307,6 +307,8 @@ class Profile
 			$connect = false;
 		}
 
+		$profile_url = '';
+
 		// Is the local user already connected to that user?
 		if ($connect && local_user()) {
 			if (isset($profile['url'])) {
@@ -437,9 +439,9 @@ class Profile
 				'fullname' => $profile['name'],
 				'firstname' => $firstname,
 				'lastname' => $lastname,
-				'photo300' => $profile['contact_photo'],
-				'photo100' => $profile['contact_thumb'],
-				'photo50' => $profile['contact_micro'],
+				'photo300' => defaults($profile, 'contact_photo', ''),
+				'photo100' => defaults($profile, 'contact_thumb', ''),
+				'photo50' => defaults($profile, 'contact_micro', ''),
 			];
 		} else {
 			$diaspora = false;
@@ -497,7 +499,7 @@ class Profile
 			$p['photo'] = proxy_url($p['photo'], false, PROXY_SIZE_SMALL);
 		}
 
-		$p['url'] = Contact::magicLink($p['url']);
+		$p['url'] = Contact::magicLink(defaults($p, 'url', $profile_url));
 
 		$tpl = get_markup_template('profile_vcard.tpl');
 		$o .= replace_macros($tpl, [
@@ -710,7 +712,7 @@ class Profile
 			'$classtoday' => $classtoday,
 			'$count' => count($r),
 			'$event_reminders' => L10n::t('Event Reminders'),
-			'$event_title' => L10n::t('Events this week:'),
+			'$event_title' => L10n::t('Upcoming events the next 7 days:'),
 			'$events' => $r,
 		]);
 	}
@@ -944,6 +946,16 @@ class Profile
 				'title' => L10n::t('Only You Can See This'),
 				'id'    => 'notes-tab',
 				'accesskey' => 't',
+			];
+		}
+
+		if (!empty($_SESSION['new_member']) && $is_owner) {
+			$tabs[] = [
+				'label' => L10n::t('Tips for New Members'),
+				'url'   => System::baseUrl() . '/newmember',
+				'sel'   => false,
+				'title' => L10n::t('Tips for New Members'),
+				'id'    => 'newmember-tab',
 			];
 		}
 

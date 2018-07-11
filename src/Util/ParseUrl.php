@@ -159,19 +159,21 @@ class ParseUrl
 		if ($do_oembed) {
 			$oembed_data = OEmbed::fetchURL($url);
 
-			if (!in_array($oembed_data->type, ["error", "rich", ""])) {
-				$siteinfo["type"] = $oembed_data->type;
-			}
+			if (!empty($oembed_data->type)) {
+				if (!in_array($oembed_data->type, ["error", "rich", ""])) {
+					$siteinfo["type"] = $oembed_data->type;
+				}
 
-			if (($oembed_data->type == "link") && ($siteinfo["type"] != "photo")) {
-				if (isset($oembed_data->title)) {
-					$siteinfo["title"] = trim($oembed_data->title);
-				}
-				if (isset($oembed_data->description)) {
-					$siteinfo["text"] = trim($oembed_data->description);
-				}
-				if (isset($oembed_data->thumbnail_url)) {
-					$siteinfo["image"] = $oembed_data->thumbnail_url;
+				if (($oembed_data->type == "link") && ($siteinfo["type"] != "photo")) {
+					if (isset($oembed_data->title)) {
+						$siteinfo["title"] = trim($oembed_data->title);
+					}
+					if (isset($oembed_data->description)) {
+						$siteinfo["text"] = trim($oembed_data->description);
+					}
+					if (isset($oembed_data->thumbnail_url)) {
+						$siteinfo["image"] = $oembed_data->thumbnail_url;
+					}
 				}
 			}
 		}
@@ -251,9 +253,9 @@ class ParseUrl
 				}
 			}
 
-			$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
+			if (!empty($attr["content"])) {
+				$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
 
-			if ($attr["content"] != "") {
 				switch (strtolower($attr["name"])) {
 					case "fulltitle":
 						$siteinfo["title"] = trim($attr["content"]);
@@ -319,9 +321,9 @@ class ParseUrl
 				}
 			}
 
-			$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
+			if (!empty($attr["content"])) {
+				$attr["content"] = trim(html_entity_decode($attr["content"], ENT_QUOTES, "UTF-8"));
 
-			if ($attr["content"] != "") {
 				switch (strtolower($attr["property"])) {
 					case "og:image":
 						$siteinfo["image"] = $attr["content"];
@@ -363,7 +365,7 @@ class ParseUrl
 									"height" => $photodata[1]];
 				}
 			}
-		} elseif ($siteinfo["image"] != "") {
+		} elseif (!empty($siteinfo["image"])) {
 			$src = self::completeUrl($siteinfo["image"], $url);
 
 			unset($siteinfo["image"]);

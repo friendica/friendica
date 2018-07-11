@@ -1,6 +1,22 @@
 <div class="widget" id="group-sidebar">
+	<div id="sidebar-group-header">
 	<h3>{{$title}}</h3>
-
+	{{if ! $newgroup}}
+	<a class="group-edit-tool pull-right" href="{{$grouppage}}">
+	<i class="faded-icon fa fa-pencil" aria-hidden="true"></i><span class="sr-only">{{$editgroupstext}}</span>
+	</a>
+	{{else}}
+	<a class="group-edit-tool pull-right" id="sidebar-new-group" onclick="javascript:$('#group-new-form').fadeIn('fast');">
+	<i class="faded-icon fa fa-plus" aria-hidden="true"></i><span class="sr-only">{{$createtext}}</span>
+	</a>
+	<form id="group-new-form" action="group/new" method="post" style="display:none;">
+		<div class="form-group">
+			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+			<input name="groupname" id="id_groupname" class="form-control input-sm" placeholder="{{$creategroup}}">
+		</div>
+	</form>
+	{{/if}}
+	</div>
 	<div id="sidebar-group-list">
 		{{* The list of available groups *}}
 		<ul role="menu" id="sidebar-group-ul">
@@ -29,23 +45,10 @@
 					<a id="sidebar-group-element-{{$group.id}}" class="sidebar-group-element" href="{{$group.href}}">{{$group.text}}</a>
 				</li>
 			{{/foreach}}
+
+			{{if $ungrouped}}<li class="{{if $ungrouped_selected}}selected{{/if}} sidebar-group-li" id="sidebar-ungrouped"><a href="nogroup">{{$ungrouped}}</a></li>{{/if}}
 		</ul>
 	</div>
 
-	{{if $newgroup}}
-	<div id="sidebar-new-group">
-		{{* show the input field by clicking "new group" *}}
-		<button type="button" class="btn-link" onclick="javascript:$('#group-new-form').fadeIn('fast');">{{$createtext}}</button>
-		<form id="group-new-form" action="group/new" method="post" style="display:none;">
-			<div class="form-group">
-				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-				<input name="groupname" id="id_groupname" class="form-control input-sm" placeholder="{{$creategroup}}">
-			</div>
-		</form>
-	</div>
-	{{else}}
-	<div id="sidebar-edit-groups"><a href="{{$grouppage}}">{{$editgroupstext}}</a></div>
-	{{/if}}
 
-	{{if $ungrouped}}<div id="sidebar-ungrouped"><a href="nogroup">{{$ungrouped}}</a></div>{{/if}}
 </div>

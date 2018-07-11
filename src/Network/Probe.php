@@ -109,6 +109,7 @@ class Probe
 		$redirects = 0;
 
 		logger("Probing for ".$host, LOGGER_DEBUG);
+		$xrd = null;
 
 		$ret = Network::curl($ssl_url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 		if ($ret['success']) {
@@ -696,6 +697,14 @@ class Probe
 			}
 		}
 
+		if (empty($result["network"])) {
+			$result["network"] = NETWORK_PHANTOM;
+		}
+
+		if (empty($result["url"])) {
+			$result["url"] = $uri;
+		}
+
 		logger($uri." is ".$result["network"], LOGGER_DEBUG);
 
 		if (empty($result["baseurl"])) {
@@ -979,7 +988,7 @@ class Probe
 			}
 		}
 
-		if (is_array($webfinger["aliases"])) {
+		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
 				if (normalise_link($alias) != normalise_link($data["url"]) && ! strstr($alias, "@")) {
 					$data["alias"] = $alias;
@@ -989,7 +998,7 @@ class Probe
 			}
 		}
 
-		if (substr($webfinger["subject"], 0, 5) == "acct:") {
+		if (!empty($webfinger["subject"]) && (substr($webfinger["subject"], 0, 5) == "acct:")) {
 			$data["addr"] = substr($webfinger["subject"], 5);
 		}
 
@@ -1048,13 +1057,17 @@ class Probe
 			return false;
 		}
 
+		if (!isset($data["baseurl"])) {
+			$data["baseurl"] = "";
+		}
+
 		if ($vcards->length > 0) {
 			$vcard = $vcards->item(0);
 
 			// We have to discard the guid from the hcard in favour of the guid from lrdd
 			// Reason: Hubzilla doesn't use the value "uid" in the hcard like Diaspora does.
 			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' uid ')]", $vcard); // */
-			if (($search->length > 0) && ($data["guid"] == "")) {
+			if (($search->length > 0) && empty($data["guid"])) {
 				$data["guid"] = $search->item(0)->nodeValue;
 			}
 
@@ -1088,21 +1101,23 @@ class Probe
 		}
 
 		$avatar = [];
-		$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
-		foreach ($photos as $photo) {
-			$attr = [];
-			foreach ($photo->attributes as $attribute) {
-				$attr[$attribute->name] = trim($attribute->value);
-			}
+		if (!empty($vcard)) {
+			$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
+			foreach ($photos as $photo) {
+				$attr = [];
+				foreach ($photo->attributes as $attribute) {
+					$attr[$attribute->name] = trim($attribute->value);
+				}
 
-			if (isset($attr["src"]) && isset($attr["width"])) {
-				$avatar[$attr["width"]] = $attr["src"];
-			}
+				if (isset($attr["src"]) && isset($attr["width"])) {
+					$avatar[$attr["width"]] = $attr["src"];
+				}
 
-			// We don't have a width. So we just take everything that we got.
-			// This is a Hubzilla workaround which doesn't send a width.
-			if ((sizeof($avatar) == 0) && !empty($attr["src"])) {
-				$avatar[] = $attr["src"];
+				// We don't have a width. So we just take everything that we got.
+				// This is a Hubzilla workaround which doesn't send a width.
+				if ((sizeof($avatar) == 0) && !empty($attr["src"])) {
+					$avatar[] = $attr["src"];
+				}
 			}
 		}
 
@@ -1176,7 +1191,7 @@ class Probe
 			return false;
 		}
 
-		if (is_array($webfinger["aliases"])) {
+		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
 				if (normalise_link($alias) != normalise_link($data["url"]) && ! strstr($alias, "@")) {
 					$data["alias"] = $alias;
@@ -1206,7 +1221,9 @@ class Probe
 			$data["network"] = NETWORK_DIASPORA;
 
 			// The Diaspora handle must always be lowercase
-			$data["addr"] = strtolower($data["addr"]);
+			if (!empty($data["addr"])) {
+				$data["addr"] = strtolower($data["addr"]);
+			}
 
 			// We have to overwrite the detected value for "notify" since Hubzilla doesn't send it
 			$data["notify"] = $data["baseurl"] . "/receive/users/" . $data["guid"];
@@ -1230,7 +1247,7 @@ class Probe
 	{
 		$data = [];
 
-		if (is_array($webfinger["aliases"])) {
+		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
 				if (strstr($alias, "@") && !strstr(normalise_link($alias), "http://")) {
 					$data["addr"] = str_replace('acct:', '', $alias);
@@ -1238,7 +1255,7 @@ class Probe
 			}
 		}
 
-		if (is_string($webfinger["subject"]) && strstr($webfinger["subject"], "@")
+		if (!empty($webfinger["subject"]) && strstr($webfinger["subject"], "@")
 			&& !strstr(normalise_link($webfinger["subject"]), "http://")
 		) {
 			$data["addr"] = str_replace('acct:', '', $webfinger["subject"]);
@@ -1303,32 +1320,35 @@ class Probe
 			return false;
 		}
 		$feed = $ret['body'];
+		$dummy1 = null;
+		$dummy2 = null;
+		$dummy2 = null;
 		$feed_data = Feed::import($feed, $dummy1, $dummy2, $dummy3, true);
 		if (!$feed_data) {
 			return false;
 		}
 
-		if ($feed_data["header"]["author-name"] != "") {
+		if (!empty($feed_data["header"]["author-name"])) {
 			$data["name"] = $feed_data["header"]["author-name"];
 		}
-		if ($feed_data["header"]["author-nick"] != "") {
+		if (!empty($feed_data["header"]["author-nick"])) {
 			$data["nick"] = $feed_data["header"]["author-nick"];
 		}
-		if ($feed_data["header"]["author-avatar"] != "") {
+		if (!empty($feed_data["header"]["author-avatar"])) {
 			$data["photo"] = self::fixAvatar($feed_data["header"]["author-avatar"], $data["url"]);
 		}
-		if ($feed_data["header"]["author-id"] != "") {
+		if (!empty($feed_data["header"]["author-id"])) {
 			$data["alias"] = $feed_data["header"]["author-id"];
 		}
-		if ($feed_data["header"]["author-location"] != "") {
+		if (!empty($feed_data["header"]["author-location"])) {
 			$data["location"] = $feed_data["header"]["author-location"];
 		}
-		if ($feed_data["header"]["author-about"] != "") {
+		if (!empty($feed_data["header"]["author-about"])) {
 			$data["about"] = $feed_data["header"]["author-about"];
 		}
 		// OStatus has serious issues when the the url doesn't fit (ssl vs. non ssl)
 		// So we take the value that we just fetched, although the other one worked as well
-		if ($feed_data["header"]["author-link"] != "") {
+		if (!empty($feed_data["header"]["author-link"])) {
 			$data["url"] = $feed_data["header"]["author-link"];
 		}
 
@@ -1510,6 +1530,7 @@ class Probe
 			return false;
 		}
 		$feed = $ret['body'];
+		$dummy1 = $dummy2 = $dummy3 = null;
 		$feed_data = Feed::import($feed, $dummy1, $dummy2, $dummy3, true);
 
 		if (!$feed_data) {
@@ -1526,26 +1547,26 @@ class Probe
 			return self::feed($feed_url, false);
 		}
 
-		if ($feed_data["header"]["author-name"] != "") {
+		if (!empty($feed_data["header"]["author-name"])) {
 			$data["name"] = $feed_data["header"]["author-name"];
 		}
 
-		if ($feed_data["header"]["author-nick"] != "") {
+		if (!empty($feed_data["header"]["author-nick"])) {
 			$data["nick"] = $feed_data["header"]["author-nick"];
 		}
 
-		if ($feed_data["header"]["author-avatar"] != "") {
+		if (!empty($feed_data["header"]["author-avatar"])) {
 			$data["photo"] = $feed_data["header"]["author-avatar"];
 		}
 
-		if ($feed_data["header"]["author-id"] != "") {
+		if (!empty($feed_data["header"]["author-id"])) {
 			$data["alias"] = $feed_data["header"]["author-id"];
 		}
 
 		$data["url"] = $url;
 		$data["poll"] = $url;
 
-		if ($feed_data["header"]["author-link"] != "") {
+		if (!empty($feed_data["header"]["author-link"])) {
 			$data["baseurl"] = $feed_data["header"]["author-link"];
 		} else {
 			$data["baseurl"] = $data["url"];

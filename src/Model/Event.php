@@ -268,9 +268,9 @@ class Event extends BaseObject
 		if ($event['id']) {
 			// has the event actually changed?
 			$existing_event = dba::selectFirst('event', ['edited'], ['id' => $event['id'], 'uid' => $event['uid']]);
-			if ((! DBM::is_result($existing_event)) || ($existing_event['edited'] === $event['edited'])) {
+			if (!DBM::is_result($existing_event) || ($existing_event['edited'] === $event['edited'])) {
 
-				$item = dba::selectFirst('item', [], ['event-id' => $event['id'], 'uid' => $event['uid']]);
+				$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
 
 				return DBM::is_result($item) ? $item['id'] : 0;
 			}
@@ -289,7 +289,7 @@ class Event extends BaseObject
 
 			dba::update('event', $updated_fields, ['id' => $event['id'], 'uid' => $event['uid']]);
 
-			$item = dba::selectFirst('item', ['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
+			$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
 			if (DBM::is_result($item)) {
 				$object = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($event['uri']) . '</id>';
 				$object .= '<content>' . xmlify(self::getBBCode($event)) . '</content>';
@@ -305,7 +305,7 @@ class Event extends BaseObject
 
 			Addon::callHooks('event_updated', $event['id']);
 		} else {
-			$event['guid'] = get_guid(32);
+			$event['guid'] = System::createGUID(32);
 
 			// New event. Store it.
 			dba::insert('event', $event);
@@ -464,8 +464,7 @@ class Event extends BaseObject
 		}
 
 		// Query for the event by event id
-		$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
-				`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event`
+		$r = q("SELECT `event`.*, `item`.`id` AS `itemid` FROM `event`
 			LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
 			WHERE `event`.`uid` = %d AND `event`.`id` = %d $sql_extra",
 			intval($owner_uid),
@@ -505,8 +504,7 @@ class Event extends BaseObject
 
 		// Query for the event by date.
 		// @todo Slow query (518 seconds to run), to be optimzed
-		$r = q("SELECT `event`.*, `item`.`id` AS `itemid`,`item`.`plink`,
-					`item`.`author-name`, `item`.`author-avatar`, `item`.`author-link` FROM `event`
+		$r = q("SELECT `event`.*, `item`.`id` AS `itemid` FROM `event`
 				LEFT JOIN `item` ON `item`.`event-id` = `event`.`id` AND `item`.`uid` = `event`.`uid`
 				WHERE `event`.`uid` = %d AND event.ignore = %d
 				AND ((`adjust` = 0 AND (`finish` >= '%s' OR (nofinish AND start >= '%s')) AND `start` <= '%s')
@@ -542,6 +540,11 @@ class Event extends BaseObject
 		$last_date = '';
 		$fmt = L10n::t('l, F j');
 		foreach ($event_result as $event) {
+			$item = Item::selectFirst(['plink', 'author-name', 'author-avatar', 'author-link'], ['id' => $event['itemid']]);
+			if (DBM::is_result($item)) {
+				$event = array_merge($event, $item);
+			}
+
 			$start = $event['adjust'] ? DateTimeFormat::local($event['start'], 'c')  : DateTimeFormat::utc($event['start'], 'c');
 			$j     = $event['adjust'] ? DateTimeFormat::local($event['start'], 'j')  : DateTimeFormat::utc($event['start'], 'j');
 			$day   = $event['adjust'] ? DateTimeFormat::local($event['start'], $fmt) : DateTimeFormat::utc($event['start'], $fmt);

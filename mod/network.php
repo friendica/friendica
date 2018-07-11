@@ -360,21 +360,21 @@ function network_content(App $a, $update = 0, $parent = 0)
 	$arr = ['query' => $a->query_string];
 	Addon::callHooks('network_content_init', $arr);
 
-	$nouveau = false;
+	$flat_mode = false;
 
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
 			if ($a->argv[$x] === 'new') {
-				$nouveau = true;
+				$flat_mode = true;
 			}
 		}
 	}
 
 	if (x($_GET, 'file')) {
-		$nouveau = true;
+		$flat_mode = true;
 	}
 
-	if ($nouveau) {
+	if ($flat_mode) {
 		$o = networkFlatView($a, $update);
 	} else {
 		$o = networkThreadedView($a, $update, $parent);
@@ -393,7 +393,7 @@ function network_content(App $a, $update = 0, $parent = 0)
 function networkFlatView(App $a, $update = 0)
 {
 	// Rawmode is used for fetching new content at the end of the page
-	$rawmode = (isset($_GET['mode']) AND ( $_GET['mode'] == 'raw'));
+	$rawmode = (isset($_GET['mode']) && ($_GET['mode'] == 'raw'));
 
 	if (isset($_GET['last_id'])) {
 		$last_id = intval($_GET['last_id']);
@@ -699,9 +699,7 @@ function networkThreadedView(App $a, $update, $parent)
 		$order_mode = 'commented';
 	}
 
-	if ($sql_order == '') {
-		$sql_order = "$sql_table.$ordering";
-	}
+	$sql_order = "$sql_table.$ordering";
 
 	if (x($_GET, 'offset')) {
 		$sql_range = sprintf(" AND $sql_order <= '%s'", dbesc($_GET['offset']));
@@ -835,7 +833,7 @@ function networkThreadedView(App $a, $update, $parent)
 			$top_limit = DateTimeFormat::utcNow();
 		}
 
-		$items = dba::p("SELECT `item`.`parent-uri` AS `uri`, 0 AS `item_id`, `item`.$ordering AS `order_date` FROM `item`
+		$items = dba::p("SELECT `item`.`parent-uri` AS `uri`, 0 AS `item_id`, `item`.$ordering AS `order_date`, `author`.`url` AS `author-link` FROM `item`
 			STRAIGHT_JOIN (SELECT `oid` FROM `term` WHERE `term` IN
 				(SELECT SUBSTR(`term`, 2) FROM `search` WHERE `uid` = ? AND `term` LIKE '#%') AND `otype` = ? AND `type` = ? AND `uid` = 0) AS `term`
 			ON `item`.`id` = `term`.`oid`

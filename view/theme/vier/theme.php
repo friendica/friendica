@@ -29,10 +29,12 @@ function vier_init(App $a)
 
 	$a->set_template_engine('smarty3');
 
-	if ($a->argv[0].$a->argv[1] === "profile".$a->user['nickname'] || $a->argv[0] === "network" && local_user()) {
-		vier_community_info();
+	if (!empty($a->argv[0])) {
+		if ($a->argv[0] . defaults($a->argv, 1, '') === "profile".$a->user['nickname'] || $a->argv[0] === "network" && local_user()) {
+			vier_community_info();
 
-		$a->page['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
+			$a->page['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
+		}
 	}
 
 	if ($a->is_mobile || $a->is_tablet) {
@@ -104,7 +106,7 @@ EOT;
 
 	// Hide the left menu bar
 	/// @TODO maybe move this static array out where it should belong?
-	if (($a->page['aside'] == "") && in_array($a->argv[0], ["community", "events", "help", "manage", "notifications",
+	if (empty($a->page['aside']) && in_array($a->argv[0], ["community", "events", "help", "manage", "notifications",
 			"probe", "webfinger", "login", "invite", "credits"])) {
 		$a->page['htmlhead'] .= "<link rel='stylesheet' href='view/theme/vier/hide.css' />";
 	}

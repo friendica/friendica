@@ -106,8 +106,10 @@ if (!$foreground) {
 	}
 
 	fclose(STDIN);  // Close all of the standard
-	fclose(STDOUT); // file descriptors as we
-	fclose(STDERR); // are running as a daemon.
+
+	// Enabling this seem to block a running php process with 100% CPU usage when there is an outpout
+	// fclose(STDOUT); // file descriptors as we
+	// fclose(STDERR); // are running as a daemon.
 
 	dba::disconnect();
 

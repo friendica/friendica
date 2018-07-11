@@ -7,54 +7,52 @@
 <script type="text/javascript" src="view/theme/frio/js/mod_group.js"></script>
 
 <div class="generic-page-wrapper">
-
+	{{if $editable == 1}}
 	{{* The buttons for editing the contact group (edit name / remove contact group) *}}
 	<div class="group-actions pull-right">
-		<button type="button" id="group-rename" class="btn btn-clear" onclick="openClose('group-edit-wrapper'); return false;" title="{{$edit_name}}" data-toggle="tooltip">
+		<button type="button" id="group-rename" class="btn btn-clear" onclick="showHide('group-edit-wrapper'); showHide('group-edit-header'); return false;" title="{{$edit_name}}" data-toggle="tooltip">
 			<i class="fa fa-pencil" aria-hidden="true"></i>
 		</button>
 		{{if $drop}}{{$drop}}{{/if}}
 	</div>
+	{{/if}}
 
-	{{include file="section_title.tpl"}}
+	<div class="section-title-wrapper">
+		<div id="group-edit-header">
+			<h2>{{$title}}</h2>
+		</div>
 
-	{{* Edit the name of the group *}}
-	<div id="group-edit-wrapper" class="panel panel-inline">
-		<form action="group/{{$gid}}" id="group-edit-form" method="post">
-			<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
+		{{* Edit the name of the group *}}
+		<div id="group-edit-wrapper">
 
-			{{include file="field_input.tpl" field=$gname}}
-			<div id="group-edit-submit-wrapper" class="form-group pull-right">
-				<button class="btn btn-primary btn-small" type="submit" name="submit" value="{{$submit|escape:'html'}}">
-					{{$submit|escape:'html'}}
-				</button>
-			</div>
-			<div id="group-edit-select-end" class="clear"></div>
-		</form>
+			<form action="group/{{$gid}}" id="group-edit-form" method="post">
+
+				<div class="pull-left">
+				{{include file="field_input.tpl" field=$gname label=false}}
+				</div>
+				<div id="group-edit-submit-wrapper" class="form-group pull-right">
+					<button class="btn btn-primary btn-small" type="submit" name="submit" value="{{$submit|escape:'html'}}">
+						{{$submit|escape:'html'}}
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="clear"></div>
 	</div>
 
 	{{* The search input field to search for contacts *}}
 	<div id="contacts-search-wrapper">
-		<div id="contacts-search-form" class="navbar-form" role="search">
+		<form id="contacts-search-form" class="navbar-form" role="search" method="get" >
 			<div class="row">
-				<div class="col-md-2"></div>
-				<div class="col-md-8 ">
-					<div class="form-group form-group-search">
-						<input type="text"
-							name="filter"
-							id="contacts-search"
-							class="search-input form-control form-search"
-							onkeyup="filterList(); return false;"
-							onfocus="this.select(); return false;"
-						/>
-					</div>
+				<div class="form-group form-group-search">
+					<input type="text" name="search" id="contacts-search" class="search-input form-control form-search" onfocus="this.select();" onkeyup="filterList(); return false;" />
+					<button class="btn btn-default btn-sm form-button-search" onclick="filterList(); return false;">{{$submit_filter}}</button>
 				</div>
-				<div class="col-md-2"></div>
 			</div>
-		</div>
+		</form>
 	</div>
 
-	<hr>
 	<div id="contacts-search-end"></div>
 
 	{{if $groupeditor}}

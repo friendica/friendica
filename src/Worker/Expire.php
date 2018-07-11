@@ -26,21 +26,37 @@ class Expire {
 		if ($param == 'delete') {
 			logger('Delete expired items', LOGGER_DEBUG);
 			// physically remove anything that has been deleted for more than two months
-			$r = dba::p("SELECT `id`, `icid` FROM `item` WHERE `deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY");
-			while ($row = dba::fetch($r)) {
+			$condition = ["`deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY"];
+			$rows = dba::select('item', ['id', 'iaid', 'icid'],  $condition);
+			while ($row = dba::fetch($rows)) {
 				dba::delete('item', ['id' => $row['id']]);
-				if (!dba::exists('item', ['icid' => $row['icid']])) {
+				if (!empty($row['iaid']) && !dba::exists('item', ['iaid' => $row['iaid']])) {
+					dba::delete('item-activity', ['id' => $row['iaid']]);
+				}
+				if (!empty($row['icid']) && !dba::exists('item', ['icid' => $row['icid']])) {
 					dba::delete('item-content', ['id' => $row['icid']]);
 				}
 			}
-			dba::close($r);
+			dba::close($rows);
 
-			logger('Delete expired items - done', LOGGER_DEBUG);
+			// Normally we shouldn't have orphaned data at all.
+			// If we do have some, then we have to check why.
+			logger('Deleting orphaned item activities - start', LOGGER_DEBUG);
+			$condition = ["NOT EXISTS (SELECT `iaid` FROM `item` WHERE `item`.`uri` = `item-activity`.`uri`)"];
+			dba::delete('item-activity', $condition);
+			logger('Orphaned item activities deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
+
+			logger('Deleting orphaned item content - start', LOGGER_DEBUG);
+			$condition = ["NOT EXISTS (SELECT `icid` FROM `item` WHERE `item`.`uri` = `item-content`.`uri`)"];
+			dba::delete('item-content', $condition);
+			logger('Orphaned item content deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
 
 			// make this optional as it could have a performance impact on large sites
 			if (intval(Config::get('system', 'optimize_items'))) {
 				dba::e("OPTIMIZE TABLE `item`");
 			}
+
+			logger('Delete expired items - done', LOGGER_DEBUG);
 			return;
 		} elseif (intval($param) > 0) {
 			$user = dba::selectFirst('user', ['uid', 'username', 'expire'], ['uid' => $param]);

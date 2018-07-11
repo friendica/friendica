@@ -11,7 +11,7 @@ use Friendica\Database\DBM;
 
 function friendica_init(App $a)
 {
-	if ($a->argv[1] == "json") {
+	if (!empty($a->argv[1]) && ($a->argv[1] == "json")) {
 		$register_policy = ['REGISTER_CLOSED', 'REGISTER_APPROVE', 'REGISTER_OPEN'];
 
 		$sql_extra = '';

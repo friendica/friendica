@@ -12,7 +12,7 @@ use Friendica\Util\DateTimeFormat;
  *
  * @author Hypolite Petovan <mrpetovan@gmail.com>
  */
-class DatabaseCacheDriver implements ICacheDriver
+class DatabaseCacheDriver extends AbstractCacheDriver implements ICacheDriver
 {
 	public function get($key)
 	{
@@ -33,11 +33,11 @@ class DatabaseCacheDriver implements ICacheDriver
 		return null;
 	}
 
-	public function set($key, $value, $duration = Cache::MONTH)
+	public function set($key, $value, $ttl = Cache::FIVE_MINUTES)
 	{
 		$fields = [
 			'v'       => serialize($value),
-			'expires' => DateTimeFormat::utc('now + ' . $duration . ' seconds'),
+			'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds'),
 			'updated' => DateTimeFormat::utcNow()
 		];
 
@@ -49,8 +49,12 @@ class DatabaseCacheDriver implements ICacheDriver
 		return dba::delete('cache', ['k' => $key]);
 	}
 
-	public function clear()
+	public function clear($outdated = true)
 	{
-		return dba::delete('cache', ['`expires` < NOW()']);
+		if ($outdated) {
+			return dba::delete('cache', ['`expires` < NOW()']);
+		} else {
+			return dba::delete('cache', ['`k` IS NOT NULL ']);
+		}
 	}
 }

@@ -475,34 +475,34 @@ class Contact extends BaseObject
 			$profile = $default;
 		}
 
-		if (($profile["photo"] == "") && isset($default["photo"])) {
+		if (empty($profile["photo"]) && isset($default["photo"])) {
 			$profile["photo"] = $default["photo"];
 		}
 
-		if (($profile["name"] == "") && isset($default["name"])) {
+		if (empty($profile["name"]) && isset($default["name"])) {
 			$profile["name"] = $default["name"];
 		}
 
-		if (($profile["network"] == "") && isset($default["network"])) {
+		if (empty($profile["network"]) && isset($default["network"])) {
 			$profile["network"] = $default["network"];
 		}
 
-		if (($profile["thumb"] == "") && isset($profile["photo"])) {
+		if (empty($profile["thumb"]) && isset($profile["photo"])) {
 			$profile["thumb"] = $profile["photo"];
 		}
 
-		if (($profile["micro"] == "") && isset($profile["thumb"])) {
+		if (empty($profile["micro"]) && isset($profile["thumb"])) {
 			$profile["micro"] = $profile["thumb"];
 		}
 
-		if ((($profile["addr"] == "") || ($profile["name"] == "")) && ($profile["gid"] != 0)
+		if ((empty($profile["addr"]) || empty($profile["name"])) && (defaults($profile, "gid", 0) != 0)
 			&& in_array($profile["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])
 		) {
 			Worker::add(PRIORITY_LOW, "UpdateGContact", $profile["gid"]);
 		}
 
 		// Show contact details of Diaspora contacts only if connected
-		if (($profile["cid"] == 0) && ($profile["network"] == NETWORK_DIASPORA)) {
+		if ((defaults($profile, "cid", 0) == 0) && (defaults($profile, "network", "") == NETWORK_DIASPORA)) {
 			$profile["location"] = "";
 			$profile["about"] = "";
 			$profile["gender"] = "";
@@ -596,7 +596,7 @@ class Contact extends BaseObject
 			$uid = local_user();
 		}
 
-		if ($contact['uid'] != $uid) {
+		if (empty($contact['uid']) || ($contact['uid'] != $uid)) {
 			if ($uid == 0) {
 				$profile_link = self::magicLink($contact['url']);
 				$menu = ['profile' => [L10n::t('View Profile'), $profile_link, true]];
@@ -696,49 +696,20 @@ class Contact extends BaseObject
 	 *
 	 * @return array
 	 */
-	public static function getUngroupedList($uid, $start = 0, $count = 0)
+	public static function getUngroupedList($uid)
 	{
-		if (!$count) {
-			$r = q(
-				"SELECT COUNT(*) AS `total`
-				 FROM `contact`
-				 WHERE `uid` = %d
-				 AND NOT `self`
-				 AND NOT `blocked`
-				 AND NOT `pending`
-				 AND `id` NOT IN (
-					SELECT DISTINCT(`contact-id`)
-					FROM `group_member`
-					WHERE `uid` = %d
-				)",
-				intval($uid),
-				intval($uid)
-			);
-
-			return $r;
-		}
-
-		$r = q(
-			"SELECT *
-			FROM `contact`
-			WHERE `uid` = %d
-			AND NOT `self`
-			AND NOT `blocked`
-			AND NOT `pending`
-			AND `id` NOT IN (
-				SELECT DISTINCT(`contact-id`)
-				FROM `group_member`
-				INNER JOIN `group` ON `group`.`id` = `group_member`.`gid`
-				WHERE `group`.`uid` = %d
-			)
-			LIMIT %d, %d",
-			intval($uid),
-			intval($uid),
-			intval($start),
-			intval($count)
-		);
-
-		return $r;
+		return q("SELECT *
+			   FROM `contact`
+			   WHERE `uid` = %d
+			   AND NOT `self`
+			   AND NOT `blocked`
+			   AND NOT `pending`
+			   AND `id` NOT IN (
+			   	SELECT DISTINCT(`contact-id`)
+			   	FROM `group_member`
+			   	INNER JOIN `group` ON `group`.`id` = `group_member`.`gid`
+			   	WHERE `group`.`uid` = %d
+			   )", intval($uid), intval($uid));
 	}
 
 	/**
@@ -1562,8 +1533,12 @@ class Contact extends BaseObject
 
 			$contact_record = [
 				'id' => dba::lastInsertId(),
-				'network' => NETWORK_OSTATUS
+				'network' => NETWORK_OSTATUS,
+				'name' => $name,
+				'url' => $url,
+				'photo' => $photo
 			];
+
 			Contact::updateAvatar($photo, $importer["uid"], $contact_record["id"], true);
 
 			/// @TODO Encapsulate this into a function/method
@@ -1732,8 +1707,21 @@ class Contact extends BaseObject
 	 */
 	public static function magicLinkbyId($cid, $url = '')
 	{
-		$contact = dba::selectFirst('contact', ['network', 'url', 'uid'], ['id' => $cid]);
+		$contact = dba::selectFirst('contact', ['id', 'network', 'url', 'uid'], ['id' => $cid]);
 
+		return self::magicLinkbyContact($contact, $url);
+        }
+
+	/**
+	 * @brief Returns a magic link to authenticate remote visitors
+	 *
+	 * @param array $contact The contact array with "uid", "network" and "url"
+	 * @param integer $url An url that we will be redirected to after the authentication
+	 *
+	 * @return string with "redir" link
+	 */
+	public static function magicLinkbyContact($contact, $url = '')
+	{
 		if ($contact['network'] != NETWORK_DFRN) {
 			return $url ?: $contact['url']; // Equivalent to ($url != '') ? $url : $contact['url'];
 		}
@@ -1747,7 +1735,7 @@ class Contact extends BaseObject
 			return self::magicLink($contact['url'], $url);
 		}
 
-		$redirect = 'redir/' . $cid;
+		$redirect = 'redir/' . $contact['id'];
 
 		if ($url != '') {
 			$redirect .= '?url=' . $url;

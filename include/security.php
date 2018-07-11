@@ -41,7 +41,7 @@ function new_cookie($time, $user = [])
 	if ($user) {
 		$value = json_encode(["uid" => $user["uid"],
 			"hash" => cookie_hash($user),
-			"ip" => $_SERVER['REMOTE_ADDR']]);
+			"ip" => defaults($_SERVER, 'REMOTE_ADDR', '0.0.0.0')]);
 	} else {
 		$value = "";
 	}
@@ -70,7 +70,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	$_SESSION['page_flags'] = $user_record['page-flags'];
 	$_SESSION['my_url'] = System::baseUrl() . '/profile/' . $user_record['nickname'];
 	$_SESSION['my_address'] = $user_record['nickname'] . '@' . substr(System::baseUrl(), strpos(System::baseUrl(), '://') + 3);
-	$_SESSION['addr'] = $_SERVER['REMOTE_ADDR'];
+	$_SESSION['addr'] = defaults($_SERVER, 'REMOTE_ADDR', '0.0.0.0');
 
 	$a->user = $user_record;
 

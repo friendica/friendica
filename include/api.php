@@ -16,6 +16,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
@@ -90,11 +91,15 @@ function api_source()
 	}
 
 	// Support for known clients that doesn't send a source name
-	if (strpos($_SERVER['HTTP_USER_AGENT'], "Twidere") !== false) {
-		return "Twidere";
-	}
+	if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+		if(strpos($_SERVER['HTTP_USER_AGENT'], "Twidere") !== false) {
+			return "Twidere";
+		}
 
-	logger("Unrecognized user-agent ".$_SERVER['HTTP_USER_AGENT'], LOGGER_DEBUG);
+		logger("Unrecognized user-agent ".$_SERVER['HTTP_USER_AGENT'], LOGGER_DEBUG);
+	} else {
+		logger("Empty user-agent", LOGGER_DEBUG);
+	}
 
 	return "api";
 }
@@ -164,7 +169,8 @@ function api_login(App $a)
 	$oauth1 = new FKOAuth1();
 	// login with oauth
 	try {
-		list($consumer, $token) = $oauth1->verify_request(OAuthRequest::from_request());
+		$request = OAuthRequest::from_request();
+		list($consumer, $token) = $oauth1->verify_request($request);
 		if (!is_null($token)) {
 			$oauth1->loginUser($token->uid);
 			Addon::callHooks('logged_in', $a->user);
@@ -193,8 +199,8 @@ function api_login(App $a)
 		throw new UnauthorizedException("This API requires login");
 	}
 
-	$user = $_SERVER['PHP_AUTH_USER'];
-	$password = $_SERVER['PHP_AUTH_PW'];
+	$user = defaults($_SERVER, 'PHP_AUTH_USER', '');
+	$password = defaults($_SERVER, 'PHP_AUTH_PW', '');
 
 	// allow "user@server" login (but ignore 'server' part)
 	$at = strstr($user, "@", true);
@@ -258,7 +264,7 @@ function api_check_method($method)
 	if ($method == "*") {
 		return true;
 	}
-	return (strpos($method, $_SERVER['REQUEST_METHOD']) !== false);
+	return (stripos($method, defaults($_SERVER, 'REQUEST_METHOD', 'GET')) !== false);
 }
 
 /**
@@ -298,7 +304,7 @@ function api_call(App $a)
 				//unset($_SERVER['PHP_AUTH_USER']);
 
 				/// @TODO should be "true ==[=] $info['auth']", if you miss only one = character, you assign a variable (only with ==). Let's make all this even.
-				if ($info['auth'] === true && api_user() === false) {
+				if (!empty($info['auth']) && api_user() === false) {
 					api_login($a);
 				}
 
@@ -475,7 +481,7 @@ function api_rss_extra(App $a, $arr, $user_info)
 		'base'         => System::baseUrl(),
 		'updated'      => api_date(null),
 		'atom_updated' => DateTimeFormat::utcNow(DateTimeFormat::ATOM),
-		'language'     => $user_info['language'],
+		'language'     => $user_info['lang'],
 		'logo'         => System::baseUrl() . "/images/friendica-32.png",
 	];
 
@@ -571,9 +577,12 @@ function api_get_user(App $a, $contact_id = null)
 		}
 	}
 
+	// $called_api is the API path exploded on / and is expected to have at least 2 elements
 	if (is_null($user) && ($a->argc > (count($called_api) - 1)) && (count($called_api) > 0)) {
 		$argid = count($called_api);
-		list($user, $null) = explode(".", $a->argv[$argid]);
+		if (!empty($a->argv[$argid])) {
+			list($user, $null) = explode(".", $a->argv[$argid]);
+		}
 		if (is_numeric($user)) {
 			$user = dbesc(api_unique_id_to_nurl(intval($user)));
 
@@ -773,13 +782,13 @@ function api_get_user(App $a, $contact_id = null)
 				$link_color = PConfig::get($ret['uid'], 'frio', 'link_color');
 				$bgcolor = PConfig::get($ret['uid'], 'frio', 'background_color');
 			}
-			if (!$nav_bg) {
+			if (empty($nav_bg)) {
 				$nav_bg = "#708fa0";
 			}
-			if (!$link_color) {
+			if (empty($link_color)) {
 				$link_color = "#6fdbe8";
 			}
-			if (!$bgcolor) {
+			if (empty($bgcolor)) {
 				$bgcolor = "#ededed";
 			}
 
@@ -801,12 +810,12 @@ function api_get_user(App $a, $contact_id = null)
  */
 function api_item_get_user(App $a, $item)
 {
-	$status_user = api_get_user($a, $item["author-id"]);
+	$status_user = api_get_user($a, defaults($item, 'author-id', null));
 
-	$status_user["protected"] = $item["private"];
+	$status_user["protected"] = defaults($item, 'private', 0);
 
-	if ($item['thr-parent'] == $item['uri']) {
-		$owner_user = api_get_user($a, $item["owner-id"]);
+	if (defaults($item, 'thr-parent', '') == defaults($item, 'uri', '')) {
+		$owner_user = api_get_user($a, defaults($item, 'author-id', null));
 	} else {
 		$owner_user = $status_user;
 	}
@@ -880,7 +889,6 @@ function api_create_xml(array $data, $root_element)
 {
 	$childname = key($data);
 	$data2 = array_pop($data);
-	$key = key($data2);
 
 	$namespaces = ["" => "http://api.twitter.com",
 				"statusnet" => "http://status.net/schema/api/1/",
@@ -893,18 +901,19 @@ function api_create_xml(array $data, $root_element)
 	}
 
 	if (is_array($data2)) {
+		$key = key($data2);
 		api_walk_recursive($data2, "api_reformat_xml");
-	}
 
-	if ($key == "0") {
-		$data4 = [];
-		$i = 1;
+		if ($key == "0") {
+			$data4 = [];
+			$i = 1;
 
-		foreach ($data2 as $item) {
-			$data4[$i++ . ":" . $childname] = $item;
+			foreach ($data2 as $item) {
+				$data4[$i++ . ":" . $childname] = $item;
+			}
+
+			$data2 = $data4;
 		}
-
-		$data2 = $data4;
 	}
 
 	$data3 = [$root_element => $data2];
@@ -1272,7 +1281,7 @@ function api_status_show($type)
 	// get last public wall message
 	$condition = ['owner-id' => $user_info['pid'], 'uid' => api_user(),
 		'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]];
-	$lastwall = dba::selectFirst('item', [], $condition, ['order' => ['id' => true]]);
+	$lastwall = Item::selectFirst(Item::ITEM_FIELDLIST, $condition, ['order' => ['id' => true]]);
 
 	if (DBM::is_result($lastwall)) {
 		$in_reply_to = api_in_reply_to($lastwall);
@@ -1299,19 +1308,19 @@ function api_status_show($type)
 			'in_reply_to_screen_name' => $in_reply_to['screen_name'],
 			'user' => $user_info,
 			$geo => null,
-			'coordinates' => "",
-			'place' => "",
-			'contributors' => "",
+			'coordinates' => '',
+			'place' => '',
+			'contributors' => '',
 			'is_quote_status' => false,
 			'retweet_count' => 0,
 			'favorite_count' => 0,
 			'favorited' => $lastwall['starred'] ? true : false,
 			'retweeted' => false,
 			'possibly_sensitive' => false,
-			'lang' => "",
+			'lang' => '',
 			'statusnet_html' => $converted["html"],
 			'statusnet_conversation_id' => $lastwall['parent'],
-			'external_url' => System::baseUrl() . "/display/" . $lastwall['guid'],
+			'external_url' => System::baseUrl() . '/display/' . $lastwall['guid'],
 		];
 
 		if (count($converted["attachments"]) > 0) {
@@ -1357,7 +1366,7 @@ function api_users_show($type)
 
 	$condition = ['owner-id' => $user_info['pid'], 'uid' => api_user(),
 		'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT], 'private' => false];
-	$lastwall = dba::selectFirst('item', [], $condition, ['order' => ['id' => true]]);
+	$lastwall = Item::selectFirst(Item::ITEM_FIELDLIST, $condition, ['order' => ['id' => true]]);
 
 	if (DBM::is_result($lastwall)) {
 		$in_reply_to = api_in_reply_to($lastwall);
@@ -1477,7 +1486,7 @@ function api_users_lookup($type)
 {
 	$users = [];
 
-	if (x($_REQUEST['user_id'])) {
+	if (!empty($_REQUEST['user_id'])) {
 		foreach (explode(',', $_REQUEST['user_id']) as $id) {
 			if (!empty($id)) {
 				$users[] = api_get_user(get_app(), $id);
@@ -1801,28 +1810,28 @@ function api_statuses_show($type)
 	}
 
 	// params
-	$id = intval($a->argv[3]);
+	$id = intval(defaults($a->argv, 3, 0));
 
 	if ($id == 0) {
-		$id = intval($_REQUEST["id"]);
+		$id = intval(defaults($_REQUEST, 'id', 0));
 	}
 
 	// Hotot workaround
 	if ($id == 0) {
-		$id = intval($a->argv[4]);
+		$id = intval(defaults($a->argv, 4, 0));
 	}
 
 	logger('API: api_statuses_show: ' . $id);
 
-	$conversation = (x($_REQUEST, 'conversation') ? 1 : 0);
+	$conversation = !empty($_REQUEST['conversation']);
 
 	// try to fetch the item for the local user - or the public item, if there is no local one
-	$uri_item = dba::selectFirst('item', ['uri'], ['id' => $id]);
+	$uri_item = Item::selectFirst(['uri'], ['id' => $id]);
 	if (!DBM::is_result($uri_item)) {
 		throw new BadRequestException("There is no status with this id.");
 	}
 
-	$item = dba::selectFirst('item', ['id'], ['uri' => $uri_item['uri'], 'uid' => [0, api_user()]], ['order' => ['uid' => true]]);
+	$item = Item::selectFirst(['id'], ['uri' => $uri_item['uri'], 'uid' => [0, api_user()]], ['order' => ['uid' => true]]);
 	if (!DBM::is_result($item)) {
 		throw new BadRequestException("There is no status with this id.");
 	}
@@ -1874,35 +1883,35 @@ function api_conversation_show($type)
 	}
 
 	// params
-	$id = intval($a->argv[3]);
-	$count = (x($_REQUEST, 'count') ? $_REQUEST['count'] : 20);
-	$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] - 1 : 0);
+	$id       = intval(defaults($a->argv , 3         , 0));
+	$since_id = intval(defaults($_REQUEST, 'since_id', 0));
+	$max_id   = intval(defaults($_REQUEST, 'max_id'  , 0));
+	$count    = intval(defaults($_REQUEST, 'count'   , 20));
+	$page     = intval(defaults($_REQUEST, 'page'    , 1)) - 1;
 	if ($page < 0) {
 		$page = 0;
 	}
-	$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
-	$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
 
-	$start = $page*$count;
+	$start = $page * $count;
 
 	if ($id == 0) {
-		$id = intval($_REQUEST["id"]);
+		$id = intval(defaults($_REQUEST, 'id', 0));
 	}
 
 	// Hotot workaround
 	if ($id == 0) {
-		$id = intval($a->argv[4]);
+		$id = intval(defaults($a->argv, 4, 0));
 	}
 
 	logger('API: api_conversation_show: '.$id);
 
 	// try to fetch the item for the local user - or the public item, if there is no local one
-	$item = dba::selectFirst('item', ['parent-uri'], ['id' => $id]);
+	$item = Item::selectFirst(['parent-uri'], ['id' => $id]);
 	if (!DBM::is_result($item)) {
 		throw new BadRequestException("There is no status with this id.");
 	}
 
-	$parent = dba::selectFirst('item', ['id'], ['uri' => $item['parent-uri'], 'uid' => [0, api_user()]], ['order' => ['uid' => true]]);
+	$parent = Item::selectFirst(['id'], ['uri' => $item['parent-uri'], 'uid' => [0, api_user()]], ['order' => ['uid' => true]]);
 	if (!DBM::is_result($parent)) {
 		throw new BadRequestException("There is no status with this id.");
 	}
@@ -1954,15 +1963,15 @@ function api_statuses_repeat($type)
 	api_get_user($a);
 
 	// params
-	$id = intval($a->argv[3]);
+	$id = intval(defaults($a->argv, 3, 0));
 
 	if ($id == 0) {
-		$id = intval($_REQUEST["id"]);
+		$id = intval(defaults($_REQUEST, 'id', 0));
 	}
 
 	// Hotot workaround
 	if ($id == 0) {
-		$id = intval($a->argv[4]);
+		$id = intval(defaults($a->argv, 4, 0));
 	}
 
 	logger('API: api_statuses_repeat: '.$id);
@@ -2020,15 +2029,15 @@ function api_statuses_destroy($type)
 	api_get_user($a);
 
 	// params
-	$id = intval($a->argv[3]);
+	$id = intval(defaults($a->argv, 3, 0));
 
 	if ($id == 0) {
-		$id = intval($_REQUEST["id"]);
+		$id = intval(defaults($_REQUEST, 'id', 0));
 	}
 
 	// Hotot workaround
 	if ($id == 0) {
-		$id = intval($a->argv[4]);
+		$id = intval(defaults($a->argv, 4, 0));
 	}
 
 	logger('API: api_statuses_destroy: '.$id);
@@ -2205,7 +2214,7 @@ function api_favorites_create_destroy($type)
 	// for versioned api.
 	/// @TODO We need a better global soluton
 	$action_argv_id = 2;
-	if ($a->argv[1] == "1.1") {
+	if (count($a->argv) > 1 && $a->argv[1] == "1.1") {
 		$action_argv_id = 3;
 	}
 
@@ -2214,10 +2223,9 @@ function api_favorites_create_destroy($type)
 	}
 	$action = str_replace("." . $type, "", $a->argv[$action_argv_id]);
 	if ($a->argc == $action_argv_id + 2) {
-		$itemid = intval($a->argv[$action_argv_id + 1]);
+		$itemid = intval(defaults($a->argv, $action_argv_id + 1, 0));
 	} else {
-		///  @TODO use x() to check if _REQUEST contains 'id'
-		$itemid = intval($_REQUEST['id']);
+		$itemid = intval(defaults($_REQUEST, 'id', 0));
 	}
 
 	$item = Item::selectFirstForUser(api_user(), [], ['id' => $itemid, 'uid' => api_user()]);
@@ -2340,25 +2348,33 @@ function api_format_messages($item, $recipient, $sender)
 {
 	// standard meta information
 	$ret = [
-			'id'                    => $item['id'],
-			'sender_id'             => $sender['id'] ,
-			'text'                  => "",
-			'recipient_id'          => $recipient['id'],
-			'created_at'            => api_date($item['created']),
-			'sender_screen_name'    => $sender['screen_name'],
-			'recipient_screen_name' => $recipient['screen_name'],
-			'sender'                => $sender,
-			'recipient'             => $recipient,
-			'title'                 => "",
-			'friendica_seen'        => $item['seen'],
-			'friendica_parent_uri'  => $item['parent-uri'],
+		'id'                    => $item['id'],
+		'sender_id'             => $sender['id'] ,
+		'text'                  => "",
+		'recipient_id'          => $recipient['id'],
+		'created_at'            => api_date(defaults($item, 'created', DateTimeFormat::utcNow())),
+		'sender_screen_name'    => $sender['screen_name'],
+		'recipient_screen_name' => $recipient['screen_name'],
+		'sender'                => $sender,
+		'recipient'             => $recipient,
+		'title'                 => "",
+		'friendica_seen'        => defaults($item, 'seen', 0),
+		'friendica_parent_uri'  => defaults($item, 'parent-uri', ''),
 	];
 
 	// "uid" and "self" are only needed for some internal stuff, so remove it from here
-	unset($ret["sender"]["uid"]);
-	unset($ret["sender"]["self"]);
-	unset($ret["recipient"]["uid"]);
-	unset($ret["recipient"]["self"]);
+	if (isset($ret['sender']['uid'])) {
+		unset($ret['sender']['uid']);
+	}
+	if (isset($ret['sender']['self'])) {
+		unset($ret['sender']['self']);
+	}
+	if (isset($ret['recipient']['uid'])) {
+		unset($ret['recipient']['uid']);
+	}
+	if (isset($ret['recipient']['self'])) {
+		unset($ret['recipient']['self']);
+	}
 
 	//don't send title to regular StatusNET requests to avoid confusing these apps
 	if (x($_GET, 'getText')) {
@@ -2405,8 +2421,8 @@ function api_convert_item($item)
 		$statustext = trim($statustitle."\n\n".$statusbody);
 	}
 
-	if (($item["network"] == NETWORK_FEED) && (strlen($statustext)> 1000)) {
-		$statustext = substr($statustext, 0, 1000)."... \n".$item["plink"];
+	if ((defaults($item, 'network', Protocol::PHANTOM) == Protocol::FEED) && (strlen($statustext)> 1000)) {
+		$statustext = substr($statustext, 0, 1000) . "... \n" . defaults($item, 'plink', '');
 	}
 
 	$statushtml = BBCode::convert(api_clean_attachments($body), false);
@@ -2440,7 +2456,7 @@ function api_convert_item($item)
 	}
 
 	// feeds without body should contain the link
-	if (($item['network'] == NETWORK_FEED) && (strlen($item['body']) == 0)) {
+	if ((defaults($item, 'network', Protocol::PHANTOM) == Protocol::FEED) && (strlen($item['body']) == 0)) {
 		$statushtml .= BBCode::convert($item['plink']);
 	}
 
@@ -2482,7 +2498,7 @@ function api_get_attachments(&$body)
 		}
 	}
 
-	if (strstr($_SERVER['HTTP_USER_AGENT'], "AndStatus")) {
+	if (strstr(defaults($_SERVER, 'HTTP_USER_AGENT', ''), "AndStatus")) {
 		foreach ($images[0] as $orig) {
 			$body = str_replace($orig, "", $body);
 		}
@@ -3324,18 +3340,15 @@ function api_statusnet_config($type)
 {
 	$a = get_app();
 
-	$name = $a->config['sitename'];
-	$server = $a->get_hostname();
-	$logo = System::baseUrl() . '/images/friendica-64.png';
-	$email = $a->config['admin_email'];
-	$closed = (($a->config['register_policy'] == REGISTER_CLOSED) ? 'true' : 'false');
-	$private = ((Config::get('system', 'block_public')) ? 'true' : 'false');
-	$textlimit = (string) (($a->config['max_import_size']) ? $a->config['max_import_size'] : 200000);
-	if ($a->config['api_import_size']) {
-		$textlimit = (string) $a->config['api_import_size'];
-	}
-	$ssl = ((Config::get('system', 'have_ssl')) ? 'true' : 'false');
-	$sslserver = (($ssl === 'true') ? str_replace('http:', 'https:', System::baseUrl()) : '');
+	$name      = Config::get('config', 'sitename');
+	$server    = $a->get_hostname();
+	$logo      = System::baseUrl() . '/images/friendica-64.png';
+	$email     = Config::get('config', 'admin_email');
+	$closed    = Config::get('config', 'register_policy') == REGISTER_CLOSED ? 'true' : 'false';
+	$private   = Config::get('system', 'block_public') ? 'true' : 'false';
+	$textlimit = (string) Config::get('config', 'api_import_size', Config::get('config', 'max_import_size', 200000));
+	$ssl       = Config::get('system', 'have_ssl') ? 'true' : 'false';
+	$sslserver = Config::get('system', 'have_ssl') ? str_replace('http:', 'https:', System::baseUrl()) : '';
 
 	$config = [
 		'site' => ['name' => $name,'server' => $server, 'theme' => 'default', 'path' => '',
@@ -3457,32 +3470,38 @@ api_register_func('api/followers/ids', 'api_followers_ids', true);
  */
 function api_direct_messages_new($type)
 {
-
 	$a = get_app();
 
 	if (api_user() === false) {
 		throw new ForbiddenException();
 	}
 
-	if (!x($_POST, "text") || (!x($_POST, "screen_name") && !x($_POST, "user_id"))) {
+	if (empty($_POST["text"]) || empty($_POST["screen_name"]) && empty($_POST["user_id"])) {
 		return;
 	}
 
 	$sender = api_get_user($a);
 
-	if ($_POST['screen_name']) {
+	$recipient = null;
+	if (!empty($_POST['screen_name'])) {
 		$r = q(
 			"SELECT `id`, `nurl`, `network` FROM `contact` WHERE `uid`=%d AND `nick`='%s'",
 			intval(api_user()),
 			dbesc($_POST['screen_name'])
 		);
 
-		// Selecting the id by priority, friendica first
-		api_best_nickname($r);
+		if (DBM::is_result($r)) {
+			// Selecting the id by priority, friendica first
+			api_best_nickname($r);
 
-		$recipient = api_get_user($a, $r[0]['nurl']);
+			$recipient = api_get_user($a, $r[0]['nurl']);
+		}
 	} else {
 		$recipient = api_get_user($a, $_POST['user_id']);
+	}
+
+	if (empty($recipient)) {
+		throw new NotFoundException('Recipient not found');
 	}
 
 	$replyto = '';
@@ -3622,17 +3641,17 @@ function api_direct_messages_box($type, $box, $verbose)
 		throw new ForbiddenException();
 	}
 	// params
-	$count = (x($_GET, 'count') ? $_GET['count'] : 20);
-	$page = (x($_REQUEST, 'page') ? $_REQUEST['page'] -1 : 0);
+	$count = defaults($_GET, 'count', 20);
+	$page = defaults($_REQUEST, 'page', 1) - 1;
 	if ($page < 0) {
 		$page = 0;
 	}
 
-	$since_id = (x($_REQUEST, 'since_id') ? $_REQUEST['since_id'] : 0);
-	$max_id = (x($_REQUEST, 'max_id') ? $_REQUEST['max_id'] : 0);
+	$since_id = defaults($_REQUEST, 'since_id', 0);
+	$max_id = defaults($_REQUEST, 'max_id', 0);
 
-	$user_id = (x($_REQUEST, 'user_id') ? $_REQUEST['user_id'] : "");
-	$screen_name = (x($_REQUEST, 'screen_name') ? $_REQUEST['screen_name'] : "");
+	$user_id = defaults($_REQUEST, 'user_id', '');
+	$screen_name = defaults($_REQUEST, 'screen_name', '');
 
 	//  caller user info
 	unset($_REQUEST["user_id"]);
@@ -3656,7 +3675,7 @@ function api_direct_messages_box($type, $box, $verbose)
 	if ($box=="sentbox") {
 		$sql_extra = "`mail`.`from-url`='" . dbesc($profile_url) . "'";
 	} elseif ($box == "conversation") {
-		$sql_extra = "`mail`.`parent-uri`='" . dbesc($_GET["uri"])  . "'";
+		$sql_extra = "`mail`.`parent-uri`='" . dbesc(defaults($_GET, 'uri', ''))  . "'";
 	} elseif ($box == "all") {
 		$sql_extra = "true";
 	} elseif ($box == "inbox") {
@@ -4516,7 +4535,7 @@ function post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $f
 	$owner_record = q("SELECT * FROM `contact` WHERE `uid`= %d AND `self` LIMIT 1", intval(api_user()));
 
 	$arr = [];
-	$arr['guid']          = get_guid(32);
+	$arr['guid']          = System::createGUID(32);
 	$arr['uid']           = intval(api_user());
 	$arr['uri']           = $uri;
 	$arr['parent-uri']    = $uri;
@@ -5577,8 +5596,10 @@ function api_friendica_notification($type)
 
 	if ($type == "xml") {
 		$xmlnotes = [];
-		foreach ($notes as $note) {
-			$xmlnotes[] = ["@attributes" => $note];
+		if (!empty($notes)) {
+			foreach ($notes as $note) {
+				$xmlnotes[] = ["@attributes" => $note];
+			}
 		}
 
 		$notes = $xmlnotes;

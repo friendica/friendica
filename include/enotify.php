@@ -34,7 +34,7 @@ function notification($params)
 	$siteurl = System::baseUrl(true);
 	$thanks = L10n::t('Thank You,');
 	$sitename = $a->config['sitename'];
-	if (!x($a->config['admin_name'])) {
+	if (empty($a->config['admin_name'])) {
 		$site_admin = L10n::t('%s Administrator', $sitename);
 	} else {
 		$site_admin = L10n::t('%1$s, %2$s Administrator', $a->config['admin_name'], $sitename);
@@ -93,6 +93,8 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_MAIL) {
+		$itemlink = $siteurl.'/message/'.$params['item']['id'];
+
 		$subject = L10n::t('[Friendica:Notify] New mail received at %s', $sitename);
 
 		$preamble = L10n::t('%1$s sent you a new private message at %2$s.', $params['source_name'], $sitename);
@@ -101,7 +103,6 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to view and/or reply to your private messages.');
 		$tsitelink = sprintf($sitelink, $siteurl.'/message/'.$params['item']['id']);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'/message/'.$params['item']['id'].'">'.$sitename.'</a>');
-		$itemlink = $siteurl.'/message/'.$params['item']['id'];
 	}
 
 	if ($params['type'] == NOTIFY_COMMENT) {
@@ -130,10 +131,11 @@ function notification($params)
 		$item = null;
 
 		if ($params['otype'] === 'item' && $parent_id) {
-			$item = Item::selectFirstForUser($params['uid'], [], ['id' => $parent_id]);
+			$item = Item::selectFirstForUser($params['uid'], Item::ITEM_FIELDLIST, ['id' => $parent_id]);
 		}
 
 		$item_post_type = item_post_type($item);
+		$itemlink = $item['plink'];
 
 		// "a post"
 		$dest_str = L10n::t('%1$s commented on [url=%2$s]a %3$s[/url]',
@@ -242,6 +244,7 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_TAGSHARE) {
+		$itemlink =  $params['link'];
 		$subject = L10n::t('[Friendica:Notify] %s tagged your post', $params['source_name']);
 
 		$preamble = L10n::t('%1$s tagged your post at %2$s', $params['source_name'], $sitename);
@@ -253,10 +256,10 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to view and/or reply to the conversation.');
 		$tsitelink = sprintf($sitelink, $siteurl);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-		$itemlink =  $params['link'];
 	}
 
 	if ($params['type'] == NOTIFY_INTRO) {
+		$itemlink = $params['link'];
 		$subject = L10n::t('[Friendica:Notify] Introduction received');
 
 		$preamble = L10n::t('You\'ve received an introduction from \'%1$s\' at %2$s', $params['source_name'], $sitename);
@@ -270,7 +273,6 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to approve or reject the introduction.');
 		$tsitelink = sprintf($sitelink, $siteurl);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-		$itemlink =  $params['link'];
 
 		switch ($params['verb']) {
 			case ACTIVITY_FRIEND:
@@ -300,6 +302,7 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_SUGGEST) {
+		$itemlink =  $params['link'];
 		$subject = L10n::t('[Friendica:Notify] Friend suggestion received');
 
 		$preamble = L10n::t('You\'ve received a friend suggestion from \'%1$s\' at %2$s', $params['source_name'], $sitename);
@@ -316,11 +319,11 @@ function notification($params)
 		$sitelink = L10n::t('Please visit %s to approve or reject the suggestion.');
 		$tsitelink = sprintf($sitelink, $siteurl);
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-		$itemlink =  $params['link'];
 	}
 
 	if ($params['type'] == NOTIFY_CONFIRM) {
 		if ($params['verb'] == ACTIVITY_FRIEND) { // mutual connection
+			$itemlink =  $params['link'];
 			$subject = L10n::t('[Friendica:Notify] Connection accepted');
 
 			$preamble = L10n::t('\'%1$s\' has accepted your connection request at %2$s', $params['source_name'], $sitename);
@@ -334,8 +337,8 @@ function notification($params)
 			$sitelink = L10n::t('Please visit %s if you wish to make any changes to this relationship.');
 			$tsitelink = sprintf($sitelink, $siteurl);
 			$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-			$itemlink =  $params['link'];
 		} else { // ACTIVITY_FOLLOW
+			$itemlink =  $params['link'];
 			$subject = L10n::t('[Friendica:Notify] Connection accepted');
 
 			$preamble = L10n::t('\'%1$s\' has accepted your connection request at %2$s', $params['source_name'], $sitename);
@@ -351,13 +354,13 @@ function notification($params)
 			$sitelink = L10n::t('Please visit %s  if you wish to make any changes to this relationship.');
 			$tsitelink = sprintf($sitelink, $siteurl);
 			$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
-			$itemlink =  $params['link'];
 		}
 	}
 
 	if ($params['type'] == NOTIFY_SYSTEM) {
 		switch($params['event']) {
 			case "SYSTEM_REGISTER_REQUEST":
+				$itemlink =  $params['link'];
 				$subject = L10n::t('[Friendica System Notify]') . ' ' . L10n::t('registration request');
 
 				$preamble = L10n::t('You\'ve received a registration request from \'%1$s\' at %2$s', $params['source_name'], $sitename);
@@ -375,7 +378,6 @@ function notification($params)
 				$sitelink = L10n::t('Please visit %s to approve or reject the request.');
 				$tsitelink = sprintf($sitelink, $params['link']);
 				$hsitelink = sprintf($sitelink, '<a href="'.$params['link'].'">'.$sitename.'</a><br><br>');
-				$itemlink =  $params['link'];
 				break;
 			case "SYSTEM_DB_UPDATE_FAIL":
 				break;
@@ -572,7 +574,7 @@ function notification($params)
 		$datarray['sitename'] = $sitename;
 		$datarray['siteurl'] = $siteurl;
 		$datarray['type'] = $params['type'];
-		$datarray['parent'] = $params['parent'];
+		$datarray['parent'] = $parent_id;
 		$datarray['source_name'] = $params['source_name'];
 		$datarray['source_link'] = $params['source_link'];
 		$datarray['source_photo'] = $params['source_photo'];
@@ -607,7 +609,7 @@ function notification($params)
 			'$source_name'  => $datarray['source_name'],
 			'$source_link'  => $datarray['source_link'],
 			'$source_photo' => $datarray['source_photo'],
-			'$username'     => $datarray['to_name'],
+			'$username'     => $datarray['username'],
 			'$hsitelink'    => $datarray['hsitelink'],
 			'$hitemlink'    => $datarray['hitemlink'],
 			'$thanks'       => $datarray['thanks'],
@@ -628,7 +630,7 @@ function notification($params)
 			'$source_name'  => $datarray['source_name'],
 			'$source_link'  => $datarray['source_link'],
 			'$source_photo' => $datarray['source_photo'],
-			'$username'     => $datarray['to_name'],
+			'$username'     => $datarray['username'],
 			'$tsitelink'    => $datarray['tsitelink'],
 			'$titemlink'    => $datarray['titemlink'],
 			'$thanks'       => $datarray['thanks'],
@@ -738,18 +740,13 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 
 	// Only act if it is a "real" post
 	// We need the additional check for the "local_profile" because of mixed situations on connector networks
-	$item = q("SELECT `id`, `mention`, `tag`,`parent`, `title`, `body`, `author-id`, `guid`,
-			`parent-uri`, `uri`, `contact-id`, `network`
-			FROM `item` WHERE `id` = %d AND `gravity` IN (%d, %d) AND
-				NOT (`author-id` IN ($contact_list)) LIMIT 1",
-		intval($itemid), intval(GRAVITY_PARENT), intval(GRAVITY_COMMENT));
-	if (!$item)
-		return false;
-
-	if ($item[0]['network'] != NETWORK_FEED) {
-		$author = dba::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item[0]['author-id']]);
-	} else {
-		$author = dba::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item[0]['contact-id']]);
+	$fields = ['id', 'mention', 'tag', 'parent', 'title', 'body',
+		'author-link', 'author-name', 'author-avatar', 'author-id',
+		'guid', 'parent-uri', 'uri', 'contact-id', 'network'];
+	$condition = ['id' => $itemid, 'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]];
+	$item = Item::selectFirst($fields, $condition);
+	if (!DBM::is_result($item) || in_array($item['author-id'], $contacts)) {
+		return;
 	}
 
 	// Generate the notification array
@@ -759,17 +756,17 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 	$params["language"] = $user["language"];
 	$params["to_name"] = $user["username"];
 	$params["to_email"] = $user["email"];
-	$params["item"] = $item[0];
-	$params["parent"] = $item[0]["parent"];
-	$params["link"] = System::baseUrl().'/display/'.urlencode($item[0]["guid"]);
+	$params["item"] = $item;
+	$params["parent"] = $item["parent"];
+	$params["link"] = System::baseUrl().'/display/'.urlencode($item["guid"]);
 	$params["otype"] = 'item';
-	$params["source_name"] = $author["name"];
-	$params["source_link"] = $author["url"];
-	$params["source_photo"] = $author["thumb"];
+	$params["source_name"] = $item["author-name"];
+	$params["source_link"] = $item["author-link"];
+	$params["source_photo"] = $item["author-avatar"];
 
-	if ($item[0]["parent-uri"] === $item[0]["uri"]) {
+	if ($item["parent-uri"] === $item["uri"]) {
 		// Send a notification for every new post?
-		$send_notification = dba::exists('contact', ['id' => $item[0]['contact-id'], 'notify_new_posts' => true]);
+		$send_notification = dba::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true]);
 
 		if (!$send_notification) {
 			$tags = q("SELECT `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` = %d AND `uid` = %d",
@@ -796,11 +793,11 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 	$tagged = false;
 
 	foreach ($profiles AS $profile) {
-		if (strpos($item[0]["tag"], "=".$profile."]") || strpos($item[0]["body"], "=".$profile."]"))
+		if (strpos($item["tag"], "=".$profile."]") || strpos($item["body"], "=".$profile."]"))
 			$tagged = true;
 	}
 
-	if ($item[0]["mention"] || $tagged || ($defaulttype == NOTIFY_TAGSELF)) {
+	if ($item["mention"] || $tagged || ($defaulttype == NOTIFY_TAGSELF)) {
 		$params["type"] = NOTIFY_TAGSELF;
 		$params["verb"] = ACTIVITY_TAG;
 	}
@@ -810,7 +807,7 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 			WHERE `thread`.`iid` = %d AND NOT `thread`.`ignored` AND
 				(`thread`.`mention` OR `item`.`author-id` IN ($contact_list))
 			LIMIT 1",
-			intval($item[0]["parent"]));
+			intval($item["parent"]));
 
 	if ($parent && !isset($params["type"])) {
 		$params["type"] = NOTIFY_COMMENT;

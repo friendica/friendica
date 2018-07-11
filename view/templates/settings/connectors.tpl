@@ -7,13 +7,9 @@
 <form action="settings/connectors" method="post" autocomplete="off">
 <input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
 
-<span id="settings_general_inflated" class="settings-block fakelink" style="display: block;" onclick="openClose('settings_general_expanded'); openClose('settings_general_inflated');">
-	<h3 class="connector">{{$general_settings}}</h3>
-</span>
+	<h3 class="settings-heading"><a onclick="openClose('settings_general_expanded'); openClose('settings_general_inflated');">{{$general_settings}}</a></h3>
+
 <div id="settings_general_expanded" class="settings-block" style="display: none;">
-	<span class="fakelink" onclick="openClose('settings_general_expanded'); openClose('settings_general_inflated');">
-		<h3 class="connector">{{$general_settings}}</h3>
-	</span>
 
 	{{include file="field_checkbox.tpl" field=$disable_cw}}
 	{{include file="field_checkbox.tpl" field=$no_intelligent_shortening}}

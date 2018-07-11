@@ -14,7 +14,7 @@ user:
         uid: 42
         username: Test user
         nickname: selfcontact
-        verified: true
+        verified: 1
         password: $2y$10$DLRNTRmJgKe1cSrFJ5Jb0edCqvXlA9sh/RHdSnfxjbR.04yZRm4Qm
         theme: frio
 
@@ -24,12 +24,12 @@ contact:
         uid: 42
         name: Self contact
         nick: selfcontact
-        self: true
+        self: 1
         nurl: http://localhost/profile/selfcontact
         url: http://localhost/profile/selfcontact
         about: User used in tests
-        pending: false
-        blocked: false
+        pending: 0
+        blocked: 0
         rel: 1
         network: dfrn
     -
@@ -39,162 +39,162 @@ contact:
         # the fallback to api_get_nick() in api_get_user()
         name: othercontact
         nick: othercontact
-        self: false
+        self: 0
         nurl: http://localhost/profile/othercontact
         url: http://localhost/profile/othercontact
-        pending: false
-        blocked: false
+        pending: 0
+        blocked: 0
         rel: 0
         network: dfrn
     -
         id: 44
-        uid: 0
+        uid: 42
         name: Friend contact
         nick: friendcontact
-        self: false
+        self: 0
         nurl: http://localhost/profile/friendcontact
         url: http://localhost/profile/friendcontact
-        pending: false
-        blocked: false
+        pending: 0
+        blocked: 0
         rel: 2
         network: dfrn
 
 item:
     -
         id: 1
-        visible: true
+        visible: 1
         contact-id: 42
         author-id: 42
         owner-id: 45
         uid: 42
         verb: http://activitystrea.ms/schema/1.0/post
-        unseen: true
+        unseen: 1
         body: Parent status
         parent: 1
         author-link: http://localhost/profile/selfcontact
-        wall: true
-        starred: true
-        origin: true
+        wall: 1
+        starred: 1
+        origin: 1
         allow_cid: ''
         allow_gid: ''
         deny_cid: ''
         deny_gid: ''
     -
         id: 2
-        visible: true
+        visible: 1
         contact-id: 42
         author-id: 42
         owner-id: 45
         uid: 42
         verb: http://activitystrea.ms/schema/1.0/post
-        unseen: false
+        unseen: 0
         body: Reply
         parent: 1
         author-link: http://localhost/profile/selfcontact
-        wall: true
-        starred: false
-        origin: true
+        wall: 1
+        starred: 0
+        origin: 1
     -
         id: 3
-        visible: true
+        visible: 1
         contact-id: 43
         author-id: 43
         owner-id: 42
         uid: 42
         verb: http://activitystrea.ms/schema/1.0/post
-        unseen: false
+        unseen: 0
         body: Other user status
         parent: 3
         author-link: http://localhost/profile/othercontact
-        wall: true
-        starred: false
-        origin: true
+        wall: 1
+        starred: 0
+        origin: 1
     -
         id: 4
-        visible: true
+        visible: 1
         contact-id: 44
         author-id: 44
         owner-id: 42
         uid: 42
         verb: http://activitystrea.ms/schema/1.0/post
-        unseen: false
+        unseen: 0
         body: Friend user reply
         parent: 1
         author-link: http://localhost/profile/othercontact
-        wall: true
-        starred: false
-        origin: true
+        wall: 1
+        starred: 0
+        origin: 1
     -
         id: 5
-        visible: true
+        visible: 1
         contact-id: 42
         author-id: 42
         owner-id: 42
         uid: 42
         verb: http://activitystrea.ms/schema/1.0/post
-        unseen: false
+        unseen: 0
         body: '[share]Shared status[/share]'
         parent: 1
         author-link: http://localhost/profile/othercontact
-        wall: true
-        starred: false
-        origin: true
+        wall: 1
+        starred: 0
+        origin: 1
         allow_cid: ''
         allow_gid: ''
         deny_cid: ''
         deny_gid: ''
     -
         id: 6
-        visible: true
+        visible: 1
         contact-id: 44
         author-id: 44
         owner-id: 42
         uid: 42
         verb: http://activitystrea.ms/schema/1.0/post
-        unseen: false
+        unseen: 0
         body: Friend user status
         parent: 6
         author-link: http://localhost/profile/othercontact
-        wall: true
-        starred: false
-        origin: true
+        wall: 1
+        starred: 0
+        origin: 1
 
 thread:
     -
         iid: 1
-        visible: true
+        visible: 1
         contact-id: 42
         author-id: 42
         owner-id: 42
         uid: 42
-        wall: true
+        wall: 1
     -
         iid: 3
-        visible: true
+        visible: 1
         contact-id: 43
         author-id: 43
         owner-id: 43
         uid: 0
-        wall: true
+        wall: 1
     -
         iid: 6
-        visible: true
+        visible: 1
         contact-id: 44
         author-id: 44
         owner-id: 44
         uid: 0
-        wall: true
+        wall: 1
 
 group:
     -
         id: 1
         uid: 42
-        visible: true
+        visible: 1
         name: Visible list
     -
         id: 2
         uid: 42
-        visible: false
+        visible: 0
         name: Private list
 
 search:

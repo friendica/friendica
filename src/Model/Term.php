@@ -15,7 +15,42 @@ require_once 'include/dba.php';
 
 class Term
 {
-	public static function insertFromTagFieldByItemId($itemid)
+	public static function tagTextFromItemId($itemid)
+	{
+		$tag_text = '';
+		$condition = ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_HASHTAG, TERM_MENTION]];
+		$tags = dba::select('term', [], $condition);
+		while ($tag = dba::fetch($tags)) {
+			if ($tag_text != '') {
+				$tag_text .= ',';
+			}
+
+			if ($tag['type'] == 1) {
+				$tag_text .= '#';
+			} else {
+				$tag_text .= '@';
+			}
+			$tag_text .= '[url=' . $tag['url'] . ']' . $tag['term'] . '[/url]';
+		}
+		return $tag_text;
+	}
+
+	public static function fileTextFromItemId($itemid)
+	{
+		$file_text = '';
+		$condition = ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_FILE, TERM_CATEGORY]];
+		$tags = dba::select('term', [], $condition);
+		while ($tag = dba::fetch($tags)) {
+			if ($tag['type'] == TERM_CATEGORY) {
+				$file_text .= '<' . $tag['term'] . '>';
+			} else {
+				$file_text .= '[' . $tag['term'] . ']';
+			}
+		}
+		return $file_text;
+	}
+
+	public static function insertFromTagFieldByItemId($itemid, $tags)
 	{
 		$profile_base = System::baseUrl();
 		$profile_data = parse_url($profile_base);
@@ -23,11 +58,13 @@ class Term
 		$profile_base_friendica = $profile_data['host'] . $profile_path . '/profile/';
 		$profile_base_diaspora = $profile_data['host'] . $profile_path . '/u/';
 
-		$fields = ['guid', 'uid', 'id', 'edited', 'deleted', 'created', 'received', 'title', 'body', 'tag', 'parent'];
+		$fields = ['guid', 'uid', 'id', 'edited', 'deleted', 'created', 'received', 'title', 'body', 'parent'];
 		$message = Item::selectFirst($fields, ['id' => $itemid]);
 		if (!DBM::is_result($message)) {
 			return;
 		}
+
+		$message['tag'] = $tags;
 
 		// Clean up all tags
 		dba::delete('term', ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_HASHTAG, TERM_MENTION]]);
@@ -57,14 +94,14 @@ class Term
 		$pattern = '/\W\#([^\[].*?)[\s\'".,:;\?!\[\]\/]/ism';
 		if (preg_match_all($pattern, $data, $matches)) {
 			foreach ($matches[1] as $match) {
-				$tags['#' . strtolower($match)] = '';
+				$tags['#' . $match] = '';
 			}
 		}
 
 		$pattern = '/\W([\#@])\[url\=(.*?)\](.*?)\[\/url\]/ism';
 		if (preg_match_all($pattern, $data, $matches, PREG_SET_ORDER)) {
 			foreach ($matches as $match) {
-				$tags[$match[1] . strtolower(trim($match[3], ',.:;[]/\"?!'))] = $match[2];
+				$tags[$match[1] . trim($match[3], ',.:;[]/\"?!')] = $match[2];
 			}
 		}
 
@@ -128,9 +165,9 @@ class Term
 	 * @param integer $itemid item id
 	 * @return void
 	 */
-	public static function insertFromFileFieldByItemId($itemid)
+	public static function insertFromFileFieldByItemId($itemid, $files)
 	{
-		$message = Item::selectFirst(['uid', 'deleted', 'file'], ['id' => $itemid]);
+		$message = Item::selectFirst(['uid', 'deleted'], ['id' => $itemid]);
 		if (!DBM::is_result($message)) {
 			return;
 		}
@@ -141,6 +178,8 @@ class Term
 		if ($message["deleted"]) {
 			return;
 		}
+
+		$message['file'] = $files;
 
 		if (preg_match_all("/\[(.*?)\]/ism", $message["file"], $files)) {
 			foreach ($files[1] as $file) {
@@ -193,12 +232,14 @@ class Term
 
 		while ($tag = dba::fetch($taglist)) {
 			if ($tag["url"] == "") {
-				$tag["url"] = $searchpath . strtolower($tag["term"]);
+				$tag["url"] = $searchpath . $tag["term"];
 			}
 
 			$orig_tag = $tag["url"];
 
-			$tag["url"] = Contact::magicLinkById($item['author-id'], $tag['url']);
+			$author = ['uid' => 0, 'id' => $item['author-id'],
+				'network' => $item['author-network'], 'url' => $item['author-link']];
+			$tag["url"] = Contact::magicLinkByContact($author, $tag['url']);
 
 			if ($tag["type"] == TERM_HASHTAG) {
 				if ($orig_tag != $tag["url"]) {

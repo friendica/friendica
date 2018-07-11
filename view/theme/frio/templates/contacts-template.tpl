@@ -16,14 +16,10 @@
 	<div id="contacts-search-wrapper">
 		<form id="contacts-search-form" class="navbar-form" role="search" action="{{$cmd}}" method="get" >
 			<div class="row">
-				<div class="col-md-2"></div>
-				<div class="col-md-8 ">
-					<div class="form-group form-group-search">
-						<input type="text" name="search" id="contacts-search" class="search-input form-control form-search" onfocus="this.select();" value="{{$search|escape:'html'}}" placeholder="{{$desc}}"/>
-						<button class="btn btn-default btn-sm form-button-search" type="submit" id="contacts-search-submit">{{$submit}}</button>
-					</div>
+				<div class="form-group form-group-search">
+					<input type="text" name="search" id="contacts-search" class="search-input form-control form-search" onfocus="this.select();" value="{{$search|escape:'html'}}" placeholder="{{$desc}}"/>
+					<button class="btn btn-default btn-sm form-button-search" type="submit" id="contacts-search-submit">{{$submit}}</button>
 				</div>
-				<div class="col-md-2"></div>
 			</div>
 		</form>
 	</div>

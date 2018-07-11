@@ -4,10 +4,9 @@
  */
 namespace Friendica\Database;
 
+use dba;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
-use dba;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
@@ -410,10 +409,10 @@ class DBStructure
 				// Compare the field structure field by field
 				foreach ($structure["fields"] AS $fieldname => $parameters) {
 					// Compare the field definition
-					$field_definition = $database[$name]["fields"][$fieldname];
+					$field_definition = defaults($database[$name]["fields"], $fieldname, ['Collation' => '']);
 
 					// Define the default collation if not given
-					if (!isset($parameters['Collation']) && !is_null($field_definition['Collation'])) {
+					if (!isset($parameters['Collation']) && !empty($field_definition['Collation'])) {
 						$parameters['Collation'] = 'utf8mb4_general_ci';
 					} else {
 						$parameters['Collation'] = null;
@@ -537,26 +536,26 @@ class DBStructure
 	private static function FieldCommand($parameters, $create = true) {
 		$fieldstruct = $parameters["type"];
 
-		if (!is_null($parameters["Collation"])) {
+		if (!empty($parameters["Collation"])) {
 			$fieldstruct .= " COLLATE ".$parameters["Collation"];
 		}
 
-		if ($parameters["not null"]) {
+		if (!empty($parameters["not null"])) {
 			$fieldstruct .= " NOT NULL";
 		}
 
-		if (isset($parameters["default"])) {
+		if (!empty($parameters["default"])) {
 			if (strpos(strtolower($parameters["type"]),"int")!==false) {
 				$fieldstruct .= " DEFAULT ".$parameters["default"];
 			} else {
 				$fieldstruct .= " DEFAULT '".$parameters["default"]."'";
 			}
 		}
-		if ($parameters["extra"] != "") {
+		if (!empty($parameters["extra"])) {
 			$fieldstruct .= " ".$parameters["extra"];
 		}
 
-		if (!is_null($parameters["comment"])) {
+		if (!empty($parameters["comment"])) {
 			$fieldstruct .= " COMMENT '".dbesc($parameters["comment"])."'";
 		}
 
@@ -580,7 +579,7 @@ class DBStructure
 			}
 		}
 
-		if (!is_null($structure["indexes"])) {
+		if (!empty($structure["indexes"])) {
 			foreach ($structure["indexes"] AS $indexname => $fieldnames) {
 				$sql_index = self::createIndex($indexname, $fieldnames, "");
 				if (!is_null($sql_index)) {
@@ -589,11 +588,11 @@ class DBStructure
 			}
 		}
 
-		if (!is_null($structure["engine"])) {
+		if (!empty($structure["engine"])) {
 			$engine = " ENGINE=" . $structure["engine"];
 		}
 
-		if (!is_null($structure["comment"])) {
+		if (!empty($structure["comment"])) {
 			$comment = " COMMENT='" . dbesc($structure["comment"]) . "'";
 		}
 
@@ -1182,6 +1181,7 @@ class DBStructure
 						"author-link" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Link to the profile page of the author of this item"],
 						"author-avatar" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Link to the avatar picture of the author of this item"],
 						"icid" => ["type" => "int unsigned", "relation" => ["item-content" => "id"], "comment" => "Id of the item-content table entry that contains the whole item content"],
+						"iaid" => ["type" => "int unsigned", "relation" => ["item-activity" => "id"], "comment" => "Id of the item-activity table entry that contains the activity data"],
 						"title" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "item title"],
 						"content-warning" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 						"body" => ["type" => "mediumtext", "comment" => "item body content"],
@@ -1242,13 +1242,25 @@ class DBStructure
 						"ownerid" => ["owner-id"],
 						"uid_uri" => ["uid", "uri(190)"],
 						"resource-id" => ["resource-id"],
-						"contactid_allowcid_allowpid_denycid_denygid" => ["contact-id","allow_cid(10)","allow_gid(10)","deny_cid(10)","deny_gid(10)"], //
-						"uid_type_changed" => ["uid","type","changed"],
-						"contactid_verb" => ["contact-id","verb"],
 						"deleted_changed" => ["deleted","changed"],
 						"uid_wall_changed" => ["uid","wall","changed"],
 						"uid_eventid" => ["uid","event-id"],
 						"icid" => ["icid"],
+						"iaid" => ["iaid"],
+						]
+				];
+		$database["item-activity"] = [
+				"comment" => "Activities for items",
+				"fields" => [
+						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
+						"uri" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+						"uri-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "SHA-1 and RIPEMD-160 hash from uri"],
+						"activity" => ["type" => "smallint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
+						],
+				"indexes" => [
+						"PRIMARY" => ["id"],
+						"uri-hash" => ["UNIQUE", "uri-hash"],
+						"uri" => ["uri(191)"],
 						]
 				];
 		$database["item-content"] = [
@@ -1262,6 +1274,7 @@ class DBStructure
 						"body" => ["type" => "mediumtext", "comment" => "item body content"],
 						"location" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "text location where this item originated"],
 						"coord" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "longitude/latitude pair representing location where this item originated"],
+						"language" => ["type" => "text", "comment" => "Language information about this post"],
 						"app" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "application which generated this item"],
 						"rendered-hash" => ["type" => "varchar(32)", "not null" => "1", "default" => "", "comment" => ""],
 						"rendered-html" => ["type" => "mediumtext", "comment" => "item.body converted to html"],
@@ -1285,9 +1298,11 @@ class DBStructure
 						"name" => ["type" => "varchar(128)", "not null" => "1", "default" => "", "comment" => ""],
 						"locked" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"pid" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "Process ID"],
-						],
+						"expires" => ["type" => "datetime", "not null" => "1", "default" => NULL_DATE, "comment" => "datetime of cache expiration"],
+				],
 				"indexes" => [
 						"PRIMARY" => ["id"],
+						"name_expires" => ["name", "expires"]
 						]
 				];
 		$database["mail"] = [
@@ -1715,7 +1730,6 @@ class DBStructure
 						"created" => ["type" => "datetime", "not null" => "1", "default" => NULL_DATE, "comment" => ""],
 						"received" => ["type" => "datetime", "not null" => "1", "default" => NULL_DATE, "comment" => ""],
 						"global" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
-						"aid" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						"uid" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "relation" => ["user" => "uid"], "comment" => "User id"],
 						],
 				"indexes" => [

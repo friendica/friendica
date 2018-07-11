@@ -144,6 +144,10 @@ class L10n
 	{
 		$a = get_app();
 
+		if (empty($s)) {
+			return '';
+		}
+
 		if (x($a->strings, $s)) {
 			$t = $a->strings[$s];
 			$s = is_array($t) ? $t[0] : $t;

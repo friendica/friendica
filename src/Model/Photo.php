@@ -45,7 +45,7 @@ class Photo
 		if (DBM::is_result($photo)) {
 			$guid = $photo['guid'];
 		} else {
-			$guid = get_guid();
+			$guid = System::createGUID();
 		}
 
 		$existing_photo = dba::selectFirst('photo', ['id'], ['resource-id' => $rid, 'uid' => $uid, 'contact-id' => $cid, 'scale' => $scale]);
@@ -275,6 +275,6 @@ class Photo
 	 */
 	public static function newResource()
 	{
-		return get_guid(32, false);
+		return system::createGUID(32, false);
 	}
 }

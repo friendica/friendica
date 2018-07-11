@@ -262,14 +262,20 @@ function localize_item(&$item)
 	}
 
 	if (activity_match($item['verb'], ACTIVITY_TAG)) {
-		$fields = ['author-link', 'author-name', 'verb', 'object-type', 'resource-id', 'body', 'plink'];
+		$fields = ['author-id', 'author-link', 'author-name', 'author-network',
+			'verb', 'object-type', 'resource-id', 'body', 'plink'];
 		$obj = Item::selectFirst($fields, ['uri' => $item['parent-uri']]);
 		if (!DBM::is_result($obj)) {
 			return;
 		}
 
-		$author  = '[url=' . Contact::magicLinkById($item['author-id']) . ']' . $item['author-name'] . '[/url]';
-		$objauthor =  '[url=' . Contact::magicLinkById($obj['author-id']) . ']' . $obj['author-name'] . '[/url]';
+		$author_arr = ['uid' => 0, 'id' => $item['author-id'],
+			'network' => $item['author-network'], 'url' => $item['author-link']];
+		$author  = '[url=' . Contact::magicLinkByContact($author_arr) . ']' . $item['author-name'] . '[/url]';
+
+		$author_arr = ['uid' => 0, 'id' => $obj['author-id'],
+			'network' => $obj['author-network'], 'url' => $obj['author-link']];
+		$objauthor  = '[url=' . Contact::magicLinkByContact($author_arr) . ']' . $obj['author-name'] . '[/url]';
 
 		switch ($obj['verb']) {
 			case ACTIVITY_POST:
@@ -341,7 +347,12 @@ function localize_item(&$item)
 	}
 
 	// add sparkle links to appropriate permalinks
-	$item['plink'] = Contact::magicLinkById($item['author-id'], $item['plink']);
+	$author = ['uid' => 0, 'id' => $item['author-id'],
+		'network' => $item['author-network'], 'url' => $item['author-link']];
+
+	if (!empty($item['plink'])) {
+		$item['plink'] = Contact::magicLinkbyContact($author, $item['plink']);
+	}
 }
 
 /**
@@ -474,7 +485,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 		$profile_owner = $a->profile['uid'];
 		if (!$update) {
 			$live_update_div = '<div id="live-display"></div>' . "\r\n"
-				. "<script> var profile_uid = " . $_SESSION['uid'] . ";"
+				. "<script> var profile_uid = " . defaults($_SESSION, 'uid', 0) . ";"
 				. " var profile_page = 1; </script>";
 		}
 	} elseif ($mode === 'community') {
@@ -569,7 +580,9 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 
 				$tags = \Friendica\Model\Term::populateTagsFromItem($item);
 
-				$profile_link = Contact::magicLinkbyId($item['author-id']);
+				$author = ['uid' => 0, 'id' => $item['author-id'],
+					'network' => $item['author-network'], 'url' => $item['author-link']];
+				$profile_link = Contact::magicLinkbyContact($author);
 
 				if (strpos($profile_link, 'redir/') === 0) {
 					$sparkle = ' sparkle';
@@ -621,8 +634,8 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 
 				$tmp_item = [
 					'template' => $tpl,
-					'id' => (($preview) ? 'P0' : $item['item_id']),
-					'guid' => (($preview) ? 'Q0' : $item['guid']),
+					'id' => ($preview ? 'P0' : $item['id']),
+					'guid' => ($preview ? 'Q0' : $item['guid']),
 					'network' => $item['network'],
 					'network_name' => ContactSelector::networkToName($item['network'], $profile_link),
 					'linktitle' => L10n::t('View %s\'s profile @ %s', $profile_name, $item['author-link']),
@@ -669,7 +682,7 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 				$arr = ['item' => $item, 'output' => $tmp_item];
 				Addon::callHooks('display_item', $arr);
 
-				$threads[$threadsid]['id'] = $item['item_id'];
+				$threads[$threadsid]['id'] = $item['id'];
 				$threads[$threadsid]['network'] = $item['network'];
 				$threads[$threadsid]['items'] = [$arr['output']];
 
@@ -711,6 +724,8 @@ function conversation(App $a, $items, $mode, $update, $preview = false, $order =
 					continue;
 				}
 
+				/// @todo Check if this call is needed or not
+				$arr = ['item' => $item];
 				Addon::callHooks('display_item', $arr);
 
 				$item['pagedrop'] = $page_dropping;
@@ -803,7 +818,9 @@ function item_photo_menu($item) {
 		$sub_link = 'javascript:dosubthread(' . $item['id'] . '); return false;';
 	}
 
-	$profile_link = Contact::magicLinkById($item['author-id']);
+	$author = ['uid' => 0, 'id' => $item['author-id'],
+		'network' => $item['author-network'], 'url' => $item['author-link']];
+	$profile_link = Contact::magicLinkbyContact($author);
 	$sparkle = (strpos($profile_link, 'redir/') === 0);
 
 	$cid = 0;
@@ -908,7 +925,9 @@ function builtin_activity_puller($item, &$conv_responses) {
 		}
 
 		if (activity_match($item['verb'], $verb) && ($item['id'] != $item['parent'])) {
-			$url = Contact::MagicLinkbyId($item['author-id']);
+			$author = ['uid' => 0, 'id' => $item['author-id'],
+				'network' => $item['author-network'], 'url' => $item['author-link']];
+			$url = Contact::magicLinkbyContact($author);
 			if (strpos($url, 'redir/') === 0) {
 				$sparkle = ' class="sparkle" ';
 			}

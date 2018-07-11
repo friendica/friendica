@@ -9,12 +9,15 @@ php:
 
 services:
  - mysql
+ - redis-server
+ - memcached
 env:
- - USER=travis DB=test
+ - MYSQL_HOST=localhost MYSQL_PORT=3306 MYSQL_USERNAME=travis MYSQL_PASSWORD= MYSQL_DATABASE=test
 
 install:
  - composer install
 before_script:
  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
- # In order to avoid bin/worker.php warnings
- - touch .htconfig.php
+ - mysql -utravis test < database.sql
+ - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+ - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini

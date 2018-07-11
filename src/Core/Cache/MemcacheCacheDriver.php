@@ -2,16 +2,21 @@
 
 namespace Friendica\Core\Cache;
 
-use Friendica\BaseObject;
 use Friendica\Core\Cache;
+
+use Exception;
+use Memcache;
 
 /**
  * Memcache Cache Driver
  *
  * @author Hypolite Petovan <mrpetovan@gmail.com>
  */
-class MemcacheCacheDriver extends BaseObject implements ICacheDriver
+class MemcacheCacheDriver extends AbstractCacheDriver implements IMemoryCacheDriver
 {
+	use TraitCompareSet;
+	use TraitCompareDelete;
+
 	/**
 	 * @var Memcache
 	 */
@@ -20,22 +25,26 @@ class MemcacheCacheDriver extends BaseObject implements ICacheDriver
 	public function __construct($memcache_host, $memcache_port)
 	{
 		if (!class_exists('Memcache', false)) {
-			throw new \Exception('Memcache class isn\'t available');
+			throw new Exception('Memcache class isn\'t available');
 		}
 
-		$this->memcache = new \Memcache();
+		$this->memcache = new Memcache();
 
 		if (!$this->memcache->connect($memcache_host, $memcache_port)) {
-			throw new \Exception('Expected Memcache server at ' . $memcache_host . ':' . $memcache_port . ' isn\'t available');
+			throw new Exception('Expected Memcache server at ' . $memcache_host . ':' . $memcache_port . ' isn\'t available');
 		}
 	}
 
+	/**
+	 * (@inheritdoc)
+	 */
 	public function get($key)
 	{
 		$return = null;
+		$cachekey = $this->getCacheKey($key);
 
 		// We fetch with the hostname as key to avoid problems with other applications
-		$cached = $this->memcache->get(self::getApp()->get_hostname() . ':' . $key);
+		$cached = $this->memcache->get($cachekey);
 
 		// @see http://php.net/manual/en/memcache.get.php#84275
 		if (is_bool($cached) || is_double($cached) || is_long($cached)) {
@@ -54,24 +63,57 @@ class MemcacheCacheDriver extends BaseObject implements ICacheDriver
 		return $return;
 	}
 
-	public function set($key, $value, $duration = Cache::MONTH)
+	/**
+	 * (@inheritdoc)
+	 */
+	public function set($key, $value, $ttl = Cache::FIVE_MINUTES)
 	{
+		$cachekey = $this->getCacheKey($key);
+
 		// We store with the hostname as key to avoid problems with other applications
-		return $this->memcache->set(
-			self::getApp()->get_hostname() . ":" . $key,
-			serialize($value),
-			MEMCACHE_COMPRESSED,
-			time() + $duration
-		);
+		if ($ttl > 0) {
+			return $this->memcache->set(
+				$cachekey,
+				serialize($value),
+				MEMCACHE_COMPRESSED,
+				time() + $ttl
+			);
+		} else {
+			return $this->memcache->set(
+				$cachekey,
+				serialize($value),
+				MEMCACHE_COMPRESSED
+			);
+		}
 	}
 
+	/**
+	 * (@inheritdoc)
+	 */
 	public function delete($key)
 	{
-		return $this->memcache->delete($key);
+		$cachekey = $this->getCacheKey($key);
+		return $this->memcache->delete($cachekey);
 	}
 
-	public function clear()
+	/**
+	 * (@inheritdoc)
+	 */
+	public function clear($outdated = true)
 	{
-		return true;
+		if ($outdated) {
+			return true;
+		} else {
+			return $this->memcache->flush();
+		}
+	}
+
+	/**
+	 * (@inheritdoc)
+	 */
+	public function add($key, $value, $ttl = Cache::FIVE_MINUTES)
+	{
+		$cachekey = $this->getCacheKey($key);
+		return $this->memcache->add($cachekey, serialize($value), MEMCACHE_COMPRESSED, $ttl);
 	}
 }

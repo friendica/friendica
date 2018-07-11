@@ -188,7 +188,7 @@ function proxy_init(App $a) {
 				die();
 			}
 
-			$fields = ['uid' => 0, 'contact-id' => 0, 'guid' => get_guid(), 'resource-id' => $urlhash, 'created' => DateTimeFormat::utcNow(), 'edited' => DateTimeFormat::utcNow(),
+			$fields = ['uid' => 0, 'contact-id' => 0, 'guid' => System::createGUID(), 'resource-id' => $urlhash, 'created' => DateTimeFormat::utcNow(), 'edited' => DateTimeFormat::utcNow(),
 				'filename' => basename($_REQUEST['url']), 'type' => '', 'album' => '', 'height' => imagesy($image), 'width' => imagesx($image),
 				'datasize' => 0, 'data' => $img_str, 'scale' => 100, 'profile' => 0,
 				'allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '', 'desc' => $mime];

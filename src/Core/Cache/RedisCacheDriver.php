@@ -2,8 +2,10 @@
 
 namespace Friendica\Core\Cache;
 
-use Friendica\BaseObject;
 use Friendica\Core\Cache;
+
+use Exception;
+use Redis;
 
 /**
  * Redis Cache Driver. This driver is based on Memcache driver
@@ -11,7 +13,7 @@ use Friendica\Core\Cache;
  * @author Hypolite Petovan <mrpetovan@gmail.com>
  * @author Roland Haeder <roland@mxchange.org>
  */
-class RedisCacheDriver extends BaseObject implements ICacheDriver
+class RedisCacheDriver extends AbstractCacheDriver implements IMemoryCacheDriver
 {
 	/**
 	 * @var Redis
@@ -21,29 +23,27 @@ class RedisCacheDriver extends BaseObject implements ICacheDriver
 	public function __construct($redis_host, $redis_port)
 	{
 		if (!class_exists('Redis', false)) {
-			throw new \Exception('Redis class isn\'t available');
+			throw new Exception('Redis class isn\'t available');
 		}
 
-		$this->redis = new \Redis();
+		$this->redis = new Redis();
 
 		if (!$this->redis->connect($redis_host, $redis_port)) {
-			throw new \Exception('Expected Redis server at ' . $redis_host . ':' . $redis_port . ' isn\'t available');
+			throw new Exception('Expected Redis server at ' . $redis_host . ':' . $redis_port . ' isn\'t available');
 		}
 	}
 
 	public function get($key)
 	{
 		$return = null;
+		$cachekey = $this->getCacheKey($key);
 
-		// We fetch with the hostname as key to avoid problems with other applications
-		$cached = $this->redis->get(self::getApp()->get_hostname() . ':' . $key);
-
-		// @see http://php.net/manual/en/redis.get.php#84275
-		if (is_bool($cached) || is_double($cached) || is_long($cached)) {
-			return $return;
+		$cached = $this->redis->get($cachekey);
+		if ($cached === false && !$this->redis->exists($cachekey)) {
+			return null;
 		}
 
-		$value = @unserialize($cached);
+		$value = unserialize($cached);
 
 		// Only return a value if the serialized value is valid.
 		// We also check if the db entry is a serialized
@@ -55,23 +55,94 @@ class RedisCacheDriver extends BaseObject implements ICacheDriver
 		return $return;
 	}
 
-	public function set($key, $value, $duration = Cache::MONTH)
+	public function set($key, $value, $ttl = Cache::FIVE_MINUTES)
 	{
-		// We store with the hostname as key to avoid problems with other applications
-		return $this->redis->set(
-			self::getApp()->get_hostname() . ":" . $key,
-			serialize($value),
-			time() + $duration
-		);
+		$cachekey = $this->getCacheKey($key);
+
+		$cached = serialize($value);
+
+		if ($ttl > 0) {
+			return $this->redis->setex(
+				$cachekey,
+				$ttl,
+				$cached
+			);
+		} else {
+			return $this->redis->set(
+				$cachekey,
+				$cached
+			);
+		}
 	}
 
 	public function delete($key)
 	{
-		return $this->redis->delete($key);
+		$cachekey = $this->getCacheKey($key);
+		return ($this->redis->delete($cachekey) > 0);
 	}
 
-	public function clear()
+	public function clear($outdated = true)
 	{
-		return true;
+		if ($outdated) {
+			return true;
+		} else {
+			return $this->redis->flushAll();
+		}
+	}
+
+	/**
+	 * (@inheritdoc)
+	 */
+	public function add($key, $value, $ttl = Cache::FIVE_MINUTES)
+	{
+		$cachekey = $this->getCacheKey($key);
+		$cached = serialize($value);
+
+		return $this->redis->setnx($cachekey, $cached);
+	}
+
+	/**
+	 * (@inheritdoc)
+	 */
+	public function compareSet($key, $oldValue, $newValue, $ttl = Cache::FIVE_MINUTES)
+	{
+		$cachekey = $this->getCacheKey($key);
+
+		$newCached = serialize($newValue);
+
+		$this->redis->watch($cachekey);
+		// If the old value isn't what we expected, somebody else changed the key meanwhile
+		if ($this->get($key) === $oldValue) {
+			if ($ttl > 0) {
+				$result = $this->redis->multi()
+					->setex($cachekey, $ttl, $newCached)
+					->exec();
+			} else {
+				$result = $this->redis->multi()
+					->set($cachekey, $newValue)
+					->exec();
+			}
+			return $result !== false;
+		}
+		$this->redis->unwatch();
+		return false;
+	}
+	/**
+	 * (@inheritdoc)
+	 */
+	public function compareDelete($key, $value)
+	{
+		$cachekey = $this->getCacheKey($key);
+
+		$this->redis->watch($cachekey);
+		// If the old value isn't what we expected, somebody else changed the key meanwhile
+		if ($this->get($key) === $value) {
+			$result = $this->redis->multi()
+				->del($cachekey)
+				->exec();
+			return $result !== false;
+		}
+		$this->redis->unwatch();
+		return false;
 	}
 }

@@ -45,6 +45,7 @@ Example: To set the automatic database cleanup process add this line to your .ht
 * **dlogfile** - location of the developer log file
 * **dlogip** - restricts develop log writes to requests originating from this IP address
 * **frontend_worker_timeout** - Value in minutes after we think that a frontend task was killed by the webserver. Default value is 10.
+* **groupedit_image_limit** (Integer) - Number of contacts at which the group editor should switch from display the profile pictures of the contacts to only display the names. Default is 400. This can alternatively be set on a per account basis in the pconfig table.
 * **hsts** (Boolean) - Enables the sending of HTTP Strict Transport Security headers
 * **ignore_cache** (Boolean) - For development only. Disables the item cache.
 * **instances_social_key** - Key to the API of https://instances.social which retrieves data about mastodon servers. See https://instances.social/api/token to get an API key.

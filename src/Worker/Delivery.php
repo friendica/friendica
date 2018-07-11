@@ -53,7 +53,7 @@ class Delivery extends BaseObject
 		} elseif ($cmd == self::RELOCATION) {
 			$uid = $item_id;
 		} else {
-			$item = dba::selectFirst('item', ['parent'], ['id' => $item_id]);
+			$item = Item::selectFirst(['parent'], ['id' => $item_id]);
 			if (!DBM::is_result($item) || empty($item['parent'])) {
 				return;
 			}
@@ -259,6 +259,10 @@ class Delivery extends BaseObject
 				return;
 			}
 
+			$user = dba::selectFirst('user', [], ['uid' => $target_uid]);
+
+			$target_importer = array_merge($target_importer, $user);
+
 			// Set the user id. This is important if this is a public contact
 			$target_importer['importer_uid']  = $target_uid;
 			DFRN::import($atom, $target_importer);
@@ -436,12 +440,12 @@ class Delivery extends BaseObject
 
 			if (empty($target_item['title'])) {
 				$condition = ['uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
-				$title = dba::selectFirst('item', ['title'], $condition);
+				$title = Item::selectFirst(['title'], $condition);
 				if (DBM::is_result($title) && ($title['title'] != '')) {
 					$subject = $title['title'];
 				} else {
 					$condition = ['parent-uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
-					$title = dba::selectFirst('item', ['title'], $condition);
+					$title = Item::selectFirst(['title'], $condition);
 					if (DBM::is_result($title) && ($title['title'] != '')) {
 						$subject = $title['title'];
 					}

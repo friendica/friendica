@@ -21,8 +21,8 @@ if (!isset($minimal)) {
 ?>
 <html>
 	<head>
-		<title><?php if (x($page, 'title')) echo $page['title'] ?></title>
-		<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?>">
+		<title><?php if (!empty($page['title'])) echo $page['title'] ?></title>
+		<meta request="<?php echo htmlspecialchars(defaults($_REQUEST, 'pagename', '')) ?>">
 		<script  type="text/javascript">var baseurl = "<?php echo System::baseUrl(); ?>";</script>
 		<script type="text/javascript">var frio = "<?php echo 'view/theme/frio'; ?>";</script>
 <?php

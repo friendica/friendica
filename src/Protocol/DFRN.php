@@ -77,6 +77,11 @@ class DFRN
 		}
 
 		foreach ($items as $item) {
+			// These values aren't sent when sending from the queue.
+			/// @todo Check if we can set these values from the queue or if they are needed at all.
+			$item["entry:comment-allow"] = defaults($item, "entry:comment-allow", true);
+			$item["entry:cid"] = defaults($item, "entry:cid", 0);
+
 			$entry = self::entry($doc, "text", $item, $owner, $item["entry:comment-allow"], $item["entry:cid"]);
 			$root->appendChild($entry);
 		}
@@ -952,10 +957,10 @@ class DFRN
 		if (isset($parent_item)) {
 			$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $item['parent-uri']]);
 			if (DBM::is_result($conversation)) {
-				if ($r['conversation-uri'] != '') {
+				if ($conversation['conversation-uri'] != '') {
 					$conversation_uri = $conversation['conversation-uri'];
 				}
-				if ($r['conversation-href'] != '') {
+				if ($conversation['conversation-href'] != '') {
 					$conversation_href = $conversation['conversation-href'];
 				}
 			}
@@ -1534,8 +1539,8 @@ class DFRN
 	private static function fetchauthor($xpath, $context, $importer, $element, $onlyfetch, $xml = "")
 	{
 		$author = [];
-		$author["name"] = $xpath->evaluate($element."/atom:name/text()", $context)->item(0)->nodeValue;
-		$author["link"] = $xpath->evaluate($element."/atom:uri/text()", $context)->item(0)->nodeValue;
+		$author["name"] = XML::getFirstNodeValue($xpath, $element."/atom:name/text()", $context);
+		$author["link"] = XML::getFirstNodeValue($xpath, $element."/atom:uri/text()", $context);
 
 		$fields = ['id', 'uid', 'url', 'network', 'avatar-date', 'avatar', 'name-date', 'uri-date', 'addr',
 			'name', 'nick', 'about', 'location', 'keywords', 'xmpp', 'bdyear', 'bd', 'hidden', 'contact-type'];
@@ -1606,33 +1611,33 @@ class DFRN
 			}
 
 			// Update contact data
-			$value = $xpath->evaluate($element . "/dfrn:handle/text()", $context)->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, $element . "/dfrn:handle/text()", $context);
 			if ($value != "") {
 				$poco["addr"] = $value;
 			}
 
-			$value = $xpath->evaluate($element . "/poco:displayName/text()", $context)->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, $element . "/poco:displayName/text()", $context);
 			if ($value != "") {
 				$poco["name"] = $value;
 			}
 
-			$value = $xpath->evaluate($element . "/poco:preferredUsername/text()", $context)->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, $element . "/poco:preferredUsername/text()", $context);
 			if ($value != "") {
 				$poco["nick"] = $value;
 			}
 
-			$value = $xpath->evaluate($element . "/poco:note/text()", $context)->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, $element . "/poco:note/text()", $context);
 			if ($value != "") {
 				$poco["about"] = $value;
 			}
 
-			$value = $xpath->evaluate($element . "/poco:address/poco:formatted/text()", $context)->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, $element . "/poco:address/poco:formatted/text()", $context);
 			if ($value != "") {
 				$poco["location"] = $value;
 			}
 
 			/// @todo Only search for elements with "poco:type" = "xmpp"
-			$value = $xpath->evaluate($element . "/poco:ims/poco:value/text()", $context)->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, $element . "/poco:ims/poco:value/text()", $context);
 			if ($value != "") {
 				$poco["xmpp"] = $value;
 			}
@@ -1645,7 +1650,7 @@ class DFRN
 			/// - poco:country
 
 			// If the "hide" element is present then the profile isn't searchable.
-			$hide = intval($xpath->evaluate($element . "/dfrn:hide/text()", $context)->item(0)->nodeValue == "true");
+			$hide = intval(XML::getFirstNodeValue($xpath, $element . "/dfrn:hide/text()", $context) == "true");
 
 			logger("Hidden status for contact " . $contact_old["url"] . ": " . $hide, LOGGER_DEBUG);
 
@@ -1667,7 +1672,7 @@ class DFRN
 			}
 
 			// "dfrn:birthday" contains the birthday converted to UTC
-			$birthday = $xpath->evaluate($element . "/dfrn:birthday/text()", $context)->item(0)->nodeValue;
+			$birthday = XML::getFirstNodeValue($xpath, $element . "/poco:birthday/text()", $context);
 
 			if (strtotime($birthday) > time()) {
 				$bd_timestamp = strtotime($birthday);
@@ -1676,7 +1681,7 @@ class DFRN
 			}
 
 			// "poco:birthday" is the birthday in the format "yyyy-mm-dd"
-			$value = $xpath->evaluate($element . "/poco:birthday/text()", $context)->item(0)->nodeValue;
+			$value = XML::getFirstNodeValue($xpath, $element . "/poco:birthday/text()", $context);
 
 			if (!in_array($value, ["", "0000-00-00", "0001-01-01"])) {
 				$bdyear = date("Y");
@@ -2087,13 +2092,6 @@ class DFRN
 
 		logger('Contacts are updated.');
 
-		// update items
-		// This is an extreme performance killer
-		Item::update(['owner-link' => $relocate["url"]], ['owner-link' => $old["url"], 'uid' => $importer["importer_uid"]]);
-		Item::update(['author-link' => $relocate["url"]], ['author-link' => $old["url"], 'uid' => $importer["importer_uid"]]);
-
-		logger('Items are updated.');
-
 		/// @TODO
 		/// merge with current record, current contents have priority
 		/// update record, set url-updated
@@ -2417,12 +2415,11 @@ class DFRN
 		$item["source"] = $xml;
 
 		// Get the uri
-		$item["uri"] = $xpath->query("atom:id/text()", $entry)->item(0)->nodeValue;
+		$item["uri"] = XML::getFirstNodeValue($xpath, "atom:id/text()", $entry);
 
-		$item["edited"] = $xpath->query("atom:updated/text()", $entry)->item(0)->nodeValue;
+		$item["edited"] = XML::getFirstNodeValue($xpath, "atom:updated/text()", $entry);
 
-		$current = dba::selectFirst('item',
-			['id', 'uid', 'edited', 'body'],
+		$current = Item::selectFirst(['id', 'uid', 'edited', 'body'],
 			['uri' => $item["uri"], 'uid' => $importer["importer_uid"]]
 		);
 		// Is there an existing item?
@@ -2443,11 +2440,11 @@ class DFRN
 		$item["author-link"] = $author["link"];
 		$item["author-id"] = Contact::getIdForURL($author["link"], 0);
 
-		$item["title"] = $xpath->query("atom:title/text()", $entry)->item(0)->nodeValue;
+		$item["title"] = XML::getFirstNodeValue($xpath, "atom:title/text()", $entry);
 
-		$item["created"] = $xpath->query("atom:published/text()", $entry)->item(0)->nodeValue;
+		$item["created"] = XML::getFirstNodeValue($xpath, "atom:published/text()", $entry);
 
-		$item["body"] = $xpath->query("dfrn:env/text()", $entry)->item(0)->nodeValue;
+		$item["body"] = XML::getFirstNodeValue($xpath, "dfrn:env/text()", $entry);
 		$item["body"] = str_replace([' ',"\t","\r","\n"], ['','','',''], $item["body"]);
 		// make sure nobody is trying to sneak some html tags by us
 		$item["body"] = notags(base64url_decode($item["body"]));
@@ -2480,18 +2477,15 @@ class DFRN
 		// We don't need the content element since "dfrn:env" is always present
 		//$item["body"] = $xpath->query("atom:content/text()", $entry)->item(0)->nodeValue;
 
-		$item["location"] = $xpath->query("dfrn:location/text()", $entry)->item(0)->nodeValue;
+		$item["location"] = XML::getFirstNodeValue($xpath, "dfrn:location/text()", $entry);
 
-		$georsspoint = $xpath->query("georss:point", $entry);
-		if ($georsspoint) {
-			$item["coord"] = $georsspoint->item(0)->nodeValue;
-		}
+		$item["coord"] = XML::getFirstNodeValue($xpath, "georss:point", $entry);
 
-		$item["private"] = $xpath->query("dfrn:private/text()", $entry)->item(0)->nodeValue;
+		$item["private"] = XML::getFirstNodeValue($xpath, "dfrn:private/text()", $entry);
 
-		$item["extid"] = $xpath->query("dfrn:extid/text()", $entry)->item(0)->nodeValue;
+		$item["extid"] = XML::getFirstNodeValue($xpath, "dfrn:extid/text()", $entry);
 
-		if ($xpath->query("dfrn:bookmark/text()", $entry)->item(0)->nodeValue == "true") {
+		if (XML::getFirstNodeValue($xpath, "dfrn:bookmark/text()", $entry) == "true") {
 			$item["bookmark"] = true;
 		}
 
@@ -2504,18 +2498,18 @@ class DFRN
 			}
 		}
 
-		$item["guid"] = $xpath->query("dfrn:diaspora_guid/text()", $entry)->item(0)->nodeValue;
+		$item["guid"] = XML::getFirstNodeValue($xpath, "dfrn:diaspora_guid/text()", $entry);
 
 		// We store the data from "dfrn:diaspora_signature" in a different table, this is done in "Item::insert"
-		$dsprsig = unxmlify($xpath->query("dfrn:diaspora_signature/text()", $entry)->item(0)->nodeValue);
+		$dsprsig = unxmlify(XML::getFirstNodeValue($xpath, "dfrn:diaspora_signature/text()", $entry));
 		if ($dsprsig != "") {
 			$item["dsprsig"] = $dsprsig;
 		}
 
-		$item["verb"] = $xpath->query("activity:verb/text()", $entry)->item(0)->nodeValue;
+		$item["verb"] = XML::getFirstNodeValue($xpath, "activity:verb/text()", $entry);
 
-		if ($xpath->query("activity:object-type/text()", $entry)->item(0)->nodeValue != "") {
-			$item["object-type"] = $xpath->query("activity:object-type/text()", $entry)->item(0)->nodeValue;
+		if (XML::getFirstNodeValue($xpath, "activity:object-type/text()", $entry) != "") {
+			$item["object-type"] = XML::getFirstNodeValue($xpath, "activity:object-type/text()", $entry);
 		}
 
 		$object = $xpath->query("activity:object", $entry)->item(0);
@@ -2552,8 +2546,10 @@ class DFRN
 						$termhash = array_shift($parts);
 						$termurl = implode(":", $parts);
 
-						if (strlen($item["tag"])) {
+						if (!empty($item["tag"])) {
 							$item["tag"] .= ",";
+						} else {
+							$item["tag"] = "";
 						}
 
 						$item["tag"] .= $termhash . "[url=" . $termurl . "]" . $term . "[/url]";
@@ -2569,7 +2565,7 @@ class DFRN
 			self::parseLinks($links, $item);
 		}
 
-		$item['conversation-uri'] = $xpath->query('ostatus:conversation/text()', $entry)->item(0)->nodeValue;
+		$item['conversation-uri'] = XML::getFirstNodeValue($xpath, 'ostatus:conversation/text()', $entry);
 
 		$conv = $xpath->query('ostatus:conversation', $entry);
 		if (is_object($conv->item(0))) {
@@ -2754,10 +2750,15 @@ class DFRN
 			return false;
 		}
 
-		$condition = ["`uri` = ? AND `uid` = ? AND NOT `file` LIKE '%[%'", $uri, $importer["importer_uid"]];
-		$item = dba::selectFirst('item', ['id', 'parent', 'contact-id'], $condition);
+		$condition = ['uri' => $uri, 'uid' => $importer["importer_uid"]];
+		$item = Item::selectFirst(['id', 'parent', 'contact-id', 'file', 'deleted'], $condition);
 		if (!DBM::is_result($item)) {
 			logger("Item with uri " . $uri . " for user " . $importer["importer_uid"] . " wasn't found.", LOGGER_DEBUG);
+			return;
+		}
+
+		if (strstr($item['file'], '[')) {
+			logger("Item with uri " . $uri . " for user " . $importer["importer_uid"] . " is filed. So it won't be deleted.", LOGGER_DEBUG);
 			return;
 		}
 
@@ -2838,11 +2839,11 @@ class DFRN
 		logger("Import DFRN message for user " . $importer["importer_uid"] . " from contact " . $importer["id"], LOGGER_DEBUG);
 
 		// is it a public forum? Private forums aren't exposed with this method
-		$forum = intval($xpath->evaluate("/atom:feed/dfrn:community/text()")->item(0)->nodeValue);
+		$forum = intval(XML::getFirstNodeValue($xpath, "/atom:feed/dfrn:community/text()"));
 
 		// The account type is new since 3.5.1
 		if ($xpath->query("/atom:feed/dfrn:account_type")->length > 0) {
-			$accounttype = intval($xpath->evaluate("/atom:feed/dfrn:account_type/text()")->item(0)->nodeValue);
+			$accounttype = intval(XML::getFirstNodeValue($xpath, "/atom:feed/dfrn:account_type/text()"));
 
 			if ($accounttype != $importer["contact-type"]) {
 				dba::update('contact', ['contact-type' => $accounttype], ['id' => $importer["id"]]);
@@ -2890,7 +2891,7 @@ class DFRN
 			$newentries = [];
 			$entries = $xpath->query("/atom:feed/atom:entry");
 			foreach ($entries as $entry) {
-				$created = $xpath->query("atom:published/text()", $entry)->item(0)->nodeValue;
+				$created = XML::getFirstNodeValue($xpath, "atom:published/text()", $entry);
 				$newentries[strtotime($created)] = $entry;
 			}
 

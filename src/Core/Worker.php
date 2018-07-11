@@ -4,15 +4,11 @@
  */
 namespace Friendica\Core;
 
-use Friendica\Core\Addon;
-use Friendica\Core\Config;
-use Friendica\Core\System;
+use dba;
 use Friendica\Database\DBM;
 use Friendica\Model\Process;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Lock;
 use Friendica\Util\Network;
-use dba;
 
 require_once 'include/dba.php';
 
@@ -108,16 +104,16 @@ class Worker
 				}
 
 				// If possible we will fetch new jobs for this worker
-				if (!$refetched && Lock::set('worker_process', 0)) {
+				if (!$refetched && Lock::acquire('worker_process', 0)) {
 					$stamp = (float)microtime(true);
 					$refetched = self::findWorkerProcesses($passing_slow);
 					self::$db_duration += (microtime(true) - $stamp);
-					Lock::remove('worker_process');
+					Lock::release('worker_process');
 				}
 			}
 
 			// To avoid the quitting of multiple workers only one worker at a time will execute the check
-			if (Lock::set('worker', 0)) {
+			if (Lock::acquire('worker', 0)) {
 				$stamp = (float)microtime(true);
 				// Count active workers and compare them with a maximum value that depends on the load
 				if (self::tooMuchWorkers()) {
@@ -130,7 +126,7 @@ class Worker
 					logger('Memory limit reached, quitting.', LOGGER_DEBUG);
 					return;
 				}
-				Lock::remove('worker');
+				Lock::release('worker');
 				self::$db_duration += (microtime(true) - $stamp);
 			}
 
@@ -145,7 +141,7 @@ class Worker
 		if (Config::get('system', 'worker_daemon_mode', false)) {
 			self::IPCSetJobState(false);
 		}
-		logger("Couldn't select a workerqueue entry, quitting.", LOGGER_DEBUG);
+		logger("Couldn't select a workerqueue entry, quitting process " . getmypid() . ".", LOGGER_DEBUG);
 	}
 
 	/**
@@ -313,7 +309,7 @@ class Worker
 
 		$argc = count($argv);
 
-		$new_process_id = uniqid("wrk", true);
+		$new_process_id = System::processID("wrk");
 
 		logger("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]." - Process PID: ".$new_process_id);
 
@@ -601,7 +597,7 @@ class Worker
 						['id' => $entry["id"]]
 					);
 				} else {
-					logger("Worker process ".$entry["pid"]." (".implode(" ", $argv).") now runs for ".round($duration)." of ".$max_duration." allowed minutes. That's okay.", LOGGER_DEBUG);
+					logger("Worker process ".$entry["pid"]." (".substr(json_encode($argv), 0, 50).") now runs for ".round($duration)." of ".$max_duration." allowed minutes. That's okay.", LOGGER_DEBUG);
 				}
 			}
 		}
@@ -883,7 +879,7 @@ class Worker
 		dba::close($r);
 
 		$stamp = (float)microtime(true);
-		if (!Lock::set('worker_process')) {
+		if (!Lock::acquire('worker_process')) {
 			return false;
 		}
 		self::$lock_duration = (microtime(true) - $stamp);
@@ -892,7 +888,7 @@ class Worker
 		$found = self::findWorkerProcesses($passing_slow);
 		self::$db_duration += (microtime(true) - $stamp);
 
-		Lock::remove('worker_process');
+		Lock::release('worker_process');
 
 		if ($found) {
 			$r = dba::select('workerqueue', [], ['pid' => getmypid(), 'done' => false]);
@@ -1097,13 +1093,13 @@ class Worker
 		}
 
 		// If there is a lock then we don't have to check for too much worker
-		if (!Lock::set('worker', 0)) {
+		if (!Lock::acquire('worker', 0)) {
 			return true;
 		}
 
 		// If there are already enough workers running, don't fork another one
 		$quit = self::tooMuchWorkers();
-		Lock::remove('worker');
+		Lock::release('worker');
 
 		if ($quit) {
 			return true;

@@ -7,6 +7,7 @@ namespace Friendica\Database;
 use Friendica\Core\Config;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use dba;
 
 require_once 'include/dba.php';
@@ -28,6 +29,12 @@ class PostUpdate
 			return;
 		}
 		if (!self::update1206()) {
+			return;
+		}
+		if (!self::update1274()) {
+			return;
+		}
+		if (!self::update1275()) {
 			return;
 		}
 	}
@@ -215,6 +222,99 @@ class PostUpdate
 
 		Config::set("system", "post_update_version", 1206);
 		logger("Done", LOGGER_DEBUG);
+		return true;
+	}
+
+	/**
+	 * @brief update the "item-content" table
+	 *
+	 * @return bool "true" when the job is done
+	 */
+	private static function update1274()
+	{
+		// Was the script completed?
+		if (Config::get("system", "post_update_version") >= 1274) {
+			return true;
+		}
+
+		logger("Start", LOGGER_DEBUG);
+
+		$fields = ['id', 'title', 'content-warning', 'body', 'location', 'tag', 'file',
+			'coord', 'app', 'rendered-hash', 'rendered-html', 'verb',
+			'object-type', 'object', 'target-type', 'target', 'plink',
+			'author-id', 'owner-id'];
+
+		$condition = ["`icid` IS NULL"];
+		$params = ['limit' => 10000];
+		$items = Item::select($fields, $condition, $params);
+
+		if (!DBM::is_result($items)) {
+			Config::set("system", "post_update_version", 1274);
+			logger("Done", LOGGER_DEBUG);
+			return true;
+		}
+
+		$rows = 0;
+
+		while ($item = Item::fetch($items)) {
+			// Clearing the author and owner data if there is an id.
+			if ($item['author-id'] > 0) {
+				$item['author-name'] = '';
+				$item['author-link'] = '';
+				$item['author-avatar'] = '';
+			}
+
+			if ($item['owner-id'] > 0) {
+				$item['owner-name'] = '';
+				$item['owner-link'] = '';
+				$item['owner-avatar'] = '';
+			}
+
+			Item::update($item, ['id' => $item['id']]);
+			++$rows;
+		}
+		dba::close($items);
+
+		logger("Processed rows: " . $rows, LOGGER_DEBUG);
+		return true;
+	}
+	/**
+	 * @brief update the "item-activity" table
+	 *
+	 * @return bool "true" when the job is done
+	 */
+	private static function update1275()
+	{
+		// Was the script completed?
+		if (Config::get("system", "post_update_version") >= 1275) {
+			return true;
+		}
+
+		logger("Start", LOGGER_DEBUG);
+
+		$fields = ['id', 'verb'];
+
+		$condition = ["`iaid` IS NULL AND NOT `icid` IS NULL AND `verb` IN (?, ?, ?, ?, ?)",
+			ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE];
+
+		$params = ['limit' => 10000];
+		$items = Item::select($fields, $condition, $params);
+
+		if (!DBM::is_result($items)) {
+			Config::set("system", "post_update_version", 1275);
+			logger("Done", LOGGER_DEBUG);
+			return true;
+		}
+
+		$rows = 0;
+
+		while ($item = Item::fetch($items)) {
+			Item::update($item, ['id' => $item['id']]);
+			++$rows;
+		}
+		dba::close($items);
+
+		logger("Processed rows: " . $rows, LOGGER_DEBUG);
 		return true;
 	}
 }

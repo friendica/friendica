@@ -174,14 +174,31 @@ class App
 		$this->callstack['parser'] = [];
 
 		$this->config = [];
-		$this->page = [];
+
+		$this->page = [
+			'aside' => '',
+			'bottom' => '',
+			'content' => '',
+			'end' => '',
+			'footer' => '',
+			'htmlhead' => '',
+			'nav' => '',
+			'page_title' => '',
+			'right_aside' => '',
+			'template' => '',
+			'title' => ''
+		];
+
 		$this->pager = [];
 
 		$this->query_string = '';
 
-		$this->process_id = uniqid('log', true);
+		$this->process_id = System::processID('log');
 
-		startup();
+		set_time_limit(0);
+
+		// This has to be quite large to deal with embedded private photos
+		ini_set('pcre.backtrack_limit', 500000);
 
 		$this->scheme = 'http';
 
@@ -290,7 +307,7 @@ class App
 		$this->is_tablet = $mobile_detect->isTablet();
 
 		// Friendica-Client
-		$this->is_friendica_app = ($_SERVER['HTTP_USER_AGENT'] == 'Apache-HttpClient/UNAVAILABLE (java 1.4)');
+		$this->is_friendica_app = isset($_SERVER['HTTP_USER_AGENT']) && $_SERVER['HTTP_USER_AGENT'] == 'Apache-HttpClient/UNAVAILABLE (java 1.4)';
 
 		// Register template engines
 		$this->register_template_engine('Friendica\Render\FriendicaSmartyEngine');
@@ -409,11 +426,17 @@ class App
 	public function set_baseurl($url)
 	{
 		$parsed = @parse_url($url);
+		$hostname = '';
 
 		if (x($parsed)) {
-			$this->scheme = $parsed['scheme'];
+			if (!empty($parsed['scheme'])) {
+				$this->scheme = $parsed['scheme'];
+			}
 
-			$hostname = $parsed['host'];
+			if (!empty($parsed['host'])) {
+				$hostname = $parsed['host'];
+			}
+
 			if (x($parsed, 'port')) {
 				$hostname .= ':' . $parsed['port'];
 			}
@@ -429,7 +452,7 @@ class App
 				$this->hostname = Config::get('config', 'hostname');
 			}
 
-			if (!isset($this->hostname) || ( $this->hostname == '')) {
+			if (!isset($this->hostname) || ($this->hostname == '')) {
 				$this->hostname = $hostname;
 			}
 		}
@@ -863,7 +886,7 @@ class App
 			return;
 		}
 
-		array_unshift($args, ((x($this->config, 'php_path')) && (strlen($this->config['php_path'])) ? $this->config['php_path'] : 'php'));
+		array_unshift($args, $this->getConfigValue('config', 'php_path', 'php'));
 
 		for ($x = 0; $x < count($args); $x ++) {
 			$args[$x] = escapeshellarg($args[$x]);
@@ -875,7 +898,7 @@ class App
 			return;
 		}
 
-		if (Config::get('system', 'proc_windows')) {
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			$resource = proc_open('cmd /c start /b ' . $cmdline, [], $foo, $this->get_basepath());
 		} else {
 			$resource = proc_open($cmdline . ' &', [], $foo, $this->get_basepath());
@@ -1145,7 +1168,12 @@ class App
 			}
 		}
 
-		$user_theme = defaults($_SESSION, 'theme', $system_theme);
+		if (!empty($_SESSION)) {
+			$user_theme = defaults($_SESSION, 'theme', $system_theme);
+		} else {
+			$user_theme = $system_theme;
+		}
+
 		// Specific mobile theme override
 		if (($this->is_mobile || $this->is_tablet) && defaults($_SESSION, 'show-mobile', true)) {
 			$system_mobile_theme = Config::get('system', 'mobile-theme');

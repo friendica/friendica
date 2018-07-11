@@ -540,7 +540,7 @@ class BBCode extends BaseObject
 	private static function convertAttachment($return, $simplehtml = false, $tryoembed = true)
 	{
 		$data = self::getAttachmentData($return);
-		if (!$data) {
+		if (empty($data) || empty($data["url"])) {
 			return $return;
 		}
 
@@ -549,7 +549,7 @@ class BBCode extends BaseObject
 			$data["title"] = str_replace(["http://", "https://"], "", $data["title"]);
 		}
 
-		if (((strpos($data["text"], "[img=") !== false) || (strpos($data["text"], "[img]") !== false) || Config::get('system', 'always_show_preview')) && ($data["image"] != "")) {
+		if (((strpos($data["text"], "[img=") !== false) || (strpos($data["text"], "[img]") !== false) || Config::get('system', 'always_show_preview')) && !empty($data["image"])) {
 			$data["preview"] = $data["image"];
 			$data["image"] = "";
 		}
@@ -567,13 +567,15 @@ class BBCode extends BaseObject
 					throw new Exception('OEmbed is disabled for this attachment.');
 				}
 			} catch (Exception $e) {
+				$data["title"] = defaults($data, 'title', $data['url']);
+
 				if ($simplehtml != 4) {
 					$return = sprintf('<div class="type-%s">', $data["type"]);
 				}
 
-				if ($data["image"] != "") {
+				if (!empty($data["image"])) {
 					$return .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $data["url"], self::proxyUrl($data["image"], $simplehtml), $data["title"]);
-				} elseif ($data["preview"] != "") {
+				} elseif (!empty($data["preview"])) {
 					$return .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $data["url"], self::proxyUrl($data["preview"], $simplehtml), $data["title"]);
 				}
 
@@ -1377,6 +1379,13 @@ class BBCode extends BaseObject
 			"&\[url=/posts/([^\[\]]*)\](.*)\[\/url\]&Usi",
 			function ($match) {
 				return "[url=" . System::baseUrl() . "/display/" . $match[1] . "]" . $match[2] . "[/url]";
+			}, $text
+		);
+
+		$text = preg_replace_callback(
+			"&\[url=/people\?q\=(.*)\](.*)\[\/url\]&Usi",
+			function ($match) {
+				return "[url=" . System::baseUrl() . "/search?search=%40" . $match[1] . "]" . $match[2] . "[/url]";
 			}, $text
 		);
 

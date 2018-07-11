@@ -78,6 +78,7 @@
 	<h3>{{$corporate}}</h3>
 	{{include file="field_input.tpl" field=$allowed_sites}}
 	{{include file="field_input.tpl" field=$allowed_email}}
+	{{include file="field_input.tpl" field=$forbidden_nicknames}}
 	{{include file="field_checkbox.tpl" field=$no_oembed_rich_content}}
 	{{include file="field_input.tpl" field=$allowed_oembed}}
 	{{include file="field_checkbox.tpl" field=$block_public}}
@@ -168,7 +169,7 @@
 	<h3>{{$relocate}}</h3>
 	{{include file="field_input.tpl" field=$relocate_url}}
 	<input type="hidden" name="page_site" value="{{$submit|escape:'html'}}">
-	<div class="submit"><input type="submit" name="relocate" value="{{$submit|escape:'html'}}" /></div>
+	<div class="submit"><input type="submit" name="relocate" value="{{$relocate_button|escape:'html'}}" /></div>
 	</form>
 
 </div>

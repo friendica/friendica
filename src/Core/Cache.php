@@ -4,8 +4,7 @@
  */
 namespace Friendica\Core;
 
-use Friendica\Core\Cache;
-use Friendica\Core\Config;
+use Friendica\Core\Cache\CacheDriverFactory;
 
 /**
  * @brief Class for storing data for a short time
@@ -24,31 +23,13 @@ class Cache extends \Friendica\BaseObject
 	/**
 	 * @var Cache\ICacheDriver
 	 */
-	static $driver = null;
+	private static $driver = null;
 
 	public static function init()
 	{
-		switch(Config::get('system', 'cache_driver', 'database')) {
-			case 'memcache':
-				$memcache_host = Config::get('system', 'memcache_host', '127.0.0.1');
-				$memcache_port = Config::get('system', 'memcache_port', 11211);
+		$driver_name = Config::get('system', 'cache_driver', 'database');
 
-				self::$driver = new Cache\MemcacheCacheDriver($memcache_host, $memcache_port);
-				break;
-			case 'memcached':
-				$memcached_hosts = Config::get('system', 'memcached_hosts', [['127.0.0.1', 11211]]);
-
-				self::$driver = new Cache\MemcachedCacheDriver($memcached_hosts);
-				break;
-			case 'redis':
-				$redis_host = Config::get('system', 'redis_host', '127.0.0.1');
-				$redis_port = Config::get('system', 'redis_port', 6379);
-
-				self::$driver = new Cache\RedisCacheDriver($redis_host, $redis_port);
-				break;
-			default:
-				self::$driver = new Cache\DatabaseCacheDriver();
-		}
+		self::$driver = CacheDriverFactory::create($driver_name);
 	}
 
 	/**

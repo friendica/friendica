@@ -955,6 +955,8 @@ class dba {
 	 * @return boolean Was the command executed successfully?
 	 */
 	public static function rollback() {
+		$ret = false;
+
 		switch (self::$driver) {
 			case 'pdo':
 				if (!self::$db->inTransaction()) {
@@ -1015,7 +1017,7 @@ class dba {
 		$commands = [];
 
 		// Create a key for the loop prevention
-		$key = $table . ':' . implode(':', array_keys($conditions)) . ':' . implode(':', $conditions);
+		$key = $table . ':' . json_encode($conditions);
 
 		// We quit when this key already exists in the callstack.
 		if (isset($callstack[$key])) {
@@ -1042,7 +1044,7 @@ class dba {
 			$rel_def = array_values(self::$relation[$table])[0];
 
 			// Create a key for preventing double queries
-			$qkey = $field . '-' . $table . ':' . implode(':', array_keys($conditions)) . ':' . implode(':', $conditions);
+			$qkey = $field . '-' . $table . ':' . json_encode($conditions);
 
 			// When the search field is the relation field, we don't need to fetch the rows
 			// This is useful when the leading record is already deleted in the frontend but the rest is done in the backend
@@ -1109,7 +1111,7 @@ class dba {
 
 					// Split the SQL queries in chunks of 100 values
 					// We do the $i stuff here to make the code better readable
-					$i = $counter[$key_table][$key_condition];
+					$i = isset($counter[$key_table][$key_condition]) ? $counter[$key_table][$key_condition] : 0;
 					if (isset($compacted[$key_table][$key_condition][$i]) && count($compacted[$key_table][$key_condition][$i]) > 100) {
 						++$i;
 					}

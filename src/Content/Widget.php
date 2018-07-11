@@ -264,7 +264,7 @@ class Widget
 
 		$cid = $zcid = 0;
 
-		if (is_array($_SESSION['remote'])) {
+		if (!empty($_SESSION['remote'])) {
 			foreach ($_SESSION['remote'] as $visitor) {
 				if ($visitor['uid'] == $profile_uid) {
 					$cid = $visitor['cid'];

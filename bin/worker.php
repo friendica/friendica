@@ -63,4 +63,3 @@ Worker::unclaimProcess();
 Worker::endProcess();
 
 killme();
-

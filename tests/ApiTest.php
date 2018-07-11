@@ -29,12 +29,22 @@ class ApiTest extends DatabaseTest
 		global $a;
 		parent::setUp();
 
+		// Reusable App object
+		$this->app = new App(__DIR__.'/../');
+		$a = $this->app;
+
 		// User data that the test database is populated with
 		$this->selfUser = [
 			'id' => 42,
 			'name' => 'Self contact',
 			'nick' => 'selfcontact',
 			'nurl' => 'http://localhost/profile/selfcontact'
+		];
+		$this->friendUser = [
+			'id' => 44,
+			'name' => 'Friend contact',
+			'nick' => 'friendcontact',
+			'nurl' => 'http://localhost/profile/friendcontact'
 		];
 		$this->otherUser = [
 			'id' => 43,
@@ -52,10 +62,6 @@ class ApiTest extends DatabaseTest
 			'authenticated' => true,
 			'uid' => $this->selfUser['id']
 		];
-
-		// Reusable App object
-		$this->app = new App(__DIR__.'/../');
-		$a = $this->app;
 
 		// Default config
 		Config::set('config', 'hostname', 'localhost');
@@ -481,7 +487,7 @@ class ApiTest extends DatabaseTest
 
 		$this->app->query_string = 'api_path.rss';
 		$this->assertEquals(
-			'<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL.
+			'<?xml version="1.0" encoding="UTF-8"?>'."\n".
 				'some_data',
 			api_call($this->app)
 		);
@@ -505,7 +511,7 @@ class ApiTest extends DatabaseTest
 
 		$this->app->query_string = 'api_path.atom';
 		$this->assertEquals(
-			'<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL.
+			'<?xml version="1.0" encoding="UTF-8"?>'."\n".
 				'some_data',
 			api_call($this->app)
 		);
@@ -571,14 +577,14 @@ class ApiTest extends DatabaseTest
 	public function testApiErrorWithXml()
 	{
 		$this->assertEquals(
-			'<?xml version="1.0"?>'.PHP_EOL.
+			'<?xml version="1.0"?>'."\n".
 			'<status xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" '.
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
-				'xmlns:georss="http://www.georss.org/georss">'.PHP_EOL.
-			'  <error>error_message</error>'.PHP_EOL.
-			'  <code>200 Friendica\Network\HTTP</code>'.PHP_EOL.
-			'  <request/>'.PHP_EOL.
-			'</status>'.PHP_EOL,
+				'xmlns:georss="http://www.georss.org/georss">'."\n".
+			'  <error>error_message</error>'."\n".
+			'  <code>200 Friendica\Network\HTTP</code>'."\n".
+			'  <request/>'."\n".
+			'</status>'."\n",
 			api_error('xml', new HTTPException('error_message'))
 		);
 	}
@@ -591,14 +597,14 @@ class ApiTest extends DatabaseTest
 	public function testApiErrorWithRss()
 	{
 		$this->assertEquals(
-			'<?xml version="1.0"?>'.PHP_EOL.
+			'<?xml version="1.0"?>'."\n".
 			'<status xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" '.
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
-				'xmlns:georss="http://www.georss.org/georss">'.PHP_EOL.
-			'  <error>error_message</error>'.PHP_EOL.
-			'  <code>200 Friendica\Network\HTTP</code>'.PHP_EOL.
-			'  <request/>'.PHP_EOL.
-			'</status>'.PHP_EOL,
+				'xmlns:georss="http://www.georss.org/georss">'."\n".
+			'  <error>error_message</error>'."\n".
+			'  <code>200 Friendica\Network\HTTP</code>'."\n".
+			'  <request/>'."\n".
+			'</status>'."\n",
 			api_error('rss', new HTTPException('error_message'))
 		);
 	}
@@ -611,14 +617,14 @@ class ApiTest extends DatabaseTest
 	public function testApiErrorWithAtom()
 	{
 		$this->assertEquals(
-			'<?xml version="1.0"?>'.PHP_EOL.
+			'<?xml version="1.0"?>'."\n".
 			'<status xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" '.
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
-				'xmlns:georss="http://www.georss.org/georss">'.PHP_EOL.
-			'  <error>error_message</error>'.PHP_EOL.
-			'  <code>200 Friendica\Network\HTTP</code>'.PHP_EOL.
-			'  <request/>'.PHP_EOL.
-			'</status>'.PHP_EOL,
+				'xmlns:georss="http://www.georss.org/georss">'."\n".
+			'  <error>error_message</error>'."\n".
+			'  <code>200 Friendica\Network\HTTP</code>'."\n".
+			'  <request/>'."\n".
+			'</status>'."\n",
 			api_error('atom', new HTTPException('error_message'))
 		);
 	}
@@ -629,7 +635,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiRssExtra()
 	{
-		$user_info = ['url' => 'user_url'];
+		$user_info = ['url' => 'user_url', 'lang' => 'en'];
 		$result = api_rss_extra($this->app, [], $user_info);
 		$this->assertEquals($user_info, $result['$user']);
 		$this->assertEquals($user_info['url'], $result['$rss']['alternate']);
@@ -818,7 +824,7 @@ class ApiTest extends DatabaseTest
 	public function testApiGetUserWithCalledApi()
 	{
 		global $called_api;
-		$called_api = ['api_path'];
+		$called_api = ['api', 'api_path'];
 		$this->assertSelfUser(api_get_user($this->app));
 	}
 
@@ -852,7 +858,6 @@ class ApiTest extends DatabaseTest
 	{
 		$this->assertSelfUser(api_get_user($this->app, 0));
 	}
-
 
 	/**
 	 * Test the api_item_get_user() function.
@@ -957,12 +962,12 @@ class ApiTest extends DatabaseTest
 	public function testApiCreateXml()
 	{
 		$this->assertEquals(
-			'<?xml version="1.0"?>'.PHP_EOL.
+			'<?xml version="1.0"?>'."\n".
 			'<root_element xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" '.
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
-				'xmlns:georss="http://www.georss.org/georss">'.PHP_EOL.
-				'  <data>some_data</data>'.PHP_EOL.
-			'</root_element>'.PHP_EOL,
+				'xmlns:georss="http://www.georss.org/georss">'."\n".
+				'  <data>some_data</data>'."\n".
+			'</root_element>'."\n",
 			api_create_xml(['data' => ['some_data']], 'root_element')
 		);
 	}
@@ -974,10 +979,10 @@ class ApiTest extends DatabaseTest
 	public function testApiCreateXmlWithoutNamespaces()
 	{
 		$this->assertEquals(
-			'<?xml version="1.0"?>'.PHP_EOL.
-			'<ok>'.PHP_EOL.
-				'  <data>some_data</data>'.PHP_EOL.
-			'</ok>'.PHP_EOL,
+			'<?xml version="1.0"?>'."\n".
+			'<ok>'."\n".
+				'  <data>some_data</data>'."\n".
+			'</ok>'."\n",
 			api_create_xml(['data' => ['some_data']], 'ok')
 		);
 	}
@@ -999,12 +1004,12 @@ class ApiTest extends DatabaseTest
 	public function testApiFormatDataWithXml()
 	{
 		$this->assertEquals(
-			'<?xml version="1.0"?>'.PHP_EOL.
+			'<?xml version="1.0"?>'."\n".
 			'<root_element xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" '.
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
-				'xmlns:georss="http://www.georss.org/georss">'.PHP_EOL.
-				'  <data>some_data</data>'.PHP_EOL.
-			'</root_element>'.PHP_EOL,
+				'xmlns:georss="http://www.georss.org/georss">'."\n".
+				'  <data>some_data</data>'."\n".
+			'</root_element>'."\n",
 			api_format_data('root_element', 'xml', ['data' => ['some_data']])
 		);
 	}
@@ -1073,6 +1078,7 @@ class ApiTest extends DatabaseTest
 				'width' => 666,
 				'height' => 666,
 				'tmp_name' => $this->getTempImage(),
+				'name' => 'spacer.png',
 				'type' => 'image/png'
 			]
 		];
@@ -1110,6 +1116,7 @@ class ApiTest extends DatabaseTest
 				'width' => 666,
 				'height' => 666,
 				'tmp_name' => $this->getTempImage(),
+				'name' => 'spacer.png',
 				'type' => 'image/png'
 			]
 		];
@@ -1217,6 +1224,7 @@ class ApiTest extends DatabaseTest
 				'width' => 666,
 				'height' => 666,
 				'tmp_name' => $this->getTempImage(),
+				'name' => 'spacer.png',
 				'type' => 'image/png'
 			]
 		];
@@ -1833,6 +1841,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFavoritesCreateDestroy()
 	{
+		$this->app->argv = ['api', '1.1', 'favorites', 'create'];
+		$this->app->argc = count($this->app->argv);
 		api_favorites_create_destroy('json');
 	}
 
@@ -1843,9 +1853,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFavoritesCreateDestroyWithInvalidId()
 	{
-		// This triggers a very specific condition ($action_argv_id + 2)
-		$this->app->argv[1] = '1.1';
-		$this->app->argc = 5;
+		$this->app->argv = ['api', '1.1', 'favorites', 'create', '12.json'];
+		$this->app->argc = count($this->app->argv);
 		api_favorites_create_destroy('json');
 	}
 
@@ -1856,8 +1865,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFavoritesCreateDestroyWithInvalidAction()
 	{
-		$this->app->argv[1] = '1.1';
-		$this->app->argc = 10;
+		$this->app->argv = ['api', '1.1', 'favorites', 'change.json'];
+		$this->app->argc = count($this->app->argv);
 		$_REQUEST['id'] = 1;
 		api_favorites_create_destroy('json');
 	}
@@ -1868,9 +1877,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateAction()
 	{
-		$this->app->argv[1] = '1.1';
-		$this->app->argv[3] = 'create';
-		$this->app->argc = 10;
+		$this->app->argv = ['api', '1.1', 'favorites', 'create.json'];
+		$this->app->argc = count($this->app->argv);
 		$_REQUEST['id'] = 3;
 		$result = api_favorites_create_destroy('json');
 		$this->assertStatus($result['status']);
@@ -1882,9 +1890,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateActionAndRss()
 	{
-		$this->app->argv[1] = '1.1';
-		$this->app->argv[3] = 'create';
-		$this->app->argc = 10;
+		$this->app->argv = ['api', '1.1', 'favorites', 'create.rss'];
+		$this->app->argc = count($this->app->argv);
 		$_REQUEST['id'] = 3;
 		$result = api_favorites_create_destroy('rss');
 		$this->assertXml($result, 'status');
@@ -1896,9 +1903,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction()
 	{
-		$this->app->argv[1] = '1.1';
-		$this->app->argv[3] = 'destroy';
-		$this->app->argc = 10;
+		$this->app->argv = ['api', '1.1', 'favorites', 'destroy.json'];
+		$this->app->argc = count($this->app->argv);
 		$_REQUEST['id'] = 3;
 		$result = api_favorites_create_destroy('json');
 		$this->assertStatus($result['status']);
@@ -1911,6 +1917,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFavoritesCreateDestroyWithoutAuthenticatedUser()
 	{
+		$this->app->argv = ['api', '1.1', 'favorites', 'create.json'];
+		$this->app->argc = count($this->app->argv);
 		$_SESSION['authenticated'] = false;
 		api_favorites_create_destroy('json');
 	}
@@ -1962,7 +1970,7 @@ class ApiTest extends DatabaseTest
 			['id' => 2, 'screen_name' => 'recipient_name'],
 			['id' => 3, 'screen_name' => 'sender_name']
 		);
-		$this->assertEquals('item_title'.PHP_EOL.'item_body', $result['text']);
+		$this->assertEquals('item_title'."\n".'item_body', $result['text']);
 		$this->assertEquals(1, $result['id']);
 		$this->assertEquals(2, $result['recipient_id']);
 		$this->assertEquals(3, $result['sender_id']);
@@ -2014,8 +2022,8 @@ class ApiTest extends DatabaseTest
 			['id' => 2, 'screen_name' => 'recipient_name'],
 			['id' => 3, 'screen_name' => 'sender_name']
 		);
-		$this->assertNull($result['sender']);
-		$this->assertNull($result['recipient']);
+		$this->assertTrue(!isset($result['sender']));
+		$this->assertTrue(!isset($result['recipient']));
 	}
 
 	/**
@@ -2051,7 +2059,8 @@ class ApiTest extends DatabaseTest
 				'repellat officia illum quos impedit quam iste esse unde qui '.
 				'suscipit aut facilis ut inventore omnis exercitationem quo magnam '.
 				'consequatur maxime aut illum soluta quaerat natus unde aspernatur '.
-				'et sed beatae nihil ullam temporibus corporis ratione blanditiis'
+				'et sed beatae nihil ullam temporibus corporis ratione blanditiis',
+				'plink' => 'item_plink'
 			]
 		);
 		$this->assertStringStartsWith('item_title', $result['text']);
@@ -2108,7 +2117,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiGetAttachmentsWithImage()
 	{
-		$body = '[img]img_url[/img]';
+		$body = '[img]http://via.placeholder.com/1x1.png[/img]';
 		$this->assertInternalType('array', api_get_attachments($body));
 	}
 
@@ -2119,7 +2128,7 @@ class ApiTest extends DatabaseTest
 	public function testApiGetAttachmentsWithImageAndAndStatus()
 	{
 		$_SERVER['HTTP_USER_AGENT'] = 'AndStatus';
-		$body = '[img]img_url[/img]';
+		$body = '[img]http://via.placeholder.com/1x1.png[/img]';
 		$this->assertInternalType('array', api_get_attachments($body));
 	}
 
@@ -2155,7 +2164,7 @@ class ApiTest extends DatabaseTest
 	public function testApiFormatItemsEmbededImages()
 	{
 		$this->assertEquals(
-			'text http://localhost/display/item_guid',
+			'text ' . \Friendica\Core\System::baseUrl() . '/display/item_guid',
 			api_format_items_embeded_images(['guid' => 'item_guid'], 'text data:image/foo')
 		);
 	}
@@ -2196,7 +2205,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFormatItemsActivities()
 	{
-		$item = [];
+		$item = ['uid' => 0, 'uri' => ''];
 		$result = api_format_items_activities($item);
 		$this->assertArrayHasKey('like', $result);
 		$this->assertArrayHasKey('dislike', $result);
@@ -2211,7 +2220,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFormatItemsActivitiesWithXml()
 	{
-		$item = [];
+		$item = ['uid' => 0, 'uri' => ''];
 		$result = api_format_items_activities($item, 'xml');
 		$this->assertArrayHasKey('friendica:like', $result);
 		$this->assertArrayHasKey('friendica:dislike', $result);
@@ -2325,10 +2334,16 @@ class ApiTest extends DatabaseTest
 			[
 				'item_network' => 'item_network',
 				'source' => 'web',
-				'coord' => '5 7'
+				'coord' => '5 7',
+				'body' => '',
+				'verb' => '',
+				'author-id' => 43,
+				'author-network' => \Friendica\Core\Protocol::DFRN,
+				'author-link' => 'http://localhost/profile/othercontact',
+				'plink' => '',
 			]
 		];
-		$result = api_format_items($items, [], true);
+		$result = api_format_items($items, ['id' => 0], true);
 		foreach ($result as $status) {
 			$this->assertStatus($status);
 		}
@@ -2342,10 +2357,16 @@ class ApiTest extends DatabaseTest
 	{
 		$items = [
 			[
-				'coord' => '5 7'
+				'coord' => '5 7',
+				'body' => '',
+				'verb' => '',
+				'author-id' => 43,
+				'author-network' => \Friendica\Core\Protocol::DFRN,
+				'author-link' => 'http://localhost/profile/othercontact',
+				'plink' => '',
 			]
 		];
-		$result = api_format_items($items, [], true, 'xml');
+		$result = api_format_items($items, ['id' => 0], true, 'xml');
 		foreach ($result as $status) {
 			$this->assertStatus($status);
 		}
@@ -2389,7 +2410,6 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiHelpTestWithXml()
 	{
-		$this->markTestIncomplete('Triggers this error: "key() expects parameter 1 to be array, string given"');
 		$result = api_help_test('xml');
 		$this->assertXml($result, 'ok');
 	}
@@ -2615,7 +2635,7 @@ class ApiTest extends DatabaseTest
 		$result = api_statusnet_config('json');
 		$this->assertEquals('localhost', $result['config']['site']['server']);
 		$this->assertEquals('default', $result['config']['site']['theme']);
-		$this->assertEquals('http://localhost/images/friendica-64.png', $result['config']['site']['logo']);
+		$this->assertEquals(\Friendica\Core\System::baseUrl() . '/images/friendica-64.png', $result['config']['site']['logo']);
 		$this->assertTrue($result['config']['site']['fancy']);
 		$this->assertEquals('en', $result['config']['site']['language']);
 		$this->assertEquals('UTC', $result['config']['site']['timezone']);
@@ -2725,7 +2745,7 @@ class ApiTest extends DatabaseTest
 	public function testApiDirectMessagesNewWithScreenName()
 	{
 		$_POST['text'] = 'message_text';
-		$_POST['screen_name'] = $this->otherUser['nick'];
+		$_POST['screen_name'] = $this->friendUser['nick'];
 		$result = api_direct_messages_new('json');
 		$this->assertEquals(1, $result['direct_message']['id']);
 		$this->assertContains('message_text', $result['direct_message']['text']);
@@ -2740,7 +2760,7 @@ class ApiTest extends DatabaseTest
 	public function testApiDirectMessagesNewWithTitle()
 	{
 		$_POST['text'] = 'message_text';
-		$_POST['screen_name'] = $this->otherUser['nick'];
+		$_POST['screen_name'] = $this->friendUser['nick'];
 		$_REQUEST['title'] = 'message_title';
 		$result = api_direct_messages_new('json');
 		$this->assertEquals(1, $result['direct_message']['id']);
@@ -2757,7 +2777,7 @@ class ApiTest extends DatabaseTest
 	public function testApiDirectMessagesNewWithRss()
 	{
 		$_POST['text'] = 'message_text';
-		$_POST['screen_name'] = $this->otherUser['nick'];
+		$_POST['screen_name'] = $this->friendUser['nick'];
 		$result = api_direct_messages_new('rss');
 		$this->assertXml($result, 'direct-messages');
 	}
@@ -3357,7 +3377,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiShareAsRetweet()
 	{
-		$item = [];
+		$item = ['body' => ''];
 		$result = api_share_as_retweet($item);
 		$this->assertFalse($result);
 	}
@@ -3397,7 +3417,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiInReplyTo()
 	{
-		$result = api_in_reply_to([]);
+		$result = api_in_reply_to(['id' => 0, 'parent' => 0, 'uri' => '', 'thr-parent' => '']);
 		$this->assertArrayHasKey('status_id', $result);
 		$this->assertArrayHasKey('user_id', $result);
 		$this->assertArrayHasKey('status_id_str', $result);
@@ -3562,7 +3582,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFriendicaNotificationWithArgumentCount()
 	{
-		$this->app->argc = 3;
+		$this->app->argv = ['api', 'friendica', 'notification'];
+		$this->app->argc = count($this->app->argv);
 		$result = api_friendica_notification('json');
 		$this->assertEquals(['note' => false], $result);
 	}
@@ -3573,8 +3594,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFriendicaNotificationWithXmlResult()
 	{
-		$this->markTestIncomplete('Fails with "Invalid argument supplied for foreach()".');
-		$this->app->argc = 3;
+		$this->app->argv = ['api', 'friendica', 'notification'];
+		$this->app->argc = count($this->app->argv);
 		$result = api_friendica_notification('xml');
 		$this->assertXml($result, 'notes');
 	}

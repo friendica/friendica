@@ -11,6 +11,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBM;
 use Friendica\Model\Queue as QueueModel;
 use Friendica\Model\PushSubscriber;
+use Friendica\Model\User;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\PortableContact;
@@ -106,7 +107,7 @@ class Queue
 
 		$data   = $q_item['content'];
 		$public = $q_item['batch'];
-		$owner  = $user;
+		$owner  = User::getOwnerDataById($user['uid']);
 
 		$deliver_status = 0;
 

@@ -106,7 +106,7 @@ function item_post(App $a) {
 			$thr_parent_contact = Contact::getDetailsByURL($parent_item["author-link"]);
 
 			if ($parent_item['id'] != $parent_item['parent']) {
-				$parent_item = dba::selectFirst('item', [], ['id' => $parent_item['parent']]);
+				$parent_item = Item::selectFirst(Item::ITEM_FIELDLIST, ['id' => $parent_item['parent']]);
 			}
 		}
 
@@ -170,13 +170,15 @@ function item_post(App $a) {
 	$orig_post = null;
 
 	if ($post_id) {
-		$orig_post = dba::selectFirst('item', [], ['id' => $post_id]);
+		$orig_post = Item::selectFirst(Item::ITEM_FIELDLIST, ['id' => $post_id]);
 	}
 
 	$user = dba::selectFirst('user', [], ['uid' => $profile_uid]);
 	if (!DBM::is_result($user) && !$parent) {
 		return;
 	}
+
+	$categories = '';
 
 	if ($orig_post) {
 		$str_group_allow   = $orig_post['allow_gid'];
@@ -217,20 +219,20 @@ function item_post(App $a) {
 			$str_contact_deny  = $user['deny_cid'];
 		} else {
 			// use the posted permissions
-			$str_group_allow   = perms2str($_REQUEST['group_allow']);
-			$str_contact_allow = perms2str($_REQUEST['contact_allow']);
-			$str_group_deny    = perms2str($_REQUEST['group_deny']);
-			$str_contact_deny  = perms2str($_REQUEST['contact_deny']);
+			$str_group_allow   = perms2str(defaults($_REQUEST, 'group_allow', ''));
+			$str_contact_allow = perms2str(defaults($_REQUEST, 'contact_allow', ''));
+			$str_group_deny    = perms2str(defaults($_REQUEST, 'group_deny', ''));
+			$str_contact_deny  = perms2str(defaults($_REQUEST, 'contact_deny', ''));
 		}
 
-		$title             = notags(trim($_REQUEST['title']));
-		$location          = notags(trim($_REQUEST['location']));
-		$coord             = notags(trim($_REQUEST['coord']));
-		$verb              = notags(trim($_REQUEST['verb']));
-		$emailcc           = notags(trim($_REQUEST['emailcc']));
-		$body              = escape_tags(trim($_REQUEST['body']));
-		$network           = notags(trim(defaults($_REQUEST, 'network', NETWORK_DFRN)));
-		$guid              = get_guid(32);
+		$title             =      notags(trim(defaults($_REQUEST, 'title'   , '')));
+		$location          =      notags(trim(defaults($_REQUEST, 'location', '')));
+		$coord             =      notags(trim(defaults($_REQUEST, 'coord'   , '')));
+		$verb              =      notags(trim(defaults($_REQUEST, 'verb'    , '')));
+		$emailcc           =      notags(trim(defaults($_REQUEST, 'emailcc' , '')));
+		$body              = escape_tags(trim(defaults($_REQUEST, 'body'    , '')));
+		$network           =      notags(trim(defaults($_REQUEST, 'network' , NETWORK_DFRN)));
+		$guid              =      System::createGUID(32);
 
 		$postopts = defaults($_REQUEST, 'postopts', '');
 
@@ -243,7 +245,6 @@ function item_post(App $a) {
 		// If this is a comment, set the permissions from the parent.
 
 		if ($parent_item) {
-
 			// for non native networks use the network of the original post as network of the item
 			if (($parent_item['network'] != NETWORK_DIASPORA)
 				&& ($parent_item['network'] != NETWORK_OSTATUS)
@@ -279,15 +280,15 @@ function item_post(App $a) {
 		}
 	}
 
-	if (strlen($categories)) {
+	if (!empty($categories)) {
 		// get the "fileas" tags for this post
 		$filedas = file_tag_file_to_list($categories, 'file');
 	}
 	// save old and new categories, so we can determine what needs to be deleted from pconfig
 	$categories_old = $categories;
-	$categories = file_tag_list_to_file(trim($_REQUEST['category']), 'category');
+	$categories = file_tag_list_to_file(trim(defaults($_REQUEST, 'category', '')), 'category');
 	$categories_new = $categories;
-	if (strlen($filedas)) {
+	if (!empty($filedas)) {
 		// append the fileas stuff to the new categories list
 		$categories .= file_tag_list_to_file($filedas, 'file');
 	}
@@ -649,16 +650,18 @@ function item_post(App $a) {
 
 	$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $datarray['parent-uri']]);
 	if (DBM::is_result($conversation)) {
-		if ($r['conversation-uri'] != '') {
+		if ($conversation['conversation-uri'] != '') {
 			$datarray['conversation-uri'] = $conversation['conversation-uri'];
 		}
-		if ($r['conversation-href'] != '') {
+		if ($conversation['conversation-href'] != '') {
 			$datarray['conversation-href'] = $conversation['conversation-href'];
 		}
 	}
 
 	if ($orig_post) {
 		$datarray['edit'] = true;
+	} else {
+		$datarray['edit'] = false;
 	}
 
 	// Check for hashtags in the body and repair or add hashtag links
@@ -672,6 +675,9 @@ function item_post(App $a) {
 		// We set the datarray ID to -1 because in preview mode the dataray
 		// doesn't have an ID.
 		$datarray["id"] = -1;
+		$datarray["item_id"] = -1;
+		$datarray["author-network"] = NETWORK_DFRN;
+
 		$o = conversation($a,[array_merge($contact_record,$datarray)],'search', false, true);
 		logger('preview: ' . $o);
 		echo json_encode(['preview' => $o]);

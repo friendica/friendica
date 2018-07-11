@@ -248,7 +248,7 @@ class Login extends BaseModule
 				// Make sure to refresh the last login time for the user if the user
 				// stays logged in for a long time, e.g. with "Remember Me"
 				$login_refresh = false;
-				if (!x($_SESSION['last_login_date'])) {
+				if (empty($_SESSION['last_login_date'])) {
 					$_SESSION['last_login_date'] = DateTimeFormat::utcNow();
 				}
 				if (strcmp(DateTimeFormat::utc('now - 12 hours'), $_SESSION['last_login_date']) > 0) {

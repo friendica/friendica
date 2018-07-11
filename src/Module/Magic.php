@@ -13,7 +13,7 @@ use dba;
 
 /**
  * Magic Auth (remote authentication) module.
- * 
+ *
  * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/Zotlabs/Module/Magic.php
  */
 class Magic extends BaseModule
@@ -31,7 +31,7 @@ class Magic extends BaseModule
 		$test = ((x($_REQUEST, 'test')) ? intval($_REQUEST['test']) : 0);
 		$owa  = ((x($_REQUEST, 'owa'))  ? intval($_REQUEST['owa'])  : 0);
 
-		// NOTE: I guess $dest isn't just the profile url (could be also 
+		// NOTE: I guess $dest isn't just the profile url (could be also
 		// other profile pages e.g. photo). We need to find a solution
 		// to be able to redirct to other pages than the contact profile.
 		$cid = Contact::getIdForURL($dest);
@@ -48,8 +48,8 @@ class Magic extends BaseModule
 		$contact = dba::selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
 
 		// Redirect if the contact is already authenticated on this site.
-		if (array_key_exists('id', $a->contact) && strpos($contact['nurl'], normalise_link(self::getApp()->get_baseurl())) !== false) {
-			if($test) {
+		if (!empty($a->contact) && array_key_exists('id', $a->contact) && strpos($contact['nurl'], normalise_link(self::getApp()->get_baseurl())) !== false) {
+			if ($test) {
 				$ret['success'] = true;
 				$ret['message'] .= 'Local site - you are already authenticated.' . EOL;
 				return $ret;
@@ -111,7 +111,7 @@ class Magic extends BaseModule
 			}
 		}
 
-		if($test) {
+		if ($test) {
 			$ret['message'] = 'Not authenticated or invalid arguments' . EOL;
 			return $ret;
 		}

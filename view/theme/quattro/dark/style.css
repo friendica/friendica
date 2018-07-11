@@ -64,7 +64,7 @@
 .icon.unlock {
   background-image: url("../../../images/icons/22/unlock.png");
 }
-.icon.addon {
+.icon.plugin {
   background-image: url("../../../images/icons/22/plugin.png");
 }
 .icon.type-unkn {
@@ -143,7 +143,7 @@
 .icon.s10.unlock {
   background-image: url("../../../images/icons/10/unlock.png");
 }
-.icon.s10.addon {
+.icon.s10.plugin {
   background-image: url("../../../images/icons/10/plugin.png");
 }
 .icon.s10.type-unkn {
@@ -222,7 +222,7 @@
 .icon.s16.unlock {
   background-image: url("../../../images/icons/16/unlock.png");
 }
-.icon.s16.addon {
+.icon.s16.plugin {
   background-image: url("../../../images/icons/16/plugin.png");
 }
 .icon.s16.type-unkn {
@@ -301,7 +301,7 @@
 .icon.s22.unlock {
   background-image: url("../../../images/icons/22/unlock.png");
 }
-.icon.s22.addon {
+.icon.s22.plugin {
   background-image: url("../../../images/icons/22/plugin.png");
 }
 .icon.s22.type-unkn {
@@ -380,7 +380,7 @@
 .icon.s48.unlock {
   background-image: url("../../../images/icons/48/unlock.png");
 }
-.icon.s48.addon {
+.icon.s48.plugin {
   background-image: url("../../../images/icons/48/plugin.png");
 }
 .icon.s48.type-unkn {
@@ -2477,6 +2477,9 @@ footer {
   margin-top: 25px;
   clear: both;
 }
+.pager .disabled {
+  display: none;
+}
 /**
  * ADMIN
  */
@@ -2511,11 +2514,11 @@ footer {
   clear: left;
   text-align: right;
 }
-#adminpage #addonslist {
+#adminpage #pluginslist {
   margin: 0;
   padding: 0;
 }
-#adminpage .addon {
+#adminpage .plugin {
   list-style: none;
   display: block;
   border: 1px solid #888888;
@@ -2523,10 +2526,10 @@ footer {
   margin-bottom: 5px;
   clear: left;
 }
-#adminpage .addon desc {
+#adminpage .plugin desc {
   margin-left: 2.5em;
 }
-#adminpage .toggleaddon {
+#adminpage .toggleplugin {
   float: left;
   margin-right: 1em;
 }

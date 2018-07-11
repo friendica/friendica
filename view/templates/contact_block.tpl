@@ -1,6 +1,6 @@
 
 <div id="contact-block">
-<h4 class="contact-block-h4">{{$contacts}}</h4>
+<h3 class="contact-block-h4">{{$contacts}}</h3>
 {{if $micropro}}
 		<a class="allcontact-link" href="viewcontacts/{{$nickname}}">{{$viewcontacts}}</a>
 		<div class='contact-block-content'>

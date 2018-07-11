@@ -643,13 +643,20 @@ function logger($msg, $level = 0) {
 	}
 
 	$callers = debug_backtrace();
+
+	if (count($callers) > 1) {
+		$function = $callers[1]['function'];
+	} else {
+		$function = '';
+	}
+
 	$logline = sprintf("%s@%s\t[%s]:%s:%s:%s\t%s\n",
 			DateTimeFormat::utcNow(DateTimeFormat::ATOM),
 			$process_id,
 			$LOGGER_LEVELS[$level],
 			basename($callers[0]['file']),
 			$callers[0]['line'],
-			$callers[1]['function'],
+			$function,
 			$msg
 		);
 
@@ -1156,7 +1163,7 @@ function put_item_in_cache(&$item, $update = false)
 	$rendered_html = defaults($item, 'rendered-html', '');
 
 	if ($rendered_hash == ''
-		|| $item["rendered-html"] == ""
+		|| $rendered_html == ""
 		|| $rendered_hash != hash("md5", $item["body"])
 		|| Config::get("system", "ignore_cache")
 	) {
@@ -1176,7 +1183,7 @@ function put_item_in_cache(&$item, $update = false)
 			$update = true;
 		}
 
-		if ($update && ($item["id"] > 0)) {
+		if ($update && !empty($item["id"])) {
 			Item::update(['rendered-html' => $item["rendered-html"], 'rendered-hash' => $item["rendered-hash"]],
 					['id' => $item["id"]]);
 		}
@@ -1280,7 +1287,8 @@ function prepare_body(array &$item, $attach = false, $is_preview = false)
 				]);
 			}
 
-			$id = end(explode('/', $the_url));
+			$url_parts = explode('/', $the_url);
+			$id = end($url_parts);
 			$as .= replace_macros(get_markup_template('video_top.tpl'), [
 				'$video' => [
 					'id'     => $id,
@@ -1549,7 +1557,7 @@ function return_bytes($size_str) {
 function generate_user_guid() {
 	$found = true;
 	do {
-		$guid = get_guid(32);
+		$guid = System::createGUID(32);
 		$x = q("SELECT `uid` FROM `user` WHERE `guid` = '%s' LIMIT 1",
 			dbesc($guid)
 		);
@@ -1710,11 +1718,11 @@ function reltoabs($text, $base) {
  * @return string
  */
 function item_post_type($item) {
-	if (intval($item['event-id'])) {
+	if (!empty($item['event-id'])) {
 		return L10n::t('event');
-	} elseif (strlen($item['resource-id'])) {
+	} elseif (!empty($item['resource-id'])) {
 		return L10n::t('photo');
-	} elseif (strlen($item['verb']) && $item['verb'] !== ACTIVITY_POST) {
+	} elseif (!empty($item['verb']) && $item['verb'] !== ACTIVITY_POST) {
 		return L10n::t('activity');
 	} elseif ($item['id'] != $item['parent']) {
 		return L10n::t('comment');

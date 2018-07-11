@@ -128,7 +128,7 @@ if ((x($_GET,'zrl')) && $a->mode == App::MODE_NORMAL) {
 		// Valid profile links contain a path with "/profile/" and no query parameters
 		if ((parse_url($_GET['zrl'], PHP_URL_QUERY) == "") &&
 			strstr(parse_url($_GET['zrl'], PHP_URL_PATH), "/profile/")) {
-			if ($_SESSION["visitor_home"] != $_GET["zrl"]) {
+			if (defaults($_SESSION, "visitor_home", "") != $_GET["zrl"]) {
 				$_SESSION['my_url'] = $_GET['zrl'];
 				$_SESSION['authenticated'] = 0;
 			}

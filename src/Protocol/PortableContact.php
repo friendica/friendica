@@ -120,7 +120,9 @@ class PortableContact
 			$contact_type = -1;
 			$generation = 0;
 
-			$name = $entry->displayName;
+			if (!empty($entry->displayName)) {
+				$name = $entry->displayName;
+			}
 
 			if (isset($entry->urls)) {
 				foreach ($entry->urls as $url) {
@@ -419,7 +421,7 @@ class PortableContact
 
 						GContact::update($contact);
 
-						if (trim($noscrape["updated"]) != "") {
+						if (!empty($noscrape["updated"])) {
 							$fields = ['last_contact' => DateTimeFormat::utcNow()];
 							dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
@@ -1027,7 +1029,7 @@ class PortableContact
 
 		if (!$serverret["success"] || ($serverret["body"] == "") || empty($xmlobj) || !is_object($xmlobj)) {
 			// Workaround for bad configured servers (known nginx problem)
-			if (!in_array($serverret["debug"]["http_code"], ["403", "404"])) {
+			if (!empty($serverret["debug"]) && !in_array($serverret["debug"]["http_code"], ["403", "404"])) {
 				$failure = true;
 			}
 			$possible_failure = true;
@@ -1174,17 +1176,19 @@ class PortableContact
 				if (!empty($data->channels_total)) {
 					$registered_users = $data->channels_total;
 				}
-				switch ($data->register_policy) {
-					case "REGISTER_OPEN":
-						$register_policy = REGISTER_OPEN;
-						break;
-					case "REGISTER_APPROVE":
-						$register_policy = REGISTER_APPROVE;
-						break;
-					case "REGISTER_CLOSED":
-					default:
-						$register_policy = REGISTER_CLOSED;
-						break;
+				if (!empty($data->register_policy)) {
+					switch ($data->register_policy) {
+						case "REGISTER_OPEN":
+							$register_policy = REGISTER_OPEN;
+							break;
+						case "REGISTER_APPROVE":
+							$register_policy = REGISTER_APPROVE;
+							break;
+						case "REGISTER_CLOSED":
+						default:
+							$register_policy = REGISTER_CLOSED;
+							break;
+					}
 				}
 			} else {
 				// Test for Hubzilla, Redmatrix or Friendica
@@ -1266,7 +1270,7 @@ class PortableContact
 					$network = NETWORK_DIASPORA;
 				}
 
-				if ($data->registrations_open) {
+				if (!empty($data->registrations_open) && $data->registrations_open) {
 					$register_policy = REGISTER_OPEN;
 				} else {
 					$register_policy = REGISTER_CLOSED;
@@ -1317,7 +1321,9 @@ class PortableContact
 				if (isset($data->version)) {
 					$network = NETWORK_DFRN;
 
-					$noscrape = defaults($data->no_scrape_url, '');
+					if (!empty($data->no_scrape_url)) {
+						$noscrape = $data->no_scrape_url;
+					}
 					$version = $data->version;
 					$site_name = $data->site_name;
 					$info = $data->info;
@@ -1515,7 +1521,7 @@ class PortableContact
 		if ($serverdata) {
 			$servers = json_decode($serverdata);
 
-			if (is_array($servers->pods)) {
+			if (!empty($servers->pods)) {
 				foreach ($servers->pods as $server) {
 					Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", "https://".$server->host);
 				}

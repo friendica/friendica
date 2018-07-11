@@ -167,7 +167,7 @@ class Notifier {
 
 			$fields = ['network', 'author-id', 'owner-id'];
 			$condition = ['uri' => $target_item["thr-parent"], 'uid' => $target_item["uid"]];
-			$thr_parent = dba::selectFirst('item', $fields, $condition);
+			$thr_parent = Item::selectFirst($fields, $condition);
 
 			logger('GUID: '.$target_item["guid"].': Parent is '.$parent['network'].'. Thread parent is '.$thr_parent['network'], LOGGER_DEBUG);
 

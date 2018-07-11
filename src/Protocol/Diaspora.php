@@ -1349,7 +1349,7 @@ class Diaspora
 		$author = "";
 
 		// Fetch the author - for the old and the new Diaspora version
-		if ($source_xml->post->status_message->diaspora_handle) {
+		if ($source_xml->post->status_message && $source_xml->post->status_message->diaspora_handle) {
 			$author = (string)$source_xml->post->status_message->diaspora_handle;
 		} elseif ($source_xml->author && ($source_xml->getName() == "status_message")) {
 			$author = (string)$source_xml->author;
@@ -1542,13 +1542,6 @@ class Diaspora
 		dba::update('gcontact', $fields, ['addr' => $old_handle]);
 
 		logger('Contacts are updated.');
-
-		// update items
-		// This is an extreme performance killer
-		Item::update(['owner-link' => $data["url"]], ['owner-link' => $contact["url"], 'uid' => $importer["uid"]]);
-		Item::update(['author-link' => $data["url"]], ['author-link' => $contact["url"], 'uid' => $importer["uid"]]);
-
-		logger('Items are updated.');
 
 		return true;
 	}
@@ -1932,50 +1925,6 @@ class Diaspora
 	}
 
 	/**
-	 * @brief Creates the body for a "like" message
-	 *
-	 * @param array  $contact     The contact that send us the "like"
-	 * @param array  $parent_item The item array of the parent item
-	 * @param string $guid        message guid
-	 *
-	 * @return string the body
-	 */
-	private static function constructLikeBody($contact, $parent_item, $guid)
-	{
-		$bodyverb = L10n::t('%1$s likes %2$s\'s %3$s');
-
-		$ulink = "[url=".$contact["url"]."]".$contact["name"]."[/url]";
-		$alink = "[url=".$parent_item["author-link"]."]".$parent_item["author-name"]."[/url]";
-		$plink = "[url=".System::baseUrl()."/display/".urlencode($guid)."]".L10n::t("status")."[/url]";
-
-		return sprintf($bodyverb, $ulink, $alink, $plink);
-	}
-
-	/**
-	 * @brief Creates a XML object for a "like"
-	 *
-	 * @param array $importer    Array of the importer user
-	 * @param array $parent_item The item array of the parent item
-	 *
-	 * @return string The XML
-	 */
-	private static function constructLikeObject($importer, $parent_item)
-	{
-		$objtype = ACTIVITY_OBJ_NOTE;
-		$link = '<link rel="alternate" type="text/html" href="'.System::baseUrl()."/display/".$importer["nickname"]."/".$parent_item["id"].'" />';
-		$parent_body = $parent_item["body"];
-
-		$xmldata = ["object" => ["type" => $objtype,
-						"local" => "1",
-						"id" => $parent_item["uri"],
-						"link" => $link,
-						"title" => "",
-						"content" => $parent_body]];
-
-		return XML::fromArray($xmldata, $xml, true);
-	}
-
-	/**
 	 * @brief Processes "like" messages
 	 *
 	 * @param array  $importer Array of the importer user
@@ -2053,9 +2002,8 @@ class Diaspora
 		$datarray["parent-uri"] = $parent_item["uri"];
 
 		$datarray["object-type"] = ACTIVITY_OBJ_NOTE;
-		$datarray["object"] = self::constructLikeObject($importer, $parent_item);
 
-		$datarray["body"] = self::constructLikeBody($contact, $parent_item, $guid);
+		$datarray["body"] = $verb;
 
 		// like on comments have the comment as parent. So we need to fetch the toplevel parent
 		if ($parent_item["id"] != $parent_item["parent"]) {
@@ -2217,7 +2165,7 @@ class Diaspora
 		}
 
 		// Send all existing comments and likes to the requesting server
-		$comments = Item::select(['id', 'verb', 'self'], ['parent' => $item['id']]);
+		$comments = Item::select(['id', 'parent', 'verb', 'self'], ['parent' => $item['id']]);
 		while ($comment = Item::fetch($comments)) {
 			if ($comment['id'] == $comment['parent']) {
 				continue;
@@ -2757,14 +2705,15 @@ class Diaspora
 		}
 
 		// Fetch items that are about to be deleted
-		$fields = ['uid', 'id', 'parent', 'parent-uri', 'author-link'];
+		$fields = ['uid', 'id', 'parent', 'parent-uri', 'author-link', 'file'];
 
 		// When we receive a public retraction, we delete every item that we find.
 		if ($importer['uid'] == 0) {
-			$condition = ["`guid` = ? AND NOT `file` LIKE '%%[%%' AND NOT `deleted`", $target_guid];
+			$condition = ['guid' => $target_guid, 'deleted' => false];
 		} else {
-			$condition = ["`guid` = ? AND `uid` = ? AND NOT `file` LIKE '%%[%%' AND NOT `deleted`", $target_guid, $importer['uid']];
+			$condition = ['guid' => $target_guid, 'deleted' => false, 'uid' => $importer['uid']];
 		}
+
 		$r = Item::select($fields, $condition);
 		if (!DBM::is_result($r)) {
 			logger("Target guid ".$target_guid." was not found on this system for user ".$importer['uid'].".");
@@ -2772,6 +2721,11 @@ class Diaspora
 		}
 
 		while ($item = Item::fetch($r)) {
+			if (strstr($item['file'], '[')) {
+				logger("Target guid " . $target_guid . " for user " . $item['uid'] . " is filed. So it won't be deleted.", LOGGER_DEBUG);
+				continue;
+			}
+
 			// Fetch the parent item
 			$parent = Item::selectFirst(['author-link'], ['id' => $item["parent"]]);
 
@@ -3266,7 +3220,7 @@ class Diaspora
 		$author = self::myHandle($owner);
 
 		$message = ["author" => $author,
-				"guid" => get_guid(32),
+				"guid" => System::createGUID(32),
 				"parent_type" => "Post",
 				"parent_guid" => $item["guid"]];
 
@@ -3398,12 +3352,12 @@ class Diaspora
 
 		$guid = "";
 		preg_match("/guid='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$guid = $matches[1];
 		}
 
 		preg_match('/guid="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$guid = $matches[1];
 		}
 
@@ -3428,12 +3382,12 @@ class Diaspora
 
 		$profile = "";
 		preg_match("/profile='(.*?)'/ism", $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$profile = $matches[1];
 		}
 
 		preg_match('/profile="(.*?)"/ism', $attributes, $matches);
-		if ($matches[1] != "") {
+		if (!empty($matches[1])) {
 			$profile = $matches[1];
 		}
 

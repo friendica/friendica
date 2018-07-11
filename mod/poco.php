@@ -23,15 +23,15 @@ function poco_init(App $a) {
 	if ($a->argc > 1) {
 		$user = notags(trim($a->argv[1]));
 	}
-	if (! x($user)) {
+	if (empty($user)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");
-		if (! DBM::is_result($c)) {
+		if (!DBM::is_result($c)) {
 			System::httpExit(401);
 		}
 		$system_mode = true;
 	}
 
-	$format = (($_GET['format']) ? $_GET['format'] : 'json');
+	$format = defaults($_GET, 'format', 'json');
 
 	$justme = false;
 	$global = false;
@@ -76,11 +76,11 @@ function poco_init(App $a) {
 
 	if ($justme) {
 		$sql_extra = " AND `contact`.`self` = 1 ";
+	} else {
+		$sql_extra = "";
 	}
-//	else
-//		$sql_extra = " AND `contact`.`self` = 0 ";
 
-	if ($cid) {
+	if (!empty($cid)) {
 		$sql_extra = sprintf(" AND `contact`.`id` = %d ", intval($cid));
 	}
 	if (x($_GET, 'updatedSince')) {
@@ -112,8 +112,9 @@ function poco_init(App $a) {
 	} else {
 		$totalResults = 0;
 	}
-	$startIndex = intval($_GET['startIndex']);
-	if (! $startIndex) {
+	if (!empty($_GET['startIndex'])) {
+		$startIndex = intval($_GET['startIndex']);
+	} else {
 		$startIndex = 0;
 	}
 	$itemsPerPage = ((x($_GET, 'count') && intval($_GET['count'])) ? intval($_GET['count']) : $totalResults);
@@ -204,6 +205,10 @@ function poco_init(App $a) {
 	if (is_array($contacts)) {
 		if (DBM::is_result($contacts)) {
 			foreach ($contacts as $contact) {
+				if (!isset($contact['updated'])) {
+					$contact['updated'] = '';
+				}
+
 				if (! isset($contact['generation'])) {
 					if ($global) {
 						$contact['generation'] = 3;

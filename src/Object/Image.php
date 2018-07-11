@@ -731,8 +731,11 @@ class Image
 			$headers=[];
 			$h = explode("\n", $a->get_curl_headers());
 			foreach ($h as $l) {
-				list($k,$v) = array_map("trim", explode(":", trim($l), 2));
-				$headers[$k] = $v;
+				$data = array_map("trim", explode(":", trim($l), 2));
+				if (count($data) > 1) {
+					list($k,$v) = $data;
+					$headers[$k] = $v;
+				}
 			}
 			if (array_key_exists('Content-Type', $headers))
 				$type = $headers['Content-Type'];
@@ -781,18 +784,22 @@ class Image
 			$img_str = Network::fetchUrl($url, true, $redirects, 4);
 			$filesize = strlen($img_str);
 
-			if (function_exists("getimagesizefromstring")) {
-				$data = getimagesizefromstring($img_str);
-			} else {
-				$tempfile = tempnam(get_temppath(), "cache");
+			try {
+				if (function_exists("getimagesizefromstring")) {
+					$data = getimagesizefromstring($img_str);
+				} else {
+					$tempfile = tempnam(get_temppath(), "cache");
 
-				$a = get_app();
-				$stamp1 = microtime(true);
-				file_put_contents($tempfile, $img_str);
-				$a->save_timestamp($stamp1, "file");
+					$a = get_app();
+					$stamp1 = microtime(true);
+					file_put_contents($tempfile, $img_str);
+					$a->save_timestamp($stamp1, "file");
 
-				$data = getimagesize($tempfile);
-				unlink($tempfile);
+					$data = getimagesize($tempfile);
+					unlink($tempfile);
+				}
+			} catch (Exception $e) {
+				return false;
 			}
 
 			if ($data) {

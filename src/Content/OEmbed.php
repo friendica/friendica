@@ -108,7 +108,7 @@ class OEmbed
 				$txt = '{"type":"error"}';
 			} else { //save in cache
 				$j = json_decode($txt);
-				if ($j->type != "error") {
+				if (!empty($j->type) && $j->type != "error") {
 					dba::insert('oembed', [
 						'url' => normalise_link($embedurl),
 						'maxwidth' => $a->videowidth,

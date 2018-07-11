@@ -241,7 +241,7 @@ function acl_content(App $a)
 
 	if ($conv_id) {
 		// In multi threaded posts the conv_id is not the parent of the whole thread
-		$parent_item = dba::selectFirst('item', ['parent'], ['id' => $conv_id]);
+		$parent_item = Item::selectFirst(['parent'], ['id' => $conv_id]);
 		if (DBM::is_result($parent_item)) {
 			$conv_id = $parent_item['parent'];
 		}

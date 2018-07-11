@@ -96,7 +96,7 @@ function poke_init(App $a) {
 
 	$arr = [];
 
-	$arr['guid']          = get_guid(32);
+	$arr['guid']          = System::createGUID(32);
 	$arr['uid']           = $uid;
 	$arr['uri']           = $uri;
 	$arr['parent-uri']    = ($parent_uri ? $parent_uri : $uri);

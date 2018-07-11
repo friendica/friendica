@@ -23,17 +23,19 @@ $db_data = 'mysqldatabasename';
 
 // Use environment variables for mysql if they are set beforehand
 if (!empty(getenv('MYSQL_HOST'))
-	&& !empty(getenv('MYSQL_PORT'))
 	&& (!empty(getenv('MYSQL_USERNAME')) || !empty(getenv('MYSQL_USER')))
-	&& !empty(getenv('MYSQL_PASSWORD'))
+	&& !getenv('MYSQL_PASSWORD') === false
 	&& !empty(getenv('MYSQL_DATABASE'))) {
-	$db_host = getenv('MYSQL_HOST') . ':' . getenv('MYSQL_PORT');
+	$db_host = getenv('MYSQL_HOST');
+	if (!empty(getenv('MYSQL_PORT'))) {
+		$db_host .= ':' . getenv('MYSQL_PORT');
+	}
 	if (!empty(getenv('MYSQL_USERNAME'))) {
 		$db_user = getenv('MYSQL_USERNAME');
-	} elseif (!empty(getenv('MYSQL_USER'))) {
+	} else {
 		$db_user = getenv('MYSQL_USER');
 	}
-	$db_pass = getenv('MYSQL_PASSWORD');
+	$db_pass = (string) getenv('MYSQL_PASSWORD');
 	$db_data = getenv('MYSQL_DATABASE');
 }
 
