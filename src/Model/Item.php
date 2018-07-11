@@ -575,13 +575,13 @@ class Item extends BaseObject
 				CONTACT_IS_SHARING, CONTACT_IS_FRIEND, intval($uid));
 		} else {
 			if (strpos($sql_commands, "`contact`.") !== false) {
-				$joins .= "STRAIGHT_JOIN `contact` ON `contact`.`id` = $master_table.`contact-id`";
+				$joins .= "LEFT JOIN `contact` ON `contact`.`id` = $master_table.`contact-id`";
 			}
 			if (strpos($sql_commands, "`author`.") !== false) {
-				$joins .= " STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = $master_table.`author-id`";
+				$joins .= " LEFT JOIN `contact` AS `author` ON `author`.`id` = $master_table.`author-id`";
 			}
 			if (strpos($sql_commands, "`owner`.") !== false) {
-				$joins .= " STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = $master_table.`owner-id`";
+				$joins .= " LEFT JOIN `contact` AS `owner` ON `owner`.`id` = $master_table.`owner-id`";
 			}
 		}
 
