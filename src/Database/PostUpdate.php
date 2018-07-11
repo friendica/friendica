@@ -31,9 +31,9 @@ class PostUpdate
 		if (!self::update1206()) {
 			return;
 		}
-//		if (!self::update1276()) {
-//			return;
-//		}
+		if (!self::update1276()) {
+			return;
+		}
 	}
 
 	/**
@@ -234,12 +234,12 @@ class PostUpdate
 			return true;
 		}
 
-		logger("Start", LOGGER_DEBUG);
+		$id = Config::get("system", "post_update_version_1276_id", 0);
+
+		logger("Start from item " . $id, LOGGER_DEBUG);
 
 		$fields = array_merge(Item::MIXED_CONTENT_FIELDLIST, ['network', 'author-id', 'owner-id', 'tag', 'file',
 			'author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link', 'id']);
-
-		$id = Config::get("system", "post_update_version_1276_id", 0);
 
 		$start_id = $id;
 		$rows = 0;
@@ -271,7 +271,7 @@ class PostUpdate
 
 		Config::set("system", "post_update_version_1276_id", $id);
 
-		logger("Processed rows: " . $rows, LOGGER_DEBUG);
+		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
 
 		if ($start_id == $id) {
 			Config::set("system", "post_update_version", 1275);
