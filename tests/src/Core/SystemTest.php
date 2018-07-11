@@ -3,7 +3,6 @@
 namespace Friendica\Test\src\Core;
 
 use Friendica\Core\System;
-use Friendica\Network\HTTPException\InternalServerErrorException;
 use PHPUnit\Framework\TestCase;
 
 class SystemTest extends TestCase
@@ -46,7 +45,7 @@ class SystemTest extends TestCase
 	}
 
 	/**
-	 * @expectedException InternalServerErrorException
+	 * @expectedException Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	function testProcessIdToLongPrefix() {
 		System::processID('testtesttesttesttesttesttesttesttesttesttesttesttesttest');
