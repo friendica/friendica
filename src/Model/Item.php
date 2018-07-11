@@ -1865,12 +1865,12 @@ class Item extends BaseObject
 			$fields = $condition;
 		}
 
-		if (!empty($item['plink'])) {
-			$fields['uri-plink-hash'] = hash('ripemd320', $condition['uri']);
-		} else {
-			// Ensure that we don't delete the plink
+		// Ensure that we don't delete the plink
+		if (empty($item['plink'])) {
 			unset($fields['plink']);
 		}
+
+		$fields['uri-plink-hash'] = hash('ripemd320', $condition['uri']);
 
 		logger('Update content for URI ' . $condition['uri']);
 
