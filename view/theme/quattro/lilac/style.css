@@ -1,3 +1,4 @@
+/* THIS FILE IS GENERATED FROM THE less SOURCE DO NOT EDIT MANUALLY */
 /**
  * Fabio Comuni <http://kirgroup.com/profile/fabrixxm>
  **/
@@ -2514,11 +2515,11 @@ footer {
   clear: left;
   text-align: right;
 }
-#adminpage #pluginslist {
+#adminpage #addonslist {
   margin: 0;
   padding: 0;
 }
-#adminpage .plugin {
+#adminpage .addon {
   list-style: none;
   display: block;
   border: 1px solid #888888;
@@ -2526,10 +2527,10 @@ footer {
   margin-bottom: 5px;
   clear: left;
 }
-#adminpage .plugin desc {
+#adminpage .addon desc {
   margin-left: 2.5em;
 }
-#adminpage .toggleplugin {
+#adminpage .toggleaddon {
   float: left;
   margin-right: 1em;
 }

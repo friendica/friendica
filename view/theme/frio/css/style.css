@@ -2948,7 +2948,7 @@ section.help-content-wrapper li {
 #admin-summary-wrapper {
     padding-top: 10px;
 }
-#adminpage ul#pluginslist, li.plugin {
+#adminpage ul#addonslist, li.addon {
     list-style: none;
 }
 #adminpage li .icon {
@@ -2989,7 +2989,7 @@ section.help-content-wrapper li {
     font-size: 11px;
     color: #555555;
 }
-#adminpage .plugin .desc {
+#adminpage .addon .desc {
     padding-left: 10px;
 }
 .adminpage .admin-settings-action-link,
