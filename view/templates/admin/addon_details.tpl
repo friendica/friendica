@@ -2,7 +2,7 @@
 <div id='adminpage'>
 	<h1>{{$title}} - {{$page}}</h1>
 
-	<p><span class='toggleplugin icon {{$status}}'></span> {{$info.name}} - {{$info.version}} : <a href="{{$baseurl}}/admin/{{$function}}/{{$addon}}/?a=t&amp;t={{$form_security_token}}">{{$action}}</a></p>
+	<p><span class='toggleaddon icon {{$status}}'></span> {{$info.name}} - {{$info.version}} : <a href="{{$baseurl}}/admin/{{$function}}/{{$addon}}/?a=t&amp;t={{$form_security_token}}">{{$action}}</a></p>
 	<p>{{$info.description}}</p>
 
 	<p class="author">{{$str_author}}
@@ -30,7 +30,7 @@
 
 	{{if $readme}}
 	<h3>Readme</h3>
-	<div id="plugin_readme">
+	<div id="addon_readme">
 		{{$readme}}
 	</div>
 	{{/if}}
