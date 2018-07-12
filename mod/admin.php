@@ -1937,7 +1937,7 @@ function admin_page_addons(App $a)
 			$func($a, $admin_form);
 		}
 
-		$t = get_markup_template('admin/plugins_details.tpl');
+		$t = get_markup_template('admin/addon_details.tpl');
 
 		return replace_macros($t, [
 			'$title' => L10n::t('Administration'),
@@ -2208,7 +2208,7 @@ function admin_page_themes(App $a)
 			$screenshot = null;
 		}
 
-		$t = get_markup_template('admin/plugins_details.tpl');
+		$t = get_markup_template('admin/addon_details.tpl');
 		return replace_macros($t, [
 			'$title' => L10n::t('Administration'),
 			'$page' => L10n::t('Themes'),
