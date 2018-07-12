@@ -686,6 +686,19 @@ class Item extends BaseObject
 	}
 
 	/**
+	 * @brief Generate a server unique item hash for linking between the item tables
+	 *
+	 * @param string $uri     Item URI
+	 * @param date   $created Item creation date
+	 *
+	 * @return string the item hash
+	 */
+	private static function itemHash($uri, $received)
+	{
+		return date('Ymd-His', strtotime($received)) . ':' . hash('ripemd256', $uri);
+	}
+
+	/**
 	 * @brief Update existing item entries
 	 *
 	 * @param array $fields The fields that are to be changed
@@ -710,7 +723,7 @@ class Item extends BaseObject
 		// We cannot simply expand the condition to check for origin entries
 		// The condition needn't to be a simple array but could be a complex condition.
 		// And we have to execute this query before the update to ensure to fetch the same data.
-		$items = dba::select('item', ['id', 'origin', 'uri', 'uri-hash', 'plink', 'iaid', 'icid', 'tag', 'file'], $condition);
+		$items = dba::select('item', ['id', 'origin', 'uri', 'received', 'uri-hash', 'iaid', 'icid', 'tag', 'file'], $condition);
 
 		$content_fields = [];
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
@@ -759,15 +772,15 @@ class Item extends BaseObject
 		$rows = dba::affected_rows();
 
 		while ($item = dba::fetch($items)) {
-			if (empty($item['uri-hash']) && !empty($item['uri'])) {
-				dba::update('item', ['uri-hash' => hash('ripemd320', $item['uri'])], ['id' => $item['id']]);
+			// This part here can safely be removed when the legacy fields in the item had been removed
+			if (empty($item['uri-hash']) && !empty($item['uri']) && !empty($item['received'])) {
+				$item['uri-hash'] = self::itemHash($item['uri'], $item['received']);
+				dba::update('item', ['uri-hash' => $item['uri-hash']], ['id' => $item['id']]);
 			}
 
-			if (!empty($item['plink'])) {
-				$content_fields['plink'] = $item['plink'];
-			}
 			if (!empty($item['iaid']) || (!empty($content_fields['verb']) && (self::activityToIndex($content_fields['verb']) >= 0))) {
-				self::updateActivity($content_fields, ['uri' => $item['uri']]);
+				// The hash value is only needed during the transition period to the new structure
+				self::updateActivity($content_fields, ['uri' => $item['uri']], $item['uri-hash']);
 
 				if (empty($item['iaid'])) {
 					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
@@ -790,7 +803,8 @@ class Item extends BaseObject
 					}
 				}
 			} else {
-				self::updateContent($content_fields, ['uri' => $item['uri']]);
+				// The hash value is only needed during the transition period to the new structure
+				self::updateContent($content_fields, ['uri' => $item['uri']], $item['uri-hash']);
 
 				if (empty($item['icid'])) {
 					$item_content = dba::selectFirst('item-content', [], ['uri' => $item['uri']]);
@@ -1141,7 +1155,6 @@ class Item extends BaseObject
 
 		$item['guid'] = self::guid($item, $notify);
 		$item['uri'] = notags(trim(defaults($item, 'uri', self::newURI($item['uid'], $item['guid']))));
-		$item['uri-hash'] = hash('ripemd320', $item['uri']);
 
 		// Store conversation data
 		$item = Conversation::insert($item);
@@ -1277,6 +1290,9 @@ class Item extends BaseObject
 		$item['inform']        = trim(defaults($item, 'inform', ''));
 		$item['file']          = trim(defaults($item, 'file', ''));
 
+		// Unique identifier to be linked against item-activities and item-content
+		$item['uri-hash']      = self::itemHash($item['uri'], $item['received']);
+
 		// When there is no content then we don't post it
 		if ($item['body'].$item['title'] == '') {
 			logger('No body, no title.');
@@ -1291,10 +1307,6 @@ class Item extends BaseObject
 		// We haven't invented time travel by now.
 		if ($item['edited'] > DateTimeFormat::utcNow()) {
 			$item['edited'] = DateTimeFormat::utcNow();
-		}
-
-		if (($item['author-link'] == "") && ($item['owner-link'] == "")) {
-			logger("Both author-link and owner-link are empty. Called by: " . System::callstack(), LOGGER_DEBUG);
 		}
 
 		$item['plink'] = defaults($item, 'plink', System::baseUrl() . '/display/' . urlencode($item['guid']));
@@ -1723,7 +1735,7 @@ class Item extends BaseObject
 		}
 
 		$fields = ['uri' => $item['uri'], 'activity' => $activity_index,
-			'uri-hash' => hash('ripemd320', $item['uri'])];
+			'uri-hash' => $item['uri-hash']];
 
 		$saved_item = $item;
 
@@ -1766,7 +1778,7 @@ class Item extends BaseObject
 	private static function insertContent(&$item)
 	{
 		$fields = ['uri' => $item['uri'], 'plink' => $item['plink'],
-			'uri-plink-hash' => hash('ripemd320', $item['uri'])];
+			'uri-plink-hash' => $item['uri-hash']];
 
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			if (isset($item[$field])) {
@@ -1819,10 +1831,11 @@ class Item extends BaseObject
 	/**
 	 * @brief Update existing item content entries
 	 *
-	 * @param array $item The item fields that are to be changed
-	 * @param array $condition The condition for finding the item content entries
+	 * @param array  $item The item fields that are to be changed
+	 * @param array  $condition The condition for finding the item content entries
+	 * @param string $hash Unique hash value for this single item. (Only for transition phase)
 	 */
-	private static function updateActivity($item, $condition)
+	private static function updateActivity($item, $condition, $hash)
 	{
 		if (empty($item['verb'])) {
 			return false;
@@ -1833,8 +1846,7 @@ class Item extends BaseObject
 			return false;
 		}
 
-		$fields = ['activity' => $activity_index,
-			'uri-hash' => hash('ripemd320', $condition['uri'])];
+		$fields = ['activity' => $activity_index, 'uri-hash' => $hash];
 
 		logger('Update activity for URI ' . $condition['uri']);
 
@@ -1848,8 +1860,9 @@ class Item extends BaseObject
 	 *
 	 * @param array $item The item fields that are to be changed
 	 * @param array $condition The condition for finding the item content entries
+	 * @param string $hash Unique hash value for this single item. (Only for transition phase)
 	 */
-	private static function updateContent($item, $condition)
+	private static function updateContent($item, $condition, $hash)
 	{
 		// We have to select only the fields from the "item-content" table
 		$fields = [];
@@ -1865,12 +1878,7 @@ class Item extends BaseObject
 			$fields = $condition;
 		}
 
-		// Ensure that we don't delete the plink
-		if (empty($item['plink'])) {
-			unset($fields['plink']);
-		}
-
-		$fields['uri-plink-hash'] = hash('ripemd320', $condition['uri']);
+		$fields['uri-plink-hash'] = $hash;
 
 		logger('Update content for URI ' . $condition['uri']);
 
