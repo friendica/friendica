@@ -335,7 +335,7 @@ class Probe
 		}
 
 		if (x($data, "photo")) {
-			$data["baseurl"] = Network::getUrlMatch(normalise_link($data["baseurl"]), normalise_link($data["photo"]));
+			$data["baseurl"] = Network::getUrlMatch(normalise_link(defaults($data, "baseurl", "")), normalise_link($data["photo"]));
 		} else {
 			$data["photo"] = System::baseUrl().'/images/person-175.jpg';
 		}
@@ -1142,7 +1142,7 @@ class Probe
 			}
 
 			// Older Friendica versions had used the "uid" field differently than newer versions
-			if ($data["nick"] == $data["guid"]) {
+			if (!empty($data["nick"]) && !empty($data["guid"]) && ($data["nick"] == $data["guid"])) {
 				unset($data["guid"]);
 			}
 		}
@@ -1390,16 +1390,16 @@ class Probe
 			}
 		}
 
-		$data["location"] = $xpath->query("//p[contains(@class, 'p-locality')]")->item(0)->nodeValue;
+		$data["location"] = XML::getFirstNodeValue($xpath, "//p[contains(@class, 'p-locality')]");
 
 		if ($data["location"] == '') {
-			$data["location"] = $xpath->query("//p[contains(@class, 'location')]")->item(0)->nodeValue;
+			$data["location"] = XML::getFirstNodeValue($xpath, "//p[contains(@class, 'location')]");
 		}
 
-		$data["about"] = $xpath->query("//p[contains(@class, 'p-note')]")->item(0)->nodeValue;
+		$data["about"] = XML::getFirstNodeValue($xpath, "//p[contains(@class, 'p-note')]");
 
 		if ($data["about"] == '') {
-			$data["about"] = $xpath->query("//p[contains(@class, 'summary')]")->item(0)->nodeValue;
+			$data["about"] = XML::getFirstNodeValue($xpath, "//p[contains(@class, 'summary')]");
 		}
 
 		$avatar = $xpath->query("//img[contains(@class, 'u-photo')]")->item(0);

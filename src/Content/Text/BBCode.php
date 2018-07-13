@@ -579,7 +579,7 @@ class BBCode extends BaseObject
 					$return .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $data["url"], self::proxyUrl($data["preview"], $simplehtml), $data["title"]);
 				}
 
-				if (($data["type"] == "photo") && ($data["url"] != "") && ($data["image"] != "")) {
+				if (($data["type"] == "photo") && !empty($data["url"]) && !empty($data["image"])) {
 					$return .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a>', $data["url"], self::proxyUrl($data["image"], $simplehtml), $data["title"]);
 				} else {
 					$return .= sprintf('<h4><a href="%s">%s</a></h4>', $data['url'], $data['title']);
@@ -613,7 +613,7 @@ class BBCode extends BaseObject
 			return $data["text"] . $data["after"];
 		}
 
-		$title = htmlentities($data["title"], ENT_QUOTES, 'UTF-8', false);
+		$title = htmlentities(defaults($data, 'title', ''), ENT_QUOTES, 'UTF-8', false);
 		$text = htmlentities($data["text"], ENT_QUOTES, 'UTF-8', false);
 		if ($plaintext || (($title != "") && strstr($text, $title))) {
 			$data["title"] = $data["url"];

@@ -44,6 +44,7 @@ class Delivery extends BaseObject
 				return;
 			}
 			$uid = $target_item['uid'];
+			$items = [];
 		} elseif ($cmd == self::SUGGESTION) {
 			$target_item = dba::selectFirst('fsuggest', [], ['id' => $item_id]);
 			if (!DBM::is_result($target_item)) {
@@ -125,6 +126,10 @@ class Delivery extends BaseObject
 				&& !$parent["private"]) {
 				$public_message = true;
 			}
+		}
+
+		if (empty($items)) {
+			logger('No delivery data for  ' . $cmd . ' - Item ID: ' .$item_id . ' - Contact ID: ' . $contact_id);
 		}
 
 		$owner = User::getOwnerDataById($uid);
@@ -271,7 +276,7 @@ class Delivery extends BaseObject
 
 		// We don't have a relationship with contacts on a public post.
 		// Se we transmit with the new method and via Diaspora as a fallback
-		if (($items[0]['uid'] == 0) || ($contact['uid'] == 0)) {
+		if (!empty($items) && (($items[0]['uid'] == 0) || ($contact['uid'] == 0))) {
 			// Transmit in public if it's a relay post
 			$public_dfrn = ($contact['contact-type'] == ACCOUNT_TYPE_RELAY);
 

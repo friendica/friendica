@@ -378,7 +378,7 @@ class Notifier {
 		}
 
 		// If this is a public message and pubmail is set on the parent, include all your email contacts
-		if (function_exists('imap_open') && !Config::get('system','imap_disabled')) {
+		if (!empty($target_item) && function_exists('imap_open') && !Config::get('system','imap_disabled')) {
 			if (!strlen($target_item['allow_cid']) && !strlen($target_item['allow_gid'])
 				&& !strlen($target_item['deny_cid']) && !strlen($target_item['deny_gid'])
 				&& intval($target_item['pubmail'])) {
@@ -412,7 +412,7 @@ class Notifier {
 		// delivery loop
 		if (DBM::is_result($r)) {
 			foreach ($r as $contact) {
-				logger("Deliver ".$target_item["guid"]." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
+				logger("Deliver ".$item_id." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
 				Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 						'Delivery', $cmd, $item_id, (int)$contact['id']);

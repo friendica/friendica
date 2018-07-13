@@ -352,7 +352,7 @@ class Worker
 		$a->process_id = $old_process_id;
 		unset($a->queue);
 
-		$duration = number_format(microtime(true) - $stamp, 3);
+		$duration = (microtime(true) - $stamp);
 
 		self::$up_start = microtime(true);
 

@@ -93,7 +93,7 @@ class ItemContent extends BaseObject
 			}
 		}
 
-		$html = Text\BBCode::convert($post['text'] . $post['after'], false, $htmlmode);
+		$html = Text\BBCode::convert($post['text'] . defaults($post, 'after', ''), false, $htmlmode);
 		$msg = Text\HTML::toPlaintext($html, 0, true);
 		$msg = trim(html_entity_decode($msg, ENT_QUOTES, 'UTF-8'));
 
@@ -102,7 +102,7 @@ class ItemContent extends BaseObject
 			if ($post['type'] == 'link') {
 				$link = $post['url'];
 			} elseif ($post['type'] == 'text') {
-				$link = $post['url'];
+				$link = defaults($post, 'url', '');
 			} elseif ($post['type'] == 'video') {
 				$link = $post['url'];
 			} elseif ($post['type'] == 'photo') {

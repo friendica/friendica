@@ -929,6 +929,10 @@ function remote_user()
  */
 function notice($s)
 {
+	if (empty($_SESSION)) {
+		return;
+	}
+
 	$a = get_app();
 	if (!x($_SESSION, 'sysmsg')) {
 		$_SESSION['sysmsg'] = [];
