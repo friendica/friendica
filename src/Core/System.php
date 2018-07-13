@@ -5,6 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\XML;
 
 /**
@@ -180,9 +181,12 @@ EOT;
 	 *
 	 * @param int          $size     The size of the GUID (default is 16)
 	 * @param bool|string  $prefix   A given prefix (default is empty)
+	 * @param bool         $prefer_prefix If set, the prefix length won't get truncated
 	 * @return string a generated GUID
+	 *
+	 * @throws InternalServerErrorException Prefix size for GUID is to long
 	 */
-	public static function createGUID($size = 16, $prefix = '')
+	public static function createGUID($size = 16, $prefix = '', $prefer_prefix = false)
 	{
 		if (is_bool($prefix) && !$prefix) {
 			$prefix = '';
@@ -195,11 +199,25 @@ EOT;
 		}
 
 		if ($size >= 24) {
-			$prefix = substr($prefix, 0, $size - 22);
-			return str_replace('.', '', uniqid($prefix, true));
+			if (!$prefer_prefix) {
+				$prefix = substr($prefix, 0, $size - 22);
+				return str_replace('.', '', uniqid($prefix, true));
+			} else {
+				if ($size <= (strlen($prefix) + 5)) {
+					throw new InternalServerErrorException('Prefix size for GUID is too long.');
+				}
+				return substr(str_replace('.', '', uniqid($prefix, true)), 0, $size);
+			}
 		} else {
-			$prefix = substr($prefix, 0, max($size - 13, 0));
-			return uniqid($prefix);
+			if (!$prefer_prefix) {
+				$prefix = substr($prefix, 0, max($size - 13, 0));
+				return uniqid($prefix);
+			} else {
+				if ($size <= (strlen($prefix) + 5)) {
+					throw new InternalServerErrorException('Prefix size for GUID is too long.');
+				}
+				return substr(uniqid($prefix), 0, $size);
+			}
 		}
 	}
 
@@ -209,10 +227,12 @@ EOT;
 	 * @param string $prefix A given prefix
 	 *
 	 * @return string a generated process identifier
+	 *
+	 * @throws InternalServerErrorException Prefix size for process ID is to long
 	 */
 	public static function processID($prefix)
 	{
-		return uniqid($prefix . ':' . str_pad(getmypid() . ':', 8, '0') . ':');
+		return self::createGUID(24, $prefix . ':' . str_pad(getmypid() . ':', 8, '0') . ':', true);
 	}
 
 	/// @todo Move the following functions from boot.php
