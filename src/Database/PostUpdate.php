@@ -274,7 +274,7 @@ class PostUpdate
 		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
 
 		if ($start_id == $id) {
-			Config::set("system", "post_update_version", 1275);
+			Config::set("system", "post_update_version", 1276);
 			logger("Done", LOGGER_DEBUG);
 			return true;
 		}
