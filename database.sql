@@ -455,7 +455,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`id` int unsigned NOT NULL auto_increment,
 	`guid` varchar(255) NOT NULL DEFAULT '' COMMENT 'A unique identifier for this item',
 	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-320 hash from uri',
+	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-256 hash from uri',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Owner id which owns this copy of the item',
 	`contact-id` int unsigned NOT NULL DEFAULT 0 COMMENT 'contact.id',
 	`type` varchar(20) NOT NULL DEFAULT '' COMMENT '',
@@ -551,7 +551,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 CREATE TABLE IF NOT EXISTS `item-activity` (
 	`id` int unsigned NOT NULL auto_increment,
 	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-320 hash from uri',
+	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-256 hash from uri',
 	`activity` smallint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uri-hash` (`uri-hash`),
@@ -564,7 +564,7 @@ CREATE TABLE IF NOT EXISTS `item-activity` (
 CREATE TABLE IF NOT EXISTS `item-content` (
 	`id` int unsigned NOT NULL auto_increment,
 	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`uri-plink-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-320 hash from uri',
+	`uri-plink-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-256 hash from uri',
 	`title` varchar(255) NOT NULL DEFAULT '' COMMENT 'item title',
 	`content-warning` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`body` mediumtext COMMENT 'item body content',

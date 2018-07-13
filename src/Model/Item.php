@@ -789,19 +789,16 @@ class Item extends BaseObject
 			if (empty($item['uri-hash']) && !empty($item['uri']) && !empty($item['received'])) {
 				$item['uri-hash'] = self::itemHash($item['uri'], $item['received']);
 				dba::update('item', ['uri-hash' => $item['uri-hash']], ['id' => $item['id']]);
+				dba::update('item-activity', ['uri-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
+				dba::update('item-content', ['uri-plink-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
 			}
 
 			if (!empty($item['iaid']) || (!empty($content_fields['verb']) && (self::activityToIndex($content_fields['verb']) >= 0))) {
-				if (self::isLegacyMode()) {
-					$activity_condition = ['uri' => $item['uri']];
-				} else {
-					$activity_condition = ['uri-hash' => $item['uri-hash']];
-				}
 				// The hash value is only needed during the transition period to the new structure
-				self::updateActivity($content_fields, $activity_condition, $item['uri-hash']);
+				self::updateActivity($content_fields, ['uri-hash' => $item['uri-hash']], $item['uri-hash']);
 
 				if (empty($item['iaid'])) {
-					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
+					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
 					if (DBM::is_result($item_activity)) {
 						$item_fields = ['iaid' => $item_activity['id'], 'icid' => null];
 						foreach (self::MIXED_CONTENT_FIELDLIST as $field) {
@@ -825,16 +822,11 @@ class Item extends BaseObject
 					}
 				}
 			} else {
-				if (self::isLegacyMode()) {
-					$content_condition = ['uri' => $item['uri']];
-				} else {
-					$content_condition = ['uri-plink-hash' => $item['uri-hash']];
-				}
 				// The hash value is only needed during the transition period to the new structure
-				self::updateContent($content_fields, $content_condition, $item['uri-hash']);
+				self::updateContent($content_fields, ['uri-plink-hash' => $item['uri-hash']], $item['uri-hash']);
 
 				if (empty($item['icid'])) {
-					$item_content = dba::selectFirst('item-content', [], ['uri' => $item['uri']]);
+					$item_content = dba::selectFirst('item-content', [], ['uri-plink-hash' => $item['uri-hash']]);
 					if (DBM::is_result($item_content)) {
 						$item_fields = ['icid' => $item_content['id']];
 						// Clear all fields in the item table that have a content in the item-content table
@@ -1773,29 +1765,23 @@ class Item extends BaseObject
 			unset($item[$field]);
 		}
 
-		if (self::isLegacyMode()) {
-			$activity_condition = ['uri' => $item['uri']];
-		} else {
-			$activity_condition = ['uri-hash' => $item['uri-hash']];
-		}
-
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_activity');
 		if (!$locked) {
-			logger("Couldn't acquire lock for " . json_encode($content_condition) . " - proceeding anyway.");
+			logger("Couldn't acquire lock for " . $item['uri-hash'] . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
-		$item_activity = dba::selectFirst('item-activity', ['id'], $activity_condition);
+		$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
 		if (DBM::is_result($item_activity)) {
 			$item['iaid'] = $item_activity['id'];
-			logger('Fetched activity for ' . json_encode($content_condition) . ' (' . $item['iaid'] . ')');
+			logger('Fetched activity for ' . $item['uri-hash'] . ' (' . $item['iaid'] . ')');
 		} elseif (dba::insert('item-activity', $fields)) {
 			$item['iaid'] = dba::lastInsertId();
-			logger('Inserted activity for ' . json_encode($content_condition) . ' (' . $item['iaid'] . ')');
+			logger('Inserted activity for ' . $item['uri-hash'] . ' (' . $item['iaid'] . ')');
 		} else {
 			// This shouldn't happen.
-			logger('Could not insert activity for ' . json_encode($content_condition) . ' - should not happen');
+			logger('Could not insert activity for ' . $item['uri-hash'] . ' - should not happen');
 			return false;
 		}
 		if ($locked) {
@@ -1820,29 +1806,23 @@ class Item extends BaseObject
 			}
 		}
 
-		if (self::isLegacyMode()) {
-			$content_condition = ['uri' => $item['uri']];
-		} else {
-			$content_condition = ['uri-plink-hash' => $item['uri-hash']];
-		}
-
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_content');
 		if (!$locked) {
-			logger("Couldn't acquire lock for " . json_encode($content_condition) . " - proceeding anyway.");
+			logger("Couldn't acquire lock for " . $item['uri-hash'] . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
-		$item_content = dba::selectFirst('item-content', ['id'], $content_condition);
+		$item_content = dba::selectFirst('item-content', ['id'], ['uri-plink-hash' => $item['uri-hash']]);
 		if (DBM::is_result($item_content)) {
 			$item['icid'] = $item_content['id'];
-			logger('Fetched content for ' . json_encode($content_condition) . ' (' . $item['icid'] . ')');
+			logger('Fetched content for ' . $item['uri-hash'] . ' (' . $item['icid'] . ')');
 		} elseif (dba::insert('item-content', $fields)) {
 			$item['icid'] = dba::lastInsertId();
-			logger('Inserted content for ' . json_encode($content_condition) . ' (' . $item['icid'] . ')');
+			logger('Inserted content for ' . $item['uri-hash'] . ' (' . $item['icid'] . ')');
 		} else {
 			// This shouldn't happen.
-			logger('Could not insert content for ' . json_encode($content_condition) . ' - should not happen');
+			logger('Could not insert content for ' . $item['uri-hash'] . ' - should not happen');
 		}
 		if ($locked) {
 			Lock::release('item_insert_content');
