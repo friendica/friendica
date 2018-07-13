@@ -1254,7 +1254,7 @@ class DBStructure
 				"comment" => "Activities for items",
 				"fields" => [
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
-						"uri" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+						"uri" => ["type" => "varchar(255)", "comment" => ""],
 						"uri-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-256 hash from uri"],
 						"activity" => ["type" => "smallint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						],
@@ -1268,7 +1268,7 @@ class DBStructure
 				"comment" => "Content for all posts",
 				"fields" => [
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
-						"uri" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+						"uri" => ["type" => "varchar(255)", "comment" => ""],
 						"uri-plink-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-256 hash from uri"],
 						"title" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "item title"],
 						"content-warning" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],

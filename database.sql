@@ -550,7 +550,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 --
 CREATE TABLE IF NOT EXISTS `item-activity` (
 	`id` int unsigned NOT NULL auto_increment,
-	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`uri` varchar(255) COMMENT '',
 	`uri-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-256 hash from uri',
 	`activity` smallint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	 PRIMARY KEY(`id`),
@@ -563,7 +563,7 @@ CREATE TABLE IF NOT EXISTS `item-activity` (
 --
 CREATE TABLE IF NOT EXISTS `item-content` (
 	`id` int unsigned NOT NULL auto_increment,
-	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`uri` varchar(255) COMMENT '',
 	`uri-plink-hash` char(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-256 hash from uri',
 	`title` varchar(255) NOT NULL DEFAULT '' COMMENT 'item title',
 	`content-warning` varchar(255) NOT NULL DEFAULT '' COMMENT '',

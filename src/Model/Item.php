@@ -794,8 +794,7 @@ class Item extends BaseObject
 			}
 
 			if (!empty($item['iaid']) || (!empty($content_fields['verb']) && (self::activityToIndex($content_fields['verb']) >= 0))) {
-				// The hash value is only needed during the transition period to the new structure
-				self::updateActivity($content_fields, ['uri-hash' => $item['uri-hash']], $item['uri-hash']);
+				self::updateActivity($content_fields, ['uri-hash' => $item['uri-hash']]);
 
 				if (empty($item['iaid'])) {
 					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
@@ -822,8 +821,7 @@ class Item extends BaseObject
 					}
 				}
 			} else {
-				// The hash value is only needed during the transition period to the new structure
-				self::updateContent($content_fields, ['uri-plink-hash' => $item['uri-hash']], $item['uri-hash']);
+				self::updateContent($content_fields, ['uri-plink-hash' => $item['uri-hash']]);
 
 				if (empty($item['icid'])) {
 					$item_content = dba::selectFirst('item-content', [], ['uri-plink-hash' => $item['uri-hash']]);
@@ -1757,8 +1755,7 @@ class Item extends BaseObject
 			return false;
 		}
 
-		$fields = ['uri' => $item['uri'], 'activity' => $activity_index,
-			'uri-hash' => $item['uri-hash']];
+		$fields = ['activity' => $activity_index, 'uri-hash' => $item['uri-hash']];
 
 		// We just remove everything that is content
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
@@ -1797,7 +1794,7 @@ class Item extends BaseObject
 	 */
 	private static function insertContent(&$item)
 	{
-		$fields = ['uri' => $item['uri'], 'uri-plink-hash' => $item['uri-hash']];
+		$fields = ['uri-plink-hash' => $item['uri-hash']];
 
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			if (isset($item[$field])) {
@@ -1834,9 +1831,8 @@ class Item extends BaseObject
 	 *
 	 * @param array  $item The item fields that are to be changed
 	 * @param array  $condition The condition for finding the item content entries
-	 * @param string $hash Unique hash value for this single item. (Only for transition phase)
 	 */
-	private static function updateActivity($item, $condition, $hash)
+	private static function updateActivity($item, $condition)
 	{
 		if (empty($item['verb'])) {
 			return false;
@@ -1847,15 +1843,9 @@ class Item extends BaseObject
 			return false;
 		}
 
-		$fields = ['activity' => $activity_index];
+		$fields = ['activity' => $activity_index, 'uri' => null];
 
-		if (self::isLegacyMode()) {
-			$fields['uri-hash'] = $hash;
-		} else {
-//			$fields['uri'] = '';
-		}
-
-		logger('Update activity for ' . json_encode($condition));
+		logger('Update activity for ' . $condition['uri-hash']);
 
 		dba::update('item-activity', $fields, $condition, true);
 
@@ -1867,9 +1857,8 @@ class Item extends BaseObject
 	 *
 	 * @param array $item The item fields that are to be changed
 	 * @param array $condition The condition for finding the item content entries
-	 * @param string $hash Unique hash value for this single item. (Only for transition phase)
 	 */
-	private static function updateContent($item, $condition, $hash)
+	private static function updateContent($item, $condition)
 	{
 		// We have to select only the fields from the "item-content" table
 		$fields = [];
@@ -1885,11 +1874,7 @@ class Item extends BaseObject
 			$fields = $condition;
 		}
 
-		if (self::isLegacyMode()) {
-			$fields['uri-plink-hash'] = $hash;
-		} else {
-//			$fields['uri'] = '';
-		}
+		$fields['uri'] = null;
 
 		logger('Update content for ' . json_encode($condition));
 
