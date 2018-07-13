@@ -787,7 +787,16 @@ class Item extends BaseObject
 		while ($item = dba::fetch($items)) {
 			// This part here can safely be removed when the legacy fields in the item had been removed
 			if (empty($item['uri-hash']) && !empty($item['uri']) && !empty($item['created'])) {
-				$item['uri-hash'] = self::itemHash($item['uri'], $item['created']);
+
+				// Fetch the uri-hash from an existing item entry if there is one
+				$item_condition = ["`uri` = ? AND `uri-hash` != ''", $item['uri']];
+				$existing = dba::selectfirst('item', ['uri-hash'], $item_condition);
+				if (DBM::is_result($existing)) {
+					$item['uri-hash'] = $existing['uri-hash'];
+				} else {
+					$item['uri-hash'] = self::itemHash($item['uri'], $item['created']);
+				}
+
 				dba::update('item', ['uri-hash' => $item['uri-hash']], ['id' => $item['id']]);
 				dba::update('item-activity', ['uri-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
 				dba::update('item-content', ['uri-plink-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
@@ -1267,6 +1276,13 @@ class Item extends BaseObject
 			}
 		}
 
+		// Ensure to always have the same creation date.
+		$existing = dba::selectfirst('item', ['created', 'uri-hash'], ['uri' => $item['uri']]);
+		if (DBM::is_result($existing)) {
+			$item['created'] = $existing['created'];
+			$item['uri-hash'] = $existing['uri-hash'];
+		}
+
 		self::addLanguageToItemArray($item);
 
 		$item['wall']          = intval(defaults($item, 'wall', 0));
@@ -1312,7 +1328,7 @@ class Item extends BaseObject
 		$item['file']          = trim(defaults($item, 'file', ''));
 
 		// Unique identifier to be linked against item-activities and item-content
-		$item['uri-hash']      = self::itemHash($item['uri'], $item['created']);
+		$item['uri-hash']      = defaults($item, 'uri-hash', self::itemHash($item['uri'], $item['created']));
 
 		// When there is no content then we don't post it
 		if ($item['body'].$item['title'] == '') {
