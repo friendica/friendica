@@ -2005,6 +2005,9 @@ class Diaspora
 
 		$datarray["body"] = $verb;
 
+		// Diaspora doesn't provide a date for likes
+		$datarray["changed"] = $datarray["created"] = $datarray["edited"] = DateTimeFormat::utcNow();
+
 		// like on comments have the comment as parent. So we need to fetch the toplevel parent
 		if ($parent_item["id"] != $parent_item["parent"]) {
 			$toplevel = Item::selectFirst(['origin'], ['id' => $parent_item["parent"]]);

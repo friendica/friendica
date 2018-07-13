@@ -708,8 +708,7 @@ class Item extends BaseObject
 	 */
 	private static function itemHash($uri, $created)
 	{
-		return strtotime($created) . hash('ripemd128', $uri);
-		//return date('Ymd-His', strtotime($created)) . ':' . hash('ripemd256', $uri);
+		return round(strtotime($created) / 100) . hash('ripemd128', $uri);
 	}
 
 	/**
