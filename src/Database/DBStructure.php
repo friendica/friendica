@@ -1158,7 +1158,7 @@ class DBStructure
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
 						"guid" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "A unique identifier for this item"],
 						"uri" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
-						"uri-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-256 hash from uri"],
+						"uri-hash" => ["type" => "varchar(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-128 hash from uri"],
 						"uid" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "relation" => ["user" => "uid"], "comment" => "Owner id which owns this copy of the item"],
 						"contact-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "relation" => ["contact" => "id"], "comment" => "contact.id"],
 						"type" => ["type" => "varchar(20)", "not null" => "1", "default" => "", "comment" => ""],
@@ -1255,7 +1255,7 @@ class DBStructure
 				"fields" => [
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
 						"uri" => ["type" => "varchar(255)", "comment" => ""],
-						"uri-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-256 hash from uri"],
+						"uri-hash" => ["type" => "varchar(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-128 hash from uri"],
 						"activity" => ["type" => "smallint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						],
 				"indexes" => [
@@ -1269,7 +1269,7 @@ class DBStructure
 				"fields" => [
 						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "relation" => ["thread" => "iid"]],
 						"uri" => ["type" => "varchar(255)", "comment" => ""],
-						"uri-plink-hash" => ["type" => "char(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-256 hash from uri"],
+						"uri-plink-hash" => ["type" => "varchar(80)", "not null" => "1", "default" => "", "comment" => "RIPEMD-128 hash from uri"],
 						"title" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "item title"],
 						"content-warning" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 						"body" => ["type" => "mediumtext", "comment" => "item body content"],

@@ -706,9 +706,10 @@ class Item extends BaseObject
 	 *
 	 * @return string the item hash
 	 */
-	private static function itemHash($uri, $received)
+	private static function itemHash($uri, $created)
 	{
-		return date('Ymd-His', strtotime($received)) . ':' . hash('ripemd256', $uri);
+		return strtotime($created) . hash('ripemd128', $uri);
+		//return date('Ymd-His', strtotime($created)) . ':' . hash('ripemd256', $uri);
 	}
 
 	/**
@@ -736,7 +737,7 @@ class Item extends BaseObject
 		// We cannot simply expand the condition to check for origin entries
 		// The condition needn't to be a simple array but could be a complex condition.
 		// And we have to execute this query before the update to ensure to fetch the same data.
-		$items = dba::select('item', ['id', 'origin', 'uri', 'received', 'uri-hash', 'iaid', 'icid', 'tag', 'file'], $condition);
+		$items = dba::select('item', ['id', 'origin', 'uri', 'created', 'uri-hash', 'iaid', 'icid', 'tag', 'file'], $condition);
 
 		$content_fields = [];
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
@@ -786,8 +787,8 @@ class Item extends BaseObject
 
 		while ($item = dba::fetch($items)) {
 			// This part here can safely be removed when the legacy fields in the item had been removed
-			if (empty($item['uri-hash']) && !empty($item['uri']) && !empty($item['received'])) {
-				$item['uri-hash'] = self::itemHash($item['uri'], $item['received']);
+			if (empty($item['uri-hash']) && !empty($item['uri']) && !empty($item['created'])) {
+				$item['uri-hash'] = self::itemHash($item['uri'], $item['created']);
 				dba::update('item', ['uri-hash' => $item['uri-hash']], ['id' => $item['id']]);
 				dba::update('item-activity', ['uri-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
 				dba::update('item-content', ['uri-plink-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
@@ -1312,7 +1313,7 @@ class Item extends BaseObject
 		$item['file']          = trim(defaults($item, 'file', ''));
 
 		// Unique identifier to be linked against item-activities and item-content
-		$item['uri-hash']      = self::itemHash($item['uri'], $item['received']);
+		$item['uri-hash']      = self::itemHash($item['uri'], $item['created']);
 
 		// When there is no content then we don't post it
 		if ($item['body'].$item['title'] == '') {
