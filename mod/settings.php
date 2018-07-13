@@ -26,12 +26,14 @@ use Friendica\Util\Temporal;
 function get_theme_config_file($theme)
 {
 	$a = get_app();
-	$base_theme = $a->theme_info['extends'];
+	if (!empty($a->theme_info['extends'])) {
+		$base_theme = $a->theme_info['extends'];
+	}
 
 	if (file_exists("view/theme/$theme/config.php")) {
 		return "view/theme/$theme/config.php";
 	}
-	if (file_exists("view/theme/$base_theme/config.php")) {
+	if (!empty($base_theme) && file_exists("view/theme/$base_theme/config.php")) {
 		return "view/theme/$base_theme/config.php";
 	}
 	return null;
@@ -1155,7 +1157,7 @@ function settings_content(App $a)
 
 	// Private/public post links for the non-JS ACL form
 	$private_post = 1;
-	if ($_REQUEST['public']) {
+	if (!empty($_REQUEST['public']) && !$_REQUEST['public']) {
 		$private_post = 0;
 	}
 
