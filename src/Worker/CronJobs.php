@@ -36,7 +36,7 @@ class CronJobs
 		// Call possible post update functions
 		// see src/Database/PostUpdate.php for more details
 		if ($command == 'post_update') {
-			PostUpdate::update();
+//			PostUpdate::update();
 			return;
 		}
 

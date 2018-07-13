@@ -78,6 +78,17 @@ class Item extends BaseObject
 	// The item-activity table only stores the index and needs this array to know the matching activity.
 	const ACTIVITIES = [ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE];
 
+	private static $legacy_mode = null;
+
+	public static function isLegacyMode()
+	{
+		if (is_null(self::$legacy_mode)) {
+			self::$legacy_mode = (Config::get("system", "post_update_version") < 1276);
+		}
+
+		return self::$legacy_mode;
+	}
+
 	/**
 	 * @brief returns an activity index from an activity string
 	 *
@@ -156,11 +167,13 @@ class Item extends BaseObject
 		// ---------------------- Transform item content data ----------------------
 
 		// Fetch data from the item-content table whenever there is content there
-		foreach (self::MIXED_CONTENT_FIELDLIST as $field) {
-			if (empty($row[$field]) && !empty($row['internal-item-' . $field])) {
-				$row[$field] = $row['internal-item-' . $field];
+		if (self::isLegacyMode()) {
+			foreach (self::MIXED_CONTENT_FIELDLIST as $field) {
+				if (empty($row[$field]) && !empty($row['internal-item-' . $field])) {
+					$row[$field] = $row['internal-item-' . $field];
+				}
+				unset($row['internal-item-' . $field]);
 			}
-			unset($row['internal-item-' . $field]);
 		}
 
 		if (!empty($row['internal-iaid']) && array_key_exists('verb', $row)) {
@@ -645,7 +658,7 @@ class Item extends BaseObject
 		foreach ($fields as $table => $table_fields) {
 			foreach ($table_fields as $field => $select) {
 				if (empty($selected) || in_array($select, $selected)) {
-					if (in_array($select, self::MIXED_CONTENT_FIELDLIST)) {
+					if (self::isLegacyMode() && in_array($select, self::MIXED_CONTENT_FIELDLIST)) {
 						$selection[] = "`item`.`".$select."` AS `internal-item-" . $select . "`";
 					}
 					if (is_int($field)) {
@@ -729,7 +742,7 @@ class Item extends BaseObject
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			if (isset($fields[$field])) {
 				$content_fields[$field] = $fields[$field];
-				if (in_array($field, self::CONTENT_FIELDLIST)) {
+				if (in_array($field, self::CONTENT_FIELDLIST) || !self::isLegacyMode()) {
 					unset($fields[$field]);
 				} else {
 					$fields[$field] = null;
@@ -779,15 +792,24 @@ class Item extends BaseObject
 			}
 
 			if (!empty($item['iaid']) || (!empty($content_fields['verb']) && (self::activityToIndex($content_fields['verb']) >= 0))) {
+				if (self::isLegacyMode()) {
+					$activity_condition = ['uri' => $item['uri']];
+				} else {
+					$activity_condition = ['uri-hash' => $item['uri-hash']];
+				}
 				// The hash value is only needed during the transition period to the new structure
-				self::updateActivity($content_fields, ['uri' => $item['uri']], $item['uri-hash']);
+				self::updateActivity($content_fields, $activity_condition, $item['uri-hash']);
 
 				if (empty($item['iaid'])) {
 					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
 					if (DBM::is_result($item_activity)) {
 						$item_fields = ['iaid' => $item_activity['id'], 'icid' => null];
 						foreach (self::MIXED_CONTENT_FIELDLIST as $field) {
-							$item_fields[$field] = '';
+							if (self::isLegacyMode()) {
+								$item_fields[$field] = null;
+							} else {
+								unset($item_fields[$field]);
+							}
 						}
 						dba::update('item', $item_fields, ['id' => $item['id']]);
 
@@ -803,8 +825,13 @@ class Item extends BaseObject
 					}
 				}
 			} else {
+				if (self::isLegacyMode()) {
+					$content_condition = ['uri' => $item['uri']];
+				} else {
+					$content_condition = ['uri-plink-hash' => $item['uri-hash']];
+				}
 				// The hash value is only needed during the transition period to the new structure
-				self::updateContent($content_fields, ['uri' => $item['uri']], $item['uri-hash']);
+				self::updateContent($content_fields, $content_condition, $item['uri-hash']);
 
 				if (empty($item['icid'])) {
 					$item_content = dba::selectFirst('item-content', [], ['uri' => $item['uri']]);
@@ -813,7 +840,11 @@ class Item extends BaseObject
 						// Clear all fields in the item table that have a content in the item-content table
 						foreach ($item_content as $field => $content) {
 							if (in_array($field, self::MIXED_CONTENT_FIELDLIST) && !empty($item_content[$field])) {
-								$item_fields[$field] = '';
+								if (self::isLegacyMode()) {
+									$item_fields[$field] = null;
+								} else {
+									unset($item_fields[$field]);
+								}
 							}
 						}
 						dba::update('item', $item_fields, ['id' => $item['id']]);
@@ -1737,31 +1768,34 @@ class Item extends BaseObject
 		$fields = ['uri' => $item['uri'], 'activity' => $activity_index,
 			'uri-hash' => $item['uri-hash']];
 
-		$saved_item = $item;
-
 		// We just remove everything that is content
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			unset($item[$field]);
 		}
 
+		if (self::isLegacyMode()) {
+			$activity_condition = ['uri' => $item['uri']];
+		} else {
+			$activity_condition = ['uri-hash' => $item['uri-hash']];
+		}
+
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_activity');
 		if (!$locked) {
-			logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
+			logger("Couldn't acquire lock for " . json_encode($content_condition) . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
-		$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
+		$item_activity = dba::selectFirst('item-activity', ['id'], $activity_condition);
 		if (DBM::is_result($item_activity)) {
 			$item['iaid'] = $item_activity['id'];
-			logger('Fetched activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
+			logger('Fetched activity for ' . json_encode($content_condition) . ' (' . $item['iaid'] . ')');
 		} elseif (dba::insert('item-activity', $fields)) {
 			$item['iaid'] = dba::lastInsertId();
-			logger('Inserted activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
+			logger('Inserted activity for ' . json_encode($content_condition) . ' (' . $item['iaid'] . ')');
 		} else {
-			// This shouldn't happen. But if it does, we simply store it in the item-content table
-			logger('Could not insert activity for URI ' . $item['uri'] . ' - should not happen');
-			$item = $saved_item;
+			// This shouldn't happen.
+			logger('Could not insert activity for ' . json_encode($content_condition) . ' - should not happen');
 			return false;
 		}
 		if ($locked) {
@@ -1777,8 +1811,7 @@ class Item extends BaseObject
 	 */
 	private static function insertContent(&$item)
 	{
-		$fields = ['uri' => $item['uri'], 'plink' => $item['plink'],
-			'uri-plink-hash' => $item['uri-hash']];
+		$fields = ['uri' => $item['uri'], 'uri-plink-hash' => $item['uri-hash']];
 
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			if (isset($item[$field])) {
@@ -1787,44 +1820,32 @@ class Item extends BaseObject
 			}
 		}
 
+		if (self::isLegacyMode()) {
+			$content_condition = ['uri' => $item['uri']];
+		} else {
+			$content_condition = ['uri-plink-hash' => $item['uri-hash']];
+		}
+
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_content');
 		if (!$locked) {
-			logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
+			logger("Couldn't acquire lock for " . json_encode($content_condition) . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
-		$item_content = dba::selectFirst('item-content', ['id'], ['uri' => $item['uri']]);
+		$item_content = dba::selectFirst('item-content', ['id'], $content_condition);
 		if (DBM::is_result($item_content)) {
 			$item['icid'] = $item_content['id'];
-			logger('Fetched content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
+			logger('Fetched content for ' . json_encode($content_condition) . ' (' . $item['icid'] . ')');
 		} elseif (dba::insert('item-content', $fields)) {
 			$item['icid'] = dba::lastInsertId();
-			logger('Inserted content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
+			logger('Inserted content for ' . json_encode($content_condition) . ' (' . $item['icid'] . ')');
 		} else {
-			// By setting the ICID value through the worker we should avoid timing problems.
-			// When the locking works, this shouldn't be needed. But better be prepared.
-			Worker::add(PRIORITY_HIGH, 'SetItemContentID', $item['uri']);
-			logger('Could not insert content for URI ' . $item['uri'] . ' - trying asynchronously');
+			// This shouldn't happen.
+			logger('Could not insert content for ' . json_encode($content_condition) . ' - should not happen');
 		}
 		if ($locked) {
 			Lock::release('item_insert_content');
-		}
-	}
-
-	/**
-	 * @brief Set the item content id for a given URI
-	 *
-	 * @param string $uri The item URI
-	 */
-	public static function setICIDforURI($uri)
-	{
-		$item_content = dba::selectFirst('item-content', ['id'], ['uri' => $uri]);
-		if (DBM::is_result($item_content)) {
-			dba::update('item', ['icid' => $item_content['id']], ['icid' => 0, 'uri' => $uri]);
-			logger('Asynchronously set item content id for URI ' . $uri . ' (' . $item_content['id'] . ') - Affected: '. (int)dba::affected_rows());
-		} else {
-			logger('No item-content found for URI ' . $uri);
 		}
 	}
 
@@ -1846,9 +1867,15 @@ class Item extends BaseObject
 			return false;
 		}
 
-		$fields = ['activity' => $activity_index, 'uri-hash' => $hash];
+		$fields = ['activity' => $activity_index];
 
-		logger('Update activity for URI ' . $condition['uri']);
+		if (self::isLegacyMode()) {
+			$fields['uri-hash'] = $hash;
+		} else {
+//			$fields['uri'] = '';
+		}
+
+		logger('Update activity for ' . json_encode($condition));
 
 		dba::update('item-activity', $fields, $condition, true);
 
@@ -1878,9 +1905,13 @@ class Item extends BaseObject
 			$fields = $condition;
 		}
 
-		$fields['uri-plink-hash'] = $hash;
+		if (self::isLegacyMode()) {
+			$fields['uri-plink-hash'] = $hash;
+		} else {
+//			$fields['uri'] = '';
+		}
 
-		logger('Update content for URI ' . $condition['uri']);
+		logger('Update content for ' . json_encode($condition));
 
 		dba::update('item-content', $fields, $condition, true);
 	}
