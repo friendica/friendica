@@ -606,3 +606,7 @@ img.invalid-src:after { vertical-align: top;}
 .tag-cloud {
   word-wrap: break-word;
 }
+
+#register-explicid-content {
+  font-weight: bold;
+}

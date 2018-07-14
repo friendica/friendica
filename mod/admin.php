@@ -986,6 +986,7 @@ function admin_page_site_post(App $a)
 	$private_addons			=	((x($_POST,'private_addons'))		? True					: False);
 	$disable_embedded		=	((x($_POST,'disable_embedded'))		? True					: False);
 	$allow_users_remote_self	=	((x($_POST,'allow_users_remote_self'))	? True					: False);
+	$explicit_content	=	((x($_POST,'explicit_content'))	? True					: False);
 
 	$no_multi_reg		=	((x($_POST,'no_multi_reg'))		? True						: False);
 	$no_openid		=	!((x($_POST,'no_openid'))		? True						: False);
@@ -1153,6 +1154,7 @@ function admin_page_site_post(App $a)
 	Config::set('system', 'enotify_no_content', $enotify_no_content);
 	Config::set('system', 'disable_embedded', $disable_embedded);
 	Config::set('system', 'allow_users_remote_self', $allow_users_remote_self);
+	Config::set('system', 'explicit_content', $explicit_content);
 	Config::set('system', 'check_new_version_url', $check_new_version_url);
 
 	Config::set('system', 'block_extended_register', $no_multi_reg);
@@ -1405,6 +1407,7 @@ function admin_page_site(App $a)
 		'$enotify_no_content'	=> ['enotify_no_content', L10n::t("Don't include post content in email notifications"), Config::get('system','enotify_no_content'), L10n::t("Don't include the content of a post/comment/private message/etc. in the email notifications that are sent out from this site, as a privacy measure.")],
 		'$private_addons'	=> ['private_addons', L10n::t("Disallow public access to addons listed in the apps menu."), Config::get('config','private_addons'), L10n::t("Checking this box will restrict addons listed in the apps menu to members only.")],
 		'$disable_embedded'	=> ['disable_embedded', L10n::t("Don't embed private images in posts"), Config::get('system','disable_embedded'), L10n::t("Don't replace locally-hosted private photos in posts with an embedded copy of the image. This means that contacts who receive posts containing private photos will have to authenticate and load each image, which may take a while.")],
+		'$explicit_content' => ['explicit_content', L10n::t('Explicit Content'), Config::get('system', 'explicit_content', False), L10n::t('Set this to announce that your node is used mostly for explicit content that might not be suited for minors. This information will be published in the node information and might be used, e.g. by the global directory, to filter your node from listings of nodes to join. Additionally a note about this will be shown at the user registration page.')],
 		'$allow_users_remote_self' => ['allow_users_remote_self', L10n::t('Allow Users to set remote_self'), Config::get('system','allow_users_remote_self'), L10n::t('With checking this, every user is allowed to mark every contact as a remote_self in the repair contact dialog. Setting this flag on a contact causes mirroring every posting of that contact in the users stream.')],
 		'$no_multi_reg'		=> ['no_multi_reg', L10n::t("Block multiple registrations"),  Config::get('system','block_extended_register'), L10n::t("Disallow users to register additional accounts for use as pages.")],
 		'$no_openid'		=> ['no_openid', L10n::t("OpenID support"), !Config::get('system','no_openid'), L10n::t("OpenID support for registration and logins.")],

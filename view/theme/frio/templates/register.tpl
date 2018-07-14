@@ -10,6 +10,8 @@
 
 		{{if $registertext != ""}}<div class="error-message">{{$registertext}} </div>{{/if}}
 
+		{{if $explicit_content}} <p id="register-explicid-content">{{$explicit_content_note}}</p> {{/if}}
+
 
 		{{if $oidlabel}}
 		<div id="register-openid-wrapper" class="form-group">

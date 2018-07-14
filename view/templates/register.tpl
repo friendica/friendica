@@ -7,6 +7,7 @@
 
 	{{if $registertext != ""}}<div class="error-message">{{$registertext}} </div>{{/if}}
 
+	{{if $explicit_content}} <p id="register-explicid-content">{{$explicit_content_note}}</p> {{/if}}
 
 	<p id="register-realpeople">{{$realpeople}}</p>
 
