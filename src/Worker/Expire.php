@@ -45,12 +45,12 @@ class Expire {
 			// Currently disabled to be able to detect some problem
 			/*
 			logger('Deleting orphaned item activities - start', LOGGER_DEBUG);
-			$condition = ["NOT EXISTS (SELECT `iaid` FROM `item` WHERE `item`.`uri-hash` = `item-activity`.`uri-hash`)"];
+			$condition = ["NOT EXISTS (SELECT `iaid` FROM `item` WHERE `item`.`uri` = `item-activity`.`uri`)"];
 			dba::delete('item-activity', $condition);
 			logger('Orphaned item activities deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
 
 			logger('Deleting orphaned item content - start', LOGGER_DEBUG);
-			$condition = ["NOT EXISTS (SELECT `icid` FROM `item` WHERE `item`.`uri-hash` = `item-content`.`uri-plink-hash`)"];
+			$condition = ["NOT EXISTS (SELECT `icid` FROM `item` WHERE `item`.`uri` = `item-content`.`uri`)"];
 			dba::delete('item-content', $condition);
 			logger('Orphaned item content deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
 			*/
