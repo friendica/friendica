@@ -46,7 +46,7 @@ class Markdown extends BaseObject
 
 		self::getApp()->save_timestamp($stamp1, "parser");
 
-		return $html;
+		return '<div class="markdown-html">' . $html . '</div>';
 	}
 
 	/**
