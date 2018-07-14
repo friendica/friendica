@@ -247,7 +247,7 @@ span.oembed, h4 {
   margin: 0px 0px 0px 0px;
 }
 
-code {
+code, .markdown-html pre > code {
   display: block;
   background-color: #eee;
   color: #666;
@@ -255,13 +255,17 @@ code {
   font-size: 0.85em;
   font-family: monospace;
 }
-key {
+key, .markdown-html code {
   display: inline;
   background-color: #eee;
   color: #666;
   padding: 0.2em;
   font-size: 0.85em;
   font-family: monospace;
+}
+.markdown-html pre > code {
+  padding: 0;
+  background-color: transparent;
 }
 
 /* fields help text */
