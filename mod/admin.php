@@ -190,7 +190,7 @@ function admin_content(App $a)
 		'database' => [ L10n::t('Database'), [
 			'dbsync'       => ["admin/dbsync/"      , L10n::t('DB updates')           , "dbsync"],
 			'queue'        => ["admin/queue/"       , L10n::t('Inspect Queue')        , "queue"], ]],
-			'workerqueue'        => ["admin/workerqueue/"       , L10n::t('Inspect worker Queue')        , "workerqueue"], ]],
+			'workerqueue'        => ["admin/workerqueue/"       , L10n::t('Inspect worker Queue')        , "workerqueue"],
 		'tools' => [ L10n::t('Tools'), [
 			'contactblock' => ["admin/contactblock/", L10n::t('Contact Blocklist')    , "contactblock"],
 			'blocklist'    => ["admin/blocklist/"   , L10n::t('Server Blocklist')     , "blocklist"],
@@ -733,7 +733,7 @@ function admin_page_federation(App $a)
  * @brief Admin Inspect Queue Page
  *
  * Generates a page for the admin to have a look into the current queue of
- * postings that are not deliverabke. Shown are the name and url of the
+ * postings that are not deliverable. Shown are the name and url of the
  * recipient, the delivery network and the dates when the posting was generated
  * and the last time tried to deliver the posting.
  *
