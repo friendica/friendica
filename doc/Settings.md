@@ -162,6 +162,14 @@ It is disabled by default, as it causes additional load on the server and may be
 As admin of the node you can also set this flag directly in the database.
 Before doing so, you should be sure you know what you do and have a backup of the database.
 
+#### Explicit Content
+
+If you are running a node with explicit content, you can announce this with this option.
+When checked an information flag will be set in the published information about your node.
+(Should *Publish Server Information* be enabled.)
+
+Additionally a note will be displayed on the registration page for new users.
+
 ### Advanced
 
 #### Proxy Configuration Settings

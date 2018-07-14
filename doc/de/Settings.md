@@ -156,6 +156,14 @@ Außerdem könnte es durch Nutzer als Spam Verteiler missbraucht werden.
 Als Administrator der Friendica-Instanz kannst du diese Einstellungen ansonsten nur direkt in der Datenbank vornehmen.
 Bevor du das tust solltest du sicherstellen, dass du ein Backup der Datenbank hast und genau weißt was die Änderungen an der Datenbank bewirken, die du vornehmen willst.
 
+#### Explizite Inhalte
+
+Wenn Sie einen Knoten mit explizitem, nicht jugendfreien Inhalt betreiben, können Sie dies mit dieser Option ankündigen.
+Ist diese Option aktiviert, wird ein Informationsflag in den veröffentlichten Informationen zu Ihrem Knoten gesetzt.
+(Sollte *Server Informationen veröffentlichen* aktiviert sein.)
+
+Zusätzlich wird auf der Registrierungsseite für neue Benutzer ein Hinweis angezeigt.
+
 ### Erweitert
 
 #### Proxy Einstellungen
