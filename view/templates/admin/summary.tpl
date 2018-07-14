@@ -11,7 +11,7 @@
 
 	<dl>
 		<dt>{{$queues.label}}</dt>
-		<dd><a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a> - {{$queues.workerq}}</dd>
+		<dd><a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a> - <a href="{{$baseurl}}/admin/workerqueue">{{$queues.workerq}}</a></dd>
 	</dl>
 	<dl>
 		<dt>{{$pending.0}}</dt>
