@@ -803,7 +803,12 @@ class Item extends BaseObject
 			}
 
 			if (!empty($item['iaid']) || (!empty($content_fields['verb']) && (self::activityToIndex($content_fields['verb']) >= 0))) {
-				self::updateActivity($content_fields, ['uri-hash' => $item['uri-hash']]);
+				if (!empty($item['iaid'])) {
+					$update_condition = ['id' => $item['iaid']];
+				} else {
+					$update_condition = ['uri' => $item['uri']];
+				}
+				self::updateActivity($content_fields, $update_condition);
 
 				if (empty($item['iaid'])) {
 					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
@@ -830,7 +835,12 @@ class Item extends BaseObject
 					}
 				}
 			} else {
-				self::updateContent($content_fields, ['uri-plink-hash' => $item['uri-hash']]);
+				if (!empty($item['icid'])) {
+					$update_condition = ['id' => $item['icid']];
+				} else {
+					$update_condition = ['uri' => $item['uri']];
+				}
+				self::updateContent($content_fields, $update_condition);
 
 				if (empty($item['icid'])) {
 					$item_content = dba::selectFirst('item-content', [], ['uri-plink-hash' => $item['uri-hash']]);
@@ -1771,7 +1781,8 @@ class Item extends BaseObject
 			return false;
 		}
 
-		$fields = ['activity' => $activity_index, 'uri-hash' => $item['uri-hash']];
+		$fields = ['uri' => $item['uri'], 'activity' => $activity_index,
+			'uri-hash' => $item['uri-hash']];
 
 		// We just remove everything that is content
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
@@ -1781,20 +1792,23 @@ class Item extends BaseObject
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_activity');
 		if (!$locked) {
-			logger("Couldn't acquire lock for " . $item['uri-hash'] . " - proceeding anyway.");
+			logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
-		$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
+		$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
+		if (!DBM::is_result($item_activity)) {
+			$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
+		}
 		if (DBM::is_result($item_activity)) {
 			$item['iaid'] = $item_activity['id'];
-			logger('Fetched activity for ' . $item['uri-hash'] . ' (' . $item['iaid'] . ')');
+			logger('Fetched activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
 		} elseif (dba::insert('item-activity', $fields)) {
 			$item['iaid'] = dba::lastInsertId();
-			logger('Inserted activity for ' . $item['uri-hash'] . ' (' . $item['iaid'] . ')');
+			logger('Inserted activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
 		} else {
 			// This shouldn't happen.
-			logger('Could not insert activity for ' . $item['uri-hash'] . ' - should not happen');
+			logger('Could not insert activity for URI ' . $item['uri'] . ' - should not happen');
 			return false;
 		}
 		if ($locked) {
@@ -1810,7 +1824,7 @@ class Item extends BaseObject
 	 */
 	private static function insertContent(&$item)
 	{
-		$fields = ['uri-plink-hash' => $item['uri-hash']];
+		$fields = ['uri' => $item['uri'], 'uri-plink-hash' => $item['uri-hash']];
 
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			if (isset($item[$field])) {
@@ -1822,20 +1836,23 @@ class Item extends BaseObject
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_content');
 		if (!$locked) {
-			logger("Couldn't acquire lock for " . $item['uri-hash'] . " - proceeding anyway.");
+			logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
-		$item_content = dba::selectFirst('item-content', ['id'], ['uri-plink-hash' => $item['uri-hash']]);
+		$item_content = dba::selectFirst('item-content', ['id'], ['uri' => $item['uri']]);
+		if (!DBM::is_result($item_content)) {
+			$item_content = dba::selectFirst('item-content', ['id'], ['uri-plink-hash' => $item['uri-hash']]);
+		}
 		if (DBM::is_result($item_content)) {
 			$item['icid'] = $item_content['id'];
-			logger('Fetched content for ' . $item['uri-hash'] . ' (' . $item['icid'] . ')');
+			logger('Fetched content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
 		} elseif (dba::insert('item-content', $fields)) {
 			$item['icid'] = dba::lastInsertId();
-			logger('Inserted content for ' . $item['uri-hash'] . ' (' . $item['icid'] . ')');
+			logger('Inserted content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
 		} else {
 			// This shouldn't happen.
-			logger('Could not insert content for ' . $item['uri-hash'] . ' - should not happen');
+			logger('Could not insert content for URI ' . $item['uri'] . ' - should not happen');
 		}
 		if ($locked) {
 			Lock::release('item_insert_content');
@@ -1859,9 +1876,9 @@ class Item extends BaseObject
 			return false;
 		}
 
-		$fields = ['activity' => $activity_index, 'uri' => null];
+		$fields = ['activity' => $activity_index];
 
-		logger('Update activity for ' . $condition['uri-hash']);
+		logger('Update activity for ' . json_encode($condition));
 
 		dba::update('item-activity', $fields, $condition, true);
 
@@ -1889,8 +1906,6 @@ class Item extends BaseObject
 			// This is to ensure that we always store content.
 			$fields = $condition;
 		}
-
-		$fields['uri'] = null;
 
 		logger('Update content for ' . json_encode($condition));
 
