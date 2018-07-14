@@ -1797,9 +1797,6 @@ class Item extends BaseObject
 
 		// Do we already have this content?
 		$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
-		if (!DBM::is_result($item_activity)) {
-			$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
-		}
 		if (DBM::is_result($item_activity)) {
 			$item['iaid'] = $item_activity['id'];
 			logger('Fetched activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
@@ -1841,9 +1838,6 @@ class Item extends BaseObject
 
 		// Do we already have this content?
 		$item_content = dba::selectFirst('item-content', ['id'], ['uri' => $item['uri']]);
-		if (!DBM::is_result($item_content)) {
-			$item_content = dba::selectFirst('item-content', ['id'], ['uri-plink-hash' => $item['uri-hash']]);
-		}
 		if (DBM::is_result($item_content)) {
 			$item['icid'] = $item_content['id'];
 			logger('Fetched content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
@@ -1862,8 +1856,8 @@ class Item extends BaseObject
 	/**
 	 * @brief Update existing item content entries
 	 *
-	 * @param array  $item The item fields that are to be changed
-	 * @param array  $condition The condition for finding the item content entries
+	 * @param array $item The item fields that are to be changed
+	 * @param array $condition The condition for finding the item content entries
 	 */
 	private static function updateActivity($item, $condition)
 	{
