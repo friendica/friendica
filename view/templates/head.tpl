@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="view/asset/jgrowl/jquery.jgrowl.min.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="view/asset/jquery-datetimepicker/build/jquery.datetimepicker.min.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="view/asset/perfect-scrollbar/css/perfect-scrollbar.min.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="vendor/pear/text_highlighter/sample.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="vendor/scrivo/highlight.php/styles/idea.css" type="text/css" media="screen" />
 
 <link rel="stylesheet" type="text/css" href="{{$stylesheet}}" media="all" />
 

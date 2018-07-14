@@ -11,6 +11,8 @@ use Friendica\Model\Contact;
 use Michelf\MarkdownExtra;
 use Friendica\Content\Text\HTML;
 
+require_once 'include/text.php';
+
 /**
  * Friendica-specific usage of Markdown
  *
@@ -32,6 +34,14 @@ class Markdown extends BaseObject
 
 		$MarkdownParser = new MarkdownExtra();
 		$MarkdownParser->hard_wrap = $hardwrap;
+		$MarkdownParser->code_block_content_func = function ($string, $type) {
+			if ($type) {
+				return text_highlight($string, $type);
+			} else {
+				return $string;
+			}
+		};
+
 		$html = $MarkdownParser->transform($text);
 
 		self::getApp()->save_timestamp($stamp1, "parser");
