@@ -82,6 +82,18 @@ function babel_content()
 					'title' => L10n::t('Markdown::toBBCode'),
 					'content' => '<pre>' . $bbcode . '</pre>'
 				];
+
+				$html = Text\Markdown::convert($markdown, false);
+				$results[] = [
+					'title' => L10n::t('Markdown::convert'),
+					'content' => $html
+				];
+
+				$results[] = [
+					'title' => L10n::t('Markdown::convert (Raw HTML)'),
+					'content' => '<pre>' . htmlspecialchars($html) . '</pre>'
+				];
+
 				break;
 			case 'html' :
 				$html = trim($_REQUEST['text']);
