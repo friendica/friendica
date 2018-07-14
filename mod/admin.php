@@ -189,8 +189,8 @@ function admin_content(App $a)
 			'tos'          => ["admin/tos/"         , L10n::t("Terms of Service")     , "tos"] ]],
 		'database' => [ L10n::t('Database'), [
 			'dbsync'       => ["admin/dbsync/"      , L10n::t('DB updates')           , "dbsync"],
-			'queue'        => ["admin/queue/"       , L10n::t('Inspect Queue')        , "queue"], ]],
-			'workerqueue'        => ["admin/workerqueue/"       , L10n::t('Inspect worker Queue')        , "workerqueue"],
+			'queue'        => ["admin/queue/"       , L10n::t('Inspect Queue')        , "queue"],
+			'workerqueue'  => ["admin/workerqueue/" , L10n::t('Inspect worker Queue') , "workerqueue"] ]],
 		'tools' => [ L10n::t('Tools'), [
 			'contactblock' => ["admin/contactblock/", L10n::t('Contact Blocklist')    , "contactblock"],
 			'blocklist'    => ["admin/blocklist/"   , L10n::t('Server Blocklist')     , "blocklist"],
