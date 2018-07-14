@@ -41,15 +41,19 @@ class Expire {
 
 			// Normally we shouldn't have orphaned data at all.
 			// If we do have some, then we have to check why.
+
+			// Currently disabled to be able to detect some problem
+			/*
 			logger('Deleting orphaned item activities - start', LOGGER_DEBUG);
-			$condition = ["NOT EXISTS (SELECT `iaid` FROM `item` WHERE `item`.`uri` = `item-activity`.`uri`)"];
+			$condition = ["NOT EXISTS (SELECT `iaid` FROM `item` WHERE `item`.`uri-hash` = `item-activity`.`uri-hash`)"];
 			dba::delete('item-activity', $condition);
 			logger('Orphaned item activities deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
 
 			logger('Deleting orphaned item content - start', LOGGER_DEBUG);
-			$condition = ["NOT EXISTS (SELECT `icid` FROM `item` WHERE `item`.`uri` = `item-content`.`uri`)"];
+			$condition = ["NOT EXISTS (SELECT `icid` FROM `item` WHERE `item`.`uri-hash` = `item-content`.`uri-plink-hash`)"];
 			dba::delete('item-content', $condition);
 			logger('Orphaned item content deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
+			*/
 
 			// make this optional as it could have a performance impact on large sites
 			if (intval(Config::get('system', 'optimize_items'))) {
