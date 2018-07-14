@@ -779,11 +779,9 @@ function admin_page_queue(App $a)
  */
 function admin_page_workerqueue(App $a)
 {
-	// get content from the queue table
-	$r = q("SELECT `q`.`id`,`q`.`parameter`, `q`.`created`, `q`.`priority`
-			FROM `workerqueue` AS `q`
-                        WHERE (`q`.`done` = 0)
-			ORDER BY `q`.`priority`;");
+	// get jobs from the workerqueue table
+	$statement = dba::select('workerqueue', ['id', 'parameter', 'created', 'priority'], ['done' => 0], ['order'=> ['priority']]);
+	$r = dba::inArray($statement);
 
 	$t = get_markup_template('admin/workerqueue.tpl');
 	return replace_macros($t, [
