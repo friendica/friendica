@@ -14,7 +14,7 @@
 		{{* The work queues short statistic. *}}
 		<div id="admin-summary-queues" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$queues.label}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry"><a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a> - {{$queues.workerq}}</div>
+			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry"><a href="{{$baseurl}}/admin/queue">{{$queues.queue}}</a> - <a href="{{$baseurl}}/admin/workerqueue">{{$queues.workerq}}</a></div>
 		</div>
 
 		{{* Number of pending registrations. *}}
