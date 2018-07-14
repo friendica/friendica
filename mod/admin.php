@@ -782,6 +782,7 @@ function admin_page_workerqueue(App $a)
 	// get content from the queue table
 	$r = q("SELECT `q`.`id`,`q`.`parameter`, `q`.`created`, `q`.`priority`
 			FROM `workerqueue` AS `q`
+                        WHERE (`q`.`done` = 0)
 			ORDER BY `q`.`priority`;");
 
 	$t = get_markup_template('admin/workerqueue.tpl');
