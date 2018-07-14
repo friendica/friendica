@@ -811,7 +811,7 @@ class Item extends BaseObject
 				self::updateActivity($content_fields, $update_condition);
 
 				if (empty($item['iaid'])) {
-					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
+					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
 					if (DBM::is_result($item_activity)) {
 						$item_fields = ['iaid' => $item_activity['id'], 'icid' => null];
 						foreach (self::MIXED_CONTENT_FIELDLIST as $field) {
@@ -843,7 +843,7 @@ class Item extends BaseObject
 				self::updateContent($content_fields, $update_condition);
 
 				if (empty($item['icid'])) {
-					$item_content = dba::selectFirst('item-content', [], ['uri-plink-hash' => $item['uri-hash']]);
+					$item_content = dba::selectFirst('item-content', [], ['uri' => $item['uri']]);
 					if (DBM::is_result($item_content)) {
 						$item_fields = ['icid' => $item_content['id']];
 						// Clear all fields in the item table that have a content in the item-content table
