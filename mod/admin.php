@@ -190,6 +190,7 @@ function admin_content(App $a)
 		'database' => [ L10n::t('Database'), [
 			'dbsync'       => ["admin/dbsync/"      , L10n::t('DB updates')           , "dbsync"],
 			'queue'        => ["admin/queue/"       , L10n::t('Inspect Queue')        , "queue"], ]],
+			'workerqueue'        => ["admin/workerqueue/"       , L10n::t('Inspect worker Queue')        , "workerqueue"], ]],
 		'tools' => [ L10n::t('Tools'), [
 			'contactblock' => ["admin/contactblock/", L10n::t('Contact Blocklist')    , "contactblock"],
 			'blocklist'    => ["admin/blocklist/"   , L10n::t('Server Blocklist')     , "blocklist"],
@@ -257,6 +258,9 @@ function admin_content(App $a)
 				break;
 			case 'queue':
 				$o = admin_page_queue($a);
+				break;
+			case 'workerqueue':
+				$o = admin_page_workerqueue($a);
 				break;
 			case 'federation':
 				$o = admin_page_federation($a);
@@ -758,6 +762,38 @@ function admin_page_queue(App $a)
 		'$created_header' => L10n::t('Created'),
 		'$last_header' => L10n::t('Last Tried'),
 		'$info' => L10n::t('This page lists the content of the queue for outgoing postings. These are postings the initial delivery failed for. They will be resend later and eventually deleted if the delivery fails permanently.'),
+		'$entries' => $r,
+	]);
+}
+
+/**
+ * @brief Admin Inspect Worker Queue Page
+ *
+ * Generates a page for the admin to have a look into the current queue of
+ * worker jobs. Shown are the parameters for the job and its priority.
+ *
+ * The returned string holds the content of the page.
+ *
+ * @param App $a
+ * @return string
+ */
+function admin_page_workerqueue(App $a)
+{
+	// get content from the queue table
+	$r = q("SELECT `q`.`id`,`q`.`parameter`, `q`.`created`, `q`.`priority`
+			FROM `workerqueue` AS `q`
+			ORDER BY `q`.`priority`;");
+
+	$t = get_markup_template('admin/workerqueue.tpl');
+	return replace_macros($t, [
+		'$title' => L10n::t('Administration'),
+		'$page' => L10n::t('Inspect Worker Queue'),
+		'$count' => count($r),
+		'$id_header' => L10n::t('ID'),
+		'$param_header' => L10n::t('Job Parameters'),
+		'$created_header' => L10n::t('Created'),
+		'$prio_header' => L10n::t('Priority'),
+		'$info' => L10n::t('This page lists the currently queued worker jobs. These jobs are handled by the worker cronjob you\'ve set up during install.'),
 		'$entries' => $r,
 	]);
 }
