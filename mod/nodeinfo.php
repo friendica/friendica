@@ -142,7 +142,7 @@ function nodeinfo_init(App $a) {
 			$nodeinfo['metadata']['services']['inbound'][] = 'twitter';
 		}
 
-		$nodeinfo['metadata']['explicitContent'] = Config::get('system', 'explicit_content', False) == True;
+		$nodeinfo['metadata']['explicitContent'] = Config::get('system', 'explicit_content', false) == true;
 	}
 
 	header('Content-type: application/json; charset=utf-8');

@@ -293,7 +293,7 @@ function register_content(App $a)
 		'$privstatement' => $tos->privacy_complete,
 		'$baseurl'   => System::baseurl(),
 		'$form_security_token' => get_form_security_token("register"),
-		'$explicit_content' => Config::get('system', 'explicit_content', False),
+		'$explicit_content' => Config::get('system', 'explicit_content', false),
 		'$explicit_content_note' => L10n::t('Note: This node explicitly contains adult content')
 	]);
 	return $o;
