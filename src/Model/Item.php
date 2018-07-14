@@ -798,20 +798,20 @@ class Item extends BaseObject
 				}
 
 				dba::update('item', ['uri-hash' => $item['uri-hash']], ['id' => $item['id']]);
-				dba::update('item-activity', ['uri-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
-				dba::update('item-content', ['uri-plink-hash' => $item['uri-hash']], ['uri' => $item['uri']]);
+				dba::update('item-activity', ['uri-hash' => $item['uri-hash']], ["`uri` = ? AND `uri-hash` = ''", $item['uri']]);
+				dba::update('item-content', ['uri-plink-hash' => $item['uri-hash']], ["`uri` = ? AND `uri-plink-hash` = ''", $item['uri']]);
 			}
 
 			if (!empty($item['iaid']) || (!empty($content_fields['verb']) && (self::activityToIndex($content_fields['verb']) >= 0))) {
 				if (!empty($item['iaid'])) {
 					$update_condition = ['id' => $item['iaid']];
 				} else {
-					$update_condition = ['uri' => $item['uri']];
+					$update_condition = ['uri-hash' => $item['uri-hash']];
 				}
 				self::updateActivity($content_fields, $update_condition);
 
 				if (empty($item['iaid'])) {
-					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
+					$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
 					if (DBM::is_result($item_activity)) {
 						$item_fields = ['iaid' => $item_activity['id'], 'icid' => null];
 						foreach (self::MIXED_CONTENT_FIELDLIST as $field) {
@@ -838,12 +838,12 @@ class Item extends BaseObject
 				if (!empty($item['icid'])) {
 					$update_condition = ['id' => $item['icid']];
 				} else {
-					$update_condition = ['uri' => $item['uri']];
+					$update_condition = ['uri-plink-hash' => $item['uri-hash']];
 				}
 				self::updateContent($content_fields, $update_condition);
 
 				if (empty($item['icid'])) {
-					$item_content = dba::selectFirst('item-content', [], ['uri' => $item['uri']]);
+					$item_content = dba::selectFirst('item-content', [], ['uri-plink-hash' => $item['uri-hash']]);
 					if (DBM::is_result($item_content)) {
 						$item_fields = ['icid' => $item_content['id']];
 						// Clear all fields in the item table that have a content in the item-content table
@@ -1796,7 +1796,7 @@ class Item extends BaseObject
 		}
 
 		// Do we already have this content?
-		$item_activity = dba::selectFirst('item-activity', ['id'], ['uri' => $item['uri']]);
+		$item_activity = dba::selectFirst('item-activity', ['id'], ['uri-hash' => $item['uri-hash']]);
 		if (DBM::is_result($item_activity)) {
 			$item['iaid'] = $item_activity['id'];
 			logger('Fetched activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
@@ -1837,7 +1837,7 @@ class Item extends BaseObject
 		}
 
 		// Do we already have this content?
-		$item_content = dba::selectFirst('item-content', ['id'], ['uri' => $item['uri']]);
+		$item_content = dba::selectFirst('item-content', ['id'], ['uri-plink-hash' => $item['uri-hash']]);
 		if (DBM::is_result($item_content)) {
 			$item['icid'] = $item_content['id'];
 			logger('Fetched content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
