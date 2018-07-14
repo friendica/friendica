@@ -141,6 +141,8 @@ function nodeinfo_init(App $a) {
 		if (Addon::isEnabled('twitter')) {
 			$nodeinfo['metadata']['services']['inbound'][] = 'twitter';
 		}
+
+		$nodeinfo['metadata']['explicitContent'] = Config::get('system', 'explicit_content', False);;
 	}
 
 	header('Content-type: application/json; charset=utf-8');
