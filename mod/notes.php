@@ -68,13 +68,13 @@ function notes_content(App $a, $update = false)
 
 	$params = ['order' => ['created' => true],
 		'limit' => [$a->pager['start'], $a->pager['itemspage']]];
-	$r = Item::selectForUser(local_user(), ['item_id'], $condition, $params);
+	$r = Item::selectForUser(local_user(), ['id'], $condition, $params);
 
 	if (DBM::is_result($r)) {
 		$parents_arr = [];
 
 		while ($rr = Item::fetch($r)) {
-			$parents_arr[] = $rr['item_id'];
+			$parents_arr[] = $rr['id'];
 		}
 		dba::close($r);
 
