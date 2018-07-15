@@ -1,6 +1,6 @@
 <?php
 
-namespace Friendica\Test\src\Core\Lock;
+namespace Friendica\Test\src\Model;
 
 use dba;
 use Friendica\App;
