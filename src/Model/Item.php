@@ -581,11 +581,11 @@ class Item extends BaseObject
 			$joins .= sprintf("STRAIGHT_JOIN `contact` ON `contact`.`id` = $master_table.`contact-id`
 				AND NOT `contact`.`blocked`
 				AND ((NOT `contact`.`readonly` AND NOT `contact`.`pending` AND (`contact`.`rel` IN (%s, %s)))
-				OR `contact`.`self` OR (`item`.`id` != `item`.`parent`) OR `contact`.`uid` = 0)
+				OR `contact`.`self` OR `item`.`gravity` != %d OR `contact`.`uid` = 0)
 				STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = $master_table.`author-id` AND NOT `author`.`blocked`
 				STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = $master_table.`owner-id` AND NOT `owner`.`blocked`
 				LEFT JOIN `user-item` ON `user-item`.`iid` = $master_table_key AND `user-item`.`uid` = %d",
-				CONTACT_IS_SHARING, CONTACT_IS_FRIEND, intval($uid));
+				CONTACT_IS_SHARING, CONTACT_IS_FRIEND, GRAVITY_PARENT, intval($uid));
 		} else {
 			if (strpos($sql_commands, "`contact`.") !== false) {
 				$joins .= "LEFT JOIN `contact` ON `contact`.`id` = $master_table.`contact-id`";
