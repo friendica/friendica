@@ -212,7 +212,10 @@ EOT;
 	 */
 	public static function processID($prefix)
 	{
-		return uniqid($prefix . ':' . str_pad(getmypid() . ':', 8, '0') . ':');
+		// We aren't calling any other function here.
+		// Doing so could easily create an endless loop
+		$trailer = $prefix . ':' . getmypid() . ':';
+		return substr($trailer . uniqid('') . mt_rand(), 0, 26);
 	}
 
 	/// @todo Move the following functions from boot.php

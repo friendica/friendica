@@ -67,8 +67,11 @@ function parse_url_content(App $a) {
 		$hdrs = [];
 		$h = explode("\n", $result["header"]);
 		foreach ($h as $l) {
-			list($k,$v) = array_map("trim", explode(":", trim($l), 2));
-			$hdrs[$k] = $v;
+			$header = array_map("trim", explode(":", trim($l), 2));
+			if (count($header) == 2) {
+				list($k,$v) = $header;
+				$hdrs[$k] = $v;
+			}
 		}
 		if (array_key_exists("Content-Type", $hdrs)) {
 			$type = $hdrs["Content-Type"];
