@@ -36,6 +36,7 @@ class CronJobs
 		// Call possible post update functions
 		// see src/Database/PostUpdate.php for more details
 		if ($command == 'post_update') {
+// Post updates will be reenabled (hopefully in a few days) when most item works are done
 //			PostUpdate::update();
 			return;
 		}

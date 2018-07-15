@@ -1004,7 +1004,7 @@ class PortableContact
 		// Quit if there is a timeout.
 		// But we want to make sure to only quit if we are mostly sure that this server url fits.
 		if (DBM::is_result($gserver) && ($orig_server_url == $server_url) &&
-			($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+			(!$serverret["success"] && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT))) {
 			logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
 			dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 			return false;
@@ -1019,7 +1019,7 @@ class PortableContact
 			$serverret = Network::curl($server_url."/.well-known/host-meta", false, $redirects, ['timeout' => 20]);
 
 			// Quit if there is a timeout
-			if ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			if (!$serverret["success"] && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
 				dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 				return false;
@@ -1332,7 +1332,9 @@ class PortableContact
 						$noscrape = $data->no_scrape_url;
 					}
 					$version = $data->version;
-					$site_name = $data->site_name;
+					if (!empty($data->site_name)) {
+						$site_name = $data->site_name;
+					}
 					$info = $data->info;
 					$register_policy = constant($data->register_policy);
 					$platform = $data->platform;
