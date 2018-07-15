@@ -57,9 +57,9 @@ function notes_content(App $a, $update = false)
 		$o .= status_editor($a, $x, $a->contact['id']);
 	}
 
-	$condition = ["`uid` = ? AND `type` = 'note' AND `id` = `parent` AND NOT `wall`
+	$condition = ["`uid` = ? AND `type` = 'note' AND `gravity` = ? AND NOT `wall`
 		AND `allow_cid` = ? AND `contact-id` = ?",
-		local_user(), '<' . $a->contact['id'] . '>', $a->contact['id']];
+		local_user(), GRAVITY_PARENT, '<' . $a->contact['id'] . '>', $a->contact['id']];
 
 	$notes = dba::count('item', $condition);
 
