@@ -15,7 +15,7 @@ function filer_content(App $a)
 		killme();
 	}
 
-	$term = unxmlify(trim($_GET['term']));
+	$term = unxmlify(isset($_GET['term']) ? trim($_GET['term']) : null);
 	$item_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 
 	logger('filer: tag ' . $term . ' item ' . $item_id);
