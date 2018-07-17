@@ -20,6 +20,7 @@ use DOMNode;
 use DOMText;
 use DOMXPath;
 use Exception;
+use stdClass;
 
 require_once 'include/dba.php';
 require_once 'mod/proxy.php';
@@ -163,11 +164,12 @@ class OEmbed
 		return $j;
 	}
 
-	private static function formatObject($j)
+	private static function formatObject(stdClass $j)
 	{
 		$embedurl = $j->embedurl;
 		$jhtml = $j->html;
 		$ret = '<div class="oembed ' . $j->type . '">';
+
 		switch ($j->type) {
 			case "video":
 				if (isset($j->thumbnail_url)) {
@@ -326,7 +328,7 @@ class OEmbed
 
 		$o = self::fetchURL($url, !self::isAllowedURL($url));
 
-		if (!is_object($o) || $o->type == 'error') {
+		if (!is_object($o) || !property_exists($o, 'type') || $o->type == 'error') {
 			throw new Exception('OEmbed failed for URL: ' . $url);
 		}
 
