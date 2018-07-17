@@ -224,7 +224,7 @@ class NotificationsManager extends BaseObject
 	 * 	string 'ago' => T relative date of the notification
 	 * 	bool 'seen' => Is the notification marked as "seen"
 	 */
-	private function formatNotifs($notifs, $ident = "")
+	private function formatNotifs(array $notifs, $ident = "")
 	{
 		$notif = [];
 		$arr = [];
