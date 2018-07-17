@@ -181,6 +181,7 @@ function item_post(App $a) {
 	}
 
 	$categories = '';
+	$postopts = '';
 
 	if (is_array($orig_post)) {
 		$str_group_allow   = $orig_post['allow_gid'];
