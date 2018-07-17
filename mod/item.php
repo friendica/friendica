@@ -158,29 +158,31 @@ function item_post(App $a) {
 	// Now check that valid personal details have been provided
 	if (!can_write_wall($profile_uid) && !$allow_comment) {
 		notice(L10n::t('Permission denied.') . EOL) ;
+
 		if (x($_REQUEST, 'return')) {
 			goaway($return_path);
 		}
+
 		killme();
 	}
 
-
-	// is this an edited post?
-
+	// Init post instance
 	$orig_post = null;
 
-	if ($post_id) {
+	// is this an edited post?
+	if ($post_id > 0) {
 		$orig_post = Item::selectFirst(Item::ITEM_FIELDLIST, ['id' => $post_id]);
 	}
 
 	$user = dba::selectFirst('user', [], ['uid' => $profile_uid]);
+
 	if (!DBM::is_result($user) && !$parent) {
 		return;
 	}
 
 	$categories = '';
 
-	if ($orig_post) {
+	if (is_array($orig_post)) {
 		$str_group_allow   = $orig_post['allow_gid'];
 		$str_contact_allow = $orig_post['allow_cid'];
 		$str_group_deny    = $orig_post['deny_gid'];
