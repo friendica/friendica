@@ -183,7 +183,7 @@ function item_post(App $a) {
 	$categories = '';
 	$postopts = '';
 
-	if (is_array($orig_post)) {
+	if (!empty($orig_post)) {
 		$str_group_allow   = $orig_post['allow_gid'];
 		$str_contact_allow = $orig_post['allow_cid'];
 		$str_group_deny    = $orig_post['deny_gid'];
