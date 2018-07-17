@@ -20,6 +20,7 @@ use Friendica\Model\Item;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
+use Friendica\Model\Process;
 
 require_once 'mod/proxy.php';
 require_once 'include/enotify.php';
@@ -124,7 +125,7 @@ function ping_init(App $a)
 				header("Content-type: text/xml");
 				echo XML::fromArray($data, $xml);
 			}
-			killme();
+			Process::stop();
 		}
 
 		$notifs = ping_get_notifications(local_user());

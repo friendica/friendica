@@ -124,7 +124,7 @@ if ((x($_GET,'zrl')) && $a->mode == App::MODE_NORMAL) {
 			logger("Invalid ZRL parameter " . $_GET['zrl'], LOGGER_DEBUG);
 			header('HTTP/1.1 403 Forbidden');
 			echo "<h1>403 Forbidden</h1>";
-			killme();
+			Process::stop();
 		}
 	}
 }
@@ -204,7 +204,7 @@ if ((local_user()) || (! $privateapps === "1")) {
  * "module"_content - the string return of this function contains our page body
  *
  * Modules which emit other serialisations besides HTML (XML,JSON, etc.) should do
- * so within the module init and/or post functions and then invoke killme() to terminate
+ * so within the module init and/or post functions and then execute Process::Stop() to terminate
  * further processing.
  */
 if (strlen($a->module)) {
@@ -295,7 +295,7 @@ if (strlen($a->module)) {
 	if (! $a->module_loaded) {
 		// Stupid browser tried to pre-fetch our Javascript img template. Don't log the event or return anything - just quietly exit.
 		if ((x($_SERVER, 'QUERY_STRING')) && preg_match('/{[0-9]}/', $_SERVER['QUERY_STRING']) !== 0) {
-			killme();
+			Process::stop();
 		}
 
 		if ((x($_SERVER, 'QUERY_STRING')) && ($_SERVER['QUERY_STRING'] === 'q=internal_error.html') && isset($dreamhost_error_hack)) {
@@ -501,7 +501,7 @@ if (isset($_GET["mode"]) && ($_GET["mode"] == "raw")) {
 
 	echo substr($target->saveHTML(), 6, -8);
 
-	killme();
+	Process::stop();
 }
 
 $page    = $a->page;
@@ -540,4 +540,4 @@ if (empty($template)) {
 /// @TODO Looks unsafe (remote-inclusion), is maybe not but Theme::getPathForFile() uses file_exists() but does not escape anything
 require_once $template;
 
-killme();
+Process::stop();

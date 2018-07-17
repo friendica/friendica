@@ -10,6 +10,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\Temporal;
+use Friendica\Model\Process;
 
 $install_wizard_pass = 1;
 
@@ -18,7 +19,7 @@ function install_init(App $a) {
 	// $baseurl/install/testrwrite to test if rewite in .htaccess is working
 	if ($a->argc == 2 && $a->argv[1] == "testrewrite") {
 		echo "ok";
-		killme();
+		Process::stop();
 	}
 
 	// We overwrite current theme css, because during install we could not have a working mod_rewrite

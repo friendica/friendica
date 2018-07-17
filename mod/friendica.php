@@ -9,6 +9,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBM;
+use Friendica\Model\Process;
 
 function friendica_init(App $a)
 {
@@ -67,7 +68,7 @@ function friendica_init(App $a)
 		];
 
 		echo json_encode($data);
-		killme();
+		Process::stop();
 	}
 }
 

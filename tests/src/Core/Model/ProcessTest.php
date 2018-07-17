@@ -56,13 +56,13 @@ class ProcessTest extends DatabaseTest
 		$id = Process::getID();
 		$this->assertInternalType('int', $id);
 
-		$this->assertProcessCode(Process::getCode(), Process::PROC_APP, getmypid(), Process::getID());
+		$this->assertProcessCode(Process::toString(), Process::PROC_APP, getmypid(), Process::getID());
 
 		Process::updatePID(123);
-		$this->assertProcessCode(Process::getCode(), Process::PROC_APP, 123, Process::getID());
+		$this->assertProcessCode(Process::toString(), Process::PROC_APP, 123, Process::getID());
 
 		Process::updatePID(getmypid());
-		$this->assertProcessCode(Process::getCode(), Process::PROC_APP, getmypid(), Process::getID());
+		$this->assertProcessCode(Process::toString(), Process::PROC_APP, getmypid(), Process::getID());
 	}
 
 	public function testProcess() {
@@ -72,7 +72,7 @@ class ProcessTest extends DatabaseTest
 		$id = Process::getID();
 		$this->assertInternalType('int', $id);
 
-		$this->assertProcessCode(Process::getCode(), Process::PROC_APP, getmypid(), Process::getID());
+		$this->assertProcessCode(Process::toString(), Process::PROC_APP, getmypid(), Process::getID());
 
 		$this->assertTrue(Process::isRunning());
 		$this->assertTrue(Process::isRunning($id));
@@ -97,7 +97,7 @@ class ProcessTest extends DatabaseTest
 		$childCommand = "bin/worker.php";
 		Process::startChild($childCommand);
 
-		$this->assertProcessCode(Process::getCode(), Process::PROC_DAEMON, getmypid(), Process::getID());
+		$this->assertProcessCode(Process::toString(), Process::PROC_DAEMON, getmypid(), Process::getID());
 
 		return Process::getID();
 	}
@@ -117,6 +117,6 @@ class ProcessTest extends DatabaseTest
 
 		$this->assertEquals($ret['id'], Process::getID());
 
-		$this->assertProcessCode(Process::getCode(), Process::PROC_WORKER, getmypid(), Process::getID());
+		$this->assertProcessCode(Process::toString(), Process::PROC_WORKER, getmypid(), Process::getID());
 	}
 }
