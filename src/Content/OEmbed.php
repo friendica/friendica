@@ -328,7 +328,7 @@ class OEmbed
 
 		$o = self::fetchURL($url, !self::isAllowedURL($url));
 
-		if (!is_object($o) || !property_exists($o, 'type') || $o->type == 'error') {
+		if (!is_object($o) || property_exists($o, 'type') && $o->type == 'error') {
 			throw new Exception('OEmbed failed for URL: ' . $url);
 		}
 
