@@ -18,11 +18,7 @@ class RedisCacheDriverTest extends MemoryCacheTest
 
 	protected function getInstance()
 	{
-		try {
-			$this->cache = CacheDriverFactory::create('redis');
-		} catch (\Exception $exception) {
-			throw new \Exception("Redis - TestCase failed: " . $exception->getMessage(), $exception->getCode(), $exception);
-		}
+		$this->cache = CacheDriverFactory::create('redis');
 		return $this->cache;
 	}
 

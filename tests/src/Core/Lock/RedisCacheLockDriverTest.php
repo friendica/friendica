@@ -19,12 +19,7 @@ class RedisCacheLockDriverTest extends LockTest
 
 	protected function getInstance()
 	{
-		try {
-			$this->cache = CacheDriverFactory::create('redis');
-		} catch (\Exception $exception) {
-			print "Redis - TestCase failed: " . $exception->getMessage();
-			throw new \Exception();
-		}
+		$this->cache = CacheDriverFactory::create('redis');
 		return new CacheLockDriver($this->cache);
 
 	}

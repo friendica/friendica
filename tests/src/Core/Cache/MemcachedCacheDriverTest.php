@@ -18,14 +18,8 @@ class MemcachedCacheDriverTest extends MemoryCacheTest
 
 	protected function getInstance()
 	{
-
-		try {
-			$this->cache = CacheDriverFactory::create('memcached');
-		} catch (\Exception $exception) {
-			throw new \Exception("Memcached - TestCase failed: " . $exception->getMessage(), $exception->getCode(), $exception);
-		}
+		$this->cache = CacheDriverFactory::create('memcached');
 		return $this->cache;
-
 	}
 
 	public function tearDown()
