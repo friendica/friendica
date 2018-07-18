@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1277
+-- DB_UPDATE_VERSION 1278
 -- ------------------------------------------
 
 
@@ -471,9 +471,9 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`icid` int unsigned COMMENT 'Id of the item-content table entry that contains the whole item content',
 	`iaid` int unsigned COMMENT 'Id of the item-activity table entry that contains the activity data',
 	`extid` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`post-type` tinyint unsigned NOT NULL DEFAULT 0 COMMENT 'Post type (personal note, bookmark, ...)',
 	`global` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`private` boolean NOT NULL DEFAULT '0' COMMENT 'distribution is restricted',
-	`bookmark` boolean NOT NULL DEFAULT '0' COMMENT 'item has been bookmarked',
 	`visible` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`moderated` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`deleted` boolean NOT NULL DEFAULT '0' COMMENT 'item has been deleted',
@@ -495,7 +495,8 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`resource-id` varchar(32) NOT NULL DEFAULT '' COMMENT 'Used to link other tables to items, it identifies the linked resource (e.g. photo) and if set must also set resource_type',
 	`event-id` int unsigned NOT NULL DEFAULT 0 COMMENT 'Used to link to the event.id',
 	`attach` mediumtext COMMENT 'JSON structure representing attachments to this item',
-	`type` varchar(20) NOT NULL DEFAULT '' COMMENT '',
+	`type` varchar(20) COMMENT 'Deprecated',
+	`bookmark` boolean COMMENT 'Deprecated',
 	`file` mediumtext COMMENT 'Deprecated',
 	`location` varchar(255) COMMENT 'Deprecated',
 	`coord` varchar(255) COMMENT 'Deprecated',
@@ -759,6 +760,20 @@ CREATE TABLE IF NOT EXISTS `pconfig` (
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_cat_k` (`uid`,`cat`,`k`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='personal (per user) configuration storage';
+
+--
+-- TABLE permissionset
+--
+CREATE TABLE IF NOT EXISTS `permissionset` (
+	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
+	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Owner id of this permission set',
+	`allow_cid` mediumtext COMMENT 'Access Control - list of allowed contact.id \'<19><78>\'',
+	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed groups',
+	`deny_cid` mediumtext COMMENT 'Access Control - list of denied contact.id',
+	`deny_gid` mediumtext COMMENT 'Access Control - list of denied groups',
+	 PRIMARY KEY(`id`),
+	 INDEX `uid_allow_cid_allow_gid_deny_cid_deny_gid` (`allow_cid`(50),`allow_gid`(30),`deny_cid`(50),`deny_gid`(30))
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
 
 --
 -- TABLE photo
@@ -1031,13 +1046,14 @@ CREATE TABLE IF NOT EXISTS `thread` (
 	`visible` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`starred` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`ignored` boolean NOT NULL DEFAULT '0' COMMENT '',
-	`bookmark` boolean NOT NULL DEFAULT '0' COMMENT '',
+	`post-type` tinyint unsigned NOT NULL DEFAULT 0 COMMENT 'Post type (personal note, bookmark, ...)',
 	`unseen` boolean NOT NULL DEFAULT '1' COMMENT '',
 	`deleted` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`origin` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`forum_mode` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`mention` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`network` char(4) NOT NULL DEFAULT '' COMMENT '',
+	`bookmark` boolean COMMENT '',
 	 PRIMARY KEY(`iid`),
 	 INDEX `uid_network_commented` (`uid`,`network`,`commented`),
 	 INDEX `uid_network_created` (`uid`,`network`,`created`),

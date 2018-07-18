@@ -1497,7 +1497,7 @@ class DBStructure
 						],
 				"indexes" => [
 						"PRIMARY" => ["id"],
-						"uid" => ["uid"],
+						"uid_allow_cid_allow_gid_deny_cid_deny_gid" => ["allow_cid(50)", "allow_gid(30)", "deny_cid(50)", "deny_gid(30)"],
 						]
 				];
 		$database["photo"] = [
