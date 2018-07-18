@@ -1445,7 +1445,6 @@ function photos_content(App $a)
 					$comments .= replace_macros($cmnt_tpl, [
 						'$return_path' => '',
 						'$jsreload' => $return_url,
-						'$type' => 'wall-comment',
 						'$id' => $link_item['id'],
 						'$parent' => $link_item['id'],
 						'$profile_uid' =>  $owner_uid,
@@ -1484,7 +1483,6 @@ function photos_content(App $a)
 					$comments .= replace_macros($cmnt_tpl,[
 						'$return_path' => '',
 						'$jsreload' => $return_url,
-						'$type' => 'wall-comment',
 						'$id' => $link_item['id'],
 						'$parent' => $link_item['id'],
 						'$profile_uid' =>  $owner_uid,
@@ -1545,7 +1543,6 @@ function photos_content(App $a)
 						$comments .= replace_macros($cmnt_tpl, [
 							'$return_path' => '',
 							'$jsreload' => $return_url,
-							'$type' => 'wall-comment',
 							'$id' => $item['item_id'],
 							'$parent' => $item['parent'],
 							'$profile_uid' =>  $owner_uid,

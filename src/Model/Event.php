@@ -319,7 +319,7 @@ class Event extends BaseObject
 			$item_arr['uri']           = $event['uri'];
 			$item_arr['parent-uri']    = $event['uri'];
 			$item_arr['guid']          = $event['guid'];
-			$item_arr['type']          = 'activity';
+			$item_arr['post-type']     = Item::PT_EVENT;
 			$item_arr['wall']          = $event['cid'] ? 0 : 1;
 			$item_arr['contact-id']    = $contact['id'];
 			$item_arr['owner-name']    = $contact['name'];
