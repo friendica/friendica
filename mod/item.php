@@ -182,6 +182,7 @@ function item_post(App $a) {
 
 	$categories = '';
 	$postopts = '';
+	$emailcc = '';
 
 	if (!empty($orig_post)) {
 		$str_group_allow   = $orig_post['allow_gid'];
@@ -192,7 +193,6 @@ function item_post(App $a) {
 		$coord             = $orig_post['coord'];
 		$verb              = $orig_post['verb'];
 		$objecttype        = $orig_post['object-type'];
-		$emailcc           = $orig_post['emailcc'];
 		$app               = $orig_post['app'];
 		$categories        = $orig_post['file'];
 		$title             = notags(trim($_REQUEST['title']));
@@ -210,7 +210,6 @@ function item_post(App $a) {
 		 * use the user default permissions - as they won't have
 		 * been supplied via a form.
 		 */
-		/// @TODO use x($_REQUEST, 'foo') here
 		if ($api_source
 			&& !array_key_exists('contact_allow', $_REQUEST)
 			&& !array_key_exists('group_allow', $_REQUEST)

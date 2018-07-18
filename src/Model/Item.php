@@ -72,7 +72,7 @@ class Item extends BaseObject
 			'title', 'content-warning', 'body', 'location', 'coord', 'app',
 			'rendered-hash', 'rendered-html', 'object-type', 'object', 'target-type', 'target',
 			'author-id', 'author-link', 'author-name', 'author-avatar',
-			'owner-id', 'owner-link', 'owner-name', 'owner-avatar', 'emailcc'];
+			'owner-id', 'owner-link', 'owner-name', 'owner-avatar'];
 
 	// Never reorder or remove entries from this list. Just add new ones at the end, if needed.
 	// The item-activity table only stores the index and needs this array to know the matching activity.
