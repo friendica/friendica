@@ -31,6 +31,9 @@ abstract class CacheTest extends DatabaseTest
 		Config::set('system', 'theme', 'system_theme');
 	}
 
+	/**
+	 * @small
+	 */
 	function testSimple() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -56,6 +59,9 @@ abstract class CacheTest extends DatabaseTest
 		$this->assertNull($this->instance->get('value1'));
 	}
 
+	/**
+	 * @small
+	 */
 	function testClear() {
 		$value = 'ipsum lorum';
 		$this->instance->set('1_value1', $value . '1');
@@ -90,6 +96,9 @@ abstract class CacheTest extends DatabaseTest
 		]);
 	}
 
+	/**
+	 * @medium
+	 */
 	function testTTL() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -103,6 +112,9 @@ abstract class CacheTest extends DatabaseTest
 		$this->assertNull($this->instance->get('value1'));
 	}
 
+	/**
+	 * @small
+	 */
 	function testDifferentTypesInCache() {
 		// String test
 		$value = "foobar";

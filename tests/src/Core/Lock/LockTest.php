@@ -30,12 +30,18 @@ abstract class LockTest extends DatabaseTest
 		Config::set('system', 'theme', 'system_theme');
 	}
 
+	/**
+	 * @small
+	 */
 	public function testLock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->assertTrue($this->instance->isLocked('foo'));
 		$this->assertFalse($this->instance->isLocked('bar'));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testDoubleLock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->assertTrue($this->instance->isLocked('foo'));
@@ -43,6 +49,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertTrue($this->instance->acquireLock('foo', 1));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testReleaseLock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->assertTrue($this->instance->isLocked('foo'));
@@ -50,6 +59,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertFalse($this->instance->isLocked('foo'));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testReleaseAll() {
 		$this->instance->acquireLock('foo', 1);
 		$this->instance->acquireLock('bar', 1);
@@ -66,6 +78,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertFalse($this->instance->isLocked('nice'));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testReleaseAfterUnlock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->instance->acquireLock('bar', 1);
@@ -83,6 +98,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertFalse($this->instance->isLocked('nice'));
 	}
 
+	/**
+	 * @medium
+	 */
 	function testLockTTL() {
 
 		// TODO [nupplaphil] - Because of the Datetime-Utils for the database, we have to wait a FULL second between the checks to invalidate the db-locks/cache
