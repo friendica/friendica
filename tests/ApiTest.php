@@ -69,6 +69,16 @@ class ApiTest extends DatabaseTest
 	}
 
 	/**
+	 * Cleanup variables used by tests.
+	 */
+	protected function tearDown()
+	{
+		parent::tearDown();
+		$app = get_app();
+		$app->argc = 1;
+	}
+
+	/**
 	 * Assert that an user array contains expected keys.
 	 * @param array $user User array
 	 * @return void
