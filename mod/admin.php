@@ -782,6 +782,11 @@ function admin_page_workerqueue(App $a)
 	// get jobs from the workerqueue table
 	$statement = dba::select('workerqueue', ['id', 'parameter', 'created', 'priority'], ['done' => 0], ['order'=> ['priority']]);
 	$r = dba::inArray($statement);
+        
+	for($i = 0; $i < count($r); $i++) {
+		$r[$i]["parameter"] = implode(": ", explode("\",\"", $r[$i]["parameter"]));
+		$r[$i]["parameter"] = substr($r[$i]["parameter"], 2, -4);
+ 	}
 
 	$t = get_markup_template('admin/workerqueue.tpl');
 	return replace_macros($t, [
