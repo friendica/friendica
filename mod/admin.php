@@ -784,7 +784,7 @@ function admin_page_workerqueue(App $a)
 	$r = dba::inArray($statement);
         
 	for($i = 0; $i < count($r); $i++) {
-		$r[$i]['parameter'] = implode(': ', explode('",', $r[$i]['parameter']));
+		$r[$i]['parameter'] = implode(': ', explode('","', $r[$i]['parameter']));
 		$r[$i]['parameter'] = substr($r[$i]['parameter'], 2, -4);
  	}
 
