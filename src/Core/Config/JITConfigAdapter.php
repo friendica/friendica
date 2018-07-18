@@ -96,6 +96,13 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 
 		$stored = $this->get($cat, $k, null, true);
 
+		if (!isset($this->in_db[$cat])) {
+			$this->in_db[$cat] = [];
+		}
+		if (!isset($this->in_db[$cat][$k])) {
+			$this->in_db[$cat] = false;
+		}
+
 		if (($stored === $dbvalue) && $this->in_db[$cat][$k]) {
 			return true;
 		}
