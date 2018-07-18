@@ -1202,7 +1202,8 @@ class ApiTest extends DatabaseTest
 	{
 		$_FILES = [
 			'media' => [
-				'id' => 666
+				'id' => 666,
+				'tmp_name' => 'tmp_name'
 			]
 		];
 		api_media_upload();
