@@ -171,12 +171,14 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	}
 
 	if ($login_initial) {
-		// If the user specified to remember the authentication, then set a cookie
-		// that expires after one week (the default is when the browser is closed).
-		// The cookie will be renewed automatically.
-		// The week ensures that sessions will expire after some inactivity.
+		/*
+		 * If the user specified to remember the authentication, then set a cookie
+		 * that expires after one week (the default is when the browser is closed).
+		 * The cookie will be renewed automatically.
+		 * The week ensures that sessions will expire after some inactivity.
+		 */
 		if ($_SESSION['remember']) {
-			logger('Injecting cookie for remembered user ' . $_SESSION['remember_user']['nickname']);
+			logger('Injecting cookie for remembered user ' . $a->user['nickname']);
 			new_cookie(604800, $user_record);
 			unset($_SESSION['remember']);
 		}
