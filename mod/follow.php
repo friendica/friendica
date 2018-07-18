@@ -19,7 +19,7 @@ function follow_post(App $a)
 		// NOTREACHED
 	}
 
-	if ($_REQUEST['cancel']) {
+	if (isset($_REQUEST['cancel'])) {
 		goaway($_SESSION['return_url']);
 	}
 
@@ -166,10 +166,13 @@ function follow_content(App $a)
 		'$url_label'     => L10n::t('Profile URL'),
 		'$myaddr'        => $myaddr,
 		'$request'       => $request,
-		/*'$location'      => Friendica\Content\Text\BBCode::::convert($r[0]['location']),
+		/*
+		 * @TODO commented out?
+		'$location'      => Friendica\Content\Text\BBCode::::convert($r[0]['location']),
 		'$location_label'=> L10n::t('Location:'),
 		'$about'         => Friendica\Content\Text\BBCode::::convert($r[0]['about'], false, false),
-		'$about_label'   => L10n::t('About:'),*/
+		'$about_label'   => L10n::t('About:'),
+		*/
 		'$keywords'      => $r[0]['keywords'],
 		'$keywords_label'=> L10n::t('Tags:')
 	]);
