@@ -74,8 +74,10 @@ class ApiTest extends DatabaseTest
 	protected function tearDown()
 	{
 		parent::tearDown();
+
 		$app = get_app();
 		$app->argc = 1;
+		$app->argv = ['home'];
 	}
 
 	/**
