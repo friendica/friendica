@@ -1707,7 +1707,6 @@ class Diaspora
 		$datarray["guid"] = $guid;
 		$datarray["uri"] = self::getUriFromGuid($author, $guid);
 
-		$datarray["type"] = "remote-comment";
 		$datarray["verb"] = ACTIVITY_POST;
 		$datarray["gravity"] = GRAVITY_COMMENT;
 
@@ -1996,7 +1995,6 @@ class Diaspora
 		$datarray["guid"] = $guid;
 		$datarray["uri"] = self::getUriFromGuid($author, $guid);
 
-		$datarray["type"] = "activity";
 		$datarray["verb"] = $verb;
 		$datarray["gravity"] = GRAVITY_ACTIVITY;
 		$datarray["parent-uri"] = $parent_item["uri"];

@@ -1034,7 +1034,6 @@ function api_statuses_mediap($type)
 	}
 	$user_info = api_get_user($a);
 
-	$_REQUEST['type'] = 'wall';
 	$_REQUEST['profile_uid'] = api_user();
 	$_REQUEST['api_source'] = true;
 	$txt = requestdata('status');
@@ -1123,9 +1122,7 @@ function api_statuses_update($type)
 	}
 	$_REQUEST['profile_uid'] = api_user();
 
-	if ($parent) {
-		$_REQUEST['type'] = 'net-comment';
-	} else {
+	if (!$parent) {
 		// Check for throttling (maximum posts per day, week and month)
 		$throttle_day = Config::get('system', 'throttle_limit_day');
 		if ($throttle_day > 0) {
@@ -1168,8 +1165,6 @@ function api_statuses_update($type)
 				throw new TooManyRequestsException(L10n::t("Monthly posting limit of %d post reached. The post was rejected.", "Monthly posting limit of %d posts reached. The post was rejected.", $throttle_month));
 			}
 		}
-
-		$_REQUEST['type'] = 'wall';
 	}
 
 	if (x($_FILES, 'media')) {
@@ -1991,7 +1986,6 @@ function api_statuses_repeat($type)
 		}
 		$_REQUEST['body'] = $post;
 		$_REQUEST['profile_uid'] = api_user();
-		$_REQUEST['type'] = 'wall';
 		$_REQUEST['api_source'] = true;
 
 		if (!x($_REQUEST, "source")) {

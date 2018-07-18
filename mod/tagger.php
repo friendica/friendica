@@ -119,7 +119,6 @@ EOT;
 	$arr['uri'] = $uri;
 	$arr['uid'] = $owner_uid;
 	$arr['contact-id'] = $contact['id'];
-	$arr['type'] = 'activity';
 	$arr['wall'] = $item['wall'];
 	$arr['gravity'] = GRAVITY_COMMENT;
 	$arr['parent'] = $item['id'];

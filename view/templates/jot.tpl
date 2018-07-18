@@ -1,5 +1,3 @@
-
-
 <div id="profile-jot-wrapper" >
 	<div id="profile-jot-banner-wrapper">
 		<div id="profile-jot-desc" >&nbsp;</div>
@@ -8,7 +6,8 @@
 	<div id="profile-jot-banner-end"></div>
 
 	<form id="profile-jot-form" action="{{$action}}" method="post" >
-		<input type="hidden" name="type" value="{{$ptyp}}" />
+		<input type="hidden" name="wall" value="{{$wall}}" />
+		<input type="hidden" name="post_type" value="{{$posttype}}" />
 		<input type="hidden" name="profile_uid" value="{{$profile_uid}}" />
 		<input type="hidden" name="return" value="{{$return_path|escape:'html'}}" />
 		<input type="hidden" name="location" id="jot-location" value="{{$defloc|escape:'html'}}" />
@@ -65,7 +64,7 @@
 
 
 	<div id="profile-jot-plugin-wrapper">
-  	{{$jotplugins}}
+	{{$jotplugins}}
 	</div>
 
 	<div id="profile-rotator-wrapper" style="display: {{$visitor}};" >

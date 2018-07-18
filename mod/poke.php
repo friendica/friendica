@@ -100,7 +100,6 @@ function poke_init(App $a) {
 	$arr['uid']           = $uid;
 	$arr['uri']           = $uri;
 	$arr['parent-uri']    = ($parent_uri ? $parent_uri : $uri);
-	$arr['type']          = 'activity';
 	$arr['wall']          = 1;
 	$arr['contact-id']    = $poster['id'];
 	$arr['owner-name']    = $poster['name'];

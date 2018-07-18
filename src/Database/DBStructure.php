@@ -1174,9 +1174,9 @@ class DBStructure
 						"icid" => ["type" => "int unsigned", "relation" => ["item-content" => "id"], "comment" => "Id of the item-content table entry that contains the whole item content"],
 						"iaid" => ["type" => "int unsigned", "relation" => ["item-activity" => "id"], "comment" => "Id of the item-activity table entry that contains the activity data"],
 						"extid" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+						"post-type" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => "Post type (personal note, bookmark, ...)"],
 						"global" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"private" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "distribution is restricted"],
-						"bookmark" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "item has been bookmarked"],
 						"visible" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"moderated" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"deleted" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "item has been deleted"],
@@ -1191,6 +1191,7 @@ class DBStructure
 						"mention" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "The owner of this item was mentioned in it"],
 						"forum_mode" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						// User specific fields. Should possible be replaced with something different
+						// Possibly we could move some of these fields into the thread table
 						"allow_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed contact.id '<19><78>'"],
 						"allow_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed groups"],
 						"deny_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied contact.id"],
@@ -1202,10 +1203,9 @@ class DBStructure
 						"event-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "relation" => ["event" => "id"], "comment" => "Used to link to the event.id"],
 						// Will be replaced by the "attach" table
 						"attach" => ["type" => "mediumtext", "comment" => "JSON structure representing attachments to this item"],
-						// Seems to be only used for notes, but is filled at many places.
-						// Will be replaced with some general field that contain the values of "origin" and "wall" as well.
-						"type" => ["type" => "varchar(20)", "not null" => "1", "default" => "", "comment" => ""],
 						// Deprecated fields. Will be removed in upcoming versions
+						"type" => ["type" => "varchar(20)", "comment" => "Deprecated"],
+						"bookmark" => ["type" => "boolean", "comment" => "Deprecated"],
 						"file" => ["type" => "mediumtext", "comment" => "Deprecated"],
 						"location" => ["type" => "varchar(255)", "comment" => "Deprecated"],
 						"coord" => ["type" => "varchar(255)", "comment" => "Deprecated"],
@@ -1483,6 +1483,21 @@ class DBStructure
 				"indexes" => [
 						"PRIMARY" => ["id"],
 						"uid_cat_k" => ["UNIQUE", "uid", "cat", "k"],
+						]
+				];
+		$database["permissionset"] = [
+				"comment" => "",
+				"fields" => [
+						"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
+						"uid" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "relation" => ["user" => "uid"], "comment" => "Owner id of this permission set"],
+						"allow_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed contact.id '<19><78>'"],
+						"allow_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed groups"],
+						"deny_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied contact.id"],
+						"deny_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied groups"],
+						],
+				"indexes" => [
+						"PRIMARY" => ["id"],
+						"uid" => ["uid"],
 						]
 				];
 		$database["photo"] = [
@@ -1768,13 +1783,14 @@ class DBStructure
 						"visible" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"starred" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"ignored" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
-						"bookmark" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
+						"post-type" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => "Post type (personal note, bookmark, ...)"],
 						"unseen" => ["type" => "boolean", "not null" => "1", "default" => "1", "comment" => ""],
 						"deleted" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"origin" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"forum_mode" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						"mention" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
 						"network" => ["type" => "char(4)", "not null" => "1", "default" => "", "comment" => ""],
+						"bookmark" => ["type" => "boolean", "comment" => ""],
 						],
 				"indexes" => [
 						"PRIMARY" => ["iid"],

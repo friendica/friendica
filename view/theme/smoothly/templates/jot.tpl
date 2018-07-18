@@ -1,5 +1,3 @@
-
-
 <div id="profile-jot-wrapper" >
 	<div id="profile-jot-banner-wrapper">
 		<div id="profile-jot-desc" >&nbsp;</div>
@@ -8,7 +6,8 @@
 	<div id="profile-jot-banner-end"></div>
 
 	<form id="profile-jot-form" action="{{$action}}" method="post" >
-		<input type="hidden" name="type" value="{{$ptyp}}" />
+		<input type="hidden" name="wall" value="{{$wall}}" />
+		<input type="hidden" name="post_type" value="{{$posttype}}" />
 		<input type="hidden" name="profile_uid" value="{{$profile_uid}}" />
 		<input type="hidden" name="return" value="{{$return_path}}" />
 		<input type="hidden" name="location" id="jot-location" value="{{$defloc}}" />
@@ -25,8 +24,8 @@
 		</div>
 		{{/if}}
 		<div id="jot-text-wrap">
-                	<img id="profile-jot-text-loading" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait}}" style="display: none;" /><br>
-                	<textarea rows="5" cols="80" class="profile-jot-text" id="profile-jot-text" name="body" placeholder="{{$share}}">
+			<img id="profile-jot-text-loading" src="images/rotator.gif" alt="{{$wait}}" title="{{$wait}}" style="display: none;" /><br>
+			<textarea rows="5" cols="80" class="profile-jot-text" id="profile-jot-text" name="body" placeholder="{{$share}}">
 			{{if $content}}{{$content}}{{/if}}
 			</textarea>
 		</div>
@@ -62,7 +61,7 @@
 	</div>
 
 	<div id="profile-jot-plugin-wrapper" style="display: none;">
-  	{{$jotplugins}}
+	{{$jotplugins}}
 	</div>
 	<div id="profile-jot-tools-end"></div>
 

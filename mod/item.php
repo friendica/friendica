@@ -90,6 +90,7 @@ function item_post(App $a) {
 
 	$objecttype = null;
 	$profile_uid = defaults($_REQUEST, 'profile_uid', local_user());
+	$posttype = defaults($_REQUEST, 'post_type', Item::PT_ARTICLE);
 
 	if ($thr_parent || $thr_parent_uri) {
 		if ($thr_parent) {
@@ -124,10 +125,6 @@ function item_post(App $a) {
 		$parent_contact = Contact::getDetailsByURL($parent_item["author-link"]);
 
 		$objecttype = ACTIVITY_OBJ_COMMENT;
-
-		if (!x($_REQUEST, 'type')) {
-			$_REQUEST['type'] = 'net-comment';
-		}
 	}
 
 	if ($parent) {
@@ -138,6 +135,7 @@ function item_post(App $a) {
 	$app         = strip_tags(defaults($_REQUEST, 'source', ''));
 	$extid       = strip_tags(defaults($_REQUEST, 'extid', ''));
 	$object      = defaults($_REQUEST, 'object', '');
+	$wall        = intval(defaults($_REQUEST, 'wall', 1));
 
 	// Ensure that the user id in a thread always stay the same
 	if (!is_null($parent_user) && in_array($parent_user, [local_user(), 0])) {
@@ -257,6 +255,8 @@ function item_post(App $a) {
 			$str_contact_deny  = $parent_item['deny_cid'];
 			$str_group_deny    = $parent_item['deny_gid'];
 			$private           = $parent_item['private'];
+
+			$wall              = $parent_item['wall'];
 		}
 
 		$pubmail_enabled = defaults($_REQUEST, 'pubmail_enable', false) && !$private;
@@ -325,16 +325,6 @@ function item_post(App $a) {
 		$contact_record = $author;
 	} else {
 		$contact_record = dba::selectFirst('contact', [], ['uid' => $profile_uid, 'self' => true]);
-	}
-
-	$post_type = notags(trim($_REQUEST['type']));
-
-	if ($post_type === 'net-comment' && $parent_item !== null) {
-		if ($parent_item['wall'] == 1) {
-			$post_type = 'wall-comment';
-		} else {
-			$post_type = 'remote-comment';
-		}
 	}
 
 	// Look for any tags and linkify them
@@ -427,6 +417,7 @@ function item_post(App $a) {
 		$contact_id = $private_id;
 		$contact_record = $forum_contact;
 		$_REQUEST['origin'] = false;
+		$wall = 0;
 	}
 
 	/*
@@ -505,11 +496,11 @@ function item_post(App $a) {
 
 	// embedded bookmark or attachment in post? set bookmark flag
 
-	$bookmark = 0;
 	$data = BBCode::getAttachmentData($body);
-	if (preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $body, $match, PREG_SET_ORDER) || isset($data["type"])) {
+	if ((preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $body, $match, PREG_SET_ORDER) || isset($data["type"]))
+		&& ($posttype != Item::PT_PERSONAL_NOTE)) {
+		$posttype = Item::PT_PAGE;
 		$objecttype = ACTIVITY_OBJ_BOOKMARK;
-		$bookmark = 1;
 	}
 
 	$body = bb_translate_video($body);
@@ -554,12 +545,6 @@ function item_post(App $a) {
 		}
 	}
 
-	$wall = 0;
-
-	if (($post_type === 'wall' || $post_type === 'wall-comment') && !count($forum_contact)) {
-		$wall = 1;
-	}
-
 	if (!strlen($verb)) {
 		$verb = ACTIVITY_POST;
 	}
@@ -586,7 +571,6 @@ function item_post(App $a) {
 
 	$datarray = [];
 	$datarray['uid']           = $profile_uid;
-	$datarray['type']          = $post_type;
 	$datarray['wall']          = $wall;
 	$datarray['gravity']       = $gravity;
 	$datarray['network']       = $network;
@@ -616,6 +600,7 @@ function item_post(App $a) {
 	$datarray['file']          = $categories;
 	$datarray['inform']        = $inform;
 	$datarray['verb']          = $verb;
+	$datarray['post-type']     = $posttype;
 	$datarray['object-type']   = $objecttype;
 	$datarray['allow_cid']     = $str_contact_allow;
 	$datarray['allow_gid']     = $str_group_allow;
@@ -624,7 +609,6 @@ function item_post(App $a) {
 	$datarray['private']       = $private;
 	$datarray['pubmail']       = $pubmail_enabled;
 	$datarray['attach']        = $attachments;
-	$datarray['bookmark']      = intval($bookmark);
 
 	// This is not a bug. The item store function changes 'parent-uri' to 'thr-parent' and fetches 'parent-uri' new. (We should change this)
 	$datarray['parent-uri']    = $thr_parent_uri;

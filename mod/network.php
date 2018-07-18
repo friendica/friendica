@@ -589,8 +589,8 @@ function networkThreadedView(App $a, $update, $parent)
 	// desired.
 
 	$sql_post_table = '';
-	$sql_options = (($star) ? " AND `thread`.`starred` " : '');
-	$sql_options .= (($bmark) ? " AND `thread`.`bookmark` " : '');
+	$sql_options = ($star ? " AND `thread`.`starred` " : '');
+	$sql_options .= ($bmark ? sprintf(" AND `thread`.`post-type` = %d ", Item::PT_PAGE) : '');
 	$sql_extra = $sql_options;
 	$sql_extra2 = '';
 	$sql_extra3 = '';

@@ -57,13 +57,9 @@ function notes_content(App $a, $update = false)
 		$o .= status_editor($a, $x, $a->contact['id']);
 	}
 
-	$condition = ["`uid` = ? AND `type` = 'note' AND `gravity` = ? AND NOT `wall`
-		AND `allow_cid` = ? AND `contact-id` = ?",
-		local_user(), GRAVITY_PARENT, '<' . $a->contact['id'] . '>', $a->contact['id']];
+	$condition = ['uid' => local_user(), 'post-type' => Item::PT_PERSONAL_NOTE, 'gravity' => GRAVITY_PARENT,
+		'wall' => false, 'allow_cid' => '<' . $a->contact['id'] . '>', 'contact-id'=> $a->contact['id']];
 
-	$notes = dba::count('item', $condition);
-
-	$a->set_pager_total($notes);
 	$a->set_pager_itemspage(40);
 
 	$params = ['order' => ['created' => true],
@@ -86,6 +82,6 @@ function notes_content(App $a, $update = false)
 		}
 	}
 
-	$o .= paginate($a);
+	$o .= alt_pager($a, count($r));
 	return $o;
 }

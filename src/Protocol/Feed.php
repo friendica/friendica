@@ -190,7 +190,6 @@ class Feed {
 		$header = [];
 		$header["uid"] = $importer["uid"];
 		$header["network"] = NETWORK_FEED;
-		$header["type"] = "remote";
 		$header["wall"] = 0;
 		$header["origin"] = 0;
 		$header["gravity"] = GRAVITY_PARENT;

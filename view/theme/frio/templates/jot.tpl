@@ -1,4 +1,3 @@
-
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
 <button class="btn btn-sm btn-main pull-right" id="jotOpen" aria-label="{{$new_post}}" title="{{$new_post}}" onclick="jotShow();"><i class="fa fa-pencil-square-o fa-2x"></i></button>
 
@@ -70,7 +69,8 @@
 					<div id="profile-jot-banner-end"></div>
 
 					{{* The hidden input fields which submit important values with the post *}}
-					<input type="hidden" name="type" value="{{$ptyp}}" />
+					<input type="hidden" name="jot" value="{{$jot}}" />
+					<input type="hidden" name="post_type" value="{{$posttype}}" />
 					<input type="hidden" name="profile_uid" value="{{$profile_uid}}" />
 					<input type="hidden" name="return" value="{{$return_path}}" />
 					<input type="hidden" name="location" id="jot-location" value="{{$defloc}}" />

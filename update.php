@@ -85,7 +85,6 @@ function update_1189() {
 }
 
 function update_1191() {
-
 	Config::set('system', 'maintenance', 1);
 
 	if (Addon::isEnabled('forumlist')) {
@@ -143,7 +142,6 @@ function update_1191() {
 	Config::set('system', 'maintenance', 0);
 
 	return UPDATE_SUCCESS;
-
 }
 
 function update_1203() {
@@ -231,5 +229,17 @@ function update_1260() {
 function update_1261() {
 	// This fixes the results of an issue in the develop branch of 2018-05.
 	dba::update('contact', ['blocked' => false, 'pending' => false], ['uid' => 0, 'blocked' => true, 'pending' => true]);
+	return UPDATE_SUCCESS;
+}
+
+function update_1278() {
+	Config::set('system', 'maintenance', 1);
+	Config::set('system', 'maintenance_reason', L10n::t('%s: Updating post-type.', DBM::date().' '.date('e')));
+
+	Item::update(['post-type' => Item::PT_PAGE], ['bookmark' => true]);
+	Item::update(['post-type' => Item::PT_PERSONAL_NOTE], ['type' => 'note']);
+
+	Config::set('system', 'maintenance', 0);
+
 	return UPDATE_SUCCESS;
 }

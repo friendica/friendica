@@ -459,7 +459,7 @@ function photos_post(App $a)
 			$arr['uid']           = $page_owner_uid;
 			$arr['uri']           = $uri;
 			$arr['parent-uri']    = $uri;
-			$arr['type']          = 'photo';
+			$arr['post-type']     = Item::PT_IMAGE;
 			$arr['wall']          = 1;
 			$arr['resource-id']   = $p[0]['resource-id'];
 			$arr['contact-id']    = $owner_record['id'];
@@ -626,7 +626,6 @@ function photos_post(App $a)
 					$arr['uid']           = $page_owner_uid;
 					$arr['uri']           = $uri;
 					$arr['parent-uri']    = $uri;
-					$arr['type']          = 'activity';
 					$arr['wall']          = 1;
 					$arr['contact-id']    = $owner_record['id'];
 					$arr['owner-name']    = $owner_record['name'];

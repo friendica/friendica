@@ -780,7 +780,7 @@ class Post extends BaseObject
 				'$return_path' => $a->query_string,
 				'$threaded'    => $this->isThreaded(),
 				'$jsreload'    => '',
-				'$type'        => $conv->getMode() === 'profile' ? 'wall-comment' : 'net-comment',
+				'$wall'        => ($conv->getMode() === 'profile'),
 				'$id'          => $this->getId(),
 				'$parent'      => $this->getId(),
 				'$qcomment'    => $qcomment,

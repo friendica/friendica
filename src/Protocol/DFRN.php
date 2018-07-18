@@ -1017,7 +1017,7 @@ class DFRN
 			XML::addElement($doc, $entry, "dfrn:extid", $item['extid']);
 		}
 
-		if ($item['bookmark']) {
+		if ($item['post-type'] == Item::PT_PAGE) {
 			XML::addElement($doc, $entry, "dfrn:bookmark", "true");
 		}
 
@@ -2308,7 +2308,6 @@ class DFRN
 				|| ($item["verb"] == ACTIVITY_ATTENDMAYBE)
 			) {
 				$is_like = true;
-				$item["type"] = "activity";
 				$item["gravity"] = GRAVITY_ACTIVITY;
 				// only one like or dislike per person
 				// splitted into two queries for performance issues
@@ -2489,7 +2488,7 @@ class DFRN
 		$item["extid"] = XML::getFirstNodeValue($xpath, "dfrn:extid/text()", $entry);
 
 		if (XML::getFirstNodeValue($xpath, "dfrn:bookmark/text()", $entry) == "true") {
-			$item["bookmark"] = true;
+			$item["post-type"] = Item::PT_PAGE;
 		}
 
 		$notice_info = $xpath->query("statusnet:notice_info", $entry);
@@ -2621,7 +2620,6 @@ class DFRN
 		}
 
 		if ($entrytype == DFRN::REPLY_RC) {
-			$item["type"] = "remote-comment";
 			$item["wall"] = 1;
 		} elseif ($entrytype == DFRN::TOP_LEVEL) {
 			if (!isset($item["object-type"])) {
@@ -2829,7 +2827,6 @@ class DFRN
 		$header = [];
 		$header["uid"] = $importer["importer_uid"];
 		$header["network"] = NETWORK_DFRN;
-		$header["type"] = "remote";
 		$header["wall"] = 0;
 		$header["origin"] = 0;
 		$header["contact-id"] = $importer["id"];
