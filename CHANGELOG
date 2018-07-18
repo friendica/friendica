@@ -1,3 +1,61 @@
+Version 2018.08 (2018-xx-xx) [v2018-07-18]
+  Friendica Core:
+    Update to the translation (CS, DE, EN-US, FI, IT, NL, PL, ZH-CN) [translation teams]
+    Update to the documentation [astifter, rebeka-catalinafabrixxm, M-arcus, tobiasd]
+    Enhancements to the database structure, handling and documentation [abanink, Angristan, annando, miqrogroove, tobiasd]
+    Enhancements of unit testing [abanink, rudloff]
+    Enhancements to labeling of UI elements [andyhee, tobiasd]
+    Enhancements to the background workers [annando, miqrogroove, rabuzarus]
+    Enhancements to the PHP7.2 compatibility [annando, miqrogroove, MrPetovan]
+    Enhancements to the content filter [MrPetovan]
+    Enhancements to the hooks provided for addons [abanink]
+    Enhancements to the interaction with public postings [annando]
+    Enhancements to the config storage [frabrixxm]
+    Enhancements of the themes (frio) [hoergen, rabuzarus]
+    Enhancements to the handling of locks [nupplaphil]
+    Enhancements to the redis integration [nupplaphil]
+    Enhancements to the admin panel [JeroenED]
+    Fixed a bug in database optimization [annando]
+    Fixed a bug in the tagcloud widget [annando]
+    Fixed a bug in the daemon mode of the background worker [annando]
+    Fixed a bug in the frio theme that contact filtering [rabuzarus]
+    Fixed a bug that mangeled the display of some additional smileys [abanink]
+    Fixed a bug in generating registration mails [MrPetovan]
+    Fixed a bug that caused blank reshare bodies [MrPetovon]
+    Fixed a bug in the API handling of private mails [fabrixxm]
+    Fixed a bug when calling the mail() function [miqrogroove]
+    Fixed a bug that caused deleted accounts being displayed in the local directory [miqrogroove]
+    Fixed a bug when checking the domain of an email address [VVelox]
+    Fixed a bug that prevented reshares from Twitter to be shown as this [annando]
+    Fixed a bug that caused broken profile links [miqrogroove]
+    Fixed a bug that caused content from unknown accounts to 
+    Added conversation cleanup configuration [miqrogroove]
+    Added support of the usage of internal diaspora links to accounts [annando]
+    Added the possibility for admins to block certain nicknames (e.g. rolenames) [tobiasd]
+    Added the generation of system guid [nupplaphil]
+    Added the possibility for admins to mark a node for explicit content [tobiasd]
+    General code refactoring and beautification work [annando, MrPetovan, Quix0r, tobiasd]
+    Fixation of the position on the network page when new posts arrive [rabuzarus]
+    Ported OpenWebAuth from Hubzilla [rabuzarus]
+
+  Friendica Addons:
+    Update to the translations (CS, EN-US, ZH-CN) [translation teams]
+    General update to use the new item class  [annando, tobiasd]
+    langfilter: Fixed a problem with default values of the filtered languages [tobiasd]
+    added addons:
+      mastodoncustomemojis [MrPetovan]
+    deprecated addons:
+      retriver
+
+  Directory:
+    Enhancements of the health summary [andyhee]
+    Enhancements of the PHP7 compatibility [MrPetovan]
+
+  Closed Issues:
+    1308, 2337, 2675, 4710, 4739, 4923, 4971, 4985, 5066, 5099, 5137,
+    5188, 5202, 5222, 5233, 5243, 5247, 5252, 5257, 5268, 5274, 5275,
+    5278, 5298, 5319, 5322, 5333
+
 Version 2018.05 (2018-06-01)
   Friendica Core:
     Update to the translations (DE, EN-GB, EN-US, FI, IS, IT, NL, PL, RU, ZN CH) [translation teams]
