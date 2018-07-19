@@ -247,6 +247,10 @@ class dba {
 	public static function connected() {
 		$connected = false;
 
+		if (is_null(self::$db)) {
+			return false;
+		}
+
 		switch (self::$driver) {
 			case 'pdo':
 				$r = dba::p("SELECT 1");
