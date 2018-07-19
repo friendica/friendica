@@ -154,25 +154,6 @@ class App
 
 		$this->basepath = rtrim($basepath, DIRECTORY_SEPARATOR);
 
-		// The order of the following calls is important to ensure proper initialization
-		$this->loadConfigFiles();
-
-		$this->loadDatabase();
-
-		$this->determineMode();
-
-		$this->determineUrlPath();
-
-		Config::load();
-
-		if ($this->mode & self::MODE_DBAVAILABLE) {
-			Core\Addon::loadHooks();
-
-			$this->loadAddonConfig();
-		}
-
-		$this->loadDefaultTimezone();
-
 		$this->performance['start'] = microtime(true);
 		$this->performance['database'] = 0;
 		$this->performance['database_write'] = 0;
@@ -193,6 +174,25 @@ class App
 		$this->callstack['file'] = [];
 		$this->callstack['rendering'] = [];
 		$this->callstack['parser'] = [];
+
+		// The order of the following calls is important to ensure proper initialization
+		$this->loadConfigFiles();
+
+		$this->loadDatabase();
+
+		$this->determineMode();
+
+		$this->determineUrlPath();
+
+		Config::load();
+
+		if ($this->mode & self::MODE_DBAVAILABLE) {
+			Core\Addon::loadHooks();
+
+			$this->loadAddonConfig();
+		}
+
+		$this->loadDefaultTimezone();
 
 		$this->page = [
 			'aside' => '',
