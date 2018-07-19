@@ -1196,15 +1196,14 @@ class DBStructure
 						"allow_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed groups"],
 						"deny_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied contact.id"],
 						"deny_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied groups"],
-						// These fields will be moved into some item-delivery-information table
-						"postopts" => ["type" => "text", "comment" => "External post connectors add their network name to this comma-separated string to identify that they should be delivered to these networks during delivery"],
-						"inform" => ["type" => "mediumtext", "comment" => "Additional receivers of this post"],
 						// It is to be decided whether these fields belong to the user or the structure
 						"resource-id" => ["type" => "varchar(32)", "not null" => "1", "default" => "", "comment" => "Used to link other tables to items, it identifies the linked resource (e.g. photo) and if set must also set resource_type"],
 						"event-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "relation" => ["event" => "id"], "comment" => "Used to link to the event.id"],
 						// Could possibly be replaced by the "attach" table?
 						"attach" => ["type" => "mediumtext", "comment" => "JSON structure representing attachments to this item"],
 						// Deprecated fields. Will be removed in upcoming versions
+						"postopts" => ["type" => "text", "comment" => "Deprecated"],
+						"inform" => ["type" => "mediumtext", "comment" => "Deprecated"],
 						"type" => ["type" => "varchar(20)", "comment" => "Deprecated"],
 						"bookmark" => ["type" => "boolean", "comment" => "Deprecated"],
 						"file" => ["type" => "mediumtext", "comment" => "Deprecated"],
