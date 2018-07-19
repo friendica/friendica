@@ -27,7 +27,7 @@ class Expire {
 			logger('Delete expired items', LOGGER_DEBUG);
 			// physically remove anything that has been deleted for more than two months
 			$condition = ["`deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY"];
-			$rows = dba::select('item', ['id', 'iaid', 'icid'],  $condition);
+			$rows = dba::select('item', ['id', 'iaid', 'icid', 'psid'],  $condition);
 			while ($row = dba::fetch($rows)) {
 				dba::delete('item', ['id' => $row['id']]);
 				if (!empty($row['iaid']) && !dba::exists('item', ['iaid' => $row['iaid']])) {
@@ -35,6 +35,11 @@ class Expire {
 				}
 				if (!empty($row['icid']) && !dba::exists('item', ['icid' => $row['icid']])) {
 					dba::delete('item-content', ['id' => $row['icid']]);
+				}
+				// When the permission set will be used in photo and events as well.
+				// this query here needs to be extended.
+				if (!empty($row['psid']) && !dba::exists('item', ['psid' => $row['psid']])) {
+					dba::delete('permissionset', ['id' => $row['psid']]);
 				}
 			}
 			dba::close($rows);
