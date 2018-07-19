@@ -1301,6 +1301,17 @@ class DBStructure
 						"uri" => ["uri(191)"],
 						]
 				];
+		$database["item-delivery-data"] = [
+				"comment" => "Delivery data for items",
+				"fields" => [
+						"iid" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "relation" => ["item" => "id"], "comment" => "Item id"],
+						"postopts" => ["type" => "text", "comment" => "External post connectors add their network name to this comma-separated string to identify that they should be delivered to these networks during delivery"],
+						"inform" => ["type" => "mediumtext", "comment" => "Additional receivers of the linked item"],
+						],
+				"indexes" => [
+						"PRIMARY" => ["iid"],
+						]
+				];
 		$database["locks"] = [
 				"comment" => "",
 				"fields" => [

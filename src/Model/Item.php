@@ -73,6 +73,9 @@ class Item extends BaseObject
 	// Field list for "item-content" table that is not present in the "item" table
 	const CONTENT_FIELDLIST = ['language'];
 
+	// Field list for additional delivery data
+	const DELIVERY_DATA_FIELDLIST = ['postopts', 'inform'];
+
 	// All fields in the item table
 	const ITEM_FIELDLIST = ['id', 'uid', 'parent', 'uri', 'parent-uri', 'thr-parent', 'guid',
 			'contact-id', 'type', 'wall', 'gravity', 'extid', 'icid', 'iaid', 'psid',
@@ -95,7 +98,7 @@ class Item extends BaseObject
 	public static function isLegacyMode()
 	{
 		if (is_null(self::$legacy_mode)) {
-			self::$legacy_mode = (Config::get("system", "post_update_version") < 1276);
+			self::$legacy_mode = (Config::get("system", "post_update_version") < 1279);
 		}
 
 		return self::$legacy_mode;
@@ -180,7 +183,8 @@ class Item extends BaseObject
 
 		// Fetch data from the item-content table whenever there is content there
 		if (self::isLegacyMode()) {
-			foreach (self::MIXED_CONTENT_FIELDLIST as $field) {
+			$legacy_fields = array_merge(self::DELIVERY_DATA_FIELDLIST, self::MIXED_CONTENT_FIELDLIST);
+			foreach ($legacy_fields as $field) {
 				if (empty($row[$field]) && !empty($row['internal-item-' . $field])) {
 					$row[$field] = $row['internal-item-' . $field];
 				}
@@ -512,8 +516,8 @@ class Item extends BaseObject
 
 		$fields['item'] = ['id', 'uid', 'parent', 'uri', 'parent-uri', 'thr-parent', 'guid',
 			'contact-id', 'owner-id', 'author-id', 'type', 'wall', 'gravity', 'extid',
-			'created', 'edited', 'commented', 'received', 'changed', 'postopts',
-			'resource-id', 'event-id', 'tag', 'attach', 'inform', 'post-type',
+			'created', 'edited', 'commented', 'received', 'changed',
+			'resource-id', 'event-id', 'tag', 'attach', 'post-type',
 			'file', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid',
 			'private', 'pubmail', 'moderated', 'visible', 'starred', 'bookmark',
 			'unseen', 'deleted', 'origin', 'forum_mode', 'mention', 'global',
@@ -524,6 +528,8 @@ class Item extends BaseObject
 		$fields['item-activity'] = ['activity', 'activity' => 'internal-activity'];
 
 		$fields['item-content'] = array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST);
+
+		$fields['item-delivery-data'] = self::DELIVERY_DATA_FIELDLIST;
 
 		$fields['author'] = ['url' => 'author-link', 'name' => 'author-name',
 			'thumb' => 'author-avatar', 'nick' => 'author-nick', 'network' => 'author-network'];
@@ -634,6 +640,10 @@ class Item extends BaseObject
 			$joins .= " LEFT JOIN `item-content` ON `item-content`.`id` = `item`.`icid`";
 		}
 
+		if (strpos($sql_commands, "`item-delivery-data`.") !== false) {
+			$joins .= " LEFT JOIN `item-delivery-data` ON `item-delivery-data`.`iid` = `item`.`id`";
+		}
+
 		if ((strpos($sql_commands, "`parent-item`.") !== false) || (strpos($sql_commands, "`parent-author`.") !== false)) {
 			$joins .= " STRAIGHT_JOIN `item` AS `parent-item` ON `parent-item`.`id` = `item`.`parent`";
 		}
@@ -670,7 +680,8 @@ class Item extends BaseObject
 		foreach ($fields as $table => $table_fields) {
 			foreach ($table_fields as $field => $select) {
 				if (empty($selected) || in_array($select, $selected)) {
-					if (self::isLegacyMode() && in_array($select, self::MIXED_CONTENT_FIELDLIST)) {
+					$legacy_fields = array_merge(self::DELIVERY_DATA_FIELDLIST, self::MIXED_CONTENT_FIELDLIST);
+					if (self::isLegacyMode() && in_array($select, $legacy_fields)) {
 						$selection[] = "`item`.`".$select."` AS `internal-item-" . $select . "`";
 					}
 					if (is_int($field)) {
@@ -783,6 +794,12 @@ class Item extends BaseObject
 			$files = '';
 		}
 
+		$delivery_data = ['postopts' => defaults($fields, 'postopts', ''),
+			'inform' => defaults($fields, 'inform', '')];
+
+		$fields['postopts'] = null;
+		$fields['inform'] = null;
+
 		if (!empty($fields)) {
 			$success = dba::update('item', $fields, $condition);
 
@@ -797,6 +814,7 @@ class Item extends BaseObject
 		$rows = dba::affected_rows();
 
 		while ($item = dba::fetch($items)) {
+
 			// This part here can safely be removed when the legacy fields in the item had been removed
 			if (empty($item['uri-hash']) && !empty($item['uri']) && !empty($item['created'])) {
 
@@ -886,6 +904,8 @@ class Item extends BaseObject
 					dba::update('item', ['file' => ''], ['id' => $item['id']]);
 				}
 			}
+
+			self::updateDeliveryData($item['id'], $delivery_data);
 
 			self::updateThread($item['id']);
 
@@ -1032,6 +1052,8 @@ class Item extends BaseObject
 		if (!self::exists(["`uri` = ? AND `uid` != 0 AND NOT `deleted`", $item['uri']])) {
 			self::delete(['uri' => $item['uri'], 'uid' => 0, 'deleted' => false], $priority);
 		}
+
+		dba::delete('item-delivery-data', ['iid' => $item['id']]);
 
 		// If it's the parent of a comment thread, kill all the kids
 		if ($item['id'] == $item['parent']) {
@@ -1626,6 +1648,12 @@ class Item extends BaseObject
 			self::insertContent($item);
 		}
 
+		$delivery_data = ['postopts' => defaults($item, 'postopts', ''),
+			'inform' => defaults($item, 'inform', '')];
+
+		unset($item['postopts']);
+		unset($item['inform']);
+
 		dba::transaction();
 		$ret = dba::insert('item', $item);
 
@@ -1650,6 +1678,10 @@ class Item extends BaseObject
 			$spoolpath = get_spoolpath();
 			if ($spoolpath != "") {
 				$spool = $spoolpath.'/'.$file;
+
+				// Ensure to have the removed data from above again in the item array
+				$item = array_merge($item, $delivery_data);
+
 				file_put_contents($spool, json_encode($item));
 				logger("Item wasn't stored - Item was spooled into file ".$file, LOGGER_DEBUG);
 			}
@@ -1748,6 +1780,10 @@ class Item extends BaseObject
 			self::updateThread($parent_id);
 		}
 
+		$delivery_data['iid'] = $current_post;
+
+		self::insertDeliveryData($delivery_data);
+
 		dba::commit();
 
 		/*
@@ -1777,6 +1813,35 @@ class Item extends BaseObject
 		}
 
 		return $current_post;
+	}
+
+	/**
+	 * @brief Insert a new item delivery data entry
+	 *
+	 * @param array $item The item fields that are to be inserted
+	 */
+	private static function insertDeliveryData($delivery_data)
+	{
+		if (empty($delivery_data['iid']) || (empty($delivery_data['postopts']) && empty($delivery_data['inform']))) {
+			return;
+		}
+
+		dba::insert('item-delivery-data', $delivery_data);
+	}
+
+	/**
+	 * @brief Update an existing item delivery data entry
+	 *
+	 * @param integer $id The item id that is to be updated
+	 * @param array $item The item fields that are to be inserted
+	 */
+	private static function updateDeliveryData($id, $delivery_data)
+	{
+		if (empty($id) || (empty($delivery_data['postopts']) && empty($delivery_data['inform']))) {
+			return;
+		}
+
+		dba::update('item-delivery-data', $delivery_data, ['iid' => $id], true);
 	}
 
 	/**
@@ -2072,6 +2137,8 @@ class Item extends BaseObject
 			unset($item['mention']);
 			unset($item['origin']);
 			unset($item['starred']);
+			unset($item['postopts']);
+			unset($item['inform']);
 			if ($item['uri'] == $item['parent-uri']) {
 				$item['contact-id'] = $item['owner-id'];
 			} else {
@@ -2131,6 +2198,8 @@ class Item extends BaseObject
 		unset($item['mention']);
 		unset($item['origin']);
 		unset($item['starred']);
+		unset($item['postopts']);
+		unset($item['inform']);
 		$item['contact-id'] = Contact::getIdForURL($item['author-link']);
 
 		$public_shadow = self::insert($item, false, false, true);

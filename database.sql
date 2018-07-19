@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1278
+-- DB_UPDATE_VERSION 1279
 -- ------------------------------------------
 
 
@@ -587,6 +587,16 @@ CREATE TABLE IF NOT EXISTS `item-content` (
 	 UNIQUE INDEX `uri-plink-hash` (`uri-plink-hash`),
 	 INDEX `uri` (`uri`(191))
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Content for all posts';
+
+--
+-- TABLE item-delivery-data
+--
+CREATE TABLE IF NOT EXISTS `item-delivery-data` (
+	`iid` int unsigned NOT NULL COMMENT 'Item id',
+	`postopts` text COMMENT 'External post connectors add their network name to this comma-separated string to identify that they should be delivered to these networks during delivery',
+	`inform` mediumtext COMMENT 'Additional receivers of the linked item',
+	 PRIMARY KEY(`iid`)
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Delivery data for items';
 
 --
 -- TABLE locks

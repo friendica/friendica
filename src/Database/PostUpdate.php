@@ -32,7 +32,7 @@ class PostUpdate
 		if (!self::update1206()) {
 			return;
 		}
-		if (!self::update1278()) {
+		if (!self::update1279()) {
 			return;
 		}
 	}
@@ -228,20 +228,21 @@ class PostUpdate
 	 *
 	 * @return bool "true" when the job is done
 	 */
-	private static function update1278()
+	private static function update1279()
 	{
 		// Was the script completed?
-		if (Config::get("system", "post_update_version") >= 1278) {
+		if (Config::get("system", "post_update_version") >= 1279) {
 			return true;
 		}
 
-		$id = Config::get("system", "post_update_version_1278_id", 0);
+		$id = Config::get("system", "post_update_version_1279_id", 0);
 
 		logger("Start from item " . $id, LOGGER_DEBUG);
 
 		$fields = array_merge(Item::MIXED_CONTENT_FIELDLIST, ['network', 'author-id', 'owner-id', 'tag', 'file',
 			'author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link', 'id',
-			'uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid', 'post-type', 'bookmark', 'type']);
+			'uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid', 'post-type', 'bookmark', 'type',
+			'inform']);
 
 		$start_id = $id;
 		$rows = 0;
@@ -285,12 +286,12 @@ class PostUpdate
 		}
 		dba::close($items);
 
-		Config::set("system", "post_update_version_1278_id", $id);
+		Config::set("system", "post_update_version_1279_id", $id);
 
 		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
 
 		if ($start_id == $id) {
-			Config::set("system", "post_update_version", 1278);
+			Config::set("system", "post_update_version", 1279);
 			logger("Done", LOGGER_DEBUG);
 			return true;
 		}
