@@ -1153,9 +1153,9 @@ function photos_content(App $a)
 		}
 
 		if ($order_field === 'posted') {
-			$order =  [L10n::t('Show Newest First'), 'photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album)];
+			$order =  [L10n::t('Show Newest First'), 'photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album), 'oldest'];
 		} else {
-			$order = [L10n::t('Show Oldest First'), 'photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album) . '?f=&order=posted'];
+			$order = [L10n::t('Show Oldest First'), 'photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($album) . '?f=&order=posted', 'newest'];
 		}
 
 		$photos = [];

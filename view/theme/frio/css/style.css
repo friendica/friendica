@@ -1235,17 +1235,19 @@ div#sidebar-group-list {
 .group-edit-tool {
     color: #555;
 }
-aside #group-sidebar .group-edit-tool,
-aside #saved-search-list .savedsearchdrop {
-    opacity: 0.1;
-    transition: all 0.25s ease-in-out;
-}
-aside #group-sidebar .group-edit-tool:hover,
-aside #saved-search-list .saved-search-li:hover .savedsearchdrop {
+
+.faded-icon {
     color: #555;
-    opacity: 0.8;
-    transition: all 0.25s ease-in-out;
+    opacity: 0.3;
+    transition: all 0.1s ease-in-out;
 }
+.faded-icon:hover {
+    opacity: 1;
+}
+.icon-padding {
+    margin-left: 20px;
+}
+
 aside #group-sidebar .sidebar-group-li .group-edit-tool:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop:hover {
     opacity: 1;

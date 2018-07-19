@@ -1,17 +1,29 @@
-
 <div class="generic-page-wrapper">
 
+	<div class="pull-left">
 	<h3 id="photo-album-title">{{$album}}</h3>
+	</div>
 
-	<div class="photo-album-actions">
-	{{if $can_post}}
-		<a class="photos-upload-link" href="{{$upload.1}}">{{$upload.0}}</a>
+	<div class="photo-album-actions pull-right">
+		{{if $can_post}}
+		<a class="photos-upload-link" href="{{$upload.1}}" title="{{$upload.0}}" data-toggle="tooltip">
+		<i class="faded-icon fa fa-plus"></i></a>
 		{{/if}}
-		{{if $can_post && $edit}}<span role="presentation" class="separator">&nbsp;•&nbsp;</span>{{/if}}
 		{{if $edit}}
-		<a id="album-edit-link" href="{{$edit.1}}" title="{{$edit.0}}">{{$edit.0}}</a>
+		<span class="icon-padding"> </span>
+		<a id="album-edit-link" href="{{$edit.1}}" title="{{$edit.0}}" data-toggle="tooltip">
+		<i class="faded-icon fa fa-pencil"></i></a>
 		{{/if}}
-		<a class="photos-order-link" href="{{$order.1}}" title="{{$order.0}}">{{$order.0}}</a>
+		{{if ! $noorder}}
+		<span class="icon-padding"> </span>
+		<a class="photos-order-link" href="{{$order.1}}" title="{{$order.0}}" data-toggle="tooltip">
+		{{if $order.2 == "newest"}}
+		<i class="faded-icon fa fa-sort-numeric-desc"></i>
+		{{else}}
+		<i class="faded-icon fa fa-sort-numeric-asc"></i>
+		{{/if}}
+		</a>
+		{{/if}}
 	</div>
 	<div class="clear"></div>
 
@@ -26,4 +38,4 @@
 	{{$paginate}}
 </div>
 
-<script type="text/javascript">$(document).ready(function() { loadingPage = false; justifyPhotos('photo-album-contents-{{$album_id}}'); });</script>
+<script type="text/javascript">$(document).ready(function() { loadingPage = false; justifyPhotos(); });</script>

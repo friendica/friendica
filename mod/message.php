@@ -108,8 +108,23 @@ function message_content(App $a)
 	$myprofile = System::baseUrl() . '/profile/' . $a->user['nickname'];
 
 	$tpl = get_markup_template('mail_head.tpl');
+	if ($a->argc > 1 && $a->argv[1] == 'new') {
+		$button = [
+			'label' => L10n::t('Discard'),
+			'url' => '/message',
+			'sel' => 'close',
+		];
+	} else {
+		$button = [
+			'label' => L10n::t('New Message'),
+			'url' => '/message/new',
+			'sel' => 'new',
+			'accesskey' => 'm',
+		];
+	}
 	$header = replace_macros($tpl, [
 		'$messages' => L10n::t('Messages'),
+		'$button' => $button,
 	]);
 
 	if (($a->argc == 3) && ($a->argv[1] === 'drop' || $a->argv[1] === 'dropconv')) {
