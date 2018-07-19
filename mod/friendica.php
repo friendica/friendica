@@ -68,7 +68,7 @@ function friendica_init(App $a)
 		];
 
 		echo json_encode($data);
-		Process::stop();
+		Process::stop(Process::STOP_EXIT);
 	}
 }
 

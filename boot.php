@@ -867,7 +867,7 @@ function goaway($path)
 	}
 
 	header("Location: $url");
-	Process::stop();
+	Process::stop(Process::STOP_EXIT);
 }
 
 /**
