@@ -75,7 +75,7 @@ class Item extends BaseObject
 
 	// All fields in the item table
 	const ITEM_FIELDLIST = ['id', 'uid', 'parent', 'uri', 'parent-uri', 'thr-parent', 'guid',
-			'contact-id', 'type', 'wall', 'gravity', 'extid', 'icid', 'iaid',
+			'contact-id', 'type', 'wall', 'gravity', 'extid', 'icid', 'iaid', 'psid',
 			'created', 'edited', 'commented', 'received', 'changed', 'verb',
 			'postopts', 'plink', 'resource-id', 'event-id', 'tag', 'attach', 'inform',
 			'file', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'post-type',
@@ -514,7 +514,7 @@ class Item extends BaseObject
 			'contact-id', 'owner-id', 'author-id', 'type', 'wall', 'gravity', 'extid',
 			'created', 'edited', 'commented', 'received', 'changed', 'postopts',
 			'resource-id', 'event-id', 'tag', 'attach', 'inform', 'post-type',
-			'file', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
+			'file', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid',
 			'private', 'pubmail', 'moderated', 'visible', 'starred', 'bookmark',
 			'unseen', 'deleted', 'origin', 'forum_mode', 'mention', 'global',
 			'id' => 'item_id', 'network', 'icid', 'iaid', 'id' => 'internal-iid',
