@@ -43,11 +43,6 @@ class Expire
 				if (!empty($row['psid']) && !DBA::exists('item', ['psid' => $row['psid']])) {
 					DBA::delete('permissionset', ['id' => $row['psid']]);
 				}
-				// When the permission set will be used in photo and events as well.
-				// this query here needs to be extended.
-				if (!empty($row['psid']) && !dba::exists('item', ['psid' => $row['psid']])) {
-					dba::delete('permissionset', ['id' => $row['psid']]);
-				}
 			}
 			DBA::close($rows);
 
