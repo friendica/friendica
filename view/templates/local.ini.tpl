@@ -4,10 +4,10 @@
 ; documentation of their data type and behavior.
 
 [database]
-hostname = {{$dbhost}}
-username = {{$dbuser}}
-password = {{$dbpass}}
-database = {{$dbdata}}
+hostname = "{{$dbhost}}"
+username = "{{$dbuser}}"
+password = "{{$dbpass}}"
+database = "{{$dbdata}}"
 charset = utf8mb4
 
 ; ****************************************************************
@@ -15,9 +15,9 @@ charset = utf8mb4
 ; ****************************************************************
 
 [config]
-php_path = {{$phpath}}
+php_path = "{{$phpath}}"
 
-admin_email = {{$adminmail}}
+admin_email = "{{$adminmail}}"
 
 sitename = Friendica Social Network
 
@@ -27,11 +27,11 @@ register_text =
 max_import_size = 200000
 
 [system]
-urlpath = {{$urlpath}}
+urlpath = "{{$urlpath}}"
 
-default_timezone = {{$timezone}}
+default_timezone = "{{$timezone}}"
 
-language = {{$language}}
+language = "{{$language}}"
 
 allowed_themes = vier,quattro,duepuntozero,smoothly,frio
 theme = vier

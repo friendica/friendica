@@ -6,6 +6,9 @@ namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\CacheDriverFactory;
 
+/**
+ * @requires extension memcached
+ */
 class MemcachedCacheDriverTest extends MemoryCacheTest
 {
 	/**
@@ -15,24 +18,13 @@ class MemcachedCacheDriverTest extends MemoryCacheTest
 
 	protected function getInstance()
 	{
-		if (class_exists('Memcached')) {
-			try {
-				$this->cache = CacheDriverFactory::create('memcached');
-			} catch (\Exception $exception) {
-				throw new \Exception("Memcached - TestCase failed: " . $exception->getMessage(), $exception->getCode(), $exception);
-			}
-			return $this->cache;
-		} else {
-			$this->markTestSkipped('Memcached driver isn\'t available');
-			return null;
-		}
+		$this->cache = CacheDriverFactory::create('memcached');
+		return $this->cache;
 	}
 
 	public function tearDown()
 	{
-		if (class_exists('Memcached')) {
-			$this->cache->clear(false);
-		}
+		$this->cache->clear(false);
 		parent::tearDown();
 	}
 }

@@ -8,6 +8,7 @@ Database config values overwrite the same file config values.
 
 ## File configuration
 
+WARNING: some characters `?{}|&~![()^"` should not be used in the keys or values. If one of those character is required put the value between double quotes (eg. password = "let&me&in")
 The configuration format for file configuration is an INI string returned from a PHP file.
 This prevents your webserver from displaying your private configuration it interprets the configuration files and displays nothing.
 

@@ -69,6 +69,18 @@ class ApiTest extends DatabaseTest
 	}
 
 	/**
+	 * Cleanup variables used by tests.
+	 */
+	protected function tearDown()
+	{
+		parent::tearDown();
+
+		$app = get_app();
+		$app->argc = 1;
+		$app->argv = ['home'];
+	}
+
+	/**
 	 * Assert that an user array contains expected keys.
 	 * @param array $user User array
 	 * @return void
@@ -1202,7 +1214,8 @@ class ApiTest extends DatabaseTest
 	{
 		$_FILES = [
 			'media' => [
-				'id' => 666
+				'id' => 666,
+				'tmp_name' => 'tmp_name'
 			]
 		];
 		api_media_upload();
