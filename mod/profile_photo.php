@@ -70,6 +70,7 @@ function profile_photo_post(App $a)
 		$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = %d LIMIT 1", dbesc($image_id),
 			dbesc(local_user()), intval($scale));
 
+		$url = System::baseUrl() . '/profile/' . $a->user['nickname'];
 		if (DBM::is_result($r)) {
 
 			$base_image = $r[0];
@@ -121,7 +122,6 @@ function profile_photo_post(App $a)
 
 				info(L10n::t('Shift-reload the page or clear browser cache if the new photo does not display immediately.') . EOL);
 				// Update global directory in background
-				$url = System::baseUrl() . '/profile/' . $a->user['nickname'];
 				if ($url && strlen(Config::get('system', 'directory'))) {
 					Worker::add(PRIORITY_LOW, "Directory", $url);
 				}
@@ -132,7 +132,7 @@ function profile_photo_post(App $a)
 			}
 		}
 
-		goaway(System::baseUrl() . '/profiles');
+		goaway($url);
 		return; // NOTREACHED
 	}
 
@@ -163,7 +163,9 @@ function profile_photo_post(App $a)
 
 	$ph->orient($src);
 	@unlink($src);
-	profile_photo_crop_ui_head($a, $ph);
+
+	$imagecrop = profile_photo_crop_ui_head($a, $ph);
+	goaway(System::baseUrl() . '/profile_photo/use/' . $imagecrop['hash']);
 }
 
 function profile_photo_content(App $a)
@@ -182,12 +184,7 @@ function profile_photo_content(App $a)
 
 	$imagecrop = [];
 
-	if ($a->argv[1] == 'use') {
-		if ($a->argc < 3) {
-			notice(L10n::t('Permission denied.') . EOL);
-			return;
-		};
-
+	if ($a->argv[1] == 'use' && $a->argc >= 3) {
 //		check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
 
 		$resource_id = $a->argv[2];
@@ -221,7 +218,7 @@ function profile_photo_content(App $a)
 				Worker::add(PRIORITY_LOW, "Directory", $url);
 			}
 
-			goaway(System::baseUrl() . '/profiles');
+			goaway(System::baseUrl() . '/profile/' . $a->user['nickname']);
 			return; // NOTREACHED
 		}
 		$ph = new Image($r[0]['data'], $r[0]['type']);
@@ -234,7 +231,7 @@ function profile_photo_content(App $a)
 	);
 
 
-	if (!empty($imagecrop)) {
+	if (empty($imagecrop)) {
 		$tpl = get_markup_template('profile_photo.tpl');
 
 		$o = replace_macros($tpl,
