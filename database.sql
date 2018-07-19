@@ -486,6 +486,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`unseen` boolean NOT NULL DEFAULT '1' COMMENT 'item has not been seen',
 	`mention` boolean NOT NULL DEFAULT '0' COMMENT 'The owner of this item was mentioned in it',
 	`forum_mode` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
+	`psid` int unsigned COMMENT 'ID of the permission set of this post',
 	`allow_cid` mediumtext COMMENT 'Access Control - list of allowed contact.id \'<19><78>\'',
 	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed groups',
 	`deny_cid` mediumtext COMMENT 'Access Control - list of denied contact.id',

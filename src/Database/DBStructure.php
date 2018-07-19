@@ -1192,6 +1192,7 @@ class DBStructure
 						"forum_mode" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						// User specific fields. Should possible be replaced with something different
 						// Possibly we could move some of these fields into the thread table
+						"psid" => ["type" => "int unsigned", "relation" => ["permissionset" => "id"], "comment" => "ID of the permission set of this post"],
 						"allow_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed contact.id '<19><78>'"],
 						"allow_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed groups"],
 						"deny_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied contact.id"],

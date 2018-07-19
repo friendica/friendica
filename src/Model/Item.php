@@ -17,6 +17,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBM;
+use Friendica\Model\PermissionSet;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
@@ -761,8 +762,8 @@ class Item extends BaseObject
 			}
 		}
 
-		$author_owner_fields = ['author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link'];
-		foreach ($author_owner_fields as $field) {
+		$clear_fields = ['bookmark', 'type', 'author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link'];
+		foreach ($clear_fields as $field) {
 			if (array_key_exists($field, $fields)) {
 				$fields[$field] = null;
 			}
@@ -1615,6 +1616,10 @@ class Item extends BaseObject
 		} else {
 			$files = '';
 		}
+
+		// Creates the permission set
+		// Currently we only store the data but don't using it
+		$item['psid'] = PermissionSet::fetchIDForPost($item);
 
 		// We are doing this outside of the transaction to avoid timing problems
 		if (!self::insertActivity($item)) {
