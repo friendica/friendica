@@ -24,8 +24,10 @@ class PermissionSet extends BaseObject
 	public static function fetchIDForPost($postarray)
 	{
 		$condition = ['uid' => $postarray['uid'],
-			'allow_cid' => $postarray['allow_cid'], 'allow_gid' => $postarray['allow_gid'],
-			'deny_cid' => $postarray['deny_cid'], 'deny_gid' => $postarray['deny_gid']];
+			'allow_cid' => self::sortPermissions($postarray['allow_cid']),
+			'allow_gid' => self::sortPermissions($postarray['allow_gid']),
+			'deny_cid' => self::sortPermissions($postarray['deny_cid']),
+			'deny_gid' => self::sortPermissions($postarray['deny_gid'])];
 
 		$set = dba::selectFirst('permissionset', ['id'], $condition);
 
@@ -35,5 +37,24 @@ class PermissionSet extends BaseObject
 			$set = dba::selectFirst('permissionset', ['id'], $condition);
 		}
 		return $set['id'];
+	}
+
+	private static function sortPermissions($permissionlist)
+	{
+		$cleaned_list = trim($permissionlist, '<>');
+
+		if (empty($cleaned_list)) {
+			return $permissionlist;
+		}
+
+		$elements = explode('><', $cleaned_list);
+
+		if (count($elements) <= 1) {
+			return $permissionlist;
+		}
+
+		asort($elements);
+
+		return '<' . implode('><', $elements) . '>';
 	}
 }
