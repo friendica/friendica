@@ -16,6 +16,7 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\Model\PermissionSet;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
