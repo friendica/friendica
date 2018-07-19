@@ -849,7 +849,7 @@ function check_addons(App $a)
  */
 function killme()
 {
-	exit();
+	Process::stop(Process::STOP_EXIT);
 }
 
 /**
