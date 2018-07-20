@@ -2755,7 +2755,7 @@ class Diaspora
 	 *
 	 * @return int The message id of the newly created item
 	 */
-	private static function receiveStatusMessage(array $importer, $data, $xml)
+	private static function receiveStatusMessage(array $importer, SimpleXMLElement $data, $xml)
 	{
 		$author = notags(unxmlify($data->author));
 		$guid = notags(unxmlify($data->guid));
