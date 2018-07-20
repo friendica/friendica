@@ -69,8 +69,6 @@ HELP;
 				$output = DBStructure::update(true, false);
 				break;
 			case "update":
-				$output = DBStructure::update(true, true);
-
 				$build = Core\Config::get('system', 'build');
 				if (empty($build)) {
 					Core\Config::set('system', 'build', DB_UPDATE_VERSION);
@@ -80,7 +78,17 @@ HELP;
 				$stored = intval($build);
 				$current = intval(DB_UPDATE_VERSION);
 
-				// run any left update_nnnn functions in update.php
+				// run the pre_update_nnnn functions in update.php
+				for ($x = $stored; $x < $current; $x ++) {
+					$r = run_update_function($x, false);
+					if (!$r) {
+						break;
+					}
+				}
+
+				$output = DBStructure::update(true, true);
+
+				// run the update_nnnn functions in update.php
 				for ($x = $stored; $x < $current; $x ++) {
 					$r = run_update_function($x);
 					if (!$r) {

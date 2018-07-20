@@ -703,10 +703,17 @@ function update_db()
 				return;
 			}
 
+			// run the pre_update_nnnn functions in update.php
+			for ($x = $stored + 1; $x <= $current; $x++) {
+				$r = run_update_function($x, false);
+				if (!$r) {
+					break;
+				}
+			}
+
 			Config::set('database', 'dbupdate_' . DB_UPDATE_VERSION, time());
 
-			// run update routine
-			// it update the structure in one call
+			// update the structure in one call
 			$retval = DBStructure::update(false, true);
 			if ($retval) {
 				DBStructure::updateFail(
@@ -718,7 +725,7 @@ function update_db()
 				Config::set('database', 'dbupdate_' . DB_UPDATE_VERSION, 'success');
 			}
 
-			// run any left update_nnnn functions in update.php
+			// run the update_nnnn functions in update.php
 			for ($x = $stored + 1; $x <= $current; $x++) {
 				$r = run_update_function($x);
 				if (!$r) {
@@ -731,9 +738,11 @@ function update_db()
 	return;
 }
 
-function run_update_function($x)
+function run_update_function($x, $post_update = true)
 {
-	if (function_exists('update_' . $x)) {
+	$funcname = ($post_update ? 'update_' : 'pre_update_');
+
+	if (function_exists($funcname . $x)) {
 		// There could be a lot of processes running or about to run.
 		// We want exactly one process to run the update command.
 		// So store the fact that we're taking responsibility
@@ -741,15 +750,15 @@ function run_update_function($x)
 		// If the update fails or times-out completely you may need to
 		// delete the config entry to try again.
 
-		$t = Config::get('database', 'update_' . $x);
+		$t = Config::get('database', $funcname . $x);
 		if (!is_null($t)) {
 			return false;
 		}
-		Config::set('database', 'update_' . $x, time());
+		Config::set('database', $funcname . $x, time());
 
 		// call the specific update
 
-		$func = 'update_' . $x;
+		$func = $funcname . $x;
 		$retval = $func();
 
 		if ($retval) {
@@ -760,13 +769,17 @@ function run_update_function($x)
 			);
 			return false;
 		} else {
-			Config::set('database', 'update_' . $x, 'success');
-			Config::set('system', 'build', $x);
+			Config::set('database', $funcname . $x, 'success');
+			if ($post_update) {
+				Config::set('system', 'build', $x);
+			}
 			return true;
 		}
 	} else {
-		Config::set('database', 'update_' . $x, 'success');
-		Config::set('system', 'build', $x);
+		Config::set('database', $funcname . $x, 'success');
+		if ($post_update) {
+			Config::set('system', 'build', $x);
+		}
 		return true;
 	}
 }
