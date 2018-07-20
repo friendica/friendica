@@ -217,7 +217,7 @@ a.btn:hover {
     font-size: 12px;
 }
 .btn-primary {
-    background: $nav_bg;
+    background: $nav_bg !important;
     color: $btn_primary_color !important;
 }
 .btn-primary:hover, .btn-primary:focus {
@@ -3256,6 +3256,50 @@ section .profile-match-wrapper {
 .mod-home.is-not-singleuser .login-panel-content,
 .mod-login .login-panel-content {
     background-color: rgba(255,255,255,.85);
+}
+
+.qq-upload-button {
+    background: $nav_bg !important;
+    color: $btn_primary_color !important;
+    float: none;
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    border-radius: 3px;
+    outline: 0!important;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    color: inherit;
+    width: 100% !important;
+}
+
+.qq-upload-drop-area {
+    background: white !important;
+    float: none;
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    border-radius: 3px;
+    outline: 0!important;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    color: inherit;
+    width: 100% !important;
+    display: block !important;
+    position: relative !important;
+    border: black 1px dashed !important;
+    margin-bottom: 5px !important;
+    margin-top: 15px !important;
 }
 
 /* Medium devices (desktops, 992px and up) */
