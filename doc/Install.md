@@ -137,7 +137,11 @@ For more information during the installation, you can use this command line opti
 
 ### Prepare .htaccess file
 
-Copy .htaccess-dist to .htaccess (be careful under stupid M$ Windows) to have working mod-rewrite again. If you have installed Friendica into a sub directory, like /friendica/ set this path in RewriteBase accordingly.
+Copy .htaccess-dist to .htaccess (be careful under Windows) to have working mod-rewrite again. If you have installed Friendica into a sub directory, like /friendica/ set this path in RewriteBase accordingly.
+
+Examples:
+    $ cp .htacces-dist .htaccess (Linux, leave the $ out)
+    > copy .htaccess-dist .htacces (Windows, leave the > out)
 
 ### Set up the worker
 
