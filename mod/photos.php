@@ -1040,7 +1040,7 @@ function photos_content(App $a)
 
 		$albumselect = '';
 
-		$albumselect .= '<option value="" ' . (!$selname ? ' selected="selected" ' : '') . '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>';
+		$albumselect .= '<option value="" ' . (!$selname ? ' selected="selected" ' : '') . '>&lt;current year&gt;</option>';
 		if (count($a->data['albums'])) {
 			foreach ($a->data['albums'] as $album) {
 				if (($album['album'] === '') || ($album['album'] === 'Contact Photos') || ($album['album'] === L10n::t('Contact Photos'))) {
@@ -1076,7 +1076,7 @@ function photos_content(App $a)
 			'$usage' => $usage_message,
 			'$nickname' => $a->data['user']['nickname'],
 			'$newalbum' => L10n::t('New album name: '),
-			'$existalbumtext' => L10n::t('or existing album name: '),
+			'$existalbumtext' => L10n::t('or select existing album:'),
 			'$nosharetext' => L10n::t('Do not show a status post for this upload'),
 			'$albumselect' => $albumselect,
 			'$permissions' => L10n::t('Permissions'),
