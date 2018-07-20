@@ -33,6 +33,8 @@ require_once 'include/dba.php';
  * 1. Create a function "update_4712()" here in the update.php
  * 2. Apply the needed structural changes in src/Database/DBStructure.php
  * 3. Set DB_UPDATE_VERSION in boot.php to 4712.
+ *
+ * If you need to run a script before the database update, name the function "pre_update_4712()"
  */
 
 function update_1178() {
