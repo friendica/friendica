@@ -806,7 +806,6 @@ class DBStructure
 
 		$sql .= ";";
 
-		print $sql . "\n";
 		$stmt = DBA::p($sql);
 
 		if (is_bool($stmt)) {
