@@ -644,7 +644,7 @@ class DBA
 
 		$fields = [];
 
-		if (is_null($condition) || empty($condition)) {
+		if (empty($condition)) {
 			return DBStructure::existsTable($table);
 		}
 
