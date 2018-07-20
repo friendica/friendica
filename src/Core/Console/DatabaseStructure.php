@@ -80,7 +80,7 @@ HELP;
 
 				// run the pre_update_nnnn functions in update.php
 				for ($x = $stored; $x < $current; $x ++) {
-					$r = run_update_function($x, false);
+					$r = run_update_function($x, 'pre_update');
 					if (!$r) {
 						break;
 					}
@@ -90,7 +90,7 @@ HELP;
 
 				// run the update_nnnn functions in update.php
 				for ($x = $stored; $x < $current; $x ++) {
-					$r = run_update_function($x);
+					$r = run_update_function($x, 'update');
 					if (!$r) {
 						break;
 					}

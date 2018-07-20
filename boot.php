@@ -705,7 +705,7 @@ function update_db()
 
 			// run the pre_update_nnnn functions in update.php
 			for ($x = $stored + 1; $x <= $current; $x++) {
-				$r = run_update_function($x, false);
+				$r = run_update_function($x, 'pre_update');
 				if (!$r) {
 					break;
 				}
@@ -727,7 +727,7 @@ function update_db()
 
 			// run the update_nnnn functions in update.php
 			for ($x = $stored + 1; $x <= $current; $x++) {
-				$r = run_update_function($x);
+				$r = run_update_function($x, 'update');
 				if (!$r) {
 					break;
 				}
@@ -738,11 +738,11 @@ function update_db()
 	return;
 }
 
-function run_update_function($x, $post_update = true)
+function run_update_function($x, $prefix)
 {
-	$funcname = ($post_update ? 'update_' : 'pre_update_');
+	$funcname = $prefix . '_' . $x;
 
-	if (function_exists($funcname . $x)) {
+	if (function_exists($funcname)) {
 		// There could be a lot of processes running or about to run.
 		// We want exactly one process to run the update command.
 		// So store the fact that we're taking responsibility
@@ -750,16 +750,14 @@ function run_update_function($x, $post_update = true)
 		// If the update fails or times-out completely you may need to
 		// delete the config entry to try again.
 
-		$t = Config::get('database', $funcname . $x);
+		$t = Config::get('database', $funcname);
 		if (!is_null($t)) {
 			return false;
 		}
-		Config::set('database', $funcname . $x, time());
+		Config::set('database', $funcname, time());
 
 		// call the specific update
-
-		$func = $funcname . $x;
-		$retval = $func();
+		$retval = $funcname();
 
 		if ($retval) {
 			//send the administrator an e-mail
@@ -769,14 +767,14 @@ function run_update_function($x, $post_update = true)
 			);
 			return false;
 		} else {
-			Config::set('database', $funcname . $x, 'success');
+			Config::set('database', $funcname, 'success');
 			if ($post_update) {
 				Config::set('system', 'build', $x);
 			}
 			return true;
 		}
 	} else {
-		Config::set('database', $funcname . $x, 'success');
+		Config::set('database', $funcname, 'success');
 		if ($post_update) {
 			Config::set('system', 'build', $x);
 		}
