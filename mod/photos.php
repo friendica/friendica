@@ -220,7 +220,7 @@ function photos_post(App $a)
 			// Update the photo albums cache
 			Photo::clearAlbumCache($page_owner_uid);
 
-			$newurl = str_replace(bin2hex($album), bin2hex($newalbum), $_SESSION['photo_return']);
+			$newurl = System::baseUrl() . '/photos/' . $a->user['nickname'] . '/album/' . bin2hex($newalbum);
 			goaway($newurl);
 			return; // NOTREACHED
 		}

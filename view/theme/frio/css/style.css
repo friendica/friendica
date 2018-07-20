@@ -2470,6 +2470,13 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 
 /* photos */
+#photo-album-edit-name-label {
+    width: 100%;
+}
+.photo-album-edit-name {
+    width: 60%;
+}
+
 .photo-album-actions {
     margin-bottom: 10px;
 }
