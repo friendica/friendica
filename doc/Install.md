@@ -139,9 +139,11 @@ For more information during the installation, you can use this command line opti
 
 Copy .htaccess-dist to .htaccess (be careful under Windows) to have working mod-rewrite again. If you have installed Friendica into a sub directory, like /friendica/ set this path in RewriteBase accordingly.
 
-Examples:
-    $ cp .htacces-dist .htaccess (Linux, leave the $ out)
-    > copy .htaccess-dist .htacces (Windows, leave the > out)
+Example:
+
+    cp .htacces-dist .htaccess
+
+*Note*: Do **not** rename the .htaccess-dist file as it is tracked by GIT and renaming will cause a dirty working directory.
 
 ### Set up the worker
 
